@@ -13,7 +13,7 @@ import { TermPick, type Term } from './attrs'
 interface EntOpt {
   ent_id: string
   ent_log_nm: string
-  mdl_subj: { subj_nm: string }
+  mdl_subj: { subj_nm: string; lgc_sts_cd?: string }
 }
 interface Rel {
   rel_id: string
@@ -118,7 +118,10 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
   const rule = f.prnt_ent_id && f.chld_ent_id ? relError(f) : null
   // 중복 사전 확인(REL_DUP) : 로드된 목록에 같은 부모·자식·관계명 조합이 있으면 등록 막음(수정 중인 자기 자신 제외)
   const dup = !!f.prnt_ent_id && !!f.chld_ent_id && rels.some((x) => x.rel_id !== edit?.rel_id && x.prnt_ent_id === f.prnt_ent_id && x.chld_ent_id === f.chld_ent_id && (x.rel_nm ?? '') === f.rel_nm)
-  const ready = !!f.prnt_ent_id && !!f.chld_ent_id && !rule && !dup && !locked
+  // 잠금 = 화면이 넘긴 값 또는 고른 부모·자식 엔터티의 주제영역이 작성완료(sql/031 MLK01 과 같은 기준) — #31 가드가 호출처 미전달로 꺼져 있던 문제(R-P5, 2026-10-24 전수 점검)
+  const subjDone = (id: string) => opts.find((o) => o.ent_id === id)?.mdl_subj.lgc_sts_cd === 'CMPTN'
+  const lockedNow = locked || subjDone(f.prnt_ent_id) || subjDone(f.chld_ent_id)
+  const ready = !!f.prnt_ent_id && !!f.chld_ent_id && !rule && !dup && !lockedNow
   const nm = (id: string) => opts.find((o) => o.ent_id === id)?.ent_log_nm ?? '?'
 
   const save = async (e: React.FormEvent) => {
@@ -247,7 +250,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
               {f.prnt_ent_id && f.chld_ent_id ? `${nm(f.prnt_ent_id)} ${relNotation(f)} ${nm(f.chld_ent_id)}` : ''}
               {rule && <span className="ml-2 font-sans text-red-700">{RULE_MSG[rule] ?? rule}</span>}
               {dup && <span className="ml-2 font-sans text-red-700">같은 부모·자식·관계명의 관계가 이미 있습니다</span>}
-              {locked && <span className="ml-2 font-sans text-red-700">작성완료 주제영역입니다 — 완료 취소 후 편집하십시오</span>}
+              {lockedNow && <span className="ml-2 font-sans text-red-700">작성완료 주제영역입니다 — 완료 취소 후 편집하십시오</span>}
             </span>
             <span className="flex gap-2">
               {edit && (

@@ -108,9 +108,10 @@ export function simpleCrud(c: Cfg) {
     }
   }
 
-  const remove = async (req: Request, { params }: Ctx) => {
+  // pre = 호출 측이 이미 확인한 권한(같은 요청 재확인 방지, R-P2 2026-10-24 전수 점검) — 같은 권한(c.perm)으로 확인한 것만 넘길 것
+  const remove = async (req: Request, { params }: Ctx, pre?: Awaited<ReturnType<typeof requireAreaRole>>) => {
     const p = await params
-    const auth = await requireAreaRole(p.areaId, c.perm ?? 'SETTINGS')
+    const auth = pre ?? (await requireAreaRole(p.areaId, c.perm ?? 'SETTINGS'))
     if (auth instanceof NextResponse) return auth
     try {
       const cur = await current(p.areaId, p[c.idParam], new URL(req.url).searchParams.get('ver_no'))

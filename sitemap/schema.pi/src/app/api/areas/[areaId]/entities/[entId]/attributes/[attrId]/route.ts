@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { apiError, audit, dbError, requireAreaRole } from '@/lib/api'
-import { nextSeq } from '@/lib/model-attr'
+import { isSeqConflict, nextSeq } from '@/lib/model-attr'
 
 type Ctx = { params: Promise<{ areaId: string; entId: string; attrId: string }> }
 const YN = z.enum(['Y', 'N'])
@@ -88,8 +88,15 @@ export async function PATCH(req: Request, { params }: Ctx) {
     }
     const uid = auth.user.usr_id
     const set = { ...(swap ? { term_id: swap } : {}), pk_yn: pk ? 'Y' : 'N', pk_seq: pkSeq, esntl_yn: esntl, ...(b.data.attr_desc !== undefined ? { attr_desc: b.data.attr_desc } : {}), ...(b.data.attr_asst_nm !== undefined ? { attr_asst_nm: b.data.attr_asst_nm || null } : {}), ver_no: b.data.ver_no + 1, modr_id: uid }
-    const { data, error } = await db().from('mdl_attr').update(set).eq('attr_id', attrId).eq('ver_no', b.data.ver_no).eq('del_yn', 'N').select('attr_id, term_id, ver_no, pk_yn, pk_seq, esntl_yn, attr_desc')
-    if (error) return dbError(error, 'ATTR_DUP')
+    const upd = () => db().from('mdl_attr').update(set).eq('attr_id', attrId).eq('ver_no', b.data.ver_no).eq('del_yn', 'N').select('attr_id, term_id, ver_no, pk_yn, pk_seq, esntl_yn, attr_desc')
+    let { data, error } = await upd()
+    // PK 순번이 동시 변경과 겹치면 다시 계산해 1회 재시도(R-P5, #29 형제, 2026-10-24 전수 점검)
+    if (error && isSeqConflict(error) && set.pk_seq != null && cur.pk_seq == null) {
+      set.pk_seq = (await nextSeq(entId)).pk
+      ;({ data, error } = await upd())
+    }
+    if (error) return isSeqConflict(error) ? dbError(error) : dbError(error, 'ATTR_DUP')
+    if (!data) return dbError({ message: 'update returned no row' })
     if (!data.length) return apiError('VERSION_CONFLICT', 409)
     await audit({ area_id: areaId, tgt_tp_cd: 'ATTR', tgt_id: attrId, act_cd: 'UPD', bfr_val: cur, aftr_val: { ...cur, ...set }, usr_id: uid })
     // 부모 식별자 용어 교체 → 같은 용어로 상속한 자식 속성도 교체(사용자가 미리보기 후 propagate 선택)

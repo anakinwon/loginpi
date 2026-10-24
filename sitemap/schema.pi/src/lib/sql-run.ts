@@ -292,8 +292,9 @@ async function runOra(t: Target, pwd: string, stmts: Stmt[], kinds: Kind[], o: R
 }
 
 // 접속 열기 공통(실행·메타) — 같은 분류체계·서버 직접·조회 전용 계정(DA 아니면)·스위치·키·비밀번호·공인 주소 확인
-export async function openConn(areaId: string, connId: string, perms: readonly Perm[]): Promise<{ c: NonNullable<Awaited<ReturnType<typeof getConn>>>; d: Dialect; t: Target; pwd: string } | NextResponse> {
-  const c = await getConn(areaId, connId)
+// pre = 호출 측이 이미 조회한 접속(같은 요청 재조회 방지, R-P2 2026-10-24 전수 점검) — 없으면 여기서 조회
+export async function openConn(areaId: string, connId: string, perms: readonly Perm[], pre?: Awaited<ReturnType<typeof getConn>>): Promise<{ c: NonNullable<Awaited<ReturnType<typeof getConn>>>; d: Dialect; t: Target; pwd: string } | NextResponse> {
+  const c = pre !== undefined ? pre : await getConn(areaId, connId)
   if (!c) return failRes({ code: 'NOT_FOUND', status: 404 })
   if (c.exec_mthd_cd !== 'SRV') return failRes({ code: 'SQL_AGT_UNSUPPORTED', status: 400 })
   // DA 아닌 역할 = 조회 전용 계정 접속만(fail-closed) — 어휘 판정·READ ONLY 트랜잭션은 사용자 함수 안 부작용을 못 막고, 메타도 그 계정 권한으로 열람
@@ -354,7 +355,7 @@ export async function runEditor(areaId: string, uid: string, perms: readonly Per
   const mode: Mode = b.commit ? 'TX' : manual && (write || prefix.length) ? 'TRY' : write ? 'AUTO' : 'READ'
   const histMode = mode === 'TX' ? 'CMIT' : mode === 'TRY' ? 'TRY' : mode === 'AUTO' ? 'WRITE' : 'READ'
 
-  const oc = await openConn(areaId, b.conn_id, perms)
+  const oc = await openConn(areaId, b.conn_id, perms, cn)
   if (oc instanceof NextResponse) return oc
   const { c, t, pwd } = oc
 

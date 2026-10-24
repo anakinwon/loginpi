@@ -10,7 +10,7 @@ import { entSchema, MDL_LVLS, prepareEnt, type MdlLvl } from '@/lib/model'
 import { entNames, type EntWord } from '@/lib/model-name'
 
 type Ctx = { params: Promise<{ areaId: string }> }
-const COLS = 'ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, ent_asst_nm, dic_ids, mdl_lvl_cd, ver_no, regr_id, reg_dtm, mdl_subj!inner(subj_nm, subj_abbr_nm, up_subj_id), mdl_prj!mdl_ent_mdl_prj_id_fkey(tbl_pfx_txt, trgt_dbms_cd)'
+const COLS = 'ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, ent_asst_nm, dic_ids, mdl_lvl_cd, ver_no, regr_id, reg_dtm, mdl_subj!inner(subj_nm, subj_abbr_nm, up_subj_id, lgc_sts_cd), mdl_prj!mdl_ent_mdl_prj_id_fkey(tbl_pfx_txt, trgt_dbms_cd)'
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params

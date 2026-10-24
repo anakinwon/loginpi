@@ -77,6 +77,21 @@ export async function attrSuggestInput(areaId: string, ent: NonNullable<Awaited<
 }
 
 // 다음 표시 순서·PK 순서
+// 순번 유일 인덱스 충돌 여부 — 23505 이면서 메시지·상세에 순번 컬럼(attr_seq/pk_seq)이 나올 때만(용어 중복 ATTR_DUP 과 구분)
+export const isSeqConflict = (e: { code?: string; message?: string; details?: string }) => e.code === '23505' && /attr_seq|pk_seq/.test(`${e.message ?? ''} ${e.details ?? ''}`)
+
+// 속성 등록 — 동시 등록으로 순번이 겹치면 다시 계산해 1회 재시도(R-P5 — #29 를 FK·역할 상속에도, 2026-10-24 전수 점검). row 의 순번은 실제 저장값으로 바뀜
+export async function insertAttr(row: { ent_id: string; attr_seq: number; pk_seq: number | null }) {
+  let r = await db().from('mdl_attr').insert(row).select('attr_id, ver_no').single<{ attr_id: string; ver_no: number }>()
+  if (r.error && isSeqConflict(r.error)) {
+    const s = await nextSeq(row.ent_id)
+    row.attr_seq = s.attr
+    if (row.pk_seq != null) row.pk_seq = s.pk
+    r = await db().from('mdl_attr').insert(row).select('attr_id, ver_no').single<{ attr_id: string; ver_no: number }>()
+  }
+  return r
+}
+
 export async function nextSeq(entId: string) {
   const { data, error } = await db().from('mdl_attr').select('attr_seq, pk_seq').eq('ent_id', entId).eq('del_yn', 'N')
   if (error) throw error

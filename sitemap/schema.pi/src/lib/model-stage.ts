@@ -2,9 +2,9 @@
 // 순서 : 엔터티 작성완료(관문 통과) → 엔터티 선택 물리 전환 → 테이블 작성완료(남은 동기화 0) → ERD 작성완료(sql/037) → DDL. 완료 = DB 트리거 편집 잠금(sql/032·037), 수정은 완료 취소 후
 import { db } from './db'
 import { inChunks } from './paging'
-import { findDgm, loadDgm, type DgmLvl } from './model-dgm'
+import { loadDgm, type DgmLvl } from './model-dgm'
 import { loadLogical } from './model-logical'
-import { loadPhy, syncPlan } from './model-phy'
+import { loadPhy, syncPlan, syncPre } from './model-phy'
 import { checkLogical } from './modelpi/normalize'
 import { dgmWhy, phyDgmWhy, scopeWhy, type Sts } from './modelpi/stage'
 
@@ -93,8 +93,10 @@ export async function setPhy(areaId: string, prjId: string, mdlId: string, tblId
   const plan = new Map<string, number>()
   if (sts === 'CMPTN') {
     const targets = p.tables.filter((t) => tblIds.includes(t.phy_tbl_id) && t.phy_sts_cd !== sts && lgc.get(t.ent_id) === 'CMPTN' && !phyDgmWhy(sts, { ent_id: t.ent_id, subj_id: subjOf.get(t.ent_id) ?? '' }, lock).length)
+    // 엔터티 상태·논리 변환·관계 자식은 모든 테이블이 같은 입력 — 한 번만 계산해 테이블별 계획에 재사용(R-P2, 2026-10-24 전수 점검)
+    const pre = targets.length ? await syncPre(areaId, prjId, p) : null
     const ns = await Promise.all(targets.map(async (t) => {
-      const sp = await syncPlan(areaId, prjId, p, 'sync', t.phy_tbl_id)
+      const sp = await syncPlan(areaId, prjId, p, 'sync', t.phy_tbl_id, pre)
       return sp ? sp.ops.length + sp.addFk.length + sp.delFk.length : 0
     }))
     targets.forEach((t, i) => plan.set(t.phy_tbl_id, ns[i]))
@@ -155,7 +157,7 @@ async function entSubj(entIds: string[]) {
 export async function setDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl, phyId: string | null, sts: Sts, uid: string): Promise<StageRes | null> {
   const d = await loadDgm(areaId, prjId, subjId, lvl, phyId)
   if (!d) return null
-  const dgm = await findDgm(areaId, prjId, subjId, lvl)
+  const dgm = d.dgm // loadDgm 이 조회한 같은 다이어그램 — 재조회하지 않음(R-P2, 2026-10-24 전수 점검)
   const nm = dgm?.dgm_nm ?? 'ERD'
   if (dgm?.dgm_sts_cd === sts) return { done: [], fail: [] }
   if (sts === 'CMPTN') {

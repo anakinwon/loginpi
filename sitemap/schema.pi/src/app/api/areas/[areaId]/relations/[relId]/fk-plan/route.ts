@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
-import { nextSeq } from '@/lib/model-attr'
+import { insertAttr, isSeqConflict, nextSeq } from '@/lib/model-attr'
 import { applyFkSteps, fkState } from '@/lib/model-fk'
 import { fkWant } from '@/lib/modelpi/fk'
 
@@ -49,24 +49,31 @@ export async function POST(req: Request, { params }: Ctx) {
     let roled = 0
     const need = new Set(p.needs.map((n) => n.src_attr_id))
     const w = fkWant(p.rel)
-    for (const r of b.roles ?? []) {
+    // 역할 용어는 한 번에 조회, 순번은 상속 적용 뒤 한 번만 계산해 올려 씀(R-P2, 2026-10-24 전수 점검)
+    const roles = b.roles ?? []
+    const [tq, seq] = roles.length
+      ? await Promise.all([db().from('std_term').select('term_id, term_log_nm').in('term_id', [...new Set(roles.map((r) => r.term_id))]).eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM'), nextSeq(p.rel.chld_ent_id)])
+      : [null, { attr: 1, pk: 1 }]
+    if (tq?.error) throw tq.error
+    const termBy = new Map((tq?.data ?? []).map((x) => [x.term_id as string, x as { term_id: string; term_log_nm: string }]))
+    for (const r of roles) {
       const nm = p.needs.find((n) => n.src_attr_id === r.src_attr_id)?.term_log_nm ?? r.src_attr_id
       if (!need.has(r.src_attr_id)) {
         fail.push({ term_log_nm: nm, reason: 'ROLE_NOT_NEEDED' })
         continue
       }
-      const t = await db().from('std_term').select('term_id, term_log_nm').eq('term_id', r.term_id).eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').maybeSingle()
-      if (t.error) throw t.error
+      const t = { data: termBy.get(r.term_id) ?? null }
       if (!t.data) {
         fail.push({ term_log_nm: nm, reason: 'ATTR_TERM_INVALID' })
         continue
       }
       const pk = w.pk && !p.self
-      const seq = await nextSeq(p.rel.chld_ent_id)
       const row = { area_id: areaId, ent_id: p.rel.chld_ent_id, term_id: r.term_id, attr_seq: seq.attr, pk_yn: pk ? 'Y' : 'N', pk_seq: pk ? seq.pk : null, esntl_yn: pk || w.esntl ? 'Y' : 'N', fk_rel_id: relId, src_attr_id: r.src_attr_id, regr_id: uid, modr_id: uid }
-      const { data, error } = await db().from('mdl_attr').insert(row).select('attr_id').single()
-      if (error) {
-        fail.push({ term_log_nm: t.data.term_log_nm, reason: error.code === '23505' ? 'ATTR_DUP' : (error.code ?? 'DB') })
+      const { data, error } = await insertAttr(row)
+      seq.attr = Math.max(seq.attr, row.attr_seq + 1)
+      if (row.pk_seq != null) seq.pk = Math.max(seq.pk, row.pk_seq + 1)
+      if (error || !data) {
+        fail.push({ term_log_nm: t.data.term_log_nm, reason: error?.code === '23505' && !isSeqConflict(error) ? 'ATTR_DUP' : (error?.code ?? 'DB') })
         continue
       }
       await audit({ area_id: areaId, tgt_tp_cd: 'ATTR', tgt_id: data.attr_id, act_cd: 'INS', aftr_val: { ...row, fk_plan: 'role', role_of: nm }, usr_id: uid })

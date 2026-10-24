@@ -108,8 +108,11 @@ export function TermPick({ api, areaId, picked, onPick, label, initialQ }: { api
   )
 }
 
-export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: { api: string; areaId: string; entId: string; entNm: string; editor: boolean; onChanged?: () => void }) {
+export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onChanged }: { api: string; areaId: string; entId: string; entNm: string; editor: boolean; onChanged?: () => void }) {
   const base = `${api}/entities/${entId}/attributes`
+  // 작성완료 주제영역의 엔터티 = 서버(MLK01)뿐 아니라 화면도 편집 막음(R-P5, 2026-10-24 전수 점검)
+  const [locked, setLocked] = useState(false)
+  const editor = canEdit && !locked
   const [items, setItems] = useState<Attr[]>([])
   const [sug, setSug] = useState<{ pk: Cand[]; required: Cand[]; warn: string[]; must?: Must }>({ pk: [], required: [], warn: [] })
   const [chk, setChk] = useState<Set<string>>(new Set())
@@ -121,7 +124,10 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
 
   const load = useCallback(async () => {
     const [a, s] = await Promise.all([piFetch(base).then((r) => r.json()), piFetch(`${base}/suggest`).then((r) => r.json())])
-    if (a.ok) setItems(a.items)
+    if (a.ok) {
+      setItems(a.items)
+      setLocked(!!a.locked)
+    }
     if (s.ok) {
       setSug({ pk: s.pk, required: s.required, warn: s.warn, must: s.must })
       // 기본 체크 = 용어가 있는 주식별자·필수 후보(선택 FK 는 해제)
@@ -469,6 +475,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
         </tbody>
         </table>
       </div>
+      {canEdit && locked && <p className="text-xs text-red-700">작성완료 주제영역의 엔터티입니다 — 완료 취소 후 편집하십시오</p>}
       {editor && (
         <div className="flex flex-wrap items-center gap-2 rounded border border-[#d5ddec] bg-white p-2">
           <span className="font-semibold text-[#1f3a68]">＋ 속성 추가</span>

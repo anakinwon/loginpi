@@ -44,7 +44,7 @@ export async function DELETE(req: Request, ctx: Ctx) {
   const mode = new URL(req.url).searchParams.get('fk') === 'del' ? 'del' : 'keep'
   const auth = await requireAreaRole(areaId, 'MODEL_EDIT') // 권한 먼저(관계 삭제 뒤 권한 오류로 응답이 어긋나지 않게)
   if (auth instanceof NextResponse) return auth
-  const res = await relCrud.remove(req, ctx)
+  const res = await relCrud.remove(req, ctx, auth) // 위에서 확인한 같은 권한(MODEL_EDIT) 재사용
   if (res.status !== 200) return res
   const uid = auth.user.usr_id
   const set = mode === 'del' ? { del_yn: 'Y', del_dtm: new Date().toISOString(), modr_id: uid } : { fk_rel_id: null, src_attr_id: null, modr_id: uid }
@@ -54,6 +54,7 @@ export async function DELETE(req: Request, ctx: Ctx) {
     console.error('[relations/delete] 상속 속성 처리 실패', relId, error.message)
     return NextResponse.json({ ok: true, partial: true, fk_mode: mode, fk_attrs: null, message: '관계는 삭제했지만 상속 속성 처리에 실패했습니다 — 속성 패널에서 확인하십시오' })
   }
-  for (const a of data) await audit({ area_id: areaId, tgt_tp_cd: 'ATTR', tgt_id: a.attr_id as string, act_cd: mode === 'del' ? 'DEL' : 'UPD', aftr_val: { ...a, ...set, rel_id: relId, fk_mode: mode }, usr_id: uid })
+  // 감사 이력은 서로 독립 — 동시 기록(R-P2, 2026-10-24 전수 점검)
+  await Promise.all(data.map((a) => audit({ area_id: areaId, tgt_tp_cd: 'ATTR', tgt_id: a.attr_id as string, act_cd: mode === 'del' ? 'DEL' : 'UPD', aftr_val: { ...a, ...set, rel_id: relId, fk_mode: mode }, usr_id: uid })))
   return NextResponse.json({ ok: true, fk_mode: mode, fk_attrs: data.length })
 }

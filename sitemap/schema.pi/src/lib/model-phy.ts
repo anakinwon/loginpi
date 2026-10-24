@@ -145,9 +145,16 @@ export async function phyDdlInput(areaId: string, prjId: string, p: NonNullable<
 
 // 동기화 계획(S5) — 저장 모델 vs 현재 논리 변환
 // 범위(sync) = 작성중 테이블 중 엔터티가 작성완료(또는 논리 삭제)인 것 — 논리 편집 중·물리 작성완료 테이블은 건드리지 않음. all = 전환된 테이블 전체(차이 보기), only = 테이블 1개
-export async function syncPlan(areaId: string, prjId: string, p: NonNullable<Awaited<ReturnType<typeof loadPhy>>>, mode: 'sync' | 'all' = 'sync', only: string | string[] | null = null) {
+// 동기화 계획의 공통 입력(엔터티 상태·논리 변환·관계 자식) — 테이블 여러 개를 따로 계획할 때 한 번만 계산해 넘김(R-P2)
+export async function syncPre(areaId: string, prjId: string, p: NonNullable<Awaited<ReturnType<typeof loadPhy>>>) {
   // 엔터티 상태와 현재 논리 변환은 서로 독립 — 함께 조회(R-P1)
   const [info, plan] = await Promise.all([entInfoOf(p.tables.map((t) => t.ent_id)), phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, new Set(p.tables.map((t) => t.ent_id)))])
+  const relChld = plan ? await relChldOf([...new Set([...p.fks.map((f) => f.rel_id), ...plan.fks.map((f) => f.rel_id)])]) : new Map<string, string>()
+  return { info, plan, relChld }
+}
+
+export async function syncPlan(areaId: string, prjId: string, p: NonNullable<Awaited<ReturnType<typeof loadPhy>>>, mode: 'sync' | 'all' = 'sync', only: string | string[] | null = null, pre: Awaited<ReturnType<typeof syncPre>> | null = null) {
+  const { info, plan, relChld } = pre ?? (await syncPre(areaId, prjId, p))
   let prev = p.tables
   if (mode === 'sync') prev = prev.filter((t) => t.phy_sts_cd === 'WRT' && (info.get(t.ent_id)?.del_yn === 'Y' || info.get(t.ent_id)?.lgc_sts_cd === 'CMPTN'))
   if (only) {
@@ -162,7 +169,6 @@ export async function syncPlan(areaId: string, prjId: string, p: NonNullable<Awa
   const ops = planSync(prev as unknown as StoredTbl[], next)
   const have = new Map(p.fks.map((f) => [f.rel_id, f]))
   const want = new Set(plan.fks.map((f) => f.rel_id))
-  const relChld = await relChldOf([...new Set([...p.fks.map((f) => f.rel_id), ...plan.fks.map((f) => f.rel_id)])])
   // FK 삭제·추가 = 범위 안 자식 테이블만
   const delFk = p.fks.filter((f) => !want.has(f.rel_id) && prevEnts.has(relChld.get(f.rel_id) ?? ''))
   const taken = new Set(p.fks.filter((f) => want.has(f.rel_id)).map((f) => f.fk_nm))

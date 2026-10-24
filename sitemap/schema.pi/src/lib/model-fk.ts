@@ -2,7 +2,7 @@
 // 사용처 : /relations/[relId]/fk-plan(미리보기·적용·역할명), /relations/[relId]/resolve-nm(N:M 해소 후 두 식별 관계 상속)
 import { db } from './db'
 import { audit } from './api'
-import { listAttrs, nextSeq } from './model-attr'
+import { insertAttr, isSeqConflict, listAttrs, nextSeq } from './model-attr'
 import { fkNeeds, fkPlan, type FkChildIn, type FkRelIn, type FkStep } from './modelpi/fk'
 
 export type FkChildRow = FkChildIn & { ver_no: number; pk_seq: number | null; std_term: { term_log_nm: string } | null }
@@ -24,20 +24,23 @@ export async function applyFkSteps(areaId: string, st: NonNullable<Awaited<Retur
   const relId = st.rel.rel_id
   const done: FkStep[] = []
   const fail: { term_log_nm: string; reason: string }[] = []
+  // 순번은 한 번만 계산해 단계마다 올려 씀(R-P2 — 단계마다 자식 속성 전체 조회 반복 제거, 2026-10-24 전수 점검)
+  const seq = steps.length ? await nextSeq(st.rel.chld_ent_id) : { attr: 1, pk: 1 }
   for (const s of steps) {
     if (s.kind === 'add') {
-      const seq = await nextSeq(st.rel.chld_ent_id)
       const row = { area_id: areaId, ent_id: st.rel.chld_ent_id, term_id: s.term_id, attr_seq: seq.attr, pk_yn: s.pk ? 'Y' : 'N', pk_seq: s.pk ? seq.pk : null, esntl_yn: s.pk || s.esntl ? 'Y' : 'N', fk_rel_id: relId, src_attr_id: s.src_attr_id, regr_id: uid, modr_id: uid }
-      const { data, error } = await db().from('mdl_attr').insert(row).select('attr_id').single()
-      if (error) {
-        fail.push({ term_log_nm: s.term_log_nm, reason: error.code === '23505' ? 'ATTR_DUP' : (error.code ?? 'DB') })
+      const { data, error } = await insertAttr(row)
+      seq.attr = Math.max(seq.attr, row.attr_seq + 1)
+      if (row.pk_seq != null) seq.pk = Math.max(seq.pk, row.pk_seq + 1)
+      if (error || !data) {
+        fail.push({ term_log_nm: s.term_log_nm, reason: error?.code === '23505' && !isSeqConflict(error) ? 'ATTR_DUP' : (error?.code ?? 'DB') })
         continue
       }
       await audit({ area_id: areaId, tgt_tp_cd: 'ATTR', tgt_id: data.attr_id, act_cd: 'INS', aftr_val: { ...row, fk_plan: 'add' }, usr_id: uid })
     } else {
       const cur = st.child.find((a) => a.attr_id === s.attr_id)
       if (!cur) continue
-      const pkSeq = s.pk ? (cur.pk_seq ?? (await nextSeq(st.rel.chld_ent_id)).pk) : null
+      const pkSeq = s.pk ? (cur.pk_seq ?? seq.pk++) : null
       const set = { fk_rel_id: relId, src_attr_id: s.src_attr_id, pk_yn: s.pk ? 'Y' : 'N', pk_seq: pkSeq, esntl_yn: s.pk || s.esntl ? 'Y' : 'N', ver_no: cur.ver_no + 1, modr_id: uid }
       const { data, error } = await db().from('mdl_attr').update(set).eq('attr_id', s.attr_id).eq('ver_no', cur.ver_no).eq('del_yn', 'N').select('attr_id')
       if (error || !data.length) {

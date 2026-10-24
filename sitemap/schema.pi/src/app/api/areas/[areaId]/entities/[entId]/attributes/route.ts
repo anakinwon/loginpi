@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
-import { getEnt, listAttrs, nextSeq } from '@/lib/model-attr'
+import { getEnt, insertAttr, isSeqConflict, listAttrs, nextSeq } from '@/lib/model-attr'
 
 type Ctx = { params: Promise<{ areaId: string; entId: string }> }
 const YN = z.enum(['Y', 'N'])
@@ -16,9 +16,6 @@ const schema = z.object({
   src_attr_id: z.string().uuid().nullable().optional(), // 상속 원천 = 관계 부모의 주식별자(역할명 상속, sql/027)
   attr_desc: z.string().trim().max(4000).nullable().optional(),
 })
-// 순번 유일 인덱스 충돌 여부 — 23505 이면서 메시지·상세에 순번 컬럼(attr_seq/pk_seq)이 나올 때만
-const isSeqConflict = (e: { code?: string; message?: string; details?: string }) =>
-  e.code === '23505' && /attr_seq|pk_seq/.test(`${e.message ?? ''} ${e.details ?? ''}`)
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId, entId } = await params
@@ -26,7 +23,11 @@ export async function GET(_req: Request, { params }: Ctx) {
   if (auth instanceof NextResponse) return auth
   if (!z.string().uuid().safeParse(entId).success) return apiError('INVALID_INPUT', 400)
   try {
-    return NextResponse.json({ ok: true, items: await listAttrs(areaId, entId) })
+    // locked = 엔터티의 주제영역이 작성완료(sql/031 MLK01) — 화면이 먼저 편집을 막게 함께 내려줌(R-P5, 2026-10-24 전수 점검)
+    const [items, s] = await Promise.all([listAttrs(areaId, entId), db().from('mdl_ent').select('mdl_subj!inner(lgc_sts_cd)').eq('ent_id', entId).eq('area_id', areaId).maybeSingle()])
+    if (s.error) throw s.error
+    const locked = (s.data?.mdl_subj as unknown as { lgc_sts_cd: string } | null)?.lgc_sts_cd === 'CMPTN'
+    return NextResponse.json({ ok: true, items, locked })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }
@@ -76,16 +77,8 @@ export async function POST(req: Request, { params }: Ctx) {
       regr_id: uid,
       modr_id: uid,
     }
-    let { data, error } = await db().from('mdl_attr').insert(row).select('attr_id, ver_no').single()
-    // 동시 등록으로 순번이 겹치면 순번을 다시 계산해 1회 재시도
-    if (error && isSeqConflict(error)) {
-      const seq2 = await nextSeq(entId)
-      row.attr_seq = seq2.attr
-      row.pk_seq = pk ? seq2.pk : null
-      const retry = await db().from('mdl_attr').insert(row).select('attr_id, ver_no').single()
-      data = retry.data
-      error = retry.error
-    }
+    // 동시 등록으로 순번이 겹치면 공용 함수가 다시 계산해 1회 재시도
+    const { data, error } = await insertAttr(row)
     // 순번 충돌이 남아 있으면 일반 오류, 용어 중복일 때만 ATTR_DUP
     if (error) return isSeqConflict(error) ? dbError(error) : dbError(error, 'ATTR_DUP')
     if (!data) return dbError({ message: 'insert returned no row' })
