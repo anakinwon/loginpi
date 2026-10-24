@@ -60,6 +60,8 @@ export async function payTipPiReward(paymentId: string): Promise<void> {
   try {
     const createRes = await fetch(PI_PAYMENTS_URL, {
       method: 'POST',
+      // Pi A2U 결제 API 상한 10초 — 실패는 기존 재시도 경로(R-P4 결제 예외, 2026-10-24)
+      signal: AbortSignal.timeout(10_000),
       headers: {
         Authorization: `Key ${apiKey}`,
         'Content-Type': 'application/json',
@@ -82,6 +84,8 @@ export async function payTipPiReward(paymentId: string): Promise<void> {
 
     const approveRes = await fetch(`${PI_PAYMENTS_URL}/${payoutId}/approve`, {
       method: 'POST',
+      // Pi A2U 결제 API 상한 10초 — 실패는 기존 재시도 경로(R-P4 결제 예외, 2026-10-24)
+      signal: AbortSignal.timeout(10_000),
       headers: { Authorization: `Key ${apiKey}` },
     })
     if (!approveRes.ok)
@@ -91,6 +95,8 @@ export async function payTipPiReward(paymentId: string): Promise<void> {
 
     const completeRes = await fetch(`${PI_PAYMENTS_URL}/${payoutId}/complete`, {
       method: 'POST',
+      // Pi A2U 결제 API 상한 10초 — 실패는 기존 재시도 경로(R-P4 결제 예외, 2026-10-24)
+      signal: AbortSignal.timeout(10_000),
       headers: { Authorization: `Key ${apiKey}` },
     })
     if (!completeRes.ok)

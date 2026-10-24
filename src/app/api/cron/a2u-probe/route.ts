@@ -77,6 +77,8 @@ export async function GET(request: NextRequest) {
   // A2U 생성 프로브
   const createRes = await fetch(PI_PAYMENTS_URL, {
     method: 'POST',
+    // Pi A2U 결제 API 상한 10초(R-P4 결제 예외, 2026-10-24)
+    signal: AbortSignal.timeout(10_000),
     headers: {
       Authorization: `Key ${apiKey}`,
       'Content-Type': 'application/json',
@@ -104,7 +106,11 @@ export async function GET(request: NextRequest) {
       if (paymentId) {
         const cancelRes = await fetch(
           `${PI_PAYMENTS_URL}/${paymentId}/cancel`,
-          { method: 'POST', headers: { Authorization: `Key ${apiKey}` } },
+          {
+            method: 'POST',
+            headers: { Authorization: `Key ${apiKey}` },
+            signal: AbortSignal.timeout(10_000),
+          },
         )
         cancelled = cancelRes.ok
       }

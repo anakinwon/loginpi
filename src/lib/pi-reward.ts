@@ -75,6 +75,8 @@ export async function triggerPiReward(
     // Step 1: A2U 결제 생성
     const createRes = await fetch(PI_PAYMENTS_URL, {
       method: 'POST',
+      // Pi A2U 결제 API 상한 10초 — 실패는 기존 재시도 경로(R-P4 결제 예외, 2026-10-24)
+      signal: AbortSignal.timeout(10_000),
       headers: {
         Authorization: `Key ${apiKey}`,
         'Content-Type': 'application/json',
@@ -105,6 +107,8 @@ export async function triggerPiReward(
     // Step 2: 승인
     const approveRes = await fetch(`${PI_PAYMENTS_URL}/${paymentId}/approve`, {
       method: 'POST',
+      // Pi A2U 결제 API 상한 10초 — 실패는 기존 재시도 경로(R-P4 결제 예외, 2026-10-24)
+      signal: AbortSignal.timeout(10_000),
       headers: { Authorization: `Key ${apiKey}` },
     })
     if (!approveRes.ok) {
@@ -118,6 +122,8 @@ export async function triggerPiReward(
       `${PI_PAYMENTS_URL}/${paymentId}/complete`,
       {
         method: 'POST',
+        // Pi A2U 결제 API 상한 10초 — 실패는 기존 재시도 경로(R-P4 결제 예외, 2026-10-24)
+        signal: AbortSignal.timeout(10_000),
         headers: { Authorization: `Key ${apiKey}` },
       },
     )

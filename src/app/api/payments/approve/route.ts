@@ -30,6 +30,8 @@ export const POST = withGuard(async function (request: NextRequest) {
     const res = await fetch(`${PI_PAYMENTS_URL}/${paymentId}/approve`, {
       method: 'POST',
       headers: { Authorization: `Key ${apiKey}` },
+      // Pi 결제 API 상한 10초 — 시간 초과는 아래 기존 실패 경로, 재호출은 already_* 멱등 처리(R-P4 결제 예외, 2026-10-24)
+      signal: AbortSignal.timeout(10_000),
     })
     if (!res.ok) {
       const text = await res.text()

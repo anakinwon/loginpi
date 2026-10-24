@@ -32,6 +32,7 @@ export async function getChatMemberStatus(
   try {
     const res = await fetch(
       `${API_BASE}/bot${token}/getChatMember?chat_id=${chatId}&user_id=${userId}`,
+      { signal: AbortSignal.timeout(5000) }, // Telegram API 상한 5초(R-P4, 2026-10-24)
     )
     const json = (await res.json()) as {
       ok: boolean
@@ -73,6 +74,8 @@ export async function sendTelegramMessage(
   try {
     const res = await fetch(`${API_BASE}/bot${token}/sendMessage`, {
       method: 'POST',
+      // Telegram API 상한 5초(R-P4, 2026-10-24)
+      signal: AbortSignal.timeout(5000),
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })

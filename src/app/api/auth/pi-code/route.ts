@@ -54,6 +54,8 @@ export async function POST(request: NextRequest) {
   try {
     const piRes = await fetch(PI_API_URL, {
       headers: { Authorization: `Bearer ${accessToken}` },
+      // Pi /v2/me 상한 5초 — 시간 초과는 아래 기존 실패 경로(R-P4 인증 예외 5초, 2026-10-24)
+      signal: AbortSignal.timeout(5000),
     })
     if (!piRes.ok) {
       return NextResponse.json({ error: 'pi_auth_fail' }, { status: 401 })

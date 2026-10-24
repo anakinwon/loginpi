@@ -45,6 +45,8 @@ export async function GET() {
     try {
       const r = await fetch(`https://${host}/accounts/${appWallet}`, {
         cache: 'no-store',
+        // Horizon 조회 상한 5초(R-P4, 2026-10-24)
+        signal: AbortSignal.timeout(5000),
       })
       if (!r.ok) return { exists: false, masterWeight: null }
       const acc = (await r.json()) as HorizonAccount

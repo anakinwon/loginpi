@@ -24,6 +24,8 @@ async function verifyPiTokenAndGetUserId(
   try {
     const piRes = await fetch('https://api.minepi.com/v2/me', {
       headers: { Authorization: `Bearer ${accessToken}` },
+      // Pi /v2/me 상한 5초 — 시간 초과는 아래 기존 실패 경로(R-P4 인증 예외 5초, 2026-10-24)
+      signal: AbortSignal.timeout(5000),
     })
     if (!piRes.ok) return null
 

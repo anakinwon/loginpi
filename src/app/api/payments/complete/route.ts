@@ -52,6 +52,8 @@ async function handlePOST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ txid }),
+      // Pi 결제 API 상한 10초 — 시간 초과는 아래 기존 실패 경로, 재호출은 already_* 멱등 처리(R-P4 결제 예외, 2026-10-24)
+      signal: AbortSignal.timeout(10_000),
     })
     if (!res.ok) {
       const text = await res.text()
@@ -129,13 +131,15 @@ async function handlePOST(request: NextRequest) {
             }).catch((e) => console.error('[주문알림] broadcast 실패', e))
           }
 
-          // Telegram 즉시 발송 — cron 대기 없이 결제 완료 시점에 바로 발송(연동된 판매자).
-          // 안전망 cron(/api/cron/order-autocomplete)은 이 즉시 발송이 실패/유실된 건만 재시도.
-          try {
-            await dispatchOrderNotis()
-          } catch (e) {
-            console.error('[주문알림] Telegram 즉시 발송 실패', e)
-          }
+          // Telegram 즉시 발송 — cron 대기 없이 결제 완료 직후 발송(연동된 판매자).
+          // 결제 완료 응답이 Telegram 을 기다리지 않게 after() 로(R-P4, 2026-10-24). 안전망 cron(/api/cron/order-autocomplete)은 실패/유실 건만 재시도.
+          after(async () => {
+            try {
+              await dispatchOrderNotis()
+            } catch (e) {
+              console.error('[주문알림] Telegram 즉시 발송 실패', e)
+            }
+          })
         }
       }
     } else if (meta?.type === 'MPS_BOND' && payment.user_uid) {

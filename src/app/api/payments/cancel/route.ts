@@ -54,6 +54,8 @@ async function handlePOST(request: NextRequest) {
       await fetch(`${PI_PAYMENTS_URL}/${paymentId}/cancel`, {
         method: 'POST',
         headers: { Authorization: `Key ${apiKey}` },
+        // Pi 결제 API 상한 10초 — 실패는 무시(로컬 상태 우선, R-P4 결제 예외)
+        signal: AbortSignal.timeout(10_000),
       })
     } catch {
       /* Pi API 연결 실패는 무시 — 로컬 상태 갱신을 우선한다 */
