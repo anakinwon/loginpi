@@ -14,9 +14,11 @@ export async function GET(req: Request, { params }: Ctx) {
   if (auth instanceof NextResponse) return auth
   const page = Math.max(1, Number(new URL(req.url).searchParams.get('page')) || 1)
   try {
+    // 요금표 1회 조회 + 권한 확인 때 받은 요금제 재사용(R-P2, 2026-10-24 전수 점검)
+    const feesP = feePlans()
     const [fees, upgrade, hist, terms] = await Promise.all([
-      feePlans(),
-      upgradeQuotes(areaId),
+      feesP,
+      upgradeQuotes(areaId, Date.now(), { cur: auth.plan, fees: feesP }),
       db()
         .from('pi_pymnt')
         .select('pymnt_id, pi_amt, pymnt_sts_cd, meta_val, apv_dtm, cmpl_dtm', { count: 'exact' })

@@ -39,7 +39,7 @@ export async function loadHome(user: CurrentUser, want: string | null) {
   const mine = new Set(areas.map((a) => a.area_id))
   const last = (u.data as { lst_area_id: string | null } | null)?.lst_area_id ?? null
   const areaId = [want, last].find((x): x is string => !!x && mine.has(x)) ?? areas[0].area_id
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'VIEW', user) // 이미 확인한 사용자 전달(R-P2, 2026-10-24 전수 점검)
   if (!('perms' in auth)) return { areas, area: null }
   if (areaId !== last) await rememberArea(user.usr_id, areaId)
   const has = (p: string) => (auth.perms as string[]).includes(p)

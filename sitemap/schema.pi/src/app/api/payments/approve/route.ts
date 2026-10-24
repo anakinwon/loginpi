@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { apiError, dbError, parseBody } from '@/lib/api'
 import { db } from '@/lib/db'
 import { approvePiPayment, cancelPiPayment, getPiPayment, hasOtherApproved, markCanceled, parseAreaPlanMeta, payerAuth, planPrice } from '@/lib/payments'
-import { areaPlan, subscribed, upgradeQuotes } from '@/lib/plan'
+import { areaPlan, feePlans, subscribed, upgradeQuotes } from '@/lib/plan'
 
 const SLACK_MS = 10 * 60_000 // 업그레이드 금액 창 : 준비 ~ 승인 사이 날짜 경계를 넘는 경우만 허용(10분)
 const body = z.object({ paymentId: z.string().min(1).max(200) })
@@ -34,11 +34,13 @@ export async function POST(req: Request) {
   }
   if (p.direction !== 'user_to_app' || p.status.cancelled || p.status.user_cancelled) return reject('PAY_MISMATCH', 409)
   try {
-    if (await hasOtherApproved(meta.area_id, p.identifier)) return reject('PAY_DUP', 409)
     const amt = Number(p.amount)
+    // 이중 결제·요금제·가격 조회는 서로 독립 — 동시 조회 후 기존 순서(이중 결제 → 요금제 → 금액)로 판정(R-P1·R-P2, 2026-10-24 전수 점검)
     if (meta.prd_cd === 'U') {
       const now = Date.now()
-      const [cur, prev] = await Promise.all([upgradeQuotes(meta.area_id, now), upgradeQuotes(meta.area_id, now - SLACK_MS)])
+      const [dup, plan, fees] = await Promise.all([hasOtherApproved(meta.area_id, p.identifier), areaPlan(meta.area_id), feePlans()])
+      if (dup) return reject('PAY_DUP', 409)
+      const [cur, prev] = await Promise.all([upgradeQuotes(meta.area_id, now, { cur: plan, fees }), upgradeQuotes(meta.area_id, now - SLACK_MS, { cur: plan, fees })])
       const q = cur.from === meta.from_plan ? cur.quotes.find((x) => x.plan_cd === meta.plan_cd && x.prd === meta.prd) : undefined
       if (!q) return reject('PAY_UPGRADE', 409) // 현재 요금제·기간이 준비 뒤 바뀜
       // 사용 일수가 늘면 차감이 줄어 금액이 오름 → 10분 전 금액(준비가 날짜 경계 전) 이상 ~ 지금 금액 이하
@@ -46,9 +48,9 @@ export async function POST(req: Request) {
       if (amt < lo - 1e-6 || amt > q.amount + 1e-6) return reject('PAY_AMOUNT', 400)
       meta.pre = q.terms // 차액을 받은 선결제 수 — 견적 뒤 반영된 선결제가 차액 없이 올라가지 않게(보안 검토 2026-10-19)
     } else {
-      const cur = await areaPlan(meta.area_id)
+      const [dup, cur, price] = await Promise.all([hasOtherApproved(meta.area_id, p.identifier), areaPlan(meta.area_id), planPrice(meta.plan_cd, meta.prd_cd)])
+      if (dup) return reject('PAY_DUP', 409)
       if (subscribed(cur) && meta.plan_cd !== cur.plan) return reject('PAY_SUBSCRIBED', 409) // 구독 중 = 업그레이드 + 현재 요금제 선결제만
-      const price = await planPrice(meta.plan_cd, meta.prd_cd)
       if (price == null || Math.abs(amt - price) > 1e-6) return reject('PAY_AMOUNT', 400) // 정가와 정확히 일치(초과도 거부)
     }
     const uid = who.user.usr_id

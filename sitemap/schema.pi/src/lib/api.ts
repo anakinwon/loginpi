@@ -254,17 +254,17 @@ export interface AreaAuth {
   perms: Perm[]
   plan: AreaPlan
 }
-export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaAuth | NextResponse> {
-  const user = await currentUser()
+// known = 호출자가 이미 확인한 사용자(있으면 currentUser 재조회 생략 — R-P2, 2026-10-24 전수 점검)
+export async function requireAreaRole(areaId: string, perm: Perm, known?: CurrentUser): Promise<AreaAuth | NextResponse> {
+  // 요금제는 areaId 만 쓰므로 사용자 확인과 동시에 시작(R-P1, 2026-10-24 전수 점검) — 미로그인이면 결과 버림, 오류는 아래 판정 순서대로
+  const planP = areaPlan(areaId).then(
+    (plan) => ({ plan }),
+    (e) => ({ err: e as { code?: string; message?: string } }),
+  )
+  const user = known ?? (await currentUser())
   if (!user) return apiError('AUTH_REQUIRED', 401)
   // 멤버 역할·요금제 조회를 병렬로 실행(직렬 왕복 누적 방지) — 오류 판정 순서는 기존과 같음
-  const [m, p] = await Promise.all([
-    db().from('std_area_mbr').select('mbr_role_cd').eq('area_id', areaId).eq('usr_id', user.usr_id).eq('del_yn', 'N').maybeSingle(),
-    areaPlan(areaId).then(
-      (plan) => ({ plan }),
-      (e) => ({ err: e as { code?: string; message?: string } }),
-    ),
-  ])
+  const [m, p] = await Promise.all([db().from('std_area_mbr').select('mbr_role_cd').eq('area_id', areaId).eq('usr_id', user.usr_id).eq('del_yn', 'N').maybeSingle(), planP])
   if (m.error) return dbError(m.error)
   if (!m.data) return apiError('FORBIDDEN', 403)
   if ('err' in p) return dbError(p.err)

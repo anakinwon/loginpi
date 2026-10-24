@@ -47,11 +47,16 @@ export async function feePlans(): Promise<FeePlan[]> {
 export const subscribed = (p: AreaPlan) => p.plan !== 'FREE' && !p.grace
 
 // 업그레이드 견적 — 현재 결제 요금제보다 높은 요금제(같은 요금제 월 → 연 포함)마다 일할계산 금액(src/lib/upgrade.ts). 무료·유예만 = 빈 목록
-export async function upgradeQuotes(areaId: string, now = Date.now()): Promise<{ from: PlanCd; quotes: (UpgQuote & { plan_cd: PlanCd })[] }> {
-  const cur = await areaPlan(areaId)
+//  known = 호출자가 이미 가진 현재 요금제·요금표(있으면 재조회 생략 — R-P2, 2026-10-24 전수 점검). fees 를 Promise 로 넘기면 호출자가 그 Promise 도 직접 await 할 것(무료면 여기서 기다리지 않음)
+export async function upgradeQuotes(
+  areaId: string,
+  now = Date.now(),
+  known: { cur?: AreaPlan; fees?: FeePlan[] | Promise<FeePlan[]> } = {},
+): Promise<{ from: PlanCd; quotes: (UpgQuote & { plan_cd: PlanCd })[] }> {
+  const cur = known.cur ?? (await areaPlan(areaId))
   if (cur.plan === 'FREE') return { from: cur.plan, quotes: [] }
   const [fees, terms] = await Promise.all([
-    feePlans(),
+    known.fees ?? feePlans(),
     db().from('std_area_plan').select('prd_cd, strt_dtm, end_dtm, grnt_rsn_cd').eq('area_id', areaId).eq('plan_cd', cur.plan).eq('del_yn', 'N').gt('end_dtm', new Date(now).toISOString()),
   ])
   if (terms.error) throw terms.error
