@@ -10,9 +10,9 @@
 ## 1. 결론 요약
 
 1. **뼈대는 Galène에서 배운다.** 빈 인터셉터 레지스트리, 레이어당 수신 루프 1개, 패킷 캐시 하나로 전달·재전송·첫 화면을 모두 처리하는 구조를 M1·M2에서 처음부터 직접 짠다(REA_01 2·4.2절).
-2. **이름과 경계는 M1부터 mediasoup 것을 쓴다.** `room`(=Router)·`transport`·`producer`·`consumer`로 시작하고 M3에서는 이름을 바꾸지 않는다. 대신 닫힘 연쇄, 4분류 판정, 순번 재작성(SeqRewriter), 시그널링 동사를 정밀하게 다듬는다(D-1, REA_02 5.1·5.6절).
+2. **경계는 M1부터 mediasoup 것을 쓰고, 이름은 섬 이름으로 짓는다(마스터 승인 C-1).** `bora`(=Router)·`capri`(=Transport)·`santorini`(=Producer)·`jeju`(=Consumer), 엔진은 Galápagos로 시작하고 M3에서는 이름을 바꾸지 않는다. 대신 닫힘 연쇄, 4분류 판정, 순번 재작성(SeqRewriter), 시그널링 동사를 정밀하게 다듬는다(D-1, REA_02 5.1·5.6절).
 3. **품질 장치는 LiveKit 기본값을 출발점으로 한다.** 서버가 키프레임 경계에서 simulcast 레이어를 자동으로 바꾸고, 구독자 PC마다 할당기(STABLE/DEFICIENT)를 두며, BWE는 REMB와 NACK 비율로 판단한다. 재전송은 본문 1벌과 구독자별 메타 링으로 한다(D-3·D-7·D-8, REA_03 5.3~5.8절).
-4. **Go에 맞게 새로 설계하는 부분이 있다.** 방 상태는 room 고루틴 1개가 소유한다. 패킷 경로는 "레이어 수신 고루틴 → 구독자별 크기 제한 큐 → 구독자 송신 고루틴"으로 흐르고, 느린 청중은 자기 큐에서만 버린다. 헤더는 구독자별 값으로 복사한다(D-10).
+4. **Go에 맞게 새로 설계하는 부분이 있다.** 방 상태는 bora(방) 고루틴 1개가 소유한다. 패킷 경로는 "레이어 수신 고루틴 → 구독자별 크기 제한 큐 → 구독자 송신 고루틴"으로 흐르고, 느린 청중은 자기 큐에서만 버린다. 헤더는 구독자별 값으로 복사한다(D-10).
 5. **품질 판정은 LiveKit 공식 배포판과 나란히 잰다.** 같은 VM에서 Q1~Q11 지표와 T1~T9 시나리오(`tc netem`)로 측정하고, 목표값은 M4 첫 측정 뒤 마스터가 확정한다(7절).
 
 ---
@@ -40,13 +40,13 @@
 ```
 media/
   go.mod                       module seminar.pi/media (Go 최신 안정판, pion/webrtc v4 — 공식판, 포크 금지)
-  cmd/seminar-media/main.go    설정 로드(env) · UDP mux · HTTP(WSS) 서버 기동
+  cmd/galapagos/main.go        엔진 Galápagos 기동 — 설정 로드(env) · UDP mux · HTTP(WSS) 서버
   internal/
     signal/     WebSocket 프로토콜 · 입장권 검증 · 세션 상태기계
-    room/       Router — 방 1개 = 고루틴 1개(제어 평면 단일 소유)
-    transport/  pion PC 생성(빈 인터셉터) · ICE 후보 보관 · RTCP 읽기·분배
-    producer/   레이어별 수신 스트림 · 64비트 순번 확장 · 키프레임 판별 · 레이어 활성·비트레이트
-    consumer/   구독자 × 트랙 상태 · LayerPolicy · SeqRewriter · TS/VP8 재작성 · 송신
+    bora/       Router(방) — 방 1개 = 고루틴 1개(제어 평면 단일 소유) · 타입 bora.Room
+    capri/      Transport(연결) — pion PC 생성(빈 인터셉터) · ICE 후보 보관 · RTCP 읽기·분배 · 타입 capri.Transport
+    santorini/  Producer(송신 원천) — 레이어별 수신 스트림 · 64비트 순번 확장 · 키프레임 판별 · 레이어 활성·비트레이트 · 타입 santorini.Producer
+    jeju/       Consumer(청중 수신) — 구독자 × 트랙 상태 · LayerPolicy · SeqRewriter · TS/VP8 재작성 · 송신 · 타입 jeju.Consumer
     forward/    팬아웃 — 구독자별 제한 큐, 혼잡 시 프레임 단위 버림
     nack/       PacketCache(본문) · LossTracker(상류) · SendMeta(하류 메타 링)
     pli/        KeyframeLimiter(레이어별)
@@ -60,12 +60,24 @@ media/
 - `rtcpx`·`rtpx`는 PRD_01 3절 구조도에 없던 공용 패키지다. 인터셉터를 끄면 SR·RR이 사라지고(REA_02 8절), 순번 감김 같은 경계 조건이 여러 모듈에 흩어진다(REA_01 8절). 그래서 한곳에 모았다.
 - `internal/`에 둬서 외부 import를 막는다. Next 빌드와는 분리한다(PRD_01 6절).
 
-### 3.2 경계 명명 시점 결정 (D-1)
+### 3.2 경계 명명 시점 결정 (D-1 — **마스터 승인 C-1, 2026-10-25 : 섬 이름으로 생성**)
 
-**결정 : M1부터 mediasoup 이름(Router=`room`, `transport`, `producer`, `consumer`)으로 패키지를 만든다. M3은 "재편"이 아니라 "경계 정밀화"로 바꾼다.**
+**결정 : M1부터 mediasoup 경계(Router·Transport·Producer·Consumer)로 패키지를 나누되, 패키지 이름은 전세계 아름다운 섬 이름으로 짓는다(마스터 지시). 패키지 안 타입 이름은 역할 이름(Room·Transport·Producer·Consumer)을 그대로 써서 코드가 읽히게 한다. M3은 "재편"이 아니라 "경계 정밀화"로 바꾼다.**
+
+#### 섬 이름 추천과 선정 (C-1)
+
+| 경계(mediasoup) | 역할 | 선정 섬 | 고른 이유 | 패키지 |
+|---|---|---|---|---|
+| 엔진 전체 | 자체 SFU 엔진 | **Galápagos**(에콰도르) | 진화의 섬 — 세 참고모델에서 배워 진화시키는 우리 엔진 | `cmd/galapagos` |
+| Router | 방 — 흐름이 모이고 갈라지는 곳 | **Bora Bora**(프랑스령 폴리네시아) | 산호초가 둘러싼 석호 — 울타리 안에 모인 하나의 방 | `bora` |
+| Transport | 연결 — 드나드는 통로 | **Capri**(이탈리아) | 푸른 동굴(Grotta Azzurra) — 좁은 입구로 드나드는 통로 | `capri` |
+| Producer | 송신 원천 — 발표자의 영상이 솟는 곳 | **Santorini**(그리스) | 화산 칼데라 — 분출하는 원천 | `santorini` |
+| Consumer | 청중 수신 — 받아 보는 쪽 | **Jeju**(대한민국) | 세계 자연유산의 섬 — 우리 청중이 머무는 곳 | `jeju` |
+
+후보로 검토했으나 고르지 않은 섬 : Bali(인도네시아)·Maui(하와이)·Moorea(프랑스령 폴리네시아)·Palawan(필리핀)·Zanzibar(탄자니아)·Mauritius(모리셔스) — 이후 모듈(record·metrics 등)을 섬 이름으로 바꿀 때 후보로 쓴다. 지금은 기능 모듈(signal·forward·nack·pli·bwe·rtcpx·rtpx·record·metrics)은 기능 이름 유지.
 
 이유
-1. PRD_01 3절 구조도가 이미 이 이름이다. M1을 Galène 이름(group·upConn·downTrack)으로 짰다가 M3에서 바꾸면 같은 코드를 두 번 옮기게 되고, 그만큼 회귀 위험도 커진다.
+1. PRD_01 3절 구조도와 경계가 같다(이름만 섬 이름으로, 역할은 괄호 병기). M1을 Galène 이름(group·upConn·downTrack)으로 짰다가 M3에서 바꾸면 같은 코드를 두 번 옮기게 되고, 그만큼 회귀 위험도 커진다.
 2. Galène 개념은 이 경계에 그대로 들어간다. upTrack은 producer 레이어, downTrack은 consumer, group은 room, writer는 forward에 대응한다(REA_01 4.1, REA_02 6.1 매핑표).
 3. M3에 남는 일은 이름이 아니라 **의미**다. 닫힘 연쇄, 늦은 합류자에게 상태 전달, 4분류 Decision, SeqRewriter의 Drop/Sync, consume paused→resume, 시그널링 동사 정리가 여기에 해당한다. 이것들은 M2 동작을 먼저 확인한 뒤에 넣어야 안전하다.
 
@@ -81,19 +93,19 @@ func VerifyTicket(raw string, secret []byte, now time.Time) (Ticket, error) // H
 type Session interface { Send(ntf Notification); Close(code ErrCode) }
 ```
 
-**room** (M1 최소 → M3 경계) — 참고 : mediasoup 5.1·6.2 `room/`, Galène 5.10, LiveKit 5.6
-- 역할 : producer→consumers 표, 참가자 목록, 정원·역할 검사. **상태 변경은 room 고루틴의 명령 채널로만 한다.** 새 Producer가 생기면 기존 청중 전원에게 Consumer를 자동으로 만든다(웨비나라서 가능한 편의). Producer가 닫히면 연결된 Consumer를 모두 닫고 `producerClosed`를 알린다. 늦게 합류한 Consumer에게는 일시정지 상태와 레이어 활성 정보를 바로 넘긴다.
+**bora**(Router·방) (M1 최소 → M3 경계) — 참고 : mediasoup 5.1·6.2 `room/`, Galène 5.10, LiveKit 5.6
+- 역할 : producer→consumers 표, 참가자 목록, 정원·역할 검사. **상태 변경은 bora(방) 고루틴의 명령 채널로만 한다.** 새 Producer가 생기면 기존 청중 전원에게 Consumer를 자동으로 만든다(웨비나라서 가능한 편의). Producer가 닫히면 연결된 Consumer를 모두 닫고 `producerClosed`를 알린다. 늦게 합류한 Consumer에게는 일시정지 상태와 레이어 활성 정보를 바로 넘긴다.
 ```go
 type Room interface {
   Join(t Ticket, s Session) (*Peer, error)            // 정원·역할·중복 sub 검사
   Leave(peerID string)                                // Transport 닫힘 → Producer/Consumer 연쇄 정리
-  Produce(peerID string, tr *webrtc.TrackRemote, kind Kind, rid string) (*producer.Producer, error) // presenter·panel만
-  Consume(peerID, producerID string, paused bool) (*consumer.Consumer, error)
+  Produce(peerID string, tr *webrtc.TrackRemote, kind Kind, rid string) (*santorini.Producer, error) // presenter·panel만
+  Consume(peerID, producerID string, paused bool) (*jeju.Consumer, error)
   SetPriority(producerID string, p uint8)             // 화면공유 255 > 발표자 영상 > 패널 영상
 }
 ```
 
-**transport** (M1) — 참고 : Galène 5.1, mediasoup 6.2 `transport/`, LiveKit 5.1·6.1
+**capri**(Transport·연결) (M1) — 참고 : Galène 5.1, mediasoup 6.2 `transport/`, LiveKit 5.1·6.1
 - 역할 : 참가자당 **발행 PC 1개(클라이언트 offer)와 구독 PC 1개(서버 offer)**(D-2). 청중은 구독 PC만 가진다. SettingEngine에는 UDP mux 단일 포트, mDNS 끔, NAT 1:1 IP, SRTP 재전송 보호 창 확대(D-5)를 넣는다. MediaEngine은 VP8+Opus로 하고 H.264는 M0 결과로 정한다. 피드백은 영상 nack·nack pli·ccm fir·goog-remb, 음성은 없음으로 둔다. 구독 PC는 M4부터 abs-send-time 확장을 등록한다. `ReadRTCP` 루프에서 RR은 consumer RTT·손실, NACK은 consumer 재전송, PLI·FIR은 pli, REMB는 bwe로 보낸다.
 ```go
 func NewAPI(cfg Config) *webrtc.API // interceptor.Registry{} 비움 — 단위 테스트로 비어 있음 확인
@@ -105,7 +117,7 @@ type Transport interface {
 }
 ```
 
-**producer** (M1 → M2 → M4) — 참고 : Galène 4.2·5.2, mediasoup 5.9·6.2 `producer/`, LiveKit 5.2·5.5
+**santorini**(Producer·송신 원천) (M1 → M2 → M4) — 참고 : Galène 4.2·5.2, mediasoup 5.9·6.2 `producer/`, LiveKit 5.2·5.5
 - 역할 : 들어오는 트랙 1개가 Producer 1개이고, simulcast면 rid l/m/h가 레이어 0/1/2다. 레이어마다 **수신 고루틴 1개**가 읽기, 64비트 순번 확장, 키프레임 판별, 들어온 헤더 확장 제거, 캐시 저장, 손실 기록, forward 투입을 처리한다. 원본 SSRC는 producer 밖으로 내보내지 않고, 밖에서는 (ProducerID, 레이어)로만 식별한다(mediasoup mappedSsrc 개념). 레이어별 SR(NTP↔RTP)을 보관한다. 레이어 활성은 500ms 주기로 판정하는데, 레이어 0은 2초, 상위 레이어는 10초 동안 이어져야 활성이다. 비트레이트는 1초마다 갱신한다(M4).
 ```go
 type Producer interface {
@@ -127,7 +139,7 @@ type Item struct { ExtSeq uint64; Idx uint16; Key, Marker bool; Layer int8; At t
 func (q *Queue) Offer(it Item) (dropped bool)  // 비차단
 ```
 
-**consumer** (M1 단일 레이어 → M3 4분류 → M4 전환) — 참고 : mediasoup 5.6·5.7·6.2 `consumer/`, LiveKit 5.4·5.5, Galène packetmap
+**jeju**(Consumer·청중 수신) (M1 단일 레이어 → M3 4분류 → M4 전환) — 참고 : mediasoup 5.6·5.7·6.2 `consumer/`, LiveKit 5.4·5.5, Galène packetmap
 - 역할 : 구독자 × 트랙 1개를 맡는다. **출력 SSRC는 Consumer가 살아 있는 동안 바뀌지 않는다.** 송신 고루틴 1개가 큐에서 꺼낸 항목을 캐시에서 읽고(`GetAt`), LayerPolicy로 판정한 뒤 SeqRewriter·TS 오프셋·VP8 picture ID 재작성을 거쳐 **새 헤더 값**으로 직렬화해 보낸다. `rtp.Header.Extensions`는 구독자별로 새로 만든다(REA_02 검증 정정 6). 보낸 패킷은 SendMeta에 기록한다.
 ```go
 type Decision uint8 // Forward | Drop(순번 기록) | SilentDrop(다른 레이어) | Buffer(첫 키프레임 전)
@@ -229,9 +241,9 @@ type Allocator interface {                 // 구독자 구독 PC당 1개, 이�
 
 | 출발 | 패킷 | 처리 | 결과 |
 |---|---|---|---|
-| 청중 | NACK | transport → consumer.OnNACK → SendMeta.Resolve(억제·3회) → PacketCache.Get | 같은 SSRC로 재전송, 캐시 미스면 50ms 모아 상류 NACK |
-| 청중 | PLI·FIR | consumer.OnPLI → 재전송 중단 표시 → producer 현재 레이어 Limiter.Need | 레이어당 최소 간격 안에서 발표자에게 PLI 1건 |
-| 청중 | RR | consumer.OnRR → RTT·손실·지터 | SendMeta 억제 간격, LossTracker 간격, 품질 점수 |
+| 청중 | NACK | capri → jeju.OnNACK → SendMeta.Resolve(억제·3회) → PacketCache.Get | 같은 SSRC로 재전송, 캐시 미스면 50ms 모아 상류 NACK |
+| 청중 | PLI·FIR | jeju.OnPLI → 재전송 중단 표시 → santorini 현재 레이어 Limiter.Need | 레이어당 최소 간격 안에서 발표자에게 PLI 1건 |
+| 청중 | RR | jeju.OnRR → RTT·손실·지터 | SendMeta 억제 간격, LossTracker 간격, 품질 점수 |
 | 청중 | REMB | bwe.Allocator.OnREMB | 혼잡 판정 → LayerPolicy.SetTarget |
 | 서버 → 발표자 | RR+REMB(1초), NACK, PLI | rtcpx | 발표자 인코더 송신량·손실 복구 |
 | 서버 → 청중 | SR(0.5초) | rtcpx | 립싱크, 청중 RR의 LSR 기준 |
@@ -241,7 +253,7 @@ type Allocator interface {                 // 구독자 구독 PC당 1개, 이�
 
 | 상태 | 소유자 | 다른 고루틴의 접근 |
 |---|---|---|
-| 방·참가자·producer→consumers 표 | room 고루틴 | 명령 채널로만 |
+| 방·참가자·producer→consumers 표 | bora(방) 고루틴 | 명령 채널로만 |
 | 레이어 캐시 쓰기·LossTracker·Limiter | producer 레이어 수신 고루틴 | 캐시 읽기(`GetAt`·`Get`)는 슬롯 순번 검증 + RWMutex [TBD : M2 벤치마크로 잠금 방식 확정] |
 | Consumer 상태·SeqRewriter·SendMeta | consumer 송신 고루틴 | RTCP는 채널로 전달 |
 | Allocator | 구독 PC당 이벤트 고루틴 | 이벤트 큐 |
@@ -289,7 +301,7 @@ type Allocator interface {                 // 구독자 구독 PC당 1개, 이�
 
 | 클레임 | 형식 | 의미·검증 |
 |---|---|---|
-| `aud` | `"seminar-media"` | 고정값이며 다르면 거부 |
+| `aud` | `"seminar-media"` | 고정값이며 다르면 거부. 서비스 식별자라 엔진 이름(Galápagos)과 무관하게 유지 — 변경은 C-8 확인 때 |
 | `room` | 문자열 | 방 ID(화면 서버 기준). 미디어 서버는 첫 입장 때 방을 메모리에 만든다 |
 | `sub` | 문자열 | seminar.pi 사용자 UUID. 같은 방에 같은 sub가 다시 들어오면 기존 세션을 닫는다(`DUPLICATE_SESSION`) |
 | `name` | 문자열 | 표시명. 미디어 서버는 전달만 한다 |
@@ -311,7 +323,7 @@ PRD_01 5절의 통과 기준은 **그대로 유지**한다. 아래는 작업 목
 | 단계 | 작업 | 참고 | 통과 기준 |
 |---|---|---|---|
 | **M0** | (진행 중) `/lab/camera` 실기기 관문. **추가 관찰** : `webrtc-internals`에서 VP8/H.264 송신 가능 여부, rid simulcast 송신, RTCP REMB 수신, RTX 협상 | — | PRD_01 그대로 + 관찰 결과를 TROUBLESHOOT에 기록 |
-| **M1** | ① `media/` 모듈 + `NewAPI`(빈 레지스트리, VP8+Opus, UDP mux) ② signal : 봉투·join·ping, 개발용 입장권 ③ room : 참가자·역할·정원 ④ transport : 발행 PC(클라이언트 offer)·구독 PC(서버 offer), trickle 보관, connected 후 연결 ⑤ producer 수신 고루틴 : 64비트 순번·키프레임 판별·확장 제거 ⑥ forward 큐(캐시 없이 패킷 복사) ⑦ consumer : 고정 OutSSRC, 단일 레이어 오프셋, 첫 키프레임 전 Buffer ⑧ pli 최소(구독 시 1회 + 0.5초 상한) ⑨ rtcpx 최소 SR(하류)·RR(상류) | REA_01 6.1, REA_02 6.3 M1, REA_03 6.3 M1 | 같은 LAN과 LTE에서 발표자 1 → 청중 2 영상. 레지스트리 비어 있음 테스트 통과 |
+| **M1** | ① `media/` 모듈 + `NewAPI`(빈 레지스트리, VP8+Opus, UDP mux) ② signal : 봉투·join·ping, 개발용 입장권 ③ bora(Router) : 참가자·역할·정원 ④ capri(Transport) : 발행 PC(클라이언트 offer)·구독 PC(서버 offer), trickle 보관, connected 후 연결 ⑤ santorini(Producer) 수신 고루틴 : 64비트 순번·키프레임 판별·확장 제거 ⑥ forward 큐(캐시 없이 패킷 복사) ⑦ jeju(Consumer) : 고정 OutSSRC, 단일 레이어 오프셋, 첫 키프레임 전 Buffer ⑧ pli 최소(구독 시 1회 + 0.5초 상한) ⑨ rtcpx 최소 SR(하류)·RR(상류) | REA_01 6.1, REA_02 6.3 M1, REA_03 6.3 M1 | 같은 LAN과 LTE에서 발표자 1 → 청중 2 영상. 레지스트리 비어 있음 테스트 통과 |
 | **M2** | ① PacketCache(영상 512·음성 64슬롯 고정) → 전달을 (extSeq, idx)로 교체 ② LossTracker(상류 NACK·RTT 간격·10회·넘치면 PLI) ③ SendMeta + 하류 재전송(억제·3회·대기 상한·PLI 후 중단) ④ 캐시 미스면 50ms 묶음 상류 NACK ⑤ pli.Limiter 완성(레이어별 간격·FIR 갱신·1초 재시도) ⑥ 신규 구독자 캐시 재생 ⑦ SR 외삽·RTT·SRTP 재전송 보호 창 확대 ⑧ 큐 혼잡 시 프레임 단위 버림 ⑨ TURN(cafe.pi 자격 증명 라우트) ⑩ `tc netem` 시험 환경 ⑪ metrics 카운터 수집 시작 | REA_01 6.2, REA_02 5.3~5.5, REA_03 5.3·5.4 | 3% 손실에서 화면 깨짐이 회복된다. 같은 SSRC 재전송이 SRTP에서 거부되지 않음을 확인 |
 | **M3** | ① 닫힘 연쇄(Transport→Producer/Consumer, Producer→Consumer) ② 늦은 합류자 상태 전달 ③ Decision 4분류 + SeqRewriter(Drop/Sync) ④ consume paused→resume(resume 즉시 키프레임) ⑤ 5.2절 메시지 확정·`docs/SIGNAL_API.md` 작성 ⑥ 레이어 비활성 감지 ⑦ 표 형식 단위 테스트 + `-race` | REA_02 5.1·5.6·6.2, REA_03 6.3 M3 | 기능 회귀 0, 모듈 의존이 3.1절 구조와 일치(PRD_01 기준과 같음) |
 | **M4** | ① 레이어 활성·비트레이트 ② simulcast 전환(키프레임 경계·SR TS 정렬·75ms 상한·프레임 미완료 skip·옛 패킷 차단·VP8 picture ID) ③ Allocator(REMB만) ④ NACK 비율 혼잡 판정 ⑤ 패딩 탐침 ⑥ dynacast·setLayer ⑦ 품질 점수. **각 단계 끝에 7절 해당 시나리오를 측정** | REA_03 6.3 M4·6.4, REA_02 5.7·5.8 | 7절 목표 충족(목표값은 첫 측정 후 마스터 확정) |
@@ -382,7 +394,7 @@ PRD_01 5절의 통과 기준은 **그대로 유지**한다. 아래는 작업 목
 
 | # | 결정 항목 | 선택지 | **선택** | 근거 | 되돌릴 조건 |
 |---|---|---|---|---|---|
-| D-1 | 경계 명명 시점 | (a) M1은 Galène 이름, M3에서 재편 (b) M1부터 mediasoup 이름 | **(b)** M3은 경계 정밀화 | 같은 코드를 두 번 옮기지 않는다. PRD_01 구조도와 일치하고 Galène 개념도 1:1로 매핑된다(REA_02 6.1) | M1 구현 중 경계가 Galène 경로를 방해해 일정이 20% 이상 밀리면 M1만 단일 패키지로 짜고 M3에서 분리 |
+| D-1 | 경계 명명 시점 | (a) M1은 Galène 이름, M3에서 재편 (b) M1부터 mediasoup 이름 | **(b)** M3은 경계 정밀화 · 패키지 이름은 섬 이름(마스터 C-1) | 같은 코드를 두 번 옮기지 않는다. PRD_01 구조도와 경계가 같고 Galène 개념도 1:1로 매핑된다(REA_02 6.1) | M1 구현 중 경계가 Galène 경로를 방해해 일정이 20% 이상 밀리면 M1만 단일 패키지로 짜고 M3에서 분리 |
 | D-2 | PeerConnection 구성 | (a) 스트림당 PC(Galène) (b) 참가자당 발행·구독 PC 2개(LiveKit) (c) 단일 PC | **(b)** 발행은 클라이언트 offer, 구독은 서버 offer로 고정 | offer 방향을 고정하면 glare가 생기지 않는다. REMB가 PC 단위라 구독 PC 1개 = 할당기 1개가 자연스럽다(REA_03 5.6·5.7). 청중 1명에 ICE·DTLS 1회 | Pi Browser에서 구독 PC에 트랙을 추가하는 재협상이 실패하거나 화면이 깜박이면 (a)로 [확인중 : M1 실기기] |
 | D-3 | 패킷 캐시 구조 | (a) 구독자별 재전송 버퍼(mediasoup) (b) 레이어당 본문 캐시 1벌 + 구독자별 메타 링(Galène 캐시 + LiveKit sequencer) | **(b)** 고정 슬롯 링, 내부 순번 64비트, 영상 512·음성 64슬롯으로 시작 | 30명이 받아도 본문은 1벌이다. 같은 캐시를 전달·재전송·첫 화면에 함께 쓴다(REA_01 5.2, REA_03 5.3). 64비트 확장으로 감김 오류를 줄인다 | M2 netem에서 캐시 미스율이 5%를 넘으면 Galène식 RTT 기반 크기 자동 조정을 앞당긴다. 경합 비용이 크면 구독자 측 복사본으로 |
 | D-4 | NACK 정책 | 단일 솔루션 방식 / 조합 | **조합** : 상류는 Galène 비트맵 기준(20ms·2~24패킷·최근 4 제외) + mediasoup 재요청(RTT 간격·10회·넘치면 PLI), 하류는 LiveKit 억제(min(100ms,2RTT)·3회·대기 상한·PLI 후 중단) + 캐시 미스면 Galène 50ms 묶음 | 세 문서가 검증한 규칙 중 서로 겹치지 않는 장치만 골랐다 | T2·T3에서 Q3 목표 미달이면 mediasoup 재전송 페이싱(10ms당 N개)을 추가 |
@@ -391,7 +403,7 @@ PRD_01 5절의 통과 기준은 **그대로 유지**한다. 아래는 작업 목
 | D-7 | BWE 방식 | (a) REMB + NACK 비율(LiveKit 기본) (b) TWCC 피드백 + 지연 기반 추정 직접 작성(mediasoup 내장 BWE·GCC 개념) | **(a)** M4 1차. TWCC는 협상하지 않음 | LiveKit 상용 기본값이 (a)이고, mediasoup도 내장 BWE를 기본으로 꺼 둔다(REA_02 5.8). 구현량이 몇 배 차이 난다. 손실·RTT 수집은 M2부터 | Pi Browser가 REMB를 보내지 않으면 RR 손실 + NACK 비율만 쓰는 대체 경로로. T4에서 Q4가 목표의 2배를 넘으면 (b) 검토 착수 [확인중 : M0·M4 실기기] |
 | D-8 | simulcast 선택 알고리즘 | (a) 클라이언트가 화면 크기로 재요청(Galène) (b) 서버 자동 | **(b)** 클라이언트는 `setLayer`로 상한만 보낸다. 서버는 Allocator(STABLE/DEFICIENT, 레이어 0 보장, 우선순위, 1.2배 히스테리시스, 일시정지 끔)로 목표를 정하고, LayerPolicy가 키프레임 경계에서 전환한다(SR NTP TS 정렬, SR이 없으면 보류하고 키프레임 재요청, 75ms 상한, 프레임 미완료 skip, 옛 패킷 차단, 부족 상태 하향은 즉시 차단). 레이어는 rid l/m/h 3개 | (a)는 재협상과 SSRC 변경이 일어나 WKWebView에서 깜박일 위험이 있다(REA_01 7절). 전환 규칙은 mediasoup이 수년간 고친 엣지 케이스다(REA_02 5.7) | 발표자 기기가 3레이어를 못 보내면 2레이어(Galène식 고·저). SR이 오랫동안 오지 않으면 경과 시간 기준 오프셋으로 대체 [TBD : 대기 한도] |
 | D-9 | 시그널링 형식 | (a) Galène 대칭·비동기 (b) 요청/응답/알림 봉투 + mediasoup 동사 + 표준 SDP (c) mediasoup ORTC 파라미터 JSON | **(b)** | `produce`·`consume`은 결과(ID)가 필요해서 요청/응답 짝이 맞다. 표준 SDP라 클라이언트 라이브러리가 필요 없다(REA_02 7절). 동사가 서버 모듈과 1:1 | 메시지 종류가 20개를 넘어 관리가 어려워지면 스키마 파일(JSON Schema)로 생성. 형식 자체를 되돌릴 조건은 없음 |
-| D-10 | 동시성 모델 | (a) Galène식 원자 변수·잠금·작성자 풀 (b) 단일 소유 + 채널 | **(b)** room 고루틴 = 제어 평면, 레이어 수신 고루틴 = 캐시 쓰기, consumer 송신 고루틴 = 구독자 상태, 구독자별 제한 큐(32) | mediasoup의 단일 스레드 무경합 성질을 Go에서 얻는다(REA_02 8절). 청중 1명 단위 격리(REA_01 정정 3) | T1에서 Q11 CPU가 목표를 넘으면 LiveKit식 병렬 분할 또는 √n 작성자 풀 |
+| D-10 | 동시성 모델 | (a) Galène식 원자 변수·잠금·작성자 풀 (b) 단일 소유 + 채널 | **(b)** bora(방) 고루틴 = 제어 평면, 레이어 수신 고루틴 = 캐시 쓰기, consumer 송신 고루틴 = 구독자 상태, 구독자별 제한 큐(32) | mediasoup의 단일 스레드 무경합 성질을 Go에서 얻는다(REA_02 8절). 청중 1명 단위 격리(REA_01 정정 3) | T1에서 Q11 CPU가 목표를 넘으면 LiveKit식 병렬 분할 또는 √n 작성자 풀 |
 | D-11 | 입장권 | (a) 자체 HMAC 형식 (b) JWT HS256(알고리즘 고정) | **(b)** 수명 60초, `jti` 일회용, `cap`·`end` 클레임 | 표준 형식이라 화면 서버(Node)와 Go 양쪽 구현이 쉽고 서명은 PRD의 HMAC 그대로다. Galène 토큰 검증 규칙(만료 필수·5초 오차·실패 지연)을 따른다(REA_01 5.11) | 화면 서버가 JWT 라이브러리를 도입하기 어렵다고 판단되면 (a)로(클레임은 같음) |
 | D-12 | 헤더 확장 | (a) 들어온 확장 그대로 전달 (b) 전부 제거하고 필요한 것만 서버가 새로 붙임 | **(b)** | 구독자별 확장을 새로 만들어야 경합이 없다(REA_02 정정 6). TWCC를 쓰지 않으므로 하류에는 abs-send-time(M4)만 있으면 된다(REA_01 5.1) | abs-capture-time 기반 TS 정렬이 필요해지면 해당 확장만 producer에서 보존 |
 | D-13 | 코덱 | VP8 / H.264 / VP9·AV1 SVC | **VP8 + Opus 1차**, SVC는 하지 않음 | 세 솔루션 모두 VP8 simulcast를 지원하고 SVC는 Pi Browser 보장이 없다(REA_01·02·03 7절) | M0에서 iOS Pi Browser가 VP8 송신이나 simulcast를 못 하면 H.264 추가 [확인중 : M0] |
@@ -404,8 +416,8 @@ PRD_01 5절의 통과 기준은 **그대로 유지**한다. 아래는 작업 목
 
 | # | 항목 | 권고 | 시한 |
 |---|---|---|---|
-| C-1 | D-1 : M1부터 mediasoup 명칭, M3 범위를 경계 정밀화로 축소 | 승인 권고 | M1 착수 전 |
-| C-2 | D-2 : 참가자당 발행·구독 PC 2개(Galène 스트림당 PC 대신) | 승인 권고. M1 실기기에서 깨지면 되돌림 | M1 착수 전 |
+| C-1 | D-1 : M1부터 mediasoup 경계, M3 범위를 경계 정밀화로 축소 | **승인(2026-10-25)** — 패키지 이름은 섬 이름(3.2절 : bora·capri·santorini·jeju, 엔진 Galápagos) | 완료 |
+| C-2 | D-2 : 참가자당 발행·구독 PC 2개(Galène 스트림당 PC 대신) | **승인(2026-10-25)**. M1 실기기에서 깨지면 되돌림 | 완료 |
 | C-3 | 발표자 기기 범위 : Pi Browser에서 simulcast 발행이 불확실함 → 발표자는 PC/일반 브라우저, Pi Browser는 청중 우선 | [TBD : 마스터] — M0 결과 후 | M0 완료 시 |
 | C-4 | LiveKit 공식 릴리스 바이너리를 시험 VM에 설치(비교 측정용) | 승인 필요 | M4 착수 전 |
 | C-5 | 시험·운영 VM(리전·사양·비용) | PRD_01 6절 기존 항목 | M1 LTE 시험 전 |
@@ -436,3 +448,4 @@ PRD_01 5절의 통과 기준은 **그대로 유지**한다. 아래는 작업 목
 | 날짜 | 내용 |
 |---|---|
 | 2026-10-25 | v1.0 — REA_01·02·03(검증 완료) 취합. 통합 모듈 설계, 데이터 흐름, 시그널링 초안, 단계 계획 갱신, 품질 기준, 결정 D-1~D-13, 마스터 확인 C-1~C-9 |
+| 2026-10-25 | v1.1 — 마스터 승인 C-1(경계 M1부터·패키지 섬 이름 bora·capri·santorini·jeju·엔진 Galápagos)·C-2(참가자당 PC 2개) |

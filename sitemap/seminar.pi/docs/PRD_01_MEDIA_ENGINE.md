@@ -28,7 +28,7 @@
 
 ## 3. 구조
 
-> **변경 제안 대기** : 통합 설계 [PRD_02](PRD_02_ENGINE_DESIGN.md) 6절이 이 절의 일부(경계 이름 M1부터·M3 범위·입장권 형식)를 바꾸자고 제안했다 — 마스터 확인 C-1·C-8 승인 전까지 이 문서가 정본.
+> **변경 반영 상태** : 통합 설계 [PRD_02](PRD_02_ENGINE_DESIGN.md) — **C-1 승인(2026-10-25)** : 경계는 M1부터, 패키지 이름은 섬 이름(bora=Router·capri=Transport·santorini=Producer·jeju=Consumer, 엔진 Galápagos), M3은 경계 정밀화. **C-2 승인** : 참가자당 PC 2개. 입장권 형식(C-8)은 승인 전까지 이 문서가 정본.
 
 ```
 [브라우저 — seminar.pi 화면(Next.js · Vercel)]
@@ -36,12 +36,12 @@
    ② WSS  /signal            : 입장권 제시 → join · produce · consume · trickle ICE · leave
    ③ UDP/TCP(DTLS-SRTP)      : 영상·음성
         ▼
-[media — 자체 Go 서버, 별도 VM]  sitemap/seminar.pi/media/
+[media — 자체 Go 서버 Galápagos, 별도 VM]  sitemap/seminar.pi/media/
    signal/     WebSocket 프로토콜 · 입장권 검증(MEDIA_TOKEN_SECRET)
-   room/       Router(mediasoup 개념) — 방 1개 = Router 1개, 역할(발표자·패널·청중)
-   transport/  참가자별 송신·수신 PeerConnection(pion — S-1 범위만)
-   producer/   들어오는 트랙(simulcast 레이어 rid=h·m·l)
-   consumer/   나가는 트랙 — 레이어 선택, 레이어 전환 때 SSRC·순번·타임스탬프 다시 매기기
+   bora/       Router(방) — 방 1개 = Router 1개, 역할(발표자·패널·청중)  ※ 섬 이름 패키지(C-1 승인)
+   capri/      Transport(연결) — 참가자별 송신·수신 PeerConnection(pion — S-1 범위만)
+   santorini/  Producer(송신 원천) — 들어오는 트랙(simulcast 레이어 rid=h·m·l)
+   jeju/       Consumer(청중 수신) — 나가는 트랙 — 레이어 선택, 레이어 전환 때 SSRC·순번·타임스탬프 다시 매기기
    forward/    RTP 전달 경로(producer → consumers)
    nack/       패킷 캐시(링 버퍼) · 구독자 NACK에 재전송 · 발행자에게 NACK 요청
    pli/        키프레임 요청 모으기·조절(초당 상한)
@@ -68,7 +68,7 @@
 
 ## 5. 단계 계획 — 통과 기준(go/no-go), 건너뛰기 금지
 
-> **변경 제안 대기** : 통합 설계 [PRD_02](PRD_02_ENGINE_DESIGN.md) 6절이 이 절의 일부(경계 이름 M1부터·M3 범위·입장권 형식)를 바꾸자고 제안했다 — 마스터 확인 C-1·C-8 승인 전까지 이 문서가 정본.
+> **변경 반영 상태** : 통합 설계 [PRD_02](PRD_02_ENGINE_DESIGN.md) — **C-1 승인(2026-10-25)** : 경계는 M1부터, 패키지 이름은 섬 이름(bora=Router·capri=Transport·santorini=Producer·jeju=Consumer, 엔진 Galápagos), M3은 경계 정밀화. **C-2 승인** : 참가자당 PC 2개. 입장권 형식(C-8)은 승인 전까지 이 문서가 정본.
 
 | 단계 | 참고 | 만드는 것 | 통과 기준 |
 |---|---|---|---|
