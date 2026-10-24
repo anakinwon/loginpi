@@ -80,6 +80,10 @@ export async function POST(request: NextRequest) {
   if (names.length === 0) {
     return apiError('ADM_EVT_PI_USERNAME_REQUIRED', 400)
   }
+  // 한 번에 처리할 이름 상한(입력 폭주로 요청이 길어지지 않게, R-P2)
+  if (names.length > 200) {
+    return apiError('BAD_REQUEST_BODY', 400)
+  }
 
   try {
     const db = getSupabaseAdmin()
@@ -89,43 +93,49 @@ export async function POST(request: NextRequest) {
     const already: string[] = [] // 이미 제외됨
     const notFound: string[] = [] // 요원 미발견
 
+    // 이름마다 3왕복(조회·중복 확인·추가)하던 N+1 → 사용자·기존 제외를 한 번씩 조회 후 한 번에 추가(R-P2, 2026-10-24 전수 점검)
+    const { data: targets, error: targetErr } = await db
+      .from('sys_user')
+      .select('id, pi_username')
+      .in('pi_username', names)
+    if (targetErr) throw targetErr
+    const byName = new Map(
+      (targets ?? []).map((t) => [t.pi_username as string, t.id as string]),
+    )
+    const ids = [...byName.values()]
+    const { data: ex, error: checkErr } = ids.length
+      ? await db
+          .from('evt_exclude')
+          .select('user_id')
+          .eq('event_id', 'evt-20260614-001')
+          .in('user_id', ids)
+          .eq('del_yn', 'N')
+      : { data: [], error: null }
+    if (checkErr) throw checkErr
+    const excluded = new Set((ex ?? []).map((x) => x.user_id as string))
+    const ins: Record<string, string>[] = []
     for (const name of names) {
-      // pi_username으로 요원(sys_user) 조회
-      const { data: target, error: targetErr } = await db
-        .from('sys_user')
-        .select('id, pi_username')
-        .eq('pi_username', name)
-        .maybeSingle()
-      if (targetErr) throw targetErr
-      if (!target) {
+      const id = byName.get(name)
+      if (!id) {
         notFound.push(name)
         continue
       }
-
-      // 이미 제외 대상자인지 확인
-      const { data: existing, error: checkErr } = await db
-        .from('evt_exclude')
-        .select('evt_exclude_id')
-        .eq('event_id', 'evt-20260614-001')
-        .eq('user_id', target.id)
-        .eq('del_yn', 'N')
-        .maybeSingle()
-      if (checkErr) throw checkErr
-      if (existing) {
+      if (excluded.has(id)) {
         already.push(name)
         continue
       }
-
-      // 제외 대상자 추가
-      const { error } = await db.from('evt_exclude').insert({
+      ins.push({
         event_id: 'evt-20260614-001',
-        user_id: target.id,
+        user_id: id,
         exclude_reason_tx: reason?.trim() || '관리자 판단',
         regr_id: slug,
         modr_id: slug,
       })
-      if (error) throw error
       added.push(name)
+    }
+    if (ins.length) {
+      const { error } = await db.from('evt_exclude').insert(ins)
+      if (error) throw error
     }
 
     return NextResponse.json({ added, already, notFound }, { status: 201 })

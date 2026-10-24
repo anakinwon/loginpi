@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { piFetch } from '@/lib/pi-fetch'
 
 type Props = { category: string; postId: string }
 
@@ -19,7 +20,7 @@ export function PostDetailActions({ category, postId }: Props) {
   const handleDelete = async () => {
     if (!confirm(t('deletePost'))) return
     setDeleting(true)
-    const res = await fetch(`/api/board/${category}/${postId}`, {
+    const res = await piFetch(`/api/board/${category}/${postId}`, {
       method: 'DELETE',
     })
     if (res.ok) {

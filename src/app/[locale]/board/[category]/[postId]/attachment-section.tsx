@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { piFetch } from '@/lib/pi-fetch'
 
 type Attachment = {
   attch_id: string
@@ -44,7 +45,7 @@ export function AttachmentSection({
     const formData = new FormData()
     Array.from(files).forEach((f) => formData.append('files', f))
 
-    const res = await fetch(`/api/board/${category}/${postId}/attachments`, {
+    const res = await piFetch(`/api/board/${category}/${postId}/attachments`, {
       method: 'POST',
       body: formData,
     })

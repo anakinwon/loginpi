@@ -19,21 +19,21 @@ export async function GET() {
 
   const db = getSupabaseAdmin()
 
-  // 현재 프로모션 상태
-  const { data: current } = await db
-    .from('v_promo_fee_current')
-    .select(
-      'promo_fee_id, promo_active_yn, promo_start_dtm, promo_end_dtm, reason_memo, status_label, is_active_now',
-    )
-    .single()
-
-  // 최근 변경 이력 (20건)
-  const { data: history } = await db
-    .from('v_promo_fee_recent_history')
-    .select(
-      'audit_id, old_active_yn, new_active_yn, old_start_dtm, new_start_dtm, old_end_dtm, new_end_dtm, changed_by, changed_at, reason_memo',
-    )
-    .limit(20)
+  // 현재 프로모션 상태·최근 변경 이력(20건)은 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
+  const [{ data: current }, { data: history }] = await Promise.all([
+    db
+      .from('v_promo_fee_current')
+      .select(
+        'promo_fee_id, promo_active_yn, promo_start_dtm, promo_end_dtm, reason_memo, status_label, is_active_now',
+      )
+      .single(),
+    db
+      .from('v_promo_fee_recent_history')
+      .select(
+        'audit_id, old_active_yn, new_active_yn, old_start_dtm, new_start_dtm, old_end_dtm, new_end_dtm, changed_by, changed_at, reason_memo',
+      )
+      .limit(20),
+  ])
 
   return NextResponse.json({
     current: current ?? null,

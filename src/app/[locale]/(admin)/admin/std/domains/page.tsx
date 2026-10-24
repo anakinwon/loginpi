@@ -150,7 +150,7 @@ export default function StdDomainsPage() {
         ? `/api/admin/std/domains/${editing.dom_id}`
         : '/api/admin/std/domains'
       const method = editing ? 'PATCH' : 'POST'
-      const res = await fetch(url, {
+      const res = await piFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

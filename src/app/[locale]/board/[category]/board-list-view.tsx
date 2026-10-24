@@ -9,6 +9,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { maskUsername } from '@/lib/mask-username'
 import { PostSearch } from './post-search'
+import { piFetch } from '@/lib/pi-fetch'
 
 // 게시글 1행 높이: py-3(24px) + 텍스트(20px) + border(1px) ≈ 45px
 const ROW_HEIGHT_PX = 45
@@ -99,7 +100,7 @@ export function BoardListView({
     setLoading(true)
     const sp = new URLSearchParams({ page: String(page), limit: String(limit) })
     if (q) sp.set('q', q)
-    fetch(`/api/board/${category}?${sp}`)
+    piFetch(`/api/board/${category}?${sp}`)
       .then((r) => r.json())
       .then((d: { posts: Post[]; total: number }) => {
         setPosts(d.posts ?? [])

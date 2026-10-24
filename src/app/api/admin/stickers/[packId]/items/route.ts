@@ -82,17 +82,24 @@ export async function POST(request: NextRequest, { params }: Params) {
     regr_id: string
     modr_id: string
   }[] = []
+  // 파일 업로드는 서로 독립 — 동시 업로드 후 원래 순서로 행 구성(R-P1, 2026-10-24 전수 점검)
+  const ups = await Promise.all(
+    files.map(async (f) => {
+      const ext = ALLOWED_MIME.get(f.type)!
+      const path = `stickers/${packId}/${crypto.randomUUID()}.${ext}`
+      const { error } = await db.storage
+        .from(BUCKET)
+        .upload(path, await f.arrayBuffer(), {
+          contentType: f.type,
+          upsert: false,
+        })
+      return error ? null : path
+    }),
+  )
   for (let i = 0; i < files.length; i++) {
     const f = files[i]
-    const ext = ALLOWED_MIME.get(f.type)!
-    const path = `stickers/${packId}/${crypto.randomUUID()}.${ext}`
-    const { error: upError } = await db.storage
-      .from(BUCKET)
-      .upload(path, await f.arrayBuffer(), {
-        contentType: f.type,
-        upsert: false,
-      })
-    if (upError) continue
+    const path = ups[i]
+    if (!path) continue
 
     const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(path)
     rows.push({

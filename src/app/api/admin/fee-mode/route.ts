@@ -17,11 +17,16 @@ export async function GET() {
   if (!user) return apiError('ADM_MASTER_ONLY', 403)
 
   const db = getSupabaseAdmin()
-  const { data: mode } = await db.rpc('fn_get_active_fee_mode')
-  const { data: history } = await db
-    .from('v_fee_mode_recent_history')
-    .select('audit_id, old_mode, new_mode, changed_by, changed_at, reason_memo')
-    .limit(20)
+  // 현재 모드·이력은 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
+  const [{ data: mode }, { data: history }] = await Promise.all([
+    db.rpc('fn_get_active_fee_mode'),
+    db
+      .from('v_fee_mode_recent_history')
+      .select(
+        'audit_id, old_mode, new_mode, changed_by, changed_at, reason_memo',
+      )
+      .limit(20),
+  ])
 
   return NextResponse.json({
     active_mode: mode === 'PI' ? 'PI' : 'BEAN',

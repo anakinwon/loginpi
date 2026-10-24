@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { maskUsername } from '@/lib/mask-username'
+import { piFetch } from '@/lib/pi-fetch'
 
 type Comment = {
   cmnt_id: string
@@ -55,7 +56,7 @@ export function CommentSection({
   const handleSubmit = async () => {
     if (!content.trim()) return
     setSubmitting(true)
-    const res = await fetch(`/api/board/${category}/${postId}/comments`, {
+    const res = await piFetch(`/api/board/${category}/${postId}/comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cmnt_cont: content.trim() }),
@@ -101,7 +102,7 @@ export function CommentSection({
   }
 
   const handleAccept = async (cmntId: string | null) => {
-    const res = await fetch(`/api/board/${category}/${postId}/accept`, {
+    const res = await piFetch(`/api/board/${category}/${postId}/accept`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cmnt_id: cmntId }),

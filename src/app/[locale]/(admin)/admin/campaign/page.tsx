@@ -459,7 +459,7 @@ function PendingPanel({
 
   const load = useCallback(async () => {
     setLoading(true)
-    const res = await fetch(
+    const res = await piFetch(
       `/api/admin/campaign?campaign_cd=${encodeURIComponent(campaignCd)}`,
     )
     if (res.ok) setData((await res.json()) as PendingData)

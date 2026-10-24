@@ -42,7 +42,7 @@ export function StoreShopfront({
           .then((d: { items?: StoreItem[] } | null) =>
             (d?.items ?? []).filter((it) => it.shop_id === shopId),
           )
-      : fetch(`/api/store/items?shop=${shopId}&limit=50`)
+      : piFetch(`/api/store/items?shop=${shopId}&limit=50`)
           .then((r) => (r.ok ? r.json() : null))
           .then((d: { items?: StoreItem[] } | null) => d?.items ?? [])
     req

@@ -45,9 +45,15 @@ export default function LinksPage() {
   const t = useTranslations('admin.links')
   const tc = useTranslations('common')
 
-  // allUsers: 통계카드·필터칩 카운트용(검색과 무관) / users: 목록용(검색 결과 반영)
-  const [allUsers, setAllUsers] = useState<UserRow[]>([])
+  // 서버 페이지네이션 — users: 현재 페이지 행 / total: 현재 조건 건수 / counts: 통계카드·필터칩용 전체 상태별 건수(검색 무관)
   const [users, setUsers] = useState<UserRow[]>([])
+  const [total, setTotal] = useState(0)
+  const [counts, setCounts] = useState<Record<LinkStatus | 'all', number>>({
+    all: 0,
+    linked: 0,
+    pi_only: 0,
+    google_only: 0,
+  })
   const [loading, setLoading] = useState(true)
   const [searching, setSearching] = useState(false)
   const [filter, setFilter] = useState<LinkStatus | 'all'>('all')
@@ -76,11 +82,10 @@ export default function LinksPage() {
         window.alert(d.error ?? t('toggleFailed'))
         return
       }
-      // optimistic 갱신 — 목록·통계 양쪽 반영
-      const apply = (arr: UserRow[]) =>
-        arr.map((x) => (x.id === u.id ? { ...x, del_yn: next } : x))
-      setUsers(apply)
-      setAllUsers(apply)
+      // optimistic 갱신 — 활성/비활성은 연동상태 건수와 무관해 목록만 반영
+      setUsers((arr) =>
+        arr.map((x) => (x.id === u.id ? { ...x, del_yn: next } : x)),
+      )
     } finally {
       setToggling(null)
     }
@@ -91,35 +96,44 @@ export default function LinksPage() {
     setPage(1)
   }, [limit, filter, search])
 
-  // 최초 전체 로드 (통계 + 목록 초기값)
-  useEffect(() => {
-    piFetch('/api/admin/links')
-      .then((r) => r.json())
-      .then((d: { users: UserRow[] }) => {
-        setAllUsers(d.users ?? [])
-        setUsers(d.users ?? [])
-      })
-      .finally(() => setLoading(false))
-  }, [])
-
-  // username 검색 (debounce). 2글자 미만이면 서버 호출 없이 전체(allUsers) 표시.
-  // 서버에서 pi_username을 pg_trgm GIN(.ilike '%q%')으로 부분일치 검색한다.
+  // 페이지·크기·필터·검색 변경 시 서버 조회 (검색어 입력은 300ms debounce).
+  // 2글자 미만 검색어는 보내지 않음(전체) — 서버가 pi_username을 pg_trgm GIN(.ilike '%q%')으로 부분일치 검색.
   useEffect(() => {
     const term = search.trim()
-    if (term.length < 2) {
-      setUsers(allUsers)
-      setSearching(false)
-      return
-    }
+    const p = new URLSearchParams({ page: String(page), size: String(limit) })
+    if (filter !== 'all') p.set('status', filter)
+    if (term.length >= 2) p.set('q', term)
+    let stale = false
     setSearching(true)
-    const h = setTimeout(() => {
-      piFetch(`/api/admin/links?q=${encodeURIComponent(term)}`)
-        .then((r) => r.json())
-        .then((d: { users: UserRow[] }) => setUsers(d.users ?? []))
-        .finally(() => setSearching(false))
-    }, 300)
-    return () => clearTimeout(h)
-  }, [search, allUsers])
+    const h = setTimeout(
+      () => {
+        piFetch(`/api/admin/links?${p}`)
+          .then((r) => r.json())
+          .then(
+            (d: {
+              users?: UserRow[]
+              total?: number
+              counts?: Record<LinkStatus | 'all', number>
+            }) => {
+              if (stale) return
+              setUsers(d.users ?? [])
+              setTotal(d.total ?? 0)
+              if (d.counts) setCounts(d.counts)
+            },
+          )
+          .finally(() => {
+            if (stale) return
+            setSearching(false)
+            setLoading(false)
+          })
+      },
+      term.length >= 2 ? 300 : 0,
+    )
+    return () => {
+      stale = true
+      clearTimeout(h)
+    }
+  }, [page, limit, filter, search])
 
   const STATUS_LABEL: Record<LinkStatus, string> = {
     linked: t('status.linked'),
@@ -127,19 +141,8 @@ export default function LinksPage() {
     google_only: t('status.googleOnly'),
   }
 
-  // 통계·필터칩 카운트는 전체(allUsers) 기준 유지 (검색 무관)
-  const counts = {
-    linked: allUsers.filter((u) => getLinkStatus(u) === 'linked').length,
-    pi_only: allUsers.filter((u) => getLinkStatus(u) === 'pi_only').length,
-    google_only: allUsers.filter((u) => getLinkStatus(u) === 'google_only')
-      .length,
-  }
-
-  // 목록은 검색 결과(users)에 연동상태 필터만 적용 (username 검색은 서버 처리)
-  const filtered =
-    filter === 'all' ? users : users.filter((u) => getLinkStatus(u) === filter)
-  const totalPages = Math.ceil(filtered.length / limit)
-  const displayedLinks = filtered.slice((page - 1) * limit, page * limit)
+  // 필터·검색·페이지는 서버 처리 — 받은 행이 곧 현재 페이지
+  const totalPages = Math.ceil(total / limit)
 
   const STAT_CARDS = [
     {
@@ -167,7 +170,7 @@ export default function LinksPage() {
       <div>
         <h1 className="text-2xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          {t('totalCount', { count: allUsers.length })}
+          {t('totalCount', { count: counts.all })}
         </p>
       </div>
 
@@ -211,7 +214,7 @@ export default function LinksPage() {
         )}
         {search.trim().length >= 2 && !searching && (
           <span className="text-muted-foreground text-xs">
-            {t('searchResultCount', { count: users.length })}
+            {t('searchResultCount', { count: total })}
           </span>
         )}
       </div>
@@ -228,7 +231,7 @@ export default function LinksPage() {
             }`}
           >
             {s === 'all'
-              ? `${tc('all')} (${allUsers.length})`
+              ? `${tc('all')} (${counts.all})`
               : `${STATUS_LABEL[s]} (${counts[s]})`}
           </button>
         ))}
@@ -236,7 +239,7 @@ export default function LinksPage() {
 
       {loading ? (
         <p className="text-muted-foreground text-sm">{tc('loading')}</p>
-      ) : filtered.length === 0 ? (
+      ) : users.length === 0 ? (
         <p className="text-muted-foreground text-sm">{t('noUsers')}</p>
       ) : (
         <div className="overflow-hidden overflow-x-auto rounded-lg border">
@@ -267,7 +270,7 @@ export default function LinksPage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {displayedLinks.map((u) => {
+              {users.map((u) => {
                 const status = getLinkStatus(u)
                 const inactive = u.del_yn === 'Y'
                 return (

@@ -219,7 +219,7 @@ export default function AdminThemesPage() {
         ? `/api/admin/themes/${editing.theme_cd}`
         : '/api/admin/themes'
       const method = editing ? 'PATCH' : 'POST'
-      const res = await fetch(url, {
+      const res = await piFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

@@ -171,7 +171,7 @@ export default function StdTermsPage() {
         ? `/api/admin/std/terms/${editing.term_id}`
         : '/api/admin/std/terms'
       const method = editing ? 'PATCH' : 'POST'
-      const res = await fetch(url, {
+      const res = await piFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

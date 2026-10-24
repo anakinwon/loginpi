@@ -69,6 +69,8 @@ async function callGemini(prompt: string, apiKey: string): Promise<string> {
         responseMimeType: 'application/json',
       },
     }),
+    // 외부 AI 호출 상한(R-P4, 2026-10-24) — 배치 번역이라 응답이 길 수 있어 30초, 시간 초과는 아래 실패 경로로
+    signal: AbortSignal.timeout(30_000),
   })
   if (!res.ok) {
     // KISA IL 완화: 에러 응답 크기 제한 후 로깅 (민감한 정보 노출 금지)

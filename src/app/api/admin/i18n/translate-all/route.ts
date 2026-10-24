@@ -48,6 +48,8 @@ export async function POST(req: NextRequest) {
           method: 'POST',
           headers: { 'content-type': 'application/json', ...authHeader },
           body: JSON.stringify({ locale: lc }),
+          // locale 1개 번역 상한(R-P4, 2026-10-24) — 순차 처리는 Gemini 속도 제한 때문에 의도됨
+          signal: AbortSignal.timeout(240_000),
         })
         if (!tr.ok) {
           console.error(`[i18n-bg] translate 실패 ${lc}: ${tr.status}`)
@@ -57,6 +59,7 @@ export async function POST(req: NextRequest) {
           method: 'POST',
           headers: { 'content-type': 'application/json', ...authHeader },
           body: JSON.stringify({ locale: lc }),
+          signal: AbortSignal.timeout(60_000),
         })
         if (!sy.ok) {
           console.error(`[i18n-bg] sync 실패 ${lc}: ${sy.status}`)
