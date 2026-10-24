@@ -86,6 +86,8 @@ async function callGeocode(
   const res = await fetch(`${GEOCODE_URL}?${sp}`, {
     // 동일 좌표/주소 반복 변환 방지 — Next.js fetch 캐시 1일(비용 절감)
     next: { revalidate: 86400 },
+    // 외부 호출 상한(R-P4, 2026-10-24 전수 점검) — 시간 초과는 아래 throw 경로로
+    signal: AbortSignal.timeout(2000),
   })
 
   if (!res.ok) {

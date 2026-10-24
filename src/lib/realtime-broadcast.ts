@@ -24,7 +24,13 @@ async function broadcastToTopic(
     body: JSON.stringify({
       messages: [{ topic, event, payload }],
     }),
+    // 채팅 전송 응답이 기다리므로 2초 상한(R-P4, 2026-10-24 전수 점검) — 실패는 아래에서 기록만
+    signal: AbortSignal.timeout(2000),
+  }).catch((e: unknown) => {
+    console.error(`[realtime] broadcast 시간 초과·실패 ${topic}`, e)
+    return null
   })
+  if (!res) return
 
   if (!res.ok) {
     console.error(`[realtime] broadcast 실패 ${topic}`, await res.text())

@@ -68,33 +68,33 @@ async function listPublicRooms(limit = 10): Promise<RoomRow[]> {
   const now = new Date().toISOString()
 
   // 1) 활성 부스트 카페 (boost_expire_dtm 미래) — 만료 늦은 순(최근 구매 우선)
-  const { data: boostedRooms } = await db
-    .from('msg_room')
-    .select(ROOM_SELECT)
-    .eq('is_public_yn', 'Y')
-    .eq('room_tp_cd', 'G')
-    .eq('del_yn', 'N')
-    .gt('expr_dtm', now)
-    .gt('boost_expire_dtm', now)
-    .order('boost_expire_dtm', { ascending: false })
-    .limit(limit)
+  // 2) 일반 카페 — 최신순. 두 조회는 동시에(R-P1, 2026-10-24 전수 점검) — 부스트는 최대 limit 개라 일반을 limit*2 받아 메모리에서 제외
+  const [{ data: boostedRooms }, { data: normalRooms }] = await Promise.all([
+    db
+      .from('msg_room')
+      .select(ROOM_SELECT)
+      .eq('is_public_yn', 'Y')
+      .eq('room_tp_cd', 'G')
+      .eq('del_yn', 'N')
+      .gt('expr_dtm', now)
+      .gt('boost_expire_dtm', now)
+      .order('boost_expire_dtm', { ascending: false })
+      .limit(limit),
+    db
+      .from('msg_room')
+      .select(ROOM_SELECT)
+      .eq('is_public_yn', 'Y')
+      .eq('room_tp_cd', 'G')
+      .eq('del_yn', 'N')
+      .gt('expr_dtm', now)
+      .order('reg_dtm', { ascending: false })
+      .limit(limit * 2),
+  ])
   const boosted = (boostedRooms ?? []) as unknown as RoomRow[]
-  const boostedIds = boosted.map((r) => r.room_id)
-
-  // 2) 일반 카페 (부스트 제외) — 최신순, 남은 자리만큼
-  let normalQuery = db
-    .from('msg_room')
-    .select(ROOM_SELECT)
-    .eq('is_public_yn', 'Y')
-    .eq('room_tp_cd', 'G')
-    .eq('del_yn', 'N')
-    .gt('expr_dtm', now)
-    .order('reg_dtm', { ascending: false })
-    .limit(limit)
-  if (boostedIds.length > 0)
-    normalQuery = normalQuery.not('room_id', 'in', `(${boostedIds.join(',')})`)
-  const { data: normalRooms } = await normalQuery
-  const normal = (normalRooms ?? []) as unknown as RoomRow[]
+  const boostedIds = new Set(boosted.map((r) => r.room_id))
+  const normal = ((normalRooms ?? []) as unknown as RoomRow[]).filter(
+    (r) => !boostedIds.has(r.room_id),
+  )
 
   const rows = [...boosted, ...normal].slice(0, limit)
   if (rows.length === 0) return []

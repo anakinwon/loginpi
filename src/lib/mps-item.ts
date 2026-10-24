@@ -315,25 +315,24 @@ export async function getItemDetail(itemId: string, viewerId?: string) {
   const row = item as MpsItem
   if (row.item_st_cd === 'DRAFT' && row.seller_id !== viewerId) return null
 
-  let shop: Record<string, unknown> | null = null
-  if (row.shop_id) {
-    const { data } = await db
-      .from('mps_shop')
-      .select(
-        'shop_id, shop_nm, shop_type_cd, addr, biz_hour, contact_tel, dlvr_yn',
-      )
-      .eq('shop_id', row.shop_id)
-      .eq('del_yn', 'N')
-      .maybeSingle()
-    shop = data
-  }
-
+  // 매장·보증금 거래 여부·진행 중 주문 수는 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
   // 보증금 거래 여부 — 구매자가 취소수수료 발생 여부를 거래 전에 인지 (FR-10 단서 공시)
   // 진행 중 주문 수 — 거래중/판매완료 배지 구분
-  const [sellerBonded, tradingCounts] = await Promise.all([
+  const [shopRes, sellerBonded, tradingCounts] = await Promise.all([
+    row.shop_id
+      ? db
+          .from('mps_shop')
+          .select(
+            'shop_id, shop_nm, shop_type_cd, addr, biz_hour, contact_tel, dlvr_yn',
+          )
+          .eq('shop_id', row.shop_id)
+          .eq('del_yn', 'N')
+          .maybeSingle()
+      : { data: null },
     isSellerBonded(row.seller_id),
     getTradingCounts([row.item_id]),
   ])
+  const shop = shopRes.data as Record<string, unknown> | null
 
   return {
     ...row,

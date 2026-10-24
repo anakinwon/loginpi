@@ -198,16 +198,19 @@ export async function getOrCreateDirectRoom(
     if (itemId) dq = dq.eq('item_id', itemId)
     const { data: directRooms } = await dq
 
+    // 상대가 멤버인 방을 한 번에 조회(R-P2 — 방마다 조회하던 N+1 제거, 2026-10-24 전수 점검)
+    const dIds = (directRooms ?? []).map((r) => r.room_id)
+    const { data: otherMbrs } = dIds.length
+      ? await supabase
+          .from('msg_room_mbr')
+          .select('room_id')
+          .in('room_id', dIds)
+          .eq('usr_id', userId2)
+          .eq('del_yn', 'N')
+      : { data: [] }
+    const withOther = new Set((otherMbrs ?? []).map((m) => m.room_id))
     for (const room of directRooms ?? []) {
-      const { data: otherMbr } = await supabase
-        .from('msg_room_mbr')
-        .select('room_mbr_id')
-        .eq('room_id', room.room_id)
-        .eq('usr_id', userId2)
-        .eq('del_yn', 'N')
-        .single()
-
-      if (otherMbr) {
+      if (withOther.has(room.room_id)) {
         // 재문의 = 재활성: 만료 12시간 연장 + 직거래 규격으로 정규화(과거 'Direct'/'CODING' 방 포함).
         //   만료돼 목록에서 사라졌던 방도 다시 문의하면 되살아난다(대화 이력 보존).
         const exp = new Date(Date.now() + 12 * 3600 * 1000).toISOString()

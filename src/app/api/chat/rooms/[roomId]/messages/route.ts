@@ -122,14 +122,17 @@ export async function POST(request: NextRequest, { params }: Params) {
   const user = await getSessionUser()
   if (!user) return apiError('AUTH_REQUIRED', 401)
 
-  const mbr = await getRoomMember(roomId, user.id)
+  // 멤버 확인과 최근 전송 수(rate limit)는 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
+  const [mbr, recentCount] = await Promise.all([
+    getRoomMember(roomId, user.id),
+    getRecentMsgCount(roomId, user.id),
+  ])
   if (!mbr) return apiError('CHAT_NOT_MEMBER', 403)
 
   // 메시지 전송 = 가장 명확한 활성 사용자 신호
   recordActivity(user.id, 'MSG')
 
   // rate limiting: 1초 5건 초과 방지
-  const recentCount = await getRecentMsgCount(roomId, user.id)
   if (recentCount >= 5) {
     return apiError('CHAT_MSG_RATE_LIMIT', 429)
   }

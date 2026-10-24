@@ -102,23 +102,30 @@ export default async function ChatRoomPage({ params }: Params) {
     }
   }
 
-  // 초기 메시지 50건 + 현재 멤버 수를 병렬 조회
-  const [{ data: rawMsgs }, { count: mbrCount }] = await Promise.all([
-    getSupabaseAdmin()
-      .from('msg_msg')
-      .select(
-        'msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, src_lang_cd, del_yn, reg_dtm',
-      )
-      .eq('room_id', roomId)
-      .eq('del_yn', 'N')
-      .order('reg_dtm', { ascending: false })
-      .limit(50),
-    getSupabaseAdmin()
-      .from('msg_room_mbr')
-      .select('room_mbr_id', { count: 'exact', head: true })
-      .eq('room_id', roomId)
-      .eq('del_yn', 'N'),
-  ])
+  // 초기 메시지 50건 + 현재 멤버 수 + 테마 이모지를 병렬 조회(R-P1, 2026-10-24 전수 점검)
+  const [{ data: rawMsgs }, { count: mbrCount }, { data: themeData }] =
+    await Promise.all([
+      getSupabaseAdmin()
+        .from('msg_msg')
+        .select(
+          'msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, src_lang_cd, del_yn, reg_dtm',
+        )
+        .eq('room_id', roomId)
+        .eq('del_yn', 'N')
+        .order('reg_dtm', { ascending: false })
+        .limit(50),
+      getSupabaseAdmin()
+        .from('msg_room_mbr')
+        .select('room_mbr_id', { count: 'exact', head: true })
+        .eq('room_id', roomId)
+        .eq('del_yn', 'N'),
+      // msg_theme JOIN으로 테마 이모지 가져오기
+      getSupabaseAdmin()
+        .from('msg_theme')
+        .select('theme_emoji')
+        .eq('theme_cd', room.theme_cd)
+        .single(),
+    ])
 
   const isOwner = mbr?.mbr_role_cd === 'OWNER'
   const capacityAlert = isOwner && (mbrCount ?? 0) >= room.max_mbr_cnt
@@ -150,13 +157,6 @@ export default async function ChatRoomPage({ params }: Params) {
       }
     }
   }
-
-  // msg_theme JOIN으로 테마 이모지 가져오기
-  const { data: themeData } = await getSupabaseAdmin()
-    .from('msg_theme')
-    .select('theme_emoji')
-    .eq('theme_cd', room.theme_cd)
-    .single()
 
   const themeEmoji =
     (themeData as { theme_emoji?: string } | null)?.theme_emoji ?? '💬'

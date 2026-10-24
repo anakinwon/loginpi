@@ -74,26 +74,23 @@ export async function GET(req: NextRequest) {
 
   const fbckIds = (rows ?? []).map((r: { fbck_id: string }) => r.fbck_id)
 
-  // 이미지 병렬 조회
-  const { data: imgRows } = fbckIds.length
-    ? await db
-        .from('fbck_img')
-        .select('fbck_id, img_ord, img_url')
-        .in('fbck_id', fbckIds)
-        .eq('del_yn', 'N')
-        .order('img_ord', { ascending: true })
-    : { data: [] }
-
-  // 작성자 표시명 조회
+  // 이미지·작성자 표시명은 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
   const usrIds = [
     ...new Set((rows ?? []).map((r: { usr_id: string }) => r.usr_id)),
   ]
-  const { data: userRows } = usrIds.length
-    ? await db
-        .from('sys_user')
-        .select('id, pi_username, nick_nm')
-        .in('id', usrIds)
-    : { data: [] }
+  const [{ data: imgRows }, { data: userRows }] = await Promise.all([
+    fbckIds.length
+      ? db
+          .from('fbck_img')
+          .select('fbck_id, img_ord, img_url')
+          .in('fbck_id', fbckIds)
+          .eq('del_yn', 'N')
+          .order('img_ord', { ascending: true })
+      : { data: [] },
+    usrIds.length
+      ? db.from('sys_user').select('id, pi_username, nick_nm').in('id', usrIds)
+      : { data: [] },
+  ])
 
   const userMap = new Map(
     (userRows ?? []).map(

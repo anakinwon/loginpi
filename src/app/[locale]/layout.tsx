@@ -72,12 +72,19 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  const session = await auth()
-  const messages = await getMessages()
-
+  // 세션·메시지·UI 테마·요금제 모드·오픈 프로모는 서로 독립 — 모든 페이지가 거치므로 동시 조회(R-P1, 2026-10-24 전수 점검)
   // 활성 UI 테마가 '전체 적용(GLOBAL)'이면 :root에 색상 주입 (전 페이지).
   // 'ADMIN'이면 여기선 주입하지 않고 (admin)/layout이 스코프 주입한다.
-  const activeTheme = await getActiveUiTheme()
+  // 요금제 모드 — PI 모드면 마이크로 요금을 client에서 "무료"로 표시(서버 microFeeBean과 일관)
+  // 오픈 프로모 상태(활성 + 종료시각) — 무료 표시 + 홈 배너 client 자동 숨김(종료시각 도달 시)
+  const [session, messages, activeTheme, feeMode, openPromo] =
+    await Promise.all([
+      auth(),
+      getMessages(),
+      getActiveUiTheme(),
+      getActiveFeeMode(),
+      getOpenPromoState(),
+    ])
   const globalThemeCss =
     activeTheme?.apply_scope_cd === 'GLOBAL'
       ? buildThemeStyleCss(activeTheme.theme_tokens, 'GLOBAL')
@@ -92,11 +99,6 @@ export default async function LocaleLayout({
   )
   // 운영(메인넷)이면 홈 백서·매뉴얼 기본 펼침 (대시보드·Event 숨김은 server에서 직접 분기)
   const isProd = computeIsProd(tier)
-
-  // 활성 요금제 모드 — PI 모드면 마이크로 요금을 client에서 "무료"로 표시(서버 microFeeBean과 일관)
-  const feeMode = await getActiveFeeMode()
-  // 오픈 프로모 상태(활성 + 종료시각) — 무료 표시 + 홈 배너 client 자동 숨김(종료시각 도달 시)
-  const openPromo = await getOpenPromoState()
 
   return (
     <html lang={locale} suppressHydrationWarning>
