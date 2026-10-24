@@ -221,7 +221,7 @@ type Allocator interface {                 // 구독자 구독 PC당 1개, 이�
 ### 4.1 정방향 (발표자 영상 RTP → 청중 N명)
 
 ```
-[발표자 브라우저] ──SRTP──▶ pion(복호) ─▶ producer 레이어 수신 고루틴 (rid=h)
+[발표자 브라우저] ──SRTP──▶ pion(복호) ─▶ santorini(Producer) 레이어 수신 고루틴 (rid=h)
    1 ReadRTP → rtpx.Extend(16→64비트) → VP8 키프레임 판별 → 들어온 헤더 확장 제거
    2 nack.PacketCache.Store  → idx            (본문 1벌, 레이어당 캐시 1개)
    3 nack.LossTracker.Receive → 기준 초과 구멍이면 상류 NACK(rtcpx)
@@ -229,7 +229,7 @@ type Allocator interface {                 // 구독자 구독 PC당 1개, 이�
    5 forward: 구독 Consumer마다 Queue.Offer(extSeq, idx, flags)   ← 데이터 복사 없음
         │ (큐가 차면 그 Consumer만 marker까지 버림 + 키프레임 필요 표시)
         ▼
- consumer 송신 고루틴 (청중 k)
+ jeju(Consumer) 송신 고루틴 (청중 k)
    6 cache.GetAt(extSeq, idx) → 슬롯이 덮였으면 건너뜀(뒤에서 NACK로 복구)
    7 LayerPolicy.Decide → Forward | Drop(SeqRewriter.Drop) | SilentDrop | Buffer
    8 Switch면 SeqRewriter.Sync + TS 오프셋 재계산(레이어별 SR NTP 정렬, 75ms 상한)
@@ -254,8 +254,8 @@ type Allocator interface {                 // 구독자 구독 PC당 1개, 이�
 | 상태 | 소유자 | 다른 고루틴의 접근 |
 |---|---|---|
 | 방·참가자·producer→consumers 표 | bora(방) 고루틴 | 명령 채널로만 |
-| 레이어 캐시 쓰기·LossTracker·Limiter | producer 레이어 수신 고루틴 | 캐시 읽기(`GetAt`·`Get`)는 슬롯 순번 검증 + RWMutex [TBD : M2 벤치마크로 잠금 방식 확정] |
-| Consumer 상태·SeqRewriter·SendMeta | consumer 송신 고루틴 | RTCP는 채널로 전달 |
+| 레이어 캐시 쓰기·LossTracker·Limiter | santorini(Producer) 레이어 수신 고루틴 | 캐시 읽기(`GetAt`·`Get`)는 슬롯 순번 검증 + RWMutex [TBD : M2 벤치마크로 잠금 방식 확정] |
+| Consumer 상태·SeqRewriter·SendMeta | jeju(Consumer) 송신 고루틴 | RTCP는 채널로 전달 |
 | Allocator | 구독 PC당 이벤트 고루틴 | 이벤트 큐 |
 
 - 모든 테스트는 `go test -race`로 돌린다. 순번 감김(65535→0), 순서 뒤바뀜, 캐시 덮어쓰기, 레이어 전환 엣지 케이스(REA_02 5.7 각 항목)를 표 형식 단위 테스트로 먼저 작성한다.
@@ -403,7 +403,7 @@ PRD_01 5절의 통과 기준은 **그대로 유지**한다. 아래는 작업 목
 | D-7 | BWE 방식 | (a) REMB + NACK 비율(LiveKit 기본) (b) TWCC 피드백 + 지연 기반 추정 직접 작성(mediasoup 내장 BWE·GCC 개념) | **(a)** M4 1차. TWCC는 협상하지 않음 | LiveKit 상용 기본값이 (a)이고, mediasoup도 내장 BWE를 기본으로 꺼 둔다(REA_02 5.8). 구현량이 몇 배 차이 난다. 손실·RTT 수집은 M2부터 | Pi Browser가 REMB를 보내지 않으면 RR 손실 + NACK 비율만 쓰는 대체 경로로. T4에서 Q4가 목표의 2배를 넘으면 (b) 검토 착수 [확인중 : M0·M4 실기기] |
 | D-8 | simulcast 선택 알고리즘 | (a) 클라이언트가 화면 크기로 재요청(Galène) (b) 서버 자동 | **(b)** 클라이언트는 `setLayer`로 상한만 보낸다. 서버는 Allocator(STABLE/DEFICIENT, 레이어 0 보장, 우선순위, 1.2배 히스테리시스, 일시정지 끔)로 목표를 정하고, LayerPolicy가 키프레임 경계에서 전환한다(SR NTP TS 정렬, SR이 없으면 보류하고 키프레임 재요청, 75ms 상한, 프레임 미완료 skip, 옛 패킷 차단, 부족 상태 하향은 즉시 차단). 레이어는 rid l/m/h 3개 | (a)는 재협상과 SSRC 변경이 일어나 WKWebView에서 깜박일 위험이 있다(REA_01 7절). 전환 규칙은 mediasoup이 수년간 고친 엣지 케이스다(REA_02 5.7) | 발표자 기기가 3레이어를 못 보내면 2레이어(Galène식 고·저). SR이 오랫동안 오지 않으면 경과 시간 기준 오프셋으로 대체 [TBD : 대기 한도] |
 | D-9 | 시그널링 형식 | (a) Galène 대칭·비동기 (b) 요청/응답/알림 봉투 + mediasoup 동사 + 표준 SDP (c) mediasoup ORTC 파라미터 JSON | **(b)** | `produce`·`consume`은 결과(ID)가 필요해서 요청/응답 짝이 맞다. 표준 SDP라 클라이언트 라이브러리가 필요 없다(REA_02 7절). 동사가 서버 모듈과 1:1 | 메시지 종류가 20개를 넘어 관리가 어려워지면 스키마 파일(JSON Schema)로 생성. 형식 자체를 되돌릴 조건은 없음 |
-| D-10 | 동시성 모델 | (a) Galène식 원자 변수·잠금·작성자 풀 (b) 단일 소유 + 채널 | **(b)** bora(방) 고루틴 = 제어 평면, 레이어 수신 고루틴 = 캐시 쓰기, consumer 송신 고루틴 = 구독자 상태, 구독자별 제한 큐(32) | mediasoup의 단일 스레드 무경합 성질을 Go에서 얻는다(REA_02 8절). 청중 1명 단위 격리(REA_01 정정 3) | T1에서 Q11 CPU가 목표를 넘으면 LiveKit식 병렬 분할 또는 √n 작성자 풀 |
+| D-10 | 동시성 모델 | (a) Galène식 원자 변수·잠금·작성자 풀 (b) 단일 소유 + 채널 | **(b)** bora(방) 고루틴 = 제어 평면, 레이어 수신 고루틴 = 캐시 쓰기, jeju(Consumer) 송신 고루틴 = 구독자 상태, 구독자별 제한 큐(32) | mediasoup의 단일 스레드 무경합 성질을 Go에서 얻는다(REA_02 8절). 청중 1명 단위 격리(REA_01 정정 3) | T1에서 Q11 CPU가 목표를 넘으면 LiveKit식 병렬 분할 또는 √n 작성자 풀 |
 | D-11 | 입장권 | (a) 자체 HMAC 형식 (b) JWT HS256(알고리즘 고정) | **(b)** 수명 60초, `jti` 일회용, `cap`·`end` 클레임 | 표준 형식이라 화면 서버(Node)와 Go 양쪽 구현이 쉽고 서명은 PRD의 HMAC 그대로다. Galène 토큰 검증 규칙(만료 필수·5초 오차·실패 지연)을 따른다(REA_01 5.11) | 화면 서버가 JWT 라이브러리를 도입하기 어렵다고 판단되면 (a)로(클레임은 같음) |
 | D-12 | 헤더 확장 | (a) 들어온 확장 그대로 전달 (b) 전부 제거하고 필요한 것만 서버가 새로 붙임 | **(b)** | 구독자별 확장을 새로 만들어야 경합이 없다(REA_02 정정 6). TWCC를 쓰지 않으므로 하류에는 abs-send-time(M4)만 있으면 된다(REA_01 5.1) | abs-capture-time 기반 TS 정렬이 필요해지면 해당 확장만 producer에서 보존 |
 | D-13 | 코덱 | VP8 / H.264 / VP9·AV1 SVC | **VP8 + Opus 1차**, SVC는 하지 않음 | 세 솔루션 모두 VP8 simulcast를 지원하고 SVC는 Pi Browser 보장이 없다(REA_01·02·03 7절) | M0에서 iOS Pi Browser가 VP8 송신이나 simulcast를 못 하면 H.264 추가 [확인중 : M0] |
