@@ -2,7 +2,7 @@
 // 멀티테넌트 환경설정 생성기(2026-10-24 마스터 지시) — 키별 구하는 곳·공유 규칙 정본 = docs/ENV_GUIDE.md
 //   node scripts/tenant-env.mjs multi                      # 모든 앱 .env.local → 루트 .env.multi 모음 재생성
 //   node scripts/tenant-env.mjs new <domain> [--port 3003] [--out <dir>]
-//     → sitemap/<domain>/ 에 .env.example · .env.local(로컬·스테이징) · .env.vercel-prod(운영 Vercel 등록용) 한 세트 생성
+//     → sitemap/<domain>/ 에 .env.example · .env.local(로컬·스테이징) · .env.vercel-prod(운영 Vercel 등록용) + docs/PRD·ROADMAP·TROUBLESHOOT 골격 · CLAUDE.md · .claude/settings.json 한 세트 생성, sites.json appSts → BUILDING
 //       비밀키는 새로 생성, 공유 키는 기존 앱에서 복사, 포털 발급 값은 빈 칸 + 구하는 곳 주석. 기존 파일은 덮어쓰지 않음
 //   ⚠ 생성 파일은 비밀값 포함 — 모두 .gitignore(.env*) 대상(.env.example 만 커밋)
 import { randomBytes } from 'node:crypto'
@@ -156,28 +156,197 @@ function create(domain, port, outDir) {
       ...keys.flatMap((k) => (k in vals ? [`${k}=${vals[k]}`] : [`${k}=`])),
     ].join('\n') + '\n'
 
+  const site = JSON.parse(readFileSync(join(ROOT, 'sitemap/sites.json'), 'utf8')).sites.find((s) => s.domain === domain)
   const files = [
     ['.env.example', tpl],
     ['.env.local', render(local, '로컬·스테이징')],
     ['.env.vercel-prod', render(prod, '운영 Vercel 등록용(Settings → Environment Variables → Production) — 앱이 읽지 않음, 등록 후 보관')],
+    // 첫 할 일 문서·설정 — 앱 코드 골격(_template)은 만들지 않는다(PRD_28 §3 선제 작성 금지)
+    ['docs/PRD.md', prdDoc(domain, name, site)],
+    ['docs/ROADMAP.md', roadmapDoc(domain, name, port)],
+    ['docs/TROUBLESHOOT.md', troubleDoc(domain)],
+    ['CLAUDE.md', claudeDoc(domain)],
+    ['.claude/settings.json', readFileSync(join(ROOT, 'sitemap/sitemap.pi/.claude/settings.json'), 'utf8').replace('"sitemap.pi"', JSON.stringify(domain))],
   ]
   for (const [f, body] of files) {
     const p = join(dir, f)
     if (existsSync(p)) console.log(`건너뜀(이미 있음) : ${relative(ROOT, p)}`)
     else {
-      if (f === '.env.example') writeFileSync(p, body) // 비밀값 없음 — 커밋 대상
-      else writeSecret(p, body)
+      mkdirSync(join(p, '..'), { recursive: true })
+      if (f.startsWith('.env.') && f !== '.env.example') writeSecret(p, body)
+      else writeFileSync(p, body) // 비밀값 없음 — 커밋 대상
       console.log(`생성 : ${relative(ROOT, p)}`)
     }
   }
+  if (!outDir) markBuilding(domain, site)
   // 로컬에서 비워 둬도 되는 키 — 운영 전용(모니터링·운영 DB·uid)·선택(Pi Sign-In·운영 읽기 전용·dev tier)
   const optional = new RegExp(`^(MON_INGEST_|PROD_RO_|STAGING_DB_TARGET|DEV_SUPABASE_|ADMIN_PI_UIDS|NEXT_PUBLIC_SUPABASE_URL|SUPABASE_SERVICE_ROLE_KEY|NEXT_PUBLIC_PI_OAUTH_CLIENT_ID|${NAME}_PROD_)`)
   const empty = keys.filter((k) => !local[k])
   const need = empty.filter((k) => !optional.test(k))
   console.log(`\n직접 발급 필수 ${need.length}개 : ${need.join(', ')}`)
   console.log(`운영·선택(로컬은 비워도 됨) ${empty.length - need.length}개 : ${empty.filter((k) => optional.test(k)).join(', ')}`)
-  console.log('→ 구하는 곳 docs/ENV_GUIDE.md 3절, 신규 테넌트 체크리스트 4절')
+  console.log('→ 구하는 곳 docs/ENV_GUIDE.md 3절')
+  console.log(`\n다음 할 일 = sitemap/multitenant_create_TODO-List.md (단계 0 결정 → 2 PRD 확정 → 3 앱 골격 …), 진행 현황 표에 ${domain} 행 추가`)
   if (!outDir) multi()
+}
+
+// sites.json 해당 사이트 appSts PLANNED → BUILDING (서식 보존 위해 텍스트 치환, 없으면 안내만)
+function markBuilding(domain, site) {
+  if (!site) return console.log(`⚠ sitemap/sites.json 에 ${domain} 없음 — 레지스트리 등록은 PRD_28 §8 기준으로 직접 추가`)
+  if (site.appSts !== 'PLANNED') return
+  const p = join(ROOT, 'sitemap/sites.json')
+  const s = readFileSync(p, 'utf8')
+  const at = s.indexOf(`"domain": "${domain}"`)
+  const end = s.indexOf('}', at)
+  const block = s.slice(at, end).replace('"appSts": "PLANNED"', '"appSts": "BUILDING"')
+  writeFileSync(p, s.slice(0, at) + block + s.slice(end))
+  console.log(`sites.json : ${domain} appSts PLANNED → BUILDING`)
+}
+
+// ── 첫 할 일 문서 골격 — 값은 sites.json, 규칙은 PRD_28 §1.1 링크(복제 금지), 미정은 [TBD] ──
+const today = () => new Date().toISOString().slice(0, 10)
+const R = '../../../docs' // sitemap/<domain>/docs → 루트 docs
+
+function prdDoc(domain, name, site = {}) {
+  return `# PRD: ${domain}
+
+> 버전 v0.1(골격) · 작성 ${today()} · \`node scripts/tenant-env.mjs new\` 생성 — [TBD] 를 채워 v1.0 확정 후 앱 코드 착수
+> 상위 플랜 : [PRD_28 멀티사이트](${R}/PRD_28_PI_MULTISITE.md) §8 · 사업 근거 : [PRD_27](${R}/PRD_27_PI_FACTORY.md) 사이트 표 · 할 일 : [TODO 목록](../../multitenant_create_TODO-List.md)
+
+## 1. 개요 (sitemap/sites.json)
+
+| 항목 | 값 |
+|---|---|
+| 도메인 | ${domain} |
+| 카테고리 · 프리셋 | ${site.ctgr ?? '[TBD]'} · ${site.preset ?? '[TBD]'} |
+| 웨이브 | ${site.wave ?? '[TBD]'} |
+| 요금제(디렉터리 버블) | ${site.planCd ?? '[TBD]'} |
+| 보류 플래그 | ${site.hold ?? '없음'} |
+| 한 줄 정의 | [TBD] |
+
+## 2. 핵심 가치 (절대 불가침)
+
+1. Pi Browser 에서 Pi 계정으로 로그인할 수 있어야 한다.
+2. Pi Browser 에서 Pi 로 결제할 수 있어야 한다.
+3. [TBD : 이 사이트 고유 가치]
+
+## 3. 공통 규칙 — 상속(복제 금지)
+
+- 등재 가드레일 9개 : PRD_28 §1.1 (사이트 간 데이터 교차 0 · 거래는 Pi만(Bean·토큰 어휘 금지) · 교차 프로모션 금지 · 템플릿 그대로 제출 금지 · 순차 제출)
+- 구축 결함 재발 방지 R-P0~P6 : 루트 CLAUDE.md · 원장 [BUILD_DEFECTS](${R}/BUILD_DEFECTS.md) 1절 신규 시스템 체크리스트
+- 로그인 3경로 : [LOGIN_PLAYBOOK](${R}/LOGIN_PLAYBOOK.md) — Google 연동은 마스터 예외 승인 사이트만
+- 환경변수 : [ENV_GUIDE](${R}/ENV_GUIDE.md)
+
+## 4. 로그인 방식
+
+[TBD : 마스터] Pi 전용(기본) / Pi + Google 연동(예외 — PRD_28 §1.1-2·LOGIN_PLAYBOOK 갱신 필요)
+
+## 5. 기능 요구사항
+
+| ID | 기능 | 우선순위 | 비고 |
+|---|---|---|---|
+| F-01 | Pi 로그인(@pi/auth) | P0 | 공용 패키지 배선만 |
+| F-02 | [TBD] | | |
+
+## 6. 화면
+
+[TBD] — 첫 출시 화면 목록(화면 수 최소화)
+
+## 7. 데이터
+
+- DB : 비운영 = pi-nonprod 프로젝트 \`${name}_dev\`·\`${name}_stg\` 스키마 / 운영 = ${domain} 전용 Supabase 프로젝트 \`public\`
+- 마이그레이션 : \`packages/pi-db/sql\` baseline + \`sitemap/${domain}/sql/001_${name}_*.sql\` → \`node scripts/db-migrate.mjs --app ${name} --tier dev|stg|prod\`
+- 명명 : DA 표준(docs/da/데이터표준규칙.md), 시스템 칼럼 4개·논리삭제
+
+## 8. 수익 모델
+
+[TBD] — 거래는 Pi만, 판매자·개최자 수익 + 플랫폼 수수료 구조(PRD_27 원칙)
+
+## 9. 확인 필요
+
+| # | 질문 | 담당 | 상태 |
+|---|---|---|---|
+| 1 | [TBD] | 마스터 | [확인중] |
+
+## 변경 이력
+
+| 날짜 | 내용 |
+|---|---|
+| ${today()} | 골격 생성(tenant-env.mjs new) |
+`
+}
+
+function roadmapDoc(domain, name, port) {
+  return `# ROADMAP: ${domain}
+
+> 작성일 ${today()} · 요구사항 \`PRD.md\` · 공통 단계 정본 [TODO 목록](../../multitenant_create_TODO-List.md)
+
+## 진행률 요약
+
+| Phase | 이름 | 상태 |
+|---|---|---|
+| 0 | 선결(결정·환경·포털·DB) | **진행중** |
+| 1 | MVP(로그인 + 고유 기능 1개 + 결제 1개) | 대기 — PRD v1.0 확정 후 |
+| 2 | 수익 | 대기 |
+| 3 | 등재(A-1~A-7·실기기) | 대기 |
+
+## Phase 0 — 선결
+
+- [x] 설정 한 세트 생성 — \`node scripts/tenant-env.mjs new ${domain} --port ${port}\` (${today()})
+- [ ] PRD v1.0 확정(4절 로그인·5절 기능·8절 수익)
+- [ ] Pi Developer Portal testnet 앱 등록 · API 키 · 도메인 검증 (ENV_GUIDE 3.2)
+- [ ] pi-nonprod Exposed schemas \`${name}_dev\`·\`${name}_stg\` + \`db-migrate.mjs --app ${name} --tier dev\`
+- [ ] Vercel 프로젝트(Root Directory \`sitemap/${domain}\`, 운영 브랜치 \`prod/${name}\`)
+
+**완료 기준** : PRD v1.0 · Pi 앱 ID · 비운영 DB · 스테이징 URL
+
+## Phase 1 — MVP
+
+- [ ] 앱 골격(sitemap.pi 복제 지점 — TODO 3단계) · \`pnpm build\` 통과
+- [ ] 모니터링 연결(TODO 7단계)
+- [ ] Pi Browser 실기기 로그인·결제
+`
+}
+
+function troubleDoc(domain) {
+  return `# TROUBLESHOOT: ${domain}
+
+> 장애·결함의 원인과 결과를 남겨 같은 문제를 재발시키지 않는다(R-P0). 공통 사례 = [BUILD_DEFECTS](${R}/BUILD_DEFECTS.md)
+
+| 날짜 | 증상 | 원인 | 조치 | 재발 방지 |
+|---|---|---|---|---|
+`
+}
+
+function claudeDoc(domain) {
+  return `# CLAUDE.md — ${domain}
+
+@../../CLAUDE.md
+
+> **우선순위** : 위 루트(loginpi) CLAUDE.md 규칙을 먼저 적용한다. 이 파일은 ${domain} 전용 추가 규칙만 담고, 충돌 시 루트를 따른다.
+
+- 요구사항 정본 : \`docs/PRD.md\` / 로드맵 : \`docs/ROADMAP.md\` / 장애 기록 : \`docs/TROUBLESHOOT.md\`
+- 상위 플랜 : \`../../docs/PRD_28_PI_MULTISITE.md\` — 사이트별 앱·DB·배포 분리(PDB). 공용 코드는 \`packages/pi-*\` 사용, 복제 금지
+- 공통 할 일 : \`../multitenant_create_TODO-List.md\` · 환경변수 : \`../../docs/ENV_GUIDE.md\`
+
+## 명령어 (앱 골격 생성 후 유효)
+
+\`\`\`bash
+pnpm dev | pnpm build | pnpm lint | pnpm tsc --noEmit
+\`\`\`
+
+라우트·API 변경 커밋 전 최소 관문은 \`pnpm build\`.
+
+## 구축 결함 재발 방지
+
+루트 \`loginpi/CLAUDE.md\` '구축 결함 재발 방지 R-P0~P6' 상속(정본 복제 금지) — 첫 운영 배포 전 \`../../docs/BUILD_DEFECTS.md\` 1절 신규 시스템 체크리스트 통과.
+
+## 변경 이력
+
+| 날짜 | 내용 |
+|---|---|
+| ${today()} | 최초 생성(tenant-env.mjs new) |
+`
 }
 
 const [cmd, arg] = process.argv.slice(2)
