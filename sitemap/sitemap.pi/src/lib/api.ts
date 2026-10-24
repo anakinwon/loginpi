@@ -189,28 +189,60 @@ export async function checkSiteWrite(
   domain: string,
   opts: { addsOpen: boolean; submit: boolean; exceptId?: string },
 ): Promise<NextResponse | null> {
-  if (opts.addsOpen) {
-    const { count, error } = await db()
-      .from('site_mst')
-      .select('site_id', { count: 'exact', head: true })
-      .eq('ownr_usr_id', userId)
-      .eq('del_yn', 'N')
-      .in('site_sts_cd', OPEN_STS)
-    if (error) return dbFail(error)
-    if ((count ?? 0) >= LIMITS.openMax) return apiError('SITE_LIMIT', 409)
-  }
-  if (opts.submit) {
+  // 4개 조회는 서로 결과를 쓰지 않음 → 병렬(R-P1). 판정·오류 코드 우선순위는 기존 순서 그대로
+  const since = new Date(
+    Date.now() - LIMITS.payTimeoutWindowH * 3600_000,
+  ).toISOString()
+  let occupyQ = db()
+    .from('site_mst')
+    .select('site_id', { count: 'exact', head: true })
+    .eq('site_dom_nm', domain)
+    .eq('del_yn', 'N')
+    .in('site_sts_cd', OCCUPY_STS)
+  if (opts.exceptId) occupyQ = occupyQ.neq('site_id', opts.exceptId)
+  const [open, blockedRes, timeoutRes, occupy] = await Promise.all([
+    opts.addsOpen
+      ? db()
+          .from('site_mst')
+          .select('site_id', { count: 'exact', head: true })
+          .eq('ownr_usr_id', userId)
+          .eq('del_yn', 'N')
+          .in('site_sts_cd', OPEN_STS)
+      : null,
     // 반려 이력(site_sts_hist) 기준 — OWNERSHIP + 금지 7종(BLOCK_REAPPLY_RSN, 마스터 D2). 재신청으로 rjct_* 가 지워진 행도 이력엔 남는다
-    const { data: blocked, error: rjctErr } = await db()
-      .from('site_sts_hist')
-      .select('chg_rsn_cd, site_mst!inner(ownr_usr_id)')
-      .eq('site_dom_nm', domain)
-      .eq('del_yn', 'N')
-      .eq('new_sts_cd', 'REJECTED')
-      .in('chg_rsn_cd', BLOCK_REAPPLY_RSN)
-      .eq('site_mst.ownr_usr_id', userId)
-      .limit(1)
-    if (rjctErr) return dbFail(rjctErr)
+    opts.submit
+      ? db()
+          .from('site_sts_hist')
+          .select('chg_rsn_cd, site_mst!inner(ownr_usr_id)')
+          .eq('site_dom_nm', domain)
+          .eq('del_yn', 'N')
+          .eq('new_sts_cd', 'REJECTED')
+          .in('chg_rsn_cd', BLOCK_REAPPLY_RSN)
+          .eq('site_mst.ownr_usr_id', userId)
+          .limit(1)
+      : null,
+    opts.submit
+      ? db()
+          .from('site_sts_hist')
+          .select('hist_id, site_mst!inner(ownr_usr_id)', {
+            count: 'exact',
+            head: true,
+          })
+          .eq('site_dom_nm', domain)
+          .eq('del_yn', 'N')
+          .eq('chg_rsn_cd', 'PAY_TIMEOUT')
+          .eq('site_mst.ownr_usr_id', userId)
+          .gte('chg_dtm', since)
+      : null,
+    opts.submit ? occupyQ : null,
+  ])
+  if (open) {
+    if (open.error) return dbFail(open.error)
+    if ((open.count ?? 0) >= LIMITS.openMax) return apiError('SITE_LIMIT', 409)
+  }
+  if (blockedRes && timeoutRes && occupy) {
+    const blocked = blockedRes.data
+    if (blockedRes.error) return dbFail(blockedRes.error)
     if (blocked?.length)
       return apiError(
         blocked[0].chg_rsn_cd === 'OWNERSHIP'
@@ -218,33 +250,11 @@ export async function checkSiteWrite(
           : 'DOMAIN_REJECTED_POLICY',
         409,
       )
-    const since = new Date(
-      Date.now() - LIMITS.payTimeoutWindowH * 3600_000,
-    ).toISOString()
-    const { count: timeouts, error: toErr } = await db()
-      .from('site_sts_hist')
-      .select('hist_id, site_mst!inner(ownr_usr_id)', {
-        count: 'exact',
-        head: true,
-      })
-      .eq('site_dom_nm', domain)
-      .eq('del_yn', 'N')
-      .eq('chg_rsn_cd', 'PAY_TIMEOUT')
-      .eq('site_mst.ownr_usr_id', userId)
-      .gte('chg_dtm', since)
-    if (toErr) return dbFail(toErr)
-    if ((timeouts ?? 0) >= LIMITS.payTimeoutMax)
+    if (timeoutRes.error) return dbFail(timeoutRes.error)
+    if ((timeoutRes.count ?? 0) >= LIMITS.payTimeoutMax)
       return apiError('APPLY_COOLDOWN', 409)
-    let q = db()
-      .from('site_mst')
-      .select('site_id', { count: 'exact', head: true })
-      .eq('site_dom_nm', domain)
-      .eq('del_yn', 'N')
-      .in('site_sts_cd', OCCUPY_STS)
-    if (opts.exceptId) q = q.neq('site_id', opts.exceptId)
-    const { count, error } = await q
-    if (error) return dbFail(error)
-    if (count) return apiError('DUPLICATE_DOMAIN', 409)
+    if (occupy.error) return dbFail(occupy.error)
+    if (occupy.count) return apiError('DUPLICATE_DOMAIN', 409)
   }
   return null
 }

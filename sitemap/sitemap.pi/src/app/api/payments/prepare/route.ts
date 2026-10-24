@@ -119,18 +119,17 @@ export const POST = withAuthGuard(
     if (!PAYABLE.includes(site.site_sts_cd))
       return apiError('INVALID_STATE', 409)
 
-    const fee = await getRegFee(site.plan_cd)
-    if (!fee || fee.pi_amt <= 0) return apiError('PAY_NOT_REQUIRED', 409)
+    // 요금 3조회는 서로 결과를 안 씀 → 병렬(R-P1)
     // 합산 — 신청에 반짝임이 포함돼 있고 아직 결제되지 않았으면 단가를 더한다(판매 안 함이면 제외)
-    const spk =
-      site.spk_yn === 'Y' && !site.spk_pymnt_id
-        ? await getSpkFee(site.plan_cd)
-        : null
     // 합산 — 이펙트도 같은 규칙(선택됨·미결제·판매 중)
-    const efct =
-      site.efct_cd && !site.efct_pymnt_id
-        ? await getEfctFee(site.plan_cd)
-        : null
+    const [fee, spk, efct] = await Promise.all([
+      getRegFee(site.plan_cd),
+      site.spk_yn === 'Y' && !site.spk_pymnt_id
+        ? getSpkFee(site.plan_cd)
+        : null,
+      site.efct_cd && !site.efct_pymnt_id ? getEfctFee(site.plan_cd) : null,
+    ])
+    if (!fee || fee.pi_amt <= 0) return apiError('PAY_NOT_REQUIRED', 409)
     const metadata: SiteRegMeta = {
       type: SITE_REG,
       site_id: site.site_id,

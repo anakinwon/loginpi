@@ -32,6 +32,24 @@ const toSessionUser = (u: MeUser): PiSessionUser => ({
   role: u.role,
 })
 
+// /api/auth/me 공유 — SiteHeader·AuthStatus·LoginGate 가 동시에 마운트돼도 1회만 요청(R-P2).
+// 같은 연동 id 로 5초 안의 호출은 진행 중·완료 Promise 를 재사용, 로그아웃(id 없음)·refreshGoogle 은 무효화
+const ME_TTL_MS = 5_000
+let meCache: {
+  key: string
+  at: number
+  p: ReturnType<typeof readApi<{ user: MeUser | null }>>
+} | null = null
+function fetchMe(key: string, force: boolean) {
+  if (!force && meCache?.key === key && Date.now() - meCache.at < ME_TTL_MS)
+    return meCache.p
+  const p = readApi<{ user: MeUser | null }>(
+    fetch('/api/auth/me', { credentials: 'include', cache: 'no-store' }),
+  )
+  meCache = { key, at: Date.now(), p }
+  return p
+}
+
 export function useAppUser() {
   const pi = usePiAuth()
   const { data: session, status, update } = useSession()
@@ -42,18 +60,20 @@ export function useAppUser() {
   const linkUnknown = !!session?.user?.linkUnknown
 
   // react-hooks/set-state-in-effect 경고 1건 — 세션 변화에 따른 서버 재조회(외부 시스템 동기화)라 의도된 패턴
-  const refresh = useCallback(async () => {
-    if (!linkedId) {
-      setGoogleUser(null)
-      return
-    }
-    setMeLoading(true)
-    const r = await readApi<{ user: MeUser | null }>(
-      fetch('/api/auth/me', { credentials: 'include', cache: 'no-store' }),
-    )
-    setGoogleUser(r.ok && r.data.user ? toSessionUser(r.data.user) : null)
-    setMeLoading(false)
-  }, [linkedId])
+  const refresh = useCallback(
+    async (force = false) => {
+      if (!linkedId) {
+        meCache = null
+        setGoogleUser(null)
+        return
+      }
+      setMeLoading(true)
+      const r = await fetchMe(linkedId, force)
+      setGoogleUser(r.ok && r.data.user ? toSessionUser(r.data.user) : null)
+      setMeLoading(false)
+    },
+    [linkedId],
+  )
   useEffect(() => {
     void refresh()
   }, [refresh])
@@ -74,7 +94,7 @@ export function useAppUser() {
     // 인자를 넘겨야 POST(/api/auth/session) → jwt trigger 'update' 로 연동 재조회(인자 없으면 GET 만 — 실측 2026-10-11)
     refreshGoogle: async () => {
       await update({ linked: true })
-      await refresh()
+      await refresh(true)
     },
   }
 }

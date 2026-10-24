@@ -114,8 +114,10 @@ export function createPiAuthRoute<U extends PiAuthUserRecord>(
     // Pi Network API로 토큰 검증 — 클라이언트가 보낸 uid·username은 신뢰하지 않는다
     let piUser: PiUserDTO
     try {
+      // 5초 타임아웃(R-P4) — 시간 초과는 아래 catch 의 연결 실패(502) 경로로 간다
       const piRes = await fetch(PI_API_URL, {
         headers: { Authorization: `Bearer ${accessToken}` },
+        signal: AbortSignal.timeout(5000),
       })
       if (!piRes.ok) return apiError('AUTH_PI_TOKEN_INVALID', 401)
       piUser = (await piRes.json()) as PiUserDTO

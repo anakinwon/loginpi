@@ -109,15 +109,12 @@ export const POST = withAuthGuard(
         return reject('INVALID_STATE', 409)
       if (site.efct_pymnt_id && site.efct_pymnt_id !== payment.identifier)
         return reject('PAY_ALREADY_PAID', 409)
-      if (
-        await hasOtherApprovedPayment(
-          site.site_id,
-          payment.identifier,
-          SITE_EFCT,
-        )
-      )
-        return reject('PAY_ALREADY_PAID', 409)
-      const efct = await getEfctFee(site.plan_cd)
+      // 중복 확인·단가 조회는 서로 결과를 안 씀 → 병렬(R-P1), 판정 순서는 그대로
+      const [paidOther, efct] = await Promise.all([
+        hasOtherApprovedPayment(site.site_id, payment.identifier, SITE_EFCT),
+        getEfctFee(site.plan_cd),
+      ])
+      if (paidOther) return reject('PAY_ALREADY_PAID', 409)
       if (efct == null) return reject('PAY_NOT_REQUIRED', 409)
       expected = efct
     } else if (meta.type === SITE_SPK) {
@@ -130,15 +127,11 @@ export const POST = withAuthGuard(
         return reject('INVALID_STATE', 409)
       if (site.spk_pymnt_id && site.spk_pymnt_id !== payment.identifier)
         return reject('PAY_ALREADY_PAID', 409)
-      if (
-        await hasOtherApprovedPayment(
-          site.site_id,
-          payment.identifier,
-          SITE_SPK,
-        )
-      )
-        return reject('PAY_ALREADY_PAID', 409)
-      const spk = await getSpkFee(site.plan_cd)
+      const [paidOther, spk] = await Promise.all([
+        hasOtherApprovedPayment(site.site_id, payment.identifier, SITE_SPK),
+        getSpkFee(site.plan_cd),
+      ])
+      if (paidOther) return reject('PAY_ALREADY_PAID', 409)
       if (spk == null) return reject('PAY_NOT_REQUIRED', 409)
       expected = spk
     } else {
@@ -147,22 +140,21 @@ export const POST = withAuthGuard(
       if (site.pymnt_id && site.pymnt_id !== payment.identifier)
         return reject('PAY_ALREADY_PAID', 409)
       if (meta.plan_cd !== site.plan_cd) return reject('PAY_SITE_MISMATCH', 409)
-      if (await hasOtherApprovedPayment(site.site_id, payment.identifier))
-        return reject('PAY_ALREADY_PAID', 409)
-      const fee = await getRegFee(site.plan_cd)
+      // 중복 확인·사용료·합산 단가 4조회는 서로 결과를 안 씀 → 병렬(R-P1), 판정 순서는 그대로
+      const [paidOther, fee, spk, efct] = await Promise.all([
+        hasOtherApprovedPayment(site.site_id, payment.identifier),
+        getRegFee(site.plan_cd),
+        site.spk_yn === 'Y' && !site.spk_pymnt_id
+          ? getSpkFee(site.plan_cd)
+          : null,
+        site.efct_cd && !site.efct_pymnt_id ? getEfctFee(site.plan_cd) : null,
+      ])
+      if (paidOther) return reject('PAY_ALREADY_PAID', 409)
       if (!fee || fee.pi_amt <= 0) return reject('PAY_NOT_REQUIRED', 409)
       // 합산 포함 여부도 사이트 현재 값과 일치해야 한다(prepare 뒤 반짝임을 끄거나 켠 경우 거부)
-      const spk =
-        site.spk_yn === 'Y' && !site.spk_pymnt_id
-          ? await getSpkFee(site.plan_cd)
-          : null
       if ((spk != null ? 'Y' : 'N') !== meta.spk)
         return reject('PAY_SITE_MISMATCH', 409)
       // 합산 이펙트 포함 여부·코드도 현재 값과 일치해야 한다
-      const efct =
-        site.efct_cd && !site.efct_pymnt_id
-          ? await getEfctFee(site.plan_cd)
-          : null
       if ((efct != null ? site.efct_cd : undefined) !== meta.efct)
         return reject('PAY_SITE_MISMATCH', 409)
       expected = fee.pi_amt + (spk ?? 0) + (efct ?? 0)

@@ -33,17 +33,25 @@ export const GET = withGuard(
     if (error) return dbFail(error)
     if (!site) return apiError('NOT_FOUND', 404)
 
-    // ponytail: 사이트당 연 365행 합산 — 느려지면 site_mst 누계 반정규화(DDL 판정 10)
-    const { data: stats, error: statErr } = await db()
-      .from('stat_site_dly')
-      .select('view_cnt')
-      .eq('site_id', site.site_id)
-      .eq('del_yn', 'N')
-    if (statErr) return dbFail(statErr)
-    const viewCnt = (stats ?? []).reduce(
-      (sum, r) => sum + (r.view_cnt as number),
-      0,
-    )
+    // 조회수 합계는 DB SUM(sql/018) — 행을 받아 합산하면 1000행 상한에서 과소(R-P3)
+    let viewCnt: number
+    const sum = await db().rpc('fn_sel_site_view_sum', {
+      p_site_id: site.site_id,
+    })
+    if (!sum.error) viewCnt = Number(sum.data ?? 0)
+    else if (sum.error.code === 'PGRST202') {
+      // sql/018 미적용 DB 폴백 — 기존 행 합산(사이트당 연 365행)
+      const { data: stats, error: statErr } = await db()
+        .from('stat_site_dly')
+        .select('view_cnt')
+        .eq('site_id', site.site_id)
+        .eq('del_yn', 'N')
+      if (statErr) return dbFail(statErr)
+      viewCnt = (stats ?? []).reduce(
+        (sum, r) => sum + (r.view_cnt as number),
+        0,
+      )
+    } else return dbFail(sum.error)
 
     return NextResponse.json({ site, viewCnt }, { headers: PUBLIC_CACHE })
   }),

@@ -89,19 +89,21 @@ export async function getRegFees(): Promise<RegFee[]> {
 }
 
 // 요금제별 남은 슬롯 — PLAN_CAP − 점유 상태(APPLYING·PAID·IN_USE·USED·SUSPENDED) 실사이트 수. 음수는 0 으로 고정(상한 초과 등록은 막지 않는다)
+// 요금제별 head count 병렬(R-P3) — 행을 받아 세면 1000행 상한에서 과소 집계된다
 export async function getPlanRemaining(): Promise<Record<ApplyPlanCd, number>> {
-  const { data, error } = await db()
-    .from('site_mst')
-    .select('plan_cd')
-    .eq('del_yn', 'N')
-    .in('site_sts_cd', OCCUPY_STS)
-    .in('plan_cd', APPLY_PLAN_CD)
-  if (error) throw error
-  const used: Record<string, number> = {}
-  for (const r of data ?? []) used[r.plan_cd] = (used[r.plan_cd] ?? 0) + 1
-  return Object.fromEntries(
-    APPLY_PLAN_CD.map((p) => [p, Math.max(0, PLAN_CAP[p] - (used[p] ?? 0))]),
-  ) as Record<ApplyPlanCd, number>
+  const counts = await Promise.all(
+    APPLY_PLAN_CD.map(async (p) => {
+      const { count, error } = await db()
+        .from('site_mst')
+        .select('site_id', { count: 'exact', head: true })
+        .eq('del_yn', 'N')
+        .in('site_sts_cd', OCCUPY_STS)
+        .eq('plan_cd', p)
+      if (error) throw error
+      return [p, Math.max(0, PLAN_CAP[p] - (count ?? 0))] as const
+    }),
+  )
+  return Object.fromEntries(counts) as Record<ApplyPlanCd, number>
 }
 
 // 반짝임 부가서비스 단가 — fee_plan SPARKLE × 요금제(sql/014). 없음·미판매·0 이면 null(판매 안 함)
@@ -145,6 +147,9 @@ export type PiApiResult =
   | { ok: true; payment: PaymentDTO }
   | { ok: false; status: number; body: string; alreadyApproved?: PaymentDTO }
 
+// 결제 = R-P4 예외, 2026-10-24 — 2초 상한 대신 10초(Pi 결제 API 응답 지연 시 승인·완료 실패가 더 큰 손해)
+const PI_PAY_TIMEOUT_MS = 10_000
+
 async function piApi(
   path: string,
   method: 'GET' | 'POST',
@@ -152,7 +157,7 @@ async function piApi(
 ): Promise<PiApiResult> {
   const apiKey = process.env.PI_API_KEY
   if (!apiKey) return { ok: false, status: 500, body: 'PI_API_KEY 미설정' }
-  // 네트워크 예외·8초 타임아웃은 { ok:false, status:0 } 으로 정규화 — 호출자가 throw(500) 대신 건별 거부·skip 으로 처리(크론 회차 격리, 적대적 리뷰 2026-10-13)
+  // 네트워크 예외·타임아웃(PI_PAY_TIMEOUT_MS)은 { ok:false, status:0 } 으로 정규화 — 호출자가 throw(500) 대신 건별 거부·skip 으로 처리(크론 회차 격리, 적대적 리뷰 2026-10-13)
   let res: Response
   try {
     res = await fetch(`${PI_PAYMENTS_URL}/${path}`, {
@@ -163,7 +168,7 @@ async function piApi(
       },
       body: body ? JSON.stringify(body) : undefined,
       cache: 'no-store',
-      signal: AbortSignal.timeout(8_000),
+      signal: AbortSignal.timeout(PI_PAY_TIMEOUT_MS),
     })
   } catch (e) {
     return {

@@ -20,7 +20,8 @@ export const maxDuration = 60
 const ACTOR = 'SYSTEM'
 const REJECT_MAX = 20
 const START_MAX = 50
-const TIME_BUDGET_MS = 45_000 // maxDuration 60s 안에서 Pi API 왕복(건당 최대 2회·8초 타임아웃)을 멈추는 선
+const START_CONC = 5 // ③ RPC 동시 호출 수
+const TIME_BUDGET_MS = 38_000 // maxDuration 60s 안에서 Pi API 왕복(건당 최대 2회·10초 타임아웃)을 멈추는 선
 const hoursAgo = (now: number, h: number) =>
   new Date(now - h * 3_600_000).toISOString()
 
@@ -89,21 +90,30 @@ export const GET = dbRoute(async (req: NextRequest) => {
       .order('pay_dtm')
       .limit(START_MAX)
     if (error) throw error
-    for (const s of data ?? []) {
-      const { error: e } = await db().rpc('fn_bgn_site_use', {
-        p_site_id: s.site_id,
-        p_actor: ACTOR,
-      })
-      if (e) {
-        // P0004 요금제 사용기간 결측 — 요금표 수정 전까지 매 회차 실패 목록에 남는다(운영자 확인)
-        console.error(
-          '[cron/sweep] fn_bgn_site_use',
-          s.site_id,
-          e.code,
-          e.message,
-        )
-        r.startFailed.push({ site_id: s.site_id, code: e.code ?? 'UNKNOWN' })
-      } else r.started.push(s.site_id)
+    // 행마다 독립(RPC 가 자기 행만 FOR UPDATE) → 5건씩 병렬(R-P1). 묶음 사이는 pay_dtm 순서 유지
+    const rows = data ?? []
+    for (let i = 0; i < rows.length; i += START_CONC) {
+      await Promise.all(
+        rows.slice(i, i + START_CONC).map(async (s) => {
+          const { error: e } = await db().rpc('fn_bgn_site_use', {
+            p_site_id: s.site_id,
+            p_actor: ACTOR,
+          })
+          if (e) {
+            // P0004 요금제 사용기간 결측 — 요금표 수정 전까지 매 회차 실패 목록에 남는다(운영자 확인)
+            console.error(
+              '[cron/sweep] fn_bgn_site_use',
+              s.site_id,
+              e.code,
+              e.message,
+            )
+            r.startFailed.push({
+              site_id: s.site_id,
+              code: e.code ?? 'UNKNOWN',
+            })
+          } else r.started.push(s.site_id)
+        }),
+      )
     }
   }
 
@@ -120,20 +130,34 @@ export const GET = dbRoute(async (req: NextRequest) => {
       .order('aply_dtm')
       .limit(REJECT_MAX * 5)
     if (error) throw error
+    // 후보 전체의 진행 중(APPROVED) 원장을 1회 조회 후 site_id 별로 묶는다(N+1 제거, R-P2). 후보 ≤ REJECT_MAX*5 라 1000행 상한 밖
+    const ids = (data ?? []).map((s) => s.site_id)
+    const approvedBySite = new Map<
+      string,
+      { pymnt_id: string; usr_id: string; site_id: string }[]
+    >()
+    if (ids.length) {
+      const { data: rows, error: aErr } = await db()
+        .from('pi_pymnt')
+        .select('pymnt_id, usr_id, site_id:meta_val->>site_id')
+        .eq('pymnt_tp_cd', SITE_REG)
+        .eq('pymnt_sts_cd', 'APPROVED')
+        .eq('del_yn', 'N')
+        .in('meta_val->>site_id', ids)
+      if (aErr) throw aErr
+      for (const p of rows ?? []) {
+        const list = approvedBySite.get(p.site_id) ?? []
+        list.push(p)
+        approvedBySite.set(p.site_id, list)
+      }
+    }
     for (const s of data ?? []) {
       if (r.rejected.length >= REJECT_MAX) break
       if (Date.now() - now > TIME_BUDGET_MS) {
         r.skipped.push({ site_id: s.site_id, why: 'time_budget' })
         continue
       }
-      const { data: approved, error: aErr } = await db()
-        .from('pi_pymnt')
-        .select('pymnt_id, usr_id')
-        .eq('pymnt_tp_cd', SITE_REG)
-        .eq('pymnt_sts_cd', 'APPROVED')
-        .eq('del_yn', 'N')
-        .eq('meta_val->>site_id', s.site_id)
-      if (aErr) throw aErr
+      const approved = approvedBySite.get(s.site_id)
       let blocked: string | null = null
       for (const p of approved ?? []) {
         const got = await getPiPayment(p.pymnt_id)
