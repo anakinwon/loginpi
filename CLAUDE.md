@@ -82,7 +82,7 @@ node scripts/promote-to-prod.mjs --yes   # 운영 승격 (master→production, f
 
 - 스키마: `src/env.ts` — `next.config.ts` 상단 `import './src/env'`로 빌드 시점 자동 검증
 - 새 env 추가 시 `src/env.ts` + `.env.example` 동시 수정
-- **환경변수 질문·신규 테넌트 = `docs/ENV_GUIDE.md` 정본**(키별 구하는 곳·시스템 간 공유 규칙·질의 이력) — 질문엔 위치만 안내하고 새 답은 5절에 추가. 값 모음 `.env.multi`(gitignore), 신규 테넌트 설정 한 세트 `node scripts/tenant-env.mjs new <도메인>.pi`, 모음 갱신 `… multi`
+- **환경변수 질문·신규 테넌트 = `docs/ENV_GUIDE.md` 정본**(키별 구하는 곳·시스템 간 공유 규칙·질의 이력) — 질문엔 위치만 안내하고 새 답은 5절에 추가. 값 모음 `.env.multi`(gitignore), 신규 테넌트 설정 한 세트 `node scripts/tenant-env.mjs new <도메인>.pi`(env·docs 골격·CLAUDE.md), 모음 갱신 `… multi`, **신규 테넌트 전체 단계 = `sitemap/multitenant_create_TODO-List.md`**
 
 ### pnpm 11
 

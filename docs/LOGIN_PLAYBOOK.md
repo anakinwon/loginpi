@@ -17,7 +17,7 @@ Q4. 결제가 있는가?                                     → Pi Browser 에�
 |---|---|---|---|---|
 | ① Pi SDK | Pi Browser | `pi_username`(불변 키) + 앱별 `pi_uid` | Developer Portal 앱 2개(testnet·mainnet) | `@pi/auth` 호출 배선 2파일(`api/auth/pi/route.ts`·`lib/auth.ts`, ≈60줄) — 로직 0줄 |
 | ② Pi Sign-In(OAuth) | 일반 브라우저 | 같음(`/v2/me` 검증 → 같은 `/api/auth/pi`) | Portal → Pi Sign-In → Client ID + Redirect URI | 1호 코드 복사(M1 승격 후 0줄) |
-| ③ Google + 연동 | 일반 브라우저 | Google sub ↔ `sys_user` 매핑(`sys_usr_auth_lnk`) | Google Cloud OAuth 클라이언트 + `AUTH_SECRET` + DDL 003 | 1호 코드 복사(M1 승격 후 0줄). **마스터 예외 승인 2026-10-11**(PRD_28 §1.1-2 "Pi 외 로그인 금지"의 예외, sitemap.pi 적용, 근거 `sql/003` 헤더 DA-APPROVED). PRD_28 §1.1-2 개정 필요 [TBD], 등재 심사 A-4 리스크는 pi-mainnet-listing-auditor 재점검 대상 |
+| ③ Google + 연동 | 일반 브라우저 | Google sub ↔ `sys_user` 매핑(`sys_usr_auth_lnk`) | Google Cloud OAuth 클라이언트 + `AUTH_SECRET` + DDL 003 | 1호 코드 복사(M1 승격 후 0줄). **마스터 예외 승인 2026-10-11**(PRD_28 §1.1-2 "Pi 외 로그인 금지"의 예외, sitemap.pi 적용 · seminar.pi 추가 2026-10-24, 근거 `sql/003` 헤더 DA-APPROVED). PRD_28 §1.1-2 개정 필요 [TBD], 등재 심사 A-4 리스크는 pi-mainnet-listing-auditor 재점검 대상 |
 
 세 경로 모두 **서버 세션은 하나** : `getSessionUser()` 가 Pi 쿠키 → `X-Pi-Token` 헤더 → Google(NextAuth) 순으로 사용자를 돌려준다. API 는 어느 경로로 로그인했는지 모른다(알 필요도 없다).
 

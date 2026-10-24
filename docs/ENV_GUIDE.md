@@ -29,6 +29,7 @@ node scripts/tenant-env.mjs new yea.pi --port 3005   # 신규 테넌트 설정 �
 | cafe.pi | 루트 | https://cafepi.vercel.app | cafe (`production`) · 스테이징 loginpi (`master`, https://loginpi.vercel.app) | :3000 |
 | sitemap.pi | `sitemap/sitemap.pi` | [확인중] | sitemaps (`prod/sitemap`) · 스테이징 https://sitemapst.vercel.app | :3001 |
 | schema.pi | `sitemap/schema.pi` | https://schem.vercel.app | schema (`prod/schema`) | :3002 |
+| seminar.pi | `sitemap/seminar.pi` | 없음(미배포) | 없음 — 예정 `prod/seminar` | :3003 |
 
 **같아야 하는 값과 달라야 하는 값** (2026-10-24 실측)
 
@@ -105,7 +106,8 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 
 ## 4. 신규 테넌트 추가 체크리스트
 
-1. `node scripts/tenant-env.mjs new <도메인>.pi --port <빈 포트>`
+0. 전체 단계 정본 = `sitemap/multitenant_create_TODO-List.md`(아래는 env 관련 요약)
+1. `node scripts/tenant-env.mjs new <도메인>.pi --port <빈 포트>` — env 3종 + docs(PRD·ROADMAP·TROUBLESHOOT) 골격 + CLAUDE.md + `.claude/settings.json` + sites.json BUILDING
    - `sitemap/<도메인>.pi/`에 `.env.example`·`.env.local`·`.env.vercel-prod`를 만든다.
    - 비밀키는 새로 만들고, 공유 값(비운영 DB·관리자·모니터링 키)은 기존 앱에서 복사한다.
    - `.env.multi`도 다시 만든다. 이미 있는 파일은 덮어쓰지 않는다.
@@ -125,4 +127,5 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | 2026-10-24 | 멀티테넌트 핵심 환경설정 정리 | `.env.multi`(값), 이 문서(구하는 곳) |
 | 2026-10-24 | 키와 값을 어디서 구하나 | 3절 |
 | 2026-10-24 | 테넌트를 추가하면 설정 파일을 한 세트로 | 4절, `scripts/tenant-env.mjs new` |
+| 2026-10-24 | 새 테넌트를 이름만 말하면 첫 할 일 정리 | `sitemap/multitenant_create_TODO-List.md` + 생성기(4절) |
 | 이전 | `CRON_SECRET`이 뭔가 | Vercel 크론이 `Authorization: Bearer` 헤더로 보내는 비밀값이다. 직접 만들고 앱마다 따로 쓴다 → 3.1 |
