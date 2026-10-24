@@ -37,6 +37,7 @@ const schema = z.object({
   DB_CONN_ALLOW_PRIVATE: z.enum(['0', '1']).optional(),
   // 모니터링 주기 수집(GET /api/mon/collect, Vercel Cron 이 Authorization: Bearer 로 보냄) — 없으면 주기 수집 꺼짐(화면 열 때만 수집)
   CRON_SECRET: z.string().min(16).optional(),
+  MON_INGEST_KEY: z.string().min(32).optional(), // 다른 시스템(cafe.pi·sitemap.pi) 모니터링 수집 비밀키 — 각 앱의 MON_INGEST_KEY 와 같은 값(2026-10-24)
 }).superRefine((v, ctx) => {
   const g = [v.GOOGLE_CLIENT_ID, v.GOOGLE_CLIENT_SECRET, v.AUTH_SECRET]
   if (g.some(Boolean) && !g.every(Boolean))

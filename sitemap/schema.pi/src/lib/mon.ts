@@ -1,23 +1,20 @@
 // 모니터링 공용 순수 로직(2026-10-21, sql/068) — 브라우저·서버 공용(서버 전용 기능 없음)
 // 경로 정규화(UUID·숫자 → :id), 응답 표본 → 분 × 경로 묶음, 누적 카운터 → 구간 초당 값, HTTP 상태 분류
+import { normPage, normRoute, type RawSample } from '@pi/mon'
 export const SLOW_MS = 1000 // 느림 기준(1초)
 export const KEEP_DAYS = 7 // 이력 보관
 
-const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi
-// /api/areas/<uuid>/terms?page=2 → /api/areas/:id/terms (질의 문자열·끝 슬래시 제거, 200자)
-export function normRoute(url: string): string | null {
-  const p = url.replace(/^https?:\/\/[^/]+/i, '').split(/[?#]/)[0].replace(/\/+$/, '')
-  if (!p.startsWith('/api/') || /\/mon(\/|$)/.test(p)) return null // 모니터링 자체(/api/mon/*·/api/areas/:id/mon/*)는 제외 — 화면 폴링이 앱 지표를 오염시키지 않게
-  const r = p.replace(UUID, ':id').replace(/\/\d+(?=\/|$)/g, '/:id')
-  return /^[\w\-/:.]{1,200}$/.test(r) ? r : null // 경로 문자만 허용(브라우저 보고값 = 신뢰 안 함, 임의 문자열 적재 방지)
-}
+// 경로·화면 정규화와 시스템코드는 공용 패키지 단일 소스(2026-10-24 cafe.pi·sitemap.pi 모니터링 — 모든 시스템이 같은 기준)
+export { normPage, normRoute, SYSTEMS, isSys, type SysCd } from '@pi/mon'
 
-// 화면 경로(location.pathname) → /areas/:id/terms (질의·해시·끝 슬래시 제거, UUID·숫자 → :id, 200자) — 브라우저 보고값이라 경로 문자만 허용
-export function normPage(path: string): string | null {
-  const p = path.split(/[?#]/)[0].replace(/\/+$/, '') || '/'
-  if (!p.startsWith('/')) return null
-  const r = p.replace(UUID, ':id').replace(/\/\d+(?=\/|$)/g, '/:id')
-  return /^[\w\-/:.]{1,200}$/.test(r) ? r : null
+// 브라우저 표본 → 서버 표본(서버가 다시 정규화, 끝난 시각은 지금 ±10분만, 클라이언트 값 신뢰 안 함) — /api/mon/app·/api/mon/ingest 공용
+export function toSamples(raw: RawSample[], now = Date.now()): Sample[] {
+  const ss: Sample[] = []
+  for (const x of raw) {
+    const route = normRoute(x.r)
+    if (route && Math.abs(x.t - now) < 600_000 && x.ms >= 0) ss.push({ route, t: x.t, ms: x.ms, status: x.st, page: x.p ? normPage(x.p) : null })
+  }
+  return ss
 }
 
 // AI 원인 분석 주원인 = 1순위 원인 제목 앞 200자(sql/073 main_caus_txt 길이) — 서버 저장·화면 비교가 같은 기준

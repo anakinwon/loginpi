@@ -287,8 +287,8 @@ export async function analyzeRoute(route: string, min: number, mdlId: string | u
   const lo = Math.max(now - min * 60000, CLEAN_FROM, dep && dep.sts !== 'FAIL' ? dep.cut : 0)
   const since = new Date(lo).toISOString()
   const [agg, evt, src] = await Promise.all([
-    db().from('mon_app_hist').select('bkt_dtm, req_cnt, err_cnt, slow_cnt, rsp_sum_val, rsp_max_val').eq('route_txt', route).gte('bkt_dtm', since).order('bkt_dtm', { ascending: false }).limit(MAX_AGG),
-    db().from('mon_app_evt_hist').select('occr_dtm, evt_cd, scr_txt, sts_no, rsp_val').eq('route_txt', route).gte('occr_dtm', since).order('occr_dtm', { ascending: false }).limit(MAX_EVT),
+    db().from('mon_app_hist').select('bkt_dtm, req_cnt, err_cnt, slow_cnt, rsp_sum_val, rsp_max_val').eq('sys_cd', 'SCHEMA').eq('route_txt', route).gte('bkt_dtm', since).order('bkt_dtm', { ascending: false }).limit(MAX_AGG),
+    db().from('mon_app_evt_hist').select('occr_dtm, evt_cd, scr_txt, sts_no, rsp_val').eq('sys_cd', 'SCHEMA').eq('route_txt', route).gte('occr_dtm', since).order('occr_dtm', { ascending: false }).limit(MAX_EVT),
     gatherSrc(route),
   ])
   if (agg.error) throw agg.error

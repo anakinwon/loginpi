@@ -64,8 +64,8 @@ export async function verifyData(route: string) {
   const after = new Date(d.cut).toISOString()
   const before = new Date(d.cut - Math.max(now - d.cut, 10 * 60_000)).toISOString() // 기준선 = 배포 전 같은 길이(최소 10분)
   const [agg, evt] = await Promise.all([
-    db().from('mon_app_hist').select('bkt_dtm, req_cnt, err_cnt, slow_cnt').eq('route_txt', route).gte('bkt_dtm', before).order('bkt_dtm'),
-    db().from('mon_app_evt_hist').select('occr_dtm, evt_cd, sts_no, rsp_val, scr_txt').eq('route_txt', route).gte('occr_dtm', after).order('occr_dtm', { ascending: false }).limit(20),
+    db().from('mon_app_hist').select('bkt_dtm, req_cnt, err_cnt, slow_cnt').eq('sys_cd', 'SCHEMA').eq('route_txt', route).gte('bkt_dtm', before).order('bkt_dtm'),
+    db().from('mon_app_evt_hist').select('occr_dtm, evt_cd, sts_no, rsp_val, scr_txt').eq('sys_cd', 'SCHEMA').eq('route_txt', route).gte('occr_dtm', after).order('occr_dtm', { ascending: false }).limit(20),
   ])
   if (agg.error) throw agg.error
   if (evt.error) throw evt.error

@@ -1,0 +1,15 @@
+{
+  "name": "@pi/mon",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pi 멀티사이트 공용 애플리케이션 모니터링 — 브라우저 API 응답 계측(Rum)·경로 정규화·schema.pi 수집 API 전달(앱 서버 → /api/mon/ingest, 비밀키)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.tsx"
+  },
+  "peerDependencies": {
+    "next": "^16",
+    "react": "^19"
+  }
+}

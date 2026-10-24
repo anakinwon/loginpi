@@ -11,7 +11,7 @@ import { GitPullRequest, Sparkles } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import type { AiMdl, AiResult, AiRun } from '@/lib/mon-ai'
-import { mainOf, pageMenu, routeMenu, SLOW_MS } from '@/lib/mon'
+import { mainOf, pageMenu, routeMenu, SLOW_MS, SYSTEMS, type SysCd } from '@/lib/mon'
 import { fmtN, Line, Stack, Tile, type Pt } from './charts'
 import { normFile } from '@/lib/mon-fix-patch'
 import { Pager, StepBar, type Step } from './fix-steps'
@@ -297,6 +297,11 @@ type Row = { bkt_dtm: string; route_txt: string; req_cnt: number; err_cnt: numbe
 
 export default function AppTab({ live, min, canApv }: { live: boolean; min: number; canApv: boolean }) {
   const { areaId } = useParams<{ areaId: string }>()
+  // 시스템 선택(2026-10-24, sql/075) — schema.pi 외 시스템(cafe.pi·sitemap.pi)은 서버가 전역 관리자에게만 선택지로 내려줌. AI 원인 분석·수정은 schema.pi 소스 대상이라 schema.pi 에서만
+  const [sys, setSys] = useState<SysCd>('SCHEMA')
+  const own = sys === 'SCHEMA'
+  const rMenu = (r: string) => (own ? routeMenu(r) : r.split('/').slice(2, 4).join('/') || r)
+  const pMenu = (p: string | null) => (own ? pageMenu(p) : (p ?? '-'))
   const [key, setKey] = useState<Key>('req')
   const [f, setF] = useState<Filter>({})
   const [pg, setPg] = useState(1)
@@ -335,7 +340,13 @@ export default function AppTab({ live, min, canApv }: { live: boolean; min: numb
     setKey(on ? k : 'req')
     pick({ ...f, cd: on ? cd : undefined })
   }
-  const { data, err } = usePoll<{ rows: Row[]; evts?: Evt[] }>(`/api/mon/app?area=${areaId}&min=${min}`, live)
+  const { data, err } = usePoll<{ rows: Row[]; evts?: Evt[]; systems?: SysCd[] }>(`/api/mon/app?area=${areaId}&min=${min}&sys=${sys}`, live)
+  const pickSys = (v: SysCd) => {
+    setSys(v)
+    setF({})
+    setPg(1)
+    setAi(null)
+  }
   const v = useMemo(() => {
     const rows = data?.rows ?? []
     const by = new Map<string, { req: number; err: number; slow: number; sum: number }>()
@@ -370,7 +381,7 @@ export default function AppTab({ live, min, canApv }: { live: boolean; min: numb
   const base = evts.filter((e) => (!f.cd || e.evt_cd === f.cd) && (!f.t || minOf(e.occr_dtm) === minOf(f.t)))
   const scrTop = [
     ...base.reduce((m, e) => {
-      const k = pageMenu(e.scr_txt)
+      const k = pMenu(e.scr_txt)
       const x = m.get(k) ?? { slow: 0, err: 0 }
       x[e.evt_cd === 'ERR' ? 'err' : 'slow']++
       return m.set(k, x)
@@ -378,7 +389,7 @@ export default function AppTab({ live, min, canApv }: { live: boolean; min: numb
   ]
     .sort((a, b) => b[1].slow + b[1].err - (a[1].slow + a[1].err))
     .slice(0, 8)
-  const list = f.scr ? base.filter((e) => pageMenu(e.scr_txt) === f.scr) : base
+  const list = f.scr ? base.filter((e) => pMenu(e.scr_txt) === f.scr) : base
   const pages = Math.max(1, Math.ceil(list.length / PAGE))
   const cur = Math.min(pg, pages)
   const fTxt = [f.cd && (f.cd === 'SLOW' ? '느림' : '오류'), f.t && `${fmtS(f.t).slice(0, 5)} 분`, f.scr && `화면 ${f.scr}`].filter(Boolean).join(' · ')
@@ -387,7 +398,20 @@ export default function AppTab({ live, min, canApv }: { live: boolean; min: numb
   const errPct = v.tot.req ? Math.round((v.tot.err / v.tot.req) * 1000) / 10 : 0
   return (
     <div className="space-y-3">
-      <p className="text-xs text-[#5b6578]">schema.pi 화면이 부른 API 응답을 브라우저가 재서 모은 값입니다(로그인 사용자, 1분 단위). 서버 내부 구간(SQL·외부 호출) 분해는 없습니다.</p>
+      <div className="flex flex-wrap items-center gap-2">
+        {(data?.systems?.length ?? 0) > 1 && (
+          <select aria-label="모니터링 시스템" value={sys} onChange={(e) => pickSys(e.target.value as SysCd)} className="rounded border border-[#d6deeb] bg-white px-2 py-1 text-sm font-semibold text-[#1f3a68]">
+            {data!.systems!.map((x) => (
+              <option key={x} value={x}>
+                {SYSTEMS[x]}
+              </option>
+            ))}
+          </select>
+        )}
+        <p className="text-xs text-[#5b6578]">
+          {SYSTEMS[sys]} 화면이 부른 API 응답을 브라우저가 재서 모은 값입니다(로그인 사용자, 1분 단위, 운영 배포만). 서버 내부 구간(SQL·외부 호출) 분해는 없습니다.{!own && ' AI 원인 분석·수정은 schema.pi 에서만 제공합니다.'}
+        </p>
+      </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         <Tile nm="TPS(최근 5분)" val={fmtN(v.tps, 2)} sub="초당 요청" />
         <Tile nm="요청 수" val={v.tot.req.toLocaleString()} sub={`최근 ${min}분`} />
@@ -424,20 +448,20 @@ export default function AppTab({ live, min, canApv }: { live: boolean; min: numb
                 <th className="px-2 py-1">최대(ms)</th>
                 <th className="px-2 py-1" title={SLOW_TXT}>느림</th>
                 <th className="px-2 py-1">오류</th>
-                <th className="px-2 py-1">AI 분석</th>
+                {own && <th className="px-2 py-1">AI 분석</th>}
               </tr>
             </thead>
             <tbody>
               {top.map(([r, x]) => (
                 <tr key={r} className="border-b">
-                  <td className="whitespace-nowrap px-2 py-1 font-semibold text-[#2c3850]">{routeMenu(r)}</td>
+                  <td className="whitespace-nowrap px-2 py-1 font-semibold text-[#2c3850]">{rMenu(r)}</td>
                   <td className="px-2 py-1 font-mono text-xs text-[#5b6578]">{r}</td>
                   <td className="px-2 py-1 text-right tabular-nums">{x.req.toLocaleString()}</td>
                   <td className="px-2 py-1 text-right tabular-nums">{Math.round(x.sum / Math.max(1, x.req))}</td>
                   <td className="px-2 py-1 text-right tabular-nums">{x.max}</td>
                   <td className={`px-2 py-1 text-right tabular-nums ${x.slow ? 'text-amber-700' : ''}`}>{x.slow}</td>
                   <td className={`px-2 py-1 text-right tabular-nums ${x.err ? 'text-red-700' : ''}`}>{x.err}</td>
-                  <td className="px-2 py-1 text-center">
+                  {own && <td className="px-2 py-1 text-center">
                     {(x.err > 0 || x.slow > 0) && (
                       <button
                         type="button"
@@ -449,12 +473,12 @@ export default function AppTab({ live, min, canApv }: { live: boolean; min: numb
                         <Sparkles className="h-3 w-3" aria-hidden /> {ai?.busy && ai.route === r ? '분석 중…' : '원인 분석'}
                       </button>
                     )}
-                  </td>
+                  </td>}
                 </tr>
               ))}
               {!top.length && (
                 <tr>
-                  <td colSpan={8} className="px-2 py-4 text-center text-gray-500">
+                  <td colSpan={own ? 8 : 7} className="px-2 py-4 text-center text-gray-500">
                     {!data ? '불러오는 중…' : v.rt.size ? `${KEY_NM[key]} 건이 있는 경로가 없습니다` : '아직 수집된 요청이 없습니다 — 화면을 사용하면 1분 안에 쌓입니다'}
                   </td>
                 </tr>
@@ -525,11 +549,11 @@ export default function AppTab({ live, min, canApv }: { live: boolean; min: numb
                   <tr key={`${e.occr_dtm}-${i}`} className="border-b">
                     <td className="whitespace-nowrap px-2 py-1 tabular-nums">{fmtS(e.occr_dtm)}</td>
                     <td className="px-2 py-1">
-                      <div className="font-semibold text-[#2c3850]">{pageMenu(e.scr_txt)}</div>
+                      <div className="font-semibold text-[#2c3850]">{pMenu(e.scr_txt)}</div>
                       <div className="font-mono text-xs text-[#5b6578]">{e.scr_txt ?? '—'}</div>
                     </td>
                     <td className="px-2 py-1">
-                      <div className="font-semibold text-[#2c3850]">{routeMenu(e.route_txt)}</div>
+                      <div className="font-semibold text-[#2c3850]">{rMenu(e.route_txt)}</div>
                       <div className="font-mono text-xs text-[#5b6578]">{e.route_txt}</div>
                     </td>
                     <td className={`whitespace-nowrap px-2 py-1 ${bad ? 'text-red-700' : 'text-amber-700'}`}>
