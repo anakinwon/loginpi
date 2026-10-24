@@ -29,34 +29,34 @@
 | P | 위치(`sitemap/schema.pi/src/`) | 내용 | 등급 | 상태 |
 |---|---|---|---|---|
 | P1 | `lib/api.ts:258` | `currentUser()` 뒤 `areaPlan` 직렬(공용·모든 API) | B | 미수정 |
-| P1 | `lib/model-phy.ts:64` `loadPhy` | 모델 확인 뒤 테이블·칼럼 조회 | A | 미수정 |
-| P1 | `lib/model-phy.ts:149` `syncPlan` | `entInfoOf`→`phyPlan`, 청크 루프 직렬 | A | 미수정 |
-| P1 | `lib/model-dgm.ts:48` `loadDgm` | `phy_tbl` 뒤 `dgm_rel`·`dgm_ent` | A | 미수정 |
-| P1 | `api/…/physical/route.ts:58` | `loadPhy` 뒤 `phyPlan` | A | 미수정 |
-| P1 | `api/…/attributes/route.ts:42` | `getEnt`→`std_term`→`nextSeq` | A | 미수정 |
-| P1 | `lib/model.ts:96` `prepareEnt` | `mdl_subj`→`entWords` | A | 미수정 |
-| P1 | `api/…/entities/route.ts:47` | `std_dic`→`withActors` | A | 미수정 |
-| P1 | `api/…/terms·domains·key-domains·entity-classes/route.ts` | 권한 뒤 `pendingChg` 직렬(words #24 의 형제 4곳) | A | 미수정 |
-| P1 | `api/…/key-domains/route.ts:49` | 건수→`withActors` | A | 미수정 |
-| P1 | `api/…/approvals/route.ts:46` | 이름 조회 4회 직렬 | A | 미수정 |
-| P1 | `lib/home.ts:25` | 멤버→`lst_area_id` | A | 미수정 |
-| P1 | `api/mon/app/route.ts:26` | `addApp`→`addAppEvt`(모니터링 수집) | A | 미수정 |
-| P1 | `api/…/subjects/suggest/route.ts:47` | `ex`·`eq` 가 첫 `Promise.all` 밖 | A | 미수정 |
-| P1 | `api/…/versions/route.ts:36` | 스냅샷 a→b→현재, POST 현재→mx | A | 미수정 |
-| P1 | `lib/model-ddl.ts:24` | `ddlTargets`·`buildDdl` 직렬 | A | 미수정 |
-| P1 | `lib/change.ts:70` | `inUse`·`wordNameError` 3조회씩 | A | 미수정 |
-| P1 | `api/…/domains/route.ts:57` | 검증 4단계 직렬 | A | 미수정 |
-| P1 | `lib/bulk-check.ts:39…` | 100개 청크 for+await(`inChunks` 있음) | A | 미수정 |
+| P1 | `lib/model-phy.ts:64` `loadPhy` | 모델 확인 뒤 테이블·칼럼 조회 | A | ✅ 수정 |
+| P1 | `lib/model-phy.ts:149` `syncPlan` | `entInfoOf`→`phyPlan`, 청크 루프 직렬 | A | ✅ 수정 |
+| P1 | `lib/model-dgm.ts:48` `loadDgm` | `phy_tbl` 뒤 `dgm_rel`·`dgm_ent` | A | ✅ 수정 |
+| P1 | `api/…/physical/route.ts:58` | `loadPhy` 뒤 `phyPlan` | A | ✅ 수정 |
+| P1 | `api/…/attributes/route.ts:42` | `getEnt`→`std_term`→`nextSeq` | A | ✅ 수정 |
+| P1 | `lib/model.ts:96` `prepareEnt` | `mdl_subj`→`entWords` | A | ✅ 수정 |
+| P1 | `api/…/entities/route.ts:47` | `std_dic`→`withActors` | A | ✅ 수정 |
+| P1 | `api/…/terms·domains·key-domains·entity-classes/route.ts` | 권한 뒤 `pendingChg` 직렬(words #24 의 형제 4곳) | A | ✅ 수정 |
+| P1 | `api/…/key-domains/route.ts:49` | 건수→`withActors` | A | ✅ 수정 |
+| P1 | `api/…/approvals/route.ts:46` | 이름 조회 4회 직렬 | A | ✅ 수정 |
+| P1 | `lib/home.ts:25` | 멤버→`lst_area_id` | A | ✅ 수정 |
+| P1 | `api/mon/app/route.ts:26` | `addApp`→`addAppEvt`(모니터링 수집) | A | ✅ 수정 |
+| P1 | `api/…/subjects/suggest/route.ts:47` | `ex`·`eq` 가 첫 `Promise.all` 밖 | A | ✅ 수정 |
+| P1 | `api/…/versions/route.ts:36` | 스냅샷 a→b→현재, POST 현재→mx | A | ✅ 수정 |
+| P1 | `lib/model-ddl.ts:24` | `ddlTargets`·`buildDdl` 직렬 | A | ✅ 수정 |
+| P1 | `lib/change.ts:70` | `inUse`·`wordNameError` 3조회씩 | A | ✅ 수정 |
+| P1 | `api/…/domains/route.ts:57` | 검증 4단계 직렬 | A | ✅ 수정 |
+| P1 | `lib/bulk-check.ts:39…` | 100개 청크 for+await(`inChunks` 있음) | A | ✅ 수정 |
 | P1 | `api/payments/approve/route.ts:40` | 결제 승인 3조회 직렬 | B | 미수정 |
-| P2 | `lib/model-stage.ts:96` `setPhy` | 테이블마다 같은 `phyPlan` N회 | A | 미수정 |
-| P2 | `lib/model-stage.ts:156` `setDgm` | `loadDgm` 결과 두고 `findDgm` 재조회 | A | 미수정 |
-| P2 | `lib/model-fk.ts:29`·`fk-plan/route.ts:58` | 단계마다 `nextSeq`·`std_term` 재조회 | A | 미수정 |
+| P2 | `lib/model-stage.ts:96` `setPhy` | 테이블마다 같은 `phyPlan` N회 | A | ✅ 수정 |
+| P2 | `lib/model-stage.ts:156` `setDgm` | `loadDgm` 결과 두고 `findDgm` 재조회 | A | ✅ 수정 |
+| P2 | `lib/model-fk.ts:29`·`fk-plan/route.ts:58` | 단계마다 `nextSeq`·`std_term` 재조회 | A | ✅ 수정 |
 | P2 | `lib/home.ts:44` | 가진 `user` 를 `requireAreaRole` 이 재조회 | B | 미수정 |
-| P2 | `api/…/relations/[relId]/route.ts:44` | 권한 2회·감사 insert 루프 | A | 미수정 |
+| P2 | `api/…/relations/[relId]/route.ts:44` | 권한 2회·감사 insert 루프 | A | ✅ 수정 |
 | P2 | `api/…/plan/route.ts:134`·`lib/plan.ts` | `areaPlan`·`feePlans` 재조회 | B | 미수정 |
-| P2 | `lib/sql-run.ts:315` | `getConn` 2회 | A | 미수정 |
-| P5 | `attributes/[attrId]/route.ts:76`·`model-fk.ts:29`·`fk-plan/route.ts:65` | `nextSeq` 충돌 재시도 없음(#29 형제), 23505 를 ATTR_DUP 로 오표시 | A | 미수정 |
-| P5 | `model/relations.tsx:52` + 호출처 3곳 | **#31 의 `locked` prop 을 아무도 안 넘김 — 화면 가드가 실제로 꺼져 있음**, `attrs.tsx` 잠금 가드 없음 | A | 미수정 |
+| P2 | `lib/sql-run.ts:315` | `getConn` 2회 | A | ✅ 수정 |
+| P5 | `attributes/[attrId]/route.ts:76`·`model-fk.ts:29`·`fk-plan/route.ts:65` | `nextSeq` 충돌 재시도 없음(#29 형제), 23505 를 ATTR_DUP 로 오표시 | A | ✅ 수정 |
+| P5 | `model/relations.tsx:52` + 호출처 3곳 | **#31 의 `locked` prop 을 아무도 안 넘김 — 화면 가드가 실제로 꺼져 있음**, `attrs.tsx` 잠금 가드 없음 | A | ✅ 수정 |
 
 ### 2.2 sitemap.pi + 공용 패키지 (9건 — P1 3 · P2 3 · P3 2 · P4 1)
 
@@ -131,4 +131,5 @@
 
 | 날짜 | 시스템 | 등급 | 처리(패턴 · 매치 N · 처리 N) | 커밋 |
 |---|---|---|---|---|
-| — | — | — | `[TBD : 마스터 지시 — A 즉시 / B 타임아웃 값·실기기 / C 설계]` | — |
+| 2026-10-24 | schema.pi | A | P1 직렬 조회 · 매치 18행(공용 함수·라우트·bulk-check 묶음 7곳) · 처리 18 — 커밋 메시지의 '19'는 syncPlan 보조 함수를 따로 센 것 | `87c1141d` |
+| 2026-10-24 | schema.pi | A | P2 반복 조회 · 매치 5 · 처리 5 / P5 순번 충돌·잠금 가드 · 매치 2 · 처리 2(#31 가드가 실제로 꺼져 있던 것 포함) | `4aa5fe32` |
