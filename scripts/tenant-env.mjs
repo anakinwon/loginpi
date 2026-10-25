@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // 멀티테넌트 환경설정 생성기(2026-10-24 마스터 지시) — 키별 구하는 곳·공유 규칙 정본 = docs/ENV_GUIDE.md
 //   node scripts/tenant-env.mjs multi                      # 모든 앱 .env.local → 루트 .env.multi 모음 재생성
+//   node scripts/tenant-env.mjs header --port 3003 --name seminar   # 환경값 출처(사이트·메뉴) 안내 블록만 출력
 //   node scripts/tenant-env.mjs new <domain> [--port 3003] [--out <dir>]
 //     → sitemap/<domain>/ 에 .env.example · .env.local(로컬·스테이징) · .env.vercel-prod(운영 Vercel 등록용) + docs/PRD·ROADMAP·TROUBLESHOOT 골격 · CLAUDE.md · .claude/settings.json 한 세트 생성, sites.json appSts → BUILDING
 //       비밀키는 새로 생성, 공유 키는 기존 앱에서 복사, 포털 발급 값은 빈 칸 + 구하는 곳 주석. 기존 파일은 덮어쓰지 않음
@@ -190,6 +191,48 @@ function create(domain, port, outDir) {
   if (!outDir) multi()
 }
 
+// 환경값을 얻는 사이트·메뉴 안내 — .env.local 상단 블록(단일 소스, 상세 = docs/ENV_GUIDE.md 3절). 손으로 정리한 파일엔 `header` 명령 출력을 붙인다
+function sourcesHeader(port, NAME) {
+  return [
+    '# ----------------------------------------------------------------',
+    '# 환경값을 얻는 곳 (사이트 → 메뉴) — 상세 docs/ENV_GUIDE.md 3절',
+    '# ----------------------------------------------------------------',
+    '# [1] Pi Developer Portal — Pi Browser 주소창 develop.pi → Develop → 앱 선택(testnet·mainnet 앱 따로)',
+    '#     NEXT_PUBLIC_PI_APP_DOMAIN      앱 화면 맨 위 "Open app" 주소(예 https://xxxxNNNN.pinet.com/)',
+    '#     PI_API_KEY                     앱 화면 → API Key → Generate (한 번만 보임 — 즉시 복사)',
+    '#     PI_DOMAIN_VALIDATION_KEY       앱 체크리스트 → Verify domain(도메인 검증) 단계의 키',
+    '#     NEXT_PUBLIC_PI_OAUTH_CLIENT_ID 앱 화면 → Pi Sign-In → Client ID (콜백 <앱URL>/auth/pi/callback 등록)',
+    '#     PI_WALLET_ADDRESS·SEED         앱 화면 → App Wallet (A2U 지급을 쓸 때만)',
+    '# [2] Google Cloud Console — https://console.cloud.google.com/apis/credentials (상단에서 프로젝트 선택)',
+    '#     GOOGLE_CLIENT_ID·GOOGLE_CLIENT_SECRET  ① 처음이면 OAuth 동의 화면(Google 인증 플랫폼 → 브랜딩·대상) 먼저 설정',
+    '#                                    ② + 사용자 인증 정보 만들기 → OAuth 클라이언트 ID → 유형 "웹 애플리케이션"',
+    `#                                    ③ 승인된 JavaScript 원본 http://localhost:${port} (운영은 운영 도메인 추가)`,
+    `#                                    ④ 승인된 리디렉션 URI http://localhost:${port}/api/auth/callback/google (운영은 운영 도메인 추가)`,
+    '#                                    ⑤ 만들기 → 팝업의 "클라이언트 ID"·"클라이언트 보안 비밀번호" 복사',
+    '# [3] Supabase — https://supabase.com/dashboard → 프로젝트 선택(비운영 = pi-nonprod, 운영 = 사이트 전용 프로젝트)',
+    '#     *_SUPABASE_URL                 Project Settings → Data API → Project URL',
+    '#     *_SERVICE_ROLE_KEY             Project Settings → API Keys → secret 키(또는 Legacy API keys 탭의 service_role) — 서버 전용',
+    '#     PROD_RO_SUPABASE_KEY           운영 프로젝트의 읽기 전용 권한 키 — 전권 secret 키 사용 금지, 발급 방식 [확인중 : 마스터] (STAGING_DB_TARGET=prod-ro 일 때만)',
+    '#     *_PUBLISHABLE_KEY              Project Settings → API Keys → publishable',
+    `#     ${NAME}_*_DATABASE_URL         화면 상단 Connect → Session pooler(5432) 접속 문자열 — Vercel 등록 금지`,
+    '#     (스키마 노출)                  Project Settings → Data API → Exposed schemas 에 <이름>_dev·<이름>_stg 추가',
+    '# [4] Vercel — https://vercel.com/dashboard → 프로젝트 → Settings → Environment Variables',
+    '#     운영 값 등록처(Production) — .env.vercel-prod 값을 옮겨 붙이고 재배포',
+    '# [5] 직접 생성(사이트 없음) — AUTH_SECRET·PI_SESSION_SECRET·CRON_SECRET 등 비밀키',
+    `#     node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"  (생성기가 이미 채움)`,
+    '# [6] 기존 앱에서 복사 — ADMIN_PI_USERNAMES·STAGING_SUPABASE_*(sitemap/sitemap.pi/.env.local), MON_INGEST_KEY·MON_INGEST_URL(루트 .env.multi — 운영만)',
+    '#     ADMIN_PI_UIDS                  관리자가 이 앱(메인넷)에 Pi 로그인한 뒤 Supabase Table Editor → sys_user 의 pi_uid (앱·네트워크마다 값이 다름)',
+    '# [7] 그 밖의 외부 서비스(Anthropic·Gemini·GitHub·Telegram·Resend·Google Maps) — ENV_GUIDE 3.6 표',
+    '# [8] 설정값(사이트 없음 — 직접 정함)',
+    `#     NEXT_PUBLIC_APP_URL            로컬 http://localhost:${port} · 운영은 운영 도메인`,
+    '#     NEXT_PUBLIC_PI_SANDBOX         testnet·스테이징·로컬 true, 메인넷 운영 false',
+    '#     NEXT_PUBLIC_GOOGLE_LOGIN       Google 로그인 버튼 노출 1(예외 승인 사이트만)',
+    '#     APP_TIER                       dev · staging · prod (비우면 VERCEL_ENV 로 판정)',
+    '#     SUPABASE_SCHEMA                비운영 <이름>_dev·<이름>_stg, 운영은 비움(public)',
+    '#     STAGING_DB_TARGET              스테이징에서 운영 DB 를 읽기 전용으로 볼 때만 prod-ro',
+  ]
+}
+
 // .env.local 을 '언제 채우나' 단계별로 — ✅ 값 있음 · ⬜ 비어 있음 + 키별 구하는 곳(ENV_GUIDE 3절 요약). 단계에 없는 키는 '기타'로 보존
 function renderStaged(keys, vals, domain, NAME, port) {
   const N = {
@@ -244,6 +287,7 @@ function renderStaged(keys, vals, domain, NAME, port) {
     '# 키별 구하는 곳 = docs/ENV_GUIDE.md 3절 · 전체 단계 = sitemap/multitenant_create_TODO-List.md',
     '# ⚠ 비밀값 포함 — git 제외(.gitignore). 값을 바꾸면 dev 서버 재시작',
     '# ================================================================',
+    ...sourcesHeader(port, NAME),
     ...head('STEP 0 — 이미 설정됨 (생성기가 넣음, 손대지 않음)'),
     ...keys.filter((k) => vals[k]).flatMap((k) => line(k, N[k] ?? '생성기 기본값')),
   ]
@@ -420,8 +464,9 @@ const opt = (k) => {
   return i > 0 ? process.argv[i + 1] : undefined
 }
 if (cmd === 'multi') multi()
+else if (cmd === 'header') console.log(sourcesHeader(opt('port') ?? 3003, (opt('name') ?? 'APP').toUpperCase()).join('\n'))
 else if (cmd === 'new' && arg) create(arg, Number(opt('port') ?? 3003), opt('out'))
 else {
-  console.log('사용 : node scripts/tenant-env.mjs multi | new <domain.pi> [--port 3003] [--out <dir>]')
+  console.log('사용 : node scripts/tenant-env.mjs multi | new <domain.pi> [--port 3003] [--out <dir>] | header [--port 3003] [--name seminar]')
   process.exit(1)
 }

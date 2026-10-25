@@ -68,9 +68,24 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 ### 3.3 Google Cloud Console — Google 로그인
 
 - **여는 곳**: https://console.cloud.google.com/apis/credentials → 상단에서 프로젝트 선택
-- `GOOGLE_CLIENT_ID`·`GOOGLE_CLIENT_SECRET`: **사용자 인증 정보 만들기 → OAuth 클라이언트 ID → 웹 애플리케이션**
-  - 승인된 리디렉션 URI에 `<앱URL>/api/auth/callback/google`을 추가한다(로컬은 `http://localhost:<포트>/...`).
+- `GOOGLE_CLIENT_ID`·`GOOGLE_CLIENT_SECRET` 발급 순서:
+  1. 처음 쓰는 프로젝트면 **OAuth 동의 화면**(Google 인증 플랫폼 → 브랜딩·대상)을 먼저 설정한다(앱 이름·지원 이메일·외부 사용자).
+  2. **+ 사용자 인증 정보 만들기 → OAuth 클라이언트 ID**, 애플리케이션 유형 **웹 애플리케이션**.
+  3. **승인된 JavaScript 원본**: `http://localhost:<포트>`(운영은 운영 도메인을 추가).
+  4. **승인된 리디렉션 URI**: `<앱URL>/api/auth/callback/google`(로컬 예 `http://localhost:3003/api/auth/callback/google`).
+  5. **만들기** → 팝업의 **클라이언트 ID**·**클라이언트 보안 비밀번호**를 복사한다(보안 비밀번호는 나중에 다시 볼 수 없을 수 있으니 바로 `.env.local`에).
+  - 앱마다 클라이언트를 따로 만든다(2절 — 시스템마다 달라야 하는 값).
 - `NEXT_PUBLIC_GOOGLE_LOGIN=1`이면 Google 로그인 버튼이 보인다.
+
+### 3.3.1 설정값·로그인 후 얻는 값
+
+| 키 | 정하는 법 |
+|---|---|
+| `NEXT_PUBLIC_APP_URL` | 로컬 `http://localhost:<포트>`, 운영은 운영 도메인 |
+| `NEXT_PUBLIC_PI_SANDBOX` | testnet·스테이징·로컬 `true`, 메인넷 운영 `false` |
+| `APP_TIER` | `dev`·`staging`·`prod`(비우면 `VERCEL_ENV`로 판정) |
+| `STAGING_DB_TARGET` | 스테이징에서 운영 DB를 읽기 전용으로 볼 때만 `prod-ro` |
+| `ADMIN_PI_UIDS` | 관리자가 해당 앱(메인넷)에 Pi 로그인한 뒤 Supabase Table Editor → `sys_user`의 `pi_uid`. 앱·네트워크마다 값이 다르다 |
 
 ### 3.4 Supabase — DB
 
@@ -81,10 +96,11 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | 키 | 대시보드 위치 |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` · `SUPABASE_URL` · `STAGING_SUPABASE_URL` · `DEV_SUPABASE_URL` | **Project Settings → Data API → Project URL** |
-| `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_SECRET_KEY` · `STAGING_/DEV_SUPABASE_SERVICE_ROLE_KEY` | **Project Settings → API Keys** → secret(구 `service_role`) — 서버 전용이라 화면 코드에 넣으면 안 된다 |
+| `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_SECRET_KEY` · `STAGING_/DEV_SUPABASE_SERVICE_ROLE_KEY` | **Project Settings → API Keys** → secret 키(또는 Legacy API keys 탭의 `service_role`) — 서버 전용이라 화면 코드에 넣으면 안 된다 |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` · `SUPABASE_PUBLISHABLE_KEY` | 같은 화면 → publishable |
 | `<APP>_DEV/STG/PROD_DATABASE_URL` · `SCHEMA_DATABASE_URL` | 상단 **Connect → Session pooler(5432)** 접속 문자열. 마이그레이션 스크립트 전용이라 **Vercel에 등록하지 않는다** |
 | `SUPABASE_SCHEMA` | 비운영만 `<앱>_dev`·`<앱>_stg`. **Project Settings → Data API → Exposed schemas**에 등록해야 한다. 운영은 비운다 |
+| `PROD_RO_SUPABASE_URL`·`PROD_RO_SUPABASE_KEY` | 운영 프로젝트 주소 + **읽기 전용 권한 키**(전권 secret 금지, 발급 방식 [확인중 : 마스터]). `STAGING_DB_TARGET=prod-ro` 일 때만 쓴다(`packages/pi-db/src/db-env.ts`) |
 
 ### 3.5 Vercel — 운영 값을 넣는 곳
 
@@ -129,4 +145,5 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | 2026-10-24 | 테넌트를 추가하면 설정 파일을 한 세트로 | 4절, `scripts/tenant-env.mjs new` |
 | 2026-10-24 | 새 테넌트를 이름만 말하면 첫 할 일 정리 | `sitemap/multitenant_create_TODO-List.md` + 생성기(4절) |
 | 2026-10-25 | seminar.pi `.env.local` 을 언제 채우나 | 파일 자체에 STEP 0~6 단계별 주석(✅ 설정됨 · ⬜ 비어 있음) — 신규 테넌트 생성기(`tenant-env.mjs new`)도 같은 STEP 구조로 생성(2026-10-25) |
+| 2026-10-25 | `GOOGLE_CLIENT_ID` 등 모든 환경값을 어느 사이트·메뉴에서 얻나 | 3절(상세) + 각 앱 `.env.local` 상단 '환경값을 얻는 곳' 블록(생성기 자동 포함, 기존 파일은 `node scripts/tenant-env.mjs header --port <포트> --name <이름>` 출력을 붙임) |
 | 이전 | `CRON_SECRET`이 뭔가 | Vercel 크론이 `Authorization: Bearer` 헤더로 보내는 비밀값이다. 직접 만들고 앱마다 따로 쓴다 → 3.1 |
