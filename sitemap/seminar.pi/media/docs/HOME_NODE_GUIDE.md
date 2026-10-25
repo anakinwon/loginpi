@@ -85,15 +85,18 @@ seminar-galapagos.duckdns.org {
 ```
 
 `run-engine.cmd` (비밀값은 이 파일에만. 엔진이 죽으면 5초 뒤 다시 켜는 반복 구조)
+- `..._HERE` 를 실제 값으로 바꿉니다. **cmd 에서 `<` `>` 는 파일 입출력 기호**라 값에 남으면 그 줄이 깨집니다
+- `PUBLIC_IP_HERE` = 2절 ② 공인 IP / `TOKEN_SECRET_HERE` = 마스터 PC `sitemap/seminar.pi/.env.vercel-prod` 의 같은 키 값(Vercel 과 같은 값)
+- 일반 브라우저 시험도 하면 Origin 뒤에 쉼표로 Vercel 도메인(`https://xxx.vercel.app`)을 붙입니다(5절)
 ```
 @echo off
 rem MEDIA_ENV=production : 개발용 입장(MEDIA_DEV_TICKET)을 코드에서 강제로 끔 — 인터넷에 여는 엔진이라 필수
 set MEDIA_ENV=production
 set MEDIA_LISTEN=127.0.0.1:7880
 set MEDIA_UDP_PORT=7882
-set MEDIA_PUBLIC_IP=<공인 IP — 2절 ② 값>
-set MEDIA_TOKEN_SECRET=<4.2-3 에서 만든 값, Vercel 과 같은 값>
-set MEDIA_ALLOWED_ORIGINS=<seminar 앱 주소들, 쉼표 구분 — 5절 형식>
+set MEDIA_PUBLIC_IP=PUBLIC_IP_HERE
+set MEDIA_TOKEN_SECRET=TOKEN_SECRET_HERE
+set MEDIA_ALLOWED_ORIGINS=https://seminar0532.pinet.com
 :loop
 C:\galapagos\galapagos.exe >> C:\galapagos\engine.log 2>&1
 echo %date% %time% engine exited - restart in 5s >> C:\galapagos\engine.log
@@ -113,7 +116,7 @@ goto loop
 `duckdns.cmd` (공인 IP 가 바뀌면 이름을 새 IP 로 갱신 — `ip=` 를 비우면 요청을 보낸 IP 로 갱신, 출처 : duckdns.org/spec.jsp, 확인일 2026-10-25. curl 은 Windows 10 1803 이상 기본 포함)
 ```
 @echo off
-curl -s "https://www.duckdns.org/update?domains=seminar-galapagos&token=<토큰>&ip=" >> C:\galapagos\duckdns.log
+curl -s "https://www.duckdns.org/update?domains=seminar-galapagos&token=DUCKDNS_TOKEN_HERE&ip=" >> C:\galapagos\duckdns.log
 ```
 
 ### 4.3 방화벽 (관리자 PowerShell)
@@ -146,8 +149,32 @@ Set-ScheduledTask -TaskName 'Galapagos Caddy' -Settings $s
 | `C:\galapagos\duckdns.log` | 192.168.0.8 | `OK` | `KO` → 토큰·도메인 이름 확인 |
 | `C:\galapagos\caddy.log` | 192.168.0.8 | `certificate obtained successfully` 와 도메인 이름 | DuckDNS 갱신(`OK`)과 공유기 TCP 443 포워딩부터 확인 |
 | `C:\galapagos\engine.log` | 192.168.0.8 | `Galápagos 대기 http 127.0.0.1:7880 · udp 7882` | 기동 거부 문구 확인(`MEDIA_ALLOWED_ORIGINS` 비어 있으면 거부) |
-| `http://127.0.0.1:7880/healthz` | 192.168.0.8 브라우저 | `ok` | 엔진 미기동 |
+| `http://127.0.0.1:7880/healthz` | 192.168.0.8 브라우저 | `ok` | 엔진 미기동 → 4.6 |
 | `https://seminar-galapagos.duckdns.org/healthz` | 휴대폰 LTE(와이파이 끔) | `ok` + 자물쇠(인증서 정상) | 위 caddy.log |
+
+### 4.6 엔진이 안 뜰 때 (healthz 접속 안 됨)
+
+관리자 cmd 에서 반복 없이 **한 번 직접 실행**하면 거부 사유가 화면에 바로 나옵니다.
+```
+schtasks /End /TN "Galapagos Engine"
+taskkill /IM galapagos.exe /F
+cd /d C:\galapagos
+findstr /B /C:"set " run-engine.cmd > %TEMP%\genv.cmd
+call %TEMP%\genv.cmd
+del %TEMP%\genv.cmd
+galapagos.exe
+```
+
+| 화면 문구 | 원인 | 조치 |
+|---|---|---|
+| `Galápagos 대기 http 127.0.0.1:7880 · udp 7882` | 엔진은 정상 — 작업 스케줄러 쪽 문제 | `schtasks /Query /TN "Galapagos Engine" /V /FO LIST` 의 '마지막 결과' 확인, `schtasks /Run` 으로 시작했는지 확인 |
+| `MEDIA_TOKEN_SECRET 은 32자 이상 필수` | 비밀키가 비었거나 잘림·`_HERE` 그대로 | 값 다시 붙여넣기(앞뒤 공백 없이) |
+| `MEDIA_ALLOWED_ORIGINS 필수` | Origin 빈 값 | 4.2 형식으로 입력 |
+| `API 구성 실패` · `bind` · `Only one usage of each socket address` | `MEDIA_PUBLIC_IP` 형식 오류이거나 7880·7882 를 다른 프로그램이 사용 | IP 는 숫자 4덩어리만, `netstat -ano \| findstr ":7880 :7882"` 로 점유 프로세스 확인 |
+| `지정된 파일을 찾을 수 없습니다` | `set` 줄에 `<` `>` 가 남음 | 4.2 의 `_HERE` 치환 확인 |
+| 실행 차단 경고·아무 반응 없음 | 다른 PC 에서 옮긴 실행 파일 차단(SmartScreen) | 파일 속성 → 하단 '차단 해제' 체크 |
+
+확인 뒤 `Ctrl+C` 로 끄고 `schtasks /Run /TN "Galapagos Engine"` 로 다시 맡깁니다. `engine.log` 는 관리자 권한으로만 열립니다(4.2 폴더 권한).
 
 ## 5. 앱(Vercel) 쪽 설정 — 아소카가 코드, 마스터가 Vercel 값
 
