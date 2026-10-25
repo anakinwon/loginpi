@@ -1,9 +1,10 @@
-// 4분류 판정(Forward/Drop/SilentDrop/Buffer)과 SeqRewriter 반영, 일시정지·재개(PRD_02 3.3 jeju, REA_02 5.6). M3 에서 정밀화.
+// 4분류 판정(Forward/Drop/SilentDrop/Buffer)과 SeqRewriter 반영, 일시정지·재개, 레이어 사용 가능 훅(PRD_02 3.3 jeju, REA_02 5.6·5.9).
 package jeju
 
 import (
 	"seminar.pi/media/internal/forward"
 	"seminar.pi/media/internal/pli"
+	"seminar.pi/media/internal/santorini"
 )
 
 // Decision — 항목 하나의 처리 결과.
@@ -34,11 +35,21 @@ type LayerPolicy interface {
 }
 
 // decide — 정책 판정 + 일시정지 + 순번 반영. send=true 면 보낸다(송신 고루틴 전용).
+// 일시정지 중 패킷은 SilentDrop 과 같다(순번 공간 밖) — 재개 뒤 첫 키프레임에서 Sync 로 이어 붙인다(REA_02 5.1 consume paused→resume).
 func (c *Consumer) decide(it forward.Item) (send bool) {
 	if c.paused {
-		return false // M3 : paused 중 순번 처리(Drop 여부) 확정
+		return false
 	}
 	d, sw := c.policy.Decide(it, c.lastMarker)
+	if c.seq.resync && d == Forward {
+		if !it.Key && c.producer.Kind() == santorini.Video {
+			return false // 재개 후 키프레임 전 — Buffer(음성은 키프레임이 없어 바로 이어 붙임)
+		}
+		c.seq.resync = false
+		if sw == nil {
+			sw = &Switch{}
+		}
+	}
 	if sw != nil {
 		c.seq.Sync(it.ExtSeq)
 	}
@@ -51,13 +62,27 @@ func (c *Consumer) decide(it forward.Item) (send bool) {
 	return false
 }
 
-// Pause — 청중 수신 일시정지.
-func (c *Consumer) Pause() { c.do(func() { c.paused = true }) }
+// Pause — 청중 수신 일시정지(producer.pause 연쇄, 할당기 일시정지).
+func (c *Consumer) Pause() { c.do(c.pause) }
 
 // Resume — 재개 즉시 키프레임 요청(PRD_02 5.2 consumer.resume).
-func (c *Consumer) Resume() {
-	c.do(func() {
-		c.paused = false
-		c.requestKeyframe(pli.NewConsumer)
-	})
+func (c *Consumer) Resume() { c.do(c.resume) }
+
+func (c *Consumer) pause() { c.paused = true }
+
+// resume — 송신 고루틴 전용. 일시정지가 아니면 아무것도 하지 않는다.
+func (c *Consumer) resume() {
+	if !c.paused {
+		return
+	}
+	c.paused = false
+	c.seq.resync = true
+	c.requestKeyframe(pli.NewConsumer)
+}
+
+// layerUsable — 레이어 비활성 감지 훅. 없거나 비활성(santorini Active, M4)인 레이어는 전환 후보에서 뺀다(REA_02 5.9 점수 0 제외).
+// M4 LayerPolicy·Allocator 가 목표 레이어를 고를 때 쓴다.
+func (c *Consumer) layerUsable(i int8) bool {
+	l := c.producer.Layer(i)
+	return l != nil && l.Active()
 }
