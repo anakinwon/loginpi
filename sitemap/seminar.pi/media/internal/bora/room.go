@@ -331,6 +331,12 @@ func (r *Room) produce(peerID, mid string, kind santorini.Kind, src santorini.So
 			pr = p.pubMids[mid] // 같은 mid 재요청 — 기존 것
 			return nil
 		}
+		// 참가자당 (종류, 출처) 1개 — produce 반복으로 Producer·청중 Consumer 가 곱으로 늘어나는 자원 고갈 차단
+		for _, old := range p.Producers {
+			if old.Kind() == kind && old.Source() == src {
+				return signal.Errf(signal.CodeRateLimited, "같은 종류·출처의 발행이 이미 있음")
+			}
+		}
 		pr = santorini.New(newID(), peerID, kind, src)
 		pr.SetPriority(priorityOf(src, p.Ticket.Role))
 		r.producers[pr.ID()] = pr
