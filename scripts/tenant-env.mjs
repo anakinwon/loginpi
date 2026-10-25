@@ -159,7 +159,7 @@ function create(domain, port, outDir) {
   const site = JSON.parse(readFileSync(join(ROOT, 'sitemap/sites.json'), 'utf8')).sites.find((s) => s.domain === domain)
   const files = [
     ['.env.example', tpl],
-    ['.env.local', render(local, '로컬·스테이징')],
+    ['.env.local', renderStaged(keys, local, domain, NAME, port)],
     ['.env.vercel-prod', render(prod, '운영 Vercel 등록용(Settings → Environment Variables → Production) — 앱이 읽지 않음, 등록 후 보관')],
     // 첫 할 일 문서·설정 — 앱 코드 골격(_template)은 만들지 않는다(PRD_28 §3 선제 작성 금지)
     ['docs/PRD.md', prdDoc(domain, name, site)],
@@ -188,6 +188,71 @@ function create(domain, port, outDir) {
   console.log('→ 구하는 곳 docs/ENV_GUIDE.md 3절')
   console.log(`\n다음 할 일 = sitemap/multitenant_create_TODO-List.md (단계 0 결정 → 2 PRD 확정 → 3 앱 골격 …), 진행 현황 표에 ${domain} 행 추가`)
   if (!outDir) multi()
+}
+
+// .env.local 을 '언제 채우나' 단계별로 — ✅ 값 있음 · ⬜ 비어 있음 + 키별 구하는 곳(ENV_GUIDE 3절 요약). 단계에 없는 키는 '기타'로 보존
+function renderStaged(keys, vals, domain, NAME, port) {
+  const N = {
+    NEXT_PUBLIC_APP_URL: `로컬 주소 http://localhost:${port}`,
+    NEXT_PUBLIC_PI_SANDBOX: '로컬·스테이징 true (메인넷 운영만 false)',
+    PI_SESSION_SECRET: '세션 서명 비밀키 — 자동 생성(운영은 .env.vercel-prod 의 다른 값)',
+    AUTH_SECRET: 'Google 로그인(NextAuth) 비밀키 — 자동 생성',
+    NEXT_PUBLIC_GOOGLE_LOGIN: 'Google 로그인 버튼 노출 1',
+    CRON_SECRET: '크론 호출 비밀키 — 자동 생성',
+    ADMIN_PI_USERNAMES: '관리자 Pi 사용자명 — 기존 앱과 같은 값',
+    APP_TIER: 'staging — 비운영 DB(pi-nonprod) 사용',
+    SUPABASE_SCHEMA: '비운영 스키마(<이름>_stg)',
+    STAGING_SUPABASE_URL: 'pi-nonprod 프로젝트 주소 — sitemap.pi 에서 복사',
+    STAGING_SUPABASE_SERVICE_ROLE_KEY: 'pi-nonprod 서버 키 — sitemap.pi 에서 복사',
+    NEXT_PUBLIC_PI_APP_DOMAIN: 'Portal 앱 화면 "Open app" 주소 — ENV_GUIDE 3.2',
+    PI_API_KEY: 'Portal → API Key → Generate(한 번만 표시)',
+    PI_DOMAIN_VALIDATION_KEY: 'Portal 체크리스트 → 도메인 검증 키',
+    NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: '(선택) 일반 브라우저 Pi 로그인 — Portal → Pi Sign-In',
+    GOOGLE_CLIENT_ID: `Google Cloud Console → OAuth 클라이언트(리디렉션 http://localhost:${port}/api/auth/callback/google) — ENV_GUIDE 3.3`,
+    GOOGLE_CLIENT_SECRET: '위와 같은 화면',
+    [`${NAME}_STG_DATABASE_URL`]: 'pi-nonprod → Connect → Session pooler(5432) — 마이그레이션 전용, Vercel 등록 금지',
+    [`${NAME}_DEV_DATABASE_URL`]: '위와 같은 접속 문자열(dev 스키마 적용 시)',
+    DEV_SUPABASE_URL: '(선택) APP_TIER=dev 로 돌릴 때만',
+    DEV_SUPABASE_SERVICE_ROLE_KEY: '(선택) 위와 같음',
+    NEXT_PUBLIC_SUPABASE_URL: '운영 사이트 전용 Supabase 주소',
+    SUPABASE_SERVICE_ROLE_KEY: '운영 서버 키',
+    MON_INGEST_URL: '모니터링 수집 주소 — 운영만',
+    MON_INGEST_KEY: '세 시스템 공통 값 — 운영만',
+    ADMIN_PI_UIDS: '운영 관리자 Pi uid(메인넷 앱 기준)',
+    [`${NAME}_PROD_DATABASE_URL`]: '운영 DB 마이그레이션 때만 잠시 사용',
+    STAGING_DB_TARGET: '(선택) 스테이징에서 운영 DB 읽기 전용 볼 때',
+    PROD_RO_SUPABASE_URL: '(선택) 위와 같음',
+    PROD_RO_SUPABASE_KEY: '(선택) 위와 같음',
+  }
+  const STEPS = [
+    ['STEP 1 — Pi 로그인을 붙일 때 (Pi Developer Portal testnet 앱 등록 후)', ['NEXT_PUBLIC_PI_APP_DOMAIN', 'PI_API_KEY', 'PI_DOMAIN_VALIDATION_KEY', 'NEXT_PUBLIC_PI_OAUTH_CLIENT_ID']],
+    ['STEP 2 — Google 연동을 붙일 때 (마스터 예외 승인 사이트만 — PRD 4절)', ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET']],
+    ['STEP 3 — 첫 DB 테이블을 만들 때 (sql/001)', [`${NAME}_STG_DATABASE_URL`, `${NAME}_DEV_DATABASE_URL`, 'DEV_SUPABASE_URL', 'DEV_SUPABASE_SERVICE_ROLE_KEY']],
+    ['STEP 4 — 운영 전용 (로컬은 비워 둠 — 값은 .env.vercel-prod 에 모아 Vercel Production 에 등록)', ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'MON_INGEST_URL', 'MON_INGEST_KEY', 'ADMIN_PI_UIDS', `${NAME}_PROD_DATABASE_URL`, 'STAGING_DB_TARGET', 'PROD_RO_SUPABASE_URL', 'PROD_RO_SUPABASE_KEY']],
+  ]
+  const left = new Set(keys)
+  const line = (k, note) => {
+    left.delete(k)
+    return [`# ${vals[k] ? '✅' : '⬜'} ${note ?? ''}`.trimEnd(), `${k}=${vals[k] ?? ''}`]
+  }
+  const head = (t) => ['', '# ================================================================', `# ${t}`, '# ================================================================']
+  // STEP 0 = 생성기가 값을 넣은 키(비밀키 생성·공유 값 복사)
+  const out = [
+    '# ================================================================',
+    `# ${domain} .env.local — "언제 설정하나" 단계별 정리 (node scripts/tenant-env.mjs new 생성, ${new Date().toISOString().slice(0, 10)})`,
+    '# ✅ = 값 있음 · ⬜ = 아직 비어 있음(해당 단계가 오면 채움) · 키 설명은 .env.example',
+    '# 키별 구하는 곳 = docs/ENV_GUIDE.md 3절 · 전체 단계 = sitemap/multitenant_create_TODO-List.md',
+    '# ⚠ 비밀값 포함 — git 제외(.gitignore). 값을 바꾸면 dev 서버 재시작',
+    '# ================================================================',
+    ...head('STEP 0 — 이미 설정됨 (생성기가 넣음, 손대지 않음)'),
+    ...keys.filter((k) => vals[k]).flatMap((k) => line(k, N[k] ?? '생성기 기본값')),
+  ]
+  for (const [t, ks] of STEPS) {
+    const own = ks.filter((k) => left.has(k))
+    if (own.length) out.push(...head(t), ...own.flatMap((k) => line(k, N[k])))
+  }
+  if (left.size) out.push(...head('기타 (단계 미분류 — 앱 전용 키, .env.example 설명 참고)'), ...[...left].flatMap((k) => line(k)))
+  return out.join('\n') + '\n'
 }
 
 // sites.json 해당 사이트 appSts PLANNED → BUILDING (서식 보존 위해 텍스트 치환, 없으면 안내만)

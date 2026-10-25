@@ -128,5 +128,5 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | 2026-10-24 | 키와 값을 어디서 구하나 | 3절 |
 | 2026-10-24 | 테넌트를 추가하면 설정 파일을 한 세트로 | 4절, `scripts/tenant-env.mjs new` |
 | 2026-10-24 | 새 테넌트를 이름만 말하면 첫 할 일 정리 | `sitemap/multitenant_create_TODO-List.md` + 생성기(4절) |
-| 2026-10-25 | seminar.pi `.env.local` 을 언제 채우나 | 파일 자체에 STEP 0~6 단계별 주석(✅ 설정됨 · ⬜ 비어 있음) — 신규 테넌트 생성기 출력에도 같은 구조 반영 [TBD] |
+| 2026-10-25 | seminar.pi `.env.local` 을 언제 채우나 | 파일 자체에 STEP 0~6 단계별 주석(✅ 설정됨 · ⬜ 비어 있음) — 신규 테넌트 생성기(`tenant-env.mjs new`)도 같은 STEP 구조로 생성(2026-10-25) |
 | 이전 | `CRON_SECRET`이 뭔가 | Vercel 크론이 `Authorization: Bearer` 헤더로 보내는 비밀값이다. 직접 만들고 앱마다 따로 쓴다 → 3.1 |
