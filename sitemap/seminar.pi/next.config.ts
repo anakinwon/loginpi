@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
   turbopack: { root: repoRoot },
   outputFileTracingRoot: repoRoot,
   poweredByHeader: false,
+  // Pi 도메인 검증 파일(testnet 키)을 서버리스 번들에 포함 — src/app/validation-key.txt/route.ts 가 읽음
+  outputFileTracingIncludes: { '/validation-key.txt': ['./validation-key.txt'] },
   async headers() {
     return [
       {
