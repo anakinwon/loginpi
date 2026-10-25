@@ -44,7 +44,7 @@ node scripts/tenant-env.mjs new yea.pi --port 3005   # 신규 테넌트 설정 �
 
 ### 3.1 직접 만드는 비밀키 — 포털 없이 명령 한 줄
 
-`AUTH_SECRET` · `PI_SESSION_SECRET` · `CRON_SECRET` · `MON_INGEST_KEY`(처음 한 번만 만들고 세 시스템에 같은 값) · `SITEMAP_VERIFY_SECRET`
+`AUTH_SECRET` · `PI_SESSION_SECRET` · `CRON_SECRET` · `MON_INGEST_KEY`(처음 한 번만 만들고 세 시스템에 같은 값) · `SITEMAP_VERIFY_SECRET` · `MEDIA_TOKEN_SECRET`(seminar.pi — 앱과 Galápagos 엔진에 같은 값)
 
 ```bash
 node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
@@ -146,4 +146,5 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | 2026-10-24 | 새 테넌트를 이름만 말하면 첫 할 일 정리 | `sitemap/multitenant_create_TODO-List.md` + 생성기(4절) |
 | 2026-10-25 | seminar.pi `.env.local` 을 언제 채우나 | 파일 자체에 STEP 0~6 단계별 주석(✅ 설정됨 · ⬜ 비어 있음) — 신규 테넌트 생성기(`tenant-env.mjs new`)도 같은 STEP 구조로 생성(2026-10-25) |
 | 2026-10-25 | `GOOGLE_CLIENT_ID` 등 모든 환경값을 어느 사이트·메뉴에서 얻나 | 3절(상세) + 각 앱 `.env.local` 상단 '환경값을 얻는 곳' 블록(생성기 자동 포함, 기존 파일은 `node scripts/tenant-env.mjs header --port <포트> --name <이름>` 출력을 붙임) |
+| 2026-10-25 | seminar.pi `MEDIA_TOKEN_SECRET` 은 어디서 구하나 | 사이트 없음 — 직접 만드는 입장권 서명 키(3.1). **앱과 엔진이 같은 값**: 로컬 = `.env.local`, 운영 = `.env.vercel-prod` 값을 Vercel(Production)과 엔진 PC `C:galapagosun-engine.cmd` 에 넣는다(`media/docs/HOME_NODE_GUIDE.md`) |
 | 이전 | `CRON_SECRET`이 뭔가 | Vercel 크론이 `Authorization: Bearer` 헤더로 보내는 비밀값이다. 직접 만들고 앱마다 따로 쓴다 → 3.1 |
