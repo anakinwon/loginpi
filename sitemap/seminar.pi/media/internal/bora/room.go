@@ -79,6 +79,9 @@ type Room struct {
 	consumers map[string]map[string]*jeju.Consumer // producerID → consumerID → Consumer
 	paused    map[string]bool                      // 일시정지된 producerID(M3)
 	recs      map[string]recording                 // producerID → 녹화(M5, MEDIA_RECORD_DIR 설정 시)
+	maxLayer  map[string]int8                      // consumerID → consumer.setLayer 상한(없으면 최고 레이어)
+	dyna      map[string]*bwe.Dynacast             // 영상 producerID → 발행 레이어 상한(ntf publishLayers·REMB)
+	opened    bool                                 // 관리 API 로 연 방 — 비어도 정리하지 않는다(종료 시각·CloseRoom 으로만)
 
 	cmd  chan func()
 	once sync.Once
@@ -92,6 +95,7 @@ func NewRoom(id string, cap int, end time.Time) *Room {
 		peers: map[string]*Peer{}, producers: map[string]*santorini.Producer{},
 		consumers: map[string]map[string]*jeju.Consumer{},
 		paused:    map[string]bool{}, recs: map[string]recording{},
+		maxLayer: map[string]int8{}, dyna: map[string]*bwe.Dynacast{},
 		cmd: make(chan func(), 64), done: make(chan struct{}),
 	}
 	go r.loop()
@@ -141,6 +145,14 @@ func (r *Room) do(fn func()) {
 }
 
 func newID() string { return rand.Text()[:16] }
+
+// reapable — 방 고루틴 전용. 종료 시각이 지났거나, 입장권으로 자동 생성된 방이 비었으면 Manager 가 목록에서 빼고 닫는다.
+func (r *Room) reapable(now time.Time) bool {
+	if !r.end.IsZero() && now.After(r.end) {
+		return true
+	}
+	return !r.opened && len(r.peers) == 0
+}
 
 // Join — 정원·역할·중복 sub(기존 세션 DUPLICATE_SESSION 종료) 검사 후 Peer 생성. 구독 PC 를 만들고 기존 Producer 를 자동 구독한다.
 func (r *Room) Join(t signal.Ticket, s signal.Session) (*Peer, *signal.Error) {
@@ -320,6 +332,7 @@ func (r *Room) produce(peerID, mid string, kind santorini.Kind, src santorini.So
 			return nil
 		}
 		pr = santorini.New(newID(), peerID, kind, src)
+		pr.SetPriority(priorityOf(src, p.Ticket.Role))
 		r.producers[pr.ID()] = pr
 		p.Producers[pr.ID()] = pr
 		r.consumers[pr.ID()] = map[string]*jeju.Consumer{}
@@ -387,6 +400,7 @@ func (r *Room) consume(p *Peer, pr *santorini.Producer, paused bool) *signal.Err
 	// 출력 SSRC = sender SSRC(TrackLocalStaticRTP 가 바인딩 SSRC 로 덮어쓰므로 이 값이 Consumer 수명 동안 고정)
 	c := jeju.New(newID(), pr, track, uint32(sender.GetParameters().Encodings[0].SSRC), paused)
 	c.SetReporter(p.Sub)
+	c.SetNackStats(p.Alloc.OnNackStats) // M4 ④ NACK 비율 혼잡 판정(D-7 — REMB 가 안 와도 동작하는 경로)
 	sink.c.Store(c)
 	if r.consumers[pr.ID()] == nil {
 		r.consumers[pr.ID()] = map[string]*jeju.Consumer{}
@@ -494,6 +508,7 @@ func (r *Room) startReady(p *Peer) {
 				l.Subscribe(c.Queue())
 			}
 		}
+		c.SetAbsSendTimeID(capri.AbsSendTimeID(p.senders[c.ID()])) // answer 적용 뒤라 협상 ID 가 정해져 있다(D-12 M4)
 		c.Start()
 	}
 	p.ready = nil
@@ -524,28 +539,33 @@ func (r *Room) trickle(peerID string, t signal.Trickle) *signal.Error {
 	})
 }
 
-// consumerOf — 방 고루틴 밖에서 Consumer 를 찾는다(Consumer 메서드는 자체 채널이라 어느 고루틴이든 안전).
-func (r *Room) consumerOf(peerID, consumerID string) (*jeju.Consumer, *signal.Error) {
-	var c *jeju.Consumer
-	e := r.call(func() *signal.Error {
-		if p := r.peers[peerID]; p != nil {
-			c = p.Consumers[consumerID]
-		}
-		if c == nil {
+// SetLayer — consumer.setLayer. 상한을 Consumer(전환 정책)와 할당기(대역 계산) 양쪽에 반영한다(PRD_02 3.3 bwe OnConsumerChanged).
+func (r *Room) SetLayer(peerID, consumerID string, maxSpatial int8) *signal.Error {
+	return r.call(func() *signal.Error {
+		p := r.peers[peerID]
+		if p == nil || p.Consumers[consumerID] == nil {
 			return signal.Errf(signal.CodeNotFound, "consumer 없음")
+		}
+		c := p.Consumers[consumerID]
+		m := min(max(maxSpatial, 0), santorini.MaxLayers-1)
+		r.maxLayer[consumerID] = m
+		c.SetMax(m)
+		if p.Alloc != nil {
+			p.Alloc.OnConsumerChanged(r.view(c))
 		}
 		return nil
 	})
-	return c, e
 }
 
-// SetPriority — 화면공유 255 > 발표자 영상 > 패널 영상.
-func (r *Room) SetPriority(producerID string, p uint8) {
-	r.exec(func() {
-		if pr := r.producers[producerID]; pr != nil {
-			pr.SetPriority(p)
-		}
-	})
+// priorityOf — 할당 우선순위 : 화면공유 255 > 발표자 영상 > 패널 영상(PRD_02 D-8). 값 사이 간격은 [TBD : 역할 추가 시].
+func priorityOf(src santorini.Source, role signal.Role) uint8 {
+	switch {
+	case src == santorini.Screen:
+		return 255
+	case role == signal.RolePresenter:
+		return 128
+	}
+	return 64
 }
 
 // Close — 방 종료(모든 참가자 연쇄 정리 후 고루틴 종료).

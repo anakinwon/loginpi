@@ -28,6 +28,7 @@ func TestAdminHandler(t *testing.T) {
 		{"ID 경로 문자", "POST", "/admin/rooms", `{"id":"../x","cap":5}`, auth, 400},
 		{"없는 방 종료", "DELETE", "/admin/rooms/none", "", auth, 404},
 		{"방 종료", "DELETE", "/admin/rooms/room-1", "", auth, 204},
+		{"카운터", "GET", "/admin/metrics", "", auth, 200},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

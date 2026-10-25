@@ -9,6 +9,7 @@ import (
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp"
 
+	"seminar.pi/media/internal/forward"
 	"seminar.pi/media/internal/nack"
 	"seminar.pi/media/internal/rtcpx"
 	"seminar.pi/media/internal/santorini"
@@ -154,5 +155,50 @@ func TestOnNACK(t *testing.T) {
 	ms := cons.meta.TakeMisses(time.Now().Add(nack.MissBatchWait))
 	if len(ms) != 1 || ms[0].Src != k+6 || ms[0].Layer != 0 {
 		t.Errorf("미스 묶음 : %v", ms)
+	}
+}
+
+// 전환 뒤 재전송 : 전환 전 출력 순번은 재전송하지 않고(헤더 기준이 달라짐), 전환 뒤 순번은 처음과 같은 TS 로 다시 보낸다.
+// abs-send-time ID 가 있으면 새 확장을 붙이고, NACK 비율 창 입력(보낸 수·재전송 수)을 넘긴다.
+func TestRetransmitAfterSwitch(t *testing.T) {
+	const k = uint64(1<<16) - 3 // 감김 근처
+	cons, cache, w := setup(t, k, k+9, true)
+	var gotSent, gotRtx uint32
+	cons.SetNackStats(func(s, r uint32) { gotSent, gotRtx = s, r })
+	cons.SetAbsSendTimeID(3)
+	if !cons.replay() {
+		t.Fatal("재생 실패")
+	}
+	old := w.pkts[3]
+
+	// 같은 레이어로 재기준(재개·전환과 같은 경로) 후 새 패킷 1개
+	pkt := &rtp.Packet{Header: rtp.Header{Version: 2, SSRC: 1111, SequenceNumber: uint16((k + 10) & 0xFFFF), Timestamp: 777, Marker: true}, Payload: []byte{9}}
+	raw, err := pkt.Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	idx := cache.Store(k+10, 777, true, true, raw)
+	it := forward.Item{ExtSeq: k + 10, Idx: idx, Key: true, Marker: true, Layer: 0, At: time.Now()}
+	cons.applySwitch(&Switch{From: 0, To: 0}, it)
+	if !cons.send(raw, it, time.Now()) {
+		t.Fatal("전환 뒤 송신 실패")
+	}
+	fresh := w.pkts[len(w.pkts)-1]
+	w.pkts = nil
+
+	cons.onNACK(nackFor(old.SequenceNumber)[0].(*rtcp.TransportLayerNack))
+	if len(w.pkts) != 0 {
+		t.Fatalf("전환 전 순번을 재전송함 : %+v", w.pkts)
+	}
+	cons.onNACK(nackFor(fresh.SequenceNumber)[0].(*rtcp.TransportLayerNack))
+	if len(w.pkts) != 1 || w.pkts[0].Timestamp != fresh.Timestamp || w.pkts[0].SequenceNumber != fresh.SequenceNumber {
+		t.Fatalf("전환 뒤 재전송 불일치 : %+v / %+v", w.pkts, fresh)
+	}
+	if w.pkts[0].GetExtension(3) == nil {
+		t.Error("abs-send-time 확장 없음")
+	}
+	cons.flushStats()
+	if gotSent != 11 || gotRtx != 1 {
+		t.Errorf("NACK 통계 sent=%d rtx=%d, 기대 11·1", gotSent, gotRtx)
 	}
 }

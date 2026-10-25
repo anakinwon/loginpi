@@ -213,3 +213,65 @@ func TestRoomClosed(t *testing.T) {
 		t.Fatalf("%v", e)
 	}
 }
+
+// setLayer 상한 → 할당기 뷰·Dynacast(하향 5초)·REMB 상한·ntf publishLayers.
+func TestSetLayerPublishCaps(t *testing.T) {
+	f := newFixture(t)
+	if e := f.r.SetLayer("B", "nope", 0); e == nil || e.Code != signal.CodeNotFound {
+		t.Fatalf("없는 consumer setLayer: %v", e)
+	}
+	if e := f.r.SetLayer("B", "cb", 0); e != nil {
+		t.Fatal(e)
+	}
+	if e := f.r.SetLayer("C", "cc", 9); e != nil { // 범위 밖은 최고 레이어로
+		t.Fatal(e)
+	}
+	now := time.Now()
+	f.r.exec(func() {
+		if v := f.r.view(f.cb); v.MaxLayer != 0 {
+			t.Errorf("cb 뷰 상한 %d", v.MaxLayer)
+		}
+		if v := f.r.view(f.cc); v.MaxLayer != 2 {
+			t.Errorf("cc 뷰 상한 %d", v.MaxLayer)
+		}
+		f.r.publishCaps(now)
+		if got := f.pa.REMBCap(); got != 3_700_000 {
+			t.Errorf("REMB 상한 %d", got)
+		}
+		f.r.maxLayer["cc"] = 1
+		f.r.publishCaps(now.Add(time.Second)) // 하향 대기 시작
+		f.r.publishCaps(now.Add(7 * time.Second))
+		if got := f.pa.REMBCap(); got != 1_200_000 {
+			t.Errorf("하향 후 REMB 상한 %d", got)
+		}
+		if got := f.sess["A"].got; len(got) != 1 || got[0] != signal.NPublishLayers {
+			t.Errorf("발행자 알림 %v", got)
+		}
+	})
+}
+
+// 자동 생성 방은 비면 정리, 관리 API 로 연 방은 남고(종료 시각 지나면 정리), 자동 방은 OpenRoom 이 넘겨받는다.
+func TestReapRooms(t *testing.T) {
+	m := NewManager()
+	auto := m.room(signal.Ticket{Room: "auto", Cap: 3})
+	m.OpenRoom("kept", 5, time.Time{})
+	m.OpenRoom("over", 5, time.Now().Add(-time.Second))
+	m.room(signal.Ticket{Room: "adopt", Cap: 3})
+	if !m.OpenRoom("adopt", 7, time.Time{}) {
+		t.Fatal("자동 생성 방을 관리 API 가 넘겨받지 못함")
+	}
+	if m.OpenRoom("adopt", 7, time.Time{}) {
+		t.Fatal("관리 API 로 연 방 중복 열기 허용")
+	}
+	m.reap(nil)
+	got := map[string]int{}
+	for _, info := range m.Rooms() {
+		got[info.ID] = info.Cap
+	}
+	if _, ok := got["auto"]; ok || got["kept"] != 5 || got["adopt"] != 7 || len(got) != 2 {
+		t.Fatalf("정리 결과 %v", got)
+	}
+	if !isDone(auto.Done()) {
+		t.Fatal("정리된 방 고루틴이 남음")
+	}
+}

@@ -240,6 +240,7 @@ func (c *Consumer) applySwitch(sw *Switch, it forward.Item) {
 		in--
 	}
 	c.seq.Sync(in)
+	c.fencePend = true // 다음 송신 순번부터 새 TS·VP8 기준 — 그 앞은 재전송 안 함
 	if s, ok := c.policy.(*simulcast); ok {
 		c.tsOffset = s.tsOffset
 		s.vp8.Sync()

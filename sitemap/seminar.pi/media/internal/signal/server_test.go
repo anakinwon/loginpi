@@ -2,7 +2,9 @@
 package signal
 
 import (
+	"bufio"
 	"encoding/json"
+	"net"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -110,4 +112,28 @@ func TestWSOrigin(t *testing.T) {
 		t.Fatalf("허용 Origin 거부: %v", err)
 	}
 	ws.Close()
+}
+
+// 송신 큐가 차서 끊을 때 호출자(방 고루틴)는 소켓 쓰기(최대 10초)를 기다리지 않는다 — Send 비차단 계약.
+func TestSendQueueFullDoesNotBlock(t *testing.T) {
+	a, b := net.Pipe() // 상대가 읽지 않으면 쓰기가 막히는 느린 청중 대역
+	defer b.Close()
+	s := newSession(&WSConn{c: a, r: bufio.NewReader(a), max: MaxMessage})
+	done := make(chan struct{})
+	go func() {
+		for i := 0; i < sendQueue+10; i++ {
+			s.Send(Notification{M: "x"})
+		}
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("큐 가득 참 처리에서 호출자가 막힘")
+	}
+	select {
+	case <-s.done:
+	default:
+		t.Fatal("큐가 찼는데 세션이 끝나지 않음")
+	}
 }

@@ -32,7 +32,7 @@
 
 ```
 [브라우저 — seminar.pi 화면(Next.js · Vercel)]
-   ① HTTPS /api/media/token : 로그인 + (유료면) Pi 결제 확인 → 입장권 발급(HMAC, 수 분 유효)
+   ① HTTPS /api/media/ticket : 로그인 + (유료면) Pi 결제 확인 → 입장권 발급(HMAC, 수 분 유효)
    ② WSS  /signal            : 입장권 제시 → join · produce · consume · trickle ICE · leave
    ③ UDP/TCP(DTLS-SRTP)      : 영상·음성
         ▼

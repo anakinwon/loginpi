@@ -81,10 +81,10 @@
  │── join{ticket} ───────▶│ 입장권 검증(4절 오류) · 정원·역할·중복 검사
  │◀─ res{peerId,…,producers:[pa]}
  │◀─ ntf transport.subscribe{sdp} (200ms 묶음)
- │◀─ ntf consumerCreated{ca, pa, paused:true}
+ │◀─ ntf consumerCreated{ca, pa, paused:false}
  │◀─ ntf producerPaused{pa}   ← pa 가 일시정지 중일 때만(늦은 합류자 상태)
  │── transport.subscribe.answer{sdp} ─▶
- │── consumer.resume{ca} ──▶│ 즉시 키프레임 요청 → 첫 화면
+ │                          │ answer·연결 뒤 송신 시작 → 캐시 재생 또는 키프레임 요청 → 첫 화면
  │                          │◀── producer.close{pa} ───────────────│
  │                          │ ① pa 닫기 ② ca 등 연결 Consumer 전부 닫기 ③ 표 정리
  │◀─ ntf producerClosed{pa} │ ④ 알림(소유자 제외)
@@ -92,7 +92,7 @@
 
 - **닫힘 연쇄** (REA_02 5.1) : 참가자 닫힘(`leave`·연결 끊김·45초 무수신·`DUPLICATE_SESSION`) → ① 그 참가자의 producer 각각 닫힘 연쇄 ② 그 참가자의 consumer 를 레이어에서 떼고 닫기 ③ 발행·구독 PC 와 할당기 닫기 ④ 방 표에서 제거.
   producer 닫힘 → ① 방 표에서 빼 새 구독 차단 ② producer 수신 중단 ③ 연결 consumer 전부 닫고 각 참가자 표에서 제거 ④ `producerClosed`.
-- **consume paused → resume** : 서버가 만든 consumer 는 `paused:true` 로 시작할 수 있다. 클라이언트는 트랙을 붙이고 `consumer.resume` 을 보낸다. 재개된 영상은 첫 키프레임부터 출력되며 RTP 순번은 끊김 없이 이어진다(서버 SeqRewriter, REA_02 5.6).
+- **consume paused → resume** : 현재 서버가 자동으로 만드는 consumer(입장 시·새 producer 발행 시)는 **`paused:false` 로 시작**하며, `consumer.resume` 없이 구독 PC 연결 뒤 바로 보낸다(2026-10-25 검토 지적 반영 — 문서를 동작에 맞춤). `consumer.resume` 은 받으면 성공으로 응답하고, 일시정지된 consumer 만 재개한다. 재개된 영상은 첫 키프레임부터 출력되며 RTP 순번은 끊김 없이 이어진다(서버 SeqRewriter, REA_02 5.6). paused 시작으로 바꾸려면 시험 화면에 `consumer.resume` 송신을 먼저 넣는다.
 - **producer 일시정지 중 consumer.resume** : 응답은 성공, 실제 재개는 `producer.resume` 때.
 
 ## 5. 오류 코드
@@ -147,7 +147,7 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 → {"t":"req","id":1,"m":"join","d":{"ticket":"eyJ..."}}
 ← {"t":"res","id":1,"ok":true,"d":{"peerId":"au_9","role":"audience","iceServers":[],"producers":[{"id":"p_7f3a","kind":"video","peer":"pr_1"}]}}
 ← {"t":"ntf","m":"transport.subscribe","d":{"sdp":"v=0\r\n..."}}
-← {"t":"ntf","m":"consumerCreated","d":{"consumerId":"c_12","producerId":"p_7f3a","mid":"0","kind":"video","paused":true}}
+← {"t":"ntf","m":"consumerCreated","d":{"consumerId":"c_12","producerId":"p_7f3a","mid":"0","kind":"video","paused":false}}
 → {"t":"req","id":2,"m":"transport.subscribe.answer","d":{"sdp":"v=0\r\n..."}}
 ← {"t":"res","id":2,"ok":true}
 → {"t":"req","id":3,"m":"consumer.resume","d":{"consumerId":"c_12"}}

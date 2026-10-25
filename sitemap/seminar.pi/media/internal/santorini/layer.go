@@ -13,6 +13,7 @@ import (
 	"github.com/pion/rtp"
 
 	"seminar.pi/media/internal/forward"
+	"seminar.pi/media/internal/metrics"
 	"seminar.pi/media/internal/nack"
 	"seminar.pi/media/internal/pli"
 	"seminar.pi/media/internal/rtcpx"
@@ -50,8 +51,9 @@ type Layer struct {
 	sinks   map[*forward.Queue]struct{}
 	act     activity // M4 activity.go
 
-	cmd chan func()        // 다른 고루틴 → 수신 고루틴 명령
-	sr  atomic.Pointer[SR] // capri RTCP 고루틴이 쓰고 jeju 가 읽음
+	cmd  chan func()        // 다른 고루틴 → 수신 고루틴 명령
+	sr   atomic.Pointer[SR] // capri RTCP 고루틴이 쓰고 jeju 가 읽음
+	remb *atomic.Int64      // Producer 의 발행 상한(bps, 0 = REMB 안 보냄) — AddLayer 가 Run 전에 연결
 }
 
 func newLayer(i int8, kind Kind, done <-chan struct{}) *Layer {
@@ -151,7 +153,13 @@ func (l *Layer) Run(r Reader, up RTCPWriter) {
 				if sr, ok := l.LastSR(); ok {
 					lsr, dlsr = uint32(sr.NTP>>16), rtcpx.DLSR(sr.At, now)
 				}
-				_ = up.WriteRTCP([]rtcp.Packet{rtcpx.ReceiverReport(me, []rtcp.ReceptionReport{stats.Report(ssrc, lsr, dlsr)})})
+				pk := []rtcp.Packet{rtcpx.ReceiverReport(me, []rtcp.ReceptionReport{stats.Report(ssrc, lsr, dlsr)})}
+				if l.remb != nil && l.kind == Video { // 발행자 방향 1초 RR+REMB(PRD_02 3.3 bwe) — 상한은 bora 가 구독자 요청 레이어로 정한다
+					if c := l.remb.Load(); c > 0 {
+						pk = append(pk, rtcpx.REMB(me, float32(c), []uint32{ssrc}))
+					}
+				}
+				_ = up.WriteRTCP(pk)
 			}
 		case <-l.done:
 			return
@@ -192,8 +200,10 @@ func (l *Layer) handle(b, scratch []byte, st *rtcpx.ReceptionStats) uint32 {
 	ext := l.ext.Extend(p.SequenceNumber)
 	st.Update(ext)
 	key := l.kind == Audio || rtpx.IsVP8Keyframe(p.Payload) // 음성은 모든 패킷이 시작점
+	metrics.Global.PacketsIn.Add(1)
 	if key && l.kind == Video {
 		l.limiter.KeyframeSeen()
+		metrics.Global.Keyframes.Add(1)
 	}
 	data := b
 	if p.Extension { // 들어온 헤더 확장은 버린다 — 구독자별로 새로 만든다(D-12)

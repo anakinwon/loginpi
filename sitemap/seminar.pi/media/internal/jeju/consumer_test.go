@@ -147,3 +147,26 @@ func TestForwardPath(t *testing.T) {
 	default:
 	}
 }
+
+// Start 전(구독 PC 미연결) 명령이 버퍼(64)를 넘겨도 호출자가 막히지 않는다 — 방·할당기 고루틴 교착 방지(D-10).
+func TestCommandsBeforeStartDoNotBlock(t *testing.T) {
+	prod := santorini.New("p1", "peer1", santorini.Video, santorini.Camera)
+	defer prod.Close()
+	c := New("c1", prod, nil, 1, false)
+	defer c.Close()
+	done := make(chan struct{})
+	go func() {
+		for i := 0; i < 500; i++ {
+			c.Pause()
+			c.Resume()
+			c.SetTarget(int8(i%3), false)
+			c.SetMax(int8(i % 3))
+		}
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(3 * time.Second):
+		t.Fatal("Start 전 명령에서 막힘")
+	}
+}

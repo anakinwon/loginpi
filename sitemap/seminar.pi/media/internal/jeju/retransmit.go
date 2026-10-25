@@ -42,6 +42,7 @@ func (c *Consumer) onNACK(n *rtcp.TransportLayerNack) {
 		}
 		if c.writeOut(buf[:k], seq) == nil {
 			metrics.Global.Retransmits.Add(1)
+			c.statRtx++
 		}
 	}
 	c.flushMisses(now)
@@ -88,8 +89,8 @@ func (c *Consumer) writeOut(raw []byte, out uint16) error {
 	return err
 }
 
-// write — 고정 OutSSRC·출력 순번·ts−tsOffset·헤더 확장 제거(D-12)·VP8 picture ID 연속화(M4). 출력 TS·페이로드 크기를 돌려준다.
-// raw 는 호출자 버퍼(캐시 사본)라 제자리 수정해도 된다. 재전송도 picture ID 는 같은 오프셋으로 다시 쓴다(VP8Munger 는 더 새 값만 기준 갱신).
+// write — 고정 OutSSRC·출력 순번·ts−tsOffset·헤더 확장 교체(들어온 것 제거 + abs-send-time, D-12)·VP8 picture ID 연속화(M4). 출력 TS·페이로드 크기를 돌려준다.
+// raw 는 호출자 버퍼(캐시 사본)라 제자리 수정해도 된다. 재전송은 현재 구간(SendMeta.Fence 이후)만 오므로 tsOffset·picture ID 오프셋이 처음 보낼 때와 같다.
 func (c *Consumer) write(raw []byte, out uint16) (uint32, int, error) {
 	var p rtp.Packet
 	if err := p.Unmarshal(raw); err != nil {
@@ -99,6 +100,11 @@ func (c *Consumer) write(raw []byte, out uint16) (uint32, int, error) {
 	p.SequenceNumber = out
 	p.Timestamp -= c.tsOffset
 	p.Extension, p.Extensions = false, nil
+	if c.absID != 0 {
+		if b, err := rtp.NewAbsSendTimeExtension(time.Now()).Marshal(); err == nil {
+			_ = p.SetExtension(c.absID, b)
+		}
+	}
 	c.rewriteVP8(p.Payload)
 	return p.Timestamp, len(p.Payload), c.out.WriteRTP(&p)
 }

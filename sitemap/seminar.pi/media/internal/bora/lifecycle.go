@@ -7,6 +7,7 @@ import (
 	"log"
 	"slices"
 	"strings"
+	"time"
 
 	"seminar.pi/media/internal/bwe"
 	"seminar.pi/media/internal/jeju"
@@ -57,9 +58,58 @@ func (r *Room) refreshViews() {
 			continue
 		}
 		for _, c := range p.Consumers {
-			p.Alloc.OnConsumerChanged(consumerView(c))
+			p.Alloc.OnConsumerChanged(r.view(c))
 		}
 	}
+	r.publishCaps(time.Now())
+}
+
+// rembLayerBps — 발행 허용 레이어별 REMB 상한 기여(bps). [TBD : M4 실측 — 발표자 simulcast 실제 비트레이트]
+var rembLayerBps = [santorini.MaxLayers]int64{300_000, 900_000, 2_500_000}
+
+// publishCaps — 방 고루틴 전용, ViewInterval 마다. 영상 producer 별 구독자 요청 최대 레이어(setLayer, 녹화는 최고) → Dynacast(상향 즉시·하향 5초)
+// → 바뀌면 발행자에게 ntf publishLayers, 그리고 허용 레이어 합계를 REMB 상한으로(레이어 수신 고루틴이 1초 RR 과 함께 보낸다, PRD_02 3.3 bwe).
+func (r *Room) publishCaps(now time.Time) {
+	for id, pr := range r.producers {
+		if pr.Kind() != santorini.Video {
+			continue
+		}
+		req := int8(0) // 레이어 0 은 늘 켠다(Dynacast)
+		if _, ok := r.recs[id]; ok {
+			req = santorini.MaxLayers - 1
+		}
+		for cid := range r.consumers[id] {
+			req = max(req, r.maxOf(cid))
+		}
+		d := r.dyna[id]
+		if d == nil {
+			d = bwe.NewDynacast()
+			r.dyna[id] = d
+		}
+		pub, changed := d.Set("", req, now) // ponytail: 요청 집계는 위에서 끝냈으니 키 1개로 — 구독자별 표는 쓰지 않는다
+		var capBps int64
+		for i := int8(0); i <= pub; i++ {
+			capBps += rembLayerBps[i]
+		}
+		pr.SetREMBCap(capBps)
+		if o := r.peers[pr.PeerID()]; changed && o != nil && o.Session != nil {
+			o.Session.Send(signal.Notification{M: signal.NPublishLayers, D: signal.PublishLayers{ProducerID: id, Rids: bwe.Rids(pub)}})
+		}
+	}
+}
+
+func (r *Room) maxOf(consumerID string) int8 {
+	if m, ok := r.maxLayer[consumerID]; ok {
+		return m
+	}
+	return santorini.MaxLayers - 1
+}
+
+// view — 할당기용 스냅샷에 setLayer 상한을 채운다.
+func (r *Room) view(c *jeju.Consumer) bwe.ConsumerView {
+	v := consumerView(c)
+	v.MaxLayer = r.maxOf(c.ID())
+	return v
 }
 
 // ── 공개 메서드(signal 요청 → Manager.Request 가 부른다). 방이 닫혔으면 ROOM_CLOSED ──
@@ -171,6 +221,7 @@ func (r *Room) closeProducer(producerID string) {
 	}
 	delete(r.consumers, producerID)
 	delete(r.paused, producerID)
+	delete(r.dyna, producerID)
 	r.notify(pr.PeerID(), signal.NProducerClosed, signal.ProducerRef{ProducerID: producerID})
 }
 
@@ -184,6 +235,7 @@ func (r *Room) detachConsumer(p *Peer, c *jeju.Consumer) {
 	}
 	c.Close()
 	delete(p.Consumers, c.ID())
+	delete(r.maxLayer, c.ID())
 	if m := r.consumers[c.ProducerID()]; m != nil {
 		delete(m, c.ID())
 	}
@@ -232,7 +284,7 @@ func (r *Room) initConsumer(p *Peer, c *jeju.Consumer) {
 		}
 	}
 	if p.Alloc != nil {
-		p.Alloc.OnConsumerChanged(consumerView(c))
+		p.Alloc.OnConsumerChanged(r.view(c))
 	}
 }
 

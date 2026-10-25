@@ -67,7 +67,7 @@
 | `MEDIA_PUBLIC_IP` | 없음 | NAT 1:1 공인 IP(VM) | M1 |
 | `MEDIA_TOKEN_SECRET` | 없음(필수, 32자 이상) | 입장권 HS256 키 — Next 와 같은 값 | M5(M1 은 읽어서 NewVerifier 로) |
 | `MEDIA_DEV_TICKET` | 없음 | `1` 이면 개발용 입장권 발급 엔드포인트 허용 — 운영 금지(R-P6 : `NODE_ENV`·운영 가드 첫 줄) | M1 |
-| `MEDIA_ALLOWED_ORIGINS` | 없음 | WS Origin 허용 목록(쉼표) | M1 |
+| `MEDIA_ALLOWED_ORIGINS` | 없음(운영 = MEDIA_DEV_TICKET 아니면 비어 있을 때 기동 거부) | WS Origin 허용 목록(쉼표) | M1 |
 | `MEDIA_ICE_SERVERS` | 없음 | join 응답 iceServers(JSON) — TURN 은 M2 | M1·M2 |
 | `MEDIA_RECORD_DIR` | 없음(미설정 = 녹화 끔) | 녹화 파일 저장 위치 | M5 |
 | `MEDIA_ADMIN_SECRET` | 없음(32자 미만 = 관리 API 404) | `/admin/rooms` Bearer 키 — cmd 가 읽어 `bora.AdminHandler` 로 | M5(통합 때 cmd 연결) |

@@ -76,10 +76,12 @@ func newSession(ws *WSConn) *session {
 
 func (s *session) ID() string { return s.id }
 
+// shutdown — done 을 닫고 소켓 닫기는 별도 고루틴에 맡긴다. ws.Close 는 쓰기 잠금(wmu)·쓰기 기한(최대 10초 ×2)을 기다릴 수 있어
+// 호출자(방 고루틴의 Send·pion 후보 콜백)가 느린 청중 1명 때문에 멈추면 안 된다(Send 비차단 계약).
 func (s *session) shutdown() {
 	s.once.Do(func() {
 		close(s.done)
-		_ = s.ws.Close()
+		go func() { _ = s.ws.Close() }()
 	})
 }
 

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"seminar.pi/media/internal/bora"
 	"seminar.pi/media/internal/capri"
@@ -38,6 +39,9 @@ func main() {
 	}
 	if signal.DevTicketEnabled() {
 		log.Printf("⚠ 개발용 입장 허용(MEDIA_DEV_TICKET=1) — 운영 금지")
+	} else if strings.TrimSpace(os.Getenv("MEDIA_ALLOWED_ORIGINS")) == "" {
+		// fail-closed : 비어 있으면 Origin 검사가 꺼진다(SIGNAL_API 1절 '목록만 허용'). Pi Browser 포워딩 도메인 포함 여부 [TBD : 실기기]
+		log.Fatalf("MEDIA_ALLOWED_ORIGINS 필수(쉼표 구분 Origin 목록, 개발용은 MEDIA_DEV_TICKET=1)")
 	}
 
 	cfg := capri.Config{UDPPort: defaultUDPPort, PublicIP: os.Getenv("MEDIA_PUBLIC_IP")}

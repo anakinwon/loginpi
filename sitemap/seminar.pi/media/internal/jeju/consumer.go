@@ -10,6 +10,7 @@ import (
 	"github.com/pion/rtp"
 
 	"seminar.pi/media/internal/forward"
+	"seminar.pi/media/internal/metrics"
 	"seminar.pi/media/internal/nack"
 	"seminar.pi/media/internal/pli"
 	"seminar.pi/media/internal/rtcpx"
@@ -41,8 +42,16 @@ type Consumer struct {
 	sent       sendStats
 	rtt        time.Duration // 청중 RR 로 잰 왕복 시간(SendMeta 억제 간격·품질 점수 입력, M2·M4)
 	fir        pli.FIRFilter // 같은 FIR 순번 반복 무시(M2)
+	fencePend  bool          // 전환·재개 뒤 첫 송신 순번에서 SendMeta.Fence(재전송 헤더 기준이 바뀜)
+	statSent   uint32        // NACK 비율 창 입력 : 마지막 보고 뒤 보낸 패킷(M4 D-7)
+	statRtx    uint32        // 같은 창의 재전송 수
+
+	// Start 전에만 설정(Start 의 채널 닫힘이 송신 고루틴과의 순서를 보장)
+	absID     uint8                       // 구독 PC 에 협상된 abs-send-time 확장 ID(0 = 없음, D-12 M4)
+	nackStats func(sent, repeated uint32) // 할당기 OnNackStats(nil 이면 보고 안 함)
 
 	started atomic.Bool
+	startCh chan struct{}
 	cmd     chan func()
 	once    sync.Once
 	done    chan struct{}
@@ -64,9 +73,10 @@ func New(id string, p *santorini.Producer, out Writer, outSSRC uint32, paused bo
 	c := &Consumer{
 		id: id, producer: p, q: forward.NewQueue(forward.QueueSize), out: out, outSSRC: outSSRC, clock: clock,
 		policy: newPolicy(p), meta: nack.NewSendMeta(slots), paused: paused,
-		cmd: make(chan func(), 64), done: make(chan struct{}),
+		cmd: make(chan func(), 64), startCh: make(chan struct{}), done: make(chan struct{}),
 	}
 	c.q.SetAudio(p.Kind() == santorini.Audio) // 음성은 그 패킷만 버림(M2 congest)
+	go c.loop()                               // Start 전에도 명령을 비운다 — 연결 전 Pause·SetTarget·SetMax 가 do 에서 막히지 않게
 	return c
 }
 
@@ -82,10 +92,16 @@ func (c *Consumer) Queue() *forward.Queue { return c.q }
 // SetReporter — 하류 SR 을 보낼 곳(구독 Transport). Start 전에만 부른다.
 func (c *Consumer) SetReporter(w santorini.RTCPWriter) { c.report = w }
 
-// Start — 송신 고루틴을 1번만 띄운다(구독 PC 연결·answer 적용 뒤, bora).
+// SetAbsSendTimeID — 협상된 abs-send-time 확장 ID(capri.AbsSendTimeID). Start 전에만 부른다.
+func (c *Consumer) SetAbsSendTimeID(id uint8) { c.absID = id }
+
+// SetNackStats — NACK 비율 혼잡 판정 입력(bwe.Allocator.OnNackStats). Start 전에만 부른다.
+func (c *Consumer) SetNackStats(fn func(sent, repeated uint32)) { c.nackStats = fn }
+
+// Start — 송신을 1번만 시작한다(구독 PC 연결·answer 적용 뒤, bora).
 func (c *Consumer) Start() {
 	if c.started.CompareAndSwap(false, true) {
-		go c.Run()
+		close(c.startCh)
 	}
 }
 
@@ -95,7 +111,7 @@ func (c *Consumer) Started() bool { return c.started.Load() }
 // Close — 송신 고루틴 종료. 레이어 Unsubscribe·Transport RemoveTrack 은 bora(lifecycle.go)가 한다.
 func (c *Consumer) Close() { c.once.Do(func() { close(c.done) }) }
 
-// do — 다른 고루틴 → 송신 고루틴 명령. 닫혔으면 버린다.
+// do — 다른 고루틴 → 송신 고루틴 명령. 닫혔으면 버린다. 송신 고루틴은 New 부터 Close 까지 늘 비우므로 무기한 막히지 않는다(D-10).
 func (c *Consumer) do(fn func()) {
 	select {
 	case c.cmd <- fn:
@@ -103,10 +119,25 @@ func (c *Consumer) do(fn func()) {
 	}
 }
 
-// Run — 송신 고루틴. 시작 시 c.replay()(M2) 가 false 면 키프레임 요청(pli.NewConsumer — Limiter 가 0.5초 상한).
+// loop — 송신 고루틴(New 가 띄움). Start 전에는 명령만 처리하고(상태는 이 고루틴 소유 그대로), Start 뒤 run.
+func (c *Consumer) loop() {
+	for {
+		select {
+		case fn := <-c.cmd:
+			fn()
+		case <-c.startCh:
+			c.run()
+			return
+		case <-c.done:
+			return
+		}
+	}
+}
+
+// run — 송신 본체. 시작 시 c.replay()(M2) 가 false 면 키프레임 요청(pli.NewConsumer — Limiter 가 0.5초 상한).
 // 루프 : cmd 처리 / q.C() 항목 → c.decide(M3) → cache.GetAt → 출력 헤더(OutSSRC·seq.Input·ts−tsOffset, 확장 새로 — D-12) → out.WriteRTP → c.recordSent(M2).
 // q.TakeKeyframeNeed() 면 키프레임 요청. 하류 SR 은 SRInterval 마다.
-func (c *Consumer) Run() {
+func (c *Consumer) run() {
 	if !c.replay() {
 		c.requestKeyframe(pli.NewConsumer)
 	}
@@ -124,6 +155,7 @@ func (c *Consumer) Run() {
 			c.forward(it, buf)
 		case now := <-sr.C:
 			c.sendSR(now)
+			c.flushStats()
 		case <-c.done:
 			return
 		}
@@ -156,13 +188,28 @@ func (c *Consumer) send(raw []byte, it forward.Item, now time.Time) bool {
 	if err != nil {
 		return false
 	}
+	if c.fencePend { // 새 구간 첫 순번 — 그 앞(전환 전·Sync 로 비운 칸)은 재전송하지 않는다
+		c.meta.Fence(out)
+		c.fencePend = false
+	}
 	c.lastMarker = it.Marker
+	c.statSent++
+	metrics.Global.PacketsOut.Add(1)
 	c.sent.packets++
 	c.sent.octets += uint32(size)
 	c.sent.lastTS, c.sent.lastAt = ts, now
 	c.noteSent(ts)
 	c.recordSent(out, it, now)
 	return true
+}
+
+// flushStats — 마지막 보고 뒤 보낸 수·재전송 수를 할당기에 넘긴다(창 집계·8% 판정은 bwe nackWindow). 송신 고루틴 전용.
+func (c *Consumer) flushStats() {
+	if c.nackStats == nil || c.statSent == 0 {
+		return
+	}
+	c.nackStats(c.statSent, c.statRtx)
+	c.statSent, c.statRtx = 0, 0
 }
 
 // sendSR — 하류 SR. 발표자 SR 이 있으면 그 NTP↔RTP 를 지금으로 외삽하고, 없으면 마지막 보낸 TS 에서 외삽한다.

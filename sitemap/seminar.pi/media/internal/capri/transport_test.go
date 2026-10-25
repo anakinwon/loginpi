@@ -37,3 +37,63 @@ func TestNewAPIOffersVP8AndOpus(t *testing.T) {
 		t.Error("TWCC 피드백이 붙음 — 기본 인터셉터가 등록된 것으로 보임(S-1 위반)")
 	}
 }
+
+// D-12 M4 : 구독(서버 송신) 트랙에 abs-send-time 이 협상되고 sender 에서 ID 를 읽을 수 있다.
+func TestAbsSendTimeNegotiated(t *testing.T) {
+	api, err := NewAPI(Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	srv, err := api.NewPeerConnection(webrtc.Configuration{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer srv.Close()
+	track, err := webrtc.NewTrackLocalStaticRTP(CodecVP8, "v", "s")
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := srv.AddTrack(track)
+	if err != nil {
+		t.Fatal(err)
+	}
+	offer, err := srv.CreateOffer(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = srv.SetLocalDescription(offer); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(offer.SDP, AbsSendTimeURI) {
+		t.Fatal("구독 offer 에 abs-send-time 없음")
+	}
+	// 청중 쪽(브라우저 대역) : 기본 코덱 + abs-send-time 수신
+	me := &webrtc.MediaEngine{}
+	if err = me.RegisterDefaultCodecs(); err != nil {
+		t.Fatal(err)
+	}
+	if err = me.RegisterHeaderExtension(webrtc.RTPHeaderExtensionCapability{URI: AbsSendTimeURI}, webrtc.RTPCodecTypeVideo); err != nil {
+		t.Fatal(err)
+	}
+	cli, err := webrtc.NewAPI(webrtc.WithMediaEngine(me)).NewPeerConnection(webrtc.Configuration{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cli.Close()
+	if err = cli.SetRemoteDescription(offer); err != nil {
+		t.Fatal(err)
+	}
+	ans, err := cli.CreateAnswer(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = cli.SetLocalDescription(ans); err != nil {
+		t.Fatal(err)
+	}
+	if err = srv.SetRemoteDescription(ans); err != nil {
+		t.Fatal(err)
+	}
+	if id := AbsSendTimeID(s); id == 0 {
+		t.Fatal("협상된 abs-send-time ID 를 못 읽음")
+	}
+}

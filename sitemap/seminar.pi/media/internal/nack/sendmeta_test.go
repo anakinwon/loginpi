@@ -107,3 +107,51 @@ func TestSendMetaMissBatch(t *testing.T) {
 		t.Errorf("상한 : %d개, 첫 %d", len(got), got[0].Src)
 	}
 }
+
+// 전환 경계(Fence) : 경계 앞 순번·Sync 로 비운 칸은 거부, 경계 뒤 구멍 추정은 경계 앞 이웃을 쓰지 않는다. 감김 포함.
+func TestSendMetaFence(t *testing.T) {
+	t0 := time.Unix(4000, 0)
+	cases := []struct {
+		name  string
+		base  uint16 // 첫 출력 순번
+		fence uint16 // base 기준 오프셋 — 이 칸 앞 1칸(fence-1)은 Sync 로 비움
+		query uint16 // base 기준 오프셋
+		ok    bool
+	}{
+		{"경계 뒤 송신 순번", 100, 6, 7, true},
+		{"경계 앞 송신 순번(옛 레이어)", 100, 6, 3, false},
+		{"Sync 로 비운 칸", 100, 6, 5, false},
+		{"감김 — 경계 뒤", 65530, 6, 8, true},
+		{"감김 — 비운 칸", 65530, 6, 5, false},
+		{"감김 — 경계 앞", 65530, 6, 2, false},
+	}
+	for _, c := range cases {
+		m := NewSendMeta(VideoSlots)
+		for i := uint16(0); i < 10; i++ {
+			if i == c.fence-1 {
+				continue // 프레임 중간 전환 : 출력 1칸 비움
+			}
+			if i == c.fence {
+				m.Fence(c.base + i)
+			}
+			m.Push(c.base+i, 500000+uint64(i), int8(i/c.fence), t0) // 경계 앞 레이어 0, 뒤 레이어 1
+		}
+		_, l, ok := m.Resolve(c.base+c.query, t0, 0)
+		if ok != c.ok || (ok && l != 1) {
+			t.Errorf("%s : ok=%v 레이어 %d, 기대 ok=%v", c.name, ok, l, c.ok)
+		}
+	}
+}
+
+// 경계가 링보다 멀어지면 풀린다 — 16비트 비교가 감겨 새 순번을 거부하지 않게.
+func TestSendMetaFenceExpires(t *testing.T) {
+	t0 := time.Unix(4000, 0)
+	m := NewSendMeta(VideoSlots)
+	m.Fence(0)
+	for i := 0; i < 40000; i++ { // 32768 을 넘겨 감김 구간을 지나감
+		m.Push(uint16(i), uint64(i)+1000, 0, t0)
+	}
+	if _, _, ok := m.Resolve(uint16(39990), t0, 0); !ok {
+		t.Fatal("오래된 경계가 새 순번 재전송을 막음")
+	}
+}

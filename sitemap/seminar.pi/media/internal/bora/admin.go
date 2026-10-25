@@ -9,6 +9,7 @@ import (
 	"sort"
 	"time"
 
+	"seminar.pi/media/internal/metrics"
 	"seminar.pi/media/internal/signal"
 )
 
@@ -31,8 +32,8 @@ func (m *Manager) Rooms() []RoomInfo {
 	})
 	out := make([]RoomInfo, 0, len(rs))
 	for _, r := range rs {
-		info := RoomInfo{ID: r.id, Cap: r.cap, End: r.end}
-		if r.exec(func() { info.Peers, info.Producers = len(r.peers), len(r.producers) }) {
+		info := RoomInfo{ID: r.id}
+		if r.exec(func() { info.Cap, info.End, info.Peers, info.Producers = r.cap, r.end, len(r.peers), len(r.producers) }) {
 			out = append(out, info)
 		}
 	}
@@ -40,16 +41,23 @@ func (m *Manager) Rooms() []RoomInfo {
 	return out
 }
 
-// OpenRoom — 첫 입장 전에 방을 정원·종료 시각과 함께 만든다(이후 입장권의 cap·end 는 무시). 이미 있으면 false.
+// OpenRoom — 방을 정원·종료 시각과 함께 연다(이후 입장권의 cap·end 는 무시, 비어도 정리하지 않음).
+// 입장권으로 먼저 자동 생성된 방이면 관리자 값으로 덮어쓴다(청중 선점으로 정원·종료 시각을 못 정하는 일 방지). 이미 관리 API 로 연 방이면 false.
+// 관리 API 는 MaxRooms 상한 밖이다(인증된 관리자 전용).
 func (m *Manager) OpenRoom(id string, cap int, end time.Time) bool {
 	ok := false
 	m.exec(func() {
-		if m.rooms[id] == nil {
-			r := NewRoom(id, cap, end)
+		r := m.rooms[id]
+		if r == nil {
+			r = NewRoom(id, cap, end)
 			r.api, r.ice = m.api, m.ice // 없으면 첫 입장이 "엔진 API 미설정"으로 실패
 			m.rooms[id] = r
-			ok = true
 		}
+		r.exec(func() {
+			if !r.opened {
+				r.opened, r.cap, r.end, ok = true, cap, end, true
+			}
+		})
 	})
 	return ok
 }
@@ -64,6 +72,12 @@ func (m *Manager) CloseRoom(id string) bool {
 	if r == nil {
 		return false
 	}
+	shutRoom(r)
+	return true
+}
+
+// shutRoom — 목록에서 뺀 방을 닫는다(참가자에게 ROOM_CLOSED 후 연쇄 정리).
+func shutRoom(r *Room) {
 	r.exec(func() {
 		for _, p := range r.peers {
 			if p.Session != nil {
@@ -72,13 +86,13 @@ func (m *Manager) CloseRoom(id string) bool {
 		}
 	})
 	r.Close()
-	return true
 }
 
 // AdminHandler — cmd/galapagos 가 "/admin/" 에 그대로(StripPrefix 없이) 마운트.
 //
 //	GET    /admin/rooms        방 목록
-//	POST   /admin/rooms        {"id","cap","end"(유닉스 초, 선택)} 방 미리 열기 → 201, 이미 있으면 409
+//	GET    /admin/metrics      엔진 전역 카운터(metrics.Global)
+//	POST   /admin/rooms        {"id","cap","end"(유닉스 초, 선택)} 방 열기(자동 생성 방이면 값 덮어씀) → 201, 이미 관리 API 로 연 방이면 409
 //	DELETE /admin/rooms/{id}   강제 종료 → 204, 없으면 404
 //
 // secret 이 32바이트 미만이면 API 전체를 끈다(404).
@@ -86,6 +100,9 @@ func AdminHandler(m *Manager, secret []byte) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /admin/rooms", func(w http.ResponseWriter, _ *http.Request) {
 		adminJSON(w, http.StatusOK, m.Rooms())
+	})
+	mux.HandleFunc("GET /admin/metrics", func(w http.ResponseWriter, _ *http.Request) {
+		adminJSON(w, http.StatusOK, metrics.Global.Snapshot())
 	})
 	mux.HandleFunc("POST /admin/rooms", func(w http.ResponseWriter, req *http.Request) {
 		var in struct {

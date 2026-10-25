@@ -47,6 +47,11 @@ func NewAPI(cfg Config) (*webrtc.API, error) {
 	if err := m.RegisterCodec(webrtc.RTPCodecParameters{RTPCodecCapability: CodecOpus, PayloadType: 111}, webrtc.RTPCodecTypeAudio); err != nil {
 		return nil, err
 	}
+	// D-12 M4 : 하류(서버 송신 = sendonly)에만 abs-send-time — 청중 REMB 산출 입력. 값은 jeju 가 패킷마다 새로 쓴다.
+	if err := m.RegisterHeaderExtension(webrtc.RTPHeaderExtensionCapability{URI: AbsSendTimeURI},
+		webrtc.RTPCodecTypeVideo, webrtc.RTPTransceiverDirectionSendonly); err != nil {
+		return nil, err
+	}
 	const srtpReplayWindow = 512
 	se := webrtc.SettingEngine{}
 	if cfg.UDPPort > 0 {
@@ -66,6 +71,22 @@ func NewAPI(cfg Config) (*webrtc.API, error) {
 	se.SetSRTCPReplayProtectionWindow(srtpReplayWindow)
 	return webrtc.NewAPI(webrtc.WithMediaEngine(m), webrtc.WithSettingEngine(se),
 		webrtc.WithInterceptorRegistry(&interceptor.Registry{})), nil
+}
+
+// AbsSendTimeURI — abs-send-time 헤더 확장(RFC 5285 형식, WebRTC 실험 확장).
+const AbsSendTimeURI = "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time"
+
+// AbsSendTimeID — 구독 sender 에 협상된 abs-send-time 확장 ID(answer 적용 뒤에 부른다). 협상 안 됐으면 0.
+func AbsSendTimeID(s *webrtc.RTPSender) uint8 {
+	if s == nil {
+		return 0
+	}
+	for _, h := range s.GetParameters().HeaderExtensions {
+		if h.URI == AbsSendTimeURI && h.ID > 0 && h.ID < 15 { // 1바이트 헤더 범위
+			return uint8(h.ID)
+		}
+	}
+	return 0
 }
 
 // RTCPSink — 구독 PC 의 트랙별 RTCP 수신자(jeju.Consumer 가 구현). 호출은 capri RTCP 읽기 고루틴 → 구현은 채널로 넘겨야 한다(D-10).
