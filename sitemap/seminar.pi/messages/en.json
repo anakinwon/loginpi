@@ -134,6 +134,7 @@
       "payVerify": "Amount re-check and entry",
       "settle": "Payout",
       "vod": "Recording replay"
-    }
+    },
+    "refLabel": "Reference model"
   }
 }

@@ -2,11 +2,15 @@
 // ⚠ 상태를 바꿀 때 docs/ROADMAP.md 도 같이 갱신한다(이 파일은 화면용 요약, 정본은 ROADMAP)
 export type StepStatus = 'done' | 'doing' | 'todo'
 
+// 참조 모델(제품명) — 화상 엔진은 REA 분석 3종(PRD_02), 로그인은 1호 사이트 구현(LOGIN_PLAYBOOK)
+export type RefModel = 'Galène' | 'mediasoup' | 'LiveKit' | 'sitemap.pi'
+
 export interface FeatureStep {
   id: string
   status: StepStatus
   stage?: string // 화상 엔진 단계(M0~M5)
   date?: string // 완료일
+  ref?: RefModel[] // 이 단계의 참조 모델
   note?: string // 부분 결과(언어 무관 짧은 표기, 예 'Android ✓ · iOS …')
 }
 
@@ -23,9 +27,9 @@ export const FEATURES: Feature[] = [
     id: 'F01',
     prio: 'P0',
     steps: [
-      { id: 'piLogin', status: 'done', date: '2026-10-25' },
-      { id: 'googleLogin', status: 'done', date: '2026-10-25' },
-      { id: 'accountLink', status: 'done', date: '2026-10-25' },
+      { id: 'piLogin', status: 'done', date: '2026-10-25', ref: ['sitemap.pi'] },
+      { id: 'googleLogin', status: 'done', date: '2026-10-25', ref: ['sitemap.pi'] },
+      { id: 'accountLink', status: 'done', date: '2026-10-25', ref: ['sitemap.pi'] },
     ],
   },
   {
@@ -33,11 +37,11 @@ export const FEATURES: Feature[] = [
     prio: 'P0',
     steps: [
       { id: 'deviceTest', status: 'doing', stage: 'M0', note: 'Android ✓ · iOS …' },
-      { id: 'oneToTwo', status: 'todo', stage: 'M1' },
-      { id: 'recovery', status: 'todo', stage: 'M2' },
-      { id: 'structure', status: 'todo', stage: 'M3' },
-      { id: 'autoQuality', status: 'todo', stage: 'M4' },
-      { id: 'roomService', status: 'todo', stage: 'M5' },
+      { id: 'oneToTwo', status: 'todo', stage: 'M1', ref: ['Galène'] },
+      { id: 'recovery', status: 'todo', stage: 'M2', ref: ['Galène'] },
+      { id: 'structure', status: 'todo', stage: 'M3', ref: ['mediasoup'] },
+      { id: 'autoQuality', status: 'todo', stage: 'M4', ref: ['LiveKit'] },
+      { id: 'roomService', status: 'todo', stage: 'M5', ref: ['Galène', 'LiveKit'] },
     ],
   },
   {
@@ -72,6 +76,11 @@ export const FEATURES: Feature[] = [
     steps: [{ id: 'vod', status: 'todo' }],
   },
 ]
+
+// 기능의 참조 모델 = 단계 참조의 합(첫 등장 순)
+export function featureRefs(f: Feature): RefModel[] {
+  return [...new Set(f.steps.flatMap((s) => s.ref ?? []))]
+}
 
 // 기능 상태 = 단계 전부 완료면 done, 하나라도 완료·진행이면 doing, 아니면 todo
 export function featureStatus(f: Feature): StepStatus {
