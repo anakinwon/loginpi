@@ -10,7 +10,12 @@ type Trickle = { pc: 'pub' | 'sub'; candidate: RTCIceCandidateInit }
 
 const REQ_TIMEOUT_MS = 10000
 
-export function SfuLab({ wsUrl }: { wsUrl?: string }) {
+// 엔진 주소 — env 기본값, 화면에서 바꿀 수 있음(시험용 임시 터널 주소는 매번 바뀌어 재배포 없이 입력). ws:// · wss:// 만 허용
+const WS_RE = /^wss?:\/\/[^\s]+$/
+
+export function SfuLab({ wsUrl: envWsUrl }: { wsUrl?: string }) {
+  const [wsInput, setWsInput] = useState(envWsUrl ?? '')
+  const wsUrl = WS_RE.test(wsInput.trim()) ? wsInput.trim() : undefined
   const localRef = useRef<HTMLVideoElement>(null)
   const remoteRef = useRef<HTMLVideoElement>(null)
   const wsRef = useRef<WebSocket | null>(null)
@@ -97,7 +102,7 @@ export function SfuLab({ wsUrl }: { wsUrl?: string }) {
   }
 
   async function join() {
-    if (!wsUrl) return add('NEXT_PUBLIC_MEDIA_WS_URL 미설정')
+    if (!wsUrl) return add('엔진 주소 없음 — ws:// 또는 wss:// 로 시작하는 주소를 입력하세요')
     leave()
     setState('접속 중')
     const ws = new WebSocket(wsUrl)
@@ -198,7 +203,18 @@ export function SfuLab({ wsUrl }: { wsUrl?: string }) {
       <header>
         <h1 className="text-xl font-bold">M1 SFU 실험실</h1>
         <p className="text-muted-foreground text-sm">Galápagos 엔진 발표자 1 → 청중 2 영상 점검 (PRD_02 M1)</p>
-        <p className="text-muted-foreground text-xs">엔진 주소 : {wsUrl ?? '미설정(NEXT_PUBLIC_MEDIA_WS_URL)'}</p>
+        <label className="mt-2 flex flex-col gap-1 text-xs">
+          <span className="text-muted-foreground">엔진 주소 (wss://…/signal)</span>
+          <input
+            className="rounded-md border border-neutral-700 bg-transparent px-2 py-1 font-mono text-sm"
+            value={wsInput}
+            onChange={(e) => setWsInput(e.target.value)}
+            placeholder="wss://xxxx.trycloudflare.com/signal"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+        </label>
       </header>
 
       <section className="space-y-2">
