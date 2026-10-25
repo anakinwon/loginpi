@@ -74,7 +74,8 @@
     "LINK_CODE_INVALID": "연동 코드가 올바르지 않거나 만료되었습니다. Pi Browser에서 다시 발급하세요.",
     "LINK_ALREADY_LINKED": "이미 연동된 계정입니다.",
     "LINK_CODE_GEN_FAILED": "연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요.",
-    "AUTH_DB_UNAVAILABLE": "사용자 정보를 저장하지 못해 로그인할 수 없습니다. 잠시 후 다시 시도하세요."
+    "AUTH_DB_UNAVAILABLE": "사용자 정보를 저장하지 못해 로그인할 수 없습니다. 잠시 후 다시 시도하세요.",
+    "LINK_TRY_LIMIT": "연동 코드를 여러 번 틀렸습니다. 15분 뒤에 다시 시도하세요"
   },
   "progress": {
     "title": "제작 진행 현황",

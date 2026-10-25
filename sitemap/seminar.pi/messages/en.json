@@ -74,7 +74,8 @@
     "LINK_CODE_INVALID": "The link code is invalid or expired. Issue a new one in Pi Browser.",
     "LINK_ALREADY_LINKED": "This account is already linked.",
     "LINK_CODE_GEN_FAILED": "Could not create a link code. Please try again later.",
-    "AUTH_DB_UNAVAILABLE": "Could not save your account, so sign-in failed. Please try again later."
+    "AUTH_DB_UNAVAILABLE": "Could not save your account, so sign-in failed. Please try again later.",
+    "LINK_TRY_LIMIT": "Too many incorrect link codes. Try again in 15 minutes."
   },
   "progress": {
     "title": "Build progress",
