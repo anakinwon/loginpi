@@ -2,7 +2,7 @@
 -- DA-APPROVED: 마스터 지시 2026-10-25 "1번부터 진행"(연동 코드 보안 보강, 자동 보안 리뷰 HIGH) — 신규 이력 테이블 1개(sys_ 접두·_hist), sys_user 무변경. DA 사후 리뷰 대상
 -- 선행 : 003_sitemap_auth_link.sql. 적용 : node scripts/db-migrate.mjs --app sitemap --tier dev|stg|prod
 -- 설계 :
---  · 사용 : POST /api/auth/link-complete 가 Google sub 별 최근 15분 실패 건수를 세어 5건을 넘으면 429(LINK_TRY_LIMIT) — 시도를 먼저 'N' 으로 기록한 뒤 센다(동시 요청 경합 차단)
+--  · 사용 : POST /api/auth/link-complete 가 Google sub 별 최근 15분 실패 건수를 세어 5건을 넘거나 전체 계정 합계가 30건을 넘으면 429(LINK_TRY_LIMIT) — 시도를 먼저 'N' 으로 기록한 뒤 센다(동시 요청 경합 차단)
 --  · 시도마다 1행 — 처음엔 succ_yn='N', 연동 성공 시 'Y' 로 갱신. 물리 삭제 없음, 오래된 행 정리는 논리삭제 배치(후속)
 --  · 6자리 코드는 값 공간이 100만이라 IP(메모리) 제한만으로는 여러 IP·여러 인스턴스 분산 시도를 막지 못함 → DB 공유 카운터
 BEGIN;
@@ -28,6 +28,9 @@ COMMENT ON TABLE sys_auth_lnk_try_hist IS '연동 코드 입력 실패 이력 �
 -- 조회 : (제공자, sub) 최근 실패 건수 — reg_dtm 범위 스캔
 CREATE INDEX IF NOT EXISTS x_sys_auth_lnk_try_hist_01
   ON sys_auth_lnk_try_hist (prvd_cd, prvd_sub_txt, reg_dtm) WHERE succ_yn = 'N';
+-- 조회 : 모든 계정 합계 최근 실패 건수(30건 초과 시 429 — 계정 다수 동원 우회 차단, seminar.pi sql/003 과 같은 인덱스)
+CREATE INDEX IF NOT EXISTS x_sys_auth_lnk_try_hist_02
+  ON sys_auth_lnk_try_hist (prvd_cd, reg_dtm) WHERE succ_yn = 'N';
 
 SELECT fn_grant_svc_only('TABLE', 'sys_auth_lnk_try_hist');
 

@@ -1,8 +1,11 @@
 // 연동 완료 — POST /api/auth/link-complete { code }. Google(NextAuth) 세션 필수, 아직 연동되지 않은 Google 만.
 //  유효 코드(미사용·미만료) → 코드 선점(use_dtm, 1회만) → sys_usr_auth_lnk(usr_id ↔ Google sub) 생성.
 //  성공 후 클라이언트는 useSession().update() 로 JWT 의 userId 를 재조회한다(src/auth.ts jwt trigger='update').
-//  무차별 대입 방어(2026-10-25) : 시도를 먼저 DB(sys_auth_lnk_try_hist, 인스턴스 공유)에 실패로 기록한 뒤 Google sub 당 최근 TRY_WINDOW_MIN 분 실패가 TRY_MAX 를 넘으면 429, 성공 시 그 행을 Y 로.
-//  IP 단위 제한은 withAuthGuard(메모리)가 별도로 건다
+//  무차별 대입 방어(2026-10-25) : 시도를 먼저 DB(sys_auth_lnk_try_hist, 인스턴스 공유)에 실패로 기록한 뒤 최근 TRY_WINDOW_MIN 분 실패를 센다.
+//   ① Google sub 당 TRY_MAX 초과 ② 전체(모든 계정 합계) GLOBAL_MAX 초과 — 둘 중 하나면 429. ②는 Google 계정을 여러 개 동원해도 막히는 상한
+//   (6자리 = 100만, 15분 30회 = 하루 2,880회 → 활성 코드 1개 기준 첫 적중까지 평균 약 1년, 활성 코드 k개면 1/k).
+//   대가 : 거절된 시도도 'N' 으로 남아 Google 계정 1개로 15분 31회만 보내도 전체 연동을 계속 막을 수 있음(값싼 서비스 거부 — 연동은 일회성이라 감수, 문제 시 거절 시도 별도 상태로 분리 검토).
+//   기록 테이블이 없으면(DDL 미적용) 연동 자체를 503 으로 막는다(fail-closed). 성공 시 시도 행을 Y 로. IP 제한은 withAuthGuard(메모리)가 별도
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
@@ -10,6 +13,7 @@ import { auth, googleEnabled } from '@/auth'
 import { apiError, db, dbFail, dbRoute, parseBody } from '@/lib/api'
 
 const TRY_MAX = 5
+const GLOBAL_MAX = 30
 const TRY_WINDOW_MIN = 15
 
 const bodySchema = z.object({
@@ -18,10 +22,6 @@ const bodySchema = z.object({
     .trim()
     .regex(/^\d{6}$/),
 })
-
-// 실패 기록 테이블이 아직 없는 DB(DDL 미적용) — 기존 동작 유지 + 경고. 적용 후엔 정상 경로만 탄다
-const missingTable = (code?: string) =>
-  code === '42P01' || code === 'PGRST205'
 
 export const POST = withAuthGuard(
   dbRoute(async (req) => {
@@ -39,21 +39,21 @@ export const POST = withAuthGuard(
       .insert({ prvd_cd: 'GOOGLE', prvd_sub_txt: sub, succ_yn: 'N' })
       .select('try_id')
       .maybeSingle<{ try_id: string }>()
-    const tracked = !missingTable(tryErr?.code)
-    if (!tracked)
-      console.warn('[auth/link-complete] sys_auth_lnk_try_hist 미적용 — 시도 제한 꺼짐')
-    else if (tryErr) return dbFail(tryErr)
+    // 테이블 없음(42P01·PGRST205)도 dbFail → 503 : 제한 없이 열어 두지 않는다
+    if (tryErr || !attempt) return dbFail(tryErr ?? { message: '시도 기록 실패' })
 
     // 실패 횟수(방금 기록 포함)와 코드 조회는 서로 결과를 쓰지 않음 → 병렬(R-P1)
     const since = new Date(Date.now() - TRY_WINDOW_MIN * 60_000).toISOString()
-    const [tries, found] = await Promise.all([
+    const fails = () =>
       db()
         .from('sys_auth_lnk_try_hist')
         .select('try_id', { count: 'exact', head: true })
         .eq('prvd_cd', 'GOOGLE')
-        .eq('prvd_sub_txt', sub)
         .eq('succ_yn', 'N')
-        .gte('reg_dtm', since),
+        .gte('reg_dtm', since)
+    const [mine, all, found] = await Promise.all([
+      fails().eq('prvd_sub_txt', sub),
+      fails(),
       db()
         .from('sys_auth_lnk_cd')
         .select('lnk_cd_id, usr_id, exp_dtm')
@@ -62,10 +62,10 @@ export const POST = withAuthGuard(
         .is('use_dtm', null)
         .maybeSingle<{ lnk_cd_id: string; usr_id: string; exp_dtm: string }>(),
     ])
-    if (tracked) {
-      if (tries.error) return dbFail(tries.error)
-      if ((tries.count ?? 0) > TRY_MAX) return apiError('LINK_TRY_LIMIT', 429)
-    }
+    if (mine.error) return dbFail(mine.error)
+    if (all.error) return dbFail(all.error)
+    if ((mine.count ?? 0) > TRY_MAX || (all.count ?? 0) > GLOBAL_MAX)
+      return apiError('LINK_TRY_LIMIT', 429)
     if (found.error) return dbFail(found.error)
 
     const cd = found.data
@@ -106,14 +106,12 @@ export const POST = withAuthGuard(
     }
 
     // 성공 — 이 시도를 실패 건수에서 뺀다(실패 시 로그만, 응답은 성공 유지)
-    if (attempt) {
-      const { error } = await db()
-        .from('sys_auth_lnk_try_hist')
-        .update({ succ_yn: 'Y' })
-        .eq('try_id', attempt.try_id)
-      if (error)
-        console.error('[auth/link-complete] 시도 성공 표시 실패', error.message)
-    }
+    const { error: okErr } = await db()
+      .from('sys_auth_lnk_try_hist')
+      .update({ succ_yn: 'Y' })
+      .eq('try_id', attempt.try_id)
+    if (okErr)
+      console.error('[auth/link-complete] 시도 성공 표시 실패', okErr.message)
 
     return NextResponse.json({ ok: true, userId: cd.usr_id })
   }),
