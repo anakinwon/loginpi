@@ -7,6 +7,7 @@ import (
 	"github.com/pion/rtcp"
 
 	"seminar.pi/media/internal/pli"
+	"seminar.pi/media/internal/rtcpx"
 )
 
 // OnRTCP — capri.RTCPSink 구현. 어느 고루틴이든 안전(채널).
@@ -39,5 +40,9 @@ func (c *Consumer) requestKeyframe(r pli.Reason) {
 	}
 }
 
-// onRR — RTT·손실·지터(SendMeta 억제 간격·품질 점수 입력). M1 에서 구현(RTT = rtcpx.RTT).
-func (c *Consumer) onRR(r rtcp.ReceptionReport, now time.Time) {}
+// onRR — RTT(우리 SR 의 LSR·DLSR 기준). 손실·지터 활용은 M2·M4.
+func (c *Consumer) onRR(r rtcp.ReceptionReport, now time.Time) {
+	if d := rtcpx.RTT(r.LastSenderReport, r.Delay, now); d > 0 {
+		c.rtt = d
+	}
+}

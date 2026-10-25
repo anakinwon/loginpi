@@ -1,5 +1,5 @@
-// S-1 구성 점검 — 빈 인터셉터 API 로 PeerConnection 을 만들고 VP8·Opus 를 협상할 수 있는지(실행 : go test ./...)
-package main
+// S-1 구성 점검 — 빈 인터셉터 API 로 PeerConnection 을 만들고 VP8·Opus 를 협상할 수 있는지(실행 : go test ./internal/capri)
+package capri
 
 import (
 	"strings"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestNewAPIOffersVP8AndOpus(t *testing.T) {
-	api, err := newAPI()
+	api, err := NewAPI(Config{})
 	if err != nil {
 		t.Fatal(err)
 	}

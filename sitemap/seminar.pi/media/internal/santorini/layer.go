@@ -1,16 +1,21 @@
-// Layer — 레이어 수신 고루틴 1개와 그 소유 상태(캐시 쓰기·LossTracker·Limiter·구독 큐 목록). 수신 루프 본문은 M1 에서 구현.
+// Layer — 레이어 수신 고루틴 1개와 그 소유 상태(캐시 쓰기·LossTracker·Limiter·구독 큐 목록·상류 RR 통계). 근거 PRD_02 4.1 1~5단계.
 package santorini
 
 import (
+	"errors"
+	"io"
+	"math/rand/v2"
 	"sync/atomic"
 	"time"
 
 	"github.com/pion/interceptor"
 	"github.com/pion/rtcp"
+	"github.com/pion/rtp"
 
 	"seminar.pi/media/internal/forward"
 	"seminar.pi/media/internal/nack"
 	"seminar.pi/media/internal/pli"
+	"seminar.pi/media/internal/rtcpx"
 	"seminar.pi/media/internal/rtpx"
 )
 
@@ -100,17 +105,109 @@ func (l *Layer) do(fn func()) {
 	}
 }
 
+// readRing — 읽기 고루틴 → 수신 고루틴 전달 채널 크기. 버퍼 링은 이보다 2개 많아(채널 안 + 처리 중 1 + 읽는 중 1) 재사용이 겹치지 않는다.
+const readRing = 32
+
 // Run — 수신 고루틴 본문. 4.1 정방향 1~5단계 :
 // Read → rtpx Extend → IsVP8Keyframe(키면 limiter.KeyframeSeen) → 헤더 확장 제거(D-12) → cache.Store → loss.Receive → l.observe(M4)
 // → sinks 마다 Offer(forward.Item). 틈틈이 cmd 처리, 주기적으로 l.feedback(now)(M2) 결과를 up.WriteRTCP, 상류 RR(rtcpx, 1초).
-// M1 에서 구현 — 지금은 Producer 닫힘까지 명령만 처리한다.
+// Read 는 막히는 호출이라 읽기만 하는 고루틴을 따로 두고, 상태는 전부 이 고루틴이 소유한다(D-10).
 func (l *Layer) Run(r Reader, up RTCPWriter) {
+	in := make(chan []byte, readRing)
+	go l.readLoop(r, in)
+	fb := time.NewTicker(FeedbackInterval)
+	defer fb.Stop()
+	rr := time.NewTicker(rtcpx.RRInterval)
+	defer rr.Stop()
+
+	var (
+		ssrc    uint32 // 발표자 레이어 원본 SSRC(첫 패킷에서) — 밖으로 내보내지 않는다
+		stats   rtcpx.ReceptionStats
+		scratch = make([]byte, nack.SlotSize)
+		me      = rand.Uint32() // 상류 RTCP 보낸이 SSRC
+	)
 	for {
 		select {
 		case fn := <-l.cmd:
 			fn()
+		case b, ok := <-in:
+			if !ok {
+				in = nil // 트랙 끝 — 명령은 Producer 닫힘까지 계속 받는다(Subscribe 호출자가 막히지 않게)
+				continue
+			}
+			if s := l.handle(b, scratch, &stats); s != 0 {
+				ssrc = s
+			}
+		case now := <-fb.C:
+			if ssrc != 0 {
+				// 상류 RTT 는 우리가 SR 을 보내지 않아 아직 모른다 [TBD : M2]
+				if pk := l.feedback(now, ssrc, 0); len(pk) > 0 {
+					_ = up.WriteRTCP(pk)
+				}
+			}
+		case now := <-rr.C:
+			if ssrc != 0 {
+				var lsr, dlsr uint32
+				if sr, ok := l.LastSR(); ok {
+					lsr, dlsr = uint32(sr.NTP>>16), rtcpx.DLSR(sr.At, now)
+				}
+				_ = up.WriteRTCP([]rtcp.Packet{rtcpx.ReceiverReport(me, []rtcp.ReceptionReport{stats.Report(ssrc, lsr, dlsr)})})
+			}
 		case <-l.done:
 			return
 		}
 	}
+}
+
+// readLoop — Read 만 하는 고루틴. 버퍼 소유권은 채널로 수신 고루틴에 넘어간다.
+func (l *Layer) readLoop(r Reader, in chan<- []byte) {
+	defer close(in)
+	ring := make([][]byte, readRing+2)
+	for i := range ring {
+		ring[i] = make([]byte, nack.SlotSize)
+	}
+	for i := 0; ; i = (i + 1) % len(ring) {
+		n, _, err := r.Read(ring[i])
+		if errors.Is(err, io.ErrShortBuffer) {
+			continue // 슬롯보다 큰 패킷 — 캐시에 못 담으므로 버린다
+		}
+		if err != nil {
+			return
+		}
+		select {
+		case in <- ring[i][:n]:
+		case <-l.done:
+			return
+		}
+	}
+}
+
+// handle — 패킷 1개(수신 고루틴 전용). 원본 SSRC 를 돌려준다(해석 실패면 0).
+func (l *Layer) handle(b, scratch []byte, st *rtcpx.ReceptionStats) uint32 {
+	var p rtp.Packet
+	if p.Unmarshal(b) != nil {
+		return 0
+	}
+	now := time.Now()
+	ext := l.ext.Extend(p.SequenceNumber)
+	st.Update(ext)
+	key := l.kind == Audio || rtpx.IsVP8Keyframe(p.Payload) // 음성은 모든 패킷이 시작점
+	if key && l.kind == Video {
+		l.limiter.KeyframeSeen()
+	}
+	data := b
+	if p.Extension { // 들어온 헤더 확장은 버린다 — 구독자별로 새로 만든다(D-12)
+		p.Extension, p.Extensions = false, nil
+		if n, err := p.MarshalTo(scratch); err == nil {
+			data = scratch[:n]
+		}
+	}
+	idx := l.cache.Store(ext, p.Timestamp, key, p.Marker, data)
+	l.loss.Receive(ext, key)
+	l.observe(len(b), now)
+	it := forward.Item{ExtSeq: ext, Idx: idx, Key: key, Marker: p.Marker, Layer: l.idx, At: now}
+	for q := range l.sinks {
+		q.Offer(it)
+	}
+	return p.SSRC
 }
