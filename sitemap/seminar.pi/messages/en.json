@@ -75,5 +75,65 @@
     "LINK_ALREADY_LINKED": "This account is already linked.",
     "LINK_CODE_GEN_FAILED": "Could not create a link code. Please try again later.",
     "AUTH_DB_UNAVAILABLE": "Could not save your account, so sign-in failed. Please try again later."
+  },
+  "progress": {
+    "title": "Build progress",
+    "subtitle": "Done, in progress and planned, by feature · as of {date}",
+    "overall": "Overall steps",
+    "stepsDone": "{done}/{total} steps done ({pct}%)",
+    "featureUnit": "features",
+    "status": {
+      "done": "Done",
+      "doing": "In progress",
+      "todo": "Planned"
+    },
+    "features": {
+      "F01": {
+        "name": "Sign-in",
+        "desc": "Pi Browser sign-in, Google sign-in in other browsers, and linking both accounts"
+      },
+      "F05": {
+        "name": "Live video seminar",
+        "desc": "Our own video engine Galápagos — the goal is one presenter streaming to up to 30 attendees"
+      },
+      "F02": {
+        "name": "Create a seminar",
+        "desc": "Set the title, time, capacity and entry fee to open a seminar"
+      },
+      "F03": {
+        "name": "Seminar list and details",
+        "desc": "Browse open seminars page by page and view their details"
+      },
+      "F04": {
+        "name": "Pi entry payment",
+        "desc": "Pay the entry fee in Pi; the server re-checks the amount before letting you in"
+      },
+      "F06": {
+        "name": "Host payouts",
+        "desc": "Pay entry-fee revenue out to hosts in Pi"
+      },
+      "F07": {
+        "name": "Replays",
+        "desc": "Watch recorded seminars later"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser sign-in",
+      "googleLogin": "Google sign-in",
+      "accountLink": "Account linking",
+      "deviceTest": "Camera device test",
+      "oneToTwo": "Presenter 1 → 2 attendees",
+      "recovery": "Freeze recovery and stability",
+      "structure": "Engine structure cleanup",
+      "autoQuality": "Auto quality, 30 attendees",
+      "roomService": "Room entry and recording",
+      "createForm": "Create screen",
+      "list": "List",
+      "detail": "Details",
+      "payRequest": "Payment request",
+      "payVerify": "Amount re-check and entry",
+      "settle": "Payout",
+      "vod": "Recording replay"
+    }
   }
 }

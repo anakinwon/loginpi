@@ -75,5 +75,65 @@
     "LINK_ALREADY_LINKED": "이미 연동된 계정입니다.",
     "LINK_CODE_GEN_FAILED": "연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요.",
     "AUTH_DB_UNAVAILABLE": "사용자 정보를 저장하지 못해 로그인할 수 없습니다. 잠시 후 다시 시도하세요."
+  },
+  "progress": {
+    "title": "제작 진행 현황",
+    "subtitle": "기능별로 완료·진행·계획을 보여 줍니다 · {date} 기준",
+    "overall": "전체 단계 진척",
+    "stepsDone": "{done}/{total} 단계 완료 ({pct}%)",
+    "featureUnit": "개 기능",
+    "status": {
+      "done": "완료",
+      "doing": "진행",
+      "todo": "계획"
+    },
+    "features": {
+      "F01": {
+        "name": "로그인",
+        "desc": "Pi Browser 로그인, 일반 브라우저 Google 로그인, 두 계정 연동"
+      },
+      "F05": {
+        "name": "실시간 화상 세미나",
+        "desc": "자체 화상 엔진 Galápagos — 발표자 1명이 청중 최대 30명에게 영상을 보내는 것이 목표입니다"
+      },
+      "F02": {
+        "name": "세미나 개설",
+        "desc": "제목·일시·정원·입장료를 정해 세미나를 엽니다"
+      },
+      "F03": {
+        "name": "세미나 목록·상세",
+        "desc": "열린 세미나를 페이지 단위로 찾아보고 상세 정보를 확인합니다"
+      },
+      "F04": {
+        "name": "Pi 입장 결제",
+        "desc": "입장료를 Pi로 결제하면 서버가 금액을 다시 확인한 뒤 입장시킵니다"
+      },
+      "F06": {
+        "name": "개최자 수익 정산",
+        "desc": "입장료 수익을 개최자에게 Pi로 정산합니다"
+      },
+      "F07": {
+        "name": "다시보기",
+        "desc": "녹화한 세미나를 나중에 다시 봅니다"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser 로그인",
+      "googleLogin": "Google 로그인",
+      "accountLink": "계정 연동",
+      "deviceTest": "카메라 기기 시험",
+      "oneToTwo": "발표자 1 → 청중 2 영상",
+      "recovery": "끊김 회복·안정화",
+      "structure": "엔진 구조 정리",
+      "autoQuality": "화질 자동 조절·청중 30명",
+      "roomService": "방 입장·녹화",
+      "createForm": "개설 화면",
+      "list": "목록",
+      "detail": "상세",
+      "payRequest": "결제 요청",
+      "payVerify": "금액 재검증·입장 처리",
+      "settle": "정산",
+      "vod": "녹화 다시보기"
+    }
   }
 }
