@@ -8,9 +8,13 @@
     "start": "next start -p 3003"
   },
   "dependencies": {
+    "@pi/auth": "workspace:*",
+    "@pi/db": "workspace:*",
+    "@pi/guard": "workspace:*",
     "@supabase/supabase-js": "^2.107.0",
     "@t3-oss/env-nextjs": "^0.13.11",
     "next": "16.2.7",
+    "next-auth": "5.0.0-beta.31",
     "next-intl": "^4.13.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",

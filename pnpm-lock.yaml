@@ -274,6 +274,15 @@ importers:
 
   sitemap/seminar.pi:
     dependencies:
+      '@pi/auth':
+        specifier: workspace:*
+        version: link:../../packages/pi-auth
+      '@pi/db':
+        specifier: workspace:*
+        version: link:../../packages/pi-db
+      '@pi/guard':
+        specifier: workspace:*
+        version: link:../../packages/pi-guard
       '@supabase/supabase-js':
         specifier: ^2.107.0
         version: 2.117.3
@@ -283,6 +292,9 @@ importers:
       next:
         specifier: 16.2.7
         version: 16.2.7(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      next-auth:
+        specifier: 5.0.0-beta.31
+        version: 5.0.0-beta.31(next@16.2.7(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
       next-intl:
         specifier: ^4.13.0
         version: 4.13.0(next@16.2.7(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(typescript@6.0.3)

@@ -6,5 +6,74 @@
   "home": {
     "title": "seminar.pi",
     "description": "Hosts open seminars, and participants join live video sessions with Pi."
+  },
+  "nav": {
+    "link": "Link account",
+    "switchLocale": "한국어"
+  },
+  "auth": {
+    "checking": "Checking sign-in…",
+    "signedIn": "{name}",
+    "required": "Please sign in with your Pi account.",
+    "signIn": "Sign in with Pi",
+    "openInPiBrowser": "Open this page in Pi Browser to sign in with your Pi account.",
+    "authenticating": "Signing in…",
+    "google": "Sign in with Google",
+    "signOut": "Sign out",
+    "or": "or",
+    "linkRequired": "You are signed in with Google, but it is not linked to a Pi account yet. Issue a link code in Pi Browser and enter it here.",
+    "linkNeeded": "Link Pi account",
+    "linkCheckFailed": "Could not check your account link status (temporary server error). Please refresh in a moment."
+  },
+  "piOAuth": {
+    "signingIn": "Signing in with your Pi account…",
+    "failed": "Pi sign-in failed. Please try again.",
+    "stateMismatch": "Could not verify this sign-in request (expired or another tab). Please try again.",
+    "retry": "Retry",
+    "backHome": "Home"
+  },
+  "link": {
+    "title": "Link account",
+    "intro": "Connect the account you signed in with in Pi Browser to Google sign-in in a regular browser. After linking you can use the same account on a PC browser.",
+    "checking": "Checking sign-in…",
+    "piIssueTitle": "To sign in from a regular browser too",
+    "codeHint": "Issue the code below, then sign in with Google on a PC browser and enter it on the Link account page (within 10 minutes).",
+    "piIssue": "Issue link code",
+    "reissue": "Issue a new code",
+    "expiresIn": "Expires in {min} min",
+    "enterTitle": "Enter link code",
+    "enterHint": "In Pi Browser open seminar.pi → Link account → Issue link code, then enter the 6-digit code.",
+    "codeLabel": "Link code",
+    "submit": "Link",
+    "done": "Linked. You can now use Google sign-in as well.",
+    "linked": "{name} is linked to Google sign-in."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Sign-in required",
+    "AUTH_PI_REQUIRED": "Pi sign-in required",
+    "AUTH_PI_SESSION_INVALID": "Your session expired. Please sign in again",
+    "AUTH_PI_TOKEN_INVALID": "Pi sign-in verification failed",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Pi sign-in information is missing",
+    "FORBIDDEN": "You do not have permission",
+    "BAD_REQUEST": "Bad request",
+    "BAD_REQUEST_BODY": "Bad request",
+    "INVALID_INPUT": "Invalid input",
+    "QUERY_FAILED": "Failed to load",
+    "SAVE_FAILED": "Failed to save",
+    "INTERNAL": "Something went wrong",
+    "SERVER_CONFIG": "Server configuration error. Please contact the operator",
+    "PI_API_CONNECT_FAILED": "Could not reach Pi Network",
+    "DB_UNAVAILABLE": "Data is temporarily unavailable. Please try again later",
+    "NOT_FOUND": "Not found",
+    "RATE_LIMITED": "Too many requests. Please try again shortly",
+    "PAYLOAD_TOO_LARGE": "Request is too large",
+    "NETWORK": "Check your network connection",
+    "AUTH_PI_ACCOUNT_CONFLICT": "This Pi username is already registered with different credentials. Please contact the admin",
+    "AUTH_PI_ACCOUNT_INACTIVE": "This account is inactive. Please contact the admin",
+    "AUTH_GOOGLE_REQUIRED": "Google sign-in is required.",
+    "LINK_CODE_INVALID": "The link code is invalid or expired. Issue a new one in Pi Browser.",
+    "LINK_ALREADY_LINKED": "This account is already linked.",
+    "LINK_CODE_GEN_FAILED": "Could not create a link code. Please try again later.",
+    "AUTH_DB_UNAVAILABLE": "Could not save your account, so sign-in failed. Please try again later."
   }
 }
