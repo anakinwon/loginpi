@@ -37,8 +37,15 @@ export const env = createEnv({
     AUTH_SECRET: z.string().min(32).optional(),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+    // 미디어 엔진(Galápagos) 입장권 JWT HS256 서명 키 — 엔진 MEDIA_TOKEN_SECRET 과 같은 값(PRD_02 D-11). 미설정 = 입장권 발급 503
+    MEDIA_TOKEN_SECRET: z.string().min(32).optional(),
   },
   client: {
+    // 미디어 엔진 시그널링 WebSocket 주소(예 ws://localhost:7880/signal, 운영 wss://). 미설정 = 화상 기능 숨김
+    NEXT_PUBLIC_MEDIA_WS_URL: z
+      .string()
+      .regex(/^wss?:\/\//, 'ws:// 또는 wss:// 주소여야 합니다')
+      .optional(),
     // M0 기기 2대 연결 시그널링 = Supabase Realtime broadcast(테이블 미사용). 비운영 pi-nonprod 프로젝트 값
     NEXT_PUBLIC_LAB_SUPABASE_URL: z.url().optional(),
     NEXT_PUBLIC_LAB_SUPABASE_PUBLISHABLE_KEY: z.string().min(1).optional(),
@@ -76,6 +83,8 @@ export const env = createEnv({
     AUTH_SECRET: process.env.AUTH_SECRET,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    MEDIA_TOKEN_SECRET: process.env.MEDIA_TOKEN_SECRET,
+    NEXT_PUBLIC_MEDIA_WS_URL: process.env.NEXT_PUBLIC_MEDIA_WS_URL,
     NEXT_PUBLIC_GOOGLE_LOGIN: process.env.NEXT_PUBLIC_GOOGLE_LOGIN,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,

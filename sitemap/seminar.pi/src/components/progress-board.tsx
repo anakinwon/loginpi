@@ -3,7 +3,9 @@ import { useTranslations } from 'next-intl'
 import {
   FEATURES,
   PROGRESS_UPDATED,
+  featureRefs,
   featureStatus,
+  type RefModel,
   type StepStatus,
 } from '@/data/progress'
 
@@ -26,6 +28,24 @@ const TONE: Record<StepStatus, { dot: string; text: string; ring: string }> = {
     text: 'text-muted-foreground',
     ring: 'border-white/10 bg-white/[0.03]',
   },
+}
+
+// 참조 모델 색 — Galène 녹색 / mediasoup 파랑 / LiveKit 주황 / 자체(1호 사이트) 보라
+const REF_TONE: Record<RefModel, string> = {
+  Galène: 'border-emerald-400/50 text-emerald-300',
+  mediasoup: 'border-indigo-400/50 text-indigo-300',
+  LiveKit: 'border-orange-400/50 text-orange-300',
+  'sitemap.pi': 'border-violet-400/50 text-violet-300',
+}
+
+function RefTag({ name }: { name: RefModel }) {
+  return (
+    <span
+      className={`rounded border px-1.5 py-px font-mono text-[11px] ${REF_TONE[name]}`}
+    >
+      {name}
+    </span>
+  )
 }
 
 export function ProgressBoard() {
@@ -91,6 +111,7 @@ export function ProgressBoard() {
           )
           .map((f) => {
             const done = f.steps.filter((s) => s.status === 'done').length
+            const refs = featureRefs(f)
             return (
               <li
                 key={f.id}
@@ -113,6 +134,14 @@ export function ProgressBoard() {
                 <p className="text-muted-foreground text-sm">
                   {t(`features.${f.id}.desc`)}
                 </p>
+                {refs.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                    <span className="text-muted-foreground">{t('refLabel')}</span>
+                    {refs.map((r) => (
+                      <RefTag key={r} name={r} />
+                    ))}
+                  </div>
+                )}
                 <ol className="flex flex-wrap gap-2">
                   {f.steps.map((s, i) => (
                     <li
@@ -128,6 +157,9 @@ export function ProgressBoard() {
                       </span>
                       <span>{t(`steps.${s.id}`)}</span>
                       <span className="sr-only">{t(`status.${s.status}`)}</span>
+                      {s.ref?.map((r) => (
+                        <RefTag key={r} name={r} />
+                      ))}
                       {s.note && (
                         <span className="text-muted-foreground text-xs">
                           {s.note}
