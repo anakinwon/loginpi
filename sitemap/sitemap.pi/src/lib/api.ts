@@ -47,6 +47,8 @@ export const apiError = createApiError({
   LINK_ALREADY_LINKED: '이미 연동된 계정입니다',
   LINK_CODE_GEN_FAILED:
     '연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요',
+  LINK_TRY_LIMIT:
+    '연동 코드를 여러 번 틀렸습니다. 15분 뒤에 다시 시도하세요',
   // 사용료 결제(sql/004·012)
   PLAN_TERM_MISSING:
     '요금제 사용기간이 설정되지 않았습니다. 요금표를 확인하세요',

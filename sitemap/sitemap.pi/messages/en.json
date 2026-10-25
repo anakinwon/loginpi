@@ -380,7 +380,8 @@
     "PAY_PENDING_REFUND": "This paid application was rejected and awaits a refund. Please contact the admin",
     "APPLY_COOLDOWN": "This domain was repeatedly rejected for missed payment deadlines. Please apply again later",
     "PLAN_TERM_MISSING": "The plan has no usage period configured. Check the fee table.",
-    "DOMAIN_REJECTED_POLICY": "This domain was rejected for a prohibited category and cannot be re-applied. Contact the administrator."
+    "DOMAIN_REJECTED_POLICY": "This domain was rejected for a prohibited category and cannot be re-applied. Contact the administrator.",
+    "LINK_TRY_LIMIT": "Too many incorrect link codes. Try again in 15 minutes."
   },
   "cfg": {
     "intro": "Usage-fee state timers (hours, 0.01–720). Saved values reach the notices within minutes (cache 30 s–2.5 min); automatic transitions will read them once the cron (P5) ships. For device testing, lower to 0.05, run the full flow, then restore.",
