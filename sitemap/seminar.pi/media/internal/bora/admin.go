@@ -1,9 +1,15 @@
-// 방 관리 API — 방 목록·강제 종료(화면 서버 관리 화면용, M5). 인증은 MEDIA_TOKEN_SECRET 기반 [TBD : M5 — 관리자 입장권 형식].
+// 방 관리 API — 방 목록·미리 열기(정원·종료 시각)·강제 종료(M5). 인증 = Authorization: Bearer <MEDIA_ADMIN_SECRET> [TBD : 화면 서버 내부 호출 전용 여부].
+// 발표자 지정은 입장권 role(Next /api/media/ticket 이 결정)로 한다 — 엔진은 DB 를 모른다(PRD_02 5.3 경계).
 package bora
 
 import (
+	"crypto/subtle"
+	"encoding/json"
 	"net/http"
+	"sort"
 	"time"
+
+	"seminar.pi/media/internal/signal"
 )
 
 // RoomInfo — 방 요약(관리 화면).
@@ -15,15 +21,128 @@ type RoomInfo struct {
 	End       time.Time `json:"end,omitempty"`
 }
 
-// Rooms — 방 목록. M5 에서 구현.
-func (m *Manager) Rooms() []RoomInfo { return nil }
-
-// CloseRoom — 방 강제 종료(참가자에게 ROOM_CLOSED). 없으면 false. M5 에서 구현.
-func (m *Manager) CloseRoom(id string) bool { return false }
-
-// AdminHandler — /admin/rooms HTTP API(cmd/galapagos 가 마운트). M5 에서 구현.
-func AdminHandler(m *Manager, secret []byte) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		http.Error(w, "bora admin: M5 에서 구현", http.StatusNotImplemented)
+// Rooms — 방 목록(ID 순). 목록 고루틴에서 방을 복사한 뒤 각 방 고루틴에서 인원을 센다(목록 고루틴을 오래 잡지 않게).
+func (m *Manager) Rooms() []RoomInfo {
+	var rs []*Room
+	m.exec(func() {
+		for _, r := range m.rooms {
+			rs = append(rs, r)
+		}
 	})
+	out := make([]RoomInfo, 0, len(rs))
+	for _, r := range rs {
+		info := RoomInfo{ID: r.id, Cap: r.cap, End: r.end}
+		if r.exec(func() { info.Peers, info.Producers = len(r.peers), len(r.producers) }) {
+			out = append(out, info)
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
+	return out
+}
+
+// OpenRoom — 첫 입장 전에 방을 정원·종료 시각과 함께 만든다(이후 입장권의 cap·end 는 무시). 이미 있으면 false.
+func (m *Manager) OpenRoom(id string, cap int, end time.Time) bool {
+	ok := false
+	m.exec(func() {
+		if m.rooms[id] == nil {
+			m.rooms[id] = NewRoom(id, cap, end)
+			ok = true
+		}
+	})
+	return ok
+}
+
+// CloseRoom — 방 강제 종료(참가자에게 ROOM_CLOSED 후 연쇄 정리). 없으면 false.
+func (m *Manager) CloseRoom(id string) bool {
+	var r *Room
+	m.exec(func() {
+		r = m.rooms[id]
+		delete(m.rooms, id)
+	})
+	if r == nil {
+		return false
+	}
+	r.exec(func() {
+		for _, p := range r.peers {
+			if p.Session != nil {
+				p.Session.Close(signal.CodeRoomClosed)
+			}
+		}
+	})
+	r.Close()
+	return true
+}
+
+// AdminHandler — cmd/galapagos 가 "/admin/" 에 그대로(StripPrefix 없이) 마운트.
+//
+//	GET    /admin/rooms        방 목록
+//	POST   /admin/rooms        {"id","cap","end"(유닉스 초, 선택)} 방 미리 열기 → 201, 이미 있으면 409
+//	DELETE /admin/rooms/{id}   강제 종료 → 204, 없으면 404
+//
+// secret 이 32바이트 미만이면 API 전체를 끈다(404).
+func AdminHandler(m *Manager, secret []byte) http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /admin/rooms", func(w http.ResponseWriter, _ *http.Request) {
+		adminJSON(w, http.StatusOK, m.Rooms())
+	})
+	mux.HandleFunc("POST /admin/rooms", func(w http.ResponseWriter, req *http.Request) {
+		var in struct {
+			ID  string `json:"id"`
+			Cap int    `json:"cap"`
+			End int64  `json:"end"`
+		}
+		if json.NewDecoder(http.MaxBytesReader(w, req.Body, 4096)).Decode(&in) != nil ||
+			!adminRoomID(in.ID) || in.Cap < 1 || in.Cap > 1000 || in.End < 0 {
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+		var end time.Time
+		if in.End > 0 {
+			end = time.Unix(in.End, 0)
+		}
+		if !m.OpenRoom(in.ID, in.Cap, end) {
+			http.Error(w, "room exists", http.StatusConflict)
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+	mux.HandleFunc("DELETE /admin/rooms/{id}", func(w http.ResponseWriter, req *http.Request) {
+		if !m.CloseRoom(req.PathValue("id")) {
+			http.NotFound(w, req)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+	want := []byte("Bearer " + string(secret))
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if len(secret) < signal.MinSecret {
+			http.NotFound(w, req)
+			return
+		}
+		if subtle.ConstantTimeCompare([]byte(req.Header.Get("Authorization")), want) != 1 {
+			time.Sleep(signal.FailDelay)
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		w.Header().Set("Cache-Control", "no-store")
+		mux.ServeHTTP(w, req)
+	})
+}
+
+func adminRoomID(id string) bool {
+	if id == "" || len(id) > 64 {
+		return false
+	}
+	for _, c := range id {
+		if !(c == '-' || c == '_' || c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z') {
+			return false
+		}
+	}
+	return true
+}
+
+func adminJSON(w http.ResponseWriter, code int, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	_ = json.NewEncoder(w).Encode(v)
 }
