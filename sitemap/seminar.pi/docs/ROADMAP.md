@@ -8,7 +8,7 @@
 |---|---|---|
 | 0 | 선결(결정·환경·포털·DB) | **진행중** |
 | 1 | MVP(로그인 + 고유 기능 1개 + 결제 1개) | 대기 — PRD v1.0 확정 후 |
-| M | 자체 화상 엔진 M0~M5([PRD_01](PRD_01_MEDIA_ENGINE.md) 5절) | **M0 통과 → M1 착수 가능** — 단계별 통과 기준, 건너뛰기 금지 |
+| M | 자체 화상 엔진 M0~M5([PRD_01](PRD_01_MEDIA_ENGINE.md) 5절) | **M0 Android 통과(iOS 대기) → M1 착수 가능** — 단계별 통과 기준, 건너뛰기 금지 |
 | 2 | 수익 | 대기 |
 | 3 | 등재(A-1~A-7·실기기) | 대기 |
 
@@ -28,7 +28,7 @@
 
 | 단계 | 참고 | 핵심 산출 | 통과 기준 | 상태 |
 |---|---|---|---|---|
-| M0 실기기 관문 | — | 최소 앱 + `/lab/camera`(R-P6 가드), 기기 2대 직접 연결 | iOS·Android Pi Browser 영상 송수신·자동재생 | **통과(2026-10-25)** — 기기 2대 로그인·화면 연결 성공(마스터). 기기 OS 구분 [확인중 : 마스터] |
+| M0 실기기 관문 | — | 최소 앱 + `/lab/camera`(R-P6 가드), 기기 2대 직접 연결 | iOS·Android Pi Browser 영상 송수신·자동재생 | **Android 통과(2026-10-25)** — Android 2대 로그인·화면 연결 성공(마스터). **iOS 미시험** — M1 완료 판정 전 iOS 1대 이상 시험 필수 |
 | M1 최소 SFU | Galène | Go 설치 · `media/` 모듈 · WebSocket 시그널링 · 1→2 전달 | LAN·LTE 영상 표시 | **착수 가능**(Go 1.27.0 · `media/` 모듈 · pion v4.2.25 · S-1 점검 테스트) — M0 통과(2026-10-25) |
 | M2 안정화 | Galène | 패킷 캐시·NACK · PLI 조절 · TURN · `tc netem` | 3% 손실 회복 | 대기 |
 | M3 구조 다듬기 | mediasoup | Router·Transport·Producer·Consumer 재구성 · API 문서 · 단위 테스트 | 회귀 0 | 대기 |
@@ -41,7 +41,8 @@
 - [x] (서비스) `/lab/camera` 시험 화면 — 카메라·마이크 미리보기·전후면 전환, 기기 2대 직접 연결(Supabase Realtime broadcast, id 작은 쪽 offer), 결과 복사. 운영 빌드는 `LAB_ENABLED=1` 일 때만(R-P6) (2026-10-24)
 - [x] (마스터) Vercel env : `LAB_ENABLED=1`, `NEXT_PUBLIC_LAB_SUPABASE_URL`·`NEXT_PUBLIC_LAB_SUPABASE_PUBLISHABLE_KEY`(pi-nonprod — ENV_GUIDE 3.4)
 - [x] (마스터) Vercel 프로젝트 생성(Root `sitemap/seminar.pi`) (2026-10-25)
-- [x] (마스터) Pi Browser 실기기 시험 — 기기 2대 로그인·화면 연결 성공(2026-10-25)
+- [x] (마스터) Pi Browser 실기기 시험 — Android 2대 로그인·화면 연결 성공(2026-10-25)
+- [ ] (마스터) Pi Browser iOS 실기기 시험 — iOS ↔ Android 화면 연결(카메라 권한·영상 자동재생이 iOS WebView 에서 다를 수 있음)
 - [ ] (마스터) 호스팅 결정 — M1 외부 시험 전까지
 
 ## Phase 1 — MVP
