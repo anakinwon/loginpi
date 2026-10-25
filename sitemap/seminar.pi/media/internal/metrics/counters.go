@@ -1,4 +1,6 @@
-// 엔진 전역 카운터(PRD_02 3.3 metrics). 구독자·레이어별 분해는 M2 가 필요할 때 추가한다.
+// 엔진 전역 카운터(PRD_02 3.3 metrics, K-5 Q7·Q8). M2 수집 지점 : NACKIn·Retransmits·DuplicateNACK·CacheMiss = jeju/retransmit.go,
+// NACKOut·PLIOut = santorini/feedback.go, QueueDrops = forward/congest.go. PacketsIn/Out·Keyframes·LayerSwitches 는 M1 Run·M4 전환이 올린다.
+// 구독자·레이어별 분해는 [TBD : M4 비교에서 필요해지면].
 package metrics
 
 import "sync/atomic"
