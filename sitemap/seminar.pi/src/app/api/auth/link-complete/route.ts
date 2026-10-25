@@ -4,7 +4,8 @@
 //  무차별 대입 방어(2026-10-25) : 시도를 먼저 DB(sys_auth_lnk_try_hist, 인스턴스 공유)에 실패로 기록한 뒤 최근 TRY_WINDOW_MIN 분 실패를 센다.
 //   ① Google sub 당 TRY_MAX 초과 ② 전체(모든 계정 합계) GLOBAL_MAX 초과 — 둘 중 하나면 429. ②는 Google 계정을 여러 개 동원해도 막히는 상한
 //   (6자리 = 100만, 15분 30회 = 하루 2,880회 → 활성 코드 1개 기준 첫 적중까지 평균 약 1년, 활성 코드 k개면 1/k).
-//   대가 : 거절된 시도도 'N' 으로 남아 Google 계정 1개로 15분 31회만 보내도 전체 연동을 계속 막을 수 있음(값싼 서비스 거부 — 연동은 일회성이라 감수, 문제 시 거절 시도 별도 상태로 분리 검토).
+//   한도로 거절된 시도는 논리삭제(del_yn='Y')해 집계에서 뺀다 → 계정 1개가 전체 집계에 보태는 실패는 약 TRY_MAX 건.
+//   남은 대가 : Google 계정 약 6개(GLOBAL_MAX/TRY_MAX)로 15분마다 실제로 틀리면 전체 연동을 막을 수 있음(연동은 일회성이라 감수).
 //   기록 테이블이 없으면(DDL 미적용) 연동 자체를 503 으로 막는다(fail-closed). 성공 시 시도 행을 Y 로. IP 제한은 withAuthGuard(메모리)가 별도
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -50,6 +51,7 @@ export const POST = withAuthGuard(
         .select('try_id', { count: 'exact', head: true })
         .eq('prvd_cd', 'GOOGLE')
         .eq('succ_yn', 'N')
+        .eq('del_yn', 'N')
         .gte('reg_dtm', since)
     const [mine, all, found] = await Promise.all([
       fails().eq('prvd_sub_txt', sub),
@@ -64,8 +66,15 @@ export const POST = withAuthGuard(
     ])
     if (mine.error) return dbFail(mine.error)
     if (all.error) return dbFail(all.error)
-    if ((mine.count ?? 0) > TRY_MAX || (all.count ?? 0) > GLOBAL_MAX)
+    if ((mine.count ?? 0) > TRY_MAX || (all.count ?? 0) > GLOBAL_MAX) {
+      // 거절된 시도는 실제 코드 검증에 닿지 않았으므로 집계에서 뺀다(전체 잠금 증폭 방지)
+      const { error } = await db()
+        .from('sys_auth_lnk_try_hist')
+        .update({ del_yn: 'Y', del_dtm: new Date().toISOString() })
+        .eq('try_id', attempt.try_id)
+      if (error) return dbFail(error)
       return apiError('LINK_TRY_LIMIT', 429)
+    }
     if (found.error) return dbFail(found.error)
 
     const cd = found.data
