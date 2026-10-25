@@ -27,7 +27,7 @@
 | 단계 | 참고 | 핵심 산출 | 통과 기준 | 상태 |
 |---|---|---|---|---|
 | M0 실기기 관문 | — | 최소 앱 + `/lab/camera`(R-P6 가드), 기기 2대 직접 연결 | iOS·Android Pi Browser 영상 송수신·자동재생 | **화면 완료 · 실기기 시험 대기** |
-| M1 최소 SFU | Galène | Go 설치 · `media/` 모듈 · WebSocket 시그널링 · 1→2 전달 | LAN·LTE 영상 표시 | 대기 |
+| M1 최소 SFU | Galène | Go 설치 · `media/` 모듈 · WebSocket 시그널링 · 1→2 전달 | LAN·LTE 영상 표시 | **착수 준비 완료**(Go 1.27.0 · `media/` 모듈 · pion v4.2.25 · S-1 점검 테스트) — M0 통과 후 구현 |
 | M2 안정화 | Galène | 패킷 캐시·NACK · PLI 조절 · TURN · `tc netem` | 3% 손실 회복 | 대기 |
 | M3 구조 다듬기 | mediasoup | Router·Transport·Producer·Consumer 재구성 · API 문서 · 단위 테스트 | 회귀 0 | 대기 |
 | M4 품질 맞추기 | LiveKit | simulcast · 대역폭 추정 · 청중 30 · 나란히 측정 | PRD_01 4절 목표 | 대기 |
