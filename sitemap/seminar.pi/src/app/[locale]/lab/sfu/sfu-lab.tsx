@@ -12,9 +12,11 @@ const REQ_TIMEOUT_MS = 10000
 
 // 엔진 주소 — env 기본값, 화면에서 바꿀 수 있음(시험용 임시 터널 주소는 매번 바뀌어 재배포 없이 입력). ws:// · wss:// 만 허용
 const WS_RE = /^wss?:\/\/[^\s]+$/
+// 시험용 기본 엔진 주소(마스터 지시 2026-10-25) — 마스터 PC 엔진 + cloudflared 임시 터널. 엔진·터널을 다시 켜면 주소가 바뀌므로 그때 갱신(VM 확정 C-5 후 env 로 대체)
+const LAB_DEFAULT_WS = 'wss://eliminate-acting-sie-contains.trycloudflare.com/signal'
 
 export function SfuLab({ wsUrl: envWsUrl }: { wsUrl?: string }) {
-  const [wsInput, setWsInput] = useState(envWsUrl ?? '')
+  const [wsInput, setWsInput] = useState(envWsUrl ?? LAB_DEFAULT_WS)
   const wsUrl = WS_RE.test(wsInput.trim()) ? wsInput.trim() : undefined
   const localRef = useRef<HTMLVideoElement>(null)
   const remoteRef = useRef<HTMLVideoElement>(null)
