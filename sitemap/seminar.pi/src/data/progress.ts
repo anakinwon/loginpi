@@ -37,7 +37,13 @@ export const FEATURES: Feature[] = [
     prio: 'P0',
     steps: [
       { id: 'deviceTest', status: 'doing', stage: 'M0', note: 'Android ✓ · iOS …' },
-      { id: 'oneToTwo', status: 'todo', stage: 'M1', ref: ['Galène'] },
+      {
+        id: 'oneToTwo',
+        status: 'doing',
+        stage: 'M1',
+        ref: ['Galène'],
+        note: 'LAN ✓ · LTE …',
+      },
       { id: 'recovery', status: 'todo', stage: 'M2', ref: ['Galène'] },
       { id: 'structure', status: 'todo', stage: 'M3', ref: ['mediasoup'] },
       { id: 'autoQuality', status: 'todo', stage: 'M4', ref: ['LiveKit'] },
