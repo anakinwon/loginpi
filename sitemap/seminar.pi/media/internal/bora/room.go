@@ -14,6 +14,7 @@ import (
 	"seminar.pi/media/internal/bwe"
 	"seminar.pi/media/internal/capri"
 	"seminar.pi/media/internal/jeju"
+	"seminar.pi/media/internal/pli"
 	"seminar.pi/media/internal/santorini"
 	"seminar.pi/media/internal/signal"
 )
@@ -28,6 +29,9 @@ var (
 
 // OfferBatch — 구독 PC 재협상 묶음 시간(PRD_02 5.2 transport.subscribe).
 const OfferBatch = 200 * time.Millisecond
+
+// ViewInterval — 할당기에 레이어 활성·비트레이트를 다시 넘기는 주기(M4 bora 통합).
+const ViewInterval = time.Second
 
 // Peer — 참가자 1명. 필드는 방 고루틴 소유.
 type Peer struct {
@@ -49,6 +53,7 @@ type Peer struct {
 	awaiting     bool // 서버 offer 를 보내고 answer 대기 중
 	dirty        bool // 대기 중에 새 트랙이 생김 → answer 뒤 다시 offer
 	subConnected bool
+	renego       bool             // RemoveTrack 뒤 재협상 필요(새 트랙 없이도 offer)
 	announce     []*jeju.Consumer // 다음 offer 와 함께 consumerCreated 를 보낼 것
 	offered      []*jeju.Consumer // offer 에 실렸고 answer 대기
 	ready        []*jeju.Consumer // answer 적용됨, 연결 뒤 시작
@@ -72,6 +77,8 @@ type Room struct {
 	peers     map[string]*Peer
 	producers map[string]*santorini.Producer
 	consumers map[string]map[string]*jeju.Consumer // producerID → consumerID → Consumer
+	paused    map[string]bool                      // 일시정지된 producerID(M3)
+	recs      map[string]recording                 // producerID → 녹화(M5, MEDIA_RECORD_DIR 설정 시)
 
 	cmd  chan func()
 	once sync.Once
@@ -84,7 +91,8 @@ func NewRoom(id string, cap int, end time.Time) *Room {
 		id: id, cap: cap, end: end,
 		peers: map[string]*Peer{}, producers: map[string]*santorini.Producer{},
 		consumers: map[string]map[string]*jeju.Consumer{},
-		cmd:       make(chan func(), 64), done: make(chan struct{}),
+		paused:    map[string]bool{}, recs: map[string]recording{},
+		cmd: make(chan func(), 64), done: make(chan struct{}),
 	}
 	go r.loop()
 	return r
@@ -94,10 +102,14 @@ func (r *Room) ID() string            { return r.id }
 func (r *Room) Done() <-chan struct{} { return r.done }
 
 func (r *Room) loop() {
+	views := time.NewTicker(ViewInterval)
+	defer views.Stop()
 	for {
 		select {
 		case fn := <-r.cmd:
 			fn()
+		case <-views.C:
+			r.refreshViews()
 		case <-r.done:
 			return
 		}
@@ -128,15 +140,6 @@ func (r *Room) do(fn func()) {
 	}
 }
 
-// call — 오류를 돌려주는 명령. 방이 닫혔으면 ROOM_CLOSED.
-func (r *Room) call(fn func() *signal.Error) *signal.Error {
-	var e *signal.Error
-	if !r.exec(func() { e = fn() }) {
-		return signal.Errf(signal.CodeRoomClosed, "방이 닫힘")
-	}
-	return e
-}
-
 func newID() string { return rand.Text()[:16] }
 
 // Join — 정원·역할·중복 sub(기존 세션 DUPLICATE_SESSION 종료) 검사 후 Peer 생성. 구독 PC 를 만들고 기존 Producer 를 자동 구독한다.
@@ -157,10 +160,14 @@ func (r *Room) join(t signal.Ticket, s signal.Session) (*Peer, *signal.Error) {
 	}
 	if t.Sub != "" {
 		for id, old := range r.peers {
-			if old.Ticket.Sub == t.Sub {
-				old.Session.Close(signal.CodeDuplicateSession)
-				r.closePeer(id)
+			if old.Ticket.Sub != t.Sub {
+				continue
 			}
+			if !signal.ReplaceOnRejoin { // C-8 승인 대기 — false 면 새 입장 거부
+				return nil, signal.Errf(signal.CodeDuplicateSession, "이미 입장한 계정")
+			}
+			old.Session.Close(signal.CodeDuplicateSession)
+			r.closePeer(id)
 		}
 	}
 	if r.cap > 0 && len(r.peers) >= r.cap {
@@ -196,15 +203,6 @@ func (r *Room) join(t signal.Ticket, s signal.Session) (*Peer, *signal.Error) {
 		}
 	}
 	return p, nil
-}
-
-// producerList — 방 고루틴 전용. join 응답의 producers.
-func (r *Room) producerList() []signal.ProducerInfo {
-	out := make([]signal.ProducerInfo, 0, len(r.producers))
-	for _, pr := range r.producers {
-		out = append(out, signal.ProducerInfo{ID: pr.ID(), Kind: pr.Kind().String(), Peer: pr.PeerID()})
-	}
-	return out
 }
 
 // trickleSender — 서버 ICE 후보 → ntf trickle.
@@ -274,6 +272,10 @@ func (r *Room) addLayer(p *Peer, pr *santorini.Producer, t remoteTrack) {
 			l.Subscribe(c.Queue())
 		}
 	}
+	if rc, ok := r.recs[pr.ID()]; ok {
+		l.Subscribe(rc.c.Queue())
+		l.RequestKeyframe(pli.NewConsumer) // 녹화는 키프레임부터
+	}
 	go func() { // 발표자 RTCP(SR → 하류 SR 외삽 기준). 수신기가 멈추면 끝
 		for {
 			var pkts []rtcp.Packet
@@ -320,6 +322,8 @@ func (r *Room) produce(peerID, mid string, kind santorini.Kind, src santorini.So
 		pr = santorini.New(newID(), peerID, kind, src)
 		r.producers[pr.ID()] = pr
 		p.Producers[pr.ID()] = pr
+		r.consumers[pr.ID()] = map[string]*jeju.Consumer{}
+		r.startRecording(pr)
 		if mid != "" {
 			p.pubMids[mid] = pr
 			for _, t := range p.pendTracks[mid] {
@@ -418,7 +422,16 @@ func (r *Room) negotiate(p *Peer) {
 		p.dirty = true
 		return
 	}
-	if len(p.announce) == 0 {
+	live := p.announce[:0]
+	for _, c := range p.announce {
+		select {
+		case <-c.Done(): // 알리기 전에 닫힘
+		default:
+			live = append(live, c)
+		}
+	}
+	p.announce = live
+	if len(p.announce) == 0 && !p.renego {
 		return
 	}
 	sdp, err := p.Sub.CreateOffer()
@@ -431,7 +444,9 @@ func (r *Room) negotiate(p *Peer) {
 			ConsumerID: c.ID(), ProducerID: c.ProducerID(), Mid: p.Sub.SenderMid(p.senders[c.ID()]),
 			Kind: c.Producer().Kind().String(),
 		}})
+		r.initConsumer(p, c) // 늦은 합류자 일시정지 상태·할당기 레이어 정보(M3)
 	}
+	p.renego = false
 	p.offered = append(p.offered, p.announce...)
 	p.announce = nil
 	p.awaiting = true
@@ -522,18 +537,6 @@ func (r *Room) consumerOf(peerID, consumerID string) (*jeju.Consumer, *signal.Er
 		return nil
 	})
 	return c, e
-}
-
-// closeOwnProducer — producer.close(본인 것만).
-func (r *Room) closeOwnProducer(peerID, producerID string) *signal.Error {
-	return r.call(func() *signal.Error {
-		p := r.peers[peerID]
-		if p == nil || p.Producers[producerID] == nil {
-			return signal.Errf(signal.CodeNotFound, "producer 없음")
-		}
-		r.closeProducer(producerID)
-		return nil
-	})
 }
 
 // SetPriority — 화면공유 255 > 발표자 영상 > 패널 영상.

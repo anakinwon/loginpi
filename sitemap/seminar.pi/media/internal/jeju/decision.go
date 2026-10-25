@@ -47,11 +47,11 @@ func (c *Consumer) decide(it forward.Item) (send bool) {
 		}
 		c.seq.resync = false
 		if sw == nil {
-			sw = &Switch{}
+			sw = &Switch{From: -1, To: it.Layer} // 재개 = 새 시작(프레임 미완료 skip·전환 카운터 없음)
 		}
 	}
 	if sw != nil {
-		c.seq.Sync(it.ExtSeq)
+		c.applySwitch(sw, it) // Sync + TS 오프셋·VP8 재기준(M4)
 	}
 	switch d {
 	case Forward:

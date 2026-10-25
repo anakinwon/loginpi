@@ -21,13 +21,13 @@ const (
 )
 
 // newMux — 엔진 HTTP 경로. 테스트도 같은 구성을 쓴다.
-func newMux(m *bora.Manager, secret []byte) *http.ServeMux {
+func newMux(m *bora.Manager, secret, adminSecret []byte) *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.Handle("/signal", signal.NewServer(m, signal.NewVerifier(secret)))
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write([]byte("ok"))
 	})
-	mux.Handle("/admin/rooms", bora.AdminHandler(m, secret))
+	mux.Handle("/admin/", bora.AdminHandler(m, adminSecret)) // StripPrefix 없이 — MEDIA_ADMIN_SECRET 32자 미만이면 404(M5)
 	return mux
 }
 
@@ -67,5 +67,5 @@ func main() {
 		addr = defaultListen
 	}
 	log.Printf("Galápagos 대기 http %s · udp %d", addr, cfg.UDPPort)
-	log.Fatal(http.ListenAndServe(addr, newMux(m, secret)))
+	log.Fatal(http.ListenAndServe(addr, newMux(m, secret, []byte(os.Getenv("MEDIA_ADMIN_SECRET")))))
 }

@@ -47,6 +47,7 @@ func NewAPI(cfg Config) (*webrtc.API, error) {
 	if err := m.RegisterCodec(webrtc.RTPCodecParameters{RTPCodecCapability: CodecOpus, PayloadType: 111}, webrtc.RTPCodecTypeAudio); err != nil {
 		return nil, err
 	}
+	const srtpReplayWindow = 512
 	se := webrtc.SettingEngine{}
 	if cfg.UDPPort > 0 {
 		conn, err := net.ListenUDP("udp", &net.UDPAddr{Port: cfg.UDPPort})
@@ -60,6 +61,9 @@ func NewAPI(cfg Config) (*webrtc.API, error) {
 		se.SetNAT1To1IPs([]string{cfg.PublicIP}, webrtc.ICECandidateTypeHost)
 	}
 	se.SetIncludeLoopbackCandidate(cfg.Loopback)
+	// D-5 : RTX 없이 같은 SSRC 재전송 — 늦게 온 재전송이 SRTP 재생 방지 창에 걸리지 않게 넓힌다 [TBD : M2 실측 — 창 크기]
+	se.SetSRTPReplayProtectionWindow(srtpReplayWindow)
+	se.SetSRTCPReplayProtectionWindow(srtpReplayWindow)
 	return webrtc.NewAPI(webrtc.WithMediaEngine(m), webrtc.WithSettingEngine(se),
 		webrtc.WithInterceptorRegistry(&interceptor.Registry{})), nil
 }

@@ -70,6 +70,7 @@
 | `MEDIA_ALLOWED_ORIGINS` | 없음 | WS Origin 허용 목록(쉼표) | M1 |
 | `MEDIA_ICE_SERVERS` | 없음 | join 응답 iceServers(JSON) — TURN 은 M2 | M1·M2 |
 | `MEDIA_RECORD_DIR` | 없음(미설정 = 녹화 끔) | 녹화 파일 저장 위치 | M5 |
+| `MEDIA_ADMIN_SECRET` | 없음(32자 미만 = 관리 API 404) | `/admin/rooms` Bearer 키 — cmd 가 읽어 `bora.AdminHandler` 로 | M5(통합 때 cmd 연결) |
 
 ### Next(`src/env.ts`·`.env.example`, 이 커밋)
 
@@ -85,3 +86,9 @@ export PATH="/c/Program Files/Go/bin:$PATH"; cd sitemap/seminar.pi/media
 go vet ./... && go build ./... && go test ./...   # CGO 없음 → -race 불가, 보고에 "race 미검증" 명시
 cd .. && pnpm exec tsc --noEmit                     # Next 변경 시. pnpm build·pnpm dev 금지(마스터 dev 3003 사용 중)
 ```
+
+## 통합 기록 (2026-10-25)
+
+M1~M5 병합 후 단계가 남긴 신규 파일(각 패키지 `*_test.go`, `signal/ws.go`, `cmd/galapagos/e2e_test.go`, `capri/transport_test.go`(구 cmd main_test.go), `media/docs/M2_TURN_NETEM.md`, `media/scripts/netem.sh`, `docs/SIGNAL_API.md`)은 각자 만든 단계 소유로 본다.
+통합 배선 : jeju 송신 공용 `send/write`(SeqRewriter·applySwitch·VP8·noteSent·recordSent), PLI/FIR → stopRTX·FIRFilter, RR → SendMeta.SetRTT, 음성 큐 SetAudio,
+bora 닫힘 연쇄 + 구독 PC RemoveTrack 재협상, Room.paused·recs, initConsumer·producerInfos, 할당기 레이어 정보 1초 갱신, ReplaceOnRejoin, 녹화 Consumer, capri SRTP 재생 창 512.

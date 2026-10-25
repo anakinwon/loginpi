@@ -82,15 +82,23 @@ func (c *Consumer) flushMisses(now time.Time) {
 	}
 }
 
-// writeOut — 캐시 본문을 출력 헤더로 바꿔 보낸다 : 고정 OutSSRC·출력 순번·ts−tsOffset·헤더 확장 제거(D-12). 재전송·캐시 재생 공용.
+// writeOut — 재전송 : 캐시 본문을 출력 헤더로 바꿔 보낸다(같은 SSRC·같은 출력 순번, D-5).
 func (c *Consumer) writeOut(raw []byte, out uint16) error {
+	_, _, err := c.write(raw, out)
+	return err
+}
+
+// write — 고정 OutSSRC·출력 순번·ts−tsOffset·헤더 확장 제거(D-12)·VP8 picture ID 연속화(M4). 출력 TS·페이로드 크기를 돌려준다.
+// raw 는 호출자 버퍼(캐시 사본)라 제자리 수정해도 된다. 재전송도 picture ID 는 같은 오프셋으로 다시 쓴다(VP8Munger 는 더 새 값만 기준 갱신).
+func (c *Consumer) write(raw []byte, out uint16) (uint32, int, error) {
 	var p rtp.Packet
 	if err := p.Unmarshal(raw); err != nil {
-		return err
+		return 0, 0, err
 	}
 	p.SSRC = c.outSSRC
 	p.SequenceNumber = out
 	p.Timestamp -= c.tsOffset
 	p.Extension, p.Extensions = false, nil
-	return c.out.WriteRTP(&p)
+	c.rewriteVP8(p.Payload)
+	return p.Timestamp, len(p.Payload), c.out.WriteRTP(&p)
 }

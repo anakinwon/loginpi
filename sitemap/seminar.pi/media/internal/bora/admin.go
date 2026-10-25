@@ -45,7 +45,9 @@ func (m *Manager) OpenRoom(id string, cap int, end time.Time) bool {
 	ok := false
 	m.exec(func() {
 		if m.rooms[id] == nil {
-			m.rooms[id] = NewRoom(id, cap, end)
+			r := NewRoom(id, cap, end)
+			r.api, r.ice = m.api, m.ice // 없으면 첫 입장이 "엔진 API 미설정"으로 실패
+			m.rooms[id] = r
 			ok = true
 		}
 	})

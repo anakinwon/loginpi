@@ -3,21 +3,64 @@
 package bora
 
 import (
+	"errors"
+	"log"
 	"slices"
 	"strings"
-	"sync"
 
 	"seminar.pi/media/internal/bwe"
 	"seminar.pi/media/internal/jeju"
+	"seminar.pi/media/internal/record"
 	"seminar.pi/media/internal/santorini"
 	"seminar.pi/media/internal/signal"
 )
 
-// pausedProducers — 일시정지된 producerID 집합. 쓰기는 그 방 고루틴에서만, 방이 여러 개라 sync.Map.
-// ponytail: Room 구조체가 M1 파일이라 여기 둔다 — 통합 때 Room.paused map 으로 옮기면 잠금 불필요.
-var pausedProducers sync.Map
+// recording — Producer 1개의 녹화(최고 레이어 고정 Consumer → record.Recorder). 할당기에 넣지 않는다(M5).
+type recording struct {
+	c   *jeju.Consumer
+	rec *record.Recorder
+}
 
-func producerPaused(id string) bool { _, ok := pausedProducers.Load(id); return ok }
+// startRecording — 방 고루틴 전용. MEDIA_RECORD_DIR 미설정이면 아무것도 하지 않는다(기본 꺼짐).
+// 레이어 구독은 addLayer 가 한다. ponytail: 녹화 중 손실은 Recorder 가 다음 키프레임까지 버린다 — 키프레임 재요청 연결 없음.
+func (r *Room) startRecording(pr *santorini.Producer) {
+	rec, err := record.Open(r.id, pr.ID(), pr.Kind() == santorini.Video)
+	if err != nil {
+		if !errors.Is(err, record.ErrDisabled) {
+			log.Printf("녹화 시작 실패 %s/%s: %v", r.id, pr.ID(), err)
+		}
+		return
+	}
+	c := jeju.New(newID(), pr, rec, 0, false) // 출력 SSRC 는 파일에 쓰이지 않음
+	r.recs[pr.ID()] = recording{c: c, rec: rec}
+	c.Start()
+}
+
+func (r *Room) stopRecording(producerID string) {
+	rc, ok := r.recs[producerID]
+	if !ok {
+		return
+	}
+	delete(r.recs, producerID)
+	rc.c.Close()
+	if err := rc.rec.Close(); err != nil { // WriteRTP 와 잠금으로 보호됨
+		log.Printf("녹화 마감 실패 %s/%s: %v", r.id, producerID, err)
+	}
+}
+
+func (r *Room) producerPaused(id string) bool { return r.paused[id] }
+
+// refreshViews — 방 고루틴 전용, ViewInterval 마다. 레이어 활성·비트레이트(santorini, 1초 갱신)를 할당기로(M4).
+func (r *Room) refreshViews() {
+	for _, p := range r.peers {
+		if p.Alloc == nil {
+			continue
+		}
+		for _, c := range p.Consumers {
+			p.Alloc.OnConsumerChanged(consumerView(c))
+		}
+	}
+}
 
 // ── 공개 메서드(signal 요청 → Manager.Request 가 부른다). 방이 닫혔으면 ROOM_CLOSED ──
 
@@ -52,7 +95,7 @@ func (r *Room) ResumeConsumer(peerID, consumerID string) *signal.Error {
 			return signal.Errf(signal.CodeNotFound, "consumer 없음: "+consumerID)
 		}
 		c := p.Consumers[consumerID]
-		if !producerPaused(c.ProducerID()) {
+		if !r.producerPaused(c.ProducerID()) {
 			c.Resume() // 즉시 키프레임 요청(jeju)
 		}
 		return nil
@@ -97,6 +140,9 @@ func (r *Room) closePeer(peerID string) {
 	if p.Alloc != nil {
 		p.Alloc.Close()
 	}
+	if p.offerTimer != nil {
+		p.offerTimer.Stop()
+	}
 	delete(r.peers, peerID)
 }
 
@@ -112,6 +158,7 @@ func (r *Room) closeProducer(producerID string) {
 		delete(owner.Producers, producerID)
 	}
 	pr.Close()
+	r.stopRecording(producerID)
 	for _, p := range r.peers {
 		for _, c := range p.Consumers {
 			if c.ProducerID() == producerID {
@@ -123,12 +170,12 @@ func (r *Room) closeProducer(producerID string) {
 		c.Close()
 	}
 	delete(r.consumers, producerID)
-	pausedProducers.Delete(producerID)
+	delete(r.paused, producerID)
 	r.notify(pr.PeerID(), signal.NProducerClosed, signal.ProducerRef{ProducerID: producerID})
 }
 
-// detachConsumer — 레이어 구독 해제 → 송신 고루틴 종료 → 표·할당기에서 제거.
-// [TBD : M1 통합] 구독 PC RemoveTrack + 재협상(ntf transport.subscribe) — Consumer 별 RTPSender 를 M1 이 보관해야 한다.
+// detachConsumer — 레이어 구독 해제 → 송신 고루틴 종료 → 표·할당기에서 제거 → 구독 PC RemoveTrack + 재협상 예약.
+// 참가자 자신이 나가는 중이면(closePeer) 재협상 타이머는 closePeer 가 멈춘다.
 func (r *Room) detachConsumer(p *Peer, c *jeju.Consumer) {
 	for i := int8(0); i < santorini.MaxLayers; i++ {
 		if l := c.Producer().Layer(i); l != nil {
@@ -143,20 +190,27 @@ func (r *Room) detachConsumer(p *Peer, c *jeju.Consumer) {
 	if p.Alloc != nil {
 		p.Alloc.Remove(c.ID())
 	}
+	if s := p.senders[c.ID()]; s != nil {
+		delete(p.senders, c.ID())
+		if p.Sub != nil && p.Sub.RemoveTrack(s) == nil {
+			p.renego = true
+			r.scheduleOffer(p)
+		}
+	}
 }
 
 // setProducerPaused — 연결 Consumer 전부 일시정지/재개(재개는 키프레임 요청 포함) + 다른 참가자에게 알림.
 // ponytail: Consumer 의 paused 는 1개라 producer.resume 이 아직 consumer.resume 안 한 Consumer 도 재개한다 — 문제되면 Consumer 에 이유별 플래그.
 func (r *Room) setProducerPaused(pr *santorini.Producer, paused bool) {
-	if producerPaused(pr.ID()) == paused {
+	if r.paused[pr.ID()] == paused {
 		return
 	}
 	m := signal.NProducerResumed
 	if paused {
-		pausedProducers.Store(pr.ID(), struct{}{})
+		r.paused[pr.ID()] = true
 		m = signal.NProducerPaused
 	} else {
-		pausedProducers.Delete(pr.ID())
+		delete(r.paused, pr.ID())
 	}
 	for _, c := range r.consumers[pr.ID()] {
 		if paused {
@@ -171,7 +225,7 @@ func (r *Room) setProducerPaused(pr *santorini.Producer, paused bool) {
 // initConsumer — 늦은 합류자 상태 전달(REA_02 5.1 새 Consumer 합류). M1 Consume 이 ntf consumerCreated 직후 부른다.
 // Producer 가 일시정지면 Consumer 도 멈추고 producerPaused 를 보내며, 할당기에 레이어 활성·비트레이트를 바로 넘긴다.
 func (r *Room) initConsumer(p *Peer, c *jeju.Consumer) {
-	if producerPaused(c.ProducerID()) {
+	if r.producerPaused(c.ProducerID()) {
 		c.Pause()
 		if p.Session != nil {
 			p.Session.Send(signal.Notification{M: signal.NProducerPaused, D: signal.ProducerRef{ProducerID: c.ProducerID()}})

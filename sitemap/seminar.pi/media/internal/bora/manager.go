@@ -87,7 +87,7 @@ func (m *Manager) Join(s signal.Session, t signal.Ticket) (signal.JoinRes, *sign
 		return signal.JoinRes{}, e
 	}
 	var list []signal.ProducerInfo
-	r.exec(func() { list = r.producerList() })
+	r.exec(func() { list = r.producerInfos(p.ID) })
 	m.exec(func() { m.sessions[s.ID()] = sessRef{room: r, peer: p.ID} })
 	ice := m.iceOut
 	if ice == nil {
@@ -162,12 +162,7 @@ func (m *Manager) Request(s signal.Session, method string, d json.RawMessage) (a
 		if e != nil {
 			return nil, e
 		}
-		c, e := r.consumerOf(ref.peer, v.ConsumerID)
-		if e != nil {
-			return nil, e
-		}
-		c.Resume()
-		return struct{}{}, nil
+		return struct{}{}, r.ResumeConsumer(ref.peer, v.ConsumerID)
 	case signal.MConsumerSetLayer:
 		v, e := decode[signal.SetLayer](d)
 		if e != nil {
@@ -184,9 +179,15 @@ func (m *Manager) Request(s signal.Session, method string, d json.RawMessage) (a
 		if e != nil {
 			return nil, e
 		}
-		return struct{}{}, r.closeOwnProducer(ref.peer, v.ProducerID)
+		return struct{}{}, r.CloseProducer(ref.peer, v.ProducerID)
+	case signal.MProducerPause, signal.MProducerResume:
+		v, e := decode[signal.ProducerRef](d)
+		if e != nil {
+			return nil, e
+		}
+		return struct{}{}, r.PauseProducer(ref.peer, v.ProducerID, method == signal.MProducerPause)
 	}
-	return nil, signal.Errf(signal.CodeNotFound, "미구현 메서드: "+method) // producer.pause/resume = M3
+	return nil, signal.Errf(signal.CodeNotFound, "미구현 메서드: "+method)
 }
 
 // Left — signal.Handler. 세션이 속한 방에서 Leave.

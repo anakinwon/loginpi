@@ -199,7 +199,7 @@ func TestPauseAndLateJoiner(t *testing.T) {
 				}
 			}
 		}
-		if producerPaused("pa") {
+		if f.r.producerPaused("pa") {
 			t.Errorf("재개 후에도 일시정지 표시")
 		}
 	})

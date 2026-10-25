@@ -20,8 +20,7 @@ func (c *Consumer) replay() bool {
 	if c.paused {
 		return true
 	}
-	cur, _, _ := c.policy.State()
-	l := c.producer.Layer(cur)
+	cur, l := c.curLayer()
 	if l == nil {
 		return false
 	}
@@ -50,16 +49,9 @@ func (c *Consumer) replay() bool {
 		if !c.decide(it) {
 			continue
 		}
-		out, ok := c.seq.Input(ext)
-		if !ok {
-			continue
+		if c.send(buf[:n], it, now) {
+			sent = true
 		}
-		if c.writeOut(buf[:n], out) != nil {
-			return sent
-		}
-		c.lastMarker = p.Marker
-		c.recordSent(out, it, now)
-		sent = true
 	}
 	return sent
 }

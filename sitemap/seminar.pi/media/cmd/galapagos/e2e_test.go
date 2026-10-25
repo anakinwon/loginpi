@@ -5,6 +5,8 @@ package main
 import (
 	"encoding/json"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -118,7 +120,8 @@ func addCandidate(pc *webrtc.PeerConnection, d json.RawMessage) {
 }
 
 // audience — 청중 1명 : 서버 offer 에 answer, 받은 영상 패킷을 got 으로.
-func audience(t *testing.T, api *webrtc.API, url, name string, got chan<- rtp.Packet) *client {
+// closed 는 ntf producerClosed 를 받으면 신호(M3 닫힘 연쇄 통합 확인).
+func audience(t *testing.T, api *webrtc.API, url, name string, got chan<- rtp.Packet, closed chan<- string) *client {
 	pc, err := api.NewPeerConnection(webrtc.Configuration{})
 	if err != nil {
 		t.Fatal(err)
@@ -141,6 +144,8 @@ func audience(t *testing.T, api *webrtc.API, url, name string, got chan<- rtp.Pa
 			}()
 		case signal.MTrickle:
 			addCandidate(pc, e.D)
+		case signal.NProducerClosed:
+			closed <- name
 		}
 	})
 	pc.OnICECandidate(trickleOut(c, "sub"))
@@ -162,18 +167,21 @@ func audience(t *testing.T, api *webrtc.API, url, name string, got chan<- rtp.Pa
 
 func TestPresenterToTwoAudience(t *testing.T) {
 	t.Setenv("MEDIA_DEV_TICKET", "1")
+	recDir := t.TempDir()
+	t.Setenv("MEDIA_RECORD_DIR", recDir) // M5 녹화 배선 확인
 	api, err := capri.NewAPI(capri.Config{Loopback: true})
 	if err != nil {
 		t.Fatal(err)
 	}
 	m := bora.NewManager()
 	m.SetAPI(api, nil)
-	srv := httptest.NewServer(newMux(m, nil))
+	srv := httptest.NewServer(newMux(m, nil, nil))
 	defer srv.Close()
 	url := "ws" + strings.TrimPrefix(srv.URL, "http") + "/signal"
 
 	got1, got2 := make(chan rtp.Packet, 256), make(chan rtp.Packet, 256)
-	audience(t, api, url, "a1", got1) // 발행 전 입장
+	closed := make(chan string, 4)
+	audience(t, api, url, "a1", got1, closed) // 발행 전 입장
 
 	// 발표자 : 발행 PC offer → answer, produce(mid)
 	pc, err := api.NewPeerConnection(webrtc.Configuration{})
@@ -214,7 +222,7 @@ func TestPresenterToTwoAudience(t *testing.T) {
 	var pr signal.ProduceRes
 	pres.request(signal.MProduce, signal.ProduceReq{Mid: pc.GetTransceivers()[0].Mid(), Kind: "video", Source: "camera"}, &pr)
 
-	audience(t, api, url, "a2", got2) // 발행 뒤 입장(늦은 합류자)
+	audience(t, api, url, "a2", got2, closed) // 발행 뒤 입장(늦은 합류자)
 
 	// 발표자 송신 : 20ms 마다 VP8 패킷, 10개마다 키프레임(청중은 첫 키프레임부터 받는다)
 	stop := make(chan struct{})
@@ -257,5 +265,19 @@ func TestPresenterToTwoAudience(t *testing.T) {
 				t.Fatalf("%s : %d/%d 패킷만 도착", name, i, want)
 			}
 		}
+	}
+
+	// 통합 : producer.close → 청중 2명 모두 producerClosed(M3 닫힘 연쇄 + 구독 PC RemoveTrack 재협상)
+	pres.request(signal.MProducerClose, signal.ProducerRef{ProducerID: pr.ProducerID}, nil)
+	for i := 0; i < 2; i++ {
+		select {
+		case <-closed:
+		case <-time.After(5 * time.Second):
+			t.Fatalf("producerClosed %d/2 만 도착", i)
+		}
+	}
+	// 통합 : 녹화 파일(IVF 헤더 32바이트 + 프레임)이 producer.close 때 마감됨
+	if st, err := os.Stat(filepath.Join(recDir, "r1", pr.ProducerID+".ivf")); err != nil || st.Size() <= 32 {
+		t.Errorf("녹화 파일 없음·비어 있음: %v", err)
 	}
 }

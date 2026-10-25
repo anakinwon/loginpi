@@ -40,6 +40,7 @@ type Consumer struct {
 	tsOffset   uint32 // M1 단일 레이어 : 0, M4 전환 시 재계산
 	sent       sendStats
 	rtt        time.Duration // 청중 RR 로 잰 왕복 시간(SendMeta 억제 간격·품질 점수 입력, M2·M4)
+	fir        pli.FIRFilter // 같은 FIR 순번 반복 무시(M2)
 
 	started atomic.Bool
 	cmd     chan func()
@@ -56,15 +57,17 @@ type sendStats struct {
 
 // New — 출력 SSRC 는 호출자(bora)가 정한 값(구독 PC sender 의 SSRC). paused 면 resume 전까지 보내지 않는다(M3).
 func New(id string, p *santorini.Producer, out Writer, outSSRC uint32, paused bool) *Consumer {
-	clock := uint32(48000)
+	clock, slots := uint32(48000), nack.AudioSlots
 	if p.Kind() == santorini.Video {
-		clock = 90000
+		clock, slots = 90000, nack.VideoSlots
 	}
-	return &Consumer{
+	c := &Consumer{
 		id: id, producer: p, q: forward.NewQueue(forward.QueueSize), out: out, outSSRC: outSSRC, clock: clock,
-		policy: newPolicy(p), meta: nack.NewSendMeta(nack.VideoSlots), paused: paused,
+		policy: newPolicy(p), meta: nack.NewSendMeta(slots), paused: paused,
 		cmd: make(chan func(), 64), done: make(chan struct{}),
 	}
+	c.q.SetAudio(p.Kind() == santorini.Audio) // 음성은 그 패킷만 버림(M2 congest)
+	return c
 }
 
 func (c *Consumer) ID() string                    { return c.id }
@@ -108,7 +111,6 @@ func (c *Consumer) Run() {
 		c.requestKeyframe(pli.NewConsumer)
 	}
 	buf := make([]byte, nack.SlotSize)
-	var pkt rtp.Packet
 	sr := time.NewTicker(rtcpx.SRInterval)
 	defer sr.Stop()
 	for {
@@ -119,7 +121,7 @@ func (c *Consumer) Run() {
 			if c.q.TakeKeyframeNeed() {
 				c.requestKeyframe(pli.QueueDrop)
 			}
-			c.forward(it, buf, &pkt)
+			c.forward(it, buf)
 		case now := <-sr.C:
 			c.sendSR(now)
 		case <-c.done:
@@ -129,7 +131,7 @@ func (c *Consumer) Run() {
 }
 
 // forward — 항목 1개 송신(송신 고루틴 전용).
-func (c *Consumer) forward(it forward.Item, buf []byte, pkt *rtp.Packet) {
+func (c *Consumer) forward(it forward.Item, buf []byte) {
 	if !c.decide(it) {
 		return
 	}
@@ -141,26 +143,26 @@ func (c *Consumer) forward(it forward.Item, buf []byte, pkt *rtp.Packet) {
 	if n == 0 {
 		return // 슬롯이 덮였다 — 구멍은 NACK 로 복구(M2)
 	}
-	if pkt.Unmarshal(buf[:n]) != nil {
-		return
-	}
+	c.send(buf[:n], it, time.Now())
+}
+
+// send — decide 를 통과한 패킷 1개 : 출력 순번(M3) → 헤더 재작성·VP8 picture ID(M4) → WriteRTP → 기록(M2·M4). 송신 루프·캐시 재생 공용.
+func (c *Consumer) send(raw []byte, it forward.Item, now time.Time) bool {
 	out, ok := c.seq.Input(it.ExtSeq)
 	if !ok {
-		return
+		return false // 옛 패킷·버린 순번 재수신(M3)
 	}
-	pkt.SSRC = c.outSSRC
-	pkt.SequenceNumber = out
-	pkt.Timestamp -= c.tsOffset
-	pkt.Extension, pkt.Extensions = false, nil
-	if c.out.WriteRTP(pkt) != nil {
-		return
+	ts, size, err := c.write(raw, out)
+	if err != nil {
+		return false
 	}
-	now := time.Now()
 	c.lastMarker = it.Marker
 	c.sent.packets++
-	c.sent.octets += uint32(len(pkt.Payload))
-	c.sent.lastTS, c.sent.lastAt = pkt.Timestamp, now
+	c.sent.octets += uint32(size)
+	c.sent.lastTS, c.sent.lastAt = ts, now
+	c.noteSent(ts)
 	c.recordSent(out, it, now)
+	return true
 }
 
 // sendSR — 하류 SR. 발표자 SR 이 있으면 그 NTP↔RTP 를 지금으로 외삽하고, 없으면 마지막 보낸 TS 에서 외삽한다.
