@@ -19,8 +19,8 @@
 - [x] Pi Developer Portal testnet 앱 등록 · API 키 · 도메인 검증 (ENV_GUIDE 3.2) — 검증 키 `/validation-key.txt` 배포·검증 완료(2026-10-25)
 - [x] DB — 마스터가 seminar 전용 Supabase 프로젝트 1개(`SUPABASE_SCHEMA=public`)로 결정 → `db-migrate.mjs --app seminar --tier prod --db-url <Session pooler>` 로 baseline·pi_pymnt·`sql/001`(Google 연동) 적용(2026-10-25). ⚠ `.env.local` 의 `SEMINAR_*_DATABASE_URL` 은 Direct 호스트(IPv6 전용)라 이 PC 에서 ENOTFOUND — Session pooler(`aws-0-ap-northeast-2`) 사용
 - [x] 로그인 3경로 이식(sitemap.pi 동일, LOGIN_PLAYBOOK) — Pi SDK·Pi Sign-In(OAuth)·Google+연동 코드, `pnpm build` 통과(2026-10-25)
-- [ ] Pi Browser 실기기 로그인 검증 — LOGIN_PLAYBOOK §6 체크리스트(R7 : 이 항목 전엔 로그인 미완료)
-- [ ] Vercel 프로젝트(Root Directory `sitemap/seminar.pi`, 운영 브랜치 `prod/seminar`)
+- [x] Pi Browser 실기기 로그인 — 성공(마스터 2026-10-25, `seminar0532.pinet.com`). LOGIN_PLAYBOOK §6 나머지(재로그인·관리자·Google 연동) 미확인
+- [x] Vercel 프로젝트 `seminar`(Root `sitemap/seminar.pi`) — master push 배포 success(2026-10-25). 운영 브랜치 `prod/seminar` 분리는 [TBD : 마스터]
 
 **완료 기준** : PRD v1.0 · Pi 앱 ID · 비운영 DB · 스테이징 URL
 
@@ -28,7 +28,7 @@
 
 | 단계 | 참고 | 핵심 산출 | 통과 기준 | 상태 |
 |---|---|---|---|---|
-| M0 실기기 관문 | — | 최소 앱 + `/lab/camera`(R-P6 가드), 기기 2대 직접 연결 | iOS·Android Pi Browser 영상 송수신·자동재생 | **화면 완료 · 실기기 시험 대기** |
+| M0 실기기 관문 | — | 최소 앱 + `/lab/camera`(R-P6 가드), 기기 2대 직접 연결 | iOS·Android Pi Browser 영상 송수신·자동재생 | **실기기 카메라 성공(2026-10-25)** — 기기 2대 송수신·iOS/Android 구분 결과 [확인중 : 마스터] |
 | M1 최소 SFU | Galène | Go 설치 · `media/` 모듈 · WebSocket 시그널링 · 1→2 전달 | LAN·LTE 영상 표시 | **착수 준비 완료**(Go 1.27.0 · `media/` 모듈 · pion v4.2.25 · S-1 점검 테스트) — M0 통과 후 구현 |
 | M2 안정화 | Galène | 패킷 캐시·NACK · PLI 조절 · TURN · `tc netem` | 3% 손실 회복 | 대기 |
 | M3 구조 다듬기 | mediasoup | Router·Transport·Producer·Consumer 재구성 · API 문서 · 단위 테스트 | 회귀 0 | 대기 |
@@ -39,9 +39,9 @@
 
 - [x] (서비스) seminar.pi 최소 Next 앱 골격(화면·i18n ko/en·env, @pi/* 는 M1·M5) · `pnpm build` 통과 (2026-10-24)
 - [x] (서비스) `/lab/camera` 시험 화면 — 카메라·마이크 미리보기·전후면 전환, 기기 2대 직접 연결(Supabase Realtime broadcast, id 작은 쪽 offer), 결과 복사. 운영 빌드는 `LAB_ENABLED=1` 일 때만(R-P6) (2026-10-24)
-- [ ] (마스터) Vercel env : `LAB_ENABLED=1`, `NEXT_PUBLIC_LAB_SUPABASE_URL`·`NEXT_PUBLIC_LAB_SUPABASE_PUBLISHABLE_KEY`(pi-nonprod — ENV_GUIDE 3.4)
-- [ ] (마스터) Vercel 프로젝트 생성(Root `sitemap/seminar.pi`) — 스테이징 URL 확보 (HTTPS 필요)
-- [ ] (마스터) Pi Browser iOS·Android 실기기 시험 → 결과 TROUBLESHOOT 기록
+- [x] (마스터) Vercel env : `LAB_ENABLED=1`, `NEXT_PUBLIC_LAB_SUPABASE_URL`·`NEXT_PUBLIC_LAB_SUPABASE_PUBLISHABLE_KEY`(pi-nonprod — ENV_GUIDE 3.4)
+- [x] (마스터) Vercel 프로젝트 생성(Root `sitemap/seminar.pi`) (2026-10-25)
+- [~] (마스터) Pi Browser 실기기 시험 — 카메라 성공(2026-10-25). "결과 복사" 원문·기기 OS·2대 연결 여부 기록 대기
 - [ ] (마스터) 호스팅 결정 — M1 외부 시험 전까지
 
 ## Phase 1 — MVP
