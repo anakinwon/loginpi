@@ -19,7 +19,7 @@ export function ReactionMenu({
   onPick: (e: string) => void
 }) {
   const t = useTranslations('room')
-  const m = useMenu(open, onClose, TRIGGER)
+  const m = useMenu(open, onClose, TRIGGER, '[data-more-trigger]')
   if (!open) return null
   return (
     <div ref={m.rootRef} className="relative">
