@@ -1,6 +1,6 @@
-# SIGNAL_API — Galápagos 시그널링 프로토콜 (확정판 v1.1.3)
+# SIGNAL_API — Galápagos 시그널링 프로토콜 (확정판 v1.2)
 
-> 작성 2026-10-25 · v1.1 개정 2026-10-26(UI 설계서 `ui-design/ui-design.md` 13절 #1 결정 — 14.7 필수 A~D + `room.end`, 받는 사람·필드 정본 = 설계서 7.2) · v1.1.1 구현 결정 문서화 2026-10-26 · v1.1.3 `ntf score` 송신 2026-10-27(3.4) · M3 산출물 · 근거 `PRD_02_ENGINE_DESIGN.md` 5절(D-9 봉투·D-11 입장권), REA_02 5.1(수명주기 이벤트)·6.2(동사 경계)
+> 작성 2026-10-25 · v1.1 개정 2026-10-26(UI 설계서 `ui-design/ui-design.md` 13절 #1 결정 — 14.7 필수 A~D + `room.end`, 받는 사람·필드 정본 = 설계서 7.2) · v1.1.1 구현 결정 문서화 2026-10-26 · v1.1.3 `ntf score` 송신 2026-10-27(3.4) · **v1.2 후속 E·F·G(사회·레이아웃·발언자) 2026-10-27(3.5) — 아소카 결정(마스터 위임 2026-10-26)** · M3 산출물 · 근거 `PRD_02_ENGINE_DESIGN.md` 5절(D-9 봉투·D-11 입장권), REA_02 5.1(수명주기 이벤트)·6.2(동사 경계)
 > 코드 정본 : `media/internal/signal/envelope.go`(이름·필드·오류 코드), `session.go`(시간 상수), `ticket.go`(입장권). **이 문서와 코드가 다르면 코드를 고치기 전에 이 문서를 먼저 고친다**(이름·필드 변경은 M3 합의 필요).
 > 표준 SDP 를 그대로 주고받는다 — 클라이언트 라이브러리가 필요 없다(D-9).
 
@@ -43,7 +43,7 @@
 
 | 메서드 | `d` | 응답 `d` | 역할 | 단계 | 비고 |
 |---|---|---|---|---|---|
-| `join` | `{ticket}` | `{peerId, role, iceServers, producers, peers}` | 전원 | M1 (`peers` v1.1) | 첫 메시지여야 함. `producers` = 방에 이미 있는 다른 참가자 producer 목록 `[{id, kind, peer, source}]`(늦은 합류자 상태, `source` v1.1). `peers` = 3.3 A |
+| `join` | `{ticket}` | `{peerId, role, iceServers, producers, peers, policy, layout?}` | 전원 | M1 (`peers` v1.1 · `policy`·`layout` v1.2) | 첫 메시지여야 함. `producers` = 방에 이미 있는 다른 참가자 producer 목록 `[{id, kind, peer, source}]`(늦은 합류자 상태, `source` v1.1). `peers` = 3.3 A. `policy` = 현재 잠금 `{locked:{audio,video}}`, `layout` = 발표자가 정한 마지막 레이아웃(없으면 생략) — 3.5 |
 | `transport.publish` | `{sdp}` (offer) | `{sdp}` (answer) | presenter·panel | M1 | 발행 PC 협상. 클라이언트 offer 고정(D-2 glare 없음) |
 | `produce` | `{mid, kind, source, rids?}` | `{producerId}` | presenter·panel | M1 | 역할 검사 2회(signal·방). `kind` `audio`\|`video`(그 밖은 `SDP_INVALID`), `source` `camera`\|`screen`\|`mic`(그 밖은 `camera` 로 간주), `rids` simulcast `["l","m","h"]` — `rids` 는 현재 서버가 읽지 않고 레이어는 수신 트랙의 rid 로 정한다 |
 | `transport.subscribe.answer` | `{sdp}` (answer) | `{}` | 전원 | M1 | `ntf transport.subscribe` 에 대한 답 |
@@ -51,7 +51,7 @@
 | `consumer.resume` | `{consumerId}` | `{}` | 전원 | M3 | 수신 준비 끝 신호 → 서버가 **즉시 키프레임 요청**. producer 가 일시정지면 producer 재개 때 함께 재개 |
 | `consumer.setLayer` | `{consumerId, maxSpatial, maxTemporal?}` | `{}` | 전원 | M3 정의·M4 사용 | 화면 크기 기반 **상한**만(0=l·1=m·2=h, 범위 밖은 0~2 로 자름). 실제 레이어는 서버가 정함. 100ms 디바운스. `maxTemporal` 은 현재 무시(시간 레이어 미지원) |
 | `producer.pause` | `{producerId}` | `{}` | 소유자 | M3 | 마이크·카메라 끄기. 연결 Consumer 전부 일시정지 + 다른 참가자에게 `ntf producerPaused` |
-| `producer.resume` | `{producerId}` | `{}` | 소유자 | M3 | 연결 Consumer 재개(키프레임 요청) + `ntf producerResumed` |
+| `producer.resume` | `{producerId}` | `{}` | 소유자 | M3 | 연결 Consumer 재개(키프레임 요청) + `ntf producerResumed`. 잠금 중(3.5)이면 발표자 외 `LOCKED`(v1.2) |
 | `producer.close` | `{producerId}` | `{}` | 소유자 | M3 | 닫힘 연쇄(4절) + `ntf producerClosed` |
 | `ping` | `{}` | `{}` | 전원 | M1 | 양방향. 서버가 보낸 `ping` 에도 클라이언트는 `res` 로 답한다 |
 | `leave` | `{}` | `{}` | 전원 | M1 | 참가자 닫힘 연쇄(4절) 후 서버가 연결 종료 |
@@ -61,6 +61,10 @@
 | `reaction.send` | `{emojis}` | `{}` | 전원 | M3 (v1.1) | 3.3 C |
 | `peer.setRole` | `{peerId, role}` | `{}` | presenter | M3 (v1.1) | 3.3 D. `role` `panel`\|`audience` |
 | `room.end` | `{}` | `{}` | presenter | M3 (v1.1) | 3.3 D. 세미나 종료 |
+| `peer.mute` | `{peerId, kind}` | `{}` | presenter | v1.2 | 3.5 E. `kind` `audio`\|`video` |
+| `room.muteAll` | `{kind, lock}` | `{}` | presenter | v1.2 | 3.5 E. `lock:false` = 음소거 + 잠금 해제 |
+| `peer.askUnmute` | `{peerId, kind}` | `{}` | presenter | v1.2 | 3.5 E |
+| `room.setLayout` | `{mode, spotlight, follow}` | `{}` | presenter | v1.2 | 3.5 F |
 
 > `pong` 이름(`MPong`)은 코드에 예약돼 있으나 응답 봉투(`res`)로 대신한다 — 클라이언트는 보내지 않아도 된다.
 > 소유자가 아닌 producer 에 대한 `producer.*` 요청과 없는 `consumerId` 는 `NOT_FOUND`(존재 여부를 숨기려고 `ROLE_FORBIDDEN` 이 아님).
@@ -86,6 +90,11 @@
 | `hand` | `{peerId, raisedTs}` | M3 (v1.1) | **presenter·panel·손든 본인만**(청중끼리 노출 안 함) — 3.3 C |
 | `reaction` | `{counts: {[emoji]: n}, ts}` | M3 (v1.1) | 방 전원(보낸 사람 포함). 서버 **300ms 창 합산·익명** |
 | `roleChanged` | `{peerId, role, by}` | M3 (v1.1) | 방 전원(대상·요청자 포함) — 3.3 D |
+| `mutedBy` | `{kind, by, producerIds}` | v1.2 | **음소거된 본인만** — 서버가 일시정지한 내 producer 목록(본인은 `producerPaused` 를 받지 않음) — 3.5 E |
+| `roomPolicy` | `{locked: {audio, video}}` | v1.2 | 방 전원. 잠금이 **바뀔 때만** — 3.5 E |
+| `askUnmute` | `{kind, by}` | v1.2 | **대상 본인만**. 자동으로 켜지 않는다 — 3.5 E |
+| `layout` | `{mode, spotlight, follow}` | v1.2 | 방 전원(요청자 포함). 값이 **바뀔 때만** — 3.5 F |
+| `activeSpeaker` | `{peerId \| null}` | v1.2 | 방 전원. 판정이 바뀔 때만·**방당 500ms 에 최대 1건**, 입장 직후 현재 발언자 1건 — 3.5 G |
 
 ### 3.3 v1.1 추가 규칙 (UI 설계서 7.2·14.4·14.7 — 13절 #1·#2·#4·#6·#8·#9 결정)
 
@@ -132,6 +141,34 @@
 
 `consumer.setLayer` 와 짝 : 클라이언트용 `consumer.pause` 는 **없다** — 화면 밖·백그라운드 타일은 `maxSpatial:0`(최저 레이어)으로 낮춘다(설계서 14.2). 완전 정지 메시지는 후속 검토 [TBD].
 
+### 3.5 v1.2 추가 규칙 — 후속 E 사회 · F 레이아웃 · G 발언자 (설계서 14.7, 아소카 결정(마스터 위임 2026-10-26))
+
+공통 : 요청은 전부 **presenter 만**(세션 역할) — 아니면 `ROLE_FORBIDDEN`. `kind` = `audio`(음성 producer 전부) \| `video`(**카메라만** — 화면공유는 사회 대상 아님), 그 밖 값 `SDP_INVALID`. 대상 없음 `NOT_FOUND`, 대상이 presenter(본인 포함) `ROLE_FORBIDDEN`.
+
+**E — 사회**
+
+| 메시지 | 규칙 | 오류 |
+|---|---|---|
+| `peer.mute{peerId, kind}` | 대상의 그 종류 producer 중 켜진 것을 서버가 일시정지(= `producer.pause` 와 같은 처리, 다른 참가자에게 `producerPaused`) → 새로 멈춘 것이 있으면 대상에게 `ntf mutedBy{kind, by, producerIds}`. 이미 꺼졌거나 발행이 없으면 성공·알림 없음. 대상은 잠금이 없으면 스스로 다시 켤 수 있다 | 공통 |
+| `room.muteAll{kind, lock}` | **한 방 고루틴 처리 안에서 순서 고정** : ① 잠금 표시(`lock:true`) 또는 해제(`lock:false`) ② 발표자 외 전원의 그 종류 일시정지 + 각자 `mutedBy` ③ 잠금이 바뀌었으면 전원 `ntf roomPolicy{locked}`. ①과 ② 사이에 다른 요청(`producer.resume`)이 끼어들 수 없다(Jitsi 경합 원천 차단). 잠금 해제는 `lock:false` 로 다시 보낸다 — 잠금 중엔 이미 모두 꺼져 있어 추가 음소거가 없다 | 공통 |
+| 잠금 효과 | 발표자 외 참가자의 ⓐ 잠긴 종류 `producer.resume`(꺼진 것 켜기) ⓑ 잠긴 종류 새 `produce`(음성 전부·카메라 — 새 발행으로 우회 차단) ⓒ `peer.askUnmute` 는 `LOCKED`. 끄기(`producer.pause`)·닫기는 언제나 허용. 잠금은 방 메모리에만(방이 닫히면 사라짐), `join` 응답 `policy` 로 늦은 입장자에게 전달 | `LOCKED` |
+| `peer.askUnmute{peerId, kind}` | 대상(panel — 발행 가능한 사람)에게 `ntf askUnmute{kind, by}` 만 보낸다. **서버·클라이언트 모두 자동으로 켜지 않는다** — 화면이 [마이크 켜기]/[무시] 를 띄우고 본인 탭으로만 켠다(설계서 14.4 동의 원칙) | 대상이 audience `ROLE_FORBIDDEN`, 잠금 중 `LOCKED` |
+
+**F — 레이아웃**
+
+| 메시지 | 규칙 | 오류 |
+|---|---|---|
+| `room.setLayout{mode, spotlight, follow}` | `mode` = `auto`(무대 자동, `spotlight` 는 서버가 비움) \| `spotlight`(`spotlight` = 타일 키 `cam:<peerId>`·`screen:<producerId>`, 1~64자). `follow` = 청중 화면도 따라 바뀜. 서버가 방마다 **마지막 값 1개를 보관**해 `join` 응답 `layout` 으로 주고, 값이 바뀌었을 때만 전원 `ntf layout`(Jitsi Follow Me 재시도 불필요). 키가 가리키는 타일이 없으면 클라이언트는 자동 배치로 둔다 | 값 범위 밖 `SDP_INVALID` |
+
+**G — 발언자**
+
+| 항목 | 규칙 |
+|---|---|
+| 입력 | 발행 PC 음성 m-line 에 `urn:ietf:params:rtp-hdrext:ssrc-audio-level`(RFC 6464) 를 **MediaEngine 확장 등록만으로** 협상(수신 전용 방향, 인터셉터 없음 — S-1). 레이어 수신 고루틴이 확장을 버리기 전에 원소 첫 바이트(V·7비트 레벨 = −dBov)를 직접 읽어(`rtpx.AudioLevel`) 지수 평활(1/8). 0.5초 새 값이 없으면(DTX·끊김) 무음 |
+| 판정 | 방 고루틴 **100ms** 마다, 일시정지되지 않은 음성 producer 의 참가자별 가장 큰 값. **−50 dBov 보다 큼**이 말하는 중. 가장 큰 사람이 **300ms 이어지면** 전환, 현재 발언자가 말하는 중이면 **6 dB 더 커야** 후보(히스테리시스), 현재 발언자가 **1.5초** 조용하면 `null` [확인중 : 마스터 실기기 — 수치는 `bora/speaker.go` 손잡이] |
+| 송신 | 판정이 바뀔 때만, **방당 500ms 에 최대 1건**(넘으면 미뤘다가 다음 판정에 — 그사이 되돌아오면 안 보냄). 입장 직후 현재 발언자가 있으면 본인에게 1건 |
+| 화면 | 말하기 링 = `activeSpeaker` 대상 타일. 엔진이 확장을 협상하지 못한 연결·실험실 등 엔진 판정이 없으면 클라이언트 `AudioContext` 판정(설계서 3절 G7)으로 대체 |
+
 ## 4. 수명주기 (서버 동작 — 클라이언트가 기대할 순서)
 
 ```
@@ -160,7 +197,8 @@
 | `TICKET_INVALID` | 서명·`aud`·형식·`jti` 재사용 실패, 첫 메시지가 `join` 아님(10초 시한 초과는 알림 없이 종료) | `join` | 종료 |
 | `TICKET_EXPIRED` | `exp` 지남(오차 5초) | `join` | 종료 |
 | `ROOM_FULL` | 정원(`cap`) 초과 | `join` | 종료 |
-| `ROLE_FORBIDDEN` | audience 의 `transport.publish`·`produce`, v1.1 권한 밖 요청(3.3 — `hand.set`·`hand.lowerAll`·`peer.setRole`·`room.end`) | 발행·관리 요청 | 유지 |
+| `ROLE_FORBIDDEN` | audience 의 `transport.publish`·`produce`, v1.1·v1.2 권한 밖 요청(3.3 — `hand.set`·`hand.lowerAll`·`peer.setRole`·`room.end`, 3.5 — `peer.mute`·`room.muteAll`·`peer.askUnmute`·`room.setLayout`) | 발행·관리 요청 | 유지 |
+| `LOCKED` | 발표자 잠금 중 `producer.resume`·잠긴 종류 `produce`·`peer.askUnmute`(3.5 E, v1.2) | 발행 요청 | 유지 |
 | `ROOM_CLOSED` | 방 종료(`end` 지남·관리자 종료·`room.end`)·닫힌 방에 요청 | 전부 · `ntf error` | 종료 |
 | `DUPLICATE_SESSION` | 같은 방에 같은 `sub` 가 다시 입장 → **기존** 세션에 `ntf error` | `ntf error` | 기존 세션 종료 |
 | `SDP_INVALID` | SDP 파싱·적용 실패, 대기 중 offer 없이 온 `transport.subscribe.answer`, **요청 `d` 해석 실패(모든 요청)**, `produce` 의 잘못된 `kind` [TBD : 일반 `BAD_REQUEST` 코드 분리 여부] | `transport.*` · 전부 | 유지 |
@@ -221,7 +259,7 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 
 - 알 수 없는 알림은 클라이언트가 무시한다. 알 수 없는 메서드는 서버가 `NOT_FOUND`.
 - 필드 추가는 하위 호환(무시 가능)으로만. 이름 변경·삭제는 이 문서 개정 + M3 합의.
-- 메시지 종류가 20개를 넘어 관리가 어려우면 JSON Schema 로 생성(D-9 되돌릴 조건). 현재(v1.1) 요청 18 · 알림 17(서버 `trickle` 포함) — 후속 E(사회 기능) 착수 때 요청이 20을 넘으므로 그때 전환 판단 [확인중 : 마스터].
+- 메시지 종류가 20개를 넘어 관리가 어려우면 JSON Schema 로 생성(D-9 되돌릴 조건). **현재(v1.2) 요청 22 · 알림 22(서버 `trickle` 포함) — 둘 다 20 초과로 되돌릴 조건에 닿았다.** v1.2 에서는 전환하지 않고 손으로 쓴 `envelope.go` 를 정본으로 유지(아소카 결정(마스터 위임 2026-10-26) — 밤사이 계약 형식 변경 위험 회피), JSON Schema 생성 전환 여부 [확인중 : 마스터]
 
 ## 변경 이력
 
@@ -233,3 +271,4 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 | 2026-10-26 | **v1.1.1** 구현 결정 문서화(이름·필드 변경 없음, 3.3) — ① 승격·강등 역할은 같은 `sub` 재입장 때 유지(방 단위 기억, presenter 승격 불가, 방이 닫히면 소멸) ② `room.end` 순서 = 요청자 성공 응답 → 나머지 전원 `ROOM_CLOSED` → 정리 ③ 관리 API `POST /admin/rooms` 로 다시 열면 종료 표시 해제 ④ `reaction.send` 한 요청 안 중복 이모지는 1개로 셈 ⑤ 서버가 강등된 사람의 발행 PC 를 닫음 ⑥ `peerJoined` 는 받는 사람보다 뒤에 들어온 사람만, `peerLeft` 는 모르는 `peerId` 가 섞일 수 있음(무시) ⑦ 값 검사가 속도 제한보다 먼저(잘못된 요청은 한도 미사용) |
 | 2026-10-26 | v1.1.2 — `consumerCreated` 에 `peer`(발행자 peerId, `ProducerInfo.peer` 와 같은 값) 추가 : 입장 뒤 생긴 producer 의 주인을 화면이 알 수 있게(W3 검토 지적). 필드 추가 = 하위 호환 |
 | 2026-10-27 | **v1.1.3** — `ntf score` 서버 송신 시작(3.4) : 받는 사람 = Consumer 주인, 5초 판정·등급 바뀔 때만, 처음 등급 excellent 기준, `lost` = RR 10초 끊김. `{producerId}` 형·`layersChanged`·`streamState` 는 계속 미송신, `publishLayers` 는 송신 중임을 표기. 이름·필드 변경 없음(`score` 행 `d` 를 실제 송신 형식 `{consumerId, score, grade}` 로 좁혀 적음). 아소카 결정(마스터 위임 2026-10-26) |
+| 2026-10-27 | **v1.2** — 후속 E·F·G(3.5, 설계서 14.7) : 요청 4(`peer.mute`·`room.muteAll`·`peer.askUnmute`·`room.setLayout`)·알림 5(`mutedBy`·`roomPolicy`·`askUnmute`·`layout`·`activeSpeaker`)·오류 코드 `LOCKED`, `join` 응답 `policy`·`layout`(필드 추가 = 하위 호환), `producer.resume` 잠금 검사. 잠금 → 일시정지 → 알림 한 처리, 해제 = `muteAll{lock:false}`, `video` = 카메라만, 엔진 RFC 6464 오디오 레벨 판정(100ms·−50 dBov·300ms·6 dB·1.5초·방당 500ms). D-9 메시지 수 22·22 — JSON Schema 전환은 [확인중 : 마스터]. 기존 이름·필드 변경 없음. 아소카 결정(마스터 위임 2026-10-26) |
