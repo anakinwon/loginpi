@@ -37,6 +37,7 @@ const ViewInterval = time.Second
 type Peer struct {
 	ID        string
 	Ticket    signal.Ticket
+	Role      signal.Role // 세션 역할(정본) — 입장권 role 로 시작, peer.setRole 로 바뀐다(SIGNAL_API 6절)
 	Session   signal.Session
 	Pub       *capri.Transport // presenter·panel 만
 	Sub       *capri.Transport
@@ -47,6 +48,10 @@ type Peer struct {
 	pubMids    map[string]*santorini.Producer // 발행 m-line mid → Producer(produce 요청과 OnTrack 짝)
 	pendTracks map[string][]remoteTrack       // produce 전에 도착한 트랙
 	senders    map[string]*webrtc.RTPSender   // consumerID → 구독 PC sender
+
+	raisedTs  int64     // 손 든 서버 시각(ms), 0 = 내림(v1.1)
+	chatRate  rateLimit // chat.send 속도 제한(v1.1)
+	reactRate rateLimit // reaction.send 속도 제한(v1.1)
 
 	// 구독 PC 재협상 상태
 	offerTimer   *time.Timer
@@ -83,6 +88,13 @@ type Room struct {
 	dyna      map[string]*bwe.Dynacast             // 영상 producerID → 발행 레이어 상한(ntf publishLayers·REMB)
 	opened    bool                                 // 관리 API 로 연 방 — 비어도 정리하지 않는다(종료 시각·CloseRoom 으로만)
 
+	// v1.1 묶음 알림(interact.go)
+	joined     []signal.PeerInfo // 다음 ntf peerJoined
+	left       []string          // 다음 ntf peerLeft
+	peerTimer  *time.Timer
+	reactions  map[string]int // 300ms 창 반응 합산
+	reactTimer *time.Timer
+
 	cmd  chan func()
 	once sync.Once
 	done chan struct{}
@@ -95,7 +107,7 @@ func NewRoom(id string, cap int, end time.Time) *Room {
 		peers: map[string]*Peer{}, producers: map[string]*santorini.Producer{},
 		consumers: map[string]map[string]*jeju.Consumer{},
 		paused:    map[string]bool{}, recs: map[string]recording{},
-		maxLayer: map[string]int8{}, dyna: map[string]*bwe.Dynacast{},
+		maxLayer: map[string]int8{}, dyna: map[string]*bwe.Dynacast{}, reactions: map[string]int{},
 		cmd: make(chan func(), 64), done: make(chan struct{}),
 	}
 	go r.loop()
@@ -193,7 +205,7 @@ func (r *Room) join(t signal.Ticket, s signal.Session) (*Peer, *signal.Error) {
 		return nil, signal.Errf(signal.CodeInternal, err.Error())
 	}
 	p := &Peer{
-		ID: newID(), Ticket: t, Session: s, Sub: sub, Alloc: bwe.NewAllocator(),
+		ID: newID(), Ticket: t, Role: t.Role, Session: s, Sub: sub, Alloc: bwe.NewAllocator(),
 		Producers: map[string]*santorini.Producer{}, Consumers: map[string]*jeju.Consumer{},
 		pubMids: map[string]*santorini.Producer{}, pendTracks: map[string][]remoteTrack{}, senders: map[string]*webrtc.RTPSender{},
 	}
@@ -214,7 +226,19 @@ func (r *Room) join(t signal.Ticket, s signal.Session) (*Peer, *signal.Error) {
 			return nil, e
 		}
 	}
+	r.queueJoined(p)
 	return p, nil
+}
+
+// joinState — Join + 응답용 상태(producers·peers)를 같은 방 고루틴 실행 안에서 찍는다(따로 읽으면 그 사이 입장이 겹친다).
+func (r *Room) joinState(t signal.Ticket, s signal.Session) (p *Peer, prods []signal.ProducerInfo, peers []signal.PeerInfo, e *signal.Error) {
+	e = r.call(func() (e *signal.Error) {
+		if p, e = r.join(t, s); e == nil {
+			prods, peers = r.producerInfos(p.ID), r.peerInfos(p)
+		}
+		return
+	})
+	return
 }
 
 // trickleSender — 서버 ICE 후보 → ntf trickle.
@@ -239,7 +263,7 @@ func (r *Room) publish(peerID, sdp string) (string, *signal.Error) {
 		if p == nil {
 			return signal.Errf(signal.CodeNotFound, "참가자 없음")
 		}
-		if !p.Ticket.Role.CanProduce() {
+		if !p.Role.CanProduce() {
 			return signal.Errf(signal.CodeRoleForbidden, "발행 권한 없음")
 		}
 		if p.Pub == nil {
@@ -321,7 +345,7 @@ func (r *Room) produce(peerID, mid string, kind santorini.Kind, src santorini.So
 		if p == nil {
 			return signal.Errf(signal.CodeNotFound, "참가자 없음")
 		}
-		if !p.Ticket.Role.CanProduce() {
+		if !p.Role.CanProduce() {
 			return signal.Errf(signal.CodeRoleForbidden, "발행 권한 없음")
 		}
 		if p.Pub == nil {
@@ -338,7 +362,7 @@ func (r *Room) produce(peerID, mid string, kind santorini.Kind, src santorini.So
 			}
 		}
 		pr = santorini.New(newID(), peerID, kind, src)
-		pr.SetPriority(priorityOf(src, p.Ticket.Role))
+		pr.SetPriority(priorityOf(src, p.Role))
 		r.producers[pr.ID()] = pr
 		p.Producers[pr.ID()] = pr
 		r.consumers[pr.ID()] = map[string]*jeju.Consumer{}
@@ -462,7 +486,7 @@ func (r *Room) negotiate(p *Peer) {
 	for _, c := range p.announce {
 		p.Session.Send(signal.Notification{M: signal.NConsumerCreated, D: signal.ConsumerCreated{
 			ConsumerID: c.ID(), ProducerID: c.ProducerID(), Mid: p.Sub.SenderMid(p.senders[c.ID()]),
-			Kind: c.Producer().Kind().String(),
+			Kind: c.Producer().Kind().String(), Source: string(c.Producer().Source()),
 		}})
 		r.initConsumer(p, c) // 늦은 합류자 일시정지 상태·할당기 레이어 정보(M3)
 	}

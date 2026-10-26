@@ -253,7 +253,7 @@ func TestSetLayerPublishCaps(t *testing.T) {
 // 자동 생성 방은 비면 정리, 관리 API 로 연 방은 남고(종료 시각 지나면 정리), 자동 방은 OpenRoom 이 넘겨받는다.
 func TestReapRooms(t *testing.T) {
 	m := NewManager()
-	auto := m.room(signal.Ticket{Room: "auto", Cap: 3})
+	auto, _ := m.room(signal.Ticket{Room: "auto", Cap: 3})
 	m.OpenRoom("kept", 5, time.Time{})
 	m.OpenRoom("over", 5, time.Now().Add(-time.Second))
 	m.room(signal.Ticket{Room: "adopt", Cap: 3})
