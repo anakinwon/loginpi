@@ -26,7 +26,7 @@ const SweepInterval = 10 * time.Second
 type Manager struct {
 	rooms    map[string]*Room   // loop 고루틴 소유
 	sessions map[string]sessRef // 세션 ID → 방·참가자(loop 고루틴 소유)
-	// ended — room.end 로 끝난 방 ID(loop 고루틴 소유). 이후 join 은 ROOM_CLOSED, 엔진 재시작 시 초기화.
+	// ended — room.end 로 끝난 방 ID(loop 고루틴 소유). 이후 join 은 ROOM_CLOSED, 관리 API 로 다시 열거나(OpenRoom) 엔진 재시작 시 초기화.
 	// ponytail: 프로세스 수명 동안 쌓인다(방 ID 는 서명된 입장권에서만 옴) — 많아지면 종료 시각 기준 만료
 	ended map[string]bool
 	cmd   chan func()
@@ -147,7 +147,7 @@ func (m *Manager) Join(s signal.Session, t signal.Ticket) (signal.JoinRes, *sign
 	if ice == nil {
 		ice = []signal.ICEServer{}
 	}
-	return signal.JoinRes{PeerID: p.ID, Role: t.Role, IceServers: ice, Producers: list, Peers: peers}, nil
+	return signal.JoinRes{PeerID: p.ID, Role: p.Role, IceServers: ice, Producers: list, Peers: peers}, nil
 }
 
 func decode[T any](d json.RawMessage) (T, *signal.Error) {
@@ -273,22 +273,22 @@ func (m *Manager) Request(s signal.Session, method string, d json.RawMessage) (a
 		if e := r.RequirePresenter(ref.peer); e != nil {
 			return nil, e
 		}
-		m.endRoom(r, s.ID())
-		return signal.EndSession{D: struct{}{}, Code: signal.CodeRoomClosed}, nil
+		m.endRoom(r)
+		sid := s.ID()
+		return signal.EndSession{D: struct{}{}, Code: signal.CodeRoomClosed, After: func() { shutRoom(r, sid) }}, nil
 	}
 	return nil, signal.Errf(signal.CodeNotFound, "미구현 메서드: "+method)
 }
 
-// endRoom — room.end. 종료 표시(이후 join ROOM_CLOSED) → 목록에서 빼기 → 요청자 외 전원 ntf error ROOM_CLOSED·연쇄 정리.
-// 요청자 세션은 signal 서버가 성공 응답 뒤 닫는다(EndSession).
-func (m *Manager) endRoom(r *Room, requester string) {
+// endRoom — room.end ①. 종료 표시(이후 join ROOM_CLOSED) → 목록에서 빼기. 성공 응답 전에 해 둔다(응답과 정리 사이 join 차단).
+// ② 요청자 외 전원 ROOM_CLOSED·연쇄 정리는 signal 서버가 요청자 성공 응답을 큐에 넣은 뒤 EndSession.After 로 한다.
+func (m *Manager) endRoom(r *Room) {
 	m.exec(func() {
 		m.ended[r.id] = true
 		if m.rooms[r.id] == r {
 			delete(m.rooms, r.id)
 		}
 	})
-	shutRoom(r, requester)
 }
 
 // Left — signal.Handler. 세션이 속한 방에서 Leave.

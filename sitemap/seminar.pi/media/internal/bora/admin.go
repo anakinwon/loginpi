@@ -43,12 +43,13 @@ func (m *Manager) Rooms() []RoomInfo {
 
 // OpenRoom — 방을 정원·종료 시각과 함께 연다(이후 입장권의 cap·end 는 무시, 비어도 정리하지 않음).
 // 입장권으로 먼저 자동 생성된 방이면 관리자 값으로 덮어쓴다(청중 선점으로 정원·종료 시각을 못 정하는 일 방지). 이미 관리 API 로 연 방이면 false.
-// 관리 API 는 MaxRooms 상한 밖이다(인증된 관리자 전용).
+// room.end 로 끝난 방 ID 면 종료 표시를 지운다(다시 입장 가능). 관리 API 는 MaxRooms 상한 밖이다(인증된 관리자 전용).
 func (m *Manager) OpenRoom(id string, cap int, end time.Time) bool {
 	ok := false
 	m.exec(func() {
 		r := m.rooms[id]
 		if r == nil {
+			delete(m.ended, id) // room.end 로 끝난 방 ID 를 관리자가 다시 연다
 			r = NewRoom(id, cap, end)
 			r.api, r.ice = m.api, m.ice // 없으면 첫 입장이 "엔진 API 미설정"으로 실패
 			m.rooms[id] = r

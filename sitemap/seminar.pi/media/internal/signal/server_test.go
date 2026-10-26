@@ -11,7 +11,10 @@ import (
 	"time"
 )
 
-type fakeHandler struct{ left chan string }
+type fakeHandler struct {
+	left  chan string
+	after func() // "end" 요청의 EndSession.After
+}
 
 func (f *fakeHandler) Join(s Session, t Ticket) (JoinRes, *Error) {
 	return JoinRes{PeerID: "p-" + t.Name, Role: t.Role}, nil
@@ -20,6 +23,9 @@ func (f *fakeHandler) Join(s Session, t Ticket) (JoinRes, *Error) {
 func (f *fakeHandler) Request(s Session, m string, d json.RawMessage) (any, *Error) {
 	if m == "echo" {
 		return d, nil
+	}
+	if m == "end" {
+		return EndSession{D: struct{}{}, Code: CodeRoomClosed, After: f.after}, nil
 	}
 	return nil, Errf(CodeNotFound, m)
 }
@@ -135,5 +141,48 @@ func TestSendQueueFullDoesNotBlock(t *testing.T) {
 	case <-s.done:
 	default:
 		t.Fatal("큐가 찼는데 세션이 끝나지 않음")
+	}
+}
+
+// EndSession 순서 : 성공 응답(클라이언트 수신) → After(다른 세션 정리) → ntf error ROOM_CLOSED. After 가 응답보다 먼저면 응답을 못 받은 채 기다리다 실패.
+func TestEndSessionOrder(t *testing.T) {
+	t.Setenv("MEDIA_DEV_TICKET", "1")
+	t.Setenv("NODE_ENV", "")
+	gotReply := make(chan struct{})
+	afterSaw := make(chan bool, 1)
+	h := &fakeHandler{left: make(chan string, 1), after: func() {
+		select {
+		case <-gotReply:
+			afterSaw <- true
+		case <-time.After(2 * time.Second):
+			afterSaw <- false
+		}
+	}}
+	srv := httptest.NewServer(NewServer(h, NewVerifier(nil)))
+	defer srv.Close()
+	ws, err := DialWS("ws"+strings.TrimPrefix(srv.URL, "http"), "", MaxMessage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ws.Close()
+	roundTrip(t, ws, Envelope{T: TypeReq, ID: 1, M: MJoin, D: json.RawMessage(`{"room":"r","role":"presenter","name":"a"}`)})
+	if r := roundTrip(t, ws, Envelope{T: TypeReq, ID: 2, M: "end"}); r.T != TypeRes || r.ID != 2 || r.OK == nil || !*r.OK {
+		t.Fatalf("end 응답 %+v", r)
+	}
+	close(gotReply)
+	if !<-afterSaw {
+		t.Fatal("After 가 성공 응답 전에 실행됨")
+	}
+	_ = ws.SetReadDeadline(time.Now().Add(3 * time.Second))
+	_, msg, err := ws.ReadMessage()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var n Envelope
+	if json.Unmarshal(msg, &n) != nil || n.T != TypeNtf || n.M != NError {
+		t.Fatalf("마지막 알림 %s", msg)
+	}
+	if !strings.Contains(string(n.D), string(CodeRoomClosed)) {
+		t.Errorf("ROOM_CLOSED 아님 %s", msg)
 	}
 }
