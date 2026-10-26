@@ -357,7 +357,7 @@
     "roomLink": "룸 바로가기(개최자)",
     "piBrowserOnly": "결제는 Pi Browser 에서 Pi 로그인 후 할 수 있습니다.",
     "payCancelled": "결제를 취소했습니다.",
-    "payTimeout": "결제 응답이 없습니다. 잠시 후 다시 시도하세요.",
+    "payStillWaiting": "지갑 응답을 아직 기다리는 중입니다. Pi 지갑에서 서명을 마쳤다면 잠시만 기다려 주세요.",
     "payFailed": "결제에 실패했습니다.",
     "err": {
       "SMN_FULL": "정원이 찼습니다.",

@@ -26,7 +26,8 @@ type Detail = SeminarCard & {
   isHost: boolean
 }
 
-const CALLBACK_TIMEOUT_MS = 120_000 // 지갑 서명 대기 포함 상한
+// 지갑 서명이 길어지면 오류 대신 "아직 기다리는 중" 안내만(U8) — 늦게 온 성공 앞에 오류가 번쩍이지 않게
+const STILL_WAITING_MS = 120_000
 
 const post = (path: string, body?: unknown) =>
   readApi<{ ok: true }>(
@@ -93,14 +94,16 @@ export function SeminarDetail({ id }: { id: string }) {
         <dt className="text-muted-foreground">{t('fee')}</dt>
         <dd>{fee ? t('feeValue', { amount: fee }) : t('free')}</dd>
       </dl>
-      {d.isHost && (
-        <Link href={`/s/${d.id}/join`} className={BTN}>
+      {/* 개최자는 룸 링크만 — 자기 세미나에 입장·결제 버튼을 보이지 않는다(U1) */}
+      {d.isHost ? (
+        <Link href={`/s/${d.id}/join`} className={BTN_PRIMARY}>
           {t('roomLink')}
         </Link>
+      ) : (
+        <LoginGate>
+          {() => <Action d={d} fee={fee} onChanged={() => setReload((n) => n + 1)} />}
+        </LoginGate>
       )}
-      <LoginGate>
-        {() => <Action d={d} fee={fee} onChanged={() => setReload((n) => n + 1)} />}
-      </LoginGate>
     </article>
   )
 }
@@ -120,6 +123,7 @@ function Action({
   const { isInPiBrowser } = usePiAuth()
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
+  const [waiting, setWaiting] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const settled = useRef(false)
   const joinPath = `/s/${d.id}/join`
@@ -142,6 +146,7 @@ function Action({
     if (settled.current) return
     settled.current = true
     if (timer.current) clearTimeout(timer.current)
+    setWaiting(false)
     setMsg(text)
     setBusy(false)
     onChanged() // 좌석·상태가 바뀌었을 수 있다
@@ -162,8 +167,9 @@ function Action({
     settled.current = false
     setBusy(true)
     setMsg(null)
+    setWaiting(false)
     let currentId: string | null = null
-    timer.current = setTimeout(() => fail(t('payTimeout')), CALLBACK_TIMEOUT_MS)
+    timer.current = setTimeout(() => setWaiting(true), STILL_WAITING_MS)
     try {
       window.Pi.createPayment(
         {
@@ -186,18 +192,23 @@ function Action({
             } else fail(errText(r.body))
           },
           onCancel: (paymentId) => {
-            void post('/api/payments/cancel', { paymentId: paymentId || currentId })
+            // id 없으면 서버 원장도 없다 — 호출 생략(U5)
+            const pid = paymentId || currentId
+            if (pid) void post('/api/payments/cancel', { paymentId: pid })
             fail(t('payCancelled'))
           },
           onError: (e, p) => {
             const pid = p?.identifier || currentId
             if (pid) void post('/api/payments/cancel', { paymentId: pid })
-            fail(e?.message || t('payFailed'))
+            // SDK 오류 원문은 번역되지 않은 영어 — 화면은 공통 문구, 원문은 콘솔(U4)
+            console.error('[seminar] Pi createPayment onError', e)
+            fail(t('payFailed'))
           },
         },
       )
     } catch (e) {
-      fail(e instanceof Error ? e.message : t('payFailed'))
+      console.error('[seminar] Pi createPayment', e)
+      fail(t('payFailed'))
     }
   }
 
@@ -213,6 +224,11 @@ function Action({
       </button>
       {fee && !isInPiBrowser && (
         <p className="text-muted-foreground text-xs">{t('piBrowserOnly')}</p>
+      )}
+      {busy && waiting && (
+        <p role="status" className="text-muted-foreground text-xs">
+          {t('payStillWaiting')}
+        </p>
       )}
       {msg && (
         <p role="alert" className="text-danger text-sm">

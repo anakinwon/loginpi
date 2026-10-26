@@ -357,7 +357,7 @@
     "roomLink": "Go to room (host)",
     "piBrowserOnly": "Payment is available in Pi Browser after Pi sign-in.",
     "payCancelled": "Payment canceled.",
-    "payTimeout": "No payment response. Please try again shortly.",
+    "payStillWaiting": "Still waiting for the wallet. If you already signed in Pi Wallet, please wait a moment.",
     "payFailed": "Payment failed.",
     "err": {
       "SMN_FULL": "This seminar is full.",
