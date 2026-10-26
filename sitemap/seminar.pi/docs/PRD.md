@@ -127,6 +127,10 @@
 | D-8 | 룸 ID | **룸 ID = smn_id** | 별도 매핑 불필요 |
 | D-9 | 청중 입장권 | 유료 세미나는 **참가 등록이 있어야** 발급, 무료는 클릭 시 등록 후 발급 | UI 12절 M5(입장권 = 결제 확인 후) |
 | D-10 | 결제 유형코드 | `pymnt_tp_cd = SMN_ENT`, SDK metadata = `{ type: 'SMN_ENT', smn_id }` | pi_pymnt 유형 분기 + 함수가 meta `smn_id` 로 세미나 일치 검증 |
+| D-12 | 이중 결제 인덱스 | `x_pi_pymnt_01` = **(usr_id, meta smn_id)** APPROVED SMN_ENT 부분 유일(sql/006) — `approvedTargetIndexSql` 출력(smn_id 단독)은 세미나당 동시 결제 1명이 되어 쓰지 않음 | 같은 대상 = 사람 × 세미나(fn_chk_smn_cap 사용자당 점유 1개와 같은 단위) |
+| D-13 | approve 정원 확인 위치 | `approvePayment`(원장 APPROVED → Pi approve) **뒤** `fn_chk_smn_cap` → OK 아니면 `cancelPayment` | 패키지 흐름에 원장 기록과 Pi approve 사이 끼울 자리 없음. 서명 전이라 취소 가능, 취소 거부 시 초과 1석(D-6 상한과 같은 성격) |
+| D-14 | 입장권 게이트 | uuid 방 = 세미나 존재·종료/취소 아님(404·409), 청중은 무료 또는 참가 등록(402), 정원 = max_cnt+1. uuid 아닌 실험실 방 코드는 개발 또는 `LAB_ENABLED=1` 만(R-P6) | D-8·D-9 |
+| D-15 | 홈·카드 | 홈 = S1 목록, 제작 현황은 `/progress`(헤더 링크). 카드는 정원만(남은 좌석은 상세) — 목록마다 참가 집계 조회를 피함(R-P3) | UI 설계서 5절 |
 | D-11 | 주제영역 접두사 | 신규 `smn_`(세미나) — 테이블 `smn_mst`·`smn_ptc`, 신규 표준단어 SMN·PTC·ENT·HST | DA 표준 2-1 신규 접두사 = DA 승인 필요 → 위임 승인, DA 사후 리뷰 |
 
 ## 변경 이력
@@ -138,4 +142,5 @@
 | 2026-10-24 | 화상 방식 결정 반영 — 자체 구축(엔진까지), 9절 #1·F-05 |
 | 2026-10-24 | v0.2 — 10절 화상 엔진 기준점(마스터 확정), F-05 → PRD_01 |
 | 2026-10-26 | v1.0 보정(T1 검토 반영) — 7절 DB 표기 정정(프로젝트 1개·스키마 3개, prod = `public`), 표준단어 통일(`smn_mst`·`smn_ptc`·`fn_join_smn`), 결제 검증 `PAY_INVALID`·approve 정원 확인 `fn_chk_smn_cap`(D-5·D-6), D-10 `SMN_ENT`, 1회성 재설정 기록, prod 적용 |
+| 2026-10-27 | S1·S2·S5 + 세미나·결제 API 구현에 따른 아소카 결정(마스터 위임 2026-10-26) D-12~D-15 추가(sql/006 적용 dev·stg·public) |
 | 2026-10-26 | **v1.0 확정** — 아소카 결정(마스터 위임) D-1~D-11(11절), 6절 화면 5종(UI 설계서 v1.0), 7절 세미나 모델(sql/004 smn_smnr·smn_ptcp·fn_join_smn_smnr), 9절 #2·#4 결정 |
