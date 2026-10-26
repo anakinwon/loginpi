@@ -24,9 +24,9 @@ async function piApi(
   const apiKey = process.env.PI_API_KEY
   if (!apiKey)
     return { ok: false, status: 500, body: 'PI_API_KEY 미설정', noKey: true }
-  let res: Response
+  // 본문 읽기까지 try 안 — 본문 수신 중 타임아웃·비 JSON 성공 응답도 { ok:false, status:0 } 으로(라우트 500 방지)
   try {
-    res = await fetch(`${PI_PAYMENTS_URL}/${path}`, {
+    const res = await fetch(`${PI_PAYMENTS_URL}/${path}`, {
       method,
       headers: {
         Authorization: `Key ${apiKey}`,
@@ -36,6 +36,24 @@ async function piApi(
       cache: 'no-store',
       signal: AbortSignal.timeout(PI_PAY_TIMEOUT_MS),
     })
+    const text = await res.text()
+    let j: { error?: string; payment?: PiPaymentDTO } | undefined
+    try {
+      j = JSON.parse(text)
+    } catch {
+      j = undefined
+    }
+    if (res.ok)
+      return isPayment(j)
+        ? { ok: true, payment: j }
+        : { ok: false, status: 0, body: `invalid body: ${text.slice(0, 200)}` }
+    return {
+      ok: false,
+      status: res.status,
+      body: text,
+      ...(typeof j?.error === 'string' && { error: j.error }),
+      ...(isPayment(j?.payment) && { payment: j.payment }),
+    }
   } catch (e) {
     return {
       ok: false,
@@ -43,21 +61,13 @@ async function piApi(
       body: e instanceof Error ? e.message : 'fetch',
     }
   }
-  if (res.ok) return { ok: true, payment: (await res.json()) as PiPaymentDTO }
-  const text = await res.text()
-  try {
-    const j = JSON.parse(text) as { error?: string; payment?: PiPaymentDTO }
-    return {
-      ok: false,
-      status: res.status,
-      body: text,
-      ...(j.error && { error: j.error }),
-      ...(j.payment && { payment: j.payment }),
-    }
-  } catch {
-    return { ok: false, status: res.status, body: text }
-  }
 }
+
+// 최소 형태 확인 — 흐름이 identifier·status 를 바로 읽는다
+const isPayment = (j: unknown): j is PiPaymentDTO =>
+  typeof (j as PiPaymentDTO)?.identifier === 'string' &&
+  typeof (j as PiPaymentDTO)?.status === 'object' &&
+  (j as PiPaymentDTO).status !== null
 
 const enc = encodeURIComponent
 // 조회 — 개발자 approve 전엔 지갑 변동 없음(승인 전 검증용)
