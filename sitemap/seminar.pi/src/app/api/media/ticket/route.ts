@@ -75,6 +75,15 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
     if (cap === 'watch' && Number(smn.data.ent_pi_amt) > 0 && !ptc.data)
       return NextResponse.json({ error: 'payment_required' }, { status: 402, headers: noStore })
     roomCap = smn.data.max_cnt + 1
+    // 발표자 입장 = 세미나 시작(PRD D-4 SCHEDULED → LIVE). 조건부 갱신이라 여러 번 불려도 한 번만 바뀐다
+    if (cap === 'present' && smn.data.smn_sts_cd === 'SCHEDULED') {
+      const { error: liveErr } = await db()
+        .from('smn_mst')
+        .update({ smn_sts_cd: 'LIVE', modr_id: user.id })
+        .eq('smn_id', room)
+        .eq('smn_sts_cd', 'SCHEDULED')
+      if (liveErr) return dbFail(liveErr)
+    }
   } else if (!labOpen()) {
     return NextResponse.json({ error: 'not_found' }, { status: 404, headers: noStore })
   }
