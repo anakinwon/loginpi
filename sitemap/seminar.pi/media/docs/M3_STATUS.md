@@ -81,3 +81,20 @@
 - 새 테스트 `-count=5` 반복 통과 : `TestLayerUsable`(jeju)·`TestJoinPausedProducerNotifyOrder`(bora)·`TestModuleDepsMatchOwnershipDiagram`(archtest).
 - 실패 가능성 확인(되돌림) : `layerUsable` 을 `false` 고정 → TestLayerUsable 실패, `initConsumer` 를 transport.subscribe 뒤로 미룸 → TestJoinPausedProducerNotifyOrder 실패.
 - `-race` 미실행(CGO 없음).
+
+## 6. 시그널링 v1.1 구현(2026-10-26, `../docs/SIGNAL_API.md` 3.3 정본)
+
+권한은 전부 서버가 **세션 역할**(`Peer.Role` — 입장권 role 로 시작, `peer.setRole` 로 바뀜)로 방 고루틴에서 검사한다. 발행(`transport.publish`·`produce`) 검사도 `Peer.Role` 로 바꿨다(`bora/room.go`).
+
+| 묶음 | 구현 위치 | 시험 |
+|---|---|---|
+| A 참가자 | `bora/room.go:234` joinState(join 응답 producers·peers 를 한 번의 방 고루틴 실행에서 — 별도 exec 1회 제거) · `bora/interact.go:39` peerInfos(청중에게 남의 raisedTs 0) · `:54-95` peerJoined/peerLeft 200ms 묶음(받는 사람마다 자기보다 뒤에 들어온 사람만, 입장 먼저) · `bora/lifecycle.go:197` 닫힘 연쇄 ④ 뒤 queueLeft | `bora/interact_test.go` TestPeerBatch·TestHandRecipientsAndOrder(가림), e2e |
+| B 출처 | `bora/lifecycle.go` producerInfos `source` · `bora/room.go` negotiate consumerCreated `source` | e2e(`source:"mic"`) |
+| C 상호작용 | `bora/interact.go:98` Chat(공백 제거 1~500자 → SDP_INVALID, 초당 2건 → RATE_LIMITED, 보낸 사람 제외) · `:120` sendHand(presenter·panel·본인) · `:130` SetHand(청중만, 재올림 시각 유지·알림 없음) · `:156` LowerAllHands · `:172` React(7종·1~3개·초당 2건, 300ms 창 합산·익명, 보낸 사람 포함) · `:27` rateLimit(1초 슬라이딩 창) | TestRateLimit·TestHandRecipientsAndOrder·TestLowerAll·TestReaction·TestChat, e2e |
+| D 역할 | `bora/interact.go:230` SetRole — 승격 : 역할 → 손 내림 → roleChanged → 올라간 손마다 ntf hand / 강등 : 역할 → producer 닫힘 연쇄(producerClosed) → 발행 PC 닫기 → roleChanged | TestSetRoleErrors·TestPromote·TestDemote, e2e(승격 뒤 produce 성공·강등 뒤 publish/produce ROLE_FORBIDDEN) |
+| 종료 | `bora/manager.go:285` endRoom(종료 표시 `Manager.ended` → 목록에서 빼기 → 요청자 외 ROOM_CLOSED·연쇄 정리) · `signal/session.go` EndSession · `signal/server.go:240`(요청자는 성공 응답 뒤 ntf error ROOM_CLOSED) · `manager.go` room()(종료된 방 join → ROOM_CLOSED) | e2e(전원 ROOM_CLOSED·이후 join ROOM_CLOSED) |
+
+- 의존 : 새 간선 없음(bora → signal 기존), archtest 표 수정 없이 PASS. 외부 의존 추가 없음.
+- 실행(Go windows/amd64) : `go vet ./...` 통과 · `go test -count=1 ./...` 15패키지 통과 · 시간 민감 시험 `-count=5` 통과(bora v1.1 시험 전부, `cmd/galapagos` TestV11Interactions). `-race` 미실행(CGO 없음).
+- 실패 가능성 확인(되돌림) : sendHand 받는 사람을 전원으로·peerJoined 앞선 입장자 제외를 끄면 bora 시험 4개 실패.
+- 남은 일 : 구현 자의 판단 2건 — ① 강등 시 서버가 발행 PC 도 닫는다(문서는 클라이언트 정리만 적음, 재승격 때 새 PC 로 협상) ② 관리 API `POST /admin/rooms` 로 다시 열어도 `room.end` 종료 표시는 남는다(엔진 재시작 때만 초기화 — 문서 그대로). 채팅 속도 한도는 [TBD : M5 실측].
