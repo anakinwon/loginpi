@@ -36,11 +36,18 @@ export function StreamVideo({
 }
 
 // 원격 소리 재생 — 거부되면 1초 간격 3회 재시도 후 blocked(하단 바 "소리 켜기" 노출). Jitsi AudioTrack 재시도 방식(설계서 14.5)
+// stream 이 null(오류·끊김·나가기·발행자 퇴장)이면 srcObject 를 비우고 멈춘다 — 이전 소리가 계속 나지 않게
 export function useRemoteAudio(ref: RefObject<HTMLAudioElement | null>, stream: MediaStream | null) {
   const [blocked, setBlocked] = useState(false)
   useEffect(() => {
     const el = ref.current
-    if (!el || !stream?.getAudioTracks().length) return
+    if (!el) return
+    if (!stream?.getAudioTracks().length) {
+      el.pause()
+      el.srcObject = null
+      setBlocked(false)
+      return
+    }
     el.srcObject = stream
     let tries = 0
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -67,20 +74,22 @@ export function Stage({
   role,
   state,
   local,
-  remote,
+  remoteVideo,
+  remoteAudio,
   localOn,
   remotePaused,
 }: {
   role: Role
   state: RoomState
   local: MediaStream | null
-  remote: MediaStream | null
+  remoteVideo: MediaStream | null
+  remoteAudio: MediaStream | null
   localOn: { audio: boolean; video: boolean }
   remotePaused: { audio: boolean; video: boolean }
 }) {
   const t = useTranslations('room')
   // 발표자는 내 카메라, 청중은 받은 영상
-  const main = role === 'presenter' ? local : remote
+  const main = role === 'presenter' ? local : remoteVideo
   const hasVideo = !!main?.getVideoTracks().length
   const videoOff = role === 'presenter' ? !localOn.video : remotePaused.video
   const notice =
@@ -102,7 +111,7 @@ export function Stage({
           {notice}
         </p>
       )}
-      {role === 'audience' && remote && remotePaused.audio && (
+      {role === 'audience' && remoteAudio && remotePaused.audio && (
         <span className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs">{t('micOff')}</span>
       )}
     </div>

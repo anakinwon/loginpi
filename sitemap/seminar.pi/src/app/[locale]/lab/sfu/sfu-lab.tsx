@@ -19,7 +19,7 @@ export function SfuLab({ wsUrl: envWsUrl }: { wsUrl?: string }) {
   const add = (m: string) => setLog((l) => [...l, `${new Date().toLocaleTimeString()} ${m}`].slice(-80))
   const r = useRoom({ wsUrl, onLog: add })
   const audioRef = useRef<HTMLAudioElement>(null)
-  const sound = useRemoteAudio(audioRef, r.remoteStream)
+  const sound = useRemoteAudio(audioRef, r.remoteAudio)
 
   function join() {
     if (!wsUrl) return add('엔진 주소 없음 — ws:// 또는 wss:// 로 시작하는 주소를 입력하세요')
@@ -97,7 +97,7 @@ export function SfuLab({ wsUrl: envWsUrl }: { wsUrl?: string }) {
         <div>
           <p className="text-sm">받은 영상(청중)</p>
           <div className="aspect-video w-full overflow-hidden rounded bg-black">
-            <StreamVideo stream={r.remoteStream} />
+            <StreamVideo stream={r.remoteVideo} />
           </div>
           {sound.blocked && (
             <button className={btn} onClick={() => void sound.enable()}>

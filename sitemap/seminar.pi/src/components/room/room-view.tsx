@@ -32,7 +32,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   const r = useRoom({ wsUrl })
   const audioRef = useRef<HTMLAudioElement>(null)
   const [role, setRole] = useState<Role>(canPresent ? 'presenter' : 'audience')
-  const sound = useRemoteAudio(audioRef, r.remoteStream)
+  const sound = useRemoteAudio(audioRef, r.remoteAudio)
 
   function onJoin(local: MediaStream | null) {
     // [입장] 탭 안에서 소리 요소를 먼저 재생해 자동재생 허용을 받아 둔다(설계서 14.5). iOS 실기기 확인 전 [확인중 : 마스터 실기기]
@@ -65,7 +65,8 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
             role={stageRole}
             state={r.state}
             local={r.localStream}
-            remote={r.remoteStream}
+            remoteVideo={r.remoteVideo}
+            remoteAudio={r.remoteAudio}
             localOn={r.localOn}
             remotePaused={r.remotePaused}
           />
