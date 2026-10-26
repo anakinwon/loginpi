@@ -71,7 +71,7 @@
 |---|---|---|---|
 | `transport.subscribe` | `{sdp}` (서버 offer) | M1 | 구독 PC 재협상 필요 시. 트랙이 연달아 바뀌면 **200ms 묶음** 1회 |
 | `trickle` | `{pc, candidate}` | M1 | 서버 ICE 후보(`pc` `pub`\|`sub`). 응답 없음 |
-| `consumerCreated` | `{consumerId, producerId, mid, kind, source, paused}` | M1(paused M3·`source` v1.1) | 새 producer 가 생기면 기존 참가자 전원, 입장 시 기존 producer 마다. 서버가 자동 생성(왕복 절감). **현재 `paused` 는 항상 `false`**(4절) — 일시정지 상태는 뒤따르는 `producerPaused` 로 안다. 묶음의 `consumerCreated` 들이 먼저, 그다음 `transport.subscribe` |
+| `consumerCreated` | `{consumerId, producerId, mid, kind, source, peer, paused}` | M1(paused M3·`source` v1.1·`peer` v1.1.2) | 새 producer 가 생기면 기존 참가자 전원, 입장 시 기존 producer 마다. 서버가 자동 생성(왕복 절감). **현재 `paused` 는 항상 `false`**(4절) — 일시정지 상태는 뒤따르는 `producerPaused` 로 안다. 묶음의 `consumerCreated` 들이 먼저, 그다음 `transport.subscribe` |
 | `producerClosed` | `{producerId}` | M3 | 소유자를 뺀 전원. 이 알림이 갈 때 연결 Consumer 는 **이미 닫혀 있다** → 클라이언트는 해당 트랙을 지운다 |
 | `producerPaused` | `{producerId}` | M3 | 소유자를 뺀 전원. 일시정지 중 늦게 들어온 참가자는 `consumerCreated` 직후 받는다 |
 | `producerResumed` | `{producerId}` | M3 | 소유자를 뺀 전원 |
@@ -189,7 +189,7 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 ```jsonc
 → {"t":"req","id":1,"m":"join","d":{"ticket":"eyJ..."}}
 ← {"t":"res","id":1,"ok":true,"d":{"peerId":"au_9","role":"audience","iceServers":[],"producers":[{"id":"p_7f3a","kind":"video","peer":"pr_1","source":"camera"}],"peers":[{"peerId":"pr_1","name":"발표자","role":"presenter","raisedTs":0},{"peerId":"au_9","name":"청중","role":"audience","raisedTs":0}]}}
-← {"t":"ntf","m":"consumerCreated","d":{"consumerId":"c_12","producerId":"p_7f3a","mid":"0","kind":"video","source":"camera","paused":false}}
+← {"t":"ntf","m":"consumerCreated","d":{"consumerId":"c_12","producerId":"p_7f3a","mid":"0","kind":"video","source":"camera","peer":"pe_1","paused":false}}
 ← {"t":"ntf","m":"transport.subscribe","d":{"sdp":"v=0\r\n..."}}
 → {"t":"req","id":2,"m":"transport.subscribe.answer","d":{"sdp":"v=0\r\n..."}}
 ← {"t":"res","id":2,"ok":true}
@@ -216,3 +216,4 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 | 2026-10-26 | v1.0.1 문서를 코드에 맞춤(이름·필드 변경 없음) — 10초 시한 초과는 알림 없이 종료·첫 메시지 비join 응답, 서버 `trickle` 알림 추가, 알림 순서(consumerCreated → producerPaused → transport.subscribe), `paused` 항상 false, `produce` kind·source·rids 처리, setLayer 자르기·maxTemporal 무시, `SDP_INVALID` 실제 범위, M4 알림 3종 미송신 표기 |
 | 2026-10-26 | **v1.1** — UI 설계서 13절 #1 결정(마스터 채택)으로 14.7 필수 A~D + `room.end` 추가. 요청 6(`chat.send`·`hand.set`·`hand.lowerAll`·`reaction.send`·`peer.setRole`·`room.end`)·알림 6(`peerJoined`·`peerLeft`·`chat`·`hand`·`reaction`·`roleChanged`), `join` 응답 `peers`, `ProducerInfo`·`consumerCreated` 에 `source`, 6절 `role` = 입장 시 초기값(세션 역할 정본, 13절 #9), 3.1 `trickle` `ntf` 허용(13절 #7). 기존 이름·필드 변경 없음, 신규 오류 코드 없음(`LOCKED` 는 후속 E 때) |
 | 2026-10-26 | **v1.1.1** 구현 결정 문서화(이름·필드 변경 없음, 3.3) — ① 승격·강등 역할은 같은 `sub` 재입장 때 유지(방 단위 기억, presenter 승격 불가, 방이 닫히면 소멸) ② `room.end` 순서 = 요청자 성공 응답 → 나머지 전원 `ROOM_CLOSED` → 정리 ③ 관리 API `POST /admin/rooms` 로 다시 열면 종료 표시 해제 ④ `reaction.send` 한 요청 안 중복 이모지는 1개로 셈 ⑤ 서버가 강등된 사람의 발행 PC 를 닫음 ⑥ `peerJoined` 는 받는 사람보다 뒤에 들어온 사람만, `peerLeft` 는 모르는 `peerId` 가 섞일 수 있음(무시) ⑦ 값 검사가 속도 제한보다 먼저(잘못된 요청은 한도 미사용) |
+| 2026-10-26 | v1.1.2 — `consumerCreated` 에 `peer`(발행자 peerId, `ProducerInfo.peer` 와 같은 값) 추가 : 입장 뒤 생긴 producer 의 주인을 화면이 알 수 있게(W3 검토 지적). 필드 추가 = 하위 호환 |

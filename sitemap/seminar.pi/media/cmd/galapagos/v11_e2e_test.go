@@ -205,7 +205,7 @@ func TestV11Interactions(t *testing.T) {
 	a1.request(signal.MTransportPublish, signal.SDP{SDP: offer.SDP}, &ans)
 	var pr signal.ProduceRes
 	a1.request(signal.MProduce, signal.ProduceReq{Mid: pc.GetTransceivers()[0].Mid(), Kind: "audio", Source: "mic"}, &pr)
-	a2.wait(t, signal.NConsumerCreated, has(`"source":"mic"`))
+	a2.wait(t, signal.NConsumerCreated, has(`"source":"mic","peer":"`)) // v1.1.2 : 발행자 peer 동봉
 
 	// 강등 → A1 producer 닫힘(producerClosed)·이후 발행 ROLE_FORBIDDEN
 	p.request(signal.MPeerSetRole, signal.SetRoleReq{PeerID: a1j.PeerID, Role: signal.RoleAudience}, nil)

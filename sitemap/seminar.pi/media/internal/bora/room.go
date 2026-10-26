@@ -492,7 +492,7 @@ func (r *Room) negotiate(p *Peer) {
 	for _, c := range p.announce {
 		p.Session.Send(signal.Notification{M: signal.NConsumerCreated, D: signal.ConsumerCreated{
 			ConsumerID: c.ID(), ProducerID: c.ProducerID(), Mid: p.Sub.SenderMid(p.senders[c.ID()]),
-			Kind: c.Producer().Kind().String(), Source: string(c.Producer().Source()),
+			Kind: c.Producer().Kind().String(), Source: string(c.Producer().Source()), Peer: c.Producer().PeerID(),
 		}})
 		r.initConsumer(p, c) // 늦은 합류자 일시정지 상태·할당기 레이어 정보(M3)
 	}

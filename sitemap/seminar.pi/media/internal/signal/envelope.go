@@ -144,6 +144,7 @@ type ConsumerCreated struct {
 	Mid        string `json:"mid"`
 	Kind       string `json:"kind"`
 	Source     string `json:"source"` // v1.1
+	Peer       string `json:"peer"`   // v1.1.2 — 발행자 peerId(ProducerInfo.peer 와 같은 값, 입장 뒤 생긴 producer 의 주인 식별)
 	Paused     bool   `json:"paused"`
 }
 
