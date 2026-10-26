@@ -4,15 +4,15 @@
 
 ## 1. TURN 경유 (M2 ⑨)
 
-- 자격 증명은 cafe.pi `POST /api/voice/turn-credentials` 방식을 그대로 쓴다(PRD_01 51행) — 우선순위 Cloudflare Realtime TURN → HMAC(coturn·Metered) → 공개 TURN(검증용). 영구 비밀은 서버에만, 클라이언트엔 단기 자격 증명만.
-- seminar.pi 에 같은 라우트를 두고(Next, [TBD : 담당 단계·마스터 결정]) 시험 화면이 받은 `iceServers` 를 `RTCPeerConnection` 에 넣는다.
+- 자격 증명은 cafe.pi `POST /api/voice/turn-credentials` 방식을 그대로 쓴다(PRD_01 51행) — 우선순위 Cloudflare Realtime TURN → HMAC(coturn, SHA-1) → STUN 만. **구현 : seminar.pi `POST /api/media/turn`(2026-10-26 `a786ccfd`)** — 실험실 화면 연결·실제 TURN 중계 미검증. 영구 비밀은 서버에만, 클라이언트엔 단기 자격 증명만.
+- 시험 화면이 `/api/media/turn` 에서 받은 `iceServers` 를 `RTCPeerConnection` 에 넣는다 [TBD : 실험실 화면 연결].
 - 엔진 쪽은 TURN 서버가 아니라 **ICE 후보 상대**일 뿐이다. 엔진 join 응답의 `iceServers`(`MEDIA_ICE_SERVERS`, JSON 배열 `[{urls, username?, credential?}]`)는 정적 STUN 용이고, TURN 단기 자격 증명은 화면 서버가 직접 준다. [TBD : 엔진 응답에 TURN 을 실을지 — 실으면 엔진이 HMAC 비밀을 알아야 함]
 - 강제 경유 시험 : 브라우저에서 `iceTransportPolicy: 'relay'` 로 연결해 relay 후보만으로 화면이 나오는지 본다(Galène relay 전용 시험 옵션 개념, REA_01 6.2 8).
 
 ## 2. 같은 SSRC 재전송과 SRTP 재전송 보호 창 (M2 ⑦, D-5)
 
 - 재전송은 RTX 없이 **같은 SSRC·같은 출력 순번**으로 다시 보낸다(`jeju/retransmit.go`). pion 의 SRTP 재전송 보호 창이 작으면 늦은 재전송이 재전송 공격으로 오인돼 버려질 수 있다.
-- 설정 지점 : capri `SettingEngine` — `SetSRTPReplayProtectionWindow(512)`·`SetSRTCPReplayProtectionWindow(512)`(REA_01 5.1 의 512 출발). 보호 끄기(`DisableSRTPReplayProtection`)는 보안 약화라 쓰지 않는다.
+- **창은 받는 쪽이 정한다.** capri `SetSRTPReplayProtectionWindow(512)`·`SetSRTCPReplayProtectionWindow(512)` 은 엔진이 **받는** 방향(발표자 → 엔진, 상류 재전송)에만 적용된다. 엔진 → 청중 재전송은 **청중 쪽 창**(Chrome libwebrtc 1024, pion 기본 64)이 결정하며 서버가 넓힐 수 없다(5절 하네스 실측 2026-10-26 — 창 64 봇은 T6 에서 7/10). 창이 작은 클라이언트까지 보장하려면 RTX(별도 SSRC) 도입을 판단한다 [TBD : M4 이후 — Safari·Firefox 창 크기 확인중]. 보호 끄기(`DisableSRTPReplayProtection`)는 보안 약화라 쓰지 않는다.
 - 확인 : T2 에서 청중 `getStats` 의 `nackCount` 대비 `retransmittedPacketsReceived` 가 0 이 아닌지, 서버 `metrics.Retransmits` 와 비교. [확인중 : M2 실측]
 
 ## 3. 손실·지연 시험 (`media/scripts/netem.sh`, M2 ⑩)
@@ -37,7 +37,7 @@
 | 상류 대기 NACK 상한 | 1000 | `nack/loss.go` MaxPendingNACK |
 | 피드백 주기 | 20ms | `santorini/feedback.go` FeedbackInterval |
 | 구독자 큐 | 32 | `forward/queue.go` QueueSize |
-| SRTP 보호 창 | 512 | capri(M1) |
+| SRTP 보호 창(엔진 수신 방향만) | 512 | capri(M1) — 청중 수신 창은 클라이언트가 정함(2절) |
 
 ## 5. 로컬 손실 하네스 결과(프로세스 내 모의 — 실제 네트워크 netem 아님)
 
