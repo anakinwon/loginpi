@@ -102,11 +102,13 @@ export type PeerRole = 'presenter' | 'panel' | 'audience'
 export type PeerLike = { peerId: string; name: string; role: PeerRole; raisedTs: number }
 
 // 하단 바 버튼 우선순위(설계서 14.3 표) — 앞에서부터 메인 슬롯을 채운다. 가장 좁은 폭(≤370)의 청중은 반응보다 채팅이 앞
-// (표의 "손들기·채팅"). 화질(audience 565 칸)은 M4 consumer.setLayer 와 함께라 아직 없다
-export type BarId = 'audio' | 'video' | 'screen' | 'chat' | 'people' | 'hands' | 'hand' | 'react'
+// (표의 "손들기·채팅"). 화질(M4)은 청중 맨 뒤 — 폭 > 565 에서 메인 5칸째, 그 아래는 더보기(넘친 것이 1개뿐이면 바로 노출)
+export type BarId = 'audio' | 'video' | 'screen' | 'chat' | 'people' | 'hands' | 'hand' | 'react' | 'quality'
 export function barOrder(role: PeerRole, width: number): BarId[] {
   if (role === 'audience')
-    return width > BAR.slotWidths[2] ? ['hand', 'react', 'chat', 'people'] : ['hand', 'chat', 'react', 'people']
+    return width > BAR.slotWidths[2]
+      ? ['hand', 'react', 'chat', 'people', 'quality']
+      : ['hand', 'chat', 'react', 'people', 'quality']
   return ['audio', 'video', 'chat', 'people', 'screen', role === 'presenter' ? 'hands' : 'react']
 }
 
@@ -206,4 +208,83 @@ export function groupTracks<T extends TrackLike>(tracks: T[]): { screens: T[]; g
     groups.set(tr.peerId, g)
   }
   return { screens, groups }
+}
+
+// ── M4 수신 화질(설계서 14.2)·품질 알림(14.1·6.3) ──
+
+// 렌더 높이 × 배율(DPR > 2 면 2, 그 외 1) : < 360 → 0(l), < 720 → 1(m), 그 외 2(h). 100ms 디바운스, 화면 밖 2초 이상·탭 숨김 → 0
+export const LAYER = { steps: [360, 720], debounceMs: 100, offscreenMs: 2000, top: 2 }
+export type Layer = 0 | 1 | 2
+export function layerFor(height: number, dpr: number): Layer {
+  const h = height * (dpr > 2 ? 2 : 1)
+  return h < LAYER.steps[0] ? 0 : h < LAYER.steps[1] ? 1 : 2
+}
+// offMs = 화면 밖으로 나간 뒤 경과(보이면 null). 클라이언트용 consumer.pause 가 없어 "받지 않음" 대신 최저 레이어(SIGNAL_API 3.4)
+export function wantLayer(i: { height: number; dpr: number; offMs: number | null; hidden: boolean }): Layer {
+  if (i.hidden || (i.offMs != null && i.offMs >= LAYER.offscreenMs)) return 0
+  return layerFor(i.height, i.dpr)
+}
+
+// 청중 수동 화질 상한(하단 바 '화질') — 자동 계산값을 넘지 못하게 자른다
+export type QualityCap = 'auto' | 'high' | 'medium' | 'low'
+export const QUALITY_CAPS: QualityCap[] = ['auto', 'high', 'medium', 'low']
+const CAP: Record<QualityCap, Layer> = { auto: 2, high: 2, medium: 1, low: 0 }
+export const capLayer = (want: Layer, cap: QualityCap): Layer => Math.min(want, CAP[cap]) as Layer
+
+// setLayer 송신기 — consumer 마다 100ms 디바운스, 마지막으로 보낸 값과 같으면 보내지 않는다(처음 기준 = 서버 기본 최고 레이어).
+// timers 는 시험이 바꿔 끼운다
+type Timers = { set: (fn: () => void, ms: number) => unknown; clear: (t: unknown) => void }
+const realTimers: Timers = {
+  set: (fn, ms) => setTimeout(fn, ms),
+  clear: (t) => clearTimeout(t as ReturnType<typeof setTimeout>),
+}
+export function layerSender(send: (consumerId: string, maxSpatial: Layer) => void, timers: Timers = realTimers) {
+  const sent = new Map<string, Layer>()
+  const due = new Map<string, unknown>()
+  const cancel = (id: string) => {
+    if (due.has(id)) timers.clear(due.get(id))
+    due.delete(id)
+  }
+  return {
+    update(id: string, v: Layer) {
+      cancel(id)
+      if ((sent.get(id) ?? LAYER.top) === v) return
+      const fire = () => {
+        due.delete(id)
+        sent.set(id, v)
+        send(id, v)
+      }
+      due.set(id, timers.set(fire, LAYER.debounceMs))
+    },
+    // consumer 가 사라짐
+    forget(id: string) {
+      cancel(id)
+      sent.delete(id)
+    },
+    // 세션 정리
+    reset() {
+      for (const id of [...due.keys()]) cancel(id)
+      sent.clear()
+    },
+  }
+}
+
+// ntf score 등급(SIGNAL_API 3.4) — 알림 전 기본은 excellent. 여러 Consumer 중 가장 나쁜 것을 보인다
+export type Grade = 'excellent' | 'good' | 'poor' | 'lost'
+const GRADE_RANK: Record<Grade, number> = { excellent: 0, good: 1, poor: 2, lost: 3 }
+export function worstGrade(grades: Iterable<Grade>): Grade {
+  let w: Grade = 'excellent'
+  for (const g of grades) if (GRADE_RANK[g] > GRADE_RANK[w]) w = g
+  return w
+}
+export const isBadGrade = (g: Grade) => g === 'poor' || g === 'lost'
+
+// 품질 알림 표시(설계서 14.1) — 나빠지면 즉시, 회복 뒤 hideMs 지나야 숨김(그사이 다시 나빠지면 계속 표시). okAt = 회복 시각(0 = 없음)
+export const TOAST = { hideMs: 5000 }
+export type ToastState = { shown: boolean; okAt: number }
+export function nextToast(st: ToastState, bad: boolean, now: number): ToastState {
+  if (bad) return st.shown && !st.okAt ? st : { shown: true, okAt: 0 }
+  if (!st.shown) return st
+  if (!st.okAt) return { shown: true, okAt: now }
+  return now - st.okAt >= TOAST.hideMs ? { shown: false, okAt: 0 } : st
 }

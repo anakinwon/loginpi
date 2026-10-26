@@ -2,6 +2,8 @@
 package jeju
 
 import (
+	"time"
+
 	"seminar.pi/media/internal/forward"
 	"seminar.pi/media/internal/pli"
 	"seminar.pi/media/internal/santorini"
@@ -77,6 +79,9 @@ func (c *Consumer) resume() {
 	}
 	c.paused = false
 	c.seq.resync = true
+	// 일시정지 중엔 청중 RR 이 끊기므로 RR 기준을 비운다 — 재개 직후 옛 RR 시각으로 "10초 RR 없음 = lost" 오판(전원 토스트) 방지.
+	// 새 RR 이 올 때까지 품질 판정은 보류된다(score.go tick : sinceRR < 0)
+	c.lastRR = time.Time{}
 	c.requestKeyframe(pli.NewConsumer)
 }
 

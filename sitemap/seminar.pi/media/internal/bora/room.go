@@ -4,6 +4,7 @@ package bora
 import (
 	"crypto/rand"
 	"encoding/json"
+	"math"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -437,6 +438,12 @@ func (r *Room) consume(p *Peer, pr *santorini.Producer, paused bool) *signal.Err
 	c := jeju.New(newID(), pr, track, uint32(sender.GetParameters().Encodings[0].SSRC), paused)
 	c.SetReporter(p.Sub)
 	c.SetNackStats(p.Alloc.OnNackStats) // M4 ④ NACK 비율 혼잡 판정(D-7 — REMB 가 안 와도 동작하는 경로)
+	if s := p.Session; s != nil {       // 수신 품질 등급이 바뀔 때만 그 Consumer 주인에게(SIGNAL_API 3.4, M4)
+		id := c.ID()
+		c.SetScoreSink(func(score float64, grade string) {
+			s.Send(signal.Notification{M: signal.NScore, D: signal.ScoreNtf{ConsumerID: id, Score: math.Round(score*10) / 10, Grade: grade}})
+		})
+	}
 	sink.c.Store(c)
 	if r.consumers[pr.ID()] == nil {
 		r.consumers[pr.ID()] = map[string]*jeju.Consumer{}

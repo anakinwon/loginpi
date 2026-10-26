@@ -45,10 +45,15 @@ type Consumer struct {
 	fencePend  bool          // 전환·재개 뒤 첫 송신 순번에서 SendMeta.Fence(재전송 헤더 기준이 바뀜)
 	statSent   uint32        // NACK 비율 창 입력 : 마지막 보고 뒤 보낸 패킷(M4 D-7)
 	statRtx    uint32        // 같은 창의 재전송 수
+	rrLoss     float64       // 마지막 청중 RR 손실 비율(0~1, 품질 점수 입력 M4)
+	rrJitter   time.Duration // 마지막 청중 RR 지터
+	lastRR     time.Time     // 마지막 청중 RR 수신 시각(0 = 아직 없음)
+	quality    quality       // ntf score 등급 변화 판정(score.go)
 
 	// Start 전에만 설정(Start 의 채널 닫힘이 송신 고루틴과의 순서를 보장)
-	absID     uint8                       // 구독 PC 에 협상된 abs-send-time 확장 ID(0 = 없음, D-12 M4)
-	nackStats func(sent, repeated uint32) // 할당기 OnNackStats(nil 이면 보고 안 함)
+	absID     uint8                             // 구독 PC 에 협상된 abs-send-time 확장 ID(0 = 없음, D-12 M4)
+	nackStats func(sent, repeated uint32)       // 할당기 OnNackStats(nil 이면 보고 안 함)
+	onScore   func(score float64, grade string) // 등급 변화 → ntf score(nil 이면 점수 계산 안 함, score.go)
 
 	started atomic.Bool
 	startCh chan struct{}
@@ -144,6 +149,8 @@ func (c *Consumer) run() {
 	buf := make([]byte, nack.SlotSize)
 	sr := time.NewTicker(rtcpx.SRInterval)
 	defer sr.Stop()
+	sc := time.NewTicker(ScoreInterval)
+	defer sc.Stop()
 	for {
 		select {
 		case fn := <-c.cmd:
@@ -156,6 +163,8 @@ func (c *Consumer) run() {
 		case now := <-sr.C:
 			c.sendSR(now)
 			c.flushStats()
+		case now := <-sc.C:
+			c.scoreTick(now)
 		case <-c.done:
 			return
 		}

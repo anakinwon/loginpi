@@ -387,7 +387,7 @@ Tailwind 유틸(`bg-surface`·`text-danger` 등)로 쓰려면 `@theme inline` �
 | 관찰 | 타일 `<video>` 를 IntersectionObserver + ResizeObserver(공용 1개) | LiveKit `RemoteVideoTrack.ts:375-390`, `useResizeObserver.ts:48-96` |
 | 단계 | 렌더 높이 × 배율(**DPR > 2 이면 2, 그 외 1**) : **<360 → `maxSpatial:0`(l), <720 → 1(m), 그 외 → 2(h)** | Jitsi 180/360/720 단계(`video-quality/constants.ts:26-31`, "높이 ≥ 임계값" 규칙) + LiveKit 픽셀 밀도 기본값(`RemoteVideoTrack.ts:305-321` — pixelDensity 미설정 시 DPR>2 면 2, 그 외 1). DPR 2 기기에서 한 층 덜 받아 대역폭 절약. 엔진 simulcast 3층(l·m·h)에 맞춤 |
 | 디바운스 | 100ms (SIGNAL_API `consumer.setLayer` 서버 디바운스와 별개) | 두 앱 동일 |
-| 안 보임 | 2초 이상 화면 밖 또는 `document.visibilityState='hidden'` → `consumer` 일시정지 [TBD : 엔진에 클라이언트용 consumer.pause 없음 — `setLayer` 최저 + 후속 메시지 검토] | LiveKit 3초(`VideoTrack.tsx:51`)·백그라운드 정지(`Track.ts:355-380`) |
+| 안 보임 | 2초 이상 화면 밖 또는 `document.visibilityState='hidden'` → **`setLayer` 최저(`maxSpatial:0`)** — 엔진에 클라이언트용 `consumer.pause` 가 없어 일시정지 대신(SIGNAL_API 3.4, 아소카 결정(마스터 위임 2026-10-26)). 완전 정지 메시지는 후속 검토 [TBD] | LiveKit 3초(`VideoTrack.tsx:51`)·백그라운드 정지(`Track.ts:355-380`) |
 | 송신 측(dynacast) | 엔진 `ntf publishLayers`(M4) 이미 정의 — 클라이언트는 받은 rid 만 인코딩 유지 | LiveKit dynacast, SIGNAL_API 3.2 |
 
 ### 14.3 하단 바 — 폭 기반 버튼 수 (Jitsi 표를 역할별로 재구성)
@@ -486,6 +486,9 @@ Jitsi 는 폭 임계값 표로 메인 버튼 수를 정하고 넘치는 것은 "
 | 말하기 판정 | 수치 없음 | RMS 0.04 [확인중 : 마스터 실기기] | 기기마다 보정 필요 |
 | 발표자 선택지 표시 | 관리자 판정 함수 | 화면은 `role` 문자열(ADMIN·MASTER) 힌트, 실제 권한은 입장권 API `isAdmin` | 판정 함수가 서버 전용 — 후속 : `@pi/auth/client` 에 클라이언트용 역할 판정 내보내기 [TBD] |
 | `peerJoined`·`peerLeft`(7.2) | 단건 | 200ms 묶음 배열(원소 형식 같음) | 입장 폭주 대비(R-P2), SIGNAL_API v1.1 |
+| 화면 밖 타일(14.2, M4) | consumer 일시정지 | `setLayer` 최저(0) | 클라이언트용 `consumer.pause` 없음 — 아소카 결정(마스터 위임 2026-10-26) |
+| 품질 알림(14.1·6.3, M4) | 연결 품질 아이콘 | 상단 토스트 1개(경고 아이콘 + "네트워크가 불안정합니다", `aria-live=polite`) — 내 수신 Consumer 중 **가장 나쁜 등급**이 poor·lost 면 즉시, 회복 5초 뒤 숨김 | 엔진 `ntf score` 는 Consumer 주인에게만·등급 바뀔 때만(SIGNAL_API 3.4) |
+| 청중 '화질' 칸(14.3, M4) | 폭 > 565 에서만 | 순서 맨 뒤 — 420~565 에서는 넘친 버튼이 1개뿐이라 Jitsi 규칙(더보기 1개면 바로 노출)으로 함께 보이고, ≤ 420 에서는 더보기 안. 메뉴 = 자동/높음/보통/낮음(menuitemradio), 계산 레이어를 그 값으로 자름(자동·높음 = 2·보통 = 1·낮음 = 0), 재입장해도 유지·페이지를 새로 열면 자동 | 기존 슬롯 규칙 재사용 |
 
 ## 변경 이력
 
@@ -496,3 +499,4 @@ Jitsi 는 폭 임계값 표로 메인 버튼 수를 정하고 넘치는 것은 "
 | 2026-10-26 | v0.2 — LiveKit Meet·Jitsi Meet 소스 정밀 분석(14절) : 공통 결론 6, 화질 단계 규칙, 폭 기반 하단 바, 손들기·반응·승격 흐름, 역할별 대기실·연결 테스트, 접근성, 시그널링 v1.1 통합안(필수 A~D·후속 E~G·보류 H) |
 | 2026-10-26 | v0.2 팀장 지적 9건 반영 — 화질 배율을 LiveKit 실제 동작(DPR>2 면 2, 그 외 1)으로 정정, G6 근거(Jitsi 4000ms) 14.3 추가, 7.2 를 14.7 과 일치·받는 사람 정본 명시, D-9 메시지 수 판단 시점, 역할 변경 방식 13절 #9, 앞 절 모순 6곳(반응 7종·소리 켜기·이름 표시만·0절) 정리, `LOCKED`·조인 키 명시 |
 | 2026-10-26 | **v1.0 확정** — 마스터 결정 8건(13절 #1~6·#8·#9) : v1.1 채택·채팅 저장 안 함·청중 승격 허용(바로 전환)·발표자는 관리자만·반응 7종·보라 강조색·발표자 세미나 종료(`room.end`) |
+| 2026-10-27 | M4 구현 반영 — 14.2 화면 밖 = `setLayer` 최저(consumer.pause 없음), 14.9 편차 3건(화면 밖 타일·품질 알림·청중 화질 칸). 아소카 결정(마스터 위임 2026-10-26) |

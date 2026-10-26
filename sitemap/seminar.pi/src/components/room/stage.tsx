@@ -1,34 +1,41 @@
 'use client'
 // 룸 무대(S4) — 레이아웃 6.2(발표자 고정·발표+패널·화면공유), 타일은 video-tile.tsx. 영상은 항상 muted 로 재생하고 소리는 별도 <audio>(useRemoteAudio)로만 낸다
 // → 자동재생 정책으로 소리가 막혀도 영상은 나온다(설계서 14.5)
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useState, type RefObject } from 'react'
 import { useTranslations } from 'next-intl'
-import { groupTracks, nextPin, type PinState } from './room-rules'
+import { useLayerWatch } from './layer-watch'
+import { groupTracks, nextPin, type Layer, type PinState } from './room-rules'
 import type { Peer, RemoteTrack, RoomState, SessionRole } from './use-room'
 import { VideoTile } from './video-tile'
 
 const PLAY_RETRY_MS = 1000
 const PLAY_RETRY_MAX = 3
 
+// onLayer 가 있으면 렌더 높이·가시성으로 수신 화질을 정한다(원격 영상만, layer-watch.ts)
+export type LayerFn = (consumerId: string, maxSpatial: Layer) => void
 export function StreamVideo({
   stream,
   mirror,
   className = '',
+  consumerId,
+  onLayer,
 }: {
   stream: MediaStream | null
   mirror?: boolean
   className?: string
+  consumerId?: string
+  onLayer?: LayerFn
 }) {
-  const ref = useRef<HTMLVideoElement>(null)
+  const [el, setEl] = useState<HTMLVideoElement | null>(null) // 콜백 ref — 관찰자가 요소를 받아야 한다
+  useLayerWatch(el, consumerId, onLayer)
   useEffect(() => {
-    const el = ref.current
     if (!el) return
     el.srcObject = stream
     if (stream) el.play().catch(() => {})
-  }, [stream])
+  }, [el, stream])
   return (
     <video
-      ref={ref}
+      ref={setEl}
       muted
       playsInline
       autoPlay
@@ -87,6 +94,7 @@ type Tile = {
   mirror: boolean
   screen: boolean
   presenter: boolean
+  consumerId?: string // 원격 영상만 — setLayer 대상
 }
 
 // 발행자 타일 목록 — 무대는 발행자만(청중은 인원 수·목록만, 설계서 14.1). 원격 트랙 주인은 consumerCreated.peer(room-rules ownerKey·groupTracks)
@@ -135,6 +143,7 @@ function buildTiles({
       key: `screen:${tr.producerId}`,
       name: t('tile.screen', { name: byId.get(tr.peerId)?.name ?? t('tile.presenter') }),
       video: tr.stream,
+      consumerId: tr.consumerId,
       audio: null,
       micOff: false,
       camOff: tr.paused,
@@ -149,6 +158,7 @@ function buildTiles({
       key: `cam:${pid}`,
       name: p?.name ?? t('tile.presenter'),
       video: g.cam?.stream ?? null,
+      consumerId: g.cam?.consumerId,
       audio: g.mic?.stream ?? null,
       micOff: !!g.mic?.paused,
       camOff: !!g.cam?.paused,
@@ -170,6 +180,7 @@ type StageProps = {
   local: MediaStream | null
   localScreen: MediaStream | null
   localOn: { audio: boolean; video: boolean }
+  onLayer?: LayerFn
 }
 
 // 레이아웃(설계서 6.2) — 발표자 고정(발행자 1) / 발표 + 패널(큰 무대 1 + 작은 타일 줄 : 모바일 가로 스크롤, 데스크톱 우하단) /
@@ -198,6 +209,8 @@ export function Stage(props: StageProps) {
         micOff={!!main?.micOff}
         camOff={!!main?.camOff}
         mirror={main?.mirror}
+        consumerId={main?.consumerId}
+        onLayer={props.onLayer}
       >
         {notice && (
           <p className="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center text-sm">
@@ -231,6 +244,8 @@ export function Stage(props: StageProps) {
                   micOff={x.micOff}
                   camOff={x.camOff}
                   mirror={x.mirror}
+                  consumerId={x.consumerId}
+                  onLayer={props.onLayer}
                 />
               </button>
             </li>

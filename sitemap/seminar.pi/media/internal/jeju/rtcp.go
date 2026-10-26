@@ -57,8 +57,11 @@ func (c *Consumer) curLayer() (int8, *santorini.Layer) {
 	return cur, nil
 }
 
-// onRR — RTT(우리 SR 의 LSR·DLSR 기준) → SendMeta 재전송 억제 간격(M2).
+// onRR — RTT(우리 SR 의 LSR·DLSR 기준) → SendMeta 재전송 억제 간격(M2). 손실·지터·수신 시각은 품질 점수 입력(M4, score.go).
 func (c *Consumer) onRR(r rtcp.ReceptionReport, now time.Time) {
+	c.rrLoss = float64(r.FractionLost) / 256
+	c.rrJitter = time.Duration(uint64(r.Jitter) * uint64(time.Second) / uint64(c.clock))
+	c.lastRR = now
 	if d := rtcpx.RTT(r.LastSenderReport, r.Delay, now); d > 0 {
 		c.rtt = d
 		c.meta.SetRTT(d)

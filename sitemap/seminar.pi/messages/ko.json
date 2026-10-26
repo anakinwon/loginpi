@@ -273,6 +273,14 @@
       "e5": "할 말 없음",
       "e6": "하트"
     },
+    "quality": {
+      "label": "화질",
+      "auto": "자동",
+      "high": "높음",
+      "medium": "보통",
+      "low": "낮음",
+      "unstable": "네트워크가 불안정합니다"
+    },
     "roles": {
       "presenter": "발표자",
       "panel": "패널",

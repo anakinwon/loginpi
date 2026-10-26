@@ -6,10 +6,10 @@ import { useTranslations } from 'next-intl'
 import { LoginGate } from '@/components/login-gate'
 import { Link } from '@/i18n/navigation'
 import { ConnectionBadge, useConnectionCheck } from './connection-check'
-import { ControlBar, useBarVisibility, type PanelTab } from './control-bar'
+import { ControlBar, ICON, Icon, QualityMenu, useBarVisibility, type PanelTab } from './control-bar'
 import { Prejoin } from './prejoin'
 import { Floaters, ReactionMenu } from './reactions'
-import { handKey, handNotice } from './room-rules'
+import { handKey, handNotice, isBadGrade, nextToast, TOAST, type Grade, type ToastState } from './room-rules'
 import { SidePanel } from './side-panel'
 import { Spinner, Stage, useRemoteAudio } from './stage'
 import { useRoom, type MediaKind, type Role, type SessionRole } from './use-room'
@@ -83,6 +83,30 @@ function useCanShare() {
   return ok
 }
 
+// 수신 품질 알림(설계서 14.1·6.3, ntf score) — 나쁠 때(poor·lost)만 보이고 회복 5초 뒤 숨긴다. 낭독은 polite(영역은 늘 붙여 둠)
+function QualityToast({ grade }: { grade: Grade }) {
+  const t = useTranslations('room')
+  const bad = isBadGrade(grade)
+  const [st, setSt] = useState<ToastState>({ shown: false, okAt: 0 })
+  useEffect(() => {
+    setSt((s) => nextToast(s, bad, Date.now()))
+    if (bad) return
+    // 여유 50ms — 타이머가 1ms 일찍 깨도 숨김
+    const timer = setTimeout(() => setSt((s) => nextToast(s, false, Date.now())), TOAST.hideMs + 50)
+    return () => clearTimeout(timer)
+  }, [bad])
+  return (
+    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 top-14 z-50 flex justify-center px-4">
+      {st.shown && (
+        <p className="bg-surface-raised text-warning flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
+          <Icon d={ICON.warn} small />
+          <span className="text-foreground">{t('quality.unstable')}</span>
+        </p>
+      )}
+    </div>
+  )
+}
+
 // 화면 알림 문구 키 — 오류 코드가 있으면 그 문구, 없으면 일반 실패 문구
 const ERR_NOTICE = new Set(['RATE_LIMITED', 'ROLE_FORBIDDEN', 'MEDIA_FAILED'])
 
@@ -109,6 +133,11 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   const [panel, setPanel] = useState<PanelTab | null>(null)
   const [tab, setTab] = useState<PanelTab>('chat')
   const [reactOpen, setReactOpen] = useState(false)
+  const [qualityOpen, setQualityOpen] = useState(false)
+  // 화질 메뉴는 청중 전용 — 역할이 바뀌면 열린 메뉴를 닫는다
+  useEffect(() => {
+    if (r.role && r.role !== 'audience') setQualityOpen(false)
+  }, [r.role])
   const [seenN, setSeenN] = useState(0)
   const [dismissed, setDismissed] = useState<ReadonlySet<string>>(new Set())
   const [promoHidden, setPromoHidden] = useState(false)
@@ -172,6 +201,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
     if (live) return
     setPanel(null)
     setReactOpen(false)
+    setQualityOpen(false)
     setDismissed(new Set())
     leaveRef.current?.close()
   }, [live])
@@ -228,6 +258,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
       <div aria-live="polite" className="sr-only">
         {announce}
       </div>
+      <QualityToast grade={live ? r.quality : 'excellent'} />
       {r.state === 'idle' ? (
         <Prejoin
           room={room}
@@ -316,6 +347,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                   local={r.localStream}
                   localScreen={r.localScreen}
                   localOn={r.localOn}
+                  onLayer={r.setLayer}
                 />
                 <Floaters reaction={r.reaction} />
               </div>
@@ -327,6 +359,12 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
             >
               <div className="flex justify-center">
                 <ReactionMenu open={reactOpen} onClose={() => setReactOpen(false)} onPick={r.react} />
+                <QualityMenu
+                  open={qualityOpen}
+                  cap={r.qualityCap}
+                  onClose={() => setQualityOpen(false)}
+                  onPick={r.setQualityCap}
+                />
               </div>
               <ControlBar
                 role={role}
@@ -342,6 +380,8 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                 raised={raisedCount}
                 handUp={(me?.raisedTs ?? 0) > 0}
                 reactOpen={reactOpen}
+                qualityOpen={qualityOpen}
+                qualityCap={r.qualityCap}
                 soundBlocked={sound.blocked}
                 width={width}
                 onHold={bar.onMenu}
@@ -350,6 +390,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                 onPanel={openPanel}
                 onHand={async (up) => sayErr(await r.setHand(up), 'actionFailed')}
                 onReact={() => setReactOpen((o) => !o)}
+                onQuality={() => setQualityOpen((o) => !o)}
                 onSound={() => void sound.enable()}
                 onLeave={onLeave}
               />
