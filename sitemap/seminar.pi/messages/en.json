@@ -297,5 +297,94 @@
       "end": "End seminar",
       "endConfirm": "End now"
     }
+  },
+  "list": {
+    "tabsLabel": "Seminar list view",
+    "tabs": {
+      "all": "All",
+      "hosted": "Hosted by me",
+      "joined": "Joined"
+    },
+    "empty": {
+      "all": "No upcoming seminars.",
+      "hosted": "You have not hosted any seminars.",
+      "joined": "You have not joined any seminars."
+    },
+    "loading": "Loading…",
+    "retry": "Retry",
+    "free": "Free",
+    "fee": "{amount} Pi",
+    "host": "Host {name}",
+    "capacity": "Capacity {n}",
+    "status": {
+      "SCHEDULED": "Scheduled",
+      "LIVE": "Live",
+      "ENDED": "Ended",
+      "CANCELED": "Canceled"
+    },
+    "hostNew": "Host a seminar",
+    "progress": "Progress",
+    "pager": "Pagination",
+    "prev": "Prev",
+    "next": "Next",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "loading": "Loading…",
+    "back": "Back to list",
+    "notFound": "Seminar not found.",
+    "status": {
+      "SCHEDULED": "Scheduled",
+      "LIVE": "Live",
+      "ENDED": "Ended",
+      "CANCELED": "Canceled"
+    },
+    "startAt": "Date",
+    "host": "Host",
+    "seats": "Seats left",
+    "seatsValue": "{left} / {max}",
+    "fee": "Entry fee",
+    "feeValue": "{amount} Pi",
+    "free": "Free",
+    "enter": "Enter",
+    "payEnter": "Pay with Pi and enter ({amount} Pi)",
+    "paying": "Processing payment…",
+    "joining": "Registering…",
+    "registered": "You are registered.",
+    "full": "This seminar is full.",
+    "closed": "This seminar has ended.",
+    "canceled": "This seminar was canceled.",
+    "roomLink": "Go to room (host)",
+    "piBrowserOnly": "Payment is available in Pi Browser after Pi sign-in.",
+    "payCancelled": "Payment canceled.",
+    "payTimeout": "No payment response. Please try again shortly.",
+    "payFailed": "Payment failed.",
+    "err": {
+      "SMN_FULL": "This seminar is full.",
+      "SMN_CLOSED": "This seminar has ended or was canceled.",
+      "SMN_ALREADY": "You are already registered or a payment is in progress.",
+      "SMN_FREE": "Free seminars do not take payment.",
+      "SMN_PAY_REQUIRED": "This is a paid seminar. Please pay to enter.",
+      "SMN_PAY_INVALID": "We could not verify your payment. Please contact the admin.",
+      "PAY_PI_FAILED": "Could not reach the Pi payment server. Please try again shortly.",
+      "PAY_MISMATCH": "Payment details do not match.",
+      "PAY_AMOUNT_MISMATCH": "The payment amount differs from the entry fee.",
+      "PAY_CANCELLED": "This payment was canceled.",
+      "PAY_ALREADY_PAID": "A payment is already in progress or completed.",
+      "PAY_INVALID_STATE": "This payment cannot be processed now.",
+      "PAY_PI_CANCEL_REFUSED": "The payment is already in progress and cannot be canceled. Please check again shortly."
+    }
+  },
+  "host": {
+    "title": "Host a seminar",
+    "notAdmin": "Only admins can host seminars for now.",
+    "name": "Title (1–100 chars)",
+    "startAt": "Start time",
+    "maxCnt": "Capacity (1–100)",
+    "fee": "Entry fee (Pi)",
+    "feeHint": "0 = free, up to 7 decimals",
+    "submit": "Create",
+    "submitting": "Creating…",
+    "invalid": "Check your input — title, a future time, capacity 1–100, fee 0 or more (up to 7 decimals)."
   }
 }
