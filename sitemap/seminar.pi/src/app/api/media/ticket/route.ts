@@ -39,7 +39,9 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
       { error: 'bad_request' },
       { status: 400, headers: noStore },
     )
-  const { room, cap } = parsed.data
+  // uuid 방은 소문자로 통일(S3) — 대소문자만 다른 같은 세미나가 엔진에서 다른 방이 되지 않게(실험실 방 코드는 그대로)
+  const { cap } = parsed.data
+  const room = isUuid(parsed.data.room) ? parsed.data.room.toLowerCase() : parsed.data.room
   if (cap === 'present' && !isAdmin(user))
     return NextResponse.json(
       { error: 'forbidden' },
