@@ -40,7 +40,10 @@ const (
 	botNACKTries  = 10                     // 순번당 최대 NACK 횟수 — 넘으면 포기
 	botTick       = 10 * time.Millisecond
 	botRRInterval = time.Second
-	drainWait     = 1500 * time.Millisecond // 송출 멈춘 뒤 남은 구멍 회복 대기
+	// 청중 봇 SRTP·SRTCP 재생 방지 창 — Chrome(libwebrtc pc/srtp_session.cc policy.window_size = 1024)과 같게.
+	// pion 기본 64 는 RTT 150ms 에서 첫 재전송을 잃은 뒤 오는 재전송(구멍 뒤 약 450ms ≈ 70패킷 뒤)을 재생으로 버린다(T6 포기의 원인, 5절).
+	botReplayWindow = 1024
+	drainWait       = 1500 * time.Millisecond // 송출 멈춘 뒤 남은 구멍 회복 대기
 )
 
 // shaper — 한 방향 손실·지연. loss 는 시험 중 바꿀 수 있다(T3 버스트).
@@ -185,6 +188,8 @@ func botAPI(t *testing.T, conn net.PacketConn) *webrtc.API {
 	se.SetICEUDPMux(webrtc.NewICEUDPMux(nil, conn))
 	se.SetIncludeLoopbackCandidate(true)
 	se.SetNetworkTypes([]webrtc.NetworkType{webrtc.NetworkTypeUDP4})
+	se.SetSRTPReplayProtectionWindow(botReplayWindow)
+	se.SetSRTCPReplayProtectionWindow(botReplayWindow)
 	return webrtc.NewAPI(webrtc.WithMediaEngine(m), webrtc.WithSettingEngine(se),
 		webrtc.WithInterceptorRegistry(&interceptor.Registry{}))
 }
