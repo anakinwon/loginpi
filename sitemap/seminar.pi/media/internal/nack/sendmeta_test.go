@@ -1,4 +1,4 @@
-// SendMeta 표 형식 단위 테스트 — 억제 간격 min(100ms,2RTT)·3회 상한·PLI 후 중단·출력 순번 감김·구멍 추정·미스 50ms 묶음(실행 : go test ./internal/nack)
+// SendMeta 표 형식 단위 테스트 — 억제 간격 max(min(100ms,2RTT),1.2RTT)·3회 상한·PLI 후 중단·출력 순번 감김·구멍 추정·미스 50ms 묶음(실행 : go test ./internal/nack)
 package nack
 
 import (
@@ -33,6 +33,12 @@ func TestSendMetaResolve(t *testing.T) {
 			{0, 10, 200000, true},
 			{39 * ms, 10, 0, false},
 			{40 * ms, 10, 200000, true},
+		}},
+		{"억제 하한 1.2RTT(RTT 150ms → 180ms, 앞 재전송 도착 전 재전송 금지)", 150 * ms, []uint16{10}, false, []q{
+			{0, 10, 200000, true},
+			{100 * ms, 10, 0, false}, // 예전 min(100ms,2RTT) 이면 통과하던 지점
+			{179 * ms, 10, 0, false},
+			{180 * ms, 10, 200000, true},
 		}},
 		{"출력 순번 감김 65535→0", 0, []uint16{65534, 65535, 0, 1}, false, []q{
 			{0, 65535, 200001, true},

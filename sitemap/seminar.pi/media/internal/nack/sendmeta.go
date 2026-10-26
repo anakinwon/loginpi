@@ -1,12 +1,12 @@
 // SendMeta — 하류(구독자별) 메타 링 : 출력 순번 → 원본 extSeq·레이어·송신 시각·재전송 횟수(REA_03 5.3 sequencer 개념).
-// 억제 min(100ms,2RTT)·최대 3회·PLI 후 키프레임까지 재전송 중단, 캐시 미스는 50ms 묶음 대기(상한 MaxPendingNACK)(PRD_02 D-4).
+// 억제 max(min(100ms,2RTT), 1.2RTT)·최대 3회·PLI 후 키프레임까지 재전송 중단, 캐시 미스는 50ms 묶음 대기(상한 MaxPendingNACK)(PRD_02 D-4).
 package nack
 
 import "time"
 
 const (
 	MaxRetransmits = 3                      // 출력 순번당 하류 재전송 최대 횟수(REA_03 5.3)
-	RtxSuppress    = 100 * time.Millisecond // 재요청 억제 상한 — 실제 간격 min(100ms, 2RTT)
+	RtxSuppress    = 100 * time.Millisecond // 재요청 억제 기준 — 실제 간격 max(min(100ms, 2RTT), 1.2RTT)
 	MissBatchWait  = 50 * time.Millisecond  // 캐시 미스 묶음 대기(REA_01 5.4)
 	inferSpan      = 16                     // 보낸 적 없는 출력 순번(상류 손실 구멍)을 이웃 항목에서 추정할 탐색 폭
 )
@@ -97,6 +97,10 @@ func (m *SendMeta) Resolve(out uint16, now time.Time, rtt time.Duration) (src ui
 	gap := RtxSuppress
 	if rtt > 0 && 2*rtt < gap {
 		gap = 2 * rtt
+	}
+	// RTT 가 100ms 를 넘으면 앞 재전송이 도착하기 전에 3회를 다 써 버린다(M2 하네스 T6 실측 2026-10-26) → 간격은 최소 1.2RTT
+	if floor := rtt * 6 / 5; floor > gap {
+		gap = floor
 	}
 	if e.count > 0 && now.Sub(e.lastRtx) < gap {
 		return 0, 0, false
