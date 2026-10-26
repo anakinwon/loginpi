@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { LoginGate } from '@/components/login-gate'
 import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
+import { isUuid } from '@/lib/seminar-rules'
 import { ConnectionBadge, useConnectionCheck } from './connection-check'
 import { ControlBar, ICON, Icon, QualityMenu, useBarVisibility, type PanelTab } from './control-bar'
 import { Prejoin } from './prejoin'
@@ -80,8 +81,6 @@ function Ended({ code, room, onRejoin }: { code: string; room: string; onRejoin:
 
 // 화면 알림 유지 시간 — 설계서 14.4 알림 지속 5단계 중 5s
 const NOTICE_MS = 5000
-// 세미나 방 = uuid(PRD D-8). 실험실 방 코드는 DB 종료 처리를 건너뛴다
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 // 요소 폭(px) 추적 — 하단 바 슬롯 수·라벨 판정(창이 아니라 무대 열 기준 — 사이드 패널이 열리면 좁아진다).
 // 콜백 ref(요소가 입장 뒤에 생기므로 처음 렌더의 ref 로는 못 잡는다)
@@ -291,10 +290,10 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   async function endSeminar() {
     leaveRef.current?.close()
     // DB 상태 먼저 ENDED(정본) — 엔진을 재시작해도 입장권이 다시 나가지 않게(입장권 409). 실험실 방 코드는 DB 가 없어 건너뜀.
-    // DB 갱신이 실패해도 방은 닫는다(참가자를 붙잡아 두지 않음) — 실패는 콘솔에 남긴다
-    if (UUID_RE.test(room)) {
+    // DB 갱신이 실패하면 방을 닫지 않고 알린다 — 엔진만 닫으면 재시작 뒤 입장권이 다시 나가 종료가 풀린다(2차 검토 지적). 발표자가 다시 누르면 된다
+    if (isUuid(room)) {
       const res = await piFetch(`/api/seminars/${room}/end`, { method: 'POST' }).catch(() => null)
-      if (!res?.ok) console.error('[room] 세미나 종료 DB 반영 실패', res?.status)
+      if (!res?.ok) return say('endFailed')
     }
     // 성공하면 서버가 전원(나 포함)에게 ntf error ROOM_CLOSED → 종료 화면
     sayErr(await r.end(), 'endFailed')

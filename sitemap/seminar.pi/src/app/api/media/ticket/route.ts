@@ -49,6 +49,7 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
     )
 
   let roomCap: number | undefined
+  let startLive = false
   if (isUuid(room)) {
     // 세미나·내 참가 — 서로 의존 없음 → 병렬(R-P1)
     const [smn, ptc] = await Promise.all([
@@ -75,15 +76,7 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
     if (cap === 'watch' && Number(smn.data.ent_pi_amt) > 0 && !ptc.data)
       return NextResponse.json({ error: 'payment_required' }, { status: 402, headers: noStore })
     roomCap = smn.data.max_cnt + 1
-    // 발표자 입장 = 세미나 시작(PRD D-4 SCHEDULED → LIVE). 조건부 갱신이라 여러 번 불려도 한 번만 바뀐다
-    if (cap === 'present' && smn.data.smn_sts_cd === 'SCHEDULED') {
-      const { error: liveErr } = await db()
-        .from('smn_mst')
-        .update({ smn_sts_cd: 'LIVE', modr_id: user.id })
-        .eq('smn_id', room)
-        .eq('smn_sts_cd', 'SCHEDULED')
-      if (liveErr) return dbFail(liveErr)
-    }
+    startLive = cap === 'present' && smn.data.smn_sts_cd === 'SCHEDULED'
   } else if (!labOpen()) {
     return NextResponse.json({ error: 'not_found' }, { status: 404, headers: noStore })
   }
@@ -102,5 +95,15 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
       { error: 'media_unavailable' },
       { status: 503, headers: noStore },
     )
+  // 발표자 입장 = 세미나 시작(PRD D-4 SCHEDULED → LIVE). 서명 성공 뒤에만(서명 실패 503 인데 LIVE 로 남지 않게 — 2차 검토 지적).
+  //  조건부 갱신이라 여러 번 불려도 한 번만 바뀐다
+  if (startLive) {
+    const { error: liveErr } = await db()
+      .from('smn_mst')
+      .update({ smn_sts_cd: 'LIVE', modr_id: user.id })
+      .eq('smn_id', room)
+      .eq('smn_sts_cd', 'SCHEDULED')
+    if (liveErr) return dbFail(liveErr)
+  }
   return NextResponse.json({ ticket, wsUrl: wsUrl ?? null }, { headers: noStore })
 }))

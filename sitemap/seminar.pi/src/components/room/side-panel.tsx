@@ -306,14 +306,15 @@ function PeopleTab({
         {sortPeers(peers).map((p) => {
           const hand = p.role === 'audience' && p.raisedTs > 0
           return (
-            <li key={p.peerId} className="flex min-h-11 items-center gap-2 rounded-lg px-2">
+            <li key={p.peerId} className="flex min-h-11 flex-wrap items-center gap-2 rounded-lg px-2 py-1">
               <span
                 aria-hidden
                 className="bg-surface-raised grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold uppercase"
               >
                 {[...p.name][0] ?? '?'}
               </span>
-              <span className="min-w-0 flex-1">
+              {/* 이름 최소 폭 확보 — 사회 버튼이 여러 개면 다음 줄로 내려간다(2차 QA : 버튼 3개에 이름이 0폭) */}
+              <span className="min-w-24 flex-1">
                 <span className="block truncate text-sm">
                   {p.peerId === selfId ? t('tile.self', { name: p.name }) : p.name}
                 </span>
