@@ -26,33 +26,62 @@ export function SeminarList() {
   // 개설 버튼 노출 힌트(실제 권한은 POST /api/seminars 가 서버에서 판정, PRD D-1)
   const { user } = useAppUser()
   const canHost = user?.role === 'ADMIN' || user?.role === 'MASTER'
+  // 탭 키보드(U3, WAI-ARIA 탭 패턴) — 좌우 화살표·Home·End 로 이동하며 바로 선택(선택 탭만 tabindex 0)
+  function onTabKey(e: React.KeyboardEvent) {
+    const i = TABS.indexOf(tab)
+    const n = TABS.length
+    const next =
+      e.key === 'ArrowRight' ? (i + 1) % n
+      : e.key === 'ArrowLeft' ? (i - 1 + n) % n
+      : e.key === 'Home' ? 0
+      : e.key === 'End' ? n - 1
+      : -1
+    if (next < 0) return
+    e.preventDefault()
+    setTab(TABS[next])
+    document.getElementById(`smn-tab-${TABS[next]}`)?.focus()
+  }
+
   return (
     <div className="space-y-4">
-      <div role="tablist" aria-label={t('tabsLabel')} className="flex gap-2 overflow-x-auto">
-        {TABS.map((k) => (
-          <button
-            key={k}
-            type="button"
-            role="tab"
-            aria-selected={tab === k}
-            onClick={() => setTab(k)}
-            className={`h-10 shrink-0 rounded-full px-4 text-sm ${tab === k ? 'bg-accent font-semibold text-white' : 'bg-surface'}`}
-          >
-            {t(`tabs.${k}`)}
-          </button>
-        ))}
+      <div className="flex items-center gap-2">
+        <div
+          role="tablist"
+          aria-label={t('tabsLabel')}
+          onKeyDown={onTabKey}
+          className="flex gap-2 overflow-x-auto"
+        >
+          {TABS.map((k) => (
+            <button
+              key={k}
+              id={`smn-tab-${k}`}
+              type="button"
+              role="tab"
+              aria-selected={tab === k}
+              aria-controls="smn-tabpanel"
+              tabIndex={tab === k ? 0 : -1}
+              onClick={() => setTab(k)}
+              className={`h-10 shrink-0 rounded-full px-4 text-sm ${tab === k ? 'bg-accent font-semibold text-white' : 'bg-surface'}`}
+            >
+              {t(`tabs.${k}`)}
+            </button>
+          ))}
+        </div>
+        {/* 탭 목록 밖 — tablist 안에는 tab 만 둔다 */}
         {canHost && (
           <Link href="/host/new" className={`${BTN} ml-auto shrink-0`}>
             {t('hostNew')}
           </Link>
         )}
       </div>
-      {/* key = 탭 — 탭 전환 시 쪽·결과 초기화 */}
-      {tab === 'all' ? (
-        <TabList key={tab} tab={tab} />
-      ) : (
-        <LoginGate>{() => <TabList key={tab} tab={tab} />}</LoginGate>
-      )}
+      <div id="smn-tabpanel" role="tabpanel" aria-labelledby={`smn-tab-${tab}`} tabIndex={0}>
+        {/* key = 탭 — 탭 전환 시 쪽·결과 초기화 */}
+        {tab === 'all' ? (
+          <TabList key={tab} tab={tab} />
+        ) : (
+          <LoginGate>{() => <TabList key={tab} tab={tab} />}</LoginGate>
+        )}
+      </div>
     </div>
   )
 }
