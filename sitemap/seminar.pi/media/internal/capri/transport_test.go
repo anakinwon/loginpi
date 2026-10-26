@@ -2,6 +2,7 @@
 package capri
 
 import (
+	"net"
 	"strings"
 	"testing"
 
@@ -95,5 +96,61 @@ func TestAbsSendTimeNegotiated(t *testing.T) {
 	}
 	if id := AbsSendTimeID(s); id == 0 {
 		t.Fatal("협상된 abs-send-time ID 를 못 읽음")
+	}
+}
+
+// 공인 IP 설정 시 공인 IP host 후보를 '추가'하고 LAN(여기선 루프백) host 후보도 남긴다 — 같은 공유기 안 단말이 헤어핀 없이 붙는다.
+func TestPublicIPAppendsKeepsLocalHost(t *testing.T) {
+	const pub = "203.0.113.7" // 문서용 주소(RFC 5737) — 실제 인터페이스와 겹치지 않는다
+	l, err := net.ListenUDP("udp", &net.UDPAddr{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	port := l.LocalAddr().(*net.UDPAddr).Port
+	l.Close()
+	api, err := NewAPI(Config{UDPPort: port, PublicIP: pub, Loopback: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc, err := api.NewPeerConnection(webrtc.Configuration{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer pc.Close()
+	if _, err = pc.AddTransceiverFromKind(webrtc.RTPCodecTypeVideo, webrtc.RTPTransceiverInit{Direction: webrtc.RTPTransceiverDirectionRecvonly}); err != nil {
+		t.Fatal(err)
+	}
+	offer, err := pc.CreateOffer(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	done := webrtc.GatheringCompletePromise(pc)
+	if err = pc.SetLocalDescription(offer); err != nil {
+		t.Fatal(err)
+	}
+	<-done
+	var hasPub, hasLocal bool
+	for _, line := range strings.Split(pc.LocalDescription().SDP, "\n") {
+		if !strings.HasPrefix(line, "a=candidate:") || !strings.Contains(line, "typ host") {
+			continue
+		}
+		f := strings.Fields(line) // a=candidate:<foundation> <comp> <proto> <prio> <ip> <port> typ host
+		if len(f) < 6 {
+			continue
+		}
+		if f[4] == pub {
+			hasPub = true
+		} else if ip := net.ParseIP(f[4]); ip != nil && ip.To4() != nil {
+			hasLocal = true
+		}
+	}
+	if !hasPub || !hasLocal {
+		t.Fatalf("host 후보 공인=%v 로컬=%v — 둘 다 있어야 함\n%s", hasPub, hasLocal, pc.LocalDescription().SDP)
+	}
+}
+
+func TestPublicIPInvalidRejected(t *testing.T) {
+	if _, err := NewAPI(Config{PublicIP: "not-an-ip"}); err == nil {
+		t.Fatal("잘못된 MEDIA_PUBLIC_IP 를 받아들임")
 	}
 }

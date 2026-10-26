@@ -3,6 +3,7 @@
 package capri
 
 import (
+	"fmt"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -59,6 +60,10 @@ func NewAPI(cfg Config) (*webrtc.API, error) {
 		return nil, err
 	}
 	const srtpReplayWindow = 512
+	// 잘못된 값은 Gather 때가 아니라 기동 때(소켓을 열기 전) 막는다
+	if cfg.PublicIP != "" && net.ParseIP(cfg.PublicIP) == nil {
+		return nil, fmt.Errorf("MEDIA_PUBLIC_IP 형식 오류: %q", cfg.PublicIP)
+	}
 	se := webrtc.SettingEngine{}
 	if cfg.UDPPort > 0 {
 		conn, err := net.ListenUDP("udp", &net.UDPAddr{Port: cfg.UDPPort})
@@ -68,8 +73,16 @@ func NewAPI(cfg Config) (*webrtc.API, error) {
 		se.SetICEUDPMux(webrtc.NewICEUDPMux(nil, conn))
 	}
 	if cfg.PublicIP != "" {
-		// ponytail: 구식(deprecated) API 지만 1:1 NAT 한 줄로 충분 — 규칙이 더 필요해지면 SetICEAddressRewriteRules 로
-		se.SetNAT1To1IPs([]string{cfg.PublicIP}, webrtc.ICECandidateTypeHost)
+		// 공인 IP 를 host 후보로 '추가'(Append) — 구 SetNAT1To1IPs 는 사설 후보를 공인 IP 로 '바꿔'(Replace)
+		// 같은 공유기 안 단말(예 : 집 PC)이 헤어핀 NAT 에 의존하다 ICE_FAILED 로 끊겼다(2026-10-27 실기기).
+		// LAN 후보를 남기면 집 안 단말은 직접, 외부 단말은 공인 IP 로 붙는다. 부작용 : 가상 어댑터 주소도 SDP 에 노출된다.
+		if err := se.SetICEAddressRewriteRules(webrtc.ICEAddressRewriteRule{
+			External:        []string{cfg.PublicIP},
+			AsCandidateType: webrtc.ICECandidateTypeHost,
+			Mode:            webrtc.ICEAddressRewriteAppend,
+		}); err != nil {
+			return nil, err
+		}
 	}
 	se.SetIncludeLoopbackCandidate(cfg.Loopback)
 	// D-5 : RTX 없이 같은 SSRC 재전송 — 늦게 온 재전송이 SRTP 재생 방지 창에 걸리지 않게 넓힌다 [TBD : M2 실측 — 창 크기]

@@ -44,7 +44,7 @@ func main() {
 		log.Fatalf("MEDIA_ALLOWED_ORIGINS 필수(쉼표 구분 Origin 목록, 개발용은 MEDIA_DEV_TICKET=1)")
 	}
 
-	cfg := capri.Config{UDPPort: defaultUDPPort, PublicIP: os.Getenv("MEDIA_PUBLIC_IP")}
+	cfg := capri.Config{UDPPort: defaultUDPPort, PublicIP: strings.TrimSpace(os.Getenv("MEDIA_PUBLIC_IP"))}
 	if v := os.Getenv("MEDIA_UDP_PORT"); v != "" {
 		p, err := strconv.Atoi(v)
 		if err != nil {
