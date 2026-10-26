@@ -4,17 +4,17 @@
 // v1.1(3.3) : 참가자(peers)·출처(source)·채팅·손들기·반응·역할 변경(세션 역할이 정본)·세미나 종료
 import { useEffect, useRef, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
-import { batchReaction, REACT, type PeerLike, type PeerRole } from './room-rules'
+import { batchReaction, ownerKey, REACT, type PeerLike, type PeerRole } from './room-rules'
 
 export type Role = 'presenter' | 'audience' // 입장권으로 요청하는 역할(panel 은 승격으로만, SIGNAL_API 6절)
 export type SessionRole = PeerRole
 export type MediaKind = 'audio' | 'video'
 export type Source = 'camera' | 'screen' | 'mic'
 export type Peer = PeerLike
-// 받은 producer 하나 — peerId 는 모르면 null(아래 Consumer 주석), stream 은 그 트랙 하나만 담은 화면용 스트림(트랙이 같으면 같은 객체)
+// 받은 producer 하나 — peerId = 주인 키(ownerKey : consumerCreated.peer, 비면 producer 별 대체 키), stream 은 그 트랙 하나만 담은 화면용 스트림(트랙이 같으면 같은 객체)
 export type RemoteTrack = {
   producerId: string
-  peerId: string | null
+  peerId: string
   kind: MediaKind
   source: Source
   paused: boolean
@@ -41,8 +41,7 @@ type Env = {
   e?: { code: string; msg: string }
 }
 type Trickle = { pc: 'pub' | 'sub'; candidate: RTCIceCandidateInit }
-// [계약 공백] consumerCreated 에는 발행자 peerId 가 없다(SIGNAL_API 3.2) — 입장 때 받은 producers[].peer 로만 안다.
-// 엔진이 필드를 더하면 바로 쓰도록 peer·peerId 를 선택 필드로 읽는다(보고 사항)
+// peer = 발행자 peerId(SIGNAL_API v1.1.2 — envelope.go ConsumerCreated.Peer). 구 엔진이면 비어 올 수 있어 선택 필드
 type Consumer = {
   consumerId: string
   producerId: string
@@ -51,7 +50,6 @@ type Consumer = {
   source?: Source
   paused?: boolean
   peer?: string
-  peerId?: string
 }
 type JoinRes = {
   peerId: string
@@ -122,7 +120,6 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   const tracksRef = useRef(new Map<string, MediaStreamTrack>())
   const consumersRef = useRef(new Map<string, Consumer>())
   const pausedRef = useRef(new Set<string>())
-  const producerPeer = useRef(new Map<string, string>()) // producerId → 발행자 peerId(입장 응답 producers)
   const streamCache = useRef(new Map<string, { track: MediaStreamTrack; stream: MediaStream }>())
   // 내 producer·송신기 — 출처별(mic·camera·screen)
   const producersRef = useRef<Partial<Record<Source, string>>>({})
@@ -235,7 +232,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       }
       list.push({
         producerId: c.producerId,
-        peerId: c.peer ?? c.peerId ?? producerPeer.current.get(c.producerId) ?? null,
+        peerId: ownerKey(c.peer, c.producerId),
         kind: c.kind,
         source: c.source ?? (c.kind === 'audio' ? 'mic' : 'camera'),
         paused: pausedRef.current.has(c.producerId),
@@ -314,7 +311,6 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       if (c) tracksRef.current.delete(c.mid)
       consumersRef.current.delete(id)
       pausedRef.current.delete(id)
-      producerPeer.current.delete(id)
       sync()
     } else if (e.m === 'transport.subscribe') {
       // 서버 offer → answer(구독 PC 재협상). 직렬 큐 — 앞 협상의 answer 송신이 끝난 뒤 다음 offer 를 적용한다
@@ -423,7 +419,6 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       setRole(res.role ?? ticketRole)
       for (const p of res.peers ?? []) peersRef.current.set(p.peerId, p)
       commitPeers()
-      for (const pr of res.producers) producerPeer.current.set(pr.id, pr.peer)
       log(`입장 peer=${res.peerId} 참가자 ${res.peers?.length ?? '?'}명 기존 발행 ${res.producers.length}개`)
       // 구독 PC 는 모든 참가자에게 서버 offer 로 생긴다
       const sub = newPC('sub', ice, my)
@@ -721,7 +716,6 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     tracksRef.current.clear()
     consumersRef.current.clear()
     pausedRef.current.clear()
-    producerPeer.current.clear()
     streamCache.current.clear()
     producersRef.current = {}
     sendersRef.current = {}

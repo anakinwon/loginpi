@@ -185,3 +185,25 @@ export function nextPin(st: PinState, keys: string[], screenKeys: string[]): Pin
   }
   return seen.length === st.seen.length ? st : { ...st, seen }
 }
+
+// 원격 트랙 주인(SIGNAL_API v1.1.2) — consumerCreated.peer(발행자 peerId)가 정본. 비어 있으면(구 엔진) producer 마다 따로 묶어
+// 남의 카메라끼리 한 타일로 합쳐지지 않게 한다(추측 금지 — 주인 모르는 트랙은 각자 이름 없는 "발표자" 타일)
+export const ownerKey = (peer: string | undefined, producerId: string) => peer || `?${producerId}`
+
+// 무대 묶음 — 화면공유는 각자 타일, 카메라·마이크는 주인별 1타일(같은 주인의 같은 종류가 또 오면 마지막 것)
+export type TrackLike = { peerId: string; kind: 'audio' | 'video'; source: string }
+export function groupTracks<T extends TrackLike>(tracks: T[]): { screens: T[]; groups: Map<string, { cam?: T; mic?: T }> } {
+  const screens: T[] = []
+  const groups = new Map<string, { cam?: T; mic?: T }>()
+  for (const tr of tracks) {
+    if (tr.source === 'screen') {
+      screens.push(tr)
+      continue
+    }
+    const g = groups.get(tr.peerId) ?? {}
+    if (tr.kind === 'audio') g.mic = tr
+    else g.cam = tr
+    groups.set(tr.peerId, g)
+  }
+  return { screens, groups }
+}

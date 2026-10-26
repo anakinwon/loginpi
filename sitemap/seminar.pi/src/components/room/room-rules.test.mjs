@@ -6,11 +6,13 @@ import {
   batchReaction,
   enqueueReactions,
   gradeNet,
+  groupTracks,
   handKey,
   handNotice,
   mainSlots,
   nextPin,
   nextSpeaking,
+  ownerKey,
   readStats,
   sortPeers,
   splitSlots,
@@ -161,4 +163,29 @@ test('화면공유 자동 고정 1회 → 끝나면 이전 고정 복원, 수동
   assert.deepEqual(st, { pin: 'cam:x', prev: null, seen: [] })
   // 다시 공유하면(새 키) 또 1회 자동 고정
   assert.equal(nextPin(st, ['cam:x', 'screen:2'], ['screen:2']).pin, 'screen:2')
+})
+
+test('트랙 주인 — consumerCreated.peer 정본, 비면 producer 별 키(합치지 않음)', () => {
+  assert.equal(ownerKey('pe_1', 'p_1'), 'pe_1')
+  assert.equal(ownerKey(undefined, 'p_1'), '?p_1')
+  assert.equal(ownerKey('', 'p_2'), '?p_2')
+})
+
+test('무대 묶음 — 주인별 카메라·마이크 1타일, 주인 모르는 카메라 2개도 둘 다 남는다, 화면공유는 따로', () => {
+  const T = (producerId, peer, kind, source) => ({ producerId, peerId: ownerKey(peer, producerId), kind, source })
+  const { screens, groups } = groupTracks([
+    T('v1', 'a', 'video', 'camera'),
+    T('m1', 'a', 'audio', 'mic'),
+    T('v2', 'b', 'video', 'camera'),
+    T('s1', 'a', 'video', 'screen'),
+    T('vx', '', 'video', 'camera'),
+    T('vy', undefined, 'video', 'camera'),
+  ])
+  assert.deepEqual(
+    screens.map((x) => x.producerId),
+    ['s1'],
+  )
+  assert.deepEqual([...groups.keys()], ['a', 'b', '?vx', '?vy'])
+  assert.deepEqual([groups.get('a').cam.producerId, groups.get('a').mic.producerId], ['v1', 'm1'])
+  assert.equal(groups.get('?vy').cam.producerId, 'vy')
 })
