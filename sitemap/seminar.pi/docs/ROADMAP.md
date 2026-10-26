@@ -31,9 +31,9 @@
 | M0 실기기 관문 | — | 최소 앱 + `/lab/camera`(R-P6 가드), 기기 2대 직접 연결 | iOS·Android Pi Browser 영상 송수신·자동재생 | **Android 통과(2026-10-25)** — Android 2대 로그인·화면 연결 성공(마스터). **iOS 미시험** — M1 완료 판정 전 iOS 1대 이상 시험 필수 |
 | M1 최소 SFU | Galène | Go 설치 · `media/` 모듈 · WebSocket 시그널링 · 1→2 전달 | LAN·LTE 영상 표시 | **LAN 통과(2026-10-25)** — Pi Browser 발표자 1 → 청중 2 영상 성공(마스터, 같은 와이파이·PC 엔진+cloudflared 터널). **LTE 대기**(VM C-5 필요). 구현 M1~M5 병합 `028c06b7`(단위시험 통과, M2~M5 실측 대기) |
 | M2 안정화 | Galène | 패킷 캐시·NACK · PLI 조절 · TURN · `tc netem` | 3% 손실 회복 | **로컬 하네스 통과(2026-10-26)** — 프로세스 내 손실 모의 T2·T3·T6·T7 각 5회 20/20(`media/docs/M2_TURN_NETEM.md` 5절), 재전송 억제 하한 1.2RTT 수정, TURN 자격 증명 API(`a786ccfd`, 화면 연결 전). **실네트워크 대기**(LTE·netem·실기기) |
-| M3 구조 다듬기 | mediasoup | Router·Transport·Producer·Consumer 재구성 · API 문서 · 단위 테스트 | 회귀 0 | **진행(2026-10-26)** — ①②③⑤ 구현·④⑥⑦ 부분(`media/docs/M3_STATUS.md`), 의존 관문 시험 **PASS**(마스터 11간선 승인 2026-10-26), SIGNAL_API 코드 정합 9건. 동작 변경(④⑥)은 M2 실기기 뒤 |
-| M4 품질 맞추기 | LiveKit | simulcast · 대역폭 추정 · 청중 30 · 나란히 측정 | PRD_01 4절 목표 | 대기 |
-| M5 서비스화 | — | 입장권=Pi 결제 · 방 관리 · 모니터링 · 녹화 | PRD F-04·05·07 · 실기기 결제·입장 | 대기 |
+| M3 구조 다듬기 | mediasoup | Router·Transport·Producer·Consumer 재구성 · API 문서 · 단위 테스트 | 회귀 0 | **진행(2026-10-26)** — ①②③⑤ 구현·④⑥⑦ 부분(`media/docs/M3_STATUS.md`), 의존 관문 시험 **PASS**(마스터 11간선 승인 2026-10-26), SIGNAL_API 코드 정합 9건. 동작 변경(④⑥)은 M2 실기기 뒤. SIGNAL_API v1.2(사회·레이아웃·발언자, `8dbabb3b`) |
+| M4 품질 맞추기 | LiveKit | simulcast · 대역폭 추정 · 청중 30 · 나란히 측정 | PRD_01 4절 목표 | **진행(2026-10-27)** — 연결 품질 알림(`ntf score`)·타일 크기별 화질(setLayer)·청중 화질 상한 배포(`515446e3`). 청중 30·나란히 측정 대기 |
+| M5 서비스화 | — | 입장권=Pi 결제 · 방 관리 · 모니터링 · 녹화 | PRD F-04·05·07 · 실기기 결제·입장 | **진행(2026-10-27)** — 목록·상세·개최·Pi 결제 입장·입장권 등록 확인·상태 전이(LIVE·ENDED) 배포(`515446e3`~`e04839d2`), 브라우저 QA 2차 7/7. **실기기 결제·입장 대기**, 녹화·모니터링 대기 |
 
 ### M0 할 일
 

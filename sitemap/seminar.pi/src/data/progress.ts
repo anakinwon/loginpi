@@ -45,30 +45,30 @@ export const FEATURES: Feature[] = [
         note: 'LAN ✓ · LTE …',
       },
       { id: 'recovery', status: 'doing', stage: 'M2', ref: ['Galène'], note: 'local ✓ · LTE …' },
-      { id: 'structure', status: 'doing', stage: 'M3', ref: ['mediasoup'], note: 'gate ✓ · v1.1 ✓' },
-      { id: 'autoQuality', status: 'todo', stage: 'M4', ref: ['LiveKit'] },
-      { id: 'roomService', status: 'todo', stage: 'M5', ref: ['Galène', 'LiveKit'] },
+      { id: 'structure', status: 'doing', stage: 'M3', ref: ['mediasoup'], note: 'gate ✓ · v1.2 ✓' },
+      { id: 'autoQuality', status: 'doing', stage: 'M4', ref: ['LiveKit'], note: 'score·layer ✓ · 30 …' },
+      { id: 'roomService', status: 'doing', stage: 'M5', ref: ['Galène', 'LiveKit'], note: 'ticket·status ✓ · device …' },
     ],
   },
   {
     id: 'F02',
     prio: 'P0',
-    steps: [{ id: 'createForm', status: 'todo' }],
+    steps: [{ id: 'createForm', status: 'doing', note: 'QA ✓ · device …' }],
   },
   {
     id: 'F03',
     prio: 'P0',
     steps: [
-      { id: 'list', status: 'todo' },
-      { id: 'detail', status: 'todo' },
+      { id: 'list', status: 'doing', note: 'QA ✓ · device …' },
+      { id: 'detail', status: 'doing', note: 'QA ✓ · device …' },
     ],
   },
   {
     id: 'F04',
     prio: 'P0',
     steps: [
-      { id: 'payRequest', status: 'todo' },
-      { id: 'payVerify', status: 'todo' },
+      { id: 'payRequest', status: 'doing', note: 'API ✓ · device …' },
+      { id: 'payVerify', status: 'doing', note: 'API ✓ · device …' },
     ],
   },
   {
