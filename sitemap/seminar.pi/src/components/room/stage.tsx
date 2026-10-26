@@ -70,6 +70,11 @@ export function useRemoteAudio(ref: RefObject<HTMLAudioElement | null>, stream: 
   return { blocked, enable }
 }
 
+// 진행 표시 — reduced-motion 이면 globals.css 가 회전을 멈춘다
+export function Spinner() {
+  return <span aria-hidden className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+}
+
 export function Stage({
   role,
   state,

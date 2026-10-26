@@ -6,7 +6,8 @@ import { piFetch } from '@pi/auth/client'
 
 export type Role = 'presenter' | 'audience'
 export type MediaKind = 'audio' | 'video'
-export type RoomState = 'idle' | 'ticket' | 'connecting' | 'joined' | 'closed' | 'error'
+// reconnecting = 입장 뒤 발행·구독 PC 중 하나가 disconnected(ICE 가 스스로 복구 중). failed 가 되면 error(ICE_FAILED)
+export type RoomState = 'idle' | 'ticket' | 'connecting' | 'joined' | 'reconnecting' | 'closed' | 'error'
 type Env = { t: 'req' | 'res' | 'ntf'; id?: number; m?: string; ok?: boolean; d?: unknown; e?: { code: string; msg: string } }
 type Trickle = { pc: 'pub' | 'sub'; candidate: RTCIceCandidateInit }
 type Consumer = { consumerId: string; producerId: string; kind: MediaKind; mid: string; paused?: boolean }
@@ -55,6 +56,8 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   const nextId = useRef(1)
   // 구독 PC 재협상 직렬 큐 — 서버 offer 가 연달아 와도 setRemoteDescription·answer 가 겹치지 않게 차례로 처리
   const subChain = useRef<Promise<void>>(Promise.resolve())
+  // 지금 disconnected 인 PC 종류 — 둘 다 회복돼야 joined 로 돌아간다
+  const downRef = useRef(new Set<'pub' | 'sub'>())
   // 세션 순번 — leave 때마다 증가. 늦게 끝난 이전 세션의 await·이벤트가 새 세션 상태를 덮지 않게 비교한다
   const seqRef = useRef(0)
   // 구독 대응표 — mid→트랙(ontrack), producerId→consumer(consumerCreated), 일시정지 producerId 집합(알림 도착 순서 무관)
@@ -140,8 +143,15 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       if (ev.candidate) send({ t: 'ntf', m: 'trickle', d: { pc: kind, candidate: ev.candidate.toJSON() } })
     }
     pc.onconnectionstatechange = () => {
-      log(`${kind === 'pub' ? '발행' : '구독'} PC ${pc.connectionState}`)
-      if (pc.connectionState === 'failed' && seqRef.current === my) fail('ICE_FAILED')
+      const st = pc.connectionState
+      log(`${kind === 'pub' ? '발행' : '구독'} PC ${st}`)
+      if (seqRef.current !== my) return
+      if (st === 'failed') return fail('ICE_FAILED')
+      if (st === 'disconnected') downRef.current.add(kind)
+      else if (st === 'connected') downRef.current.delete(kind)
+      // 입장 뒤에만 joined ↔ reconnecting 을 오간다(입장 중·오류·끊김 상태는 건드리지 않음)
+      const next = downRef.current.size ? 'reconnecting' : 'joined'
+      setState((s) => (s === 'joined' || s === 'reconnecting' ? next : s))
     }
     return pc
   }
@@ -329,6 +339,8 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   function closePublish() {
     pubRef.current?.close()
     pubRef.current = null
+    downRef.current.delete('pub')
+    if (!downRef.current.size) setState((s) => (s === 'reconnecting' ? 'joined' : s))
     iceWait.current.pub = []
     producersRef.current = {}
     setLocalOn({ audio: false, video: false })
@@ -386,6 +398,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     pausedRef.current.clear()
     producersRef.current = {}
     subChain.current = Promise.resolve()
+    downRef.current.clear()
     setRemoteVideo(null)
     setRemoteAudio(null)
     setRemotePaused({ audio: false, video: false })

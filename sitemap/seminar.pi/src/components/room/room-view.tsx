@@ -4,9 +4,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { LoginGate } from '@/components/login-gate'
+import { Link } from '@/i18n/navigation'
 import { ControlBar } from './control-bar'
 import { Prejoin } from './prejoin'
-import { Stage, useRemoteAudio } from './stage'
+import { Spinner, Stage, useRemoteAudio } from './stage'
 import { useRoom, type MediaKind, type Role } from './use-room'
 
 export function RoomView({ room, wsUrl }: { room: string; wsUrl?: string }) {
@@ -24,6 +25,33 @@ export function RoomView({ room, wsUrl }: { room: string; wsUrl?: string }) {
         />
       )}
     </LoginGate>
+  )
+}
+
+// 오류 코드별 다음 행동(설계서 7.3) — 정원·종료 = 홈으로(상세 S2 는 M5 전이라 홈), 중복 세션 = 안내만, 그 밖 = 다시 입장(대기실 → 입장권 재발급)
+const HOME_CODES = new Set(['ROOM_FULL', 'ROOM_CLOSED'])
+const INFO_CODES = new Set(['DUPLICATE_SESSION'])
+
+// 끊김·오류 전체 화면(설계서 6.3) — 무대·하단 바를 덮는다
+function Ended({ code, onRejoin }: { code: string; onRejoin: () => void }) {
+  const t = useTranslations('room')
+  const key = `err.${code}`
+  const btn = 'bg-accent inline-grid h-11 place-items-center rounded-full px-5 font-semibold text-white'
+  return (
+    <section role="alert" className="bg-background fixed inset-0 z-40 grid place-items-center p-4">
+      <div className="bg-surface w-full max-w-md space-y-4 rounded-xl p-6 text-center">
+        <p>{t.has(key) ? t(key) : t('err.generic')}</p>
+        {HOME_CODES.has(code) ? (
+          <Link href="/" className={btn}>
+            {t('home')}
+          </Link>
+        ) : INFO_CODES.has(code) ? null : (
+          <button type="button" onClick={onRejoin} className={btn}>
+            {t('rejoin')}
+          </button>
+        )}
+      </div>
+    </section>
   )
 }
 
@@ -66,7 +94,6 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
 
   const ended = r.state === 'error' || r.state === 'closed'
   const stageRole: Role = r.forbidden ? 'audience' : role
-  const errKey = `err.${r.error ?? 'CLOSED'}`
   return (
     <div className="space-y-3">
       <audio ref={audioRef} autoPlay />
@@ -79,14 +106,18 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
       {r.state === 'idle' ? (
         <Prejoin room={room} name={name} canPresent={canPresent} role={role} onRole={setRole} onJoin={onJoin} />
       ) : ended ? (
-        <section className="bg-surface mx-auto max-w-md space-y-3 rounded-xl p-5 text-center" role="alert">
-          <p>{t.has(errKey) ? t(errKey) : t('err.generic')}</p>
-          <button type="button" onClick={r.leave} className="bg-accent h-11 rounded-full px-5 font-semibold text-white">
-            {t('rejoin')}
-          </button>
-        </section>
+        <Ended code={r.error ?? 'CLOSED'} onRejoin={r.leave} />
       ) : (
         <>
+          {/* 상단 정보 줄 — 재연결 배지(설계서 6.3). 인원 수·연결 품질은 같은 줄에 붙는다 */}
+          <div className="flex min-h-7 items-center gap-2 text-xs">
+            {r.state === 'reconnecting' && (
+              <span role="status" className="bg-surface-raised inline-flex items-center gap-2 rounded-full px-3 py-1">
+                <Spinner />
+                {t('state.reconnecting')}
+              </span>
+            )}
+          </div>
           <Stage
             role={stageRole}
             state={r.state}
