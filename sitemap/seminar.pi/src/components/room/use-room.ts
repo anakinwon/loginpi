@@ -32,7 +32,14 @@ export type ChatMsg = {
 }
 // reconnecting = 입장 뒤 발행·구독 PC 중 하나가 disconnected(ICE 가 스스로 복구 중). failed 가 되면 error(ICE_FAILED)
 export type RoomState = 'idle' | 'ticket' | 'connecting' | 'joined' | 'reconnecting' | 'closed' | 'error'
-type Env = { t: 'req' | 'res' | 'ntf'; id?: number; m?: string; ok?: boolean; d?: unknown; e?: { code: string; msg: string } }
+type Env = {
+  t: 'req' | 'res' | 'ntf'
+  id?: number
+  m?: string
+  ok?: boolean
+  d?: unknown
+  e?: { code: string; msg: string }
+}
 type Trickle = { pc: 'pub' | 'sub'; candidate: RTCIceCandidateInit }
 // [계약 공백] consumerCreated 에는 발행자 peerId 가 없다(SIGNAL_API 3.2) — 입장 때 받은 producers[].peer 로만 안다.
 // 엔진이 필드를 더하면 바로 쓰도록 peer·peerId 를 선택 필드로 읽는다(보고 사항)
@@ -277,7 +284,8 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       if (d.role === 'audience') {
         // 강등 — 서버가 내 producer 를 닫았다. 내 트랙·발행 PC 정리, 손 목록은 청중 범위 밖이라 비운다
         closePublish()
-        for (const p of peersRef.current.values()) if (p.peerId !== selfRef.current) patchPeer(p.peerId, { raisedTs: 0 })
+        for (const p of peersRef.current.values())
+          if (p.peerId !== selfRef.current) patchPeer(p.peerId, { raisedTs: 0 })
       }
       // 승격 — 마이크는 자동으로 켜지 않는다(화면이 [마이크 켜기] 알림을 띄움, 설계서 14.4)
     }
@@ -551,7 +559,8 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       delete sendersRef.current.screen
       stopScreen()
       tr?.sender.replaceTrack(null).catch(() => {})
-      if (id) await request('producer.close', { producerId: id }).catch((e: Error) => log(`화면공유 닫기 실패 ${e.message}`))
+      if (id)
+        await request('producer.close', { producerId: id }).catch((e: Error) => log(`화면공유 닫기 실패 ${e.message}`))
       return null
     }
     const s = await navigator.mediaDevices?.getDisplayMedia({ video: true, audio: false }).catch(() => null)
@@ -623,7 +632,15 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     if ([...body].length > CHAT_MAX) return 'SDP_INVALID'
     const n = ++chatN.current
     const me = peersRef.current.get(selfRef.current)
-    addChat({ n, peerId: selfRef.current, name: me?.name ?? '', text: body, ts: Date.now(), mine: true, status: 'sending' })
+    addChat({
+      n,
+      peerId: selfRef.current,
+      name: me?.name ?? '',
+      text: body,
+      ts: Date.now(),
+      mine: true,
+      status: 'sending',
+    })
     const mark = (p: Partial<ChatMsg>) => setChat((l) => l.map((m) => (m.n === n ? { ...m, ...p } : m)))
     try {
       const r = await request<{ ts: number }>('chat.send', { text: body })

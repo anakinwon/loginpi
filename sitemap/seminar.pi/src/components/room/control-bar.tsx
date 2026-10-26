@@ -1,6 +1,6 @@
 'use client'
-// 하단 컨트롤 바 — 발표자 : 마이크·카메라·나가기, 청중 : 나가기(+ 소리 막힘 시 "소리 켜기"). 설계서 6.1·14.3
-// 꺼짐 = danger 색 + 사선 아이콘(색만으로 상태를 전하지 않음), 아이콘만 보여도 aria-label 유지.
+// 하단 컨트롤 바 — 역할별 버튼(설계서 6.1·14.3 표) : presenter·panel = 마이크·카메라·채팅·참가자·화면공유(+손 목록 / 반응),
+// audience = 손들기·반응·채팅·참가자. 나가기·소리 켜기는 슬롯 밖. 꺼짐 = danger 색 + 사선 아이콘(색만으로 상태를 전하지 않음), 아이콘만 보여도 aria-label 유지.
 // 폭 기반 슬롯(565/420/370) + 더보기(넘친 버튼이 1개면 바로 노출) · 폭 > 760px 텍스트 라벨 · 단축키 Ctrl/⌘+D·E · 자동 숨김(useBarVisibility)
 import {
   useEffect,
@@ -13,10 +13,15 @@ import {
   type ReactNode,
 } from 'react'
 import { useTranslations } from 'next-intl'
-import { BAR, mainSlots, splitSlots } from './room-rules'
-import type { MediaKind, Role } from './use-room'
+import { BAR, barOrder, mainSlots, splitSlots, type BarId } from './room-rules'
+import type { MediaKind, SessionRole } from './use-room'
 
-export const ICON: Record<MediaKind | 'leave' | 'more', string> = {
+export const ICON: Record<MediaKind | 'leave' | 'more' | 'screen' | 'chat' | 'people' | 'close', string> = {
+  screen: 'M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-7v2h3v2H8v-2h3v-2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v9h16V6H4Z',
+  chat: 'M6 4h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V6a2 2 0 0 1 2-2Z',
+  people:
+    'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm7.5 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2 19c0-3 3-5 7-5s7 2 7 5v1H2v-1Zm16-4.6c2.4.4 4 1.9 4 4.1V20h-4.5v-1c0-1.8-.5-3.3-1.4-4.5.6-.1 1.2-.1 1.9-.1Z',
+  close: 'M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5Z',
   audio:
     'M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z',
   video: 'M15 8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2.5l5 3.5V7l-5 3.5V8Z',
@@ -98,8 +103,9 @@ export function menuKeys(e: ReactKeyboardEvent<HTMLElement>) {
   items[next].focus()
 }
 
-// 열린 메뉴 공용 동작 — 열리면 첫 항목에 포커스, Esc = 닫고 여는 버튼으로 포커스 복귀, Tab·바깥 탭 = 닫기
-export function useMenu(open: boolean, close: () => void) {
+// 열린 메뉴 공용 동작 — 열리면 첫 항목에 포커스, Esc = 닫고 여는 버튼으로 포커스 복귀, Tab·바깥 탭 = 닫기.
+// triggerSel = 여는 버튼이 메뉴 밖에 따로 있을 때(반응 메뉴) — 그 버튼 탭은 바깥 탭으로 치지 않고, Esc 때 포커스를 돌려준다
+export function useMenu(open: boolean, close: () => void, triggerSel?: string) {
   const rootRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -114,16 +120,20 @@ export function useMenu(open: boolean, close: () => void) {
       if (e.key === 'Tab') return latest.current() // 포커스 이동은 브라우저에 맡긴다
       if (e.key !== 'Escape') return
       latest.current()
-      triggerRef.current?.focus()
+      ;(triggerRef.current ?? (triggerSel ? document.querySelector<HTMLElement>(triggerSel) : null))?.focus()
     }
-    const onDown = (e: PointerEvent) => !rootRef.current?.contains(e.target as Node) && latest.current()
+    const onDown = (e: PointerEvent) => {
+      const el = e.target as Element
+      if (rootRef.current?.contains(el) || (triggerSel && el.closest?.(triggerSel))) return
+      latest.current()
+    }
     window.addEventListener('keydown', onKey)
     window.addEventListener('pointerdown', onDown)
     return () => {
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('pointerdown', onDown)
     }
-  }, [open])
+  }, [open, triggerSel])
   return { rootRef, menuRef, triggerRef }
 }
 
@@ -183,38 +193,128 @@ function MoreMenu({ items, onOpen }: { items: BarItem[]; onOpen: (o: boolean) =>
   )
 }
 
+// 아이콘 + 텍스트 버튼(채팅·참가자·화면공유·손들기·반응) — 메뉴 안이면 menuitem(토글은 menuitemcheckbox), 밖이면 aria-pressed.
+// badge = 안 읽은 채팅·손든 사람 수(9 초과는 9+)
+export function BarButton({
+  icon,
+  text,
+  pressed,
+  badge,
+  label,
+  menu,
+  disabled,
+  accent,
+  onClick,
+  ...rest
+}: {
+  icon: ReactNode
+  text: string
+  pressed?: boolean
+  badge?: number
+  label: boolean
+  menu: boolean
+  disabled?: boolean
+  accent?: boolean // 켜짐을 강조색으로(손들기)
+  onClick: () => void
+  'data-react-trigger'?: boolean
+}) {
+  const state =
+    pressed === undefined
+      ? { role: menu ? 'menuitem' : undefined }
+      : menu
+        ? { role: 'menuitemcheckbox', 'aria-checked': pressed }
+        : { 'aria-pressed': pressed }
+  return (
+    <button
+      type="button"
+      {...state}
+      {...rest}
+      aria-label={badge ? `${text} (${badge})` : text}
+      title={text}
+      disabled={disabled}
+      onClick={onClick}
+      className={`${BTN} ${shape(label)} relative ${pressed && accent ? 'bg-accent text-white' : pressed ? 'bg-surface-raised ring-accent ring-2' : 'bg-surface-raised'}`}
+    >
+      {icon}
+      {label && <span aria-hidden>{text}</span>}
+      {!!badge && (
+        <span
+          aria-hidden
+          className="bg-danger absolute -top-1 -right-1 min-w-5 rounded-full px-1 text-center text-[11px] leading-5 font-bold text-white"
+        >
+          {badge > 9 ? '9+' : badge}
+        </span>
+      )}
+    </button>
+  )
+}
+
+const Emoji = ({ c }: { c: string }) => (
+  <span aria-hidden className="text-xl leading-none">
+    {c}
+  </span>
+)
+
+export type PanelTab = 'chat' | 'people'
+
 export function ControlBar({
   role,
   ready,
+  addReady,
   has,
   localOn,
   pending,
+  canShare,
+  sharing,
+  panel,
+  unread,
+  raised,
+  handUp,
+  reactOpen,
   soundBlocked,
   width,
   onHold,
   onToggle,
+  onShare,
+  onPanel,
+  onHand,
+  onReact,
   onSound,
   onLeave,
 }: {
-  role: Role
-  ready: boolean // 입장 완료 전(입장권·연결 중)엔 토글 비활성 — 발행 전이라 눌러도 효과 없음
-  has: Record<MediaKind, boolean> // 실제로 가진 트랙만 버튼 노출(음성만 발표자에게 카메라 버튼 숨김)
+  role: SessionRole
+  ready: boolean // 발행 완료(produce 응답) 전엔 마이크·카메라 토글 비활성 — producerId 가 없어 눌러도 실패
+  addReady: boolean // 아직 없는 마이크·카메라를 켜서 발행할 수 있나(입장 완료·발행 협상 중 아님)
+  has: Record<MediaKind, boolean> // 가진 트랙 — 없는 종류는 presenter 면 숨김(카메라 없이 입장), panel 이면 "켜기"(승격 뒤 발행)
   localOn: { audio: boolean; video: boolean }
   pending: MediaKind | null
+  canShare: boolean // getDisplayMedia 기능 탐지 결과(UA 판정 금지, 설계서 6.1)
+  sharing: boolean
+  panel: PanelTab | null
+  unread: number
+  raised: number // 손든 사람 수(presenter 손 목록 배지)
+  handUp: boolean // 내 손(audience)
+  reactOpen: boolean
   soundBlocked: boolean
-  width: number // 룸 영역 폭(px) — 슬롯 수·라벨 판정
+  width: number // 룸 영역 폭(px) — 슬롯 수·라벨 판정(사이드 패널이 열리면 좁아진다)
   onHold: (hold: boolean) => void // 메뉴 열림 등으로 자동 숨김을 보류
   onToggle: (kind: MediaKind, on: boolean) => void
+  onShare: (on: boolean) => void
+  onPanel: (tab: PanelTab) => void
+  onHand: (raised: boolean) => void
+  onReact: () => void
   onSound: () => void
   onLeave: () => void
 }) {
   const t = useTranslations('room')
-  const presenter = role === 'presenter'
+  const stage = role !== 'audience'
+  // presenter 는 가진 트랙만, panel 은 늘 둘 다(없으면 탭해서 켠다 — 승격 뒤 자동 켜기 금지)
+  const shown = (k: MediaKind) => has[k] || role === 'panel'
 
-  // 단축키 — 최신 값은 ref 로 읽는다(리스너는 한 번만 등록)
-  const latest = useRef({ presenter, ready, has, localOn, onToggle })
+  // 단축키 — 최신 값은 ref 로 읽는다(리스너는 한 번만 등록). 아직 없는 트랙은 단축키로 켜지 않는다(권한 팝업은 버튼 탭으로만)
+  const latest = useRef({ stage, ready, has, localOn, onToggle })
   useEffect(() => {
-    latest.current = { presenter, ready, has, localOn, onToggle }
+    latest.current = { stage, ready, has, localOn, onToggle }
   })
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -222,7 +322,7 @@ export function ControlBar({
       // e.code(물리 키) — 한글 입력 상태에선 e.key 가 'ㅇ'·'ㄷ' 로 와 단축키가 안 먹는다
       const kind = ({ KeyD: 'audio', KeyE: 'video' } as const)[e.code as 'KeyD' | 'KeyE']
       const p = latest.current
-      if (!kind || !p.presenter || !p.ready || !p.has[kind]) return
+      if (!kind || !p.stage || !p.ready || !p.has[kind]) return
       e.preventDefault() // Ctrl+D 북마크·Ctrl+E 주소창 검색 대신
       p.onToggle(kind, !p.localOn[kind])
     }
@@ -230,31 +330,107 @@ export function ControlBar({
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  // 슬롯 대상 버튼(우선순위 순). W3 의 화면공유·채팅·참가자·손들기·반응이 이 목록에 붙는다
-  const items: BarItem[] = presenter
-    ? (['audio', 'video'] as const)
-        .filter((k) => has[k])
-        .map((k) => ({
-          id: k,
-          node: ({ label, menu }) => (
-            <MediaButton
-              kind={k}
-              on={localOn[k]}
-              label={label}
-              menu={menu}
-              disabled={!ready || pending !== null}
-              onClick={() => onToggle(k, !localOn[k])}
+  const node: Record<BarId, BarItem['node'] | null> = {
+    audio: stage && shown('audio') ? mediaNode('audio') : null,
+    video: stage && shown('video') ? mediaNode('video') : null,
+    screen:
+      stage && canShare
+        ? (o) => (
+            <BarButton
+              {...o}
+              icon={<Icon d={ICON.screen} />}
+              text={t(sharing ? 'screen.stop' : 'screen.start')}
+              pressed={sharing}
+              disabled={!addReady && !sharing}
+              onClick={() => onShare(!sharing)}
             />
-          ),
-        }))
-    : []
+          )
+        : null,
+    chat: (o) => (
+      <BarButton
+        {...o}
+        icon={<Icon d={ICON.chat} />}
+        text={t('panel.chat')}
+        pressed={panel === 'chat'}
+        badge={unread}
+        onClick={() => onPanel('chat')}
+      />
+    ),
+    people: (o) => (
+      <BarButton
+        {...o}
+        icon={<Icon d={ICON.people} />}
+        text={t('panel.people')}
+        pressed={panel === 'people'}
+        onClick={() => onPanel('people')}
+      />
+    ),
+    // 손 목록(presenter) = 참가자 패널(손든 사람이 위로 정렬) — 배지로 대기 수
+    hands:
+      role === 'presenter'
+        ? (o) => (
+            <BarButton
+              {...o}
+              icon={<Emoji c="✋" />}
+              text={t('hand.list')}
+              badge={raised}
+              onClick={() => onPanel('people')}
+            />
+          )
+        : null,
+    hand:
+      role === 'audience'
+        ? (o) => (
+            <BarButton
+              {...o}
+              icon={<Emoji c="✋" />}
+              text={t(handUp ? 'hand.lower' : 'hand.raise')}
+              pressed={handUp}
+              accent
+              onClick={() => onHand(!handUp)}
+            />
+          )
+        : null,
+    react:
+      role !== 'presenter'
+        ? (o) => (
+            <BarButton
+              {...o}
+              icon={<Emoji c="😀" />}
+              text={t('react.open')}
+              pressed={o.menu ? undefined : reactOpen}
+              data-react-trigger
+              onClick={onReact}
+            />
+          )
+        : null,
+  }
+
+  function mediaNode(k: MediaKind): BarItem['node'] {
+    const missing = !has[k]
+    return ({ label, menu }) => (
+      <MediaButton
+        kind={k}
+        on={localOn[k]}
+        label={label}
+        menu={menu}
+        disabled={missing ? !addReady : !ready || pending !== null}
+        onClick={() => onToggle(k, !localOn[k])}
+      />
+    )
+  }
+
+  const items: BarItem[] = barOrder(role, width).flatMap((id) => {
+    const n = node[id]
+    return n ? [{ id, node: n }] : []
+  })
   const labels = width > BAR.labelMinWidth
   const { main, more } = splitSlots(items, mainSlots(width, role))
 
   return (
     <nav
       aria-label={t('controls')}
-      className="landscape-short:h-full landscape-short:flex-col landscape-short:pt-0 landscape-short:pb-0 landscape-short:pr-[max(8px,env(safe-area-inset-right))] flex items-center justify-center gap-3 pt-2 pb-[max(12px,env(safe-area-inset-bottom))]"
+      className="landscape-short:h-full landscape-short:flex-col landscape-short:pt-0 landscape-short:pb-0 landscape-short:pr-[max(8px,env(safe-area-inset-right))] flex flex-wrap items-center justify-center gap-3 pt-2 pb-[max(12px,env(safe-area-inset-bottom))]"
     >
       {main.map((it) => (
         <span key={it.id} className="contents">
