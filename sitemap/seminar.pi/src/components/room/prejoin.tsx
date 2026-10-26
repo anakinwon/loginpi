@@ -89,15 +89,27 @@ export function Prejoin({
     onJoin(presenter ? stream : null)
   }
 
+  // 카메라 없이 입장(설계서 5.1·P7) — 영상 트랙을 끄고 빼서 음성만 발행. 남는 트랙이 없으면 미디어 없이
+  function joinNoCam() {
+    if (!stream) return join()
+    stream.getVideoTracks().forEach((tr) => {
+      tr.stop()
+      stream.removeTrack(tr)
+    })
+    if (stream.getTracks().length) return join()
+    handed.current = true
+    onJoin(null)
+  }
+
+  const hasVideo = !!stream?.getVideoTracks().length
+
   return (
     <section className="mx-auto max-w-md space-y-4">
       <h1 className="text-lg font-bold">{t('title', { room })}</h1>
 
       {presenter ? (
         <div className="bg-surface relative aspect-video overflow-hidden rounded-xl">
-          {stream?.getVideoTracks().length ? (
-            <StreamVideo stream={stream} mirror className={on.video ? '' : 'invisible'} />
-          ) : null}
+          {hasVideo && <StreamVideo stream={stream} mirror className={on.video ? '' : 'invisible'} />}
           {status !== 'ok' && (
             <p className="text-muted-foreground absolute inset-0 grid place-items-center p-4 text-center text-sm">
               {t(`preview.${status}`)}
@@ -138,14 +150,27 @@ export function Prejoin({
         </div>
       )}
 
+      {/* 연결 점검은 입장 후(대기실엔 엔진 연결이 없음 — 설계 편차, connection-check.tsx) */}
+      {presenter && <p className="text-muted-foreground text-xs">{t('net.afterJoin')}</p>}
+
       <button
         type="button"
         onClick={join}
         disabled={presenter && status === 'pending'}
         className="bg-accent h-12 w-full rounded-full font-semibold text-white disabled:opacity-40"
       >
-        {t('join')}
+        {/* 카메라를 못 쓰는 발표자에겐 기본 버튼이 곧 "카메라 없이 입장" */}
+        {presenter && status !== 'pending' && !hasVideo ? t('joinNoCam') : t('join')}
       </button>
+      {presenter && hasVideo && (
+        <button
+          type="button"
+          onClick={joinNoCam}
+          className="h-11 w-full rounded-full border border-white/15 text-sm font-medium"
+        >
+          {t('joinNoCam')}
+        </button>
+      )}
     </section>
   )
 }

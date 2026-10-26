@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type RefObject } from 'react'
 import { useTranslations } from 'next-intl'
 import { LoginGate } from '@/components/login-gate'
 import { Link } from '@/i18n/navigation'
+import { ConnectionBadge, useConnectionCheck } from './connection-check'
 import { ControlBar, useBarVisibility } from './control-bar'
 import { Prejoin } from './prejoin'
 import { Spinner, Stage, useRemoteAudio } from './stage'
@@ -83,6 +84,10 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   const width = useWidth(rootRef)
   const live = r.state === 'joined' || r.state === 'reconnecting'
   const bar = useBarVisibility(live)
+  const stageRole: Role = r.forbidden ? 'audience' : role
+  // 발표자 연결 점검 — 발행 중일 때만(입장 직후 1회, 재연결 뒤 다시)
+  const publishing = stageRole === 'presenter' && r.state === 'joined' && !!r.localStream
+  const check = useConnectionCheck(r.pubStats, publishing, r.localOn)
 
   useEffect(() => {
     if (!notice) return
@@ -110,7 +115,6 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   }
 
   const ended = r.state === 'error' || r.state === 'closed'
-  const stageRole: Role = r.forbidden ? 'audience' : role
   return (
     <div ref={rootRef} className="space-y-3">
       <audio ref={audioRef} autoPlay />
@@ -136,6 +140,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                   {t('state.reconnecting')}
                 </span>
               )}
+              <ConnectionBadge check={check} />
             </div>
             <Stage
               role={stageRole}

@@ -13,6 +13,7 @@
   --color-danger: var(--danger);
   --color-accent: var(--accent);
   --color-speaking: var(--speaking);
+  --color-warning: var(--warning);
 }
 
 /* M0 단일 어두운 테마 — 라이트 테마는 화면 확정(PRD 6절) 후 */
@@ -27,4 +28,6 @@
   --danger: #e5484d;
   --accent: #7c6cf2;
   --speaking: #46c98b;
+  /* 연결 점검 '보통' 배지(설계서 14.5) — 9절 토큰 표에 없던 추가값 */
+  --warning: #f5a524;
 }

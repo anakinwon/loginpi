@@ -202,6 +202,24 @@
       "presenter": "Presenter",
       "micOff": "Microphone off"
     },
-    "more": "More options"
+    "more": "More options",
+    "joinNoCam": "Join without camera",
+    "net": {
+      "afterJoin": "Your connection is checked automatically after you join.",
+      "measuring": "Checking connection…",
+      "good": "Good connection",
+      "fair": "Fair connection",
+      "poor": "Poor connection",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% of audio data is being lost.",
+          "video": "{pct}% of video data is being lost."
+        },
+        "rate": {
+          "audio": "Audio upload is low at {kbps} kbps.",
+          "video": "Video upload is low at {kbps} kbps. Quality may drop."
+        }
+      }
+    }
   }
 }

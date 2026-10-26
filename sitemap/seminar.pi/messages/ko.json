@@ -202,6 +202,24 @@
       "presenter": "발표자",
       "micOff": "마이크 꺼짐"
     },
-    "more": "더보기"
+    "more": "더보기",
+    "joinNoCam": "카메라 없이 입장",
+    "net": {
+      "afterJoin": "연결 상태는 입장 후 자동으로 확인합니다.",
+      "measuring": "연결 확인 중…",
+      "good": "연결 양호",
+      "fair": "연결 보통",
+      "poor": "연결 나쁨",
+      "reason": {
+        "loss": {
+          "audio": "소리 데이터 {pct}%가 손실되고 있습니다.",
+          "video": "영상 데이터 {pct}%가 손실되고 있습니다."
+        },
+        "rate": {
+          "audio": "소리 전송 속도가 {kbps}kbps 로 낮습니다.",
+          "video": "영상 전송 속도가 {kbps}kbps 로 낮습니다. 화질이 떨어질 수 있습니다."
+        }
+      }
+    }
   }
 }

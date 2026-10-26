@@ -370,6 +370,11 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     }
   }
 
+  // 발행 PC 통계(발표자 연결 점검용) — 발행 전·청중이면 null
+  function pubStats(): Promise<RTCStatsReport | null> {
+    return pubRef.current?.getStats().catch(() => null) ?? Promise.resolve(null)
+  }
+
   function leave() {
     teardown()
     setState('idle')
@@ -421,5 +426,6 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     join,
     leave,
     setMedia,
+    pubStats,
   }
 }
