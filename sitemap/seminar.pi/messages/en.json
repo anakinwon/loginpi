@@ -150,7 +150,8 @@
     "preview": {
       "pending": "Preparing camera and microphone…",
       "audioOnly": "Camera unavailable — sending audio only.",
-      "none": "Camera and microphone unavailable. Check permissions (you can still join without media)."
+      "none": "Camera and microphone unavailable. Check permissions (you can still join without media).",
+      "videoOnly": "Microphone unavailable — sending video only. Check microphone permission."
     },
     "mic": {
       "on": "Turn off microphone",
@@ -190,6 +191,13 @@
       "ICE_FAILED": "The video connection dropped. Check your network.",
       "MEDIA_FAILED": "Couldn't start the camera or microphone.",
       "TIMEOUT": "The video server isn't responding."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Couldn't change the microphone. Please try again.",
+        "video": "Couldn't change the camera. Please try again."
+      },
+      "forbidden": "You don't have permission to present, so you'll continue as audience."
     }
   }
 }
