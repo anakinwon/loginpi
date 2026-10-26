@@ -98,6 +98,7 @@
 | 5 | VOD 녹화 저장소·보관 기간(R3, P2) | 마스터 | [확인중 : 마스터] |
 | 6 | Google 연동 예외의 등재 A-4 영향 | pi-mainnet-listing-auditor | [확인중 : pi-mainnet-listing-auditor] |
 | 7 | 교육 공통 모듈과의 경계 — PRD_27 은 seminar 를 웨비나·강사 정산 공통 모듈(7개 사이트 재사용) 대상으로 기록. F-02(개설)·F-06(정산)을 공용 패키지로 만들지 여부 | 마스터 | [확인중 : 마스터] |
+| 8 | 세션 전 미완료 결제 복구(U7) — Pi `onIncompletePaymentFound` 는 `@pi/auth` 의 인증 부트스트랩(pi-auth-root) 안에서 세션 발급 **전**에 불릴 수 있어, complete·cancel 호출이 401 로 실패하고 결제가 APPROVED 로 남을 수 있다. 인증 부트스트랩은 이번 범위 밖(공용 패키지 변경 금지) — 세션 확보 후 재시도(대기열)를 `@pi/auth` 에 넣을지. 그 전까지 완화 = 다음 approve 의 이전 결제 정리(D-17)·상세 조회 복구(D-16) | 마스터 | [확인중 : 마스터] |
 
 ## 10. 화상 엔진 기준점 (마스터 확정 2026-10-24)
 
@@ -127,7 +128,15 @@
 | D-8 | 룸 ID | **룸 ID = smn_id** | 별도 매핑 불필요 |
 | D-9 | 청중 입장권 | 유료 세미나는 **참가 등록이 있어야** 발급, 무료는 클릭 시 등록 후 발급 | UI 12절 M5(입장권 = 결제 확인 후) |
 | D-10 | 결제 유형코드 | `pymnt_tp_cd = SMN_ENT`, SDK metadata = `{ type: 'SMN_ENT', smn_id }` | pi_pymnt 유형 분기 + 함수가 meta `smn_id` 로 세미나 일치 검증 |
+| D-12 | 이중 결제 인덱스 | `x_pi_pymnt_01` = **(usr_id, meta smn_id)** APPROVED SMN_ENT 부분 유일(sql/006) — `approvedTargetIndexSql` 출력(smn_id 단독)은 세미나당 동시 결제 1명이 되어 쓰지 않음 | 같은 대상 = 사람 × 세미나(fn_chk_smn_cap 사용자당 점유 1개와 같은 단위) |
+| D-13 | approve 정원 확인 위치 | `approvePayment`(원장 APPROVED → Pi approve) **뒤** `fn_chk_smn_cap` → OK 아니면 `cancelPayment` | 패키지 흐름에 원장 기록과 Pi approve 사이 끼울 자리 없음. 서명 전이라 취소 가능, 취소 거부 시 초과 1석(D-6 상한과 같은 성격) |
+| D-14 | 입장권 게이트 | uuid 방 = 세미나 존재·종료/취소 아님(404·409), 청중은 무료 또는 참가 등록(402), 정원 = max_cnt+1. uuid 아닌 실험실 방 코드는 개발 또는 `LAB_ENABLED=1` 만(R-P6) | D-8·D-9 |
+| D-15 | 홈·카드 | 홈 = S1 목록, 제작 현황은 `/progress`(헤더 링크). 카드는 정원만(남은 좌석은 상세) — 목록마다 참가 집계 조회를 피함(R-P3) | UI 설계서 5절 |
 | D-11 | 주제영역 접두사 | 신규 `smn_`(세미나) — 테이블 `smn_mst`·`smn_ptc`, 신규 표준단어 SMN·PTC·ENT·HST | DA 표준 2-1 신규 접두사 = DA 승인 필요 → 위임 승인, DA 사후 리뷰 |
+| D-16 | 결제 완료 원자화(보안 검토 S1) | complete 는 `completePayment({ finalize })` 의 finalize = **`fn_cmpl_smn_ent`(sql/007)** — 세미나 행 잠금 아래 원장 COMPLETED(본인·SMN_ENT·APPROVED 또는 같은 tx 재호출) + `fn_join_smn` 을 한 트랜잭션. 등록 거부여도 원장 COMPLETED 는 남김(돈은 이미 이동, 수동 환불 D-7). 재호출(이미 COMPLETED)은 `fn_join_smn` 으로 등록만 재시도. **복구** : 상세 GET 이 "내 COMPLETED SMN_ENT 결제 + 참가 없음" 을 보면 `fn_join_smn` 으로 등록 — 두 번 결제를 요구하지 않음 | 원장·참가 갈라짐 차단 |
+| D-17 | 이전 APPROVED 결제 정리(S2) | approve 검증기가 같은 세미나의 내 다른 APPROVED SMN_ENT 를 최대 3건 Pi 조회(병렬) — 취소·만료(404)면 원장 CANCELED, 진행 중·판정 불가면 `ALREADY_PAID`. 3건 초과도 `ALREADY_PAID`. Pi 조회 타임아웃은 패키지 값(10초, BUILD_DEFECTS 2.7 예외)을 따름 | 서명 전 이탈한 결제가 sql/006 인덱스를 막아 다시 결제 못 하는 문제 |
+| D-18 | 정원 ≠ 동시 접속 상한(S4) | `max_cnt` 는 **참가 등록 수** 상한(유료 = 결제 등록, 무료 = 입장 클릭 등록). 화상 엔진의 동시 접속 상한(입장권 cap = max_cnt+1)은 **별개** — 등록자가 나가도 등록은 남고, 무료 세미나 청중 입장권은 등록 없이도 발급되므로(D-9) 무료 세미나의 실제 동시 시청 인원은 엔진 cap 이 막는다. 등록 정원이 찼다고 엔진 자리가 찬 것은 아니며 그 반대도 같다 | 두 수를 같은 것으로 안내하지 않기 |
+| D-19 | 입력·표시 보강 | 시작일시 = 지금 이후 **1년 안**(S5, 서버·화면 같은 규칙) · uuid 방 ID 는 소문자로 통일(S3) · 세미나 없음 approve = `SMN_CLOSED`(U6) · 개최자는 상세에서 룸 링크만(U1) · 지갑 대기 120초 = 오류 대신 '아직 기다리는 중' 안내(U8) | 보안·Pi/UX 검토 반영 |
 
 ## 변경 이력
 
@@ -138,4 +147,6 @@
 | 2026-10-24 | 화상 방식 결정 반영 — 자체 구축(엔진까지), 9절 #1·F-05 |
 | 2026-10-24 | v0.2 — 10절 화상 엔진 기준점(마스터 확정), F-05 → PRD_01 |
 | 2026-10-26 | v1.0 보정(T1 검토 반영) — 7절 DB 표기 정정(프로젝트 1개·스키마 3개, prod = `public`), 표준단어 통일(`smn_mst`·`smn_ptc`·`fn_join_smn`), 결제 검증 `PAY_INVALID`·approve 정원 확인 `fn_chk_smn_cap`(D-5·D-6), D-10 `SMN_ENT`, 1회성 재설정 기록, prod 적용 |
+| 2026-10-27 | S1·S2·S5 + 세미나·결제 API 구현에 따른 아소카 결정(마스터 위임 2026-10-26) D-12~D-15 추가(sql/006 적용 dev·stg·public) |
+| 2026-10-27 | 보안·Pi/UX 검토 반영 — 아소카 결정(마스터 위임 2026-10-26) D-16~D-19(결제 완료 원자화 sql/007 dev·stg·public 적용·이전 결제 정리·정원≠동시 접속·입력 보강), 9절 #8 세션 전 미완료 결제 복구 [확인중 : 마스터] |
 | 2026-10-26 | **v1.0 확정** — 아소카 결정(마스터 위임) D-1~D-11(11절), 6절 화면 5종(UI 설계서 v1.0), 7절 세미나 모델(sql/004 smn_smnr·smn_ptcp·fn_join_smn_smnr), 9절 #2·#4 결정 |

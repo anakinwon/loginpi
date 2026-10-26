@@ -25,6 +25,22 @@ export const apiError = createApiError({
     '연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요',
   LINK_TRY_LIMIT:
     '연동 코드를 여러 번 틀렸습니다. 15분 뒤에 다시 시도하세요',
+  // 세미나 입장(sql/004 fn_join_smn·fn_chk_smn_cap 결과, src/lib/seminar-rules.ts 매핑)
+  SMN_FULL: '정원이 찼습니다',
+  SMN_CLOSED: '종료되었거나 취소된 세미나입니다',
+  SMN_ALREADY: '이미 참가 등록된 세미나입니다',
+  SMN_FREE: '무료 세미나는 결제하지 않습니다',
+  SMN_PAY_REQUIRED: '유료 세미나입니다. 결제 후 입장하세요',
+  SMN_PAY_INVALID: '결제 정보를 확인할 수 없습니다',
+  // 결제(@pi/payments PayFail 매핑)
+  PAY_PI_FAILED: 'Pi 결제 서버와 통신하지 못했습니다. 잠시 후 다시 시도하세요',
+  PAY_MISMATCH: '결제 정보가 일치하지 않습니다',
+  PAY_AMOUNT_MISMATCH: '결제 금액이 입장료와 다릅니다',
+  PAY_CANCELLED: '취소된 결제입니다',
+  PAY_ALREADY_PAID: '이미 진행 중이거나 완료된 결제가 있습니다',
+  PAY_INVALID_STATE: '결제를 처리할 수 없는 상태입니다',
+  PAY_PI_CANCEL_REFUSED:
+    '결제가 이미 진행 중이라 취소할 수 없습니다. 잠시 후 다시 확인하세요',
 })
 
 export const db = () => getSupabaseAdmin()

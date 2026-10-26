@@ -4,6 +4,7 @@
 // Google 로그인됐으나 미연동이면 계정 연동(/link) 안내. UA 판정 없음(cafe.pi 규칙)
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
+import { BTN } from '@/components/seminar/shared'
 import {
   GoogleLoginButton,
   GoogleSignOutButton,
@@ -32,21 +33,21 @@ export function AuthStatus() {
   if (googleLinkError) return <LinkCheckFailed />
   if (googleUnlinked)
     return (
-      <Link href="/link" className="btn text-sm">
+      <Link href="/link" className={BTN}>
         {t('linkNeeded')}
       </Link>
     )
   return (
     <span className="flex items-center gap-2 text-sm">
       <button
-        className="btn text-sm"
+        className={BTN}
         disabled={busy}
         onClick={() => void login()}
       >
         {busy ? t('authenticating') : t('signIn')}
       </button>
-      {googleLoginEnabled && <GoogleLoginButton className="btn text-sm" />}
-      {piError && <span className="text-destructive text-xs">{piError}</span>}
+      {googleLoginEnabled && <GoogleLoginButton className={BTN} />}
+      {piError && <span className="text-danger text-xs">{piError}</span>}
     </span>
   )
 }

@@ -22,7 +22,7 @@ export function LinkPanel() {
   if (googleUnlinked) return <LinkCodeForm />
   if (user && source === 'google')
     return (
-      <p className="card text-sm" role="status">
+      <p className="bg-surface rounded-xl p-4 text-sm" role="status">
         {t('linked', { name: user.username ?? user.displayName })}
       </p>
     )

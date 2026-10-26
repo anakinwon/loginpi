@@ -11,6 +11,7 @@
     "@pi/auth": "workspace:*",
     "@pi/db": "workspace:*",
     "@pi/guard": "workspace:*",
+    "@pi/payments": "workspace:*",
     "@supabase/supabase-js": "^2.107.0",
     "@t3-oss/env-nextjs": "^0.13.11",
     "next": "16.2.7",

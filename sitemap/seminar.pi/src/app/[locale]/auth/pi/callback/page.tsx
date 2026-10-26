@@ -12,6 +12,7 @@ import {
   startPiOAuth,
 } from '@pi/auth/client'
 import { env } from '@/env'
+import { BTN, BTN_PRIMARY } from '@/components/seminar/shared'
 
 let oauthHandled = false
 
@@ -89,16 +90,16 @@ export default function PiOAuthCallbackPage() {
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4">
       {error ? (
         <>
-          <p className="text-destructive text-sm font-medium" role="alert">
+          <p className="text-danger text-sm font-medium" role="alert">
             {error}
           </p>
           <div className="flex gap-2">
-            <button className="btn btn-primary" onClick={retry}>
+            <button className={BTN_PRIMARY} onClick={retry}>
               {t('retry')}
             </button>
             {/* 풀 리로드 복귀 — 새 세션이 앱 전체에 반영되게 */}
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a href="/" className="btn">
+            <a href="/" className={BTN}>
               {t('backHome')}
             </a>
           </div>

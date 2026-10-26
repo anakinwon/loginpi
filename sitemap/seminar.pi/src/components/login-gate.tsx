@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { startPiOAuth, usePiAuth, type PiSessionUser } from '@pi/auth/client'
 import { env } from '@/env'
+import { BTN_PRIMARY } from '@/components/seminar/shared'
 import {
   GoogleLoginButton,
   googleLoginEnabled,
@@ -69,11 +70,11 @@ export function LoginGate({
       </div>
     )
   return (
-    <div className="card flex flex-col items-start gap-2">
+    <div className="bg-surface rounded-xl p-4 flex flex-col items-start gap-2">
       <p className="text-sm">{t('required')}</p>
       <div className="flex flex-wrap items-center gap-2">
         <button
-          className="btn btn-primary"
+          className={BTN_PRIMARY}
           disabled={busy}
           onClick={() => void login()}
         >
@@ -90,7 +91,7 @@ export function LoginGate({
       {!oauthReady && !googleLoginEnabled && (
         <p className="text-muted-foreground text-xs">{t('openInPiBrowser')}</p>
       )}
-      {piError && <p className="text-destructive text-xs">{piError}</p>}
+      {piError && <p className="text-danger text-xs">{piError}</p>}
     </div>
   )
 }
