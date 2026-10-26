@@ -21,7 +21,7 @@
 |---|---|---|---|
 | T2 균일 손실 3% | `sudo ./netem.sh eth0 t2 <청중IP>` | Q3·Q6·Q7, 캐시 미스율 | 화면 깨짐이 회복된다(PRD_02 6절) |
 | T3 버스트 10% 5초 | `sudo ./netem.sh eth0 t3 <청중IP>` | Q3·Q7·Q8 | 5초 뒤 회복, PLI 레이어 간격 이하 |
-| T6 150ms±30ms | `sudo ./netem.sh eth0 t6 <청중IP>` | Q2·Q7 | 억제 min(100ms,2RTT) 로 중복 NACK 이 폭주하지 않음 |
+| T6 150ms±30ms | `sudo ./netem.sh eth0 t6 <청중IP>` | Q2·Q7 | 억제 max(min(100ms,2RTT),1.2RTT) 로 중복 NACK 이 폭주하지 않음 |
 | T7 상류 3% | 발표자 쪽 장치에서 `t7` | Q3·Q8 | 청중 30명 PLI 가 레이어당 l 2회/초·m·h 1회/초 이하로 모임 |
 | T4 대역 제한 | `RATE=2mbit … t4` → `… t4` | Q4 | M4 범위(여기선 도구만) |
 
