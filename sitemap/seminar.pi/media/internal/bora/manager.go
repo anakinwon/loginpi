@@ -125,8 +125,7 @@ func (m *Manager) Join(s signal.Session, t signal.Ticket) (signal.JoinRes, *sign
 	var r *Room
 	var p *Peer
 	var e *signal.Error
-	var list []signal.ProducerInfo
-	var peers []signal.PeerInfo
+	var res signal.JoinRes
 	for try := 0; try < 2; try++ {
 		var ended bool
 		if r, ended = m.room(t); ended {
@@ -134,7 +133,7 @@ func (m *Manager) Join(s signal.Session, t signal.Ticket) (signal.JoinRes, *sign
 		} else if r == nil {
 			return signal.JoinRes{}, signal.Errf(signal.CodeRoomFull, "방 수 상한")
 		}
-		p, list, peers, e = r.joinState(t, s)
+		p, res, e = r.joinState(t, s)
 		if e == nil || e.Code != signal.CodeRoomClosed || !isDone(r.Done()) {
 			break // 정리와 겹쳐 닫힌 방이면 한 번 더 — 새 방을 받는다
 		}
@@ -147,7 +146,8 @@ func (m *Manager) Join(s signal.Session, t signal.Ticket) (signal.JoinRes, *sign
 	if ice == nil {
 		ice = []signal.ICEServer{}
 	}
-	return signal.JoinRes{PeerID: p.ID, Role: p.Role, IceServers: ice, Producers: list, Peers: peers}, nil
+	res.PeerID, res.Role, res.IceServers = p.ID, p.Role, ice
+	return res, nil
 }
 
 func decode[T any](d json.RawMessage) (T, *signal.Error) {
@@ -269,6 +269,27 @@ func (m *Manager) Request(s signal.Session, method string, d json.RawMessage) (a
 			return nil, e
 		}
 		return struct{}{}, r.SetRole(ref.peer, v.PeerID, v.Role)
+	case signal.MPeerMute, signal.MPeerAskUnmute:
+		v, e := decode[signal.MuteReq](d)
+		if e != nil {
+			return nil, e
+		}
+		if method == signal.MPeerMute {
+			return struct{}{}, r.MutePeer(ref.peer, v.PeerID, v.Kind)
+		}
+		return struct{}{}, r.AskUnmute(ref.peer, v.PeerID, v.Kind)
+	case signal.MRoomMuteAll:
+		v, e := decode[signal.MuteAllReq](d)
+		if e != nil {
+			return nil, e
+		}
+		return struct{}{}, r.MuteAll(ref.peer, v.Kind, v.Lock)
+	case signal.MRoomSetLayout:
+		v, e := decode[signal.Layout](d)
+		if e != nil {
+			return nil, e
+		}
+		return struct{}{}, r.SetLayout(ref.peer, v)
 	case signal.MRoomEnd:
 		if e := r.RequirePresenter(ref.peer); e != nil {
 			return nil, e
