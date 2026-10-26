@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { LoginGate } from '@/components/login-gate'
+import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
 import { ConnectionBadge, useConnectionCheck } from './connection-check'
 import { ControlBar, ICON, Icon, QualityMenu, useBarVisibility, type PanelTab } from './control-bar'
@@ -46,10 +47,12 @@ export function RoomView({ room, wsUrl }: { room: string; wsUrl?: string }) {
 
 // 오류 코드별 다음 행동(설계서 7.3) — 정원·종료 = 홈으로(상세 S2 는 M5 전이라 홈), 중복 세션 = 안내 + 홈으로(다시 입장하면 다른 기기를
 // 끊으므로 다시 입장 버튼은 두지 않는다 — 빠져나갈 길은 홈 링크), 그 밖 = 다시 입장(대기실 → 입장권 재발급)
-const HOME_CODES = new Set(['ROOM_FULL', 'ROOM_CLOSED', 'DUPLICATE_SESSION'])
+// 입장권 거절(QA 2026-10-27) : 402 = 유료 미등록 → 상세(S2)에서 결제, 404·409 = 세미나 없음·종료 → 홈 — 다시 입장해도 같은 실패라 다시 입장 버튼을 두지 않는다
+const HOME_CODES = new Set(['ROOM_FULL', 'ROOM_CLOSED', 'DUPLICATE_SESSION', 'TICKET_404', 'TICKET_409'])
+const DETAIL_CODES = new Set(['TICKET_402'])
 
 // 끊김·오류 전체 화면(설계서 6.3) — 무대·하단 바를 덮는다
-function Ended({ code, onRejoin }: { code: string; onRejoin: () => void }) {
+function Ended({ code, room, onRejoin }: { code: string; room: string; onRejoin: () => void }) {
   const t = useTranslations('room')
   const key = `err.${code}`
   const btn = 'bg-accent inline-grid h-11 place-items-center rounded-full px-5 font-semibold text-white'
@@ -57,7 +60,11 @@ function Ended({ code, onRejoin }: { code: string; onRejoin: () => void }) {
     <section role="alert" className="bg-background fixed inset-0 z-40 grid place-items-center p-4">
       <div className="bg-surface w-full max-w-md space-y-4 rounded-xl p-6 text-center">
         <p>{t.has(key) ? t(key) : t('err.generic')}</p>
-        {HOME_CODES.has(code) ? (
+        {DETAIL_CODES.has(code) ? (
+          <Link href={`/s/${room}`} className={btn}>
+            {t('toDetail')}
+          </Link>
+        ) : HOME_CODES.has(code) ? (
           <Link href="/" className={btn}>
             {t('home')}
           </Link>
@@ -73,6 +80,8 @@ function Ended({ code, onRejoin }: { code: string; onRejoin: () => void }) {
 
 // 화면 알림 유지 시간 — 설계서 14.4 알림 지속 5단계 중 5s
 const NOTICE_MS = 5000
+// 세미나 방 = uuid(PRD D-8). 실험실 방 코드는 DB 종료 처리를 건너뛴다
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 // 요소 폭(px) 추적 — 하단 바 슬롯 수·라벨 판정(창이 아니라 무대 열 기준 — 사이드 패널이 열리면 좁아진다).
 // 콜백 ref(요소가 입장 뒤에 생기므로 처음 렌더의 ref 로는 못 잡는다)
@@ -190,7 +199,8 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
     if (!ev) return
     if (ev.type === 'mutedBy') say(`mutedBy.${ev.kind}`)
     else if (ev.type === 'askUnmute') setAsk(ev.kind)
-    else if (role !== 'presenter') say(ev.locks.audio ? 'policy.locked' : 'policy.unlocked')
+    // 오디오·영상 어느 쪽이든 잠기면 잠김 안내(v1.2 검토 지적 : 오디오만 보던 것)
+    else if (role !== 'presenter') say(ev.locks.audio || ev.locks.video ? 'policy.locked' : 'policy.unlocked')
   }, [r.modEvent]) // eslint-disable-line react-hooks/exhaustive-deps
   const myLocks = lockedFor(role, r.locks)
   // 잠금이 걸리면 마이크 켜기 요청 알림은 의미가 없다
@@ -207,7 +217,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   }
 
   // 발표자 무대 고정 → 청중도 따라 보게(room.setLayout). 내 화면공유 키를 아직 모르면(발행 전) 보내지 않는다
-  async function pinForAll(key: string) {
+  async function pinForAll(key: string | null) {
     if (role !== 'presenter') return
     const l = layoutFor(key, r.screenProducerId())
     if (l) sayErr(await r.setLayout(l), 'actionFailed')
@@ -280,6 +290,12 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
 
   async function endSeminar() {
     leaveRef.current?.close()
+    // DB 상태 먼저 ENDED(정본) — 엔진을 재시작해도 입장권이 다시 나가지 않게(입장권 409). 실험실 방 코드는 DB 가 없어 건너뜀.
+    // DB 갱신이 실패해도 방은 닫는다(참가자를 붙잡아 두지 않음) — 실패는 콘솔에 남긴다
+    if (UUID_RE.test(room)) {
+      const res = await piFetch(`/api/seminars/${room}/end`, { method: 'POST' }).catch(() => null)
+      if (!res?.ok) console.error('[room] 세미나 종료 DB 반영 실패', res?.status)
+    }
     // 성공하면 서버가 전원(나 포함)에게 ntf error ROOM_CLOSED → 종료 화면
     sayErr(await r.end(), 'endFailed')
   }
@@ -313,7 +329,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
           onJoin={onJoin}
         />
       ) : ended ? (
-        <Ended code={r.error ?? 'CLOSED'} onRejoin={r.leave} />
+        <Ended code={r.error ?? 'CLOSED'} room={room} onRejoin={r.leave} />
       ) : (
         <div className="flex gap-3">
           {/* 무대 열 — 세로 : 무대 위·바 아래, 낮은 가로 화면(휴대폰 회전) : 바를 오른쪽 세로로(설계서 6.2) */}

@@ -187,7 +187,10 @@
       "WS_FAILED": "Couldn't connect to the video server.",
       "ICE_FAILED": "The video connection dropped. Check your network.",
       "MEDIA_FAILED": "Couldn't start the camera or microphone.",
-      "TIMEOUT": "The video server isn't responding."
+      "TIMEOUT": "The video server isn't responding.",
+      "TICKET_402": "This is a paid seminar. Please pay on the seminar page before entering.",
+      "TICKET_404": "Seminar not found.",
+      "TICKET_409": "This seminar has ended or was canceled."
     },
     "notice": {
       "toggleFailed": {
@@ -222,7 +225,8 @@
       "micOff": "Microphone off",
       "screen": "{name}'s screen",
       "row": "Other speakers",
-      "pin": "Show {name} large"
+      "pin": "Show {name} large",
+      "unpin": "Auto layout"
     },
     "more": "More options",
     "joinNoCam": "Join without camera",
@@ -330,7 +334,8 @@
       "audio": "The presenter asked you to turn on your microphone.",
       "video": "The presenter asked you to turn on your camera.",
       "ignore": "Ignore"
-    }
+    },
+    "toDetail": "Go to seminar page"
   },
   "list": {
     "tabsLabel": "Seminar list view",

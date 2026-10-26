@@ -187,7 +187,7 @@ type StageProps = {
   speaker: string | null // ntf activeSpeaker(v1.2)
   engineSpeaker: boolean // 엔진 발언자 판정 사용 가능 — 아니면 타일이 직접 판정
   layout: RoomLayout | null // 발표자 레이아웃(ntf layout) — 청중·패널은 follow 면 따라 본다
-  onPin?: (key: string) => void // 발표자가 작은 타일을 고정 → room.setLayout
+  onPin?: (key: string | null) => void // 발표자가 작은 타일을 고정 → room.setLayout(null = 자동 배치로 되돌림)
 }
 
 // 레이아웃(설계서 6.2) — 발표자 고정(발행자 1) / 발표 + 패널(큰 무대 1 + 작은 타일 줄 : 모바일 가로 스크롤, 데스크톱 우하단) /
@@ -217,6 +217,19 @@ export function Stage(props: StageProps) {
   const notice = !live ? t('state.connecting') : !main ? t('waiting') : null
   return (
     <div className="relative">
+      {live && props.onPin && pin.pin && (
+        // 발표자 전용 — 고정을 풀고 청중 화면도 자동 배치로(room.setLayout mode auto). v1.2 검토 지적 : 되돌릴 길이 없었음
+        <button
+          type="button"
+          onClick={() => {
+            setPin((p) => ({ ...p, pin: null, prev: null }))
+            props.onPin?.(null)
+          }}
+          className="bg-surface/80 absolute top-2 left-2 z-10 rounded-full px-3 py-1 text-xs font-semibold"
+        >
+          {t('tile.unpin')}
+        </button>
+      )}
       <VideoTile
         video={main?.video ?? null}
         audio={main?.audio ?? null}
