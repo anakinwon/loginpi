@@ -3,6 +3,14 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   barOrder,
+  capLayer,
+  isBadGrade,
+  layerFor,
+  layerSender,
+  nextToast,
+  TOAST,
+  wantLayer,
+  worstGrade,
   batchReaction,
   enqueueReactions,
   gradeNet,
@@ -188,4 +196,100 @@ test('무대 묶음 — 주인별 카메라·마이크 1타일, 주인 모르는
   assert.deepEqual([...groups.keys()], ['a', 'b', '?vx', '?vy'])
   assert.deepEqual([groups.get('a').cam.producerId, groups.get('a').mic.producerId], ['v1', 'm1'])
   assert.equal(groups.get('?vy').cam.producerId, 'vy')
+})
+
+// ── M4 ──
+
+test('화질 단계 — 높이 × (DPR>2 면 2) : <360 l, <720 m, 그 외 h', () => {
+  assert.equal(layerFor(359, 1), 0)
+  assert.equal(layerFor(360, 1), 1)
+  assert.equal(layerFor(719, 2), 1) // DPR 2 는 배율 1 — 한 층 덜 받는다
+  assert.equal(layerFor(720, 1), 2)
+  assert.equal(layerFor(200, 3), 1) // DPR 3 → 400
+  assert.equal(layerFor(360, 3), 2) // → 720
+})
+
+test('화면 밖 2초 이상·탭 숨김 → 0, 그 전엔 높이대로', () => {
+  const base = { height: 800, dpr: 1, offMs: null, hidden: false }
+  assert.equal(wantLayer(base), 2)
+  assert.equal(wantLayer({ ...base, offMs: 1999 }), 2)
+  assert.equal(wantLayer({ ...base, offMs: 2000 }), 0)
+  assert.equal(wantLayer({ ...base, hidden: true }), 0)
+})
+
+test('수동 상한 — 자동값을 넘지 못하게 자름', () => {
+  assert.equal(capLayer(2, 'auto'), 2)
+  assert.equal(capLayer(2, 'medium'), 1)
+  assert.equal(capLayer(1, 'high'), 1)
+  assert.equal(capLayer(2, 'low'), 0)
+})
+
+// 가짜 타이머 — set 은 대기열에 넣고 run 으로 실행
+function fakeTimers() {
+  const q = new Map()
+  let n = 0
+  return {
+    set: (fn) => (q.set(++n, fn), n),
+    clear: (t) => q.delete(t),
+    run: () => {
+      const fns = [...q.values()]
+      q.clear()
+      fns.forEach((f) => f())
+    },
+    size: () => q.size,
+  }
+}
+
+test('setLayer 송신 — 100ms 디바운스 마지막 값만, 같은 값은 안 보냄(처음 기준 2)', () => {
+  const sent = []
+  const tm = fakeTimers()
+  const s = layerSender((id, v) => sent.push([id, v]), tm)
+  s.update('c1', 2) // 서버 기본과 같음
+  assert.equal(tm.size(), 0)
+  s.update('c1', 1)
+  s.update('c1', 0) // 디바운스 안에서 덮어씀
+  assert.equal(tm.size(), 1)
+  tm.run()
+  assert.deepEqual(sent, [['c1', 0]])
+  s.update('c1', 0)
+  assert.equal(tm.size(), 0)
+  s.update('c1', 2)
+  s.update('c1', 0) // 되돌아오면 대기 취소
+  assert.equal(tm.size(), 0)
+  s.forget('c1')
+  s.update('c1', 1)
+  tm.run()
+  assert.deepEqual(sent, [
+    ['c1', 0],
+    ['c1', 1],
+  ])
+})
+
+test('품질 등급 — 가장 나쁜 것, poor·lost 만 나쁨', () => {
+  assert.equal(worstGrade([]), 'excellent')
+  assert.equal(worstGrade(['good', 'lost', 'poor']), 'lost')
+  assert.deepEqual(['excellent', 'good', 'poor', 'lost'].map(isBadGrade), [false, false, true, true])
+})
+
+test('품질 알림 — 나빠지면 즉시, 회복 5초 뒤 숨김, 그사이 다시 나쁘면 유지', () => {
+  let st = { shown: false, okAt: 0 }
+  st = nextToast(st, false, 0)
+  assert.equal(st.shown, false)
+  st = nextToast(st, true, 100)
+  assert.deepEqual(st, { shown: true, okAt: 0 })
+  st = nextToast(st, false, 1000) // 회복 시각 기록
+  assert.deepEqual(st, { shown: true, okAt: 1000 })
+  st = nextToast(st, false, 1000 + TOAST.hideMs - 1)
+  assert.equal(st.shown, true)
+  st = nextToast(st, true, 3000) // 다시 나빠짐 — 회복 시각 초기화
+  assert.deepEqual(st, { shown: true, okAt: 0 })
+  st = nextToast(nextToast(st, false, 4000), false, 4000 + TOAST.hideMs)
+  assert.deepEqual(st, { shown: false, okAt: 0 })
+})
+
+test('청중 화질 칸 — 맨 뒤, 폭 > 565 에서만 메인 5칸 안', () => {
+  assert.equal(barOrder('audience', 600).at(-1), 'quality')
+  assert.equal(barOrder('audience', 600).indexOf('quality') < mainSlots(600, 'audience'), true)
+  assert.equal(barOrder('audience', 500).indexOf('quality') < mainSlots(500, 'audience'), false)
+  assert.equal(barOrder('presenter', 600).includes('quality'), false)
 })

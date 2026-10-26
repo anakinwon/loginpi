@@ -2,9 +2,22 @@
 // 화상 방 연결 훅 — 입장권·TURN 발급 → 엔진 /signal(WebSocket) → 발행 PC(클라이언트 offer)·구독 PC(서버 offer, PRD_02 D-2).
 // 봉투 {t,id,m,ok,d,e}·메시지 이름은 docs/SIGNAL_API.md v1.1 = media/internal/signal/envelope.go. 룸 화면(/s/[id]/join)과 실험실(/lab/sfu)이 같이 쓴다
 // v1.1(3.3) : 참가자(peers)·출처(source)·채팅·손들기·반응·역할 변경(세션 역할이 정본)·세미나 종료
+// M4(v1.1.3) : 타일 크기별 consumer.setLayer(100ms 디바운스·바뀔 때만, 청중 수동 상한) · ntf score 등급(가장 나쁜 것)
 import { useEffect, useRef, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
-import { batchReaction, ownerKey, REACT, type PeerLike, type PeerRole } from './room-rules'
+import {
+  batchReaction,
+  capLayer,
+  layerSender,
+  ownerKey,
+  REACT,
+  worstGrade,
+  type Grade,
+  type Layer,
+  type PeerLike,
+  type PeerRole,
+  type QualityCap,
+} from './room-rules'
 
 export type Role = 'presenter' | 'audience' // 입장권으로 요청하는 역할(panel 은 승격으로만, SIGNAL_API 6절)
 export type SessionRole = PeerRole
@@ -14,6 +27,7 @@ export type Peer = PeerLike
 // 받은 producer 하나 — peerId = 주인 키(ownerKey : consumerCreated.peer, 비면 producer 별 대체 키), stream 은 그 트랙 하나만 담은 화면용 스트림(트랙이 같으면 같은 객체)
 export type RemoteTrack = {
   producerId: string
+  consumerId: string // setLayer 대상
   peerId: string
   kind: MediaKind
   source: Source
@@ -130,6 +144,13 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   const chatN = useRef(0)
   const reactRef = useRef<{ list: string[]; timer?: ReturnType<typeof setTimeout> }>({ list: [] })
   const reactSeq = useRef(0)
+  // 수신 화질 — consumerId → 타일이 계산한 레이어(상한 적용 전), 송신기(디바운스·중복 제거), 수동 상한, 등급
+  const wantRef = useRef(new Map<string, Layer>())
+  const capRef = useRef<QualityCap>('auto')
+  const gradesRef = useRef(new Map<string, Grade>())
+  const layerRef = useRef<ReturnType<typeof layerSender> | null>(null)
+  const [qualityCap, setCap] = useState<QualityCap>('auto')
+  const [quality, setQuality] = useState<Grade>('excellent')
   const [state, setState] = useState<RoomState>('idle')
   const [error, setError] = useState<string | null>(null)
   const [localStream, setLocalStream] = useState<MediaStream | null>(null)
@@ -232,6 +253,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       }
       list.push({
         producerId: c.producerId,
+        consumerId: c.consumerId,
         peerId: ownerKey(c.peer, c.producerId),
         kind: c.kind,
         source: c.source ?? (c.kind === 'audio' ? 'mic' : 'camera'),
@@ -310,7 +332,10 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     } else if (e.m === 'producerClosed') {
       const id = (e.d as { producerId: string }).producerId
       const c = consumersRef.current.get(id)
-      if (c) tracksRef.current.delete(c.mid)
+      if (c) {
+        tracksRef.current.delete(c.mid)
+        forgetConsumer(c.consumerId)
+      }
       consumersRef.current.delete(id)
       pausedRef.current.delete(id)
       sync()
@@ -350,6 +375,12 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     } else if (e.m === 'reaction') {
       const r = e.d as { counts: Record<string, number> }
       setReaction({ counts: r.counts ?? {}, seq: ++reactSeq.current })
+    } else if (e.m === 'score') {
+      // 내 수신(consumerId)만 — producerId 형은 엔진이 아직 보내지 않는다(SIGNAL_API 3.4). 모르는 consumer 는 무시
+      const sc = e.d as { consumerId?: string; grade: Grade }
+      if (!sc.consumerId || ![...consumersRef.current.values()].some((c) => c.consumerId === sc.consumerId)) return
+      gradesRef.current.set(sc.consumerId, sc.grade)
+      setQuality(worstGrade(gradesRef.current.values()))
     } else if (e.m === 'error') {
       const er = e.d as { code: string; msg: string }
       log(`서버 오류 ${er.code} ${er.msg}`)
@@ -708,6 +739,28 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     }, REACT.batchMs)
   }
 
+  // 수신 화질 상한(설계서 14.2) — 타일이 렌더 높이·가시성으로 계산한 값. 청중 수동 상한으로 자른 뒤 바뀔 때만 보낸다
+  function sender() {
+    layerRef.current ??= layerSender((consumerId, maxSpatial) =>
+      request('consumer.setLayer', { consumerId, maxSpatial }).catch((e: Error) => log(`화질 요청 실패 ${e.message}`)),
+    )
+    return layerRef.current
+  }
+  function setLayer(consumerId: string, maxSpatial: Layer) {
+    wantRef.current.set(consumerId, maxSpatial)
+    sender().update(consumerId, capLayer(maxSpatial, capRef.current))
+  }
+  function setQualityCap(cap: QualityCap) {
+    capRef.current = cap
+    setCap(cap)
+    for (const [id, v] of wantRef.current) sender().update(id, capLayer(v, cap))
+  }
+  function forgetConsumer(consumerId: string) {
+    wantRef.current.delete(consumerId)
+    layerRef.current?.forget(consumerId)
+    if (gradesRef.current.delete(consumerId)) setQuality(worstGrade(gradesRef.current.values()))
+  }
+
   // 발행 PC 통계(발표자 연결 점검용) — 발행 전·청중이면 null
   function pubStats(): Promise<RTCStatsReport | null> {
     return pubRef.current?.getStats().catch(() => null) ?? Promise.resolve(null)
@@ -740,6 +793,10 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     tracksRef.current.clear()
     consumersRef.current.clear()
     pausedRef.current.clear()
+    wantRef.current.clear()
+    layerRef.current?.reset()
+    gradesRef.current.clear()
+    setQuality('excellent')
     streamCache.current.clear()
     producersRef.current = {}
     sendersRef.current = {}
@@ -800,5 +857,9 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     end,
     react,
     pubStats,
+    setLayer,
+    quality,
+    qualityCap,
+    setQualityCap,
   }
 }
