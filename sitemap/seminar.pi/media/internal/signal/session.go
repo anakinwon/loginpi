@@ -26,6 +26,13 @@ type Session interface {
 	Close(code ErrCode)
 }
 
+// EndSession — Request 가 이 값을 돌려주면 서버는 응답 d(D)를 먼저 보내고 ntf error(Code)로 세션을 닫는다
+// (room.end 요청자 : 성공 응답 → ROOM_CLOSED 순서, SIGNAL_API 3.3 D).
+type EndSession struct {
+	D    any
+	Code ErrCode
+}
+
 // Handler — 방 쪽(bora.Manager)이 구현. signal 세션 고루틴이 부른다.
 type Handler interface {
 	// Join — 입장권 검증을 통과한 세션의 입장. 정원·역할·중복 sub 는 방이 다시 검사한다(R-P5 2회 검사).

@@ -237,6 +237,11 @@ func (sv *server) serve(ws *WSConn) {
 				return
 			default:
 				d, e := sv.h.Request(s, env.M, env.D)
+				if end, ok := d.(EndSession); ok && e == nil {
+					s.reply(env.ID, end.D, nil)
+					s.Close(end.Code)
+					return
+				}
 				s.reply(env.ID, d, e)
 			}
 		case TypeNtf: // 클라이언트 알림(trickle 등) — 응답 없음

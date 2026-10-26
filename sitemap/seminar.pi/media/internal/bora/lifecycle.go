@@ -194,6 +194,7 @@ func (r *Room) closePeer(peerID string) {
 		p.offerTimer.Stop()
 	}
 	delete(r.peers, peerID)
+	r.queueLeft(peerID) // ④ 뒤 200ms 묶음 ntf peerLeft(v1.1)
 }
 
 // closeProducer — Producer 닫힘 연쇄. 순서 : ① 표에서 빼 새 Consume 차단 ② Producer 닫기(레이어 수신 고루틴 종료 → 큐 투입 중단)
@@ -293,7 +294,7 @@ func (r *Room) producerInfos(except string) []signal.ProducerInfo {
 	out := make([]signal.ProducerInfo, 0, len(r.producers))
 	for id, pr := range r.producers {
 		if pr.PeerID() != except {
-			out = append(out, signal.ProducerInfo{ID: id, Kind: pr.Kind().String(), Peer: pr.PeerID()})
+			out = append(out, signal.ProducerInfo{ID: id, Kind: pr.Kind().String(), Peer: pr.PeerID(), Source: string(pr.Source())})
 		}
 	}
 	slices.SortFunc(out, func(a, b signal.ProducerInfo) int { return strings.Compare(a.ID, b.ID) })

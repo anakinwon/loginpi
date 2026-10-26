@@ -26,7 +26,10 @@ const SweepInterval = 10 * time.Second
 type Manager struct {
 	rooms    map[string]*Room   // loop 고루틴 소유
 	sessions map[string]sessRef // 세션 ID → 방·참가자(loop 고루틴 소유)
-	cmd      chan func()
+	// ended — room.end 로 끝난 방 ID(loop 고루틴 소유). 이후 join 은 ROOM_CLOSED, 엔진 재시작 시 초기화.
+	// ponytail: 프로세스 수명 동안 쌓인다(방 ID 는 서명된 입장권에서만 옴) — 많아지면 종료 시각 기준 만료
+	ended map[string]bool
+	cmd   chan func()
 
 	api    *webrtc.API // SetAPI 로 기동 시 1번(이후 읽기만)
 	ice    []webrtc.ICEServer
@@ -35,7 +38,7 @@ type Manager struct {
 
 // NewManager — 엔진 기동 시 1개. 서비스 전에 SetAPI 를 불러야 한다.
 func NewManager() *Manager {
-	m := &Manager{rooms: map[string]*Room{}, sessions: map[string]sessRef{}, cmd: make(chan func())}
+	m := &Manager{rooms: map[string]*Room{}, sessions: map[string]sessRef{}, ended: map[string]bool{}, cmd: make(chan func())}
 	go func() {
 		for fn := range m.cmd {
 			fn()
@@ -66,9 +69,12 @@ func (m *Manager) exec(fn func()) {
 }
 
 // room — 있으면 돌려주고, 없으면 입장권 기준(cap·end)으로 만든다. 방 수가 MaxRooms 면 nil.
-func (m *Manager) room(t signal.Ticket) *Room {
-	var r *Room
+// room.end 로 끝난 방이면 nil, ended=true.
+func (m *Manager) room(t signal.Ticket) (r *Room, ended bool) {
 	m.exec(func() {
+		if ended = m.ended[t.Room]; ended {
+			return
+		}
 		r = m.rooms[t.Room]
 		if r == nil && len(m.rooms) < MaxRooms {
 			var end time.Time
@@ -80,7 +86,7 @@ func (m *Manager) room(t signal.Ticket) *Room {
 			m.rooms[t.Room] = r
 		}
 	})
-	return r
+	return r, ended
 }
 
 // reap — 정리 대상 방(Room.reapable)을 목록에서 빼고 닫는다. only 가 nil 이 아니면 그 방만 본다.
@@ -103,7 +109,7 @@ func (m *Manager) reap(only *Room) {
 		}
 	})
 	for _, r := range dead {
-		shutRoom(r)
+		shutRoom(r, "")
 	}
 }
 
@@ -119,11 +125,16 @@ func (m *Manager) Join(s signal.Session, t signal.Ticket) (signal.JoinRes, *sign
 	var r *Room
 	var p *Peer
 	var e *signal.Error
+	var list []signal.ProducerInfo
+	var peers []signal.PeerInfo
 	for try := 0; try < 2; try++ {
-		if r = m.room(t); r == nil {
+		var ended bool
+		if r, ended = m.room(t); ended {
+			return signal.JoinRes{}, signal.Errf(signal.CodeRoomClosed, "세미나 종료")
+		} else if r == nil {
 			return signal.JoinRes{}, signal.Errf(signal.CodeRoomFull, "방 수 상한")
 		}
-		p, e = r.Join(t, s)
+		p, list, peers, e = r.joinState(t, s)
 		if e == nil || e.Code != signal.CodeRoomClosed || !isDone(r.Done()) {
 			break // 정리와 겹쳐 닫힌 방이면 한 번 더 — 새 방을 받는다
 		}
@@ -131,14 +142,12 @@ func (m *Manager) Join(s signal.Session, t signal.Ticket) (signal.JoinRes, *sign
 	if e != nil {
 		return signal.JoinRes{}, e
 	}
-	var list []signal.ProducerInfo
-	r.exec(func() { list = r.producerInfos(p.ID) })
 	m.exec(func() { m.sessions[s.ID()] = sessRef{room: r, peer: p.ID} })
 	ice := m.iceOut
 	if ice == nil {
 		ice = []signal.ICEServer{}
 	}
-	return signal.JoinRes{PeerID: p.ID, Role: t.Role, IceServers: ice, Producers: list}, nil
+	return signal.JoinRes{PeerID: p.ID, Role: t.Role, IceServers: ice, Producers: list, Peers: peers}, nil
 }
 
 func decode[T any](d json.RawMessage) (T, *signal.Error) {
@@ -226,8 +235,60 @@ func (m *Manager) Request(s signal.Session, method string, d json.RawMessage) (a
 			return nil, e
 		}
 		return struct{}{}, r.PauseProducer(ref.peer, v.ProducerID, method == signal.MProducerPause)
+	case signal.MChatSend:
+		v, e := decode[signal.ChatSendReq](d)
+		if e != nil {
+			return nil, e
+		}
+		ts, e := r.Chat(ref.peer, v.Text)
+		if e != nil {
+			return nil, e
+		}
+		return signal.ChatSendRes{Ts: ts}, nil
+	case signal.MHandSet:
+		v, e := decode[signal.HandSetReq](d)
+		if e != nil {
+			return nil, e
+		}
+		ts, e := r.SetHand(ref.peer, v.Raised)
+		if e != nil {
+			return nil, e
+		}
+		return signal.HandSetRes{RaisedTs: ts}, nil
+	case signal.MHandLowerAll:
+		return struct{}{}, r.LowerAllHands(ref.peer)
+	case signal.MReactionSend:
+		v, e := decode[signal.ReactionSendReq](d)
+		if e != nil {
+			return nil, e
+		}
+		return struct{}{}, r.React(ref.peer, v.Emojis)
+	case signal.MPeerSetRole:
+		v, e := decode[signal.SetRoleReq](d)
+		if e != nil {
+			return nil, e
+		}
+		return struct{}{}, r.SetRole(ref.peer, v.PeerID, v.Role)
+	case signal.MRoomEnd:
+		if e := r.RequirePresenter(ref.peer); e != nil {
+			return nil, e
+		}
+		m.endRoom(r, s.ID())
+		return signal.EndSession{D: struct{}{}, Code: signal.CodeRoomClosed}, nil
 	}
 	return nil, signal.Errf(signal.CodeNotFound, "미구현 메서드: "+method)
+}
+
+// endRoom — room.end. 종료 표시(이후 join ROOM_CLOSED) → 목록에서 빼기 → 요청자 외 전원 ntf error ROOM_CLOSED·연쇄 정리.
+// 요청자 세션은 signal 서버가 성공 응답 뒤 닫는다(EndSession).
+func (m *Manager) endRoom(r *Room, requester string) {
+	m.exec(func() {
+		m.ended[r.id] = true
+		if m.rooms[r.id] == r {
+			delete(m.rooms, r.id)
+		}
+	})
+	shutRoom(r, requester)
 }
 
 // Left — signal.Handler. 세션이 속한 방에서 Leave.

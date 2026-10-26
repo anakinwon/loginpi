@@ -72,15 +72,15 @@ func (m *Manager) CloseRoom(id string) bool {
 	if r == nil {
 		return false
 	}
-	shutRoom(r)
+	shutRoom(r, "")
 	return true
 }
 
-// shutRoom — 목록에서 뺀 방을 닫는다(참가자에게 ROOM_CLOSED 후 연쇄 정리).
-func shutRoom(r *Room) {
+// shutRoom — 목록에서 뺀 방을 닫는다(참가자에게 ROOM_CLOSED 후 연쇄 정리). except 세션은 알리지 않는다(room.end 요청자 — signal 이 응답 뒤 닫음).
+func shutRoom(r *Room, except string) {
 	r.exec(func() {
 		for _, p := range r.peers {
-			if p.Session != nil {
+			if p.Session != nil && p.Session.ID() != except {
 				p.Session.Close(signal.CodeRoomClosed)
 			}
 		}
