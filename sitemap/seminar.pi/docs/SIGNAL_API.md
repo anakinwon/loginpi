@@ -11,7 +11,7 @@
 | 주소 | `wss://<미디어 서버>/signal` (개발 `ws://localhost:7880/signal`, Next env `NEXT_PUBLIC_MEDIA_WS_URL`) |
 | Origin | `MEDIA_ALLOWED_ORIGINS` 목록만 허용 |
 | 세션 | WebSocket 연결 1개 = 세션 1개 = 참가자 1명 |
-| 입장 시한 | 연결 후 **10초** 안에 `join` (넘으면 `ntf error TICKET_INVALID` 후 종료) |
+| 입장 시한 | 연결 후 **10초** 안에 `join` (넘으면 **알림 없이** 연결 종료). 첫 메시지가 `join` 요청이 아니면 `res ok:false TICKET_INVALID` 후 종료 |
 | 생존 확인 | 20초 무수신이면 서버가 `ping`, **45초** 무수신이면 종료 |
 | 메시지 크기 | 최대 **64KB** [TBD : M1 실측] — 넘으면 종료 |
 | 형식 | 텍스트 프레임, UTF-8 JSON 1개 |
@@ -45,11 +45,11 @@
 |---|---|---|---|---|---|
 | `join` | `{ticket}` | `{peerId, role, iceServers, producers}` | 전원 | M1 | 첫 메시지여야 함. `producers` = 방에 이미 있는 다른 참가자 producer 목록(늦은 합류자 상태) |
 | `transport.publish` | `{sdp}` (offer) | `{sdp}` (answer) | presenter·panel | M1 | 발행 PC 협상. 클라이언트 offer 고정(D-2 glare 없음) |
-| `produce` | `{mid, kind, source, rids?}` | `{producerId}` | presenter·panel | M1 | 역할 검사 2회(signal·방). `kind` `audio`\|`video`, `source` `camera`\|`screen`\|`mic`, `rids` simulcast `["l","m","h"]` |
+| `produce` | `{mid, kind, source, rids?}` | `{producerId}` | presenter·panel | M1 | 역할 검사 2회(signal·방). `kind` `audio`\|`video`(그 밖은 `SDP_INVALID`), `source` `camera`\|`screen`\|`mic`(그 밖은 `camera` 로 간주), `rids` simulcast `["l","m","h"]` — `rids` 는 현재 서버가 읽지 않고 레이어는 수신 트랙의 rid 로 정한다 |
 | `transport.subscribe.answer` | `{sdp}` (answer) | `{}` | 전원 | M1 | `ntf transport.subscribe` 에 대한 답 |
-| `trickle` | `{pc, candidate}` | `{}` | 전원 | M1 | `pc` `pub`\|`sub`. 원격 SDP 전 도착분은 서버가 보관 |
+| `trickle` | `{pc, candidate}` | `{}` | 전원 | M1 | `pc` `pub`\|`sub`. 원격 SDP 전 도착분은 서버가 보관. 알림(`ntf`)으로 보내도 처리한다(응답 없음) |
 | `consumer.resume` | `{consumerId}` | `{}` | 전원 | M3 | 수신 준비 끝 신호 → 서버가 **즉시 키프레임 요청**. producer 가 일시정지면 producer 재개 때 함께 재개 |
-| `consumer.setLayer` | `{consumerId, maxSpatial, maxTemporal?}` | `{}` | 전원 | M3 정의·M4 사용 | 화면 크기 기반 **상한**만(0=l·1=m·2=h). 실제 레이어는 서버가 정함. 100ms 디바운스 |
+| `consumer.setLayer` | `{consumerId, maxSpatial, maxTemporal?}` | `{}` | 전원 | M3 정의·M4 사용 | 화면 크기 기반 **상한**만(0=l·1=m·2=h, 범위 밖은 0~2 로 자름). 실제 레이어는 서버가 정함. 100ms 디바운스. `maxTemporal` 은 현재 무시(시간 레이어 미지원) |
 | `producer.pause` | `{producerId}` | `{}` | 소유자 | M3 | 마이크·카메라 끄기. 연결 Consumer 전부 일시정지 + 다른 참가자에게 `ntf producerPaused` |
 | `producer.resume` | `{producerId}` | `{}` | 소유자 | M3 | 연결 Consumer 재개(키프레임 요청) + `ntf producerResumed` |
 | `producer.close` | `{producerId}` | `{}` | 소유자 | M3 | 닫힘 연쇄(4절) + `ntf producerClosed` |
@@ -64,14 +64,15 @@
 | 알림 | `d` | 단계 | 받는 사람 · 시점 |
 |---|---|---|---|
 | `transport.subscribe` | `{sdp}` (서버 offer) | M1 | 구독 PC 재협상 필요 시. 트랙이 연달아 바뀌면 **200ms 묶음** 1회 |
-| `consumerCreated` | `{consumerId, producerId, mid, kind, paused}` | M1(paused M3) | 새 producer 가 생기면 기존 참가자 전원, 입장 시 기존 producer 마다. 서버가 자동 생성(왕복 절감) |
+| `trickle` | `{pc, candidate}` | M1 | 서버 ICE 후보(`pc` `pub`\|`sub`). 응답 없음 |
+| `consumerCreated` | `{consumerId, producerId, mid, kind, paused}` | M1(paused M3) | 새 producer 가 생기면 기존 참가자 전원, 입장 시 기존 producer 마다. 서버가 자동 생성(왕복 절감). **현재 `paused` 는 항상 `false`**(4절) — 일시정지 상태는 뒤따르는 `producerPaused` 로 안다. 묶음의 `consumerCreated` 들이 먼저, 그다음 `transport.subscribe` |
 | `producerClosed` | `{producerId}` | M3 | 소유자를 뺀 전원. 이 알림이 갈 때 연결 Consumer 는 **이미 닫혀 있다** → 클라이언트는 해당 트랙을 지운다 |
 | `producerPaused` | `{producerId}` | M3 | 소유자를 뺀 전원. 일시정지 중 늦게 들어온 참가자는 `consumerCreated` 직후 받는다 |
 | `producerResumed` | `{producerId}` | M3 | 소유자를 뺀 전원 |
-| `layersChanged` | `{consumerId, spatial, temporal}` | M4 | 그 Consumer 의 주인. 서버 레이어 전환 결과 |
-| `streamState` | `{consumerId, state}` | M4 | `active`\|`paused` — 할당기 일시정지(기본 꺼짐이라 드묾) |
+| `layersChanged` | `{consumerId, spatial, temporal}` | M4 | 그 Consumer 의 주인. 서버 레이어 전환 결과 — **이름·형식만 정의, 현재 서버 미송신** |
+| `streamState` | `{consumerId, state}` | M4 | `active`\|`paused` — 할당기 일시정지(기본 꺼짐이라 드묾) — **현재 서버 미송신** |
 | `publishLayers` | `{producerId, rids}` | M4 | 발행자. dynacast — 예 `{"l":true,"m":true,"h":false}`, 하향 5초 디바운스 |
-| `score` | `{consumerId}`\|`{producerId}` + `{score, grade}` | M4 | 5초 주기 품질 점수(LiveKit 식, REA_03 5.10) |
+| `score` | `{consumerId}`\|`{producerId}` + `{score, grade}` | M4 | 5초 주기 품질 점수(LiveKit 식, REA_03 5.10) — **현재 서버 미송신** |
 | `error` | `{code, msg}` | M1 | 치명 오류 후 서버가 연결 종료할 수 있음 |
 
 ## 4. 수명주기 (서버 동작 — 클라이언트가 기대할 순서)
@@ -80,9 +81,9 @@
 청중                        서버                                   발표자
  │── join{ticket} ───────▶│ 입장권 검증(4절 오류) · 정원·역할·중복 검사
  │◀─ res{peerId,…,producers:[pa]}
- │◀─ ntf transport.subscribe{sdp} (200ms 묶음)
- │◀─ ntf consumerCreated{ca, pa, paused:false}
- │◀─ ntf producerPaused{pa}   ← pa 가 일시정지 중일 때만(늦은 합류자 상태)
+ │◀─ ntf consumerCreated{ca, pa, paused:false}   (200ms 묶음 안의 consumer 마다)
+ │◀─ ntf producerPaused{pa}   ← pa 가 일시정지 중일 때만(늦은 합류자 상태), 해당 consumerCreated 바로 뒤
+ │◀─ ntf transport.subscribe{sdp} (묶음당 1회, consumerCreated 들 다음)
  │── transport.subscribe.answer{sdp} ─▶
  │                          │ answer·연결 뒤 송신 시작 → 캐시 재생 또는 키프레임 요청 → 첫 화면
  │                          │◀── producer.close{pa} ───────────────│
@@ -99,13 +100,13 @@
 
 | 코드 | 의미 | 주로 나오는 곳 | 연결 |
 |---|---|---|---|
-| `TICKET_INVALID` | 서명·`aud`·형식·`jti` 재사용 실패, 10초 안에 join 없음 | `join` | 종료 |
+| `TICKET_INVALID` | 서명·`aud`·형식·`jti` 재사용 실패, 첫 메시지가 `join` 아님(10초 시한 초과는 알림 없이 종료) | `join` | 종료 |
 | `TICKET_EXPIRED` | `exp` 지남(오차 5초) | `join` | 종료 |
 | `ROOM_FULL` | 정원(`cap`) 초과 | `join` | 종료 |
 | `ROLE_FORBIDDEN` | audience 의 `transport.publish`·`produce` | 발행 요청 | 유지 |
 | `ROOM_CLOSED` | 방 종료(`end` 지남·관리자 종료)·닫힌 방에 요청 | 전부 · `ntf error` | 종료 |
 | `DUPLICATE_SESSION` | 같은 방에 같은 `sub` 가 다시 입장 → **기존** 세션에 `ntf error` | `ntf error` | 기존 세션 종료 |
-| `SDP_INVALID` | SDP 파싱·적용 실패 | `transport.*` | 유지 |
+| `SDP_INVALID` | SDP 파싱·적용 실패, 대기 중 offer 없이 온 `transport.subscribe.answer`, **요청 `d` 해석 실패(모든 요청)**, `produce` 의 잘못된 `kind` [TBD : 일반 `BAD_REQUEST` 코드 분리 여부] | `transport.*` · 전부 | 유지 |
 | `NOT_FOUND` | 없는 메서드·producer·consumer, 남의 producer | 전부 | 유지 |
 | `RATE_LIMITED` | 요청 과다 [TBD : 한도 M5] | 전부 | 유지 |
 | `INTERNAL` | 서버 내부 오류 | 전부 | 유지 |
@@ -146,8 +147,8 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 ```jsonc
 → {"t":"req","id":1,"m":"join","d":{"ticket":"eyJ..."}}
 ← {"t":"res","id":1,"ok":true,"d":{"peerId":"au_9","role":"audience","iceServers":[],"producers":[{"id":"p_7f3a","kind":"video","peer":"pr_1"}]}}
-← {"t":"ntf","m":"transport.subscribe","d":{"sdp":"v=0\r\n..."}}
 ← {"t":"ntf","m":"consumerCreated","d":{"consumerId":"c_12","producerId":"p_7f3a","mid":"0","kind":"video","paused":false}}
+← {"t":"ntf","m":"transport.subscribe","d":{"sdp":"v=0\r\n..."}}
 → {"t":"req","id":2,"m":"transport.subscribe.answer","d":{"sdp":"v=0\r\n..."}}
 ← {"t":"res","id":2,"ok":true}
 → {"t":"req","id":3,"m":"consumer.resume","d":{"consumerId":"c_12"}}
@@ -163,10 +164,11 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 
 - 알 수 없는 알림은 클라이언트가 무시한다. 알 수 없는 메서드는 서버가 `NOT_FOUND`.
 - 필드 추가는 하위 호환(무시 가능)으로만. 이름 변경·삭제는 이 문서 개정 + M3 합의.
-- 메시지 종류가 20개를 넘어 관리가 어려우면 JSON Schema 로 생성(D-9 되돌릴 조건). 현재 요청 12 · 알림 10.
+- 메시지 종류가 20개를 넘어 관리가 어려우면 JSON Schema 로 생성(D-9 되돌릴 조건). 현재 요청 12 · 알림 11(서버 `trickle` 포함).
 
 ## 변경 이력
 
 | 날짜 | 내용 |
 |---|---|
 | 2026-10-25 | v1.0 확정 — PRD_02 5절 초안 확정, M3 동작(닫힘 연쇄·늦은 합류자·paused→resume·producer 일시정지) 반영 |
+| 2026-10-26 | v1.0.1 문서를 코드에 맞춤(이름·필드 변경 없음) — 10초 시한 초과는 알림 없이 종료·첫 메시지 비join 응답, 서버 `trickle` 알림 추가, 알림 순서(consumerCreated → producerPaused → transport.subscribe), `paused` 항상 false, `produce` kind·source·rids 처리, setLayer 자르기·maxTemporal 무시, `SDP_INVALID` 실제 범위, M4 알림 3종 미송신 표기 |
