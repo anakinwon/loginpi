@@ -9,7 +9,19 @@ import { ConnectionBadge, useConnectionCheck } from './connection-check'
 import { ControlBar, ICON, Icon, QualityMenu, useBarVisibility, type PanelTab } from './control-bar'
 import { Prejoin } from './prejoin'
 import { Floaters, ReactionMenu } from './reactions'
-import { handKey, handNotice, isBadGrade, nextToast, TOAST, type Grade, type ToastState } from './room-rules'
+import {
+  handKey,
+  handNotice,
+  isBadGrade,
+  layoutFor,
+  lockedFor,
+  nextToast,
+  peerMedia,
+  TOAST,
+  type Grade,
+  type ModAction,
+  type ToastState,
+} from './room-rules'
 import { SidePanel } from './side-panel'
 import { Spinner, Stage, useRemoteAudio } from './stage'
 import { useRoom, type MediaKind, type Role, type SessionRole } from './use-room'
@@ -108,7 +120,7 @@ function QualityToast({ grade }: { grade: Grade }) {
 }
 
 // 화면 알림 문구 키 — 오류 코드가 있으면 그 문구, 없으면 일반 실패 문구
-const ERR_NOTICE = new Set(['RATE_LIMITED', 'ROLE_FORBIDDEN', 'MEDIA_FAILED'])
+const ERR_NOTICE = new Set(['RATE_LIMITED', 'ROLE_FORBIDDEN', 'MEDIA_FAILED', 'LOCKED'])
 
 function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; name: string; canPresent: boolean }) {
   const t = useTranslations('room')
@@ -141,6 +153,8 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   const [seenN, setSeenN] = useState(0)
   const [dismissed, setDismissed] = useState<ReadonlySet<string>>(new Set())
   const [promoHidden, setPromoHidden] = useState(false)
+  // 발표자의 켜기 요청(v1.2 askUnmute) — 고정 알림, 자동으로 켜지 않는다. [켜기]/[무시] 로만 닫힌다
+  const [ask, setAsk] = useState<MediaKind | null>(null)
   const leaveRef = useRef<HTMLDialogElement>(null)
   const [leaveStep, setLeaveStep] = useState<'choose' | 'confirm'>('choose')
   const me = r.peers.find((p) => p.peerId === r.selfId)
@@ -169,6 +183,35 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
     if (r.role === 'audience') say('demoted')
     setPromoHidden(false)
   }, [r.role])
+
+  // 사회 알림(v1.2) — 음소거됨·잠금 바뀜은 5초 알림(발표자는 자기가 한 일이라 잠금 알림 생략), 켜기 요청은 고정 알림
+  useEffect(() => {
+    const ev = r.modEvent
+    if (!ev) return
+    if (ev.type === 'mutedBy') say(`mutedBy.${ev.kind}`)
+    else if (ev.type === 'askUnmute') setAsk(ev.kind)
+    else if (role !== 'presenter') say(ev.locks.audio ? 'policy.locked' : 'policy.unlocked')
+  }, [r.modEvent]) // eslint-disable-line react-hooks/exhaustive-deps
+  const myLocks = lockedFor(role, r.locks)
+  // 잠금이 걸리면 마이크 켜기 요청 알림은 의미가 없다
+  useEffect(() => {
+    if (myLocks.audio && ask === 'audio') setAsk(null)
+  }, [myLocks.audio, ask])
+
+  async function moderate(peerId: string, a: ModAction) {
+    const e =
+      a === 'askMic'
+        ? await r.askUnmute(peerId, 'audio')
+        : await r.mutePeer(peerId, a === 'muteMic' ? 'audio' : 'video')
+    sayErr(e, 'actionFailed')
+  }
+
+  // 발표자 무대 고정 → 청중도 따라 보게(room.setLayout). 내 화면공유 키를 아직 모르면(발행 전) 보내지 않는다
+  async function pinForAll(key: string) {
+    if (role !== 'presenter') return
+    const l = layoutFor(key, r.screenProducerId())
+    if (l) sayErr(await r.setLayout(l), 'actionFailed')
+  }
 
   // 안 읽은 채팅 — 채팅 탭이 보이는 동안은 다 읽은 것
   const lastN = r.chat.at(-1)?.n ?? 0
@@ -203,6 +246,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
     setReactOpen(false)
     setQualityOpen(false)
     setDismissed(new Set())
+    setAsk(null)
     leaveRef.current?.close()
   }, [live])
 
@@ -290,6 +334,10 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                   )}
                 </span>
                 <ConnectionBadge check={check} />
+                {/* 잠금 이유(v1.2) — 마이크 버튼이 막힌 까닭을 화면에도 남긴다 */}
+                {myLocks.audio && role !== 'audience' && (
+                  <span className="bg-surface-raised rounded-full px-3 py-1">🔒 {t('mod.locked')}</span>
+                )}
               </div>
               {/* 고정 알림 — 승격(마이크 켜기)·손든 사람(1명 = 바로 처리, 2명 이상 = 묶음 → 참가자 패널) */}
               {promo && (
@@ -297,7 +345,8 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                   <p className="min-w-0 flex-1">{t('stage.promoted')}</p>
                   <button
                     type="button"
-                    disabled={r.pubBusy}
+                    disabled={r.pubBusy || myLocks.audio}
+                    title={myLocks.audio ? t('mod.locked') : undefined}
                     onClick={() => void toggle('audio', true)}
                     className={`${btnS} bg-accent text-white disabled:opacity-40`}
                   >
@@ -305,6 +354,25 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                   </button>
                   <button type="button" onClick={() => setPromoHidden(true)} className={`${btnS} bg-surface`}>
                     {t('stage.later')}
+                  </button>
+                </div>
+              )}
+              {ask && role !== 'audience' && (
+                <div role="alert" className="bg-surface-raised flex flex-wrap items-center gap-2 rounded-xl p-3 text-sm">
+                  <p className="min-w-0 flex-1">{t(`ask.${ask}`)}</p>
+                  <button
+                    type="button"
+                    disabled={r.pubBusy || myLocks[ask]}
+                    onClick={() => {
+                      setAsk(null)
+                      void toggle(ask, true) // 사용자 탭 안에서만 켠다(장치 권한 팝업 포함)
+                    }}
+                    className={`${btnS} bg-accent text-white disabled:opacity-40`}
+                  >
+                    {t(ask === 'audio' ? 'mic.off' : 'cam.off')}
+                  </button>
+                  <button type="button" onClick={() => setAsk(null)} className={`${btnS} bg-surface`}>
+                    {t('ask.ignore')}
                   </button>
                 </div>
               )}
@@ -348,6 +416,10 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                   localScreen={r.localScreen}
                   localOn={r.localOn}
                   onLayer={r.setLayer}
+                  speaker={r.speaker}
+                  engineSpeaker={r.engineSpeaker}
+                  layout={r.layout}
+                  onPin={role === 'presenter' ? (k) => void pinForAll(k) : undefined}
                 />
                 <Floaters reaction={r.reaction} />
               </div>
@@ -372,6 +444,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                 addReady={r.state === 'joined' && !r.pubBusy}
                 has={has}
                 localOn={r.localOn}
+                locked={myLocks}
                 pending={r.pending}
                 canShare={canShare}
                 sharing={!!r.localScreen}
@@ -410,6 +483,10 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
             onPromote={async (id) => sayErr(await r.setPeerRole(id, 'panel'), 'actionFailed')}
             onDemote={async (id) => sayErr(await r.setPeerRole(id, 'audience'), 'actionFailed')}
             onLowerAll={async () => sayErr(await r.lowerAll(), 'actionFailed')}
+            media={peerMedia(r.tracks)}
+            locks={r.locks}
+            onMod={(id, a) => void moderate(id, a)}
+            onMuteAll={async (lock) => sayErr(await r.muteAll('audio', lock), 'actionFailed')}
           />
         </div>
       )}

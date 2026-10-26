@@ -5,18 +5,22 @@
 // M4(v1.1.3) : 타일 크기별 consumer.setLayer(100ms 디바운스·바뀔 때만, 청중 수동 상한) · ntf score 등급(가장 나쁜 것)
 import { useEffect, useRef, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
+// v1.2(3.5) : 사회(peer.mute·room.muteAll 잠금·peer.askUnmute)·레이아웃(room.setLayout)·발언자(ntf activeSpeaker)
 import {
   batchReaction,
   capLayer,
   layerSender,
+  NO_LOCKS,
   ownerKey,
   REACT,
   worstGrade,
   type Grade,
   type Layer,
+  type Locks,
   type PeerLike,
   type PeerRole,
   type QualityCap,
+  type RoomLayout,
 } from './room-rules'
 
 export type Role = 'presenter' | 'audience' // 입장권으로 요청하는 역할(panel 은 승격으로만, SIGNAL_API 6절)
@@ -71,7 +75,14 @@ type JoinRes = {
   iceServers: RTCIceServer[]
   producers: { id: string; kind: MediaKind; peer: string; source?: Source }[]
   peers?: Peer[]
+  policy?: { locked: Locks } // v1.2 — 있으면 엔진이 사회·발언자를 지원
+  layout?: RoomLayout
 }
+// 사회 알림(화면이 문구·고정 알림으로 보인다) — seq 로 같은 내용이 연달아 와도 새 알림
+export type ModEvent =
+  | { type: 'mutedBy'; kind: MediaKind; seq: number }
+  | { type: 'askUnmute'; kind: MediaKind; seq: number }
+  | { type: 'policy'; locks: Locks; seq: number }
 
 const REQ_TIMEOUT_MS = 10000
 const CHAT_MAX = 500 // SIGNAL_API 3.3 C — 유니코드 문자 수
@@ -174,6 +185,13 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   const [peers, setPeers] = useState<Peer[]>([])
   const [chat, setChat] = useState<ChatMsg[]>([])
   const [reaction, setReaction] = useState<{ counts: Record<string, number>; seq: number } | null>(null)
+  // v1.2 — 잠금(join policy·ntf roomPolicy), 레이아웃(join layout·ntf layout), 발언자(ntf activeSpeaker), 엔진 발언자 판정 지원 여부
+  const [locks, setLocks] = useState<Locks>(NO_LOCKS)
+  const [layout, setLayoutState] = useState<RoomLayout | null>(null)
+  const [speaker, setSpeaker] = useState<string | null>(null)
+  const [engineSpeaker, setEngineSpeaker] = useState(false)
+  const [modEvent, setModEvent] = useState<ModEvent | null>(null)
+  const modSeq = useRef(0)
 
   const log = (m: string) => onLog?.(m)
 
@@ -383,6 +401,28 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       if (!sc.consumerId || ![...consumersRef.current.values()].some((c) => c.consumerId === sc.consumerId)) return
       gradesRef.current.set(sc.consumerId, sc.grade)
       setQuality(worstGrade(gradesRef.current.values()))
+    } else if (e.m === 'mutedBy') {
+      // 발표자가 내 producer 를 껐다(본인에겐 producerPaused 가 오지 않음) — 내 트랙도 꺼서 미리보기·버튼을 맞춘다
+      const m = e.d as { kind: MediaKind; producerIds: string[] }
+      const mine = producersRef.current[m.kind === 'audio' ? 'mic' : 'camera']
+      if (!mine || !m.producerIds?.includes(mine)) return
+      localRef.current?.getTracks().forEach((t) => {
+        if (t.kind === m.kind) t.enabled = false
+      })
+      setLocalOn((p) => ({ ...p, [m.kind]: false }))
+      setModEvent({ type: 'mutedBy', kind: m.kind, seq: ++modSeq.current })
+    } else if (e.m === 'askUnmute') {
+      // 켜 달라는 요청 — 자동으로 켜지 않는다(화면이 [켜기]/[무시] 고정 알림, 사용자 탭으로만)
+      const a = e.d as { kind: MediaKind }
+      setModEvent({ type: 'askUnmute', kind: a.kind, seq: ++modSeq.current })
+    } else if (e.m === 'roomPolicy') {
+      const l = (e.d as { locked: Locks }).locked ?? NO_LOCKS
+      setLocks(l)
+      setModEvent({ type: 'policy', locks: l, seq: ++modSeq.current })
+    } else if (e.m === 'layout') {
+      setLayoutState(e.d as RoomLayout)
+    } else if (e.m === 'activeSpeaker') {
+      setSpeaker((e.d as { peerId: string | null }).peerId ?? null)
     } else if (e.m === 'error') {
       const er = e.d as { code: string; msg: string }
       log(`서버 오류 ${er.code} ${er.msg}`)
@@ -454,6 +494,9 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       setRole(res.role ?? ticketRole)
       for (const p of res.peers ?? []) peersRef.current.set(p.peerId, p)
       commitPeers()
+      setEngineSpeaker(!!res.policy) // v1.2 엔진만 policy 를 준다 — 구 엔진이면 타일이 AudioContext 로 말하기 판정
+      setLocks(res.policy?.locked ?? NO_LOCKS)
+      setLayoutState(res.layout ?? null)
       log(`입장 peer=${res.peerId} 참가자 ${res.peers?.length ?? '?'}명 기존 발행 ${res.producers.length}개`)
       // 구독 PC 는 모든 참가자에게 서버 offer 로 생긴다
       const sub = newPC('sub', ice, my)
@@ -725,6 +768,13 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   const lowerAll = () => admin('hand.lowerAll', {})
   const setPeerRole = (peerId: string, r: 'panel' | 'audience') => admin('peer.setRole', { peerId, role: r })
   const end = () => admin('room.end', {})
+  // 사회(v1.2) — 순서·잠금 검사는 서버가 한 처리 안에서 한다. 결과는 producerPaused·roomPolicy 알림으로 온다
+  const mutePeer = (peerId: string, kind: MediaKind) => admin('peer.mute', { peerId, kind })
+  const askUnmute = (peerId: string, kind: MediaKind) => admin('peer.askUnmute', { peerId, kind })
+  const muteAll = (kind: MediaKind, lock: boolean) => admin('room.muteAll', { kind, lock })
+  // 레이아웃 — 무대 고정의 내 화면공유 키는 room-rules layoutFor 가 바꾼다(그래서 내 화면공유 producerId 를 넘긴다)
+  const setLayout = (l: RoomLayout) => admin('room.setLayout', l)
+  const screenProducerId = () => producersRef.current.screen
 
   // 반응 — 500ms 묶음(최대 3개)으로 보낸다. 서버가 300ms 합산해 전원(나 포함)에게 ntf reaction 으로 돌려준다
   function react(emoji: string) {
@@ -825,6 +875,11 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     setPeers([])
     setChat([])
     setReaction(null)
+    setLocks(NO_LOCKS)
+    setLayoutState(null)
+    setSpeaker(null)
+    setEngineSpeaker(false)
+    setModEvent(null)
   }
 
   return {
@@ -863,5 +918,15 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     quality,
     qualityCap,
     setQualityCap,
+    locks,
+    layout,
+    speaker,
+    engineSpeaker,
+    modEvent,
+    mutePeer,
+    askUnmute,
+    muteAll,
+    setLayout,
+    screenProducerId,
   }
 }

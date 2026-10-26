@@ -1,6 +1,6 @@
 'use client'
 // 영상 타일 — 이름·마이크 꺼짐 아이콘·카메라 끔 아바타 원·말하기 링(설계서 6.3·14.1·G7). 영상은 항상 muted(소리는 useRemoteAudio)
-// 말하기 판정은 클라이언트 AudioContext 레벨(엔진 발언자 감지 G 전까지) — 켤 때 0.2s·끌 때 0.5s 유지돼야 바뀐다(화면 흔들림 방지)
+// 말하기 판정은 엔진 ntf activeSpeaker(v1.2 G)가 정본, 구 엔진이면 클라이언트 AudioContext 레벨 — 켤 때 0.2s·끌 때 0.5s 유지돼야 바뀐다(화면 흔들림 방지)
 import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { ICON, Icon } from './control-bar'
@@ -65,6 +65,7 @@ export function VideoTile({
   mirror,
   consumerId,
   onLayer,
+  speaking: engineSpeaking,
   children,
 }: {
   video: MediaStream | null
@@ -75,12 +76,14 @@ export function VideoTile({
   mirror?: boolean
   consumerId?: string // 원격 영상이면 그 consumer(수신 화질 판정, 설계서 14.2)
   onLayer?: LayerFn
+  speaking?: boolean // 엔진 발언자 판정(ntf activeSpeaker, v1.2) — 없으면(구 엔진) 이 타일이 AudioContext 로 판정
   children?: ReactNode // 타일 위 안내·스피너
 }) {
   const t = useTranslations('room')
   const hasVideo = !!video?.getVideoTracks().length
   const hasAudio = !!audio?.getAudioTracks().length
-  const speaking = useSpeaking(audio, hasAudio && !micOff)
+  const local = useSpeaking(audio, engineSpeaking === undefined && hasAudio && !micOff)
+  const speaking = engineSpeaking ?? local
   const showAvatar = !!name && (!hasVideo || camOff)
   return (
     <div className="bg-surface relative aspect-video w-full overflow-hidden rounded-xl">

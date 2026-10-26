@@ -203,7 +203,16 @@
       "err": {
         "RATE_LIMITED": "You are sending too fast. Please wait a moment.",
         "ROLE_FORBIDDEN": "You do not have permission to do this.",
-        "MEDIA_FAILED": "Could not start your mic or camera. Please check permissions."
+        "MEDIA_FAILED": "Could not start your mic or camera. Please check permissions.",
+        "LOCKED": "Locked by the presenter."
+      },
+      "mutedBy": {
+        "audio": "The presenter muted your microphone.",
+        "video": "The presenter turned off your camera."
+      },
+      "policy": {
+        "locked": "The presenter locked microphones. You can turn yours on once they are unlocked.",
+        "unlocked": "Microphones are unlocked."
       }
     },
     "home": "Go to home",
@@ -304,6 +313,23 @@
       "cancel": "Cancel",
       "end": "End seminar",
       "endConfirm": "End now"
+    },
+    "mod": {
+      "muteAll": "Mute everyone",
+      "lock": "Lock mics",
+      "unlock": "Unlock mics",
+      "locked": "The presenter has locked microphones",
+      "muteMic": "Mute mic",
+      "askMic": "Ask to unmute",
+      "muteCam": "Turn off camera",
+      "muteMicOf": "Mute {name}",
+      "askMicOf": "Ask {name} to unmute",
+      "muteCamOf": "Turn off camera of {name}"
+    },
+    "ask": {
+      "audio": "The presenter asked you to turn on your microphone.",
+      "video": "The presenter asked you to turn on your camera.",
+      "ignore": "Ignore"
     }
   }
 }
