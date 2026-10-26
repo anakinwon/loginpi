@@ -41,7 +41,7 @@
 | F-01 | Pi 로그인(@pi/auth) + Google 연동 | P0 | 공용 패키지 배선만 |
 | F-02 | 세미나 개설(제목·일시·정원·입장료) | P0 | 개최자 = **ADMIN 만**(11절 D-1) |
 | F-03 | 세미나 목록·상세 | P0 | 서버 페이지네이션(데이터 패칭 표준 ①), 탭 전체·내가 연 것·내가 참가한 것 |
-| F-04 | Pi 입장 결제(U2A) | P0 | `pi_pymnt`(@pi/db baseline 010, `pymnt_tp_cd=SMNR_ENTR`) · 서버가 `smn_smnr.entr_pi_amt` 로 금액 재검증 |
+| F-04 | Pi 입장 결제(U2A) | P0 | `pi_pymnt`(@pi/db baseline 010, `pymnt_tp_cd=SMN_ENT`) · DB 함수 `fn_join_smn` 이 결제(본인·COMPLETED·유형·금액·세미나)를 `smn_mst.ent_pi_amt` 로 재검증 |
 | F-05 | 실시간 화상 룸 입장 | P0 | 자체 화상 엔진 — [PRD_01](PRD_01_MEDIA_ENGINE.md) M0~M5 |
 | F-06 | 개최자 수익 정산(A2U) | P1 | 수수료율 9절 #3 |
 | F-07 | VOD 다시보기 | P2 | R3 — 녹화 저장소 9절 #5 |
@@ -60,20 +60,22 @@
 
 ## 7. 데이터
 
-- DB : 비운영 = pi-nonprod 프로젝트 `seminar_dev`·`seminar_stg` 스키마 / 운영 = seminar.pi 전용 Supabase 프로젝트 `public`
-- 마이그레이션 : `packages/pi-db/sql` baseline + `sitemap/seminar.pi/sql/001_seminar_*.sql` → `node scripts/db-migrate.mjs --app seminar --tier dev|stg|prod`
+- DB : **Supabase 프로젝트 1개**(seminar 전용, 같은 ref) 안에서 스키마로 tier 를 나눈다 — `public` = prod tier(앱 `SUPABASE_SCHEMA=public`) · `seminar_dev` = dev · `seminar_stg` = stg. [확인중 : 마스터 — 운영 전용 프로젝트 분리 여부]
+- 마이그레이션 : `packages/pi-db/sql` baseline + `sitemap/seminar.pi/sql/NNN_*.sql` → `node scripts/db-migrate.mjs --app seminar --tier dev|stg|prod --db-url <Session pooler>` (prod → `public`). `.env.local` 의 Direct 호스트는 IPv6 전용이라 Session pooler 사용(ROADMAP Phase 0)
 - 명명 : DA 표준(docs/da/데이터표준규칙.md), 시스템 칼럼 4개·논리삭제
-- 세미나 모델 : [`sql/004_seminar_smnr.sql`](../sql/004_seminar_smnr.sql) — 신규 접두사 `smn_`(아소카 결정)
+- 세미나 모델 : [`sql/004_seminar_smnr.sql`](../sql/004_seminar_smnr.sql) — 신규 접두사 `smn_`, 신규 표준단어 세미나 `SMN`·참가 `PTC`·입장 `ENT`·개최자 `HST`(아소카 결정, DA 사후 리뷰 — `ENT` 는 행안부 공통표준단어 '기업'과 동음)
 
 | 테이블 | 1행 | 주요 칼럼 |
 |---|---|---|
-| `smn_smnr` | 세미나 1건(`smnr_id` = 화상 룸 ID) | `host_usr_id`→sys_user · `smnr_nm` · `start_dtm` · `end_dtm` · `cncl_dtm` · `max_cnt`(기본 30, 1~100) · `entr_pi_amt`(NUMERIC(18,7), 0=무료) · `smnr_sts_cd` |
-| `smn_ptcp` | 참가(입장 등록) 1건 | `smnr_id`→smn_smnr · `usr_id`→sys_user · `pymnt_id`→pi_pymnt(무료 NULL) |
+| `smn_mst` | 세미나 1건(`smn_id` = 화상 룸 ID) | `hst_usr_id`→sys_user · `smn_nm` · `start_dtm` · `end_dtm` · `cncl_dtm` · `max_cnt`(기본 30, 1~100) · `ent_pi_amt`(NUMERIC(18,7), 0=무료) · `smn_sts_cd` |
+| `smn_ptc` | 참가(입장 등록) 1건 | `ptc_id` · `smn_id`→smn_mst · `usr_id`→sys_user · `pymnt_id`→pi_pymnt(무료 NULL) |
 
-- 인덱스 : `x_smn_smnr_01`(상태+시작일시) · `_02`(개최자+시작일시) · `x_smn_ptcp_01`(유일 세미나+사용자, 정원 집계) · `_02`(내 참가) · `_03`(유일 결제ID) — 활성행 부분 인덱스
-- 입장 등록은 `fn_join_smn_smnr(smnr_id, usr_id, pymnt_id)` 한 곳 — 세미나 행 잠금 후 판정, 결과 `OK·ALREADY·NOT_FOUND·CLOSED·FULL·PAY_REQUIRED`(R-P5)
+- 인덱스 : `x_smn_mst_01`(시작일시, **예정·진행 중만** 부분 인덱스 — S1 전체 탭 `ORDER BY start_dtm LIMIT` 를 정렬 없이) · `_02`(개최자+시작일시) · `x_smn_ptc_01`(유일 세미나+사용자, 정원 집계) · `_02`(내 참가) · `_03`(유일 결제ID) — 활성행 부분 인덱스
+- 입장 등록은 `fn_join_smn(smn_id, usr_id, pymnt_id)` 한 곳 — 세미나 행 잠금 후 판정, 결과 `OK·ALREADY·NOT_FOUND·CLOSED·FULL·PAY_REQUIRED·PAY_INVALID`(R-P5). 유료 approve 단계 정원 확인은 `fn_chk_smn_cap(smn_id, usr_id, pymnt_id)` → `OK·FULL·CLOSED·NOT_FOUND·ALREADY`(11절 D-6)
+- 두 함수 `search_path` = 생성 스키마 고정(한 프로젝트 안 다중 스키마라 호출자 경로에 흔들리지 않게)
 - FK 유지(PostgREST 임베디드 조인 전제, 루트 CLAUDE.md FK 정책)
-- 적용 : dev·stg 적용 완료(2026-10-26, 2회 실행 멱등 확인). **prod 미적용** — 운영 DB(`prod/seminar`)가 아직 없음(접속 문자열 미설정)
+- 적용 : dev·stg·prod(`public`) 적용 완료(2026-10-26, 각 2회 실행 멱등 확인) · 롤백 전용 기능 시험 3스키마 전부 통과
+- ⚠ 1회성 재설정(2026-10-26) : 004 첫 판(`smn_smnr`·`smn_ptcp`·`fn_join_smn_smnr`)을 표준단어 통일로 같은 파일에서 다시 썼다. `seminar_dev`·`seminar_stg` 는 **행 0건 확인 후** 한 트랜잭션으로 첫 판 객체를 DROP 하고 `schema_migrations` 의 004 1행만 지워 재적용(`public` 은 첫 판 미적용). 이후 004 변경은 새 NNN 파일로
 
 ## 8. 수익 모델
 
@@ -119,13 +121,13 @@
 | D-2 | 입장료 | **Pi 단위, 0 = 무료**, 저장 NUMERIC(18,7)(pi_pymnt.pi_amt 와 같은 정밀도) | 결제 원장과 정밀도가 같아야 서버 재검증이 정확히 일치 |
 | D-3 | 정원 | **기본 30·최대 100**, 청중(참가 등록)만 셈 | ROADMAP M4 목표 30 |
 | D-4 | 상태 | **SCHEDULED → LIVE → ENDED**, 개최자 취소 = **CANCELED** | 최소 4상태. ENDED·CANCELED 는 입장 불가 |
-| D-5 | 입장 등록 | 무료 = "입장" 클릭 시 / 유료 = 결제 **COMPLETED** 시 `smn_ptcp` 1행 | 사용자당 세미나 활성 1건(유일 인덱스) |
-| D-6 | 정원 경합 | 무료는 등록 시 DB 잠금 판정, 유료는 **approve 단계에서 앱이 정원 확인**, complete 는 정원 초과여도 등록 | 결제가 끝난 사람을 막으면 환불 경로가 없음 |
+| D-5 | 입장 등록 | 무료 = "입장" 클릭 시 / 유료 = 결제 **COMPLETED** 시 `smn_ptc` 1행 — `fn_join_smn` 이 결제를 본인·COMPLETED·`SMN_ENT`·금액(`ent_pi_amt`)·세미나(meta `smn_id`) 모두 일치할 때만 인정, 아니면 `PAY_INVALID` | 사용자당 세미나 활성 1건(유일 인덱스) |
+| D-6 | 정원 경합 | 무료 = `fn_join_smn` 이 세미나 행 잠금 후 판정(FULL). 유료 = **approve 단계 `fn_chk_smn_cap`** 이 같은 행 잠금 아래 [활성 참가 + 10분 안의 APPROVED `SMN_ENT` 결제 점유(자기 결제 제외)] 를 정원과 비교 → OK·FULL·CLOSED. 앱 순서 : pi_pymnt APPROVED 기록 → `fn_chk_smn_cap` → FULL 이면 결제 취소. complete 단계(`fn_join_smn`)는 결제가 유효하면 정원을 다시 막지 않음 | 결제가 끝난 사람을 막으면 환불 경로가 없음. 초과 등록 상한 = 점유 10분을 넘겨 complete 된 결제 수(실무상 0) |
 | D-7 | 환불 | **v1.0 자동 환불 없음** — 개최자 취소 시 수동 환불 [TBD : 환불 절차] | A2U 정산(F-06) 전 자동 환불은 위험 |
-| D-8 | 룸 ID | **룸 ID = smnr_id** | 별도 매핑 불필요 |
+| D-8 | 룸 ID | **룸 ID = smn_id** | 별도 매핑 불필요 |
 | D-9 | 청중 입장권 | 유료 세미나는 **참가 등록이 있어야** 발급, 무료는 클릭 시 등록 후 발급 | UI 12절 M5(입장권 = 결제 확인 후) |
-| D-10 | 결제 유형코드 | `pymnt_tp_cd = SMNR_ENTR`(meta.type) | pi_pymnt 유형 분기 |
-| D-11 | 주제영역 접두사 | 신규 `smn_`(세미나) — 테이블 `smn_smnr`·`smn_ptcp` | DA 표준 2-1 신규 접두사 = DA 승인 필요 → 위임 승인, DA 사후 리뷰 |
+| D-10 | 결제 유형코드 | `pymnt_tp_cd = SMN_ENT`, SDK metadata = `{ type: 'SMN_ENT', smn_id }` | pi_pymnt 유형 분기 + 함수가 meta `smn_id` 로 세미나 일치 검증 |
+| D-11 | 주제영역 접두사 | 신규 `smn_`(세미나) — 테이블 `smn_mst`·`smn_ptc`, 신규 표준단어 SMN·PTC·ENT·HST | DA 표준 2-1 신규 접두사 = DA 승인 필요 → 위임 승인, DA 사후 리뷰 |
 
 ## 변경 이력
 
@@ -135,4 +137,5 @@
 | 2026-10-24 | 1차 보강 — 한 줄 정의·핵심 가치 3·로그인(Google 연동 예외)·기능 초안 F-01~07·수익 R1~R3·확인 질문 7 (근거 PRD_27·PRD_28) |
 | 2026-10-24 | 화상 방식 결정 반영 — 자체 구축(엔진까지), 9절 #1·F-05 |
 | 2026-10-24 | v0.2 — 10절 화상 엔진 기준점(마스터 확정), F-05 → PRD_01 |
+| 2026-10-26 | v1.0 보정(T1 검토 반영) — 7절 DB 표기 정정(프로젝트 1개·스키마 3개, prod = `public`), 표준단어 통일(`smn_mst`·`smn_ptc`·`fn_join_smn`), 결제 검증 `PAY_INVALID`·approve 정원 확인 `fn_chk_smn_cap`(D-5·D-6), D-10 `SMN_ENT`, 1회성 재설정 기록, prod 적용 |
 | 2026-10-26 | **v1.0 확정** — 아소카 결정(마스터 위임) D-1~D-11(11절), 6절 화면 5종(UI 설계서 v1.0), 7절 세미나 모델(sql/004 smn_smnr·smn_ptcp·fn_join_smn_smnr), 9절 #2·#4 결정 |
