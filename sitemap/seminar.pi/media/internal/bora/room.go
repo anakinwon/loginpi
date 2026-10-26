@@ -94,6 +94,8 @@ type Room struct {
 	peerTimer  *time.Timer
 	reactions  map[string]int // 300ms 창 반응 합산
 	reactTimer *time.Timer
+	// roles — peer.setRole 로 바뀐 역할(입장권 sub → 역할). 재입장 때 입장권 role(초기값) 대신 쓴다. panel|audience 만 담긴다(발표자 승격 불가), 방이 닫히면 사라진다.
+	roles map[string]signal.Role
 
 	cmd  chan func()
 	once sync.Once
@@ -107,7 +109,7 @@ func NewRoom(id string, cap int, end time.Time) *Room {
 		peers: map[string]*Peer{}, producers: map[string]*santorini.Producer{},
 		consumers: map[string]map[string]*jeju.Consumer{},
 		paused:    map[string]bool{}, recs: map[string]recording{},
-		maxLayer: map[string]int8{}, dyna: map[string]*bwe.Dynacast{}, reactions: map[string]int{},
+		maxLayer: map[string]int8{}, dyna: map[string]*bwe.Dynacast{}, reactions: map[string]int{}, roles: map[string]signal.Role{},
 		cmd: make(chan func(), 64), done: make(chan struct{}),
 	}
 	go r.loop()
@@ -204,8 +206,12 @@ func (r *Room) join(t signal.Ticket, s signal.Session) (*Peer, *signal.Error) {
 	if err != nil {
 		return nil, signal.Errf(signal.CodeInternal, err.Error())
 	}
+	role := t.Role
+	if saved, ok := r.roles[t.Sub]; ok && t.Sub != "" && role != signal.RolePresenter {
+		role = saved // 승격·강등 뒤 재입장 — 발표자 입장권이면 입장권 그대로
+	}
 	p := &Peer{
-		ID: newID(), Ticket: t, Role: t.Role, Session: s, Sub: sub, Alloc: bwe.NewAllocator(),
+		ID: newID(), Ticket: t, Role: role, Session: s, Sub: sub, Alloc: bwe.NewAllocator(),
 		Producers: map[string]*santorini.Producer{}, Consumers: map[string]*jeju.Consumer{},
 		pubMids: map[string]*santorini.Producer{}, pendTracks: map[string][]remoteTrack{}, senders: map[string]*webrtc.RTPSender{},
 	}

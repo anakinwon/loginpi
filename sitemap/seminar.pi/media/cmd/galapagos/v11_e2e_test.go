@@ -1,10 +1,12 @@
 // v1.1 통합 테스트 — 실제 /signal 에 봇 3개(발표자 P·청중 A1·A2)를 붙여 SIGNAL_API 3.3 을 끝에서 끝까지 확인 :
-// peers·peerJoined/peerLeft, 손들기 받는 사람 범위, 반응 합산, 채팅 제한, 역할 권한, 승격 뒤 발행·강등 뒤 닫힘, room.end 전원 종료.
+// peers·peerJoined/peerLeft, 손들기 받는 사람 범위, 반응 합산(중복 1개), 채팅 제한, 역할 권한, 승격 재입장 유지, 승격 뒤 발행·강등 뒤 닫힘,
+// room.end 전원 종료, 관리 API 다시 열기 뒤 입장.
 // 실행 : go test ./cmd/galapagos -run V11 (네트워크 = 로컬 루프백만)
 package main
 
 import (
 	"encoding/json"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"sync"
@@ -92,7 +94,8 @@ func TestV11Interactions(t *testing.T) {
 	}
 	m := bora.NewManager()
 	m.SetAPI(api, nil)
-	srv := httptest.NewServer(newMux(m, nil, nil))
+	adminSecret := []byte(strings.Repeat("s", signal.MinSecret))
+	srv := httptest.NewServer(newMux(m, nil, adminSecret))
 	defer srv.Close()
 	url := "ws" + strings.TrimPrefix(srv.URL, "http") + "/signal"
 
@@ -132,7 +135,7 @@ func TestV11Interactions(t *testing.T) {
 		{a1, []string{"👍", "👍", "👍", "👍"}, signal.CodeSDPInvalid},
 		{a1, []string{"👍", "👏"}, ""},
 		{a2, []string{"👍"}, ""},
-		{a2, []string{"👍"}, ""},
+		{a2, []string{"👍", "👍"}, ""}, // 한 요청 안의 중복은 1개로 센다
 		{a2, []string{"👍"}, signal.CodeRateLimited},
 	} {
 		if e := st.b.try(signal.MReactionSend, signal.ReactionSendReq{Emojis: st.emojis}); errCode(e) != st.want {
@@ -172,6 +175,19 @@ func TestV11Interactions(t *testing.T) {
 	a1.wait(t, signal.NHand, has(a2j.PeerID)) // 승격 뒤 남의 손 목록을 받는다
 	if _, ok := a2.find(signal.NHand, has(a1j.PeerID)); ok {
 		t.Error("청중 A2 가 A1 손 알림을 받음")
+	}
+
+	// D — 승격은 재입장해도 유지 : 같은 sub 가 청중 입장권으로 다시 들어오면 panel(이전 세션은 DUPLICATE_SESSION)
+	old := a1
+	a1, a1j = joinBot(t, url, "v11", "A1", signal.RoleAudience)
+	old.wait(t, signal.NError, has(string(signal.CodeDuplicateSession)))
+	if a1j.Role != signal.RolePanel {
+		t.Errorf("재입장 역할 %s 기대 panel", a1j.Role)
+	}
+	for _, info := range a1j.Peers {
+		if info.PeerID == a1j.PeerID && info.Role != signal.RolePanel {
+			t.Errorf("재입장 peers 본인 역할 %s", info.Role)
+		}
 	}
 
 	pc, err := api.NewPeerConnection(webrtc.Configuration{})
@@ -217,6 +233,21 @@ func TestV11Interactions(t *testing.T) {
 	late := dial(t, url, func(signal.Envelope) {})
 	if e := late.try(signal.MJoin, map[string]any{"room": "v11", "role": "audience", "name": "L", "sub": "L"}); errCode(e) != signal.CodeRoomClosed {
 		t.Errorf("종료된 방 join %+v", e.E)
+	}
+
+	// 관리 API 로 같은 방 ID 를 다시 열면 종료 표시가 지워져 입장 가능, 이전 방의 승격 기록은 없음(A1 은 입장권 role)
+	req, _ := http.NewRequest(http.MethodPost, srv.URL+"/admin/rooms", strings.NewReader(`{"id":"v11","cap":5}`))
+	req.Header.Set("Authorization", "Bearer "+string(adminSecret))
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	res.Body.Close()
+	if res.StatusCode != http.StatusCreated {
+		t.Fatalf("관리 API 다시 열기 %d", res.StatusCode)
+	}
+	if _, rj := joinBot(t, url, "v11", "A1", signal.RoleAudience); rj.Role != signal.RoleAudience {
+		t.Errorf("다시 연 방 A1 역할 %s 기대 audience", rj.Role)
 	}
 	if pj.Peers == nil || len(pj.Peers) != 1 {
 		t.Errorf("첫 입장 peers(본인만) %+v", pj.Peers)

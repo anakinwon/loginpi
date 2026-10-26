@@ -26,11 +26,12 @@ type Session interface {
 	Close(code ErrCode)
 }
 
-// EndSession — Request 가 이 값을 돌려주면 서버는 응답 d(D)를 먼저 보내고 ntf error(Code)로 세션을 닫는다
-// (room.end 요청자 : 성공 응답 → ROOM_CLOSED 순서, SIGNAL_API 3.3 D).
+// EndSession — Request 가 이 값을 돌려주면 서버는 응답 d(D)를 먼저 큐에 넣고 → After(있으면) → ntf error(Code)로 세션을 닫는다
+// (room.end : 요청자 성공 응답 → 나머지 전원 ROOM_CLOSED → 요청자 ROOM_CLOSED·닫기, SIGNAL_API 3.3 D).
 type EndSession struct {
-	D    any
-	Code ErrCode
+	D     any
+	Code  ErrCode
+	After func() // 응답을 큐에 넣은 뒤 실행(다른 세션 정리)
 }
 
 // Handler — 방 쪽(bora.Manager)이 구현. signal 세션 고루틴이 부른다.

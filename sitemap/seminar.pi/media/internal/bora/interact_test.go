@@ -1,4 +1,4 @@
-// v1.1 표 형식 단위 테스트 — 받는 사람 범위(ntf hand)·raisedTs 서버 시각 순서·반응 300ms 합산·허용 목록·속도 제한·채팅 500자,
+// v1.1 표 형식 단위 테스트 — 재입장 역할 유지·room.end 순서·종료 방 다시 열기, 받는 사람 범위(ntf hand)·raisedTs 서버 시각 순서·반응 300ms 합산·허용 목록·속도 제한·채팅 500자,
 // peer.setRole 권한·승격/강등 처리 순서·강등 뒤 발행 금지, peers 가림·입퇴장 묶음(SIGNAL_API 3.3). 실행 : go test ./internal/bora
 package bora
 
@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"seminar.pi/media/internal/capri"
 	"seminar.pi/media/internal/jeju"
 	"seminar.pi/media/internal/santorini"
 	"seminar.pi/media/internal/signal"
@@ -15,13 +16,14 @@ import (
 
 // recSession — 알림 전체를 기록(방 고루틴에서만 쓰고 읽는다).
 type recSession struct {
-	id  string
-	got []signal.Notification
+	id     string
+	got    []signal.Notification
+	closed signal.ErrCode // Close 로 받은 코드(빈 값 = 안 닫힘)
 }
 
 func (s *recSession) ID() string                 { return s.id }
 func (s *recSession) Send(n signal.Notification) { s.got = append(s.got, n) }
-func (s *recSession) Close(signal.ErrCode)       {}
+func (s *recSession) Close(c signal.ErrCode)     { s.closed = c }
 
 // v11Room — P(presenter)·N(panel)·A1·A2(audience). N 은 producer pn 발행, A1 이 pn 구독.
 type v11Room struct {
@@ -184,6 +186,7 @@ func TestReaction(t *testing.T) {
 		{"4개", []string{"👍", "👍", "👍", "👍"}, signal.CodeSDPInvalid},
 		{"허용 밖", []string{"🔥"}, signal.CodeSDPInvalid},
 		{"섞임", []string{"👍", "x"}, signal.CodeSDPInvalid},
+		{"중복 4개", []string{"😀", "😀", "😀", "😀"}, signal.CodeSDPInvalid}, // 개수 제한은 중복 제거 전 배열 길이
 	} {
 		if e := v.r.React("A1", st.emojis); code(e) != st.want {
 			t.Errorf("%s : %v 기대 %s", st.name, e, st.want)
@@ -201,14 +204,14 @@ func TestReaction(t *testing.T) {
 		{"A1", []string{"👍", "👏"}, ""},
 		{"A1", []string{"👍"}, ""},
 		{"A1", []string{"💖"}, signal.CodeRateLimited}, // 1초 안 3번째 — 합산 안 함
-		{"A2", []string{"👍", "👍", "😮"}, ""},
+		{"A2", []string{"👍", "👍", "😮"}, ""},           // 한 요청 안의 중복 👍 는 1개로 센다
 	} {
 		if e := v.r.React(st.peer, st.emojis); code(e) != st.want {
 			t.Errorf("%s %v : %v 기대 %q", st.peer, st.emojis, e, st.want)
 		}
 	}
 	time.Sleep(ReactionWindow + 150*time.Millisecond)
-	want := map[string]int{"👍": 4, "👏": 1, "😮": 1}
+	want := map[string]int{"👍": 3, "👏": 1, "😮": 1}
 	for id, ns := range v.take() {
 		if len(ns) != 1 || ns[0].M != signal.NReaction {
 			t.Errorf("%s 반응 알림 %v", id, names(ns))
@@ -387,5 +390,126 @@ func TestPeerBatch(t *testing.T) {
 		if !reflect.DeepEqual(got[st.id], st.want) {
 			t.Errorf("%s %+v 기대 %+v", st.id, got[st.id], st.want)
 		}
+	}
+}
+
+// 재입장 역할 : peer.setRole 로 바뀐 역할이 같은 sub 재입장 때 입장권 role 보다 우선, 발표자로는 절대 올라가지 않음, 방이 닫히면 사라진다.
+func TestRoleSurvivesRejoin(t *testing.T) {
+	api, err := capri.NewAPI(capri.Config{Loopback: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	newRoom := func() *Room {
+		r := NewRoom("rj", 31, time.Time{})
+		r.api = api
+		t.Cleanup(r.Close)
+		return r
+	}
+	join := func(r *Room, sub string, role signal.Role) *Peer {
+		t.Helper()
+		p, e := r.Join(signal.Ticket{Sub: sub, Name: sub, Role: role}, &recSession{id: sub})
+		if e != nil {
+			t.Fatalf("%s 입장 %v", sub, e)
+		}
+		return p
+	}
+	// 표 : 저장된 역할 × 입장권 역할 → 세션 역할
+	for _, st := range []struct {
+		name         string
+		sub          string
+		saved        signal.Role // 빈 값 = 저장 없음
+		ticket, want signal.Role
+	}{
+		{"승격 뒤 재입장", "a", signal.RolePanel, signal.RoleAudience, signal.RolePanel},
+		{"강등 뒤 재입장", "b", signal.RoleAudience, signal.RolePanel, signal.RoleAudience},
+		{"발표자 입장권은 그대로", "c", signal.RoleAudience, signal.RolePresenter, signal.RolePresenter},
+		{"저장 없음", "d", "", signal.RoleAudience, signal.RoleAudience},
+		{"sub 없음은 저장값 무시", "", signal.RolePanel, signal.RoleAudience, signal.RoleAudience},
+	} {
+		r := newRoom()
+		if st.saved != "" {
+			r.exec(func() { r.roles[st.sub] = st.saved })
+		}
+		if p := join(r, st.sub, st.ticket); p.Role != st.want {
+			t.Errorf("%s : %s 기대 %s", st.name, p.Role, st.want)
+		}
+	}
+	// 흐름 : 승격 → 재입장(패널 유지·join 응답 peers 도 panel) → 강등 → 재입장(청중) / 새 방에서는 입장권 role
+	r := newRoom()
+	pres := join(r, "p", signal.RolePresenter)
+	a := join(r, "a", signal.RoleAudience)
+	if e := r.SetRole(pres.ID, a.ID, signal.RolePanel); e != nil {
+		t.Fatal(e)
+	}
+	a2, _, peers, e := r.joinState(signal.Ticket{Sub: "a", Name: "a", Role: signal.RoleAudience}, &recSession{id: "a2"})
+	if e != nil || a2.Role != signal.RolePanel {
+		t.Fatalf("승격 뒤 재입장 역할 %v %v", a2, e)
+	}
+	for _, info := range peers {
+		if info.PeerID == a2.ID && info.Role != signal.RolePanel {
+			t.Errorf("join 응답 peers 의 본인 역할 %s", info.Role)
+		}
+		if info.PeerID == a.ID {
+			t.Errorf("이전 세션이 peers 에 남음")
+		}
+	}
+	if e := r.SetRole(pres.ID, a2.ID, signal.RoleAudience); e != nil {
+		t.Fatal(e)
+	}
+	if p := join(r, "a", signal.RolePanel); p.Role != signal.RoleAudience {
+		t.Errorf("강등 뒤 패널 입장권으로 재입장 %s 기대 audience", p.Role)
+	}
+	if p := join(newRoom(), "a", signal.RoleAudience); p.Role != signal.RoleAudience {
+		t.Errorf("새 방(이전 방 닫힘)에서 %s", p.Role)
+	}
+}
+
+// room.end : 권한 검사 → 응답 전 종료 표시(join ROOM_CLOSED), 다른 세션은 아직 열림 → After(서버가 요청자 응답을 큐에 넣은 뒤) → 요청자 외 ROOM_CLOSED.
+// 관리 API 로 같은 방 ID 를 다시 열면 종료 표시가 지워진다.
+func TestRoomEndOrderAndReopen(t *testing.T) {
+	m := NewManager()
+	v := newV11(t)
+	m.exec(func() {
+		m.rooms["v11"] = v.r
+		for id := range v.sess {
+			m.sessions[id] = sessRef{room: v.r, peer: id}
+		}
+	})
+	for _, id := range []string{"N", "A1"} {
+		if _, e := m.Request(v.sess[id], signal.MRoomEnd, nil); code(e) != signal.CodeRoleForbidden {
+			t.Errorf("%s room.end %v 기대 ROLE_FORBIDDEN", id, e)
+		}
+	}
+	d, e := m.Request(v.sess["P"], signal.MRoomEnd, nil)
+	end, ok := d.(signal.EndSession)
+	if e != nil || !ok || end.After == nil || end.Code != signal.CodeRoomClosed {
+		t.Fatalf("room.end 응답 %+v %v", d, e)
+	}
+	if r, ended := m.room(signal.Ticket{Room: "v11"}); r != nil || !ended {
+		t.Errorf("응답 전 종료 표시 없음 (방 %v)", r)
+	}
+	if !v.r.exec(func() {
+		for id, s := range v.sess {
+			if s.closed != "" {
+				t.Errorf("응답 전에 %s 가 닫힘", id)
+			}
+		}
+	}) {
+		t.Fatal("응답 전에 방이 닫힘")
+	}
+	end.After()
+	for id, want := range map[string]signal.ErrCode{"P": "", "N": signal.CodeRoomClosed, "A1": signal.CodeRoomClosed, "A2": signal.CodeRoomClosed} {
+		if got := v.sess[id].closed; got != want {
+			t.Errorf("After 뒤 %s 닫힘 %q 기대 %q", id, got, want)
+		}
+	}
+	if !isDone(v.r.Done()) {
+		t.Error("방 고루틴이 남음")
+	}
+	if !m.OpenRoom("v11", 5, time.Time{}) {
+		t.Fatal("종료된 방 ID 다시 열기 실패")
+	}
+	if r, ended := m.room(signal.Ticket{Room: "v11"}); r == nil || ended {
+		t.Errorf("다시 연 방 join 불가 (종료 표시 %v)", ended)
 	}
 }

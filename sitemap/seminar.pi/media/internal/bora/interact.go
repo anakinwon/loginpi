@@ -168,14 +168,18 @@ func (r *Room) LowerAllHands(peerID string) *signal.Error {
 	})
 }
 
-// React — reaction.send. 허용 7종·1~3개·피어당 초당 2건. 첫 반응이 연 300ms 창에 합산해 전원에게 익명 1회.
+// React — reaction.send. 허용 7종·1~3개(중복은 1개로 셈)·피어당 초당 2건. 검사는 속도 제한보다 먼저(잘못된 요청은 한도를 쓰지 않음). 첫 반응이 연 300ms 창에 합산해 전원에게 익명 1회.
 func (r *Room) React(peerID string, emojis []string) *signal.Error {
 	if len(emojis) < 1 || len(emojis) > signal.ReactionMaxEmojis {
 		return signal.Errf(signal.CodeSDPInvalid, "반응은 1~3개")
 	}
+	uniq := make([]string, 0, len(emojis))
 	for _, em := range emojis {
 		if !slices.Contains(signal.ReactionEmojis[:], em) {
 			return signal.Errf(signal.CodeSDPInvalid, "허용되지 않은 반응")
+		}
+		if !slices.Contains(uniq, em) {
+			uniq = append(uniq, em) // 한 요청 안의 중복은 1개로 센다
 		}
 	}
 	return r.call(func() *signal.Error {
@@ -186,7 +190,7 @@ func (r *Room) React(peerID string, emojis []string) *signal.Error {
 		if !p.reactRate.allow(time.Now()) {
 			return signal.Errf(signal.CodeRateLimited, "반응 속도 제한")
 		}
-		for _, em := range emojis {
+		for _, em := range uniq {
 			r.reactions[em]++
 		}
 		if r.reactTimer == nil {
@@ -246,6 +250,9 @@ func (r *Room) SetRole(byID, targetID string, role signal.Role) *signal.Error {
 			return nil
 		}
 		q.Role = role
+		if q.Ticket.Sub != "" {
+			r.roles[q.Ticket.Sub] = role // 재입장해도 유지(room.go join)
+		}
 		changed := signal.RoleChanged{PeerID: q.ID, Role: role, By: byID}
 		if role == signal.RolePanel {
 			if q.raisedTs != 0 {

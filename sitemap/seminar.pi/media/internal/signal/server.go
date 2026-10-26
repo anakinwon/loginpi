@@ -239,6 +239,9 @@ func (sv *server) serve(ws *WSConn) {
 				d, e := sv.h.Request(s, env.M, env.D)
 				if end, ok := d.(EndSession); ok && e == nil {
 					s.reply(env.ID, end.D, nil)
+					if end.After != nil {
+						end.After()
+					}
 					s.Close(end.Code)
 					return
 				}
