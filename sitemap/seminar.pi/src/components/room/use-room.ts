@@ -648,15 +648,27 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       mine: true,
       status: 'sending',
     })
+    return deliverChat(n, body)
+  }
+
+  // 실패한 내 메시지 다시 보내기 — 같은 글을 같은 자리(n)에서 다시 보낸다(새 줄을 만들지 않아 중복 없음)
+  function retryChat(n: number, text: string): Promise<string | null> {
+    return deliverChat(n, text, Date.now())
+  }
+
+  function deliverChat(n: number, text: string, ts?: number): Promise<string | null> {
     const mark = (p: Partial<ChatMsg>) => setChat((l) => l.map((m) => (m.n === n ? { ...m, ...p } : m)))
-    try {
-      const r = await request<{ ts: number }>('chat.send', { text: body })
-      mark({ ts: r.ts, status: 'sent' })
-      return null
-    } catch (e) {
-      mark({ status: 'failed' })
-      return codeOf(e)
-    }
+    if (ts) mark({ ts, status: 'sending' })
+    return request<{ ts: number }>('chat.send', { text }).then(
+      (r) => {
+        mark({ ts: r.ts, status: 'sent' })
+        return null
+      },
+      (e: unknown) => {
+        mark({ status: 'failed' })
+        return codeOf(e)
+      },
+    )
   }
 
   // 손들기(audience) — 응답 raisedTs(서버 시각)로 내 상태 확정
@@ -781,6 +793,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     addMedia,
     shareScreen,
     sendChat,
+    retryChat,
     setHand,
     lowerAll,
     setPeerRole,

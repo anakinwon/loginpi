@@ -22,6 +22,7 @@ export function SidePanel({
   onTab,
   onClose,
   onSend,
+  onRetry,
   onPromote,
   onDemote,
   onLowerAll,
@@ -34,7 +35,8 @@ export function SidePanel({
   chat: ChatMsg[]
   onTab: (t: PanelTab) => void
   onClose: () => void
-  onSend: (text: string) => Promise<boolean> // false = 실패(입력 내용 유지)
+  onSend: (text: string) => void // 실패는 그 메시지 줄의 [다시 보내기](onRetry)로 — 입력 칸에 되돌리지 않는다(중복 방지)
+  onRetry: (m: ChatMsg) => void
   onPromote: (peerId: string) => void
   onDemote: (peerId: string) => void
   onLowerAll: () => void
@@ -134,7 +136,7 @@ export function SidePanel({
         hidden={tab !== 'chat'}
         className="flex min-h-0 flex-1 flex-col"
       >
-        <ChatTab chat={chat} visible={open && tab === 'chat'} onSend={onSend} />
+        <ChatTab chat={chat} visible={open && tab === 'chat'} onSend={onSend} onRetry={onRetry} />
       </div>
       <div
         role="tabpanel"
@@ -160,10 +162,12 @@ function ChatTab({
   chat,
   visible,
   onSend,
+  onRetry,
 }: {
   chat: ChatMsg[]
   visible: boolean
-  onSend: (text: string) => Promise<boolean>
+  onSend: (text: string) => void
+  onRetry: (m: ChatMsg) => void
 }) {
   const t = useTranslations('room')
   const [text, setText] = useState('')
@@ -175,12 +179,12 @@ function ChatTab({
   }, [chat.length, visible])
   const time = (ts: number) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
-  async function submit(e: React.FormEvent) {
+  function submit(e: React.FormEvent) {
     e.preventDefault()
     const body = text.trim()
     if (!body) return
     setText('')
-    if (!(await onSend(body))) setText((cur) => cur || body) // 실패면 다시 보낼 수 있게 되돌린다(그사이 새로 쓴 글은 지키고)
+    onSend(body)
   }
 
   return (
@@ -198,7 +202,18 @@ function ChatTab({
                 </p>
               )}
               <p className="break-words whitespace-pre-wrap">{m.text}</p>
-              {m.status === 'failed' && <p className="text-danger text-xs">{t('chat.failed')}</p>}
+              {m.status === 'failed' && (
+                <p className="text-danger flex items-center gap-2 text-xs">
+                  {t('chat.failed')}
+                  <button
+                    type="button"
+                    onClick={() => onRetry(m)}
+                    className="text-foreground min-h-8 rounded-full px-2 font-semibold underline"
+                  >
+                    {t('chat.retry')}
+                  </button>
+                </p>
+              )}
             </li>
           )
         })}

@@ -364,11 +364,8 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
             chat={r.chat}
             onTab={setTab}
             onClose={() => setPanel(null)}
-            onSend={async (text) => {
-              const code = await r.sendChat(text)
-              sayErr(code, 'chatFailed')
-              return !code
-            }}
+            onSend={async (text) => sayErr(await r.sendChat(text), 'chatFailed')}
+            onRetry={async (m) => sayErr(await r.retryChat(m.n, m.text), 'chatFailed')}
             onPromote={async (id) => sayErr(await r.setPeerRole(id, 'panel'), 'actionFailed')}
             onDemote={async (id) => sayErr(await r.setPeerRole(id, 'audience'), 'actionFailed')}
             onLowerAll={async () => sayErr(await r.lowerAll(), 'actionFailed')}
