@@ -119,6 +119,9 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | `TELEGRAM_BOT_TOKEN` · `TELEGRAM_BOT_USERNAME` | Telegram 앱 → `@BotFather` → `/newbot`. `TELEGRAM_WEBHOOK_SECRET`은 3.1처럼 직접 만든다 |
 | `RESEND_API_KEY` · `RESEND_FROM_EMAIL` | https://resend.com/api-keys (발신 도메인 인증 필요) |
 | `GOOGLE_MAPS_API_KEY` · `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | https://console.cloud.google.com/google/maps-apis/credentials (공개 키는 HTTP 리퍼러로 제한한다) |
+| `CLOUDFLARE_TURN_TOKEN_ID` · `CLOUDFLARE_TURN_API_TOKEN` (cafe.pi·seminar.pi) | https://dash.cloudflare.com → **Realtime → TURN Server → Create**(키 생성) → 화면의 **Turn Token ID**·**API Token** 복사. API Token 은 생성 직후 한 번만 보인다 [확인중 : 대시보드 메뉴 이름 — Cloudflare 개편 잦음]. 로컬·운영 다른 키 권장 |
+| `TURN_HOST` · `TURN_SECRET` (cafe.pi·seminar.pi) | 직접 운영하는 coturn 서버 주소(호스트만)와 그 서버 `turnserver.conf` 의 `use-auth-secret` + `static-auth-secret=<값>`(값은 3.1 처럼 직접 생성). seminar.pi 는 HMAC-SHA1(coturn 기본), cafe.pi 는 SHA-256 으로 서명 [확인중 : cafe.pi 쪽이 coturn 기본과 맞는지]. Metered 관리형은 HMAC 비밀을 주지 않는 방식일 수 있음 [확인중]. 응답에 `turns:<호스트>:443` 이 포함되므로 coturn 은 **인증서를 두고 TLS 443 을 열어야** 함(아니면 그 주소만 실패) [확인중 : 실제 서버 구성] |
+| `TURN_CREDENTIAL_TTL` | 값 직접 지정(초, 기본 3600) — 비밀 아님 |
 
 ## 4. 신규 테넌트 추가 체크리스트
 
@@ -147,4 +150,5 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | 2026-10-25 | seminar.pi `.env.local` 을 언제 채우나 | 파일 자체에 STEP 0~6 단계별 주석(✅ 설정됨 · ⬜ 비어 있음) — 신규 테넌트 생성기(`tenant-env.mjs new`)도 같은 STEP 구조로 생성(2026-10-25) |
 | 2026-10-25 | `GOOGLE_CLIENT_ID` 등 모든 환경값을 어느 사이트·메뉴에서 얻나 | 3절(상세) + 각 앱 `.env.local` 상단 '환경값을 얻는 곳' 블록(생성기 자동 포함, 기존 파일은 `node scripts/tenant-env.mjs header --port <포트> --name <이름>` 출력을 붙임) |
 | 2026-10-25 | seminar.pi `MEDIA_TOKEN_SECRET` 은 어디서 구하나 | 사이트 없음 — 직접 만드는 입장권 서명 키(3.1). **앱과 엔진이 같은 값**: 로컬 = `.env.local`, 운영 = `.env.vercel-prod` 값을 Vercel(Production)과 엔진 PC `C:galapagosun-engine.cmd` 에 넣는다(`media/docs/HOME_NODE_GUIDE.md`) |
+| 2026-10-26 | seminar.pi TURN 키(`CLOUDFLARE_TURN_*`·`TURN_HOST`·`TURN_SECRET`·`TURN_CREDENTIAL_TTL`)는 어디서 구하나 | 3.6 표. 전부 선택 — 없으면 `/api/media/turn` 이 STUN 만 준다. 이름은 cafe.pi 와 같다(같은 Cloudflare 키를 써도 되나 사용량이 합산됨) |
 | 이전 | `CRON_SECRET`이 뭔가 | Vercel 크론이 `Authorization: Bearer` 헤더로 보내는 비밀값이다. 직접 만들고 앱마다 따로 쓴다 → 3.1 |

@@ -39,6 +39,14 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     // 미디어 엔진(Galápagos) 입장권 JWT HS256 서명 키 — 엔진 MEDIA_TOKEN_SECRET 과 같은 값(PRD_02 D-11). 미설정 = 입장권 발급 503
     MEDIA_TOKEN_SECRET: z.string().min(32).optional(),
+    // TURN 단기 자격 증명(/api/media/turn, M2 ⑨) — 전부 서버 전용·선택. 1순위 Cloudflare Realtime TURN(둘 다 있어야 사용)
+    CLOUDFLARE_TURN_TOKEN_ID: z.string().optional(),
+    CLOUDFLARE_TURN_API_TOKEN: z.string().optional(),
+    // 2순위 HMAC(coturn use-auth-secret) — 둘 다 있어야 사용. 둘 다 없으면 STUN 만
+    TURN_HOST: z.string().optional(),
+    TURN_SECRET: z.string().optional(),
+    // 자격 증명 수명(초) — 기본 3600, 라우트가 60~86400 으로 제한
+    TURN_CREDENTIAL_TTL: z.coerce.number().int().positive().optional(),
   },
   client: {
     // 미디어 엔진 시그널링 WebSocket 주소(예 ws://localhost:7880/signal, 운영 wss://). 미설정 = 화상 기능 숨김
@@ -84,6 +92,11 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     MEDIA_TOKEN_SECRET: process.env.MEDIA_TOKEN_SECRET,
+    CLOUDFLARE_TURN_TOKEN_ID: process.env.CLOUDFLARE_TURN_TOKEN_ID,
+    CLOUDFLARE_TURN_API_TOKEN: process.env.CLOUDFLARE_TURN_API_TOKEN,
+    TURN_HOST: process.env.TURN_HOST,
+    TURN_SECRET: process.env.TURN_SECRET,
+    TURN_CREDENTIAL_TTL: process.env.TURN_CREDENTIAL_TTL,
     NEXT_PUBLIC_MEDIA_WS_URL: process.env.NEXT_PUBLIC_MEDIA_WS_URL,
     NEXT_PUBLIC_GOOGLE_LOGIN: process.env.NEXT_PUBLIC_GOOGLE_LOGIN,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
