@@ -2,13 +2,23 @@
 // 하단 컨트롤 바 — 발표자 : 마이크·카메라·나가기, 청중 : 나가기(+ 소리 막힘 시 "소리 켜기"). 설계서 6.1·14.3
 // 꺼짐 = danger 색 + 사선 아이콘(색만으로 상태를 전하지 않음), 아이콘만 보여도 aria-label 유지.
 // 폭 기반 슬롯(565/420/370) + 더보기(넘친 버튼이 1개면 바로 노출) · 폭 > 760px 텍스트 라벨 · 단축키 Ctrl/⌘+D·E · 자동 숨김(useBarVisibility)
-import { useEffect, useId, useRef, useState, type FocusEvent, type PointerEvent as RPointerEvent, type ReactNode } from 'react'
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FocusEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as RPointerEvent,
+  type ReactNode,
+} from 'react'
 import { useTranslations } from 'next-intl'
 import { BAR, mainSlots, splitSlots } from './room-rules'
 import type { MediaKind, Role } from './use-room'
 
 export const ICON: Record<MediaKind | 'leave' | 'more', string> = {
-  audio: 'M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z',
+  audio:
+    'M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z',
   video: 'M15 8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2.5l5 3.5V7l-5 3.5V8Z',
   leave:
     'M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85a1 1 0 0 1-1.41-.02L.29 13.08a1 1 0 0 1 0-1.41C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67a1 1 0 0 1 0 1.41l-2.48 2.48a1 1 0 0 1-1.41.02 11.3 11.3 0 0 0-2.66-1.85 1 1 0 0 1-.56-.9v-3.1A15.3 15.3 0 0 0 12 9Z',
@@ -25,7 +35,8 @@ export function Icon({ d, off, small }: { d: string; off?: boolean; small?: bool
 }
 
 // 원형(아이콘만) / 알약(아이콘 + 텍스트 라벨, 넓은 화면) — 지름·높이 48px(최소 터치 타깃, 설계서 9절)
-const BTN = 'inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full transition-colors disabled:opacity-40'
+const BTN =
+  'inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full transition-colors disabled:opacity-40'
 const shape = (label?: boolean) => (label ? 'px-4 text-sm font-medium' : 'w-12')
 
 // 마이크·카메라 토글 — 대기실 미리보기와 룸 하단 바가 같이 쓴다
@@ -34,12 +45,14 @@ export function MediaButton({
   on,
   disabled,
   label,
+  menu,
   onClick,
 }: {
   kind: MediaKind
   on: boolean
   disabled?: boolean
   label?: boolean // 텍스트 라벨 표시(넓은 화면) — aria-label 은 항상
+  menu?: boolean // 더보기 메뉴 안 — 토글은 menuitemcheckbox(aria-checked)
   onClick: () => void
 }) {
   const t = useTranslations('room')
@@ -47,7 +60,7 @@ export function MediaButton({
   return (
     <button
       type="button"
-      aria-pressed={on}
+      {...(menu ? { role: 'menuitemcheckbox', 'aria-checked': on } : { 'aria-pressed': on })}
       aria-label={text}
       title={text}
       disabled={disabled}
@@ -65,42 +78,83 @@ function typing(el: EventTarget | null) {
   return el instanceof HTMLElement && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))
 }
 
-// 더보기 — 데스크톱 팝오버, 좁은 화면 하단 시트(최대 80dvh). Esc·바깥 탭으로 닫힘, 열림 중엔 바 자동 숨김 보류(onOpen)
-function MoreMenu({ items, onOpen }: { items: { id: string; node: (label: boolean) => ReactNode }[]; onOpen: (o: boolean) => void }) {
-  const t = useTranslations('room')
-  const [open, setOpenState] = useState(false)
-  const id = useId()
+// 메뉴 키보드(WAI-ARIA 메뉴 패턴) — ↑↓(←→) 순환·Home·End 로 menuitem 사이 이동. 더보기·반응 메뉴가 같이 쓴다
+export function menuKeys(e: ReactKeyboardEvent<HTMLElement>) {
+  const items = [...e.currentTarget.querySelectorAll<HTMLElement>('[role^="menuitem"]:not([disabled])')]
+  if (!items.length) return
+  const i = items.indexOf(document.activeElement as HTMLElement)
+  const next =
+    e.key === 'ArrowDown' || e.key === 'ArrowRight'
+      ? (i + 1) % items.length
+      : e.key === 'ArrowUp' || e.key === 'ArrowLeft'
+        ? (i - 1 + items.length) % items.length
+        : e.key === 'Home'
+          ? 0
+          : e.key === 'End'
+            ? items.length - 1
+            : -1
+  if (next < 0) return
+  e.preventDefault()
+  items[next].focus()
+}
+
+// 열린 메뉴 공용 동작 — 열리면 첫 항목에 포커스, Esc = 닫고 여는 버튼으로 포커스 복귀, Tab·바깥 탭 = 닫기
+export function useMenu(open: boolean, close: () => void) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const setOpen = (o: boolean) => {
-    setOpenState(o)
-    onOpen(o)
-  }
-  // 닫힌 채 사라지면(역할 전환·퇴장) 보류도 푼다
-  useEffect(() => () => onOpen(false), []) // eslint-disable-line react-hooks/exhaustive-deps
+  const menuRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const latest = useRef(close)
+  useEffect(() => {
+    latest.current = close
+  })
   useEffect(() => {
     if (!open) return
-    const close = () => {
-      setOpenState(false)
-      onOpen(false)
+    menuRef.current?.querySelector<HTMLElement>('[role^="menuitem"]:not([disabled])')?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') return latest.current() // 포커스 이동은 브라우저에 맡긴다
+      if (e.key !== 'Escape') return
+      latest.current()
+      triggerRef.current?.focus()
     }
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close()
-    const onDown = (e: PointerEvent) => !rootRef.current?.contains(e.target as Node) && close()
+    const onDown = (e: PointerEvent) => !rootRef.current?.contains(e.target as Node) && latest.current()
     window.addEventListener('keydown', onKey)
     window.addEventListener('pointerdown', onDown)
     return () => {
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('pointerdown', onDown)
     }
-  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open])
+  return { rootRef, menuRef, triggerRef }
+}
+
+// 메뉴 표면 — 데스크톱 팝오버(버튼 위), 좁은 화면 하단 시트(최대 80dvh)
+export const MENU_SURFACE =
+  'bg-surface fixed inset-x-0 bottom-0 z-30 flex max-h-[80dvh] flex-col gap-2 overflow-y-auto rounded-t-2xl p-4 pb-[max(16px,env(safe-area-inset-bottom))] shadow-xl sm:absolute sm:inset-x-auto sm:right-0 sm:bottom-full sm:mb-2 sm:rounded-xl sm:pb-4'
+
+export type BarItem = { id: string; node: (o: { label: boolean; menu: boolean }) => ReactNode }
+
+// 더보기 — 항목을 누르면 닫힌다. 열림 중엔 바 자동 숨김 보류(onOpen)
+function MoreMenu({ items, onOpen }: { items: BarItem[]; onOpen: (o: boolean) => void }) {
+  const t = useTranslations('room')
+  const [open, setOpenState] = useState(false)
+  const id = useId()
+  const setOpen = (o: boolean) => {
+    setOpenState(o)
+    onOpen(o)
+  }
+  const m = useMenu(open, () => setOpen(false))
+  // 닫힌 채 사라지면(역할 전환·퇴장) 보류도 푼다
+  useEffect(() => () => onOpen(false), []) // eslint-disable-line react-hooks/exhaustive-deps
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={m.rootRef} className="relative">
       <button
+        ref={m.triggerRef}
         type="button"
         aria-label={t('more')}
         title={t('more')}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-controls={id}
+        aria-controls={open ? id : undefined}
         onClick={() => setOpen(!open)}
         className={`${BTN} ${shape()} bg-surface-raised`}
       >
@@ -108,13 +162,19 @@ function MoreMenu({ items, onOpen }: { items: { id: string; node: (label: boolea
       </button>
       {open && (
         <div
+          ref={m.menuRef}
           id={id}
           role="menu"
-          className="bg-surface fixed inset-x-0 bottom-0 z-30 flex max-h-[80dvh] flex-col gap-2 overflow-y-auto rounded-t-2xl p-4 pb-[max(16px,env(safe-area-inset-bottom))] shadow-xl sm:absolute sm:inset-x-auto sm:right-0 sm:bottom-full sm:mb-2 sm:rounded-xl sm:pb-4"
+          aria-label={t('more')}
+          onKeyDown={menuKeys}
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest('[role^="menuitem"]')) setOpen(false)
+          }}
+          className={MENU_SURFACE}
         >
           {items.map((it) => (
             <div key={it.id} role="none">
-              {it.node(true)}
+              {it.node({ label: true, menu: true })}
             </div>
           ))}
         </div>
@@ -159,7 +219,8 @@ export function ControlBar({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || typing(e.target)) return
-      const kind = ({ d: 'audio', e: 'video' } as const)[e.key.toLowerCase() as 'd' | 'e']
+      // e.code(물리 키) — 한글 입력 상태에선 e.key 가 'ㅇ'·'ㄷ' 로 와 단축키가 안 먹는다
+      const kind = ({ KeyD: 'audio', KeyE: 'video' } as const)[e.code as 'KeyD' | 'KeyE']
       const p = latest.current
       if (!kind || !p.presenter || !p.ready || !p.has[kind]) return
       e.preventDefault() // Ctrl+D 북마크·Ctrl+E 주소창 검색 대신
@@ -170,16 +231,17 @@ export function ControlBar({
   }, [])
 
   // 슬롯 대상 버튼(우선순위 순). W3 의 화면공유·채팅·참가자·손들기·반응이 이 목록에 붙는다
-  const items: { id: string; node: (label: boolean) => ReactNode }[] = presenter
+  const items: BarItem[] = presenter
     ? (['audio', 'video'] as const)
         .filter((k) => has[k])
         .map((k) => ({
           id: k,
-          node: (label: boolean) => (
+          node: ({ label, menu }) => (
             <MediaButton
               kind={k}
               on={localOn[k]}
               label={label}
+              menu={menu}
               disabled={!ready || pending !== null}
               onClick={() => onToggle(k, !localOn[k])}
             />
@@ -196,7 +258,7 @@ export function ControlBar({
     >
       {main.map((it) => (
         <span key={it.id} className="contents">
-          {it.node(labels)}
+          {it.node({ label: labels, menu: false })}
         </span>
       ))}
       {more.length > 0 && <MoreMenu items={more} onOpen={onHold} />}

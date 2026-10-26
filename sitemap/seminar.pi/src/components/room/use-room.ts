@@ -8,7 +8,14 @@ export type Role = 'presenter' | 'audience'
 export type MediaKind = 'audio' | 'video'
 // reconnecting = 입장 뒤 발행·구독 PC 중 하나가 disconnected(ICE 가 스스로 복구 중). failed 가 되면 error(ICE_FAILED)
 export type RoomState = 'idle' | 'ticket' | 'connecting' | 'joined' | 'reconnecting' | 'closed' | 'error'
-type Env = { t: 'req' | 'res' | 'ntf'; id?: number; m?: string; ok?: boolean; d?: unknown; e?: { code: string; msg: string } }
+type Env = {
+  t: 'req' | 'res' | 'ntf'
+  id?: number
+  m?: string
+  ok?: boolean
+  d?: unknown
+  e?: { code: string; msg: string }
+}
 type Trickle = { pc: 'pub' | 'sub'; candidate: RTCIceCandidateInit }
 type Consumer = { consumerId: string; producerId: string; kind: MediaKind; mid: string; paused?: boolean }
 
@@ -74,6 +81,8 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   const [localOn, setLocalOn] = useState({ audio: false, video: false })
   const [remotePaused, setRemotePaused] = useState({ audio: false, video: false })
   const [pending, setPending] = useState<MediaKind | null>(null)
+  // 발행 완료(produce 응답까지) — 그 전엔 producerId 가 없어 토글이 실패하므로 하단 바 버튼을 막는다
+  const [published, setPublished] = useState(false)
   // 토글 요청 중 여부 — 단축키 연타처럼 렌더 전에 다시 불릴 때 state 클로저 값은 믿을 수 없어 ref 로 막는다
   const busyRef = useRef(false)
   // 발행 거부(ROLE_FORBIDDEN) — 연결은 유지하고 화면은 청중으로 전환(설계서 7.3)
@@ -333,6 +342,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       audio: s.getAudioTracks().some((t) => t.enabled),
       video: s.getVideoTracks().some((t) => t.enabled),
     })
+    setPublished(true)
   }
 
   // 발행 정리 — 발행 PC·producer 표·내 트랙(ROLE_FORBIDDEN 은 연결 유지, 발행만 접는다)
@@ -343,6 +353,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     if (!downRef.current.size) setState((s) => (s === 'reconnecting' ? 'joined' : s))
     iceWait.current.pub = []
     producersRef.current = {}
+    setPublished(false)
     setLocalOn({ audio: false, video: false })
     stopLocal()
   }
@@ -410,6 +421,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     setLocalOn({ audio: false, video: false })
     busyRef.current = false
     setPending(null)
+    setPublished(false)
     setForbidden(false)
   }
 
@@ -423,6 +435,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     localOn,
     remotePaused,
     pending,
+    published,
     join,
     leave,
     setMedia,

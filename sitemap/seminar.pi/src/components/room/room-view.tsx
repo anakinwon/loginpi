@@ -29,9 +29,9 @@ export function RoomView({ room, wsUrl }: { room: string; wsUrl?: string }) {
   )
 }
 
-// 오류 코드별 다음 행동(설계서 7.3) — 정원·종료 = 홈으로(상세 S2 는 M5 전이라 홈), 중복 세션 = 안내만, 그 밖 = 다시 입장(대기실 → 입장권 재발급)
-const HOME_CODES = new Set(['ROOM_FULL', 'ROOM_CLOSED'])
-const INFO_CODES = new Set(['DUPLICATE_SESSION'])
+// 오류 코드별 다음 행동(설계서 7.3) — 정원·종료 = 홈으로(상세 S2 는 M5 전이라 홈), 중복 세션 = 안내 + 홈으로(다시 입장하면 다른 기기를
+// 끊으므로 다시 입장 버튼은 두지 않는다 — 빠져나갈 길은 홈 링크), 그 밖 = 다시 입장(대기실 → 입장권 재발급)
+const HOME_CODES = new Set(['ROOM_FULL', 'ROOM_CLOSED', 'DUPLICATE_SESSION'])
 
 // 끊김·오류 전체 화면(설계서 6.3) — 무대·하단 바를 덮는다
 function Ended({ code, onRejoin }: { code: string; onRejoin: () => void }) {
@@ -46,7 +46,7 @@ function Ended({ code, onRejoin }: { code: string; onRejoin: () => void }) {
           <Link href="/" className={btn}>
             {t('home')}
           </Link>
-        ) : INFO_CODES.has(code) ? null : (
+        ) : (
           <button type="button" onClick={onRejoin} className={btn}>
             {t('rejoin')}
           </button>
@@ -120,9 +120,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
       <audio ref={audioRef} autoPlay />
       {/* 알림 영역은 항상 붙여 둔다 — 내용이 바뀔 때 화면 낭독기가 읽게(오류성 알림이라 assertive) */}
       <div aria-live="assertive" className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-4">
-        {notice && (
-          <p className="bg-surface-raised rounded-lg px-4 py-2 text-sm shadow-lg">{t(`notice.${notice}`)}</p>
-        )}
+        {notice && <p className="bg-surface-raised rounded-lg px-4 py-2 text-sm shadow-lg">{t(`notice.${notice}`)}</p>}
       </div>
       {r.state === 'idle' ? (
         <Prejoin room={room} name={name} canPresent={canPresent} role={role} onRole={setRole} onJoin={onJoin} />
@@ -134,12 +132,15 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
           <div className="min-w-0 flex-1 space-y-2">
             {/* 상단 정보 줄 — 재연결 배지(설계서 6.3). 인원 수·연결 품질은 같은 줄에 붙는다 */}
             <div className="flex min-h-7 items-center gap-2 text-xs">
-              {r.state === 'reconnecting' && (
-                <span role="status" className="bg-surface-raised inline-flex items-center gap-2 rounded-full px-3 py-1">
-                  <Spinner />
-                  {t('state.reconnecting')}
-                </span>
-              )}
+              {/* status 영역은 늘 붙여 두고 안의 내용만 바꾼다 — 붙는 순간의 영역은 화면 낭독기가 놓친다 */}
+              <span role="status">
+                {r.state === 'reconnecting' && (
+                  <span className="bg-surface-raised inline-flex items-center gap-2 rounded-full px-3 py-1">
+                    <Spinner />
+                    {t('state.reconnecting')}
+                  </span>
+                )}
+              </span>
               <ConnectionBadge check={check} />
             </div>
             <Stage
@@ -160,7 +161,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
           >
             <ControlBar
               role={stageRole}
-              ready={r.state === 'joined'}
+              ready={r.state === 'joined' && r.published}
               has={{
                 audio: !!r.localStream?.getAudioTracks().length,
                 video: !!r.localStream?.getVideoTracks().length,

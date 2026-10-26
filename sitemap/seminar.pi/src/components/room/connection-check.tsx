@@ -44,14 +44,24 @@ export function useConnectionCheck(
 }
 
 // 상단 정보 줄 배지 — 보통·나쁨(또는 원인 있음)이면 원인 문장을 옆에 보인다. 색 + 글자(색만으로 전하지 않음)
+// status 영역은 늘 붙여 두고 안의 내용만 바꾼다(붙는 순간의 영역은 화면 낭독기가 놓친다)
 export function ConnectionBadge({ check }: { check: Check }) {
+  return (
+    <span role="status" className="inline-flex flex-wrap items-center gap-2">
+      <BadgeBody check={check} />
+    </span>
+  )
+}
+
+function BadgeBody({ check }: { check: Check }) {
   const t = useTranslations('room.net')
   if (!check) return null
   if (check === 'measuring') return <span className="text-muted-foreground">{t('measuring')}</span>
   const { grade, reason } = check
-  const tone = grade === 'poor' ? 'bg-danger text-white' : grade === 'fair' ? 'bg-warning text-black' : 'bg-surface-raised'
+  const tone =
+    grade === 'poor' ? 'bg-danger text-white' : grade === 'fair' ? 'bg-warning text-black' : 'bg-surface-raised'
   return (
-    <span role="status" className="inline-flex flex-wrap items-center gap-2">
+    <>
       <span className={`rounded-full px-3 py-1 ${tone}`}>{t(grade)}</span>
       {reason && (
         <span className="text-muted-foreground">
@@ -60,6 +70,6 @@ export function ConnectionBadge({ check }: { check: Check }) {
             : t(`reason.rate.${reason.kind}`, { kbps: Math.round(reason.value) })}
         </span>
       )}
-    </span>
+    </>
   )
 }

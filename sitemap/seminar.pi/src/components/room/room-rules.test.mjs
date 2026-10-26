@@ -34,6 +34,8 @@ test('연결 점검 — 처리량 임계(영상 750 보통·60 나쁨 kbps), 꺼
   assert.equal(r.grade, 'fair')
   assert.equal(Math.round(r.reason.value), 300)
   assert.equal(gradeNet(...samples({ vKbps: 40 }), ON).grade, 'poor')
+  assert.equal(gradeNet(...samples({ vKbps: 600 }), ON).grade, 'fair') // 750 미만 경계 안쪽
+  assert.equal(gradeNet(...samples({ vKbps: 750 }), ON).grade, 'good') // 750 은 "미만" 이 아님
   assert.equal(gradeNet(...samples({ aKbps: 10 }), ON).grade, 'fair')
   assert.deepEqual(gradeNet(...samples({ vKbps: 40 }), { audio: true, video: false }), { grade: 'good', reason: null })
   assert.equal(gradeNet(readStats(null), readStats([]), ON), null)
@@ -46,6 +48,8 @@ test('하단 바 슬롯 수 — 폭 임계 565·420·370 초과 기준', () => {
   assert.equal(mainSlots(371, 'audience'), 3)
   assert.equal(mainSlots(370, 'audience'), 2)
   assert.equal(mainSlots(566, 'audience'), 5)
+  assert.equal(mainSlots(420, 'audience'), 3) // 경계값 420 은 "초과" 가 아니므로 아래 단계
+  assert.equal(mainSlots(420, 'panel'), 3)
 })
 
 test('더보기에 1개만 남으면 바로 노출', () => {
