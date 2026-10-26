@@ -385,6 +385,6 @@
     "feeHint": "0 = free, up to 7 decimals",
     "submit": "Create",
     "submitting": "Creating…",
-    "invalid": "Check your input — title, a future time, capacity 1–100, fee 0 or more (up to 7 decimals)."
+    "invalid": "Check your input — title, a time within the next year, capacity 1–100, fee 0 or more (up to 7 decimals)."
   }
 }

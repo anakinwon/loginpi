@@ -20,6 +20,7 @@ import {
   PAGE_SIZE,
   parsePage,
   parseTab,
+  startAtOk,
 } from '@/lib/seminar-rules'
 
 const PUBLIC_CACHE = 'public, s-maxage=30, stale-while-revalidate=120'
@@ -88,10 +89,10 @@ export const GET = withAuthGuard(
 
 const createSchema = z.object({
   title: z.string().trim().min(1).max(100),
-  // ISO 일시(오프셋 포함) — 지금 이후만
+  // ISO 일시(오프셋 포함) — 지금 이후 ~ 1년 안(S5)
   startAt: z.iso
     .datetime({ offset: true })
-    .refine((v) => Date.parse(v) > Date.now()),
+    .refine((v) => startAtOk(Date.parse(v))),
   maxCnt: z.number().int().min(1).max(100),
   fee: z.coerce.string().trim().regex(FEE_RE),
 })

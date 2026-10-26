@@ -1,14 +1,14 @@
 'use client'
 
 // S5 세미나 개설 — ADMIN 만(PRD D-1). 비로그인 = LoginGate, 비관리자 = 안내(서버도 403). 성공 시 상세(S2)로 이동.
-// 입력 검사는 화면이 먼저 하고 서버(zod)가 다시 한다 — 제목 1~100자, 지금 이후 일시, 정원 1~100, 입장료 0 이상 소수 7자리
+// 입력 검사는 화면이 먼저 하고 서버(zod)가 다시 한다 — 제목 1~100자, 지금 이후 ~ 1년 안 일시, 정원 1~100, 입장료 0 이상 소수 7자리
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { LoginGate } from '@/components/login-gate'
 import { useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
-import { FEE_RE } from '@/lib/seminar-rules'
+import { FEE_RE, startAtOk } from '@/lib/seminar-rules'
 import { BTN_PRIMARY, useSeminarErrText } from './shared'
 
 const INPUT = 'bg-surface w-full rounded-lg border border-white/10 px-3 py-2'
@@ -42,7 +42,7 @@ function Form() {
     const startMs = Date.parse(String(f.get('startAt') ?? '')) // datetime-local = 보는 사람 지역 시간
     const maxCnt = Number(f.get('maxCnt'))
     const fee = String(f.get('fee') ?? '').trim()
-    if (!title || !(startMs > Date.now()) || !FEE_RE.test(fee))
+    if (!title || !startAtOk(startMs) || !FEE_RE.test(fee))
       return setMsg(t('invalid'))
     setBusy(true)
     setMsg(null)
