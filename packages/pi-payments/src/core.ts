@@ -43,11 +43,15 @@ export const PI_UNIT = 10_000_000
 export const toUnits = (amt: number | string) =>
   Math.round(Number(amt) * PI_UNIT)
 
-// 정가와 정확히 일치(초과도 거부) — 숫자가 아니면 false
+// 정가(b)와 정확히 일치(초과도 거부) — 숫자·비어 있지 않은 숫자 문자열만, 정가는 0 초과
+//  Number('')·Number(null) = 0 이라 형식부터 거른다
+const isAmt = (v: unknown): v is number | string =>
+  (typeof v === 'number' && Number.isFinite(v)) ||
+  (typeof v === 'string' && v.trim() !== '' && Number.isFinite(Number(v)))
 export const amountEquals = (a: number | string, b: number | string) => {
-  const x = toUnits(a)
+  if (!isAmt(a) || !isAmt(b)) return false
   const y = toUnits(b)
-  return Number.isFinite(x) && Number.isFinite(y) && x === y
+  return y > 0 && toUnits(a) === y
 }
 
 // 실패 코드 — 앱이 자기 apiError 코드로 옮긴다(README 매핑 표). 검증기 고유 코드도 허용

@@ -50,6 +50,18 @@ test('금액 비교 — 10^7 정수 단위', () => {
   assert.ok(!amountEquals('abc', 0))
 })
 
+test('금액 비교 — 빈 값·null·비숫자 거부, 정가는 0 초과', () => {
+  assert.ok(!amountEquals('', 0)) // Number('') = 0 함정
+  assert.ok(!amountEquals('  ', '0'))
+  assert.ok(!amountEquals(null as unknown as number, 0))
+  assert.ok(!amountEquals(undefined as unknown as number, 0))
+  assert.ok(!amountEquals(0, 0)) // 0 원 정가
+  assert.ok(!amountEquals(-1, -1)) // 음수 정가
+  assert.ok(!amountEquals('1e', 1))
+  assert.ok(!amountEquals(Number.NaN, 1))
+  assert.ok(amountEquals(' 0.5 ', 0.5)) // 앞뒤 공백 NUMERIC 문자열 허용
+})
+
 test('검증기 배선 — 통과', async () => {
   let seen = ''
   const v: Validators = {
