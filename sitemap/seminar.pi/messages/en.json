@@ -169,10 +169,6 @@
       "reconnecting": "Reconnecting…"
     },
     "waiting": "Waiting for the presenter.",
-    "noCameraSelf": "Presenting without a camera.",
-    "camOff": "The presenter's camera is off.",
-    "camOffSelf": "Your camera is off.",
-    "micOff": "Presenter muted",
     "rejoin": "Join again",
     "err": {
       "generic": "Something went wrong. Please join again.",
@@ -200,6 +196,11 @@
       },
       "forbidden": "You don't have permission to present, so you'll continue as audience."
     },
-    "home": "Go to home"
+    "home": "Go to home",
+    "tile": {
+      "self": "{name} (you)",
+      "presenter": "Presenter",
+      "micOff": "Microphone off"
+    }
   }
 }

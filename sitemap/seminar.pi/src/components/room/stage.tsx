@@ -1,9 +1,10 @@
 'use client'
-// 룸 무대(S4) — 발표자 고정 1화면(설계서 6.2). 영상은 항상 muted 로 재생하고 소리는 별도 <audio>(useRemoteAudio)로만 낸다
+// 룸 무대(S4) — 발표자 고정 1화면(설계서 6.2), 타일은 video-tile.tsx. 영상은 항상 muted 로 재생하고 소리는 별도 <audio>(useRemoteAudio)로만 낸다
 // → 자동재생 정책으로 소리가 막혀도 영상은 나온다(설계서 14.5)
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { useTranslations } from 'next-intl'
 import type { Role, RoomState } from './use-room'
+import { VideoTile } from './video-tile'
 
 const PLAY_RETRY_MS = 1000
 const PLAY_RETRY_MAX = 3
@@ -78,6 +79,7 @@ export function Spinner() {
 export function Stage({
   role,
   state,
+  name,
   local,
   remoteVideo,
   remoteAudio,
@@ -86,6 +88,7 @@ export function Stage({
 }: {
   role: Role
   state: RoomState
+  name: string
   local: MediaStream | null
   remoteVideo: MediaStream | null
   remoteAudio: MediaStream | null
@@ -93,32 +96,33 @@ export function Stage({
   remotePaused: { audio: boolean; video: boolean }
 }) {
   const t = useTranslations('room')
-  // 발표자는 내 카메라, 청중은 받은 영상
-  const main = role === 'presenter' ? local : remoteVideo
-  const hasVideo = !!main?.getVideoTracks().length
-  const videoOff = role === 'presenter' ? !localOn.video : remotePaused.video
-  const notice =
-    state !== 'joined'
-      ? t('state.connecting')
-      : !hasVideo
-        ? t(role === 'presenter' ? 'noCameraSelf' : 'waiting')
-        : videoOff
-          ? t(role === 'presenter' ? 'camOffSelf' : 'camOff')
-          : null
-
+  const presenter = role === 'presenter'
+  // 발표자는 내 카메라·마이크, 청중은 받은 영상·소리. 청중 화면의 발표자 이름은 v1.1 참가자 목록(peers) 전까지 일반 명칭
+  const video = presenter ? local : remoteVideo
+  const audio = presenter ? local : remoteAudio
+  const live = state === 'joined' || state === 'reconnecting'
+  const hasMedia = !!(video?.getVideoTracks().length || audio?.getAudioTracks().length)
+  const notice = !live ? t('state.connecting') : !presenter && !hasMedia ? t('waiting') : null
   return (
-    <div className="bg-surface relative aspect-video w-full overflow-hidden rounded-xl">
-      {hasVideo && (
-        <StreamVideo stream={main} mirror={role === 'presenter'} className={videoOff ? 'invisible' : ''} />
-      )}
+    <VideoTile
+      video={video}
+      audio={audio}
+      name={!live || !hasMedia ? undefined : presenter ? t('tile.self', { name }) : t('tile.presenter')}
+      micOff={presenter ? !localOn.audio : remotePaused.audio}
+      camOff={presenter ? !localOn.video : remotePaused.video}
+      mirror={presenter}
+    >
       {notice && (
-        <p className="text-muted-foreground absolute inset-0 grid place-items-center p-4 text-center text-sm">
+        <p className="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center text-sm">
+          {!live && <Spinner />}
           {notice}
         </p>
       )}
-      {role === 'audience' && remoteAudio && remotePaused.audio && (
-        <span className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs">{t('micOff')}</span>
+      {state === 'reconnecting' && (
+        <div className="absolute inset-0 grid place-items-center bg-black/40" aria-hidden>
+          <Spinner />
+        </div>
       )}
-    </div>
+    </VideoTile>
   )
 }

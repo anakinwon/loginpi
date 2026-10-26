@@ -121,6 +121,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
           <Stage
             role={stageRole}
             state={r.state}
+            name={name}
             local={r.localStream}
             remoteVideo={r.remoteVideo}
             remoteAudio={r.remoteAudio}
