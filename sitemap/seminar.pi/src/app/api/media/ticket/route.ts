@@ -1,10 +1,18 @@
 // 미디어 입장권 발급 — POST {room, cap:'present'|'watch'} → {ticket, wsUrl}. 로그인 필수(쿠키 OR X-Pi-Token, null 이면 401 — redirect 금지).
-// cap=present 는 관리자만 [TBD : 개최자 권한은 F-02 이후]. 결제 확인은 F-04 에서 이 자리에 연결.
+// cap=present 는 관리자만(PRD D-1). room = smn_id(D-8) : 세미나가 있고 종료·취소가 아니어야 발급(404·409),
+//  cap=watch 는 무료이거나 활성 참가 등록이 있어야 발급(D-9, 없으면 402). 정원 cap = max_cnt + 발표자 1.
+// uuid 가 아닌 방 코드(M0~M3 실험실 방)는 실험실이 열린 환경에서만 DB 확인 없이 발급(R-P6, 아소카 결정(마스터 위임 2026-10-26)) — 운영은 LAB_ENABLED=1 일 때만
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
+import { env } from '@/env'
+import { db, dbFail, dbRoute } from '@/lib/api'
 import { getSessionUser, isAdmin } from '@/lib/auth'
 import { signMediaTicket } from '@/lib/media-ticket'
+import { isUuid, OPEN_STS } from '@/lib/seminar-rules'
+
+const labOpen = () =>
+  process.env.NODE_ENV !== 'production' || env.LAB_ENABLED === '1'
 
 const Body = z.object({
   room: z.string().regex(/^[A-Za-z0-9_-]{1,64}$/),
@@ -13,7 +21,8 @@ const Body = z.object({
 
 const noStore = { 'Cache-Control': 'no-store' }
 
-export const POST = withAuthGuard(async (req) => {
+// 세션 확인도 DB 를 쓰므로 dbRoute(미설정 503·예외 500)
+export const POST = withAuthGuard(dbRoute(async (req) => {
   // 서로 의존 없는 세션 확인·본문 파싱은 병렬(R-P1)
   const [user, raw] = await Promise.all([
     getSessionUser(req),
@@ -37,7 +46,36 @@ export const POST = withAuthGuard(async (req) => {
       { status: 403, headers: noStore },
     )
 
-  // TODO F-04 : 결제 확인 훅 자리 — cap=watch 는 해당 방(세미나) 결제 완료 사용자만 발급. 결제 기능 생기면 여기서 확인 후 402/403.
+  let roomCap: number | undefined
+  if (isUuid(room)) {
+    // 세미나·내 참가 — 서로 의존 없음 → 병렬(R-P1)
+    const [smn, ptc] = await Promise.all([
+      db()
+        .from('smn_mst')
+        .select('max_cnt, ent_pi_amt, smn_sts_cd')
+        .eq('smn_id', room)
+        .eq('del_yn', 'N')
+        .maybeSingle<{ max_cnt: number; ent_pi_amt: number | string; smn_sts_cd: string }>(),
+      db()
+        .from('smn_ptc')
+        .select('ptc_id')
+        .eq('smn_id', room)
+        .eq('usr_id', user.id)
+        .eq('del_yn', 'N')
+        .maybeSingle(),
+    ])
+    if (smn.error) return dbFail(smn.error)
+    if (ptc.error) return dbFail(ptc.error)
+    if (!smn.data)
+      return NextResponse.json({ error: 'not_found' }, { status: 404, headers: noStore })
+    if (!(OPEN_STS as readonly string[]).includes(smn.data.smn_sts_cd))
+      return NextResponse.json({ error: 'closed' }, { status: 409, headers: noStore })
+    if (cap === 'watch' && Number(smn.data.ent_pi_amt) > 0 && !ptc.data)
+      return NextResponse.json({ error: 'payment_required' }, { status: 402, headers: noStore })
+    roomCap = smn.data.max_cnt + 1
+  } else if (!labOpen()) {
+    return NextResponse.json({ error: 'not_found' }, { status: 404, headers: noStore })
+  }
 
   const wsUrl = process.env.NEXT_PUBLIC_MEDIA_WS_URL
   const ticket = signMediaTicket({
@@ -45,6 +83,7 @@ export const POST = withAuthGuard(async (req) => {
     sub: user.id,
     name: user.display_name || user.pi_username || '',
     role: cap === 'present' ? 'presenter' : 'audience',
+    cap: roomCap,
   })
   // wsUrl 은 참고값 — 시험 단계는 화면에서 엔진 주소(임시 터널)를 직접 넣으므로 없어도 발급
   if (!ticket)
@@ -53,4 +92,4 @@ export const POST = withAuthGuard(async (req) => {
       { status: 503, headers: noStore },
     )
   return NextResponse.json({ ticket, wsUrl: wsUrl ?? null }, { headers: noStore })
-})
+}))
