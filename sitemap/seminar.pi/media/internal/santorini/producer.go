@@ -52,6 +52,7 @@ type Producer struct {
 	source   Source
 	priority atomic.Uint32 // 화면공유 255 > 발표자 영상 > 패널 영상(bwe 가 읽음)
 	remb     atomic.Int64  // 발표자에게 보낼 REMB 상한(bps, 0 = 안 보냄) — bora 가 1초마다 정함
+	levelID  atomic.Uint32 // 음성 : 협상된 ssrc-audio-level 확장 ID(0 = 없음, level.go)
 
 	mu     sync.RWMutex
 	layers [MaxLayers]*Layer
@@ -99,6 +100,7 @@ func (p *Producer) AddLayer(rid string, r Reader, up RTCPWriter) *Layer {
 	}
 	l := newLayer(i, p.kind, p.done)
 	l.remb = &p.remb
+	l.levelID = &p.levelID
 	p.layers[i] = l
 	go l.Run(r, up)
 	return l
