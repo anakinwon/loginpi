@@ -5,6 +5,11 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-danger: var(--danger);
+  --color-accent: var(--accent);
+  --color-speaking: var(--speaking);
 }
 
 /* M0 단일 어두운 테마 — 라이트 테마는 화면 확정(PRD 6절) 후 */
@@ -13,4 +18,10 @@
   --background: #0b0d14;
   --foreground: oklch(0.985 0 0);
   --muted-foreground: oklch(0.708 0 0);
+  /* 화상 룸 토큰(docs/ui-design/ui-design.md 9절) — accent 보라 = 13절 #5 결정 */
+  --surface: #161a24;
+  --surface-raised: #222838;
+  --danger: #e5484d;
+  --accent: #7c6cf2;
+  --speaking: #46c98b;
 }

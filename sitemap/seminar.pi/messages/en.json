@@ -137,5 +137,59 @@
       "vod": "Recording replay"
     },
     "refLabel": "Reference model"
+  },
+  "room": {
+    "title": "Join seminar · {room}",
+    "noEngine": "The video server is not ready yet.",
+    "joinAs": "Join as",
+    "presenter": "Presenter",
+    "audience": "Audience",
+    "join": "Join now",
+    "nameLabel": "Name",
+    "audienceHint": "Audience members don't use a camera or microphone. After joining you'll see and hear the presenter.",
+    "preview": {
+      "pending": "Preparing camera and microphone…",
+      "audioOnly": "Camera unavailable — sending audio only.",
+      "none": "Camera and microphone unavailable. Check permissions (you can still join without media)."
+    },
+    "mic": {
+      "on": "Turn off microphone",
+      "off": "Turn on microphone"
+    },
+    "cam": {
+      "on": "Turn off camera",
+      "off": "Turn on camera"
+    },
+    "controls": "Call controls",
+    "leave": "Leave",
+    "enableSound": "Enable sound",
+    "state": {
+      "connecting": "Connecting…"
+    },
+    "waiting": "Waiting for the presenter.",
+    "noCameraSelf": "Presenting without a camera.",
+    "camOff": "The presenter's camera is off.",
+    "camOffSelf": "Your camera is off.",
+    "micOff": "Presenter muted",
+    "rejoin": "Join again",
+    "err": {
+      "generic": "Something went wrong. Please join again.",
+      "CLOSED": "The connection was lost.",
+      "NO_ENGINE": "The video server is not ready yet.",
+      "TICKET_401": "Please sign in.",
+      "TICKET_403": "You don't have permission to present. Join as audience.",
+      "TICKET_503": "The video server is not configured yet.",
+      "TICKET_NETWORK": "Check your network connection.",
+      "TICKET_INVALID": "Your entry pass has expired.",
+      "TICKET_EXPIRED": "Your entry pass has expired.",
+      "ROOM_FULL": "This seminar is full.",
+      "ROOM_CLOSED": "This seminar has ended.",
+      "DUPLICATE_SESSION": "You joined from another device, so this screen was disconnected.",
+      "ROLE_FORBIDDEN": "You don't have permission to present.",
+      "WS_FAILED": "Couldn't connect to the video server.",
+      "ICE_FAILED": "The video connection dropped. Check your network.",
+      "MEDIA_FAILED": "Couldn't start the camera or microphone.",
+      "TIMEOUT": "The video server isn't responding."
+    }
   }
 }
