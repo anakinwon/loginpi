@@ -46,10 +46,11 @@ export const POST = withAuthGuard(async (req) => {
     name: user.display_name || user.pi_username || '',
     role: cap === 'present' ? 'presenter' : 'audience',
   })
-  if (!ticket || !wsUrl)
+  // wsUrl 은 참고값 — 시험 단계는 화면에서 엔진 주소(임시 터널)를 직접 넣으므로 없어도 발급
+  if (!ticket)
     return NextResponse.json(
       { error: 'media_unavailable' },
       { status: 503, headers: noStore },
     )
-  return NextResponse.json({ ticket, wsUrl }, { headers: noStore })
+  return NextResponse.json({ ticket, wsUrl: wsUrl ?? null }, { headers: noStore })
 })

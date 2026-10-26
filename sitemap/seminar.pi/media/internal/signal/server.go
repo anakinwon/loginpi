@@ -47,6 +47,8 @@ func NewServer(h Handler, v *Verifier) http.Handler {
 
 func (sv *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if len(sv.origins) > 0 && !sv.origins[r.Header.Get("Origin")] {
+		// 거부한 Origin 을 남겨 MEDIA_ALLOWED_ORIGINS 를 맞출 수 있게 한다(브라우저는 403 본문을 보여주지 않음)
+		log.Printf("origin 불허 : %q", r.Header.Get("Origin"))
 		http.Error(w, "origin 불허", http.StatusForbidden)
 		return
 	}

@@ -1,8 +1,9 @@
 'use client'
 // M1 SFU 실험실 — 발표자/청중 선택 → 엔진 /signal(WebSocket) 접속 → 발표자는 카메라 송신(발행 PC = 클라이언트 offer),
-// 청중은 서버 offer 로 수신(구독 PC, PRD_02 D-2). 입장은 개발용(엔진 MEDIA_DEV_TICKET=1 — 운영 엔진은 거부, 정식 입장권은 M5)
-// 봉투 {t,id,m,ok,d,e}·메시지 이름은 media/internal/signal/envelope.go 와 같다(PRD_02 5절)
+// 청중은 서버 offer 로 수신(구독 PC, PRD_02 D-2). 입장은 로그인 입장권(/api/media/ticket) 우선, 발급 실패 시에만 개발용 입장
+// (엔진 MEDIA_DEV_TICKET=1 일 때만 통과 — 운영 엔진은 거부). 봉투 {t,id,m,ok,d,e}·메시지 이름은 media/internal/signal/envelope.go 와 같다(PRD_02 5절)
 import { useEffect, useRef, useState } from 'react'
+import { piFetch } from '@pi/auth/client'
 
 type Role = 'presenter' | 'audience'
 type Env = { t: 'req' | 'res' | 'ntf'; id?: number; m?: string; ok?: boolean; d?: unknown; e?: { code: string; msg: string } }
@@ -12,11 +13,22 @@ const REQ_TIMEOUT_MS = 10000
 
 // 엔진 주소 — env 기본값, 화면에서 바꿀 수 있음(시험용 임시 터널 주소는 매번 바뀌어 재배포 없이 입력). ws:// · wss:// 만 허용
 const WS_RE = /^wss?:\/\/[^\s]+$/
-// 시험용 기본 엔진 주소(마스터 지시 2026-10-25) — 마스터 PC 엔진 + cloudflared 임시 터널. 엔진·터널을 다시 켜면 주소가 바뀌므로 그때 갱신(VM 확정 C-5 후 env 로 대체)
-const LAB_DEFAULT_WS = 'wss://eliminate-acting-sie-contains.trycloudflare.com/signal'
+
+// 로그인 입장권 — 미로그인(401)·발표 권한 없음(403)·서버 키 미설정(503)이면 null(개발용 입장으로 넘어감)
+async function fetchTicket(room: string, role: Role): Promise<{ ticket?: string; why?: string }> {
+  const r = await piFetch('/api/media/ticket', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ room, cap: role === 'presenter' ? 'present' : 'watch' }),
+  }).catch(() => null)
+  if (!r) return { why: '네트워크 오류' }
+  if (!r.ok) return { why: `${r.status}` }
+  const j = (await r.json().catch(() => null)) as { ticket?: string } | null
+  return j?.ticket ? { ticket: j.ticket } : { why: '응답 형식' }
+}
 
 export function SfuLab({ wsUrl: envWsUrl }: { wsUrl?: string }) {
-  const [wsInput, setWsInput] = useState(envWsUrl ?? LAB_DEFAULT_WS)
+  const [wsInput, setWsInput] = useState(envWsUrl ?? '')
   const wsUrl = WS_RE.test(wsInput.trim()) ? wsInput.trim() : undefined
   const localRef = useRef<HTMLVideoElement>(null)
   const remoteRef = useRef<HTMLVideoElement>(null)
@@ -106,6 +118,10 @@ export function SfuLab({ wsUrl: envWsUrl }: { wsUrl?: string }) {
   async function join() {
     if (!wsUrl) return add('엔진 주소 없음 — ws:// 또는 wss:// 로 시작하는 주소를 입력하세요')
     leave()
+    setState('입장권 발급 중')
+    // 입장권(60초·1회용)은 WebSocket 열기 직전에 받는다
+    const tk = await fetchTicket(room, role)
+    add(tk.ticket ? '입장권 발급됨' : `입장권 없음(${tk.why}) — 개발용 입장 시도(운영 엔진은 거부)`)
     setState('접속 중')
     const ws = new WebSocket(wsUrl)
     wsRef.current = ws
@@ -124,16 +140,16 @@ export function SfuLab({ wsUrl: envWsUrl }: { wsUrl?: string }) {
       add('시그널링 끊김')
       setState('끊김')
     }
-    await new Promise<void>((resolve, reject) => {
-      ws.onopen = () => resolve()
-      ws.onerror = () => reject(new Error('WebSocket 연결 실패'))
-    })
     try {
-      const res = await request<{ peerId: string; iceServers: RTCIceServer[]; producers: unknown[] }>('join', {
-        room,
-        role,
-        name,
+      // 연결 실패(터널 꺼짐·주소 오타·엔진 Origin 거부 403)도 로그에 남긴다
+      await new Promise<void>((resolve, reject) => {
+        ws.onopen = () => resolve()
+        ws.onerror = () => reject(new Error('WebSocket 연결 실패'))
       })
+      const res = await request<{ peerId: string; iceServers: RTCIceServer[]; producers: unknown[] }>(
+        'join',
+        tk.ticket ? { ticket: tk.ticket } : { room, role, name },
+      )
       add(`입장 peer=${res.peerId} 기존 발행 ${res.producers.length}개`)
       setState('입장')
       // 구독 PC 는 모든 참가자에게 서버 offer 로 생긴다
