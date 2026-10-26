@@ -69,6 +69,20 @@ func dial(t *testing.T, url string, onNtf func(signal.Envelope)) *client {
 
 func (c *client) request(m string, d any, out any) {
 	c.t.Helper()
+	e := c.try(m, d)
+	if e.OK == nil || !*e.OK {
+		c.t.Fatalf("%s 실패: %+v", m, e.E)
+	}
+	if out != nil {
+		if err := json.Unmarshal(e.D, out); err != nil {
+			c.t.Fatal(err)
+		}
+	}
+}
+
+// try — 요청 1건의 응답 봉투(실패 응답도 그대로). 5초 안에 응답이 없으면 실패.
+func (c *client) try(m string, d any) signal.Envelope {
+	c.t.Helper()
 	b, _ := json.Marshal(d)
 	ch := make(chan signal.Envelope, 1)
 	c.mu.Lock()
@@ -82,17 +96,11 @@ func (c *client) request(m string, d any, out any) {
 	}
 	select {
 	case e := <-ch:
-		if e.OK == nil || !*e.OK {
-			c.t.Fatalf("%s 실패: %+v", m, e.E)
-		}
-		if out != nil {
-			if err := json.Unmarshal(e.D, out); err != nil {
-				c.t.Fatal(err)
-			}
-		}
+		return e
 	case <-time.After(5 * time.Second):
 		c.t.Fatalf("%s 응답 없음", m)
 	}
+	return signal.Envelope{}
 }
 
 func (c *client) notify(m string, d any) {
