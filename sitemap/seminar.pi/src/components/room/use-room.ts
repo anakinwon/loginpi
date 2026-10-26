@@ -6,7 +6,8 @@ import { piFetch } from '@pi/auth/client'
 
 export type Role = 'presenter' | 'audience'
 export type MediaKind = 'audio' | 'video'
-export type RoomState = 'idle' | 'ticket' | 'connecting' | 'joined' | 'closed' | 'error'
+// reconnecting = 입장 뒤 발행·구독 PC 중 하나가 disconnected(ICE 가 스스로 복구 중). failed 가 되면 error(ICE_FAILED)
+export type RoomState = 'idle' | 'ticket' | 'connecting' | 'joined' | 'reconnecting' | 'closed' | 'error'
 type Env = { t: 'req' | 'res' | 'ntf'; id?: number; m?: string; ok?: boolean; d?: unknown; e?: { code: string; msg: string } }
 type Trickle = { pc: 'pub' | 'sub'; candidate: RTCIceCandidateInit }
 type Consumer = { consumerId: string; producerId: string; kind: MediaKind; mid: string; paused?: boolean }
@@ -53,6 +54,10 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   const pendingRef = useRef(new Map<number, (e: Env | null) => void>())
   const iceWait = useRef<{ pub: RTCIceCandidateInit[]; sub: RTCIceCandidateInit[] }>({ pub: [], sub: [] })
   const nextId = useRef(1)
+  // 구독 PC 재협상 직렬 큐 — 서버 offer 가 연달아 와도 setRemoteDescription·answer 가 겹치지 않게 차례로 처리
+  const subChain = useRef<Promise<void>>(Promise.resolve())
+  // 지금 disconnected 인 PC 종류 — 둘 다 회복돼야 joined 로 돌아간다
+  const downRef = useRef(new Set<'pub' | 'sub'>())
   // 세션 순번 — leave 때마다 증가. 늦게 끝난 이전 세션의 await·이벤트가 새 세션 상태를 덮지 않게 비교한다
   const seqRef = useRef(0)
   // 구독 대응표 — mid→트랙(ontrack), producerId→consumer(consumerCreated), 일시정지 producerId 집합(알림 도착 순서 무관)
@@ -63,10 +68,14 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   const [state, setState] = useState<RoomState>('idle')
   const [error, setError] = useState<string | null>(null)
   const [localStream, setLocalStream] = useState<MediaStream | null>(null)
-  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null)
+  // 원격 영상·소리는 종류별 스트림 — 소리 트랙이 붙어도 영상 요소 srcObject 가 바뀌지 않게(깜박임 방지)
+  const [remoteVideo, setRemoteVideo] = useState<MediaStream | null>(null)
+  const [remoteAudio, setRemoteAudio] = useState<MediaStream | null>(null)
   const [localOn, setLocalOn] = useState({ audio: false, video: false })
   const [remotePaused, setRemotePaused] = useState({ audio: false, video: false })
   const [pending, setPending] = useState<MediaKind | null>(null)
+  // 토글 요청 중 여부 — 단축키 연타처럼 렌더 전에 다시 불릴 때 state 클로저 값은 믿을 수 없어 ref 로 막는다
+  const busyRef = useRef(false)
   // 발행 거부(ROLE_FORBIDDEN) — 연결은 유지하고 화면은 청중으로 전환(설계서 7.3)
   const [forbidden, setForbidden] = useState(false)
 
@@ -80,9 +89,9 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     setLocalStream(null)
   }
 
-  // 오류 화면으로 — 카메라 표시등이 남지 않게 내 트랙도 끈다
+  // 오류 화면으로 — leave 와 같은 전체 정리(WS·PC·원격 트랙 — 소리가 계속 나지 않게) 후 오류 코드만 남긴다
   function fail(code: string) {
-    stopLocal()
+    teardown()
     setError(code)
     setState('error')
   }
@@ -108,10 +117,17 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     })
   }
 
-  // 트랙 구성이 바뀔 때만 화면용 스트림을 새로 만든다(같은 객체를 고치면 React 가 모름, 매번 만들면 영상이 깜박임)
+  // 종류별 트랙 구성이 실제로 바뀔 때만 화면용 스트림을 새로 만든다(같은 객체를 고치면 React 가 모름, 매번 만들면 영상이 깜박임)
   function syncTracks() {
-    const tracks = [...tracksRef.current.values()]
-    setRemoteStream(tracks.length ? new MediaStream(tracks) : null)
+    const live = [...tracksRef.current.values()].filter((t) => t.readyState === 'live')
+    const pick = (k: MediaKind) => (prev: MediaStream | null) => {
+      const ts = live.filter((t) => t.kind === k)
+      const cur = prev?.getTracks() ?? []
+      if (cur.length === ts.length && ts.every((t) => cur.includes(t))) return prev
+      return ts.length ? new MediaStream(ts) : null
+    }
+    setRemoteVideo(pick('video'))
+    setRemoteAudio(pick('audio'))
   }
 
   function syncPaused() {
@@ -127,8 +143,15 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       if (ev.candidate) send({ t: 'ntf', m: 'trickle', d: { pc: kind, candidate: ev.candidate.toJSON() } })
     }
     pc.onconnectionstatechange = () => {
-      log(`${kind === 'pub' ? '발행' : '구독'} PC ${pc.connectionState}`)
-      if (pc.connectionState === 'failed' && seqRef.current === my) fail('ICE_FAILED')
+      const st = pc.connectionState
+      log(`${kind === 'pub' ? '발행' : '구독'} PC ${st}`)
+      if (seqRef.current !== my) return
+      if (st === 'failed') return fail('ICE_FAILED')
+      if (st === 'disconnected') downRef.current.add(kind)
+      else if (st === 'connected') downRef.current.delete(kind)
+      // 입장 뒤에만 joined ↔ reconnecting 을 오간다(입장 중·오류·끊김 상태는 건드리지 않음)
+      const next = downRef.current.size ? 'reconnecting' : 'joined'
+      setState((s) => (s === 'joined' || s === 'reconnecting' ? next : s))
     }
     return pc
   }
@@ -165,15 +188,22 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       syncTracks()
       syncPaused()
     } else if (e.m === 'transport.subscribe') {
-      // 서버 offer → answer(구독 PC 재협상)
-      const pc = subRef.current
-      if (!pc) return
-      await pc.setRemoteDescription({ type: 'offer', sdp: (e.d as { sdp: string }).sdp })
-      await flushIce('sub')
-      const ans = await pc.createAnswer()
-      await pc.setLocalDescription(ans)
-      await request('transport.subscribe.answer', { sdp: ans.sdp })
-      log('구독 offer 응답 완료')
+      // 서버 offer → answer(구독 PC 재협상). 직렬 큐 — 앞 협상의 answer 송신이 끝난 뒤 다음 offer 를 적용한다
+      const sdp = (e.d as { sdp: string }).sdp
+      const my = seqRef.current
+      const run = subChain.current.then(async () => {
+        const pc = subRef.current
+        if (!pc || seqRef.current !== my) return // 대기 중 나가기·재입장 — 이전 세션 offer 는 버린다
+        await pc.setRemoteDescription({ type: 'offer', sdp })
+        await flushIce('sub')
+        const ans = await pc.createAnswer()
+        await pc.setLocalDescription(ans)
+        await request('transport.subscribe.answer', { sdp: ans.sdp })
+        log('구독 offer 응답 완료')
+      })
+      // 실패해도 큐는 다음 offer 를 받는다(오류 로그는 호출부 onNtf catch)
+      subChain.current = run.catch(() => {})
+      await run
     } else if (e.m === 'error') {
       const er = e.d as { code: string; msg: string }
       log(`서버 오류 ${er.code} ${er.msg}`)
@@ -187,7 +217,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   // devName = 실험실 개발용 입장(엔진 MEDIA_DEV_TICKET=1 만 통과)
   async function join(room: string, role: Role, local?: MediaStream | null, devName?: string) {
     if (!wsUrl) return fail('NO_ENGINE')
-    leave()
+    teardown()
     const my = seqRef.current
     const stale = () => seqRef.current !== my
     // 넘겨받은 대기실 스트림은 지금부터 훅 소유 — 발행 전에 실패해도 leave·fail 이 끈다
@@ -218,8 +248,9 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     ws.onclose = () => {
       log('시그널링 끊김')
       if (stale()) return
-      stopLocal()
-      setState((s) => (s === 'error' ? s : 'closed'))
+      // 끊김도 전체 정리 — PC·원격 트랙이 남아 소리가 계속 나지 않게(fail 은 핸들러를 먼저 떼므로 여기 오지 않음)
+      teardown()
+      setState('closed')
     }
     try {
       // 연결 실패(터널 꺼짐·주소 오타·엔진 Origin 거부 403)도 로그에 남긴다
@@ -239,8 +270,18 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       const sub = newPC('sub', ice, my)
       subRef.current = sub
       sub.ontrack = (ev) => {
-        log(`수신 트랙 ${ev.track.kind}`)
-        tracksRef.current.set(ev.transceiver.mid ?? ev.track.id, ev.track)
+        const key = ev.transceiver.mid ?? ev.track.id
+        const track = ev.track
+        // 재협상 때 같은 트랙으로 다시 오면 무시(스트림 재생성·영상 깜박임 방지)
+        if (tracksRef.current.get(key) === track) return
+        log(`수신 트랙 ${track.kind}`)
+        tracksRef.current.set(key, track)
+        // 트랙이 끝나면 표에서 빼고 화면 갱신 — 이전 세션·이미 바뀐 트랙이면 무시
+        track.addEventListener('ended', () => {
+          if (seqRef.current !== my || tracksRef.current.get(key) !== track) return
+          tracksRef.current.delete(key)
+          syncTracks()
+        })
         syncTracks()
       }
       setState('joined')
@@ -251,7 +292,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       // ROLE_FORBIDDEN 은 연결 유지(SIGNAL_API 5절) — 발행만 접고 청중처럼 계속 본다(설계서 7.3)
       if (e instanceof SignalError && e.code === 'ROLE_FORBIDDEN') {
         setForbidden(true)
-        return stopLocal()
+        return closePublish()
       }
       fail(e instanceof SignalError ? e.code : 'MEDIA_FAILED')
     }
@@ -294,24 +335,53 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     })
   }
 
+  // 발행 정리 — 발행 PC·producer 표·내 트랙(ROLE_FORBIDDEN 은 연결 유지, 발행만 접는다)
+  function closePublish() {
+    pubRef.current?.close()
+    pubRef.current = null
+    downRef.current.delete('pub')
+    if (!downRef.current.size) setState((s) => (s === 'reconnecting' ? 'joined' : s))
+    iceWait.current.pub = []
+    producersRef.current = {}
+    setLocalOn({ audio: false, video: false })
+    stopLocal()
+  }
+
   // 마이크·카메라 켜기/끄기 — 서버 일시정지(producer.pause/resume). 상태는 서버 응답 뒤에만 확정(낙관적 갱신 안 함, 설계서 14.3)
-  async function setMedia(kind: MediaKind, on: boolean) {
+  // 반환 = 화면 알림이 필요한 실패면 false(요청 중 재호출·나가기 취소는 알림 대상 아님 → true)
+  async function setMedia(kind: MediaKind, on: boolean): Promise<boolean> {
     const track = localRef.current?.getTracks().find((t) => t.kind === kind)
     const producerId = producersRef.current[kind]
-    if (!track || !producerId || pending) return
+    if (!track || !producerId) return false
+    if (busyRef.current) return true
+    busyRef.current = true
     setPending(kind)
     try {
       await request(on ? 'producer.resume' : 'producer.pause', { producerId })
       track.enabled = on
       setLocalOn((p) => ({ ...p, [kind]: on }))
+      return true
     } catch (e) {
       log(`${kind} 전환 실패 ${(e as Error).message}`)
+      return e instanceof SignalError && e.code === 'LEFT'
     } finally {
+      busyRef.current = false
       setPending(null)
     }
   }
 
+  // 발행 PC 통계(발표자 연결 점검용) — 발행 전·청중이면 null
+  function pubStats(): Promise<RTCStatsReport | null> {
+    return pubRef.current?.getStats().catch(() => null) ?? Promise.resolve(null)
+  }
+
   function leave() {
+    teardown()
+    setState('idle')
+  }
+
+  // 세션 전체 정리(leave·fail·끊김 공용) — 화면 상태(state·error)는 호출부가 정한다
+  function teardown() {
     seqRef.current++
     const ws = wsRef.current
     if (ws) {
@@ -332,13 +402,30 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     consumersRef.current.clear()
     pausedRef.current.clear()
     producersRef.current = {}
-    setRemoteStream(null)
+    subChain.current = Promise.resolve()
+    downRef.current.clear()
+    setRemoteVideo(null)
+    setRemoteAudio(null)
     setRemotePaused({ audio: false, video: false })
     setLocalOn({ audio: false, video: false })
+    busyRef.current = false
     setPending(null)
     setForbidden(false)
-    setState('idle')
   }
 
-  return { state, error, forbidden, localStream, remoteStream, localOn, remotePaused, pending, join, leave, setMedia }
+  return {
+    state,
+    error,
+    forbidden,
+    localStream,
+    remoteVideo,
+    remoteAudio,
+    localOn,
+    remotePaused,
+    pending,
+    join,
+    leave,
+    setMedia,
+    pubStats,
+  }
 }

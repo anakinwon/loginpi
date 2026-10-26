@@ -150,7 +150,8 @@
     "preview": {
       "pending": "Preparing camera and microphone…",
       "audioOnly": "Camera unavailable — sending audio only.",
-      "none": "Camera and microphone unavailable. Check permissions (you can still join without media)."
+      "none": "Camera and microphone unavailable. Check permissions (you can still join without media).",
+      "videoOnly": "Microphone unavailable — sending video only. Check microphone permission."
     },
     "mic": {
       "on": "Turn off microphone",
@@ -164,13 +165,10 @@
     "leave": "Leave",
     "enableSound": "Enable sound",
     "state": {
-      "connecting": "Connecting…"
+      "connecting": "Connecting…",
+      "reconnecting": "Reconnecting…"
     },
     "waiting": "Waiting for the presenter.",
-    "noCameraSelf": "Presenting without a camera.",
-    "camOff": "The presenter's camera is off.",
-    "camOffSelf": "Your camera is off.",
-    "micOff": "Presenter muted",
     "rejoin": "Join again",
     "err": {
       "generic": "Something went wrong. Please join again.",
@@ -190,6 +188,38 @@
       "ICE_FAILED": "The video connection dropped. Check your network.",
       "MEDIA_FAILED": "Couldn't start the camera or microphone.",
       "TIMEOUT": "The video server isn't responding."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Couldn't change the microphone. Please try again.",
+        "video": "Couldn't change the camera. Please try again."
+      },
+      "forbidden": "You don't have permission to present, so you'll continue as audience."
+    },
+    "home": "Go to home",
+    "tile": {
+      "self": "{name} (you)",
+      "presenter": "Presenter",
+      "micOff": "Microphone off"
+    },
+    "more": "More options",
+    "joinNoCam": "Join without camera",
+    "net": {
+      "afterJoin": "Your connection is checked automatically after you join.",
+      "measuring": "Checking connection…",
+      "good": "Good connection",
+      "fair": "Fair connection",
+      "poor": "Poor connection",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% of audio data is being lost.",
+          "video": "{pct}% of video data is being lost."
+        },
+        "rate": {
+          "audio": "Audio upload is low at {kbps} kbps.",
+          "video": "Video upload is low at {kbps} kbps. Quality may drop."
+        }
+      }
     }
   }
 }

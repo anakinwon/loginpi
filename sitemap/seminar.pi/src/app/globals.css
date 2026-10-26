@@ -1,6 +1,9 @@
 /* seminar.pi 전역 스타일 — Tailwind v4 CSS-first 진입점(config 파일 없음) */
 @import 'tailwindcss';
 
+/* 낮은 가로 화면(휴대폰 회전) — 룸 하단 바를 오른쪽 세로 바로(설계서 6.2). 데스크톱 가로 창은 높이가 커서 해당 없음 */
+@custom-variant landscape-short (@media (orientation: landscape) and (max-height: 540px));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -10,6 +13,7 @@
   --color-danger: var(--danger);
   --color-accent: var(--accent);
   --color-speaking: var(--speaking);
+  --color-warning: var(--warning);
 }
 
 /* M0 단일 어두운 테마 — 라이트 테마는 화면 확정(PRD 6절) 후 */
@@ -24,4 +28,24 @@
   --danger: #e5484d;
   --accent: #7c6cf2;
   --speaking: #46c98b;
+  /* 연결 점검 '보통' 배지(설계서 14.5) — 9절 토큰 표에 없던 추가값 */
+  --warning: #f5a524;
+}
+
+/* 키보드 포커스 표시(설계서 14.6 — Tab 이동에만 보이고 마우스·터치 클릭엔 안 보임) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 움직임 줄이기 — 바 페이드·스피너·말하기 링 전환 등 모든 애니메이션·전환을 끈다(설계서 9절) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
