@@ -1,7 +1,20 @@
 // room-rules.ts 판정 시험 — node src/components/room/room-rules.test.mjs (Node 24 는 .ts 를 타입 제거로 바로 읽는다)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { gradeNet, mainSlots, nextSpeaking, readStats, splitSlots } from './room-rules.ts'
+import {
+  barOrder,
+  batchReaction,
+  enqueueReactions,
+  gradeNet,
+  handKey,
+  handNotice,
+  mainSlots,
+  nextPin,
+  nextSpeaking,
+  readStats,
+  sortPeers,
+  splitSlots,
+} from './room-rules.ts'
 
 // 발행 PC getStats 모양 표본 — kbps·손실률로 5초 구간 두 번
 function samples({ aKbps = 40, vKbps = 1200, aLost = 0, vLost = 0 } = {}) {
@@ -79,4 +92,73 @@ test('말하기 꺼짐은 0.5초 이상 조용해야', () => {
   const on = { on: true, since: 0 }
   assert.deepEqual(run([false, false, false, false, true], on), []) // 0.4초 침묵 후 다시 말함 → 유지
   assert.deepEqual(run([false, false, false, false, false, false], on), [[500, false]])
+})
+
+// ── M3 ──
+const P = (peerId, role, raisedTs = 0, name = peerId) => ({ peerId, name, role, raisedTs })
+
+test('참가자 정렬 — presenter → panel → 손든 청중(먼저 든 순) → 나머지 이름순', () => {
+  const list = [
+    P('b', 'audience', 0, '나비'),
+    P('h2', 'audience', 2000, '가람'),
+    P('pn', 'panel'),
+    P('a', 'audience', 0, '가람'),
+    P('h1', 'audience', 1000, '하늘'),
+    P('pr', 'presenter'),
+  ]
+  assert.deepEqual(
+    sortPeers(list).map((p) => p.peerId),
+    ['pr', 'pn', 'h1', 'h2', 'a', 'b'],
+  )
+  assert.notEqual(list[0].peerId, 'pr') // 원본 배열은 건드리지 않는다
+})
+
+test('반응 묶음 — 허용 7종만, 묶음당 최대 3개', () => {
+  let b = []
+  for (const e of ['👍', '🔥', '👏', '👍', '💖']) b = batchReaction(b, e)
+  assert.deepEqual(b, ['👍', '👏', '👍']) // 🔥 허용 밖, 4번째 💖 는 넘쳐 버림
+})
+
+test('반응 큐 — 최대 3종·50개 상한·5초 소멸', () => {
+  const counts = { '👍': 30, '👏': 30, '😀': 1, '💖': 2 }
+  let { queue, nextId } = enqueueReactions([], counts, 0, 1)
+  assert.equal(queue.length, 50)
+  assert.ok(!queue.some((f) => f.emoji === '😀')) // 적은 4번째 종류는 빠진다
+  assert.equal(nextId, 51)
+  ;({ queue } = enqueueReactions(queue, { '👍': 1 }, 4999, nextId))
+  assert.equal(queue.length, 50) // 꽉 찬 큐는 새 것을 버린다
+  ;({ queue } = enqueueReactions(queue, { '👍': 1 }, 5000, nextId))
+  assert.equal(queue.length, 1) // 5초 지난 것은 모두 정리
+  assert.equal(enqueueReactions([], { '🔥': 3 }, 0, 1).queue.length, 0)
+})
+
+test('손든 사람 알림 쌓임 방지 — 1명 = 그 사람, 2명 이상 = 묶음, 무시한 손은 제외', () => {
+  const one = [P('pr', 'presenter'), P('a', 'audience', 1000), P('pn', 'panel', 0)]
+  assert.equal(handNotice(one, new Set()).kind, 'one')
+  assert.equal(handNotice(one, new Set()).peer.peerId, 'a')
+  const two = [...one, P('b', 'audience', 500)]
+  assert.deepEqual(handNotice(two, new Set()), { kind: 'many', count: 2 })
+  assert.equal(handNotice(two, new Set([handKey(two[3])])).peer.peerId, 'a')
+  assert.deepEqual(handNotice(one, new Set([handKey(one[1])])), { kind: 'none' })
+  // 무시한 뒤 다시 손을 들면(새 raisedTs) 다시 알린다
+  assert.equal(handNotice([P('a', 'audience', 3000)], new Set([handKey(one[1])])).kind, 'one')
+})
+
+test('하단 바 순서 — 역할별, 가장 좁은 청중은 채팅이 반응보다 앞', () => {
+  assert.deepEqual(barOrder('audience', 371).slice(0, 3), ['hand', 'react', 'chat'])
+  assert.deepEqual(barOrder('audience', 370).slice(0, 2), ['hand', 'chat'])
+  assert.equal(barOrder('presenter', 600).at(-1), 'hands')
+  assert.equal(barOrder('panel', 600).at(-1), 'react')
+})
+
+test('화면공유 자동 고정 1회 → 끝나면 이전 고정 복원, 수동 해제 뒤 재고정 없음', () => {
+  let st = { pin: 'cam:x', prev: null, seen: [] }
+  st = nextPin(st, ['cam:x', 'screen:1'], ['screen:1'])
+  assert.deepEqual(st, { pin: 'screen:1', prev: 'cam:x', seen: ['screen:1'] })
+  const manual = { ...st, pin: null, prev: null } // 사용자가 고정 해제
+  assert.equal(nextPin(manual, ['cam:x', 'screen:1'], ['screen:1']).pin, null)
+  st = nextPin(st, ['cam:x'], [])
+  assert.deepEqual(st, { pin: 'cam:x', prev: null, seen: [] })
+  // 다시 공유하면(새 키) 또 1회 자동 고정
+  assert.equal(nextPin(st, ['cam:x', 'screen:2'], ['screen:2']).pin, 'screen:2')
 })
