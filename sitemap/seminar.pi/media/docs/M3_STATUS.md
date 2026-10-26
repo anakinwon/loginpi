@@ -97,4 +97,17 @@
 - 의존 : 새 간선 없음(bora → signal 기존), archtest 표 수정 없이 PASS. 외부 의존 추가 없음.
 - 실행(Go windows/amd64) : `go vet ./...` 통과 · `go test -count=1 ./...` 15패키지 통과 · 시간 민감 시험 `-count=5` 통과(bora v1.1 시험 전부, `cmd/galapagos` TestV11Interactions). `-race` 미실행(CGO 없음).
 - 실패 가능성 확인(되돌림) : sendHand 받는 사람을 전원으로·peerJoined 앞선 입장자 제외를 끄면 bora 시험 4개 실패.
-- 남은 일 : 구현 자의 판단 2건 — ① 강등 시 서버가 발행 PC 도 닫는다(문서는 클라이언트 정리만 적음, 재승격 때 새 PC 로 협상) ② 관리 API `POST /admin/rooms` 로 다시 열어도 `room.end` 종료 표시는 남는다(엔진 재시작 때만 초기화 — 문서 그대로). 채팅 속도 한도는 [TBD : M5 실측].
+- 남은 일 : 채팅·반응 속도 한도는 [TBD : M5 실측]. (구현 자의 판단 2건 — 강등 시 발행 PC 닫기·종료 표시 유지 — 은 6.1 에서 결정·문서화로 해소)
+
+### 6.1 W1 검토 후속(v1.1.1, 2026-10-26 — 메인 세션 결정 4건 + 구현 결정 문서화)
+
+| 결정 | 구현 위치 | 시험(되돌리면 실패 확인) |
+|---|---|---|
+| ① 승격·강등 역할은 재입장해도 유지 — 방마다 `Room.roles`(입장권 sub → 세션 역할), join 은 입장권 role(초기값) 대신 사용, presenter 입장권·빈 sub 는 제외, panel·audience 만 기록(발표자 승격 불가), 방이 닫히면 소멸. join 응답 `role` 도 세션 역할(`p.Role`) | `bora/room.go` join · `bora/interact.go` SetRole · `bora/manager.go` Join | TestRoleSurvivesRejoin(표 5행 + 승격→재입장→강등→재입장→새 방), e2e(A1 재입장 panel·이전 세션 DUPLICATE_SESSION) |
+| ② `room.end` 순서 = 종료 표시 → 요청자 성공 응답(큐) → 나머지 전원 ROOM_CLOSED·정리 → 요청자 ROOM_CLOSED | `signal/session.go` EndSession.After · `signal/server.go`(reply → After → Close) · `bora/manager.go` endRoom(표시만)·After=shutRoom | TestEndSessionOrder(After 가 클라이언트 응답 수신을 기다림), TestRoomEndOrderAndReopen(응답 전 다른 세션 열림·방 살아 있음) |
+| ③ 관리 API `POST /admin/rooms` 로 새로 열면 그 방 ID 의 종료 표시 해제 | `bora/admin.go` OpenRoom | TestRoomEndOrderAndReopen, e2e(room.end 뒤 POST 201 → join 성공·역할 기억 없음) |
+| ④ `reaction.send` 한 요청 안 중복 이모지는 1개로 셈(개수 1~3 검사는 중복 제거 전 길이 — 기존 4개 거부 유지) | `bora/interact.go` React | TestReaction(👍 합계 4→3, 중복 4개 거부), e2e(`["👍","👍"]`) |
+
+- 문서 : `../docs/SIGNAL_API.md` v1.1.1 — 위 4건 + 서버가 강등된 사람 발행 PC 를 닫음, `peerJoined` = 받는 사람보다 뒤 입장자만, `peerLeft` 의 모르는 peerId 는 무시, 값 검사가 속도 제한보다 먼저.
+- 실행(Go windows/amd64) : `go vet ./...` 통과 · `go test -count=1 ./...` 15패키지 통과 · 새 시간 민감 시험 `-count=5` 통과(bora TestRoleSurvivesRejoin·TestRoomEndOrderAndReopen·TestReaction·TestPeerBatch, signal TestEndSessionOrder, `cmd/galapagos` TestV11Interactions). `-race` 미실행(CGO 없음). archtest 표 수정 없음·외부 의존 추가 없음.
+- 관찰 : 변이 시험 중 1회 `cmd/galapagos` TestLossT3Burst10 이 실패(역할 변이와 무관한 기존 손실 시험, 이후 전체 실행 통과) — 시간 민감 시험으로 기록만.
