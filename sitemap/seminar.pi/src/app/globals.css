@@ -1,6 +1,9 @@
 /* seminar.pi 전역 스타일 — Tailwind v4 CSS-first 진입점(config 파일 없음) */
 @import 'tailwindcss';
 
+/* 낮은 가로 화면(휴대폰 회전) — 룸 하단 바를 오른쪽 세로 바로(설계서 6.2). 데스크톱 가로 창은 높이가 커서 해당 없음 */
+@custom-variant landscape-short (@media (orientation: landscape) and (max-height: 540px));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

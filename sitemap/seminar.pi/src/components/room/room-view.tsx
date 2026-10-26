@@ -1,11 +1,11 @@
 'use client'
 // 세미나 룸 화면 — 로그인 게이트 → 대기실(S3) → 룸(S4)을 한 페이지 상태 전환으로 잇는다(설계서 5절 :
 // 대기실 카메라 스트림과 [입장] 탭 제스처를 그대로 룸에 넘겨야 Pi Browser 자동재생이 막히지 않는다). 서버 redirect 없음
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { useTranslations } from 'next-intl'
 import { LoginGate } from '@/components/login-gate'
 import { Link } from '@/i18n/navigation'
-import { ControlBar } from './control-bar'
+import { ControlBar, useBarVisibility } from './control-bar'
 import { Prejoin } from './prejoin'
 import { Spinner, Stage, useRemoteAudio } from './stage'
 import { useRoom, type MediaKind, type Role } from './use-room'
@@ -58,6 +58,19 @@ function Ended({ code, onRejoin }: { code: string; onRejoin: () => void }) {
 // 화면 알림 유지 시간 — 설계서 14.4 알림 지속 5단계 중 5s
 const NOTICE_MS = 5000
 
+// 요소 폭(px) 추적 — 하단 바 슬롯 수·라벨 판정(창이 아니라 룸 영역 기준 — W3 사이드 패널이 열리면 좁아진다)
+function useWidth(ref: RefObject<HTMLElement | null>) {
+  const [w, setW] = useState(0)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [ref])
+  return w
+}
+
 function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; name: string; canPresent: boolean }) {
   const t = useTranslations('room')
   const r = useRoom({ wsUrl })
@@ -66,6 +79,10 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   const sound = useRemoteAudio(audioRef, r.remoteAudio)
   // 화면 안 알림(alert() 금지, 설계서 14.5) — 값은 room.notice.* 키
   const [notice, setNotice] = useState<string | null>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const width = useWidth(rootRef)
+  const live = r.state === 'joined' || r.state === 'reconnecting'
+  const bar = useBarVisibility(live)
 
   useEffect(() => {
     if (!notice) return
@@ -95,7 +112,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   const ended = r.state === 'error' || r.state === 'closed'
   const stageRole: Role = r.forbidden ? 'audience' : role
   return (
-    <div className="space-y-3">
+    <div ref={rootRef} className="space-y-3">
       <audio ref={audioRef} autoPlay />
       {/* 알림 영역은 항상 붙여 둔다 — 내용이 바뀔 때 화면 낭독기가 읽게(오류성 알림이라 assertive) */}
       <div aria-live="assertive" className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-4">
@@ -108,41 +125,52 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
       ) : ended ? (
         <Ended code={r.error ?? 'CLOSED'} onRejoin={r.leave} />
       ) : (
-        <>
-          {/* 상단 정보 줄 — 재연결 배지(설계서 6.3). 인원 수·연결 품질은 같은 줄에 붙는다 */}
-          <div className="flex min-h-7 items-center gap-2 text-xs">
-            {r.state === 'reconnecting' && (
-              <span role="status" className="bg-surface-raised inline-flex items-center gap-2 rounded-full px-3 py-1">
-                <Spinner />
-                {t('state.reconnecting')}
-              </span>
-            )}
+        // 룸 — 세로 : 무대 위·바 아래, 낮은 가로 화면(휴대폰 회전) : 바를 오른쪽 세로로(설계서 6.2). W3 사이드 패널은 이 줄의 오른쪽에 붙는다
+        <div {...bar.area} className="landscape-short:flex-row flex flex-col gap-2">
+          <div className="min-w-0 flex-1 space-y-2">
+            {/* 상단 정보 줄 — 재연결 배지(설계서 6.3). 인원 수·연결 품질은 같은 줄에 붙는다 */}
+            <div className="flex min-h-7 items-center gap-2 text-xs">
+              {r.state === 'reconnecting' && (
+                <span role="status" className="bg-surface-raised inline-flex items-center gap-2 rounded-full px-3 py-1">
+                  <Spinner />
+                  {t('state.reconnecting')}
+                </span>
+              )}
+            </div>
+            <Stage
+              role={stageRole}
+              state={r.state}
+              name={name}
+              local={r.localStream}
+              remoteVideo={r.remoteVideo}
+              remoteAudio={r.remoteAudio}
+              localOn={r.localOn}
+              remotePaused={r.remotePaused}
+            />
           </div>
-          <Stage
-            role={stageRole}
-            state={r.state}
-            name={name}
-            local={r.localStream}
-            remoteVideo={r.remoteVideo}
-            remoteAudio={r.remoteAudio}
-            localOn={r.localOn}
-            remotePaused={r.remotePaused}
-          />
-          <ControlBar
-            role={stageRole}
-            ready={r.state === 'joined'}
-            has={{
-              audio: !!r.localStream?.getAudioTracks().length,
-              video: !!r.localStream?.getVideoTracks().length,
-            }}
-            localOn={r.localOn}
-            pending={r.pending}
-            soundBlocked={sound.blocked}
-            onToggle={(k, on) => void toggle(k, on)}
-            onSound={() => void sound.enable()}
-            onLeave={r.leave}
-          />
-        </>
+          {/* 자동 숨김 — 200ms 페이드(reduced-motion 이면 즉시), 숨겨도 자리는 유지해 무대가 출렁이지 않게 */}
+          <div
+            {...bar.bar}
+            className={`transition-opacity duration-200 motion-reduce:transition-none ${bar.shown ? '' : 'pointer-events-none opacity-0'}`}
+          >
+            <ControlBar
+              role={stageRole}
+              ready={r.state === 'joined'}
+              has={{
+                audio: !!r.localStream?.getAudioTracks().length,
+                video: !!r.localStream?.getVideoTracks().length,
+              }}
+              localOn={r.localOn}
+              pending={r.pending}
+              soundBlocked={sound.blocked}
+              onToggle={(k, on) => void toggle(k, on)}
+              onSound={() => void sound.enable()}
+              width={width}
+              onHold={bar.onMenu}
+              onLeave={r.leave}
+            />
+          </div>
+        </div>
       )}
     </div>
   )

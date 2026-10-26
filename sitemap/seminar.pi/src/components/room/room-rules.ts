@@ -14,3 +14,19 @@ export function nextSpeaking(
   const since = cur.since || now
   return now - since >= (loud ? SPEAK.onMs : SPEAK.offMs) ? { on: loud, since: 0 } : { on: cur.on, since }
 }
+
+// 하단 바(설계서 14.3) — 메인 슬롯 폭 임계(폭 > 565·420·370), 텍스트 라벨은 폭 > 760, 마우스 무조작 숨김 4000ms
+export const BAR = { slotWidths: [565, 420, 370], labelMinWidth: 760, hideMs: 4000 }
+
+// 역할별 메인 슬롯 수 — 표의 버튼 수(presenter·panel 6·4·3·2, audience 5·4·3·2). 나가기·소리 켜기는 슬롯 밖
+export function mainSlots(width: number, role: 'presenter' | 'panel' | 'audience'): number {
+  const table = role === 'audience' ? [5, 4, 3, 2] : [6, 4, 3, 2]
+  const i = BAR.slotWidths.findIndex((w) => width > w)
+  return table[i === -1 ? table.length - 1 : i]
+}
+
+// 슬롯 나누기 — 넘친 버튼이 1개뿐이면 더보기를 만들지 않고 바로 노출(Jitsi 규칙)
+export function splitSlots<T>(items: T[], slots: number): { main: T[]; more: T[] } {
+  if (items.length <= slots + 1) return { main: items, more: [] }
+  return { main: items.slice(0, slots), more: items.slice(slots) }
+}

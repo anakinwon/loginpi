@@ -201,6 +201,7 @@
       "self": "{name} (you)",
       "presenter": "Presenter",
       "micOff": "Microphone off"
-    }
+    },
+    "more": "More options"
   }
 }
