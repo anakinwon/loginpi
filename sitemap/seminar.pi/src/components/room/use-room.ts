@@ -553,7 +553,17 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       delete producersRef.current.screen
       delete sendersRef.current.screen
       stopScreen()
-      tr?.sender.replaceTrack(null).catch(() => {})
+      if (tr) {
+        tr.sender.replaceTrack(null).catch(() => {})
+        // 죽은 sendonly 를 남기지 않는다 — 다음 offer(다음 발행·공유)부터 inactive 로 협상돼 서버도 그 m-line 을 받기만 끝낸다.
+        // ponytail: 공유 1회당 inactive m-line 1개씩 늘어난다(수 회면 무해). mid 재사용(replaceTrack)은 엔진 closeProducer 가
+        // pubMids[mid] 를 지우지 않아 같은 mid produce 가 닫힌 producer 를 돌려주므로 엔진 수정 뒤 전환
+        try {
+          tr.direction = 'inactive'
+        } catch {
+          // 발행 PC 가 이미 닫힘(강등·나가기) — 할 일 없음
+        }
+      }
       if (id)
         await request('producer.close', { producerId: id }).catch((e: Error) => log(`화면공유 닫기 실패 ${e.message}`))
       return null
