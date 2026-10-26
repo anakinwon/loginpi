@@ -131,21 +131,57 @@ func TestDecisionString(t *testing.T) {
 func TestLayerUsable(t *testing.T) {
 	p := santorini.New("p", "peer", santorini.Video, santorini.Camera)
 	defer p.Close()
-	p.AddLayer("l", blockReader{p.Done()}, nopRTCP{})
+	rd := &fakeReader{ch: make(chan []byte, 16)}
+	p.AddLayer("l", rd, nopRTCP{})
 	c := New("c", p, nil, 1, false)
 	defer c.Close()
-	for _, st := range []struct {
+	check := func(cases []struct {
+		layer int8
+		want  bool
+	}) {
+		t.Helper()
+		for _, st := range cases {
+			if got := c.layerUsable(st.layer); got != st.want {
+				t.Errorf("layerUsable(%d)=%v 기대 %v", st.layer, got, st.want)
+			}
+		}
+	}
+	check([]struct {
 		layer int8
 		want  bool
 	}{
 		{0, false}, // 있지만 패킷 없음 = 비활성
 		{1, false}, // 없음
 		{2, false}, // 없음
-	} {
-		if got := c.layerUsable(st.layer); got != st.want {
-			t.Errorf("layerUsable(%d)=%v 기대 %v", st.layer, got, st.want)
+	})
+
+	// 레이어 0 에 실제 수신 경로(Layer.Run → observe)로 20ms 간격 패킷을 넣는다 — 2초(4주기) 연속이면 활성.
+	stop := make(chan struct{})
+	fed := make(chan struct{})
+	go func() {
+		defer close(fed)
+		for seq := uint16(1); ; seq++ {
+			select {
+			case <-stop:
+				return
+			case rd.ch <- vp8Packet(t, seq, uint32(seq)*3000, seq == 1, false):
+			}
+			time.Sleep(20 * time.Millisecond)
 		}
+	}()
+	end := time.Now().Add(5 * time.Second)
+	for !c.layerUsable(0) && time.Now().Before(end) {
+		time.Sleep(20 * time.Millisecond)
 	}
+	close(stop)
+	<-fed
+	check([]struct {
+		layer int8
+		want  bool
+	}{
+		{0, true},  // 2초 이상 연속 수신 + 방금 받음 = 활성
+		{1, false}, // 여전히 없음
+	})
 }
 
 // SeqRewriter 보강 : 재전송(같은 입력 재수신)은 같은 출력 순번, Sync 이전 순번의 Drop 은 무시.
