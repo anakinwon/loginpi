@@ -134,6 +134,10 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   const [tab, setTab] = useState<PanelTab>('chat')
   const [reactOpen, setReactOpen] = useState(false)
   const [qualityOpen, setQualityOpen] = useState(false)
+  // 화질 메뉴는 청중 전용 — 역할이 바뀌면 열린 메뉴를 닫는다
+  useEffect(() => {
+    if (r.role && r.role !== 'audience') setQualityOpen(false)
+  }, [r.role])
   const [seenN, setSeenN] = useState(0)
   const [dismissed, setDismissed] = useState<ReadonlySet<string>>(new Set())
   const [promoHidden, setPromoHidden] = useState(false)

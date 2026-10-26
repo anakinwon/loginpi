@@ -25,7 +25,8 @@ function observers() {
       clearTimeout(e.timer)
       e.offAt = it.isIntersecting ? null : performance.now()
       // 화면 밖 2초 뒤 최저 레이어로 — 그 전에 돌아오면 타이머 취소
-      if (!it.isIntersecting) e.timer = setTimeout(e.report, LAYER.offscreenMs)
+      // +50ms 여유 : 타이머가 조금 일찍 깨거나 performance.now() 가 거칠게 반올림돼도 2초 판정이 넘어가게(토스트와 같은 방식)
+      if (!it.isIntersecting) e.timer = setTimeout(e.report, LAYER.offscreenMs + 50)
       e.report()
     }
   })

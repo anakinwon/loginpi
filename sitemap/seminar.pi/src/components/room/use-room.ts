@@ -301,6 +301,8 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       setRole(d.role)
       // 발행 권한이 다시 생겼다 — 이전 ROLE_FORBIDDEN 표시를 풀어야 화면이 새 역할(panel·presenter)로 돌아온다
       if (d.role !== 'audience') setForbidden(false)
+      // 화질 상한 버튼은 청중 바에만 있다 — 무대에 오르면 상한을 풀어(자동) 고를 수 없는 상한에 갇히지 않게
+      if (d.role !== 'audience' && capRef.current !== 'auto') setQualityCap('auto')
       log(`내 역할 → ${d.role}`)
       if (d.role === 'audience') {
         // 강등 — 서버가 내 producer 를 닫았다. 내 트랙·발행 PC 정리, 손 목록은 청중 범위 밖이라 비운다

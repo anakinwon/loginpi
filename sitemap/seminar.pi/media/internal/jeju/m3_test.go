@@ -216,3 +216,13 @@ func TestSeqRewriterRetransmitAndStaleDrop(t *testing.T) {
 		runSeq(t, c.name, &s, c.steps)
 	}
 }
+
+// 재개 시 RR 기준 초기화 — 일시정지 전 RR 시각이 남으면 재개 직후 lost 오판(M4 검토 지적)
+func TestResumeClearsLastRR(t *testing.T) {
+	c := New("c", santorini.New("p", "peer", santorini.Video, santorini.Camera), nil, 1, true)
+	c.lastRR = time.Now().Add(-30 * time.Second)
+	c.resume()
+	if !c.lastRR.IsZero() {
+		t.Fatalf("재개 뒤 lastRR = %v, 0 이어야 함", c.lastRR)
+	}
+}
