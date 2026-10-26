@@ -22,7 +22,7 @@ LTE 휴대폰 ─ 신호 wss ─→ Cloudflare 임시 터널 ─(집 PC가 바�
 1. `run-engine.cmd`(4.2) 값 :
    - `MEDIA_PUBLIC_IP` = 공유기 관리 화면(`http://192.168.0.1`) 시스템 요약 정보의 **외부 IP 주소**(2절 ②) — 숫자 4덩어리만
    - `MEDIA_TOKEN_SECRET` = 마스터 PC `sitemap/seminar.pi/.env.vercel-prod` 의 같은 키 값(Vercel 과 같은 값, 앞뒤 공백 없이)
-   - `MEDIA_ALLOWED_ORIGINS=https://seminar0532.pinet.com,https://xxx.vercel.app` — 뒤의 것은 Vercel → seminar → Settings → Domains 첫 줄로 바꿔 넣습니다. Pi Browser 가 보내는 Origin 이 둘 중 어느 쪽인지 아직 실측 전이라 **둘 다** 넣습니다 [확인중 : Pi Browser Origin]
+   - `MEDIA_ALLOWED_ORIGINS=https://seminarz.vercel.app,https://seminar0532.pinet.com` — Pi 포털 래퍼(seminar0532.pinet.com)가 실제 앱을 **https://seminarz.vercel.app** 에서 불러오므로(2026-10-27 래퍼 HTML 확인) Pi Browser 의 Origin 은 앞의 값일 가능성이 높습니다. 실측 전이라 **둘 다** 넣습니다 [확인중 : Pi Browser Origin]
    - `MEDIA_ADMIN_SECRET` 은 **넣지 않습니다** — 터널은 엔진의 모든 경로를 공개하므로, 넣으면 관리 API(`/admin/`)가 인터넷에 열립니다(없으면 `/admin/` 은 404)
 2. 방화벽 UDP 7882 규칙(4.3 첫 줄) 실행
 3. 엔진 켜기 / 값을 바꾼 뒤 다시 켜기 — 관리자 cmd 에서 세 줄(`/End` 만 하면 galapagos.exe 가 남아 포트를 잡고 있음) :
@@ -176,7 +176,7 @@ set MEDIA_LISTEN=127.0.0.1:7880
 set MEDIA_UDP_PORT=7882
 set MEDIA_PUBLIC_IP=PUBLIC_IP_HERE
 set MEDIA_TOKEN_SECRET=TOKEN_SECRET_HERE
-set MEDIA_ALLOWED_ORIGINS=https://seminar0532.pinet.com
+set MEDIA_ALLOWED_ORIGINS=https://seminarz.vercel.app,https://seminar0532.pinet.com
 :loop
 C:\galapagos\galapagos.exe >> C:\galapagos\engine.log 2>&1
 echo %date% %time% engine exited - restart in 5s >> C:\galapagos\engine.log
