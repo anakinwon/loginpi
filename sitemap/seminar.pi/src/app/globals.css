@@ -31,3 +31,21 @@
   /* 연결 점검 '보통' 배지(설계서 14.5) — 9절 토큰 표에 없던 추가값 */
   --warning: #f5a524;
 }
+
+/* 키보드 포커스 표시(설계서 14.6 — Tab 이동에만 보이고 마우스·터치 클릭엔 안 보임) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 움직임 줄이기 — 바 페이드·스피너·말하기 링 전환 등 모든 애니메이션·전환을 끈다(설계서 9절) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
