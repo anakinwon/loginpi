@@ -256,6 +256,25 @@ galapagos.exe
 
 확인 뒤 `Ctrl+C` 로 끄고 `schtasks /Run /TN "Galapagos Engine"` 로 다시 맡깁니다. `engine.log` 는 관리자 권한으로만 열립니다(4.2 폴더 권한).
 
+### 4.7 엔진 교체 (새 빌드로 바꿀 때)
+
+화면(Vercel)은 push 하면 자동 배포되지만 **엔진은 이 PC 에서 직접 바꿔야** 합니다. 화면이 새 기능(v1.1 채팅·손들기·반응·무대 초대·세미나 종료, v1.2 사회자 음소거·레이아웃·발언자)을 쓰는데 엔진이 옛 빌드면 그 기능만 실패합니다(기본 입장·영상은 동작).
+
+1. 마스터 PC 에서 새 파일 : `sitemap/seminar.pi/media/bin/galapagos.exe` (아소카가 빌드해 둠 — 아래 SHA256 확인)
+2. 192.168.0.16 관리자 cmd :
+   ```
+   schtasks /End /TN "Galapagos Engine"
+   taskkill /IM galapagos.exe /F
+   copy /Y <USB 경로>\galapagos.exe C:\galapagos\galapagos.exe
+   schtasks /Run /TN "Galapagos Engine"
+   ```
+3. 확인 : `http://127.0.0.1:7880/healthz` → `ok`, `C:\galapagos\engine.log` 마지막 줄 `Galápagos 대기 …`
+4. 파일 확인(선택) : PowerShell `Get-FileHash C:\galapagos\galapagos.exe` 가 빌드 기록의 SHA256 과 같은지
+
+| 빌드 | 커밋 | SHA256 |
+|---|---|---|
+| 2026-10-27 01:45 (v1.2) | `7f623e75` | `bdcbe4896908fa2be09fc5df30aaa6b84d34a21f16c55c51a8f35a928441cbc0` |
+
 ## 5. 앱(Vercel) 쪽 설정 — 아소카가 코드, 마스터가 Vercel 값
 
 | 항목 | 값 | 담당 |
