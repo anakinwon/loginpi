@@ -104,8 +104,9 @@ export function menuKeys(e: ReactKeyboardEvent<HTMLElement>) {
 }
 
 // 열린 메뉴 공용 동작 — 열리면 첫 항목에 포커스, Esc = 닫고 여는 버튼으로 포커스 복귀, Tab·바깥 탭 = 닫기.
-// triggerSel = 여는 버튼이 메뉴 밖에 따로 있을 때(반응 메뉴) — 그 버튼 탭은 바깥 탭으로 치지 않고, Esc 때 포커스를 돌려준다
-export function useMenu(open: boolean, close: () => void, triggerSel?: string) {
+// triggerSel = 여는 버튼이 메뉴 밖에 따로 있을 때(반응 메뉴) — 그 버튼 탭은 바깥 탭으로 치지 않고, Esc 때 포커스를 돌려준다.
+// fallbackSel = 여는 버튼이 이미 사라졌을 때(더보기 안에서 열어 더보기가 닫힘) Esc 포커스를 받을 요소(더보기 버튼)
+export function useMenu(open: boolean, close: () => void, triggerSel?: string, fallbackSel?: string) {
   const rootRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -120,7 +121,8 @@ export function useMenu(open: boolean, close: () => void, triggerSel?: string) {
       if (e.key === 'Tab') return latest.current() // 포커스 이동은 브라우저에 맡긴다
       if (e.key !== 'Escape') return
       latest.current()
-      ;(triggerRef.current ?? (triggerSel ? document.querySelector<HTMLElement>(triggerSel) : null))?.focus()
+      const q = (s?: string) => (s ? document.querySelector<HTMLElement>(s) : null)
+      ;(triggerRef.current ?? q(triggerSel) ?? q(fallbackSel))?.focus()
     }
     const onDown = (e: PointerEvent) => {
       const el = e.target as Element
@@ -133,7 +135,7 @@ export function useMenu(open: boolean, close: () => void, triggerSel?: string) {
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('pointerdown', onDown)
     }
-  }, [open, triggerSel])
+  }, [open, triggerSel, fallbackSel])
   return { rootRef, menuRef, triggerRef }
 }
 
@@ -160,6 +162,7 @@ function MoreMenu({ items, onOpen }: { items: BarItem[]; onOpen: (o: boolean) =>
       <button
         ref={m.triggerRef}
         type="button"
+        data-more-trigger
         aria-label={t('more')}
         title={t('more')}
         aria-haspopup="menu"
@@ -217,6 +220,8 @@ export function BarButton({
   accent?: boolean // 켜짐을 강조색으로(손들기)
   onClick: () => void
   'data-react-trigger'?: boolean
+  'aria-haspopup'?: 'menu' // 메뉴를 여는 버튼(반응) — 토글 상태는 aria-expanded 로(aria-pressed 대신)
+  'aria-expanded'?: boolean
 }) {
   const state =
     pressed === undefined
@@ -398,7 +403,7 @@ export function ControlBar({
               {...o}
               icon={<Emoji c="😀" />}
               text={t('react.open')}
-              pressed={o.menu ? undefined : reactOpen}
+              {...(o.menu ? {} : { 'aria-haspopup': 'menu' as const, 'aria-expanded': reactOpen })}
               data-react-trigger
               onClick={onReact}
             />

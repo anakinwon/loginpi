@@ -3,7 +3,7 @@
 // → 자동재생 정책으로 소리가 막혀도 영상은 나온다(설계서 14.5)
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { useTranslations } from 'next-intl'
-import { nextPin, type PinState } from './room-rules'
+import { groupTracks, nextPin, type PinState } from './room-rules'
 import type { Peer, RemoteTrack, RoomState, SessionRole } from './use-room'
 import { VideoTile } from './video-tile'
 
@@ -89,8 +89,7 @@ type Tile = {
   presenter: boolean
 }
 
-// 발행자 타일 목록 — 무대는 발행자만(청중은 인원 수·목록만, 설계서 14.1). 원격 트랙의 발행자를 모르면(계약 공백 — use-room.ts Consumer 주석)
-// 발행 가능한 다른 참가자(presenter·panel)가 1명뿐일 때만 그 사람으로 보고, 아니면 이름 없는 "발표자" 타일 하나에 모은다
+// 발행자 타일 목록 — 무대는 발행자만(청중은 인원 수·목록만, 설계서 14.1). 원격 트랙 주인은 consumerCreated.peer(room-rules ownerKey·groupTracks)
 function buildTiles({
   t,
   viewer,
@@ -130,31 +129,19 @@ function buildTiles({
     })
   }
   const byId = new Map(peers.map((p) => [p.peerId, p]))
-  const stagers = peers.filter((p) => p.peerId !== selfId && p.role !== 'audience')
-  const guess = stagers.length === 1 ? stagers[0].peerId : null
-  const groups = new Map<string, { cam?: RemoteTrack; mic?: RemoteTrack }>()
-  for (const tr of tracks) {
-    const pid = tr.peerId ?? guess ?? '?'
-    const p = byId.get(pid)
-    const name = p?.name ?? t('tile.presenter')
-    if (tr.source === 'screen') {
-      out.push({
-        key: `screen:${tr.producerId}`,
-        name: t('tile.screen', { name }),
-        video: tr.stream,
-        audio: null,
-        micOff: false,
-        camOff: tr.paused,
-        mirror: false,
-        screen: true,
-        presenter: false,
-      })
-      continue
-    }
-    const g = groups.get(pid) ?? {}
-    if (tr.kind === 'audio') g.mic = tr
-    else g.cam = tr
-    groups.set(pid, g)
+  const { screens, groups } = groupTracks(tracks)
+  for (const tr of screens) {
+    out.push({
+      key: `screen:${tr.producerId}`,
+      name: t('tile.screen', { name: byId.get(tr.peerId)?.name ?? t('tile.presenter') }),
+      video: tr.stream,
+      audio: null,
+      micOff: false,
+      camOff: tr.paused,
+      mirror: false,
+      screen: true,
+      presenter: false,
+    })
   }
   for (const [pid, g] of groups) {
     const p = byId.get(pid)

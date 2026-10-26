@@ -249,6 +249,7 @@
       "empty": "No messages yet. Chat is not saved.",
       "me": "You",
       "failed": "Not sent.",
+      "retry": "Retry",
       "input": "Type a message",
       "send": "Send"
     },

@@ -7,7 +7,21 @@ import { ICON, Icon } from './control-bar'
 import { nextSpeaking, SPEAK } from './room-rules'
 import { StreamVideo } from './stage'
 
-// ponytail: 타일마다 AudioContext 1개 — 지금은 무대 1개라 충분, 패널 타일 여러 개(M3)면 공용 컨텍스트 1개로 합친다
+// 공용 AudioContext 1개 — 브라우저마다 동시 컨텍스트 수 상한이 있어 타일마다 만들지 않는다. 트랙마다 analyser 만 따로,
+// 마지막 사용자가 빠지면 닫는다(다음 사용 때 새로 만든다)
+const shared: { ctx: AudioContext | null; users: number } = { ctx: null, users: 0 }
+function acquireCtx(): AudioContext {
+  if (!shared.ctx || shared.ctx.state === 'closed') shared.ctx = new AudioContext()
+  shared.users++
+  return shared.ctx
+}
+function releaseCtx() {
+  if (--shared.users > 0) return
+  shared.users = 0
+  shared.ctx?.close().catch(() => {})
+  shared.ctx = null
+}
+
 export function useSpeaking(stream: MediaStream | null, enabled: boolean) {
   const [speaking, setSpeaking] = useState(false)
   useEffect(() => {
@@ -16,7 +30,7 @@ export function useSpeaking(stream: MediaStream | null, enabled: boolean) {
       setSpeaking(false)
       return
     }
-    const ctx = new AudioContext()
+    const ctx = acquireCtx()
     const src = ctx.createMediaStreamSource(new MediaStream([track]))
     const an = ctx.createAnalyser()
     an.fftSize = 512
@@ -35,7 +49,7 @@ export function useSpeaking(stream: MediaStream | null, enabled: boolean) {
     return () => {
       clearInterval(timer)
       src.disconnect()
-      ctx.close().catch(() => {})
+      releaseCtx()
       setSpeaking(false)
     }
   }, [stream, enabled])
