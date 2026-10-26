@@ -18,12 +18,12 @@
 
 ## 2. 관문 — 모듈 의존이 3.1절 구조와 일치
 
-- **판정 : [확인중] — 다이어그램 밖 간선 11개, 마스터 승인 대기** (PASS 아님).
-- 기준 : 유일하게 글로 적힌 구조도 `OWNERSHIP.md:57`(`bora → {signal, capri, santorini, jeju, bwe}` · `jeju → {santorini, forward, nack, pli}` · `santorini → {forward, nack, pli, rtcpx, rtpx}` · `record → jeju` · 나머지 내부 의존 없음). cmd/ 에 대한 규칙은 이 줄에 없다. OWNERSHIP.md 는 계약 파일이라 고치지 않았다.
+- **판정 : PASS(2026-10-26)** — 마스터가 아래 11간선 확대를 승인("OWNERSHIP 구조도에 의존 11개를 추가 승인함")해 `OWNERSHIP.md:57` 과 `deps_test.go` diagram 에 반영, 보류 0. 간선 하나를 지우면 "구조도 위반" 으로 실패함을 변이 시험으로 확인.
+- 기준 : 유일하게 글로 적힌 구조도 `OWNERSHIP.md:57` — 2026-10-26 마스터 승인으로 11간선 확대 반영(현재 정본은 그 줄). 승인 전 기준(기록용) : `bora → {signal, capri, santorini, jeju, bwe}` · `jeju → {santorini, forward, nack, pli}` · `santorini → {forward, nack, pli, rtcpx, rtpx}` · `record → jeju` · 나머지 내부 의존 없음, cmd/ 규칙 없음.
 - 테스트 : `internal/archtest/deps_test.go` — `cmd/`·`internal/` 를 하위 디렉터리까지 순회(filepath.WalkDir)해 운영 코드 import 를 읽는다. 구조도 간선 = 통과, `pending` 목록 간선 = 이유와 함께 하위 테스트 SKIP, **둘 다 아닌 간선·구조도에 없는 새 패키지·코드에서 사라진 pending 간선 = 실패**. 외부 의존은 `github.com/pion/` 만.
 - 실패 확인 : pending 에서 `jeju → rtpx` 를 지우면 "구조도 위반 jeju → rtpx (파일 : layerpolicy.go)" 로 실패, `internal/rtpx/zz`(bora import) 임시 패키지를 만들면 "구조도에 없는 새 패키지" 로 실패(둘 다 되돌림).
 
-### 보류 간선 11개와 권고
+### 승인된 11간선과 사유(2026-10-26 승인 — 기록용)
 
 | 간선 | 쓰는 곳 | 권고 | 근거 |
 |---|---|---|---|
@@ -39,7 +39,7 @@
 | cmd/galapagos → capri | `cmd/galapagos/main.go:47` | 확대 승인 | 같음(UDP mux·API 설정) |
 | cmd/galapagos → signal | `cmd/galapagos/main.go:27·37` | 확대 승인 | 같음(/signal WS 서버) |
 
-권고 문구(마스터 결정용) : `OWNERSHIP.md:57` 을 위 11간선 포함으로 넓히고(metrics 는 "잎 — 누구나 import 가능"으로 한 줄 처리 가능), 승인 뒤 `deps_test.go` 의 pending 항목을 diagram 으로 옮긴다 [확인중 : 마스터 — OWNERSHIP.md:57 확대 승인].
+권고 문구(마스터 결정용) : `OWNERSHIP.md:57` 을 위 11간선 포함으로 넓히고(metrics 는 "잎 — 누구나 import 가능"으로 한 줄 처리 가능), 승인 뒤 `deps_test.go` 의 pending 항목을 diagram 으로 옮긴다 → **승인·반영 완료(2026-10-26)**.
 
 - 실제 간선(`go list ./...`, 2026-10-26)
 
@@ -77,7 +77,7 @@
 
 ## 5. 실행 결과(2026-10-26, Go 1.27.0 windows/amd64)
 
-- `go vet ./...` 통과(5.8초) · `go test -count=1 ./...` 15패키지 전부 통과(15.9초, archtest 는 PASS 이나 보류 간선 11개 SKIP — 2절 [확인중]).
+- `go vet ./...` 통과(5.8초) · `go test -count=1 ./...` 15패키지 전부 통과(15.9초) — 승인 반영 뒤 archtest 보류 0·PASS(2026-10-26).
 - 새 테스트 `-count=5` 반복 통과 : `TestLayerUsable`(jeju)·`TestJoinPausedProducerNotifyOrder`(bora)·`TestModuleDepsMatchOwnershipDiagram`(archtest).
 - 실패 가능성 확인(되돌림) : `layerUsable` 을 `false` 고정 → TestLayerUsable 실패, `initConsumer` 를 transport.subscribe 뒤로 미룸 → TestJoinPausedProducerNotifyOrder 실패.
 - `-race` 미실행(CGO 없음).

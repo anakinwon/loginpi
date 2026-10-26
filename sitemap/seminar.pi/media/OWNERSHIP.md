@@ -54,7 +54,7 @@
 | record | `New(path) (*Recorder, error)` · `WriteRTP`(jeju.Writer) · `Close` |
 | metrics | `Counters`(atomic 필드) · `Global` · `Sample` · `Score(s) (score, grade)` |
 
-의존 방향(순환 없음, `go list` 확인) : `bora → {signal, capri, santorini, jeju, bwe}` · `jeju → {santorini, forward, nack, pli}` · `santorini → {forward, nack, pli, rtcpx, rtpx}` · `record → jeju` · 나머지(signal·capri·forward·nack·pli·bwe·rtcpx·rtpx·metrics)는 내부 의존 없음.
+의존 방향(순환 없음, `go list` 확인, 2026-10-26 마스터 승인으로 11간선 확대 — 자동 검사 `internal/archtest`) : `cmd/galapagos → {bora, capri, signal}` · `bora → {signal, capri, santorini, jeju, bwe, metrics, pli, record}` · `jeju → {santorini, forward, nack, pli, metrics, rtcpx, rtpx}` · `santorini → {forward, nack, pli, rtcpx, rtpx, metrics}` · `forward → metrics` · `record → jeju` · 나머지(signal·capri·nack·pli·bwe·rtcpx·rtpx·metrics)는 내부 의존 없음.
 
 ## 3. 환경변수
 

@@ -17,45 +17,30 @@ import (
 
 const module = "seminar.pi/media"
 
-// diagram — OWNERSHIP.md:57 그대로 : `bora → {signal, capri, santorini, jeju, bwe}` · `jeju → {santorini, forward, nack, pli}`
-// · `santorini → {forward, nack, pli, rtcpx, rtpx}` · `record → jeju` · 나머지(signal·capri·forward·nack·pli·bwe·rtcpx·rtpx·metrics)는 내부 의존 없음.
+// diagram — OWNERSHIP.md:57 그대로(2026-10-26 마스터 승인으로 11간선 확대 — metrics 카운터·pli 사유·record 녹화기·하류 SR·VP8 다시 쓰기·진입점 조립).
 // 키 = 모듈 경로 뒤("internal/" 생략). 구조도를 넓히는 일은 OWNERSHIP.md 를 먼저 고친 뒤(마스터 승인) 여기에 옮긴다.
 var diagram = map[string][]string{
-	"bora":      {"signal", "capri", "santorini", "jeju", "bwe"},
-	"jeju":      {"santorini", "forward", "nack", "pli"},
-	"santorini": {"forward", "nack", "pli", "rtcpx", "rtpx"},
-	"record":    {"jeju"},
-	"signal":    {},
-	"capri":     {},
-	"forward":   {},
-	"nack":      {},
-	"pli":       {},
-	"bwe":       {},
-	"rtcpx":     {},
-	"rtpx":      {},
-	"metrics":   {},
-	// cmd/galapagos 는 구조도 줄에 없다(규칙 없음) — 패키지 자체는 OWNERSHIP 1절 M1 소유로 적혀 있어 알려진 패키지로 두되,
-	// 내부 간선은 하나도 구조도 근거가 없으므로 전부 pending 에 둔다.
-	"cmd/galapagos": {},
+	"cmd/galapagos": {"bora", "capri", "signal"},
+	"bora":          {"signal", "capri", "santorini", "jeju", "bwe", "metrics", "pli", "record"},
+	"jeju":          {"santorini", "forward", "nack", "pli", "metrics", "rtcpx", "rtpx"},
+	"santorini":     {"forward", "nack", "pli", "rtcpx", "rtpx", "metrics"},
+	"forward":       {"metrics"},
+	"record":        {"jeju"},
+	"signal":        {},
+	"capri":         {},
+	"nack":          {},
+	"pli":           {},
+	"bwe":           {},
+	"rtcpx":         {},
+	"rtpx":          {},
+	"metrics":       {},
 }
 
 // pending — 코드에 있으나 구조도에 없는 간선. 통과가 아니라 "마스터 승인 대기"로 SKIP 보고한다.
 // 여기 없는 새 간선은 실패, 코드에서 사라진 보류 간선도 실패(목록이 썩지 않게).
 const approval = " [확인중 : 마스터 — OWNERSHIP.md:57 확대 승인]"
 
-var pending = map[string]string{
-	"bora → metrics":         "관리 API `bora/admin.go` 의 GET /admin/metrics 가 metrics.Global.Snapshot() 을 내보낸다(M5). PRD_02 는 내보내기 위치를 정하지 않음",
-	"bora → pli":             "녹화 Consumer 시작 시 `room.go` 가 RequestKeyframe(pli.NewConsumer) 호출 — Reason 상수 사용(santorini 시그니처가 pli.Reason 을 받음)",
-	"bora → record":          "방이 Producer 별 녹화기(record.Open, `lifecycle.go` recording)를 만든다(M5). 구조도는 record → jeju 만 적음",
-	"jeju → metrics":         "송신·재전송·레이어 전환 카운터(metrics.Global.PacketsOut·NACKIn·LayerSwitches) — `consumer.go`·`retransmit.go`·`layerpolicy.go`",
-	"jeju → rtcpx":           "하류 SR 0.5초 주기·RTP 시각 외삽(rtcpx.SRInterval·ExtrapolateRTP) — `consumer.go`(PRD_02 4.2 하류 SR)",
-	"jeju → rtpx":            "레이어 전환 시 VP8 picture ID 다시 쓰기(rtpx.VP8Munger) — `layerpolicy.go`",
-	"santorini → metrics":    "수신 패킷·NACK·PLI 송신 카운터(metrics.Global.PacketsIn·NACKOut·PLIOut) — `layer.go`·`feedback.go`",
-	"forward → metrics":      "혼잡 큐 버림 카운터(metrics.Global.QueueDrops) — `congest.go`",
-	"cmd/galapagos → bora":   "진입점이 방 관리자(bora.Manager = signal.Handler)·관리 API(bora.AdminHandler)를 만든다 — `main.go`",
-	"cmd/galapagos → capri":  "진입점이 UDP mux·API 설정(capri.Config·NewAPI)을 만든다 — `main.go`",
-	"cmd/galapagos → signal": "진입점이 /signal WS 서버(signal.NewServer·NewVerifier)를 건다 — `main.go`",
-}
+var pending = map[string]string{}
 
 // externalOK — 운영 코드가 쓸 수 있는 외부 모듈(S-1 pion 만, OWNERSHIP "새 외부 Go 의존성 금지").
 var externalOK = []string{"github.com/pion/"}
@@ -140,7 +125,9 @@ func TestModuleDepsMatchOwnershipDiagram(t *testing.T) {
 			t.Skip("구조도 밖 간선 : " + pending[e] + approval)
 		})
 	}
-	t.Logf("다이어그램 밖 간선 %d개, 마스터 승인 대기", len(present))
+	if len(present) > 0 {
+		t.Logf("다이어그램 밖 간선 %d개, 마스터 승인 대기", len(present))
+	}
 }
 
 // filesImporting — 위반 보고용 : imp 를 import 하는 운영 파일 이름.
