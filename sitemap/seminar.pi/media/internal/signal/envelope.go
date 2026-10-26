@@ -35,6 +35,13 @@ const (
 	MPing                     = "ping"                       // M1 양방향
 	MPong                     = "pong"                       // M1
 	MLeave                    = "leave"                      // M1
+	// v1.1 (SIGNAL_API 3.3) — 권한은 세션 역할로 서버가 검사
+	MChatSend     = "chat.send"     // 전원
+	MHandSet      = "hand.set"      // audience
+	MHandLowerAll = "hand.lowerAll" // presenter
+	MReactionSend = "reaction.send" // 전원
+	MPeerSetRole  = "peer.setRole"  // presenter
+	MRoomEnd      = "room.end"      // presenter
 
 	NTransportSubscribe = "transport.subscribe" // M1 서버 offer(200ms 묶음)
 	NConsumerCreated    = "consumerCreated"     // M1
@@ -46,6 +53,13 @@ const (
 	NPublishLayers      = "publishLayers"       // M4 dynacast
 	NScore              = "score"               // M4
 	NError              = "error"               // M1
+	// v1.1 (SIGNAL_API 3.3)
+	NPeerJoined  = "peerJoined"  // 방 전원(본인 제외), 200ms 묶음
+	NPeerLeft    = "peerLeft"    // 방 전원, 200ms 묶음
+	NChat        = "chat"        // 방 전원(보낸 본인 제외)
+	NHand        = "hand"        // presenter·panel·본인만
+	NReaction    = "reaction"    // 방 전원, 서버 300ms 합산·익명
+	NRoleChanged = "roleChanged" // 방 전원
 )
 
 // ErrCode — 오류 코드(PRD_02 5.2).
@@ -89,9 +103,10 @@ type ICEServer struct {
 }
 
 type ProducerInfo struct {
-	ID   string `json:"id"`
-	Kind string `json:"kind"` // "audio"|"video"
-	Peer string `json:"peer"`
+	ID     string `json:"id"`
+	Kind   string `json:"kind"` // "audio"|"video"
+	Peer   string `json:"peer"`
+	Source string `json:"source"` // v1.1 "camera"|"screen"|"mic"
 }
 
 type JoinRes struct {
@@ -99,6 +114,7 @@ type JoinRes struct {
 	Role       Role           `json:"role"`
 	IceServers []ICEServer    `json:"iceServers"`
 	Producers  []ProducerInfo `json:"producers"`
+	Peers      []PeerInfo     `json:"peers"` // v1.1 방 참가자 전원(본인 포함)
 }
 
 // SDP — transport.publish 요청·응답, ntf transport.subscribe, transport.subscribe.answer.
@@ -127,6 +143,7 @@ type ConsumerCreated struct {
 	ProducerID string `json:"producerId"`
 	Mid        string `json:"mid"`
 	Kind       string `json:"kind"`
+	Source     string `json:"source"` // v1.1
 	Paused     bool   `json:"paused"`
 }
 
@@ -165,4 +182,87 @@ type ScoreNtf struct {
 	ProducerID string  `json:"producerId,omitempty"`
 	Score      float64 `json:"score"`
 	Grade      string  `json:"grade"`
+}
+
+// ── v1.1 페이로드(SIGNAL_API 3.3) — 시각은 서버 Unix 밀리초 ──
+
+// 계약 수치(SIGNAL_API 3.3 C).
+const (
+	ChatMaxRunes      = 500 // chat.send 최대 글자 수(유니코드 문자)
+	ReactionMaxEmojis = 3   // reaction.send 1회 최대 개수
+)
+
+// ReactionEmojis — 허용 반응 7종(설계서 13절 #4). 이 밖 값은 SDP_INVALID.
+var ReactionEmojis = [...]string{"👍", "👏", "😀", "😮", "🙁", "😶", "💖"}
+
+// PeerInfo — join 응답 peers·ntf peerJoined 원소. PeerID 는 ProducerInfo.Peer 와 같은 값.
+type PeerInfo struct {
+	PeerID   string `json:"peerId"`
+	Name     string `json:"name"`
+	Role     Role   `json:"role"`
+	RaisedTs int64  `json:"raisedTs"` // 0 = 내림. audience 수신자에게는 본인 외 0
+}
+
+// PeerJoined — ntf peerJoined(200ms 묶음).
+type PeerJoined struct {
+	Peers []PeerInfo `json:"peers"`
+}
+
+// PeerLeft — ntf peerLeft(200ms 묶음).
+type PeerLeft struct {
+	PeerIDs []string `json:"peerIds"`
+}
+
+type ChatSendReq struct {
+	Text string `json:"text"`
+}
+
+// ChatSendRes — 보낸 사람 확정용 서버 시각.
+type ChatSendRes struct {
+	Ts int64 `json:"ts"`
+}
+
+type ChatNtf struct {
+	PeerID string `json:"peerId"`
+	Name   string `json:"name"`
+	Text   string `json:"text"`
+	Ts     int64  `json:"ts"`
+}
+
+type HandSetReq struct {
+	Raised bool `json:"raised"`
+}
+
+// HandSetRes — 기록된 raisedTs(내림이면 0).
+type HandSetRes struct {
+	RaisedTs int64 `json:"raisedTs"`
+}
+
+// HandNtf — ntf hand. presenter·panel·본인만 받는다.
+type HandNtf struct {
+	PeerID   string `json:"peerId"`
+	RaisedTs int64  `json:"raisedTs"`
+}
+
+type ReactionSendReq struct {
+	Emojis []string `json:"emojis"`
+}
+
+// ReactionNtf — 300ms 창 합산, 보낸 사람 정보 없음.
+type ReactionNtf struct {
+	Counts map[string]int `json:"counts"`
+	Ts     int64          `json:"ts"`
+}
+
+// SetRoleReq — peer.setRole. Role 은 panel|audience 만.
+type SetRoleReq struct {
+	PeerID string `json:"peerId"`
+	Role   Role   `json:"role"`
+}
+
+// RoleChanged — ntf roleChanged. By = 요청한 presenter 의 peerId.
+type RoleChanged struct {
+	PeerID string `json:"peerId"`
+	Role   Role   `json:"role"`
+	By     string `json:"by"`
 }
