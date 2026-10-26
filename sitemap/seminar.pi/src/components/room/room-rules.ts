@@ -288,3 +288,55 @@ export function nextToast(st: ToastState, bad: boolean, now: number): ToastState
   if (!st.okAt) return { shown: true, okAt: now }
   return now - st.okAt >= TOAST.hideMs ? { shown: false, okAt: 0 } : st
 }
+
+// ── v1.2 사회·레이아웃·발언자(SIGNAL_API 3.5) ──
+
+export type Locks = { audio: boolean; video: boolean }
+export const NO_LOCKS: Locks = { audio: false, video: false }
+// 내가 못 켜는 종류 — 잠금은 발표자 외 전원(서버도 LOCKED 로 막는다, 화면은 버튼을 미리 막고 이유를 보인다)
+export const lockedFor = (role: PeerRole, locks: Locks): Locks => (role === 'presenter' ? NO_LOCKS : locks)
+
+// 참가자별 마이크·카메라 상태(true = 켜짐, false = 꺼짐, 없음 = 발행 안 함) — 화면공유는 사회 대상 아님
+export type PeerMedia = { audio?: boolean; video?: boolean }
+export function peerMedia(tracks: (TrackLike & { paused: boolean })[]): Map<string, PeerMedia> {
+  const out = new Map<string, PeerMedia>()
+  for (const tr of tracks) {
+    if (tr.source === 'screen') continue
+    const m = out.get(tr.peerId) ?? {}
+    m[tr.kind] = !tr.paused
+    out.set(tr.peerId, m)
+  }
+  return out
+}
+
+// 참가자 줄 사회 동작(발표자만, 대상이 발표자면 없음) — 켜진 마이크 끄기 / 꺼진·없는 마이크 켜기 요청(panel, 잠금 아닐 때) / 켜진 카메라 끄기
+export type ModAction = 'muteMic' | 'askMic' | 'muteCam'
+export function modActions(viewer: PeerRole, peer: PeerLike, media: PeerMedia | undefined, locks: Locks): ModAction[] {
+  if (viewer !== 'presenter' || peer.role === 'presenter') return []
+  const out: ModAction[] = []
+  if (media?.audio === true) out.push('muteMic')
+  else if (peer.role === 'panel' && !locks.audio) out.push('askMic')
+  if (media?.video === true) out.push('muteCam')
+  return out
+}
+
+// 레이아웃(ntf layout) — 발표자가 아닌 사람이 따라 볼 타일 키. 따라 보기가 아니거나 auto 면 null(자기 무대 규칙)
+export type RoomLayout = { mode: 'auto' | 'spotlight'; spotlight: string; follow: boolean }
+export function followKey(layout: RoomLayout | null, viewer: PeerRole): string | null {
+  if (!layout || viewer === 'presenter' || !layout.follow || layout.mode !== 'spotlight') return null
+  return layout.spotlight || null
+}
+
+// 발표자 무대 고정 → room.setLayout. 내 화면공유 타일 키(screen:self)는 다른 사람에게 보이는 키(screen:<producerId>)로 바꾼다
+// (모르면 null = 보내지 않음). 고정 해제(null)는 auto
+export function layoutFor(pin: string | null, screenProducerId: string | undefined): RoomLayout | null {
+  if (!pin) return { mode: 'auto', spotlight: '', follow: true }
+  const key = pin === 'screen:self' ? (screenProducerId ? `screen:${screenProducerId}` : null) : pin
+  return key ? { mode: 'spotlight', spotlight: key, follow: true } : null
+}
+
+// 말하기 링 — 엔진 발언자(ntf activeSpeaker)를 쓸 수 있으면 그 사람 타일만, 아니면 undefined(타일이 AudioContext 로 직접 판정)
+export function ringFor(peerId: string | undefined, speaker: string | null, engine: boolean): boolean | undefined {
+  if (!engine) return undefined
+  return !!peerId && peerId === speaker
+}

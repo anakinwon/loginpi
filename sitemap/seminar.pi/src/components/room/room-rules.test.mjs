@@ -4,6 +4,12 @@ import assert from 'node:assert/strict'
 import {
   barOrder,
   capLayer,
+  followKey,
+  layoutFor,
+  lockedFor,
+  modActions,
+  peerMedia,
+  ringFor,
   isBadGrade,
   layerFor,
   layerSender,
@@ -292,4 +298,51 @@ test('청중 화질 칸 — 맨 뒤, 폭 > 565 에서만 메인 5칸 안', () =>
   assert.equal(barOrder('audience', 600).indexOf('quality') < mainSlots(600, 'audience'), true)
   assert.equal(barOrder('audience', 500).indexOf('quality') < mainSlots(500, 'audience'), false)
   assert.equal(barOrder('presenter', 600).includes('quality'), false)
+})
+
+test('v1.2 잠금 — 발표자는 대상 아님', () => {
+  const locks = { audio: true, video: false }
+  assert.deepEqual(lockedFor('presenter', locks), { audio: false, video: false })
+  assert.deepEqual(lockedFor('panel', locks), locks)
+})
+
+test('v1.2 참가자 미디어 — 화면공유 제외, 일시정지 = 꺼짐', () => {
+  const m = peerMedia([
+    { peerId: 'n', kind: 'audio', source: 'mic', paused: false },
+    { peerId: 'n', kind: 'video', source: 'camera', paused: true },
+    { peerId: 'n', kind: 'video', source: 'screen', paused: false },
+  ])
+  assert.deepEqual(m.get('n'), { audio: true, video: false })
+})
+
+test('v1.2 사회 동작 — 발표자만, 켜진 것 끄기·꺼진 마이크 요청(잠금이면 없음)', () => {
+  const panel = { peerId: 'n', name: 'N', role: 'panel', raisedTs: 0 }
+  const free = { audio: false, video: false }
+  assert.deepEqual(modActions('presenter', panel, { audio: true, video: true }, free), ['muteMic', 'muteCam'])
+  assert.deepEqual(modActions('presenter', panel, { audio: false }, free), ['askMic'])
+  assert.deepEqual(modActions('presenter', panel, undefined, free), ['askMic']) // 아직 발행 안 함 — 요청은 가능
+  assert.deepEqual(modActions('presenter', panel, { audio: false }, { audio: true, video: false }), [])
+  assert.deepEqual(modActions('panel', panel, { audio: true }, free), [])
+  assert.deepEqual(modActions('presenter', { ...panel, role: 'presenter' }, { audio: true }, free), [])
+  assert.deepEqual(modActions('presenter', { ...panel, role: 'audience' }, undefined, free), []) // 청중은 요청 대상 아님
+})
+
+test('v1.2 레이아웃 — 따라 보기·발표자 고정 변환', () => {
+  const spot = { mode: 'spotlight', spotlight: 'cam:p', follow: true }
+  assert.equal(followKey(spot, 'audience'), 'cam:p')
+  assert.equal(followKey(spot, 'presenter'), null)
+  assert.equal(followKey({ ...spot, follow: false }, 'panel'), null)
+  assert.equal(followKey({ mode: 'auto', spotlight: '', follow: true }, 'audience'), null)
+  assert.equal(followKey(null, 'audience'), null)
+  assert.deepEqual(layoutFor('cam:n', undefined), { mode: 'spotlight', spotlight: 'cam:n', follow: true })
+  assert.deepEqual(layoutFor('screen:self', 'p9'), { mode: 'spotlight', spotlight: 'screen:p9', follow: true })
+  assert.equal(layoutFor('screen:self', undefined), null)
+  assert.deepEqual(layoutFor(null, undefined), { mode: 'auto', spotlight: '', follow: true })
+})
+
+test('v1.2 말하기 링 — 엔진 발언자 우선, 없으면 타일 자체 판정', () => {
+  assert.equal(ringFor('a', 'a', true), true)
+  assert.equal(ringFor('b', 'a', true), false)
+  assert.equal(ringFor(undefined, null, true), false)
+  assert.equal(ringFor('a', null, false), undefined)
 })

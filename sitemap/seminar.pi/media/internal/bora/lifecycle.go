@@ -132,6 +132,9 @@ func (r *Room) PauseProducer(peerID, producerID string, paused bool) *signal.Err
 		if pr == nil {
 			return signal.Errf(signal.CodeNotFound, "producer 없음: "+producerID)
 		}
+		if !paused && r.paused[producerID] && r.lockedFor(r.peers[peerID], pr.Kind(), pr.Source()) {
+			return signal.Errf(signal.CodeLocked, "발표자가 잠금") // v1.2 — 이미 켜져 있으면 성공(잠금은 켜기만 막는다)
+		}
 		r.setProducerPaused(pr, paused)
 		return nil
 	})
@@ -194,6 +197,7 @@ func (r *Room) closePeer(peerID string) {
 		p.offerTimer.Stop()
 	}
 	delete(r.peers, peerID)
+	r.speaker.forget(peerID)
 	r.queueLeft(peerID) // ④ 뒤 200ms 묶음 ntf peerLeft(v1.1)
 }
 

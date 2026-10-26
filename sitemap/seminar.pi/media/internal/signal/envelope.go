@@ -42,6 +42,11 @@ const (
 	MReactionSend = "reaction.send" // 전원
 	MPeerSetRole  = "peer.setRole"  // presenter
 	MRoomEnd      = "room.end"      // presenter
+	// v1.2 (SIGNAL_API 3.5) — 사회·레이아웃, 전부 presenter
+	MPeerMute      = "peer.mute"      // 대상 producer 일시정지 + 대상에 ntf mutedBy
+	MRoomMuteAll   = "room.muteAll"   // 잠금 → 일시정지 → 알림(한 처리 안)
+	MPeerAskUnmute = "peer.askUnmute" // 대상에 ntf askUnmute(자동 켜기 없음)
+	MRoomSetLayout = "room.setLayout" // 방 레이아웃 보관 + ntf layout
 
 	NTransportSubscribe = "transport.subscribe" // M1 서버 offer(200ms 묶음)
 	NConsumerCreated    = "consumerCreated"     // M1
@@ -60,6 +65,12 @@ const (
 	NHand        = "hand"        // presenter·panel·본인만
 	NReaction    = "reaction"    // 방 전원, 서버 300ms 합산·익명
 	NRoleChanged = "roleChanged" // 방 전원
+	// v1.2 (SIGNAL_API 3.5)
+	NMutedBy       = "mutedBy"       // 음소거된 본인만
+	NRoomPolicy    = "roomPolicy"    // 방 전원 — 잠금 상태
+	NAskUnmute     = "askUnmute"     // 대상 본인만
+	NLayout        = "layout"        // 방 전원(요청자 포함)
+	NActiveSpeaker = "activeSpeaker" // 방 전원, 방당 500ms 에 최대 1건
 )
 
 // ErrCode — 오류 코드(PRD_02 5.2).
@@ -76,6 +87,7 @@ const (
 	CodeNotFound         ErrCode = "NOT_FOUND"
 	CodeRateLimited      ErrCode = "RATE_LIMITED"
 	CodeInternal         ErrCode = "INTERNAL"
+	CodeLocked           ErrCode = "LOCKED" // v1.2 — 잠금 중 producer.resume·produce·askUnmute(연결 유지)
 )
 
 // Error — 응답 e 필드·ntf error 데이터. error 인터페이스를 만족한다.
@@ -114,7 +126,9 @@ type JoinRes struct {
 	Role       Role           `json:"role"`
 	IceServers []ICEServer    `json:"iceServers"`
 	Producers  []ProducerInfo `json:"producers"`
-	Peers      []PeerInfo     `json:"peers"` // v1.1 방 참가자 전원(본인 포함)
+	Peers      []PeerInfo     `json:"peers"`            // v1.1 방 참가자 전원(본인 포함)
+	Policy     RoomPolicy     `json:"policy"`           // v1.2 현재 잠금 상태
+	Layout     *Layout        `json:"layout,omitempty"` // v1.2 발표자가 정한 마지막 레이아웃(없으면 생략)
 }
 
 // SDP — transport.publish 요청·응답, ntf transport.subscribe, transport.subscribe.answer.
@@ -266,4 +280,57 @@ type RoleChanged struct {
 	PeerID string `json:"peerId"`
 	Role   Role   `json:"role"`
 	By     string `json:"by"`
+}
+
+// ── v1.2 페이로드(SIGNAL_API 3.5) — 사회·레이아웃·발언자 ──
+
+// MuteReq — peer.mute·peer.askUnmute. Kind 는 audio(마이크)|video(카메라 — 화면공유는 대상 아님).
+type MuteReq struct {
+	PeerID string `json:"peerId"`
+	Kind   string `json:"kind"`
+}
+
+// MuteAllReq — room.muteAll. Lock=true 면 잠금(발표자 외 그 종류 켜기·새 발행 LOCKED), false 면 음소거만 하고 잠금을 푼다.
+type MuteAllReq struct {
+	Kind string `json:"kind"`
+	Lock bool   `json:"lock"`
+}
+
+// MutedBy — ntf mutedBy. 서버가 일시정지한 내 producer(본인에겐 producerPaused 가 가지 않으므로 이 목록으로 안다).
+type MutedBy struct {
+	Kind        string   `json:"kind"`
+	By          string   `json:"by"`
+	ProducerIDs []string `json:"producerIds"`
+}
+
+// AskUnmute — ntf askUnmute. 받은 쪽은 사용자 탭으로만 켠다(자동 켜기 금지).
+type AskUnmute struct {
+	Kind string `json:"kind"`
+	By   string `json:"by"`
+}
+
+// RoomPolicy — ntf roomPolicy·join 응답 policy. 종류별 잠금(발표자는 잠금 대상 아님).
+type RoomPolicy struct {
+	Locked Locks `json:"locked"`
+}
+
+type Locks struct {
+	Audio bool `json:"audio"`
+	Video bool `json:"video"`
+}
+
+// Layout — room.setLayout 요청·ntf layout·join 응답 layout. Mode auto(무대 자동)|spotlight(Spotlight 타일 고정),
+// Spotlight = 타일 키 cam:<peerId>·screen:<producerId>(auto 면 빈 값), Follow = 청중 화면도 따라 바뀜.
+type Layout struct {
+	Mode      string `json:"mode"`
+	Spotlight string `json:"spotlight"`
+	Follow    bool   `json:"follow"`
+}
+
+// LayoutSpotlightMax — spotlight 키 최대 길이(타일 키 cam:<peerId>·screen:<producerId>).
+const LayoutSpotlightMax = 64
+
+// ActiveSpeaker — ntf activeSpeaker. PeerID nil = 지금 말하는 사람 없음(JSON null).
+type ActiveSpeaker struct {
+	PeerID *string `json:"peerId"`
 }

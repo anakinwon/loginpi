@@ -50,10 +50,13 @@ type Layer struct {
 	limiter *pli.Limiter
 	sinks   map[*forward.Queue]struct{}
 	act     activity // M4 activity.go
+	lvl     level    // 후속 G level.go(음성만)
 
 	cmd  chan func()        // 다른 고루틴 → 수신 고루틴 명령
 	sr   atomic.Pointer[SR] // capri RTCP 고루틴이 쓰고 jeju 가 읽음
 	remb *atomic.Int64      // Producer 의 발행 상한(bps, 0 = REMB 안 보냄) — AddLayer 가 Run 전에 연결
+	// levelID — Producer 의 오디오 레벨 확장 ID(0 = 읽지 않음) — AddLayer 가 Run 전에 연결
+	levelID *atomic.Uint32
 }
 
 func newLayer(i int8, kind Kind, done <-chan struct{}) *Layer {
@@ -204,6 +207,11 @@ func (l *Layer) handle(b, scratch []byte, st *rtcpx.ReceptionStats) uint32 {
 	if key && l.kind == Video {
 		l.limiter.KeyframeSeen()
 		metrics.Global.Keyframes.Add(1)
+	}
+	if l.kind == Audio && p.Extension && l.levelID != nil {
+		if id := uint8(l.levelID.Load()); id != 0 {
+			l.observeLevel(p.GetExtension(id), now) // 확장을 버리기 전에 소리 크기만 읽는다(후속 G)
+		}
 	}
 	data := b
 	if p.Extension { // 들어온 헤더 확장은 버린다 — 구독자별로 새로 만든다(D-12)

@@ -97,6 +97,10 @@ type Room struct {
 	reactTimer *time.Timer
 	// roles — peer.setRole 로 바뀐 역할(입장권 sub → 역할). 재입장 때 입장권 role(초기값) 대신 쓴다. panel|audience 만 담긴다(발표자 승격 불가), 방이 닫히면 사라진다.
 	roles map[string]signal.Role
+	// v1.2(moderate.go) — 종류별 잠금(room.muteAll lock), 마지막 레이아웃(room.setLayout, 입장 응답에 실음), 발언자 판정
+	locks   signal.Locks
+	layout  *signal.Layout
+	speaker speakerDetector
 
 	cmd  chan func()
 	once sync.Once
@@ -123,12 +127,16 @@ func (r *Room) Done() <-chan struct{} { return r.done }
 func (r *Room) loop() {
 	views := time.NewTicker(ViewInterval)
 	defer views.Stop()
+	speak := time.NewTicker(SpeakerTick)
+	defer speak.Stop()
 	for {
 		select {
 		case fn := <-r.cmd:
 			fn()
 		case <-views.C:
 			r.refreshViews()
+		case now := <-speak.C:
+			r.tickSpeaker(now)
 		case <-r.done:
 			return
 		}
@@ -234,14 +242,22 @@ func (r *Room) join(t signal.Ticket, s signal.Session) (*Peer, *signal.Error) {
 		}
 	}
 	r.queueJoined(p)
+	if r.speaker.sent != "" && s != nil { // 지금 발언자(v1.2) — 다음 판정 변화까지 기다리지 않게
+		s.Send(signal.Notification{M: signal.NActiveSpeaker, D: speakerNtf(r.speaker.sent)})
+	}
 	return p, nil
 }
 
-// joinState — Join + 응답용 상태(producers·peers)를 같은 방 고루틴 실행 안에서 찍는다(따로 읽으면 그 사이 입장이 겹친다).
-func (r *Room) joinState(t signal.Ticket, s signal.Session) (p *Peer, prods []signal.ProducerInfo, peers []signal.PeerInfo, e *signal.Error) {
+// joinState — Join + 응답용 상태(producers·peers·잠금·레이아웃)를 같은 방 고루틴 실행 안에서 찍는다(따로 읽으면 그 사이 입장이 겹친다).
+// 응답의 PeerID·Role·IceServers 는 호출자(Manager)가 채운다.
+func (r *Room) joinState(t signal.Ticket, s signal.Session) (p *Peer, res signal.JoinRes, e *signal.Error) {
 	e = r.call(func() (e *signal.Error) {
 		if p, e = r.join(t, s); e == nil {
-			prods, peers = r.producerInfos(p.ID), r.peerInfos(p)
+			res = signal.JoinRes{Producers: r.producerInfos(p.ID), Peers: r.peerInfos(p), Policy: signal.RoomPolicy{Locked: r.locks}}
+			if r.layout != nil {
+				l := *r.layout
+				res.Layout = &l
+			}
 		}
 		return
 	})
@@ -309,6 +325,9 @@ func (r *Room) attachTrack(p *Peer, mid string, t remoteTrack) {
 // addLayer — 방 고루틴 전용. 레이어 수신 고루틴을 띄우고, 이미 시작한 Consumer 들을 구독시키고, 발표자 SR 을 읽는다.
 func (r *Room) addLayer(p *Peer, pr *santorini.Producer, t remoteTrack) {
 	rid := t.tr.RID()
+	if pr.Kind() == santorini.Audio {
+		pr.SetAudioLevelID(capri.AudioLevelID(t.rx)) // 발언자 판정 입력(후속 G) — 레이어 수신 고루틴 시작 전에
+	}
 	l := pr.AddLayer(rid, t.tr, p.Pub)
 	for _, c := range r.consumers[pr.ID()] {
 		if c.Started() {
@@ -361,6 +380,9 @@ func (r *Room) produce(peerID, mid string, kind santorini.Kind, src santorini.So
 		if mid != "" && p.pubMids[mid] != nil {
 			pr = p.pubMids[mid] // 같은 mid 재요청 — 기존 것
 			return nil
+		}
+		if r.lockedFor(p, kind, src) { // 잠금 중 새 발행으로 음소거를 우회하지 못하게(v1.2)
+			return signal.Errf(signal.CodeLocked, "발표자가 잠금")
 		}
 		// 참가자당 (종류, 출처) 1개 — produce 반복으로 Producer·청중 Consumer 가 곱으로 늘어나는 자원 고갈 차단
 		for _, old := range p.Producers {

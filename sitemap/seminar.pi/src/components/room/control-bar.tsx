@@ -55,6 +55,7 @@ export function MediaButton({
   kind,
   on,
   disabled,
+  reason,
   label,
   menu,
   onClick,
@@ -62,12 +63,14 @@ export function MediaButton({
   kind: MediaKind
   on: boolean
   disabled?: boolean
+  reason?: string // 막힌 이유(발표자 잠금 등) — 이름·툴팁에 덧붙여 낭독기도 이유를 듣는다
   label?: boolean // 텍스트 라벨 표시(넓은 화면) — aria-label 은 항상
   menu?: boolean // 더보기 메뉴 안 — 토글은 menuitemcheckbox(aria-checked)
   onClick: () => void
 }) {
   const t = useTranslations('room')
-  const text = t(`${kind === 'audio' ? 'mic' : 'cam'}.${on ? 'on' : 'off'}`)
+  const base = t(`${kind === 'audio' ? 'mic' : 'cam'}.${on ? 'on' : 'off'}`)
+  const text = reason ? `${base} — ${reason}` : base
   return (
     <button
       type="button"
@@ -79,7 +82,7 @@ export function MediaButton({
       className={`${BTN} ${shape(label)} ${on ? 'bg-surface-raised' : 'bg-danger text-white'}`}
     >
       <Icon d={ICON[kind]} off={!on} />
-      {label && <span aria-hidden>{text}</span>}
+      {label && <span aria-hidden>{base}</span>}
     </button>
   )
 }
@@ -275,6 +278,7 @@ export function ControlBar({
   addReady,
   has,
   localOn,
+  locked,
   pending,
   canShare,
   sharing,
@@ -302,6 +306,7 @@ export function ControlBar({
   addReady: boolean // 아직 없는 마이크·카메라를 켜서 발행할 수 있나(입장 완료·발행 협상 중 아님)
   has: Record<MediaKind, boolean> // 가진 트랙 — 없는 종류는 presenter 면 숨김(카메라 없이 입장), panel 이면 "켜기"(승격 뒤 발행)
   localOn: { audio: boolean; video: boolean }
+  locked: Record<MediaKind, boolean> // 발표자 잠금으로 내가 켤 수 없는 종류(v1.2, 끄기는 늘 가능)
   pending: MediaKind | null
   canShare: boolean // getDisplayMedia 기능 탐지 결과(UA 판정 금지, 설계서 6.1)
   sharing: boolean
@@ -330,9 +335,9 @@ export function ControlBar({
   const shown = (k: MediaKind) => has[k] || role === 'panel'
 
   // 단축키 — 최신 값은 ref 로 읽는다(리스너는 한 번만 등록). 아직 없는 트랙은 단축키로 켜지 않는다(권한 팝업은 버튼 탭으로만)
-  const latest = useRef({ stage, ready, has, localOn, onToggle })
+  const latest = useRef({ stage, ready, has, localOn, locked, onToggle })
   useEffect(() => {
-    latest.current = { stage, ready, has, localOn, onToggle }
+    latest.current = { stage, ready, has, localOn, locked, onToggle }
   })
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -340,7 +345,7 @@ export function ControlBar({
       // e.code(물리 키) — 한글 입력 상태에선 e.key 가 'ㅇ'·'ㄷ' 로 와 단축키가 안 먹는다
       const kind = ({ KeyD: 'audio', KeyE: 'video' } as const)[e.code as 'KeyD' | 'KeyE']
       const p = latest.current
-      if (!kind || !p.stage || !p.ready || !p.has[kind]) return
+      if (!kind || !p.stage || !p.ready || !p.has[kind] || (p.locked[kind] && !p.localOn[kind])) return
       e.preventDefault() // Ctrl+D 북마크·Ctrl+E 주소창 검색 대신
       p.onToggle(kind, !p.localOn[kind])
     }
@@ -439,13 +444,15 @@ export function ControlBar({
 
   function mediaNode(k: MediaKind): BarItem['node'] {
     const missing = !has[k]
+    const blocked = locked[k] && !localOn[k] // 잠금 중 켜기만 막는다(서버도 LOCKED)
     return ({ label, menu }) => (
       <MediaButton
         kind={k}
         on={localOn[k]}
         label={label}
         menu={menu}
-        disabled={missing ? !addReady : !ready || pending !== null}
+        reason={blocked ? t('mod.locked') : undefined}
+        disabled={blocked || (missing ? !addReady : !ready || pending !== null)}
         onClick={() => onToggle(k, !localOn[k])}
       />
     )

@@ -52,6 +52,12 @@ func NewAPI(cfg Config) (*webrtc.API, error) {
 		webrtc.RTPCodecTypeVideo, webrtc.RTPTransceiverDirectionSendonly); err != nil {
 		return nil, err
 	}
+	// 후속 G : 상류(발행 PC = recvonly) 음성에만 ssrc-audio-level(RFC 6464) — 인터셉터가 아니라 MediaEngine 확장 협상만이다(S-1 유지).
+	// 값 해석은 santorini(rtpx.AudioLevel)가 하고, 하류로는 내보내지 않는다(레이어가 들어온 확장을 버림, D-12).
+	if err := m.RegisterHeaderExtension(webrtc.RTPHeaderExtensionCapability{URI: AudioLevelURI},
+		webrtc.RTPCodecTypeAudio, webrtc.RTPTransceiverDirectionRecvonly); err != nil {
+		return nil, err
+	}
 	const srtpReplayWindow = 512
 	se := webrtc.SettingEngine{}
 	if cfg.UDPPort > 0 {
@@ -83,6 +89,22 @@ func AbsSendTimeID(s *webrtc.RTPSender) uint8 {
 	}
 	for _, h := range s.GetParameters().HeaderExtensions {
 		if h.URI == AbsSendTimeURI && h.ID > 0 && h.ID < 15 { // 1바이트 헤더 범위
+			return uint8(h.ID)
+		}
+	}
+	return 0
+}
+
+// AudioLevelURI — rtpx.AudioLevelURI 와 같은 값(capri 는 내부 의존이 없어 따로 둔다 — archtest 구조도).
+const AudioLevelURI = "urn:ietf:params:rtp-hdrext:ssrc-audio-level"
+
+// AudioLevelID — 발행 PC 수신기에 협상된 ssrc-audio-level 확장 ID(OnTrack 뒤에 부른다). 협상 안 됐으면 0.
+func AudioLevelID(rx *webrtc.RTPReceiver) uint8 {
+	if rx == nil {
+		return 0
+	}
+	for _, h := range rx.GetParameters().HeaderExtensions {
+		if h.URI == AudioLevelURI && h.ID > 0 && h.ID < 256 {
 			return uint8(h.ID)
 		}
 	}

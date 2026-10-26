@@ -4,7 +4,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ICON, Icon, type PanelTab } from './control-bar'
-import { sortPeers } from './room-rules'
+import { modActions, sortPeers, type Locks, type ModAction, type PeerMedia } from './room-rules'
 import type { ChatMsg, Peer, SessionRole } from './use-room'
 
 const CHAT_MAX = 500 // SIGNAL_API 3.3 C. maxLength 는 UTF-16 단위라 이모지는 2로 센다 → 서버(문자 수)보다 엄격, 넘칠 일 없음
@@ -26,6 +26,10 @@ export function SidePanel({
   onPromote,
   onDemote,
   onLowerAll,
+  media,
+  locks,
+  onMod,
+  onMuteAll,
 }: {
   tab: PanelTab
   open: boolean
@@ -40,6 +44,10 @@ export function SidePanel({
   onPromote: (peerId: string) => void
   onDemote: (peerId: string) => void
   onLowerAll: () => void
+  media: Map<string, PeerMedia> // 참가자별 마이크·카메라(v1.2 사회 동작 판정)
+  locks: Locks
+  onMod: (peerId: string, action: ModAction) => void
+  onMuteAll: (lock: boolean) => void // 모두 마이크 끄기(lock = 잠금 설정·유지 여부)
 }) {
   const t = useTranslations('room')
   const id = useId()
@@ -152,6 +160,10 @@ export function SidePanel({
           onPromote={onPromote}
           onDemote={onDemote}
           onLowerAll={onLowerAll}
+          media={media}
+          locks={locks}
+          onMod={onMod}
+          onMuteAll={onMuteAll}
         />
       </div>
     </aside>
@@ -247,6 +259,10 @@ function PeopleTab({
   onPromote,
   onDemote,
   onLowerAll,
+  media,
+  locks,
+  onMod,
+  onMuteAll,
 }: {
   viewer: SessionRole
   selfId: string
@@ -254,6 +270,10 @@ function PeopleTab({
   onPromote: (peerId: string) => void
   onDemote: (peerId: string) => void
   onLowerAll: () => void
+  media: Map<string, PeerMedia>
+  locks: Locks
+  onMod: (peerId: string, action: ModAction) => void
+  onMuteAll: (lock: boolean) => void
 }) {
   const t = useTranslations('room')
   const presenter = viewer === 'presenter'
@@ -261,6 +281,22 @@ function PeopleTab({
   const small = 'h-8 shrink-0 rounded-full px-3 text-xs font-semibold'
   return (
     <div className="p-2">
+      {/* 방 사회(v1.2, 발표자) — 모두 끄기는 지금 잠금 상태 유지, 잠금 토글은 끄기 + 잠금/해제를 서버 한 처리로 */}
+      {presenter && (
+        <div className="mb-2 flex gap-2">
+          <button type="button" onClick={() => onMuteAll(locks.audio)} className={`${small} bg-surface-raised flex-1`}>
+            {t('mod.muteAll')}
+          </button>
+          <button
+            type="button"
+            aria-pressed={locks.audio}
+            onClick={() => onMuteAll(!locks.audio)}
+            className={`${small} flex-1 ${locks.audio ? 'bg-danger text-white' : 'bg-surface-raised'}`}
+          >
+            {t(locks.audio ? 'mod.unlock' : 'mod.lock')}
+          </button>
+        </div>
+      )}
       {presenter && raised && (
         <button type="button" onClick={onLowerAll} className={`${small} bg-surface-raised mb-2 w-full`}>
           {t('hand.lowerAll')}
@@ -293,6 +329,18 @@ function PeopleTab({
                   {t('stage.invite')}
                 </button>
               )}
+              {/* 사회 동작(v1.2) — 켜진 마이크·카메라 끄기, 꺼진 마이크 켜기 요청(본인이 탭해야 켜짐) */}
+              {modActions(viewer, p, media.get(p.peerId), locks).map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  aria-label={t(`mod.${a}Of`, { name: p.name })}
+                  onClick={() => onMod(p.peerId, a)}
+                  className={`${small} bg-surface-raised`}
+                >
+                  {t(`mod.${a}`)}
+                </button>
+              ))}
               {presenter && p.role === 'panel' && (
                 <button type="button" onClick={() => onDemote(p.peerId)} className={`${small} bg-surface-raised`}>
                   {t('stage.remove')}

@@ -441,11 +441,11 @@ func TestRoleSurvivesRejoin(t *testing.T) {
 	if e := r.SetRole(pres.ID, a.ID, signal.RolePanel); e != nil {
 		t.Fatal(e)
 	}
-	a2, _, peers, e := r.joinState(signal.Ticket{Sub: "a", Name: "a", Role: signal.RoleAudience}, &recSession{id: "a2"})
+	a2, res, e := r.joinState(signal.Ticket{Sub: "a", Name: "a", Role: signal.RoleAudience}, &recSession{id: "a2"})
 	if e != nil || a2.Role != signal.RolePanel {
 		t.Fatalf("승격 뒤 재입장 역할 %v %v", a2, e)
 	}
-	for _, info := range peers {
+	for _, info := range res.Peers {
 		if info.PeerID == a2.ID && info.Role != signal.RolePanel {
 			t.Errorf("join 응답 peers 의 본인 역할 %s", info.Role)
 		}

@@ -4,7 +4,7 @@
 import { useEffect, useState, type RefObject } from 'react'
 import { useTranslations } from 'next-intl'
 import { useLayerWatch } from './layer-watch'
-import { groupTracks, nextPin, type Layer, type PinState } from './room-rules'
+import { followKey, groupTracks, nextPin, ringFor, type Layer, type PinState, type RoomLayout } from './room-rules'
 import type { Peer, RemoteTrack, RoomState, SessionRole } from './use-room'
 import { VideoTile } from './video-tile'
 
@@ -95,6 +95,7 @@ type Tile = {
   screen: boolean
   presenter: boolean
   consumerId?: string // 원격 영상만 — setLayer 대상
+  peerId?: string // 카메라 타일의 주인(발언자 링, v1.2) — 화면공유 타일은 없음
 }
 
 // 발행자 타일 목록 — 무대는 발행자만(청중은 인원 수·목록만, 설계서 14.1). 원격 트랙 주인은 consumerCreated.peer(room-rules ownerKey·groupTracks)
@@ -121,6 +122,7 @@ function buildTiles({
       mirror: true,
       screen: false,
       presenter: viewer === 'presenter',
+      peerId: selfId,
     })
   }
   if (localScreen) {
@@ -165,6 +167,7 @@ function buildTiles({
       mirror: false,
       screen: false,
       presenter: !p || p.role === 'presenter',
+      peerId: pid,
     })
   }
   return out
@@ -181,6 +184,10 @@ type StageProps = {
   localScreen: MediaStream | null
   localOn: { audio: boolean; video: boolean }
   onLayer?: LayerFn
+  speaker: string | null // ntf activeSpeaker(v1.2)
+  engineSpeaker: boolean // 엔진 발언자 판정 사용 가능 — 아니면 타일이 직접 판정
+  layout: RoomLayout | null // 발표자 레이아웃(ntf layout) — 청중·패널은 follow 면 따라 본다
+  onPin?: (key: string) => void // 발표자가 작은 타일을 고정 → room.setLayout
 }
 
 // 레이아웃(설계서 6.2) — 발표자 고정(발행자 1) / 발표 + 패널(큰 무대 1 + 작은 타일 줄 : 모바일 가로 스크롤, 데스크톱 우하단) /
@@ -196,8 +203,16 @@ export function Stage(props: StageProps) {
     setPin((s) => nextPin(s, keys, screenKeys))
   }, [sig]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 따라 보기(v1.2 F) — 레이아웃이 바뀔 때마다 발표자 고정을 따른다. 그 뒤 내가 직접 고정하면 다음 레이아웃까지 내 고정
+  const follow = followKey(props.layout, props.viewer)
+  const [own, setOwn] = useState(false)
+  useEffect(() => setOwn(false), [props.layout])
+  const forced = !own && follow ? tiles.find((x) => x.key === follow) : undefined
+
   const live = props.state === 'joined' || props.state === 'reconnecting'
-  const main = tiles.find((x) => x.key === pin.pin) ?? tiles.find((x) => x.presenter && !x.screen) ?? tiles[0] ?? null
+  const main =
+    forced ?? tiles.find((x) => x.key === pin.pin) ?? tiles.find((x) => x.presenter && !x.screen) ?? tiles[0] ?? null
+  const ring = (x: Tile | null) => ringFor(x?.peerId, props.speaker, props.engineSpeaker)
   const rest = tiles.filter((x) => x !== main)
   const notice = !live ? t('state.connecting') : !main ? t('waiting') : null
   return (
@@ -211,6 +226,7 @@ export function Stage(props: StageProps) {
         mirror={main?.mirror}
         consumerId={main?.consumerId}
         onLayer={props.onLayer}
+        speaking={ring(main)}
       >
         {notice && (
           <p className="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center text-sm">
@@ -234,7 +250,11 @@ export function Stage(props: StageProps) {
               <button
                 type="button"
                 aria-label={t('tile.pin', { name: x.name })}
-                onClick={() => setPin((s) => ({ ...s, pin: x.key, prev: null }))}
+                onClick={() => {
+                  setPin((s) => ({ ...s, pin: x.key, prev: null }))
+                  setOwn(true)
+                  props.onPin?.(x.key)
+                }}
                 className="block w-full rounded-xl text-left shadow-lg"
               >
                 <VideoTile
@@ -246,6 +266,7 @@ export function Stage(props: StageProps) {
                   mirror={x.mirror}
                   consumerId={x.consumerId}
                   onLayer={props.onLayer}
+                  speaking={ring(x)}
                 />
               </button>
             </li>
