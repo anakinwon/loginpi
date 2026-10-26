@@ -1,6 +1,6 @@
-# SIGNAL_API — Galápagos 시그널링 프로토콜 (확정판 v1.1.1)
+# SIGNAL_API — Galápagos 시그널링 프로토콜 (확정판 v1.1.3)
 
-> 작성 2026-10-25 · v1.1 개정 2026-10-26(UI 설계서 `ui-design/ui-design.md` 13절 #1 결정 — 14.7 필수 A~D + `room.end`, 받는 사람·필드 정본 = 설계서 7.2) · v1.1.1 구현 결정 문서화 2026-10-26 · M3 산출물 · 근거 `PRD_02_ENGINE_DESIGN.md` 5절(D-9 봉투·D-11 입장권), REA_02 5.1(수명주기 이벤트)·6.2(동사 경계)
+> 작성 2026-10-25 · v1.1 개정 2026-10-26(UI 설계서 `ui-design/ui-design.md` 13절 #1 결정 — 14.7 필수 A~D + `room.end`, 받는 사람·필드 정본 = 설계서 7.2) · v1.1.1 구현 결정 문서화 2026-10-26 · v1.1.3 `ntf score` 송신 2026-10-27(3.4) · M3 산출물 · 근거 `PRD_02_ENGINE_DESIGN.md` 5절(D-9 봉투·D-11 입장권), REA_02 5.1(수명주기 이벤트)·6.2(동사 경계)
 > 코드 정본 : `media/internal/signal/envelope.go`(이름·필드·오류 코드), `session.go`(시간 상수), `ticket.go`(입장권). **이 문서와 코드가 다르면 코드를 고치기 전에 이 문서를 먼저 고친다**(이름·필드 변경은 M3 합의 필요).
 > 표준 SDP 를 그대로 주고받는다 — 클라이언트 라이브러리가 필요 없다(D-9).
 
@@ -75,10 +75,10 @@
 | `producerClosed` | `{producerId}` | M3 | 소유자를 뺀 전원. 이 알림이 갈 때 연결 Consumer 는 **이미 닫혀 있다** → 클라이언트는 해당 트랙을 지운다 |
 | `producerPaused` | `{producerId}` | M3 | 소유자를 뺀 전원. 일시정지 중 늦게 들어온 참가자는 `consumerCreated` 직후 받는다 |
 | `producerResumed` | `{producerId}` | M3 | 소유자를 뺀 전원 |
-| `layersChanged` | `{consumerId, spatial, temporal}` | M4 | 그 Consumer 의 주인. 서버 레이어 전환 결과 — **이름·형식만 정의, 현재 서버 미송신** |
-| `streamState` | `{consumerId, state}` | M4 | `active`\|`paused` — 할당기 일시정지(기본 꺼짐이라 드묾) — **현재 서버 미송신** |
-| `publishLayers` | `{producerId, rids}` | M4 | 발행자. dynacast — 예 `{"l":true,"m":true,"h":false}`, 하향 5초 디바운스 |
-| `score` | `{consumerId}`\|`{producerId}` + `{score, grade}` | M4 | 5초 주기 품질 점수(LiveKit 식, REA_03 5.10) — **현재 서버 미송신** |
+| `layersChanged` | `{consumerId, spatial, temporal}` | M4 | 그 Consumer 의 주인. 서버 레이어 전환 결과 — **이름·형식만 정의, 현재 서버 미송신**(v1.1.3 재확인 : 화면이 쓰는 곳 없음 — 화질 표시는 `score` 로 충분) |
+| `streamState` | `{consumerId, state}` | M4 | `active`\|`paused` — 할당기 일시정지(기본 꺼짐이라 드묾) — **현재 서버 미송신**(v1.1.3 재확인) |
+| `publishLayers` | `{producerId, rids}` | M4 | 발행자. dynacast — 예 `{"l":true,"m":true,"h":false}`, 하향 5초 디바운스. **송신 중**(`bora/lifecycle.go` publishCaps, 1초마다 판정·바뀔 때만) |
+| `score` | `{consumerId, score, grade}` | M4 (v1.1.3 송신) | **그 Consumer 의 주인**(수신자). 5초 주기 판정(LiveKit 식, REA_03 5.10 = `metrics.Scorer`) 중 **등급이 바뀔 때만** — 3.4. `{producerId}` 형(발행자 상류 품질)은 **이름·형식만 정의, 현재 서버 미송신** |
 | `error` | `{code, msg}` | M1 | 치명 오류 후 서버가 연결 종료할 수 있음 |
 | `peerJoined` | `{peers: [{peerId, name, role, raisedTs}]}` | M3 (v1.1) | 방 전원(들어온 본인 제외). **200ms 묶음** — 3.3 A |
 | `peerLeft` | `{peerIds: [string]}` | M3 (v1.1) | 방 전원. **200ms 묶음** — 3.3 A |
@@ -116,6 +116,21 @@
 |---|---|---|
 | `peer.setRole{peerId, role}` | presenter 만. `role` = `panel`\|`audience`(무대 초대·내리기, 13절 #3·#9 ⓐ — 세션 중 바로 전환, 재입장 없음). 같은 역할이면 성공·알림 없음. **승격(→panel)** : 역할 변경 → 손이 올라가 있으면 내림(`ntf hand` raisedTs 0) → `ntf roleChanged{peerId, role, by}`(전원, `by` = 요청자 peerId) → 승격된 사람에게 현재 올라가 있는 손마다 `ntf hand`(이제 받는 범위에 들어옴). 마이크는 **자동으로 켜지지 않는다** — 본인이 `transport.publish`·`produce` 로 발행. **강등(→audience)** : 역할 변경 → 그 사람 producer 전부 닫힘 연쇄(4절, 다른 참가자에게 `producerClosed`) → `ntf roleChanged`. **서버도 강등된 사람의 발행 PC 를 닫는다**(v1.1.1 — 다시 승격되면 새 `transport.publish` 로 새 PC 를 협상, 이전 PC 재사용 없음). 강등된 클라이언트는 자기 트랙·발행 PC 를 정리하고 손 목록을 비운다(이후 `transport.publish`·`produce` 는 `ROLE_FORBIDDEN`). **바뀐 역할은 재입장해도 유지**(v1.1.1) — 엔진이 방마다 입장권 `sub` → 세션 역할을 기억해 같은 `sub` 의 다음 `join` 은 입장권 `role`(초기값) 대신 그 역할로 들어온다(`join` 응답 `role`·`peers` 도 그 값). panel·audience 만 기억하므로 이 경로로 presenter 가 되는 일은 없고, presenter 입장권은 입장권 그대로. 방이 닫히면(종료·정리) 기억도 사라진다 | presenter 아님·대상이 presenter(본인 포함) `ROLE_FORBIDDEN`, 대상 없음 `NOT_FOUND`, `role` 이 그 밖 값 `SDP_INVALID` |
 | `room.end{}` | presenter 만(13절 #6). 순서 : 종료 표시(이후 `join` 차단) → **요청자에게 성공 응답을 먼저 보낸 뒤** → 나머지 전원에게 `ntf error{code:"ROOM_CLOSED"}`·닫힘 연쇄·연결 종료 → 요청자에게도 `ntf error{code:"ROOM_CLOSED"}` 후 종료(v1.1.1 — 요청자는 다른 사람이 닫히기 전에 응답을 받는다). 엔진 메모리에 종료 표시를 남겨 같은 방 ID 의 이후 `join` 은 `ROOM_CLOSED` — 관리 API `POST /admin/rooms` 로 같은 방 ID 를 새로 열면 지워진다(v1.1.1), 그 밖에는 엔진 재시작 시 초기화 | `ROLE_FORBIDDEN` |
+
+### 3.4 `ntf score` 규칙 (v1.1.3 — 아소카 결정(마스터 위임 2026-10-26))
+
+| 항목 | 규칙 |
+|---|---|
+| 받는 사람 | 그 Consumer 의 주인 1명(구독자). 다른 참가자·발행자에게는 보내지 않는다 |
+| 주기 | Consumer 마다 **5초** 판정(송신 고루틴 타이머) |
+| 보내는 때 | **등급이 바뀔 때만**(R-P2). 처음 등급 = `excellent` 로 본다 — 좋은 연결은 알림 0건, 클라이언트도 알림 전엔 `excellent` 로 둔다 |
+| 입력 | 청중 RR 의 `fractionLost`(손실)·`jitter`, 우리 SR 기준 RTT, 레이어 거리(`setLayer` 상한 중 발행 중인 최고 레이어 − 현재 레이어). 비트레이트 비율은 [TBD : M4 실측] 미사용. 음성은 손실 가중 8·레이어 무시 |
+| `score` | 평활 점수 30~100(소수 1자리, 하강 빠르게 0.8·상승 느리게 0.4). `lost` 일 때만 0 |
+| `grade` | `>80 excellent` · `>40 good` · `>20 poor` · 그 밖 `lost`. 점수 하한이 30 이라 **`lost` 는 "보냈는데 RR 이 10초 넘게 없음"으로만** 나온다(Chrome 음성 RR 5초 ±50% 를 감안해 주기와 따로 둔다) |
+| 판정 보류 | 그 창에 보낸 패킷이 없거나(일시정지·발행 없음) RR 을 한 번도 못 받았으면 판정하지 않고 등급 유지 |
+| 화면 | 설계서 14.1·6.3 — `poor`·`lost` 즉시 토스트, 회복 5초 뒤 숨김. 여러 Consumer 중 가장 나쁜 등급으로 표시 |
+
+`consumer.setLayer` 와 짝 : 클라이언트용 `consumer.pause` 는 **없다** — 화면 밖·백그라운드 타일은 `maxSpatial:0`(최저 레이어)으로 낮춘다(설계서 14.2). 완전 정지 메시지는 후속 검토 [TBD].
 
 ## 4. 수명주기 (서버 동작 — 클라이언트가 기대할 순서)
 
@@ -217,3 +232,4 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 | 2026-10-26 | **v1.1** — UI 설계서 13절 #1 결정(마스터 채택)으로 14.7 필수 A~D + `room.end` 추가. 요청 6(`chat.send`·`hand.set`·`hand.lowerAll`·`reaction.send`·`peer.setRole`·`room.end`)·알림 6(`peerJoined`·`peerLeft`·`chat`·`hand`·`reaction`·`roleChanged`), `join` 응답 `peers`, `ProducerInfo`·`consumerCreated` 에 `source`, 6절 `role` = 입장 시 초기값(세션 역할 정본, 13절 #9), 3.1 `trickle` `ntf` 허용(13절 #7). 기존 이름·필드 변경 없음, 신규 오류 코드 없음(`LOCKED` 는 후속 E 때) |
 | 2026-10-26 | **v1.1.1** 구현 결정 문서화(이름·필드 변경 없음, 3.3) — ① 승격·강등 역할은 같은 `sub` 재입장 때 유지(방 단위 기억, presenter 승격 불가, 방이 닫히면 소멸) ② `room.end` 순서 = 요청자 성공 응답 → 나머지 전원 `ROOM_CLOSED` → 정리 ③ 관리 API `POST /admin/rooms` 로 다시 열면 종료 표시 해제 ④ `reaction.send` 한 요청 안 중복 이모지는 1개로 셈 ⑤ 서버가 강등된 사람의 발행 PC 를 닫음 ⑥ `peerJoined` 는 받는 사람보다 뒤에 들어온 사람만, `peerLeft` 는 모르는 `peerId` 가 섞일 수 있음(무시) ⑦ 값 검사가 속도 제한보다 먼저(잘못된 요청은 한도 미사용) |
 | 2026-10-26 | v1.1.2 — `consumerCreated` 에 `peer`(발행자 peerId, `ProducerInfo.peer` 와 같은 값) 추가 : 입장 뒤 생긴 producer 의 주인을 화면이 알 수 있게(W3 검토 지적). 필드 추가 = 하위 호환 |
+| 2026-10-27 | **v1.1.3** — `ntf score` 서버 송신 시작(3.4) : 받는 사람 = Consumer 주인, 5초 판정·등급 바뀔 때만, 처음 등급 excellent 기준, `lost` = RR 10초 끊김. `{producerId}` 형·`layersChanged`·`streamState` 는 계속 미송신, `publishLayers` 는 송신 중임을 표기. 이름·필드 변경 없음(`score` 행 `d` 를 실제 송신 형식 `{consumerId, score, grade}` 로 좁혀 적음). 아소카 결정(마스터 위임 2026-10-26) |

@@ -367,6 +367,7 @@ type subBot struct {
 	name     string
 	pliAfter time.Duration
 	storm    atomic.Bool
+	rrLoss   atomic.Uint32 // >0 이면 RR FractionLost 를 이 값(1/256)으로 덮는다 — ntf score 시험용(score_e2e_test.go)
 
 	mu        sync.Mutex
 	pc        *webrtc.PeerConnection
@@ -393,6 +394,7 @@ type subBot struct {
 	pliSent   int
 	first     chan struct{}
 	firstOnce sync.Once
+	scores    []signal.ScoreNtf // 받은 ntf score
 }
 
 func startSubscriber(t *testing.T, url, name string, conn net.PacketConn, pliAfter time.Duration) *subBot {
@@ -420,6 +422,12 @@ func startSubscriber(t *testing.T, url, name string, conn net.PacketConn, pliAft
 			}()
 		case signal.MTrickle:
 			addCandidate(pc, e.D)
+		case signal.NScore:
+			var sc signal.ScoreNtf
+			_ = json.Unmarshal(e.D, &sc)
+			s.mu.Lock()
+			s.scores = append(s.scores, sc)
+			s.mu.Unlock()
 		}
 	})
 	pc.OnICECandidate(trickleOut(c, "sub"))
@@ -553,7 +561,11 @@ func (s *subBot) due(now time.Time) []rtcp.Packet {
 		if s.lsr != 0 {
 			dlsr = rtcpx.DLSR(s.lsrAt, now)
 		}
-		out = append(out, rtcpx.ReceiverReport(1, []rtcp.ReceptionReport{s.stats.Report(s.ssrc, s.lsr, dlsr)}))
+		rr := s.stats.Report(s.ssrc, s.lsr, dlsr)
+		if f := s.rrLoss.Load(); f > 0 {
+			rr.FractionLost = uint8(f)
+		}
+		out = append(out, rtcpx.ReceiverReport(1, []rtcp.ReceptionReport{rr}))
 		s.lastRR = now
 	}
 	return out
