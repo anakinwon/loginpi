@@ -1,6 +1,6 @@
 // 하류 재전송 — 청중 NACK → SendMeta.Resolve(억제·3회·PLI 후 중단) → cache.Get → 같은 SSRC 재전송(D-5), 캐시 미스는 50ms 모아 상류 NACK(PRD_02 4.2).
-// D-5 : RTX 없이 같은 SSRC·같은 순번으로 다시 보내므로 구독 PC 의 SRTP 재전송 보호 창을 넓혀야 한다
-// (설정 지점 = capri SettingEngine.SetSRTPReplayProtectionWindow(512) [TBD : M2 실측 — 창 크기별 재전송 거부 여부], REA_01 5.1).
+// D-5 : RTX 없이 같은 SSRC·같은 순번으로 다시 보낸다. 늦은 재전송의 수락 여부는 청중 쪽 SRTP 재전송 보호 창이 정한다
+// (Chrome 1024 · pion 기본 64 — 서버 capri 512 는 엔진 수신 방향만, docs/M2_TURN_NETEM.md 2절·5절 실측 2026-10-26).
 package jeju
 
 import (
