@@ -7,6 +7,7 @@ import { AuthStatus } from './auth-status'
 
 export function SiteHeader() {
   const t = useTranslations('nav')
+  const tl = useTranslations('list')
   const locale = useLocale()
   const pathname = usePathname()
 
@@ -17,6 +18,7 @@ export function SiteHeader() {
           seminar.pi
         </Link>
         <nav className="flex flex-wrap items-center gap-3 text-sm">
+          <Link href="/progress">{tl('progress')}</Link>
           <Link href="/link">{t('link')}</Link>
           <Link href={pathname} locale={locale === 'ko' ? 'en' : 'ko'}>
             {t('switchLocale')}
