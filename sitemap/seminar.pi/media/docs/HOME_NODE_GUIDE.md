@@ -1,7 +1,87 @@
-# 집 상시 PC(192.168.0.8)에 Galápagos 엔진 올리기 — 외부 접속 가이드
+# 집 상시 PC(192.168.0.16)에 Galápagos 엔진 올리기 — 외부 접속 가이드
 
-> 작성 2026-10-25 · 대상 : 마스터 집 네트워크의 상시 가동 PC `192.168.0.8`(Pi Node 실행 중) · 관련 결정 C-5(VM) 대안
+> 작성 2026-10-25 · 대상 : 마스터 집 네트워크의 상시 가동 PC `192.168.0.16`(Pi Node 실행 중) · 관련 결정 C-5(VM) 대안
 > 목적 : 클라우드 VM 대신 집 PC로 **M1 LTE 시험을 먼저** 진행한다. M2 손실 시험은 그 PC 의 OS 확인 뒤(6절 4번). 운영 서비스는 VM 권장(8절)
+
+## ★ 현행 방식 (2026-10-26) — 대안 1 : 신호는 터널, 영상만 UDP 포워딩
+
+> 0~4절의 443·Caddy·DuckDNS 방식은 **인터넷에서 TCP 443 수신이 안 되어 보류**(외부 점검 3곳 모두 시간 초과, 2026-10-26 — 공유기 포워딩 미반영 또는 통신사 차단, 원인 미확정). 공유기 WAN = 공인 IP(`115.86.x.x`)와 같음을 확인(이중 NAT·CGNAT 아님, 케이블모뎀은 통과만 함).
+> 이 절만 따라 하면 되고, 0~4절은 엔진 파일·`run-engine.cmd`·방화벽(4.2·4.3·4.6)만 그대로 씁니다.
+
+```
+LTE 휴대폰 ─ 신호 wss ─→ Cloudflare 임시 터널 ─(집 PC가 바깥으로 연결, 포워딩 불필요)─→ 192.168.0.16 엔진 :7880
+          └─ 영상 UDP ─→ <공인 IP>:7882 ─(공유기 UDP 포워딩 1줄)─→ 192.168.0.16 :7882
+```
+
+### A. 공유기 (ipTIME, `http://192.168.0.1`)
+1. 고급 설정 → NAT/라우터 관리 → **포트포워드 설정** : `UDP 7882 → 192.168.0.16 : 7882` 한 줄 (TCP 443 규칙은 지워도 됨) → 적용
+2. 고급 설정 → 네트워크 관리 → 내부 네트워크 설정 → **수동 주소 등록** 에 192.168.0.16 등록(재부팅 후 IP 변경 방지)
+- 메뉴 이름은 펌웨어마다 조금 다를 수 있음 [확인중 : 마스터 공유기 화면 — 2026-10-26 로그인 경로 `/sess-bin/login_session.cgi` 로 ipTIME 확인]
+
+### B. 192.168.0.16 — 엔진
+1. `run-engine.cmd`(4.2) 값 :
+   - `MEDIA_PUBLIC_IP` = 공유기 관리 화면(`http://192.168.0.1`) 시스템 요약 정보의 **외부 IP 주소**(2절 ②) — 숫자 4덩어리만
+   - `MEDIA_TOKEN_SECRET` = 마스터 PC `sitemap/seminar.pi/.env.vercel-prod` 의 같은 키 값(Vercel 과 같은 값, 앞뒤 공백 없이)
+   - `MEDIA_ALLOWED_ORIGINS=https://seminar0532.pinet.com,https://xxx.vercel.app` — 뒤의 것은 Vercel → seminar → Settings → Domains 첫 줄로 바꿔 넣습니다. Pi Browser 가 보내는 Origin 이 둘 중 어느 쪽인지 아직 실측 전이라 **둘 다** 넣습니다 [확인중 : Pi Browser Origin]
+   - `MEDIA_ADMIN_SECRET` 은 **넣지 않습니다** — 터널은 엔진의 모든 경로를 공개하므로, 넣으면 관리 API(`/admin/`)가 인터넷에 열립니다(없으면 `/admin/` 은 404)
+2. 방화벽 UDP 7882 규칙(4.3 첫 줄) 실행
+3. 엔진 켜기 / 값을 바꾼 뒤 다시 켜기 — 관리자 cmd 에서 세 줄(`/End` 만 하면 galapagos.exe 가 남아 포트를 잡고 있음) :
+   ```
+   schtasks /End /TN "Galapagos Engine"
+   taskkill /IM galapagos.exe /F
+   schtasks /Run /TN "Galapagos Engine"
+   ```
+   작업을 아직 등록하지 않았다면 4.4 의 Engine 줄과 72시간 설정만 먼저 실행합니다
+4. Caddy·DuckDNS 작업을 등록했었다면 끕니다(등록한 적 없으면 "지정된 작업 없음" — 건너뜀) :
+   ```
+   schtasks /End /TN "Galapagos Caddy"
+   schtasks /Change /TN "Galapagos Caddy" /DISABLE
+   schtasks /Change /TN "Galapagos DuckDNS" /DISABLE
+   ```
+5. 확인 : 그 PC 브라우저 `http://127.0.0.1:7880/healthz` → `ok` (안 되면 4.6)
+
+### C. 192.168.0.16 — 터널 (cloudflared)
+1. 설치(한 번) : `winget install --id Cloudflare.cloudflared` (마스터 PC 에서 같은 방법으로 설치해 쓴 적 있음, 2026-10-25)
+2. **새** cmd 창에서 실행 — **창을 닫으면 터널도 끊깁니다** :
+   ```
+   cloudflared tunnel --no-autoupdate --url http://127.0.0.1:7880
+   ```
+   `cloudflared` 를 찾을 수 없다고 나오면 설치 경로로 실행 : `"C:\Program Files (x86)\cloudflared\cloudflared.exe" tunnel --no-autoupdate --url http://127.0.0.1:7880` (마스터 PC 기준 경로, 다르면 `where cloudflared`)
+3. 화면에 나온 `https://xxxx-xxxx.trycloudflare.com` 을 적어 둡니다 → 엔진 주소 = **`wss://xxxx-xxxx.trycloudflare.com/signal`**
+4. 확인 : 휴대폰 LTE(와이파이 끔)로 `https://xxxx-xxxx.trycloudflare.com/healthz` → `ok`
+- 임시 터널 주소는 **다시 켤 때마다 바뀝니다**(마스터 PC 에서 관찰, 2026-10-25) — 바뀌면 시험 화면 엔진 주소 칸에만 새로 넣으면 됨(재배포 불필요). 고정 주소는 도메인 구입 후 Cloudflare 고정 터널로 [TBD : 마스터 — 도메인]
+
+### D. Vercel (seminar 프로젝트, Production)
+1. Settings → Environment Variables :
+   - `MEDIA_TOKEN_SECRET` = B 와 같은 값(32자 이상)
+   - `LAB_ENABLED` = 정확히 `1` (시험 화면 열기)
+   - `NEXT_PUBLIC_PI_APP_DOMAIN` = `seminar0532.pinet.com` (없으면 Pi Browser 의 입장권 요청이 `403 cross_origin_auth` 로 막힘) [확인중 : Vercel 현재 값 — 마스터 PC 사본은 비어 있음]
+2. Deployments → 최신 배포 … → **Redeploy**
+3. 같은 화면에서 상태가 **Ready** 인지 확인. **Error** 면 위 값 형식 오류(빌드가 값을 검사함) — 이때 Vercel 은 옛 배포를 그대로 내보내므로 화면이 열려도 반영된 것이 아닙니다
+
+### E. 시험 (휴대폰 2대 이상, 모두 와이파이 끔)
+1. 발표자 휴대폰 : Pi Browser 로 `https://seminar0532.pinet.com/ko/lab/sfu` → **로그인 먼저**(발표자는 관리자 계정)
+2. 엔진 주소 칸의 기존 글자를 **지우고** C-3 의 `wss://…/signal` 입력
+3. 방 이름은 기본값 `lab-1` 그대로(영문·숫자·`-`·`_` 만 — 한글·공백이면 `입장권 없음(400)`)
+4. '발표자' 선택 → 입장 → 카메라·마이크 권한 창이 뜨면 **허용**
+5. 청중 휴대폰(들) : 같은 주소·로그인·같은 엔진 주소·같은 방 → '청중' 선택 → 입장. `탭하여 재생` 버튼이 보이면 누릅니다
+6. 성공 로그 : `입장권 발급됨` → `입장 peer=… 기존 발행 N개` → 발표자 `발행 PC connected` / 청중 `구독 PC connected` · `수신 트랙 video`
+
+| 로그 문구 | 원인 | 조치 |
+|---|---|---|
+| `입장권 없음(401)` | 로그인 안 됨 | 먼저 로그인 |
+| `입장권 없음(403)` — 발표자만 | 발표자는 관리자(ADMIN)만 | 관리자 계정으로 발표, 또는 아소카에게 권한 확인 요청 |
+| `입장권 없음(403)` — 청중도 | 앱의 Origin 검사(`cross_origin_auth`) | D-1 `NEXT_PUBLIC_PI_APP_DOMAIN` 확인 후 Redeploy |
+| `입장권 없음(400)` | 방 이름 형식 | E-3 |
+| `입장권 없음(503)` | `MEDIA_TOKEN_SECRET` 미설정, 또는 배포 실패로 옛 배포가 서비스 중 | D 전체 확인(Ready 여부 포함) |
+| `입장 실패 TICKET_INVALID 형식 오류` | 바로 앞 `입장권 없음(…)` 의 결과 | 앞줄 원인부터 해결 |
+| `입장 실패 TICKET_INVALID 서명 불일치` | Vercel 과 엔진의 비밀키가 다름 | B-1·D-1 값 다시 붙여넣기 → B-3 엔진 재시작 |
+| `발급 시각이 미래` / `TICKET_EXPIRED` | 집 PC 시계가 5초 넘게 어긋남 | 그 PC : Windows 설정 → 시간 및 언어 → 날짜 및 시간 → **지금 동기화** |
+| `WebSocket 연결 실패` | 터널 꺼짐·주소 오타, 또는 엔진이 Origin 거부 | C-2 창·C-4 healthz 확인 → 정상이면 `engine.log` 의 `origin 불허 : "…"` 줄의 값을 B-1 `MEDIA_ALLOWED_ORIGINS` 에 추가 → B-3 |
+| `발행 PC failed` / `구독 PC failed` | 영상 UDP 가 집에 못 들어옴 | A-1 UDP 포워딩·B-2 방화벽·`MEDIA_PUBLIC_IP` 확인 |
+
+- Origin 만 따로 확인하려면 아무 PC cmd : `curl -i -H "Origin: https://seminar0532.pinet.com" https://xxxx-xxxx.trycloudflare.com/signal` → `403 … origin 불허` = 허용 목록 불일치 / `400` = Origin 통과
+- UDP 까지 막혀 `failed` 가 계속되면 → 대안 2(관리형 TURN 중계, 포워딩 없음 — 엔진이 `MEDIA_ICE_SERVERS` 를 자기 연결에도 쓰므로 설정만으로 될 것으로 봄) [확인중 : TURN 실측] [TBD : 마스터 — 서비스 선택]
 
 ## 0. 한눈에 보기
 
@@ -10,9 +90,9 @@
    │ ① 신호 wss://<이름>.duckdns.org/signal  (TCP 443)
    │ ② 영상 UDP <공인 IP>:7882
    ▼
-[집 공유기]  ── 포트포워딩 : TCP 443, UDP 7882 → 192.168.0.8
+[집 공유기]  ── 포트포워딩 : TCP 443, UDP 7882 → 192.168.0.16
    ▼
-[192.168.0.8 상시 PC]
+[192.168.0.16 상시 PC]
    ├─ Caddy (443, 인증서 자동 발급) ──▶ Galápagos 127.0.0.1:7880 (신호)
    ├─ Galápagos UDP 7882 (영상)
    └─ Pi Node (기존, 31400~31409) — 그대로 둠
@@ -26,7 +106,7 @@
 
 | 항목 | 결과 | 의미 |
 |---|---|---|
-| 192.168.0.8 TCP 31401 | 열림 | Pi Node 동작 중 |
+| 192.168.0.16 TCP 31401 | 열림 | Pi Node 동작 중 |
 | TCP 22(SSH)·3389(원격 데스크톱)·5985·445 | 닫힘 | 열린 원격 접속 포트 없음(바깥으로 연결하는 원격 앱 여부는 미확인) → 설치는 그 PC 앞에서 |
 | TCP 80·443·2375 | 닫힘 | Caddy 가 443 을 쓸 수 있음(다른 프로그램이 점유하지 않음) |
 | ping | 응답 없음 | Windows 방화벽 기본값으로 보임 [확인중 : OS] |
@@ -36,9 +116,9 @@
 
 | # | 확인할 것 | 방법 | 통과 기준 |
 |---|---|---|---|
-| ① | 192.168.0.8 의 OS | 그 PC 화면 | Windows 면 4절, Linux 면 부록 |
+| ① | 192.168.0.16 의 OS | 그 PC 화면 | Windows 면 4절, Linux 면 부록 |
 | ② | 공유기 WAN IP | 공유기 관리 화면(보통 192.168.0.1) → 인터넷/WAN 정보의 IP 를 https://api.ipify.org 값과 비교 | **같으면 OK** · WAN IP 가 100.64~100.127 로 시작하면 통신사 공유 IP(CGNAT) → 포트포워딩 불가, 8절 VM · 192.168·10·172.16~31 로 시작하면 이중 공유기(통신사 모뎀 + 개인 공유기) → 상위 장비에도 포트포워딩 또는 브리지 모드 [확인중 : 통신사 장비] |
-| ③ | 업로드 속도 | 192.168.0.8 에서 속도 측정 사이트 | 청중 수 × 청중 1인당 비트레이트 이상 [TBD : 1인당 비트레이트 실측 후 확정 — 참고로 1.5Mbps 가정 시 청중 30명 ≈ 45Mbps] |
+| ③ | 업로드 속도 | 192.168.0.16 에서 속도 측정 사이트 | 청중 수 × 청중 1인당 비트레이트 이상 [TBD : 1인당 비트레이트 실측 후 확정 — 참고로 1.5Mbps 가정 시 청중 30명 ≈ 45Mbps] |
 | ④ | 그 PC 여유 자원 | 작업 관리자 | Pi Node 를 포함해 CPU·메모리가 상시 포화되지 않음 [TBD : 엔진 부하 실측 후 기준 확정] |
 | ⑤ | 공유기 포트포워딩 메뉴 | 공유기 관리 화면 | Pi Node 용 31400~31409 설정이 이미 있으면 같은 화면 사용 |
 
@@ -48,13 +128,13 @@
 
 | 이름 | 프로토콜 | 외부 포트 | 내부 IP | 내부 포트 |
 |---|---|---|---|---|
-| galapagos-wss | TCP | 443 | 192.168.0.8 | 443 |
-| galapagos-media | UDP | 7882 | 192.168.0.8 | 7882 |
+| galapagos-wss | TCP | 443 | 192.168.0.16 | 443 |
+| galapagos-media | UDP | 7882 | 192.168.0.16 | 7882 |
 
-- 192.168.0.8 이 바뀌지 않도록 공유기의 "고정 IP 할당(DHCP 예약)"에 그 PC 를 등록합니다.
+- 192.168.0.16 이 바뀌지 않도록 공유기의 "고정 IP 할당(DHCP 예약)"에 그 PC 를 등록합니다.
 - 80번은 열지 않습니다. Caddy 는 443 하나로 인증서를 받을 수 있습니다(TLS-ALPN 방식, 출처 : caddyserver.com/docs/automatic-https, 확인일 2026-10-25).
 
-## 4. 192.168.0.8 설치 — Windows 기준
+## 4. 192.168.0.16 설치 — Windows 기준
 
 ### 4.1 DuckDNS 이름 만들기 (마스터, 3분)
 1. https://www.duckdns.org 접속 → Google 등으로 로그인
@@ -146,10 +226,10 @@ Set-ScheduledTask -TaskName 'Galapagos Caddy' -Settings $s
 
 | 확인 | 어디서 | 기대 | 실패하면 |
 |---|---|---|---|
-| `C:\galapagos\duckdns.log` | 192.168.0.8 | `OK` | `KO` → 토큰·도메인 이름 확인 |
-| `C:\galapagos\caddy.log` | 192.168.0.8 | `certificate obtained successfully` 와 도메인 이름 | DuckDNS 갱신(`OK`)과 공유기 TCP 443 포워딩부터 확인 |
-| `C:\galapagos\engine.log` | 192.168.0.8 | `Galápagos 대기 http 127.0.0.1:7880 · udp 7882` | 기동 거부 문구 확인(`MEDIA_ALLOWED_ORIGINS` 비어 있으면 거부) |
-| `http://127.0.0.1:7880/healthz` | 192.168.0.8 브라우저 | `ok` | 엔진 미기동 → 4.6 |
+| `C:\galapagos\duckdns.log` | 192.168.0.16 | `OK` | `KO` → 토큰·도메인 이름 확인 |
+| `C:\galapagos\caddy.log` | 192.168.0.16 | `certificate obtained successfully` 와 도메인 이름 | DuckDNS 갱신(`OK`)과 공유기 TCP 443 포워딩부터 확인 |
+| `C:\galapagos\engine.log` | 192.168.0.16 | `Galápagos 대기 http 127.0.0.1:7880 · udp 7882` | 기동 거부 문구 확인(`MEDIA_ALLOWED_ORIGINS` 비어 있으면 거부) |
+| `http://127.0.0.1:7880/healthz` | 192.168.0.16 브라우저 | `ok` | 엔진 미기동 → 4.6 |
 | `https://seminar-galapagos.duckdns.org/healthz` | 휴대폰 LTE(와이파이 끔) | `ok` + 자물쇠(인증서 정상) | 위 caddy.log |
 
 ### 4.6 엔진이 안 뜰 때 (healthz 접속 안 됨)
@@ -182,14 +262,14 @@ galapagos.exe
 |---|---|---|
 | Vercel `NEXT_PUBLIC_MEDIA_WS_URL` | `wss://seminar-galapagos.duckdns.org/signal` | 마스터 등록 → Redeploy |
 | Vercel `MEDIA_TOKEN_SECRET` | 엔진과 같은 값(4.2-3) | 마스터 |
-| `/lab/sfu` 하드코딩 터널 주소 제거 | env 로 대체 | 아소카 |
-| `/lab/sfu` 가 입장권(`/api/media/ticket`)을 받아 join | 개발용 입장 없이 입장 — 인터넷에 열린 엔진이라 필수 | 아소카(코드 추가 필요) |
+| `/lab/sfu` 하드코딩 터널 주소 제거 | env 기본값 + 화면 입력 칸 | 아소카 — **완료(2026-10-26)** |
+| `/lab/sfu` 가 입장권(`/api/media/ticket`)을 받아 join | 개발용 입장 없이 입장 — 인터넷에 열린 엔진이라 필수 | 아소카 — **완료(2026-10-26)** |
 | 엔진 `MEDIA_ALLOWED_ORIGINS` | seminar 앱의 실제 Origin | 형식 `https://호스트`(경로·끝 슬래시 없음), 여러 개면 쉼표. 엔진은 문자열 그대로 비교하므로 하나라도 다르면 403 "origin 불허", 비우면 기동 거부 [확인중 : Pi Browser 가 보내는 Origin — 실기기 1회 확인] |
 
 ⚠ 엔진을 인터넷에 열 때 개발용 입장(`MEDIA_DEV_TICKET=1`)을 켜면 주소를 아는 누구나 방에 들어옵니다. `run-engine.cmd` 의 `MEDIA_ENV=production` 이 이를 코드에서 막습니다 — 지우지 마세요.
 
 ## 6. 시험 순서
-0. **선행** : 5절 아소카 코드 반영 + Vercel `NEXT_PUBLIC_MEDIA_WS_URL`·`MEDIA_TOKEN_SECRET` 등록 + Redeploy. 발표자 휴대폰은 **관리자(ADMIN) 계정**으로 로그인(발표 입장권은 관리자만 발급), 청중은 아무 계정으로 로그인
+0. **선행** : (아소카 코드는 2026-10-26 반영) Vercel `NEXT_PUBLIC_MEDIA_WS_URL`·`MEDIA_TOKEN_SECRET` 등록 + Redeploy. 발표자 휴대폰은 **관리자(ADMIN) 계정**으로 로그인(발표 입장권은 관리자만 발급), 청중은 아무 계정으로 로그인
 1. 4.5 확인 5개 통과
 2. **발표자·청중 모두 LTE(와이파이 끔)** 로 `/ko/lab/sfu` 접속 → 발표자 1 → 청중 2. 청중이 영상을 받으면 **M1 완료**(LAN·LTE 모두 통과)
 3. 성공 뒤 집 와이파이 단말을 1대 추가해 헤어핀 NAT 확인(7절) — 실패해도 M1 판정과 무관
@@ -202,7 +282,7 @@ galapagos.exe
 | 같은 집 와이파이 단말 | 엔진은 공인 IP 를 알리고 앱은 공인 주소로 접속하므로, 공유기가 "자기 공인 IP 로 되돌아오는 연결(헤어핀 NAT)"을 지원해야 집 안에서도 **신호(wss 443)·영상(UDP 7882) 모두** 붙습니다 [확인중 : 공유기 기종]. 안 되면 집 안 시험은 지금 방식(마스터 PC + 임시 터널) 유지 |
 | 공인 IP 변경 | 통신사가 IP 를 바꾸면 DuckDNS 는 5분 안에 따라가지만, 엔진의 `MEDIA_PUBLIC_IP` 는 수동 수정 + 엔진 재시작 필요(자동화는 후속) |
 | Pi Node 영향 | 영상 송출이 업로드 대역폭·CPU 를 나눠 씀 → 세미나 중 Pi Node 동작에 영향이 있을 수 있음 |
-| 노출 범위 | 공유기에서 여는 포트는 TCP 443·UDP 7882 두 개뿐. 그 PC 의 공유 폴더·원격 접속은 열지 않음 |
+| 노출 범위 | 0~4절 방식 : 공유기에서 TCP 443·UDP 7882 두 개만. ★현행(대안 1) : 공유기는 UDP 7882 하나, 신호는 터널이 엔진의 **모든 HTTP 경로**를 공개하므로 `MEDIA_ADMIN_SECRET` 을 넣지 않음(`/admin/` 404 유지). 그 PC 의 공유 폴더·원격 접속은 열지 않음 |
 | 통신사 약관 | 가정용 회선에서 서버·상업 서비스 운영이 제한될 수 있음 [확인중 : 통신사 약관] — 시험용으로만, 운영은 VM |
 | 정전·재부팅 | 작업 스케줄러가 켜질 때 자동 실행. 정전이 잦으면 VM |
 
@@ -211,7 +291,7 @@ galapagos.exe
 - **청중 30명·운영** : 업로드 대역폭·안정성 때문에 클라우드 VM(C-5) — 엔진은 같은 프로그램이라 옮기기만 하면 됨
 - 2절 ② 에서 CGNAT 로 판정되면 이 가이드는 쓸 수 없음 → 바로 VM
 
-## 부록 — 192.168.0.8 이 Linux 라면
+## 부록 — 192.168.0.16 이 Linux 라면
 - 엔진 : 아소카가 `GOOS=linux GOARCH=amd64` 로 빌드 → `/opt/galapagos/galapagos`
 - 자동 시작 : systemd 서비스(`Restart=always`, 전용 저권한 사용자, 환경변수는 `/etc/galapagos.env` 권한 600, `MEDIA_ENV=production` 포함)
 - Caddy : 배포판 패키지 설치, `/etc/caddy/Caddyfile` 에 4.2 와 같은 내용
