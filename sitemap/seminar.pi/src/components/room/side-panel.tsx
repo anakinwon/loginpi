@@ -1,6 +1,6 @@
 'use client'
 // 사이드 패널 — 채팅·참가자 탭(설계서 14.4·5.3). 닫아도 언마운트하지 않는다(쓰던 글·스크롤 유지, 안 읽은 수는 room-view 가 센다).
-// 폭 <580px 이면 전체 화면, 그 이상은 룸 오른쪽 열. 채팅은 저장 안 함(엔진 중계만 — 늦게 들어오면 이전 대화 없음, 13절 #2)
+// 폭 <580px 이면 전체 화면(포커스 가둠), 그 이상은 룸 오른쪽 열. 탭 ←→·Esc 닫기. 채팅은 저장 안 함(엔진 중계만 — 늦게 들어오면 이전 대화 없음, 13절 #2)
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ICON, Icon, type PanelTab } from './control-bar'
@@ -9,6 +9,8 @@ import type { ChatMsg, Peer, SessionRole } from './use-room'
 
 const CHAT_MAX = 500 // SIGNAL_API 3.3 C. maxLength 는 UTF-16 단위라 이모지는 2로 센다 → 서버(문자 수)보다 엄격, 넘칠 일 없음
 const SAME_SENDER_MS = 60000 // 같은 사람이 1분 안에 이어 쓰면 이름·시각 줄 생략(설계서 14.4)
+const FULL_SCREEN = '(max-width: 579.98px)' // 아래 className 의 min-[580px] 와 짝 — 이 폭에선 패널이 전체 화면
+const FOCUSABLE = ':is(button, input, a[href], [tabindex]):not([disabled]):not([tabindex="-1"])'
 
 export function SidePanel({
   tab,
@@ -40,14 +42,64 @@ export function SidePanel({
   const t = useTranslations('room')
   const id = useId()
   const tabs: PanelTab[] = ['chat', 'people']
+  const tabEl = (x: PanelTab) => document.getElementById(`${id}-${x}`)
+  const asideRef = useRef<HTMLElement>(null)
+  // 열리면 활성 탭으로 포커스, 닫히면(포커스가 패널 안·없음일 때만) 연 곳으로 돌려준다. tab 은 열 때 값만 본다
+  useEffect(() => {
+    if (!open) return
+    const back = document.activeElement as HTMLElement | null
+    tabEl(tab)?.focus()
+    return () => {
+      const cur = document.activeElement
+      if ((cur === document.body || asideRef.current?.contains(cur)) && back?.isConnected) back.focus()
+    }
+  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 탭 목록 키보드(WAI-ARIA 탭 패턴, roving tabindex) — ←→ 순환·Home·End 로 바로 전환하고 포커스 이동
+  function tabKeys(e: React.KeyboardEvent) {
+    const i = tabs.indexOf(tab)
+    const n = tabs.length
+    const next =
+      e.key === 'ArrowRight'
+        ? tabs[(i + 1) % n]
+        : e.key === 'ArrowLeft'
+          ? tabs[(i - 1 + n) % n]
+          : e.key === 'Home'
+            ? tabs[0]
+            : e.key === 'End'
+              ? tabs[n - 1]
+              : null
+    if (!next) return
+    e.preventDefault()
+    onTab(next)
+    tabEl(next)?.focus()
+  }
+
+  // Esc = 닫기. 폭 <580px(전체 화면 패널)에선 Tab 이 패널 밖 무대·바로 새지 않게 가둔다
+  function panelKeys(e: React.KeyboardEvent<HTMLElement>) {
+    if (e.key === 'Escape') {
+      e.stopPropagation()
+      return onClose()
+    }
+    if (e.key !== 'Tab' || !window.matchMedia(FULL_SCREEN).matches) return
+    const els = [...e.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((el) => !el.closest('[hidden]'))
+    if (!els.length) return
+    const edge = e.shiftKey ? els[0] : els[els.length - 1]
+    if (document.activeElement !== edge) return
+    e.preventDefault()
+    ;(e.shiftKey ? els[els.length - 1] : els[0]).focus()
+  }
+
   return (
     <aside
+      ref={asideRef}
       hidden={!open}
       aria-label={t('panel.title')}
+      onKeyDown={panelKeys}
       className="bg-surface fixed inset-0 z-30 flex flex-col min-[580px]:static min-[580px]:z-auto min-[580px]:h-[min(80dvh,720px)] min-[580px]:w-80 min-[580px]:shrink-0 min-[580px]:rounded-xl"
     >
       <div className="flex items-center gap-1 border-b border-white/10 p-2">
-        <div role="tablist" aria-label={t('panel.title')} className="flex flex-1 gap-1">
+        <div role="tablist" aria-label={t('panel.title')} onKeyDown={tabKeys} className="flex flex-1 gap-1">
           {tabs.map((x) => (
             <button
               key={x}
@@ -56,6 +108,7 @@ export function SidePanel({
               id={`${id}-${x}`}
               aria-selected={tab === x}
               aria-controls={`${id}-${x}-panel`}
+              tabIndex={tab === x ? 0 : -1}
               onClick={() => onTab(x)}
               className={`h-10 flex-1 rounded-lg text-sm font-medium ${tab === x ? 'bg-surface-raised' : 'text-muted-foreground'}`}
             >
