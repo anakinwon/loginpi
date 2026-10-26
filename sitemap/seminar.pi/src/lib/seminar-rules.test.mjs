@@ -11,6 +11,9 @@ import {
   parsePage,
   parseTab,
   payErrorCode,
+  START_AHEAD_MAX_MS,
+  startAtOk,
+  stalePayState,
 } from './seminar-rules.ts'
 
 test('탭·페이지 해석', () => {
@@ -56,4 +59,23 @@ test('결과 코드 매핑', () => {
   assert.equal(payErrorCode('weird'), 'INTERNAL')
   assert.ok(isUuid('6f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e5f'))
   assert.ok(!isUuid('lab-room'))
+})
+
+test('이전 APPROVED 결제 정리 판정(S2)', () => {
+  const st = (cancelled, user_cancelled) => ({ ok: true, payment: { status: { cancelled, user_cancelled } } })
+  assert.equal(stalePayState(st(true, false)), 'gone')
+  assert.equal(stalePayState(st(false, true)), 'gone')
+  assert.equal(stalePayState(st(false, false)), 'pending')
+  assert.equal(stalePayState({ ok: false, status: 404 }), 'gone')
+  // 타임아웃(0)·5xx·키 없음은 판정 불가 → 막는 쪽
+  for (const status of [0, 500, 502]) assert.equal(stalePayState({ ok: false, status }), 'pending')
+})
+
+test('개설 시작일시 상한(S5)', () => {
+  const now = 1_700_000_000_000
+  assert.equal(startAtOk(now + 1, now), true)
+  assert.equal(startAtOk(now + START_AHEAD_MAX_MS, now), true)
+  assert.equal(startAtOk(now + START_AHEAD_MAX_MS + 1, now), false)
+  assert.equal(startAtOk(now, now), false)
+  assert.equal(startAtOk(NaN, now), false)
 })

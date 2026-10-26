@@ -86,3 +86,25 @@ const PAY_CODES: Record<string, string> = {
 }
 export const payErrorCode = (code: string) =>
   code.startsWith('SMN_') ? code : (PAY_CODES[code] ?? 'INTERNAL')
+
+// 이전 APPROVED 결제의 Pi 조회 결과 → 정리할지(보안 검토 S2). 'gone' = Pi 에서 취소·만료(또는 404 없음) → 원장 CANCELED,
+//  'pending' = 아직 진행 중이거나 판정 불가(타임아웃·5xx) → 새 결제를 막는다(안전 쪽)
+export type PiLookup =
+  | { ok: true; payment: { status: { cancelled: boolean; user_cancelled: boolean } } }
+  | { ok: false; status: number }
+export const stalePayState = (r: PiLookup): 'gone' | 'pending' =>
+  r.ok
+    ? r.payment.status.cancelled || r.payment.status.user_cancelled
+      ? 'gone'
+      : 'pending'
+    : r.status === 404
+      ? 'gone'
+      : 'pending'
+
+// 이전 결제 정리 상한(R-P4 — Pi 조회는 병렬, 이 수를 넘으면 정리하지 않고 막는다)
+export const STALE_LOOKUP_MAX = 3
+
+// 개설 시작일시 — 지금 이후 ~ 1년 안(보안 검토 S5)
+export const START_AHEAD_MAX_MS = 366 * 24 * 60 * 60 * 1000
+export const startAtOk = (ms: number, now = Date.now()) =>
+  Number.isFinite(ms) && ms > now && ms <= now + START_AHEAD_MAX_MS
