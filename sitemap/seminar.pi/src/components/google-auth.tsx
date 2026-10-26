@@ -9,6 +9,7 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { piFetch, usePiAuth, type PiSessionUser } from '@pi/auth/client'
 import { env } from '@/env'
+import { BTN, BTN_PRIMARY } from '@/components/seminar/shared'
 import { readApi, useApiErrorText } from '@/lib/client-api'
 
 export const googleLoginEnabled = env.NEXT_PUBLIC_GOOGLE_LOGIN === '1'
@@ -100,7 +101,7 @@ export function useAppUser() {
 }
 
 export function GoogleLoginButton({
-  className = 'btn',
+  className = BTN,
 }: {
   className?: string
 }) {
@@ -122,7 +123,7 @@ export function GoogleSignOutButton() {
   return (
     <button
       type="button"
-      className="btn text-sm"
+      className={BTN}
       onClick={() => void signOut({ callbackUrl: '/' })}
     >
       {t('signOut')}
@@ -134,7 +135,7 @@ export function GoogleSignOutButton() {
 export function LinkCheckFailed() {
   const t = useTranslations('auth')
   return (
-    <p className="text-destructive text-sm" role="alert">
+    <p className="text-danger text-sm" role="alert">
       {t('linkCheckFailed')}
     </p>
   )
@@ -151,7 +152,7 @@ export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
 
   return (
     <form
-      className="card flex flex-col gap-2"
+      className="bg-surface rounded-xl p-4 flex flex-col gap-2"
       onSubmit={async (e) => {
         e.preventDefault()
         setBusy(true)
@@ -188,7 +189,7 @@ export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
       />
       {msg && (
         <p
-          className={msg.ok ? 'text-sm' : 'text-destructive text-sm'}
+          className={msg.ok ? 'text-sm' : 'text-danger text-sm'}
           role={msg.ok ? 'status' : 'alert'}
         >
           {msg.text}
@@ -196,7 +197,7 @@ export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
       )}
       <div className="flex gap-2">
         <button
-          className="btn btn-primary"
+          className={BTN_PRIMARY}
           disabled={busy || code.length !== 6}
         >
           {t('submit')}
@@ -230,7 +231,7 @@ export function PiLinkCodeIssuer() {
   }, [issued])
 
   return (
-    <div className="card flex flex-col gap-2">
+    <div className="bg-surface rounded-xl p-4 flex flex-col gap-2">
       <p className="font-medium">{t('piIssueTitle')}</p>
       <p className="text-sm">{t('codeHint')}</p>
       {issued ? (
@@ -244,13 +245,13 @@ export function PiLinkCodeIssuer() {
         </>
       ) : null}
       {error && (
-        <p className="text-destructive text-sm" role="alert">
+        <p className="text-danger text-sm" role="alert">
           {error}
         </p>
       )}
       <div>
         <button
-          className="btn btn-primary"
+          className={BTN_PRIMARY}
           disabled={busy}
           onClick={async () => {
             setBusy(true)
