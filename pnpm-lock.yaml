@@ -190,6 +190,18 @@ importers:
         specifier: ^19
         version: 19.2.7
 
+  packages/pi-payments:
+    devDependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.107.0
+        version: 2.117.3
+      '@types/node':
+        specifier: ^22.19.20
+        version: 22.19.20
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   sitemap/schema.pi:
     dependencies:
       '@anthropic-ai/sdk':

@@ -1,0 +1,22 @@
+{
+  "name": "@pi/payments",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pi 멀티사이트 공용 U2A 결제(서버 전용) — Pi Platform API 클라이언트(조회·approve·complete·cancel, 10초)·pi_pymnt 원장 전이·앱 검증기 기반 approve/complete/cancel 흐름",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --import ./test/resolve-ts.mjs --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@supabase/supabase-js": "^2.107.0"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.107.0",
+    "@types/node": "^22.19.20",
+    "typescript": "^6.0.3"
+  }
+}
