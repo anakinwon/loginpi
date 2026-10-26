@@ -277,6 +277,8 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     patchPeer(d.peerId, { role: d.role, ...(d.role === 'panel' ? { raisedTs: 0 } : {}) })
     if (d.peerId === selfRef.current) {
       setRole(d.role)
+      // 발행 권한이 다시 생겼다 — 이전 ROLE_FORBIDDEN 표시를 풀어야 화면이 새 역할(panel·presenter)로 돌아온다
+      if (d.role !== 'audience') setForbidden(false)
       log(`내 역할 → ${d.role}`)
       if (d.role === 'audience') {
         // 강등 — 서버가 내 producer 를 닫았다. 내 트랙·발행 PC 정리, 손 목록은 청중 범위 밖이라 비운다
