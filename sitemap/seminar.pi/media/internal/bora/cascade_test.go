@@ -3,8 +3,11 @@
 package bora
 
 import (
+	"slices"
 	"testing"
+	"time"
 
+	"seminar.pi/media/internal/capri"
 	"seminar.pi/media/internal/jeju"
 	"seminar.pi/media/internal/santorini"
 	"seminar.pi/media/internal/signal"
@@ -114,5 +117,41 @@ func TestLateJoinerState(t *testing.T) {
 				}
 			})
 		})
+	}
+}
+
+// 실제 Join 경로(capri 구독 PC 생성 → 기존 producer consume → OfferBatch 뒤 negotiate)에서
+// 일시정지된 producer 를 늦게 구독하면 알림 순서가 consumerCreated → producerPaused → transport.subscribe 인지(SIGNAL_API 4절, M3 정정 4번).
+func TestJoinPausedProducerNotifyOrder(t *testing.T) {
+	f := newFixture(t)
+	api, err := capri.NewAPI(capri.Config{Loopback: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.r.exec(func() { f.r.api = api })
+	if e := f.r.PauseProducer("A", "pa", true); e != nil {
+		t.Fatal(e)
+	}
+	d := &fakeSession{id: "D"}
+	f.r.exec(func() { f.sess["D"] = d })
+	if _, e := f.r.Join(signal.Ticket{Role: signal.RoleAudience, Sub: "d-user", Cap: 31}, d); e != nil {
+		t.Fatal(e)
+	}
+	var got []string
+	for end := time.Now().Add(3 * time.Second); time.Now().Before(end); time.Sleep(10 * time.Millisecond) {
+		f.r.exec(func() { got = slices.Clone(d.got) })
+		if slices.Contains(got, signal.NTransportSubscribe) {
+			break
+		}
+	}
+	var seq []string // trickle(서버 ICE 후보)은 순서 검사에서 뺀다 — 수집 시점이 비결정적
+	for _, m := range got {
+		if m != signal.MTrickle {
+			seq = append(seq, m)
+		}
+	}
+	want := []string{signal.NConsumerCreated, signal.NProducerPaused, signal.NTransportSubscribe}
+	if !slices.Equal(seq, want) {
+		t.Fatalf("알림 순서 %v 기대 %v (원본 %v)", seq, want, got)
 	}
 }
