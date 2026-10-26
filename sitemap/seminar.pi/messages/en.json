@@ -273,6 +273,14 @@
       "e5": "Speechless",
       "e6": "Love"
     },
+    "quality": {
+      "label": "Quality",
+      "auto": "Auto",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "unstable": "Your network is unstable"
+    },
     "roles": {
       "presenter": "Presenter",
       "panel": "Panelist",

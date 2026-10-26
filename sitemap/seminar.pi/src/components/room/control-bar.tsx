@@ -1,6 +1,6 @@
 'use client'
 // 하단 컨트롤 바 — 역할별 버튼(설계서 6.1·14.3 표) : presenter·panel = 마이크·카메라·채팅·참가자·화면공유(+손 목록 / 반응),
-// audience = 손들기·반응·채팅·참가자. 나가기·소리 켜기는 슬롯 밖. 꺼짐 = danger 색 + 사선 아이콘(색만으로 상태를 전하지 않음), 아이콘만 보여도 aria-label 유지.
+// audience = 손들기·반응·채팅·참가자·화질(M4 수동 상한). 나가기·소리 켜기는 슬롯 밖. 꺼짐 = danger 색 + 사선 아이콘(색만으로 상태를 전하지 않음), 아이콘만 보여도 aria-label 유지.
 // 폭 기반 슬롯(565/420/370) + 더보기(넘친 버튼이 1개면 바로 노출) · 폭 > 760px 텍스트 라벨 · 단축키 Ctrl/⌘+D·E · 자동 숨김(useBarVisibility)
 import {
   useEffect,
@@ -13,10 +13,16 @@ import {
   type ReactNode,
 } from 'react'
 import { useTranslations } from 'next-intl'
-import { BAR, barOrder, mainSlots, splitSlots, type BarId } from './room-rules'
+import { BAR, barOrder, mainSlots, QUALITY_CAPS, splitSlots, type BarId, type QualityCap } from './room-rules'
 import type { MediaKind, SessionRole } from './use-room'
 
-export const ICON: Record<MediaKind | 'leave' | 'more' | 'screen' | 'chat' | 'people' | 'close', string> = {
+export const ICON: Record<
+  MediaKind | 'leave' | 'more' | 'screen' | 'chat' | 'people' | 'close' | 'quality' | 'warn',
+  string
+> = {
+  quality:
+    'M3 6h11v2H3V6Zm15 0h3v2h-3v2h-2V4h2v2ZM3 16h3v2H3v-2Zm7 0h11v2H10v-2Zm-2-2h2v6H8v-6Zm-5-3h7v2H3v-2Zm11 0h7v2h-7v2h-2V9h2v2Z',
+  warn: 'M12 2 1 21h22L12 2Zm1 15h-2v-2h2v2Zm0-4h-2V9h2v4Z',
   screen: 'M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-7v2h3v2H8v-2h3v-2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v9h16V6H4Z',
   chat: 'M6 4h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V6a2 2 0 0 1 2-2Z',
   people:
@@ -220,6 +226,7 @@ export function BarButton({
   accent?: boolean // 켜짐을 강조색으로(손들기)
   onClick: () => void
   'data-react-trigger'?: boolean
+  'data-quality-trigger'?: boolean
   'aria-haspopup'?: 'menu' // 메뉴를 여는 버튼(반응) — 토글 상태는 aria-expanded 로(aria-pressed 대신)
   'aria-expanded'?: boolean
 }) {
@@ -276,6 +283,8 @@ export function ControlBar({
   raised,
   handUp,
   reactOpen,
+  qualityOpen,
+  qualityCap,
   soundBlocked,
   width,
   onHold,
@@ -284,6 +293,7 @@ export function ControlBar({
   onPanel,
   onHand,
   onReact,
+  onQuality,
   onSound,
   onLeave,
 }: {
@@ -300,6 +310,8 @@ export function ControlBar({
   raised: number // 손든 사람 수(presenter 손 목록 배지)
   handUp: boolean // 내 손(audience)
   reactOpen: boolean
+  qualityOpen: boolean
+  qualityCap: QualityCap
   soundBlocked: boolean
   width: number // 룸 영역 폭(px) — 슬롯 수·라벨 판정(사이드 패널이 열리면 좁아진다)
   onHold: (hold: boolean) => void // 메뉴 열림 등으로 자동 숨김을 보류
@@ -308,6 +320,7 @@ export function ControlBar({
   onPanel: (tab: PanelTab) => void
   onHand: (raised: boolean) => void
   onReact: () => void
+  onQuality: () => void // 화질 메뉴 열기·닫기(청중)
   onSound: () => void
   onLeave: () => void
 }) {
@@ -409,6 +422,19 @@ export function ControlBar({
             />
           )
         : null,
+    quality:
+      role === 'audience'
+        ? (o) => (
+            <BarButton
+              {...o}
+              icon={<Icon d={ICON.quality} />}
+              text={`${t('quality.label')} · ${t(`quality.${qualityCap}`)}`}
+              {...(o.menu ? {} : { 'aria-haspopup': 'menu' as const, 'aria-expanded': qualityOpen })}
+              data-quality-trigger
+              onClick={onQuality}
+            />
+          )
+        : null,
   }
 
   function mediaNode(k: MediaKind): BarItem['node'] {
@@ -459,6 +485,50 @@ export function ControlBar({
         {labels && <span aria-hidden>{t('leave')}</span>}
       </button>
     </nav>
+  )
+}
+
+// 화질 메뉴(청중, 설계서 14.3 '화질' 칸) — 자동/높음/보통/낮음 중 하나(menuitemradio), 고르면 닫는다. 자동 계산 레이어를 이 값으로 자른다
+export function QualityMenu({
+  open,
+  cap,
+  onClose,
+  onPick,
+}: {
+  open: boolean
+  cap: QualityCap
+  onClose: () => void
+  onPick: (c: QualityCap) => void
+}) {
+  const t = useTranslations('room')
+  const m = useMenu(open, onClose, '[data-quality-trigger]', '[data-more-trigger]')
+  if (!open) return null
+  return (
+    <div ref={m.rootRef} className="relative">
+      <div
+        ref={m.menuRef}
+        role="menu"
+        aria-label={t('quality.label')}
+        onKeyDown={menuKeys}
+        className={`${MENU_SURFACE} sm:right-1/2! sm:translate-x-1/2`}
+      >
+        {QUALITY_CAPS.map((c) => (
+          <button
+            key={c}
+            type="button"
+            role="menuitemradio"
+            aria-checked={c === cap}
+            onClick={() => {
+              onPick(c)
+              onClose()
+            }}
+            className={`hover:bg-surface-raised h-12 rounded-full px-4 text-left text-sm ${c === cap ? 'ring-accent font-semibold ring-2' : ''}`}
+          >
+            {t(`quality.${c}`)}
+          </button>
+        ))}
+      </div>
+    </div>
   )
 }
 

@@ -5,7 +5,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { ICON, Icon } from './control-bar'
 import { nextSpeaking, SPEAK } from './room-rules'
-import { StreamVideo } from './stage'
+import { StreamVideo, type LayerFn } from './stage'
 
 // 공용 AudioContext 1개 — 브라우저마다 동시 컨텍스트 수 상한이 있어 타일마다 만들지 않는다. 트랙마다 analyser 만 따로,
 // 마지막 사용자가 빠지면 닫는다(다음 사용 때 새로 만든다)
@@ -63,6 +63,8 @@ export function VideoTile({
   micOff,
   camOff,
   mirror,
+  consumerId,
+  onLayer,
   children,
 }: {
   video: MediaStream | null
@@ -71,6 +73,8 @@ export function VideoTile({
   micOff: boolean
   camOff: boolean
   mirror?: boolean
+  consumerId?: string // 원격 영상이면 그 consumer(수신 화질 판정, 설계서 14.2)
+  onLayer?: LayerFn
   children?: ReactNode // 타일 위 안내·스피너
 }) {
   const t = useTranslations('room')
@@ -80,7 +84,15 @@ export function VideoTile({
   const showAvatar = !!name && (!hasVideo || camOff)
   return (
     <div className="bg-surface relative aspect-video w-full overflow-hidden rounded-xl">
-      {hasVideo && <StreamVideo stream={video} mirror={mirror} className={camOff ? 'invisible' : ''} />}
+      {hasVideo && (
+        <StreamVideo
+          stream={video}
+          mirror={mirror}
+          className={camOff ? 'invisible' : ''}
+          consumerId={consumerId}
+          onLayer={onLayer}
+        />
+      )}
       {showAvatar && (
         <div className="absolute inset-0 grid place-items-center" aria-hidden>
           <span className="bg-surface-raised grid size-20 place-items-center rounded-full text-3xl font-bold uppercase">
