@@ -16,6 +16,8 @@ const (
 	maxRtxPerLoss  = 2.0                    // T6 : 손실 순번당 재전송 평균 — 넘으면 중복 재전송 폭주
 	maxPLIPerSecL0 = 2.0                    // Q8 : 레이어 l(0) 초당 2회
 	minPLIGapL0    = 450 * time.Millisecond // Limiter 500ms − 피드백 주기·타이머 여유
+	limiterL0      = 500 * time.Millisecond // 레이어 l Limiter 간격 — 폭주 창 안 최대 PLI = 창/간격 + 1(첫 PLI 는 창 시작 경계)
+	cleanTail      = 300 * time.Millisecond // run 뒤 손실 없이 더 보내는 구간 — 마지막 손실도 뒤 패킷으로 구멍이 드러나게
 	warmup         = 1500 * time.Millisecond
 )
 
@@ -32,6 +34,7 @@ type scenario struct {
 type outcome struct {
 	subs     []subResult
 	d        counterDelta
+	dRun     counterDelta // 손실 구간(run)만의 증가분 — T7 폭주와 섞지 않는다
 	pub      *pubBot
 	stormPLI []time.Time
 	runSec   float64
@@ -76,9 +79,14 @@ func runScenario(t *testing.T, sc scenario) outcome {
 		time.Sleep(10 * time.Millisecond)
 	}
 	runSec := time.Since(start).Seconds()
+	dRun := delta(before)
+	pubTx.setLoss(0) // 끝 구간 : 손실을 풀고 조금 더 보내 run 마지막 손실도 구멍으로 잡히게(재전송도 이 구간엔 손실 없음 — 5.1 한계)
+	for _, rx := range sc.subRx {
+		rx.setLoss(0)
+	}
+	time.Sleep(cleanTail)
 	var storm []time.Time
 	if sc.storm > 0 {
-		pubTx.setLoss(0)
 		time.Sleep(drainWait) // 앞 구간 구멍 정리 뒤 폭주
 		mark := len(pub.PLIs())
 		for _, s := range subs {
@@ -92,9 +100,10 @@ func runScenario(t *testing.T, sc scenario) outcome {
 	}
 	pub.Stop()
 	time.Sleep(drainWait)
-	o := outcome{d: delta(before), pub: pub, stormPLI: storm, runSec: runSec}
+	o := outcome{d: delta(before), dRun: dRun, pub: pub, stormPLI: storm, runSec: runSec}
+	last := uint16(pub.lastSeq.Load())
 	for _, s := range subs {
-		o.subs = append(o.subs, s.result())
+		o.subs = append(o.subs, s.result(last))
 	}
 	t.Logf("[%s] 엔진 증가분 nackIn=%d nackOut=%d rtx=%d dupNack=%d cacheMiss=%d(%.1f%%) pliOut=%d queueDrops=%d keyframes=%d packetsOut=%d",
 		sc.name, o.d["nackIn"], o.d["nackOut"], o.d["retransmits"], o.d["duplicateNack"], o.d["cacheMiss"],
@@ -102,9 +111,9 @@ func runScenario(t *testing.T, sc scenario) outcome {
 	t.Logf("[%s] 발표자 받은 NACK 순번=%d 재전송=%d PLI=%d · 상류 손실 버림=%d/%d", sc.name, pub.nacked.Load(), pub.resent.Load(),
 		len(pub.PLIs()), pubTx.dropped.Load(), pubTx.dropped.Load()+pubTx.passed.Load())
 	for i, r := range o.subs {
-		t.Logf("[%s] %s 받음=%d 중복=%d 구멍=%d 회복=%d(%.2f%%) 포기=%d 남음=%d NACK=%d PLI=%d 회복시간 p50=%v p95=%v max=%v · 하류 버림=%d",
+		t.Logf("[%s] %s 받음=%d 중복=%d 구멍=%d 회복=%d(%.2f%%) 포기=%d 남음=%d NACK=%d PLI=%d 회복시간 p50=%v p95=%v max=%v 끝구간=%d · 하류 버림=%d",
 			sc.name, r.Name, r.Received, r.Dups, r.Lost, r.Recovered, 100*r.RecoveredRatio(), r.GaveUp, r.StillMiss,
-			r.NACKSent, r.PLISent, r.RecoverP50, r.RecoverP95, r.RecMax, sc.subRx[i].dropped.Load())
+			r.NACKSent, r.PLISent, r.RecoverP50, r.RecoverP95, r.RecMax, r.Tail, sc.subRx[i].dropped.Load())
 	}
 	return o
 }
@@ -112,6 +121,9 @@ func runScenario(t *testing.T, sc scenario) outcome {
 // checkRecovery — 손실이 걸린 청중의 회복률·회복 시간.
 func checkRecovery(t *testing.T, name string, r subResult) {
 	t.Helper()
+	if r.Tail != 0 {
+		t.Errorf("[%s] %s : 발표자 마지막 순번까지 못 받음(끝 구간 %d — 구멍으로도 안 잡힌 손실)", name, r.Name, r.Tail)
+	}
 	if r.Lost == 0 {
 		t.Errorf("[%s] %s : 구멍이 하나도 없음 — 손실 주입이 안 됨", name, r.Name)
 		return
@@ -200,10 +212,12 @@ func TestLossT7Upstream3(t *testing.T) {
 	for _, r := range o.subs {
 		sent += r.PLISent
 	}
+	checkPLIRate(t, "T7 손실 구간", o.dRun, o.runSec)
 	st := o.stormPLI
-	t.Logf("[T7] PLI 폭주 : 청중 송신 합계(전 구간)=%d · 폭주 3초 동안 발표자 수신=%d", sent, len(st))
-	if r := float64(len(st)) / 3; r > maxPLIPerSecL0 {
-		t.Errorf("[T7] 폭주 중 발표자 PLI %.2f/초 > %.0f/초", r, maxPLIPerSecL0)
+	t.Logf("[T7] PLI : 손실 구간 PLIOut=%d(%.1f초) · 청중 송신 합계(전 구간)=%d · 폭주 3초 동안 발표자 수신=%d", o.dRun["pliOut"], o.runSec, sent, len(st))
+	// 첫 PLI 는 창 시작 경계에 올 수 있어 그 뒤 간격 수로 센다 : (n−1) ≤ 창/Limiter 간격
+	if limit := int(3 * time.Second / limiterL0); len(st)-1 > limit {
+		t.Errorf("[T7] 폭주 중 발표자 PLI %d건 — 첫 PLI 뒤 %d건 > %d건(3초/%v)", len(st), len(st)-1, limit, limiterL0)
 	}
 	for i := 1; i < len(st); i++ {
 		if g := st[i].Sub(st[i-1]); g < minPLIGapL0 {

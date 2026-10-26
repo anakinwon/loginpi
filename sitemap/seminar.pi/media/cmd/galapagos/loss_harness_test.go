@@ -218,6 +218,7 @@ type pubBot struct {
 	forceKey atomic.Bool
 	nacked   atomic.Uint64 // 엔진이 요청한 순번 수
 	resent   atomic.Uint64 // 이력에 있어 다시 보낸 수
+	lastSeq  atomic.Uint32 // 마지막으로 보낸 발표자 순번(끝 구간 손실 확인용 — 청중이 페이로드 끝 2바이트로 받은 최대값과 비교)
 	stop     chan struct{}
 	stopped  sync.WaitGroup
 }
@@ -323,12 +324,14 @@ func (b *pubBot) send() {
 				pl[1] = 0x00
 			}
 		}
+		pl[payloadSize-2], pl[payloadSize-1] = byte(seq>>8), byte(seq) // 발표자 순번 표식 — 엔진은 VP8 기술자(앞쪽)만 고친다
 		p := &rtp.Packet{Header: rtp.Header{Version: 2, SequenceNumber: seq, Timestamp: ts, Marker: i%pktPerFrame == pktPerFrame-1}, Payload: pl}
 		b.mu.Lock()
 		b.hist[int(seq)%pubHistory] = p
 		b.mu.Unlock()
 		cp := *p // WriteRTP 가 헤더(SSRC·PT)를 고치므로 사본으로
 		_ = b.track.WriteRTP(&cp)
+		b.lastSeq.Store(uint32(seq))
 		seq++
 		if p.Marker {
 			ts += 3600
@@ -369,6 +372,8 @@ type subBot struct {
 	pc        *webrtc.PeerConnection
 	ssrc      uint32
 	ext       rtpx.SeqExtender
+	pubExt    rtpx.SeqExtender // 페이로드 표식(발표자 순번) 확장
+	pubMax    uint64
 	started   bool
 	max       uint64
 	seen      map[uint64]bool
@@ -428,7 +433,11 @@ func startSubscriber(t *testing.T, url, name string, conn net.PacketConn, pliAft
 			if err != nil {
 				return
 			}
-			s.onRTP(p.SequenceNumber, time.Now())
+			var pubSeq uint16
+			if n := len(p.Payload); n >= 2 {
+				pubSeq = uint16(p.Payload[n-2])<<8 | uint16(p.Payload[n-1])
+			}
+			s.onRTP(p.SequenceNumber, pubSeq, time.Now())
 		}
 	})
 	done := make(chan struct{})
@@ -454,10 +463,11 @@ func (s *subBot) readSR(rx *webrtc.RTPReceiver) {
 	}
 }
 
-func (s *subBot) onRTP(seq uint16, now time.Time) {
+func (s *subBot) onRTP(seq, pubSeq uint16, now time.Time) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.firstOnce.Do(func() { close(s.first) })
+	s.pubMax = max(s.pubMax, s.pubExt.Extend(pubSeq))
 	ext := s.ext.Extend(seq)
 	s.stats.Update(ext)
 	if s.seen[ext] {
@@ -556,6 +566,7 @@ type subResult struct {
 	Recovered, GaveUp, StillMiss   int
 	NACKSent, PLISent              int
 	RecoverP50, RecoverP95, RecMax time.Duration
+	Tail                           int // 발표자 마지막 순번 − 청중이 받은 최대 발표자 순번 : 뒤 패킷이 없어 구멍으로도 안 잡힌 끝 구간 손실
 }
 
 // RecoveredRatio — 구멍 난 순번 중 메워진 비율(구멍이 없으면 1).
@@ -566,7 +577,8 @@ func (r subResult) RecoveredRatio() float64 {
 	return float64(r.Recovered) / float64(r.Lost)
 }
 
-func (s *subBot) result() subResult {
+// result — pubLast = 발표자가 마지막으로 보낸 순번.
+func (s *subBot) result(pubLast uint16) subResult {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	d := slices.Clone(s.delays)
@@ -581,7 +593,8 @@ func (s *subBot) result() subResult {
 	if len(d) > 0 {
 		mx = d[len(d)-1]
 	}
-	return subResult{s.name, s.received, s.dups, s.lost, s.recovered, s.gaveUp, len(s.missing), s.nackSent, s.pliSent, q(0.5), q(0.95), mx}
+	return subResult{s.name, s.received, s.dups, s.lost, s.recovered, s.gaveUp, len(s.missing), s.nackSent, s.pliSent, q(0.5), q(0.95), mx,
+		int(pubLast - uint16(s.pubMax))}
 }
 
 // waitFirst — 첫 패킷 도착까지(연결 실패면 시험 중단).
