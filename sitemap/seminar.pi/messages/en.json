@@ -194,13 +194,26 @@
         "audio": "Couldn't change the microphone. Please try again.",
         "video": "Couldn't change the camera. Please try again."
       },
-      "forbidden": "You don't have permission to present, so you'll continue as audience."
+      "forbidden": "You don't have permission to present, so you'll continue as audience.",
+      "demoted": "You were moved back to the audience.",
+      "endFailed": "Could not end the seminar. Please try again.",
+      "chatFailed": "Message not sent.",
+      "actionFailed": "Could not complete the request. Please try again.",
+      "shareFailed": "Could not start screen sharing.",
+      "err": {
+        "RATE_LIMITED": "You are sending too fast. Please wait a moment.",
+        "ROLE_FORBIDDEN": "You do not have permission to do this.",
+        "MEDIA_FAILED": "Could not start your mic or camera. Please check permissions."
+      }
     },
     "home": "Go to home",
     "tile": {
       "self": "{name} (you)",
       "presenter": "Presenter",
-      "micOff": "Microphone off"
+      "micOff": "Microphone off",
+      "screen": "{name}'s screen",
+      "row": "Other speakers",
+      "pin": "Show {name} large"
     },
     "more": "More options",
     "joinNoCam": "Join without camera",
@@ -220,6 +233,68 @@
           "video": "Video upload is low at {kbps} kbps. Quality may drop."
         }
       }
+    },
+    "people": "{n} in the room",
+    "screen": {
+      "start": "Share screen",
+      "stop": "Stop sharing"
+    },
+    "panel": {
+      "title": "Chat and participants",
+      "chat": "Chat",
+      "people": "People",
+      "close": "Close panel"
+    },
+    "chat": {
+      "empty": "No messages yet. Chat is not saved.",
+      "me": "You",
+      "failed": "Not sent.",
+      "input": "Type a message",
+      "send": "Send"
+    },
+    "hand": {
+      "raise": "Raise hand",
+      "lower": "Lower hand",
+      "list": "Raised hands",
+      "lowerAll": "Lower all hands",
+      "raised": "Hand raised",
+      "notice": "{name} raised a hand.",
+      "dismiss": "Dismiss",
+      "waiting": "{n} people waiting to speak"
+    },
+    "react": {
+      "open": "Reactions",
+      "e0": "Like",
+      "e1": "Clap",
+      "e2": "Laugh",
+      "e3": "Surprised",
+      "e4": "Sad",
+      "e5": "Speechless",
+      "e6": "Love"
+    },
+    "roles": {
+      "presenter": "Presenter",
+      "panel": "Panelist",
+      "audience": "Audience"
+    },
+    "stage": {
+      "invite": "Invite to stage",
+      "remove": "Move to audience",
+      "promoted": "You were invited to the stage. Turn on your mic to speak (it does not turn on automatically).",
+      "later": "Later"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} raised a hand."
+    },
+    "leaveDialog": {
+      "title": "Leave the seminar",
+      "body": "You can leave on your own, or end the seminar and disconnect everyone.",
+      "confirmTitle": "End the seminar?",
+      "confirmBody": "Everyone will be disconnected and nobody can rejoin this seminar.",
+      "cancel": "Cancel",
+      "end": "End seminar",
+      "endConfirm": "End now"
     }
   }
 }

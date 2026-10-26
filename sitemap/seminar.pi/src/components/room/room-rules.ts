@@ -95,3 +95,93 @@ export function splitSlots<T>(items: T[], slots: number): { main: T[]; more: T[]
   if (items.length <= slots + 1) return { main: items, more: [] }
   return { main: items.slice(0, slots), more: items.slice(slots) }
 }
+
+// ── M3 (SIGNAL_API v1.1) ──
+
+export type PeerRole = 'presenter' | 'panel' | 'audience'
+export type PeerLike = { peerId: string; name: string; role: PeerRole; raisedTs: number }
+
+// 하단 바 버튼 우선순위(설계서 14.3 표) — 앞에서부터 메인 슬롯을 채운다. 가장 좁은 폭(≤370)의 청중은 반응보다 채팅이 앞
+// (표의 "손들기·채팅"). 화질(audience 565 칸)은 M4 consumer.setLayer 와 함께라 아직 없다
+export type BarId = 'audio' | 'video' | 'screen' | 'chat' | 'people' | 'hands' | 'hand' | 'react'
+export function barOrder(role: PeerRole, width: number): BarId[] {
+  if (role === 'audience')
+    return width > BAR.slotWidths[2] ? ['hand', 'react', 'chat', 'people'] : ['hand', 'chat', 'react', 'people']
+  return ['audio', 'video', 'chat', 'people', 'screen', role === 'presenter' ? 'hands' : 'react']
+}
+
+// 참가자 패널 정렬(설계서 14.4) — presenter → panel → 손든 audience(먼저 든 순, 서버 시각) → 나머지 이름순
+export function sortPeers<T extends PeerLike>(peers: T[]): T[] {
+  const rank = (p: T) => (p.role === 'presenter' ? 0 : p.role === 'panel' ? 1 : p.raisedTs > 0 ? 2 : 3)
+  return [...peers].sort(
+    (a, b) => rank(a) - rank(b) || (rank(a) === 2 ? a.raisedTs - b.raisedTs : 0) || a.name.localeCompare(b.name),
+  )
+}
+
+// 반응(설계서 14.4, SIGNAL_API 3.3 C) — 허용 7종, 보낼 때 500ms 묶음(묶음당 최대 3개), 받으면 화면 큐 50개·5초 소멸, 한 알림에서 최대 3종
+export const REACT = {
+  emojis: ['👍', '👏', '😀', '😮', '🙁', '😶', '💖'],
+  batchMs: 500,
+  maxPerBatch: 3,
+  maxKinds: 3,
+  queueCap: 50,
+  lifeMs: 5000,
+  lanes: 4, // 떠오르는 궤적 수(globals.css .float-up 레인)
+}
+
+// 묶음에 1개 추가 — 허용 밖이거나 이미 3개면 그대로(넘친 탭은 버린다)
+export function batchReaction(batch: string[], emoji: string): string[] {
+  if (!REACT.emojis.includes(emoji) || batch.length >= REACT.maxPerBatch) return batch
+  return [...batch, emoji]
+}
+
+export type Floater = { id: number; emoji: string; lane: number; born: number }
+
+// ntf reaction{counts} → 화면 큐. 지난 것(5초) 정리 후 많은 순 최대 3종을 개수만큼 넣되 큐는 50개 상한
+// (넘치면 새 것을 버린다 — 이미 떠 있는 것이 사라지며 튀지 않게)
+export function enqueueReactions(
+  queue: Floater[],
+  counts: Record<string, number>,
+  now: number,
+  nextId: number,
+): { queue: Floater[]; nextId: number } {
+  const q = queue.filter((f) => now - f.born < REACT.lifeMs)
+  const kinds = Object.entries(counts)
+    .filter(([e, n]) => REACT.emojis.includes(e) && n > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, REACT.maxKinds)
+  for (const [emoji, n] of kinds) {
+    for (let i = 0; i < n && q.length < REACT.queueCap; i++) {
+      q.push({ id: nextId, emoji, lane: nextId % REACT.lanes, born: now })
+      nextId++
+    }
+  }
+  return { queue: q, nextId }
+}
+
+// 손든 사람 알림 쌓임 방지(설계서 14.4) — 0명 없음 / 1명 알림 안 [무대로]·[무시] / 2명 이상 "N명 대기" 하나(→ 참가자 패널)
+export type HandNotice<T> = { kind: 'none' } | { kind: 'one'; peer: T } | { kind: 'many'; count: number }
+export function handNotice<T extends PeerLike>(peers: T[], dismissed: ReadonlySet<string>): HandNotice<T> {
+  const waiting = sortPeers(peers.filter((p) => p.role === 'audience' && p.raisedTs > 0 && !dismissed.has(handKey(p))))
+  if (!waiting.length) return { kind: 'none' }
+  return waiting.length === 1 ? { kind: 'one', peer: waiting[0] } : { kind: 'many', count: waiting.length }
+}
+// [무시] 는 그 손(올린 시각)만 — 내렸다 다시 들면 새 알림
+export const handKey = (p: PeerLike) => `${p.peerId}:${p.raisedTs}`
+
+// 무대 고정(설계서 14.1) — 새 화면공유가 생기면 1번만 자동 고정하고 그 전 고정을 기억, 고정된 것이 사라지면 기억한 고정으로 복원.
+// 사용자가 직접 고정을 바꾸면(prev 비움) 복원하지 않는다. seen = 이미 자동 고정한 화면공유 키(수동 해제 뒤 재고정 안 함)
+export type PinState = { pin: string | null; prev: string | null; seen: string[] }
+export function nextPin(st: PinState, keys: string[], screenKeys: string[]): PinState {
+  const seen = st.seen.filter((k) => keys.includes(k))
+  const fresh = screenKeys.find((k) => !st.seen.includes(k))
+  if (fresh) {
+    // 자동 고정 중에 또 공유가 생기면 처음 기억한 고정을 그대로 둔다
+    const prev = st.pin && st.seen.includes(st.pin) ? st.prev : st.pin
+    return { pin: fresh, prev, seen: [...seen, fresh] }
+  }
+  if (st.pin && !keys.includes(st.pin)) {
+    return { pin: st.prev && keys.includes(st.prev) ? st.prev : null, prev: null, seen }
+  }
+  return seen.length === st.seen.length ? st : { ...st, seen }
+}

@@ -13,11 +13,13 @@ type Preview = { role: Role; stream: MediaStream | null; status: MediaStatus }
 
 const VIDEO = { width: { ideal: 1280 }, height: { ideal: 720 } }
 
-// 둘 다 → 소리만 → 영상만 순서로 시도 — 마이크만 거부·카메라 정상이면 영상만이라도 보낸다
-async function getPreview(): Promise<MediaStream | null> {
+// 둘 다 → 소리만 → 영상만 순서로 시도 — 마이크만 거부·카메라 정상이면 영상만이라도 보낸다.
+// alive() 가 false 면(청중으로 전환·화면 떠남) 다음 시도를 하지 않는다 — 청중은 권한 팝업 0회(설계서 5.1)
+async function getPreview(alive: () => boolean): Promise<MediaStream | null> {
   const md = navigator.mediaDevices
   if (!md?.getUserMedia) return null
   for (const c of [{ video: VIDEO, audio: true }, { audio: true }, { video: VIDEO }]) {
+    if (!alive()) return null
     const s = await md.getUserMedia(c).catch(() => null)
     if (s) return s
   }
@@ -55,7 +57,7 @@ export function Prejoin({
   useEffect(() => {
     if (role !== 'presenter') return
     let alive = true
-    getPreview().then((s) => {
+    getPreview(() => alive).then((s) => {
       if (!alive) return s?.getTracks().forEach((tr) => tr.stop())
       streamRef.current = s
       setOn({ audio: true, video: true }) // 새 트랙은 켜진 상태로 온다 — 토글 표시를 맞춘다
