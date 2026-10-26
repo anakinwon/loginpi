@@ -15,7 +15,7 @@
 ## Phase 0 — 선결
 
 - [x] 설정 한 세트 생성 — `node scripts/tenant-env.mjs new seminar.pi --port 3003` (2026-10-24)
-- [x] PRD v1.0 확정(4절 로그인·5절 기능·8절 수익) — 2026-10-26 아소카 결정(마스터 위임), PRD 11절 D-1~D-10 · 세미나 모델 sql/004
+- [x] PRD v1.0 확정(4절 로그인·5절 기능·8절 수익) — 2026-10-26 아소카 결정(마스터 위임), PRD 11절 D-1~D-11 · 세미나 모델 sql/004(smn_mst·smn_ptc, dev·stg·prod(public) 적용 2026-10-26)
 - [x] Pi Developer Portal testnet 앱 등록 · API 키 · 도메인 검증 (ENV_GUIDE 3.2) — 검증 키 `/validation-key.txt` 배포·검증 완료(2026-10-25)
 - [x] DB — 마스터가 seminar 전용 Supabase 프로젝트 1개(`SUPABASE_SCHEMA=public`)로 결정 → `db-migrate.mjs --app seminar --tier prod --db-url <Session pooler>` 로 baseline·pi_pymnt·`sql/001`(Google 연동) 적용(2026-10-25). ⚠ `.env.local` 의 `SEMINAR_*_DATABASE_URL` 은 Direct 호스트(IPv6 전용)라 이 PC 에서 ENOTFOUND — Session pooler(`aws-0-ap-northeast-2`) 사용
 - [x] 로그인 3경로 이식(sitemap.pi 동일, LOGIN_PLAYBOOK) — Pi SDK·Pi Sign-In(OAuth)·Google+연동 코드, `pnpm build` 통과(2026-10-25)
