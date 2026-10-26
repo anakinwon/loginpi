@@ -1,5 +1,5 @@
 // 결제 흐름 3종 — 앱의 /api/payments/{approve,complete,cancel} 라우트가 세션 확인 뒤 호출한다(NextResponse 무관, 결과 객체 반환).
-//  approve  : Pi GET → verifyPayment(결제자·방향·검증기 정가) → 원장 APPROVED → Pi approve(실패 시 Pi cancel + 원장 CANCELED)
+//  approve  : Pi GET → verifyPayment(결제자·방향·검증기 정가) → 원장 APPROVED → Pi approve(실패 시 재조회 → Pi cancel 성공일 때만 원장 CANCELED)
 //  complete : 원장 선조회(본인·APPROVED) → Pi complete → txid 대조 → finalize(앱 RPC) 또는 원장 COMPLETED
 //  cancel   : 본인 APPROVED 만, Pi cancel 성공 시에만 CANCELED. 원장 없으면 Pi 결제자 확인 뒤 Pi cancel(IDOR 차단)
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -64,7 +64,15 @@ export async function approvePayment(
   // 2) 검증(서버 정가 재계산)
   const v = await verifyPayment(payment, user, validators)
   if (!v.ok) {
-    if (v.cancelPi) await cancelQuietly(payment.identifier)
+    // 원장에 이미 본인 행이 있으면(approve 재호출) Pi 취소하지 않는다 — 대상 중복 검사가 자기 결제를 걸어도 결제를 지키게.
+    //  조회 실패도 취소 안 함(안전 쪽)
+    if (v.cancelPi) {
+      const tracked = await getOwnPayment(db, payment.identifier, user.id).then(
+        (row) => row !== null,
+        () => true,
+      )
+      if (!tracked) await cancelQuietly(payment.identifier)
+    }
     return fail(v.code, v.status, v.detail)
   }
 
@@ -74,6 +82,11 @@ export async function approvePayment(
     ins = await insertApprovedPayment(db, payment, user.id, v.type)
   } catch (e) {
     return dbErr(e)
+  }
+  if ('busy' in ins) {
+    // 같은 대상에 다른 결제가 동시에 APPROVED 가 됨(부분 유일 인덱스) — 이 결제는 정리
+    await cancelQuietly(payment.identifier)
+    return fail('ALREADY_PAID', 409)
   }
   if (!ins.inserted) {
     const row = ins.row
@@ -87,23 +100,28 @@ export async function approvePayment(
     // APPROVED 재호출 — 아래 Pi approve 를 다시 시도(already_approved 멱등)
   }
 
-  // 4) Pi approve — 실패 시 Pi cancel + 원장 CANCELED(좀비 APPROVED 방지)
+  // 4) Pi approve — 실패 시 되돌림. 원장 CANCELED 는 Pi 쪽도 확실히 취소됐을 때만
+  //  (우리 쪽 타임아웃이어도 Pi 는 승인했을 수 있다 — CANCELED 로 덮으면 돈은 나가고 complete 가 영영 INVALID_STATE)
+  const done = { ok: true, paymentId: payment.identifier, type: v.type } as const
   const r = await approvePiPayment(payment.identifier)
-  if (!r.ok && r.error !== 'already_approved') {
-    console.error(
-      '[pi-payments/approve] Pi approve',
-      r.status,
-      r.body.slice(0, 300),
-    )
-    await cancelQuietly(payment.identifier)
+  if (r.ok || r.error === 'already_approved') return done
+  console.error(
+    '[pi-payments/approve] Pi approve',
+    r.status,
+    r.body.slice(0, 300),
+  )
+  const again = await getPiPayment(payment.identifier)
+  if (again.ok && again.payment.status.developer_approved) return done
+  const c = await cancelPiPayment(payment.identifier).catch(() => null)
+  if (c?.ok || (again.ok && again.payment.status.cancelled))
     await markPaymentCanceled(db, payment.identifier, user.id)
-    return piFail(r)
-  }
-  return { ok: true, paymentId: payment.identifier, type: v.type }
+  // 그 외 — 원장 APPROVED 유지 : 사용자가 서명했으면 complete 가 복구, 아니면 Pi 만료 후 운영 정리
+  return piFail(r)
 }
 
 // finalize : 원장 COMPLETED 와 도메인 반영을 한 트랜잭션으로 하는 앱 RPC(예: sitemap.pi fn_cmpl_site_reg_pymnt).
 //  주면 원장 갱신도 finalize 책임, 안 주면 markPaymentCompleted 만 한다. 재호출 멱등이어야 한다
+//  ctx.row 는 갱신 전 행(APPROVED). 성공 응답의 row 는 COMPLETED·tx_id 를 반영한 행
 export type Finalize<R> = (ctx: {
   row: PymntRow
   payment: PiPaymentDTO
@@ -150,10 +168,17 @@ export async function completePayment<R = void>(
 
   // 4) 원장 COMPLETED(+ 도메인 반영)
   try {
-    if (finalize)
-      return { ok: true, row, result: await finalize({ row, payment, txid }) }
-    await markPaymentCompleted(db, paymentId, user.id, txid)
-    return { ok: true, row }
+    if (finalize) {
+      const result = await finalize({ row, payment, txid })
+      return {
+        ok: true,
+        row: { ...row, pymnt_sts_cd: 'COMPLETED', tx_id: txid },
+        result,
+      }
+    }
+    const updated = await markPaymentCompleted(db, paymentId, user.id, txid)
+    // 0행(동시 취소 등) — Pi 는 완료됐는데 원장이 못 따라감 : 운영 확인 대상(로그는 markPaymentCompleted)
+    return updated ? { ok: true, row: updated } : fail('INVALID_STATE', 409)
   } catch (e) {
     console.error('[pi-payments/complete] finalize', paymentId, e)
     return dbErr(e)

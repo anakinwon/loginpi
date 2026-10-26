@@ -37,7 +37,11 @@ export async function insertApprovedPayment(
   payment: PiPaymentDTO,
   userId: string,
   type: string,
-): Promise<{ inserted: true } | { inserted: false; row: PymntRow | null }> {
+): Promise<
+  | { inserted: true }
+  | { inserted: false; row: PymntRow | null }
+  | { inserted: false; busy: true } // 대상 부분 유일 인덱스 위반(같은 대상 진행 중 결제) → 호출자가 ALREADY_PAID
+> {
   const { data, error } = await db
     .from('pi_pymnt')
     .upsert(
@@ -56,6 +60,8 @@ export async function insertApprovedPayment(
       { onConflict: 'pymnt_id', ignoreDuplicates: true },
     )
     .select('pymnt_id')
+  // 23505 = pymnt_id 외 유일 제약 위반(ON CONFLICT 는 pymnt_id 만) — approvedTargetIndexSql 인덱스가 막은 동시 approve
+  if (error?.code === '23505') return { inserted: false, busy: true }
   if (error) throw error
   if (data && data.length > 0) return { inserted: true }
   // 충돌로 무시됨 — 다른 사용자 행일 수 있어 usr_id 조건 없이 조회
@@ -92,13 +98,14 @@ export async function markPaymentCanceled(
 }
 
 // APPROVED → COMPLETED + tx_id. 도메인 반영을 한 트랜잭션에 묶어야 하면 앱 RPC(finalize)를 대신 쓴다
+//  → 갱신된 행. 0행 갱신(동시 취소·이미 완료)이면 재조회해 같은 txid 의 COMPLETED 만 성공, 그 외 null(호출자가 INVALID_STATE)
 export async function markPaymentCompleted(
   db: SupabaseClient,
   paymentId: string,
   userId: string,
   txid: string,
-): Promise<void> {
-  const { error } = await db
+): Promise<PymntRow | null> {
+  const { data, error } = await db
     .from('pi_pymnt')
     .update({
       pymnt_sts_cd: 'COMPLETED',
@@ -109,7 +116,18 @@ export async function markPaymentCompleted(
     .eq('pymnt_id', paymentId)
     .eq('usr_id', userId)
     .eq('pymnt_sts_cd', 'APPROVED')
+    .select(ROW_COLS)
   if (error) throw error
+  const updated = (data as PymntRow[] | null)?.[0]
+  if (updated) return updated
+  const row = await getOwnPayment(db, paymentId, userId)
+  if (row?.pymnt_sts_cd === 'COMPLETED' && row.tx_id === txid) return row
+  console.error(
+    '[pi-payments] markPaymentCompleted 0행',
+    paymentId,
+    row?.pymnt_sts_cd ?? 'NONE',
+  )
+  return null
 }
 
 const META_KEY = /^[a-z_][a-z0-9_]{0,62}$/
@@ -139,4 +157,28 @@ export async function hasOtherApprovedPayment(
     .limit(1)
   if (error) throw error
   return (data?.length ?? 0) > 0
+}
+
+const TP_CD = /^[A-Z][A-Z0-9_]{0,19}$/ // pymnt_tp_cd VARCHAR(20)
+
+// R-P5 — 같은 대상에 APPROVED 1건만 허용하는 부분 유일 인덱스 DDL(앱 sql/ 에 붙여 넣는다).
+//  hasOtherApprovedPayment(조회→기록 2단계)만으론 동시 approve 2건이 둘 다 통과한다 → DB 가 최종 차단, insertApprovedPayment 가 23505 → busy
+//  types 여러 개 = 그 유형들끼리도 같은 대상 1건(hasOtherApprovedPayment 의 types 와 같게). meta 값이 없는 행은 NULL 이라 충돌 안 함
+export function approvedTargetIndexSql(opts: {
+  nn: string // x_pi_pymnt_NN 의 NN(앱 DB 안에서 겹치지 않게)
+  metaKey: string
+  types: readonly string[]
+}): string {
+  if (!/^\d{2}$/.test(opts.nn)) throw new Error(`nn 형식 오류: ${opts.nn}`)
+  if (!META_KEY.test(opts.metaKey))
+    throw new Error(`metaKey 형식 오류: ${opts.metaKey}`)
+  if (opts.types.length === 0 || !opts.types.every((t) => TP_CD.test(t)))
+    throw new Error(`types 형식 오류: ${opts.types.join(',')}`)
+  const types = opts.types.map((t) => `'${t}'`).join(', ')
+  return [
+    `-- DA-APPROVED: <승인 근거·일자> — pi_pymnt 대상(${opts.metaKey}) 진행 중 결제 1건 제한(@pi/payments approvedTargetIndexSql)`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS x_pi_pymnt_${opts.nn}`,
+    `  ON pi_pymnt ((meta_val ->> '${opts.metaKey}'))`,
+    `  WHERE pymnt_sts_cd = 'APPROVED' AND del_yn = 'N' AND pymnt_tp_cd IN (${types});`,
+  ].join('\n')
 }
