@@ -25,7 +25,7 @@ import {
   reset,
   status,
 } from './engine'
-import { addMine, listMine, removeMine, type MyImage } from './my-images'
+import { addMine, listMine, removeMine, shrink, type MyImage } from './my-images'
 import { BG, checkMine, PRESETS, withUnsaved } from './rules'
 import { FxRows } from '../media-fx'
 
@@ -107,10 +107,16 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
     // 새 이미지가 가장 최신이라 상한 초과로 지워지는 것은 늘 지금 선택이 아니다
     setErr(null)
     const id = crypto.randomUUID()
-    const e = await choose(`m:${id}`, f)
+    let small: Blob
+    try {
+      small = await shrink(f) // 원본(휴대폰 사진 수십 MB 디코드)은 여기서 한 번만 줄이고 버린다
+    } catch {
+      return setErr('bgFailed')
+    }
+    const e = await choose(`m:${id}`, small)
     if (e) return e === 'superseded' ? undefined : setErr(e) // 디코드 실패면 밀려났어도 저장하지 않는다
     try {
-      await addMine(f, id)
+      await addMine(small, id)
       const l = await listMine()
       setMine((prev) =>
         withUnsaved(l, prev).map((x) => ({
@@ -122,7 +128,7 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
       // 저장만 실패(용량 초과·IndexedDB 막힘) — 배경은 이미 적용됐다. '불러오지 못함'이라 하면 틀린 안내라 저장 실패로 알리고,
       // 이번 회의 동안은 목록에 남겨 선택 표시·삭제가 되게 한다(URL 은 새로 — 이전 목록 URL 은 정리 effect 가 해제)
       setMine((l) =>
-        [{ id, ts: Date.now(), blob: f as Blob, unsaved: true }, ...l.filter((x) => x.id !== id)].map((x) => ({
+        [{ id, ts: Date.now(), blob: small, unsaved: true }, ...l.filter((x) => x.id !== id)].map((x) => ({
           ...x,
           url: URL.createObjectURL(x.blob),
         })),
