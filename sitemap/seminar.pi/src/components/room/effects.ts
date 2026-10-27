@@ -5,6 +5,7 @@
 // (숨은 탭에서도 프레임이 멈추지 않게). 코드는 옮기지 않았다(S-2)
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useStores, type VideoEffect } from './extensions'
+import { failHit } from './room-rules'
 
 // 효과 1단계 — src(이전 단계 결과) 를 out 캔버스(w×h)에 그린다. 동기 함수(프레임마다 호출)
 export type EffectDraw = (out: CanvasRenderingContext2D, src: CanvasImageSource, w: number, h: number) => void
@@ -74,11 +75,7 @@ function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[]) {
         if (e) fails.delete(e)
       } catch {
         ctx.drawImage(src, 0, 0, w, h)
-        if (e) {
-          const n = (fails.get(e) ?? 0) + 1
-          fails.set(e, n)
-          if (n >= FX.failMax) e.on.set(false)
-        }
+        if (e && failHit(fails, e, FX.failMax)) e.on.set(false)
       }
       src = c
     })
