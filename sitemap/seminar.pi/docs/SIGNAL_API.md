@@ -1,6 +1,6 @@
-# SIGNAL_API — Galápagos 시그널링 프로토콜 (확정판 v1.2)
+# SIGNAL_API — Galápagos 시그널링 프로토콜 (확정판 v1.3)
 
-> 작성 2026-10-25 · v1.1 개정 2026-10-26(UI 설계서 `ui-design/ui-design.md` 13절 #1 결정 — 14.7 필수 A~D + `room.end`, 받는 사람·필드 정본 = 설계서 7.2) · v1.1.1 구현 결정 문서화 2026-10-26 · v1.1.3 `ntf score` 송신 2026-10-27(3.4) · **v1.2 후속 E·F·G(사회·레이아웃·발언자) 2026-10-27(3.5) — 아소카 결정(마스터 위임 2026-10-26)** · M3 산출물 · 근거 `PRD_02_ENGINE_DESIGN.md` 5절(D-9 봉투·D-11 입장권), REA_02 5.1(수명주기 이벤트)·6.2(동사 경계)
+> 작성 2026-10-25 · v1.1 개정 2026-10-26(UI 설계서 `ui-design/ui-design.md` 13절 #1 결정 — 14.7 필수 A~D + `room.end`, 받는 사람·필드 정본 = 설계서 7.2) · v1.1.1 구현 결정 문서화 2026-10-26 · v1.1.3 `ntf score` 송신 2026-10-27(3.4) · **v1.2 후속 E·F·G(사회·레이아웃·발언자) 2026-10-27(3.5) — 아소카 결정(마스터 위임 2026-10-26)** · **v1.3 범용 중계 `app.send`·`ntf app` 2026-10-27(3.6) — 계획서 A-2, 아소카 결정(마스터 위임 2026-10-27)** · M3 산출물 · 근거 `PRD_02_ENGINE_DESIGN.md` 5절(D-9 봉투·D-11 입장권), REA_02 5.1(수명주기 이벤트)·6.2(동사 경계)
 > 코드 정본 : `media/internal/signal/envelope.go`(이름·필드·오류 코드), `session.go`(시간 상수), `ticket.go`(입장권). **이 문서와 코드가 다르면 코드를 고치기 전에 이 문서를 먼저 고친다**(이름·필드 변경은 M3 합의 필요).
 > 표준 SDP 를 그대로 주고받는다 — 클라이언트 라이브러리가 필요 없다(D-9).
 
@@ -65,6 +65,7 @@
 | `room.muteAll` | `{kind, lock}` | `{}` | presenter | v1.2 | 3.5 E. `lock:false` = 음소거 + 잠금 해제 |
 | `peer.askUnmute` | `{peerId, kind}` | `{}` | presenter | v1.2 | 3.5 E |
 | `room.setLayout` | `{mode, spotlight, follow}` | `{}` | presenter | v1.2 | 3.5 F |
+| `app.send` | `{topic, d}` | `{}` | 주제별(3.6 주제표) | v1.3 | 3.6. 범용 중계 — `d` 는 엔진이 해석·저장하지 않고 그대로 보낸다(4KB 이하). 잠금과 무관 |
 
 > `pong` 이름(`MPong`)은 코드에 예약돼 있으나 응답 봉투(`res`)로 대신한다 — 클라이언트는 보내지 않아도 된다.
 > 소유자가 아닌 producer 에 대한 `producer.*` 요청과 없는 `consumerId` 는 `NOT_FOUND`(존재 여부를 숨기려고 `ROLE_FORBIDDEN` 이 아님).
@@ -95,6 +96,7 @@
 | `askUnmute` | `{kind, by}` | v1.2 | **대상 본인만**. 자동으로 켜지 않는다 — 3.5 E |
 | `layout` | `{mode, spotlight, follow}` | v1.2 | 방 전원(요청자 포함). 값이 **바뀔 때만** — 3.5 F |
 | `activeSpeaker` | `{peerId \| null}` | v1.2 | 방 전원. 판정이 바뀔 때만·**방당 500ms 에 최대 1건**, 입장 직후 현재 발언자 1건 — 3.5 G |
+| `app` | `{topic, d, from}` | v1.3 | 방 전원(**보낸 본인 제외** — 본인은 응답으로 확정). `from` = 엔진이 채운 보낸 사람 `peerId`. 지난 신호는 보관·재전송 안 함 — 3.6 |
 
 ### 3.3 v1.1 추가 규칙 (UI 설계서 7.2·14.4·14.7 — 13절 #1·#2·#4·#6·#8·#9 결정)
 
@@ -169,6 +171,28 @@
 | 송신 | 판정이 바뀔 때만, **방당 500ms 에 최대 1건**(넘으면 미뤘다가 다음 판정에 — 그사이 되돌아오면 안 보냄). 입장 직후 현재 발언자가 있으면 본인에게 1건 |
 | 화면 | 말하기 링 = `activeSpeaker` 대상 타일. 엔진이 확장을 협상하지 못한 연결·실험실 등 엔진 판정이 없으면 클라이언트 `AudioContext` 판정(설계서 3절 G7)으로 대체 |
 
+### 3.6 v1.3 추가 규칙 — 범용 중계 `app` (계획서 A-2, 아소카 결정(마스터 위임 2026-10-27))
+
+목적 : 자막·녹화/AI 기록 상태·설문/Q&A 새로고침처럼 **엔진이 내용을 알 필요 없는 화면 신호**를 기능마다 메시지를 늘리지 않고 1쌍으로 보낸다(D-9 메시지 수 증가 억제, 9절). 엔진은 `d` 를 해석·저장하지 않는다 — 내용의 정본은 화면 서버 DB, 엔진은 "지금 전원에게 알리기"만 한다.
+
+| 항목 | 규칙 | 오류 |
+|---|---|---|
+| `app.send{topic, d}` | 검사 순서 고정 : ① `topic` 이 아래 주제표에 있다 ② `d` 직렬화가 **4096바이트 이하**(받은 JSON 그대로 센다, 생략하면 `null`) ③ 보낸 사람의 세션 역할이 그 주제에 허용된다 ④ 피어당 **초당 2건**(주제 합산, 1초 슬라이딩 창 — `chat.send` 와 같은 방식, 한도는 따로) → 통과하면 보낸 사람 외 전원에게 `ntf app{topic, d, from}`, 응답 `{}`. 앞 단계에서 거절된 요청은 한도를 쓰지 않는다(3.3 v1.1.1 ⑦ 과 같은 원칙) | ① `NOT_FOUND` ② `SDP_INVALID` ③ `ROLE_FORBIDDEN` ④ `RATE_LIMITED` |
+| `ntf app{topic, d, from}` | 받는 사람 = 방 전원(보낸 본인 제외 — 본인은 성공 응답으로 확정). `from` = **엔진이 채운** 보낸 사람 `peerId`(보낸 쪽이 위조할 수 없다, 이름은 `peers` 로 찾는다). `d` 는 보낸 값 그대로(공백만 정리될 수 있음). **보관·재전송 없음** — 늦게 들어온 사람은 지난 신호를 받지 못한다 | — |
+| 잠금 | `room.muteAll` 잠금(3.5 E)과 **무관** — 잠금 중에도 중계 | — |
+| 받는 쪽 | 엔진이 `d` 모양을 검사하지 않으므로 **화면이 주제별로 `d` 를 검사해 맞지 않으면 버린다**. 글은 텍스트로만 표시(HTML 해석 금지). 모르는 `topic` 은 무시(9절). 엔진이 v1.3 이전이면 `app.send` 가 `NOT_FOUND`(없는 메서드) — 화면은 **허용된 주제로 보냈는데 `NOT_FOUND`** 이면 미지원으로 보고 자막·녹화·AI 회의록 항목을 숨긴다(설계서 15절) | — |
+| 늦은 입장자 | `state` 처럼 "지금 상태"가 필요한 주제는 보낸 쪽 화면이 `ntf peerJoined` 를 받으면 **1초에 한 번 이하로 묶어** 현재 상태를 다시 보낸다(초당 2건 한도 안) — 엔진 보관(입장 응답에 실기)으로 바꿀지는 [확인중 : Agent10 — SubAgent6·7 화면 계약 확정 때] | — |
+
+**주제표** — 코드 정본 `envelope.go` `AppTopics`. 주제를 늘릴 때는 이 표를 먼저 고친다.
+
+| `topic` | 보낼 수 있는 역할 | 쓰임 | `d` 모양(화면 약속 — 엔진은 검사 안 함) |
+|---|---|---|---|
+| `caption` | presenter · panel | 말하는 사람 자기 브라우저가 음성 조각을 글로 바꾼 결과를 전원에게(계획서 A-1) | [확인중 : SubAgent3·8 화면 계약 확정 시 기재] |
+| `state` | presenter | 녹화·AI 기록 시작/종료 → 전원 배지(마스터 결정 M-4) | [확인중 : SubAgent6·7 화면 계약 확정 시 기재] |
+| `refresh` | 전원 | 설문·Q&A 등 화면 서버 데이터가 바뀜 → 받은 사람이 다시 읽기(투표한 청중도 보냄) | [확인중 : SubAgent4 화면 계약 확정 시 기재] |
+
+근거(REA) : `docs/rea/evidence/REA_04/engine-01-app-relay-anchors.json` — REA 가 내보낸 meet.jit.si 배포본(내보내기 Evidence `ev_4be1f45f…`, lib-jitsi-meet sha256 `9eb5dc78…`·app.bundle `e94ef107…`, 재계산 일치)에서 ⓐ 얼굴 표식·반응·텍스트·자막이 **한 통로(EndpointMessage)를 판별 값으로 나눠 쓰고**(판별 키가 `type`·`name` 으로 섞임, relay[4~7]) ⓑ `from` 은 **브리지가 채우며**(relay[0]·[2]) ⓒ 중계 경로에 **크기·속도·역할 검사가 없어** 기능마다 받는 쪽이 보낸 사람을 따로 거른다(자막 = 숨은 전사기만, relay[3]·[8]·[9]). → 우리는 판별 키를 `topic` 하나로 고정하고, 권한(주제×역할)·크기·속도를 엔진 한 곳에서 검사한다(받는 쪽 필터 누락 = 위조 자막 위험 제거). 브리지의 본인 되돌림·서버 상한은 배포 클라이언트로 판단 불가라 근거로 쓰지 않았다. 코드는 옮기지 않았다(S-2 — 구현은 `chat.send` 본보기).
+
 ## 4. 수명주기 (서버 동작 — 클라이언트가 기대할 순서)
 
 ```
@@ -197,13 +221,13 @@
 | `TICKET_INVALID` | 서명·`aud`·형식·`jti` 재사용 실패, 첫 메시지가 `join` 아님(10초 시한 초과는 알림 없이 종료) | `join` | 종료 |
 | `TICKET_EXPIRED` | `exp` 지남(오차 5초) | `join` | 종료 |
 | `ROOM_FULL` | 정원(`cap`) 초과 | `join` | 종료 |
-| `ROLE_FORBIDDEN` | audience 의 `transport.publish`·`produce`, v1.1·v1.2 권한 밖 요청(3.3 — `hand.set`·`hand.lowerAll`·`peer.setRole`·`room.end`, 3.5 — `peer.mute`·`room.muteAll`·`peer.askUnmute`·`room.setLayout`) | 발행·관리 요청 | 유지 |
+| `ROLE_FORBIDDEN` | audience 의 `transport.publish`·`produce`, v1.1·v1.2 권한 밖 요청(3.3 — `hand.set`·`hand.lowerAll`·`peer.setRole`·`room.end`, 3.5 — `peer.mute`·`room.muteAll`·`peer.askUnmute`·`room.setLayout`), 3.6 — 주제표의 역할 밖 `app.send`(v1.3) | 발행·관리 요청 | 유지 |
 | `LOCKED` | 발표자 잠금 중 `producer.resume`·잠긴 종류 `produce`·`peer.askUnmute`(3.5 E, v1.2) | 발행 요청 | 유지 |
 | `ROOM_CLOSED` | 방 종료(`end` 지남·관리자 종료·`room.end`)·닫힌 방에 요청 | 전부 · `ntf error` | 종료 |
 | `DUPLICATE_SESSION` | 같은 방에 같은 `sub` 가 다시 입장 → **기존** 세션에 `ntf error` | `ntf error` | 기존 세션 종료 |
-| `SDP_INVALID` | SDP 파싱·적용 실패, 대기 중 offer 없이 온 `transport.subscribe.answer`, **요청 `d` 해석 실패(모든 요청)**, `produce` 의 잘못된 `kind` [TBD : 일반 `BAD_REQUEST` 코드 분리 여부] | `transport.*` · 전부 | 유지 |
-| `NOT_FOUND` | 없는 메서드·producer·consumer, 남의 producer | 전부 | 유지 |
-| `RATE_LIMITED` | 요청 과다 [TBD : 한도 M5]. v1.1 `chat.send`·`reaction.send` 는 피어당 초당 2건(3.3 C) | 전부 | 유지 |
+| `SDP_INVALID` | SDP 파싱·적용 실패, 대기 중 offer 없이 온 `transport.subscribe.answer`, **요청 `d` 해석 실패(모든 요청)**, `produce` 의 잘못된 `kind`, `app.send` 의 `d` 4096바이트 초과(3.6, v1.3) [TBD : 일반 `BAD_REQUEST` 코드 분리 여부] | `transport.*` · 전부 | 유지 |
+| `NOT_FOUND` | 없는 메서드·producer·consumer, 남의 producer, 주제표에 없는 `app.send` `topic`(3.6, v1.3) | 전부 | 유지 |
+| `RATE_LIMITED` | 요청 과다 [TBD : 한도 M5]. v1.1 `chat.send`·`reaction.send` 는 피어당 초당 2건(3.3 C), v1.3 `app.send` 는 피어당 초당 2건(주제 합산, 3.6) | 전부 | 유지 |
 | `INTERNAL` | 서버 내부 오류 | 전부 | 유지 |
 
 - 입장권 실패는 **200ms 지연 후** 응답한다(추측 공격 완화, REA_01 5.11).
@@ -259,7 +283,7 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 
 - 알 수 없는 알림은 클라이언트가 무시한다. 알 수 없는 메서드는 서버가 `NOT_FOUND`.
 - 필드 추가는 하위 호환(무시 가능)으로만. 이름 변경·삭제는 이 문서 개정 + M3 합의.
-- 메시지 종류가 20개를 넘어 관리가 어려우면 JSON Schema 로 생성(D-9 되돌릴 조건). **현재(v1.2) 요청 22 · 알림 22(서버 `trickle` 포함) — 둘 다 20 초과로 되돌릴 조건에 닿았다.** v1.2 에서는 전환하지 않고 손으로 쓴 `envelope.go` 를 정본으로 유지(아소카 결정(마스터 위임 2026-10-26) — 밤사이 계약 형식 변경 위험 회피), JSON Schema 생성 전환 여부 [확인중 : 마스터]
+- 메시지 종류가 20개를 넘어 관리가 어려우면 JSON Schema 로 생성(D-9 되돌릴 조건). **현재(v1.3) 요청 23 · 알림 23(서버 `trickle` 포함) — 둘 다 20 초과로 되돌릴 조건에 닿았다.** v1.3 은 이후 기능 신호를 `app` 1쌍(3.6 주제표)으로 받아 메시지 수 증가를 멈춘다. v1.2 에서는 전환하지 않고 손으로 쓴 `envelope.go` 를 정본으로 유지(아소카 결정(마스터 위임 2026-10-26) — 밤사이 계약 형식 변경 위험 회피), JSON Schema 생성 전환 여부 [확인중 : 마스터]
 
 ## 변경 이력
 
@@ -272,3 +296,4 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 | 2026-10-26 | v1.1.2 — `consumerCreated` 에 `peer`(발행자 peerId, `ProducerInfo.peer` 와 같은 값) 추가 : 입장 뒤 생긴 producer 의 주인을 화면이 알 수 있게(W3 검토 지적). 필드 추가 = 하위 호환 |
 | 2026-10-27 | **v1.1.3** — `ntf score` 서버 송신 시작(3.4) : 받는 사람 = Consumer 주인, 5초 판정·등급 바뀔 때만, 처음 등급 excellent 기준, `lost` = RR 10초 끊김. `{producerId}` 형·`layersChanged`·`streamState` 는 계속 미송신, `publishLayers` 는 송신 중임을 표기. 이름·필드 변경 없음(`score` 행 `d` 를 실제 송신 형식 `{consumerId, score, grade}` 로 좁혀 적음). 아소카 결정(마스터 위임 2026-10-26) |
 | 2026-10-27 | **v1.2** — 후속 E·F·G(3.5, 설계서 14.7) : 요청 4(`peer.mute`·`room.muteAll`·`peer.askUnmute`·`room.setLayout`)·알림 5(`mutedBy`·`roomPolicy`·`askUnmute`·`layout`·`activeSpeaker`)·오류 코드 `LOCKED`, `join` 응답 `policy`·`layout`(필드 추가 = 하위 호환), `producer.resume` 잠금 검사. 잠금 → 일시정지 → 알림 한 처리, 해제 = `muteAll{lock:false}`, `video` = 카메라만, 엔진 RFC 6464 오디오 레벨 판정(100ms·−50 dBov·300ms·6 dB·1.5초·방당 500ms). D-9 메시지 수 22·22 — JSON Schema 전환은 [확인중 : 마스터]. 기존 이름·필드 변경 없음. 아소카 결정(마스터 위임 2026-10-26) |
+| 2026-10-27 | **v1.3** — 범용 중계(3.6, 계획서 A-2) : 요청 `app.send{topic, d}`·알림 `app{topic, d, from}` 1쌍. 주제표 `caption`=presenter·panel / `state`=presenter / `refresh`=전원(표 밖 `NOT_FOUND`, 역할 밖 `ROLE_FORBIDDEN`), `d` 4096바이트 이하(`SDP_INVALID`), 피어당 초당 2건 주제 합산(`RATE_LIMITED`), 검사 순서 주제→크기→역할→속도(거절은 한도 미사용), 받는 사람 = 보낸 본인 제외 전원, `from` = 엔진이 채운 peerId, 보관·재전송 없음, 잠금과 무관. 메시지 수 23·23. 신규 오류 코드·기존 이름·필드 변경 없음. 근거 REA_04 엔진편(`docs/rea/evidence/REA_04/engine-01-app-relay-anchors.json`). 아소카 결정(마스터 위임 2026-10-27) |

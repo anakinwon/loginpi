@@ -1,8 +1,9 @@
-// 시그널링 v1.1 방 동작(SIGNAL_API 3.3) — 참가자 목록·입퇴장 묶음 알림, 채팅·손들기·반응(서버 합산), 역할 전환(무대 초대·내리기).
+// 시그널링 v1.1 방 동작(SIGNAL_API 3.3) — 참가자 목록·입퇴장 묶음 알림, 채팅·손들기·반응(서버 합산), 역할 전환(무대 초대·내리기), v1.3 범용 중계(3.6).
 // 권한은 전부 세션 역할(Peer.Role)로 방 고루틴에서 검사한다. room.end 는 Manager(종료 표시·방 정리)가 맡는다.
 package bora
 
 import (
+	"encoding/json"
 	"slices"
 	"strings"
 	"time"
@@ -196,6 +197,32 @@ func (r *Room) React(peerID string, emojis []string) *signal.Error {
 		if r.reactTimer == nil {
 			r.reactTimer = time.AfterFunc(ReactionWindow, func() { r.do(r.flushReactions) })
 		}
+		return nil
+	})
+}
+
+// AppSend — app.send(v1.3, SIGNAL_API 3.6). 주제 허용표 → d 4KB → 역할 → 피어당 초당 2건(주제 합산) 순으로 검사해
+// 보낸 사람 외 전원에게 ntf app{topic, d, from}. d 는 해석하지 않고 그대로 중계, 잠금(LOCKED)과 무관.
+func (r *Room) AppSend(peerID, topic string, d json.RawMessage) *signal.Error {
+	roles, ok := signal.AppTopics[topic]
+	if !ok {
+		return signal.Errf(signal.CodeNotFound, "알 수 없는 주제")
+	}
+	if len(d) > signal.AppMaxBytes {
+		return signal.Errf(signal.CodeSDPInvalid, "d 는 4KB 이하")
+	}
+	return r.call(func() *signal.Error {
+		p := r.peers[peerID]
+		if p == nil {
+			return signal.Errf(signal.CodeNotFound, "참가자 없음")
+		}
+		if !slices.Contains(roles, p.Role) {
+			return signal.Errf(signal.CodeRoleForbidden, "이 주제를 보낼 수 없는 역할")
+		}
+		if !p.appRate.allow(time.Now()) {
+			return signal.Errf(signal.CodeRateLimited, "중계 속도 제한")
+		}
+		r.notify(peerID, signal.NApp, signal.AppNtf{Topic: topic, D: d, From: peerID})
 		return nil
 	})
 }

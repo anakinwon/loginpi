@@ -47,6 +47,8 @@ const (
 	MRoomMuteAll   = "room.muteAll"   // 잠금 → 일시정지 → 알림(한 처리 안)
 	MPeerAskUnmute = "peer.askUnmute" // 대상에 ntf askUnmute(자동 켜기 없음)
 	MRoomSetLayout = "room.setLayout" // 방 레이아웃 보관 + ntf layout
+	// v1.3 (SIGNAL_API 3.6) — 범용 중계. 권한은 주제별(AppTopics)
+	MAppSend = "app.send"
 
 	NTransportSubscribe = "transport.subscribe" // M1 서버 offer(200ms 묶음)
 	NConsumerCreated    = "consumerCreated"     // M1
@@ -71,6 +73,8 @@ const (
 	NAskUnmute     = "askUnmute"     // 대상 본인만
 	NLayout        = "layout"        // 방 전원(요청자 포함)
 	NActiveSpeaker = "activeSpeaker" // 방 전원, 방당 500ms 에 최대 1건
+	// v1.3 (SIGNAL_API 3.6)
+	NApp = "app" // 방 전원(보낸 본인 제외), from = 서버가 채운 보낸 사람 peerId
 )
 
 // ErrCode — 오류 코드(PRD_02 5.2).
@@ -333,4 +337,30 @@ const LayoutSpotlightMax = 64
 // ActiveSpeaker — ntf activeSpeaker. PeerID nil = 지금 말하는 사람 없음(JSON null).
 type ActiveSpeaker struct {
 	PeerID *string `json:"peerId"`
+}
+
+// ── v1.3 페이로드(SIGNAL_API 3.6) — 범용 중계 ──
+
+// AppMaxBytes — app.send d 의 직렬화 최대 바이트(받은 그대로 센다).
+const AppMaxBytes = 4096
+
+// AppTopics — app.send 주제별로 보낼 수 있는 세션 역할. 표에 없는 주제는 NOT_FOUND, 역할 밖은 ROLE_FORBIDDEN.
+// 주제를 늘릴 때는 SIGNAL_API 3.6 표를 먼저 고친다.
+var AppTopics = map[string][]Role{
+	"caption": {RolePresenter, RolePanel},               // 말하는 사람의 자막 조각
+	"state":   {RolePresenter},                          // 녹화·AI 기록 상태(전원 배지)
+	"refresh": {RolePresenter, RolePanel, RoleAudience}, // 설문·Q&A 등 서버 데이터가 바뀌었으니 다시 읽으라는 신호
+}
+
+// AppSendReq — app.send. D 는 엔진이 해석하지 않고 그대로 중계한다(없으면 null).
+type AppSendReq struct {
+	Topic string          `json:"topic"`
+	D     json.RawMessage `json:"d"`
+}
+
+// AppNtf — ntf app. From 은 서버가 채운다(보낸 사람이 위조할 수 없음).
+type AppNtf struct {
+	Topic string          `json:"topic"`
+	D     json.RawMessage `json:"d"`
+	From  string          `json:"from"`
 }
