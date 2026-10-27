@@ -3,7 +3,7 @@
 // features/<이름>/ 에 새 파일을 만든 뒤 features/index.ts 에 1줄 등록만 한다. 등록이 0개면 기존 화면·동작 그대로(회귀 0).
 // 자리 4곳 : ⋯ 더보기 항목(more) · 사이드 패널 탭(tab) · 무대 위 오버레이(Overlay — 시트·배지·자막도 여기서 그린다) · 영상 효과(effect).
 // 기능 간 공유 상태는 featureStore(모듈 저장소)로 — 메뉴 항목·오버레이·효과·onApp 이 같은 저장소를 본다. 근거 기록 docs/rea/REA_04_UI_EXT.md
-import { useCallback, useRef, useSyncExternalStore, type ComponentType, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ComponentType, type ReactNode } from 'react'
 import type { useRoom, SessionRole } from './use-room'
 import type { EffectDraw } from './effects'
 
@@ -135,4 +135,14 @@ export function wantSpeech(featureId: string, mode: SpeechMode | null) {
     else delete next[featureId]
     return next
   })
+}
+
+// 무대 위 공용 자리(15.6) — 녹화·AI 기록 배지(좌상단)와 시작·종료 토스트(상단 가운데)가 기능마다 같은 absolute 좌표라
+//  동시에 켜지면 하나가 가려지던 것을 막는다. room-view 가 이 id 의 flex 줄을 오버레이보다 먼저 그리고, 기능은 createPortal 로 붙는다
+export const BADGE_SLOT_ID = 'room-badges' // 가로 줄(360px 폭이면 줄바꿈)
+export const TOAST_SLOT_ID = 'room-toasts' // 세로 줄
+export function useStageSlot(id: typeof BADGE_SLOT_ID | typeof TOAST_SLOT_ID) {
+  const [el, setEl] = useState<HTMLElement | null>(null)
+  useEffect(() => setEl(document.getElementById(id)), [id])
+  return el
 }

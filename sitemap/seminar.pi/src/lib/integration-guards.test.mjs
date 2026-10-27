@@ -76,5 +76,21 @@ test('⑤ 외부 AI 를 부르는 라우트는 모두 speechGate 를 거치고, 
   // 회의록 요약(summarize)은 lib/notes 만 부르고, 요약 라우트는 manage(시작자·개최자·ADMIN) 확인
   const sum = srcFiles.filter((p) => /\bsummarize\(/.test(readFileSync(p, 'utf8')) && !rel(p).endsWith('lib/gemini.ts'))
   assert.deepEqual(sum.map(rel), ['src/lib/notes.ts'])
+})
+
+test('⑥ 녹화·AI 기록 배지·토스트는 공용 자리에 portal 로 붙는다 — 같은 absolute 좌표로 겹치지 않게(15.6)', () => {
+  const view = read('src/components/room/room-view.tsx')
+  assert.match(view, /id=\{BADGE_SLOT_ID\}[\s\S]*flex-wrap/)
+  assert.match(view, /id=\{TOAST_SLOT_ID\}[\s\S]*flex-col/)
+  // 슬롯은 오버레이보다 먼저 그린다(오버레이 마운트 때 getElementById 로 찾는다)
+  assert.ok(view.indexOf('id={TOAST_SLOT_ID}') < view.indexOf('f.Overlay &&'))
+  for (const f of ['recording', 'notes']) {
+    const s = read(`src/components/room/features/${f}/index.tsx`)
+    assert.match(s, /useStageSlot\(BADGE_SLOT_ID\)/, f)
+    assert.match(s, /useStageSlot\(TOAST_SLOT_ID\)/, f)
+    assert.doesNotMatch(s, /absolute top-\[calc\(12px|absolute top-12 /, `${f} 에 배지·토스트 고정 좌표 잔존`)
+  }
+  // 무대 고정 해제 버튼은 배지 줄(좌상단)과 다른 자리
+  assert.doesNotMatch(read('src/components/room/stage.tsx'), /absolute top-2 left-2/)
   assert.match(read('src/app/api/notes/[id]/end/route.ts'), /if \(!n\.manage\) return apiError\('FORBIDDEN', 403\)/)
 })

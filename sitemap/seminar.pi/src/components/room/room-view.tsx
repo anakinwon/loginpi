@@ -22,7 +22,7 @@ import {
   type PanelTab,
 } from './control-bar'
 import { useVideoEffects } from './effects'
-import { featureStore, speechWants, useStore, useStores, type RoomCtx } from './extensions'
+import { BADGE_SLOT_ID, TOAST_SLOT_ID, featureStore, speechWants, useStore, useStores, type RoomCtx } from './extensions'
 import { FEATURES } from './features'
 import { Prejoin } from './prejoin'
 import { Floaters, ReactionMenu } from './reactions'
@@ -556,6 +556,15 @@ function Room({
                   onPin={role === 'presenter' ? (k) => void pinForAll(k) : undefined}
                 />
                 <Floaters reaction={r.reaction} />
+                {/* 배지 줄·토스트 줄(15.6) — 녹화·AI 기록 배지·토스트가 portal 로 나란히 붙는다(겹침 방지) */}
+                <div
+                  id={BADGE_SLOT_ID}
+                  className="pointer-events-none absolute top-[calc(12px+env(safe-area-inset-top))] right-3 left-3 z-10 flex flex-wrap items-start gap-1.5"
+                />
+                <div
+                  id={TOAST_SLOT_ID}
+                  className="pointer-events-none absolute inset-x-0 top-12 z-10 flex flex-col items-center gap-1.5 px-3"
+                />
                 {FEATURES.map((f) => f.Overlay && <f.Overlay key={f.id} ctx={ctx} barShown={bar.shown} />)}
               </div>
             </div>
