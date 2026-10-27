@@ -147,7 +147,7 @@ export function ProgressBoard() {
                   {f.steps.map((s, i) => (
                     <li
                       key={s.id}
-                      className={`flex min-w-0 items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${TONE[s.status].ring}`}
+                      className={`flex min-w-0 flex-wrap items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${TONE[s.status].ring}`}
                     >
                       <span
                         className={`size-2 shrink-0 rounded-full ${TONE[s.status].dot}`}

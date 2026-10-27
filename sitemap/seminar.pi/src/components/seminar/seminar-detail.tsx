@@ -79,7 +79,7 @@ export function SeminarDetail({ id }: { id: string }) {
   const fee = formatFee(d.fee)
   return (
     <article className="space-y-6">
-      <Link href="/" className="text-muted-foreground text-sm hover:underline">
+      <Link href="/" className="text-muted-foreground inline-flex min-h-6 items-center text-sm hover:underline">
         ← {t('back')}
       </Link>
       <header className="space-y-2">

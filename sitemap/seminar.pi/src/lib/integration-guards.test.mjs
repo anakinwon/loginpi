@@ -191,3 +191,28 @@ test('⑬ 새 탭 링크(target=_blank)는 낭독기에 새 탭임을 글로 알
   }
   for (const l of ['ko', 'en']) assert.ok(JSON.parse(read(`messages/${l}.json`)).room.consent.newTab, l)
 })
+
+test('⑭ ko·en 같은 키의 문구 변수({name} 등)가 짝이 맞는다 — 한쪽만 다르면 그 언어 화면에서 변수가 빠지거나 형식 오류가 난다(r6)', () => {
+  const flat = (o, pre = '') =>
+    Object.entries(o).flatMap(([k, v]) => (v && typeof v === 'object' ? flat(v, `${pre}${k}.`) : [[`${pre}${k}`, v]]))
+  // {변수} 와 {변수, plural, …} 의 이름만 모은다
+  const vars = (s) =>
+    [...String(s).matchAll(/\{\s*([A-Za-z_]\w*)\s*[,}]/g)]
+      .map((m) => m[1])
+      .sort()
+      .join(',')
+  const [ko, en] = ['ko', 'en'].map((l) => new Map(flat(JSON.parse(read(`messages/${l}.json`)))))
+  const bad = [...ko].filter(([k, v]) => en.has(k) && vars(v) !== vars(en.get(k))).map(([k]) => k)
+  assert.ok([...ko.values()].filter((v) => vars(v)).length >= 30, '변수 문구 수집 실패')
+  assert.deepEqual(bad, [])
+})
+
+test('⑮ 360px 폭 — 제작 현황 단계 칸은 줄바꿈된다(비고 글이 칸 밖으로 넘쳐 가로 스크롤 생기던 것, r6 실측 378px)', () => {
+  assert.match(read('src/components/progress-board.tsx'), /flex min-w-0 flex-wrap items-center gap-2 rounded-md border/)
+})
+
+test('⑯ 글자 링크도 터치 대상 높이 24px 이상(WCAG 2.5.8) — 헤더 메뉴·상세 공유 줄·목록으로', () => {
+  assert.match(read('src/components/site-header.tsx'), /<nav className="[^"]*\[&>a\]:min-h-6/)
+  assert.match(read('src/components/seminar/share-links.tsx'), /text-xs \[&>\*\]:inline-flex \[&>\*\]:min-h-6/)
+  assert.match(read('src/components/seminar/seminar-detail.tsx'), /inline-flex min-h-6 items-center text-sm hover:underline">\s*← /)
+})
