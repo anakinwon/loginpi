@@ -7,6 +7,7 @@ import {
   formatFee,
   isUuid,
   joinError,
+  prejoinHeading,
   pageCount,
   parsePage,
   parseTab,
@@ -78,4 +79,9 @@ test('개설 시작일시 상한(S5)', () => {
   assert.equal(startAtOk(now + START_AHEAD_MAX_MS + 1, now), false)
   assert.equal(startAtOk(now, now), false)
   assert.equal(startAtOk(NaN, now), false)
+})
+
+test('대기실 머리말 — 세미나 방은 h2 고정 문구(UUID 노출·h1 중복 없음), 실험실 방은 h1 방 코드', () => {
+  assert.deepEqual(prejoinHeading('54000d08-4e41-4a6b-9c1d-0123456789ab'), { level: 2, key: 'titleSeminar' })
+  assert.deepEqual(prejoinHeading('lab-room_1'), { level: 1, key: 'title' })
 })

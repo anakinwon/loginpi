@@ -212,6 +212,7 @@
   },
   "room": {
     "title": "Join seminar · {room}",
+    "titleSeminar": "Get ready to join",
     "noEngine": "The video server is not ready yet.",
     "joinAs": "Join as",
     "presenter": "Presenter",

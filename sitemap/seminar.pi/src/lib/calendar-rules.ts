@@ -4,6 +4,8 @@
 // 세미나에 예정 종료일시가 없다(smn_mst.end_dtm = 실제 종료) → 일정 길이는 1시간으로 둔다
 // ponytail: 고정 1시간, 예정 종료일시 칼럼이 생기면 그 값으로
 export const DEFAULT_DUR_MS = 60 * 60 * 1000
+// .ics 시작 전 알림(분)
+export const REMIND_MIN = 10
 
 export interface CalEvent {
   id: string // smn_id — .ics UID
@@ -118,6 +120,10 @@ export function buildIcs(e: CalEvent, now = new Date()) {
     `LOCATION:${icsEscape(e.url)}`,
     `URL:${stripCtl(e.url)}`,
     `STATUS:${e.canceled ? 'CANCELLED' : 'CONFIRMED'}`,
+    // 시작 전 알림(RFC 5545 3.6.6) — 지원하는 캘린더 앱이 울린다(무시하는 앱도 있음). 취소된 일정엔 넣지 않는다
+    ...(e.canceled
+      ? []
+      : ['BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsEscape(e.title)}`, `TRIGGER:-PT${REMIND_MIN}M`, 'END:VALARM']),
     'END:VEVENT',
     'END:VCALENDAR',
   ]

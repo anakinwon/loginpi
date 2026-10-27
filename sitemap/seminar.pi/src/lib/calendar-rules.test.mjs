@@ -95,3 +95,14 @@ test('.ics — UID·CRLF·회의록 링크·취소 상태', () => {
   assert.match(flat, /STATUS:CONFIRMED/)
   assert.match(buildIcs({ ...ev, canceled: true }), /STATUS:CANCELLED/)
 })
+
+test('.ics — 시작 10분 전 알림(VEVENT 안), 취소 일정엔 없음, 알림 문구도 주입 차단', () => {
+  const ics = buildIcs({ ...ev, title: 'A\rATTENDEE:x' })
+  const lines = ics.replace(/\r\n /g, '').split('\r\n')
+  const a = lines.indexOf('BEGIN:VALARM')
+  assert.ok(a > lines.indexOf('BEGIN:VEVENT') && lines.indexOf('END:VALARM') < lines.indexOf('END:VEVENT'))
+  assert.ok(lines.includes('TRIGGER:-PT10M'))
+  assert.ok(lines.includes('DESCRIPTION:A\\nATTENDEE:x'))
+  assert.ok(!lines.some((l) => l.startsWith('ATTENDEE')))
+  assert.ok(!buildIcs({ ...ev, canceled: true }).includes('VALARM'))
+})
