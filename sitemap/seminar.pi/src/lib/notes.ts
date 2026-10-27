@@ -159,6 +159,8 @@ export async function finishNote(
     })
     .eq('nt_id', ntId)
     .eq('nt_sts_cd', from)
+    // 삭제된 회의록은 요약하지 않는다 — 권한 확인(loadNote)과 이 갱신 사이에 삭제되면 0행(지운 내용을 외부 AI 로 보내지 않게)
+    .eq('del_yn', 'N')
   // 다시 만들기는 마지막 실패 1분 뒤부터 — 권한자가 되풀이해도 외부 AI 호출은 분당 1회
   if (from === 'FAILED')
     up = up.lt('mod_dtm', new Date(now.getTime() - RETRY_GAP_MS).toISOString())
@@ -199,5 +201,6 @@ export async function finishNote(
       mod_dtm: new Date().toISOString(),
     })
     .eq('nt_id', ntId)
+    .eq('del_yn', 'N') // 요약 중 삭제되면 요약을 남기지 않는다
   return error ? { error } : { status }
 }

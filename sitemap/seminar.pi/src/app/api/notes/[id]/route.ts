@@ -12,6 +12,7 @@ import {
   MAX_MD_SEGS,
   MAX_SHOTS_LIST,
   noteMarkdown,
+  pickLabels,
   SEG_PAGE,
 } from '@/lib/note-rules'
 import { loadNote, readSegs, signShots } from '@/lib/notes'
@@ -35,6 +36,7 @@ const MD_L: Record<
     transcript: string
     shot: string
     cut: string
+    blank: string
   }
 > = {
   ko: {
@@ -44,6 +46,7 @@ const MD_L: Record<
     transcript: '전체 기록',
     shot: '화면 캡처',
     cut: '이하 생략(기록이 길어 뒷부분은 들어가지 않았습니다)',
+    blank: '기록된 내용이 없습니다',
   },
   en: {
     points: 'Key points',
@@ -52,6 +55,7 @@ const MD_L: Record<
     transcript: 'Transcript',
     shot: 'Screen capture',
     cut: 'Truncated (the rest of a long transcript is not included)',
+    blank: 'Nothing was recorded',
   },
 }
 
@@ -147,7 +151,7 @@ export const GET = withAuthGuard(
         )
       if ('error' in r) return dbFail(r.error)
       const tz = q.get('tz') || undefined
-      const L = MD_L[q.get('lang') ?? ''] ?? MD_L.ko
+      const L = pickLabels(MD_L, q.get('lang'))
       const at = (iso: string) => hhmm(iso, tz)
       const day = (iso: string) => {
         try {

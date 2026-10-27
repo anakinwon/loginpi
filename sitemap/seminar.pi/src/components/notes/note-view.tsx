@@ -11,7 +11,7 @@ import { Pagination } from '@/components/seminar/pagination'
 import { BTN, BTN_PRIMARY } from '@/components/seminar/shared'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
-import { hhmm, SEG_PAGE } from '@/lib/note-rules'
+import { emptySummary, hhmm, SEG_PAGE } from '@/lib/note-rules'
 
 const POLL_MS = 5000
 const POLL_MAX_MS = 120_000
@@ -82,6 +82,7 @@ function Note({ id }: { id: string }) {
   const [ask, setAsk] = useState(false)
   const [busy, setBusy] = useState(false)
   const [delErr, setDelErr] = useState(false)
+  const [dlErr, setDlErr] = useState(false)
 
   useEffect(() => {
     let live = true
@@ -124,7 +125,9 @@ function Note({ id }: { id: string }) {
     const r = await piFetch(
       `/api/notes/${id}?part=md&lang=${locale}&tz=${encodeURIComponent(tz)}`,
     ).catch(() => null)
-    if (!r?.ok) return setErr(t('error'))
+    // 실패는 내려받기 버튼 아래에만(회의록 본문은 그대로 — 삭제 실패와 같은 규칙)
+    setDlErr(!r?.ok)
+    if (!r?.ok) return
     const url = URL.createObjectURL(await r.blob())
     const a = document.createElement('a')
     a.href = url
@@ -169,6 +172,8 @@ function Note({ id }: { id: string }) {
     timeStyle: 'short',
   })
   const s = head.summary
+  // 말한 내용 없이 끝난 회의록 — 빈 칸 3개·AI 고지 대신 안내 1줄(E2E r1)
+  const blank = head.status === 'DONE' && emptySummary(s)
   return (
     <article className="space-y-6">
       {/* 대면 노트(세미나 없음)는 내 회의록 목록으로 */}
@@ -183,7 +188,9 @@ function Note({ id }: { id: string }) {
         <p className="text-muted-foreground text-sm">
           {t('meta', { date, min: String(min) })}
         </p>
-        <p className="text-muted-foreground text-xs">ⓘ {t('aiWarn')}</p>
+        {!blank && (
+          <p className="text-muted-foreground text-xs">ⓘ {t('aiWarn')}</p>
+        )}
       </header>
 
       <section
@@ -222,7 +229,8 @@ function Note({ id }: { id: string }) {
             )}
           </div>
         )}
-        {head.status === 'DONE' && s && (
+        {blank && <p>{t('blank')}</p>}
+        {head.status === 'DONE' && s && !blank && (
           <>
             <List title={t('points')} items={s.points} none={t('none')} />
             <List title={t('decisions')} items={s.decisions} none={t('none')} />
@@ -241,6 +249,11 @@ function Note({ id }: { id: string }) {
       >
         {t('download')}
       </button>
+      {dlErr && (
+        <p role="alert" className="text-sm">
+          {t('dlFail')}
+        </p>
+      )}
 
       {head.del && (
         <section className="space-y-2 border-t pt-4 text-sm">

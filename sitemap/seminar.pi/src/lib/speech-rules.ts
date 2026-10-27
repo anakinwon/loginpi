@@ -35,7 +35,7 @@ type Box = 'webm' | 'ogg' | 'mp4'
 // 'audio/webm;codecs=opus' → 'audio/webm'. 모르는 형식 = null
 export function baseMime(type: string | null | undefined) {
   const t = (type ?? '').split(';')[0].trim().toLowerCase()
-  return t in MIME ? t : null
+  return Object.hasOwn(MIME, t) ? t : null // 자기 속성만('constructor'·'__proto__' 는 모르는 형식)
 }
 export const aiMime = (type: string) => MIME[baseMime(type) ?? '']?.ai ?? null
 
