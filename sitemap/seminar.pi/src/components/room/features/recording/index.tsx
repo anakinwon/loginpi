@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl'
 import { BADGE_SLOT_ID, TOAST_SLOT_ID, featureStore, useStageSlot, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 import { APP_RETRY, latestOnly, sendRetry } from '../../app-retry'
 import type { Recorder } from './recorder'
-import { applyRec, othersRecording, pruneRec, recFileName, saveVia, type RecBy } from './rules'
+import { applyRec, othersRecording, pruneRec, recFileName, saveVia, stopToast, type RecBy } from './rules'
 
 const RESEND_MS = 1000 // 늦은 입장자 재알림 묶음(초당 2건 한도 안)
 const sendState = (ctx: RoomCtx, on: boolean, live: () => boolean) =>
@@ -55,7 +55,7 @@ let ctxNow: (() => RoomCtx) | null = null // 최신 ctx(Overlay 가 맞춘다) �
 let gen = 0 // 세대 — onReset(퇴장·끊김) 때 증가. startRec 의 await 사이에 바뀌면 시작하지 않는다
 
 // 종료 — 파일 저장 + 전원 알림. ctx 가 없으면(퇴장·끊김) 알림 없이 저장만(데이터 유실 방지)
-async function stopRec(ctx: RoomCtx | null) {
+async function stopRec(ctx: RoomCtx | null, auto = false) {
   const rec = recorder
   if (!rec) return
   recorder = null
@@ -74,7 +74,7 @@ async function stopRec(ctx: RoomCtx | null) {
         lastSaved.set(true)
       }
     }
-    toast.set(blob.size ? 'saved' : 'empty')
+    toast.set(stopToast(blob.size, auto))
   } catch {
     toast.set('saveFailed')
   } finally {
@@ -111,7 +111,7 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
     try {
       // 녹화 중 브라우저가 녹화를 멈추거나(오류) 메모리 상한(recorder.ts R.maxBytes)에 닿으면 종료·저장·고지 해제 — 이 녹화기일 때만(다음 녹화를 끄지 않게)
       const rec = mod.startRecorder(stage, ac, () => {
-        if (recorder === rec) void stopRec(ctxNow?.() ?? null)
+        if (recorder === rec) void stopRec(ctxNow?.() ?? null, true)
       })
       recorder = rec
       started = true

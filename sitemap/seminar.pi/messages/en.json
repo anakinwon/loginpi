@@ -534,6 +534,7 @@
       "toast": {
         "started": "Recording started — everyone can see it",
         "saved": "Recording saved. Check your downloads folder. If nothing was saved, tap [Save again] at the top of the screen.",
+        "autoStopped": "Recording ended because the browser stopped it or the size limit was reached. Everything up to that point was saved. Start recording again to continue.",
         "empty": "Nothing was recorded, so no file was created.",
         "saveFailed": "Could not create the recording file.",
         "startedBy": "The presenter started recording",

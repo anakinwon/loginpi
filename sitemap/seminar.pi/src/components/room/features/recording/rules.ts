@@ -65,6 +65,11 @@ export function pruneRec(by: RecBy, peers: readonly { peerId: string; role: stri
   return Object.fromEntries(keep.map((id) => [id, true] as const))
 }
 
+// 종료 토스트 — 저장한 파일이 없으면 empty, 자동 종료(브라우저 녹화 중단·메모리 상한)면 이유를 알린다(전에는 '저장했어요'만 떠 왜 멈췄는지 몰랐다)
+export function stopToast(size: number, auto: boolean): 'saved' | 'autoStopped' | 'empty' {
+  return !size ? 'empty' : auto ? 'autoStopped' : 'saved'
+}
+
 // 다시 저장 방법 — 파일 공유(앱 안 브라우저·모바일에서 '파일에 저장' 가능)가 되면 share, 아니면 <a download>. 기능 탐지만(UA 판정 금지)
 type ShareNav = { canShare?: (data: { files: File[] }) => boolean; share?: unknown }
 export function saveVia(nav: ShareNav | undefined, file: File): 'share' | 'download' {

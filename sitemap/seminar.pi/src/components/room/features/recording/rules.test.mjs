@@ -1,7 +1,8 @@
 // 녹화 순수 판정 시험 — node --test src/components/room/features/recording/rules.test.mjs (Node 24 타입 제거)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { applyRec, fitRect, othersRecording, pickMime, pruneRec, readRecording, recFileName, saveVia } from './rules.ts'
+import { applyRec, fitRect, othersRecording, pickMime, pruneRec, readRecording, recFileName, saveVia, stopToast } from './rules.ts'
+import { readFileSync } from 'node:fs'
 
 test('pickMime — 앞 후보 우선, iOS(mp4 만)·미지원', () => {
   assert.equal(pickMime(() => true), 'video/webm;codecs=vp9,opus')
@@ -73,4 +74,14 @@ test('pruneRec — 강등·퇴장한 사람의 녹화 표시는 지운다(다시
   // 바뀐 것이 없으면 null(다시 그리지 않게)
   assert.equal(pruneRec({ P: true }, peers), null)
   assert.equal(pruneRec({}, peers), null)
+})
+
+test('stopToast — 자동 종료는 이유를 알리고, 토스트 키는 ko·en 둘 다 있다', () => {
+  assert.equal(stopToast(10, false), 'saved')
+  assert.equal(stopToast(10, true), 'autoStopped')
+  assert.equal(stopToast(0, true), 'empty')
+  for (const l of ['ko', 'en']) {
+    const m = JSON.parse(readFileSync(new URL(`../../../../../messages/${l}.json`, import.meta.url), 'utf8'))
+    for (const k of ['saved', 'autoStopped', 'empty', 'saveFailed']) assert.ok(m.room.recording.toast[k], `${l} ${k}`)
+  }
 })
