@@ -2,13 +2,14 @@
 // 회의록 화면(설계서 15.9) — 머리(제목·시각·길이·AI 고지) → 요약(요점·결정·할 일) → 화면 캡처(화면에 들어오기 직전 조회) → 전체 기록(50줄 쪽, 같은 방식)
 //  → [Markdown 내려받기](piFetch → Blob → 객체 URL — <a download> 는 X-Pi-Token 을 못 붙인다). 비로그인 = LoginGate(redirect 없음).
 //  상태 : 만드는 중 = 5초 간격 조회·최대 2분(넘으면 새로 고침 안내) / 실패 = 안내 + 관리 권한자에게 [다시 만들기] / 완료
+//  [회의록 삭제] = 기록 시작자·ADMIN(head.del) — 두 번 눌러 확인(window.confirm 은 WebView 가 막을 수 있어 쓰지 않음) → DELETE → 내 회의록 목록
 import { useEffect, useRef, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { LoginGate } from '@/components/login-gate'
 import { Pagination } from '@/components/seminar/pagination'
 import { BTN, BTN_PRIMARY } from '@/components/seminar/shared'
-import { Link } from '@/i18n/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
 import { hhmm, SEG_PAGE } from '@/lib/note-rules'
 
@@ -23,6 +24,7 @@ type Head = {
   status: 'RECORDING' | 'SUMMARIZING' | 'DONE' | 'FAILED'
   summary: { points: string[]; decisions: string[]; todos: string[] } | null
   manage: boolean
+  del: boolean
 }
 
 // 화면에 들어오기 직전(200px 앞) 한 번 true — 데이터 패칭 표준 ③
@@ -76,6 +78,10 @@ function Note({ id }: { id: string }) {
   const [tick, setTick] = useState(0)
   const [long, setLong] = useState(false)
   const since = useRef(Date.now())
+  const router = useRouter()
+  const [ask, setAsk] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [delErr, setDelErr] = useState(false)
 
   useEffect(() => {
     let live = true
@@ -125,6 +131,20 @@ function Note({ id }: { id: string }) {
     a.download = `${(head?.title || 'notes').replace(/[\\/:*?"<>|]/g, '_')}.md`
     a.click()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+
+  const remove = async () => {
+    setBusy(true)
+    const r = await piFetch(`/api/notes/${id}`, { method: 'DELETE' }).catch(
+      () => null,
+    )
+    setBusy(false)
+    // 실패는 삭제 영역 안에만(회의록 본문은 그대로) — 확인 단계를 닫아 다시 누를 수 있게
+    if (!r?.ok) {
+      setAsk(false)
+      return setDelErr(true)
+    }
+    router.push('/notes')
   }
 
   if (err)
@@ -221,6 +241,46 @@ function Note({ id }: { id: string }) {
       >
         {t('download')}
       </button>
+
+      {head.del && (
+        <section className="space-y-2 border-t pt-4 text-sm">
+          {ask ? (
+            <>
+              <p role="alert">{t('delAsk')}</p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className={BTN}
+                  disabled={busy}
+                  onClick={() => void remove()}
+                >
+                  {t('delYes')}
+                </button>
+                <button
+                  type="button"
+                  className={BTN}
+                  disabled={busy}
+                  onClick={() => setAsk(false)}
+                >
+                  {t('delNo')}
+                </button>
+              </div>
+            </>
+          ) : (
+            <button
+              type="button"
+              className={BTN}
+              onClick={() => {
+                setDelErr(false)
+                setAsk(true)
+              }}
+            >
+              {t('del')}
+            </button>
+          )}
+          {delErr && <p role="alert">{t('delFail')}</p>}
+        </section>
+      )}
     </article>
   )
 }

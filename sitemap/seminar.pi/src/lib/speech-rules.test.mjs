@@ -5,9 +5,11 @@ import {
   aiMime,
   baseMime,
   billSec,
+  RESERVE_BYTES_PER_SEC,
+  reserveSec,
+  settleSec,
   chunkError,
   chunkSec,
-  extraSec,
   LANG_RE,
   MAX_CHUNK_BYTES,
   paceStyle,
@@ -94,13 +96,23 @@ test('과금 초 — 신고 길이 vs 바이트(128kbps) 중 큰 쪽', () => {
   assert.equal(billSec(1000, 16_001), 2)
 })
 
-test('호출 후 정산 — 실제 음성 토큰(초당 32)이 과금 초보다 많으면 차이', () => {
-  assert.equal(extraSec(5, 160), 0) // 5초 = 160 토큰
-  assert.equal(extraSec(5, 161), 1)
-  assert.equal(extraSec(10, 32 * 213), 203) // 저비트레이트 160KB 에 213초 담은 경우
-  assert.equal(extraSec(5, null), 0)
-  assert.equal(extraSec(5, NaN), 0)
-  assert.equal(extraSec(5, -1), 0)
+test('선예약 — opus 최저 6kbps 로 본 최악 길이(사후 정산 경합 차단)', () => {
+  assert.equal(RESERVE_BYTES_PER_SEC, 750)
+  assert.equal(reserveSec(5000, 3750), 5) // 6kbps 5초 = 신고 길이 그대로
+  assert.equal(reserveSec(5000, 32_000), 43) // 크롬 기본(약 51kbps) 5초 조각 = 43초 예약
+  assert.equal(reserveSec(500, MAX_CHUNK_BYTES), 214) // 160KB 에 담길 수 있는 최장 = 213.3초 → 214
+  assert.ok(reserveSec(5000, 100) >= 5) // 예약 >= 신고 길이
+})
+
+test('호출 뒤 정산 — 음수 = 환급, 양수 = 추가, 실패 = 과금 초까지 환급', () => {
+  assert.equal(settleSec(43, 5, 160), -38) // 실제 5초 → 38초 환급
+  assert.equal(settleSec(43, 5, 32 * 7), -36) // 실제 7초
+  assert.equal(settleSec(214, 10, 32 * 213), -1) // 저비트레이트 213초 = 거의 전부 과금
+  assert.equal(settleSec(5, 5, 32 * 9), 4) // 6kbps 보다 낮은 비트레이트 = 차이 추가
+  assert.equal(settleSec(43, 5, null), -38) // 호출 실패·토큰 없음 = 128kbps 하한까지만
+  assert.equal(settleSec(43, 5, NaN), -38)
+  assert.equal(settleSec(43, 5, -1), -38)
+  assert.equal(settleSec(5, 5, 160), 0) // 차이 없음 = 호출 생략
 })
 
 test('사용 판정 결과 매핑', () => {

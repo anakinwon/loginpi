@@ -140,3 +140,25 @@ export function recAlert(s: {
   if (s.micLost) return 'micLost'
   return s.limited ? 'limited' : null
 }
+
+// 회의록 조각 저장 자격(D-1) — 기록 시작자·개최자·ADMIN 의 음성만 회의록에 남긴다. 무대 화자(참가자) 음성은 자막만.
+//  서버가 무대 역할을 모르므로(무대 승격 DB 기록 없음) 참가자 조각이 회의록을 오염·주입하지 못하게 막는 단기 규칙
+export function canRecordSeg(p: {
+  uid: string
+  starter: string
+  host: string | null | undefined
+  admin: boolean
+}) {
+  return p.admin || p.uid === p.starter || (!!p.host && p.uid === p.host)
+}
+
+// 요약 입력의 기록 블록 — 조각 글·화자명은 신뢰할 수 없는 데이터(말한 사람이 '앞 지시를 무시하라' 고 말할 수 있다).
+//  구분자 안에 넣고, 조각 안의 구분자 꼴(<<< · >>>)은 비슷한 다른 글자로 바꿔 블록을 빠져나오지 못하게 한다(프롬프트 주입 차단)
+export const TX_OPEN = '<<<TRANSCRIPT'
+export const TX_CLOSE = 'TRANSCRIPT>>>'
+export function fenceTranscript(lines: readonly string[]) {
+  const safe = lines.map((l) =>
+    l.replace(/<<</g, '‹‹‹').replace(/>>>/g, '›››'),
+  )
+  return `${TX_OPEN}\n${safe.join('\n')}\n${TX_CLOSE}`
+}
