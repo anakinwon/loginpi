@@ -4,6 +4,7 @@
 // 부가 기능 확장 지점(F-U, extensions.ts) — features/index.ts 등록부를 ⋯ 항목·패널 탭·무대 오버레이·영상 효과·app 수신·음성 조각·마이크 동의로 잇는다.
 // 등록이 0개면 아무것도 더하지 않는다(회귀 0)
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useLocale, useTranslations } from 'next-intl'
 import { LoginGate } from '@/components/login-gate'
 import { piFetch } from '@pi/auth/client'
@@ -36,6 +37,7 @@ import {
   peerMedia,
   speechOn,
   TOAST,
+  topDialog,
   type Grade,
   type ModAction,
   type ToastState,
@@ -421,17 +423,26 @@ function Room({
   const promo = role === 'panel' && !has.audio && !promoHidden && r.state === 'joined'
   const ended = r.state === 'error' || r.state === 'closed'
   const btnS = 'h-9 shrink-0 rounded-full px-4 text-sm font-semibold'
+  const noticeP = notice && (
+    <p className="bg-surface-raised rounded-lg px-4 py-2 text-sm shadow-lg">{t(notice.key, notice.v)}</p>
+  )
+  // 시트(모달 <dialog>)가 열려 있으면 알림을 그 안에 그린다 — 바깥은 inert 라 가려지고 낭독되지 않는다(topDialog).
+  // ponytail: 알림이 뜬 뒤 시트가 닫히면 남은 시간(최대 NOTICE_MS) 동안 닫힌 시트 안에 머문다 — 다음 렌더에 바깥으로 돌아온다
+  const noticeHost = notice && typeof document !== 'undefined' ? topDialog(document.querySelectorAll('dialog')) : null
   return (
     <div className="space-y-3">
       <audio ref={audioRef} autoPlay />
       {/* 알림 영역은 항상 붙여 두고 내용만 바꾼다 — 오류성 알림은 assertive, 채팅·손들기 낭독은 polite */}
       <div aria-live="assertive" className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-4">
-        {notice && (
-          <p className="bg-surface-raised rounded-lg px-4 py-2 text-sm shadow-lg">
-            {t(notice.key, notice.v)}
-          </p>
-        )}
+        {!noticeHost && noticeP}
       </div>
+      {noticeHost &&
+        createPortal(
+          <div role="alert" className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-4">
+            {noticeP}
+          </div>,
+          noticeHost,
+        )}
       <div aria-live="polite" className="sr-only">
         {announce}
       </div>

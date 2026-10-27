@@ -41,7 +41,22 @@ import {
   appSupportedBy,
   consentPlan,
 } from './room-rules.ts'
-import { failHit } from './room-rules.ts'
+import { failHit, topDialog } from './room-rules.ts'
+
+// 회귀(T05 r6) — 효과 시트(모달 dialog)가 열린 채 ctx.notice(소음 줄 실패 등)가 뜨면 바깥 알림 줄은 inert 라 가려지고 낭독되지 않았다
+test('화면 알림 자리 — 열린 dialog 중 맨 위, 없으면 null(바깥 줄)', async () => {
+  const a = { open: true, n: 'a' }
+  const b = { open: false, n: 'b' }
+  const c = { open: true, n: 'c' }
+  assert.equal(topDialog([]), null)
+  assert.equal(topDialog([b]), null)
+  assert.equal(topDialog([a, b]), a)
+  assert.equal(topDialog([a, b, c]), c)
+  const { readFileSync } = await import('node:fs')
+  const src = readFileSync(new URL('./room-view.tsx', import.meta.url), 'utf8')
+  assert.match(src, /topDialog\(document\.querySelectorAll\('dialog'\)\)/)
+  assert.match(src, /createPortal\(\s*<div role="alert"[\s\S]{0,200}noticeHost/)
+})
 
 // 회귀(T05 r2) — 연속 실패로 끈 효과의 횟수가 남아, 조명 등으로 파이프라인이 살아 있는 동안 다시 켠 배경이 실패 1번에 바로 꺼졌다
 test('효과 연속 실패 — 상한에서 끄고 횟수를 지운다', () => {

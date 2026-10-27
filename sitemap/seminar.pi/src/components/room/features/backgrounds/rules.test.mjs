@@ -1,7 +1,7 @@
 // 배경 효과 판정 시험 — node --test src/components/room/features/backgrounds/rules.test.mjs (Node 24 는 .ts 를 타입 제거로 바로 읽는다)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { afterDelete, BG, checkMine, coverRect, failBack, keepShown, nextTs, overflowIds, pipelineKilled, slowerEvery, slowWatch, withUnsaved } from './rules.ts'
+import { afterDelete, BG, checkMine, coverRect, dropShown, failBack, keepShown, nextTs, overflowIds, pipelineKilled, slowerEvery, slowWatch, withUnsaved } from './rules.ts'
 
 // 30fps 로 프레임마다 ms 만큼 걸린다고 치고 sec 초 동안 돌린다 — 한 번이라도 끄라고 하면 true
 function run(ms, sec, watch = slowWatch()) {
@@ -174,4 +174,28 @@ test('쓰는 내 이미지 삭제 — 흐림으로, 고르던 중이면 앞 배�
   const del = src.slice(src.indexOf('const del = async'), src.indexOf('removeMine(id)'))
   assert.match(del, /dropMine\(id\)/)
   assert.doesNotMatch(del, /choose\('none'\)/)
+})
+
+// 회귀(T05 r6) — 그리던 내 이미지 A 를 다른 배경(못 읽는 파일 등)을 고르는 중에 지우면 A 가 계속 송출되고,
+// 고르던 것이 실패하면 failBack 이 지운 A 로 되돌아가 목록에 없는(지울 수도 없는) 배경이 남았다
+test('그리는 내 이미지를 고르는 중에 삭제 — 흐림으로 바꿔 그리고, 실패해도 흐림에 머문다', async () => {
+  assert.equal(dropShown('m:a', 'm:b', 'm:a', true), true)
+  assert.equal(dropShown('m:a', 'm:a', 'm:a', true), false) // 고르는 것 자체가 그것 — afterDelete 몫
+  assert.equal(dropShown('m:a', 'm:b', 'blur', true), false) // 그리는 것이 아님
+  assert.equal(dropShown('m:a', 'm:b', 'm:a', false), false)
+  assert.equal(failBack('blur', true), 'blur') // 엔진이 shown 을 blur 로 바꾼 뒤의 실패 복귀
+  const { readFileSync } = await import('node:fs')
+  const src = readFileSync(new URL('./engine.ts', import.meta.url), 'utf8')
+  const body = src.slice(src.indexOf('export async function dropMine('), src.indexOf('bgOn.sub('))
+  assert.match(body, /dropShown\([\s\S]{0,80}\{\s*backdrop = null\s*\/\/[^\n]*\n\s*shown = 'blur'/)
+  assert.ok(body.indexOf('dropShown(') < body.indexOf('afterDelete('))
+})
+
+// 회귀(T05 r6) — 시트가 열린 채 저절로 꺼지면(느림·연속 실패) 무대 토스트가 모달 시트 뒤(inert)라 안 보이고 낭독도 안 됐다
+test('시트가 열린 채 자동 끔 — 시트 안 알림 줄(role=alert)에 남긴다', async () => {
+  const { readFileSync } = await import('node:fs')
+  const src = readFileSync(new URL('./index.tsx', import.meta.url), 'utf8')
+  assert.match(src, /const off = useStore\(autoOff\)/)
+  assert.match(src, /if \(isOpen && off\) setErr\(off\)/)
+  assert.match(src, /role="alert"[\s\S]{0,80}t\(err\)/)
 })
