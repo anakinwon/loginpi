@@ -5,13 +5,14 @@
 // 사용 지표를 odml.pa.googleapis.com 로 보내며 끄는 옵션이 없음(1회 실패면 주기 전송 중단). 코드는 옮기지 않았다(S-2)
 import type { ImageSegmenter } from '@mediapipe/tasks-vision'
 import { featureStore } from '../../extensions'
-import { BG, coverRect, slowWatch } from './rules'
+import { BG, coverRect, pipelineKilled, slowWatch } from './rules'
 
 // 선택 — none · blur · p:<프리셋> · m:<내 이미지 id>
 export const choice = featureStore<string>('none')
 export const bgOn = featureStore(false) // 파이프라인 효과 켜짐(30회 연속 실패면 파이프라인이 false 로)
 export const status = featureStore<'idle' | 'loading'>('idle')
-export const autoOff = featureStore(0) // 성능 자동 끔 시각(0 = 없음) — 오버레이가 경고 토스트
+// 저절로 꺼진 까닭(room.effects.* 문구 키, null = 없음) — 오버레이가 경고 토스트. autoOff = 느려서 끔, bgStopped = 그리기 연속 실패로 파이프라인이 끔
+export const autoOff = featureStore<string | null>(null)
 
 // 기능 탐지(UA 판정 금지) — 분리 입력 업로드에 webgl2/webgl 이 필요하다(REA mediapipe-04 gpu_cpu)
 // 1회만 판정해 캐시하고 시험용 컨텍스트는 바로 놓는다 — 렌더마다 열면 버려진 컨텍스트가 쌓여 상한(Chrome 약 16개)에서 분리기 컨텍스트가 끊긴다
@@ -107,10 +108,10 @@ async function toBackdrop(next: string, blob?: Blob): Promise<HTMLCanvasElement>
 // 배경 고르기 — 반환 = 오류 문구 키(room.effects.*)·'superseded'(다른 선택에 밀려난 실패, 문구 없음) 또는 null. blob = 내 이미지일 때
 export async function choose(next: string, blob?: Blob): Promise<string | null> {
   const my = ++pick
-  autoOff.set(0)
+  autoOff.set(null)
   if (next === 'none') {
+    choice.set('none') // bgOn 보다 먼저 — 아래 구독이 사용자 끔을 파이프라인 끔으로 오인하지 않게
     bgOn.set(false)
-    choice.set('none')
     status.set('idle')
     return null
   }
@@ -134,9 +135,18 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
   }
 }
 
-// 파이프라인이 꺼 버리면(연속 실패) 선택도 '없음'으로
+// 파이프라인이 꺼 버리면(그리기 30회 연속 실패 — WebGL 컨텍스트 유실 등) 선택을 '없음'으로, 알리고(배경이 말없이 사라져 방이 드러나지 않게),
+// 망가진 분리기를 버린다(재사용하면 다시 골라도 같은 실패만 되풀이 — 다음 선택 때 새로 만든다, wasm 은 장기 캐시라 재다운로드 없음)
 bgOn.sub(() => {
-  if (!bgOn.get() && status.get() === 'idle' && choice.get() !== 'none') choice.set('none')
+  if (!pipelineKilled(bgOn.get(), choice.get(), status.get())) return
+  choice.set('none')
+  try {
+    seg?.close()
+  } catch {}
+  seg = null
+  loading = null
+  mask = null
+  autoOff.set('bgStopped')
 })
 
 let small: HTMLCanvasElement | null = null // 분리 입력(축소)
@@ -193,12 +203,12 @@ export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: n
   out.drawImage(person, 0, 0)
   if (watch(performance.now() - t0, t0)) {
     void choose('none')
-    autoOff.set(Date.now())
+    autoOff.set('autoOff')
   }
 }
 
 // 퇴장 — 선택만 처음으로(분리기 인스턴스는 다음 방에서 재사용)
 export function reset() {
   void choose('none')
-  autoOff.set(0)
+  autoOff.set(null)
 }
