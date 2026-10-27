@@ -2,13 +2,17 @@
 // 녹화(로컬 저장, SA6 — 설계서 15.6·계획서 M-4) — 발표자만 ⋯ [녹화 시작] → 고지 확인 대화상자 → 전원에게 state{recording:true} → 무대 합성 녹화.
 // 끄면 state{recording:false} + 파일 다운로드(seminar-<id>-<시각>.webm|mp4). 받는 쪽은 빨간 '녹화 중' 배지(자동 숨김 없음) + 3초 토스트.
 // 전원 고지를 못 하면(sendApp 실패) 시작하지 않는다. 늦게 들어온 사람에게는 녹화 중인 발표자가 1초 묶음으로 다시 알린다(SIGNAL_API 3.6).
+// 고지는 fail-open 을 막으려고 시작·종료·재알림 모두 재시도(RATE_LIMITED·TIMEOUT)하고, 녹화 중에는 10초마다 현재 상태를 다시 보낸다(app-retry).
 // d 약속 : { recording: boolean } — 같은 state 주제의 다른 키(AI 기록 등)는 이 기능이 무시한다
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { featureStore, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
+import { APP_RETRY, sendRetry } from '../../app-retry'
 import type { Recorder } from './recorder'
 
 const RESEND_MS = 1000 // 늦은 입장자 재알림 묶음(초당 2건 한도 안)
+const sendState = (ctx: RoomCtx, on: boolean, live: () => boolean) =>
+  sendRetry(() => ctx.sendApp('state', { recording: on }), live)
 const TOAST_MS = 3000
 
 const recOn = featureStore(false) // 내가 녹화 중
@@ -36,6 +40,8 @@ async function stopRec(ctx: RoomCtx | null) {
   busy.set(true)
   recOn.set(false)
   startedAt.set(0)
+  // 종료 알림은 파일 저장을 기다리지 않고 먼저 — 한도에 걸리면 다시 보낸다(사이에 새 녹화가 시작되면 그만). 역할을 잃었으면 엔진이 거절하고 받는 쪽이 역할로 내린다
+  if (ctx) void sendState(ctx, false, () => !recorder && !recOn.get())
   try {
     const blob = await rec.stop()
     if (blob.size) (await import('./recorder')).saveBlob(blob, fileName)
@@ -45,7 +51,6 @@ async function stopRec(ctx: RoomCtx | null) {
   } finally {
     busy.set(false)
   }
-  if (ctx) void ctx.sendApp('state', { recording: false })
 }
 
 // ac = 클릭 핸들러에서 동기로 만든 AudioContext(사용자 활성화). 시작하지 못하면 여기서 닫는다
@@ -63,7 +68,9 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
     if (g !== gen) return
     if (!mod.canRecord()) return ctx.notice('recording.unsupported')
     // 먼저 전원에게 알린다 — 실패하면 시작하지 않는다(M-4)
-    if (await ctx.sendApp('state', { recording: true })) return ctx.notice('recording.notifyFailed')
+    const err = await sendState(ctx, true, () => g === gen)
+    if (err === 'CANCELLED') return
+    if (err) return ctx.notice('recording.notifyFailed')
     // 기다리는 사이 퇴장·끊김(onReset)이면 시작하지 않고 알림을 되돌린다
     if (g !== gen) return void ctx.sendApp('state', { recording: false })
     try {
@@ -159,11 +166,22 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
 
   // 늦은 입장자 — 참가자 구성이 바뀌면 1초 묶어서 현재 상태를 다시 알린다
   const peerKey = [...ids].sort().join(',')
+  const ctxRef = useRef(ctx)
+  useEffect(() => {
+    ctxRef.current = ctx
+  })
   useEffect(() => {
     if (!mine) return
-    const timer = setTimeout(() => void ctx.sendApp('state', { recording: true }), RESEND_MS)
+    const timer = setTimeout(() => void sendState(ctxRef.current, true, recOn.get), RESEND_MS)
     return () => clearTimeout(timer)
-  }, [mine, peerKey]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mine, peerKey])
+
+  // 녹화 중 주기 재알림 — 묶음 재알림이 한도에 걸렸거나 신호를 놓친 사람도 10초 안에 배지를 본다(M-4 고지 fail-open 방지)
+  useEffect(() => {
+    if (!mine) return
+    const timer = setInterval(() => void sendState(ctxRef.current, true, recOn.get), APP_RETRY.heartbeatMs)
+    return () => clearInterval(timer)
+  }, [mine])
 
   const btn = 'h-9 shrink-0 rounded-full px-4 text-sm font-semibold disabled:opacity-40'
   return (

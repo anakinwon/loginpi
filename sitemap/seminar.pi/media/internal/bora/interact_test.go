@@ -263,7 +263,7 @@ func TestChat(t *testing.T) {
 	}
 }
 
-// app.send(v1.3) — 주제 허용표·역할·d 4KB·피어당 초당 2건(주제 합산)·잘못된 요청은 한도 미사용·잠금 무관,
+// app.send(v1.3) — 주제 허용표·역할·d 4KB·피어당 초당 2건(caption·refresh 합산, state 따로 v1.3.2)·잘못된 요청은 한도 미사용·잠금 무관,
 // 받는 사람 = 보낸 본인 외 전원, d 는 받은 그대로·from 은 서버가 채움, JSON 모양.
 func TestAppSend(t *testing.T) {
 	v := newV11(t)
@@ -283,7 +283,8 @@ func TestAppSend(t *testing.T) {
 		{"없는 참가자", "X", "refresh", nil, signal.CodeNotFound},
 		{"발표자 caption 4096바이트", "P", "caption", big, ""},
 		{"발표자 state", "P", "state", json.RawMessage(`{"recording":true}`), ""},
-		{"발표자 1초 안 3번째", "P", "refresh", nil, signal.CodeRateLimited},
+		{"발표자 refresh(state 는 한도 따로)", "P", "refresh", nil, ""},
+		{"발표자 1초 안 3번째(caption·refresh 합산)", "P", "caption", nil, signal.CodeRateLimited},
 		{"패널 caption", "N", "caption", json.RawMessage(`{"text":"안녕"}`), ""},
 		{"청중 refresh(앞의 거절은 한도 미사용)", "A1", "refresh", nil, ""},
 		{"청중 refresh 2번째", "A1", "refresh", json.RawMessage(`{"kind":"poll"}`), ""},
@@ -294,12 +295,12 @@ func TestAppSend(t *testing.T) {
 		}
 	}
 	got := v.take()
-	// 성공 5건 : P caption·P state·N caption·A1 refresh 2건 — 각자 자기 것은 못 받는다
+	// 성공 6건 : P caption·P state·P refresh·N caption·A1 refresh 2건 — 각자 자기 것은 못 받는다
 	want := map[string][]string{
 		"P":  {"N/caption", "A1/refresh", "A1/refresh"},
-		"N":  {"P/caption", "P/state", "A1/refresh", "A1/refresh"},
-		"A1": {"P/caption", "P/state", "N/caption"},
-		"A2": {"P/caption", "P/state", "N/caption", "A1/refresh", "A1/refresh"},
+		"N":  {"P/caption", "P/state", "P/refresh", "A1/refresh", "A1/refresh"},
+		"A1": {"P/caption", "P/state", "P/refresh", "N/caption"},
+		"A2": {"P/caption", "P/state", "P/refresh", "N/caption", "A1/refresh", "A1/refresh"},
 	}
 	for id, w := range want {
 		var seq []string
@@ -322,10 +323,35 @@ func TestAppSend(t *testing.T) {
 		want string
 	}{
 		{got["A2"][1].D.(signal.AppNtf), `{"topic":"state","d":{"recording":true},"from":"P"}`},
-		{got["A2"][3].D.(signal.AppNtf), `{"topic":"refresh","d":null,"from":"A1"}`}, // d 생략 = null
+		{got["A2"][2].D.(signal.AppNtf), `{"topic":"refresh","d":null,"from":"P"}`}, // d 생략 = null
 	} {
 		if b, _ := json.Marshal(st.n); string(b) != st.want {
 			t.Errorf("JSON %s 기대 %s", b, st.want)
+		}
+	}
+}
+
+// app.send 'state' 한도 분리(v1.3.2) — 자막을 초당 한도까지 보내도 녹화·AI 기록 고지(M-4)는 나가고,
+// state 자체도 초당 2건 한도를 지키며, state 가 한도에 걸려도 자막은 막히지 않는다.
+func TestAppSendStateBudget(t *testing.T) {
+	v := newV11(t)
+	cp := json.RawMessage(`{"text":"안녕"}`)
+	st := json.RawMessage(`{"recording":true}`)
+	for _, c := range []struct {
+		name, topic string
+		d           json.RawMessage
+		want        signal.ErrCode
+	}{
+		{"자막 1", "caption", cp, ""},
+		{"자막 2", "caption", cp, ""},
+		{"자막 3 — 합산 한도", "caption", cp, signal.CodeRateLimited},
+		{"고지 1 — 자막 한도와 무관", "state", st, ""},
+		{"고지 2", "state", st, ""},
+		{"고지 3 — state 한도", "state", st, signal.CodeRateLimited},
+		{"refresh — 여전히 합산 한도", "refresh", nil, signal.CodeRateLimited},
+	} {
+		if e := v.r.AppSend("P", c.topic, c.d); code(e) != c.want {
+			t.Errorf("%s : %v 기대 %q", c.name, e, c.want)
 		}
 	}
 }

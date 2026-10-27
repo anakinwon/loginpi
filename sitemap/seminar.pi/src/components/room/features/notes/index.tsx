@@ -16,6 +16,7 @@ import {
   type RoomCtx,
   type RoomFeature,
 } from '../../extensions'
+import { APP_RETRY, sendRetry } from '../../app-retry'
 import {
   frameDiff,
   noteState,
@@ -32,6 +33,9 @@ import { presenterGone, presenterResync } from '../../room-rules'
 const TOAST_MS = 3000
 const RESEND_MS = 1000
 const NOTES_ICON = 'M3 18h12v-2H3v2zM3 6v2h18V6H3zm0 7h18v-2H3v2z'
+// 전원 고지(M-4) — 한도·응답 없음이면 다시 보낸다(app-retry, 녹화와 같은 fail-open 방지)
+const sendState = (ctx: RoomCtx, v: boolean, live: () => boolean) =>
+  sendRetry(() => ctx.sendApp('state', { notes: v }), live)
 
 const on = featureStore(false) // 내가(발표자) 켬 — ⋯ 항목 체크
 const ntIdStore = featureStore<string | null>(null) // 내가 켠 회의록 ID
@@ -55,7 +59,7 @@ async function toggle(ctx: RoomCtx) {
       on.set(false)
       ntIdStore.set(null)
       wantSpeech('notes', null)
-      void ctx.sendApp('state', { notes: false })
+      void sendState(ctx, false, () => !on.get())
       endNote(id)
       ctx.notice('notes.stoppedMine')
       return
@@ -68,7 +72,7 @@ async function toggle(ctx: RoomCtx) {
     const j = (await r?.json().catch(() => null)) as { ntId?: string } | null
     if (!r?.ok || !j?.ntId) return ctx.notice('notes.startFail')
     // 전원 고지가 먼저 — 방송이 실패하면 기록을 시작하지 않는다(M-4)
-    if (await ctx.sendApp('state', { notes: true })) {
+    if (await sendState(ctx, true, () => true)) {
       endNote(j.ntId)
       return ctx.notice('notes.startFail')
     }
@@ -189,12 +193,20 @@ function NotesOverlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     const grew = n > prevN.current
     prevN.current = n
     if (!mine || !grew) return
-    const tm = setTimeout(
-      () => void ctx.sendApp('state', { notes: true }),
-      RESEND_MS,
-    )
+    const tm = setTimeout(() => void sendState(ctx, true, on.get), RESEND_MS)
     return () => clearTimeout(tm)
   }, [n, mine]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 기록 중 10초 주기 재알림 — 묶음 재알림이 한도에 걸려 빠진 사람도 배지를 본다(M-4)
+  const ctxRef = useRef(ctx)
+  useEffect(() => {
+    ctxRef.current = ctx
+  })
+  useEffect(() => {
+    if (!mine) return
+    const tm = setInterval(() => void sendState(ctxRef.current, true, on.get), APP_RETRY.heartbeatMs)
+    return () => clearInterval(tm)
+  }, [mine])
 
   return (
     <>
