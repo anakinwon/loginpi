@@ -11,10 +11,13 @@ import { Pagination } from '@/components/seminar/pagination'
 import { BTN, BTN_PRIMARY } from '@/components/seminar/shared'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
-import { emptySummary, headFatal, hhmm, SEG_PAGE } from '@/lib/note-rules'
-
-const POLL_MS = 5000
-const POLL_MAX_MS = 120_000
+import {
+  emptySummary,
+  headFatal,
+  hhmm,
+  pollDelay,
+  SEG_PAGE,
+} from '@/lib/note-rules'
 
 type Head = {
   title: string
@@ -78,6 +81,7 @@ function Note({ id }: { id: string }) {
   const [tick, setTick] = useState(0)
   const [long, setLong] = useState(false)
   const since = useRef(Date.now())
+  const seenSts = useRef<string | null>(null)
   const router = useRouter()
   const [ask, setAsk] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -111,10 +115,16 @@ function Note({ id }: { id: string }) {
     }
   }, [id, tick, t])
 
-  // 만드는 중이면 5초마다 다시 본다(최대 2분). 기록 중도 본다 — 대면 노트 [종료] 직후 끝내기 요청보다 조회가 먼저 닿는 경합
+  // 만드는 중이면 5초마다 다시 본다(최대 2분). 기록 중도 본다 — 대면 노트 [종료] 직후 끝내기 요청보다 조회가 먼저 닿는 경합.
+  //  기준 시각은 상태가 바뀔 때 다시 잡는다(pollDelay, r6 T07)
   useEffect(() => {
-    if (head?.status !== 'SUMMARIZING' && head?.status !== 'RECORDING') return
-    if (Date.now() - since.current > POLL_MAX_MS) return setLong(true)
+    if (!head) return
+    if (head.status !== seenSts.current) {
+      seenSts.current = head.status
+      since.current = Date.now()
+    }
+    const delay = pollDelay(head.status, since.current, Date.now())
+    if (delay === null) return setLong(head.status === 'SUMMARIZING')
     // 숨은 탭(다른 앱·탭으로 전환)은 조회를 쉬고, 다시 보일 때 바로 1번 본다(보강 r5 T07 — 뒤에 둔 탭의 5초 조회 부하)
     const next = () => setTick((n) => n + 1)
     const onShow = () => {
@@ -126,7 +136,7 @@ function Note({ id }: { id: string }) {
       if (document.visibilityState === 'hidden')
         document.addEventListener('visibilitychange', onShow)
       else next()
-    }, POLL_MS)
+    }, delay)
     return () => {
       clearTimeout(tm)
       document.removeEventListener('visibilitychange', onShow)

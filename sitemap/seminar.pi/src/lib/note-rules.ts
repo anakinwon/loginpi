@@ -93,6 +93,20 @@ export function headFatal(status: number, loaded: boolean) {
   return !loaded || status === 404 || status === 403
 }
 
+// 회의록 화면 상태 조회 간격 — 기준 시각(since)은 화면을 연 때가 아니라 '그 상태를 처음 본 때'(r6 T07).
+//  전에는 화면을 연 때부터 2분이 지나면 조회를 멈춰, 기록 중(RECORDING)에 연 참가자는 발표자가 끈 뒤에도 '아직 기록 중' 에 멈췄고
+//  요약이 막 시작돼도 곧바로 '오래 걸리고 있습니다' 가 떴다.
+//  RECORDING = 처음 2분 5초(대면 노트 [종료] 직후 경합), 그 뒤 30초(긴 세미나 동안 부하 1/6) / SUMMARIZING = 5초, 2분 넘으면 null(새로 고침 안내) / 그 밖 null
+export const POLL_MS = 5000
+export const POLL_SLOW_MS = 30_000
+export const POLL_MAX_MS = 120_000
+export function pollDelay(status: string, since: number, now: number) {
+  const late = now - since > POLL_MAX_MS
+  if (status === 'RECORDING') return late ? POLL_SLOW_MS : POLL_MS
+  if (status === 'SUMMARIZING') return late ? null : POLL_MS
+  return null
+}
+
 export function emptySummary(s: MdNote['summary']) {
   return !s || !(s.points.length || s.decisions.length || s.todos.length)
 }
@@ -117,7 +131,14 @@ export function noteMarkdown(
   },
   cut = false,
 ): string {
-  const esc = (s: string) => s.replace(/\r?\n/g, ' ').trim()
+  // 한 줄로 + 마크다운 보기 프로그램이 원격 그림·HTML 을 불러오지 않게(제목·화자명·발화·AI 요약은 모두 사람이 넣은 글 — 열어 보는 순간 외부 주소 호출, 보강 r6 T07).
+  //  '<' 는 문자 참조로, '![' 는 '!\[' 로 — 보이는 글자는 그대로
+  const esc = (s: string) =>
+    s
+      .replace(/\r?\n/g, ' ')
+      .replace(/</g, '&lt;')
+      .replace(/!\[/g, '!\\[')
+      .trim()
   const out = [
     `# ${esc(note.title)}`,
     '',
