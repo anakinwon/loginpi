@@ -547,7 +547,8 @@
       "stopped": "AI notes turned off",
       "startedMine": "AI notes on — shown to everyone",
       "stoppedMine": "AI notes off — creating the notes",
-      "startFail": "Couldn't start AI notes"
+      "startFail": "Couldn't start AI notes",
+      "gone": "AI notes stopped — the notes were ended or deleted elsewhere"
     },
     "dubbing": {
       "listen": "Listen in translated voice",

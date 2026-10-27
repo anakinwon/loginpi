@@ -169,6 +169,14 @@ export function canRecordSeg(p: {
   return p.admin || p.uid === p.starter || (!!p.host && p.uid === p.host)
 }
 
+// 회의록이 다른 곳에서 끝났거나 삭제됨(R4 T07) — /api/speech/chunk 응답 rec=false(이 세미나에 기록 중 회의록 없음)를 발표자 화면이 믿어도 되는가.
+//  켠 직후엔 켜기 전에 녹음을 시작한 조각(최대 10초 녹음 + 15초 올리기)의 응답이 늦게 올 수 있어 rec=false 가 옛 값일 수 있다 → 켠 지 30초 지난 뒤의 false 만 믿는다.
+//  rec 가 boolean 이 아니면(구 서버·회의록 조회 실패) 판단하지 않는다
+export const NOTE_GONE_AFTER_MS = 30_000
+export function noteGone(rec: unknown, now: number, onAt: number) {
+  return rec === false && onAt > 0 && now - onAt > NOTE_GONE_AFTER_MS
+}
+
 // 요약 입력의 기록 블록 — 조각 글·화자명은 신뢰할 수 없는 데이터(말한 사람이 '앞 지시를 무시하라' 고 말할 수 있다).
 //  구분자 안에 넣고, 조각 안의 구분자 꼴(<<< · >>>)은 비슷한 다른 글자로 바꿔 블록을 빠져나오지 못하게 한다(프롬프트 주입 차단)
 export const TX_OPEN = '<<<TRANSCRIPT'

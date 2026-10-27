@@ -23,6 +23,7 @@ import {
 import { APP_RETRY, sendRetry } from '../../app-retry'
 import {
   frameDiff,
+  noteGone,
   noteState,
   SHOT_DIFF,
   SHOT_H,
@@ -45,6 +46,16 @@ const on = featureStore(false) // 내가(발표자) 켬 — ⋯ 항목 체크
 const ntIdStore = featureStore<string | null>(null) // 내가 켠 회의록 ID
 const roomOn = featureStore(false) // 방에 AI 기록 중(state 수신) — 배지
 let busy = false
+let onAt = 0 // 내가 켠 시각(noteGone — 켜기 전 조각의 늦은 응답을 믿지 않게)
+
+// 내 회의록 내리기(끄기·다른 곳 종료) — 저장소·말하기 요청·전원 고지를 함께
+function dropMine(ctx: RoomCtx) {
+  on.set(false)
+  ntIdStore.set(null)
+  onAt = 0
+  wantSpeech('notes', null)
+  void sendState(ctx, false, () => !on.get())
+}
 
 function endNote(id: string) {
   // 퇴장 직후에도 끝까지 가게 keepalive(본문 없음 — 64KB 제한 무관)
@@ -60,10 +71,7 @@ async function toggle(ctx: RoomCtx) {
   try {
     const id = ntIdStore.get()
     if (id) {
-      on.set(false)
-      ntIdStore.set(null)
-      wantSpeech('notes', null)
-      void sendState(ctx, false, () => !on.get())
+      dropMine(ctx)
       endNote(id)
       ctx.notice('notes.stoppedMine')
       return
@@ -81,6 +89,7 @@ async function toggle(ctx: RoomCtx) {
       return ctx.notice('notes.startFail')
     }
     ntIdStore.set(j.ntId)
+    onAt = Date.now()
     on.set(true)
     wantSpeech('notes', 'quiet')
     ctx.notice('notes.startedMine')
@@ -253,6 +262,13 @@ export const notes: RoomFeature = {
     // 무대 역할(panel)은 말하기를 요청하지 않는다 — 서버가 회의록에 남기는 조각은 기록 시작자·개최자·ADMIN 것뿐(canRecordSeg, D-1)이라
     //  panel 의 quiet 조각은 자막 방송도 저장도 없이 외부 AI 사용량만 쓴다(r3 T07). 자막이 켜져 있으면 captions 가 따로 요청한다
   },
+  // 회의록이 회의록 화면에서 삭제·[기록 끝내고 요약]으로 끝남 — 서버가 조각 응답에 rec=false 를 실어 보낸다.
+  //  배지·회의록용 음성 조각을 내린다(전에는 발표자가 끌 때까지 배지가 남고 외부 AI 사용량이 계속 들었다, r2·r3 승계)
+  onSpeech: (_text, _ts, ctx, meta) => {
+    if (busy || !on.get() || !noteGone(meta?.rec, Date.now(), onAt)) return
+    dropMine(ctx)
+    ctx.notice('notes.gone')
+  },
   onReset: () => {
     // 퇴장·끊김 — 켜 둔 회의록은 끝낸다(배지가 사라지는데 기록이 계속되면 안 된다, M-4)
     // ponytail: 잠깐 끊겨도 회의록이 나뉜다 — 문제가 되면 재접속 유예(예 30초) 뒤에 끝내기
@@ -262,5 +278,6 @@ export const notes: RoomFeature = {
     ntIdStore.reset()
     roomOn.reset()
     busy = false
+    onAt = 0
   },
 }

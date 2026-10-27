@@ -8,6 +8,8 @@ import {
   fenceTranscript,
   frameDiff,
   isJpeg,
+  noteGone,
+  NOTE_GONE_AFTER_MS,
   noteMarkdown,
   noteState,
   noteUrl,
@@ -295,4 +297,43 @@ test('AI 회의록 state 수신(panel)은 말하기를 요청하지 않는다 �
   assert.doesNotMatch(onApp, /wantSpeech\(/)
   // 말하기 요청은 발표자 자기 켜기(toggle) 한 곳뿐
   assert.equal((src.match(/wantSpeech\('notes', 'quiet'\)/g) ?? []).length, 1)
+})
+
+test('noteGone — 켠 지 30초 지난 뒤의 rec=false 만 회의록 종료·삭제로 본다(r4 T07)', async () => {
+  const on = 1_000_000
+  assert.equal(noteGone(false, on + NOTE_GONE_AFTER_MS + 1, on), true)
+  // 켠 직후 = 켜기 전에 녹음한 조각의 늦은 응답일 수 있다
+  assert.equal(noteGone(false, on + 5_000, on), false)
+  assert.equal(noteGone(false, on + NOTE_GONE_AFTER_MS, on), false)
+  // 기록 중·구 서버(rec 없음)·조회 실패·안 켬은 판단하지 않는다
+  assert.equal(noteGone(true, on + 60_000, on), false)
+  assert.equal(noteGone(undefined, on + 60_000, on), false)
+  assert.equal(noteGone('false', on + 60_000, on), false)
+  assert.equal(noteGone(false, on + 60_000, 0), false)
+  // 문턱 ≥ 조각 최대 길이 + 올리기 시간 제한(늦은 응답이 문턱 안에 다 도착)
+  const { CHUNK_MAX_MS } = await import('./speech-rules.ts')
+  const sp = readFileSync(new URL('../components/room/use-speech.ts', import.meta.url), 'utf8')
+  const up = Number(sp.match(/UPLOAD_TIMEOUT_MS = ([\d_]+)/)[1].replace(/_/g, ''))
+  assert.ok(NOTE_GONE_AFTER_MS >= CHUNK_MAX_MS + up, `${NOTE_GONE_AFTER_MS} < ${CHUNK_MAX_MS}+${up}`)
+})
+
+test('회의록 삭제·다른 곳 종료 감지 배선 — chunk 응답 rec·발표자 onSpeech 내리기·rec 는 자막 방송에 안 실림(r4 T07)', () => {
+  const route = readFileSync(new URL('../app/api/speech/chunk/route.ts', import.meta.url), 'utf8')
+  assert.match(route, /const rec = target\.p_smn_id && !nt\.error \? !!nt\.data : undefined/)
+  assert.match(route, /\{ text: r\.text, lang: r\.lang, ts, sig, rec \}/)
+  const sp = readFileSync(new URL('../components/room/use-speech.ts', import.meta.url), 'utf8')
+  const cast = sp.slice(sp.indexOf("l.sendApp('caption'"))
+  assert.doesNotMatch(cast.slice(0, cast.indexOf('})')), /\.\.\.meta|rec/)
+  const src = readFileSync(new URL('../components/room/features/notes/index.tsx', import.meta.url), 'utf8')
+  const sp2 = src.slice(src.indexOf('onSpeech:'), src.indexOf('onReset:'))
+  assert.match(sp2, /noteGone\(meta\?\.rec, Date\.now\(\), onAt\)/)
+  assert.match(sp2, /dropMine\(ctx\)/)
+  assert.match(sp2, /notice\('notes\.gone'\)/)
+  // 내리기 = 저장소·말하기 요청·전원 고지(state false) 함께
+  const drop = src.slice(src.indexOf('function dropMine'), src.indexOf('\n}\n', src.indexOf('function dropMine')))
+  for (const re of [/on\.set\(false\)/, /ntIdStore\.set\(null\)/, /wantSpeech\('notes', null\)/, /sendState\(ctx, false/]) assert.match(drop, re)
+  for (const l of ['ko', 'en']) {
+    const m = JSON.parse(readFileSync(new URL(`../../messages/${l}.json`, import.meta.url), 'utf8'))
+    assert.ok(m.room.notes.gone?.length > 5, l)
+  }
 })

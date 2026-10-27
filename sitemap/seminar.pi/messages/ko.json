@@ -547,7 +547,8 @@
       "stopped": "AI 회의록이 꺼졌습니다",
       "startedMine": "AI 회의록을 켰습니다 — 참가자 전원에게 표시됩니다",
       "stoppedMine": "AI 회의록을 껐습니다 — 회의록을 만드는 중입니다",
-      "startFail": "AI 회의록을 시작하지 못했습니다"
+      "startFail": "AI 회의록을 시작하지 못했습니다",
+      "gone": "회의록이 다른 곳에서 끝났거나 삭제되어 AI 기록을 멈췄습니다"
     },
     "dubbing": {
       "listen": "음성 번역 듣기",

@@ -1,4 +1,5 @@
-// 음성 조각 → 글 — POST multipart/form-data { audio: 5초 독립 오디오 파일(webm/ogg/mp4 — wav 는 받지 않음), smnId 또는 ntId, durMs, lang? } → { text, lang, ts, sig }.
+// 음성 조각 → 글 — POST multipart/form-data { audio: 5초 독립 오디오 파일(webm/ogg/mp4 — wav 는 받지 않음), smnId 또는 ntId, durMs, lang? } → { text, lang, ts, sig, rec? }.
+// rec = (세미나 조각만) 기록 중 AI 회의록이 있는가 — 발표자 화면의 회의록 종료·삭제 감지(note-rules noteGone)
 // sig = 세미나 자막 서명(translate-rules capSig, 대면 노트·빈 글·500자 초과는 null) — 자막 방송에 실어 번역·합성(/api/speech/translate·tts)이 서버가 만든 글만 받게(보안 검토 D-2)
 // 말하는 사람 자기 브라우저가 자기 마이크 조각을 보낸다(계획 A-1, piFetch — Pi Browser 는 쿠키가 없어 X-Pi-Token). 비로그인 401(redirect 없음).
 // 순서 : 키 확인(없으면 503, 화면 숨김) → 세션·본문 병렬(R-P1) → 조각 검사(형식·크기 160KB·길이·독립 파일 머리) → speechGate VC(fn_use_smn_vc 1왕복)
@@ -175,8 +176,11 @@ export const POST = withAuthGuard(
         )
     }
     const sig = target.p_smn_id && r.text ? await capSig(env.PI_SESSION_SECRET, target.p_smn_id, r.text) : null
+    // rec = 이 세미나에 기록 중 회의록이 있는가(세미나 조각, 조회 성공일 때만) — 발표자 화면이 삭제·다른 곳 종료를 알아
+    //  'AI 기록 중' 배지와 회의록용 음성 조각을 내린다(noteGone, 삭제 뒤에도 외부 AI 사용량이 계속 들던 문제)
+    const rec = target.p_smn_id && !nt.error ? !!nt.data : undefined
     return NextResponse.json(
-      { text: r.text, lang: r.lang, ts, sig },
+      { text: r.text, lang: r.lang, ts, sig, rec },
       { headers: noStore },
     )
   }),
