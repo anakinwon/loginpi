@@ -13,6 +13,7 @@ export const SHOT_MAX_W = 1280 // 저장 캡처 최대 폭(px)
 export const SHOT_QUALITY = 0.7 // JPEG 품질
 export const MAX_SHOT_BYTES = 600_000 // 서버 상한(1280px JPEG 0.7 은 보통 100~300KB)
 export const SEG_PAGE = 50 // 전체 기록 한 쪽 줄 수(설계서 15.9)
+export const NOTE_LIST_PAGE = 10 // 내 회의록 목록(/notes·대면 노트 '최근 노트') 한 쪽
 export const MAX_SHOTS_LIST = 120 // 회의록 화면 캡처 목록 상한(분당 2장 × 1시간)
 export const MAX_MD_SEGS = 5000 // Markdown 내려받기 조각 상한
 

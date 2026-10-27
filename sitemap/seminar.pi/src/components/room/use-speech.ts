@@ -28,9 +28,11 @@ export function useSpeech({
   sendApp,
   onText,
   onNoAgr,
+  field = 'smnId',
 }: {
   track: MediaStreamTrack | null // 내 마이크(원본) — 없으면 쉰다
-  seminarId: string
+  seminarId: string // 대상 id — field 가 'ntId' 면 대면 노트 회의록 id(세미나 없음, SA2)
+  field?: 'smnId' | 'ntId'
   lang: string // 말하는 언어(화면 locale) — 서버가 알아내면 응답 lang 이 우선
   on: boolean
   broadcast: boolean // true = 자막 방송(caption), false = 글로만(onText)
@@ -57,7 +59,7 @@ export function useSpeech({
       const l = latest.current
       const fd = new FormData()
       fd.append('audio', blob, 'chunk')
-      fd.append('smnId', seminarId)
+      fd.append(field, seminarId)
       fd.append('durMs', String(durMs))
       fd.append('lang', l.lang)
       const r = await piFetch('/api/speech/chunk', {
@@ -116,7 +118,7 @@ export function useSpeech({
       // 마지막 조각은 보낸다(끄기 직전 말한 것까지 자막·기록에 남게) — onstop 이 upload 후 next 는 stopped 로 멈춤
       if (rec?.state === 'recording') rec.stop()
     }
-  }, [on, limited, track, seminarId])
+  }, [on, limited, track, seminarId, field])
 
   return { limited }
 }

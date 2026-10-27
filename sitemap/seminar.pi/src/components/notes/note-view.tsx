@@ -97,9 +97,9 @@ function Note({ id }: { id: string }) {
     }
   }, [id, tick, t])
 
-  // 만드는 중이면 5초마다 다시 본다(최대 2분)
+  // 만드는 중이면 5초마다 다시 본다(최대 2분). 기록 중도 본다 — 대면 노트 [종료] 직후 끝내기 요청보다 조회가 먼저 닿는 경합
   useEffect(() => {
-    if (head?.status !== 'SUMMARIZING') return
+    if (head?.status !== 'SUMMARIZING' && head?.status !== 'RECORDING') return
     if (Date.now() - since.current > POLL_MAX_MS) return setLong(true)
     const tm = setTimeout(() => setTick((n) => n + 1), POLL_MS)
     return () => clearTimeout(tm)
@@ -151,14 +151,13 @@ function Note({ id }: { id: string }) {
   const s = head.summary
   return (
     <article className="space-y-6">
-      {head.smnId && (
-        <Link
-          href={`/s/${head.smnId}`}
-          className="text-muted-foreground text-sm hover:underline"
-        >
-          ← {t('back')}
-        </Link>
-      )}
+      {/* 대면 노트(세미나 없음)는 내 회의록 목록으로 */}
+      <Link
+        href={head.smnId ? `/s/${head.smnId}` : '/notes'}
+        className="text-muted-foreground text-sm hover:underline"
+      >
+        ← {t(head.smnId ? 'back' : 'mine')}
+      </Link>
       <header className="space-y-1">
         <h1 className="text-xl font-bold">{head.title}</h1>
         <p className="text-muted-foreground text-sm">
