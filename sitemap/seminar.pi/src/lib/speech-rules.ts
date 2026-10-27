@@ -166,6 +166,10 @@ export const DUB_QUEUE_MAX = 3
 // 재생 속도 범위 — 원문 발화 시간에 맞추되 알아듣기 어려운 속도는 막는다
 export const DUB_RATE_MIN = 0.8
 export const DUB_RATE_MAX = 1.5
+// 늦은 더빙 버리기(보강 r3 T09) — 자막을 받은 뒤 이 시간이 지나도록 재생을 시작 못 한 문장은 버린다.
+//  합성·앞 문장 재생이 밀려 원음보다 한참 늦게 읽히는 것 방지(큐 3개 상한만으로는 합성 지연이 길 때 15초 넘게 밀린다)
+export const DUB_STALE_MS = 15_000
+export const dubStale = (at: number, now: number) => now - at > DUB_STALE_MS
 // 더빙을 켠 동안 원음 볼륨(설계서 15.4 — 20%)
 export const DUB_DUCK = 0.2
 
