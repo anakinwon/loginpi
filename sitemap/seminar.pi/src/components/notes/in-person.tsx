@@ -35,6 +35,8 @@ const MIC: MediaTrackConstraints = {
   autoGainControl: true,
 }
 
+const REC_MARK = '● ' // 기록 중 탭 제목 앞 표시
+
 const mmss = (sec: number) =>
   `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
 
@@ -81,6 +83,15 @@ function Recorder() {
   const [gone, setGone] = useState(false) // 노트가 다른 곳에서 끝났거나 삭제됐다(서버가 조각을 멈춤)
   const left = useRef(false) // 화면을 떠났다 — 개발 StrictMode 의 즉시 재실행과 진짜 떠남을 가른다
   const ended = useRef(false) // 끝내기 요청을 이미 보냄(종료 버튼·창 닫힘)
+  // 화면이 살아 있다 — 시작·다시 연결의 마이크 권한 창·API 대기 중에 앱 안 이동으로 떠나면, 늦게 온 마이크를 놓고
+  //  만든 회의록을 RECORDING 으로 남기지 않는다(전에는 마이크 표시가 계속 켜져 있고 회의록이 '기록 중'으로 고착 — T02 r4)
+  const alive = useRef(true)
+  useEffect(() => {
+    alive.current = true
+    return () => {
+      alive.current = false
+    }
+  }, [])
 
   const { limited, flush } = useSpeech({
     track,
@@ -137,6 +148,18 @@ function Recorder() {
     }
   }, [ntId, flush])
 
+  // 탭 제목 앞 '● ' — 다른 탭에 가 있어도 아직 기록 중임을 탭 목록에서 본다(보강 T02 r4). 끝났거나(gone) 떠나면 뗀다.
+  //  앱 안 이동으로 새 화면 제목이 먼저 들어와 있으면 표시가 없으니 건드리지 않는다
+  useEffect(() => {
+    if (!ntId || gone) return
+    if (!document.title.startsWith(REC_MARK))
+      document.title = REC_MARK + document.title
+    return () => {
+      if (document.title.startsWith(REC_MARK))
+        document.title = document.title.slice(REC_MARK.length)
+    }
+  }, [ntId, gone])
+
   // 화면을 떠나면 마이크를 놓는다
   useEffect(() => () => track?.stop(), [track])
 
@@ -160,6 +183,7 @@ function Recorder() {
         .catch(() => null)
       if (!stream) return setErr(t('micDenied'))
       const stopMic = () => stream.getTracks().forEach((x) => x.stop())
+      if (!alive.current) return stopMic()
       const r = await readApi<{ ntId: string }>(
         piFetch('/api/notes', {
           method: 'POST',
@@ -171,6 +195,10 @@ function Recorder() {
         stopMic()
         return setErr(errText(r.body))
       }
+      if (!alive.current) {
+        stopMic()
+        return endNote(r.data.ntId)
+      }
       const a = await readApi(
         piFetch('/api/speech/agree', {
           method: 'POST',
@@ -178,10 +206,10 @@ function Recorder() {
           body: JSON.stringify({ ntId: r.data.ntId, agree: true }),
         }),
       )
-      if (!a.ok) {
+      if (!a.ok || !alive.current) {
         stopMic()
         endNote(r.data.ntId) // 빈 회의록을 RECORDING 으로 남기지 않는다
-        return setErr(errText(a.body))
+        return a.ok ? undefined : setErr(errText(a.body))
       }
       setTrack(stream.getAudioTracks()[0] ?? null)
       setNtId(r.data.ntId)
@@ -208,6 +236,7 @@ function Recorder() {
       .getUserMedia({ audio: MIC })
       .catch(() => null)
     if (!s) return setErr(t('micDenied'))
+    if (!alive.current) return s.getTracks().forEach((x) => x.stop())
     setErr(null)
     setMicLost(false)
     setTrack(s.getAudioTracks()[0] ?? null)
