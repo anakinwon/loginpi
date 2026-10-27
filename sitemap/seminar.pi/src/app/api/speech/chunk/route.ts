@@ -18,7 +18,7 @@ import { geminiEnabled, transcribe } from '@/lib/gemini'
 import { canRecordSeg } from '@/lib/note-rules'
 import { isUuid } from '@/lib/seminar-rules'
 import { capSig } from '@/lib/translate-rules'
-import { speechGate } from '@/lib/speech-gate'
+import { speechGate, stageGate } from '@/lib/speech-gate'
 import {
   aiMime,
   billSec,
@@ -96,7 +96,10 @@ export const POST = withAuthGuard(
     }
     const sec = billSec(durMs, bytes.length)
     const held = refReady ? reserveSec(durMs, bytes.length) : sec
-    // 자격·동의·계량 = 공용 관문(speechGate, 번역·합성과 한 곳)
+    // 무대 확인(D-1, 세미나만 — 대면 노트는 본인 노트) → 자격·동의·계량 = 공용 관문(speechGate, 번역·합성과 한 곳).
+    //  무대가 먼저 — 청중 요청이 DB 예약(행 잠금)까지 가지 않게
+    const offStage = target.p_smn_id ? await stageGate(target.p_smn_id, user) : null
+    if (offStage) return offStage
     const denied = await speechGate({ smnId: target.p_smn_id, ntId: target.p_nt_id }, user, 'VC', held)
     if (denied) return denied
 

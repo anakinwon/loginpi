@@ -65,3 +65,46 @@ func TestAdminDisabledWithoutSecret(t *testing.T) {
 		t.Fatalf("키 없음인데 %d", rec.Code)
 	}
 }
+
+// 무대 역할 조회(D-1) — 접속 중 sub 의 세션 역할, 방·접속 없으면 404, 인증 필수
+func TestAdminPeerRole(t *testing.T) {
+	secret := []byte("0123456789abcdef0123456789abcdef")
+	m := NewManager()
+	v := newV11(t)
+	v.r.exec(func() {
+		v.r.peers["N"].Ticket.Sub = "usr-n"
+		v.r.peers["A1"].Ticket.Sub = "usr-a"
+	})
+	m.exec(func() { m.rooms["v11"] = v.r })
+	h := AdminHandler(m, secret)
+	for _, c := range []struct {
+		path, auth, role string
+		want             int
+	}{
+		{"/admin/rooms/v11/peers/usr-n", "Bearer " + string(secret), "panel", 200},
+		{"/admin/rooms/v11/peers/usr-a", "Bearer " + string(secret), "audience", 200},
+		{"/admin/rooms/v11/peers/none", "Bearer " + string(secret), "", 404},
+		{"/admin/rooms/nope/peers/usr-n", "Bearer " + string(secret), "", 404},
+		{"/admin/rooms/v11/peers/usr-n", "", "", 401},
+	} {
+		req := httptest.NewRequest("GET", c.path, nil)
+		if c.auth != "" {
+			req.Header.Set("Authorization", c.auth)
+		}
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, req)
+		var got struct {
+			Role      string
+			Presenter bool
+		}
+		_ = json.Unmarshal(rec.Body.Bytes(), &got)
+		if rec.Code != c.want || got.Role != c.role || got.Presenter != (c.want == 200) {
+			t.Errorf("%s : %d %+v 기대 %d %q", c.path, rec.Code, got, c.want, c.role)
+		}
+	}
+	// 발표자가 나가면 presenter false
+	v.r.exec(func() { delete(v.r.peers, "P") })
+	if info, ok := m.PeerRole("v11", "usr-n"); !ok || info.Presenter || info.Role != "panel" {
+		t.Errorf("발표자 퇴장 뒤 %+v %v", info, ok)
+	}
+}
