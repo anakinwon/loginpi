@@ -139,6 +139,17 @@ export function parseNameSignal(d: unknown): { what: 'name'; name: string } | { 
 }
 
 // 별명 형식 — 한 줄 1~30자 + 서식 문자(\p{Cf} : 방향 바꿈·폭 0 문자) 금지(보안 검토 : 'RLO' 등으로 다른 이름처럼 보이게 하는 사칭)
-export const nameOk = (n: string) => !!n && [...n].length <= NCKNM_MAX && ONE_LINE_RE.test(n) && !/\p{Cf}/u.test(n)
+export const nameOk = (n: string) =>
+  !!n && [...n].length <= NCKNM_MAX && ONE_LINE_RE.test(n) && !/\p{Cf}/u.test(n) && scriptsOk(n)
+
+// 문자 체계 섞기 제한(UTS #39 'Highly Restrictive' 축약) — 한 체계만, 또는 라틴+한자+한글 / 라틴+한자+가나 조합만.
+// 라틴·키릴·그리스를 섞은 닮은꼴(예 'аnakin' 의 키릴 а)로 남의 이름처럼 보이게 하는 사칭을 막는다.
+// ponytail: 한 체계 안의 닮은꼴(전부 키릴로 쓴 이름)은 못 막는다 — 필요하면 TR39 skeleton(confusables 표) 도입
+const SCRIPTS = ['Latin', 'Hangul', 'Han', 'Hiragana', 'Katakana', 'Cyrillic', 'Greek', 'Arabic', 'Hebrew', 'Thai'] as const
+const MIXES: readonly (readonly string[])[] = [['Latin', 'Han', 'Hangul'], ['Latin', 'Han', 'Hiragana', 'Katakana']]
+function scriptsOk(n: string) {
+  const used = SCRIPTS.filter((s) => new RegExp(String.raw`\p{Script=${s}}`, 'u').test(n))
+  return used.length <= 1 || MIXES.some((m) => used.every((s) => m.includes(s)))
+}
 // 이름 비교 키 — 호환 정규화(NFKC)·대소문자·공백 무시. 같은 세미나의 개최자 이름·다른 별명과 같으면 사칭으로 본다
 export const nameKey = (n: string) => n.normalize('NFKC').toLowerCase().replace(/\s+/g, '')

@@ -55,3 +55,13 @@ test('별명 사칭 막기 — 서식 문자 거절, 정규화 키로 같은 이
   const route = readFileSync(new URL('../app/api/seminars/[id]/ncknm/route.ts', import.meta.url), 'utf8')
   assert.match(route, /apiError\('NAME_TAKEN', 409\)/)
 })
+
+test('별명 문자 체계 — 라틴·키릴 섞기 거절, 한글·라틴·한자는 허용', async () => {
+  const { nameOk } = await import('./seminar-rules.ts')
+  assert.equal(nameOk('аnakin'), false) // 키릴 а + 라틴
+  assert.equal(nameOk('아소카 Ahsoka'), true)
+  assert.equal(nameOk('元 아나킨'), true)
+  assert.equal(nameOk('Анакин'), true) // 한 체계(키릴)만 — 허용(ponytail 한계)
+  const room = readFileSync(new URL('../components/room/use-room.ts', import.meta.url), 'utf8')
+  assert.match(room, /nameKey\(p\.name\) === nameKey\(ns\.name\)/) // 받는 쪽 사칭 검사
+})

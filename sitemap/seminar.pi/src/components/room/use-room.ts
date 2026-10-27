@@ -8,7 +8,7 @@ import { piFetch } from '@pi/auth/client'
 // v1.2(3.5) : 사회(peer.mute·room.muteAll 잠금·peer.askUnmute)·레이아웃(room.setLayout)·발언자(ntf activeSpeaker)
 // v1.3(A-2) : 범용 중계 app.send{topic,d} → ntf app{topic,d,from}(부가 기능 공용, extensions.ts) · 입장 직후 1회 지원 확인 · 카메라 송신기(영상 효과 replaceTrack)
 import type { AppMsg } from './extensions'
-import { parseNameSignal } from '@/lib/seminar-rules'
+import { nameKey, parseNameSignal } from '@/lib/seminar-rules'
 import {
   APP_MAX,
   APP_PROBE,
@@ -444,7 +444,9 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
       if (typeof a?.topic !== 'string') return
       // 별명 변경(sql/014) — 보낸 사람(from, 엔진이 채움)의 이름만 바꾼다
       const ns = a.topic === 'refresh' ? parseNameSignal(a.d) : null
-      if (ns?.what === 'name' && peersRef.current.has(a.from)) {
+      // 보낸 쪽이 API 를 거치지 않고 신호만 보낼 수 있어, 방 안 다른 사람 이름과 같으면(사칭) 받지 않는다(보안 검토)
+      const clash = ns?.what === 'name' && [...peersRef.current.values()].some((p) => p.peerId !== a.from && nameKey(p.name) === nameKey(ns.name))
+      if (ns?.what === 'name' && !clash && peersRef.current.has(a.from)) {
         patchPeer(a.from, { name: ns.name })
         commitPeers()
       }
