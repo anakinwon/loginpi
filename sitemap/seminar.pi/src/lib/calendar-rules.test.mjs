@@ -66,6 +66,20 @@ test('.ics — 제목에 \\rATTENDEE 를 넣어도 새 속성 줄이 생기지 �
   assert.ok(lines.includes('SUMMARY:T\\nATTENDEE:mailto:evil@x'))
 })
 
+// 결함 T01 r6 : NEL(U+0085)·U+2028·2029 가 통과 — 범용 줄 나누기(유니코드 줄 경계) 파서에선 새 속성 줄이 된다
+test('.ics·메일 — NEL·U+2028·2029·C1 제어문자로도 속성 줄·머리줄을 끼워 넣지 못한다', () => {
+  assert.equal(icsEscape('a\u0085b\u2028c\u2029d'), 'a\\nb\\nc\\nd')
+  assert.equal(icsEscape('a\u0080b\u009Fc d'), 'abc d')
+  const ics = buildIcs({ ...ev, title: 'T\u0085ATTENDEE:x\u2028X-EVIL:1', url: ev.url + '\u2029X-EVIL:2' })
+  // 유니코드 줄 경계 전부로 나눠도(접힘 펼친 뒤) 주입 줄 없음
+  const lines = ics.replace(/\r\n /g, '').split(/\r\n|[\r\n\u0085\u2028\u2029]/)
+  assert.ok(!lines.some((l) => /^(ATTENDEE|X-EVIL)/.test(l)))
+  assert.ok(!/[\u0080-\u009F\u2028\u2029]/.test(ics))
+  const m = mailtoUrl('a\u0085Bcc: x\u2028y', 'b')
+  assert.ok(m.startsWith('mailto:?subject=a%20Bcc%3A%20x%20y&'))
+  assert.equal(new URL(webMailUrl('a\u2029b', 'c')).searchParams.get('su'), 'a b')
+})
+
 test('링크 복사 — 성공·거부·클립보드 없음', async () => {
   let got = ''
   assert.equal(await copyText('u1', { writeText: async (s) => void (got = s) }), true)

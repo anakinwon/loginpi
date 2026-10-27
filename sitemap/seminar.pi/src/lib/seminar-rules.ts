@@ -24,7 +24,8 @@ export const pageCount = (total: number) =>
 
 // 한 줄 이름(세미나·회의록 제목) — 제어문자(줄바꿈·NUL 등) 금지. 화면 입력칸은 한 줄이라 API 직접 호출만 걸린다.
 //  제목은 .ics·메일 제목·Markdown 머리로 흘러가므로 들어오는 곳에서 막는다(야간 시험 T01 r4). TAB 은 붙여넣기에 섞여 오므로 허용(.ics 도 TAB 보존)
-export const ONE_LINE_RE = /^[^\u0000-\u0008\u000A-\u001F\u007F]*$/
+//  C1 제어문자(U+0080~009F, NEL 포함)·줄/문단 구분자(U+2028·2029)도 줄바꿈으로 읽는 처리기가 있어 함께 막는다(T01 r6)
+export const ONE_LINE_RE = /^[^\u0000-\u0008\u000A-\u001F\u007F-\u009F\u2028\u2029]*$/
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
