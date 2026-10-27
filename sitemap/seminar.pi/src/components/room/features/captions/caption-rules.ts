@@ -1,5 +1,5 @@
 // 자막 app 메시지 검사(순수 함수) — 엔진은 d 를 검사하지 않으므로 화면이 주제별로 검사해 맞지 않으면 버린다(SIGNAL_API 3.6).
-// caption d = {text, ts, lang}(use-speech 가 보냄), state d = 부분 객체 {captions?: boolean, …}. 시험 : caption-rules.test.mjs
+// caption d = {text, ts, lang}(use-speech 가 보냄), state d = 부분 객체 {captions?: boolean, …}. 시험 : node --test src/components/room/features/media-fx/media-fx.test.mjs
 
 export const CAPTION = {
   maxChars: 500, // 표시 상한(5초 조각은 이보다 훨씬 짧다)

@@ -62,7 +62,7 @@ function useNoise(track: MediaStreamTrack | null, on: boolean, ctx: RoomCtx) {
         const real = track.getSettings().noiseSuppression
         if (!live || real === undefined || real === on) return
         noiseOn.set(real)
-        notice('room.effects.noiseFail')
+        notice('effects.noiseFail')
       })
     return () => {
       live = false

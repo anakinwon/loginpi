@@ -7,10 +7,13 @@ import { captionsState, parseCaption } from '../captions/caption-rules.ts'
 test('보통 조명은 보정하지 않는다', () => {
   assert.equal(lightGain(0.5), 1)
   assert.equal(lightGain(0.45), 1)
+  // 경계에서 1 로 이어진다(불연속 없음)
+  assert.ok(Math.abs(lightGain(0.419) - 1) < 0.01)
+  assert.ok(Math.abs(lightGain(0.581) - 1) < 0.01)
 })
 
 test('어두우면 올리고 상한에서 멈춘다, 밝으면 하한까지만 낮춘다', () => {
-  assert.equal(lightGain(0.3), 0.5 / 0.3)
+  assert.equal(lightGain(0.3), (LIGHT.target - LIGHT.dead) / 0.3)
   assert.equal(lightGain(0.05), LIGHT.max)
   assert.equal(lightGain(0), LIGHT.max)
   assert.equal(lightGain(1), LIGHT.min)

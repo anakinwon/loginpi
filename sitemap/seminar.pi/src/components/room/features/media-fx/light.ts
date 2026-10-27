@@ -1,5 +1,5 @@
 // 조명 보정 판정(순수 함수, 설계서 15.5) — 저해상도 표본의 평균 밝기 → 목표 밝기로 끌어올리는 brightness 배율.
-// 급변 방지 = 표본마다 목표 배율 쪽으로 일부만 이동(지수 평활). 시험 : node --test src/components/room/features/media-fx/light.test.mjs
+// 급변 방지 = 표본마다 목표 배율 쪽으로 일부만 이동(지수 평활). 시험 : node --test src/components/room/features/media-fx/media-fx.test.mjs
 // Jitsi 배포본엔 조명 보정이 없다(REA jitsi-03 lighting 0건) — 자체 설계, 근거 없는 숫자는 아래 상수에 모았다(실기기 조정용)
 
 export const LIGHT = {
@@ -14,10 +14,13 @@ export const LIGHT = {
   sampleH: 18,
 }
 
-// 평균 밝기 → 목표 배율
+// 평균 밝기 → 목표 배율. dead zone 가장자리(target±dead)를 기준으로 삼아 경계에서 1 로 이어진다(펌핑 방지)
 export function lightGain(mean: number): number {
-  if (!Number.isFinite(mean) || Math.abs(mean - LIGHT.target) < LIGHT.dead) return 1
-  return Math.min(LIGHT.max, Math.max(LIGHT.min, LIGHT.target / Math.max(mean, 0.01)))
+  if (!Number.isFinite(mean)) return 1
+  const lo = LIGHT.target - LIGHT.dead
+  const hi = LIGHT.target + LIGHT.dead
+  const g = mean < lo ? lo / Math.max(mean, 0.01) : mean > hi ? hi / mean : 1
+  return Math.min(LIGHT.max, Math.max(LIGHT.min, g))
 }
 
 // 직전 배율 → 다음 배율(완화)
