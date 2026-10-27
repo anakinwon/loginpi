@@ -142,7 +142,7 @@ LTE 휴대폰 ─ 신호 wss ─→ Cloudflare 임시 터널 ─(집 PC가 바�
 3. 화면의 **token** 은 비밀값 — 저장소·채팅에 붙이지 않고 그 PC 의 `duckdns.cmd` 에만 둡니다
 
 ### 4.2 파일 준비·배치
-1. **엔진 파일** : 아소카가 `media/` 에서 `GOOS=windows GOARCH=amd64 go build -o galapagos.exe ./cmd/galapagos` 로 빌드해 전달 [확인중 : 전달 경로 — USB 또는 공유 폴더]
+1. **엔진 파일** : 아소카가 `media/` 에서 `CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o bin/galapagos.exe ./cmd/galapagos` 로 빌드해 전달(4.7 표의 빌드는 모두 이 명령. **v1.3(`45541466…`)부터는 커밋을 마친 깨끗한 작업 트리에서** 빌드 — `go version -m bin/galapagos.exe` 가 `vcs.modified=false` 이고, 그 커밋을 checkout 해 이 명령으로 다시 빌드하면 같은 SHA256(다른 폴더에서 재현 확인 2026-10-27). 그 전 빌드는 미커밋 작업 트리였을 수 있다 — 4.7 표 커밋 칸 참고) [확인중 : 전달 경로 — USB 또는 공유 폴더]
 2. **Caddy** : https://caddyserver.com/download 에서 Windows amd64 공식 파일을 받아 이름을 `caddy.exe` 로 바꿉니다
 3. **입장권 비밀키** : 마스터 PC 에서 `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"` 로 만들고, Vercel 과 `run-engine.cmd` 두 곳에 직접 입력합니다(채팅·저장소·커밋 메시지에 붙이지 않음)
 4. 폴더 `C:\galapagos\` 를 만들고 아래 파일을 둔 뒤, **폴더 권한을 관리자·SYSTEM 만으로 제한**합니다(다른 계정이 파일을 바꾸거나 비밀값을 읽지 못하게). 관리자 PowerShell :
@@ -258,9 +258,9 @@ galapagos.exe
 
 ### 4.7 엔진 교체 (새 빌드로 바꿀 때)
 
-화면(Vercel)은 push 하면 자동 배포되지만 **엔진은 이 PC 에서 직접 바꿔야** 합니다. 화면이 새 기능(v1.1 채팅·손들기·반응·무대 초대·세미나 종료, v1.2 사회자 음소거·레이아웃·발언자)을 쓰는데 엔진이 옛 빌드면 그 기능만 실패합니다(기본 입장·영상은 동작).
+화면(Vercel)은 push 하면 자동 배포되지만 **엔진은 이 PC 에서 직접 바꿔야** 합니다. 화면이 새 기능(v1.1 채팅·손들기·반응·무대 초대·세미나 종료, v1.2 사회자 음소거·레이아웃·발언자, v1.3 자막·녹화/기록 상태·새로고침 중계 `app`)을 쓰는데 엔진이 옛 빌드면 그 기능만 실패합니다(기본 입장·영상은 동작).
 
-1. 마스터 PC 에서 새 파일 : `sitemap/seminar.pi/media/bin/galapagos.exe` (아소카가 빌드해 둠 — 아래 SHA256 확인)
+1. 마스터 PC 에서 새 파일 : `sitemap/seminar.pi/media/bin/galapagos.exe` (아소카가 빌드해 둠 — 아래 SHA256 확인). `bin/` 은 git 에 올라가지 않으므로 작업 폴더(worktree)를 정리했거나 다른 체크아웃이면 파일이 없거나 옛 빌드일 수 있다 — **없거나 SHA256 이 다르면 표의 커밋을 checkout 해 4.2 명령으로 다시 빌드**(같은 SHA256 이 나온다)
 2. 192.168.0.16 관리자 cmd :
    ```
    schtasks /End /TN "Galapagos Engine"
@@ -273,7 +273,9 @@ galapagos.exe
 
 | 빌드 | 커밋 | SHA256 |
 |---|---|---|
-| **2026-10-27 07:52 (v1.2 + LAN 후보)** — 현행 | `9d8eea86` (LAN 후보 Append) | `12cfde8b6be2d5271df817d261becea7b6b73243b3f27f429392cfb7e87598a9` |
+| **2026-10-27 20:55 (v1.3.1 범용 중계 `app` + 잘못된 UTF-8 연결 종료)** — 새 빌드, 교체 대기 | `4e33bbad` (브랜치 `feat/seminar-app-relay`, `vcs.modified=false`, 재현 확인) | `a11f7f367d84c03d1061458b4e1d9b8601b276848a4d71730524c7b8896df826` |
+| 2026-10-27 20:37 (v1.3) — **폐기, 설치 금지** : 잘못된 UTF-8 `app.send` 를 그대로 중계(청중 1명이 방 전원 연결을 끊을 수 있음, SIGNAL_API v1.3.1) | `21844766` (`vcs.modified=false`) | `45541466cd242d665285d45c161f3b62c4cd4cd8c2a04cea6d06fcbbdb104e98` |
+| 2026-10-27 07:52 (v1.2 + LAN 후보) — 현재 집 PC | `c5f42247` + 미커밋 수정(LAN 후보 Append — `9d8eea86` 커밋 07:55 전 빌드, `vcs.modified=true`) | `12cfde8b6be2d5271df817d261becea7b6b73243b3f27f429392cfb7e87598a9` |
 | 2026-10-27 01:45 (v1.2) — 구, 같은 집 PC 끊김 | `7f623e75` | `bdcbe4896908fa2be09fc5df30aaa6b84d34a21f16c55c51a8f35a928441cbc0` |
 
 ## 5. 앱(Vercel) 쪽 설정 — 아소카가 코드, 마스터가 Vercel 값

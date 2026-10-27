@@ -1,0 +1,78 @@
+{
+ "title": "REA_04 엔진편 — 범용 중계 app.send(SIGNAL_API v1.3 3.6) 설계 근거 : meet.jit.si 배포본의 endpoint 메시지 중계(모양·방송·보낸 사람·크기·속도·권한)",
+ "date": "2026-10-27",
+ "author": "Agent10 기반 구축 담당(engine) — feat/seminar-app-relay",
+ "scope": "REA 가 이미 내보낸(다이제스트 검증된) meet.jit.si 배포 스크립트 2개에 대한 문자열 앵커 정적 분석만. 회의 참가 0회·새 네트워크 요청 0회. 서버(브리지·Prosody) 동작은 배포 클라이언트에서 관측 불가 → unknown 으로 남김",
+ "s2_safety": "상용 프로그램 아님(Jitsi = Apache-2.0). 앵커 문맥은 근거 위치 확인용 짧은 발췌만 두고 코드는 옮기지 않았다(엔진 구현은 기존 chat.send 본보기 그대로)",
+ "rea_usage": {
+  "mcp": "REA MCP 서버 연결 실패(CONNECT_TIMEOUT 30초) — 이번 실행에서 MCP 도구 호출 불가",
+  "cli": "rea@6.4.0 (C:/Users/anaki/AppData/Roaming/npm/rea) 사용 가능",
+  "reused_evidence": [
+   { "evidence_id": "ev_0f5b34a466fd1c310d6fded998fa992cc3d62ad07b7fee71ae14b44a62b2c83b", "operation": "inspect_web_page (meet.jit.si 대기 화면)", "by": "REA_04 jitsi-01" },
+   { "evidence_id": "ev_4be1f45fc31619641c18832898afcada31bac5aace0fa50eed75e83c0e04eae5", "operation": "export_web_scripts → 스크래치패드 rea04-jitsi/scripts (manifest.json)", "by": "REA_04 jitsi-01" }
+  ],
+  "cli_calls_this_run": [
+   {
+    "command": "rea inspect-evidence-bundle {path: rea04-jitsi/raw/04-export-web-scripts.json, detail: summary}",
+    "result": "거부 evidence_integrity_mismatch — 이 파일은 번들이 아니라 단일 Evidence 레코드(ev_4be1f45f…)임을 REA 가 확인. 번들 검증 대신 아래 sha256 재계산으로 내보낸 바이트가 REA manifest 와 같음을 확인"
+   }
+  ],
+  "not_retried": "analyze-javascript-application(app.bundle 300초 타임아웃·lib-jitsi-meet V8 힙 4096MB 고갈 — REA_04 jitsi-04 blocked) 은 같은 입력·같은 메모리라 다시 돌리지 않음"
+ },
+ "artifacts": {
+  "ljm": {
+   "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+   "rea_script_key": "scr_19669fcddfc7f878317e02bfb8c79ce586ee02baa664270570c57c69146c9921",
+   "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6",
+   "bytes": 1145590,
+   "sha256_recomputed_this_run": "일치"
+  },
+  "app": {
+   "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+   "rea_script_key": "scr_795fdff0f05bcda41b5a93d4a94767a7ef68f106f8ead894bff850bffcb635f9",
+   "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57",
+   "bytes": 3658821,
+   "sha256_recomputed_this_run": "일치"
+  },
+  "source_crosscheck": "jitsi-meet 소스 사본 commit 3860ada65d279a46492ba8cef0f43557fefaa14b (REA_04 jitsi-04 source_copy)"
+ },
+ "method": "스크래치패드 rea05-relay/probe.mjs(키워드 출현 오프셋·sha256) → ctx.mjs(오프셋 앞뒤 문맥). 오프셋 = UTF-8 디코드 문자열 기준 문자 위치(REA_04 jitsi-03 과 같은 기준)",
+ "anchors": [
+  { "id": "relay[0]", "file": "ljm", "offset": 141874, "needle": "EndpointMessage", "excerpt": "sendMessage(e,t){this._send({colibriClass:\"EndpointMessage\",msgPayload:t,to:e})}", "note": "브리지 채널 송신 모양 = {colibriClass, msgPayload, to}. 보낸 쪽은 from 을 넣지 않는다" },
+  { "id": "relay[1]", "file": "ljm", "offset": 664529, "needle": "broadcastEndpointMessage", "excerpt": "sendEndpointMessage(e,t){this.rtc.sendChannelMessage(e,t)} … broadcastEndpointMessage(e){this.sendEndpointMessage(\"\",e)}", "note": "방송 = to 빈 문자열. 송신 함수는 검사 없이 채널로 바로 넘긴다(크기·속도·권한 검사 없음)" },
+  { "id": "relay[2]", "file": "ljm", "offset": 143698, "needle": "EndpointMessage", "excerpt": "case\"EndpointMessage\":if(!i.msgPayload||\"object\"!=typeof i.msgPayload){ys.warn(`Dropping malformed EndpointMessage from ${i.from}: missing msgPayload`);break}t.emit(ar.ENDPOINT_MESSAGE_RECEIVED,i.from,i.msgPayload)", "note": "수신 = 브리지가 채운 from + msgPayload. 객체가 아니면 받는 쪽에서 버린다" },
+  { "id": "relay[3]", "file": "ljm", "offset": 178957, "needle": "too large", "excerpt": "if(\"open\"===e.readyState&&t.sctp&&r>t.sctp.maxMessageSize)throw new TypeError(\"Message too large (can send a maximum of \"+t.sctp.maxMessageSize+\" bytes)\")", "note": "ljm 안 'too large' 유일 1건 = WebRTC adapter 의 DataChannel SCTP maxMessageSize 보정. 앱 수준 endpoint 메시지 크기 상한은 없음" },
+  { "id": "relay[4]", "file": "app", "offset": 2671090, "needle": "sendEndpointMessage", "excerpt": "e.sendEndpointMessage(\"\",{type:\"face-landmarks\",faceLandmarks:t})", "note": "한 통로를 여러 기능이 공유 — 판별 키 type" },
+  { "id": "relay[5]", "file": "app", "offset": 2857001, "needle": "sendEndpointMessage", "excerpt": "n.sendEndpointMessage(\"\",{name:AV,reactions:t,timestamp:Date.now()})", "note": "반응도 같은 통로 — 판별 키 name(같은 앱 안에서 type·name 두 키 혼용)" },
+  { "id": "relay[6]", "file": "app", "offset": 2209047, "needle": "sendEndpointMessage", "excerpt": "\"send-endpoint-text-message\":(e,t)=>{try{APP.conference.sendEndpointMessage(e,{name:me,text:t})}", "note": "외부 API 로도 임의 텍스트를 같은 통로에 보낼 수 있음" },
+  { "id": "relay[7]", "file": "app", "offset": 2889329, "needle": "transcription-result", "excerpt": "Qce=\"transcription-result\",Xce=\"translation-result\",eue=\"translation_language\"", "note": "자막·번역 자막도 같은 통로의 판별 값" },
+  { "id": "relay[8]", "file": "app", "offset": 2890895, "needle": "participant.isHidden()", "excerpt": "if(n.type===QO){if(!n.participant.isHidden())return t(n);l=n.data}else{if(n.type!==tN||\"transcriber\"!==n.id)return t(n);l=n.json}if(![Qce,Xce].includes(…type))return t(n)", "note": "권한은 받는 쪽이 검사 — 자막은 숨은 참가자(전사기) 또는 비참가자 'transcriber' 에게서 온 것만 받는다. 소스 react/features/subtitles/middleware.ts:138-154 와 일치" },
+  { "id": "relay[9]", "file": "app", "offset": 1815857, "needle": "ENDPOINT_MESSAGE_RECEIVED", "excerpt": "fP=(e,t)=>{…o===DA&&a===xA.stop&&e===s&&n(gP())}…o.on(m.ENDPOINT_MESSAGE_RECEIVED,fP)", "note": "원격 제어도 받는 쪽이 보낸 사람 id(e) 를 대상(s)과 비교해 걸러낸다" }
+ ],
+ "bounded_negatives": [
+  { "search": "LiveKit Meet 첫 화면 내보낸 스크립트 11개(스크래치패드 rea04/exported-scripts, REA_04 meet-livekit-04)", "needles": ["destinationIdentities", "publishData", "topic:", "lk-chat-topic", "too large", "exceeds", "maxDataPacketSize", "DataPacket_Kind", "canPublishData", "sendText"], "hits": 0, "meaning": "방 화면 청크가 첫 화면에 로드되지 않음 — LiveKit 데이터 패킷 규칙은 이 증거로 판단 불가(부재의 증거 아님)" },
+  { "search": "ljm 전체", "needles": ["too large", "exceed"], "hits": "1 · 2", "meaning": "too large 1건은 relay[3](SCTP 보정). exceed 2건은 endpoint 메시지와 무관한 위치(365339·813840)" }
+ ],
+ "questions": [
+  { "q": "범용 중계 메시지 모양", "status": "답함(관측)", "answer": "{colibriClass:'EndpointMessage', msgPayload(임의 JSON 객체), to(빈 값 = 방송)}", "anchors": ["relay[0]", "relay[1]"] },
+  { "q": "보낸 사람 표시", "status": "답함(관측)", "answer": "보낸 쪽은 from 을 넣지 않고 받는 쪽은 브리지 프레임의 from 을 쓴다 → 보낸 사람 id 는 서버가 정한다", "anchors": ["relay[0]", "relay[2]"] },
+  { "q": "방송 대상(보낸 본인 포함 여부)", "status": "미확인", "answer": "to='' 방송만 관측. 브리지가 보낸 본인에게 되돌려 보내는지는 서버 동작이라 배포 클라이언트로 판단 불가" },
+  { "q": "크기 상한", "status": "답함(범위 한정 음성 검색)", "answer": "클라이언트에 앱 수준 상한 없음(SCTP DataChannel 보정만). 브리지 상한은 미확인", "anchors": ["relay[3]"] },
+  { "q": "속도 상한", "status": "추론", "answer": "송신 함수가 검사 없이 채널로 넘김 → 클라이언트 속도 제한 없음. 브리지 쪽 미확인", "anchors": ["relay[1]"] },
+  { "q": "권한", "status": "답함(관측 + 소스 대조)", "answer": "중계 경로에 역할 검사 없음. 기능마다 받는 쪽이 보낸 사람을 거른다(자막 = 숨은 전사기만, 원격 제어 = 대상 id 비교)", "anchors": ["relay[8]", "relay[9]"] },
+  { "q": "기능 다중화", "status": "답함(관측)", "answer": "얼굴 표식·반응·텍스트·자막이 한 통로를 쓰고 판별 키가 type·name 으로 섞여 있다", "anchors": ["relay[4]", "relay[5]", "relay[6]", "relay[7]"] }
+ ],
+ "design_mapping_seminar_pi": [
+  "한 통로 + 판별 값 = Jitsi 와 같은 구조(기능마다 엔진 메시지를 늘리지 않음, 계획서 A-2·D-9). 단 판별 키를 봉투 필수 필드 topic 하나로 고정(Jitsi 의 type·name 혼용 회피)",
+  "from 은 서버가 채운다 = Jitsi 브리지와 같음 — 받는 쪽이 보낸 사람을 믿을 수 있다",
+  "권한을 받는 쪽이 아니라 서버(엔진)에서 주제×역할 표로 검사 — Jitsi 는 기능마다 받는 쪽 필터를 따로 두어야 하고 하나라도 빠지면 위조 자막이 그대로 뜬다. 우리는 caption=presenter·panel, state=presenter, refresh=전원, 표 밖 = NOT_FOUND",
+  "크기 4KB·피어당 초당 2건 = Jitsi 클라이언트에 없는 상한을 엔진에서 둔다 — 세션 송신 큐 128·방 31명 팬아웃·메시지 64KB 상한과 맞추고 R-P5(실패 경로 먼저)",
+  "받는 사람 = 보낸 본인 제외 = 우리 chat 과 같음(본인은 응답으로 확정). Jitsi 브리지의 본인 되돌림 여부는 미확인이라 근거로 쓰지 않음",
+  "d 는 엔진이 해석하지 않는다. Jitsi 처럼 받는 쪽이 모양을 검사해 버린다(주제별 화면 코드 책임 — SIGNAL_API 3.6 에 명시)",
+  "참고(REA 아님, REA_01 5.10 소스 정독) : Galène 도 자막 권한 caption 을 운영자(op) 묶음에만 준다 — 서버 측 자막 권한의 선례"
+ ],
+ "unknowns": [
+  "Jitsi 브리지(JVB)의 EndpointMessage 크기·속도 상한, 보낸 본인 되돌림 — 서버 코드라 이 배포 클라이언트 증거 범위 밖",
+  "LiveKit 데이터 패킷(topic·destinationIdentities) 규칙 — 방 화면 청크 미수집"
+ ]
+}

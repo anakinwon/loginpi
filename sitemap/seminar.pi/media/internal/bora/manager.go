@@ -290,6 +290,12 @@ func (m *Manager) Request(s signal.Session, method string, d json.RawMessage) (a
 			return nil, e
 		}
 		return struct{}{}, r.SetLayout(ref.peer, v)
+	case signal.MAppSend:
+		v, e := decode[signal.AppSendReq](d)
+		if e != nil {
+			return nil, e
+		}
+		return struct{}{}, r.AppSend(ref.peer, v.Topic, v.D)
 	case signal.MRoomEnd:
 		if e := r.RequirePresenter(ref.peer); e != nil {
 			return nil, e

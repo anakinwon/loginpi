@@ -144,6 +144,34 @@ func TestSendQueueFullDoesNotBlock(t *testing.T) {
 	}
 }
 
+// 잘못된 UTF-8 텍스트 프레임 → 응답·중계 없이 연결 종료(RFC 6455 8.1). json.RawMessage 는 잘못된 바이트를 그대로 두므로
+// 고치기 전에는 echo(= app.send 처럼 d 를 그대로 다시 보냄)가 그 바이트를 돌려줬다 — 받는 브라우저 전원이 1007 로 끊기는 경로.
+func TestInvalidUTF8Closes(t *testing.T) {
+	t.Setenv("MEDIA_DEV_TICKET", "1")
+	t.Setenv("NODE_ENV", "")
+	h := &fakeHandler{left: make(chan string, 1)}
+	srv := httptest.NewServer(NewServer(h, NewVerifier(nil)))
+	defer srv.Close()
+	ws, err := DialWS("ws"+strings.TrimPrefix(srv.URL, "http"), "", MaxMessage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ws.Close()
+	roundTrip(t, ws, Envelope{T: TypeReq, ID: 1, M: MJoin, D: json.RawMessage(`{"room":"r","role":"presenter","name":"a"}`)})
+	if err := ws.WriteText([]byte("{\"t\":\"req\",\"id\":2,\"m\":\"echo\",\"d\":\"\xff\xfe<x>\"}")); err != nil {
+		t.Fatal(err)
+	}
+	_ = ws.SetReadDeadline(time.Now().Add(3 * time.Second))
+	if _, msg, err := ws.ReadMessage(); err == nil {
+		t.Fatalf("잘못된 UTF-8 프레임을 처리함 : %q", msg)
+	}
+	select {
+	case <-h.left: // 읽기 기한 초과가 아니라 서버가 세션을 끝냈다
+	case <-time.After(3 * time.Second):
+		t.Error("잘못된 UTF-8 뒤 Left 호출 없음")
+	}
+}
+
 // EndSession 순서 : 성공 응답(클라이언트 수신) → After(다른 세션 정리) → ntf error ROOM_CLOSED. After 가 응답보다 먼저면 응답을 못 받은 채 기다리다 실패.
 func TestEndSessionOrder(t *testing.T) {
 	t.Setenv("MEDIA_DEV_TICKET", "1")

@@ -1,8 +1,9 @@
 // v1.1 표 형식 단위 테스트 — 재입장 역할 유지·room.end 순서·종료 방 다시 열기, 받는 사람 범위(ntf hand)·raisedTs 서버 시각 순서·반응 300ms 합산·허용 목록·속도 제한·채팅 500자,
-// peer.setRole 권한·승격/강등 처리 순서·강등 뒤 발행 금지, peers 가림·입퇴장 묶음(SIGNAL_API 3.3). 실행 : go test ./internal/bora
+// peer.setRole 권한·승격/강등 처리 순서·강등 뒤 발행 금지, peers 가림·입퇴장 묶음(SIGNAL_API 3.3), v1.3 app.send 중계(3.6). 실행 : go test ./internal/bora
 package bora
 
 import (
+	"encoding/json"
 	"reflect"
 	"strings"
 	"testing"
@@ -258,6 +259,73 @@ func TestChat(t *testing.T) {
 		}
 		if d := got[id][0].D.(signal.ChatNtf); d.Text != strings.Repeat("가", 500) || d.Name != "n-A1" || d.PeerID != "A1" || d.Ts == 0 {
 			t.Errorf("%s 채팅 데이터 이름 %q 글자 %d", id, d.Name, len([]rune(d.Text)))
+		}
+	}
+}
+
+// app.send(v1.3) — 주제 허용표·역할·d 4KB·피어당 초당 2건(주제 합산)·잘못된 요청은 한도 미사용·잠금 무관,
+// 받는 사람 = 보낸 본인 외 전원, d 는 받은 그대로·from 은 서버가 채움, JSON 모양.
+func TestAppSend(t *testing.T) {
+	v := newV11(t)
+	v.r.exec(func() { v.r.locks = signal.Locks{Audio: true, Video: true} })       // 잠금 중에도 중계는 된다
+	big := json.RawMessage(`"` + strings.Repeat("a", signal.AppMaxBytes-2) + `"`) // 정확히 4096바이트
+	for _, st := range []struct {
+		name, from, topic string
+		d                 json.RawMessage
+		want              signal.ErrCode
+	}{
+		{"표에 없는 주제", "P", "chat", nil, signal.CodeNotFound},
+		{"빈 주제", "P", "", nil, signal.CodeNotFound},
+		{"청중 caption", "A1", "caption", nil, signal.CodeRoleForbidden},
+		{"청중 state", "A1", "state", nil, signal.CodeRoleForbidden},
+		{"패널 state", "N", "state", nil, signal.CodeRoleForbidden},
+		{"4097바이트", "P", "caption", append(big[:len(big):len(big)], ' '), signal.CodeSDPInvalid},
+		{"없는 참가자", "X", "refresh", nil, signal.CodeNotFound},
+		{"발표자 caption 4096바이트", "P", "caption", big, ""},
+		{"발표자 state", "P", "state", json.RawMessage(`{"recording":true}`), ""},
+		{"발표자 1초 안 3번째", "P", "refresh", nil, signal.CodeRateLimited},
+		{"패널 caption", "N", "caption", json.RawMessage(`{"text":"안녕"}`), ""},
+		{"청중 refresh(앞의 거절은 한도 미사용)", "A1", "refresh", nil, ""},
+		{"청중 refresh 2번째", "A1", "refresh", json.RawMessage(`{"kind":"poll"}`), ""},
+		{"청중 1초 안 3번째", "A1", "refresh", nil, signal.CodeRateLimited},
+	} {
+		if e := v.r.AppSend(st.from, st.topic, st.d); code(e) != st.want {
+			t.Errorf("%s : %v 기대 %q", st.name, e, st.want)
+		}
+	}
+	got := v.take()
+	// 성공 5건 : P caption·P state·N caption·A1 refresh 2건 — 각자 자기 것은 못 받는다
+	want := map[string][]string{
+		"P":  {"N/caption", "A1/refresh", "A1/refresh"},
+		"N":  {"P/caption", "P/state", "A1/refresh", "A1/refresh"},
+		"A1": {"P/caption", "P/state", "N/caption"},
+		"A2": {"P/caption", "P/state", "N/caption", "A1/refresh", "A1/refresh"},
+	}
+	for id, w := range want {
+		var seq []string
+		for _, n := range got[id] {
+			if n.M != signal.NApp {
+				t.Fatalf("%s 알림 %s", id, n.M)
+			}
+			a := n.D.(signal.AppNtf)
+			seq = append(seq, a.From+"/"+a.Topic)
+		}
+		if !reflect.DeepEqual(seq, w) {
+			t.Errorf("%s 받은 순서 %v 기대 %v", id, seq, w)
+		}
+	}
+	if a := got["A2"][0].D.(signal.AppNtf); string(a.D) != string(big) {
+		t.Errorf("d 가 바뀜 : %d바이트", len(a.D))
+	}
+	for _, st := range []struct {
+		n    signal.AppNtf
+		want string
+	}{
+		{got["A2"][1].D.(signal.AppNtf), `{"topic":"state","d":{"recording":true},"from":"P"}`},
+		{got["A2"][3].D.(signal.AppNtf), `{"topic":"refresh","d":null,"from":"A1"}`}, // d 생략 = null
+	} {
+		if b, _ := json.Marshal(st.n); string(b) != st.want {
+			t.Errorf("JSON %s 기대 %s", b, st.want)
 		}
 	}
 }

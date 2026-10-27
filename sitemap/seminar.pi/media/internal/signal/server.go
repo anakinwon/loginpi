@@ -13,6 +13,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+	"unicode/utf8"
 )
 
 // sendQueue — 세션 송신 큐 크기. 차면 느린 클라이언트로 보고 연결을 끊는다. [TBD : M2 실측]
@@ -168,6 +169,8 @@ func (s *session) writeLoop() {
 }
 
 // read — 봉투 1개. 기한은 마지막 수신 + d.
+// 텍스트 프레임은 올바른 UTF-8 이어야 한다(RFC 6455 8.1) — 아니면 연결 종료. json.RawMessage(app.send d 등)는
+// 잘못된 바이트를 그대로 남겨 중계하므로, 받는 브라우저 전원이 1007 로 끊기는 것을 모든 메서드 공통 관문에서 막는다.
 func (s *session) read(d time.Duration) (Envelope, error) {
 	var e Envelope
 	_ = s.ws.SetReadDeadline(time.Now().Add(d))
@@ -176,7 +179,7 @@ func (s *session) read(d time.Duration) (Envelope, error) {
 		return e, err
 	}
 	s.lastRecv.Store(time.Now().UnixNano())
-	if op != opText {
+	if op != opText || !utf8.Valid(msg) {
 		return e, errWSProtocol
 	}
 	err = json.Unmarshal(msg, &e)
