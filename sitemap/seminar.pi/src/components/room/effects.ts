@@ -3,9 +3,9 @@
 // 카메라 송신기 RTCRtpSender.replaceTrack(재협상 없음). 켜진 효과가 0개면 아무것도 만들지 않고 원본 그대로 보낸다(회귀 0).
 // 근거(REA_04_UI_EXT R-E1·R-E2) : Jitsi·LiveKit 배포본 모두 효과 적용 = 같은 송신기의 replaceTrack, LiveKit 대체 경로 = captureStream + 워커 타이머
 // (숨은 탭에서도 프레임이 멈추지 않게). 코드는 옮기지 않았다(S-2)
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useStores, type VideoEffect } from './extensions'
-import { failHit, fxFrameDue, swapSender } from './room-rules'
+import { failHit, fxFrameDue, onTrackEnd, swapSender } from './room-rules'
 import { ticker } from './ticker'
 
 // 효과 1단계 — src(이전 단계 결과) 를 out 캔버스(w×h)에 그린다. 동기 함수(프레임마다 호출)
@@ -16,6 +16,14 @@ export const FX = { fps: 30, failMax: 30 } // 연속 실패 상한 — 넘으면
 // 기능 탐지(UA 판정 금지) — 캔버스 송출이 없으면 효과를 켤 수 없다
 export const canProcessVideo = () =>
   typeof HTMLCanvasElement !== 'undefined' && typeof HTMLCanvasElement.prototype.captureStream === 'function'
+
+// 트랙이 살아 있는지(장치 끊김·앱 전환으로 끝나면 다시 그린다) — 끝난 카메라로는 효과가 적용되지 않으므로(useVideoEffects)
+// 효과 시트가 배경·조명을 켤 수 있는 척하지 않고 '카메라를 켜면…' 안내를 보이게 한다
+export function useTrackLive(t: MediaStreamTrack | null | undefined): boolean {
+  const [, bump] = useReducer((x: number) => x + 1, 0)
+  useEffect(() => (t ? onTrackEnd(t, bump) : undefined), [t])
+  return !!t && t.readyState === 'live'
+}
 
 // 파이프라인 1개 — 켜진 효과 목록은 매 프레임 active() 로 읽는다(효과를 더하거나 빼도 송신 트랙을 다시 바꾸지 않아 원본이 새지 않음)
 function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[]) {

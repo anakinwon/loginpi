@@ -10,7 +10,7 @@ import {
   type RoomCtx,
   type RoomFeature,
 } from '../../extensions'
-import { canProcessVideo } from '../../effects'
+import { canProcessVideo, useTrackLive } from '../../effects'
 import {
   autoOff,
   bgOn,
@@ -37,7 +37,9 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   const preview = useRef<HTMLVideoElement>(null)
   const [mine, setMine] = useState<(MyImage & { url: string; unsaved?: boolean })[]>([])
   const [err, setErr] = useState<string | null>(null)
-  const cam = ctx.r.localStream?.getVideoTracks()[0]
+  const raw = ctx.r.localStream?.getVideoTracks()[0]
+  // 장치 쪽에서 끝난 카메라(앱 전환·장치 분리)는 없는 것과 같다 — 고른 배경이 적용되지 않는데 고를 수 있는 척하지 않는다(r5 E2E)
+  const cam = useTrackLive(raw) ? raw : undefined
   const ok = isOpen && canProcessVideo() && canSegment() // 시트가 열렸을 때만 판정(닫힌 시트는 렌더 내용이 보이지 않는다)
   const { hold } = ctx
 
