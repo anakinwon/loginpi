@@ -542,7 +542,8 @@
     },
     "dubbing": {
       "listen": "Listen in translated voice",
-      "blocked": "Could not play the translated voice. Please turn it on again"
+      "blocked": "Could not play the translated voice. Please turn it on again",
+      "stopped": "Translated voice was turned off. It is not available in this seminar right now"
     }
   },
   "list": {

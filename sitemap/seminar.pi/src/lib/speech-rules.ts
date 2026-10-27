@@ -155,6 +155,12 @@ export function paceStyle(rate: number) {
 // ── 음성 번역 듣기(더빙, SA9 — M-3 표준 합성 음성) ──
 // 사용자당 분당 합성 음성 요청(캐시 적중 포함, translate-rules hitRate 로 셈) — 발표자 1명 5초 조각이면 정상 12회, 패널 2명이 동시에 말해도 여유
 export const TTS_REQ_PER_MIN = 30
+// 합성 1문장 글자 상한 — 5초 자막 번역은 100자 안팎, 넘는 문장은 화면이 요청하지 않고 건너뜀(비용 상한, 보안 검토 D-2)
+export const TTS_MAX_CHARS = 300
+// 합성 응답이 이 상태면 이후 문장도 모두 실패한다 — 더빙을 끄고 알린다(문장마다 헛요청 반복 방지).
+//  401 로그아웃 · 403 자격 없음 · 409 LIVE 아님 · 503 AI 꺼짐 · 429 중 세미나 한도 소진(SPEECH_QUOTA). 분당 횟수(SPEECH_RATE)·502 는 그 문장만 건너뜀
+export const dubStop = (status: number, code?: unknown) =>
+  status === 401 || status === 403 || status === 409 || status === 503 || (status === 429 && code === 'SPEECH_QUOTA')
 // 재생 큐 — 재생 대기가 이만큼을 넘으면 가장 오래된 것을 버린다(늦은 더빙은 원음과 어긋나 쓸모없음)
 export const DUB_QUEUE_MAX = 3
 // 재생 속도 범위 — 원문 발화 시간에 맞추되 알아듣기 어려운 속도는 막는다
