@@ -13,7 +13,7 @@
 //  · 음성 입력 audio/webm·ogg·m4a·wav 등, 요청 전체 20MB 이하 — docs/audio(2026-09-23)
 // 개인정보 : store:false — 요청·응답을 Google 쪽 대화 저장소에 남기지 않게(기본 true). 국외 이전 고지는 /privacy
 import 'server-only'
-import { fenceTranscript, TX_CLOSE, TX_OPEN } from './note-rules'
+import { fenceTranscript, trPrompt, TX_CLOSE, TX_OPEN } from './note-rules'
 import { LANG_RE, MAX_TEXT_CHARS, paceStyle } from './speech-rules'
 
 const URL_INTERACTIONS =
@@ -26,6 +26,8 @@ const TTS_VOICE = 'Kore'
 // R-P4 예외 원장 docs/BUILD_DEFECTS.md 2.7 — 실시간 경로 10초, 요약(종료 시 1회) 30초
 const TIMEOUT_MS = 10_000
 const SUMMARY_TIMEOUT_MS = 30_000
+// 번역 출력 토큰 상한(generation_config.max_output_tokens — SDK genai.d.ts GenerationConfig_2, docs/rea/evidence/REA_04) — 자막 1문장 500자 기준
+const TR_MAX_OUT_TOKENS = 2_048
 // 요약 입력 스크린샷 상한 — 요청 20MB 안에 들게(SA7 은 분당 최대 2장을 모으므로 그중 고른다)
 // ponytail: 앞에서부터 자름, 회의가 길어 장면 대표성이 문제면 균등 추출로
 export const MAX_SUMMARY_IMAGES = 12
@@ -180,16 +182,9 @@ export async function translate(
     textOf(
       await interact({
         model: GEMINI_MODEL.text,
-        input: [
-          {
-            type: 'text',
-            text:
-              `Translate the following live caption into ${langName(target)} (${target}). ` +
-              'Keep names, numbers and tone. If it is already in that language, return it unchanged. ' +
-              'Return only the translation.\n\n' +
-              text,
-          },
-        ],
+        input: [{ type: 'text', text: trPrompt(text, langName(target), target) }],
+        // 출력 상한 — DB 계량(fn_use_smn_ai)은 입력 글자만 센다. 500자 번역은 수백 토큰이라 여유 4배, 넘치면(completed 아님) 실패 = 원문 표시
+        generation_config: { max_output_tokens: TR_MAX_OUT_TOKENS },
       }),
     ) || null
   )
