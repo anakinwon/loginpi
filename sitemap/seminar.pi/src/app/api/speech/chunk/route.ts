@@ -1,4 +1,4 @@
-// 음성 조각 → 글 — POST multipart/form-data { audio: 5초 독립 오디오 파일(webm/ogg/mp4/wav), smnId 또는 ntId, durMs, lang? } → { text, lang, ts }.
+// 음성 조각 → 글 — POST multipart/form-data { audio: 5초 독립 오디오 파일(webm/ogg/mp4 — wav 는 받지 않음), smnId 또는 ntId, durMs, lang? } → { text, lang, ts }.
 // 말하는 사람 자기 브라우저가 자기 마이크 조각을 보낸다(계획 A-1, piFetch — Pi Browser 는 쿠키가 없어 X-Pi-Token). 비로그인 401(redirect 없음).
 // 순서 : 키 확인(없으면 503, 화면 숨김) → 세션·본문 병렬(R-P1) → 조각 검사(형식·크기 160KB·길이·독립 파일 머리) → fn_use_smn_vc 1왕복
 //  (권한·동의·분당 20회·분당 70초·참가자 1인 상한·누적 상한, 대상 행 잠금 R-P5) → 외부 AI 음성→글(10초, BUILD_DEFECTS 2.7) → 실패 502 = 화면은 그 조각 자막만 건너뜀
@@ -113,6 +113,6 @@ export const POST = withAuthGuard(
       { headers: noStore },
     )
   }),
-  // 본문 상한 = 조각 상한 + multipart 머리 여유(기본 64KB 로는 5초 aac·wav 가 413)
+  // 본문 상한 = 조각 상한 + multipart 머리 여유(기본 64KB 로는 5초 aac 가 413)
   { maxBodySize: MAX_CHUNK_BYTES + 16_384 },
 )
