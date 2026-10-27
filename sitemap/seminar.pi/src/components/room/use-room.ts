@@ -15,6 +15,7 @@ import {
   batchReaction,
   capLayer,
   layerSender,
+  localPlan,
   NO_LOCKS,
   ownerKey,
   REACT,
@@ -595,6 +596,7 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
           if (seqRef.current !== my) return
           producersRef.current[source] = r.producerId
           sendersRef.current[source] = tr
+          if (source !== 'screen') watchLocalEnd(t, source, my)
           log(`발행 ${source} producer=${r.producerId}`)
           if (!t.enabled) await request('producer.pause', { producerId: r.producerId })
         }),
@@ -713,6 +715,18 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
     stopScreen()
   }
 
+  // 내 카메라·마이크 트랙이 장치 쪽에서 끝나면(모바일 앱 전환·장치 분리·권한 회수) 화면에 켜짐으로 남지 않게 끔으로 맞추고 서버도 일시정지 —
+  // 청중은 멈춘 화면 대신 '꺼짐'을 본다. 다시 켜면 setMedia 가 새 트랙을 받는다(localPlan 'reacquire')
+  function watchLocalEnd(t: MediaStreamTrack, source: 'mic' | 'camera', my: number) {
+    t.addEventListener('ended', () => {
+      if (seqRef.current !== my || !localRef.current?.getTracks().includes(t)) return
+      log(`내 ${source} 트랙 끝남(장치 끊김)`)
+      const producerId = producersRef.current[source]
+      if (producerId) request('producer.pause', { producerId }).catch(() => {})
+      setLocalOn((p) => ({ ...p, [t.kind]: false }))
+    })
+  }
+
   // 마이크·카메라 켜기/끄기 — 서버 일시정지(producer.pause/resume). 상태는 서버 응답 뒤에만 확정(낙관적 갱신 안 함, 설계서 14.3)
   // 반환 = 화면 알림이 필요한 실패면 false(요청 중 재호출·나가기 취소는 알림 대상 아님 → true)
   async function setMedia(kind: MediaKind, on: boolean): Promise<boolean> {
@@ -722,9 +736,33 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
     if (busyRef.current) return true
     busyRef.current = true
     setPending(kind)
+    const my = seqRef.current
     try {
+      let t = track
+      if (localPlan(on, track.readyState) === 'reacquire') {
+        // 장치가 끊겨 끝난 트랙(앱 전환·장치 회수) — 같은 송신기에 새 트랙을 끼운다(재협상·새 producer 없음). 이 탭 안에서 바로 요청
+        const s = await navigator.mediaDevices
+          ?.getUserMedia(kind === 'audio' ? { audio: true } : { video: VIDEO })
+          .catch(() => null)
+        const nt = s?.getTracks()[0]
+        if (!nt) return false
+        if (seqRef.current !== my) {
+          nt.stop()
+          return true
+        }
+        const source: Source = kind === 'audio' ? 'mic' : 'camera'
+        await sendersRef.current[source]?.sender.replaceTrack(nt).catch((e: unknown) => {
+          nt.stop()
+          throw e
+        })
+        watchLocalEnd(nt, source, my)
+        const merged = new MediaStream([...(localRef.current?.getTracks() ?? []).filter((x) => x !== track), nt])
+        localRef.current = merged
+        setLocalStream(merged)
+        t = nt
+      }
       await request(on ? 'producer.resume' : 'producer.pause', { producerId })
-      track.enabled = on
+      t.enabled = on
       setLocalOn((p) => ({ ...p, [kind]: on }))
       return true
     } catch (e) {

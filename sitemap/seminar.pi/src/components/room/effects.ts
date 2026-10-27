@@ -5,7 +5,7 @@
 // (숨은 탭에서도 프레임이 멈추지 않게). 코드는 옮기지 않았다(S-2)
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useStores, type VideoEffect } from './extensions'
-import { failHit, fxFrameDue } from './room-rules'
+import { failHit, fxFrameDue, swapSender } from './room-rules'
 import { ticker } from './ticker'
 
 // 효과 1단계 — src(이전 단계 결과) 를 out 캔버스(w×h)에 그린다. 동기 함수(프레임마다 호출)
@@ -90,10 +90,10 @@ export function useVideoEffects(
     if (!any || !track || track.readyState !== 'live') return
     const p = startPipeline(track, () => activeRef.current)
     setOut(p.track)
-    sender?.replaceTrack(p.track).catch(() => {})
+    const revert = swapSender(sender, p.track, () => (track.readyState === 'live' ? track : null))
     return () => {
-      // 원본으로 되돌린 뒤 멈춘다 — 송신기가 이미 닫혔으면(강등·나가기) 되돌릴 것이 없다
-      if (sender?.track === p.track) sender.replaceTrack(track.readyState === 'live' ? track : null).catch(() => {})
+      // 원본으로 되돌린 뒤 멈춘다 — 교체가 아직 대기 중이어도 되돌린다(swapSender). 송신기가 닫혔으면 되돌리기 요청은 조용히 실패
+      revert()
       p.stop()
       setOut(null)
     }
