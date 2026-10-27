@@ -3,13 +3,14 @@
 import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
-import { buildIcs } from '@/lib/calendar-rules'
+import { buildIcs, icsNotesLabel } from '@/lib/calendar-rules'
 import { isUuid } from '@/lib/seminar-rules'
 
 export const GET = withGuard(
   dbRoute(async (req, ctx) => {
-    const { id } = await (ctx as { params: Promise<{ id: string }> }).params
-    if (!isUuid(id)) return apiError('NOT_FOUND', 404)
+    const { id: raw } = await (ctx as { params: Promise<{ id: string }> }).params
+    if (!isUuid(raw)) return apiError('NOT_FOUND', 404)
+    const id = raw.toLowerCase()
 
     const [smn, nt] = await Promise.all([
       db()
@@ -43,6 +44,7 @@ export const GET = withGuard(
       notesUrl: ntId ? `${base}/notes/${ntId}` : null,
       canceled: smn.data.smn_sts_cd === 'CANCELED',
       modAt: smn.data.mod_dtm,
+      notesLabel: icsNotesLabel(req.nextUrl.searchParams.get('hl')),
     })
     return new NextResponse(body, {
       headers: {

@@ -8,6 +8,7 @@ import {
   copyText,
   foldLine,
   icsEscape,
+  icsNotesLabel,
   icsSeq,
   inViewerTz,
   mailtoUrl,
@@ -155,4 +156,31 @@ test('.ics — SEQUENCE·LAST-MODIFIED 는 변경일시에서, 늦은 변경이 
   const old = buildIcs(ev, new Date(ev.startAt))
   assert.match(old, /\r\nSEQUENCE:0\r\n/)
   assert.ok(!old.includes('LAST-MODIFIED'))
+})
+
+test('.ics — UID 는 대소문자와 무관하게 같다(대문자 UUID 주소로 받아도 같은 일정)', () => {
+  const now = new Date('2026-10-01T00:00:00Z')
+  const lower = buildIcs(ev, now)
+  const upper = buildIcs({ ...ev, id: ev.id.toUpperCase() }, now)
+  const uid = (s) => s.match(/^UID:[^\r]*/m)[0]
+  assert.equal(uid(upper), uid(lower))
+  assert.equal(uid(lower), `UID:${ev.id}@seminar.pi`)
+})
+
+test('.ics — 회의록 라벨은 ?hl 언어별, 모르는 값·없음 = 영어', () => {
+  assert.equal(icsNotesLabel('ko'), '회의록')
+  assert.equal(icsNotesLabel('en'), 'Notes')
+  assert.equal(icsNotesLabel('xx'), 'Notes')
+  assert.equal(icsNotesLabel(null), 'Notes')
+  assert.equal(icsNotesLabel('__proto__'), 'Notes')
+  const ics = buildIcs({ ...ev, notesUrl: 'https://seminar.example/notes/n1', notesLabel: icsNotesLabel('ko') })
+  assert.match(ics.replace(/\r\n /g, ''), /DESCRIPTION:.*\\n회의록: https:\/\/seminar\.example\/notes\/n1/)
+})
+
+test('공유 칸 — 고정 높이 대신 min-h(글자 확대·360px 줄접힘), .ics 링크에 언어 전달', async () => {
+  const { readFileSync } = await import('node:fs')
+  const src = readFileSync(new URL('../components/seminar/share-links.tsx', import.meta.url), 'utf8')
+  assert.match(src, /'[^']*\bmin-h-10\b[^']*'/)
+  assert.ok(!/'[^'\n]*[\s']h-10\b/.test(src))
+  assert.match(src, /\/ics\?hl=/)
 })
