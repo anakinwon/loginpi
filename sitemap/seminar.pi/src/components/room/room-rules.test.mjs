@@ -5,6 +5,7 @@ import {
   barOrder,
   capLayer,
   followKey,
+  fxFrameDue,
   layoutFor,
   lockedFor,
   modActions,
@@ -444,4 +445,14 @@ test('발표자 입장·재입장 때 현재 state 1번 방송(notes:false 포�
   assert.equal(presenterResync('presenter', false, 'p1'), false)
   assert.equal(presenterResync('presenter', true, null), false)
   assert.equal(presenterResync('panel', true, 'p1'), false) // state 는 presenter 만 보낼 수 있다
+})
+
+// 회귀(T03 r2) — 카메라를 끈 동안에도 효과 파이프라인이 검은 프레임을 그려 조명 배율이 최대로 치솟고(다시 켜면 과노출) 배경 분리가 헛돌던 결함
+test('fxFrameDue — 카메라 꺼짐·같은 프레임·준비 전이면 그리지 않는다', () => {
+  const ok = { enabled: true, w: 640, h: 360, ready: 4, time: 1.5, last: 1.4 }
+  assert.equal(fxFrameDue(ok), true)
+  assert.equal(fxFrameDue({ ...ok, enabled: false }), false)
+  assert.equal(fxFrameDue({ ...ok, time: 1.4 }), false)
+  assert.equal(fxFrameDue({ ...ok, ready: 1 }), false)
+  assert.equal(fxFrameDue({ ...ok, w: 0 }), false)
 })

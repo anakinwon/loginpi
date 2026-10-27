@@ -210,3 +210,13 @@ export async function settleWithin(
     clearTimeout(timer)
   }
 }
+
+// 자막 방송 순서 — 조각 업로드는 겹친다(외부 AI 지연이 5초를 넘으면 뒤 조각 응답이 먼저 온다). 앞서 보낸 자막보다 오래된 조각(ts 작음)이면
+//  false = 방송·화면 표시를 건너뛴다(최신 자막이 옛 문장으로 덮이고 더빙이 거꾸로 읽던 결함, T03 r2). 글로만 받는 대면 노트는 이 판정을 쓰지 않는다
+export const captionFresh = (lastTs: number, ts: number) => ts >= lastTs
+
+// 무음 조각 거르기(비용 절감, T03 r2) — 마이크가 켜진 채 아무도 말하지 않는 5초 조각을 외부 AI 로 보내지 않는다.
+//  level = 조각 동안 시간 영역 RMS 최대값 기준. 말하기 링(SPEAK.level 0.04)보다 낮게 잡아 작은 목소리는 보낸다 [확인중 : 마스터 실기기 — 마이크·AGC 마다 다름]
+//  minSamples = 측정 표본이 이보다 적으면(AudioContext 가 suspended·미지원 — Pi Browser 자동재생 정책 등) 판정하지 않고 보낸다(fail-open, 자막이 끊기지 않게)
+export const VAD = { level: 0.01, pollMs: 100, minSamples: 10 }
+export const chunkHeard = (peak: number, samples: number) => samples < VAD.minSamples || peak >= VAD.level

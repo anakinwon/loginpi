@@ -21,6 +21,9 @@ import {
   dubRate,
   pushDub,
   settleWithin,
+  captionFresh,
+  chunkHeard,
+  VAD,
 } from './speech-rules.ts'
 
 const bytes = (...head) => {
@@ -205,4 +208,28 @@ test('tts·translate 라우트 — 캐시 적중 분기에서 aiGate 를 await p
   // aiGate = agreeGate(live) — LIVE 아님 409, 비참가(개최자·참가·ADMIN 아님) 403
   assert.ok(ag.includes(`liveOnly && m.data.smn_sts_cd !== 'LIVE'`) && ag.includes(`apiError('FORBIDDEN', 403)`))
   assert.match(e, /export const aiGate = \(smnId: string, user: UserRow\) => agreeGate\(smnId, user, true\)/)
+})
+
+// 회귀(T03 r2) — 겹친 조각 업로드에서 늦게 온 옛 조각이 최신 자막을 덮고 더빙이 거꾸로 읽던 결함
+test('captionFresh — 앞서 방송한 조각보다 오래된 조각은 버린다', () => {
+  let last = 0
+  const deliver = (ts) => {
+    if (!captionFresh(last, ts)) return false
+    last = ts
+    return true
+  }
+  assert.equal(deliver(10_000), true) // 조각 A(0~5초)
+  assert.equal(deliver(15_000), true) // 조각 B 응답이 먼저
+  assert.equal(deliver(10_500), false) // 늦게 온 옛 조각 — 버림
+  assert.equal(deliver(20_000), true)
+})
+
+// 보강(T03 r2) — 마이크 켜진 채 무음인 조각은 외부 AI 로 보내지 않는다(비용), 측정 못 하면 보낸다(fail-open)
+test('chunkHeard — 무음 조각 거르기·측정 불가 시 보냄', () => {
+  assert.equal(chunkHeard(0.002, 50), false) // 5초 내내 조용함
+  assert.equal(chunkHeard(VAD.level, 50), true) // 경계 = 보냄
+  assert.equal(chunkHeard(0.05, 50), true) // 말함
+  assert.equal(chunkHeard(0, 0), true) // AudioContext suspended·미지원 = 표본 없음 → 보냄
+  assert.equal(chunkHeard(0, VAD.minSamples - 1), true)
+  assert.ok(VAD.level < 0.04) // 말하기 링 기준보다 낮다(작은 목소리 보냄)
 })

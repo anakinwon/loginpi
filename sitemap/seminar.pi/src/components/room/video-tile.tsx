@@ -10,12 +10,12 @@ import { StreamVideo, type LayerFn } from './stage'
 // 공용 AudioContext 1개 — 브라우저마다 동시 컨텍스트 수 상한이 있어 타일마다 만들지 않는다. 트랙마다 analyser 만 따로,
 // 마지막 사용자가 빠지면 닫는다(다음 사용 때 새로 만든다)
 const shared: { ctx: AudioContext | null; users: number } = { ctx: null, users: 0 }
-function acquireCtx(): AudioContext {
+export function acquireCtx(): AudioContext {
   if (!shared.ctx || shared.ctx.state === 'closed') shared.ctx = new AudioContext()
   shared.users++
   return shared.ctx
 }
-function releaseCtx() {
+export function releaseCtx() {
   if (--shared.users > 0) return
   shared.users = 0
   shared.ctx?.close().catch(() => {})
