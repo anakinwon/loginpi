@@ -61,6 +61,10 @@ export const keepShown = (next: string, shown: string, on: boolean) => on && nex
 export const afterDelete = (m: string, choice: string, shown: string, on: boolean) =>
   choice !== m ? null : !on ? 'none' : shown === m ? 'blur' : shown
 
+// 그리고 있는 내 이미지(m)를 다른 배경을 고르는 중에 지울 때 = true(엔진이 고르는 것이 끝날 때까지 흐림으로 그린다).
+// 안 바꾸면 지운 이미지가 계속 송출되고, 고르던 것이 실패하면 failBack 이 지운 이미지로 돌아가 목록에 없는 배경이 남는다(야간 r6 T05)
+export const dropShown = (m: string, choice: string, shown: string, on: boolean) => on && shown === m && choice !== m
+
 // 분리기 시각(ms) — 같은 분리기에는 엄격히 커지는 값만 넣어야 한다. 정밀도를 낮춘 타이머(사생활 보호 설정)는 같은 값을 줄 수 있다
 export const nextTs = (prev: number, now: number) => Math.max(now, prev + 1)
 
