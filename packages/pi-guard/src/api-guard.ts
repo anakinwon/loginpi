@@ -3,7 +3,7 @@
 // 사용: export const GET = withGuard(async (req) => { ... }, { onMetric })
 import { NextRequest, NextResponse } from 'next/server'
 import {
-  checkRateLimit,
+  checkClientLimit,
   forbiddenResponse,
   getClientIp,
   getPolicyForPath,
@@ -73,10 +73,10 @@ export function withGuard(handler: Handler, opts?: GuardOptions): Handler {
       })
     }
 
-    // 3) Rate limiting — 개발 환경은 HMR·반복 새로고침·프로브가 단일 IP 라 우회(proxy.ts 와 동일 규칙)
+    // 3) Rate limiting(로그인 사용자는 IP+세션 버킷, checkClientLimit) — 개발 환경은 HMR·반복 새로고침·프로브가 단일 IP 라 우회(proxy.ts 와 동일 규칙)
     let remaining = -1
     if (process.env.NODE_ENV !== 'development') {
-      const rl = checkRateLimit(ip, getPolicyForPath(pathname, req.method))
+      const rl = checkClientLimit(req, getPolicyForPath(pathname, req.method))
       if (!rl.allowed) return rateLimitedResponse(rl.retryAfter)
       remaining = rl.remaining
     }

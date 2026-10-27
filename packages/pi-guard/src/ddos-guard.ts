@@ -38,15 +38,19 @@ function cleanup(now: number) {
   lastCleanup = now
 }
 
+// scale·tag 는 checkClientLimit 의 IP 전체 상한 버킷용(한도 × scale, 키 접두 분리). 기본값이면 기존 동작 그대로
 export function checkRateLimit(
   ip: string,
   policy: PolicyKey,
+  scale = 1,
+  tag = '',
 ): { allowed: boolean; remaining: number; retryAfter: number } {
   const now = Date.now()
   cleanup(now)
 
-  const p = RATE_POLICY[policy]
-  const key = `${policy}:${ip}`
+  const base = RATE_POLICY[policy]
+  const p = { ...base, limit: base.limit * scale }
+  const key = `${policy}${tag}:${ip}`
   const bucket = buckets.get(key) ?? {
     count: 0,
     windowStart: now,
@@ -98,6 +102,36 @@ export function getClientIp(req: NextRequest): string {
   }
 
   return 'unknown'
+}
+
+// 같은 NAT(행사장 Wi-Fi 등) 뒤 로그인 사용자들이 IP 버킷 하나를 나눠 쓰면 한 사람의 연타·새로고침이 남의 화면까지 429 로 막는다(seminar 야간 E2E r4).
+// 세션 자격(X-Pi-Token·pi_session·authjs 쿠키)이 있으면 IP+자격 끝 32자 버킷으로 따로 세고, 자격을 돌려 쓰는 우회는 IP 전체 상한(한도 × NAT_SCALE)이 막는다.
+// 자격 진위는 여기서 보지 않는다(키로만 씀 — 검증은 핸들러). AUTH(로그인 시도)는 무차별 대입 대상이라 IP 단독 그대로.
+// ponytail: 상한 10배는 어림값 — 행사 규모 실측이 쌓이면 조정
+export const NAT_SCALE = 10
+const SESSION_COOKIES = [
+  'pi_session',
+  'authjs.session-token',
+  '__Secure-authjs.session-token',
+]
+
+export function sessionKey(req: NextRequest): string | null {
+  const v =
+    req.headers.get('x-pi-token') ||
+    SESSION_COOKIES.map((n) => req.cookies.get(n)?.value).find(Boolean)
+  return v ? v.slice(-32) : null
+}
+
+export function checkClientLimit(
+  req: NextRequest,
+  policy: PolicyKey,
+): { allowed: boolean; remaining: number; retryAfter: number } {
+  const ip = getClientIp(req)
+  const sk = policy === 'AUTH' ? null : sessionKey(req)
+  if (!sk) return checkRateLimit(ip, policy)
+  const all = checkRateLimit(ip, policy, NAT_SCALE, '*')
+  if (!all.allowed) return all
+  return checkRateLimit(`${ip}#${sk}`, policy)
 }
 
 // method 가 GET 이면 /api/auth/** 도 세션 조회(복원·/me)라 일반 API 한도 — 로그인 시도(POST/DELETE)만 AUTH 버킷(8회/분, 5분 차단).
