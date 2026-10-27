@@ -117,20 +117,20 @@ async function pump() {
   a.play().catch(end)
 }
 
-function enqueue(ctx: RoomCtx, text: string, src: string) {
+function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null) {
   const lang = dubLang.get()
   // 발표자 언어 = 듣는 언어면 원음 그대로(합성 과금·횟수 낭비 방지)
-  if (!dubOn.get() || !lang || sameLang(src, lang) || !isUuid(ctx.seminarId)) return
+  if (!dubOn.get() || !lang || !sig || sameLang(src, lang) || !isUuid(ctx.seminarId)) return
   const ac = new AbortController()
   // 번역은 자막 화면(SA8)과 같은 translateCaption — 같은 문장·언어는 번역 요청 1회(A-3). 서버는 받은 글을 그대로 읽기만 한다
-  const audio = translateCaption(text, src, lang, ctx.seminarId)
+  const audio = translateCaption(text, src, lang, ctx.seminarId, sig)
     .then((said) =>
-      said === null || ac.signal.aborted
+      said === null || !said.sig || ac.signal.aborted
         ? null
         : piFetch('/api/speech/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ smnId: ctx.seminarId, text: said, lang }),
+            body: JSON.stringify({ smnId: ctx.seminarId, text: said.text, lang, sig: said.sig }),
             signal: ac.signal,
           }).then((r) => (r.ok ? r.blob() : null)), // 429·502 등은 그 문장만 건너뜀(자막은 그대로)
     )
@@ -194,7 +194,7 @@ export const dubbing: RoomFeature = {
   onApp: (m, ctx) => {
     if (m.topic !== 'caption' || !dubOn.get()) return
     const c = parseCaption(m.d)
-    if (c) enqueue(ctx, c.text, c.lang)
+    if (c) enqueue(ctx, c.text, c.lang, c.sig)
   },
   onReset: () => {
     dubOn.reset()

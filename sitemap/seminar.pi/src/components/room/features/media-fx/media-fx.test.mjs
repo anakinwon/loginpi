@@ -47,7 +47,12 @@ test('자막 d 검사 — 모양이 틀리면 버린다', () => {
     text: '안녕 하세요',
     ts: 5,
     lang: 'ko',
+    sig: null,
   })
+  // 서버 발급 서명(D-2)은 그대로 전달, 문자열 아님·64자 초과는 버림
+  assert.equal(parseCaption({ text: 'x', sig: 'abc' }).sig, 'abc')
+  assert.equal(parseCaption({ text: 'x', sig: 5 }).sig, null)
+  assert.equal(parseCaption({ text: 'x', sig: 'a'.repeat(65) }).sig, null)
   assert.equal(parseCaption({ text: 'a'.repeat(900) }).text.length, 500)
   assert.equal(parseCaption({ text: '<b>x</b>', ts: 'x' }).lang, '')
 })

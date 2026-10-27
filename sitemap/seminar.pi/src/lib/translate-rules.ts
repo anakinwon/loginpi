@@ -1,7 +1,7 @@
 // 번역 자막 순수 규칙(SA8) — 대상 언어 목록·판정, 캐시 키(문장 해시×언어), 모듈 LRU, 사용자당 분당 요청 창.
 // 서버(/api/speech/translate)·화면(자막 시트 언어 목록) 공용 — server-only 없음. 시험 : node --test src/lib/translate-rules.test.mjs
-// speech-rules 를 import 하지 않는다 — node:test 가 .ts 를 확장자 없이 못 찾음. 글자 상한은 speech-rules MAX_TEXT_CHARS(gemini translate 상한)와 같게 유지
-const MAX_TEXT_CHARS = 2_000
+// speech-rules 를 import 하지 않는다 — node:test 가 .ts 를 확장자 없이 못 찾음. 글자 상한 = 자막 표시 상한 CAPTION.maxChars(500, 시험이 같음을 확인)
+export const MAX_TEXT_CHARS = 500
 
 // 번역 대상 언어 — 루트 cafe.pi 의 완역 66개 언어(scripts/i18n-lang-map.mjs) 기준 언어 코드.
 // seminar.pi src/i18n/routing.ts 는 UI locale(ko·en)만 있고, 루트 routing.ts 는 국가 코드('dz' = 알제리)가 섞여 그대로 못 쓴다
@@ -81,4 +81,43 @@ export function hitRate(
   }
   w.n++
   return w.n <= max
+}
+
+// 세미나별 외부 AI 글자 상한(sql/010 fn_use_smn_ai, 보안 검토 D-2) — 캐시 미스만 센다.
+//  번역 : 120분 발화 ≈ 원문 10만 자 × 듣는 언어 10개 = 100만 자. 합성 음성은 비싸서 20만 자. 사용자 분당 = 실시간 자막 여러 배 여유
+export const AI_LIMIT = {
+  TRANS: { maxChr: 1_000_000, maxMinChr: 6_000 },
+  TTS: { maxChr: 200_000, maxMinChr: 3_000 },
+} as const
+
+// 서버 발급 자막 서명(D-2) — 번역·합성은 서버가 만든 글(음성→글 결과 · 번역 결과)만 받는다(임의 글 AI 대행 차단).
+// sig = HMAC-SHA256(파생키, 'smn-cap' 줄바꿈 smnId 줄바꿈 cleanText(text)) base64url. 파생키 = HMAC(secret, 'smn-cap-key:v1') — 세션 서명과 키 분리.
+// Web Crypto(서버 전용으로만 부른다 — secret 은 서버 env). 검증은 crypto.subtle.verify(상수 시간)
+const keys = new Map<string, Promise<CryptoKey>>()
+const enc = new TextEncoder()
+function capKey(secret: string) {
+  let k = keys.get(secret)
+  if (!k) {
+    k = crypto.subtle
+      .importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+      .then((m) => crypto.subtle.sign('HMAC', m, enc.encode('smn-cap-key:v1')))
+      .then((raw) => crypto.subtle.importKey('raw', raw, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']))
+    keys.set(secret, k)
+  }
+  return k
+}
+const capMsg = (smnId: string, t: string) => enc.encode(['smn-cap', smnId.toLowerCase(), t].join('\n'))
+
+// 서명 — 글이 비었거나 상한 초과면 null(서명 없는 자막 = 번역·합성 불가, 원문만 표시)
+export async function capSig(secret: string, smnId: string, text: string) {
+  const t = cleanText(text)
+  if (!t) return null
+  const s = await crypto.subtle.sign('HMAC', await capKey(secret), capMsg(smnId, t))
+  return Buffer.from(s).toString('base64url')
+}
+
+export async function capSigOk(secret: string, smnId: string, text: string, sig: unknown) {
+  const t = cleanText(text)
+  if (!t || typeof sig !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(sig)) return false
+  return crypto.subtle.verify('HMAC', await capKey(secret), Buffer.from(sig, 'base64url'), capMsg(smnId, t))
 }

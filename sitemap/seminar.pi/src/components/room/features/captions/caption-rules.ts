@@ -1,5 +1,5 @@
 // 자막 app 메시지 검사(순수 함수) — 엔진은 d 를 검사하지 않으므로 화면이 주제별로 검사해 맞지 않으면 버린다(SIGNAL_API 3.6).
-// caption d = {text, ts, lang}(use-speech 가 보냄), state d = 부분 객체 {captions?: boolean, …}. 시험 : node --test src/components/room/features/media-fx/media-fx.test.mjs
+// caption d = {text, ts, lang, sig}(use-speech 가 보냄 — sig = 서버 발급 자막 서명, 번역·더빙 요청에 그대로 전달), state d = 부분 객체 {captions?: boolean, …}. 시험 : node --test src/components/room/features/media-fx/media-fx.test.mjs
 
 export const CAPTION = {
   maxChars: 500, // 표시 상한(5초 조각은 이보다 훨씬 짧다)
@@ -7,7 +7,7 @@ export const CAPTION = {
   resendMs: 1_000, // 늦은 입장자에게 상태 재방송은 1초에 1번 이하(SIGNAL_API 3.6)
 }
 
-export type Caption = { text: string; ts: number; lang: string }
+export type Caption = { text: string; ts: number; lang: string; sig: string | null }
 
 export function parseCaption(d: unknown): Caption | null {
   if (!d || typeof d !== 'object') return null
@@ -19,6 +19,7 @@ export function parseCaption(d: unknown): Caption | null {
     text,
     ts: typeof o.ts === 'number' && Number.isFinite(o.ts) ? o.ts : Date.now(),
     lang: typeof o.lang === 'string' ? o.lang.slice(0, 16) : '',
+    sig: typeof o.sig === 'string' && o.sig.length <= 64 ? o.sig : null,
   }
 }
 

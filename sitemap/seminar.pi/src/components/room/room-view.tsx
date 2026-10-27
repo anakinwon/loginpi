@@ -233,7 +233,7 @@ function Room({
     on: speechOn({ live, wants, agreed: consent.agreed, role, peers: r.peers }),
     broadcast: wants.includes('caption'),
     sendApp: r.sendApp,
-    onText: (text, ts) => FEATURES.forEach((f) => f.onSpeech?.(text, ts, ctxRef.current)),
+    onText: (text, ts, meta) => FEATURES.forEach((f) => f.onSpeech?.(text, ts, ctxRef.current, meta)),
     // 서버에 동의 기록이 없다 — 이 기기 기록을 지우고 다시 묻는다(동의하면 음성 조각이 다시 돈다, 안 하면 마이크만 계속)
     onNoAgr: () => {
       consent.reset()

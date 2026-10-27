@@ -32,6 +32,7 @@ export const capLatest = featureStore<{
   name: string
   text: string
   lang: string
+  sig: string | null // 서버 발급 자막 서명 — 없으면 번역하지 않고 원문
   at: number
 } | null>(null)
 
@@ -268,6 +269,7 @@ export const captions: RoomFeature = {
           name: nameOf(ctx, m.from),
           text: c.text,
           lang: c.lang,
+          sig: c.sig,
           at: Date.now(),
         })
     } else if (m.topic === 'state') {
@@ -279,14 +281,15 @@ export const captions: RoomFeature = {
       capRoom.set(on)
     }
   },
-  onSpeech: (text, _ts, ctx) => {
+  onSpeech: (text, _ts, ctx, meta) => {
     if (speechWants.get().captions !== 'caption') return // AI 회의록만 켠 조용한 모드면 띄우지 않는다
-    const c = parseCaption({ text })
+    const c = parseCaption({ text, ...meta })
     if (c)
       capLatest.set({
         name: nameOf(ctx, ctx.r.selfId ?? ''),
         text: c.text,
         lang: c.lang,
+        sig: c.sig,
         at: Date.now(),
       })
   },
