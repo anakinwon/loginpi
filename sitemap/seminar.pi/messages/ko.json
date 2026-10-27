@@ -9,7 +9,8 @@
   },
   "nav": {
     "link": "계정 연동",
-    "switchLocale": "English"
+    "switchLocale": "English",
+    "privacy": "개인정보 처리방침"
   },
   "auth": {
     "checking": "로그인 확인 중…",

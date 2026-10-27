@@ -20,7 +20,6 @@ for (const [file, names] of [
   ['attendance/route.ts', ['POST']],
   ['polls/route.ts', ['POST', 'PATCH']],
   ['qna/route.ts', ['POST', 'PATCH']],
-  ['consent/route.ts', ['POST']],
 ]) {
   for (const name of names) {
     test(`${file} ${name} — gate·종료 확인이 첫 쓰기보다 앞`, () => {
@@ -34,6 +33,17 @@ for (const [file, names] of [
     })
   }
 }
+
+// 동의 POST 는 agreeGate(개최자·ADMIN·활성 참가 + 종료 409) 한 곳 — /api/speech/agree 와 형제(D-3·T04·T10 병합)
+test('consent/route.ts POST — agreeGate 가 첫 쓰기보다 앞, agreeGate 안에 종료(closed) 확인', () => {
+  const h = handler(src('consent/route.ts'), 'POST')
+  const g = h.indexOf('agreeGate(')
+  const w = h.search(WRITE)
+  assert.ok(w > 0 && g > 0 && g < w, 'agreeGate 가 쓰기보다 뒤')
+  const e = readFileSync(new URL('./engage.ts', import.meta.url), 'utf8')
+  const ag = e.slice(e.indexOf('export async function agreeGate'))
+  assert.ok(ag.includes('closed()'), 'agreeGate 에 종료 확인 없음')
+})
 
 test('처리방침 — 출석부의 Pi 사용자명 개최자 제공·보관 기간 고지(ko·en)', () => {
   const msg = (l) => JSON.parse(readFileSync(new URL(`../../messages/${l}.json`, import.meta.url), 'utf8')).privacy.keep
