@@ -19,6 +19,7 @@ export function CameraLab({ signalUrl, signalKey }: { signalUrl?: string; signal
   const localRef = useRef<HTMLVideoElement>(null)
   const remoteRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const mounted = useRef(true) // 권한 창 대기 중 화면을 떠나면 늦게 온 카메라·마이크를 놓는다(표시등 고착 방지, T02 r4 형제)
   const pcRef = useRef<RTCPeerConnection | null>(null)
   const chRef = useRef<RealtimeChannel | null>(null)
   const pendingIce = useRef<RTCIceCandidateInit[]>([])
@@ -44,7 +45,9 @@ export function CameraLab({ signalUrl, signalKey }: { signalUrl?: string; signal
       RTCPeerConnection: typeof RTCPeerConnection !== 'undefined',
     })
     // 화면을 떠나면 연결·카메라·마이크 모두 정리(표시등이 남지 않게)
+    mounted.current = true
     return () => {
+      mounted.current = false
       leave()
       stopCamera()
     }
@@ -59,6 +62,7 @@ export function CameraLab({ signalUrl, signalKey }: { signalUrl?: string; signal
         video: { facingMode: next, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: true,
       })
+      if (!mounted.current) return s.getTracks().forEach((t) => t.stop())
       streamRef.current = s
       const v = s.getVideoTracks()[0]?.getSettings()
       setCamInfo(`성공 ${v?.width}x${v?.height} ${v?.frameRate ?? '?'}fps · 마이크 ${s.getAudioTracks().length ? '있음' : '없음'}`)

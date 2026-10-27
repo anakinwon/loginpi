@@ -296,3 +296,46 @@ test('AI 회의록 state 수신(panel)은 말하기를 요청하지 않는다 �
   // 말하기 요청은 발표자 자기 켜기(toggle) 한 곳뿐
   assert.equal((src.match(/wantSpeech\('notes', 'quiet'\)/g) ?? []).length, 1)
 })
+
+test('대면 노트 — 시작·다시 연결 대기 중에 화면을 떠나면 늦게 온 마이크를 놓고 회의록을 RECORDING 으로 남기지 않는다(T02 r4)', async () => {
+  const s = await inPerson()
+  // 마이크 획득 직후·회의록 생성 직후·동의 직후 세 지점에서 떠남 확인
+  assert.match(s, /if \(!stream\) return setErr\(t\('micDenied'\)\)\s*\n[^\n]*stopMic[^\n]*\n\s*if \(!alive\.current\) return stopMic\(\)/)
+  assert.match(s, /if \(!alive\.current\) \{\s*\n\s*stopMic\(\)\s*\n\s*return endNote\(r\.data\.ntId\)/)
+  assert.match(s, /if \(!a\.ok \|\| !alive\.current\) \{\s*\n\s*stopMic\(\)\s*\n\s*endNote\(r\.data\.ntId\)/)
+  // 다시 연결 — 떠난 뒤 온 트랙은 바로 놓는다
+  assert.match(s, /if \(!alive\.current\) return s\.getTracks\(\)\.forEach\(\(x\) => x\.stop\(\)\)/)
+  // 정리에서 alive 를 내리고, 마운트(StrictMode 재실행 포함)에서 다시 올린다
+  assert.match(s, /alive\.current = true\s*\n\s*return \(\) => \{\s*\n\s*alive\.current = false/)
+  // 형제(R-P0) : 카메라 실험실도 같은 경합을 막는다
+  const lab = readFileSync(new URL('../app/[locale]/lab/camera/camera-lab.tsx', import.meta.url), 'utf8')
+  assert.match(lab, /if \(!mounted\.current\) return s\.getTracks\(\)\.forEach/)
+  assert.match(lab, /mounted\.current = true\s*\n\s*return \(\) => \{\s*\n\s*mounted\.current = false/)
+})
+
+test('대면 노트 — 기록 중 탭 제목 앞 ● 표시, 끝나거나 떠나면 뗀다(보강 T02 r4)', async () => {
+  const s = await inPerson()
+  assert.match(s, /const REC_MARK = '● '/)
+  assert.match(s, /if \(!ntId \|\| gone\) return/)
+  assert.match(s, /document\.title = REC_MARK \+ document\.title/)
+  assert.match(s, /document\.title = document\.title\.slice\(REC_MARK\.length\)/)
+  assert.match(s, /\}, \[ntId, gone\]\)/)
+  // 동작 모의 — 같은 규칙으로 붙이고 떼기 : 겹치지 않고, 새 화면 제목은 건드리지 않는다
+  const REC_MARK = '● '
+  const doc = { title: '대면 노트' }
+  const on = () => {
+    if (!doc.title.startsWith(REC_MARK)) doc.title = REC_MARK + doc.title
+    return () => {
+      if (doc.title.startsWith(REC_MARK)) doc.title = doc.title.slice(REC_MARK.length)
+    }
+  }
+  const off = on()
+  on()
+  assert.equal(doc.title, '● 대면 노트')
+  off()
+  assert.equal(doc.title, '대면 노트')
+  const off2 = on()
+  doc.title = 'Home' // 앱 안 이동으로 새 제목이 먼저 들어옴
+  off2()
+  assert.equal(doc.title, 'Home')
+})
