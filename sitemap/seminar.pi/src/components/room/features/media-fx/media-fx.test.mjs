@@ -1,7 +1,83 @@
 // 조명 보정·자막 메시지 검사 시험 — node --test src/components/room/features/media-fx/media-fx.test.mjs
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { LIGHT, lightFilter, lightGain, lightStep, meanLuma } from './light.ts'
+import { LIGHT, lightFilter, lightGain, lightStep, lightTracker, meanLuma } from './light.ts'
+import { syncNoise } from './noise.ts'
+
+// 가짜 마이크 — applyConstraints 가 ms 뒤에 끝나고 그때 설정이 바뀐다(ignore = 브라우저가 무시)
+function fakeMic({ ms = 20, ignore = false } = {}) {
+  const s = { noiseSuppression: true }
+  const calls = []
+  return {
+    calls,
+    readyState: 'live',
+    getSettings: () => ({ ...s }),
+    applyConstraints: (c) => {
+      calls.push(c.noiseSuppression)
+      return new Promise((r) =>
+        setTimeout(() => {
+          if (!ignore) s.noiseSuppression = c.noiseSuppression
+          r()
+        }, ms),
+      )
+    },
+  }
+}
+
+test('소음 스위치 빠른 연타(끔→켬) — 앞 요청이 진행 중이어도 마지막 값으로 맞춘다(T03 r4)', async () => {
+  const mic = fakeMic()
+  let want = false
+  const a = { live: true }
+  const p1 = syncNoise(mic, () => want, () => a.live)
+  // 연타 : 앞 effect 정리(live=false) 뒤 켬 요청
+  a.live = false
+  want = true
+  const p2 = syncNoise(mic, () => want, () => true)
+  assert.deepEqual(await Promise.all([p1, p2]), [null, null])
+  assert.equal(mic.getSettings().noiseSuppression, true)
+})
+
+test('소음 — 앞 요청이 이미 나간 뒤 연타해도 최종 설정은 스위치와 같다', async () => {
+  const mic = fakeMic()
+  let want = false
+  const a = { live: true }
+  const p1 = syncNoise(mic, () => want, () => a.live)
+  await new Promise((r) => setTimeout(r, 1)) // 끔 요청이 applyConstraints 진행 중
+  a.live = false
+  want = true
+  await Promise.all([p1, syncNoise(mic, () => want, () => true)])
+  assert.deepEqual(mic.calls, [false, true])
+  assert.equal(mic.getSettings().noiseSuppression, true)
+})
+
+test('소음 — 이미 같은 값이면 요청 안 함, 브라우저가 무시하면 실제 값을 돌려준다', async () => {
+  const mic = fakeMic({ ignore: true })
+  assert.equal(await syncNoise(mic, () => true, () => true), null)
+  assert.equal(mic.calls.length, 0)
+  assert.equal(await syncNoise(mic, () => false, () => true), true)
+  // 끝난 트랙은 건드리지 않는다
+  assert.equal(await syncNoise({ ...mic, readyState: 'ended' }, () => false, () => true), null)
+})
+
+test('조명 — 끄면 배율 1·즉시 표본으로 돌아간다(다시 켤 때 옛 장면 배율 금지, T03 r4)', () => {
+  let v = true
+  const subs = []
+  const on = { get: () => v, sub: (fn) => subs.push(fn) }
+  const set = (x) => {
+    v = x
+    subs.forEach((f) => f())
+  }
+  const t = lightTracker(on)
+  assert.equal(t.due(), true)
+  for (let i = 0; i < 30; i++) t.sample(0.05)
+  t.due()
+  assert.ok(t.gain() > 1.5)
+  set(false)
+  assert.equal(t.gain(), 1)
+  set(true)
+  assert.equal(t.due(), true) // 다시 켜면 첫 프레임에 바로 잰다
+  assert.equal(t.due(), false)
+})
 import { captionsState, parseCaption, stepSize } from '../captions/caption-rules.ts'
 
 test('보통 조명은 보정하지 않는다', () => {

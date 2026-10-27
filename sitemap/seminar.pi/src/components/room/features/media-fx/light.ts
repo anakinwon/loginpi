@@ -42,3 +42,23 @@ export function meanLuma(px: ArrayLike<number>): number {
   for (let i = 0; i < px.length; i += 4) s += 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2]
   return n ? s / n / 255 : LIGHT.target
 }
+
+// 보정 상태(표본 차례·배율) — on 이 꺼지면 처음(배율 1, 다음 프레임 즉시 표본)으로 되돌린다.
+//  결함(T03 r4) : 어두운 곳에서 켜 둔 배율(최대 1.8)이 끈 뒤에도 남아, 밝아진 장면에서 다시 켜면 약 2초 동안 너무 밝게 나갔다
+export function lightTracker(on: { get: () => boolean; sub: (fn: () => void) => unknown }) {
+  let gain = 1
+  let n = 0
+  const reset = () => {
+    gain = 1
+    n = 0
+  }
+  on.sub(() => {
+    if (!on.get()) reset()
+  })
+  return {
+    due: () => n++ % LIGHT.every === 0,
+    sample: (mean: number) => (gain = lightStep(mean, gain)),
+    gain: () => gain,
+    reset,
+  }
+}
