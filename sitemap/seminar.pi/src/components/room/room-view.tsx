@@ -34,6 +34,7 @@ import {
   lockedFor,
   nextToast,
   peerMedia,
+  speechOn,
   TOAST,
   type Grade,
   type ModAction,
@@ -228,7 +229,8 @@ function Room({
     track: role !== 'audience' ? (r.localStream?.getAudioTracks()[0] ?? null) : null,
     seminarId: room,
     lang: locale,
-    on: live && wants.length > 0 && consent.agreed,
+    // 발표자 아닌 무대 역할은 발표자가 방에 있을 때만(발표자 state 로 켜졌는데 발표자가 사라지면 끌 사람이 없다)
+    on: speechOn({ live, wants, agreed: consent.agreed, role, peers: r.peers }),
     broadcast: wants.includes('caption'),
     sendApp: r.sendApp,
     onText: (text, ts) => FEATURES.forEach((f) => f.onSpeech?.(text, ts, ctxRef.current)),

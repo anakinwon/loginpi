@@ -130,6 +130,30 @@ export function visibleExtras<T extends { roles: readonly PeerRole[]; app?: bool
 export type PeerRole = 'presenter' | 'panel' | 'audience'
 export type PeerLike = { peerId: string; name: string; role: PeerRole; raisedTs: number }
 
+// 발표자가 방에 있다 — 자막·AI 회의록처럼 발표자 state 로 켜진 panel 음성 처리는 발표자가 있을 때만 돈다.
+// 발표자가 끊김 신호 없이 나가면(창 닫힘·망 단절) 끌 사람이 없어 panel 음성이 세미나 한도를 계속 쓰기 때문(R-P5)
+export const presenterHere = (peers: readonly Pick<PeerLike, 'role'>[]) => peers.some((p) => p.role === 'presenter')
+
+// 음성 조각 녹음 켜기 — 방에 있음·말하기 요청 있음·동의함, 발표자 아닌 무대 역할은 발표자가 있을 때만(room-view 가 이 판정만 쓴다)
+// ponytail: 클라이언트 게이트일 뿐 — 서버 /api/speech/chunk 는 아직 무대 역할·발표자 유무를 확인하지 않는다(D-1 남은 과제)
+export function speechOn(s: {
+  live: boolean
+  wants: readonly unknown[]
+  agreed: boolean
+  role: PeerRole
+  peers: readonly Pick<PeerLike, 'role'>[]
+}): boolean {
+  return s.live && s.wants.length > 0 && s.agreed && (s.role === 'presenter' || presenterHere(s.peers))
+}
+
+// 발표자 state 로 켜진 방 상태(자막·AI 회의록)를 내려야 하나 — 발표자가 아니고, 입장했고, 발표자가 방에 없다
+export const presenterGone = (role: PeerRole, selfId: string | null | undefined, peers: readonly Pick<PeerLike, 'role'>[]) =>
+  role !== 'presenter' && !!selfId && !presenterHere(peers)
+
+// 발표자 입장·재입장 때 현재 state 를 1번 방송하나 — 꺼져 있어도 false 로 panel 을 맞춘다(자막·AI 회의록 공통)
+export const presenterResync = (role: PeerRole, appSupported: boolean | null, selfId: string | null | undefined) =>
+  role === 'presenter' && appSupported === true && !!selfId
+
 // 하단 바 버튼 우선순위(설계서 14.3 표) — 앞에서부터 메인 슬롯을 채운다. 가장 좁은 폭(≤370)의 청중은 반응보다 채팅이 앞
 // (표의 "손들기·채팅"). 화질(M4)은 청중 맨 뒤 — 폭 > 565 에서 메인 5칸째, 그 아래는 더보기(넘친 것이 1개뿐이면 바로 노출)
 export type BarId = 'audio' | 'video' | 'screen' | 'chat' | 'people' | 'hands' | 'hand' | 'react' | 'quality'

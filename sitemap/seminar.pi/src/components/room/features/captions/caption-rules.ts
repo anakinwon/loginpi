@@ -28,3 +28,16 @@ export function captionsState(d: unknown): boolean | null {
   const v = (d as Record<string, unknown>).captions
   return typeof v === 'boolean' ? v : null
 }
+
+// 자막 글자 크기 — 라디오 그룹 키보드 이동(WAI-ARIA radiogroup : 화살표는 순환, Home·End 는 양 끝). 해당 없는 키면 null
+export const SIZES = ['sm', 'md', 'lg'] as const
+export type Size = (typeof SIZES)[number]
+export function stepSize(cur: Size, key: string): Size | null {
+  const i = SIZES.indexOf(cur)
+  const n = SIZES.length
+  if (key === 'ArrowRight' || key === 'ArrowDown') return SIZES[(i + 1) % n]
+  if (key === 'ArrowLeft' || key === 'ArrowUp') return SIZES[(i - 1 + n) % n]
+  if (key === 'Home') return SIZES[0]
+  if (key === 'End') return SIZES[n - 1]
+  return null
+}

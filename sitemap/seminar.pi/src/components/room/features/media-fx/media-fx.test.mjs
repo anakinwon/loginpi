@@ -2,7 +2,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { LIGHT, lightFilter, lightGain, lightStep, meanLuma } from './light.ts'
-import { captionsState, parseCaption } from '../captions/caption-rules.ts'
+import { captionsState, parseCaption, stepSize } from '../captions/caption-rules.ts'
 
 test('보통 조명은 보정하지 않는다', () => {
   assert.equal(lightGain(0.5), 1)
@@ -57,4 +57,16 @@ test('state 의 자막 키만 읽는다', () => {
   assert.equal(captionsState({ captions: false, record: true }), false)
   assert.equal(captionsState({ record: true }), null)
   assert.equal(captionsState('x'), null)
+})
+
+test('자막 글자 크기 라디오 — 화살표 순환·Home·End, 다른 키는 무시', () => {
+  assert.equal(stepSize('md', 'ArrowRight'), 'lg')
+  assert.equal(stepSize('lg', 'ArrowRight'), 'sm')
+  assert.equal(stepSize('lg', 'ArrowDown'), 'sm')
+  assert.equal(stepSize('sm', 'ArrowLeft'), 'lg')
+  assert.equal(stepSize('md', 'ArrowUp'), 'sm')
+  assert.equal(stepSize('lg', 'Home'), 'sm')
+  assert.equal(stepSize('sm', 'End'), 'lg')
+  assert.equal(stepSize('md', 'Tab'), null)
+  assert.equal(stepSize('md', ' '), null)
 })
