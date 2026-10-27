@@ -34,6 +34,7 @@ export const GET = withAuthGuard(
         .eq('del_yn', 'N')
         .eq('smn_pll_opt.del_yn', 'N')
         .order('reg_dtm', { ascending: false })
+        .order('pll_id') // 같은 등록 시각 — 쪽 경계에서 중복·누락 없게
         .order('opt_seq', { referencedTable: 'smn_pll_opt' })
         .range(from, from + POLL_PAGE - 1)
         .returns<PllRow[]>(),

@@ -41,6 +41,7 @@ export const GET = withAuthGuard(
         .eq('del_yn', 'N')
         .in('smn_sts_cd', [...OPEN_STS])
         .order('start_dtm', { ascending: true })
+        .order('smn_id') // 같은 시작 시각(정시 개최가 흔함) — 쪽 경계에서 중복·누락 없게
         .range(from, to)
         .returns<SmnRow[]>()
       if (error) return dbFail(error)
@@ -60,6 +61,7 @@ export const GET = withAuthGuard(
         .eq('del_yn', 'N')
         .eq('hst_usr_id', user.id)
         .order('start_dtm', { ascending: false })
+        .order('smn_id')
         .range(from, to)
         .returns<SmnRow[]>()
       if (error) return dbFail(error)
@@ -77,6 +79,7 @@ export const GET = withAuthGuard(
       .eq('usr_id', user.id)
       .eq('smn_mst.del_yn', 'N')
       .order('reg_dtm', { ascending: false })
+      .order('ptc_id')
       .range(from, to)
       .returns<{ smn_mst: SmnRow }[]>()
     if (error) return dbFail(error)

@@ -61,6 +61,7 @@ export const GET = withAuthGuard(
         .eq('smn_id', w.smnId)
         .eq('del_yn', 'N')
         .order('ent_dtm')
+        .order('atd_id') // 같은 입장 시각 — 쪽 경계에서 중복·누락 없게
         .range(from, from + size - 1)
         .returns<AtdRow[]>(),
     ])

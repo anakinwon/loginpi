@@ -89,6 +89,7 @@ export const GET = withAuthGuard(
           .eq('del_yn', 'N')
           .not('seg_cont', 'is', null)
           .order('seg_dtm')
+          .order('seg_id') // 같은 시각 조각(동시 화자) — 쪽 경계에서 중복·누락 없게
           .range((page - 1) * SEG_PAGE, page * SEG_PAGE - 1),
       ])
       if (n.error) return dbFail(n.error)
