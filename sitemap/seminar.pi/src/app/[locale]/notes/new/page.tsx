@@ -2,6 +2,7 @@
 import { useTranslations } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { use } from 'react'
+import { geminiEnabled } from '@/lib/gemini'
 import { InPersonNote } from '@/components/notes/in-person'
 
 export default function NoteNewPage({
@@ -14,7 +15,7 @@ export default function NoteNewPage({
   return (
     <div className="space-y-6 py-2">
       <h1 className="text-2xl font-bold">{t('inPerson')}</h1>
-      <InPersonNote />
+      <InPersonNote ai={geminiEnabled()} />
     </div>
   )
 }

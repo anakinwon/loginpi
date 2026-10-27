@@ -790,6 +790,8 @@
     "end": "End and create notes",
     "wakeWarn": "Recording may stop if the screen turns off",
     "adminOnly": "Only admins can use this",
+    "aiOff": "AI notes aren't available right now (server setup needed). Past notes are listed below",
+    "reload": "Reload",
     "unsupported": "Recording is not available on this device",
     "micDenied": "Can't use the microphone — check the permission",
     "limited": "The processing time limit is used up — end and create the notes",

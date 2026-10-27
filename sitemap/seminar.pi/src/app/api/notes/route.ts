@@ -1,5 +1,5 @@
 // AI 회의록 시작·조회 — POST { smnId } → { ntId } : 개최자(발표자)·관리자만, 세미나 LIVE 일 때. 이미 기록 중인 회의록이 있으면 그것을 돌려준다(멱등 — 재접속 후 다시 켜기).
-//  POST { title } → { ntId } : 대면 노트(세미나 없음, SA2) — ADMIN 만(외부 AI 비용), 외부 AI 키가 없으면 503. 시작할 때마다 새 회의록
+//  POST { title } → { ntId } : 대면 노트(세미나 없음, SA2) — ADMIN 만(외부 AI 비용). 시작할 때마다 새 회의록. 두 경우 모두 외부 AI 키가 없으면 503
 //  GET ?smnId= → { ntId | null } : 이 세미나에서 내가 볼 수 있는 가장 최근 회의록(상세 화면 [회의록 보기]). 비로그인 401(redirect 없음, piFetch 로 호출)
 //  GET ?page=N(smnId 없음) → { notes, total } : 내가 시작한 회의록 10건씩(최근순, 대면 노트 목록 /notes)
 import { NextResponse } from 'next/server'
@@ -32,9 +32,11 @@ export const POST = withAuthGuard(
     ])
     if (user instanceof NextResponse) return user
     if (body instanceof NextResponse) return body
+    // 외부 AI 키가 없으면 세미나 AI 회의록도 503 — 전에는 세미나 쪽만 그대로 만들어 전원에게 'AI 기록 중' 배지를 띄우고
+    //  조각은 전부 503·요약은 FAILED 로 끝났다(대면 노트만 막던 형제 경로, T02 r6)
+    if (!geminiEnabled()) return apiError('AI_UNAVAILABLE', 503)
     if ('title' in body) {
       if (!isAdmin(user)) return apiError('FORBIDDEN', 403)
-      if (!geminiEnabled()) return apiError('AI_UNAVAILABLE', 503)
       // ponytail: 기록 중 창을 닫으면 pagehide keepalive 로 끝내지만, 그마저 못 가면 RECORDING 으로 남는다 — 잦으면 오래된 RECORDING 정리 작업
       const { data, error } = await db()
         .from('smn_nt')

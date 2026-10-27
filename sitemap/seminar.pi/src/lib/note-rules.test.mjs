@@ -439,3 +439,34 @@ test('회의록 화면 상태 조회 — 숨은 탭은 쉬고 다시 보일 때 
   assert.match(show, /visibilityState === 'hidden'\) return/)
   assert.match(show, /removeEventListener\('visibilitychange', onShow\)\s+next\(\)/)
 })
+
+test('회의록 시작 — 외부 AI 키가 없으면 세미나·대면 노트 모두 503, 대면 노트 화면은 마이크를 묻지 않고 안내만(T02 r6)', async () => {
+  const route = readFileSync(new URL('../app/api/notes/route.ts', import.meta.url), 'utf8')
+  const post = route.slice(route.indexOf('export const POST'), route.indexOf('export const GET'))
+  // 키 확인이 대면 노트·세미나 분기보다 먼저 — 세미나 AI 회의록이 키 없이 만들어져 전원에게 'AI 기록 중'이 뜨지 않게
+  const gate = post.indexOf("if (!geminiEnabled()) return apiError('AI_UNAVAILABLE', 503)")
+  assert.ok(gate > 0 && gate < post.indexOf("if ('title' in body)"), '키 확인이 분기 앞')
+  assert.equal((post.match(/geminiEnabled\(\)/g) ?? []).length, 1)
+  // 화면 — page 가 서버에서 키 유무를 넘기고, 없으면 Recorder(마이크 권한 창)·[새 대면 노트] 링크를 그리지 않는다
+  for (const p of ['../app/[locale]/notes/new/page.tsx', '../app/[locale]/notes/page.tsx'])
+    assert.match(readFileSync(new URL(p, import.meta.url), 'utf8'), /ai=\{geminiEnabled\(\)\}/, p)
+  const s = await inPerson()
+  assert.match(s, /\{ai \? \(\s*\n\s*<Recorder \/>\s*\n\s*\) : \(/)
+  assert.match(s, /\{ai && \(user\.role === 'ADMIN' \|\| user\.role === 'MASTER'\) && \(/)
+  for (const l of ['ko', 'en']) {
+    const m = JSON.parse(readFileSync(new URL(`../../messages/${l}.json`, import.meta.url), 'utf8')).notes
+    assert.ok(m.aiOff && !/Google|Gemini|Meet/.test(m.aiOff), `${l} aiOff`)
+  }
+})
+
+test('내 회의록 목록 — 불러오기 실패 뒤 [다시 불러오기]로 새로고침 없이 다시 조회(보강 T02 r6)', async () => {
+  const s = await inPerson()
+  const list = s.slice(s.indexOf('export function NoteList()'), s.indexOf('export function NotesHome'))
+  assert.match(list, /\}, \[page, tries\]\)/)
+  assert.match(list, /setErr\(false\)\s*\n\s*setRes\(null\)\s*\n\s*setTries\(\(n\) => n \+ 1\)/)
+  assert.match(list, /role="alert"/)
+  for (const l of ['ko', 'en']) {
+    const m = JSON.parse(readFileSync(new URL(`../../messages/${l}.json`, import.meta.url), 'utf8')).notes
+    assert.ok(m.reload && !/Google|Gemini|Meet/.test(m.reload), `${l} reload`)
+  }
+})
