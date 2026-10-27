@@ -5,7 +5,7 @@
 // 사용 지표를 odml.pa.googleapis.com 로 보내며 끄는 옵션이 없음(1회 실패면 주기 전송 중단). 코드는 옮기지 않았다(S-2)
 import type { ImageSegmenter } from '@mediapipe/tasks-vision'
 import { featureStore } from '../../extensions'
-import { afterDelete, BG, coverRect, dropShown, failBack, keepShown, nextTs, pipelineKilled, slowerEvery, slowWatch } from './rules'
+import { afterDelete, BG, coverRect, dropShown, edgeAlpha, failBack, keepShown, nextTs, pipelineKilled, slowerEvery, slowWatch } from './rules'
 
 // 선택 — none · blur · p:<프리셋> · m:<내 이미지 id>
 export const choice = featureStore<string>('none')
@@ -112,6 +112,7 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
   autoOff.set(null)
   if (next === 'none') {
     shown = 'none'
+    release()
     choice.set('none') // bgOn 보다 먼저 — 아래 구독이 사용자 끔을 파이프라인 끔으로 오인하지 않게
     bgOn.set(false)
     status.set('idle')
@@ -171,15 +172,33 @@ bgOn.sub(() => {
   } catch {}
   seg = null
   loading = null
-  mask = null
+  release()
   autoOff.set('bgStopped')
 })
 
+const EDGE = Uint8Array.from({ length: 256 }, (_, i) => edgeAlpha(i / 255)) // 프레임마다 3.7만 번 계산하지 않게 표로
 let small: HTMLCanvasElement | null = null // 분리 입력(축소)
 let mask: HTMLCanvasElement | null = null // 사람 마스크(알파 = 사람일 확률)
 let person: HTMLCanvasElement | null = null // 오려 낸 사람
 let tiny: HTMLCanvasElement | null = null // 흐림용 축소본
 let maskData: ImageData | null = null
+let fitted: HTMLCanvasElement | null = null // backdrop 을 출력 크기(w×h)로 맞춰 둔 것 — 매 프레임 확대·축소 없이 그대로 복사
+let fittedFor: HTMLCanvasElement | null = null
+
+// 끔 — 프레임 크기 캔버스·배경을 놓는다(모바일 메모리). 분리기 인스턴스는 남긴다(다시 켤 때 wasm·모델 재로딩 없음)
+function release() {
+  backdrop = fitted = fittedFor = small = mask = person = tiny = null
+  maskData = null
+}
+
+function fitBackdrop(w: number, h: number) {
+  if (fittedFor !== backdrop || fitted?.width !== w || fitted.height !== h) {
+    const r = coverRect(backdrop!.width, backdrop!.height, w, h)
+    fit((fitted ??= canvas()), w, h).drawImage(backdrop!, r.x, r.y, r.w, r.h)
+    fittedFor = backdrop
+  }
+  return fitted!
+}
 let watch = slowWatch()
 let ts = 0 // 직전 분리 시각(nextTs)
 let every = 1 // 분리 간격(프레임 N장마다 1번, slowerEvery)
@@ -205,7 +224,7 @@ function segment(src: CanvasImageSource, now: number) {
     const a = m.getAsFloat32Array()
     const mctx = fit((mask ??= canvas()), m.width, m.height)
     if (maskData?.width !== m.width || maskData.height !== m.height) maskData = new ImageData(m.width, m.height)
-    for (let i = 0; i < a.length; i++) maskData.data[i * 4 + 3] = a[i] * 255
+    for (let i = 0; i < a.length; i++) maskData.data[i * 4 + 3] = EDGE[Math.round(a[i] * 255)] // 경계 다듬기(rules.edgeAlpha)
     mctx.putImageData(maskData, 0, 0)
   })
 }
@@ -223,12 +242,12 @@ export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: n
   pctx.drawImage(src, 0, 0, w, h)
   if (mask) {
     pctx.globalCompositeOperation = 'destination-in'
+    pctx.imageSmoothingQuality = 'high' // 256×144 마스크를 크게 늘릴 때 계단·띠 없이
     pctx.drawImage(mask, 0, 0, w, h)
   }
   // 배경 — 이미지면 꽉 채움, 아니면 흐림(줄였다 늘리기 : ctx.filter 없는 브라우저도 같게)
   if (backdrop) {
-    const r = coverRect(backdrop.width, backdrop.height, w, h)
-    out.drawImage(backdrop, r.x, r.y, r.w, r.h)
+    out.drawImage(fitBackdrop(w, h), 0, 0) // 1:1 복사(고른 뒤·화면 회전 때만 다시 맞춤)
   } else {
     const tw = Math.max(1, Math.round(w / BG.blurDiv))
     const th = Math.max(1, Math.round(h / BG.blurDiv))

@@ -8,6 +8,10 @@ export const BG = {
   inH: 144,
   outW: 1280, // 배경 이미지는 고를 때 이 크기를 덮는 만큼만 남긴다(매 프레임 축소 비용·메모리)
   outH: 720,
+  // 경계 다듬기 — 분리 확률(0~1)을 edgeLo~edgeHi 에서 0→1 로 다시 펼친다(smoothstep). 0.5 경계를 안쪽으로 당겨(침식)
+  // 원본 벽(밝은 배경)이 사람 가장자리에 묻어 나오는 흰 테두리와, 머리를 움직일 때 지난 자리 번쩍임을 줄인다 [확인중 : 실기기로 값 조정]
+  edgeLo: 0.5,
+  edgeHi: 0.85,
   blurDiv: 24, // 흐림 = 1/24 로 줄였다 늘리기(ctx.filter 미지원 브라우저도 같은 결과)
   myMax: 3, // 내 이미지 최대 장수
   myBytes: 2 * 1024 * 1024, // 장당 상한
@@ -88,4 +92,10 @@ export function overflowIds(list: readonly { id: string; ts: number }[], max = B
     .sort((a, b) => a.ts - b.ts)
     .slice(0, Math.max(0, list.length - max))
     .map((x) => x.id)
+}
+
+// 분리 확률 → 마스크 알파(0~255). 넓게 퍼진 흐린 띠를 좁히고 경계를 안쪽으로 당긴다
+export function edgeAlpha(p: number, lo = BG.edgeLo, hi = BG.edgeHi) {
+  const t = Math.min(1, Math.max(0, (p - lo) / (hi - lo)))
+  return Math.round(t * t * (3 - 2 * t) * 255)
 }

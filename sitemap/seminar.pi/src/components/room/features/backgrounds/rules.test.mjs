@@ -199,3 +199,34 @@ test('시트가 열린 채 자동 끔 — 시트 안 알림 줄(role=alert)에 �
   assert.match(src, /if \(isOpen && off\) setErr\(off\)/)
   assert.match(src, /role="alert"[\s\S]{0,80}t\(err\)/)
 })
+
+// 회귀(2026-10-28 마스터 실기기) — 모바일에서 내 이미지 배경을 넣으면 메모리 부족으로 영상이 느려지고 끊겼다.
+// 원인 : 휴대폰 사진을 원본 해상도로 디코드(고를 때·썸네일마다) + 배경을 매 프레임 확대·축소 + 끈 뒤에도 프레임 캔버스 유지
+test('배경 이미지 메모리 — 받자마자 줄이고, 출력 크기로 1번 맞추고, 끄면 놓는다', async () => {
+  const { readFileSync } = await import('node:fs')
+  const idx = readFileSync(new URL('./index.tsx', import.meta.url), 'utf8')
+  const onFile = idx.slice(idx.indexOf('const onFile = async'), idx.indexOf('const del = async'))
+  assert.ok(onFile.indexOf('shrink(f)') > 0 && onFile.indexOf('shrink(f)') < onFile.indexOf('choose('))
+  assert.match(onFile, /addMine\(small, id\)/)
+  assert.doesNotMatch(onFile, /choose\(`m:\$\{id\}`, f\)|addMine\(f,/)
+  const my = readFileSync(new URL('./my-images.ts', import.meta.url), 'utf8')
+  assert.match(my, /resizeWidth: BG\.outW/)
+  assert.match(my, /if \(m\.small\) continue/) // 예전 원본 저장분도 줄인다
+  const eng = readFileSync(new URL('./engine.ts', import.meta.url), 'utf8')
+  const draw = eng.slice(eng.indexOf('export function draw('), eng.indexOf('export function reset('))
+  assert.match(draw, /fitBackdrop\(w, h\)/)
+  assert.doesNotMatch(draw, /coverRect\(/) // 매 프레임 확대·축소 없음
+  const none = eng.slice(eng.indexOf("if (next === 'none')"), eng.indexOf('keepShown(next'))
+  assert.match(none, /release\(\)/)
+})
+
+// 보강(2026-10-28 마스터 PC) — 배경과 인물 경계에 흰 잔상이 번들거리고, 머리를 움직이면 지난 자리가 번쩍였다(넓은 흐린 띠에 원본 벽이 묻어남)
+test('경계 다듬기 — 0.5 경계를 안쪽으로 당기고 띠를 좁힌다', async () => {
+  const { edgeAlpha } = await import('./rules.ts')
+  assert.equal(edgeAlpha(0), 0)
+  assert.equal(edgeAlpha(BG.edgeLo), 0) // 예전엔 128(반투명 — 벽이 비침)
+  assert.equal(edgeAlpha(BG.edgeHi), 255)
+  assert.equal(edgeAlpha(1), 255)
+  assert.ok(edgeAlpha(0.6) < 0.6 * 255) // 경계 근처는 예전보다 투명(침식)
+  for (let p = 0; p < 1; p += 0.05) assert.ok(edgeAlpha(p) <= edgeAlpha(p + 0.05)) // 단조 증가
+})
