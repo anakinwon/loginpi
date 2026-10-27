@@ -200,7 +200,7 @@ function NotesOverlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   // 발표자 입장·재입장 — 자기 현재 값을 1번 방송(새로 고침 뒤엔 false — 남은 panel 의 배지·음성 요청을 맞춘다)
   const selfId = ctx.r.selfId
   useEffect(() => {
-    if (presenterResync(ctx.role, ctx.appSupported, selfId)) void ctx.sendApp('state', { notes: on.get() })
+    if (presenterResync(ctx.role, ctx.appSupported, selfId)) void sendState(ctx, on.get(), latest()) // 한도에 빠지지 않게 재시도(T03 r5)
   }, [ctx.role, ctx.appSupported, selfId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 늦게 들어온 사람 — 참가자 수가 늘면 1초 묶어 현재 상태 다시 방송(초당 2건 한도 안)
