@@ -35,20 +35,26 @@ const str = (v: FormDataEntryValue | null) =>
   typeof v === 'string' && v ? v : null
 
 // sql/010 적용 여부 — fn_ref_smn_vc_sec 를 잘못된 인자(p_sec 0, 즉시 RETURN·부작용 없음)로 불러 본다.
-//  적용됨은 인스턴스 동안 기억, 미적용·오류는 60초마다 다시 확인(R-P2). 오류도 미적용으로 본다(보수적 = 008 방식)
+//  적용됨은 인스턴스 동안 기억, 미적용은 60초마다 다시 확인(R-P2).
+//  '함수 없음'(PGRST202·42883)만 미적용으로 본다 — 일시 DB 오류로 작은 선과금(008 방식)에 떨어지면 상한이 느슨해진다(fail-open, 보안 검토 2026-10-28).
+//  그 밖의 오류는 큰 예약(reserveSec) 유지 = 과금 쪽으로 닫힘, 기억하지 않고 다음 요청에 다시 확인
+const FN_MISSING = new Set(['PGRST202', '42883'])
 let refOk = false
 let refAt = 0
 async function vcRefReady() {
   if (refOk || Date.now() - refAt < 60_000) return refOk
-  refAt = Date.now()
   const { error } = await db().rpc('fn_ref_smn_vc_sec', {
     p_smn_id: null,
     p_nt_id: null,
     p_usr_id: null,
     p_sec: 0,
   })
-  if (error)
-    console.warn('[speech/chunk] sql/010 미적용 — 008 방식 예약', error.code)
+  if (error && !FN_MISSING.has(error.code)) {
+    console.warn('[speech/chunk] sql/010 확인 실패 — 큰 예약 유지', error.code)
+    return true
+  }
+  refAt = Date.now()
+  if (error) console.warn('[speech/chunk] sql/010 미적용 — 008 방식 예약', error.code)
   refOk = !error
   return refOk
 }
