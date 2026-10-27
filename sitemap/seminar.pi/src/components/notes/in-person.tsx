@@ -81,6 +81,10 @@ function Recorder() {
   const [finishing, setFinishing] = useState(false)
   const [micLost, setMicLost] = useState(false)
   const [gone, setGone] = useState(false) // 노트가 다른 곳에서 끝났거나 삭제됐다(서버가 조각을 멈춤)
+  // 서버가 조각을 멈췄다(한도·고지 기록 없음·끝남·삭제) — 더는 기록되지 않는다. 전에는 한도·고지 없음이면 '● 기록 중' 타이머·탭 표시가
+  //  계속 돌고 마이크도 켜진 채였다(T02 r5). gone 과 달리 회의록은 아직 RECORDING 이라 떠나면 그대로 끝내기 요청을 보낸다
+  const [halted, setHalted] = useState(false)
+  const [fixing, setFixing] = useState(false) // [마이크 다시 연결] 권한 창 대기 중 — 연타로 마이크 2개를 잡지 않게
   const left = useRef(false) // 화면을 떠났다 — 개발 StrictMode 의 즉시 재실행과 진짜 떠남을 가른다
   const ended = useRef(false) // 끝내기 요청을 이미 보냄(종료 버튼·창 닫힘)
   // 화면이 살아 있다 — 시작·다시 연결의 마이크 권한 창·API 대기 중에 앱 안 이동으로 떠나면, 늦게 온 마이크를 놓고
@@ -105,10 +109,11 @@ function Recorder() {
     onNoAgr: () => setErr(t('noAgr')),
     // 다른 기기·회의록 화면에서 끝냈거나 지웠다 — '기록 중'으로 두지 않고 알리며 마이크를 놓는다(트랙 정리 effect 가 stop)
     onHalt: (why) => {
+      setHalted(true)
+      setTrack(null) // 마이크를 놓는다(트랙 정리 effect 가 stop)
       if (why !== 'live' && why !== 'gone') return
       ended.current = true // 떠날 때 끝내기 요청을 또 보내지 않는다([종료] 버튼은 그대로 회의록 화면으로)
       setGone(true)
-      setTrack(null)
     },
   })
 
@@ -151,14 +156,14 @@ function Recorder() {
   // 탭 제목 앞 '● ' — 다른 탭에 가 있어도 아직 기록 중임을 탭 목록에서 본다(보강 T02 r4). 끝났거나(gone) 떠나면 뗀다.
   //  앱 안 이동으로 새 화면 제목이 먼저 들어와 있으면 표시가 없으니 건드리지 않는다
   useEffect(() => {
-    if (!ntId || gone) return
+    if (!ntId || halted) return
     if (!document.title.startsWith(REC_MARK))
       document.title = REC_MARK + document.title
     return () => {
       if (document.title.startsWith(REC_MARK))
         document.title = document.title.slice(REC_MARK.length)
     }
-  }, [ntId, gone])
+  }, [ntId, halted])
 
   // 화면을 떠나면 마이크를 놓는다
   useEffect(() => () => track?.stop(), [track])
@@ -231,12 +236,16 @@ function Recorder() {
   }
 
   // 끊긴 마이크를 다시 잡는다(탭 = 권한 제스처) — 새 트랙이면 useSpeech 가 같은 회의록에 이어서 조각을 보낸다
+  //  권한 창을 기다리는 동안 [종료]를 눌렀거나 노트가 끝났으면(ended) 늦게 온 마이크는 놓는다 — 끝낸 회의록에 녹음을 다시 시작하지 않게(T02 r5)
   async function reconnect() {
+    setFixing(true)
     const s = await navigator.mediaDevices
       .getUserMedia({ audio: MIC })
       .catch(() => null)
+    setFixing(false)
     if (!s) return setErr(t('micDenied'))
-    if (!alive.current) return s.getTracks().forEach((x) => x.stop())
+    if (!alive.current || ended.current)
+      return s.getTracks().forEach((x) => x.stop())
     setErr(null)
     setMicLost(false)
     setTrack(s.getAudioTracks()[0] ?? null)
@@ -246,7 +255,7 @@ function Recorder() {
   if (ntId)
     return (
       <section className="bg-surface space-y-4 rounded-xl p-4">
-        {!gone && (
+        {!halted && (
           <p className="bg-danger inline-flex rounded-full px-3 py-1 text-sm font-semibold text-white">
             ● {t('recBadge', { time: mmss(sec) })}
           </p>
@@ -273,10 +282,11 @@ function Recorder() {
             {alert === 'err' ? err : t(alert)}
           </p>
         )}
-        {micLost && !gone && !finishing && (
+        {micLost && !halted && !finishing && (
           <button
             type="button"
             className={`${BTN} w-full`}
+            disabled={fixing}
             onClick={() => void reconnect()}
           >
             {t('micRetry')}
@@ -296,8 +306,16 @@ function Recorder() {
       </section>
     )
 
+  // 제목 칸에서 Enter = [기록 시작](form 제출 — 키 입력도 마이크 권한 제스처, 보강 T02 r5). 비활성 조건은 버튼과 같다
+  const ready = !busy && told && !!title.trim()
   return (
-    <section className="bg-surface space-y-4 rounded-xl p-4">
+    <form
+      className="bg-surface space-y-4 rounded-xl p-4"
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (ready) void start()
+      }}
+    >
       <label className="block space-y-1 text-sm">
         <span>{t('titleLabel')}</span>
         <input
@@ -319,10 +337,9 @@ function Recorder() {
       </label>
       <p className="text-muted-foreground text-xs">{t('toldWhy')}</p>
       <button
-        type="button"
+        type="submit"
         className={`${BTN_PRIMARY} w-full`}
-        disabled={busy || !told || !title.trim()}
-        onClick={() => void start()}
+        disabled={!ready}
       >
         {busy ? t('starting') : `● ${t('start')}`}
       </button>
@@ -331,7 +348,7 @@ function Recorder() {
           {err}
         </p>
       )}
-    </section>
+    </form>
   )
 }
 
