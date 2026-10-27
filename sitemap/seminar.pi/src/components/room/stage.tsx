@@ -294,7 +294,7 @@ export function Stage(props: StageProps) {
           className="mt-2 flex gap-2 overflow-x-auto md:absolute md:right-3 md:bottom-3 md:mt-0 md:max-w-[60%] md:justify-end"
         >
           {rest.map((x) => (
-            <li key={x.key} className="w-36 shrink-0 md:w-44">
+            <li key={x.key} className="relative w-36 shrink-0 md:w-44">
               <button
                 type="button"
                 aria-label={t('tile.pin', { name: x.name })}
@@ -317,6 +317,19 @@ export function Stage(props: StageProps) {
                   speaking={ring(x)}
                 />
               </button>
+              {/* 내 작은 타일 — 타일 전체가 고정 버튼이라 안에 버튼을 넣을 수 없어(중첩 금지) 이름표 자리에 형제 버튼을 겹쳐 둔다 */}
+              {!x.screen && x.peerId === props.selfId && (
+                <button
+                  type="button"
+                  onClick={openRename}
+                  title={t('rename.tile')}
+                  className="absolute bottom-2 left-2 z-10 flex max-w-[80%] items-center gap-1 rounded bg-black/80 px-2 py-1 text-xs hover:underline"
+                >
+                  <span className="truncate">{x.name}</span>
+                  <span aria-hidden>✏️</span>
+                  <span className="sr-only">{t('rename.tile')}</span>
+                </button>
+              )}
             </li>
           ))}
         </ul>
