@@ -628,6 +628,7 @@
     "payStillWaiting": "Still waiting for the wallet. If you already signed in Pi Wallet, please wait a moment.",
     "payFailed": "Payment failed.",
     "err": {
+      "ISLAND_FULL": "All 100 island names are in use right now. You can open a new seminar after an upcoming or live one ends or is canceled.",
       "SMN_FULL": "This seminar is full.",
       "SMN_CLOSED": "This seminar has ended or was canceled.",
       "SMN_ALREADY": "You are already registered or a payment is in progress.",
@@ -661,14 +662,14 @@
   "host": {
     "title": "Host a seminar",
     "notAdmin": "Only admins can host seminars for now.",
-    "name": "Title (1–100 chars)",
+    "name": "The seminar name is picked automatically from famous islands of the world.",
     "startAt": "Start time",
     "maxCnt": "Capacity (1–100)",
     "fee": "Entry fee (Pi)",
     "feeHint": "0 = free, up to 7 decimals",
     "submit": "Create",
     "submitting": "Creating…",
-    "invalid": "Check your input — title, a time within the next year, capacity 1–100, fee 0 or more (up to 7 decimals).",
+    "invalid": "Check your input — a time within a year from now, capacity 1–100, entry fee 0 or more (up to 7 decimals).",
     "attendance": {
       "title": "Attendance",
       "back": "Back to seminar",

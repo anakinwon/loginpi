@@ -38,11 +38,10 @@ function Form() {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const f = new FormData(e.currentTarget)
-    const title = String(f.get('title') ?? '').trim()
     const startMs = Date.parse(String(f.get('startAt') ?? '')) // datetime-local = 보는 사람 지역 시간
     const maxCnt = Number(f.get('maxCnt'))
     const fee = String(f.get('fee') ?? '').trim()
-    if (!title || !startAtOk(startMs) || !FEE_RE.test(fee))
+    if (!startAtOk(startMs) || !FEE_RE.test(fee))
       return setMsg(t('invalid'))
     setBusy(true)
     setMsg(null)
@@ -51,7 +50,6 @@ function Form() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title,
           startAt: new Date(startMs).toISOString(),
           maxCnt,
           fee,
@@ -65,10 +63,8 @@ function Form() {
 
   return (
     <form onSubmit={(e) => void submit(e)} className="space-y-4">
-      <label className="block space-y-1 text-sm">
-        <span>{t('name')}</span>
-        <input name="title" required maxLength={100} className={INPUT} />
-      </label>
+      {/* 이름 입력 없음 — 개설 때 남은 섬 이름에서 무작위로 정해진다(sql/011) */}
+      <p className="text-muted-foreground text-sm">🏝️ {t('name')}</p>
       <label className="block space-y-1 text-sm">
         <span>{t('startAt')}</span>
         <input name="startAt" type="datetime-local" required className={INPUT} />

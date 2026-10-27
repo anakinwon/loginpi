@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
 import {
+  apiError,
   db,
   dbFail,
   dbRoute,
@@ -16,7 +17,6 @@ import {
 import { SMN_COLS, toCard, type SmnRow } from '@/lib/seminar'
 import {
   FEE_RE,
-  ONE_LINE_RE,
   OPEN_STS,
   PAGE_SIZE,
   parsePage,
@@ -91,8 +91,8 @@ export const GET = withAuthGuard(
   }),
 )
 
+// 이름은 받지 않는다 — 남은 섬 이름에서 무작위로 정한다(sql/011 fn_crt_smn, 마스터 2026-10-28)
 const createSchema = z.object({
-  title: z.string().trim().min(1).max(100).regex(ONE_LINE_RE),
   // ISO 일시(오프셋 포함) — 지금 이후 ~ 1년 안(S5)
   startAt: z.iso
     .datetime({ offset: true })
@@ -110,22 +110,19 @@ export const POST = withAuthGuard(
     ])
     if (user instanceof NextResponse) return user
     if (body instanceof NextResponse) return body
+    // 섬 고르기 + 저장을 한 함수·한 트랜잭션으로(잠금으로 동시 개설이 같은 섬을 고르지 않음, R-P5)
     const { data, error } = await db()
-      .from('smn_mst')
-      .insert({
-        hst_usr_id: user.id,
-        smn_nm: body.title,
-        start_dtm: new Date(body.startAt).toISOString(),
-        max_cnt: body.maxCnt,
-        ent_pi_amt: body.fee,
-        regr_id: user.id,
-        modr_id: user.id,
+      .rpc('fn_crt_smn', {
+        p_hst_usr_id: user.id,
+        p_start_dtm: new Date(body.startAt).toISOString(),
+        p_max_cnt: body.maxCnt,
+        p_ent_pi_amt: body.fee,
       })
-      .select('smn_id')
-      .single<{ smn_id: string }>()
     if (error) return dbFail(error)
+    const r = (data as { smn_id: string; smn_nm: string }[] | null)?.[0]
+    if (!r) return apiError('ISLAND_FULL', 409) // 진행·예정 세미나가 섬 수(100)만큼 열려 있음
     return NextResponse.json(
-      { id: data.smn_id },
+      { id: r.smn_id, name: r.smn_nm },
       { status: 201, headers: { 'Cache-Control': NO_STORE } },
     )
   }),
