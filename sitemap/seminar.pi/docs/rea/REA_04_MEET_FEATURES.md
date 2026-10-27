@@ -172,17 +172,49 @@
 
 | # | 내용 | 담당 |
 |---|---|---|
-| 1 | **MediaPipe 모델 파일 미커밋으로 `pnpm build`(Vercel 포함) 실패** — `scripts/copy-mediapipe.mjs` 머리 주석의 curl 1줄로 `public/mediapipe/models/selfie_segmenter_landscape.tflite`(약 250KB, Apache-2.0)를 받아 커밋해야 배포된다. 이번 실행은 다운로드가 권한 정책에 거부됨 | [확인중 : 마스터] |
+| 1 | ~~**MediaPipe 모델 파일 미커밋으로 `pnpm build`(Vercel 포함) 실패**~~ **해결(`9ca1b26c`)** — `scripts/copy-mediapipe.mjs` 머리 주석의 curl 1줄로 `public/mediapipe/models/selfie_segmenter_landscape.tflite`(약 250KB, Apache-2.0)를 받아 커밋해야 배포된다. 이번 실행은 다운로드가 권한 정책에 거부됨 | [확인중 : 마스터] |
 | 2 | Jitsi 지연 로드 자산(워클릿·wasm·모델)의 배포본 크기·sha256 — 다운로드 거부로 미확인 | [확인중 : 권한 허용 시] |
 | 3 | RNNoise BSD-3-Clause·Selfie Segmentation 모델 카드 원문 대조 | [확인중 : 라이선스 원문] |
 | 4 | 효과 전환 때 재협상 없음·숨은 탭 워커 타이머 30fps 유지 — 정적 읽기만 | [확인중 : 통합 QA] |
 | 5 | Pi Browser WebView 의 MediaStreamTrackProcessor·captureStream·MediaRecorder·File System Access·AudioContext 지원 — 전부 기능 탐지로 숨김 처리했으나 실제 노출 여부 미측정 | [확인중 : 실기기] |
 | 6 | 음성 5초 조각 재시작 방식의 이음새 손실(조각 경계 단어 잘림) | [확인중 : 실측] |
-| 7 | 엔진 v1.3.1(`4e33bbad`, sha256 `a11f7f36…`) 집 PC 교체 전에는 `app` 필요 기능(자막·녹화·AI 회의록·번역·더빙) 숨김 — 교체 후 실제 응답 확인 | [확인중 : 마스터 엔진 교체] |
-| 8 | 배포 뒤 배포본 기준 회귀 재측정(이번 비교는 로컬 HEAD) | [확인중 : 배포 후] |
+| 7 | 엔진 `27a18b31` 빌드(v1.3.2 + 관리 API, sha256 `225efa5e…`, v1.3.1 대체) 집 PC 교체 전에는 `app` 필요 기능(자막·녹화·AI 회의록·번역·더빙) 숨김 — 교체 후 실제 응답 확인 | [확인중 : 마스터 엔진 교체] |
+| 8 | ~~배포 뒤 배포본 기준 회귀 재측정~~ **해소 — 9절 야간 r1~r6** | — |
+
+## 9. 야간 회귀 비교 (2026-10-27 23:06 ~ 10-28 04:51, 라운드 r1~r6)
+
+라운드마다 병합 → `pnpm build` → push → `Vercel – seminar` success 확인 뒤, **배포본 `https://seminarz.vercel.app`** 을 6절 기준선(2026-10-27 19:33~19:50 KST, 기능 10종 추가 전 배포)과 같은 3장면(목록·진척·404)으로 다시 수집해 비교했다. 요약 JSON = `docs/rea/evidence/REA_04/night/r1~r6.json`(원본 full·normalized 캡처는 작업 폴더, 커밋 안 함). REA MCP 는 연결 실패라 이번에도 CLI.
+
+**명령**(cwd = rea-agents/scripts, 장면 `<s>` = list·progress·404)
+
+```
+node rea.mjs capture-browser-scenario <기준선 입력 baseline-seminarz-scene-<s>.input.json> --format json --full-output > <작업>/rea/rN-scene-<s>.full.json
+node rea.mjs compare-web-captures REA_04/baseline-seminarz-scene-<s>.normalized.json <작업>/rea/rN-scene-<s>.normalized.json --format json
+```
+
+normalized 는 full 의 `data.normalized_result` 를 꺼낸 것.
+
+| 라운드 | 수집(KST) | 배포 커밋 | list 증거 | progress 증거 | 404 증거 | 요청 수(list · progress · 404) |
+|---|---|---|---|---|---|---|
+| r1 | 00:30 | `5efcf604` 직후 배포 | `ev_747d55f736a956a3a81dc95e9c20da63acf3449a8135ea586523c40e26bceca4` | `ev_9ffd0585e8cd2b26ee27c5593e6472e74ae3c2d4d0ef8addc651bd661582da1c` | `ev_a9a593472d077d5caa0254434b7f68c25f10b3d1dc65daf190a891eb1139fef1` | 38→42 · 33→37 · 17→17 |
+| r2 | 01:21 | `7e569f76` | `ev_56b7f0f79e22cac3c6b8ab7c1f6f95cb8e86b9844521904ca15db59cdd5ba752` | `ev_c96df272049a0058b3fbbac71f437283344eaeabe3af9650ff762d484b5b5281` | `ev_1f81674d255a25a9b74d4fd63be628a385044e878f4bd9768f8d235c7a9296d4` | 38→42 · 33→37 · 17→17 |
+| r3 | 02:13 | `f9806079` | `ev_167ec98ecc28da0a824ec865003899127c747d4c9a54053b8eee1ef0860ec9c4` | `ev_a136951d7dde3d176244cb6999de4cfb3041bb761860174bccb1a1ad728ea4c1` | `ev_a47ff93966dbab52c07a47bd063770348fc0df743c6e5b1770518d6b56c624fc` | 38→42 · 33→37 · 17→17 |
+| r4 | 03:15 | `87933872` | `ev_49e9037faa357964a3e2ad423d008a705e2c8225239b60384f5df4693d5a8e84` | `ev_771d4b0b0ad6f1f580cf6079ba5fed386db0210ba4d3c05728e9d872e150483d` | `ev_c9a1423524411cf14b5d0fe0e28d699eb3b3cdfd1bd6697b89abc13e3a7f2d1c` | 38→42 · 33→37 · 17→17 |
+| r5 | 03:55 | `1af8268b`(r5 병합, 배포는 `350adc25`) | `ev_68c989e248c801255fc0b11e54514d2d226f3cc1204b38050658521e5fe0ccff` | `ev_0da2cb6d53a4b45e74becb7efc6a95ac1fd51a6014aa7f379c31fd9940af36f0` | `ev_30bd99551d842198f48c45fcbcc004e18272a95cbcb86118da3f213e8b75c8d6` | 38→42 · 33→37 · 17→17 |
+| r6 | 04:51 | `4f322641` | `ev_efc6c9cf6aeed267b9964a99324b2fa8332d0a2913ab9ba1c4ae3ced5e8dd3ef` | `ev_ac0857bbd1af87494a1614c3559ee0d2a8aaf959803203564bf15f08bcb6ee28` | `ev_8ae4b40a5af2bc70e3d09504e4d2b9ec96711c0123b82d1b07847e824bc8ed92` | 38→42 · 33→37 · 17→15 |
+
+**차이(6회 공통)** : 세 장면 모두 overall `changed`, 정렬 aligned 2단계, 수집 complete, **페이지 오류 0**, **접근성 이름 추가·삭제 0**.
+
+- **list** : 요청 38→42(fetch 20→24). screenshot·접근성·storage·events 변화 = 목록 데이터 변화. r1 에서 로컬 QA 세미나가 운영 목록에 노출된 것을 발견 → 결함(high)으로 분리(NIGHT_REPORT_2026-10-28 ① 위험 3, TROUBLESHOOT).
+- **progress** : 요청 33→37. 화면·접근성 변화 = 진척 문구 갱신. 실패는 RSC prefetch `ERR_ABORTED` 뿐(기준선과 같은 종류).
+- **404** : 문서 307→404 동일. r1~r5 요청 17→17, **r6 17→15**(script 12→11·other 2→1, Pi SDK 스크립트 `ERR_ABORTED` 요청이 빠짐 — 오류 감소 방향). 변화는 events(배포 id·CSS preload 경고)뿐.
+- 콘솔은 Pi SDK postMessage origin 경고와 404 리소스 오류뿐이며 기준선에도 있었다.
+
+판정 : 야간 59건 병합으로 기존 3장면의 **화면 회귀 0건·오류 0**. 8절 #8(배포본 기준 재측정)은 이것으로 해소.
 
 ## 변경 이력
 
 | 날짜 | 내용 |
 |---|---|
 | 2026-10-27 | 최초 작성 — Jitsi·LiveKit Meet·MediaPipe·기준선/회귀 REA 기록 합본, 발견 ①~⑧ → 설계·코드·커밋 추적, 기능 팀 reaUsed, 회귀 결과, [확인중] 8건 |
+| 2026-10-28 | 9절 야간 회귀 비교(r1~r6 REA 명령·증거 ID·차이) 추가, 8절 #1·#8 해소·#7 엔진 빌드 갱신 |

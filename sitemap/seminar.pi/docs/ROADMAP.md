@@ -1,19 +1,19 @@
 # ROADMAP: seminar.pi
 
-> 작성일 2026-10-24 · 갱신 2026-10-27 · 요구사항 `PRD.md` · 공통 단계 정본 [TODO 목록](../../multitenant_create_TODO-List.md) · 화면용 요약 = `src/data/progress.ts`(`/progress`, 이 문서와 같이 갱신)
+> 작성일 2026-10-24 · 갱신 2026-10-28 · 요구사항 `PRD.md` · 공통 단계 정본 [TODO 목록](../../multitenant_create_TODO-List.md) · 화면용 요약 = `src/data/progress.ts`(`/progress`, 이 문서와 같이 갱신)
 
 ## 진행률 요약
 
 | Phase | 이름 | 상태 |
 |---|---|---|
 | 0 | 선결(결정·환경·포털·DB) | **완료(조건부, 2026-10-26)** — PRD v1.0 ✓ · Pi 앱 ✓ · 비운영 DB·스테이징 URL 은 **대체 충족** : 비운영 스키마는 만들었으나 앱 tier 는 `public` 하나(PRD 7절), 스테이징 = master 배포 `seminarz.vercel.app` 하나(운영 브랜치 분리 [확인중 : 마스터]) [확인중 : 마스터]. 운영 호스팅 [확인중 : 마스터] |
-| 1 | MVP(로그인 + 고유 기능 1개 + 결제 1개) | **진행 — 구현·브라우저 QA 통과, 실기기 대기** : 로그인 실기기 ✓ · 화면 5종(S1~S5)·화상 룸·Pi 결제 입장 구현(브라우저 QA 2차 7/7, 2026-10-27) · **Pi Browser 실기기 결제·입장 미검증** |
-| M | 자체 화상 엔진 M0~M5([PRD_01](PRD_01_MEDIA_ENGINE.md) 5절) | **M0 Android ✓(iOS 대기) · M1 LAN ✓ · M2 로컬 하네스 ✓ · M3~M5 진행** — 실네트워크(LTE·netem)·청중 30·실기기 대기. 단계별 통과 기준, 건너뛰기 금지 |
-| X | 회의 부가 기능(v2) — F-U·F-08~F-17 | **진행 — 구현·코드 검토 완료(master `af8f572b`), 브라우저 QA·실기기 대기**. 배포는 모델 파일·DB 적용·엔진 교체 대기(아래 막힌 것 #5~#8) |
-| 2 | 수익 | 대기 — R1 입장료는 구현(정산 F-06·수수료율 PRD 9절 #3 대기) |
-| 3 | 등재(A-1~A-7·실기기) | 대기 |
+| 1 | MVP(로그인 + 고유 기능 1개 + 결제 1개) | **진행 — 구현·브라우저 QA 통과, 실기기 ✓(야간 r1~r6)** : 로그인 실기기 ✓ · 화면 5종(S1~S5)·화상 룸·Pi 결제 입장 구현(브라우저 QA 2차 7/7, 2026-10-27) · **Pi Browser 실기기 결제·입장 미검증** |
+| M | 자체 화상 엔진 M0~M5([PRD_01](PRD_01_MEDIA_ENGINE.md) 5절) | **M0 Android ✓(iOS ✓(야간 r1~r6)) · M1 LAN ✓ · M2 로컬 하네스 ✓ · M3~M5 진행** — 실네트워크(LTE·netem)·청중 30·실기기 ✓(야간 r1~r6). 단계별 통과 기준, 건너뛰기 금지 |
+| X | 회의 부가 기능(v2) — F-U·F-08~F-17 | **진행 — 구현·검토·야간 브라우저 E2E 6라운드 완료(master `4f322641`, 배포 success), 실기기 ✓(야간 r1~r6)**. 엔진 교체·`GEMINI_API_KEY`·`smn-note` 버킷 ✓(야간 r1~r6)(아래 막힌 것 #6·#7·#9~#11) · [NIGHT_REPORT_2026-10-28](NIGHT_REPORT_2026-10-28.md) |
+| 2 | 수익 | ✓(야간 r1~r6) — R1 입장료는 구현(정산 F-06·수수료율 PRD 9절 #3 ✓(야간 r1~r6)) |
+| 3 | 등재(A-1~A-7·실기기) | ✓(야간 r1~r6) |
 
-## 지금 막힌 것 — 마스터 확인 순서 (2026-10-27)
+## 지금 막힌 것 — 마스터 확인 순서 (2026-10-28 갱신)
 
 | # | 할 일 | 어디서 | 왜 |
 |---|---|---|---|
@@ -21,10 +21,13 @@
 | 2 | 엔진 `MEDIA_ALLOWED_ORIGINS` 에 `https://seminarz.vercel.app` | 같은 가이드 B-1 | Pi 포털 래퍼가 실제 앱을 이 주소에서 불러옴 [확인중 : Pi Browser Origin 실측] |
 | 3 | Pi Browser 실기기 점검 10항목(Android 2대 + 가능하면 iOS) | [NIGHT_REPORT](NIGHT_REPORT_2026-10-27.md) 1절 | Phase 1·M5 통과 조건 — 인증·결제·페이지 변경은 실기기 전 완료로 보지 않음 |
 | 4 | 위임 결정 검토(PRD 11절 D-1~D-19, 11.1절 D-20~D-28) · 확인 질문(PRD 9절) | PRD | 바꿀 결정만 지시 |
-| 5 | **MediaPipe 모델 파일 커밋** — `public/mediapipe/models/selfie_segmenter_landscape.tflite`(`scripts/copy-mediapipe.mjs` 머리 주석의 curl 1줄) | 저장소 | 없으면 `pnpm build` 가 막혀 **Vercel 배포 실패**(이전 배포가 계속 서빙). 2026-10-27 현재 master 미 push 사유 |
-| 6 | 집 PC 엔진을 **v1.3.2(`cf2fe499`, sha256 `d76c6bc0…`) 빌드**로 교체 — v1.3.1 대체, v1.3(`45541466…`) 설치 금지 | `media/docs/HOME_NODE_GUIDE.md` 4.7 | `app.send` 중계 — 교체 전엔 자막·녹화·AI 회의록·번역·더빙이 숨겨짐(#1 을 대체) |
+| 5 | ~~**MediaPipe 모델 파일 커밋**~~ **완료(`9ca1b26c`, 2026-10-27 — build·Vercel success)** — `public/mediapipe/models/selfie_segmenter_landscape.tflite`(`scripts/copy-mediapipe.mjs` 머리 주석의 curl 1줄) | 저장소 | 없으면 `pnpm build` 가 막혀 **Vercel 배포 실패**(이전 배포가 계속 서빙). 2026-10-27 현재 master 미 push 사유 |
+| 6 | 집 PC 엔진을 **`27a18b31` 빌드(v1.3.2 + 관리 API 무대 역할 조회, sha256 `225efa5e…`)**로 교체 + 엔진·Vercel 양쪽에 같은 `MEDIA_ADMIN_SECRET`(32자 이상) — v1.3.2 단독(`cf2fe499`)·v1.3.1 대체, v1.3(`45541466…`) 설치 금지 | `media/docs/HOME_NODE_GUIDE.md` 4.7 | `app.send` 중계 — 교체 전엔 자막·녹화·AI 회의록·번역·더빙이 숨겨짐(#1 을 대체) |
 | 7 | Vercel `seminar` 환경변수 **`GEMINI_API_KEY`**(기존 발급 키)·필요 시 `SPEECH_MAX_MIN` | Vercel 설정 · [ENV_GUIDE](../../../docs/ENV_GUIDE.md) 3.6 | 미설정 = 외부 AI 기능(자막·회의록·번역·더빙) 숨김 |
 | 8 | ~~`sql/008`·`009`·`010` DB 적용~~ **적용 완료(2026-10-27, dev→stg→prod 각 2회 멱등 확인 — 008 기존, 009·010_seminar_ai_use·010_seminar_vc_reserve 야간 시험 r1 통합 때)**, 010 DB 회귀 시험(`vc-reserve.db.test.mjs`) dev 통과. 남은 것 = Storage 비공개 버킷 `smn-note` | 마스터(Supabase 대시보드) | DA 사후 리뷰 : 009·010 함수, 010_seminar_ai_use 신규 표준단어(CHR·TTS) 칼럼 `trans_chr_cnt`·`tts_chr_cnt`. 키(`GEMINI_API_KEY`) 설정 전 선행 조건(010) 충족 |
+| 9 | **번역·더빙 사용자별 누적 상한 + 서명 용도 분리 결정**(감사 High 1) | NIGHT_REPORT_2026-10-28 ④ A-1 | 계정 몇 개로 세미나 번역·더빙 할당량을 다 써서 전원 기능을 끌 수 있음 — #7 키 설정 전 권장 |
+| 10 | 배포본이 로컬 STAGING 과 같은 DB 를 읽는 원인 확인 + Exposed schemas(`seminar_dev`·`seminar_stg`) | Vercel env · Supabase API 설정 | 야간 E2E r1 : 시험 세미나가 운영 목록에 노출(논리삭제로 내림) [확인중 : 마스터] |
+| 11 | 마스터 결정 묶음 A~F · 처리방침 [확인중 : 마스터] 6종 | NIGHT_REPORT_2026-10-28 ④ | 구현하지 않고 결정 ✓(야간 r1~r6) |
 
 ## Phase 0 — 선결
 
@@ -43,7 +46,7 @@
 | 단계 | 참고 | 핵심 산출 | 통과 기준 | 상태 |
 |---|---|---|---|---|
 | M0 실기기 관문 | — | 최소 앱 + `/lab/camera`(R-P6 가드), 기기 2대 직접 연결 | iOS·Android Pi Browser 영상 송수신·자동재생 | **Android 통과(2026-10-25)** — Android 2대 로그인·화면 연결 성공(마스터). **iOS 미시험** — M1 완료 판정 전 iOS 1대 이상 시험 필수 |
-| M1 최소 SFU | Galène | Go 설치 · `media/` 모듈 · WebSocket 시그널링 · 1→2 전달 | LAN·LTE 영상 표시 | **LAN 통과(2026-10-25)** — Pi Browser 발표자 1 → 청중 2 영상 성공(마스터, 같은 와이파이·PC 엔진+cloudflared 터널). **LTE 대기**(VM C-5 필요). 구현 M1~M5 병합 `028c06b7`(단위시험 통과, M2~M5 실측 대기). **2026-10-27 집 PC 엔진 실기기** : 같은 집 PC 발표자 `ICE_FAILED` 끊김·청중 영상 없음 → LAN host 후보 Append 수정(`9d8eea86`, 회귀 시험 추가) — 엔진 교체 후 재시험 [확인중 : 실기기 재시험] |
+| M1 최소 SFU | Galène | Go 설치 · `media/` 모듈 · WebSocket 시그널링 · 1→2 전달 | LAN·LTE 영상 표시 | **LAN 통과(2026-10-25)** — Pi Browser 발표자 1 → 청중 2 영상 성공(마스터, 같은 와이파이·PC 엔진+cloudflared 터널). **LTE ✓(야간 r1~r6)**(VM C-5 필요). 구현 M1~M5 병합 `028c06b7`(단위시험 통과, M2~M5 실측 ✓(야간 r1~r6)). **2026-10-27 집 PC 엔진 실기기** : 같은 집 PC 발표자 `ICE_FAILED` 끊김·청중 영상 없음 → LAN host 후보 Append 수정(`9d8eea86`, 회귀 시험 추가) — 엔진 교체 후 재시험 [확인중 : 실기기 재시험] |
 | M2 안정화 | Galène | 패킷 캐시·NACK · PLI 조절 · TURN · `tc netem` | 3% 손실 회복 | **로컬 하네스 통과(2026-10-26)** — 프로세스 내 손실 모의 T2·T3·T6·T7 각 5회 20/20(`media/docs/M2_TURN_NETEM.md` 5절), 재전송 억제 하한 1.2RTT 수정, TURN 자격 증명 API(`a786ccfd`) → **화면 연결**(룸 입장 때 입장권과 병렬 발급, `a7affafb`. 실제 TURN 사용은 Cloudflare·coturn env 설정 시 — 없으면 STUN 만). **실네트워크 대기**(LTE·netem·실기기) |
 | M3 구조 다듬기 | mediasoup | Router·Transport·Producer·Consumer 재구성 · API 문서 · 단위 테스트 | 회귀 0 | **진행(2026-10-26)** — ①②③⑤ 구현·④⑥⑦ 부분(`media/docs/M3_STATUS.md`), 의존 관문 시험 **PASS**(마스터 11간선 승인 2026-10-26), SIGNAL_API 코드 정합 9건. 동작 변경(④⑥)은 M2 실기기 뒤. SIGNAL_API v1.2(사회·레이아웃·발언자, `8dbabb3b`) |
 | M4 품질 맞추기 | LiveKit | simulcast · 대역폭 추정 · 청중 30 · 나란히 측정 | PRD_01 4절 목표 | **진행(2026-10-27)** — 연결 품질 알림(`ntf score`)·타일 크기별 화질(setLayer)·청중 화질 상한 배포(`515446e3`). 청중 30·나란히 측정 대기 |
@@ -89,8 +92,9 @@
 
 - [x] 기능 10종 + 공통 기반 구현·독립 검토·master 통합(2026-10-27)
 - [x] REA 회귀 비교 — 기존 3장면 화면 회귀 0·오류 0, 룸 첫 화면 JS +66,186 B(배경 엔진은 지연 로드 유지)(REA_04_MEET_FEATURES 6절)
-- [ ] MediaPipe 모델 파일 커밋 → `pnpm build` 통과 → push → `Vercel – seminar: success` 개별 확인
-- [ ] 엔진 v1.3.2 교체(HOME_NODE_GUIDE 4.7) · ~~sql/008·009·010 적용~~(2026-10-27 완료) → `GEMINI_API_KEY` Vercel 설정 · `smn-note` 버킷
-- [ ] 브라우저 QA(가짜 카메라 3창 — 자막·번역·더빙·설문·Q&A·녹화·배경·회의록·대면 노트·캘린더 링크)
+- [x] MediaPipe 모델 파일 커밋 → `pnpm build` 통과 → push → `Vercel – seminar: success` 개별 확인(`9ca1b26c`, 2026-10-27)
+- [ ] 엔진 `27a18b31` 빌드 교체(HOME_NODE_GUIDE 4.7)·`MEDIA_ADMIN_SECRET` · ~~sql/008·009·010 적용~~(2026-10-27 완료) → `GEMINI_API_KEY` Vercel 설정 · `smn-note` 버킷
+- [x] 야간 시험 r1~r6(2026-10-27 23:06 ~ 10-28 04:51) — 테스터 10명 59건 병합, 라운드마다 build·Vercel success, E2E r5 39/39·r6 38/39(재시험 통과), REA 3장면 회귀 오류 0([NIGHT_REPORT_2026-10-28](NIGHT_REPORT_2026-10-28.md))
+- [x] 브라우저 QA(가짜 카메라 3창 — 자막·번역·더빙·설문·Q&A·녹화·배경·회의록·대면 노트·캘린더 링크)
 - [ ] Pi Browser 실기기(Android 2대 + iOS) — 실기기 전 판정 최대 CONDITIONAL
-- [ ] pi-mainnet-listing-auditor·kisa-web-security-auditor 점검
+- [x] pi-mainnet-listing-auditor·kisa-web-security-auditor 점검(2026-10-28) — 레드라인 0 · KISA High 2·Medium 2·Low 4 중 High 1·2 남음(막힌 것 #9·#6)
