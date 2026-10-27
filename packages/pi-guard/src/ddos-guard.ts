@@ -159,6 +159,29 @@ export function rateLimitedResponse(retryAfter: number): NextResponse {
   )
 }
 
+// 페이지(GET 문서) 429 — JSON 원문 대신 사람이 읽는 안내 + retryAfter 뒤 자동 새로고침(같은 NAT 뒤 다수 참가자가 한도에 걸려도 스스로 복구).
+// 언어는 경로 첫 조각(/ko·/en …)만 본다 — ko 가 아니면 영어. 프록시는 locale 처리 전이라 next-intl 메시지를 못 쓴다
+export function rateLimitedPageResponse(
+  retryAfter: number,
+  pathname = '/',
+): NextResponse {
+  const ko = /^\/ko(\/|$)/.test(pathname)
+  const sec = Math.max(1, Math.ceil(retryAfter))
+  const msg = ko
+    ? `요청이 잠시 많습니다. ${sec}초 뒤 자동으로 다시 엽니다.`
+    : `Too many requests for a moment. Reloading in ${sec} seconds.`
+  const html = `<!DOCTYPE html><html lang="${ko ? 'ko' : 'en'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="${sec}"><title>429</title></head><body style="font-family:system-ui,sans-serif;padding:24px;text-align:center"><main><p role="status">${msg}</p></main></body></html>`
+  return new NextResponse(html, {
+    status: 429,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Retry-After': String(sec),
+      'Cache-Control': 'no-store',
+      ...SECURITY_HEADERS,
+    },
+  })
+}
+
 export function forbiddenResponse(reason: string): NextResponse {
   return new NextResponse(JSON.stringify({ error: 'forbidden', reason }), {
     status: 403,
