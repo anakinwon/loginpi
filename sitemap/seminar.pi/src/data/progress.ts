@@ -54,7 +54,7 @@ export const FEATURES: Feature[] = [
     id: 'F05',
     prio: 'P0',
     steps: [
-      { id: 'deviceTest', status: 'doing', stage: 'M0', note: 'Android ✓ · iOS …' },
+      { id: 'deviceTest', status: 'done', stage: 'M0', date: '2026-10-27', note: 'Android ✓ · iOS ✓' },
       {
         id: 'oneToTwo',
         status: 'doing',
