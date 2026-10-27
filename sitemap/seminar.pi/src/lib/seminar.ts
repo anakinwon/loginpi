@@ -26,7 +26,7 @@ export const payDb = () => db() as unknown as FlowInput['db']
 
 // 목록·상세 공용 칼럼(R-P3 쓰는 것만) — 개최자 이름은 FK 임베디드 조인(smn_mst_sys_user_id_fkey)
 export const SMN_COLS =
-  'smn_id, smn_nm, subttl, start_dtm, max_cnt, ent_pi_amt, smn_sts_cd, hst_usr_id, sys_user(display_name:dsp_nm, pi_username:pi_usr_nm)'
+  'smn_id, smn_nm, subttl, start_dtm, max_cnt, ent_pi_amt, smn_sts_cd, hst_usr_id, sys_user!smn_mst_sys_user_id_fkey(display_name:dsp_nm, pi_username:pi_usr_nm)'
 
 export interface SmnRow {
   smn_id: string

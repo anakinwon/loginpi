@@ -21,7 +21,7 @@ export const PUT = withAuthGuard(
       gate(id, user),
       db()
         .from('smn_mst')
-        .select('hst_usr_id, sys_user(dsp_nm, pi_usr_nm)')
+        .select('hst_usr_id, sys_user!smn_mst_sys_user_id_fkey(dsp_nm, pi_usr_nm)')
         .eq('smn_id', id)
         .maybeSingle<{ hst_usr_id: string; sys_user: { dsp_nm: string | null; pi_usr_nm: string | null } | null }>(),
       db().from('smn_ncknm').select('ncknm').eq('smn_id', id).neq('usr_id', user.id).eq('del_yn', 'N').limit(500),
