@@ -153,7 +153,7 @@ export function useMenu(open: boolean, close: () => void, triggerSel?: string, f
 
 // 메뉴 표면 — 데스크톱 팝오버(버튼 위), 좁은 화면 하단 시트(최대 80dvh)
 export const MENU_SURFACE =
-  'bg-surface fixed inset-x-0 bottom-0 z-30 flex max-h-[80dvh] flex-col gap-2 overflow-y-auto rounded-t-2xl p-4 pb-[max(16px,env(safe-area-inset-bottom))] shadow-xl sm:absolute sm:inset-x-auto sm:right-0 sm:bottom-full sm:mb-2 sm:rounded-xl sm:pb-4'
+  'bg-surface fixed inset-x-0 bottom-0 z-30 flex max-h-[80dvh] flex-col gap-2 overflow-y-auto rounded-t-2xl p-4 pb-[max(16px,env(safe-area-inset-bottom))] shadow-xl sm:absolute sm:inset-x-auto sm:right-0 sm:bottom-full sm:mb-2 sm:w-max sm:max-w-[min(20rem,calc(100vw-2rem))] sm:rounded-xl sm:pb-4'
 
 export type BarItem = { id: string; node: (o: { label: boolean; menu: boolean }) => ReactNode }
 
