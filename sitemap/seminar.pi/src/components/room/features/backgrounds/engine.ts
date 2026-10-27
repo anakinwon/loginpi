@@ -5,7 +5,7 @@
 // 사용 지표를 odml.pa.googleapis.com 로 보내며 끄는 옵션이 없음(1회 실패면 주기 전송 중단). 코드는 옮기지 않았다(S-2)
 import type { ImageSegmenter } from '@mediapipe/tasks-vision'
 import { featureStore } from '../../extensions'
-import { BG, coverRect, failBack, nextTs, pipelineKilled, slowWatch } from './rules'
+import { BG, coverRect, failBack, nextTs, pipelineKilled, slowerEvery, slowWatch } from './rules'
 
 // 선택 — none · blur · p:<프리셋> · m:<내 이미지 id>
 export const choice = featureStore<string>('none')
@@ -126,6 +126,7 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
     backdrop = img
     shown = next
     watch = slowWatch()
+    every = 1
     status.set('idle')
     bgOn.set(true)
     return null
@@ -143,7 +144,9 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
 // 파이프라인이 꺼 버리면(그리기 30회 연속 실패 — WebGL 컨텍스트 유실 등) 선택을 '없음'으로, 알리고(배경이 말없이 사라져 방이 드러나지 않게),
 // 망가진 분리기를 버린다(재사용하면 다시 골라도 같은 실패만 되풀이 — 다음 선택 때 새로 만든다, wasm 은 장기 캐시라 재다운로드 없음)
 bgOn.sub(() => {
-  if (!pipelineKilled(bgOn.get(), choice.get(), status.get())) return
+  if (!pipelineKilled(bgOn.get(), choice.get())) return
+  pick++ // 고르는 중이던 선택은 버린다 — 끝나서 bgOn 을 다시 켜면 선택은 '없음'인데 배경이 그려지고, 망가진 분리기를 다시 쓴다
+  status.set('idle')
   shown = 'none'
   choice.set('none')
   try {
@@ -162,6 +165,8 @@ let tiny: HTMLCanvasElement | null = null // 흐림용 축소본
 let maskData: ImageData | null = null
 let watch = slowWatch()
 let ts = 0 // 직전 분리 시각(nextTs)
+let every = 1 // 분리 간격(프레임 N장마다 1번, slowerEvery)
+let frameNo = 0
 
 function fit(c: HTMLCanvasElement, w: number, h: number) {
   if (c.width !== w || c.height !== h) {
@@ -171,14 +176,12 @@ function fit(c: HTMLCanvasElement, w: number, h: number) {
   return c.getContext('2d')!
 }
 
-// 프레임 1장(동기) — 분리기가 아직 없으면 원본 통과
-export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: number, h: number) {
-  if (!seg) return void out.drawImage(src, 0, 0, w, h)
-  const t0 = performance.now()
-  ts = nextTs(ts, t0)
+// 분리 1회 — 입력을 줄여 넣고 사람 마스크를 갱신한다(VIDEO 모드 콜백은 동기)
+function segment(src: CanvasImageSource, now: number) {
+  ts = nextTs(ts, now)
   const sctx = fit((small ??= canvas()), BG.inW, BG.inH)
   sctx.drawImage(src, 0, 0, BG.inW, BG.inH)
-  seg.segmentForVideo(small, ts, (res) => {
+  seg!.segmentForVideo(small, ts, (res) => {
     // 모델 출력 마지막 채널 = 사람(1채널 모델이면 [0], 배경·사람 2채널이면 [1]) [확인중 : 모델 파일 넣은 뒤 실측]
     const m = res.confidenceMasks?.at(-1)
     if (!m) return
@@ -188,6 +191,14 @@ export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: n
     for (let i = 0; i < a.length; i++) maskData.data[i * 4 + 3] = a[i] * 255
     mctx.putImageData(maskData, 0, 0)
   })
+}
+
+// 프레임 1장(동기) — 분리기가 아직 없으면 원본 통과
+export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: number, h: number) {
+  if (!seg) return void out.drawImage(src, 0, 0, w, h)
+  const t0 = performance.now()
+  // 느린 기기 단계 — 사이 프레임은 분리를 건너뛰고 직전 마스크로 합성(마스크가 아직 없으면 분리)
+  if (!mask || frameNo++ % every === 0) segment(src, t0)
   // 사람 = 원본 ∩ 마스크(늘릴 때 보간으로 경계가 부드러워진다)
   const pctx = fit((person ??= canvas()), w, h)
   pctx.globalCompositeOperation = 'source-over'
@@ -210,6 +221,9 @@ export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: n
   }
   out.drawImage(person, 0, 0)
   if (watch(performance.now() - t0, t0)) {
+    every = slowerEvery(every)
+    watch = slowWatch() // 낮춘 단계는 새 창으로 다시 잰다
+    if (every) return
     void choose('none')
     autoOff.set('autoOff')
   }

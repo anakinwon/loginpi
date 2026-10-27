@@ -2,7 +2,8 @@
 export const BG = {
   order: 20, // 효과 순서 — 조명(10) 뒤. 조명이 합성된 배경까지 재면 어두운 배경(격자·노을)에서 사람이 1.8배로 과노출된다(rules.test)
   fpsMin: 15, // 처리 능력이 이 fps 미만으로
-  slowSec: 3, // 연속 이 초만큼 이어지면 자동 끔
+  slowSec: 3, // 연속 이 초만큼 이어지면 한 단계 낮추고(분리 간격 ×2), 가장 낮은 단계에서도 그러면 자동 끔
+  maxEvery: 2, // 분리 간격 상한 — 프레임 N장마다 1번 분리, 사이 프레임은 직전 마스크 재사용(30fps 카메라면 15회/초)
   inW: 256, // 사람 분리 입력 축소(landscape 모델 입력 256×144, REA mediapipe-05 alt_landscape)
   inH: 144,
   outW: 1280, // 배경 이미지는 고를 때 이 크기를 덮는 만큼만 남긴다(매 프레임 축소 비용·메모리)
@@ -36,9 +37,18 @@ export function slowWatch(min = BG.fpsMin, sec = BG.slowSec) {
   }
 }
 
-// 효과가 꺼졌는데 선택이 남아 있고 고르는 중도 아니면 = 파이프라인이 연속 실패로 끈 것(사용자 끔·실패는 choose 가 선택부터 '없음'으로 바꾼다)
-export const pipelineKilled = (on: boolean, choice: string, status: 'idle' | 'loading') =>
-  !on && status === 'idle' && choice !== 'none'
+// 느림 판정이 났을 때 다음 분리 간격 — 0 = 더 낮출 단계가 없음(자동 끔). 바로 끄면 가리던 방이 드러나므로 분리 횟수부터 줄인다
+export const slowerEvery = (every: number) => (every < BG.maxEvery ? every * 2 : 0)
+
+// bgOn 이 켬→끔으로 바뀌었는데 선택이 남아 있으면 = 파이프라인이 연속 실패로 끈 것(사용자 끔·실패는 choose 가 선택부터 '없음'으로 바꾼다).
+// 다른 배경을 고르는 중(loading)이어도 같다 — 저장소는 같은 값으로는 알리지 않아, 켬→끔 전환은 끔 경로 3곳(사용자·실패·파이프라인)뿐이다
+export const pipelineKilled = (on: boolean, choice: string) => !on && choice !== 'none'
+
+// 시트를 다시 열 때 목록 — 저장소 목록 + 이번 회의에만 둔 저장 실패분(unsaved). 다시 읽는다고 사라지면 쓰고 있는 이미지의 선택 표시·삭제가 없어진다
+export const withUnsaved = <T extends { id: string; unsaved?: boolean }>(db: readonly T[], prev: readonly T[]): T[] => [
+  ...prev.filter((x) => x.unsaved && !db.some((d) => d.id === x.id)),
+  ...db,
+]
 
 // 새 선택이 실패했을 때 돌아갈 선택 — 앞 배경이 켜져 있었으면 그대로 둔다('없음'으로 떨어지면 가리던 방이 상대에게 드러난다)
 export const failBack = (prev: string, prevOn: boolean) => (prevOn ? prev : 'none')
