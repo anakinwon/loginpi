@@ -19,6 +19,9 @@ export interface CalEvent {
 // 보는 사람의 시간대 — next-intl useFormatter 는 서버(배포본 = UTC) 시간대를 물려받으므로 화면 표시엔 이 값을 명시한다(E2E r2)
 export const viewerTz = () => Intl.DateTimeFormat().resolvedOptions().timeZone
 export const inViewerTz = <const T extends object>(o: T, tz = viewerTz()) => ({ ...o, timeZone: tz })
+// 남에게 보내는 글(메일 초대)의 일시 — 받는 사람은 다른 시간대일 수 있어 시간대 이름(GMT+9 등)을 붙인다.
+//  dateStyle·timeStyle 은 timeZoneName 과 같이 쓰면 RangeError 라 칸별로 적는다
+export const ZONED = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' } as const
 
 // 2026-10-27T05:00:00.000Z → 20261027T050000Z (UTC 기본형)
 export const utcStamp = (d: Date) =>

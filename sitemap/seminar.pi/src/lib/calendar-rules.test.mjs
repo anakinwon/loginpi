@@ -11,6 +11,7 @@ import {
   inViewerTz,
   mailtoUrl,
   utcStamp,
+  ZONED,
   viewerTz,
   webMailUrl,
 } from './calendar-rules.ts'
@@ -120,4 +121,15 @@ test('보는 사람 시간대 — 서버 UTC 와 무관하게 KST 로 표시', (
   assert.match(s, /1:21/) // 오전/AM 표기는 ICU 데이터마다 다름
   // 기본값 = 실행 환경 시간대(브라우저에선 사용자 시간대)
   assert.equal(inViewerTz({}).timeZone, viewerTz())
+})
+
+// 보강 r3 : 메일 초대 본문 일시에 시간대 이름 — 다른 시간대 받는 사람이 오독하지 않게(dateStyle 혼용 RangeError 없음)
+test('메일 일시 — 시간대 이름 포함', () => {
+  const d = new Date('2026-10-27T16:21:00.000Z')
+  const ko = new Intl.DateTimeFormat('ko', inViewerTz(ZONED, 'Asia/Seoul')).format(d)
+  assert.match(ko, /28/)
+  assert.match(ko, /GMT\+9|KST/)
+  const en = new Intl.DateTimeFormat('en', inViewerTz(ZONED, 'America/New_York')).format(d)
+  assert.match(en, /Oct 27/)
+  assert.match(en, /EDT|GMT-4/)
 })
