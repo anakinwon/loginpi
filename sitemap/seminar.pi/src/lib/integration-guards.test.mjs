@@ -52,3 +52,60 @@ test('④ 일반 fetch(\'/api/…) 는 허용 목록만 — 나머지는 piFetch
   )
   assert.deepEqual(hits.filter((h) => !ALLOW.has(h)), [])
 })
+
+test('⑤ 외부 AI 를 부르는 라우트는 모두 speechGate 를 거치고, 사용 판정 RPC 는 관문 한 곳에만 있다(필수 과제 ③)', () => {
+  const routes = srcFiles.filter((p) => rel(p).startsWith('src/app/api/'))
+  // gemini 의 transcribe·translate·tts 를 가져오는 라우트 = 계량 대상
+  const aiRoutes = routes.filter((p) =>
+    /import \{[^}]*\b(transcribe|translate|tts)\b[^}]*\} from '@\/lib\/gemini'/.test(readFileSync(p, 'utf8')),
+  )
+  assert.deepEqual(aiRoutes.map(rel).sort(), [
+    'src/app/api/speech/chunk/route.ts',
+    'src/app/api/speech/translate/route.ts',
+    'src/app/api/speech/tts/route.ts',
+  ])
+  const kinds = { chunk: 'VC', translate: 'TRANS', tts: 'TTS' }
+  for (const p of aiRoutes) {
+    const k = kinds[rel(p).split('/')[4]]
+    assert.match(readFileSync(p, 'utf8'), new RegExp(`await speechGate\\([^;]*'${k}'`), `${rel(p)} 에 speechGate ${k} 없음`)
+  }
+  const direct = srcFiles.filter(
+    (p) => !rel(p).endsWith('lib/speech-gate.ts') && /rpc\(\s*'fn_use_smn_(ai|vc)'/.test(readFileSync(p, 'utf8')),
+  )
+  assert.deepEqual(direct.map(rel), [], '관문 밖에서 사용 판정 RPC 직접 호출')
+  // 회의록 요약(summarize)은 lib/notes 만 부르고, 요약 라우트는 manage(시작자·개최자·ADMIN) 확인
+  const sum = srcFiles.filter((p) => /\bsummarize\(/.test(readFileSync(p, 'utf8')) && !rel(p).endsWith('lib/gemini.ts'))
+  assert.deepEqual(sum.map(rel), ['src/lib/notes.ts'])
+  assert.match(read('src/app/api/notes/[id]/end/route.ts'), /if \(!n\.manage\) return apiError\('FORBIDDEN', 403\)/)
+})
+
+test('⑥ 녹화·AI 기록 배지·토스트는 공용 자리에 portal 로 붙는다 — 같은 absolute 좌표로 겹치지 않게(15.6)', () => {
+  const view = read('src/components/room/room-view.tsx')
+  assert.match(view, /id=\{BADGE_SLOT_ID\}[\s\S]*flex-wrap/)
+  assert.match(view, /id=\{TOAST_SLOT_ID\}[\s\S]*flex-col/)
+  // 슬롯은 오버레이보다 먼저 그린다(오버레이 마운트 때 getElementById 로 찾는다)
+  assert.ok(view.indexOf('id={TOAST_SLOT_ID}') < view.indexOf('f.Overlay &&'))
+  for (const f of ['recording', 'notes']) {
+    const s = read(`src/components/room/features/${f}/index.tsx`)
+    assert.match(s, /useStageSlot\(BADGE_SLOT_ID\)/, f)
+    assert.match(s, /useStageSlot\(TOAST_SLOT_ID\)/, f)
+    assert.doesNotMatch(s, /absolute top-\[calc\(12px|absolute top-12 /, `${f} 에 배지·토스트 고정 좌표 잔존`)
+  }
+  // 무대 고정 해제 버튼은 배지 줄(좌상단)과 다른 자리
+  assert.doesNotMatch(read('src/components/room/stage.tsx'), /absolute top-2 left-2/)
+})
+
+test('⑦ 부가 기능의 ⋯ 항목·탭 이름 키와 useTranslations 이름공간이 ko·en 모두 있다(빠지면 화면에 키가 그대로 보인다)', () => {
+  const feat = srcFiles.filter((p) => rel(p).startsWith('src/components/room/features/'))
+  const msgs = Object.fromEntries(['ko', 'en'].map((l) => [l, JSON.parse(read(`messages/${l}.json`))]))
+  const at = (o, path) => path.split('.').reduce((x, k) => (x && typeof x === 'object' ? x[k] : undefined), o)
+  const need = new Set()
+  for (const p of feat) {
+    const s = readFileSync(p, 'utf8')
+    for (const m of s.matchAll(/\blabel: '([\w.]+)'/g)) need.add(`room.${m[1]}`)
+    for (const m of s.matchAll(/useTranslations\('([\w.]+)'\)/g)) need.add(m[1])
+  }
+  assert.ok(need.size >= 10, `키 수집 실패 : ${need.size}`)
+  const miss = [...need].flatMap((k) => ['ko', 'en'].filter((l) => at(msgs[l], k) === undefined).map((l) => `${l}:${k}`))
+  assert.deepEqual(miss, [])
+})

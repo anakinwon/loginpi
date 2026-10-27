@@ -224,14 +224,14 @@ export function Stage(props: StageProps) {
   return (
     <div className="relative">
       {live && props.onPin && pin.pin && (
-        // 발표자 전용 — 고정을 풀고 청중 화면도 자동 배치로(room.setLayout mode auto). v1.2 검토 지적 : 되돌릴 길이 없었음
+        // 발표자 전용 — 고정을 풀고 청중 화면도 자동 배치로(room.setLayout mode auto). 우상단 = 좌상단 녹화·AI 기록 배지 줄(15.6)과 겹치지 않게. v1.2 검토 지적 : 되돌릴 길이 없었음
         <button
           type="button"
           onClick={() => {
             setPin((p) => ({ ...p, pin: null, prev: null }))
             props.onPin?.(null)
           }}
-          className="bg-surface/80 absolute top-2 left-2 z-10 rounded-full px-3 py-1 text-xs font-semibold"
+          className="bg-surface/80 absolute top-2 right-2 z-20 rounded-full px-3 py-1 text-xs font-semibold"
         >
           {t('tile.unpin')}
         </button>

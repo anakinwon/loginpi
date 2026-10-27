@@ -6,11 +6,15 @@
 //  끄기 : state {notes:false} → POST /api/notes/[id]/end(요약, 기다리지 않음). 늦게 들어온 사람에겐 발표자가 참가자 수가 늘 때 1초 묶어 다시 방송(SIGNAL_API 3.6).
 //  엔진 app 미지원이면 항목을 숨긴다(app:true — 전원 고지를 못 하면 시작하지 않는다 15.1). 호출은 전부 piFetch(Pi Browser 쿠키 없음)
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { Icon } from '../../control-bar'
 import {
+  BADGE_SLOT_ID,
+  TOAST_SLOT_ID,
   featureStore,
+  useStageSlot,
   useStore,
   wantSpeech,
   type RoomCtx,
@@ -142,6 +146,8 @@ function NotesOverlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const mine = useStore(on)
   const ntId = useStore(ntIdStore)
   const shown = useStore(roomOn) || mine
+  const slot = useStageSlot(BADGE_SLOT_ID)
+  const toastSlot = useStageSlot(TOAST_SLOT_ID)
   const [toast, setToast] = useState<string | null>(null)
   const prev = useRef(shown)
   const isPresenter = ctx.role === 'presenter'
@@ -210,19 +216,17 @@ function NotesOverlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
 
   return (
     <>
-      {shown && (
-        <div
-          role="status"
-          className="bg-accent pointer-events-none absolute top-[calc(12px+env(safe-area-inset-top))] left-3 z-10 inline-flex h-6 items-center rounded-full px-3 text-[13px] text-white"
-        >
-          {t('badge')}
-        </div>
-      )}
-      {toast && (
-        <div className="bg-surface-raised pointer-events-none absolute top-12 left-1/2 z-10 -translate-x-1/2 rounded-lg px-3 py-2 text-sm shadow">
-          {toast}
-        </div>
-      )}
+      {shown &&
+        slot &&
+        createPortal(
+          <div role="status" className="bg-accent inline-flex h-6 items-center rounded-full px-3 text-[13px] text-white">
+            {t('badge')}
+          </div>,
+          slot,
+        )}
+      {toast &&
+        toastSlot &&
+        createPortal(<div className="bg-surface-raised rounded-lg px-3 py-2 text-sm shadow">{toast}</div>, toastSlot)}
     </>
   )
 }

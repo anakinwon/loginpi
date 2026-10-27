@@ -6,8 +6,9 @@
 // d 약속 : { recording: boolean } — 같은 state 주제의 다른 키(AI 기록 등)는 이 기능이 무시한다(rules.ts readRecording·applyRec)
 // 저장이 막히는 곳(앱 안 브라우저 등)을 위해 마지막 녹화 파일을 다음 녹화·퇴장·닫기 전까지 들고 [다시 저장](파일 공유 → 내려받기)을 띄운다
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
-import { featureStore, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
+import { BADGE_SLOT_ID, TOAST_SLOT_ID, featureStore, useStageSlot, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 import { APP_RETRY, sendRetry } from '../../app-retry'
 import type { Recorder } from './recorder'
 import { applyRec, othersRecording, recFileName, saveVia, type RecBy } from './rules'
@@ -134,6 +135,8 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const anchor = useRef<HTMLSpanElement>(null)
   const dialog = useRef<HTMLDialogElement>(null)
   const mine = useStore(recOn)
+  const slot = useStageSlot(BADGE_SLOT_ID)
+  const toastSlot = useStageSlot(TOAST_SLOT_ID)
   const since = useStore(startedAt)
   const open = useStore(confirmOpen)
   const isBusy = useStore(busy)
@@ -213,16 +216,19 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   return (
     <>
       <span ref={anchor} hidden />
-      {(mine || others) && (
-        <div
-          role="status"
-          className="bg-danger pointer-events-none absolute top-[calc(12px+env(safe-area-inset-top))] left-3 z-10 inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-semibold text-white"
-        >
-          <span aria-hidden className="size-2 animate-pulse rounded-full bg-white" />
-          {t('badge')}
-          {mine && since > 0 && <span className="tabular-nums">{mmss(now - since)}</span>}
-        </div>
-      )}
+      {(mine || others) &&
+        slot &&
+        createPortal(
+          <div
+            role="status"
+            className="bg-danger inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-semibold text-white"
+          >
+            <span aria-hidden className="size-2 animate-pulse rounded-full bg-white" />
+            {t('badge')}
+            {mine && since > 0 && <span className="tabular-nums">{mmss(now - since)}</span>}
+          </div>,
+          slot,
+        )}
       {canResave && !mine && (
         <div
           role="group"
@@ -243,14 +249,14 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
           </button>
         </div>
       )}
-      {msg && (
-        <div
-          aria-hidden
-          className="bg-surface-raised pointer-events-none absolute top-12 left-1/2 z-10 max-w-[92%] -translate-x-1/2 rounded-xl px-4 py-2 text-sm shadow"
-        >
-          {t(`toast.${msg}`)}
-        </div>
-      )}
+      {msg &&
+        toastSlot &&
+        createPortal(
+          <div aria-hidden className="bg-surface-raised max-w-[92%] rounded-xl px-4 py-2 text-sm shadow">
+            {t(`toast.${msg}`)}
+          </div>,
+          toastSlot,
+        )}
       <dialog
         ref={dialog}
         aria-labelledby="rec-title"
