@@ -12,8 +12,9 @@ import { featureStore, remoteVolume, useStore, type RoomCtx, type RoomFeature } 
 import { SwitchRow } from '../sheet'
 import { parseCaption } from '../captions/caption-rules'
 import { translateCaption } from '../captions/translate'
+import { sameLang } from '@/lib/translate-rules'
 import { isUuid } from '@/lib/seminar-rules'
-import { DUB_DUCK, dubRate, pushDub } from '@/lib/speech-rules'
+import { DUB_DUCK, dubRate, once, pushDub } from '@/lib/speech-rules'
 
 export const dubOn = featureStore(false)
 const dubLang = featureStore('') // 듣는 언어('' = 원문 → 더빙 없음). 자막 시트 언어 선택을 DubRow 가 옮겨 담는다
@@ -99,13 +100,14 @@ async function pump() {
   const a = el
   const url = URL.createObjectURL(blob)
   curUrl = url
-  const end = () => {
+  // 디코드 실패면 onerror 와 play() 거부가 둘 다 온다 — 두 번째가 다음 문장 핸들러를 지우지 않게 1회만
+  const end = once(() => {
     if (g !== gen) return
     a.onended = a.onerror = a.onloadedmetadata = null
     URL.revokeObjectURL(url)
     curUrl = null
     done()
-  }
+  })
   a.onloadedmetadata = () => {
     a.playbackRate = dubRate(a.duration)
   }
@@ -117,7 +119,8 @@ async function pump() {
 
 function enqueue(ctx: RoomCtx, text: string, src: string) {
   const lang = dubLang.get()
-  if (!dubOn.get() || !lang || !isUuid(ctx.seminarId)) return
+  // 발표자 언어 = 듣는 언어면 원음 그대로(합성 과금·횟수 낭비 방지)
+  if (!dubOn.get() || !lang || sameLang(src, lang) || !isUuid(ctx.seminarId)) return
   const ac = new AbortController()
   // 번역은 자막 화면(SA8)과 같은 translateCaption — 같은 문장·언어는 번역 요청 1회(A-3). 서버는 받은 글을 그대로 읽기만 한다
   const audio = translateCaption(text, src, lang, ctx.seminarId)

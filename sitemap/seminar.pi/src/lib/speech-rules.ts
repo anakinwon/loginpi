@@ -142,7 +142,7 @@ export function paceStyle(rate: number) {
 }
 
 // ── 음성 번역 듣기(더빙, SA9 — M-3 표준 합성 음성) ──
-// 사용자당 분당 합성 음성 요청(캐시 적중 포함) — 발표자 1명 5초 조각이면 정상 12회, 패널 2명이 동시에 말해도 여유
+// 사용자당 분당 합성 음성 요청(캐시 적중 포함, translate-rules hitRate 로 셈) — 발표자 1명 5초 조각이면 정상 12회, 패널 2명이 동시에 말해도 여유
 export const TTS_REQ_PER_MIN = 30
 // 재생 큐 — 재생 대기가 이만큼을 넘으면 가장 오래된 것을 버린다(늦은 더빙은 원음과 어긋나 쓸모없음)
 export const DUB_QUEUE_MAX = 3
@@ -152,19 +152,14 @@ export const DUB_RATE_MAX = 1.5
 // 더빙을 켠 동안 원음 볼륨(설계서 15.4 — 20%)
 export const DUB_DUCK = 0.2
 
-// 분당 요청 창(슬라이딩 1분) — 통과면 기록하고 true. hits 는 호출부의 모듈 Map
-export function rateOk(
-  hits: Map<string, number[]>,
-  key: string,
-  now: number,
-  max: number,
-) {
-  const recent = (hits.get(key) ?? []).filter((t) => now - t < 60_000)
-  const ok = recent.length < max
-  if (ok) recent.push(now)
-  if (recent.length) hits.set(key, recent)
-  else hits.delete(key)
-  return ok
+// 한 번만 실행 — 재생 끝(onended·onerror·play() 거부)이 한 문장에 겹쳐 와도 다음 문장으로 1번만 넘어가게
+export function once(f: () => void) {
+  let fin = false
+  return () => {
+    if (fin) return
+    fin = true
+    f()
+  }
 }
 
 // 재생 속도 = 합성 음성 길이 ÷ 원문 발화 길이, 0.8~1.5 로 묶음. 원문 길이 = 자막 1개 = 음성 조각 1개(CHUNK_MS)
