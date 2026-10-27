@@ -42,6 +42,7 @@ test('내 이미지 검사 — 2MB 초과·이미지 아님 거부', () => {
   assert.equal(checkMine('image/png', BG.myBytes), null)
   assert.equal(checkMine('image/png', BG.myBytes + 1), 'myTooBig')
   assert.equal(checkMine('text/plain', 10), 'bgFailed')
+  assert.equal(checkMine('image/svg+xml', 10), 'bgFailed')
 })
 
 test('내 이미지 상한 3장 — 넘치면 오래된 것부터', () => {

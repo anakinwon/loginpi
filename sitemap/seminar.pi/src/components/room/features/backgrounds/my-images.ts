@@ -38,8 +38,8 @@ export async function listMine(): Promise<MyImage[]> {
   return all.sort((a, b) => b.ts - a.ts) // 최신 먼저
 }
 
-export async function addMine(blob: Blob): Promise<MyImage> {
-  const img = { id: crypto.randomUUID(), ts: Date.now(), blob }
+export async function addMine(blob: Blob, id = crypto.randomUUID()): Promise<MyImage> {
+  const img = { id, ts: Date.now(), blob }
   await tx('readwrite', (s) => void s.put(img))
   const drop = overflowIds(await listMine())
   if (drop.length) await tx('readwrite', (s) => drop.forEach((id) => s.delete(id)))

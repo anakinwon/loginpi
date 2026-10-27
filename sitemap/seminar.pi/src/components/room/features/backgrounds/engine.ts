@@ -34,13 +34,16 @@ function blockTelemetry() {
   }
 }
 
+// wasm 경로 버전 — 장기 캐시(immutable, next.config)라 버전이 바뀌면 경로도 바뀌어야 한다. package.json 과 다르면 copy-mediapipe 가 빌드를 막는다
+const MP_VER = '1.1.1'
+
 let seg: ImageSegmenter | null = null
 let loading: Promise<ImageSegmenter> | null = null
 function loadSegmenter(): Promise<ImageSegmenter> {
   return (loading ??= (async () => {
     blockTelemetry()
     const { FilesetResolver, ImageSegmenter } = await import('@mediapipe/tasks-vision') // 처음 고를 때만(첫 화면 JS 예산, 설계 15.15)
-    const files = await FilesetResolver.forVisionTasks('/mediapipe/wasm') // basePath 필수(생략하면 사이트 루트를 찾음)
+    const files = await FilesetResolver.forVisionTasks(`/mediapipe/wasm/${MP_VER}`) // basePath 필수(생략하면 사이트 루트를 찾음)
     seg = await ImageSegmenter.createFromOptions(files, {
       baseOptions: { modelAssetPath: '/mediapipe/models/selfie_segmenter_landscape.tflite', delegate: 'CPU' },
       runningMode: 'VIDEO',
@@ -54,9 +57,39 @@ function loadSegmenter(): Promise<ImageSegmenter> {
   }))
 }
 
-let backdrop: CanvasImageSource | null = null
-let backdropSize = { w: 1, h: 1 }
+let backdrop: HTMLCanvasElement | null = null
+const canvas = () => document.createElement('canvas')
 let pick = 0 // 고르는 중 다른 것을 고르면 앞 결과를 버린다
+
+// 배경을 고를 때 1번만 출력 크기 근처(1280×720 을 덮는 크기)로 래스터해 둔다 — 매 프레임 대형 비트맵 축소·SVG 래스터 비용을 없앤다
+async function toBackdrop(next: string, blob?: Blob): Promise<HTMLCanvasElement> {
+  let src: CanvasImageSource
+  let sw: number
+  let sh: number
+  let bmp: ImageBitmap | null = null
+  if (blob) {
+    bmp = await createImageBitmap(blob) // 못 읽는 형식(HEIC 등)은 여기서 실패 → bgFailed
+    src = bmp
+    sw = bmp.width
+    sh = bmp.height
+  } else {
+    const el = new Image()
+    el.src = `/backgrounds/${next.slice(2)}.svg`
+    await el.decode()
+    src = el
+    sw = el.naturalWidth || 1280
+    sh = el.naturalHeight || 720
+  }
+  const k = Math.min(1, Math.max(BG.outW / sw, BG.outH / sh)) // 키우지는 않는다
+  const c = canvas()
+  c.width = Math.max(1, Math.round(sw * k))
+  c.height = Math.max(1, Math.round(sh * k))
+  const x = c.getContext('2d')!
+  x.imageSmoothingQuality = 'medium'
+  x.drawImage(src, 0, 0, c.width, c.height)
+  bmp?.close() // 원본 해상도 비트맵(수십 MB 가능)은 바로 놓는다
+  return c
+}
 
 // 배경 고르기 — 반환 = 오류 문구 키(room.effects.*) 또는 null. blob = 내 이미지일 때
 export async function choose(next: string, blob?: Blob): Promise<string | null> {
@@ -71,25 +104,10 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
   choice.set(next)
   status.set('loading')
   try {
-    let img: CanvasImageSource | null = null
-    let size = { w: 1, h: 1 }
-    if (next.startsWith('p:') || blob) {
-      if (blob) {
-        const b = await createImageBitmap(blob)
-        img = b
-        size = { w: b.width, h: b.height }
-      } else {
-        const el = new Image()
-        el.src = `/backgrounds/${next.slice(2)}.svg`
-        await el.decode()
-        img = el
-        size = { w: el.naturalWidth || 1280, h: el.naturalHeight || 720 }
-      }
-    }
+    const img = next.startsWith('p:') || blob ? await toBackdrop(next, blob) : null
     await loadSegmenter()
     if (my !== pick) return null
     backdrop = img
-    backdropSize = size
     watch = slowWatch()
     status.set('idle')
     bgOn.set(true)
@@ -108,7 +126,6 @@ bgOn.sub(() => {
   if (!bgOn.get() && status.get() === 'idle' && choice.get() !== 'none') choice.set('none')
 })
 
-const canvas = () => document.createElement('canvas')
 let small: HTMLCanvasElement | null = null // 분리 입력(축소)
 let mask: HTMLCanvasElement | null = null // 사람 마스크(알파 = 사람일 확률)
 let person: HTMLCanvasElement | null = null // 오려 낸 사람
@@ -153,7 +170,7 @@ export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: n
   }
   // 배경 — 이미지면 꽉 채움, 아니면 흐림(줄였다 늘리기 : ctx.filter 없는 브라우저도 같게)
   if (backdrop) {
-    const r = coverRect(backdropSize.w, backdropSize.h, w, h)
+    const r = coverRect(backdrop.width, backdrop.height, w, h)
     out.drawImage(backdrop, r.x, r.y, r.w, r.h)
   } else {
     const tw = Math.max(1, Math.round(w / BG.blurDiv))

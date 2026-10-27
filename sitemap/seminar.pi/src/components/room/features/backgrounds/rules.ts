@@ -4,6 +4,8 @@ export const BG = {
   slowSec: 3, // 연속 이 초만큼 이어지면 자동 끔
   inW: 256, // 사람 분리 입력 축소(landscape 모델 입력 256×144, REA mediapipe-05 alt_landscape)
   inH: 144,
+  outW: 1280, // 배경 이미지는 고를 때 이 크기를 덮는 만큼만 남긴다(매 프레임 축소 비용·메모리)
+  outH: 720,
   blurDiv: 24, // 흐림 = 1/24 로 줄였다 늘리기(ctx.filter 미지원 브라우저도 같은 결과)
   myMax: 3, // 내 이미지 최대 장수
   myBytes: 2 * 1024 * 1024, // 장당 상한
@@ -42,7 +44,7 @@ export function coverRect(sw: number, sh: number, w: number, h: number) {
 
 // 내 이미지 파일 검사 — 반환 = 오류 문구 키(room.effects.*) 또는 null
 export function checkMine(type: string, size: number): string | null {
-  if (!type.startsWith('image/')) return 'bgFailed'
+  if (!type.startsWith('image/') || type === 'image/svg+xml') return 'bgFailed' // SVG 는 크기 없는 파일이 많아 디코드가 들쭉날쭉
   return size > BG.myBytes ? 'myTooBig' : null
 }
 

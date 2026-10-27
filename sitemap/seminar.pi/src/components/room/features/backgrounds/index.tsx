@@ -68,11 +68,16 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
     if (!f) return
     const bad = checkMine(f.type, f.size)
     if (bad) return setErr(bad)
+    // 먼저 적용(디코드)해 보고 성공한 것만 저장 — 못 읽는 형식이 깨진 썸네일로 상한 슬롯을 차지하지 않게.
+    // 새 이미지가 가장 최신이라 상한 초과로 지워지는 것은 늘 지금 선택이 아니다
+    setErr(null)
+    const id = crypto.randomUUID()
+    const e = await choose(`m:${id}`, f)
+    if (e) return setErr(e)
     try {
-      const m = await addMine(f)
+      await addMine(f, id)
       const l = await listMine()
       setMine(l.map((x) => ({ ...x, url: URL.createObjectURL(x.blob) })))
-      await pickIt(`m:${m.id}`, f)
     } catch {
       setErr('bgFailed')
     }
@@ -92,7 +97,7 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
         type="button"
         aria-pressed={sel}
         aria-label={label}
-        disabled={busy && !sel}
+        disabled={busy && !sel && id !== 'none'} // '없음'은 모델을 받는 중에도 눌러 취소할 수 있게(choose 의 pick 토큰)
         onClick={() => void pickIt(id, blob)}
         className={`${tile} bg-surface-raised ${sel ? 'border-accent' : 'border-transparent'}`}
         style={img ? { backgroundImage: `url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}

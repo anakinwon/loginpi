@@ -1,0 +1,5 @@
+selfie_segmenter_landscape.tflite
+출처 : https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter_landscape/float16/latest/selfie_segmenter_landscape.tflite
+(MediaPipe Selfie Segmentation 모델 — 모델 카드 : https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter#selfie-model)
+라이선스 : Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
+용도 : seminar.pi 배경 효과 사람 분리(자체 호스팅, src/components/room/features/backgrounds/engine.ts)
