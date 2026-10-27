@@ -9,6 +9,7 @@ import {
   lockedFor,
   modActions,
   peerMedia,
+  presenterHere,
   ringFor,
   isBadGrade,
   layerFor,
@@ -408,4 +409,10 @@ test('동의 서버·기기 맞추기', () => {
   assert.equal(consentPlan({ agreed: false, stored: false }, false), 'ask')
   assert.equal(consentPlan(null, true), 'mark') // 네트워크·오류
   assert.equal(consentPlan(null, false), 'ask')
+})
+
+test('발표자가 방에 있을 때만 panel 음성 처리(자막·AI 회의록) — 발표자가 끊김 신호 없이 사라지면 멈춘다', () => {
+  assert.equal(presenterHere([{ role: 'presenter' }, { role: 'panel' }]), true)
+  assert.equal(presenterHere([{ role: 'panel' }, { role: 'audience' }]), false)
+  assert.equal(presenterHere([]), false)
 })

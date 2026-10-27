@@ -15,10 +15,10 @@ import { featureStore, speechWants, useStore, wantSpeech, type RoomCtx, type Roo
 import { DubRow } from '../dubbing'
 import { Sheet, SwitchRow } from '../sheet'
 import { isTranslateLang, TRANSLATE_LANGS } from '@/lib/translate-rules'
-import { CAPTION, captionsState, parseCaption } from './caption-rules'
+import { presenterHere } from '../../room-rules'
+import { CAPTION, captionsState, parseCaption, SIZES, stepSize, type Size } from './caption-rules'
 import { useTranslated } from './translate'
 
-type Size = 'sm' | 'md' | 'lg'
 const SCALE: Record<Size, number> = { sm: 0.85, md: 1, lg: 1.25 }
 const PREF_KEY = 'seminar.captions' // 개인 설정(보기·크기) — 다음 입장에도 유지
 
@@ -116,6 +116,12 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
     wantSpeech('captions', room && ctx.role !== 'audience' ? 'caption' : null)
   }, [room, ctx.role])
 
+  // 발표자가 끊김 신호 없이 나가면(창 닫힘·망 단절) 방 자막을 내린다 — 끌 사람이 없다. 다시 들어오면 발표자가 현재 값을 방송한다
+  const here = presenterHere(ctx.r.peers)
+  useEffect(() => {
+    if (!presenter && ctx.r.selfId && !here) capRoom.set(false)
+  }, [presenter, here, ctx.r.selfId])
+
   // presenter 입장·재입장 — 자기 현재 값을 1번 방송(꺼져 있으면 false 로 panel 을 맞춘다)
   const sendRef = useRef(ctx.sendApp)
   useEffect(() => {
@@ -148,12 +154,13 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
     [presenter, room],
   )
 
-  // 음성 처리 한도 소진 — presenter 가 방 자막을 끄고 전원에게 사유와 함께 방송(받는 쪽 알림은 onApp)
+  // 음성 처리 한도 소진 — 방 자막을 내리고 내 화면에 알린다. presenter 면 전원에게 사유와 함께 방송(받는 쪽 알림은 onApp).
+  // panel 이 먼저 한도에 닿아도(세미나 단위 한도) 자기 자막이 멈췄음을 안다 — state 는 presenter 만 보낼 수 있어 방송은 없다
   useEffect(() => {
-    if (!ctx.speechLimited || !presenter || !capRoom.get()) return
-    capRoom.set(false)
+    if (!ctx.speechLimited || !capRoom.get()) return
+    capRoom.set(false) // panel 도 내린다 — 뒤이어 오는 presenter 의 limit 방송으로 같은 알림이 두 번 뜨지 않게(onApp 은 켜져 있을 때만 알림)
     ctx.notice('captions.limit')
-    void sendRef.current('state', { captions: false, captionsReason: 'limit' })
+    if (presenter) void sendRef.current('state', { captions: false, captionsReason: 'limit' })
   }, [ctx.speechLimited]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -204,13 +211,24 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
         )}
         <div role="radiogroup" aria-label={t('size.label')} className="flex items-center justify-between gap-3">
           <span>{t('size.label')}</span>
-          <div className="bg-surface-raised flex rounded-full p-0.5">
-            {(['sm', 'md', 'lg'] as const).map((s) => (
+          {/* 라디오 그룹 키보드(WAI-ARIA) — Tab 은 고른 것 1개에만 서고, 화살표·Home·End 로 바꾸며 초점도 따라간다 */}
+          <div
+            className="bg-surface-raised flex rounded-full p-0.5"
+            onKeyDown={(e) => {
+              const next = stepSize(size, e.key)
+              if (!next) return
+              e.preventDefault()
+              capSize.set(next)
+              e.currentTarget.querySelectorAll('button')[SIZES.indexOf(next)]?.focus()
+            }}
+          >
+            {SIZES.map((s) => (
               <button
                 key={s}
                 type="button"
                 role="radio"
                 aria-checked={size === s}
+                tabIndex={size === s ? 0 : -1}
                 onClick={() => capSize.set(s)}
                 className={`h-9 rounded-full px-3 ${size === s ? 'bg-accent text-white' : ''}`}
               >

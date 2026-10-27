@@ -130,6 +130,10 @@ export function visibleExtras<T extends { roles: readonly PeerRole[]; app?: bool
 export type PeerRole = 'presenter' | 'panel' | 'audience'
 export type PeerLike = { peerId: string; name: string; role: PeerRole; raisedTs: number }
 
+// 발표자가 방에 있다 — 자막·AI 회의록처럼 발표자 state 로 켜진 panel 음성 처리는 발표자가 있을 때만 돈다.
+// 발표자가 끊김 신호 없이 나가면(창 닫힘·망 단절) 끌 사람이 없어 panel 음성이 세미나 한도를 계속 쓰기 때문(R-P5)
+export const presenterHere = (peers: readonly Pick<PeerLike, 'role'>[]) => peers.some((p) => p.role === 'presenter')
+
 // 하단 바 버튼 우선순위(설계서 14.3 표) — 앞에서부터 메인 슬롯을 채운다. 가장 좁은 폭(≤370)의 청중은 반응보다 채팅이 앞
 // (표의 "손들기·채팅"). 화질(M4)은 청중 맨 뒤 — 폭 > 565 에서 메인 5칸째, 그 아래는 더보기(넘친 것이 1개뿐이면 바로 노출)
 export type BarId = 'audio' | 'video' | 'screen' | 'chat' | 'people' | 'hands' | 'hand' | 'react' | 'quality'
