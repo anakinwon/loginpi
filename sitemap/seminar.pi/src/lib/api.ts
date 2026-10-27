@@ -49,6 +49,10 @@ export const apiError = createApiError({
   SPEECH_RATE: '음성 요청이 너무 잦습니다. 잠시 후 다시 시도하세요',
   SPEECH_QUOTA: '이 세미나의 음성 처리 시간이 모두 소진되었습니다',
   SPEECH_FAILED: '음성을 글로 바꾸지 못했습니다',
+  // AI 회의록(api/notes/*, src/lib/note-rules.ts)
+  NOTE_NOT_RECORDING: '기록 중인 회의록이 아닙니다',
+  NOTE_SHOT_INVALID: '화면 캡처 형식이 올바르지 않습니다',
+  NOTE_SHOT_RATE: '화면 캡처가 너무 잦습니다',
 })
 
 export const db = () => getSupabaseAdmin()

@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl'
 import { piFetch, usePiAuth } from '@pi/auth/client'
 import { useAppUser } from '@/components/google-auth'
 import { LoginGate } from '@/components/login-gate'
+import { NoteLink } from '@/components/notes/note-view'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
 import { formatFee } from '@/lib/seminar-rules'
@@ -104,6 +105,7 @@ export function SeminarDetail({ id }: { id: string }) {
           {() => <Action d={d} fee={fee} onChanged={() => setReload((n) => n + 1)} />}
         </LoginGate>
       )}
+      {userId && <NoteLink smnId={d.id} />}
     </article>
   )
 }
