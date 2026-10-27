@@ -8,7 +8,7 @@ import {
   forbiddenResponse,
   getClientIp,
   isMaliciousAgent,
-  rateLimitedResponse,
+  rateLimitedPageResponse,
 } from '@pi/guard'
 import { routing } from './i18n/routing'
 
@@ -33,7 +33,7 @@ export default function proxy(req: NextRequest) {
   // 개발 환경은 HMR·반복 새로고침이 단일 IP에 몰리므로 차단 우회
   const rl = checkRateLimit(getClientIp(req), 'PAGE')
   if (process.env.NODE_ENV !== 'development' && !rl.allowed) {
-    return rateLimitedResponse(rl.retryAfter)
+    return rateLimitedPageResponse(rl.retryAfter, req.nextUrl.pathname)
   }
   const res = intlMiddleware(req)
   applySecurityHeaders(res)
