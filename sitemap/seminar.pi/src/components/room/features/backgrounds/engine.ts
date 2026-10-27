@@ -5,6 +5,7 @@
 // 사용 지표를 odml.pa.googleapis.com 로 보내며 끄는 옵션이 없음(1회 실패면 주기 전송 중단). 코드는 옮기지 않았다(S-2)
 import type { ImageSegmenter } from '@mediapipe/tasks-vision'
 import { featureStore } from '../../extensions'
+import { SCENES, SH, SW, type Scene, type SceneId } from './scenes'
 import { afterDelete, BG, coverRect, dropShown, edgeAlpha, failBack, keepShown, nextTs, pipelineKilled, slowerEvery, slowWatch } from './rules'
 
 // 선택 — none · blur · p:<프리셋> · m:<내 이미지 id>
@@ -66,6 +67,8 @@ function loadSegmenter(): Promise<ImageSegmenter> {
 }
 
 let backdrop: HTMLCanvasElement | null = null
+let anim: Scene | null = null // 움직이는 배경(a:<장면>) — backdrop 캔버스(SW×SH)에 animMs 마다 다시 그린다
+let animAt = 0
 const canvas = () => document.createElement('canvas')
 let shown = 'none' // 지금 실제로 그리는 선택(성공한 마지막 선택) — 고르는 중인 choice 와 다를 수 있다
 let pick = 0 // 고르는 중 다른 것을 고르면 앞 결과를 버린다
@@ -127,10 +130,18 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
   choice.set(next)
   status.set('loading')
   try {
+    const scene = next.startsWith('a:') ? (SCENES[next.slice(2) as SceneId] ?? null) : null
+    if (next.startsWith('a:') && !scene) throw new Error('scene')
     const img = next.startsWith('p:') || blob ? await toBackdrop(next, blob) : null
     await loadSegmenter()
     if (my !== pick) return null
-    backdrop = img
+    anim = scene
+    animAt = 0
+    if (scene) {
+      backdrop = canvas()
+      backdrop.width = SW
+      backdrop.height = SH
+    } else backdrop = img
     shown = next
     watch = slowWatch()
     every = 1
@@ -187,6 +198,7 @@ let fittedFor: HTMLCanvasElement | null = null
 
 // 끔 — 프레임 크기 캔버스·배경을 놓는다(모바일 메모리). 분리기 인스턴스는 남긴다(다시 켤 때 wasm·모델 재로딩 없음)
 function release() {
+  anim = null
   backdrop = fitted = fittedFor = small = mask = person = tiny = null
   maskData = null
 }
@@ -246,6 +258,11 @@ export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: n
     pctx.drawImage(mask, 0, 0, w, h)
   }
   // 배경 — 이미지면 꽉 채움, 아니면 흐림(줄였다 늘리기 : ctx.filter 없는 브라우저도 같게)
+  if (anim && backdrop && t0 - animAt >= BG.animMs) {
+    animAt = t0
+    anim(backdrop.getContext('2d')!, t0 / 1000)
+    fittedFor = null // 내용이 바뀌었으니 출력 크기로 다시 맞춘다(그리는 때만 — 25fps)
+  }
   if (backdrop) {
     out.drawImage(fitBackdrop(w, h), 0, 0) // 1:1 복사(고른 뒤·화면 회전 때만 다시 맞춤)
   } else {

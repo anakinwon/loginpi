@@ -479,6 +479,12 @@
       "bg": "배경",
       "bgNone": "없음",
       "bgBlur": "흐리게",
+      "scenes": {
+        "beach": "🏝️ 몰디브 해변",
+        "autumn": "🍁 설악산 단풍",
+        "fireplace": "🔥 벽난로",
+        "xmas": "🎄 크리스마스 회의실"
+      },
       "bgs": {
         "dusk": "노을",
         "ocean": "바다",

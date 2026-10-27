@@ -230,3 +230,17 @@ test('경계 다듬기 — 0.5 경계를 안쪽으로 당기고 띠를 좁힌다
   assert.ok(edgeAlpha(0.6) < 0.6 * 255) // 경계 근처는 예전보다 투명(침식)
   for (let p = 0; p < 1; p += 0.05) assert.ok(edgeAlpha(p) <= edgeAlpha(p + 0.05)) // 단조 증가
 })
+
+// 기능(2026-10-28 마스터) — 데스크톱 움직이는 배경 4종(몰디브 해변·설악산 단풍·벽난로·크리스마스 회의실). 동영상 파일 없이 캔버스 장면
+test('움직이는 배경 — 장면 4종, 25fps 로만 다시 그리고 그때만 다시 맞춤, 데스크톱 게이팅', async () => {
+  const { readFileSync } = await import('node:fs')
+  const sc = readFileSync(new URL('./scenes.ts', import.meta.url), 'utf8')
+  assert.match(sc, /export const SCENES = \{ beach, autumn, fireplace, xmas \}/)
+  assert.equal(BG.animMs, 40)
+  const eng = readFileSync(new URL('./engine.ts', import.meta.url), 'utf8')
+  const draw = eng.slice(eng.indexOf('export function draw('), eng.indexOf('export function reset('))
+  assert.match(draw, /t0 - animAt >= BG\.animMs[\s\S]{0,160}fittedFor = null/)
+  assert.match(eng.slice(eng.indexOf('function release('), eng.indexOf('function fitBackdrop(')), /anim = null/)
+  const idx = readFileSync(new URL('./index.tsx', import.meta.url), 'utf8')
+  assert.match(idx, /\(min-width: 1024px\) and \(pointer: fine\)/)
+})

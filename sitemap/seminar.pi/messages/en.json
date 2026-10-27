@@ -479,6 +479,12 @@
       "bg": "Background",
       "bgNone": "None",
       "bgBlur": "Blur",
+      "scenes": {
+        "beach": "🏝️ Maldives beach",
+        "autumn": "🍁 Autumn valley",
+        "fireplace": "🔥 Fireplace",
+        "xmas": "🎄 Christmas meeting room"
+      },
       "bgs": {
         "dusk": "Dusk",
         "ocean": "Ocean",

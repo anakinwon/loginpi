@@ -27,12 +27,15 @@ import {
 } from './engine'
 import { addMine, listMine, removeMine, shrink, type MyImage } from './my-images'
 import { BG, checkMine, PRESETS, withUnsaved } from './rules'
+import { SCENE_IDS } from './scenes'
 import { FxRows } from '../media-fx'
 
 const open = featureStore(false)
 
 function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   const t = useTranslations('room.effects')
+  // 표시 게이팅만(인증과 무관) — 넓은 화면 + 정밀 포인터(마우스)
+  const [desk] = useState(() => typeof matchMedia !== 'undefined' && matchMedia('(min-width: 1024px) and (pointer: fine)').matches)
   const isOpen = useStore(open)
   const cur = useStore(choice)
   const busy = useStore(status) === 'loading'
@@ -228,6 +231,11 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
                 {thumb(`p:${p}`, t(`bgs.${p}`), `/backgrounds/${p}.svg`)}
               </div>
             ))}
+            {/* 움직이는 배경 — 데스크톱(넓은 화면·마우스)만. 매 프레임 장면을 그려 휴대폰에선 무겁다 */}
+            {desk &&
+              SCENE_IDS.map((s) => (
+                <div key={s}>{thumb(`a:${s}`, t(`scenes.${s}`))}</div>
+              ))}
             {mine.map((m, i) => (
               <div key={m.id} className="relative">
                 {/* 장마다 다른 이름 — 모두 '내 이미지'면 낭독기 사용자가 어느 것을 고르고 지우는지 구별하지 못한다 */}
