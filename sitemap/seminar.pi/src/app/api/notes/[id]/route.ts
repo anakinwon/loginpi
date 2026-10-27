@@ -16,7 +16,7 @@ import {
   SEG_PAGE,
 } from '@/lib/note-rules'
 import { loadNote, readSegs, signShots } from '@/lib/notes'
-import { isUuid } from '@/lib/seminar-rules'
+import { isUuid, parsePage } from '@/lib/seminar-rules'
 
 const noStore = { 'Cache-Control': 'no-store' }
 type Seg = {
@@ -78,7 +78,7 @@ export const GET = withAuthGuard(
         .eq('del_yn', 'N')
 
     if (part === 'segs') {
-      const page = Math.max(1, Math.floor(Number(q.get('page')) || 1))
+      const page = parsePage(q.get('page'))
       // 권한 확인과 쪽 조회는 독립 — 병렬(R-P1), 권한이 없으면 결과를 버린다. 글 조각만(캡처는 shots)
       const [n, r] = await Promise.all([
         loadNote(ntId, user),

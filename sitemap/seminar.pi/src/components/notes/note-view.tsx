@@ -11,7 +11,7 @@ import { Pagination } from '@/components/seminar/pagination'
 import { BTN, BTN_PRIMARY } from '@/components/seminar/shared'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
-import { emptySummary, hhmm, SEG_PAGE } from '@/lib/note-rules'
+import { emptySummary, headFatal, hhmm, SEG_PAGE } from '@/lib/note-rules'
 
 const POLL_MS = 5000
 const POLL_MAX_MS = 120_000
@@ -83,12 +83,19 @@ function Note({ id }: { id: string }) {
   const [busy, setBusy] = useState(false)
   const [delErr, setDelErr] = useState(false)
   const [dlErr, setDlErr] = useState(false)
+  const loaded = useRef(false)
 
   useEffect(() => {
     let live = true
     void readApi<Head>(piFetch(`/api/notes/${id}`)).then((r) => {
       if (!live) return
-      if (r.ok) return setHead(r.data)
+      if (r.ok) {
+        loaded.current = true
+        return setHead(r.data)
+      }
+      // 상태 조회 일시 오류 — 화면을 두고(새 객체로 조회 효과를 다시 걸어) 다음 조회를 이어 간다(headFatal)
+      if (!headFatal(r.status, loaded.current))
+        return setHead((h) => h && { ...h })
       setErr(
         t(
           r.status === 404
@@ -108,8 +115,22 @@ function Note({ id }: { id: string }) {
   useEffect(() => {
     if (head?.status !== 'SUMMARIZING' && head?.status !== 'RECORDING') return
     if (Date.now() - since.current > POLL_MAX_MS) return setLong(true)
-    const tm = setTimeout(() => setTick((n) => n + 1), POLL_MS)
-    return () => clearTimeout(tm)
+    // 숨은 탭(다른 앱·탭으로 전환)은 조회를 쉬고, 다시 보일 때 바로 1번 본다(보강 r5 T07 — 뒤에 둔 탭의 5초 조회 부하)
+    const next = () => setTick((n) => n + 1)
+    const onShow = () => {
+      if (document.visibilityState === 'hidden') return
+      document.removeEventListener('visibilitychange', onShow)
+      next()
+    }
+    const tm = setTimeout(() => {
+      if (document.visibilityState === 'hidden')
+        document.addEventListener('visibilitychange', onShow)
+      else next()
+    }, POLL_MS)
+    return () => {
+      clearTimeout(tm)
+      document.removeEventListener('visibilitychange', onShow)
+    }
   }, [head])
 
   const retry = async () => {

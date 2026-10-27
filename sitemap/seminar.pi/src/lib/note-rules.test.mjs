@@ -7,6 +7,7 @@ import {
   emptySummary,
   fenceTranscript,
   frameDiff,
+  headFatal,
   isJpeg,
   noteGone,
   NOTE_GONE_AFTER_MS,
@@ -414,4 +415,27 @@ test('대면 노트 — 제목 칸 Enter 로 기록 시작(form 제출, 버튼�
   assert.match(s, /type="submit"\s*\n\s*className=\{`\$\{BTN_PRIMARY\} w-full`\}\s*\n\s*disabled=\{!ready\}/)
   // 기록 화면의 버튼은 form 밖 — 제출 버튼은 하나뿐
   assert.equal((s.match(/type="submit"/g) ?? []).length, 1)
+})
+
+test('headFatal — 보이는 회의록의 상태 조회 일시 오류(네트워크·429·5xx)는 화면을 두고 이어 조회, 첫 조회·404·403 만 화면 오류(r5 T07)', () => {
+  for (const st of [0, 429, 500, 502, 503]) assert.equal(headFatal(st, true), false, String(st))
+  for (const st of [404, 403]) assert.equal(headFatal(st, true), true, String(st))
+  for (const st of [0, 500, 404]) assert.equal(headFatal(st, false), true, String(st))
+  // 배선 : 화면이 일시 오류에 setErr 대신 같은 머리를 새 객체로 넣어 조회 효과를 다시 건다
+  const src = readFileSync(new URL('../components/notes/note-view.tsx', import.meta.url), 'utf8')
+  const at = src.indexOf('headFatal(r.status, loaded.current)')
+  assert.ok(at > 0 && at < src.indexOf('setErr(', at), 'setErr 앞에 headFatal 판정 없음')
+  assert.match(src.slice(at, at + 120), /setHead\(\(h\) => h && \{ \.\.\.h \}\)/)
+})
+
+test('회의록 화면 상태 조회 — 숨은 탭은 쉬고 다시 보일 때 1번, 정리 때 듣기 해제(보강 r5 T07)', () => {
+  const src = readFileSync(new URL('../components/notes/note-view.tsx', import.meta.url), 'utf8')
+  const at = src.indexOf('const tm = setTimeout(')
+  const body = src.slice(at, src.indexOf('}, [head])', at))
+  assert.ok(at > 0)
+  assert.match(body, /visibilityState === 'hidden'\)\s+document\.addEventListener\('visibilitychange', onShow\)/)
+  assert.match(body, /clearTimeout\(tm\)\s+document\.removeEventListener\('visibilitychange', onShow\)/)
+  const show = src.slice(src.indexOf('const onShow'), at)
+  assert.match(show, /visibilityState === 'hidden'\) return/)
+  assert.match(show, /removeEventListener\('visibilitychange', onShow\)\s+next\(\)/)
 })
