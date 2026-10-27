@@ -292,7 +292,7 @@ test('더빙 — 번역 중단(trStop)이면 자동으로 끄고(원음 복구) 
   assert.ok(src.includes("import { translateCaption, trStop } from '../captions/translate'"))
   assert.match(src, /if \(stop && dubOn\.get\(\)\) dubOn\.set\(false\)/) // Overlay — 끄면 [on] 효과가 remoteVolume 1·stopAll
   assert.match(src, /if \(!lang \|\| !ok \|\| stop\) return null/) // DubRow — 다시 켜서 원음만 줄이는 것 방지
-  assert.ok(src.includes('remoteVolume.set(dubVolume(on, room))'))
+  assert.ok(src.includes('remoteVolume.set(dubVolume(on, room, same))'))
 })
 
 // 회귀(T09 r5) — 방 자막이 꺼져 있는데(발표자가 아직 안 켬·끔·한도·발표자 퇴장) 더빙을 켜 두면 더빙할 문장이 안 오는데도 원음이 20% 로 줄어 있었다
@@ -333,4 +333,37 @@ test('chunk — 010 감지는 함수 없음(PGRST202·42883)만 후퇴, 그 밖�
   const src = await readFile(new URL('../app/api/speech/chunk/route.ts', import.meta.url), 'utf8')
   assert.match(src, /FN_MISSING = new Set\(\['PGRST202', '42883'\]\)/)
   assert.match(src, /if \(error && !FN_MISSING\.has\(error\.code\)\) \{[^}]*return true/)
+})
+
+// 회귀(T09 r6) — 다국어 패널 : 내 듣는 언어로 말하는 화자는 더빙하지 않는데(enqueue sameLang) 원음까지 20% 로 줄어 그 화자 말이 거의 안 들렸다
+test('더빙 원음 볼륨 — 마지막 원격 자막이 듣는 언어와 같으면 100%, 다르면 20%, 꺼지면 판정 초기화', async () => {
+  const { dubVolume, DUB_DUCK } = await import('./speech-rules.ts')
+  assert.equal(dubVolume(true, true, true), 1) // 같은 언어 화자 = 원음 그대로
+  assert.equal(dubVolume(true, true, false), DUB_DUCK)
+  assert.equal(dubVolume(true, false, false), 1)
+  assert.equal(dubVolume(false, true, false), 1)
+  const { readFile } = await import('node:fs/promises')
+  const src = await readFile(new URL('../components/room/features/dubbing/index.tsx', import.meta.url), 'utf8')
+  // 판정은 원격 자막(onApp)에서 — 내 음성(onSpeech)은 엔진이 되돌려 주지 않아 여기 안 온다
+  assert.match(src, /srcSame\.set\(sameLang\(c\.lang, dubLang\.get\(\)\)\)[^\n]*\n\s+enqueue\(ctx, c\.text, c\.lang, c\.sig\)/)
+  assert.match(src, /playFails = 0\n\s+srcSame\.set\(false\)/) // 끄기·언어 바꾸기(stopAll) = 판정 초기화
+  assert.ok(src.includes('srcSame.reset()')) // 퇴장
+  assert.ok(src.includes('}, [on, room, same])'))
+})
+
+// 보강(T09 r6) — 재생 대기가 밀리면 원음과 점점 어긋나 결국 15초(dubStale)로 버려졌다 → 뒤에 밀린 문장 1개당 15% 빨리 읽어 따라잡는다
+test('더빙 따라잡기 — 대기 문장 수만큼 가속, 상한 1.5 유지, 이상한 값은 가속 없음', async () => {
+  const { dubRate, DUB_CATCHUP, DUB_RATE_MAX } = await import('./speech-rules.ts')
+  assert.equal(DUB_CATCHUP, 0.15)
+  assert.equal(dubRate(5, undefined, 0), 1)
+  assert.equal(dubRate(5, undefined, 1), 1.15)
+  assert.equal(dubRate(5, undefined, 2), 1.3)
+  assert.equal(dubRate(5, undefined, 9), DUB_RATE_MAX) // 상한
+  assert.equal(dubRate(6, undefined, 2), DUB_RATE_MAX) // 1.2 × 1.3 = 1.56 → 1.5
+  assert.equal(dubRate(3, undefined, 1), 0.8) // 0.6 × 1.15 = 0.69 → 하한 0.8
+  for (const b of [-1, NaN, Infinity]) assert.equal(dubRate(5, undefined, b), 1)
+  assert.equal(dubRate(NaN, undefined, 2), 1)
+  const { readFile } = await import('node:fs/promises')
+  const src = await readFile(new URL('../components/room/features/dubbing/index.tsx', import.meta.url), 'utf8')
+  assert.ok(src.includes('a.playbackRate = dubRate(a.duration, undefined, queue.length - 1)'))
 })
