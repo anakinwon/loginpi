@@ -50,6 +50,7 @@ export const apiError = createApiError({
   SPEECH_QUOTA: '이 세미나의 음성 처리 시간이 모두 소진되었습니다',
   SPEECH_FAILED: '음성을 글로 바꾸지 못했습니다',
   TRANSLATE_FAILED: '자막을 번역하지 못했습니다',
+  SPEECH_TTS_FAILED: '번역 음성을 만들지 못했습니다',
   // 설문(sql/009 fn_vote_smn_pll 결과)
   POLL_CLOSED: '마감된 설문입니다',
   // AI 회의록(api/notes/*, src/lib/note-rules.ts)

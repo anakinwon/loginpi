@@ -5,12 +5,14 @@
 // 최신 자막 1개(화자 이름 + 문장, 최대 3줄), 8초 새 조각 없으면 사라짐, pointer-events 없음, aria-live 없음(원음과 이중 낭독 — 15.12).
 // 늦은 입장자 = presenter 화면이 참가자 수 증가 시 1초에 1번 이하로 state 재방송(SIGNAL_API 3.6, throttle).
 // presenter 입장·재입장 때 자기 현재 값을 1번 방송(퇴장 뒤 꺼진 스위치와 panel 의 켜진 자막이 어긋나 음성 한도를 쓰는 것 방지).
-// 음성 한도 소진 = presenter 가 state{captions:false, captionsReason:'limit'} 방송 → 전원 알림(설계서 15.4). 번역·더빙(SA8·SA9)은 이 시트·저장소 위에 붙인다
+// 음성 한도 소진 = presenter 가 state{captions:false, captionsReason:'limit'} 방송 → 전원 알림(설계서 15.4)
 // 번역 자막(SA8) = 개인 설정 — '번역 자막 보기'(원문/번역 토글) + 언어 선택(TRANSLATE_LANGS, 표시명 Intl.DisplayNames). 기본 언어 = UI locale, localStorage 에 함께 저장
+// 음성 번역 듣기(SA9 DubRow) = 번역 자막이 켜졌을 때만, 같은 언어(lang)로 — 꺼짐(원문)이면 숨김
 import { useEffect, useMemo, useRef } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Icon } from '../../control-bar'
 import { featureStore, speechWants, useStore, wantSpeech, type RoomCtx, type RoomFeature } from '../../extensions'
+import { DubRow } from '../dubbing'
 import { Sheet, SwitchRow } from '../sheet'
 import { isTranslateLang, TRANSLATE_LANGS } from '@/lib/translate-rules'
 import { CAPTION, captionsState, parseCaption } from './caption-rules'
@@ -217,6 +219,7 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
             ))}
           </div>
         </div>
+        <DubRow lang={tr ? lang : ''} />
       </Sheet>
     </>
   )

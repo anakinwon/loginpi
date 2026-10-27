@@ -15,6 +15,9 @@ import {
   speechMaxSec,
   usrMaxSec,
   vcUseError,
+  once,
+  dubRate,
+  pushDub,
 } from './speech-rules.ts'
 
 const bytes = (...head) => {
@@ -126,4 +129,24 @@ test('언어 코드·속도 문구', () => {
   assert.equal(paceStyle(1.2), 'speaking quickly')
   assert.equal(paceStyle(0.8), 'speaking slowly')
   assert.equal(paceStyle(NaN), null)
+})
+
+test('더빙 — 끝 처리 1회·재생 속도·큐 넘침', () => {
+  let n = 0
+  const end = once(() => n++)
+  end() // 디코드 실패 = onerror
+  end() // 같은 문장의 play() 거부
+  assert.equal(n, 1)
+
+  assert.equal(dubRate(5), 1)
+  assert.equal(dubRate(6), 1.2)
+  assert.equal(dubRate(10), 1.5) // 상한
+  assert.equal(dubRate(2), 0.8) // 하한
+  assert.equal(dubRate(NaN), 1)
+
+  let q = []
+  for (const x of [1, 2, 3]) q = pushDub(q, x).q
+  const r = pushDub(q, 4)
+  assert.deepEqual(r.q, [2, 3, 4])
+  assert.deepEqual(r.dropped, [1])
 })
