@@ -14,7 +14,7 @@ import { parseCaption } from '../captions/caption-rules'
 import { translateCaption } from '../captions/translate'
 import { sameLang } from '@/lib/translate-rules'
 import { isUuid } from '@/lib/seminar-rules'
-import { DUB_DUCK, dubRate, once, pushDub } from '@/lib/speech-rules'
+import { DUB_DUCK, dubRate, dubStop, once, pushDub, TTS_MAX_CHARS } from '@/lib/speech-rules'
 
 export const dubOn = featureStore(false)
 const dubLang = featureStore('') // 듣는 언어('' = 원문 → 더빙 없음). 자막 시트 언어 선택을 DubRow 가 옮겨 담는다
@@ -125,14 +125,23 @@ function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null) {
   // 번역은 자막 화면(SA8)과 같은 translateCaption — 같은 문장·언어는 번역 요청 1회(A-3). 서버는 받은 글을 그대로 읽기만 한다
   const audio = translateCaption(text, src, lang, ctx.seminarId, sig)
     .then((said) =>
-      said === null || !said.sig || ac.signal.aborted
+      said === null || !said.sig || ac.signal.aborted || said.text.trim().length > TTS_MAX_CHARS // 긴 문장은 서버가 400 — 요청 없이 건너뜀
         ? null
         : piFetch('/api/speech/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ smnId: ctx.seminarId, text: said.text, lang, sig: said.sig }),
             signal: ac.signal,
-          }).then((r) => (r.ok ? r.blob() : null)), // 429·502 등은 그 문장만 건너뜀(자막은 그대로)
+          }).then(async (r) => {
+            if (r.ok) return r.blob()
+            // 한도 소진·종료·자격 없음·AI 꺼짐 = 다음 문장도 실패 → 더빙 끄고 1번 알림(dubOn 이 켜져 있을 때만 — 동시 실패 여러 건이어도 1회)
+            const j = (await r.json().catch(() => null)) as { code?: unknown } | null
+            if (dubStop(r.status, j?.code) && dubOn.get()) {
+              dubOn.set(false)
+              ctx.notice('dubbing.stopped')
+            }
+            return null // 분당 횟수·502 등은 그 문장만 건너뜀(자막은 그대로)
+          }),
     )
     .catch(() => null)
   const r = pushDub(queue, { ac, audio })

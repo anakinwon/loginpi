@@ -42,7 +42,8 @@ export async function gate(smnId: string, user: UserRow): Promise<Gate | NextRes
 
 // 음성 처리 동의(SPEECH_XFER) 자격 — fn_use_smn_vc 와 같은 규칙 : 개최자·ADMIN·활성 참가 등록자 + 종료·취소 세미나 409(closed, 야간 시험 T04). 통과면 null.
 //  /api/seminars/[id]/consent 와 /api/speech/agree 가 함께 쓴다(형제 경로 한 곳 — 남의 세미나에 동의 행이 쌓이지 않게, D-3)
-export async function agreeGate(smnId: string, user: UserRow): Promise<NextResponse | null> {
+//  liveOnly = 번역·합성 캐시 적중 경로(aiGate) — fn_use_smn_ai 와 같은 규칙(LIVE 만, 아니면 SPEECH_NOT_LIVE 409)
+export async function agreeGate(smnId: string, user: UserRow, liveOnly = false): Promise<NextResponse | null> {
   const [m, p] = await Promise.all([
     db().from('smn_mst').select('hst_usr_id, smn_sts_cd').eq('smn_id', smnId).eq('del_yn', 'N').maybeSingle<{ hst_usr_id: string; smn_sts_cd: string }>(),
     db().from('smn_ptc').select('ptc_id').eq('smn_id', smnId).eq('usr_id', user.id).eq('del_yn', 'N').maybeSingle(),
@@ -51,7 +52,11 @@ export async function agreeGate(smnId: string, user: UserRow): Promise<NextRespo
   if (p.error) return dbFail(p.error)
   if (!m.data) return apiError('NOT_FOUND', 404)
   if (!(OPEN_STS as readonly string[]).includes(m.data.smn_sts_cd)) return closed()
+  if (liveOnly && m.data.smn_sts_cd !== 'LIVE') return apiError('SPEECH_NOT_LIVE', 409)
   if (m.data.hst_usr_id !== user.id && !p.data && !isAdmin(user)) return apiError('FORBIDDEN', 403)
   return null
 }
+
+// 번역·합성 캐시 적중 자격(보안 검토 D-2 회귀) — 적중이라도 비참가자·LIVE 아님은 거부. 미스는 fn_use_smn_ai 가 같은 판정 + 계량(왕복 1회)
+export const aiGate = (smnId: string, user: UserRow) => agreeGate(smnId, user, true)
 

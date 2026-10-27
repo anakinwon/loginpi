@@ -176,3 +176,33 @@ test('settleWithin — 진행 중 업로드 기다림(실패 포함)·상한 초
   assert.equal(await settleWithin([wait(1000)], 30), false)
   assert.ok(Date.now() - t0 < 500) // 느린 업로드가 종료를 붙잡지 않는다
 })
+
+// 회귀(T09 r2) — 합성이 다음 문장도 실패할 상태(한도 소진·종료·자격 없음·AI 꺼짐)면 더빙을 끈다. 일시 실패는 그 문장만 건너뜀
+test('dubStop — 401·403·409·503·SPEECH_QUOTA 는 끔, SPEECH_RATE·400·502 는 계속', async () => {
+  const { dubStop, TTS_MAX_CHARS } = await import('./speech-rules.ts')
+  for (const s of [401, 403, 409, 503]) assert.equal(dubStop(s), true, String(s))
+  assert.equal(dubStop(429, 'SPEECH_QUOTA'), true)
+  assert.equal(dubStop(429, 'SPEECH_RATE'), false)
+  for (const s of [400, 500, 502]) assert.equal(dubStop(s), false, String(s))
+  assert.equal(TTS_MAX_CHARS, 300)
+})
+
+// 회귀(T09 r2, 보안 검토 D-2) — 캐시 적중도 자격 판정 : 비참가자 + 적중 → 403, 종료 세미나 + 적중 → 409.
+//  라우트는 DB·외부 AI 가 필요해 원문 순서로 확인 — 적중 분기의 aiGate 가 내주기(await p)보다 앞
+test('tts·translate 라우트 — 캐시 적중 분기에서 aiGate 를 await p 보다 먼저, tts 본문 상한 = TTS_MAX_CHARS', async () => {
+  const { readFile } = await import('node:fs/promises')
+  for (const f of ['tts', 'translate']) {
+    const src = (await readFile(new URL(`../app/api/speech/${f}/route.ts`, import.meta.url), 'utf8')).replace(/\r\n/g, '\n')
+    const hit = src.indexOf('if (p) {')
+    const g = src.indexOf('await aiGate(smnId, user)')
+    const serve = src.indexOf('await p\n')
+    assert.ok(hit > 0 && g > hit && g < src.indexOf('} else {', hit) && serve > g, `${f}: 적중 분기 aiGate 순서`)
+  }
+  const tts = await readFile(new URL('../app/api/speech/tts/route.ts', import.meta.url), 'utf8')
+  assert.match(tts, /\.max\(TTS_MAX_CHARS\)/)
+  const e = await readFile(new URL('./engage.ts', import.meta.url), 'utf8')
+  const ag = e.slice(e.indexOf('export async function agreeGate'))
+  // aiGate = agreeGate(live) — LIVE 아님 409, 비참가(개최자·참가·ADMIN 아님) 403
+  assert.ok(ag.includes(`liveOnly && m.data.smn_sts_cd !== 'LIVE'`) && ag.includes(`apiError('FORBIDDEN', 403)`))
+  assert.match(e, /export const aiGate = \(smnId: string, user: UserRow\) => agreeGate\(smnId, user, true\)/)
+})
