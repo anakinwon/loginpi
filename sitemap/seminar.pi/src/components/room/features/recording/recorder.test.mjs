@@ -107,3 +107,17 @@ test('정상 — 녹화 중 오류면 onFail, 멈추면 타이머·트랙 정리
   assert.equal(blob.type, 'video/webm')
   assert.equal(live.timers, 0)
 })
+
+test('메모리 상한 — 모은 조각이 2GB 를 넘으면 onFail 1번(자동 종료·저장), 그 전엔 부르지 않는다', async () => {
+  recorderMode = 'ok'
+  let failed = 0
+  const r = startRecorder(stage, ac(), () => failed++)
+  const GB = 1024 ** 3
+  lastRec.ondataavailable({ data: { size: 0 } })
+  lastRec.ondataavailable({ data: { size: GB } })
+  assert.equal(failed, 0)
+  lastRec.ondataavailable({ data: { size: GB } }) // 2GB 도달
+  lastRec.ondataavailable({ data: { size: 1 } }) // 종료 처리 중 마지막 조각 — 다시 부르지 않는다
+  assert.equal(failed, 1)
+  await r.stop()
+})

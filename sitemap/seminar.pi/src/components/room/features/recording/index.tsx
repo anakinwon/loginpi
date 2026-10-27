@@ -9,13 +9,16 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import { BADGE_SLOT_ID, TOAST_SLOT_ID, featureStore, useStageSlot, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
-import { APP_RETRY, sendRetry } from '../../app-retry'
+import { APP_RETRY, latestOnly, sendRetry } from '../../app-retry'
 import type { Recorder } from './recorder'
 import { applyRec, othersRecording, recFileName, saveVia, type RecBy } from './rules'
 
 const RESEND_MS = 1000 // 늦은 입장자 재알림 묶음(초당 2건 한도 안)
 const sendState = (ctx: RoomCtx, on: boolean, live: () => boolean) =>
   sendRetry(() => ctx.sendApp('state', { recording: on }), live)
+const latest = latestOnly() // 켜기·끄기 고지 엇갈림 방지 — 끄기 재시도가 곧바로 다시 시작한 녹화의 '켜짐' 뒤에 도착하지 않게
+// 끄기 고지(재시도) — 새 켜기 고지가 시작되면 멈춘다
+const sendOff = (ctx: RoomCtx) => void sendState(ctx, false, latest())
 const TOAST_MS = 3000
 
 const recOn = featureStore(false) // 내가 녹화 중
@@ -60,7 +63,7 @@ async function stopRec(ctx: RoomCtx | null) {
   recOn.set(false)
   startedAt.set(0)
   // 종료 알림은 파일 저장을 기다리지 않고 먼저 — 한도에 걸리면 다시 보낸다(사이에 새 녹화가 시작되면 그만). 역할을 잃었으면 엔진이 거절하고 받는 쪽이 역할로 내린다
-  if (ctx) void sendState(ctx, false, () => !recorder && !recOn.get())
+  if (ctx) sendOff(ctx)
   try {
     const blob = await rec.stop()
     if (blob.size) {
@@ -94,14 +97,19 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
     if (g !== gen) return
     if (!mod.canRecord()) return ctx.notice('recording.unsupported')
     // 먼저 전원에게 알린다 — 실패하면 시작하지 않는다(M-4)
-    const err = await sendState(ctx, true, () => g === gen)
+    const cur = latest() // 앞 녹화의 끄기 재시도는 여기서 멈춘다
+    const err = await sendState(ctx, true, () => g === gen && cur())
     if (err === 'CANCELLED') return
-    if (err) return ctx.notice('recording.notifyFailed')
+    if (err) {
+      // TIMEOUT 은 엔진이 이미 방송했을 수 있다 — 녹화 없이 배지가 남지 않게 끄기도 보낸다(영구 오류면 엔진이 거절, 무해)
+      sendOff(ctx)
+      return ctx.notice('recording.notifyFailed')
+    }
     dropLast() // 새 녹화가 시작되면 이전 파일은 놓는다(메모리에 둘을 들지 않게) — 시작 못 하면 남겨 둔다
-    // 기다리는 사이 퇴장·끊김(onReset)이면 시작하지 않고 알림을 되돌린다
-    if (g !== gen) return void ctx.sendApp('state', { recording: false })
+    // 기다리는 사이 퇴장·끊김(onReset)이면 시작하지 않고 알림을 되돌린다(재시도 — 1회만 보내면 한도에 걸려 배지가 남는다)
+    if (g !== gen) return sendOff(ctx)
     try {
-      // 녹화 중 브라우저가 녹화를 멈추면(오류) 종료·저장·고지 해제 — 이 녹화기일 때만(다음 녹화를 끄지 않게)
+      // 녹화 중 브라우저가 녹화를 멈추거나(오류) 메모리 상한(recorder.ts R.maxBytes)에 닿으면 종료·저장·고지 해제 — 이 녹화기일 때만(다음 녹화를 끄지 않게)
       const rec = mod.startRecorder(stage, ac, () => {
         if (recorder === rec) void stopRec(ctxNow?.() ?? null)
       })
@@ -109,7 +117,7 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
       started = true
     } catch {
       // 이미 '녹화 중'을 알렸으니 해제도 재시도 — 1회만 보내 한도에 걸리면 받는 쪽 배지가 녹화 없이 남는다(배지는 명시적 false 로만 내림)
-      void sendState(ctx, false, () => !recorder && !recOn.get())
+      sendOff(ctx)
       return ctx.notice('recording.unsupported')
     }
     if (ac.state !== 'running') ctx.notice('recording.audioSuspended')
