@@ -222,3 +222,12 @@ test('회의록 화면 — 보조 동작(내려받기·삭제) 실패가 화면 
     assert.doesNotMatch(body, /setErr\(/, `${fn} 가 setErr 사용`)
   }
 })
+
+test('AI 회의록 state 수신(panel)은 말하기를 요청하지 않는다 — panel 조각은 회의록에 안 남아 사용량만 쓴다(r3 T07, D-1)', () => {
+  const src = readFileSync(new URL('../components/room/features/notes/index.tsx', import.meta.url), 'utf8')
+  const onApp = src.slice(src.indexOf('onApp:'), src.indexOf('onReset:'))
+  assert.ok(onApp.length > 20, 'onApp 을 찾지 못함')
+  assert.doesNotMatch(onApp, /wantSpeech\(/)
+  // 말하기 요청은 발표자 자기 켜기(toggle) 한 곳뿐
+  assert.equal((src.match(/wantSpeech\('notes', 'quiet'\)/g) ?? []).length, 1)
+})

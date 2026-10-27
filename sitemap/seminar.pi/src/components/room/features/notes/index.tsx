@@ -1,7 +1,7 @@
 'use client'
 // AI 회의록(SubAgent7, 계획서 SA7·M-4, 설계서 15.6·15.9) — 발표자 ⋯ [AI 회의록] 켜기/끄기(menuitemcheckbox, 확인 대화상자 없음 15.2).
 //  켜기 : POST /api/notes → ntId → 말하기 요청 quiet(자막 방송 없이 글로만 — 서버 /api/speech/chunk 가 기록 중 회의록에 조각 저장) → app 'state' {notes:true} 방송
-//  → 무대(전원) 'AI 기록 중' 배지(자동 숨김 없음) + 시작·종료 토스트 3초. panel 은 state 를 받으면 자기 말하기도 quiet 로 켠다(화자명이 붙은 조각).
+//  → 무대(전원) 'AI 기록 중' 배지(자동 숨김 없음) + 시작·종료 토스트 3초. panel 은 배지만(말하기 요청 없음 — 서버가 panel 조각을 회의록에 넣지 않는다, D-1).
 //  화면공유 중이면 1초마다 64×36 축소 프레임을 마지막 캡처와 비교 → 많이 바뀌면 캡처(분당 2장) → POST /api/notes/[id]/shot.
 //  끄기 : state {notes:false} → POST /api/notes/[id]/end(요약, 기다리지 않음). 늦게 들어온 사람에겐 발표자가 참가자 수가 늘 때 1초 묶어 다시 방송(SIGNAL_API 3.6).
 //  엔진 app 미지원이면 항목을 숨긴다(app:true — 전원 고지를 못 하면 시작하지 않는다 15.1). 호출은 전부 piFetch(Pi Browser 쿠키 없음)
@@ -183,7 +183,6 @@ function NotesOverlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   useEffect(() => {
     if (!gone) return
     roomOn.set(false)
-    wantSpeech('notes', null)
   }, [gone])
 
   // 발표자 입장·재입장 — 자기 현재 값을 1번 방송(새로 고침 뒤엔 false — 남은 panel 의 배지·음성 요청을 맞춘다)
@@ -251,8 +250,8 @@ export const notes: RoomFeature = {
     const v = noteState(m.d)
     if (v === null) return
     roomOn.set(v)
-    // 무대 역할(panel)도 자기 말을 회의록에 남긴다(청중은 use-speech 가 마이크 트랙을 안 줘 녹음 없음, 나중에 승격돼도 이어짐) — 발표자는 자기 켜기로 이미 요청 중
-    if (!on.get()) wantSpeech('notes', v ? 'quiet' : null)
+    // 무대 역할(panel)은 말하기를 요청하지 않는다 — 서버가 회의록에 남기는 조각은 기록 시작자·개최자·ADMIN 것뿐(canRecordSeg, D-1)이라
+    //  panel 의 quiet 조각은 자막 방송도 저장도 없이 외부 AI 사용량만 쓴다(r3 T07). 자막이 켜져 있으면 captions 가 따로 요청한다
   },
   onReset: () => {
     // 퇴장·끊김 — 켜 둔 회의록은 끝낸다(배지가 사라지는데 기록이 계속되면 안 된다, M-4)
