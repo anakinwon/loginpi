@@ -52,6 +52,8 @@ export const apiError = createApiError({
   SPEECH_STAGE_ONLY: '무대에 오른 사람만 음성 자막을 쓸 수 있습니다',
   TRANSLATE_FAILED: '자막을 번역하지 못했습니다',
   SPEECH_TTS_FAILED: '번역 음성을 만들지 못했습니다',
+  // 자막 서명 불일치 — 그 문장만의 문제(조작·변형된 자막). 권한 없음(FORBIDDEN)과 구분해 화면이 번역·더빙 전체를 멈추지 않게(야간 시험 r5 T08)
+  CAPTION_SIG_INVALID: '확인되지 않은 자막이라 번역하지 않았습니다',
   // 설문(sql/009 fn_vote_smn_pll 결과)
   POLL_CLOSED: '마감된 설문입니다',
   // AI 회의록(api/notes/*, src/lib/note-rules.ts)

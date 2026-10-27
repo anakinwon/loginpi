@@ -172,7 +172,10 @@ export async function capSigOk(secret: string, smnId: string, text: string, sig:
 //  권한 없음(401·403 : 무료 세미나를 방 링크로 바로 들어와 입장 등록이 없는 경우 등) · 서버 AI 미설정(503 AI_UNAVAILABLE) · 세미나 누적 한도(429 SPEECH_QUOTA)
 //  일시 실패(분당 한도 SPEECH_RATE·DB 503·502·409·네트워크)는 null = 다음 문장에 다시 시도
 export type TrStop = 'forbidden' | 'unavailable' | 'quota'
+//  서명 불일치(403 CAPTION_SIG_INVALID)는 그 문장만의 문제 — 패널 1명의 변조·고장 자막 1개가 청중 전원의 번역을 입장 내내 끄고
+//  '입장 등록한 참가자만' 이라는 틀린 사유를 띄우던 결함(야간 시험 r5 T08). 그 문장만 원문으로 둔다
 export function trStopOf(status: number, code: unknown): TrStop | null {
+  if (code === 'CAPTION_SIG_INVALID') return null
   if (status === 401 || status === 403) return 'forbidden'
   if (status === 503 && code === 'AI_UNAVAILABLE') return 'unavailable'
   if (status === 429 && code === 'SPEECH_QUOTA') return 'quota'
@@ -181,3 +184,24 @@ export function trStopOf(status: number, code: unknown): TrStop | null {
 
 // 번역 언어를 바꾼 뒤 요청까지 기다리는 시간 — 닫힌 select 에서 화살표로 훑으면 언어마다 change 가 나서 언어 수만큼 외부 AI 를 부른다(R-P2 디바운스)
 export const TR_LANG_SETTLE_MS = 400
+
+// 번역 대기 중 표시(보강 r5 T08) — 새 자막이 오면 번역이 오는 1~2초 동안 원문(외국어)이 번쩍였다가 번역으로 바뀌었다(5초 조각마다).
+//  대기 중엔 직전 번역을 그대로 두고(새 자막이 직전 번역을 받은 뒤 TR_HOLD_MS 안에 왔을 때만)(실시간 통역처럼 한 박자 늦게), 번역 실패·언어 바뀜·오래됨이면 원문.
+//  key = '' 는 번역 안 함(꺼짐·같은 언어·서명 없음·중단). out = 마지막으로 받은 번역(key·언어·받은 시각), failKey = 실패한 key, capAt = 지금 자막을 받은 시각(렌더 중 Date.now 금지 — 순수)
+export const TR_HOLD_MS = 8_000
+export type TrOut = { key: string; text: string; lang: string; at: number }
+export function shownOf(
+  cap: { text: string; lang: string } | null,
+  key: string,
+  lang: string,
+  out: TrOut | null,
+  failKey: string,
+  capAt: number,
+): { text: string; lang: string } | null {
+  if (!cap) return null
+  if (key && out) {
+    if (out.key === key) return { text: out.text, lang: out.lang }
+    if (failKey !== key && out.lang === lang && capAt - out.at <= TR_HOLD_MS) return { text: out.text, lang: out.lang }
+  }
+  return { text: cap.text, lang: cap.lang }
+}
