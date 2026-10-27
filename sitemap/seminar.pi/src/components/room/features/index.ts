@@ -11,6 +11,7 @@ import { polls } from './engage/polls'
 import { qna } from './engage/qna'
 import { notes } from './notes'
 import { mediaFx } from './media-fx'
+import { mirror } from './mirror'
 import { recording } from './recording'
 
 export const FEATURES: readonly RoomFeature[] = [
@@ -20,6 +21,7 @@ export const FEATURES: readonly RoomFeature[] = [
   notes,
   mediaFx,
   backgrounds,
+  mirror,
   qna,
   polls,
   attend,

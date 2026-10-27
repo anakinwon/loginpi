@@ -213,6 +213,7 @@
     "refLabel": "Reference model"
   },
   "room": {
+    "mirror": "Mirror my video",
     "barPin": "Always show bottom bar",
     "barAuto": "Auto-hide bottom bar",
     "title": "Join seminar · {room}",

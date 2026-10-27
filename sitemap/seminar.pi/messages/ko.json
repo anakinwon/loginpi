@@ -213,6 +213,7 @@
     "refLabel": "참조 모델"
   },
   "room": {
+    "mirror": "내 화면 거울 보기",
     "barPin": "하단 바 항상 보이기",
     "barAuto": "하단 바 자동 숨기기",
     "title": "세미나 입장 · {room}",

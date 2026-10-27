@@ -7,6 +7,7 @@ import { remoteVolume, useStore } from './extensions'
 import { useLayerWatch } from './layer-watch'
 import { followKey, groupTracks, nextPin, ringFor, type Layer, type PinState, type RoomLayout } from './room-rules'
 import type { Peer, RemoteTrack, RoomState, SessionRole } from './use-room'
+import { mirrorOn } from './features/mirror'
 import { VideoTile } from './video-tile'
 
 const PLAY_RETRY_MS = 1000
@@ -28,6 +29,7 @@ export function StreamVideo({
   onLayer?: LayerFn
 }) {
   const [el, setEl] = useState<HTMLVideoElement | null>(null) // 콜백 ref — 관찰자가 요소를 받아야 한다
+  const mirrorSelf = useStore(mirrorOn) // 내 화면 거울 보기(⋯ 메뉴, features/mirror) — 내 타일·미리보기만
   useLayerWatch(el, consumerId, onLayer)
   useEffect(() => {
     if (!el) return
@@ -40,7 +42,7 @@ export function StreamVideo({
       muted
       playsInline
       autoPlay
-      className={`h-full w-full object-contain ${mirror ? '-scale-x-100' : ''} ${className}`}
+      className={`h-full w-full object-contain ${mirror && mirrorSelf ? '-scale-x-100' : ''} ${className}`}
     />
   )
 }
