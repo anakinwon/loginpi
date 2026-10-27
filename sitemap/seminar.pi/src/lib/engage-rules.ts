@@ -47,6 +47,9 @@ export function attendSec(ent: string | number | Date, hb: string | number | Dat
   return Number.isFinite(s) && s > 0 ? Math.floor(s) : 0
 }
 
+// 하트비트를 멈출 응답 — 다시 보내도 같은 거절(유료 미등록 402·세미나 없음 404·종료 409). 401·429·5xx·네트워크는 다음 주기에 다시 시도
+export const beatStops = (status: number) => status === 402 || status === 404 || status === 409
+
 export const isOnline = (hb: string | number | Date, now: number) => now - new Date(hb).getTime() < ONLINE_MS
 
 // 1시간 2분 → '1:02:00', 5분 3초 → '5:03'
