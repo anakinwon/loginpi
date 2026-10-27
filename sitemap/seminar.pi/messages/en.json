@@ -130,6 +130,50 @@
       "F07": {
         "name": "Replays",
         "desc": "Watch recorded seminars later"
+      },
+      "FU": {
+        "name": "Meeting add-ons foundation",
+        "desc": "One signal channel for add-ons, AI connection, voice chunks, microphone consent and data tables"
+      },
+      "F08": {
+        "name": "Schedule and sharing",
+        "desc": "Calendar link, event file (.ics) and email invite for each seminar"
+      },
+      "F09": {
+        "name": "Noise reduction and lighting",
+        "desc": "Reduce microphone noise and brighten dark camera video"
+      },
+      "F10": {
+        "name": "Live captions",
+        "desc": "Turn the presenter's speech into text under the stage"
+      },
+      "F11": {
+        "name": "Polls, Q&A and attendance",
+        "desc": "Run polls and questions during a seminar; hosts download the attendance list"
+      },
+      "F12": {
+        "name": "Background effects",
+        "desc": "Blur your background or replace it with a preset or your own image (processed on your device)"
+      },
+      "F13": {
+        "name": "Local recording",
+        "desc": "The presenter records the seminar on their own device and everyone sees that recording is on"
+      },
+      "F14": {
+        "name": "AI meeting notes",
+        "desc": "When the presenter turns it on, speech and screens are recorded and summarized into key points, decisions and to-dos"
+      },
+      "F15": {
+        "name": "In-person meeting notes",
+        "desc": "Record a meeting with only a microphone and get meeting notes (admins)"
+      },
+      "F16": {
+        "name": "Translated captions",
+        "desc": "Show captions translated into the language you choose"
+      },
+      "F17": {
+        "name": "Listen in translation",
+        "desc": "Read translated captions aloud with a synthetic voice while lowering the original audio"
       }
     },
     "steps": {
@@ -149,7 +193,19 @@
       "payRequest": "Payment request",
       "payVerify": "Amount re-check and entry",
       "settle": "Payout",
-      "vod": "Recording replay"
+      "vod": "Recording replay",
+      "appRelay": "Engine add-on signal channel",
+      "aiBase": "AI, voice chunks, consent and data tables",
+      "shareLinks": "Calendar link, .ics and email invite",
+      "noiseLight": "Noise reduction and lighting",
+      "liveCaptions": "Live captions",
+      "pollQnaAttend": "Polls, Q&A and attendance list",
+      "backgrounds": "Blur, presets and your own image",
+      "localRecording": "Presenter recording and recording badge",
+      "aiNotes": "Recording, summary and notes page",
+      "inPersonNotes": "Microphone-only notes and my notes",
+      "captionTranslate": "Language choice and original/translated toggle",
+      "dubbing": "Synthetic voice playback and lowered original audio"
     },
     "refLabel": "Reference model"
   },

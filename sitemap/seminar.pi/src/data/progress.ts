@@ -1,4 +1,4 @@
-// 홈 "제작 진행 현황" 데이터 — 기능(PRD 5절 F-01~07)별 단계와 상태. 문구는 messages progress.* (i18n)
+// 홈 "제작 진행 현황" 데이터 — 기능(PRD 5절 F-01~07, 5.1절 F-U·F-08~17)별 단계와 상태. 문구는 messages progress.* (i18n)
 // ⚠ 상태를 바꿀 때 docs/ROADMAP.md 도 같이 갱신한다(이 파일은 화면용 요약, 정본은 ROADMAP)
 export type StepStatus = 'done' | 'doing' | 'todo'
 
@@ -15,7 +15,25 @@ export interface FeatureStep {
 }
 
 export interface Feature {
-  id: 'F01' | 'F02' | 'F03' | 'F04' | 'F05' | 'F06' | 'F07'
+  id:
+    | 'F01'
+    | 'F02'
+    | 'F03'
+    | 'F04'
+    | 'F05'
+    | 'F06'
+    | 'F07'
+    | 'FU'
+    | 'F08'
+    | 'F09'
+    | 'F10'
+    | 'F11'
+    | 'F12'
+    | 'F13'
+    | 'F14'
+    | 'F15'
+    | 'F16'
+    | 'F17'
   prio: 'P0' | 'P1' | 'P2'
   steps: FeatureStep[]
 }
@@ -83,6 +101,29 @@ export const FEATURES: Feature[] = [
     prio: 'P2',
     steps: [{ id: 'vod', status: 'todo' }],
   },
+  // 회의 부가 기능(v2) — 구현·검토 완료(master af8f572b), 브라우저 QA·실기기 대기. 정본 ROADMAP Phase X
+  {
+    id: 'FU',
+    prio: 'P1',
+    steps: [
+      { id: 'appRelay', status: 'doing', ref: ['Jitsi', 'LiveKit'], note: 'v1.3.1 ✓ · engine swap …' },
+      { id: 'aiBase', status: 'doing', note: 'review ✓ · DB … · key …' },
+    ],
+  },
+  { id: 'F08', prio: 'P1', steps: [{ id: 'shareLinks', status: 'doing', note: 'review ✓ · QA … · device …' }] },
+  { id: 'F09', prio: 'P2', steps: [{ id: 'noiseLight', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · QA … · device …' }] },
+  { id: 'F10', prio: 'P1', steps: [{ id: 'liveCaptions', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · QA … · device …' }] },
+  { id: 'F11', prio: 'P1', steps: [{ id: 'pollQnaAttend', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · DB … · device …' }] },
+  {
+    id: 'F12',
+    prio: 'P2',
+    steps: [{ id: 'backgrounds', status: 'doing', ref: ['Jitsi', 'LiveKit'], note: 'review ✓ · model file …' }],
+  },
+  { id: 'F13', prio: 'P1', steps: [{ id: 'localRecording', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · QA … · device …' }] },
+  { id: 'F14', prio: 'P1', steps: [{ id: 'aiNotes', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · DB … · device …' }] },
+  { id: 'F15', prio: 'P2', steps: [{ id: 'inPersonNotes', status: 'doing', note: 'review ✓ · DB … · device …' }] },
+  { id: 'F16', prio: 'P2', steps: [{ id: 'captionTranslate', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · QA … · device …' }] },
+  { id: 'F17', prio: 'P2', steps: [{ id: 'dubbing', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · QA … · device …' }] },
 ]
 
 // 기능의 참조 모델 = 단계 참조의 합(첫 등장 순)
