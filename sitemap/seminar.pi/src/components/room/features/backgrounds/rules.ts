@@ -28,8 +28,8 @@ export function slowWatch(min = BG.fpsMin, sec = BG.slowSec) {
     n++
     cost += ms
     if (now - start < 1000) return false
-    // 탭이 숨어 프레임이 끊긴 창(2초 넘게 비었음)은 판정하지 않는다
-    if (now - start < 2000) slow = (n * 1000) / Math.max(cost, 1) < min ? slow + 1 : 0
+    // 탭이 숨어 프레임이 끊긴 창(2초 넘게 비었음)은 판정하지 않고 연속도 끊는다 — 틈을 건너 이어 세면 돌아온 직후 느린 1초에 꺼진다
+    slow = now - start < 2000 && (n * 1000) / Math.max(cost, 1) < min ? slow + 1 : 0
     start = now
     n = 0
     cost = 0
@@ -52,6 +52,14 @@ export const withUnsaved = <T extends { id: string; unsaved?: boolean }>(db: rea
 
 // 새 선택이 실패했을 때 돌아갈 선택 — 앞 배경이 켜져 있었으면 그대로 둔다('없음'으로 떨어지면 가리던 방이 상대에게 드러난다)
 export const failBack = (prev: string, prevOn: boolean) => (prevOn ? prev : 'none')
+
+// 이미 그리고 있는 배경을 또 고름(연타) — 다시 래스터하지 않고, 느린 기기 단계(분리 간격)도 처음으로 되돌리지 않는다
+export const keepShown = (next: string, shown: string, on: boolean) => on && next === shown
+
+// 쓰고 있는 내 이미지(m)를 지울 때 갈 선택 — null = 지금 선택과 무관. 그리던 중이면 흐림으로(바로 '없음'이면 가리던 방이 드러난다),
+// 고르던 중이면 앞 배경으로 되돌리고, 아무것도 켜져 있지 않았으면 없음
+export const afterDelete = (m: string, choice: string, shown: string, on: boolean) =>
+  choice !== m ? null : !on ? 'none' : shown === m ? 'blur' : shown
 
 // 분리기 시각(ms) — 같은 분리기에는 엄격히 커지는 값만 넣어야 한다. 정밀도를 낮춘 타이머(사생활 보호 설정)는 같은 값을 줄 수 있다
 export const nextTs = (prev: number, now: number) => Math.max(now, prev + 1)
