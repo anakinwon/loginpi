@@ -3,6 +3,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   capError,
+  clampPage,
   FEE_RE,
   formatFee,
   isUuid,
@@ -78,4 +79,12 @@ test('개설 시작일시 상한(S5)', () => {
   assert.equal(startAtOk(now + START_AHEAD_MAX_MS + 1, now), false)
   assert.equal(startAtOk(now, now), false)
   assert.equal(startAtOk(NaN, now), false)
+})
+
+test('쪽 맞추기 — 목록이 줄어 현재 쪽이 넘치면 마지막 쪽(T04 r2 : Q&A 빈 2쪽에 갇힘)', () => {
+  assert.equal(clampPage(2, 1), 1) // 2쪽 마지막 질문 답변 → 1쪽
+  assert.equal(clampPage(3, 2), 2)
+  assert.equal(clampPage(2, 3), 2) // 그대로
+  assert.equal(clampPage(1, 0), 1) // 빈 목록도 1쪽
+  assert.equal(clampPage(5, 0), 1)
 })
