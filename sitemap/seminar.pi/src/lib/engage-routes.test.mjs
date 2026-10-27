@@ -111,3 +111,32 @@ test('처리방침 — 질문·설문 공개 범위와 보관 고지(ko·en, T04
   assert.ok(msg('ko').some((s) => s.startsWith('질문과 설문') && s.includes('세미나를 삭제할 때까지')))
   assert.ok(msg('en').some((s) => s.startsWith('Q&A and polls') && s.includes('until the seminar is deleted')))
 })
+
+// refresh 는 caption 과 피어당 초당 2건 합산(SIGNAL_API 3.6) — 자막 켠 발표자의 [답변함]·추천 신호가 RATE_LIMITED 로 빠지던 결함(T04 r4).
+//  패턴 = app.send('refresh') 1회 보내고 결과 무시 · 매치 1(engage/shared.ts tell) · 처리 1(sendRetry)
+test('refresh 신호 — sendRetry 로 보냄(한도 초과 시 재시도), 맨 sendApp(refresh) 없음', () => {
+  const s = readFileSync(new URL('../components/room/features/engage/shared.ts', import.meta.url), 'utf8')
+  assert.match(s, /sendRetry\(\(\) => ctx\.sendApp\('refresh'/)
+  assert.doesNotMatch(s, /void ctx\.sendApp\('refresh'/)
+  const spec = readFileSync(new URL('../../docs/SIGNAL_API.md', import.meta.url), 'utf8')
+  assert.ok(spec.includes('`caption`·`refresh` 는 합산'), '계약의 합산 규칙이 바뀌면 이 재시도 근거를 다시 볼 것')
+})
+
+// 설계서 15.3 의 선택지 길이가 DB(sql/008 VARCHAR(200))·POLL.OPT_LEN 과 달랐다(문서 500자, T04 r4)
+test('설문 길이 — 설계서 15.3 · sql/008 · POLL 상수 일치', async () => {
+  const { POLL } = await import('./engage-rules.ts')
+  const doc = readFileSync(new URL('../../docs/ui-design/ui-design.md', import.meta.url), 'utf8')
+  const ddl = readFileSync(new URL('../../sql/008_seminar_meet_ext.sql', import.meta.url), 'utf8')
+  assert.ok(doc.includes(`질문 ${POLL.Q_MAX}자·선택지 ${POLL.OPT_LEN}자`))
+  assert.match(ddl, new RegExp(`opt_cont\\s+VARCHAR\\(${POLL.OPT_LEN}\\)`))
+  assert.match(ddl, new RegExp(`qst_cont\\s+VARCHAR\\(${POLL.Q_MAX}\\)`))
+})
+
+// 출석부 보강(T04 r4) — 보이는 동안 HB_MS 마다 다시 읽기, 다시 읽기 실패는 표 유지, 접속 판정 시각은 성공한 자료 기준
+test('출석부 — 주기 다시 읽기·실패 시 표 유지·성공 때만 기준 시각', () => {
+  const s = readFileSync(new URL('../components/seminar/attendance.tsx', import.meta.url), 'utf8')
+  assert.match(s, /setInterval\([\s\S]*?visibilityState === 'visible'[\s\S]*?HB_MS\)/)
+  assert.match(s, /\[id, page, tick, t, errText\]/)
+  assert.match(s, /else if \(!tick \|\| r\.status === 403\) setErr/)
+  assert.match(s, /if \(r\.ok\) \{\s*setNow\(Date\.now\(\)\)/)
+})
