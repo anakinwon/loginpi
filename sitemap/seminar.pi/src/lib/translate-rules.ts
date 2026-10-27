@@ -38,6 +38,20 @@ export function sameLang(a: string, b: string) {
   return !!x && x === trLangOf(b)
 }
 
+// 번역할 글자가 있는지 — 숫자·문장부호·기호뿐인 자막('2026', '…', '10:30', '😀')은 어느 언어로도 같아서 번역 요청 없이 원문(보강 r6 T08 — 외부 AI 비용·DB 계량 절감)
+export const hasWords = (t: string) => /\p{L}/u.test(t)
+
+// 언어 목록 앞에 둘 '내 언어' — 브라우저 선호 언어·UI locale·지금 고른 언어 순으로 대상 키로 바꿔 순서대로(중복 제거).
+//  76개 언어 select 를 360px 화면에서 끝까지 훑지 않게(보강 r6 T08). 목록 밖 언어는 뺀다
+export function prefLangs(prefs: readonly string[] | undefined, locale: string, current: string) {
+  const out: string[] = []
+  for (const c of [...(prefs ?? []), locale, current]) {
+    const k = trLangOf(c)
+    if (isTranslateLang(k) && !out.includes(k)) out.push(k)
+  }
+  return out
+}
+
 // 번역 언어 기본값(사용자가 아직 안 골랐을 때) — 브라우저 선호 언어(navigator.languages) 중 대상 목록에 있는 첫 언어 → UI locale → 'en'.
 //  UI 는 ko·en 뿐이라 베트남어 브라우저 사용자도 영어로 기본 번역되던 것을 자기 언어로(야간 시험 r3 T08 보강)
 export function pickTrLang(prefs: readonly string[] | undefined, locale: string) {

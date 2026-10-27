@@ -15,7 +15,7 @@ import { Icon } from '../../control-bar'
 import { featureStore, speechWants, useStore, wantSpeech, type RoomCtx, type RoomFeature } from '../../extensions'
 import { DubRow } from '../dubbing'
 import { Sheet, SwitchRow } from '../sheet'
-import { isTranslateLang, pickTrLang, TRANSLATE_LANGS } from '@/lib/translate-rules'
+import { isTranslateLang, pickTrLang, prefLangs, TRANSLATE_LANGS } from '@/lib/translate-rules'
 import { presenterGone, presenterResync } from '../../room-rules'
 import { CAPTION, captionsState, parseCaption, SIZES, stepSize, type Size } from './caption-rules'
 import { trStop, useTranslated } from './translate'
@@ -114,6 +114,9 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   // 내 화면 자막을 숨겼으면 번역 요청도 하지 않는다(보이지 않는 번역에 문장마다 외부 AI·DB 계량 — r4 T08 보강). 더빙은 translateCaption 을 따로 부른다
   const shown = useTranslated(latest, tr && show, lang, ctx.seminarId)
   const langs = useLangNames(locale)
+  // 목록 앞 '내 언어'(브라우저 선호·UI·고른 언어) — 76개 목록을 다 훑지 않게(보강 r6 T08). 전체 목록에도 그대로 남긴다(선택값 1개만 표시되므로 중복 무해)
+  const mine = prefLangs(typeof navigator === 'undefined' ? [] : navigator.languages, locale, lang)
+  const langLabel = (c: string) => langs.find(([k]) => k === c)?.[1] ?? c
   const stop = useStore(trStop)
 
   // 번역 중단(권한 없음·AI 미설정·한도) — 번역을 켠 사람에게 1번 알린다. 시트에도 사유를 남긴다
@@ -220,11 +223,20 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
               onChange={(e) => capTrLang.set(e.target.value)}
               className="bg-surface-raised h-10 max-w-[60%] rounded-lg px-2"
             >
-              {langs.map(([code, name]) => (
-                <option key={code} value={code}>
-                  {name}
-                </option>
-              ))}
+              <optgroup label={t('langMine')}>
+                {mine.map((code) => (
+                  <option key={`m-${code}`} value={code}>
+                    {langLabel(code)}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label={t('langAll')}>
+                {langs.map(([code, name]) => (
+                  <option key={code} value={code}>
+                    {name}
+                  </option>
+                ))}
+              </optgroup>
             </select>
           </label>
         )}

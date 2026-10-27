@@ -439,6 +439,8 @@
       "region": "Captions",
       "translate": "Show translated captions",
       "lang": "Translation language",
+      "langMine": "My languages",
+      "langAll": "All languages",
       "trStop": {
         "forbidden": "Translated captions are only for registered participants. Showing the original",
         "unavailable": "Translated captions are not available right now. Showing the original",
