@@ -15,6 +15,10 @@ import {
   noteState,
   noteUrl,
   pickLabels,
+  pollDelay,
+  POLL_MAX_MS,
+  POLL_MS,
+  POLL_SLOW_MS,
   holdWake,
   recAlert,
   SHOT_DIFF,
@@ -438,4 +442,33 @@ test('회의록 화면 상태 조회 — 숨은 탭은 쉬고 다시 보일 때 
   const show = src.slice(src.indexOf('const onShow'), at)
   assert.match(show, /visibilityState === 'hidden'\) return/)
   assert.match(show, /removeEventListener\('visibilitychange', onShow\)\s+next\(\)/)
+})
+
+test('pollDelay — 상태를 처음 본 때부터 2분 : 기록 중 회의록을 연 참가자도 끈 뒤 요약·완료를 본다(r6 T07)', () => {
+  const t0 = 1_000_000
+  assert.equal(pollDelay('RECORDING', t0, t0 + 1000), POLL_MS)
+  // 기록 중 2분 넘게 열어 두면 멈추지 않고 30초 간격(전에는 조회 중단 → '아직 기록 중' 고착)
+  assert.equal(pollDelay('RECORDING', t0, t0 + POLL_MAX_MS + 1), POLL_SLOW_MS)
+  assert.equal(pollDelay('SUMMARIZING', t0, t0 + 1000), POLL_MS)
+  assert.equal(pollDelay('SUMMARIZING', t0, t0 + POLL_MAX_MS + 1), null)
+  for (const s of ['DONE', 'FAILED', 'x']) assert.equal(pollDelay(s, t0, t0), null)
+  // 배선 : 상태가 바뀌면 기준 시각을 다시 잡고, 간격은 pollDelay 값
+  const src = readFileSync(new URL('../components/notes/note-view.tsx', import.meta.url), 'utf8')
+  assert.match(src, /head\.status !== seenSts\.current\) \{\s+seenSts\.current = head\.status\s+since\.current = Date\.now\(\)/)
+  assert.match(src, /const delay = pollDelay\(head\.status, since\.current, Date\.now\(\)\)/)
+  assert.match(src, /\}, delay\)/)
+  assert.ok(!/POLL_MAX_MS\)/.test(src), '화면을 연 때 기준 2분 판정 잔존')
+})
+
+test('noteMarkdown — 제목·화자·발화·요약의 HTML 태그·원격 그림 문법은 글자로만(보강 r6 T07)', () => {
+  const L = { points: 'P', decisions: 'D', todos: 'T', transcript: 'X', shot: 'S', cut: 'C' }
+  const md = noteMarkdown(
+    { title: '<img src=https://e.x/a.png>', start: 's', end: null, summary: { points: ['![p](https://e.x/b.png)'], decisions: [], todos: [] } },
+    [{ at: '10:00', spk: '<b>A</b>', text: '보세요 ![x](https://e.x/c.png) <iframe>', shot: false }],
+    L,
+  )
+  assert.ok(!/<img|<b>|<iframe/.test(md), md)
+  assert.ok(!/(^|[^\\])!\[/.test(md), md)
+  assert.match(md, /&lt;img src=https:\/\/e\.x\/a\.png>/)
+  assert.match(md, /보세요 !\\\[x\]/)
 })
