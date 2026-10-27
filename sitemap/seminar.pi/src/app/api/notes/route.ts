@@ -16,7 +16,7 @@ import {
 import { isAdmin } from '@/lib/auth'
 import { geminiEnabled } from '@/lib/gemini'
 import { NOTE_LIST_PAGE } from '@/lib/note-rules'
-import { isUuid, ONE_LINE_RE } from '@/lib/seminar-rules'
+import { isUuid, ONE_LINE_RE, parsePage } from '@/lib/seminar-rules'
 
 const Body = z.union([
   z.object({ smnId: z.string().refine(isUuid) }),
@@ -104,7 +104,7 @@ export const GET = withAuthGuard(
     const smnId = q.get('smnId')
     if (smnId === null) {
       // 내 회의록 목록 — x_smn_nt_02 (usr_id, start_dtm DESC). 건수는 페이지 수 표시에 쓴다
-      const page = Math.max(1, Math.floor(Number(q.get('page')) || 1))
+      const page = parsePage(q.get('page'))
       const { data, error, count } = await db()
         .from('smn_nt')
         .select('nt_id, smn_id, nt_nm, start_dtm, nt_sts_cd', {
