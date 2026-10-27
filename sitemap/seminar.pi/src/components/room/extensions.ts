@@ -49,7 +49,7 @@ export type PanelTabDef = {
 
 // 영상 효과(15.5) — 원본 카메라 트랙 → 켜진 효과를 order 순으로 → canvas.captureStream → RTCRtpSender.replaceTrack(재협상 없음, effects.ts)
 export type VideoEffect = {
-  order: number // 작은 것부터 적용(예 배경 10 → 조명 20)
+  order: number // 작은 것부터 적용(예 조명 10 → 배경 20 : 카메라 보정 뒤 합성)
   on: FeatureStore<boolean> // 켜짐 — 30회 연속 실패하면 파이프라인이 false 로 되돌린다
   draw: EffectDraw
 }

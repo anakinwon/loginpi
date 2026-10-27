@@ -453,7 +453,10 @@
         "dots": "Dots"
       },
       "myAdd": "My image",
-      "myDel": "Delete my image",
+      "myItem": "My image {n}",
+      "myDel": "Delete my image {n}",
+      "mySaveFail": "The background is applied but could not be saved on this device (this meeting only)",
+      "bgStopped": "The background effect stopped and was turned off. Choose it again to restart",
       "myNote": "Your images are stored only on this device (up to 3, 2 MB each)",
       "myTooBig": "Only images up to 2 MB can be used",
       "preparing": "Preparing…",

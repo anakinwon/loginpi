@@ -1,5 +1,6 @@
 // 배경 효과 판정(순수 함수) — 성능 자동 끔·내 이미지 상한·cover 맞춤. 시험 rules.test.mjs(node --test)
 export const BG = {
+  order: 20, // 효과 순서 — 조명(10) 뒤. 조명이 합성된 배경까지 재면 어두운 배경(격자·노을)에서 사람이 1.8배로 과노출된다(rules.test)
   fpsMin: 15, // 처리 능력이 이 fps 미만으로
   slowSec: 3, // 연속 이 초만큼 이어지면 자동 끔
   inW: 256, // 사람 분리 입력 축소(landscape 모델 입력 256×144, REA mediapipe-05 alt_landscape)
@@ -34,6 +35,10 @@ export function slowWatch(min = BG.fpsMin, sec = BG.slowSec) {
     return slow >= sec
   }
 }
+
+// 효과가 꺼졌는데 선택이 남아 있고 고르는 중도 아니면 = 파이프라인이 연속 실패로 끈 것(사용자 끔·실패는 choose 가 선택부터 '없음'으로 바꾼다)
+export const pipelineKilled = (on: boolean, choice: string, status: 'idle' | 'loading') =>
+  !on && status === 'idle' && choice !== 'none'
 
 // 이미지(sw×sh)를 w×h 에 꽉 채우는 drawImage 대상 사각형(가운데 기준 잘림)
 export function coverRect(sw: number, sh: number, w: number, h: number) {

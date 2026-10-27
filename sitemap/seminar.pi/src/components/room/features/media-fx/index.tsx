@@ -1,6 +1,6 @@
 'use client'
 // 조명 보정 + 소음 줄이기(SA3, 설계서 15.5). 줄(FxRows)은 배경 기능의 효과 시트 '배경' 절 아래에 붙는다(⋯ '효과' 1개 = 시트 1개), 고르면 바로 적용.
-// 조명 = 영상 효과 슬롯(order 20, 배경 10 뒤) : 32×18 표본 평균 밝기 → ctx.filter brightness·contrast, 완화 이동(light.ts).
+// 조명 = 영상 효과 슬롯(LIGHT.order 10, 배경 20 앞 — 카메라 원본만 재고 고친다) : 32×18 표본 평균 밝기 → ctx.filter brightness·contrast, 완화 이동(light.ts).
 // 소음 = 마이크 트랙 applyConstraints(noiseSuppression·autoGainControl 토글, echoCancellation 늘 켬 — 끄면 하울링).
 // 판단(REA jitsi-03 ①) : Jitsi 도 기본은 브라우저 내장 처리(noiseSuppression·echoCancellation·autoGainControl true)이고 RNNoise(wasm 워클릿)는
 // 더보기의 '추가' 옵션일 뿐이다 → 우리는 브라우저 내장으로 충분하다고 보고 RNNoise·워클릿을 넣지 않는다(번들·CPU 0). 실기기 음질이 모자라면 그때 검토.
@@ -123,7 +123,7 @@ export function FxRows({ ctx }: { ctx: RoomCtx }) {
 export const mediaFx: RoomFeature = {
   id: 'media-fx',
   Overlay: FxOverlay,
-  effect: { order: 20, on: lightOn, draw: drawLight },
+  effect: { order: LIGHT.order, on: lightOn, draw: drawLight },
   onReset: () => {
     lightOn.reset()
     noiseOn.reset()

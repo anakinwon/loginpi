@@ -1,6 +1,6 @@
 'use client'
 // 배경 효과(SA5, 설계서 15.5) — ⋯ '효과' → 효과 시트(미리보기·배경 : 없음·흐리게·기본 6종·내 이미지). 고르면 바로 적용(미리보기 = 송출본).
-// 무대 역할(presenter·panel)만. 효과 순서 10(조명 20 보다 먼저). 성능이 15fps 미만 3초면 자동 끔 + 경고 토스트(rules.slowWatch).
+// 무대 역할(presenter·panel)만. 효과 순서 BG.order 20(조명 10 뒤 — 조명은 카메라 원본만 재고 고친다). 성능이 15fps 미만 3초면 자동 끔 + 경고 토스트(rules.slowWatch).
 // 조명·소음 줄은 SA3(media-fx FxRows)를 이 시트의 '배경' 절 아래에 붙인다 — ⋯ '효과' 항목은 이 기능 1개만 등록
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -22,7 +22,7 @@ import {
   status,
 } from './engine'
 import { addMine, listMine, removeMine, type MyImage } from './my-images'
-import { checkMine, PRESETS } from './rules'
+import { BG, checkMine, PRESETS } from './rules'
 import { FxRows } from '../media-fx'
 
 const open = featureStore(false)
@@ -96,7 +96,15 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
       const l = await listMine()
       setMine(l.map((x) => ({ ...x, url: URL.createObjectURL(x.blob) })))
     } catch {
-      setErr('bgFailed')
+      // 저장만 실패(용량 초과·IndexedDB 막힘) — 배경은 이미 적용됐다. '불러오지 못함'이라 하면 틀린 안내라 저장 실패로 알리고,
+      // 이번 회의 동안은 목록에 남겨 선택 표시·삭제가 되게 한다(URL 은 새로 — 이전 목록 URL 은 정리 effect 가 해제)
+      setMine((l) =>
+        [{ id, ts: Date.now(), blob: f as Blob }, ...l.filter((x) => x.id !== id)].map((x) => ({
+          ...x,
+          url: URL.createObjectURL(x.blob),
+        })),
+      )
+      setErr('mySaveFail')
     }
   }
   const del = async (id: string) => {
@@ -118,6 +126,7 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
       <button
         type="button"
         aria-pressed={sel}
+        aria-busy={sel && busy} // 이름표가 '준비 중…' 글자를 덮으므로 낭독기에 준비 중임을 따로 알린다
         aria-label={label}
         disabled={busy && !sel && id !== 'none'} // '없음'은 모델을 받는 중에도 눌러 취소할 수 있게(choose 의 pick 토큰)
         onClick={() => void pickIt(id, blob)}
@@ -190,13 +199,14 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
                 {thumb(`p:${p}`, t(`bgs.${p}`), `/backgrounds/${p}.svg`)}
               </div>
             ))}
-            {mine.map((m) => (
+            {mine.map((m, i) => (
               <div key={m.id} className="relative">
-                {thumb(`m:${m.id}`, t('myAdd'), m.url, m.blob)}
+                {/* 장마다 다른 이름 — 모두 '내 이미지'면 낭독기 사용자가 어느 것을 고르고 지우는지 구별하지 못한다 */}
+                {thumb(`m:${m.id}`, t('myItem', { n: i + 1 }), m.url, m.blob)}
                 <button
                   type="button"
                   onClick={() => void del(m.id)}
-                  aria-label={t('myDel')}
+                  aria-label={t('myDel', { n: i + 1 })}
                   className="absolute -top-1 -left-1 h-6 w-6 rounded-full bg-black/80 text-xs text-white"
                 >
                   ✕
@@ -231,24 +241,24 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   )
 }
 
-// 성능 자동 끔 경고 — 3초(polite, 설계 15.5·15.12)
+// 저절로 꺼짐 경고(느려서·연속 실패) — 3초(polite, 설계 15.5·15.12)
 function AutoOffToast() {
   const t = useTranslations('room.effects')
-  const at = useStore(autoOff)
+  const key = useStore(autoOff)
   useEffect(() => {
-    if (!at) return
-    const id = setTimeout(() => autoOff.set(0), 3000)
+    if (!key) return
+    const id = setTimeout(() => autoOff.set(null), 3000)
     return () => clearTimeout(id)
-  }, [at])
+  }, [key])
   return (
     <div
       role="status"
       aria-live="polite"
       className="pointer-events-none absolute inset-x-0 top-3 flex justify-center"
     >
-      {at > 0 && (
+      {key && (
         <span className="bg-warning rounded-full px-4 py-2 text-sm font-semibold text-black">
-          {t('autoOff')}
+          {t(key)}
         </span>
       )}
     </div>
@@ -277,7 +287,7 @@ export const backgrounds: RoomFeature = {
     },
   ],
   Overlay,
-  effect: { order: 10, on: bgOn, draw },
+  effect: { order: BG.order, on: bgOn, draw },
   onReset: () => {
     open.set(false)
     reset()

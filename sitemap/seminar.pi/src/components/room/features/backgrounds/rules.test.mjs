@@ -1,7 +1,7 @@
 // 배경 효과 판정 시험 — node --test src/components/room/features/backgrounds/rules.test.mjs (Node 24 는 .ts 를 타입 제거로 바로 읽는다)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { BG, checkMine, coverRect, overflowIds, slowWatch } from './rules.ts'
+import { BG, checkMine, coverRect, overflowIds, pipelineKilled, slowWatch } from './rules.ts'
 
 // 30fps 로 프레임마다 ms 만큼 걸린다고 치고 sec 초 동안 돌린다 — 한 번이라도 끄라고 하면 true
 function run(ms, sec, watch = slowWatch()) {
@@ -54,4 +54,32 @@ test('내 이미지 상한 3장 — 넘치면 오래된 것부터', () => {
   ]
   assert.deepEqual(overflowIds(l), ['a'])
   assert.deepEqual(overflowIds(l.slice(0, 3)), [])
+})
+
+// 회귀(T05 r1) — 조명이 배경 합성 뒤에 오면 어두운 가상 배경까지 재서 보통 조명의 사람을 과노출시켰다
+test('조명은 배경보다 먼저 — 카메라 원본만 재고 고친다', async () => {
+  const { LIGHT, lightGain } = await import('../media-fx/light.ts')
+  assert.ok(LIGHT.order < BG.order)
+  // 격자 배경(#0f172a, 밝기 약 0.08)이 화면 65%, 보통 조명 사람(0.5)이 35% 인 합성본
+  const composite = 0.65 * 0.08 + 0.35 * 0.5
+  assert.equal(lightGain(composite), LIGHT.max) // 합성본을 재면 1.8배 — 고치기 전 결함
+  assert.equal(lightGain(0.5), 1) // 카메라 원본을 재면 손대지 않는다
+})
+
+test('파이프라인 끔 판정 — 사용자 끔·고르는 중·이미 없음은 아니다', () => {
+  assert.equal(pipelineKilled(false, 'blur', 'idle'), true) // 연속 실패로 꺼짐 → 알림·분리기 버림
+  assert.equal(pipelineKilled(false, 'none', 'idle'), false) // choose('none') 은 선택부터 '없음'
+  assert.equal(pipelineKilled(false, 'p:dusk', 'loading'), false) // 처음 고르는 중
+  assert.equal(pipelineKilled(true, 'blur', 'idle'), false)
+})
+
+// 회귀(T05 r1) — 내 이미지 썸네일·삭제 버튼 이름이 모두 같아 낭독기로 구별 불가, 저장 실패를 '불러오지 못함'으로 오안내
+test('효과 문구 — 내 이미지 번호·저장 실패·멈춤 문구가 ko·en 모두 있다', async () => {
+  const { readFileSync } = await import('node:fs')
+  for (const lang of ['ko', 'en']) {
+    const fx = JSON.parse(readFileSync(new URL(`../../../../../messages/${lang}.json`, import.meta.url), 'utf8')).room.effects
+    assert.match(fx.myItem, /\{n\}/, lang)
+    assert.match(fx.myDel, /\{n\}/, lang)
+    assert.ok(fx.mySaveFail && fx.bgStopped && fx.autoOff, lang)
+  }
 })
