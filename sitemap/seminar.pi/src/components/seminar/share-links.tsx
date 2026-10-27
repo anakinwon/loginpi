@@ -1,10 +1,10 @@
 'use client'
 
-// S2 상세 '일정·공유' 줄(UI 설계 15.8, 계획 SA1) — [캘린더에 추가][일정 파일][메일로 초대] 3버튼 + 기본 메일 앱(mailto)·링크 복사 글자 링크.
+// S2 상세 '일정·공유' 줄(UI 설계 15.8, 계획 SA1) — [캘린더에 추가][일정 파일][메일로 초대] 3버튼 + 기본 메일 앱(mailto)·링크 복사·앱으로 공유 글자 링크.
 //  전부 일반 링크(OAuth 없음, M-2). 외부는 새 탭(noopener), .ics 는 공개 라우트라 세션 불필요. 링크 = 상세 딥링크(배포 주소)
 import { useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { calendarUrl, canCopy, copyText, mailtoUrl, webMailUrl } from '@/lib/calendar-rules'
+import { calendarUrl, canCopy, canShare, copyText, mailtoUrl, shareLink, webMailUrl } from '@/lib/calendar-rules'
 import { useStartText, type SeminarCard } from './shared'
 
 // min-h — 글자 확대(WCAG 1.4.4)·좁은 폭(360px)에서 두세 줄로 접혀도 칸이 늘어난다(고정 h-10 이면 글자가 칸 밖으로 넘침)
@@ -15,7 +15,7 @@ export function ShareLinks({ d }: { d: SeminarCard }) {
   const t = useTranslations('seminar.share')
   const start = useStartText()
   const locale = useLocale()
-  const [copied, setCopied] = useState<'ok' | 'fail' | null>(null)
+  const [copied, setCopied] = useState<'ok' | 'fail' | 'shareFail' | null>(null)
   const base = (process.env.NEXT_PUBLIC_APP_URL || window.location.origin).replace(/\/$/, '')
   const url = `${base}/s/${d.id}`
   const subject = t('mailSubject', { title: d.title })
@@ -50,8 +50,22 @@ export function ShareLinks({ d }: { d: SeminarCard }) {
             {t('copy')}
           </button>
         )}
+        {/* 기기 공유 시트 — 기능 탐지(Web Share 있을 때만). 닫기(cancel)는 안내 없음, 실패는 링크 복사로 안내 */}
+        {canShare() && (
+          <button
+            type="button"
+            className="text-muted-foreground hover:underline"
+            onClick={() =>
+              void shareLink({ title: d.title, text: subject, url }).then((r) =>
+                setCopied(r === 'fail' ? 'shareFail' : null),
+              )
+            }
+          >
+            {t('share')}
+          </button>
+        )}
         <span role="status" aria-live="polite" className="text-muted-foreground">
-          {copied && t(copied === 'ok' ? 'copied' : 'copyFail')}
+          {copied && t(copied === 'ok' ? 'copied' : copied === 'fail' ? 'copyFail' : 'shareFail')}
         </span>
       </div>
     </section>

@@ -101,3 +101,9 @@ test('한 줄 제목 — 줄바꿈·단독 \\r·NUL·DEL 거부, TAB·일반 글
   for (const bad of ['a\nb', 'a\rATTENDEE:x', 'a\u0000', 'a\u007F', 'a\u001Fb']) assert.ok(!ONE_LINE_RE.test(bad), JSON.stringify(bad))
   for (const ok of ['파이 세미나; 1부, 입문\\심화', 'Pi 🎉 2026', 'a\tb']) assert.ok(ONE_LINE_RE.test(ok))
 })
+
+// 결함 T01 r6 : C1 제어문자(NEL U+0085 등)·줄/문단 구분자(U+2028·2029)는 통과했음 — 범용 줄 나누기 파서가 줄바꿈으로 읽는다
+test('한 줄 제목 — NEL·C1 제어문자·U+2028·U+2029 거부, 바로 옆 글자(U+00A0·é)는 허용', () => {
+  for (const bad of ['a\u0085ATTENDEE:x', 'a\u0080', 'a\u009F', 'a\u2028b', 'a\u2029b']) assert.ok(!ONE_LINE_RE.test(bad), JSON.stringify(bad))
+  for (const ok of ['a b', 'PyCafé™', 'a‧b']) assert.ok(ONE_LINE_RE.test(ok), JSON.stringify(ok))
+})

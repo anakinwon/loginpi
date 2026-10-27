@@ -65,7 +65,8 @@ export function calendarUrl(e: CalEvent) {
 }
 
 // 메일 제목은 한 줄 — 제목 칸에 줄바꿈·제어문자가 들어가면 머리줄이 깨진다(기존 행 대비, 새 제목은 ONE_LINE_RE 로 막음)
-const oneLine = (s: string) => s.replace(/[\u0000-\u001F\u007F]+/g, ' ')
+//  C1 제어문자(U+0080~009F, NEL 포함)·줄/문단 구분자(U+2028·2029)도 줄바꿈으로 읽는 처리기가 있어 같이 공백으로
+const oneLine = (s: string) => s.replace(/[\u0000-\u001F\u007F-\u009F\u2028\u2029]+/g, ' ')
 
 // 웹 메일 작성 링크(받는 사람 비움 — 보내는 사람이 고른다)
 export function webMailUrl(subject: string, body: string) {
@@ -90,18 +91,32 @@ export async function copyText(text: string, clip: Clip = globalThis.navigator?.
   }
 }
 
-// 제어문자(TAB 제외 U+0000~001F·U+007F) 제거 — 단독 \r 등이 줄을 끊어 속성(ATTENDEE 등)을 끼워 넣지 못하게
-// eslint-disable-next-line no-control-regex
-const stripCtl = (s: string) => s.replace(/[\u0000-\u0008\u000A-\u001F\u007F]/g, '')
+// 기기 공유 시트(Web Share) — 메신저 등 설치 앱으로 바로 보낸다(메일·클립보드가 막힌 WebView 의 대안). 기능 탐지(UA 판정 아님).
+//  'cancel' = 사용자가 시트를 닫음(안내 없음), 'fail' = 미지원·거부(화면이 링크 복사로 안내)
+type Sharer = { share?: (d: { title?: string; text?: string; url?: string }) => Promise<void> } | undefined
+export const canShare = (nav: Sharer = globalThis.navigator) => typeof nav?.share === 'function'
+export async function shareLink(d: { title?: string; text?: string; url: string }, nav: Sharer = globalThis.navigator) {
+  if (!canShare(nav)) return 'fail' as const
+  try {
+    await nav!.share!(d)
+    return 'ok' as const
+  } catch (e) {
+    return (e as { name?: string } | null)?.name === 'AbortError' ? ('cancel' as const) : ('fail' as const)
+  }
+}
 
-// TEXT 값 이스케이프(RFC 5545 3.3.11) — \ ; , 줄바꿈. 줄바꿈 3종(\r\n·\r·\n)을 먼저 \n 으로 바꾸고 남은 제어문자 제거
+// 제어문자(TAB 제외 U+0000~001F·U+007F~009F)·줄/문단 구분자(U+2028·2029) 제거 — 단독 \r·NEL 등이 줄을 끊어 속성(ATTENDEE 등)을 끼워 넣지 못하게
+//  (NEL·U+2028 을 줄바꿈으로 보는 범용 줄 나누기 파서가 있다)
+const stripCtl = (s: string) => s.replace(/[\u0000-\u0008\u000A-\u001F\u007F-\u009F\u2028\u2029]/g, '')
+
+// TEXT 값 이스케이프(RFC 5545 3.3.11) — \ ; , 줄바꿈. 줄바꿈(\r\n·\r·\n·NEL·U+2028·2029)을 먼저 \n 으로 바꾸고 남은 제어문자 제거
 export const icsEscape = (s: string) =>
   stripCtl(
     s
       .replace(/\\/g, '\\\\')
       .replace(/;/g, '\\;')
       .replace(/,/g, '\\,')
-      .replace(/\r\n|\r|\n/g, '\\n'),
+      .replace(/\r\n|[\r\n\u0085\u2028\u2029]/g, '\\n'),
   )
 
 // 줄접기(RFC 5545 3.1) — 75 옥텟 넘으면 CRLF + 공백. UTF-8 글자 중간을 자르지 않는다
