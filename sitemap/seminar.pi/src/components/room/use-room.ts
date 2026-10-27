@@ -6,7 +6,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
 // v1.2(3.5) : 사회(peer.mute·room.muteAll 잠금·peer.askUnmute)·레이아웃(room.setLayout)·발언자(ntf activeSpeaker)
+// v1.3(A-2) : 범용 중계 app.send{topic,d} → ntf app{topic,d,from}(부가 기능 공용, extensions.ts) · 입장 직후 1회 지원 확인 · 카메라 송신기(영상 효과 replaceTrack)
+import type { AppMsg } from './extensions'
 import {
+  APP_MAX,
+  APP_PROBE,
+  appSupportedBy,
   batchReaction,
   capLayer,
   layerSender,
@@ -121,7 +126,8 @@ async function fetchTurn(): Promise<RTCIceServer[]> {
   return j?.iceServers ?? []
 }
 
-export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) => void }) {
+// appProbe = 등록 기능 중 엔진 app 중계가 있어야 보이는 항목이 있을 때만 입장 직후 지원 확인(없으면 요청 0 — 회귀 0)
+export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; onLog?: (m: string) => void; appProbe?: boolean }) {
   const wsRef = useRef<WebSocket | null>(null)
   const pubRef = useRef<RTCPeerConnection | null>(null)
   const subRef = useRef<RTCPeerConnection | null>(null)
@@ -192,6 +198,12 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   const [engineSpeaker, setEngineSpeaker] = useState(false)
   const [modEvent, setModEvent] = useState<ModEvent | null>(null)
   const modSeq = useRef(0)
+  // v1.3 app 중계 — 구독자(부가 기능), 지원 여부(null = 확인 중·입장 전, false = 구 엔진 : 의존 기능 숨김). ref = 요청 경로용 최신값
+  const appSubs = useRef(new Set<(m: AppMsg) => void>())
+  const appRef = useRef<boolean | null>(null)
+  const [appSupported, setAppState] = useState<boolean | null>(null)
+  // 카메라 송신기 — 영상 효과가 처리 트랙으로 replaceTrack 할 대상(카메라 발행 전·강등 뒤 null)
+  const [videoSender, setVideoSender] = useState<RTCRtpSender | null>(null)
 
   const log = (m: string) => onLog?.(m)
 
@@ -423,6 +435,17 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       setLayoutState(e.d as RoomLayout)
     } else if (e.m === 'activeSpeaker') {
       setSpeaker((e.d as { peerId: string | null }).peerId ?? null)
+    } else if (e.m === 'app') {
+      // 부가 기능 중계(v1.3) — 형식이 맞는 것만 구독자에게. 구독자 오류가 시그널링 처리를 멈추지 않게 각자 감싼다
+      const a = e.d as AppMsg
+      if (typeof a?.topic !== 'string') return
+      for (const fn of appSubs.current) {
+        try {
+          fn(a)
+        } catch (err) {
+          log(`app 처리 실패 ${a.topic} ${(err as Error).message}`)
+        }
+      }
     } else if (e.m === 'error') {
       const er = e.d as { code: string; msg: string }
       log(`서버 오류 ${er.code} ${er.msg}`)
@@ -517,6 +540,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
         sync()
       }
       setState('joined')
+      if (appProbe) probeApp(my)
       if (ticketRole === 'presenter') await publish(local, my)
     } catch (e) {
       log(`입장 실패 ${(e as Error).message}`)
@@ -556,6 +580,9 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
         pubRef.current = pc
       }
       const trs = list.map((x) => ({ ...x, tr: pc.addTransceiver(x.t, { direction: 'sendonly' }) }))
+      // 카메라 송신기는 offer 전에 알린다 — 영상 효과가 연결(ICE·DTLS) 전에 처리 트랙으로 바꿔 원본 프레임이 나가지 않게 [확인중 : 실기기 첫 프레임]
+      const cam = trs.find((x) => x.source === 'camera')
+      if (cam) setVideoSender(cam.tr.sender)
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
       const ans = await request<{ sdp: string }>('transport.publish', { sdp: offer.sdp })
@@ -679,6 +706,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     iceWait.current.pub = []
     producersRef.current = {}
     sendersRef.current = {}
+    setVideoSender(null)
     setPublished(false)
     setLocalOn({ audio: false, video: false })
     stopLocal()
@@ -775,6 +803,45 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   // 레이아웃 — 무대 고정의 내 화면공유 키는 room-rules layoutFor 가 바꾼다(그래서 내 화면공유 producerId 를 넘긴다)
   const setLayout = (l: RoomLayout) => admin('room.setLayout', l)
   const screenProducerId = () => producersRef.current.screen
+
+  // ── v1.3 app 중계(A-2) ──
+  function setApp(v: boolean | null) {
+    appRef.current = v
+    setAppState(v)
+  }
+
+  // 지원 확인(입장 직후 1회, 부작용 없음) — 요청·판정 규칙은 room-rules APP_PROBE·appSupportedBy(시험 있음)
+  function probeApp(my: number) {
+    request('app.send', APP_PROBE).then(
+      () => seqRef.current === my && setApp(true),
+      (e: unknown) => {
+        const c = codeOf(e)
+        if (seqRef.current !== my || c === 'LEFT') return
+        setApp(appSupportedBy(c))
+      },
+    )
+  }
+
+  // 보내기 — 반환 = 오류 코드(성공 null). 구 엔진(확인 결과 false)·큰 d 는 보내지 않는다.
+  // 지원 여부는 probeApp 만 정한다 — v1.3 의 NOT_FOUND 는 주제 오타·'참가자 없음' 경합도 내므로 한 번의 실패로 세션 전체 기능을 끄지 않는다
+  async function sendApp(topic: string, d: unknown): Promise<string | null> {
+    if (appRef.current === false) return 'NOT_FOUND'
+    if (new TextEncoder().encode(JSON.stringify(d ?? null)).length > APP_MAX) return 'TOO_LARGE'
+    try {
+      await request('app.send', { topic, d })
+      return null
+    } catch (e) {
+      return codeOf(e)
+    }
+  }
+
+  // 받기 구독 — 반환 = 해지 함수. 세션이 바뀌어도 구독은 유지(룸 화면이 한 번 건다)
+  function subscribeApp(fn: (m: AppMsg) => void) {
+    appSubs.current.add(fn)
+    return () => {
+      appSubs.current.delete(fn)
+    }
+  }
 
   // 반응 — 500ms 묶음(최대 3개)으로 보낸다. 서버가 300ms 합산해 전원(나 포함)에게 ntf reaction 으로 돌려준다
   function react(emoji: string) {
@@ -880,6 +947,8 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     setSpeaker(null)
     setEngineSpeaker(false)
     setModEvent(null)
+    setApp(null)
+    setVideoSender(null)
   }
 
   return {
@@ -928,5 +997,9 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     muteAll,
     setLayout,
     screenProducerId,
+    appSupported,
+    sendApp,
+    subscribeApp,
+    videoSender,
   }
 }

@@ -30,6 +30,11 @@ import {
   readStats,
   sortPeers,
   splitSlots,
+  visibleExtras,
+  APP_MAX,
+  APP_PROBE,
+  appSupportedBy,
+  consentPlan,
 } from './room-rules.ts'
 
 // 발행 PC getStats 모양 표본 — kbps·손실률로 5초 구간 두 번
@@ -345,4 +350,62 @@ test('v1.2 말하기 링 — 엔진 발언자 우선, 없으면 타일 자체 �
   assert.equal(ringFor('b', 'a', true), false)
   assert.equal(ringFor(undefined, null, true), false)
   assert.equal(ringFor('a', null, false), undefined)
+})
+
+test('부가 ⋯ 항목(15.2) — 있으면 +1칸은 늘 더보기, 칸 수 상한 메인 + 1 불변(역할 3 × 폭 4)', () => {
+  // 부가 항목이 없으면 기존 규칙 그대로(회귀 0)
+  assert.deepEqual(splitSlots([1, 2, 3], 2, []), { main: [1, 2, 3], more: [] })
+  // 넘친 기본 버튼이 1개여도 바로 노출하지 않고 ⋯ 안으로, 부가 항목은 그 뒤
+  assert.deepEqual(splitSlots([1, 2, 3], 2, ['x']), { main: [1, 2], more: [3, 'x'] })
+  assert.deepEqual(splitSlots([1, 2], 2, ['x', 'y']), { main: [1, 2], more: ['x', 'y'] })
+  for (const role of ['presenter', 'panel', 'audience'])
+    for (const width of [800, 500, 400, 300]) {
+      const items = barOrder(role, width)
+      const slots = mainSlots(width, role)
+      for (const extra of [[], ['captions'], ['captions', 'record', 'notes', 'effects']]) {
+        const { main, more } = splitSlots(items, slots, extra)
+        assert.ok(main.length + (more.length ? 1 : 0) <= slots + 1, `${role} ${width} ${extra.length}`)
+        assert.deepEqual([...main, ...more], [...items, ...extra]) // 빠지거나 겹친 항목 없음
+      }
+    }
+})
+
+test('부가 ⋯ 항목 거르기 — 역할, app 필요 항목은 지원 확인 뒤에만', () => {
+  const items = [
+    { id: 'cap', roles: ['presenter', 'panel', 'audience'], app: true },
+    { id: 'fx', roles: ['presenter', 'panel'] },
+    { id: 'rec', roles: ['presenter'], app: true },
+  ]
+  const ids = (role, app) => visibleExtras(items, role, app).map((x) => x.id)
+  assert.deepEqual(ids('presenter', true), ['cap', 'fx', 'rec'])
+  assert.deepEqual(ids('presenter', null), ['fx']) // 확인 중
+  assert.deepEqual(ids('presenter', false), ['fx']) // 구 엔진
+  assert.deepEqual(ids('panel', true), ['cap', 'fx'])
+  assert.deepEqual(ids('audience', true), ['cap'])
+  assert.deepEqual(ids('audience', false), [])
+})
+
+// 엔진 app 중계 지원 확인 — v1.3 엔진은 모르는·빈 topic 에 NOT_FOUND(주제표 ①)라서, 확인 요청은 주제표 안 topic + 상한 초과 d 여야
+// 구 엔진(미구현 메서드 NOT_FOUND)과 갈린다(REA_04_UI_EXT R-A2 — 엔진 배포본 a11f7f36 의 검사 순서)
+test('app 지원 확인 요청·판정', () => {
+  assert.ok(['caption', 'state', 'refresh'].includes(APP_PROBE.topic)) // 주제표(SIGNAL_API 3.6) 안 — 아니면 v1.3 도 NOT_FOUND
+  const bytes = new TextEncoder().encode(JSON.stringify(APP_PROBE.d)).length
+  assert.ok(bytes > APP_MAX) // ② 에서 거절(중계·속도 한도 사용 없음)
+  assert.ok(new TextEncoder().encode(JSON.stringify({ t: 'req', id: 1, m: 'app.send', d: APP_PROBE })).length < 64 << 10) // 엔진 MaxMessage
+  assert.equal(appSupportedBy('SDP_INVALID'), true) // v1.3
+  assert.equal(appSupportedBy(null), true)
+  assert.equal(appSupportedBy('ROLE_FORBIDDEN'), true)
+  assert.equal(appSupportedBy('NOT_FOUND'), false) // 구 엔진
+  assert.equal(appSupportedBy('TIMEOUT'), false)
+})
+
+// 마이크 동의 — 서버가 정본, 이 기기 기록은 서버를 모를 때만, 서버에 없고 기기에 있으면 다시 기록
+test('동의 서버·기기 맞추기', () => {
+  assert.equal(consentPlan({ agreed: true, stored: true }, false), 'mark')
+  assert.equal(consentPlan({ agreed: false, stored: true }, false), 'ask')
+  assert.equal(consentPlan({ agreed: false, stored: true }, true), 'repost') // 전에 POST 실패
+  assert.equal(consentPlan({ agreed: false, stored: false }, true), 'mark') // DB 미적용
+  assert.equal(consentPlan({ agreed: false, stored: false }, false), 'ask')
+  assert.equal(consentPlan(null, true), 'mark') // 네트워크·오류
+  assert.equal(consentPlan(null, false), 'ask')
 })

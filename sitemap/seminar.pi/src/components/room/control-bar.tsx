@@ -2,7 +2,9 @@
 // 하단 컨트롤 바 — 역할별 버튼(설계서 6.1·14.3 표) : presenter·panel = 마이크·카메라·채팅·참가자·화면공유(+손 목록 / 반응),
 // audience = 손들기·반응·채팅·참가자·화질(M4 수동 상한). 나가기·소리 켜기는 슬롯 밖. 꺼짐 = danger 색 + 사선 아이콘(색만으로 상태를 전하지 않음), 아이콘만 보여도 aria-label 유지.
 // 폭 기반 슬롯(565/420/370) + 더보기(넘친 버튼이 1개면 바로 노출) · 폭 > 760px 텍스트 라벨 · 단축키 Ctrl/⌘+D·E · 자동 숨김(useBarVisibility)
+// 부가 기능(설계서 15.2) — extra 가 있으면 +1칸은 늘 ⋯, 넘친 기본 버튼 → 구분선 → 부가 항목(ExtraItem). 없으면 기존 그대로
 import {
+  Fragment,
   useEffect,
   useId,
   useRef,
@@ -13,6 +15,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useTranslations } from 'next-intl'
+import { featureStore, useStore, type MoreItem, type RoomCtx } from './extensions'
 import { BAR, barOrder, mainSlots, QUALITY_CAPS, splitSlots, type BarId, type QualityCap } from './room-rules'
 import type { MediaKind, SessionRole } from './use-room'
 
@@ -154,8 +157,8 @@ export const MENU_SURFACE =
 
 export type BarItem = { id: string; node: (o: { label: boolean; menu: boolean }) => ReactNode }
 
-// 더보기 — 항목을 누르면 닫힌다. 열림 중엔 바 자동 숨김 보류(onOpen)
-function MoreMenu({ items, onOpen }: { items: BarItem[]; onOpen: (o: boolean) => void }) {
+// 더보기 — 항목을 누르면 닫힌다. 열림 중엔 바 자동 숨김 보류(onOpen). sep = 부가 항목이 시작하는 자리(그 앞에 구분선)
+function MoreMenu({ items, sep, onOpen }: { items: BarItem[]; sep: number; onOpen: (o: boolean) => void }) {
   const t = useTranslations('room')
   const [open, setOpenState] = useState(false)
   const id = useId()
@@ -194,10 +197,11 @@ function MoreMenu({ items, onOpen }: { items: BarItem[]; onOpen: (o: boolean) =>
           }}
           className={MENU_SURFACE}
         >
-          {items.map((it) => (
-            <div key={it.id} role="none">
-              {it.node({ label: true, menu: true })}
-            </div>
+          {items.map((it, i) => (
+            <Fragment key={it.id}>
+              {i === sep && i > 0 && <div role="separator" className="my-1 border-t border-white/10" />}
+              <div role="none">{it.node({ label: true, menu: true })}</div>
+            </Fragment>
           ))}
         </div>
       )}
@@ -230,7 +234,7 @@ export function BarButton({
   onClick: () => void
   'data-react-trigger'?: boolean
   'data-quality-trigger'?: boolean
-  'aria-haspopup'?: 'menu' // 메뉴를 여는 버튼(반응) — 토글 상태는 aria-expanded 로(aria-pressed 대신)
+  'aria-haspopup'?: 'menu' | 'dialog' // 메뉴(반응)·시트(부가 기능)를 여는 버튼 — 토글 상태는 aria-expanded 로(aria-pressed 대신)
   'aria-expanded'?: boolean
 }) {
   const state =
@@ -270,7 +274,36 @@ const Emoji = ({ c }: { c: string }) => (
   </span>
 )
 
-export type PanelTab = 'chat' | 'people'
+// 부가 ⋯ 항목(extensions MoreItem) — 켜기/끄기 상태는 기능 저장소에서 읽는다(바 전체를 다시 그리지 않아도 표시가 맞게)
+const OFF = featureStore(false)
+export function ExtraItem({
+  item,
+  ctx,
+  label,
+  menu,
+}: {
+  item: MoreItem
+  ctx: RoomCtx
+  label: boolean
+  menu: boolean
+}) {
+  const t = useTranslations('room')
+  const on = useStore(item.checked ?? OFF)
+  return (
+    <BarButton
+      icon={item.icon}
+      text={t(item.label)}
+      pressed={item.checked ? on : undefined}
+      label={label}
+      menu={menu}
+      {...(item.sheet ? { 'aria-haspopup': 'dialog' as const } : {})}
+      onClick={() => item.onClick(ctx)}
+    />
+  )
+}
+
+// 'chat'·'people' + 부가 기능 탭 id(extensions PanelTabDef)
+export type PanelTab = string
 
 export function ControlBar({
   role,
@@ -300,6 +333,7 @@ export function ControlBar({
   onQuality,
   onSound,
   onLeave,
+  extra = [],
 }: {
   role: SessionRole
   ready: boolean // 발행 완료(produce 응답) 전엔 마이크·카메라 토글 비활성 — producerId 가 없어 눌러도 실패
@@ -328,6 +362,7 @@ export function ControlBar({
   onQuality: () => void // 화질 메뉴 열기·닫기(청중)
   onSound: () => void
   onLeave: () => void
+  extra?: BarItem[] // 부가 기능 ⋯ 항목(역할·엔진 지원으로 이미 거른 것)
 }) {
   const t = useTranslations('room')
   const stage = role !== 'audience'
@@ -463,7 +498,7 @@ export function ControlBar({
     return n ? [{ id, node: n }] : []
   })
   const labels = width > BAR.labelMinWidth
-  const { main, more } = splitSlots(items, mainSlots(width, role))
+  const { main, more } = splitSlots(items, mainSlots(width, role), extra)
 
   return (
     <nav
@@ -475,7 +510,7 @@ export function ControlBar({
           {it.node({ label: labels, menu: false })}
         </span>
       ))}
-      {more.length > 0 && <MoreMenu items={more} onOpen={onHold} />}
+      {more.length > 0 && <MoreMenu items={more} sep={more.length - extra.length} onOpen={onHold} />}
       {soundBlocked && (
         <button type="button" onClick={onSound} className={`${BTN} bg-accent px-4 text-sm font-semibold text-white`}>
           <span aria-hidden>🔊</span> {t('enableSound')}
@@ -544,7 +579,7 @@ export function QualityMenu({
 export function useBarVisibility(active: boolean) {
   const [shown, setShown] = useState(true)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  const holds = useRef({ over: false, focus: false, menu: false })
+  const holds = useRef({ over: false, focus: false, menu: false, sheet: false })
   const mouse = useRef(false) // 마지막 조작이 마우스였나 — 터치 사용자에겐 타이머를 걸지 않는다
 
   const arm = () => {
@@ -563,6 +598,7 @@ export function useBarVisibility(active: boolean) {
   useEffect(() => {
     if (!active) {
       clearTimeout(timer.current)
+      holds.current.sheet = false // 퇴장·끊김으로 닫힌 부가 기능 시트의 보류가 다음 입장까지 남지 않게
       setShown(true)
     }
     return () => clearTimeout(timer.current)
@@ -600,5 +636,7 @@ export function useBarVisibility(active: boolean) {
       },
     },
     onMenu: (open: boolean) => hold('menu', open),
+    // 부가 기능 시트·대화상자(extensions ctx.hold) — 더보기 메뉴와 따로 센다(메뉴 항목 탭으로 메뉴가 닫혀도 시트가 열려 있으면 보류 유지)
+    onSheet: (open: boolean) => hold('sheet', open),
   }
 }

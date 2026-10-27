@@ -1,14 +1,29 @@
 'use client'
 // 세미나 룸 화면 — 로그인 게이트 → 대기실(S3) → 룸(S4)을 한 페이지 상태 전환으로 잇는다(설계서 5절 :
 // 대기실 카메라 스트림과 [입장] 탭 제스처를 그대로 룸에 넘겨야 Pi Browser 자동재생이 막히지 않는다). 서버 redirect 없음
-import { useEffect, useRef, useState } from 'react'
-import { useTranslations } from 'next-intl'
+// 부가 기능 확장 지점(F-U, extensions.ts) — features/index.ts 등록부를 ⋯ 항목·패널 탭·무대 오버레이·영상 효과·app 수신·음성 조각·마이크 동의로 잇는다.
+// 등록이 0개면 아무것도 더하지 않는다(회귀 0)
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { LoginGate } from '@/components/login-gate'
 import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
 import { isUuid } from '@/lib/seminar-rules'
 import { ConnectionBadge, useConnectionCheck } from './connection-check'
-import { ControlBar, ICON, Icon, QualityMenu, useBarVisibility, type PanelTab } from './control-bar'
+import { ConsentDialog, useConsent } from './consent'
+import {
+  ControlBar,
+  ExtraItem,
+  ICON,
+  Icon,
+  QualityMenu,
+  useBarVisibility,
+  type BarItem,
+  type PanelTab,
+} from './control-bar'
+import { useVideoEffects } from './effects'
+import { featureStore, speechWants, useStore, useStores, type RoomCtx } from './extensions'
+import { FEATURES } from './features'
 import { Prejoin } from './prejoin'
 import { Floaters, ReactionMenu } from './reactions'
 import {
@@ -23,10 +38,23 @@ import {
   type Grade,
   type ModAction,
   type ToastState,
+  visibleExtras,
 } from './room-rules'
-import { SidePanel } from './side-panel'
+import { SidePanel, type ExtraTab } from './side-panel'
 import { Spinner, Stage, useRemoteAudio } from './stage'
 import { useRoom, type MediaKind, type Role, type SessionRole } from './use-room'
+import { useSpeech } from './use-speech'
+
+// 등록부에서 한 번만 뽑는 목록(모듈 상수 — 저장소 구독 목록이 렌더마다 같아야 한다)
+const MORE = FEATURES.flatMap((f) => f.more ?? [])
+const TABS = FEATURES.flatMap((f) => (f.tab ? [f.tab] : []))
+const ZERO = featureStore(0)
+const TAB_BADGES = TABS.map((x) => x.badge ?? ZERO)
+const EFFECTS = FEATURES.flatMap((f) => (f.effect ? [f.effect] : [])).sort((a, b) => a.order - b.order)
+// 발언자 음성을 처리하는 기능이 있을 때만 마이크 동의·대기실 고지(A-6). 음성 조각은 동의한 사람만 돈다
+const CONSENT = FEATURES.some((f) => f.consent)
+// 엔진 app 중계가 있어야 보이는 ⋯ 항목이 있을 때만 입장 직후 지원 확인(없으면 확인 요청도 보내지 않는다)
+const NEEDS_APP = MORE.some((it) => it.app)
 
 export function RoomView({ room, wsUrl }: { room: string; wsUrl?: string }) {
   const t = useTranslations('room')
@@ -37,6 +65,7 @@ export function RoomView({ room, wsUrl }: { room: string; wsUrl?: string }) {
         <Room
           room={room}
           wsUrl={wsUrl}
+          userId={user.userId}
           name={user.displayName || user.username || ''}
           // 발표 선택지 노출용 힌트일 뿐 — 실제 발표 권한은 입장권 API(isAdmin)가 서버에서 판정(13절 #8 : 지금은 관리자만)
           canPresent={user.role === 'ADMIN' || user.role === 'MASTER'}
@@ -130,13 +159,25 @@ function QualityToast({ grade }: { grade: Grade }) {
 // 화면 알림 문구 키 — 오류 코드가 있으면 그 문구, 없으면 일반 실패 문구
 const ERR_NOTICE = new Set(['RATE_LIMITED', 'ROLE_FORBIDDEN', 'MEDIA_FAILED', 'LOCKED'])
 
-function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; name: string; canPresent: boolean }) {
+function Room({
+  room,
+  wsUrl,
+  userId,
+  name,
+  canPresent,
+}: {
+  room: string
+  wsUrl: string
+  userId: string
+  name: string
+  canPresent: boolean
+}) {
   const t = useTranslations('room')
-  const r = useRoom({ wsUrl })
+  const r = useRoom({ wsUrl, appProbe: NEEDS_APP })
   const audioRef = useRef<HTMLAudioElement>(null)
   const [ticketRole, setTicketRole] = useState<Role>(canPresent ? 'presenter' : 'audience')
   const sound = useRemoteAudio(audioRef, r.remoteAudio)
-  // 화면 안 알림(alert() 금지, 설계서 14.5) — 값은 room.notice.* 키(+ 변수)
+  // 화면 안 알림(alert() 금지, 설계서 14.5) — key = room.* 아래 전체 경로(+ 변수). say 는 notice.* 를, 부가 기능(ctx.notice)은 자기 키를 쓴다
   const [notice, setNotice] = useState<{ key: string; v?: Record<string, string> } | null>(null)
   // 새 채팅·손들기 낭독(aria-live polite, 설계서 10절) — 오류 알림(assertive)과 분리
   const [announce, setAnnounce] = useState('')
@@ -172,10 +213,63 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
     const timer = setTimeout(() => setNotice(null), NOTICE_MS)
     return () => clearTimeout(timer)
   }, [notice])
-  const say = (key: string, v?: Record<string, string>) => setNotice({ key, v })
+  const say = (key: string, v?: Record<string, string>) => setNotice({ key: `notice.${key}`, v })
   const sayErr = (code: string | null, fallback: string) => {
     if (code) say(ERR_NOTICE.has(code) ? `err.${code}` : fallback)
   }
+
+  // ── 부가 기능(extensions.ts) ──
+  const locale = useLocale()
+  // 마이크 동의 — 음성 처리 기능이 있고 내가 말할 수 있을 때만(발표 가능·무대 역할)
+  const consent = useConsent(room, userId, CONSENT && (canPresent || role !== 'audience'))
+  // 음성 조각(A-1) — 기능들의 말하기 요청을 합쳐 녹음기 1개로. 동의한 무대 역할의 내 마이크만(청중 음성은 나가지 않는다)
+  const wants = Object.values(useStore(speechWants))
+  const speech = useSpeech({
+    track: role !== 'audience' ? (r.localStream?.getAudioTracks()[0] ?? null) : null,
+    seminarId: room,
+    lang: locale,
+    on: live && wants.length > 0 && consent.agreed,
+    broadcast: wants.includes('caption'),
+    sendApp: r.sendApp,
+    onText: (text, ts) => FEATURES.forEach((f) => f.onSpeech?.(text, ts, ctxRef.current)),
+    // 서버에 동의 기록이 없다 — 이 기기 기록을 지우고 다시 묻는다(동의하면 음성 조각이 다시 돈다, 안 하면 마이크만 계속)
+    onNoAgr: () => {
+      consent.reset()
+      void consent.ask()
+    },
+  })
+  // 영상 효과 — 켜진 효과가 없으면 null(원본 그대로). 내 타일은 처리된 영상을 보여 준다(송출본 = 미리보기)
+  const fxTrack = useVideoEffects(EFFECTS, r.localStream?.getVideoTracks()[0] ?? null, r.videoSender)
+  const selfView = useMemo(
+    () => (fxTrack && r.localStream ? new MediaStream([...r.localStream.getAudioTracks(), fxTrack]) : r.localStream),
+    [fxTrack, r.localStream],
+  )
+  const ctx: RoomCtx = {
+    r,
+    role,
+    seminarId: room,
+    appSupported: r.appSupported,
+    sendApp: r.sendApp,
+    speechLimited: speech.limited,
+    notice: (key, v) => setNotice({ key, v }),
+    announce: setAnnounce,
+    hold: bar.onSheet,
+    openPanel,
+  }
+  const ctxRef = useRef(ctx)
+  useEffect(() => {
+    ctxRef.current = ctx
+  })
+  // ntf app → 등록 기능(구독은 한 번 — 세션이 바뀌어도 유지)
+  useEffect(
+    () => r.subscribeApp((m) => FEATURES.forEach((f) => f.onApp?.(m, ctxRef.current))),
+    [], // eslint-disable-line react-hooks/exhaustive-deps
+  )
+  const extra: BarItem[] = visibleExtras(MORE, role, r.appSupported).map((it) => ({
+    id: `x:${it.id}`,
+    node: (o) => <ExtraItem item={it} ctx={ctx} {...o} />,
+  }))
+  const badges = useStores(TAB_BADGES)
 
   // 발표 거부(ROLE_FORBIDDEN) — 청중으로 계속한다는 사실을 알린다(설계서 7.3)
   useEffect(() => {
@@ -222,13 +316,23 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
     if (l) sayErr(await r.setLayout(l), 'actionFailed')
   }
 
+  // 지금 화면에 보이는 패널 탭 — 패널이 열려 있으면 tab(사이드 패널이 그리는 기준과 같다). panel 은 '어느 버튼으로 열었나'라서 탭을 옮겨도 그대로다
+  const shown = panel !== null ? tab : null
   // 안 읽은 채팅 — 채팅 탭이 보이는 동안은 다 읽은 것
   const lastN = r.chat.at(-1)?.n ?? 0
-  const chatVisible = panel === 'chat'
+  const chatVisible = shown === 'chat'
   useEffect(() => {
     if (chatVisible) setSeenN(lastN)
   }, [chatVisible, lastN])
   const unread = chatVisible ? 0 : r.chat.filter((m) => !m.mine && m.n > seenN).length
+  // 부가 탭(Q&A·설문 등) — 바 '채팅' 배지 = 채팅 + 부가 탭 새 항목 합계(패널 입구가 채팅 버튼 하나라서, 15.3)
+  const extraTabs: ExtraTab[] = TABS.map((x, i) => ({
+    id: x.id,
+    label: x.label,
+    badge: badges[i],
+    node: <x.Panel ctx={ctx} visible={shown === x.id} />,
+  }))
+  const badgeAll = unread + badges.reduce((a, b) => a + b, 0)
 
   // 낭독 — 새 채팅(남의 것)·새로 든 손
   const lastMsg = r.chat.at(-1)
@@ -257,9 +361,14 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
     setDismissed(new Set())
     setAsk(null)
     leaveRef.current?.close()
+    // 부가 기능 — 저장소를 처음 값으로(시트·배지·자막·말하기 요청). 시트 보류는 useBarVisibility 가 비활성 때 푼다
+    for (const f of FEATURES) f.onReset?.()
+    speechWants.reset()
   }, [live])
 
   async function toggle(kind: MediaKind, on: boolean) {
+    // 마이크를 처음 켜기 직전 동의(A-6) — 동의 안 함이어도 마이크는 켠다(음성 처리만 빠짐, consent.agreed 로 막힘). 닫기(Esc)만 켜기 취소
+    if (kind === 'audio' && on && consent.needed && (await consent.ask()) === null) return
     // 아직 없는 마이크·카메라(승격된 panel·카메라 없이 들어온 발표자) = 이 탭으로 켜서 발행. 자동으로 켜지 않는다(설계서 14.4)
     if (!has[kind]) return sayErr(await r.addMedia(kind), `toggleFailed.${kind}`)
     if (!(await r.setMedia(kind, on))) say(`toggleFailed.${kind}`)
@@ -277,7 +386,13 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
       if (!el.srcObject) el.srcObject = new MediaStream()
       el.play().catch(() => {})
     }
-    void r.join(room, ticketRole, local)
+    // 마이크를 켠 채 발표자로 입장 = 첫 송출 직전 → 동의를 먼저 묻는다. 동의 안 함 = 마이크 켠 채(음성 처리 없음), 닫기 = 마이크를 끈 채 입장(입장은 막지 않음)
+    const mic = ticketRole === 'presenter' ? (local?.getAudioTracks().filter((tr) => tr.enabled) ?? []) : []
+    if (!mic.length || !consent.needed) return void r.join(room, ticketRole, local)
+    void consent.ask().then((a) => {
+      if (a === null) mic.forEach((tr) => (tr.enabled = false))
+      void r.join(room, ticketRole, local)
+    })
   }
 
   function onLeave() {
@@ -310,7 +425,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
       <div aria-live="assertive" className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-4">
         {notice && (
           <p className="bg-surface-raised rounded-lg px-4 py-2 text-sm shadow-lg">
-            {t(`notice.${notice.key}`, notice.v)}
+            {t(notice.key, notice.v)}
           </p>
         )}
       </div>
@@ -326,6 +441,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
           role={ticketRole}
           onRole={setTicketRole}
           onJoin={onJoin}
+          notice={CONSENT}
         />
       ) : ended ? (
         <Ended code={r.error ?? 'CLOSED'} room={room} onRejoin={r.leave} />
@@ -427,7 +543,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                   selfName={me?.name ?? name}
                   peers={r.peers}
                   tracks={r.tracks}
-                  local={r.localStream}
+                  local={selfView}
                   localScreen={r.localScreen}
                   localOn={r.localOn}
                   onLayer={r.setLayer}
@@ -437,6 +553,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                   onPin={role === 'presenter' ? (k) => void pinForAll(k) : undefined}
                 />
                 <Floaters reaction={r.reaction} />
+                {FEATURES.map((f) => f.Overlay && <f.Overlay key={f.id} ctx={ctx} barShown={bar.shown} />)}
               </div>
             </div>
             {/* 자동 숨김 — 200ms 페이드(reduced-motion 이면 즉시), 숨겨도 자리는 유지해 무대가 출렁이지 않게 */}
@@ -464,7 +581,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                 canShare={canShare}
                 sharing={!!r.localScreen}
                 panel={panel}
-                unread={unread}
+                unread={badgeAll}
                 raised={raisedCount}
                 handUp={(me?.raisedTs ?? 0) > 0}
                 reactOpen={reactOpen}
@@ -481,6 +598,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
                 onQuality={() => setQualityOpen((o) => !o)}
                 onSound={() => void sound.enable()}
                 onLeave={onLeave}
+                extra={extra}
               />
             </div>
           </div>
@@ -502,9 +620,11 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
             locks={r.locks}
             onMod={(id, a) => void moderate(id, a)}
             onMuteAll={async (lock) => sayErr(await r.muteAll('audio', lock), 'actionFailed')}
+            extra={extraTabs}
           />
         </div>
       )}
+      {CONSENT && <ConsentDialog open={consent.open} onAnswer={consent.answer} />}
       {/* 발표자 나가기 — [나가기]/[세미나 종료](확인 1단계 더). 기본 <dialog> : Esc·포커스 가두기 내장 */}
       <dialog
         ref={leaveRef}

@@ -90,10 +90,39 @@ export function gradeNet(a: Totals, b: Totals, on: Record<NetKind, boolean>): Ne
   return best
 }
 
-// 슬롯 나누기 — 넘친 버튼이 1개뿐이면 더보기를 만들지 않고 바로 노출(Jitsi 규칙)
-export function splitSlots<T>(items: T[], slots: number): { main: T[]; more: T[] } {
+// 슬롯 나누기 — 넘친 버튼이 1개뿐이면 더보기를 만들지 않고 바로 노출(Jitsi 규칙).
+// extra(부가 기능 ⋯ 항목, 설계서 15.2)가 있으면 +1칸은 늘 ⋯ — 넘친 기본 버튼 뒤에 부가 항목. 칸 수 상한 '메인 + 1 + 나가기' 불변
+export function splitSlots<T>(items: T[], slots: number, extra: T[] = []): { main: T[]; more: T[] } {
+  if (extra.length) return { main: items.slice(0, slots), more: [...items.slice(slots), ...extra] }
   if (items.length <= slots + 1) return { main: items, more: [] }
   return { main: items.slice(0, slots), more: items.slice(slots) }
+}
+
+// ── 엔진 app 중계(SIGNAL_API 3.6, v1.3) ──
+// d 의 JSON 바이트 상한(검사 ②, 엔진 AppMaxBytes) — 넘으면 화면이 보내지 않는다
+export const APP_MAX = 4096
+// 지원 확인 요청(부작용 없음) — 주제표에 있는 topic + 상한을 넘는 d. v1.3 = ① 통과·② SDP_INVALID(중계·속도 한도 사용 없음), 구 엔진 = NOT_FOUND(미구현 메서드).
+// 빈·모르는 topic 은 v1.3 도 ① 에서 NOT_FOUND 라 구 엔진과 구분되지 않는다(엔진 배포본 REA 확인 — REA_04_UI_EXT R-A2·4절). 직렬화 ≈4.1KB < 엔진 메시지 상한 64KB
+export const APP_PROBE = { topic: 'refresh', d: 'x'.repeat(APP_MAX + 1) } as const
+// 확인 응답 코드 → 지원 여부. 성공(null)·그 밖 거절 = 지원, NOT_FOUND(구 엔진)·TIMEOUT(응답 없음) = 미지원
+export const appSupportedBy = (code: string | null) => code !== 'NOT_FOUND' && code !== 'TIMEOUT'
+
+// 마이크 동의 — 서버 조회 결과({agreed, stored} | 응답 없음 null)와 이 기기 기록으로 할 일을 정한다(consent.tsx).
+// mark = 동의된 것으로 / repost = 서버에 없고 이 기기엔 있음(전에 POST 실패) → 1회 다시 기록 / ask = 마이크 켤 때 묻는다.
+// 서버를 모르면(미적용 stored:false·네트워크·오류) 이 기기 기록이 대신한다
+export function consentPlan(server: { agreed?: boolean; stored?: boolean } | null, local: boolean) {
+  if (server?.stored && server.agreed) return 'mark'
+  if (!server?.stored) return local ? 'mark' : 'ask'
+  return local ? 'repost' : 'ask'
+}
+
+// 부가 ⋯ 항목 거르기(15.1) — 내 역할에 보이는 것만, app 중계가 필요한 항목은 엔진 지원이 확인됐을 때만(확인 중 null·구 엔진 false = 숨김)
+export function visibleExtras<T extends { roles: readonly PeerRole[]; app?: boolean }>(
+  items: readonly T[],
+  role: PeerRole,
+  app: boolean | null,
+): T[] {
+  return items.filter((it) => it.roles.includes(role) && (!it.app || app === true))
 }
 
 // ── M3 (SIGNAL_API v1.1) ──
