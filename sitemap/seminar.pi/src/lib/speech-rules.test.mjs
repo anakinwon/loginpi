@@ -167,7 +167,8 @@ test('합성 음성 사용 판정(D-2) — PAY 는 402, 나머지는 vcUseError 
 })
 
 test('더빙 자동 끄기 — 다음 문장도 실패할 오류만(한도·종료·미결제), 한 문장 실패는 건너뜀', () => {
-  for (const c of ['SPEECH_QUOTA', 'SPEECH_NOT_LIVE', 'SMN_PAY_REQUIRED']) assert.equal(dubStop(c), true, c)
-  for (const c of ['SPEECH_TTS_FAILED', 'FORBIDDEN', 'SPEECH_RATE', 'AI_UNAVAILABLE', undefined, null, 1])
+  for (const c of ['SPEECH_QUOTA', 'SPEECH_NOT_LIVE', 'SMN_PAY_REQUIRED', 'DB_UNAVAILABLE', 'QUERY_FAILED', 'AI_UNAVAILABLE'])
+    assert.equal(dubStop(c), true, c)
+  for (const c of ['SPEECH_TTS_FAILED', 'FORBIDDEN', 'SPEECH_RATE', undefined, null, 1])
     assert.equal(dubStop(c), false, String(c))
 })

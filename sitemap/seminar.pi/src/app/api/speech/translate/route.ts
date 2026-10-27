@@ -1,6 +1,7 @@
 // 자막 문장 번역(SA8) — POST { smnId, text, lang } → { text }. 청중이 자막 시트에서 고른 언어로 자기 화면 자막만 번역한다(계획 A-3, piFetch).
-// 순서 : 키 확인(없으면 503) → 세션·본문 병렬(R-P1) → 사용자당 분당 60회 → 캐시(문장 해시×언어) → 참가 자격(gate, 캐시 미스만) → 외부 AI 번역(10초, BUILD_DEFECTS 2.7)
-// 캐시 적중은 자격 확인 없이 돌려준다 — 요청자가 보낸 문장의 번역이라 새어 나갈 데이터가 없고, 비용이 없다(같은 자막을 여러 청중이 동시에 요청 = DB 왕복 절약, R-P2)
+// 순서 : 키 확인(없으면 503) → 세션·본문 병렬(R-P1) → 사용자당 분당 60회 → 원문 자막 서명 확인(DB 없음, 실패 403) → 캐시(문장 해시×언어) → 참가 자격(gate, 캐시 미스만) → 외부 AI 번역(10초, BUILD_DEFECTS 2.7)
+// 서버가 발급한 자막(speech/chunk 서명, 10분)만 번역한다 — 임의 글 외부 AI 대행 차단(보안 검토 D-2). 서명 없는 옛 화면 자막은 번역 안 됨(원문 표시)
+// 캐시 적중은 자격 확인 없이 돌려준다 — 서명이 '이 세미나의 서버 발급 자막'을 보증하고, 비용이 없다(같은 자막을 여러 청중이 동시에 요청 = DB 왕복 절약, R-P2)
 // 동시에 같은 문장·언어 요청이 몰리면 진행 중 Promise 를 같이 기다린다(외부 AI 1회). 실패한 결과는 캐시에서 지운다. 비로그인 401(redirect 없음)
 // ponytail: 캐시·요청 창 모두 서버 인스턴스 메모리 — 인스턴스가 여러 개면 인스턴스별(상한 = 인스턴스 수 × 60회). 정확한 전역 상한이 필요하면 DB 함수(fn_use_smn_vc 와 같은 방식)로
 import { NextResponse } from 'next/server'
@@ -26,12 +27,14 @@ export const POST = withAuthGuard(
     if (typeof b.smnId !== 'string' || !isUuid(b.smnId) || !text || !isTranslateLang(b.lang))
       return apiError('INVALID_INPUT', 400)
     const lang = b.lang
+    const smnId = b.smnId.toLowerCase()
     if (!hitRate(rate, user.id, Date.now())) return apiError('SPEECH_RATE', 429)
+    if (!verifyCaption(env.PI_SESSION_SECRET, b.sig, { smnId, lang: '', text })) return apiError('FORBIDDEN', 403)
 
     const key = await cacheKey(text, lang)
     let p = cache.get(key)
     if (!p) {
-      const g = await gate(b.smnId.toLowerCase(), user)
+      const g = await gate(smnId, user)
       if (g instanceof NextResponse) return g
       if (!g.open) return closed()
       // 자격 확인을 기다리는 사이 같은 요청이 먼저 넣었을 수 있다
@@ -43,11 +46,8 @@ export const POST = withAuthGuard(
       cache.delete(key)
       return apiError('TRANSLATE_FAILED', 502)
     }
-    // 서버가 발급한 원문 자막(chunk 서명)의 번역에만 번역문 서명을 붙인다 — 더빙(/api/speech/tts)은 이 서명이 있는 글만 합성(D-2)
-    const smnId = b.smnId.toLowerCase()
-    const sig = verifyCaption(env.PI_SESSION_SECRET, b.sig, { smnId, lang: '', text })
-      ? signCaption(env.PI_SESSION_SECRET, { smnId, lang, text: out })
-      : undefined
+    // 번역문 서명 — 더빙(/api/speech/tts)은 이 서명이 있는 글만 합성(D-2). 매 응답 새로 발급(만료 10분)
+    const sig = signCaption(env.PI_SESSION_SECRET, { smnId, lang, text: out })
     return NextResponse.json({ text: out, sig }, { headers: noStore })
   }),
 )

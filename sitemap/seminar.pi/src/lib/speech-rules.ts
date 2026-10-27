@@ -153,9 +153,10 @@ export const TTS_SMN_MAX_CHR = 300_000
 export const TTS_USR_MAX_CHR = TTS_SMN_MAX_CHR / 2
 
 // 합성 음성 응답 오류 중 '다음 문장도 똑같이 실패할' 것 — 더빙을 끄고 알린다(문장마다 헛요청·DB 왕복 반복 방지).
+// DB 오류(DB_UNAVAILABLE·QUERY_FAILED — 예 : sql/010 미적용으로 fn_use_smn_tts 없음)·키 없음(AI_UNAVAILABLE)도 문장마다 똑같이 실패하므로 끈다(R-P5 실패 루프 차단).
 // 한 문장만의 실패(502 합성 실패·403 서명 불일치·429 분당 요청)는 그 문장만 건너뛴다
-export const dubStop = (code: unknown) =>
-  code === 'SPEECH_QUOTA' || code === 'SPEECH_NOT_LIVE' || code === 'SMN_PAY_REQUIRED'
+const DUB_STOP = new Set(['SPEECH_QUOTA', 'SPEECH_NOT_LIVE', 'SMN_PAY_REQUIRED', 'DB_UNAVAILABLE', 'QUERY_FAILED', 'AI_UNAVAILABLE'])
+export const dubStop = (code: unknown) => typeof code === 'string' && DUB_STOP.has(code)
 
 // fn_use_smn_tts 결과 → 오류(OK = 통과). PAY = 유료 세미나 미등록(입장권·gate 와 같은 402)
 export function ttsUseError(rslt: string | null | undefined): Err {

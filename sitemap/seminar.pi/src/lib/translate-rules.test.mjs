@@ -1,7 +1,7 @@
 // translate-rules.ts 시험(SA8) — node --test src/lib/translate-rules.test.mjs. 한국어 → 영어 번역 요청의 규칙·캐시 키 확인
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { cacheKey, cleanText, hitRate, isTranslateLang, Lru, sameLang, TRANSLATE_LANGS } from './translate-rules.ts'
+import { cacheKey, cleanText, hitRate, isTranslateLang, Lru, sameLang, sigFresh, TRANSLATE_LANGS } from './translate-rules.ts'
 
 test('대상 언어 — 60개 이상, 중복 없음, 목록 밖·형식 이상 거부', () => {
   assert.ok(TRANSLATE_LANGS.length >= 60)
@@ -57,4 +57,14 @@ test('사용자당 분당 60회 — 61번째 거부, 1분 지나면 다시 허�
   assert.equal(hitRate(t, 'u1', 1000), false)
   assert.ok(hitRate(t, 'u2', 1000))
   assert.ok(hitRate(t, 'u1', 61_000))
+})
+
+test('번역 캐시 서명 신선도 — 만료·여유 30초 안·형식 이상·없음은 다시 요청', () => {
+  const now = 1_000_000
+  assert.equal(sigFresh(`${now + 600_000}.abc`, now), true)
+  assert.equal(sigFresh(`${now + 10_000}.abc`, now), false) // 30초 여유 안
+  assert.equal(sigFresh(`${now - 1}.abc`, now), false) // 만료
+  assert.equal(sigFresh('x.abc', now), false)
+  assert.equal(sigFresh('.abc', now), false)
+  assert.equal(sigFresh(undefined, now), false)
 })

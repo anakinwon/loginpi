@@ -82,3 +82,10 @@ export function hitRate(
   w.n++
   return w.n <= max
 }
+
+// 서명('<만료 ms>.<mac>', caption-sig)이 아직 쓸 만한가 — 화면 번역 캐시 재사용 판정. 여유 30초 = 그 사이 더빙 요청이 서버에 닿을 시간
+export function sigFresh(sig: unknown, now: number, margin = 30_000) {
+  if (typeof sig !== 'string') return false
+  const exp = Number(sig.slice(0, sig.indexOf('.')))
+  return Number.isSafeInteger(exp) && exp > now + margin
+}
