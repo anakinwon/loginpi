@@ -153,3 +153,8 @@ function scriptsOk(n: string) {
 }
 // 이름 비교 키 — 호환 정규화(NFKC)·대소문자·공백 무시. 같은 세미나의 개최자 이름·다른 별명과 같으면 사칭으로 본다
 export const nameKey = (n: string) => n.normalize('NFKC').toLowerCase().replace(/\s+/g, '')
+
+// 구 엔진(app.send 없음, v1.3 미만) 예비 통로 — 이름 변경을 채팅 글에 표식을 붙여 보낸다. 받는 화면은 채팅 목록에 넣지 않고 이름만 바꾼다.
+// 표식 = 보이지 않는 구분 문자(U+2063) + 'smn-name:' — 사람이 채팅으로 칠 일이 없는 값
+export const NAME_MARK = '⁣smn-name:'
+export const nameFromChat = (text: string) => (text.startsWith(NAME_MARK) ? parseNameSignal({ what: 'name', name: text.slice(NAME_MARK.length) }) : null)

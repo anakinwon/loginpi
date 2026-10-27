@@ -63,5 +63,16 @@ test('별명 문자 체계 — 라틴·키릴 섞기 거절, 한글·라틴·한
   assert.equal(nameOk('元 아나킨'), true)
   assert.equal(nameOk('Анакин'), true) // 한 체계(키릴)만 — 허용(ponytail 한계)
   const room = readFileSync(new URL('../components/room/use-room.ts', import.meta.url), 'utf8')
-  assert.match(room, /nameKey\(p\.name\) === nameKey\(ns\.name\)/) // 받는 쪽 사칭 검사
+  assert.match(room, /nameKey\(p\.name\) === nameKey\(name\)/) // 받는 쪽 사칭 검사(applyName — 신호·채팅 표식 공용)
+})
+
+test('구 엔진 예비 통로 — 채팅 표식으로 이름 변경, 일반 채팅은 그대로', async () => {
+  const { NAME_MARK, nameFromChat } = await import('./seminar-rules.ts')
+  assert.deepEqual(nameFromChat(NAME_MARK + '마스터 아나킨'), { what: 'name', name: '마스터 아나킨' })
+  assert.equal(nameFromChat('안녕하세요'), null)
+  assert.equal(nameFromChat('smn-name:가짜'), null) // 표식 없이 친 글은 이름 변경 아님
+  assert.equal(nameFromChat(NAME_MARK + 'a‮b'), null) // 서식 문자 거절은 같다
+  const room = readFileSync(new URL('../components/room/use-room.ts', import.meta.url), 'utf8')
+  assert.match(room, /request\('chat\.send', \{ text: NAME_MARK \+ name \}\)/)
+  assert.match(room, /name: peersRef\.current\.get\(c\.peerId\)\?\.name \?\? c\.name/) // 채팅에도 바꾼 이름
 })

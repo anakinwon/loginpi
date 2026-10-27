@@ -214,6 +214,7 @@
   },
   "room": {
     "rename": {
+      "later": "Name saved, but others couldn't be notified now. They'll see it after you rejoin.",
       "tile": "Click to change my name",
       "menu": "Change my name",
       "title": "My name in this seminar",

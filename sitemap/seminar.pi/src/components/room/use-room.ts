@@ -8,7 +8,7 @@ import { piFetch } from '@pi/auth/client'
 // v1.2(3.5) : 사회(peer.mute·room.muteAll 잠금·peer.askUnmute)·레이아웃(room.setLayout)·발언자(ntf activeSpeaker)
 // v1.3(A-2) : 범용 중계 app.send{topic,d} → ntf app{topic,d,from}(부가 기능 공용, extensions.ts) · 입장 직후 1회 지원 확인 · 카메라 송신기(영상 효과 replaceTrack)
 import type { AppMsg } from './extensions'
-import { nameKey, parseNameSignal } from '@/lib/seminar-rules'
+import { NAME_MARK, nameFromChat, nameKey, parseNameSignal } from '@/lib/seminar-rules'
 import {
   APP_MAX,
   APP_PROBE,
@@ -255,6 +255,13 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
   function commitPeers() {
     setPeers([...peersRef.current.values()])
   }
+  // 받은 이름 변경 적용 — 보낸 쪽이 API 를 거치지 않고 신호만 보낼 수 있어, 방 안 다른 사람 이름과 같으면(사칭) 받지 않는다(보안 검토)
+  function applyName(from: string, name: string) {
+    if (!peersRef.current.has(from)) return
+    if ([...peersRef.current.values()].some((p) => p.peerId !== from && nameKey(p.name) === nameKey(name))) return
+    patchPeer(from, { name })
+    commitPeers()
+  }
   function patchPeer(id: string, p: Partial<Peer>) {
     const cur = peersRef.current.get(id)
     if (cur) peersRef.current.set(id, { ...cur, ...p })
@@ -406,7 +413,12 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
       onRoleChanged(e.d as { peerId: string; role: SessionRole })
     } else if (e.m === 'chat') {
       const c = e.d as { peerId: string; name: string; text: string; ts: number }
-      addChat({ ...c, n: ++chatN.current, mine: false, status: 'sent' })
+      // 구 엔진 예비 통로의 이름 변경 표식 — 채팅에 넣지 않고 이름만 바꾼다
+      const nm = nameFromChat(c.text)
+      if (nm?.what === 'name') return void applyName(c.peerId, nm.name)
+      if (c.text.startsWith(NAME_MARK)) return // 형식이 틀린 표식도 채팅에 보이지 않게
+      // 엔진이 채우는 name 은 입장권 이름(바꾸기 전) — 바꾼 이름이 있으면 그것으로
+      addChat({ ...c, name: peersRef.current.get(c.peerId)?.name ?? c.name, n: ++chatN.current, mine: false, status: 'sent' })
     } else if (e.m === 'reaction') {
       const r = e.d as { counts: Record<string, number> }
       setReaction({ counts: r.counts ?? {}, seq: ++reactSeq.current })
@@ -444,12 +456,7 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
       if (typeof a?.topic !== 'string') return
       // 별명 변경(sql/014) — 보낸 사람(from, 엔진이 채움)의 이름만 바꾼다
       const ns = a.topic === 'refresh' ? parseNameSignal(a.d) : null
-      // 보낸 쪽이 API 를 거치지 않고 신호만 보낼 수 있어, 방 안 다른 사람 이름과 같으면(사칭) 받지 않는다(보안 검토)
-      const clash = ns?.what === 'name' && [...peersRef.current.values()].some((p) => p.peerId !== a.from && nameKey(p.name) === nameKey(ns.name))
-      if (ns?.what === 'name' && !clash && peersRef.current.has(a.from)) {
-        patchPeer(a.from, { name: ns.name })
-        commitPeers()
-      }
+      if (ns?.what === 'name') applyName(a.from, ns.name)
       for (const fn of appSubs.current) {
         try {
           fn(a)
@@ -915,7 +922,14 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
       patchPeer(selfRef.current, { name })
       commitPeers()
     }
-    return sendApp('refresh', { what: 'name', name })
+    if (!(await sendApp('refresh', { what: 'name', name }))) return null
+    // 구 엔진(app.send 없음) — 채팅 통로에 표식을 붙여 보낸다(받는 화면이 채팅에 넣지 않음). 채팅이 잠겨 있으면 실패
+    try {
+      await request('chat.send', { text: NAME_MARK + name })
+      return null
+    } catch (e) {
+      return codeOf(e)
+    }
   }
 
   async function sendApp(topic: string, d: unknown): Promise<string | null> {
