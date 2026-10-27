@@ -1,0 +1,160 @@
+{
+  "title": "REA_04 활용 기록 — Agent10 기반 구축(ai-db) : 외부 AI REST 형식 검증(공식 SDK 배포본) + Jitsi 배포본 근거(자막 결과·동의·투표·출석·음성 업로드)",
+  "date": "2026-10-27",
+  "owner": "Agent10 기반 구축 담당(ai-db) — 브랜치 feat/seminar-ai-db",
+  "safety": "S-2 준수 — 분석 대상은 오픈소스(Apache-2.0) 배포본뿐. 코드는 옮기지 않고 사실(필드 이름·값·구조)만 읽어 우리 설계에 반영. 상용 프로그램 디컴파일 없음",
+  "rea": {
+    "version": "rea 6.4.0 (CLI, C:/Users/anaki/AppData/Roaming/npm/rea)",
+    "mcp": "rea MCP 서버 연결 실패(CONNECT_TIMEOUT 30초) → 같은 기능을 CLI 로 실행",
+    "raw_outputs_dir": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-aidb/out (세션 스크래치패드 — 아래 sha256 으로 동일성 확인)",
+    "helper_scripts": "같은 스크래치패드 rea04-aidb/tools — make-trace-input.mjs(분석 Evidence → trace 입력), endpoints.mjs(endpoint 노드 목록), aidb-anchors.mjs(Jitsi 앵커)"
+  },
+  "questions": [
+    {
+      "id": "G1",
+      "question": "외부 AI 새 REST(Interactions) 의 요청·응답 필드 정확한 이름 — 공식 문서 페이지가 응답 경로·response_format 모양·temperature 지원을 보여 주지 않음(WebFetch 2026-10-27)",
+      "why_rea": "주장이 '배포된 패키지' 에 달려 있음 → 공식 SDK npm 배포본을 REA 로 정적 분석(SDK 를 의존성으로 추가하지 않고 사실만 확인)",
+      "target": {
+        "package": "@google/genai 2.31.0 (npm, Apache-2.0, 2026-10-23 게시)",
+        "tarball_sha256": "dfc7a74e63005b9d5024d4508af69905ef39038d11247fab2c12e3399baed6c5",
+        "tarball_integrity": "sha512-u1fw0qEiuWwNcjZixJFRfQF0awQnHb/rBBQUeiYGF+nmTXQCvcgpR2UMhKU9KNdnZdYhahY5jwS6nJ2V2tGtDA==",
+        "analyzed_dir_sha256": "cf83f76c7fbe2b67c5b087f3751ab339df66396ee403ad6d983ae40d76007e7e (package.json + LICENSE + dist/web/index.mjs·map)",
+        "dist_web_index_mjs_sha256": "5a9f07eba3f93b1c12452a2054ac85ed09ecd6f0a2931fece9c8fe5936b5b623"
+      },
+      "rea_runs": [
+        {
+          "command": "rea analyze-javascript-application <target> --artifact-format directory --max-heap-mb 2048 --analysis-timeout-ms 240000 --format json",
+          "evidence_id": "ev_60a2a01f99c5aab7bb2320f8070801ad69a9c12b3c86a6c3dcd28dacb3a0aa2c",
+          "result": "완료 — 그래프 노드 295(모듈 export 중심), endpoint 노드 9(x-goog-api-key·x-goog-upload-url·content-type·cookie 등)",
+          "raw_sha256": "62feced499690c6e41bf755852e01aaf973a2a694bc6d9c9fd1328859d8a916b (genai-analyze.json, 52MB)"
+        },
+        {
+          "command": "rea trace-application-feature {seed:{kind:'string', value:'/{api_version}/interactions'}, direction:'both'}",
+          "evidence_id": "ev_6c937d0007e6ec5a8dd7c1cce35c3f5632cef5288f6ee7e11707255834bf834a",
+          "result": "no-match(source_graph_status complete) — 그래프가 문자열 리터럴을 seed 노드로 색인하지 않음. 부재 증거 아님(아래 정적 읽기로 실재 확인). 첫 시도는 Git Bash 경로 변환으로 seed 가 'C:/Program Files/Git/…' 로 바뀌어 MSYS_NO_PATHCONV=1 로 재실행",
+          "raw_sha256": "89ee3faded20f443cd8287b6eaba5756ee3a7ca5031b3e275c09c8b1e6cc8bc8"
+        },
+        {
+          "command": "rea trace-application-feature {seed:{kind:'string', value:'model_output'}}",
+          "evidence_id": "ev_3758b96ad0062a1f31306687aac9e025c5e9ccf4c1c9b0c734b8be7964541989",
+          "result": "no-match — 같은 이유",
+          "raw_sha256": "6f1e9b68d4a5c3019a4c6111b388ab63e3aaaad119349ea2e35026b8eaccd817"
+        },
+        {
+          "command": "rea trace-application-feature {seed:{kind:'endpoint', …}}",
+          "result": "invalid_input — 허용 seed kind = node-id·route·string·api·channel·module·native-export (CLI 오류 응답으로 확인)"
+        },
+        {
+          "command": "rea trace-application-feature {seed:{kind:'node-id', value:'jag_node_39f6a0b63eff09905ef0048f2733d369de93496da70f056bd551dbaaf5f6f256'(x-goog-api-key endpoint)}}",
+          "evidence_id": "ev_daefd11f3ebe3e8a9ca30ee7bab14060703db02994a7e27ca8525ca3cae0e471",
+          "result": "matched 1 · traced nodes 295 · edges 299 · terminal paths 8 · coverage complete — 인증 헤더 x-goog-api-key 가 SDK 의 요청 경로 전반에 쓰임",
+          "raw_sha256": "3ab0474c974e41dbae07afbbf98f3bbab266907e6b2046973aad29eedd3a0780"
+        }
+      ],
+      "static_reading_of_rea_target": [
+        "dist/web/index.mjs L23026 interactionsCreate : pathToFunc('/{api_version}/interactions'), JSON 본문, Content-Type application/json",
+        "dist/web/index.mjs L25487~25546 addOutputProperties : steps 를 뒤에서부터 보며 type 'user_input' 에서 멈추고 'thought' 는 건너뜀, 'model_output' 의 content[] 중 type 'text' 의 text 를 이어 붙여 output_text, type 'audio' 항목(data·mime_type)을 output_audio",
+        "dist/web/index.mjs L27926 GOOGLE_API_KEY_HEADER = 'x-goog-api-key', L13580 기본 baseUrl https://generativelanguage.googleapis.com/",
+        "dist/genai.d.ts L2436 store?: boolean ('Input only. Whether to store the response and request')",
+        "dist/genai.d.ts L6797~6816 GenerationConfig_2 : max_output_tokens · speech_config(SpeakerConfig | SpeechConfig_2[]) · temperature(@deprecated) · thinking_level",
+        "dist/genai.d.ts L15369 SpeechConfig_2 = { language?, speaker?, voice? }",
+        "dist/genai.d.ts L836 AudioResponseFormat_2 = { type:'audio', mime_type?('audio/mp3'|'audio/ogg_opus'|'audio/l16'|'audio/wav'|…), sample_rate?, bit_rate?, delivery? }",
+        "dist/genai.d.ts L15947 TextResponseFormat_2 = { type:'text', mime_type?('application/json'|'text/plain'), schema? } — minLength 등 일부 키워드는 강제 안 됨(앱에서 검증)",
+        "dist/genai.d.ts L15323 SpeechAnnotation = { type:'speech_metadata', style?, speaker?, start_index?, end_index? }",
+        "dist/genai.d.ts L16028 ThinkingLevel_2 = 'minimal'|'low'|'medium'|'high'"
+      ],
+      "observed": [
+        "엔드포인트 POST /v1beta/interactions, 인증 헤더 x-goog-api-key",
+        "응답 텍스트 = steps[type=model_output].content[type=text].text, 오디오 = content[type=audio].{data, mime_type}",
+        "store 플래그 존재(문서 : 기본 true) — false 로 보관 끔",
+        "합성 음성 언어 지정 = generation_config.speech_config[].language, 목소리 = .voice",
+        "JSON 출력 강제 = response_format {type:'text', mime_type:'application/json', schema}",
+        "temperature 는 deprecated → 쓰지 않음"
+      ],
+      "inferred": [
+        "SDK 가 thought 단계를 건너뛰므로 우리도 model_output 만 모은다(생각 텍스트가 자막에 섞이지 않게)"
+      ],
+      "unknown": [
+        "REA 그래프는 문자열 seed 를 색인하지 않아 '/interactions' 경로의 호출 그래프 경로 자체는 trace 로 얻지 못함(정적 읽기로 대체)",
+        "SDK 배포본과 서버 실제 동작의 일치 — 아래 live_smoke 로 실호출 확인"
+      ],
+      "applied_to": [
+        "sitemap/seminar.pi/src/lib/gemini.ts — interact()(store:false·x-goog-api-key·model_output 수집), interactJson()(response_format JSON 스키마), tts()(response_format audio·speech_config [{voice, language}]·speech_metadata style), temperature 미사용"
+      ]
+    },
+    {
+      "id": "J1~J5",
+      "question": "Jitsi Meet 배포본에서 ai-db 범위 근거 : J1 자막 결과 메시지 형식(회의록 조각 칼럼), J2 녹화 동의 저장 방식(동의 테이블), J3 다시 투표(1인 1표 설계), J4 출석 기록 유무, J5 클라이언트가 음성을 외부로 직접 올리는지",
+      "why_rea": "SubAgent0 이 REA export-web-scripts 로 내보내 다이제스트 검증한 배포본(REA_04 jitsi-01)을 재사용 — 새 참가·새 수집 없이 같은 증거에서 질문만 추가",
+      "target": {
+        "app.bundle.min.js_sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57 (3,658,821 B)",
+        "lib-jitsi-meet.min.js_sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6 (1,145,590 B)",
+        "config.js_inline_sha256": "7be2429eb5b0b08208b342bbb4d68c47c2372b3e507bd6fa15ae59a038f0216c (9,431 B)",
+        "export_path": "스크래치패드 rea04-jitsi/scripts/files/isolated (REA export-web-scripts 산출, jitsi-01-rea-capture.json)"
+      },
+      "method": "aidb-anchors.mjs — 해시가 jitsi-04 기록과 다르면 중단, 문자열 위치(문자 오프셋)와 앞뒤 160자 문맥만 추출(실행 없음)",
+      "anchors_raw_sha256": "5bc882ae9b30fb1906e9fce03f3f534be5a375fff93dbc9f770b1bf5636009d0 — 같은 파일을 aidb-jitsi-anchors.json 으로 이 폴더에 보관(앵커별 오프셋·문맥 160자)",
+      "findings": [
+        {
+          "q": "J1 자막 결과 형식",
+          "anchors": "app @2889329 'transcription-result' · @2891138 message_id · @2892062/2892204 is_interim · @2892217 stability(>0.85 = stable) · @2889356 'translation-result'",
+          "observed": "메시지 필드 = message_id · participant{id, name, avatar_url} · timestamp · transcript[0].text · is_interim · stability · language. 중간 결과(unstable)·최종(final) 구분",
+          "decision": "smn_nt_seg = spk_usr_id(participant.id) · spk_nm(participant.name 스냅샷) · seg_cont(text) · seg_dtm(timestamp) · lang_cd(language). 우리는 5초 독립 조각의 최종 결과만 다루므로 중간·안정도 칼럼 없음(YAGNI)",
+          "applied_to": "sql/008_seminar_meet_ext.sql §2, src/app/api/speech/chunk/route.ts 응답 {text, lang, ts}"
+        },
+        {
+          "q": "J2 녹화 동의",
+          "anchors": "app @2865922 recordings.requireConsent·skipConsentInMeeting(클라이언트 설정 읽기) · config @5377 requireConsent:false · app 'consentDialog' 0건",
+          "observed": "동의 요구는 배포 config 값일 뿐이고 meet.jit.si 는 꺼져 있음. 동의 결과를 서버에 남기는 경로는 이 번들에서 관측 안 됨",
+          "inferred": "Jitsi 는 동의를 서버 기록으로 증빙하지 않음 [추론 — 서버(Prosody) 쪽은 범위 밖]",
+          "decision": "smn_agr(동의유형·동의버전·동의일시, 철회 = 논리삭제) + 음성 조각마다 서버가 동의 확인(fn_use_smn_vc NO_AGR) — M-4 '고지+동의'를 Jitsi 보다 엄격하게",
+          "applied_to": "sql/008 §10·§13, src/app/api/speech/agree/route.ts, src/lib/speech-rules.ts PRIVACY_VER"
+        },
+        {
+          "q": "J3 다시 투표",
+          "anchors": "app @1436093 'changeVote':'Change vote' · @2973764 haveVoted = lastVote !== null · ljm @391171 'answer-poll'",
+          "observed": "사용자당 설문별 마지막 응답 1개(lastVote)를 두고 'Change vote' 로 바꿈",
+          "decision": "smn_pll_vt 부분 유일 인덱스(pll_id, usr_id) 1인 1표 + 다시 투표 = 같은 행 opt_id UPDATE(ON CONFLICT) — PGlite 시험으로 확인",
+          "applied_to": "sql/008 §5"
+        },
+        {
+          "q": "J4 출석",
+          "anchors": "app 'joinTime' 0건 · ljm @515539 'speakerstats' json-message(users) · app speakerStats 83건(발언 시간 화면)",
+          "observed": "출석부(입장·마지막 접속 시각) 기능 없음, 서버 컴포넌트가 발언 통계만 보냄",
+          "decision": "출석은 우리 설계 — smn_atd(입장일시 = 첫 입장권, 최종하트비트일시 = 60초) 사용자당 1행",
+          "applied_to": "sql/008 §8"
+        },
+        {
+          "q": "J5 클라이언트 음성 업로드",
+          "anchors": "app MediaRecorder 2건 @1856021·@1857614(둘 다 로컬 녹화) · 'audio/webm' 1건 @1853522(자기 녹화 mediaType)",
+          "observed": "Jitsi 자막은 서버(Jigasi)가 음성을 받아 처리 — 클라이언트가 음성 조각을 외부 API 로 올리는 코드 없음",
+          "inferred": "A-1(말하는 사람 브라우저가 5초 조각 업로드)은 참고 구현이 없는 우리 설계. REA_04 jitsi-04 설계 함의 'timeslice 조각은 첫 조각에만 webm 머리' 가 그대로 적용됨",
+          "decision": "서버가 조각 머리(webm EBML 1A45DFA3·OggS·ftyp·RIFF/WAVE)를 검사해 이어 붙은 조각을 외부 AI 호출 전에 거름(SPEECH_CHUNK_INVALID) — 화면(use-speech)은 5초마다 MediaRecorder stop/start",
+          "applied_to": "src/lib/speech-rules.ts sniffBox·chunkError(+ node:test), src/app/api/speech/chunk/route.ts"
+        }
+      ]
+    }
+  ],
+  "reused_prior_rea_evidence": [
+    "jitsi-04-findings.json Q4 설문 제한(문항·선택지 500자, 선택지 2~255, 중복 금지) → smn_pll qst_cont 500 · smn_pll_opt 2~10(우리는 더 작게)·200자",
+    "jitsi-04-findings.json Q3 녹화 전원 고지(presence 속성) → 동의·고지 범위 설계(A-6) 참고, /privacy '녹화' 절",
+    "jitsi-04-findings.json Q5 더빙 덕킹 0.15 → /privacy 문구엔 미반영(SA9 몫)"
+  ],
+  "non_rea_checks": {
+    "official_docs_webfetch_2026-10-27": [
+      "https://ai.google.dev/gemini-api/docs/audio (갱신 2026-09-23) — 입력 audio/webm·ogg·m4a·wav 등, 요청 20MB, 1초 = 32토큰",
+      "https://ai.google.dev/gemini-api/docs/interactions (갱신 2026-10-15) — generateContent 는 legacy·계속 지원, store 기본 true",
+      "https://ai.google.dev/gemini-api/docs/models (갱신 2026-10-22) — 새 프로젝트 권장 gemini-3.5-flash-lite·3.8-flash, TTS gemini-3.8-flash(-lite)-tts, 2.5 계열은 기존 사용자만",
+      "https://ai.google.dev/gemini-api/docs/thinking (갱신 2026-10-14) — gemini-3.5-flash-lite 생각 기본 minimal",
+      "https://ai.google.dev/gemini-api/docs/speech-generation (갱신 2026-10-12) — 단건 응답 WAV 24kHz mono 16bit, 속도 숫자 인자 없음(문구 style 로)",
+      "https://ai.google.dev/api/interactions — 요청 필드·응답 Interaction 모양"
+    ],
+    "live_smoke_2026-10-27": "루트 .env.local 키로 gemini.ts 4함수 실호출(키 출력 안 함) : tts(ko 10초 문장) 3,756ms → RIFF/WAVE 484,196B · transcribe(그 WAV) 2,883ms 원문과 일치·lang 'ko' · translate(en) 1,190ms · summarize 1,002ms points 1·todos 1",
+    "pglite_sql_test": "PGlite 0.5.12 + pg_trgm 로 baseline 2파일 + seminar sql 001~008 을 2회 적용(멱등) + fn_use_smn_vc 7결과·1인 1표·다시 투표·추천건수 트리거·출석 첫 입장 보존·조각 CHECK 시험 통과(스크래치패드 pgtest/run.mjs)"
+  },
+  "blocked": [
+    "REA MCP 서버 연결 실패(CONNECT_TIMEOUT) — CLI 로 대체, 기능 손실 없음",
+    "REA trace 문자열 seed 2건 no-match(그래프가 export·endpoint 중심 색인) — node-id seed 로 우회 + 정적 읽기",
+    "이 실행 환경에 Agent 도구가 없어 da-standards·legal-compliance-advisor 에이전트를 부르지 못함 → 각 정의서 체크리스트로 대행, 통합 단계 재검증 필요"
+  ]
+}
