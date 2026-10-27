@@ -1,0 +1,156 @@
+{
+ "wasm_structure": {
+  "tool": "node <스크래치>/rea04/tools/wasminfo.cjs (섹션 파싱 + WebAssembly.Module compile, 실행 안 함)",
+  "files": [
+   {
+    "file": "vision_wasm_internal.wasm",
+    "bytes": 13519922,
+    "sha256": "0e101a010e262ef8e78f22e3c95b60a9705fd06962753c9acd6356d9fb56b7bd",
+    "memory": [
+     {
+      "flags": 1,
+      "shared": false,
+      "min_pages": 291,
+      "max_pages": 32768
+     }
+    ],
+    "imports": {
+     "function": 234
+    },
+    "exports": 154
+   },
+   {
+    "file": "vision_wasm_nosimd_internal.wasm",
+    "bytes": 12627509,
+    "sha256": "c9b1b69bb87baf9e529254d8559dcbcf4c5a9c0eda84f56a12f17d675335ec9c",
+    "memory": [
+     {
+      "flags": 1,
+      "shared": false,
+      "min_pages": 290,
+      "max_pages": 32768
+     }
+    ],
+    "imports": {
+     "function": 233
+    },
+    "exports": 154
+   },
+   {
+    "file": "vision_wasm_module_internal.wasm",
+    "bytes": 13519940,
+    "sha256": "3b57e4b55ac6346bf940212e3e11250b308a6a474077385e2f527b119cf74525",
+    "memory": [
+     {
+      "flags": 1,
+      "shared": false,
+      "min_pages": 291,
+      "max_pages": 32768
+     }
+    ],
+    "imports": {
+     "function": 234
+    },
+    "exports": 154
+   }
+  ],
+  "reading": "memory flags=1(최대값 있음, shared 아님) → 스레드·SharedArrayBuffer 미사용, COOP/COEP(교차 출처 격리) 불필요. 초기 291 페이지 = 18.2 MiB, 최대 32768 페이지 = 2 GiB"
+ },
+ "compression_local_measure": [
+  {
+   "file": "vision_wasm_internal.wasm",
+   "raw": 13519922,
+   "gzip9": 3958449,
+   "brotli11": 2751172
+  },
+  {
+   "file": "vision_wasm_internal.js",
+   "raw": 334128,
+   "gzip9": 80947,
+   "brotli11": 66947
+  },
+  {
+   "file": "vision_wasm_nosimd_internal.wasm",
+   "raw": 12627509,
+   "gzip9": 3824237,
+   "brotli11": 2655029
+  },
+  {
+   "file": "vision_wasm_nosimd_internal.js",
+   "raw": 333931,
+   "gzip9": 80880,
+   "brotli11": 66830
+  }
+ ],
+ "runtime_note": "Chrome 156 headless 탐침 : createFromOptions 를 부를 때마다 로더 JS(334,128)·wasm(13,519,922) 을 다시 받음(Cache-Control no-store 조건) → 인스턴스는 1개 만들어 재사용, 정적 파일은 장기 캐시 헤더",
+ "selfhost": {
+  "public_files_required": [
+   {
+    "path": "public/mediapipe/wasm/vision_wasm_internal.js",
+    "bytes": 334128
+   },
+   {
+    "path": "public/mediapipe/wasm/vision_wasm_internal.wasm",
+    "bytes": 13519922
+   },
+   {
+    "path": "public/mediapipe/wasm/vision_wasm_nosimd_internal.js",
+    "bytes": 333931
+   },
+   {
+    "path": "public/mediapipe/wasm/vision_wasm_nosimd_internal.wasm",
+    "bytes": 12627509
+   }
+  ],
+  "wasm_total_bytes": 26815490,
+  "per_client_download": {
+   "simd": {
+    "bytes": 13854050,
+    "brotli_est": 2818119
+   },
+   "nosimd": {
+    "bytes": 12961440,
+    "brotli_est": 2721859
+   }
+  },
+  "not_needed": [
+   "vision_wasm_module_internal.{js,wasm} — FilesetResolver.forVisionTasks(base, true)(모듈 워커) 일 때만, nosimd 짝 없음",
+   "vision_bundle.{cjs,js,mjs}·*.map·vision.d.ts — npm import 로 Next 번들에 들어가므로 public 불필요"
+  ],
+  "model": {
+   "file": "public/mediapipe/models/selfie_segmenter.tflite",
+   "official_url": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite",
+   "input": "256 x 256, float16",
+   "bytes": "[확인중 : 다운로드 권한 거부 — 마스터 승인 후 실측]",
+   "alt_landscape": {
+    "url": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter_landscape/float16/latest/selfie_segmenter_landscape.tflite",
+    "input": "144 x 256, float16"
+   },
+   "model_card": "https://storage.googleapis.com/mediapipe-assets/Model%20Card%20MediaPipe%20Selfie%20Segmentation.pdf (라이선스 문구 [확인중 : PDF 글리프 인코딩이라 본문 추출 실패])",
+   "bench_pixel6_native": {
+    "square": "CPU 33.46ms / GPU 35.15ms",
+    "landscape": "CPU 34.19ms / GPU 33.55ms",
+    "note": "안드로이드 네이티브 기준 — 웹 수치 아님"
+   },
+   "source": "https://developers.google.com/edge/mediapipe/solutions/vision/image_segmenter (Models·Task benchmarks 절)"
+  }
+ },
+ "rea_attempts_failed": [
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs inspect-artifact \"<스크래치>/rea04/pkg/mediapipe-tasks-vision-1.1.1.tgz\" --format json",
+   "result": "target_unavailable : unsupported binary format (.tgz 미지원)"
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs inspect-artifact \"<스크래치>/rea04/x/package\" --format json",
+   "result": "target_unavailable : 디렉터리는 analyze_javascript_application 로 안내"
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs inspect-artifact \"<스크래치>/rea04/x/package/wasm/vision_wasm_internal.wasm\" --format json",
+   "result": "target_unavailable : unsupported binary format (WebAssembly 미지원)"
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs inspect-artifact \"<스크래치>/rea04/pkg/tasks-vision-1.1.1-repack.zip\" --format json (PowerShell Compress-Archive 재포장본)",
+   "result": "artifact_operation_failed : Artifact path is absolute or unsafe \"package\\package.json\"(역슬래시 항목) → bsdtar 로 다시 묶어 성공"
+  }
+ ]
+}

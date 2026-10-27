@@ -1,0 +1,110 @@
+{
+ "method": "Apache-2.0 공개 배포본을 읽기만 함(코드 이식 없음). REA 의미 분석이 heap 한계로 멈춰 리터럴 문자열 문맥을 indexOf 로 읽음 — node <스크래치>/rea04/tools/ctx.cjs",
+ "bundle": {
+  "file": "vision_bundle.mjs",
+  "sha256": "a84921e02321e582484c1f8126d344b5f33b791fa09c640a52e20ee8632068f1",
+  "offset_unit": "JS 문자열 인덱스(ASCII 파일이라 바이트와 같음)"
+ },
+ "findings": {
+  "wasm_selection": [
+   {
+    "offset": 49496,
+    "needle": "async function ah(t){if(t)return!0",
+    "meaning": "SIMD 판정 : module 변형 요청이면 검사 없이 true, 아니면 작은 SIMD wasm 을 WebAssembly.instantiate 해 성공 여부로 판정(기능 탐지, UA 아님)"
+   },
+   {
+    "offset": 49644,
+    "needle": "wasmLoaderPath:`${e}/${t}_${r=`wasm${r?\"_module\":\"\"}${await ah(r)?\"\":\"_nosimd\"}_internal`}.js`",
+    "meaning": "경로 = <basePath>/vision_wasm[_module][_nosimd]_internal.{js,wasm}. module=true 면 nosimd 를 고르지 않음(패키지에 module_nosimd 없음)"
+   },
+   {
+    "offset": 49833,
+    "needle": "uh.forVisionTasks=function(t,e=!1){return hh(\"vision\",t??Ks``,e)}",
+    "meaning": "basePath 생략 시 빈 문자열 → \"/vision_wasm_internal.js\"(사이트 루트) 를 찾음. 반드시 basePath 지정"
+   },
+   {
+    "offset": 56336,
+    "needle": "e.crossOrigin=\"anonymous\"",
+    "meaning": "메인 스레드에서는 로더 JS 를 <script crossOrigin=anonymous> 로 주입, 워커면 importScripts/동적 import"
+   },
+   {
+    "offset": 40508,
+    "needle": "e.createScriptURL(t)",
+    "meaning": "Trusted Types 정책으로 스크립트 URL 생성 — CSP require-trusted-types 를 켜면 정책 허용 필요"
+   }
+  ],
+  "telemetry": [
+   {
+    "offset": 52864,
+    "needle": "url:\"https://odml.pa.googleapis.com/v1/log\"",
+    "meaning": "사용 지표를 protobuf 로 fetch POST(x-goog-api-key 헤더, withCredentials false, 10초 타임아웃)"
+   },
+   {
+    "offset": 52558,
+    "needle": "setInterval(()=>{this.flush()},6e4)",
+    "meaning": "60초마다 전송, close() 때 마지막 전송. 실패(200 아님·차단) 1회면 오류로 표시하고 타이머 해제 = 이후 전송 중단"
+   },
+   {
+    "offset": 67639,
+    "needle": "t.o=new $h(t.D(),e,r)",
+    "meaning": "작업(ImageSegmenter 등) 생성 시 무조건 지표 수집기 생성 — 끄는 공개 옵션 없음(vision.d.ts TaskRunnerOptions = baseOptions 뿐)"
+   },
+   {
+    "readme_privacy_notice": "README \"Privacy Notice\"(Last modified: June 5, 2026) : 입력 영상은 기기 밖으로 안 나감. 성능·사용 지표는 Google 로 전송. \"You are responsible for obtaining informed consent from your app users about Google's processing of MediaPipe metrics data as required by applicable law.\""
+   }
+  ],
+  "gpu_cpu": [
+   {
+    "offset": 69110,
+    "needle": "\"GPU\"===e.delegate",
+    "meaning": "baseOptions.delegate 는 \"CPU\"|\"GPU\" 2종, 지정 없으면 CPU 경로"
+   },
+   {
+    "offset": 87833,
+    "needle": "_addBoundTextureAsImageToStream",
+    "meaning": "영상 프레임 입력 경로는 이것 하나 — 프레임을 WebGL 텍스처로 올려 넣음"
+   },
+   {
+    "offset": 57188,
+    "needle": "t.j.canvas.getContext(\"webgl2\")||t.j.canvas.getContext(\"webgl\")",
+    "meaning": "입력 업로드에 webgl2(없으면 webgl) 필수 → CPU delegate 여도 WebGL 이 없으면 동작 불가"
+   },
+   {
+    "offset": 77439,
+    "needle": "GPU does not fully support 4-channel float32 or float16 formats",
+    "meaning": "마스크를 WebGL 텍스처로 바꿀 때 R32F(EXT_color_buffer_float+OES_texture_float_linear+EXT_float_blend) 또는 R16F(EXT_color_buffer_half_float) 필요, 둘 다 없으면 예외"
+   },
+   {
+    "loader_webgpu": "vision_wasm_internal.js @213417 preinitializedWebGPUDevice 존재하나 vision_bundle.mjs 에 WebGPU 참조 0건 → 1.1.1 의 GPU delegate = WebGL2",
+    "loader": {
+     "file": "wasm/vision_wasm_internal.js",
+     "sha256": "6522286aa32dd93eff17c3da002b0649516f87abfec7a80b5bfe5c9625caa5f8"
+    }
+   }
+  ],
+  "mobile_webview": [
+   {
+    "offset": 55961,
+    "needle": "function Uh(){",
+    "meaning": "OffscreenCanvas 사용 여부를 라이브러리가 UA 로 판단 : UA 에 \"Safari\" 가 있고 \"Chrome\" 이 없으면 \"Version/NN\" ≥ 17 일 때만 사용. iOS WKWebView UA 는 보통 \"Safari\"·\"Version/\" 이 없어 이 검사를 건너뛰고 OffscreenCanvas 존재만으로 사용함"
+   },
+   {
+    "offset": 58462,
+    "needle": "new OffscreenCanvas(1,1)",
+    "meaning": "canvas 옵션을 안 주면 OffscreenCanvas(1,1) 자동 생성 → 그 위에서 webgl2 를 얻으므로, OffscreenCanvas 의 WebGL 미지원 WebView 에서 실패 가능 [확인중 : 실기기]"
+   },
+   {
+    "offset": 58502,
+    "needle": "OffscreenCanvas not supported and GraphRunner constructor glCanvas parameter is undefined",
+    "meaning": "OffscreenCanvas 가 없으면 document.createElement(\"canvas\") 로 대체"
+   },
+   {
+    "loader_safari_workaround": "vision_wasm_internal.js @176685 https://webkit.org/b/222758 — Safari WebGL2 getContext 버그 우회 코드 포함",
+    "loader": {
+     "file": "wasm/vision_wasm_internal.js",
+     "sha256": "6522286aa32dd93eff17c3da002b0649516f87abfec7a80b5bfe5c9625caa5f8"
+    }
+   }
+  ]
+ }
+}

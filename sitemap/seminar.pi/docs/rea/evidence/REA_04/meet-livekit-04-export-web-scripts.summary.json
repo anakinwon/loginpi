@@ -1,0 +1,185 @@
+{
+ "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/04-export-web-scripts.json",
+ "raw_sha256": "fda4d42854e19d9afb83f4e0fff30d1071ea74de37639f45dda015455e04be33",
+ "evidence_id": "ev_00022c5f94a3c5085e09e433749a5ec821278571acb6a4fdd14fa81327ab4245",
+ "operation": "export_web_scripts",
+ "predicate_type": "rea.web-script-export",
+ "provider": {
+  "id": "rea-web-script-export",
+  "name": "REA captured script export",
+  "version": "1"
+ },
+ "confidence": "derived",
+ "authority": "historical-reference",
+ "limitations": [
+  "Observation starts when REA attaches; prior network and console activity is unavailable.",
+  "Raw network headers, bodies, cookies, storage values, console objects, and WebSocket payloads are never retained; explicitly requested primitive console text is retained verbatim, while payload captures retain value-free shapes.",
+  "Source maps are reported only as declarative URLs and are not fetched.",
+  "URL-less scripts and console events without an allowed source URL are excluded because their origin cannot be proven.",
+  "Only script bytes retained in this capture are exported. Sources are not refetched or executed, and a response or Debugger source does not prove execution.",
+  "Ordinary unambiguous URL paths preserve relative module layouts by origin, including case-distinct spellings. Query variants, exact path collisions, file/directory prefixes, inline sources, and unrepresentable paths are isolated. A case-distinct pair is isolated only when the destination filesystem cannot store both spellings; the record names that pair. Browser module relationships of isolated paths remain unknown.",
+  "Local JavaScript analysis does not implement browser import maps, root-relative URL resolution, remote URL loading, or browser runtime behavior. It may strip import queries and fragments; isolated variants are not canonical targets.",
+  "Source-map declarations are retained as metadata. No source maps or missing dependencies are fetched or reconstructed.",
+  "Captured response bytes are browser-decoded bytes; Debugger sources are the exposed text encoded as UTF-8. Redacted bytes are exported exactly as retained, and may no longer parse as JavaScript."
+ ],
+ "subject": {
+  "name": "02-inspect-web-page.json",
+  "digest": {
+   "sha256": "d2481cb615c73eaba4c7777798da5db869a12a53f8701164b8bdbcc1bb4594c5"
+  },
+  "format": "file",
+  "architecture": null,
+  "local_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/02-inspect-web-page.json"
+ },
+ "output_directory": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04\\exported-scripts",
+ "manifest_sha256": "75f60b4f07fd3d8ad2a0e0b274b8bd8b113f41d12257f42df22bd6800fe78759",
+ "scripts": [
+  {
+   "index": 0,
+   "url": "https://meet.livekit.io/_next/static/chunks/4a176a97-00bd2281f16f2c53.js",
+   "state": "exported",
+   "relative_path": "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/4a176a97-00bd2281f16f2c53.js",
+   "sha256": "f085e107d13bb81fa2ecb6ed68d56a34e4e7ec7a17b957f30df856ab6e7f6401"
+  },
+  {
+   "index": 1,
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "state": "exported",
+   "relative_path": "isolated/source-2-d9f0a63dc4cd892f3c11bd640b2429ab9646f322a7a70afee6409ca6bc4c9d6d.js",
+   "sha256": "8f1a66bb3132bd59867f5baedeb2e755bfbe69ce10d24878f5514897051fe90d"
+  },
+  {
+   "index": 2,
+   "url": "https://meet.livekit.io/_next/static/chunks/app/layout-bb7ad1dba58cabcb.js",
+   "state": "exported",
+   "relative_path": "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/app/layout-bb7ad1dba58cabcb.js",
+   "sha256": "ac2d44cfd59888d70c3cae7f5c7d206162643f3755e771e8ee36d6346756641c"
+  },
+  {
+   "index": 3,
+   "url": "https://meet.livekit.io/_next/static/chunks/11-8239cac66db1d0d8.js",
+   "state": "exported",
+   "relative_path": "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/11-8239cac66db1d0d8.js",
+   "sha256": "510ddf46efec1398276660cfacb54b9a5995761db0e359eebfcc76579d26fce9"
+  },
+  {
+   "index": 4,
+   "url": "https://meet.livekit.io/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js",
+   "state": "exported",
+   "relative_path": "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js",
+   "sha256": "8d5378805f0fd3825b8521f6f87c30e87a44bed7d97939121b2f8094f0fb4685"
+  },
+  {
+   "index": 5,
+   "url": "https://meet.livekit.io/_next/static/chunks/main-app-c1d00de144b27ee2.js",
+   "state": "exported",
+   "relative_path": "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/main-app-c1d00de144b27ee2.js",
+   "sha256": "10681a51cd2ffcf7dec158c71fa208754b2174c532e7fb9338ec21df4a25b0a7"
+  },
+  {
+   "index": 6,
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "state": "exported",
+   "relative_path": "isolated/source-7-6d7c88d6ed06ba7beccb2ef530bf9a46f13613638d0f9f2a697c092d3930db22.js",
+   "sha256": "76525418c074a45b3047c4ff9e49c252978d6ee748ed9e7fffac81910ef14505"
+  },
+  {
+   "index": 7,
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "state": "exported",
+   "relative_path": "isolated/source-8-298c884300606d0d4a2c0c05c64a56d9bd728279c769a12da76e3c4600324dab.js",
+   "sha256": "93268a0726ec1efaa676ae5171f84267e72b7c3d215b6190794cb4069d5f58d8"
+  },
+  {
+   "index": 8,
+   "url": "https://meet.livekit.io/_next/static/chunks/webpack-0cfd51bb6a36e13b.js",
+   "state": "exported",
+   "relative_path": "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/webpack-0cfd51bb6a36e13b.js",
+   "sha256": "0572e4b7b18c214b09a53a7a533d1df9cb4917f833d2e5941f78faf8ab3042eb"
+  },
+  {
+   "index": 9,
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "state": "exported",
+   "relative_path": "isolated/source-10-94560720b20aca7ec25f7c66dbc7a2ac7b8dc7f0a3e3c9fd487e8e68ee13a88c.js",
+   "sha256": "2dcb2e50c883929aebb7a64a7a22cfe2260d856a3c36a6926c082da19c552b7b"
+  },
+  {
+   "index": 10,
+   "url": "https://meet.livekit.io/_next/static/chunks/295-b920c121c12763d5.js",
+   "state": "exported",
+   "relative_path": "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/295-b920c121c12763d5.js",
+   "sha256": "3093f621fdd97c9bf3a9655698259118701f05276c91bd82ce0cd1bb7191157a"
+  },
+  {
+   "index": 11,
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "state": "exported",
+   "relative_path": "isolated/source-12-5380e7f157492fe6c8e96991459ada583fb09bd4cf4ed595b9783c6e7653abd2.js",
+   "sha256": "1230f91146ae44b64dfa4b21a363ec90efb742fdd1062427e0a7e4fb0d7076bc"
+  },
+  {
+   "index": 12,
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "state": "exported",
+   "relative_path": "isolated/source-13-6d55ae162050c53f06079723fea4b4cb151c744ef0258cbb356b2966fb741121.js",
+   "sha256": "3814cddd18b2095e01abb745a99e5ada90178e709c09879324c3b623f2d829ea"
+  },
+  {
+   "index": 13,
+   "url": "https://meet.livekit.io/_next/static/chunks/787-9333209d8f8fb674.js",
+   "state": "exported",
+   "relative_path": "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/787-9333209d8f8fb674.js",
+   "sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68"
+  },
+  {
+   "index": 14,
+   "url": "https://meet.livekit.io/_next/static/chunks/965-89dc141cb237a849.js",
+   "state": "exported",
+   "relative_path": "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/965-89dc141cb237a849.js",
+   "sha256": "4c77459e565f685fd0cd8a4e18ff4de3aa3a386fca68d0a3ffebc75dd33e9ee6"
+  },
+  {
+   "index": 15,
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "state": "exported",
+   "relative_path": "isolated/source-16-61f35a73b0d202198387b92d5064aed706e64839bef87ebac458229a7a1f81a3.js",
+   "sha256": "f158da4b9371d073bc1d9cca38044807cb946788682b45acc28a6cadbba77aba"
+  },
+  {
+   "index": 16,
+   "url": "https://meet.livekit.io/_next/static/chunks/app/rooms/%5BroomName%5D/page-54756b6953c030df.js",
+   "state": "exported",
+   "relative_path": "isolated/source-17-b95c5a8b72f8c44ec96813347108c01d2ae03252fb1cce430e11c9e5a2db2360.js",
+   "sha256": "77ddb7a444080a139d8a6d24389986c08f65f1767f1c3e6e2194669d1687854b"
+  },
+  {
+   "index": 17,
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "state": "exported",
+   "relative_path": "isolated/source-18-524a040cffa522d1f845a4da83fc54e68f199a31b7455dc7eec8b3e2c0aa32e5.js",
+   "sha256": "3b3e40039c06fb3add6d2ae5422bf9f5d6e63532a2227241dc971c4def9fc0c7"
+  },
+  {
+   "index": 18,
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "state": "exported",
+   "relative_path": "isolated/source-19-36a284eb55da332f69cc97f6686db13c0abf3832c4083a44cef586fbcff6ef0b.js",
+   "sha256": "ee6bb81f4e9fc030a39a7c71affc4d1f2b900baa4b4c7af83361388d7c39599b"
+  },
+  {
+   "index": 19,
+   "url": "https://meet.livekit.io/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js",
+   "state": "exported",
+   "relative_path": "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js",
+   "sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f"
+  },
+  {
+   "index": 20,
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "state": "exported",
+   "relative_path": "isolated/source-21-c74e12fd4b8d420af524c5a50169960bf1993885f89389e9605a83b69f0d201a.js",
+   "sha256": "d713188abaee72a62f0d440937bc4d109e46077e794b8eff6819952383ab1296"
+  }
+ ]
+}

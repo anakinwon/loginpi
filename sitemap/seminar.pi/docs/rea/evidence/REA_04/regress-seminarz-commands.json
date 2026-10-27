@@ -1,0 +1,198 @@
+{
+  "kind": "rea04-regress-commands",
+  "rea_version": "6.4.0",
+  "captured_at": "2026-10-27 KST 22:4x",
+  "browser": "Chrome 156.0.8078.48 headless",
+  "targets": {
+    "deployed": "https://seminarz.vercel.app (dpl_3ZwiUw2xoTaYDd9udatQmZhAzxRk = 기준선과 같은 배포 — master 가 origin 보다 43커밋 앞, 미배포)",
+    "local": "http://localhost:3003 (sitemap/seminar.pi .next 운영 빌드, BUILD_ID wf3OAfoG4UamplvuyJDjn, 22:41 빌드 = HEAD af8f572b 이후)"
+  },
+  "non_rea": [
+    "npx next start -p 3003 (cwd sitemap/seminar.pi)",
+    "node scripts/copy-mediapipe.mjs → exit 1 \"모델 파일 없음\"",
+    "grep -l \"ImageSegmenter|vision_wasm_internal|FilesetResolver\" .next/static/chunks/*.js → 0439w6hixvrtq.js, 2k9rs0tc7wn1i.js",
+    "node C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/tools/regress-summary.mjs ..."
+  ],
+  "commands": [
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs capture-browser-scenario \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/in/baseline-scene-list.json\" --format json --full-output",
+      "purpose": "배포본 재수집(기준선과 같은 시나리오 파일) — list",
+      "result": "complete",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/deployed-scene-list.full.json",
+      "stdout_sha256": "506c75a69166942bb83281568c0e82aa81388e85204376272713bd777b48593e",
+      "rea_evidence_id": "ev_188733c08013ae303b94281e517b8eff4a08d0d5e177b7207e39604935a6b2a7"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs capture-browser-scenario \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/in/baseline-scene-progress.json\" --format json --full-output",
+      "purpose": "배포본 재수집(기준선과 같은 시나리오 파일) — progress",
+      "result": "complete",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/deployed-scene-progress.full.json",
+      "stdout_sha256": "7077457404d88e2f747e47dd03a0664ca880aa9f24d489f0c2cc94548acd6bb3",
+      "rea_evidence_id": "ev_d5042c24e58c1b00b112b111722afdd15b2c156b6222b53776bac7047274c52b"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs capture-browser-scenario \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/in/baseline-scene-404.json\" --format json --full-output",
+      "purpose": "배포본 재수집(기준선과 같은 시나리오 파일) — 404",
+      "result": "complete",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/deployed-scene-404.full.json",
+      "stdout_sha256": "7ccc95ee2f0ef7830f2065733017450fc2712658bda188849391e7a07c77069b",
+      "rea_evidence_id": "ev_3d68efae50d53f5bb3392a38a8bf0ccdef6e4f7e199b45c18ea99ca63722df42"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs compare-web-captures \"C:/Users/anaki/workspace/loginpi/sitemap/seminar.pi/docs/rea/evidence/REA_04/baseline-seminarz-scene-list.normalized.json\" \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/deployed-scene-list.normalized.json\" --format json",
+      "purpose": "기준선 vs 배포본 재수집 — list",
+      "result": "changed (요약 JSON scenes.list.deployed)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/cmp-deployed-list.json",
+      "stdout_sha256": "9f43bc64cb539d375d400e1876326bb3656c01f6edfd0dd397f53bf181a591eb",
+      "rea_evidence_id": "ev_1b7be16d2caa6a51b617cc8d78bb7e4d35cefcbb38347bd6ecedab5fe5be64ad"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs compare-web-captures \"C:/Users/anaki/workspace/loginpi/sitemap/seminar.pi/docs/rea/evidence/REA_04/baseline-seminarz-scene-progress.normalized.json\" \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/deployed-scene-progress.normalized.json\" --format json",
+      "purpose": "기준선 vs 배포본 재수집 — progress",
+      "result": "changed (요약 JSON scenes.progress.deployed)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/cmp-deployed-progress.json",
+      "stdout_sha256": "82c2eba102c5c7f521a1df3865a6fd139728f8c9fefc4f0f2a2d9dcab8d2f35e",
+      "rea_evidence_id": "ev_22a63857a9c778d9c5db632775642f7b961d5a2c2363d109e85848dbc4f802a1"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs compare-web-captures \"C:/Users/anaki/workspace/loginpi/sitemap/seminar.pi/docs/rea/evidence/REA_04/baseline-seminarz-scene-404.normalized.json\" \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/deployed-scene-404.normalized.json\" --format json",
+      "purpose": "기준선 vs 배포본 재수집 — 404",
+      "result": "changed (요약 JSON scenes.404.deployed)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/cmp-deployed-404.json",
+      "stdout_sha256": "66f3aa0ccf40c31e9c7b9cf4fcd078dfd5582b17b01e46cdadcc0ea67d60c2e4",
+      "rea_evidence_id": "ev_2613ccbbe834ef7f496e12f46e1ad3e87b72ba32441e7a303933f12309908f8c"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs capture-browser-scenario \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/in/local-scene-list.json\" --format json --full-output",
+      "purpose": "로컬 HEAD 운영 빌드(next start -p 3003, BUILD_ID wf3OAfoG4UamplvuyJDjn) — list (기준선 시나리오에서 호스트만 http://localhost:3003 로 치환)",
+      "result": "complete",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/local-scene-list.full.json",
+      "stdout_sha256": "80b71bf0023df31d898c386f57927d4ecd8071beaff6afce1ce764a5de6bb5d7",
+      "rea_evidence_id": "ev_6f9104ed3d21e7d29cdda4de0d1de4c53dc709f6276d98d0c78e863452605826"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs capture-browser-scenario \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/in/local-scene-progress.json\" --format json --full-output",
+      "purpose": "로컬 HEAD 운영 빌드(next start -p 3003, BUILD_ID wf3OAfoG4UamplvuyJDjn) — progress (기준선 시나리오에서 호스트만 http://localhost:3003 로 치환)",
+      "result": "complete",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/local-scene-progress.full.json",
+      "stdout_sha256": "b1005ab06691953d9835369a8ca938b52500243382ab1535dc3a9fbf0a866484",
+      "rea_evidence_id": "ev_8535406c7eb51db72ae7c366f59f00b1a0639456e4ecd4db3734480179a25657"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs capture-browser-scenario \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/in/local-scene-404.json\" --format json --full-output",
+      "purpose": "로컬 HEAD 운영 빌드(next start -p 3003, BUILD_ID wf3OAfoG4UamplvuyJDjn) — 404 (기준선 시나리오에서 호스트만 http://localhost:3003 로 치환)",
+      "result": "complete",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/local-scene-404.full.json",
+      "stdout_sha256": "cbe336dfd00546ce819964c0bc5b4b487457b3023d8542f7370501138b066bec",
+      "rea_evidence_id": "ev_8cba80b4423c32a317bf9741f5013488cdb529e49e0f94e19f4eb2bfb6f73b8c"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs compare-web-captures \"C:/Users/anaki/workspace/loginpi/sitemap/seminar.pi/docs/rea/evidence/REA_04/baseline-seminarz-scene-list.normalized.json\" \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/local-scene-list.normalized.json\" --format json",
+      "purpose": "기준선 vs 로컬 HEAD — list",
+      "result": "changed (요약 JSON scenes.list.local)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/cmp-local-list.json",
+      "stdout_sha256": "d382b217897c5c1e8de277f16ecbf967b60cc20e385f89cf5e2ad11b0635fb96",
+      "rea_evidence_id": "ev_178194b7d33a62169df2b94142524ba98b809e09c68495cb3cdc9c97fcafc359"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs compare-web-captures \"C:/Users/anaki/workspace/loginpi/sitemap/seminar.pi/docs/rea/evidence/REA_04/baseline-seminarz-scene-progress.normalized.json\" \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/local-scene-progress.normalized.json\" --format json",
+      "purpose": "기준선 vs 로컬 HEAD — progress",
+      "result": "changed (요약 JSON scenes.progress.local)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/cmp-local-progress.json",
+      "stdout_sha256": "360718933bdad4502b407421f9190794c957820ead0eaeb7d919444ce5226491",
+      "rea_evidence_id": "ev_6d0b7eab176289eebca530a40ec25b6d1b589144b2e3e3cc030045fcacfd26b0"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs compare-web-captures \"C:/Users/anaki/workspace/loginpi/sitemap/seminar.pi/docs/rea/evidence/REA_04/baseline-seminarz-scene-404.normalized.json\" \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/local-scene-404.normalized.json\" --format json",
+      "purpose": "기준선 vs 로컬 HEAD — 404",
+      "result": "changed (요약 JSON scenes.404.local)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/cmp-local-404.json",
+      "stdout_sha256": "8a2259ab0b6933f73e681a0290d8bec5ae39d5f1b332d4ff61f2c89252b165c0",
+      "rea_evidence_id": "ev_24401d0d214723074da055addcaaf6545c43c4f61c81b6684eb8bb06568b522a"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs list-browser-targets http://127.0.0.1:9352 --format json",
+      "purpose": "CDP 대상 확인(Chrome --headless=new --remote-debugging-port=9352 --user-data-dir=<빈 임시폴더> --use-fake-device-for-media-stream --use-fake-ui-for-media-stream)",
+      "result": "page 3개: AC48091D 목록, 080895AF 룸 86ff7149 join(비로그인 LoginGate), AC50E106 404",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/targets-local.json",
+      "stdout_sha256": "89176e210d6d66fce0fc3cb6f4b67e6c7e47d1133a5e2130d9f5742016f1e024",
+      "rea_evidence_id": "ev_3d593760212d4cb3828cf45ec94cd4e1106de18cea44400fc4b45a3cb9ab8b55"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs analyze-web-bundle http://127.0.0.1:9352 080895AF47F849144CDD0410808D2E15 --observation-ms 3000 --format json --full-output",
+      "purpose": "로컬 HEAD 번들 — room",
+      "result": "complete (요약 JSON bundles.room)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/bundle-room.full.json",
+      "stdout_sha256": "599745250a79c409e17c262486de6138771c92432632cefd2108e4dd296138de",
+      "rea_evidence_id": "ev_0017f665039d511dbe6d59208efd06c4262de28412011881bf7353fdb52115a9"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs analyze-web-bundle http://127.0.0.1:9352 AC48091D6A22807AE21D7F979D39302A --observation-ms 3000 --format json --full-output",
+      "purpose": "로컬 HEAD 번들 — list",
+      "result": "complete (요약 JSON bundles.list)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/bundle-list.full.json",
+      "stdout_sha256": "2762d8da343becdb3f413c4b6b767ee2b3cb73513570dee4af1ef49c4c48fc77",
+      "rea_evidence_id": "ev_3c2eb448b3b8b5a0531d517ee9c855bde6f68451146400db79493bc827e245b6"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs analyze-web-bundle http://127.0.0.1:9352 AC50E1063BF4EC3220D7FB8555AA1264 --observation-ms 3000 --format json --full-output",
+      "purpose": "로컬 HEAD 번들 — 404",
+      "result": "complete (요약 JSON bundles.404)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/bundle-404.full.json",
+      "stdout_sha256": "33dfefa03aad6d3a113afd7fda448f936a0d5abfb37ce1556d15d4129cc104ae",
+      "rea_evidence_id": "ev_c072f0e1ba947374087dd83fc01deca1d71a6ff9168a3050d51f88918292794f"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs inspect-web-page http://127.0.0.1:9352 080895AF47F849144CDD0410808D2E15 --observation-ms 3000 --include-script-sources --include-accessibility-text --include-console-text --include-storage-keys --format json",
+      "purpose": "스크립트 원문 확보 — room",
+      "result": "성공(큰 원본 scratch 보관)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/inspect-room.json",
+      "stdout_sha256": "ded06416dd60f1f08c23d7bee5cb43d3914312b3aff96a8973f3e0f8a275ccea",
+      "rea_evidence_id": "ev_3a4140bac6ff046cbe418de0cffca6526afbdc8699a9d7033f1ba4d8d73e4dfa"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs export-web-scripts \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/inspect-room.json\" \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/scripts-room\" --format json",
+      "purpose": "스크립트 내보내기 후 MediaPipe 표지(ImageSegmenter|FilesetResolver|vision_wasm) grep — room",
+      "result": "14개 export, 표지 = 2k9rs0tc7wn1i.js(앱 엔진 동적 import 호출부)만, 라이브러리 본체 0439w6hixvrtq.js 미적재",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/export-room.json",
+      "stdout_sha256": "8bf5877eafe237bd1eb86554ce7b15bda30bdda1df8c327e3c041c14b68b3d7c",
+      "rea_evidence_id": "ev_f4ee06464f3b4170bfd0f9306f2d2ac6b99133dd755325b5c4eeaa5fe9c4bc88"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs inspect-web-page http://127.0.0.1:9352 AC48091D6A22807AE21D7F979D39302A --observation-ms 3000 --include-script-sources --include-accessibility-text --include-console-text --include-storage-keys --format json",
+      "purpose": "스크립트 원문 확보 — list",
+      "result": "성공(큰 원본 scratch 보관)",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/inspect-list.json",
+      "stdout_sha256": "7247e9bd29d828f2bdea6961cdab2a8899b3a0e236879bf90f8f645936c0dd6f",
+      "rea_evidence_id": "ev_ce48ef681b214fdc38b01d664ff96cf72da111fbec84ac7faa1e18c4bf3770e5"
+    },
+    {
+      "cwd": "C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts",
+      "cmd": "node rea.mjs export-web-scripts \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/inspect-list.json\" \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/scripts-list\" --format json",
+      "purpose": "스크립트 내보내기 후 MediaPipe 표지(ImageSegmenter|FilesetResolver|vision_wasm) grep — list",
+      "result": "12개 export, 표지 없음",
+      "stdout_file": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-regress/out/export-list.json",
+      "stdout_sha256": "2b5fa1321e9e87333e48d510c51596541dbe65110917edc1683ad8c595f06ad4",
+      "rea_evidence_id": "ev_809fa8fe5d0893aaf8acf35de516f3bc2cb6565c9c7eab98f7b7024f797c4ae9"
+    }
+  ]
+}

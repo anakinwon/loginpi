@@ -1,0 +1,155 @@
+{
+ "setup": {
+  "chrome": "Chrome/156.0.8078.48",
+  "launch": "\"C:/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --remote-debugging-port=9447 --user-data-dir=<빈 임시폴더 C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04-mediapipe-chrome> --no-first-run --no-default-browser-check http://127.0.0.1:8747/probe.html",
+  "server": "node C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/tools/serve.cjs <패키지> <탐침> 8747 (CSP: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self')",
+  "model": "실제 모델 다운로드가 권한 거부되어 64바이트 가짜 모델 버퍼로 wasm 로딩·그래프 시작까지만 관찰"
+ },
+ "rea": [
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs list-browser-targets http://127.0.0.1:9447 --format json",
+   "evidence_id": "ev_17a48229bdbf3d22c65def6e5c6bc5227e83e7e7c1efab7f9cdfbf00d218c5e5",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/out/list-browser-targets.json",
+   "raw_sha256": "1a7addaac16248f7e84fdc18af42b7d75302fa7ef7c731e8b9f083cec7dd7e26",
+   "raw_bytes": 1501
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs inspect-web-page http://127.0.0.1:9447 10BD63FE91610E24921BE09746F5A7D2 --observation-ms 2000 --include-accessibility-text --include-console-text --format json",
+   "evidence_id": "ev_28ef6bbf8b583b0267dedb8f3fccbf7ac47a5e7308330454d79ae5aa869b30e1",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/out/inspect-web-page.json",
+   "raw_sha256": "0f56f242b9f3f17b7fc1e542a1acf887232fd28a7501bae5d94c2d7f4cad6abe",
+   "raw_bytes": 38269
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs analyze-web-bundle http://127.0.0.1:9447 10BD63FE91610E24921BE09746F5A7D2 --observation-ms 2000 --format json",
+   "evidence_id": "ev_442cbbbb1386979a86831589203d6ca306fbbdfcebaac60fff01b24fb7bc6c20",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/out/analyze-web-bundle.json",
+   "raw_sha256": "c793f43dadcb4d372eafd436fdfcb141ee7d12b7f3080489e48702b115fcc81c",
+   "raw_bytes": 4472
+  }
+ ],
+ "captured_scripts_sha256": [
+  {
+   "sha256": "6a14865165cb9718c1c3f12cee0a855ad9736132a33c28c81cbd5c7c8670a0fe",
+   "bytes": 2092
+  },
+  {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "sha256": "a84921e02321e582484c1f8126d344b5f33b791fa09c640a52e20ee8632068f1",
+   "bytes": 156139
+  },
+  {
+   "sha256": "6522286aa32dd93eff17c3da002b0649516f87abfec7a80b5bfe5c9625caa5f8",
+   "bytes": 334128
+  }
+ ],
+ "bundle_endpoints_detected_by_rea": [],
+ "bundle_endpoint_note": "REA analyze-web-bundle 은 endpoints=[] — 텔레메트리 URL(odml.pa.googleapis.com/v1/log)은 fetch(변수) 형태라 정적 추론에서 빠짐. 문자열 문맥 읽기로 확인(04 파일)",
+ "console_errors": [
+  {
+   "type": "error",
+   "url": "http://127.0.0.1:8747/mp/wasm/vision_wasm_internal.js",
+   "text": "ERROR: The model is not a valid Flatbuffer buffer"
+  },
+  {
+   "type": "error",
+   "url": "http://127.0.0.1:8747/mp/wasm/vision_wasm_internal.js",
+   "text": "E1027 10:47:27.012999 2191552 gl_graph_runner_internal.cc:255] StartGraph failed: INVALID_ARGUMENT: The model is not a valid Flatbuffer buffer; Initialize was not ok [MediaPipeTasksStatus='3']"
+  },
+  {
+   "type": "error",
+   "url": "http://127.0.0.1:8747/mp/wasm/vision_wasm_internal.js",
+   "text": "ERROR: The model is not a valid Flatbuffer buffer"
+  },
+  {
+   "type": "error",
+   "url": "http://127.0.0.1:8747/mp/wasm/vision_wasm_internal.js",
+   "text": "E1027 10:47:27.143000 2191552 gl_graph_runner_internal.cc:255] StartGraph failed: INVALID_ARGUMENT: The model is not a valid Flatbuffer buffer; Initialize was not ok [MediaPipeTasksStatus='3']"
+  }
+ ],
+ "probe_result": {
+  "ua_brands": [
+   "Not:A-Brand 8",
+   "Chromium 156",
+   "Google Chrome 156"
+  ],
+  "simd": true,
+  "fileset": {
+   "wasmLoaderPath": "/mp/wasm/vision_wasm_internal.js",
+   "wasmBinaryPath": "/mp/wasm/vision_wasm_internal.wasm"
+  },
+  "fileset_module": {
+   "wasmLoaderPath": "/mp/wasm/vision_wasm_module_internal.js",
+   "wasmBinaryPath": "/mp/wasm/vision_wasm_module_internal.wasm"
+  },
+  "offscreen_canvas": true,
+  "cross_origin_isolated": false,
+  "shared_array_buffer": false,
+  "webgl2": true,
+  "gl_ext": {
+   "EXT_color_buffer_float": true,
+   "OES_texture_float_linear": true,
+   "EXT_float_blend": true,
+   "EXT_color_buffer_half_float": true
+  },
+  "gl_renderer": "WebKit WebGL",
+  "create_cpu_fake_model": {
+   "ok": false,
+   "ms": 1181,
+   "error": "INVALID_ARGUMENT: The model is not a valid Flatbuffer buffer; Initialize was not ok; StartGraph failed\n=== Source Location Trace: === \nthird_party/mediapipe/tasks/cc/common.cc:30\nthird_party/mediapipe/tasks/cc/core/model_resources.cc:94\nthird_party/mediapipe/tasks/cc/core/model_task_graph.cc:222\nthird_party/mediapipe/tasks/cc/vision/image_segmenter/image_segmenter_graph.cc:412\nthird_party/mediapip"
+  },
+  "create_gpu_fake_model": {
+   "ok": false,
+   "ms": 128,
+   "error": "INVALID_ARGUMENT: The model is not a valid Flatbuffer buffer; Initialize was not ok; StartGraph failed\n=== Source Location Trace: === \nthird_party/mediapipe/tasks/cc/common.cc:30\nthird_party/mediapipe/tasks/cc/core/model_resources.cc:94\nthird_party/mediapipe/tasks/cc/core/model_task_graph.cc:222\nthird_party/mediapipe/tasks/cc/vision/image_segmenter/image_segmenter_graph.cc:412\nthird_party/mediapip"
+  },
+  "resources": [
+   {
+    "path": "/probe.mjs",
+    "transfer": 2392,
+    "decoded": 2092,
+    "ms": 32
+   },
+   {
+    "path": "/mp/vision_bundle.mjs",
+    "transfer": 156439,
+    "decoded": 156139,
+    "ms": 5
+   },
+   {
+    "path": "/mp/wasm/vision_wasm_internal.js",
+    "transfer": 334428,
+    "decoded": 334128,
+    "ms": 9
+   },
+   {
+    "path": "/favicon.ico",
+    "transfer": 302,
+    "decoded": 2,
+    "ms": 14
+   },
+   {
+    "path": "/mp/wasm/vision_wasm_internal.wasm",
+    "transfer": 13520222,
+    "decoded": 13519922,
+    "ms": 1072
+   },
+   {
+    "path": "/mp/wasm/vision_wasm_internal.js",
+    "transfer": 334428,
+    "decoded": 334128,
+    "ms": 19
+   },
+   {
+    "path": "/mp/wasm/vision_wasm_internal.wasm",
+    "transfer": 13520222,
+    "decoded": 13519922,
+    "ms": 72
+   }
+  ],
+  "csp_violations": []
+ }
+}

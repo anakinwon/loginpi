@@ -1,0 +1,86 @@
+{
+ "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/08-analyze-javascript-application.json",
+ "raw_sha256": "7e3eabd7ebb8804f20669e43ddee827f9199640c8ce5d3e3f3132cc5e9fa0297",
+ "evidence_id": "ev_373bbdd4defc8c53e8eac3faea4309c981624fb1a619d77aa66246fb33599380",
+ "operation": "analyze_javascript_application",
+ "predicate_type": "rea.javascript-application-analysis",
+ "provider": {
+  "id": "rea-javascript-application",
+  "name": "REA JavaScript application analyzer",
+  "version": "1"
+ },
+ "confidence": "derived",
+ "authority": "shipped-artifact",
+ "limitations": [
+  "CommonJS and ESM binding relationships were recovered from inert syntax and resolved only within the inventoried artifact container.",
+  "Graph coverage is incomplete; unavailable facts remain explicit and must not be read as absence.",
+  "JavaScript and HTML were parsed as inert text; bundle bootstrap code was never executed.",
+  "Static imports, entrypoints, workers, endpoints, and storage relationships do not prove runtime execution.",
+  "Static paths and relationships may remain unresolved when expressions are dynamic or obfuscated.",
+  "Webpack/Rspack factories were recovered from AST literals; REA did not invoke push handlers or bundle bootstrap code.",
+  "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/11-8239cac66db1d0d8.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/11-8239cac66db1d0d8.js during semantic",
+  "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/4a176a97-00bd2281f16f2c53.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/4a176a97-00bd2281f16f2c53.js during semantic",
+  "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/787-9333209d8f8fb674.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/787-9333209d8f8fb674.js during semantic",
+  "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js: Resource constraint during analyze_javascript_application: Semantic graph for origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js exceeds the parent's remaining result budget; static and module facts were retained",
+  "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js during semantic"
+ ],
+ "subject": {
+  "name": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04\\exported-scripts\\files",
+  "digest": {
+   "sha256": "b39673b0eb40e83dfade3f3aae3be570895510ce983b06e777bce8e1dc14fa2d"
+  },
+  "format": "directory",
+  "architecture": null,
+  "local_path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04\\exported-scripts\\files"
+ },
+ "root_artifact_sha256": "b39673b0eb40e83dfade3f3aae3be570895510ce983b06e777bce8e1dc14fa2d",
+ "inventory_manifest_id": "agm_5184a950b51ce5751e9a9f17ee35e3262107a7cb1e010f80e319b13720597d5a",
+ "inventory_graph_sha256": "4f1cafd68df7d6067ac4d90a8f835c737fb13a1410b871e8ccd076f880ee6f64",
+ "statistics": {
+  "relevant_files": 21,
+  "nested_asar_containers": 0,
+  "text_bytes_read": 1300753,
+  "invalid_utf8_files": 0,
+  "parsed_javascript_files": 21,
+  "visited_ast_nodes": 372496,
+  "findings": 649,
+  "modules": 171,
+  "parse_failures": 0
+ },
+ "summary": {
+  "browser_windows": 0,
+  "explicit_web_preferences": 0,
+  "preload_entrypoints": 0,
+  "context_bridge_apis": 0,
+  "exposed_api_members": 0,
+  "ipc": {
+   "operations": 0,
+   "literal_channels": 0,
+   "dynamic_channel_operations": 0,
+   "renderer_transmissions": 0,
+   "renderer_listeners": 0,
+   "main_handlers": 0,
+   "paired_renderer_transmissions": 0,
+   "ambiguous_renderer_transmissions": 0,
+   "unpaired_literal_renderer_transmissions": 0
+  },
+  "sender_validation_observations": 0,
+  "utility_processes": 0,
+  "resolved_utility_entrypoints": 0,
+  "native_addon_bindings": 0,
+  "resolved_native_addon_bindings": 0
+ },
+ "app_limitations": [
+  "CommonJS and ESM binding relationships were recovered from inert syntax and resolved only within the inventoried artifact container.",
+  "Graph coverage is incomplete; unavailable facts remain explicit and must not be read as absence.",
+  "JavaScript and HTML were parsed as inert text; bundle bootstrap code was never executed.",
+  "Static imports, entrypoints, workers, endpoints, and storage relationships do not prove runtime execution.",
+  "Static paths and relationships may remain unresolved when expressions are dynamic or obfuscated.",
+  "Webpack/Rspack factories were recovered from AST literals; REA did not invoke push handlers or bundle bootstrap code.",
+  "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/11-8239cac66db1d0d8.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/11-8239cac66db1d0d8.js during semantic",
+  "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/4a176a97-00bd2281f16f2c53.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/4a176a97-00bd2281f16f2c53.js during semantic",
+  "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/787-9333209d8f8fb674.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/787-9333209d8f8fb674.js during semantic",
+  "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js: Resource constraint during analyze_javascript_application: Semantic graph for origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js exceeds the parent's remaining result budget; static and module facts were retained",
+  "origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing origins/7e42f27de9a1dfa89d232d7e5eb896baf9d0db3815c1e1e21471a3c15854876e/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js during semantic"
+ ]
+}

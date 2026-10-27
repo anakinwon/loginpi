@@ -1,0 +1,522 @@
+{
+  "kind": "rea04-baseline-bundle-summary",
+  "note": "바이트는 브라우저 해제(decoded) 기준 — 전송(압축) 크기 아님. gzip9·brotli11 은 로컬 재압축 추정치",
+  "generated_at": "2026-10-27T10:44:34.853Z",
+  "deployment_dpl": "dpl_3ZwiUw2xoTaYDd9udatQmZhAzxRk",
+  "pages": {
+    "404": {
+      "evidence_id": "ev_b6d33fa83cf58588158a32c7c692738c1ae28cad8a9bbca0fea043b4c7f88f25",
+      "file_sha256": "8732a0a25b83f996671e069c72583613c04555d06082c9c387deeaddb9355088",
+      "target_url": "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join",
+      "scripts_observed": 18,
+      "total_decoded_bytes": 910228,
+      "completeness": {
+        "status": "complete",
+        "parsed_scripts": 18,
+        "parse_failures": 0,
+        "visited_ast_nodes": 241909
+      },
+      "dpl": "dpl_3ZwiUw2xoTaYDd9udatQmZhAzxRk",
+      "endpoints": [
+        "call:fetch /api/auth/me",
+        "call:e.get cookie",
+        "call:e.get set-cookie",
+        "call:t.delete set-cookie",
+        "call:get next"
+      ],
+      "vendor_fingerprints": [
+        "Next.js",
+        "React"
+      ],
+      "scripts": 18
+    },
+    "list": {
+      "evidence_id": "ev_a65f0c39e78fcb61557a6f4cbeb1765bee64d38786c0cf21de6ff78bde37f3d9",
+      "file_sha256": "1e8a0f82975b24d34884abecc79fbdb57430c599838c37787801f9db98a32be8",
+      "target_url": "https://seminarz.vercel.app/",
+      "scripts_observed": 23,
+      "total_decoded_bytes": 915414,
+      "completeness": {
+        "status": "complete",
+        "parsed_scripts": 23,
+        "parse_failures": 0,
+        "visited_ast_nodes": 243547
+      },
+      "dpl": "dpl_3ZwiUw2xoTaYDd9udatQmZhAzxRk",
+      "endpoints": [
+        "call:fetch /api/auth/me",
+        "call:e.get cookie",
+        "call:e.get set-cookie",
+        "call:t.delete set-cookie",
+        "call:get next"
+      ],
+      "vendor_fingerprints": [
+        "Next.js",
+        "React"
+      ],
+      "scripts": 23
+    },
+    "room": {
+      "evidence_id": "ev_5623f766c524ca570fbcf9d74cb7dba11320c23c1de29b948dcf5c820b48e936",
+      "file_sha256": "b34fa8ee42073ca47d2121e3e7eba63dc56fdb5729db99822d26d6662d97674f",
+      "target_url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+      "scripts_observed": 20,
+      "total_decoded_bytes": 974636,
+      "completeness": {
+        "status": "complete",
+        "parsed_scripts": 20,
+        "parse_failures": 0,
+        "visited_ast_nodes": 260609
+      },
+      "dpl": "dpl_3ZwiUw2xoTaYDd9udatQmZhAzxRk",
+      "endpoints": [
+        "call:fetch /api/auth/me",
+        "call:w.current.delete pub",
+        "call:e.get cookie",
+        "call:e.get set-cookie",
+        "call:t.delete set-cookie",
+        "call:get next"
+      ],
+      "vendor_fingerprints": [
+        "React",
+        "Next.js"
+      ],
+      "scripts": 20
+    }
+  },
+  "room_vs_list": {
+    "room_scripts": 20,
+    "shared_with_list": 12,
+    "shared_bytes": 882134,
+    "room_only_count": 8,
+    "room_only_bytes": 92502,
+    "room_only_gzip9_est": 31334,
+    "room_only_brotli11_est": 27730,
+    "room_only": [
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/04atw3ed80w63.js",
+        "sha256": "e775cebb035d2f70aa67c856fc50d66dc6e18f194db3632883a0ff7dfecf69c5",
+        "bytes": 38540,
+        "exported": true,
+        "gzip9_bytes_est": 14555,
+        "brotli11_bytes_est": 12990,
+        "markers": {
+          "RTCPeerConnection": 1,
+          "getUserMedia": 2,
+          "getDisplayMedia": 1,
+          "WebSocket": 3,
+          "replaceTrack": 1,
+          "AudioContext": 2,
+          "chat.send": 1,
+          "hand.set": 1,
+          "reaction.send": 1,
+          "room.setLayout": 1,
+          "peer.mute": 1,
+          "room.end": 1
+        }
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "2b7624563a7c55b6a609560fabd5c92a9ce7519604ba83ea6556ec6678ee947e",
+        "bytes": 948,
+        "exported": true,
+        "gzip9_bytes_est": 425,
+        "brotli11_bytes_est": 379,
+        "markers": {}
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "2d1f2087f3b8bd3b9bd1c848fcbf2c0fa60436cb46c145b628661c5f28c13a27",
+        "bytes": 4009,
+        "exported": true,
+        "gzip9_bytes_est": 464,
+        "brotli11_bytes_est": 396,
+        "markers": {}
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "a6f28dd719590074697fb5c19ce61e80715c75fb7ccf6fb2c3958d358f41dde3",
+        "bytes": 245,
+        "exported": true,
+        "gzip9_bytes_est": 184,
+        "brotli11_bytes_est": 147,
+        "markers": {}
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "c46512e5e15e2698ed5eaa5b85e9bc1bccffa745c25c0ac78c547987e7992970",
+        "bytes": 1045,
+        "exported": true,
+        "gzip9_bytes_est": 504,
+        "brotli11_bytes_est": 416,
+        "markers": {}
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "2933bfc422b3c19d9211d9f5707948e58666512450daf0404ebb7849ebeae827",
+        "bytes": 5443,
+        "exported": true,
+        "gzip9_bytes_est": 1270,
+        "brotli11_bytes_est": 1065,
+        "markers": {}
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "f89750f554b88de74bd7edeb76f8f26dc526e8d2c94cc1042796c530d0bb659f",
+        "bytes": 17276,
+        "exported": true,
+        "gzip9_bytes_est": 5758,
+        "brotli11_bytes_est": 4941,
+        "markers": {}
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/07ful3tqmevt1.js",
+        "sha256": "126305afd30485cb6b9c93d2d5b6fc28bc2f9f5ca2ba5a5e1193dfba83366a98",
+        "bytes": 24996,
+        "exported": true,
+        "gzip9_bytes_est": 8174,
+        "brotli11_bytes_est": 7396,
+        "markers": {
+          "getUserMedia": 2,
+          "getDisplayMedia": 1,
+          "chat.send": 1
+        }
+      }
+    ]
+  },
+  "room_all_script_markers": {
+    "RTCPeerConnection": 1,
+    "getUserMedia": 4,
+    "getDisplayMedia": 2,
+    "WebSocket": 3,
+    "replaceTrack": 1,
+    "AudioContext": 2,
+    "chat.send": 2,
+    "hand.set": 1,
+    "reaction.send": 1,
+    "room.setLayout": 1,
+    "peer.mute": 1,
+    "room.end": 1,
+    "zod": 485,
+    "X-Pi-Token": 1
+  },
+  "export": {
+    "evidence_id": "ev_1a0f33bb4e56a358701667189344854d9260cc46383d16b6d06ce91b7c8ff1fe",
+    "capture_sha256": "e6d9c25be8fcc56f28eecefad99375c3faed6a56afefb6abfef2a30122be555b",
+    "exported": 20,
+    "completeness": "policy_filtered"
+  },
+  "per_page_scripts": {
+    "404": [
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/3qu0wr_xr36nr.js",
+        "sha256": "5c23b359f672edf05f073eac403a912e6a26435cb8c2c580395925e2895e691d",
+        "bytes": 23348
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join",
+        "sha256": "f89750f554b88de74bd7edeb76f8f26dc526e8d2c94cc1042796c530d0bb659f",
+        "bytes": 17276
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/058782aojn7-u.js",
+        "sha256": "0fe1f1fa8ff6d59f1480b245b230f05ddee0d02dba015e851b4831671a256805",
+        "bytes": 2543
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join",
+        "sha256": "dc0cfccf32a94872e7c9a64a5d1659163da508f02b3e5235a141fc52357eb1f9",
+        "bytes": 5443
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/32eyko6hb9n62.js",
+        "sha256": "0661df967a630f831ac9838b016e67b9c9260766eb7dae400d47085919738784",
+        "bytes": 291338
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/2_78m9erj35-8.js",
+        "sha256": "c5073d35464884d1a875d6fec92a2abded12c6cdaccb883e042788fb27374ed6",
+        "bytes": 138109
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/0sx4t7va5oqbd.js",
+        "sha256": "3b7cd0cd24b1125af2b0487ee2b57f9344f4513919aec024788d74aeca1714f7",
+        "bytes": 54647
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/28vlffllwujc2.js",
+        "sha256": "69f62cbf1106f576442bfd3fe1e65a9fe6b9b7d787db3122666f757a1e70474b",
+        "bytes": 56734
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/1bm6ck635eofv.js",
+        "sha256": "c79c1625ae37137245ba01d9af05008a0dbfe4258bda8e706e463cac5d6bbf67",
+        "bytes": 25031
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/2q_opz_1nzoz5.js",
+        "sha256": "1fc4f366fe37284ba56c6a62af61a9bcbff7a7c3090fe9ea89085d7919280079",
+        "bytes": 49570
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join",
+        "sha256": "3814cddd18b2095e01abb745a99e5ada90178e709c09879324c3b623f2d829ea",
+        "bytes": 43
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join",
+        "sha256": "2d1f2087f3b8bd3b9bd1c848fcbf2c0fa60436cb46c145b628661c5f28c13a27",
+        "bytes": 4009
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join",
+        "sha256": "c46512e5e15e2698ed5eaa5b85e9bc1bccffa745c25c0ac78c547987e7992970",
+        "bytes": 1045
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/turbopack-0nb2uzuru3t2-.js",
+        "sha256": "ddb2d0763ecbb041f214386b29bc9846c0c7de26e047388fbb377788db63a802",
+        "bytes": 11041
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/0ir1g_m_--p8h.js",
+        "sha256": "511318349fa0807bb4aafbeab60677816a37c45b2bff6912ec28ff79b4581b20",
+        "bytes": 3375
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join",
+        "sha256": "92645d981d369be278d42a769abd800c738cf937918a654cd40520340c09a12f",
+        "bytes": 76
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/0yzli9w_82_gj.js",
+        "sha256": "34afe4f37db0cb5370e03c83eb1b2badecb6939830724392cba9ff5a4238ddbc",
+        "bytes": 226355
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join",
+        "sha256": "a6f28dd719590074697fb5c19ce61e80715c75fb7ccf6fb2c3958d358f41dde3",
+        "bytes": 245
+      }
+    ],
+    "list": [
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/3qu0wr_xr36nr.js",
+        "sha256": "5c23b359f672edf05f073eac403a912e6a26435cb8c2c580395925e2895e691d",
+        "bytes": 23348
+      },
+      {
+        "url": "https://seminarz.vercel.app/",
+        "sha256": "9650b2fc23637c3b0174cf0056878e8a3a6abe44c14bd3d31ce0560ac19cc1ec",
+        "bytes": 2072
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/058782aojn7-u.js",
+        "sha256": "0fe1f1fa8ff6d59f1480b245b230f05ddee0d02dba015e851b4831671a256805",
+        "bytes": 2543
+      },
+      {
+        "url": "https://seminarz.vercel.app/",
+        "sha256": "3814cddd18b2095e01abb745a99e5ada90178e709c09879324c3b623f2d829ea",
+        "bytes": 43
+      },
+      {
+        "url": "https://seminarz.vercel.app/",
+        "sha256": "fb8c8e84e9358e6bdcb62c485a4e26294858e233f354847669c53b63a6c202a7",
+        "bytes": 177
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/32eyko6hb9n62.js",
+        "sha256": "0661df967a630f831ac9838b016e67b9c9260766eb7dae400d47085919738784",
+        "bytes": 291338
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/31bc93lqa_i7u.js",
+        "sha256": "ea019363553c0047bb8137bc668b5f4ceea785c436920ace5e9eafb82490dcb1",
+        "bytes": 742
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/2_78m9erj35-8.js",
+        "sha256": "c5073d35464884d1a875d6fec92a2abded12c6cdaccb883e042788fb27374ed6",
+        "bytes": 138109
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/0sx4t7va5oqbd.js",
+        "sha256": "3b7cd0cd24b1125af2b0487ee2b57f9344f4513919aec024788d74aeca1714f7",
+        "bytes": 54647
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/28vlffllwujc2.js",
+        "sha256": "69f62cbf1106f576442bfd3fe1e65a9fe6b9b7d787db3122666f757a1e70474b",
+        "bytes": 56734
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/1bm6ck635eofv.js",
+        "sha256": "c79c1625ae37137245ba01d9af05008a0dbfe4258bda8e706e463cac5d6bbf67",
+        "bytes": 25031
+      },
+      {
+        "url": "https://seminarz.vercel.app/",
+        "sha256": "1ed4c2f4859688d1c9f2972fe765887fea51bb8ce39b8d4910223cea686bb66b",
+        "bytes": 588
+      },
+      {
+        "url": "https://seminarz.vercel.app/",
+        "sha256": "413694aa7e113c3cd88b2084599ec8e917548b034a7fb21b0109c90e35a2b6fa",
+        "bytes": 527
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/2q_opz_1nzoz5.js",
+        "sha256": "1fc4f366fe37284ba56c6a62af61a9bcbff7a7c3090fe9ea89085d7919280079",
+        "bytes": 49570
+      },
+      {
+        "url": "https://seminarz.vercel.app/",
+        "sha256": "004322d1c71525c9d6b101051f0ad6fb48b0f732df451cef12a5a45d0e2c3a3a",
+        "bytes": 1300
+      },
+      {
+        "url": "https://seminarz.vercel.app/",
+        "sha256": "397925c1c22d078fc5cf3f3e6a1d198e453d9171534db68a01a03e258135f219",
+        "bytes": 3845
+      },
+      {
+        "url": "https://seminarz.vercel.app/",
+        "sha256": "85c2e1f1e2a7ae691270e5b1e5837fe11ead7336927653be123902efe2283eca",
+        "bytes": 17275
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/1-4cunm-mtdoj.js",
+        "sha256": "03f3224d70f59fe9e90ac166a1610da81c1d44f8896134dd573cc73f5fbcc977",
+        "bytes": 4968
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/turbopack-0nb2uzuru3t2-.js",
+        "sha256": "ddb2d0763ecbb041f214386b29bc9846c0c7de26e047388fbb377788db63a802",
+        "bytes": 11041
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/0ir1g_m_--p8h.js",
+        "sha256": "511318349fa0807bb4aafbeab60677816a37c45b2bff6912ec28ff79b4581b20",
+        "bytes": 3375
+      },
+      {
+        "url": "https://seminarz.vercel.app/",
+        "sha256": "be6ada50ed2bb4378b2da4b8805c09e908fb3acd0a75c3958d826faf23ea1edb",
+        "bytes": 1056
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/0yzli9w_82_gj.js",
+        "sha256": "34afe4f37db0cb5370e03c83eb1b2badecb6939830724392cba9ff5a4238ddbc",
+        "bytes": 226355
+      },
+      {
+        "url": "https://seminarz.vercel.app/",
+        "sha256": "51c85b0988942656466ff0da0ef8733dade20dc75b66d989eb2df4fe58c9dbe4",
+        "bytes": 730
+      }
+    ],
+    "room": [
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/3qu0wr_xr36nr.js",
+        "sha256": "5c23b359f672edf05f073eac403a912e6a26435cb8c2c580395925e2895e691d",
+        "bytes": 23348
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/058782aojn7-u.js",
+        "sha256": "0fe1f1fa8ff6d59f1480b245b230f05ddee0d02dba015e851b4831671a256805",
+        "bytes": 2543
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/04atw3ed80w63.js",
+        "sha256": "e775cebb035d2f70aa67c856fc50d66dc6e18f194db3632883a0ff7dfecf69c5",
+        "bytes": 38540
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/32eyko6hb9n62.js",
+        "sha256": "0661df967a630f831ac9838b016e67b9c9260766eb7dae400d47085919738784",
+        "bytes": 291338
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/2_78m9erj35-8.js",
+        "sha256": "c5073d35464884d1a875d6fec92a2abded12c6cdaccb883e042788fb27374ed6",
+        "bytes": 138109
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/0sx4t7va5oqbd.js",
+        "sha256": "3b7cd0cd24b1125af2b0487ee2b57f9344f4513919aec024788d74aeca1714f7",
+        "bytes": 54647
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "3814cddd18b2095e01abb745a99e5ada90178e709c09879324c3b623f2d829ea",
+        "bytes": 43
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/28vlffllwujc2.js",
+        "sha256": "69f62cbf1106f576442bfd3fe1e65a9fe6b9b7d787db3122666f757a1e70474b",
+        "bytes": 56734
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/1bm6ck635eofv.js",
+        "sha256": "c79c1625ae37137245ba01d9af05008a0dbfe4258bda8e706e463cac5d6bbf67",
+        "bytes": 25031
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "2b7624563a7c55b6a609560fabd5c92a9ce7519604ba83ea6556ec6678ee947e",
+        "bytes": 948
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "2d1f2087f3b8bd3b9bd1c848fcbf2c0fa60436cb46c145b628661c5f28c13a27",
+        "bytes": 4009
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/2q_opz_1nzoz5.js",
+        "sha256": "1fc4f366fe37284ba56c6a62af61a9bcbff7a7c3090fe9ea89085d7919280079",
+        "bytes": 49570
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "a6f28dd719590074697fb5c19ce61e80715c75fb7ccf6fb2c3958d358f41dde3",
+        "bytes": 245
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "c46512e5e15e2698ed5eaa5b85e9bc1bccffa745c25c0ac78c547987e7992970",
+        "bytes": 1045
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "2933bfc422b3c19d9211d9f5707948e58666512450daf0404ebb7849ebeae827",
+        "bytes": 5443
+      },
+      {
+        "url": "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445/join",
+        "sha256": "f89750f554b88de74bd7edeb76f8f26dc526e8d2c94cc1042796c530d0bb659f",
+        "bytes": 17276
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/turbopack-0nb2uzuru3t2-.js",
+        "sha256": "ddb2d0763ecbb041f214386b29bc9846c0c7de26e047388fbb377788db63a802",
+        "bytes": 11041
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/0ir1g_m_--p8h.js",
+        "sha256": "511318349fa0807bb4aafbeab60677816a37c45b2bff6912ec28ff79b4581b20",
+        "bytes": 3375
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/07ful3tqmevt1.js",
+        "sha256": "126305afd30485cb6b9c93d2d5b6fc28bc2f9f5ca2ba5a5e1193dfba83366a98",
+        "bytes": 24996
+      },
+      {
+        "url": "https://seminarz.vercel.app/_next/static/chunks/0yzli9w_82_gj.js",
+        "sha256": "34afe4f37db0cb5370e03c83eb1b2badecb6939830724392cba9ff5a4238ddbc",
+        "bytes": 226355
+      }
+    ]
+  }
+}

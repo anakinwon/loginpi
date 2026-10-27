@@ -1,0 +1,314 @@
+{
+ "operation": "trace_web_source_location",
+ "script": {
+  "manifest_index": 13,
+  "url": "https://meet.livekit.io/_next/static/chunks/787-9333209d8f8fb674.js",
+  "sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68"
+ },
+ "source_map": {
+  "path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/maps/787-9333209d8f8fb674.js.map",
+  "sha256": "39fb862e434cecf2d0f641fd58823e3659071561bc08b72b154332fe0b21a5e3",
+  "bytes": 766730,
+  "url": "https://meet.livekit.io/_next/static/chunks/787-9333209d8f8fb674.js.map",
+  "association": "caller-selected"
+ },
+ "limitations": [
+  "The source/map pairing and source-map URL context are caller-selected. Deployment authenticity and execution remain unknown.",
+  "Capture metadata and its Evidence reference are historical context; this trace independently verifies only the selected manifest, script and map bytes.",
+  "Source names and sourceRoot are reported declarations. Resolved URLs are derived by the pinned upstream codec; no original source is fetched or executed.",
+  "Embedded source hashes identify the UTF-8 encoding of decoded sourcesContent text, not an independently retained original file. Missing or out-of-range original content positions remain explicit.",
+  "Lookup returns all segments at the greatest generated position not greater than the selected point, including earlier lines and generated-only segments. A mapped point does not establish an executed range or UI causality.",
+  "Regular maps and inline indexed sections are supported. External section URLs are unsupported; unknown extensions are retained in raw map text and are not interpreted.",
+  "Complete evidence has a 4 MiB map, 32 MiB reply, 262144 decoded rows/segments and 64-level section budget. The owned codec has a 20-second deadline, 192 MiB old-generation heap and one V8 worker; cleanup may extend the deadline. V8 heap limits do not establish aggregate RSS limits."
+ ],
+ "traces": [
+  {
+   "label": "tasks-vision 버전 상수",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-1.json",
+   "raw_sha256": "ed957d4695ddca2dd92144dcf63a77d31933d20c9ec0ae65cf3763ef9a89daa0",
+   "evidence_id": "ev_7d54a01d9f15ec74e751b2d54fb5b5ff6e5e70307f00b982b1f48cbbb6e6d5be",
+   "requested": {
+    "line": 1,
+    "column": 242663
+   },
+   "matched_generated": {
+    "line": 1,
+    "column": 242663
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/package.json",
+   "original_position": {
+    "line": 28,
+    "column": 2,
+    "offset": 753,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "wasm 파일셋 기본 CDN 경로",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-2.json",
+   "raw_sha256": "9e8200c17226cf3d3b316975271028f0435efbb8999557ab8ba51cceccbbdf6c",
+   "evidence_id": "ev_bbdddd6e3188c21538fd551c991aad3503daef2af63c243664643a977bf192a2",
+   "requested": {
+    "line": 115,
+    "column": 4426
+   },
+   "matched_generated": {
+    "line": 115,
+    "column": 4425
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/transformers/BackgroundTransformer.ts",
+   "original_position": {
+    "line": 64,
+    "column": 8,
+    "offset": 2129,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "selfie 분할 모델 기본 URL",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-3.json",
+   "raw_sha256": "d9d458e85bb95e9cd168f9f69a47e1ffd2221c0198517f44eccb70e04f2b7c37",
+   "evidence_id": "ev_543425ee60616886d208bf09d30af6740b2252686480cb85ba41e0512bc35877",
+   "requested": {
+    "line": 115,
+    "column": 4668
+   },
+   "matched_generated": {
+    "line": 115,
+    "column": 4667
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/transformers/BackgroundTransformer.ts",
+   "original_position": {
+    "line": 71,
+    "column": 10,
+    "offset": 2432,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "runningMode VIDEO",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-4.json",
+   "raw_sha256": "076059042b58795346d3d80137723ab96ab2a9fd459c932d84bc8fc161c8ab87",
+   "evidence_id": "ev_066e9c616f0b893a99b1b9d7f42b9a1f5e707f9e91ab895edfc8fe451f9f4614",
+   "requested": {
+    "line": 115,
+    "column": 4869
+   },
+   "matched_generated": {
+    "line": 115,
+    "column": 4869
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/transformers/BackgroundTransformer.ts",
+   "original_position": {
+    "line": 76,
+    "column": 19,
+    "offset": 2677,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "폴백 미지원 오류 메시지",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-5.json",
+   "raw_sha256": "e2b0d84f0497a7c3855be6a7cb4a0d67442d2e211ce0fbbf427c3257c8154bf5",
+   "evidence_id": "ev_343c153724d961176fa6562430d82e6b5fa02c42e35eeac34ccbf6f407e1b18a",
+   "requested": {
+    "line": 115,
+    "column": 8708
+   },
+   "matched_generated": {
+    "line": 115,
+    "column": 8663
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/index.ts",
+   "original_position": {
+    "line": 144,
+    "column": 29,
+    "offset": 4771,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "switchTo(모드 전환)",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-6.json",
+   "raw_sha256": "bea11a81a4961845b3c03e455131b1dc9bb88168a24cf0316280f3c5ca58a52f",
+   "evidence_id": "ev_4e3bf24a1bfda15db59de392ed3ce2902208c7e1425dffab5a4e2abed9e2aa3c",
+   "requested": {
+    "line": 115,
+    "column": 8072
+   },
+   "matched_generated": {
+    "line": 115,
+    "column": 8072
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/index.ts",
+   "original_position": {
+    "line": 95,
+    "column": 2,
+    "offset": 2990,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "blurRadius 기본값 해체",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-7.json",
+   "raw_sha256": "aee3c7fd9a5877c4da021838a96469cc906877f1e9a8c019666a4b171e5841f1",
+   "evidence_id": "ev_c49e9018f335e32bd3ccfd61511f3581bb5f5d706be6733a82cbed9569045816",
+   "requested": {
+    "line": 115,
+    "column": 8806
+   },
+   "matched_generated": {
+    "line": 115,
+    "column": 8804
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/index.ts",
+   "original_position": {
+    "line": 156,
+    "column": 8,
+    "offset": 5141,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "requestVideoFrameCallback(첫 프레임)",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-8.json",
+   "raw_sha256": "ea414709eafac4097f53a86f2280852b8d008a0a83744be97d23cdbc05f7ea11",
+   "evidence_id": "ev_8854912018752b6316ad0114ef83cbacd8be80cf0019127abc13fd794882acea",
+   "requested": {
+    "line": 115,
+    "column": 6528
+   },
+   "matched_generated": {
+    "line": 115,
+    "column": 6528
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/transformers/BackgroundTransformer.ts",
+   "original_position": {
+    "line": 159,
+    "column": 29,
+    "offset": 5781,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "MediaStreamTrackProcessor 지원 검사",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-9.json",
+   "raw_sha256": "9b29171db864106bf8ceb9f0e4a58ec46ddb839c9c3accb021855cc7f8232e10",
+   "evidence_id": "ev_0c168862f62429a53cfcf298c5d6eb5fba843184e62712efef330f8ae7ac8fe8",
+   "requested": {
+    "line": 1,
+    "column": 236251
+   },
+   "matched_generated": {
+    "line": 1,
+    "column": 236251
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/ProcessorWrapper.ts",
+   "original_position": {
+    "line": 31,
+    "column": 13,
+    "offset": 1185,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "maxFps 기본값",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-10.json",
+   "raw_sha256": "c75dc0d00104ac4b015675d1ddf7b8ca41a59fd4531951bd1edf0d4751d6672d",
+   "evidence_id": "ev_91690604359af7743a13607d1ab97b893a5b6f8b2249d197d27a417aa15bff2b",
+   "requested": {
+    "line": 1,
+    "column": 236003
+   },
+   "matched_generated": {
+    "line": 1,
+    "column": 236003
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/ProcessorWrapper.ts",
+   "original_position": {
+    "line": 99,
+    "column": 9,
+    "offset": 2957,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "canvas.captureStream 폴백",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-11.json",
+   "raw_sha256": "37f9c4935be59308fa34ee992a6110dbfeb2c38a43b5e50a62cede2c751afbfc",
+   "evidence_id": "ev_13ca35a9d43a026d66710b182662dabbda85e55ae795c36f722b3c9a10e8cdce",
+   "requested": {
+    "line": 1,
+    "column": 237510
+   },
+   "matched_generated": {
+    "line": 1,
+    "column": 237510
+   },
+   "original_source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/ProcessorWrapper.ts",
+   "original_position": {
+    "line": 143,
+    "column": 47,
+    "offset": 4659,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  },
+  {
+   "label": "Krisp 동적 import",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/06-trace-787-12.json",
+   "raw_sha256": "e815bf0f44f8d003d1331050e1063e3c4401e053f87e3d0e064e9c3943a1f1dd",
+   "evidence_id": "ev_8864b41ef4658f9ff4f5946112993f745d1696e01cf36d3303ef3d1b955944b4",
+   "requested": {
+    "line": 1,
+    "column": 99211
+   },
+   "matched_generated": {
+    "line": 1,
+    "column": 99211
+   },
+   "original_source": "pnpm[@livekit+components-react@2.9.24_@livekit+krisp-noise-filter@0.4.5_livekit-client@2.23._67aeedaf696c6007c6dba6ea9c9864ca]/@livekit/components-react/src/hooks/cloud/krisp/useKrispNoiseFilter.ts",
+   "original_position": {
+    "line": 56,
+    "column": 32,
+    "offset": 2126,
+    "content_position": "verified-in-embedded-text"
+   },
+   "state": "mapped",
+   "source_authenticity": "unknown",
+   "execution": "unknown"
+  }
+ ]
+}

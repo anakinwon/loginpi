@@ -1,0 +1,370 @@
+{
+ "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/03-analyze-web-bundle.json",
+ "raw_sha256": "721adff4b4857d9e6876409acf58e8470459481397ee5e365a51c53a361aa486",
+ "evidence_id": "ev_a25218aa0a019f0a2cb9c2dee24fc650f2d36cfc42da3ebb8f027ba022565caa",
+ "operation": "analyze_web_bundle",
+ "predicate_type": "rea.web-bundle-analysis",
+ "provider": {
+  "id": "rea-cdp-browser",
+  "name": "REA Chrome DevTools Protocol observation provider",
+  "version": "2"
+ },
+ "confidence": "observed",
+ "authority": "external-service",
+ "limitations": [
+  "Artifact identity is unavailable for this observation.",
+  "Static bundle findings are observations or bounded inferences; REA does not execute captured JavaScript.",
+  "String-built routes and endpoints, encrypted configuration, and server-side behavior may remain unknown.",
+  "Page-declared WebMCP metadata is untrusted and is never registered or invoked as an REA tool."
+ ],
+ "capture": {
+  "target_url": "https://meet.livekit.io/rooms/rea04-probe",
+  "scripts_observed": 12,
+  "scripts_analyzed": 12
+ },
+ "inferences": [
+  {
+   "kind": "vendor_fingerprint",
+   "value": "React",
+   "confidence": "medium"
+  },
+  {
+   "kind": "vendor_fingerprint",
+   "value": "React",
+   "confidence": "medium"
+  },
+  {
+   "kind": "vendor_fingerprint",
+   "value": "Next.js",
+   "confidence": "high"
+  },
+  {
+   "kind": "vendor_fingerprint",
+   "value": "Next.js",
+   "confidence": "high"
+  }
+ ],
+ "unknowns": [
+  {
+   "dimension": "source_maps",
+   "reason": "One or more requested source maps were unavailable or incomplete",
+   "affected_script_keys": [
+    "scr_44135209a71cad1314a34ad20365cb71f737431987ddc9ef251fab830ea02262",
+    "scr_6daa71b45027ffc18b4981d988526269b812203fbab1c6ca5b09b5ca8472fa47",
+    "scr_77dd9747192adc1f0fad83dfd30a936881e5d41cb4e56fd1da985f67e74c1136",
+    "scr_837c849ba3fe001d4501b2ba676de55ecc3978ed3de7083594fb4c469f7577f4",
+    "scr_d47132939313db07707a78329254a8d1bbd3c2b94ec4d80936c46041e1cc9b71"
+   ]
+  }
+ ],
+ "completeness": {
+  "status": "partial",
+  "parsed_scripts": 12,
+  "parse_failures": 0,
+  "visited_ast_nodes": 372378
+ },
+ "endpoints": [
+  {
+   "value": "*",
+   "mechanism": "call:listeners.get",
+   "location": {
+    "script_key": "scr_d47132939313db07707a78329254a8d1bbd3c2b94ec4d80936c46041e1cc9b71",
+    "line": 1,
+    "column": 212880
+   }
+  },
+  {
+   "value": "Cache-Control",
+   "mechanism": "call:e.get",
+   "location": {
+    "script_key": "scr_d47132939313db07707a78329254a8d1bbd3c2b94ec4d80936c46041e1cc9b71",
+    "line": 1,
+    "column": 366815
+   }
+  },
+  {
+   "value": "audioinput",
+   "mechanism": "call:or.userMediaPromiseMap.delete",
+   "location": {
+    "script_key": "scr_d47132939313db07707a78329254a8d1bbd3c2b94ec4d80936c46041e1cc9b71",
+    "line": 1,
+    "column": 445866
+   }
+  },
+  {
+   "value": "videoinput",
+   "mechanism": "call:or.userMediaPromiseMap.delete",
+   "location": {
+    "script_key": "scr_d47132939313db07707a78329254a8d1bbd3c2b94ec4d80936c46041e1cc9b71",
+    "line": 1,
+    "column": 445977
+   }
+  }
+ ],
+ "routes": [],
+ "source_maps": {
+  "status": "partial",
+  "requested": 11,
+  "processed": 11,
+  "items": [
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/4a176a97-00bd2281f16f2c53.js.map",
+    "status": "included",
+    "limitation": null,
+    "sha256": "caa9a1e3f09beb339b3404dbe73e6cacfde07741b6090db7416ea2aec24d4199",
+    "bytes": 635673,
+    "original_source_count": 1
+   },
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/app/layout-bb7ad1dba58cabcb.js.map",
+    "status": "included",
+    "limitation": null,
+    "sha256": "c51236b38f3a771e599131b3df3a7429e4ff5086d0e515582c469b92dc045a4b",
+    "bytes": 1329,
+    "original_source_count": 4
+   },
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/11-8239cac66db1d0d8.js.map",
+    "status": "included",
+    "limitation": null,
+    "sha256": "9e5574aaeeb00c8d067ecb4e18bccf759ef49d84d1191c2aa93ad7aaa1a75d94",
+    "bytes": 737247,
+    "original_source_count": 144
+   },
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js.map",
+    "status": "partial",
+    "limitation": "Module edges are incomplete: 2 of 152 original sources could not be parsed in full (webpack://_N_E/node_modules/.pnpm/@livekit+components-react@2.9.24_@livekit+krisp-noise-filter@0.4.5_livekit-client@2.23._67aeedaf696c6007c6dba6ea9c9864ca/node_modules/@livekit/components-react/src/hooks/internal/useResizeObserver.ts, webpack://_N_E/node_modules/.pnpm/@livekit+components-react@2.9.24_@livekit+krisp-noise-filter@0.4.5_livekit-client@2.23._67aeedaf696c6007c6dba6ea9c9864ca/node_modules/@livekit/components-react/src/hooks/useTrackVolume.ts).",
+    "sha256": "768f79298e2f0dedb8eee775aa75ec7b9282c49191e465fd685a1b36d005b0f7",
+    "bytes": 630276,
+    "original_source_count": 152
+   },
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/main-app-c1d00de144b27ee2.js.map",
+    "status": "included",
+    "limitation": null,
+    "sha256": "fa976f1a4f8332943738348bd0c8df3eb2bbce776274633ff8f0aefd52fee548",
+    "bytes": 2290,
+    "original_source_count": 2
+   },
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/webpack-0cfd51bb6a36e13b.js.map",
+    "status": "invalid",
+    "limitation": "Source-map JSON mappings could not be decoded safely.",
+    "sha256": null,
+    "bytes": null,
+    "original_source_count": 0
+   },
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/295-b920c121c12763d5.js.map",
+    "status": "partial",
+    "limitation": "Module edges are incomplete: 1 of 14 original sources could not be parsed in full (webpack://_N_E/node_modules/.pnpm/react-hot-toast@2.5.2_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/react-hot-toast/src/core/toast.ts).",
+    "sha256": "01c81128818105385334abb12329ced8a8a3cef51104d5bde30e72fdc379b0ae",
+    "bytes": 41957,
+    "original_source_count": 14
+   },
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/787-9333209d8f8fb674.js.map",
+    "status": "partial",
+    "limitation": "Module edges are incomplete: 1 of 181 original sources could not be parsed in full (webpack://_N_E/node_modules/.pnpm/@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a/node_modules/@livekit/track-processors/package.json).",
+    "sha256": "39fb862e434cecf2d0f641fd58823e3659071561bc08b72b154332fe0b21a5e3",
+    "bytes": 766730,
+    "original_source_count": 181
+   },
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/965-89dc141cb237a849.js.map",
+    "status": "included",
+    "limitation": null,
+    "sha256": "0163dd313d13631e2a2d71d8ff8d07828491f3d7c5e5ce4d29d1c28aabb7d9aa",
+    "bytes": 43547,
+    "original_source_count": 12
+   },
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/app/rooms/%5BroomName%5D/page-54756b6953c030df.js.map",
+    "status": "included",
+    "limitation": null,
+    "sha256": "8d9a56f23fb08b341119604a8d127b67775e5ddb45d58d6129ba86a91ecae168",
+    "bytes": 16891,
+    "original_source_count": 4
+   },
+   {
+    "declared_url": "https://meet.livekit.io/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js.map",
+    "status": "fetch_failed",
+    "limitation": "Expanded source-map evidence exceeds the 32 MiB public representation budget.",
+    "sha256": null,
+    "bytes": null,
+    "original_source_count": 0
+   }
+  ]
+ },
+ "selected_original_sources": [
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+components-react@2.9.24_@livekit+krisp-noise-filter@0.4.5_livekit-client@2.23._67aeedaf696c6007c6dba6ea9c9864ca]/@livekit/components-react/src/hooks/cloud/krisp/useKrispNoiseFilter.ts",
+   "sha256": "8800dc59e77fae5f19baed04120dbc0f5e9fba437ca1d13c176a20371c0d5b99",
+   "bytes": 3870
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@mediapipe+tasks-vision@0.10.14]/@mediapipe/tasks-vision/vision_bundle.mjs",
+   "sha256": "e77f281f9619150d937023c355bae170e9120e3b9e43f1e23a2a7bee07197669",
+   "bytes": 136870
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/logger.ts",
+   "sha256": "7f00bc03f7402918d2a2445b01feb06e980bc91192907eca0253c93cbf6ab30c",
+   "bytes": 2165
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/FrameTicker.ts",
+   "sha256": "383ad248bed6e60ef84bd4875a7868aaf50c798e7681300b2b729f802cac8fae",
+   "bytes": 2756
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/utils.ts",
+   "sha256": "fcb5cd4e9c5c8b52ef50724584b12096c3c094ce07dff170ff9fd8576f684957",
+   "bytes": 1048
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/ProcessorWrapper.ts",
+   "sha256": "9d93cdeaa3f1167fda36f3b25f67017edcc34c5474c66abd9a99334fa64f4ce3",
+   "bytes": 15775
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/transformers/BackgroundTransformer.ts",
+   "sha256": "9ca9f967198ac1756bd04720c6c6aa4560b1ec13471c57d9c505ec01e8aac7e4",
+   "bytes": 8403
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/package.json",
+   "sha256": "4f288e5a228be82f5c69e4e737cd6330ba443f03ad3d87719c574d8d679e3778",
+   "bytes": 1623
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/webgl/utils.ts",
+   "sha256": "80ab61cd05525551bff24c5e4f51136d5e0096bb61d9635796185d0da5ee4227",
+   "bytes": 5062
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/webgl/shader-programs/vertexShader.ts",
+   "sha256": "949da50a15d87183c0925122a080510c10698c6ec46b920281e270312d0ef639",
+   "bytes": 316
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/webgl/shader-programs/blurShader.ts",
+   "sha256": "c04ccc41bf590779c3a84a1c0c636e29c22489546d8204cfa98767abad21d42b",
+   "bytes": 3399
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/webgl/shader-programs/boxBlurShader.ts",
+   "sha256": "4845bca4ccde875b6a92dd5ca5e733d0e26d57384ee92649350fc60a18929032",
+   "bytes": 1739
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/webgl/shader-programs/compositeShader.ts",
+   "sha256": "80a17838d278fa6335d72d0347f928287bd59a485e659c60ecc487f35abf89d2",
+   "bytes": 2214
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/webgl/shader-programs/downSampler.ts",
+   "sha256": "db566bf206e3e056442f92c358ee6942bbdcccbb4d6c0bad9a7dead17c904189",
+   "bytes": 2718
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/webgl/index.ts",
+   "sha256": "1c9e2202660d5ad592209fc57fbe313026dd3032b52fed8b5eeb49f8b8c0ace4",
+   "bytes": 11858
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/transformers/VideoTransformer.ts",
+   "sha256": "e10bca84ad750493622304f837cb553364165d567b7b3eb54fc55fb9d1826420",
+   "bytes": 1882
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/audio/GainAudioProcessor.ts",
+   "sha256": "3021504d74287de447541eb70d346991b986d13e3c5638aa1153382f6898ce26",
+   "bytes": 4092
+  },
+  {
+   "map": "787-9333209d8f8fb674.js.map",
+   "source": "pnpm[@livekit+track-processors@0.8.1_@types+dom-mediacapture-transform@0.1.11_livekit-client_6f29d295e022604532df563f1424822a]/@livekit/track-processors/src/index.ts",
+   "sha256": "641d4bd14697e66295a6083c4ef402b64b2e54a3f69617b53bacf69e65f599fa",
+   "bytes": 7916
+  },
+  {
+   "map": "965-89dc141cb237a849.js.map",
+   "source": "lib/useSetupE2EE.ts",
+   "sha256": "d7e257d7ac6a1b8f40fb98d2758bf5097cf362f625fd0603a222c529f15acf51",
+   "bytes": 513
+  },
+  {
+   "map": "965-89dc141cb237a849.js.map",
+   "source": "lib/client-utils.ts",
+   "sha256": "98e478c19753c9228cdbc3f4ea3335178278d65ab8470db8200140917a06aa42",
+   "bytes": 809
+  },
+  {
+   "map": "965-89dc141cb237a849.js.map",
+   "source": "lib/Debug.tsx",
+   "sha256": "8ba93baac5ff4c6eab4edb8ab1862ceb8aa13bc75866300dec01430786fedfc6",
+   "bytes": 7317
+  },
+  {
+   "map": "965-89dc141cb237a849.js.map",
+   "source": "lib/CameraSettings.tsx",
+   "sha256": "799663263051ff1e19ff4632370305114bd2eef1449cd171e39b839d1c10a4c2",
+   "bytes": 5739
+  },
+  {
+   "map": "965-89dc141cb237a849.js.map",
+   "source": "lib/MicrophoneSettings.tsx",
+   "sha256": "88940c2549f2e54ba881e0cd25c796ebc7bd61bfbcc7ebc658334cb0e141cb2e",
+   "bytes": 1706
+  },
+  {
+   "map": "965-89dc141cb237a849.js.map",
+   "source": "lib/SettingsMenu.tsx",
+   "sha256": "83797d4338d65ea044a261081c5bff2394ea9eac55aa53b8dee9e4ad951ee93e",
+   "bytes": 4782
+  },
+  {
+   "map": "965-89dc141cb237a849.js.map",
+   "source": "lib/usePerfomanceOptimiser.ts",
+   "sha256": "7c698a596a0442420c8103cb3ae298722788e15a85c0b7c281393d763e55f9f4",
+   "bytes": 2393
+  },
+  {
+   "map": "965-89dc141cb237a849.js.map",
+   "source": "lib/KeyboardShortcuts.tsx",
+   "sha256": "23bd148994a8f6ddd698413854f31b3be8327b38fd30ff7e9983c2fe6cd94f27",
+   "bytes": 974
+  },
+  {
+   "map": "page-54756b6953c030df.js.map",
+   "source": "lib/RecordingIndicator.tsx",
+   "sha256": "6940b3564b1deb4ae3294bbf27edbaa0d703a31fca9a390b206283f51ffd6338",
+   "bytes": 1028
+  },
+  {
+   "map": "page-54756b6953c030df.js.map",
+   "source": "app/rooms/[roomName]/PageClientImpl.tsx",
+   "sha256": "cccbc585ce4cfdbaf5c4a7965d4812a810dc509927ae6cb51faaeeb64cdf576f",
+   "bytes": 8039
+  }
+ ]
+}

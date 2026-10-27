@@ -1,0 +1,71 @@
+{
+ "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/07-meet-source-vs-deployed.json",
+ "raw_sha256": "2d32e42ecddeac4fa765d5d970c1f7939564f354325dc7b667c94100c0dd3f85",
+ "method": "배포 소스맵 sourcesContent SHA-256(REA artifact) 과 로컬 사본(CRLF→LF 정규화) SHA-256 비교, node:crypto",
+ "local_copy": {
+  "repo": "livekit-examples/meet",
+  "commit": "aed896b0fecd6c926523fb62ce508bdfc324004a"
+ },
+ "rows": [
+  {
+   "path": "lib/useSetupE2EE.ts",
+   "deployed_sha256": "d7e257d7ac6a1b8f40fb98d2758bf5097cf362f625fd0603a222c529f15acf51",
+   "local_lf_sha256": "d7e257d7ac6a1b8f40fb98d2758bf5097cf362f625fd0603a222c529f15acf51",
+   "equal": true
+  },
+  {
+   "path": "lib/client-utils.ts",
+   "deployed_sha256": "98e478c19753c9228cdbc3f4ea3335178278d65ab8470db8200140917a06aa42",
+   "local_lf_sha256": "98e478c19753c9228cdbc3f4ea3335178278d65ab8470db8200140917a06aa42",
+   "equal": true
+  },
+  {
+   "path": "lib/Debug.tsx",
+   "deployed_sha256": "8ba93baac5ff4c6eab4edb8ab1862ceb8aa13bc75866300dec01430786fedfc6",
+   "local_lf_sha256": "8ba93baac5ff4c6eab4edb8ab1862ceb8aa13bc75866300dec01430786fedfc6",
+   "equal": true
+  },
+  {
+   "path": "lib/CameraSettings.tsx",
+   "deployed_sha256": "799663263051ff1e19ff4632370305114bd2eef1449cd171e39b839d1c10a4c2",
+   "local_lf_sha256": "799663263051ff1e19ff4632370305114bd2eef1449cd171e39b839d1c10a4c2",
+   "equal": true
+  },
+  {
+   "path": "lib/MicrophoneSettings.tsx",
+   "deployed_sha256": "88940c2549f2e54ba881e0cd25c796ebc7bd61bfbcc7ebc658334cb0e141cb2e",
+   "local_lf_sha256": "88940c2549f2e54ba881e0cd25c796ebc7bd61bfbcc7ebc658334cb0e141cb2e",
+   "equal": true
+  },
+  {
+   "path": "lib/SettingsMenu.tsx",
+   "deployed_sha256": "83797d4338d65ea044a261081c5bff2394ea9eac55aa53b8dee9e4ad951ee93e",
+   "local_lf_sha256": "83797d4338d65ea044a261081c5bff2394ea9eac55aa53b8dee9e4ad951ee93e",
+   "equal": true
+  },
+  {
+   "path": "lib/usePerfomanceOptimiser.ts",
+   "deployed_sha256": "7c698a596a0442420c8103cb3ae298722788e15a85c0b7c281393d763e55f9f4",
+   "local_lf_sha256": "7c698a596a0442420c8103cb3ae298722788e15a85c0b7c281393d763e55f9f4",
+   "equal": true
+  },
+  {
+   "path": "lib/KeyboardShortcuts.tsx",
+   "deployed_sha256": "23bd148994a8f6ddd698413854f31b3be8327b38fd30ff7e9983c2fe6cd94f27",
+   "local_lf_sha256": "23bd148994a8f6ddd698413854f31b3be8327b38fd30ff7e9983c2fe6cd94f27",
+   "equal": true
+  },
+  {
+   "path": "lib/RecordingIndicator.tsx",
+   "deployed_sha256": "6940b3564b1deb4ae3294bbf27edbaa0d703a31fca9a390b206283f51ffd6338",
+   "local_lf_sha256": "6940b3564b1deb4ae3294bbf27edbaa0d703a31fca9a390b206283f51ffd6338",
+   "equal": true
+  },
+  {
+   "path": "app/rooms/[roomName]/PageClientImpl.tsx",
+   "deployed_sha256": "cccbc585ce4cfdbaf5c4a7965d4812a810dc509927ae6cb51faaeeb64cdf576f",
+   "local_lf_sha256": "cccbc585ce4cfdbaf5c4a7965d4812a810dc509927ae6cb51faaeeb64cdf576f",
+   "equal": true
+  }
+ ]
+}

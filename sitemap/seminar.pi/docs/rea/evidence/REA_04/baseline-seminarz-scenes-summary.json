@@ -1,0 +1,175 @@
+{
+  "kind": "rea04-baseline-scenes-summary",
+  "generated_at": "2026-10-27T10:47:28.066Z",
+  "scenes": {
+    "scene-list": {
+      "start_url": "https://seminarz.vercel.app/ko",
+      "evidence_id": "ev_e3447cdf9d01b7686bccbda9605bc99b5504c9f999ac85abc226e500cda86db5",
+      "scenario_sha256": "5d763eb09dc4e35a8edc7da22450469c944ebc2fe505701df844aefaf3822f3b",
+      "full_envelope_sha256": "af1888c7a74e42dc00c490a9657107b5b5d24372d847815e708156ab8f4c848a",
+      "normalized_sha256": "3bf8b0cfba3162a8d905ee7f064ae91f966276e528123ab5c5414418568c6345",
+      "completeness": "complete",
+      "duration_ms": 6071,
+      "final_url": "https://seminarz.vercel.app/",
+      "documents": [
+        "307 https://seminarz.vercel.app/ko",
+        "200 https://seminarz.vercel.app/"
+      ],
+      "requests_total": 38,
+      "requests_by_type": {
+        "document": 2,
+        "stylesheet": 1,
+        "script": 14,
+        "other": 1,
+        "fetch": 20
+      },
+      "fetch_requests": {
+        "https://seminarz.vercel.app/api/seminars?tab=all&page=1": 1,
+        "https://seminarz.vercel.app/api/auth/pi": 1,
+        "https://seminarz.vercel.app/api/auth/session": 2,
+        "https://seminarz.vercel.app/link?_rsc=*": 5,
+        "https://seminarz.vercel.app/progress?_rsc=*": 4,
+        "https://seminarz.vercel.app/?_rsc=*": 3,
+        "https://seminarz.vercel.app/s/1c10a138-30d0-4beb-825c-134266b7323d?_rsc=*": 2,
+        "https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445?_rsc=*": 2
+      },
+      "failed_requests": [
+        "fetch https://seminarz.vercel.app/s/1c10a138-30d0-4beb-825c-134266b7323d?_rsc=j5t6Ei1OzF-EpOxR net::ERR_ABORTED",
+        "fetch https://seminarz.vercel.app/s/86ff7149-ddbf-4b36-bfac-1a0fefc80445?_rsc=j5t6Ei1OzF-EpOxR net::ERR_ABORTED"
+      ],
+      "console": [
+        "https://sdk.minepi.com/pi-sdk.js :: SDKMessaging instantiated on Pi environment: production",
+        "https://sdk.minepi.com/pi-sdk.js :: Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://app-cdn.minepi.com') does not match the recipient window's origin ('https://seminarz.vercel.app').",
+        "https://sdk.minepi.com/pi-sdk.js :: Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://app-cdn.minepi.com') does not match the recipient window's origin ('https://seminarz.vercel.app')."
+      ],
+      "websockets": 0,
+      "screenshot": {
+        "sha256": "eaaa63ff68dfb9ba5ff065908177b2258b4adca38693860a0f00c7b3c812b004",
+        "bytes": 23011
+      },
+      "accessibility": {
+        "sha256": "a9f071fe67ac3a1e5d9e15a5ac765c57ceb4a511d92c3ee0b6dc6bc221b4c5d6",
+        "bytes": 1380,
+        "text": "- document:\n  - banner:\n    - link \"seminar.pi\":\n      - /url: /\n    - navigation:\n      - link \"제작 현황\":\n        - /url: /progress\n      - link \"계정 연동\":\n        - /url: /link\n      - link \"English\":\n        - /url: /en\n    - button \"Pi로 로그인\"\n    - button \"Google로 로그인\"\n  - main:\n    - heading \"seminar.pi\" [level=1]\n    - paragraph: 개최자가 세미나를 열고, 참가자는 Pi 로 입장해 실시간 화상으로 참여합니다.\n    - tablist \"세미나 목록 보기\":\n      - tab \"전체\" [selected]\n      - tab \"내가 연 것\"\n      - tab \"내가 참가한 것\"\n    - tabpanel \"전체\":\n      - list:\n        - listitem:\n          - link \"테스트 무료 2026. 10. 26. 오후 9:44 개최 anakin2 정원 30명 진행 중\":\n            - /url: /s/86ff7149-ddbf-4b36-bfac-1a0fefc80445\n            - heading \"테스트\" [level=2]\n            - text: 무료\n            - paragraph: 2026. 10. 26. 오후 9:44\n            - paragraph: 개최 anakin2 정원 30명 진행 중\n        - listitem:\n          - link \"Test 무료 2026. 10. 26. 오후 9:57 개최 anakin2 정원 30명 진행 중\":\n            - /url: /s/1c10a138-30d0-4beb-825c-134266b7323d\n            - heading \"Test\" [level=2]\n            - text: 무료\n            - paragraph: 2026. 10. 26. 오후 9:57\n            - paragraph: 개최 anakin2 정원 30명 진행 중\n  - alert"
+      },
+      "cookies": [
+        "__Host-authjs.csrf-token (httpOnly=true, sameSite=Lax)",
+        "__Secure-authjs.callback-url (httpOnly=true, sameSite=Lax)"
+      ],
+      "same_deploy_rerun_noise": {
+        "compare_evidence_id": "ev_4681df6d647cdcb30f4bc5e0ca82512b4cff35e6d8f993255d9a93703ef02955",
+        "overall_status": "changed",
+        "changed": [
+          "scenario_start:events",
+          "settle:storage",
+          "settle:events"
+        ]
+      }
+    },
+    "scene-progress": {
+      "start_url": "https://seminarz.vercel.app/ko/progress",
+      "evidence_id": "ev_e58afca21ecfa164dcdb6f85d2077128b2241b83c4344bdaebc1f8da8e08145a",
+      "scenario_sha256": "1cfc40dc6d7328361d53e175b55f0246046dd9bce053120d78c1f9ea85fed20d",
+      "full_envelope_sha256": "e7b88805378b9cd6c907a0bb9ab674abef036a7ff2e7856585453e63d22775a5",
+      "normalized_sha256": "e7429c0aa67ec7ca6eee37db0e23afa4ef3dbff0f05bcfeaa09820a0d5e59df0",
+      "completeness": "complete",
+      "duration_ms": 5904,
+      "final_url": "https://seminarz.vercel.app/progress",
+      "documents": [
+        "307 https://seminarz.vercel.app/ko/progress",
+        "200 https://seminarz.vercel.app/progress"
+      ],
+      "requests_total": 33,
+      "requests_by_type": {
+        "document": 2,
+        "stylesheet": 1,
+        "script": 14,
+        "other": 1,
+        "fetch": 15
+      },
+      "fetch_requests": {
+        "https://seminarz.vercel.app/api/auth/pi": 1,
+        "https://seminarz.vercel.app/api/auth/session": 2,
+        "https://seminarz.vercel.app/link?_rsc=*": 4,
+        "https://seminarz.vercel.app/?_rsc=*": 3,
+        "https://seminarz.vercel.app/progress?_rsc=*": 5
+      },
+      "failed_requests": [],
+      "console": [
+        "https://sdk.minepi.com/pi-sdk.js :: SDKMessaging instantiated on Pi environment: production",
+        "https://sdk.minepi.com/pi-sdk.js :: Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://app-cdn.minepi.com') does not match the recipient window's origin ('https://seminarz.vercel.app').",
+        "https://sdk.minepi.com/pi-sdk.js :: Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://app-cdn.minepi.com') does not match the recipient window's origin ('https://seminarz.vercel.app')."
+      ],
+      "websockets": 0,
+      "screenshot": {
+        "sha256": "69eb85becec152cd774882a11ac26991655946677b20c1ae0cc0df00e2222584",
+        "bytes": 46271
+      },
+      "accessibility": {
+        "sha256": "e26531c02243e3c849d4aa748ec32ad3a1e77d4dae3020f88c60b29f0ae644f3",
+        "bytes": 3949,
+        "text": "- document:\n  - banner:\n    - link \"seminar.pi\":\n      - /url: /\n    - navigation:\n      - link \"제작 현황\":\n        - /url: /progress\n      - link \"계정 연동\":\n        - /url: /link\n      - link \"English\":\n        - /url: /en/progress\n    - button \"Pi로 로그인\"\n    - button \"Google로 로그인\"\n  - main:\n    - heading \"제작 현황\" [level=1]\n    - region \"제작 진행 현황\":\n      - heading \"제작 진행 현황\" [level=2]\n      - paragraph: 기능별로 완료·진행·계획을 보여 줍니다 · 2026-10-27 기준\n      - text: 완료 1개 기능 진행 4개 기능 계획 2개 기능 전체 단계 진척 3/17 단계 완료 (18%)\n      - progressbar \"전체 단계 진척\"\n      - list:\n        - listitem:\n          - text: F-05\n          - heading \"실시간 화상 세미나\" [level=3]\n          - text: P0 진행 · 0/7\n          - paragraph: 자체 화상 엔진 Galápagos — 발표자 1명이 청중 최대 30명에게 영상을 보내는 것이 목표입니다\n          - text: 참조 모델 Galène mediasoup LiveKit Jitsi\n          - list:\n            - listitem: M0 카메라 기기 시험 진행 Android ✓ · iOS …\n            - listitem: M1 발표자 1 → 청중 2 영상 진행 Galène LAN ✓ · LAN fix ✓ · retest … · LTE …\n            - listitem: M2 끊김 회복·안정화 진행 Galène local ✓ · TURN API ✓ · LTE …\n            - listitem: M3 엔진 구조 정리 진행 mediasoup gate ✓ · v1.2 ✓\n            - listitem: M4 화질 자동 조절·청중 30명 진행 LiveKit score·layer ✓ · 30 …\n            - listitem: M5 방 입장·녹화 진행 Galène LiveKit ticket·status ✓ · device …\n            - listitem: UI 화상 룸 화면(대기실·무대·채팅·손들기·사회) 진행 LiveKit Jitsi QA ✓ · device …\n        - listitem:\n          - text: F-02\n          - heading \"세미나 개설\" [level=3]\n          - text: P0 진행 · 0/1\n          - paragraph: 제목·일시·정원·입장료를 정해 세미나를 엽니다\n          - list:\n            - listitem: 1 개설 화면 진행 QA ✓ · device …\n        - listitem:\n          - text: F-03\n          - heading \"세미나 목록·상세\" [level=3]\n          - text: P0 진행 · 0/2\n          - paragraph: 열린 세미나를 페이지 단위로 찾아보고 상세 정보를 확인합니다\n          - list:\n            - listitem: 1 목록 진행 QA ✓ · device …\n            - listitem: 2 상세 진행 QA ✓ · device …\n        - listitem:\n          - text: F-04\n          - heading \"Pi 입장 결제\" [level=3]\n          - text: P0 진행 · 0/2\n          - paragraph: 입장료를 Pi로 결제하면 서버가 금액을 다시 확인한 뒤 입장시킵니다\n          - list:\n            - listitem: 1 결제 요청 진행 API ✓ · device …\n            - listitem: 2 금액 재검증·입장 처리 진행 API ✓ · device …\n        - listitem:\n          - text: F-01\n          - heading \"로그인\" [level=3]\n          - text: P0 완료 · 3/3\n          - paragraph: Pi Browser 로그인, 일반 브라우저 Google 로그인, 두 계정 연동\n          - text: 참조 모델 sitemap.pi\n          - list:\n            - listitem: 1 Pi Browser 로그인 완료 sitemap.pi 10-25\n            - listitem: 2 Google 로그인 완료 sitemap.pi 10-25\n            - listitem: 3 계정 연동 완료 sitemap.pi 10-25\n        - listitem:\n          - text: F-06\n          - heading \"개최자 수익 정산\" [level=3]\n          - text: P1 계획 · 0/1\n          - paragraph: 입장료 수익을 개최자에게 Pi로 정산합니다\n          - list:\n            - listitem: 1 정산 계획\n        - listitem:\n          - text: F-07\n          - heading \"다시보기\" [level=3]\n          - text: P2 계획 · 0/1\n          - paragraph: 녹화한 세미나를 나중에 다시 봅니다\n          - list:\n            - listitem: 1 녹화 다시보기 계획\n  - alert"
+      },
+      "cookies": [
+        "__Host-authjs.csrf-token (httpOnly=true, sameSite=Lax)",
+        "__Secure-authjs.callback-url (httpOnly=true, sameSite=Lax)"
+      ],
+      "same_deploy_rerun_noise": {
+        "compare_evidence_id": "ev_727527ed84471e2f5039b914c989b5340a9d1fae26731414a9fdfccfbb7c0f37",
+        "overall_status": "changed",
+        "changed": [
+          "scenario_start:events",
+          "settle:storage",
+          "settle:events"
+        ]
+      }
+    },
+    "scene-404": {
+      "start_url": "https://seminarz.vercel.app/ko/s/00000000-0000-4000-8000-000000000404/join",
+      "evidence_id": "ev_867565849848bf0199f95973d6fea8a1b28a8da3c056dea40081c38ed38011df",
+      "scenario_sha256": "6ced0bf4bb67a89095cc01f23db8dd5ee92be3ceb1b63e9d5b308d05ce72e7d9",
+      "full_envelope_sha256": "0ebd7aae4b03e448701c5174c090d413a2faa544737024247116e2f2580e7c88",
+      "normalized_sha256": "75aa93908cb8ae0451323903baa05a9d8d16a772fde28bb6ba6cd59d2559b6d8",
+      "completeness": "complete",
+      "duration_ms": 4744,
+      "final_url": "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join",
+      "documents": [
+        "307 https://seminarz.vercel.app/ko/s/00000000-0000-4000-8000-000000000404/join",
+        "404 https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join"
+      ],
+      "requests_total": 17,
+      "requests_by_type": {
+        "document": 2,
+        "stylesheet": 1,
+        "script": 12,
+        "other": 2
+      },
+      "fetch_requests": {},
+      "failed_requests": [
+        "script https://sdk.minepi.com/pi-sdk.js net::ERR_ABORTED"
+      ],
+      "console": [
+        "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join :: Failed to load resource: the server responded with a status of 404 ()"
+      ],
+      "websockets": 0,
+      "screenshot": {
+        "sha256": "ad4350c95ab4f0739f83878b380e29d69c22bf00591be328549ab1c10641a388",
+        "bytes": 5095
+      },
+      "accessibility": {
+        "sha256": "c12c1480b9536974ab49f60e623d9222977faa43101f7973f248e4ba28739834",
+        "bytes": 103,
+        "text": "- document:\n  - heading \"404\" [level=1]\n  - heading \"This page could not be found.\" [level=2]\n  - alert"
+      },
+      "cookies": [],
+      "same_deploy_rerun_noise": {
+        "compare_evidence_id": "ev_4f24117a7ac14155a0ca46a0b2c02b762ed65a39a2ed64b6a79cf437bea830aa",
+        "overall_status": "changed",
+        "changed": [
+          "scenario_start:events",
+          "settle:events"
+        ]
+      }
+    }
+  }
+}

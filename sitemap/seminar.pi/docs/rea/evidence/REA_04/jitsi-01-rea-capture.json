@@ -1,0 +1,442 @@
+{
+ "rea_version": "rea-agents 6.4.0 (CLI, MCP 연결 실패 상태라 CLI 사용)",
+ "target": {
+  "url": "https://meet.jit.si/ReaProbebaee262251e0",
+  "license": "Apache-2.0 (jitsi-meet·lib-jitsi-meet)",
+  "deploy_cdn_tag": "meetjitsi_9523.6636",
+  "note": "무작위 방 이름의 대기(prejoin) 화면만 사용, 회의 참가 버튼은 누르지 않음"
+ },
+ "browser": {
+  "product": "Chrome/156.0.8078.48",
+  "protocol_version": "1.3",
+  "revision": "537.36 (@d0c02bfad08ec92a6ffcf989e53cd995e6381a4c)",
+  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "js_version": "15.6.75.19"
+ },
+ "steps": [
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs list-browser-targets http://127.0.0.1:9344 --format json",
+   "evidence_id": "ev_17c0314896d7774cc3ad4d198527327b4fd3225a3e5aceda5f4f667bbde48a2b",
+   "raw": {
+    "path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\01-list-browser-targets.json",
+    "sha256": "6413285d5d9dd49b4bc934478d629304f4d74bce36b82f20f1a8851224396d7a",
+    "bytes": 1527
+   },
+   "result": [
+    {
+     "target_id": "FB691BBCEE4941C13025C3694FE4B006",
+     "type": "page",
+     "title": "Rea Probebaee 262251 E 0 | Jitsi Meet",
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "origin": "https://meet.jit.si",
+     "attached": false
+    }
+   ]
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs inspect-web-page http://127.0.0.1:9344 FB691BBCEE4941C13025C3694FE4B006 --observation-ms 5000 --include-script-sources --include-storage-keys --include-accessibility-text --include-console-text --format json",
+   "evidence_id": "ev_0f5b34a466fd1c310d6fded998fa992cc3d62ad07b7fee71ae14b44a62b2c83b",
+   "raw": {
+    "path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\02-inspect-web-page.json",
+    "sha256": "6d1e89dc7a260b2eaef16fd2d588435921500d36bfa8c80ccbde28ba02191bd8",
+    "bytes": 6083328
+   },
+   "completeness": "policy_filtered",
+   "scripts": [
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+     "script_key": "scr_19669fcddfc7f878317e02bfb8c79ce586ee02baa664270570c57c69146c9921",
+     "language": "JavaScript",
+     "length": 1145446,
+     "cdp_hash": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6",
+     "source_map_url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.map"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/olm.wasm",
+     "script_key": "scr_29bcda4e71537858d73c2dbb38af4da1142ad9a63e522a7cc9b0510acf8675e1",
+     "language": "WebAssembly",
+     "length": 153573,
+     "cdp_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "source_map_url": null
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/chunks/4690.min.js",
+     "script_key": "scr_34590fba186c230587ead0ca168696c8a4f1a7f1c483312f672a3c9855e6fb27",
+     "language": "JavaScript",
+     "length": 818631,
+     "cdp_hash": "0d7dd97b6fefb9fbb996d253b0949601bb7689f8c953b15928835d1b5f68271c",
+     "source_map_url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/chunks/4690.min.js.map"
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "script_key": "scr_53cdee1855fc9e102b393f872ab12adb68096d63d348399883d59fb9f47968f9",
+     "language": "JavaScript",
+     "length": 9381,
+     "cdp_hash": "0bee9b8367ec54e7856ca903726863bba674377a5cc5671ee07f95b51259a3f5",
+     "source_map_url": null
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "script_key": "scr_61614cb42080c5a7c427ddac71719a24d4f6d59561e2065a80c0eb452de2fe7a",
+     "language": "JavaScript",
+     "length": 1833,
+     "cdp_hash": "c4448d8d1c19ff487de5f0fc3f73640d95f2e3ec34bf3302ced13d910af8e0ac",
+     "source_map_url": null
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+     "script_key": "scr_795fdff0f05bcda41b5a93d4a94767a7ef68f106f8ead894bff850bffcb635f9",
+     "language": "JavaScript",
+     "length": 3635129,
+     "cdp_hash": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57",
+     "source_map_url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js.map"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/preload.min.js?v=139",
+     "script_key": "scr_b591cc11c617f3214b31eed6459371282c453f8e90db83fb82abc4c57f3ab2fa",
+     "language": "JavaScript",
+     "length": 7101,
+     "cdp_hash": "1257d1263e3405120a04152468e32f19168eaf06fa24af47367cb170d93b49ac",
+     "source_map_url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/preload.min.js.map"
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "script_key": "scr_bbab227fb86782b4d683c2941104cf7b2ce8f3a2f8698e2bb8af28f1a00c40ab",
+     "language": "JavaScript",
+     "length": 6388,
+     "cdp_hash": "65ec4aedd4dc872804f0f31b8c987eec98b7b1f8f9578f325c11eaf7acea1ab7",
+     "source_map_url": null
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "script_key": "scr_cd5f8bd2dd69c308cb5c7b9749d48ea8b67e451e288087a2cc690ea2908cb4ea",
+     "language": "JavaScript",
+     "length": 236,
+     "cdp_hash": "0921dfc0e4bd7b558ef412d90a57e497d32af656f39a178c242024c7c0b6121b",
+     "source_map_url": null
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "script_key": "scr_edf8bb9bf456be79c3457a1cecfb6315e6b49412278733e1008cf3d8798d1ac8",
+     "language": "JavaScript",
+     "length": 9431,
+     "cdp_hash": "7be2429eb5b0b08208b342bbb4d68c47c2372b3e507bd6fa15ae59a038f0216c",
+     "source_map_url": null
+    }
+   ],
+   "resources": [
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/preload.min.js?v=139",
+     "type": "Script",
+     "content_size": 7101
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+     "type": "Script",
+     "content_size": 3658821
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/css/all.css?v=9523.6636",
+     "type": "Stylesheet",
+     "content_size": 98171
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+     "type": "Script",
+     "content_size": 1145590
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/chunks/4690.min.js",
+     "type": "Script",
+     "content_size": 818631
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/watermark.svg",
+     "type": "Image",
+     "content_size": 12312
+    }
+   ],
+   "storage_key_names": {
+    "local_storage": [
+     "features/prejoin",
+     "AMP_unsent_<분석도구 키 일부 — 가림>",
+     "features/calendar-sync",
+     "features/base/settings",
+     "features/base/known-domains",
+     "__AMDID",
+     "features/custom-panel",
+     "features/video-quality-persistent-storage",
+     "features/virtual-background",
+     "features/polls-history",
+     "features/keyboard-shortcuts",
+     "features/recent-list",
+     "features/dropbox",
+     "features/noise-suppression",
+     "features/base/jwt",
+     "language"
+    ],
+    "values_redacted": true
+   },
+   "workers": [],
+   "limitations": [
+    "Artifact identity is unavailable for this observation.",
+    "Observation starts when REA attaches; prior network and console activity is unavailable.",
+    "Raw network headers, bodies, cookies, storage values, console objects, and WebSocket payloads are never retained; explicitly requested primitive console text is retained verbatim, while payload captures retain value-free shapes.",
+    "Source maps are reported only as declarative URLs and are not fetched.",
+    "URL-less scripts and console events without an allowed source URL are excluded because their origin cannot be proven.",
+    "Browser host platform and architecture were not observed."
+   ]
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs analyze-web-bundle http://127.0.0.1:9344 FB691BBCEE4941C13025C3694FE4B006 --observation-ms 3000 --fetch-source-maps --format json",
+   "evidence_id": "ev_43a7f71c38f70e2ea541276124caffa0a8e4cb2e84130144937f532fbd6e90b3",
+   "raw": {
+    "path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\03-analyze-web-bundle.json",
+    "sha256": "e282de32819ae68da477a6add873565eb15db65ead201e2f204123820c12e63b",
+    "bytes": 31291053
+   },
+   "chunks": [
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+     "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6",
+     "bytes": 1145590
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/olm.wasm",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/chunks/4690.min.js",
+     "sha256": "0d7dd97b6fefb9fbb996d253b0949601bb7689f8c953b15928835d1b5f68271c",
+     "bytes": 818631
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "sha256": "0bee9b8367ec54e7856ca903726863bba674377a5cc5671ee07f95b51259a3f5",
+     "bytes": 9381
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "sha256": "c4448d8d1c19ff487de5f0fc3f73640d95f2e3ec34bf3302ced13d910af8e0ac",
+     "bytes": 1833
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+     "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57",
+     "bytes": 3658821
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/preload.min.js?v=139",
+     "sha256": "1257d1263e3405120a04152468e32f19168eaf06fa24af47367cb170d93b49ac",
+     "bytes": 7101
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "sha256": "65ec4aedd4dc872804f0f31b8c987eec98b7b1f8f9578f325c11eaf7acea1ab7",
+     "bytes": 6388
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "sha256": "0921dfc0e4bd7b558ef412d90a57e497d32af656f39a178c242024c7c0b6121b",
+     "bytes": 236
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "sha256": "7be2429eb5b0b08208b342bbb4d68c47c2372b3e507bd6fa15ae59a038f0216c",
+     "bytes": 9431
+    }
+   ],
+   "chunk_edges": 2,
+   "endpoints_count": 268,
+   "source_maps": [
+    {
+     "declared_url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.map",
+     "status": "partial",
+     "artifact_sha256": "6c2584f469849463bbf33cd0f4718810acafa3d621d5201100b6401cd8b9ab4d",
+     "bytes": 4193271,
+     "limitation": "Module edges are incomplete: 3 of 414 original sources could not be parsed in full (webpack://JitsiMeetJS/webpack/universalModuleDefinition, webpack://JitsiMeetJS/watchRTC/webpack/universalModuleDefinition, webpack://JitsiMeetJS/watchRTC/webpack/startup)."
+    },
+    {
+     "declared_url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/chunks/4690.min.js.map",
+     "status": "fetch_failed",
+     "artifact_sha256": null,
+     "bytes": null,
+     "limitation": "Expanded source-map evidence exceeds the 32 MiB public representation budget."
+    },
+    {
+     "declared_url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js.map",
+     "status": "fetch_failed",
+     "artifact_sha256": null,
+     "bytes": null,
+     "limitation": "Source-map layout exceeds the 262144 segment/generated-row decoder budget."
+    },
+    {
+     "declared_url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/preload.min.js.map",
+     "status": "included",
+     "artifact_sha256": "5118655cbea1f3ec66243696afc1328de29158bdb16b0264816efbe00bba262c",
+     "bytes": 58073,
+     "limitation": null
+    }
+   ],
+   "inferences": [
+    {
+     "kind": "bundle_runtime",
+     "value": "webpack",
+     "confidence": "high"
+    },
+    {
+     "kind": "bundle_runtime",
+     "value": "webpack",
+     "confidence": "high"
+    },
+    {
+     "kind": "vendor_fingerprint",
+     "value": "React",
+     "confidence": "medium"
+    }
+   ],
+   "unknowns": [
+    {
+     "dimension": "source_maps",
+     "reason": "One or more requested source maps were unavailable or incomplete",
+     "affected_script_keys": [
+      "scr_19669fcddfc7f878317e02bfb8c79ce586ee02baa664270570c57c69146c9921",
+      "scr_34590fba186c230587ead0ca168696c8a4f1a7f1c483312f672a3c9855e6fb27",
+      "scr_795fdff0f05bcda41b5a93d4a94767a7ef68f106f8ead894bff850bffcb635f9"
+     ]
+    }
+   ],
+   "completeness": {
+    "status": "partial",
+    "parsed_scripts": 10,
+    "parse_failures": 0,
+    "visited_ast_nodes": 1171759
+   },
+   "limitations": [
+    "Artifact identity is unavailable for this observation.",
+    "Static bundle findings are observations or bounded inferences; REA does not execute captured JavaScript.",
+    "String-built routes and endpoints, encrypted configuration, and server-side behavior may remain unknown.",
+    "Page-declared WebMCP metadata is untrusted and is never registered or invoked as an REA tool."
+   ]
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs export-web-scripts \"C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\02-inspect-web-page.json\" \"C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\scripts\" --format json",
+   "evidence_id": "ev_4be1f45fc31619641c18832898afcada31bac5aace0fa50eed75e83c0e04eae5",
+   "raw": {
+    "path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\04-export-web-scripts.json",
+    "sha256": "442a50903a185a920749b20367bef793e3c2d3984e18fc36519df055466815e2",
+    "bytes": 13706
+   },
+   "capture_sha256": "6d1e89dc7a260b2eaef16fd2d588435921500d36bfa8c80ccbde28ba02191bd8",
+   "output_directory": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\scripts",
+   "exported": [
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+     "state": "exported",
+     "file": "isolated/source-1-2a6ab3657dbaf5b647fb0fa5d750be51a6b30a175176cbe100b8e0403f6e96ea.js",
+     "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6",
+     "bytes": 1145590,
+     "representation": "debugger-source-utf8"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/olm.wasm",
+     "state": "unavailable",
+     "file": null,
+     "sha256": null,
+     "bytes": null,
+     "representation": null
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/chunks/4690.min.js",
+     "state": "exported",
+     "file": "origins/eda1f7ee07b8d9215225c4416538be106ab6d62801424fb1e467a89ba100d207/v1/_cdn/meetjitsi_9523.6636/libs/chunks/4690.min.js",
+     "sha256": "0d7dd97b6fefb9fbb996d253b0949601bb7689f8c953b15928835d1b5f68271c",
+     "bytes": 818631,
+     "representation": "debugger-source-utf8"
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "state": "exported",
+     "file": "isolated/source-4-d56e910f05be1eb16e002c6b4d44322b83f1f671afc2faad983f377cd880f5a9.js",
+     "sha256": "0bee9b8367ec54e7856ca903726863bba674377a5cc5671ee07f95b51259a3f5",
+     "bytes": 9381,
+     "representation": "debugger-source-utf8"
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "state": "exported",
+     "file": "isolated/source-5-ef3da3869eeb793533aef47189a5ca74f51a2cc82833c27c294e7b790faaf66f.js",
+     "sha256": "c4448d8d1c19ff487de5f0fc3f73640d95f2e3ec34bf3302ced13d910af8e0ac",
+     "bytes": 1833,
+     "representation": "debugger-source-utf8"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+     "state": "exported",
+     "file": "isolated/source-6-410408f85c384fd381eaea1e25c080a29f68354bf7786cc0fa20fe2ad321f367.js",
+     "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57",
+     "bytes": 3658821,
+     "representation": "debugger-source-utf8"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/preload.min.js?v=139",
+     "state": "exported",
+     "file": "isolated/source-7-ddaf718dc6c7c67d611645a9a3f9dc56cba1bc2a9acf64b846b4402af8101028.js",
+     "sha256": "1257d1263e3405120a04152468e32f19168eaf06fa24af47367cb170d93b49ac",
+     "bytes": 7101,
+     "representation": "debugger-source-utf8"
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "state": "exported",
+     "file": "isolated/source-8-7e357e1536bdf8331339e2a3765a79ec43c980a7e9914bb31016b244aff91dec.js",
+     "sha256": "65ec4aedd4dc872804f0f31b8c987eec98b7b1f8f9578f325c11eaf7acea1ab7",
+     "bytes": 6388,
+     "representation": "debugger-source-utf8"
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "state": "exported",
+     "file": "isolated/source-9-de9c76affbb0d12684eee3f7c5e0ad50e15d26a456fd4405912babce1a994a4e.js",
+     "sha256": "0921dfc0e4bd7b558ef412d90a57e497d32af656f39a178c242024c7c0b6121b",
+     "bytes": 236,
+     "representation": "debugger-source-utf8"
+    },
+    {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "state": "exported",
+     "file": "isolated/source-10-c0a2c5347d5b72caa9d78f5bb2f48d724898c5a870274dbf5a83d27652dda7c0.js",
+     "sha256": "7be2429eb5b0b08208b342bbb4d68c47c2372b3e507bd6fa15ae59a038f0216c",
+     "bytes": 9431,
+     "representation": "debugger-source-utf8"
+    }
+   ]
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs analyze-javascript-application \"C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\scripts\\files\" --artifact-format directory --max-heap-mb 4096 --format json",
+   "evidence_id": "ev_e37d50d3ed0317a6dd8189c575715c9a80b5d68986beb3eefe3f99fa89025a8b",
+   "raw": {
+    "path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\05-analyze-javascript-application.json",
+    "sha256": "3638852ee22732337bd736ef0d7d023f174cff7c2fdb4e6d3ece0205bdc052f4",
+    "bytes": 2752601
+   },
+   "result": {
+    "error": "JavaScript application analysis failed",
+    "code": "provider_timeout",
+    "timeout_ms": 300000,
+    "limitations": [
+     "CommonJS and ESM binding relationships were recovered from inert syntax and resolved only within the inventoried artifact container.",
+     "Graph coverage is incomplete; unavailable facts remain explicit and must not be read as absence.",
+     "JavaScript and HTML were parsed as inert text; bundle bootstrap code was never executed.",
+     "Source analysis was interrupted: Analysis operation timed out after 300000ms: analyze_javascript_application",
+     "Static imports, entrypoints, workers, endpoints, and storage relationships do not prove runtime execution.",
+     "Static paths and relationships may remain unresolved when expressions are dynamic or obfuscated.",
+     "Webpack/Rspack factories were recovered from AST literals; REA did not invoke push handlers or bundle bootstrap code.",
+     "isolated/source-1-2a6ab3657dbaf5b647fb0fa5d750be51a6b30a175176cbe100b8e0403f6e96ea.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing isolated/source-1-2a6ab3657dbaf5b647fb0fa5d750be51a6b30a175176cbe100b8e0403f6e96ea.js during semantic",
+     "isolated/source-6-410408f85c384fd381eaea1e25c080a29f68354bf7786cc0fa20fe2ad321f367.js: Analysis operation timed out after 300000ms: analyze_javascript_application"
+    ]
+   }
+  }
+ ]
+}

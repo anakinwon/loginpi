@@ -1,0 +1,145 @@
+{
+ "note": "입력 = {application: 08 증거 전체(인라인), seed, direction:\"both\"}. 입력 파일(약 19.5MB)은 실행 후 삭제했다. 5건 모두 no-match — REA 앱 그래프가 웹팩 압축 청크 안의 JSX 문자열·브라우저 API 를 seed 노드로 색인하지 않은 것으로 보이며, 부재의 증거가 아니다(02 키워드 검색으로 실재 확인).",
+ "traces": [
+  {
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/09-trace-bgfx.json",
+   "raw_sha256": "5928218ff3c57efe9854367cbd60577bd20e2ef38e7307393213988cd10b2dce",
+   "evidence_id": "ev_acc1a11123bb6802c76e1f9fc0d5b8937aedcb8900327156ab43d6d5c12e0694",
+   "seed": {
+    "kind": "string",
+    "value": "Background Effects",
+    "match": "exact",
+    "case_sensitive": true
+   },
+   "direction": "both",
+   "coverage": {
+    "status": "no-match",
+    "source_graph_status": "partial",
+    "total_seed_matches": 0
+   },
+   "summary": {
+    "matched_seeds": 0,
+    "traced_nodes": 0,
+    "traced_edges": 0,
+    "terminal_paths": 0,
+    "native_handoffs": 0,
+    "observed_facts": 0,
+    "inferred_facts": 0,
+    "unknown_facts": 0,
+    "unavailable_facts": 0
+   }
+  },
+  {
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/10-trace-1.json",
+   "raw_sha256": "178b647bf09d98526c45985a8858df055642f401d4a2262e214d5dd287def99b",
+   "evidence_id": "ev_0274690ecd3413f48894697f34ebf808e28ac5f5309ac1fe7ac8c3f3bfcbe649",
+   "seed": {
+    "kind": "string",
+    "value": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite",
+    "match": "exact",
+    "case_sensitive": true
+   },
+   "direction": "both",
+   "coverage": {
+    "status": "no-match",
+    "source_graph_status": "partial",
+    "total_seed_matches": 0
+   },
+   "summary": {
+    "matched_seeds": 0,
+    "traced_nodes": 0,
+    "traced_edges": 0,
+    "terminal_paths": 0,
+    "native_handoffs": 0,
+    "observed_facts": 0,
+    "inferred_facts": 0,
+    "unknown_facts": 0,
+    "unavailable_facts": 0
+   }
+  },
+  {
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/10-trace-2.json",
+   "raw_sha256": "0e457d0772f8a551aeaff933fb787bbe5bc0106f22439705843aaefdd24b7dea",
+   "evidence_id": "ev_b121e6fe41059f508026e68e6383efad7427725d2838498363cf0c3a289f42dc",
+   "seed": {
+    "kind": "api",
+    "value": "MediaStreamTrackProcessor",
+    "match": "exact",
+    "case_sensitive": true
+   },
+   "direction": "both",
+   "coverage": {
+    "status": "no-match",
+    "source_graph_status": "partial",
+    "total_seed_matches": 0
+   },
+   "summary": {
+    "matched_seeds": 0,
+    "traced_nodes": 0,
+    "traced_edges": 0,
+    "terminal_paths": 0,
+    "native_handoffs": 0,
+    "observed_facts": 0,
+    "inferred_facts": 0,
+    "unknown_facts": 0,
+    "unavailable_facts": 0
+   }
+  },
+  {
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/10-trace-3.json",
+   "raw_sha256": "47895d779d690543a7fe65adc7dfc7efbb873e019c15e1f6e285854040311cf0",
+   "evidence_id": "ev_f1827a560cf676eb3a1ba886913ea2069448600d67caaf503dde5d2582242d89",
+   "seed": {
+    "kind": "api",
+    "value": "getUserMedia",
+    "match": "exact",
+    "case_sensitive": true
+   },
+   "direction": "both",
+   "coverage": {
+    "status": "no-match",
+    "source_graph_status": "partial",
+    "total_seed_matches": 0
+   },
+   "summary": {
+    "matched_seeds": 0,
+    "traced_nodes": 0,
+    "traced_edges": 0,
+    "terminal_paths": 0,
+    "native_handoffs": 0,
+    "observed_facts": 0,
+    "inferred_facts": 0,
+    "unknown_facts": 0,
+    "unavailable_facts": 0
+   }
+  },
+  {
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/10-trace-4.json",
+   "raw_sha256": "c48d6f03f79a9a0d89677c3bd91a6ce0a1cf0988e26b3d803c4d6cadd344acb8",
+   "evidence_id": "ev_d96686fc9575530f4711919684a00a2ebdcdca08d55fa604d2692dfb8147c1e2",
+   "seed": {
+    "kind": "module",
+    "value": "@livekit/krisp-noise-filter",
+    "match": "exact",
+    "case_sensitive": true
+   },
+   "direction": "both",
+   "coverage": {
+    "status": "no-match",
+    "source_graph_status": "partial",
+    "total_seed_matches": 0
+   },
+   "summary": {
+    "matched_seeds": 0,
+    "traced_nodes": 0,
+    "traced_edges": 0,
+    "terminal_paths": 0,
+    "native_handoffs": 0,
+    "observed_facts": 0,
+    "inferred_facts": 0,
+    "unknown_facts": 0,
+    "unavailable_facts": 0
+   }
+  }
+ ]
+}

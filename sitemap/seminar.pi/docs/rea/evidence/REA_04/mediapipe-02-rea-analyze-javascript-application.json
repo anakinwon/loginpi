@@ -1,0 +1,64 @@
+{
+ "runs": [
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs analyze-javascript-application \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/x/package\" --artifact-format directory --format json",
+   "evidence_id": "ev_64c22abffbed7e7c18300199b655fe4599be8cc54fda923743d86a02ce0677e7",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/out/analyze-js-app.json",
+   "raw_sha256": "4722465aa4bc0ed64dc40fee9e6c0e7d1f397d4b264f1499c2e277c1300028af",
+   "raw_bytes": 1545301
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs analyze-javascript-application \"C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/x/package\" --artifact-format directory --max-heap-mb 6144 --format json",
+   "evidence_id": "ev_7cae03b6ba6a0425aa5f24e2d3d052058dffd2c086f9a2466b9aeaac8fd60f4c",
+   "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/out/analyze-js-app-6g.json",
+   "raw_sha256": "a0d02dec769e597de500a375b99fc773003f7416a0846d562439a6b1a715df56",
+   "raw_bytes": 1545110
+  }
+ ],
+ "subject_digest_sha256": "1d3ee45cf14984a5fe6abe4c28adb743f8955dc2855fcc432b21b7e33d21e5dc",
+ "statistics": {
+  "relevant_files": 10,
+  "nested_asar_containers": 0,
+  "text_bytes_read": 2387916,
+  "invalid_utf8_files": 0,
+  "parsed_javascript_files": 7,
+  "visited_ast_nodes": 283998,
+  "findings": 37,
+  "modules": 0,
+  "parse_failures": 0
+ },
+ "recovered_public_exports_vision_d_ts": [
+  "DEFAULT_CATEGORY_TO_COLOR_MAP",
+  "DrawingUtils",
+  "FaceDetector",
+  "FaceDetectorResult",
+  "FaceLandmarker",
+  "FilesetResolver",
+  "GestureRecognizer",
+  "HandLandmarker",
+  "HolisticLandmarker",
+  "ImageClassifier",
+  "ImageEmbedder",
+  "ImageSegmenter",
+  "ImageSegmenterResult",
+  "InteractiveSegmenter",
+  "InteractiveSegmenterLegacy",
+  "InteractiveSegmenterLegacyResult",
+  "MPImage",
+  "MPMask",
+  "ObjectDetector",
+  "ObjectDetectorResult",
+  "PoseLandmarker",
+  "PoseLandmarkerResult"
+ ],
+ "source_map": "vision_bundle.mjs.map 의 sources = [\"vision_js.js\"] 1개, sourcesContent 157,665 bytes(압축 해제본과 같은 수준) — 원본 TS 복원 불가",
+ "limitations_heap": [
+  "vision_bundle.cjs: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing vision_bundle.cjs during semantic",
+  "vision_bundle.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing vision_bundle.js during semantic",
+  "vision_bundle.mjs: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing vision_bundle.mjs during semantic",
+  "wasm/vision_wasm_internal.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing wasm/vision_wasm_internal.js during semantic",
+  "wasm/vision_wasm_module_internal.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing wasm/vision_wasm_module_internal.js during semantic",
+  "wasm/vision_wasm_nosimd_internal.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing wasm/vision_wasm_nosimd_internal.js during semantic"
+ ],
+ "note": "번들 6개(js 3·wasm 로더 3)가 1024MB·6144MB 모두 의미 분석 단계에서 heap 소진 → REA 그래프는 vision.d.ts 공개 API 와 파일 관계만 확보. 세부 로직(wasm 경로 선택·텔레메트리·WebGL 요구)은 리터럴 문자열 문맥 읽기로 보강(03 파일)"
+}

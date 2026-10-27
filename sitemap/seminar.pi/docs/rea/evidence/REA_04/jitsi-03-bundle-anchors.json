@@ -1,0 +1,509 @@
+{
+ "files": {
+  "app": {
+   "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+   "script_key": "scr_795fdff0f05bcda41b5a93d4a94767a7ef68f106f8ead894bff850bffcb635f9",
+   "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57",
+   "bytes": 3658821
+  },
+  "ljm": {
+   "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+   "script_key": "scr_19669fcddfc7f878317e02bfb8c79ce586ee02baa664270570c57c69146c9921",
+   "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6",
+   "bytes": 1145590
+  },
+  "config": {
+   "url": "https://meet.jit.si/ReaProbebaee262251e0 (인라인 config.js)",
+   "script_key": "scr_edf8bb9bf456be79c3457a1cecfb6315e6b49412278733e1008cf3d8798d1ac8",
+   "sha256": "7be2429eb5b0b08208b342bbb4d68c47c2372b3e507bd6fa15ae59a038f0216c",
+   "bytes": 9431
+  }
+ },
+ "anchors": {
+  "noise_suppression": [
+   {
+    "file": "app",
+    "needle": "libs/noise-suppressor-worklet.min.js",
+    "note": "RNNoise 는 별도 AudioWorklet 모듈(addModule)로 로드, 프로세서 이름 NoiseSuppressorWorklet",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1509113,
+    "excerpt": "uppressorNode=e,Js.filterNodeReady&&(null===(t=Js.filterNode)||void 0===t||t.enable())})):async function(){await Zs.resume();const e=`${R()}libs/noise-suppressor-worklet.min.js`;try{await Zs.audioWorklet.addModule(e)}catch(e){return void Gs.error(\"Error while adding audio worklet module: \",e)}return new AudioWorkle"
+   },
+   {
+    "file": "app",
+    "needle": "Zs||(Zs=new AudioContext)",
+    "note": "AudioContext 를 sampleRate 지정 없이 생성(장치 기본 rate)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1506152,
+    "excerpt": "iseSuppressionEffect created with \"+(n?\"Krisp\":\"RNNoise\"))}startEffect(e){var t;let n;return this._originalMediaTrack=e.getAudioTracks()[0],Zs||(Zs=new AudioContext),this._audioSource=Zs.createMediaStreamSource(e),this._audioDestination=Zs.createMediaStreamDestination(),this._outputMediaTrack=this._audio"
+   },
+   {
+    "file": "app",
+    "needle": "NoiseSuppressionEffect created with ",
+    "note": "config.noiseSuppression.krisp.enabled 이면 Krisp, 아니면 RNNoise",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1506010,
+    "excerpt": "putMediaTrack\",void 0),Ks(this,\"_options\",void 0),this._options=e;const n=null==e||null===(t=e.krisp)||void 0===t?void 0:t.enabled;Gs.info(\"NoiseSuppressionEffect created with \"+(n?\"Krisp\":\"RNNoise\"))}startEffect(e){var t;let n;return this._originalMediaTrack=e.getAudioTracks()[0],Zs||(Zs=new AudioContext),this._au"
+   },
+   {
+    "file": "app",
+    "needle": "krispsdk.mjs",
+    "note": "Krisp SDK(독점) — 경로만 존재, 분석하지 않음",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1506571,
+    "excerpt": "nabled?async function(e,t){if(await Zs.resume(),!Js.sdk){var n,r,i,o,a,s,l,c,u,d,p,f,h,m,g;const t=`${R()}libs/krisp`,v=(await import(`${t}/krispsdk.mjs`)).default,b={krisp:{models:{modelBVC:`${t}/models/${null==e||null===(n=e.krisp)||void 0===n||null===(n=n.models)||void 0===n?void 0:n.mode"
+   },
+   {
+    "file": "app",
+    "needle": "y=\"rnnoise.wasm\"",
+    "note": "메인 스레드 RNNoise(비동기 wasm) — VAD 용",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2508312,
+    "excerpt": "?null:t.arg)}else t(i)}}function x(e){return b.get(e)}function R(e){try{return p.grow(e-h.byteLength+65535>>>16),v(p.buffer),1}catch(e){}}I(y=\"rnnoise.wasm\")||(_=y,y=i.locateFile?i.locateFile(_,u):u+_);var M,O={b:function(e,t,n){m.copyWithin(e,t,t+n)},a:function(e){var t,n=m.length,r=2147483648;"
+   },
+   {
+    "file": "app",
+    "needle": "createVADProcessor=",
+    "note": "회의 옵션 createVADProcessor = RNNoise 프로세서(말하는 중 음소거 감지 등)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2523733,
+    "excerpt": "ksInitialized=!0,tee.log(`Initialized with ${e.length} local tracks`)}))},_getConferenceOptions(){const e=i6(APP.store.getState());return e.createVADProcessor=Q9,e},useVideoStream(e){return tee.debug(`useVideoStream: ${e}`),new Promise(((t,n)=>{aee.enqueue((r=>{const i=Rs(APP.store.getState());if(t"
+   }
+  ],
+  "virtual_background": [
+   {
+    "file": "app",
+    "needle": "segHeight:288,segWidth:512,targetFps:30",
+    "note": "단말 등급표 HIGH=WebGPU 512x288 / LOW=TFLite 256x144 / MEDIUM=WebGL 384x216, 모두 30fps",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2407033,
+    "excerpt": ".WEBGPU=\"webgpu\"}(d4||(d4={})),function(e){e.HIGH=\"high\",e.LOW=\"low\",e.MEDIUM=\"medium\"}(p4||(p4={}));const h4={[p4.HIGH]:{backend:d4.WEBGPU,segHeight:288,segWidth:512,targetFps:30},[p4.LOW]:{backend:d4.TFLITE,segHeight:144,segWidth:256,targetFps:30},[p4.MEDIUM]:{backend:d4.WEBGL,segHeight:216,segWidth:384,targetFps:30"
+   },
+   {
+    "file": "app",
+    "needle": "libs/vb-inference-worker.min.js",
+    "note": "추론은 Worker(blob importScripts) 안에서",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2413567,
+    "excerpt": "workerReady\",!1),this._capabilities={...e}}get capabilities(){return this._capabilities}async init(){const e=R().replace(/\\/?$/,\"/\"),t=`${e}libs/vb-inference-worker.min.js`,n=`importScripts(${JSON.stringify(t)});`,r=new Blob([n],{type:\"application/javascript\"}),i=window.URL.createObjectURL(r);this._worker=new "
+   },
+   {
+    "file": "app",
+    "needle": "libs/selfie_segmentation_landscape.tflite",
+    "note": "모델 = MediaPipe Selfie Segmentation landscape (.tflite + tfjs model.json)",
+    "found": true,
+    "total_matches": 2,
+    "char_offset": 2414882,
+    "excerpt": "istener(\"message\",c),l(new Error(`Inference worker init error: ${e.data.error}`))}};this._worker.addEventListener(\"message\",c);const u=`${e}libs/selfie_segmentation_landscape.tflite`,d=`${e}libs/selfie_segmentation_landscape_tfjs/model.json`;YK.debug(`[WorkerBackend] Initialising inference worker — backend: ${this._capa"
+   },
+   {
+    "file": "app",
+    "needle": "new window.MediaStreamTrackProcessor({track:n,maxBufferSize:2})",
+    "note": "insertable streams 경로 : MSTP(maxBufferSize 2) → 처리 → MediaStreamTrackGenerator",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2428633,
+    "excerpt": "a=parseInt(String(o),10),s=parseInt(String(i),10);this._outputCanvasElement.width=a,this._outputCanvasElement.height=s,this._trackProcessor=new window.MediaStreamTrackProcessor({track:n,maxBufferSize:2}),this._trackGenerator=new window.MediaStreamTrackGenerator({kind:\"video\"});const l=n.getSettings(),c=this._trackGenerator,u=c.getSettings.bi"
+   },
+   {
+    "file": "app",
+    "needle": "new VideoFrame(r,{timestamp:t.timestamp})",
+    "note": "합성 캔버스를 원본 timestamp 로 VideoFrame 화하여 write, 원본 frame.close()",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2429946,
+    "excerpt": "ry{r=await this._processor.processFrame(t)}catch(e){YK.error(\"[InsertableStreamsPipeline] Frame processing error\",e)}let o=!0;if(r){const e=new VideoFrame(r,{timestamp:t.timestamp});try{o=await i(e,\"[InsertableStreamsPipeline] Write error\")}finally{e.close()}}else o=await i(t,\"[InsertableStreamsPipeline] Passthrough wri"
+   },
+   {
+    "file": "app",
+    "needle": "this._outputCanvasElement.captureStream(parseInt(String(i),10))",
+    "note": "폴백 경로 : video→canvas→captureStream(원본 frameRate)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2435530,
+    "excerpt": "rseInt(String(r),10),this._inputVideoElement.autoplay=!0,this._inputVideoElement.srcObject=e,this._inputVideoElement.play().catch((()=>{})),this._outputCanvasElement.captureStream(parseInt(String(i),10))}_startTimerLoop(e){this._maskFrameTimerWorker=new Worker(I4,{name:\"VirtualBackground timer\"}),this._maskFrameTimerWorker.onmessage=t=>{3==="
+   },
+   {
+    "file": "app",
+    "needle": "timeMs:1e3/30",
+    "note": "폴백 경로 타이머 = Worker setTimeout 33ms(백그라운드 탭 스로틀 회피)",
+    "found": true,
+    "total_matches": 3,
+    "char_offset": 2435853,
+    "excerpt": "r.onmessage=t=>{3===t.data.id&&Promise.resolve(e()).then((()=>{var e;null===(e=this._maskFrameTimerWorker)||void 0===e||e.postMessage({id:1,timeMs:1e3/30})}))},this._inputVideoElement.readyState>=2?this._maskFrameTimerWorker.postMessage({id:1,timeMs:1e3/30}):this._inputVideoElement.onloadedda"
+   },
+   {
+    "file": "app",
+    "needle": "this._options={height:144,virtualBackground:t,width:256}",
+    "note": "V1(구) 경로 : 256x144 TFLite",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2433221,
+    "excerpt": "${this._backend.capabilities.backend}, pipeline: `+(s?\"insertable-streams\":\"capture-stream\")+`, compositor: ${this._compositorName}`)}var r;this._options={height:144,virtualBackground:t,width:256},this._model=e,this._segmentationPixelCount=36864,t.backgroundType===$K&&(this._virtualImage=document.createElement(\"img\"),this._virtualImag"
+   },
+   {
+    "file": "app",
+    "needle": "resizeHeight:r,resizeQuality:\"medium\",resizeWidth:n",
+    "note": "추론 입력 = createImageBitmap 축소(segWidth x segHeight)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2409602,
+    "excerpt": "unter%u==0;if(this._inferenceSkipCounter++,d)try{const t=this._backend.capabilities,n=t.segWidth,r=t.segHeight,i=await createImageBitmap(e,{resizeHeight:r,resizeQuality:\"medium\",resizeWidth:n}),o=await this._backend.infer(i);o?(this._cachedMaskData=this._applyMaskEMA(o),this._consecutiveFailures=0):(this._consecutiveFailures++,th"
+   },
+   {
+    "file": "app",
+    "needle": "temporalBlendRatio)&&void 0!==t?t:.75",
+    "note": "마스크 시간 평활 EMA 0.75",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2408471,
+    "excerpt": "r,this._vbConfig=e.vbConfig,this._options=e.virtualBackground,this._temporalBlendRatio=null!==(t=null===(n=e.vbConfig)||void 0===n?void 0:n.temporalBlendRatio)&&void 0!==t?t:.75;const s=e.backend.capabilities.backend===d4.TFLITE,l=s?.1:.28,c=s?.5:.65;var u;this._edgeLow=null!==(r=null===(i=e.vbConfig)||void 0===i?vo"
+   },
+   {
+    "file": "app",
+    "needle": "inferenceStride)&&void 0!==t?t:2:1",
+    "note": "TFLite 는 2프레임마다 추론, GPU 는 매 프레임",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2409404,
+    "excerpt": "erformance.now();let c=null;const u=this._backend.capabilities.backend===d4.TFLITE?null!==(t=null===(n=this._vbConfig)||void 0===n?void 0:n.inferenceStride)&&void 0!==t?t:2:1,d=this._inferenceSkipCounter%u==0;if(this._inferenceSkipCounter++,d)try{const t=this._backend.capabilities,n=t.segWidth,r=t.segHeight,i=awa"
+   },
+   {
+    "file": "app",
+    "needle": "Persistent inference failure (30 consecutive)",
+    "note": "연속 30회 실패 시 통과(passthrough) 전환",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2411279,
+    "excerpt": "undCtx=null,this.onInferenceFailure=null}_checkFailureThreshold(){var e;this._consecutiveFailures<30||(YK.error(\"[BackgroundFrameProcessor] Persistent inference failure (30 consecutive) — switching to passthrough\"),this._isReady=!1,this._consecutiveFailures=0,this._backend.stop().catch((()=>{})),null===(e=this.onInferenceFa"
+   },
+   {
+    "file": "app",
+    "needle": "WebGL unavailable — using Canvas 2D fallback",
+    "note": "합성기 = WebGL(셰이더) 우선, Canvas2D 폴백",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2432730,
+    "excerpt": " b4(e);const o=document.createElement(\"canvas\"),a=new C4(o);a.isAvailable?(i=a,this._compositorName=\"webgl\"):(YK.debug(\"[VirtualBackground] WebGL unavailable — using Canvas 2D fallback\"),i=new _4,this._compositorName=\"canvas-2d\"),this._processor=new g4({backend:this._backend,compositor:i,vbConfig:r,virtualBackground:t});co"
+   },
+   {
+    "file": "app",
+    "needle": "toDataURL(\"image/jpeg\",.5)",
+    "note": "사용자 배경 이미지 = 1920x1080 JPEG q0.5 data URL",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2163964,
+    "excerpt": ";i.onload=function(){const e=document.createElement(\"canvas\"),o=e.getContext(\"2d\");e.width=t,e.height=n,null==o||o.drawImage(i,0,0,t,n),r(e.toDataURL(\"image/jpeg\",.5))},i.src=e}))}(a.result),t=cx();r([...o,{id:t,src:e}]),n({backgroundEffectEnabled:!0,backgroundType:$K,selectedThumbnail:t,virtualSource:e})"
+   },
+   {
+    "file": "app",
+    "needle": "getItem(\"virtualBackgrounds\")",
+    "note": "사용자 배경은 localStorage \"virtualBackgrounds\" 에만 저장(서버 업로드 없음)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2172792,
+    "excerpt": "hange,i=e.options,o=e.selectedVideoInputId,s=e.dispatch,c=e.t;const u=uJ(),d=u.classes,p=u.cx,f=sJ((0,_o.useState)(!1),2),h=f[0],m=f[1],g=a.getItem(\"virtualBackgrounds\"),v=sJ((0,_o.useState)(g&&l(g)||[]),2),b=v[0],y=v[1],_=sJ((0,_o.useState)(!1),2),w=_[0],S=_[1],E=(0,_o.useCallback)((e=>{const t=e.currentTar"
+   },
+   {
+    "file": "config",
+    "needle": "virtualBackground: {",
+    "note": "배포 설정 virtualBackground.enableV2 = true",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 6873,
+    "excerpt": "{ disableSearch: true }, enableInsecureRoomNameWarning: true, enableWebHIDFeature: true, disableIframeAPI: true, virtualBackground: { enableV2: true }, showChatPermissionsModeratorSetting: true, faceLandmarks: { enableFaceCentering: true, enableFace"
+   }
+  ],
+  "local_recording": [
+   {
+    "file": "app",
+    "needle": "UR=\"video/webm;codecs=vp8,opus\"",
+    "note": "mimeType = video/webm;codecs=vp8,opus (자기 오디오만이면 audio/webm)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1853213,
+    "excerpt": "urn{type:cR}}function jR(e){return{type:dR,intent:e}}function BR(e){return{type:pR,intent:e}}function FR(e){return{type:fR,running:e}}const UR=\"video/webm;codecs=vp8,opus\",HR={recorder:void 0,stream:void 0,audioContext:void 0,audioDestination:void 0,roomName:\"\",selfRecording:{on:!1,withVideo:!1},firstChunk:voi"
+   },
+   {
+    "file": "app",
+    "needle": "audioBitrateMode:\"constant\",mimeType:this.mediaType,videoBitsPerSecond:25e5",
+    "note": "MediaRecorder 옵션 : 영상 2.5Mbps, 오디오 CBR",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1856048,
+    "excerpt": "am([...(null===(h=this.audioDestination)||void 0===h?void 0:h.stream.getAudioTracks())||[],e])}this.recorder=new MediaRecorder(this.stream,{audioBitrateMode:\"constant\",mimeType:this.mediaType,videoBitsPerSecond:25e5});let g=Promise.resolve();var v;this.recorder.addEventListener(\"dataavailable\",(e=>{if(e.data&&e.data.size>0){const t=e.data;g=g.then((asyn"
+   },
+   {
+    "file": "app",
+    "needle": "this.recorder.start(5e3)",
+    "note": "조각 간격 5초(timeslice 5000ms)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1857415,
+    "excerpt": "}})),t||(null===(v=c)||void 0===v||v.addEventListener(\"inactive\",(()=>{i(LR())})),this.stream.addEventListener(\"inactive\",(()=>{i(LR())}))),this.recorder.start(5e3)},isSupported:()=>p.isChromiumBased()&&!p.isElectron()&&!p.isReactNative()&&!go()&&Boolean(navigator.mediaDevices.setCaptureHandleConfig)&&v"
+   },
+   {
+    "file": "app",
+    "needle": "startIn:\"downloads\"",
+    "note": "저장 = File System Access showSaveFilePicker → createWritable 로 조각을 순차 write",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1854250,
+    "excerpt": "e.stop()},async startLocalRecording(e,t){var n,r;const i=e.dispatch,o=e.getState;this.roomName=null!==(n=s6(o()))&&void 0!==n?n:\"\";const a={startIn:\"downloads\",suggestedName:`${this.getFilename()}.webm`};this.fileHandle=await window.showSaveFilePicker(a),this.writableStream=await(null===(r=this.fil"
+   },
+   {
+    "file": "app",
+    "needle": "makeMetadataSeekable",
+    "note": "종료 시 첫 조각 EBML 메타데이터를 seekable(길이 포함)로 다시 써서 seek(0) 덮어쓰기",
+    "found": true,
+    "total_matches": 3,
+    "char_offset": 748716,
+    "excerpt": "eateFloatBuffer=n.createIntBuffer=n.createUIntBuffer=n.encodeValueToBuffer=n.concat=n.putRefinedMetaData=n.extractElement=n.removeElement=n.makeMetadataSeekable=n.createRIFFChunk=n.VP8BitStreamToRiffWebPBuffer=n.WebPBlockFilter=n.WebPFrameFilter=n.encodeTag=n.readBlock=n.ebmlBlock=n.writeVint=n.read"
+   },
+   {
+    "file": "app",
+    "needle": "displaySurface:\"browser\",frameRate:30",
+    "note": "합성 = 현재 탭 getDisplayMedia(30fps) 자체가 화면 합성, 오디오는 AudioContext 로 탭+마이크 믹스",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1855119,
+    "excerpt": "ediaDevices.setCaptureHandleConfig({handle:`JitsiMeet-${l}`,permittedOrigins:[\"*\"]}),c=await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:\"browser\",frameRate:30},audio:{autoGainControl:!1,channelCount:2,echoCancellation:!1,noiseSuppression:!1,restrictOwnAudio:!1,suppressLocalAudioPlayback:!1},prefer"
+   },
+   {
+    "file": "app",
+    "needle": "preferCurrentTab:!0,surfaceSwitching:\"exclude\"",
+    "note": "현재 탭 선택 유도 + Capture Handle 로 다른 탭 선택 시 WrongSurfaceSelected",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1855290,
+    "excerpt": "ate:30},audio:{autoGainControl:!1,channelCount:2,echoCancellation:!1,noiseSuppression:!1,restrictOwnAudio:!1,suppressLocalAudioPlayback:!1},preferCurrentTab:!0,surfaceSwitching:\"exclude\"});const e=c.getVideoTracks()[0];if(s){var m;const t=\"browser\"===e.getSettings().displaySurface,n=s&&(null===(m=e.getCaptureHandle())||void "
+   },
+   {
+    "file": "app",
+    "needle": "isSupported:()=>p.isChromiumBased()",
+    "note": "지원 조건 : Chromium·Electron 아님·모바일 아님·setCaptureHandleConfig·showSaveFilePicker·isTypeSupported",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1857441,
+    "excerpt": "d 0===v||v.addEventListener(\"inactive\",(()=>{i(LR())})),this.stream.addEventListener(\"inactive\",(()=>{i(LR())}))),this.recorder.start(5e3)},isSupported:()=>p.isChromiumBased()&&!p.isElectron()&&!p.isReactNative()&&!go()&&Boolean(navigator.mediaDevices.setCaptureHandleConfig)&&void 0!==window.showSaveFilePicker&&Me"
+   },
+   {
+    "file": "app",
+    "needle": "notifyAllParticipants&&!i&&a&&e.dispatch",
+    "note": "전원 고지 : notifyAllParticipants 이고 자기녹화가 아니면 참가자 속성 localRecording 설정",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2754618,
+    "excerpt": " t=e.getState(),r=n.recording,i=n.onlySelf,a=null===(o=U7(t))||void 0===o?void 0:o.id,s=t[\"features/base/config\"].localRecording;null!=s&&s.notifyAllParticipants&&!i&&a&&e.dispatch(Cb({id:a,local:!0,localRecording:r}));break}case bu:{const t=e.getState()[\"features/base/conference\"].conference;null==t||t.muteParticipant"
+   },
+   {
+    "file": "app",
+    "needle": "setLocalParticipantProperty(\"localRecording\"",
+    "note": "참가자 presence 속성 localRecording 으로 다른 사람 화면에 녹화 표시",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2748190,
+    "excerpt": "t)}if(a[u]&&(n.participant.name=a[u]),void 0!==p&&d){var g;const e=a6(o);e&&p!==(null===(g=U7(o()))||void 0===g?void 0:g.localRecording)&&e.setLocalParticipantProperty(\"localRecording\",p)}const v=t(n);if(null!==(r=o()[\"features/base/config\"])&&void 0!==r&&r.hosts){var b;const t=o()[\"features/base/config\"].disableThirdParty"
+   },
+   {
+    "file": "config",
+    "needle": "localRecording: {",
+    "note": "배포 설정 localRecording.notifyAllParticipants = true",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 5587,
+    "excerpt": "}, liveStreaming: { enabled: true }, recordingService: { enabled: false, sharingEnabled: false }, localRecording: { disable: false, notifyAllParticipants: true }, requireDisplayName: false, welcomePage: { disabled: f"
+   }
+  ],
+  "polls": [
+   {
+    "file": "ljm",
+    "needle": "const al=\"answer-poll\",dl=\"new-poll\"",
+    "note": "설문 명령 2종",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 391161,
+    "excerpt": "endIQ(e,()=>{},e=>{jc(e,{membersToApprove:i,operation:\"lobby approve members\",roomJid:this.lobbyRoom,userJid:this.xmpp.connection.jid})})}}}const al=\"answer-poll\",dl=\"new-poll\";class cl{constructor(e){this._mainRoom=e,this._xmpp=e.xmpp,this._handleMessages=this._handleMessages.bind(this),this._mainRoom.xmpp.addList"
+   },
+   {
+    "file": "ljm",
+    "needle": "JSON.stringify({answers:i,command:dl,pollId:e,question:t,type:\"polls\"})",
+    "note": "생성 = 서버 polls 컴포넌트로 json-message 개인 메시지",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 391609,
+    "excerpt": "pp.removeListener(Ar.POLLS_EVENT,this._handleMessages)}createPoll(e,t,i){this._mainRoom.sendPrivateMessage(this._xmpp.pollsComponentAddress,JSON.stringify({answers:i,command:dl,pollId:e,question:t,type:\"polls\"}),\"json-message\",!0)}answerPoll(e,t){this._mainRoom.sendPrivateMessage(this._xmpp.pollsComponentAddress,JSON.stringify({answers:t,command:al,"
+   },
+   {
+    "file": "ljm",
+    "needle": "case\"old-polls\"",
+    "note": "늦게 들어온 사람은 서버가 old-polls 로 이력 전달(history:true)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 391973,
+    "excerpt": ":\"polls\"}),\"json-message\",!0)}_handleMessages(e){switch(e.command){case dl:this._mainRoom.eventEmitter.emit(Ar.POLLS_RECEIVE_EVENT,e);break;case\"old-polls\":var t;null==e||null===(t=e.polls)||void 0===t||t.forEach(e=>{this._mainRoom.eventEmitter.emit(Ar.POLLS_RECEIVE_EVENT,{history:!0,...e})});b"
+   },
+   {
+    "file": "app",
+    "needle": "e.POLLS=\"polls-tab\"",
+    "note": "설문은 채팅 사이드 패널의 탭(chat-tab·cc-tab·file_sharing-tab·polls-tab)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1471266,
+    "excerpt": "cal\",On=\"remote\",Nn=\"LOBBY_CHAT_MESSAGE\";var Ln;!function(e){e.CHAT=\"chat-tab\",e.CLOSED_CAPTIONS=\"cc-tab\",e.FILE_SHARING=\"file_sharing-tab\",e.POLLS=\"polls-tab\"}(Ln||(Ln={}));const jn=\"groupchat\",Bn=\"MODERATE_CHAT_MESSAGE\";__webpack_require__(17642),__webpack_require__(58004),__webpack_require__(338"
+   },
+   {
+    "file": "app",
+    "needle": "disabled:n.length>=255",
+    "note": "선택지 최대 255개, 문항·선택지 maxLength 500, 중복 선택지 오류",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2965844,
+    "excerpt": "eOption\")))}))),_o.createElement(\"div\",{className:f.addButtonContainer},_o.createElement(SA,{accessibilityLabel:p(\"polls.create.addOption\"),disabled:n.length>=255,labelKey:\"polls.create.addOption\",onClick:()=>{t(),y(n.length)},type:vA.SECONDARY}))),_o.createElement(\"div\",{className:f.footer},_o.create"
+   }
+  ],
+  "captions": [
+   {
+    "file": "app",
+    "needle": "Qce=\"transcription-result\",Xce=\"translation-result\",eue=\"translation_language\"",
+    "note": "자막 = endpoint 메시지 transcription-result/translation-result, 번역 언어는 참가자 속성 translation_language",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2889324,
+    "excerpt": ".abs(a+r.value-s)<1e3?t({type:xce,boundary:null}):o||t({type:xce,boundary:null!=s?s:0});break}}return e(r)}}));const Zce=Y(\"app:subtitles\"),Qce=\"transcription-result\",Xce=\"translation-result\",eue=\"translation_language\";function tue(e){return e.replace(/[-_A-Z].*/,\"\")}function nue(e,t,n){var r,i;let o=e.dispatch,a=e.getState,s=arguments.length>3&&void 0!==a"
+   },
+   {
+    "file": "app",
+    "needle": "id:\"subtitles-language-select\"",
+    "note": "언어 선택 = cc-tab 상단 드롭다운 \"번역 대상 언어\"(원문 + 번역 언어 목록)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2989548,
+    "excerpt": "assName:t.container},_o.createElement(\"span\",{className:t.label},e(\"transcribing.translateTo\"),\":\"),_o.createElement(FG,{className:t.select,id:\"subtitles-language-select\",onChange:a,options:o,value:r||\"transcribing.original\"}))};function Bde(e){if(null==e||!e.length)return[];const t=[];let n=null;for(const r "
+   },
+   {
+    "file": "app",
+    "needle": "transcriptionSubtitles:{bottom:",
+    "note": "표시 위치 = 무대 하단 중앙 절대배치, maxWidth 50vw, 툴바 표시 시 위로 이동, pointerEvents none",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 3193862,
+    "excerpt": "th.floor(.04*u),16);var u;const d=.1*c;let p=Ek(e,l),f=0;return r&&(p+=bk(function(e,t){return`${dte(e,t)+.25}rem`}(e,i))+10+d),a&&(f+=30),{transcriptionSubtitles:{bottom:`${p}px`,marginBottom:`${f}px`,fontSize:yk(c),left:\"50%\",maxWidth:\"50vw\",overflowWrap:\"break-word\",pointerEvents:\"none\",position:\"absolute\","
+   },
+   {
+    "file": "config",
+    "needle": "transcription: {",
+    "note": "배포 설정 transcription.enabled=false·disableClosedCaptions=true (meet.jit.si 공개판은 자막 꺼짐)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 5076,
+    "excerpt": "oisyMicDetection: true, enableClosePage: true, disableLocalVideoFlip: false, hiddenDomain: 'recorder.meet.jit.si', transcription: { enabled: false, translationEnabled: false, disableClosedCaptions: true, inviteJigasiOnBackendTranscribing: "
+   }
+  ],
+  "audio_translation": [
+   {
+    "file": "app",
+    "needle": "setReceiverTranslationLanguage(n.language)",
+    "note": "청중이 고른 언어로 서버 측 음성 번역 수신 요청",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2691912,
+    "excerpt": "res/base/conference\"].conference;var i;t&&(Xie.info(`Setting audio translation language to ${null!==(i=n.language)&&void 0!==i?i:\"off\"}`),t.setReceiverTranslationLanguage(n.language));break}case Hie:{const t=e.getState()[\"features/base/conference\"].conference;var o;t&&(Xie.info(`Setting audio translation language for ${n"
+   },
+   {
+    "file": "app",
+    "needle": "\"number\"==typeof n&&n>=0&&n<=1?n:.15",
+    "note": "번역 음성 재생 중 원음 볼륨 0.15 로 덕킹(설정 duckedVolume)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 2946125,
+    "excerpt": "nction(e,t){const n=function(e){var t;const n=null===(t=e[\"features/base/config\"].audioTranslation)||void 0===t?void 0:t.duckedVolume;return\"number\"==typeof n&&n>=0&&n<=1?n:.15}(e),r=t?e[\"features/filmstrip\"].participantsVolume[t]:void 0;return\"number\"==typeof r?Math.min(r,n):n}(e,t.participantId):o&&void 0===a&&(a"
+   },
+   {
+    "file": "ljm",
+    "needle": "isAudioTranslationSupported(){return Boolean(this.xmpp.audioTranslationComponentAddress)}",
+    "note": "서버 컴포넌트가 있어야 기능 노출",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 654459,
+    "excerpt": "t i=this.getParticipantById(e);i&&this.room.kick(i.getJid(),t)}muteRemoteAudio(e){this.qualityController.audioController.muteRemoteAudio(e)}isAudioTranslationSupported(){return Boolean(this.xmpp.audioTranslationComponentAddress)}setReceiverTranslationLanguage(e){this._receiverTranslationLanguage!==e&&(this._receiverTranslationLanguage=e,this._updateTranslationRequest"
+   },
+   {
+    "file": "config",
+    "needle": "audioTranslation: {",
+    "note": "배포 설정 audioTranslation.enabled=true, duckedVolume 0.15",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 4745,
+    "excerpt": "oLevels: false, audioQuality: { stereo: false, enableOpusDtx: true, enableAdvancedAudioSettings: true }, audioTranslation: { enabled: true, duckedVolume: 0.15 }, enableTalkWhileMuted: true, mouseMoveCallbackInterval: 1000, enableNoA"
+   }
+  ],
+  "lighting": [
+   {
+    "file": "app",
+    "note": "조명 보정 관련 문자열 부재(범위 한정 음성 검색)",
+    "negative_search": [
+     {
+      "needle": "brightness(",
+      "total_matches": 0
+     },
+     {
+      "needle": "contrast(",
+      "total_matches": 0
+     },
+     {
+      "needle": "lowLight",
+      "total_matches": 0
+     },
+     {
+      "needle": "relight",
+      "total_matches": 0
+     },
+     {
+      "needle": "backgroundBlur",
+      "total_matches": 0
+     }
+    ]
+   },
+   {
+    "file": "ljm",
+    "note": "조명 보정 관련 문자열 부재",
+    "negative_search": [
+     {
+      "needle": "brightness(",
+      "total_matches": 0
+     },
+     {
+      "needle": "contrast(",
+      "total_matches": 0
+     },
+     {
+      "needle": "lowLight",
+      "total_matches": 0
+     },
+     {
+      "needle": "relight",
+      "total_matches": 0
+     }
+    ]
+   },
+   {
+    "file": "app",
+    "needle": "exposureCompensation",
+    "note": "유일 히트 = ImageCapture getPhotoCapabilities 폴리필(조명 보정 아님)",
+    "found": true,
+    "total_matches": 1,
+    "char_offset": 1861386,
+    "excerpt": "ideoStreamTrack(){return this._videoStreamTrack}getPhotoCapabilities(){return new Promise((function(e,t){const n={current:0,min:0,max:0};e({exposureCompensation:n,exposureMode:\"none\",fillLightMode:\"none\",focusMode:\"none\",imageHeight:n,imageWidth:n,iso:n,redEyeReduction:!1,whiteBalanceMode:\"none\",zoo"
+   }
+  ]
+ }
+}

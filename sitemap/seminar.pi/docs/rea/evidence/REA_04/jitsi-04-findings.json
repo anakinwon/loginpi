@@ -1,0 +1,190 @@
+{
+ "title": "REA_04 Jitsi Meet 배포본 분석 — 노이즈 억제·가상 배경·로컬 녹화·설문·자막·조명 보정",
+ "date": "2026-10-27",
+ "target": {
+  "url": "https://meet.jit.si/ReaProbebaee262251e0",
+  "deploy_cdn_tag": "meetjitsi_9523.6636",
+  "deploy_release_number": "7156 (배포 config.js deploymentInfo.releaseNumber)",
+  "license": "Apache-2.0 (jitsi-meet package.json license, lib-jitsi-meet 동일)",
+  "scope": "무작위 방 이름의 대기(prejoin) 화면 + 번들 정적 분석만. '회의 참여' 버튼은 누르지 않음(참가 0회)",
+  "source_copy": {
+   "path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/oss/jitsi",
+   "commit": "3860ada65d279a46492ba8cef0f43557fefaa14b (2026-10-26)",
+   "note": "node_modules 미설치 사본 — 패키지 내부 파일(rnnoise.wasm 등) 크기는 사본에서 확인 불가"
+  },
+  "deployed_scripts": {
+   "app.bundle.min.js": { "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57", "bytes": 3658821 },
+   "lib-jitsi-meet.min.js": { "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6", "bytes": 1145590 },
+   "config.js(인라인)": { "sha256": "7be2429eb5b0b08208b342bbb4d68c47c2372b3e507bd6fa15ae59a038f0216c", "bytes": 9431 },
+   "chunks/4690.min.js": { "sha256": "0d7dd97b6fefb9fbb996d253b0949601bb7689f8c953b15928835d1b5f68271c", "bytes": 818631, "content": "zxcvbn 키보드 표 + olm(E2EE) — 6개 조사 항목과 무관" }
+  }
+ },
+ "evidence_files": {
+  "jitsi-01-rea-capture.json": "REA list-browser-targets·inspect-web-page·analyze-web-bundle·export-web-scripts·analyze-javascript-application(실패) 요약",
+  "jitsi-02-prejoin-scenarios.json": "REA capture-browser-scenario 3건(배경 대화상자·흐림 미리보기·오디오 설정) 요약",
+  "jitsi-03-bundle-anchors.json": "REA 로 내보낸 배포 스크립트의 근거 앵커(문자 오프셋·문맥 280자) 47개 + 음성(부재) 검색",
+  "jitsi-04-findings.json": "이 파일 — 질문별 관측·추론·미확인, 설계 함의, 막힌 것"
+ },
+ "questions": [
+  {
+   "id": 1,
+   "topic": "노이즈 억제",
+   "status": "답함(정적) — 런타임 미관측",
+   "observed": [
+    "대기 화면 getUserMedia 오디오 제약 = autoGainControl:true · channelCount:1 · echoCancellation:true · noiseSuppression:true (REA 시나리오 콘솔 'Got media constraints', ev_19536eeb…)",
+    "RNNoise 는 별도 AudioWorklet 모듈 `libs/noise-suppressor-worklet.min.js` 를 audioWorklet.addModule 로 올리고 AudioWorkletNode('NoiseSuppressorWorklet') 로 MediaStreamSource → 노드 → MediaStreamDestination 연결 (anchors noise_suppression[0])",
+    "AudioContext 는 sampleRate 지정 없이 생성 (anchors noise_suppression[1])",
+    "config.noiseSuppression.krisp.enabled 이면 Krisp, 아니면 RNNoise. meet.jit.si 배포 config 에 krisp 설정 없음 → RNNoise 사용 (anchors noise_suppression[2], config.js 전문에 'krisp' 0건)",
+    "메인 번들에도 비동기 RNNoise(`rnnoise.wasm`, Emscripten locateFile) 가 있고 회의 옵션 createVADProcessor 로 쓰임 = 음성 활동 감지용(말하는 중 음소거 알림·잡음 마이크 감지; config enableTalkWhileMuted·enableNoisyMicDetection = true) (anchors noise_suppression[4][5])",
+    "localStorage 키 'features/noise-suppression' 존재(켜짐 상태 저장) (inspect-web-page storage key names)"
+   ],
+   "source_crosscheck": [
+    "react/features/stream-effects/noise-suppression/NoiseSuppressorWorklet.ts : createRNNWasmModuleSync(@jitsi/rnnoise-wasm 0.2.1, wasm 동기 내장), 프레임 480 샘플(float32, RNNOISE_SAMPLE_LENGTH), 워클릿 quantum 128 과 LCM 1920 샘플 원형 버퍼",
+    "react/features/noise-suppression/functions.ts : 화면공유 오디오 중이거나 channelCount>1(스테레오)이면 켜기 거부(효과는 트랙당 1개)",
+    "UI = 툴바(더보기) 버튼 key 'noisesuppression', 문구 'Extra noise suppression' — 브라우저 내장 억제 위에 '추가' 억제로 표현"
+   ],
+   "inferred": [
+    "워클릿 안에 리샘플러가 없고 RNNoise 는 48kHz 전제 → 장치 기본 rate 가 48kHz 라는 가정에 의존 [추론]"
+   ],
+   "unknown": [
+    "noise-suppressor-worklet.min.js·rnnoise.wasm 배포본 크기·SHA256 (curl 거부, 대기 화면에서 로드되지 않음)"
+   ],
+   "proprietary_existence_only": [
+    "Krisp SDK : `${baseUrl}libs/krisp/krispsdk.mjs` + models(modelBVC·model8·modelNC·inbound8/16)·assets — 독점 모듈, 경로 존재만 기록하고 분석·다운로드하지 않음 (anchors noise_suppression[3])"
+   ]
+  },
+  {
+   "id": 2,
+   "topic": "가상 배경·흐림",
+   "status": "답함(정적) — 대기 화면 UI 관측, 추론 워커 로드는 관측 불가",
+   "observed": [
+    "배포 config virtualBackground.enableV2 = true (anchors virtual_background[15])",
+    "단말 등급표 : HIGH = WebGPU 512x288 · MEDIUM = WebGL 384x216 · LOW = TFLite(wasm) 256x144, 모두 targetFps 30. 등급 판정 = navigator.gpu.requestAdapter → webgl2/webgl → 없으면 LOW (기능 탐지, UA 미사용) (anchors virtual_background[0])",
+    "추론 = Worker('VB V2 Inference', blob 안 importScripts `libs/vb-inference-worker.min.js`), 모델 = `libs/selfie_segmentation_landscape.tflite` + `libs/selfie_segmentation_landscape_tfjs/model.json`, wasm 기준 `libs/`, 초기화 30초 제한 (anchors virtual_background[1][2])",
+    "프레임 처리 기본 경로 = insertable streams : MediaStreamTrackProcessor({maxBufferSize:2}) → processFrame → new VideoFrame(합성 캔버스,{timestamp: 원본}) → MediaStreamTrackGenerator, 원본 frame.close() (anchors virtual_background[3][4])",
+    "폴백 경로 = <video> → canvas.captureStream(원본 frameRate) + Worker setTimeout 1000/30ms 타이머(백그라운드 탭 스로틀 회피) (anchors virtual_background[5][6])",
+    "추론 입력 = createImageBitmap(frame,{resizeWidth:segW,resizeHeight:segH,resizeQuality:'medium'}) 을 워커로 전송(transfer), 마스크 ImageData 수신 (anchors virtual_background[8])",
+    "TFLite 는 2프레임마다 추론(inferenceStride 2), GPU 는 매 프레임. 마스크 시간 평활 EMA 0.75. 경계 smoothstep 하한/상한 TFLite .1/.5 · GPU .28/.65 (anchors virtual_background[9][10])",
+    "합성기 = WebGL(webgl2→webgl) 셰이더 우선, 안 되면 Canvas 2D. 배경 흐림은 배경 캔버스에 ctx.filter = blur(blurValue px) (anchors virtual_background[12])",
+    "연속 30회 추론 실패 → 원본 통과(passthrough) (anchors virtual_background[11])",
+    "구(V1) 경로 = 256x144 TFLite, canvas 합성 연산(source-in·destination-over) (anchors virtual_background[7])",
+    "대기 화면 UI(REA 시나리오 접근성 트리) : 설정 대화상자 '배경' 탭 = 미리보기 + '배경 추가' + 라디오(배경 제거·약간 흐리게·흐리게·기본 이미지 7종) + 취소/확인 (ev_227b29b0…)",
+    "기본 배경 이미지 7장 = images/virtual-background/background-1~7.jpg, 150,458~915,156 바이트(SHA256 은 jitsi-02 feature_requests) (ev_19536eeb…)",
+    "사용자 업로드 배경 = 1920x1080 JPEG 품질 0.5 data URL 로 축소해 localStorage 'virtualBackgrounds' 에만 저장(서버 업로드 없음) (anchors virtual_background[13][14])"
+   ],
+   "source_crosscheck": [
+    "DeviceTierDetector.ts TIER_PROFILES 와 배포본 등급표 문자열 일치",
+    "VirtualBackgrounds.tsx : 흐리게 blurValue 25, 약간 흐리게 blurValue 8",
+    "vendor 파일 크기(소스 사본) : selfie_segmentation_landscape.tflite 249,792 B / tfjs model.json 123,195 B + group1-shard1of1.bin 212,980 B / tflite.wasm 1,634,895 B / tflite-simd.wasm 2,186,931 B — 배포본과 동일성 미검증",
+    "모델 출처 = MediaPipe Selfie Segmentation(vendor/README.md 링크) — 라이선스 Apache-2.0 [확인중 : 모델 카드 원문 미대조]"
+   ],
+   "inferred": [
+    "headless Chrome 의 가짜 카메라로는 흐림 결과 화면이 육안 구분되지 않음(스크린샷 sha256 48cd803a…) — 효과 동작 여부는 미판정"
+   ],
+   "unknown": [
+    "vb-inference-worker.min.js·모델·wasm 배포본 크기·SHA256 (워커 안 요청은 REA 페이지 프레임 캡처 범위 밖, curl 거부)",
+    "실측 처리 fps (testMode 벤치 로그는 설정 꺼짐)"
+   ]
+  },
+  {
+   "id": 3,
+   "topic": "로컬 녹화",
+   "status": "답함(정적) — 회의 안 기능이라 런타임 미관측",
+   "observed": [
+    "mimeType = 'video/webm;codecs=vp8,opus' (자기 오디오만 녹화면 'audio/webm;') (anchors local_recording[0])",
+    "MediaRecorder 옵션 = audioBitrateMode 'constant', videoBitsPerSecond 2,500,000 (anchors local_recording[1])",
+    "조각 간격 = recorder.start(5000) → 5초 (anchors local_recording[2])",
+    "저장 = File System Access : showSaveFilePicker({startIn:'downloads', suggestedName:'<방이름>_<ISO시각>.webm'}) → createWritable 에 조각을 Promise 체인으로 순차 write (anchors local_recording[3])",
+    "첫 조각은 ts-ebml 로 길이 자리표시(864,000,000ms) 메타데이터를 넣고, 종료 시 실제 길이로 makeMetadataSeekable 해서 seek(0) 덮어쓰기 → 탐색 가능한 webm (anchors local_recording[4])",
+    "합성 방식 = 캔버스 합성 없음. getDisplayMedia({video:{displaySurface:'browser',frameRate:30}, audio:{AGC·EC·NS 끔, channelCount 2}, preferCurrentTab:true, surfaceSwitching:'exclude'}) 로 '현재 탭' 화면 자체를 영상으로, 오디오는 AudioContext MediaStreamDestination 에 탭 오디오 + 로컬 마이크를 섞음 (anchors local_recording[5][6])",
+    "Capture Handle(`JitsiMeet-<id>`) 로 다른 탭/창을 고르면 WrongSurfaceSelected 오류 (anchors local_recording[6])",
+    "자기 녹화(self) 모드 = 로컬 오디오·비디오 트랙 clone 만 녹화",
+    "지원 조건 = Chromium 계열 · Electron 아님 · ReactNative 아님 · 모바일 아님 · setCaptureHandleConfig · showSaveFilePicker · isTypeSupported (anchors local_recording[7])",
+    "전원 고지 = config localRecording.notifyAllParticipants(meet.jit.si = true) 이고 자기 녹화가 아니면 참가자 속성 'localRecording' 을 presence 로 설정 → 다른 참가자 화면이 녹화 상태 ON 으로 표시 (anchors local_recording[8][9][10])",
+    "meet.jit.si 설정 recordings.requireConsent = false (동의 절차는 꺼짐)"
+   ],
+   "source_crosscheck": [
+    "LocalRecordingManager.web.ts : VIDEO_BIT_RATE 2500000, recorder.start(5000), fixDuration(chunk, 864000000) — 주석은 '24h' 이나 값은 10일(ms) [소스 주석과 값 불일치, 동작 영향 없음]"
+   ],
+   "unknown": [
+    "녹화 시작 시 화면 고지 문구·아이콘 실물(회의 참가 필요)"
+   ]
+  },
+  {
+   "id": 4,
+   "topic": "설문(polls)",
+   "status": "답함(정적) — 회의 안 기능",
+   "observed": [
+    "전송 = lib-jitsi-meet 이 서버 polls 컴포넌트(pollsComponentAddress) 로 개인 메시지 'json-message' 전송. 생성 {type:'polls', command:'new-poll', pollId, question, answers}, 응답 {type:'polls', command:'answer-poll', pollId, answers} (anchors polls[0][1])",
+    "서버 권위 : 서버가 POLLS_EVENT 로 다시 뿌리고, 늦게 들어온 사람에게 'old-polls' 로 이력(history:true) 전달 (anchors polls[2])",
+    "isSupported = 서버 컴포넌트 주소 존재 여부, config.disablePolls 로 끔",
+    "UI 배치 = 채팅 사이드 패널의 탭 하나 'polls-tab' (탭 목록 chat-tab · cc-tab · file_sharing-tab · polls-tab) (anchors polls[3])",
+    "생성 폼 = 질문 textarea + 선택지(최소 2, 3개 이상일 때 삭제 버튼, 추가 최대 255, 각 maxLength 500), 중복 선택지 오류 'Options must be unique' (anchors polls[4])",
+    "임시 저장 설문은 방별로 localStorage 'features/polls-history' 에 보관, 재입장 시 복원"
+   ],
+   "source_crosscheck": [
+    "polls/constants.ts CHAR_LIMIT 500 · ANSWERS_LIMIT 255, types.ts 응답 answers = boolean 배열(선택지별 체크 → 복수 선택 가능)",
+    "lang/main.json polls.* : 'Create a poll'·'Ask a question'·'Add option'·'Save'·'Send'·'Skip'·'Change vote'·'Show details'(투표자 이름)·알림 'A new poll was added to this meeting / Open polls tab to vote'"
+   ],
+   "unknown": [ "서버(Prosody 모듈) 쪽 검증·저장 방식 — 배포본은 클라이언트만 관측" ]
+  },
+  {
+   "id": 5,
+   "topic": "자막·번역 자막 UI",
+   "status": "답함(정적) — meet.jit.si 공개판은 자막 꺼짐",
+   "observed": [
+    "meet.jit.si 설정 transcription.enabled=false · translationEnabled=false · disableClosedCaptions=true → 공개판에서는 자막 UI 미노출 (anchors captions[3])",
+    "수신 = endpoint 메시지 'transcription-result'(interim/final) · 'translation-result', 번역 언어 요청 = 참가자 속성 'translation_language' (서버 전사기 Jigasi 가 언어별 번역) (anchors captions[0])",
+    "언어 선택 = (a) CC 버튼 → 언어 선택 대화상자(원문 + 상단 고정 언어 + 번역 언어 목록), (b) 사이드 패널 'cc-tab' 상단 '번역 대상 언어' 드롭다운 id 'subtitles-language-select' (anchors captions[1])",
+    "표시 위치 = 무대 하단 중앙 절대배치(left 50%, maxWidth 50vw, 글자 크기 = 화면 높이 기반 계산, 줄높이 1.2, 검정 배경, z-index 7 = 팝업보다 아래), 툴바가 보이면 위로 이동(transition), pointer-events none (anchors captions[2])"
+   ],
+   "source_crosscheck": [
+    "subtitles/middleware.ts : interim 은 unstable, final 은 stable 로 누적, 같은 화자 앞부분 중복 제거",
+    "subtitles/components/web/Captions.tsx : maxWidth '50vw', zIndex 7"
+   ],
+   "extra_audio_translation": {
+    "observed": [
+     "meet.jit.si 설정 audioTranslation.enabled=true, duckedVolume 0.15 (anchors audio_translation[3])",
+     "청중이 언어를 고르면 conference.setReceiverTranslationLanguage(lang) → 서버 번역 음성 소스 수신, 번역 음성이 나오는 동안 원 화자 음량을 0.15(설정값, 0~1 검증)로 낮춤(덕킹) (anchors audio_translation[0][1])",
+     "서버 컴포넌트(audioTranslationComponentAddress)가 있어야 노출 (anchors audio_translation[2])"
+    ],
+    "source_crosscheck": [ "audio-translation/constants.ts 지원 언어 13개(en·es·pt·fr·de·it·ru·zh·ja·ko·hi·id·vi), E2EE 중 사용 불가, 방 단위 끔(RoomMetadata)" ]
+   }
+  },
+  {
+   "id": 6,
+   "topic": "조명 보정",
+   "status": "없음(범위 한정 음성 검색)",
+   "observed": [
+    "app.bundle·lib-jitsi-meet 에서 'brightness(' · 'contrast(' · 'lowLight' · 'relight' 0건 (anchors lighting[0][1])",
+    "'exposureCompensation' 1건은 ImageCapture getPhotoCapabilities 폴리필(조명 보정 아님) (anchors lighting[2])",
+    "소스 사본 react/ 전체에서 lighting·brightness(·low light·relight 검색 히트는 '하이라이트' 주석뿐",
+    "인접 기능 : 얼굴 중앙 맞춤(faceLandmarks.enableFaceCentering=true, captureInterval 1000ms) 은 있으나 밝기 보정 아님"
+   ],
+   "boundary": "검색 대상 = 대기 화면에서 로드된 스크립트 10개 + 소스 사본. 지연 로드 청크·워커 파일은 미포함"
+  }
+ ],
+ "design_implications_for_seminar_pi": [
+  "노이즈 : Jitsi 도 기본은 브라우저 내장 noiseSuppression·echoCancellation·autoGainControl true + 모노(channelCount 1). 계획서 SubAgent3(내장 제약 토글)과 일치 → MVP 는 내장 토글만. RNNoise 는 '추가 억제' 옵션이며 화면공유 오디오·스테레오와 동시 불가 제약이 있으니 실측 불만이 생길 때 npm 패키지로 검토(코드 이식 금지)",
+  "효과 파이프라인 : Jitsi 는 트랙당 효과 1개 → seminar.pi 는 조명 보정과 가상 배경을 '한 캔버스 파이프라인' 안에서 순서대로 처리해야 함(replaceTrack 대상 트랙 1개). 기본 = MediaStreamTrackProcessor/Generator, 없으면 canvas.captureStream 폴백 — 분기는 'MediaStreamTrackProcessor' in window 기능 탐지(UA 금지 철칙과 같은 방식). Pi Browser WebView 의 MSTP 지원은 미확인이라 폴백 필수",
+  "백그라운드 탭 : 폴백 경로 타이머를 Worker setTimeout(33ms)으로 돌려 탭 스로틀을 피함 — 조명 보정 루프도 requestAnimationFrame 단독이면 백그라운드에서 멈춤, Worker 타이머 패턴(개념) 참고",
+  "가상 배경 성능 표 : 단말 등급(WebGPU 512x288 / WebGL 384x216 / wasm 256x144, 30fps)·저사양 2프레임마다 추론·마스크 EMA 0.75·30회 실패 시 원본 통과 — seminar.pi 가상 배경 착수 시 기준 수치로 사용(값만 참고, 코드 미이식)",
+  "사용자 배경 이미지 : Jitsi 는 localStorage(dataURL, 용량 초과 시 오래된 것부터 삭제) → 계획서 A-8 'IndexedDB 로컬' 결정이 용량 면에서 더 안전, 1920x1080 JPEG 0.5 축소 저장 수치는 참고",
+  "녹화(M-4) : Jitsi 로컬 녹화는 Chromium 데스크톱 전용(showSaveFilePicker·Capture Handle) → Pi Browser·모바일 불가. seminar.pi 는 기능 탐지 후 File System Access 가 없으면 Blob 다운로드 폴백 필요. webm 길이 없음 문제를 Jitsi 는 ts-ebml 로 첫 조각 메타데이터를 다시 씀 — 같은 문제를 예상하고 처리 방법을 정해야 함",
+  "녹화 전원 고지 : Jitsi 는 참가자 presence 속성으로 '녹화 중'을 퍼뜨림 → seminar.pi 는 A-2 범용 중계 app.send{topic:'state'} 로 같은 효과(엔진 메시지 추가 불필요). 단 Jitsi 공개판은 동의(requireConsent) 꺼짐 — M-4 '고지+동의'는 우리가 더 엄격",
+  "A-1 음성 조각 [추론, 실측 필요] : MediaRecorder timeslice 조각은 첫 조각에만 webm 헤더가 있음(Jitsi 가 첫 조각만 메타데이터 보정하는 이유). 5초 조각을 각각 음성→글 API 로 보내려면 조각마다 MediaRecorder 를 stop/start 해서 독립 파일로 만들어야 함",
+  "설문 : Jitsi 는 서버가 권위(생성·응답 중계·늦은 입장자 old-polls 이력) → seminar.pi 는 DB(smn_) + A-2 'refresh' 신호로 같은 구조. 검증 기준 = 문항·선택지 500자, 선택지 최소 2·최대 255(우리는 더 작게), 중복 금지, 선택지별 boolean(복수 선택). 배치 = 사이드 패널 탭(A-7 과 일치)",
+  "자막 : Jitsi 는 무대 하단 중앙 오버레이(maxWidth 50vw, 툴바 표시 시 위로) + 사이드 패널 cc 탭(자막 기록 + 번역 대상 언어 드롭다운) 두 군데 — A-7 '무대 하단 1줄 오버레이'에 '자막 기록' 탭 추가 여부를 SubAgent0 이 판단할 재료. 언어 선택은 개인별(참가자 속성) — A-3 청중별 요청 + 서버 캐시와 같은 모델",
+  "더빙(A-3·M-3) : Jitsi 음성 번역도 청중이 언어를 고르고, 번역 음성 재생 중 원음을 0.15 로 덕킹 → seminar.pi TTS 재생 중 발표자 원음 볼륨(또는 GainNode)을 낮추는 개념 차용",
+  "조명 보정 : Jitsi 에 참고 구현 없음 → 계획서 SubAgent3 자체 설계 유지. 배경 흐림이 같은 canvas ctx.filter 계열을 쓴다는 점만 확인",
+  "상표·문구 : Jitsi UI 문구('Extra noise suppression' 등)는 참고만, 우리 문구로 작성(Google·Gemini·Meet 상표 금지 규칙 유지)"
+ ],
+ "blocked": [
+  "curl 로 지연 로드 자산(노이즈 워클릿·rnnoise.wasm·추론 워커·모델·wasm) 다운로드 → 권한 거부. 배포본 크기·SHA256 미검증, 소스 사본 vendor 크기로 대체",
+  "curl 로 로컬 CDP /json/list 조회 → 권한 거부(REA list-browser-targets 로 대체)",
+  "REA 페이지 네트워크 캡처는 Worker 안 importScripts·fetch 를 포함하지 않음 → 흐림 선택 후에도 워커·모델 요청 미관측, inspect-web-page workers = []",
+  "REA analyze-javascript-application : app.bundle 300초 타임아웃 + lib-jitsi-meet V8 힙 고갈(4096MB) → 모듈 그래프 미생성, 문자열 앵커 정적 분석으로 대체 (여유 RAM 4GB 라 재시도 안 함)",
+  "REA analyze-web-bundle 소스맵 : app.bundle(세그먼트 예산 262144 초과)·chunks/4690(32MiB 초과) 실패, lib-jitsi-meet·preload 만 처리 → 소스맵 기반 원본 경로 매핑 불가",
+  "노이즈 억제 토글·녹화·설문·자막은 회의 안 기능이라 참가 금지 범위에서 런타임 관측 못 함. meet.jit.si 는 자막 꺼짐 설정"
+ ]
+}

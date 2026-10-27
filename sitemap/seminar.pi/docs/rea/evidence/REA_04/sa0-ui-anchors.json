@@ -1,0 +1,59 @@
+{
+ "title": "SubAgent0 UI 설계(ui-design.md 15절) 근거 앵커 — meet.jit.si 배포본",
+ "date": "2026-10-27",
+ "method": "REA(rea@6.4.0) export-web-scripts 로 받은 배포본 app.bundle 을 indexOf 로 읽음(scratchpad rea04-tools/ctx.mjs 와 같은 방식, 정규식·실행 없음). REA MCP 서버는 이 실행에서 연결 실패(CONNECT_TIMEOUT)라 CLI 산출물 재사용. 코드 이식 없음(S-2).",
+ "bundle": {
+  "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+  "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57",
+  "bytes": 3658821,
+  "export_manifest": "jitsi-01-rea-capture.json · rea04-jitsi/scripts/manifest.json (source_evidence_id ev_0f5b34a4…)"
+ },
+ "source_crosscheck_commit": "jitsi-meet@3860ada",
+ "anchors": [
+  {
+   "id": "R1",
+   "question": "더보기(overflow) 우선순위 — 메뉴 항목 순서",
+   "needle": "CF=[\"microphone\",\"camera\",\"desktop\"",
+   "offset": 1930852,
+   "total": 1,
+   "context": "camera\",\"chat\"]},{width:200,order:[\"microphone\",\"camera\"]}],CF=[\"microphone\",\"camera\",\"desktop\",\"chat\",\"raisehand\",\"reactions\",\"participants-pane\",\"tileview\",\"overflowmenu\",\"hangup\",\"invite\",\"toggle-camera\",\"videoquality\",\"fullscreen\",\"security\",\"closedcaptions\",\"recording\",\"livestreaming\",\"linktosalesforce\",\"sharedvideo\",\"shareaudio\",\"noisesuppression\"",
+   "source": "react/features/toolbox/constants.ts:93 MAIN_TOOLBAR_BUTTONS_PRIORITY"
+  },
+  {
+   "id": "R1b",
+   "question": "모바일 Drawer 최대 높이",
+   "needle": "AF=\"80dvh - 64px\"",
+   "offset": 1931293,
+   "total": 1,
+   "context": "\"embedmeeting\",\"feedback\",\"download\",\"help\",\"custom-panel\"],AF=\"80dvh - 64px\",TF=\"#929292\",IF=[\"audiotranslation\",\"camera\",\"chat\",\"closedcaptions\",\"custom-panel\",\"desktop\",\"download\",\"embedmeeting\",\"etherpad\",\"feedback\",\"filesharing\",\"fullscreen\",\"hangup\",\"help\",\"highlight\",\"invite\",\"linktosalesforce\",\"livestreaming\",\"microphone\",\"mute",
+   "source": "react/features/toolbox/constants.ts DRAWER_MAX_HEIGHT"
+  },
+  {
+   "id": "R2",
+   "question": "상단 라벨 늘 보임/자동 숨김 기본값",
+   "needle": "alwaysVisible:[\"raised-hands-count\",\"recording\"",
+   "offset": 3500150,
+   "total": 1,
+   "context": "or(var n=0,r=Array(t);n<t;n++)r[n]=e[n];return r}const bTe={alwaysVisible:[\"raised-hands-count\",\"recording\",\"time-timer\"],autoHide:[\"highlight-moment\",\"subject\",\"conference-timer\",\"participants-count\",\"e2ee\",\"transcribing\",\"video-quality\",\"visitors-count\",\"insecure-room\",\"top-panel-toggle\"]},yTe=e=>{const t=e[\"features/base/config\"].conferenceInfo;var n,r;return t?",
+   "source": "react/features/conference/components/constants.ts:2"
+  },
+  {
+   "id": "R3",
+   "question": "자막 글자 크기 공식",
+   "needle": "Math.max(Math.floor(.04*u),16)",
+   "offset": 3193711,
+   "total": 1,
+   "context": "&&o,s=t._toolboxVisible,l=void 0!==s&&s,c=void 0===(u=i)?16:Math.max(Math.floor(.04*u),16);var u;const d=.1*c;let p=Ek(e,l),f=0;return r&&(p+=bk(function(e,t){return`${dte(e,t)+.25}rem`}(e,i))+10+d),a&&(f+=30),{transcriptionSubtitles:{bottom:`${p}px`,marginBottom:`${f}px`,fontSize:yk(c),left:\"50%\",maxWidth:\"50vw\",overflowWrap:\"break-word\",pointerEv",
+   "source": "react/features/subtitles/functions.web.ts:29, constants.ts:4 MIN_SUBTITLES_FONT_SIZE=16"
+  },
+  {
+   "id": "R3b",
+   "question": "자막 위치·폭·포인터",
+   "needle": "maxWidth:\"50vw\"",
+   "offset": 3193950,
+   "total": 1,
+   "context": "om:`${p}px`,marginBottom:`${f}px`,fontSize:yk(c),left:\"50%\",maxWidth:\"50vw\",overflowWrap:\"break-word\",pointerEvents:\"none\",position:\"absolute\",textShadow:\"\\n                0px 0px 1px rgba(0,0,0,0.3),\\n                0px 1px 1px rgba(0,0,0,0.3),\\n                1px 0px 1px rgba(0,0,0,0.3),\\n                0px 0px 1px rgba(0,0,0,0",
+   "source": "react/features/subtitles/components/web/Captions.tsx:76-92"
+  }
+ ]
+}

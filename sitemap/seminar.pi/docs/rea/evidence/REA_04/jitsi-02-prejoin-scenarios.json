@@ -1,0 +1,619 @@
+{
+ "purpose": "대기 화면에서 배경 선택 대화상자·흐림 미리보기·오디오 설정을 열어 지연 로드 자산(추론 워커·모델·노이즈 워클릿)이 관측되는지 확인",
+ "scenarios": [
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs capture-browser-scenario \"C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\scenarios\\s1-open-background.json\" --format json",
+   "input": {
+    "browser": {
+     "mode": "connect",
+     "cdp_endpoint": "http://127.0.0.1:9344",
+     "target_id": "FB691BBCEE4941C13025C3694FE4B006"
+    },
+    "start_url": {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0"
+    },
+    "actions": [
+     {
+      "step_id": "wait_prejoin",
+      "action": "wait_for",
+      "locator": {
+       "kind": "role",
+       "role": "button",
+       "name": "배경 선택"
+      },
+      "state": "visible",
+      "timeout_ms": 30000
+     },
+     {
+      "step_id": "open_bg",
+      "action": "click",
+      "locator": {
+       "kind": "role",
+       "role": "button",
+       "name": "배경 선택"
+      },
+      "timeout_ms": 10000
+     },
+     {
+      "step_id": "settle",
+      "action": "wait_for_timeout",
+      "duration_ms": 3000
+     }
+    ],
+    "capture": {
+     "at_end": [
+      "url",
+      "accessibility",
+      "screenshot"
+     ],
+     "events": [
+      "network",
+      "workers",
+      "console",
+      "page-errors"
+     ]
+    }
+   },
+   "evidence_id": "ev_227b29b02cf101aca795bef3b8f0a636771bd80d57167f00858f04e3b4c7114e",
+   "raw": {
+    "path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\06-scenario-open-background.json",
+    "sha256": "884a1cc9dca274f51f32481f3ddf29b64929b13f9f8d5de3de9462ac6deb0070",
+    "bytes": 246316
+   },
+   "steps": [
+    {
+     "step_id": "scenario_start",
+     "action": "goto_start",
+     "status": "completed",
+     "elapsed_ms": 1742
+    },
+    {
+     "step_id": "wait_prejoin",
+     "action": "wait_for",
+     "status": "completed",
+     "elapsed_ms": 852
+    },
+    {
+     "step_id": "open_bg",
+     "action": "click",
+     "status": "completed",
+     "elapsed_ms": 205
+    },
+    {
+     "step_id": "settle",
+     "action": "wait_for_timeout",
+     "status": "completed",
+     "elapsed_ms": 3184
+    }
+   ],
+   "completeness": {
+    "status": "incomplete",
+    "equality_eligible": false,
+    "missing_sections": [
+     "events"
+    ],
+    "truncated_sections": []
+   },
+   "final_accessibility": "- document:\n  - main:\n    - dialog \"설정\":\n      - tablist \"설정\":\n        - heading \"설정\" [level=1]\n        - tab \"오디오\"\n        - tab \"비디오\"\n        - tab \"배경\" [selected]\n        - tab \"알림\"\n        - tab \"프로필\"\n        - tab \"캘린더\"\n        - tab \"단축키\"\n        - tab \"더보기\"\n      - tabpanel:\n        - img\n        - text: \"현재 배경: 없음\"\n        - radiogroup \"배경 선택\":\n          - radio \"배경 제거\": 없음\n          - radio \"약간 흐리게\"\n          - radio \"흐리게\"\n          - radio \"해변\"\n          - radio \"흰색 중립 벽\"\n          - radio \"흰색 빈 방\"\n          - radio \"검은색 바닥 램프\"\n          - radio \"산\"\n          - radio \"숲\"\n          - radio \"일출\"\n      - button \"대화 상자 닫기\"\n      - button \"취소 (대화 상자 나가기)\": 취소\n      - button \"확인 (저장하고 대화 상자 나가기)\": 확인",
+   "final_screenshot": {
+    "sha256": "2cad0fc983e4c153c5ebfc67ec045f424e70bb3c2ece4316eaef6d22859e328e",
+    "bytes": 91107
+   },
+   "feature_requests": [
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/chunks/4690.min.js",
+     "step": 1,
+     "type": "script",
+     "status": 200
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-1.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-2.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-3.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-4.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-5.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-6.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-7.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200
+    }
+   ],
+   "console_feature_lines": [
+    {
+     "step": 1,
+     "level": "debug",
+     "text": "2026-10-27T10:50:32.338Z [DEBUG] [app:tracks] (TIME) loadEffects() start=1675.6999999284744, end=1675.6999999284744, time=0"
+    },
+    {
+     "step": 1,
+     "level": "info",
+     "text": "2026-10-27T10:50:32.339Z [INFO] [rtc:RTCUtils] <Es.<anonymous>>:  Got media constraints:  {\"video\":{\"height\":{\"ideal\":720,\"max\":720,\"min\":180},\"width\":{\"ideal\":1280,\"max\":1280,\"min\":320},\"frameRate\":{\"max\":30}},\"audio\":{\"autoGainControl\":true,\"channelCount\":1,\"echoCancellation\":true,\"noiseSuppressio"
+    },
+    {
+     "step": 2,
+     "level": "debug",
+     "text": "2026-10-27T10:50:32.953Z [DEBUG] [app:tracks] (TIME) loadEffects() start=2261.100000023842, end=2291, time=29.899999976158142"
+    }
+   ],
+   "limitations": [
+    "Artifact identity is unavailable for this observation.",
+    "Event sequence records provider receipt order; simultaneous browser causality is not inferred.",
+    "Network content is retained only when selected; response bytes are browser-decoded, not compressed wire bytes.",
+    "Request bytes are limited to what Playwright exposes; not_exposed does not establish body absence or multipart file coverage.",
+    "Network content reads settle within 5 seconds each and never wait for unfinished responses or refetch them.",
+    "Playwright scenario events do not expose request initiator stacks; receipt order does not prove causality.",
+    "Storage values are hashed only after declared-secret redaction.",
+    "Shared-context network capture excludes requests without a known root or descendant Page frame.",
+    "CDP attachment cannot recover pre-attach events or guarantee launch-time context options.",
+    "Browser host platform and architecture were not observed."
+   ]
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs capture-browser-scenario \"C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\scenarios\\s2-blur-preview.json\" --format json",
+   "input": {
+    "browser": {
+     "mode": "connect",
+     "cdp_endpoint": "http://127.0.0.1:9344",
+     "target_id": "FB691BBCEE4941C13025C3694FE4B006"
+    },
+    "start_url": {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0"
+    },
+    "actions": [
+     {
+      "step_id": "wait_prejoin",
+      "action": "wait_for",
+      "locator": {
+       "kind": "role",
+       "role": "button",
+       "name": "배경 선택"
+      },
+      "state": "visible",
+      "timeout_ms": 30000
+     },
+     {
+      "step_id": "open_bg",
+      "action": "click",
+      "locator": {
+       "kind": "role",
+       "role": "button",
+       "name": "배경 선택"
+      },
+      "timeout_ms": 10000
+     },
+     {
+      "step_id": "wait_dialog",
+      "action": "wait_for",
+      "locator": {
+       "kind": "role",
+       "role": "radio",
+       "name": "흐리게"
+      },
+      "state": "visible",
+      "timeout_ms": 10000
+     },
+     {
+      "step_id": "pick_blur",
+      "action": "click",
+      "locator": {
+       "kind": "role",
+       "role": "radio",
+       "name": "흐리게"
+      },
+      "timeout_ms": 10000
+     },
+     {
+      "step_id": "settle",
+      "action": "wait_for_timeout",
+      "duration_ms": 12000
+     }
+    ],
+    "capture": {
+     "at_end": [
+      "url",
+      "accessibility",
+      "screenshot"
+     ],
+     "events": [
+      "network",
+      "workers",
+      "console",
+      "page-errors"
+     ],
+     "network": {
+      "response_body": true
+     }
+    }
+   },
+   "evidence_id": "ev_19536eeb80f5e18a90c7b687d0be72d01aaff6024be9e735482236ced44681c3",
+   "raw": {
+    "path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\07-scenario-blur-preview.json",
+    "sha256": "82a50d347739fe3177458ad617b0592a9157d93dab6f3f223bf1ed24a9b1d55e",
+    "bytes": 13358612
+   },
+   "steps": [
+    {
+     "step_id": "scenario_start",
+     "action": "goto_start",
+     "status": "completed",
+     "elapsed_ms": 460
+    },
+    {
+     "step_id": "wait_prejoin",
+     "action": "wait_for",
+     "status": "completed",
+     "elapsed_ms": 551
+    },
+    {
+     "step_id": "open_bg",
+     "action": "click",
+     "status": "completed",
+     "elapsed_ms": 90
+    },
+    {
+     "step_id": "wait_dialog",
+     "action": "wait_for",
+     "status": "completed",
+     "elapsed_ms": 28
+    },
+    {
+     "step_id": "pick_blur",
+     "action": "click",
+     "status": "completed",
+     "elapsed_ms": 309
+    },
+    {
+     "step_id": "settle",
+     "action": "wait_for_timeout",
+     "status": "completed",
+     "elapsed_ms": 12172
+    }
+   ],
+   "completeness": {
+    "status": "incomplete",
+    "equality_eligible": false,
+    "missing_sections": [
+     "events"
+    ],
+    "truncated_sections": []
+   },
+   "final_accessibility": "- document:\n  - main:\n    - dialog \"설정\":\n      - tablist \"설정\":\n        - heading \"설정\" [level=1]\n        - tab \"오디오\"\n        - tab \"비디오\"\n        - tab \"배경\" [selected]\n        - tab \"알림\"\n        - tab \"프로필\"\n        - tab \"캘린더\"\n        - tab \"단축키\"\n        - tab \"더보기\"\n      - tabpanel:\n        - text: \"현재 배경: 흐리게 배경 추가\"\n        - radiogroup \"배경 선택\":\n          - radio \"배경 제거\": 없음\n          - radio \"약간 흐리게\"\n          - radio \"흐리게\" [checked]\n          - radio \"해변\"\n          - radio \"흰색 중립 벽\"\n          - radio \"흰색 빈 방\"\n          - radio \"검은색 바닥 램프\"\n          - radio \"산\"\n          - radio \"숲\"\n          - radio \"일출\"\n      - button \"대화 상자 닫기\"\n      - button \"취소 (대화 상자 나가기)\": 취소\n      - button \"확인 (저장하고 대화 상자 나가기)\": 확인",
+   "final_screenshot": {
+    "sha256": "48cd803a33f7e6d1b02b3085afb882346e0d80f99c1b2ca1ca9747675abc7626",
+    "bytes": 67527
+   },
+   "feature_requests": [
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/chunks/4690.min.js",
+     "step": 1,
+     "type": "script",
+     "status": 200,
+     "bytes": 818631,
+     "sha256": "0d7dd97b6fefb9fbb996d253b0949601bb7689f8c953b15928835d1b5f68271c"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-1.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200,
+     "bytes": 473714,
+     "sha256": "178355af66c551481155fc335733a031814e71583ca3ddbfd1aa7e46cf19aeef"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-2.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200,
+     "bytes": 346667,
+     "sha256": "cad604859427c23f55d04704e4202f53a0b033330d88981d219793f25936cc3b"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-3.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200,
+     "bytes": 162595,
+     "sha256": "6edb35603f4799260a648dc7246edbc362766fb7b8449dae8650c63a8834e66e"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-4.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200,
+     "bytes": 701637,
+     "sha256": "2bffac65c60e27ac35e20f258c688a06878987a6b0e53b1f52da88f68b8eaf56"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-5.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200,
+     "bytes": 150458,
+     "sha256": "ec0ac644a7930451f7b856f41947310ba217c49109ffa5ac052c62e5dbfa1962"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-6.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200,
+     "bytes": 613424,
+     "sha256": "cf0973b1f715e8a670a655711dab13d1166e27ac1d6f3ffc6ad0690dae0381e5"
+    },
+    {
+     "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/images/virtual-background/background-7.jpg",
+     "step": 2,
+     "type": "image",
+     "status": 200,
+     "bytes": 915156,
+     "sha256": "75a09857ec3917cce5dc2376f5016b971a8692e0342b0c8736bfdbf54eab0d3e"
+    }
+   ],
+   "console_feature_lines": [
+    {
+     "step": 1,
+     "level": "debug",
+     "text": "2026-10-27T10:51:51.841Z [DEBUG] [app:tracks] (TIME) loadEffects() start=684.6999999284744, end=684.6999999284744, time=0"
+    },
+    {
+     "step": 1,
+     "level": "info",
+     "text": "2026-10-27T10:51:51.858Z [INFO] [rtc:RTCUtils] <Es.<anonymous>>:  Got media constraints:  {\"video\":{\"height\":{\"ideal\":720,\"max\":720,\"min\":180},\"width\":{\"ideal\":1280,\"max\":1280,\"min\":320},\"frameRate\":{\"max\":30}},\"audio\":{\"autoGainControl\":true,\"channelCount\":1,\"echoCancellation\":true,\"noiseSuppressio"
+    },
+    {
+     "step": 2,
+     "level": "debug",
+     "text": "2026-10-27T10:51:52.150Z [DEBUG] [app:tracks] (TIME) loadEffects() start=981.8999999761581, end=993.6999999284744, time=11.799999952316284"
+    },
+    {
+     "step": 4,
+     "level": "info",
+     "text": "2026-10-27T10:51:52.499Z [INFO] [app:virtual-background] \"Blur\" option set for virtual background preview!"
+    },
+    {
+     "step": 5,
+     "level": "info",
+     "text": "2026-10-27T10:51:54.504Z [INFO] [app:face-landmarks] <fie.startDetection>:  Worker has not been initialized"
+    },
+    {
+     "step": 5,
+     "level": "debug",
+     "text": "2026-10-27T10:51:54.517Z [DEBUG] [app:tracks] (TIME) loadEffects() start=3359.2999999523163, end=3360.7999999523163, time=1.5"
+    }
+   ],
+   "limitations": [
+    "Artifact identity is unavailable for this observation.",
+    "Event sequence records provider receipt order; simultaneous browser causality is not inferred.",
+    "Network content is retained only when selected; response bytes are browser-decoded, not compressed wire bytes.",
+    "Request bytes are limited to what Playwright exposes; not_exposed does not establish body absence or multipart file coverage.",
+    "Network content reads settle within 5 seconds each and never wait for unfinished responses or refetch them.",
+    "Playwright scenario events do not expose request initiator stacks; receipt order does not prove causality.",
+    "Storage values are hashed only after declared-secret redaction.",
+    "Shared-context network capture excludes requests without a known root or descendant Page frame.",
+    "Some selected network content was unavailable; per-transaction content states retain the reason.",
+    "CDP attachment cannot recover pre-attach events or guarantee launch-time context options.",
+    "Browser host platform and architecture were not observed."
+   ]
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs capture-browser-scenario \"C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\scenarios\\s3-open-audio-settings.json\" --format json",
+   "input": {
+    "browser": {
+     "mode": "connect",
+     "cdp_endpoint": "http://127.0.0.1:9344",
+     "target_id": "FB691BBCEE4941C13025C3694FE4B006"
+    },
+    "start_url": {
+     "url": "https://meet.jit.si/ReaProbebaee262251e0"
+    },
+    "actions": [
+     {
+      "step_id": "wait_prejoin",
+      "action": "wait_for",
+      "locator": {
+       "kind": "role",
+       "role": "button",
+       "name": "오디오 설정"
+      },
+      "state": "visible",
+      "timeout_ms": 30000
+     },
+     {
+      "step_id": "open_audio",
+      "action": "click",
+      "locator": {
+       "kind": "role",
+       "role": "button",
+       "name": "오디오 설정"
+      },
+      "timeout_ms": 10000
+     },
+     {
+      "step_id": "settle",
+      "action": "wait_for_timeout",
+      "duration_ms": 2000
+     }
+    ],
+    "capture": {
+     "at_end": [
+      "url",
+      "accessibility",
+      "screenshot"
+     ],
+     "events": [
+      "console",
+      "page-errors"
+     ]
+    }
+   },
+   "evidence_id": "ev_9238b4afb902f2dbd4234f43a0f0df683c3549967a2cb0b41ef35752b088e07e",
+   "raw": {
+    "path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\10-scenario-open-audio-settings.json",
+    "sha256": "abb9107f6ea7a1c779fe09e97c43f1c8a512b45f7d525355a357d26fcb1f97ef",
+    "bytes": 68030
+   },
+   "steps": [
+    {
+     "step_id": "scenario_start",
+     "action": "goto_start",
+     "status": "completed",
+     "elapsed_ms": 489
+    },
+    {
+     "step_id": "wait_prejoin",
+     "action": "wait_for",
+     "status": "completed",
+     "elapsed_ms": 3209
+    },
+    {
+     "step_id": "open_audio",
+     "action": "click",
+     "status": "completed",
+     "elapsed_ms": 58
+    },
+    {
+     "step_id": "settle",
+     "action": "wait_for_timeout",
+     "status": "completed",
+     "elapsed_ms": 2136
+    }
+   ],
+   "completeness": {
+    "status": "incomplete",
+    "equality_eligible": false,
+    "missing_sections": [
+     "events"
+    ],
+    "truncated_sections": []
+   },
+   "final_accessibility": "- document:\n  - main:\n    - link \"Jitsi Meet 로고, 홈페이지 링크\":\n      - /url: https://jitsi.org\n    - figure\n    - heading \"회의 참여\" [level=1]\n    - text: Rea Probebaee 262251 E 0\n    - textbox \"당신의 이름을 입력해주세요.\"\n    - button \"회의 참여\":\n      - text: 회의 참여\n      - button \"오디오 없이 참여\"\n    - button \"음소거 전환\"\n    - button \"오디오 설정\" [expanded]\n    - button \"비디오 비활성화 전환\"\n    - button \"비디오 설정\"\n    - button \"사용자 초대\"\n    - button \"배경 선택\"\n    - button \"설정 전환\"\n    - button \"떠나기\"\n    - alert:\n      - heading \"장치가 제대로 작동하고 있습니다\" [level=3]\n  - dialog \"오디오 설정\":\n    - menu \"오디오 설정\":\n      - group \"마이크\":\n        - text: 마이크\n        - menuitemradio \"시스템과 동일 (Fake Default Audio Input)\" [checked]\n        - menuitemradio \"Fake Audio Input 1\"\n        - menuitemradio \"Fake Audio Input 2\"\n      - group \"스피커\":\n        - text: 스피커\n        - menuitemradio \"시스템과 동일 (Fake Default Audio Output)\" [checked]\n        - menuitemradio \"Fake Audio Output 1\"\n        - menuitemradio \"Fake Audio Output 2\"",
+   "final_screenshot": {
+    "sha256": "76cdc6a8550b8643d5b5cd99a90e3efd513d8ac7c846f8d5ad43a2c97d3406f6",
+    "bytes": 27851
+   },
+   "feature_requests": [],
+   "console_feature_lines": [
+    {
+     "step": 1,
+     "level": "debug",
+     "text": "2026-10-27T10:54:12.981Z [DEBUG] [app:tracks] (TIME) loadEffects() start=669.1000000238419, end=669.1000000238419, time=0"
+    },
+    {
+     "step": 1,
+     "level": "info",
+     "text": "2026-10-27T10:54:12.981Z [INFO] [rtc:RTCUtils] <Es.<anonymous>>:  Got media constraints:  {\"video\":{\"height\":{\"ideal\":720,\"max\":720,\"min\":180},\"width\":{\"ideal\":1280,\"max\":1280,\"min\":320},\"frameRate\":{\"max\":30}},\"audio\":{\"autoGainControl\":true,\"channelCount\":1,\"echoCancellation\":true,\"noiseSuppressio"
+    },
+    {
+     "step": 1,
+     "level": "info",
+     "text": "2026-10-27T10:54:15.559Z [INFO] [app:face-landmarks] <fie.startDetection>:  Worker has not been initialized"
+    },
+    {
+     "step": 2,
+     "level": "info",
+     "text": "2026-10-27T10:54:15.948Z [INFO] [rtc:RTCUtils] <Es.<anonymous>>:  Got media constraints:  {\"video\":false,\"audio\":{\"autoGainControl\":true,\"echoCancellation\":true,\"noiseSuppression\":true,\"deviceId\":{\"exact\":\"default\"}}}"
+    },
+    {
+     "step": 2,
+     "level": "info",
+     "text": "2026-10-27T10:54:15.948Z [INFO] [rtc:RTCUtils] <Es.<anonymous>>:  Got media constraints:  {\"video\":false,\"audio\":{\"autoGainControl\":true,\"echoCancellation\":true,\"noiseSuppression\":true,\"deviceId\":{\"exact\":\"7dcb0f5a206bba09290dab2e1945998729629ad5cd3d629d7d85666022b16b44\"}}}"
+    },
+    {
+     "step": 2,
+     "level": "info",
+     "text": "2026-10-27T10:54:15.948Z [INFO] [rtc:RTCUtils] <Es.<anonymous>>:  Got media constraints:  {\"video\":false,\"audio\":{\"autoGainControl\":true,\"echoCancellation\":true,\"noiseSuppression\":true,\"deviceId\":{\"exact\":\"b1cd922ecf2604e5210d055f533c75e4406329c2dec23e73bd06accd9aae297b\"}}}"
+    }
+   ],
+   "limitations": [
+    "Artifact identity is unavailable for this observation.",
+    "Event sequence records provider receipt order; simultaneous browser causality is not inferred.",
+    "Network content is retained only when selected; response bytes are browser-decoded, not compressed wire bytes.",
+    "Request bytes are limited to what Playwright exposes; not_exposed does not establish body absence or multipart file coverage.",
+    "Network content reads settle within 5 seconds each and never wait for unfinished responses or refetch them.",
+    "Playwright scenario events do not expose request initiator stacks; receipt order does not prove causality.",
+    "Storage values are hashed only after declared-secret redaction.",
+    "CDP attachment cannot recover pre-attach events or guarantee launch-time context options.",
+    "Browser host platform and architecture were not observed."
+   ]
+  }
+ ],
+ "after_blur": [
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs list-browser-targets http://127.0.0.1:9344 --format json",
+   "evidence_id": "ev_17c0314896d7774cc3ad4d198527327b4fd3225a3e5aceda5f4f667bbde48a2b",
+   "raw": {
+    "path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\08-list-browser-targets-after-blur.json",
+    "sha256": "6413285d5d9dd49b4bc934478d629304f4d74bce36b82f20f1a8851224396d7a",
+    "bytes": 1527
+   },
+   "targets": [
+    {
+     "target_id": "FB691BBCEE4941C13025C3694FE4B006",
+     "type": "page",
+     "title": "Rea Probebaee 262251 E 0 | Jitsi Meet",
+     "url": "https://meet.jit.si/ReaProbebaee262251e0",
+     "origin": "https://meet.jit.si",
+     "attached": false
+    }
+   ],
+   "excluded": {
+    "disallowed_origin": 0,
+    "unsupported_url": 0,
+    "non_page": 2
+   }
+  },
+  {
+   "cmd": "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs inspect-web-page http://127.0.0.1:9344 FB691BBCEE4941C13025C3694FE4B006 --observation-ms 6000 --include-script-sources --include-accessibility-text --include-console-text --format json",
+   "evidence_id": "ev_8fe17aee0f79ffaeb9137c982785758a6f632a271ec1a33e0bd897a5e22958ae",
+   "raw": {
+    "path": "C:\\Users\\anaki\\AppData\\Local\\Temp\\claude\\C--Users-anaki-workspace-loginpi\\a7d862b1-8c7b-4ecb-aa09-178648623821\\scratchpad\\rea04-jitsi\\raw\\09-inspect-web-page-after-blur.json",
+    "sha256": "40910cfe6297cb83d4dc92b44f4f8ba1421238a480a95a8e159b311a76adca4e",
+    "bytes": 6114567
+   },
+   "workers": [],
+   "script_urls": [
+    "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+    "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/olm.wasm",
+    "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/chunks/4690.min.js",
+    "https://meet.jit.si/ReaProbebaee262251e0",
+    "https://meet.jit.si/ReaProbebaee262251e0",
+    "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+    "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/preload.min.js?v=139",
+    "https://meet.jit.si/ReaProbebaee262251e0",
+    "https://meet.jit.si/ReaProbebaee262251e0",
+    "https://meet.jit.si/ReaProbebaee262251e0"
+   ]
+  }
+ ],
+ "observation": "흐림을 골라도 vb-inference-worker·모델·wasm 요청은 페이지 프레임 네트워크 캡처에 나타나지 않음(워커 안 importScripts·fetch 는 범위 밖), 워커 목록도 비어 있음. 대기 화면 오디오 설정에는 노이즈 억제 토글이 없음(회의 안 툴바 전용)"
+}

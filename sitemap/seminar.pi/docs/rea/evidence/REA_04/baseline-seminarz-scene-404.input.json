@@ -1,0 +1,50 @@
+{
+  "browser": {
+    "mode": "launch",
+    "executable_path": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    "headless": true
+  },
+  "start_url": {
+    "url": "https://seminarz.vercel.app/ko/s/00000000-0000-4000-8000-000000000404/join",
+    "query": []
+  },
+  "environment": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "device_scale_factor": 1
+    },
+    "locale": "ko-KR",
+    "timezone": "Asia/Seoul",
+    "color_scheme": "light",
+    "reduced_motion": "reduce",
+    "service_workers": "block"
+  },
+  "actions": [
+    {
+      "step_id": "settle",
+      "action": "wait_for_timeout",
+      "duration_ms": 3000
+    }
+  ],
+  "capture": {
+    "after_each_step": [],
+    "at_end": [
+      "url",
+      "screenshot",
+      "accessibility",
+      "storage"
+    ],
+    "events": [
+      "console",
+      "page-errors",
+      "network",
+      "websockets"
+    ],
+    "network": {
+      "request_body": false,
+      "response_body": false,
+      "header_values": false
+    }
+  }
+}

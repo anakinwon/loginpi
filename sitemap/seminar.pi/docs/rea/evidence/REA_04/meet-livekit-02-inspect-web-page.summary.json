@@ -1,0 +1,666 @@
+{
+ "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/02-inspect-web-page.json",
+ "raw_sha256": "d2481cb615c73eaba4c7777798da5db869a12a53f8701164b8bdbcc1bb4594c5",
+ "evidence_id": "ev_e15414b374e8f54262aacdf617a345c213c146e8e6cd93e4b315d35b09ab6351",
+ "operation": "inspect_web_page",
+ "predicate_type": "rea.web-page-inspection",
+ "provider": {
+  "id": "rea-cdp-browser",
+  "name": "REA Chrome DevTools Protocol observation provider",
+  "version": "2"
+ },
+ "confidence": "observed",
+ "authority": "external-service",
+ "limitations": [
+  "Artifact identity is unavailable for this observation.",
+  "Observation starts when REA attaches; prior network and console activity is unavailable.",
+  "Raw network headers, bodies, cookies, storage values, console objects, and WebSocket payloads are never retained; explicitly requested primitive console text is retained verbatim, while payload captures retain value-free shapes.",
+  "Source maps are reported only as declarative URLs and are not fetched.",
+  "URL-less scripts and console events without an allowed source URL are excluded because their origin cannot be proven.",
+  "Browser host platform and architecture were not observed."
+ ],
+ "target": {
+  "target_id": "61752313B0C3E47E0E5C27A7914AE658",
+  "type": "page",
+  "title": "LiveKit Meet | Conference app build with LiveKit open source",
+  "url": "https://meet.livekit.io/rooms/rea04-probe",
+  "origin": "https://meet.livekit.io",
+  "attached": false
+ },
+ "capture_window": {
+  "started_at": "2026-10-27T10:33:17.838Z",
+  "ended_at": "2026-10-27T10:33:21.086Z",
+  "observation_ms": 3000
+ },
+ "completeness": {
+  "status": "policy_filtered",
+  "conditions": [
+   "attach_limited",
+   "policy_filtered"
+  ],
+  "policy_filtered_sections": [
+   "json_body_shapes",
+   "websocket_shapes",
+   "workers"
+  ],
+  "attach_limited_sections": [
+   "console_events",
+   "metadata",
+   "network_requests",
+   "websocket_connections",
+   "websocket_frames"
+  ],
+  "truncated_sections": [],
+  "unavailable_sections": [],
+  "excluded": [
+   {
+    "section": "json_body_shapes",
+    "reason": "not_approved",
+    "count": null
+   },
+   {
+    "section": "websocket_shapes",
+    "reason": "not_approved",
+    "count": null
+   },
+   {
+    "section": "workers",
+    "reason": "out_of_target_scope",
+    "count": 1
+   }
+  ],
+  "dropped_events": {
+   "scripts": 0,
+   "network_requests": 0,
+   "console_events": 0,
+   "websocket_connections": 0,
+   "websocket_frames": 0,
+   "webmcp_tools": 0,
+   "timeline_events": 0,
+   "total": 0
+  }
+ },
+ "scripts": [
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/4a176a97-00bd2281f16f2c53.js",
+   "bytes": 173072,
+   "sha256": "f085e107d13bb81fa2ecb6ed68d56a34e4e7ec7a17b957f30df856ab6e7f6401",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/4a176a97-00bd2281f16f2c53.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "bytes": 16,
+   "sha256": "8f1a66bb3132bd59867f5baedeb2e755bfbe69ce10d24878f5514897051fe90d",
+   "source_map_url": null
+  },
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/app/layout-bb7ad1dba58cabcb.js",
+   "bytes": 400,
+   "sha256": "ac2d44cfd59888d70c3cae7f5c7d206162643f3755e771e8ee36d6346756641c",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/app/layout-bb7ad1dba58cabcb.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/11-8239cac66db1d0d8.js",
+   "bytes": 173547,
+   "sha256": "510ddf46efec1398276660cfacb54b9a5995761db0e359eebfcc76579d26fce9",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/11-8239cac66db1d0d8.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js",
+   "bytes": 86226,
+   "sha256": "8d5378805f0fd3825b8521f6f87c30e87a44bed7d97939121b2f8094f0fb4685",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/main-app-c1d00de144b27ee2.js",
+   "bytes": 610,
+   "sha256": "10681a51cd2ffcf7dec158c71fa208754b2174c532e7fb9338ec21df4a25b0a7",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/main-app-c1d00de144b27ee2.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "bytes": 455,
+   "sha256": "76525418c074a45b3047c4ff9e49c252978d6ee748ed9e7fffac81910ef14505",
+   "source_map_url": null
+  },
+  {
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "bytes": 845,
+   "sha256": "93268a0726ec1efaa676ae5171f84267e72b7c3d215b6190794cb4069d5f58d8",
+   "source_map_url": null
+  },
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/webpack-0cfd51bb6a36e13b.js",
+   "bytes": 4079,
+   "sha256": "0572e4b7b18c214b09a53a7a533d1df9cb4917f833d2e5941f78faf8ab3042eb",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/webpack-0cfd51bb6a36e13b.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "bytes": 130,
+   "sha256": "2dcb2e50c883929aebb7a64a7a22cfe2260d856a3c36a6926c082da19c552b7b",
+   "source_map_url": null
+  },
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/295-b920c121c12763d5.js",
+   "bytes": 13044,
+   "sha256": "3093f621fdd97c9bf3a9655698259118701f05276c91bd82ce0cd1bb7191157a",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/295-b920c121c12763d5.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "bytes": 3779,
+   "sha256": "1230f91146ae44b64dfa4b21a363ec90efb742fdd1062427e0a7e4fb0d7076bc",
+   "source_map_url": null
+  },
+  {
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "bytes": 43,
+   "sha256": "3814cddd18b2095e01abb745a99e5ada90178e709c09879324c3b623f2d829ea",
+   "source_map_url": null
+  },
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/787-9333209d8f8fb674.js",
+   "bytes": 260584,
+   "sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/787-9333209d8f8fb674.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/965-89dc141cb237a849.js",
+   "bytes": 13772,
+   "sha256": "4c77459e565f685fd0cd8a4e18ff4de3aa3a386fca68d0a3ffebc75dd33e9ee6",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/965-89dc141cb237a849.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "bytes": 45,
+   "sha256": "f158da4b9371d073bc1d9cca38044807cb946788682b45acc28a6cadbba77aba",
+   "source_map_url": null
+  },
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/app/rooms/%5BroomName%5D/page-54756b6953c030df.js",
+   "bytes": 4377,
+   "sha256": "77ddb7a444080a139d8a6d24389986c08f65f1767f1c3e6e2194669d1687854b",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/app/rooms/%5BroomName%5D/page-54756b6953c030df.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "bytes": 2641,
+   "sha256": "3b3e40039c06fb3add6d2ae5422bf9f5d6e63532a2227241dc971c4def9fc0c7",
+   "source_map_url": null
+  },
+  {
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "bytes": 57,
+   "sha256": "ee6bb81f4e9fc030a39a7c71affc4d1f2b900baa4b4c7af83361388d7c39599b",
+   "source_map_url": null
+  },
+  {
+   "url": "https://meet.livekit.io/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js",
+   "bytes": 562110,
+   "sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+   "source_map_url": "https://meet.livekit.io/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js.map"
+  },
+  {
+   "url": "https://meet.livekit.io/rooms/rea04-probe",
+   "bytes": 917,
+   "sha256": "d713188abaee72a62f0d440937bc4d109e46077e794b8eff6819952383ab1296",
+   "source_map_url": null
+  }
+ ],
+ "resources": [
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/app/rooms/%5BroomName%5D/page-54756b6953c030df.js",
+   "content_size": 4377
+  },
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/295-b920c121c12763d5.js",
+   "content_size": 13044
+  },
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js",
+   "content_size": 562114
+  },
+  {
+   "type": "Stylesheet",
+   "url": "https://meet.livekit.io/_next/static/css/3589b74ac4f7511a.css",
+   "content_size": 573
+  },
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/787-9333209d8f8fb674.js",
+   "content_size": 260584
+  },
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/webpack-0cfd51bb6a36e13b.js",
+   "content_size": 4079
+  },
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js",
+   "content_size": 86226
+  },
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/11-8239cac66db1d0d8.js",
+   "content_size": 173547
+  },
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/4a176a97-00bd2281f16f2c53.js",
+   "content_size": 173072
+  },
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/main-app-c1d00de144b27ee2.js",
+   "content_size": 610
+  },
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/965-89dc141cb237a849.js",
+   "content_size": 13772
+  },
+  {
+   "type": "Script",
+   "url": "https://meet.livekit.io/_next/static/chunks/app/layout-bb7ad1dba58cabcb.js",
+   "content_size": 400
+  },
+  {
+   "type": "Stylesheet",
+   "url": "https://meet.livekit.io/_next/static/css/f3cf1723f99b7d41.css",
+   "content_size": 20779
+  }
+ ],
+ "accessibility_names": [
+  "RootWebArea:LiveKit Meet | Conference app build with LiveKit open source",
+  "button:Microphone",
+  "button:Camera",
+  "textbox:Username",
+  "button:Join Room"
+ ],
+ "storage": {
+  "local_storage_keys": [
+   "lk-user-choices"
+  ],
+  "session_storage_keys": [],
+  "indexed_db_names": [],
+  "values_redacted": true
+ },
+ "keyword_hits": [
+  {
+   "keyword": "Background Effects",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "965-89dc141cb237a849.js",
+     "script_sha256": "4c77459e565f685fd0cd8a4e18ff4de3aa3a386fca68d0a3ffebc75dd33e9ee6",
+     "offset": 7558,
+     "context": "dren:[(0,i.jsx)(\"div\",{style:{marginBottom:\"8px\"},children:\"Background Effects\"}),(0,i.jsxs)(\"div\",{style:{display:\"flex\",gap:\"10px\",flexW"
+    }
+   ]
+  },
+  {
+   "keyword": "background-blur",
+   "count": 5,
+   "first_hits": [
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 258860,
+     "context": "0===e.blurRadius?\"virtual-background\":void 0===e.imagePath?\"background-blur\":\"legacy\"}async switchTo(e){var t;switch(e.mode){case\"backg"
+    },
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 258930,
+     "context": "-blur\":\"legacy\"}async switchTo(e){var t;switch(e.mode){case\"background-blur\":await this.updateTransformerOptions({imagePath:void 0,blur"
+    },
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 259591,
+     "context": "fallback is supported in this browser\");switch(e.mode){case\"background-blur\":{let{mode:t,blurRadius:i=cs,segmenterOptions:o,assetPaths:"
+    }
+   ]
+  },
+  {
+   "keyword": "virtual-background",
+   "count": 5,
+   "first_hits": [
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 258818,
+     "context": "abled\":\"string\"==typeof e.imagePath&&void 0===e.blurRadius?\"virtual-background\":void 0===e.imagePath?\"background-blur\":\"legacy\"}async swit"
+    },
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 259075,
+     "context": "l!=(t=e.blurRadius)?t:cs,backgroundDisabled:!1});break;case\"virtual-background\":await this.updateTransformerOptions({imagePath:e.imagePath"
+    },
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 259786,
+     "context": "enterOptions:o,assetPaths:a,onFrameProcessed:s});break}case\"virtual-background\":{let{mode:t,imagePath:i,segmenterOptions:o,assetPaths:a,on"
+    }
+   ]
+  },
+  {
+   "keyword": "\"@mediapipe/tasks-vision\":\"0.10.14\"",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 242667,
+     "context": "ansformer.destroy(e),this.lifecycleState=\"destroyed\"}}},sZ={\"@mediapipe/tasks-vision\":\"0.10.14\"},s1=sW(\"livekit-track-processor-web-gl\");function s0(e,t){l"
+    }
+   ]
+  },
+  {
+   "keyword": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 255240,
+     "context": "(n=this.options.assetPaths)?void 0:n.tasksVisionFileSet)?r:`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${sZ[\"@mediapipe/tasks-vision\"]}/wasm`);this.imageSegmenter="
+    }
+   ]
+  },
+  {
+   "keyword": "selfie_segmenter.tflite",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 255578,
+     "context": "pipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite\",delegate:\"GPU\",...this.options.segmenterOptions},canvas:th"
+    }
+   ]
+  },
+  {
+   "keyword": "delegate:\"GPU\"",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 255603,
+     "context": "er/selfie_segmenter/float16/latest/selfie_segmenter.tflite\",delegate:\"GPU\",...this.options.segmenterOptions},canvas:this.canvas,runnin"
+    }
+   ]
+  },
+  {
+   "keyword": "MediaStreamTrackProcessor",
+   "count": 4,
+   "first_hits": [
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 236251,
+     "context": "ned\"!=typeof MediaStreamTrackGenerator&&\"undefined\"!=typeof MediaStreamTrackProcessor,t=\"undefined\"!=typeof HTMLCanvasElement&&\"undefined\"!=typeo"
+    },
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 236514,
+     "context": "ned\"!=typeof MediaStreamTrackGenerator&&\"undefined\"!=typeof MediaStreamTrackProcessor}async setup(t){this.source=t.track;let{width:n,height:r}=aw"
+    },
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 237594,
+     "context": "vas=sJ(null!=n?n:300,null!=r?r:300)}else this.processor=new MediaStreamTrackProcessor({track:this.source}),this.trackGenerator=new MediaStreamTra"
+    }
+   ]
+  },
+  {
+   "keyword": "captureStream",
+   "count": 4,
+   "first_hits": [
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 236351,
+     "context": "=typeof HTMLCanvasElement&&\"undefined\"!=typeof VideoFrame&&\"captureStream\"in HTMLCanvasElement.prototype;return e||t}static get hasMo"
+    },
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 237510,
+     "context": "vas.getContext(\"2d\"),this.capturedStream=this.displayCanvas.captureStream(),this.canvas=sJ(null!=n?n:300,null!=r?r:300)}else this.pro"
+    },
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 259515,
+     "context": "o)throw Error(\"Neither MediaStreamTrackProcessor nor canvas.captureStream() fallback is supported in this browser\");switch(e.mode){ca"
+    }
+   ]
+  },
+  {
+   "keyword": "Enhanced Noise Cancellation",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "965-89dc141cb237a849.js",
+     "script_sha256": "4c77459e565f685fd0cd8a4e18ff4de3aa3a386fca68d0a3ffebc75dd33e9ee6",
+     "offset": 9765,
+     "context": "isabled:s,\"aria-pressed\":e,children:[e?\"Disable\":\"Enable\",\" Enhanced Noise Cancellation\"]})]})}var p=s(7604);function b(e){let r=(0,n.Vt)(),s=(0,n."
+    }
+   ]
+  },
+  {
+   "keyword": "isKrispNoiseFilterSupported",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 99211,
+     "context": ";let m=i.useCallback(async t=>{if(t){let{KrispNoiseFilter:t,isKrispNoiseFilterSupported:i}=await n.e(950).then(n.bind(n,9393));if(!i())return void "
+    }
+   ]
+  },
+  {
+   "keyword": "noiseSuppression:!0",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "dc2a882c-7e5efa4c36ea18f5.js",
+     "script_sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+     "offset": 276019,
+     "context": "Id:{ideal:\"default\"},autoGainControl:!0,echoCancellation:!0,noiseSuppression:!0,voiceIsolation:!0},o0={deviceId:{ideal:\"default\"},resolutio"
+    }
+   ]
+  },
+  {
+   "keyword": "voiceIsolation:!0",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "dc2a882c-7e5efa4c36ea18f5.js",
+     "script_sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+     "offset": 276039,
+     "context": ",autoGainControl:!0,echoCancellation:!0,noiseSuppression:!0,voiceIsolation:!0},o0={deviceId:{ideal:\"default\"},resolution:aF.h720.resoluti"
+    }
+   ]
+  },
+  {
+   "keyword": "NEXT_PUBLIC_LK_RECORD_ENDPOINT",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "965-89dc141cb237a849.js",
+     "script_sha256": "4c77459e565f685fd0cd8a4e18ff4de3aa3a386fca68d0a3ffebc75dd33e9ee6",
+     "offset": 9866,
+     "context": "s(7604);function b(e){let r=(0,n.Vt)(),s=(0,n.Dt)(),l=p.env.NEXT_PUBLIC_LK_RECORD_ENDPOINT,c=t.useMemo(()=>({media:{camera:!0,microphone:!0,label:\"Med"
+    }
+   ]
+  },
+  {
+   "keyword": " Recording\"",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "965-89dc141cb237a849.js",
+     "script_sha256": "4c77459e565f685fd0cd8a4e18ff4de3aa3a386fca68d0a3ffebc75dd33e9ee6",
+     "offset": 11926,
+     "context": "on\",{disabled:j,onClick:()=>k(),children:[x?\"Stop\":\"Start\",\" Recording\"]})]})]})]}),(0,i.jsx)(\"div\",{style:{display:\"flex\",justifyC"
+    }
+   ]
+  },
+  {
+   "keyword": "lk-settings-menu-modal",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "787-9333209d8f8fb674.js",
+     "script_sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+     "offset": 96915,
+     "context": "r:n,messageDecoder:t}),r&&o.createElement(\"div\",{className:\"lk-settings-menu-modal\",style:{display:c.showSettings?\"block\":\"none\"}},o.createEle"
+    }
+   ]
+  },
+  {
+   "keyword": "SettingsComponent:h.J",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "page-54756b6953c030df.js",
+     "script_sha256": "77ddb7a444080a139d8a6d24389986c08f65f1767f1c3e6e2194669d1687854b",
+     "offset": 3928,
+     "context": ":[(0,r.jsx)(c.N,{}),(0,r.jsx)(p.r,{chatMessageFormatter:p.d,SettingsComponent:h.J}),(0,r.jsx)(i.B,{}),(0,r.jsx)(d,{})]})})}},8840:(e,o,n)=>{\""
+    }
+   ]
+  },
+  {
+   "keyword": "TranscriptionReceived",
+   "count": 7,
+   "first_hits": [
+    {
+     "script": "dc2a882c-7e5efa4c36ea18f5.js",
+     "script_sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+     "offset": 157430,
+     "context": "ceived=\"dataReceived\",e.SipDTMFReceived=\"sipDTMFReceived\",e.TranscriptionReceived=\"transcriptionReceived\",e.ConnectionQualityChanged=\"connect"
+    },
+    {
+     "script": "dc2a882c-7e5efa4c36ea18f5.js",
+     "script_sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+     "offset": 159168,
+     "context": "ceived=\"dataReceived\",e.SipDTMFReceived=\"sipDTMFReceived\",e.TranscriptionReceived=\"transcriptionReceived\",e.IsSpeakingChanged=\"isSpeakingChan"
+    },
+    {
+     "script": "dc2a882c-7e5efa4c36ea18f5.js",
+     "script_sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+     "offset": 162354,
+     "context": "date\",e.AudioTrackFeatureUpdate=\"audioTrackFeatureUpdate\",e.TranscriptionReceived=\"transcriptionReceived\",e.TimeSyncUpdate=\"timeSyncUpdate\",e"
+    }
+   ]
+  },
+  {
+   "keyword": "lk.transcription_final",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "ecf69c3a-cb22cd33c464349f.js",
+     "script_sha256": "8d5378805f0fd3825b8521f6f87c30e87a44bed7d97939121b2f8094f0fb4685",
+     "offset": 48084,
+     "context": "ublishOnBehalf=\"lk.publish_on_behalf\",e.TranscriptionFinal=\"lk.transcription_final\",e.TranscriptionSegmentId=\"lk.segment_id\",e.TranscribedTrac"
+    }
+   ]
+  },
+  {
+   "keyword": "caption",
+   "count": 0,
+   "first_hits": []
+  },
+  {
+   "keyword": "useTranscriptions",
+   "count": 0,
+   "first_hits": []
+  },
+  {
+   "keyword": "MediaRecorder is not available",
+   "count": 3,
+   "first_hits": [
+    {
+     "script": "dc2a882c-7e5efa4c36ea18f5.js",
+     "script_sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+     "offset": 291881,
+     "context": "\"!=typeof MediaRecorder;class cr{constructor(){throw Error(\"MediaRecorder is not available in this environment\")}}let ca=cn?MediaRecorder:cr;class cs "
+    },
+    {
+     "script": "dc2a882c-7e5efa4c36ea18f5.js",
+     "script_sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+     "offset": 292027,
+     "context": " cs extends ca{constructor(e,t){let i,n;if(!cn)throw Error(\"MediaRecorder is not available in this environment\");super(new MediaStream([e.mediaStreamT"
+    },
+    {
+     "script": "dc2a882c-7e5efa4c36ea18f5.js",
+     "script_sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+     "offset": 306033,
+     "context": "ments[0]?arguments[0]:100;if(!cn)return void this.log.warn(\"MediaRecorder is not available, cannot start preconnect buffer\",this.logContext);if(this.l"
+    }
+   ]
+  },
+  {
+   "keyword": "LocalTrackCpuConstrained",
+   "count": 4,
+   "first_hits": [
+    {
+     "script": "965-89dc141cb237a849.js",
+     "script_sha256": "4c77459e565f685fd0cd8a4e18ff4de3aa3a386fca68d0a3ffebc75dd33e9ee6",
+     "offset": 12891,
+     "context": "deoQuality(i.Xb.LOW)})})};return e.localParticipant.on(i.YI.LocalTrackCpuConstrained,r),()=>{e.localParticipant.off(i.YI.LocalTrackCpuConstraine"
+    },
+    {
+     "script": "965-89dc141cb237a849.js",
+     "script_sha256": "4c77459e565f685fd0cd8a4e18ff4de3aa3a386fca68d0a3ffebc75dd33e9ee6",
+     "offset": 12952,
+     "context": "ocalTrackCpuConstrained,r),()=>{e.localParticipant.off(i.YI.LocalTrackCpuConstrained,r)}},[e,l.reducePublisherVideoQuality,l.reduceSubscriberVid"
+    },
+    {
+     "script": "dc2a882c-7e5efa4c36ea18f5.js",
+     "script_sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+     "offset": 158898,
+     "context": "ublished\",e.LocalTrackUnpublished=\"localTrackUnpublished\",e.LocalTrackCpuConstrained=\"localTrackCpuConstrained\",e.LocalSenderCreated=\"localSende"
+    }
+   ]
+  },
+  {
+   "keyword": "hardwareConcurrency<6",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "965-89dc141cb237a849.js",
+     "script_sha256": "4c77459e565f685fd0cd8a4e18ff4de3aa3a386fca68d0a3ffebc75dd33e9ee6",
+     "offset": 788,
+     "context": "or(Math.random()*i));return r}function l(){return navigator.hardwareConcurrency<6}s.d(r,{DU:()=>a,ND:()=>t,S:()=>n,gz:()=>l,ll:()=>i})},6220:"
+    }
+   ]
+  },
+  {
+   "keyword": "950===e?\"4ae8876b\"",
+   "count": 1,
+   "first_hits": [
+    {
+     "script": "webpack-0cfd51bb6a36e13b.js",
+     "script_sha256": "0572e4b7b18c214b09a53a7a533d1df9cb4917f833d2e5941f78faf8ab3042eb",
+     "offset": 1249,
+     "context": "reduce((t,o)=>(r.f[o](e,t),t),[])),r.u=e=>\"static/chunks/\"+(950===e?\"4ae8876b\":e)+\".\"+({604:\"5306a4dfe6a747b8\",950:\"aae8becf5adc0380\"})[e]"
+    }
+   ]
+  }
+ ],
+ "keyword_search_note": "키워드 검색은 REA 가 보존한 스크립트 원문(artifact.text)에 대한 정적 문자열 검색이다. 0건은 \"캡처된 21개 스크립트 안에 없음\"까지만 뜻한다(지연 로드 청크 604·950 미포함)."
+}

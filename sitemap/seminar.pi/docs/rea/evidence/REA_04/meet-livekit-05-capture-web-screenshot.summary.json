@@ -1,0 +1,37 @@
+{
+ "raw_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/05-capture-web-screenshot.json",
+ "raw_sha256": "5b34cffda734dd40e2e6af05df23a09dc4aaf502e8cdb981a8e0cfdcc85afadb",
+ "evidence_id": "ev_8e0a26dd9a4079162424cbfae9d2f3c20e70e2b5672ff3ea2995a84895ee087e",
+ "operation": "capture_web_screenshot",
+ "predicate_type": "rea.web-screenshot",
+ "provider": {
+  "id": "rea-cdp-browser",
+  "name": "REA Chrome DevTools Protocol observation provider",
+  "version": "2"
+ },
+ "confidence": "observed",
+ "authority": "external-service",
+ "limitations": [
+  "Artifact identity is unavailable for this observation.",
+  "The screenshot contains the visible viewport, including on-screen content.",
+  "REA does not scroll, evaluate JavaScript, or capture beyond the current viewport.",
+  "Browser host platform and architecture were not observed."
+ ],
+ "target": {
+  "target_id": "61752313B0C3E47E0E5C27A7914AE658",
+  "url": "https://meet.livekit.io/rooms/rea04-probe",
+  "origin": "https://meet.livekit.io"
+ },
+ "captured_at": "2026-10-27T10:36:47.900Z",
+ "viewport": {
+  "width": 1422,
+  "height": 748
+ },
+ "png": {
+  "sha256": "6a1d1b1f4fdce815d5081f37d6dbf278c7dbd6b041ec181bf2f82b7def103aa9",
+  "bytes": 12865,
+  "scratch_path": "C:/Users/anaki/AppData/Local/Temp/claude/C--Users-anaki-workspace-loginpi/a7d862b1-8c7b-4ecb-aa09-178648623821/scratchpad/rea04/raw/05-prejoin.png",
+  "scratch_png_sha256": "6a1d1b1f4fdce815d5081f37d6dbf278c7dbd6b041ec181bf2f82b7def103aa9"
+ },
+ "observed_ui": "미리보기 영상 1 + [Microphone ▾] [Camera ▾] 토글·장치 메뉴 + Username 입력 + Join Room — 입장 전 화면에 배경 효과·잡음 설정 없음"
+}
