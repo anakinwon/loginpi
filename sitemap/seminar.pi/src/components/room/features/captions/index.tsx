@@ -103,7 +103,8 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   const locale = useLocale()
   // 기본 = 브라우저 선호 언어(목록에 있으면) → UI locale → 'en'. navigator 는 마운트 뒤에만(SSR 없음 — 'use client' 오버레이)
   const lang = trLang || pickTrLang(typeof navigator === 'undefined' ? [] : navigator.languages, locale)
-  const shown = useTranslated(latest, tr, lang, ctx.seminarId)
+  // 내 화면 자막을 숨겼으면 번역 요청도 하지 않는다(보이지 않는 번역에 문장마다 외부 AI·DB 계량 — r4 T08 보강). 더빙은 translateCaption 을 따로 부른다
+  const shown = useTranslated(latest, tr && show, lang, ctx.seminarId)
   const langs = useLangNames(locale)
   const stop = useStore(trStop)
 
