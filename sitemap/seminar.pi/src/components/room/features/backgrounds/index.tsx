@@ -1,6 +1,6 @@
 'use client'
 // 배경 효과(SA5, 설계서 15.5) — ⋯ '효과' → 효과 시트(미리보기·배경 : 없음·흐리게·기본 6종·내 이미지). 고르면 바로 적용(미리보기 = 송출본).
-// 무대 역할(presenter·panel)만. 효과 순서 BG.order 20(조명 10 뒤 — 조명은 카메라 원본만 재고 고친다). 성능이 15fps 미만 3초면 자동 끔 + 경고 토스트(rules.slowWatch).
+// 무대 역할(presenter·panel)만. 효과 순서 BG.order 20(조명 10 뒤 — 조명은 카메라 원본만 재고 고친다). 성능이 15fps 미만 3초면 분리 간격을 2배로 낮추고, 그래도 느리면 자동 끔 + 경고 토스트(rules.slowWatch·slowerEvery).
 // 조명·소음 줄은 SA3(media-fx FxRows)를 이 시트의 '배경' 절 아래에 붙인다 — ⋯ '효과' 항목은 이 기능 1개만 등록
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -22,7 +22,7 @@ import {
   status,
 } from './engine'
 import { addMine, listMine, removeMine, type MyImage } from './my-images'
-import { BG, checkMine, PRESETS } from './rules'
+import { BG, checkMine, PRESETS, withUnsaved } from './rules'
 import { FxRows } from '../media-fx'
 
 const open = featureStore(false)
@@ -34,7 +34,7 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   const busy = useStore(status) === 'loading'
   const ref = useRef<HTMLDialogElement>(null)
   const preview = useRef<HTMLVideoElement>(null)
-  const [mine, setMine] = useState<(MyImage & { url: string })[]>([])
+  const [mine, setMine] = useState<(MyImage & { url: string; unsaved?: boolean })[]>([])
   const [err, setErr] = useState<string | null>(null)
   const cam = ctx.r.localStream?.getVideoTracks()[0]
   const ok = isOpen && canProcessVideo() && canSegment() // 시트가 열렸을 때만 판정(닫힌 시트는 렌더 내용이 보이지 않는다)
@@ -56,7 +56,13 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
       .then(
         (l) =>
           alive &&
-          setMine(l.map((m) => ({ ...m, url: URL.createObjectURL(m.blob) }))),
+          // 저장 실패분(unsaved)은 이번 회의 동안 남긴다 — 덮어쓰면 쓰고 있는 이미지의 선택 표시·삭제가 사라진다
+          setMine((prev) =>
+            withUnsaved(l, prev).map((m) => ({
+              ...m,
+              url: URL.createObjectURL(m.blob),
+            })),
+          ),
       )
       .catch(() => {})
     return () => {
@@ -94,12 +100,17 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
     try {
       await addMine(f, id)
       const l = await listMine()
-      setMine(l.map((x) => ({ ...x, url: URL.createObjectURL(x.blob) })))
+      setMine((prev) =>
+        withUnsaved(l, prev).map((x) => ({
+          ...x,
+          url: URL.createObjectURL(x.blob),
+        })),
+      )
     } catch {
       // 저장만 실패(용량 초과·IndexedDB 막힘) — 배경은 이미 적용됐다. '불러오지 못함'이라 하면 틀린 안내라 저장 실패로 알리고,
       // 이번 회의 동안은 목록에 남겨 선택 표시·삭제가 되게 한다(URL 은 새로 — 이전 목록 URL 은 정리 effect 가 해제)
       setMine((l) =>
-        [{ id, ts: Date.now(), blob: f as Blob }, ...l.filter((x) => x.id !== id)].map((x) => ({
+        [{ id, ts: Date.now(), blob: f as Blob, unsaved: true }, ...l.filter((x) => x.id !== id)].map((x) => ({
           ...x,
           url: URL.createObjectURL(x.blob),
         })),

@@ -1,7 +1,7 @@
 // 배경 효과 판정 시험 — node --test src/components/room/features/backgrounds/rules.test.mjs (Node 24 는 .ts 를 타입 제거로 바로 읽는다)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { BG, checkMine, coverRect, failBack, nextTs, overflowIds, pipelineKilled, slowWatch } from './rules.ts'
+import { BG, checkMine, coverRect, failBack, nextTs, overflowIds, pipelineKilled, slowerEvery, slowWatch, withUnsaved } from './rules.ts'
 
 // 30fps 로 프레임마다 ms 만큼 걸린다고 치고 sec 초 동안 돌린다 — 한 번이라도 끄라고 하면 true
 function run(ms, sec, watch = slowWatch()) {
@@ -66,11 +66,43 @@ test('조명은 배경보다 먼저 — 카메라 원본만 재고 고친다', a
   assert.equal(lightGain(0.5), 1) // 카메라 원본을 재면 손대지 않는다
 })
 
-test('파이프라인 끔 판정 — 사용자 끔·고르는 중·이미 없음은 아니다', () => {
-  assert.equal(pipelineKilled(false, 'blur', 'idle'), true) // 연속 실패로 꺼짐 → 알림·분리기 버림
-  assert.equal(pipelineKilled(false, 'none', 'idle'), false) // choose('none') 은 선택부터 '없음'
-  assert.equal(pipelineKilled(false, 'p:dusk', 'loading'), false) // 처음 고르는 중
-  assert.equal(pipelineKilled(true, 'blur', 'idle'), false)
+test('파이프라인 끔 판정 — 사용자 끔·이미 없음은 아니다', () => {
+  assert.equal(pipelineKilled(false, 'blur'), true) // 연속 실패로 꺼짐 → 알림·분리기 버림
+  assert.equal(pipelineKilled(false, 'none'), false) // choose('none') 은 선택부터 '없음'
+  assert.equal(pipelineKilled(true, 'blur'), false)
+})
+
+// 회귀(T05 r3) — 흐림이 돌던 중 다른 배경을 고르는 사이(loading) 파이프라인이 끄면 판정에서 빠졌다 →
+// 망가진 분리기를 버리지 않아 선택이 끝나면 다시 켜져 같은 실패를 되풀이하고, 끔 알림도 없었다
+test('파이프라인 끔 판정 — 다른 배경을 고르는 중이어도 끔으로 본다', async () => {
+  assert.equal(pipelineKilled(false, 'p:dusk'), true)
+  // 엔진 끔 처리가 고르는 중인 선택을 버리고(pick++) 상태를 idle 로 되돌리는지
+  const { readFileSync } = await import('node:fs')
+  const src = readFileSync(new URL('./engine.ts', import.meta.url), 'utf8')
+  const body = src.slice(src.indexOf('bgOn.sub('), src.indexOf("autoOff.set('bgStopped')"))
+  assert.match(body, /pick\+\+/)
+  assert.match(body, /status\.set\('idle'\)/)
+})
+
+// 회귀(T05 r3) — 저장 실패로 이번 회의에만 둔 내 이미지가 시트를 닫았다 열면(목록 다시 읽기) 사라져 선택 표시·삭제가 없어졌다
+test('내 이미지 목록 다시 읽기 — 저장 실패분은 남기고 저장된 것과 겹치지 않는다', () => {
+  const db = [{ id: 'a' }, { id: 'b' }]
+  const prev = [{ id: 'x', unsaved: true }, { id: 'a' }, { id: 'old' }, { id: 'b', unsaved: true }]
+  assert.deepEqual(withUnsaved(db, prev).map((m) => m.id), ['x', 'a', 'b'])
+  assert.deepEqual(withUnsaved(db, []).map((m) => m.id), ['a', 'b'])
+})
+
+// 보강(T05 r3) — 느린 기기에서 바로 끄면 가리던 방이 드러난다. 분리 간격을 2배로 낮춘 단계를 먼저 거친다
+test('느림 단계 — 분리 간격 1→2, 2 에서 또 느리면 끔', () => {
+  assert.equal(slowerEvery(1), 2)
+  assert.equal(slowerEvery(BG.maxEvery), 0)
+  // 분리 80ms·합성만 5ms 인 기기 : 매 프레임 분리면 12.5fps(끔 대상), 2장마다 분리면 평균 42.5ms = 23.5fps(유지)
+  assert.equal(run(80, 4.2), true)
+  const w = slowWatch()
+  let off = false
+  let i = 0
+  for (let t = 0; t <= 10000; t += 33) off = w(i++ % 2 === 0 ? 80 : 5, t) || off
+  assert.equal(off, false)
 })
 
 // 회귀(T05 r1) — 내 이미지 썸네일·삭제 버튼 이름이 모두 같아 낭독기로 구별 불가, 저장 실패를 '불러오지 못함'으로 오안내
