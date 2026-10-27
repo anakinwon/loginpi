@@ -3,6 +3,8 @@
 //  조회는 piFetch(X-Pi-Token — Pi Browser 는 쿠키 없음), 비로그인 = LoginGate(redirect 없음), 권한 없음 = 403 문구.
 //  CSV 는 <a href> 직접 내려받기가 X-Pi-Token 을 못 붙이므로 piFetch 로 받아 화면에서 만든다(번역된 머리글, 수식 주입 방지 — engage-rules toCsv).
 //  Pi Browser 의 Blob 내려받기 동작은 [확인중 : 실기기]
+//  화면이 보이는 동안 하트비트 간격(HB_MS)마다 지금 쪽을 다시 읽는다 — 진행 중 세미나의 '접속 중/나감'이 처음 연 시각에 멈춰 있던 것 보강(T04 r4).
+//  다시 읽기 실패는 표를 지우지 않는다(처음 읽기 실패만 오류 화면)
 import { useEffect, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
@@ -10,7 +12,7 @@ import { LoginGate } from '@/components/login-gate'
 import { Link } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
 import { inViewerTz } from '@/lib/calendar-rules'
-import { attendSec, fmtDur, isOnline, toCsv } from '@/lib/engage-rules'
+import { attendSec, fmtDur, HB_MS, isOnline, toCsv } from '@/lib/engage-rules'
 import { Pagination } from './pagination'
 import { BTN, useSeminarErrText } from './shared'
 
@@ -32,21 +34,29 @@ function Sheet({ id }: { id: string }) {
   const [err, setErr] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [now, setNow] = useState(0)
+  const [tick, setTick] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (document.visibilityState === 'visible') setTick((n) => n + 1)
+    }, HB_MS)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     let live = true
     void load(id, `page=${page}`).then((r) => {
       if (!live) return
-      setNow(Date.now())
       if (r.ok) {
+        setNow(Date.now()) // 상태(접속 중/나감) 기준 시각 = 받은 자료 시각 — 실패한 다시 읽기는 옛 표를 새 시각으로 판정하지 않게
         setD(r.data)
         setErr(null)
-      } else setErr(r.status === 403 ? t('forbidden') : errText(r.body))
+      } else if (!tick || r.status === 403) setErr(r.status === 403 ? t('forbidden') : errText(r.body))
     })
     return () => {
       live = false
     }
-  }, [id, page, t, errText])
+  }, [id, page, tick, t, errText])
 
   const when = (iso: string) => f.dateTime(new Date(iso), inViewerTz({ dateStyle: 'short', timeStyle: 'short' }))
   const name = (r: Row) => r.name || r.piName || '—'

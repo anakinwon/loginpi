@@ -3,6 +3,7 @@
 //  신호 계약 : app.send('refresh', {what:'polls'|'qna', kind?:'new'}) — 내용은 싣지 않고 '다시 읽어라'만(받는 쪽이 parseRefresh 로 검사, 맞지 않으면 버린다)
 import { useEffect, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
+import { sendRetry } from '../../app-retry'
 import { featureStore, useStore, type AppMsg, type FeatureStore, type RoomCtx } from '../../extensions'
 import { readApi, type ApiErrorBody } from '@/lib/client-api'
 import { parseRefresh, type RefreshWhat } from '@/lib/engage-rules'
@@ -42,9 +43,11 @@ export function resetSlots() {
   pollToast.reset()
 }
 
-// 변경을 알린다 — 엔진이 app 을 모르면(구 엔진) 실패해도 그만(다른 사람은 탭을 열 때 다시 읽는다, 15.3)
+// 변경을 알린다 — 엔진이 app 을 모르면(구 엔진) 실패해도 그만(다른 사람은 탭을 열 때 다시 읽는다, 15.3).
+//  refresh 는 caption 과 피어당 초당 2건을 합산한다(SIGNAL_API 3.6) — 자막을 켠 발표자·panel 이 답변·추천을 누르면 RATE_LIMITED 로
+//  신호가 조용히 빠져 다른 사람 목록이 멈췄다(야간 시험 T04 r4). 한도·응답 없음이면 짧게 다시 보낸다(app-retry, 녹화·AI 기록 고지와 같은 방식)
 export const tell = (ctx: RoomCtx, what: RefreshWhat, isNew = false) =>
-  void ctx.sendApp('refresh', isNew ? { what, kind: 'new' } : { what })
+  void sendRetry(() => ctx.sendApp('refresh', isNew ? { what, kind: 'new' } : { what }))
 
 export const engageable = (seminarId: string) => isUuid(seminarId) // 실험실 방(UUID 아님)은 서버 기록이 없다
 
