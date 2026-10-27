@@ -20,7 +20,7 @@ export type RoomCtx = {
   appSupported: boolean | null
   sendApp: (topic: string, d: unknown) => Promise<string | null> // 반환 = 오류 코드(성공 null)
   speechLimited: boolean // 세미나 음성 처리 한도 소진(A-5, 서버 SPEECH_QUOTA) — 자막·AI 회의록이 멈췄음을 알린다
-  notice: (key: string, v?: Record<string, string>) => void // 화면 알림 5초(assertive) — key 는 room.* 아래 전체 경로
+  notice: (key: string, v?: Record<string, string>) => void // 화면 알림 5초(assertive) — key 는 room 네임스페이스 기준 상대 키(예 'captions.limit', 'room.' 붙이지 않음)
   announce: (text: string) => void // 낭독만(polite, 화면에 안 보임) — 시작·종료처럼 오류가 아닌 알림
   hold: (open: boolean) => void // 시트·대화상자가 열려 있는 동안 하단 바 자동 숨김 보류
   openPanel: (tab: string) => void // 사이드 패널을 그 탭으로 연다(이미 그 탭이면 닫는다)
