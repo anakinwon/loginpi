@@ -12,6 +12,9 @@ const R = {
   fps: 30,
   sliceMs: 1000, // 1초 조각
   videoBps: 1_500_000,
+  // 메모리 안전 상한 — 조각을 메모리에 모으므로 넘으면 자동 종료·저장(탭이 메모리 부족으로 죽으면 녹화 전체를 잃는다).
+  // 1.5Mbps 기준 약 3시간. ponytail: 고정값 — 기기 메모리별 조정이 필요하면 navigator.deviceMemory 로 낮추기
+  maxBytes: 2 * 1024 ** 3,
 } as const
 
 // 기능 탐지 — UA 로 막지 않는다. 셋 중 하나라도 없으면 녹화 불가 안내
@@ -78,11 +81,15 @@ export function startRecorder(stage: HTMLElement, ac: AudioContext, onFail?: () 
   const stream = new MediaStream([...canvas.captureStream(R.fps).getVideoTracks(), ...dest.stream.getAudioTracks()])
   // ponytail: 조각을 메모리에 모은다(1.5Mbps ≈ 시간당 0.7GB) — 긴 녹화가 문제면 showSaveFilePicker 로 조각마다 디스크에 쓰기
   const chunks: Blob[] = []
+  let bytes = 0
   let rec: MediaRecorder
   try {
     rec = new MediaRecorder(stream, { ...(mime ? { mimeType: mime } : {}), videoBitsPerSecond: R.videoBps })
     rec.ondataavailable = (e) => {
-      if (e.data.size) chunks.push(e.data)
+      if (!e.data.size) return
+      chunks.push(e.data)
+      // 상한을 넘으면 1번만 알린다 — 부른 쪽이 오류 때와 같이 종료·저장·고지 해제
+      if (bytes < R.maxBytes && (bytes += e.data.size) >= R.maxBytes) onFail?.()
     }
     // 녹화 중 오류(인코더 중단 등) — 브라우저가 녹화를 멈추므로 부른 쪽이 종료·저장·'녹화 중' 고지 해제
     rec.onerror = () => onFail?.()
