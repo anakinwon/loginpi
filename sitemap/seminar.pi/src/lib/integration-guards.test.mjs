@@ -67,7 +67,8 @@ test('⑤ 외부 AI 를 부르는 라우트는 모두 speechGate 를 거치고, 
   const kinds = { chunk: 'VC', translate: 'TRANS', tts: 'TTS' }
   for (const p of aiRoutes) {
     const k = kinds[rel(p).split('/')[4]]
-    assert.match(readFileSync(p, 'utf8'), new RegExp(`await speechGate\\([^;]*'${k}'`), `${rel(p)} 에 speechGate ${k} 없음`)
+    // 번역·합성은 shareMiss(판정 전 진행 중 Promise 캐시, r3 T09) 안에서 speechGate 를 부른다
+    assert.match(readFileSync(p, 'utf8'), new RegExp(`await (shareMiss\\(cache, key, \\(\\) => )?speechGate\\([^;]*'${k}'`), `${rel(p)} 에 speechGate ${k} 없음`)
   }
   const direct = srcFiles.filter(
     (p) => !rel(p).endsWith('lib/speech-gate.ts') && /rpc\(\s*'fn_use_smn_(ai|vc)'/.test(readFileSync(p, 'utf8')),

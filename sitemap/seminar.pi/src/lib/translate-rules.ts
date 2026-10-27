@@ -64,6 +64,27 @@ export class Lru<V> {
   }
 }
 
+// 캐시 미스 공유(야간 시험 r3 T09) — 자막 1문장은 청중 전원에게 동시에 방송돼 번역·합성 요청이 한꺼번에 온다.
+//  판정(gate = fn_use_smn_ai 1왕복)이 끝난 뒤에 캐시에 넣으면 그 왕복 동안 온 청중 전원이 미스로 계량돼 세미나 누적 글자가 청중 수만큼 빨리 닳는다
+//  (청중 20명이면 더빙 상한 20만 자가 몇 분 만에 소진 → SPEECH_QUOTA 로 전원 더빙 꺼짐). 그래서 판정 전에 작업 Promise 를 먼저 넣는다 —
+//  뒤에 온 같은 문장·언어는 적중 분기(aiGate, 차감 없음)로 같은 Promise 를 기다린다.
+//  첫 요청이 거절·실패하면 Promise = null + 캐시에서 지움(기다리던 쪽은 그 문장만 건너뜀). gate 예외는 첫 요청에게 그대로 던진다
+// ponytail: 첫 요청이 개인 사유(분당 상한·자격 없음)로 거절되면 기다리던 사람도 그 문장을 놓친다 — 드묾, 필요하면 null 일 때 자기 판정으로 1회 재시도
+export async function shareMiss<V, D>(
+  cache: Lru<Promise<V | null>>,
+  key: string,
+  gate: () => Promise<D | null>,
+  work: () => Promise<V | null>,
+): Promise<{ denied: D | null; p: Promise<V | null> }> {
+  const g = gate()
+  const p = g.then((d) => (d ? null : work())).catch(() => null)
+  cache.set(key, p)
+  void p.then((v) => {
+    if (v === null && cache.get(key) === p) cache.delete(key)
+  })
+  return { denied: await g, p }
+}
+
 // 사용자당 분당 요청 상한(고정 1분 창) — 넘으면 false. 창이 지난 항목은 표가 커질 때 정리
 export const TRANSLATE_PER_MIN = 60
 export function hitRate(
