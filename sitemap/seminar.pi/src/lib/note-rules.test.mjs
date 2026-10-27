@@ -7,6 +7,7 @@ import {
   noteMarkdown,
   noteState,
   noteUrl,
+  recAlert,
   SHOT_DIFF,
   shotAllowed,
 } from './note-rules.ts'
@@ -86,4 +87,12 @@ test('noteMarkdown — 요약·할 일 체크박스·캡처 위치·빈 조각 �
     true,
   )
   assert.ok(cutMd.endsWith('_… CUT_\n'))
+})
+
+test('recAlert — 대면 노트 경고 우선순위(오류 > 마이크 끊김 > 한도)', () => {
+  const s = { err: null, limited: false, micLost: false }
+  assert.equal(recAlert(s), null)
+  assert.equal(recAlert({ ...s, limited: true }), 'limited')
+  assert.equal(recAlert({ ...s, limited: true, micLost: true }), 'micLost')
+  assert.equal(recAlert({ err: 'x', limited: true, micLost: true }), 'err')
 })

@@ -166,10 +166,7 @@ export function once(f: () => void) {
 // ponytail: 원문 길이를 조각 고정 길이로 봄 — 자막 메시지에 실제 durMs 가 실리면 그 값으로
 export function dubRate(dubSec: number, srcMs = CHUNK_MS) {
   if (!Number.isFinite(dubSec) || dubSec <= 0 || srcMs <= 0) return 1
-  return Math.min(
-    DUB_RATE_MAX,
-    Math.max(DUB_RATE_MIN, (dubSec * 1000) / srcMs),
-  )
+  return Math.min(DUB_RATE_MAX, Math.max(DUB_RATE_MIN, (dubSec * 1000) / srcMs))
 }
 
 // 재생 큐에 넣기 — 넘치면 앞(오래된 것)부터 버린다. 버린 항목을 돌려줘 호출부가 정리(요청 취소 등)
@@ -177,4 +174,22 @@ export function pushDub<T>(q: readonly T[], item: T, max = DUB_QUEUE_MAX) {
   const next = [...q, item]
   const dropped = next.length > max ? next.splice(0, next.length - max) : []
   return { q: next, dropped }
+}
+
+// 진행 중 조각 업로드를 끝까지 기다리되 상한을 둔다 — 대면 노트 [종료] 가 마지막 말까지 회의록에 넣고 요약을 시작하게(useSpeech flush).
+//  모두 끝나면 true, 상한이 먼저 오면 false(호출부는 그래도 끝내기를 진행 — 기다림이 종료를 막지 않는다)
+export async function settleWithin(
+  ps: Iterable<Promise<unknown>>,
+  maxMs: number,
+): Promise<boolean> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const late = new Promise<boolean>((r) => {
+    timer = setTimeout(r, maxMs, false)
+  })
+  const all = Promise.allSettled([...ps]).then(() => true)
+  try {
+    return await Promise.race([all, late])
+  } finally {
+    clearTimeout(timer)
+  }
 }

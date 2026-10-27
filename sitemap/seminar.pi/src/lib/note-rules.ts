@@ -129,3 +129,14 @@ export function noteMarkdown(
   if (cut) out.push('', `_… ${L.cut}_`) // 조각 상한(MAX_MD_SEGS)을 넘어 뒷부분 생략
   return out.join('\n') + '\n'
 }
+
+// 대면 노트 기록 중 경고 1줄 — 서버 오류 문구 > 마이크 끊김(기록이 멈춤) > 처리 한도. 'err' 면 화면이 오류 문구를, 그 밖은 notes.<키>를 보인다
+export function recAlert(s: {
+  err: string | null
+  limited: boolean
+  micLost: boolean
+}): 'err' | 'micLost' | 'limited' | null {
+  if (s.err) return 'err'
+  if (s.micLost) return 'micLost'
+  return s.limited ? 'limited' : null
+}

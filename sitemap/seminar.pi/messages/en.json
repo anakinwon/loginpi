@@ -764,6 +764,8 @@
     "micDenied": "Can't use the microphone — check the permission",
     "limited": "The processing time limit is used up — end and create the notes",
     "noAgr": "Stopped: no notice confirmation on record — end and start again",
+    "micLost": "The microphone disconnected and recording stopped — end to create the notes, then start again",
+    "finishing": "Saving the last words…",
     "st": {
       "RECORDING": "Recording",
       "SUMMARIZING": "Creating",
