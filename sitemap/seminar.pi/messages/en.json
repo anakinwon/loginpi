@@ -220,6 +220,7 @@
       "save": "Save",
       "saving": "Saving…",
       "cancel": "Cancel",
+      "taken": "That name is already used by someone else (host or attendee). Pick another.",
       "failed": "Couldn't save your name. Try again."
     },
     "roomTitle": {

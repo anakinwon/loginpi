@@ -47,7 +47,7 @@ function RenameSheet({ ctx }: { ctx: RoomCtx }) {
       }),
     )
     setBusy(false)
-    if (!r.ok) return setErr(t('failed'))
+    if (!r.ok) return setErr(t(r.body.code === 'NAME_TAKEN' ? 'taken' : 'failed'))
     await ctx.r.renameSelf(r.data.name) // 신호 실패(구 엔진)여도 저장은 됐다 — 다른 사람은 다음 입장부터 새 이름
     renameOpen.set(false)
   }

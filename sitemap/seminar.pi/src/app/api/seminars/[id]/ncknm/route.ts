@@ -5,16 +5,9 @@ import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute, parseBody, requireUser } from '@/lib/api'
 import { gate } from '@/lib/engage'
-import { isUuid, NCKNM_MAX, ONE_LINE_RE } from '@/lib/seminar-rules'
+import { isUuid, nameKey, nameOk } from '@/lib/seminar-rules'
 
-const schema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1)
-    .regex(ONE_LINE_RE)
-    .refine((v) => [...v].length <= NCKNM_MAX),
-})
+const schema = z.object({ name: z.string().trim().refine(nameOk) })
 
 export const PUT = withAuthGuard(
   dbRoute(async (req, ctx) => {
@@ -23,8 +16,26 @@ export const PUT = withAuthGuard(
     const [user, body] = await Promise.all([requireUser(req), parseBody(req, schema)])
     if (user instanceof NextResponse) return user
     if (body instanceof NextResponse) return body
-    const g = await gate(id, user)
+    // 자격 확인과 사칭 확인 재료(개최자 이름·다른 사람 별명)를 병렬로(R-P1)
+    const [g, host, others] = await Promise.all([
+      gate(id, user),
+      db()
+        .from('smn_mst')
+        .select('hst_usr_id, sys_user(dsp_nm, pi_usr_nm)')
+        .eq('smn_id', id)
+        .maybeSingle<{ hst_usr_id: string; sys_user: { dsp_nm: string | null; pi_usr_nm: string | null } | null }>(),
+      db().from('smn_ncknm').select('ncknm').eq('smn_id', id).neq('usr_id', user.id).eq('del_yn', 'N').limit(500),
+    ])
     if (g instanceof NextResponse) return g
+    if (host.error) return dbFail(host.error)
+    if (others.error) return dbFail(others.error)
+    // 사칭 막기 — 개최자가 아니면 개최자 이름, 누구든 같은 세미나의 다른 별명과 같은 이름은 거절
+    const k = nameKey(body.name)
+    const taken = [
+      ...(host.data && host.data.hst_usr_id !== user.id ? [host.data.sys_user?.dsp_nm, host.data.sys_user?.pi_usr_nm] : []),
+      ...(others.data ?? []).map((r) => r.ncknm as string),
+    ].some((n) => n && nameKey(n) === k)
+    if (taken) return apiError('NAME_TAKEN', 409)
     const { error } = await db()
       .from('smn_ncknm')
       .upsert(

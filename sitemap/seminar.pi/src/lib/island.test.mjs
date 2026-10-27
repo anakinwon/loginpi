@@ -43,3 +43,15 @@ test('룸 이름 신호 — 별명은 한 줄 1~30자, 제목 신호, 나머지�
   const ticket = readFileSync(new URL('../app/api/media/ticket/route.ts', import.meta.url), 'utf8')
   assert.match(ticket, /name: nickname \|\| user\.display_name/) // 별명이 입장권 표시명
 })
+
+test('별명 사칭 막기 — 서식 문자 거절, 정규화 키로 같은 이름 판정', async () => {
+  const { nameOk, nameKey, parseNameSignal } = await import('./seminar-rules.ts')
+  assert.equal(nameOk('아소카'), true)
+  assert.equal(nameOk('ab‮cd'), false) // RLO(방향 바꿈)
+  assert.equal(nameOk('ho​st'), false) // 폭 0 공백
+  assert.equal(parseNameSignal({ what: 'name', name: 'a⁦b' }), null)
+  assert.equal(nameKey('Ａｎａｋｉｎ'), nameKey('anakin')) // 전각 → NFKC
+  assert.equal(nameKey('Anakin Won'), nameKey('anakinwon'))
+  const route = readFileSync(new URL('../app/api/seminars/[id]/ncknm/route.ts', import.meta.url), 'utf8')
+  assert.match(route, /apiError\('NAME_TAKEN', 409\)/)
+})

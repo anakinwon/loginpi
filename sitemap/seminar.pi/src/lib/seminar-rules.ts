@@ -135,5 +135,10 @@ export function parseNameSignal(d: unknown): { what: 'name'; name: string } | { 
   if (what === 'title') return { what }
   if (what !== 'name' || typeof name !== 'string') return null
   const n = name.trim()
-  return n && [...n].length <= NCKNM_MAX && ONE_LINE_RE.test(n) ? { what, name: n } : null
+  return nameOk(n) ? { what, name: n } : null
 }
+
+// 별명 형식 — 한 줄 1~30자 + 서식 문자(\p{Cf} : 방향 바꿈·폭 0 문자) 금지(보안 검토 : 'RLO' 등으로 다른 이름처럼 보이게 하는 사칭)
+export const nameOk = (n: string) => !!n && [...n].length <= NCKNM_MAX && ONE_LINE_RE.test(n) && !/\p{Cf}/u.test(n)
+// 이름 비교 키 — 호환 정규화(NFKC)·대소문자·공백 무시. 같은 세미나의 개최자 이름·다른 별명과 같으면 사칭으로 본다
+export const nameKey = (n: string) => n.normalize('NFKC').toLowerCase().replace(/\s+/g, '')
