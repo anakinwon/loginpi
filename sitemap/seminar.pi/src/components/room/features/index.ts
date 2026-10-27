@@ -4,6 +4,9 @@
 // 예) import { captions } from './captions'  →  export const FEATURES: readonly RoomFeature[] = [captions]
 import type { RoomFeature } from '../extensions'
 import { captions } from './captions'
+import { attend } from './engage/attend'
+import { polls } from './engage/polls'
+import { qna } from './engage/qna'
 import { mediaFx } from './media-fx'
 
-export const FEATURES: readonly RoomFeature[] = [captions, mediaFx]
+export const FEATURES: readonly RoomFeature[] = [captions, mediaFx, qna, polls, attend]

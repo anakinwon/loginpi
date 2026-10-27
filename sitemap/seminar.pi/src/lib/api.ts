@@ -49,6 +49,8 @@ export const apiError = createApiError({
   SPEECH_RATE: '음성 요청이 너무 잦습니다. 잠시 후 다시 시도하세요',
   SPEECH_QUOTA: '이 세미나의 음성 처리 시간이 모두 소진되었습니다',
   SPEECH_FAILED: '음성을 글로 바꾸지 못했습니다',
+  // 설문(sql/009 fn_vote_smn_pll 결과)
+  POLL_CLOSED: '마감된 설문입니다',
 })
 
 export const db = () => getSupabaseAdmin()

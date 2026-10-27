@@ -189,7 +189,7 @@
 |---|---|---|---|
 | `caption` | presenter · panel | 말하는 사람 자기 브라우저가 음성 조각을 글로 바꾼 결과를 전원에게(계획서 A-1) | `{text, ts, lang}` — text 문자열(받는 쪽은 공백 정리 후 500자로 자름, 빈 글이면 버림), ts 조각 시작 ms, lang 말한 언어. 화면은 텍스트로만 표시(SA3 `features/captions/caption-rules.ts`). 번역 필드는 [확인중 : SubAgent8] |
 | `state` | presenter | 녹화·AI 기록 시작/종료 → 전원 배지(마스터 결정 M-4) | **키별 부분 객체** — 받는 쪽은 아는 키만 반영하고 나머지는 무시. `captions: boolean`(방 자막 켜짐, SA3 — panel 은 받아서 자기 마이크 자막을 켬). 녹화·AI 기록 키는 [확인중 : SubAgent6·7 화면 계약 확정 시 기재] |
-| `refresh` | 전원 | 설문·Q&A 등 화면 서버 데이터가 바뀜 → 받은 사람이 다시 읽기(투표한 청중도 보냄) | [확인중 : SubAgent4 화면 계약 확정 시 기재] |
+| `refresh` | 전원 | 설문·Q&A 등 화면 서버 데이터가 바뀜 → 받은 사람이 다시 읽기(투표한 청중도 보냄) | `{what, kind?}` — `what` = `'polls'` 또는 `'qna'`, `kind` = `'new'`(선택) — `what` 외 값이면 버림, `kind:'new'` = 새 설문·질문(탭이 안 보이면 배지 +1, 새 설문은 10초 토스트). 내용은 싣지 않음. 받는 쪽 1.5초 디바운스·숨은 탭은 열 때 1회 조회(SubAgent4 `features/engage/shared.ts`·`engage-rules.ts parseRefresh`) |
 
 근거(REA) : `docs/rea/evidence/REA_04/engine-01-app-relay-anchors.json` — REA 가 내보낸 meet.jit.si 배포본(내보내기 Evidence `ev_4be1f45f…`, lib-jitsi-meet sha256 `9eb5dc78…`·app.bundle `e94ef107…`, 재계산 일치)에서 ⓐ 얼굴 표식·반응·텍스트·자막이 **한 통로(EndpointMessage)를 판별 값으로 나눠 쓰고**(판별 키가 `type`·`name` 으로 섞임, relay[4~7]) ⓑ `from` 은 **브리지가 채우며**(relay[0]·[2]) ⓒ 중계 경로에 **크기·속도·역할 검사가 없어** 기능마다 받는 쪽이 보낸 사람을 따로 거른다(자막 = 숨은 전사기만, relay[3]·[8]·[9]). → 우리는 판별 키를 `topic` 하나로 고정하고, 권한(주제×역할)·크기·속도를 엔진 한 곳에서 검사한다(받는 쪽 필터 누락 = 위조 자막 위험 제거). 브리지의 본인 되돌림·서버 상한은 배포 클라이언트로 판단 불가라 근거로 쓰지 않았다. 코드는 옮기지 않았다(S-2 — 구현은 `chat.send` 본보기).
 

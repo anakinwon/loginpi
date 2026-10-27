@@ -97,9 +97,15 @@ export function SeminarDetail({ id }: { id: string }) {
       </dl>
       {/* 개최자는 룸 링크만 — 자기 세미나에 입장·결제 버튼을 보이지 않는다(U1) */}
       {d.isHost ? (
-        <Link href={`/s/${d.id}/join`} className={BTN_PRIMARY}>
-          {t('roomLink')}
-        </Link>
+        <div className="space-y-2">
+          <Link href={`/s/${d.id}/join`} className={BTN_PRIMARY}>
+            {t('roomLink')}
+          </Link>
+          {/* 개최자 줄 '출석부'(설계서 15.8) */}
+          <Link href={`/host/attendance/${d.id}`} className="text-muted-foreground block text-sm hover:underline">
+            {t('attendance')}
+          </Link>
+        </div>
       ) : (
         <LoginGate>
           {() => <Action d={d} fee={fee} onChanged={() => setReload((n) => n + 1)} />}

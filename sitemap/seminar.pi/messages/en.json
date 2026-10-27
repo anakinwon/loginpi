@@ -82,7 +82,8 @@
     "SPEECH_NO_AGR": "Consent to voice processing is required",
     "SPEECH_RATE": "Too many voice requests. Please try again shortly",
     "SPEECH_QUOTA": "Voice processing time for this seminar is used up",
-    "SPEECH_FAILED": "Could not convert speech to text"
+    "SPEECH_FAILED": "Could not convert speech to text",
+    "POLL_CLOSED": "This poll is closed"
   },
   "progress": {
     "title": "Build progress",
@@ -261,10 +262,12 @@
       "stop": "Stop sharing"
     },
     "panel": {
-      "title": "Chat and participants",
+      "title": "Chat · Q&A · Polls · People",
       "chat": "Chat",
       "people": "People",
-      "close": "Close panel"
+      "close": "Close panel",
+      "qna": "Q&A",
+      "polls": "Polls"
     },
     "chat": {
       "empty": "No messages yet. Chat is not saved.",
@@ -374,7 +377,49 @@
       "none": "No effects are available on this device",
       "noiseFail": "Noise reduction cannot be changed on this device"
     },
-    "sheetClose": "Close"
+    "sheetClose": "Close",
+    "polls": {
+      "new": "New poll",
+      "question": "Question",
+      "option": "Option {n}",
+      "remove": "Remove option {n}",
+      "addOption": "Add option",
+      "start": "Start poll",
+      "cancel": "Cancel",
+      "dup": "Options must be different",
+      "vote": "Vote",
+      "change": "Change vote",
+      "close": "Close poll",
+      "closed": "Closed",
+      "mine": "Your choice",
+      "result": "{pct}% ({n} votes)",
+      "total": "{n} votes in total",
+      "empty": "No polls yet.",
+      "loading": "Loading…",
+      "labOnly": "Polls are available in seminar rooms only.",
+      "started": "A new poll has started",
+      "goVote": "Vote"
+    },
+    "qna": {
+      "sort": "Sort",
+      "by": {
+        "top": "Top",
+        "new": "Newest"
+      },
+      "rcm": "Upvote ({n})",
+      "answered": "Answered",
+      "answer": "Mark answered",
+      "unanswer": "Unmark answered",
+      "hide": "Hide",
+      "doneN": "{n} answered",
+      "backOpen": "Unanswered questions",
+      "empty": "No questions yet.",
+      "emptyDone": "No answered questions.",
+      "loading": "Loading…",
+      "input": "Ask a question (500 chars)",
+      "send": "Send",
+      "labOnly": "Q&A is available in seminar rooms only."
+    }
   },
   "list": {
     "tabsLabel": "Seminar list view",
@@ -460,7 +505,8 @@
       "mailApp": "Send with default mail app",
       "mailSubject": "[Seminar invite] {title}",
       "mailBody": "{title}\nWhen: {start}\n\nJoin directly with this link.\n{url}"
-    }
+    },
+    "attendance": "Attendance"
   },
   "host": {
     "title": "Host a seminar",
@@ -472,7 +518,27 @@
     "feeHint": "0 = free, up to 7 decimals",
     "submit": "Create",
     "submitting": "Creating…",
-    "invalid": "Check your input — title, a time within the next year, capacity 1–100, fee 0 or more (up to 7 decimals)."
+    "invalid": "Check your input — title, a time within the next year, capacity 1–100, fee 0 or more (up to 7 decimals).",
+    "attendance": {
+      "title": "Attendance",
+      "back": "Back to seminar",
+      "loading": "Loading…",
+      "forbidden": "Only the host and admins can view attendance.",
+      "count": "{n} people",
+      "csv": "Download CSV",
+      "empty": "No one has joined yet.",
+      "online": "Online",
+      "left": "Left",
+      "col": {
+        "name": "Name",
+        "pi": "Pi username",
+        "ent": "Joined",
+        "hb": "Last seen",
+        "dur": "Time attended",
+        "min": "Attended (min)",
+        "state": "Status"
+      }
+    }
   },
   "privacy": {
     "title": "Privacy Policy — Voice and AI features",
