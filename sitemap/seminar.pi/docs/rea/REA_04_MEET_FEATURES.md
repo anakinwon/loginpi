@@ -172,7 +172,7 @@
 
 | # | 내용 | 담당 |
 |---|---|---|
-| 1 | ~~**MediaPipe 모델 파일 미커밋으로 `pnpm build`(Vercel 포함) 실패**~~ **해결(`9ca1b26c`)** — `scripts/copy-mediapipe.mjs` 머리 주석의 curl 1줄로 `public/mediapipe/models/selfie_segmenter_landscape.tflite`(약 250KB, Apache-2.0)를 받아 커밋해야 배포된다. 이번 실행은 다운로드가 권한 정책에 거부됨 | [확인중 : 마스터] |
+| 1 | ~~**MediaPipe 모델 파일 미커밋으로 `pnpm build`(Vercel 포함) 실패**~~ **해결(`9ca1b26c`)** — `public/mediapipe/models/selfie_segmenter_landscape.tflite`(약 250KB, Apache-2.0) 커밋 | — |
 | 2 | Jitsi 지연 로드 자산(워클릿·wasm·모델)의 배포본 크기·sha256 — 다운로드 거부로 미확인 | [확인중 : 권한 허용 시] |
 | 3 | RNNoise BSD-3-Clause·Selfie Segmentation 모델 카드 원문 대조 | [확인중 : 라이선스 원문] |
 | 4 | 효과 전환 때 재협상 없음·숨은 탭 워커 타이머 30fps 유지 — 정적 읽기만 | [확인중 : 통합 QA] |

@@ -112,7 +112,7 @@ export const FEATURES: Feature[] = [
   },
   { id: 'F08', prio: 'P1', steps: [{ id: 'shareLinks', status: 'doing', note: 'QA ✓ · device …' }] },
   { id: 'F09', prio: 'P2', steps: [{ id: 'noiseLight', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · device …' }] },
-  { id: 'F10', prio: 'P1', steps: [{ id: 'liveCaptions', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · device …' }] },
+  { id: 'F10', prio: 'P1', steps: [{ id: 'liveCaptions', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · engine … · key … · device …' }] },
   { id: 'F11', prio: 'P1', steps: [{ id: 'pollQnaAttend', status: 'doing', ref: ['Jitsi'], note: 'DB ✓ · QA ✓ · device …' }] },
   {
     id: 'F12',
@@ -122,8 +122,8 @@ export const FEATURES: Feature[] = [
   { id: 'F13', prio: 'P1', steps: [{ id: 'localRecording', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · device …' }] },
   { id: 'F14', prio: 'P1', steps: [{ id: 'aiNotes', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · key … · device …' }] },
   { id: 'F15', prio: 'P2', steps: [{ id: 'inPersonNotes', status: 'doing', note: 'QA ✓ · key … · device …' }] },
-  { id: 'F16', prio: 'P2', steps: [{ id: 'captionTranslate', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · device …' }] },
-  { id: 'F17', prio: 'P2', steps: [{ id: 'dubbing', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · device …' }] },
+  { id: 'F16', prio: 'P2', steps: [{ id: 'captionTranslate', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · engine … · key … · device …' }] },
+  { id: 'F17', prio: 'P2', steps: [{ id: 'dubbing', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · engine … · key … · device …' }] },
 ]
 
 // 기능의 참조 모델 = 단계 참조의 합(첫 등장 순)
