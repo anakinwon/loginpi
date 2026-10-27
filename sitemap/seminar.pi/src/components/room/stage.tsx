@@ -5,15 +5,7 @@ import { useEffect, useRef, useState, type RefObject } from 'react'
 import { useTranslations } from 'next-intl'
 import { remoteVolume, useStore } from './extensions'
 import { useLayerWatch } from './layer-watch'
-import {
-  followKey,
-  groupTracks,
-  nextPin,
-  ringFor,
-  type Layer,
-  type PinState,
-  type RoomLayout,
-} from './room-rules'
+import { followKey, groupTracks, nextPin, ringFor, type Layer, type PinState, type RoomLayout } from './room-rules'
 import type { Peer, RemoteTrack, RoomState, SessionRole } from './use-room'
 import { VideoTile } from './video-tile'
 
@@ -55,10 +47,7 @@ export function StreamVideo({
 
 // 원격 소리 재생 — 거부되면 1초 간격 3회 재시도 후 blocked(하단 바 "소리 켜기" 노출). Jitsi AudioTrack 재시도 방식(설계서 14.5)
 // stream 이 null(오류·끊김·나가기·발행자 퇴장)이면 srcObject 를 비우고 멈춘다 — 이전 소리가 계속 나지 않게
-export function useRemoteAudio(
-  ref: RefObject<HTMLAudioElement | null>,
-  stream: MediaStream | null,
-) {
+export function useRemoteAudio(ref: RefObject<HTMLAudioElement | null>, stream: MediaStream | null) {
   const [blocked, setBlocked] = useState(false)
   // 더빙 덕킹(extensions remoteVolume) — iOS WebKit 은 volume 이 읽기 전용이라 원음이 그대로 [확인중 : 실기기]
   const volume = useStore(remoteVolume)
@@ -81,8 +70,7 @@ export function useRemoteAudio(
       el.play().then(
         () => setBlocked(false),
         () => {
-          if (++tries < PLAY_RETRY_MAX)
-            timer = setTimeout(attempt, PLAY_RETRY_MS)
+          if (++tries < PLAY_RETRY_MAX) timer = setTimeout(attempt, PLAY_RETRY_MS)
           else setBlocked(true)
         },
       )
@@ -99,12 +87,7 @@ export function useRemoteAudio(
 
 // 진행 표시 — reduced-motion 이면 globals.css 가 회전을 멈춘다
 export function Spinner() {
-  return (
-    <span
-      aria-hidden
-      className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-    />
-  )
+  return <span aria-hidden className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
 }
 
 type Tile = {
@@ -134,10 +117,7 @@ function buildTiles({
   localOn,
 }: StageProps & { t: ReturnType<typeof useTranslations<'room'>> }): Tile[] {
   const out: Tile[] = []
-  if (
-    viewer === 'presenter' ||
-    (viewer === 'panel' && local?.getTracks().length)
-  ) {
+  if (viewer === 'presenter' || (viewer === 'panel' && local?.getTracks().length)) {
     out.push({
       key: `cam:${selfId || 'self'}`,
       name: t('tile.self', { name: selfName }),
@@ -235,18 +215,12 @@ export function Stage(props: StageProps) {
   const follow = followKey(props.layout, props.viewer)
   const [own, setOwn] = useState(false)
   useEffect(() => setOwn(false), [props.layout])
-  const forced =
-    !own && follow ? tiles.find((x) => x.key === follow) : undefined
+  const forced = !own && follow ? tiles.find((x) => x.key === follow) : undefined
 
   const live = props.state === 'joined' || props.state === 'reconnecting'
   const main =
-    forced ??
-    tiles.find((x) => x.key === pin.pin) ??
-    tiles.find((x) => x.presenter && !x.screen) ??
-    tiles[0] ??
-    null
-  const ring = (x: Tile | null) =>
-    ringFor(x?.peerId, props.speaker, props.engineSpeaker)
+    forced ?? tiles.find((x) => x.key === pin.pin) ?? tiles.find((x) => x.presenter && !x.screen) ?? tiles[0] ?? null
+  const ring = (x: Tile | null) => ringFor(x?.peerId, props.speaker, props.engineSpeaker)
   const rest = tiles.filter((x) => x !== main)
   const notice = !live ? t('state.connecting') : !main ? t('waiting') : null
   const { box, full, toggle } = useFullscreen()
@@ -277,7 +251,9 @@ export function Stage(props: StageProps) {
         onDoubleClick={toggle}
         title={t('tile.fullscreen')}
         className={
-          full ? 'relative w-full max-w-[calc(100dvh*16/9)]' : undefined
+          full
+            ? 'relative w-full max-w-[calc(100dvh*16/9)]'
+            : undefined
         }
       >
         <VideoTile
@@ -298,10 +274,7 @@ export function Stage(props: StageProps) {
             </p>
           )}
           {props.state === 'reconnecting' && (
-            <div
-              className="absolute inset-0 grid place-items-center bg-black/40"
-              aria-hidden
-            >
+            <div className="absolute inset-0 grid place-items-center bg-black/40" aria-hidden>
               <Spinner />
             </div>
           )}
@@ -351,8 +324,7 @@ function useFullscreen() {
   const [api, setApi] = useState(false)
   const [css, setCss] = useState(false)
   useEffect(() => {
-    const on = () =>
-      setApi(!!box.current && document.fullscreenElement === box.current)
+    const on = () => setApi(!!box.current && document.fullscreenElement === box.current)
     document.addEventListener('fullscreenchange', on)
     return () => document.removeEventListener('fullscreenchange', on)
   }, [])
@@ -365,12 +337,10 @@ function useFullscreen() {
     return () => window.removeEventListener('keydown', key)
   }, [css])
   const toggle = () => {
-    if (document.fullscreenElement)
-      return void document.exitFullscreen().catch(() => {})
+    if (document.fullscreenElement) return void document.exitFullscreen().catch(() => {})
     if (css) return setCss(false)
     const el = box.current
-    if (el && document.fullscreenEnabled && el.requestFullscreen)
-      el.requestFullscreen().catch(() => setCss(true))
+    if (el && document.fullscreenEnabled && el.requestFullscreen) el.requestFullscreen().catch(() => setCss(true))
     else setCss(true)
   }
   return {
