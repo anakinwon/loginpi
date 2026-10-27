@@ -41,6 +41,14 @@ export const apiError = createApiError({
   PAY_INVALID_STATE: '결제를 처리할 수 없는 상태입니다',
   PAY_PI_CANCEL_REFUSED:
     '결제가 이미 진행 중이라 취소할 수 없습니다. 잠시 후 다시 확인하세요',
+  // 음성 처리(sql/008 fn_use_smn_vc 결과, src/lib/speech-rules.ts 매핑) — UI 문구에 외부 AI 상표 금지
+  AI_UNAVAILABLE: 'AI 기능을 지금 쓸 수 없습니다',
+  SPEECH_CHUNK_INVALID: '음성 조각 형식이 올바르지 않습니다',
+  SPEECH_NOT_LIVE: '진행 중인 세미나가 아닙니다',
+  SPEECH_NO_AGR: '음성 처리 동의가 필요합니다',
+  SPEECH_RATE: '음성 요청이 너무 잦습니다. 잠시 후 다시 시도하세요',
+  SPEECH_QUOTA: '이 세미나의 음성 처리 시간이 모두 소진되었습니다',
+  SPEECH_FAILED: '음성을 글로 바꾸지 못했습니다',
 })
 
 export const db = () => getSupabaseAdmin()

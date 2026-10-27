@@ -75,7 +75,14 @@
     "LINK_ALREADY_LINKED": "This account is already linked.",
     "LINK_CODE_GEN_FAILED": "Could not create a link code. Please try again later.",
     "AUTH_DB_UNAVAILABLE": "Could not save your account, so sign-in failed. Please try again later.",
-    "LINK_TRY_LIMIT": "Too many incorrect link codes. Try again in 15 minutes."
+    "LINK_TRY_LIMIT": "Too many incorrect link codes. Try again in 15 minutes.",
+    "AI_UNAVAILABLE": "AI features are not available right now",
+    "SPEECH_CHUNK_INVALID": "The audio chunk format is invalid",
+    "SPEECH_NOT_LIVE": "This seminar is not live",
+    "SPEECH_NO_AGR": "Consent to voice processing is required",
+    "SPEECH_RATE": "Too many voice requests. Please try again shortly",
+    "SPEECH_QUOTA": "Voice processing time for this seminar is used up",
+    "SPEECH_FAILED": "Could not convert speech to text"
   },
   "progress": {
     "title": "Build progress",
@@ -426,5 +433,59 @@
     "submit": "Create",
     "submitting": "Creating…",
     "invalid": "Check your input — title, a time within the next year, capacity 1–100, fee 0 or more (up to 7 decimals)."
+  },
+  "privacy": {
+    "title": "Privacy Policy — Voice and AI features",
+    "effective": "Effective {date}",
+    "intro": "This policy explains the personal information we process when you use live captions, translated captions, voice translation, AI meeting notes and in-person notes in a seminar. These features use an external AI service, so the information is transferred abroad.",
+    "whoTitle": "Whose information is processed",
+    "who": [
+      "Presenters and participants on stage: we ask for your consent once, before you first turn on your microphone. You can join the seminar without consenting.",
+      "Audience: you do not use a microphone, so no voice is sent. You only see captions and notes.",
+      "In-person notes: an admin records a meeting with a microphone and confirms that attendees were informed before recording."
+    ],
+    "xferTitle": "Transfer of personal information abroad (Korean Personal Information Protection Act, Art. 28-8)",
+    "xfer": [
+      {
+        "k": "Recipient",
+        "v": "Google LLC (Gemini API) — contact [TBD: Google privacy contact]"
+      },
+      {
+        "k": "Countries",
+        "v": "United States and other countries where Google data centers are located [TBD: processing region]"
+      },
+      {
+        "k": "When and how",
+        "v": "About every 5 seconds while a feature is on, over an encrypted connection (HTTPS)."
+      },
+      {
+        "k": "Items",
+        "v": "Voice, spoken content (text), speaker display name (for note summaries), screen-share screenshots (when AI notes are on)"
+      },
+      {
+        "k": "Purpose",
+        "v": "Speech to text, translation, meeting-note summaries, synthetic speech (standard voices, no voice cloning)"
+      },
+      {
+        "k": "Retention",
+        "v": "Ends as soon as the result is returned. We ask Google not to store requests (store=false). Abuse-monitoring logs may still be kept under Google’s terms [TBD: retention period and paid-tier status]."
+      },
+      {
+        "k": "How to refuse, and what happens",
+        "v": "If you do not consent or turn off your microphone, no voice is sent. You can still take part in the seminar; only captions, translations and notes of your own speech are not created. You can withdraw consent at any time [TBD: where the withdraw button is]."
+      }
+    ],
+    "keepTitle": "What this service keeps",
+    "keep": [
+      "Original audio: not stored. It is discarded right after conversion to text.",
+      "Live captions: not stored.",
+      "AI meeting notes (when the presenter turns them on): spoken content, screenshots and the summary, kept until the notes are deleted [TBD: maximum retention].",
+      "Consent records: the time of consent and the policy version, kept as proof [TBD: retention period].",
+      "Usage: per-minute request counts and processing time, used to enforce cost limits."
+    ],
+    "recTitle": "Recording",
+    "rec": "Recordings are saved only as a file on the presenter’s device. They are not uploaded to our servers or transferred abroad. While recording or AI notes are on, every participant sees an indicator.",
+    "rightsTitle": "Your rights",
+    "rights": "You can ask to access, correct, delete or stop the processing of your information. Contact: [TBD: privacy officer name and contact]"
   }
 }

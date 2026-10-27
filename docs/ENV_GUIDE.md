@@ -114,7 +114,8 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | 키 | 구하는 곳 |
 |---|---|
 | `ANTHROPIC_API_KEY` | https://console.anthropic.com/settings/keys |
-| `GEMINI_API_KEY` | https://aistudio.google.com/apikey |
+| `GEMINI_API_KEY` | https://aistudio.google.com/apikey (cafe.pi·seminar.pi — seminar.pi 는 서버 전용, 미설정 = AI 자막·회의록 숨김) |
+| `SPEECH_MAX_MIN` (seminar.pi) | 값 직접 지정(분, 기본 120) — 세미나(또는 대면 노트) 1건당 음성 처리 상한. 비밀 아님 |
 | `GITHUB_TOKEN` · `GITHUB_DEPLOY_TOKEN` | https://github.com/settings/tokens (repo 범위) |
 | `TELEGRAM_BOT_TOKEN` · `TELEGRAM_BOT_USERNAME` | Telegram 앱 → `@BotFather` → `/newbot`. `TELEGRAM_WEBHOOK_SECRET`은 3.1처럼 직접 만든다 |
 | `RESEND_API_KEY` · `RESEND_FROM_EMAIL` | https://resend.com/api-keys (발신 도메인 인증 필요) |
@@ -151,4 +152,5 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | 2026-10-25 | `GOOGLE_CLIENT_ID` 등 모든 환경값을 어느 사이트·메뉴에서 얻나 | 3절(상세) + 각 앱 `.env.local` 상단 '환경값을 얻는 곳' 블록(생성기 자동 포함, 기존 파일은 `node scripts/tenant-env.mjs header --port <포트> --name <이름>` 출력을 붙임) |
 | 2026-10-25 | seminar.pi `MEDIA_TOKEN_SECRET` 은 어디서 구하나 | 사이트 없음 — 직접 만드는 입장권 서명 키(3.1). **앱과 엔진이 같은 값**: 로컬 = `.env.local`, 운영 = `.env.vercel-prod` 값을 Vercel(Production)과 엔진 PC `C:galapagosun-engine.cmd` 에 넣는다(`media/docs/HOME_NODE_GUIDE.md`) |
 | 2026-10-26 | seminar.pi TURN 키(`CLOUDFLARE_TURN_*`·`TURN_HOST`·`TURN_SECRET`·`TURN_CREDENTIAL_TTL`)는 어디서 구하나 | 3.6 표. 전부 선택 — 없으면 `/api/media/turn` 이 STUN 만 준다. 이름은 cafe.pi 와 같다(같은 Cloudflare 키를 써도 되나 사용량이 합산됨) |
+| 2026-10-27 | seminar.pi `GEMINI_API_KEY`·`SPEECH_MAX_MIN` 은 어디서 구하나 | 3.6 표. 키는 기존 발급 키 그대로(계정 단위, 사용량 합산), 상한은 직접 정하는 값 |
 | 이전 | `CRON_SECRET`이 뭔가 | Vercel 크론이 `Authorization: Bearer` 헤더로 보내는 비밀값이다. 직접 만들고 앱마다 따로 쓴다 → 3.1 |

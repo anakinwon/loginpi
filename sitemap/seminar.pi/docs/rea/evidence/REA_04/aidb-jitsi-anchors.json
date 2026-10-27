@@ -1,0 +1,294 @@
+{
+ "files": {
+  "app": {
+   "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57",
+   "bytes": 3658821
+  },
+  "ljm": {
+   "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6",
+   "bytes": 1145590
+  },
+  "config": {
+   "sha256": "7be2429eb5b0b08208b342bbb4d68c47c2372b3e507bd6fa15ae59a038f0216c",
+   "bytes": 9431
+  }
+ },
+ "summary": {
+  "q1_transcription_payload": [
+   "app:transcription-result=1",
+   "app:is_interim=5",
+   "app:stability=2",
+   "app:message_id=1",
+   "app:translation-result=1"
+  ],
+  "q2_consent": [
+   "app:requireConsent=1",
+   "config:requireConsent=1",
+   "app:consentDialog=0",
+   "app:suggestRecording=8"
+  ],
+  "q3_polls_vote": [
+   "app:changeVote=4",
+   "app:answer-poll=0",
+   "ljm:answer-poll=1"
+  ],
+  "q4_attendance": [
+   "app:speakerStats=83",
+   "app:joinTime=0",
+   "ljm:speakerstats=3"
+  ],
+  "q5_client_audio_upload": [
+   "app:MediaRecorder=2",
+   "app:audio/webm=1"
+  ]
+ },
+ "anchors": {
+  "q1_transcription_payload": [
+   {
+    "file": "app",
+    "needle": "transcription-result",
+    "note": "자막 결과 endpoint 메시지 타입",
+    "count": 1,
+    "hits": [
+     {
+      "offset": 2889329,
+      "context": " 0!==i?i:0;Math.abs(a+r.value-s)<1e3?t({type:xce,boundary:null}):o||t({type:xce,boundary:null!=s?s:0});break}}return e(r)}}));const Zce=Y(\"app:subtitles\"),Qce=\"transcription-result\",Xce=\"translation-result\",eue=\"translation_language\";function tue(e){return e.replace(/[-_A-Z].*/,\"\")}function nue(e,t,n){var r,i;let o=e.dispatch,a=e.getState"
+     }
+    ]
+   },
+   {
+    "file": "app",
+    "needle": "is_interim",
+    "note": "중간 결과 표시",
+    "count": 5,
+    "hits": [
+     {
+      "offset": 2892062,
+      "context": "language,interim:!1,isTranscription:!1,timestamp:v,id:p})),t(n);l.language===w&&(C={clearTimeOut:void 0,final:r,participant:g})}else if(l.type===Qce){const e=l.is_interim;if(!Array.isArray(l.transcript)||!l.transcript[0])return t(n);const r=l.transcript[0].text,i=`${_}${r}`;if(!e||!k){const e={};if(l.is_interim?l.stability>.85?e"
+     },
+     {
+      "offset": 2892204,
+      "context": "===Qce){const e=l.is_interim;if(!Array.isArray(l.transcript)||!l.transcript[0])return t(n);const r=l.transcript[0].text,i=`${_}${r}`;if(!e||!k){const e={};if(l.is_interim?l.stability>.85?e.stable=r:e.unstable=r:e.final=r,((e,t,n,r)=>{APP.API.notifyTranscriptionChunkReceived({messageID:e,language:t,participant:n,...r})})(p,l.lang"
+     },
+     {
+      "offset": 2892422,
+      "context": "=r,((e,t,n,r)=>{APP.API.notifyTranscriptionChunkReceived({messageID:e,language:t,participant:n,...r})})(p,l.language,g,e),\"ReactNative\"!==navigator.product&&!l.is_interim&&E)try{let e=document.body.getElementsByTagName(\"transcript\")[0];e||(e=document.createElement(\"transcript\"),document.body.appendChild(e)),e.append(`${new Date("
+     }
+    ]
+   },
+   {
+    "file": "app",
+    "needle": "stability",
+    "note": "안정도",
+    "count": 2,
+    "hits": [
+     {
+      "offset": 2892217,
+      "context": " e=l.is_interim;if(!Array.isArray(l.transcript)||!l.transcript[0])return t(n);const r=l.transcript[0].text,i=`${_}${r}`;if(!e||!k){const e={};if(l.is_interim?l.stability>.85?e.stable=r:e.unstable=r:e.final=r,((e,t,n,r)=>{APP.API.notifyTranscriptionChunkReceived({messageID:e,language:t,participant:n,...r})})(p,l.language,g,e),\"R"
+     },
+     {
+      "offset": 2893136,
+      "context": "s_interim&&k)return t(n);const m=u[\"features/subtitles\"]._transcriptMessages.get(p);C={clearTimeOut:null==m?void 0:m.clearTimeOut,participant:g},l.is_interim?l.stability>.85?C.stable=i:C.unstable=i:C.final=i}if(C){if(C.final){var T;const e=null===(T=u[\"features/subtitles\"]._cachedTranscriptMessages)||void 0===T?void 0:T.get(p);"
+     }
+    ]
+   },
+   {
+    "file": "app",
+    "needle": "message_id",
+    "note": "메시지 식별자",
+    "count": 1,
+    "hits": [
+     {
+      "offset": 2891138,
+      "context": "id)return t(n);l=n.json}if(![Qce,Xce].includes(null===(r=l)||void 0===r?void 0:r.type))return t(n);const c=e.dispatch,u=(0,e.getState)(),d=VV(e.getState()),p=l.message_id,f=null!==(i=l.participant)&&void 0!==i?i:{},h=f.name,m=f.id,g={avatarUrl:f.avatar_url,id:m,name:h},v=l.timestamp,b=g.id,y=l.speaker;let _=\"\";if(null===(o=u[\"fe"
+     }
+    ]
+   },
+   {
+    "file": "app",
+    "needle": "translation-result",
+    "note": "번역 결과 메시지",
+    "count": 1,
+    "hits": [
+     {
+      "offset": 2889356,
+      "context": "ue-s)<1e3?t({type:xce,boundary:null}):o||t({type:xce,boundary:null!=s?s:0});break}}return e(r)}}));const Zce=Y(\"app:subtitles\"),Qce=\"transcription-result\",Xce=\"translation-result\",eue=\"translation_language\";function tue(e){return e.replace(/[-_A-Z].*/,\"\")}function nue(e,t,n){var r,i;let o=e.dispatch,a=e.getState,s=arguments.length>3&&vo"
+     }
+    ]
+   }
+  ],
+  "q2_consent": [
+   {
+    "file": "app",
+    "needle": "requireConsent",
+    "note": "녹화 동의 요구 설정",
+    "count": 1,
+    "hits": [
+     {
+      "offset": 2865922,
+      "context": "},a=o.requireRecordingConsent,s=o.skipRecordingConsentInMeeting,l=(t[\"features/base/conference\"]||{}).conference,c=t[\"features/base/config\"].recordings||{},u=c.requireConsent,d=c.skipConsentInMeeting,p=S8(t),f=t[\"features/base/config\"],h=f.iAmRecorder,m=f.testing,g=(void 0===m?{}:m).showSpotConsentDialog,v=void 0!==g&&g,b=t[\"feature"
+     }
+    ]
+   },
+   {
+    "file": "config",
+    "needle": "requireConsent",
+    "note": "배포 config 값",
+    "count": 1,
+    "hits": [
+     {
+      "offset": 5377,
+      "context": "dTranscribing: true,\n        renderTranscriptDetails: false    },\n    recordings: {\n        suggestRecording: false,\n        showPrejoinWarning: false,\n        requireConsent: false,\n                skipConsentInMeeting: false    },\n    liveStreaming: {\n        enabled: true    },\n    recordingService: {\n        enabled: false,\n    "
+     }
+    ]
+   },
+   {
+    "file": "app",
+    "needle": "consentDialog",
+    "note": "동의 대화상자 키",
+    "count": 0,
+    "hits": []
+   },
+   {
+    "file": "app",
+    "needle": "suggestRecording",
+    "note": "녹화 제안",
+    "count": 8,
+    "hits": [
+     {
+      "offset": 1432403,
+      "context": "try using one of the <a href=\\'{{recommendedBrowserPageLink}}\\' target=\\'_blank\\'>fully supported browsers</a>.\",\"suboptimalExperienceTitle\":\"Browser Warning\",\"suggestRecordingAction\":\"Start\",\"suggestRecordingDescription\":\"Would you like to start a recording?\",\"suggestRecordingTitle\":\"Record this meeting\",\"unlinkFromSalesforceError\":\""
+     },
+     {
+      "offset": 1432436,
+      "context": "recommendedBrowserPageLink}}\\' target=\\'_blank\\'>fully supported browsers</a>.\",\"suboptimalExperienceTitle\":\"Browser Warning\",\"suggestRecordingAction\":\"Start\",\"suggestRecordingDescription\":\"Would you like to start a recording?\",\"suggestRecordingTitle\":\"Record this meeting\",\"unlinkFromSalesforceError\":\"Failed to unlink from Salesforce\""
+     },
+     {
+      "offset": 1432505,
+      "context": "sers</a>.\",\"suboptimalExperienceTitle\":\"Browser Warning\",\"suggestRecordingAction\":\"Start\",\"suggestRecordingDescription\":\"Would you like to start a recording?\",\"suggestRecordingTitle\":\"Record this meeting\",\"unlinkFromSalesforceError\":\"Failed to unlink from Salesforce\",\"unlinkFromSalesforceSuccess\":\"Unlinked from Salesforce\",\"unmute\":\"U"
+     }
+    ]
+   }
+  ],
+  "q3_polls_vote": [
+   {
+    "file": "app",
+    "needle": "changeVote",
+    "note": "투표 변경",
+    "count": 4,
+    "hits": [
+     {
+      "offset": 1436093,
+      "context": "{\"notUniqueOption\":\"Options must be unique\"},\"notification\":{\"description\":\"Open polls tab to vote\",\"title\":\"A new poll was added to this meeting\"},\"results\":{\"changeVote\":\"Change vote\",\"empty\":\"There are no polls in the meeting yet.\",\"hideDetailedResults\":\"Hide details\",\"showDetailedResults\":\"Show details\",\"vote\":\"Vote\"}},\"powe"
+     },
+     {
+      "offset": 2973764,
+      "context": "a,voterCount:r}}))}),[r.answers,s]),d=pa(),p=(0,_o.useCallback)((()=>{d(tV(n,!0)),f4(ul(\"vote.changed\"))}),[d,n]),f=E_().t;return _o.createElement(e,{answers:u,changeVote:p,creatorName:i,haveVoted:null!==r.lastVote,pollId:n,question:r.question,showDetails:s,t:f,toggleIsDetailed:c})})((e=>{let t=e.answers,n=e.changeVote,r=e.creat"
+     },
+     {
+      "offset": 2973914,
+      "context": "answers:u,changeVote:p,creatorName:i,haveVoted:null!==r.lastVote,pollId:n,question:r.question,showDetails:s,t:f,toggleIsDetailed:c})})((e=>{let t=e.answers,n=e.changeVote,r=e.creatorName,i=e.haveVoted,o=e.pollId,a=e.showDetails,s=e.question,l=e.t,c=e.toggleIsDetailed;const u=gde().classes;return _o.createElement(\"div\",{className"
+     }
+    ]
+   },
+   {
+    "file": "app",
+    "needle": "answer-poll",
+    "note": "응답 명령",
+    "count": 0,
+    "hits": []
+   },
+   {
+    "file": "ljm",
+    "needle": "answer-poll",
+    "note": "응답 전송(lib)",
+    "count": 1,
+    "hits": [
+     {
+      "offset": 391171,
+      "context": "nnection.sendIQ(e,()=>{},e=>{jc(e,{membersToApprove:i,operation:\"lobby approve members\",roomJid:this.lobbyRoom,userJid:this.xmpp.connection.jid})})}}}const al=\"answer-poll\",dl=\"new-poll\";class cl{constructor(e){this._mainRoom=e,this._xmpp=e.xmpp,this._handleMessages=this._handleMessages.bind(this),this._mainRoom.xmpp.addListener("
+     }
+    ]
+   }
+  ],
+  "q4_attendance": [
+   {
+    "file": "app",
+    "needle": "speakerStats",
+    "note": "발언 통계",
+    "count": 83,
+    "hits": [
+     {
+      "offset": 1448952,
+      "context": "he dial in phone numbers for this meeting\\\\n{{dialInfoPageUrl}}\",\"mainText\":\"Click the following link to join the meeting:\\\\n{{roomUrl}}\"},\"speaker\":\"Speaker\",\"speakerStats\":{\"angry\":\"Angry\",\"disgusted\":\"Disgusted\",\"displayEmotions\":\"Display emotions\",\"fearful\":\"Fearful\",\"happy\":\"Happy\",\"hours\":\"{{count}}h\",\"labelTooltip\":\"Number "
+     },
+     {
+      "offset": 1449356,
+      "context": "l\":\"Neutral\",\"sad\":\"Sad\",\"search\":\"Search\",\"searchDescription\":\"Start typing to filter participants\",\"searchHint\":\"Search participants\",\"seconds\":\"{{count}}s\",\"speakerStats\":\"Participants Stats\",\"speakerTime\":\"Speaker Time\",\"surprised\":\"Surprised\",\"timelineEnd\":\"End\",\"timelineStart\":\"Start\"},\"startupoverlay\":{\"genericTitle\":\"The m"
+     },
+     {
+      "offset": 1452885,
+      "context": "eaudio\":\"Share audio\",\"sharedvideo\":\"Share video\",\"shortcuts\":\"Toggle shortcuts\",\"show\":\"Show on stage\",\"showWhiteboard\":\"Show whiteboard\",\"silence\":\"Silence\",\"speakerStats\":\"Toggle participants statistics\",\"stopScreenSharing\":\"Stop sharing your screen\",\"stopSharedVideo\":\"Stop video\",\"surprised\":\"Surprised\",\"tileView\":\"Toggle tile"
+     }
+    ]
+   },
+   {
+    "file": "app",
+    "needle": "joinTime",
+    "note": "참가 시각",
+    "count": 0,
+    "hits": []
+   },
+   {
+    "file": "ljm",
+    "needle": "speakerstats",
+    "note": "발언 통계 서버 메시지",
+    "count": 3,
+    "hits": [
+     {
+      "offset": 515539,
+      "context": "entsMsgs.push(e),!0;const i=Na(Ma(e,':scope>json-message[*|xmlns=\"http://jitsi.org/jitmeet\"]')),n=this.tryParseJSONAndVerify(i);return!n||\"object\"!=typeof n||(\"speakerstats\"===n[Mu]&&n.users?this.eventEmitter.emit(Ar.SPEAKER_STATS_RECEIVED,n.users):\"av_moderation\"===n[Mu]?this.eventEmitter.emit(Ar.AV_MODERATION_RECEIVED,n):\"breako"
+     },
+     {
+      "offset": 517161,
+      "context": "ceComponentAddress)),\"audio-translation\"===e.type&&(this.audioTranslationComponentAddress=e.name,this._components.push(this.audioTranslationComponentAddress)),\"speakerstats\"===e.type&&(this.speakerStatsComponentAddress=e.name,this._components.push(this.speakerStatsComponentAddress)),\"lobbyrooms\"===e.type){this.lobbySupported=!0;co"
+     },
+     {
+      "offset": 526495,
+      "context": "omise.resolve()}sendDominantSpeakerEvent(e,t){if(!this.speakerStatsComponentAddress||!e)return;const i=(0,Ni.$msg)({to:this.speakerStatsComponentAddress});i.c(\"speakerstats\",{room:e,silence:t,xmlns:\"http://jitsi.org/jitmeet\"}).up(),this.connection.send(i)}sendFaceLandmarksEvent(e,t){if(!this.speakerStatsComponentAddress||!e)return"
+     }
+    ]
+   }
+  ],
+  "q5_client_audio_upload": [
+   {
+    "file": "app",
+    "needle": "MediaRecorder",
+    "note": "MediaRecorder 사용처(녹화 외 용도 있는지)",
+    "count": 2,
+    "hits": [
+     {
+      "offset": 1856021,
+      "context": "ckToLocalRecording(n),this.stream=new MediaStream([...(null===(h=this.audioDestination)||void 0===h?void 0:h.stream.getAudioTracks())||[],e])}this.recorder=new MediaRecorder(this.stream,{audioBitrateMode:\"constant\",mimeType:this.mediaType,videoBitsPerSecond:25e5});let g=Promise.resolve();var v;this.recorder.addEventListener(\"dataav"
+     },
+     {
+      "offset": 1857614,
+      "context": ")=>p.isChromiumBased()&&!p.isElectron()&&!p.isReactNative()&&!go()&&Boolean(navigator.mediaDevices.setCaptureHandleConfig)&&void 0!==window.showSaveFilePicker&&MediaRecorder.isTypeSupported(UR),isRecordingLocally(){return Boolean(this.recorder)}};async function VR(e,t){const n=new Fx.Decoder,r=new Fx.Reader;r.logging=!1,r.drop_defa"
+     }
+    ]
+   },
+   {
+    "file": "app",
+    "needle": "audio/webm",
+    "note": "음성 webm 사용처",
+    "count": 1,
+    "hits": [
+     {
+      "offset": 1853522,
+      "context": "deo:!1},firstChunk:void 0,fileHandle:void 0,startTime:void 0,writableStream:void 0,get mediaType(){return this.selfRecording.on&&!this.selfRecording.withVideo?\"audio/webm;\":UR},initializeAudioMixer(){this.audioContext=new AudioContext,this.audioDestination=this.audioContext.createMediaStreamDestination()},mixAudioStream(e){var t"
+     }
+    ]
+   }
+  ]
+ }
+}
