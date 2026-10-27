@@ -3,16 +3,18 @@
 // S2 상세 '일정·공유' 줄(UI 설계 15.8, 계획 SA1) — [캘린더에 추가][일정 파일][메일로 초대] 3버튼 + 기본 메일 앱(mailto)·링크 복사 글자 링크.
 //  전부 일반 링크(OAuth 없음, M-2). 외부는 새 탭(noopener), .ics 는 공개 라우트라 세션 불필요. 링크 = 상세 딥링크(배포 주소)
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { calendarUrl, canCopy, copyText, mailtoUrl, webMailUrl } from '@/lib/calendar-rules'
 import { useStartText, type SeminarCard } from './shared'
 
+// min-h — 글자 확대(WCAG 1.4.4)·좁은 폭(360px)에서 두세 줄로 접혀도 칸이 늘어난다(고정 h-10 이면 글자가 칸 밖으로 넘침)
 const CELL =
-  'bg-surface-raised grid h-10 place-items-center rounded-lg px-2 text-center text-sm'
+  'bg-surface-raised grid min-h-10 place-items-center rounded-lg px-2 py-1 text-center text-sm'
 
 export function ShareLinks({ d }: { d: SeminarCard }) {
   const t = useTranslations('seminar.share')
   const start = useStartText()
+  const locale = useLocale()
   const [copied, setCopied] = useState<'ok' | 'fail' | null>(null)
   const base = (process.env.NEXT_PUBLIC_APP_URL || window.location.origin).replace(/\/$/, '')
   const url = `${base}/s/${d.id}`
@@ -27,7 +29,7 @@ export function ShareLinks({ d }: { d: SeminarCard }) {
         <a className={CELL} href={calendarUrl({ id: d.id, title: d.title, startAt: d.startAt, url })} {...ext}>
           {t('calendar')}
         </a>
-        <a className={CELL} href={`/api/seminars/${d.id}/ics`} download>
+        <a className={CELL} href={`/api/seminars/${d.id}/ics?hl=${locale.split('-')[0]}`} download>
           {t('ics')}
         </a>
         <a className={CELL} href={webMailUrl(subject, body)} {...ext}>

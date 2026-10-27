@@ -15,7 +15,12 @@ export interface CalEvent {
   notesUrl?: string | null // 회의록이 있으면 링크
   canceled?: boolean
   modAt?: string | null // 마지막 변경(smn_mst.mod_dtm) — .ics SEQUENCE·LAST-MODIFIED
+  notesLabel?: string // 설명의 회의록 라벨(언어별)
 }
+
+// .ics 설명의 회의록 라벨 — 공개 라우트라 세션 언어가 없어 화면이 ?hl= 로 넘긴다. 모르는 값 = 영어
+const NOTES_LABEL: Record<string, string> = { ko: '회의록', en: 'Notes' }
+export const icsNotesLabel = (hl?: string | null) => (hl && Object.hasOwn(NOTES_LABEL, hl) ? NOTES_LABEL[hl] : NOTES_LABEL.en)
 
 // 개정 번호(RFC 5545 3.8.7.4) — 같은 UID 를 다시 받을 때 캘린더 앱이 번호가 큰 쪽(시각 변경·취소)을 반영한다. 변경일시 초 단위라 늘기만 한다
 // ponytail: 초 단위 epoch, 2038 년에 int32 를 넘음 — 그 전에 개정 칼럼으로
@@ -129,14 +134,15 @@ export function buildIcs(e: CalEvent, now = new Date()) {
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:${e.id}@seminar.pi`,
+    // UID 는 소문자로 고정 — 대문자 UUID 주소로 받아도 같은 일정으로 갱신되게(다르면 캘린더에 일정이 둘 생김)
+    `UID:${e.id.toLowerCase()}@seminar.pi`,
     `DTSTAMP:${utcStamp(now)}`,
     `SEQUENCE:${icsSeq(e.modAt)}`,
     ...(icsSeq(e.modAt) ? [`LAST-MODIFIED:${utcStamp(new Date(e.modAt!))}`] : []),
     `DTSTART:${utcStamp(s)}`,
     `DTEND:${utcStamp(en)}`,
     `SUMMARY:${icsEscape(e.title)}`,
-    `DESCRIPTION:${icsEscape(describe(e))}`,
+    `DESCRIPTION:${icsEscape(describe(e, e.notesLabel))}`,
     `LOCATION:${icsEscape(e.url)}`,
     `URL:${stripCtl(e.url)}`,
     `STATUS:${e.canceled ? 'CANCELLED' : 'CONFIRMED'}`,
