@@ -48,6 +48,7 @@ async function resave() {
   }
   ;(await import('./recorder')).saveBlob(f, f.name)
 }
+let ctxNow: (() => RoomCtx) | null = null // 최신 ctx(Overlay 가 맞춘다) — 녹화기 오류 콜백이 클릭 때의 낡은 ctx 로 고지하지 않게
 let gen = 0 // 세대 — onReset(퇴장·끊김) 때 증가. startRec 의 await 사이에 바뀌면 시작하지 않는다
 
 // 종료 — 파일 저장 + 전원 알림. ctx 가 없으면(퇴장·끊김) 알림 없이 저장만(데이터 유실 방지)
@@ -100,10 +101,15 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
     // 기다리는 사이 퇴장·끊김(onReset)이면 시작하지 않고 알림을 되돌린다
     if (g !== gen) return void ctx.sendApp('state', { recording: false })
     try {
-      recorder = mod.startRecorder(stage, ac)
+      // 녹화 중 브라우저가 녹화를 멈추면(오류) 종료·저장·고지 해제 — 이 녹화기일 때만(다음 녹화를 끄지 않게)
+      const rec = mod.startRecorder(stage, ac, () => {
+        if (recorder === rec) void stopRec(ctxNow?.() ?? null)
+      })
+      recorder = rec
       started = true
     } catch {
-      void ctx.sendApp('state', { recording: false })
+      // 이미 '녹화 중'을 알렸으니 해제도 재시도 — 1회만 보내 한도에 걸리면 받는 쪽 배지가 녹화 없이 남는다(배지는 명시적 false 로만 내림)
+      void sendState(ctx, false, () => !recorder && !recOn.get())
       return ctx.notice('recording.unsupported')
     }
     if (ac.state !== 'running') ctx.notice('recording.audioSuspended')
@@ -198,6 +204,7 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const ctxRef = useRef(ctx)
   useEffect(() => {
     ctxRef.current = ctx
+    ctxNow = () => ctxRef.current
   })
   useEffect(() => {
     if (!mine) return
@@ -229,26 +236,31 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
           </div>,
           slot,
         )}
-      {canResave && !mine && (
-        <div
-          role="group"
-          aria-label={t('resave.label')}
-          className="bg-surface-raised absolute top-[calc(44px+env(safe-area-inset-top))] left-3 z-10 inline-flex max-w-[calc(100%-24px)] items-center gap-1 rounded-full py-1 pr-1 pl-3 text-[13px] shadow"
-        >
-          <span className="truncate">{t('resave.label')}</span>
-          <button type="button" onClick={() => void resave()} className="bg-danger h-8 shrink-0 rounded-full px-3 font-semibold text-white">
-            {t('resave.save')}
-          </button>
-          <button
-            type="button"
-            onClick={dropLast}
-            aria-label={t('resave.dismiss')}
-            className="hover:bg-surface h-8 w-8 shrink-0 rounded-full"
+      {/* 다시 저장 칩 — 토스트 줄(세로 쌓기)에 넣는다. 따로 absolute(top 44px)면 같은 순간 뜨는 '저장했어요' 토스트(top 48px)와 3초간 겹쳤다 */}
+      {canResave &&
+        !mine &&
+        toastSlot &&
+        createPortal(
+          <div
+            role="group"
+            aria-label={t('resave.label')}
+            className="bg-surface-raised pointer-events-auto inline-flex max-w-full items-center gap-1 rounded-full py-1 pr-1 pl-3 text-[13px] shadow"
           >
-            <span aria-hidden>×</span>
-          </button>
-        </div>
-      )}
+            <span className="truncate">{t('resave.label')}</span>
+            <button type="button" onClick={() => void resave()} className="bg-danger h-8 shrink-0 rounded-full px-3 font-semibold text-white">
+              {t('resave.save')}
+            </button>
+            <button
+              type="button"
+              onClick={dropLast}
+              aria-label={t('resave.dismiss')}
+              className="hover:bg-surface h-8 w-8 shrink-0 rounded-full"
+            >
+              <span aria-hidden>×</span>
+            </button>
+          </div>,
+          toastSlot,
+        )}
       {msg &&
         toastSlot &&
         createPortal(
