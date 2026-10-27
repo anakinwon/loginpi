@@ -40,6 +40,11 @@ export function tally(
   })
 }
 
+// 설문 카드가 투표 화면(라디오)인가 — 청중은 투표 전·[다시 투표] 중, 개최자·ADMIN 은 [투표]를 누른 때만.
+//  개최자는 평소 실시간 결과를 본다 — 결과를 보려고 직접 투표해 집계가 오염되던 결함(E2E r1, 야간 시험 T04 r2)
+export const pollVoting = (p: { open: boolean; mine: string | null; staff: boolean; change: boolean }) =>
+  p.open && (p.change || (!p.staff && !p.mine))
+
 // 출석 시간(초) — 첫 입장 ~ 마지막 하트비트. 시계가 거꾸로면 0
 // ponytail: 중간에 나갔다 온 공백도 포함(사용자당 1행 설계, sql/008), 구간별 합이 필요하면 입퇴장 로그 테이블로
 export function attendSec(ent: string | number | Date, hb: string | number | Date): number {
@@ -49,6 +54,10 @@ export function attendSec(ent: string | number | Date, hb: string | number | Dat
 
 // 하트비트를 멈출 응답 — 다시 보내도 같은 거절(유료 미등록 402·세미나 없음 404·종료 409). 401·429·5xx·네트워크는 다음 주기에 다시 시도
 export const beatStops = (status: number) => status === 402 || status === 404 || status === 409
+
+// 화면이 다시 보일 때 하트비트를 당겨 보낼까 — 모바일 백그라운드는 타이머를 늦춰 '나감'으로 보이다 늦게 돌아온다.
+//  마지막 전송 뒤 30초(간격 절반) 이상이면 바로 보낸다 — 탭을 빨리 껐다 켜도 요청이 몰리지 않게
+export const beatDue = (lastMs: number, now: number) => now - lastMs >= HB_MS / 2
 
 export const isOnline = (hb: string | number | Date, now: number) => now - new Date(hb).getTime() < ONLINE_MS
 

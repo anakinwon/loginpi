@@ -3,6 +3,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   attendSec,
+  beatDue,
   beatStops,
   cleanPoll,
   cleanQuestion,
@@ -10,6 +11,7 @@ import {
   fmtDur,
   isOnline,
   parseRefresh,
+  pollVoting,
   tally,
   toCsv,
 } from './engage-rules.ts'
@@ -77,4 +79,22 @@ test('refresh 신호 모양', () => {
 test('하트비트 중단 — 다시 보내도 같은 거절만', () => {
   for (const s of [402, 404, 409]) assert.equal(beatStops(s), true)
   for (const s of [0, 200, 401, 429, 500, 503]) assert.equal(beatStops(s), false)
+})
+
+test('설문 카드 투표 화면 — 개최자는 평소 실시간 결과, [투표]를 눌러야 라디오(E2E r1·T04 r2)', () => {
+  const v = (o) => pollVoting({ open: true, mine: null, staff: false, change: false, ...o })
+  assert.equal(v({}), true) // 청중 투표 전 = 라디오
+  assert.equal(v({ mine: 'o1' }), false) // 청중 투표 후 = 결과
+  assert.equal(v({ mine: 'o1', change: true }), true) // 다시 투표
+  assert.equal(v({ staff: true }), false) // 개최자 투표 전에도 결과(집계 오염 없이)
+  assert.equal(v({ staff: true, change: true }), true) // 개최자가 [투표]를 누름
+  assert.equal(v({ open: false }), false) // 마감 = 모두 결과
+  assert.equal(v({ open: false, change: true }), false)
+})
+
+test('출석 하트비트 당겨 보내기 — 마지막 전송 뒤 30초 이상만', () => {
+  assert.equal(beatDue(0, 1_000_000), true) // 아직 안 보냄
+  assert.equal(beatDue(1_000_000, 1_029_999), false) // 빠른 탭 전환 = 안 보냄
+  assert.equal(beatDue(1_000_000, 1_030_000), true)
+  assert.equal(beatDue(1_000_000, 1_000_000 + 5 * 60_000), true) // 백그라운드 5분 뒤 복귀
 })
