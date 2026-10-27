@@ -47,6 +47,10 @@ export const env = createEnv({
     TURN_SECRET: z.string().optional(),
     // 자격 증명 수명(초) — 기본 3600, 라우트가 60~86400 으로 제한
     TURN_CREDENTIAL_TTL: z.coerce.number().int().positive().optional(),
+    // 외부 AI(음성→글·번역·요약·합성 음성, 계획 M-1) 서버 키 — 미설정 = AI 기능 503 + 화면 숨김(src/lib/gemini.ts)
+    GEMINI_API_KEY: z.string().optional(),
+    // 세미나(또는 대면 노트) 1건당 음성 처리 상한(분) — 기본 120(src/lib/speech-rules.ts), 비용 폭주 차단(A-5)
+    SPEECH_MAX_MIN: z.coerce.number().int().min(1).max(1440).optional(),
   },
   client: {
     // 미디어 엔진 시그널링 WebSocket 주소(예 ws://localhost:7880/signal, 운영 wss://). 미설정 = 화상 기능 숨김
@@ -97,6 +101,8 @@ export const env = createEnv({
     TURN_HOST: process.env.TURN_HOST,
     TURN_SECRET: process.env.TURN_SECRET,
     TURN_CREDENTIAL_TTL: process.env.TURN_CREDENTIAL_TTL,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    SPEECH_MAX_MIN: process.env.SPEECH_MAX_MIN,
     NEXT_PUBLIC_MEDIA_WS_URL: process.env.NEXT_PUBLIC_MEDIA_WS_URL,
     NEXT_PUBLIC_GOOGLE_LOGIN: process.env.NEXT_PUBLIC_GOOGLE_LOGIN,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
