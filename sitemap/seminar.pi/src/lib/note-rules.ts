@@ -150,8 +150,10 @@ export function recAlert(s: {
   err: string | null
   limited: boolean
   micLost: boolean
-}): 'err' | 'micLost' | 'limited' | null {
+  gone?: boolean // 노트가 다른 곳에서 끝났거나 삭제됨 — 마이크 끊김보다 앞(다시 연결해도 소용없다)
+}): 'err' | 'gone' | 'micLost' | 'limited' | null {
   if (s.err) return 'err'
+  if (s.gone) return 'gone'
   if (s.micLost) return 'micLost'
   return s.limited ? 'limited' : null
 }
@@ -176,4 +178,35 @@ export function fenceTranscript(lines: readonly string[]) {
     l.replace(/<<</g, '‹‹‹').replace(/>>>/g, '›››'),
   )
   return `${TX_OPEN}\n${safe.join('\n')}\n${TX_CLOSE}`
+}
+
+// 화면 꺼짐 막기(대면 노트 기록 중, 기능 탐지) — again() = 탭 복귀 때 다시 요청, release() = 놓기.
+//  요청이 놓은 '뒤'에 끝나면 그 잠금을 바로 돌려준다 — 전에는 기록 화면을 떠난 뒤 늦게 온 잠금이 남아 다른 화면에서도
+//  탭을 바꿀 때까지 화면이 꺼지지 않았다(T02 r3). 새 잠금이 오면 앞 잠금은 놓는다(덮어써서 잃지 않게)
+type WakeSentinel = { release(): Promise<void> }
+export function holdWake(
+  nav: { wakeLock?: { request(type: 'screen'): Promise<WakeSentinel> } },
+  onFail: () => void,
+) {
+  let lock: WakeSentinel | null = null
+  let done = false
+  const drop = (l: WakeSentinel | null) => void l?.release().catch(() => {})
+  const again = () => {
+    if (done) return
+    if (!nav.wakeLock) return onFail()
+    nav.wakeLock.request('screen').then((l) => {
+      if (done) return drop(l)
+      drop(lock)
+      lock = l
+    }, onFail)
+  }
+  again()
+  return {
+    again,
+    release: () => {
+      done = true
+      drop(lock)
+      lock = null
+    },
+  }
 }
