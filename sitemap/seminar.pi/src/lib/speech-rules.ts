@@ -210,6 +210,9 @@ export const dubStale = (at: number, now: number) => now - at > DUB_STALE_MS
 export const DUB_FAIL_MAX = 3
 // 더빙을 켠 동안 원음 볼륨(설계서 15.4 — 20%)
 export const DUB_DUCK = 0.2
+// 원음 볼륨 — 더빙이 켜져 있고 방 자막이 돌 때만 줄인다. 방 자막이 꺼져 있으면(발표자가 아직 안 켬·끔·한도·발표자 퇴장) 더빙할 문장이 오지 않으니
+//  스위치는 켠 채로 원음 100%(야간 시험 r5 T09 — 켜 두면 아무 소리도 없이 원음만 20% 로 줄어 있었다). 방 자막이 다시 켜지면 그대로 이어진다
+export const dubVolume = (on: boolean, room: boolean) => (on && room ? DUB_DUCK : 1)
 
 // 한 번만 실행 — 재생 끝(onended·onerror·play() 거부)이 한 문장에 겹쳐 와도 다음 문장으로 1번만 넘어가게
 export function once<A extends unknown[]>(f: (...a: A) => void) {
