@@ -76,6 +76,7 @@ test('⑤ 외부 AI 를 부르는 라우트는 모두 speechGate 를 거치고, 
   // 회의록 요약(summarize)은 lib/notes 만 부르고, 요약 라우트는 manage(시작자·개최자·ADMIN) 확인
   const sum = srcFiles.filter((p) => /\bsummarize\(/.test(readFileSync(p, 'utf8')) && !rel(p).endsWith('lib/gemini.ts'))
   assert.deepEqual(sum.map(rel), ['src/lib/notes.ts'])
+  assert.match(read('src/app/api/notes/[id]/end/route.ts'), /if \(!n\.manage\) return apiError\('FORBIDDEN', 403\)/)
 })
 
 test('⑥ 녹화·AI 기록 배지·토스트는 공용 자리에 portal 로 붙는다 — 같은 absolute 좌표로 겹치지 않게(15.6)', () => {
@@ -92,5 +93,19 @@ test('⑥ 녹화·AI 기록 배지·토스트는 공용 자리에 portal 로 붙
   }
   // 무대 고정 해제 버튼은 배지 줄(좌상단)과 다른 자리
   assert.doesNotMatch(read('src/components/room/stage.tsx'), /absolute top-2 left-2/)
-  assert.match(read('src/app/api/notes/[id]/end/route.ts'), /if \(!n\.manage\) return apiError\('FORBIDDEN', 403\)/)
+})
+
+test('⑦ 부가 기능의 ⋯ 항목·탭 이름 키와 useTranslations 이름공간이 ko·en 모두 있다(빠지면 화면에 키가 그대로 보인다)', () => {
+  const feat = srcFiles.filter((p) => rel(p).startsWith('src/components/room/features/'))
+  const msgs = Object.fromEntries(['ko', 'en'].map((l) => [l, JSON.parse(read(`messages/${l}.json`))]))
+  const at = (o, path) => path.split('.').reduce((x, k) => (x && typeof x === 'object' ? x[k] : undefined), o)
+  const need = new Set()
+  for (const p of feat) {
+    const s = readFileSync(p, 'utf8')
+    for (const m of s.matchAll(/\blabel: '([\w.]+)'/g)) need.add(`room.${m[1]}`)
+    for (const m of s.matchAll(/useTranslations\('([\w.]+)'\)/g)) need.add(m[1])
+  }
+  assert.ok(need.size >= 10, `키 수집 실패 : ${need.size}`)
+  const miss = [...need].flatMap((k) => ['ko', 'en'].filter((l) => at(msgs[l], k) === undefined).map((l) => `${l}:${k}`))
+  assert.deepEqual(miss, [])
 })
