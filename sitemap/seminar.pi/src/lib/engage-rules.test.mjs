@@ -3,6 +3,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   attendSec,
+  beatStops,
   cleanPoll,
   cleanQuestion,
   csvCell,
@@ -71,4 +72,9 @@ test('refresh 신호 모양', () => {
   assert.equal(parseRefresh({ what: 'chat' }), null)
   assert.equal(parseRefresh('polls'), null)
   assert.equal(parseRefresh(null), null)
+})
+
+test('하트비트 중단 — 다시 보내도 같은 거절만', () => {
+  for (const s of [402, 404, 409]) assert.equal(beatStops(s), true)
+  for (const s of [0, 200, 401, 429, 500, 503]) assert.equal(beatStops(s), false)
 })
