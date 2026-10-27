@@ -598,6 +598,13 @@
     "pageOf": "{page} / {pages}"
   },
   "seminar": {
+    "subTitle": {
+      "label": "Subtitle",
+      "placeholder": "Add a subtitle — attendees see 'Island - Subtitle'",
+      "save": "Save subtitle",
+      "saving": "Saving…",
+      "saved": "Saved."
+    },
     "loading": "Loading…",
     "back": "Back to list",
     "notFound": "Seminar not found.",
@@ -663,6 +670,7 @@
     "title": "Host a seminar",
     "notAdmin": "Only admins can host seminars for now.",
     "name": "The seminar name is picked automatically from famous islands of the world.",
+    "subTitle": "Subtitle (optional, up to 60) — attendees see 'Island - Subtitle'",
     "startAt": "Start time",
     "maxCnt": "Capacity (1–100)",
     "fee": "Entry fee (Pi)",

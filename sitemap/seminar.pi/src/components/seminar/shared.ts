@@ -8,7 +8,9 @@ import { useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 
 export interface SeminarCard {
   id: string
-  title: string
+  title: string // 룸 이름(섬 이름 - 부제)
+  island: string
+  subTitle: string
   startAt: string
   maxCnt: number
   fee: number

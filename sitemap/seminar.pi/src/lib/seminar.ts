@@ -13,6 +13,7 @@ import {
   isUuid,
   OPEN_STS,
   payErrorCode,
+  smnTitle,
   STALE_LOOKUP_MAX,
   stalePayState,
 } from './seminar-rules'
@@ -25,11 +26,12 @@ export const payDb = () => db() as unknown as FlowInput['db']
 
 // 목록·상세 공용 칼럼(R-P3 쓰는 것만) — 개최자 이름은 FK 임베디드 조인(smn_mst_sys_user_id_fkey)
 export const SMN_COLS =
-  'smn_id, smn_nm, start_dtm, max_cnt, ent_pi_amt, smn_sts_cd, hst_usr_id, sys_user(display_name:dsp_nm, pi_username:pi_usr_nm)'
+  'smn_id, smn_nm, sub_ttl, start_dtm, max_cnt, ent_pi_amt, smn_sts_cd, hst_usr_id, sys_user(display_name:dsp_nm, pi_username:pi_usr_nm)'
 
 export interface SmnRow {
   smn_id: string
   smn_nm: string
+  sub_ttl: string | null
   start_dtm: string
   max_cnt: number
   ent_pi_amt: number | string
@@ -41,7 +43,9 @@ export interface SmnRow {
 // 응답용 — 개최자 표시명 평탄화(usr_id 는 본인 판정에만 쓰고 내보내지 않는다)
 export const toCard = (r: SmnRow) => ({
   id: r.smn_id,
-  title: r.smn_nm,
+  title: smnTitle(r.smn_nm, r.sub_ttl), // 표시용 룸 이름(섬 - 부제)
+  island: r.smn_nm,
+  subTitle: r.sub_ttl ?? '',
   startAt: r.start_dtm,
   maxCnt: r.max_cnt,
   fee: Number(r.ent_pi_amt),

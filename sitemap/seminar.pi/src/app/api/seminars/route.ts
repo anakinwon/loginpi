@@ -17,6 +17,8 @@ import {
 import { SMN_COLS, toCard, type SmnRow } from '@/lib/seminar'
 import {
   FEE_RE,
+  ONE_LINE_RE,
+  SUB_TTL_MAX,
   OPEN_STS,
   PAGE_SIZE,
   parsePage,
@@ -99,6 +101,7 @@ const createSchema = z.object({
     .refine((v) => startAtOk(Date.parse(v))),
   maxCnt: z.number().int().min(1).max(100),
   fee: z.coerce.string().trim().regex(FEE_RE),
+  subTitle: z.string().trim().max(SUB_TTL_MAX).regex(ONE_LINE_RE).optional(), // 부제(sql/012) — 나중에 상세에서도 수정
 })
 
 export const POST = withAuthGuard(
@@ -121,6 +124,11 @@ export const POST = withAuthGuard(
     if (error) return dbFail(error)
     const r = (data as { smn_id: string; smn_nm: string }[] | null)?.[0]
     if (!r) return apiError('ISLAND_FULL', 409) // 진행·예정 세미나가 섬 수(100)만큼 열려 있음
+    // 부제는 만든 뒤 1회 저장(앞 결과의 id 가 필요해 직렬). 실패해도 세미나는 이미 열렸으니 상세에서 다시 저장하면 된다
+    if (body.subTitle) {
+      const { error: subErr } = await db().from('smn_mst').update({ sub_ttl: body.subTitle }).eq('smn_id', r.smn_id)
+      if (subErr) console.error('[seminars] 부제 저장 실패', subErr.code)
+    }
     return NextResponse.json(
       { id: r.smn_id, name: r.smn_nm },
       { status: 201, headers: { 'Cache-Control': NO_STORE } },

@@ -6,7 +6,7 @@ import { setRequestLocale } from 'next-intl/server'
 import { getSupabaseAdmin, resolveDbConfig } from '@pi/db'
 import { RoomView } from '@/components/room/room-view'
 import { env } from '@/env'
-import { isUuid } from '@/lib/seminar-rules'
+import { isUuid, smnTitle } from '@/lib/seminar-rules'
 
 const ROOM_RE = /^[A-Za-z0-9_-]{1,64}$/
 
@@ -16,12 +16,12 @@ async function seminarTitle(id: string) {
   if (!url || !key) return null
   const { data, error } = await getSupabaseAdmin()
     .from('smn_mst')
-    .select('smn_nm')
+    .select('smn_nm, sub_ttl')
     .eq('smn_id', id)
     .eq('del_yn', 'N')
-    .maybeSingle<{ smn_nm: string }>()
+    .maybeSingle<{ smn_nm: string; sub_ttl: string | null }>()
   if (error) return null
-  return data ? data.smn_nm : undefined // undefined = 없는 세미나 → 404
+  return data ? smnTitle(data.smn_nm, data.sub_ttl) : undefined // undefined = 없는 세미나 → 404
 }
 
 export default async function JoinPage({ params }: { params: Promise<{ locale: string; id: string }> }) {

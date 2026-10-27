@@ -41,6 +41,7 @@ function Form() {
     const startMs = Date.parse(String(f.get('startAt') ?? '')) // datetime-local = 보는 사람 지역 시간
     const maxCnt = Number(f.get('maxCnt'))
     const fee = String(f.get('fee') ?? '').trim()
+    const subTitle = String(f.get('subTitle') ?? '').trim()
     if (!startAtOk(startMs) || !FEE_RE.test(fee))
       return setMsg(t('invalid'))
     setBusy(true)
@@ -53,6 +54,7 @@ function Form() {
           startAt: new Date(startMs).toISOString(),
           maxCnt,
           fee,
+          ...(subTitle ? { subTitle } : {}),
         }),
       }),
     )
@@ -65,6 +67,10 @@ function Form() {
     <form onSubmit={(e) => void submit(e)} className="space-y-4">
       {/* 이름 입력 없음 — 개설 때 남은 섬 이름에서 무작위로 정해진다(sql/011) */}
       <p className="text-muted-foreground text-sm">🏝️ {t('name')}</p>
+      <label className="block space-y-1 text-sm">
+        <span>{t('subTitle')}</span>
+        <input name="subTitle" maxLength={60} className={INPUT} />
+      </label>
       <label className="block space-y-1 text-sm">
         <span>{t('startAt')}</span>
         <input name="startAt" type="datetime-local" required className={INPUT} />

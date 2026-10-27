@@ -21,3 +21,13 @@ test('개설 — 이름을 받지 않고 fn_crt_smn 이 고른다, 남은 섬 �
   assert.match(sql, /pg_advisory_xact_lock/) // 동시 개설이 같은 섬을 고르지 않게
   assert.match(sql, /smn_sts_cd IN \('SCHEDULED', 'LIVE'\)/) // 끝나거나 취소되면 다시 쓸 수 있다
 })
+
+test('룸 이름 = 섬 이름 - 부제, 부제 없으면 섬 이름만', async () => {
+  const { smnTitle } = await import('./seminar-rules.ts')
+  assert.equal(smnTitle('발리', '파이 개발 세미나'), '발리 - 파이 개발 세미나')
+  assert.equal(smnTitle('발리', ''), '발리')
+  assert.equal(smnTitle('발리', '   '), '발리')
+  assert.equal(smnTitle('발리', null), '발리')
+  const patch = readFileSync(new URL('../app/api/seminars/[id]/route.ts', import.meta.url), 'utf8')
+  assert.match(patch, /if \(!isAdmin\(user\)\) q = q\.eq\('hst_usr_id', user\.id\)/) // 개최자·ADMIN 만
+})

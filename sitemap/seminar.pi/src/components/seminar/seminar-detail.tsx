@@ -12,7 +12,7 @@ import { LoginGate } from '@/components/login-gate'
 import { NoteLink } from '@/components/notes/note-view'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
-import { formatFee, OPEN_STS } from '@/lib/seminar-rules'
+import { formatFee, OPEN_STS, smnTitle, SUB_TTL_MAX } from '@/lib/seminar-rules'
 import { ShareLinks } from './share-links'
 import {
   BTN,
@@ -84,6 +84,13 @@ export function SeminarDetail({ id }: { id: string }) {
       </Link>
       <header className="space-y-2">
         <h1 className="text-2xl font-bold break-words">{d.title}</h1>
+        {d.isHost && (
+          <SubTitleForm
+            id={d.id}
+            value={d.subTitle}
+            onSaved={(sub) => setD((x) => (x ? { ...x, subTitle: sub, title: smnTitle(x.island, sub) } : x))}
+          />
+        )}
         <p className="text-muted-foreground text-sm">{t(`status.${d.status}`)}</p>
       </header>
       <dl className="bg-surface grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 rounded-xl p-4 text-sm">
@@ -252,4 +259,52 @@ function Action({
 
 function Notice({ text }: { text: string }) {
   return <p className="bg-surface rounded-xl p-4 text-sm">{text}</p>
+}
+
+// 부제 저장·수정(개최자, 언제든) — 참가자에게는 '섬 이름 - 부제'가 룸 이름으로 보인다(sql/012)
+function SubTitleForm({ id, value, onSaved }: { id: string; value: string; onSaved: (sub: string) => void }) {
+  const t = useTranslations('seminar.subTitle')
+  const errText = useSeminarErrText()
+  const [text, setText] = useState(value)
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState<string | null>(null)
+  const dirty = text.trim() !== value
+  async function save(e: React.FormEvent) {
+    e.preventDefault()
+    setBusy(true)
+    setMsg(null)
+    const r = await readApi<{ ok: true; subTitle: string }>(
+      piFetch(`/api/seminars/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subTitle: text }),
+      }),
+    )
+    setBusy(false)
+    if (!r.ok) return setMsg(errText(r.body))
+    onSaved(r.data.subTitle)
+    setText(r.data.subTitle)
+    setMsg(t('saved'))
+  }
+  return (
+    <form onSubmit={(e) => void save(e)} className="flex flex-wrap items-center gap-2">
+      <label className="sr-only" htmlFor="smn-sub-ttl">
+        {t('label')}
+      </label>
+      <input
+        id="smn-sub-ttl"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        maxLength={SUB_TTL_MAX}
+        placeholder={t('placeholder')}
+        className="bg-surface-raised h-10 min-w-0 flex-1 rounded-lg px-3 text-sm"
+      />
+      <button type="submit" disabled={busy || !dirty} className={`${BTN} disabled:opacity-40`}>
+        {busy ? t('saving') : t('save')}
+      </button>
+      <p role="status" className="text-muted-foreground w-full text-xs">
+        {msg}
+      </p>
+    </form>
+  )
 }

@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
 import { buildIcs, icsNotesLabel } from '@/lib/calendar-rules'
-import { isUuid } from '@/lib/seminar-rules'
+import { isUuid, smnTitle } from '@/lib/seminar-rules'
 
 export const GET = withGuard(
   dbRoute(async (req, ctx) => {
@@ -16,10 +16,10 @@ export const GET = withGuard(
     const [smn, nt] = await Promise.all([
       db()
         .from('smn_mst')
-        .select('smn_nm, start_dtm, smn_sts_cd, mod_dtm')
+        .select('smn_nm, sub_ttl, start_dtm, smn_sts_cd, mod_dtm')
         .eq('smn_id', id)
         .eq('del_yn', 'N')
-        .maybeSingle<{ smn_nm: string; start_dtm: string; smn_sts_cd: string; mod_dtm: string }>(),
+        .maybeSingle<{ smn_nm: string; sub_ttl: string | null; start_dtm: string; smn_sts_cd: string; mod_dtm: string }>(),
       // 완성된 회의록 최신 1건(R-P3, x_smn_nt_01 순서)
       db()
         .from('smn_nt')
@@ -39,7 +39,7 @@ export const GET = withGuard(
     const ntId = nt.data?.[0]?.nt_id as string | undefined
     const body = buildIcs({
       id,
-      title: smn.data.smn_nm,
+      title: smnTitle(smn.data.smn_nm, smn.data.sub_ttl),
       startAt: smn.data.start_dtm,
       url: `${base}/s/${id}`,
       piUrl: `${piBase()}/s/${id}`,

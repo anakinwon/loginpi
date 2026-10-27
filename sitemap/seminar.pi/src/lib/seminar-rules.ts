@@ -121,3 +121,7 @@ export const STALE_LOOKUP_MAX = 3
 export const START_AHEAD_MAX_MS = 366 * 24 * 60 * 60 * 1000
 export const startAtOk = (ms: number, now = Date.now()) =>
   Number.isFinite(ms) && ms > now && ms <= now + START_AHEAD_MAX_MS
+
+// 세미나 룸 이름 = 섬 이름 + ' - ' + 부제(sql/012, 마스터 2026-10-28). 부제가 없거나 공백이면 섬 이름만
+export const SUB_TTL_MAX = 60
+export const smnTitle = (nm: string, sub?: string | null) => (sub?.trim() ? `${nm} - ${sub.trim()}` : nm)
