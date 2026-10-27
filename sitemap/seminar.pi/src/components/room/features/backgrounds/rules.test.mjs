@@ -1,7 +1,7 @@
 // 배경 효과 판정 시험 — node --test src/components/room/features/backgrounds/rules.test.mjs (Node 24 는 .ts 를 타입 제거로 바로 읽는다)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { BG, checkMine, coverRect, failBack, nextTs, overflowIds, pipelineKilled, slowerEvery, slowWatch, withUnsaved } from './rules.ts'
+import { afterDelete, BG, checkMine, coverRect, failBack, keepShown, nextTs, overflowIds, pipelineKilled, slowerEvery, slowWatch, withUnsaved } from './rules.ts'
 
 // 30fps 로 프레임마다 ms 만큼 걸린다고 치고 sec 초 동안 돌린다 — 한 번이라도 끄라고 하면 true
 function run(ms, sec, watch = slowWatch()) {
@@ -138,4 +138,40 @@ test('내 이미지 추가 타일 — 키보드 포커스 표시', async () => {
   const src = readFileSync(new URL('./index.tsx', import.meta.url), 'utf8')
   assert.match(src, /focus-within:ring-2/)
   assert.match(src, /type="file"[\s\S]{0,80}sr-only/)
+})
+
+// 회귀(T05 r4) — 숨은 탭 틈(2초 넘게 프레임 없음)을 건너도 느린 초 수가 이어져, 돌아온 직후 느린 1초만에 단계 낮춤·자동 끔이 났다(연속 3초 규칙 위반)
+test('숨은 탭 틈은 연속을 끊는다 — 틈 뒤 느린 1초로는 끄지 않는다', () => {
+  const w = slowWatch()
+  let off = false
+  let t = 0
+  for (const end = t + 2100; t <= end; t += 33) off = w(80, t) || off // 느린 2초(창 2개 판정, slow=2)
+  t += 10000 // 탭 숨김 10초
+  for (const end = t + 1100; t <= end; t += 33) off = w(80, t) || off // 돌아와 느린 1초 남짓
+  assert.equal(off, false)
+})
+
+// 보강(T05 r4) — 이미 쓰는 배경 타일을 또 누르면(연타) 다시 래스터하고 느린 기기 단계가 1로 돌아가 3초 뒤 또 느림 판정이 났다
+test('같은 배경 다시 고름 — 그리는 중이면 그대로 둔다', async () => {
+  assert.equal(keepShown('blur', 'blur', true), true)
+  assert.equal(keepShown('blur', 'blur', false), false) // 파이프라인이 껐으면 새로 켠다
+  assert.equal(keepShown('p:dusk', 'blur', true), false)
+  const { readFileSync } = await import('node:fs')
+  const src = readFileSync(new URL('./engine.ts', import.meta.url), 'utf8')
+  const body = src.slice(src.indexOf('export async function choose('), src.indexOf("status.set('loading')"))
+  assert.match(body, /keepShown\(next, shown, bgOn\.get\(\)\)/) // 'loading'·래스터 전에 판정
+})
+
+// 보강(T05 r4) — 쓰고 있는 내 이미지를 지우면 선택이 '없음'으로 떨어져 가리던 방이 상대에게 드러났다
+test('쓰는 내 이미지 삭제 — 흐림으로, 고르던 중이면 앞 배경으로', async () => {
+  assert.equal(afterDelete('m:a', 'm:a', 'm:a', true), 'blur')
+  assert.equal(afterDelete('m:a', 'm:a', 'p:dusk', true), 'p:dusk') // 고르던 중 삭제 → 앞 배경 유지
+  assert.equal(afterDelete('m:a', 'm:a', 'none', false), 'none') // 가리던 것이 없었으면 없음
+  assert.equal(afterDelete('m:a', 'blur', 'blur', true), null) // 안 쓰는 이미지는 선택 그대로
+  assert.equal(afterDelete('m:a', 'p:dusk', 'm:a', true), null) // 다른 배경을 고르는 중이면 그것에 맡긴다
+  const { readFileSync } = await import('node:fs')
+  const src = readFileSync(new URL('./index.tsx', import.meta.url), 'utf8')
+  const del = src.slice(src.indexOf('const del = async'), src.indexOf('removeMine(id)'))
+  assert.match(del, /dropMine\(id\)/)
+  assert.doesNotMatch(del, /choose\('none'\)/)
 })

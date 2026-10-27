@@ -5,7 +5,7 @@
 // 사용 지표를 odml.pa.googleapis.com 로 보내며 끄는 옵션이 없음(1회 실패면 주기 전송 중단). 코드는 옮기지 않았다(S-2)
 import type { ImageSegmenter } from '@mediapipe/tasks-vision'
 import { featureStore } from '../../extensions'
-import { BG, coverRect, failBack, nextTs, pipelineKilled, slowerEvery, slowWatch } from './rules'
+import { afterDelete, BG, coverRect, failBack, keepShown, nextTs, pipelineKilled, slowerEvery, slowWatch } from './rules'
 
 // 선택 — none · blur · p:<프리셋> · m:<내 이미지 id>
 export const choice = featureStore<string>('none')
@@ -117,6 +117,12 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
     status.set('idle')
     return null
   }
+  if (keepShown(next, shown, bgOn.get())) {
+    // 이미 그리는 배경 — 고르던 다른 선택만 취소한다(pick 은 위에서 올렸다)
+    choice.set(next)
+    status.set('idle')
+    return null
+  }
   choice.set(next)
   status.set('loading')
   try {
@@ -139,6 +145,12 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
     if (back === 'none') bgOn.set(false)
     return 'bgFailed'
   }
+}
+
+// 내 이미지 삭제 — 쓰고 있던 것이면 rules.afterDelete 로 옮긴다(흐림·앞 배경·없음)
+export async function dropMine(id: string) {
+  const to = afterDelete(`m:${id}`, choice.get(), shown, bgOn.get())
+  if (to) await choose(to)
 }
 
 // 파이프라인이 꺼 버리면(그리기 30회 연속 실패 — WebGL 컨텍스트 유실 등) 선택을 '없음'으로, 알리고(배경이 말없이 사라져 방이 드러나지 않게),

@@ -18,6 +18,7 @@ import {
   choice,
   choose,
   draw,
+  dropMine,
   reset,
   status,
 } from './engine'
@@ -119,7 +120,7 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
     }
   }
   const del = async (id: string) => {
-    if (cur === `m:${id}`) await choose('none')
+    await dropMine(id) // 쓰고 있던 이미지면 흐림·앞 배경으로(바로 '없음'이면 가리던 방이 드러난다)
     await removeMine(id).catch(() => {})
     setMine((l) =>
       l
