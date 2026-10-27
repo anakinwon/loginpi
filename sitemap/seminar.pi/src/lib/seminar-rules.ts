@@ -22,6 +22,10 @@ export const parsePage = (v: string | null | undefined): number => {
 export const pageCount = (total: number) =>
   Math.max(1, Math.ceil(total / PAGE_SIZE))
 
+// 한 줄 이름(세미나·회의록 제목) — 제어문자(줄바꿈·NUL 등) 금지. 화면 입력칸은 한 줄이라 API 직접 호출만 걸린다.
+//  제목은 .ics·메일 제목·Markdown 머리로 흘러가므로 들어오는 곳에서 막는다(야간 시험 T01 r4). TAB 은 붙여넣기에 섞여 오므로 허용(.ics 도 TAB 보존)
+export const ONE_LINE_RE = /^[^\u0000-\u0008\u000A-\u001F\u007F]*$/
+
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 export const isUuid = (v: unknown): v is string =>

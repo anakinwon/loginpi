@@ -16,6 +16,7 @@ import {
 import { SMN_COLS, toCard, type SmnRow } from '@/lib/seminar'
 import {
   FEE_RE,
+  ONE_LINE_RE,
   OPEN_STS,
   PAGE_SIZE,
   parsePage,
@@ -91,7 +92,7 @@ export const GET = withAuthGuard(
 )
 
 const createSchema = z.object({
-  title: z.string().trim().min(1).max(100),
+  title: z.string().trim().min(1).max(100).regex(ONE_LINE_RE),
   // ISO 일시(오프셋 포함) — 지금 이후 ~ 1년 안(S5)
   startAt: z.iso
     .datetime({ offset: true })

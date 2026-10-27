@@ -16,11 +16,11 @@ import {
 import { isAdmin } from '@/lib/auth'
 import { geminiEnabled } from '@/lib/gemini'
 import { NOTE_LIST_PAGE } from '@/lib/note-rules'
-import { isUuid } from '@/lib/seminar-rules'
+import { isUuid, ONE_LINE_RE } from '@/lib/seminar-rules'
 
 const Body = z.union([
   z.object({ smnId: z.string().refine(isUuid) }),
-  z.object({ title: z.string().trim().min(1).max(100) }),
+  z.object({ title: z.string().trim().min(1).max(100).regex(ONE_LINE_RE) }),
 ])
 const noStore = { 'Cache-Control': 'no-store' }
 

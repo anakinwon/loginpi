@@ -8,6 +8,7 @@ import {
   copyText,
   foldLine,
   icsEscape,
+  icsSeq,
   inViewerTz,
   mailtoUrl,
   utcStamp,
@@ -132,4 +133,26 @@ test('메일 일시 — 시간대 이름 포함', () => {
   const en = new Intl.DateTimeFormat('en', inViewerTz(ZONED, 'America/New_York')).format(d)
   assert.match(en, /Oct 27/)
   assert.match(en, /EDT|GMT-4/)
+})
+
+// 결함 T01 r4 : mailto 본문 줄바꿈이 %0A 단독(RFC 6068 5절은 %0D%0A), 메일 제목에 제목의 줄바꿈·제어문자가 그대로 들어감
+test('메일 — mailto 본문 줄바꿈은 %0D%0A, 제목 줄바꿈·제어문자는 공백', () => {
+  const m = mailtoUrl('a\r\nBcc: x\u0000', '1\n2\r3\r\n4')
+  assert.equal(m, 'mailto:?subject=a%20Bcc%3A%20x%20&body=1%0D%0A2%0D%0A3%0D%0A4')
+  const u = new URL(webMailUrl('a\nb', '1\n2'))
+  assert.equal(u.searchParams.get('su'), 'a b')
+  assert.equal(u.searchParams.get('body'), '1\n2')
+})
+
+// 보강 T01 r4 : 시각 변경·취소 뒤 다시 받은 .ics 를 캘린더 앱이 새 개정으로 반영하도록 SEQUENCE·LAST-MODIFIED
+test('.ics — SEQUENCE·LAST-MODIFIED 는 변경일시에서, 늦은 변경이 더 크다', () => {
+  assert.equal(icsSeq(null), 0)
+  assert.equal(icsSeq('bad'), 0)
+  assert.ok(icsSeq('2026-10-28T01:00:01Z') > icsSeq('2026-10-28T01:00:00Z'))
+  const ics = buildIcs({ ...ev, modAt: '2026-10-28T01:02:03.456Z' }, new Date(ev.startAt))
+  assert.match(ics, /\r\nSEQUENCE:1793149323\r\n/)
+  assert.match(ics, /\r\nLAST-MODIFIED:20261028T010203Z\r\n/)
+  const old = buildIcs(ev, new Date(ev.startAt))
+  assert.match(old, /\r\nSEQUENCE:0\r\n/)
+  assert.ok(!old.includes('LAST-MODIFIED'))
 })
