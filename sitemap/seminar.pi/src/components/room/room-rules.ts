@@ -393,3 +393,10 @@ export function ringFor(peerId: string | undefined, speaker: string | null, engi
   if (!engine) return undefined
   return !!peerId && peerId === speaker
 }
+
+// 영상 효과 파이프라인(effects.ts) 프레임 그리기 판정 — 새 프레임이고 카메라가 켜졌을 때만.
+// 카메라 끔(track.enabled=false)은 검은 프레임이라 그리면 조명 보정이 어둠을 재 배율이 최대(1.8)로 치솟고(다시 켜면 약 2초 과노출),
+// 배경 분리도 헛돈다(CPU·배터리). 끈 동안 송출은 서버가 일시정지(producer.pause), 내 타일은 꺼짐 표시라 마지막 프레임이 남아도 보이지 않는다
+export function fxFrameDue(v: { enabled: boolean; w: number; h: number; ready: number; time: number; last: number }): boolean {
+  return v.enabled && v.w > 0 && v.h > 0 && v.ready >= 2 && v.time !== v.last
+}

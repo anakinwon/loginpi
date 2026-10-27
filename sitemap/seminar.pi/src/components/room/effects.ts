@@ -5,6 +5,7 @@
 // (숨은 탭에서도 프레임이 멈추지 않게). 코드는 옮기지 않았다(S-2)
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useStores, type VideoEffect } from './extensions'
+import { fxFrameDue } from './room-rules'
 
 // 효과 1단계 — src(이전 단계 결과) 를 out 캔버스(w×h)에 그린다. 동기 함수(프레임마다 호출)
 export type EffectDraw = (out: CanvasRenderingContext2D, src: CanvasImageSource, w: number, h: number) => void
@@ -53,8 +54,8 @@ function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[]) {
   const frame = () => {
     const w = video.videoWidth
     const h = video.videoHeight
-    // 새 프레임일 때만 그린다(타이머는 fps 의 2배로 돈다)
-    if (!w || !h || video.readyState < 2 || video.currentTime === last) return
+    // 새 프레임이고 카메라가 켜졌을 때만 그린다(타이머는 fps 의 2배로 돈다, 판정 room-rules fxFrameDue)
+    if (!fxFrameDue({ enabled: track.enabled, w, h, ready: video.readyState, time: video.currentTime, last })) return
     last = video.currentTime
     const list = active()
     // 마지막 효과가 막 꺼져 파이프라인이 닫히기 직전이면 원본을 그대로 통과(null 단계)
