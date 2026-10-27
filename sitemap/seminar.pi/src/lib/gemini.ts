@@ -13,7 +13,7 @@
 //  · 음성 입력 audio/webm·ogg·m4a·wav 등, 요청 전체 20MB 이하 — docs/audio(2026-09-23)
 // 개인정보 : store:false — 요청·응답을 Google 쪽 대화 저장소에 남기지 않게(기본 true). 국외 이전 고지는 /privacy
 import 'server-only'
-import { fenceTranscript, trPrompt, TX_CLOSE, TX_OPEN } from './note-rules'
+import { fenceTranscript, trPrompt, TX_CLOSE, TX_OPEN, unfence } from './note-rules'
 import { LANG_RE, MAX_TEXT_CHARS, paceStyle } from './speech-rules'
 
 const URL_INTERACTIONS =
@@ -178,16 +178,15 @@ export async function translate(
 ): Promise<string | null> {
   if (!text.trim() || text.length > MAX_TEXT_CHARS || !LANG_RE.test(target))
     return null
-  return (
-    textOf(
-      await interact({
-        model: GEMINI_MODEL.text,
-        input: [{ type: 'text', text: trPrompt(text, langName(target), target) }],
-        // 출력 상한 — DB 계량(fn_use_smn_ai)은 입력 글자만 센다. 500자 번역은 수백 토큰이라 여유 4배, 넘치면(completed 아님) 실패 = 원문 표시
-        generation_config: { max_output_tokens: TR_MAX_OUT_TOKENS },
-      }),
-    ) || null
+  const out = textOf(
+    await interact({
+      model: GEMINI_MODEL.text,
+      input: [{ type: 'text', text: trPrompt(text, langName(target), target) }],
+      // 출력 상한 — DB 계량(fn_use_smn_ai)은 입력 글자만 센다. 500자 번역은 수백 토큰이라 여유 4배, 넘치면(completed 아님) 실패 = 원문 표시
+      generation_config: { max_output_tokens: TR_MAX_OUT_TOKENS },
+    }),
   )
+  return (out && unfence(out)) || null // 되돌아온 구분자 제거(r6 T08)
 }
 
 export interface NoteSummary {
@@ -240,7 +239,12 @@ export async function summarize(
   const r = out?.v
   if (!r) return null
   const arr = (v: unknown) =>
-    Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []
+    Array.isArray(v)
+      ? v
+          .filter((x): x is string => typeof x === 'string')
+          .map(unfence) // 되돌아온 구분자 제거(r6 T08, translate 와 형제)
+          .filter(Boolean)
+      : []
   return {
     points: arr(r.points),
     decisions: arr(r.decisions),

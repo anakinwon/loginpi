@@ -6,7 +6,7 @@
 // 언어를 바꾸면 TR_LANG_SETTLE_MS 동안 더 안 바뀔 때만 요청(select 화살표 훑기 = 언어마다 외부 AI 호출 방지)
 import { useEffect, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
-import { sameLang, shownOf, TR_LANG_SETTLE_MS, trStopOf, type TrOut, type TrStop } from '@/lib/translate-rules'
+import { hasWords, sameLang, shownOf, TR_LANG_SETTLE_MS, trStopOf, type TrOut, type TrStop } from '@/lib/translate-rules'
 import { featureStore, useStore } from '../../extensions'
 
 type Said = { text: string; sig: string | null }
@@ -22,7 +22,8 @@ export function translateCaption(
   smnId: string,
   sig: string | null,
 ): Promise<Said | null> {
-  if (sameLang(src, lang)) return Promise.resolve({ text, sig })
+  // 같은 언어·글자 없는 자막(숫자·기호뿐, 보강 r6 T08) = 원문 그대로 — 번역 요청·계량 없음
+  if (sameLang(src, lang) || !hasWords(text)) return Promise.resolve({ text, sig })
   if (!sig || trStop.get()) return Promise.resolve(null)
   const key = [smnId, lang, text].join('\n') // 결과 sig 가 세미나별이라 세미나도 키에
   let p = local.get(key)
@@ -67,7 +68,7 @@ export function useTranslated(
     const id = setTimeout(() => setReqLang(lang), TR_LANG_SETTLE_MS)
     return () => clearTimeout(id)
   }, [lang, reqLang])
-  const skip = !cap || !on || !cap.sig || !!stop || sameLang(cap.lang, reqLang)
+  const skip = !cap || !on || !cap.sig || !!stop || sameLang(cap.lang, reqLang) || !hasWords(cap.text)
   const key = skip ? '' : `${reqLang}\n${cap.text}`
 
   useEffect(() => {

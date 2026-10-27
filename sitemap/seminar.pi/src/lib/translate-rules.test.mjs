@@ -7,11 +7,13 @@ import {
   capSig,
   capSigOk,
   cleanText,
+  hasWords,
   hitRate,
   isTranslateLang,
   Lru,
   MAX_TEXT_CHARS,
   pickTrLang,
+  prefLangs,
   sameLang,
   shownOf,
   TR_HOLD_MS,
@@ -351,4 +353,44 @@ test('번역 대기 표시 — 대기 중 직전 번역 유지, 실패·언어 �
   assert.deepEqual(shownOf(cap, k, 'ko', out, '', 1_000 + TR_HOLD_MS + 1), cap) // 오래된 번역은 남기지 않음
   assert.deepEqual(shownOf(cap, '', 'ko', out, '', 2_000), cap) // 번역 안 함(꺼짐·같은 언어·서명 없음·중단)
   assert.deepEqual(shownOf(cap, k, 'ko', null, '', 2_000), cap) // 첫 문장 대기 = 원문
+})
+
+// 결함(r6 T08) — 외부 AI 가 구분자를 되돌려 주면 자막에 보이고 서명을 받아 더빙이 읽었다. translate·summarize 둘 다 지운다(R-P0 형제)
+test('출력 구분자 제거 — 번역·회의록 요약 출력에서 <<<TRANSCRIPT·TRANSCRIPT>>> 를 지움', async () => {
+  const { unfence, TX_OPEN, TX_CLOSE } = await import('./note-rules.ts')
+  assert.equal(unfence(`${TX_OPEN}
+Hello everyone
+${TX_CLOSE}`), 'Hello everyone')
+  assert.equal(unfence(`Hi ${TX_CLOSE} there`), 'Hi  there')
+  assert.equal(unfence(`${TX_OPEN}${TX_CLOSE}`), '') // 구분자뿐 = 빈 글(호출부가 실패 처리)
+  assert.equal(unfence('a ‹‹‹ b ››› c'), 'a ‹‹‹ b ››› c') // 무력화된 자막 글은 그대로
+  const { readFile } = await import('node:fs/promises')
+  const g = await readFile(new URL('./gemini.ts', import.meta.url), 'utf8')
+  const tr = g.slice(g.indexOf('export async function translate('), g.indexOf('export interface NoteSummary'))
+  assert.ok(tr.includes('unfence(out)'))
+  const sm = g.slice(g.indexOf('export async function summarize('), g.indexOf('export async function tts('))
+  assert.ok(sm.includes('.map(unfence)'))
+})
+
+// 보강(r6 T08) — 숫자·기호뿐인 자막은 번역 요청 없이 원문
+test('글자 없는 자막 — 숫자·문장부호·이모지뿐이면 번역하지 않음, 어느 문자든 글자가 있으면 번역', async () => {
+  for (const t of ['2026', '…', '10:30', '😀👍', '3.14 %', '?!']) assert.equal(hasWords(t), false, t)
+  for (const t of ['네', 'OK', 'مرحبا', '你好', 'Привет', '50 Pi']) assert.equal(hasWords(t), true, t)
+  const { readFile } = await import('node:fs/promises')
+  const src = await readFile(new URL('../components/room/features/captions/translate.ts', import.meta.url), 'utf8')
+  assert.ok(src.includes('sameLang(src, lang) || !hasWords(text)')) // translateCaption(더빙 공용)
+  assert.ok(src.includes('|| !hasWords(cap.text)')) // 화면 skip
+})
+
+// 보강(r6 T08) — 언어 select 앞에 '내 언어' 묶음
+test('내 언어 — 브라우저 선호·UI·고른 언어 순, 대상 키로 정규화·중복 제거·목록 밖 제외, ko·en 문구', async () => {
+  assert.deepEqual(prefLangs(['vi-VN', 'en-US', 'en'], 'ko', 'fr'), ['vi', 'en', 'ko', 'fr'])
+  assert.deepEqual(prefLangs(['zh-Hant-TW', 'iw', 'xx-YY', ''], 'en', 'en'), ['zh-TW', 'he', 'en'])
+  assert.deepEqual(prefLangs(undefined, 'ko', 'ko'), ['ko'])
+  for (const c of prefLangs(['pt-BR', 'no', 'tl'], 'ko', 'zh')) assert.ok(isTranslateLang(c), c)
+  const { readFile } = await import('node:fs/promises')
+  for (const f of ['ko', 'en']) {
+    const m = JSON.parse(await readFile(new URL(`../../messages/${f}.json`, import.meta.url), 'utf8'))
+    assert.ok(m.room.captions.langMine && m.room.captions.langAll, f)
+  }
 })
