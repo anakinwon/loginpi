@@ -1,7 +1,7 @@
 // 배경 효과 판정 시험 — node --test src/components/room/features/backgrounds/rules.test.mjs (Node 24 는 .ts 를 타입 제거로 바로 읽는다)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { BG, checkMine, coverRect, overflowIds, pipelineKilled, slowWatch } from './rules.ts'
+import { BG, checkMine, coverRect, failBack, nextTs, overflowIds, pipelineKilled, slowWatch } from './rules.ts'
 
 // 30fps 로 프레임마다 ms 만큼 걸린다고 치고 sec 초 동안 돌린다 — 한 번이라도 끄라고 하면 true
 function run(ms, sec, watch = slowWatch()) {
@@ -82,4 +82,28 @@ test('효과 문구 — 내 이미지 번호·저장 실패·멈춤 문구가 ko
     assert.match(fx.myDel, /\{n\}/, lang)
     assert.ok(fx.mySaveFail && fx.bgStopped && fx.autoOff, lang)
   }
+})
+
+// 회귀(T05 r2) — 흐림을 켠 채 못 읽는 이미지(HEIC 등)를 고르면 실패와 함께 배경이 '없음'으로 떨어져 가리던 방이 상대에게 드러났다
+test('새 선택 실패 — 앞 배경이 켜져 있으면 그대로 둔다', () => {
+  assert.equal(failBack('blur', true), 'blur')
+  assert.equal(failBack('p:dusk', true), 'p:dusk')
+  assert.equal(failBack('blur', false), 'none') // 송출 중이 아니었으면(파이프라인이 끔 등) 없음
+  assert.equal(failBack('none', false), 'none')
+})
+
+// 보강(T05 r2) — 분리기는 엄격히 커지는 시각만 받는다. 정밀도를 낮춘 타이머가 같은 값을 주면 프레임마다 예외 → 30회 뒤 배경이 꺼졌다
+test('분리 시각 — 같은·거꾸로 간 시각도 1ms 씩 올린다', () => {
+  assert.equal(nextTs(0, 100), 100)
+  assert.equal(nextTs(100, 100), 101)
+  assert.equal(nextTs(101, 100), 102)
+  assert.equal(nextTs(102, 200), 200)
+})
+
+// 보강(T05 r2) — '내 이미지 추가'의 파일 입력은 sr-only 라 키보드 포커스가 안 보였다
+test('내 이미지 추가 타일 — 키보드 포커스 표시', async () => {
+  const { readFileSync } = await import('node:fs')
+  const src = readFileSync(new URL('./index.tsx', import.meta.url), 'utf8')
+  assert.match(src, /focus-within:ring-2/)
+  assert.match(src, /type="file"[\s\S]{0,80}sr-only/)
 })
