@@ -83,6 +83,7 @@
     "SPEECH_RATE": "음성 요청이 너무 잦습니다. 잠시 후 다시 시도하세요",
     "SPEECH_QUOTA": "이 세미나의 음성 처리 시간이 모두 소진되었습니다",
     "SPEECH_FAILED": "음성을 글로 바꾸지 못했습니다",
+    "TRANSLATE_FAILED": "자막을 번역하지 못했습니다",
     "POLL_CLOSED": "마감된 설문입니다",
     "NOTE_NOT_RECORDING": "기록 중인 회의록이 아닙니다",
     "NOTE_SHOT_INVALID": "화면 캡처 형식이 올바르지 않습니다",
@@ -372,7 +373,9 @@
       "waiting": "발표자가 자막을 켜면 표시됩니다",
       "limit": "음성 처리 한도에 도달해 자막·AI 회의록을 멈췄습니다",
       "sendFail": "자막을 켜지 못했습니다. 잠시 뒤 다시 시도해 주세요",
-      "region": "자막"
+      "region": "자막",
+      "translate": "번역 자막 보기",
+      "lang": "번역 언어"
     },
     "effects": {
       "title": "효과",

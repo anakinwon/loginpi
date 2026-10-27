@@ -6,12 +6,15 @@
 // 늦은 입장자 = presenter 화면이 참가자 수 증가 시 1초에 1번 이하로 state 재방송(SIGNAL_API 3.6, throttle).
 // presenter 입장·재입장 때 자기 현재 값을 1번 방송(퇴장 뒤 꺼진 스위치와 panel 의 켜진 자막이 어긋나 음성 한도를 쓰는 것 방지).
 // 음성 한도 소진 = presenter 가 state{captions:false, captionsReason:'limit'} 방송 → 전원 알림(설계서 15.4). 번역·더빙(SA8·SA9)은 이 시트·저장소 위에 붙인다
-import { useEffect, useRef } from 'react'
-import { useTranslations } from 'next-intl'
+// 번역 자막(SA8) = 개인 설정 — '번역 자막 보기'(원문/번역 토글) + 언어 선택(TRANSLATE_LANGS, 표시명 Intl.DisplayNames). 기본 언어 = UI locale, localStorage 에 함께 저장
+import { useEffect, useMemo, useRef } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { Icon } from '../../control-bar'
 import { featureStore, speechWants, useStore, wantSpeech, type RoomCtx, type RoomFeature } from '../../extensions'
 import { Sheet, SwitchRow } from '../sheet'
+import { isTranslateLang, TRANSLATE_LANGS } from '@/lib/translate-rules'
 import { CAPTION, captionsState, parseCaption } from './caption-rules'
+import { useTranslated } from './translate'
 
 type Size = 'sm' | 'md' | 'lg'
 const SCALE: Record<Size, number> = { sm: 0.85, md: 1, lg: 1.25 }
@@ -21,6 +24,8 @@ export const capSheet = featureStore(false)
 export const capRoom = featureStore(false) // 방 자막 켜짐(presenter 결정, state 로 전원 공유)
 export const capShow = featureStore(true) // 내 화면에 보기
 export const capSize = featureStore<Size>('md')
+export const capTr = featureStore(false) // 번역 자막 보기(꺼짐 = 원문)
+export const capTrLang = featureStore('') // 번역 언어('' = 아직 안 고름 → UI locale)
 export const capLatest = featureStore<{
   name: string
   text: string
@@ -46,19 +51,43 @@ function usePrefs() {
       const p = JSON.parse(localStorage.getItem(PREF_KEY) ?? '{}') as {
         show?: unknown
         size?: unknown
+        tr?: unknown
+        trLang?: unknown
       }
       if (typeof p.show === 'boolean') capShow.set(p.show)
       if (p.size === 'sm' || p.size === 'md' || p.size === 'lg') capSize.set(p.size)
+      if (typeof p.tr === 'boolean') capTr.set(p.tr)
+      if (isTranslateLang(p.trLang)) capTrLang.set(p.trLang)
     } catch {}
   }, [])
   const show = useStore(capShow)
   const size = useStore(capSize)
+  const tr = useStore(capTr)
+  const trLang = useStore(capTrLang)
   useEffect(() => {
     try {
-      localStorage.setItem(PREF_KEY, JSON.stringify({ show, size }))
+      localStorage.setItem(PREF_KEY, JSON.stringify({ show, size, tr, trLang }))
     } catch {}
-  }, [show, size])
-  return { show, size }
+  }, [show, size, tr, trLang])
+  return { show, size, tr, trLang }
+}
+
+// 언어 선택 목록 — 각 언어를 UI locale 로 부른 이름(자기 언어 이름 병기), 이름순. Intl 미지원 언어는 코드 그대로
+function useLangNames(locale: string) {
+  return useMemo(() => {
+    const name = (loc: string, code: string) => {
+      try {
+        return new Intl.DisplayNames([loc], { type: 'language' }).of(code) ?? code
+      } catch {
+        return code
+      }
+    }
+    return TRANSLATE_LANGS.map((c) => {
+      const a = name(locale, c)
+      const b = name(c, c)
+      return [c, a === b ? a : `${a} (${b})`] as const
+    }).sort((x, y) => x[1].localeCompare(y[1], locale))
+  }, [locale])
 }
 
 function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean }) {
@@ -66,8 +95,12 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   const open = useStore(capSheet)
   const room = useStore(capRoom)
   const latest = useStore(capLatest)
-  const { show, size } = usePrefs()
+  const { show, size, tr, trLang } = usePrefs()
   const presenter = ctx.role === 'presenter'
+  const locale = useLocale()
+  const lang = trLang || (isTranslateLang(locale) ? locale : 'en')
+  const text = useTranslated(latest, tr, lang, ctx.seminarId)
+  const langs = useLangNames(locale)
 
   // 수명 — 마지막 조각 뒤 8초
   useEffect(() => {
@@ -139,7 +172,7 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
             }}
           >
             {latest.name && <span className="text-muted-foreground mr-2">{latest.name}</span>}
-            {latest.text}
+            {text}
           </p>
         </div>
       )}
@@ -150,6 +183,23 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
           !room && <p className="text-muted-foreground">{t('waiting')}</p>
         )}
         <SwitchRow label={t('show')} on={show} onChange={capShow.set} />
+        <SwitchRow label={t('translate')} on={tr} onChange={capTr.set} />
+        {tr && (
+          <label className="flex items-center justify-between gap-3">
+            <span>{t('lang')}</span>
+            <select
+              value={lang}
+              onChange={(e) => capTrLang.set(e.target.value)}
+              className="bg-surface-raised h-10 max-w-[60%] rounded-lg px-2"
+            >
+              {langs.map(([code, name]) => (
+                <option key={code} value={code}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <div role="radiogroup" aria-label={t('size.label')} className="flex items-center justify-between gap-3">
           <span>{t('size.label')}</span>
           <div className="bg-surface-raised flex rounded-full p-0.5">
