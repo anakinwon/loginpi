@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useStores, type VideoEffect } from './extensions'
 import { failHit, fxFrameDue } from './room-rules'
+import { ticker } from './ticker'
 
 // 효과 1단계 — src(이전 단계 결과) 를 out 캔버스(w×h)에 그린다. 동기 함수(프레임마다 호출)
 export type EffectDraw = (out: CanvasRenderingContext2D, src: CanvasImageSource, w: number, h: number) => void
@@ -15,29 +16,6 @@ export const FX = { fps: 30, failMax: 30 } // 연속 실패 상한 — 넘으면
 // 기능 탐지(UA 판정 금지) — 캔버스 송출이 없으면 효과를 켤 수 없다
 export const canProcessVideo = () =>
   typeof HTMLCanvasElement !== 'undefined' && typeof HTMLCanvasElement.prototype.captureStream === 'function'
-
-// 주기 호출 — 워커 타이머(숨은 탭의 창 타이머 감속을 피함), 워커를 못 만들면 창 타이머
-function ticker(ms: number, fn: () => void): () => void {
-  let stop = () => {}
-  const windowTimer = () => {
-    const id = setInterval(fn, ms)
-    stop = () => clearInterval(id)
-  }
-  try {
-    const url = URL.createObjectURL(new Blob([`setInterval(()=>postMessage(0),${ms})`], { type: 'text/javascript' }))
-    const w = new Worker(url)
-    URL.revokeObjectURL(url)
-    w.onmessage = fn
-    w.onerror = () => {
-      w.terminate()
-      windowTimer()
-    }
-    stop = () => w.terminate()
-  } catch {
-    windowTimer()
-  }
-  return () => stop()
-}
 
 // 파이프라인 1개 — 켜진 효과 목록은 매 프레임 active() 로 읽는다(효과를 더하거나 빼도 송신 트랙을 다시 바꾸지 않아 원본이 새지 않음)
 function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[]) {
