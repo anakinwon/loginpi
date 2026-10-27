@@ -8,7 +8,8 @@ import { captions } from './captions'
 import { attend } from './engage/attend'
 import { polls } from './engage/polls'
 import { qna } from './engage/qna'
+import { notes } from './notes'
 import { mediaFx } from './media-fx'
 import { recording } from './recording'
 
-export const FEATURES: readonly RoomFeature[] = [captions, recording, mediaFx, backgrounds, qna, polls, attend]
+export const FEATURES: readonly RoomFeature[] = [captions, recording, notes, mediaFx, backgrounds, qna, polls, attend]

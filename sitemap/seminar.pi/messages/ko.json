@@ -83,7 +83,11 @@
     "SPEECH_RATE": "음성 요청이 너무 잦습니다. 잠시 후 다시 시도하세요",
     "SPEECH_QUOTA": "이 세미나의 음성 처리 시간이 모두 소진되었습니다",
     "SPEECH_FAILED": "음성을 글로 바꾸지 못했습니다",
-    "POLL_CLOSED": "마감된 설문입니다"
+    "POLL_CLOSED": "마감된 설문입니다",
+    "NOTE_NOT_RECORDING": "기록 중인 회의록이 아닙니다",
+    "NOTE_SHOT_INVALID": "화면 캡처 형식이 올바르지 않습니다",
+    "NOTE_SHOT_RATE": "화면 캡처가 너무 잦습니다",
+    "NOTE_RETRY_SOON": "잠시 뒤에 다시 만들 수 있습니다(1분 간격)"
   },
   "progress": {
     "title": "제작 진행 현황",
@@ -463,6 +467,15 @@
         "startedBy": "발표자가 녹화를 시작했습니다",
         "stoppedBy": "발표자가 녹화를 끝냈습니다"
       }
+    },
+    "notes": {
+      "on": "AI 회의록",
+      "badge": "AI 기록 중",
+      "started": "발표자가 AI 회의록을 켰습니다",
+      "stopped": "AI 회의록이 꺼졌습니다",
+      "startedMine": "AI 회의록을 켰습니다 — 참가자 전원에게 표시됩니다",
+      "stoppedMine": "AI 회의록을 껐습니다 — 회의록을 만드는 중입니다",
+      "startFail": "AI 회의록을 시작하지 못했습니다"
     }
   },
   "list": {
@@ -637,5 +650,31 @@
     "rec": "녹화는 발표자 기기에만 파일로 저장되며 서버에 올리거나 국외로 이전하지 않습니다. 녹화와 AI 기록이 진행되는 동안 모든 참가자 화면에 표시가 나타납니다.",
     "rightsTitle": "정보주체의 권리",
     "rights": "내 정보의 열람, 정정, 삭제, 처리 정지를 요청할 수 있습니다. 연락처 : [확인중 : 마스터 — 개인정보 보호책임자 이름·연락처]"
+  },
+  "notes": {
+    "title": "회의록",
+    "back": "세미나로",
+    "loading": "불러오는 중…",
+    "meta": "회의록 · {date} · {min}분",
+    "aiWarn": "AI 가 만든 요약이라 틀릴 수 있습니다",
+    "points": "요점",
+    "decisions": "결정 사항",
+    "todos": "할 일",
+    "shots": "화면 캡처 ({n})",
+    "transcript": "전체 기록",
+    "download": "Markdown 내려받기",
+    "making": "회의록을 만드는 중입니다…",
+    "makingLong": "오래 걸리고 있습니다. 잠시 뒤 새로 고침해 주세요",
+    "recording": "아직 기록 중입니다",
+    "failed": "요약을 만들지 못했습니다 — 전체 기록은 아래에 있습니다",
+    "retry": "다시 만들기",
+    "finish": "기록 끝내고 요약 만들기",
+    "none": "내용이 없습니다",
+    "notFound": "회의록을 찾을 수 없습니다",
+    "forbidden": "이 회의록을 볼 권한이 없습니다",
+    "shotAlt": "{at} 화면 캡처",
+    "close": "닫기",
+    "view": "회의록 보기",
+    "error": "불러오지 못했습니다"
   }
 }

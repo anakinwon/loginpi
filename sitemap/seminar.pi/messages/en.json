@@ -83,7 +83,11 @@
     "SPEECH_RATE": "Too many voice requests. Please try again shortly",
     "SPEECH_QUOTA": "Voice processing time for this seminar is used up",
     "SPEECH_FAILED": "Could not convert speech to text",
-    "POLL_CLOSED": "This poll is closed"
+    "POLL_CLOSED": "This poll is closed",
+    "NOTE_NOT_RECORDING": "These notes are not recording",
+    "NOTE_SHOT_INVALID": "Invalid screen capture",
+    "NOTE_SHOT_RATE": "Too many screen captures",
+    "NOTE_RETRY_SOON": "You can try again in a minute"
   },
   "progress": {
     "title": "Build progress",
@@ -463,6 +467,15 @@
         "startedBy": "The presenter started recording",
         "stoppedBy": "The presenter stopped recording"
       }
+    },
+    "notes": {
+      "on": "AI notes",
+      "badge": "AI notes on",
+      "started": "The presenter turned on AI notes",
+      "stopped": "AI notes turned off",
+      "startedMine": "AI notes on — shown to everyone",
+      "stoppedMine": "AI notes off — creating the notes",
+      "startFail": "Couldn't start AI notes"
     }
   },
   "list": {
@@ -637,5 +650,31 @@
     "rec": "Recordings are saved only as a file on the presenter’s device. They are not uploaded to our servers or transferred abroad. While recording or AI notes are on, every participant sees an indicator.",
     "rightsTitle": "Your rights",
     "rights": "You can ask to access, correct, delete or stop the processing of your information. Contact: [TBD: privacy officer name and contact]"
+  },
+  "notes": {
+    "title": "Notes",
+    "back": "Back to seminar",
+    "loading": "Loading…",
+    "meta": "Notes · {date} · {min} min",
+    "aiWarn": "AI-generated summary — it may contain mistakes",
+    "points": "Key points",
+    "decisions": "Decisions",
+    "todos": "Action items",
+    "shots": "Screen captures ({n})",
+    "transcript": "Transcript",
+    "download": "Download Markdown",
+    "making": "Creating the notes…",
+    "makingLong": "This is taking a while. Please refresh later",
+    "recording": "Still recording",
+    "failed": "Couldn't create the summary — the full transcript is below",
+    "retry": "Try again",
+    "finish": "End recording and summarize",
+    "none": "Nothing here",
+    "notFound": "Notes not found",
+    "forbidden": "You don't have access to these notes",
+    "shotAlt": "Screen capture at {at}",
+    "close": "Close",
+    "view": "View notes",
+    "error": "Couldn't load"
   }
 }

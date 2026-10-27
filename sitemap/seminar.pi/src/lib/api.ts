@@ -51,6 +51,11 @@ export const apiError = createApiError({
   SPEECH_FAILED: '음성을 글로 바꾸지 못했습니다',
   // 설문(sql/009 fn_vote_smn_pll 결과)
   POLL_CLOSED: '마감된 설문입니다',
+  // AI 회의록(api/notes/*, src/lib/note-rules.ts)
+  NOTE_NOT_RECORDING: '기록 중인 회의록이 아닙니다',
+  NOTE_SHOT_INVALID: '화면 캡처 형식이 올바르지 않습니다',
+  NOTE_SHOT_RATE: '화면 캡처가 너무 잦습니다',
+  NOTE_RETRY_SOON: '잠시 뒤에 다시 만들 수 있습니다(1분 간격)',
 })
 
 export const db = () => getSupabaseAdmin()

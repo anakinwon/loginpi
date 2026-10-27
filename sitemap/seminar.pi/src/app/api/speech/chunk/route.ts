@@ -87,11 +87,25 @@ export const POST = withAuthGuard(
 
     // 조각 시작 시각(서버 추정) — 클라이언트 시계를 믿지 않는다
     const ts = Date.now() - durMs
-    const r = await transcribe(
-      Buffer.from(bytes).toString('base64'),
-      aiMime(audio.type) as string,
-      lang,
-    )
+    // 기록 중 회의록 찾기(AI 회의록 켜짐 = 세미나의 RECORDING 1건, 대면 노트 = ntId 자신)는 외부 AI 호출과 독립 — 병렬(R-P1)
+    const ntQ = db()
+      .from('smn_nt')
+      .select('nt_id')
+      .eq('nt_sts_cd', 'RECORDING')
+      .eq('del_yn', 'N')
+    const [r, nt] = await Promise.all([
+      transcribe(
+        Buffer.from(bytes).toString('base64'),
+        aiMime(audio.type) as string,
+        lang,
+      ),
+      (target.p_smn_id
+        ? ntQ.eq('smn_id', target.p_smn_id)
+        : ntQ.eq('nt_id', target.p_nt_id as string)
+      )
+        .limit(1)
+        .maybeSingle<{ nt_id: string }>(),
+    ])
     if (!r) return apiError('SPEECH_FAILED', 502)
 
     // 정산 — 실제 음성이 과금 초보다 길면(저비트레이트로 긴 오디오) 차이를 더 올린다. 다음 조각부터 RATE·QUOTA 에 반영
@@ -105,9 +119,29 @@ export const POST = withAuthGuard(
       if (e2) console.error('[speech/chunk] 정산 실패', e2.code, e2.message)
     }
 
-    // 회의록(AI 회의록 켜짐) 조각 저장 = SubAgent7 이 이 자리에 붙인다 :
-    //  smn_nt_seg INSERT { nt_id, spk_usr_id: user.id, spk_nm: user.display_name || user.pi_username, seg_cont: r.text, lang_cd: r.lang, seg_dtm: ts }
-    //  (빈 text 는 저장하지 않음, 응답을 늦추지 않게 실패해도 자막은 돌려준다)
+    // 회의록 조각 저장(SubAgent7) — 빈 글은 저장하지 않고, 저장이 실패해도 자막은 돌려준다(화자명 = 발화 시점 표시명 스냅샷)
+    if (nt.error)
+      console.error('[speech/chunk] 회의록 조회 실패', nt.error.code)
+    if (nt.data && r.text) {
+      const { error: e3 } = await db()
+        .from('smn_nt_seg')
+        .insert({
+          nt_id: nt.data.nt_id,
+          spk_usr_id: user.id,
+          spk_nm: (user.display_name || user.pi_username || '').slice(0, 100),
+          seg_cont: r.text,
+          lang_cd: r.lang,
+          seg_dtm: new Date(ts).toISOString(),
+          regr_id: user.id,
+          modr_id: user.id,
+        })
+      if (e3)
+        console.error(
+          '[speech/chunk] 회의록 조각 저장 실패',
+          e3.code,
+          e3.message,
+        )
+    }
     return NextResponse.json(
       { text: r.text, lang: r.lang, ts },
       { headers: noStore },

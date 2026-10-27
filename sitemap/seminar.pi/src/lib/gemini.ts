@@ -200,15 +200,18 @@ export interface NoteSummary {
   todos: string[]
 }
 
-// 회의록 요약 — 조각(시각·화자·내용) + 스크린샷 → 요점·결정·할 일. 종료 시 1회(30초)
+// 회의록 요약 — 조각(시각·화자·내용) + 스크린샷(앞에 캡처 시각 글) → 요점·결정·할 일(화면 관련 요점엔 캡처 시각). 종료 시 1회(30초)
+//  cut = 조각 상한을 넘어 뒷부분을 못 넣음 → 입력 끝에 '이하 생략' 표시
 export async function summarize(
   segments: { at: string; spk: string; text: string }[],
-  images: { data: string; mime: string }[] = [],
+  images: { data: string; mime: string; at?: string }[] = [],
+  cut = false,
 ): Promise<NoteSummary | null> {
   const lines = segments
     .filter((s) => s.text.trim())
     .map((s) => `[${s.at}] ${s.spk}: ${s.text}`)
   if (!lines.length) return null
+  if (cut) lines.push('[…] (transcript truncated here — later part omitted)')
   const list = { type: 'array', items: { type: 'string' } }
   const out = await interactJson<Partial<NoteSummary>>(
     {
@@ -219,12 +222,14 @@ export async function summarize(
           text:
             'You are writing meeting notes from a seminar transcript (and slide screenshots, if any). ' +
             'Write in the main language of the transcript. Return key points, decisions made, and action items ' +
-            '(include the owner name when stated). Use only what is in the transcript; do not invent.\n\n' +
+            '(include the owner name when stated). Use only what is in the transcript; do not invent. ' +
+            'Each screenshot is preceded by its capture time; when a point is about a screenshot, cite it as [HH:MM screen capture].\n\n' +
             lines.join('\n'),
         },
-        ...images
-          .slice(0, MAX_SUMMARY_IMAGES)
-          .map((i) => ({ type: 'image', data: i.data, mime_type: i.mime })),
+        ...images.slice(0, MAX_SUMMARY_IMAGES).flatMap((i) => [
+          { type: 'text', text: `[${i.at ?? '?'}] screen capture:` },
+          { type: 'image', data: i.data, mime_type: i.mime },
+        ]),
       ],
     },
     {

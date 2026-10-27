@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl'
 import { piFetch, usePiAuth } from '@pi/auth/client'
 import { useAppUser } from '@/components/google-auth'
 import { LoginGate } from '@/components/login-gate'
+import { NoteLink } from '@/components/notes/note-view'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
 import { formatFee, OPEN_STS } from '@/lib/seminar-rules'
@@ -113,6 +114,7 @@ export function SeminarDetail({ id }: { id: string }) {
       )}
       {/* 일정·공유 — 종료·취소된 세미나는 숨김(UI 설계 15 표) */}
       {(OPEN_STS as readonly string[]).includes(d.status) && <ShareLinks d={d} />}
+      {userId && <NoteLink smnId={d.id} />}
     </article>
   )
 }
