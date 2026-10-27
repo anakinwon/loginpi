@@ -13,7 +13,7 @@ export function SiteHeader() {
 
   return (
     <header className="border-b border-white/10">
-      <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+      <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 lg:max-w-none lg:px-8">
         <Link href="/" className="text-lg font-bold">
           seminar.pi
         </Link>

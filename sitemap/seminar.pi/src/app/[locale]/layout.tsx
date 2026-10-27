@@ -45,7 +45,7 @@ export default async function LocaleLayout({
           <SessionProvider>
             <PiAuthRoot>
               <SiteHeader />
-              <main className="mx-auto max-w-3xl px-4 py-6">{children}</main>
+              <main className="mx-auto max-w-3xl px-4 py-6 lg:max-w-none lg:px-8">{children}</main>
             </PiAuthRoot>
           </SessionProvider>
         </NextIntlClientProvider>

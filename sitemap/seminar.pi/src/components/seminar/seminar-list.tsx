@@ -123,7 +123,7 @@ function TabList({ tab }: { tab: Tab }) {
 
   return (
     <div className="space-y-4">
-      <ul className="grid gap-3 sm:grid-cols-2">
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {res.rows.map((s) => (
           <li key={s.id}>
             <Card s={s} />
