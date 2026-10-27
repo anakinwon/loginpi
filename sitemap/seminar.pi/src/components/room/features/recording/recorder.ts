@@ -1,8 +1,10 @@
 // 로컬 녹화기(SA6, 설계서 15.6·계획서 M-4) — 무대 상자 안의 <video> 들을 지금 보이는 자리 그대로 canvas 에 그리고,
 // 원격 소리 + 내 마이크를 AudioContext 로 섞어 MediaRecorder 1초 조각으로 모은다. 종료하면 Blob 1개(발표자 기기에만, 서버 전송 없음).
-// 처음 녹화할 때 동적 import 로만 불러온다(룸 첫 화면 JS 예산, 설계서 15.13). 순수 판정(pickMime·recFileName·fitRect)은 recorder.test.mjs
+// 처음 녹화할 때 동적 import 로만 불러온다(룸 첫 화면 JS 예산, 설계서 15.13). 순수 판정(pickMime·recFileName·fitRect 등)은 rules.ts·rules.test.mjs
 // 근거(REA jitsi ③) : 조각 단위 MediaRecorder + 탭 소리·마이크 AudioContext 합성. 우리는 탭 캡처(getDisplayMedia, 데스크톱 Chromium 한정) 대신
 //  canvas 합성을 써 모바일·Pi Browser 에서도 기능 탐지로 시도한다. 코드는 옮기지 않았다(S-2)
+import { ticker } from '../../ticker'
+import { fitRect, pickMime } from './rules'
 
 const R = {
   w: 1280, // 녹화 화면 크기 — 무대 비율과 달라도 가운데 맞춤(남는 곳은 검정)
@@ -11,36 +13,6 @@ const R = {
   sliceMs: 1000, // 1초 조각
   videoBps: 1_500_000,
 } as const
-
-// 지원 형식 — 앞에서부터 처음 되는 것(iOS Safari 는 mp4 만). 없으면 '' = 브라우저 기본
-export const MIME_CANDIDATES = [
-  'video/webm;codecs=vp9,opus',
-  'video/webm;codecs=vp8,opus',
-  'video/webm',
-  'video/mp4;codecs=avc1,mp4a.40.2',
-  'video/mp4',
-] as const
-
-export function pickMime(isSupported: (m: string) => boolean): string {
-  return MIME_CANDIDATES.find((m) => isSupported(m)) ?? ''
-}
-
-// seminar-<id>-<YYYYMMDD-HHmmss>.<webm|mp4> — 시각은 기기 현지 시각
-export function recFileName(seminarId: string, mime: string, at: Date): string {
-  const p = (n: number) => String(n).padStart(2, '0')
-  const ts = `${at.getFullYear()}${p(at.getMonth() + 1)}${p(at.getDate())}-${p(at.getHours())}${p(at.getMinutes())}${p(at.getSeconds())}`
-  const id = seminarId.replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40) || 'room'
-  return `seminar-${id}-${ts}.${mime.includes('mp4') ? 'mp4' : 'webm'}`
-}
-
-// 상자(box) 안에 원본(sw×sh)을 비율 유지로 가운데 맞춤(object-contain) — 그릴 사각형
-export function fitRect(box: { x: number; y: number; w: number; h: number }, sw: number, sh: number) {
-  if (!sw || !sh || !box.w || !box.h) return null
-  const s = Math.min(box.w / sw, box.h / sh)
-  const w = sw * s
-  const h = sh * s
-  return { x: box.x + (box.w - w) / 2, y: box.y + (box.h - h) / 2, w, h }
-}
 
 // 기능 탐지 — UA 로 막지 않는다. 셋 중 하나라도 없으면 녹화 불가 안내
 export function canRecord(): boolean {
@@ -84,9 +56,9 @@ export function startRecorder(stage: HTMLElement, ac: AudioContext): Recorder {
       g.drawImage(v, d.x, d.y, d.w, d.h)
     }
   }
-  // ponytail: setInterval 그리기 — 탭이 뒤로 가면 브라우저가 1초 1회로 늦춘다(영상이 멈춘 듯 보임). 필요하면 Worker 타이머로
+  // 워커 타이머 — 발표자가 다른 탭·창을 화면 공유하느라 이 탭이 숨어도 녹화가 초당 1프레임으로 멈추지 않게(창 타이머는 숨은 탭에서 1초 1회)
   draw()
-  const timer = setInterval(draw, 1000 / R.fps)
+  const stopTick = ticker(Math.round(1000 / R.fps), draw)
 
   const dest = ac.createMediaStreamDestination()
   let sources: MediaStreamAudioSourceNode[] = []
@@ -117,7 +89,7 @@ export function startRecorder(stage: HTMLElement, ac: AudioContext): Recorder {
   const stop = () =>
     new Promise<Blob>((resolve) => {
       const done = () => {
-        clearInterval(timer)
+        stopTick()
         stream.getTracks().forEach((t) => t.stop())
         sources.forEach((s) => s.disconnect())
         void ac.close().catch(() => {})

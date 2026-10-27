@@ -522,9 +522,10 @@
         "cancel": "Cancel",
         "start": "Start recording"
       },
+      "resave": { "label": "Recording file", "save": "Save again", "dismiss": "Close save again" },
       "toast": {
         "started": "Recording started — everyone can see it",
-        "saved": "Recording saved. Check your downloads folder. If nothing was saved, record again from a regular browser.",
+        "saved": "Recording saved. Check your downloads folder. If nothing was saved, tap [Save again] at the top of the screen.",
         "empty": "Nothing was recorded, so no file was created.",
         "saveFailed": "Could not create the recording file.",
         "startedBy": "The presenter started recording",

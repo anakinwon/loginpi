@@ -3,12 +3,14 @@
 // 끄면 state{recording:false} + 파일 다운로드(seminar-<id>-<시각>.webm|mp4). 받는 쪽은 빨간 '녹화 중' 배지(자동 숨김 없음) + 3초 토스트.
 // 전원 고지를 못 하면(sendApp 실패) 시작하지 않는다. 늦게 들어온 사람에게는 녹화 중인 발표자가 1초 묶음으로 다시 알린다(SIGNAL_API 3.6).
 // 고지는 fail-open 을 막으려고 시작·종료·재알림 모두 재시도(RATE_LIMITED·TIMEOUT)하고, 녹화 중에는 10초마다 현재 상태를 다시 보낸다(app-retry).
-// d 약속 : { recording: boolean } — 같은 state 주제의 다른 키(AI 기록 등)는 이 기능이 무시한다
+// d 약속 : { recording: boolean } — 같은 state 주제의 다른 키(AI 기록 등)는 이 기능이 무시한다(rules.ts readRecording·applyRec)
+// 저장이 막히는 곳(앱 안 브라우저 등)을 위해 마지막 녹화 파일을 다음 녹화·퇴장·닫기 전까지 들고 [다시 저장](파일 공유 → 내려받기)을 띄운다
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { featureStore, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 import { APP_RETRY, sendRetry } from '../../app-retry'
 import type { Recorder } from './recorder'
+import { applyRec, othersRecording, recFileName, saveVia, type RecBy } from './rules'
 
 const RESEND_MS = 1000 // 늦은 입장자 재알림 묶음(초당 2건 한도 안)
 const sendState = (ctx: RoomCtx, on: boolean, live: () => boolean) =>
@@ -19,18 +21,33 @@ const recOn = featureStore(false) // 내가 녹화 중
 const startedAt = featureStore(0)
 const confirmOpen = featureStore(false)
 const busy = featureStore(false) // 시작·종료 처리 중(두 번 누름 방지)
-const recBy = featureStore<Readonly<Record<string, true>>>({}) // 녹화 중이라고 알린 다른 발표자 peerId
+const recBy = featureStore<RecBy>({}) // 녹화 중이라고 알린 다른 발표자 peerId
 const toast = featureStore<string | null>(null) // room.recording.* 아래 키
+const lastSaved = featureStore(false) // 다시 저장할 마지막 녹화 파일이 있음(lastFile)
 let recorder: Recorder | null = null
 let fileName = ''
-let gen = 0 // 세대 — onReset(퇴장·끊김) 때 증가. startRec 의 await 사이에 바뀌면 시작하지 않는다
+let lastFile: File | null = null // ponytail: 메모리에 1개 보관(긴 녹화면 수백 MB) — 다음 녹화 시작·퇴장·[닫기] 때 놓는다
 
-// d 검사 — 엔진은 모양을 보지 않으므로 받는 쪽이 거른다
-export function readRecording(d: unknown): boolean | null {
-  if (!d || typeof d !== 'object') return null
-  const v = (d as { recording?: unknown }).recording
-  return typeof v === 'boolean' ? v : null
+const dropLast = () => {
+  lastFile = null
+  lastSaved.set(false)
 }
+
+// 다시 저장 — 버튼 클릭(사용자 제스처) 안에서만 부른다. 파일 공유가 되면 공유 시트(파일에 저장), 아니면 <a download>
+async function resave() {
+  const f = lastFile
+  if (!f) return
+  const nav = typeof navigator === 'undefined' ? undefined : navigator
+  if (saveVia(nav, f) === 'share') {
+    try {
+      return await navigator.share({ files: [f] })
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'AbortError') return // 사용자가 닫음
+    }
+  }
+  ;(await import('./recorder')).saveBlob(f, f.name)
+}
+let gen = 0 // 세대 — onReset(퇴장·끊김) 때 증가. startRec 의 await 사이에 바뀌면 시작하지 않는다
 
 // 종료 — 파일 저장 + 전원 알림. ctx 가 없으면(퇴장·끊김) 알림 없이 저장만(데이터 유실 방지)
 async function stopRec(ctx: RoomCtx | null) {
@@ -44,7 +61,14 @@ async function stopRec(ctx: RoomCtx | null) {
   if (ctx) void sendState(ctx, false, () => !recorder && !recOn.get())
   try {
     const blob = await rec.stop()
-    if (blob.size) (await import('./recorder')).saveBlob(blob, fileName)
+    if (blob.size) {
+      ;(await import('./recorder')).saveBlob(blob, fileName)
+      // 퇴장·끊김(ctx 없음)이면 들지 않는다 — 룸을 떠나면 다시 저장 단추도 없다
+      if (ctx && typeof File !== 'undefined') {
+        lastFile = new File([blob], fileName, { type: blob.type })
+        lastSaved.set(true)
+      }
+    }
     toast.set(blob.size ? 'saved' : 'empty')
   } catch {
     toast.set('saveFailed')
@@ -71,6 +95,7 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
     const err = await sendState(ctx, true, () => g === gen)
     if (err === 'CANCELLED') return
     if (err) return ctx.notice('recording.notifyFailed')
+    dropLast() // 새 녹화가 시작되면 이전 파일은 놓는다(메모리에 둘을 들지 않게) — 시작 못 하면 남겨 둔다
     // 기다리는 사이 퇴장·끊김(onReset)이면 시작하지 않고 알림을 되돌린다
     if (g !== gen) return void ctx.sendApp('state', { recording: false })
     try {
@@ -81,7 +106,7 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
       return ctx.notice('recording.unsupported')
     }
     if (ac.state !== 'running') ctx.notice('recording.audioSuspended')
-    fileName = mod.recFileName(ctx.seminarId, recorder.mime, new Date())
+    fileName = recFileName(ctx.seminarId, recorder.mime, new Date())
     recorder.setAudio([ctx.r.remoteAudio, ctx.r.localStream])
     recOn.set(true)
     startedAt.set(Date.now())
@@ -114,12 +139,11 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const isBusy = useStore(busy)
   const by = useStore(recBy)
   const msg = useStore(toast)
+  const canResave = useStore(lastSaved)
   const [now, setNow] = useState(0)
   const { r, role, hold } = ctx
   const ids = new Set(r.peers.map((p) => p.peerId))
-  // 알린 사람이 지금도 방의 발표자일 때만 배지 — 나갔거나(종료 신호 없이 끊김) 강등됐으면(강등 뒤 종료 알림은
-  // 엔진이 ROLE_FORBIDDEN 으로 거절, SIGNAL_API 3.6) 내린다. 수신 측 판정이 정본
-  const others = Object.keys(by).some((id) => r.peers.find((p) => p.peerId === id)?.role === 'presenter')
+  const others = othersRecording(by, r.peers) // 알린 사람이 지금도 방의 발표자일 때만(퇴장·강등이면 내림)
 
   // 확인 대화상자 — 열려 있는 동안 바 자동 숨김 보류
   useEffect(() => {
@@ -159,9 +183,11 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     if (mine) recorder?.setAudio([r.remoteAudio, r.localStream])
   }, [mine, r.remoteAudio, r.localStream])
 
-  // 발표자 역할을 잃으면 녹화를 끝낸다(파일은 저장)
+  // 발표자 역할을 잃으면 녹화를 끝낸다(파일은 저장). 열려 있던 시작 확인 대화상자도 닫는다(누르면 엔진이 거절해 '알리지 못함'만 뜬다)
   useEffect(() => {
-    if (mine && role !== 'presenter') void stopRec(ctx)
+    if (role === 'presenter') return
+    confirmOpen.set(false)
+    if (mine) void stopRec(ctx)
   }, [mine, role]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 늦은 입장자 — 참가자 구성이 바뀌면 1초 묶어서 현재 상태를 다시 알린다
@@ -195,6 +221,26 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
           <span aria-hidden className="size-2 animate-pulse rounded-full bg-white" />
           {t('badge')}
           {mine && since > 0 && <span className="tabular-nums">{mmss(now - since)}</span>}
+        </div>
+      )}
+      {canResave && !mine && (
+        <div
+          role="group"
+          aria-label={t('resave.label')}
+          className="bg-surface-raised absolute top-[calc(44px+env(safe-area-inset-top))] left-3 z-10 inline-flex max-w-[calc(100%-24px)] items-center gap-1 rounded-full py-1 pr-1 pl-3 text-[13px] shadow"
+        >
+          <span className="truncate">{t('resave.label')}</span>
+          <button type="button" onClick={() => void resave()} className="bg-danger h-8 shrink-0 rounded-full px-3 font-semibold text-white">
+            {t('resave.save')}
+          </button>
+          <button
+            type="button"
+            onClick={dropLast}
+            aria-label={t('resave.dismiss')}
+            className="hover:bg-surface h-8 w-8 shrink-0 rounded-full"
+          >
+            <span aria-hidden>×</span>
+          </button>
         </div>
       )}
       {msg && (
@@ -271,14 +317,10 @@ export const recording: RoomFeature = {
   Overlay,
   onApp: (m) => {
     if (m.topic !== 'state') return
-    const on = readRecording(m.d)
-    if (on === null || on === !!recBy.get()[m.from]) return
-    recBy.set((s) => {
-      const next = { ...s }
-      if (on) next[m.from] = true
-      else delete next[m.from]
-      return next
-    })
+    const next = applyRec(recBy.get(), m.from, m.d)
+    if (!next) return
+    const on = !!next[m.from]
+    recBy.set(next)
     toast.set(on ? 'startedBy' : 'stoppedBy') // 토스트 + polite 낭독은 Overlay
   },
   onReset: () => {
@@ -286,5 +328,6 @@ export const recording: RoomFeature = {
     void stopRec(null)
     confirmOpen.reset()
     recBy.reset()
+    dropLast() // 퇴장하면 다시 저장 파일도 놓는다
   },
 }
