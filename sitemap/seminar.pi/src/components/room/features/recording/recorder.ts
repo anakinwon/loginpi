@@ -51,7 +51,8 @@ export function startRecorder(stage: HTMLElement, ac: AudioContext, onFail?: () 
     if (!area) return
     const k = area.w / sr.width
     for (const v of stage.querySelectorAll('video')) {
-      if (v.readyState < 2 || !v.videoWidth) continue
+      // 대화상자(효과 시트 미리보기 등) 안 영상은 무대가 아니다 — 열린 채 녹화하면 무대 위에 미리보기가 덧그려졌다
+      if (v.readyState < 2 || !v.videoWidth || v.closest('dialog')) continue
       const r = v.getBoundingClientRect()
       const box = { x: area.x + (r.left - sr.left) * k, y: area.y + (r.top - sr.top) * k, w: r.width * k, h: r.height * k }
       const d = fitRect(box, v.videoWidth, v.videoHeight)

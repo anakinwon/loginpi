@@ -22,6 +22,7 @@ const track = () => {
   let on = true
   return { stop: () => on && (on = false, live.tracks--) }
 }
+const drawn = [] // 그린 영상 id
 let recorderMode = 'ok' // 'ok' | 'ctorThrows' | 'startThrows'
 let lastRec = null
 function install() {
@@ -41,7 +42,7 @@ function install() {
   }
   globalThis.document = {
     createElement: () => ({
-      getContext: () => ({ fillRect() {}, drawImage() {} }),
+      getContext: () => ({ fillRect() {}, drawImage: (v) => drawn.push(v.id) }),
       captureStream: () => ({ getVideoTracks: () => [track()] }),
     }),
   }
@@ -119,5 +120,22 @@ test('메모리 상한 — 모은 조각이 2GB 를 넘으면 onFail 1번(자동
   lastRec.ondataavailable({ data: { size: GB } }) // 2GB 도달
   lastRec.ondataavailable({ data: { size: 1 } }) // 종료 처리 중 마지막 조각 — 다시 부르지 않는다
   assert.equal(failed, 1)
+  await r.stop()
+})
+
+test('그리기 — 대화상자(효과 시트 미리보기) 안 영상은 무대 녹화에 덧그리지 않는다', async () => {
+  recorderMode = 'ok'
+  const vid = (id, inDialog) => ({
+    id,
+    readyState: 4,
+    videoWidth: 640,
+    videoHeight: 360,
+    closest: (sel) => (sel === 'dialog' && inDialog ? {} : null),
+    getBoundingClientRect: () => ({ left: 0, top: 0, width: 320, height: 180 }),
+  })
+  const st = { ...stage, querySelectorAll: () => [vid('tile', false), vid('preview', true)] }
+  drawn.length = 0
+  const r = startRecorder(st, ac())
+  assert.deepEqual(drawn, ['tile'])
   await r.stop()
 })
