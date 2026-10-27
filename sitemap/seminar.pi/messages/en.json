@@ -351,7 +351,30 @@
       "decline": "Don't agree",
       "agree": "Agree and turn on mic",
       "notice": "When recording, captions or AI meeting notes are on, speakers’ voices are processed. Audience voices are not sent."
-    }
+    },
+    "captions": {
+      "title": "Captions",
+      "room": "Live captions (whole room)",
+      "show": "Show captions",
+      "size": {
+        "label": "Text size",
+        "sm": "Small",
+        "md": "Medium",
+        "lg": "Large"
+      },
+      "waiting": "Captions appear when the presenter turns them on",
+      "limit": "Speech processing limit reached, so captions stopped",
+      "sendFail": "Could not turn on captions. Please try again shortly",
+      "region": "Captions"
+    },
+    "effects": {
+      "title": "Effects",
+      "light": "Light correction",
+      "noise": "Reduce noise",
+      "none": "No effects are available on this device",
+      "noiseFail": "Noise reduction cannot be changed on this device"
+    },
+    "sheetClose": "Close"
   },
   "list": {
     "tabsLabel": "Seminar list view",
