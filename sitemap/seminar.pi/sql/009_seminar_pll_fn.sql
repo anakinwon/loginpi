@@ -1,6 +1,6 @@
 -- 009_seminar_pll_fn.sql — 설문 투표(1인 1표, 다시 투표 = 같은 행 갱신)·설문 집계 함수 2개(SubAgent4 설문·Q&A·출석)
 -- DA-APPROVED: 아소카 결정(마스터 위임 2026-10-27) — 함수 2개(fn_vote_smn_pll·fn_cnt_smn_pll) 신규만, 테이블·인덱스 무변경(008 그대로). DA 사후 리뷰 대상
--- 선행 : 008. 적용 : node scripts/db-migrate.mjs --app seminar --tier dev|stg|prod — 통합 단계에서(작성 시점 미적용)
+-- 선행 : 008. 적용 : node scripts/db-migrate.mjs --app seminar --tier dev|stg|prod — 2026-10-27 dev·stg·prod 적용 완료(야간 시험 r1 통합, PRD 9절 #17)
 --
 -- 왜 함수인가 :
 --  · 투표 — x_smn_pll_vt_01 이 부분 유일 인덱스(WHERE del_yn='N')라 PostgREST upsert(onConflict)를 못 쓴다(008 주석 42P10).

@@ -137,7 +137,8 @@ function QnaPanel({ ctx, visible }: { ctx: RoomCtx; visible: boolean }) {
         className="bg-surface sticky bottom-0 flex gap-2 border-t border-white/10 p-2"
         onSubmit={async (e) => {
           e.preventDefault()
-          if (!text.trim()) return
+          // requestSubmit()(Ctrl/⌘+Enter)은 비활성 [보내기] 버튼을 무시하고 제출한다 — 보내는 중이면 여기서 막는다(중복 질문, T04 r6)
+          if (busy || !text.trim()) return
           if (await act('POST', { text }, true)) {
             setText('')
             view(false)
@@ -154,7 +155,7 @@ function QnaPanel({ ctx, visible }: { ctx: RoomCtx; visible: boolean }) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
-            if (!sendKey({ key: e.key, ctrlKey: e.ctrlKey, metaKey: e.metaKey, isComposing: e.nativeEvent.isComposing })) return
+            if (!sendKey({ key: e.key, ctrlKey: e.ctrlKey, metaKey: e.metaKey, isComposing: e.nativeEvent.isComposing, repeat: e.repeat })) return
             e.preventDefault()
             e.currentTarget.form?.requestSubmit()
           }}
