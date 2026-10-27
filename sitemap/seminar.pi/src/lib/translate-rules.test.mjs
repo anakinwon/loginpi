@@ -208,7 +208,7 @@ test('자막 표시 — 번역문은 bdi(오른쪽→왼쪽 언어 격리) + lan
 // 회귀(T09 r3) — 방송된 자막 1문장에 청중이 동시에 요청 : 판정 왕복 동안 온 요청이 전부 미스로 계량돼 세미나 누적 글자가 청중 수만큼 닳던 결함.
 //  판정 전에 Promise 를 캐시에 넣어 뒤 요청은 적중(차감 없음)으로 공유 — 계량(gate) 1회·외부 AI(work) 1회
 test('shareMiss — 동시 미스는 계량 1회·외부 AI 1회, 거절·실패·판정 예외는 null + 캐시에서 지움', async () => {
-  const { shareMiss } = await import('./translate-rules.ts')
+  const { shareMiss, DENIED } = await import('./translate-rules.ts')
   const tick = () => new Promise((r) => setTimeout(r, 5))
   // 청중 20명 동시 — 라우트와 같은 흐름(get → 적중이면 공유, 미스면 shareMiss)
   const cache = new Lru(10)
@@ -236,7 +236,7 @@ test('shareMiss — 동시 미스는 계량 1회·외부 AI 1회, 거절·실패
   let w2 = 0
   const r2 = await shareMiss(c2, 'k', async () => 'QUOTA', async () => (w2++, 'x'))
   assert.equal(r2.denied, 'QUOTA')
-  assert.equal(await r2.p, null)
+  assert.equal(await r2.p, DENIED) // 거절은 실패(null)와 구분 — 기다리던 쪽이 자기 판정으로 다시 가게
   await tick()
   assert.equal(w2, 0)
   assert.equal(c2.get('k'), undefined)
@@ -293,4 +293,29 @@ test('자막 숨김 — 번역 요청 끔(더빙은 별도 경로)', async () =>
   const { readFile } = await import('node:fs/promises')
   const cap = await readFile(new URL('../components/room/features/captions/index.tsx', import.meta.url), 'utf8')
   assert.ok(cap.includes('useTranslated(latest, tr && show, lang, ctx.seminarId)'))
+})
+
+// 보안 검토(2026-10-28) — 첫 요청자의 개인 거절(분당 상한·자격 없음)이 같은 문장을 기다리던 정상 사용자에게 번지던 결함.
+//  라우트와 같은 흐름 : 적중 → DENIED 면 자기 판정(shareMiss)으로 다시. 정상 사용자는 성공, 자기 계량 1회
+test('shareMiss — 첫 요청 거절은 나눠 갖지 않는다(기다리던 정상 사용자는 자기 판정으로 성공)', async () => {
+  const { shareMiss, DENIED } = await import('./translate-rules.ts')
+  const tick = () => new Promise((r) => setTimeout(r, 5))
+  const cache = new Lru(10)
+  const gates = []
+  const req = async (user) => {
+    let p = cache.get('k')
+    if (p && (await p) === DENIED) p = undefined
+    if (!p) {
+      const r = await shareMiss(cache, 'k', async () => (gates.push(user), await tick(), user === 'bad' ? 'QUOTA' : null), async () => 'text')
+      if (r.denied) return r.denied
+      p = r.p
+    }
+    return p
+  }
+  const bad = req('bad')
+  await new Promise((r) => setTimeout(r, 1)) // bad 의 판정이 진행 중일 때 good 이 적중
+  const [b, g] = await Promise.all([bad, req('good')])
+  assert.equal(b, 'QUOTA')
+  assert.equal(g, 'text')
+  assert.deepEqual(gates, ['bad', 'good'])
 })

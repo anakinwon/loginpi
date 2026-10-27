@@ -204,7 +204,7 @@ test('tts·translate 라우트 — 캐시 적중 분기에서 aiGate 를 await p
     const hit = src.indexOf('if (p) {')
     const g = src.indexOf('await aiGate(smnId, user)')
     const serve = src.indexOf('await p\n')
-    assert.ok(hit > 0 && g > hit && g < src.indexOf('} else {', hit) && serve > g, `${f}: 적중 분기 aiGate 순서`)
+    assert.ok(hit > 0 && g > hit && g < src.indexOf('if (!p) {', hit) && serve > g, `${f}: 적중 분기 aiGate 순서`)
   }
   const tts = await readFile(new URL('../app/api/speech/tts/route.ts', import.meta.url), 'utf8')
   assert.match(tts, /\.max\(TTS_MAX_CHARS\)/)
@@ -311,4 +311,12 @@ test('더빙 연속 재생 실패 — once 는 첫 결과(실패 여부)만, 3�
   assert.ok(src.includes('a.play().catch(() => end(true))'))
   assert.match(src, /if \(!failed\) playFails = 0\s+else if \(\+\+playFails >= DUB_FAIL_MAX\) \{\s+dubOn\.set\(false\)[^\n]*\n\s+alertBlocked\?\.\(\)/)
   assert.match(src, /playing = false\n\s+playFails = 0/) // 끄기·다시 켜기 = 새로 셈
+})
+
+// 보안 검토(2026-10-28) — sql/010 감지가 RPC 오류 종류와 무관하게 작은 선과금으로 후퇴하던 fail-open 회귀 방지
+test('chunk — 010 감지는 함수 없음(PGRST202·42883)만 후퇴, 그 밖의 오류는 큰 예약 유지', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const src = await readFile(new URL('../app/api/speech/chunk/route.ts', import.meta.url), 'utf8')
+  assert.match(src, /FN_MISSING = new Set\(\['PGRST202', '42883'\]\)/)
+  assert.match(src, /if \(error && !FN_MISSING\.has\(error\.code\)\) \{[^}]*return true/)
 })

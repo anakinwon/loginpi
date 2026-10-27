@@ -93,19 +93,21 @@ export class Lru<V> {
 //  판정(gate = fn_use_smn_ai 1왕복)이 끝난 뒤에 캐시에 넣으면 그 왕복 동안 온 청중 전원이 미스로 계량돼 세미나 누적 글자가 청중 수만큼 빨리 닳는다
 //  (청중 20명이면 더빙 상한 20만 자가 몇 분 만에 소진 → SPEECH_QUOTA 로 전원 더빙 꺼짐). 그래서 판정 전에 작업 Promise 를 먼저 넣는다 —
 //  뒤에 온 같은 문장·언어는 적중 분기(aiGate, 차감 없음)로 같은 Promise 를 기다린다.
-//  첫 요청이 거절·실패하면 Promise = null + 캐시에서 지움(기다리던 쪽은 그 문장만 건너뜀). gate 예외는 첫 요청에게 그대로 던진다
-// ponytail: 첫 요청이 개인 사유(분당 상한·자격 없음)로 거절되면 기다리던 사람도 그 문장을 놓친다 — 드묾, 필요하면 null 일 때 자기 판정으로 1회 재시도
+//  첫 요청이 실패하면 Promise = null, 거절되면 DENIED + 둘 다 캐시에서 지움. gate 예외는 첫 요청에게 그대로 던진다
+//  거절은 개인 사유(상한·자격)라 나눠 갖지 않는다 — 기다리던 쪽은 DENIED 를 받으면 자기 판정(shareMiss)으로 다시 간다(보안 검토 2026-10-28)
+export const DENIED = Symbol('denied')
+export type Shared<V> = Promise<V | null | typeof DENIED>
 export async function shareMiss<V, D>(
-  cache: Lru<Promise<V | null>>,
+  cache: Lru<Shared<V>>,
   key: string,
   gate: () => Promise<D | null>,
   work: () => Promise<V | null>,
-): Promise<{ denied: D | null; p: Promise<V | null> }> {
+): Promise<{ denied: D | null; p: Shared<V> }> {
   const g = gate()
-  const p = g.then((d) => (d ? null : work())).catch(() => null)
+  const p: Shared<V> = g.then<V | null | typeof DENIED>((d) => (d ? DENIED : work())).catch(() => null)
   cache.set(key, p)
   void p.then((v) => {
-    if (v === null && cache.get(key) === p) cache.delete(key)
+    if ((v === null || v === DENIED) && cache.get(key) === p) cache.delete(key)
   })
   return { denied: await g, p }
 }
