@@ -5,6 +5,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute, requireUser } from '@/lib/api'
+import { closed, gate } from '@/lib/engage'
 import { isUuid } from '@/lib/seminar-rules'
 import { PRIVACY_VER } from '@/lib/speech-rules'
 
@@ -45,6 +46,10 @@ export const POST = withAuthGuard(
   dbRoute(async (req, ctx) => {
     const w = await who(req, ctx)
     if (w instanceof NextResponse) return w
+    // 참가 자격·상태 확인 뒤에만 기록(야간 시험 T04, D-3) — 출석·설문·Q&A 와 같은 gate : 없는 세미나 404·유료 미등록 402·종료 409
+    const g = await gate(w.smnId, w.user)
+    if (g instanceof NextResponse) return g
+    if (!g.open) return closed()
     const { error } = await db().from(TABLE).insert({
       smn_id: w.smnId,
       usr_id: w.user.id,
