@@ -15,7 +15,8 @@ import {
   type RoomFeature,
 } from '../../extensions'
 import { SwitchRow } from '../sheet'
-import { LIGHT, lightFilter, lightStep, meanLuma } from './light'
+import { LIGHT, lightFilter, lightTracker, meanLuma } from './light'
+import { syncNoise } from './noise'
 
 export const lightOn = featureStore(false)
 export const noiseOn = featureStore(true) // 기본 켬 = 브라우저 기본값과 같다(getUserMedia audio:true)
@@ -26,11 +27,10 @@ const canFilter = () =>
   'filter' in CanvasRenderingContext2D.prototype
 export const canLight = () => canProcessVideo() && canFilter()
 
-let gain = 1
-let n = 0
+const light = lightTracker(lightOn) // 끄면 배율 1 로(다시 켤 때 옛 장면 배율로 시작하지 않게)
 let sample: CanvasRenderingContext2D | null = null
 const drawLight: EffectDraw = (out, src, w, h) => {
-  if (n++ % LIGHT.every === 0) {
+  if (light.due()) {
     sample ??= document
       .createElement('canvas')
       .getContext('2d', { willReadFrequently: true })
@@ -38,13 +38,12 @@ const drawLight: EffectDraw = (out, src, w, h) => {
       sample.canvas.width = LIGHT.sampleW
       sample.canvas.height = LIGHT.sampleH
       sample.drawImage(src, 0, 0, LIGHT.sampleW, LIGHT.sampleH)
-      gain = lightStep(
+      light.sample(
         meanLuma(sample.getImageData(0, 0, LIGHT.sampleW, LIGHT.sampleH).data),
-        gain,
       )
     }
   }
-  out.filter = lightFilter(gain)
+  out.filter = lightFilter(light.gain())
   out.drawImage(src, 0, 0, w, h)
   out.filter = 'none'
 }
@@ -59,21 +58,13 @@ function useNoise(track: MediaStreamTrack | null, on: boolean, ctx: RoomCtx) {
   const notice = ctx.notice
   useEffect(() => {
     if (!track || track.readyState !== 'live' || !canNoise()) return
-    if (track.getSettings().noiseSuppression === on) return
     let live = true
-    track
-      .applyConstraints({
-        echoCancellation: true,
-        noiseSuppression: on,
-        autoGainControl: on,
-      })
-      .catch(() => {})
-      .then(() => {
-        const real = track.getSettings().noiseSuppression
-        if (!live || real === undefined || real === on) return
-        noiseOn.set(real)
-        notice('effects.noiseFail')
-      })
+    // 줄 세워 실행 — 빠른 연타에도 마지막 스위치 값으로 맞춘다(noise.ts)
+    void syncNoise(track, noiseOn.get, () => live).then((real) => {
+      if (real === null) return
+      noiseOn.set(real)
+      notice('effects.noiseFail')
+    })
     return () => {
       live = false
     }
@@ -127,7 +118,6 @@ export const mediaFx: RoomFeature = {
   onReset: () => {
     lightOn.reset()
     noiseOn.reset()
-    gain = 1
-    n = 0
+    light.reset()
   },
 }
