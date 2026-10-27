@@ -108,6 +108,24 @@ test('질문 보내기 키 — Ctrl/⌘+Enter 만, 한글 조합 중 Enter 는 �
   assert.equal(k({ metaKey: true }), true)
   assert.equal(k({ ctrlKey: true, isComposing: true }), false)
   assert.equal(k({ key: 'a', ctrlKey: true }), false)
+  assert.equal(k({ ctrlKey: true, repeat: true }), false) // 누르고 있는 자동 반복 — 중복 질문(T04 r6)
+})
+
+// requestSubmit() 은 비활성 제출 버튼을 무시한다 → 제출 처리기 자체가 보내는 중(busy)을 막아야 한다(T04 r6)
+test('질문·새 설문 제출 — 보내는 중이면 첫 await 전에 돌아간다(중복 등록 방지, T04 r6)', async () => {
+  const { readFileSync } = await import('node:fs')
+  const read = (f) => readFileSync(new URL(`../components/room/features/engage/${f}`, import.meta.url), 'utf8')
+  for (const [f, guard] of [
+    ['qna.tsx', 'if (busy || !text.trim()) return'],
+    ['polls.tsx', 'if (busy || !valid) return'],
+  ]) {
+    const s = read(f)
+    const sub = s.indexOf('onSubmit={async (e) => {')
+    assert.ok(sub > 0, f)
+    const g = s.indexOf(guard, sub)
+    assert.ok(g > sub && g < s.indexOf('await ', sub), `${f} : busy 확인이 첫 await 보다 뒤`)
+  }
+  assert.ok(read('qna.tsx').includes('repeat: e.repeat'), 'qna 가 자동 반복을 sendKey 에 넘기지 않음')
 })
 
 test('남은 글자 수 — 상한 90% 부터만(T04 r3)', () => {

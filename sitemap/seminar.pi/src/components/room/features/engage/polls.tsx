@@ -188,6 +188,7 @@ function NewPoll({ onSubmit, onCancel }: { onSubmit: (q: string, opts: string[])
       className="space-y-2"
       onSubmit={async (e) => {
         e.preventDefault()
+        if (busy || !valid) return // 빠른 연타·Enter 로 같은 설문이 두 번 만들어지지 않게(T04 r6)
         setBusy(true)
         await onSubmit(q, opts)
         setBusy(false)
