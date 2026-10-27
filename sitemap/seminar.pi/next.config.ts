@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(self), microphone=(self)' },
         ],
       },
+      // 배경 효과 MediaPipe(wasm 26.8MB·모델) — 장기 캐시(설계 15.15, R-P4). wasm 은 버전 경로(/mediapipe/wasm/<버전>), 모델은 바꿀 때 파일명을 바꾼다
+      {
+        source: '/mediapipe/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
     ]
   },
 }

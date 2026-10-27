@@ -375,7 +375,29 @@
       "light": "Light correction",
       "noise": "Reduce noise",
       "none": "No effects are available on this device",
-      "noiseFail": "Noise reduction cannot be changed on this device"
+      "noiseFail": "Noise reduction cannot be changed on this device",
+      "close": "Close",
+      "preview": "My preview",
+      "bg": "Background",
+      "bgNone": "None",
+      "bgBlur": "Blur",
+      "bgs": {
+        "dusk": "Dusk",
+        "ocean": "Ocean",
+        "forest": "Forest",
+        "studio": "Studio",
+        "grid": "Grid",
+        "dots": "Dots"
+      },
+      "myAdd": "My image",
+      "myDel": "Delete my image",
+      "myNote": "Your images are stored only on this device (up to 3, 2 MB each)",
+      "myTooBig": "Only images up to 2 MB can be used",
+      "preparing": "Preparing…",
+      "bgFailed": "Could not load the background effect",
+      "autoOff": "Your device is too slow, so the background effect was turned off",
+      "unsupported": "Background effects are not available on this device",
+      "noCam": "Turn on your camera to choose a background"
     },
     "sheetClose": "Close",
     "polls": {

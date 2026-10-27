@@ -255,6 +255,7 @@ function Room({
     announce: setAnnounce,
     hold: bar.onSheet,
     openPanel,
+    fxTrack,
   }
   const ctxRef = useRef(ctx)
   useEffect(() => {
