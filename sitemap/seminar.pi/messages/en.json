@@ -88,7 +88,8 @@
     "NOTE_NOT_RECORDING": "These notes are not recording",
     "NOTE_SHOT_INVALID": "Invalid screen capture",
     "NOTE_SHOT_RATE": "Too many screen captures",
-    "NOTE_RETRY_SOON": "You can try again in a minute"
+    "NOTE_RETRY_SOON": "You can try again in a minute",
+    "SPEECH_TTS_FAILED": "Could not create the translated voice"
   },
   "progress": {
     "title": "Build progress",
@@ -478,6 +479,10 @@
       "startedMine": "AI notes on — shown to everyone",
       "stoppedMine": "AI notes off — creating the notes",
       "startFail": "Couldn't start AI notes"
+    },
+    "dubbing": {
+      "listen": "Listen in translated voice",
+      "blocked": "Could not play the translated voice. Please turn it on again"
     }
   },
   "list": {

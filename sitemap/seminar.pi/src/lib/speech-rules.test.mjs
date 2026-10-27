@@ -15,6 +15,9 @@ import {
   speechMaxSec,
   usrMaxSec,
   vcUseError,
+  rateOk,
+  dubRate,
+  pushDub,
 } from './speech-rules.ts'
 
 const bytes = (...head) => {
@@ -126,4 +129,25 @@ test('언어 코드·속도 문구', () => {
   assert.equal(paceStyle(1.2), 'speaking quickly')
   assert.equal(paceStyle(0.8), 'speaking slowly')
   assert.equal(paceStyle(NaN), null)
+})
+
+test('더빙 — 분당 요청 창·재생 속도·큐 넘침', () => {
+  const hits = new Map()
+  for (let i = 0; i < 30; i++) assert.equal(rateOk(hits, 'u', 1000 + i, 30), true)
+  assert.equal(rateOk(hits, 'u', 2000, 30), false)
+  assert.equal(rateOk(hits, 'v', 2000, 30), true) // 사용자별
+  assert.equal(rateOk(hits, 'u', 61_001, 30), true) // 1분 지나면 풀림
+
+
+  assert.equal(dubRate(5), 1)
+  assert.equal(dubRate(6), 1.2)
+  assert.equal(dubRate(10), 1.5) // 상한
+  assert.equal(dubRate(2), 0.8) // 하한
+  assert.equal(dubRate(NaN), 1)
+
+  let q = []
+  for (const x of [1, 2, 3]) q = pushDub(q, x).q
+  const r = pushDub(q, 4)
+  assert.deepEqual(r.q, [2, 3, 4])
+  assert.deepEqual(r.dropped, [1])
 })

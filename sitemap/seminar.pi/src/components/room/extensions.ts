@@ -122,6 +122,9 @@ export function useStores<T>(list: readonly FeatureStore<T>[]): T[] {
   return useSyncExternalStore(sub, snap, snap)
 }
 
+// 원음(원격 소리 <audio>) 볼륨 0~1 — 음성 번역 듣기(더빙)가 켜진 동안 낮춘다(설계서 15.4 덕킹). stage.tsx useRemoteAudio 가 반영
+export const remoteVolume = featureStore(1)
+
 // 말하기 요청 — 기능별 모드(없으면 요청 안 함). room-view 가 1개의 use-speech 로 돌린다(자막·회의록이 같이 켜져도 녹음은 1번)
 export const speechWants = featureStore<Readonly<Record<string, SpeechMode>>>({})
 export function wantSpeech(featureId: string, mode: SpeechMode | null) {

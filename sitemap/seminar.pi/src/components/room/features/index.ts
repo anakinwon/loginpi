@@ -5,6 +5,7 @@
 import type { RoomFeature } from '../extensions'
 import { backgrounds } from './backgrounds'
 import { captions } from './captions'
+import { dubbing } from './dubbing'
 import { attend } from './engage/attend'
 import { polls } from './engage/polls'
 import { qna } from './engage/qna'
@@ -14,6 +15,7 @@ import { recording } from './recording'
 
 export const FEATURES: readonly RoomFeature[] = [
   captions,
+  dubbing,
   recording,
   notes,
   mediaFx,

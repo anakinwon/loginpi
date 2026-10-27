@@ -3,6 +3,7 @@
 // → 자동재생 정책으로 소리가 막혀도 영상은 나온다(설계서 14.5)
 import { useEffect, useState, type RefObject } from 'react'
 import { useTranslations } from 'next-intl'
+import { remoteVolume, useStore } from './extensions'
 import { useLayerWatch } from './layer-watch'
 import { followKey, groupTracks, nextPin, ringFor, type Layer, type PinState, type RoomLayout } from './room-rules'
 import type { Peer, RemoteTrack, RoomState, SessionRole } from './use-room'
@@ -48,6 +49,11 @@ export function StreamVideo({
 // stream 이 null(오류·끊김·나가기·발행자 퇴장)이면 srcObject 를 비우고 멈춘다 — 이전 소리가 계속 나지 않게
 export function useRemoteAudio(ref: RefObject<HTMLAudioElement | null>, stream: MediaStream | null) {
   const [blocked, setBlocked] = useState(false)
+  // 더빙 덕킹(extensions remoteVolume) — iOS WebKit 은 volume 이 읽기 전용이라 원음이 그대로 [확인중 : 실기기]
+  const volume = useStore(remoteVolume)
+  useEffect(() => {
+    if (ref.current) ref.current.volume = volume
+  }, [ref, volume])
   useEffect(() => {
     const el = ref.current
     if (!el) return
