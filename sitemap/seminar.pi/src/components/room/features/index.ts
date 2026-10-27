@@ -9,5 +9,6 @@ import { attend } from './engage/attend'
 import { polls } from './engage/polls'
 import { qna } from './engage/qna'
 import { mediaFx } from './media-fx'
+import { recording } from './recording'
 
-export const FEATURES: readonly RoomFeature[] = [captions, mediaFx, backgrounds, qna, polls, attend]
+export const FEATURES: readonly RoomFeature[] = [captions, recording, mediaFx, backgrounds, qna, polls, attend]

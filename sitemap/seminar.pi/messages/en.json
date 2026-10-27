@@ -441,6 +441,28 @@
       "input": "Ask a question (500 chars)",
       "send": "Send",
       "labOnly": "Q&A is available in seminar rooms only."
+    },
+    "recording": {
+      "title": "Record",
+      "badge": "Recording",
+      "unsupported": "This browser cannot record. Please record from a regular browser on a computer.",
+      "audioSuspended": "Sound recording may not have started on this device. Only the picture may be recorded.",
+      "notifyFailed": "Recording did not start because participants could not be notified. Please try again shortly.",
+      "confirm": {
+        "title": "Start recording?",
+        "body": "When recording starts, everyone will see a 'Recording' indicator. The file is saved only on this device and is never uploaded or transferred abroad. Please tell participants before you start.",
+        "download": "When you stop, the file is saved to your downloads folder. In-app browsers may block file saving, so record from a regular browser on a computer.",
+        "cancel": "Cancel",
+        "start": "Start recording"
+      },
+      "toast": {
+        "started": "Recording started — everyone can see it",
+        "saved": "Recording saved. Check your downloads folder. If nothing was saved, record again from a regular browser.",
+        "empty": "Nothing was recorded, so no file was created.",
+        "saveFailed": "Could not create the recording file.",
+        "startedBy": "The presenter started recording",
+        "stoppedBy": "The presenter stopped recording"
+      }
     }
   },
   "list": {
