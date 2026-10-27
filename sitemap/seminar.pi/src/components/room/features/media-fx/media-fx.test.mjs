@@ -59,6 +59,35 @@ test('소음 — 이미 같은 값이면 요청 안 함, 브라우저가 무시�
   assert.equal(await syncNoise({ ...mic, readyState: 'ended' }, () => false, () => true), null)
 })
 
+test('소음 — Chromium 처럼 applyConstraints 를 무시하면 swap(마이크 다시 열기)으로 맞춘다(T03 r6)', async () => {
+  const mic = fakeMic({ ignore: true, ms: 1 })
+  const fresh = fakeMic({ ms: 1 })
+  const asked = []
+  const swap = async (c) => {
+    asked.push(c)
+    return fresh
+  }
+  assert.equal(await syncNoise(mic, () => false, () => true, swap), null)
+  assert.deepEqual(asked, [{ echoCancellation: true, noiseSuppression: false, autoGainControl: false }])
+  // swap 이 실패(발행 전·경합)하면 실제 값을 돌려준다(스위치 되돌림·알림)
+  assert.equal(await syncNoise(mic, () => false, () => true, async () => null), true)
+})
+
+test('소음 — swap 으로 연 트랙도 값을 못 맞추면 다시 열지 않고 알린다(무한 교체 금지)', async () => {
+  const mic = fakeMic({ ignore: true, ms: 1 })
+  const stubborn = fakeMic({ ignore: true, ms: 1 }) // 새로 열어도 소음 줄이기 켜진 채
+  let n = 0
+  const swap = async () => (n++, stubborn)
+  assert.equal(await syncNoise(mic, () => false, () => true, swap), null)
+  // effect 가 새 트랙으로 다시 돈다 → 같은 값으로 연 트랙이라 swap 안 함
+  assert.equal(await syncNoise(stubborn, () => false, () => true, swap), true)
+  assert.equal(n, 1)
+  // 사용자가 다시 켰다 끄면(값이 다르면) 그 트랙에서는 다시 시도할 수 있다
+  stubborn.getSettings = () => ({ noiseSuppression: false })
+  assert.equal(await syncNoise(stubborn, () => true, () => true, swap), null)
+  assert.equal(n, 2)
+})
+
 test('조명 — 끄면 배율 1·즉시 표본으로 돌아간다(다시 켤 때 옛 장면 배율 금지, T03 r4)', () => {
   let v = true
   const subs = []
