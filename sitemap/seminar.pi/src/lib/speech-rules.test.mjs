@@ -284,3 +284,31 @@ test('dubStale — 15초 이하 재생, 넘으면 버림 + 재생기가 재생 �
   assert.ok(wait > 0 && judge > wait && judge < src.indexOf('a.play()'))
   assert.ok(src.includes('pushDub(queue, { ac, audio, at: Date.now() })'))
 })
+
+// 회귀(T09 r4) — 번역이 멈추면(trStop : 권한 없음·AI 미설정·번역 한도) 번역문이 안 와 더빙 소리가 없는데, 스위치는 켜진 채 원음만 20% 로 줄어 있었다
+test('더빙 — 번역 중단(trStop)이면 자동으로 끄고(원음 복구) 스위치를 숨김', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const src = await readFile(new URL('../components/room/features/dubbing/index.tsx', import.meta.url), 'utf8')
+  assert.ok(src.includes("import { translateCaption, trStop } from '../captions/translate'"))
+  assert.match(src, /if \(stop && dubOn\.get\(\)\) dubOn\.set\(false\)/) // Overlay — 끄면 [on] 효과가 remoteVolume 1·stopAll
+  assert.match(src, /if \(!lang \|\| !ok \|\| stop\) return null/) // DubRow — 다시 켜서 원음만 줄이는 것 방지
+  assert.ok(src.includes('remoteVolume.set(on ? DUB_DUCK : 1)'))
+})
+
+// 보강(T09 r4) — 합성 음성을 연달아 못 틀면(형식 미지원·자동재생 잠김) 문장마다 조용히 실패하지 않고 끈 뒤 '다시 켜 주세요' 알림
+test('더빙 연속 재생 실패 — once 는 첫 결과(실패 여부)만, 3번 연속 실패면 끄고 알림, 정상 재생이면 0 으로', async () => {
+  const { once, DUB_FAIL_MAX } = await import('./speech-rules.ts')
+  assert.equal(DUB_FAIL_MAX, 3)
+  const got = []
+  const end = once((failed) => got.push(failed))
+  end(true) // onerror
+  end(true) // play() 거부 — 같은 문장 두 번째 신호는 무시(2번 세지 않음)
+  end(false)
+  assert.deepEqual(got, [true])
+  const { readFile } = await import('node:fs/promises')
+  const src = await readFile(new URL('../components/room/features/dubbing/index.tsx', import.meta.url), 'utf8')
+  assert.ok(src.includes('a.onended = () => end(false)') && src.includes('a.onerror = () => end(true)'))
+  assert.ok(src.includes('a.play().catch(() => end(true))'))
+  assert.match(src, /if \(!failed\) playFails = 0\s+else if \(\+\+playFails >= DUB_FAIL_MAX\) \{\s+dubOn\.set\(false\)[^\n]*\n\s+alertBlocked\?\.\(\)/)
+  assert.match(src, /playing = false\n\s+playFails = 0/) // 끄기·다시 켜기 = 새로 셈
+})

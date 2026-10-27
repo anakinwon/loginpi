@@ -11,10 +11,10 @@ import { piFetch } from '@pi/auth/client'
 import { featureStore, remoteVolume, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 import { SwitchRow } from '../sheet'
 import { parseCaption } from '../captions/caption-rules'
-import { translateCaption } from '../captions/translate'
+import { translateCaption, trStop } from '../captions/translate'
 import { sameLang } from '@/lib/translate-rules'
 import { isUuid } from '@/lib/seminar-rules'
-import { DUB_DUCK, dubRate, dubStale, dubStop, once, pushDub, TTS_MAX_CHARS } from '@/lib/speech-rules'
+import { DUB_DUCK, DUB_FAIL_MAX, dubRate, dubStale, dubStop, once, pushDub, TTS_MAX_CHARS } from '@/lib/speech-rules'
 
 export const dubOn = featureStore(false)
 const dubLang = featureStore('') // 듣는 언어('' = 원문 → 더빙 없음). 자막 시트 언어 선택을 DubRow 가 옮겨 담는다
@@ -25,6 +25,7 @@ let queue: Item[] = []
 let playing = false
 let gen = 0
 let curUrl: string | null = null
+let playFails = 0 // 연속 재생 실패 수(DUB_FAIL_MAX) — 정상 재생 1번이면 0
 
 const canDub = () => typeof Audio !== 'undefined' && typeof URL !== 'undefined' && !!URL.createObjectURL
 
@@ -72,6 +73,7 @@ function stopAll() {
   for (const it of queue) it.ac.abort()
   queue = []
   playing = false
+  playFails = 0
   if (curUrl) URL.revokeObjectURL(curUrl)
   curUrl = null
   if (el) {
@@ -101,20 +103,27 @@ async function pump() {
   const url = URL.createObjectURL(blob)
   curUrl = url
   // 디코드 실패면 onerror 와 play() 거부가 둘 다 온다 — 두 번째가 다음 문장 핸들러를 지우지 않게 1회만
-  const end = once(() => {
+  const end = once((failed: boolean) => {
     if (g !== gen) return
     a.onended = a.onerror = a.onloadedmetadata = null
     URL.revokeObjectURL(url)
     curUrl = null
+    // 연속 재생 실패(형식 미지원·자동재생 잠김 재발) — 문장마다 조용히 실패하며 원음만 20% 로 줄어 있지 않게 끄고 알린다(보강 r4 T09)
+    if (!failed) playFails = 0
+    else if (++playFails >= DUB_FAIL_MAX) {
+      dubOn.set(false) // Overlay 가 stopAll·원음 복구
+      alertBlocked?.()
+      return
+    }
     done()
   })
   a.onloadedmetadata = () => {
     a.playbackRate = dubRate(a.duration)
   }
-  a.onended = end
-  a.onerror = end
+  a.onended = () => end(false)
+  a.onerror = () => end(true)
   a.src = url
-  a.play().catch(end)
+  a.play().catch(() => end(true))
 }
 
 function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null) {
@@ -154,6 +163,7 @@ function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null) {
 export function DubRow({ lang }: { lang: string }) {
   const t = useTranslations('room.dubbing')
   const on = useStore(dubOn)
+  const stop = useStore(trStop)
   const [ok, setOk] = useState(false) // 기능 탐지는 마운트 뒤(서버 렌더와 어긋나지 않게)
   useEffect(() => setOk(canDub()), [])
   useEffect(() => {
@@ -162,7 +172,7 @@ export function DubRow({ lang }: { lang: string }) {
     dubLang.set(lang)
     if (!lang) dubOn.set(false)
   }, [lang])
-  if (!lang || !ok) return null
+  if (!lang || !ok || stop) return null // 번역이 멈췄으면(trStop) 더빙도 불가 — 사유는 시트의 번역 문구가 보인다
   return (
     <SwitchRow
       label={t('listen')}
@@ -181,6 +191,7 @@ let alertBlocked: (() => void) | null = null
 // 켜짐·꺼짐 반영 — 원음 덕킹, 끄면 큐 정리
 function DubbingOverlay({ ctx }: { ctx: RoomCtx }) {
   const on = useStore(dubOn)
+  const stop = useStore(trStop)
   useEffect(() => {
     alertBlocked = () => ctx.notice('dubbing.blocked')
   })
@@ -188,6 +199,11 @@ function DubbingOverlay({ ctx }: { ctx: RoomCtx }) {
     remoteVolume.set(on ? DUB_DUCK : 1)
     if (!on) stopAll()
   }, [on])
+  // 번역 중단(trStop — 권한 없음·AI 미설정·번역 한도)이면 번역문이 더 안 와 더빙도 소리가 없다 → 끄고 원음 복구.
+  //  안 끄면 스위치는 켜진 채 원음만 20% 로 줄어 아무것도 안 들렸다(야간 시험 r4 T09). 알림은 자막 쪽 trStop 알림 1번으로 충분
+  useEffect(() => {
+    if (stop && dubOn.get()) dubOn.set(false)
+  }, [stop])
   useEffect(
     () => () => {
       alertBlocked = null

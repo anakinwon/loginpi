@@ -206,16 +206,18 @@ export const DUB_RATE_MAX = 1.5
 //  합성·앞 문장 재생이 밀려 원음보다 한참 늦게 읽히는 것 방지(큐 3개 상한만으로는 합성 지연이 길 때 15초 넘게 밀린다)
 export const DUB_STALE_MS = 15_000
 export const dubStale = (at: number, now: number) => now - at > DUB_STALE_MS
+// 연속 재생 실패 상한(보강 r4 T09) — 합성 음성을 이만큼 연달아 못 틀면(형식 미지원·자동재생 잠김) 더빙을 끄고 '다시 켜 주세요' 알림
+export const DUB_FAIL_MAX = 3
 // 더빙을 켠 동안 원음 볼륨(설계서 15.4 — 20%)
 export const DUB_DUCK = 0.2
 
 // 한 번만 실행 — 재생 끝(onended·onerror·play() 거부)이 한 문장에 겹쳐 와도 다음 문장으로 1번만 넘어가게
-export function once(f: () => void) {
+export function once<A extends unknown[]>(f: (...a: A) => void) {
   let fin = false
-  return () => {
+  return (...a: A) => {
     if (fin) return
     fin = true
-    f()
+    f(...a)
   }
 }
 
