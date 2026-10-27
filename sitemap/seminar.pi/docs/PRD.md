@@ -126,7 +126,7 @@
 | 14 | 집 PC 엔진 v1.3.1(`4e33bbad`, sha256 `a11f7f36…`, HOME_NODE_GUIDE 4.7) 교체 — 교체 전엔 `app` 필요 기능 숨김. v1.3(`45541466…`)은 폐기·설치 금지 | 마스터 | [확인중 : 마스터 엔진 교체] |
 | 15 | 외부 AI 모델명·단가 — 공식 문서 확인 후 확정(계획 A-4). 사용량 상한 `SPEECH_MAX_MIN` 기본 120분이 비용상 적절한지 | 마스터 | [확인중 : 공식 문서·마스터] |
 | 16 | 회의록 스크린샷 저장소 — Supabase Storage 비공개 버킷 `smn-note` 생성·서명 URL(계획 A-8) | 마스터 | [확인중 : 버킷 생성] |
-| 17 | `sql/008`·`009`·`010` DB 적용(dev→stg→prod) — da-standards·legal-compliance-advisor 검증 후. 그 전엔 회의록·설문·Q&A·출석 API 가 실패하고 `/privacy` 링크는 숨김. **`010`(음성 선예약·환급·청중 몫) 적용 전엔 `GEMINI_API_KEY` 를 넣지 않는다**(코드는 010 미적용을 감지해 008 방식으로 후퇴하지만, 청중 몫 상한은 010 에만 있다). 적용 뒤 010 파일 하단 '검증' 7줄 실행(proconfig 포함) | 마스터 | [확인중 : DA·법무 검증] |
+| 17 | `sql/008`·`009`·`010`(`010_seminar_ai_use`·`010_seminar_vc_reserve`) DB 적용(dev→stg→prod) — **적용 완료 2026-10-27**(각 tier 2회 멱등, 010 DB 회귀 시험 dev 통과). `010` 은 `GEMINI_API_KEY` 설정 전 선행 조건이었고 충족. 남은 것 = DA 사후 리뷰(009·010 함수, 신규 표준단어 CHR·TTS)·법무 검증 | 마스터 | 적용 완료 · [확인중 : DA·법무 사후 검증] |
 | 18 | MediaPipe 모델 파일(`public/mediapipe/models/selfie_segmenter_landscape.tflite`) 미커밋 → `pnpm build` 실패(REA_04_MEET_FEATURES 8절 #1) | 마스터 | [확인중 : 마스터 — 파일 추가] |
 
 ## 10. 화상 엔진 기준점 (마스터 확정 2026-10-24)

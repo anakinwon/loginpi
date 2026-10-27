@@ -22,9 +22,9 @@
 | 3 | Pi Browser 실기기 점검 10항목(Android 2대 + 가능하면 iOS) | [NIGHT_REPORT](NIGHT_REPORT_2026-10-27.md) 1절 | Phase 1·M5 통과 조건 — 인증·결제·페이지 변경은 실기기 전 완료로 보지 않음 |
 | 4 | 위임 결정 검토(PRD 11절 D-1~D-19, 11.1절 D-20~D-28) · 확인 질문(PRD 9절) | PRD | 바꿀 결정만 지시 |
 | 5 | **MediaPipe 모델 파일 커밋** — `public/mediapipe/models/selfie_segmenter_landscape.tflite`(`scripts/copy-mediapipe.mjs` 머리 주석의 curl 1줄) | 저장소 | 없으면 `pnpm build` 가 막혀 **Vercel 배포 실패**(이전 배포가 계속 서빙). 2026-10-27 현재 master 미 push 사유 |
-| 6 | 집 PC 엔진을 **v1.3.1(`4e33bbad`, sha256 `a11f7f36…`) 빌드**로 교체 — v1.3(`45541466…`) 설치 금지 | `media/docs/HOME_NODE_GUIDE.md` 4.7 | `app.send` 중계 — 교체 전엔 자막·녹화·AI 회의록·번역·더빙이 숨겨짐(#1 을 대체) |
+| 6 | 집 PC 엔진을 **v1.3.2(`cf2fe499`, sha256 `d76c6bc0…`) 빌드**로 교체 — v1.3.1 대체, v1.3(`45541466…`) 설치 금지 | `media/docs/HOME_NODE_GUIDE.md` 4.7 | `app.send` 중계 — 교체 전엔 자막·녹화·AI 회의록·번역·더빙이 숨겨짐(#1 을 대체) |
 | 7 | Vercel `seminar` 환경변수 **`GEMINI_API_KEY`**(기존 발급 키)·필요 시 `SPEECH_MAX_MIN` | Vercel 설정 · [ENV_GUIDE](../../../docs/ENV_GUIDE.md) 3.6 | 미설정 = 외부 AI 기능(자막·회의록·번역·더빙) 숨김 |
-| 8 | `sql/008`·`009`·`010` DB 적용(dev→stg→prod, 2회 멱등) + Storage 비공개 버킷 `smn-note` | `db-migrate.mjs --app seminar` | da-standards·legal-compliance-advisor 검증 후. **010 적용 전 `GEMINI_API_KEY` 설정 금지**(청중 몫 상한), 적용 뒤 010 하단 검증 실행. 그 전엔 회의록·설문·Q&A·출석 API 실패, `/privacy` 링크 숨김(PRD 9절 #16·#17) |
+| 8 | ~~`sql/008`·`009`·`010` DB 적용~~ **적용 완료(2026-10-27, dev→stg→prod 각 2회 멱등 확인 — 008 기존, 009·010_seminar_ai_use·010_seminar_vc_reserve 야간 시험 r1 통합 때)**, 010 DB 회귀 시험(`vc-reserve.db.test.mjs`) dev 통과. 남은 것 = Storage 비공개 버킷 `smn-note` | 마스터(Supabase 대시보드) | DA 사후 리뷰 : 009·010 함수, 010_seminar_ai_use 신규 표준단어(CHR·TTS) 칼럼 `trans_chr_cnt`·`tts_chr_cnt`. 키(`GEMINI_API_KEY`) 설정 전 선행 조건(010) 충족 |
 
 ## Phase 0 — 선결
 
@@ -90,7 +90,7 @@
 - [x] 기능 10종 + 공통 기반 구현·독립 검토·master 통합(2026-10-27)
 - [x] REA 회귀 비교 — 기존 3장면 화면 회귀 0·오류 0, 룸 첫 화면 JS +66,186 B(배경 엔진은 지연 로드 유지)(REA_04_MEET_FEATURES 6절)
 - [ ] MediaPipe 모델 파일 커밋 → `pnpm build` 통과 → push → `Vercel – seminar: success` 개별 확인
-- [ ] 엔진 v1.3.1 교체 · sql/008·009·010 적용(010 은 키 설정 전 필수) → `GEMINI_API_KEY` Vercel 설정 · `smn-note` 버킷
+- [ ] 엔진 v1.3.2 교체(HOME_NODE_GUIDE 4.7) · ~~sql/008·009·010 적용~~(2026-10-27 완료) → `GEMINI_API_KEY` Vercel 설정 · `smn-note` 버킷
 - [ ] 브라우저 QA(가짜 카메라 3창 — 자막·번역·더빙·설문·Q&A·녹화·배경·회의록·대면 노트·캘린더 링크)
 - [ ] Pi Browser 실기기(Android 2대 + iOS) — 실기기 전 판정 최대 CONDITIONAL
 - [ ] pi-mainnet-listing-auditor·kisa-web-security-auditor 점검
