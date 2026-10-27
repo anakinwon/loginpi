@@ -28,7 +28,7 @@
 | R-S1 | 5초 음성 조각을 어떻게 끊나 | Jitsi `e94ef107` @1857428 : `recorder.start(5e3)`, @752648 : ts-ebml `makeMetadataSeekable`(길이 머리 보정) | `start(timeslice)` 조각은 첫 조각에만 webm 머리가 있다. Jitsi 는 조각을 이어 한 파일로 고쳐 쓴다. 조각마다 따로 음성→글을 하려면 **조각마다 녹음기를 새로 시작**해야 단독 해독이 된다 | `use-speech.ts` — 5초마다 `MediaRecorder` 를 멈추고 새로 시작, 각 Blob 이 독립 파일 |
 | R-S2 | 녹음 형식을 어떻게 고르나 | LiveKit `dc2a882c` @306250 : `"audio/webm;codecs=opus"` 를 `MediaRecorder.isTypeSupported` 로 확인, 안 되면 `"video/mp4"` | 형식은 기능 탐지로 고른다(UA 판정 아님). Safari 는 mp4 계열 | `pickAudioMime()` — webm/opus → audio/mp4 → video/mp4, 다 안 되면 음성 조각을 쓰지 않음 |
 | R-A1 | 기능별 메시지를 하나의 통로로 보내는 방식 | LiveKit `8d537880` @51746 : `publishData(payload, {topic, reliable, destinationIdentities})`, 채팅도 topic(`lk-chat-topic`)으로 구분. Jitsi `9eb5dc78` @664562 : `sendEndpointMessage`·`broadcastEndpointMessage`(빈 대상 = 전원) | 두 앱 모두 **범용 통로 + 주제(topic)** 로 기능 메시지를 나른다 | 계획서 A-2 `app.send{topic,d}` → `ntf app{topic,d,from}` 를 화면에 연결 — `use-room` `sendApp`·`subscribeApp`, `room-view` 가 등록 기능의 `onApp` 으로 나눠 줌 |
-| R-A2 | 서버가 기능을 지원하지 않을 때 화면은 | LiveKit `8d537880` @78359 : 채팅 송신 때 `serverInfo.edition`·`version`(1.8.2 비교)으로 옛 방식 여부를 가름 | 서버 판에 따라 화면 동작을 가른다 | 입장 직후 1회 지원 확인(`probeApp` — 빈 topic 요청 : 구 엔진은 `NOT_FOUND`(미구현 메서드), v1.3 은 권한표 밖 거절). 미지원·확인 중이면 `app` 이 필요한 ⋯ 항목을 숨김(`visibleExtras`) |
+| R-A2 | 서버가 기능을 지원하지 않을 때 화면은 | LiveKit `8d537880` @78359 : 채팅 송신 때 `serverInfo.edition`·`version`(1.8.2 비교)으로 옛 방식 여부를 가름 | 서버 판에 따라 화면 동작을 가른다 | 입장 직후 1회 지원 확인(`probeApp`, 등록 항목 중 `app` 필요가 있을 때만 — 주제표 안 topic `refresh` + 4KB 초과 `d` : v1.3 은 ② 에서 `SDP_INVALID`(중계·속도 한도 사용 없음), 구 엔진은 `NOT_FOUND`(미구현 메서드)). 엔진 = 모르는·빈 topic 에 `NOT_FOUND` 확정(`interact.go` AppSend ①) → 빈 topic 검사는 v1.3 도 미지원으로 오판해 검사 방식 변경. 보내기 실패 1번으로 지원 여부를 바꾸지 않는다. 미지원·확인 중이면 `app` 이 필요한 ⋯ 항목을 숨김(`visibleExtras`) |
 | R-P1 | 사이드 패널에 기능 탭을 어떻게 붙이나 | Jitsi `e94ef107` @1471275 : 패널 탭 열거 `chat-tab`·`cc-tab`·`file_sharing-tab`·`polls-tab` | 패널 하나에 기능 탭을 배열로 붙인다 | `side-panel.tsx` `extra` 탭 — 채팅과 참가자 사이에 등록 순서대로(설계서 15.3 : Q&A·설문, `cc-tab` 은 미채택) |
 | R-M1 | ⋯ 메뉴 순서 | (SubAgent0 앵커 `sa0-ui-anchors.json` R1 재사용) 자막(16) → 녹화(17) → 소음(22) → 배경(25) | — | `features/index.ts` 등록 순서 주석, `splitSlots(items, slots, extra)` 구분선 |
 
@@ -43,5 +43,5 @@
 
 - 모두 정적 읽기다. 효과 전환 때 재협상이 정말 없는지, 숨은 탭에서 워커 타이머가 실제로 30fps 를 유지하는지는 실행으로 보지 않았다 → 실기기·브라우저 QA 때 확인 [확인중 : 통합 QA].
 - LiveKit Meet 배포본의 `livekit-client`·트랙 프로세서 판(버전)은 확인하지 못했다(소스맵 대조 안 함).
-- 엔진 v1.3 이 빈 topic 을 어떤 코드로 거절할지는 엔진 구현 전이다. 화면은 `NOT_FOUND`·`TIMEOUT` 만 미지원으로 보므로, 엔진은 모르는 topic 에 `NOT_FOUND` 를 쓰지 않아야 한다(권한표 밖 = `ROLE_FORBIDDEN` 권장) [확인중 : Agent10 엔진].
+- 엔진 v1.3(feat/seminar-app-relay `interact.go` AppSend)은 모르는·빈 topic 에 `NOT_FOUND`('알 수 없는 주제')로 확정됐다 → 빈 topic 검사는 구 엔진과 구분되지 않아, 주제표 안 topic + 상한 초과 `d`(② `SDP_INVALID`)로 검사 방식을 바꿨다(`room-rules` `APP_PROBE`·`appSupportedBy`, 시험 있음). 실제 엔진 응답은 통합 QA 에서 확인 [확인중 : 통합 QA].
 - 룸 첫 화면 JS 예산(설계서 15.15, 기준선 974,636 B)은 이 브랜치에서 다시 재지 않았다. 등록 기능이 0개라 늘어난 코드는 확장 지점·동의·효과·음성 훅뿐이다 → 통합 뒤 REA `analyze-web-bundle` 로 같은 방법 재측정 [확인중 : 통합 후].

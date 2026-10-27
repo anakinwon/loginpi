@@ -339,9 +339,9 @@
     "toDetail": "Go to seminar page",
     "consent": {
       "title": "Before you turn on your microphone",
-      "body": "If recording, captions or AI meeting notes are turned on in this seminar, your voice may be converted to text, stored and translated. Voice processing is done by an AI service outside your country.",
+      "body": "If recording, captions or AI meeting notes are turned on in this seminar, your voice may be converted to text, stored and translated. Voice processing is done by an AI service outside your country. If you don’t agree, your mic still turns on — only your voice is left out of processing.",
       "privacy": "Privacy policy",
-      "cancel": "Cancel",
+      "decline": "Don't agree",
       "agree": "Agree and turn on mic",
       "notice": "When recording, captions or AI meeting notes are on, speakers’ voices are processed. Audience voices are not sent."
     }

@@ -53,6 +53,8 @@ const TAB_BADGES = TABS.map((x) => x.badge ?? ZERO)
 const EFFECTS = FEATURES.flatMap((f) => (f.effect ? [f.effect] : [])).sort((a, b) => a.order - b.order)
 // 발언자 음성을 처리하는 기능이 있을 때만 마이크 동의·대기실 고지(A-6). 음성 조각은 동의한 사람만 돈다
 const CONSENT = FEATURES.some((f) => f.consent)
+// 엔진 app 중계가 있어야 보이는 ⋯ 항목이 있을 때만 입장 직후 지원 확인(없으면 확인 요청도 보내지 않는다)
+const NEEDS_APP = MORE.some((it) => it.app)
 
 export function RoomView({ room, wsUrl }: { room: string; wsUrl?: string }) {
   const t = useTranslations('room')
@@ -63,6 +65,7 @@ export function RoomView({ room, wsUrl }: { room: string; wsUrl?: string }) {
         <Room
           room={room}
           wsUrl={wsUrl}
+          userId={user.userId}
           name={user.displayName || user.username || ''}
           // 발표 선택지 노출용 힌트일 뿐 — 실제 발표 권한은 입장권 API(isAdmin)가 서버에서 판정(13절 #8 : 지금은 관리자만)
           canPresent={user.role === 'ADMIN' || user.role === 'MASTER'}
@@ -156,9 +159,21 @@ function QualityToast({ grade }: { grade: Grade }) {
 // 화면 알림 문구 키 — 오류 코드가 있으면 그 문구, 없으면 일반 실패 문구
 const ERR_NOTICE = new Set(['RATE_LIMITED', 'ROLE_FORBIDDEN', 'MEDIA_FAILED', 'LOCKED'])
 
-function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; name: string; canPresent: boolean }) {
+function Room({
+  room,
+  wsUrl,
+  userId,
+  name,
+  canPresent,
+}: {
+  room: string
+  wsUrl: string
+  userId: string
+  name: string
+  canPresent: boolean
+}) {
   const t = useTranslations('room')
-  const r = useRoom({ wsUrl })
+  const r = useRoom({ wsUrl, appProbe: NEEDS_APP })
   const audioRef = useRef<HTMLAudioElement>(null)
   const [ticketRole, setTicketRole] = useState<Role>(canPresent ? 'presenter' : 'audience')
   const sound = useRemoteAudio(audioRef, r.remoteAudio)
@@ -206,7 +221,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   // ── 부가 기능(extensions.ts) ──
   const locale = useLocale()
   // 마이크 동의 — 음성 처리 기능이 있고 내가 말할 수 있을 때만(발표 가능·무대 역할)
-  const consent = useConsent(room, CONSENT && (canPresent || role !== 'audience'))
+  const consent = useConsent(room, userId, CONSENT && (canPresent || role !== 'audience'))
   // 음성 조각(A-1) — 기능들의 말하기 요청을 합쳐 녹음기 1개로. 동의한 무대 역할의 내 마이크만(청중 음성은 나가지 않는다)
   const wants = Object.values(useStore(speechWants))
   const speech = useSpeech({
@@ -217,6 +232,11 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
     broadcast: wants.includes('caption'),
     sendApp: r.sendApp,
     onText: (text, ts) => FEATURES.forEach((f) => f.onSpeech?.(text, ts, ctxRef.current)),
+    // 서버에 동의 기록이 없다 — 이 기기 기록을 지우고 다시 묻는다(동의하면 음성 조각이 다시 돈다, 안 하면 마이크만 계속)
+    onNoAgr: () => {
+      consent.reset()
+      void consent.ask()
+    },
   })
   // 영상 효과 — 켜진 효과가 없으면 null(원본 그대로). 내 타일은 처리된 영상을 보여 준다(송출본 = 미리보기)
   const fxTrack = useVideoEffects(EFFECTS, r.localStream?.getVideoTracks()[0] ?? null, r.videoSender)
@@ -296,9 +316,11 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
     if (l) sayErr(await r.setLayout(l), 'actionFailed')
   }
 
+  // 지금 화면에 보이는 패널 탭 — 패널이 열려 있으면 tab(사이드 패널이 그리는 기준과 같다). panel 은 '어느 버튼으로 열었나'라서 탭을 옮겨도 그대로다
+  const shown = panel !== null ? tab : null
   // 안 읽은 채팅 — 채팅 탭이 보이는 동안은 다 읽은 것
   const lastN = r.chat.at(-1)?.n ?? 0
-  const chatVisible = panel === 'chat'
+  const chatVisible = shown === 'chat'
   useEffect(() => {
     if (chatVisible) setSeenN(lastN)
   }, [chatVisible, lastN])
@@ -308,7 +330,7 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
     id: x.id,
     label: x.label,
     badge: badges[i],
-    node: <x.Panel ctx={ctx} visible={panel === x.id} />,
+    node: <x.Panel ctx={ctx} visible={shown === x.id} />,
   }))
   const badgeAll = unread + badges.reduce((a, b) => a + b, 0)
 
@@ -345,8 +367,8 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
   }, [live])
 
   async function toggle(kind: MediaKind, on: boolean) {
-    // 마이크를 처음 켜기 직전 동의(A-6) — 취소하면 꺼진 채 참여 계속. 물을 필요가 없으면 기존 흐름 그대로
-    if (kind === 'audio' && on && consent.needed && !(await consent.ask())) return
+    // 마이크를 처음 켜기 직전 동의(A-6) — 동의 안 함이어도 마이크는 켠다(음성 처리만 빠짐, consent.agreed 로 막힘). 닫기(Esc)만 켜기 취소
+    if (kind === 'audio' && on && consent.needed && (await consent.ask()) === null) return
     // 아직 없는 마이크·카메라(승격된 panel·카메라 없이 들어온 발표자) = 이 탭으로 켜서 발행. 자동으로 켜지 않는다(설계서 14.4)
     if (!has[kind]) return sayErr(await r.addMedia(kind), `toggleFailed.${kind}`)
     if (!(await r.setMedia(kind, on))) say(`toggleFailed.${kind}`)
@@ -364,11 +386,11 @@ function Room({ room, wsUrl, name, canPresent }: { room: string; wsUrl: string; 
       if (!el.srcObject) el.srcObject = new MediaStream()
       el.play().catch(() => {})
     }
-    // 마이크를 켠 채 발표자로 입장 = 첫 송출 직전 → 동의를 먼저 묻는다. 취소 = 마이크를 끈 채 입장(입장은 막지 않음)
+    // 마이크를 켠 채 발표자로 입장 = 첫 송출 직전 → 동의를 먼저 묻는다. 동의 안 함 = 마이크 켠 채(음성 처리 없음), 닫기 = 마이크를 끈 채 입장(입장은 막지 않음)
     const mic = ticketRole === 'presenter' ? (local?.getAudioTracks().filter((tr) => tr.enabled) ?? []) : []
     if (!mic.length || !consent.needed) return void r.join(room, ticketRole, local)
-    void consent.ask().then((ok) => {
-      if (!ok) mic.forEach((tr) => (tr.enabled = false))
+    void consent.ask().then((a) => {
+      if (a === null) mic.forEach((tr) => (tr.enabled = false))
       void r.join(room, ticketRole, local)
     })
   }

@@ -9,6 +9,9 @@ import { piFetch } from '@pi/auth/client'
 // v1.3(A-2) : 범용 중계 app.send{topic,d} → ntf app{topic,d,from}(부가 기능 공용, extensions.ts) · 입장 직후 1회 지원 확인 · 카메라 송신기(영상 효과 replaceTrack)
 import type { AppMsg } from './extensions'
 import {
+  APP_MAX,
+  APP_PROBE,
+  appSupportedBy,
   batchReaction,
   capLayer,
   layerSender,
@@ -88,7 +91,6 @@ export type ModEvent =
 
 const REQ_TIMEOUT_MS = 10000
 const CHAT_MAX = 500 // SIGNAL_API 3.3 C — 유니코드 문자 수
-const APP_MAX = 4096 // app.send d 의 JSON 바이트 상한(A-2 4KB) — 넘으면 보내지 않는다(엔진도 거절)
 const CHAT_KEEP = 200 // ponytail: 화면에 남기는 채팅 수 상한(저장 안 함 — 오래된 것부터 버림), 긴 세미나에서 더 필요하면 가상 스크롤과 함께 늘린다
 const VIDEO = { width: { ideal: 1280 }, height: { ideal: 720 } }
 
@@ -124,7 +126,8 @@ async function fetchTurn(): Promise<RTCIceServer[]> {
   return j?.iceServers ?? []
 }
 
-export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) => void }) {
+// appProbe = 등록 기능 중 엔진 app 중계가 있어야 보이는 항목이 있을 때만 입장 직후 지원 확인(없으면 요청 0 — 회귀 0)
+export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; onLog?: (m: string) => void; appProbe?: boolean }) {
   const wsRef = useRef<WebSocket | null>(null)
   const pubRef = useRef<RTCPeerConnection | null>(null)
   const subRef = useRef<RTCPeerConnection | null>(null)
@@ -537,7 +540,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
         sync()
       }
       setState('joined')
-      probeApp(my)
+      if (appProbe) probeApp(my)
       if (ticketRole === 'presenter') await publish(local, my)
     } catch (e) {
       log(`입장 실패 ${(e as Error).message}`)
@@ -577,6 +580,9 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
         pubRef.current = pc
       }
       const trs = list.map((x) => ({ ...x, tr: pc.addTransceiver(x.t, { direction: 'sendonly' }) }))
+      // 카메라 송신기는 offer 전에 알린다 — 영상 효과가 연결(ICE·DTLS) 전에 처리 트랙으로 바꿔 원본 프레임이 나가지 않게 [확인중 : 실기기 첫 프레임]
+      const cam = trs.find((x) => x.source === 'camera')
+      if (cam) setVideoSender(cam.tr.sender)
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
       const ans = await request<{ sdp: string }>('transport.publish', { sdp: offer.sdp })
@@ -589,7 +595,6 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
           if (seqRef.current !== my) return
           producersRef.current[source] = r.producerId
           sendersRef.current[source] = tr
-          if (source === 'camera') setVideoSender(tr.sender)
           log(`발행 ${source} producer=${r.producerId}`)
           if (!t.enabled) await request('producer.pause', { producerId: r.producerId })
         }),
@@ -805,20 +810,20 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     setAppState(v)
   }
 
-  // 지원 확인(입장 직후 1회) — 빈 topic 은 v1.3 엔진이 권한표 밖으로 거절하고(중계 안 함) 구 엔진은 NOT_FOUND(미구현 메서드, SIGNAL_API 5절)
-  // → NOT_FOUND·TIMEOUT 만 미지원. 근거 REA_04_UI_EXT R-A2(LiveKit 도 서버 판에 따라 기능을 가른다)
+  // 지원 확인(입장 직후 1회, 부작용 없음) — 요청·판정 규칙은 room-rules APP_PROBE·appSupportedBy(시험 있음)
   function probeApp(my: number) {
-    request('app.send', { topic: '', d: null }).then(
+    request('app.send', APP_PROBE).then(
       () => seqRef.current === my && setApp(true),
       (e: unknown) => {
         const c = codeOf(e)
         if (seqRef.current !== my || c === 'LEFT') return
-        setApp(c !== 'NOT_FOUND' && c !== 'TIMEOUT')
+        setApp(appSupportedBy(c))
       },
     )
   }
 
-  // 보내기 — 반환 = 오류 코드(성공 null). 구 엔진·큰 d 는 보내지 않는다. 엔진이 NOT_FOUND 면 그때부터 미지원
+  // 보내기 — 반환 = 오류 코드(성공 null). 구 엔진(확인 결과 false)·큰 d 는 보내지 않는다.
+  // 지원 여부는 probeApp 만 정한다 — v1.3 의 NOT_FOUND 는 주제 오타·'참가자 없음' 경합도 내므로 한 번의 실패로 세션 전체 기능을 끄지 않는다
   async function sendApp(topic: string, d: unknown): Promise<string | null> {
     if (appRef.current === false) return 'NOT_FOUND'
     if (new TextEncoder().encode(JSON.stringify(d ?? null)).length > APP_MAX) return 'TOO_LARGE'
@@ -826,9 +831,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       await request('app.send', { topic, d })
       return null
     } catch (e) {
-      const c = codeOf(e)
-      if (c === 'NOT_FOUND') setApp(false)
-      return c
+      return codeOf(e)
     }
   }
 

@@ -19,7 +19,7 @@ export type RoomCtx = {
   // 엔진 app 중계 지원 — null = 확인 중, false = 구 엔진(app 이 필요한 항목은 숨김 : 전원 고지를 못 하면 시작하지 않는다, 15.1)
   appSupported: boolean | null
   sendApp: (topic: string, d: unknown) => Promise<string | null> // 반환 = 오류 코드(성공 null)
-  speechLimited: boolean // 세미나 음성 처리 한도 소진(A-5, 서버 SPEECH_LIMIT) — 자막·AI 회의록이 멈췄음을 알린다
+  speechLimited: boolean // 세미나 음성 처리 한도 소진(A-5, 서버 SPEECH_QUOTA) — 자막·AI 회의록이 멈췄음을 알린다
   notice: (key: string, v?: Record<string, string>) => void // 화면 알림 5초(assertive) — key 는 room.* 아래 전체 경로
   announce: (text: string) => void // 낭독만(polite, 화면에 안 보임) — 시작·종료처럼 오류가 아닌 알림
   hold: (open: boolean) => void // 시트·대화상자가 열려 있는 동안 하단 바 자동 숨김 보류
