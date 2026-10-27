@@ -273,7 +273,8 @@ galapagos.exe
 
 | 빌드 | 커밋 | SHA256 |
 |---|---|---|
-| **2026-10-27 23:40 (v1.3.2 `app.send` 'state' 속도 한도 자막과 분리 — 녹화·AI 기록 고지 RATE_LIMITED 차단)** — 새 빌드, 교체 대기(v1.3.1 대신 이것 설치) | `cf2fe499` (master 병합 커밋, 엔진 변경 `8e178933`, `vcs.modified=false`) | `d76c6bc0bb371ec18f112e553abb78fe1aac7570d491d8221e73cf711e5b21ee` |
+| **2026-10-28 01:49 (v1.3.2 + 관리 API `GET /admin/rooms/{id}/peers/{sub}` 무대 역할·발표자 유무 조회 — 음성 자막 무대 관문 D-1)** — 새 빌드, 교체 대기(v1.3.2 대신 이것 설치. 엔진·Vercel 양쪽에 같은 `MEDIA_ADMIN_SECRET`(32자 이상)을 넣어야 관문이 켜짐, 미설정이면 관문 생략) | `27a18b31` (master 병합 커밋, 엔진 변경 야간 시험 r3 T03, `vcs.modified=false`, 깨끗한 임시 worktree 빌드) | `225efa5e6a21c1bd55b9c99221e6f03e946e991176c3e6b6afd9036af2cea83a` |
+| 2026-10-27 23:40 (v1.3.2 `app.send` 'state' 속도 한도 자막과 분리 — 녹화·AI 기록 고지 RATE_LIMITED 차단) — v1.3.2 + 관리 API 빌드로 대체 | `cf2fe499` (master 병합 커밋, 엔진 변경 `8e178933`, `vcs.modified=false`) | `d76c6bc0bb371ec18f112e553abb78fe1aac7570d491d8221e73cf711e5b21ee` |
 | 2026-10-27 20:55 (v1.3.1 범용 중계 `app` + 잘못된 UTF-8 연결 종료) — v1.3.2 로 대체 | `4e33bbad` (브랜치 `feat/seminar-app-relay`, `vcs.modified=false`, 재현 확인) | `a11f7f367d84c03d1061458b4e1d9b8601b276848a4d71730524c7b8896df826` |
 | 2026-10-27 20:37 (v1.3) — **폐기, 설치 금지** : 잘못된 UTF-8 `app.send` 를 그대로 중계(청중 1명이 방 전원 연결을 끊을 수 있음, SIGNAL_API v1.3.1) | `21844766` (`vcs.modified=false`) | `45541466cd242d665285d45c161f3b62c4cd4cd8c2a04cea6d06fcbbdb104e98` |
 | 2026-10-27 07:52 (v1.2 + LAN 후보) — 현재 집 PC | `c5f42247` + 미커밋 수정(LAN 후보 Append — `9d8eea86` 커밋 07:55 전 빌드, `vcs.modified=true`) | `12cfde8b6be2d5271df817d261becea7b6b73243b3f27f429392cfb7e87598a9` |
