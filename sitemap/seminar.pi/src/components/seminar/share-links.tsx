@@ -1,9 +1,10 @@
 'use client'
 
-// S2 상세 '일정·공유' 줄(UI 설계 15.8, 계획 SA1) — [캘린더에 추가][일정 파일][메일로 초대] 3버튼 + 기본 메일 앱(mailto) 글자 링크.
+// S2 상세 '일정·공유' 줄(UI 설계 15.8, 계획 SA1) — [캘린더에 추가][일정 파일][메일로 초대] 3버튼 + 기본 메일 앱(mailto)·링크 복사 글자 링크.
 //  전부 일반 링크(OAuth 없음, M-2). 외부는 새 탭(noopener), .ics 는 공개 라우트라 세션 불필요. 링크 = 상세 딥링크(배포 주소)
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { calendarUrl, mailtoUrl, webMailUrl } from '@/lib/calendar-rules'
+import { calendarUrl, canCopy, copyText, mailtoUrl, webMailUrl } from '@/lib/calendar-rules'
 import { useStartText, type SeminarCard } from './shared'
 
 const CELL =
@@ -12,6 +13,7 @@ const CELL =
 export function ShareLinks({ d }: { d: SeminarCard }) {
   const t = useTranslations('seminar.share')
   const start = useStartText()
+  const [copied, setCopied] = useState<'ok' | 'fail' | null>(null)
   const base = (process.env.NEXT_PUBLIC_APP_URL || window.location.origin).replace(/\/$/, '')
   const url = `${base}/s/${d.id}`
   const subject = t('mailSubject', { title: d.title })
@@ -32,9 +34,24 @@ export function ShareLinks({ d }: { d: SeminarCard }) {
           {t('mail')}
         </a>
       </div>
-      <a className="text-muted-foreground text-xs hover:underline" href={mailtoUrl(subject, body)}>
-        {t('mailApp')}
-      </a>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+        <a className="text-muted-foreground hover:underline" href={mailtoUrl(subject, body)}>
+          {t('mailApp')}
+        </a>
+        {/* 링크 복사 — 기능 탐지(클립보드 있을 때만), 하단 바·버튼 칸 추가 없음(글자 링크 줄) */}
+        {canCopy() && (
+          <button
+            type="button"
+            className="text-muted-foreground hover:underline"
+            onClick={() => void copyText(url).then((ok) => setCopied(ok ? 'ok' : 'fail'))}
+          >
+            {t('copy')}
+          </button>
+        )}
+        <span role="status" aria-live="polite" className="text-muted-foreground">
+          {copied && t(copied === 'ok' ? 'copied' : 'copyFail')}
+        </span>
+      </div>
     </section>
   )
 }

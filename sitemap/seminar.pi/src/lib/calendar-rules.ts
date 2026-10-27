@@ -52,13 +52,32 @@ export function webMailUrl(subject: string, body: string) {
 export const mailtoUrl = (subject: string, body: string) =>
   `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 
-// TEXT 값 이스케이프(RFC 5545 3.3.11) — \ ; , 줄바꿈
+// 링크 복사 — 외부 링크·mailto 가 안 열리는 환경(Pi Browser [확인중 : 실기기])의 대안. 클립보드 없음·거부 = false(화면이 안내)
+type Clip = { writeText: (s: string) => Promise<void> } | undefined
+export const canCopy = (clip: Clip = globalThis.navigator?.clipboard) => typeof clip?.writeText === 'function'
+export async function copyText(text: string, clip: Clip = globalThis.navigator?.clipboard) {
+  if (!canCopy(clip)) return false
+  try {
+    await clip!.writeText(text)
+    return true
+  } catch {
+    return false
+  }
+}
+
+// 제어문자(TAB 제외 U+0000~001F·U+007F) 제거 — 단독 \r 등이 줄을 끊어 속성(ATTENDEE 등)을 끼워 넣지 못하게
+// eslint-disable-next-line no-control-regex
+const stripCtl = (s: string) => s.replace(/[\u0000-\u0008\u000A-\u001F\u007F]/g, '')
+
+// TEXT 값 이스케이프(RFC 5545 3.3.11) — \ ; , 줄바꿈. 줄바꿈 3종(\r\n·\r·\n)을 먼저 \n 으로 바꾸고 남은 제어문자 제거
 export const icsEscape = (s: string) =>
-  s
-    .replace(/\\/g, '\\\\')
-    .replace(/;/g, '\\;')
-    .replace(/,/g, '\\,')
-    .replace(/\r?\n/g, '\\n')
+  stripCtl(
+    s
+      .replace(/\\/g, '\\\\')
+      .replace(/;/g, '\\;')
+      .replace(/,/g, '\\,')
+      .replace(/\r\n|\r|\n/g, '\\n'),
+  )
 
 // 줄접기(RFC 5545 3.1) — 75 옥텟 넘으면 CRLF + 공백. UTF-8 글자 중간을 자르지 않는다
 export function foldLine(line: string) {
@@ -97,7 +116,7 @@ export function buildIcs(e: CalEvent, now = new Date()) {
     `SUMMARY:${icsEscape(e.title)}`,
     `DESCRIPTION:${icsEscape(describe(e))}`,
     `LOCATION:${icsEscape(e.url)}`,
-    `URL:${e.url}`,
+    `URL:${stripCtl(e.url)}`,
     `STATUS:${e.canceled ? 'CANCELLED' : 'CONFIRMED'}`,
     'END:VEVENT',
     'END:VCALENDAR',
