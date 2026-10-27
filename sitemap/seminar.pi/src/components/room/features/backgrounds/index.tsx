@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { featureStore, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 import { canProcessVideo } from '../../effects'
-import { autoOff, bgOn, canSegment, choice, choose, draw, lastOut, reset, status } from './engine'
+import { autoOff, bgOn, canSegment, choice, choose, draw, reset, status } from './engine'
 import { addMine, listMine, removeMine, type MyImage } from './my-images'
 import { checkMine, PRESETS } from './rules'
 
@@ -17,8 +17,6 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   const isOpen = useStore(open)
   const cur = useStore(choice)
   const busy = useStore(status) === 'loading'
-  const on = useStore(bgOn)
-  const outCanvas = useStore(lastOut)
   const ref = useRef<HTMLDialogElement>(null)
   const preview = useRef<HTMLVideoElement>(null)
   const [mine, setMine] = useState<(MyImage & { url: string })[]>([])
@@ -48,16 +46,16 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   }, [isOpen])
   useEffect(() => () => mine.forEach((m) => URL.revokeObjectURL(m.url)), [mine])
 
-  // 미리보기 — 배경이 켜졌으면 이 단계 결과, 아니면 카메라 원본
+  // 미리보기 = 최종 송출본(조명 등 뒤 효과까지 거친 트랙, 설계 15.5). 효과가 없으면 카메라 원본. 트랙은 송출과 공유라 멈추지 않는다
+  const shown = ctx.fxTrack ?? cam
   useEffect(() => {
     const v = preview.current
     if (!v || !isOpen) return
-    v.srcObject = on && outCanvas ? outCanvas.captureStream(15) : cam ? new MediaStream([cam]) : null
+    v.srcObject = shown ? new MediaStream([shown]) : null
     return () => {
-      if (on && outCanvas && v.srcObject instanceof MediaStream) v.srcObject.getTracks().forEach((x) => x.stop())
       v.srcObject = null
     }
-  }, [isOpen, on, cam, outCanvas])
+  }, [isOpen, shown])
 
   const pickIt = async (id: string, blob?: Blob) => {
     setErr(null)

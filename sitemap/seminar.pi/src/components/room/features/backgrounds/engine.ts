@@ -69,6 +69,12 @@ async function toBackdrop(next: string, blob?: Blob): Promise<HTMLCanvasElement>
   let bmp: ImageBitmap | null = null
   if (blob) {
     bmp = await createImageBitmap(blob) // 못 읽는 형식(HEIC 등)은 여기서 실패 → bgFailed
+    // 해상도 상한 — 원본을 다 디코드한 뒤에야 크기를 알 수 있어 이 1회 메모리는 막지 못한다(바이트 2MB 상한이 1차 방어, 영향은 자기 기기뿐).
+    // 넘으면 바로 놓고 거부해 1280×720 래스터·저장으로 이어지지 않게 한다
+    if (bmp.width > BG.myPx || bmp.height > BG.myPx) {
+      bmp.close()
+      throw new Error('too large')
+    }
     src = bmp
     sw = bmp.width
     sh = bmp.height
@@ -132,7 +138,6 @@ let person: HTMLCanvasElement | null = null // 오려 낸 사람
 let tiny: HTMLCanvasElement | null = null // 흐림용 축소본
 let maskData: ImageData | null = null
 let watch = slowWatch()
-export const lastOut = featureStore<HTMLCanvasElement | null>(null) // 시트 미리보기용 — 이 단계 결과 캔버스(바뀔 때만 알림)
 
 function fit(c: HTMLCanvasElement, w: number, h: number) {
   if (c.width !== w || c.height !== h) {
@@ -144,7 +149,6 @@ function fit(c: HTMLCanvasElement, w: number, h: number) {
 
 // 프레임 1장(동기) — 분리기가 아직 없으면 원본 통과
 export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: number, h: number) {
-  lastOut.set(out.canvas as HTMLCanvasElement)
   if (!seg) return void out.drawImage(src, 0, 0, w, h)
   const t0 = performance.now()
   const sctx = fit((small ??= canvas()), BG.inW, BG.inH)

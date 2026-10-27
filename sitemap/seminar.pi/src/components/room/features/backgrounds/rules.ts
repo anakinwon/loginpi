@@ -9,6 +9,7 @@ export const BG = {
   blurDiv: 24, // 흐림 = 1/24 로 줄였다 늘리기(ctx.filter 미지원 브라우저도 같은 결과)
   myMax: 3, // 내 이미지 최대 장수
   myBytes: 2 * 1024 * 1024, // 장당 상한
+  myPx: 8192, // 디코드 뒤 가로·세로 상한 — 고압축 PNG 는 2MB 안에도 수만 px 가 될 수 있다
 }
 
 export const PRESETS = ['dusk', 'ocean', 'forest', 'studio', 'grid', 'dots'] as const

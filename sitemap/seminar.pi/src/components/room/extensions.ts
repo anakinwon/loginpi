@@ -24,6 +24,7 @@ export type RoomCtx = {
   announce: (text: string) => void // 낭독만(polite, 화면에 안 보임) — 시작·종료처럼 오류가 아닌 알림
   hold: (open: boolean) => void // 시트·대화상자가 열려 있는 동안 하단 바 자동 숨김 보류
   openPanel: (tab: string) => void // 사이드 패널을 그 탭으로 연다(이미 그 탭이면 닫는다)
+  fxTrack: MediaStreamTrack | null // 효과를 모두 거친 최종 송출 영상(켜진 효과 없으면 null = 원본)
 }
 
 // ⋯ 더보기 부가 항목(15.2) — 넘친 기본 버튼 다음, 구분선 아래에 등록 순서대로 붙는다
