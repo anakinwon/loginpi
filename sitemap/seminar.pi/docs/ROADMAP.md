@@ -6,7 +6,7 @@
 
 | Phase | 이름 | 상태 |
 |---|---|---|
-| 0 | 선결(결정·환경·포털·DB) | **완료(조건부, 2026-10-26)** — PRD v1.0 ✓ · Pi 앱 ✓ · 비운영 DB·스테이징 URL 은 **대체 충족** : 비운영 스키마는 만들었으나 앱 tier 는 `public` 하나(PRD 7절), 스테이징 = master 배포 `seminarz.vercel.app` 하나(운영 브랜치 분리 [TBD : 마스터]) [확인중 : 마스터]. 운영 호스팅 [확인중 : 마스터] |
+| 0 | 선결(결정·환경·포털·DB) | **완료(조건부, 2026-10-26)** — PRD v1.0 ✓ · Pi 앱 ✓ · 비운영 DB·스테이징 URL 은 **대체 충족** : 비운영 스키마는 만들었으나 앱 tier 는 `public` 하나(PRD 7절), 스테이징 = master 배포 `seminarz.vercel.app` 하나(운영 브랜치 분리 [확인중 : 마스터]) [확인중 : 마스터]. 운영 호스팅 [확인중 : 마스터] |
 | 1 | MVP(로그인 + 고유 기능 1개 + 결제 1개) | **진행 — 구현·브라우저 QA 통과, 실기기 대기** : 로그인 실기기 ✓ · 화면 5종(S1~S5)·화상 룸·Pi 결제 입장 구현(브라우저 QA 2차 7/7, 2026-10-27) · **Pi Browser 실기기 결제·입장 미검증** |
 | M | 자체 화상 엔진 M0~M5([PRD_01](PRD_01_MEDIA_ENGINE.md) 5절) | **M0 Android ✓(iOS 대기) · M1 LAN ✓ · M2 로컬 하네스 ✓ · M3~M5 진행** — 실네트워크(LTE·netem)·청중 30·실기기 대기. 단계별 통과 기준, 건너뛰기 금지 |
 | 2 | 수익 | 대기 — R1 입장료는 구현(정산 F-06·수수료율 PRD 9절 #3 대기) |
@@ -29,7 +29,7 @@
 - [x] DB — 마스터가 seminar 전용 Supabase 프로젝트 1개(`SUPABASE_SCHEMA=public`)로 결정 → `db-migrate.mjs --app seminar --tier prod --db-url <Session pooler>` 로 baseline·pi_pymnt·`sql/001`(Google 연동) 적용(2026-10-25). ⚠ `.env.local` 의 `SEMINAR_*_DATABASE_URL` 은 Direct 호스트(IPv6 전용)라 이 PC 에서 ENOTFOUND — Session pooler(`aws-0-ap-northeast-2`) 사용
 - [x] 로그인 3경로 이식(sitemap.pi 동일, LOGIN_PLAYBOOK) — Pi SDK·Pi Sign-In(OAuth)·Google+연동 코드, `pnpm build` 통과(2026-10-25)
 - [x] 실기기 로그인 3경로 — Pi Browser 로그인·Google 로그인·Pi 계정 연동 성공(마스터 2026-10-25, `seminar0532.pinet.com`)
-- [x] Vercel 프로젝트 `seminar`(Root `sitemap/seminar.pi`) — master push 배포 success(2026-10-25). 운영 브랜치 `prod/seminar` 분리는 [TBD : 마스터]
+- [x] Vercel 프로젝트 `seminar`(Root `sitemap/seminar.pi`) — master push 배포 success(2026-10-25). 운영 브랜치 `prod/seminar` 분리는 [확인중 : 마스터]
 
 **완료 기준** : PRD v1.0 · Pi 앱 ID · 비운영 DB · 스테이징 URL
 
