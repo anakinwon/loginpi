@@ -121,3 +121,17 @@ export async function capSigOk(secret: string, smnId: string, text: string, sig:
   if (!t || typeof sig !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(sig)) return false
   return crypto.subtle.verify('HMAC', await capKey(secret), Buffer.from(sig, 'base64url'), capMsg(smnId, t))
 }
+
+// 번역·합성 실패 응답 → 이번 입장 동안 요청을 멈출 사유. 문장마다 같은 결과가 되풀이되는 실패만(R-P2 — 청중 수 × 문장 수만큼 헛된 왕복·DB 잠금 방지)
+//  권한 없음(401·403 : 무료 세미나를 방 링크로 바로 들어와 입장 등록이 없는 경우 등) · 서버 AI 미설정(503 AI_UNAVAILABLE) · 세미나 누적 한도(429 SPEECH_QUOTA)
+//  일시 실패(분당 한도 SPEECH_RATE·DB 503·502·409·네트워크)는 null = 다음 문장에 다시 시도
+export type TrStop = 'forbidden' | 'unavailable' | 'quota'
+export function trStopOf(status: number, code: unknown): TrStop | null {
+  if (status === 401 || status === 403) return 'forbidden'
+  if (status === 503 && code === 'AI_UNAVAILABLE') return 'unavailable'
+  if (status === 429 && code === 'SPEECH_QUOTA') return 'quota'
+  return null
+}
+
+// 번역 언어를 바꾼 뒤 요청까지 기다리는 시간 — 닫힌 select 에서 화살표로 훑으면 언어마다 change 가 나서 언어 수만큼 외부 AI 를 부른다(R-P2 디바운스)
+export const TR_LANG_SETTLE_MS = 400

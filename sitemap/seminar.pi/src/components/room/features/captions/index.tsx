@@ -17,7 +17,7 @@ import { Sheet, SwitchRow } from '../sheet'
 import { isTranslateLang, TRANSLATE_LANGS } from '@/lib/translate-rules'
 import { presenterGone, presenterResync } from '../../room-rules'
 import { CAPTION, captionsState, parseCaption, SIZES, stepSize, type Size } from './caption-rules'
-import { useTranslated } from './translate'
+import { trStop, useTranslated } from './translate'
 
 const SCALE: Record<Size, number> = { sm: 0.85, md: 1, lg: 1.25 }
 const PREF_KEY = 'seminar.captions' // 개인 설정(보기·크기) — 다음 입장에도 유지
@@ -102,8 +102,14 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   const presenter = ctx.role === 'presenter'
   const locale = useLocale()
   const lang = trLang || (isTranslateLang(locale) ? locale : 'en')
-  const text = useTranslated(latest, tr, lang, ctx.seminarId)
+  const shown = useTranslated(latest, tr, lang, ctx.seminarId)
   const langs = useLangNames(locale)
+  const stop = useStore(trStop)
+
+  // 번역 중단(권한 없음·AI 미설정·한도) — 번역을 켠 사람에게 1번 알린다. 시트에도 사유를 남긴다
+  useEffect(() => {
+    if (stop && capTr.get()) ctx.notice(`captions.trStop.${stop}`)
+  }, [stop]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 수명 — 마지막 조각 뒤 8초
   useEffect(() => {
@@ -182,7 +188,8 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
             }}
           >
             {latest.name && <span className="text-muted-foreground mr-2">{latest.name}</span>}
-            {text}
+            {/* bdi = 아랍어·히브리어 등 오른쪽→왼쪽 번역문이 이름 뒤에서 문장부호 순서가 뒤섞이지 않게, lang = 한자 글꼴(중·일)·낭독기 발음 */}
+            <bdi lang={shown?.lang || undefined}>{shown?.text}</bdi>
           </p>
         </div>
       )}
@@ -194,6 +201,7 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
         )}
         <SwitchRow label={t('show')} on={show} onChange={capShow.set} />
         <SwitchRow label={t('translate')} on={tr} onChange={capTr.set} />
+        {tr && stop && <p className="text-muted-foreground text-sm">{t(`trStop.${stop}`)}</p>}
         {tr && (
           <label className="flex items-center justify-between gap-3">
             <span>{t('lang')}</span>
@@ -297,5 +305,6 @@ export const captions: RoomFeature = {
     capSheet.reset()
     capRoom.reset()
     capLatest.reset()
+    trStop.reset()
   },
 }
