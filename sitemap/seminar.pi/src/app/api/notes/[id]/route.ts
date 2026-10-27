@@ -89,6 +89,7 @@ export const GET = withAuthGuard(
           .eq('del_yn', 'N')
           .not('seg_cont', 'is', null)
           .order('seg_dtm')
+          .order('seg_id') // 동률 경계 고정 — lib/notes.ts 와 같게(T04 r3)
           .range((page - 1) * SEG_PAGE, page * SEG_PAGE - 1),
       ])
       if (n.error) return dbFail(n.error)

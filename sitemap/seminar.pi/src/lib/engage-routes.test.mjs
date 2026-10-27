@@ -68,3 +68,46 @@ test('오류 코드 번역 — api.ts 카탈로그 전 코드가 ko·en apiError
   const c = readFileSync(new URL('./client-api.ts', import.meta.url), 'utf8')
   assert.match(c, /useTranslations\('seminar\.err'\)/)
 })
+
+// 쪽 나눔 조회는 마지막 정렬에 PK 가 있어야 한다 — 같은 값(정각 시작 세미나·같은 추천 수)이면 PostgreSQL 이 순서를 보장하지 않아
+//  쪽 사이에 중복·누락(T04 r3). '.range(' 를 쓰는 앱 전체 쿼리를 본다(R-P0 형제 경로)
+test('쪽 나눔 조회 — .range( 앞 정렬에 PK 동률 경계', () => {
+  const app = new URL('../', import.meta.url)
+  const files = [
+    ['app/api/seminars/route.ts', /smn_id|ptc_id/],
+    ['app/api/notes/route.ts', /nt_id/],
+    ['app/api/notes/[id]/route.ts', /seg_id/],
+    ['lib/notes.ts', /seg_id/],
+    ['app/api/seminars/[id]/attendance/route.ts', /atd_id/],
+    ['app/api/seminars/[id]/polls/route.ts', /pll_id/],
+    ['app/api/seminars/[id]/qna/route.ts', /qna_id/],
+  ]
+  for (const [f, pk] of files) {
+    const s = readFileSync(new URL(f, app), 'utf8')
+    let i = -1
+    let n = 0
+    while ((i = s.indexOf('.range(', i + 1)) >= 0) {
+      // 이 .range( 바로 앞 쿼리 조각(앞 .from( 부터)
+      const q = s.slice(s.lastIndexOf('.from(', i), i)
+      const orders = [...q.matchAll(/\.order\('(\w+)'/g)].map((m) => m[1])
+      // qna 는 정렬을 변수 q 에 따로 붙인다 — 그 줄을 함께 본다
+      const extra = f.includes('qna') ? [...s.matchAll(/q = q\.order\('(\w+)'/g)].map((m) => m[1]) : []
+      const last = [...orders, ...extra].filter((o) => o !== 'opt_seq')
+      assert.ok(last.some((o) => pk.test(o)), `${f} ${n + 1}번째 .range( 에 PK 정렬 없음 (${last.join(',')})`)
+      n++
+    }
+    assert.ok(n > 0, `${f} 에 .range( 없음`)
+  }
+})
+
+test('설문 카드 — [취소](다시 투표)는 열린 설문에만(마감 뒤 실패한 투표가 남긴 [취소] 방지, T04 r3)', () => {
+  const s = readFileSync(new URL('../components/room/features/engage/polls.tsx', import.meta.url), 'utf8')
+  assert.match(s, /\{change && p\.open && \(/)
+  assert.doesNotMatch(s, /\{change && \(/)
+})
+
+test('처리방침 — 질문·설문 공개 범위와 보관 고지(ko·en, T04 r3)', () => {
+  const msg = (l) => JSON.parse(readFileSync(new URL(`../../messages/${l}.json`, import.meta.url), 'utf8')).privacy.keep
+  assert.ok(msg('ko').some((s) => s.startsWith('질문과 설문') && s.includes('세미나를 삭제할 때까지')))
+  assert.ok(msg('en').some((s) => s.startsWith('Q&A and polls') && s.includes('until the seminar is deleted')))
+})

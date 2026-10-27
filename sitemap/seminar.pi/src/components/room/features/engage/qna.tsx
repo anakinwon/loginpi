@@ -1,11 +1,11 @@
 'use client'
 // Q&A 탭(SubAgent4, 설계서 15.3) — 질문 등록(500자)·추천 ▲(aria-pressed, 1인 1회)·추천순/최신순, 개최자·ADMIN 은 [답변함]·[숨기기](내 질문은 본인도 숨김).
-//  답변한 질문은 아래 '답변함 N개'로 접힌다. 20개 단위 페이지. refresh 신호 수신·저장소 초기화는 polls 기능이 두 탭 몫을 함께 한다(중복 처리 방지)
+//  Ctrl/⌘+Enter 로 보내기, 상한 90% 부터 남은 글자 수(T04 r3 보강). 답변한 질문은 아래 '답변함 N개'로 접힌다. 20개 단위 페이지. refresh 신호 수신·저장소 초기화는 polls 기능이 두 탭 몫을 함께 한다(중복 처리 방지)
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Pagination } from '@/components/seminar/pagination'
 import { useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
-import { QNA_MAX } from '@/lib/engage-rules'
+import { charsLeft, QNA_MAX, sendKey } from '@/lib/engage-rules'
 import type { RoomCtx, RoomFeature } from '../../extensions'
 import { api, engageable, SLOTS, tell, useLoad } from './shared'
 
@@ -25,6 +25,7 @@ function QnaPanel({ ctx, visible }: { ctx: RoomCtx; visible: boolean }) {
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<ApiErrorBody | null>(null)
   const ok = engageable(ctx.seminarId)
+  const left = charsLeft(text.length, QNA_MAX)
   const base = `/api/seminars/${ctx.seminarId}/qna`
   const { data, err, reload } = useLoad<List>(
     ok ? `${base}?page=${page}&sort=${sort}&ans=${ans ? 1 : 0}` : null,
@@ -152,7 +153,17 @@ function QnaPanel({ ctx, visible }: { ctx: RoomCtx; visible: boolean }) {
           placeholder={t('input')}
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (!sendKey({ key: e.key, ctrlKey: e.ctrlKey, metaKey: e.metaKey, isComposing: e.nativeEvent.isComposing })) return
+            e.preventDefault()
+            e.currentTarget.form?.requestSubmit()
+          }}
         />
+        {left !== null && (
+          <span aria-live="polite" className="text-muted-foreground self-center text-xs tabular-nums">
+            {t('left', { n: left })}
+          </span>
+        )}
         <button type="submit" className={`${SMALL} bg-accent! text-white`} disabled={busy || !text.trim()}>
           {t('send')}
         </button>

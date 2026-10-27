@@ -514,6 +514,7 @@
       "loading": "Loading…",
       "input": "Ask a question (500 chars)",
       "send": "Send",
+      "left": "{n} left",
       "labOnly": "Q&A is available in seminar rooms only."
     },
     "recording": {
@@ -724,7 +725,8 @@
       "AI meeting notes (when the presenter turns them on): spoken content, screenshots and the summary, kept until the notes are deleted [TBD: maximum retention].",
       "Consent records: the time of consent and the policy version, kept as proof [TBD: retention period].",
       "Usage: per-minute request counts and processing time, used to enforce cost limits.",
-      "Attendance: the time you joined, the time you were last connected, your display name and your Pi username are stored and given to the host as an attendance list (on screen and as a CSV download). Kept until the seminar is deleted."
+      "Attendance: the time you joined, the time you were last connected, your display name and your Pi username are stored and given to the host as an attendance list (on screen and as a CSV download). Kept until the seminar is deleted.",
+      "Q&A and polls: the question text and the asker's display name (or Pi username if none) are visible to every participant. Upvotes and votes show only counts, never who cast them. Kept, including hidden questions, until the seminar is deleted."
     ],
     "recTitle": "Recording",
     "rec": "Recordings are saved only as a file on the presenter’s device. They are not uploaded to our servers or transferred abroad. While recording or AI notes are on, every participant sees an indicator.",

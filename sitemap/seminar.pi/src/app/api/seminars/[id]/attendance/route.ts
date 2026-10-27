@@ -61,6 +61,7 @@ export const GET = withAuthGuard(
         .eq('smn_id', w.smnId)
         .eq('del_yn', 'N')
         .order('ent_dtm')
+        .order('atd_id') // 동률 경계 고정 — 같은 시각이면 쪽 사이 중복·누락(야간 시험 T04 r3)
         .range(from, from + size - 1)
         .returns<AtdRow[]>(),
     ])

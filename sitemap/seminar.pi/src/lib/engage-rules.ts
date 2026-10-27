@@ -89,3 +89,10 @@ export function parseRefresh(d: unknown): { what: RefreshWhat; isNew: boolean } 
   if (what !== 'polls' && what !== 'qna') return null
   return { what, isNew: kind === 'new' }
 }
+
+// 질문 입력 Ctrl/⌘+Enter = 보내기(Enter 만은 줄바꿈 그대로). 한글 조합 중(isComposing)의 Enter 는 조합 확정이라 보내지 않는다
+export const sendKey = (e: { key: string; ctrlKey: boolean; metaKey: boolean; isComposing?: boolean }) =>
+  e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.isComposing
+
+// 남은 글자 수 — 상한의 90% 부터 숫자(붙여넣기가 maxLength 에서 말없이 잘리는 것을 미리 알림), 아니면 null
+export const charsLeft = (len: number, max: number) => (len >= max * 0.9 ? Math.max(0, max - len) : null)
