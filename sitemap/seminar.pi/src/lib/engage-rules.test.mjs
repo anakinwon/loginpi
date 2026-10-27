@@ -5,6 +5,7 @@ import {
   attendSec,
   beatDue,
   beatStops,
+  charsLeft,
   cleanPoll,
   cleanQuestion,
   csvCell,
@@ -12,6 +13,7 @@ import {
   isOnline,
   parseRefresh,
   pollVoting,
+  sendKey,
   tally,
   toCsv,
 } from './engage-rules.ts'
@@ -97,4 +99,21 @@ test('출석 하트비트 당겨 보내기 — 마지막 전송 뒤 30초 이상
   assert.equal(beatDue(1_000_000, 1_029_999), false) // 빠른 탭 전환 = 안 보냄
   assert.equal(beatDue(1_000_000, 1_030_000), true)
   assert.equal(beatDue(1_000_000, 1_000_000 + 5 * 60_000), true) // 백그라운드 5분 뒤 복귀
+})
+
+test('질문 보내기 키 — Ctrl/⌘+Enter 만, 한글 조합 중 Enter 는 제외(T04 r3)', () => {
+  const k = (o) => sendKey({ key: 'Enter', ctrlKey: false, metaKey: false, ...o })
+  assert.equal(k({}), false) // Enter = 줄바꿈
+  assert.equal(k({ ctrlKey: true }), true)
+  assert.equal(k({ metaKey: true }), true)
+  assert.equal(k({ ctrlKey: true, isComposing: true }), false)
+  assert.equal(k({ key: 'a', ctrlKey: true }), false)
+})
+
+test('남은 글자 수 — 상한 90% 부터만(T04 r3)', () => {
+  assert.equal(charsLeft(0, 500), null)
+  assert.equal(charsLeft(449, 500), null)
+  assert.equal(charsLeft(450, 500), 50)
+  assert.equal(charsLeft(500, 500), 0)
+  assert.equal(charsLeft(600, 500), 0)
 })
