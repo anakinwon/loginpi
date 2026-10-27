@@ -53,7 +53,8 @@ type Peer struct {
 	raisedTs  int64     // 손 든 서버 시각(ms), 0 = 내림(v1.1)
 	chatRate  rateLimit // chat.send 속도 제한(v1.1)
 	reactRate rateLimit // reaction.send 속도 제한(v1.1)
-	appRate   rateLimit // app.send 속도 제한(v1.3, 주제 합산)
+	appRate   rateLimit // app.send 속도 제한(v1.3, caption·refresh 합산)
+	stateRate rateLimit // app.send 'state' 전용 한도(v1.3.2) — 자막 조각이 녹화·AI 기록 고지(M-4)를 밀어내지 않게 분리
 
 	// 구독 PC 재협상 상태
 	offerTimer   *time.Timer

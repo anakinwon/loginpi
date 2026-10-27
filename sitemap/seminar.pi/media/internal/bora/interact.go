@@ -201,7 +201,7 @@ func (r *Room) React(peerID string, emojis []string) *signal.Error {
 	})
 }
 
-// AppSend — app.send(v1.3, SIGNAL_API 3.6). 주제 허용표 → d 4KB → 역할 → 피어당 초당 2건(주제 합산) 순으로 검사해
+// AppSend — app.send(v1.3, SIGNAL_API 3.6). 주제 허용표 → d 4KB → 역할 → 피어당 초당 2건(state 따로, 나머지 합산) 순으로 검사해
 // 보낸 사람 외 전원에게 ntf app{topic, d, from}. d 는 해석하지 않고 그대로 중계, 잠금(LOCKED)과 무관.
 func (r *Room) AppSend(peerID, topic string, d json.RawMessage) *signal.Error {
 	roles, ok := signal.AppTopics[topic]
@@ -219,7 +219,11 @@ func (r *Room) AppSend(peerID, topic string, d json.RawMessage) *signal.Error {
 		if !slices.Contains(roles, p.Role) {
 			return signal.Errf(signal.CodeRoleForbidden, "이 주제를 보낼 수 없는 역할")
 		}
-		if !p.appRate.allow(time.Now()) {
+		rl := &p.appRate
+		if topic == "state" {
+			rl = &p.stateRate // 고지 신호는 자막과 한도를 나눠 쓰지 않는다(v1.3.2)
+		}
+		if !rl.allow(time.Now()) {
 			return signal.Errf(signal.CodeRateLimited, "중계 속도 제한")
 		}
 		r.notify(peerID, signal.NApp, signal.AppNtf{Topic: topic, D: d, From: peerID})
