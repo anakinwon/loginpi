@@ -22,7 +22,7 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   const [mine, setMine] = useState<(MyImage & { url: string })[]>([])
   const [err, setErr] = useState<string | null>(null)
   const cam = ctx.r.localStream?.getVideoTracks()[0]
-  const ok = canProcessVideo() && canSegment()
+  const ok = isOpen && canProcessVideo() && canSegment() // 시트가 열렸을 때만 판정(닫힌 시트는 렌더 내용이 보이지 않는다)
   const { hold } = ctx
 
   useEffect(() => {
@@ -60,7 +60,7 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   const pickIt = async (id: string, blob?: Blob) => {
     setErr(null)
     const e = await choose(id, blob)
-    if (e) setErr(e)
+    if (e && e !== 'superseded') setErr(e)
   }
   const onFile = async (f: File | undefined) => {
     if (!f) return
@@ -71,7 +71,7 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
     setErr(null)
     const id = crypto.randomUUID()
     const e = await choose(`m:${id}`, f)
-    if (e) return setErr(e)
+    if (e) return e === 'superseded' ? undefined : setErr(e) // 디코드 실패면 밀려났어도 저장하지 않는다
     try {
       await addMine(f, id)
       const l = await listMine()

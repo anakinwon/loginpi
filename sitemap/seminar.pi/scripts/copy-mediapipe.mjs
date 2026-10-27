@@ -1,7 +1,7 @@
 // 배경 효과용 MediaPipe wasm 을 node_modules → public/mediapipe/wasm/<버전> 로 복사(자체 호스팅, REA mediapipe-05 selfhost) — dev·build 앞에서 자동 실행.
 // 26.8MB 바이너리라 저장소에 넣지 않는다(.gitignore). 장기 캐시(immutable)라 버전 경로를 쓰고, 엔진(engine.ts MP_VER)과 버전이 다르면 빌드를 막는다.
 // 모델(약 250KB, Apache-2.0 — public/mediapipe/models/NOTICE)은 사람이 1회 받아 커밋한다. 없으면 빌드 실패(조용히 깨진 채 배포 방지) :
-//   curl -L -o public/mediapipe/models/selfie_segmenter_landscape.tflite https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter_landscape/float16/latest/selfie_segmenter_landscape.tflite
+//   curl -L -o public/mediapipe/models/selfie_segmenter_landscape.tflite https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter_landscape/float16/1/selfie_segmenter_landscape.tflite
 // 실행 : node scripts/copy-mediapipe.mjs (cwd = sitemap/seminar.pi)
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'

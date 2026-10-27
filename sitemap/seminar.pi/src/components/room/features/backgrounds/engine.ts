@@ -14,10 +14,17 @@ export const status = featureStore<'idle' | 'loading'>('idle')
 export const autoOff = featureStore(0) // 성능 자동 끔 시각(0 = 없음) — 오버레이가 경고 토스트
 
 // 기능 탐지(UA 판정 금지) — 분리 입력 업로드에 webgl2/webgl 이 필요하다(REA mediapipe-04 gpu_cpu)
+// 1회만 판정해 캐시하고 시험용 컨텍스트는 바로 놓는다 — 렌더마다 열면 버려진 컨텍스트가 쌓여 상한(Chrome 약 16개)에서 분리기 컨텍스트가 끊긴다
+let segOk: boolean | undefined
 export function canSegment() {
   if (typeof document === 'undefined') return false
-  const c = document.createElement('canvas')
-  return !!(c.getContext('webgl2') || c.getContext('webgl'))
+  if (segOk === undefined) {
+    const c = document.createElement('canvas')
+    const gl = c.getContext('webgl2') || c.getContext('webgl')
+    segOk = !!gl
+    gl?.getExtension('WEBGL_lose_context')?.loseContext()
+  }
+  return segOk
 }
 
 // 사용 지표 전송 차단 — 이 주소 하나만 실패시킨다(라이브러리가 1회 실패 뒤 타이머를 멈춤). 영상은 기기 밖으로 안 나간다(README Privacy Notice)
@@ -97,7 +104,7 @@ async function toBackdrop(next: string, blob?: Blob): Promise<HTMLCanvasElement>
   return c
 }
 
-// 배경 고르기 — 반환 = 오류 문구 키(room.effects.*) 또는 null. blob = 내 이미지일 때
+// 배경 고르기 — 반환 = 오류 문구 키(room.effects.*)·'superseded'(다른 선택에 밀려난 실패, 문구 없음) 또는 null. blob = 내 이미지일 때
 export async function choose(next: string, blob?: Blob): Promise<string | null> {
   const my = ++pick
   autoOff.set(0)
@@ -119,7 +126,7 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
     bgOn.set(true)
     return null
   } catch {
-    if (my !== pick) return null
+    if (my !== pick) return 'superseded' // 밀려났어도 실패는 실패 — 호출자가 저장하지 않게(문구는 띄우지 않음)
     status.set('idle')
     choice.set('none')
     bgOn.set(false)

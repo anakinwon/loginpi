@@ -26,9 +26,10 @@ async function tx<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBReq
       db.close()
       ok(q ? q.result : undefined)
     }
-    t.onerror = () => {
+    // 용량 초과(QuotaExceededError) 등은 abort 로만 끝난다 — 안 받으면 Promise 가 영원히 멈춘다
+    t.onerror = t.onabort = () => {
       db.close()
-      no(t.error)
+      no(t.error ?? new Error('abort'))
     }
   })
 }
