@@ -17,7 +17,7 @@ export function ShareLinks({ d }: { d: SeminarCard }) {
   const base = (process.env.NEXT_PUBLIC_APP_URL || window.location.origin).replace(/\/$/, '')
   const url = `${base}/s/${d.id}`
   const subject = t('mailSubject', { title: d.title })
-  const body = t('mailBody', { title: d.title, start: start(d.startAt), url })
+  const body = t('mailBody', { title: d.title, start: start(d.startAt, true), url })
   const ext = { target: '_blank', rel: 'noopener' }
 
   return (

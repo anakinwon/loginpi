@@ -3,6 +3,7 @@
 // 세미나 화면 공용 — 카드 타입(API toCard 와 같은 모양), 버튼 클래스, 오류 문구(seminar.err.<CODE> 우선 → apiErrors → 서버 문구)
 import { useFormatter, useTranslations } from 'next-intl'
 import { useCallback } from 'react'
+import { inViewerTz, ZONED } from '@/lib/calendar-rules'
 import { useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 
 export interface SeminarCard {
@@ -30,12 +31,14 @@ export function useSeminarErrText() {
   )
 }
 
-// 시작일시 — 보는 사람의 지역 시간대로 표시(클라이언트 조회 후 렌더라 SSR 시간대 불일치 없음)
+// 시작일시 — 보는 사람의 지역 시간대로 표시(클라이언트 조회 후 렌더라 SSR 시간대 불일치 없음).
+//  useFormatter 는 서버 시간대(배포본 UTC)를 물려받으므로 timeZone 을 명시한다(E2E r2)
 export function useStartText() {
   const f = useFormatter()
   return useCallback(
-    (iso: string) =>
-      f.dateTime(new Date(iso), { dateStyle: 'medium', timeStyle: 'short' }),
+    // zone = 시간대 이름 덧붙임(메일처럼 남에게 보내는 글)
+    (iso: string, zone = false) =>
+      f.dateTime(new Date(iso), inViewerTz(zone ? ZONED : ({ dateStyle: 'medium', timeStyle: 'short' } as const))),
     [f],
   )
 }

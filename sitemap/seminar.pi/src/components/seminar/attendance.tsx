@@ -9,6 +9,7 @@ import { piFetch } from '@pi/auth/client'
 import { LoginGate } from '@/components/login-gate'
 import { Link } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
+import { inViewerTz } from '@/lib/calendar-rules'
 import { attendSec, fmtDur, isOnline, toCsv } from '@/lib/engage-rules'
 import { Pagination } from './pagination'
 import { BTN, useSeminarErrText } from './shared'
@@ -47,7 +48,7 @@ function Sheet({ id }: { id: string }) {
     }
   }, [id, page, t, errText])
 
-  const when = (iso: string) => f.dateTime(new Date(iso), { dateStyle: 'short', timeStyle: 'short' })
+  const when = (iso: string) => f.dateTime(new Date(iso), inViewerTz({ dateStyle: 'short', timeStyle: 'short' }))
   const name = (r: Row) => r.name || r.piName || '—'
 
   async function csv() {
