@@ -9,7 +9,10 @@ import {
   lockedFor,
   modActions,
   peerMedia,
+  presenterGone,
   presenterHere,
+  presenterResync,
+  speechOn,
   ringFor,
   isBadGrade,
   layerFor,
@@ -415,4 +418,30 @@ test('발표자가 방에 있을 때만 panel 음성 처리(자막·AI 회의록
   assert.equal(presenterHere([{ role: 'presenter' }, { role: 'panel' }]), true)
   assert.equal(presenterHere([{ role: 'panel' }, { role: 'audience' }]), false)
   assert.equal(presenterHere([]), false)
+})
+
+test('음성 조각 녹음 판정(room-view on) — 발표자 아닌 무대 역할은 발표자가 있을 때만, 동의·요청·입장 필수', () => {
+  const base = { live: true, wants: ['quiet'], agreed: true, role: 'panel', peers: [{ role: 'presenter' }] }
+  assert.equal(speechOn(base), true)
+  assert.equal(speechOn({ ...base, peers: [{ role: 'audience' }] }), false) // 발표자 없음 — 끌 사람이 없다
+  assert.equal(speechOn({ ...base, role: 'presenter', peers: [] }), true) // 발표자 본인
+  assert.equal(speechOn({ ...base, wants: [] }), false)
+  assert.equal(speechOn({ ...base, agreed: false }), false)
+  assert.equal(speechOn({ ...base, live: false }), false)
+})
+
+test('발표자 부재 시 방 상태(자막·AI 회의록) 내리기 — 입장 전·발표자 본인은 제외', () => {
+  assert.equal(presenterGone('panel', 'p1', [{ role: 'audience' }]), true)
+  assert.equal(presenterGone('audience', 'p1', []), true)
+  assert.equal(presenterGone('panel', 'p1', [{ role: 'presenter' }]), false)
+  assert.equal(presenterGone('panel', null, []), false) // 입장 전(peers 미수신) 오판 방지
+  assert.equal(presenterGone('presenter', 'p1', []), false)
+})
+
+test('발표자 입장·재입장 때 현재 state 1번 방송(notes:false 포함) — app 지원·입장 완료한 발표자만', () => {
+  assert.equal(presenterResync('presenter', true, 'p1'), true)
+  assert.equal(presenterResync('presenter', null, 'p1'), false) // app 지원 미확정
+  assert.equal(presenterResync('presenter', false, 'p1'), false)
+  assert.equal(presenterResync('presenter', true, null), false)
+  assert.equal(presenterResync('panel', true, 'p1'), false) // state 는 presenter 만 보낼 수 있다
 })

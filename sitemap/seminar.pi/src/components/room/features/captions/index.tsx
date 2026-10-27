@@ -15,7 +15,7 @@ import { featureStore, speechWants, useStore, wantSpeech, type RoomCtx, type Roo
 import { DubRow } from '../dubbing'
 import { Sheet, SwitchRow } from '../sheet'
 import { isTranslateLang, TRANSLATE_LANGS } from '@/lib/translate-rules'
-import { presenterHere } from '../../room-rules'
+import { presenterGone, presenterResync } from '../../room-rules'
 import { CAPTION, captionsState, parseCaption, SIZES, stepSize, type Size } from './caption-rules'
 import { useTranslated } from './translate'
 
@@ -117,10 +117,10 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   }, [room, ctx.role])
 
   // 발표자가 끊김 신호 없이 나가면(창 닫힘·망 단절) 방 자막을 내린다 — 끌 사람이 없다. 다시 들어오면 발표자가 현재 값을 방송한다
-  const here = presenterHere(ctx.r.peers)
+  const gone = presenterGone(ctx.role, ctx.r.selfId, ctx.r.peers)
   useEffect(() => {
-    if (!presenter && ctx.r.selfId && !here) capRoom.set(false)
-  }, [presenter, here, ctx.r.selfId])
+    if (gone) capRoom.set(false)
+  }, [gone])
 
   // presenter 입장·재입장 — 자기 현재 값을 1번 방송(꺼져 있으면 false 로 panel 을 맞춘다)
   const sendRef = useRef(ctx.sendApp)
@@ -129,8 +129,8 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   })
   const selfId = ctx.r.selfId
   useEffect(() => {
-    if (presenter && ctx.appSupported && selfId) void sendRef.current('state', { captions: capRoom.get() })
-  }, [presenter, ctx.appSupported, selfId])
+    if (presenterResync(ctx.role, ctx.appSupported, selfId)) void sendRef.current('state', { captions: capRoom.get() })
+  }, [presenter, ctx.appSupported, selfId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 늦은 입장자에게 현재 상태 재방송(presenter, 켜져 있을 때만) — throttle : 대기 중이면 새로 걸지 않는다
   const count = ctx.r.peers.length

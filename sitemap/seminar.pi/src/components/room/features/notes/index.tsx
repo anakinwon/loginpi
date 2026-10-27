@@ -27,6 +27,7 @@ import {
   SHOT_W,
   shotAllowed,
 } from '@/lib/note-rules'
+import { presenterGone, presenterResync } from '../../room-rules'
 
 const TOAST_MS = 3000
 const RESEND_MS = 1000
@@ -165,6 +166,21 @@ function NotesOverlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     const tm = setTimeout(() => setToast(null), TOAST_MS)
     return () => clearTimeout(tm)
   }, [shown]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 발표자가 끊김 신호 없이 나가면(창 닫힘·망 단절) 배지와 panel 음성 요청을 내린다 — 발표자 회의록은 pagehide·onReset 으로 이미 끝났다(M-4·R-P5).
+  // 다시 들어오면 발표자가 현재 값을 방송한다(아래)
+  const gone = presenterGone(ctx.role, ctx.r.selfId, ctx.r.peers)
+  useEffect(() => {
+    if (!gone) return
+    roomOn.set(false)
+    wantSpeech('notes', null)
+  }, [gone])
+
+  // 발표자 입장·재입장 — 자기 현재 값을 1번 방송(새로 고침 뒤엔 false — 남은 panel 의 배지·음성 요청을 맞춘다)
+  const selfId = ctx.r.selfId
+  useEffect(() => {
+    if (presenterResync(ctx.role, ctx.appSupported, selfId)) void ctx.sendApp('state', { notes: on.get() })
+  }, [ctx.role, ctx.appSupported, selfId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 늦게 들어온 사람 — 참가자 수가 늘면 1초 묶어 현재 상태 다시 방송(초당 2건 한도 안)
   const n = ctx.r.peers.length
