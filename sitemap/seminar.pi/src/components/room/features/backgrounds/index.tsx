@@ -3,14 +3,17 @@
 // 무대 역할(presenter·panel)만. 효과 순서 BG.order 20(조명 10 뒤 — 조명은 카메라 원본만 재고 고친다). 성능이 15fps 미만 3초면 분리 간격을 2배로 낮추고, 그래도 느리면 자동 끔 + 경고 토스트(rules.slowWatch·slowerEvery).
 // 조명·소음 줄은 SA3(media-fx FxRows)를 이 시트의 '배경' 절 아래에 붙인다 — ⋯ '효과' 항목은 이 기능 1개만 등록
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import {
   featureStore,
+  TOAST_SLOT_ID,
+  useStageSlot,
   useStore,
   type RoomCtx,
   type RoomFeature,
 } from '../../extensions'
-import { canProcessVideo } from '../../effects'
+import { canProcessVideo, useTrackLive } from '../../effects'
 import {
   autoOff,
   bgOn,
@@ -37,7 +40,9 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   const preview = useRef<HTMLVideoElement>(null)
   const [mine, setMine] = useState<(MyImage & { url: string; unsaved?: boolean })[]>([])
   const [err, setErr] = useState<string | null>(null)
-  const cam = ctx.r.localStream?.getVideoTracks()[0]
+  const raw = ctx.r.localStream?.getVideoTracks()[0]
+  // 장치 쪽에서 끝난 카메라(앱 전환·장치 분리)는 없는 것과 같다 — 고른 배경이 적용되지 않는데 고를 수 있는 척하지 않는다(r5 E2E)
+  const cam = useTrackLive(raw) ? raw : undefined
   const ok = isOpen && canProcessVideo() && canSegment() // 시트가 열렸을 때만 판정(닫힌 시트는 렌더 내용이 보이지 않는다)
   const { hold } = ctx
 
@@ -254,27 +259,27 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   )
 }
 
-// 저절로 꺼짐 경고(느려서·연속 실패) — 3초(polite, 설계 15.5·15.12)
+// 저절로 꺼짐 경고(느려서·연속 실패) — 3초(polite, 설계 15.5·15.12). 공용 토스트 줄(15.6)에 portal 로 붙는다 —
+//  따로 absolute top-3 이면 좌상단 녹화 배지·새 설문 토스트와 겹쳤다(야간 시험 r5 T10). 비어 있을 땐 줄 맨 뒤(order-last)
 function AutoOffToast() {
   const t = useTranslations('room.effects')
   const key = useStore(autoOff)
+  const slot = useStageSlot(TOAST_SLOT_ID)
   useEffect(() => {
     if (!key) return
     const id = setTimeout(() => autoOff.set(null), 3000)
     return () => clearTimeout(id)
   }, [key])
-  return (
-    <div
-      role="status"
-      aria-live="polite"
-      className="pointer-events-none absolute inset-x-0 top-3 flex justify-center"
-    >
+  if (!slot) return null
+  return createPortal(
+    <div role="status" aria-live="polite" className={key ? 'max-w-full' : 'order-last'}>
       {key && (
-        <span className="bg-warning rounded-full px-4 py-2 text-sm font-semibold text-black">
+        <span className="bg-warning inline-block rounded-full px-4 py-2 text-sm font-semibold text-black">
           {t(key)}
         </span>
       )}
-    </div>
+    </div>,
+    slot,
   )
 }
 

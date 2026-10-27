@@ -40,7 +40,7 @@ export const POST = withAuthGuard(
     if (user instanceof NextResponse) return user
     if (body instanceof NextResponse) return body
     const smnId = body.smnId.toLowerCase()
-    if (!(await capSigOk(env.PI_SESSION_SECRET, smnId, body.text, body.sig))) return apiError('FORBIDDEN', 403)
+    if (!(await capSigOk(env.PI_SESSION_SECRET, smnId, body.text, body.sig))) return apiError('CAPTION_SIG_INVALID', 403)
     if (!hitRate(rate, user.id, Date.now(), TTS_REQ_PER_MIN)) return apiError('SPEECH_RATE', 429)
 
     const key = await cacheKey(body.text, body.lang)

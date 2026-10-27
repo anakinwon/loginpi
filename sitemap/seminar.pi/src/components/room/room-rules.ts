@@ -418,6 +418,22 @@ export function failHit<K>(fails: Map<K, number>, k: K, max: number): boolean {
 export const localPlan = (on: boolean, ready: string): 'reacquire' | 'toggle' =>
   on && ready !== 'live' ? 'reacquire' : 'toggle'
 
+// 트랙 끝남 구독 — 이미 끝난 트랙이면 바로 부른다. 'ended' 는 한 번만 쏘므로 발행 신호 왕복(수백 ms~수 초) 사이에 끝난 트랙에
+// 나중에 리스너를 달면 영영 못 듣는다(청중 멈춘 화면·효과 조용히 무시). 반환 = 구독 해제. 시험 swap-sender.test.mjs
+export type EndableTrack = {
+  readonly readyState: string
+  addEventListener(type: 'ended', fn: () => void): void
+  removeEventListener(type: 'ended', fn: () => void): void
+}
+export function onTrackEnd(t: EndableTrack, fn: () => void): () => void {
+  if (t.readyState === 'ended') {
+    fn()
+    return () => {}
+  }
+  t.addEventListener('ended', fn)
+  return () => t.removeEventListener('ended', fn)
+}
+
 // 송신기 트랙을 처리 트랙으로 바꾸고 되돌리기 함수를 준다. replaceTrack 은 비동기라 sender.track 이 늦게 바뀐다 — 교체가 끝나기 전에
 // 되돌리면(효과 빠른 켬·끔, 개발 StrictMode 이중 실행, 강등) 'sender.track === out' 검사가 거짓이라 되돌리지 않고, 늦게 끝난 교체가 이미 멈춘
 // 처리 트랙을 송신기에 남겨 청중 영상이 멈췄다(ended). 교체 요청은 PC 작업 큐에서 순서대로 처리되므로 대기 중이면 되돌리기를 뒤에 건다.

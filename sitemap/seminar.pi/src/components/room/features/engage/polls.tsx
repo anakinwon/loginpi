@@ -3,11 +3,12 @@
 //  새 설문은 10초 토스트 [투표하기] → 이 탭을 연다. 변경 뒤 refresh 신호로 다른 사람이 다시 읽는다(shared.ts).
 //  refresh 수신(onApp)·저장소 초기화(onReset)는 이 기능 하나가 설문·Q&A 두 탭 몫을 한다 — 두 기능에 다 걸면 배지가 2번 오른다
 import { useEffect, useId, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import { Pagination } from '@/components/seminar/pagination'
 import { useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import { POLL, pollVoting } from '@/lib/engage-rules'
-import { useStore, type RoomCtx, type RoomFeature } from '../../extensions'
+import { TOAST_SLOT_ID, useStageSlot, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 import { api, engageable, onRefresh, pollToast, resetSlots, SLOTS, tell, useLoad } from './shared'
 
 type Opt = { id: string; text: string; n: number; pct: number }
@@ -241,19 +242,23 @@ function NewPoll({ onSubmit, onCancel }: { onSubmit: (q: string, opts: string[])
   )
 }
 
-// 새 설문 토스트 — 10초, [투표하기] = 설문 탭 열기. 무대 위 상단 가운데(배지는 좌상단이라 겹치지 않게)
+// 새 설문 토스트 — 10초, [투표하기] = 설문 탭 열기. 공용 토스트 줄(15.6)에 portal 로 붙는다 — 따로 absolute top-3 이면
+//  360px 폭에서 좌상단 녹화 배지(전원 표시, M-4)를 10초간 덮고 녹화·AI 기록 토스트(top-12)와 겹쳤다(야간 시험 r5 T10).
+//  낭독 영역(role=status)은 늘 붙여 두고(내용만 바뀌어야 낭독된다) 비어 있을 땐 줄 맨 뒤(order-last)라 간격이 생기지 않는다
 function PollToast({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const t = useTranslations('room.polls')
   const on = useStore(pollToast)
+  const slot = useStageSlot(TOAST_SLOT_ID)
   useEffect(() => {
     if (!on) return
     const timer = setTimeout(() => pollToast.set(false), TOAST_MS)
     return () => clearTimeout(timer)
   }, [on])
-  return (
-    <div role="status" className="pointer-events-none absolute inset-x-0 top-3 z-20 flex justify-center px-3">
+  if (!slot) return null
+  return createPortal(
+    <div role="status" className={on ? 'max-w-full' : 'order-last'}>
       {on && (
-        <div className="bg-surface pointer-events-auto flex items-center gap-3 rounded-xl px-4 py-2 text-sm shadow-lg">
+        <div className="bg-surface pointer-events-auto flex max-w-full flex-wrap items-center justify-center gap-3 rounded-xl px-4 py-2 text-sm shadow-lg">
           <span>{t('started')}</span>
           <button
             type="button"
@@ -267,7 +272,8 @@ function PollToast({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
           </button>
         </div>
       )}
-    </div>
+    </div>,
+    slot,
   )
 }
 

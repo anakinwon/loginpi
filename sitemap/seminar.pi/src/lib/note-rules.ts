@@ -87,6 +87,12 @@ export function hhmm(iso: string, timeZone?: string) {
 
 // 요약이 비었는가(요점·결정·할 일 모두 0) — 말한 내용이 없던 회의록(조각 0개)은 빈 요약으로 DONE 이 된다.
 //  화면은 이때 빈 칸 3개·AI 고지 대신 '요약할 내용이 없습니다' 1줄을 보인다(E2E r1)
+// 회의록 머리 조회 실패를 화면 전체 오류로 바꿀까 — 첫 조회 실패·없음(404, 다른 곳에서 삭제)·권한 없음(403)만.
+//  이미 보이는 회의록의 5초 상태 조회가 일시 오류(네트워크 끊김·429·5xx)면 화면을 두고 다음 조회를 이어 간다(r5 T07)
+export function headFatal(status: number, loaded: boolean) {
+  return !loaded || status === 404 || status === 403
+}
+
 export function emptySummary(s: MdNote['summary']) {
   return !s || !(s.points.length || s.decisions.length || s.todos.length)
 }

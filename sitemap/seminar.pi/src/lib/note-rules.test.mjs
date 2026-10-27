@@ -7,6 +7,7 @@ import {
   emptySummary,
   fenceTranscript,
   frameDiff,
+  headFatal,
   isJpeg,
   noteGone,
   NOTE_GONE_AFTER_MS,
@@ -173,7 +174,7 @@ test('대면 노트 — 최근 문장 영역은 화면 낭독기가 새 문장�
 
 test('대면 노트 — 마이크가 끊기면 [마이크 다시 연결]로 같은 회의록에 이어 기록(ko·en 문구)', async () => {
   const s = await inPerson()
-  assert.match(s, /micLost && !gone && !finishing &&/)
+  assert.match(s, /micLost && !halted && !finishing &&/)
   assert.match(
     s,
     /setMicLost\(false\)\s*\n\s*setTrack\(s\.getAudioTracks\(\)\[0\] \?\? null\)/,
@@ -306,7 +307,7 @@ test('대면 노트 — 시작·다시 연결 대기 중에 화면을 떠나면 
   assert.match(s, /if \(!alive\.current\) \{\s*\n\s*stopMic\(\)\s*\n\s*return endNote\(r\.data\.ntId\)/)
   assert.match(s, /if \(!a\.ok \|\| !alive\.current\) \{\s*\n\s*stopMic\(\)\s*\n\s*endNote\(r\.data\.ntId\)/)
   // 다시 연결 — 떠난 뒤 온 트랙은 바로 놓는다
-  assert.match(s, /if \(!alive\.current\) return s\.getTracks\(\)\.forEach\(\(x\) => x\.stop\(\)\)/)
+  assert.match(s, /if \(!alive\.current \|\| ended\.current\)\s*\n\s*return s\.getTracks\(\)\.forEach\(\(x\) => x\.stop\(\)\)/)
   // 정리에서 alive 를 내리고, 마운트(StrictMode 재실행 포함)에서 다시 올린다
   assert.match(s, /alive\.current = true\s*\n\s*return \(\) => \{\s*\n\s*alive\.current = false/)
   // 형제(R-P0) : 카메라 실험실도 같은 경합을 막는다
@@ -318,10 +319,10 @@ test('대면 노트 — 시작·다시 연결 대기 중에 화면을 떠나면 
 test('대면 노트 — 기록 중 탭 제목 앞 ● 표시, 끝나거나 떠나면 뗀다(보강 T02 r4)', async () => {
   const s = await inPerson()
   assert.match(s, /const REC_MARK = '● '/)
-  assert.match(s, /if \(!ntId \|\| gone\) return/)
+  assert.match(s, /if \(!ntId \|\| halted\) return/)
   assert.match(s, /document\.title = REC_MARK \+ document\.title/)
   assert.match(s, /document\.title = document\.title\.slice\(REC_MARK\.length\)/)
-  assert.match(s, /\}, \[ntId, gone\]\)/)
+  assert.match(s, /\}, \[ntId, halted\]\)/)
   // 동작 모의 — 같은 규칙으로 붙이고 떼기 : 겹치지 않고, 새 화면 제목은 건드리지 않는다
   const REC_MARK = '● '
   const doc = { title: '대면 노트' }
@@ -379,4 +380,62 @@ test('회의록 삭제·다른 곳 종료 감지 배선 — chunk 응답 rec·�
     const m = JSON.parse(readFileSync(new URL(`../../messages/${l}.json`, import.meta.url), 'utf8'))
     assert.ok(m.room.notes.gone?.length > 5, l)
   }
+})
+
+test('대면 노트 — 서버가 조각을 멈추면(한도·고지 없음 포함) 기록 중 배지·탭 표시를 내리고 마이크를 놓는다(T02 r5)', async () => {
+  const s = await inPerson()
+  const at = s.indexOf('onHalt: (why) => {')
+  const halt = s.slice(at, s.indexOf('    },', at))
+  // 모든 멈춤 이유에서 halted·마이크 놓기가 이유 판정보다 먼저
+  const early = halt.indexOf("if (why !== 'live' && why !== 'gone') return")
+  assert.ok(early > 0, '이유 판정 없음')
+  for (const k of ['setHalted(true)', 'setTrack(null)']) {
+    const i = halt.indexOf(k)
+    assert.ok(i > 0 && i < early, `${k} 가 이유 판정 뒤`)
+  }
+  // 한도·고지 없음은 회의록이 아직 RECORDING — ended 를 세우지 않아 떠나면 끝내기 요청이 간다
+  assert.ok(halt.indexOf('ended.current = true') > early)
+  // 배지는 halted 로(gone 아님)
+  assert.match(s, /\{!halted && \(\s*\n\s*<p className="bg-danger/)
+  assert.doesNotMatch(s, /\{!gone && \(/)
+})
+
+test('대면 노트 — [마이크 다시 연결] 대기 중 연타 막기·종료 뒤 늦게 온 마이크는 놓기(T02 r5)', async () => {
+  const s = await inPerson()
+  const fn = s.slice(s.indexOf('async function reconnect()'), s.indexOf('const alert = recAlert'))
+  assert.match(fn, /setFixing\(true\)[\s\S]*getUserMedia[\s\S]*setFixing\(false\)/)
+  assert.match(fn, /if \(!alive\.current \|\| ended\.current\)\s*\n\s*return s\.getTracks\(\)\.forEach\(\(x\) => x\.stop\(\)\)/)
+  assert.match(s, /disabled=\{fixing\}\s*\n\s*onClick=\{\(\) => void reconnect\(\)\}/)
+})
+
+test('대면 노트 — 제목 칸 Enter 로 기록 시작(form 제출, 버튼과 같은 비활성 조건, 보강 T02 r5)', async () => {
+  const s = await inPerson()
+  assert.match(s, /const ready = !busy && told && !!title\.trim\(\)/)
+  assert.match(s, /onSubmit=\{\(e\) => \{\s*\n\s*e\.preventDefault\(\)\s*\n\s*if \(ready\) void start\(\)/)
+  assert.match(s, /type="submit"\s*\n\s*className=\{`\$\{BTN_PRIMARY\} w-full`\}\s*\n\s*disabled=\{!ready\}/)
+  // 기록 화면의 버튼은 form 밖 — 제출 버튼은 하나뿐
+  assert.equal((s.match(/type="submit"/g) ?? []).length, 1)
+})
+
+test('headFatal — 보이는 회의록의 상태 조회 일시 오류(네트워크·429·5xx)는 화면을 두고 이어 조회, 첫 조회·404·403 만 화면 오류(r5 T07)', () => {
+  for (const st of [0, 429, 500, 502, 503]) assert.equal(headFatal(st, true), false, String(st))
+  for (const st of [404, 403]) assert.equal(headFatal(st, true), true, String(st))
+  for (const st of [0, 500, 404]) assert.equal(headFatal(st, false), true, String(st))
+  // 배선 : 화면이 일시 오류에 setErr 대신 같은 머리를 새 객체로 넣어 조회 효과를 다시 건다
+  const src = readFileSync(new URL('../components/notes/note-view.tsx', import.meta.url), 'utf8')
+  const at = src.indexOf('headFatal(r.status, loaded.current)')
+  assert.ok(at > 0 && at < src.indexOf('setErr(', at), 'setErr 앞에 headFatal 판정 없음')
+  assert.match(src.slice(at, at + 120), /setHead\(\(h\) => h && \{ \.\.\.h \}\)/)
+})
+
+test('회의록 화면 상태 조회 — 숨은 탭은 쉬고 다시 보일 때 1번, 정리 때 듣기 해제(보강 r5 T07)', () => {
+  const src = readFileSync(new URL('../components/notes/note-view.tsx', import.meta.url), 'utf8')
+  const at = src.indexOf('const tm = setTimeout(')
+  const body = src.slice(at, src.indexOf('}, [head])', at))
+  assert.ok(at > 0)
+  assert.match(body, /visibilityState === 'hidden'\)\s+document\.addEventListener\('visibilitychange', onShow\)/)
+  assert.match(body, /clearTimeout\(tm\)\s+document\.removeEventListener\('visibilitychange', onShow\)/)
+  const show = src.slice(src.indexOf('const onShow'), at)
+  assert.match(show, /visibilityState === 'hidden'\) return/)
+  assert.match(show, /removeEventListener\('visibilitychange', onShow\)\s+next\(\)/)
 })

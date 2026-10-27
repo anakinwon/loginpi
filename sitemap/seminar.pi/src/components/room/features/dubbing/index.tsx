@@ -2,7 +2,7 @@
 // 음성 번역 듣기(더빙, SA9 — 설계서 15.4, 계획 M-3·A-3) — 자막 시트의 스위치 1줄(DubRow, 언어가 '원문'이면 숨김) + 소리 재생기.
 // 켜면 받은 자막(ntf app caption{text,ts,lang})마다 자막 화면과 같은 번역(translateCaption)을 거쳐 /api/speech/tts(piFetch)로 듣는 언어의 표준 합성 음성을 받아 차례로 재생한다.
 //  재생 큐 : 앞 문장이 끝나야 다음(겹치면 대기), 대기 3개 넘으면 오래된 것 버림(pushDub). 속도 = 합성 길이 ÷ 원문 조각 길이 → 0.8~1.5배(dubRate,
-//  playbackRate 는 음높이 유지). 켜진 동안 원음 20%(remoteVolume → stage useRemoteAudio). 자기 음성은 엔진이 되돌려 주지 않아 더빙하지 않는다.
+//  playbackRate 는 음높이 유지). 켜져 있고 방 자막이 도는 동안 원음 20%(remoteVolume → stage useRemoteAudio). 자기 음성은 엔진이 되돌려 주지 않아 더빙하지 않는다.
 // 자동재생 : 스위치를 켜는 탭(사용자 제스처) 안에서 재생 요소를 무음으로 1번 play() 해 잠금을 푼다(Pi Browser·iOS, 설계서 11절 P3).
 // 기능 탐지 : Audio·Blob URL 이 없으면 스위치를 숨긴다(UA 판정 금지). 더빙 켜짐은 저장하지 않는다 — 다음 입장 때 제스처 없이 켜면 소리가 막힌다
 import { useEffect, useState } from 'react'
@@ -12,9 +12,10 @@ import { featureStore, remoteVolume, useStore, type RoomCtx, type RoomFeature } 
 import { SwitchRow } from '../sheet'
 import { parseCaption } from '../captions/caption-rules'
 import { translateCaption, trStop } from '../captions/translate'
+import { capRoom } from '../captions' // 순환 import — 렌더 안에서만 읽는다(모듈 평가 때 접근 없음)
 import { sameLang } from '@/lib/translate-rules'
 import { isUuid } from '@/lib/seminar-rules'
-import { DUB_DUCK, DUB_FAIL_MAX, dubRate, dubStale, dubStop, once, pushDub, TTS_MAX_CHARS } from '@/lib/speech-rules'
+import { DUB_FAIL_MAX, dubRate, dubStale, dubStop, dubVolume, once, pushDub, TTS_MAX_CHARS } from '@/lib/speech-rules'
 
 export const dubOn = featureStore(false)
 const dubLang = featureStore('') // 듣는 언어('' = 원문 → 더빙 없음). 자막 시트 언어 선택을 DubRow 가 옮겨 담는다
@@ -192,13 +193,16 @@ let alertBlocked: (() => void) | null = null
 function DubbingOverlay({ ctx }: { ctx: RoomCtx }) {
   const on = useStore(dubOn)
   const stop = useStore(trStop)
+  const room = useStore(capRoom)
   useEffect(() => {
     alertBlocked = () => ctx.notice('dubbing.blocked')
   })
   useEffect(() => {
-    remoteVolume.set(on ? DUB_DUCK : 1)
     if (!on) stopAll()
   }, [on])
+  useEffect(() => {
+    remoteVolume.set(dubVolume(on, room))
+  }, [on, room])
   // 번역 중단(trStop — 권한 없음·AI 미설정·번역 한도)이면 번역문이 더 안 와 더빙도 소리가 없다 → 끄고 원음 복구.
   //  안 끄면 스위치는 켜진 채 원음만 20% 로 줄어 아무것도 안 들렸다(야간 시험 r4 T09). 알림은 자막 쪽 trStop 알림 1번으로 충분
   useEffect(() => {

@@ -195,8 +195,10 @@ export const TTS_REQ_PER_MIN = 30
 export const TTS_MAX_CHARS = 300
 // 합성 응답이 이 상태면 이후 문장도 모두 실패한다 — 더빙을 끄고 알린다(문장마다 헛요청 반복 방지).
 //  401 로그아웃 · 403 자격 없음 · 409 LIVE 아님 · 503 AI 꺼짐 · 429 중 세미나 한도 소진(SPEECH_QUOTA). 분당 횟수(SPEECH_RATE)·502 는 그 문장만 건너뜀
+//  서명 불일치(403 CAPTION_SIG_INVALID)는 그 문장만 건너뜀 — 변조 자막 1개로 더빙 전체가 꺼지지 않게(야간 시험 r5 T08, trStopOf 와 형제)
 export const dubStop = (status: number, code?: unknown) =>
-  status === 401 || status === 403 || status === 409 || status === 503 || (status === 429 && code === 'SPEECH_QUOTA')
+  code !== 'CAPTION_SIG_INVALID' &&
+  (status === 401 || status === 403 || status === 409 || status === 503 || (status === 429 && code === 'SPEECH_QUOTA'))
 // 재생 큐 — 재생 대기가 이만큼을 넘으면 가장 오래된 것을 버린다(늦은 더빙은 원음과 어긋나 쓸모없음)
 export const DUB_QUEUE_MAX = 3
 // 재생 속도 범위 — 원문 발화 시간에 맞추되 알아듣기 어려운 속도는 막는다
@@ -210,6 +212,9 @@ export const dubStale = (at: number, now: number) => now - at > DUB_STALE_MS
 export const DUB_FAIL_MAX = 3
 // 더빙을 켠 동안 원음 볼륨(설계서 15.4 — 20%)
 export const DUB_DUCK = 0.2
+// 원음 볼륨 — 더빙이 켜져 있고 방 자막이 돌 때만 줄인다. 방 자막이 꺼져 있으면(발표자가 아직 안 켬·끔·한도·발표자 퇴장) 더빙할 문장이 오지 않으니
+//  스위치는 켠 채로 원음 100%(야간 시험 r5 T09 — 켜 두면 아무 소리도 없이 원음만 20% 로 줄어 있었다). 방 자막이 다시 켜지면 그대로 이어진다
+export const dubVolume = (on: boolean, room: boolean) => (on && room ? DUB_DUCK : 1)
 
 // 한 번만 실행 — 재생 끝(onended·onerror·play() 거부)이 한 문장에 겹쳐 와도 다음 문장으로 1번만 넘어가게
 export function once<A extends unknown[]>(f: (...a: A) => void) {

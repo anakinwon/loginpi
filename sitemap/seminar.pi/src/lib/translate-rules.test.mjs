@@ -13,6 +13,8 @@ import {
   MAX_TEXT_CHARS,
   pickTrLang,
   sameLang,
+  shownOf,
+  TR_HOLD_MS,
   TR_LANG_SETTLE_MS,
   TRANSLATE_LANGS,
   trStopOf,
@@ -162,7 +164,7 @@ test('번역 중단 사유 — 권한 없음·AI 미설정·세미나 한도만 
   assert.equal(of('NOT_LIVE'), null)
   assert.equal(of('NOT_FOUND'), null)
   assert.equal(trStopOf(401, 'UNAUTHORIZED'), 'forbidden')
-  assert.equal(trStopOf(403, 'FORBIDDEN'), 'forbidden') // 서명 불일치도 같은 화면에선 되풀이된다
+  assert.equal(trStopOf(403, 'FORBIDDEN'), 'forbidden') // 자격 없음(aiGate·fn_use_smn_ai)
   assert.equal(trStopOf(503, 'AI_UNAVAILABLE'), 'unavailable')
   assert.equal(trStopOf(503, 'DB_UNAVAILABLE'), null) // DB 일시 장애는 다시 시도
   assert.equal(trStopOf(502, 'TRANSLATE_FAILED'), null)
@@ -318,4 +320,35 @@ test('shareMiss — 첫 요청 거절은 나눠 갖지 않는다(기다리던 �
   assert.equal(b, 'QUOTA')
   assert.equal(g, 'text')
   assert.deepEqual(gates, ['bad', 'good'])
+})
+
+// r5 T08 회귀 — 서명 불일치는 그 문장만의 문제. 전에는 403 FORBIDDEN 이라 패널 1명이 보낸 변조 자막 1개로
+//  청중 전원의 번역(trStop)과 더빙(dubStop)이 입장 내내 꺼지고 '입장 등록한 참가자만' 이라는 틀린 사유가 떴다
+test('서명 불일치 — 403 CAPTION_SIG_INVALID 는 번역·더빙을 멈추지 않음, 라우트 2곳이 이 코드로 거절, ko·en 문구', async () => {
+  const { dubStop } = await import('./speech-rules.ts')
+  assert.equal(trStopOf(403, 'CAPTION_SIG_INVALID'), null)
+  assert.equal(dubStop(403, 'CAPTION_SIG_INVALID'), false)
+  assert.equal(dubStop(403, 'FORBIDDEN'), true) // 자격 없음은 그대로 끔
+  const { readFile } = await import('node:fs/promises')
+  const rd = (p) => readFile(new URL(p, import.meta.url), 'utf8')
+  for (const f of ['translate', 'tts']) {
+    const src = await rd(`../app/api/speech/${f}/route.ts`)
+    assert.ok(/capSigOk\([^)]*\)\)\) return apiError\('CAPTION_SIG_INVALID', 403\)/.test(src), f)
+  }
+  for (const l of ['ko', 'en']) assert.ok(JSON.parse(await rd(`../../messages/${l}.json`)).apiErrors.CAPTION_SIG_INVALID, l)
+})
+
+// r5 T08 보강 — 번역 대기 중 원문(외국어)이 번쩍이지 않게 직전 번역을 잠깐 유지
+test('번역 대기 표시 — 대기 중 직전 번역 유지, 실패·언어 바뀜·오래됨·번역 안 함이면 원문', () => {
+  const cap = { text: 'こんにちは', lang: 'ja' }
+  const out = { key: 'ko\n前の文', text: '이전 문장', lang: 'ko', at: 1_000 }
+  const k = 'ko\nこんにちは'
+  assert.equal(shownOf(null, k, 'ko', out, '', 2_000), null)
+  assert.deepEqual(shownOf(cap, k, 'ko', { ...out, key: k, text: '안녕하세요' }, '', 2_000), { text: '안녕하세요', lang: 'ko' }) // 도착
+  assert.deepEqual(shownOf(cap, k, 'ko', out, '', 2_000), { text: '이전 문장', lang: 'ko' }) // 대기 중 = 직전 번역
+  assert.deepEqual(shownOf(cap, k, 'ko', out, k, 2_000), cap) // 이 문장 번역 실패 = 원문
+  assert.deepEqual(shownOf(cap, 'en\nこんにちは', 'en', out, '', 2_000), cap) // 언어 바뀜 = 다른 언어 번역을 남기지 않음
+  assert.deepEqual(shownOf(cap, k, 'ko', out, '', 1_000 + TR_HOLD_MS + 1), cap) // 오래된 번역은 남기지 않음
+  assert.deepEqual(shownOf(cap, '', 'ko', out, '', 2_000), cap) // 번역 안 함(꺼짐·같은 언어·서명 없음·중단)
+  assert.deepEqual(shownOf(cap, k, 'ko', null, '', 2_000), cap) // 첫 문장 대기 = 원문
 })

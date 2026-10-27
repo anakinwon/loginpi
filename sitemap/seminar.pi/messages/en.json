@@ -91,7 +91,8 @@
     "NOTE_SHOT_INVALID": "Invalid screen capture",
     "NOTE_SHOT_RATE": "Too many screen captures",
     "NOTE_RETRY_SOON": "You can try again in a minute",
-    "SPEECH_TTS_FAILED": "Could not create the translated voice"
+    "SPEECH_TTS_FAILED": "Could not create the translated voice",
+    "CAPTION_SIG_INVALID": "This caption could not be verified, so it was not translated"
   },
   "progress": {
     "title": "Build progress",
@@ -416,6 +417,7 @@
       "title": "Before you turn on your microphone",
       "body": "If recording, captions or AI meeting notes are turned on in this seminar, your voice may be converted to text, stored and translated. Voice processing is done by an AI service outside your country. If you don’t agree, your mic still turns on — only your voice is left out of processing.",
       "privacy": "Privacy policy",
+      "newTab": "(opens in a new tab)",
       "decline": "Don't agree",
       "agree": "Agree and turn on mic",
       "notice": "When recording, captions or AI meeting notes are on, speakers’ voices are processed. Audience voices are not sent."
@@ -433,6 +435,7 @@
       "waiting": "Captions appear when the presenter turns them on",
       "limit": "Speech processing limit reached, so captions and AI minutes stopped",
       "sendFail": "Could not turn on captions. Please try again shortly",
+      "sendFailOff": "Could not turn off captions. Please try again shortly",
       "region": "Captions",
       "translate": "Show translated captions",
       "lang": "Translation language",
@@ -534,6 +537,7 @@
       "toast": {
         "started": "Recording started — everyone can see it",
         "saved": "Recording saved. Check your downloads folder. If nothing was saved, tap [Save again] at the top of the screen.",
+        "autoStopped": "Recording ended because the browser stopped it or the size limit was reached. Everything up to that point was saved. Start recording again to continue.",
         "empty": "Nothing was recorded, so no file was created.",
         "saveFailed": "Could not create the recording file.",
         "startedBy": "The presenter started recording",

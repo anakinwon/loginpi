@@ -4,9 +4,8 @@ import createMiddleware from 'next-intl/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
 import {
   applySecurityHeaders,
-  checkRateLimit,
+  checkClientLimit,
   forbiddenResponse,
-  getClientIp,
   isMaliciousAgent,
   rateLimitedPageResponse,
 } from '@pi/guard'
@@ -31,7 +30,7 @@ export default function proxy(req: NextRequest) {
     return forbiddenResponse('blocked_agent')
   }
   // 개발 환경은 HMR·반복 새로고침이 단일 IP에 몰리므로 차단 우회
-  const rl = checkRateLimit(getClientIp(req), 'PAGE')
+  const rl = checkClientLimit(req, 'PAGE')
   if (process.env.NODE_ENV !== 'development' && !rl.allowed) {
     return rateLimitedPageResponse(rl.retryAfter, req.nextUrl.pathname)
   }

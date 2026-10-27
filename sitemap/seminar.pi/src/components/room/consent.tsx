@@ -130,7 +130,7 @@ export function ConsentDialog({ open, onAnswer }: { open: boolean; onAnswer: (a:
       </h2>
       <p className="text-muted-foreground mb-2 text-sm">{t('body')}</p>
       <Link href="/privacy" target="_blank" rel="noopener" className="text-accent mb-4 inline-block text-sm underline">
-        {t('privacy')} ↗
+        {t('privacy')} <NewTab label={t('newTab')} />
       </Link>
       <div className="flex flex-wrap justify-end gap-2">
         <button type="button" onClick={() => onAnswer(false)} className={`${btn} bg-surface-raised`}>
@@ -151,8 +151,18 @@ export function ConsentNotice() {
     <p className="text-muted-foreground text-xs">
       {t('notice')}{' '}
       <Link href="/privacy" target="_blank" rel="noopener" className="underline">
-        {t('privacy')} ↗
+        {t('privacy')} <NewTab label={t('newTab')} />
       </Link>
     </p>
+  )
+}
+
+// 새 탭 표시 — 화살표는 낭독기가 '오른쪽 위 화살표'로 읽으므로 숨기고, 새 탭에서 열린다는 사실을 글로 알린다(WCAG 3.2.5)
+function NewTab({ label }: { label: string }) {
+  return (
+    <>
+      <span aria-hidden>↗</span>
+      <span className="sr-only">{label}</span>
+    </>
   )
 }

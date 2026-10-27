@@ -7,7 +7,7 @@
 // 기능 탐지만(UA 판정 금지) : 조명 = captureStream + ctx.filter, 소음 = getSupportedConstraints().noiseSuppression
 import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { canProcessVideo, type EffectDraw } from '../../effects'
+import { canProcessVideo, useTrackLive, type EffectDraw } from '../../effects'
 import {
   featureStore,
   useStore,
@@ -96,7 +96,8 @@ export function FxRows({ ctx }: { ctx: RoomCtx }) {
     ctx.role !== 'audience'
       ? (ctx.r.localStream?.getVideoTracks()[0] ?? null)
       : null
-  const showLight = !!cam && canLight()
+  const camLive = useTrackLive(cam) // 끝난 카메라는 조명 보정이 적용되지 않는다 — 줄을 숨긴다(배경 '카메라를 켜면…' 안내와 같은 판정)
+  const showLight = camLive && canLight()
   const showNoise = !!micOf(ctx) && canNoise()
   if (!showLight && !showNoise) return null
   return (

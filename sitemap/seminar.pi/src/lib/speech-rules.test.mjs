@@ -292,7 +292,21 @@ test('더빙 — 번역 중단(trStop)이면 자동으로 끄고(원음 복구) 
   assert.ok(src.includes("import { translateCaption, trStop } from '../captions/translate'"))
   assert.match(src, /if \(stop && dubOn\.get\(\)\) dubOn\.set\(false\)/) // Overlay — 끄면 [on] 효과가 remoteVolume 1·stopAll
   assert.match(src, /if \(!lang \|\| !ok \|\| stop\) return null/) // DubRow — 다시 켜서 원음만 줄이는 것 방지
-  assert.ok(src.includes('remoteVolume.set(on ? DUB_DUCK : 1)'))
+  assert.ok(src.includes('remoteVolume.set(dubVolume(on, room))'))
+})
+
+// 회귀(T09 r5) — 방 자막이 꺼져 있는데(발표자가 아직 안 켬·끔·한도·발표자 퇴장) 더빙을 켜 두면 더빙할 문장이 안 오는데도 원음이 20% 로 줄어 있었다
+test('더빙 원음 볼륨 — 켜짐 + 방 자막 켜짐일 때만 20%, 그 외 100%', async () => {
+  const { dubVolume, DUB_DUCK } = await import('./speech-rules.ts')
+  assert.equal(dubVolume(true, true), DUB_DUCK)
+  assert.equal(dubVolume(true, false), 1)
+  assert.equal(dubVolume(false, true), 1)
+  assert.equal(dubVolume(false, false), 1)
+  const { readFile } = await import('node:fs/promises')
+  const src = await readFile(new URL('../components/room/features/dubbing/index.tsx', import.meta.url), 'utf8')
+  assert.ok(src.includes("import { capRoom } from '../captions'"))
+  assert.ok(src.includes('const room = useStore(capRoom)'))
+  assert.ok(!src.includes('DUB_DUCK'), '덕킹은 dubVolume 한 곳에서만')
 })
 
 // 보강(T09 r4) — 합성 음성을 연달아 못 틀면(형식 미지원·자동재생 잠김) 문장마다 조용히 실패하지 않고 끈 뒤 '다시 켜 주세요' 알림

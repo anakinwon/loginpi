@@ -28,3 +28,18 @@ test('쪽 나눔 조회(.range)는 모두 기본키 정렬로 동률을 끊는�
   }
   assert.ok(n >= 8, `쪽 나눔 조회를 찾지 못함(${n})`)
 })
+
+// 쪽 번호 입력 관문(r5 T07) — ?page= 는 parsePage(정수 1~1000)로만 읽는다.
+//  손으로 쓴 Math.floor(Number(..)) 는 상한이 없어 ?page=1e308 이면 offset 이 Infinity 가 되어 500, 큰 값은 과대 offset 조회
+test('API 의 ?page= 는 모두 parsePage 로 읽는다', () => {
+  let n = 0
+  for (const p of walk(join(APP, 'src', 'app', 'api')).filter((x) => /\.ts$/.test(x))) {
+    const s = readFileSync(p, 'utf8')
+    for (const m of s.matchAll(/get\('page'\)/g)) {
+      n++
+      const line = s.slice(s.lastIndexOf('\n', m.index), s.indexOf('\n', m.index))
+      assert.match(line, /parsePage\(/, `${relative(APP, p).split(sep).join('/')} : parsePage 없이 page 해석`)
+    }
+  }
+  assert.ok(n >= 6, `?page= 해석을 찾지 못함(${n})`)
+})
