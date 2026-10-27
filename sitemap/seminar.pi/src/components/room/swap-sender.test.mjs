@@ -3,7 +3,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { localPlan, swapSender } from './room-rules.ts'
+import { localPlan, onTrackEnd, swapSender } from './room-rules.ts'
 
 // 송신기 모의 — PC 작업 큐처럼 replaceTrack 을 순서대로, 비동기로 반영
 function fakeSender(track) {
@@ -83,4 +83,50 @@ test('effects.ts 가 송신기 교체를 swapSender 로만 한다(직접 replace
   const src = readFileSync(new URL('./effects.ts', import.meta.url), 'utf8')
   assert.match(src, /swapSender\(sender, p\.track/)
   assert.doesNotMatch(src.replace(/\/\/.*$/gm, ''), /\.replaceTrack\(/)
+})
+
+// 회귀(야간 r5 E2E) : 발표자 카메라가 저절로 끝났는데 청중은 멈춘 화면, 효과 시트는 고를 수 있는 척 — 'ended' 를 놓치지 않는다
+function fakeTrack(readyState) {
+  const fns = new Set()
+  return {
+    readyState,
+    addEventListener: (_, f) => fns.add(f),
+    removeEventListener: (_, f) => fns.delete(f),
+    end() {
+      this.readyState = 'ended'
+      fns.forEach((f) => f())
+    },
+    fns,
+  }
+}
+
+test('onTrackEnd — 이미 끝난 트랙은 바로, 살아 있는 트랙은 끝날 때 1번, 해제 뒤엔 안 부른다', () => {
+  let n = 0
+  onTrackEnd(fakeTrack('ended'), () => n++)
+  assert.equal(n, 1) // 발행 신호 왕복 중 끝난 트랙 — 늦게 단 리스너로는 못 듣던 경로
+  const live = fakeTrack('live')
+  const off = onTrackEnd(live, () => n++)
+  assert.equal(n, 1)
+  live.end()
+  assert.equal(n, 2)
+  const t2 = fakeTrack('live')
+  onTrackEnd(t2, () => n++)()
+  assert.equal(t2.fns.size, 0)
+  t2.end()
+  assert.equal(n, 2)
+  off()
+})
+
+test('끝남 감시 경로가 모두 onTrackEnd 를 쓰고, 효과 시트·조명 줄은 끝난 카메라를 없는 것으로 본다', () => {
+  const room = readFileSync(new URL('./use-room.ts', import.meta.url), 'utf8')
+  const w = room.slice(room.indexOf('function watchLocalEnd'), room.indexOf('async function setMedia'))
+  assert.match(w, /onTrackEnd\(t, /)
+  const fx = readFileSync(new URL('./effects.ts', import.meta.url), 'utf8')
+  assert.match(fx, /export function useTrackLive/)
+  const bg = readFileSync(new URL('./features/backgrounds/index.tsx', import.meta.url), 'utf8')
+  assert.match(bg, /const cam = useTrackLive\(raw\) \? raw : undefined/)
+  const mf = readFileSync(new URL('./features/media-fx/index.tsx', import.meta.url), 'utf8')
+  assert.match(mf, /const showLight = camLive && canLight\(\)/)
+  const note = readFileSync(new URL('../notes/in-person.tsx', import.meta.url), 'utf8')
+  assert.match(note, /onTrackEnd\(track, /)
 })

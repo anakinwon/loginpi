@@ -14,6 +14,7 @@ import {
 } from '@/components/room/use-speech'
 import { Pagination } from '@/components/seminar/pagination'
 import { BTN, BTN_PRIMARY } from '@/components/seminar/shared'
+import { onTrackEnd } from '@/components/room/room-rules'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi, useApiErrorText } from '@/lib/client-api'
 import { holdWake, NOTE_LIST_PAGE, recAlert } from '@/lib/note-rules'
@@ -172,9 +173,8 @@ function Recorder() {
   //  내 stop() 은 ended 를 쏘지 않아 화면 이탈과 섞이지 않는다
   useEffect(() => {
     if (!track) return
-    const lost = () => setMicLost(true)
-    track.addEventListener('ended', lost)
-    return () => track.removeEventListener('ended', lost)
+    // 마이크를 받은 직후(첫 렌더 전)에 이미 끝났어도 놓치지 않는다(onTrackEnd)
+    return onTrackEnd(track, () => setMicLost(true))
   }, [track])
 
   async function start() {

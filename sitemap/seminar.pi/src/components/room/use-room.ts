@@ -16,6 +16,7 @@ import {
   capLayer,
   layerSender,
   localPlan,
+  onTrackEnd,
   NO_LOCKS,
   ownerKey,
   REACT,
@@ -718,7 +719,8 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
   // 내 카메라·마이크 트랙이 장치 쪽에서 끝나면(모바일 앱 전환·장치 분리·권한 회수) 화면에 켜짐으로 남지 않게 끔으로 맞추고 서버도 일시정지 —
   // 청중은 멈춘 화면 대신 '꺼짐'을 본다. 다시 켜면 setMedia 가 새 트랙을 받는다(localPlan 'reacquire')
   function watchLocalEnd(t: MediaStreamTrack, source: 'mic' | 'camera', my: number) {
-    t.addEventListener('ended', () => {
+    // 발행 신호 왕복 사이에 이미 끝났으면 바로 처리(onTrackEnd) — 늦게 단 리스너는 'ended' 를 못 들어 청중이 멈춘 화면을 봤다
+    onTrackEnd(t, () => {
       if (seqRef.current !== my || !localRef.current?.getTracks().includes(t)) return
       log(`내 ${source} 트랙 끝남(장치 끊김)`)
       const producerId = producersRef.current[source]
