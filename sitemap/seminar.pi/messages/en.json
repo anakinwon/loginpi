@@ -128,6 +128,7 @@
       "structure": "Engine structure cleanup",
       "autoQuality": "Auto quality, 30 attendees",
       "roomService": "Room entry and recording",
+      "roomUi": "Room screen (lobby·stage·chat·raise hand·moderation)",
       "createForm": "Create screen",
       "list": "List",
       "detail": "Details",

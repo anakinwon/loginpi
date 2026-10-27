@@ -128,6 +128,7 @@
       "structure": "엔진 구조 정리",
       "autoQuality": "화질 자동 조절·청중 30명",
       "roomService": "방 입장·녹화",
+      "roomUi": "화상 룸 화면(대기실·무대·채팅·손들기·사회)",
       "createForm": "개설 화면",
       "list": "목록",
       "detail": "상세",

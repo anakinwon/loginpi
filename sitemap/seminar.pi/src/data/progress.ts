@@ -2,13 +2,13 @@
 // ⚠ 상태를 바꿀 때 docs/ROADMAP.md 도 같이 갱신한다(이 파일은 화면용 요약, 정본은 ROADMAP)
 export type StepStatus = 'done' | 'doing' | 'todo'
 
-// 참조 모델(제품명) — 화상 엔진은 REA 분석 3종(PRD_02), 로그인은 1호 사이트 구현(LOGIN_PLAYBOOK)
-export type RefModel = 'Galène' | 'mediasoup' | 'LiveKit' | 'sitemap.pi'
+// 참조 모델(제품명) — 화상 엔진은 REA 분석 3종(PRD_02), 룸 화면은 오픈소스 소스 분석 2종(ui-design 14절), 로그인은 1호 사이트 구현(LOGIN_PLAYBOOK)
+export type RefModel = 'Galène' | 'mediasoup' | 'LiveKit' | 'Jitsi' | 'sitemap.pi'
 
 export interface FeatureStep {
   id: string
   status: StepStatus
-  stage?: string // 화상 엔진 단계(M0~M5)
+  stage?: string // 화상 엔진 단계(M0~M5) 또는 화면 단계(UI)
   date?: string // 완료일
   ref?: RefModel[] // 이 단계의 참조 모델
   note?: string // 부분 결과(언어 무관 짧은 표기, 예 'Android ✓ · iOS …')
@@ -20,7 +20,7 @@ export interface Feature {
   steps: FeatureStep[]
 }
 
-export const PROGRESS_UPDATED = '2026-10-25'
+export const PROGRESS_UPDATED = '2026-10-27'
 
 export const FEATURES: Feature[] = [
   {
@@ -42,12 +42,14 @@ export const FEATURES: Feature[] = [
         status: 'doing',
         stage: 'M1',
         ref: ['Galène'],
-        note: 'LAN ✓ · LTE …',
+        note: 'LAN ✓ · LAN fix ✓ · retest … · LTE …',
       },
-      { id: 'recovery', status: 'doing', stage: 'M2', ref: ['Galène'], note: 'local ✓ · LTE …' },
+      { id: 'recovery', status: 'doing', stage: 'M2', ref: ['Galène'], note: 'local ✓ · TURN API ✓ · LTE …' },
       { id: 'structure', status: 'doing', stage: 'M3', ref: ['mediasoup'], note: 'gate ✓ · v1.2 ✓' },
       { id: 'autoQuality', status: 'doing', stage: 'M4', ref: ['LiveKit'], note: 'score·layer ✓ · 30 …' },
       { id: 'roomService', status: 'doing', stage: 'M5', ref: ['Galène', 'LiveKit'], note: 'ticket·status ✓ · device …' },
+      // 룸 화면(S3·S4) — UI 설계서 v1.0(c16bc230) → M1~M2(a7affafb) → v1.1·v1.2(8eed64d2·74e2c7cd), 브라우저 QA ✓
+      { id: 'roomUi', status: 'doing', stage: 'UI', ref: ['LiveKit', 'Jitsi'], note: 'QA ✓ · device …' },
     ],
   },
   {

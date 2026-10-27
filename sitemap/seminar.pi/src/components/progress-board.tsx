@@ -30,11 +30,12 @@ const TONE: Record<StepStatus, { dot: string; text: string; ring: string }> = {
   },
 }
 
-// 참조 모델 색 — Galène 녹색 / mediasoup 파랑 / LiveKit 주황 / 자체(1호 사이트) 보라
+// 참조 모델 색 — Galène 녹색 / mediasoup 파랑 / LiveKit 주황 / Jitsi 하늘 / 자체(1호 사이트) 보라
 const REF_TONE: Record<RefModel, string> = {
   Galène: 'border-emerald-400/50 text-emerald-300',
   mediasoup: 'border-indigo-400/50 text-indigo-300',
   LiveKit: 'border-orange-400/50 text-orange-300',
+  Jitsi: 'border-sky-400/50 text-sky-300',
   'sitemap.pi': 'border-violet-400/50 text-violet-300',
 }
 
