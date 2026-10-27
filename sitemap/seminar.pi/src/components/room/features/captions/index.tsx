@@ -14,7 +14,7 @@ import { Icon } from '../../control-bar'
 import { featureStore, speechWants, useStore, wantSpeech, type RoomCtx, type RoomFeature } from '../../extensions'
 import { DubRow } from '../dubbing'
 import { Sheet, SwitchRow } from '../sheet'
-import { isTranslateLang, TRANSLATE_LANGS } from '@/lib/translate-rules'
+import { isTranslateLang, pickTrLang, TRANSLATE_LANGS } from '@/lib/translate-rules'
 import { presenterGone, presenterResync } from '../../room-rules'
 import { CAPTION, captionsState, parseCaption, SIZES, stepSize, type Size } from './caption-rules'
 import { trStop, useTranslated } from './translate'
@@ -101,7 +101,8 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   const { show, size, tr, trLang } = usePrefs()
   const presenter = ctx.role === 'presenter'
   const locale = useLocale()
-  const lang = trLang || (isTranslateLang(locale) ? locale : 'en')
+  // 기본 = 브라우저 선호 언어(목록에 있으면) → UI locale → 'en'. navigator 는 마운트 뒤에만(SSR 없음 — 'use client' 오버레이)
+  const lang = trLang || pickTrLang(typeof navigator === 'undefined' ? [] : navigator.languages, locale)
   const shown = useTranslated(latest, tr, lang, ctx.seminarId)
   const langs = useLangNames(locale)
   const stop = useStore(trStop)

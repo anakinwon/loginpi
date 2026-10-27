@@ -16,11 +16,36 @@ export const TRANSLATE_LANGS = [
 export const isTranslateLang = (v: unknown): v is string =>
   typeof v === 'string' && (TRANSLATE_LANGS as readonly string[]).includes(v)
 
-// 언어 기본 부분('pt-BR' → 'pt', 'zh-TW' 는 대만 번체라 그대로) — 자막 언어가 대상과 같으면 요청하지 않는다
+// BCP-47 코드 → 번역 대상 언어 키. 대소문자 무시·옛 코드 정규화(Intl.Locale : iw→he, in→id, tl→fil, ji→yi),
+//  중국어는 문자 체계로(번체 = zh-TW : zh-tw·zh-Hant·zh-Hant-TW·zh-HK, 간체 = zh), 노르웨이어 'no' = 'nb'. 형식 오류·빈 값 = ''
+// 외부 AI 가 돌려주는 자막 언어 표기('zh-tw'·'iw' 등)가 대상 코드와 글자만 달라 같은 언어를 문장마다 번역·합성하던 낭비 방지(야간 시험 r3 T08)
+export function trLangOf(code: unknown): string {
+  if (typeof code !== 'string' || !code) return ''
+  let l: Intl.Locale
+  try {
+    l = new Intl.Locale(code)
+  } catch {
+    return ''
+  }
+  if (l.language === 'zh') return l.maximize().script === 'Hant' ? 'zh-TW' : 'zh'
+  if (l.language === 'no') return 'nb'
+  return l.language
+}
+
+// 자막 언어가 대상과 같으면 요청하지 않는다('pt-BR' = 'pt', 'zh-TW' ≠ 'zh'). 감지 실패('') = 다름(요청 — 외부 AI 가 같은 언어면 그대로 돌려줌)
 export function sameLang(a: string, b: string) {
-  if (!a || !b) return false
-  const base = (s: string) => (s === 'zh-TW' || s === 'zh-Hant' ? 'zh-TW' : s.split('-')[0].toLowerCase())
-  return base(a) === base(b)
+  const x = trLangOf(a)
+  return !!x && x === trLangOf(b)
+}
+
+// 번역 언어 기본값(사용자가 아직 안 골랐을 때) — 브라우저 선호 언어(navigator.languages) 중 대상 목록에 있는 첫 언어 → UI locale → 'en'.
+//  UI 는 ko·en 뿐이라 베트남어 브라우저 사용자도 영어로 기본 번역되던 것을 자기 언어로(야간 시험 r3 T08 보강)
+export function pickTrLang(prefs: readonly string[] | undefined, locale: string) {
+  for (const c of [...(prefs ?? []), locale]) {
+    const k = trLangOf(c)
+    if (isTranslateLang(k)) return k
+  }
+  return 'en'
 }
 
 // 번역할 문장 정리 — 공백 정규화, 빈 글·상한 초과 = null

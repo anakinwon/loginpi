@@ -11,6 +11,7 @@ import {
   isTranslateLang,
   Lru,
   MAX_TEXT_CHARS,
+  pickTrLang,
   sameLang,
   TR_LANG_SETTLE_MS,
   TRANSLATE_LANGS,
@@ -30,6 +31,36 @@ test('한국어 자막 → 영어 : 언어가 달라 번역 요청, 같은 언�
   assert.equal(sameLang('en', 'en'), true)
   assert.equal(sameLang('zh', 'zh-TW'), false)
   assert.equal(sameLang('', 'en'), false) // 감지 실패 = 요청(외부 AI 가 같은 언어면 그대로 돌려줌)
+})
+
+test('같은 언어 — 표기만 다른 코드는 같음(문장마다 헛번역·헛합성 방지, r3 T08 회귀)', () => {
+  // 대소문자·문자 체계 표기
+  assert.equal(sameLang('zh-tw', 'zh-TW'), true)
+  assert.equal(sameLang('zh-Hant', 'zh-TW'), true)
+  assert.equal(sameLang('zh-Hant-TW', 'zh-TW'), true)
+  assert.equal(sameLang('zh-HK', 'zh-TW'), true) // 번체
+  assert.equal(sameLang('zh-HK', 'zh'), false) // 번체 → 간체는 변환 필요
+  assert.equal(sameLang('zh-Hans-CN', 'zh'), true)
+  assert.equal(sameLang('EN-us', 'en'), true)
+  // 옛 코드
+  assert.equal(sameLang('iw', 'he'), true)
+  assert.equal(sameLang('in', 'id'), true)
+  assert.equal(sameLang('tl', 'fil'), true)
+  assert.equal(sameLang('no', 'nb'), true)
+  // 형식 오류 = 다름(요청)
+  assert.equal(sameLang('!!', '!!'), false)
+  assert.equal(sameLang(undefined, 'en'), false)
+})
+
+test('번역 언어 기본값 — 브라우저 선호 언어 → UI locale → en (r3 T08 보강)', () => {
+  assert.equal(pickTrLang(['vi-VN', 'en-US'], 'en'), 'vi')
+  assert.equal(pickTrLang(['zh-HK'], 'ko'), 'zh-TW')
+  assert.equal(pickTrLang(['zh-CN'], 'ko'), 'zh')
+  assert.equal(pickTrLang(['pt-BR'], 'ko'), 'pt')
+  assert.equal(pickTrLang(['xx-ZZ', 'qaa'], 'ko'), 'ko') // 목록 밖 → UI locale
+  assert.equal(pickTrLang([], 'xx'), 'en')
+  assert.equal(pickTrLang(undefined, 'en'), 'en')
+  for (const c of ['vi', 'zh-TW', 'zh', 'nb', 'fil', 'he']) assert.ok(isTranslateLang(pickTrLang([c], 'en')))
 })
 
 test('문장 정리 — 공백 정규화, 빈 글·500자 초과 거부', () => {
