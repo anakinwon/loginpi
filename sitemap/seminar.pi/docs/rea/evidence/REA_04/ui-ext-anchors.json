@@ -1,0 +1,195 @@
+{
+ "title": "F-U 룸 확장 지점(ui-ext) 근거 앵커 — meet.jit.si·meet.livekit.io 배포본(REA export-web-scripts 보관본)",
+ "date": "2026-10-27",
+ "method": "REA MCP 서버 연결 실패(CONNECT_TIMEOUT) → REA CLI(rea@6.4.0)가 남긴 export-web-scripts 보관본을 다시 씀. 매니페스트의 파일별 sha256 과 대조(불일치 0) 후 indexOf 로만 읽음(실행·정규식 없음). 코드 이식 없음(S-2) — 설계 판단의 근거로만 사용.",
+ "captures": [
+  {
+   "app": "meet.jit.si",
+   "capture_sha256": "6d1e89dc7a260b2eaef16fd2d588435921500d36bfa8c80ccbde28ba02191bd8",
+   "source_evidence_id": "ev_0f5b34a466fd1c310d6fded998fa992cc3d62ad07b7fee71ae14b44a62b2c83b",
+   "files": 9,
+   "sha_mismatch": 0
+  },
+  {
+   "app": "meet.livekit.io",
+   "capture_sha256": "d2481cb615c73eaba4c7777798da5db869a12a53f8701164b8bdbcc1bb4594c5",
+   "source_evidence_id": "ev_e15414b374e8f54262aacdf617a345c213c146e8e6cd93e4b315d35b09ab6351",
+   "files": 21,
+   "sha_mismatch": 0
+  }
+ ],
+ "files_used": [
+  {
+   "app": "meet.jit.si",
+   "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+   "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6"
+  },
+  {
+   "app": "meet.livekit.io",
+   "url": "https://meet.livekit.io/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js",
+   "sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f"
+  },
+  {
+   "app": "meet.livekit.io",
+   "url": "https://meet.livekit.io/_next/static/chunks/787-9333209d8f8fb674.js",
+   "sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68"
+  },
+  {
+   "app": "meet.jit.si",
+   "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+   "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57"
+  },
+  {
+   "app": "meet.livekit.io",
+   "url": "https://meet.livekit.io/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js",
+   "sha256": "8d5378805f0fd3825b8521f6f87c30e87a44bed7d97939121b2f8094f0fb4685"
+  }
+ ],
+ "anchors": {
+  "R-E1": [
+   {
+    "question": "효과 적용 시 송신 트랙 교체 방식(재협상 여부)",
+    "needle": "setEffect(",
+    "total_in_capture": 5,
+    "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+    "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6",
+    "offset": 211718,
+    "context": "_SENT,{media_type:this.getType()}))},3e3),this._testDataSent=!1)}setConference(e){this.conference=e}setEffect(e){if(void 0===this._streamEffect&&void 0===e)return Promise.resolve();if(void 0!==e&&!e.isEnabled(this))return Promise.reject(new"
+   },
+   {
+    "question": "효과 전환 내부 — 스트림 효과 시작/종료",
+    "needle": "_switchStreamEffect",
+    "total_in_capture": 3,
+    "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+    "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6",
+    "offset": 212196,
+    "context": "is.conference;return t?(this._setEffectInProgress=!0,t._removeLocalTrackFromPc(this).then(()=>(this._switchStreamEffect(e),this.isVideoTrack()&&this.containers.forEach(e=>{Jo.attachMediaStream(e,this.stream).catch(()=>{Yo.error(`Attach medi"
+   },
+   {
+    "question": "트랙 교체 API",
+    "needle": "replaceTrack(",
+    "total_in_capture": 6,
+    "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+    "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6",
+    "offset": 302980,
+    "context": "ckTransceiverMids.has(e.rtcId)||this.localTrackTransceiverMids.set(e.rtcId,r[t].mid.toString())})})}replaceTrack(e,t){var i,n;let r,s=arguments.length>2&&void 0!==arguments[2]&&arguments[2];if(!e&&!t)return rd.info(`${this} replaceTrack cal"
+   },
+   {
+    "question": "송신기 트랙 교체 API",
+    "needle": "sender.replaceTrack(",
+    "total_in_capture": 3,
+    "url": "https://meet.livekit.io/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js",
+    "sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+    "offset": 295973,
+    "context": "rocessedTrack}this.sender&&(null==(n=this.sender.transport)?void 0:n.state)!==\"closed\"&&(yield this.sender.replaceTrack(null!=r?r:e)),this.providedByUser||this._mediaStreamTrack===e||this._mediaStreamTrack.stop(),this._mediaStreamTrack=e,e&"
+   }
+  ],
+  "R-E2": [
+   {
+    "question": "처리된 트랙으로 송신기 교체",
+    "needle": "processedTrack",
+    "total_in_capture": 5,
+    "url": "https://meet.livekit.io/_next/static/chunks/787-9333209d8f8fb674.js",
+    "sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+    "offset": 239006,
+    "context": "!this.renderContext)throw TypeError(\"Missing required components for fallback implementation\");this.processedTrack=this.capturedStream.getVideoTracks()[0],this.processingEnabled=!0,this.frameCallback=e=>{if(!this.processingEnabled||!e)retur"
+   },
+   {
+    "question": "숨은 탭에서도 도는 프레임 타이머(워커, 실패 시 창 타이머)",
+    "needle": "Frame ticker worker could not be created",
+    "total_in_capture": 1,
+    "url": "https://meet.livekit.io/_next/static/chunks/787-9333209d8f8fb674.js",
+    "sha256": "9d43b3d30069058c18e08ac70e63db0a587719e99662ad78dd5f8c272e729a68",
+    "offset": 241065,
+    "context": "a); };\"],{type:\"text/javascript\"}));n=new Worker(e),URL.revokeObjectURL(e)}catch(e){return sq.warn(\"Frame ticker worker could not be created, falling back to a window timer\",e),r}return n.onmessage=()=>{null==r||r.stop(),r=void 0;try{t()}fi"
+   }
+  ],
+  "R-S1": [
+   {
+    "question": "로컬 녹화 조각 단위",
+    "needle": ".start(5e3)",
+    "total_in_capture": 1,
+    "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+    "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57",
+    "offset": 1857428,
+    "context": "(\"inactive\",(()=>{i(LR())})),this.stream.addEventListener(\"inactive\",(()=>{i(LR())}))),this.recorder.start(5e3)},isSupported:()=>p.isChromiumBased()&&!p.isElectron()&&!p.isReactNative()&&!go()&&Boolean(navigator.mediaDevices.setCaptureHandl"
+   },
+   {
+    "question": "webm 길이 헤더 보정",
+    "needle": "makeMetadataSeekable",
+    "total_in_capture": 3,
+    "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+    "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57",
+    "offset": 752648,
+    "context": "n e.concat(r)}),e)),[])},n.WebPBlockFilter=l,n.VP8BitStreamToRiffWebPBuffer=c,n.createRIFFChunk=u,n.makeMetadataSeekable=function(e,n,r,i=0,a=0){const s=p(\"EBML\",e),l=f(s)+12,c=e[e.length-1].dataEnd-l,u=p(\"Info\",e);d(\"Duration\",u),u.splice("
+   }
+  ],
+  "R-S2": [
+   {
+    "question": "녹음 형식 탐지",
+    "needle": "isTypeSupported",
+    "total_in_capture": 1,
+    "url": "https://meet.livekit.io/_next/static/chunks/dc2a882c-7e5efa4c36ea18f5.js",
+    "sha256": "22cce8ffe69ebcb78765ce9dfdc0b98b29e85f3623d0e36aac47e95a04e6f82f",
+    "offset": 306250,
+    "context": "id this.log.warn(\"preconnect buffer already started\");{let e=\"audio/webm;codecs=opus\";MediaRecorder.isTypeSupported(e)||(e=\"video/mp4\"),this.localTrackRecorder=new cs(this,{mimeType:e})}this.localTrackRecorder.start(e),this.autoStopPreConne"
+   }
+  ],
+  "R-A1": [
+   {
+    "question": "범용 데이터 메시지 송신(topic)",
+    "needle": "publishData(",
+    "total_in_capture": 2,
+    "url": "https://meet.livekit.io/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js",
+    "sha256": "8d5378805f0fd3825b8521f6f87c30e87a44bed7d97939121b2f8094f0fb4685",
+    "offset": 51746,
+    "context": "urn tW(this,arguments,function*(e,t,n={}){let{reliable:r,destinationIdentities:i,topic:o}=n;yield e.publishData(t,{destinationIdentities:i,topic:o,reliable:r})})}var nx=class{constructor(e,t){this._isResolved=!1,this.onFinally=t,this.promis"
+   },
+   {
+    "question": "범용 엔드포인트 메시지 송신",
+    "needle": "sendEndpointMessage",
+    "total_in_capture": 6,
+    "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/lib-jitsi-meet.min.js?v=9523.6636",
+    "sha256": "9eb5dc78a3b3decc2964861d6e5d8790e2d0ee024cfd4ee66eefa48a257857c6",
+    "offset": 664562,
+    "context": ")}sendEndpointStatsMessage(e){this.rtc.sendEndpointStatsMessage(e)}broadcastEndpointMessage(e){this.sendEndpointMessage(\"\",e)}sendMessage(e){let t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:\"\",i=arguments.length>2&&void 0!==argu"
+   }
+  ],
+  "R-A2": [
+   {
+    "question": "서버 기능·버전 확인",
+    "needle": "serverInfo",
+    "total_in_capture": 6,
+    "url": "https://meet.livekit.io/_next/static/chunks/ecf69c3a-cb22cd33c464349f.js",
+    "sha256": "8d5378805f0fd3825b8521f6f87c30e87a44bed7d97939121b2f8094f0fb4685",
+    "offset": 78359,
+    "context": ".localParticipant,attributes:n.attributes});h.next(u);let s=b(t$(tU({},c),{ignoreLegacy:(null==(r=e.serverInfo)?void 0:r.edition)===1||!!(null!=(i=e.serverInfo)&&i.version)&&(0,a.Zy)(null==(o=e.serverInfo)?void 0:o.version,\"1.8.2\")>0}));try"
+   }
+  ],
+  "R-P1": [
+   {
+    "question": "사이드 패널 탭 id",
+    "needle": "polls-tab",
+    "total_in_capture": 1,
+    "url": "https://meet.jit.si/v1/_cdn/meetjitsi_9523.6636/libs/app.bundle.min.js?v=9523.6636",
+    "sha256": "e94ef107beed53cf6e99d45ad9944df279c43832346ac59ad657ab27c5799a57",
+    "offset": 1471275,
+    "context": "function(e){e.CHAT=\"chat-tab\",e.CLOSED_CAPTIONS=\"cc-tab\",e.FILE_SHARING=\"file_sharing-tab\",e.POLLS=\"polls-tab\"}(Ln||(Ln={}));const jn=\"groupchat\",Bn=\"MODERATE_CHAT_MESSAGE\";__webpack_require__(17642),__webpack_require__(58004),__webpack_req"
+   }
+  ]
+ },
+ "negative": [
+  {
+   "needle": "polls.jitmeet",
+   "app": "meet.jit.si",
+   "total": 0,
+   "note": "서버 컴포넌트 이름 문자열 없음 — 설문 노출은 클라이언트 설정(isPollsEnabled 속성)로 가른다. 부재 = 이 보관본 9개 스크립트 범위 한정"
+  },
+  {
+   "needle": "chatToggle",
+   "app": "meet.livekit.io",
+   "total": 0,
+   "note": "압축된 청크라 컴포넌트 이름이 남지 않음 — 부재의 증거 아님"
+  }
+ ]
+}
