@@ -653,6 +653,7 @@
     "payStillWaiting": "Still waiting for the wallet. If you already signed in Pi Wallet, please wait a moment.",
     "payFailed": "Payment failed.",
     "err": {
+      "NAME_TAKEN": "That name is already used by someone else. Pick another.",
       "ISLAND_FULL": "All 100 island names are in use right now. You can open a new seminar after an upcoming or live one ends or is canceled.",
       "SMN_FULL": "This seminar is full.",
       "SMN_CLOSED": "This seminar has ended or was canceled.",
