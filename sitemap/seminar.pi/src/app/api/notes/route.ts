@@ -113,6 +113,7 @@ export const GET = withAuthGuard(
         .eq('usr_id', user.id)
         .eq('del_yn', 'N')
         .order('start_dtm', { ascending: false })
+        .order('nt_id') // 동률 경계 고정(T04 r3)
         .range((page - 1) * NOTE_LIST_PAGE, page * NOTE_LIST_PAGE - 1)
       if (error) return dbFail(error)
       return NextResponse.json(

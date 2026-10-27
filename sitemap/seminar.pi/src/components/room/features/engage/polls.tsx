@@ -157,7 +157,7 @@ function PollCard({
             {t(p.mine ? 'change' : 'vote')}
           </button>
         )}
-        {change && (
+        {change && p.open && (
           <button type="button" className={SMALL} disabled={busy} onClick={() => setChange(false)}>
             {t('cancel')}
           </button>

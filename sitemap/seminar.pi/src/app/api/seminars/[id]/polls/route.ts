@@ -34,6 +34,7 @@ export const GET = withAuthGuard(
         .eq('del_yn', 'N')
         .eq('smn_pll_opt.del_yn', 'N')
         .order('reg_dtm', { ascending: false })
+        .order('pll_id') // 동률 경계 고정(T04 r3)
         .order('opt_seq', { referencedTable: 'smn_pll_opt' })
         .range(from, from + POLL_PAGE - 1)
         .returns<PllRow[]>(),

@@ -41,6 +41,7 @@ export const GET = withAuthGuard(
       .eq('smn_qna_rcm.del_yn', 'N')
     q = ans ? q.not('ans_dtm', 'is', null) : q.is('ans_dtm', null)
     q = top ? q.order('rcm_cnt', { ascending: false }).order('reg_dtm') : q.order('reg_dtm', { ascending: false })
+    q = q.order('qna_id') // 동률 경계 고정 — 쪽 사이 중복·누락 방지(T04 r3)
     // 자격·목록·(미답변 화면이면) 답변함 수 — 서로 의존 없음 → 병렬(R-P1)
     const [g, list, done] = await Promise.all([
       gate(w.smnId, w.user),
