@@ -8,6 +8,7 @@ import {
   formatFee,
   isUuid,
   joinError,
+  ONE_LINE_RE,
   prejoinHeading,
   pageCount,
   parsePage,
@@ -93,4 +94,10 @@ test('쪽 맞추기 — 목록이 줄어 현재 쪽이 넘치면 마지막 쪽(T
   assert.equal(clampPage(2, 3), 2) // 그대로
   assert.equal(clampPage(1, 0), 1) // 빈 목록도 1쪽
   assert.equal(clampPage(5, 0), 1)
+})
+
+// 결함 T01 r4 : 세미나·회의록 제목 검사가 trim·길이뿐이라 API 직접 호출로 줄바꿈·제어문자 제목을 저장할 수 있었음(.ics·메일 제목·Markdown 으로 흘러감)
+test('한 줄 제목 — 줄바꿈·단독 \\r·NUL·DEL 거부, TAB·일반 글자·이모지 허용', () => {
+  for (const bad of ['a\nb', 'a\rATTENDEE:x', 'a\u0000', 'a\u007F', 'a\u001Fb']) assert.ok(!ONE_LINE_RE.test(bad), JSON.stringify(bad))
+  for (const ok of ['파이 세미나; 1부, 입문\\심화', 'Pi 🎉 2026', 'a\tb']) assert.ok(ONE_LINE_RE.test(ok))
 })

@@ -14,6 +14,14 @@ export interface CalEvent {
   url: string // 상세 딥링크(원클릭 참여)
   notesUrl?: string | null // 회의록이 있으면 링크
   canceled?: boolean
+  modAt?: string | null // 마지막 변경(smn_mst.mod_dtm) — .ics SEQUENCE·LAST-MODIFIED
+}
+
+// 개정 번호(RFC 5545 3.8.7.4) — 같은 UID 를 다시 받을 때 캘린더 앱이 번호가 큰 쪽(시각 변경·취소)을 반영한다. 변경일시 초 단위라 늘기만 한다
+// ponytail: 초 단위 epoch, 2038 년에 int32 를 넘음 — 그 전에 개정 칼럼으로
+export const icsSeq = (modAt?: string | null) => {
+  const t = modAt ? Date.parse(modAt) : NaN
+  return Number.isFinite(t) ? Math.floor(t / 1000) : 0
 }
 
 // 보는 사람의 시간대 — next-intl useFormatter 는 서버(배포본 = UTC) 시간대를 물려받으므로 화면 표시엔 이 값을 명시한다(E2E r2)
@@ -51,15 +59,18 @@ export function calendarUrl(e: CalEvent) {
   return `https://calendar.google.com/calendar/render?${q}`
 }
 
+// 메일 제목은 한 줄 — 제목 칸에 줄바꿈·제어문자가 들어가면 머리줄이 깨진다(기존 행 대비, 새 제목은 ONE_LINE_RE 로 막음)
+const oneLine = (s: string) => s.replace(/[\u0000-\u001F\u007F]+/g, ' ')
+
 // 웹 메일 작성 링크(받는 사람 비움 — 보내는 사람이 고른다)
 export function webMailUrl(subject: string, body: string) {
-  const q = new URLSearchParams({ view: 'cm', fs: '1', su: subject, body })
+  const q = new URLSearchParams({ view: 'cm', fs: '1', su: oneLine(subject), body })
   return `https://mail.google.com/mail/?${q}`
 }
 
-// 기본 메일 앱 — mailto 는 + 를 공백으로 읽지 않으므로 encodeURIComponent(RFC 6068)
+// 기본 메일 앱 — mailto 는 + 를 공백으로 읽지 않으므로 encodeURIComponent, 본문 줄바꿈은 %0D%0A(RFC 6068 5절)
 export const mailtoUrl = (subject: string, body: string) =>
-  `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  `mailto:?subject=${encodeURIComponent(oneLine(subject))}&body=${encodeURIComponent(body.replace(/\r\n|\r|\n/g, '\r\n'))}`
 
 // 링크 복사 — 외부 링크·mailto 가 안 열리는 환경(Pi Browser [확인중 : 실기기])의 대안. 클립보드 없음·거부 = false(화면이 안내)
 type Clip = { writeText: (s: string) => Promise<void> } | undefined
@@ -120,6 +131,8 @@ export function buildIcs(e: CalEvent, now = new Date()) {
     'BEGIN:VEVENT',
     `UID:${e.id}@seminar.pi`,
     `DTSTAMP:${utcStamp(now)}`,
+    `SEQUENCE:${icsSeq(e.modAt)}`,
+    ...(icsSeq(e.modAt) ? [`LAST-MODIFIED:${utcStamp(new Date(e.modAt!))}`] : []),
     `DTSTART:${utcStamp(s)}`,
     `DTEND:${utcStamp(en)}`,
     `SUMMARY:${icsEscape(e.title)}`,
