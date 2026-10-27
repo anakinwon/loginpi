@@ -42,6 +42,8 @@ test('MIME 정규화·외부 AI 형식', () => {
   assert.equal(baseMime('AUDIO/OGG; codecs=opus'), 'audio/ogg')
   assert.equal(baseMime('video/webm'), null)
   assert.equal(baseMime(''), null)
+  assert.equal(baseMime('constructor'), null) // 원형 속성 이름은 모르는 형식(r2)
+  assert.equal(baseMime('__proto__'), null)
   assert.equal(baseMime(undefined), null)
   assert.equal(aiMime('audio/mp4'), 'audio/m4a')
   assert.equal(aiMime('audio/webm;codecs=opus'), 'audio/webm')

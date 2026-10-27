@@ -85,6 +85,17 @@ export function hhmm(iso: string, timeZone?: string) {
   }
 }
 
+// 요약이 비었는가(요점·결정·할 일 모두 0) — 말한 내용이 없던 회의록(조각 0개)은 빈 요약으로 DONE 이 된다.
+//  화면은 이때 빈 칸 3개·AI 고지 대신 '요약할 내용이 없습니다' 1줄을 보인다(E2E r1)
+export function emptySummary(s: MdNote['summary']) {
+  return !s || !(s.points.length || s.decisions.length || s.todos.length)
+}
+
+// Markdown 라벨 고르기 — 알 수 없는 언어는 ko. 자기 속성만 본다(?lang=__proto__·constructor 로 Object.prototype 이 잡혀 '## undefined' 가 되지 않게)
+export function pickLabels<T>(table: Record<string, T>, lang: string | null): T {
+  return lang && Object.hasOwn(table, lang) ? table[lang] : table.ko
+}
+
 // Markdown — 제목·요약(요점·결정·할 일)·전체 기록(캡처 위치 포함)·잘림 표시(cut). 라벨은 호출부가 언어별로 넘긴다
 export function noteMarkdown(
   note: MdNote,
@@ -96,6 +107,7 @@ export function noteMarkdown(
     transcript: string
     shot: string
     cut: string
+    blank?: string
   },
   cut = false,
 ): string {
@@ -121,11 +133,14 @@ export function noteMarkdown(
     list(L.todos, note.summary.todos, true)
   }
   out.push(`## ${L.transcript}`, '')
+  const head = out.length
   for (const s of segs) {
     if (s.shot) out.push(`- ${s.at} [${L.shot}]`)
     else if (s.text?.trim())
       out.push(`- ${s.at} **${esc(s.spk) || '?'}** ${esc(s.text)}`)
   }
+  // 기록 0줄 = 화면의 빈 상태 문구와 같은 안내 1줄(빈 제목만 남은 파일 방지)
+  if (out.length === head && L.blank) out.push(`_${L.blank}_`)
   if (cut) out.push('', `_… ${L.cut}_`) // 조각 상한(MAX_MD_SEGS)을 넘어 뒷부분 생략
   return out.join('\n') + '\n'
 }

@@ -1,14 +1,17 @@
 // note-rules.ts 판정 시험 — node --test src/lib/note-rules.test.mjs (Node 24 는 .ts 를 타입 제거로 바로 읽는다)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   canRecordSeg,
+  emptySummary,
   fenceTranscript,
   frameDiff,
   isJpeg,
   noteMarkdown,
   noteState,
   noteUrl,
+  pickLabels,
   recAlert,
   SHOT_DIFF,
   shotAllowed,
@@ -174,5 +177,48 @@ test('대면 노트 — 마이크가 끊기면 [마이크 다시 연결]로 같�
       !/Google|Gemini|Meet/.test(m.micRetry + m.micLost),
       `${l} 상표 문구`,
     )
+  }
+})
+
+test('emptySummary — 말한 내용 없이 끝난 회의록(빈 요약)만 빈 상태(E2E r1)', () => {
+  assert.equal(emptySummary({ points: [], decisions: [], todos: [] }), true)
+  assert.equal(emptySummary(null), true)
+  assert.equal(emptySummary({ points: ['a'], decisions: [], todos: [] }), false)
+  assert.equal(emptySummary({ points: [], decisions: [], todos: ['t'] }), false)
+})
+
+test('pickLabels — 알 수 없는 언어·원형 속성 이름은 ko(?lang=__proto__ 로 ## undefined 가 되지 않게)', () => {
+  const T = { ko: { a: '가' }, en: { a: 'A' } }
+  assert.equal(pickLabels(T, 'en').a, 'A')
+  assert.equal(pickLabels(T, null).a, '가')
+  assert.equal(pickLabels(T, 'fr').a, '가')
+  assert.equal(pickLabels(T, '__proto__').a, '가')
+  assert.equal(pickLabels(T, 'constructor').a, '가')
+})
+
+test('noteMarkdown — 기록 0줄이면 빈 안내 1줄, 기록이 있으면 안내 없음(r2 보강)', () => {
+  const L = { points: 'P', decisions: 'D', todos: 'T', transcript: 'TR', shot: 'S', cut: 'C', blank: 'EMPTY' }
+  const note = { title: 't', start: 's', end: null, summary: { points: [], decisions: [], todos: [] } }
+  assert.match(noteMarkdown(note, [], L), /## TR\n\n_EMPTY_\n$/)
+  assert.match(noteMarkdown(note, [{ at: '10:00', spk: 'a', text: '  ', shot: false }], L), /_EMPTY_/)
+  assert.doesNotMatch(noteMarkdown(note, [{ at: '10:00', spk: 'a', text: 'hi', shot: false }], L), /EMPTY/)
+  assert.doesNotMatch(noteMarkdown(note, [{ at: '10:00', spk: '', text: null, shot: true }], L), /EMPTY/)
+})
+
+test('finishNote — 요약 시작·결과 저장 갱신이 모두 del_yn=N 조건(삭제된 회의록을 외부 AI 로 보내지 않음)', () => {
+  const src = readFileSync(new URL('./notes.ts', import.meta.url), 'utf8')
+  const fn = src.slice(src.indexOf('export async function finishNote'))
+  const ups = fn.split(".from('smn_nt')").slice(1)
+  assert.equal(ups.length, 2)
+  for (const u of ups) assert.match(u.slice(0, 900), /\.eq\('del_yn', 'N'\)/)
+})
+
+test('회의록 화면 — 보조 동작(내려받기·삭제) 실패가 화면 전체 오류(setErr)로 바뀌지 않는다(r2)', () => {
+  const src = readFileSync(new URL('../components/notes/note-view.tsx', import.meta.url), 'utf8')
+  for (const fn of ['const download', 'const remove']) {
+    const at = src.indexOf(fn)
+    const body = src.slice(at, src.indexOf('\n  }\n', at))
+    assert.ok(at > 0 && body.length > 20, fn)
+    assert.doesNotMatch(body, /setErr\(/, `${fn} 가 setErr 사용`)
   }
 })
