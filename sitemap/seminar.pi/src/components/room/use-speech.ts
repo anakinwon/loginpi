@@ -6,12 +6,12 @@
 // 서버 계약 정본 = /api/speech/chunk 머리 주석 + @/lib/speech-rules(F-A) : multipart audio·smnId·durMs·lang → 200 {text, lang, ts}.
 //  멈춤 = SPEECH_QUOTA(429, 세미나 한도 소진 — 이 세션 끝)·SPEECH_NOT_LIVE(409, 이번 켜기 끝)·SPEECH_NO_AGR(403, 서버에 동의 없음 → onNoAgr 로 다시 묻기).
 //  그 밖(SPEECH_RATE·SPEECH_FAILED·네트워크·15초 초과)은 그 조각만 건너뛴다. 실험실 방(UUID 아님)은 서버 기록이 없어 보내지 않는다
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
 import { isUuid } from '@/lib/seminar-rules'
-import { CHUNK_MIN_MS, CHUNK_MS } from '@/lib/speech-rules'
+import { CHUNK_MIN_MS, CHUNK_MS, settleWithin } from '@/lib/speech-rules'
 
-const UPLOAD_TIMEOUT_MS = 15_000 // 서버 외부 AI 10초(BUILD_DEFECTS 2.7) + 여유 — 넘으면 그 조각 포기
+export const UPLOAD_TIMEOUT_MS = 15_000 // 서버 외부 AI 10초(BUILD_DEFECTS 2.7) + 여유 — 넘으면 그 조각 포기
 
 // 녹음 형식 기능 탐지(UA 판정 금지) — webm/opus → mp4(Safari). 서버 baseMime 이 받는 형식만. 없으면 null = 이 기기에선 음성 조각을 못 만든다
 export function pickAudioMime(): string | null {
@@ -45,6 +45,8 @@ export function useSpeech({
     latest.current = { lang, broadcast, sendApp, onText, onNoAgr }
   })
   const [limited, setLimited] = useState(false) // 세미나 음성 처리 한도 소진(A-5) — 이 세션에선 다시 시작하지 않는다
+  const pending = useRef(new Set<Promise<void>>()) // 진행 중 조각 업로드(flush 가 기다린다)
+  const halt = useRef<() => Promise<void>>(async () => {}) // 지금 녹음을 멈추고 마지막 조각이 업로드 대기열에 오를 때까지
 
   useEffect(() => {
     const mime = pickAudioMime()
@@ -99,7 +101,11 @@ export function useSpeech({
       r.onstop = () => {
         spoke ||= track.enabled
         const dur = Date.now() - ts // 서버 chunkError 가 요구하는 조각 길이(0.5~10초) — 끄기 직전의 짧은 조각은 버린다
-        if (!halted && parts.length && spoke && dur >= CHUNK_MIN_MS) void upload(new Blob(parts, { type: r.mimeType || mime }), dur)
+        if (!halted && parts.length && spoke && dur >= CHUNK_MIN_MS) {
+          const p = upload(new Blob(parts, { type: r.mimeType || mime }), dur).catch(() => {})
+          pending.current.add(p)
+          void p.finally(() => pending.current.delete(p))
+        }
         next()
       }
       try {
@@ -112,13 +118,31 @@ export function useSpeech({
       }, CHUNK_MS)
     }
     next()
+    // flush 용 — 녹음 중인 조각을 지금 끊는다. onstop(속성 핸들러, 먼저 등록)이 업로드를 pending 에 올린 뒤 이 리스너가 돈다
+    halt.current = () =>
+      new Promise<void>((res) => {
+        stopped = true
+        clearTimeout(timer)
+        const r = rec
+        if (r?.state !== 'recording') return res()
+        r.addEventListener('stop', () => res(), { once: true })
+        r.stop()
+      })
     return () => {
       stopped = true
       clearTimeout(timer)
+      halt.current = async () => {}
       // 마지막 조각은 보낸다(끄기 직전 말한 것까지 자막·기록에 남게) — onstop 이 upload 후 next 는 stopped 로 멈춤
       if (rec?.state === 'recording') rec.stop()
     }
   }, [on, limited, track, seminarId, field])
 
-  return { limited }
+  // 녹음을 멈추고 진행 중 조각 업로드가 끝날 때까지(상한 maxMs) 기다린다 — 대면 노트 [종료]가 마지막 말까지 넣고 요약하게.
+  //  끝나면 true, 상한 초과면 false. 이후 이 켜기의 녹음은 재개되지 않는다(on·track 이 바뀌면 다시)
+  const flush = useCallback(async (maxMs: number) => {
+    await settleWithin([halt.current()], 1_000) // stop 이벤트가 안 오는 기기에도 매달리지 않게
+    return settleWithin(pending.current, maxMs)
+  }, [])
+
+  return { limited, flush }
 }

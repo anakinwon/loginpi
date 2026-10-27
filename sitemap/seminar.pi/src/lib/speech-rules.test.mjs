@@ -18,6 +18,7 @@ import {
   once,
   dubRate,
   pushDub,
+  settleWithin,
 } from './speech-rules.ts'
 
 const bytes = (...head) => {
@@ -149,4 +150,17 @@ test('더빙 — 끝 처리 1회·재생 속도·큐 넘침', () => {
   const r = pushDub(q, 4)
   assert.deepEqual(r.q, [2, 3, 4])
   assert.deepEqual(r.dropped, [1])
+})
+
+// 회귀(T02 r1) — 대면 노트 [종료] 가 진행 중 조각을 기다리지 않고 요약해 마지막 말이 빠지던 결함
+test('settleWithin — 진행 중 업로드 기다림(실패 포함)·상한 초과 시 false', async () => {
+  const wait = (ms, v) => new Promise((r) => setTimeout(r, ms, v))
+  assert.equal(await settleWithin([], 50), true)
+  assert.equal(
+    await settleWithin([wait(5), Promise.reject(new Error('x'))], 200),
+    true,
+  )
+  const t0 = Date.now()
+  assert.equal(await settleWithin([wait(1000)], 30), false)
+  assert.ok(Date.now() - t0 < 500) // 느린 업로드가 종료를 붙잡지 않는다
 })

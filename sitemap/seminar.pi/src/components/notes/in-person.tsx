@@ -7,12 +7,16 @@ import { useEffect, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { LoginGate } from '@/components/login-gate'
-import { pickAudioMime, useSpeech } from '@/components/room/use-speech'
+import {
+  pickAudioMime,
+  UPLOAD_TIMEOUT_MS,
+  useSpeech,
+} from '@/components/room/use-speech'
 import { Pagination } from '@/components/seminar/pagination'
 import { BTN, BTN_PRIMARY } from '@/components/seminar/shared'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi, useApiErrorText } from '@/lib/client-api'
-import { NOTE_LIST_PAGE } from '@/lib/note-rules'
+import { NOTE_LIST_PAGE, recAlert } from '@/lib/note-rules'
 
 const noSend = async () => null // 대면 노트는 방송(자막) 없음
 
@@ -65,7 +69,10 @@ function Recorder() {
   const [sec, setSec] = useState(0)
   const [noWake, setNoWake] = useState(false)
 
-  const { limited } = useSpeech({
+  const [finishing, setFinishing] = useState(false)
+  const [micLost, setMicLost] = useState(false)
+
+  const { limited, flush } = useSpeech({
     track,
     seminarId: ntId ?? '',
     field: 'ntId',
@@ -111,6 +118,15 @@ function Recorder() {
 
   // 화면을 떠나면 마이크를 놓는다
   useEffect(() => () => track?.stop(), [track])
+
+  // 마이크가 끊기면(블루투스 해제·다른 앱이 마이크 점유·권한 회수) 조각이 조용히 멈춘다 — 타이머만 도는 '기록 중'으로 두지 않고 알린다.
+  //  내 stop() 은 ended 를 쏘지 않아 화면 이탈과 섞이지 않는다
+  useEffect(() => {
+    if (!track) return
+    const lost = () => setMicLost(true)
+    track.addEventListener('ended', lost)
+    return () => track.removeEventListener('ended', lost)
+  }, [track])
 
   async function start() {
     setErr(null)
@@ -159,13 +175,18 @@ function Recorder() {
     }
   }
 
-  function finish() {
-    if (!ntId) return
-    // ponytail: 끄기 직전 녹음 중이던 조각(≤5초)은 끝내기와 경합해 빠질 수 있다 — 문제가 되면 마지막 업로드 완료를 기다린 뒤 end
+  async function finish() {
+    if (!ntId || finishing) return
+    // 녹음 중이던 마지막 조각(≤5초)과 진행 중 업로드(외부 AI ≤10초)가 회의록에 들어간 뒤 요약을 시작한다 — 먼저 끝내면
+    //  서버가 RECORDING 아님(SPEECH_NOT_LIVE)으로 거절하거나 요약 뒤에 저장돼 마지막 말이 요약에서 빠진다(T02 r1).
+    //  상한(업로드 시간 제한)을 넘으면 그래도 끝낸다
+    setFinishing(true)
+    await flush(UPLOAD_TIMEOUT_MS)
     endNote(ntId)
     router.push(`/notes/${ntId}`)
   }
 
+  const alert = recAlert({ err, limited, micLost })
   if (ntId)
     return (
       <section className="bg-surface space-y-4 rounded-xl p-4">
@@ -184,17 +205,18 @@ function Recorder() {
             <p className="text-muted-foreground text-sm">{t('waiting')}</p>
           )}
         </div>
-        {(err || limited) && (
+        {alert && (
           <p role="alert" className="text-danger text-sm">
-            {err ?? t('limited')}
+            {alert === 'err' ? err : t(alert)}
           </p>
         )}
         <button
           type="button"
           className={`${BTN_PRIMARY} w-full`}
-          onClick={finish}
+          disabled={finishing}
+          onClick={() => void finish()}
         >
-          ■ {t('end')}
+          {finishing ? t('finishing') : `■ ${t('end')}`}
         </button>
         {noWake && (
           <p className="text-muted-foreground text-xs">{t('wakeWarn')}</p>
