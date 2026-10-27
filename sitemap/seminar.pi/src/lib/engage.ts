@@ -37,5 +37,20 @@ export async function gate(smnId: string, user: UserRow): Promise<Gate | NextRes
   return { staff, open: (OPEN_STS as readonly string[]).includes(smn.data.smn_sts_cd), title: smn.data.smn_nm }
 }
 
+// 음성 처리 동의(SPEECH_XFER) 자격 — fn_use_smn_vc 와 같은 규칙 : 개최자·ADMIN·활성 참가 등록자. 통과면 null.
+//  /api/seminars/[id]/consent 와 /api/speech/agree 가 함께 쓴다(형제 경로 한 곳 — 남의 세미나에 동의 행이 쌓이지 않게, D-3)
+export async function agreeGate(smnId: string, user: UserRow): Promise<NextResponse | null> {
+  if (isAdmin(user)) return null
+  const [m, p] = await Promise.all([
+    db().from('smn_mst').select('hst_usr_id').eq('smn_id', smnId).eq('del_yn', 'N').maybeSingle<{ hst_usr_id: string }>(),
+    db().from('smn_ptc').select('ptc_id').eq('smn_id', smnId).eq('usr_id', user.id).eq('del_yn', 'N').maybeSingle(),
+  ])
+  if (m.error) return dbFail(m.error)
+  if (p.error) return dbFail(p.error)
+  if (!m.data) return apiError('NOT_FOUND', 404)
+  if (m.data.hst_usr_id !== user.id && !p.data) return apiError('FORBIDDEN', 403)
+  return null
+}
+
 // 쓰기 공통 — 종료·취소된 세미나는 쓰기 금지(조회만)
 export const closed = () => apiError('SMN_CLOSED', 409)

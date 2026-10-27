@@ -12,7 +12,7 @@ import {
   parseBody,
   requireUser,
 } from '@/lib/api'
-import { isAdmin } from '@/lib/auth'
+import { agreeGate } from '@/lib/engage'
 import { isUuid } from '@/lib/seminar-rules'
 import { PRIVACY_VER } from '@/lib/speech-rules'
 
@@ -52,28 +52,10 @@ export const POST = withAuthGuard(
       if (!data) return apiError('NOT_FOUND', 404)
     }
 
-    // 세미나는 fn_use_smn_vc 와 같은 권한(개최자·ADMIN·활성 참가 등록자)만 — 남의 세미나에 동의 행이 쌓이지 않게. 철회는 본인 행만이라 생략
-    if (smnId && body.agree && !isAdmin(user)) {
-      const [m, p] = await Promise.all([
-        db()
-          .from('smn_mst')
-          .select('hst_usr_id')
-          .eq('smn_id', smnId)
-          .eq('del_yn', 'N')
-          .maybeSingle(),
-        db()
-          .from('smn_ptc')
-          .select('ptc_id')
-          .eq('smn_id', smnId)
-          .eq('usr_id', user.id)
-          .eq('del_yn', 'N')
-          .maybeSingle(),
-      ])
-      if (m.error) return dbFail(m.error)
-      if (p.error) return dbFail(p.error)
-      if (!m.data) return apiError('NOT_FOUND', 404)
-      if (m.data.hst_usr_id !== user.id && !p.data)
-        return apiError('FORBIDDEN', 403)
+    // 세미나는 fn_use_smn_vc 와 같은 권한만(공용 agreeGate). 철회는 본인 행만이라 생략
+    if (smnId && body.agree) {
+      const denied = await agreeGate(smnId, user)
+      if (denied) return denied
     }
 
     if (!body.agree) {
