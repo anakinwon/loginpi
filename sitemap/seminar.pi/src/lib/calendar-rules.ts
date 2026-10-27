@@ -91,6 +91,20 @@ export async function copyText(text: string, clip: Clip = globalThis.navigator?.
   }
 }
 
+// 기기 공유 시트(Web Share) — 메신저 등 설치 앱으로 바로 보낸다(메일·클립보드가 막힌 WebView 의 대안). 기능 탐지(UA 판정 아님).
+//  'cancel' = 사용자가 시트를 닫음(안내 없음), 'fail' = 미지원·거부(화면이 링크 복사로 안내)
+type Sharer = { share?: (d: { title?: string; text?: string; url?: string }) => Promise<void> } | undefined
+export const canShare = (nav: Sharer = globalThis.navigator) => typeof nav?.share === 'function'
+export async function shareLink(d: { title?: string; text?: string; url: string }, nav: Sharer = globalThis.navigator) {
+  if (!canShare(nav)) return 'fail' as const
+  try {
+    await nav!.share!(d)
+    return 'ok' as const
+  } catch (e) {
+    return (e as { name?: string } | null)?.name === 'AbortError' ? ('cancel' as const) : ('fail' as const)
+  }
+}
+
 // 제어문자(TAB 제외 U+0000~001F·U+007F~009F)·줄/문단 구분자(U+2028·2029) 제거 — 단독 \r·NEL 등이 줄을 끊어 속성(ATTENDEE 등)을 끼워 넣지 못하게
 //  (NEL·U+2028 을 줄바꿈으로 보는 범용 줄 나누기 파서가 있다)
 const stripCtl = (s: string) => s.replace(/[\u0000-\u0008\u000A-\u001F\u007F-\u009F\u2028\u2029]/g, '')

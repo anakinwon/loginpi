@@ -5,7 +5,9 @@ import {
   buildIcs,
   calendarUrl,
   canCopy,
+  canShare,
   copyText,
+  shareLink,
   foldLine,
   icsEscape,
   icsNotesLabel,
@@ -78,6 +80,33 @@ test('.ics·메일 — NEL·U+2028·2029·C1 제어문자로도 속성 줄·머�
   const m = mailtoUrl('a\u0085Bcc: x\u2028y', 'b')
   assert.ok(m.startsWith('mailto:?subject=a%20Bcc%3A%20x%20y&'))
   assert.equal(new URL(webMailUrl('a\u2029b', 'c')).searchParams.get('su'), 'a b')
+})
+
+// 보강 T01 r6 : 기기 공유 시트(Web Share) — 기능 탐지, 닫기는 실패로 보지 않는다, navigator 를 this 로 호출
+test('앱으로 공유 — 성공·사용자 닫기(cancel)·거부·미지원', async () => {
+  const nav = {
+    got: null,
+    async share(d) {
+      assert.equal(this, nav) // 메서드 호출(this 잃으면 브라우저가 Illegal invocation)
+      this.got = d
+    },
+  }
+  assert.equal(await shareLink({ title: 't', url: 'u1' }, nav), 'ok')
+  assert.deepEqual(nav.got, { title: 't', url: 'u1' })
+  const abort = Object.assign(new Error('x'), { name: 'AbortError' })
+  assert.equal(await shareLink({ url: 'u' }, { share: async () => { throw abort } }), 'cancel')
+  assert.equal(await shareLink({ url: 'u' }, { share: async () => { throw new Error('NotAllowed') } }), 'fail')
+  assert.equal(await shareLink({ url: 'u' }, {}), 'fail')
+  assert.equal(await shareLink({ url: 'u' }, undefined), 'fail')
+  assert.equal(canShare({}), false)
+})
+
+test('공유 줄 — 앱으로 공유 문구 ko·en 동시', async () => {
+  const { readFile } = await import('node:fs/promises')
+  for (const l of ['ko', 'en']) {
+    const s = JSON.parse(await readFile(new URL(`../../messages/${l}.json`, import.meta.url), 'utf8')).seminar.share
+    assert.ok(s.share && s.shareFail, l)
+  }
 })
 
 test('링크 복사 — 성공·거부·클립보드 없음', async () => {

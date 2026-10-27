@@ -646,7 +646,9 @@
       "mailBody": "{title}\nWhen: {start}\n\nJoin directly with this link.\n{url}",
       "copy": "Copy link",
       "copied": "Link copied.",
-      "copyFail": "Couldn't copy. Please copy the link from the address bar."
+      "copyFail": "Couldn't copy. Please copy the link from the address bar.",
+      "share": "Share to another app",
+      "shareFail": "Couldn't share. Please use Copy link instead."
     },
     "attendance": "Attendance"
   },
