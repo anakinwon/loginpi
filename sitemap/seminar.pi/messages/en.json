@@ -351,6 +351,31 @@
       "decline": "Don't agree",
       "agree": "Agree and turn on mic",
       "notice": "When recording, captions or AI meeting notes are on, speakers’ voices are processed. Audience voices are not sent."
+    },
+    "effects": {
+      "title": "Effects",
+      "close": "Close",
+      "preview": "My preview",
+      "bg": "Background",
+      "bgNone": "None",
+      "bgBlur": "Blur",
+      "bgs": {
+        "dusk": "Dusk",
+        "ocean": "Ocean",
+        "forest": "Forest",
+        "studio": "Studio",
+        "grid": "Grid",
+        "dots": "Dots"
+      },
+      "myAdd": "My image",
+      "myDel": "Delete my image",
+      "myNote": "Your images are stored only on this device (up to 3, 2 MB each)",
+      "myTooBig": "Only images up to 2 MB can be used",
+      "preparing": "Preparing…",
+      "bgFailed": "Could not load the background effect",
+      "autoOff": "Your device is too slow, so the background effect was turned off",
+      "unsupported": "Background effects are not available on this device",
+      "noCam": "Turn on your camera to choose a background"
     }
   },
   "list": {

@@ -6,3 +6,5 @@ node_modules
 !.env.example
 # 에이전트 메모리(세션 산출물, 커밋 금지)
 .claude/agent-memory/
+# 배경 효과 wasm — scripts/copy-mediapipe.mjs 가 node_modules 에서 복사(26.8MB, 커밋 금지)
+public/mediapipe/wasm
