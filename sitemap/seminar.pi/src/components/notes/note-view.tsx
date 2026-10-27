@@ -81,6 +81,7 @@ function Note({ id }: { id: string }) {
   const router = useRouter()
   const [ask, setAsk] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [delErr, setDelErr] = useState(false)
 
   useEffect(() => {
     let live = true
@@ -138,7 +139,11 @@ function Note({ id }: { id: string }) {
       () => null,
     )
     setBusy(false)
-    if (!r?.ok) return setErr(t('delFail'))
+    // 실패는 삭제 영역 안에만(회의록 본문은 그대로) — 확인 단계를 닫아 다시 누를 수 있게
+    if (!r?.ok) {
+      setAsk(false)
+      return setDelErr(true)
+    }
     router.push('/notes')
   }
 
@@ -262,10 +267,18 @@ function Note({ id }: { id: string }) {
               </div>
             </>
           ) : (
-            <button type="button" className={BTN} onClick={() => setAsk(true)}>
+            <button
+              type="button"
+              className={BTN}
+              onClick={() => {
+                setDelErr(false)
+                setAsk(true)
+              }}
+            >
               {t('del')}
             </button>
           )}
+          {delErr && <p role="alert">{t('delFail')}</p>}
         </section>
       )}
     </article>

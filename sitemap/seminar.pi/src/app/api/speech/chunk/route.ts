@@ -3,7 +3,10 @@
 // 순서 : 키 확인(없으면 503, 화면 숨김) → 세션·본문 병렬(R-P1) → 조각 검사(형식·크기 160KB·길이·독립 파일 머리) → fn_use_smn_vc 1왕복
 //  (권한·동의·분당 20회·분당 70초·참가자 1인 상한·누적 상한, 대상 행 잠금 R-P5) → 외부 AI 음성→글(10초, BUILD_DEFECTS 2.7) → 실패 502 = 화면은 그 조각 자막만 건너뜀
 // 사용량 = opus 최저 6kbps 로 본 최악 길이를 판정 때 선예약(reserveSec, sql/010) → 호출 뒤 max(128kbps 하한 billSec, 외부 AI 음성 토큰 길이)로
-//  정산(settleSec) — 남으면 fn_ref_smn_vc_sec 환급, 모자라면 fn_add_smn_vc_sec 추가. 동시 요청이 사후 정산 전에 상한을 넘기지 못한다(D-2 ②)
+//  정산(settleSec) — 남으면 fn_ref_smn_vc_sec 환급, 모자라면 fn_add_smn_vc_sec 추가. 동시 요청이 사후 정산 전에 상한을 넘기지 못한다(chunk 정산 경합, 신규 —
+//  팀장 판정 D-2(translate·tts 무계량)·D-3(consent POST)은 이 파일 범위 밖, 담당 브랜치에서 처리)
+// sql/010 미적용 DB(fn_ref_smn_vc_sec 없음) = 008 방식(128kbps 하한 billSec 예약 + fn_add 추가)으로 자동 후퇴 — 010 의 분당 판정 없이
+//  큰 예약을 걸면 분당 조각 1개로 떨어지고 환급 실패로 사용량이 약 8배 쌓이기 때문(적용 순서 사고 방지)
 // 회의록 저장 = 기록 시작자·개최자·ADMIN 의 조각만(canRecordSeg) — 무대 참가자 음성은 자막만(회의록 오염·프롬프트 주입 차단, D-1)
 import { NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
@@ -33,12 +36,32 @@ const noStore = { 'Cache-Control': 'no-store' }
 const str = (v: FormDataEntryValue | null) =>
   typeof v === 'string' && v ? v : null
 
+// sql/010 적용 여부 — fn_ref_smn_vc_sec 를 잘못된 인자(p_sec 0, 즉시 RETURN·부작용 없음)로 불러 본다.
+//  적용됨은 인스턴스 동안 기억, 미적용·오류는 60초마다 다시 확인(R-P2). 오류도 미적용으로 본다(보수적 = 008 방식)
+let refOk = false
+let refAt = 0
+async function vcRefReady() {
+  if (refOk || Date.now() - refAt < 60_000) return refOk
+  refAt = Date.now()
+  const { error } = await db().rpc('fn_ref_smn_vc_sec', {
+    p_smn_id: null,
+    p_nt_id: null,
+    p_usr_id: null,
+    p_sec: 0,
+  })
+  if (error)
+    console.warn('[speech/chunk] sql/010 미적용 — 008 방식 예약', error.code)
+  refOk = !error
+  return refOk
+}
+
 export const POST = withAuthGuard(
   dbRoute(async (req) => {
     if (!geminiEnabled()) return apiError('AI_UNAVAILABLE', 503)
-    const [user, form] = await Promise.all([
+    const [user, form, refReady] = await Promise.all([
       getSessionUser(req),
       req.formData().catch(() => null),
+      vcRefReady(),
     ])
     if (!user) return apiError('AUTH_PI_REQUIRED', 401)
     if (!form) return apiError('BAD_REQUEST_BODY', 400)
@@ -75,7 +98,7 @@ export const POST = withAuthGuard(
       p_usr_id: user.id,
     }
     const sec = billSec(durMs, bytes.length)
-    const held = reserveSec(durMs, bytes.length)
+    const held = refReady ? reserveSec(durMs, bytes.length) : sec
     const maxSec = speechMaxSec(env.SPEECH_MAX_MIN)
     const { data, error } = await db().rpc('fn_use_smn_vc', {
       ...target,
@@ -118,7 +141,8 @@ export const POST = withAuthGuard(
     // 정산 — 선예약(held) vs 최종 과금. 호출 실패도 128kbps 하한까지 환급(외부 AI 장애 동안 예약이 상한을 갉아먹지 않게)
     const delta = settleSec(held, sec, r?.audioTokens)
     if (delta !== 0) {
-      if (delta > 0) console.warn('[speech/chunk] 사용량 추가', user.id, sec, delta)
+      if (delta > 0)
+        console.warn('[speech/chunk] 사용량 추가', user.id, sec, delta)
       const { error: e2 } = await db().rpc(
         delta > 0 ? 'fn_add_smn_vc_sec' : 'fn_ref_smn_vc_sec',
         { ...target, p_sec: Math.abs(delta) },

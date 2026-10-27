@@ -1,6 +1,7 @@
--- 010_seminar_vc_reserve.sql — 음성 조각 사용량 선예약·환급(사후 정산 경합 차단) + 청중 몫 상한(개최자 몫 보호). 야간 시험 T07(AI 회의록) D-1·D-2 후속
+-- 010_seminar_vc_reserve.sql — 음성 조각 사용량 선예약·환급(사후 정산 경합 차단) + 청중 몫 상한(개최자 몫 보호). 야간 시험 T07(AI 회의록) D-1 후속 + chunk 정산 경합(신규 — 팀장 판정 D-2 translate·tts 와 별개)
 -- DA-APPROVED: 야간 시험 T07 — 함수 1개 교체(fn_use_smn_vc, 같은 서명) + 함수 1개 신규(fn_ref_smn_vc_sec), 테이블·인덱스·칼럼 무변경(008 그대로). DA 사후 리뷰 대상
--- 선행 : 008. 적용 : node scripts/db-migrate.mjs --app seminar --tier dev|stg|prod — 통합 단계에서(작성 시점 미적용)
+-- 선행 : 008. 적용 : node scripts/db-migrate.mjs --app seminar --tier dev|stg|prod — 통합 단계에서(작성 시점 미적용). GEMINI_API_KEY 설정 전 필수
+--   (앱은 fn_ref_smn_vc_sec 유무로 010 적용을 감지해 미적용이면 008 방식 예약으로 후퇴 — 청중 몫 상한은 010 에만). 회귀 시험 src/lib/vc-reserve.db.test.mjs(트랜잭션 ROLLBACK)
 --
 -- 왜 :
 --  · 사후 정산 경합 — 이전엔 128kbps 하한으로만 선과금하고 호출 뒤 실제 길이 차이를 더했다(fn_add_smn_vc_sec).
