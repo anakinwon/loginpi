@@ -413,6 +413,13 @@ export function failHit<K>(fails: Map<K, number>, k: K, max: number): boolean {
   return true
 }
 
+// 열린 <dialog> 중 맨 위(문서상 마지막) — 화면 알림을 그 안에 그린다. showModal 은 바깥을 inert 로 만들어
+// 바깥 알림은 시트 뒤에 가려지고 낭독도 되지 않는다(효과 시트의 소음 줄 실패 등, 야간 r6 T05). 시험 room-rules.test.mjs
+export function topDialog<T extends { open: boolean }>(list: ArrayLike<T>): T | null {
+  for (let i = list.length - 1; i >= 0; i--) if (list[i].open) return list[i]
+  return null
+}
+
 // 내 마이크·카메라 켜기/끄기 계획 — 켜려는데 트랙이 장치 쪽에서 끝났으면(앱 전환·장치 분리) 새 트랙을 받아 같은 송신기에 끼운다.
 // 끄기는 끝난 트랙이어도 서버 일시정지만(권한 팝업 없음). 시험 swap-sender.test.mjs
 export const localPlan = (on: boolean, ready: string): 'reacquire' | 'toggle' =>

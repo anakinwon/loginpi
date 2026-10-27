@@ -45,6 +45,12 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   const cam = useTrackLive(raw) ? raw : undefined
   const ok = isOpen && canProcessVideo() && canSegment() // 시트가 열렸을 때만 판정(닫힌 시트는 렌더 내용이 보이지 않는다)
   const { hold } = ctx
+  const off = useStore(autoOff)
+
+  // 시트가 열린 채 저절로 꺼지면(느림·연속 실패) 시트 안 알림 줄에 남긴다 — 무대 토스트는 모달 시트 뒤(inert)라 안 보이고 낭독도 안 된다(야간 r6 T05)
+  useEffect(() => {
+    if (isOpen && off) setErr(off)
+  }, [isOpen, off])
 
   useEffect(() => {
     const d = ref.current
