@@ -9,7 +9,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
 import { isUuid } from '@/lib/seminar-rules'
-import { CHUNK_MIN_MS, CHUNK_MS, settleWithin } from '@/lib/speech-rules'
+import { captionFresh, chunkHeard, CHUNK_MIN_MS, CHUNK_MS, settleWithin, VAD } from '@/lib/speech-rules'
+import { acquireCtx, releaseCtx } from './video-tile'
 
 export const UPLOAD_TIMEOUT_MS = 15_000 // 서버 외부 AI 10초(BUILD_DEFECTS 2.7) + 여유 — 넘으면 그 조각 포기
 
@@ -55,7 +56,39 @@ export function useSpeech({
     let halted = false // 서버가 멈추라고 했다(한도·진행 아님·동의 없음) — 남은 조각도 보내지 않고, 늦게 온 같은 거절로 두 번 묻지 않는다
     let rec: MediaRecorder | null = null
     let timer: ReturnType<typeof setTimeout> | undefined
+    let lastTs = 0 // 마지막으로 방송한 자막 조각 시작 시각(captionFresh)
     const stream = new MediaStream([track])
+
+    // 무음 조각 거르기(chunkHeard) — 조각마다 최대 음량을 잰다. 잴 수 없으면(미지원·suspended) 표본이 안 쌓여 그대로 보낸다(fail-open)
+    let peak = 0
+    let samples = 0
+    let vad: (() => void) | null = null
+    if (typeof AudioContext !== 'undefined') {
+      try {
+        const ac = acquireCtx()
+        const src = ac.createMediaStreamSource(stream)
+        const an = ac.createAnalyser()
+        an.fftSize = 512
+        src.connect(an) // destination 에 잇지 않는다(내 목소리 되울림 없음)
+        ac.resume().catch(() => {})
+        const buf = new Float32Array(an.fftSize)
+        const id = setInterval(() => {
+          if (ac.state !== 'running' || !track.enabled) return
+          an.getFloatTimeDomainData(buf)
+          let sum = 0
+          for (const v of buf) sum += v * v
+          peak = Math.max(peak, Math.sqrt(sum / buf.length))
+          samples++
+        }, VAD.pollMs)
+        vad = () => {
+          clearInterval(id)
+          src.disconnect()
+          releaseCtx()
+        }
+      } catch {
+        // 측정 불가 — 모든 조각을 보낸다
+      }
+    }
 
     async function upload(blob: Blob, durMs: number) {
       const l = latest.current
@@ -85,6 +118,11 @@ export function useSpeech({
       const ts = typeof j?.ts === 'number' ? j.ts : Date.now() - durMs // 조각 시작 시각 — 서버 추정값 우선
       // sig = 서버 발급 자막 서명 — 번역·더빙 요청에 그대로 실어 보낸다(없으면 그 자막은 원문만)
       const meta = { lang: j?.lang || l.lang, sig: typeof j?.sig === 'string' ? j.sig : null }
+      // 방송 모드 = 늦게 온 옛 조각은 버린다(내 화면·남의 화면·더빙 모두 최신 1문장만 다룬다). 글로만 받는 쪽(대면 노트)은 전부 받는다
+      if (l.broadcast) {
+        if (!captionFresh(lastTs, ts)) return
+        lastTs = ts
+      }
       l.onText?.(text, ts, meta)
       if (l.broadcast) void l.sendApp('caption', { text, ts, ...meta })
     }
@@ -93,8 +131,10 @@ export function useSpeech({
       if (stopped || track.readyState !== 'live') return
       const ts = Date.now()
       const parts: Blob[] = []
-      // ponytail: 꺼진 마이크(enabled=false)만 건너뛴다. 켜진 채 조용한 조각도 보낸다 — 비용이 문제면 음량 판정(VAD)을 더한다
+      // 꺼진 마이크(enabled=false)·무음 조각(chunkHeard)은 건너뛴다
       let spoke = track.enabled
+      peak = 0
+      samples = 0
       const r = new MediaRecorder(stream, { mimeType: mime })
       rec = r
       r.ondataavailable = (e) => {
@@ -103,7 +143,7 @@ export function useSpeech({
       r.onstop = () => {
         spoke ||= track.enabled
         const dur = Date.now() - ts // 서버 chunkError 가 요구하는 조각 길이(0.5~10초) — 끄기 직전의 짧은 조각은 버린다
-        if (!halted && parts.length && spoke && dur >= CHUNK_MIN_MS) {
+        if (!halted && parts.length && spoke && chunkHeard(peak, samples) && dur >= CHUNK_MIN_MS) {
           const p = upload(new Blob(parts, { type: r.mimeType || mime }), dur).catch(() => {})
           pending.current.add(p)
           void p.finally(() => pending.current.delete(p))
@@ -134,6 +174,7 @@ export function useSpeech({
       stopped = true
       clearTimeout(timer)
       halt.current = async () => {}
+      vad?.()
       // 마지막 조각은 보낸다(끄기 직전 말한 것까지 자막·기록에 남게) — onstop 이 upload 후 next 는 stopped 로 멈춤
       if (rec?.state === 'recording') rec.stop()
     }
