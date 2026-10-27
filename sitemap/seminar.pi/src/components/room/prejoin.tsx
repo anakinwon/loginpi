@@ -3,6 +3,7 @@
 // 카메라·마이크 권한이 거부돼도 입장은 막지 않는다(카메라 실패 → 음성만, 마이크 실패 → 영상만, 둘 다 실패 → 미디어 없이)
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { prejoinHeading } from '@/lib/seminar-rules'
 import { ConsentNotice } from './consent'
 import { MediaButton } from './control-bar'
 import { StreamVideo } from './stage'
@@ -107,10 +108,15 @@ export function Prejoin({
   }
 
   const hasVideo = !!stream?.getVideoTracks().length
+  const heading = prejoinHeading(room)
 
   return (
     <section className="mx-auto max-w-md space-y-4">
-      <h1 className="text-lg font-bold">{t('title', { room })}</h1>
+      {heading.level === 2 ? (
+        <h2 className="text-lg font-bold">{t('titleSeminar')}</h2>
+      ) : (
+        <h1 className="text-lg font-bold">{t('title', { room })}</h1>
+      )}
 
       {presenter ? (
         <div className="bg-surface relative aspect-video overflow-hidden rounded-xl">

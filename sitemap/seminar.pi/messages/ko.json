@@ -212,6 +212,7 @@
   },
   "room": {
     "title": "세미나 입장 · {room}",
+    "titleSeminar": "입장 준비",
     "noEngine": "화상 서버가 아직 준비되지 않았습니다.",
     "joinAs": "입장 역할",
     "presenter": "발표자로",

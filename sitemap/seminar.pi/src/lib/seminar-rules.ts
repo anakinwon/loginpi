@@ -24,6 +24,11 @@ const UUID_RE =
 export const isUuid = (v: unknown): v is string =>
   typeof v === 'string' && UUID_RE.test(v)
 
+// 대기실 머리말 — 세미나 방(uuid)은 페이지가 세미나 제목을 h1 로 이미 그리므로 h2 + 고정 문구(UUID 원문 노출 금지),
+// 실험실 방 코드는 사람이 정한 이름이라 h1 에 그대로
+export const prejoinHeading = (room: string) =>
+  isUuid(room) ? ({ level: 2, key: 'titleSeminar' } as const) : ({ level: 1, key: 'title' } as const)
+
 // 입장료 입력 — Pi 소수 7자리까지(NUMERIC(18,7) = 정수부 11자리)
 export const FEE_RE = /^\d{1,11}(\.\d{1,7})?$/
 
