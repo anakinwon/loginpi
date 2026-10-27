@@ -58,8 +58,9 @@ export type Recorder = {
   stop: () => Promise<Blob>
 }
 
-// stage = 무대 상자(relative). 그 안의 <video> 전부를 화면에 보이는 자리·좌우반전 그대로 그린다
-export function startRecorder(stage: HTMLElement): Recorder {
+// stage = 무대 상자(relative). 그 안의 <video> 전부를 화면에 보이는 자리 그대로 그린다
+// ac = 클릭 핸들러에서 동기로 만든 AudioContext(iOS Safari 등 사용자 활성화 요구 — await 뒤에 만들면 suspended 로 무음)
+export function startRecorder(stage: HTMLElement, ac: AudioContext): Recorder {
   const canvas = document.createElement('canvas')
   canvas.width = R.w
   canvas.height = R.h
@@ -79,29 +80,24 @@ export function startRecorder(stage: HTMLElement): Recorder {
       const box = { x: area.x + (r.left - sr.left) * k, y: area.y + (r.top - sr.top) * k, w: r.width * k, h: r.height * k }
       const d = fitRect(box, v.videoWidth, v.videoHeight)
       if (!d) continue
-      if (v.classList.contains('-scale-x-100')) {
-        g.save()
-        g.translate(d.x * 2 + d.w, 0)
-        g.scale(-1, 1)
-        g.drawImage(v, d.x, d.y, d.w, d.h)
-        g.restore()
-      } else g.drawImage(v, d.x, d.y, d.w, d.h)
+      // 미리보기 거울상(-scale-x-100)은 화면 표시 전용 — 녹화는 참가자가 받는 송출본처럼 반전 없이
+      g.drawImage(v, d.x, d.y, d.w, d.h)
     }
   }
   // ponytail: setInterval 그리기 — 탭이 뒤로 가면 브라우저가 1초 1회로 늦춘다(영상이 멈춘 듯 보임). 필요하면 Worker 타이머로
   draw()
   const timer = setInterval(draw, 1000 / R.fps)
 
-  const ac = new AudioContext()
-  void ac.resume().catch(() => {})
   const dest = ac.createMediaStreamDestination()
   let sources: MediaStreamAudioSourceNode[] = []
   const setAudio = (streams: (MediaStream | null)[]) => {
     sources.forEach((s) => s.disconnect())
+    // 트랙 단위 — MediaStreamAudioSourceNode 는 스트림의 오디오 트랙 중 id 사전순 첫 1개만 쓴다(Web Audio 명세).
+    // remoteAudio 는 원격 트랙 전부를 담은 스트림 1개라 스트림 단위로 만들면 발언자 1명 소리만 남는다
     sources = streams
-      .filter((s): s is MediaStream => !!s?.getAudioTracks().length)
-      .map((s) => {
-        const n = ac.createMediaStreamSource(s)
+      .flatMap((s) => s?.getAudioTracks() ?? [])
+      .map((t) => {
+        const n = ac.createMediaStreamSource(new MediaStream([t]))
         n.connect(dest) // destination(스피커)에는 잇지 않는다 — 소리는 기존 <audio> 가 낸다
         return n
       })

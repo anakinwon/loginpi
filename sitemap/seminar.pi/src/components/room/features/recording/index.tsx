@@ -19,6 +19,7 @@ const recBy = featureStore<Readonly<Record<string, true>>>({}) // 녹화 중이�
 const toast = featureStore<string | null>(null) // room.recording.* 아래 키
 let recorder: Recorder | null = null
 let fileName = ''
+let gen = 0 // 세대 — onReset(퇴장·끊김) 때 증가. startRec 의 await 사이에 바뀌면 시작하지 않는다
 
 // d 검사 — 엔진은 모양을 보지 않으므로 받는 쪽이 거른다
 export function readRecording(d: unknown): boolean | null {
@@ -47,26 +48,39 @@ async function stopRec(ctx: RoomCtx | null) {
   if (ctx) void ctx.sendApp('state', { recording: false })
 }
 
-async function startRec(ctx: RoomCtx, stage: HTMLElement) {
-  if (recorder || busy.get()) return
+// ac = 클릭 핸들러에서 동기로 만든 AudioContext(사용자 활성화). 시작하지 못하면 여기서 닫는다
+async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | null) {
+  if (recorder || busy.get() || !ac) {
+    void ac?.close().catch(() => {})
+    if (!ac) ctx.notice('recording.unsupported')
+    return
+  }
+  const g = gen
   busy.set(true)
+  let started = false
   try {
     const mod = await import('./recorder')
+    if (g !== gen) return
     if (!mod.canRecord()) return ctx.notice('recording.unsupported')
     // 먼저 전원에게 알린다 — 실패하면 시작하지 않는다(M-4)
     if (await ctx.sendApp('state', { recording: true })) return ctx.notice('recording.notifyFailed')
+    // 기다리는 사이 퇴장·끊김(onReset)이면 시작하지 않고 알림을 되돌린다
+    if (g !== gen) return void ctx.sendApp('state', { recording: false })
     try {
-      recorder = mod.startRecorder(stage)
+      recorder = mod.startRecorder(stage, ac)
+      started = true
     } catch {
       void ctx.sendApp('state', { recording: false })
       return ctx.notice('recording.unsupported')
     }
+    if (ac.state !== 'running') ctx.notice('recording.audioSuspended')
     fileName = mod.recFileName(ctx.seminarId, recorder.mime, new Date())
     recorder.setAudio([ctx.r.remoteAudio, ctx.r.localStream])
     recOn.set(true)
     startedAt.set(Date.now())
     toast.set('started')
   } finally {
+    if (!started) void ac.close().catch(() => {})
     busy.set(false)
   }
 }
@@ -96,8 +110,9 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const [now, setNow] = useState(0)
   const { r, role, hold } = ctx
   const ids = new Set(r.peers.map((p) => p.peerId))
-  // 알린 발표자가 나갔으면 배지를 내린다(종료 신호를 못 보내고 끊긴 경우)
-  const others = Object.keys(by).some((id) => ids.has(id))
+  // 알린 사람이 지금도 방의 발표자일 때만 배지 — 나갔거나(종료 신호 없이 끊김) 강등됐으면(강등 뒤 종료 알림은
+  // 엔진이 ROLE_FORBIDDEN 으로 거절, SIGNAL_API 3.6) 내린다. 수신 측 판정이 정본
+  const others = Object.keys(by).some((id) => r.peers.find((p) => p.peerId === id)?.role === 'presenter')
 
   // 확인 대화상자 — 열려 있는 동안 바 자동 숨김 보류
   useEffect(() => {
@@ -123,6 +138,14 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     const timer = setTimeout(() => toast.set(null), TOAST_MS)
     return () => clearTimeout(timer)
   }, [msg]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 녹화 중 탭 닫기·새로 고침 — 메모리의 조각을 잃으므로 경고
+  useEffect(() => {
+    if (!mine) return
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault()
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [mine])
 
   // 소리 원본이 바뀌면(참가자 입퇴장·마이크 추가) 녹음 연결을 다시
   useEffect(() => {
@@ -188,7 +211,14 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
             onClick={() => {
               confirmOpen.set(false)
               const stage = anchor.current?.parentElement
-              if (stage) void startRec(ctx, stage)
+              if (!stage) return
+              // 클릭 직후 동기로 만들고 resume — await 뒤에 만들면 iOS Safari 등에서 suspended(무음 녹화)
+              let ac: AudioContext | null = null
+              try {
+                ac = new AudioContext()
+                void ac.resume().catch(() => {})
+              } catch {}
+              void startRec(ctx, stage, ac)
             }}
             className={`${btn} bg-danger text-white`}
           >
@@ -202,6 +232,9 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
 
 export const recording: RoomFeature = {
   id: 'recording',
+  // 발언자 음성을 녹음하므로 대기실 고지·마이크 동의 대상(M-4·A-6).
+  // 동의를 거부한 발언자의 음성을 녹화에서 뺄지는 [확인중 : 마스터] — 지금은 거부해도 녹음된다
+  consent: true,
   more: [
     {
       id: 'recording',
@@ -231,6 +264,7 @@ export const recording: RoomFeature = {
     toast.set(on ? 'startedBy' : 'stoppedBy') // 토스트 + polite 낭독은 Overlay
   },
   onReset: () => {
+    gen++
     void stopRec(null)
     confirmOpen.reset()
     recBy.reset()

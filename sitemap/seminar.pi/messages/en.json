@@ -356,6 +356,7 @@
       "title": "Record",
       "badge": "Recording",
       "unsupported": "This browser cannot record. Please record from a regular browser on a computer.",
+      "audioSuspended": "Sound recording may not have started on this device. Only the picture may be recorded.",
       "notifyFailed": "Recording did not start because participants could not be notified. Please try again shortly.",
       "confirm": {
         "title": "Start recording?",
