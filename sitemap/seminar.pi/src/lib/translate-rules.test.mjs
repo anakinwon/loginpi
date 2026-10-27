@@ -12,7 +12,9 @@ import {
   Lru,
   MAX_TEXT_CHARS,
   sameLang,
+  TR_LANG_SETTLE_MS,
   TRANSLATE_LANGS,
+  trStopOf,
 } from './translate-rules.ts'
 
 test('대상 언어 — 60개 이상, 중복 없음, 목록 밖·형식 이상 거부', () => {
@@ -112,4 +114,59 @@ test('사용자당 분당 60회 — 61번째 거부, 1분 지나면 다시 허�
   assert.equal(hitRate(t, 'u1', 1000), false)
   assert.ok(hitRate(t, 'u2', 1000))
   assert.ok(hitRate(t, 'u1', 61_000))
+})
+
+// r2 회귀 — 되풀이되는 실패는 이번 입장 동안 요청을 멈춘다(문장마다 403·503 헛요청 = 청중 수 × 문장 수 왕복·DB 잠금, R-P2)
+test('번역 중단 사유 — 권한 없음·AI 미설정·세미나 한도만 멈추고, 일시 실패는 다음 문장에 다시 시도', async () => {
+  const { vcUseError } = await import('./speech-rules.ts')
+  const of = (r) => {
+    const e = vcUseError(r)
+    return trStopOf(e.status, e.code)
+  }
+  assert.equal(of('FORBIDDEN'), 'forbidden') // 무료 세미나 방 링크로 바로 입장(smn_ptc 없음)
+  assert.equal(of('QUOTA'), 'quota')
+  assert.equal(of('RATE'), null) // 분당 한도 — 1분 뒤 회복
+  assert.equal(of('NOT_LIVE'), null)
+  assert.equal(of('NOT_FOUND'), null)
+  assert.equal(trStopOf(401, 'UNAUTHORIZED'), 'forbidden')
+  assert.equal(trStopOf(403, 'FORBIDDEN'), 'forbidden') // 서명 불일치도 같은 화면에선 되풀이된다
+  assert.equal(trStopOf(503, 'AI_UNAVAILABLE'), 'unavailable')
+  assert.equal(trStopOf(503, 'DB_UNAVAILABLE'), null) // DB 일시 장애는 다시 시도
+  assert.equal(trStopOf(502, 'TRANSLATE_FAILED'), null)
+  assert.equal(trStopOf(429, 'SPEECH_RATE'), null)
+  assert.equal(trStopOf(0, undefined), null)
+})
+
+test('화면 — 번역 중단은 요청 전에 막고 사유를 알림·시트에 표시, 더빙도 같은 사유면 끔(ko·en 문구 동시)', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const rd = (p) => readFile(new URL(p, import.meta.url), 'utf8')
+  const [tr, cap, dub, ko, en] = await Promise.all([
+    rd('../components/room/features/captions/translate.ts'),
+    rd('../components/room/features/captions/index.tsx'),
+    rd('../components/room/features/dubbing/index.tsx'),
+    rd('../../messages/ko.json').then(JSON.parse),
+    rd('../../messages/en.json').then(JSON.parse),
+  ])
+  assert.ok(/if \(!sig \|\| trStop\.get\(\)\) return Promise\.resolve\(null\)/.test(tr))
+  assert.ok(tr.includes('trStop.set(why)'))
+  assert.ok(cap.includes('trStop.reset()')) // 다음 입장에 이어지지 않게
+  assert.ok(dub.includes('trStopOf(r.status') && dub.includes("ctx.notice('dubbing.stopped')"))
+  for (const m of [ko, en]) {
+    for (const k of ['forbidden', 'unavailable', 'quota']) assert.ok(m.room.captions.trStop[k], k)
+    assert.ok(m.room.dubbing.stopped)
+  }
+})
+
+test('언어 바꾸기 디바운스 — 정해진 시간 동안 안 바뀔 때만 요청(select 화살표 훑기 = 언어 수만큼 외부 AI 방지)', async () => {
+  assert.ok(TR_LANG_SETTLE_MS >= 200 && TR_LANG_SETTLE_MS <= 1000) // 사람이 고르는 동안은 기다리고, 고른 뒤엔 바로 느껴지게
+  const { readFile } = await import('node:fs/promises')
+  const tr = await readFile(new URL('../components/room/features/captions/translate.ts', import.meta.url), 'utf8')
+  assert.ok(tr.includes('setTimeout(() => setReqLang(lang), TR_LANG_SETTLE_MS)'))
+  assert.ok(tr.includes('translateCaption(cap.text, cap.lang, reqLang,')) // 요청은 확정된 언어로만
+})
+
+test('자막 표시 — 번역문은 bdi(오른쪽→왼쪽 언어 격리) + lang(한자 글꼴·낭독기)', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const cap = await readFile(new URL('../components/room/features/captions/index.tsx', import.meta.url), 'utf8')
+  assert.ok(cap.includes('<bdi lang={shown?.lang || undefined}>{shown?.text}</bdi>'))
 })

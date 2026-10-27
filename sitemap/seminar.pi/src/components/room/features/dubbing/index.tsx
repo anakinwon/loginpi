@@ -12,7 +12,7 @@ import { featureStore, remoteVolume, useStore, type RoomCtx, type RoomFeature } 
 import { SwitchRow } from '../sheet'
 import { parseCaption } from '../captions/caption-rules'
 import { translateCaption } from '../captions/translate'
-import { sameLang } from '@/lib/translate-rules'
+import { sameLang, trStopOf } from '@/lib/translate-rules'
 import { isUuid } from '@/lib/seminar-rules'
 import { DUB_DUCK, dubRate, once, pushDub } from '@/lib/speech-rules'
 
@@ -132,7 +132,15 @@ function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ smnId: ctx.seminarId, text: said.text, lang, sig: said.sig }),
             signal: ac.signal,
-          }).then((r) => (r.ok ? r.blob() : null)), // 429·502 등은 그 문장만 건너뜀(자막은 그대로)
+          }).then(async (r) => {
+            if (r.ok) return r.blob()
+            // 되풀이되는 실패(권한 없음·AI 미설정·세미나 한도)는 더빙을 끄고 알린다(문장마다 헛요청 방지, R-P2). 분당 한도·502 등은 그 문장만 건너뜀
+            if (trStopOf(r.status, ((await r.json().catch(() => null)) as { code?: unknown } | null)?.code) && dubOn.get()) {
+              dubOn.set(false)
+              alertStopped?.()
+            }
+            return null
+          }),
     )
     .catch(() => null)
   const r = pushDub(queue, { ac, audio })
@@ -168,12 +176,14 @@ export function DubRow({ lang }: { lang: string }) {
 
 // 재생 거부 알림 — Overlay 가 ctx.notice 를 걸어 둔다(DubRow 는 ctx 가 없다)
 let alertBlocked: (() => void) | null = null
+let alertStopped: (() => void) | null = null
 
 // 켜짐·꺼짐 반영 — 원음 덕킹, 끄면 큐 정리
 function DubbingOverlay({ ctx }: { ctx: RoomCtx }) {
   const on = useStore(dubOn)
   useEffect(() => {
     alertBlocked = () => ctx.notice('dubbing.blocked')
+    alertStopped = () => ctx.notice('dubbing.stopped')
   })
   useEffect(() => {
     remoteVolume.set(on ? DUB_DUCK : 1)
@@ -182,6 +192,7 @@ function DubbingOverlay({ ctx }: { ctx: RoomCtx }) {
   useEffect(
     () => () => {
       alertBlocked = null
+      alertStopped = null
     },
     [],
   )

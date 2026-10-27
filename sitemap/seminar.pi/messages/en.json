@@ -433,7 +433,12 @@
       "sendFail": "Could not turn on captions. Please try again shortly",
       "region": "Captions",
       "translate": "Show translated captions",
-      "lang": "Translation language"
+      "lang": "Translation language",
+      "trStop": {
+        "forbidden": "Translated captions are only for registered participants. Showing the original",
+        "unavailable": "Translated captions are not available right now. Showing the original",
+        "quota": "This seminar has reached its translation limit. Showing the original"
+      }
     },
     "effects": {
       "title": "Effects",
@@ -542,7 +547,8 @@
     },
     "dubbing": {
       "listen": "Listen in translated voice",
-      "blocked": "Could not play the translated voice. Please turn it on again"
+      "blocked": "Could not play the translated voice. Please turn it on again",
+      "stopped": "Translated voice is not available right now, so it was turned off"
     }
   },
   "list": {
