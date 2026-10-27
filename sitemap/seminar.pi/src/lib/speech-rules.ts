@@ -163,6 +163,22 @@ export function vcUseError(rslt: string | null | undefined): Err {
   }
 }
 
+// 엔진 관리 API 주소 — 시그널링 ws(s) 주소와 같은 호스트·포트(엔진은 /signal·/admin/ 를 한 mux 에 둔다). 잘못된 주소면 null
+export function engineAdminBase(wsUrl: string | null | undefined): string | null {
+  if (!wsUrl || !/^wss?:\/\//i.test(wsUrl)) return null
+  try {
+    return new URL(wsUrl.replace(/^ws/i, 'http')).origin
+  } catch {
+    return null
+  }
+}
+
+// 무대 판정(D-1) — 엔진 조회 결과(null = 방에 접속 안 함) → 외부 AI 음성(chunk) 허용. 화면 speechOn 과 같은 규칙 :
+//  presenter 는 늘, panel 은 발표자가 방에 있을 때만, audience·미접속은 거절
+export type StageInfo = { role?: string; presenter?: boolean } | null
+export const stageAllowed = (i: StageInfo) =>
+  !!i && (i.role === 'presenter' || (i.role === 'panel' && i.presenter === true))
+
 // 합성 음성 속도 → 말하기 방식 문구(외부 AI 에 속도 숫자 인자가 없어 문구로 지시 — docs/speech-generation 2026-10-12).
 // 정확한 길이 맞춤은 화면 재생 속도(playbackRate 0.8~1.5, SA9)가 맡고 이건 보조
 export function paceStyle(rate: number) {

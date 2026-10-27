@@ -84,6 +84,7 @@
     "SPEECH_RATE": "음성 요청이 너무 잦습니다. 잠시 후 다시 시도하세요",
     "SPEECH_QUOTA": "이 세미나의 음성 처리 시간이 모두 소진되었습니다",
     "SPEECH_FAILED": "음성을 글로 바꾸지 못했습니다",
+    "SPEECH_STAGE_ONLY": "무대에 오른 사람만 음성 자막을 쓸 수 있습니다",
     "TRANSLATE_FAILED": "자막을 번역하지 못했습니다",
     "POLL_CLOSED": "마감된 설문입니다",
     "NOTE_NOT_RECORDING": "기록 중인 회의록이 아닙니다",

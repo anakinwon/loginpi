@@ -63,6 +63,35 @@ func (m *Manager) OpenRoom(id string, cap int, end time.Time) bool {
 	return ok
 }
 
+// PeerRoleInfo — 무대 역할 조회 결과. Presenter = 방에 presenter 세션이 있다(panel 음성 처리는 발표자가 있을 때만 — 화면 speechOn 과 같은 규칙).
+type PeerRoleInfo struct {
+	Role      signal.Role `json:"role"`
+	Presenter bool        `json:"presenter"`
+}
+
+// PeerRole — 방에 입장권 sub 로 접속 중인 세션의 역할(정본)과 발표자 유무. 방이 없거나 접속 중이 아니면 false.
+// 화면 서버가 외부 AI 음성 관문에서 무대(presenter·panel) 여부를 확인한다(야간 시험 D-1 — DB 는 무대 역할을 모른다).
+func (m *Manager) PeerRole(id, sub string) (PeerRoleInfo, bool) {
+	var r *Room
+	m.exec(func() { r = m.rooms[id] })
+	var info PeerRoleInfo
+	found := false
+	if r == nil || sub == "" {
+		return info, false
+	}
+	r.exec(func() {
+		for _, p := range r.peers {
+			if p.Ticket.Sub == sub {
+				info.Role, found = p.Role, true
+			}
+			if p.Role == signal.RolePresenter {
+				info.Presenter = true
+			}
+		}
+	})
+	return info, found
+}
+
 // CloseRoom — 방 강제 종료(참가자에게 ROOM_CLOSED 후 연쇄 정리). 없으면 false.
 func (m *Manager) CloseRoom(id string) bool {
 	var r *Room
@@ -95,6 +124,7 @@ func shutRoom(r *Room, except string) {
 //	GET    /admin/metrics      엔진 전역 카운터(metrics.Global)
 //	POST   /admin/rooms        {"id","cap","end"(유닉스 초, 선택)} 방 열기(자동 생성 방이면 값 덮어씀) → 201, 이미 관리 API 로 연 방이면 409
 //	DELETE /admin/rooms/{id}   강제 종료 → 204, 없으면 404
+//	GET    /admin/rooms/{id}/peers/{sub}  접속 중인 sub 의 세션 역할·발표자 유무 {"role","presenter"} → 200, 방·접속 없으면 404
 //
 // secret 이 32바이트 미만이면 API 전체를 끈다(404).
 func AdminHandler(m *Manager, secret []byte) http.Handler {
@@ -125,6 +155,14 @@ func AdminHandler(m *Manager, secret []byte) http.Handler {
 			return
 		}
 		w.WriteHeader(http.StatusCreated)
+	})
+	mux.HandleFunc("GET /admin/rooms/{id}/peers/{sub}", func(w http.ResponseWriter, req *http.Request) {
+		info, ok := m.PeerRole(req.PathValue("id"), req.PathValue("sub"))
+		if !ok {
+			http.NotFound(w, req)
+			return
+		}
+		adminJSON(w, http.StatusOK, info)
 	})
 	mux.HandleFunc("DELETE /admin/rooms/{id}", func(w http.ResponseWriter, req *http.Request) {
 		if !m.CloseRoom(req.PathValue("id")) {

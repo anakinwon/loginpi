@@ -70,7 +70,7 @@
 | `MEDIA_ALLOWED_ORIGINS` | 없음(운영 = MEDIA_DEV_TICKET 아니면 비어 있을 때 기동 거부) | WS Origin 허용 목록(쉼표) | M1 |
 | `MEDIA_ICE_SERVERS` | 없음 | join 응답 iceServers(JSON) — TURN 은 M2 | M1·M2 |
 | `MEDIA_RECORD_DIR` | 없음(미설정 = 녹화 끔) | 녹화 파일 저장 위치 | M5 |
-| `MEDIA_ADMIN_SECRET` | 없음(32자 미만 = 관리 API 404) | `/admin/rooms` Bearer 키 — cmd 가 읽어 `bora.AdminHandler` 로 | M5(통합 때 cmd 연결) |
+| `MEDIA_ADMIN_SECRET` | 없음(32자 미만 = 관리 API 404) | `/admin/rooms` Bearer 키 — cmd 가 읽어 `bora.AdminHandler` 로. Next 도 같은 값을 env `MEDIA_ADMIN_SECRET` 으로 받아 `GET /admin/rooms/{id}/peers/{sub}`(무대 역할·발표자 유무)로 음성 자막 관문을 본다(야간 시험 D-1) | M5(통합 때 cmd 연결) |
 
 ### Next(`src/env.ts`·`.env.example`, 이 커밋)
 

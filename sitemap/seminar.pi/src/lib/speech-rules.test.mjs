@@ -3,6 +3,8 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   aiMime,
+  engineAdminBase,
+  stageAllowed,
   baseMime,
   billSec,
   RESERVE_BYTES_PER_SEC,
@@ -246,4 +248,22 @@ test('speechHalt — 대상 삭제·권한 잃음도 이번 켜기를 멈춘다(
   // 일시 실패는 그 조각만 건너뛴다
   for (const c of ['SPEECH_RATE', 'SPEECH_FAILED', 'SPEECH_CHUNK_INVALID', 'INTERNAL', undefined, null, ''])
     assert.equal(speechHalt(c), null)
+})
+
+// D-1 — 엔진 관리 API 주소·무대 판정(서버 /api/speech/chunk stageGate 가 쓴다)
+test('engineAdminBase : ws(s) 시그널링 주소 → 같은 호스트·포트의 http(s) origin', () => {
+  assert.equal(engineAdminBase('wss://media.example.com/signal'), 'https://media.example.com')
+  assert.equal(engineAdminBase('ws://localhost:7880/signal'), 'http://localhost:7880')
+  assert.equal(engineAdminBase('WSS://Media.example.com:8443/signal?x=1'), 'https://media.example.com:8443')
+  for (const bad of [undefined, null, '', 'https://x/signal', 'wss://', 'javascript:alert(1)']) assert.equal(engineAdminBase(bad), null, String(bad))
+})
+
+test('stageAllowed : presenter 늘, panel 은 발표자 있을 때만, audience·미접속 거절(화면 speechOn 과 같은 규칙)', () => {
+  assert.equal(stageAllowed({ role: 'presenter', presenter: true }), true)
+  assert.equal(stageAllowed({ role: 'panel', presenter: true }), true)
+  assert.equal(stageAllowed({ role: 'panel', presenter: false }), false)
+  assert.equal(stageAllowed({ role: 'panel' }), false)
+  assert.equal(stageAllowed({ role: 'audience', presenter: true }), false)
+  assert.equal(stageAllowed(null), false)
+  assert.equal(stageAllowed({}), false)
 })

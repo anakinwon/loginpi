@@ -84,6 +84,7 @@
     "SPEECH_RATE": "Too many voice requests. Please try again shortly",
     "SPEECH_QUOTA": "Voice processing time for this seminar is used up",
     "SPEECH_FAILED": "Could not convert speech to text",
+    "SPEECH_STAGE_ONLY": "Only people on stage can use voice captions",
     "TRANSLATE_FAILED": "Could not translate the caption",
     "POLL_CLOSED": "This poll is closed",
     "NOTE_NOT_RECORDING": "These notes are not recording",

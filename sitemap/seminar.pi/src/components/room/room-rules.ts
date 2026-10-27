@@ -135,7 +135,7 @@ export type PeerLike = { peerId: string; name: string; role: PeerRole; raisedTs:
 export const presenterHere = (peers: readonly Pick<PeerLike, 'role'>[]) => peers.some((p) => p.role === 'presenter')
 
 // 음성 조각 녹음 켜기 — 방에 있음·말하기 요청 있음·동의함, 발표자 아닌 무대 역할은 발표자가 있을 때만(room-view 가 이 판정만 쓴다)
-// ponytail: 클라이언트 게이트일 뿐 — 서버 /api/speech/chunk 는 아직 무대 역할·발표자 유무를 확인하지 않는다(D-1 남은 과제)
+// 서버 /api/speech/chunk 도 같은 규칙을 엔진 세션 역할로 확인한다(speech-gate stageGate·speech-rules stageAllowed — MEDIA_ADMIN_SECRET 설정 시, D-1)
 export function speechOn(s: {
   live: boolean
   wants: readonly unknown[]

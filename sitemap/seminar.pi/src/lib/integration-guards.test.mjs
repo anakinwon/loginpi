@@ -109,3 +109,11 @@ test('⑦ 부가 기능의 ⋯ 항목·탭 이름 키와 useTranslations 이름�
   const miss = [...need].flatMap((k) => ['ko', 'en'].filter((l) => at(msgs[l], k) === undefined).map((l) => `${l}:${k}`))
   assert.deepEqual(miss, [])
 })
+
+test('⑧ 세미나 음성 조각은 무대 관문(stageGate)을 계량 관문(speechGate)보다 먼저 거친다(D-1 — 청중 음성 AI 호출 차단)', () => {
+  const s = read('src/app/api/speech/chunk/route.ts')
+  const st = s.indexOf('await stageGate(')
+  const sp = s.indexOf('await speechGate(')
+  assert.ok(st > 0 && sp > st, 'stageGate 가 없거나 speechGate 뒤에 있음')
+  assert.match(read('src/lib/speech-gate.ts'), /AbortSignal\.timeout\(2_000\)/, '엔진 호출 2초 제한(R-P4) 없음')
+})

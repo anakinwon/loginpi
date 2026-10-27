@@ -39,6 +39,9 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     // 미디어 엔진(Galápagos) 입장권 JWT HS256 서명 키 — 엔진 MEDIA_TOKEN_SECRET 과 같은 값(PRD_02 D-11). 미설정 = 입장권 발급 503
     MEDIA_TOKEN_SECRET: z.string().min(32).optional(),
+    // 엔진 관리 API Bearer 키 — 엔진 MEDIA_ADMIN_SECRET 과 같은 값. 설정 = /api/speech/chunk 가 엔진에 무대 역할을 묻는다(D-1, 청중 음성 AI 호출 차단).
+    //  미설정 = 무대 확인 없이 DB 청중 몫(1/2) 상한만(sql/010)
+    MEDIA_ADMIN_SECRET: z.string().min(32).optional(),
     // TURN 단기 자격 증명(/api/media/turn, M2 ⑨) — 전부 서버 전용·선택. 1순위 Cloudflare Realtime TURN(둘 다 있어야 사용)
     CLOUDFLARE_TURN_TOKEN_ID: z.string().optional(),
     CLOUDFLARE_TURN_API_TOKEN: z.string().optional(),
@@ -96,6 +99,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     MEDIA_TOKEN_SECRET: process.env.MEDIA_TOKEN_SECRET,
+    MEDIA_ADMIN_SECRET: process.env.MEDIA_ADMIN_SECRET,
     CLOUDFLARE_TURN_TOKEN_ID: process.env.CLOUDFLARE_TURN_TOKEN_ID,
     CLOUDFLARE_TURN_API_TOKEN: process.env.CLOUDFLARE_TURN_API_TOKEN,
     TURN_HOST: process.env.TURN_HOST,
