@@ -85,7 +85,8 @@
     "SPEECH_FAILED": "Could not convert speech to text",
     "NOTE_NOT_RECORDING": "These notes are not recording",
     "NOTE_SHOT_INVALID": "Invalid screen capture",
-    "NOTE_SHOT_RATE": "Too many screen captures"
+    "NOTE_SHOT_RATE": "Too many screen captures",
+    "NOTE_RETRY_SOON": "You can try again in a minute"
   },
   "progress": {
     "title": "Build progress",
@@ -525,6 +526,7 @@
     "recording": "Still recording",
     "failed": "Couldn't create the summary — the full transcript is below",
     "retry": "Try again",
+    "finish": "End recording and summarize",
     "none": "Nothing here",
     "notFound": "Notes not found",
     "forbidden": "You don't have access to these notes",

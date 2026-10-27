@@ -84,7 +84,7 @@ export function hhmm(iso: string, timeZone?: string) {
   }
 }
 
-// Markdown — 제목·요약(요점·결정·할 일)·전체 기록(캡처 위치 포함). 라벨은 호출부가 언어별로 넘긴다
+// Markdown — 제목·요약(요점·결정·할 일)·전체 기록(캡처 위치 포함)·잘림 표시(cut). 라벨은 호출부가 언어별로 넘긴다
 export function noteMarkdown(
   note: MdNote,
   segs: readonly MdSeg[],
@@ -94,7 +94,9 @@ export function noteMarkdown(
     todos: string
     transcript: string
     shot: string
+    cut: string
   },
+  cut = false,
 ): string {
   const esc = (s: string) => s.replace(/\r?\n/g, ' ').trim()
   const out = [
@@ -123,5 +125,6 @@ export function noteMarkdown(
     else if (s.text?.trim())
       out.push(`- ${s.at} **${esc(s.spk) || '?'}** ${esc(s.text)}`)
   }
+  if (cut) out.push('', `_… ${L.cut}_`) // 조각 상한(MAX_MD_SEGS)을 넘어 뒷부분 생략
   return out.join('\n') + '\n'
 }

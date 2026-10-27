@@ -142,6 +142,19 @@ function NotesOverlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const isPresenter = ctx.role === 'presenter'
   useShots(isPresenter ? ctx.r.localScreen : null, isPresenter ? ntId : null)
 
+  // 탭 닫기·새로 고침·앱 전환 종료 — onReset 이 안 도는 길. 켜 둔 회의록을 keepalive 로 끝낸다(M-4, 기록 중 고착 방지)
+  useEffect(() => {
+    const bye = () => {
+      const id = ntIdStore.get()
+      if (!id) return
+      ntIdStore.reset()
+      on.reset()
+      endNote(id)
+    }
+    window.addEventListener('pagehide', bye)
+    return () => window.removeEventListener('pagehide', bye)
+  }, [])
+
   // 시작·종료 토스트 3초(전원) + 낭독
   useEffect(() => {
     if (prev.current === shown) return

@@ -54,7 +54,14 @@ test('noteMarkdown — 요약·할 일 체크박스·캡처 위치·빈 조각 �
       { at: '14:01', spk: '', text: null, shot: true },
       { at: '14:02', spk: 'B', text: '  ', shot: false },
     ],
-    { points: 'P', decisions: 'D', todos: 'TD', transcript: 'TR', shot: 'S' },
+    {
+      points: 'P',
+      decisions: 'D',
+      todos: 'TD',
+      transcript: 'TR',
+      shot: 'S',
+      cut: 'CUT',
+    },
   )
   assert.match(md, /^# T\n/)
   assert.match(md, /## P\n\n- p\n/)
@@ -63,4 +70,20 @@ test('noteMarkdown — 요약·할 일 체크박스·캡처 위치·빈 조각 �
   assert.match(md, /- 14:00 \*\*A\*\* hi there/)
   assert.match(md, /- 14:01 \[S\]/)
   assert.doesNotMatch(md, /14:02/)
+  assert.doesNotMatch(md, /CUT/)
+  const L = {
+    points: 'P',
+    decisions: 'D',
+    todos: 'TD',
+    transcript: 'TR',
+    shot: 'S',
+    cut: 'CUT',
+  }
+  const cutMd = noteMarkdown(
+    { title: 'T', start: 's', end: null, summary: null },
+    [],
+    L,
+    true,
+  )
+  assert.ok(cutMd.endsWith('_… CUT_\n'))
 })

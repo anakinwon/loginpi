@@ -1,9 +1,12 @@
 // AI 회의록 서버 공용 — 열람 권한 확인(1왕복)·Storage 비공개 버킷 smn-note(없으면 만든다)·서명 URL.
-// 사용 : import { loadNote, uploadShot } from '@/lib/notes' (api/notes/* · api/speech/chunk)
+// 회의록 끝내기·요약(finishNote)·1000행 넘는 조각 이어 읽기(readSegs).
+// 사용 : import { loadNote, uploadShot, finishNote } from '@/lib/notes' (api/notes/* · api/speech/chunk · api/seminars/[id]/end)
 import 'server-only'
 import type { UserRow } from '@pi/db'
 import { db } from './api'
 import { isAdmin } from './auth'
+import { MAX_SUMMARY_IMAGES, summarize } from './gemini'
+import { hhmm } from './note-rules'
 
 export const NOTE_BUCKET = 'smn-note'
 export const SIGN_SEC = 3600 // 서명 URL 유효 1시간(화면을 오래 열어 두면 새로 고침)
@@ -73,18 +76,128 @@ export async function signShots(keys: string[]) {
   return data.map((d) => d.signedUrl ?? null)
 }
 
-// 캡처 원본(요약 입력) — base64. 실패한 장은 건너뛴다
-export async function readShots(keys: string[]) {
+// 캡처 원본(요약 입력) — base64 + 캡처 시각(HH:MM, 요약이 캡처 위치를 말하게). 실패한 장은 건너뛴다
+async function readShots(rows: SegRow[]) {
   const all = await Promise.all(
-    keys.map(async (k) => {
-      const { data } = await db().storage.from(NOTE_BUCKET).download(k)
+    rows.map(async (r) => {
+      const { data } = await db()
+        .storage.from(NOTE_BUCKET)
+        .download(r.img_key as string)
       return data
         ? {
             data: Buffer.from(await data.arrayBuffer()).toString('base64'),
             mime: 'image/jpeg',
+            at: hhmm(r.seg_dtm),
           }
         : null
     }),
   )
-  return all.filter((x): x is { data: string; mime: string } => !!x)
+  return all.filter((x) => !!x)
+}
+
+// PostgREST 기본 응답 상한(1000행)에서 조용히 잘리지 않게 1000행씩 이어 받는다(BUILD_DEFECTS 72·138행).
+//  max 까지만 모으고, 더 있으면 cut=true(호출부가 '이하 생략' 표시). 짧은 회의는 1왕복
+export const PAGE_ROWS = 1000
+export type SegRow = {
+  seg_dtm: string
+  spk_nm: string
+  seg_cont: string | null
+  img_key: string | null
+}
+export async function readSegs(
+  ntId: string,
+  max: number,
+  only?: 'text' | 'shot',
+): Promise<
+  | { error: { code?: string; message?: string } }
+  | { rows: SegRow[]; cut: boolean }
+> {
+  const rows: SegRow[] = []
+  // max+1 행까지 읽어 '더 있음'을 안다
+  while (rows.length <= max) {
+    let q = db()
+      .from('smn_nt_seg')
+      .select('seg_dtm, spk_nm, seg_cont, img_key')
+      .eq('nt_id', ntId)
+      .eq('del_yn', 'N')
+    if (only === 'text') q = q.not('seg_cont', 'is', null)
+    if (only === 'shot') q = q.not('img_key', 'is', null)
+    const from = rows.length
+    const to = Math.min(from + PAGE_ROWS, max + 1) - 1
+    const { data, error } = await q
+      .order('seg_dtm')
+      .order('seg_id')
+      .range(from, to)
+    if (error) return { error }
+    rows.push(...((data ?? []) as SegRow[]))
+    if ((data?.length ?? 0) < to - from + 1) break
+  }
+  return { rows: rows.slice(0, max), cut: rows.length > max }
+}
+
+export const MAX_SUMMARY_SEGS = 3000 // 요약 입력 조각 상한(5초 조각 약 4시간)
+export const RETRY_GAP_MS = 60_000 // FAILED 다시 만들기 간격(외부 AI 호출 폭주 방지)
+
+// 회의록 끝내기·요약 — RECORDING|FAILED → SUMMARIZING(조건부 갱신 — 이 갱신에 성공한 요청 1건만 요약, R-P5)
+//  → 조각 글 + 캡처(최대 12장) → 외부 AI 요약 → DONE{smr_val} | FAILED.
+//  api/notes/[id]/end(버튼·퇴장)와 api/seminars/[id]/end(세미나 종료 뒤 남은 기록 정리)가 같이 쓴다
+export async function finishNote(
+  ntId: string,
+  from: 'RECORDING' | 'FAILED',
+  usrId: string,
+): Promise<
+  { status: string } | { error: { code?: string; message?: string } }
+> {
+  const now = new Date()
+  let up = db()
+    .from('smn_nt')
+    .update({
+      nt_sts_cd: 'SUMMARIZING',
+      ...(from === 'RECORDING' ? { end_dtm: now.toISOString() } : {}),
+      modr_id: usrId,
+      mod_dtm: now.toISOString(),
+    })
+    .eq('nt_id', ntId)
+    .eq('nt_sts_cd', from)
+  // 다시 만들기는 마지막 실패 1분 뒤부터 — 권한자가 되풀이해도 외부 AI 호출은 분당 1회
+  if (from === 'FAILED')
+    up = up.lt('mod_dtm', new Date(now.getTime() - RETRY_GAP_MS).toISOString())
+  const { data: won, error: upErr } = await up.select('nt_id')
+  if (upErr) return { error: upErr }
+  if (!won?.length)
+    return { status: from === 'FAILED' ? 'RETRY_SOON' : 'SUMMARIZING' }
+
+  // 글 조각·캡처 키는 서로 독립 — 병렬(R-P1)
+  const [t, s] = await Promise.all([
+    readSegs(ntId, MAX_SUMMARY_SEGS, 'text'),
+    readSegs(ntId, MAX_SUMMARY_IMAGES, 'shot'),
+  ])
+  // ponytail: 함수가 요약 중 죽으면(시간 초과) SUMMARIZING 에 남는다 — 화면은 2분 뒤 새로 고침 안내. 잦으면 mod_dtm 2분 지난 SUMMARIZING 도 다시 만들기 허용
+  let smr: NoteRow['smr_val'] = null
+  if ('rows' in t && 'rows' in s) {
+    // 말한 내용이 없다 = 빈 요약(실패 아님)
+    if (!t.rows.length) smr = { points: [], decisions: [], todos: [] }
+    else {
+      smr = await summarize(
+        t.rows.map((x) => ({
+          at: hhmm(x.seg_dtm),
+          spk: x.spk_nm,
+          text: x.seg_cont ?? '',
+        })),
+        await readShots(s.rows),
+        t.cut,
+      )
+    }
+  }
+  const status = smr ? 'DONE' : 'FAILED'
+  const { error } = await db()
+    .from('smn_nt')
+    .update({
+      nt_sts_cd: status,
+      smr_val: smr,
+      modr_id: usrId,
+      mod_dtm: new Date().toISOString(),
+    })
+    .eq('nt_id', ntId)
+  return error ? { error } : { status }
 }

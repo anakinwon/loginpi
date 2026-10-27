@@ -171,7 +171,21 @@ function Note({ id }: { id: string }) {
         className="bg-surface space-y-4 rounded-xl p-4 text-sm"
         aria-live="polite"
       >
-        {head.status === 'RECORDING' && <p>{t('recording')}</p>}
+        {head.status === 'RECORDING' && (
+          <div className="space-y-2">
+            <p>{t('recording')}</p>
+            {/* 발표자 기기 종료 등으로 끄기가 안 온 기록 — 관리 권한자가 직접 끝내고 요약(end 라우트가 RECORDING 을 받는다) */}
+            {head.manage && (
+              <button
+                type="button"
+                className={BTN}
+                onClick={() => void retry()}
+              >
+                {t('finish')}
+              </button>
+            )}
+          </div>
+        )}
         {head.status === 'SUMMARIZING' && (
           <p>{t(long ? 'makingLong' : 'making')}</p>
         )}

@@ -53,6 +53,7 @@ export const apiError = createApiError({
   NOTE_NOT_RECORDING: '기록 중인 회의록이 아닙니다',
   NOTE_SHOT_INVALID: '화면 캡처 형식이 올바르지 않습니다',
   NOTE_SHOT_RATE: '화면 캡처가 너무 잦습니다',
+  NOTE_RETRY_SOON: '잠시 뒤에 다시 만들 수 있습니다(1분 간격)',
 })
 
 export const db = () => getSupabaseAdmin()

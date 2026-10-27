@@ -11,7 +11,7 @@ import {
   noteMarkdown,
   SEG_PAGE,
 } from '@/lib/note-rules'
-import { loadNote, signShots } from '@/lib/notes'
+import { loadNote, readSegs, signShots } from '@/lib/notes'
 import { isUuid } from '@/lib/seminar-rules'
 
 const noStore = { 'Cache-Control': 'no-store' }
@@ -31,6 +31,7 @@ const MD_L: Record<
     todos: string
     transcript: string
     shot: string
+    cut: string
   }
 > = {
   ko: {
@@ -39,6 +40,7 @@ const MD_L: Record<
     todos: '할 일',
     transcript: '전체 기록',
     shot: '화면 캡처',
+    cut: '이하 생략(기록이 길어 뒷부분은 들어가지 않았습니다)',
   },
   en: {
     points: 'Key points',
@@ -46,6 +48,7 @@ const MD_L: Record<
     todos: 'Action items',
     transcript: 'Transcript',
     shot: 'Screen capture',
+    cut: 'Truncated (the rest of a long transcript is not included)',
   },
 }
 
@@ -131,7 +134,7 @@ export const GET = withAuthGuard(
     if (part === 'md') {
       const [n, r] = await Promise.all([
         loadNote(ntId, user),
-        segs().order('seg_dtm').limit(MAX_MD_SEGS),
+        readSegs(ntId, MAX_MD_SEGS), // 1000행 상한에 안 잘리게 이어 읽기
       ])
       if (n.error) return dbFail(n.error)
       if (!n.note)
@@ -139,7 +142,7 @@ export const GET = withAuthGuard(
           n.forbidden ? 'FORBIDDEN' : 'NOT_FOUND',
           n.forbidden ? 403 : 404,
         )
-      if (r.error) return dbFail(r.error)
+      if ('error' in r) return dbFail(r.error)
       const tz = q.get('tz') || undefined
       const L = MD_L[q.get('lang') ?? ''] ?? MD_L.ko
       const at = (iso: string) => hhmm(iso, tz)
@@ -159,13 +162,14 @@ export const GET = withAuthGuard(
           end: n.note.end_dtm ? day(n.note.end_dtm) : null,
           summary: n.note.smr_val,
         },
-        ((r.data ?? []) as Seg[]).map((s) => ({
+        r.rows.map((s) => ({
           at: at(s.seg_dtm),
           spk: s.spk_nm,
           text: s.seg_cont,
           shot: !!s.img_key,
         })),
         L,
+        r.cut,
       )
       return new NextResponse(md, {
         headers: { ...noStore, 'Content-Type': 'text/markdown; charset=utf-8' },
