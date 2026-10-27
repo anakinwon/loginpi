@@ -142,3 +142,52 @@ test('⑩ 부가 기능 ctx.notice 키가 room.* 아래 ko·en 모두 있다', (
   const miss = [...keys].flatMap((k) => msgs.flatMap((m, i) => (typeof at(m, k) === 'string' ? [] : [`${['ko', 'en'][i]}:${k}`])))
   assert.deepEqual(miss, [])
 })
+
+test('⑪ 부가 기능의 무대 위 토스트(새 설문·효과 꺼짐)도 공용 토스트 줄에 붙는다 — 상단 가운데 고정 좌표면 녹화 배지(M-4 전원 표시)를 덮는다(r5)', () => {
+  const feat = srcFiles.filter((p) => rel(p).startsWith('src/components/room/features/') && p.endsWith('.tsx'))
+  // 무대 위 겹침 좌표 = 가로 전체(inset-x-0)에 상단으로 붙는 absolute(자막은 bottom 이라 제외, 시트 안 장식 -top-1·top-1 도 제외)
+  const bad = feat.filter((p) => /absolute[^'"`]*\binset-x-0\b[^'"`]*\btop-(?:\d|\[)/.test(readFileSync(p, 'utf8'))).map(rel)
+  assert.deepEqual(bad, [])
+  for (const f of ['engage/polls', 'backgrounds/index']) {
+    const s = read(`src/components/room/features/${f}.tsx`)
+    assert.match(s, /useStageSlot\(TOAST_SLOT_ID\)/, f)
+    // 낭독 영역은 늘 붙어 있어야(조건부 마운트면 첫 알림이 낭독되지 않는다) — 비었을 땐 줄 맨 뒤
+    assert.match(s, /role="status"[^>]*order-last/, f)
+  }
+})
+
+test("⑫ 화면이 부르는 t('키') 는 ko·en 모두 있다 — 함수마다 useTranslations 이름공간을 따라간다(빠지면 화면에 키가 그대로 보인다)", () => {
+  const msgs = Object.fromEntries(['ko', 'en'].map((l) => [l, JSON.parse(read(`messages/${l}.json`))]))
+  const at = (o, path) => path.split('.').reduce((x, k) => (x && typeof x === 'object' ? x[k] : undefined), o)
+  const BIND =
+    /const\s+(\w+)\s*=\s*(?:await\s+)?(?:useTranslations|getTranslations)\(\s*(?:'([\w.]+)'|\{[^}]*namespace:\s*'([\w.]+)'[^}]*\})?\s*\)/g
+  let n = 0
+  const miss = []
+  for (const p of srcFiles) {
+    const s = readFileSync(p, 'utf8')
+    const binds = [...s.matchAll(BIND)]
+    binds.forEach((b, i) => {
+      // 이 바인딩이 유효한 구간 = 다음 바인딩 전까지(같은 파일 안에서도 함수마다 이름공간이 다르다)
+      const part = s.slice(b.index, binds[i + 1]?.index ?? s.length)
+      const ns = b[2] ?? b[3] ?? ''
+      for (const m of part.matchAll(new RegExp(`\\b${b[1]}(?:\\.rich|\\.raw|\\.markup)?\\(\\s*'([\\w.]+)'`, 'g'))) {
+        n++
+        const key = ns ? `${ns}.${m[1]}` : m[1]
+        for (const l of ['ko', 'en']) if (at(msgs[l], key) === undefined) miss.push(`${l}:${key} (${rel(p)})`)
+      }
+    })
+  }
+  assert.ok(n >= 300, `키 수집 실패 : ${n}`) // 2026-10-28 기준 345개
+  assert.deepEqual(miss, [])
+})
+
+test('⑬ 새 탭 링크(target=_blank)는 낭독기에 새 탭임을 글로 알리고 ↗ 화살표는 숨긴다(WCAG 3.2.5 — 룸에서 처리방침을 열 때)', () => {
+  const files = srcFiles.filter((p) => p.endsWith('.tsx') && readFileSync(p, 'utf8').includes('target="_blank"'))
+  assert.ok(files.length >= 1)
+  for (const p of files) {
+    const s = readFileSync(p, 'utf8')
+    assert.doesNotMatch(s, /\}\s*↗/, `${rel(p)} : 화살표가 낭독된다`)
+    assert.match(s, /<NewTab /, rel(p))
+  }
+  for (const l of ['ko', 'en']) assert.ok(JSON.parse(read(`messages/${l}.json`)).room.consent.newTab, l)
+})
