@@ -4,12 +4,13 @@
 // 조각마다 녹음기를 새로 시작한다 — start(timeslice) 의 2번째 조각부터는 머리(헤더)가 없어 단독 해독이 안 된다
 // (Jitsi 배포본은 start(5e3) 조각을 ts-ebml 로 이어 붙여 한 파일로 고친다 — REA_04_UI_EXT R-S1). 형식 탐지 순서 근거 R-S2.
 // 서버 계약 정본 = /api/speech/chunk 머리 주석 + @/lib/speech-rules(F-A) : multipart audio·smnId·durMs·lang → 200 {text, lang, ts}.
-//  멈춤 = SPEECH_QUOTA(429, 세미나 한도 소진 — 이 세션 끝)·SPEECH_NOT_LIVE(409, 이번 켜기 끝)·SPEECH_NO_AGR(403, 서버에 동의 없음 → onNoAgr 로 다시 묻기).
+//  멈춤 = SPEECH_QUOTA(429, 세미나 한도 소진 — 이 세션 끝)·SPEECH_NOT_LIVE(409, 이번 켜기 끝)·SPEECH_NO_AGR(403, 서버에 동의 없음 → onNoAgr 로 다시 묻기)
+//  ·NOT_FOUND·FORBIDDEN(대상 삭제·권한 잃음, 이번 켜기 끝) — 판정 = speechHalt, 멈추면 onHalt 로 알린다.
 //  그 밖(SPEECH_RATE·SPEECH_FAILED·네트워크·15초 초과)은 그 조각만 건너뛴다. 실험실 방(UUID 아님)은 서버 기록이 없어 보내지 않는다
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
 import { isUuid } from '@/lib/seminar-rules'
-import { captionFresh, chunkHeard, CHUNK_MIN_MS, CHUNK_MS, settleWithin, VAD } from '@/lib/speech-rules'
+import { captionFresh, chunkHeard, CHUNK_MIN_MS, CHUNK_MS, settleWithin, speechHalt, type SpeechHalt, VAD } from '@/lib/speech-rules'
 import { acquireCtx, releaseCtx } from './video-tile'
 
 export const UPLOAD_TIMEOUT_MS = 15_000 // 서버 외부 AI 10초(BUILD_DEFECTS 2.7) + 여유 — 넘으면 그 조각 포기
@@ -29,6 +30,7 @@ export function useSpeech({
   sendApp,
   onText,
   onNoAgr,
+  onHalt,
   field = 'smnId',
 }: {
   track: MediaStreamTrack | null // 내 마이크(원본) — 없으면 쉰다
@@ -40,10 +42,11 @@ export function useSpeech({
   sendApp: (topic: string, d: unknown) => Promise<string | null>
   onText?: (text: string, ts: number, meta: { lang: string; sig: string | null }) => void
   onNoAgr?: () => void // 서버에 동의 기록이 없다(SPEECH_NO_AGR) — 이 기기 기록을 지우고 다시 묻는다(consent.tsx)
+  onHalt?: (why: SpeechHalt) => void // 서버가 멈추라고 했다(이번 켜기 끝) — 화면이 '기록 중'으로 남지 않게(대면 노트)
 }) {
-  const latest = useRef({ lang, broadcast, sendApp, onText, onNoAgr })
+  const latest = useRef({ lang, broadcast, sendApp, onText, onNoAgr, onHalt })
   useEffect(() => {
-    latest.current = { lang, broadcast, sendApp, onText, onNoAgr }
+    latest.current = { lang, broadcast, sendApp, onText, onNoAgr, onHalt }
   })
   const [limited, setLimited] = useState(false) // 세미나 음성 처리 한도 소진(A-5) — 이 세션에선 다시 시작하지 않는다
   const pending = useRef(new Set<Promise<void>>()) // 진행 중 조각 업로드(flush 가 기다린다)
@@ -106,11 +109,12 @@ export function useSpeech({
       if (!r) return
       const j = (await r.json().catch(() => null)) as { text?: string; lang?: string; ts?: number; sig?: string | null; code?: string } | null
       if (!r.ok) {
-        const c = j?.code
-        if (halted || (c !== 'SPEECH_QUOTA' && c !== 'SPEECH_NOT_LIVE' && c !== 'SPEECH_NO_AGR')) return
+        const why = speechHalt(j?.code)
+        if (halted || !why) return
         halted = stopped = true
-        if (c === 'SPEECH_QUOTA') setLimited(true)
-        if (c === 'SPEECH_NO_AGR') l.onNoAgr?.()
+        if (why === 'quota') setLimited(true)
+        if (why === 'agr') l.onNoAgr?.()
+        l.onHalt?.(why)
         return
       }
       const text = j?.text?.trim()

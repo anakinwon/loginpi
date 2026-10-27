@@ -117,6 +117,26 @@ export const usrMaxSec = (maxSec: number) => Math.floor(maxSec / 4)
 // BCP-47 언어 코드(힌트·번역 대상) — 'ko'·'en'·'pt-BR'·'zh-Hant'
 export const LANG_RE = /^[a-z]{2,3}(-[A-Za-z0-9]{2,8}){0,2}$/
 
+// 음성 조각 거절 코드 → 이번 켜기를 멈출 이유(null = 그 조각만 건너뛰고 계속). 화면(use-speech)이 쓴다.
+//  quota = 한도 소진 · live = 진행 중 아님(세미나 끝·노트가 다른 곳에서 끝남) · agr = 동의 없음 · gone = 대상 삭제(NOT_FOUND)·권한 잃음(FORBIDDEN).
+//  gone 을 건너뛰기로 두면 노트가 지워진 뒤에도 5초마다 거절 요청을 끝없이 보내고 화면은 '기록 중'으로 남았다(T02 r3)
+export type SpeechHalt = 'quota' | 'live' | 'agr' | 'gone'
+export function speechHalt(code: string | null | undefined): SpeechHalt | null {
+  switch (code) {
+    case 'SPEECH_QUOTA':
+      return 'quota'
+    case 'SPEECH_NOT_LIVE':
+      return 'live'
+    case 'SPEECH_NO_AGR':
+      return 'agr'
+    case 'NOT_FOUND':
+    case 'FORBIDDEN':
+      return 'gone'
+    default:
+      return null
+  }
+}
+
 type Err = { code: string; status: number } | null
 
 // fn_use_smn_vc 결과 → 오류(OK = 통과). NO_AGR 이면 화면이 동의 모달을 띄운다

@@ -24,6 +24,7 @@ import {
   captionFresh,
   chunkHeard,
   VAD,
+  speechHalt,
 } from './speech-rules.ts'
 
 const bytes = (...head) => {
@@ -234,4 +235,15 @@ test('chunkHeard — 무음 조각 거르기·측정 불가 시 보냄', () => {
   assert.equal(chunkHeard(0, 0), true) // AudioContext suspended·미지원 = 표본 없음 → 보냄
   assert.equal(chunkHeard(0, VAD.minSamples - 1), true)
   assert.ok(VAD.level < 0.04) // 말하기 링 기준보다 낮다(작은 목소리 보냄)
+})
+
+test('speechHalt — 대상 삭제·권한 잃음도 이번 켜기를 멈춘다(T02 r3 : 지워진 노트에 5초마다 거절 요청)', () => {
+  assert.equal(speechHalt('SPEECH_QUOTA'), 'quota')
+  assert.equal(speechHalt('SPEECH_NOT_LIVE'), 'live')
+  assert.equal(speechHalt('SPEECH_NO_AGR'), 'agr')
+  assert.equal(speechHalt('NOT_FOUND'), 'gone')
+  assert.equal(speechHalt('FORBIDDEN'), 'gone')
+  // 일시 실패는 그 조각만 건너뛴다
+  for (const c of ['SPEECH_RATE', 'SPEECH_FAILED', 'SPEECH_CHUNK_INVALID', 'INTERNAL', undefined, null, ''])
+    assert.equal(speechHalt(c), null)
 })

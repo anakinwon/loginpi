@@ -786,6 +786,7 @@
     "noAgr": "Stopped: no notice confirmation on record — end and start again",
     "micLost": "The microphone disconnected and recording stopped — tap Reconnect microphone or end the note",
     "micRetry": "Reconnect microphone",
+    "gone": "This note was ended or deleted elsewhere, so recording stopped — use the button below to open the notes",
     "finishing": "Saving the last words…",
     "st": {
       "RECORDING": "Recording",

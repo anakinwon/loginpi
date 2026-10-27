@@ -16,7 +16,7 @@ import { Pagination } from '@/components/seminar/pagination'
 import { BTN, BTN_PRIMARY } from '@/components/seminar/shared'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi, useApiErrorText } from '@/lib/client-api'
-import { NOTE_LIST_PAGE, recAlert } from '@/lib/note-rules'
+import { holdWake, NOTE_LIST_PAGE, recAlert } from '@/lib/note-rules'
 
 const noSend = async () => null // 대면 노트는 방송(자막) 없음
 
@@ -78,6 +78,7 @@ function Recorder() {
 
   const [finishing, setFinishing] = useState(false)
   const [micLost, setMicLost] = useState(false)
+  const [gone, setGone] = useState(false) // 노트가 다른 곳에서 끝났거나 삭제됐다(서버가 조각을 멈춤)
   const left = useRef(false) // 화면을 떠났다 — 개발 StrictMode 의 즉시 재실행과 진짜 떠남을 가른다
   const ended = useRef(false) // 끝내기 요청을 이미 보냄(종료 버튼·창 닫힘)
 
@@ -91,6 +92,13 @@ function Recorder() {
     sendApp: noSend,
     onText: (text) => setLines((l) => [...l, text].slice(-3)),
     onNoAgr: () => setErr(t('noAgr')),
+    // 다른 기기·회의록 화면에서 끝냈거나 지웠다 — '기록 중'으로 두지 않고 알리며 마이크를 놓는다(트랙 정리 effect 가 stop)
+    onHalt: (why) => {
+      if (why !== 'live' && why !== 'gone') return
+      ended.current = true // 떠날 때 끝내기 요청을 또 보내지 않는다([종료] 버튼은 그대로 회의록 화면으로)
+      setGone(true)
+      setTrack(null)
+    },
   })
 
   // 기록 중 — 경과 시간·화면 꺼짐 막기(기능 탐지)·떠나기 경고·창 닫힘이면 keepalive 로 끝내기(RECORDING 고착 방지)
@@ -102,27 +110,19 @@ function Recorder() {
       () => setSec(Math.floor((Date.now() - t0) / 1000)),
       1000,
     )
-    let lock: WakeLockSentinel | null = null
-    const wake = () => {
-      if (!('wakeLock' in navigator)) return setNoWake(true)
-      navigator.wakeLock.request('screen').then(
-        (l) => (lock = l),
-        () => setNoWake(true),
-      )
-    }
-    const vis = () => document.visibilityState === 'visible' && wake() // 탭 전환 후 잠금이 풀리면 다시
+    const wake = holdWake(navigator, () => setNoWake(true))
+    const vis = () => document.visibilityState === 'visible' && wake.again() // 탭 전환 후 잠금이 풀리면 다시
     const warn = (e: BeforeUnloadEvent) => e.preventDefault()
     const bye = () => {
       ended.current = true
       endNote(ntId)
     }
-    wake()
     document.addEventListener('visibilitychange', vis)
     window.addEventListener('beforeunload', warn)
     window.addEventListener('pagehide', bye)
     return () => {
       clearInterval(tick)
-      void lock?.release().catch(() => null)
+      wake.release()
       document.removeEventListener('visibilitychange', vis)
       window.removeEventListener('beforeunload', warn)
       window.removeEventListener('pagehide', bye)
@@ -213,13 +213,15 @@ function Recorder() {
     setTrack(s.getAudioTracks()[0] ?? null)
   }
 
-  const alert = recAlert({ err, limited, micLost })
+  const alert = recAlert({ err, limited, micLost, gone })
   if (ntId)
     return (
       <section className="bg-surface space-y-4 rounded-xl p-4">
-        <p className="bg-danger inline-flex rounded-full px-3 py-1 text-sm font-semibold text-white">
-          ● {t('recBadge', { time: mmss(sec) })}
-        </p>
+        {!gone && (
+          <p className="bg-danger inline-flex rounded-full px-3 py-1 text-sm font-semibold text-white">
+            ● {t('recBadge', { time: mmss(sec) })}
+          </p>
+        )}
         <div className="space-y-1">
           <h2 className="text-muted-foreground text-xs">{t('recentLines')}</h2>
           {lines.length ? (
@@ -237,7 +239,7 @@ function Recorder() {
             {alert === 'err' ? err : t(alert)}
           </p>
         )}
-        {micLost && !finishing && (
+        {micLost && !gone && !finishing && (
           <button
             type="button"
             className={`${BTN} w-full`}

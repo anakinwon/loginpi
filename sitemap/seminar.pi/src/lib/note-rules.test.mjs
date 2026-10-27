@@ -12,6 +12,7 @@ import {
   noteState,
   noteUrl,
   pickLabels,
+  holdWake,
   recAlert,
   SHOT_DIFF,
   shotAllowed,
@@ -153,13 +154,13 @@ test('대면 노트 — 앱 안 이동(헤더 링크·언어 바꾸기)으로 �
     /void flush\(UPLOAD_TIMEOUT_MS\)\.then\(\(\) => endNote\(ntId\)\)/,
   )
   assert.match(s, /\}, \[ntId, flush\]\)/)
-  // 종료 버튼·창 닫힘·정리 경로가 모두 ended 를 세워 두 번 끝내지 않게
-  assert.equal((s.match(/ended\.current = true/g) ?? []).length, 3)
+  // 종료 버튼·창 닫힘·정리·다른 곳에서 끝남(onHalt, r3) 경로가 모두 ended 를 세워 두 번 끝내지 않게
+  assert.equal((s.match(/ended\.current = true/g) ?? []).length, 4)
 })
 
 test('대면 노트 — 마이크가 끊기면 [마이크 다시 연결]로 같은 회의록에 이어 기록(ko·en 문구)', async () => {
   const s = await inPerson()
-  assert.match(s, /micLost && !finishing &&/)
+  assert.match(s, /micLost && !gone && !finishing &&/)
   assert.match(
     s,
     /setMicLost\(false\)\s*\n\s*setTrack\(s\.getAudioTracks\(\)\[0\] \?\? null\)/,
@@ -221,4 +222,57 @@ test('회의록 화면 — 보조 동작(내려받기·삭제) 실패가 화면 
     assert.ok(at > 0 && body.length > 20, fn)
     assert.doesNotMatch(body, /setErr\(/, `${fn} 가 setErr 사용`)
   }
+})
+
+test('recAlert — 노트가 다른 곳에서 끝남·삭제(gone)는 마이크 끊김·한도보다 앞, 오류보다 뒤(T02 r3)', () => {
+  const s = { err: null, limited: true, micLost: true }
+  assert.equal(recAlert({ ...s, gone: true }), 'gone')
+  assert.equal(recAlert({ ...s, err: 'x', gone: true }), 'err')
+  assert.equal(recAlert({ ...s, gone: false }), 'micLost')
+})
+
+test('holdWake — 놓은 뒤 늦게 온 잠금은 바로 돌려주고, 다시 요청하면 앞 잠금을 놓는다(T02 r3 누수)', async () => {
+  const released = []
+  let resolve
+  const nav = {
+    wakeLock: {
+      request: () =>
+        new Promise((r) => {
+          resolve = () => {
+            const l = { release: async () => void released.push(l) }
+            r(l)
+            return l
+          }
+        }),
+    },
+  }
+  const tick = () => new Promise((r) => setImmediate(r))
+  // ① 잠금 → again → 새 잠금이 오면 앞 잠금을 놓음 → release 가 새 잠금을 놓음
+  const w = holdWake(nav, () => assert.fail('실패 아님'))
+  const a = resolve()
+  await tick()
+  w.again()
+  const b = resolve()
+  await tick()
+  assert.deepEqual(released, [a])
+  w.release()
+  await tick()
+  assert.deepEqual(released, [a, b])
+  // ② 놓은 뒤에 요청이 끝남 → 즉시 반환, 이후 again 은 요청하지 않음
+  released.length = 0
+  const w2 = holdWake(nav, () => assert.fail('실패 아님'))
+  w2.release()
+  const c = resolve()
+  await tick()
+  assert.deepEqual(released, [c])
+  let asked = false
+  nav.wakeLock.request = () => ((asked = true), new Promise(() => {}))
+  w2.again()
+  assert.equal(asked, false)
+  // ③ 기능 없음·거절 = onFail
+  let fails = 0
+  holdWake({}, () => fails++)
+  holdWake({ wakeLock: { request: () => Promise.reject(new Error('x')) } }, () => fails++)
+  await tick()
+  assert.equal(fails, 2)
 })
