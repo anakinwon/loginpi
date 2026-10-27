@@ -187,7 +187,7 @@
 
 | `topic` | 보낼 수 있는 역할 | 쓰임 | `d` 모양(화면 약속 — 엔진은 검사 안 함) |
 |---|---|---|---|
-| `caption` | presenter · panel | 말하는 사람 자기 브라우저가 음성 조각을 글로 바꾼 결과를 전원에게(계획서 A-1) | `{text, ts, lang}` — text 문자열(받는 쪽은 공백 정리 후 500자로 자름, 빈 글이면 버림), ts 조각 시작 ms, lang 말한 언어. 화면은 텍스트로만 표시(SA3 `features/captions/caption-rules.ts`). 번역 필드는 [확인중 : SubAgent8] |
+| `caption` | presenter · panel | 말하는 사람 자기 브라우저가 음성 조각을 글로 바꾼 결과를 전원에게(계획서 A-1) | `{text, ts, lang, sig}` — text 문자열(받는 쪽은 공백 정리 후 500자로 자름, 빈 글이면 버림), ts 조각 시작 ms, lang 말한 언어, sig 서버 발급 자막 서명(/api/speech/chunk 응답 그대로, 없으면 null — 번역 /api/speech/translate·더빙 /api/speech/tts 는 sig 맞는 글만 받는다, 보안 검토 D-2). 화면은 텍스트로만 표시(SA3 `features/captions/caption-rules.ts`). 번역 결과는 방송하지 않는다(듣는 사람 각자 요청, SA8) |
 | `state` | presenter | 녹화·AI 기록 시작/종료 → 전원 배지(마스터 결정 M-4) | **키별 부분 객체** — 받는 쪽은 아는 키만 반영하고 나머지는 무시. `captions: boolean`(방 자막 켜짐, SA3 — panel 은 받아서 자기 마이크 자막을 켬). 녹화·AI 기록 키는 [확인중 : SubAgent6·7 화면 계약 확정 시 기재] |
 | `refresh` | 전원 | 설문·Q&A 등 화면 서버 데이터가 바뀜 → 받은 사람이 다시 읽기(투표한 청중도 보냄) | `{what, kind?}` — `what` = `'polls'` 또는 `'qna'`, `kind` = `'new'`(선택) — `what` 외 값이면 버림, `kind:'new'` = 새 설문·질문(탭이 안 보이면 배지 +1, 새 설문은 10초 토스트). 내용은 싣지 않음. 받는 쪽 1.5초 디바운스·숨은 탭은 열 때 1회 조회(SubAgent4 `features/engage/shared.ts`·`engage-rules.ts parseRefresh`) |
 

@@ -64,7 +64,7 @@ export type RoomFeature = {
   Overlay?: ComponentType<{ ctx: RoomCtx; barShown: boolean }> // 무대 위(relative 상자 안). 시트·배지·자막·토스트
   effect?: VideoEffect
   onApp?: (m: AppMsg, ctx: RoomCtx) => void // ntf app 수신 — 자기 topic 만 처리
-  onSpeech?: (text: string, ts: number, ctx: RoomCtx) => void // 내 음성 조각이 글로 바뀜(내 화면용 — 방송은 use-speech 가 함)
+  onSpeech?: (text: string, ts: number, ctx: RoomCtx, meta?: { lang: string; sig: string | null }) => void // 내 음성 조각이 글로 바뀜(내 화면용 — 방송은 use-speech 가 함)
   consent?: boolean // 발언자 음성을 처리하는 기능 — 하나라도 있으면 마이크 동의·대기실 고지가 켜진다(A-6)
   onReset?: () => void // 퇴장·끊김 — 저장소를 처음 값으로
 }

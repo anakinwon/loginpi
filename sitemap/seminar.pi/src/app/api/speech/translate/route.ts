@@ -1,17 +1,21 @@
-// 자막 문장 번역(SA8) — POST { smnId, text, lang } → { text }. 청중이 자막 시트에서 고른 언어로 자기 화면 자막만 번역한다(계획 A-3, piFetch).
-// 순서 : 키 확인(없으면 503) → 세션·본문 병렬(R-P1) → 사용자당 분당 60회 → 캐시(문장 해시×언어) → 참가 자격(gate, 캐시 미스만) → 외부 AI 번역(10초, BUILD_DEFECTS 2.7)
-// 캐시 적중은 자격 확인 없이 돌려준다 — 요청자가 보낸 문장의 번역이라 새어 나갈 데이터가 없고, 비용이 없다(같은 자막을 여러 청중이 동시에 요청 = DB 왕복 절약, R-P2)
-// 동시에 같은 문장·언어 요청이 몰리면 진행 중 Promise 를 같이 기다린다(외부 AI 1회). 실패한 결과는 캐시에서 지운다. 비로그인 401(redirect 없음)
-// ponytail: 캐시·요청 창 모두 서버 인스턴스 메모리 — 인스턴스가 여러 개면 인스턴스별(상한 = 인스턴스 수 × 60회). 정확한 전역 상한이 필요하면 DB 함수(fn_use_smn_vc 와 같은 방식)로
+// 자막 문장 번역(SA8) — POST { smnId, text, lang, sig } → { text, sig }. 청중이 자막 시트에서 고른 언어로 자기 화면 자막만 번역한다(계획 A-3, piFetch).
+// 순서 : 키 확인(없으면 503) → 세션·본문 병렬(R-P1) → 글자 상한 500 → 서버 발급 서명 확인(음성→글 결과만, 임의 글 403 — 보안 검토 D-2) → 사용자당 분당 60회
+//  → 캐시(문장 해시×언어) → 캐시 미스만 fn_use_smn_ai 1왕복(개최자·ADMIN·활성 참가 등록 + LIVE + 사용자 분당·세미나 누적 글자, sql/010) → 외부 AI 번역(10초, BUILD_DEFECTS 2.7)
+// 캐시 적중은 DB 확인 없이 돌려준다 — 서명이 맞는 글(이미 방송된 자막)의 번역이라 새어 나갈 데이터·비용이 없다(같은 자막을 여러 청중이 동시에 요청 = DB 왕복 절약, R-P2)
+// 응답 sig = 번역 결과 서명 — 더빙(/api/speech/tts)이 서버가 만든 번역만 읽게. 동시 같은 요청은 진행 중 Promise 공유(외부 AI 1회), 실패는 캐시에서 지운다. 비로그인 401(redirect 없음)
+// ponytail: 캐시·요청 창은 인스턴스 메모리 — 정확한 전역 상한은 DB(fn_use_smn_ai)가 맡는다
 import { NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
-import { apiError, dbRoute, requireUser } from '@/lib/api'
-import { closed, gate, noStore } from '@/lib/engage'
+import { env } from '@/env'
+import { apiError, db, dbFail, dbRoute, requireUser } from '@/lib/api'
+import { noStore } from '@/lib/engage'
 import { geminiEnabled, translate } from '@/lib/gemini'
 import { isUuid } from '@/lib/seminar-rules'
-import { cacheKey, cleanText, hitRate, isTranslateLang, Lru } from '@/lib/translate-rules'
+import { vcUseError } from '@/lib/speech-rules'
+import { AI_LIMIT, cacheKey, capSig, capSigOk, cleanText, hitRate, isTranslateLang, Lru } from '@/lib/translate-rules'
 
-const cache = new Lru<Promise<string | null>>(5_000) // 2,000자 상한 × 5,000 ≈ 최악 20MB, 실제 5초 자막은 100자 안팎
+type ApiCode = Parameters<typeof apiError>[0]
+const cache = new Lru<Promise<string | null>>(5_000) // 500자 상한 × 5,000 ≈ 최악 5MB, 실제 5초 자막은 100자 안팎
 const rate = new Map<string, { start: number; n: number }>()
 
 export const POST = withAuthGuard(
@@ -19,20 +23,30 @@ export const POST = withAuthGuard(
     if (!geminiEnabled()) return apiError('AI_UNAVAILABLE', 503)
     const [user, body] = await Promise.all([requireUser(req), req.json().catch(() => null)])
     if (user instanceof NextResponse) return user
-    const b = (body ?? {}) as { smnId?: unknown; text?: unknown; lang?: unknown }
+    const b = (body ?? {}) as { smnId?: unknown; text?: unknown; lang?: unknown; sig?: unknown }
     const text = cleanText(b.text)
     if (typeof b.smnId !== 'string' || !isUuid(b.smnId) || !text || !isTranslateLang(b.lang))
       return apiError('INVALID_INPUT', 400)
+    const smnId = b.smnId.toLowerCase()
     const lang = b.lang
+    if (!(await capSigOk(env.PI_SESSION_SECRET, smnId, text, b.sig))) return apiError('FORBIDDEN', 403)
     if (!hitRate(rate, user.id, Date.now())) return apiError('SPEECH_RATE', 429)
 
     const key = await cacheKey(text, lang)
     let p = cache.get(key)
     if (!p) {
-      const g = await gate(b.smnId.toLowerCase(), user)
-      if (g instanceof NextResponse) return g
-      if (!g.open) return closed()
-      // 자격 확인을 기다리는 사이 같은 요청이 먼저 넣었을 수 있다
+      const { data, error } = await db().rpc('fn_use_smn_ai', {
+        p_smn_id: smnId,
+        p_usr_id: user.id,
+        p_kind: 'TRANS',
+        p_chr: text.length,
+        p_max_chr: AI_LIMIT.TRANS.maxChr,
+        p_max_min_chr: AI_LIMIT.TRANS.maxMinChr,
+      })
+      if (error) return dbFail(error)
+      const e = vcUseError(data as string | null)
+      if (e) return apiError(e.code as ApiCode, e.status)
+      // 판정을 기다리는 사이 같은 요청이 먼저 넣었을 수 있다(그 몫도 계량 — 보수적)
       p = cache.get(key) ?? translate(text, lang)
       cache.set(key, p)
     }
@@ -41,6 +55,6 @@ export const POST = withAuthGuard(
       cache.delete(key)
       return apiError('TRANSLATE_FAILED', 502)
     }
-    return NextResponse.json({ text: out }, { headers: noStore })
+    return NextResponse.json({ text: out, sig: await capSig(env.PI_SESSION_SECRET, smnId, out) }, { headers: noStore })
   }),
 )
