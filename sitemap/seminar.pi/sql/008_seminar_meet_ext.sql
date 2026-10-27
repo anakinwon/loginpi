@@ -1,10 +1,11 @@
 -- 008_seminar_meet_ext.sql — 회의 확장 기능 10종 기반 테이블 한 번에(계획 A-8) : 회의록·조각, 설문·선택지·투표, Q&A·추천, 출석, 음성 처리 사용량, 동의 기록
---   + 음성 조각 사용 판정 함수 fn_use_smn_vc(R-P5 — 대상 행 잠금 아래 권한·동의·분당 요청·누적 상한) + Q&A 추천건수 동기화 트리거
--- DA-APPROVED: 아소카 결정(마스터 위임 2026-10-27) — 접두사 smn_(004 신설) 테이블 10개·함수 2개 신규, 기존 테이블 무변경. 신규 표준단어 17개(아래), DA 사후 리뷰 대상
+--   + 음성 조각 사용 판정 함수 fn_use_smn_vc(R-P5 — 대상 행 잠금 아래 권한·동의·분당 요청·분당 초·참가자 1인 상한·누적 상한)·정산 함수 fn_add_smn_vc_sec + Q&A 추천건수 동기화 트리거
+-- DA-APPROVED: 아소카 결정(마스터 위임 2026-10-27) — 접두사 smn_(004 신설) 테이블 10개·함수 3개 신규, 기존 테이블 무변경. 신규 표준단어 17개(아래), DA 사후 리뷰 대상
 -- 선행 : 004·005·006·007. 적용 : node scripts/db-migrate.mjs --app seminar --tier dev|stg|prod — 통합 단계에서(작성 시점 미적용)
 --
 -- 명명 점검(2026-10-27) : 이 실행 환경에 Agent 도구가 없어 da-standards 에이전트를 부르지 못했다 → 그 정의서(.claude/agents/da-standards.md)
 --   체크리스트(정본 §1~§6) + 행안부 공통표준단어(docs/da/references/02.01, 20251101) 동음이의 대조 + da-ddl-guard 훅으로 대행 점검. 통합 때 DA 재검증 필요
+--   → 메인 세션이 da-standards(명명·표준단어)·legal-compliance-advisor(/privacy 문안) 실제 검증을 마치기 전까지 이 파일 DB 미적용·/privacy 링크 미노출 유지
 -- 신규 표준단어(정본 §1-1 v2.3 '자음 위주 2~3자' — 아소카 결정(마스터 위임), DA 사후 리뷰 시 §9 등재) :
 --  · 회의록 NT  (note)                · 조각   SEG (segment)
 --  · 화자   SPK (speaker, 행안부 발언자 SPKR)
@@ -194,7 +195,7 @@ CREATE TABLE IF NOT EXISTS smn_pll_vt (
   CONSTRAINT smn_pll_vt_sys_user_id_fkey FOREIGN KEY (usr_id) REFERENCES sys_user (usr_id),
   CONSTRAINT smn_pll_vt_del_yn_check CHECK (del_yn IN ('Y', 'N'))
 );
-COMMENT ON TABLE  smn_pll_vt IS '설문 투표 — 1인 1표(x_smn_pll_vt_01). 다시 투표 = 같은 행 opt_id UPDATE(INSERT … ON CONFLICT). opt_id 가 같은 설문 것인지는 API 가 확인';
+COMMENT ON TABLE  smn_pll_vt IS '설문 투표 — 1인 1표(x_smn_pll_vt_01). 다시 투표 = 같은 행 opt_id UPDATE. 유일 제약이 부분 인덱스(WHERE del_yn=N)라 PostgREST upsert(onConflict) 불가(42P10) — SQL 함수에서 ON CONFLICT (pll_id, usr_id) WHERE del_yn = ''N'' DO UPDATE(fn_use_smn_vc 방식) 또는 INSERT 후 23505 면 UPDATE. opt_id 가 같은 설문 것인지는 API 가 확인';
 COMMENT ON COLUMN smn_pll_vt.vt_id IS '투표ID';
 COMMENT ON COLUMN smn_pll_vt.pll_id IS '설문ID(smn_pll)';
 COMMENT ON COLUMN smn_pll_vt.opt_id IS '선택지ID(smn_pll_opt)';
@@ -284,7 +285,7 @@ CREATE TABLE IF NOT EXISTS smn_atd (
   CONSTRAINT smn_atd_lst_hb_dtm_check CHECK (lst_hb_dtm >= ent_dtm),
   CONSTRAINT smn_atd_del_yn_check CHECK (del_yn IN ('Y', 'N'))
 );
-COMMENT ON TABLE  smn_atd IS '출석 — 사용자당 세미나 1행. 입장 = ON CONFLICT DO NOTHING(첫 입장 보존), 하트비트 = lst_hb_dtm 만 갱신. 개최자 목록·CSV';
+COMMENT ON TABLE  smn_atd IS '출석 — 사용자당 세미나 1행. 입장 = 첫 입장 보존(유일 제약이 부분 인덱스라 PostgREST upsert 불가 — INSERT 후 23505 면 무시, 또는 SQL 함수에서 ON CONFLICT (smn_id, usr_id) WHERE del_yn = ''N'' DO NOTHING), 하트비트 = lst_hb_dtm 만 갱신. 개최자 목록·CSV';
 COMMENT ON COLUMN smn_atd.atd_id IS '출석ID';
 COMMENT ON COLUMN smn_atd.smn_id IS '세미나ID(smn_mst)';
 COMMENT ON COLUMN smn_atd.usr_id IS '출석 사용자ID(sys_user)';
@@ -427,13 +428,18 @@ CREATE TRIGGER trg_smn_qna_rcm_cnt
 -- ------------------------------------------------------------
 -- 13. fn_use_smn_vc — 음성 조각 1건 사용 판정 + 사용량 기록(R-P5 : 대상 행 FOR UPDATE 아래 권한·동의·분당 요청·누적 상한을 한 번에, 왕복 1회 R-P1·P2)
 --     대상 = p_smn_id(세미나) 또는 p_nt_id(대면 노트) 중 정확히 하나
---     반환 : OK · INVALID(인자) · NOT_FOUND · NOT_LIVE(세미나 LIVE 아님 / 노트 RECORDING 아님) · FORBIDDEN · NO_AGR(동의 없음) · RATE(분당 요청 초과) · QUOTA(누적 상한 초과)
---     세미나 권한 = 개최자 · ADMIN(발표자 입장권은 ADMIN 만, D-1) · 활성 참가 등록자(무대 승격 패널). 대면 노트 권한 = 노트 시작자 본인(ADMIN 확인은 API)
+--     반환 : OK · INVALID(인자) · NOT_FOUND · NOT_LIVE(세미나 LIVE 아님 / 노트 RECORDING 아님) · FORBIDDEN · NO_AGR(동의 없음)
+--            · RATE(그 분 요청 p_max_req 또는 음성 초 p_max_min_sec 초과) · QUOTA(대상 누적 p_max_sec 또는 참가자 1인 누적 p_max_usr_sec 초과)
+--     세미나 권한 = 개최자 · ADMIN(발표자 입장권은 ADMIN 만, D-1) · 활성 참가 등록자(무대 승격 패널 — 승격 여부는 엔진 메모리라 DB 로 확인 불가)
+--       → 개최자·ADMIN 이 아닌 참가자는 1인 누적 상한 p_max_usr_sec(앱 기본 = 전체의 1/4)로 묶는다 : 청중 1명이 세미나 상한을 다 써 발표자 자막이 끊기지 않게
+--     대면 노트 권한 = 노트 시작자 본인(ADMIN 확인은 API)
+--     p_sec = 앱의 과금 초(max(신고 길이, 128kbps 바이트 길이)). 호출 후 실제 음성이 더 길면 fn_add_smn_vc_sec 로 차이를 더 올린다
 --     기록은 외부 AI 호출 '전' — 호출이 실패해도 사용량에 남는다(비용 상한을 보수적으로)
 --     ponytail: 고정 1분 창이라 분 경계에서 순간 최대 2배 허용, 정확한 슬라이딩 창이 필요하면 요청 시각 로그 테이블로
 -- ------------------------------------------------------------
 CREATE OR REPLACE FUNCTION fn_use_smn_vc(
-  p_smn_id UUID, p_nt_id UUID, p_usr_id UUID, p_sec INT, p_max_sec INT, p_max_req INT)
+  p_smn_id UUID, p_nt_id UUID, p_usr_id UUID, p_sec INT, p_max_sec INT, p_max_req INT,
+  p_max_min_sec INT, p_max_usr_sec INT)
 RETURNS TEXT
 LANGUAGE plpgsql
 AS $$
@@ -442,10 +448,14 @@ DECLARE
   v_nt smn_nt%ROWTYPE;
   v_min TIMESTAMPTZ := date_trunc('minute', CURRENT_TIMESTAMP);
   v_req INT;
+  v_min_sec INT;
   v_sum BIGINT;
+  v_usr_sum BIGINT;
+  v_ptc BOOLEAN := FALSE;
 BEGIN
   IF (p_smn_id IS NULL) = (p_nt_id IS NULL) OR p_usr_id IS NULL
-     OR p_sec IS NULL OR p_sec < 1 OR p_max_sec IS NULL OR p_max_req IS NULL THEN
+     OR p_sec IS NULL OR p_sec < 1 OR p_max_sec IS NULL OR p_max_req IS NULL
+     OR p_max_min_sec IS NULL OR p_max_usr_sec IS NULL THEN
     RETURN 'INVALID';
   END IF;
 
@@ -454,19 +464,22 @@ BEGIN
     IF NOT FOUND THEN RETURN 'NOT_FOUND'; END IF;
     IF v_smn.smn_sts_cd <> 'LIVE' THEN RETURN 'NOT_LIVE'; END IF;
     IF v_smn.hst_usr_id <> p_usr_id
-       AND NOT EXISTS (SELECT 1 FROM sys_user u WHERE u.usr_id = p_usr_id AND u.role_cd = 'ADMIN' AND u.del_yn = 'N')
-       AND NOT EXISTS (SELECT 1 FROM smn_ptc p WHERE p.smn_id = p_smn_id AND p.usr_id = p_usr_id AND p.del_yn = 'N') THEN
-      RETURN 'FORBIDDEN';
+       AND NOT EXISTS (SELECT 1 FROM sys_user u WHERE u.usr_id = p_usr_id AND u.role_cd = 'ADMIN' AND u.del_yn = 'N') THEN
+      IF NOT EXISTS (SELECT 1 FROM smn_ptc p WHERE p.smn_id = p_smn_id AND p.usr_id = p_usr_id AND p.del_yn = 'N') THEN
+        RETURN 'FORBIDDEN';
+      END IF;
+      v_ptc := TRUE;  -- 참가자 = 1인 누적 상한 대상
     END IF;
     IF NOT EXISTS (SELECT 1 FROM smn_agr a
                     WHERE a.smn_id = p_smn_id AND a.usr_id = p_usr_id AND a.agr_tp_cd = 'SPEECH_XFER' AND a.del_yn = 'N') THEN
       RETURN 'NO_AGR';
     END IF;
-    SELECT u.req_cnt INTO v_req FROM smn_vc_use u
+    SELECT u.req_cnt, u.vc_sec_cnt INTO v_req, v_min_sec FROM smn_vc_use u
      WHERE u.smn_id = p_smn_id AND u.usr_id = p_usr_id AND u.use_dtm = v_min;
-    IF COALESCE(v_req, 0) >= p_max_req THEN RETURN 'RATE'; END IF;
-    SELECT COALESCE(sum(u.vc_sec_cnt), 0) INTO v_sum FROM smn_vc_use u WHERE u.smn_id = p_smn_id;
-    IF v_sum + p_sec > p_max_sec THEN RETURN 'QUOTA'; END IF;
+    IF COALESCE(v_req, 0) >= p_max_req OR COALESCE(v_min_sec, 0) + p_sec > p_max_min_sec THEN RETURN 'RATE'; END IF;
+    SELECT COALESCE(sum(u.vc_sec_cnt), 0), COALESCE(sum(u.vc_sec_cnt) FILTER (WHERE u.usr_id = p_usr_id), 0)
+      INTO v_sum, v_usr_sum FROM smn_vc_use u WHERE u.smn_id = p_smn_id;
+    IF v_sum + p_sec > p_max_sec OR (v_ptc AND v_usr_sum + p_sec > p_max_usr_sec) THEN RETURN 'QUOTA'; END IF;
     INSERT INTO smn_vc_use AS u (smn_id, usr_id, use_dtm, req_cnt, vc_sec_cnt, regr_id, modr_id)
     VALUES (p_smn_id, p_usr_id, v_min, 1, p_sec, p_usr_id::TEXT, p_usr_id::TEXT)
     ON CONFLICT (smn_id, usr_id, use_dtm) WHERE smn_id IS NOT NULL
@@ -482,9 +495,9 @@ BEGIN
                   WHERE a.nt_id = p_nt_id AND a.usr_id = p_usr_id AND a.agr_tp_cd = 'NOTE_NOTICE' AND a.del_yn = 'N') THEN
     RETURN 'NO_AGR';
   END IF;
-  SELECT u.req_cnt INTO v_req FROM smn_vc_use u
+  SELECT u.req_cnt, u.vc_sec_cnt INTO v_req, v_min_sec FROM smn_vc_use u
    WHERE u.nt_id = p_nt_id AND u.usr_id = p_usr_id AND u.use_dtm = v_min;
-  IF COALESCE(v_req, 0) >= p_max_req THEN RETURN 'RATE'; END IF;
+  IF COALESCE(v_req, 0) >= p_max_req OR COALESCE(v_min_sec, 0) + p_sec > p_max_min_sec THEN RETURN 'RATE'; END IF;
   SELECT COALESCE(sum(u.vc_sec_cnt), 0) INTO v_sum FROM smn_vc_use u WHERE u.nt_id = p_nt_id;
   IF v_sum + p_sec > p_max_sec THEN RETURN 'QUOTA'; END IF;
   INSERT INTO smn_vc_use AS u (nt_id, usr_id, use_dtm, req_cnt, vc_sec_cnt, regr_id, modr_id)
@@ -494,12 +507,40 @@ BEGIN
   RETURN 'OK';
 END;
 $$;
-COMMENT ON FUNCTION fn_use_smn_vc(UUID, UUID, UUID, INT, INT, INT) IS '음성 조각 사용 판정+기록 — 대상 행 잠금 후 권한·동의·분당 요청·누적 상한. OK·INVALID·NOT_FOUND·NOT_LIVE·FORBIDDEN·NO_AGR·RATE·QUOTA';
+COMMENT ON FUNCTION fn_use_smn_vc(UUID, UUID, UUID, INT, INT, INT, INT, INT) IS '음성 조각 사용 판정+기록 — 대상 행 잠금 후 권한·동의·분당 요청·분당 초·참가자 1인 누적·대상 누적 상한. OK·INVALID·NOT_FOUND·NOT_LIVE·FORBIDDEN·NO_AGR·RATE·QUOTA';
+
+-- fn_add_smn_vc_sec — 호출 후 정산 : 외부 AI 가 센 실제 음성 길이가 과금 초보다 길 때 그 차이(초)를 현재 분 행에 더한다(요청건수는 그대로).
+--   판정 없음(이미 쓴 비용의 기록) — 다음 조각부터 fn_use_smn_vc 의 RATE·QUOTA 에 반영. /api/speech/chunk 만 부른다
+CREATE OR REPLACE FUNCTION fn_add_smn_vc_sec(p_smn_id UUID, p_nt_id UUID, p_usr_id UUID, p_sec INT)
+RETURNS VOID
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_min TIMESTAMPTZ := date_trunc('minute', CURRENT_TIMESTAMP);
+BEGIN
+  IF (p_smn_id IS NULL) = (p_nt_id IS NULL) OR p_usr_id IS NULL OR p_sec IS NULL OR p_sec < 1 THEN
+    RETURN;
+  END IF;
+  IF p_smn_id IS NOT NULL THEN
+    INSERT INTO smn_vc_use AS u (smn_id, usr_id, use_dtm, req_cnt, vc_sec_cnt, regr_id, modr_id)
+    VALUES (p_smn_id, p_usr_id, v_min, 0, p_sec, p_usr_id::TEXT, p_usr_id::TEXT)
+    ON CONFLICT (smn_id, usr_id, use_dtm) WHERE smn_id IS NOT NULL
+    DO UPDATE SET vc_sec_cnt = u.vc_sec_cnt + EXCLUDED.vc_sec_cnt, modr_id = EXCLUDED.modr_id;
+  ELSE
+    INSERT INTO smn_vc_use AS u (nt_id, usr_id, use_dtm, req_cnt, vc_sec_cnt, regr_id, modr_id)
+    VALUES (p_nt_id, p_usr_id, v_min, 0, p_sec, p_usr_id::TEXT, p_usr_id::TEXT)
+    ON CONFLICT (nt_id, usr_id, use_dtm) WHERE nt_id IS NOT NULL
+    DO UPDATE SET vc_sec_cnt = u.vc_sec_cnt + EXCLUDED.vc_sec_cnt, modr_id = EXCLUDED.modr_id;
+  END IF;
+END;
+$$;
+COMMENT ON FUNCTION fn_add_smn_vc_sec(UUID, UUID, UUID, INT) IS '음성 사용량 정산 — 실제 음성 길이가 과금 초보다 길 때 차이를 현재 분 행에 가산(판정 없음)';
 
 -- 함수 search_path = 생성 스키마 고정(004 와 같은 방식 — dev·stg·prod 가 같은 프로젝트의 다른 스키마)
 DO $$
 BEGIN
-  EXECUTE format('ALTER FUNCTION fn_use_smn_vc(UUID, UUID, UUID, INT, INT, INT) SET search_path = %I, pg_temp', current_schema());
+  EXECUTE format('ALTER FUNCTION fn_use_smn_vc(UUID, UUID, UUID, INT, INT, INT, INT, INT) SET search_path = %I, pg_temp', current_schema());
+  EXECUTE format('ALTER FUNCTION fn_add_smn_vc_sec(UUID, UUID, UUID, INT) SET search_path = %I, pg_temp', current_schema());
   EXECUTE format('ALTER FUNCTION fn_sync_smn_qna_rcm_cnt() SET search_path = %I, pg_temp', current_schema());
 END;
 $$;
@@ -517,7 +558,8 @@ SELECT fn_grant_svc_only('TABLE', 'smn_qna_rcm');
 SELECT fn_grant_svc_only('TABLE', 'smn_atd');
 SELECT fn_grant_svc_only('TABLE', 'smn_vc_use');
 SELECT fn_grant_svc_only('TABLE', 'smn_agr');
-SELECT fn_grant_svc_only('FUNCTION', 'fn_use_smn_vc(UUID, UUID, UUID, INT, INT, INT)');
+SELECT fn_grant_svc_only('FUNCTION', 'fn_use_smn_vc(UUID, UUID, UUID, INT, INT, INT, INT, INT)');
+SELECT fn_grant_svc_only('FUNCTION', 'fn_add_smn_vc_sec(UUID, UUID, UUID, INT)');
 SELECT fn_grant_svc_only('FUNCTION', 'fn_sync_smn_qna_rcm_cnt()');
 
 COMMIT;
@@ -525,10 +567,12 @@ COMMIT;
 -- ------------------------------------------------------------
 -- 검증 (적용 후 수동 실행)
 -- ------------------------------------------------------------
--- SELECT fn_use_smn_vc(NULL, NULL, '<usr_id>', 5, 7200, 20);                 → INVALID(대상 없음)
--- SELECT fn_use_smn_vc(gen_random_uuid(), NULL, '<usr_id>', 5, 7200, 20);    → NOT_FOUND
+-- SELECT fn_use_smn_vc(NULL, NULL, '<usr_id>', 5, 7200, 20, 70, 1800);              → INVALID(대상 없음)
+-- SELECT fn_use_smn_vc(gen_random_uuid(), NULL, '<usr_id>', 5, 7200, 20, 70, 1800); → NOT_FOUND
 -- LIVE 세미나 + 동의 없음                                                     → NO_AGR
--- 동의 후 같은 분 21회째                                                      → RATE
+-- 동의 후 같은 분 21회째 또는 같은 분 누적 70초 초과                               → RATE
+-- 참가자(개최자·ADMIN 아님) 1인 누적 1800초 초과 → QUOTA(개최자는 대상 누적 7200초까지)
+-- SELECT fn_add_smn_vc_sec(<LIVE smn_id>, NULL, '<usr_id>', 30); → 같은 분 행 vc_sec_cnt +30, req_cnt 그대로
 -- INSERT INTO smn_pll_vt 같은 (pll_id, usr_id) 활성 2건                       → 23505(x_smn_pll_vt_01)
 -- INSERT INTO smn_qna_rcm 1건 → SELECT rcm_cnt FROM smn_qna                   → 1, 그 행 del_yn='Y' → 0
 -- SELECT proconfig FROM pg_proc WHERE proname = 'fn_use_smn_vc';              → {search_path=<스키마>, pg_temp}

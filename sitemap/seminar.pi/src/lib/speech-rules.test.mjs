@@ -4,13 +4,16 @@ import assert from 'node:assert/strict'
 import {
   aiMime,
   baseMime,
+  billSec,
   chunkError,
   chunkSec,
+  extraSec,
   LANG_RE,
   MAX_CHUNK_BYTES,
   paceStyle,
   sniffBox,
   speechMaxSec,
+  usrMaxSec,
   vcUseError,
 } from './speech-rules.ts'
 
@@ -40,7 +43,7 @@ test('컨테이너 머리 판별', () => {
   assert.equal(sniffBox(WEBM), 'webm')
   assert.equal(sniffBox(OGG), 'ogg')
   assert.equal(sniffBox(MP4), 'mp4')
-  assert.equal(sniffBox(WAV), 'wav')
+  assert.equal(sniffBox(WAV), null) // wav 는 받지 않는다(5초 16kHz ≈ 160KB = 크기 상한)
   assert.equal(sniffBox(CLUSTER), null)
   assert.equal(sniffBox(new Uint8Array(2)), null)
 })
@@ -50,6 +53,11 @@ test('조각 검사', () => {
   assert.equal(chunkError(ok), null)
   assert.equal(chunkError({ ...ok, type: 'audio/mp4', bytes: MP4 }), null)
   assert.equal(chunkError({ ...ok, type: 'video/mp4' }), 'mime')
+  assert.equal(chunkError({ ...ok, type: 'audio/wav', bytes: WAV }), 'mime')
+  assert.equal(MAX_CHUNK_BYTES, 160_000) // 10초 × 128kbps
+  const full = new Uint8Array(MAX_CHUNK_BYTES)
+  full.set(WEBM.subarray(0, 4))
+  assert.equal(chunkError({ ...ok, bytes: full }), null)
   assert.equal(chunkError({ ...ok, bytes: new Uint8Array(0) }), 'size')
   assert.equal(
     chunkError({ ...ok, bytes: new Uint8Array(MAX_CHUNK_BYTES + 1) }),
@@ -71,6 +79,24 @@ test('사용 초·상한', () => {
   assert.equal(speechMaxSec(30), 1800)
   assert.equal(speechMaxSec(0), 7200)
   assert.equal(speechMaxSec(1.5), 7200)
+  assert.equal(usrMaxSec(7200), 1800) // 참가자 1인 = 전체의 1/4
+})
+
+test('과금 초 — 신고 길이 vs 바이트(128kbps) 중 큰 쪽', () => {
+  assert.equal(billSec(5000, 30_000), 5) // 정상 opus 5초 = 신고 길이
+  assert.equal(billSec(500, MAX_CHUNK_BYTES), 10) // 160KB 를 0.5초로 신고 = 10초 과금
+  assert.equal(billSec(500, 512 * 1024), 33) // (구 상한 512KB 라면 33초)
+  assert.equal(billSec(5000, 16_001), 5)
+  assert.equal(billSec(1000, 16_001), 2)
+})
+
+test('호출 후 정산 — 실제 음성 토큰(초당 32)이 과금 초보다 많으면 차이', () => {
+  assert.equal(extraSec(5, 160), 0) // 5초 = 160 토큰
+  assert.equal(extraSec(5, 161), 1)
+  assert.equal(extraSec(10, 32 * 213), 203) // 저비트레이트 160KB 에 213초 담은 경우
+  assert.equal(extraSec(5, null), 0)
+  assert.equal(extraSec(5, NaN), 0)
+  assert.equal(extraSec(5, -1), 0)
 })
 
 test('사용 판정 결과 매핑', () => {

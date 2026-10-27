@@ -1,14 +1,21 @@
-// 음성 처리 순수 규칙 — 5초 음성 조각 검사(형식·크기·길이·독립 파일 머리), 사용 판정 결과 → apiError, 상한 계산, 합성 음성 속도 문구.
+// 음성 처리 순수 규칙 — 5초 음성 조각 검사(형식·크기·길이·독립 파일 머리), 과금 초·정산, 사용 판정 결과 → apiError, 상한 계산, 합성 음성 속도 문구.
 // 서버·클라이언트 공용(server-only 없음 — 화면도 같은 상수로 조각을 만든다). 시험 : node --test src/lib/speech-rules.test.mjs
 
 // 조각 길이(계획 A-1 = 5초). 화면 녹음 오차를 감안해 0.5~10초 허용
 export const CHUNK_MS = 5_000
 export const CHUNK_MIN_MS = 500
 export const CHUNK_MAX_MS = 10_000
-// 조각 최대 크기 — 5초 opus ≈ 20~40KB, aac ≈ 40~80KB, 16kHz wav ≈ 160KB. 넉넉히 512KB(외부 AI 요청 한도 20MB 의 1/40)
-export const MAX_CHUNK_BYTES = 512 * 1024
+// 과금 하한 비트레이트(바이트/초) = 128kbps — 화면 녹음(opus 32kbps·aac 64~128kbps)보다 넉넉한 상한.
+//  보낸 바이트가 이 비트레이트로 신고 길이보다 길면 바이트 기준으로 과금(durMs 축소 신고 차단, billSec)
+export const BILL_BYTES_PER_SEC = 16_000
+// 조각 최대 크기 = 최대 길이 10초 × 128kbps = 160KB(5초 opus ≈ 20~40KB, aac ≈ 40~80KB). wav(16kHz mono 5초 ≈ 160KB)는 받지 않는다
+export const MAX_CHUNK_BYTES = (CHUNK_MAX_MS / 1000) * BILL_BYTES_PER_SEC
 // 사용자당 분당 음성 조각 요청(계획 A-5) — 5초 조각이면 정상 12회
 export const MAX_REQ_PER_MIN = 20
+// 사용자당 분당 음성 초 상한(fn_use_smn_vc RATE) — 실시간 60초 + 분 경계 오차 10초. 요청 수 상한만으론 20회×10초 = 실시간 3.3배까지 허용됨
+export const MAX_SEC_PER_MIN = 70
+// 외부 AI 음성 입력 토큰 = 초당 32(공식 문서 docs/audio 'each second of audio is represented as 32 tokens') — 호출 후 실제 길이로 정산
+export const AUDIO_TOKENS_PER_SEC = 32
 // 세미나(또는 대면 노트) 1건 음성 처리 상한 기본값(분) — env SPEECH_MAX_MIN 이 덮어쓴다
 export const SPEECH_MAX_MIN_DEFAULT = 120
 // 번역·합성 음성 입력 글자 상한(SA8·SA9 공용)
@@ -22,9 +29,8 @@ const MIME: Record<string, { ai: string; box: Box }> = {
   'audio/webm': { ai: 'audio/webm', box: 'webm' },
   'audio/ogg': { ai: 'audio/ogg', box: 'ogg' },
   'audio/mp4': { ai: 'audio/m4a', box: 'mp4' },
-  'audio/wav': { ai: 'audio/wav', box: 'wav' },
 }
-type Box = 'webm' | 'ogg' | 'mp4' | 'wav'
+type Box = 'webm' | 'ogg' | 'mp4'
 
 // 'audio/webm;codecs=opus' → 'audio/webm'. 모르는 형식 = null
 export function baseMime(type: string | null | undefined) {
@@ -51,7 +57,6 @@ export function sniffBox(b: Uint8Array): Box | null {
     return 'webm'
   if (asc(b, 0, 'OggS')) return 'ogg'
   if (asc(b, 4, 'ftyp')) return 'mp4'
-  if (asc(b, 0, 'RIFF') && asc(b, 8, 'WAVE')) return 'wav'
   return null
 }
 
@@ -76,6 +81,16 @@ export function chunkError(c: {
 
 // 사용량에 올릴 초(올림) — 0.5초 조각도 1초
 export const chunkSec = (durMs: number) => Math.ceil(durMs / 1000)
+// 호출 전 과금 초 = max(신고 길이, 128kbps 로 본 최소 길이) — 512KB 를 0.5초로 신고하는 식의 축소 신고 차단
+export const billSec = (durMs: number, bytes: number) =>
+  Math.max(chunkSec(durMs), Math.ceil(bytes / BILL_BYTES_PER_SEC))
+// 호출 후 정산 — 외부 AI 가 센 음성 토큰으로 본 실제 길이가 과금 초보다 길면 그 차이(초), 아니면 0
+//  (128kbps 하한보다 낮은 비트레이트로 긴 오디오를 담은 경우 — 이 차이를 사용량에 더 올린다)
+export function extraSec(billed: number, audioTokens: number | null) {
+  if (!audioTokens || !Number.isFinite(audioTokens) || audioTokens <= 0)
+    return 0
+  return Math.max(0, Math.ceil(audioTokens / AUDIO_TOKENS_PER_SEC) - billed)
+}
 
 // 상한(초) — env 값이 없거나 이상하면 기본 120분
 export function speechMaxSec(envMin: number | undefined) {
@@ -85,6 +100,8 @@ export function speechMaxSec(envMin: number | undefined) {
       : SPEECH_MAX_MIN_DEFAULT
   return m * 60
 }
+// 개최자·ADMIN 이 아닌 사용자(무대 승격 참가자) 1인 누적 상한 = 전체 상한의 1/4 — 청중 1명이 세미나 상한을 다 쓰지 못하게
+export const usrMaxSec = (maxSec: number) => Math.floor(maxSec / 4)
 
 // BCP-47 언어 코드(힌트·번역 대상) — 'ko'·'en'·'pt-BR'·'zh-Hant'
 export const LANG_RE = /^[a-z]{2,3}(-[A-Za-z0-9]{2,8}){0,2}$/

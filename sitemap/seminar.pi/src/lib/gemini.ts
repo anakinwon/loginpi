@@ -33,12 +33,17 @@ export const geminiEnabled = () => !!process.env.GEMINI_API_KEY
 
 type Part = { type: string; text?: string; data?: string; mime_type?: string }
 type Step = { type?: string; content?: Part[] }
+// 응답 usage.input_tokens_by_modality[{modality:'audio', tokens}] — 공식 SDK @google/genai 2.31.0 genai.d.ts(Usage·ModalityTokens) 확인
+type Usage = {
+  input_tokens_by_modality?: { modality?: string; tokens?: number }[]
+}
+type Out = { parts: Part[]; audioTokens: number | null }
 
-// 공용 호출 — 성공 시 model_output 의 content 조각들, 실패 시 null
+// 공용 호출 — 성공 시 model_output 의 content 조각들 + 입력 음성 토큰(사용량 정산용, 없으면 null), 실패 시 null
 async function interact(
   body: Record<string, unknown>,
   timeoutMs = TIMEOUT_MS,
-): Promise<Part[] | null> {
+): Promise<Out | null> {
   const key = process.env.GEMINI_API_KEY
   if (!key) return null
   try {
@@ -56,48 +61,57 @@ async function interact(
       )
       return null
     }
-    const j = (await res.json()) as { status?: string; steps?: Step[] }
+    const j = (await res.json()) as {
+      status?: string
+      steps?: Step[]
+      usage?: Usage
+    }
     if (j.status && j.status !== 'completed') return null
-    return (j.steps ?? [])
-      .filter((s) => s.type === 'model_output')
-      .flatMap((s) => s.content ?? [])
+    const audio = j.usage?.input_tokens_by_modality?.find(
+      (m) => m.modality?.toLowerCase() === 'audio',
+    )?.tokens
+    return {
+      parts: (j.steps ?? [])
+        .filter((s) => s.type === 'model_output')
+        .flatMap((s) => s.content ?? []),
+      audioTokens: typeof audio === 'number' ? audio : null,
+    }
   } catch (e) {
     console.error('[gemini]', e instanceof Error ? e.name : e)
     return null
   }
 }
 
-const textOf = (parts: Part[] | null) =>
-  parts
-    ? parts
+const textOf = (out: Out | null) =>
+  out
+    ? out.parts
         .filter((p) => p.type === 'text')
         .map((p) => p.text ?? '')
         .join('')
         .trim()
     : null
 
-// JSON 출력 — response_format 스키마로 강제하고, 그래도 깨지면 null
+// JSON 출력 — response_format 스키마로 강제하고, 그래도 깨지면 null. audioTokens = 입력 음성 토큰(정산용)
 async function interactJson<T>(
   body: Record<string, unknown>,
   schema: object,
   timeoutMs?: number,
-): Promise<T | null> {
-  const t = textOf(
-    await interact(
-      {
-        ...body,
-        response_format: {
-          type: 'text',
-          mime_type: 'application/json',
-          schema,
-        },
+): Promise<{ v: T; audioTokens: number | null } | null> {
+  const out = await interact(
+    {
+      ...body,
+      response_format: {
+        type: 'text',
+        mime_type: 'application/json',
+        schema,
       },
-      timeoutMs,
-    ),
+    },
+    timeoutMs,
   )
-  if (!t) return null
+  const t = textOf(out)
+  if (!out || !t) return null
   try {
-    return JSON.parse(t) as T
+    return { v: JSON.parse(t) as T, audioTokens: out.audioTokens }
   } catch {
     return null
   }
@@ -113,16 +127,21 @@ function langName(code: string) {
 }
 
 // 음성 조각(base64) → 글. 말이 없으면 text ''. langHint = 발표자가 고른 언어(없으면 자동 감지)
+// audioTokens = 외부 AI 가 센 입력 음성 토큰 — 호출부가 실제 길이로 사용량을 정산(speech-rules extraSec)
 export async function transcribe(
   audioB64: string,
   mime: string,
   langHint?: string | null,
-): Promise<{ text: string; lang: string | null } | null> {
+): Promise<{
+  text: string
+  lang: string | null
+  audioTokens: number | null
+} | null> {
   const hint =
     langHint && LANG_RE.test(langHint)
       ? ` The speaker most likely uses ${langName(langHint)}.`
       : ''
-  const r = await interactJson<{ text?: unknown; lang?: unknown }>(
+  const out = await interactJson<{ text?: unknown; lang?: unknown }>(
     {
       model: GEMINI_MODEL.text,
       input: [
@@ -142,10 +161,11 @@ export async function transcribe(
       required: ['text'],
     },
   )
-  if (!r || typeof r.text !== 'string') return null
+  const r = out?.v
+  if (!out || !r || typeof r.text !== 'string') return null
   const lang =
     typeof r.lang === 'string' && LANG_RE.test(r.lang) ? r.lang : null
-  return { text: r.text.trim(), lang }
+  return { text: r.text.trim(), lang, audioTokens: out.audioTokens }
 }
 
 // 문장 번역 → 대상 언어 문장. 캐시는 호출부(A-3, SA8 — 문장 해시×언어)
@@ -190,7 +210,7 @@ export async function summarize(
     .map((s) => `[${s.at}] ${s.spk}: ${s.text}`)
   if (!lines.length) return null
   const list = { type: 'array', items: { type: 'string' } }
-  const r = await interactJson<Partial<NoteSummary>>(
+  const out = await interactJson<Partial<NoteSummary>>(
     {
       model: GEMINI_MODEL.text,
       input: [
@@ -214,6 +234,7 @@ export async function summarize(
     },
     SUMMARY_TIMEOUT_MS,
   )
+  const r = out?.v
   if (!r) return null
   const arr = (v: unknown) =>
     Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []
@@ -234,7 +255,7 @@ export async function tts(
   if (!text.trim() || text.length > MAX_TEXT_CHARS || !LANG_RE.test(lang))
     return null
   const pace = paceStyle(rate)
-  const parts = await interact({
+  const out = await interact({
     model: GEMINI_MODEL.tts,
     input: [
       {
@@ -250,6 +271,6 @@ export async function tts(
       speech_config: [{ voice: TTS_VOICE, language: lang }],
     },
   })
-  const a = parts?.find((p) => p.type === 'audio' && p.data)
+  const a = out?.parts.find((p) => p.type === 'audio' && p.data)
   return a?.data ? { data: a.data, mime: a.mime_type || 'audio/wav' } : null
 }
