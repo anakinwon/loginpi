@@ -5,6 +5,7 @@
 import { useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { calendarUrl, canCopy, canShare, copyText, mailtoUrl, shareLink, webMailUrl } from '@/lib/calendar-rules'
+import { hereBase, piBase, webBase } from '@/lib/site-url'
 import { useStartText, type SeminarCard } from './shared'
 
 // min-h — 글자 확대(WCAG 1.4.4)·좁은 폭(360px)에서 두세 줄로 접혀도 칸이 늘어난다(고정 h-10 이면 글자가 칸 밖으로 넘침)
@@ -16,17 +17,19 @@ export function ShareLinks({ d }: { d: SeminarCard }) {
   const start = useStartText()
   const locale = useLocale()
   const [copied, setCopied] = useState<'ok' | 'fail' | 'shareFail' | null>(null)
-  const base = (process.env.NEXT_PUBLIC_APP_URL || window.location.origin).replace(/\/$/, '')
-  const url = `${base}/s/${d.id}`
+  // 데스크톱 주소·Pi Browser 주소를 둘 다 알린다(메일·캘린더). 복사·공유는 지금 보는 곳 기준 1개
+  const url = `${webBase()}/s/${d.id}`
+  const piUrl = `${piBase()}/s/${d.id}`
+  const here = `${hereBase(window.location.hostname)}/s/${d.id}`
   const subject = t('mailSubject', { title: d.title })
-  const body = t('mailBody', { title: d.title, start: start(d.startAt, true), url })
+  const body = t('mailBody', { title: d.title, start: start(d.startAt, true), url, piUrl })
   const ext = { target: '_blank', rel: 'noopener' }
 
   return (
     <section className="space-y-2">
       <h2 className="text-muted-foreground text-sm">{t('title')}</h2>
       <div className="grid grid-cols-3 gap-2">
-        <a className={CELL} href={calendarUrl({ id: d.id, title: d.title, startAt: d.startAt, url })} {...ext}>
+        <a className={CELL} href={calendarUrl({ id: d.id, title: d.title, startAt: d.startAt, url, piUrl })} {...ext}>
           {t('calendar')}
         </a>
         <a className={CELL} href={`/api/seminars/${d.id}/ics?hl=${locale.split('-')[0]}`} download>
@@ -46,7 +49,7 @@ export function ShareLinks({ d }: { d: SeminarCard }) {
           <button
             type="button"
             className="text-muted-foreground hover:underline"
-            onClick={() => void copyText(url).then((ok) => setCopied(ok ? 'ok' : 'fail'))}
+            onClick={() => void copyText(here).then((ok) => setCopied(ok ? 'ok' : 'fail'))}
           >
             {t('copy')}
           </button>
@@ -57,7 +60,7 @@ export function ShareLinks({ d }: { d: SeminarCard }) {
             type="button"
             className="text-muted-foreground hover:underline"
             onClick={() =>
-              void shareLink({ title: d.title, text: subject, url }).then((r) =>
+              void shareLink({ title: d.title, text: subject, url: here }).then((r) =>
                 setCopied(r === 'fail' ? 'shareFail' : null),
               )
             }

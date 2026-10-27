@@ -13,6 +13,7 @@ export interface CalEvent {
   startAt: string // ISO
   url: string // 상세 딥링크(원클릭 참여)
   notesUrl?: string | null // 회의록이 있으면 링크
+  piUrl?: string // Pi Browser 로 여는 주소(포워딩 도메인) — 본문에 함께 적는다
   canceled?: boolean
   modAt?: string | null // 마지막 변경(smn_mst.mod_dtm) — .ics SEQUENCE·LAST-MODIFIED
   notesLabel?: string // 설명의 회의록 라벨(언어별)
@@ -47,7 +48,7 @@ const range = (e: CalEvent) => {
 
 // 설명 본문 — 링크 + (있으면) 회의록 링크. 줄바꿈은 각 형식이 알아서 처리
 export const describe = (e: CalEvent, notesLabel = 'Notes') =>
-  [e.url, e.notesUrl ? `${notesLabel}: ${e.notesUrl}` : null]
+  [e.url, e.piUrl ? `Pi Browser: ${e.piUrl}` : null, e.notesUrl ? `${notesLabel}: ${e.notesUrl}` : null]
     .filter(Boolean)
     .join('\n')
 
