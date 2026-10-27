@@ -1,7 +1,7 @@
 // 녹화 순수 판정 시험 — node --test src/components/room/features/recording/rules.test.mjs (Node 24 타입 제거)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { applyRec, fitRect, othersRecording, pickMime, readRecording, recFileName, saveVia } from './rules.ts'
+import { applyRec, fitRect, othersRecording, pickMime, pruneRec, readRecording, recFileName, saveVia } from './rules.ts'
 
 test('pickMime — 앞 후보 우선, iOS(mp4 만)·미지원', () => {
   assert.equal(pickMime(() => true), 'video/webm;codecs=vp9,opus')
@@ -58,4 +58,19 @@ test('saveVia — 파일 공유 되면 share, 없거나 거절·예외면 downlo
     'download',
   )
   assert.equal(saveVia(undefined, f), 'download')
+})
+
+test('pruneRec — 강등·퇴장한 사람의 녹화 표시는 지운다(다시 발표자가 돼도 배지가 되살아나지 않게)', () => {
+  // Q 강등 — 강등 뒤 끄기 알림은 엔진이 거절해 표에 남았고, 다시 승격되면 녹화도 안 하는데 배지가 켜졌다(r5 T06)
+  const peers = [
+    { peerId: 'P', role: 'presenter' },
+    { peerId: 'Q', role: 'panel' },
+  ]
+  assert.deepEqual(pruneRec({ P: true, Q: true }, peers), { P: true })
+  assert.equal(othersRecording(pruneRec({ Q: true }, peers) ?? {}, [{ peerId: 'Q', role: 'presenter' }]), false)
+  // 퇴장(목록에 없음)도 지운다
+  assert.deepEqual(pruneRec({ P: true, X: true }, peers), { P: true })
+  // 바뀐 것이 없으면 null(다시 그리지 않게)
+  assert.equal(pruneRec({ P: true }, peers), null)
+  assert.equal(pruneRec({}, peers), null)
 })

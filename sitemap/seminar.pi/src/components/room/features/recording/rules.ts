@@ -57,6 +57,14 @@ export function othersRecording(by: RecBy, peers: readonly { peerId: string; rol
   return peers.some((p) => p.role === 'presenter' && by[p.peerId])
 }
 
+// 참가자 구성·역할이 바뀔 때 표 정리 — 지금 방의 발표자가 아닌 사람(강등·퇴장)은 지운다. 바뀐 것이 없으면 null.
+// 강등 뒤 끄기 알림은 엔진이 거절하므로 지우지 않으면, 같은 사람이 다시 발표자가 됐을 때 녹화도 안 하는데 배지가 켜진다
+export function pruneRec(by: RecBy, peers: readonly { peerId: string; role: string }[]): RecBy | null {
+  const keep = Object.keys(by).filter((id) => peers.some((p) => p.peerId === id && p.role === 'presenter'))
+  if (keep.length === Object.keys(by).length) return null
+  return Object.fromEntries(keep.map((id) => [id, true] as const))
+}
+
 // 다시 저장 방법 — 파일 공유(앱 안 브라우저·모바일에서 '파일에 저장' 가능)가 되면 share, 아니면 <a download>. 기능 탐지만(UA 판정 금지)
 type ShareNav = { canShare?: (data: { files: File[] }) => boolean; share?: unknown }
 export function saveVia(nav: ShareNav | undefined, file: File): 'share' | 'download' {

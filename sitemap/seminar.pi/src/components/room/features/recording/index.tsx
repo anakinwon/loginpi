@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl'
 import { BADGE_SLOT_ID, TOAST_SLOT_ID, featureStore, useStageSlot, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 import { APP_RETRY, latestOnly, sendRetry } from '../../app-retry'
 import type { Recorder } from './recorder'
-import { applyRec, othersRecording, recFileName, saveVia, type RecBy } from './rules'
+import { applyRec, othersRecording, pruneRec, recFileName, saveVia, type RecBy } from './rules'
 
 const RESEND_MS = 1000 // 늦은 입장자 재알림 묶음(초당 2건 한도 안)
 const sendState = (ctx: RoomCtx, on: boolean, live: () => boolean) =>
@@ -206,6 +206,13 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     confirmOpen.set(false)
     if (mine) void stopRec(ctx)
   }, [mine, role]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 받는 쪽 — 강등·퇴장한 사람의 녹화 표시를 지운다(다시 발표자가 됐을 때 녹화 없이 배지가 켜지지 않게, rules.ts pruneRec)
+  const roleKey = r.peers.map((p) => `${p.peerId}:${p.role}`).join(',')
+  useEffect(() => {
+    const next = pruneRec(recBy.get(), r.peers)
+    if (next) recBy.set(next)
+  }, [roleKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 늦은 입장자 — 참가자 구성이 바뀌면 1초 묶어서 현재 상태를 다시 알린다
   const peerKey = [...ids].sort().join(',')
