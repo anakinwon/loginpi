@@ -1,11 +1,19 @@
 'use client'
 // 룸 무대(S4) — 레이아웃 6.2(발표자 고정·발표+패널·화면공유), 타일은 video-tile.tsx. 영상은 항상 muted 로 재생하고 소리는 별도 <audio>(useRemoteAudio)로만 낸다
 // → 자동재생 정책으로 소리가 막혀도 영상은 나온다(설계서 14.5)
-import { useEffect, useState, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { useTranslations } from 'next-intl'
 import { remoteVolume, useStore } from './extensions'
 import { useLayerWatch } from './layer-watch'
-import { followKey, groupTracks, nextPin, ringFor, type Layer, type PinState, type RoomLayout } from './room-rules'
+import {
+  followKey,
+  groupTracks,
+  nextPin,
+  ringFor,
+  type Layer,
+  type PinState,
+  type RoomLayout,
+} from './room-rules'
 import type { Peer, RemoteTrack, RoomState, SessionRole } from './use-room'
 import { VideoTile } from './video-tile'
 
@@ -47,7 +55,10 @@ export function StreamVideo({
 
 // 원격 소리 재생 — 거부되면 1초 간격 3회 재시도 후 blocked(하단 바 "소리 켜기" 노출). Jitsi AudioTrack 재시도 방식(설계서 14.5)
 // stream 이 null(오류·끊김·나가기·발행자 퇴장)이면 srcObject 를 비우고 멈춘다 — 이전 소리가 계속 나지 않게
-export function useRemoteAudio(ref: RefObject<HTMLAudioElement | null>, stream: MediaStream | null) {
+export function useRemoteAudio(
+  ref: RefObject<HTMLAudioElement | null>,
+  stream: MediaStream | null,
+) {
   const [blocked, setBlocked] = useState(false)
   // 더빙 덕킹(extensions remoteVolume) — iOS WebKit 은 volume 이 읽기 전용이라 원음이 그대로 [확인중 : 실기기]
   const volume = useStore(remoteVolume)
@@ -70,7 +81,8 @@ export function useRemoteAudio(ref: RefObject<HTMLAudioElement | null>, stream: 
       el.play().then(
         () => setBlocked(false),
         () => {
-          if (++tries < PLAY_RETRY_MAX) timer = setTimeout(attempt, PLAY_RETRY_MS)
+          if (++tries < PLAY_RETRY_MAX)
+            timer = setTimeout(attempt, PLAY_RETRY_MS)
           else setBlocked(true)
         },
       )
@@ -87,7 +99,12 @@ export function useRemoteAudio(ref: RefObject<HTMLAudioElement | null>, stream: 
 
 // 진행 표시 — reduced-motion 이면 globals.css 가 회전을 멈춘다
 export function Spinner() {
-  return <span aria-hidden className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+  return (
+    <span
+      aria-hidden
+      className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+    />
+  )
 }
 
 type Tile = {
@@ -117,7 +134,10 @@ function buildTiles({
   localOn,
 }: StageProps & { t: ReturnType<typeof useTranslations<'room'>> }): Tile[] {
   const out: Tile[] = []
-  if (viewer === 'presenter' || (viewer === 'panel' && local?.getTracks().length)) {
+  if (
+    viewer === 'presenter' ||
+    (viewer === 'panel' && local?.getTracks().length)
+  ) {
     out.push({
       key: `cam:${selfId || 'self'}`,
       name: t('tile.self', { name: selfName }),
@@ -149,7 +169,9 @@ function buildTiles({
   for (const tr of screens) {
     out.push({
       key: `screen:${tr.producerId}`,
-      name: t('tile.screen', { name: byId.get(tr.peerId)?.name ?? t('tile.presenter') }),
+      name: t('tile.screen', {
+        name: byId.get(tr.peerId)?.name ?? t('tile.presenter'),
+      }),
       video: tr.stream,
       consumerId: tr.consumerId,
       audio: null,
@@ -213,16 +235,30 @@ export function Stage(props: StageProps) {
   const follow = followKey(props.layout, props.viewer)
   const [own, setOwn] = useState(false)
   useEffect(() => setOwn(false), [props.layout])
-  const forced = !own && follow ? tiles.find((x) => x.key === follow) : undefined
+  const forced =
+    !own && follow ? tiles.find((x) => x.key === follow) : undefined
 
   const live = props.state === 'joined' || props.state === 'reconnecting'
   const main =
-    forced ?? tiles.find((x) => x.key === pin.pin) ?? tiles.find((x) => x.presenter && !x.screen) ?? tiles[0] ?? null
-  const ring = (x: Tile | null) => ringFor(x?.peerId, props.speaker, props.engineSpeaker)
+    forced ??
+    tiles.find((x) => x.key === pin.pin) ??
+    tiles.find((x) => x.presenter && !x.screen) ??
+    tiles[0] ??
+    null
+  const ring = (x: Tile | null) =>
+    ringFor(x?.peerId, props.speaker, props.engineSpeaker)
   const rest = tiles.filter((x) => x !== main)
   const notice = !live ? t('state.connecting') : !main ? t('waiting') : null
+  const { box, full, toggle } = useFullscreen()
   return (
-    <div className="relative">
+    <div
+      ref={box}
+      className={
+        full
+          ? `flex flex-col items-center justify-center bg-black ${full === 'css' ? 'fixed inset-0 z-50' : 'relative'}`
+          : 'relative'
+      }
+    >
       {live && props.onPin && pin.pin && (
         // 발표자 전용 — 고정을 풀고 청중 화면도 자동 배치로(room.setLayout mode auto). 우상단 = 좌상단 녹화·AI 기록 배지 줄(15.6)과 겹치지 않게. v1.2 검토 지적 : 되돌릴 길이 없었음
         <button
@@ -236,29 +272,41 @@ export function Stage(props: StageProps) {
           {t('tile.unpin')}
         </button>
       )}
-      <VideoTile
-        video={main?.video ?? null}
-        audio={main?.audio ?? null}
-        name={live ? main?.name : undefined}
-        micOff={!!main?.micOff}
-        camOff={!!main?.camOff}
-        mirror={main?.mirror}
-        consumerId={main?.consumerId}
-        onLayer={props.onLayer}
-        speaking={ring(main)}
+      {/* 대표 영상 더블클릭 = 전체 화면 토글, ESC = 원래대로 */}
+      <div
+        onDoubleClick={toggle}
+        title={t('tile.fullscreen')}
+        className={
+          full ? 'relative w-full max-w-[calc(100dvh*16/9)]' : undefined
+        }
       >
-        {notice && (
-          <p className="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center text-sm">
-            {!live && <Spinner />}
-            {notice}
-          </p>
-        )}
-        {props.state === 'reconnecting' && (
-          <div className="absolute inset-0 grid place-items-center bg-black/40" aria-hidden>
-            <Spinner />
-          </div>
-        )}
-      </VideoTile>
+        <VideoTile
+          video={main?.video ?? null}
+          audio={main?.audio ?? null}
+          name={live ? main?.name : undefined}
+          micOff={!!main?.micOff}
+          camOff={!!main?.camOff}
+          mirror={main?.mirror}
+          consumerId={main?.consumerId}
+          onLayer={props.onLayer}
+          speaking={ring(main)}
+        >
+          {notice && (
+            <p className="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center text-sm">
+              {!live && <Spinner />}
+              {notice}
+            </p>
+          )}
+          {props.state === 'reconnecting' && (
+            <div
+              className="absolute inset-0 grid place-items-center bg-black/40"
+              aria-hidden
+            >
+              <Spinner />
+            </div>
+          )}
+        </VideoTile>
+      </div>
       {live && rest.length > 0 && (
         <ul
           aria-label={t('tile.row')}
@@ -294,4 +342,40 @@ export function Stage(props: StageProps) {
       )}
     </div>
   )
+}
+
+// 전체 화면 — Fullscreen API(ESC 는 브라우저가 처리) 우선, 없거나 거절되면(iOS Safari·일부 WebView) 화면 고정 오버레이 + ESC 키로 대체.
+// full = 'api' | 'css' | null. 기능 탐지만 쓴다(UA 판정 금지)
+function useFullscreen() {
+  const box = useRef<HTMLDivElement>(null)
+  const [api, setApi] = useState(false)
+  const [css, setCss] = useState(false)
+  useEffect(() => {
+    const on = () =>
+      setApi(!!box.current && document.fullscreenElement === box.current)
+    document.addEventListener('fullscreenchange', on)
+    return () => document.removeEventListener('fullscreenchange', on)
+  }, [])
+  useEffect(() => {
+    if (!css) return
+    const key = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setCss(false)
+    }
+    window.addEventListener('keydown', key)
+    return () => window.removeEventListener('keydown', key)
+  }, [css])
+  const toggle = () => {
+    if (document.fullscreenElement)
+      return void document.exitFullscreen().catch(() => {})
+    if (css) return setCss(false)
+    const el = box.current
+    if (el && document.fullscreenEnabled && el.requestFullscreen)
+      el.requestFullscreen().catch(() => setCss(true))
+    else setCss(true)
+  }
+  return {
+    box,
+    full: api ? ('api' as const) : css ? ('css' as const) : null,
+    toggle,
+  }
 }

@@ -295,6 +295,7 @@
     },
     "home": "홈으로",
     "tile": {
+      "fullscreen": "두 번 클릭하면 전체 화면 · ESC 로 원래대로",
       "self": "{name} (나)",
       "presenter": "발표자",
       "micOff": "마이크 꺼짐",

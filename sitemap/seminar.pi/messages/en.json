@@ -295,6 +295,7 @@
     },
     "home": "Go to home",
     "tile": {
+      "fullscreen": "Double-click for full screen · Esc to exit",
       "self": "{name} (you)",
       "presenter": "Presenter",
       "micOff": "Microphone off",
