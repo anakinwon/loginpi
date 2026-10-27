@@ -2,8 +2,8 @@
 // 대면 회의 노트(설계서 15.10, SA2) — 화상 연결 없이 마이크만. 제목 + 참석자 고지 체크 → [기록 시작](탭 = 마이크 권한 제스처)
 //  → POST /api/notes{title}(ADMIN) → POST /api/speech/agree{ntId}(NOTE_NOTICE) → useSpeech(field 'ntId', 5초 조각) → 최근 3문장
 //  → [종료하고 회의록 만들기] = /api/notes/[id]/end(keepalive) 후 회의록 화면(/notes/[id], 만드는 중 상태)으로 이동.
-//  비로그인 = LoginGate, ADMIN 아님 = 안내(redirect 없음). 내 회의록 목록(NoteList)은 /notes 와 이 화면 '최근 노트'가 같이 쓴다
-import { useEffect, useState } from 'react'
+//  앱 안 이동으로 떠나면 마지막 조각 뒤 자동 종료, 마이크가 끊기면 [마이크 다시 연결]. 비로그인 = LoginGate, ADMIN 아님 = 안내(redirect 없음). 내 회의록 목록(NoteList)은 /notes 와 이 화면 '최근 노트'가 같이 쓴다
+import { useEffect, useRef, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { LoginGate } from '@/components/login-gate'
@@ -26,6 +26,13 @@ function endNote(id: string) {
     method: 'POST',
     keepalive: true,
   }).catch(() => null)
+}
+
+// 마이크 — 시작·다시 연결이 같이 쓴다
+const MIC: MediaTrackConstraints = {
+  echoCancellation: true,
+  noiseSuppression: true,
+  autoGainControl: true,
 }
 
 const mmss = (sec: number) =>
@@ -71,6 +78,8 @@ function Recorder() {
 
   const [finishing, setFinishing] = useState(false)
   const [micLost, setMicLost] = useState(false)
+  const left = useRef(false) // 화면을 떠났다 — 개발 StrictMode 의 즉시 재실행과 진짜 떠남을 가른다
+  const ended = useRef(false) // 끝내기 요청을 이미 보냄(종료 버튼·창 닫힘)
 
   const { limited, flush } = useSpeech({
     track,
@@ -87,6 +96,7 @@ function Recorder() {
   // 기록 중 — 경과 시간·화면 꺼짐 막기(기능 탐지)·떠나기 경고·창 닫힘이면 keepalive 로 끝내기(RECORDING 고착 방지)
   useEffect(() => {
     if (!ntId) return
+    left.current = false
     const t0 = Date.now()
     const tick = setInterval(
       () => setSec(Math.floor((Date.now() - t0) / 1000)),
@@ -102,7 +112,10 @@ function Recorder() {
     }
     const vis = () => document.visibilityState === 'visible' && wake() // 탭 전환 후 잠금이 풀리면 다시
     const warn = (e: BeforeUnloadEvent) => e.preventDefault()
-    const bye = () => endNote(ntId)
+    const bye = () => {
+      ended.current = true
+      endNote(ntId)
+    }
     wake()
     document.addEventListener('visibilitychange', vis)
     window.addEventListener('beforeunload', warn)
@@ -113,8 +126,16 @@ function Recorder() {
       document.removeEventListener('visibilitychange', vis)
       window.removeEventListener('beforeunload', warn)
       window.removeEventListener('pagehide', bye)
+      // 앱 안 이동(헤더 링크·언어 바꾸기)은 pagehide·beforeunload 가 없다 — 마이크만 놓이고 회의록이 RECORDING 으로 남았다(T02 r2).
+      //  진짜 떠남이면 useSpeech 정리가 보낸 마지막 조각 업로드를 기다린 뒤 끝낸다. StrictMode 재실행은 1초 안에 left 가 false 로 돌아와 거른다
+      left.current = true
+      setTimeout(() => {
+        if (!left.current || ended.current) return
+        ended.current = true
+        void flush(UPLOAD_TIMEOUT_MS).then(() => endNote(ntId))
+      }, 1000)
     }
-  }, [ntId])
+  }, [ntId, flush])
 
   // 화면을 떠나면 마이크를 놓는다
   useEffect(() => () => track?.stop(), [track])
@@ -135,13 +156,7 @@ function Recorder() {
     setBusy(true)
     try {
       const stream = await navigator.mediaDevices
-        .getUserMedia({
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-          },
-        })
+        .getUserMedia({ audio: MIC })
         .catch(() => null)
       if (!stream) return setErr(t('micDenied'))
       const stopMic = () => stream.getTracks().forEach((x) => x.stop())
@@ -181,9 +196,21 @@ function Recorder() {
     //  서버가 RECORDING 아님(SPEECH_NOT_LIVE)으로 거절하거나 요약 뒤에 저장돼 마지막 말이 요약에서 빠진다(T02 r1).
     //  상한(업로드 시간 제한)을 넘으면 그래도 끝낸다
     setFinishing(true)
+    ended.current = true
     await flush(UPLOAD_TIMEOUT_MS)
     endNote(ntId)
     router.push(`/notes/${ntId}`)
+  }
+
+  // 끊긴 마이크를 다시 잡는다(탭 = 권한 제스처) — 새 트랙이면 useSpeech 가 같은 회의록에 이어서 조각을 보낸다
+  async function reconnect() {
+    const s = await navigator.mediaDevices
+      .getUserMedia({ audio: MIC })
+      .catch(() => null)
+    if (!s) return setErr(t('micDenied'))
+    setErr(null)
+    setMicLost(false)
+    setTrack(s.getAudioTracks()[0] ?? null)
   }
 
   const alert = recAlert({ err, limited, micLost })
@@ -209,6 +236,15 @@ function Recorder() {
           <p role="alert" className="text-danger text-sm">
             {alert === 'err' ? err : t(alert)}
           </p>
+        )}
+        {micLost && !finishing && (
+          <button
+            type="button"
+            className={`${BTN} w-full`}
+            onClick={() => void reconnect()}
+          >
+            {t('micRetry')}
+          </button>
         )}
         <button
           type="button"
