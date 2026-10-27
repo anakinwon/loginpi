@@ -158,6 +158,17 @@ test('대면 노트 — 앱 안 이동(헤더 링크·언어 바꾸기)으로 �
   assert.equal((s.match(/ended\.current = true/g) ?? []).length, 4)
 })
 
+test('대면 노트 — 최근 문장 영역은 화면 낭독기가 새 문장만 읽는다(aria-live, 보강 T02 r3)·gone 문구 ko·en·상표 없음', async () => {
+  const s = await inPerson()
+  assert.match(s, /aria-live="polite"\s*\n\s*aria-relevant="additions"\s*\n\s*>\s*\n\s*<h2[^\n]*recentLines/)
+  const { readFile } = await import('node:fs/promises')
+  for (const l of ['ko', 'en']) {
+    const m = JSON.parse(await readFile(new URL(`../../messages/${l}.json`, import.meta.url), 'utf8')).notes
+    assert.ok(m.gone, `${l} notes.gone 없음`)
+    assert.ok(!/Google|Gemini|Meet/.test(m.gone), `${l} 상표 문구`)
+  }
+})
+
 test('대면 노트 — 마이크가 끊기면 [마이크 다시 연결]로 같은 회의록에 이어 기록(ko·en 문구)', async () => {
   const s = await inPerson()
   assert.match(s, /micLost && !gone && !finishing &&/)

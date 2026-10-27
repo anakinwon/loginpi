@@ -222,7 +222,12 @@ function Recorder() {
             ● {t('recBadge', { time: mmss(sec) })}
           </p>
         )}
-        <div className="space-y-1">
+        {/* 화면 낭독기 사용자도 기록이 실제로 되는지 듣는다 — 새 문장만 읽게(aria-relevant additions) */}
+        <div
+          className="space-y-1"
+          aria-live="polite"
+          aria-relevant="additions"
+        >
           <h2 className="text-muted-foreground text-xs">{t('recentLines')}</h2>
           {lines.length ? (
             lines.map((l, i) => (
