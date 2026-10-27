@@ -20,7 +20,7 @@ import {
   type RoomCtx,
   type RoomFeature,
 } from '../../extensions'
-import { APP_RETRY, sendRetry } from '../../app-retry'
+import { APP_RETRY, latestOnly, sendRetry } from '../../app-retry'
 import {
   frameDiff,
   noteState,
@@ -40,6 +40,7 @@ const NOTES_ICON = 'M3 18h12v-2H3v2zM3 6v2h18V6H3zm0 7h18v-2H3v2z'
 // 전원 고지(M-4) — 한도·응답 없음이면 다시 보낸다(app-retry, 녹화와 같은 fail-open 방지)
 const sendState = (ctx: RoomCtx, v: boolean, live: () => boolean) =>
   sendRetry(() => ctx.sendApp('state', { notes: v }), live)
+const latest = latestOnly() // 켜기·끄기 고지 엇갈림 방지(녹화와 같음) — 끄기 재시도가 다시 켠 뒤에 도착하지 않게
 
 const on = featureStore(false) // 내가(발표자) 켬 — ⋯ 항목 체크
 const ntIdStore = featureStore<string | null>(null) // 내가 켠 회의록 ID
@@ -63,7 +64,7 @@ async function toggle(ctx: RoomCtx) {
       on.set(false)
       ntIdStore.set(null)
       wantSpeech('notes', null)
-      void sendState(ctx, false, () => !on.get())
+      void sendState(ctx, false, latest())
       endNote(id)
       ctx.notice('notes.stoppedMine')
       return
@@ -76,7 +77,9 @@ async function toggle(ctx: RoomCtx) {
     const j = (await r?.json().catch(() => null)) as { ntId?: string } | null
     if (!r?.ok || !j?.ntId) return ctx.notice('notes.startFail')
     // 전원 고지가 먼저 — 방송이 실패하면 기록을 시작하지 않는다(M-4)
-    if (await sendState(ctx, true, () => true)) {
+    if (await sendState(ctx, true, latest())) {
+      // TIMEOUT 은 이미 방송됐을 수 있다 — 기록 없이 배지가 남지 않게 끄기도 보낸다(영구 오류면 엔진이 거절, 무해)
+      void sendState(ctx, false, latest())
       endNote(j.ntId)
       return ctx.notice('notes.startFail')
     }

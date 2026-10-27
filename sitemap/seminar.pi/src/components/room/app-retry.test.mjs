@@ -1,7 +1,7 @@
 // app-retry.ts 시험 — 전원 고지 재시도(녹화·AI 기록 fail-open 방지). node --test src/components/room/app-retry.test.mjs
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { sendRetry } from './app-retry.ts'
+import { latestOnly, sendRetry } from './app-retry.ts'
 
 const noWait = async () => {}
 const seq = (codes) => {
@@ -44,4 +44,21 @@ test('기다리는 사이 상태가 바뀌면(녹화 종료) 옛 값을 보내�
   const r = await sendRetry(s.send, () => alive, async () => void (alive = false))
   assert.equal(r, 'CANCELLED')
   assert.equal(s.calls.length, 1)
+})
+
+test('latestOnly — 새 고지를 시작하면 앞 고지의 재시도는 멈춘다(끄기 재시도가 다시 켠 뒤에 도착하지 않게)', async () => {
+  const take = latestOnly()
+  const sent = []
+  let release
+  const gate = new Promise((r) => (release = r))
+  // 끄기 : 1회차 한도 → 대기(그 사이 다시 켬) → 2회차는 보내지 않아야 한다
+  const offLive = take()
+  const off = sendRetry(async () => (sent.push(false), sent.length === 1 ? 'RATE_LIMITED' : null), offLive, () => gate)
+  const onLive = take()
+  assert.equal(offLive(), false)
+  assert.equal(onLive(), true)
+  assert.equal(await sendRetry(async () => (sent.push(true), null), onLive, noWait), null)
+  release()
+  assert.equal(await off, 'CANCELLED')
+  assert.deepEqual(sent, [false, true]) // 마지막 도착 = 켜짐
 })

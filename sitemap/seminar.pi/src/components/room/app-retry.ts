@@ -26,3 +26,14 @@ export async function sendRetry(
     await wait(delays[i])
   }
 }
+
+// 마지막 고지만 살린다 — 켜기·끄기 고지가 재시도로 엇갈려 낡은 쪽이 나중에 도착하지 않게
+// (예 : 끄기가 한도에 걸려 600ms 뒤 다시 보내는 사이 다시 켜면, 늦은 끄기가 새 '켜짐' 배지를 내렸다).
+// 새 켜기·끄기 고지를 시작할 때마다 부르고, 돌려받은 함수를 sendRetry 의 live 에 넣는다(주기 재알림은 부르지 않는다)
+export function latestOnly(): () => () => boolean {
+  let n = 0
+  return () => {
+    const my = ++n
+    return () => my === n
+  }
+}
