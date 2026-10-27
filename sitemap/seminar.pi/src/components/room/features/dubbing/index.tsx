@@ -19,6 +19,7 @@ import { DUB_FAIL_MAX, dubRate, dubStale, dubStop, dubVolume, once, pushDub, TTS
 
 export const dubOn = featureStore(false)
 const dubLang = featureStore('') // 듣는 언어('' = 원문 → 더빙 없음). 자막 시트 언어 선택을 DubRow 가 옮겨 담는다
+const srcSame = featureStore(false) // 마지막 원격 자막 언어 = 듣는 언어(더빙 안 하는 화자 → 원음 100%, dubVolume)
 
 type Item = { ac: AbortController; audio: Promise<Blob | null>; at: number } // at = 자막 받은 시각(dubStale)
 let el: HTMLAudioElement | null = null
@@ -75,6 +76,7 @@ function stopAll() {
   queue = []
   playing = false
   playFails = 0
+  srcSame.set(false)
   if (curUrl) URL.revokeObjectURL(curUrl)
   curUrl = null
   if (el) {
@@ -119,7 +121,7 @@ async function pump() {
     done()
   })
   a.onloadedmetadata = () => {
-    a.playbackRate = dubRate(a.duration)
+    a.playbackRate = dubRate(a.duration, undefined, queue.length - 1) // 뒤에 밀린 문장 수만큼 빠르게(따라잡기)
   }
   a.onended = () => end(false)
   a.onerror = () => end(true)
@@ -194,6 +196,7 @@ function DubbingOverlay({ ctx }: { ctx: RoomCtx }) {
   const on = useStore(dubOn)
   const stop = useStore(trStop)
   const room = useStore(capRoom)
+  const same = useStore(srcSame)
   useEffect(() => {
     alertBlocked = () => ctx.notice('dubbing.blocked')
   })
@@ -201,8 +204,8 @@ function DubbingOverlay({ ctx }: { ctx: RoomCtx }) {
     if (!on) stopAll()
   }, [on])
   useEffect(() => {
-    remoteVolume.set(dubVolume(on, room))
-  }, [on, room])
+    remoteVolume.set(dubVolume(on, room, same))
+  }, [on, room, same])
   // 번역 중단(trStop — 권한 없음·AI 미설정·번역 한도)이면 번역문이 더 안 와 더빙도 소리가 없다 → 끄고 원음 복구.
   //  안 끄면 스위치는 켜진 채 원음만 20% 로 줄어 아무것도 안 들렸다(야간 시험 r4 T09). 알림은 자막 쪽 trStop 알림 1번으로 충분
   useEffect(() => {
@@ -223,12 +226,15 @@ export const dubbing: RoomFeature = {
   onApp: (m, ctx) => {
     if (m.topic !== 'caption' || !dubOn.get()) return
     const c = parseCaption(m.d)
-    if (c) enqueue(ctx, c.text, c.lang, c.sig)
+    if (!c) return
+    srcSame.set(sameLang(c.lang, dubLang.get())) // 엔진은 내 음성을 되돌려 주지 않는다 — 원격 화자만
+    enqueue(ctx, c.text, c.lang, c.sig)
   },
   onReset: () => {
     dubOn.reset()
     dubLang.reset()
     remoteVolume.reset()
     stopAll()
+    srcSame.reset()
   },
 }

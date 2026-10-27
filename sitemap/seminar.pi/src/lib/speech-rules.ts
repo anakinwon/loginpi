@@ -214,7 +214,9 @@ export const DUB_FAIL_MAX = 3
 export const DUB_DUCK = 0.2
 // 원음 볼륨 — 더빙이 켜져 있고 방 자막이 돌 때만 줄인다. 방 자막이 꺼져 있으면(발표자가 아직 안 켬·끔·한도·발표자 퇴장) 더빙할 문장이 오지 않으니
 //  스위치는 켠 채로 원음 100%(야간 시험 r5 T09 — 켜 두면 아무 소리도 없이 원음만 20% 로 줄어 있었다). 방 자막이 다시 켜지면 그대로 이어진다
-export const dubVolume = (on: boolean, room: boolean) => (on && room ? DUB_DUCK : 1)
+//  same = 마지막으로 받은 원격 자막 언어가 듣는 언어와 같음 — 그 화자는 더빙하지 않으니(enqueue sameLang) 원음 100%(야간 시험 r6 T09 :
+//  다국어 패널에서 내 언어로 말하는 패널의 원음이 더빙 없이 20% 로 줄어 거의 안 들렸다). ponytail: 자막이 조각(5초) 뒤에 오므로 화자가 바뀐 첫 조각은 이전 판정을 따른다
+export const dubVolume = (on: boolean, room: boolean, same = false) => (on && room && !same ? DUB_DUCK : 1)
 
 // 한 번만 실행 — 재생 끝(onended·onerror·play() 거부)이 한 문장에 겹쳐 와도 다음 문장으로 1번만 넘어가게
 export function once<A extends unknown[]>(f: (...a: A) => void) {
@@ -227,10 +229,13 @@ export function once<A extends unknown[]>(f: (...a: A) => void) {
 }
 
 // 재생 속도 = 합성 음성 길이 ÷ 원문 발화 길이, 0.8~1.5 로 묶음. 원문 길이 = 자막 1개 = 음성 조각 1개(CHUNK_MS)
+// backlog = 지금 문장 뒤에 기다리는 문장 수 — 1개당 DUB_CATCHUP 만큼 빨리 읽어 밀린 만큼 따라잡는다(보강 r6 T09 : 큐가 밀리면 원음과 점점 어긋나 결국 dubStale 로 버려졌다). 상한은 그대로 1.5
 // ponytail: 원문 길이를 조각 고정 길이로 봄 — 자막 메시지에 실제 durMs 가 실리면 그 값으로
-export function dubRate(dubSec: number, srcMs = CHUNK_MS) {
+export const DUB_CATCHUP = 0.15
+export function dubRate(dubSec: number, srcMs = CHUNK_MS, backlog = 0) {
   if (!Number.isFinite(dubSec) || dubSec <= 0 || srcMs <= 0) return 1
-  return Math.min(DUB_RATE_MAX, Math.max(DUB_RATE_MIN, (dubSec * 1000) / srcMs))
+  const boost = 1 + DUB_CATCHUP * Math.max(0, Math.floor(Number.isFinite(backlog) ? backlog : 0))
+  return Math.min(DUB_RATE_MAX, Math.max(DUB_RATE_MIN, ((dubSec * 1000) / srcMs) * boost))
 }
 
 // 재생 큐에 넣기 — 넘치면 앞(오래된 것)부터 버린다. 버린 항목을 돌려줘 호출부가 정리(요청 취소 등)
