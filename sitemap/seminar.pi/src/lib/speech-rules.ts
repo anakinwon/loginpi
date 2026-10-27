@@ -84,12 +84,23 @@ export const chunkSec = (durMs: number) => Math.ceil(durMs / 1000)
 // 호출 전 과금 초 = max(신고 길이, 128kbps 로 본 최소 길이) — 512KB 를 0.5초로 신고하는 식의 축소 신고 차단
 export const billSec = (durMs: number, bytes: number) =>
   Math.max(chunkSec(durMs), Math.ceil(bytes / BILL_BYTES_PER_SEC))
-// 호출 후 정산 — 외부 AI 가 센 음성 토큰으로 본 실제 길이가 과금 초보다 길면 그 차이(초), 아니면 0
-//  (128kbps 하한보다 낮은 비트레이트로 긴 오디오를 담은 경우 — 이 차이를 사용량에 더 올린다)
-export function extraSec(billed: number, audioTokens: number | null) {
-  if (!audioTokens || !Number.isFinite(audioTokens) || audioTokens <= 0)
-    return 0
-  return Math.max(0, Math.ceil(audioTokens / AUDIO_TOKENS_PER_SEC) - billed)
+// 선예약 하한 비트레이트(바이트/초) = opus 최저 6kbps — 같은 바이트에 담길 수 있는 가장 긴 오디오(160KB ≈ 213초).
+//  판정(fn_use_smn_vc) 때 이 최악 길이를 예약하고 호출 뒤 실제 길이로 환급(fn_ref_smn_vc_sec) — 동시 요청이 사후 정산 전에 상한을 넘기지 못하게
+export const RESERVE_BYTES_PER_SEC = 750
+export const reserveSec = (durMs: number, bytes: number) =>
+  Math.max(billSec(durMs, bytes), Math.ceil(bytes / RESERVE_BYTES_PER_SEC))
+// 호출 뒤 정산(초, 부호 있음) — 최종 과금 = max(과금 초, 외부 AI 음성 토큰으로 본 실제 길이). 음수 = 환급, 양수 = 추가(6kbps 보다 낮은 비트레이트)
+//  호출 실패·토큰 없음 = 과금 초(128kbps 하한)까지 환급 — 외부 AI 장애 동안 예약이 상한을 갉아먹지 않게
+export function settleSec(
+  reserved: number,
+  billed: number,
+  audioTokens: number | null | undefined,
+) {
+  const real =
+    audioTokens && Number.isFinite(audioTokens) && audioTokens > 0
+      ? Math.ceil(audioTokens / AUDIO_TOKENS_PER_SEC)
+      : 0
+  return Math.max(billed, real) - reserved
 }
 
 // 상한(초) — env 값이 없거나 이상하면 기본 120분
