@@ -3,6 +3,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   capError,
+  clampPage,
   FEE_RE,
   formatFee,
   isUuid,
@@ -84,4 +85,12 @@ test('개설 시작일시 상한(S5)', () => {
 test('대기실 머리말 — 세미나 방은 h2 고정 문구(UUID 노출·h1 중복 없음), 실험실 방은 h1 방 코드', () => {
   assert.deepEqual(prejoinHeading('54000d08-4e41-4a6b-9c1d-0123456789ab'), { level: 2, key: 'titleSeminar' })
   assert.deepEqual(prejoinHeading('lab-room_1'), { level: 1, key: 'title' })
+})
+
+test('쪽 맞추기 — 목록이 줄어 현재 쪽이 넘치면 마지막 쪽(T04 r2 : Q&A 빈 2쪽에 갇힘)', () => {
+  assert.equal(clampPage(2, 1), 1) // 2쪽 마지막 질문 답변 → 1쪽
+  assert.equal(clampPage(3, 2), 2)
+  assert.equal(clampPage(2, 3), 2) // 그대로
+  assert.equal(clampPage(1, 0), 1) // 빈 목록도 1쪽
+  assert.equal(clampPage(5, 0), 1)
 })

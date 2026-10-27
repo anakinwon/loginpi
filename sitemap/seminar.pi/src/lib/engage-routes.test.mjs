@@ -52,3 +52,19 @@ test('처리방침 — 출석부의 Pi 사용자명 개최자 제공·보관 기
   assert.ok(ko.some((s) => s.includes('Pi 사용자명') && s.includes('개최자') && s.includes('세미나를 삭제할 때까지')))
   assert.ok(en.some((s) => s.includes('Pi username') && s.includes('host') && s.includes('until the seminar is deleted')))
 })
+
+// 설문·Q&A·출석이 돌려주는 세미나 자격 코드(SMN_CLOSED·SMN_PAY_REQUIRED 등)가 영어 화면에서 한국어 서버 문구로 뜨던 결함(T04 r2)
+//  → 서버 오류 카탈로그(api.ts)의 모든 코드는 apiErrors 또는 seminar.err 에 ko·en 번역이 있고, useApiErrorText 가 seminar.err 도 본다
+test('오류 코드 번역 — api.ts 카탈로그 전 코드가 ko·en apiErrors|seminar.err 에 있음 + useApiErrorText 가 seminar.err 폴백', () => {
+  const a = readFileSync(new URL('./api.ts', import.meta.url), 'utf8')
+  const cat = a.slice(a.indexOf('createApiError({'), a.indexOf('\n})', a.indexOf('createApiError({')))
+  const codes = [...cat.matchAll(/^\s+([A-Z_]+):/gm)].map((m) => m[1])
+  assert.ok(codes.includes('SMN_CLOSED') && codes.length > 20, `카탈로그 파싱 실패 ${codes.length}`)
+  for (const l of ['ko', 'en']) {
+    const m = JSON.parse(readFileSync(new URL(`../../messages/${l}.json`, import.meta.url), 'utf8'))
+    const miss = codes.filter((c) => !(c in m.apiErrors) && !(c in m.seminar.err))
+    assert.deepEqual(miss, [], `${l} 번역 없음`)
+  }
+  const c = readFileSync(new URL('./client-api.ts', import.meta.url), 'utf8')
+  assert.match(c, /useTranslations\('seminar\.err'\)/)
+})

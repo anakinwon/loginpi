@@ -11,6 +11,9 @@ export const parseTab = (v: string | null | undefined): Tab =>
   (TABS as readonly string[]).includes(v ?? '') ? (v as Tab) : 'all'
 
 // 1 부터. 숫자 아님·0 이하·과대값은 1(과대 offset 조회 방지 상한 1000)
+// 목록이 줄어 현재 쪽이 마지막 쪽을 넘으면 마지막 쪽으로 — Q&A 2쪽의 마지막 질문을 답변·숨기면 빈 2쪽에 쪽 버튼 없이 갇히던 결함(야간 시험 T04 r2). Pagination 이 쓴다
+export const clampPage = (page: number, pages: number) => Math.min(page, Math.max(1, pages))
+
 export const parsePage = (v: string | null | undefined): number => {
   const n = Number(v)
   return Number.isInteger(n) && n >= 1 && n <= 1000 ? n : 1

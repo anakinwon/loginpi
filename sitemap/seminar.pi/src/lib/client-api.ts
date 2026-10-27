@@ -34,15 +34,19 @@ const GUARD_CODES: Record<string, string> = {
   payload_too_large: 'PAYLOAD_TOO_LARGE',
 }
 
-// 오류 본문 → 사용자 문구(번역 키 우선, 없으면 서버 한국어 폴백)
+// 오류 본문 → 사용자 문구(apiErrors.<CODE> → seminar.err.<CODE> → 서버 한국어 폴백).
+//  세미나 자격 코드(SMN_*·PAY_*)는 seminar.err 에만 있다 — 설문·Q&A 가 영어 화면에 한국어 서버 문구를 띄우던 결함(야간 시험 T04 r2)
 export function useApiErrorText() {
   const t = useTranslations('apiErrors')
+  const s = useTranslations('seminar.err')
   return useCallback(
     (body: ApiErrorBody) => {
       const code = body.code ?? GUARD_CODES[body.error ?? '']
-      return code && t.has(code) ? t(code) : (body.error ?? t('INTERNAL'))
+      if (code && t.has(code)) return t(code)
+      if (code && s.has(code)) return s(code)
+      return body.error ?? t('INTERNAL')
     },
-    [t],
+    [t, s],
   )
 }
 

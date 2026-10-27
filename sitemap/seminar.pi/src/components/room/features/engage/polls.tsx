@@ -1,12 +1,12 @@
 'use client'
-// 설문 탭(SubAgent4, 설계서 15.3) — 개최자·ADMIN 은 [+ 새 설문]·[마감], 전원은 1인 1표(라디오, 다시 투표 가능). 결과 = 막대 + '45% (9표)' 글자.
+// 설문 탭(SubAgent4, 설계서 15.3) — 개최자·ADMIN 은 [+ 새 설문]·[마감]·실시간 결과(투표는 [투표]를 눌러서), 전원은 1인 1표(라디오, 다시 투표 가능). 결과 = 막대 + '45% (9표)' 글자.
 //  새 설문은 10초 토스트 [투표하기] → 이 탭을 연다. 변경 뒤 refresh 신호로 다른 사람이 다시 읽는다(shared.ts).
 //  refresh 수신(onApp)·저장소 초기화(onReset)는 이 기능 하나가 설문·Q&A 두 탭 몫을 한다 — 두 기능에 다 걸면 배지가 2번 오른다
 import { useEffect, useId, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Pagination } from '@/components/seminar/pagination'
 import { useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
-import { POLL } from '@/lib/engage-rules'
+import { POLL, pollVoting } from '@/lib/engage-rules'
 import { useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 import { api, engageable, onRefresh, pollToast, resetSlots, SLOTS, tell, useLoad } from './shared'
 
@@ -98,7 +98,7 @@ function PollCard({
   const [pick, setPick] = useState<string | null>(p.mine)
   const [change, setChange] = useState(false)
   const [busy, setBusy] = useState(false)
-  const voting = p.open && (!p.mine || change)
+  const voting = pollVoting({ open: p.open, mine: p.mine, staff, change })
   const run = async (f: () => Promise<boolean>) => {
     setBusy(true)
     if (await f()) setChange(false)
@@ -152,9 +152,14 @@ function PollCard({
         </ul>
       )}
       <div className="flex gap-2">
-        {p.open && p.mine && !change && (
+        {p.open && (p.mine || staff) && !change && (
           <button type="button" className={SMALL} onClick={() => setChange(true)}>
-            {t('change')}
+            {t(p.mine ? 'change' : 'vote')}
+          </button>
+        )}
+        {change && (
+          <button type="button" className={SMALL} disabled={busy} onClick={() => setChange(false)}>
+            {t('cancel')}
           </button>
         )}
         {staff && p.open && (
