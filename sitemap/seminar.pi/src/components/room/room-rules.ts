@@ -412,3 +412,27 @@ export function failHit<K>(fails: Map<K, number>, k: K, max: number): boolean {
   fails.delete(k)
   return true
 }
+
+// 내 마이크·카메라 켜기/끄기 계획 — 켜려는데 트랙이 장치 쪽에서 끝났으면(앱 전환·장치 분리) 새 트랙을 받아 같은 송신기에 끼운다.
+// 끄기는 끝난 트랙이어도 서버 일시정지만(권한 팝업 없음). 시험 swap-sender.test.mjs
+export const localPlan = (on: boolean, ready: string): 'reacquire' | 'toggle' =>
+  on && ready !== 'live' ? 'reacquire' : 'toggle'
+
+// 송신기 트랙을 처리 트랙으로 바꾸고 되돌리기 함수를 준다. replaceTrack 은 비동기라 sender.track 이 늦게 바뀐다 — 교체가 끝나기 전에
+// 되돌리면(효과 빠른 켬·끔, 개발 StrictMode 이중 실행, 강등) 'sender.track === out' 검사가 거짓이라 되돌리지 않고, 늦게 끝난 교체가 이미 멈춘
+// 처리 트랙을 송신기에 남겨 청중 영상이 멈췄다(ended). 교체 요청은 PC 작업 큐에서 순서대로 처리되므로 대기 중이면 되돌리기를 뒤에 건다.
+// 시험 room-rules.test.mjs
+export type SenderLike<T> = { readonly track: T | null; replaceTrack(t: T | null): Promise<void> }
+export function swapSender<T>(sender: SenderLike<T> | null, out: T, back: () => T | null): () => void {
+  if (!sender) return () => {}
+  let pending = true
+  sender
+    .replaceTrack(out)
+    .catch(() => {})
+    .finally(() => {
+      pending = false
+    })
+  return () => {
+    if (pending || sender.track === out) sender.replaceTrack(back()).catch(() => {})
+  }
+}
