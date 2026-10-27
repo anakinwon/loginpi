@@ -9,6 +9,7 @@
 | 0 | 선결(결정·환경·포털·DB) | **완료(조건부, 2026-10-26)** — PRD v1.0 ✓ · Pi 앱 ✓ · 비운영 DB·스테이징 URL 은 **대체 충족** : 비운영 스키마는 만들었으나 앱 tier 는 `public` 하나(PRD 7절), 스테이징 = master 배포 `seminarz.vercel.app` 하나(운영 브랜치 분리 [확인중 : 마스터]) [확인중 : 마스터]. 운영 호스팅 [확인중 : 마스터] |
 | 1 | MVP(로그인 + 고유 기능 1개 + 결제 1개) | **진행 — 구현·브라우저 QA 통과, 실기기 대기** : 로그인 실기기 ✓ · 화면 5종(S1~S5)·화상 룸·Pi 결제 입장 구현(브라우저 QA 2차 7/7, 2026-10-27) · **Pi Browser 실기기 결제·입장 미검증** |
 | M | 자체 화상 엔진 M0~M5([PRD_01](PRD_01_MEDIA_ENGINE.md) 5절) | **M0 Android ✓(iOS 대기) · M1 LAN ✓ · M2 로컬 하네스 ✓ · M3~M5 진행** — 실네트워크(LTE·netem)·청중 30·실기기 대기. 단계별 통과 기준, 건너뛰기 금지 |
+| X | 회의 부가 기능(v2) — F-U·F-08~F-17 | **진행 — 구현·코드 검토 완료(master `af8f572b`), 브라우저 QA·실기기 대기**. 배포는 모델 파일·DB 적용·엔진 교체 대기(아래 막힌 것 #5~#8) |
 | 2 | 수익 | 대기 — R1 입장료는 구현(정산 F-06·수수료율 PRD 9절 #3 대기) |
 | 3 | 등재(A-1~A-7·실기기) | 대기 |
 
@@ -19,7 +20,11 @@
 | 1 | 집 PC 엔진을 **`9d8eea86` 빌드**로 교체 | `media/docs/HOME_NODE_GUIDE.md` 4.7 | 2026-10-27 실기기 시험에서 같은 집 PC 발표자가 잠깐 접속 뒤 `ICE_FAILED` 로 끊기고 청중 영상이 없었음 → 엔진이 LAN 주소도 host 후보로 알리도록 수정(Append) — 유력 원인 [확인중 : 실기기 재시험] |
 | 2 | 엔진 `MEDIA_ALLOWED_ORIGINS` 에 `https://seminarz.vercel.app` | 같은 가이드 B-1 | Pi 포털 래퍼가 실제 앱을 이 주소에서 불러옴 [확인중 : Pi Browser Origin 실측] |
 | 3 | Pi Browser 실기기 점검 10항목(Android 2대 + 가능하면 iOS) | [NIGHT_REPORT](NIGHT_REPORT_2026-10-27.md) 1절 | Phase 1·M5 통과 조건 — 인증·결제·페이지 변경은 실기기 전 완료로 보지 않음 |
-| 4 | 위임 결정 검토(PRD 11절 D-1~D-19) · 확인 질문(PRD 9절) | PRD | 바꿀 결정만 지시 |
+| 4 | 위임 결정 검토(PRD 11절 D-1~D-19, 11.1절 D-20~D-28) · 확인 질문(PRD 9절) | PRD | 바꿀 결정만 지시 |
+| 5 | **MediaPipe 모델 파일 커밋** — `public/mediapipe/models/selfie_segmenter_landscape.tflite`(`scripts/copy-mediapipe.mjs` 머리 주석의 curl 1줄) | 저장소 | 없으면 `pnpm build` 가 막혀 **Vercel 배포 실패**(이전 배포가 계속 서빙). 2026-10-27 현재 master 미 push 사유 |
+| 6 | 집 PC 엔진을 **v1.3.1(`4e33bbad`, sha256 `a11f7f36…`) 빌드**로 교체 — v1.3(`45541466…`) 설치 금지 | `media/docs/HOME_NODE_GUIDE.md` 4.7 | `app.send` 중계 — 교체 전엔 자막·녹화·AI 회의록·번역·더빙이 숨겨짐(#1 을 대체) |
+| 7 | Vercel `seminar` 환경변수 **`GEMINI_API_KEY`**(기존 발급 키)·필요 시 `SPEECH_MAX_MIN` | Vercel 설정 · [ENV_GUIDE](../../../docs/ENV_GUIDE.md) 3.6 | 미설정 = 외부 AI 기능(자막·회의록·번역·더빙) 숨김 |
+| 8 | `sql/008`·`009` DB 적용(dev→stg→prod, 2회 멱등) + Storage 비공개 버킷 `smn-note` | `db-migrate.mjs --app seminar` | da-standards·legal-compliance-advisor 검증 후. 그 전엔 회의록·설문·Q&A·출석 API 실패, `/privacy` 링크 숨김(PRD 9절 #16·#17) |
 
 ## Phase 0 — 선결
 
@@ -63,3 +68,29 @@
 - [ ] Pi 입장 결제 — approve/complete/cancel, 서버 금액 재검증, 결제 완료+참가 등록 한 트랜잭션(sql/007)·이중 결제 인덱스(sql/006) — 구현·브라우저 QA ✓(2026-10-27), **실기기 결제 대기**
 - [ ] **Pi Browser 실기기 결제·입장** — NIGHT_REPORT 1절 10항목
 - [ ] 모니터링 연결(TODO 7단계) — 미착수(`@pi/mon` 미배선)
+
+## Phase X — 회의 부가 기능(v2)
+
+계획 = `.claude/plans/pasted-content-id-66a2-eager-clock.md`(마스터 결정 M-1~M-4, 아소카 결정 D-20~D-28 = PRD 11.1절) · 화면 = UI 설계서 15절 · 근거 = [REA_04_MEET_FEATURES](rea/REA_04_MEET_FEATURES.md) · 상태 표기 : 구현 = master 통합 / 검토 = 독립 코드 검토 결함 반영 / QA = 브라우저 QA(Playwright 가짜 카메라) / 실기기 = Pi Browser
+
+| ID | 기능 | 구현 | 검토 | QA | 실기기 | 커밋(병합) |
+|---|---|---|---|---|---|---|
+| F-U | 공통 기반(엔진 `app.send` v1.3.1·외부 AI·음성 조각·확장 지점·동의·sql/008) | ✓ | ✓ | 대기 | 대기(엔진 교체·DB 적용 뒤) | `21844766`·`4e33bbad`·`2b15fb5e`·`89650341`·`c7809352`·`72b5fb53`·`057c12de`·`13e54040` (`0e0390bb`·`c043b76b`·`a7f6ae43`) |
+| F-08 | 일정·공유(캘린더 링크·.ics·메일 초대) | ✓ | ✓ | 대기 | 대기 | `67a8d5f9` (`8366a148`) |
+| F-09 | 소음 줄이기·조명 보정 | ✓ | ✓ | 대기 | 대기 | `d469aab1`·`92df9468`·`0c4f32d7` (`7a0af415`) |
+| F-10 | 실시간 자막 | ✓ | ✓ | 대기 | 대기(엔진·키) | `d469aab1`·`92df9468` (`7a0af415`) |
+| F-11 | 설문·Q&A·출석 | ✓ | ✓ | 대기 | 대기(sql/008·009) | `bb07eb80` (`1a74a42d`) |
+| F-12 | 배경 효과 | ✓ | ✓ | 대기 | 대기(모델 파일) | `290b8517`·`12fe33f5`·`0059f48d`·`c6a7c057` (`df0c31f5`) |
+| F-13 | 발표자 로컬 녹화·'녹화 중' 배지 | ✓ | ✓ | 대기 | 대기(Pi Browser 다운로드 [확인중]) | `5cfd6d53`·`abab8f4e` (`dd8119f8`) |
+| F-14 | AI 회의록 | ✓ | ✓ | 대기 | 대기(엔진·키·DB·버킷) | `62a0d85f`·`31cd5a72` (`dd602fe0`) |
+| F-15 | 대면 회의 노트(ADMIN) | ✓ | ✓ | 대기 | 대기(키·DB) | `800d0144` (`0eb83e51`) |
+| F-16 | 번역 자막 | ✓ | ✓ | 대기 | 대기(엔진·키) | `4a493a3a` (`1ca342ec`) |
+| F-17 | 음성 번역 듣기(더빙) | ✓ | ✓ | 대기 | 대기(엔진·키) | `4bb61455`·`717161a2` (`af8f572b`) |
+
+- [x] 기능 10종 + 공통 기반 구현·독립 검토·master 통합(2026-10-27)
+- [x] REA 회귀 비교 — 기존 3장면 화면 회귀 0·오류 0, 룸 첫 화면 JS +66,186 B(배경 엔진은 지연 로드 유지)(REA_04_MEET_FEATURES 6절)
+- [ ] MediaPipe 모델 파일 커밋 → `pnpm build` 통과 → push → `Vercel – seminar: success` 개별 확인
+- [ ] 엔진 v1.3.1 교체 · `GEMINI_API_KEY` Vercel 설정 · sql/008·009 적용 · `smn-note` 버킷
+- [ ] 브라우저 QA(가짜 카메라 3창 — 자막·번역·더빙·설문·Q&A·녹화·배경·회의록·대면 노트·캘린더 링크)
+- [ ] Pi Browser 실기기(Android 2대 + iOS) — 실기기 전 판정 최대 CONDITIONAL
+- [ ] pi-mainnet-listing-auditor·kisa-web-security-auditor 점검
