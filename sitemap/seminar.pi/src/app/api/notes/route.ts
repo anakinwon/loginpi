@@ -56,14 +56,14 @@ export const POST = withAuthGuard(
     const [smn, cur] = await Promise.all([
       db()
         .from('smn_mst')
-        .select('hst_usr_id, smn_sts_cd, smn_nm, sub_ttl')
+        .select('hst_usr_id, smn_sts_cd, smn_nm, subttl')
         .eq('smn_id', smnId)
         .eq('del_yn', 'N')
         .maybeSingle<{
           hst_usr_id: string
           smn_sts_cd: string
           smn_nm: string
-          sub_ttl: string | null
+          subttl: string | null
         }>(),
       db()
         .from('smn_nt')
@@ -88,7 +88,7 @@ export const POST = withAuthGuard(
       .insert({
         smn_id: smnId,
         usr_id: user.id,
-        nt_nm: smnTitle(smn.data.smn_nm, smn.data.sub_ttl).slice(0, 100),
+        nt_nm: smnTitle(smn.data.smn_nm, smn.data.subttl).slice(0, 100),
         regr_id: user.id,
         modr_id: user.id,
       })

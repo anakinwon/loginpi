@@ -102,7 +102,7 @@ export const PATCH = withAuthGuard(
     // 개최자 조건을 UPDATE 조건에 넣어 한 왕복으로(R-P1) — ADMIN 은 개최자 조건 없이
     let q = db()
       .from('smn_mst')
-      .update({ sub_ttl: body.subTitle || null, modr_id: user.id })
+      .update({ subttl: body.subTitle || null, modr_id: user.id })
       .eq('smn_id', id)
       .eq('del_yn', 'N')
     if (!isAdmin(user)) q = q.eq('hst_usr_id', user.id)

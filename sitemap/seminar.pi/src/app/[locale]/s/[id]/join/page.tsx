@@ -16,12 +16,12 @@ async function seminarTitle(id: string) {
   if (!url || !key) return null
   const { data, error } = await getSupabaseAdmin()
     .from('smn_mst')
-    .select('smn_nm, sub_ttl')
+    .select('smn_nm, subttl')
     .eq('smn_id', id)
     .eq('del_yn', 'N')
-    .maybeSingle<{ smn_nm: string; sub_ttl: string | null }>()
+    .maybeSingle<{ smn_nm: string; subttl: string | null }>()
   if (error) return null
-  return data ? smnTitle(data.smn_nm, data.sub_ttl) : undefined // undefined = 없는 세미나 → 404
+  return data ? smnTitle(data.smn_nm, data.subttl) : undefined // undefined = 없는 세미나 → 404
 }
 
 export default async function JoinPage({ params }: { params: Promise<{ locale: string; id: string }> }) {

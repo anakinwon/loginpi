@@ -16,10 +16,10 @@ export const GET = withGuard(
     const [smn, nt] = await Promise.all([
       db()
         .from('smn_mst')
-        .select('smn_nm, sub_ttl, start_dtm, smn_sts_cd, mod_dtm')
+        .select('smn_nm, subttl, start_dtm, smn_sts_cd, mod_dtm')
         .eq('smn_id', id)
         .eq('del_yn', 'N')
-        .maybeSingle<{ smn_nm: string; sub_ttl: string | null; start_dtm: string; smn_sts_cd: string; mod_dtm: string }>(),
+        .maybeSingle<{ smn_nm: string; subttl: string | null; start_dtm: string; smn_sts_cd: string; mod_dtm: string }>(),
       // 완성된 회의록 최신 1건(R-P3, x_smn_nt_01 순서)
       db()
         .from('smn_nt')
@@ -39,7 +39,7 @@ export const GET = withGuard(
     const ntId = nt.data?.[0]?.nt_id as string | undefined
     const body = buildIcs({
       id,
-      title: smnTitle(smn.data.smn_nm, smn.data.sub_ttl),
+      title: smnTitle(smn.data.smn_nm, smn.data.subttl),
       startAt: smn.data.start_dtm,
       url: `${base}/s/${id}`,
       piUrl: `${piBase()}/s/${id}`,

@@ -126,7 +126,7 @@ export const POST = withAuthGuard(
     if (!r) return apiError('ISLAND_FULL', 409) // 진행·예정 세미나가 섬 수(100)만큼 열려 있음
     // 부제는 만든 뒤 1회 저장(앞 결과의 id 가 필요해 직렬). 실패해도 세미나는 이미 열렸으니 상세에서 다시 저장하면 된다
     if (body.subTitle) {
-      const { error: subErr } = await db().from('smn_mst').update({ sub_ttl: body.subTitle }).eq('smn_id', r.smn_id)
+      const { error: subErr } = await db().from('smn_mst').update({ subttl: body.subTitle }).eq('smn_id', r.smn_id)
       if (subErr) console.error('[seminars] 부제 저장 실패', subErr.code)
     }
     return NextResponse.json(

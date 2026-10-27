@@ -26,10 +26,10 @@ export async function gate(smnId: string, user: UserRow): Promise<Gate | NextRes
   const [smn, ptc] = await Promise.all([
     db()
       .from('smn_mst')
-      .select('smn_nm, sub_ttl, hst_usr_id, ent_pi_amt, smn_sts_cd')
+      .select('smn_nm, subttl, hst_usr_id, ent_pi_amt, smn_sts_cd')
       .eq('smn_id', smnId)
       .eq('del_yn', 'N')
-      .maybeSingle<{ smn_nm: string; sub_ttl: string | null; hst_usr_id: string; ent_pi_amt: number | string; smn_sts_cd: string }>(),
+      .maybeSingle<{ smn_nm: string; subttl: string | null; hst_usr_id: string; ent_pi_amt: number | string; smn_sts_cd: string }>(),
     db().from('smn_ptc').select('ptc_id').eq('smn_id', smnId).eq('usr_id', user.id).eq('del_yn', 'N').maybeSingle(),
   ])
   if (smn.error) return dbFail(smn.error)
@@ -37,7 +37,7 @@ export async function gate(smnId: string, user: UserRow): Promise<Gate | NextRes
   if (!smn.data) return apiError('NOT_FOUND', 404)
   const staff = smn.data.hst_usr_id === user.id || isAdmin(user)
   if (!staff && Number(smn.data.ent_pi_amt) > 0 && !ptc.data) return apiError('SMN_PAY_REQUIRED', 402)
-  return { staff, open: (OPEN_STS as readonly string[]).includes(smn.data.smn_sts_cd), title: smnTitle(smn.data.smn_nm, smn.data.sub_ttl) }
+  return { staff, open: (OPEN_STS as readonly string[]).includes(smn.data.smn_sts_cd), title: smnTitle(smn.data.smn_nm, smn.data.subttl) }
 }
 
 // 음성 처리 동의(SPEECH_XFER) 자격 — fn_use_smn_vc 와 같은 규칙 : 개최자·ADMIN·활성 참가 등록자 + 종료·취소 세미나 409(closed, 야간 시험 T04). 통과면 null.
