@@ -1,5 +1,7 @@
 // AI 회의록 시작·조회 — POST { smnId } → { ntId } : 개최자(발표자)·관리자만, 세미나 LIVE 일 때. 이미 기록 중인 회의록이 있으면 그것을 돌려준다(멱등 — 재접속 후 다시 켜기).
+//  POST { title } → { ntId } : 대면 노트(세미나 없음, SA2) — ADMIN 만(외부 AI 비용), 외부 AI 키가 없으면 503. 시작할 때마다 새 회의록
 //  GET ?smnId= → { ntId | null } : 이 세미나에서 내가 볼 수 있는 가장 최근 회의록(상세 화면 [회의록 보기]). 비로그인 401(redirect 없음, piFetch 로 호출)
+//  GET ?page=N(smnId 없음) → { notes, total } : 내가 시작한 회의록 10건씩(최근순, 대면 노트 목록 /notes)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
@@ -12,9 +14,14 @@ import {
   requireUser,
 } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
+import { geminiEnabled } from '@/lib/gemini'
+import { NOTE_LIST_PAGE } from '@/lib/note-rules'
 import { isUuid } from '@/lib/seminar-rules'
 
-const Body = z.object({ smnId: z.string().refine(isUuid) })
+const Body = z.union([
+  z.object({ smnId: z.string().refine(isUuid) }),
+  z.object({ title: z.string().trim().min(1).max(100) }),
+])
 const noStore = { 'Cache-Control': 'no-store' }
 
 export const POST = withAuthGuard(
@@ -25,6 +32,23 @@ export const POST = withAuthGuard(
     ])
     if (user instanceof NextResponse) return user
     if (body instanceof NextResponse) return body
+    if ('title' in body) {
+      if (!isAdmin(user)) return apiError('FORBIDDEN', 403)
+      if (!geminiEnabled()) return apiError('AI_UNAVAILABLE', 503)
+      // ponytail: 기록 중 창을 닫으면 pagehide keepalive 로 끝내지만, 그마저 못 가면 RECORDING 으로 남는다 — 잦으면 오래된 RECORDING 정리 작업
+      const { data, error } = await db()
+        .from('smn_nt')
+        .insert({
+          usr_id: user.id,
+          nt_nm: body.title,
+          regr_id: user.id,
+          modr_id: user.id,
+        })
+        .select('nt_id')
+        .single<{ nt_id: string }>()
+      if (error) return dbFail(error)
+      return NextResponse.json({ ntId: data.nt_id }, { headers: noStore })
+    }
     const smnId = body.smnId.toLowerCase()
     // 세미나 확인과 기록 중 회의록 찾기는 서로 독립 — 병렬(R-P1)
     const [smn, cur] = await Promise.all([
@@ -76,7 +100,35 @@ export const GET = withAuthGuard(
   dbRoute(async (req) => {
     const user = await requireUser(req)
     if (user instanceof NextResponse) return user
-    const smnId = req.nextUrl.searchParams.get('smnId')
+    const q = req.nextUrl.searchParams
+    const smnId = q.get('smnId')
+    if (smnId === null) {
+      // 내 회의록 목록 — x_smn_nt_02 (usr_id, start_dtm DESC). 건수는 페이지 수 표시에 쓴다
+      const page = Math.max(1, Math.floor(Number(q.get('page')) || 1))
+      const { data, error, count } = await db()
+        .from('smn_nt')
+        .select('nt_id, smn_id, nt_nm, start_dtm, nt_sts_cd', {
+          count: 'exact',
+        })
+        .eq('usr_id', user.id)
+        .eq('del_yn', 'N')
+        .order('start_dtm', { ascending: false })
+        .range((page - 1) * NOTE_LIST_PAGE, page * NOTE_LIST_PAGE - 1)
+      if (error) return dbFail(error)
+      return NextResponse.json(
+        {
+          notes: (data ?? []).map((n) => ({
+            id: n.nt_id,
+            smnId: n.smn_id,
+            title: n.nt_nm,
+            start: n.start_dtm,
+            status: n.nt_sts_cd,
+          })),
+          total: count ?? 0,
+        },
+        { headers: noStore },
+      )
+    }
     if (!isUuid(smnId)) return apiError('INVALID_INPUT', 400)
     const id = smnId!.toLowerCase()
     // 최근 회의록 1건 + 개최자 + 내 참가 등록(임베디드 필터) — 1왕복

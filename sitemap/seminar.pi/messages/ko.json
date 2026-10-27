@@ -674,6 +674,34 @@
     "shotAlt": "{at} 화면 캡처",
     "close": "닫기",
     "view": "회의록 보기",
-    "error": "불러오지 못했습니다"
+    "error": "불러오지 못했습니다",
+    "mine": "내 회의록",
+    "recentNotes": "최근 노트",
+    "empty": "아직 회의록이 없습니다",
+    "newNote": "대면 노트 시작",
+    "inPerson": "대면 회의 노트",
+    "inPersonTag": "대면",
+    "titleLabel": "제목",
+    "titlePh": "예: 주간 회의",
+    "told": "참석자 모두에게 녹음과 AI 처리를 알렸습니다(필수)",
+    "toldWhy": "시작하기 전에, 이 대화가 녹음되고 외부 AI 로 글과 요약이 만들어진다는 사실을 참석자 모두에게 알려 주세요",
+    "start": "기록 시작",
+    "starting": "준비 중…",
+    "recBadge": "기록 중 {time}",
+    "recentLines": "최근 문장",
+    "waiting": "말하면 여기에 글이 나타납니다",
+    "end": "종료하고 회의록 만들기",
+    "wakeWarn": "화면을 끄면 기록이 멈출 수 있습니다",
+    "adminOnly": "관리자만 쓸 수 있습니다",
+    "unsupported": "이 기기에서는 녹음을 쓸 수 없습니다",
+    "micDenied": "마이크를 쓸 수 없습니다 — 권한을 확인해 주세요",
+    "limited": "처리 시간 한도를 다 썼습니다 — 종료하고 회의록을 만들어 주세요",
+    "noAgr": "고지 확인 기록이 없어 멈췄습니다 — 종료 후 다시 시작해 주세요",
+    "st": {
+      "RECORDING": "기록 중",
+      "SUMMARIZING": "만드는 중",
+      "DONE": "완료",
+      "FAILED": "실패"
+    }
   }
 }

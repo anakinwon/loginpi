@@ -674,6 +674,34 @@
     "shotAlt": "Screen capture at {at}",
     "close": "Close",
     "view": "View notes",
-    "error": "Couldn't load"
+    "error": "Couldn't load",
+    "mine": "My notes",
+    "recentNotes": "Recent notes",
+    "empty": "No notes yet",
+    "newNote": "Start in-person notes",
+    "inPerson": "In-person meeting notes",
+    "inPersonTag": "In person",
+    "titleLabel": "Title",
+    "titlePh": "e.g. Weekly meeting",
+    "told": "I have told everyone present that this will be recorded and processed by AI (required)",
+    "toldWhy": "Before you start, tell everyone present that this conversation will be recorded and turned into text and a summary by an external AI",
+    "start": "Start recording",
+    "starting": "Getting ready…",
+    "recBadge": "Recording {time}",
+    "recentLines": "Latest lines",
+    "waiting": "Text appears here as people speak",
+    "end": "End and create notes",
+    "wakeWarn": "Recording may stop if the screen turns off",
+    "adminOnly": "Only admins can use this",
+    "unsupported": "Recording is not available on this device",
+    "micDenied": "Can't use the microphone — check the permission",
+    "limited": "The processing time limit is used up — end and create the notes",
+    "noAgr": "Stopped: no notice confirmation on record — end and start again",
+    "st": {
+      "RECORDING": "Recording",
+      "SUMMARIZING": "Creating",
+      "DONE": "Done",
+      "FAILED": "Failed"
+    }
   }
 }
