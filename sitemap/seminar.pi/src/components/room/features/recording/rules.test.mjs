@@ -1,7 +1,7 @@
 // 녹화 순수 판정 시험 — node --test src/components/room/features/recording/rules.test.mjs (Node 24 타입 제거)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { applyRec, fitRect, othersRecording, pickMime, pruneRec, readRecording, recFileName, saveVia, stopToast } from './rules.ts'
+import { applyRec, fitRect, meetRect, othersRecording, pickMime, pruneRec, readRecording, recFileName, saveVia, stopToast } from './rules.ts'
 import { readFileSync } from 'node:fs'
 
 test('pickMime — 앞 후보 우선, iOS(mp4 만)·미지원', () => {
@@ -84,4 +84,11 @@ test('stopToast — 자동 종료는 이유를 알리고, 토스트 키는 ko·e
     const m = JSON.parse(readFileSync(new URL(`../../../../../messages/${l}.json`, import.meta.url), 'utf8'))
     for (const k of ['saved', 'autoStopped', 'empty', 'saveFailed']) assert.ok(m.room.recording.toast[k], `${l} ${k}`)
   }
+})
+
+test('meetRect — 겹친 부분·안 겹침·맞닿음', () => {
+  const b = (left, top, right, bottom) => ({ left, top, right, bottom })
+  assert.deepEqual(meetRect(b(0, 0, 10, 10), b(5, 5, 20, 20)), b(5, 5, 10, 10))
+  assert.equal(meetRect(b(0, 0, 10, 10), b(20, 0, 30, 10)), null)
+  assert.equal(meetRect(b(0, 0, 10, 10), b(10, 0, 20, 10)), null) // 선만 닿음
 })

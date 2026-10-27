@@ -31,6 +31,13 @@ export function fitRect(box: { x: number; y: number; w: number; h: number }, sw:
   return { x: box.x + (box.w - w) / 2, y: box.y + (box.h - h) / 2, w, h }
 }
 
+// 두 사각형(left·top·right·bottom)의 겹친 부분 — 안 겹치면 null. 녹화기가 스크롤 줄 밖으로 밀려난 타일을 잘라 그릴 때 쓴다
+type Box = { left: number; top: number; right: number; bottom: number }
+export function meetRect(a: Box, b: Box): Box | null {
+  const r = { left: Math.max(a.left, b.left), top: Math.max(a.top, b.top), right: Math.min(a.right, b.right), bottom: Math.min(a.bottom, b.bottom) }
+  return r.right > r.left && r.bottom > r.top ? r : null
+}
+
 // d 검사 — 엔진은 모양을 보지 않으므로 받는 쪽이 거른다. 다른 키(notes·captions)만 있으면 null(무시)
 export function readRecording(d: unknown): boolean | null {
   if (!d || typeof d !== 'object') return null

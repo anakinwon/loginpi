@@ -4,7 +4,7 @@
 // 근거(REA jitsi ③) : 조각 단위 MediaRecorder + 탭 소리·마이크 AudioContext 합성. 우리는 탭 캡처(getDisplayMedia, 데스크톱 Chromium 한정) 대신
 //  canvas 합성을 써 모바일·Pi Browser 에서도 기능 탐지로 시도한다. 코드는 옮기지 않았다(S-2)
 import { ticker } from '../../ticker'
-import { fitRect, pickMime } from './rules'
+import { fitRect, meetRect, pickMime } from './rules'
 
 const R = {
   w: 1280, // 녹화 화면 크기 — 무대 비율과 달라도 가운데 맞춤(남는 곳은 검정)
@@ -54,11 +54,22 @@ export function startRecorder(stage: HTMLElement, ac: AudioContext, onFail?: () 
       // 대화상자(효과 시트 미리보기 등) 안 영상은 무대가 아니다 — 열린 채 녹화하면 무대 위에 미리보기가 덧그려졌다
       if (v.readyState < 2 || !v.videoWidth || v.closest('dialog')) continue
       const r = v.getBoundingClientRect()
+      // 화면에서 보이는 만큼만 — 넘침을 자르는 조상(패널 타일 가로 스크롤 줄 등)과 무대 밖은 잘라 낸다.
+      // 전에는 스크롤로 밀려난 타일이 주 화면·좌우 검은 띠 위에 그대로 찍혔다
+      let vis = meetRect(r, sr)
+      for (let el = v.parentElement; vis && el && el !== stage; el = el.parentElement)
+        if (getComputedStyle(el).overflow !== 'visible') vis = meetRect(vis, el.getBoundingClientRect())
+      if (!vis) continue
       const box = { x: area.x + (r.left - sr.left) * k, y: area.y + (r.top - sr.top) * k, w: r.width * k, h: r.height * k }
       const d = fitRect(box, v.videoWidth, v.videoHeight)
       if (!d) continue
+      g.save()
+      g.beginPath()
+      g.rect(area.x + (vis.left - sr.left) * k, area.y + (vis.top - sr.top) * k, (vis.right - vis.left) * k, (vis.bottom - vis.top) * k)
+      g.clip()
       // 미리보기 거울상(-scale-x-100)은 화면 표시 전용 — 녹화는 참가자가 받는 송출본처럼 반전 없이
       g.drawImage(v, d.x, d.y, d.w, d.h)
+      g.restore()
     }
   }
   draw()
