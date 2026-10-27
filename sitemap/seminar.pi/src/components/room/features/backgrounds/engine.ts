@@ -5,7 +5,7 @@
 // 사용 지표를 odml.pa.googleapis.com 로 보내며 끄는 옵션이 없음(1회 실패면 주기 전송 중단). 코드는 옮기지 않았다(S-2)
 import type { ImageSegmenter } from '@mediapipe/tasks-vision'
 import { featureStore } from '../../extensions'
-import { BG, coverRect, pipelineKilled, slowWatch } from './rules'
+import { BG, coverRect, failBack, nextTs, pipelineKilled, slowWatch } from './rules'
 
 // 선택 — none · blur · p:<프리셋> · m:<내 이미지 id>
 export const choice = featureStore<string>('none')
@@ -67,6 +67,7 @@ function loadSegmenter(): Promise<ImageSegmenter> {
 
 let backdrop: HTMLCanvasElement | null = null
 const canvas = () => document.createElement('canvas')
+let shown = 'none' // 지금 실제로 그리는 선택(성공한 마지막 선택) — 고르는 중인 choice 와 다를 수 있다
 let pick = 0 // 고르는 중 다른 것을 고르면 앞 결과를 버린다
 
 // 배경을 고를 때 1번만 출력 크기 근처(1280×720 을 덮는 크기)로 래스터해 둔다 — 매 프레임 대형 비트맵 축소·SVG 래스터 비용을 없앤다
@@ -110,6 +111,7 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
   const my = ++pick
   autoOff.set(null)
   if (next === 'none') {
+    shown = 'none'
     choice.set('none') // bgOn 보다 먼저 — 아래 구독이 사용자 끔을 파이프라인 끔으로 오인하지 않게
     bgOn.set(false)
     status.set('idle')
@@ -122,6 +124,7 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
     await loadSegmenter()
     if (my !== pick) return null
     backdrop = img
+    shown = next
     watch = slowWatch()
     status.set('idle')
     bgOn.set(true)
@@ -129,8 +132,10 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
   } catch {
     if (my !== pick) return 'superseded' // 밀려났어도 실패는 실패 — 호출자가 저장하지 않게(문구는 띄우지 않음)
     status.set('idle')
-    choice.set('none')
-    bgOn.set(false)
+    // 앞 배경이 그대로 그려지고 있으면(분리기·backdrop 은 성공 때만 바꾼다) 선택만 되돌린다 — 실패 한 번에 방이 드러나지 않게
+    const back = failBack(shown, bgOn.get())
+    choice.set(back)
+    if (back === 'none') bgOn.set(false)
     return 'bgFailed'
   }
 }
@@ -139,6 +144,7 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
 // 망가진 분리기를 버린다(재사용하면 다시 골라도 같은 실패만 되풀이 — 다음 선택 때 새로 만든다, wasm 은 장기 캐시라 재다운로드 없음)
 bgOn.sub(() => {
   if (!pipelineKilled(bgOn.get(), choice.get(), status.get())) return
+  shown = 'none'
   choice.set('none')
   try {
     seg?.close()
@@ -155,6 +161,7 @@ let person: HTMLCanvasElement | null = null // 오려 낸 사람
 let tiny: HTMLCanvasElement | null = null // 흐림용 축소본
 let maskData: ImageData | null = null
 let watch = slowWatch()
+let ts = 0 // 직전 분리 시각(nextTs)
 
 function fit(c: HTMLCanvasElement, w: number, h: number) {
   if (c.width !== w || c.height !== h) {
@@ -168,9 +175,10 @@ function fit(c: HTMLCanvasElement, w: number, h: number) {
 export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: number, h: number) {
   if (!seg) return void out.drawImage(src, 0, 0, w, h)
   const t0 = performance.now()
+  ts = nextTs(ts, t0)
   const sctx = fit((small ??= canvas()), BG.inW, BG.inH)
   sctx.drawImage(src, 0, 0, BG.inW, BG.inH)
-  seg.segmentForVideo(small, t0, (res) => {
+  seg.segmentForVideo(small, ts, (res) => {
     // 모델 출력 마지막 채널 = 사람(1채널 모델이면 [0], 배경·사람 2채널이면 [1]) [확인중 : 모델 파일 넣은 뒤 실측]
     const m = res.confidenceMasks?.at(-1)
     if (!m) return

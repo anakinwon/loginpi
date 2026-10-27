@@ -40,6 +40,12 @@ export function slowWatch(min = BG.fpsMin, sec = BG.slowSec) {
 export const pipelineKilled = (on: boolean, choice: string, status: 'idle' | 'loading') =>
   !on && status === 'idle' && choice !== 'none'
 
+// 새 선택이 실패했을 때 돌아갈 선택 — 앞 배경이 켜져 있었으면 그대로 둔다('없음'으로 떨어지면 가리던 방이 상대에게 드러난다)
+export const failBack = (prev: string, prevOn: boolean) => (prevOn ? prev : 'none')
+
+// 분리기 시각(ms) — 같은 분리기에는 엄격히 커지는 값만 넣어야 한다. 정밀도를 낮춘 타이머(사생활 보호 설정)는 같은 값을 줄 수 있다
+export const nextTs = (prev: number, now: number) => Math.max(now, prev + 1)
+
 // 이미지(sw×sh)를 w×h 에 꽉 채우는 drawImage 대상 사각형(가운데 기준 잘림)
 export function coverRect(sw: number, sh: number, w: number, h: number) {
   const k = Math.max(w / sw, h / sh)

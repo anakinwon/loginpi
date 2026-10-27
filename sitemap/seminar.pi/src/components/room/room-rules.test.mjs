@@ -41,6 +41,16 @@ import {
   appSupportedBy,
   consentPlan,
 } from './room-rules.ts'
+import { failHit } from './room-rules.ts'
+
+// 회귀(T05 r2) — 연속 실패로 끈 효과의 횟수가 남아, 조명 등으로 파이프라인이 살아 있는 동안 다시 켠 배경이 실패 1번에 바로 꺼졌다
+test('효과 연속 실패 — 상한에서 끄고 횟수를 지운다', () => {
+  const fails = new Map()
+  for (let i = 1; i < 30; i++) assert.equal(failHit(fails, 'bg', 30), false)
+  assert.equal(failHit(fails, 'bg', 30), true) // 30번째에 끈다
+  assert.equal(fails.has('bg'), false)
+  assert.equal(failHit(fails, 'bg', 30), false) // 다시 켠 뒤 1번 실패로는 끄지 않는다(고치기 전 : 31 ≥ 30 → 바로 끔)
+})
 
 // 발행 PC getStats 모양 표본 — kbps·손실률로 5초 구간 두 번
 function samples({ aKbps = 40, vKbps = 1200, aLost = 0, vLost = 0 } = {}) {

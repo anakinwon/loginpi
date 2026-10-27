@@ -400,3 +400,15 @@ export function ringFor(peerId: string | undefined, speaker: string | null, engi
 export function fxFrameDue(v: { enabled: boolean; w: number; h: number; ready: number; time: number; last: number }): boolean {
   return v.enabled && v.w > 0 && v.h > 0 && v.ready >= 2 && v.time !== v.last
 }
+
+// 영상 효과 연속 실패 1회 기록 — true = 상한 도달(끌 때). 끌 때 횟수를 지운다 : 남겨 두면 파이프라인이 다른 효과(조명 등)로 살아 있는 동안
+// 다시 켠 효과가 실패 1번(상한+1)에 바로 다시 꺼진다. 시험 room-rules.test.mjs
+export function failHit<K>(fails: Map<K, number>, k: K, max: number): boolean {
+  const n = (fails.get(k) ?? 0) + 1
+  if (n < max) {
+    fails.set(k, n)
+    return false
+  }
+  fails.delete(k)
+  return true
+}

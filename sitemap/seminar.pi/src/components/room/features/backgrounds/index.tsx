@@ -214,7 +214,8 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
               </div>
             ))}
             <label
-              className={`${tile} bg-surface-raised grid cursor-pointer place-items-center border-dashed border-white/20`}
+              // 파일 입력은 sr-only 라 포커스가 보이지 않는다 — 키보드로 Tab 해 온 자리를 타일 테두리로 보여 준다(WCAG 2.4.7)
+              className={`${tile} bg-surface-raised focus-within:ring-accent grid cursor-pointer place-items-center border-dashed border-white/20 focus-within:ring-2`}
             >
               ＋ {t('myAdd')}
               <input
