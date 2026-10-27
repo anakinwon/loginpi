@@ -12,6 +12,7 @@ import { qna } from './engage/qna'
 import { notes } from './notes'
 import { mediaFx } from './media-fx'
 import { mirror } from './mirror'
+import { naming } from './naming'
 import { recording } from './recording'
 
 export const FEATURES: readonly RoomFeature[] = [
@@ -22,6 +23,7 @@ export const FEATURES: readonly RoomFeature[] = [
   mediaFx,
   backgrounds,
   mirror,
+  naming,
   qna,
   polls,
   attend,

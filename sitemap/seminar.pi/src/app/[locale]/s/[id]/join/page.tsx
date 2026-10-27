@@ -6,7 +6,8 @@ import { setRequestLocale } from 'next-intl/server'
 import { getSupabaseAdmin, resolveDbConfig } from '@pi/db'
 import { RoomView } from '@/components/room/room-view'
 import { env } from '@/env'
-import { isUuid, smnTitle } from '@/lib/seminar-rules'
+import { isUuid } from '@/lib/seminar-rules'
+import { RoomTitle } from '@/components/room/room-title'
 
 const ROOM_RE = /^[A-Za-z0-9_-]{1,64}$/
 
@@ -21,20 +22,20 @@ async function seminarTitle(id: string) {
     .eq('del_yn', 'N')
     .maybeSingle<{ smn_nm: string; subttl: string | null }>()
   if (error) return null
-  return data ? smnTitle(data.smn_nm, data.subttl) : undefined // undefined = 없는 세미나 → 404
+  return data ? { island: data.smn_nm, subTitle: data.subttl ?? '' } : undefined // undefined = 없는 세미나 → 404
 }
 
 export default async function JoinPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { locale, id } = await params
   setRequestLocale(locale)
-  let title: string | null | undefined = null
+  let title: { island: string; subTitle: string } | null | undefined = null
   if (isUuid(id)) {
     title = await seminarTitle(id)
     if (title === undefined) notFound()
   } else if (!ROOM_RE.test(id) || (process.env.NODE_ENV === 'production' && env.LAB_ENABLED !== '1')) notFound()
   return (
     <>
-      {title && <h1 className="mb-3 text-lg font-bold break-words">{title}</h1>}
+      {title && <RoomTitle id={id} island={title.island} subTitle={title.subTitle} />}
       <RoomView room={id} wsUrl={env.NEXT_PUBLIC_MEDIA_WS_URL} />
     </>
   )

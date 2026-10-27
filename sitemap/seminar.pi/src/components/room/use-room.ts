@@ -8,6 +8,7 @@ import { piFetch } from '@pi/auth/client'
 // v1.2(3.5) : 사회(peer.mute·room.muteAll 잠금·peer.askUnmute)·레이아웃(room.setLayout)·발언자(ntf activeSpeaker)
 // v1.3(A-2) : 범용 중계 app.send{topic,d} → ntf app{topic,d,from}(부가 기능 공용, extensions.ts) · 입장 직후 1회 지원 확인 · 카메라 송신기(영상 효과 replaceTrack)
 import type { AppMsg } from './extensions'
+import { parseNameSignal } from '@/lib/seminar-rules'
 import {
   APP_MAX,
   APP_PROBE,
@@ -441,6 +442,12 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
       // 부가 기능 중계(v1.3) — 형식이 맞는 것만 구독자에게. 구독자 오류가 시그널링 처리를 멈추지 않게 각자 감싼다
       const a = e.d as AppMsg
       if (typeof a?.topic !== 'string') return
+      // 별명 변경(sql/014) — 보낸 사람(from, 엔진이 채움)의 이름만 바꾼다
+      const ns = a.topic === 'refresh' ? parseNameSignal(a.d) : null
+      if (ns?.what === 'name' && peersRef.current.has(a.from)) {
+        patchPeer(a.from, { name: ns.name })
+        commitPeers()
+      }
       for (const fn of appSubs.current) {
         try {
           fn(a)
@@ -900,6 +907,15 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
 
   // 보내기 — 반환 = 오류 코드(성공 null). 구 엔진(확인 결과 false)·큰 d 는 보내지 않는다.
   // 지원 여부는 probeApp 만 정한다 — v1.3 의 NOT_FOUND 는 주제 오타·'참가자 없음' 경합도 내므로 한 번의 실패로 세션 전체 기능을 끄지 않는다
+  // 내 별명 바꾸기 — 내 화면은 바로, 다른 사람은 refresh 신호로(보낸 본인에겐 오지 않는다). 저장(API)은 호출한 쪽이 먼저 한다
+  async function renameSelf(name: string): Promise<string | null> {
+    if (selfRef.current) {
+      patchPeer(selfRef.current, { name })
+      commitPeers()
+    }
+    return sendApp('refresh', { what: 'name', name })
+  }
+
   async function sendApp(topic: string, d: unknown): Promise<string | null> {
     if (appRef.current === false) return 'NOT_FOUND'
     if (new TextEncoder().encode(JSON.stringify(d ?? null)).length > APP_MAX) return 'TOO_LARGE'
@@ -1076,6 +1092,7 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
     screenProducerId,
     appSupported,
     sendApp,
+    renameSelf,
     subscribeApp,
     videoSender,
   }

@@ -50,9 +50,10 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
 
   let roomCap: number | undefined
   let startLive = false
+  let nickname: string | null = null // 세미나 별명(sql/014)
   if (isUuid(room)) {
     // 세미나·내 참가 — 서로 의존 없음 → 병렬(R-P1)
-    const [smn, ptc] = await Promise.all([
+    const [smn, ptc, nck] = await Promise.all([
       db()
         .from('smn_mst')
         .select('max_cnt, ent_pi_amt, smn_sts_cd')
@@ -66,9 +67,19 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
         .eq('usr_id', user.id)
         .eq('del_yn', 'N')
         .maybeSingle(),
+      // 세미나 별명(sql/014) — 있으면 표시명으로
+      db()
+        .from('smn_ncknm')
+        .select('ncknm')
+        .eq('smn_id', room)
+        .eq('usr_id', user.id)
+        .eq('del_yn', 'N')
+        .maybeSingle<{ ncknm: string }>(),
     ])
     if (smn.error) return dbFail(smn.error)
     if (ptc.error) return dbFail(ptc.error)
+    if (nck.error) return dbFail(nck.error)
+    nickname = nck.data?.ncknm ?? null
     if (!smn.data)
       return NextResponse.json({ error: 'not_found' }, { status: 404, headers: noStore })
     if (!(OPEN_STS as readonly string[]).includes(smn.data.smn_sts_cd))
@@ -85,7 +96,7 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
   const ticket = signMediaTicket({
     room,
     sub: user.id,
-    name: user.display_name || user.pi_username || '',
+    name: nickname || user.display_name || user.pi_username || '',
     role: cap === 'present' ? 'presenter' : 'audience',
     cap: roomCap,
   })

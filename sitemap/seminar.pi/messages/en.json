@@ -213,6 +213,23 @@
     "refLabel": "Reference model"
   },
   "room": {
+    "rename": {
+      "menu": "Change my name",
+      "title": "My name in this seminar",
+      "hint": "Up to 30 characters. Used only in this seminar and updates on everyone's screen right away.",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "failed": "Couldn't save your name. Try again."
+    },
+    "roomTitle": {
+      "edit": "Click to edit the subtitle",
+      "label": "Subtitle",
+      "placeholder": "Subtitle (up to 60)",
+      "save": "Save",
+      "cancel": "Cancel",
+      "failed": "Couldn't save the subtitle."
+    },
     "mirror": "Mirror my video",
     "barPin": "Always show bottom bar",
     "barAuto": "Auto-hide bottom bar",

@@ -125,3 +125,15 @@ export const startAtOk = (ms: number, now = Date.now()) =>
 // 세미나 룸 이름 = 섬 이름 + ' - ' + 부제(sql/012, 마스터 2026-10-28). 부제가 없거나 공백이면 섬 이름만
 export const SUB_TTL_MAX = 60
 export const smnTitle = (nm: string, sub?: string | null) => (sub?.trim() ? `${nm} - ${sub.trim()}` : nm)
+
+// 룸 안 이름 신호(sql/014) — app.send('refresh', {what:'name', name}) 또는 {what:'title'}. 보낸 사람(from)은 엔진이 채워 위조 불가.
+// 맞지 않으면 null(버린다). 별명은 한 줄 1~NCKNM_MAX 자
+export const NCKNM_MAX = 30
+export function parseNameSignal(d: unknown): { what: 'name'; name: string } | { what: 'title' } | null {
+  if (!d || typeof d !== 'object') return null
+  const { what, name } = d as { what?: unknown; name?: unknown }
+  if (what === 'title') return { what }
+  if (what !== 'name' || typeof name !== 'string') return null
+  const n = name.trim()
+  return n && [...n].length <= NCKNM_MAX && ONE_LINE_RE.test(n) ? { what, name: n } : null
+}

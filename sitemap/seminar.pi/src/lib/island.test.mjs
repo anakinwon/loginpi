@@ -31,3 +31,15 @@ test('룸 이름 = 섬 이름 - 부제, 부제 없으면 섬 이름만', async (
   const patch = readFileSync(new URL('../app/api/seminars/[id]/route.ts', import.meta.url), 'utf8')
   assert.match(patch, /if \(!isAdmin\(user\)\) q = q\.eq\('hst_usr_id', user\.id\)/) // 개최자·ADMIN 만
 })
+
+test('룸 이름 신호 — 별명은 한 줄 1~30자, 제목 신호, 나머지는 버린다', async () => {
+  const { parseNameSignal } = await import('./seminar-rules.ts')
+  assert.deepEqual(parseNameSignal({ what: 'name', name: '  아소카 ' }), { what: 'name', name: '아소카' })
+  assert.deepEqual(parseNameSignal({ what: 'title' }), { what: 'title' })
+  assert.equal(parseNameSignal({ what: 'name', name: '' }), null)
+  assert.equal(parseNameSignal({ what: 'name', name: 'x'.repeat(31) }), null)
+  assert.equal(parseNameSignal({ what: 'name', name: 'a\nb' }), null)
+  assert.equal(parseNameSignal({ what: 'polls' }), null) // 설문 신호는 engage 몫
+  const ticket = readFileSync(new URL('../app/api/media/ticket/route.ts', import.meta.url), 'utf8')
+  assert.match(ticket, /name: nickname \|\| user\.display_name/) // 별명이 입장권 표시명
+})
