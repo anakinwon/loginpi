@@ -433,6 +433,7 @@
       "waiting": "Captions appear when the presenter turns them on",
       "limit": "Speech processing limit reached, so captions and AI minutes stopped",
       "sendFail": "Could not turn on captions. Please try again shortly",
+      "sendFailOff": "Could not turn off captions. Please try again shortly",
       "region": "Captions",
       "translate": "Show translated captions",
       "lang": "Translation language",

@@ -118,3 +118,27 @@ test('⑧ 세미나 음성 조각은 무대 관문(stageGate)을 계량 관문(s
   assert.ok(st > 0 && sp > st, 'stageGate 가 없거나 speechGate 뒤에 있음')
   assert.match(read('src/lib/speech-gate.ts'), /AbortSignal\.timeout\(2_000\)/, '엔진 호출 2초 제한(R-P4) 없음')
 })
+
+test('⑨ 부가 기능의 state 방송은 모두 재시도(sendRetry)를 거친다 — 녹화·AI 기록과 같은 초당 2건 창에서 조용히 빠지지 않게(T03 r5)', () => {
+  const feat = srcFiles.filter((p) => rel(p).startsWith('src/components/room/features/'))
+  const bare = feat.flatMap((p) =>
+    readFileSync(p, 'utf8')
+      .split('\n')
+      .map((l, i) => [l, i + 1])
+      .filter(([l]) => /sendApp\('state'|\('state', \{/.test(l) && !/sendRetry\(/.test(l))
+      .map(([, i]) => `${rel(p)}:${i}`),
+  )
+  assert.deepEqual(bare, [])
+})
+
+test('⑩ 부가 기능 ctx.notice 키가 room.* 아래 ko·en 모두 있다', () => {
+  const msgs = ['ko', 'en'].map((l) => JSON.parse(read(`messages/${l}.json`)).room)
+  const at = (o, path) => path.split('.').reduce((x, k) => (x && typeof x === 'object' ? x[k] : undefined), o)
+  const keys = new Set()
+  for (const p of srcFiles.filter((p) => rel(p).startsWith('src/components/room/features/')))
+    for (const m of readFileSync(p, 'utf8').matchAll(/notice\(([^)]*)\)/g))
+      for (const k of m[1].matchAll(/'([a-zA-Z]+\.[\w.]+)'/g)) keys.add(k[1])
+  assert.ok(keys.size >= 10, `키 수집 실패 : ${keys.size}`)
+  const miss = [...keys].flatMap((k) => msgs.flatMap((m, i) => (typeof at(m, k) === 'string' ? [] : [`${['ko', 'en'][i]}:${k}`])))
+  assert.deepEqual(miss, [])
+})

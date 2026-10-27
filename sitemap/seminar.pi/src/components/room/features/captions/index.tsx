@@ -10,6 +10,7 @@
 // 음성 번역 듣기(SA9 DubRow) = 번역 자막이 켜졌을 때만, 같은 언어(lang)로 — 꺼짐(원문)이면 숨김
 import { useEffect, useMemo, useRef } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
+import { latestOnly, sendRetry } from '../../app-retry'
 import { Icon } from '../../control-bar'
 import { featureStore, speechWants, useStore, wantSpeech, type RoomCtx, type RoomFeature } from '../../extensions'
 import { DubRow } from '../dubbing'
@@ -38,13 +39,20 @@ export const capLatest = featureStore<{
 
 const nameOf = (ctx: RoomCtx, peerId: string) => ctx.r.peers.find((p) => p.peerId === peerId)?.name ?? ''
 
-// presenter 토글 — 방송 실패면 되돌린다(전원에게 알리지 못하면 켜지 않는다, 15.1)
+// 방 자막 state 보내기 — 한도(RATE_LIMITED)·응답 없음이면 다시 보낸다(app-retry). 결함(T03 r5) : 녹화·AI 기록 state 와 같은 초당 2건 창을 써서
+//  늦은 입장 재방송·재입장 방송·한도 방송이 RATE_LIMITED 로 조용히 빠졌다(늦게 들어온 panel 자막이 안 켜짐). 값은 보낼 때마다 capRoom 에서 읽는다
+const capTurn = latestOnly() // 켜기·끄기 엇갈림 방지 — 늦은 재시도가 더 새 토글을 덮지 않게
+const sendCaps = (send: RoomCtx['sendApp'], live: () => boolean, extra?: object) =>
+  sendRetry(() => send('state', { captions: capRoom.get(), ...extra }), live)
+
+// presenter 토글 — 재시도해도 방송 실패면 되돌린다(전원에게 알리지 못하면 바꾸지 않는다, 15.1). 그사이 다시 눌렀으면(CANCELLED) 손대지 않는다
 async function toggleRoom(on: boolean, ctx: RoomCtx) {
   capRoom.set(on)
-  const err = await ctx.sendApp('state', { captions: on })
-  if (err) {
+  const live = capTurn()
+  const err = await sendCaps(ctx.sendApp, live)
+  if (err && live()) {
     capRoom.set(!on)
-    ctx.notice('captions.sendFail')
+    ctx.notice(on ? 'captions.sendFail' : 'captions.sendFailOff')
   }
 }
 
@@ -138,7 +146,7 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   })
   const selfId = ctx.r.selfId
   useEffect(() => {
-    if (presenterResync(ctx.role, ctx.appSupported, selfId)) void sendRef.current('state', { captions: capRoom.get() })
+    if (presenterResync(ctx.role, ctx.appSupported, selfId)) void sendCaps(sendRef.current, capTurn())
   }, [presenter, ctx.appSupported, selfId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 늦은 입장자에게 현재 상태 재방송(presenter, 켜져 있을 때만) — throttle : 대기 중이면 새로 걸지 않는다
@@ -151,7 +159,7 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
     if (!presenter || !room || !grew || timer.current) return
     timer.current = setTimeout(() => {
       timer.current = null
-      void sendRef.current('state', { captions: capRoom.get() })
+      void sendCaps(sendRef.current, capRoom.get) // 켜져 있는 동안만 재시도
     }, CAPTION.resendMs)
   }, [count, presenter, room])
   // 대기 타이머는 방 자막 꺼짐·역할 변경·언마운트 때만 지운다(참가자 수 변화로는 지우지 않음)
@@ -169,7 +177,7 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
     if (!ctx.speechLimited || !capRoom.get()) return
     capRoom.set(false) // panel 도 내린다 — 뒤이어 오는 presenter 의 limit 방송으로 같은 알림이 두 번 뜨지 않게(onApp 은 켜져 있을 때만 알림)
     ctx.notice('captions.limit')
-    if (presenter) void sendRef.current('state', { captions: false, captionsReason: 'limit' })
+    if (presenter) void sendCaps(sendRef.current, capTurn(), { captionsReason: 'limit' })
   }, [ctx.speechLimited]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
