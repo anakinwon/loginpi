@@ -196,6 +196,7 @@ type StageProps = {
   engineSpeaker: boolean // 엔진 발언자 판정 사용 가능 — 아니면 타일이 직접 판정
   layout: RoomLayout | null // 발표자 레이아웃(ntf layout) — 청중·패널은 follow 면 따라 본다
   onPin?: (key: string | null) => void // 발표자가 작은 타일을 고정 → room.setLayout(null = 자동 배치로 되돌림)
+  fit?: boolean // PC 맞춤 — 감싸개가 크기 컨테이너(cq 단위)일 때만 켠다(아니면 cqh 가 화면 높이로 잡힌다)
 }
 
 // 레이아웃(설계서 6.2) — 발표자 고정(발행자 1) / 발표 + 패널(큰 무대 1 + 작은 타일 줄 : 모바일 가로 스크롤, 데스크톱 우하단) /
@@ -253,7 +254,9 @@ export function Stage(props: StageProps) {
         className={
           full
             ? 'relative w-full max-w-[calc(100dvh*16/9)]'
-            : undefined
+            : props.fit
+              ? 'mx-auto w-[min(100cqw,calc(100cqh*16/9))]'
+              : undefined
         }
       >
         <VideoTile

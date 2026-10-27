@@ -576,15 +576,38 @@ export function QualityMenu({
 
 // 바 표시 여부(설계서 G6·14.3) — 마우스 : 4000ms 무조작 숨김(포인터가 바 위·바 안 포커스·메뉴 열림이면 유지),
 // 터치·펜 : 타이머 없이 무대 탭으로 토글. 판정은 이벤트의 pointerType 으로만(UA 판정 금지). active=false(입장 전)면 항상 표시
+const BAR_PIN_KEY = 'smn-bar-pin'
+
 export function useBarVisibility(active: boolean) {
   const [shown, setShown] = useState(true)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const holds = useRef({ over: false, focus: false, menu: false, sheet: false })
   const mouse = useRef(false) // 마지막 조작이 마우스였나 — 터치 사용자에겐 타이머를 걸지 않는다
+  // 항상 보이기(고정) — 이 기기에만 기억(localStorage, 막혀 있으면 이번 회의 동안만). arm 은 이벤트 클로저라 최신 값은 ref 로 읽는다
+  const [pinned, setPinnedState] = useState(() => {
+    try {
+      return typeof localStorage !== 'undefined' && localStorage.getItem(BAR_PIN_KEY) === '1'
+    } catch {
+      return false
+    }
+  })
+  const pinnedRef = useRef(pinned)
+  pinnedRef.current = pinned
+  const setPinned = (v: boolean) => {
+    pinnedRef.current = v
+    setPinnedState(v)
+    try {
+      localStorage.setItem(BAR_PIN_KEY, v ? '1' : '0')
+    } catch {}
+    clearTimeout(timer.current)
+    setShown(true)
+    if (!v) arm()
+  }
 
   const arm = () => {
     clearTimeout(timer.current)
     const h = holds.current
+    if (pinnedRef.current) return
     if (mouse.current && !h.over && !h.focus && !h.menu) timer.current = setTimeout(() => setShown(false), BAR.hideMs)
   }
   const hold = (k: keyof typeof holds.current, v: boolean) => {
@@ -605,7 +628,9 @@ export function useBarVisibility(active: boolean) {
   }, [active])
 
   return {
-    shown: !active || shown,
+    shown: !active || pinned || shown,
+    pinned,
+    setPinned,
     // 룸 영역(무대 포함)에 붙인다
     area: {
       onPointerMove: (e: RPointerEvent) => {

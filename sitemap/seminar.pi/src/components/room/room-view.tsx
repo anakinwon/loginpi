@@ -188,6 +188,7 @@ function Room({
   const canShare = useCanShare()
   const live = r.state === 'joined' || r.state === 'reconnecting'
   const bar = useBarVisibility(live)
+  const fit = useFitHeight(live)
   // 세션 역할이 정본(SIGNAL_API 6절) — 입장 응답 전엔 요청한 역할, 발행 거부면 청중
   const role: SessionRole = r.forbidden ? 'audience' : (r.role ?? ticketRole)
   const has = { audio: !!r.localStream?.getAudioTracks().length, video: !!r.localStream?.getVideoTracks().length }
@@ -460,10 +461,10 @@ function Room({
       ) : ended ? (
         <Ended code={r.error ?? 'CLOSED'} room={room} onRejoin={r.leave} />
       ) : (
-        <div className="flex gap-3">
+        <div ref={fit.ref} style={fit.h ? { height: fit.h } : undefined} className="flex gap-3">
           {/* 무대 열 — 세로 : 무대 위·바 아래, 낮은 가로 화면(휴대폰 회전) : 바를 오른쪽 세로로(설계서 6.2) */}
           <div ref={setStageEl} {...bar.area} className="landscape-short:flex-row flex min-w-0 flex-1 flex-col gap-2">
-            <div className="min-w-0 flex-1 space-y-2">
+            <div className={`min-w-0 flex-1 space-y-2 ${fit.h ? 'flex min-h-0 flex-col' : ''}`}>
               {/* 상단 정보 줄 — 인원 수·재연결 배지(설계서 5.2·6.3)·연결 점검 */}
               <div className="flex min-h-7 flex-wrap items-center gap-2 text-xs">
                 {r.peers.length > 0 && (
@@ -549,8 +550,10 @@ function Room({
                   ✋ {t('hand.waiting', { n: hands.count })}
                 </button>
               )}
-              <div className="relative">
+              {/* PC 맞춤(fit) — 이 칸의 남은 높이를 크기 컨테이너로 두고 대표 영상 폭을 min(폭, 높이×16/9)로 → 창 스크롤 없음 */}
+              <div className={fit.h ? 'relative min-h-0 flex-1 [container-type:size]' : 'relative'}>
                 <Stage
+                  fit={!!fit.h}
                   viewer={role}
                   state={r.state}
                   selfId={r.selfId}
@@ -584,6 +587,17 @@ function Room({
               {...bar.bar}
               className={`relative transition-opacity duration-200 motion-reduce:transition-none ${bar.shown ? '' : 'pointer-events-none opacity-0'}`}
             >
+              {/* 하단 바 고정 — PC(1024px 이상)만 — 4초 뒤 자동 숨김이 기본, 누르면 항상 보이기(이 기기에 기억). 좁은 화면은 바와 겹쳐 숨김(터치는 무대 탭 토글) */}
+              <button
+                type="button"
+                onClick={() => bar.setPinned(!bar.pinned)}
+                aria-pressed={bar.pinned}
+                title={t(bar.pinned ? 'barAuto' : 'barPin')}
+                aria-label={t(bar.pinned ? 'barAuto' : 'barPin')}
+                className={`bg-surface-raised absolute right-0 bottom-1 z-10 hidden size-9 place-items-center rounded-full text-sm lg:grid ${bar.pinned ? 'text-accent' : 'text-muted-foreground opacity-70'}`}
+              >
+                📌
+              </button>
               <div className="flex justify-center">
                 <ReactionMenu open={reactOpen} onClose={() => setReactOpen(false)} onPick={r.react} />
                 <QualityMenu
@@ -689,4 +703,25 @@ function Room({
       </dialog>
     </div>
   )
+}
+
+// PC(1024px 이상) 룸 높이 = 창 높이 − 룸 위쪽 위치 − 아래 여백(본문 pb-6) — 영상·우측 패널이 창 안에 들어와 상하좌우 스크롤이 생기지 않게.
+// 제목 줄 바뀜·창 크기를 따라가려고 CSS 고정값 대신 실제 위치를 잰다. 휴대폰은 기존 흐름(세로 스크롤) 그대로
+function useFitHeight(on: boolean) {
+  const [el, ref] = useState<HTMLDivElement | null>(null)
+  const [h, setH] = useState<number | undefined>()
+  useEffect(() => {
+    if (!el || !on) return setH(undefined)
+    const mq = matchMedia('(min-width: 1024px)')
+    const measure = () =>
+      setH(mq.matches ? Math.max(360, Math.floor(innerHeight - el.getBoundingClientRect().top - scrollY - 24)) : undefined)
+    measure()
+    addEventListener('resize', measure)
+    mq.addEventListener('change', measure)
+    return () => {
+      removeEventListener('resize', measure)
+      mq.removeEventListener('change', measure)
+    }
+  }, [el, on])
+  return { ref, h }
 }

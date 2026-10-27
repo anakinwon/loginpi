@@ -213,6 +213,8 @@
     "refLabel": "Reference model"
   },
   "room": {
+    "barPin": "Always show bottom bar",
+    "barAuto": "Auto-hide bottom bar",
     "title": "Join seminar · {room}",
     "titleSeminar": "Get ready to join",
     "noEngine": "The video server is not ready yet.",

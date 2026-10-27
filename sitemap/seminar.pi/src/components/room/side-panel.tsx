@@ -113,7 +113,7 @@ export function SidePanel({
       hidden={!open}
       aria-label={t('panel.title')}
       onKeyDown={panelKeys}
-      className="bg-surface fixed inset-0 z-30 flex flex-col min-[580px]:static min-[580px]:z-auto min-[580px]:h-[min(80dvh,720px)] min-[580px]:w-80 min-[580px]:shrink-0 min-[580px]:rounded-xl"
+      className="bg-surface fixed inset-0 z-30 flex flex-col min-[580px]:static min-[580px]:z-auto min-[580px]:h-[min(80dvh,720px)] lg:h-auto min-[580px]:w-80 min-[580px]:shrink-0 min-[580px]:rounded-xl"
     >
       <div className="flex items-center gap-1 border-b border-white/10 p-2">
         <div role="tablist" aria-label={t('panel.title')} onKeyDown={tabKeys} className="flex flex-1 gap-1">

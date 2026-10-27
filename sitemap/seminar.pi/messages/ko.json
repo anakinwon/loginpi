@@ -213,6 +213,8 @@
     "refLabel": "참조 모델"
   },
   "room": {
+    "barPin": "하단 바 항상 보이기",
+    "barAuto": "하단 바 자동 숨기기",
     "title": "세미나 입장 · {room}",
     "titleSeminar": "입장 준비",
     "noEngine": "화상 서버가 아직 준비되지 않았습니다.",
