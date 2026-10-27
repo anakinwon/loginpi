@@ -624,7 +624,10 @@
       "mail": "Invite by email",
       "mailApp": "Send with default mail app",
       "mailSubject": "[Seminar invite] {title}",
-      "mailBody": "{title}\nWhen: {start}\n\nJoin directly with this link.\n{url}"
+      "mailBody": "{title}\nWhen: {start}\n\nJoin directly with this link.\n{url}",
+      "copy": "Copy link",
+      "copied": "Link copied.",
+      "copyFail": "Couldn't copy. Please copy the link from the address bar."
     },
     "attendance": "Attendance"
   },

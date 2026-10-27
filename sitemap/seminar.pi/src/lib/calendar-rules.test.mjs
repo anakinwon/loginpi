@@ -4,6 +4,8 @@ import assert from 'node:assert/strict'
 import {
   buildIcs,
   calendarUrl,
+  canCopy,
+  copyText,
   foldLine,
   icsEscape,
   mailtoUrl,
@@ -40,6 +42,32 @@ test('메일 링크 — 웹 작성·mailto 인코딩', () => {
 
 test('TEXT 이스케이프', () => {
   assert.equal(icsEscape('a;b,c\\d\ne'), 'a\\;b\\,c\\\\d\\ne')
+})
+
+test('TEXT 이스케이프 — 단독 \\r·CRLF·제어문자(주입 차단), TAB 보존', () => {
+  assert.equal(icsEscape('a\rb'), 'a\\nb')
+  assert.equal(icsEscape('a\r\nb'), 'a\\nb')
+  assert.equal(icsEscape('a\u0000b\u001Fc\u007Fd\te'), 'abcd\te')
+  for (const s of [icsEscape('x\rATTENDEE:mailto:evil@x'), icsEscape('y\u0000\u000B\u000C')])
+    assert.ok(!/[\u0000-\u0008\u000A-\u001F\u007F]/.test(s))
+})
+
+test('.ics — 제목에 \\rATTENDEE 를 넣어도 새 속성 줄이 생기지 않는다', () => {
+  const ics = buildIcs({ ...ev, title: 'T\rATTENDEE:mailto:evil@x\u0000', url: ev.url + '\r\nX-EVIL:1' })
+  // 줄 구분은 CRLF 뿐(단독 \r·\n 없음), 펼친 뒤 ATTENDEE·X-EVIL 로 시작하는 줄 없음
+  assert.ok(!/\r(?!\n)|(?<!\r)\n/.test(ics))
+  const lines = ics.replace(/\r\n /g, '').split('\r\n')
+  assert.ok(!lines.some((l) => /^(ATTENDEE|X-EVIL)/.test(l)))
+  assert.ok(lines.includes('SUMMARY:T\\nATTENDEE:mailto:evil@x'))
+})
+
+test('링크 복사 — 성공·거부·클립보드 없음', async () => {
+  let got = ''
+  assert.equal(await copyText('u1', { writeText: async (s) => void (got = s) }), true)
+  assert.equal(got, 'u1')
+  assert.equal(await copyText('u2', { writeText: async () => { throw new Error('denied') } }), false)
+  assert.equal(await copyText('u3', undefined), false)
+  assert.equal(canCopy({}), false)
 })
 
 test('줄접기 — 75 옥텟 이하·UTF-8 글자 보존', () => {
