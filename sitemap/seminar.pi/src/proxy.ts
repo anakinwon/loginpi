@@ -13,12 +13,12 @@ import { routing } from './i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
 
-export default function proxy(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   if (isMaliciousAgent(req.headers.get('user-agent'))) {
     return forbiddenResponse('blocked_agent')
   }
   // 개발 환경은 HMR·반복 새로고침이 단일 IP에 몰리므로 차단 우회
-  const rl = checkClientLimit(req, 'PAGE')
+  const rl = await checkClientLimit(req, 'PAGE')
   if (process.env.NODE_ENV !== 'development' && !rl.allowed) {
     return rateLimitedPageResponse(rl.retryAfter, req.nextUrl.pathname)
   }

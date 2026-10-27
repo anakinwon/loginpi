@@ -105,29 +105,56 @@ export function getClientIp(req: NextRequest): string {
 }
 
 // 같은 NAT(행사장 Wi-Fi 등) 뒤 로그인 사용자들이 IP 버킷 하나를 나눠 쓰면 한 사람의 연타·새로고침이 남의 화면까지 429 로 막는다(seminar 야간 E2E r4).
-// 세션 자격(X-Pi-Token·pi_session·authjs 쿠키)이 있으면 IP+자격 끝 32자 버킷으로 따로 세고, 자격을 돌려 쓰는 우회는 IP 전체 상한(한도 × NAT_SCALE)이 막는다.
-// 자격 진위는 여기서 보지 않는다(키로만 씀 — 검증은 핸들러). AUTH(로그인 시도)는 무차별 대입 대상이라 IP 단독 그대로.
+// 서명 검증된 Pi 세션(pi_session 쿠키·X-Pi-Token, PI_SESSION_SECRET HMAC + exp)만 IP+세션 버킷으로 따로 세고, IP 전체 상한(한도 × NAT_SCALE)을 함께 건다.
+// 검증 안 된 자격은 키로 쓰지 않는다 — 토큰 문자열만 바꿔 한도 10배·차단 회피가 되던 우회 차단(보안 검토 2026-10-28).
+// 분리는 PAGE·API_GENERAL 만 — AUTH(무차별 대입)·PAYMENT·ADMIN 은 IP 단독. Google(authjs JWE) 세션은 검증 비용 때문에 IP 단독
 // ponytail: 상한 10배는 어림값 — 행사 규모 실측이 쌓이면 조정
 export const NAT_SCALE = 10
-const SESSION_COOKIES = [
-  'pi_session',
-  'authjs.session-token',
-  '__Secure-authjs.session-token',
-]
+const SPLIT_POLICIES: ReadonlySet<PolicyKey> = new Set(['PAGE', 'API_GENERAL'])
 
-export function sessionKey(req: NextRequest): string | null {
-  const v =
-    req.headers.get('x-pi-token') ||
-    SESSION_COOKIES.map((n) => req.cookies.get(n)?.value).find(Boolean)
-  return v ? v.slice(-32) : null
+// 검증 결과 캐시(토큰 → exp ms, 실패 = 0) — 같은 세션의 반복 요청마다 HMAC 을 다시 하지 않게(R-P2)
+const verified = new Map<string, number>()
+let hmacKey: { secret: string; key: Promise<CryptoKey> } | null = null
+const b64url = (s: string) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0))
+
+// Web Crypto(Edge·Node 공용) — @pi/auth verifySessionToken 과 같은 형식(payload.sig, HMAC-SHA256 base64url, exp 초)
+export async function verifiedSessionKey(
+  req: Pick<NextRequest, 'headers' | 'cookies'>,
+  secret = process.env.PI_SESSION_SECRET,
+): Promise<string | null> {
+  const token = req.cookies.get('pi_session')?.value || req.headers.get('x-pi-token')
+  if (!token || !secret || token.length > 4096) return null
+  const now = Date.now()
+  const hit = verified.get(token)
+  if (hit !== undefined) return hit > now ? token.slice(-32) : null
+  let exp = 0
+  try {
+    const dot = token.lastIndexOf('.')
+    if (dot > 0) {
+      if (hmacKey?.secret !== secret)
+        hmacKey = {
+          secret,
+          key: crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']),
+        }
+      const payload = token.slice(0, dot)
+      const ok = await crypto.subtle.verify('HMAC', await hmacKey.key, b64url(token.slice(dot + 1)), new TextEncoder().encode(payload))
+      const e = ok ? Number(JSON.parse(new TextDecoder().decode(b64url(payload))).exp) * 1000 : 0
+      exp = Number.isFinite(e) ? e : 0
+    }
+  } catch {
+    exp = 0
+  }
+  if (verified.size > 10_000) verified.clear() // ponytail: 통째 비움 — 인스턴스 로컬 단기 캐시라 충분
+  verified.set(token, exp)
+  return exp > now ? token.slice(-32) : null
 }
 
-export function checkClientLimit(
+export async function checkClientLimit(
   req: NextRequest,
   policy: PolicyKey,
-): { allowed: boolean; remaining: number; retryAfter: number } {
+): Promise<{ allowed: boolean; remaining: number; retryAfter: number }> {
   const ip = getClientIp(req)
-  const sk = policy === 'AUTH' ? null : sessionKey(req)
+  const sk = SPLIT_POLICIES.has(policy) ? await verifiedSessionKey(req) : null
   if (!sk) return checkRateLimit(ip, policy)
   const all = checkRateLimit(ip, policy, NAT_SCALE, '*')
   if (!all.allowed) return all

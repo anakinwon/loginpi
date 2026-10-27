@@ -13,7 +13,7 @@ import { routing } from './i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
 
-export default function proxy(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   // /api/sites/<domain> 잘못된 퍼센트 인코딩 — Next 가 라우트 파라미터 디코딩 단계에서 500(text/plain)을 내므로 여기서 404(KISA 2026-10-09 재점검)
   if (req.nextUrl.pathname.startsWith('/api/')) {
     try {
@@ -30,7 +30,7 @@ export default function proxy(req: NextRequest) {
     return forbiddenResponse('blocked_agent')
   }
   // 개발 환경은 HMR·반복 새로고침이 단일 IP에 몰리므로 차단 우회
-  const rl = checkClientLimit(req, 'PAGE')
+  const rl = await checkClientLimit(req, 'PAGE')
   if (process.env.NODE_ENV !== 'development' && !rl.allowed) {
     return rateLimitedPageResponse(rl.retryAfter, req.nextUrl.pathname)
   }
