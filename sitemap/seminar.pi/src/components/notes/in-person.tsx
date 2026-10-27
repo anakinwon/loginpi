@@ -41,14 +41,22 @@ const REC_MARK = '● ' // 기록 중 탭 제목 앞 표시
 const mmss = (sec: number) =>
   `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
 
-export function InPersonNote() {
+// ai = 서버에 외부 AI 키가 있는가(page 가 geminiEnabled 로 넘김) — 없으면 마이크 권한부터 묻고 503 으로 끝나지 않게
+//  [기록 시작] 대신 안내만 둔다(T02 r6). 키는 배포 환경변수라 바뀌면 다시 배포된다
+export function InPersonNote({ ai }: { ai: boolean }) {
   const t = useTranslations('notes')
   return (
     <LoginGate>
       {(user) =>
         user.role === 'ADMIN' || user.role === 'MASTER' ? (
           <div className="space-y-8">
-            <Recorder />
+            {ai ? (
+              <Recorder />
+            ) : (
+              <p role="status" className="bg-surface rounded-xl p-4 text-sm">
+                {t('aiOff')}
+              </p>
+            )}
             <section className="space-y-3">
               <h2 className="font-semibold">{t('recentNotes')}</h2>
               <NoteList />
@@ -367,6 +375,7 @@ export function NoteList() {
   const [page, setPage] = useState(1)
   const [res, setRes] = useState<{ notes: Item[]; total: number } | null>(null)
   const [err, setErr] = useState(false)
+  const [tries, setTries] = useState(0) // [다시 불러오기] — 일시 오류(네트워크·429) 뒤 새로고침 없이(보강 T02 r6)
   useEffect(() => {
     let live = true
     void readApi<{ notes: Item[]; total: number }>(
@@ -379,9 +388,25 @@ export function NoteList() {
     return () => {
       live = false
     }
-  }, [page])
+  }, [page, tries])
 
-  if (err) return <p className="text-sm">{t('error')}</p>
+  if (err)
+    return (
+      <p role="alert" className="flex items-center gap-3 text-sm">
+        {t('error')}
+        <button
+          type="button"
+          className={BTN}
+          onClick={() => {
+            setErr(false)
+            setRes(null)
+            setTries((n) => n + 1)
+          }}
+        >
+          {t('reload')}
+        </button>
+      </p>
+    )
   if (!res)
     return <p className="text-muted-foreground text-sm">{t('loading')}</p>
   if (!res.total)
@@ -423,13 +448,13 @@ export function NoteList() {
   )
 }
 
-export function NotesHome() {
+export function NotesHome({ ai }: { ai: boolean }) {
   const t = useTranslations('notes')
   return (
     <LoginGate>
       {(user) => (
         <div className="space-y-4">
-          {(user.role === 'ADMIN' || user.role === 'MASTER') && (
+          {ai && (user.role === 'ADMIN' || user.role === 'MASTER') && (
             <Link href="/notes/new" className={BTN}>
               {t('newNote')}
             </Link>
