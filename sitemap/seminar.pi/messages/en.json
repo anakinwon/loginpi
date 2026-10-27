@@ -9,7 +9,8 @@
   },
   "nav": {
     "link": "Link account",
-    "switchLocale": "한국어"
+    "switchLocale": "한국어",
+    "privacy": "Privacy"
   },
   "auth": {
     "checking": "Checking sign-in…",
