@@ -17,7 +17,8 @@ export function SiteHeader() {
         <Link href="/" className="text-lg font-bold">
           seminar.pi
         </Link>
-        <nav className="flex flex-wrap items-center gap-3 text-sm">
+        {/* 글자 링크도 터치 대상 높이 24px 이상(WCAG 2.5.8, 360px 폭에서 줄바꿈돼 위아래로 붙을 때) */}
+        <nav className="flex flex-wrap items-center gap-3 text-sm [&>a]:inline-flex [&>a]:min-h-6 [&>a]:items-center">
           <Link href="/progress">{tl('progress')}</Link>
           <Link href="/link">{t('link')}</Link>
           <Link href="/privacy">{t('privacy')}</Link>

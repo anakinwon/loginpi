@@ -36,7 +36,8 @@ export function ShareLinks({ d }: { d: SeminarCard }) {
           {t('mail')}
         </a>
       </div>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+      {/* 글자 링크·버튼도 터치 대상 높이 24px 이상(WCAG 2.5.8) — text-xs 그대로면 16px */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs [&>*]:inline-flex [&>*]:min-h-6 [&>*]:items-center">
         <a className="text-muted-foreground hover:underline" href={mailtoUrl(subject, body)}>
           {t('mailApp')}
         </a>
