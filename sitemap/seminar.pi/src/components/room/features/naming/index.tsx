@@ -9,6 +9,8 @@ import { isUuid, NCKNM_MAX, parseNameSignal } from '@/lib/seminar-rules'
 import { featureStore, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 
 const renameOpen = featureStore(false)
+// 내 타일 이름표를 눌렀을 때(stage) — 세미나 방이면 이름 바꾸기 창이 열린다(실험실 방은 창이 없어 아무 일 없음)
+export const openRename = () => renameOpen.set(true)
 export const titleVer = featureStore(0) // 받은 제목 변경 신호 수 — room-title 이 구독해 다시 읽는다
 // 룸 밖(제목 줄)에서 신호를 보내려고 룸 맥락의 sendApp 을 잡아 둔다(룸이 없으면 null)
 export const roomSend: { current: RoomCtx['sendApp'] | null } = { current: null }

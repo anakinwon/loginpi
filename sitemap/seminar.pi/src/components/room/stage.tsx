@@ -8,6 +8,7 @@ import { useLayerWatch } from './layer-watch'
 import { followKey, groupTracks, nextPin, ringFor, type Layer, type PinState, type RoomLayout } from './room-rules'
 import type { Peer, RemoteTrack, RoomState, SessionRole } from './use-room'
 import { mirrorOn } from './features/mirror'
+import { openRename } from './features/naming'
 import { VideoTile } from './video-tile'
 
 const PLAY_RETRY_MS = 1000
@@ -271,6 +272,8 @@ export function Stage(props: StageProps) {
           consumerId={main?.consumerId}
           onLayer={props.onLayer}
           speaking={ring(main)}
+          // 대표 영상이 내 카메라면 이름표를 눌러 내 이름 바꾸기(작은 타일은 통째로 고정 버튼이라 중첩 버튼 금지 — ⋯ 메뉴로)
+          onName={live && main && !main.screen && main.peerId === props.selfId ? openRename : undefined}
         >
           {notice && (
             <p className="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center text-sm">

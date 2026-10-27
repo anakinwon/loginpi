@@ -67,6 +67,7 @@ export function VideoTile({
   onLayer,
   speaking: engineSpeaking,
   children,
+  onName,
 }: {
   video: MediaStream | null
   audio: MediaStream | null
@@ -78,6 +79,7 @@ export function VideoTile({
   onLayer?: LayerFn
   speaking?: boolean // 엔진 발언자 판정(ntf activeSpeaker, v1.2) — 없으면(구 엔진) 이 타일이 AudioContext 로 판정
   children?: ReactNode // 타일 위 안내·스피너
+  onName?: () => void // 있으면 이름표가 버튼(내 타일 — 눌러서 내 이름 바꾸기)
 }) {
   const t = useTranslations('room')
   const hasVideo = !!video?.getVideoTracks().length
@@ -116,7 +118,22 @@ export function VideoTile({
               <Icon d={ICON.audio} off small />
             </span>
           )}
-          <span className="truncate">{name}</span>
+          {onName ? (
+            // 더블클릭은 무대 전체 화면 토글로 올라가지 않게 막는다
+            <button
+              type="button"
+              onClick={onName}
+              onDoubleClick={(e) => e.stopPropagation()}
+              title={t('rename.tile')}
+              className="flex min-w-0 items-center gap-1 hover:underline"
+            >
+              <span className="truncate">{name}</span>
+              <span aria-hidden>✏️</span>
+              <span className="sr-only">{t('rename.tile')}</span>
+            </button>
+          ) : (
+            <span className="truncate">{name}</span>
+          )}
         </span>
       )}
     </div>

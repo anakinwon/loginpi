@@ -214,6 +214,7 @@
   },
   "room": {
     "rename": {
+      "tile": "Click to change my name",
       "menu": "Change my name",
       "title": "My name in this seminar",
       "hint": "Up to 30 characters. Used only in this seminar and updates on everyone's screen right away.",
