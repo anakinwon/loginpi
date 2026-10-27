@@ -16,6 +16,10 @@ export interface CalEvent {
   canceled?: boolean
 }
 
+// 보는 사람의 시간대 — next-intl useFormatter 는 서버(배포본 = UTC) 시간대를 물려받으므로 화면 표시엔 이 값을 명시한다(E2E r2)
+export const viewerTz = () => Intl.DateTimeFormat().resolvedOptions().timeZone
+export const inViewerTz = <const T extends object>(o: T, tz = viewerTz()) => ({ ...o, timeZone: tz })
+
 // 2026-10-27T05:00:00.000Z → 20261027T050000Z (UTC 기본형)
 export const utcStamp = (d: Date) =>
   d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')

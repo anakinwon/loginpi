@@ -8,8 +8,10 @@ import {
   copyText,
   foldLine,
   icsEscape,
+  inViewerTz,
   mailtoUrl,
   utcStamp,
+  viewerTz,
   webMailUrl,
 } from './calendar-rules.ts'
 
@@ -105,4 +107,17 @@ test('.ics — 시작 10분 전 알림(VEVENT 안), 취소 일정엔 없음, 알
   assert.ok(lines.includes('DESCRIPTION:A\\nATTENDEE:x'))
   assert.ok(!lines.some((l) => l.startsWith('ATTENDEE')))
   assert.ok(!buildIcs({ ...ev, canceled: true }).includes('VALARM'))
+})
+
+// E2E r2 : 배포본(서버 UTC)에서 시작일시가 UTC 로 보이던 결함 — 표시 옵션에 보는 사람 시간대를 명시한다
+test('보는 사람 시간대 — 서버 UTC 와 무관하게 KST 로 표시', () => {
+  const d = new Date('2026-10-27T16:21:00.000Z') // 2026-10-28 01:21 KST
+  const o = inViewerTz({ dateStyle: 'medium', timeStyle: 'short' }, 'Asia/Seoul')
+  assert.equal(o.timeZone, 'Asia/Seoul')
+  assert.equal(o.dateStyle, 'medium')
+  const s = new Intl.DateTimeFormat('ko', o).format(d)
+  assert.match(s, /28/)
+  assert.match(s, /1:21/) // 오전/AM 표기는 ICU 데이터마다 다름
+  // 기본값 = 실행 환경 시간대(브라우저에선 사용자 시간대)
+  assert.equal(inViewerTz({}).timeZone, viewerTz())
 })
