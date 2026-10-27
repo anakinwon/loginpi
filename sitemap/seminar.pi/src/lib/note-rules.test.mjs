@@ -128,3 +128,51 @@ test('recAlert — 대면 노트 경고 우선순위(오류 > 마이크 끊김 >
   assert.equal(recAlert({ ...s, limited: true, micLost: true }), 'micLost')
   assert.equal(recAlert({ err: 'x', limited: true, micLost: true }), 'err')
 })
+
+// 대면 노트 화면 소스 지킴이(T02 r2) — 화면 시험 도구가 없어 핵심 배선을 소스로 확인한다
+const inPerson = async () => {
+  const { readFile } = await import('node:fs/promises')
+  return readFile(
+    new URL('../components/notes/in-person.tsx', import.meta.url),
+    'utf8',
+  )
+}
+
+test('대면 노트 — 앱 안 이동(헤더 링크·언어 바꾸기)으로 떠나도 마지막 조각 뒤 끝낸다(RECORDING 고착 방지)', async () => {
+  const s = await inPerson()
+  // 기록 효과 정리에서 진짜 떠남(left)·중복 아님(ended)을 확인하고 flush → endNote
+  assert.match(
+    s,
+    /left\.current = true\s*\n\s*setTimeout\(\(\) => \{\s*\n\s*if \(!left\.current \|\| ended\.current\) return/,
+  )
+  assert.match(
+    s,
+    /void flush\(UPLOAD_TIMEOUT_MS\)\.then\(\(\) => endNote\(ntId\)\)/,
+  )
+  assert.match(s, /\}, \[ntId, flush\]\)/)
+  // 종료 버튼·창 닫힘·정리 경로가 모두 ended 를 세워 두 번 끝내지 않게
+  assert.equal((s.match(/ended\.current = true/g) ?? []).length, 3)
+})
+
+test('대면 노트 — 마이크가 끊기면 [마이크 다시 연결]로 같은 회의록에 이어 기록(ko·en 문구)', async () => {
+  const s = await inPerson()
+  assert.match(s, /micLost && !finishing &&/)
+  assert.match(
+    s,
+    /setMicLost\(false\)\s*\n\s*setTrack\(s\.getAudioTracks\(\)\[0\] \?\? null\)/,
+  )
+  const { readFile } = await import('node:fs/promises')
+  for (const l of ['ko', 'en']) {
+    const m = JSON.parse(
+      await readFile(
+        new URL(`../../messages/${l}.json`, import.meta.url),
+        'utf8',
+      ),
+    ).notes
+    assert.ok(m.micRetry, `${l} notes.micRetry 없음`)
+    assert.ok(
+      !/Google|Gemini|Meet/.test(m.micRetry + m.micLost),
+      `${l} 상표 문구`,
+    )
+  }
+})
