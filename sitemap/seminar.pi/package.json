@@ -6,7 +6,7 @@
     "dev": "node scripts/copy-mediapipe.mjs && next dev --turbopack -p 3003",
     "build": "node scripts/copy-mediapipe.mjs && next build --turbopack",
     "start": "next start -p 3003",
-    "test": "node --test src/components/room/features/media-fx/media-fx.test.mjs"
+    "test": "node --test \"src/**/*.test.mjs\""
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "1.1.1",
