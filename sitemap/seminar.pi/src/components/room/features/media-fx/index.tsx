@@ -1,7 +1,7 @@
 'use client'
 // 조명 보정 + 소음 줄이기(SA3, 설계서 15.5). 줄(FxRows)은 배경 기능의 효과 시트 '배경' 절 아래에 붙는다(⋯ '효과' 1개 = 시트 1개), 고르면 바로 적용.
 // 조명 = 영상 효과 슬롯(LIGHT.order 10, 배경 20 앞 — 카메라 원본만 재고 고친다) : 32×18 표본 평균 밝기 → ctx.filter brightness·contrast, 완화 이동(light.ts).
-// 소음 = 마이크 트랙 applyConstraints(noiseSuppression·autoGainControl 토글, echoCancellation 늘 켬 — 끄면 하울링).
+// 소음 = 마이크 트랙 applyConstraints(noiseSuppression·autoGainControl 토글, echoCancellation 늘 켬 — 끄면 하울링). 못 바꾸면(Chromium) 새 제약으로 마이크 재획득 + replaceTrack(noise.ts).
 // 판단(REA jitsi-03 ①) : Jitsi 도 기본은 브라우저 내장 처리(noiseSuppression·echoCancellation·autoGainControl true)이고 RNNoise(wasm 워클릿)는
 // 더보기의 '추가' 옵션일 뿐이다 → 우리는 브라우저 내장으로 충분하다고 보고 RNNoise·워클릿을 넣지 않는다(번들·CPU 0). 실기기 음질이 모자라면 그때 검토.
 // 기능 탐지만(UA 판정 금지) : 조명 = captureStream + ctx.filter, 소음 = getSupportedConstraints().noiseSuppression
@@ -60,7 +60,8 @@ function useNoise(track: MediaStreamTrack | null, on: boolean, ctx: RoomCtx) {
     if (!track || track.readyState !== 'live' || !canNoise()) return
     let live = true
     // 줄 세워 실행 — 빠른 연타에도 마지막 스위치 값으로 맞춘다(noise.ts)
-    void syncNoise(track, noiseOn.get, () => live).then((real) => {
+    // applyConstraints 를 못 하면(Chromium) 마이크를 새 제약으로 다시 열어 송신기에 끼운다 — 발행 전·경합이면 swapMic 이 null(알림)
+    void syncNoise(track, noiseOn.get, () => live, ctx.r.swapMic).then((real) => {
       if (real === null) return
       noiseOn.set(real)
       notice('effects.noiseFail')

@@ -776,6 +776,42 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
     }
   }
 
+  // 마이크를 새 제약으로 다시 열어 같은 송신기에 끼운다(재협상·새 producer 없음) — 소음 줄이기 전환용.
+  // 결함(T03 r6) : Chromium(Pi Browser WebView 포함)은 켜진 마이크의 처리 제약(noiseSuppression 등)을 applyConstraints 로 바꾸지 못해
+  //  스위치가 늘 '바꿀 수 없음'으로 되돌아갔다. 반환 = 새 트랙(실패·경합·나가기 null — 옛 트랙 그대로)
+  async function swapMic(c: MediaTrackConstraints): Promise<MediaStreamTrack | null> {
+    const old = localRef.current?.getAudioTracks()[0]
+    const tr = sendersRef.current.mic
+    if (!old || old.readyState !== 'live' || !tr || busyRef.current) return null
+    busyRef.current = true
+    const my = seqRef.current
+    try {
+      const deviceId = old.getSettings().deviceId
+      const s = await navigator.mediaDevices
+        ?.getUserMedia({ audio: { ...c, ...(deviceId ? { deviceId: { exact: deviceId } } : {}) } })
+        .catch(() => null)
+      const nt = s?.getAudioTracks()[0]
+      if (!nt) return null
+      const stale = () =>
+        seqRef.current !== my || localRef.current?.getAudioTracks()[0] !== old || sendersRef.current.mic !== tr
+      if (stale()) return (nt.stop(), null)
+      nt.enabled = old.enabled // 음소거 상태 유지(producer 일시정지와 맞춤)
+      const ok = await tr.sender.replaceTrack(nt).then(
+        () => true,
+        () => false,
+      )
+      if (!ok || stale()) return (nt.stop(), null)
+      watchLocalEnd(nt, 'mic', my)
+      const merged = new MediaStream([...(localRef.current?.getTracks() ?? []).filter((x) => x !== old), nt])
+      localRef.current = merged
+      setLocalStream(merged)
+      old.stop() // stop() 은 'ended' 를 내지 않는다 — watchLocalEnd 오탐 없음
+      return nt
+    } finally {
+      busyRef.current = false
+    }
+  }
+
   // 채팅 — 내 메시지는 바로 보이고(sending) chat.send 응답 ts 로 확정. 반환 = 오류 코드(성공·빈 값 null)
   async function sendChat(text: string): Promise<string | null> {
     const body = text.trim()
@@ -1013,6 +1049,7 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
     join,
     leave,
     setMedia,
+    swapMic,
     addMedia,
     shareScreen,
     sendChat,
