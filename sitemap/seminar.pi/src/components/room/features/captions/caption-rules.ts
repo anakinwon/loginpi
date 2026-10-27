@@ -7,7 +7,8 @@ export const CAPTION = {
   resendMs: 1_000, // 늦은 입장자에게 상태 재방송은 1초에 1번 이하(SIGNAL_API 3.6)
 }
 
-export type Caption = { text: string; ts: number; lang: string }
+// sig = 서버(speech/chunk)가 붙인 서명 — 화면은 검사하지 않고 번역·더빙 요청에 그대로 되돌려 보낸다(D-2)
+export type Caption = { text: string; ts: number; lang: string; sig?: string }
 
 export function parseCaption(d: unknown): Caption | null {
   if (!d || typeof d !== 'object') return null
@@ -19,6 +20,7 @@ export function parseCaption(d: unknown): Caption | null {
     text,
     ts: typeof o.ts === 'number' && Number.isFinite(o.ts) ? o.ts : Date.now(),
     lang: typeof o.lang === 'string' ? o.lang.slice(0, 16) : '',
+    ...(typeof o.sig === 'string' && o.sig.length <= 64 ? { sig: o.sig } : {}),
   }
 }
 

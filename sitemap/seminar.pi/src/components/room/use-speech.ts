@@ -69,7 +69,7 @@ export function useSpeech({
         signal: typeof AbortSignal.timeout === 'function' ? AbortSignal.timeout(UPLOAD_TIMEOUT_MS) : undefined,
       }).catch(() => null)
       if (!r) return
-      const j = (await r.json().catch(() => null)) as { text?: string; lang?: string; ts?: number; code?: string } | null
+      const j = (await r.json().catch(() => null)) as { text?: string; lang?: string; ts?: number; sig?: string; code?: string } | null
       if (!r.ok) {
         const c = j?.code
         if (halted || (c !== 'SPEECH_QUOTA' && c !== 'SPEECH_NOT_LIVE' && c !== 'SPEECH_NO_AGR')) return
@@ -82,7 +82,7 @@ export function useSpeech({
       if (!text) return
       const ts = typeof j?.ts === 'number' ? j.ts : Date.now() - durMs // 조각 시작 시각 — 서버 추정값 우선
       l.onText?.(text, ts)
-      if (l.broadcast) void l.sendApp('caption', { text, ts, lang: j?.lang || l.lang })
+      if (l.broadcast) void l.sendApp('caption', { text, ts, lang: j?.lang || l.lang, sig: j?.sig })
     }
 
     const next = () => {

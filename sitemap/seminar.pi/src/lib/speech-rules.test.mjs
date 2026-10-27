@@ -15,6 +15,11 @@ import {
   speechMaxSec,
   usrMaxSec,
   vcUseError,
+  ttsUseError,
+  dubStop,
+  TTS_MAX_CHARS,
+  TTS_SMN_MAX_CHR,
+  TTS_USR_MAX_CHR,
   once,
   dubRate,
   pushDub,
@@ -149,4 +154,20 @@ test('더빙 — 끝 처리 1회·재생 속도·큐 넘침', () => {
   const r = pushDub(q, 4)
   assert.deepEqual(r.q, [2, 3, 4])
   assert.deepEqual(r.dropped, [1])
+})
+
+test('합성 음성 사용 판정(D-2) — PAY 는 402, 나머지는 vcUseError 와 같게, 상한 관계', () => {
+  assert.equal(ttsUseError('OK'), null)
+  assert.deepEqual(ttsUseError('PAY'), { code: 'SMN_PAY_REQUIRED', status: 402 })
+  assert.deepEqual(ttsUseError('NOT_LIVE'), { code: 'SPEECH_NOT_LIVE', status: 409 })
+  assert.deepEqual(ttsUseError('QUOTA'), { code: 'SPEECH_QUOTA', status: 429 })
+  assert.deepEqual(ttsUseError('FORBIDDEN'), { code: 'FORBIDDEN', status: 403 })
+  assert.deepEqual(ttsUseError(null), { code: 'INTERNAL', status: 500 })
+  assert.ok(TTS_MAX_CHARS <= 300 && TTS_USR_MAX_CHR < TTS_SMN_MAX_CHR)
+})
+
+test('더빙 자동 끄기 — 다음 문장도 실패할 오류만(한도·종료·미결제), 한 문장 실패는 건너뜀', () => {
+  for (const c of ['SPEECH_QUOTA', 'SPEECH_NOT_LIVE', 'SMN_PAY_REQUIRED']) assert.equal(dubStop(c), true, c)
+  for (const c of ['SPEECH_TTS_FAILED', 'FORBIDDEN', 'SPEECH_RATE', 'AI_UNAVAILABLE', undefined, null, 1])
+    assert.equal(dubStop(c), false, String(c))
 })

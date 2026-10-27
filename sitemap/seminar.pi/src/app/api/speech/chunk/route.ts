@@ -9,6 +9,7 @@ import { withAuthGuard } from '@pi/guard'
 import { env } from '@/env'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
 import { getSessionUser } from '@/lib/auth'
+import { signCaption } from '@/lib/caption-sig'
 import { geminiEnabled, transcribe } from '@/lib/gemini'
 import { isUuid } from '@/lib/seminar-rules'
 import {
@@ -142,8 +143,13 @@ export const POST = withAuthGuard(
           e3.message,
         )
     }
+    // 세미나 자막은 서명을 붙여 방송한다 — 청중의 번역·합성 요청이 이 서명이 있는 글만 받는다(D-2). 대면 노트는 방송 없음
+    const sig =
+      target.p_smn_id && r.text
+        ? signCaption(env.PI_SESSION_SECRET, { smnId: target.p_smn_id, lang: '', text: r.text })
+        : undefined
     return NextResponse.json(
-      { text: r.text, lang: r.lang, ts },
+      { text: r.text, lang: r.lang, ts, sig },
       { headers: noStore },
     )
   }),

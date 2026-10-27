@@ -144,6 +144,24 @@ export function paceStyle(rate: number) {
 // ── 음성 번역 듣기(더빙, SA9 — M-3 표준 합성 음성) ──
 // 사용자당 분당 합성 음성 요청(캐시 적중 포함, translate-rules hitRate 로 셈) — 발표자 1명 5초 조각이면 정상 12회, 패널 2명이 동시에 말해도 여유
 export const TTS_REQ_PER_MIN = 30
+// 합성 1문장 글자 상한(D-2) — 5초 자막 번역문은 100자 안팎, 장황한 언어로 늘어나도 300자 안
+export const TTS_MAX_CHARS = 300
+// 합성 글자 누적 상한(fn_use_smn_tts, 캐시 미스만 차감) — 세미나 1건 = 2시간 × 분당 12문장 × 100자 ≈ 14만 자/언어, 두 언어 여유.
+// 개최자·ADMIN 이 아닌 사용자 1인 = 절반 : 드문 언어 청중 1명이 2시간 내내 혼자 미스를 내도 버티고, 1명이 세미나 몫을 다 쓰진 못하게
+// ponytail: 상수 — 세미나 규모별로 달라야 하면 env(SPEECH_MAX_MIN 처럼)로
+export const TTS_SMN_MAX_CHR = 300_000
+export const TTS_USR_MAX_CHR = TTS_SMN_MAX_CHR / 2
+
+// 합성 음성 응답 오류 중 '다음 문장도 똑같이 실패할' 것 — 더빙을 끄고 알린다(문장마다 헛요청·DB 왕복 반복 방지).
+// 한 문장만의 실패(502 합성 실패·403 서명 불일치·429 분당 요청)는 그 문장만 건너뛴다
+export const dubStop = (code: unknown) =>
+  code === 'SPEECH_QUOTA' || code === 'SPEECH_NOT_LIVE' || code === 'SMN_PAY_REQUIRED'
+
+// fn_use_smn_tts 결과 → 오류(OK = 통과). PAY = 유료 세미나 미등록(입장권·gate 와 같은 402)
+export function ttsUseError(rslt: string | null | undefined): Err {
+  if (rslt === 'PAY') return { code: 'SMN_PAY_REQUIRED', status: 402 }
+  return vcUseError(rslt)
+}
 // 재생 큐 — 재생 대기가 이만큼을 넘으면 가장 오래된 것을 버린다(늦은 더빙은 원음과 어긋나 쓸모없음)
 export const DUB_QUEUE_MAX = 3
 // 재생 속도 범위 — 원문 발화 시간에 맞추되 알아듣기 어려운 속도는 막는다

@@ -538,7 +538,8 @@
     },
     "dubbing": {
       "listen": "Listen in translated voice",
-      "blocked": "Could not play the translated voice. Please turn it on again"
+      "blocked": "Could not play the translated voice. Please turn it on again",
+      "limit": "Translated voice was turned off because it is no longer available (usage limit reached or seminar ended)"
     }
   },
   "list": {

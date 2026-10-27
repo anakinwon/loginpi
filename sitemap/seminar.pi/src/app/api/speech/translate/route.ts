@@ -5,7 +5,9 @@
 // ponytail: 캐시·요청 창 모두 서버 인스턴스 메모리 — 인스턴스가 여러 개면 인스턴스별(상한 = 인스턴스 수 × 60회). 정확한 전역 상한이 필요하면 DB 함수(fn_use_smn_vc 와 같은 방식)로
 import { NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
+import { env } from '@/env'
 import { apiError, dbRoute, requireUser } from '@/lib/api'
+import { signCaption, verifyCaption } from '@/lib/caption-sig'
 import { closed, gate, noStore } from '@/lib/engage'
 import { geminiEnabled, translate } from '@/lib/gemini'
 import { isUuid } from '@/lib/seminar-rules'
@@ -19,7 +21,7 @@ export const POST = withAuthGuard(
     if (!geminiEnabled()) return apiError('AI_UNAVAILABLE', 503)
     const [user, body] = await Promise.all([requireUser(req), req.json().catch(() => null)])
     if (user instanceof NextResponse) return user
-    const b = (body ?? {}) as { smnId?: unknown; text?: unknown; lang?: unknown }
+    const b = (body ?? {}) as { smnId?: unknown; text?: unknown; lang?: unknown; sig?: unknown }
     const text = cleanText(b.text)
     if (typeof b.smnId !== 'string' || !isUuid(b.smnId) || !text || !isTranslateLang(b.lang))
       return apiError('INVALID_INPUT', 400)
@@ -41,6 +43,11 @@ export const POST = withAuthGuard(
       cache.delete(key)
       return apiError('TRANSLATE_FAILED', 502)
     }
-    return NextResponse.json({ text: out }, { headers: noStore })
+    // 서버가 발급한 원문 자막(chunk 서명)의 번역에만 번역문 서명을 붙인다 — 더빙(/api/speech/tts)은 이 서명이 있는 글만 합성(D-2)
+    const smnId = b.smnId.toLowerCase()
+    const sig = verifyCaption(env.PI_SESSION_SECRET, b.sig, { smnId, lang: '', text })
+      ? signCaption(env.PI_SESSION_SECRET, { smnId, lang, text: out })
+      : undefined
+    return NextResponse.json({ text: out, sig }, { headers: noStore })
   }),
 )

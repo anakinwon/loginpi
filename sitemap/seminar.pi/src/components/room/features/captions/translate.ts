@@ -6,21 +6,24 @@ import { useEffect, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
 import { sameLang } from '@/lib/translate-rules'
 
-const local = new Map<string, Promise<string | null>>() // ponytail: 100개 넘으면 통째로 비움 — 세미나 1회 안에선 충분
+type Tr = { text: string; sig?: string } // sig = 서버가 번역문에 붙인 서명(D-2, 더빙 /api/speech/tts 에 그대로 보냄)
+const local = new Map<string, Promise<Tr | null>>() // ponytail: 100개 넘으면 통째로 비움 — 세미나 1회 안에선 충분
 
-// 자막 1문장 번역 — 같은 원문 언어면 원문 그대로, 실패 = null(캐시에서 지워 다음에 다시 시도)
-export function translateCaption(text: string, src: string, lang: string, smnId: string) {
-  if (sameLang(src, lang)) return Promise.resolve(text)
+// 자막 1문장 번역 — 같은 원문 언어면 원문 그대로, 실패 = null(캐시에서 지워 다음에 다시 시도). sig = 원문 자막 서명(있으면 함께 보냄)
+export function translateCaption(text: string, src: string, lang: string, smnId: string, sig?: string): Promise<Tr | null> {
+  if (sameLang(src, lang)) return Promise.resolve({ text })
   const key = `${lang}\n${text}`
   let p = local.get(key)
   if (!p) {
     p = piFetch('/api/speech/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ smnId, text, lang }),
+      body: JSON.stringify({ smnId, text, lang, sig }),
     })
-      .then((r) => (r.ok ? (r.json() as Promise<{ text?: unknown }>) : null))
-      .then((j) => (typeof j?.text === 'string' ? j.text : null))
+      .then((r) => (r.ok ? (r.json() as Promise<{ text?: unknown; sig?: unknown }>) : null))
+      .then((j) =>
+        typeof j?.text === 'string' ? { text: j.text, ...(typeof j.sig === 'string' ? { sig: j.sig } : {}) } : null,
+      )
       .catch(() => null)
     if (local.size >= 100) local.clear()
     local.set(key, p)
@@ -32,7 +35,7 @@ export function translateCaption(text: string, src: string, lang: string, smnId:
 }
 
 export function useTranslated(
-  cap: { text: string; lang: string } | null,
+  cap: { text: string; lang: string; sig?: string } | null,
   on: boolean,
   lang: string,
   smnId: string,
@@ -44,8 +47,8 @@ export function useTranslated(
   useEffect(() => {
     if (!key || !cap) return
     let live = true
-    void translateCaption(cap.text, cap.lang, lang, smnId).then((t) => {
-      if (live && t !== null) setOut({ key, text: t })
+    void translateCaption(cap.text, cap.lang, lang, smnId, cap.sig).then((t) => {
+      if (live && t !== null) setOut({ key, text: t.text })
     })
     return () => {
       live = false

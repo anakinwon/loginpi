@@ -14,7 +14,7 @@ import { parseCaption } from '../captions/caption-rules'
 import { translateCaption } from '../captions/translate'
 import { sameLang } from '@/lib/translate-rules'
 import { isUuid } from '@/lib/seminar-rules'
-import { DUB_DUCK, dubRate, once, pushDub } from '@/lib/speech-rules'
+import { DUB_DUCK, dubRate, dubStop, once, pushDub, TTS_MAX_CHARS } from '@/lib/speech-rules'
 
 export const dubOn = featureStore(false)
 const dubLang = featureStore('') // 듣는 언어('' = 원문 → 더빙 없음). 자막 시트 언어 선택을 DubRow 가 옮겨 담는다
@@ -117,22 +117,32 @@ async function pump() {
   a.play().catch(end)
 }
 
-function enqueue(ctx: RoomCtx, text: string, src: string) {
+function enqueue(ctx: RoomCtx, text: string, src: string, sig?: string) {
   const lang = dubLang.get()
   // 발표자 언어 = 듣는 언어면 원음 그대로(합성 과금·횟수 낭비 방지)
   if (!dubOn.get() || !lang || sameLang(src, lang) || !isUuid(ctx.seminarId)) return
   const ac = new AbortController()
   // 번역은 자막 화면(SA8)과 같은 translateCaption — 같은 문장·언어는 번역 요청 1회(A-3). 서버는 받은 글을 그대로 읽기만 한다
-  const audio = translateCaption(text, src, lang, ctx.seminarId)
+  // 서명 없는 번역문(서명 없는 자막·옛 엔진 화면)은 서버가 403 — 요청하지 않는다(D-2)
+  const audio = translateCaption(text, src, lang, ctx.seminarId, sig)
     .then((said) =>
-      said === null || ac.signal.aborted
+      !said?.sig || said.text.length > TTS_MAX_CHARS || ac.signal.aborted
         ? null
         : piFetch('/api/speech/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ smnId: ctx.seminarId, text: said, lang }),
+            body: JSON.stringify({ smnId: ctx.seminarId, text: said.text, lang, sig: said.sig }),
             signal: ac.signal,
-          }).then((r) => (r.ok ? r.blob() : null)), // 429·502 등은 그 문장만 건너뜀(자막은 그대로)
+          }).then(async (r) => {
+            if (r.ok) return r.blob()
+            // 한도 소진·세미나 종료·미결제는 더빙을 끄고 알림, 나머지(502·403·분당 429)는 그 문장만 건너뜀(자막은 그대로)
+            const j = (await r.json().catch(() => null)) as { code?: unknown } | null
+            if (dubStop(j?.code) && dubOn.get()) {
+              dubOn.set(false)
+              notify?.('dubbing.limit')
+            }
+            return null
+          }),
     )
     .catch(() => null)
   const r = pushDub(queue, { ac, audio })
@@ -159,21 +169,21 @@ export function DubRow({ lang }: { lang: string }) {
       label={t('listen')}
       on={on}
       onChange={(v) => {
-        if (v) unlock(() => alertBlocked?.())
+        if (v) unlock(() => notify?.('dubbing.blocked'))
         dubOn.set(v)
       }}
     />
   )
 }
 
-// 재생 거부 알림 — Overlay 가 ctx.notice 를 걸어 둔다(DubRow 는 ctx 가 없다)
-let alertBlocked: (() => void) | null = null
+// 알림(재생 거부·한도 소진) — Overlay 가 ctx.notice 를 걸어 둔다(DubRow 는 ctx 가 없다)
+let notify: ((key: string) => void) | null = null
 
 // 켜짐·꺼짐 반영 — 원음 덕킹, 끄면 큐 정리
 function DubbingOverlay({ ctx }: { ctx: RoomCtx }) {
   const on = useStore(dubOn)
   useEffect(() => {
-    alertBlocked = () => ctx.notice('dubbing.blocked')
+    notify = (key) => ctx.notice(key)
   })
   useEffect(() => {
     remoteVolume.set(on ? DUB_DUCK : 1)
@@ -181,7 +191,7 @@ function DubbingOverlay({ ctx }: { ctx: RoomCtx }) {
   }, [on])
   useEffect(
     () => () => {
-      alertBlocked = null
+      notify = null
     },
     [],
   )
@@ -194,7 +204,7 @@ export const dubbing: RoomFeature = {
   onApp: (m, ctx) => {
     if (m.topic !== 'caption' || !dubOn.get()) return
     const c = parseCaption(m.d)
-    if (c) enqueue(ctx, c.text, c.lang)
+    if (c) enqueue(ctx, c.text, c.lang, c.sig)
   },
   onReset: () => {
     dubOn.reset()

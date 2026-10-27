@@ -50,6 +50,10 @@ test('자막 d 검사 — 모양이 틀리면 버린다', () => {
   })
   assert.equal(parseCaption({ text: 'a'.repeat(900) }).text.length, 500)
   assert.equal(parseCaption({ text: '<b>x</b>', ts: 'x' }).lang, '')
+  // 서버 서명(D-2)은 그대로 옮기고, 문자열이 아니거나 64자 넘으면 버린다
+  assert.equal(parseCaption({ text: 'x', sig: '123.abc' }).sig, '123.abc')
+  assert.equal('sig' in parseCaption({ text: 'x', sig: 5 }), false)
+  assert.equal('sig' in parseCaption({ text: 'x', sig: 's'.repeat(65) }), false)
 })
 
 test('state 의 자막 키만 읽는다', () => {

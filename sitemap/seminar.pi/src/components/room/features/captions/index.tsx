@@ -32,6 +32,7 @@ export const capLatest = featureStore<{
   name: string
   text: string
   lang: string
+  sig?: string // 서버 서명(D-2) — 번역 요청에 되돌려 보내 번역문 서명을 받는다(더빙이 같은 번역 캐시를 쓴다)
   at: number
 } | null>(null)
 
@@ -250,6 +251,7 @@ export const captions: RoomFeature = {
           name: nameOf(ctx, m.from),
           text: c.text,
           lang: c.lang,
+          sig: c.sig,
           at: Date.now(),
         })
     } else if (m.topic === 'state') {
