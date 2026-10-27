@@ -11,7 +11,8 @@ import { useAppUser } from '@/components/google-auth'
 import { LoginGate } from '@/components/login-gate'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
-import { formatFee } from '@/lib/seminar-rules'
+import { formatFee, OPEN_STS } from '@/lib/seminar-rules'
+import { ShareLinks } from './share-links'
 import {
   BTN,
   BTN_PRIMARY,
@@ -104,6 +105,8 @@ export function SeminarDetail({ id }: { id: string }) {
           {() => <Action d={d} fee={fee} onChanged={() => setReload((n) => n + 1)} />}
         </LoginGate>
       )}
+      {/* 일정·공유 — 종료·취소된 세미나는 숨김(UI 설계 15 표) */}
+      {(OPEN_STS as readonly string[]).includes(d.status) && <ShareLinks d={d} />}
     </article>
   )
 }
