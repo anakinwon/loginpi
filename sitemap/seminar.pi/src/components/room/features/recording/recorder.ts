@@ -32,7 +32,8 @@ export type Recorder = {
 
 // stage = 무대 상자(relative). 그 안의 <video> 전부를 화면에 보이는 자리 그대로 그린다
 // ac = 클릭 핸들러에서 동기로 만든 AudioContext(iOS Safari 등 사용자 활성화 요구 — await 뒤에 만들면 suspended 로 무음)
-export function startRecorder(stage: HTMLElement, ac: AudioContext): Recorder {
+// onFail = 녹화 중 브라우저가 녹화를 멈췄을 때(MediaRecorder error)
+export function startRecorder(stage: HTMLElement, ac: AudioContext, onFail?: () => void): Recorder {
   const canvas = document.createElement('canvas')
   canvas.width = R.w
   canvas.height = R.h
@@ -56,9 +57,7 @@ export function startRecorder(stage: HTMLElement, ac: AudioContext): Recorder {
       g.drawImage(v, d.x, d.y, d.w, d.h)
     }
   }
-  // 워커 타이머 — 발표자가 다른 탭·창을 화면 공유하느라 이 탭이 숨어도 녹화가 초당 1프레임으로 멈추지 않게(창 타이머는 숨은 탭에서 1초 1회)
   draw()
-  const stopTick = ticker(Math.round(1000 / R.fps), draw)
 
   const dest = ac.createMediaStreamDestination()
   let sources: MediaStreamAudioSourceNode[] = []
@@ -77,13 +76,24 @@ export function startRecorder(stage: HTMLElement, ac: AudioContext): Recorder {
 
   const mime = pickMime((m) => MediaRecorder.isTypeSupported(m))
   const stream = new MediaStream([...canvas.captureStream(R.fps).getVideoTracks(), ...dest.stream.getAudioTracks()])
-  const rec = new MediaRecorder(stream, { ...(mime ? { mimeType: mime } : {}), videoBitsPerSecond: R.videoBps })
   // ponytail: 조각을 메모리에 모은다(1.5Mbps ≈ 시간당 0.7GB) — 긴 녹화가 문제면 showSaveFilePicker 로 조각마다 디스크에 쓰기
   const chunks: Blob[] = []
-  rec.ondataavailable = (e) => {
-    if (e.data.size) chunks.push(e.data)
+  let rec: MediaRecorder
+  try {
+    rec = new MediaRecorder(stream, { ...(mime ? { mimeType: mime } : {}), videoBitsPerSecond: R.videoBps })
+    rec.ondataavailable = (e) => {
+      if (e.data.size) chunks.push(e.data)
+    }
+    // 녹화 중 오류(인코더 중단 등) — 브라우저가 녹화를 멈추므로 부른 쪽이 종료·저장·'녹화 중' 고지 해제
+    rec.onerror = () => onFail?.()
+    rec.start(R.sliceMs)
+  } catch (e) {
+    // 시작 실패(형식 미지원 등) — 만든 트랙을 닫고 그리기 타이머는 돌리지 않는다(전에는 실패해도 30fps 그리기가 계속 돌았다)
+    stream.getTracks().forEach((t) => t.stop())
+    throw e
   }
-  rec.start(R.sliceMs)
+  // 워커 타이머 — 발표자가 다른 탭·창을 화면 공유하느라 이 탭이 숨어도 녹화가 초당 1프레임으로 멈추지 않게(창 타이머는 숨은 탭에서 1초 1회)
+  const stopTick = ticker(Math.round(1000 / R.fps), draw)
   const type = rec.mimeType || mime || 'video/webm'
 
   const stop = () =>
