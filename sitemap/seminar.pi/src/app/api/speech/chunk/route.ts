@@ -1,7 +1,7 @@
 // 음성 조각 → 글 — POST multipart/form-data { audio: 5초 독립 오디오 파일(webm/ogg/mp4 — wav 는 받지 않음), smnId 또는 ntId, durMs, lang? } → { text, lang, ts, sig }.
 // sig = 세미나 자막 서명(translate-rules capSig, 대면 노트·빈 글·500자 초과는 null) — 자막 방송에 실어 번역·합성(/api/speech/translate·tts)이 서버가 만든 글만 받게(보안 검토 D-2)
 // 말하는 사람 자기 브라우저가 자기 마이크 조각을 보낸다(계획 A-1, piFetch — Pi Browser 는 쿠키가 없어 X-Pi-Token). 비로그인 401(redirect 없음).
-// 순서 : 키 확인(없으면 503, 화면 숨김) → 세션·본문 병렬(R-P1) → 조각 검사(형식·크기 160KB·길이·독립 파일 머리) → fn_use_smn_vc 1왕복
+// 순서 : 키 확인(없으면 503, 화면 숨김) → 세션·본문 병렬(R-P1) → 조각 검사(형식·크기 160KB·길이·독립 파일 머리) → speechGate VC(fn_use_smn_vc 1왕복)
 //  (권한·동의·분당 20회·분당 70초·참가자 1인 상한·누적 상한, 대상 행 잠금 R-P5) → 외부 AI 음성→글(10초, BUILD_DEFECTS 2.7) → 실패 502 = 화면은 그 조각 자막만 건너뜀
 // 사용량 = opus 최저 6kbps 로 본 최악 길이를 판정 때 선예약(reserveSec, sql/010) → 호출 뒤 max(128kbps 하한 billSec, 외부 AI 음성 토큰 길이)로
 //  정산(settleSec) — 남으면 fn_ref_smn_vc_sec 환급, 모자라면 fn_add_smn_vc_sec 추가. 동시 요청이 사후 정산 전에 상한을 넘기지 못한다(chunk 정산 경합, 신규 —
@@ -12,28 +12,23 @@
 import { NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
 import { env } from '@/env'
-import { apiError, db, dbFail, dbRoute } from '@/lib/api'
+import { apiError, db, dbRoute } from '@/lib/api'
 import { getSessionUser, isAdmin } from '@/lib/auth'
 import { geminiEnabled, transcribe } from '@/lib/gemini'
 import { canRecordSeg } from '@/lib/note-rules'
 import { isUuid } from '@/lib/seminar-rules'
 import { capSig } from '@/lib/translate-rules'
+import { speechGate } from '@/lib/speech-gate'
 import {
   aiMime,
   billSec,
   chunkError,
   LANG_RE,
   MAX_CHUNK_BYTES,
-  MAX_REQ_PER_MIN,
-  MAX_SEC_PER_MIN,
   reserveSec,
   settleSec,
-  speechMaxSec,
-  usrMaxSec,
-  vcUseError,
 } from '@/lib/speech-rules'
 
-type ApiCode = Parameters<typeof apiError>[0]
 const noStore = { 'Cache-Control': 'no-store' }
 const str = (v: FormDataEntryValue | null) =>
   typeof v === 'string' && v ? v : null
@@ -101,18 +96,9 @@ export const POST = withAuthGuard(
     }
     const sec = billSec(durMs, bytes.length)
     const held = refReady ? reserveSec(durMs, bytes.length) : sec
-    const maxSec = speechMaxSec(env.SPEECH_MAX_MIN)
-    const { data, error } = await db().rpc('fn_use_smn_vc', {
-      ...target,
-      p_sec: held,
-      p_max_sec: maxSec,
-      p_max_req: MAX_REQ_PER_MIN,
-      p_max_min_sec: MAX_SEC_PER_MIN,
-      p_max_usr_sec: usrMaxSec(maxSec),
-    })
-    if (error) return dbFail(error)
-    const e = vcUseError(data as string | null)
-    if (e) return apiError(e.code as ApiCode, e.status)
+    // 자격·동의·계량 = 공용 관문(speechGate, 번역·합성과 한 곳)
+    const denied = await speechGate({ smnId: target.p_smn_id, ntId: target.p_nt_id }, user, 'VC', held)
+    if (denied) return denied
 
     // 조각 시작 시각(서버 추정) — 클라이언트 시계를 믿지 않는다
     const ts = Date.now() - durMs

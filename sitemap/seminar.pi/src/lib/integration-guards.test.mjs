@@ -52,3 +52,29 @@ test('④ 일반 fetch(\'/api/…) 는 허용 목록만 — 나머지는 piFetch
   )
   assert.deepEqual(hits.filter((h) => !ALLOW.has(h)), [])
 })
+
+test('⑤ 외부 AI 를 부르는 라우트는 모두 speechGate 를 거치고, 사용 판정 RPC 는 관문 한 곳에만 있다(필수 과제 ③)', () => {
+  const routes = srcFiles.filter((p) => rel(p).startsWith('src/app/api/'))
+  // gemini 의 transcribe·translate·tts 를 가져오는 라우트 = 계량 대상
+  const aiRoutes = routes.filter((p) =>
+    /import \{[^}]*\b(transcribe|translate|tts)\b[^}]*\} from '@\/lib\/gemini'/.test(readFileSync(p, 'utf8')),
+  )
+  assert.deepEqual(aiRoutes.map(rel).sort(), [
+    'src/app/api/speech/chunk/route.ts',
+    'src/app/api/speech/translate/route.ts',
+    'src/app/api/speech/tts/route.ts',
+  ])
+  const kinds = { chunk: 'VC', translate: 'TRANS', tts: 'TTS' }
+  for (const p of aiRoutes) {
+    const k = kinds[rel(p).split('/')[4]]
+    assert.match(readFileSync(p, 'utf8'), new RegExp(`await speechGate\\([^;]*'${k}'`), `${rel(p)} 에 speechGate ${k} 없음`)
+  }
+  const direct = srcFiles.filter(
+    (p) => !rel(p).endsWith('lib/speech-gate.ts') && /rpc\(\s*'fn_use_smn_(ai|vc)'/.test(readFileSync(p, 'utf8')),
+  )
+  assert.deepEqual(direct.map(rel), [], '관문 밖에서 사용 판정 RPC 직접 호출')
+  // 회의록 요약(summarize)은 lib/notes 만 부르고, 요약 라우트는 manage(시작자·개최자·ADMIN) 확인
+  const sum = srcFiles.filter((p) => /\bsummarize\(/.test(readFileSync(p, 'utf8')) && !rel(p).endsWith('lib/gemini.ts'))
+  assert.deepEqual(sum.map(rel), ['src/lib/notes.ts'])
+  assert.match(read('src/app/api/notes/[id]/end/route.ts'), /if \(!n\.manage\) return apiError\('FORBIDDEN', 403\)/)
+})

@@ -8,11 +8,12 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
 import { env } from '@/env'
-import { apiError, db, dbFail, dbRoute, parseBody, requireUser } from '@/lib/api'
+import { apiError, dbRoute, parseBody, requireUser } from '@/lib/api'
 import { geminiEnabled, tts } from '@/lib/gemini'
 import { isUuid } from '@/lib/seminar-rules'
-import { TTS_REQ_PER_MIN, vcUseError } from '@/lib/speech-rules'
-import { AI_LIMIT, cacheKey, capSigOk, hitRate, isTranslateLang, Lru } from '@/lib/translate-rules'
+import { speechGate } from '@/lib/speech-gate'
+import { TTS_REQ_PER_MIN } from '@/lib/speech-rules'
+import { cacheKey, capSigOk, hitRate, isTranslateLang, Lru } from '@/lib/translate-rules'
 import { CAPTION } from '@/components/room/features/captions/caption-rules'
 
 const Body = z.object({
@@ -22,7 +23,6 @@ const Body = z.object({
   sig: z.string().max(64), // 서버 발급 서명(/api/speech/translate 응답 sig 또는 자막 sig)
 })
 
-type ApiCode = Parameters<typeof apiError>[0]
 
 type Audio = { data: Buffer; mime: string }
 // 합성 음성 1문장 ≈ 5초 WAV 240KB, 100개 ≈ 24MB 상한
@@ -45,17 +45,8 @@ export const POST = withAuthGuard(
     const key = await cacheKey(body.text, body.lang)
     let p = cache.get(key)
     if (!p) {
-      const { data, error } = await db().rpc('fn_use_smn_ai', {
-        p_smn_id: smnId,
-        p_usr_id: user.id,
-        p_kind: 'TTS',
-        p_chr: body.text.length,
-        p_max_chr: AI_LIMIT.TTS.maxChr,
-        p_max_min_chr: AI_LIMIT.TTS.maxMinChr,
-      })
-      if (error) return dbFail(error)
-      const e = vcUseError(data as string | null)
-      if (e) return apiError(e.code as ApiCode, e.status)
+      const denied = await speechGate({ smnId }, user, 'TTS', body.text.length)
+      if (denied) return denied
       // 자격 확인을 기다리는 사이 같은 요청이 먼저 넣었을 수 있다
       p = cache.get(key) ?? synth(body.text, body.lang)
       cache.set(key, p)

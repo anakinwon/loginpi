@@ -79,7 +79,8 @@ test('번역·합성 라우트 — engage.gate(OPEN·무료 미등록 통과) �
   for (const [f, kind] of [['translate', 'TRANS'], ['tts', 'TTS']]) {
     const src = await readFile(new URL(`../app/api/speech/${f}/route.ts`, import.meta.url), 'utf8')
     assert.ok(src.includes('capSigOk(env.PI_SESSION_SECRET'), f)
-    assert.ok(src.includes(`'fn_use_smn_ai'`) && src.includes(`p_kind: '${kind}'`), f)
+    // 계량은 공용 관문 speechGate(kind) → fn_use_smn_ai(필수 과제 ③)
+    assert.ok(src.includes(`'${kind}', `) && /await speechGate\(/.test(src), f)
     assert.ok(!/\bgate\(/.test(src), f)
   }
   const sql = await readFile(new URL('../../sql/010_seminar_ai_use.sql', import.meta.url), 'utf8')
