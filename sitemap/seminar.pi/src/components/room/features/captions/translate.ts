@@ -6,7 +6,7 @@
 // 언어를 바꾸면 TR_LANG_SETTLE_MS 동안 더 안 바뀔 때만 요청(select 화살표 훑기 = 언어마다 외부 AI 호출 방지)
 import { useEffect, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
-import { sameLang, TR_LANG_SETTLE_MS, trStopOf, type TrStop } from '@/lib/translate-rules'
+import { sameLang, shownOf, TR_LANG_SETTLE_MS, trStopOf, type TrOut, type TrStop } from '@/lib/translate-rules'
 import { featureStore, useStore } from '../../extensions'
 
 type Said = { text: string; sig: string | null }
@@ -51,14 +51,15 @@ export function translateCaption(
   return p
 }
 
-// 보일 자막 글과 그 언어(lang 속성 — 한자 글꼴 선택·화면 낭독기 발음) — 번역이 오기 전·실패·중단이면 원문과 원문 언어
+// 보일 자막 글과 그 언어(lang 속성 — 한자 글꼴 선택·화면 낭독기 발음) — 번역 대기 중엔 직전 번역(shownOf), 실패·중단이면 원문과 원문 언어
 export function useTranslated(
-  cap: { text: string; lang: string; sig: string | null } | null,
+  cap: { text: string; lang: string; sig: string | null; at: number } | null,
   on: boolean,
   lang: string,
   smnId: string,
 ): { text: string; lang: string } | null {
-  const [out, setOut] = useState<{ key: string; text: string } | null>(null)
+  const [out, setOut] = useState<TrOut | null>(null)
+  const [failKey, setFailKey] = useState('')
   const [reqLang, setReqLang] = useState(lang)
   const stop = useStore(trStop)
   useEffect(() => {
@@ -73,14 +74,14 @@ export function useTranslated(
     if (!key || !cap) return
     let live = true
     void translateCaption(cap.text, cap.lang, reqLang, smnId, cap.sig).then((t) => {
-      if (live && t !== null) setOut({ key, text: t.text })
+      if (!live) return
+      if (t === null) setFailKey(key)
+      else setOut({ key, text: t.text, lang: reqLang, at: Date.now() })
     })
     return () => {
       live = false
     }
   }, [key, smnId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!cap) return null
-  if (!skip && out?.key === key) return { text: out.text, lang: reqLang }
-  return { text: cap.text, lang: cap.lang }
+  return shownOf(cap, key, reqLang, out, failKey, cap?.at ?? 0)
 }

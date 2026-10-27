@@ -91,7 +91,8 @@
     "NOTE_SHOT_INVALID": "Invalid screen capture",
     "NOTE_SHOT_RATE": "Too many screen captures",
     "NOTE_RETRY_SOON": "You can try again in a minute",
-    "SPEECH_TTS_FAILED": "Could not create the translated voice"
+    "SPEECH_TTS_FAILED": "Could not create the translated voice",
+    "CAPTION_SIG_INVALID": "This caption could not be verified, so it was not translated"
   },
   "progress": {
     "title": "Build progress",

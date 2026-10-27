@@ -28,7 +28,7 @@ export const POST = withAuthGuard(
       return apiError('INVALID_INPUT', 400)
     const smnId = b.smnId.toLowerCase()
     const lang = b.lang
-    if (!(await capSigOk(env.PI_SESSION_SECRET, smnId, text, b.sig))) return apiError('FORBIDDEN', 403)
+    if (!(await capSigOk(env.PI_SESSION_SECRET, smnId, text, b.sig))) return apiError('CAPTION_SIG_INVALID', 403)
     if (!hitRate(rate, user.id, Date.now())) return apiError('SPEECH_RATE', 429)
 
     const key = await cacheKey(text, lang)
