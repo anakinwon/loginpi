@@ -428,6 +428,15 @@
       "PAY_ALREADY_PAID": "이미 진행 중이거나 완료된 결제가 있습니다.",
       "PAY_INVALID_STATE": "결제를 처리할 수 없는 상태입니다.",
       "PAY_PI_CANCEL_REFUSED": "결제가 이미 진행 중이라 취소할 수 없습니다. 잠시 후 다시 확인하세요."
+    },
+    "share": {
+      "title": "일정·공유",
+      "calendar": "캘린더에 추가",
+      "ics": "일정 파일",
+      "mail": "메일로 초대",
+      "mailApp": "기본 메일 앱으로 보내기",
+      "mailSubject": "[세미나 초대] {title}",
+      "mailBody": "{title}\n일시 : {start}\n\n아래 링크로 바로 참여하세요.\n{url}"
     }
   },
   "host": {
