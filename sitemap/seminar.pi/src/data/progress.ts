@@ -38,7 +38,7 @@ export interface Feature {
   steps: FeatureStep[]
 }
 
-export const PROGRESS_UPDATED = '2026-10-27'
+export const PROGRESS_UPDATED = '2026-10-28'
 
 export const FEATURES: Feature[] = [
   {
@@ -101,29 +101,29 @@ export const FEATURES: Feature[] = [
     prio: 'P2',
     steps: [{ id: 'vod', status: 'todo' }],
   },
-  // 회의 부가 기능(v2) — 구현·검토 완료(master af8f572b), 브라우저 QA·실기기 대기. 정본 ROADMAP Phase X
+  // 회의 부가 기능(v2) — 구현·검토·야간 E2E r1~r6 완료(master 4f322641), 실기기 대기. 정본 ROADMAP Phase X
   {
     id: 'FU',
     prio: 'P1',
     steps: [
-      { id: 'appRelay', status: 'doing', ref: ['Jitsi', 'LiveKit'], note: 'v1.3.1 ✓ · engine swap …' },
-      { id: 'aiBase', status: 'doing', note: 'review ✓ · DB … · key …' },
+      { id: 'appRelay', status: 'doing', ref: ['Jitsi', 'LiveKit'], note: 'v1.3.2 ✓ · QA ✓ · engine swap …' },
+      { id: 'aiBase', status: 'doing', note: 'DB ✓ · QA ✓ · key …' },
     ],
   },
-  { id: 'F08', prio: 'P1', steps: [{ id: 'shareLinks', status: 'doing', note: 'review ✓ · QA … · device …' }] },
-  { id: 'F09', prio: 'P2', steps: [{ id: 'noiseLight', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · QA … · device …' }] },
-  { id: 'F10', prio: 'P1', steps: [{ id: 'liveCaptions', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · QA … · device …' }] },
-  { id: 'F11', prio: 'P1', steps: [{ id: 'pollQnaAttend', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · DB … · device …' }] },
+  { id: 'F08', prio: 'P1', steps: [{ id: 'shareLinks', status: 'doing', note: 'QA ✓ · device …' }] },
+  { id: 'F09', prio: 'P2', steps: [{ id: 'noiseLight', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · device …' }] },
+  { id: 'F10', prio: 'P1', steps: [{ id: 'liveCaptions', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · device …' }] },
+  { id: 'F11', prio: 'P1', steps: [{ id: 'pollQnaAttend', status: 'doing', ref: ['Jitsi'], note: 'DB ✓ · QA ✓ · device …' }] },
   {
     id: 'F12',
     prio: 'P2',
-    steps: [{ id: 'backgrounds', status: 'doing', ref: ['Jitsi', 'LiveKit'], note: 'review ✓ · model file …' }],
+    steps: [{ id: 'backgrounds', status: 'doing', ref: ['Jitsi', 'LiveKit'], note: 'model ✓ · QA ✓ · device …' }],
   },
-  { id: 'F13', prio: 'P1', steps: [{ id: 'localRecording', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · QA … · device …' }] },
-  { id: 'F14', prio: 'P1', steps: [{ id: 'aiNotes', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · DB … · device …' }] },
-  { id: 'F15', prio: 'P2', steps: [{ id: 'inPersonNotes', status: 'doing', note: 'review ✓ · DB … · device …' }] },
-  { id: 'F16', prio: 'P2', steps: [{ id: 'captionTranslate', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · QA … · device …' }] },
-  { id: 'F17', prio: 'P2', steps: [{ id: 'dubbing', status: 'doing', ref: ['Jitsi'], note: 'review ✓ · QA … · device …' }] },
+  { id: 'F13', prio: 'P1', steps: [{ id: 'localRecording', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · device …' }] },
+  { id: 'F14', prio: 'P1', steps: [{ id: 'aiNotes', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · key … · device …' }] },
+  { id: 'F15', prio: 'P2', steps: [{ id: 'inPersonNotes', status: 'doing', note: 'QA ✓ · key … · device …' }] },
+  { id: 'F16', prio: 'P2', steps: [{ id: 'captionTranslate', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · device …' }] },
+  { id: 'F17', prio: 'P2', steps: [{ id: 'dubbing', status: 'doing', ref: ['Jitsi'], note: 'QA ✓ · device …' }] },
 ]
 
 // 기능의 참조 모델 = 단계 참조의 합(첫 등장 순)

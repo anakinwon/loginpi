@@ -1,0 +1,220 @@
+{
+ "kind": "rea04-night-r6",
+ "generated_at": "2026-10-27T19:51:34.577Z",
+ "target": "https://seminarz.vercel.app",
+ "baseline": "REA_04/baseline-seminarz-scene-*.normalized.json (2026-10-27 19:33~19:50 KST, 기능 10종 추가 전 배포)",
+ "scenes": {
+  "404": {
+   "evidence_id": "ev_8ae4b40a5af2bc70e3d09504e4d2b9ec96711c0123b82d1b07847e824bc8ed92",
+   "compare_overall": "changed",
+   "changed_artifacts": [
+    "scenario_start:events",
+    "settle:events"
+   ],
+   "final_url": [
+    "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join",
+    "https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join"
+   ],
+   "completeness": [
+    {
+     "status": "complete",
+     "equality_eligible": true,
+     "missing_sections": [],
+     "truncated_sections": []
+    },
+    {
+     "status": "complete",
+     "equality_eligible": true,
+     "missing_sections": [],
+     "truncated_sections": []
+    }
+   ],
+   "requests": [
+    17,
+    15
+   ],
+   "byType": [
+    {
+     "document": 2,
+     "stylesheet": 1,
+     "script": 12,
+     "other": 2
+    },
+    {
+     "document": 2,
+     "stylesheet": 1,
+     "script": 11,
+     "other": 1
+    }
+   ],
+   "documents": [
+    [
+     "307 https://seminarz.vercel.app/ko/s/00000000-0000-4000-8000-000000000404/join",
+     "404 https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join"
+    ],
+    [
+     "307 https://seminarz.vercel.app/ko/s/00000000-0000-4000-8000-000000000404/join",
+     "404 https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join"
+    ]
+   ],
+   "http_errors_after": [
+    "404 https://seminarz.vercel.app/s/00000000-0000-4000-8000-000000000404/join"
+   ],
+   "failed_after": [],
+   "console_after": [
+    "error: Failed to load resource: the server responded with a status of 404 ()",
+    "warning: The resource https://seminarz.vercel.app/_next/static/chunks/0t3vnge3bj9ts.css?dpl=dpl_7RceegA4JVJzDojBCAxSdNaXWm6w was preloaded using link"
+   ],
+   "page_errors_after": [],
+   "a11y_added": [],
+   "a11y_removed": []
+  },
+  "list": {
+   "evidence_id": "ev_efc6c9cf6aeed267b9964a99324b2fa8332d0a2913ab9ba1c4ae3ced5e8dd3ef",
+   "compare_overall": "changed",
+   "changed_artifacts": [
+    "scenario_start:events",
+    "settle:screenshot",
+    "settle:accessibility",
+    "settle:storage",
+    "settle:events"
+   ],
+   "final_url": [
+    "https://seminarz.vercel.app/",
+    "https://seminarz.vercel.app/"
+   ],
+   "completeness": [
+    {
+     "status": "complete",
+     "equality_eligible": true,
+     "missing_sections": [],
+     "truncated_sections": []
+    },
+    {
+     "status": "complete",
+     "equality_eligible": true,
+     "missing_sections": [],
+     "truncated_sections": []
+    }
+   ],
+   "requests": [
+    38,
+    42
+   ],
+   "byType": [
+    {
+     "document": 2,
+     "stylesheet": 1,
+     "script": 14,
+     "other": 1,
+     "fetch": 20
+    },
+    {
+     "document": 2,
+     "stylesheet": 1,
+     "script": 14,
+     "other": 1,
+     "fetch": 24
+    }
+   ],
+   "documents": [
+    [
+     "307 https://seminarz.vercel.app/ko",
+     "200 https://seminarz.vercel.app/"
+    ],
+    [
+     "307 https://seminarz.vercel.app/ko",
+     "200 https://seminarz.vercel.app/"
+    ]
+   ],
+   "http_errors_after": [],
+   "failed_after": [
+    "fetch https://seminarz.vercel.app/s/0ba3a13b-f1cc-4ce3-a8c4-3fe838640874?_rsc=* net::ERR_ABORTED"
+   ],
+   "console_after": [
+    "warning: Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://app-cdn.minepi.com') does not match the recipient windo",
+    "warning: Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://app-cdn.minepi.com') does not match the recipient windo"
+   ],
+   "page_errors_after": [],
+   "a11y_added": [],
+   "a11y_removed": []
+  },
+  "progress": {
+   "evidence_id": "ev_ac0857bbd1af87494a1614c3559ee0d2a8aaf959803203564bf15f08bcb6ee28",
+   "compare_overall": "changed",
+   "changed_artifacts": [
+    "scenario_start:events",
+    "settle:screenshot",
+    "settle:accessibility",
+    "settle:storage",
+    "settle:events"
+   ],
+   "final_url": [
+    "https://seminarz.vercel.app/progress",
+    "https://seminarz.vercel.app/progress"
+   ],
+   "completeness": [
+    {
+     "status": "complete",
+     "equality_eligible": true,
+     "missing_sections": [],
+     "truncated_sections": []
+    },
+    {
+     "status": "complete",
+     "equality_eligible": true,
+     "missing_sections": [],
+     "truncated_sections": []
+    }
+   ],
+   "requests": [
+    33,
+    37
+   ],
+   "byType": [
+    {
+     "document": 2,
+     "stylesheet": 1,
+     "script": 14,
+     "other": 1,
+     "fetch": 15
+    },
+    {
+     "document": 2,
+     "stylesheet": 1,
+     "script": 14,
+     "other": 1,
+     "fetch": 19
+    }
+   ],
+   "documents": [
+    [
+     "307 https://seminarz.vercel.app/ko/progress",
+     "200 https://seminarz.vercel.app/progress"
+    ],
+    [
+     "307 https://seminarz.vercel.app/ko/progress",
+     "200 https://seminarz.vercel.app/progress"
+    ]
+   ],
+   "http_errors_after": [],
+   "failed_after": [],
+   "console_after": [
+    "warning: Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://app-cdn.minepi.com') does not match the recipient windo",
+    "warning: Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://app-cdn.minepi.com') does not match the recipient windo"
+   ],
+   "page_errors_after": [],
+   "a11y_added": [],
+   "a11y_removed": []
+  }
+ },
+ "master_sha": "4f3226413a72b99783733d2480f8c1e0b4c23dc9",
+ "commands": [
+  "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs capture-browser-scenario <scratchpad>/rea04-baseline/in/baseline-scene-list.json --format json --full-output",
+  "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs compare-web-captures REA_04/baseline-seminarz-scene-list.normalized.json <scratchpad>/e2e/rea/r6-scene-list.normalized.json --format json",
+  "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs capture-browser-scenario <scratchpad>/rea04-baseline/in/baseline-scene-progress.json --format json --full-output",
+  "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs compare-web-captures REA_04/baseline-seminarz-scene-progress.normalized.json <scratchpad>/e2e/rea/r6-scene-progress.normalized.json --format json",
+  "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs capture-browser-scenario <scratchpad>/rea04-baseline/in/baseline-scene-404.json --format json --full-output",
+  "node C:/Users/anaki/AppData/Roaming/npm/node_modules/rea-agents/scripts/rea.mjs compare-web-captures REA_04/baseline-seminarz-scene-404.normalized.json <scratchpad>/e2e/rea/r6-scene-404.normalized.json --format json"
+ ]
+}
