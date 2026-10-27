@@ -336,7 +336,15 @@
       "video": "The presenter asked you to turn on your camera.",
       "ignore": "Ignore"
     },
-    "toDetail": "Go to seminar page"
+    "toDetail": "Go to seminar page",
+    "consent": {
+      "title": "Before you turn on your microphone",
+      "body": "If recording, captions or AI meeting notes are turned on in this seminar, your voice may be converted to text, stored and translated. Voice processing is done by an AI service outside your country.",
+      "privacy": "Privacy policy",
+      "cancel": "Cancel",
+      "agree": "Agree and turn on mic",
+      "notice": "When recording, captions or AI meeting notes are on, speakers’ voices are processed. Audience voices are not sent."
+    }
   },
   "list": {
     "tabsLabel": "Seminar list view",

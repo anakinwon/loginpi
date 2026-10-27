@@ -6,6 +6,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
 // v1.2(3.5) : 사회(peer.mute·room.muteAll 잠금·peer.askUnmute)·레이아웃(room.setLayout)·발언자(ntf activeSpeaker)
+// v1.3(A-2) : 범용 중계 app.send{topic,d} → ntf app{topic,d,from}(부가 기능 공용, extensions.ts) · 입장 직후 1회 지원 확인 · 카메라 송신기(영상 효과 replaceTrack)
+import type { AppMsg } from './extensions'
 import {
   batchReaction,
   capLayer,
@@ -86,6 +88,7 @@ export type ModEvent =
 
 const REQ_TIMEOUT_MS = 10000
 const CHAT_MAX = 500 // SIGNAL_API 3.3 C — 유니코드 문자 수
+const APP_MAX = 4096 // app.send d 의 JSON 바이트 상한(A-2 4KB) — 넘으면 보내지 않는다(엔진도 거절)
 const CHAT_KEEP = 200 // ponytail: 화면에 남기는 채팅 수 상한(저장 안 함 — 오래된 것부터 버림), 긴 세미나에서 더 필요하면 가상 스크롤과 함께 늘린다
 const VIDEO = { width: { ideal: 1280 }, height: { ideal: 720 } }
 
@@ -192,6 +195,12 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   const [engineSpeaker, setEngineSpeaker] = useState(false)
   const [modEvent, setModEvent] = useState<ModEvent | null>(null)
   const modSeq = useRef(0)
+  // v1.3 app 중계 — 구독자(부가 기능), 지원 여부(null = 확인 중·입장 전, false = 구 엔진 : 의존 기능 숨김). ref = 요청 경로용 최신값
+  const appSubs = useRef(new Set<(m: AppMsg) => void>())
+  const appRef = useRef<boolean | null>(null)
+  const [appSupported, setAppState] = useState<boolean | null>(null)
+  // 카메라 송신기 — 영상 효과가 처리 트랙으로 replaceTrack 할 대상(카메라 발행 전·강등 뒤 null)
+  const [videoSender, setVideoSender] = useState<RTCRtpSender | null>(null)
 
   const log = (m: string) => onLog?.(m)
 
@@ -423,6 +432,17 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
       setLayoutState(e.d as RoomLayout)
     } else if (e.m === 'activeSpeaker') {
       setSpeaker((e.d as { peerId: string | null }).peerId ?? null)
+    } else if (e.m === 'app') {
+      // 부가 기능 중계(v1.3) — 형식이 맞는 것만 구독자에게. 구독자 오류가 시그널링 처리를 멈추지 않게 각자 감싼다
+      const a = e.d as AppMsg
+      if (typeof a?.topic !== 'string') return
+      for (const fn of appSubs.current) {
+        try {
+          fn(a)
+        } catch (err) {
+          log(`app 처리 실패 ${a.topic} ${(err as Error).message}`)
+        }
+      }
     } else if (e.m === 'error') {
       const er = e.d as { code: string; msg: string }
       log(`서버 오류 ${er.code} ${er.msg}`)
@@ -517,6 +537,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
         sync()
       }
       setState('joined')
+      probeApp(my)
       if (ticketRole === 'presenter') await publish(local, my)
     } catch (e) {
       log(`입장 실패 ${(e as Error).message}`)
@@ -568,6 +589,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
           if (seqRef.current !== my) return
           producersRef.current[source] = r.producerId
           sendersRef.current[source] = tr
+          if (source === 'camera') setVideoSender(tr.sender)
           log(`발행 ${source} producer=${r.producerId}`)
           if (!t.enabled) await request('producer.pause', { producerId: r.producerId })
         }),
@@ -679,6 +701,7 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     iceWait.current.pub = []
     producersRef.current = {}
     sendersRef.current = {}
+    setVideoSender(null)
     setPublished(false)
     setLocalOn({ audio: false, video: false })
     stopLocal()
@@ -775,6 +798,47 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
   // 레이아웃 — 무대 고정의 내 화면공유 키는 room-rules layoutFor 가 바꾼다(그래서 내 화면공유 producerId 를 넘긴다)
   const setLayout = (l: RoomLayout) => admin('room.setLayout', l)
   const screenProducerId = () => producersRef.current.screen
+
+  // ── v1.3 app 중계(A-2) ──
+  function setApp(v: boolean | null) {
+    appRef.current = v
+    setAppState(v)
+  }
+
+  // 지원 확인(입장 직후 1회) — 빈 topic 은 v1.3 엔진이 권한표 밖으로 거절하고(중계 안 함) 구 엔진은 NOT_FOUND(미구현 메서드, SIGNAL_API 5절)
+  // → NOT_FOUND·TIMEOUT 만 미지원. 근거 REA_04_UI_EXT R-A2(LiveKit 도 서버 판에 따라 기능을 가른다)
+  function probeApp(my: number) {
+    request('app.send', { topic: '', d: null }).then(
+      () => seqRef.current === my && setApp(true),
+      (e: unknown) => {
+        const c = codeOf(e)
+        if (seqRef.current !== my || c === 'LEFT') return
+        setApp(c !== 'NOT_FOUND' && c !== 'TIMEOUT')
+      },
+    )
+  }
+
+  // 보내기 — 반환 = 오류 코드(성공 null). 구 엔진·큰 d 는 보내지 않는다. 엔진이 NOT_FOUND 면 그때부터 미지원
+  async function sendApp(topic: string, d: unknown): Promise<string | null> {
+    if (appRef.current === false) return 'NOT_FOUND'
+    if (new TextEncoder().encode(JSON.stringify(d ?? null)).length > APP_MAX) return 'TOO_LARGE'
+    try {
+      await request('app.send', { topic, d })
+      return null
+    } catch (e) {
+      const c = codeOf(e)
+      if (c === 'NOT_FOUND') setApp(false)
+      return c
+    }
+  }
+
+  // 받기 구독 — 반환 = 해지 함수. 세션이 바뀌어도 구독은 유지(룸 화면이 한 번 건다)
+  function subscribeApp(fn: (m: AppMsg) => void) {
+    appSubs.current.add(fn)
+    return () => {
+      appSubs.current.delete(fn)
+    }
+  }
 
   // 반응 — 500ms 묶음(최대 3개)으로 보낸다. 서버가 300ms 합산해 전원(나 포함)에게 ntf reaction 으로 돌려준다
   function react(emoji: string) {
@@ -880,6 +944,8 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     setSpeaker(null)
     setEngineSpeaker(false)
     setModEvent(null)
+    setApp(null)
+    setVideoSender(null)
   }
 
   return {
@@ -928,5 +994,9 @@ export function useRoom({ wsUrl, onLog }: { wsUrl?: string; onLog?: (m: string) 
     muteAll,
     setLayout,
     screenProducerId,
+    appSupported,
+    sendApp,
+    subscribeApp,
+    videoSender,
   }
 }

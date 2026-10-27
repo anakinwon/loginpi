@@ -1,7 +1,8 @@
 'use client'
 // 사이드 패널 — 채팅·참가자 탭(설계서 14.4·5.3). 닫아도 언마운트하지 않는다(쓰던 글·스크롤 유지, 안 읽은 수는 room-view 가 센다).
 // 폭 <580px 이면 전체 화면(포커스 가둠), 그 이상은 룸 오른쪽 열. 탭 ←→·Esc 닫기. 채팅은 저장 안 함(엔진 중계만 — 늦게 들어오면 이전 대화 없음, 13절 #2)
-import { useEffect, useId, useRef, useState } from 'react'
+// 부가 기능 탭(설계서 15.3, extensions PanelTabDef) — 채팅과 참가자 사이에 등록 순서대로. 없으면 기존 2탭 그대로
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { ICON, Icon, type PanelTab } from './control-bar'
 import { modActions, sortPeers, type Locks, type ModAction, type PeerMedia } from './room-rules'
@@ -11,6 +12,9 @@ const CHAT_MAX = 500 // SIGNAL_API 3.3 C. maxLength 는 UTF-16 단위라 이모�
 const SAME_SENDER_MS = 60000 // 같은 사람이 1분 안에 이어 쓰면 이름·시각 줄 생략(설계서 14.4)
 const FULL_SCREEN = '(max-width: 579.98px)' // 아래 className 의 min-[580px] 와 짝 — 이 폭에선 패널이 전체 화면
 const FOCUSABLE = ':is(button, input, a[href], [tabindex]):not([disabled]):not([tabindex="-1"])'
+
+// 부가 탭 1개 — label 은 room.* 아래 문구 키, badge = 새 항목 수, node = 탭 내용(room-view 가 맥락을 넣어 만든다)
+export type ExtraTab = { id: string; label: string; badge: number; node: ReactNode }
 
 export function SidePanel({
   tab,
@@ -30,6 +34,7 @@ export function SidePanel({
   locks,
   onMod,
   onMuteAll,
+  extra = [],
 }: {
   tab: PanelTab
   open: boolean
@@ -48,10 +53,12 @@ export function SidePanel({
   locks: Locks
   onMod: (peerId: string, action: ModAction) => void
   onMuteAll: (lock: boolean) => void // 모두 마이크 끄기(lock = 잠금 설정·유지 여부)
+  extra?: ExtraTab[]
 }) {
   const t = useTranslations('room')
   const id = useId()
-  const tabs: PanelTab[] = ['chat', 'people']
+  const tabs: PanelTab[] = ['chat', ...extra.map((x) => x.id), 'people']
+  const ext = new Map(extra.map((x) => [x.id, x]))
   const tabEl = (x: PanelTab) => document.getElementById(`${id}-${x}`)
   const asideRef = useRef<HTMLElement>(null)
   // 열리면 활성 탭으로 포커스, 닫히면(포커스가 패널 안·없음일 때만) 연 곳으로 돌려준다. tab 은 열 때 값만 본다
@@ -122,8 +129,13 @@ export function SidePanel({
               onClick={() => onTab(x)}
               className={`h-10 flex-1 rounded-lg text-sm font-medium ${tab === x ? 'bg-surface-raised' : 'text-muted-foreground'}`}
             >
-              {t(`panel.${x}`)}
+              {t(ext.get(x)?.label ?? `panel.${x}`)}
               {x === 'people' && ` ${peers.length}`}
+              {!!ext.get(x)?.badge && (
+                <span className="bg-danger ml-1 inline-block min-w-5 rounded-full px-1 text-center text-[11px] leading-5 font-bold text-white">
+                  {ext.get(x)!.badge > 9 ? '9+' : ext.get(x)!.badge}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -146,6 +158,18 @@ export function SidePanel({
       >
         <ChatTab chat={chat} visible={open && tab === 'chat'} onSend={onSend} onRetry={onRetry} />
       </div>
+      {extra.map((x) => (
+        <div
+          key={x.id}
+          role="tabpanel"
+          id={`${id}-${x.id}-panel`}
+          aria-labelledby={`${id}-${x.id}`}
+          hidden={tab !== x.id}
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+        >
+          {x.node}
+        </div>
+      ))}
       <div
         role="tabpanel"
         id={`${id}-people-panel`}

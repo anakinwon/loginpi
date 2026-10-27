@@ -3,6 +3,7 @@
 // 카메라·마이크 권한이 거부돼도 입장은 막지 않는다(카메라 실패 → 음성만, 마이크 실패 → 영상만, 둘 다 실패 → 미디어 없이)
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { ConsentNotice } from './consent'
 import { MediaButton } from './control-bar'
 import { StreamVideo } from './stage'
 import type { MediaKind, Role } from './use-room'
@@ -39,6 +40,7 @@ export function Prejoin({
   role,
   onRole,
   onJoin,
+  notice,
 }: {
   room: string
   name: string
@@ -46,6 +48,7 @@ export function Prejoin({
   role: Role
   onRole: (r: Role) => void
   onJoin: (local: MediaStream | null) => void
+  notice?: boolean // 음성 처리 기능이 등록돼 있으면 입장 버튼 아래 고지(A-6 — 청중 포함 전원, 동의 버튼 없음)
 }) {
   const t = useTranslations('room')
   // 미리보기는 요청한 역할과 묶어 둔다 — 역할을 바꾼 직후(새 미리보기 로딩 중)엔 이전 결과를 쓰지 않는다(입장·토글 경합 방지)
@@ -173,6 +176,7 @@ export function Prejoin({
           {t('joinNoCam')}
         </button>
       )}
+      {notice && <ConsentNotice />}
     </section>
   )
 }

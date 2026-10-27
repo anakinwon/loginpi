@@ -30,6 +30,7 @@ import {
   readStats,
   sortPeers,
   splitSlots,
+  visibleExtras,
 } from './room-rules.ts'
 
 // 발행 PC getStats 모양 표본 — kbps·손실률로 5초 구간 두 번
@@ -345,4 +346,37 @@ test('v1.2 말하기 링 — 엔진 발언자 우선, 없으면 타일 자체 �
   assert.equal(ringFor('b', 'a', true), false)
   assert.equal(ringFor(undefined, null, true), false)
   assert.equal(ringFor('a', null, false), undefined)
+})
+
+test('부가 ⋯ 항목(15.2) — 있으면 +1칸은 늘 더보기, 칸 수 상한 메인 + 1 불변(역할 3 × 폭 4)', () => {
+  // 부가 항목이 없으면 기존 규칙 그대로(회귀 0)
+  assert.deepEqual(splitSlots([1, 2, 3], 2, []), { main: [1, 2, 3], more: [] })
+  // 넘친 기본 버튼이 1개여도 바로 노출하지 않고 ⋯ 안으로, 부가 항목은 그 뒤
+  assert.deepEqual(splitSlots([1, 2, 3], 2, ['x']), { main: [1, 2], more: [3, 'x'] })
+  assert.deepEqual(splitSlots([1, 2], 2, ['x', 'y']), { main: [1, 2], more: ['x', 'y'] })
+  for (const role of ['presenter', 'panel', 'audience'])
+    for (const width of [800, 500, 400, 300]) {
+      const items = barOrder(role, width)
+      const slots = mainSlots(width, role)
+      for (const extra of [[], ['captions'], ['captions', 'record', 'notes', 'effects']]) {
+        const { main, more } = splitSlots(items, slots, extra)
+        assert.ok(main.length + (more.length ? 1 : 0) <= slots + 1, `${role} ${width} ${extra.length}`)
+        assert.deepEqual([...main, ...more], [...items, ...extra]) // 빠지거나 겹친 항목 없음
+      }
+    }
+})
+
+test('부가 ⋯ 항목 거르기 — 역할, app 필요 항목은 지원 확인 뒤에만', () => {
+  const items = [
+    { id: 'cap', roles: ['presenter', 'panel', 'audience'], app: true },
+    { id: 'fx', roles: ['presenter', 'panel'] },
+    { id: 'rec', roles: ['presenter'], app: true },
+  ]
+  const ids = (role, app) => visibleExtras(items, role, app).map((x) => x.id)
+  assert.deepEqual(ids('presenter', true), ['cap', 'fx', 'rec'])
+  assert.deepEqual(ids('presenter', null), ['fx']) // 확인 중
+  assert.deepEqual(ids('presenter', false), ['fx']) // 구 엔진
+  assert.deepEqual(ids('panel', true), ['cap', 'fx'])
+  assert.deepEqual(ids('audience', true), ['cap'])
+  assert.deepEqual(ids('audience', false), [])
 })

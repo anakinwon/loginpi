@@ -90,10 +90,21 @@ export function gradeNet(a: Totals, b: Totals, on: Record<NetKind, boolean>): Ne
   return best
 }
 
-// 슬롯 나누기 — 넘친 버튼이 1개뿐이면 더보기를 만들지 않고 바로 노출(Jitsi 규칙)
-export function splitSlots<T>(items: T[], slots: number): { main: T[]; more: T[] } {
+// 슬롯 나누기 — 넘친 버튼이 1개뿐이면 더보기를 만들지 않고 바로 노출(Jitsi 규칙).
+// extra(부가 기능 ⋯ 항목, 설계서 15.2)가 있으면 +1칸은 늘 ⋯ — 넘친 기본 버튼 뒤에 부가 항목. 칸 수 상한 '메인 + 1 + 나가기' 불변
+export function splitSlots<T>(items: T[], slots: number, extra: T[] = []): { main: T[]; more: T[] } {
+  if (extra.length) return { main: items.slice(0, slots), more: [...items.slice(slots), ...extra] }
   if (items.length <= slots + 1) return { main: items, more: [] }
   return { main: items.slice(0, slots), more: items.slice(slots) }
+}
+
+// 부가 ⋯ 항목 거르기(15.1) — 내 역할에 보이는 것만, app 중계가 필요한 항목은 엔진 지원이 확인됐을 때만(확인 중 null·구 엔진 false = 숨김)
+export function visibleExtras<T extends { roles: readonly PeerRole[]; app?: boolean }>(
+  items: readonly T[],
+  role: PeerRole,
+  app: boolean | null,
+): T[] {
+  return items.filter((it) => it.roles.includes(role) && (!it.app || app === true))
 }
 
 // ── M3 (SIGNAL_API v1.1) ──
