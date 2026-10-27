@@ -3,5 +3,6 @@
 // 비어 있으면 룸은 기존과 같다(마이크 동의·대기실 고지도 consent 기능이 등록될 때만 켜짐).
 // 예) import { captions } from './captions'  →  export const FEATURES: readonly RoomFeature[] = [captions]
 import type { RoomFeature } from '../extensions'
+import { recording } from './recording'
 
-export const FEATURES: readonly RoomFeature[] = []
+export const FEATURES: readonly RoomFeature[] = [recording]
