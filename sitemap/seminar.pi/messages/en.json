@@ -83,6 +83,7 @@
     "SPEECH_RATE": "Too many voice requests. Please try again shortly",
     "SPEECH_QUOTA": "Voice processing time for this seminar is used up",
     "SPEECH_FAILED": "Could not convert speech to text",
+    "TRANSLATE_FAILED": "Could not translate the caption",
     "POLL_CLOSED": "This poll is closed",
     "NOTE_NOT_RECORDING": "These notes are not recording",
     "NOTE_SHOT_INVALID": "Invalid screen capture",
@@ -372,7 +373,9 @@
       "waiting": "Captions appear when the presenter turns them on",
       "limit": "Speech processing limit reached, so captions and AI minutes stopped",
       "sendFail": "Could not turn on captions. Please try again shortly",
-      "region": "Captions"
+      "region": "Captions",
+      "translate": "Show translated captions",
+      "lang": "Translation language"
     },
     "effects": {
       "title": "Effects",
