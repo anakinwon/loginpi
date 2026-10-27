@@ -113,7 +113,8 @@ test('번역·합성 라우트 — engage.gate(OPEN·무료 미등록 통과) �
     const src = await readFile(new URL(`../app/api/speech/${f}/route.ts`, import.meta.url), 'utf8')
     assert.ok(src.includes('capSigOk(env.PI_SESSION_SECRET'), f)
     // 계량은 공용 관문 speechGate(kind) → fn_use_smn_ai(필수 과제 ③)
-    assert.ok(src.includes(`'${kind}', `) && /await speechGate\(/.test(src), f)
+    //  미스는 shareMiss 가 speechGate 판정 전에 진행 중 Promise 를 캐시(동시 미스 1회 계량, r3 T09)
+    assert.ok(src.includes(`'${kind}', `) && /await shareMiss\(cache, key, \(\) => speechGate\(/.test(src), f)
     assert.ok(!/\bgate\(/.test(src), f)
   }
   const sql = await readFile(new URL('../../sql/010_seminar_ai_use.sql', import.meta.url), 'utf8')
@@ -202,4 +203,70 @@ test('자막 표시 — 번역문은 bdi(오른쪽→왼쪽 언어 격리) + lan
   const { readFile } = await import('node:fs/promises')
   const cap = await readFile(new URL('../components/room/features/captions/index.tsx', import.meta.url), 'utf8')
   assert.ok(cap.includes('<bdi lang={shown?.lang || undefined}>{shown?.text}</bdi>'))
+})
+
+// 회귀(T09 r3) — 방송된 자막 1문장에 청중이 동시에 요청 : 판정 왕복 동안 온 요청이 전부 미스로 계량돼 세미나 누적 글자가 청중 수만큼 닳던 결함.
+//  판정 전에 Promise 를 캐시에 넣어 뒤 요청은 적중(차감 없음)으로 공유 — 계량(gate) 1회·외부 AI(work) 1회
+test('shareMiss — 동시 미스는 계량 1회·외부 AI 1회, 거절·실패·판정 예외는 null + 캐시에서 지움', async () => {
+  const { shareMiss } = await import('./translate-rules.ts')
+  const tick = () => new Promise((r) => setTimeout(r, 5))
+  // 청중 20명 동시 — 라우트와 같은 흐름(get → 적중이면 공유, 미스면 shareMiss)
+  const cache = new Lru(10)
+  let gates = 0
+  let works = 0
+  const req = async () => {
+    const hit = cache.get('k')
+    if (hit) return hit
+    const r = await shareMiss(
+      cache,
+      'k',
+      async () => (gates++, await tick(), null),
+      async () => (works++, await tick(), 'audio'),
+    )
+    return r.denied ? 'denied' : r.p
+  }
+  const out = await Promise.all(Array.from({ length: 20 }, req))
+  assert.deepEqual(new Set(out), new Set(['audio']))
+  assert.equal(gates, 1)
+  assert.equal(works, 1)
+  assert.ok(cache.get('k')) // 성공은 남는다
+
+  // 첫 요청 거절(한도 소진 등) — 거절 응답 그대로, 외부 AI 호출 없음, 캐시 비움
+  const c2 = new Lru(10)
+  let w2 = 0
+  const r2 = await shareMiss(c2, 'k', async () => 'QUOTA', async () => (w2++, 'x'))
+  assert.equal(r2.denied, 'QUOTA')
+  assert.equal(await r2.p, null)
+  await tick()
+  assert.equal(w2, 0)
+  assert.equal(c2.get('k'), undefined)
+
+  // 외부 AI 예외 — null, 캐시 비움
+  const c3 = new Lru(10)
+  const r3 = await shareMiss(c3, 'k', async () => null, async () => {
+    throw new Error('502')
+  })
+  assert.equal(r3.denied, null)
+  assert.equal(await r3.p, null)
+  await tick()
+  assert.equal(c3.get('k'), undefined)
+
+  // 판정 예외(DB 장애) — 첫 요청에게 던지고 캐시 비움(처리 안 된 거부 없음)
+  const c4 = new Lru(10)
+  await assert.rejects(
+    shareMiss(c4, 'k', async () => {
+      throw new Error('db')
+    }, async () => 'x'),
+  )
+  await tick()
+  assert.equal(c4.get('k'), undefined)
+
+  // 실패 정리가 같은 키의 새 항목을 지우지 않는다
+  const c5 = new Lru(10)
+  const r5 = await shareMiss(c5, 'k', async () => null, async () => (await tick(), null))
+  const fresh = Promise.resolve('new')
+  c5.set('k', fresh)
+  await r5.p
+  await tick()
+  assert.equal(c5.get('k'), fresh)
 })

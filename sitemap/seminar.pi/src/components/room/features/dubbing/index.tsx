@@ -14,12 +14,12 @@ import { parseCaption } from '../captions/caption-rules'
 import { translateCaption } from '../captions/translate'
 import { sameLang } from '@/lib/translate-rules'
 import { isUuid } from '@/lib/seminar-rules'
-import { DUB_DUCK, dubRate, dubStop, once, pushDub, TTS_MAX_CHARS } from '@/lib/speech-rules'
+import { DUB_DUCK, dubRate, dubStale, dubStop, once, pushDub, TTS_MAX_CHARS } from '@/lib/speech-rules'
 
 export const dubOn = featureStore(false)
 const dubLang = featureStore('') // 듣는 언어('' = 원문 → 더빙 없음). 자막 시트 언어 선택을 DubRow 가 옮겨 담는다
 
-type Item = { ac: AbortController; audio: Promise<Blob | null> }
+type Item = { ac: AbortController; audio: Promise<Blob | null>; at: number } // at = 자막 받은 시각(dubStale)
 let el: HTMLAudioElement | null = null
 let queue: Item[] = []
 let playing = false
@@ -95,8 +95,8 @@ async function pump() {
     playing = false
     void pump()
   }
-  // 기다리는 동안 큐 넘침으로 버려졌거나 실패한 문장 → 다음으로
-  if (queue[0] !== it || !blob || !el) return done()
+  // 기다리는 동안 큐 넘침으로 버려졌거나 실패했거나 너무 늦은(dubStale) 문장 → 다음으로
+  if (queue[0] !== it || !blob || !el || dubStale(it.at, Date.now())) return done()
   const a = el
   const url = URL.createObjectURL(blob)
   curUrl = url
@@ -144,7 +144,7 @@ function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null) {
           }),
     )
     .catch(() => null)
-  const r = pushDub(queue, { ac, audio })
+  const r = pushDub(queue, { ac, audio, at: Date.now() })
   for (const d of r.dropped) d.ac.abort()
   queue = r.q
   void pump()

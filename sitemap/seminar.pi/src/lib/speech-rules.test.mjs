@@ -267,3 +267,20 @@ test('stageAllowed : presenter 늘, panel 은 발표자 있을 때만, audience�
   assert.equal(stageAllowed(null), false)
   assert.equal(stageAllowed({}), false)
 })
+
+// 보강(T09 r3) — 자막 받은 뒤 15초 넘게 재생을 못 시작한 더빙은 버린다(원음과 한참 어긋난 낭독 방지)
+test('dubStale — 15초 이하 재생, 넘으면 버림 + 재생기가 재생 직전에 판정', async () => {
+  const { dubStale, DUB_STALE_MS } = await import('./speech-rules.ts')
+  const at = 1_000_000
+  assert.equal(DUB_STALE_MS, 15_000)
+  assert.equal(dubStale(at, at), false)
+  assert.equal(dubStale(at, at + DUB_STALE_MS), false) // 경계는 재생
+  assert.equal(dubStale(at, at + DUB_STALE_MS + 1), true)
+  const { readFile } = await import('node:fs/promises')
+  const src = await readFile(new URL('../components/room/features/dubbing/index.tsx', import.meta.url), 'utf8')
+  // 합성 결과를 기다린 뒤(await it.audio) 재생(a.play) 전에 판정, 큐에는 받은 시각을 싣는다
+  const wait = src.indexOf('await it.audio')
+  const judge = src.indexOf('dubStale(it.at, Date.now())')
+  assert.ok(wait > 0 && judge > wait && judge < src.indexOf('a.play()'))
+  assert.ok(src.includes('pushDub(queue, { ac, audio, at: Date.now() })'))
+})

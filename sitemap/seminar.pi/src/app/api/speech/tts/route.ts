@@ -15,7 +15,7 @@ import { geminiEnabled, tts } from '@/lib/gemini'
 import { isUuid } from '@/lib/seminar-rules'
 import { speechGate } from '@/lib/speech-gate'
 import { TTS_MAX_CHARS, TTS_REQ_PER_MIN } from '@/lib/speech-rules'
-import { cacheKey, capSigOk, hitRate, isTranslateLang, Lru } from '@/lib/translate-rules'
+import { cacheKey, capSigOk, hitRate, isTranslateLang, Lru, shareMiss } from '@/lib/translate-rules'
 
 const Body = z.object({
   smnId: z.string().refine(isUuid),
@@ -50,17 +50,13 @@ export const POST = withAuthGuard(
       const denied = await aiGate(smnId, user)
       if (denied) return denied
     } else {
-      const denied = await speechGate({ smnId }, user, 'TTS', body.text.length)
-      if (denied) return denied
-      // 자격 확인을 기다리는 사이 같은 요청이 먼저 넣었을 수 있다
-      p = cache.get(key) ?? synth(body.text, body.lang)
-      cache.set(key, p)
+      // 판정 전에 진행 중 Promise 를 먼저 캐시 — 판정 왕복 동안 온 청중은 적중(차감 없음)으로 공유(shareMiss, r3 T09)
+      const r = await shareMiss(cache, key, () => speechGate({ smnId }, user, 'TTS', body.text.length), () => synth(body.text, body.lang))
+      if (r.denied) return r.denied
+      p = r.p
     }
     const a = await p
-    if (!a) {
-      cache.delete(key)
-      return apiError('SPEECH_TTS_FAILED', 502)
-    }
+    if (!a) return apiError('SPEECH_TTS_FAILED', 502) // 실패 항목은 shareMiss 가 캐시에서 지운다
     return new NextResponse(new Uint8Array(a.data), {
       headers: { 'Content-Type': a.mime, 'Cache-Control': 'no-store' },
     })

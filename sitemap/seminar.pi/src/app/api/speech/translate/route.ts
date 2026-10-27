@@ -12,7 +12,7 @@ import { aiGate, noStore } from '@/lib/engage'
 import { geminiEnabled, translate } from '@/lib/gemini'
 import { isUuid } from '@/lib/seminar-rules'
 import { speechGate } from '@/lib/speech-gate'
-import { cacheKey, capSig, capSigOk, cleanText, hitRate, isTranslateLang, Lru } from '@/lib/translate-rules'
+import { cacheKey, capSig, capSigOk, cleanText, hitRate, isTranslateLang, Lru, shareMiss } from '@/lib/translate-rules'
 
 const cache = new Lru<Promise<string | null>>(5_000) // 500자 상한 × 5,000 ≈ 최악 5MB, 실제 5초 자막은 100자 안팎
 const rate = new Map<string, { start: number; n: number }>()
@@ -38,17 +38,13 @@ export const POST = withAuthGuard(
       const denied = await aiGate(smnId, user)
       if (denied) return denied
     } else {
-      const denied = await speechGate({ smnId }, user, 'TRANS', text.length)
-      if (denied) return denied
-      // 판정을 기다리는 사이 같은 요청이 먼저 넣었을 수 있다(그 몫도 계량 — 보수적)
-      p = cache.get(key) ?? translate(text, lang)
-      cache.set(key, p)
+      // 판정 전에 진행 중 Promise 를 먼저 캐시 — 판정 왕복 동안 온 청중은 적중(차감 없음)으로 공유(shareMiss, r3 T09 — tts 와 형제)
+      const r = await shareMiss(cache, key, () => speechGate({ smnId }, user, 'TRANS', text.length), () => translate(text, lang))
+      if (r.denied) return r.denied
+      p = r.p
     }
     const out = await p
-    if (!out) {
-      cache.delete(key)
-      return apiError('TRANSLATE_FAILED', 502)
-    }
+    if (!out) return apiError('TRANSLATE_FAILED', 502) // 실패 항목은 shareMiss 가 캐시에서 지운다
     return NextResponse.json({ text: out, sig: await capSig(env.PI_SESSION_SECRET, smnId, out) }, { headers: noStore })
   }),
 )
