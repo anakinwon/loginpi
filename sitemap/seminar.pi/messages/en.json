@@ -378,7 +378,6 @@
       "title": "Effects",
       "light": "Light correction",
       "noise": "Reduce noise",
-      "none": "No effects are available on this device",
       "noiseFail": "Noise reduction cannot be changed on this device",
       "close": "Close",
       "preview": "My preview",

@@ -1,14 +1,29 @@
 'use client'
 // 배경 효과(SA5, 설계서 15.5) — ⋯ '효과' → 효과 시트(미리보기·배경 : 없음·흐리게·기본 6종·내 이미지). 고르면 바로 적용(미리보기 = 송출본).
 // 무대 역할(presenter·panel)만. 효과 순서 10(조명 20 보다 먼저). 성능이 15fps 미만 3초면 자동 끔 + 경고 토스트(rules.slowWatch).
-// 조명·소음 줄은 SA3 가 같은 시트에 붙인다(통합 때 이 시트의 '배경' 절 아래)
+// 조명·소음 줄은 SA3(media-fx FxRows)를 이 시트의 '배경' 절 아래에 붙인다 — ⋯ '효과' 항목은 이 기능 1개만 등록
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { featureStore, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
+import {
+  featureStore,
+  useStore,
+  type RoomCtx,
+  type RoomFeature,
+} from '../../extensions'
 import { canProcessVideo } from '../../effects'
-import { autoOff, bgOn, canSegment, choice, choose, draw, reset, status } from './engine'
+import {
+  autoOff,
+  bgOn,
+  canSegment,
+  choice,
+  choose,
+  draw,
+  reset,
+  status,
+} from './engine'
 import { addMine, listMine, removeMine, type MyImage } from './my-images'
 import { checkMine, PRESETS } from './rules'
+import { FxRows } from '../media-fx'
 
 const open = featureStore(false)
 
@@ -38,7 +53,11 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
     if (!isOpen) return
     let alive = true
     listMine()
-      .then((l) => alive && setMine(l.map((m) => ({ ...m, url: URL.createObjectURL(m.blob) }))))
+      .then(
+        (l) =>
+          alive &&
+          setMine(l.map((m) => ({ ...m, url: URL.createObjectURL(m.blob) }))),
+      )
       .catch(() => {})
     return () => {
       alive = false
@@ -83,10 +102,15 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
   const del = async (id: string) => {
     if (cur === `m:${id}`) await choose('none')
     await removeMine(id).catch(() => {})
-    setMine((l) => l.filter((m) => m.id !== id).map((m) => ({ ...m, url: URL.createObjectURL(m.blob) }))) // 이전 목록 URL 은 정리 effect 가 해제
+    setMine((l) =>
+      l
+        .filter((m) => m.id !== id)
+        .map((m) => ({ ...m, url: URL.createObjectURL(m.blob) })),
+    ) // 이전 목록 URL 은 정리 effect 가 해제
   }
 
-  const tile = 'relative aspect-video min-h-12 overflow-hidden rounded-lg border-2 text-xs font-semibold'
+  const tile =
+    'relative aspect-video min-h-12 overflow-hidden rounded-lg border-2 text-xs font-semibold'
   // 썸네일 버튼 — 컴포넌트가 아니라 함수 호출(렌더마다 새 컴포넌트가 되어 다시 마운트되지 않게)
   const thumb = (id: string, label: string, img?: string, blob?: Blob) => {
     const sel = cur === id
@@ -98,11 +122,27 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
         disabled={busy && !sel && id !== 'none'} // '없음'은 모델을 받는 중에도 눌러 취소할 수 있게(choose 의 pick 토큰)
         onClick={() => void pickIt(id, blob)}
         className={`${tile} bg-surface-raised ${sel ? 'border-accent' : 'border-transparent'}`}
-        style={img ? { backgroundImage: `url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+        style={
+          img
+            ? {
+                backgroundImage: `url(${img})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }
+            : undefined
+        }
       >
         {!img && label}
-        {sel && busy && <span className="absolute inset-0 grid place-items-center bg-black/60">{t('preparing')}</span>}
-        {sel && !busy && <span className="bg-accent absolute top-1 right-1 rounded-full px-1 text-white">✓</span>}
+        {sel && busy && (
+          <span className="absolute inset-0 grid place-items-center bg-black/60">
+            {t('preparing')}
+          </span>
+        )}
+        {sel && !busy && (
+          <span className="bg-accent absolute top-1 right-1 rounded-full px-1 text-white">
+            ✓
+          </span>
+        )}
       </button>
     )
   }
@@ -118,7 +158,12 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
         <h2 id="fx-title" className="font-bold">
           {t('title')}
         </h2>
-        <button type="button" onClick={() => open.set(false)} aria-label={t('close')} className="h-9 w-9 rounded-full">
+        <button
+          type="button"
+          onClick={() => open.set(false)}
+          aria-label={t('close')}
+          className="h-9 w-9 rounded-full"
+        >
           ✕
         </button>
       </div>
@@ -141,7 +186,9 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
             {thumb('none', t('bgNone'))}
             {thumb('blur', t('bgBlur'))}
             {PRESETS.map((p) => (
-              <div key={p}>{thumb(`p:${p}`, t(`bgs.${p}`), `/backgrounds/${p}.svg`)}</div>
+              <div key={p}>
+                {thumb(`p:${p}`, t(`bgs.${p}`), `/backgrounds/${p}.svg`)}
+              </div>
             ))}
             {mine.map((m) => (
               <div key={m.id} className="relative">
@@ -156,7 +203,9 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
                 </button>
               </div>
             ))}
-            <label className={`${tile} bg-surface-raised grid cursor-pointer place-items-center border-dashed border-white/20`}>
+            <label
+              className={`${tile} bg-surface-raised grid cursor-pointer place-items-center border-dashed border-white/20`}
+            >
               ＋ {t('myAdd')}
               <input
                 type="file"
@@ -172,6 +221,7 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
           <p className="text-muted-foreground mt-2 text-xs">{t('myNote')}</p>
         </>
       )}
+      <FxRows ctx={ctx} />
       {err && (
         <p role="alert" className="text-danger mt-2 text-sm">
           {t(err)}
@@ -191,7 +241,11 @@ function AutoOffToast() {
     return () => clearTimeout(id)
   }, [at])
   return (
-    <div role="status" aria-live="polite" className="pointer-events-none absolute inset-x-0 top-3 flex justify-center">
+    <div
+      role="status"
+      aria-live="polite"
+      className="pointer-events-none absolute inset-x-0 top-3 flex justify-center"
+    >
       {at > 0 && (
         <span className="bg-warning rounded-full px-4 py-2 text-sm font-semibold text-black">
           {t('autoOff')}
