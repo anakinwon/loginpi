@@ -73,7 +73,18 @@ function Form() {
       </label>
       <label className="block space-y-1 text-sm">
         <span>{t('startAt')}</span>
-        <input name="startAt" type="datetime-local" required className={INPUT} />
+        <input
+          name="startAt"
+          type="datetime-local"
+          required
+          // 칸을 누르면 바로 달력이 열린다(작은 달력 아이콘을 찾지 않아도). showPicker 없는 브라우저는 기본 동작 그대로
+          onClick={(e) => {
+            try {
+              e.currentTarget.showPicker?.()
+            } catch {}
+          }}
+          className={`${INPUT} cursor-pointer`}
+        />
       </label>
       <label className="block space-y-1 text-sm">
         <span>{t('maxCnt')}</span>

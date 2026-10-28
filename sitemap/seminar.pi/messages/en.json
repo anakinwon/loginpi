@@ -116,7 +116,7 @@
       },
       "F02": {
         "name": "Create a seminar",
-        "desc": "Set the title, time, capacity and entry fee to open a seminar"
+        "desc": "Set the subtitle, time, capacity and seminar fee to create a seminar (name = island, automatic)"
       },
       "F03": {
         "name": "Seminar list and details",
@@ -124,7 +124,7 @@
       },
       "F04": {
         "name": "Pi entry payment",
-        "desc": "Pay the entry fee in Pi; the server re-checks the amount before letting you in"
+        "desc": "Pay the seminar fee in Pi; the server re-checks the amount before letting you in"
       },
       "F06": {
         "name": "Host payouts",
@@ -616,7 +616,7 @@
       "ENDED": "Ended",
       "CANCELED": "Canceled"
     },
-    "hostNew": "Host a seminar",
+    "hostNew": "Create a seminar",
     "progress": "Progress",
     "pager": "Pagination",
     "prev": "Prev",
@@ -644,7 +644,7 @@
     "host": "Host",
     "seats": "Seats left",
     "seatsValue": "{left} / {max}",
-    "fee": "Entry fee",
+    "fee": "Seminar fee",
     "feeValue": "{amount} Pi",
     "free": "Free",
     "enter": "Enter",
@@ -671,7 +671,7 @@
       "SMN_PAY_INVALID": "We could not verify your payment. Please contact the admin.",
       "PAY_PI_FAILED": "Could not reach the Pi payment server. Please try again shortly.",
       "PAY_MISMATCH": "Payment details do not match.",
-      "PAY_AMOUNT_MISMATCH": "The payment amount differs from the entry fee.",
+      "PAY_AMOUNT_MISMATCH": "The payment amount differs from the seminar fee.",
       "PAY_CANCELLED": "This payment was canceled.",
       "PAY_ALREADY_PAID": "A payment is already in progress or completed.",
       "PAY_INVALID_STATE": "This payment cannot be processed now.",
@@ -694,17 +694,17 @@
     "attendance": "Attendance"
   },
   "host": {
-    "title": "Host a seminar",
+    "title": "Create a seminar",
     "notAdmin": "Only admins can host seminars for now.",
     "name": "The seminar name is picked automatically from famous islands of the world.",
     "subTitle": "Subtitle (optional, up to 60) — attendees see 'Island - Subtitle'",
     "startAt": "Start time",
     "maxCnt": "Capacity (1–100)",
-    "fee": "Entry fee (Pi)",
+    "fee": "Seminar fee (Pi)",
     "feeHint": "0 = free, up to 7 decimals",
     "submit": "Create",
     "submitting": "Creating…",
-    "invalid": "Check your input — a time within a year from now, capacity 1–100, entry fee 0 or more (up to 7 decimals).",
+    "invalid": "Check your input — a time within a year from now, capacity 1–100, seminar fee 0 or more (up to 7 decimals).",
     "attendance": {
       "title": "Attendance",
       "back": "Back to seminar",
