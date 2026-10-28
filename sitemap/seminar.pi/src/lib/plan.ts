@@ -8,24 +8,30 @@ import { finishNote } from './notes'
 import { OPEN_STS } from './seminar-rules'
 import { engineAdminBase } from './speech-rules'
 
-// 1 Pi 의 원화 시세 — 외부 호출 2초 제한 + 성공값 5분 캐시(R-P4). 실패는 캐시하지 않는다(다음 요청이 다시 시도)
+// 1 Pi 의 원화·달러 시세(한 번에) — 외부 호출 2초 제한 + 성공값 5분 캐시(R-P4). 실패는 캐시하지 않는다(다음 요청이 다시 시도)
+//  원화 = 환산 기준(가격표가 원화), 달러 = 영어 화면 자국 통화 표시용(없으면 null — 표시만 원화로)
 const PRICE_TTL_MS = 5 * 60 * 1000
-let price: { krw: number; at: number } | null = null
+export type PiRates = { krw: number; usd: number | null }
+let price: (PiRates & { at: number }) | null = null
 export async function piKrw(): Promise<number | null> {
+  return (await piRates())?.krw ?? null
+}
+export async function piRates(): Promise<PiRates | null> {
   const now = Date.now()
-  if (price && now - price.at < PRICE_TTL_MS) return price.krw
-  const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pi-network&vs_currencies=krw', {
+  if (price && now - price.at < PRICE_TTL_MS) return price
+  const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pi-network&vs_currencies=krw,usd', {
     cache: 'no-store',
     signal: AbortSignal.timeout(2_000),
   }).catch(() => null)
-  const j = r?.ok ? ((await r.json().catch(() => null)) as { 'pi-network'?: { krw?: unknown } } | null) : null
+  const j = r?.ok ? ((await r.json().catch(() => null)) as { 'pi-network'?: { krw?: unknown; usd?: unknown } } | null) : null
   const krw = Number(j?.['pi-network']?.krw)
+  const usd = Number(j?.['pi-network']?.usd)
   if (!(krw > 0) || !Number.isFinite(krw)) {
     console.error('[plan] Pi 시세 조회 실패', r?.status ?? 'network')
     return null
   }
-  price = { krw, at: now }
-  return krw
+  price = { krw, usd: usd > 0 && Number.isFinite(usd) ? usd : null, at: now }
+  return price
 }
 
 export type FeePlan = { plan_cd: 'M' | 'Y'; krw_amt: number | string; use_sec_cnt: number; use_mon_cnt: number }

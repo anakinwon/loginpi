@@ -732,7 +732,7 @@
     "startAt": "Start time",
     "maxCnt": "Capacity (1–100)",
     "fee": "Seminar fee",
-    "feeHint": "KRW is a reference only. The Pi amount is fixed at the Pi price when you create the seminar, and participants pay that amount in Pi.",
+    "feeHint": "The local-currency amount is a reference only. The Pi amount is fixed at the Pi price when you create the seminar, and participants pay it in Pi. Until payouts are available, fees are held in the app wallet.",
     "submit": "Create",
     "submitting": "Creating…",
     "invalid": "Check your input — a date within one year from now, capacity 1–100.",
@@ -756,9 +756,7 @@
         "state": "Status"
       }
     },
-    "feeFree": "Free",
-    "feeOption": "KRW {krw} (≈ {pi} Pi)",
-    "feeOptionNoPi": "KRW {krw} (checking Pi price)"
+    "feeFree": "Free"
   },
   "privacy": {
     "title": "Privacy Policy — Voice and AI features",
@@ -887,14 +885,12 @@
     "title": "Plans",
     "loading": "Loading…",
     "free": "Free",
-    "freePrice": "0 Pi",
     "freeDesc": "{time} of seminars every month (no carry-over)",
     "monthly": "Monthly",
     "yearly": "Yearly",
     "paidDesc": "{time} of seminars, valid for {months} months",
     "pi": "{amount} Pi",
     "priceUnknown": "Checking Pi price",
-    "krwRef": "≈ KRW {krw} · reference only",
     "noAi": "No AI captions, translation, dubbing or note summaries",
     "withAi": "Includes AI captions, translation, dubbing and note summaries",
     "buy": "Pay with Pi",
@@ -902,9 +898,13 @@
     "meAdmin": "Admins have no time limit.",
     "meRemain": "Time left: {time}",
     "loginToBuy": "Log in to buy a plan.",
-    "payNote": "Payment is always in Pi, converted at the Pi price when you pay. KRW is shown for reference only. Passes that expire first are used first.",
+    "payNote": "Payment is always in Pi. The local-currency amount is a familiar reference only; the Pi amount is set at the Pi price when you pay. Passes that expire first are used first.",
     "charge": "Top up time",
     "hm": "{h} h {m} min",
-    "m": "{m} min"
+    "m": "{m} min",
+    "won": "KRW {n}",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (checking Pi price)",
+    "h": "{h} h"
   }
 }

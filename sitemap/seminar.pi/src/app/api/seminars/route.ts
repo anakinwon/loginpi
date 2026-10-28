@@ -1,7 +1,7 @@
 // 세미나 목록·개설 API(PRD F-02·F-03).
 //  GET  ?tab=all|hosted|joined&page=N — 서버 페이지네이션(12건), 건수는 페이저가 쓰므로 exact. all = 예정·진행 중 시작일시 순(x_smn_mst_01),
 //       hosted = 내가 연 것(x_smn_mst_02), joined = 내 참가(x_smn_ptc_02). all 은 공개 캐시, 나머지는 로그인 필요·private no-store
-//  POST 개설 — Pi 로그인 사용자 모두(PRD D-1 개정, 요금제 2026-10-28). ADMIN 아닌 개최자는 개설비 0 강제(정산 A2U 전까지). 비로그인 401(redirect 없음)
+//  POST 개설 — Pi 로그인 사용자 모두(PRD D-1 개정, 요금제 2026-10-28). 개설비도 누구나(마스터 2026-10-28 — 정산 A2U 전이라 참가비는 앱 지갑에 모인다). 비로그인 401(redirect 없음)
 //  개설비는 원화 선택지(feeKrw, FEE_KRW)로 받아 개설 시점 Pi 시세로 환산해 ent_pi_amt 에 고정 — 참가자 결제는 그 Pi 금액(SMN_ENT 기존 흐름). 시세 실패 = 503(추정 금지)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -14,7 +14,6 @@ import {
   parseBody,
   requireUser,
 } from '@/lib/api'
-import { isAdmin } from '@/lib/auth'
 import { piKrw } from '@/lib/plan'
 import { piAmount } from '@/lib/plan-rules'
 import { SMN_COLS, toCard, type SmnRow } from '@/lib/seminar'
@@ -116,9 +115,9 @@ export const POST = withAuthGuard(
     ])
     if (user instanceof NextResponse) return user
     if (body instanceof NextResponse) return body
-    // 개설비 — ADMIN 만(정산 전이라 일반 개최자는 무료 세미나만, 돈이 앱 지갑에 묶이지 않게). 유료면 지금 시세로 Pi 환산(캐시 5분·2초 상한)
+    // 개설비 — 누구나(마스터 2026-10-28). 유료면 지금 시세로 Pi 환산(캐시 5분·2초 상한)
     let fee = '0'
-    if (isAdmin(user) && body.feeKrw > 0) {
+    if (body.feeKrw > 0) {
       const krw = await piKrw()
       const pi = krw ? piAmount(body.feeKrw, krw) : null
       if (!pi) return apiError('PRICE_UNAVAILABLE', 503)

@@ -7,7 +7,7 @@ import { withAuthGuard } from '@pi/guard'
 import { env } from '@/env'
 import { apiError, dbRoute, parseBody, requireUser } from '@/lib/api'
 import { getSessionUser, isAdmin } from '@/lib/auth'
-import { feePlans, hostPlan, piKrw } from '@/lib/plan'
+import { feePlans, hostPlan, piKrw, piRates } from '@/lib/plan'
 import { PAY_PLANS, piAmount, PLAN, planMemo, signQuote, SMN_PLAN } from '@/lib/plan-rules'
 import { otherPlanPays, staleBusy } from '@/lib/seminar'
 import { FEE_KRW } from '@/lib/seminar-rules'
@@ -17,11 +17,13 @@ const noStore = { 'Cache-Control': 'no-store' }
 export const GET = withAuthGuard(
   dbRoute(async (req) => {
     // 세션·가격표·시세 병렬(R-P1)
-    const [user, plans, krw] = await Promise.all([getSessionUser(req), feePlans(), piKrw()])
+    const [user, plans, rates] = await Promise.all([getSessionUser(req), feePlans(), piRates()])
+    const krw = rates?.krw ?? null
     const me = user ? (isAdmin(user) ? { admin: true } : { admin: false, ...(await hostPlan(user.id)) }) : null
     return NextResponse.json(
       {
         freeSec: PLAN.freeSec,
+        usdPerPi: rates?.usd ?? null, // 영어 화면 자국 통화(달러) 표시용 — 원화 가격은 krw 그대로
         plans: plans.map((p) => ({
           plan: p.plan_cd,
           sec: p.use_sec_cnt,

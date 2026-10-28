@@ -4,7 +4,7 @@
 //  금액은 POST /api/plan 이 시세로 환산·서명한 견적(원화는 참고 표시, NEXT_PUBLIC_PLAN_KRW_REF='0' 이면 숨김). 비로그인도 가격표는 보인다(redirect 없음)
 //  결제 가능 판정은 UA 가 아니라 usePiAuth().isInPiBrowser(authenticate 성공 신호)
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { piFetch, usePiAuth } from '@pi/auth/client'
 import { env } from '@/env'
 import { useAppUser } from '@/components/google-auth'
@@ -14,6 +14,7 @@ import { readApi } from '@/lib/client-api'
 export type PlanMe = { admin: true } | { admin: false; remainSec: number; paid: boolean; endAt: string | null }
 type PlanInfo = {
   freeSec: number
+  usdPerPi: number | null // 영어 화면 달러 표시용
   plans: { plan: 'M' | 'Y'; sec: number; months: number; krw: number; pi: string | null }[]
   fees: { krw: number; pi: string | null }[] // 세미나 만들기 개설비 선택지 참고값
   me: PlanMe | null
@@ -52,9 +53,31 @@ export function useDuration() {
   return useCallback(
     (sec: number) => {
       const m = Math.max(0, Math.floor(sec / 60))
-      return m >= 60 ? t('hm', { h: Math.floor(m / 60), m: m % 60 }) : t('m', { m })
+      if (m < 60) return t('m', { m })
+      return m % 60 ? t('hm', { h: Math.floor(m / 60), m: m % 60 }) : t('h', { h: m / 60 })
     },
     [t],
+  )
+}
+
+// 자국 통화(Pi) 표시 — 결제는 언제나 Pi, 자국 통화는 익숙한 참고 표시(마스터 2026-10-28).
+//  ko = 원화 정가 "5,000원 (48.99 Pi)", 그 외 = Pi × 달러 시세 "$3.62 (48.99 Pi)"(달러 시세 없으면 원화). NEXT_PUBLIC_PLAN_KRW_REF='0' 이면 Pi 만
+export function useMoney(usdPerPi: number | null | undefined) {
+  const t = useTranslations('plan')
+  const locale = useLocale()
+  return useCallback(
+    (krw: number, pi: string | null) => {
+      if (!KRW_REF) return pi ? t('pi', { amount: pi }) : t('priceUnknown')
+      const usd = locale !== 'ko' && usdPerPi && pi ? Number(pi) * usdPerPi : null
+      const fiat =
+        usd !== null
+          ? new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD' }).format(usd)
+          : locale === 'ko'
+            ? t('won', { n: krw.toLocaleString('ko') })
+            : new Intl.NumberFormat(locale, { style: 'currency', currency: 'KRW' }).format(krw)
+      return pi ? t('money', { fiat, pi }) : t('moneyNoPi', { fiat })
+    },
+    [t, locale, usdPerPi],
   )
 }
 
@@ -62,6 +85,7 @@ export function PlanBoard() {
   const t = useTranslations('plan')
   const dur = useDuration()
   const { info, reload } = usePlan()
+  const money = useMoney(info?.usdPerPi)
   if (!info) return <p className="text-muted-foreground text-sm">{t('loading')}</p>
   const me = info.me
   return (
@@ -72,14 +96,13 @@ export function PlanBoard() {
         </p>
       )}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card title={t('free')} desc={t('freeDesc', { time: dur(info.freeSec) })} price={t('freePrice')} note={t('noAi')} />
+        <Card title={t('free')} desc={t('freeDesc', { time: dur(info.freeSec) })} price={money(0, '0')} note={t('noAi')} />
         {info.plans.map((p) => (
           <Card
             key={p.plan}
             title={t(p.plan === 'M' ? 'monthly' : 'yearly')}
             desc={t('paidDesc', { time: dur(p.sec), months: p.months })}
-            price={p.pi ? t('pi', { amount: p.pi }) : t('priceUnknown')}
-            sub={KRW_REF ? t('krwRef', { krw: p.krw.toLocaleString() }) : undefined}
+            price={money(p.krw, p.pi)}
             note={t('withAi')}
           >
             {me && !me.admin && <Buy plan={p.plan} onDone={reload} />}
@@ -96,14 +119,12 @@ function Card({
   title,
   desc,
   price,
-  sub,
   note,
   children,
 }: {
   title: string
   desc: string
   price: string
-  sub?: string
   note: string
   children?: React.ReactNode
 }) {
@@ -111,7 +132,6 @@ function Card({
     <section className="bg-surface flex flex-col gap-2 rounded-xl p-4">
       <h2 className="text-lg font-bold">{title}</h2>
       <p className="text-2xl font-bold">{price}</p>
-      {sub && <p className="text-muted-foreground text-xs">{sub}</p>}
       <p className="text-sm">{desc}</p>
       <p className="text-muted-foreground text-xs">{note}</p>
       <div className="mt-auto pt-2">{children}</div>
