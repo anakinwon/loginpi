@@ -6,6 +6,8 @@ import {
   clampPage,
   FEE_RE,
   pickPlan,
+  STATE_MARK,
+  stateFromChat,
   formatFee,
   isUuid,
   joinError,
@@ -124,4 +126,15 @@ test('pickPlan — 가입 중 유료 요금제 자동 선택', () => {
   assert.equal(pickPlan({ M: { sec: 100, endAt: '2026-11-20T00:00:00Z' }, Y: { sec: 100, endAt: '2027-10-01T00:00:00Z' } }), 'Y')
   assert.equal(pickPlan({ M: { sec: 100, endAt: '2027-12-01T00:00:00Z' }, Y: { sec: 100, endAt: '2027-10-01T00:00:00Z' } }), 'M')
   assert.equal(pickPlan({ M: { sec: 100, endAt: null }, Y: { sec: 100, endAt: null } }), 'Y') // 같으면 연간
+})
+
+// 구 엔진 상태 표식(녹화 고지 채팅 예비 통로, 마스터 2026-10-29) — 작은 JSON 객체만, 그 밖은 버림
+test('stateFromChat — 녹화 고지 채팅 표식 해석', () => {
+  assert.deepEqual(stateFromChat(STATE_MARK + '{"recording":true}'), { recording: true })
+  assert.equal(stateFromChat(STATE_MARK + 'not json'), undefined)
+  assert.equal(stateFromChat(STATE_MARK + '[1,2]'), undefined)
+  assert.equal(stateFromChat(STATE_MARK + 'null'), undefined)
+  assert.equal(stateFromChat('{"recording":true}'), undefined) // 표식 없음 = 일반 채팅
+  assert.equal(stateFromChat(STATE_MARK + JSON.stringify({ x: 'a'.repeat(600) })), undefined) // 너무 큼
+  assert.equal(STATE_MARK.charCodeAt(0), 0x2063) // 보이지 않는 구분 문자로 시작
 })

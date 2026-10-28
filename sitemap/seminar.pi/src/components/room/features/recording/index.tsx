@@ -413,7 +413,7 @@ export const recording: RoomFeature = {
       label: 'recording.title',
       icon: REC_ICON,
       roles: ['presenter'],
-      app: true, // 전원 고지가 안 되면 숨김
+      // 엔진 app 중계가 없어도 보인다 — 전원 고지는 채팅 표식으로 이어 보낸다(use-room sendApp 'state', 마스터 2026-10-29). 고지 실패면 여전히 시작하지 않음(M-4)
       checked: recOn,
       onClick: (ctx) => {
         if (busy.get()) return

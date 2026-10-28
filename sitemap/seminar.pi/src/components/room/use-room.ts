@@ -8,7 +8,7 @@ import { piFetch } from '@pi/auth/client'
 // v1.2(3.5) : 사회(peer.mute·room.muteAll 잠금·peer.askUnmute)·레이아웃(room.setLayout)·발언자(ntf activeSpeaker)
 // v1.3(A-2) : 범용 중계 app.send{topic,d} → ntf app{topic,d,from}(부가 기능 공용, extensions.ts) · 입장 직후 1회 지원 확인 · 카메라 송신기(영상 효과 replaceTrack)
 import type { AppMsg } from './extensions'
-import { NAME_MARK, nameFromChat, nameKey, parseNameSignal, TITLE_MARK } from '@/lib/seminar-rules'
+import { NAME_MARK, nameFromChat, nameKey, parseNameSignal, STATE_MARK, stateFromChat, TITLE_MARK } from '@/lib/seminar-rules'
 import {
   APP_MAX,
   APP_PROBE,
@@ -442,6 +442,12 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
       if (c.text.startsWith(NAME_MARK)) return // 형식이 틀린 표식도 채팅에 보이지 않게
       // 구 엔진 예비 통로의 제목 변경 표식 — 신 엔진 신호와 같은 모양으로 구독자(features/naming)에게 넘긴다
       if (c.text === TITLE_MARK) return void appSubs.current.forEach((fn) => fn({ topic: 'refresh', d: { what: 'title' }, from: c.peerId }))
+      // 구 엔진 예비 통로의 상태 표식(녹화·AI 기록 고지) — 채팅에 넣지 않고 'state' 신호로 구독자에게(형식이 틀리면 버림)
+      if (c.text.startsWith(STATE_MARK)) {
+        const d = stateFromChat(c.text)
+        if (d !== undefined) appSubs.current.forEach((fn) => fn({ topic: 'state', d, from: c.peerId }))
+        return
+      }
       // 엔진이 채우는 name 은 입장권 이름(바꾸기 전) — 바꾼 이름이 있으면 그것으로
       addChat({ ...c, name: peersRef.current.get(c.peerId)?.name ?? c.name, n: ++chatN.current, mine: false, status: 'sent' })
     } else if (e.m === 'reaction') {
@@ -975,10 +981,20 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
   }
 
   async function sendApp(topic: string, d: unknown): Promise<string | null> {
-    if (appRef.current === false) return 'NOT_FOUND'
     if (new TextEncoder().encode(JSON.stringify(d ?? null)).length > APP_MAX) return 'TOO_LARGE'
+    if (appRef.current !== false) {
+      try {
+        await request('app.send', { topic, d })
+        return null
+      } catch (e) {
+        const c = codeOf(e)
+        // 'state'(녹화·AI 기록 고지)만 구 엔진이면(NOT_FOUND) 채팅 통로로 이어 보낸다 — 그 밖의 주제·오류는 그대로
+        if (topic !== 'state' || c !== 'NOT_FOUND') return c
+      }
+    } else if (topic !== 'state') return 'NOT_FOUND'
+    // 구 엔진(app.send 없음) 예비 통로 — 전원 고지(M-4)를 채팅 표식으로. 받는 화면은 채팅에 넣지 않고 같은 'state' 신호로 넘긴다(마스터 2026-10-29 : 엔진 교체 없이 녹화)
     try {
-      await request('app.send', { topic, d })
+      await request('chat.send', { text: STATE_MARK + JSON.stringify(d ?? null) })
       return null
     } catch (e) {
       return codeOf(e)

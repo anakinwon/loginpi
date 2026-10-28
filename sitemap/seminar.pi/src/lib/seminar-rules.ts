@@ -180,3 +180,16 @@ export const NAME_MARK = '⁣smn-name:'
 export const nameFromChat = (text: string) => (text.startsWith(NAME_MARK) ? parseNameSignal({ what: 'name', name: text.slice(NAME_MARK.length) }) : null)
 // 제목(부제) 변경 표식 — 내용 없이 '다시 읽어라'만(받는 화면이 서버에서 제목을 다시 읽으니 위조해도 바뀌는 것 없음)
 export const TITLE_MARK = '⁣smn-title'
+// 상태(녹화·AI 기록 고지, 'state' 주제) 표식 — 구 엔진에서 전원 고지(M-4)를 채팅으로 이어 보낼 때(마스터 2026-10-29 : 엔진 교체 없이 녹화).
+//  내용 = JSON(작은 객체만). 받는 쪽 기능이 보낸 사람 역할을 다시 확인한다(녹화 배지는 발표자가 알린 것만 — recording rules othersRecording)
+export const STATE_MARK = '⁣smn-state:'
+const STATE_MAX = 512
+export function stateFromChat(text: string): Record<string, unknown> | undefined {
+  if (!text.startsWith(STATE_MARK) || text.length > STATE_MARK.length + STATE_MAX) return undefined
+  try {
+    const d: unknown = JSON.parse(text.slice(STATE_MARK.length))
+    return d && typeof d === 'object' && !Array.isArray(d) ? (d as Record<string, unknown>) : undefined
+  } catch {
+    return undefined
+  }
+}
