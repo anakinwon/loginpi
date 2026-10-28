@@ -115,7 +115,11 @@ export const POST = withAuthGuard(
     if (user instanceof NextResponse) return user
     if (body instanceof NextResponse) return body
     // 고른 요금제 남은 시간(이번 달 FREE 보장 포함) — 개설 뒤에도 입장권이 다시 확인한다
-    if (planSec(await hostPlan(user.id), body.plan) <= 0) return apiError('PLAN_EXHAUSTED', 402)
+    const hp = await hostPlan(user.id)
+    if (planSec(hp, body.plan) <= 0) return apiError('PLAN_EXHAUSTED', 402)
+    // 유료 이용권은 기간(1·12개월)이 있다 — 시작이 만료 뒤면 그 세미나는 영영 시작 못 한다(검토 지적). 무료는 달마다 새로 생기므로 제외
+    const end = Date.parse(hp.byPlan[body.plan]?.endAt ?? '')
+    if (body.plan !== 'FREE' && !(Date.parse(body.startAt) < end)) return apiError('PLAN_EXPIRES_BEFORE_START', 409)
     // 섬 고르기 + 저장을 한 함수·한 트랜잭션으로(잠금으로 동시 개설이 같은 섬을 고르지 않음, R-P5)
     const { data, error } = await db()
       .rpc('fn_crt_smn', {

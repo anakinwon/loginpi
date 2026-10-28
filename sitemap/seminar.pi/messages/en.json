@@ -97,7 +97,8 @@
     "NOTE_SHOT_RATE": "Too many screen captures",
     "NOTE_RETRY_SOON": "You can try again in a minute",
     "SPEECH_TTS_FAILED": "Could not create the translated voice",
-    "CAPTION_SIG_INVALID": "This caption could not be verified, so it was not translated"
+    "CAPTION_SIG_INVALID": "This caption could not be verified, so it was not translated",
+    "PLAN_EXPIRES_BEFORE_START": "The start time is after this plan's pass expires"
   },
   "progress": {
     "title": "Build progress",
@@ -293,7 +294,8 @@
       "TIMEOUT": "The video server isn't responding.",
       "TICKET_402": "This is a paid seminar. Please pay on the seminar page before entering.",
       "TICKET_404": "Seminar not found.",
-      "TICKET_409": "This seminar has ended or was canceled."
+      "TICKET_409": "This seminar has ended or was canceled.",
+      "TICKET_PLAN_EXHAUSTED": "This seminar's plan has no time left, so it can't start. Buying the same plan again adds time (Free renews with 1 hour next month)."
     },
     "notice": {
       "toggleFailed": {
@@ -603,7 +605,7 @@
       "stopped": "Translated voice is not available right now, so it was turned off"
     },
     "plan": {
-      "warn": "{min} min of seminar time left. You can top up on the Plans page.",
+      "warn": "{min} min left on this seminar's plan.",
       "ended": "Your seminar time ran out, so the seminar has ended and you left the room.",
       "left": "Seminar time left",
       "closed": "The seminar has ended, so you left the room."
@@ -760,7 +762,9 @@
     "planFree": "Free — {time} left this month · no AI",
     "planPaid": "{name} {time} · {price} — pay when creating",
     "planHint": "Time is taken only from passes of the plan you pick (admins too). An active plan opens without payment; Monthly or Yearly you don't have is paid in Pi when you press Create, then the seminar opens (Pi Browser). Joining is always free for participants.",
-    "planOwned": "{name} — active · {time} left"
+    "planOwned": "{name} — active · {time} left",
+    "planEnds": "The start time is after this plan's pass expires. Move the start earlier or pick another plan.",
+    "paidKept": "Your paid pass is kept. Fix the issue and press Create again (no second payment)."
   },
   "privacy": {
     "title": "Privacy Policy — Voice and AI features",
@@ -901,7 +905,7 @@
     "bought": "Payment complete. Seminar time has been added.",
     "meRemain": "Time left: {time}",
     "loginToBuy": "Log in to buy a plan.",
-    "payNote": "Payment is always in Pi. The local-currency amount is a familiar reference only; the Pi amount is set at the Pi price when you pay. Passes that expire first are used first.",
+    "payNote": "Payment is always in Pi. The local-currency amount is a familiar reference only; the Pi amount is set at the Pi price when you pay. A seminar uses time only from passes of the plan picked when it was created (several passes of that plan are used earliest-expiring first).",
     "charge": "Top up time",
     "hm": "{h} h {m} min",
     "m": "{m} min",

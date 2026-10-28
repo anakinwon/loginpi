@@ -52,6 +52,7 @@ export const apiError = createApiError({
   QUOTE_EXPIRED: '결제 견적 시간이 지났습니다. 다시 결제하세요',
   PLAN_EXHAUSTED: '세미나 이용 시간을 모두 썼습니다. 요금제에서 시간을 충전하세요',
   PLAN_AI_PAID: 'AI 기능은 유료 요금제에서 쓸 수 있습니다',
+  PLAN_EXPIRES_BEFORE_START: '시작 일시가 이 요금제 이용권 만료 뒤입니다',
   // 음성 처리(sql/008 fn_use_smn_vc 결과, src/lib/speech-rules.ts 매핑) — UI 문구에 외부 AI 상표 금지
   AI_UNAVAILABLE: 'AI 기능을 지금 쓸 수 없습니다',
   SPEECH_CHUNK_INVALID: '음성 조각 형식이 올바르지 않습니다',
