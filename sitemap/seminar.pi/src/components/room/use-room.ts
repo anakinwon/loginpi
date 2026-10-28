@@ -193,6 +193,10 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
   // 발행 거부(ROLE_FORBIDDEN) — 연결은 유지하고 화면은 청중으로 전환(설계서 7.3)
   const [forbidden, setForbidden] = useState(false)
   const [role, setRole] = useState<SessionRole | null>(null) // 세션 역할(입장 응답 → roleChanged)
+  const roleNowRef = useRef<SessionRole | null>(null) // 알림 처리기(입장 때 건 클로저)가 읽는 최신 역할
+  useEffect(() => {
+    roleNowRef.current = role
+  }, [role])
   const [selfId, setSelfId] = useState('')
   const [peers, setPeers] = useState<Peer[]>([])
   const [chat, setChat] = useState<ChatMsg[]>([])
@@ -402,8 +406,14 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
       subChain.current = run.catch(() => {})
       await run
     } else if (e.m === 'peerJoined') {
-      for (const p of (e.d as { peers: Peer[] }).peers ?? []) peersRef.current.set(p.peerId, p)
+      const joined = (e.d as { peers: Peer[] }).peers ?? []
+      for (const p of joined) peersRef.current.set(p.peerId, p)
       commitPeers()
+      // 무대에 올랐다 나간 사람이 다시 들어오면 엔진이 승격 역할(panel)을 되살린다(room.go roles — 끊김 재접속용).
+      // 입장권은 panel 을 요청할 수 없으니 새로 들어온 panel = 되살아난 승격 → 발표자 화면이 청중으로 돌린다(다시 손들 수 있게, 마스터 2026-10-28).
+      // 발표자 본인 재입장(입장 응답의 peers)은 건드리지 않는다 — 무대에 있던 사람이 발표자 새로고침 때문에 내려가지 않게
+      if (roleNowRef.current === 'presenter')
+        for (const p of joined) if (p.role === 'panel') void setPeerRole(p.peerId, 'audience')
       // 내가 이번 접속 중에 이름을 바꿨으면 새로 온 사람에게 다시 알린다(엔진 목록엔 예전 이름) — 여러 명이 몰려와도 0.5초 묶어 1번
       if (myNameRef.current && !nameTimer.current)
         nameTimer.current = setTimeout(() => {

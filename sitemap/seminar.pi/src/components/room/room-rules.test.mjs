@@ -481,3 +481,12 @@ test('fxFrameDue — 카메라 꺼짐·같은 프레임·준비 전이면 그리
   assert.equal(fxFrameDue({ ...ok, ready: 1 }), false)
   assert.equal(fxFrameDue({ ...ok, w: 0 }), false)
 })
+
+// 회귀(2026-10-28 마스터) — 무대에 올랐던 참가자가 나갔다 다시 들어오면 엔진이 panel 역할을 되살려(room.go roles)
+// 개최자 화면엔 무대에 있는 것처럼 보이고, 참가자는 손들기 버튼이 없어 다시 오를 방법이 없었다 → 발표자 화면이 새로 온 panel 을 청중으로
+test('재입장 panel — 발표자가 peerJoined 에서 청중으로 돌린다(발표자 자신의 재입장 목록은 그대로)', async () => {
+  const { readFileSync } = await import('node:fs')
+  const room = readFileSync(new URL('./use-room.ts', import.meta.url), 'utf8')
+  const pj = room.slice(room.indexOf("e.m === 'peerJoined'"), room.indexOf("e.m === 'peerLeft'"))
+  assert.match(pj, /roleNowRef\.current === 'presenter'[\s\S]{0,120}p\.role === 'panel'[\s\S]{0,40}setPeerRole\(p\.peerId, 'audience'\)/)
+})
