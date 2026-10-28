@@ -11,7 +11,7 @@ import { POLL, pollVoting } from '@/lib/engage-rules'
 import { TOAST_SLOT_ID, useStageSlot, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 import { api, engageable, onRefresh, pollToast, resetSlots, SLOTS, tell, useLoad } from './shared'
 
-type Opt = { id: string; text: string; n: number; pct: number }
+type Opt = { id: string; text: string; n: number; pct: number; voters?: string[] } // voters = 개최자·ADMIN 응답에만(서버가 정함)
 type Poll = { id: string; q: string; open: boolean; mine: string | null; total: number; opts: Opt[] }
 type List = { items: Poll[]; page: number; pages: number; staff: boolean }
 
@@ -115,6 +115,8 @@ function PollCard({
       {voting ? (
         <fieldset className="space-y-1">
           <legend className="sr-only">{p.q}</legend>
+          {/* 투표 전 고지 — 개최자에게는 누가 무엇을 골랐는지 보인다(처리방침과 같은 내용) */}
+          <p className="text-muted-foreground text-xs">{t('votersNote')}</p>
           {p.opts.map((o) => (
             <label key={o.id} className="flex min-h-10 items-center gap-2 text-sm">
               <input type="radio" name={name} checked={pick === o.id} onChange={() => setPick(o.id)} />
@@ -147,6 +149,11 @@ function PollCard({
                   style={{ width: `${o.pct}%` }}
                 />
               </div>
+              {!!o.voters?.length && (
+                <p className="text-muted-foreground mt-0.5 text-xs break-words">
+                  {t('voters', { names: o.voters.map((v) => v || '—').join(', ') })}
+                </p>
+              )}
             </li>
           ))}
           <li className="text-muted-foreground text-xs">{t('total', { n: p.total })}</li>

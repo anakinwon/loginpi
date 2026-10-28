@@ -110,6 +110,11 @@ test('처리방침 — 질문·설문 공개 범위와 보관 고지(ko·en, T04
   const msg = (l) => JSON.parse(readFileSync(new URL(`../../messages/${l}.json`, import.meta.url), 'utf8')).privacy.keep
   assert.ok(msg('ko').some((s) => s.startsWith('질문과 설문') && s.includes('세미나를 삭제할 때까지')))
   assert.ok(msg('en').some((s) => s.startsWith('Q&A and polls') && s.includes('until the seminar is deleted')))
+  // 투표자 이름 = 개최자·관리자에게만(마스터 2026-10-28) — 고지와 API 가 같은 범위
+  assert.ok(msg('ko').some((s) => s.includes('개최자와 관리자에게는 선택지별로 투표한 사람')))
+  assert.ok(msg('en').some((s) => s.includes('the organizer and admins see, for each option')))
+  const api = readFileSync(new URL('../app/api/seminars/[id]/polls/route.ts', import.meta.url), 'utf8')
+  assert.match(api, /g\.staff \? \{ \.\.\.o, voters: voters\(p\.pll_id, o\.id\) \} : o/)
 })
 
 // refresh 는 caption 과 피어당 초당 2건 합산(SIGNAL_API 3.6) — 자막 켠 발표자의 [답변함]·추천 신호가 RATE_LIMITED 로 빠지던 결함(T04 r4).

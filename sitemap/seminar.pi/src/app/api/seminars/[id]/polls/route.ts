@@ -1,6 +1,7 @@
 // 설문(SubAgent4, 설계서 15.3) — GET ?page= 목록(최신 순 5개 단위, 선택지별 표 수·내 선택), POST {q, opts} 만들기(개최자·ADMIN),
 //  PATCH {pllId, optId} 투표(1인 1표, 다시 투표 = 바꾸기) · {pllId, close:true} 마감(개최자·ADMIN).
 //  투표·집계는 sql/009 함수(fn_vote_smn_pll·fn_cnt_smn_pll). 변경 뒤 화면이 엔진 app.send('refresh',{what:'polls'}) 로 다른 사람에게 알린다.
+//  개최자·ADMIN(staff) 응답에만 선택지별 투표자 이름(voters)을 싣는다 — 참가자에게는 수만(마스터 2026-10-28, 처리방침 고지 갱신).
 //  응답은 사용자별(내 선택)이라 캐시하지 않는다(no-store). 비로그인 401 — redirect 없음
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -17,6 +18,7 @@ type PllRow = {
   smn_pll_opt: { opt_id: string; opt_seq: number; opt_cont: string }[]
 }
 type CntRow = { pll_id: string; opt_id: string; vt_cnt: number; my_yn: string }
+type VtRow = { pll_id: string; opt_id: string; sys_user: { dsp_nm: string | null; pi_usr_nm: string | null } | null }
 
 export const GET = withAuthGuard(
   dbRoute(async (req, ctx) => {
@@ -43,15 +45,35 @@ export const GET = withAuthGuard(
     if (list.error) return dbFail(list.error)
     const rows = list.data ?? []
     let cnt: CntRow[] = []
+    let vts: VtRow[] = []
     if (rows.length) {
-      const r = await db().rpc('fn_cnt_smn_pll', { p_pll_ids: rows.map((p) => p.pll_id), p_usr_id: w.user.id })
+      const ids = rows.map((p) => p.pll_id)
+      // 집계·(staff 면) 투표자 — 서로 의존 없음 → 병렬(R-P1). 이 쪽 설문(최대 POLL_PAGE)만
+      const [r, v] = await Promise.all([
+        db().rpc('fn_cnt_smn_pll', { p_pll_ids: ids, p_usr_id: w.user.id }),
+        g.staff
+          ? db()
+              .from('smn_pll_vt')
+              .select('pll_id, opt_id, sys_user!smn_pll_vt_sys_user_id_fkey(dsp_nm, pi_usr_nm)')
+              .in('pll_id', ids)
+              .eq('del_yn', 'N')
+              .order('reg_dtm')
+              .returns<VtRow[]>()
+          : null,
+      ])
       if (r.error) return dbFail(r.error)
+      if (v?.error) return dbFail(v.error)
       cnt = (r.data as CntRow[] | null) ?? []
+      vts = v?.data ?? []
     }
+    const voters = (pllId: string, optId: string) =>
+      vts.filter((x) => x.pll_id === pllId && x.opt_id === optId).map((x) => x.sys_user?.dsp_nm || x.sys_user?.pi_usr_nm || '')
     const items = rows.map((p) => {
       const mine = cnt.find((c) => c.pll_id === p.pll_id && c.my_yn === 'Y')?.opt_id ?? null
       const counts = Object.fromEntries(cnt.filter((c) => c.pll_id === p.pll_id).map((c) => [c.opt_id, c.vt_cnt]))
-      const opts = tally(p.smn_pll_opt.map((o) => ({ id: o.opt_id, text: o.opt_cont })), counts)
+      const opts = tally(p.smn_pll_opt.map((o) => ({ id: o.opt_id, text: o.opt_cont })), counts).map((o) =>
+        g.staff ? { ...o, voters: voters(p.pll_id, o.id) } : o,
+      )
       return { id: p.pll_id, q: p.qst_cont, open: p.pll_sts_cd === 'OPEN', mine, total: opts.reduce((a, o) => a + o.n, 0), opts }
     })
     const total = list.count ?? 0

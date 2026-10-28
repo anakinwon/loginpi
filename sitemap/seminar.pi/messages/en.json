@@ -534,7 +534,9 @@
       "loading": "Loading…",
       "labOnly": "Polls are available in seminar rooms only.",
       "started": "A new poll has started",
-      "goVote": "Vote"
+      "goVote": "Vote",
+      "votersNote": "The organizer can see who voted for which option.",
+      "voters": "Voted: {names}"
     },
     "qna": {
       "sort": "Sort",
@@ -804,7 +806,7 @@
       "Consent records: the time of consent and the policy version, kept as proof [TBD: retention period].",
       "Usage: per-minute request counts and processing time, used to enforce cost limits.",
       "Attendance: the time you joined, the time you were last connected, your display name and your Pi username are stored and given to the host as an attendance list (on screen and as a CSV download). Kept until the seminar is deleted.",
-      "Q&A and polls: the question text and the asker's display name (or Pi username if none) are visible to every participant. Upvotes and votes show only counts, never who cast them. Kept, including hidden questions, until the seminar is deleted."
+      "Q&A and polls: the question text and the asker's display name (or Pi username if none) are visible to every participant. Upvotes show only counts, never who cast them. Poll votes show only counts to participants; the organizer and admins see, for each option, the display name (or Pi username if none) of each voter. Kept, including hidden questions, until the seminar is deleted."
     ],
     "recTitle": "Recording",
     "rec": "Recordings are saved only as a file on the presenter’s device. They are not uploaded to our servers or transferred abroad. While recording or AI notes are on, every participant sees an indicator.",
