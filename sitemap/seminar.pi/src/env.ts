@@ -72,6 +72,8 @@ export const env = createEnv({
     NEXT_PUBLIC_PI_APP_DOMAIN: z.string().optional(),
     // '1' 이면 클라이언트에 Google 로그인 버튼 노출(서버 env 3종과 함께 설정)
     NEXT_PUBLIC_GOOGLE_LOGIN: z.enum(['1']).optional(),
+    // 요금제 화면 원화 참고 환산 표시 — '1'(기본) 보임, '0' 숨김(결제는 언제나 Pi, 원화는 표시용)
+    NEXT_PUBLIC_PLAN_KRW_REF: z.enum(['0', '1']).optional(),
     NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   },
   runtimeEnv: {
@@ -109,6 +111,7 @@ export const env = createEnv({
     SPEECH_MAX_MIN: process.env.SPEECH_MAX_MIN,
     NEXT_PUBLIC_MEDIA_WS_URL: process.env.NEXT_PUBLIC_MEDIA_WS_URL,
     NEXT_PUBLIC_GOOGLE_LOGIN: process.env.NEXT_PUBLIC_GOOGLE_LOGIN,
+    NEXT_PUBLIC_PLAN_KRW_REF: process.env.NEXT_PUBLIC_PLAN_KRW_REF,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
     NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_PI_OAUTH_CLIENT_ID,

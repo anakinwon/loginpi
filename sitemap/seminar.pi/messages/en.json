@@ -10,7 +10,8 @@
   "nav": {
     "link": "Link account",
     "switchLocale": "한국어",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "plan": "Plans"
   },
   "auth": {
     "checking": "Checking sign-in…",
@@ -569,7 +570,11 @@
         "cancel": "Cancel",
         "start": "Start recording"
       },
-      "resave": { "label": "Recording file", "save": "Save again", "dismiss": "Close save again" },
+      "resave": {
+        "label": "Recording file",
+        "save": "Save again",
+        "dismiss": "Close save again"
+      },
       "toast": {
         "started": "Recording started — everyone can see it",
         "saved": "Recording saved. Check your downloads folder. If nothing was saved, tap [Save again] at the top of the screen.",
@@ -594,6 +599,10 @@
       "listen": "Listen in translated voice",
       "blocked": "Could not play the translated voice. Please turn it on again",
       "stopped": "Translated voice is not available right now, so it was turned off"
+    },
+    "plan": {
+      "warn": "{min} min of seminar time left. You can top up on the Plans page.",
+      "ended": "Your seminar time ran out, so the seminar has ended."
     }
   },
   "list": {
@@ -716,7 +725,6 @@
       "privacy": "This address is a key to your calendar — don't share it. It's stored on this device only, never on our server."
     },
     "title": "Create a seminar",
-    "notAdmin": "Only admins can host seminars for now.",
     "name": "Let's travel to a beautiful island!",
     "subTitle": "Subtitle (optional, up to 60)",
     "startAt": "Start time",
@@ -869,5 +877,29 @@
       "DONE": "Done",
       "FAILED": "Failed"
     }
+  },
+  "plan": {
+    "title": "Plans",
+    "loading": "Loading…",
+    "free": "Free",
+    "freePrice": "0 Pi",
+    "freeDesc": "{time} of seminars every month (no carry-over)",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "paidDesc": "{time} of seminars, valid for {months} months",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Checking Pi price",
+    "krwRef": "≈ KRW {krw} · reference only",
+    "noAi": "No AI captions, translation, dubbing or note summaries",
+    "withAi": "Includes AI captions, translation, dubbing and note summaries",
+    "buy": "Pay with Pi",
+    "bought": "Payment complete. Seminar time has been added.",
+    "meAdmin": "Admins have no time limit.",
+    "meRemain": "Time left: {time}",
+    "loginToBuy": "Log in to buy a plan.",
+    "payNote": "Payment is always in Pi, converted at the Pi price when you pay. KRW is shown for reference only. Passes that expire first are used first.",
+    "charge": "Top up time",
+    "hm": "{h} h {m} min",
+    "m": "{m} min"
   }
 }

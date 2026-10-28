@@ -1,4 +1,4 @@
-// S5 세미나 개설(/host/new) — ADMIN 만(PRD D-1). 권한 판정은 클라이언트 게이트 + 서버 POST(403), redirect 없음
+// S5 세미나 개설(/host/new) — Pi 로그인 사용자(요금제, PRD D-1 개정). 권한 판정은 클라이언트 게이트 + 서버 POST(403), redirect 없음
 import { useTranslations } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { use } from 'react'
