@@ -31,6 +31,8 @@ export type Recorder = {
   mime: string
   setAudio: (streams: (MediaStream | null)[]) => void // 소리 원본이 바뀌면(참가자 입퇴장) 다시 연결
   stop: () => Promise<Blob>
+  pause: () => void // 일시정지(마스터 2026-10-29) — 녹화 중일 때만, 그리기는 계속(다시 시작 때 바로 이어지게)
+  resume: () => void
 }
 
 // stage = 무대 상자(relative). 그 안의 <video> 전부를 화면에 보이는 자리 그대로 그린다
@@ -129,7 +131,14 @@ export function startRecorder(stage: HTMLElement, ac: AudioContext, onFail?: () 
       rec.stop()
     })
 
-  return { mime: type, setAudio, stop }
+  const pause = () => {
+    if (rec.state === 'recording') rec.pause()
+  }
+  const resume = () => {
+    if (rec.state === 'paused') rec.resume()
+  }
+
+  return { mime: type, setAudio, stop, pause, resume }
 }
 
 // Blob 다운로드 — <a download>. 막히는 환경(앱 안 브라우저 등)은 화면 안내로 대신한다(호출한 쪽)

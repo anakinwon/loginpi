@@ -75,6 +75,10 @@ const busy = featureStore(false) // 시작·종료 처리 중(두 번 누름 방
 const recBy = featureStore<RecBy>({}) // 녹화 중이라고 알린 다른 발표자 peerId
 const toast = featureStore<string | null>(null) // room.recording.* 아래 키
 const lastSaved = featureStore(false) // 다시 저장할 마지막 녹화 파일이 있음(lastFile)
+// 일시정지(마스터 2026-10-29) — 멈춘 동안은 녹화 계량도 멈춘다(추가 차감 없음). 경과 표시는 멈춘 시간을 뺀다
+const paused = featureStore(false)
+const pausedAt = featureStore(0) // 지금 멈춘 시각(멈춤 중일 때)
+const pausedSum = featureStore(0) // 지난 멈춤 합(ms)
 
 // 지금 녹화 중인가(나 또는 다른 발표자) — 다른 기능이 녹화 동안 화면 요소를 감출 때(예 남은 시간 카운트다운, 마스터 2026-10-29)
 export function useRecordingNow() {
@@ -114,6 +118,9 @@ async function stopRec(ctx: RoomCtx | null, auto = false) {
   if (!rec) return
   recorder = null
   meterStop()
+  paused.set(false)
+  pausedAt.set(0)
+  pausedSum.set(0)
   busy.set(true)
   recOn.set(false)
   startedAt.set(0)
@@ -132,6 +139,41 @@ async function stopRec(ctx: RoomCtx | null, auto = false) {
     toast.set(stopToast(blob.size, auto))
   } catch {
     toast.set('saveFailed')
+  } finally {
+    busy.set(false)
+  }
+}
+
+// 일시정지 — 녹화기 멈춤 + 녹화 계량 끊기(그때까지만 차감, stop). 세미나 계량 대상(meterSmn)은 다시 시작용으로 남긴다
+function pauseRec() {
+  if (!recorder || paused.get() || busy.get()) return
+  recorder.pause()
+  paused.set(true)
+  pausedAt.set(Date.now())
+  if (meterTimer) clearInterval(meterTimer)
+  meterTimer = null
+  if (meterSmn) void meter(meterSmn, 'stop').catch(() => {})
+}
+// 다시 시작 — 서버가 유료 시간을 다시 확인(START)해야 이어 녹화. 소진·무료 구간·종료면 녹화를 끝내고 파일 저장
+async function resumeRec(ctx: RoomCtx) {
+  const rec = recorder
+  if (!rec || !paused.get() || busy.get()) return
+  busy.set(true)
+  try {
+    if (meterSmn) {
+      const m = await meter(meterSmn, 'start').catch(() => null)
+      if (recorder !== rec) return // 그사이 종료됨
+      if (!m?.ok) {
+        ctx.notice(meterDeny(m && !m.ok ? m.body.code : undefined))
+        busy.set(false)
+        return void stopRec(ctx)
+      }
+      meterTimer = setInterval(() => void beatRec(), METER_MS)
+    }
+    rec.resume()
+    pausedSum.set(pausedSum.get() + (Date.now() - pausedAt.get()))
+    pausedAt.set(0)
+    paused.set(false)
   } finally {
     busy.set(false)
   }
@@ -225,6 +267,9 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const slot = useStageSlot(BADGE_SLOT_ID)
   const toastSlot = useStageSlot(TOAST_SLOT_ID)
   const since = useStore(startedAt)
+  const isPaused = useStore(paused)
+  const pAt = useStore(pausedAt)
+  const pSum = useStore(pausedSum)
   const open = useStore(confirmOpen)
   const isBusy = useStore(busy)
   const by = useStore(recBy)
@@ -318,9 +363,33 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
             role="status"
             className="bg-danger inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-semibold text-white"
           >
-            <span aria-hidden className="size-2 animate-pulse rounded-full bg-white" />
-            {t('badge')}
-            {mine && since > 0 && <span className="tabular-nums">{mmss(now - since)}</span>}
+            <span aria-hidden className={`size-2 rounded-full bg-white ${isPaused ? '' : 'animate-pulse'}`} />
+            {t(mine && isPaused ? 'pausedBadge' : 'badge')}
+            {mine && since > 0 && <span className="tabular-nums">{mmss(now - since - pSum - (isPaused && pAt ? now - pAt : 0))}</span>}
+          </div>,
+          slot,
+        )}
+      {/* 내 녹화 조작 — 일시정지·다시 시작·종료(마스터 2026-10-29). 배지 줄은 pointer-events-none 이라 버튼만 켠다 */}
+      {mine &&
+        slot &&
+        createPortal(
+          <div role="group" aria-label={t('controls')} className="pointer-events-auto inline-flex h-6 items-center gap-1">
+            <button
+              type="button"
+              disabled={isBusy}
+              onClick={() => (isPaused ? void resumeRec(ctx) : pauseRec())}
+              className="bg-surface-raised hover:bg-surface h-6 rounded-full px-2.5 text-[13px] font-semibold disabled:opacity-40"
+            >
+              {isPaused ? `▶ ${t('resume')}` : `⏸ ${t('pause')}`}
+            </button>
+            <button
+              type="button"
+              disabled={isBusy}
+              onClick={() => void stopRec(ctx)}
+              className="bg-surface-raised hover:bg-surface h-6 rounded-full px-2.5 text-[13px] font-semibold disabled:opacity-40"
+            >
+              ■ {t('stop')}
+            </button>
           </div>,
           slot,
         )}

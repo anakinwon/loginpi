@@ -596,7 +596,12 @@
       "planOut": "Paid time ran out, so recording stopped and the file was saved.",
       "notInRoom": "Still confirming you are in the room. Start recording again in a moment.",
       "meterFailed": "Could not check recording time, so recording did not start. Try again in a moment.",
-      "paidOut": "No paid time is left, so recording cannot start. Buy the same plan again to record."
+      "paidOut": "No paid time is left, so recording cannot start. Buy the same plan again to record.",
+      "pausedBadge": "Recording paused",
+      "controls": "Recording controls",
+      "pause": "Pause",
+      "resume": "Resume",
+      "stop": "Stop recording"
     },
     "notes": {
       "on": "AI notes",
