@@ -37,6 +37,20 @@ export const isUuid = (v: unknown): v is string =>
 export const prejoinHeading = (room: string) =>
   isUuid(room) ? ({ level: 2, key: 'titleSeminar' } as const) : ({ level: 1, key: 'title' } as const)
 
+// 세미나 요금제(sql/018 smn_mst.plan_cd) — 개설 때 개최자가 고른다. 시간 차감·AI 허용은 그 요금제 이용권 기준
+export const PLAN_CDS = ['FREE', 'M', 'Y'] as const
+export type PlanCd = (typeof PLAN_CDS)[number]
+export type PlanPool = { sec: number; endAt: string | null }
+export const isPlanCd = (v: unknown): v is PlanCd => typeof v === 'string' && (PLAN_CDS as readonly string[]).includes(v)
+
+// 세미나 만들기 기본 요금제 — 남은 시간이 있는 유료 이용권이 있으면 그것(둘 다면 늦게 끝나는 쪽, 같으면 연간), 없으면 무료(마스터 2026-10-29)
+export function pickPlan(by: Partial<Record<PlanCd, PlanPool>> | null | undefined): PlanCd {
+  const paid = (['Y', 'M'] as const).filter((cd) => (by?.[cd]?.sec ?? 0) > 0)
+  if (!paid.length) return 'FREE'
+  const end = (cd: PlanCd) => Date.parse(by?.[cd]?.endAt ?? '') || 0
+  return paid.reduce((a, b) => (end(b) > end(a) ? b : a))
+}
+
 // 입장료 입력 — Pi 소수 7자리까지(NUMERIC(18,7) = 정수부 11자리)
 export const FEE_RE = /^\d{1,11}(\.\d{1,7})?$/
 

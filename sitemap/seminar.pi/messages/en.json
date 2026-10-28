@@ -755,9 +755,10 @@
       }
     },
     "plan": "Plan",
-    "planFree": "Free — {time} left this month",
-    "planPaid": "{name} {time} · {price}",
-    "planHint": "Joining is always free for participants. If you pick Monthly or Yearly, you pay for the pass in Pi when you press Create, then the seminar opens (Pi Browser)."
+    "planFree": "Free — {time} left this month · no AI",
+    "planPaid": "{name} {time} · {price} — pay when creating",
+    "planHint": "Time is taken only from passes of the plan you pick (admins too). An active plan opens without payment; Monthly or Yearly you don't have is paid in Pi when you press Create, then the seminar opens (Pi Browser). Joining is always free for participants.",
+    "planOwned": "{name} — active · {time} left"
   },
   "privacy": {
     "title": "Privacy Policy — Voice and AI features",
@@ -896,7 +897,6 @@
     "withAi": "Includes AI captions, translation, dubbing and note summaries",
     "buy": "Pay with Pi",
     "bought": "Payment complete. Seminar time has been added.",
-    "meAdmin": "Admins have no time limit.",
     "meRemain": "Time left: {time}",
     "loginToBuy": "Log in to buy a plan.",
     "payNote": "Payment is always in Pi. The local-currency amount is a familiar reference only; the Pi amount is set at the Pi price when you pay. Passes that expire first are used first.",

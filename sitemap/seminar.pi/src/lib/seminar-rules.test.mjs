@@ -5,6 +5,7 @@ import {
   capError,
   clampPage,
   FEE_RE,
+  pickPlan,
   formatFee,
   isUuid,
   joinError,
@@ -106,4 +107,15 @@ test('한 줄 제목 — 줄바꿈·단독 \\r·NUL·DEL 거부, TAB·일반 글
 test('한 줄 제목 — NEL·C1 제어문자·U+2028·U+2029 거부, 바로 옆 글자(U+00A0·é)는 허용', () => {
   for (const bad of ['a\u0085ATTENDEE:x', 'a\u0080', 'a\u009F', 'a\u2028b', 'a\u2029b']) assert.ok(!ONE_LINE_RE.test(bad), JSON.stringify(bad))
   for (const ok of ['a b', 'PyCafé™', 'a‧b']) assert.ok(ONE_LINE_RE.test(ok), JSON.stringify(ok))
+})
+
+// 세미나 만들기 기본 요금제(마스터 2026-10-29) — 가입 중 유료(남은 시간 > 0)가 있으면 그것, 둘 다면 늦게 끝나는 쪽, 없으면 무료
+test('pickPlan — 가입 중 유료 요금제 자동 선택', () => {
+  assert.equal(pickPlan(null), 'FREE')
+  assert.equal(pickPlan({ FREE: { sec: 3600, endAt: '2026-11-01T00:00:00Z' } }), 'FREE')
+  assert.equal(pickPlan({ M: { sec: 0, endAt: '2026-11-20T00:00:00Z' } }), 'FREE') // 다 쓴 이용권은 가입 아님
+  assert.equal(pickPlan({ M: { sec: 100, endAt: '2026-11-20T00:00:00Z' } }), 'M')
+  assert.equal(pickPlan({ M: { sec: 100, endAt: '2026-11-20T00:00:00Z' }, Y: { sec: 100, endAt: '2027-10-01T00:00:00Z' } }), 'Y')
+  assert.equal(pickPlan({ M: { sec: 100, endAt: '2027-12-01T00:00:00Z' }, Y: { sec: 100, endAt: '2027-10-01T00:00:00Z' } }), 'M')
+  assert.equal(pickPlan({ M: { sec: 100, endAt: null }, Y: { sec: 100, endAt: null } }), 'Y') // 같으면 연간
 })

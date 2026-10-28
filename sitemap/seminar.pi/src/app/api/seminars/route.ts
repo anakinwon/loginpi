@@ -2,6 +2,7 @@
 //  GET  ?tab=all|hosted|joined&page=N — 서버 페이지네이션(12건), 건수는 페이저가 쓰므로 exact. all = 예정·진행 중 시작일시 순(x_smn_mst_01),
 //       hosted = 내가 연 것(x_smn_mst_02), joined = 내 참가(x_smn_ptc_02). all 은 공개 캐시, 나머지는 로그인 필요·private no-store
 //  POST 개설 — Pi 로그인 사용자 모두(PRD D-1 개정, 요금제 2026-10-28). 참가자 입장은 모두 무료(입장료 0 고정 — 개최자는 요금제 이용권으로 시간을 산다, 마스터 2026-10-28). 비로그인 401(redirect 없음)
+//  요금제(plan FREE·M·Y)를 세미나에 묶는다(sql/018) — 그 요금제 남은 시간이 0 이면 402 PLAN_EXHAUSTED(유료는 화면이 먼저 결제, 관리자 예외 없음)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
@@ -13,9 +14,11 @@ import {
   parseBody,
   requireUser,
 } from '@/lib/api'
+import { hostPlan, planSec } from '@/lib/plan'
 import { SMN_COLS, toCard, type SmnRow } from '@/lib/seminar'
 import {
   ONE_LINE_RE,
+  PLAN_CDS,
   SUB_TTL_MAX,
   OPEN_STS,
   PAGE_SIZE,
@@ -99,6 +102,7 @@ const createSchema = z.object({
     .refine((v) => startAtOk(Date.parse(v))),
   maxCnt: z.number().int().min(1).max(100),
   subTitle: z.string().trim().max(SUB_TTL_MAX).regex(ONE_LINE_RE).optional(), // 부제(sql/012) — 나중에 상세에서도 수정
+  plan: z.enum(PLAN_CDS).default('FREE'), // 세미나 요금제(sql/018)
 })
 
 export const POST = withAuthGuard(
@@ -110,6 +114,8 @@ export const POST = withAuthGuard(
     ])
     if (user instanceof NextResponse) return user
     if (body instanceof NextResponse) return body
+    // 고른 요금제 남은 시간(이번 달 FREE 보장 포함) — 개설 뒤에도 입장권이 다시 확인한다
+    if (planSec(await hostPlan(user.id), body.plan) <= 0) return apiError('PLAN_EXHAUSTED', 402)
     // 섬 고르기 + 저장을 한 함수·한 트랜잭션으로(잠금으로 동시 개설이 같은 섬을 고르지 않음, R-P5)
     const { data, error } = await db()
       .rpc('fn_crt_smn', {
@@ -117,6 +123,7 @@ export const POST = withAuthGuard(
         p_start_dtm: new Date(body.startAt).toISOString(),
         p_max_cnt: body.maxCnt,
         p_ent_pi_amt: '0', // 입장료 없음(마스터 2026-10-28) — 유료 입장 경로(SMN_ENT)는 기존 세미나용으로 남는다
+        p_plan_cd: body.plan,
       })
     if (error) return dbFail(error)
     const r = (data as { smn_id: string; smn_nm: string }[] | null)?.[0]

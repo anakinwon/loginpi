@@ -10,8 +10,10 @@ import { env } from '@/env'
 import { useAppUser } from '@/components/google-auth'
 import { BTN, BTN_PRIMARY, useSeminarErrText } from '@/components/seminar/shared'
 import { readApi } from '@/lib/client-api'
+import type { PlanCd, PlanPool } from '@/lib/seminar-rules'
 
-export type PlanMe = { admin: true } | { admin: false; remainSec: number; paid: boolean; endAt: string | null }
+// 내 요금제별 남은 시간(sql/018) — 관리자도 같다(마스터 2026-10-29). 세미나 만들기 기본 요금제(pickPlan)·남은 시간 표시에 쓴다
+export type PlanMe = { remainSec: number; paid: boolean; byPlan: Partial<Record<PlanCd, PlanPool>> }
 type PlanInfo = {
   freeSec: number
   usdPerPi: number | null // 영어 화면 달러 표시용
@@ -21,6 +23,7 @@ type PlanInfo = {
 type Quote = { amount: number; memo: string; metadata: Record<string, unknown> }
 
 const KRW_REF = env.NEXT_PUBLIC_PLAN_KRW_REF !== '0'
+const PLAN_NAME = { FREE: 'free', M: 'monthly', Y: 'yearly' } as const
 const STILL_WAITING_MS = 120_000
 
 const post = <T,>(path: string, body: unknown) =>
@@ -91,7 +94,12 @@ export function PlanBoard() {
     <div className="space-y-6">
       {me && (
         <p role="status" className="bg-surface rounded-xl p-4 text-sm">
-          {me.admin ? t('meAdmin') : t('meRemain', { time: dur(me.remainSec) })}
+          {t('meRemain', {
+            time: (['FREE', 'M', 'Y'] as const)
+              .filter((cd) => (me.byPlan[cd]?.sec ?? 0) > 0)
+              .map((cd) => `${t(PLAN_NAME[cd])} ${dur(me.byPlan[cd]?.sec ?? 0)}`)
+              .join(' · ') || dur(0),
+          })}
         </p>
       )}
       <div className="grid gap-4 sm:grid-cols-3">
@@ -104,7 +112,7 @@ export function PlanBoard() {
             price={money(p.krw, p.pi)}
             note={t('withAi')}
           >
-            {me && !me.admin && <Buy plan={p.plan} onDone={reload} />}
+            {me && <Buy plan={p.plan} onDone={reload} />}
           </Card>
         ))}
       </div>

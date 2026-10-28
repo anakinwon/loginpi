@@ -5,7 +5,7 @@ import { after } from 'next/server'
 import { env } from '@/env'
 import { db } from './api'
 import { finishNote } from './notes'
-import { OPEN_STS } from './seminar-rules'
+import { isPlanCd, OPEN_STS, type PlanCd, type PlanPool } from './seminar-rules'
 import { engineAdminBase } from './speech-rules'
 
 // 1 Pi 의 원화·달러 시세(한 번에) — 외부 호출 2초 제한 + 성공값 5분 캐시(R-P4). 실패는 캐시하지 않는다(다음 요청이 다시 시도)
@@ -47,14 +47,19 @@ export async function feePlans(): Promise<FeePlan[]> {
   return data ?? []
 }
 
-// 남은 시간 — 이번 달 FREE 보장 + 남은 초 합·유료 여부·가장 이른 만료(요청당 1회 부를 것, R-P2)
-export type HostPlan = { remainSec: number; paid: boolean; endAt: string | null }
+// 남은 시간 — 이번 달 FREE 보장 + 요금제별(FREE·M·Y) 남은 초·가장 늦은 만료(sql/018 fn_rem_smn_plan_cd). 요청당 1회 부를 것(R-P2)
+//  세미나는 요금제 1개에 묶이므로(smn_mst.plan_cd) 판정은 planSec(h, 그 세미나 요금제)로. 관리자 예외 없음(마스터 2026-10-29)
+export type HostPlan = { remainSec: number; paid: boolean; byPlan: Partial<Record<PlanCd, PlanPool>> }
 export async function hostPlan(usrId: string): Promise<HostPlan> {
-  const { data, error } = await db().rpc('fn_rem_smn_plan', { p_usr_id: usrId })
+  const { data, error } = await db().rpc('fn_rem_smn_plan_cd', { p_usr_id: usrId })
   if (error) throw error
-  const r = (data as { rem_sec: number | string; paid_yn: string; min_end_dtm: string | null }[] | null)?.[0]
-  return { remainSec: Number(r?.rem_sec ?? 0), paid: r?.paid_yn === 'Y', endAt: r?.min_end_dtm ?? null }
+  const byPlan: HostPlan['byPlan'] = {}
+  for (const r of (data as { plan_cd: string; rem_sec: number | string; max_end_dtm: string | null }[] | null) ?? [])
+    if (isPlanCd(r.plan_cd)) byPlan[r.plan_cd] = { sec: Number(r.rem_sec), endAt: r.max_end_dtm }
+  const remainSec = Object.values(byPlan).reduce((a, p) => a + p.sec, 0)
+  return { remainSec, paid: !!(byPlan.M || byPlan.Y), byPlan }
 }
+export const planSec = (h: HostPlan | null, cd: string) => (h && isPlanCd(cd) ? (h.byPlan[cd]?.sec ?? 0) : 0)
 
 // 시간 소진 종료 — 세미나 ENDED(열린 상태일 때만, 조건부 갱신 = 멱등 — api/seminars/[id]/end 와 같은 규칙) +
 //  응답 뒤(after) 남은 회의록 마무리·엔진 방 강제 종료(DELETE /admin/rooms/{id}, 관리 키·엔진 주소가 있을 때만, 2초 제한 R-P4)

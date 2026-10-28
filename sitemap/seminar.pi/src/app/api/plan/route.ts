@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
 import { env } from '@/env'
 import { apiError, dbRoute, parseBody, requireUser } from '@/lib/api'
-import { getSessionUser, isAdmin } from '@/lib/auth'
+import { getSessionUser } from '@/lib/auth'
 import { feePlans, hostPlan, piKrw, piRates } from '@/lib/plan'
 import { PAY_PLANS, piAmount, PLAN, planMemo, signQuote, SMN_PLAN } from '@/lib/plan-rules'
 import { otherPlanPays, staleBusy } from '@/lib/seminar'
@@ -18,7 +18,8 @@ export const GET = withAuthGuard(
     // 세션·가격표·시세 병렬(R-P1)
     const [user, plans, rates] = await Promise.all([getSessionUser(req), feePlans(), piRates()])
     const krw = rates?.krw ?? null
-    const me = user ? (isAdmin(user) ? { admin: true } : { admin: false, ...(await hostPlan(user.id)) }) : null
+    // 관리자도 일반 개최자와 같다(마스터 2026-10-29) — 요금제별 남은 시간(byPlan)으로 세미나 만들기 기본 요금제를 고른다
+    const me = user ? await hostPlan(user.id) : null
     return NextResponse.json(
       {
         freeSec: PLAN.freeSec,
