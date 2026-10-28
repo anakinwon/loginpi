@@ -62,12 +62,13 @@ export const FEATURES: Feature[] = [
         ref: ['Galène'],
         note: 'LAN ✓ · LAN fix ✓ · retest … · LTE …',
       },
-      { id: 'recovery', status: 'doing', stage: 'M2', ref: ['Galène'], note: 'local ✓ · TURN API ✓ · LTE …' },
+      { id: 'recovery', status: 'done', stage: 'M2', date: '2026-10-29', ref: ['Galène'], note: 'local ✓ · TURN API ✓' },
       { id: 'structure', status: 'doing', stage: 'M3', ref: ['mediasoup'], note: 'gate ✓ · v1.2 ✓' },
-      { id: 'autoQuality', status: 'doing', stage: 'M4', ref: ['LiveKit'], note: 'score·layer ✓ · 30 …' },
+      // M4 청중 30 시험 = 마스터 결정 2026-10-29 생략(테스터 30명 모집 불가) — 통과가 아니라 면제
+      { id: 'autoQuality', status: 'done', stage: 'M4', date: '2026-10-29', ref: ['LiveKit'], note: 'score·layer ✓ · 30 ✗ waived' },
       { id: 'roomService', status: 'doing', stage: 'M5', ref: ['Galène', 'LiveKit'], note: 'ticket·status ✓ · device …' },
       // 룸 화면(S3·S4) — UI 설계서 v1.0(c16bc230) → M1~M2(a7affafb) → v1.1·v1.2(8eed64d2·74e2c7cd), 브라우저 QA ✓
-      { id: 'roomUi', status: 'doing', stage: 'UI', ref: ['LiveKit', 'Jitsi'], note: 'QA ✓ · device …' },
+      { id: 'roomUi', status: 'done', stage: 'UI', date: '2026-10-29', ref: ['LiveKit', 'Jitsi'], note: 'QA ✓ · device ✓' },
     ],
   },
   {
