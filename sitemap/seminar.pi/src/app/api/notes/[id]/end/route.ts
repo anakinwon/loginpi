@@ -6,6 +6,7 @@ import { withAuthGuard } from '@pi/guard'
 import { apiError, dbFail, dbRoute, requireUser } from '@/lib/api'
 import { finishNote, loadNote } from '@/lib/notes'
 import { isUuid } from '@/lib/seminar-rules'
+import { planAiOk } from '@/lib/speech-gate'
 
 export const maxDuration = 60 // 요약 30초 + 조회·캡처 읽기 여유
 const noStore = { 'Cache-Control': 'no-store' }
@@ -27,6 +28,12 @@ export const POST = withAuthGuard(
         n.forbidden ? 403 : 404,
       )
     if (!n.manage) return apiError('FORBIDDEN', 403)
+    // 세미나 회의록 요약 = AI — 무료 개최자 세미나 제외(sql/015, speech-gate 와 같은 판정)
+    if (n.note.smn_id) {
+      const paid = await planAiOk(n.note.smn_id)
+      if (paid instanceof Error) return apiError('DB_UNAVAILABLE', 503)
+      if (!paid) return apiError('PLAN_AI_PAID', 402)
+    }
     const from = n.note.nt_sts_cd
     if (from !== 'RECORDING' && from !== 'FAILED')
       return NextResponse.json({ status: from }, { headers: noStore })

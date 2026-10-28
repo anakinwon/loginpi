@@ -47,6 +47,11 @@ export const apiError = createApiError({
   PAY_INVALID_STATE: '결제를 처리할 수 없는 상태입니다',
   PAY_PI_CANCEL_REFUSED:
     '결제가 이미 진행 중이라 취소할 수 없습니다. 잠시 후 다시 확인하세요',
+  // 개최자 요금제(sql/015, src/lib/plan.ts)
+  PRICE_UNAVAILABLE: 'Pi 시세를 확인하지 못했습니다. 잠시 후 다시 시도하세요',
+  QUOTE_EXPIRED: '결제 견적 시간이 지났습니다. 다시 결제하세요',
+  PLAN_EXHAUSTED: '세미나 이용 시간을 모두 썼습니다. 요금제에서 시간을 충전하세요',
+  PLAN_AI_PAID: 'AI 기능은 유료 요금제에서 쓸 수 있습니다',
   // 음성 처리(sql/008 fn_use_smn_vc 결과, src/lib/speech-rules.ts 매핑) — UI 문구에 외부 AI 상표 금지
   AI_UNAVAILABLE: 'AI 기능을 지금 쓸 수 없습니다',
   SPEECH_CHUNK_INVALID: '음성 조각 형식이 올바르지 않습니다',

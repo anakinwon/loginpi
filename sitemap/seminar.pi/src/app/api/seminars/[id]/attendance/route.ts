@@ -1,6 +1,6 @@
 // 출석(SubAgent4) — POST = 룸 입장 기록 + 60초 하트비트(같은 호출), GET ?page= = 개최자·ADMIN 출석부(50명 단위), ?all=1 = CSV 용 전체(상한 ATD_CSV_MAX).
 //  POST 는 자격·상태 확인(gate, 병렬 2조회) 뒤에만 쓴다 — 종료·취소·삭제된 세미나·유료 참가 취소면 갱신하지 않고 409/404/402(야간 시험 T04 : 종료 뒤 마지막 시각이 늘던 결함).
-//  활성 행이 있으면 lst_hb_dtm 만 바꾸고, 없으면 INSERT(첫 입장 시각 보존), 동시에 두 번 오면 23505 → 성공(R-P5). CSV 는 화면이 번역된 머리글로 만든다(engage-rules toCsv).
+//  출석 갱신(없으면 INSERT, 첫 입장 시각 보존)·LIVE 개최자 시간 계량은 fn_hb_smn_hst(sql/015) 한 번 — 응답 remainSec, 소진이면 세미나 종료(endByPlan). CSV 는 화면이 번역된 머리글로 만든다(engage-rules toCsv).
 //  비로그인 401 — redirect 없음. 응답 no-store
 // ponytail: 확인과 갱신 사이에 세미나가 닫히면 하트비트 1번(≤60초)이 더 남는다 — 엄격히 막으려면 상태 조건을 건 RPC 로
 import { NextResponse } from 'next/server'
@@ -8,6 +8,7 @@ import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
 import { closed, gate, noStore, who } from '@/lib/engage'
 import { ATD_CSV_MAX, ATD_PAGE } from '@/lib/engage-rules'
+import { endByPlan } from '@/lib/plan'
 import { parsePage } from '@/lib/seminar-rules'
 
 type AtdRow = {
@@ -23,23 +24,16 @@ export const POST = withAuthGuard(
     const g = await gate(w.smnId, w.user)
     if (g instanceof NextResponse) return g
     if (!g.open) return closed()
-    const uid = w.user.id
-    const now = new Date().toISOString()
-    const hb = await db()
-      .from('smn_atd')
-      .update({ lst_hb_dtm: now, modr_id: uid })
-      .eq('smn_id', w.smnId)
-      .eq('usr_id', uid)
-      .eq('del_yn', 'N')
-      .select('atd_id')
-    if (hb.error) return dbFail(hb.error)
-    if (hb.data?.length) return NextResponse.json({ ok: true }, { headers: noStore })
-
-    const { error } = await db()
-      .from('smn_atd')
-      .insert({ smn_id: w.smnId, usr_id: uid, ent_dtm: now, lst_hb_dtm: now, regr_id: uid, modr_id: uid })
-    if (error && error.code !== '23505') return dbFail(error)
-    return NextResponse.json({ ok: true, first: !error }, { headers: noStore })
+    // 출석 갱신·개최자 시간 계량을 DB 함수 1왕복으로(sql/015 fn_hb_smn_hst — 출석 행 잠금으로 여러 탭 중복 계량 없음, R-P5)
+    //  remainSec = null 이면 계량 대상 아님(참가자·ADMIN 개최자·LIVE 아님). 0 이하 = 시간 소진 → 세미나 종료
+    const { data, error } = await db().rpc('fn_hb_smn_hst', { p_smn_id: w.smnId, p_usr_id: w.user.id })
+    if (error) return dbFail(error)
+    const remainSec = data === null ? null : Number(data)
+    if (remainSec !== null && remainSec <= 0) {
+      await endByPlan(w.smnId, w.user.id)
+      return NextResponse.json({ ok: true, remainSec: 0, ended: true, code: 'PLAN_EXHAUSTED' }, { headers: noStore })
+    }
+    return NextResponse.json({ ok: true, remainSec }, { headers: noStore })
   }),
 )
 

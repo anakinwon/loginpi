@@ -1,4 +1,4 @@
-// 세미나 서버 공용 — 목록·상세 조회 칼럼, 입장 결제(SMN_ENT) 검증기, @pi/payments 실패 → apiError 응답.
+// 세미나 서버 공용 — 목록·상세 조회 칼럼, 입장 결제(SMN_ENT)·요금제 결제(SMN_PLAN) 검증기, @pi/payments 실패 → apiError 응답.
 // 검증기는 서버 DB 의 smn_mst.ent_pi_amt 로 정가를 재계산한다(클라이언트 금액 불신, PRD D-5·D-10)
 import 'server-only'
 import {
@@ -8,7 +8,9 @@ import {
   type PayFail,
   type Validators,
 } from '@pi/payments'
+import { env } from '@/env'
 import { apiError, db } from './api'
+import { SMN_PLAN, verifyQuote } from './plan-rules'
 import {
   isUuid,
   OPEN_STS,
@@ -91,26 +93,58 @@ export function smnValidators(onSmn: (smnId: string) => void): Validators {
       if (!(Number(data.ent_pi_amt) > 0))
         return { ok: false, code: 'SMN_FREE', status: 400 }
 
-      const ids = (prev.data ?? []).map((r) => r.pymnt_id as string)
-      if (ids.length > STALE_LOOKUP_MAX)
+      if (await staleBusy((prev.data ?? []).map((r) => r.pymnt_id as string), user.id))
         return { ok: false, code: 'ALREADY_PAID', status: 409 }
-      const states = await Promise.all(
-        ids.map(async (id) => stalePayState(await getPiPayment(id))),
-      )
-      if (states.includes('pending'))
-        return { ok: false, code: 'ALREADY_PAID', status: 409 }
-      await Promise.all(ids.map((id) => markPaymentCanceled(payDb(), id, user.id)))
 
       onSmn(smnId)
       return { ok: true, amount: data.ent_pi_amt }
     },
+    // 요금제(sql/015) — 금액 = 서버 견적 q(서명·만료·본인·요금제 일치)의 Pi 금액. 원화·클라이언트 금액 불신(memory krw-display-only-pay-pi)
+    //  진행 중인 내 다른 SMN_PLAN 결제가 있으면 ALREADY_PAID(서명 전 이탈로 남은 것은 Pi 조회 후 정리 — SMN_ENT 와 같은 S2 규칙)
+    [SMN_PLAN]: async ({ payment, user }) => {
+      const v = verifyQuote(payment.metadata?.q, env.PI_SESSION_SECRET)
+      if (!v.ok) return v.why === 'EXPIRED'
+        ? { ok: false, code: 'QUOTE_EXPIRED', status: 409 }
+        : { ok: false, code: 'META_INVALID', status: 400 }
+      if (v.q.u !== user.id || v.q.p !== payment.metadata?.plan)
+        return { ok: false, code: 'META_INVALID', status: 400 }
+      if (await staleBusy(await otherPlanPays(user.id, payment.identifier), user.id))
+        return { ok: false, code: 'ALREADY_PAID', status: 409 }
+      return { ok: true, amount: v.q.a }
+    },
   }
+}
+
+// 내 진행 중(APPROVED) 요금제 결제 ID — 견적 라우트·검증기 공용(상한 STALE_LOOKUP_MAX + 1, R-P3)
+export async function otherPlanPays(usrId: string, exceptId?: string): Promise<string[]> {
+  let q = db()
+    .from('pi_pymnt')
+    .select('pymnt_id')
+    .eq('usr_id', usrId)
+    .eq('pymnt_tp_cd', SMN_PLAN)
+    .eq('pymnt_sts_cd', 'APPROVED')
+    .eq('del_yn', 'N')
+  if (exceptId) q = q.neq('pymnt_id', exceptId)
+  const { data, error } = await q.limit(STALE_LOOKUP_MAX + 1)
+  if (error) throw error
+  return (data ?? []).map((r) => r.pymnt_id as string)
+}
+
+// 이전 APPROVED 결제 정리(보안 검토 S2) — Pi 에서 취소·만료(404)면 원장 CANCELED 후 false, 하나라도 진행 중이거나 상한 초과면 true(막는다).
+//  Pi 조회 병렬(R-P1)
+export async function staleBusy(ids: string[], usrId: string): Promise<boolean> {
+  if (ids.length > STALE_LOOKUP_MAX) return true
+  const states = await Promise.all(ids.map(async (id) => stalePayState(await getPiPayment(id))))
+  if (states.includes('pending')) return true
+  await Promise.all(ids.map((id) => markPaymentCanceled(payDb(), id, usrId)))
+  return false
 }
 
 type ApiCode = Parameters<typeof apiError>[0]
 
-// PayFail → 응답. detail 은 서버 로그에만
+// PayFail → 응답. detail 은 서버 로그에만. 요금제 검증기 고유 코드(QUOTE_EXPIRED)는 그대로
 export function payFail(where: string, f: PayFail) {
   if (f.detail) console.error(`[payments/${where}]`, f.code, f.detail)
-  return apiError(payErrorCode(f.code) as ApiCode, f.status)
+  const code = f.code === 'QUOTE_EXPIRED' ? f.code : payErrorCode(f.code)
+  return apiError(code as ApiCode, f.status)
 }

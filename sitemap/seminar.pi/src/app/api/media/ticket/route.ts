@@ -1,5 +1,5 @@
 // 미디어 입장권 발급 — POST {room, cap:'present'|'watch'} → {ticket, wsUrl}. 로그인 필수(쿠키 OR X-Pi-Token, null 이면 401 — redirect 금지).
-// cap=present 는 관리자만(PRD D-1). room = smn_id(D-8) : 세미나가 있고 종료·취소가 아니어야 발급(404·409),
+// cap=present 는 관리자 또는 그 세미나 개최자(PRD D-1 개정, 개최자는 남은 시간 > 0 — 아니면 402 PLAN_EXHAUSTED). room = smn_id(D-8) : 세미나가 있고 종료·취소가 아니어야 발급(404·409),
 //  cap=watch 는 무료이거나 활성 참가 등록이 있어야 발급(D-9, 없으면 402). 정원 cap = max_cnt + 발표자 1.
 // uuid 가 아닌 방 코드(M0~M3 실험실 방)는 실험실이 열린 환경에서만 DB 확인 없이 발급(R-P6, 아소카 결정(마스터 위임 2026-10-26)) — 운영은 LAB_ENABLED=1 일 때만
 import { NextResponse } from 'next/server'
@@ -9,6 +9,7 @@ import { env } from '@/env'
 import { db, dbFail, dbRoute } from '@/lib/api'
 import { getSessionUser, isAdmin } from '@/lib/auth'
 import { signMediaTicket } from '@/lib/media-ticket'
+import { hostPlan } from '@/lib/plan'
 import { isUuid, OPEN_STS } from '@/lib/seminar-rules'
 
 const labOpen = () =>
@@ -42,7 +43,9 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
   // uuid 방은 소문자로 통일(S3) — 대소문자만 다른 같은 세미나가 엔진에서 다른 방이 되지 않게(실험실 방 코드는 그대로)
   const { cap } = parsed.data
   const room = isUuid(parsed.data.room) ? parsed.data.room.toLowerCase() : parsed.data.room
-  if (cap === 'present' && !isAdmin(user))
+  // 발표자 = ADMIN 또는 그 세미나 개최자(요금제 2026-10-28). 실험실 방(uuid 아님)은 ADMIN 만
+  const admin = isAdmin(user)
+  if (cap === 'present' && !admin && !isUuid(room))
     return NextResponse.json(
       { error: 'forbidden' },
       { status: 403, headers: noStore },
@@ -53,13 +56,13 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
   let nickname: string | null = null // 세미나 별명(sql/014)
   if (isUuid(room)) {
     // 세미나·내 참가 — 서로 의존 없음 → 병렬(R-P1)
-    const [smn, ptc, nck] = await Promise.all([
+    const [smn, ptc, nck, plan] = await Promise.all([
       db()
         .from('smn_mst')
-        .select('max_cnt, ent_pi_amt, smn_sts_cd')
+        .select('max_cnt, ent_pi_amt, smn_sts_cd, hst_usr_id')
         .eq('smn_id', room)
         .eq('del_yn', 'N')
-        .maybeSingle<{ max_cnt: number; ent_pi_amt: number | string; smn_sts_cd: string }>(),
+        .maybeSingle<{ max_cnt: number; ent_pi_amt: number | string; smn_sts_cd: string; hst_usr_id: string }>(),
       db()
         .from('smn_ptc')
         .select('ptc_id')
@@ -75,6 +78,8 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
         .eq('usr_id', user.id)
         .eq('del_yn', 'N')
         .maybeSingle<{ ncknm: string }>(),
+      // 비ADMIN 발표자 = 개최자 남은 시간(sql/015) — 개최자 확인과 병렬로 미리(R-P1)
+      cap === 'present' && !admin ? hostPlan(user.id) : null,
     ])
     if (smn.error) return dbFail(smn.error)
     if (ptc.error) return dbFail(ptc.error)
@@ -86,6 +91,13 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
       return NextResponse.json({ error: 'closed' }, { status: 409, headers: noStore })
     if (cap === 'watch' && Number(smn.data.ent_pi_amt) > 0 && !ptc.data)
       return NextResponse.json({ error: 'payment_required' }, { status: 402, headers: noStore })
+    if (cap === 'present' && !admin) {
+      if (smn.data.hst_usr_id !== user.id)
+        return NextResponse.json({ error: 'forbidden' }, { status: 403, headers: noStore })
+      // 개최자 남은 시간(sql/015) — 0 이하면 시작·재입장 불가
+      if (!plan || plan.remainSec <= 0)
+        return NextResponse.json({ error: 'plan_exhausted', code: 'PLAN_EXHAUSTED' }, { status: 402, headers: noStore })
+    }
     roomCap = smn.data.max_cnt + 1
     startLive = cap === 'present' && smn.data.smn_sts_cd === 'SCHEDULED'
   } else if (!labOpen()) {

@@ -14,7 +14,7 @@ const handler = (s, name) => {
   const j = s.indexOf('export const ', i + 1)
   return s.slice(i, j < 0 ? undefined : j)
 }
-const WRITE = /\.(update|insert|upsert)\(|\.rpc\('fn_vote/
+const WRITE = /\.(update|insert|upsert)\(|\.rpc\('(fn_vote|fn_hb_smn_hst)/ // 쓰는 RPC(설문 투표·출석 하트비트 계량 sql/015)
 
 for (const [file, names] of [
   ['attendance/route.ts', ['POST']],

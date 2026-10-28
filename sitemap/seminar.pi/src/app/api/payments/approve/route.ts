@@ -1,4 +1,4 @@
-// 입장 결제 승인 — POST {paymentId}. Pi SDK onReadyForServerApproval 에서 piFetch 로 호출.
+// 입장·요금제 결제 승인 — POST {paymentId}. Pi SDK onReadyForServerApproval 에서 piFetch 로 호출.
 //  @pi/payments approvePayment(Pi GET → 결제자·방향 → SMN_ENT 검증기(DB 정가·상태) → 원장 APPROVED → Pi approve) 뒤
 //  fn_chk_smn_cap(세미나 행 잠금, 사용자당 점유 1개·정원, PRD D-6) — OK 가 아니면 결제 취소(cancelPayment) 후 FULL·CLOSED·ALREADY 응답.
 //  ⚠ 정원 확인이 Pi approve 뒤인 이유 : 패키지 흐름은 원장 기록과 Pi approve 사이에 끼울 자리가 없다. 서명 전이라 Pi cancel 가능.
@@ -31,7 +31,9 @@ export const POST = withAuthGuard(
       validators: smnValidators((id) => (smnId = id)),
     })
     if (!r.ok) return payFail('approve', r)
-    if (!smnId) return apiError('INTERNAL', 500)
+    // 검증기는 SMN_ENT·SMN_PLAN 뿐 — smnId 가 없으면 요금제 결제(정원 확인 없음, sql/015)
+    if (!smnId)
+      return NextResponse.json({ ok: true, paymentId: r.paymentId }, { headers: { 'Cache-Control': 'no-store' } })
 
     const { data, error } = await db().rpc('fn_chk_smn_cap', {
       p_smn_id: smnId,

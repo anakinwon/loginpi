@@ -26,6 +26,12 @@ export type SpeechTarget = { smnId: string | null; ntId?: string | null }
 
 // amount = VC 는 예약 초, TRANS·TTS 는 글자 수
 export async function speechGate(t: SpeechTarget, user: UserRow, kind: SpeechKind, amount: number): Promise<NextResponse | null> {
+  // 무료 개최자 세미나 = AI 제외(sql/015) — 계량보다 먼저(거절인데 계량되지 않게). 대부분 캐시 적중이라 직렬 비용 없음. 대면 노트(smnId 없음)는 대상 아님
+  if (t.smnId) {
+    const paid = await planAiOk(t.smnId)
+    if (paid instanceof Error) return apiError('DB_UNAVAILABLE', 503)
+    if (!paid) return apiError('PLAN_AI_PAID', 402)
+  }
   let q
   if (kind === 'VC') {
     const maxSec = speechMaxSec(env.SPEECH_MAX_MIN)
@@ -54,6 +60,22 @@ export async function speechGate(t: SpeechTarget, user: UserRow, kind: SpeechKin
   if (error) return dbFail(error)
   const e = vcUseError(data as string | null)
   return e ? apiError(e.code as ApiCode, e.status) : null
+}
+
+// 세미나 AI 허용(개최자 ADMIN 또는 유료 이용권) — 60초 캐시(5초 조각마다 묻지 않게, R-P2). 구매·소진은 최대 60초 늦게 반영.
+const AI_TTL_MS = 60_000
+const aiCache = new Map<string, { ok: boolean; at: number }>()
+export async function planAiOk(smnId: string): Promise<boolean | Error> {
+  const hit = aiCache.get(smnId)
+  if (hit && Date.now() - hit.at < AI_TTL_MS) return hit.ok
+  const { data, error } = await db().rpc('fn_chk_smn_plan_ai', { p_smn_id: smnId })
+  if (error) {
+    console.error('[speech] 요금제 AI 확인 실패', error.code)
+    return new Error(error.code)
+  }
+  if (aiCache.size > 1000) aiCache.clear()
+  aiCache.set(smnId, { ok: data === true, at: Date.now() })
+  return data === true
 }
 
 // 무대 관문(D-1) — 세미나 음성 조각은 엔진 세션 역할이 presenter 이거나, panel 이면서 발표자가 방에 있을 때만(화면 speechOn 과 같은 규칙).

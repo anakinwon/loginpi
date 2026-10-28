@@ -1,7 +1,7 @@
 // 세미나 목록·개설 API(PRD F-02·F-03).
 //  GET  ?tab=all|hosted|joined&page=N — 서버 페이지네이션(12건), 건수는 페이저가 쓰므로 exact. all = 예정·진행 중 시작일시 순(x_smn_mst_01),
 //       hosted = 내가 연 것(x_smn_mst_02), joined = 내 참가(x_smn_ptc_02). all 은 공개 캐시, 나머지는 로그인 필요·private no-store
-//  POST 개설 — ADMIN 만(PRD D-1). 비로그인 401·비관리자 403(redirect 없음)
+//  POST 개설 — Pi 로그인 사용자 모두(PRD D-1 개정, 요금제 2026-10-28). ADMIN 아닌 개최자는 개설비 0 강제(정산 A2U 전까지). 비로그인 401(redirect 없음)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
@@ -11,9 +11,9 @@ import {
   dbFail,
   dbRoute,
   parseBody,
-  requireAdmin,
   requireUser,
 } from '@/lib/api'
+import { isAdmin } from '@/lib/auth'
 import { SMN_COLS, toCard, type SmnRow } from '@/lib/seminar'
 import {
   FEE_RE,
@@ -108,7 +108,7 @@ export const POST = withAuthGuard(
   dbRoute(async (req) => {
     // 세션·본문 병렬(R-P1)
     const [user, body] = await Promise.all([
-      requireAdmin(req),
+      requireUser(req),
       parseBody(req, createSchema),
     ])
     if (user instanceof NextResponse) return user
@@ -119,7 +119,7 @@ export const POST = withAuthGuard(
         p_hst_usr_id: user.id,
         p_start_dtm: new Date(body.startAt).toISOString(),
         p_max_cnt: body.maxCnt,
-        p_ent_pi_amt: body.fee,
+        p_ent_pi_amt: isAdmin(user) ? body.fee : '0', // 정산 전이라 일반 개최자는 무료 세미나만(돈이 앱 지갑에 묶이지 않게)
       })
     if (error) return dbFail(error)
     const r = (data as { smn_id: string; smn_nm: string }[] | null)?.[0]

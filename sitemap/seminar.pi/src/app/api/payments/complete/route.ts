@@ -1,4 +1,4 @@
-// 입장 결제 완료 — POST {paymentId, txid}. Pi SDK onReadyForServerCompletion·미완료 결제 복구(pi-auth-root)에서 piFetch 로 호출.
+// 입장·요금제 결제 완료 — POST {paymentId, txid}. Pi SDK onReadyForServerCompletion·미완료 결제 복구(pi-auth-root)에서 piFetch 로 호출.
 //  @pi/payments completePayment(원장 선조회 → Pi complete → txid 대조 → finalize) — SMN_ENT 는 finalize = fn_cmpl_smn_ent(sql/007) 로
 //  원장 COMPLETED 와 참가 등록을 한 트랜잭션에(갈라짐 차단, 보안 검토 S1). 다른 유형은 원장 COMPLETED 만(markPaymentCompleted).
 //  재호출(원장 이미 COMPLETED → 패키지가 finalize 를 다시 부르지 않음)은 fn_join_smn 으로 등록만 다시 시도(ALREADY 멱등)
@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
 import { completePayment, markPaymentCompleted } from '@pi/payments'
 import { apiError, db, dbFail, dbRoute, parseBody, requireUser } from '@/lib/api'
+import { SMN_PLAN } from '@/lib/plan-rules'
 import { payDb, payFail, SMN_ENT } from '@/lib/seminar'
 import { isUuid, joinError } from '@/lib/seminar-rules'
 
@@ -33,6 +34,18 @@ export const POST = withAuthGuard(
       paymentId: body.paymentId,
       txid: body.txid,
       finalize: async ({ row, txid }) => {
+        // 요금제 — 원장 COMPLETED + 이용권 부여 한 트랜잭션(sql/015, 멱등). PLAN_INVALID = 돈은 받았고 요금표에 없음 → 수동 처리 로그
+        if (row.pymnt_tp_cd === SMN_PLAN) {
+          const { data, error } = await db().rpc('fn_cmpl_smn_plan', {
+            p_pymnt_id: row.pymnt_id,
+            p_tx_id: txid,
+            p_usr_id: user.id,
+          })
+          if (error) throw error
+          if (data !== 'OK') console.error('[payments/complete] 요금제 부여 실패 — 수동 확인', row.pymnt_id, data)
+          if (data === 'PAY_INVALID') throw new Error('요금제 원장 COMPLETED 0행')
+          return null
+        }
         if (row.pymnt_tp_cd !== SMN_ENT) {
           const done = await markPaymentCompleted(payDb(), row.pymnt_id, user.id, txid)
           if (!done) throw new Error('원장 COMPLETED 0행')
