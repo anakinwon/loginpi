@@ -158,7 +158,7 @@ export function ConsentNotice() {
 }
 
 // 새 탭 표시 — 화살표는 낭독기가 '오른쪽 위 화살표'로 읽으므로 숨기고, 새 탭에서 열린다는 사실을 글로 알린다(WCAG 3.2.5)
-function NewTab({ label }: { label: string }) {
+export function NewTab({ label }: { label: string }) {
   return (
     <>
       <span aria-hidden>↗</span>

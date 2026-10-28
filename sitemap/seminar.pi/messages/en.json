@@ -698,13 +698,18 @@
     "gcal": {
       "connect": "Show my Google Calendar",
       "change": "Change Google Calendar address",
-      "help": "Google Calendar → Settings → pick your calendar → 'Integrate calendar' → copy 'Secret address in iCal format' and paste it here. It is stored on this device only.",
       "save": "Save",
       "remove": "Disconnect",
       "cancel": "Cancel",
       "failed": "Couldn't load your events. Check the address.",
       "allDay": "All day",
-      "day": "My events on this day"
+      "day": "My events on this day",
+      "s1": "Tap [Open Google Calendar settings] below.",
+      "s2": "Under 'Settings for my calendars' on the left, pick your calendar (your name).",
+      "s3": "Scroll to 'Integrate calendar' and copy 'Secret address in iCal format'.",
+      "s4": "Paste it here and tap [Save] — your events show as dots on the calendar.",
+      "open": "Open Google Calendar settings",
+      "privacy": "This address is a key to your calendar — don't share it. It's stored on this device only, never on our server."
     },
     "title": "Create a seminar",
     "notAdmin": "Only admins can host seminars for now.",

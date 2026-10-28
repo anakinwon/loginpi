@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { readApi } from '@/lib/client-api'
+import { NewTab } from '@/components/room/consent'
 import type { IcsEvent } from '@/lib/ics-read'
 import { START_AHEAD_MAX_MS } from '@/lib/seminar-rules'
 
@@ -34,6 +35,7 @@ function firstPick() {
 export function DateCalendar({ name, label }: { name: string; label: string }) {
   const locale = useLocale()
   const t = useTranslations('host.gcal')
+  const tr = useTranslations('room')
   const [pick, setPick] = useState(firstPick)
   const [gUrl, setGUrl] = useState(readUrl)
   const [gOpen, setGOpen] = useState(false)
@@ -189,7 +191,21 @@ export function DateCalendar({ name, label }: { name: string; label: string }) {
           </button>
         ) : (
           <div className="space-y-2">
-            <p className="text-muted-foreground">{t('help')}</p>
+            {/* 쉬운 순서 안내 + 설정 화면 바로 가기(마스터 2026-10-28 — 한 문장 설명이 어려웠음) */}
+            <ol className="text-muted-foreground list-decimal space-y-0.5 pl-4">
+              {(['s1', 's2', 's3', 's4'] as const).map((k) => (
+                <li key={k}>{t(k)}</li>
+              ))}
+            </ol>
+            <a
+              href="https://calendar.google.com/calendar/r/settings"
+              target="_blank"
+              rel="noopener"
+              className="text-accent inline-block hover:underline"
+            >
+              {t('open')} <NewTab label={tr('consent.newTab')} />
+            </a>
+            <p className="text-muted-foreground">🔒 {t('privacy')}</p>
             <input
               defaultValue={gUrl}
               id="gcal-url"
