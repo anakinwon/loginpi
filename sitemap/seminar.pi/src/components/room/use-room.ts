@@ -443,9 +443,11 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
       // 구 엔진 예비 통로의 제목 변경 표식 — 신 엔진 신호와 같은 모양으로 구독자(features/naming)에게 넘긴다
       if (c.text === TITLE_MARK) return void appSubs.current.forEach((fn) => fn({ topic: 'refresh', d: { what: 'title' }, from: c.peerId }))
       // 구 엔진 예비 통로의 상태 표식(녹화·AI 기록 고지) — 채팅에 넣지 않고 'state' 신호로 구독자에게(형식이 틀리면 버림)
+      //  채팅은 청중도 보낼 수 있으므로 지금 발표자인 사람이 보낸 것만 받는다(보안 검토 — 녹화·AI 기록 상태 위조 차단, 받는 기능마다 역할 확인을 기대하지 않게)
       if (c.text.startsWith(STATE_MARK)) {
         const d = stateFromChat(c.text)
-        if (d !== undefined) appSubs.current.forEach((fn) => fn({ topic: 'state', d, from: c.peerId }))
+        if (d !== undefined && peersRef.current.get(c.peerId)?.role === 'presenter')
+          appSubs.current.forEach((fn) => fn({ topic: 'state', d, from: c.peerId }))
         return
       }
       // 엔진이 채우는 name 은 입장권 이름(바꾸기 전) — 바꾼 이름이 있으면 그것으로
