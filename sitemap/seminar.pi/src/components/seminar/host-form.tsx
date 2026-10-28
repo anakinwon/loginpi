@@ -9,6 +9,7 @@ import { LoginGate } from '@/components/login-gate'
 import { useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
 import { FEE_RE, startAtOk } from '@/lib/seminar-rules'
+import { DateCalendar } from './date-calendar'
 import { BTN_PRIMARY, useSeminarErrText } from './shared'
 
 const INPUT = 'bg-surface w-full rounded-lg border border-white/10 px-3 py-2'
@@ -71,21 +72,8 @@ function Form() {
         <span>{t('subTitle')}</span>
         <input name="subTitle" maxLength={60} className={INPUT} />
       </label>
-      <label className="block space-y-1 text-sm">
-        <span>{t('startAt')}</span>
-        <input
-          name="startAt"
-          type="datetime-local"
-          required
-          // 칸을 누르면 바로 달력이 열린다(작은 달력 아이콘을 찾지 않아도). showPicker 없는 브라우저는 기본 동작 그대로
-          onClick={(e) => {
-            try {
-              e.currentTarget.showPicker?.()
-            } catch {}
-          }}
-          className={`${INPUT} cursor-pointer`}
-        />
-      </label>
+      {/* 시작일시 — 달력이 펼쳐진 채로(날짜 누르고 시·분 고르기), 값 형식은 datetime-local 과 같다 */}
+      <DateCalendar name="startAt" label={t('startAt')} />
       <label className="block space-y-1 text-sm">
         <span>{t('maxCnt')}</span>
         <input name="maxCnt" type="number" required min={1} max={100} defaultValue={30} className={INPUT} />
