@@ -291,10 +291,10 @@ export function Stage(props: StageProps) {
       {live && rest.length > 0 && (
         <ul
           aria-label={t('tile.row')}
-          className="mt-2 flex gap-2 overflow-x-auto md:absolute md:right-3 md:bottom-3 md:mt-0 md:max-w-[60%] md:justify-end"
+          className="mt-2 flex gap-2 overflow-x-auto md:absolute md:right-3 md:bottom-3 md:mt-0 md:max-w-[60%] md:justify-end md:overflow-visible"
         >
           {rest.map((x) => (
-            <li key={x.key} className="relative w-36 shrink-0 md:w-44">
+            <DragTile key={x.key} bound={box}>
               <button
                 type="button"
                 aria-label={t('tile.pin', { name: x.name })}
@@ -330,11 +330,75 @@ export function Stage(props: StageProps) {
                   <span className="sr-only">{t('rename.tile')}</span>
                 </button>
               )}
-            </li>
+            </DragTile>
           ))}
         </ul>
       )}
     </div>
+  )
+}
+
+// 작은 타일 끌어 옮기기(md 이상 — 타일 줄이 무대 위에 떠 있을 때만, 모바일은 무대 아래 가로 스크롤이라 끄기) — 포인터로 끌면
+//  자리에서 translate 로 옮기고 무대(bound) 밖으로는 못 나가게 자른다. 5px 미만 움직임은 클릭(고정)으로 두고, 끌었으면 그 클릭은 삼킨다
+const DRAG_PX = 5
+const WIDE = '(min-width: 768px)'
+function DragTile({ bound, children }: { bound: RefObject<HTMLDivElement | null>; children: React.ReactNode }) {
+  const [at, setAt] = useState({ x: 0, y: 0 })
+  const li = useRef<HTMLLIElement>(null)
+  const drag = useRef<{ sx: number; sy: number; ox: number; oy: number; min: { x: number; y: number }; max: { x: number; y: number } } | null>(null)
+  const moved = useRef(false)
+
+  const down = (e: React.PointerEvent<HTMLLIElement>) => {
+    if (e.button !== 0 || !window.matchMedia(WIDE).matches || !li.current || !bound.current) return
+    // 끌 수 있는 범위 = 지금 타일 자리에서 무대 네 변까지(현재 이동분 포함)
+    const t = li.current.getBoundingClientRect()
+    const b = bound.current.getBoundingClientRect()
+    drag.current = {
+      sx: e.clientX,
+      sy: e.clientY,
+      ox: at.x,
+      oy: at.y,
+      min: { x: at.x + b.left - t.left, y: at.y + b.top - t.top },
+      max: { x: at.x + b.right - t.right, y: at.y + b.bottom - t.bottom },
+    }
+    moved.current = false
+  }
+  const move = (e: React.PointerEvent<HTMLLIElement>) => {
+    const d = drag.current
+    if (!d) return
+    const dx = e.clientX - d.sx
+    const dy = e.clientY - d.sy
+    if (!moved.current) {
+      if (Math.hypot(dx, dy) < DRAG_PX) return
+      moved.current = true
+      e.currentTarget.setPointerCapture(e.pointerId) // 빨리 끌어 타일 밖으로 나가도 계속 따라오게
+    }
+    const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi)
+    setAt({ x: clamp(d.ox + dx, d.min.x, d.max.x), y: clamp(d.oy + dy, d.min.y, d.max.y) })
+  }
+  const up = () => {
+    drag.current = null
+  }
+
+  return (
+    <li
+      ref={li}
+      onPointerDown={down}
+      onPointerMove={move}
+      onPointerUp={up}
+      onPointerCancel={up}
+      onClickCapture={(e) => {
+        // 끈 뒤에 오는 클릭 = 고정·이름 바꾸기 아님
+        if (!moved.current) return
+        moved.current = false
+        e.preventDefault()
+        e.stopPropagation()
+      }}
+      style={at.x || at.y ? { transform: `translate(${at.x}px, ${at.y}px)` } : undefined}
+      className="relative w-36 shrink-0 md:w-44 md:cursor-grab md:touch-none md:active:cursor-grabbing"
+    >
+      {children}
+    </li>
   )
 }
 
