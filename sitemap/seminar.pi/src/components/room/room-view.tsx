@@ -410,10 +410,13 @@ function Room({
     })
   }
 
+  // [나가기] = 누구나 참여 대기방으로(세미나는 계속 — 다시 입장 가능, 마스터 2026-10-29 : 발표자 대화상자에서 [세미나 종료]를 눌러 방이 사라지던 혼동).
+  //  세미나 종료는 발표자 상단 줄의 [세미나 종료] → 확인 대화상자(기본 <dialog>, 포커스 가두기·Esc 닫기 내장)
   function onLeave() {
-    // 발표자는 [나가기]/[세미나 종료] 선택(설계서 6.1, 13절 #6). 대화상자는 기본 <dialog>(포커스 가두기·Esc 닫기 내장)
-    if (role !== 'presenter') return r.leave()
-    setLeaveStep('choose')
+    r.leave()
+  }
+  function askEnd() {
+    setLeaveStep('confirm')
     leaveRef.current?.showModal()
   }
 
@@ -484,6 +487,15 @@ function Room({
                 >
                   ← {t('toLobby')}
                 </button>
+                {role === 'presenter' && (
+                  <button
+                    type="button"
+                    onClick={askEnd}
+                    className="border-danger text-danger hover:bg-danger/10 inline-flex min-h-7 items-center rounded-full border px-3 font-semibold"
+                  >
+                    {t('leaveDialog.end')}
+                  </button>
+                )}
                 {r.peers.length > 0 && (
                   <span className="text-muted-foreground">{t('people', { n: r.peers.length })}</span>
                 )}
