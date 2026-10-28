@@ -1,16 +1,19 @@
 'use client'
 // 출석 기록(SubAgent4) — 룸에 들어가 있는 동안(joined·reconnecting) 입장 1회 + 60초 하트비트를 POST /api/seminars/[id]/attendance 로.
-//  무대 위 가운데에 방 남은 시간 카운트다운 — 이원화(sql/021) : 유료 세미나 = "월간 28:59:41 · 무료 1:00:00"(유료 먼저 줄고 0 이면 무료가 준다, 지금 쓰는 쪽 굵게), 무료 세미나 = "무료 59:12" — 응답 left 를 받은 뒤 1초마다 줄이고, 5분 미만이면 붉은 글자 깜빡임(움직임 줄이기 설정이면 깜빡임 없음).
+//  좌상단 배지 줄에 방 남은 시간 카운트다운(녹화 중 숨김·10초 뒤 50% 투명·5분 미만 진하게) — 이원화(sql/021) : 유료 세미나 = "월간 28:59:41 · 무료 1:00:00"(유료 먼저 줄고 0 이면 무료가 준다, 지금 쓰는 쪽 굵게), 무료 세미나 = "무료 59:12" — 응답 left 를 받은 뒤 1초마다 줄이고, 5분 미만이면 붉은 글자 깜빡임(움직임 줄이기 설정이면 깜빡임 없음).
 //  0 이 되면 바로 하트비트 1번 → 서버가 소진을 확인하면(ended) 종료 알림 후 자동으로 룸에서 나간다(마스터 2026-10-29). 방이 닫혀 409 여도 나간다.
 //  개최자 응답 remainSec 이 10분·1분 아래로 내려가면 1번씩 알림. 실패는 조용히 넘긴다 — 다음 하트비트가 다시 시도(출석이 룸 사용을 막지 않게), 다시 보내도 같은 거절(beatStops)이면 멈춘다. 화면이 다시 보이면 30초 이상 지났을 때 당겨 보낸다(beatDue)
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import { beatDue, beatStops, fmtDur, HB_MS, LOW_LEFT_SEC, splitLeft } from '@/lib/engage-rules'
-import type { RoomCtx, RoomFeature } from '../../extensions'
+import { BADGE_SLOT_ID, useStageSlot, type RoomCtx, type RoomFeature } from '../../extensions'
+import { useRecordingNow } from '../recording'
 import { api, engageable } from './shared'
 
 // 남은 시간 알림 문턱(초) — 큰 것부터. 각 문턱은 룸에 있는 동안 1번만
 const WARN_SEC = [600, 60] as const
+const DIM_AFTER_MS = 10_000 // 처음 보인 뒤 이 시간이 지나면 50% 투명(무대를 덜 가리게)
 const PLAN_KEY: Record<string, 'free' | 'monthly' | 'yearly'> = { FREE: 'free', M: 'monthly', Y: 'yearly' }
 
 type Beat = { remainSec?: number | null; left?: number | null; plan?: string; paid?: number | null; free?: number | null; ended?: boolean }
@@ -91,6 +94,16 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const sec = split ? (split.paid ?? 0) + split.free : null
 
   // 0 도달 → 하트비트 1번(같은 응답 값에 1번만). 서버가 아직 몇 초 남았다고 하면 그 값으로 다시 세고, 소진이면 ended → 나간다
+  // 위치·녹화·흐리게(마스터 2026-10-29) — 좌상단 배지 줄(녹화·AI 기록 배지와 같은 자리)에 넣고, 녹화 중이면 감추고, 처음 보인 뒤 10초면 50% 투명
+  const slot = useStageSlot(BADGE_SLOT_ID)
+  const recording = useRecordingNow()
+  const shown = live && clock !== null
+  const [dim, setDim] = useState(false)
+  useEffect(() => {
+    if (!shown) return
+    const timer = setTimeout(() => setDim(true), DIM_AFTER_MS)
+    return () => clearTimeout(timer)
+  }, [shown])
   const fired = useRef<Clock | null>(null)
   useEffect(() => {
     if (sec === 0 && clock && fired.current !== clock) {
@@ -99,14 +112,16 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     }
   }, [sec, clock])
 
-  if (!live || sec === null || !clock || !split) return null
-  const low = sec < LOW_LEFT_SEC // 5분 미만 = 유료·무료 합 기준
+  if (!live || sec === null || !clock || !split || !slot || recording) return null
+  const low = sec < LOW_LEFT_SEC // 5분 미만 = 유료·무료 합 기준 — 경고라 흐리게 하지 않는다
   const paidOn = split.paid !== null && split.paid > 0 // 지금 유료를 쓰는 중
-  return (
+  return createPortal(
     <div
       role="timer"
       aria-label={t('plan.left')}
-      className={`bg-surface/80 absolute top-2 left-1/2 z-20 -translate-x-1/2 rounded-full px-3 py-1 text-xs whitespace-nowrap tabular-nums ${low ? 'text-danger motion-safe:animate-pulse' : ''}`}
+      className={`bg-surface/80 rounded-full px-3 py-1 text-xs whitespace-nowrap tabular-nums transition-opacity duration-700 ${
+        low ? 'text-danger motion-safe:animate-pulse' : dim ? 'opacity-50' : ''
+      }`}
     >
       {split.paid !== null && (
         <>
@@ -119,7 +134,8 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
       <span className={paidOn ? 'opacity-60' : 'font-bold'}>
         {tp('free')} {fmtDur(split.free)}
       </span>
-    </div>
+    </div>,
+    slot,
   )
 }
 

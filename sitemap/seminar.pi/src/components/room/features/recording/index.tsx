@@ -28,6 +28,13 @@ const busy = featureStore(false) // 시작·종료 처리 중(두 번 누름 방
 const recBy = featureStore<RecBy>({}) // 녹화 중이라고 알린 다른 발표자 peerId
 const toast = featureStore<string | null>(null) // room.recording.* 아래 키
 const lastSaved = featureStore(false) // 다시 저장할 마지막 녹화 파일이 있음(lastFile)
+
+// 지금 녹화 중인가(나 또는 다른 발표자) — 다른 기능이 녹화 동안 화면 요소를 감출 때(예 남은 시간 카운트다운, 마스터 2026-10-29)
+export function useRecordingNow() {
+  const mine = useStore(recOn)
+  const by = useStore(recBy)
+  return mine || Object.keys(by).length > 0
+}
 let recorder: Recorder | null = null
 let fileName = ''
 let lastFile: File | null = null // ponytail: 메모리에 1개 보관(긴 녹화면 수백 MB) — 다음 녹화 시작·퇴장·[닫기] 때 놓는다
