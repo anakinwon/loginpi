@@ -467,6 +467,14 @@ function Room({
             <div className={`min-w-0 flex-1 space-y-2 ${fit.h ? 'flex min-h-0 flex-col' : ''}`}>
               {/* 상단 정보 줄 — 인원 수·재연결 배지(설계서 5.2·6.3)·연결 점검 */}
               <div className="flex min-h-7 flex-wrap items-center gap-2 text-xs">
+                {/* 참여 대기방으로(마스터 2026-10-29) — 나만 나가 대기방(Prejoin)으로. 발표자도 세미나는 끝나지 않는다(종료는 [나가기] 대화상자) */}
+                <button
+                  type="button"
+                  onClick={() => r.leave()}
+                  className="bg-surface-raised hover:bg-surface inline-flex min-h-7 items-center rounded-full px-3 font-semibold"
+                >
+                  ← {t('toLobby')}
+                </button>
                 {r.peers.length > 0 && (
                   <span className="text-muted-foreground">{t('people', { n: r.peers.length })}</span>
                 )}
@@ -688,7 +696,7 @@ function Room({
                 }}
                 className={`${btnS} bg-surface-raised`}
               >
-                {t('leave')}
+                {t('toLobby')}
               </button>
               <button type="button" onClick={() => setLeaveStep('confirm')} className={`${btnS} bg-danger text-white`}>
                 {t('leaveDialog.end')}
