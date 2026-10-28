@@ -662,6 +662,7 @@
     "payFailed": "Payment failed.",
     "err": {
       "NAME_TAKEN": "That name is already used by someone else. Pick another.",
+      "CAL_READ_FAILED": "Couldn't load your events. Check the address.",
       "ISLAND_FULL": "All 100 island names are in use right now. You can open a new seminar after an upcoming or live one ends or is canceled.",
       "SMN_FULL": "This seminar is full.",
       "SMN_CLOSED": "This seminar has ended or was canceled.",
@@ -694,6 +695,17 @@
     "attendance": "Attendance"
   },
   "host": {
+    "gcal": {
+      "connect": "Show my Google Calendar",
+      "change": "Change Google Calendar address",
+      "help": "Google Calendar → Settings → pick your calendar → 'Integrate calendar' → copy 'Secret address in iCal format' and paste it here. It is stored on this device only.",
+      "save": "Save",
+      "remove": "Disconnect",
+      "cancel": "Cancel",
+      "failed": "Couldn't load your events. Check the address.",
+      "allDay": "All day",
+      "day": "My events on this day"
+    },
     "title": "Create a seminar",
     "notAdmin": "Only admins can host seminars for now.",
     "name": "Let's travel to a beautiful island!",

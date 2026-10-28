@@ -34,6 +34,8 @@ export const apiError = createApiError({
   SMN_PAY_INVALID: '결제 정보를 확인할 수 없습니다',
   // 세미나 개설(sql/011 fn_crt_smn) — 진행·예정 세미나가 섬 이름 수만큼 열려 있음
   ISLAND_FULL: '지금 쓸 수 있는 섬 이름이 없습니다',
+  // 내 Google 일정(api/calendar/events) — 주소가 틀렸거나 Google 이 응답하지 않음
+  CAL_READ_FAILED: '일정을 불러오지 못했습니다',
   // 세미나 별명(sql/014) — 개최자 이름·다른 참가자 별명과 같음(사칭 방지)
   NAME_TAKEN: '이미 다른 사람이 쓰는 이름입니다',
   // 결제(@pi/payments PayFail 매핑)
