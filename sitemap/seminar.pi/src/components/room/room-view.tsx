@@ -371,6 +371,15 @@ function Room({
     for (const f of FEATURES) f.onReset?.()
     speechWants.reset()
   }, [live])
+  // 룸 화면이 사라질 때(뒤로 가기·상단 링크 같은 화면 안 이동)도 부가 기능 정리 — 위 [live] 효과는 언마운트에서 돌지 않아
+  //  녹화가 계속 돌며 녹화 계량(30초마다 유료 차감)이 남던 결함(검토 지적). 녹화는 멈추고 파일 저장, 계량은 stop
+  useEffect(
+    () => () => {
+      for (const f of FEATURES) f.onReset?.()
+      speechWants.reset()
+    },
+    [],
+  )
 
   async function toggle(kind: MediaKind, on: boolean) {
     // 마이크를 처음 켜기 직전 동의(A-6) — 동의 안 함이어도 마이크는 켠다(음성 처리만 빠짐, consent.agreed 로 막힘). 닫기(Esc)만 켜기 취소

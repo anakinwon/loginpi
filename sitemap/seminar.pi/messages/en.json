@@ -595,7 +595,8 @@
       "paidOnly": "Recording is available only in seminars opened on a Monthly or Yearly plan, while paid time is left.",
       "planOut": "Paid time ran out, so recording stopped and the file was saved.",
       "notInRoom": "Still confirming you are in the room. Start recording again in a moment.",
-      "meterFailed": "Could not check recording time, so recording did not start. Try again in a moment."
+      "meterFailed": "Could not check recording time, so recording did not start. Try again in a moment.",
+      "paidOut": "No paid time is left, so recording cannot start. Buy the same plan again to record."
     },
     "notes": {
       "on": "AI notes",

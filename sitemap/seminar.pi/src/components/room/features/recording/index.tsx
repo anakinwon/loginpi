@@ -44,7 +44,7 @@ const meterDeny = (code?: string) =>
   code === 'REC_PAID_ONLY'
     ? 'recording.paidOnly'
     : code === 'PLAN_EXHAUSTED'
-      ? 'recording.planOut'
+      ? 'recording.paidOut'
       : code === 'REC_NOT_IN_ROOM'
         ? 'recording.notInRoom'
         : 'recording.meterFailed'
@@ -191,13 +191,15 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
     startedAt.set(Date.now())
     toast.set('started')
     if (meterOn) {
+      // 기준 시각을 실제 녹화 시작으로 다시 — 앞의 START~전원 고지(재시도 최대 약 45초) 대기는 차감하지 않는다(검토 지적)
+      void meter(ctx.seminarId, 'start').catch(() => {})
       meterSmn = ctx.seminarId
       meterTimer = setInterval(() => void beatRec(), METER_MS)
     }
   } finally {
     if (!started) {
       void ac.close().catch(() => {})
-      if (meterOn) void meter(ctx.seminarId, 'stop').catch(() => {}) // 계량만 시작하고 녹화는 못 함 — 기준 시각을 지운다
+      // 계량만 시작하고 녹화는 못 함 — stop 을 보내면 고지 대기 시간이 차감되므로 보내지 않는다(남은 기준 시각은 다음 START 가 덮어쓰고, 녹화 중이 아니면 BEAT·STOP 이 없다)
     }
     busy.set(false)
   }
