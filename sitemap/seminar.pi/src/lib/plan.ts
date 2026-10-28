@@ -60,6 +60,15 @@ export async function hostPlan(usrId: string): Promise<HostPlan> {
   return { remainSec, paid: !!(byPlan.M || byPlan.Y), byPlan }
 }
 export const planSec = (h: HostPlan | null, cd: string) => (h && isPlanCd(cd) ? (h.byPlan[cd]?.sec ?? 0) : 0)
+// 세미나가 쓸 수 있는 시간(sql/021) — 유료(M·Y) 세미나 = 그 요금제 먼저 + 이번 달 무료, 무료 세미나 = 무료만. 카운트다운은 둘로 나눠 보인다
+export function planPools(h: HostPlan | null, cd: string): { paid: number | null; free: number } {
+  const free = planSec(h, 'FREE')
+  return cd === 'M' || cd === 'Y' ? { paid: planSec(h, cd), free } : { paid: null, free }
+}
+export const planLeft = (h: HostPlan | null, cd: string) => {
+  const p = planPools(h, cd)
+  return (p.paid ?? 0) + p.free
+}
 
 // 시간 소진 종료 — 세미나 ENDED(열린 상태일 때만, 조건부 갱신 = 멱등 — api/seminars/[id]/end 와 같은 규칙) +
 //  응답 뒤(after) 남은 회의록 마무리·엔진 방 강제 종료(DELETE /admin/rooms/{id}, 관리 키·엔진 주소가 있을 때만, 2초 제한 R-P4)

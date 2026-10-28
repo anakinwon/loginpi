@@ -9,7 +9,7 @@ import { env } from '@/env'
 import { db, dbFail, dbRoute } from '@/lib/api'
 import { getSessionUser, isAdmin } from '@/lib/auth'
 import { signMediaTicket } from '@/lib/media-ticket'
-import { hostPlan, planSec } from '@/lib/plan'
+import { hostPlan, planLeft } from '@/lib/plan'
 import { isUuid, OPEN_STS } from '@/lib/seminar-rules'
 
 const labOpen = () =>
@@ -97,7 +97,7 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
         return NextResponse.json({ error: 'forbidden' }, { status: 403, headers: noStore })
       // 개최자(관리자 포함, 마스터 2026-10-29) = 그 세미나 요금제 남은 시간 — 0 이하면 시작·재입장 불가.
       //  관리자가 남의 세미나를 대신 진행하면 계량 없음(하트비트는 개최자 본인만 계량)
-      if (host && planSec(plan, smn.data.plan_cd) <= 0)
+      if (host && planLeft(plan, smn.data.plan_cd) <= 0) // 유료 세미나 = 유료 + 무료 합(sql/021)
         return NextResponse.json({ error: 'plan_exhausted', code: 'PLAN_EXHAUSTED' }, { status: 402, headers: noStore })
     }
     roomCap = smn.data.max_cnt + 1

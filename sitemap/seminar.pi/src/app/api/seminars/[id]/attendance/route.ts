@@ -10,7 +10,7 @@ import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
 import { closed, gate, noStore, who } from '@/lib/engage'
 import { ATD_CSV_MAX, ATD_PAGE } from '@/lib/engage-rules'
-import { endByPlan, hostPlan, planSec } from '@/lib/plan'
+import { endByPlan, hostPlan, planLeft, planPools } from '@/lib/plan'
 import { parsePage } from '@/lib/seminar-rules'
 
 type AtdRow = {
@@ -29,20 +29,18 @@ export const POST = withAuthGuard(
     if (!g.open) return closed()
     // 출석 갱신·개최자 시간 계량을 DB 함수 1왕복으로(sql/015 fn_hb_smn_hst — 출석 행 잠금으로 여러 탭 중복 계량 없음, R-P5)
     //  remainSec = null 이면 계량 대상 아님(참가자·ADMIN 개최자·LIVE 아님). 0 이하 = 시간 소진 → 세미나 종료
-    //  참가자(개최자 아님)·LIVE 면 개최자의 그 요금제 남은 시간을 함께 읽는다 — 하트비트와 서로 의존 없음 → 병렬(R-P1)
-    const host = g.hostId === w.user.id
-    const [hb, hp] = await Promise.all([
-      db().rpc('fn_hb_smn_hst', { p_smn_id: w.smnId, p_usr_id: w.user.id }),
-      !host && g.live ? hostPlan(g.hostId) : null,
-    ])
-    if (hb.error) return dbFail(hb.error)
-    const remainSec = hb.data === null ? null : Number(hb.data)
-    const left = remainSec ?? (hp ? planSec(hp, g.planCd) : null)
+    const { data, error } = await db().rpc('fn_hb_smn_hst', { p_smn_id: w.smnId, p_usr_id: w.user.id })
+    if (error) return dbFail(error)
+    const remainSec = data === null ? null : Number(data)
+    // LIVE 면 카운트다운용 요금제별 남은 시간(유료·무료 이원화, sql/021) — 개최자 차감 뒤 값이 필요해 하트비트 다음에 읽는다(의존 있는 직렬)
+    const hp = g.live ? await hostPlan(g.hostId) : null
+    const pools = hp ? planPools(hp, g.planCd) : null
+    const left = remainSec ?? (hp ? planLeft(hp, g.planCd) : null)
     if (left !== null && left <= 0) {
       await endByPlan(w.smnId, w.user.id)
       return NextResponse.json({ ok: true, remainSec: 0, left: 0, plan: g.planCd, ended: true, code: 'PLAN_EXHAUSTED' }, { headers: noStore })
     }
-    return NextResponse.json({ ok: true, remainSec, left, plan: g.planCd }, { headers: noStore })
+    return NextResponse.json({ ok: true, remainSec, left, plan: g.planCd, paid: pools?.paid ?? null, free: pools?.free ?? null }, { headers: noStore })
   }),
 )
 

@@ -1,11 +1,11 @@
 'use client'
 // 출석 기록(SubAgent4) — 룸에 들어가 있는 동안(joined·reconnecting) 입장 1회 + 60초 하트비트를 POST /api/seminars/[id]/attendance 로.
-//  무대 위 가운데에 방 남은 시간 카운트다운(세미나 요금제 이름 · 남은 시간, sql/018) — 응답 left 를 받은 뒤 1초마다 줄이고, 5분 미만이면 붉은 글자 깜빡임(움직임 줄이기 설정이면 깜빡임 없음).
+//  무대 위 가운데에 방 남은 시간 카운트다운 — 이원화(sql/021) : 유료 세미나 = "월간 28:59:41 · 무료 1:00:00"(유료 먼저 줄고 0 이면 무료가 준다, 지금 쓰는 쪽 굵게), 무료 세미나 = "무료 59:12" — 응답 left 를 받은 뒤 1초마다 줄이고, 5분 미만이면 붉은 글자 깜빡임(움직임 줄이기 설정이면 깜빡임 없음).
 //  0 이 되면 바로 하트비트 1번 → 서버가 소진을 확인하면(ended) 종료 알림 후 자동으로 룸에서 나간다(마스터 2026-10-29). 방이 닫혀 409 여도 나간다.
 //  개최자 응답 remainSec 이 10분·1분 아래로 내려가면 1번씩 알림. 실패는 조용히 넘긴다 — 다음 하트비트가 다시 시도(출석이 룸 사용을 막지 않게), 다시 보내도 같은 거절(beatStops)이면 멈춘다. 화면이 다시 보이면 30초 이상 지났을 때 당겨 보낸다(beatDue)
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { beatDue, beatStops, fmtDur, HB_MS, leftNow, LOW_LEFT_SEC } from '@/lib/engage-rules'
+import { beatDue, beatStops, fmtDur, HB_MS, LOW_LEFT_SEC, splitLeft } from '@/lib/engage-rules'
 import type { RoomCtx, RoomFeature } from '../../extensions'
 import { api, engageable } from './shared'
 
@@ -13,8 +13,8 @@ import { api, engageable } from './shared'
 const WARN_SEC = [600, 60] as const
 const PLAN_KEY: Record<string, 'free' | 'monthly' | 'yearly'> = { FREE: 'free', M: 'monthly', Y: 'yearly' }
 
-type Beat = { remainSec?: number | null; left?: number | null; plan?: string; ended?: boolean }
-type Clock = { left: number; at: number; plan: string }
+type Beat = { remainSec?: number | null; left?: number | null; plan?: string; paid?: number | null; free?: number | null; ended?: boolean }
+type Clock = { paid: number | null; free: number; at: number; plan: string }
 
 function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const tp = useTranslations('plan')
@@ -56,7 +56,7 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
         }
         if (!r.ok) return
         if (r.data.ended) return out('plan.ended')
-        if (r.data.left != null) setClock({ left: r.data.left, at: Date.now(), plan: r.data.plan ?? 'FREE' })
+        if (r.data.free != null) setClock({ paid: r.data.paid ?? null, free: r.data.free, at: Date.now(), plan: r.data.plan ?? 'FREE' })
         const left = r.data.remainSec
         if (left == null) return // 계량 대상 아님(개최자 아님)
         // 가장 작은 넘은 문턱 하나만 알린다(1분 아래로 처음 들어왔으면 10분 알림은 생략)
@@ -87,7 +87,8 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     const timer = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(timer)
   }, [clock])
-  const sec = clock ? leftNow(clock.left, clock.at, now) : null
+  const split = clock ? splitLeft(clock.paid, clock.free, clock.at, now) : null
+  const sec = split ? (split.paid ?? 0) + split.free : null
 
   // 0 도달 → 하트비트 1번(같은 응답 값에 1번만). 서버가 아직 몇 초 남았다고 하면 그 값으로 다시 세고, 소진이면 ended → 나간다
   const fired = useRef<Clock | null>(null)
@@ -98,15 +99,26 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     }
   }, [sec, clock])
 
-  if (!live || sec === null || !clock) return null
-  const low = sec < LOW_LEFT_SEC
+  if (!live || sec === null || !clock || !split) return null
+  const low = sec < LOW_LEFT_SEC // 5분 미만 = 유료·무료 합 기준
+  const paidOn = split.paid !== null && split.paid > 0 // 지금 유료를 쓰는 중
   return (
     <div
       role="timer"
       aria-label={t('plan.left')}
-      className={`bg-surface/80 absolute top-2 left-1/2 z-20 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap tabular-nums ${low ? 'text-danger motion-safe:animate-pulse' : ''}`}
+      className={`bg-surface/80 absolute top-2 left-1/2 z-20 -translate-x-1/2 rounded-full px-3 py-1 text-xs whitespace-nowrap tabular-nums ${low ? 'text-danger motion-safe:animate-pulse' : ''}`}
     >
-      {tp(PLAN_KEY[clock.plan] ?? 'free')} · {fmtDur(sec)}
+      {split.paid !== null && (
+        <>
+          <span className={paidOn ? 'font-bold' : 'opacity-60'}>
+            {tp(PLAN_KEY[clock.plan] ?? 'monthly')} {fmtDur(split.paid)}
+          </span>
+          {' · '}
+        </>
+      )}
+      <span className={paidOn ? 'opacity-60' : 'font-bold'}>
+        {tp('free')} {fmtDur(split.free)}
+      </span>
     </div>
   )
 }

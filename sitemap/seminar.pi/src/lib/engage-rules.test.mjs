@@ -1,7 +1,7 @@
 // engage-rules.ts 시험 — node src/lib/engage-rules.test.mjs (설문 입력·집계·출석 시간·CSV·refresh 신호)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { attendSec, beatDue, beatStops, charsLeft, cleanPoll, cleanQuestion, csvCell, fmtDur, isOnline, parseRefresh, pollVoting, sendKey, tally, toCsv, leftNow, LOW_LEFT_SEC } from './engage-rules.ts'
+import { attendSec, beatDue, beatStops, charsLeft, cleanPoll, cleanQuestion, csvCell, fmtDur, isOnline, parseRefresh, pollVoting, sendKey, tally, toCsv, leftNow, LOW_LEFT_SEC, splitLeft } from './engage-rules.ts'
 
 test('설문 입력 — 2~10개·중복·길이', () => {
   assert.deepEqual(cleanPoll(' 다음 주제? ', [' A', 'B ']), { q: '다음 주제?', opts: ['A', 'B'] })
@@ -128,4 +128,13 @@ test('leftNow — 카운트다운·5분 문턱', () => {
   assert.equal(leftNow(30, 0, 60_000), 0)
   assert.equal(leftNow(600, 5000, 0), 600) // 받기 전 시각(초기값) = 그대로
   assert.equal(LOW_LEFT_SEC, 300)
+})
+
+// 이원화 카운트다운(sql/021) — 유료 먼저, 0 이면 무료, 무료 세미나는 무료만
+test('splitLeft — 유료 먼저 줄고 다음 무료', () => {
+  assert.deepEqual(splitLeft(100, 3600, 0, 30_000), { paid: 70, free: 3600 })
+  assert.deepEqual(splitLeft(100, 3600, 0, 160_000), { paid: 0, free: 3540 })
+  assert.deepEqual(splitLeft(0, 50, 0, 80_000), { paid: 0, free: 0 })
+  assert.deepEqual(splitLeft(null, 3600, 0, 60_000), { paid: null, free: 3540 })
+  assert.deepEqual(splitLeft(100, 3600, 5000, 0), { paid: 100, free: 3600 }) // 받기 전 시각 = 그대로
 })

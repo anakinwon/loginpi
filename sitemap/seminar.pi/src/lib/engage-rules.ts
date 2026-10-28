@@ -70,6 +70,12 @@ export const isOnline = (hb: string | number | Date, now: number) => now - new D
 //  LOW_LEFT_SEC 미만 = 붉은 글자 깜빡임(마스터 2026-10-29)
 export const LOW_LEFT_SEC = 300
 export const leftNow = (left: number, at: number, now: number) => Math.max(0, left - Math.floor(Math.max(0, now - at) / 1000))
+// 이원화 카운트다운(sql/021) — 흐른 초를 유료에서 먼저 빼고, 유료가 0 이면 무료에서. paid = null 이면 무료 세미나(무료만)
+export function splitLeft(paid: number | null, free: number, at: number, now: number): { paid: number | null; free: number } {
+  const e = Math.floor(Math.max(0, now - at) / 1000)
+  if (paid === null) return { paid: null, free: Math.max(0, free - e) }
+  return { paid: Math.max(0, paid - e), free: Math.max(0, free - Math.max(0, e - paid)) }
+}
 
 export function fmtDur(sec: number): string {
   const h = Math.floor(sec / 3600)

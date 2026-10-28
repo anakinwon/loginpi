@@ -762,7 +762,7 @@
     "plan": "Plan",
     "planFree": "Free — {time} left this month · no AI",
     "planPaid": "{name} {time} · {price} — pay when creating",
-    "planHint": "Time is taken only from passes of the plan you pick (admins too). An active plan opens without payment; Monthly or Yearly you don't have is paid in Pi when you press Create, then the seminar opens (Pi Browser). Joining is always free for participants.",
+    "planHint": "A seminar opened on a paid plan uses that plan's time first, then continues on this month's free time (no AI in the free part). An active plan opens without payment; Monthly or Yearly you don't have is paid in Pi when you press Create, then the seminar opens (Pi Browser). Joining is always free for participants.",
     "planOwned": "{name} — active · {time} left",
     "planEnds": "The start time is after this plan's pass expires. Move the start earlier or pick another plan.",
     "paidKept": "Your paid pass is kept. Fix the issue and press Create again (no second payment)."
@@ -906,7 +906,7 @@
     "bought": "Payment complete. Seminar time has been added.",
     "meRemain": "Time left: {time}",
     "loginToBuy": "Log in to buy a plan.",
-    "payNote": "Payment is always in Pi. The local-currency amount is a familiar reference only; the Pi amount is set at the Pi price when you pay. A seminar uses time only from passes of the plan picked when it was created (several passes of that plan are used earliest-expiring first).",
+    "payNote": "Payment is always in Pi. The local-currency amount is a familiar reference only; the Pi amount is set at the Pi price when you pay. A seminar on a paid plan uses that plan's passes first (earliest-expiring first), then continues on this month's free time.",
     "charge": "Top up time",
     "hm": "{h} h {m} min",
     "m": "{m} min",
