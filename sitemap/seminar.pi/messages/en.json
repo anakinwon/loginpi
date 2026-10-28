@@ -731,8 +731,6 @@
     "subTitle": "Subtitle (optional, up to 60)",
     "startAt": "Start time",
     "maxCnt": "Capacity (1–100)",
-    "fee": "Seminar fee",
-    "feeHint": "The local-currency amount is a reference only. The Pi amount is fixed at the Pi price when you create the seminar, and participants pay it in Pi. Until payouts are available, fees are held in the app wallet.",
     "submit": "Create",
     "submitting": "Creating…",
     "invalid": "Check your input — a date within one year from now, capacity 1–100.",
@@ -756,7 +754,10 @@
         "state": "Status"
       }
     },
-    "feeFree": "Free"
+    "plan": "Plan",
+    "planFree": "Free — {time} left this month",
+    "planPaid": "{name} {time} · {price}",
+    "planHint": "Joining is always free for participants. If you pick Monthly or Yearly, you pay for the pass in Pi when you press Create, then the seminar opens (Pi Browser)."
   },
   "privacy": {
     "title": "Privacy Policy — Voice and AI features",

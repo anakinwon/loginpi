@@ -1,8 +1,7 @@
 // 세미나 목록·개설 API(PRD F-02·F-03).
 //  GET  ?tab=all|hosted|joined&page=N — 서버 페이지네이션(12건), 건수는 페이저가 쓰므로 exact. all = 예정·진행 중 시작일시 순(x_smn_mst_01),
 //       hosted = 내가 연 것(x_smn_mst_02), joined = 내 참가(x_smn_ptc_02). all 은 공개 캐시, 나머지는 로그인 필요·private no-store
-//  POST 개설 — Pi 로그인 사용자 모두(PRD D-1 개정, 요금제 2026-10-28). 개설비도 누구나(마스터 2026-10-28 — 정산 A2U 전이라 참가비는 앱 지갑에 모인다). 비로그인 401(redirect 없음)
-//  개설비는 원화 선택지(feeKrw, FEE_KRW)로 받아 개설 시점 Pi 시세로 환산해 ent_pi_amt 에 고정 — 참가자 결제는 그 Pi 금액(SMN_ENT 기존 흐름). 시세 실패 = 503(추정 금지)
+//  POST 개설 — Pi 로그인 사용자 모두(PRD D-1 개정, 요금제 2026-10-28). 참가자 입장은 모두 무료(입장료 0 고정 — 개최자는 요금제 이용권으로 시간을 산다, 마스터 2026-10-28). 비로그인 401(redirect 없음)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
@@ -14,11 +13,8 @@ import {
   parseBody,
   requireUser,
 } from '@/lib/api'
-import { piKrw } from '@/lib/plan'
-import { piAmount } from '@/lib/plan-rules'
 import { SMN_COLS, toCard, type SmnRow } from '@/lib/seminar'
 import {
-  feeKrwOk,
   ONE_LINE_RE,
   SUB_TTL_MAX,
   OPEN_STS,
@@ -102,7 +98,6 @@ const createSchema = z.object({
     .datetime({ offset: true })
     .refine((v) => startAtOk(Date.parse(v))),
   maxCnt: z.number().int().min(1).max(100),
-  feeKrw: z.number().int().refine(feeKrwOk), // 개설비 원화 선택지(FEE_KRW) — Pi 는 서버가 환산
   subTitle: z.string().trim().max(SUB_TTL_MAX).regex(ONE_LINE_RE).optional(), // 부제(sql/012) — 나중에 상세에서도 수정
 })
 
@@ -115,21 +110,13 @@ export const POST = withAuthGuard(
     ])
     if (user instanceof NextResponse) return user
     if (body instanceof NextResponse) return body
-    // 개설비 — 누구나(마스터 2026-10-28). 유료면 지금 시세로 Pi 환산(캐시 5분·2초 상한)
-    let fee = '0'
-    if (body.feeKrw > 0) {
-      const krw = await piKrw()
-      const pi = krw ? piAmount(body.feeKrw, krw) : null
-      if (!pi) return apiError('PRICE_UNAVAILABLE', 503)
-      fee = pi
-    }
     // 섬 고르기 + 저장을 한 함수·한 트랜잭션으로(잠금으로 동시 개설이 같은 섬을 고르지 않음, R-P5)
     const { data, error } = await db()
       .rpc('fn_crt_smn', {
         p_hst_usr_id: user.id,
         p_start_dtm: new Date(body.startAt).toISOString(),
         p_max_cnt: body.maxCnt,
-        p_ent_pi_amt: fee,
+        p_ent_pi_amt: '0', // 입장료 없음(마스터 2026-10-28) — 유료 입장 경로(SMN_ENT)는 기존 세미나용으로 남는다
       })
     if (error) return dbFail(error)
     const r = (data as { smn_id: string; smn_nm: string }[] | null)?.[0]

@@ -1,4 +1,4 @@
-// 개최자 요금제 API(sql/015) — GET = 가격표(원화 참고 + 현재 Pi 견적 참고값) + 개설비 선택지 원화→Pi 참고값(fees) + 로그인 시 내 남은 시간, POST {plan} = 결제 견적(서명 10분).
+// 개최자 요금제 API(sql/015) — GET = 가격표(원화 참고 + 현재 Pi 견적 참고값) + 로그인 시 내 남은 시간, POST {plan} = 결제 견적(서명 10분).
 //  원화는 표시용, 결제 금액은 서버가 시세로 환산·서명한 Pi 금액만(memory krw-display-only-pay-pi). 시세 실패 = 견적 503(추정 금지).
 //  비로그인 GET 은 가격표만(redirect 없음), POST 401. 응답 no-store
 import { NextResponse } from 'next/server'
@@ -10,7 +10,6 @@ import { getSessionUser, isAdmin } from '@/lib/auth'
 import { feePlans, hostPlan, piKrw, piRates } from '@/lib/plan'
 import { PAY_PLANS, piAmount, PLAN, planMemo, signQuote, SMN_PLAN } from '@/lib/plan-rules'
 import { otherPlanPays, staleBusy } from '@/lib/seminar'
-import { FEE_KRW } from '@/lib/seminar-rules'
 
 const noStore = { 'Cache-Control': 'no-store' }
 
@@ -31,8 +30,6 @@ export const GET = withAuthGuard(
           krw: Number(p.krw_amt),
           pi: krw ? piAmount(Number(p.krw_amt), krw) : null,
         })),
-        // 세미나 만들기 개설비 선택지 — 화면 표시용 참고값(실제 저장 금액은 개설 때 서버가 다시 환산)
-        fees: FEE_KRW.filter((k) => k > 0).map((k) => ({ krw: k, pi: krw ? piAmount(k, krw) : null })),
         me,
       },
       { headers: noStore },
