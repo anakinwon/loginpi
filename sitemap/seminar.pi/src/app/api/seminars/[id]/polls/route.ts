@@ -8,12 +8,13 @@ import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute, parseBody } from '@/lib/api'
 import { closed, gate, noStore, who } from '@/lib/engage'
-import { cleanPoll, POLL_PAGE, tally } from '@/lib/engage-rules'
+import { cleanPoll, POLL_PAGE, tally, VOTER_NAMES_FROM } from '@/lib/engage-rules'
 import { isUuid, parsePage } from '@/lib/seminar-rules'
 
 type PllRow = {
   pll_id: string
   qst_cont: string
+  reg_dtm: string
   pll_sts_cd: string
   smn_pll_opt: { opt_id: string; opt_seq: number; opt_cont: string }[]
 }
@@ -31,7 +32,7 @@ export const GET = withAuthGuard(
       gate(w.smnId, w.user),
       db()
         .from('smn_pll')
-        .select('pll_id, qst_cont, pll_sts_cd, smn_pll_opt(opt_id, opt_seq, opt_cont)', { count: 'exact' })
+        .select('pll_id, qst_cont, reg_dtm, pll_sts_cd, smn_pll_opt(opt_id, opt_seq, opt_cont)', { count: 'exact' })
         .eq('smn_id', w.smnId)
         .eq('del_yn', 'N')
         .eq('smn_pll_opt.del_yn', 'N')
@@ -46,16 +47,19 @@ export const GET = withAuthGuard(
     const rows = list.data ?? []
     let cnt: CntRow[] = []
     let vts: VtRow[] = []
+    let named: string[] = []
     if (rows.length) {
       const ids = rows.map((p) => p.pll_id)
+      // 이름 공개 = 고지 뒤에 만든 설문만 — 그 전 설문의 투표자는 '누가 했는지 안 보인다' 안내를 보고 투표했다(소급 공개 금지)
+      named = rows.filter((p) => Date.parse(p.reg_dtm) >= VOTER_NAMES_FROM).map((p) => p.pll_id)
       // 집계·(staff 면) 투표자 — 서로 의존 없음 → 병렬(R-P1). 이 쪽 설문(최대 POLL_PAGE)만
       const [r, v] = await Promise.all([
         db().rpc('fn_cnt_smn_pll', { p_pll_ids: ids, p_usr_id: w.user.id }),
-        g.staff
+        g.staff && named.length
           ? db()
               .from('smn_pll_vt')
               .select('pll_id, opt_id, sys_user!smn_pll_vt_sys_user_id_fkey(dsp_nm, pi_usr_nm)')
-              .in('pll_id', ids)
+              .in('pll_id', named)
               .eq('del_yn', 'N')
               .order('reg_dtm')
               .returns<VtRow[]>()
@@ -72,7 +76,7 @@ export const GET = withAuthGuard(
       const mine = cnt.find((c) => c.pll_id === p.pll_id && c.my_yn === 'Y')?.opt_id ?? null
       const counts = Object.fromEntries(cnt.filter((c) => c.pll_id === p.pll_id).map((c) => [c.opt_id, c.vt_cnt]))
       const opts = tally(p.smn_pll_opt.map((o) => ({ id: o.opt_id, text: o.opt_cont })), counts).map((o) =>
-        g.staff ? { ...o, voters: voters(p.pll_id, o.id) } : o,
+        g.staff && named.includes(p.pll_id) ? { ...o, voters: voters(p.pll_id, o.id) } : o,
       )
       return { id: p.pll_id, q: p.qst_cont, open: p.pll_sts_cd === 'OPEN', mine, total: opts.reduce((a, o) => a + o.n, 0), opts }
     })

@@ -29,6 +29,10 @@ export function cleanQuestion(q: unknown): string | null {
 }
 
 // 설문 결과 — 선택지 순서대로 표 수·비율(정수 %, 막대와 함께 글자로 보인다 15.3). 총 0표면 모두 0%
+// 설문 투표자 이름 공개 시작 시각(개최자·관리자에게) — 이 시각 뒤에 만든 설문만. 처리방침·투표 화면 고지가 운영에 나간 뒤여야 한다
+//  ponytail: 상수 1개 — 배포가 이 시각보다 늦어지면 배포 시각으로 올릴 것(설문별 공개 표시 칼럼은 필요해지면)
+export const VOTER_NAMES_FROM = Date.parse('2026-10-29T00:00:00+09:00')
+
 export function tally(
   opts: readonly { id: string; text: string }[],
   counts: Readonly<Record<string, number>>,

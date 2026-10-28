@@ -114,7 +114,10 @@ test('처리방침 — 질문·설문 공개 범위와 보관 고지(ko·en, T04
   assert.ok(msg('ko').some((s) => s.includes('개최자와 관리자에게는 선택지별로 투표한 사람')))
   assert.ok(msg('en').some((s) => s.includes('the organizer and admins see, for each option')))
   const api = readFileSync(new URL('../app/api/seminars/[id]/polls/route.ts', import.meta.url), 'utf8')
-  assert.match(api, /g\.staff \? \{ \.\.\.o, voters: voters\(p\.pll_id, o\.id\) \} : o/)
+  assert.match(api, /g\.staff && named\.includes\(p\.pll_id\) \? \{ \.\.\.o, voters: voters\(p\.pll_id, o\.id\) \} : o/)
+  // 소급 공개 금지 — 고지 뒤에 만든 설문만 이름 조회
+  assert.match(api, /Date\.parse\(p\.reg_dtm\) >= VOTER_NAMES_FROM/)
+  assert.match(api, /\.in\('pll_id', named\)/)
 })
 
 // refresh 는 caption 과 피어당 초당 2건 합산(SIGNAL_API 3.6) — 자막 켠 발표자의 [답변함]·추천 신호가 RATE_LIMITED 로 빠지던 결함(T04 r4).
