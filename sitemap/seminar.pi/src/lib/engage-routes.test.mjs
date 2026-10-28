@@ -133,9 +133,13 @@ test('설문 길이 — 설계서 15.3 · sql/008 · POLL 상수 일치', async 
 })
 
 // 출석부 보강(T04 r4) — 보이는 동안 HB_MS 마다 다시 읽기, 다시 읽기 실패는 표 유지, 접속 판정 시각은 성공한 자료 기준
-test('출석부 — 주기 다시 읽기·실패 시 표 유지·성공 때만 기준 시각', () => {
+test('출석부 — 주기·복귀 즉시 다시 읽기·실패 시 표 유지·성공 때만 기준 시각', () => {
   const s = readFileSync(new URL('../components/seminar/attendance.tsx', import.meta.url), 'utf8')
-  assert.match(s, /setInterval\([\s\S]*?visibilityState === 'visible'[\s\S]*?HB_MS\)/)
+  // 보일 때만 10초마다 + 탭으로 돌아온 순간 바로(새 입장자가 60초 늦게·다른 화면 다녀와야 보이던 것, 마스터 2026-10-28)
+  assert.match(s, /const POLL_MS = 10_000/)
+  assert.match(s, /visibilityState === 'visible'[\s\S]*?setInterval\(refresh, POLL_MS\)/)
+  assert.match(s, /addEventListener\('visibilitychange', refresh\)/)
+  assert.match(s, /removeEventListener\('visibilitychange', refresh\)/)
   assert.match(s, /\[id, page, tick, t, errText\]/)
   assert.match(s, /else if \(!tick \|\| r\.status === 403\) setErr/)
   assert.match(s, /if \(r\.ok\) \{\s*setNow\(Date\.now\(\)\)/)

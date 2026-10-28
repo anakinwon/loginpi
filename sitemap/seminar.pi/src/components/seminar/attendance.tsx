@@ -3,7 +3,8 @@
 //  조회는 piFetch(X-Pi-Token — Pi Browser 는 쿠키 없음), 비로그인 = LoginGate(redirect 없음), 권한 없음 = 403 문구.
 //  CSV 는 <a href> 직접 내려받기가 X-Pi-Token 을 못 붙이므로 piFetch 로 받아 화면에서 만든다(번역된 머리글, 수식 주입 방지 — engage-rules toCsv).
 //  Pi Browser 의 Blob 내려받기 동작은 [확인중 : 실기기]
-//  화면이 보이는 동안 하트비트 간격(HB_MS)마다 지금 쪽을 다시 읽는다 — 진행 중 세미나의 '접속 중/나감'이 처음 연 시각에 멈춰 있던 것 보강(T04 r4).
+//  화면이 보이는 동안 10초(POLL_MS)마다 + 탭으로 돌아온 순간 지금 쪽을 다시 읽는다 — 새 입장자가 하트비트 간격(60초)만큼 늦게 보이거나
+//  다른 화면에 다녀와야 보이던 것 보강(마스터 2026-10-28, T04 r4). 서버 응답은 no-store
 //  다시 읽기 실패는 표를 지우지 않는다(처음 읽기 실패만 오류 화면)
 import { useEffect, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
@@ -12,12 +13,15 @@ import { LoginGate } from '@/components/login-gate'
 import { Link } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
 import { inViewerTz } from '@/lib/calendar-rules'
-import { attendSec, fmtDur, HB_MS, isOnline, toCsv } from '@/lib/engage-rules'
+import { attendSec, fmtDur, isOnline, toCsv } from '@/lib/engage-rules'
 import { Pagination } from './pagination'
 import { BTN, useSeminarErrText } from './shared'
 
 type Row = { name: string; piName: string; ent: string; hb: string }
 type List = { title: string; items: Row[]; total: number; page: number; pages: number }
+
+// 출석부 다시 읽기 간격 — 개최자·ADMIN 만 여는 화면이라 요청 부담이 작다(보일 때만)
+const POLL_MS = 10_000
 
 const load = (id: string, q: string) => readApi<List>(piFetch(`/api/seminars/${id}/attendance?${q}`, { cache: 'no-store' }))
 
@@ -37,10 +41,15 @@ function Sheet({ id }: { id: string }) {
   const [tick, setTick] = useState(0)
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const refresh = () => {
       if (document.visibilityState === 'visible') setTick((n) => n + 1)
-    }, HB_MS)
-    return () => clearInterval(timer)
+    }
+    const timer = setInterval(refresh, POLL_MS)
+    document.addEventListener('visibilitychange', refresh)
+    return () => {
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', refresh)
+    }
   }, [])
 
   useEffect(() => {
