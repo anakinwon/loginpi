@@ -69,6 +69,8 @@ export const isOnline = (hb: string | number | Date, now: number) => now - new D
 // 룸 남은 시간 카운트다운(sql/018 세미나 요금제) — 마지막 하트비트 응답의 남은 초(left)·받은 시각(at)에서 지금까지 흐른 초를 뺀다(0 아래로 안 감).
 //  LOW_LEFT_SEC 미만 = 붉은 글자 깜빡임(마스터 2026-10-29)
 export const LOW_LEFT_SEC = 300
+// 개최자 마지막 하트비트가 이보다 오래면 룸에 없는 것 = 차감 없음(sql/022 90초 기준과 같다) → 참가자 카운트다운 멈춤
+export const HOST_AWAY_MS = 90_000
 export const leftNow = (left: number, at: number, now: number) => Math.max(0, left - Math.floor(Math.max(0, now - at) / 1000))
 // 이원화 카운트다운(sql/021) — 흐른 초를 유료에서 먼저 빼고, 유료가 0 이면 무료에서. paid = null 이면 무료 세미나(무료만)
 export function splitLeft(paid: number | null, free: number, at: number, now: number): { paid: number | null; free: number } {

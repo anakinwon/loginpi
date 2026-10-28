@@ -16,8 +16,9 @@ const WARN_SEC = [600, 60] as const
 const DIM_AFTER_MS = 10_000 // 처음 보인 뒤 이 시간이 지나면 50% 투명(무대를 덜 가리게)
 const PLAN_KEY: Record<string, 'free' | 'monthly' | 'yearly'> = { FREE: 'free', M: 'monthly', Y: 'yearly' }
 
-type Beat = { remainSec?: number | null; left?: number | null; plan?: string; paid?: number | null; free?: number | null; ended?: boolean }
-type Clock = { paid: number | null; free: number; at: number; plan: string }
+type Beat = { remainSec?: number | null; left?: number | null; plan?: string; paid?: number | null; free?: number | null; ticking?: boolean; ended?: boolean }
+// ticking = 지금 실제로 차감 중(개최자가 룸에 있음) — 아니면 받은 값 그대로 멈춰 보인다(나간 뒤에도 줄어 보이던 결함)
+type Clock = { paid: number | null; free: number; at: number; plan: string; ticking: boolean }
 
 function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const tp = useTranslations('plan')
@@ -59,7 +60,7 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
         }
         if (!r.ok) return
         if (r.data.ended) return out('plan.ended')
-        if (r.data.free != null) setClock({ paid: r.data.paid ?? null, free: r.data.free, at: Date.now(), plan: r.data.plan ?? 'FREE' })
+        if (r.data.free != null) setClock({ paid: r.data.paid ?? null, free: r.data.free, at: Date.now(), plan: r.data.plan ?? 'FREE', ticking: r.data.ticking !== false })
         const left = r.data.remainSec
         if (left == null) return // 계량 대상 아님(개최자 아님)
         // 가장 작은 넘은 문턱 하나만 알린다(1분 아래로 처음 들어왔으면 10분 알림은 생략)
@@ -90,7 +91,7 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     const timer = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(timer)
   }, [clock])
-  const split = clock ? splitLeft(clock.paid, clock.free, clock.at, now) : null
+  const split = clock ? splitLeft(clock.paid, clock.free, clock.at, clock.ticking ? now : clock.at) : null
   const sec = split ? (split.paid ?? 0) + split.free : null
 
   // 0 도달 → 하트비트 1번(같은 응답 값에 1번만). 서버가 아직 몇 초 남았다고 하면 그 값으로 다시 세고, 소진이면 ended → 나간다

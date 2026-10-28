@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
 import { closed, gate, noStore, who } from '@/lib/engage'
-import { ATD_CSV_MAX, ATD_PAGE } from '@/lib/engage-rules'
+import { ATD_CSV_MAX, ATD_PAGE, HOST_AWAY_MS } from '@/lib/engage-rules'
 import { endByPlan, hostPlan, planLeft, planPools } from '@/lib/plan'
 import { parsePage } from '@/lib/seminar-rules'
 
@@ -32,15 +32,26 @@ export const POST = withAuthGuard(
     const { data, error } = await db().rpc('fn_hb_smn_hst', { p_smn_id: w.smnId, p_usr_id: w.user.id })
     if (error) return dbFail(error)
     const remainSec = data === null ? null : Number(data)
-    // LIVE 면 카운트다운용 요금제별 남은 시간(유료·무료 이원화, sql/021) — 개최자 차감 뒤 값이 필요해 하트비트 다음에 읽는다(의존 있는 직렬)
-    const hp = g.live ? await hostPlan(g.hostId) : null
+    // LIVE 면 카운트다운용 요금제별 남은 시간(유료·무료 이원화, sql/021) — 개최자 차감 뒤 값이 필요해 하트비트 다음에 읽는다(의존 있는 직렬).
+    //  참가자에게는 개최자가 지금 룸에 있는지(마지막 하트비트 90초 안 = 실제로 차감 중)도 — 없으면 화면 카운트다운을 멈춘다(마스터 2026-10-29)
+    const host = g.hostId === w.user.id
+    const [hp, hostAtd] = g.live
+      ? await Promise.all([
+          hostPlan(g.hostId),
+          host
+            ? null
+            : db().from('smn_atd').select('lst_hb_dtm').eq('smn_id', w.smnId).eq('usr_id', g.hostId).eq('del_yn', 'N').maybeSingle<{ lst_hb_dtm: string }>(),
+        ])
+      : [null, null]
+    if (hostAtd?.error) return dbFail(hostAtd.error)
+    const ticking = host ? remainSec !== null : !!hostAtd?.data && Date.now() - Date.parse(hostAtd.data.lst_hb_dtm) <= HOST_AWAY_MS
     const pools = hp ? planPools(hp, g.planCd) : null
     const left = remainSec ?? (hp ? planLeft(hp, g.planCd) : null)
     if (left !== null && left <= 0) {
       await endByPlan(w.smnId, w.user.id)
       return NextResponse.json({ ok: true, remainSec: 0, left: 0, plan: g.planCd, ended: true, code: 'PLAN_EXHAUSTED' }, { headers: noStore })
     }
-    return NextResponse.json({ ok: true, remainSec, left, plan: g.planCd, paid: pools?.paid ?? null, free: pools?.free ?? null }, { headers: noStore })
+    return NextResponse.json({ ok: true, remainSec, left, plan: g.planCd, paid: pools?.paid ?? null, free: pools?.free ?? null, ticking }, { headers: noStore })
   }),
 )
 
