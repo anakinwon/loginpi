@@ -98,7 +98,8 @@
     "NOTE_RETRY_SOON": "You can try again in a minute",
     "SPEECH_TTS_FAILED": "Could not create the translated voice",
     "CAPTION_SIG_INVALID": "This caption could not be verified, so it was not translated",
-    "PLAN_EXPIRES_BEFORE_START": "The start time is after this plan's pass expires"
+    "PLAN_EXPIRES_BEFORE_START": "The start time is after this plan's pass expires",
+    "PAY_ALREADY_PAID": "A payment is still being processed. If you were signing in the wallet, try again in 3 minutes."
   },
   "progress": {
     "title": "Build progress",
@@ -693,7 +694,7 @@
       "PAY_MISMATCH": "Payment details do not match.",
       "PAY_AMOUNT_MISMATCH": "The payment amount differs from the seminar fee.",
       "PAY_CANCELLED": "This payment was canceled.",
-      "PAY_ALREADY_PAID": "A payment is already in progress or completed.",
+      "PAY_ALREADY_PAID": "A payment is still being processed. If you were signing in the wallet, try again in 3 minutes.",
       "PAY_INVALID_STATE": "This payment cannot be processed now.",
       "PAY_PI_CANCEL_REFUSED": "The payment is already in progress and cannot be canceled. Please check again shortly."
     },

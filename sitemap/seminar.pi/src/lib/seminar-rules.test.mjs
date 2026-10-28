@@ -69,7 +69,13 @@ test('이전 APPROVED 결제 정리 판정(S2)', () => {
   const st = (cancelled, user_cancelled) => ({ ok: true, payment: { status: { cancelled, user_cancelled } } })
   assert.equal(stalePayState(st(true, false)), 'gone')
   assert.equal(stalePayState(st(false, true)), 'gone')
-  assert.equal(stalePayState(st(false, false)), 'pending')
+  // 승인·미서명 : 3분(SIGN_WAIT_MS) 안 = 서명 대기(막음), 지나면 버린 결제(막지 않음), 서명돼 거래 있음 = 진행 중(막음) — 2026-10-29 실기기 잔액 부족 뒤 409 고착
+  const now = Date.parse('2026-10-29T00:00:00Z')
+  const p = (created, txid) => ({ ok: true, payment: { status: { cancelled: false, user_cancelled: false }, transaction: txid ? { txid } : null, created_at: created } })
+  assert.equal(stalePayState(st(false, false), now), 'pending') // 생성 시각 모름 = 막는 쪽
+  assert.equal(stalePayState(p('2026-10-28T23:58:00Z'), now), 'pending') // 2분 전 = 서명 대기
+  assert.equal(stalePayState(p('2026-10-28T23:50:00Z'), now), 'abandoned') // 10분 전·거래 없음
+  assert.equal(stalePayState(p('2026-10-28T23:50:00Z', 'tx1'), now), 'pending') // 서명됨
   assert.equal(stalePayState({ ok: false, status: 404 }), 'gone')
   // 타임아웃(0)·5xx·키 없음은 판정 불가 → 막는 쪽
   for (const status of [0, 500, 502]) assert.equal(stalePayState({ ok: false, status }), 'pending')

@@ -115,15 +115,21 @@ export const payErrorCode = (code: string) =>
   code.startsWith('SMN_') ? code : (PAY_CODES[code] ?? 'INTERNAL')
 
 // 이전 APPROVED 결제의 Pi 조회 결과 → 정리할지(보안 검토 S2). 'gone' = Pi 에서 취소·만료(또는 404 없음) → 원장 CANCELED,
-//  'pending' = 아직 진행 중이거나 판정 불가(타임아웃·5xx) → 새 결제를 막는다(안전 쪽)
+//  'abandoned' = 승인됐지만 지갑 서명 없이(거래 없음) SIGN_WAIT_MS 가 지남 — 사용자가 지갑을 그냥 닫은 것(예 잔액 부족 안내 뒤). 막지 않는다.
+//   Pi 는 앱 서버의 사용자→앱 결제 취소를 거부하므로(403 'only cancel app-to-user payments') 정리할 수 없다 — 원장은 APPROVED 그대로 두어,
+//   나중에라도 서명되면 complete 가 정상 반영된다(돈 손실 없음). 2026-10-29 실기기 : 잔액 부족 → 지갑 닫음 → 다음 결제가 계속 409 로 막혀 빠져나갈 길이 없던 결함
+//  'pending' = 서명돼 거래 진행 중, 서명 대기 중(SIGN_WAIT_MS 안), 판정 불가(타임아웃·5xx) → 새 결제를 막는다(안전 쪽)
+export const SIGN_WAIT_MS = 3 * 60 * 1000
 export type PiLookup =
-  | { ok: true; payment: { status: { cancelled: boolean; user_cancelled: boolean } } }
+  | { ok: true; payment: { status: { cancelled: boolean; user_cancelled: boolean }; transaction?: { txid?: string } | null; created_at?: string } }
   | { ok: false; status: number }
-export const stalePayState = (r: PiLookup): 'gone' | 'pending' =>
+export const stalePayState = (r: PiLookup, now = Date.now()): 'gone' | 'abandoned' | 'pending' =>
   r.ok
     ? r.payment.status.cancelled || r.payment.status.user_cancelled
       ? 'gone'
-      : 'pending'
+      : !r.payment.transaction?.txid && now - (Date.parse(r.payment.created_at ?? '') || now) > SIGN_WAIT_MS
+        ? 'abandoned'
+        : 'pending'
     : r.status === 404
       ? 'gone'
       : 'pending'

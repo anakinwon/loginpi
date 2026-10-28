@@ -132,11 +132,12 @@ export async function otherPlanPays(usrId: string, exceptId?: string): Promise<s
 
 // 이전 APPROVED 결제 정리(보안 검토 S2) — Pi 에서 취소·만료(404)면 원장 CANCELED 후 false, 하나라도 진행 중이거나 상한 초과면 true(막는다).
 //  Pi 조회 병렬(R-P1)
+//  서명 없이 버려진 결제(abandoned)는 막지 않고 원장도 그대로 둔다(나중에 서명되면 정상 반영) — 취소·만료(gone)만 원장 CANCELED
 export async function staleBusy(ids: string[], usrId: string): Promise<boolean> {
   if (ids.length > STALE_LOOKUP_MAX) return true
   const states = await Promise.all(ids.map(async (id) => stalePayState(await getPiPayment(id))))
   if (states.includes('pending')) return true
-  await Promise.all(ids.map((id) => markPaymentCanceled(payDb(), id, usrId)))
+  await Promise.all(ids.filter((_, i) => states[i] === 'gone').map((id) => markPaymentCanceled(payDb(), id, usrId)))
   return false
 }
 

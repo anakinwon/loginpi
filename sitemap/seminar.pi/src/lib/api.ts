@@ -43,7 +43,7 @@ export const apiError = createApiError({
   PAY_MISMATCH: '결제 정보가 일치하지 않습니다',
   PAY_AMOUNT_MISMATCH: '결제 금액이 입장료와 다릅니다',
   PAY_CANCELLED: '취소된 결제입니다',
-  PAY_ALREADY_PAID: '이미 진행 중이거나 완료된 결제가 있습니다',
+  PAY_ALREADY_PAID: '처리 중인 결제가 있습니다. 지갑에서 서명 중이었다면 3분 뒤 다시 시도하세요',
   PAY_INVALID_STATE: '결제를 처리할 수 없는 상태입니다',
   PAY_PI_CANCEL_REFUSED:
     '결제가 이미 진행 중이라 취소할 수 없습니다. 잠시 후 다시 확인하세요',
