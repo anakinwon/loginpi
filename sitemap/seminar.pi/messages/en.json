@@ -713,7 +713,8 @@
       "shareFail": "Couldn't share. Please use Copy link instead."
     },
     "attendance": "Attendance",
-    "plan": "Plan"
+    "plan": "Plan",
+    "left": "Time left"
   },
   "host": {
     "gcal": {

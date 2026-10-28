@@ -13,6 +13,7 @@ import { NoteLink } from '@/components/notes/note-view'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
 import { formatFee, OPEN_STS, smnTitle, SUB_TTL_MAX } from '@/lib/seminar-rules'
+import { useDuration } from '@/components/plan/plan-board'
 import { ShareLinks } from './share-links'
 import {
   BTN,
@@ -26,6 +27,7 @@ type Detail = SeminarCard & {
   seatsLeft: number
   registered: boolean | null
   isHost: boolean
+  left: { paid: number | null; free: number } | null // 개최자 요금제 남은 초(종료·취소 = null)
 }
 
 // 지갑 서명이 길어지면 오류 대신 "아직 기다리는 중" 안내만(U8) — 늦게 온 성공 앞에 오류가 번쩍이지 않게
@@ -43,6 +45,7 @@ const post = (path: string, body?: unknown) =>
 export function SeminarDetail({ id }: { id: string }) {
   const t = useTranslations('seminar')
   const tp = useTranslations('plan')
+  const dur = useDuration()
   const errText = useSeminarErrText()
   const start = useStartText()
   const { user } = useAppUser()
@@ -105,6 +108,16 @@ export function SeminarDetail({ id }: { id: string }) {
         {/* 요금제(sql/018) — 참가자 입장은 언제나 무료. 예전 유료 입장 세미나만 입장료 줄 */}
         <dt className="text-muted-foreground">{t('plan')}</dt>
         <dd>{tp(d.plan === 'M' ? 'monthly' : d.plan === 'Y' ? 'yearly' : 'free')}</dd>
+        {/* 남은 시간 — 유료 세미나는 '월간 29시간 58분 · 무료 1시간'(유료 먼저 쓰고 무료 이어서) */}
+        {d.left && (
+          <>
+            <dt className="text-muted-foreground">{t('left')}</dt>
+            <dd>
+              {d.left.paid !== null && `${tp(d.plan === 'Y' ? 'yearly' : 'monthly')} ${dur(d.left.paid)} · `}
+              {tp('free')} {dur(d.left.free)}
+            </dd>
+          </>
+        )}
         {fee && (
           <>
             <dt className="text-muted-foreground">{t('fee')}</dt>

@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute, parseBody, requireUser } from '@/lib/api'
 import { getSessionUser, isAdmin } from '@/lib/auth'
+import { hostPlan, planPools } from '@/lib/plan'
 import { SMN_COLS, SMN_ENT, toCard, type SmnRow } from '@/lib/seminar'
 import { isUuid, ONE_LINE_RE, OPEN_STS, SUB_TTL_MAX } from '@/lib/seminar-rules'
 
@@ -76,6 +77,9 @@ export const GET = withAuthGuard(
     }
 
     const row = smn.data
+    // 남은 시간(요금제 바로 아래 줄, 마스터 2026-10-29) — 진행·예정 세미나만, 개최자 요금제 이용권 기준(유료 먼저·무료 이어서 = 룸 카운트다운과 같은 값, sql/021)
+    const open = (OPEN_STS as readonly string[]).includes(row.smn_sts_cd)
+    const left = open ? planPools(await hostPlan(row.hst_usr_id), row.plan_cd) : null
     return NextResponse.json(
       {
         ...toCard(row),
@@ -83,6 +87,7 @@ export const GET = withAuthGuard(
         // null = 비로그인(판정 불가)
         registered: user ? registered : null,
         isHost: !!user && user.id === row.hst_usr_id,
+        left, // { paid: 유료 남은 초 | null(무료 세미나), free: 무료 남은 초 } | null(종료·취소)
       },
       { headers: { 'Cache-Control': 'private, no-store' } },
     )
