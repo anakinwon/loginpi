@@ -731,11 +731,11 @@
     "subTitle": "Subtitle (optional, up to 60)",
     "startAt": "Start time",
     "maxCnt": "Capacity (1–100)",
-    "fee": "Seminar fee (Pi)",
-    "feeHint": "0 = free, up to 7 decimals",
+    "fee": "Seminar fee",
+    "feeHint": "KRW is a reference only. The Pi amount is fixed at the Pi price when you create the seminar, and participants pay that amount in Pi.",
     "submit": "Create",
     "submitting": "Creating…",
-    "invalid": "Check your input — a time within a year from now, capacity 1–100, seminar fee 0 or more (up to 7 decimals).",
+    "invalid": "Check your input — a date within one year from now, capacity 1–100.",
     "attendance": {
       "title": "Attendance",
       "back": "Back to seminar",
@@ -755,7 +755,10 @@
         "min": "Attended (min)",
         "state": "Status"
       }
-    }
+    },
+    "feeFree": "Free",
+    "feeOption": "KRW {krw} (≈ {pi} Pi)",
+    "feeOptionNoPi": "KRW {krw} (checking Pi price)"
   },
   "privacy": {
     "title": "Privacy Policy — Voice and AI features",

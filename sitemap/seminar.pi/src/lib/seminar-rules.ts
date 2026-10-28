@@ -37,6 +37,10 @@ export const isUuid = (v: unknown): v is string =>
 export const prejoinHeading = (room: string) =>
   isUuid(room) ? ({ level: 2, key: 'titleSeminar' } as const) : ({ level: 1, key: 'title' } as const)
 
+// 개설비(입장료) 선택지 — 원화 기준가(표시용). 개설 때 서버가 그 시점 Pi 시세로 환산해 ent_pi_amt 에 고정하고, 참가자는 그 Pi 금액을 결제한다(원화는 참고, memory krw-display-only-pay-pi)
+export const FEE_KRW = [0, 1000, 3000, 5000, 10000, 20000, 30000, 50000] as const
+export const feeKrwOk = (v: number) => (FEE_KRW as readonly number[]).includes(v)
+
 // 입장료 입력 — Pi 소수 7자리까지(NUMERIC(18,7) = 정수부 11자리)
 export const FEE_RE = /^\d{1,11}(\.\d{1,7})?$/
 

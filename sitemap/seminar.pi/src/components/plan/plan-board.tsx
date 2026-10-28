@@ -15,6 +15,7 @@ export type PlanMe = { admin: true } | { admin: false; remainSec: number; paid: 
 type PlanInfo = {
   freeSec: number
   plans: { plan: 'M' | 'Y'; sec: number; months: number; krw: number; pi: string | null }[]
+  fees: { krw: number; pi: string | null }[] // 세미나 만들기 개설비 선택지 참고값
   me: PlanMe | null
 }
 type Quote = { amount: number; memo: string; metadata: Record<string, unknown> }

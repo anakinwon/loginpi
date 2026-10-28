@@ -2,6 +2,7 @@
 //  GET  ?tab=all|hosted|joined&page=N — 서버 페이지네이션(12건), 건수는 페이저가 쓰므로 exact. all = 예정·진행 중 시작일시 순(x_smn_mst_01),
 //       hosted = 내가 연 것(x_smn_mst_02), joined = 내 참가(x_smn_ptc_02). all 은 공개 캐시, 나머지는 로그인 필요·private no-store
 //  POST 개설 — Pi 로그인 사용자 모두(PRD D-1 개정, 요금제 2026-10-28). ADMIN 아닌 개최자는 개설비 0 강제(정산 A2U 전까지). 비로그인 401(redirect 없음)
+//  개설비는 원화 선택지(feeKrw, FEE_KRW)로 받아 개설 시점 Pi 시세로 환산해 ent_pi_amt 에 고정 — 참가자 결제는 그 Pi 금액(SMN_ENT 기존 흐름). 시세 실패 = 503(추정 금지)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
@@ -14,9 +15,11 @@ import {
   requireUser,
 } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
+import { piKrw } from '@/lib/plan'
+import { piAmount } from '@/lib/plan-rules'
 import { SMN_COLS, toCard, type SmnRow } from '@/lib/seminar'
 import {
-  FEE_RE,
+  feeKrwOk,
   ONE_LINE_RE,
   SUB_TTL_MAX,
   OPEN_STS,
@@ -100,7 +103,7 @@ const createSchema = z.object({
     .datetime({ offset: true })
     .refine((v) => startAtOk(Date.parse(v))),
   maxCnt: z.number().int().min(1).max(100),
-  fee: z.coerce.string().trim().regex(FEE_RE),
+  feeKrw: z.number().int().refine(feeKrwOk), // 개설비 원화 선택지(FEE_KRW) — Pi 는 서버가 환산
   subTitle: z.string().trim().max(SUB_TTL_MAX).regex(ONE_LINE_RE).optional(), // 부제(sql/012) — 나중에 상세에서도 수정
 })
 
@@ -113,13 +116,21 @@ export const POST = withAuthGuard(
     ])
     if (user instanceof NextResponse) return user
     if (body instanceof NextResponse) return body
+    // 개설비 — ADMIN 만(정산 전이라 일반 개최자는 무료 세미나만, 돈이 앱 지갑에 묶이지 않게). 유료면 지금 시세로 Pi 환산(캐시 5분·2초 상한)
+    let fee = '0'
+    if (isAdmin(user) && body.feeKrw > 0) {
+      const krw = await piKrw()
+      const pi = krw ? piAmount(body.feeKrw, krw) : null
+      if (!pi) return apiError('PRICE_UNAVAILABLE', 503)
+      fee = pi
+    }
     // 섬 고르기 + 저장을 한 함수·한 트랜잭션으로(잠금으로 동시 개설이 같은 섬을 고르지 않음, R-P5)
     const { data, error } = await db()
       .rpc('fn_crt_smn', {
         p_hst_usr_id: user.id,
         p_start_dtm: new Date(body.startAt).toISOString(),
         p_max_cnt: body.maxCnt,
-        p_ent_pi_amt: isAdmin(user) ? body.fee : '0', // 정산 전이라 일반 개최자는 무료 세미나만(돈이 앱 지갑에 묶이지 않게)
+        p_ent_pi_amt: fee,
       })
     if (error) return dbFail(error)
     const r = (data as { smn_id: string; smn_nm: string }[] | null)?.[0]

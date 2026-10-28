@@ -5,6 +5,7 @@ import {
   capError,
   clampPage,
   FEE_RE,
+  feeKrwOk,
   formatFee,
   isUuid,
   joinError,
@@ -106,4 +107,9 @@ test('한 줄 제목 — 줄바꿈·단독 \\r·NUL·DEL 거부, TAB·일반 글
 test('한 줄 제목 — NEL·C1 제어문자·U+2028·U+2029 거부, 바로 옆 글자(U+00A0·é)는 허용', () => {
   for (const bad of ['a\u0085ATTENDEE:x', 'a\u0080', 'a\u009F', 'a\u2028b', 'a\u2029b']) assert.ok(!ONE_LINE_RE.test(bad), JSON.stringify(bad))
   for (const ok of ['a b', 'PyCafé™', 'a‧b']) assert.ok(ONE_LINE_RE.test(ok), JSON.stringify(ok))
+})
+
+test('개설비 원화 선택지 — FEE_KRW 에 있는 값만(임의 금액·음수·소수 거부)', () => {
+  for (const v of [0, 1000, 5000, 50000]) assert.ok(feeKrwOk(v))
+  for (const v of [4999, -1000, 1000.5, 100000]) assert.ok(!feeKrwOk(v))
 })
