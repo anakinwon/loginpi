@@ -712,7 +712,8 @@
       "share": "Share to another app",
       "shareFail": "Couldn't share. Please use Copy link instead."
     },
-    "attendance": "Attendance"
+    "attendance": "Attendance",
+    "plan": "Plan"
   },
   "host": {
     "gcal": {

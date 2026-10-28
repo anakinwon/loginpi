@@ -20,6 +20,8 @@ import {
 
 type ListRes = { rows: SeminarCard[]; total: number; page: number }
 
+const PLAN_KEY: Record<string, 'free' | 'monthly' | 'yearly'> = { FREE: 'free', M: 'monthly', Y: 'yearly' }
+
 export function SeminarList() {
   const t = useTranslations('list')
   const [tab, setTab] = useState<Tab>('all')
@@ -138,6 +140,7 @@ function TabList({ tab }: { tab: Tab }) {
 function Card({ s }: { s: SeminarCard }) {
   const t = useTranslations('list')
   const start = useStartText()
+  const tp = useTranslations('plan')
   const fee = formatFee(s.fee)
   return (
     <Link
@@ -146,10 +149,11 @@ function Card({ s }: { s: SeminarCard }) {
     >
       <div className="flex items-start justify-between gap-2">
         <h2 className="line-clamp-2 font-semibold break-words">{s.title}</h2>
+        {/* 배지 = 세미나 요금제(월간·연간·무료, 마스터 2026-10-29 — 참가자 입장은 언제나 무료라 입장료 '무료'가 요금제로 오해됨). 예전 유료 입장 세미나만 입장료 */}
         <span
-          className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${fee ? 'bg-accent text-white' : 'bg-speaking text-black'}`}
+          className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${fee || s.plan !== 'FREE' ? 'bg-accent text-white' : 'bg-speaking text-black'}`}
         >
-          {fee ? t('fee', { amount: fee }) : t('free')}
+          {fee ? t('fee', { amount: fee }) : tp(PLAN_KEY[s.plan] ?? 'free')}
         </span>
       </div>
       <p className="text-muted-foreground text-sm">{start(s.startAt)}</p>

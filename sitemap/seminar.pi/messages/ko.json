@@ -712,7 +712,8 @@
       "share": "다른 앱으로 공유",
       "shareFail": "공유하지 못했습니다. 링크 복사를 이용해 주세요."
     },
-    "attendance": "출석부"
+    "attendance": "출석부",
+    "plan": "요금제"
   },
   "host": {
     "gcal": {

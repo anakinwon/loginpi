@@ -14,6 +14,7 @@ export interface SeminarCard {
   startAt: string
   maxCnt: number
   fee: number
+  plan: string // 세미나 요금제 FREE·M·Y
   status: 'SCHEDULED' | 'LIVE' | 'ENDED' | 'CANCELED'
   host: string
 }

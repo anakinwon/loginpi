@@ -42,6 +42,7 @@ const post = (path: string, body?: unknown) =>
 
 export function SeminarDetail({ id }: { id: string }) {
   const t = useTranslations('seminar')
+  const tp = useTranslations('plan')
   const errText = useSeminarErrText()
   const start = useStartText()
   const { user } = useAppUser()
@@ -101,8 +102,15 @@ export function SeminarDetail({ id }: { id: string }) {
         <dd>{d.host || '—'}</dd>
         <dt className="text-muted-foreground">{t('seats')}</dt>
         <dd>{t('seatsValue', { left: d.seatsLeft, max: d.maxCnt })}</dd>
-        <dt className="text-muted-foreground">{t('fee')}</dt>
-        <dd>{fee ? t('feeValue', { amount: fee }) : t('free')}</dd>
+        {/* 요금제(sql/018) — 참가자 입장은 언제나 무료. 예전 유료 입장 세미나만 입장료 줄 */}
+        <dt className="text-muted-foreground">{t('plan')}</dt>
+        <dd>{tp(d.plan === 'M' ? 'monthly' : d.plan === 'Y' ? 'yearly' : 'free')}</dd>
+        {fee && (
+          <>
+            <dt className="text-muted-foreground">{t('fee')}</dt>
+            <dd>{t('feeValue', { amount: fee })}</dd>
+          </>
+        )}
       </dl>
       {/* 개최자는 룸 링크만 — 자기 세미나에 입장·결제 버튼을 보이지 않는다(U1) */}
       {d.isHost ? (
