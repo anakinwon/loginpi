@@ -211,24 +211,25 @@ export async function upsertPiUser(
     }
   }
 
-  // ①·③ uid 일치 행 갱신 또는 신규 가입
-  const { data, error } = await db
+  // ①·③ uid 일치 행 갱신 또는 신규 가입 — 표시 이름(dsp_nm)은 가입 때만 Pi 사용자명으로 정하고 이후 로그인은 덮어쓰지 않는다
+  //  (사용자가 바꾼 이름이 다음 로그인에 Pi 사용자명으로 되돌아가던 결함, seminar.pi 마스터 2026-10-29). upsert 는 dsp_nm 까지 갱신하므로 갱신 → 없으면 가입
+  const piCols = { pi_uid: piUser.uid, pi_usr_nm: piUser.username, pi_wlt_adr_txt: piUser.walletAddress, lst_lgn_dtm: nowIso }
+  const touch = () => db.from('sys_user').update(piCols).eq('pi_uid', piUser.uid).select().maybeSingle()
+  const upd = await touch()
+  if (upd.error) throw new Error(upd.error.message ?? 'Pi 사용자 저장 실패')
+  if (upd.data) return toUserRow(upd.data) as UserRow
+  const ins = await db
     .from('sys_user')
-    .upsert(
-      {
-        pi_uid: piUser.uid,
-        pi_usr_nm: piUser.username,
-        pi_wlt_adr_txt: piUser.walletAddress,
-        dsp_nm: piUser.username ?? `pi_${piUser.uid.slice(0, 8)}`,
-        lst_lgn_dtm: nowIso,
-      },
-      { onConflict: 'pi_uid' },
-    )
+    .insert({ ...piCols, dsp_nm: piUser.username ?? `pi_${piUser.uid.slice(0, 8)}` })
     .select()
     .single()
-
-  if (error) throw new Error(error.message ?? 'Pi 사용자 저장 실패')
-  return toUserRow(data) as UserRow
+  if (!ins.error) return toUserRow(ins.data) as UserRow
+  // 같은 사람의 첫 로그인이 동시에 두 번 — 먼저 가입한 쪽 행을 갱신해 쓴다(R-P5)
+  if (ins.error.code === '23505') {
+    const again = await touch()
+    if (!again.error && again.data) return toUserRow(again.data) as UserRow
+  }
+  throw new Error(ins.error.message ?? 'Pi 사용자 저장 실패')
 }
 
 const accountConflict = () =>

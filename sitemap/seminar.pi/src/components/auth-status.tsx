@@ -25,7 +25,7 @@ export function AuthStatus() {
     return (
       <span className="flex items-center gap-2 text-sm">
         <Link href="/link" className="hover:underline">
-          {t('signedIn', { name: user.username ?? user.displayName })}
+          {t('signedIn', { name: user.displayName || user.username || '' })}
         </Link>
         {source === 'google' && <GoogleSignOutButton />}
       </span>

@@ -131,6 +131,8 @@ export function createPiAuthRoute<U extends PiAuthUserRecord>(
     let userId = ''
     let userRole = 'USER'
     let nickNm: string | null = null
+    // 표시 이름 = DB dsp_nm(사용자가 바꾼 이름, 로그인은 덮어쓰지 않음 — @pi/db upsertPiUser). DB 오류면 Pi 사용자명
+    let displayName = piUser.username ?? `pi_${piUser.uid.slice(0, 8)}`
     try {
       const dbUser = await opts.upsertUser({
         uid: piUser.uid,
@@ -140,6 +142,7 @@ export function createPiAuthRoute<U extends PiAuthUserRecord>(
       userId = dbUser.id
       userRole = dbUser.role
       nickNm = dbUser.nick_nm ?? null
+      displayName = dbUser.display_name || displayName
     } catch (e) {
       // 계정 정책 거부(@pi/db PiLoginRejectedError — 타 앱 토큰 username 재사용·비활성 계정)는 세션 미발급 403
       const code = (e as { code?: unknown } | null)?.code
@@ -168,7 +171,7 @@ export function createPiAuthRoute<U extends PiAuthUserRecord>(
     const sessionData: PiSessionUser = {
       userId,
       uid: piUser.uid,
-      displayName: piUser.username ?? `pi_${piUser.uid.slice(0, 8)}`,
+      displayName,
       username: piUser.username ?? null,
       walletAddress: wallet,
       scopesGranted: piUser.credentials.scopes,

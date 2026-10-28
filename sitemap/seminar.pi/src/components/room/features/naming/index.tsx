@@ -3,7 +3,7 @@
 //  ② 룸 제목(섬 이름 - 부제)을 개최자가 눌러 부제 수정(room-title.tsx) — 저장 뒤 refresh{what:'title'} 로 다른 화면이 제목을 다시 읽는다
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { piFetch } from '@pi/auth/client'
+import { piFetch, usePiAuth } from '@pi/auth/client'
 import { readApi } from '@/lib/client-api'
 import { isUuid, NCKNM_MAX, parseNameSignal } from '@/lib/seminar-rules'
 import { featureStore, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
@@ -23,6 +23,7 @@ function RenameSheet({ ctx }: { ctx: RoomCtx }) {
   const [err, setErr] = useState<string | null>(null)
   const me = ctx.r.peers.find((p) => p.peerId === ctx.r.selfId)?.name ?? ''
   const { hold } = ctx
+  const { updateUser } = usePiAuth()
   useEffect(() => {
     titleNotify.current = ctx.r.broadcastTitle
   })
@@ -42,8 +43,9 @@ function RenameSheet({ ctx }: { ctx: RoomCtx }) {
     if (!name || name === me) return renameOpen.set(false)
     setBusy(true)
     const r = await readApi<{ name: string }>(
-      piFetch(`/api/seminars/${ctx.seminarId}/ncknm`, {
-        method: 'PUT',
+      // 계정 표시 이름(sys_user.dsp_nm)을 바꾼다 — 모든 세미나·다음 로그인에도 같은 이름(마스터 2026-10-29)
+      piFetch('/api/me/name', {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
       }),
@@ -51,6 +53,7 @@ function RenameSheet({ ctx }: { ctx: RoomCtx }) {
     setBusy(false)
     if (!r.ok) return setErr(t(r.body.code === 'NAME_TAKEN' ? 'taken' : 'failed'))
     // 알림은 신호(신 엔진) → 채팅 표식(구 엔진) 순. 둘 다 실패(채팅 잠김 등)여도 저장은 됐다 — 다른 사람은 다음 입장부터 새 이름
+    updateUser({ displayName: r.data.name }) // 상단 '○○ 님'도 바로 새 이름(다음 로그인도 dsp_nm)
     if (await ctx.r.renameSelf(r.data.name)) ctx.notice('rename.later')
     renameOpen.set(false)
   }
