@@ -751,12 +751,13 @@
       "col": {
         "name": "Name",
         "pi": "Pi username",
-        "ent": "Joined",
+        "ent": "First joined",
         "hb": "Last seen",
         "dur": "Time attended",
-        "min": "Attended (min)",
+        "min": "Attended (min, time away excluded)",
         "state": "Status"
-      }
+      },
+      "durNote": "Time attended is from first joined to last seen, minus time away (gaps longer than 2.5 minutes)."
     },
     "plan": "Plan",
     "planFree": "Free — {time} left this month · no AI",

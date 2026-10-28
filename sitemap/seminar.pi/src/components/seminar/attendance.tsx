@@ -13,11 +13,11 @@ import { LoginGate } from '@/components/login-gate'
 import { Link } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
 import { inViewerTz } from '@/lib/calendar-rules'
-import { attendSec, fmtDur, isOnline, toCsv } from '@/lib/engage-rules'
+import { fmtDur, isOnline, toCsv } from '@/lib/engage-rules'
 import { Pagination } from './pagination'
 import { BTN, useSeminarErrText } from './shared'
 
-type Row = { name: string; piName: string; ent: string; hb: string }
+type Row = { name: string; piName: string; ent: string; hb: string; sec: number } // sec = 들락거린 시간을 뺀 참석 시간(sql/020)
 type List = { title: string; items: Row[]; total: number; page: number; pages: number }
 
 // 출석부 다시 읽기 간격 — 개최자·ADMIN 만 여는 화면이라 요청 부담이 작다(보일 때만)
@@ -76,7 +76,7 @@ function Sheet({ id }: { id: string }) {
     setBusy(false)
     if (!r.ok) return setErr(errText(r.body))
     const head = [t('col.name'), t('col.pi'), t('col.ent'), t('col.hb'), t('col.min')]
-    const body = r.data.items.map((x) => [x.name, x.piName, when(x.ent), when(x.hb), Math.round(attendSec(x.ent, x.hb) / 60)])
+    const body = r.data.items.map((x) => [x.name, x.piName, when(x.ent), when(x.hb), Math.round(x.sec / 60)])
     const url = URL.createObjectURL(new Blob([toCsv([head, ...body])], { type: 'text/csv;charset=utf-8' }))
     const a = document.createElement('a')
     a.href = url
@@ -120,8 +120,8 @@ function Sheet({ id }: { id: string }) {
             <thead className="text-muted-foreground">
               <tr>
                 <th className="p-3 font-medium">{t('col.name')}</th>
-                <th className="hidden p-3 font-medium sm:table-cell">{t('col.ent')}</th>
-                <th className="hidden p-3 font-medium sm:table-cell">{t('col.hb')}</th>
+                <th className="p-3 font-medium whitespace-nowrap">{t('col.ent')}</th>
+                <th className="p-3 font-medium whitespace-nowrap">{t('col.hb')}</th>
                 <th className="p-3 font-medium">{t('col.dur')}</th>
                 <th className="p-3 font-medium">{t('col.state')}</th>
               </tr>
@@ -130,9 +130,9 @@ function Sheet({ id }: { id: string }) {
               {d.items.map((r, i) => (
                 <tr key={i} className="border-t border-white/10">
                   <td className="p-3 break-words">{name(r)}</td>
-                  <td className="hidden p-3 sm:table-cell">{when(r.ent)}</td>
-                  <td className="hidden p-3 sm:table-cell">{when(r.hb)}</td>
-                  <td className="p-3 tabular-nums">{fmtDur(attendSec(r.ent, r.hb))}</td>
+                  <td className="p-3 whitespace-nowrap">{when(r.ent)}</td>
+                  <td className="p-3 whitespace-nowrap">{when(r.hb)}</td>
+                  <td className="p-3 tabular-nums">{fmtDur(r.sec)}</td>
                   <td className="p-3">{isOnline(r.hb, now) ? t('online') : t('left')}</td>
                 </tr>
               ))}
@@ -140,6 +140,7 @@ function Sheet({ id }: { id: string }) {
           </table>
         </div>
       )}
+      {!!d.items.length && <p className="text-muted-foreground text-xs">{t('durNote')}</p>}
       <Pagination page={d.page} pages={d.pages} onPage={setPage} />
     </section>
   )

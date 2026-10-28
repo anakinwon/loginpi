@@ -16,6 +16,7 @@ import { parsePage } from '@/lib/seminar-rules'
 type AtdRow = {
   ent_dtm: string
   lst_hb_dtm: string
+  atnd_sec_cnt: number
   sys_user: { dsp_nm: string | null; pi_usr_nm: string | null } | null
 }
 
@@ -59,7 +60,7 @@ export const GET = withAuthGuard(
       gate(w.smnId, w.user),
       db()
         .from('smn_atd')
-        .select('ent_dtm, lst_hb_dtm, sys_user!smn_atd_sys_user_id_fkey(dsp_nm, pi_usr_nm)', { count: 'exact' })
+        .select('ent_dtm, lst_hb_dtm, atnd_sec_cnt, sys_user!smn_atd_sys_user_id_fkey(dsp_nm, pi_usr_nm)', { count: 'exact' })
         .eq('smn_id', w.smnId)
         .eq('del_yn', 'N')
         .order('ent_dtm')
@@ -79,6 +80,7 @@ export const GET = withAuthGuard(
           piName: r.sys_user?.pi_usr_nm || '',
           ent: r.ent_dtm,
           hb: r.lst_hb_dtm,
+          sec: r.atnd_sec_cnt, // 참석 시간(나가 있던 시간 제외, sql/020)
         })),
         total,
         page,
