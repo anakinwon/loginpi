@@ -7,7 +7,7 @@ import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute, parseBody, requireUser } from '@/lib/api'
 import { getSessionUser, isAdmin } from '@/lib/auth'
 import { SMN_COLS, SMN_ENT, toCard, type SmnRow } from '@/lib/seminar'
-import { isUuid, ONE_LINE_RE, SUB_TTL_MAX } from '@/lib/seminar-rules'
+import { isUuid, ONE_LINE_RE, OPEN_STS, SUB_TTL_MAX } from '@/lib/seminar-rules'
 
 export const GET = withAuthGuard(
   dbRoute(async (req, ctx) => {
@@ -105,10 +105,17 @@ export const PATCH = withAuthGuard(
       .update({ subttl: body.subTitle || null, modr_id: user.id })
       .eq('smn_id', id)
       .eq('del_yn', 'N')
+      .in('smn_sts_cd', [...OPEN_STS]) // 종료·취소된 세미나는 부제 고정(마스터 2026-10-29)
     if (!isAdmin(user)) q = q.eq('hst_usr_id', user.id)
     const { data, error } = await q.select('smn_id')
     if (error) return dbFail(error)
-    if (!data?.length) return apiError('FORBIDDEN', 403) // 없는 세미나이거나 개최자가 아님
+    if (!data?.length) {
+      // 실패 경로만 1번 더 — 닫힌 세미나(409)와 권한 없음·없는 세미나(403)를 나눠 알린다
+      const { data: s, error: e2 } = await db().from('smn_mst').select('hst_usr_id, smn_sts_cd').eq('smn_id', id).eq('del_yn', 'N').maybeSingle<{ hst_usr_id: string; smn_sts_cd: string }>()
+      if (e2) return dbFail(e2)
+      const mine = s && (isAdmin(user) || s.hst_usr_id === user.id)
+      return mine ? apiError('SMN_CLOSED', 409) : apiError('FORBIDDEN', 403)
+    }
     return NextResponse.json({ ok: true, subTitle: body.subTitle }, { headers: { 'Cache-Control': 'no-store' } })
   }),
 )

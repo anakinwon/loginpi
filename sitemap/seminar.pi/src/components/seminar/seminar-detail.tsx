@@ -84,7 +84,8 @@ export function SeminarDetail({ id }: { id: string }) {
       </Link>
       <header className="space-y-2">
         <h1 className="text-2xl font-bold break-words">{d.title}</h1>
-        {d.isHost && (
+        {/* 부제 고치기 = 진행·예정 세미나만(종료·취소면 숨김, 서버도 409 — 마스터 2026-10-29) */}
+        {d.isHost && (OPEN_STS as readonly string[]).includes(d.status) && (
           <SubTitleForm
             id={d.id}
             value={d.subTitle}
@@ -106,9 +107,19 @@ export function SeminarDetail({ id }: { id: string }) {
       {/* 개최자는 룸 링크만 — 자기 세미나에 입장·결제 버튼을 보이지 않는다(U1) */}
       {d.isHost ? (
         <div className="space-y-2">
-          <Link href={`/s/${d.id}/join`} className={BTN_PRIMARY}>
-            {t('roomLink')}
-          </Link>
+          {/* 종료·취소된 세미나 = 룸 바로가기 비활성(입장권도 409 로 막힘, 마스터 2026-10-29) */}
+          {(OPEN_STS as readonly string[]).includes(d.status) ? (
+            <Link href={`/s/${d.id}/join`} className={BTN_PRIMARY}>
+              {t('roomLink')}
+            </Link>
+          ) : (
+            <>
+              <button type="button" disabled className={`${BTN_PRIMARY} cursor-not-allowed opacity-50`}>
+                {t('roomLink')}
+              </button>
+              <p className="text-muted-foreground text-xs">{t(d.status === 'CANCELED' ? 'canceled' : 'closed')}</p>
+            </>
+          )}
           {/* 개최자 줄 '출석부'(설계서 15.8) */}
           <Link href={`/host/attendance/${d.id}`} className="text-muted-foreground block text-sm hover:underline">
             {t('attendance')}
