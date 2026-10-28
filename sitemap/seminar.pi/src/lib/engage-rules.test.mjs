@@ -1,22 +1,7 @@
 // engage-rules.ts 시험 — node src/lib/engage-rules.test.mjs (설문 입력·집계·출석 시간·CSV·refresh 신호)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import {
-  attendSec,
-  beatDue,
-  beatStops,
-  charsLeft,
-  cleanPoll,
-  cleanQuestion,
-  csvCell,
-  fmtDur,
-  isOnline,
-  parseRefresh,
-  pollVoting,
-  sendKey,
-  tally,
-  toCsv,
-} from './engage-rules.ts'
+import { attendSec, beatDue, beatStops, charsLeft, cleanPoll, cleanQuestion, csvCell, fmtDur, isOnline, parseRefresh, pollVoting, sendKey, tally, toCsv, leftNow, LOW_LEFT_SEC } from './engage-rules.ts'
 
 test('설문 입력 — 2~10개·중복·길이', () => {
   assert.deepEqual(cleanPoll(' 다음 주제? ', [' A', 'B ']), { q: '다음 주제?', opts: ['A', 'B'] })
@@ -134,4 +119,13 @@ test('남은 글자 수 — 상한 90% 부터만(T04 r3)', () => {
   assert.equal(charsLeft(450, 500), 50)
   assert.equal(charsLeft(500, 500), 0)
   assert.equal(charsLeft(600, 500), 0)
+})
+
+// 룸 남은 시간 카운트다운(마스터 2026-10-29) — 받은 값에서 흐른 초만큼, 0 아래로 안 감, 시계가 거꾸로 가도 늘지 않음
+test('leftNow — 카운트다운·5분 문턱', () => {
+  assert.equal(leftNow(600, 1000, 1000), 600)
+  assert.equal(leftNow(600, 1000, 61_999), 540)
+  assert.equal(leftNow(30, 0, 60_000), 0)
+  assert.equal(leftNow(600, 5000, 0), 600) // 받기 전 시각(초기값) = 그대로
+  assert.equal(LOW_LEFT_SEC, 300)
 })

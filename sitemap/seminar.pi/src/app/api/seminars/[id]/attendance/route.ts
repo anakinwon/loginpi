@@ -1,6 +1,8 @@
 // 출석(SubAgent4) — POST = 룸 입장 기록 + 60초 하트비트(같은 호출), GET ?page= = 개최자·ADMIN 출석부(50명 단위), ?all=1 = CSV 용 전체(상한 ATD_CSV_MAX).
 //  POST 는 자격·상태 확인(gate, 병렬 2조회) 뒤에만 쓴다 — 종료·취소·삭제된 세미나·유료 참가 취소면 갱신하지 않고 409/404/402(야간 시험 T04 : 종료 뒤 마지막 시각이 늘던 결함).
 //  출석 갱신(없으면 INSERT, 첫 입장 시각 보존)·LIVE 개최자 시간 계량은 fn_hb_smn_hst(sql/015) 한 번 — 응답 remainSec, 소진이면 세미나 종료(endByPlan). CSV 는 화면이 번역된 머리글로 만든다(engage-rules toCsv).
+//  방 남은 시간(sql/018) — 응답 plan(세미나 요금제)·left(그 요금제 남은 초, LIVE 일 때만) 를 개최자·참가자 모두에게 : 룸 카운트다운.
+//  참가자 하트비트는 개최자 요금제를 읽기만 하고(계량은 개최자 본인 하트비트만), 0 이하면 누구의 하트비트든 세미나를 종료한다(시간 소진 = 방 종료).
 //  비로그인 401 — redirect 없음. 응답 no-store
 // ponytail: 확인과 갱신 사이에 세미나가 닫히면 하트비트 1번(≤60초)이 더 남는다 — 엄격히 막으려면 상태 조건을 건 RPC 로
 import { NextResponse } from 'next/server'
@@ -8,7 +10,7 @@ import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
 import { closed, gate, noStore, who } from '@/lib/engage'
 import { ATD_CSV_MAX, ATD_PAGE } from '@/lib/engage-rules'
-import { endByPlan } from '@/lib/plan'
+import { endByPlan, hostPlan, planSec } from '@/lib/plan'
 import { parsePage } from '@/lib/seminar-rules'
 
 type AtdRow = {
@@ -26,14 +28,20 @@ export const POST = withAuthGuard(
     if (!g.open) return closed()
     // 출석 갱신·개최자 시간 계량을 DB 함수 1왕복으로(sql/015 fn_hb_smn_hst — 출석 행 잠금으로 여러 탭 중복 계량 없음, R-P5)
     //  remainSec = null 이면 계량 대상 아님(참가자·ADMIN 개최자·LIVE 아님). 0 이하 = 시간 소진 → 세미나 종료
-    const { data, error } = await db().rpc('fn_hb_smn_hst', { p_smn_id: w.smnId, p_usr_id: w.user.id })
-    if (error) return dbFail(error)
-    const remainSec = data === null ? null : Number(data)
-    if (remainSec !== null && remainSec <= 0) {
+    //  참가자(개최자 아님)·LIVE 면 개최자의 그 요금제 남은 시간을 함께 읽는다 — 하트비트와 서로 의존 없음 → 병렬(R-P1)
+    const host = g.hostId === w.user.id
+    const [hb, hp] = await Promise.all([
+      db().rpc('fn_hb_smn_hst', { p_smn_id: w.smnId, p_usr_id: w.user.id }),
+      !host && g.live ? hostPlan(g.hostId) : null,
+    ])
+    if (hb.error) return dbFail(hb.error)
+    const remainSec = hb.data === null ? null : Number(hb.data)
+    const left = remainSec ?? (hp ? planSec(hp, g.planCd) : null)
+    if (left !== null && left <= 0) {
       await endByPlan(w.smnId, w.user.id)
-      return NextResponse.json({ ok: true, remainSec: 0, ended: true, code: 'PLAN_EXHAUSTED' }, { headers: noStore })
+      return NextResponse.json({ ok: true, remainSec: 0, left: 0, plan: g.planCd, ended: true, code: 'PLAN_EXHAUSTED' }, { headers: noStore })
     }
-    return NextResponse.json({ ok: true, remainSec }, { headers: noStore })
+    return NextResponse.json({ ok: true, remainSec, left, plan: g.planCd }, { headers: noStore })
   }),
 )
 

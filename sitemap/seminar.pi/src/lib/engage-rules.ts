@@ -66,6 +66,11 @@ export const beatDue = (lastMs: number, now: number) => now - lastMs >= HB_MS / 
 export const isOnline = (hb: string | number | Date, now: number) => now - new Date(hb).getTime() < ONLINE_MS
 
 // 1시간 2분 → '1:02:00', 5분 3초 → '5:03'
+// 룸 남은 시간 카운트다운(sql/018 세미나 요금제) — 마지막 하트비트 응답의 남은 초(left)·받은 시각(at)에서 지금까지 흐른 초를 뺀다(0 아래로 안 감).
+//  LOW_LEFT_SEC 미만 = 붉은 글자 깜빡임(마스터 2026-10-29)
+export const LOW_LEFT_SEC = 300
+export const leftNow = (left: number, at: number, now: number) => Math.max(0, left - Math.floor(Math.max(0, now - at) / 1000))
+
 export function fmtDur(sec: number): string {
   const h = Math.floor(sec / 3600)
   const m = Math.floor((sec % 3600) / 60)

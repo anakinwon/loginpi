@@ -604,7 +604,9 @@
     },
     "plan": {
       "warn": "{min} min of seminar time left. You can top up on the Plans page.",
-      "ended": "Your seminar time ran out, so the seminar has ended."
+      "ended": "Your seminar time ran out, so the seminar has ended and you left the room.",
+      "left": "Seminar time left",
+      "closed": "The seminar has ended, so you left the room."
     }
   },
   "list": {
