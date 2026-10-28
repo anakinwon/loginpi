@@ -85,3 +85,12 @@ test('바꾼 이름 — 새 참가자가 들어올 때마다 다시 알리고, �
   const td = room.slice(room.indexOf('function teardown()'), room.indexOf('function teardown()') + 400)
   assert.match(td, /myNameRef\.current = null/)
 })
+
+test('부제 변경 — 신호 먼저, 구 엔진은 채팅 표식, 받는 화면은 서버에서 다시 읽음', () => {
+  const room = readFileSync(new URL('../components/room/use-room.ts', import.meta.url), 'utf8')
+  assert.match(room, /request\('chat\.send', \{ text: TITLE_MARK \}\)/)
+  assert.match(room, /c\.text === TITLE_MARK\) return void appSubs\.current\.forEach/)
+  const title = readFileSync(new URL('../components/room/room-title.tsx', import.meta.url), 'utf8')
+  assert.match(title, /titleNotify\.current\?\.\(\)/)
+  assert.match(title, /piFetch\(`\/api\/seminars\/\$\{id\}`\)/) // 내용은 서버가 정본
+})

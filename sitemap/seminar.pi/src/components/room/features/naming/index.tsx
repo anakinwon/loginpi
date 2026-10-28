@@ -12,8 +12,8 @@ const renameOpen = featureStore(false)
 // 내 타일 이름표를 눌렀을 때(stage) — 세미나 방이면 이름 바꾸기 창이 열린다(실험실 방은 창이 없어 아무 일 없음)
 export const openRename = () => renameOpen.set(true)
 export const titleVer = featureStore(0) // 받은 제목 변경 신호 수 — room-title 이 구독해 다시 읽는다
-// 룸 밖(제목 줄)에서 신호를 보내려고 룸 맥락의 sendApp 을 잡아 둔다(룸이 없으면 null)
-export const roomSend: { current: RoomCtx['sendApp'] | null } = { current: null }
+// 룸 밖(제목 줄)에서 '제목 바뀜'을 알리려고 룸의 broadcastTitle 을 잡아 둔다(룸이 없으면 null)
+export const titleNotify: { current: (() => Promise<string | null>) | null } = { current: null }
 
 function RenameSheet({ ctx }: { ctx: RoomCtx }) {
   const t = useTranslations('room.rename')
@@ -24,9 +24,9 @@ function RenameSheet({ ctx }: { ctx: RoomCtx }) {
   const me = ctx.r.peers.find((p) => p.peerId === ctx.r.selfId)?.name ?? ''
   const { hold } = ctx
   useEffect(() => {
-    roomSend.current = ctx.sendApp
+    titleNotify.current = ctx.r.broadcastTitle
   })
-  useEffect(() => () => void (roomSend.current = null), [])
+  useEffect(() => () => void (titleNotify.current = null), [])
   useEffect(() => {
     const d = ref.current
     if (!d) return

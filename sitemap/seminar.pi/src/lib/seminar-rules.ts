@@ -158,3 +158,5 @@ export const nameKey = (n: string) => n.normalize('NFKC').toLowerCase().replace(
 // 표식 = 보이지 않는 구분 문자(U+2063) + 'smn-name:' — 사람이 채팅으로 칠 일이 없는 값
 export const NAME_MARK = '⁣smn-name:'
 export const nameFromChat = (text: string) => (text.startsWith(NAME_MARK) ? parseNameSignal({ what: 'name', name: text.slice(NAME_MARK.length) }) : null)
+// 제목(부제) 변경 표식 — 내용 없이 '다시 읽어라'만(받는 화면이 서버에서 제목을 다시 읽으니 위조해도 바뀌는 것 없음)
+export const TITLE_MARK = '⁣smn-title'

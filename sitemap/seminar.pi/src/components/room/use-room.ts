@@ -8,7 +8,7 @@ import { piFetch } from '@pi/auth/client'
 // v1.2(3.5) : 사회(peer.mute·room.muteAll 잠금·peer.askUnmute)·레이아웃(room.setLayout)·발언자(ntf activeSpeaker)
 // v1.3(A-2) : 범용 중계 app.send{topic,d} → ntf app{topic,d,from}(부가 기능 공용, extensions.ts) · 입장 직후 1회 지원 확인 · 카메라 송신기(영상 효과 replaceTrack)
 import type { AppMsg } from './extensions'
-import { NAME_MARK, nameFromChat, nameKey, parseNameSignal } from '@/lib/seminar-rules'
+import { NAME_MARK, nameFromChat, nameKey, parseNameSignal, TITLE_MARK } from '@/lib/seminar-rules'
 import {
   APP_MAX,
   APP_PROBE,
@@ -426,6 +426,8 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
       const nm = nameFromChat(c.text)
       if (nm?.what === 'name') return void applyName(c.peerId, nm.name)
       if (c.text.startsWith(NAME_MARK)) return // 형식이 틀린 표식도 채팅에 보이지 않게
+      // 구 엔진 예비 통로의 제목 변경 표식 — 신 엔진 신호와 같은 모양으로 구독자(features/naming)에게 넘긴다
+      if (c.text === TITLE_MARK) return void appSubs.current.forEach((fn) => fn({ topic: 'refresh', d: { what: 'title' }, from: c.peerId }))
       // 엔진이 채우는 name 은 입장권 이름(바꾸기 전) — 바꾼 이름이 있으면 그것으로
       addChat({ ...c, name: peersRef.current.get(c.peerId)?.name ?? c.name, n: ++chatN.current, mine: false, status: 'sent' })
     } else if (e.m === 'reaction') {
@@ -935,6 +937,17 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
     return broadcastName(name)
   }
 
+  // 제목(부제)을 바꿨다고 알리기 — 받는 화면은 서버에서 제목을 다시 읽는다. 신호 먼저, 안 되면 채팅 표식
+  async function broadcastTitle(): Promise<string | null> {
+    if (!(await sendApp('refresh', { what: 'title' }))) return null
+    try {
+      await request('chat.send', { text: TITLE_MARK })
+      return null
+    } catch (e) {
+      return codeOf(e)
+    }
+  }
+
   // 이름 알리기 — 신호(신 엔진) 먼저, 안 되면 채팅 표식(구 엔진)
   async function broadcastName(name: string): Promise<string | null> {
     if (!(await sendApp('refresh', { what: 'name', name }))) return null
@@ -1128,6 +1141,7 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
     appSupported,
     sendApp,
     renameSelf,
+    broadcastTitle,
     subscribeApp,
     videoSender,
   }

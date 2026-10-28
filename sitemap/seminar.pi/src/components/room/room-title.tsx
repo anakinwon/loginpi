@@ -7,7 +7,7 @@ import { piFetch } from '@pi/auth/client'
 import { readApi } from '@/lib/client-api'
 import { smnTitle, SUB_TTL_MAX } from '@/lib/seminar-rules'
 import { useStore } from './extensions'
-import { roomSend, titleVer } from './features/naming'
+import { titleNotify, titleVer } from './features/naming'
 
 type Info = { island: string; subTitle: string; isHost: boolean }
 
@@ -48,7 +48,7 @@ export function RoomTitle({ id, island, subTitle }: { id: string; island: string
     setInfo((x) => ({ ...x, subTitle: r.data.subTitle }))
     setEdit(false)
     setErr(false)
-    void roomSend.current?.('refresh', { what: 'title' })
+    void titleNotify.current?.() // 지금 방에 있는 사람은 바로 다시 읽고, 새로 오는 사람은 입장 때 서버에서 최신 제목을 읽는다
   }
 
   if (edit)
