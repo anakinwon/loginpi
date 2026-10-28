@@ -99,7 +99,9 @@
     "SPEECH_TTS_FAILED": "Could not create the translated voice",
     "CAPTION_SIG_INVALID": "This caption could not be verified, so it was not translated",
     "PLAN_EXPIRES_BEFORE_START": "The start time is after this plan's pass expires",
-    "PAY_ALREADY_PAID": "A payment is still being processed. If you were signing in the wallet, try again in 3 minutes."
+    "PAY_ALREADY_PAID": "A payment is still being processed. If you were signing in the wallet, try again in 3 minutes.",
+    "REC_PAID_ONLY": "Recording is available only in Monthly or Yearly plan seminars with paid time left",
+    "REC_NOT_IN_ROOM": "Still confirming you are in the room. Try again in a moment"
   },
   "progress": {
     "title": "Build progress",
@@ -573,7 +575,8 @@
         "body": "When recording starts, everyone will see a 'Recording' indicator. The file is saved only on this device and is never uploaded or transferred abroad. Please tell participants before you start.",
         "download": "When you stop, the file is saved to your downloads folder. In-app browsers may block file saving, so record from a regular browser on a computer.",
         "cancel": "Cancel",
-        "start": "Start recording"
+        "start": "Start recording",
+        "charge": "While recording, recording time is deducted from your paid time in addition to room time (2x while recording). When paid time runs out, recording stops and the file is saved."
       },
       "resave": {
         "label": "Recording file",
@@ -588,7 +591,11 @@
         "saveFailed": "Could not create the recording file.",
         "startedBy": "The presenter started recording",
         "stoppedBy": "The presenter stopped recording"
-      }
+      },
+      "paidOnly": "Recording is available only in seminars opened on a Monthly or Yearly plan, while paid time is left.",
+      "planOut": "Paid time ran out, so recording stopped and the file was saved.",
+      "notInRoom": "Still confirming you are in the room. Start recording again in a moment.",
+      "meterFailed": "Could not check recording time, so recording did not start. Try again in a moment."
     },
     "notes": {
       "on": "AI notes",

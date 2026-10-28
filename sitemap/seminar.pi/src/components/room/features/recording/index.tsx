@@ -4,10 +4,15 @@
 // 전원 고지를 못 하면(sendApp 실패) 시작하지 않는다. 늦게 들어온 사람에게는 녹화 중인 발표자가 1초 묶음으로 다시 알린다(SIGNAL_API 3.6).
 // 고지는 fail-open 을 막으려고 시작·종료·재알림 모두 재시도(RATE_LIMITED·TIMEOUT)하고, 녹화 중에는 10초마다 현재 상태를 다시 보낸다(app-retry).
 // d 약속 : { recording: boolean } — 같은 state 주제의 다른 키(AI 기록 등)는 이 기능이 무시한다(rules.ts readRecording·applyRec)
+// 요금제(sql/023, 마스터 2026-10-29) — 세미나 방에서는 월간·연간 세미나 + 유료 남은 시간이 있을 때만 시작(서버 start 가 먼저 확인),
+//  녹화 중 30초마다 beat 로 룸 시간과 따로 유료 이용권에서 한 번 더 차감, 유료 시간이 다 되면 멈추고 파일 저장. 실험실 방(UUID 아님)은 계량 없음
 // 저장이 막히는 곳(앱 안 브라우저 등)을 위해 마지막 녹화 파일을 다음 녹화·퇴장·닫기 전까지 들고 [다시 저장](파일 공유 → 내려받기)을 띄운다
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
+import { piFetch } from '@pi/auth/client'
+import { readApi } from '@/lib/client-api'
+import { isUuid } from '@/lib/seminar-rules'
 import { BADGE_SLOT_ID, TOAST_SLOT_ID, featureStore, useStageSlot, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
 import { APP_RETRY, latestOnly, sendRetry } from '../../app-retry'
 import type { Recorder } from './recorder'
@@ -20,6 +25,48 @@ const latest = latestOnly() // 켜기·끄기 고지 엇갈림 방지 — 끄기
 // 끄기 고지(재시도) — 새 켜기 고지가 시작되면 멈춘다
 const sendOff = (ctx: RoomCtx) => void sendState(ctx, false, latest())
 const TOAST_MS = 3000
+
+// ── 녹화 계량(sql/023) ── 녹화 하트비트 간격(서버는 90초 이하 경과만 차감 — 백그라운드 타이머 지연 1분까지 여유)
+const METER_MS = 30_000
+let meterTimer: ReturnType<typeof setInterval> | null = null
+let meterSmn = '' // 계량 중인 세미나(없으면 계량 안 함)
+const meter = (smnId: string, act: 'start' | 'beat' | 'stop') =>
+  readApi<{ ok: true; paidSec: number; stop?: boolean }>(
+    piFetch(`/api/seminars/${smnId}/recording`, {
+      method: 'POST',
+      cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ act }),
+    }),
+  )
+// 시작 거절 사유 → room.recording.* 키
+const meterDeny = (code?: string) =>
+  code === 'REC_PAID_ONLY'
+    ? 'recording.paidOnly'
+    : code === 'PLAN_EXHAUSTED'
+      ? 'recording.planOut'
+      : code === 'REC_NOT_IN_ROOM'
+        ? 'recording.notInRoom'
+        : 'recording.meterFailed'
+// 계량 끝 — 타이머 정리 + 마지막 경과 차감(stop). 퇴장·끊김에서도 부른다
+function meterStop() {
+  if (meterTimer) clearInterval(meterTimer)
+  meterTimer = null
+  if (meterSmn) void meter(meterSmn, 'stop').catch(() => {})
+  meterSmn = ''
+}
+// 녹화 하트비트 — 유료 시간 소진(stop)·무료 구간·세미나 종료면 녹화를 멈추고 저장(파일은 지킨다). 네트워크 실패는 다음 번에 다시
+async function beatRec() {
+  const smn = meterSmn
+  if (!smn) return
+  const r = await meter(smn, 'beat').catch(() => null)
+  if (!r || smn !== meterSmn) return
+  const out = r.ok ? !!r.data.stop : ['PLAN_EXHAUSTED', 'REC_PAID_ONLY', 'SMN_CLOSED'].includes(r.body.code ?? '')
+  if (!out) return
+  const c = ctxNow?.() ?? null
+  c?.notice('recording.planOut')
+  void stopRec(c)
+}
 
 const recOn = featureStore(false) // 내가 녹화 중
 const startedAt = featureStore(0)
@@ -66,6 +113,7 @@ async function stopRec(ctx: RoomCtx | null, auto = false) {
   const rec = recorder
   if (!rec) return
   recorder = null
+  meterStop()
   busy.set(true)
   recOn.set(false)
   startedAt.set(0)
@@ -99,10 +147,19 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
   const g = gen
   busy.set(true)
   let started = false
+  const metered = isUuid(ctx.seminarId) // 세미나 방만 계량(실험실 방 제외)
+  let meterOn = false
   try {
     const mod = await import('./recorder')
     if (g !== gen) return
     if (!mod.canRecord()) return ctx.notice('recording.unsupported')
+    // 요금제 확인 + 계량 시작 — 무료 세미나·유료 시간 소진이면 고지 전에 멈춘다(서버가 정본)
+    if (metered) {
+      const m = await meter(ctx.seminarId, 'start').catch(() => null)
+      if (g !== gen) return
+      if (!m?.ok) return ctx.notice(meterDeny(m && !m.ok ? m.body.code : undefined))
+      meterOn = true
+    }
     // 먼저 전원에게 알린다 — 실패하면 시작하지 않는다(M-4)
     const cur = latest() // 앞 녹화의 끄기 재시도는 여기서 멈춘다
     const err = await sendState(ctx, true, () => g === gen && cur())
@@ -133,8 +190,15 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
     recOn.set(true)
     startedAt.set(Date.now())
     toast.set('started')
+    if (meterOn) {
+      meterSmn = ctx.seminarId
+      meterTimer = setInterval(() => void beatRec(), METER_MS)
+    }
   } finally {
-    if (!started) void ac.close().catch(() => {})
+    if (!started) {
+      void ac.close().catch(() => {})
+      if (meterOn) void meter(ctx.seminarId, 'stop').catch(() => {}) // 계량만 시작하고 녹화는 못 함 — 기준 시각을 지운다
+    }
     busy.set(false)
   }
 }
@@ -304,7 +368,9 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
           {t('confirm.title')}
         </h2>
         <p className="text-muted-foreground mb-2 text-sm">{t('confirm.body')}</p>
-        <p className="text-muted-foreground mb-4 text-xs">{t('confirm.download')}</p>
+        <p className="text-muted-foreground mb-2 text-xs">{t('confirm.download')}</p>
+        {/* 녹화 시간 추가 차감 고지(sql/023) — 세미나 방만 */}
+        {isUuid(ctx.seminarId) && <p className="text-warning mb-4 text-xs">{t('confirm.charge')}</p>}
         <div className="flex flex-wrap justify-end gap-2">
           <button type="button" onClick={() => confirmOpen.set(false)} className={`${btn} bg-surface-raised`}>
             {t('confirm.cancel')}

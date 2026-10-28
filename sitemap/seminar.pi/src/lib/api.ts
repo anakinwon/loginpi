@@ -53,6 +53,9 @@ export const apiError = createApiError({
   PLAN_EXHAUSTED: '세미나 이용 시간을 모두 썼습니다. 요금제에서 시간을 충전하세요',
   PLAN_AI_PAID: 'AI 기능은 유료 요금제에서 쓸 수 있습니다',
   PLAN_EXPIRES_BEFORE_START: '시작 일시가 이 요금제 이용권 만료 뒤입니다',
+  // 녹화(sql/023) — 로컬 저장, 월간·연간 세미나만, 녹화 시간 추가 차감
+  REC_PAID_ONLY: '녹화는 월간·연간 요금제 세미나에서 유료 시간이 남아 있을 때만 쓸 수 있습니다',
+  REC_NOT_IN_ROOM: '룸 입장 확인 중입니다. 잠시 뒤 다시 시도하세요',
   // 음성 처리(sql/008 fn_use_smn_vc 결과, src/lib/speech-rules.ts 매핑) — UI 문구에 외부 AI 상표 금지
   AI_UNAVAILABLE: 'AI 기능을 지금 쓸 수 없습니다',
   SPEECH_CHUNK_INVALID: '음성 조각 형식이 올바르지 않습니다',
