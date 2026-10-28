@@ -626,7 +626,7 @@
   "seminar": {
     "subTitle": {
       "label": "Subtitle",
-      "placeholder": "Add a subtitle — attendees see 'Island - Subtitle'",
+      "placeholder": "Add a subtitle",
       "save": "Save subtitle",
       "saving": "Saving…",
       "saved": "Saved."
@@ -696,8 +696,8 @@
   "host": {
     "title": "Create a seminar",
     "notAdmin": "Only admins can host seminars for now.",
-    "name": "The seminar name is picked automatically from famous islands of the world.",
-    "subTitle": "Subtitle (optional, up to 60) — attendees see 'Island - Subtitle'",
+    "name": "Let's travel to a beautiful island!",
+    "subTitle": "Subtitle (optional, up to 60)",
     "startAt": "Start time",
     "maxCnt": "Capacity (1–100)",
     "fee": "Seminar fee (Pi)",
