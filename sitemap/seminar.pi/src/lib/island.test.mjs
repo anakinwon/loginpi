@@ -76,3 +76,12 @@ test('구 엔진 예비 통로 — 채팅 표식으로 이름 변경, 일반 채
   assert.match(room, /request\('chat\.send', \{ text: NAME_MARK \+ name \}\)/)
   assert.match(room, /name: peersRef\.current\.get\(c\.peerId\)\?\.name \?\? c\.name/) // 채팅에도 바꾼 이름
 })
+
+// 회귀(2026-10-28 마스터) — 개최자가 이름을 바꾼 뒤 참가자가 다시 들어오면 예전 이름이 보였다(엔진 참가자 목록 = 입장 때 이름)
+test('바꾼 이름 — 새 참가자가 들어올 때마다 다시 알리고, 내가 다시 들어오면 그만', () => {
+  const room = readFileSync(new URL('../components/room/use-room.ts', import.meta.url), 'utf8')
+  const pj = room.slice(room.indexOf("e.m === 'peerJoined'"), room.indexOf("e.m === 'peerLeft'"))
+  assert.match(pj, /myNameRef\.current[\s\S]{0,200}broadcastName\(myNameRef\.current\)/)
+  const td = room.slice(room.indexOf('function teardown()'), room.indexOf('function teardown()') + 400)
+  assert.match(td, /myNameRef\.current = null/)
+})

@@ -135,6 +135,9 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
   const pubRef = useRef<RTCPeerConnection | null>(null)
   const subRef = useRef<RTCPeerConnection | null>(null)
   const localRef = useRef<MediaStream | null>(null) // 카메라·마이크
+  // 이번 접속 중에 바꾼 내 이름 — 엔진은 입장권 이름(바꾸기 전)을 새로 들어온 사람에게 주므로, 누가 들어올 때마다 다시 알린다
+  const myNameRef = useRef<string | null>(null)
+  const nameTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const screenRef = useRef<MediaStream | null>(null) // 화면공유(따로 — 끌 때 카메라를 건드리지 않게)
   const iceRef = useRef<RTCIceServer[]>([]) // 입장 때 받은 ICE — 승격·화면공유로 발행 PC 를 나중에 만들 때 쓴다
   // 응답 대기표 — 값은 응답(Env) 또는 null(나가기로 취소)을 받는 콜백. 콜백이 자기 타이머를 정리한다
@@ -401,6 +404,12 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
     } else if (e.m === 'peerJoined') {
       for (const p of (e.d as { peers: Peer[] }).peers ?? []) peersRef.current.set(p.peerId, p)
       commitPeers()
+      // 내가 이번 접속 중에 이름을 바꿨으면 새로 온 사람에게 다시 알린다(엔진 목록엔 예전 이름) — 여러 명이 몰려와도 0.5초 묶어 1번
+      if (myNameRef.current && !nameTimer.current)
+        nameTimer.current = setTimeout(() => {
+          nameTimer.current = undefined
+          if (myNameRef.current) void broadcastName(myNameRef.current)
+        }, 500)
     } else if (e.m === 'peerLeft') {
       for (const id of (e.d as { peerIds: string[] }).peerIds ?? []) peersRef.current.delete(id)
       commitPeers()
@@ -922,6 +931,12 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
       patchPeer(selfRef.current, { name })
       commitPeers()
     }
+    myNameRef.current = name
+    return broadcastName(name)
+  }
+
+  // 이름 알리기 — 신호(신 엔진) 먼저, 안 되면 채팅 표식(구 엔진)
+  async function broadcastName(name: string): Promise<string | null> {
     if (!(await sendApp('refresh', { what: 'name', name }))) return null
     // 구 엔진(app.send 없음) — 채팅 통로에 표식을 붙여 보낸다(받는 화면이 채팅에 넣지 않음). 채팅이 잠겨 있으면 실패
     try {
@@ -1001,6 +1016,10 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
   // 세션 전체 정리(leave·fail·끊김 공용) — 화면 상태(state·error)는 호출부가 정한다
   function teardown() {
     seqRef.current++
+    // 다시 들어오면 새 입장권에 별명이 실리므로(api/media/ticket) 다시 알릴 필요가 없다
+    myNameRef.current = null
+    clearTimeout(nameTimer.current)
+    nameTimer.current = undefined
     const ws = wsRef.current
     if (ws) {
       if (ws.readyState === WebSocket.OPEN) send({ t: 'req', id: nextId.current++, m: 'leave', d: {} })
