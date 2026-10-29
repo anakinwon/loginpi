@@ -38,10 +38,13 @@ export function buildTurns(rows, fromMs = Date.parse(DEFAULT_FROM)) {
 /**
  * 상태 판정(레코드 값만 봄 — 표·CLI·엑셀 공용) : 중단 > 대체됨 > 완료(ts_res 있음 ; loadRows 의 mid-turn 보정 ts_res_src='mid_turn' 포함)
  *   > 응답 없음(absorbed 인데 보정 안 됨 · incomplete = 세션이 턴 도중 끝남) > 진행 중(그 밖의 ts_res 없음 = 지금 실행 중인 세션의 마지막 턴)
+ * 중단 = 마지막 part 가 응답 없이 끊긴 것만(interrupted + incomplete 또는 ts_res 없음 — 로거가 응답 없는 중단 part 에 incomplete 를 같이 붙임).
+ *   interrupted 여도 마지막 part 가 응답으로 끝났으면 '중단 후 재개해 완료'라 완료(예 454cc053:27 — 중단 뒤 1,643자 최종 보고)
  */
 export const STATUS = { running: '진행 중', interrupted: '중단', noreply: '응답 없음', superseded: '대체됨', done: '완료' }   // 순서 = 상태 필터 선택지 순서
 export function turnStatus(t) {
-  const key = t.interrupted ? 'interrupted' : t.superseded ? 'superseded' : t.ts_res ? 'done' : t.absorbed || t.incomplete ? 'noreply' : 'running'
+  const cut = t.interrupted && (t.incomplete || !t.ts_res)
+  const key = cut ? 'interrupted' : t.superseded ? 'superseded' : t.ts_res ? 'done' : t.absorbed || t.incomplete ? 'noreply' : 'running'
   return { key, label: STATUS[key], resumable: key !== 'done' }
 }
 /** 미완료 전체(재수행 대상) = 진행 중 + 중단 + 응답 없음 */

@@ -27,6 +27,10 @@ test('turnStatus : 완료 · 진행 중 · 중단 · 대체됨 · 응답 없음'
   assert.equal(turnStatus(turns[4]).resumable, false)
   assert.equal(turnStatus({ ts_res: '2026-10-29T12:00:00+09:00', absorbed: true, ts_res_src: 'mid_turn' }).key, 'done')   // loadRows mid-turn 보정 반영
   assert.equal(turnStatus({ incomplete: true }).key, 'noreply')
+  // 중단 후 재개 : 마지막 part 가 응답으로 끝남 = 완료 / 앞 part 응답 뒤 마지막 part 가 응답 없이 끊김(ts_res 는 앞 part 값) = 중단
+  assert.equal(turnStatus({ interrupted: true, ts_res: '2026-10-29T07:08:32+09:00' }).key, 'done')
+  assert.equal(turnStatus({ interrupted: true, incomplete: true, ts_res: '2026-10-29T07:08:32+09:00' }).key, 'interrupted')
+  assert.equal(turnStatus({ interrupted: true, incomplete: true }).key, 'interrupted')
 })
 
 test('resolveTarget : # 번호 · 레코드 id · 세션 앞부분', () => {
