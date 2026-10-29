@@ -1,4 +1,4 @@
-# M3 경계 정밀화 — 진행 현황 (2026-10-26)
+# M3 경계 정밀화 — 진행 현황 (2026-10-26 · 2026-10-29 갱신 7절)
 
 > 기준 : `../../docs/PRD_02_ENGINE_DESIGN.md` 6절 M3 행 ①~⑦ · 통과 기준 "기능 회귀 0, 모듈 의존이 3.1절 구조와 일치"(PRD_01 5절 M3 행과 같음).
 > 원칙 : PRD_02 3.2 — M3 **동작 변경은 M2 실기기 확인 뒤**. 이번 단계는 관문 자동화·공백 점검·테스트·문서 정합만 했고 운영 코드는 바꾸지 않았다.
@@ -11,10 +11,10 @@
 | ① | 닫힘 연쇄 Transport→Producer/Consumer, Producer→Consumer | **구현** | `internal/bora/lifecycle.go:173` closePeer(① 내 Producer ② 내 Consumer ③ PC·할당기 ④ 표) · `:201` closeProducer(표 제거 → 닫기 → Consumer 정리 → `producerClosed`) · `:230` detachConsumer(레이어 Unsubscribe·RemoveTrack 재협상) | `bora/lifecycle_test.go:82·139`, `bora/cascade_test.go:18·68`(패널 범위·중복 닫기) |
 | ② | 늦은 합류자 상태 전달 | **구현** | `bora/lifecycle.go:279` initConsumer(일시정지면 Pause + `producerPaused`, 할당기에 레이어 활성·비트레이트) · `:292` producerInfos(join 응답) · `bora/room.go:211` 입장 시 기존 producer 구독 · `room.go:467` consumerCreated 직후 호출 | `bora/lifecycle_test.go:153`, `bora/cascade_test.go:85` TestLateJoinerState, `:125` TestJoinPausedProducerNotifyOrder(실제 Join 경로 알림 순서) |
 | ③ | Decision 4분류 + SeqRewriter(Drop/Sync) | **구현** | `internal/jeju/decision.go:11` Decision · `:39` decide(Drop → `seq.Drop`, 재개 게이트) · `internal/jeju/seqrewriter.go:26` Sync(옛 패킷 floor) · `:36` Drop(메움·접기) · `:54` Input | `jeju/seqrewriter_test.go`, `jeju/jeju_test.go`, `jeju/m3_test.go:188`(재전송 멱등·Sync 이전 Drop)·`:108`(일시정지 우선)·`:122`(이름) |
-| ④ | consume paused→resume(resume 즉시 키프레임) | **부분** | Consumer 쪽 완성 : `jeju/decision.go:74-81`(resume → resync + `requestKeyframe(NewConsumer)`), `jeju/replay.go:20`(paused 시작이면 재생 생략), `bora/lifecycle.go:141` ResumeConsumer. **공백** : 방이 만드는 Consumer 는 늘 `paused=false`(`bora/room.go:212`·`:355`), `ConsumerCreated.Paused` 를 채우지 않음(`room.go:463-466`), 공개 `Room.Consume(…, paused)`(`room.go:366`)는 호출자 없음 → 지금 `consumer.resume` 은 producer 일시정지 때만 의미가 있다 | `jeju/m3_test.go:74` TestResumeRequestsKeyframe(발표자 방향 PLI 확인), `jeju/seqrewriter_test.go:133` TestDecidePauseResume |
+| ④ | consume paused→resume(resume 즉시 키프레임) | **서버 쪽 완료(2026-10-29)** — paused 시작만 프로토콜 제안으로 보류(7절) | Consumer 쪽 완성 : `jeju/decision.go:74-81`(resume → resync + `requestKeyframe(NewConsumer)`), `jeju/replay.go:20`(paused 시작이면 재생 생략), `bora/lifecycle.go:141` ResumeConsumer. **공백** : 방이 만드는 Consumer 는 늘 `paused=false`(`bora/room.go:212`·`:355`), `ConsumerCreated.Paused` 를 채우지 않음(`room.go:463-466`), 공개 `Room.Consume(…, paused)`(`room.go:366`)는 호출자 없음(**2026-10-29 삭제**) → 지금 `consumer.resume` 은 producer 일시정지 때만 의미가 있다 | `jeju/m3_test.go:74` TestResumeRequestsKeyframe(발표자 방향 PLI 확인), `jeju/seqrewriter_test.go:133` TestDecidePauseResume |
 | ⑤ | 5.2 메시지 확정·`docs/SIGNAL_API.md` | **구현(문서 정합 완료)** | `internal/signal/envelope.go:24-65` 이름·오류 코드 · `../docs/SIGNAL_API.md` v1.0.1(2026-10-26 코드 기준 정정, 아래 3절) · `layersChanged`·`streamState`·`score`(`envelope.go:44-47`)는 정의만, 송신은 M4 | `signal/server_test.go` |
-| ⑥ | 레이어 비활성 감지 | **부분** | 판정 : `internal/santorini/activity.go:38` observe(500ms 주기, l 2초·상위 10초 연속) · `:77` Active(연속 + 1초 안 패킷) · `:80` Bitrate. 사용 : `bora/lifecycle.go:309` → `internal/bwe/allocator.go:150·160`(비활성 레이어 제외). **공백** : `jeju/decision.go:85` layerUsable 훅은 호출자 없음(LayerPolicy 가 직접 쓰지 않음) | `santorini/activity_test.go`, `santorini/inactive_test.go`(공개 Active·Bitrate), `jeju/m3_test.go:131` TestLayerUsable(없음·무패킷 = false, 실제 수신 경로로 2초 연속 패킷 = true) |
-| ⑦ | 표 형식 단위 테스트 + `-race` | **부분** | 표 형식 테스트 있음(위 열). **`-race` 미검증** — 이 PC 는 CGO 없음(race 검출기는 cgo 필요). CGO 가능한 PC·CI 에서 `go test -race ./...` 1회 필요 | — |
+| ⑥ | 레이어 비활성 감지 | **구현(2026-10-29)** | 판정 : `internal/santorini/activity.go:38` observe(500ms 주기, l 2초·상위 10초 연속) · `:77` Active(연속 + 1초 안 패킷) · `:80` Bitrate. 사용 : `bora/lifecycle.go:309` → `internal/bwe/allocator.go:150·160`(비활성 레이어 제외). ~~공백 : layerUsable 호출자 없음~~ → M4 에서 점수 입력(`jeju/score.go:76`)이 쓰고, 2026-10-29 LayerPolicy 목표(`jeju/layerpolicy.go` eff)도 비활성 레이어를 뺀다(7절) | `jeju/layerpolicy_test.go` TestSimulcastInactiveLayer, `santorini/activity_test.go`, `santorini/inactive_test.go`(공개 Active·Bitrate), `jeju/m3_test.go:131` TestLayerUsable(없음·무패킷 = false, 실제 수신 경로로 2초 연속 패킷 = true) |
+| ⑦ | 표 형식 단위 테스트 + `-race` | **부분(-race 만 남음)** | 표 형식 테스트 있음(위 열). **`-race` 미검증** — 이 PC 는 CGO 없음(race 검출기는 cgo 필요). CGO 가능한 PC·CI 에서 `go test -race ./...` 1회 필요 | — |
 
 ## 2. 관문 — 모듈 의존이 3.1절 구조와 일치
 
@@ -69,9 +69,9 @@
 
 | 일 | 이유·조건 |
 |---|---|
-| ④ Consumer 를 paused 로 만들고 `consumerCreated.paused:true` → 클라이언트 `consumer.resume` 뒤 송신 | 시험 화면이 `consumer.resume` 을 먼저 보내야 함(SIGNAL_API 4절). 지금 바꾸면 첫 화면 경로(캐시 재생)가 바뀐다 |
-| ⑥ `layerUsable` 을 LayerPolicy 전환 후보 선택에 연결하거나 삭제 | M4 전환 정책 실측과 함께. 지금은 할당기 쪽 비활성 제외만 동작 |
-| 사용하지 않는 공개 `Room.Consume`(`room.go:366`) 정리 | ④ 결정과 함께(paused 시작이면 이 경로를 쓸 수 있음) |
+| ④ Consumer 를 paused 로 만들고 `consumerCreated.paused:true` → 클라이언트 `consumer.resume` 뒤 송신 | 시험 화면이 `consumer.resume` 을 먼저 보내야 함(SIGNAL_API 4절). 지금 바꾸면 첫 화면 경로(캐시 재생)가 바뀐다 — **2026-10-29 재판정 : 프로토콜 변경이라 제안으로만(7절)** |
+| ~~⑥ `layerUsable` 을 LayerPolicy 전환 후보 선택에 연결하거나 삭제~~ | **완료(2026-10-29, 7절)** |
+| ~~사용하지 않는 공개 `Room.Consume` 정리~~ | **완료(2026-10-29 삭제, 7절)** — paused 시작을 하게 되면 방 고루틴 `consume(…, paused)` 로 충분 |
 | `BAD_REQUEST` 오류 코드 분리 | 프로토콜 변경(오류 코드 추가) — SIGNAL_API 개정 + 합의 |
 | `-race` 1회 실행 | CGO 가능한 환경 |
 
@@ -111,3 +111,28 @@
 - 문서 : `../docs/SIGNAL_API.md` v1.1.1 — 위 4건 + 서버가 강등된 사람 발행 PC 를 닫음, `peerJoined` = 받는 사람보다 뒤 입장자만, `peerLeft` 의 모르는 peerId 는 무시, 값 검사가 속도 제한보다 먼저.
 - 실행(Go windows/amd64) : `go vet ./...` 통과 · `go test -count=1 ./...` 15패키지 통과 · 새 시간 민감 시험 `-count=5` 통과(bora TestRoleSurvivesRejoin·TestRoomEndOrderAndReopen·TestReaction·TestPeerBatch, signal TestEndSessionOrder, `cmd/galapagos` TestV11Interactions). `-race` 미실행(CGO 없음). archtest 표 수정 없음·외부 의존 추가 없음.
 - 관찰 : 변이 시험 중 1회 `cmd/galapagos` TestLossT3Burst10 이 실패(역할 변이와 무관한 기존 손실 시험, 이후 전체 실행 통과) — 시간 민감 시험으로 기록만.
+
+## 7. M2 뒤 동작 변경(2026-10-29)
+
+M2 실기기 완료(2026-10-29)로 4절의 미룬 일을 재검토했다. 시그널링 메시지 형식·의미는 바꾸지 않았다(SIGNAL_API 개정 없음).
+
+| # | 한 일 | 위치 | 시험(되돌리면 실패 확인) |
+|---|---|---|---|
+| ⑥ | LayerPolicy 실제 목표 `eff()` = min(target, max) 이하에서 **가장 높은 활성 레이어**(없으면 0 — 할당기 `desired()` 와 같은 규칙). 효과 : 할당기에 들지 않는 **녹화 Consumer(최고 레이어 고정)** 가 발행자가 상위 레이어를 끊으면 멈추던 경로 → 낮은 레이어 키프레임 요청·다음 키프레임 경계에서 하향. 시청 Consumer 는 할당기가 이미 비활성 제외 목표를 주므로 동작 같음(할당기 주기 지연만 없어짐). 재상향은 santorini 의 상위 10초 연속 판정 그대로 | `internal/jeju/layerpolicy.go` layerSource `Active()`·eff | `jeju/layerpolicy_test.go` TestSimulcastInactiveLayer(h 비활성 → m 키프레임 요청·하향, 전부 비활성 = 0, 재활성 = 2). eff 의 활성 검사를 빼면 실패 |
+| ④ | 호출자 없는 공개 `Room.Consume` 삭제(방 고루틴 `consume(…, paused)` 는 유지) | `internal/bora/room.go` | 컴파일·bora 시험 |
+
+### 7.1 ④ paused 시작 — 프로토콜 제안(구현 안 함)
+
+웹 앱 `src/components/room/use-room.ts:377` 은 `consumerCreated.paused` 를 **"발표자가 일시정지함" 표시**로 해석하고(`pausedRef`), `consumer.resume` 을 보내지 않는다. 서버가 Consumer 를 paused 로 만들고 `paused:true` 를 보내면 ① 화면이 '일시정지' 로 보이고 ② 영상이 영영 흐르지 않는다 → 앱 변경 없이는 불가.
+제안(마스터·앱 합의 필요) : `consumerCreated` 에 새 필드(예 `startPaused`)를 더하거나 `paused` 의미를 "consumer 일시정지" 로 고정하고 producer 일시정지는 `producerPaused` 로만 알림 + 앱이 화면에 붙인 뒤 `consumer.resume` 송신. 이득은 보이지 않는 타일의 하류 대역 절감(M4 할당기와 겹침)이라 급하지 않다.
+
+### 7.2 ⑦ -race
+
+이 PC 는 여전히 CGO 불가(gcc·clang 없음, Docker 데몬 꺼짐) → 미실행. CGO 가능한 PC·CI 에서 `go test -race ./...` 1회 필요(남은 유일 항목).
+
+### 7.3 실행 결과(2026-10-29, Go 1.27.0 windows/amd64)
+
+- `go vet ./...` 통과 · `go test -count=1 ./...` **15패키지 전부 통과**(archtest 의존 관문 PASS — 새 간선 없음, 외부 의존 추가 없음). `TestSimulcast*` `-count=5` 통과.
+- 변이 확인(되돌림) : eff 의 `Active()` 검사를 빼면 TestSimulcastInactiveLayer 실패.
+- 관찰 : 다른 에이전트가 함께 돌던 첫 전체 실행에서 `cmd/galapagos` TestLossT7Upstream3("transport.publish 응답 없음")·TestV12Moderation(activeSpeaker 0건)이 각각 1회 실패 — 두 시험 모두 단독 실행·재실행에서 변경본·HEAD 원본 둘 다 통과, 변경과 무관한 시간 민감 시험으로 기록만.
+- 엔진 교체 : 동작 변경(⑥ 녹화 하향)이 엔진에 들어가므로 다음 엔진 빌드 때 함께 반영(급하지 않음 — 시청 경로는 할당기가 이미 같은 일을 함).
