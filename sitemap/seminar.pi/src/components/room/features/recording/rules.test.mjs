@@ -4,9 +4,10 @@ import assert from 'node:assert/strict'
 import { applyRec, fitRect, meetRect, othersRecording, pickMime, pruneRec, readRecording, recFileName, saveVia, stopToast } from './rules.ts'
 import { readFileSync } from 'node:fs'
 
-test('pickMime — 앞 후보 우선, iOS(mp4 만)·미지원', () => {
-  assert.equal(pickMime(() => true), 'video/webm;codecs=vp9,opus')
-  assert.equal(pickMime((m) => m.startsWith('video/mp4')), 'video/mp4;codecs=avc1,mp4a.40.2')
+test('pickMime — MP4(H.264/AAC) 우선(저장은 MP4, 마스터 2026-10-29), MP4 안 되면 webm·미지원', () => {
+  assert.equal(pickMime(() => true), 'video/mp4;codecs=avc1,mp4a.40.2')
+  assert.equal(pickMime((m) => m === 'video/mp4'), 'video/mp4') // 코덱 지정 없이만 됨
+  assert.equal(pickMime((m) => m.startsWith('video/webm')), 'video/webm;codecs=vp9,opus') // Firefox 등 — 끝낼 때 MP4 로 바꿈
   assert.equal(pickMime(() => false), '')
 })
 
@@ -80,9 +81,11 @@ test('stopToast — 자동 종료는 이유를 알리고, 토스트 키는 ko·e
   assert.equal(stopToast(10, false), 'saved')
   assert.equal(stopToast(10, true), 'autoStopped')
   assert.equal(stopToast(0, true), 'empty')
+  assert.equal(stopToast(10, false, true), 'savedOriginal') // MP4 로 못 바꿔 webm 저장
+  assert.equal(stopToast(10, true, true), 'autoStopped') // 자동 종료 이유가 먼저
   for (const l of ['ko', 'en']) {
     const m = JSON.parse(readFileSync(new URL(`../../../../../messages/${l}.json`, import.meta.url), 'utf8'))
-    for (const k of ['saved', 'autoStopped', 'empty', 'saveFailed']) assert.ok(m.room.recording.toast[k], `${l} ${k}`)
+    for (const k of ['saved', 'autoStopped', 'empty', 'saveFailed', 'savedOriginal', 'converting']) assert.ok(m.room.recording.toast[k], `${l} ${k}`)
   }
 })
 

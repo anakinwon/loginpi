@@ -1,13 +1,14 @@
 // 녹화(SA6) 순수 판정 — 형식 고르기·파일 이름·가운데 맞춤(녹화기), 녹화 고지 받기·배지 판정(화면), 다시 저장 방법.
 // import 없는 순수 함수만 둔다(node --test 로 바로 시험 : rules.test.mjs). 녹화기 본체(recorder.ts)는 처음 녹화할 때만 동적 import
 
-// 지원 형식 — 앞에서부터 처음 되는 것(iOS Safari 는 mp4 만). 없으면 '' = 브라우저 기본
+// 지원 형식 — 앞에서부터 처음 되는 것. 저장은 MP4(마스터 2026-10-29) — MP4(H.264/AAC) 녹화가 되면(Chrome 126+·Safari·Android) 처음부터 MP4,
+// 안 되는 브라우저(Firefox 등)만 webm 으로 녹화하고 끝낼 때 MP4 로 바꾼다(to-mp4.ts). 없으면 '' = 브라우저 기본
 export const MIME_CANDIDATES = [
+  'video/mp4;codecs=avc1,mp4a.40.2',
+  'video/mp4',
   'video/webm;codecs=vp9,opus',
   'video/webm;codecs=vp8,opus',
   'video/webm',
-  'video/mp4;codecs=avc1,mp4a.40.2',
-  'video/mp4',
 ] as const
 
 export function pickMime(isSupported: (m: string) => boolean): string {
@@ -72,9 +73,10 @@ export function pruneRec(by: RecBy, peers: readonly { peerId: string; role: stri
   return Object.fromEntries(keep.map((id) => [id, true] as const))
 }
 
-// 종료 토스트 — 저장한 파일이 없으면 empty, 자동 종료(브라우저 녹화 중단·메모리 상한)면 이유를 알린다(전에는 '저장했어요'만 떠 왜 멈췄는지 몰랐다)
-export function stopToast(size: number, auto: boolean): 'saved' | 'autoStopped' | 'empty' {
-  return !size ? 'empty' : auto ? 'autoStopped' : 'saved'
+// 종료 토스트 — 저장한 파일이 없으면 empty, 자동 종료(브라우저 녹화 중단·메모리 상한)면 이유를 알린다(전에는 '저장했어요'만 떠 왜 멈췄는지 몰랐다).
+// kept = MP4 로 바꾸지 못해 원래 형식(webm)으로 저장함
+export function stopToast(size: number, auto: boolean, kept = false): 'saved' | 'autoStopped' | 'empty' | 'savedOriginal' {
+  return !size ? 'empty' : auto ? 'autoStopped' : kept ? 'savedOriginal' : 'saved'
 }
 
 // 다시 저장 방법 — 파일 공유(앱 안 브라우저·모바일에서 '파일에 저장' 가능)가 되면 share, 아니면 <a download>. 기능 탐지만(UA 판정 금지)

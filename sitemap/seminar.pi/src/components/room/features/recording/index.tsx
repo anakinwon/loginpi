@@ -1,6 +1,6 @@
 'use client'
 // 녹화(로컬 저장, SA6 — 설계서 15.6·계획서 M-4) — 발표자만 ⋯ [녹화 시작] → 고지 확인 대화상자 → 전원에게 state{recording:true} → 무대 합성 녹화.
-// 끄면 state{recording:false} + 파일 다운로드(seminar-<id>-<시각>.webm|mp4). 받는 쪽은 빨간 '녹화 중' 배지(자동 숨김 없음) + 3초 토스트.
+// 끄면 state{recording:false} + MP4 파일 다운로드(seminar-<id>-<시각>.mp4 — webm 녹화는 끝낼 때 MP4 로 바꿈, to-mp4.ts). 받는 쪽은 빨간 '녹화 중' 배지(자동 숨김 없음) + 3초 토스트.
 // 전원 고지를 못 하면(sendApp 실패) 시작하지 않는다. 늦게 들어온 사람에게는 녹화 중인 발표자가 1초 묶음으로 다시 알린다(SIGNAL_API 3.6).
 // 고지는 fail-open 을 막으려고 시작·종료·재알림 모두 재시도(RATE_LIMITED·TIMEOUT)하고, 녹화 중에는 10초마다 현재 상태를 다시 보낸다(app-retry).
 // d 약속 : { recording: boolean } — 같은 state 주제의 다른 키(AI 기록 등)는 이 기능이 무시한다(rules.ts readRecording·applyRec)
@@ -79,6 +79,7 @@ const lastSaved = featureStore(false) // 다시 저장할 마지막 녹화 파�
 const paused = featureStore(false)
 const pausedAt = featureStore(0) // 지금 멈춘 시각(멈춤 중일 때)
 const pausedSum = featureStore(0) // 지난 멈춤 합(ms)
+const converting = featureStore<number | null>(null) // MP4 로 바꾸는 중 진행률(0~100), 아니면 null
 
 // 지금 녹화 중인가(나 또는 다른 발표자) — 다른 기능이 녹화 동안 화면 요소를 감출 때(예 남은 시간 카운트다운, 마스터 2026-10-29)
 export function useRecordingNow() {
@@ -126,20 +127,47 @@ async function stopRec(ctx: RoomCtx | null, auto = false) {
   startedAt.set(0)
   // 종료 알림은 파일 저장을 기다리지 않고 먼저 — 한도에 걸리면 다시 보낸다(사이에 새 녹화가 시작되면 그만). 역할을 잃었으면 엔진이 거절하고 받는 쪽이 역할로 내린다
   if (ctx) sendOff(ctx)
+  const g = gen
+  // 저장이 끝날 때까지 탭 닫기 경고 — 모듈에서 건다(퇴장·끊김으로 Overlay 가 사라져도 webm → MP4 변환 중 녹화를 잃지 않게)
+  const warn = (e: BeforeUnloadEvent) => e.preventDefault()
+  window.addEventListener('beforeunload', warn)
   try {
-    const blob = await rec.stop()
+    let blob = await rec.stop()
+    let name = fileName
     if (blob.size) {
-      ;(await import('./recorder')).saveBlob(blob, fileName)
-      // 퇴장·끊김(ctx 없음)이면 들지 않는다 — 룸을 떠나면 다시 저장 단추도 없다
-      if (ctx && typeof File !== 'undefined') {
-        lastFile = new File([blob], fileName, { type: blob.type })
+      const mod = await import('./recorder')
+      // MP4 로 저장(마스터 2026-10-29) — webm 녹화만 바꾸고, 바꾸면 원본 Blob 은 놓는다(webm 원본을 남기지 않음). 못 바꾸면 원본 저장(녹화를 잃지 않게)
+      let mp4: Blob | null = null
+      if (!blob.type.includes('mp4')) {
+        converting.set(0)
+        const src = blob
+        mp4 = await import('./to-mp4')
+          .then((m) =>
+            m.toMp4(src, mod.VIDEO_BPS, (p) => {
+              const n = Math.floor(p * 100)
+              if (n !== converting.get()) converting.set(n) // 1% 단위로만 다시 그린다
+            }),
+          )
+          .catch(() => null)
+        converting.set(null)
+      }
+      if (mp4?.size) {
+        blob = mp4
+        name = fileName.replace(/\.webm$/, '.mp4')
+      }
+      mod.saveBlob(blob, name)
+      // 퇴장·끊김(ctx 없음)이면 들지 않는다 — 룸을 떠나면 다시 저장 단추도 없다. 바꾸는 사이 나갔어도(gen 바뀜) 들지 않는다
+      if (ctx && g === gen && typeof File !== 'undefined') {
+        lastFile = new File([blob], name, { type: blob.type })
         lastSaved.set(true)
       }
     }
-    toast.set(stopToast(blob.size, auto))
+    toast.set(stopToast(blob.size, auto, !name.endsWith('.mp4')))
   } catch {
     toast.set('saveFailed')
   } finally {
+    window.removeEventListener('beforeunload', warn)
+    converting.set(null)
     busy.set(false)
   }
 }
@@ -275,6 +303,7 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const by = useStore(recBy)
   const msg = useStore(toast)
   const canResave = useStore(lastSaved)
+  const conv = useStore(converting)
   const [now, setNow] = useState(0)
   const { r, role, hold } = ctx
   const ids = new Set(r.peers.map((p) => p.peerId))
@@ -305,7 +334,7 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     return () => clearTimeout(timer)
   }, [msg]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 녹화 중 탭 닫기·새로 고침 — 메모리의 조각을 잃으므로 경고
+  // 녹화 중 탭 닫기·새로 고침 — 메모리의 조각을 잃으므로 경고(종료 뒤 저장까지는 stopRec 이 건다)
   useEffect(() => {
     if (!mine) return
     const warn = (e: BeforeUnloadEvent) => e.preventDefault()
@@ -415,6 +444,15 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
             >
               <span aria-hidden>×</span>
             </button>
+          </div>,
+          toastSlot,
+        )}
+      {/* MP4 로 바꾸는 중 — 낭독은 문구 한 번만(진행률 숫자는 aria-hidden) */}
+      {conv !== null &&
+        toastSlot &&
+        createPortal(
+          <div role="status" className="bg-surface-raised max-w-[92%] rounded-xl px-4 py-2 text-sm shadow">
+            {t('toast.converting')} <span aria-hidden className="tabular-nums">{conv}%</span>
           </div>,
           toastSlot,
         )}

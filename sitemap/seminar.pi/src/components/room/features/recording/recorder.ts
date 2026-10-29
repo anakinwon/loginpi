@@ -6,12 +6,14 @@
 import { ticker } from '../../ticker'
 import { fitRect, meetRect, pickMime } from './rules'
 
+// 영상 비트레이트 — webm 으로 녹화된 것을 MP4 로 다시 인코딩할 때도 같은 값(to-mp4.ts)
+export const VIDEO_BPS = 1_500_000
 const R = {
   w: 1280, // 녹화 화면 크기 — 무대 비율과 달라도 가운데 맞춤(남는 곳은 검정)
   h: 720,
   fps: 30,
   sliceMs: 1000, // 1초 조각
-  videoBps: 1_500_000,
+  videoBps: VIDEO_BPS,
   // 메모리 안전 상한 — 조각을 메모리에 모으므로 넘으면 자동 종료·저장(탭이 메모리 부족으로 죽으면 녹화 전체를 잃는다).
   // 1.5Mbps 기준 약 3시간. ponytail: 고정값 — 기기 메모리별 조정이 필요하면 navigator.deviceMemory 로 낮추기
   maxBytes: 2 * 1024 ** 3,

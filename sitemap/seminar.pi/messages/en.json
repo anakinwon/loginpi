@@ -576,7 +576,7 @@
       "confirm": {
         "title": "Start recording?",
         "body": "When recording starts, everyone will see a 'Recording' indicator. The file is saved only on this device and is never uploaded or transferred abroad. Please tell participants before you start.",
-        "download": "When you stop, the file is saved to your downloads folder. In-app browsers may block file saving, so record from a regular browser on a computer.",
+        "download": "When you stop, an MP4 file is saved to your downloads folder (browsers that cannot record MP4 take a moment to convert it; recordings longer than about 45 minutes may be kept in their original format). In-app browsers may block file saving, so record from a regular browser on a computer.",
         "cancel": "Cancel",
         "start": "Start recording",
         "charge": "While recording, recording time is deducted from your paid time in addition to room time (2x while recording). When paid time runs out, recording stops and the file is saved."
@@ -592,6 +592,8 @@
         "autoStopped": "Recording ended because the browser stopped it or the size limit was reached. Everything up to that point was saved. Start recording again to continue.",
         "empty": "Nothing was recorded, so no file was created.",
         "saveFailed": "Could not create the recording file.",
+        "converting": "Converting the recording to MP4. Please keep this window open.",
+        "savedOriginal": "Could not convert to MP4, so the recording was saved in its original format (webm). Check your downloads folder.",
         "startedBy": "The presenter started recording",
         "stoppedBy": "The presenter stopped recording"
       },
