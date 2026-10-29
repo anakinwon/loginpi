@@ -15,15 +15,17 @@ import (
 
 // fakeLayer — SR·캐시·키프레임 요청 기록.
 type fakeLayer struct {
-	sr    santorini.SR
-	hasSR bool
-	cache *nack.PacketCache
-	reqs  int
+	sr       santorini.SR
+	hasSR    bool
+	cache    *nack.PacketCache
+	reqs     int
+	inactive bool // 비활성 레이어 흉내(기본 활성)
 }
 
 func (f *fakeLayer) LastSR() (santorini.SR, bool) { return f.sr, f.hasSR }
 func (f *fakeLayer) Cache() *nack.PacketCache     { return f.cache }
 func (f *fakeLayer) RequestKeyframe(pli.Reason)   { f.reqs++ }
+func (f *fakeLayer) Active() bool                 { return !f.inactive }
 
 func newFakes() [3]*fakeLayer {
 	var fs [3]*fakeLayer
@@ -124,6 +126,38 @@ func TestSimulcastDeficientDowngradeBlocks(t *testing.T) {
 	// 하향은 목표 ≤ l < 현재 → 먼저 온 m 키프레임으로도 내려간다(REA_03 5.5), 차단 해제
 	if d, sw := p.Decide(store(fs[1], 1, 300, 0, true, t0), true); d != Forward || sw == nil || sw.To != 1 || p.blocked {
 		t.Errorf("m 키프레임 하향 : %v %+v blocked=%v", d, sw, p.blocked)
+	}
+}
+
+// TestSimulcastInactiveLayer — M3 ⑥ : 비활성 레이어는 목표에서 빠진다(할당기 밖 녹화 Consumer 멈춤 방지).
+func TestSimulcastInactiveLayer(t *testing.T) {
+	fs := newFakes()
+	for i := range fs {
+		fs[i].sr, fs[i].hasSR = santorini.SR{NTP: 1000 * ntpSec, RTPTime: 0}, true
+	}
+	p := policyOf(fs)
+	t0 := time.Now()
+	p.Decide(store(fs[2], 2, 100, 0, true, t0), true) // h 로 시작(목표 = 최고 레이어 고정)
+	fs[2].inactive = true                             // 발행자가 h 를 끊음
+	if cur, _, _ := p.State(); cur != 2 {
+		t.Fatalf("현재 레이어 %d, 기대 2", cur)
+	}
+	before := fs[1].reqs
+	if d, _ := p.Decide(store(fs[0], 0, 500, 0, false, t0), true); d != SilentDrop || fs[1].reqs <= before {
+		t.Errorf("h 비활성 → m 키프레임 요청 : %v 요청 %d→%d", d, before, fs[1].reqs)
+	}
+	if d, sw := p.Decide(store(fs[1], 1, 300, 0, true, t0), true); d != Forward || sw == nil || sw.To != 1 {
+		t.Errorf("m 키프레임에서 하향 : %v %+v", d, sw)
+	}
+	// 전부 비활성이면 l(0) 이 목표 — 레이어 0 보장
+	fs[1].inactive, fs[0].inactive = true, true
+	if e := p.eff(); e != 0 {
+		t.Errorf("전부 비활성 목표 %d, 기대 0", e)
+	}
+	// h 가 다시 활성(10초 연속은 santorini 가 판정) → 목표 복귀
+	fs[2].inactive = false
+	if e := p.eff(); e != 2 {
+		t.Errorf("h 재활성 목표 %d, 기대 2", e)
 	}
 }
 

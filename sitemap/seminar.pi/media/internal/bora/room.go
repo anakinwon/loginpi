@@ -417,23 +417,6 @@ func (r *Room) produce(peerID, mid string, kind santorini.Kind, src santorini.So
 	return pr, e
 }
 
-// Consume — 구독 PC 에 출력 트랙 추가 + ntf consumerCreated(다음 offer 때) + 연결 뒤 레이어 Subscribe.
-func (r *Room) Consume(peerID, producerID string, paused bool) (*jeju.Consumer, *signal.Error) {
-	var c *jeju.Consumer
-	e := r.call(func() *signal.Error {
-		p, pr := r.peers[peerID], r.producers[producerID]
-		if p == nil || pr == nil {
-			return signal.Errf(signal.CodeNotFound, "참가자 또는 producer 없음")
-		}
-		if err := r.consume(p, pr, paused); err != nil {
-			return err
-		}
-		c = p.announce[len(p.announce)-1]
-		return nil
-	})
-	return c, e
-}
-
 // lateSink — sender 를 먼저 만들어야 출력 SSRC 를 알 수 있어서, Consumer 를 나중에 꽂는 RTCP 수신자.
 type lateSink struct{ c atomic.Pointer[jeju.Consumer] }
 

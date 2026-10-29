@@ -27,6 +27,7 @@ type layerSource interface {
 	LastSR() (santorini.SR, bool)
 	Cache() *nack.PacketCache
 	RequestKeyframe(r pli.Reason)
+	Active() bool // 비활성 감지(santorini activity) — 비활성 레이어는 목표에서 뺀다(M3 ⑥)
 }
 
 // newPolicy — Consumer 생성 시 정책 선택. 음성은 레이어 1개라 그대로 전달, 영상은 simulcast 정책(레이어 1개여도 동작).
@@ -89,11 +90,18 @@ func newSimulcast(layer func(int8) layerSource) *simulcast {
 	return &simulcast{layer: layer, current: -1, target: topLayer, max: topLayer, pendingMax: -1}
 }
 
-// eff — 실제 목표 = min(target, max).
+// eff — 실제 목표 = min(target, max) 이하에서 가장 높은 활성 레이어(없으면 0 — 할당기 desired 와 같은 규칙, M3 ⑥).
+// 할당기에 들지 않는 녹화 Consumer 도 발행자가 상위 레이어를 끊으면 다음 키프레임 경계에서 내려간다(멈춤 방지).
 func (s *simulcast) eff() int8 {
 	e := s.target
 	if s.max < e {
 		e = s.max
+	}
+	for e > 0 {
+		if l := s.layer(e); l != nil && l.Active() {
+			break
+		}
+		e--
 	}
 	if e < 0 {
 		e = 0
