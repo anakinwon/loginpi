@@ -84,6 +84,32 @@ export function resolveTarget(turns, input) {
   return { turn: hits[0], no: turns.indexOf(hits[0]) + 1 }   // turns 가 최신순이라 hits[0] = 최신 턴
 }
 
+const CONT_RE = /^(이어서|계속|다시|마저|재시도|continue|go on|resume|retry)/i   // 이어가기 재지시 첫머리
+const SHORT_REQ = 15                                                        // 이 글자 수 이하 = 짧은 재지시
+const words = s => new Set(String(s || '').toLowerCase().match(/[\p{L}\p{N}_]{2,}/gu) || [])
+/**
+ * 후속 처리 추정 = '후속 처리됨 [확인중]' 보조 표시 : 상태 키(중단 등)는 그대로 두고 미완료 턴에만, 같은 세션의 바로 다음 1~3턴만 본다
+ * 근거 필드(레코드에 있는 것만) : req_head(요청 머리글) · req_chars(요청 글자 수) · tags(유형 판정 — GIT·DEPLOY)
+ *   ① 다음 턴 req_head 가 이어가기 말('이어서'·'계속'·'다시' …)로 시작  ② req_chars ≤ 15 짧은 재지시('[Image …' 같은 첨부만은 제외)
+ *   ③ 다음 턴 req_head 가 원 요청 머리 앞 20자로 시작 = 같은 요청 다시 입력  ④ 다음 턴 tags 에 GIT·DEPLOY + 원 req_head 와 핵심어(2글자+) 겹침
+ * 커밋 메시지는 레코드에 없어 ④는 요청문 핵심어로 대신한다(ponytail: 조사 붙은 한국어 낱말은 안 겹침 — 형태소 분석이 필요해지면 그때)
+ * → { id: '<세션8자>:<턴>', why } 또는 null
+ */
+export function followUp(turns, t) {
+  if (!turnStatus(t).resumable) return null
+  const head = (t.req_head || '').replace(/…$/, '').trim(), kw = words(head), at = Date.parse(t.ts_req)
+  const next = turns.filter(x => x.session_id === t.session_id && Date.parse(x.ts_req) > at).sort((a, b) => Date.parse(a.ts_req) - Date.parse(b.ts_req)).slice(0, 3)
+  for (const x of next) {
+    const h = (x.req_head || '').trim(), id = `${x.session}:${x.turn}`
+    if (CONT_RE.test(h)) return { id, why: '이어가기 재지시' }
+    if (x.req_chars != null && x.req_chars <= SHORT_REQ && !h.startsWith('[')) return { id, why: '짧은 재지시' }
+    if (head.length >= 10 && h.startsWith(head.slice(0, 20))) return { id, why: '같은 요청 다시 입력' }
+    if ((x.tags || []).some(g => g === 'GIT' || g === 'DEPLOY') && [...words(h)].some(w => kw.has(w))) return { id, why: '커밋·배포 턴이 같은 핵심어' }
+  }
+  return null
+}
+export const FOLLOW_LABEL = '후속 처리됨 [확인중]'
+
 /** 세션이 살아 있는지 : 프로세스는 확인 불가라 기록 파일 수정 시각 + 같은 세션의 뒤 요청 유무로 추정 */
 export function judgeLiveness({ mtimeMs, now = Date.now(), laterTurns = 0 }) {
   if (mtimeMs == null) return { live: false, text: '세션 기록 파일 없음 — 같은 세션 이어가기 불가, 새 세션으로 재실행' }
