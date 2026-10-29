@@ -45,7 +45,7 @@ export interface Feature {
   steps: FeatureStep[]
 }
 
-export const PROGRESS_UPDATED = '2026-10-29'
+export const PROGRESS_UPDATED = '2026-10-30'
 
 export const FEATURES: Feature[] = [
   {
@@ -103,7 +103,7 @@ export const FEATURES: Feature[] = [
         status: 'doing',
         stage: 'M3',
         ref: ['mediasoup'],
-        note: 'gate ✓ · v1.2 ✓',
+        note: 'gate ✓ · v1.2 ✓ · v1.3.3 ✓',
       },
       // M4 청중 30 시험 = 마스터 결정 2026-10-29 생략(테스터 30명 모집 불가) — 통과가 아니라 면제
       {
@@ -119,7 +119,7 @@ export const FEATURES: Feature[] = [
         status: 'doing',
         stage: 'M5',
         ref: ['Galène', 'LiveKit'],
-        note: 'ticket·status ✓ · device …',
+        note: 'ticket·status ✓ · host-away ✓ · device …',
       },
       // 룸 화면(S3·S4) — UI 설계서 v1.0(c16bc230) → M1~M2(a7affafb) → v1.1·v1.2(8eed64d2·74e2c7cd), 브라우저 QA ✓
       {
@@ -148,7 +148,7 @@ export const FEATURES: Feature[] = [
     id: 'F03',
     prio: 'P0',
     steps: [
-      // 완료 = 마스터 판정(2026-10-29), Pi Browser 실기기 검증은 대기(device …)
+      // 완료 = 마스터 판정(2026-10-29), Pi Browser 실기기 ✓(마스터 2026-10-29)
       {
         id: 'list',
         status: 'done',
@@ -191,7 +191,7 @@ export const FEATURES: Feature[] = [
     prio: 'P2',
     steps: [{ id: 'vod', status: 'drop' }], // 마스터 결정 2026-10-29 드롭,
   },
-  // 회의 부가 기능(v2) — 구현·검토·야간 E2E r1~r6 완료(master 4f322641), 실기기 대기. 정본 ROADMAP Phase X
+  // 회의 부가 기능(v2) — 구현·검토·야간 E2E r1~r6 완료(master 4f322641), 엔진 1f23d219 교체(2026-10-30), 실기기 대기. 정본 ROADMAP Phase X
   {
     id: 'FU',
     prio: 'P1',
@@ -200,7 +200,7 @@ export const FEATURES: Feature[] = [
         id: 'appRelay',
         status: 'doing',
         ref: ['Jitsi', 'LiveKit'],
-        note: 'v1.3.2 ✓ · QA ✓ · engine swap …',
+        note: 'v1.3.3 ✓ · QA ✓ · engine ✓ · device …',
       },
       // 남은 막힘 없음(DB·QA·키) — 완료, 마이크 동의 화면 실기기는 대기(device …)
       {
@@ -243,7 +243,7 @@ export const FEATURES: Feature[] = [
         id: 'liveCaptions',
         status: 'doing',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · engine … · key ✓ · device …',
+        note: 'QA ✓ · engine ✓ · key ✓ · device …',
       },
     ],
   },
@@ -294,7 +294,7 @@ export const FEATURES: Feature[] = [
         id: 'aiNotes',
         status: 'doing',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · key ✓ · device …',
+        note: 'QA ✓ · engine ✓ · key ✓ · bucket ✓ · device …',
       },
     ],
   },
@@ -306,7 +306,7 @@ export const FEATURES: Feature[] = [
         id: 'inPersonNotes',
         status: 'doing',
         ref: ['seminar.pi'],
-        note: 'QA ✓ · key ✓ · device …',
+        note: 'QA ✓ · key ✓ · STT v2 ✓ · M/F speakers ✓ · device …',
       },
     ],
   },
@@ -318,7 +318,7 @@ export const FEATURES: Feature[] = [
         id: 'captionTranslate',
         status: 'doing',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · engine … · key ✓ · device …',
+        note: 'QA ✓ · engine ✓ · key ✓ · device …',
       },
     ],
   },
@@ -330,7 +330,7 @@ export const FEATURES: Feature[] = [
         id: 'dubbing',
         status: 'doing',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · engine … · key ✓ · device …',
+        note: 'QA ✓ · engine ✓ · key ✓ · device …',
       },
     ],
   },
