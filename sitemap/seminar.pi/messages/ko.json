@@ -16,6 +16,7 @@
   "auth": {
     "checking": "로그인 확인 중…",
     "signedIn": "{name} 님",
+    "inPerson": "대면 노트",
     "required": "Pi 계정 로그인이 필요합니다.",
     "signIn": "Pi로 로그인",
     "openInPiBrowser": "Pi Browser에서 열면 Pi 계정으로 로그인할 수 있습니다.",

@@ -24,6 +24,12 @@ export function AuthStatus() {
   if (user)
     return (
       <span className="flex items-center gap-2 text-sm">
+        {/* 대면 노트는 ADMIN 만(서버 POST 도 403) — 표시 게이팅만, 화면 자체도 클라이언트 게이트 */}
+        {(user.role === 'ADMIN' || user.role === 'MASTER') && (
+          <Link href="/notes/new" className="hover:underline">
+            {t('inPerson')}
+          </Link>
+        )}
         <Link href="/link" className="hover:underline">
           {t('signedIn', { name: user.displayName || user.username || '' })}
         </Link>

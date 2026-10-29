@@ -16,6 +16,7 @@
   "auth": {
     "checking": "Checking sign-in…",
     "signedIn": "{name}",
+    "inPerson": "In-person notes",
     "required": "Please sign in with your Pi account.",
     "signIn": "Sign in with Pi",
     "openInPiBrowser": "Open this page in Pi Browser to sign in with your Pi account.",
