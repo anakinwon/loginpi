@@ -1,7 +1,7 @@
 // 요청 재수행 공용 함수 시험 — node:test (pnpm test). 대시보드 # 번호 → 턴 해석, 상태 판정, 세션 생존 추정, 재수행 명령 조립
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildTurns, resolveTarget, turnStatus, judgeLiveness, buildCommand } from '../scripts/work-history-rows.mjs'
+import { buildTurns, resolveTarget, turnStatus, judgeLiveness, buildCommand, isInterruptMarker, followUp } from '../scripts/work-history-rows.mjs'
 
 const SID_A = 'aaaa1111-0000-0000-0000-000000000001', SID_B = 'bbbb2222-0000-0000-0000-000000000002'
 const rec = (sid, turn, part, ts, extra = {}) => ({ id: `${sid}:${turn}.${part}`, session: sid.slice(0, 8), session_id: sid, turn, part, ts_req: ts, ts_res: null, req_head: `요청 ${turn}`, ...extra })
@@ -57,4 +57,39 @@ test('buildCommand : 같은 세션 이어가기 · 새 세션 재실행', () => 
   assert.deepEqual(r.args.slice(0, 3), ['--resume', SID_B, '--fork-session'])
   const n = buildCommand({ turn: turns[0], mode: 'new', cwd: '/w', print: true, request: '원 요청문' })
   assert.equal(n.args[0], '-p'); assert.match(n.args.at(-1), /원 요청문/); assert.ok(!n.args.includes('--resume'))
+})
+
+test('중단 표식 턴 : 목록에서 빼고 그 id 는 앞 턴 안내 (양성) · 표식 뒤에 글이 있는 일반 요청은 유지 (음성)', () => {
+  const SID_C = 'cccc3333-0000-0000-0000-000000000003'
+  const ts = buildTurns([
+    rec(SID_C, 26, 1, '2026-10-28T06:42:44+09:00', { interrupted: true, incomplete: true, req_head: '초대 링크 주소 변경' }),
+    rec(SID_C, 27, 1, '2026-10-28T06:46:34+09:00', { req_head: '[Request interrupted by user for tool use]' }),
+    rec(SID_C, 28, 1, '2026-10-28T06:48:00+09:00', { ts_res: '2026-10-28T06:49:00+09:00', req_head: '[Request interrupted by user] 뒤에 이어서 질문' }),
+  ], 0)
+  assert.deepEqual(ts.map(t => t.turn), [28, 26])
+  const r = resolveTarget(ts, 'cccc3333:27')
+  assert.match(r.error, /중단 표식 — 실제 요청은 cccc3333:26/)
+  assert.equal(r.candidates[0].turn, 26)
+  assert.equal(resolveTarget(ts, 'cccc3333:28').turn.turn, 28)
+  assert.equal(isInterruptMarker(' [Request interrupted by user] '), true)
+  assert.equal(isInterruptMarker('[Request interrupted by user] 계속'), false)
+})
+
+test('followUp : 다음 1~3턴 이어가기 신호면 후속 처리됨 (양성) · 신호 없음·4턴 뒤·완료 턴은 null (음성)', () => {
+  const S = 'dddd4444-0000-0000-0000-000000000004'
+  const at = m => `2026-10-28T07:${String(m).padStart(2, '0')}:00+09:00`
+  const cut = { interrupted: true, incomplete: true }
+  const mk = (head, next) => buildTurns([rec(S, 1, 1, at(0), { ...cut, req_head: head }), ...next.map((x, i) => rec(S, i + 2, 1, at(i + 1), { ts_res: at(i + 1), req_chars: 40, ...x }))], 0)
+  const fu = ts => followUp(ts, ts.at(-1))   // 최신순 → 마지막 = 원 요청(턴 1)
+  assert.deepEqual(fu(mk('초대 링크 주소를 운영 도메인으로 변경', [{ req_head: '이어서 해 줘' }])), { id: 'dddd4444:2', why: '이어가기 재지시' })
+  assert.equal(fu(mk('초대 링크 주소를 운영 도메인으로 변경', [{ req_head: '응', req_chars: 1 }])).why, '짧은 재지시')
+  assert.equal(fu(mk('개최자 본인화면 좌우 반전', [{ req_head: '개최자 본인화면 좌우 반전, 이유가 있나?' }])).why, '같은 요청 다시 입력')
+  assert.equal(fu(mk('초대 링크 주소 변경', [{ req_head: '다른 기능' }, { req_head: '링크 고친 것 배포해', tags: ['DEPLOY'] }])).id, 'dddd4444:3')
+  // 음성
+  assert.equal(fu(mk('초대 링크 주소 변경', [{ req_head: '거울 보기 끄는 옵션 넣고 모두 배포해줘', tags: ['DEPLOY'] }])), null)   // 배포 턴이지만 핵심어 안 겹침
+  assert.equal(fu(mk('초대 링크 주소 변경', [{ req_head: '[Image #2]', req_chars: 10 }])), null)                                // 첨부만은 짧은 재지시 아님
+  assert.equal(fu(mk('초대 링크 주소 변경', [{ req_head: 'A 기능' }, { req_head: 'B 기능' }, { req_head: 'C 기능' }, { req_head: '계속' }])), null)   // 4턴 뒤는 안 봄
+  const done = buildTurns([rec(S, 1, 1, at(0), { ts_res: at(0) }), rec(S, 2, 1, at(1), { req_head: '계속' })], 0)
+  assert.equal(followUp(done, done.at(-1)), null)
+  assert.equal(turnStatus(mk('x', [{ req_head: '계속' }]).at(-1)).key, 'interrupted')   // 상태 키는 그대로
 })

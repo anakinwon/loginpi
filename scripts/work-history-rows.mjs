@@ -16,6 +16,9 @@ export const projectRoot = () => process.env.WORKSPACE_ROOT ? path.join(process.
 /** 턴 키 = 레코드 id 에서 part 를 뗀 <session_id>:<turn> */
 export const turnKey = r => (r.id || '').replace(/\.\d+$/, '') || r.ts_req
 
+/** Claude Code 가 자동으로 넣는 중단 표식(사용자 요청 아님) — 로거 work-history-logger.mjs 가 거르는 정규식과 같은 모양 */
+export const isInterruptMarker = s => /^\[Request interrupted by user[^\]]*\]$/.test(String(s || '').trim())
+
 /** loadRows 결과 → 대시보드 행 순서의 턴 목록 (part 합산, 서브에이전트 토큰 포함, 같은 시각+머리글 중복 제거, 최신순) */
 export function buildTurns(rows, fromMs = Date.parse(DEFAULT_FROM)) {
   const byKey = new Map()
@@ -31,8 +34,13 @@ export function buildTurns(rows, fromMs = Date.parse(DEFAULT_FROM)) {
     t.incomplete = r.incomplete; t.absorbed = r.absorbed   // 상태는 마지막 part 기준 (앞 part 가 끊겨도 뒤 part 가 응답하면 완료)
   }
   const seen = new Set()   // ponytail: 시각+요청 머리글 기준 중복 제거, 근본 대책은 로거의 이어받은 세션 재기록 방지
-  return [...byKey.values()].filter(t => { const k = t.ts_req + '|' + (t.req_head || ''); if (seen.has(k)) return false; seen.add(k); return true })
+  const list = [...byKey.values()].filter(t => { const k = t.ts_req + '|' + (t.req_head || ''); if (seen.has(k)) return false; seen.add(k); return true })
     .sort((a, b) => Date.parse(b.ts_req) - Date.parse(a.ts_req))
+  // 요청문이 중단 표식뿐인 턴 = 앞 턴의 중단 신호라 목록에서 뺀다(로거가 거르지만 읽기 쪽 방어). resolveTarget 이 그 id 를 받으면 앞 턴을 안내
+  const markers = []
+  const prevOf = t => list.find(x => x.session_id === t.session_id && Date.parse(x.ts_req) < Date.parse(t.ts_req) && !isInterruptMarker(x.req_head))   // list 최신순 → 첫 일치 = 바로 앞 턴
+  const out = list.filter(t => !isInterruptMarker(t.req_head) || !markers.push({ marker: t, prev: prevOf(t) }))
+  return Object.assign(out, { markers })
 }
 
 /**
@@ -64,12 +72,43 @@ export function resolveTarget(turns, input) {
   const m = s.match(/^([0-9a-f-]{4,36})(?::(\d+)(?:\.\d+)?)?$/i)
   if (!m) return { error: `해석할 수 없는 입력 : ${s}`, candidates: [] }
   const [, sid, turnNo] = m
-  const hits = turns.filter(t => (t.session_id || t.session || '').toLowerCase().startsWith(sid.toLowerCase()) && (turnNo == null || String(t.turn) === turnNo))
-  if (!hits.length) return { error: `일치하는 요청 없음 : ${s}`, candidates: [] }
+  const match = t => (t.session_id || t.session || '').toLowerCase().startsWith(sid.toLowerCase()) && (turnNo == null || String(t.turn) === turnNo)
+  const hits = turns.filter(match)
+  if (!hits.length) {
+    const mk = turnNo != null && (turns.markers || []).find(m => match(m.marker))
+    if (mk) return { error: `중단 표식 — 실제 요청은 ${mk.prev ? `${mk.prev.session}:${mk.prev.turn}` : '(앞 턴 기록 없음)'}`, candidates: mk.prev ? [mk.prev] : [] }
+    return { error: `일치하는 요청 없음 : ${s}`, candidates: [] }
+  }
   const sessions = new Set(hits.map(t => t.session_id))
   if (sessions.size > 1) return { error: `세션 앞부분 '${sid}' 가 세션 ${sessions.size}개와 일치 — 더 길게 입력`, candidates: hits.slice(0, 5) }
   return { turn: hits[0], no: turns.indexOf(hits[0]) + 1 }   // turns 가 최신순이라 hits[0] = 최신 턴
 }
+
+const CONT_RE = /^(이어서|계속|다시|마저|재시도|continue|go on|resume|retry)/i   // 이어가기 재지시 첫머리
+const SHORT_REQ = 15                                                        // 이 글자 수 이하 = 짧은 재지시
+const words = s => new Set(String(s || '').toLowerCase().match(/[\p{L}\p{N}_]{2,}/gu) || [])
+/**
+ * 후속 처리 추정 = '후속 처리됨 [확인중]' 보조 표시 : 상태 키(중단 등)는 그대로 두고 미완료 턴에만, 같은 세션의 바로 다음 1~3턴만 본다
+ * 근거 필드(레코드에 있는 것만) : req_head(요청 머리글) · req_chars(요청 글자 수) · tags(유형 판정 — GIT·DEPLOY)
+ *   ① 다음 턴 req_head 가 이어가기 말('이어서'·'계속'·'다시' …)로 시작  ② req_chars ≤ 15 짧은 재지시('[Image …' 같은 첨부만은 제외)
+ *   ③ 다음 턴 req_head 가 원 요청 머리 앞 20자로 시작 = 같은 요청 다시 입력  ④ 다음 턴 tags 에 GIT·DEPLOY + 원 req_head 와 핵심어(2글자+) 겹침
+ * 커밋 메시지는 레코드에 없어 ④는 요청문 핵심어로 대신한다(ponytail: 조사 붙은 한국어 낱말은 안 겹침 — 형태소 분석이 필요해지면 그때)
+ * → { id: '<세션8자>:<턴>', why } 또는 null
+ */
+export function followUp(turns, t) {
+  if (!turnStatus(t).resumable) return null
+  const head = (t.req_head || '').replace(/…$/, '').trim(), kw = words(head), at = Date.parse(t.ts_req)
+  const next = turns.filter(x => x.session_id === t.session_id && Date.parse(x.ts_req) > at).sort((a, b) => Date.parse(a.ts_req) - Date.parse(b.ts_req)).slice(0, 3)
+  for (const x of next) {
+    const h = (x.req_head || '').trim(), id = `${x.session}:${x.turn}`
+    if (CONT_RE.test(h)) return { id, why: '이어가기 재지시' }
+    if (x.req_chars != null && x.req_chars <= SHORT_REQ && !h.startsWith('[')) return { id, why: '짧은 재지시' }
+    if (head.length >= 10 && h.startsWith(head.slice(0, 20))) return { id, why: '같은 요청 다시 입력' }
+    if ((x.tags || []).some(g => g === 'GIT' || g === 'DEPLOY') && [...words(h)].some(w => kw.has(w))) return { id, why: '커밋·배포 턴이 같은 핵심어' }
+  }
+  return null
+}
+export const FOLLOW_LABEL = '후속 처리됨 [확인중]'
 
 /** 세션이 살아 있는지 : 프로세스는 확인 불가라 기록 파일 수정 시각 + 같은 세션의 뒤 요청 유무로 추정 */
 export function judgeLiveness({ mtimeMs, now = Date.now(), laterTurns = 0 }) {

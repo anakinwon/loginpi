@@ -10,7 +10,7 @@ import readline from 'node:readline/promises'
 import { spawn } from 'node:child_process'
 import { loadRows } from './work-history-stats.mjs'
 import { makeRedactor } from './work-history-core.mjs'
-import { DEFAULT_FROM, projectRoot, buildTurns, resolveTarget, turnStatus, judgeLiveness, buildCommand, commandText } from './work-history-rows.mjs'
+import { DEFAULT_FROM, projectRoot, buildTurns, resolveTarget, turnStatus, judgeLiveness, buildCommand, commandText, isInterruptMarker, followUp, FOLLOW_LABEL } from './work-history-rows.mjs'
 
 const args = process.argv.slice(2), has = k => args.includes(k), argOf = (k, d) => has(k) ? args[args.indexOf(k) + 1] : d
 const target = args.find((a, i) => !a.startsWith('--') && !['--mode', '--from'].includes(args[i - 1]))
@@ -35,8 +35,10 @@ const sessFile = (() => { try { for (const d of fs.readdirSync(PROJECTS)) { cons
 const recs = sessFile ? fs.readFileSync(sessFile, 'utf8').split('\n').filter(Boolean).map(l => { try { return JSON.parse(l) } catch { return null } }).filter(Boolean) : []
 const textOf = c => typeof c === 'string' ? c : Array.isArray(c) ? c.filter(b => b?.type === 'text').map(b => b.text).join('\n') : ''
 const a = Date.parse(t.ts_req), main = recs.filter(j => !j.isSidechain)
-const users = main.filter(j => j.type === 'user' && !j.isMeta && textOf(j.message?.content).trim())
-const request = users.filter(u => Math.abs(Date.parse(u.timestamp) - a) <= 10e3).map(u => textOf(u.message.content))[0] || t.req_head || ''
+// 중단 표식은 사용자 요청이 아니라 뺀다 — 요청 직전(예 0.3초 앞)에 찍힌 표식을 요청문으로 잡던 문제(a7d862b1:27). 10초 안에서 가장 가까운 메시지
+const users = main.filter(j => j.type === 'user' && !j.isMeta && textOf(j.message?.content).trim() && !isInterruptMarker(textOf(j.message.content)))
+const near = u => Math.abs(Date.parse(u.timestamp) - a)
+const request = users.filter(u => near(u) <= 10e3).sort((x, y) => near(x) - near(y)).map(u => textOf(u.message.content))[0] || t.req_head || ''
 const nextUser = users.map(u => Date.parse(u.timestamp)).find(ts => ts > a + 10e3) ?? Infinity
 const end = t.ts_res ? Date.parse(t.ts_res) + 1000 : nextUser
 const lastText = main.filter(j => j.type === 'assistant' && Date.parse(j.timestamp) >= a && Date.parse(j.timestamp) <= end).map(j => textOf(j.message?.content)).filter(s => s.trim()).at(-1) || ''
@@ -51,6 +53,18 @@ console.log(`# ${no}  ${t.session_id}:${t.turn}  [${st.label}]`)
 console.log(`시작 ${kst(t.ts_req)} · 종료 ${t.ts_res ? kst(t.ts_res) : '기록 없음'}`)
 console.log(`세션 ${t.session_id} · 작업 폴더 ${redact(cwd)}${fs.existsSync(cwd) ? '' : ' (없음 — 워크트리 삭제 추정)'}`)
 console.log(`세션 상태 ${live.text}`)
+const fu = followUp(turns, t)
+if (fu) console.log(`${FOLLOW_LABEL} — 후속 턴 ${fu.id} 에서 이어졌을 가능성(${fu.why}) — 먼저 확인`)
+// 세션 기록의 git commit 명령(이 턴 ~ 뒤 3턴) : 레코드엔 커밋 메시지가 없어 CLI 만 보여 주는 참고 정보(판정에는 안 씀)
+if (st.resumable) {
+  const later = turns.filter(x => x.session_id === t.session_id && Date.parse(x.ts_req) > a).map(x => Date.parse(x.ts_req)).sort((x, y) => x - y)
+  const until = later[3] ?? Infinity
+  const commits = main.filter(j => j.type === 'assistant' && Date.parse(j.timestamp) >= a && Date.parse(j.timestamp) < until)
+    .flatMap(j => (Array.isArray(j.message?.content) ? j.message.content : []).filter(b => b?.type === 'tool_use' && /\bgit\b[^\n]*\bcommit\b/.test(b.input?.command || '')).map(b => ({ ts: j.timestamp, cmd: b.input.command })))
+  // 메시지 = -m "…" 첫 줄 → heredoc 첫 줄 → commit 이 든 줄
+  const msgOf = cmd => (cmd.match(/\bcommit\b[^\n]*?\s-\w*m\s*["']([^"'\n]+)/) || cmd.match(/<<-?\s*['"]?EOF['"]?\)?\s*\n([^\n]+)/) || [, cmd.split('\n').find(l => /\bcommit\b/.test(l))])[1].trim()
+  for (const c of commits) console.log(`git commit ${kst(c.ts)} : ${redact(msgOf(c.cmd)).slice(0, 100)}`)
+}
 if (st.key === 'noreply') console.log(`응답 없음 = ${t.absorbed ? '작업 도중 끼어든 다음 메시지에 흡수되고 응답 문장 없이 끝남 → 다음 요청 행에서 결과 확인' : '세션이 턴 도중 끝남(incomplete)'}`)
 console.log(`\n[요청문]\n${cut(request)}\n\n[마지막 응답]\n${cut(lastText)}\n`)
 
