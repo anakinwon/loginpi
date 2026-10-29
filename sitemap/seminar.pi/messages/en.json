@@ -88,6 +88,7 @@
     "SPEECH_NO_AGR": "Consent to voice processing is required",
     "SPEECH_RATE": "Too many voice requests. Please try again shortly",
     "SPEECH_QUOTA": "Voice processing time for this seminar is used up",
+    "SPEECH_USR_QUOTA": "You have used up your translation and translated voice limit for this seminar",
     "SPEECH_FAILED": "Could not convert speech to text",
     "SPEECH_STAGE_ONLY": "Only people on stage can use voice captions",
     "TRANSLATE_FAILED": "Could not translate the caption",
@@ -479,7 +480,8 @@
       "trStop": {
         "forbidden": "Translated captions are only for registered participants. Showing the original",
         "unavailable": "Translated captions are not available right now. Showing the original",
-        "quota": "This seminar has reached its translation limit. Showing the original"
+        "quota": "This seminar has reached its translation limit. Showing the original",
+        "usrQuota": "You have used up your translation limit for this seminar. Showing the original"
       }
     },
     "effects": {
@@ -617,7 +619,8 @@
     "dubbing": {
       "listen": "Listen in translated voice",
       "blocked": "Could not play the translated voice. Please turn it on again",
-      "stopped": "Translated voice is not available right now, so it was turned off"
+      "stopped": "Translated voice is not available right now, so it was turned off",
+      "usrQuota": "You have used up your translated voice limit for this seminar, so it was turned off"
     },
     "plan": {
       "warn": "{min} min left on this seminar's plan.",

@@ -116,6 +116,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | `ANTHROPIC_API_KEY` | https://console.anthropic.com/settings/keys |
 | `GEMINI_API_KEY` | https://aistudio.google.com/apikey (cafe.pi·seminar.pi — seminar.pi 는 서버 전용, 미설정 = AI 자막·회의록 숨김) |
 | `SPEECH_MAX_MIN` (seminar.pi) | 값 직접 지정(분, 기본 120) — 세미나(또는 대면 노트) 1건당 음성 처리 상한. 비밀 아님 |
+| `SPEECH_USR_TRANS_CHR` · `SPEECH_USR_TTS_CHR` (seminar.pi) | 값 직접 지정(글자, 기본 100000 · 20000) — 사용자 1인(세미나 × 사용자) 번역·합성 음성 누적 상한, 세미나 상한(100만·20만) 이하. 비밀 아님 |
 | `GITHUB_TOKEN` · `GITHUB_DEPLOY_TOKEN` | https://github.com/settings/tokens (repo 범위) |
 | `TELEGRAM_BOT_TOKEN` · `TELEGRAM_BOT_USERNAME` | Telegram 앱 → `@BotFather` → `/newbot`. `TELEGRAM_WEBHOOK_SECRET`은 3.1처럼 직접 만든다 |
 | `RESEND_API_KEY` · `RESEND_FROM_EMAIL` | https://resend.com/api-keys (발신 도메인 인증 필요) |

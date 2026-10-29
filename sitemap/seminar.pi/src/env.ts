@@ -54,6 +54,9 @@ export const env = createEnv({
     GEMINI_API_KEY: z.string().optional(),
     // 세미나(또는 대면 노트) 1건당 음성 처리 상한(분) — 기본 120(src/lib/speech-rules.ts), 비용 폭주 차단(A-5)
     SPEECH_MAX_MIN: z.coerce.number().int().min(1).max(1440).optional(),
+    // 사용자 1인(세미나 × 사용자) 번역·합성 누적 글자 상한 — 기본 10만·2만(src/lib/translate-rules.ts USR_AI_LIMIT), 세미나 상한 이하(감사 High 1)
+    SPEECH_USR_TRANS_CHR: z.coerce.number().int().min(1).max(1_000_000).optional(),
+    SPEECH_USR_TTS_CHR: z.coerce.number().int().min(1).max(200_000).optional(),
   },
   client: {
     // 미디어 엔진 시그널링 WebSocket 주소(예 ws://localhost:7880/signal, 운영 wss://). 미설정 = 화상 기능 숨김
@@ -109,6 +112,8 @@ export const env = createEnv({
     TURN_CREDENTIAL_TTL: process.env.TURN_CREDENTIAL_TTL,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     SPEECH_MAX_MIN: process.env.SPEECH_MAX_MIN,
+    SPEECH_USR_TRANS_CHR: process.env.SPEECH_USR_TRANS_CHR,
+    SPEECH_USR_TTS_CHR: process.env.SPEECH_USR_TTS_CHR,
     NEXT_PUBLIC_MEDIA_WS_URL: process.env.NEXT_PUBLIC_MEDIA_WS_URL,
     NEXT_PUBLIC_GOOGLE_LOGIN: process.env.NEXT_PUBLIC_GOOGLE_LOGIN,
     NEXT_PUBLIC_PLAN_KRW_REF: process.env.NEXT_PUBLIC_PLAN_KRW_REF,

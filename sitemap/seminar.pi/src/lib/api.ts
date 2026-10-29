@@ -63,6 +63,8 @@ export const apiError = createApiError({
   SPEECH_NO_AGR: '음성 처리 동의가 필요합니다',
   SPEECH_RATE: '음성 요청이 너무 잦습니다. 잠시 후 다시 시도하세요',
   SPEECH_QUOTA: '이 세미나의 음성 처리 시간이 모두 소진되었습니다',
+  // 사용자 1인 번역·합성 누적 한도(감사 High 1, src/lib/speech-gate.ts)
+  SPEECH_USR_QUOTA: '이 세미나에서 쓸 수 있는 내 번역·음성 번역 한도를 모두 썼습니다',
   SPEECH_FAILED: '음성을 글로 바꾸지 못했습니다',
   SPEECH_STAGE_ONLY: '무대에 오른 사람만 음성 자막을 쓸 수 있습니다',
   TRANSLATE_FAILED: '자막을 번역하지 못했습니다',

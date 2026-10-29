@@ -17,7 +17,7 @@ import {
   usrMaxSec,
   vcUseError,
 } from './speech-rules'
-import { AI_LIMIT } from './translate-rules'
+import { AI_LIMIT, usrAiMax } from './translate-rules'
 
 type ApiCode = Parameters<typeof apiError>[0]
 export type SpeechKind = 'VC' | 'TRANS' | 'TTS'
@@ -27,10 +27,16 @@ export type SpeechTarget = { smnId: string | null; ntId?: string | null }
 // amount = VC 는 예약 초, TRANS·TTS 는 글자 수
 export async function speechGate(t: SpeechTarget, user: UserRow, kind: SpeechKind, amount: number): Promise<NextResponse | null> {
   // 무료 개최자 세미나 = AI 제외(sql/015) — 계량보다 먼저(거절인데 계량되지 않게). 대부분 캐시 적중이라 직렬 비용 없음. 대면 노트(smnId 없음)는 대상 아님
+  //  번역·합성은 사용자 누적 글자(감사 High 1)를 같은 때 병렬로 읽는다(R-P1) — 둘 다 읽기라 계량 전 거절이 남지 않는다
   if (t.smnId) {
-    const paid = await planAiOk(t.smnId)
-    if (paid instanceof Error) return apiError('DB_UNAVAILABLE', 503)
+    const [paid, used] = await Promise.all([
+      planAiOk(t.smnId),
+      kind === 'VC' ? 0 : usrAiUsed(t.smnId, user.id, kind),
+    ])
+    if (paid instanceof Error || used instanceof Error) return apiError('DB_UNAVAILABLE', 503)
     if (!paid) return apiError('PLAN_AI_PAID', 402)
+    if (kind !== 'VC' && used + amount > usrAiMax(kind, kind === 'TRANS' ? env.SPEECH_USR_TRANS_CHR : env.SPEECH_USR_TTS_CHR))
+      return apiError('SPEECH_USR_QUOTA', 429)
   }
   let q
   if (kind === 'VC') {
@@ -60,6 +66,20 @@ export async function speechGate(t: SpeechTarget, user: UserRow, kind: SpeechKin
   if (error) return dbFail(error)
   const e = vcUseError(data as string | null)
   return e ? apiError(e.code as ApiCode, e.status) : null
+}
+
+// 사용자 1인 누적 번역·합성 글자(세미나 × 사용자, 감사 High 1) — smn_vc_use 분 단위 행(sql/010 trans_chr_cnt·tts_chr_cnt)의 합. 그 칼럼 하나만 읽는다(R-P3).
+//  캐시 미스(외부 AI 호출)마다 1회 — 적중은 speechGate 를 안 거쳐 읽지 않는다. 행 수 = 그 사용자가 쓴 분 수(세미나 길이 이하)
+//  ponytail: 판정이 fn_use_smn_ai 잠금 밖이라 같은 사용자의 동시 요청은 함께 통과할 수 있다 — 넘침은 사용자 분당 상한(AI_LIMIT.maxMinChr) 1분치 이하.
+//   정확한 상한이 필요하면 fn_use_smn_ai 에 p_max_usr_chr 를 더한다(fn_use_smn_vc p_max_usr_sec 처럼, DB 변경)
+async function usrAiUsed(smnId: string, usrId: string, kind: 'TRANS' | 'TTS'): Promise<number | Error> {
+  const col = kind === 'TRANS' ? 'trans_chr_cnt' : 'tts_chr_cnt'
+  const { data, error } = await db().from('smn_vc_use').select(col).eq('smn_id', smnId).eq('usr_id', usrId)
+  if (error) {
+    console.error('[speech] 사용자 AI 사용량 확인 실패', error.code)
+    return new Error(error.code)
+  }
+  return (data as unknown as Record<string, number>[]).reduce((s, r) => s + (r[col] ?? 0), 0)
 }
 
 // 세미나 AI 허용(개최자 ADMIN 또는 유료 이용권) — 60초 캐시(5초 조각마다 묻지 않게, R-P2). 구매·소진은 최대 60초 늦게 반영.
