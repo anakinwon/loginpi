@@ -226,47 +226,51 @@ function EffectsSheet({ ctx }: { ctx: RoomCtx }) {
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {thumb('none', t('bgNone'))}
             {thumb('blur', t('bgBlur'))}
-            {PRESETS.map((p) => (
-              <div key={p}>
-                {thumb(`p:${p}`, t(`bgs.${p}`), `/backgrounds/${p}.svg`)}
-              </div>
-            ))}
-            {/* 움직이는 배경 — 데스크톱(넓은 화면·마우스)만. 매 프레임 장면을 그려 휴대폰에선 무겁다 */}
+            {/* 이미지·움직이는 배경·내 이미지 — 데스크톱(넓은 화면·마우스)만. 휴대폰은 메모리 부족으로 매우 느려 흐림만(마스터 2026-10-29 F-12 B안) */}
+            {desk &&
+              PRESETS.map((p) => (
+                <div key={p}>
+                  {thumb(`p:${p}`, t(`bgs.${p}`), `/backgrounds/${p}.svg`)}
+                </div>
+              ))}
             {desk &&
               SCENE_IDS.map((s) => (
                 <div key={s}>{thumb(`a:${s}`, t(`scenes.${s}`))}</div>
               ))}
-            {mine.map((m, i) => (
-              <div key={m.id} className="relative">
-                {/* 장마다 다른 이름 — 모두 '내 이미지'면 낭독기 사용자가 어느 것을 고르고 지우는지 구별하지 못한다 */}
-                {thumb(`m:${m.id}`, t('myItem', { n: i + 1 }), m.url, m.blob)}
-                <button
-                  type="button"
-                  onClick={() => void del(m.id)}
-                  aria-label={t('myDel', { n: i + 1 })}
-                  className="absolute -top-1 -left-1 h-6 w-6 rounded-full bg-black/80 text-xs text-white"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            <label
-              // 파일 입력은 sr-only 라 포커스가 보이지 않는다 — 키보드로 Tab 해 온 자리를 타일 테두리로 보여 준다(WCAG 2.4.7)
-              className={`${tile} bg-surface-raised focus-within:ring-accent grid cursor-pointer place-items-center border-dashed border-white/20 focus-within:ring-2`}
-            >
-              ＋ {t('myAdd')}
-              <input
-                type="file"
-                accept="image/*"
-                className="sr-only"
-                onChange={(e) => {
-                  void onFile(e.target.files?.[0])
-                  e.target.value = ''
-                }}
-              />
-            </label>
+            {desk &&
+              mine.map((m, i) => (
+                <div key={m.id} className="relative">
+                  {/* 장마다 다른 이름 — 모두 '내 이미지'면 낭독기 사용자가 어느 것을 고르고 지우는지 구별하지 못한다 */}
+                  {thumb(`m:${m.id}`, t('myItem', { n: i + 1 }), m.url, m.blob)}
+                  <button
+                    type="button"
+                    onClick={() => void del(m.id)}
+                    aria-label={t('myDel', { n: i + 1 })}
+                    className="absolute -top-1 -left-1 h-6 w-6 rounded-full bg-black/80 text-xs text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            {desk && (
+              <label
+                // 파일 입력은 sr-only 라 포커스가 보이지 않는다 — 키보드로 Tab 해 온 자리를 타일 테두리로 보여 준다(WCAG 2.4.7)
+                className={`${tile} bg-surface-raised focus-within:ring-accent grid cursor-pointer place-items-center border-dashed border-white/20 focus-within:ring-2`}
+              >
+                ＋ {t('myAdd')}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  onChange={(e) => {
+                    void onFile(e.target.files?.[0])
+                    e.target.value = ''
+                  }}
+                />
+              </label>
+            )}
           </div>
-          <p className="text-muted-foreground mt-2 text-xs">{t('myNote')}</p>
+          <p className="text-muted-foreground mt-2 text-xs">{t(desk ? 'myNote' : 'mobileBlurOnly')}</p>
         </>
       )}
       <FxRows ctx={ctx} />

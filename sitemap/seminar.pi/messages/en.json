@@ -515,6 +515,7 @@
       "mySaveFail": "The background is applied but could not be saved on this device (this meeting only)",
       "bgStopped": "The background effect stopped and was turned off. Choose it again to restart",
       "myNote": "Your images are stored only on this device (up to 3, 2 MB each)",
+      "mobileBlurOnly": "On phones, only the blur background is available (image backgrounds work on PC)",
       "myTooBig": "Only images up to 2 MB can be used",
       "preparing": "Preparing…",
       "bgFailed": "Could not load the background effect",
