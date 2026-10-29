@@ -19,7 +19,7 @@
 |---|---|---|---|
 | 1 | 집 PC 엔진을 **`9d8eea86` 빌드**로 교체 | `media/docs/HOME_NODE_GUIDE.md` 4.7 | 2026-10-27 실기기 시험에서 같은 집 PC 발표자가 잠깐 접속 뒤 `ICE_FAILED` 로 끊기고 청중 영상이 없었음 → 엔진이 LAN 주소도 host 후보로 알리도록 수정(Append) — 유력 원인 [확인중 : 실기기 재시험] |
 | 2 | 엔진 `MEDIA_ALLOWED_ORIGINS` 에 `https://seminarz.vercel.app` | 같은 가이드 B-1 | Pi 포털 래퍼가 실제 앱을 이 주소에서 불러옴 [확인중 : Pi Browser Origin 실측] |
-| 3 | Pi Browser 실기기 점검 10항목(Android 2대 + 가능하면 iOS) | [NIGHT_REPORT](NIGHT_REPORT_2026-10-27.md) 1절 | Phase 1·M5 통과 조건 — 인증·결제·페이지 변경은 실기기 전 완료로 보지 않음 |
+| 3 | Pi Browser 실기기 점검 10항목(Android 2대 + 가능하면 iOS) · 회의 부가 기능 F-08~F-17 점검표(엔진 무관 F-08·09·15 는 지금 바로) | [NIGHT_REPORT](NIGHT_REPORT_2026-10-27.md) 1절 · [DEVICE_TEST_F08-F17](DEVICE_TEST_F08-F17.md) | Phase 1·M5 통과 조건 — 인증·결제·페이지 변경은 실기기 전 완료로 보지 않음 |
 | 4 | 위임 결정 검토(PRD 11절 D-1~D-19, 11.1절 D-20~D-28) · 확인 질문(PRD 9절) | PRD | 바꿀 결정만 지시 |
 | 5 | ~~**MediaPipe 모델 파일 커밋**~~ **완료(`9ca1b26c`, 2026-10-27 — build·Vercel success)** — `public/mediapipe/models/selfie_segmenter_landscape.tflite`(`scripts/copy-mediapipe.mjs` 머리 주석의 curl 1줄) | 저장소 | 없으면 `pnpm build` 가 막혀 **Vercel 배포 실패**(이전 배포가 계속 서빙) |
 | 6 | 집 PC 엔진을 **`27a18b31` 빌드(v1.3.2 + 관리 API 무대 역할 조회, sha256 `225efa5e…`)**로 교체 + 엔진·Vercel 양쪽에 같은 `MEDIA_ADMIN_SECRET`(32자 이상) — v1.3.2 단독(`cf2fe499`)·v1.3.1 대체, v1.3(`45541466…`) 설치 금지 | `media/docs/HOME_NODE_GUIDE.md` 4.7 | `app.send` 중계 — 교체 전엔 자막·녹화·AI 회의록·번역·더빙이 숨겨짐(#1 을 대체) |
