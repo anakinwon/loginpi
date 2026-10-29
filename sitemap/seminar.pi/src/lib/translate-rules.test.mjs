@@ -188,7 +188,7 @@ test('화면 — 번역 중단은 요청 전에 막고 사유를 알림·시트�
   assert.ok(tr.includes('trStop.set(why)'))
   assert.ok(cap.includes('trStop.reset()')) // 다음 입장에 이어지지 않게
   // 더빙 중단 판정은 T09 dubStop(409·모든 503 포함, trStopOf 상위 집합)으로 통합 — 병합 r2
-  assert.ok(dub.includes('dubStop(r.status') && dub.includes("ctx.notice('dubbing.stopped')"))
+  assert.ok(dub.includes('dubStop(r.status') && dub.includes("'dubbing.stopped')")) // 내 누적 한도만 'dubbing.usrQuota'(감사 High 1)
   for (const m of [ko, en]) {
     for (const k of ['forbidden', 'unavailable', 'quota']) assert.ok(m.room.captions.trStop[k], k)
     assert.ok(m.room.dubbing.stopped)
@@ -392,5 +392,73 @@ test('내 언어 — 브라우저 선호·UI·고른 언어 순, 대상 키로 �
   for (const f of ['ko', 'en']) {
     const m = JSON.parse(await readFile(new URL(`../../messages/${f}.json`, import.meta.url), 'utf8'))
     assert.ok(m.room.captions.langMine && m.room.captions.langAll, f)
+  }
+})
+
+// 감사 High 1 — 서명 용도 분리 : 번역 결과 서명은 그 언어 더빙에만. 번역 재입력·다른 언어 합성 재사용 거절
+test('서명 용도 분리 — 자막 서명은 번역·더빙 둘 다, 번역 결과 서명은 같은 언어 더빙만', async () => {
+  const { CAP_USE, trUse } = await import('./translate-rules.ts')
+  const text = 'Hello everyone'
+  const cap = await capSig(SECRET, SMN, text)
+  const tr = await capSig(SECRET, SMN, text, trUse('en'))
+  assert.notEqual(cap, tr)
+  assert.equal(await capSigOk(SECRET, SMN, text, cap), true) // 번역 라우트 = 기본(자막만)
+  assert.equal(await capSigOk(SECRET, SMN, text, tr), false) // 번역 결과를 다시 번역에 넣기 거절
+  const dubEn = [CAP_USE, trUse('en')]
+  assert.equal(await capSigOk(SECRET, SMN, text, cap, dubEn), true) // 같은 언어 화자 원문 더빙
+  assert.equal(await capSigOk(SECRET, SMN, text, tr, dubEn), true)
+  assert.equal(await capSigOk(SECRET, SMN, text, tr, [CAP_USE, trUse('ja')]), false) // 다른 언어로 합성 재사용 거절
+  const { readFile } = await import('node:fs/promises')
+  const rd = (f) => readFile(new URL(`../app/api/speech/${f}/route.ts`, import.meta.url), 'utf8')
+  const [trSrc, ttsSrc] = await Promise.all([rd('translate'), rd('tts')])
+  assert.ok(trSrc.includes('capSig(env.PI_SESSION_SECRET, smnId, out, trUse(lang))'))
+  assert.ok(/capSigOk\(env\.PI_SESSION_SECRET, smnId, text, b\.sig\)\)/.test(trSrc)) // 용도 인자 없음 = 자막만
+  assert.ok(ttsSrc.includes('const uses = [CAP_USE, trUse(body.lang)]') && ttsSrc.includes('body.sig, uses)'))
+})
+
+// 감사 High 1 — 사용자별(세미나 × 사용자) 누적 상한 : 계정 몇 개로 세미나 할당량을 다 써서 전원 기능을 끄지 못하게
+test('사용자 누적 상한 — 기본 = 세미나 상한의 1/10, env 로 조절, 세미나 상한 초과·이상값은 막음', async () => {
+  const { USR_AI_LIMIT, usrAiMax } = await import('./translate-rules.ts')
+  for (const k of ['TRANS', 'TTS']) {
+    assert.equal(USR_AI_LIMIT[k] * 10, AI_LIMIT[k].maxChr)
+    assert.ok(USR_AI_LIMIT[k] > AI_LIMIT[k].maxMinChr) // 1분 상한보다는 커야 정상 사용 가능
+    assert.equal(usrAiMax(k, undefined), USR_AI_LIMIT[k])
+    assert.equal(usrAiMax(k, 0), USR_AI_LIMIT[k])
+    assert.equal(usrAiMax(k, 1.5), USR_AI_LIMIT[k])
+    assert.equal(usrAiMax(k, 5000), 5000)
+    assert.equal(usrAiMax(k, 10_000_000), AI_LIMIT[k].maxChr)
+  }
+  assert.equal(trStopOf(429, 'SPEECH_USR_QUOTA'), 'usrQuota')
+  const { dubStop } = await import('./speech-rules.ts')
+  assert.equal(dubStop(429, 'SPEECH_USR_QUOTA'), true)
+  assert.equal(dubStop(429, 'SPEECH_RATE'), false)
+})
+
+test('사용자 누적 상한 — 서버 관문이 계량 전 거절(병렬 읽기), env·문구 ko·en 동시', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const rd = (p) => readFile(new URL(p, import.meta.url), 'utf8')
+  const [gate, env, ex, api, dub, ko, en] = await Promise.all([
+    rd('./speech-gate.ts'),
+    rd('../env.ts'),
+    rd('../../.env.example'),
+    rd('./api.ts'),
+    rd('../components/room/features/dubbing/index.tsx'),
+    rd('../../messages/ko.json').then(JSON.parse),
+    rd('../../messages/en.json').then(JSON.parse),
+  ])
+  // 누적 확인은 fn_use_smn_ai(계량) 보다 앞, 요금제 확인과 Promise.all(R-P1)
+  assert.ok(gate.indexOf("apiError('SPEECH_USR_QUOTA', 429)") < gate.indexOf("rpc('fn_use_smn_ai'"))
+  assert.ok(/Promise\.all\(\[\s*planAiOk\(t\.smnId\),\s*kind === 'VC' \? 0 : usrAiUsed\(/.test(gate))
+  assert.ok(/\.select\(col\)\.eq\('smn_id', smnId\)\.eq\('usr_id', usrId\)/.test(gate)) // 칼럼 하나만(R-P3)
+  for (const k of ['SPEECH_USR_TRANS_CHR', 'SPEECH_USR_TTS_CHR']) {
+    assert.ok(env.includes(`${k}: z.coerce`) && env.includes(`${k}: process.env.${k}`), k)
+    assert.ok(ex.includes(`${k}=`), k)
+  }
+  assert.ok(api.includes('SPEECH_USR_QUOTA:'))
+  assert.ok(dub.includes("'dubbing.usrQuota'"))
+  for (const m of [ko, en]) {
+    const s = [m.apiErrors.SPEECH_USR_QUOTA, m.room.captions.trStop.usrQuota, m.room.dubbing.usrQuota]
+    assert.ok(s.every(Boolean))
+    assert.ok(!/Google|Gemini/.test(s.join(' '))) // UI 문구 상표 금지
   }
 })

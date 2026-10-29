@@ -152,8 +152,21 @@ export const AI_LIMIT = {
   TTS: { maxChr: 200_000, maxMinChr: 3_000 },
 } as const
 
+// 사용자 1인(세미나 × 사용자) 누적 글자 상한 기본값(감사 High 1) — 계정 몇 개로 세미나 상한(AI_LIMIT)을 다 써서 전원 번역·더빙을 끄지 못하게.
+//  세미나 상한의 1/10 : 세미나 1건을 다 쓰려면 참가 등록한 계정 10개가 필요하고, 1계정 피해는 세미나 상한의 10% 로 묶인다.
+//  번역 10만 자 = 120분 발화 원문(≈10만 자)을 혼자 다른 언어로 끝까지 듣는 정상 청중도 막히지 않는 값(같은 문장·언어 캐시 적중은 안 센다).
+//  합성 2만 자 = 혼자 듣는 언어면 약 20~25분 분량 — 합성이 번역보다 비싸서 보수적으로. env SPEECH_USR_TRANS_CHR·SPEECH_USR_TTS_CHR 로 조절
+export const USR_AI_LIMIT = { TRANS: 100_000, TTS: 20_000 } as const
+// 사용자 누적 상한 — env 값이 없거나 이상하면 기본값, 세미나 상한을 넘지 못하게
+export function usrAiMax(kind: 'TRANS' | 'TTS', envVal: number | undefined) {
+  const v = Number.isInteger(envVal) && (envVal as number) >= 1 ? (envVal as number) : USR_AI_LIMIT[kind]
+  return Math.min(v, AI_LIMIT[kind].maxChr)
+}
+
 // 서버 발급 자막 서명(D-2) — 번역·합성은 서버가 만든 글(음성→글 결과 · 번역 결과)만 받는다(임의 글 AI 대행 차단).
-// sig = HMAC-SHA256(파생키, 'smn-cap' 줄바꿈 smnId 줄바꿈 cleanText(text)) base64url. 파생키 = HMAC(secret, 'smn-cap-key:v1') — 세션 서명과 키 분리.
+// sig = HMAC-SHA256(파생키, 용도 줄바꿈 smnId 줄바꿈 cleanText(text)) base64url.
+// 용도 분리(감사 High 1) : 자막(음성→글) = CAP_USE('smn-cap', 번역·더빙 둘 다 받음) · 번역 결과 = trUse(lang)('smn-tr:<언어>', 그 언어 더빙만 받음).
+//  번역 결과 서명을 번역에 다시 넣어 되번역하거나, 다른 언어 음성으로 합성(캐시 미스 = 계량만 늘림)하는 재사용을 막는다. 파생키 = HMAC(secret, 'smn-cap-key:v1') — 세션 서명과 키 분리.
 // Web Crypto(서버 전용으로만 부른다 — secret 은 서버 env). 검증은 crypto.subtle.verify(상수 시간)
 const keys = new Map<string, Promise<CryptoKey>>()
 const enc = new TextEncoder()
@@ -168,26 +181,39 @@ function capKey(secret: string) {
   }
   return k
 }
-const capMsg = (smnId: string, t: string) => enc.encode(['smn-cap', smnId.toLowerCase(), t].join('\n'))
+export const CAP_USE = 'smn-cap'
+export const trUse = (lang: string) => `smn-tr:${lang}`
+const capMsg = (use: string, smnId: string, t: string) => enc.encode([use, smnId.toLowerCase(), t].join('\n'))
 
 // 서명 — 글이 비었거나 상한 초과면 null(서명 없는 자막 = 번역·합성 불가, 원문만 표시)
-export async function capSig(secret: string, smnId: string, text: string) {
+export async function capSig(secret: string, smnId: string, text: string, use = CAP_USE) {
   const t = cleanText(text)
   if (!t) return null
-  const s = await crypto.subtle.sign('HMAC', await capKey(secret), capMsg(smnId, t))
+  const s = await crypto.subtle.sign('HMAC', await capKey(secret), capMsg(use, smnId, t))
   return Buffer.from(s).toString('base64url')
 }
 
-export async function capSigOk(secret: string, smnId: string, text: string, sig: unknown) {
+// uses = 받을 용도 목록(기본 자막만) — 하나라도 맞으면 통과
+export async function capSigOk(
+  secret: string,
+  smnId: string,
+  text: string,
+  sig: unknown,
+  uses: readonly string[] = [CAP_USE],
+) {
   const t = cleanText(text)
   if (!t || typeof sig !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(sig)) return false
-  return crypto.subtle.verify('HMAC', await capKey(secret), Buffer.from(sig, 'base64url'), capMsg(smnId, t))
+  const k = await capKey(secret)
+  const raw = Buffer.from(sig, 'base64url')
+  const ok = await Promise.all(uses.map((u) => crypto.subtle.verify('HMAC', k, raw, capMsg(u, smnId, t))))
+  return ok.includes(true)
 }
 
 // 번역·합성 실패 응답 → 이번 입장 동안 요청을 멈출 사유. 문장마다 같은 결과가 되풀이되는 실패만(R-P2 — 청중 수 × 문장 수만큼 헛된 왕복·DB 잠금 방지)
-//  권한 없음(401·403 : 무료 세미나를 방 링크로 바로 들어와 입장 등록이 없는 경우 등) · 서버 AI 미설정(503 AI_UNAVAILABLE) · 세미나 누적 한도(429 SPEECH_QUOTA)
+//  권한 없음(401·403 : 무료 세미나를 방 링크로 바로 들어와 입장 등록이 없는 경우 등) · 서버 AI 미설정(503 AI_UNAVAILABLE) · 세미나 누적 한도(429 SPEECH_QUOTA) · 사용자 누적 한도(429 SPEECH_USR_QUOTA)
 //  일시 실패(분당 한도 SPEECH_RATE·DB 503·502·409·네트워크)는 null = 다음 문장에 다시 시도
-export type TrStop = 'forbidden' | 'unavailable' | 'quota'
+//  사용자 1인 누적 한도(429 SPEECH_USR_QUOTA, 감사 High 1)도 이 세미나 동안 회복되지 않는다 = usrQuota
+export type TrStop = 'forbidden' | 'unavailable' | 'quota' | 'usrQuota'
 //  서명 불일치(403 CAPTION_SIG_INVALID)는 그 문장만의 문제 — 패널 1명의 변조·고장 자막 1개가 청중 전원의 번역을 입장 내내 끄고
 //  '입장 등록한 참가자만' 이라는 틀린 사유를 띄우던 결함(야간 시험 r5 T08). 그 문장만 원문으로 둔다
 export function trStopOf(status: number, code: unknown): TrStop | null {
@@ -195,6 +221,7 @@ export function trStopOf(status: number, code: unknown): TrStop | null {
   if (status === 401 || status === 403) return 'forbidden'
   if (status === 503 && code === 'AI_UNAVAILABLE') return 'unavailable'
   if (status === 429 && code === 'SPEECH_QUOTA') return 'quota'
+  if (status === 429 && code === 'SPEECH_USR_QUOTA') return 'usrQuota'
   return null
 }
 

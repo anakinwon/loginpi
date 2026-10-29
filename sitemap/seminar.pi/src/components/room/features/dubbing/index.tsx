@@ -150,7 +150,7 @@ function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null) {
             const j = (await r.json().catch(() => null)) as { code?: unknown } | null
             if (dubStop(r.status, j?.code) && dubOn.get()) {
               dubOn.set(false)
-              ctx.notice('dubbing.stopped')
+              ctx.notice(j?.code === 'SPEECH_USR_QUOTA' ? 'dubbing.usrQuota' : 'dubbing.stopped') // 내 누적 한도는 사유를 따로(감사 High 1)
             }
             return null // 분당 횟수·502 등은 그 문장만 건너뜀(자막은 그대로)
           }),
