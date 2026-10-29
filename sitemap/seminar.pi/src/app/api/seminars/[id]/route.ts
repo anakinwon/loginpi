@@ -78,9 +78,9 @@ export const GET = withAuthGuard(
 
     const row = smn.data
     // 남은 시간(요금제 바로 아래 줄, 마스터 2026-10-29) — 진행·예정 세미나만, 개최자 요금제 이용권 기준(유료 먼저·무료 이어서 = 룸 카운트다운과 같은 값, sql/021)
-    //  보는 사람 = 개최자·ADMIN·참가 등록자만(룸 출석 gate 와 같은 범위 — 비로그인·미등록에게 개최자 이용권 잔량 비공개, 보안 검토 지적)
+    //  보는 사람 = 개최자·ADMIN 만 — 참가자는 무조건 무료라 개최자 이용권 잔량을 보이지 않는다(룸 카운트다운과 같은 기준, 마스터 2026-10-29)
     const open = (OPEN_STS as readonly string[]).includes(row.smn_sts_cd)
-    const canSee = !!user && (user.id === row.hst_usr_id || isAdmin(user) || registered)
+    const canSee = !!user && (user.id === row.hst_usr_id || isAdmin(user))
     const left = open && canSee ? planPools(await hostPlan(row.hst_usr_id), row.plan_cd) : null
     return NextResponse.json(
       {

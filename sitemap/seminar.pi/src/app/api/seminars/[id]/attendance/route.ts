@@ -1,15 +1,16 @@
 // 출석(SubAgent4) — POST = 룸 입장 기록 + 60초 하트비트(같은 호출), GET ?page= = 개최자·ADMIN 출석부(50명 단위), ?all=1 = CSV 용 전체(상한 ATD_CSV_MAX).
 //  POST 는 자격·상태 확인(gate, 병렬 2조회) 뒤에만 쓴다 — 종료·취소·삭제된 세미나·유료 참가 취소면 갱신하지 않고 409/404/402(야간 시험 T04 : 종료 뒤 마지막 시각이 늘던 결함).
 //  출석 갱신(없으면 INSERT, 첫 입장 시각 보존)·LIVE 개최자 시간 계량은 fn_hb_smn_hst(sql/015) 한 번 — 응답 remainSec, 소진이면 세미나 종료(endByPlan). CSV 는 화면이 번역된 머리글로 만든다(engage-rules toCsv).
-//  방 남은 시간(sql/018) — 응답 plan(세미나 요금제)·left(그 요금제 남은 초, LIVE 일 때만) 를 개최자·참가자 모두에게 : 룸 카운트다운.
-//  참가자 하트비트는 개최자 요금제를 읽기만 하고(계량은 개최자 본인 하트비트만), 0 이하면 누구의 하트비트든 세미나를 종료한다(시간 소진 = 방 종료).
+//  방 남은 시간(sql/018) — 응답 plan·left·paid·free 는 개최자 본인에게만 : 룸 카운트다운. 남이 연 방에 들어온 참가자(ADMIN 포함)는
+//  무조건 무료 입장·카운트다운 없음(마스터 2026-10-29 — 전에는 개최자 남은 시간을 참가자에게도 보내 카운트다운이 돌았다) → { ok } 만.
+//  계량·소진 종료는 개최자 본인 하트비트만(개최자가 없으면 시간도 줄지 않는다).
 //  비로그인 401 — redirect 없음. 응답 no-store
 // ponytail: 확인과 갱신 사이에 세미나가 닫히면 하트비트 1번(≤60초)이 더 남는다 — 엄격히 막으려면 상태 조건을 건 RPC 로
 import { NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
 import { closed, gate, noStore, who } from '@/lib/engage'
-import { ATD_CSV_MAX, ATD_PAGE, HOST_AWAY_MS } from '@/lib/engage-rules'
+import { ATD_CSV_MAX, ATD_PAGE } from '@/lib/engage-rules'
 import { endByPlan, hostPlan, planLeft, planPools } from '@/lib/plan'
 import { parsePage } from '@/lib/seminar-rules'
 
@@ -32,19 +33,11 @@ export const POST = withAuthGuard(
     const { data, error } = await db().rpc('fn_hb_smn_hst', { p_smn_id: w.smnId, p_usr_id: w.user.id })
     if (error) return dbFail(error)
     const remainSec = data === null ? null : Number(data)
-    // LIVE 면 카운트다운용 요금제별 남은 시간(유료·무료 이원화, sql/021) — 개최자 차감 뒤 값이 필요해 하트비트 다음에 읽는다(의존 있는 직렬).
-    //  참가자에게는 개최자가 지금 룸에 있는지(마지막 하트비트 90초 안 = 실제로 차감 중)도 — 없으면 화면 카운트다운을 멈춘다(마스터 2026-10-29)
-    const host = g.hostId === w.user.id
-    const [hp, hostAtd] = g.live
-      ? await Promise.all([
-          hostPlan(g.hostId),
-          host
-            ? null
-            : db().from('smn_atd').select('lst_hb_dtm').eq('smn_id', w.smnId).eq('usr_id', g.hostId).eq('del_yn', 'N').maybeSingle<{ lst_hb_dtm: string }>(),
-        ])
-      : [null, null]
-    if (hostAtd?.error) return dbFail(hostAtd.error)
-    const ticking = host ? remainSec !== null : !!hostAtd?.data && Date.now() - Date.parse(hostAtd.data.lst_hb_dtm) <= HOST_AWAY_MS
+    // 참가자(개최자 아님) = 출석만 — 요금제·남은 시간을 보내지 않는다(카운트다운·소진 퇴장 없음)
+    if (g.hostId !== w.user.id) return NextResponse.json({ ok: true }, { headers: noStore })
+    // LIVE 면 카운트다운용 요금제별 남은 시간(유료·무료 이원화, sql/021) — 개최자 차감 뒤 값이 필요해 하트비트 다음에 읽는다(의존 있는 직렬)
+    const hp = g.live ? await hostPlan(g.hostId) : null
+    const ticking = remainSec !== null
     const pools = hp ? planPools(hp, g.planCd) : null
     const left = remainSec ?? (hp ? planLeft(hp, g.planCd) : null)
     if (left !== null && left <= 0) {
