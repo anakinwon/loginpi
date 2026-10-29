@@ -85,6 +85,11 @@
 
 - DB : **Supabase 프로젝트 1개**(seminar 전용 `dwgu…`)의 **`public` 하나만** 쓴다(마스터 결정 C 2026-10-29) — 로컬·스테이징·운영이 모두 같은 `public`. 비운영 스키마 `seminar_dev`·`seminar_stg` 는 폐지 — 이름만 `zz_retired_seminar_dev_20261029`·`zz_retired_seminar_stg_20261029` 로 바꿔 보관(되돌리기 = `ALTER SCHEMA … RENAME TO seminar_stg`, 완전 삭제는 마스터 확인 뒤)
   - 운영 규칙(공유 DB 이므로) : ① 로컬·야간 시험 데이터는 제목에 `[QA-…]` 를 붙이고 시험 뒤 논리삭제 ② DB 변경(`sql/`)은 리허설 없이 운영에 바로 적용 — 적용 전 `--dry-run` 과 SQL 검토 필수, 2회 멱등 확인 ③ `db-migrate --app seminar --tier dev|stg` 는 더 쓰지 않음
+  - 시험 데이터 규칙(2026-10-29, 근거 [QA_DATA_AUDIT_2026-10-29](QA_DATA_AUDIT_2026-10-29.md)) :
+    - **시험 계정으로만** — 자동 시험·야간 E2E 는 시험 계정(`sys_user.regr_id='QA'`)으로만 돌린다. 마스터·실사용 계정으로 자동 시험 금지(감사 4절 : 마스터 계정 행이 야간 시험 시간대에 섞여 시험인지 실사용인지 가를 수 없었음)
+    - **딸린 테이블까지 정리** — 논리삭제는 FK 연쇄가 없다. 세미나·참가·회의록·계정(`smn_mst`·`smn_ptc`·`smn_nt`·`sys_user`)만 지우면 딸린 행이 남는다(지난 정리에서 217건 잔존). 함께 정리할 대상 : `smn_nt_seg`(회의록 조각) · `smn_atd`(출석) · `smn_pll`·`smn_pll_opt`·`smn_pll_vt`(설문) · `smn_qna`·`smn_qna_rcm`(Q&A) · `smn_vc_use`(AI 계량) · `smn_agr`(동의) · `smn_ncknm`(별명) · `smn_hst_pln`(요금제 보유). 새 테이블이 생기면 이 목록에 더한다(정본 = `sql/*.sql`). `smn_fee_plan`·`smn_isl_mst` 는 기준 정보라 대상 아님
+    - **정리 방법** — id 나열 대신 조건(시험 계정 + 기간)으로 묶는다 → 사전 건수 `SELECT` → 한 트랜잭션에서 `UPDATE` 마다 반환 건수 대조 → 모두 맞을 때만 `COMMIT`(하나라도 다르면 `ROLLBACK`), `modr_id='QA-CLEANUP'` 표시. 재사용 템플릿 = [QA_DATA_AUDIT 6절](QA_DATA_AUDIT_2026-10-29.md)(날짜만 바꿔 씀)
+    - **결제 원장 `pi_pymnt` 는 정리 대상 아님** — 감사 기록이므로 시험분이라도 그대로 둔다. 정리가 필요하면 마스터 결정
 - 마이그레이션 : `packages/pi-db/sql` baseline + `sitemap/seminar.pi/sql/NNN_*.sql` → `node scripts/db-migrate.mjs --app seminar --tier dev|stg|prod --db-url <Session pooler>` (prod → `public`). `.env.local` 의 Direct 호스트는 IPv6 전용이라 Session pooler 사용(ROADMAP Phase 0)
 - 명명 : DA 표준(docs/da/데이터표준규칙.md), 시스템 칼럼 4개·논리삭제
 - 세미나 모델 : [`sql/004_seminar_smnr.sql`](../sql/004_seminar_smnr.sql) — 신규 접두사 `smn_`, 신규 표준단어 세미나 `SMN`·참가 `PTC`·입장 `ENT`·개최자 `HST`(아소카 결정, DA 사후 리뷰 — `ENT` 는 행안부 공통표준단어 '기업'과 동음)
@@ -214,3 +219,4 @@
 | 2026-10-27 | v2 회의 부가 기능 — 5.1절 F-U·F-08~F-17(구현 커밋), 9절 #13~#18(실기기·엔진 교체·외부 AI 단가·Storage 버킷·sql/008·009 적용·모델 파일), 11.1절 마스터 결정 M-1~M-4·아소카 결정(마스터 위임 2026-10-27) D-20~D-28 |
 | 2026-10-28 | 5.1절 공통 상태 현행화 — 야간 시험 r1~r6(테스터 10명, 59건 병합·E2E·REA 회귀), REJECTED 사유 반영, 남은 결정 = NIGHT_REPORT_2026-10-28 ④ [확인중 : 마스터] |
 | 2026-10-29 | 현행화 — 5절 F-01~04 완료 판정·F-06·07 드롭(마스터), 5.1절 F-11~13 완료 판정·외부 AI 키 설정·번역·더빙 사용자별 상한(`8ca821c7`)·실기기 점검표, STAGING DB 공유 원인 확정(ROADMAP 막힌 것 #10) |
+| 2026-10-29 | 7절 시험 데이터 규칙 — 시험 계정(`regr_id='QA'`)으로만, 딸린 테이블까지 정리, 조건 묶음·건수 대조 후 COMMIT(`QA-CLEANUP`), `pi_pymnt` 제외(근거 QA_DATA_AUDIT_2026-10-29) |
