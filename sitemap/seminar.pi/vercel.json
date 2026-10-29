@@ -1,0 +1,3 @@
+{
+  "crons": [{ "path": "/api/cron/note-audio", "schedule": "0 18 * * *" }]
+}

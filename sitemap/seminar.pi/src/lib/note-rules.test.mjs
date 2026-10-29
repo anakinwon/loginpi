@@ -17,6 +17,7 @@ import {
   pickLabels,
   pollDelay,
   POLL_MAX_MS,
+  SUMMARY_POLL_MAX_MS,
   POLL_MS,
   POLL_SLOW_MS,
   holdWake,
@@ -158,9 +159,10 @@ test('대면 노트 — 앱 안 이동(헤더 링크·언어 바꾸기)으로 �
   )
   assert.match(
     s,
-    /void flush\(UPLOAD_TIMEOUT_MS\)\.then\(\(\) => endNote\(ntId\)\)/,
+    // 원본 음성 마지막 파일까지 올린 뒤 끝낸다(STT 1단계 — 서버는 끝난 노트의 원본을 받지 않음)
+    /void Promise\.all\(\[flush\(UPLOAD_TIMEOUT_MS\), rawFlush\(RAW_FLUSH_MS\)\]\)\.then\(\(\) => endNote\(ntId\)\)/,
   )
-  assert.match(s, /\}, \[ntId, flush\]\)/)
+  assert.match(s, /\}, \[ntId, flush, rawFlush\]\)/)
   // 종료 버튼·창 닫힘·정리·다른 곳에서 끝남(onHalt, r3) 경로가 모두 ended 를 세워 두 번 끝내지 않게
   assert.equal((s.match(/ended\.current = true/g) ?? []).length, 4)
 })
@@ -227,9 +229,11 @@ test('noteMarkdown — 기록 0줄이면 빈 안내 1줄, 기록이 있으면 �
 test('finishNote — 요약 시작·결과 저장 갱신이 모두 del_yn=N 조건(삭제된 회의록을 외부 AI 로 보내지 않음)', () => {
   const src = readFileSync(new URL('./notes.ts', import.meta.url), 'utf8')
   const fn = src.slice(src.indexOf('export async function finishNote'))
-  const ups = fn.split(".from('smn_nt')").slice(1)
+  const ups = fn.split(".from('smn_nt')").slice(1).filter((u) => /^\s*\.update\(/.test(u))
   assert.equal(ups.length, 2)
   for (const u of ups) assert.match(u.slice(0, 900), /\.eq\('del_yn', 'N'\)/)
+  // 정밀 전사(최대 240초) 중 삭제됐으면 요약하지 않는다(대면 노트 2단계 검토)
+  assert.match(fn, /select\('del_yn'\)[\s\S]{0,200}if \(g\.data\?\.del_yn !== 'N'\)/)
 })
 
 test('회의록 화면 — 보조 동작(내려받기·삭제) 실패가 화면 전체 오류(setErr)로 바뀌지 않는다(r2)', () => {
@@ -481,7 +485,8 @@ test('pollDelay — 상태를 처음 본 때부터 2분 : 기록 중 회의록�
   // 기록 중 2분 넘게 열어 두면 멈추지 않고 30초 간격(전에는 조회 중단 → '아직 기록 중' 고착)
   assert.equal(pollDelay('RECORDING', t0, t0 + POLL_MAX_MS + 1), POLL_SLOW_MS)
   assert.equal(pollDelay('SUMMARIZING', t0, t0 + 1000), POLL_MS)
-  assert.equal(pollDelay('SUMMARIZING', t0, t0 + POLL_MAX_MS + 1), null)
+  assert.equal(pollDelay('SUMMARIZING', t0, t0 + POLL_MAX_MS + 1), POLL_MS) // 정밀 전사 + 요약은 2분을 넘을 수 있다
+  assert.equal(pollDelay('SUMMARIZING', t0, t0 + SUMMARY_POLL_MAX_MS + 1), null)
   for (const s of ['DONE', 'FAILED', 'x']) assert.equal(pollDelay(s, t0, t0), null)
   // 배선 : 상태가 바뀌면 기준 시각을 다시 잡고, 간격은 pollDelay 값
   const src = readFileSync(new URL('../components/notes/note-view.tsx', import.meta.url), 'utf8')
@@ -502,4 +507,54 @@ test('noteMarkdown — 제목·화자·발화·요약의 HTML 태그·원격 그
   assert.ok(!/(^|[^\\])!\[/.test(md), md)
   assert.match(md, /&lt;img src=https:\/\/e\.x\/a\.png>/)
   assert.match(md, /보세요 !\\\[x\]/)
+})
+
+// 대면 노트 원본 음성(STT 1단계) — 이름 만들기·읽기·창 묶기·보관 기한
+test('원본 음성 이름·창·보관 기한', async () => {
+  const { audName, parseAudName, audWindows, audExpired, AUD, spkName, pickRef, callBudget, draftRanges } = await import('./note-rules.ts')
+  assert.equal(audName(3, 180500, 'audio/webm'), '000003-180500.webm')
+  assert.equal(audName(3, 1, 'video/webm'), null) // 모르는 형식
+  assert.equal(audName(-1, 0, 'audio/ogg'), null)
+  assert.equal(audName(1, 1.5, 'audio/ogg'), null)
+  assert.deepEqual(parseAudName('000003-180500.webm'), { name: '000003-180500.webm', seq: 3, off: 180500, mime: 'audio/webm' })
+  assert.equal(parseAudName('000003-180500.m4a').mime, 'audio/mp4')
+  for (const bad of ['3-1.webm', '000003-1.exe', '../000001-1.webm', '000003-.webm']) assert.equal(parseAudName(bad), null, bad)
+  const f = (seq) => ({ seq })
+  assert.deepEqual(audWindows([f(6), f(0), f(2), f(1), f(3), f(4), f(5)], 5).map((w) => w.map((x) => x.seq)), [[0, 1, 2, 3, 4], [5, 6]])
+  assert.deepEqual(audWindows([]), [])
+  // seq 구멍(업로드 실패)에서 창을 끊는다
+  assert.deepEqual(audWindows([0, 1, 3, 4, 5].map(f)).map((w) => w.map((x) => x.seq)), [[0, 1], [3, 4, 5]])
+  const end = '2026-10-29T00:00:00Z'
+  assert.equal(audExpired(end, null, Date.parse(end) + AUD.keepMs - 1), false)
+  assert.equal(audExpired(end, null, Date.parse(end) + AUD.keepMs + 1), true)
+  assert.equal(audExpired(null, end, Date.parse(end) + 1000), false) // 기록 중
+  assert.equal(audExpired(null, end, Date.parse(end) + AUD.maxRecMs + AUD.keepMs + 1), true) // RECORDING 고착 — 무기한 남지 않게
+  assert.equal(audExpired(null, null, Date.now()), false)
+  // 초안 대체 구간 — 정밀 문장이 나온 파일만, 이어지면 합치고 양끝을 안쪽으로(앞 slack, 뒤 chunk+slack)
+  const M = AUD.sliceMs
+  const fl = [0, 1, 2, 3, 4].map((i) => ({ name: `f${i}`, seq: i, off: i * M }))
+  const C = 9000
+  const S = AUD.slackMs
+  assert.deepEqual(draftRanges(fl, new Set(['f0', 'f1', 'f2', 'f3', 'f4']), C), [[S, 5 * M - C - S]])
+  // 파일 2 결과 없음(부분 전사·빠짐) = 그 1분 초안은 남는다
+  assert.deepEqual(draftRanges(fl, new Set(['f0', 'f1', 'f3']), C), [[S, 2 * M - C - S], [3 * M + S, 4 * M - C - S]])
+  // 짧은 파일(마이크 재연결) = 다음 파일 시작에서 끊는다
+  const short = [{ name: 'a', seq: 0, off: 0 }, { name: 'b', seq: 1, off: 20_000 }]
+  assert.deepEqual(draftRanges(short, new Set(['a']), C), [[S, 20_000 - C - S]])
+  assert.deepEqual(draftRanges(short, new Set(['b']), C), [[20_000 + S, 20_000 + M - C - S]])
+  assert.deepEqual(draftRanges(fl, new Set(), C), [])
+  // 화자 표기 남1~n·녀1~n(마스터 2026-10-29), 성별 모름 = 화자N
+  assert.equal(spkName('M', 1), '남1')
+  assert.equal(spkName('F', 2), '녀2')
+  assert.equal(spkName('U', 3), '화자3')
+  // 기준 파일 = 서로 다른 화자가 가장 많은 파일(같으면 앞), 줄 없으면 null
+  const L = (f, g, n) => ({ f, g, n })
+  assert.equal(pickRef([L(0, 'M', 1), L(1, 'M', 1), L(1, 'F', 1), L(2, 'M', 1), L(2, 'F', 1), L(2, 'F', 1)]), 1)
+  assert.equal(pickRef([L(3, 'M', 1), L(0, 'F', 1)]), 0)
+  assert.equal(pickRef([]), null)
+  // 시간 예산 — 남은 만큼만, 최소 호출 시간도 안 남으면 0(그 창은 초안 유지). 요약 30초까지 300초 안
+  assert.equal(callBudget(0, 150_000), 150_000)
+  assert.equal(callBudget(AUD.budgetMs - 60_000, 150_000), 60_000)
+  assert.equal(callBudget(AUD.budgetMs - AUD.minCallMs + 1, 150_000), 0)
+  assert.ok(AUD.budgetMs + 30_000 + 20_000 <= 300_000 && AUD.sliceMs * AUD.window <= 600_000)
 })

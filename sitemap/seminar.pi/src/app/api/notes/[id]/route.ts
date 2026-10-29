@@ -16,6 +16,7 @@ import {
   SEG_PAGE,
 } from '@/lib/note-rules'
 import { loadNote, readSegs, signShots } from '@/lib/notes'
+import { removeAudio } from '@/lib/note-audio'
 import { isUuid, parsePage } from '@/lib/seminar-rules'
 
 const noStore = { 'Cache-Control': 'no-store' }
@@ -243,6 +244,8 @@ export const DELETE = withAuthGuard(
       .eq('nt_id', ntId)
       .eq('del_yn', 'N')
     if (seg.error) return dbFail(seg.error)
+    // 대면 노트 원본 음성은 삭제와 함께 바로 지운다(보관 1일을 기다리지 않음 — 개인정보). 실패는 종료 때 보관 정리(sweepAudio)가 다시
+    await removeAudio(ntId)
     return NextResponse.json({ ok: true }, { headers: noStore })
   }),
 )

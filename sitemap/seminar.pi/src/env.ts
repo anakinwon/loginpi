@@ -52,6 +52,8 @@ export const env = createEnv({
     TURN_CREDENTIAL_TTL: z.coerce.number().int().positive().optional(),
     // 외부 AI(음성→글·번역·요약·합성 음성, 계획 M-1) 서버 키 — 미설정 = AI 기능 503 + 화면 숨김(src/lib/gemini.ts)
     GEMINI_API_KEY: z.string().optional(),
+    // Vercel cron 비밀값(Authorization: Bearer) — 대면 노트 원본 음성 보관 정리(api/cron/note-audio). 미설정 = cron 503(종료 때 정리만)
+    CRON_SECRET: z.string().min(16).optional(),
     // 세미나(또는 대면 노트) 1건당 음성 처리 상한(분) — 기본 120(src/lib/speech-rules.ts), 비용 폭주 차단(A-5)
     SPEECH_MAX_MIN: z.coerce.number().int().min(1).max(1440).optional(),
     // 사용자 1인(세미나 × 사용자) 번역·합성 누적 글자 상한 — 기본 10만·2만(src/lib/translate-rules.ts USR_AI_LIMIT), 세미나 상한 이하(감사 High 1)
@@ -111,6 +113,7 @@ export const env = createEnv({
     TURN_SECRET: process.env.TURN_SECRET,
     TURN_CREDENTIAL_TTL: process.env.TURN_CREDENTIAL_TTL,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    CRON_SECRET: process.env.CRON_SECRET,
     SPEECH_MAX_MIN: process.env.SPEECH_MAX_MIN,
     SPEECH_USR_TRANS_CHR: process.env.SPEECH_USR_TRANS_CHR,
     SPEECH_USR_TTS_CHR: process.env.SPEECH_USR_TTS_CHR,

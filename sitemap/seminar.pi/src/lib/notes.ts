@@ -6,6 +6,7 @@ import type { UserRow } from '@pi/db'
 import { db } from './api'
 import { isAdmin } from './auth'
 import { MAX_SUMMARY_IMAGES, summarize } from './gemini'
+import { refineNote, removeAudio, sweepAudio } from './note-audio'
 import { hhmm } from './note-rules'
 
 export const NOTE_BUCKET = 'smn-note'
@@ -49,11 +50,13 @@ export async function loadNote(ntId: string, user: UserRow) {
 }
 
 // 캡처 1장 올리기 — 버킷이 없으면(첫 사용) 비공개로 만들고 1번 다시 시도
-export async function uploadShot(path: string, bytes: Uint8Array) {
+export const uploadShot = (path: string, bytes: Uint8Array) => uploadObj(path, bytes, 'image/jpeg')
+// 비공개 버킷에 객체 1개(캡처·대면 노트 원본 음성). upsert = 같은 이름 다시 올리기 허용(원본 음성 재시도)
+export async function uploadObj(path: string, bytes: Uint8Array, contentType: string, upsert = false) {
   const put = () =>
     db()
       .storage.from(NOTE_BUCKET)
-      .upload(path, bytes, { contentType: 'image/jpeg', upsert: false })
+      .upload(path, bytes, { contentType, upsert })
   let { error } = await put()
   if (error && /not.?found/i.test(error.message)) {
     const c = await db().storage.createBucket(NOTE_BUCKET, { public: false })
@@ -164,10 +167,30 @@ export async function finishNote(
   // 다시 만들기는 마지막 실패 1분 뒤부터 — 권한자가 되풀이해도 외부 AI 호출은 분당 1회
   if (from === 'FAILED')
     up = up.lt('mod_dtm', new Date(now.getTime() - RETRY_GAP_MS).toISOString())
-  const { data: won, error: upErr } = await up.select('nt_id')
+  const { data: won, error: upErr } = await up.select('nt_id, nt_nm, start_dtm')
   if (upErr) return { error: upErr }
   if (!won?.length)
     return { status: from === 'FAILED' ? 'RETRY_SOON' : 'SUMMARIZING' }
+  // 대면 노트 정밀 전사(원본 음성이 있을 때만, STT 1단계) — 끝낼 때 1회. 다시 만들기(FAILED)는 이미 바꾼 문장을 그대로 요약
+  if (from === 'RECORDING') {
+    await refineNote(won[0] as { nt_id: string; nt_nm: string; start_dtm: string }, usrId).catch((e) =>
+      console.error('[notes] 정밀 전사 실패 — 초안으로 요약', e instanceof Error ? e.message : e),
+    )
+    // 정밀 전사(최대 240초) 중 삭제됐으면 — 그사이 넣은 정밀 문장도 논리삭제하고 원본을 지우며 요약하지 않는다(지운 내용을 외부 AI 로 보내지 않게).
+    //  refineNote 가 모든 창을 기다린 뒤 돌아오므로 여기 1번이면 이후 새로 들어갈 문장이 없다
+    const g = await db().from('smn_nt').select('del_yn').eq('nt_id', ntId).maybeSingle<{ del_yn: string }>()
+    if (g.error) return { error: g.error }
+    if (g.data?.del_yn !== 'N') {
+      const at = new Date().toISOString()
+      const { error } = await db()
+        .from('smn_nt_seg')
+        .update({ del_yn: 'Y', del_dtm: at, modr_id: usrId, mod_dtm: at })
+        .eq('nt_id', ntId)
+        .eq('del_yn', 'N')
+      await removeAudio(ntId)
+      return error ? { error } : { status: 'DELETED' }
+    }
+  }
 
   // 글 조각·캡처 키는 서로 독립 — 병렬(R-P1)
   const [t, s] = await Promise.all([
@@ -202,5 +225,7 @@ export async function finishNote(
     })
     .eq('nt_id', ntId)
     .eq('del_yn', 'N') // 요약 중 삭제되면 요약을 남기지 않는다
+  // 원본 음성 보관 정리(종료 1일 지난·삭제된 노트) — 실패해도 요약 결과와 무관
+  await sweepAudio().catch(() => {})
   return error ? { error } : { status }
 }

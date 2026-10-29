@@ -1,6 +1,6 @@
 'use client'
 // 대면 회의 노트(설계서 15.10, SA2) — 화상 연결 없이 마이크만. 제목 + 참석자 고지 체크 → [기록 시작](탭 = 마이크 권한 제스처)
-//  → POST /api/notes{title}(ADMIN) → POST /api/speech/agree{ntId}(NOTE_NOTICE) → useSpeech(field 'ntId', 5초 조각) → 최근 3문장
+//  → POST /api/notes{title}(ADMIN) → POST /api/speech/agree{ntId}(NOTE_NOTICE) → useSpeech(field 'ntId', 9초 조각) → 최근 3문장(초안) + useRawAudio(1분 원본 → 종료 뒤 정밀 전사·화자 구분)
 //  → [종료하고 회의록 만들기] = /api/notes/[id]/end(keepalive) 후 회의록 화면(/notes/[id], 만드는 중 상태)으로 이동.
 //  앱 안 이동으로 떠나면 마지막 조각 뒤 자동 종료, 마이크가 끊기면 [마이크 다시 연결]. 비로그인 = LoginGate, ADMIN 아님 = 안내(redirect 없음). 내 회의록 목록(NoteList)은 /notes 와 이 화면 '최근 노트'가 같이 쓴다
 import { useEffect, useRef, useState } from 'react'
@@ -19,6 +19,7 @@ import { Link, useRouter } from '@/i18n/navigation'
 import { readApi, useApiErrorText } from '@/lib/client-api'
 import { holdWake, NOTE_LIST_PAGE, recAlert } from '@/lib/note-rules'
 import { CHUNK_NOTE_MS, VAD } from '@/lib/speech-rules'
+import { useRawAudio } from './use-raw-audio'
 
 const noSend = async () => null // 대면 노트는 방송(자막) 없음
 
@@ -39,6 +40,7 @@ const MIC: MediaTrackConstraints = {
 }
 
 const REC_MARK = '● ' // 기록 중 탭 제목 앞 표시
+const RAW_FLUSH_MS = 30_000 // 원본 음성 마지막 파일(≈480KB) 업로드 대기 상한
 
 const mmss = (sec: number) =>
   `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
@@ -131,6 +133,10 @@ function Recorder() {
     },
   })
 
+  // 원본 음성 1분 파일(종료 뒤 정밀 전사·화자 구분, STT 1단계) — 실시간 조각과 같은 마이크
+  const raw = useRawAudio(track, ntId)
+  const rawFlush = raw.flush
+
   // 기록 중 — 경과 시간·화면 꺼짐 막기(기능 탐지)·떠나기 경고·창 닫힘이면 keepalive 로 끝내기(RECORDING 고착 방지)
   useEffect(() => {
     if (!ntId) return
@@ -162,10 +168,10 @@ function Recorder() {
       setTimeout(() => {
         if (!left.current || ended.current) return
         ended.current = true
-        void flush(UPLOAD_TIMEOUT_MS).then(() => endNote(ntId))
+        void Promise.all([flush(UPLOAD_TIMEOUT_MS), rawFlush(RAW_FLUSH_MS)]).then(() => endNote(ntId))
       }, 1000)
     }
-  }, [ntId, flush])
+  }, [ntId, flush, rawFlush])
 
   // 탭 제목 앞 '● ' — 다른 탭에 가 있어도 아직 기록 중임을 탭 목록에서 본다(보강 T02 r4). 끝났거나(gone) 떠나면 뗀다.
   //  앱 안 이동으로 새 화면 제목이 먼저 들어와 있으면 표시가 없으니 건드리지 않는다
@@ -243,7 +249,8 @@ function Recorder() {
     //  상한(업로드 시간 제한)을 넘으면 그래도 끝낸다
     setFinishing(true)
     ended.current = true
-    await flush(UPLOAD_TIMEOUT_MS)
+    // 원본 음성 마지막 파일도 올린 뒤 끝낸다(서버는 끝난 노트의 원본을 받지 않는다)
+    await Promise.all([flush(UPLOAD_TIMEOUT_MS), rawFlush(RAW_FLUSH_MS)])
     endNote(ntId)
     router.push(`/notes/${ntId}`)
   }

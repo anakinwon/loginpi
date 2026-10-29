@@ -100,10 +100,12 @@ export function headFatal(status: number, loaded: boolean) {
 export const POLL_MS = 5000
 export const POLL_SLOW_MS = 30_000
 export const POLL_MAX_MS = 120_000
+// 요약 기다림 상한 — 대면 노트는 정밀 전사(최대 240초, AUD.budgetMs) + 요약(30초)이 먼저라 2분으론 '오래 걸림'이 정상 경우에도 떴다
+export const SUMMARY_POLL_MAX_MS = 330_000
 export function pollDelay(status: string, since: number, now: number) {
   const late = now - since > POLL_MAX_MS
   if (status === 'RECORDING') return late ? POLL_SLOW_MS : POLL_MS
-  if (status === 'SUMMARIZING') return late ? null : POLL_MS
+  if (status === 'SUMMARIZING') return now - since > SUMMARY_POLL_MAX_MS ? null : POLL_MS
   return null
 }
 
@@ -260,4 +262,85 @@ export function holdWake(
       lock = null
     },
   }
+}
+
+// ── 대면 노트 원본 음성·정밀 전사(STT PoC 1단계, 마스터 2026-10-29 : 원본 1일 보관·화자1·2) ──
+// 기록 중 1분 독립 파일을 올리고(조각 전사와 따로), 종료 뒤 5분 창(파일 5개)씩 정밀 전사해 그 시간대 초안을 바꾼다
+export const AUD = {
+  sliceMs: 60_000, // 원본 파일 1개 길이
+  bps: 64_000, // opus 64kbps — 1분 ≈ 480KB
+  maxBytes: 1_500_000, // 업로드 1개 상한(64kbps 1분 + 여유 — 브라우저가 비트레이트를 넘겨도 받게)
+  keepMs: 86_400_000, // 종료 뒤 보관 1일
+  window: 5, // 정밀 전사 창 = 파일 5개(5분)
+  par: 6, // 창 동시 전사(첫 창은 화자 기준을 정하려고 먼저 혼자)
+  maxRecMs: 86_400_000, // 끝나지 않은(RECORDING 고착) 노트 — 시작 뒤 이만큼 지나면 끝난 것으로 보고 보관 기한을 센다
+  slackMs: 5_000, // 초안 시각(서버 수신 − 길이)과 원본 시각(노트 시작 + 기기 경과)의 어긋남 여유
+  budgetMs: 240_000, // 정밀 전사 전체 시간 예산 — 남은 예산으로 창 호출 시간을 줄이고, 남은 시간이 minCallMs 보다 적으면 그 창은 초안 유지(요약 30초까지 함수 상한 300초 안)
+  minCallMs: 30_000,
+} as const
+const AUD_EXT = { 'audio/webm': 'webm', 'audio/ogg': 'ogg', 'audio/mp4': 'm4a' } as const
+export type AudFile = { name: string; seq: number; off: number; mime: string }
+
+// 객체 이름 <seq 6자리>-<노트 시작 뒤 ms>.<확장자> — 이름만으로 순서·시각·형식을 안다(DB 칼럼 없이)
+export function audName(seq: number, offMs: number, mime: string): string | null {
+  const ext = AUD_EXT[mime as keyof typeof AUD_EXT]
+  if (!ext || !Number.isInteger(seq) || seq < 0 || seq > 999_999 || !Number.isInteger(offMs) || offMs < 0) return null
+  return `${String(seq).padStart(6, '0')}-${offMs}.${ext}`
+}
+export function parseAudName(name: string): AudFile | null {
+  const m = /^(\d{6})-(\d{1,10})\.(webm|ogg|m4a)$/.exec(name)
+  if (!m) return null
+  const mime = Object.entries(AUD_EXT).find(([, e]) => e === m[3])?.[0] as string
+  return { name, seq: Number(m[1]), off: Number(m[2]), mime }
+}
+// 순서대로 창(파일 n개)으로 묶는다 — seq 구멍(업로드 실패)에서도 창을 끊는다(이어진 녹음만 한 요청에)
+export function audWindows<T extends { seq: number }>(files: T[], n: number = AUD.window): T[][] {
+  const sorted = [...files].sort((a, b) => a.seq - b.seq)
+  const out: T[][] = []
+  let cur: T[] = []
+  for (const f of sorted) {
+    if (cur.length && (cur.length >= n || f.seq !== cur[cur.length - 1].seq + 1)) {
+      out.push(cur)
+      cur = []
+    }
+    cur.push(f)
+  }
+  if (cur.length) out.push(cur)
+  return out
+}
+// 정밀 문장으로 바꿀 초안 시간대(노트 시작 뒤 ms, [from, to)) — 정밀 문장이 실제로 나온 파일(hit)만.
+//  파일 구간 = [off, min(off + 1분, 다음 파일 off)), 이어진 hit 구간은 합치고, 양끝을 안쪽으로 줄인다 :
+//  앞 slack(시각 어긋남), 뒤 chunk + slack(조각이 구간 밖으로 걸침). 경계에서는 초안이 지워지지 않고 정밀 문장과 겹쳐 남는다(유실보다 중복).
+//  빠진 파일·빈 결과 파일·실패한 창·시간 부족 창은 hit 가 아니라 그 시간대 초안이 그대로 남는다(기록 유실 0)
+export function draftRanges(files: { name: string; seq: number; off: number }[], hit: ReadonlySet<string>, chunkMs: number): [number, number][] {
+  const sorted = [...files].sort((a, b) => a.seq - b.seq)
+  const spans: [number, number][] = []
+  sorted.forEach((f, i) => {
+    if (!hit.has(f.name)) return
+    const end = Math.min(f.off + AUD.sliceMs, sorted[i + 1]?.off ?? Infinity)
+    const last = spans[spans.length - 1]
+    if (last && last[1] >= f.off) last[1] = Math.max(last[1], end)
+    else spans.push([f.off, end])
+  })
+  return spans.map(([a, b]): [number, number] => [a + AUD.slackMs, b - chunkMs - AUD.slackMs]).filter(([a, b]) => b > a)
+}
+// 화자 표기(마스터 2026-10-29 '남1~n·녀1~n') — 성별을 모르면 화자N
+export const spkName = (g: 'M' | 'F' | 'U', n: number) => `${g === 'M' ? '남' : g === 'F' ? '녀' : '화자'}${n}`
+// 창 사이 화자 번호 맞추기 기준 파일 — 첫 창 전사에서 서로 다른 화자가 가장 많이 나온 1분 파일(같으면 앞 파일). 없으면 null
+export function pickRef(lines: { f: number; g: string; n: number }[]): number | null {
+  const by = new Map<number, Set<string>>()
+  for (const l of lines) by.set(l.f, (by.get(l.f) ?? new Set()).add(`${l.g}${l.n}`))
+  let best: number | null = null
+  for (const [f, set] of [...by].sort((a, b) => a[0] - b[0])) if (best === null || set.size > by.get(best)!.size) best = f
+  return best
+}
+// 창 호출에 줄 시간 — 남은 예산(상한 maxMs), 최소 호출 시간도 안 남으면 0(건너뜀)
+export const callBudget = (elapsedMs: number, maxMs: number) => {
+  const left = AUD.budgetMs - elapsedMs
+  return left < AUD.minCallMs ? 0 : Math.min(maxMs, left)
+}
+// 보관 기한 지남 — 종료(end) 뒤 keepMs. 끝나지 않은(RECORDING 고착) 노트는 시작 + maxRecMs 를 끝으로 본다(원본이 무기한 남지 않게)
+export function audExpired(endIso: string | null, startIso: string | null, now: number) {
+  const end = endIso ? Date.parse(endIso) : startIso ? Date.parse(startIso) + AUD.maxRecMs : NaN
+  return Number.isFinite(end) && now - end > AUD.keepMs
 }

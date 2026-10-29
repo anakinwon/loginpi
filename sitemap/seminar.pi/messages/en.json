@@ -96,6 +96,7 @@
     "POLL_CLOSED": "This poll is closed",
     "NOTE_NOT_RECORDING": "These notes are not recording",
     "NOTE_SHOT_INVALID": "Invalid screen capture",
+    "NOTE_AUDIO_INVALID": "Invalid recording file",
     "NOTE_SHOT_RATE": "Too many screen captures",
     "NOTE_RETRY_SOON": "You can try again in a minute",
     "SPEECH_TTS_FAILED": "Could not create the translated voice",
@@ -816,7 +817,7 @@
       },
       {
         "k": "When and how",
-        "v": "About every 5 seconds while a feature is on, over an encrypted connection (HTTPS)."
+        "v": "About every 5 seconds while a feature is on, over an encrypted connection (HTTPS). For in-person notes, the whole recording is sent once more in 5-minute parts when the note ends (accurate transcription)."
       },
       {
         "k": "Items",
@@ -824,7 +825,7 @@
       },
       {
         "k": "Purpose",
-        "v": "Speech to text, translation, meeting-note summaries, synthetic speech (standard voices, no voice cloning)"
+        "v": "Speech to text, translation, meeting-note summaries, synthetic speech (standard voices, no voice cloning), speaker separation for in-person notes (voices are told apart and labelled by perceived gender, such as Male 1 / Female 1 — no names or identities are inferred)"
       },
       {
         "k": "Retention",
@@ -837,7 +838,7 @@
     ],
     "keepTitle": "What this service keeps",
     "keep": [
-      "Original audio: not stored. It is discarded right after conversion to text.",
+      "Original audio: for seminar captions and AI meeting notes it is not stored; it is discarded right after conversion to text. For in-person notes, the recording is kept in private storage so it can be transcribed again more accurately (with speakers) after the meeting, and it is deleted at the daily cleanup once 1 day has passed since the note ended (immediately if the note is deleted).",
       "Live captions: not stored.",
       "AI meeting notes (when the presenter turns them on): spoken content, screenshots and the summary, kept until the notes are deleted [TBD: maximum retention].",
       "Consent records: the time of consent and the policy version, kept as proof [TBD: retention period].",
@@ -891,7 +892,7 @@
     "titleLabel": "Title",
     "titlePh": "e.g. Weekly meeting",
     "told": "I have told everyone present that this will be recorded and processed by AI (required)",
-    "toldWhy": "Before you start, tell everyone present that this conversation will be recorded and turned into text and a summary by an external AI",
+    "toldWhy": "Before you start, tell everyone present that this conversation will be recorded (the recording is kept for 1 day after the note ends, and speakers are told apart by voice and labelled by perceived gender) and turned into text and a summary by an external AI",
     "start": "Start recording",
     "starting": "Getting ready…",
     "recBadge": "Recording {time}",

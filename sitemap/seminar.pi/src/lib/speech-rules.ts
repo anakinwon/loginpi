@@ -25,7 +25,7 @@ export const SPEECH_MAX_MIN_DEFAULT = 120
 // 번역·합성 음성 입력 글자 상한(SA8·SA9 공용)
 export const MAX_TEXT_CHARS = 2_000
 // 동의 기록(smn_agr.agr_ver_cd)에 남길 처리방침 문안 버전 — /privacy 문안을 바꾸면 함께 올린다
-export const PRIVACY_VER = '2026-10-28' // 10-28 : 출석 기록(Pi 사용자명 개최자 제공) 고지 추가
+export const PRIVACY_VER = '2026-10-29' // 10-28 : 출석 기록(Pi 사용자명 개최자 제공) 고지 추가 · 10-29 : 대면 노트 녹음 원본 1일 보관(정밀 전사)
 
 // 브라우저 MediaRecorder 형식 → 외부 AI 입력 MIME(공식 문서 2026-10-27 확인 : webm·ogg·m4a·wav 등 지원 — docs/audio)
 // audio/mp4(Safari·iOS MediaRecorder) → audio/m4a 로 보낸다 [추론 : 목록에 mp4 없음, m4a = MP4 오디오 컨테이너 — 실기기 확인 필요]

@@ -8,7 +8,7 @@ import { finishNote, loadNote } from '@/lib/notes'
 import { isUuid } from '@/lib/seminar-rules'
 import { planAiOk } from '@/lib/speech-gate'
 
-export const maxDuration = 60 // 요약 30초 + 조회·캡처 읽기 여유
+export const maxDuration = 300 // 대면 노트 정밀 전사(시간 예산 240초 — note-rules AUD.budgetMs) + 요약 30초 + 조회·캡처 읽기 여유
 const noStore = { 'Cache-Control': 'no-store' }
 
 export const POST = withAuthGuard(
