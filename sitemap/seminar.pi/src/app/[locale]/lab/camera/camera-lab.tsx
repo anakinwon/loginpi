@@ -4,6 +4,7 @@
 // iOS WebView 교훈(cafe.pi PRD_9 사례 #1) : 영상 요소는 숨기지 않고 playsInline, 재생 실패 시 '탭하여 재생' 버튼
 import { createClient, type RealtimeChannel } from '@supabase/supabase-js'
 import { useEffect, useRef, useState } from 'react'
+import { pickAudioMime } from '@/components/room/use-speech'
 
 const ICE: RTCIceServer[] = [{ urls: 'stun:stun.l.google.com:19302' }] // ponytail: STUN 만 — 같은 Wi-Fi 기준, LTE·방화벽은 TURN(M2)
 const STATS_MS = 2000
@@ -43,6 +44,11 @@ export function CameraLab({ signalUrl, signalKey }: { signalUrl?: string; signal
       secureContext: window.isSecureContext,
       mediaDevices: !!navigator.mediaDevices?.getUserMedia,
       RTCPeerConnection: typeof RTCPeerConnection !== 'undefined',
+      // 방 효과·대면 노트 진단(F-09·F-15) — 각 기능이 버튼을 보일지 정하는 탐지와 같다
+      'canvas.captureStream (배경·조명)': typeof HTMLCanvasElement.prototype.captureStream === 'function',
+      'canvas filter (조명)': 'filter' in CanvasRenderingContext2D.prototype,
+      'noiseSuppression (소음)': !!navigator.mediaDevices?.getSupportedConstraints?.().noiseSuppression,
+      'MediaRecorder 음성 (대면 노트)': !!pickAudioMime(),
     })
     // 화면을 떠나면 연결·카메라·마이크 모두 정리(표시등이 남지 않게)
     mounted.current = true
