@@ -6,7 +6,7 @@ import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
 import { getSessionUser } from '@/lib/auth'
 import { AUD, audName } from '@/lib/note-rules'
-import { uploadObj } from '@/lib/notes'
+import { NOTE_BUCKET, uploadObj } from '@/lib/notes'
 import { isUuid } from '@/lib/seminar-rules'
 import { baseMime, sniffBox, speechMaxSec } from '@/lib/speech-rules'
 import { env } from '@/env'
@@ -46,6 +46,12 @@ export const POST = withAuthGuard(
     if (nt.data.usr_id !== user.id) return apiError('FORBIDDEN', 403)
     if (nt.data.nt_sts_cd !== 'RECORDING') return apiError('NOTE_NOT_RECORDING', 409)
 
+    // 같은 순번은 1개만 — 이름에 off 가 들어가 off 만 바꿔 보내면 같은 seq 로 객체가 끝없이 쌓였다(보안 검토). 같은 이름 재시도(덮어쓰기)만 허용
+    const seqKey = name.slice(0, 7) // '000123-'
+    const same = await db().storage.from(NOTE_BUCKET).list(`aud/${ntId}`, { search: seqKey, limit: 2 })
+    // 버킷이 아직 없으면(첫 사용) 목록 실패 = 같은 순번 없음 — 올리기가 버킷을 만든다(uploadObj)
+    if (same.error && !/not.?found/i.test(same.error.message)) return apiError('INTERNAL', 500)
+    if ((same.data ?? []).some((o) => o.name.startsWith(seqKey) && o.name !== name)) return apiError('NOTE_AUDIO_INVALID', 400)
     const upErr = await uploadObj(`aud/${ntId}/${name}`, bytes, mime, true)
     if (upErr) {
       console.error('[notes/audio] 업로드 실패', upErr.message)

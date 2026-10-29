@@ -9,7 +9,7 @@ import { env } from '@/env'
 import { db, dbFail, dbRoute } from '@/lib/api'
 import { getSessionUser, isAdmin } from '@/lib/auth'
 import { signMediaTicket } from '@/lib/media-ticket'
-import { HOST_GRACE_MS, hostState } from '@/lib/engage-rules'
+import { hostState } from '@/lib/engage-rules'
 import { hostPlan, planLeft } from '@/lib/plan'
 import { isUuid, OPEN_STS } from '@/lib/seminar-rules'
 
@@ -55,7 +55,6 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
   let roomCap: number | undefined
   let startLive = false
   let nickname: string | null = null // 세미나 별명(sql/014)
-  let hostEntry = false // 개최자 본인 입장(부재 판정 경합 방지 표시용)
   if (isUuid(room)) {
     // 세미나·내 참가 — 서로 의존 없음 → 병렬(R-P1)
     const [smn, ptc, nck, plan] = await Promise.all([
@@ -104,8 +103,9 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
     }
     // 개최자 부재(마스터 2026-10-29) — 개최자가 아닌 사람은 개최자가 룸에 있거나 나간 지 5분 안일 때만 입장(관리자 포함 — 남이 연 방).
     //  쫓겨난 참가자가 바로 다시 들어와 개최자 없이 쓰지 못하게. 개최자 확인 뒤에야 개최자 id 를 알아 직렬(의존)
-    hostEntry = smn.data.hst_usr_id === user.id
-    if (!hostEntry) {
+    // ponytail: 입장권 발급을 개최자 '있음'으로 기록하지 않는다(보안 검토 — 개최자가 입장권만 받아 참가자 무료 사용을 늘릴 수 있음).
+    //  돌아온 개최자의 첫 하트비트 전 1~3초에 참가자 판정이 방을 닫는 경합이 남는다 — 닫기 직전 재확인(attendance)으로 좁혔고, 걸리면 개최자는 다시 입장
+    if (smn.data.hst_usr_id !== user.id) {
       const h = await db()
         .from('smn_atd')
         .select('lst_hb_dtm')
@@ -139,19 +139,6 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
     )
   // 발표자 입장 = 세미나 시작(PRD D-4 SCHEDULED → LIVE). 서명 성공 뒤에만(서명 실패 503 인데 LIVE 로 남지 않게 — 2차 검토 지적).
   //  조건부 갱신이라 여러 번 불려도 한 번만 바뀐다
-  // 개최자 재입장 — 엔진에 붙기 전에 DB 를 '있음'으로(부재 판정이 돌아온 개최자의 방을 닫지 않게, 검토 지적).
-  //  기록이 부재 기준보다 낡았을 때만 — 이 간격은 어차피 차감 0(sql/022 90초 초과)이라 계량에 영향 없음. 첫 입장(행 없음)은 참가자가 막혀 있어 경합 없음
-  if (isUuid(room) && hostEntry) {
-    const now = new Date()
-    const { error: hbErr } = await db()
-      .from('smn_atd')
-      .update({ lst_hb_dtm: now.toISOString(), modr_id: user.id, mod_dtm: now.toISOString() })
-      .eq('smn_id', room)
-      .eq('usr_id', user.id)
-      .eq('del_yn', 'N')
-      .lt('lst_hb_dtm', new Date(now.getTime() - HOST_GRACE_MS).toISOString())
-    if (hbErr) console.error('[media/ticket] 개최자 입장 표시 실패', hbErr.code)
-  }
   if (startLive) {
     const { error: liveErr } = await db()
       .from('smn_mst')
