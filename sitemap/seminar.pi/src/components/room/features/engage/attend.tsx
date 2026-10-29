@@ -16,7 +16,7 @@ const WARN_SEC = [600, 60] as const
 const DIM_AFTER_MS = 10_000 // 처음 보인 뒤 이 시간이 지나면 50% 투명(무대를 덜 가리게)
 const PLAN_KEY: Record<string, 'free' | 'monthly' | 'yearly'> = { FREE: 'free', M: 'monthly', Y: 'yearly' }
 
-type Beat = { remainSec?: number | null; left?: number | null; plan?: string; paid?: number | null; free?: number | null; ticking?: boolean; ended?: boolean }
+type Beat = { away?: boolean; remainSec?: number | null; left?: number | null; plan?: string; paid?: number | null; free?: number | null; ticking?: boolean; ended?: boolean }
 // ticking = 지금 실제로 차감 중(개최자가 룸에 있음) — 아니면 받은 값 그대로 멈춰 보인다(나간 뒤에도 줄어 보이던 결함)
 type Clock = { paid: number | null; free: number; at: number; plan: string; ticking: boolean }
 
@@ -42,6 +42,7 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
     let last = 0
     let stop = false
     const warned = new Set<number>()
+    let awayTold = false // 개최자 부재 알림 — 부재 1번에 1번(돌아오면 다시 알릴 수 있게 푼다)
     const out = (key: string) => {
       stop = true
       clearInterval(timer)
@@ -52,7 +53,8 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
       if (stop) return
       last = Date.now()
       void api<Beat>(`/api/seminars/${id}/attendance`, 'POST').then((r) => {
-        if (!r.ok && r.status === 409) return out('plan.closed') // 방이 닫힘(시간 소진·개최자 종료) — 룸에서 나간다
+        // 방이 닫힘(시간 소진·개최자 종료) 또는 개최자가 5분 넘게 없음(HOST_AWAY, 마스터 2026-10-29) — 룸에서 나간다
+        if (!r.ok && r.status === 409) return out(r.body.code === 'HOST_AWAY' ? 'plan.hostGone' : 'plan.closed')
         if (!r.ok && beatStops(r.status)) {
           stop = true
           clearInterval(timer)
@@ -60,6 +62,9 @@ function AttendBeat({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
         }
         if (!r.ok) return
         if (r.data.ended) return out('plan.ended')
+        // 참가자 — 개최자가 90초 넘게 없으면 5분 안에 안 오면 퇴장된다고 1번 알린다
+        if (r.data.away && !awayTold) notice.current('plan.hostAway')
+        awayTold = !!r.data.away
         if (r.data.free != null) setClock({ paid: r.data.paid ?? null, free: r.data.free, at: Date.now(), plan: r.data.plan ?? 'FREE', ticking: r.data.ticking !== false })
         const left = r.data.remainSec
         if (left == null) return // 계량 대상 아님(개최자 아님)

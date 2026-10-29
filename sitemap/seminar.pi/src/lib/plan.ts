@@ -70,6 +70,21 @@ export const planLeft = (h: HostPlan | null, cd: string) => {
   return (p.paid ?? 0) + p.free
 }
 
+// 엔진 방 강제 종료(DELETE /admin/rooms/{id} — 접속자 전원 ROOM_CLOSED, 종료 표시는 남기지 않아 다시 들어오면 새로 열린다).
+//  관리 키·엔진 주소가 있을 때만, 2초 제한(R-P4). 실패는 기록만(시간 소진 종료·개최자 부재 퇴장이 같이 쓴다)
+export async function closeEngineRoom(smnId: string): Promise<void> {
+  const base = engineAdminBase(env.NEXT_PUBLIC_MEDIA_WS_URL)
+  if (!base || !env.MEDIA_ADMIN_SECRET) return
+  await fetch(`${base}/admin/rooms/${encodeURIComponent(smnId)}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${env.MEDIA_ADMIN_SECRET}` },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(2_000),
+  })
+    .then((r) => r.status !== 204 && r.status !== 404 && console.error('[plan] 엔진 방 종료 실패', r.status))
+    .catch(() => console.error('[plan] 엔진 방 종료 실패 network'))
+}
+
 // 시간 소진 종료 — 세미나 ENDED(열린 상태일 때만, 조건부 갱신 = 멱등 — api/seminars/[id]/end 와 같은 규칙) +
 //  응답 뒤(after) 남은 회의록 마무리·엔진 방 강제 종료(DELETE /admin/rooms/{id}, 관리 키·엔진 주소가 있을 때만, 2초 제한 R-P4)
 export async function endByPlan(smnId: string, usrId: string): Promise<void> {
@@ -80,19 +95,9 @@ export async function endByPlan(smnId: string, usrId: string): Promise<void> {
     .in('smn_sts_cd', [...OPEN_STS])
   if (error) throw error
   after(async () => {
-    const base = engineAdminBase(env.NEXT_PUBLIC_MEDIA_WS_URL)
     const [notes] = await Promise.all([
       db().from('smn_nt').select('nt_id').eq('smn_id', smnId).eq('nt_sts_cd', 'RECORDING').eq('del_yn', 'N'),
-      base && env.MEDIA_ADMIN_SECRET
-        ? fetch(`${base}/admin/rooms/${encodeURIComponent(smnId)}`, {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${env.MEDIA_ADMIN_SECRET}` },
-            cache: 'no-store',
-            signal: AbortSignal.timeout(2_000),
-          })
-            .then((r) => r.status !== 204 && r.status !== 404 && console.error('[plan] 엔진 방 종료 실패', r.status))
-            .catch(() => console.error('[plan] 엔진 방 종료 실패 network'))
-        : null,
+      closeEngineRoom(smnId),
     ])
     if (notes.error) return console.error('[plan] 회의록 조회 실패', notes.error.code)
     await Promise.all((notes.data ?? []).map((x) => finishNote(x.nt_id, 'RECORDING', usrId)))

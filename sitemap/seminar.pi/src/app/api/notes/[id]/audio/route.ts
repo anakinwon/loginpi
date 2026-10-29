@@ -8,7 +8,8 @@ import { getSessionUser } from '@/lib/auth'
 import { AUD, audName } from '@/lib/note-rules'
 import { uploadObj } from '@/lib/notes'
 import { isUuid } from '@/lib/seminar-rules'
-import { baseMime, sniffBox } from '@/lib/speech-rules'
+import { baseMime, sniffBox, speechMaxSec } from '@/lib/speech-rules'
+import { env } from '@/env'
 
 const noStore = { 'Cache-Control': 'no-store' }
 
@@ -25,7 +26,9 @@ export const POST = withAuthGuard(
     const ntId = id.toLowerCase()
     const audio = form.get('audio')
     const mime = audio instanceof Blob ? baseMime(audio.type) : null
-    const name = mime ? audName(Number(form.get('seq')), Number(form.get('off')), mime) : null
+    // 파일 수 상한 = 음성 처리 상한(분) — 실시간 전사가 멈추는 길이 넘어 원본만 쌓이지 않게(보안 검토 : 무한 업로드)
+    const maxSeq = Math.ceil(speechMaxSec(env.SPEECH_MAX_MIN) / 60)
+    const name = mime ? audName(Number(form.get('seq')), Number(form.get('off')), mime, maxSeq) : null
     if (!(audio instanceof Blob) || !mime || !name || !audio.size || audio.size > AUD.maxBytes)
       return apiError('NOTE_AUDIO_INVALID', 400)
     const bytes = new Uint8Array(await audio.arrayBuffer())

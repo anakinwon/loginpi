@@ -1,7 +1,7 @@
 // engage-rules.ts 시험 — node src/lib/engage-rules.test.mjs (설문 입력·집계·출석 시간·CSV·refresh 신호)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { attendSec, beatDue, beatStops, charsLeft, cleanPoll, cleanQuestion, csvCell, fmtDur, isOnline, parseRefresh, pollVoting, sendKey, tally, toCsv, leftNow, LOW_LEFT_SEC, splitLeft } from './engage-rules.ts'
+import { attendSec, beatDue, beatStops, charsLeft, cleanPoll, cleanQuestion, csvCell, fmtDur, isOnline, parseRefresh, pollVoting, sendKey, tally, toCsv, leftNow, LOW_LEFT_SEC, splitLeft, hostState, HOST_GRACE_MS, HOST_WARN_MS } from './engage-rules.ts'
 
 test('설문 입력 — 2~10개·중복·길이', () => {
   assert.deepEqual(cleanPoll(' 다음 주제? ', [' A', 'B ']), { q: '다음 주제?', opts: ['A', 'B'] })
@@ -137,4 +137,18 @@ test('splitLeft — 유료 먼저 줄고 다음 무료', () => {
   assert.deepEqual(splitLeft(0, 50, 0, 80_000), { paid: 0, free: 0 })
   assert.deepEqual(splitLeft(null, 3600, 0, 60_000), { paid: null, free: 3540 })
   assert.deepEqual(splitLeft(100, 3600, 5000, 0), { paid: 100, free: 3600 }) // 받기 전 시각 = 그대로
+})
+
+// 개최자 부재(마스터 2026-10-29) — 5분 넘게 개최자 하트비트가 없으면 참가자 전원 퇴장·입장 불가, 90초 넘으면 알림
+test('hostState — 개최자 마지막 하트비트로 here·away·gone', () => {
+  const now = Date.parse('2026-10-29T12:00:00Z')
+  const ago = (ms) => new Date(now - ms).toISOString()
+  assert.equal(hostState(ago(30_000), now), 'here')
+  assert.equal(hostState(ago(HOST_WARN_MS), now), 'here')
+  assert.equal(hostState(ago(HOST_WARN_MS + 1), now), 'away')
+  assert.equal(hostState(ago(HOST_GRACE_MS), now), 'away') // 딱 경계는 아직
+  assert.equal(hostState(ago(HOST_GRACE_MS + 1), now), 'gone')
+  assert.equal(hostState(null, now), 'gone') // 한 번도 안 들어옴
+  assert.equal(hostState('nonsense', now), 'gone')
+  assert.equal(HOST_GRACE_MS, 360_000) // 5분 + 하트비트 간격 — 나간 뒤 5분 전엔 퇴장 없음
 })

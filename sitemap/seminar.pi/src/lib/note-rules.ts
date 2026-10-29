@@ -282,9 +282,11 @@ const AUD_EXT = { 'audio/webm': 'webm', 'audio/ogg': 'ogg', 'audio/mp4': 'm4a' }
 export type AudFile = { name: string; seq: number; off: number; mime: string }
 
 // 객체 이름 <seq 6자리>-<노트 시작 뒤 ms>.<확장자> — 이름만으로 순서·시각·형식을 안다(DB 칼럼 없이)
-export function audName(seq: number, offMs: number, mime: string): string | null {
+// maxSeq = 노트 1건 원본 파일 수 상한(1분 파일 — 음성 처리 상한 분, 호출부가 speechMaxSec 으로). off 는 기록 상한 안(parseAudName 10자리와 같은 범위 — 보안 검토)
+export function audName(seq: number, offMs: number, mime: string, maxSeq = 1440): string | null {
   const ext = AUD_EXT[mime as keyof typeof AUD_EXT]
-  if (!ext || !Number.isInteger(seq) || seq < 0 || seq > 999_999 || !Number.isInteger(offMs) || offMs < 0) return null
+  if (!ext || !Number.isInteger(seq) || seq < 0 || seq >= maxSeq || !Number.isInteger(offMs) || offMs < 0 || offMs > AUD.maxRecMs + AUD.sliceMs)
+    return null
   return `${String(seq).padStart(6, '0')}-${offMs}.${ext}`
 }
 export function parseAudName(name: string): AudFile | null {

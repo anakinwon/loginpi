@@ -24,11 +24,16 @@ export async function listAudio(ntId: string): Promise<AudFile[]> {
   return (data ?? []).flatMap((o) => parseAudName(o.name) ?? [])
 }
 
+// 노트 원본 전부 삭제 — 이름 규칙(parseAudName)을 거치지 않고 폴더 안 객체를 1000개씩 끝까지(정리가 이름 해석에 기대지 않게, 보안 검토)
 export async function removeAudio(ntId: string) {
-  const files = await listAudio(ntId)
-  if (!files.length) return
-  const { error } = await bucket().remove(files.map((f) => `${dir(ntId)}/${f.name}`))
-  if (error) console.error('[note-audio] 삭제 실패', ntId, error.message)
+  for (;;) {
+    const { data, error } = await bucket().list(dir(ntId), { limit: 1000 })
+    if (error) return console.error('[note-audio] 삭제 목록 실패', ntId, error.message)
+    if (!data?.length) return
+    const { error: e2 } = await bucket().remove(data.map((o) => `${dir(ntId)}/${o.name}`))
+    if (e2) return console.error('[note-audio] 삭제 실패', ntId, e2.message)
+    if (data.length < 1000) return
+  }
 }
 
 // 정밀 전사 — 종료(RECORDING → SUMMARIZING)에 이긴 요청 1건만 부른다(finishNote). 다시 만들기(FAILED)는 부르지 않는다(정밀 문장 중복 방지)

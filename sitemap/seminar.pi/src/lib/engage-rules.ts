@@ -69,6 +69,20 @@ export const isOnline = (hb: string | number | Date, now: number) => now - new D
 // 룸 남은 시간 카운트다운(sql/018 세미나 요금제) — 마지막 하트비트 응답의 남은 초(left)·받은 시각(at)에서 지금까지 흐른 초를 뺀다(0 아래로 안 감).
 //  LOW_LEFT_SEC 미만 = 붉은 글자 깜빡임(마스터 2026-10-29)
 export const LOW_LEFT_SEC = 300
+// 개최자 부재(마스터 2026-10-29) — 개최자가 나간 뒤 참가자끼리 무제한으로 쓰지 못하게. 기준 = 개최자 마지막 출석 하트비트(60초마다).
+//  WARN 넘으면 참가자에게 알림 1번(away), GRACE 넘으면 참가자 전원 퇴장·입장 불가(gone) — 개최자가 다시 들어오면 풀린다.
+//  기준이 '나간 시각'이 아니라 마지막 하트비트(최대 HB_MS 전)라 GRACE = 5분 + HB_MS — 나간 뒤 5분 전에는 절대 퇴장되지 않는다(실제 5~7분, 검토 지적).
+//  WARN 도 하트비트 1번 늦은 것만으로 뜨지 않게 HB_MS 의 2.5배.
+//  한 번도 안 들어온(하트비트 없음) 개최자 = gone(참가자만 먼저 들어가 쓰지 못하게)
+export const HOST_WARN_MS = 150_000
+export const HOST_GRACE_MS = 300_000 + 60_000
+export type HostState = 'here' | 'away' | 'gone'
+export function hostState(lastHb: string | null | undefined, now: number): HostState {
+  const t = lastHb ? Date.parse(lastHb) : NaN
+  if (!Number.isFinite(t)) return 'gone'
+  const gap = now - t
+  return gap > HOST_GRACE_MS ? 'gone' : gap > HOST_WARN_MS ? 'away' : 'here'
+}
 export const leftNow = (left: number, at: number, now: number) => Math.max(0, left - Math.floor(Math.max(0, now - at) / 1000))
 // 이원화 카운트다운(sql/021) — 흐른 초를 유료에서 먼저 빼고, 유료가 0 이면 무료에서. paid = null 이면 무료 세미나(무료만)
 export function splitLeft(paid: number | null, free: number, at: number, now: number): { paid: number | null; free: number } {

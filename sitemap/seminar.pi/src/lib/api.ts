@@ -51,6 +51,7 @@ export const apiError = createApiError({
   PRICE_UNAVAILABLE: 'Pi 시세를 확인하지 못했습니다. 잠시 후 다시 시도하세요',
   QUOTE_EXPIRED: '결제 견적 시간이 지났습니다. 다시 결제하세요',
   PLAN_EXHAUSTED: '세미나 이용 시간을 모두 썼습니다. 요금제에서 시간을 충전하세요',
+  HOST_AWAY: '개최자가 룸에 없습니다. 개최자가 들어온 뒤 입장할 수 있습니다',
   PLAN_AI_PAID: 'AI 기능은 유료 요금제에서 쓸 수 있습니다',
   PLAN_EXPIRES_BEFORE_START: '시작 일시가 이 요금제 이용권 만료 뒤입니다',
   // 녹화(sql/023) — 로컬 저장, 월간·연간 세미나만, 녹화 시간 추가 차감

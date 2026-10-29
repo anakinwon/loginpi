@@ -516,6 +516,11 @@ test('원본 음성 이름·창·보관 기한', async () => {
   assert.equal(audName(3, 1, 'video/webm'), null) // 모르는 형식
   assert.equal(audName(-1, 0, 'audio/ogg'), null)
   assert.equal(audName(1, 1.5, 'audio/ogg'), null)
+  // 상한 — 파일 수(음성 처리 상한 분)·기록 시간(보안 검토 : 무한 업로드·이름 규칙 어긋남 차단)
+  assert.equal(audName(120, 0, 'audio/webm', 120), null)
+  assert.equal(audName(119, 0, 'audio/webm', 120), '000119-0.webm')
+  assert.equal(audName(0, AUD.maxRecMs + AUD.sliceMs + 1, 'audio/webm'), null)
+  assert.ok(parseAudName(audName(0, AUD.maxRecMs + AUD.sliceMs, 'audio/webm')))
   assert.deepEqual(parseAudName('000003-180500.webm'), { name: '000003-180500.webm', seq: 3, off: 180500, mime: 'audio/webm' })
   assert.equal(parseAudName('000003-180500.m4a').mime, 'audio/mp4')
   for (const bad of ['3-1.webm', '000003-1.exe', '../000001-1.webm', '000003-.webm']) assert.equal(parseAudName(bad), null, bad)

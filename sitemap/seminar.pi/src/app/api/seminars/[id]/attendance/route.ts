@@ -6,12 +6,12 @@
 //  계량·소진 종료는 개최자 본인 하트비트만(개최자가 없으면 시간도 줄지 않는다).
 //  비로그인 401 — redirect 없음. 응답 no-store
 // ponytail: 확인과 갱신 사이에 세미나가 닫히면 하트비트 1번(≤60초)이 더 남는다 — 엄격히 막으려면 상태 조건을 건 RPC 로
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
 import { closed, gate, noStore, who } from '@/lib/engage'
-import { ATD_CSV_MAX, ATD_PAGE } from '@/lib/engage-rules'
-import { endByPlan, hostPlan, planLeft, planPools } from '@/lib/plan'
+import { ATD_CSV_MAX, ATD_PAGE, hostState } from '@/lib/engage-rules'
+import { closeEngineRoom, endByPlan, hostPlan, planLeft, planPools } from '@/lib/plan'
 import { parsePage } from '@/lib/seminar-rules'
 
 type AtdRow = {
@@ -30,11 +30,32 @@ export const POST = withAuthGuard(
     if (!g.open) return closed()
     // 출석 갱신·개최자 시간 계량을 DB 함수 1왕복으로(sql/015 fn_hb_smn_hst — 출석 행 잠금으로 여러 탭 중복 계량 없음, R-P5)
     //  remainSec = null 이면 계량 대상 아님(참가자·ADMIN 개최자·LIVE 아님). 0 이하 = 시간 소진 → 세미나 종료
-    const { data, error } = await db().rpc('fn_hb_smn_hst', { p_smn_id: w.smnId, p_usr_id: w.user.id })
-    if (error) return dbFail(error)
-    const remainSec = data === null ? null : Number(data)
-    // 참가자(개최자 아님) = 출석만 — 요금제·남은 시간을 보내지 않는다(카운트다운·소진 퇴장 없음)
-    if (g.hostId !== w.user.id) return NextResponse.json({ ok: true }, { headers: noStore })
+    //  참가자면 개최자 마지막 하트비트도 같이(독립 — 병렬 R-P1) : 개최자 부재 판정
+    const isHost = g.hostId === w.user.id
+    const [hb, hostAtd] = await Promise.all([
+      db().rpc('fn_hb_smn_hst', { p_smn_id: w.smnId, p_usr_id: w.user.id }),
+      isHost
+        ? null
+        : db().from('smn_atd').select('lst_hb_dtm').eq('smn_id', w.smnId).eq('usr_id', g.hostId).eq('del_yn', 'N').maybeSingle<{ lst_hb_dtm: string }>(),
+    ])
+    if (hb.error) return dbFail(hb.error)
+    if (hostAtd?.error) return dbFail(hostAtd.error)
+    const remainSec = hb.data === null ? null : Number(hb.data)
+    // 참가자(개최자 아님) = 출석만 — 요금제·남은 시간을 보내지 않는다(카운트다운·소진 퇴장 없음).
+    //  개최자가 5분 넘게 없으면(gone) 409 HOST_AWAY → 화면이 룸에서 나가고, 응답 뒤 엔진 방도 닫아 남은 접속(화면 조작 포함)을 끊는다(마스터 2026-10-29).
+    //  90초 넘게 없으면(away) 알림용 away — 개최자가 다시 들어오면(하트비트) 풀린다
+    if (!isHost) {
+      const st = hostState(hostAtd?.data?.lst_hb_dtm, Date.now())
+      if (st === 'gone') {
+        // 닫기 직전 개최자 기록을 다시 본다 — 그사이 개최자가 돌아왔으면(입장권이 '있음'을 먼저 기록) 닫지 않는다(재입장 경합, 검토 지적)
+        after(async () => {
+          const again = await db().from('smn_atd').select('lst_hb_dtm').eq('smn_id', w.smnId).eq('usr_id', g.hostId).eq('del_yn', 'N').maybeSingle<{ lst_hb_dtm: string }>()
+          if (!again.error && hostState(again.data?.lst_hb_dtm, Date.now()) === 'gone') await closeEngineRoom(w.smnId)
+        })
+        return apiError('HOST_AWAY', 409)
+      }
+      return NextResponse.json({ ok: true, away: st === 'away' }, { headers: noStore })
+    }
     // LIVE 면 카운트다운용 요금제별 남은 시간(유료·무료 이원화, sql/021) — 개최자 차감 뒤 값이 필요해 하트비트 다음에 읽는다(의존 있는 직렬)
     const hp = g.live ? await hostPlan(g.hostId) : null
     const ticking = remainSec !== null

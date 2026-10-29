@@ -82,6 +82,7 @@
     "PRICE_UNAVAILABLE": "Could not get the Pi price. Please try again shortly",
     "QUOTE_EXPIRED": "The payment quote expired. Please pay again",
     "PLAN_EXHAUSTED": "You have used all your seminar time. Top up on the Plans page",
+    "HOST_AWAY": "The host is not in the room. You can enter after the host joins",
     "PLAN_AI_PAID": "AI features are available on paid plans",
     "AI_UNAVAILABLE": "AI features are not available right now",
     "SPEECH_CHUNK_INVALID": "The audio chunk format is invalid",
@@ -293,7 +294,7 @@
       "TICKET_INVALID": "Your entry pass has expired.",
       "TICKET_EXPIRED": "Your entry pass has expired.",
       "ROOM_FULL": "This seminar is full.",
-      "ROOM_CLOSED": "This seminar has ended.",
+      "ROOM_CLOSED": "The room was closed — the seminar ended or the host was away for more than 5 minutes.",
       "DUPLICATE_SESSION": "You joined from another device, so this screen was disconnected.",
       "ROLE_FORBIDDEN": "You don't have permission to present.",
       "WS_FAILED": "Couldn't connect to the video server.",
@@ -303,6 +304,7 @@
       "TICKET_402": "This is a paid seminar. Please pay on the seminar page before entering.",
       "TICKET_404": "Seminar not found.",
       "TICKET_409": "This seminar has ended or was canceled.",
+      "TICKET_HOST_AWAY": "The host has not joined yet or has been away for more than 5 minutes, so you can't enter. Please try again after the host joins.",
       "TICKET_PLAN_EXHAUSTED": "This seminar's plan has no time left, so it can't start. Buying the same plan again adds time (Free renews with 1 hour next month)."
     },
     "notice": {
@@ -633,7 +635,9 @@
       "warn": "{min} min left on this seminar's plan.",
       "ended": "Your seminar time ran out, so the seminar has ended and you left the room.",
       "left": "Seminar time left",
-      "closed": "The seminar has ended, so you left the room."
+      "closed": "The seminar has ended, so you left the room.",
+      "hostAway": "The host has left the room. If they do not return within 5 minutes, all participants will be removed.",
+      "hostGone": "The host did not return within 5 minutes, so you left the room. You can enter again once the host joins."
     },
     "toLobby": "Waiting room"
   },

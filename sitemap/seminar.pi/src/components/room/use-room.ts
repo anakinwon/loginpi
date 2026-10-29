@@ -117,9 +117,9 @@ async function fetchTicket(room: string, role: Role): Promise<{ ticket?: string;
   }).catch(() => null)
   if (!r) return { why: 'NETWORK' }
   if (!r.ok) {
-    // 402 = 유료 미결제(payment_required) 또는 개최자 요금제 소진(code PLAN_EXHAUSTED, sql/018) — 문구가 달라 나눈다
-    const e = r.status === 402 ? ((await r.json().catch(() => null)) as { code?: string } | null) : null
-    return { why: e?.code === 'PLAN_EXHAUSTED' ? 'PLAN_EXHAUSTED' : `${r.status}` }
+    // 402 = 유료 미결제(payment_required) 또는 개최자 요금제 소진(code PLAN_EXHAUSTED, sql/018), 409 = 종료 또는 개최자 부재(code HOST_AWAY) — 문구가 달라 나눈다
+    const e = r.status === 402 || r.status === 409 ? ((await r.json().catch(() => null)) as { code?: string } | null) : null
+    return { why: e?.code === 'PLAN_EXHAUSTED' || e?.code === 'HOST_AWAY' ? e.code : `${r.status}` }
   }
   const j = (await r.json().catch(() => null)) as { ticket?: string } | null
   return j?.ticket ? { ticket: j.ticket } : { why: 'FORMAT' }
