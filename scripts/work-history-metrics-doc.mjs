@@ -52,7 +52,7 @@ ${QUESTIONS.map(q => `| ${q.q} | ${q.metrics.map(m => `\`${m}\``).join(', ')} | 
 | 보정 | \`fix:true, id\` | Stop 이후 도착한 turn_duration_ms · hook_ms 를 값 없는 파트에 FIFO 병합 |
 | 에이전트 | \`agent:true, id(턴), agent_id\` | 서브에이전트 모델·토큰·비용·실행시간·도구·오류 (디스패치 턴에 귀속: name → toolUseId → parentAgentId → 시작 시각) |
 
-집계(\`loadRows\`)는 id 기준 last-write-wins 로 중복을 없애고 보정·에이전트를 병합한 뒤 \`correction\`(사용자 교정)·\`recovery\`(오류 회복)를 파생한다.
+집계(\`loadRows\`)는 id 기준 last-write-wins 로 중복을 없애고 보정·에이전트를 병합한 뒤 \`correction\`(사용자 교정)·\`recovery\`(오류 회복)·mid-turn 흡수 턴의 \`ts_res\`(다음 mid_turn 턴 첫 응답 시각, \`ts_res_src='mid_turn'\`)를 파생한다.
 
 ## 5. 카테고리 (요청문 점수제: 동사 4 · 명사 1 · 도구 증거 · 부정어 창)
 

@@ -199,3 +199,23 @@ test('continuation parts are deltas, not cumulative snapshots', () => {
   assert.deepEqual(recs.map(r => r.tools_total), [1, 1])
   assert.equal(recs[1].elapsed_ms, 2000)                     // 경계(2000) → 2차 답(4000)
 })
+
+test('turn absorbed by a mid-turn message inherits ts_res from the mid-turn response (chained)', () => {
+  const { env, transcript } = setup(); const s = sid()
+  const midMsg = (text, ms) => ({ type: 'queue-operation', operation: 'remove', reason: 'absorbed_mid_turn', content: text, timestamp: iso(ms) })
+  fs.writeFileSync(transcript, jsonl([
+    user('가드 추가해줘', 0),
+    asst([toolUse('t1', 'Edit', { file_path: 'a.ts' })], 500, { requestId: 'r1' }), toolResult('t1', 900),
+    midMsg('env 값 알려줘', 1000),                                                                      // 작업 도중 끼어든 메시지 → 턴 1 은 absorbed(ts_res=null)로 방출
+    asst([toolUse('t2', 'Bash', { description: 'b' })], 1500, { requestId: 'r2' }), toolResult('t2', 1800),
+    midMsg('그리고 하나 더', 2000),                                                                     // 연쇄 : 턴 2 도 흡수
+    asst([{ type: 'text', text: '둘 다 끝났습니다' }], 4000, { requestId: 'r3' }),
+  ]))
+  runLogger(env, { session_id: s, hook_event_name: 'Stop', transcript_path: transcript })
+  const raw = readRecords(env).filter(r => !r.fix).sort((a, b) => a.turn - b.turn)
+  assert.deepEqual(raw.map(r => [r.turn, !!r.absorbed, !!r.mid_turn, r.ts_res == null]), [[1, true, false, true], [2, true, true, true], [3, false, true, false]])
+  const rows = loadRows({ root: env.WORK_HISTORY_DIR }).sort((a, b) => a.turn - b.turn)
+  assert.ok(rows.every(r => r.ts_res === raw[2].ts_res))                    // 1·2 턴 모두 물리 턴 종료 시각(3 턴 응답)으로 보정
+  assert.deepEqual(rows.map(r => r.ts_res_src ?? null), ['mid_turn', 'mid_turn', null])
+  assert.ok(rows.every(r => r.turn === 3 || r.elapsed_ms == null))         // 체감 소요는 정의 불가 그대로(timed 모집단 불변)
+})

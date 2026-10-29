@@ -46,6 +46,24 @@ export function loadRows({ from = '0000-00-00', to = '9999-99-99', root = LOG_RO
   }
   for (const fx of fixes) { const r = byId.get(fx.id); if (r) r.perf = { ...(r.perf || {}), ...fx.perf } }
   const rows = [...byId.values(), ...anon].sort((a, b) => (a.ts_req || '').localeCompare(b.ts_req || '') || (a.part || 0) - (b.part || 0))
+  // mid-turn 흡수 턴의 종료 시각 보정 : 작업 중 끼어든 메시지(absorbed_mid_turn)가 새 턴을 열면 로거는 직전 턴을 응답 텍스트 없이 absorbed 로 방출(ts_res=null)한다.
+  // 실제로는 같은 물리 턴이 이어져 다음(mid_turn) 턴의 첫 응답에서 끝나므로 그 ts_res 를 물려준다. 연쇄(14←15←16 mid)는 뒤 턴부터 풀어 전파. 기록 시점엔 모르는 값이라 로드 때 파생(과거 기록도 함께 보정)
+  const turnOf = new Map()                                                  // `${session_id}:${turn}` → { mid, res(첫 파트 응답 시각), absorbed[] }
+  for (const r of rows) {
+    if (!r.session_id || !r.turn) continue
+    const k = `${r.session_id}:${r.turn}`; const t = turnOf.get(k) || turnOf.set(k, { mid: false, res: null, part: Infinity, absorbed: [] }).get(k)
+    if (r.mid_turn) t.mid = true
+    if (r.ts_res && r.part < t.part) { t.res = r.ts_res; t.part = r.part }
+    if (r.absorbed && !r.ts_res) t.absorbed.push(r)
+  }
+  const keysDesc = [...turnOf.keys()].sort((a, b) => { const [sa, ta] = a.split(':'), [sb, tb] = b.split(':'); return sa.localeCompare(sb) || +tb - +ta })
+  for (const k of keysDesc) {
+    const t = turnOf.get(k); if (!t.absorbed.length) continue
+    const [s, n] = k.split(':'); const next = turnOf.get(`${s}:${+n + 1}`)
+    if (!next?.mid || !next.res) continue
+    for (const r of t.absorbed) { r.ts_res = next.res; r.ts_res_src = 'mid_turn' }
+    if (!t.res) t.res = next.res                                            // 연쇄 전파
+  }
   // 서브에이전트 레코드를 디스패치 턴의 part 1 레코드에 귀속 (cost_agents_usd · agent_wall · 병렬도)
   const firstPart = new Map(); for (const r of rows) { const t = r.id && r.id.replace(/\.\d+$/, ''); if (t && (!firstPart.has(t) || r.part < firstPart.get(t).part)) firstPart.set(t, r) }
   for (const a of agents.values()) {
