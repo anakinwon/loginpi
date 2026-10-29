@@ -279,9 +279,10 @@ export const FEATURES: Feature[] = [
     steps: [
       {
         id: 'localRecording',
-        status: 'doing', // 2026-10-29 실기기 : 일반 브라우저 mp4 ✓ · Pi Browser 저장 ✗
+        status: 'done', // 2026-10-29 실기기 : 일반 브라우저 mp4 ✓ · Pi Browser 는 '일반 브라우저에서만' 안내 ✓(파일 저장 불가 — 마스터 결정)
+        date: '2026-10-29',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · web mp4 ✓ · Pi ✗',
+        note: 'QA ✓ · web mp4 ✓ · Pi 안내 ✓',
       },
     ],
   },
