@@ -93,7 +93,7 @@ E2E 실패 내역 요약 : r2 = 설문 발표자 결과(T04)·위조 서명 403 
 |---|---|---|---|---|
 | 1 | T01 | ICS 주입(단독 `\r`·제어문자) | ✓ r1 수정 → r4 입구 검사 → r6 C1·NEL·U+2028 까지 | `fdf4c6a2` 계열 · `ef82381f` · `5f485ae2` |
 | 2 | T04 | 출석 하트비트가 상태 확인 전 갱신 + 사용자명 제공 고지 | ✓ 자격·상태 확인 뒤 갱신, 처리방침 ko·en 고지(보관 = 세미나 삭제 시까지) | r1 T04 |
-| 3 | T06 | 녹화 고지 fail-open | ✓ 재시도·10초 재알림·종료 알림 우선 + 엔진 state 한도 분리(v1.3.2 빌드, 교체 대기) | `8e178933` 외 |
+| 3 | T06 | 녹화 고지 fail-open | ✓ 재시도·10초 재알림·종료 알림 우선 + 엔진 state 한도 분리(v1.3.2 빌드, 교체 대기 → 2026-10-29 대체 : `8ab7e634` 빌드, 정본 HOME_NODE_GUIDE 4.7) | `8e178933` 외 |
 | 4 | T07 | 회의록 오염·프롬프트 주입·사후 정산 경합·삭제 경로 | ✓ `canRecordSeg`·`fenceTranscript`·6kbps 선예약/환급(`sql/010_seminar_vc_reserve`)·DELETE 논리삭제. 후속 : 예약 감지 fail-open 차단(`a5092228`). ✗ Storage 원본 삭제 없음 | r1 T07 · `a5092228` |
 | 5 | T08 | D-2 번역 무계량 | ✓ 서버 발급 자막 서명·참가·LIVE·500자·`fn_use_smn_ai` DB 계량(r1) + 지시문 주입·출력 상한(r4). ✗ 감사 High 1(사용자별 누적·서명 용도) | r1·r4 T08 |
 | 6 | T09 | D-2 tts 무계량 + 캐시 적중 무권한 회귀 | ✓ 캐시 적중도 `aiGate`·300자·자동 끄기(r2), 캐시 공유 거절 번짐 차단 DENIED(`db3426fb`) | r2 T09 · `db3426fb` |
@@ -122,6 +122,7 @@ E2E 실패 내역 요약 : r2 = 설문 발표자 결과(T04)·위조 서명 403 
 ## ⑦ 마스터 할 일
 
 1. **집 PC 엔진 교체** — `27a18b31` 빌드(v1.3.2 + 관리 API 무대 역할 조회, sha256 `225efa5e6a21c1bd55b9c99221e6f03e946e991176c3e6b6afd9036af2cea83a`). v1.3.2 단독(`d76c6bc0…`)·v1.3.1 대신 이것. 엔진과 Vercel 양쪽에 같은 `MEDIA_ADMIN_SECRET`(32자 이상). 정본 `media/docs/HOME_NODE_GUIDE.md` 4.7.
+   - → 2026-10-29 대체 : `8ab7e634` 빌드(sha256 `ce249a33a54bb5b54e3b08cef14d0d4d1d155cc761afbb8410d6c402fd56b94f`, 절차 `galapagos-build/8ab7e634/SWAP.md`, 정본 HOME_NODE_GUIDE 4.7). `MEDIA_ADMIN_SECRET` 은 양쪽 같은 값 **또는 양쪽 다 뺌**(한쪽만 넣으면 고장, 가이드 B-1).
 2. **Vercel `seminar` 에 `GEMINI_API_KEY`** — ④ A-1(감사 High 1) 결정 뒤 권장. 설정 뒤 **다시 배포**(`/notes` 는 정적 렌더라 빌드 시점 값). 값은 [ENV_GUIDE](../../../docs/ENV_GUIDE.md) 3.6.
 3. Supabase Storage 비공개 버킷 `smn-note` 생성.
 4. 배포본 DB 확인(④ C-1) — Vercel 운영 env 의 Supabase 주소가 의도한 운영 DB 인지.
