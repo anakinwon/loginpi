@@ -18,6 +18,7 @@ import { onTrackEnd } from '@/components/room/room-rules'
 import { Link, useRouter } from '@/i18n/navigation'
 import { readApi, useApiErrorText } from '@/lib/client-api'
 import { holdWake, NOTE_LIST_PAGE, recAlert } from '@/lib/note-rules'
+import { CHUNK_NOTE_MS, VAD } from '@/lib/speech-rules'
 
 const noSend = async () => null // 대면 노트는 방송(자막) 없음
 
@@ -29,10 +30,11 @@ function endNote(id: string) {
   }).catch(() => null)
 }
 
-// 마이크 — 시작·다시 연결이 같이 쓴다
+// 마이크 — 시작·다시 연결이 같이 쓴다. 대면 회의(테이블 위 휴대폰)용 : 소음 제거는 먼 사람 목소리를 잡음으로 깎고,
+//  스피커 재생이 없어 에코 제거도 필요 없다(Android 는 켜면 통화용 음성 경로로 바뀌어 처리가 더 강해진다). 작은 목소리를 키우는 자동 음량만 둔다 [확인중 : 실기기]
 const MIC: MediaTrackConstraints = {
-  echoCancellation: true,
-  noiseSuppression: true,
+  echoCancellation: false,
+  noiseSuppression: false,
   autoGainControl: true,
 }
 
@@ -110,6 +112,9 @@ function Recorder() {
     track,
     seminarId: ntId ?? '',
     field: 'ntId',
+    chunkMs: CHUNK_NOTE_MS,
+    vadLevel: VAD.noteLevel,
+    title: title.trim(),
     lang: locale,
     on: !!ntId,
     broadcast: false,

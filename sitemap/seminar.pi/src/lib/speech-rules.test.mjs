@@ -27,6 +27,10 @@ import {
   chunkHeard,
   VAD,
   speechHalt,
+  CHUNK_MS,
+  CHUNK_MAX_MS,
+  CHUNK_NOTE_MS,
+  NOTE_CTX,
 } from './speech-rules.ts'
 
 const bytes = (...head) => {
@@ -237,6 +241,18 @@ test('chunkHeard — 무음 조각 거르기·측정 불가 시 보냄', () => {
   assert.equal(chunkHeard(0, 0), true) // AudioContext suspended·미지원 = 표본 없음 → 보냄
   assert.equal(chunkHeard(0, VAD.minSamples - 1), true)
   assert.ok(VAD.level < 0.04) // 말하기 링 기준보다 낮다(작은 목소리 보냄)
+})
+
+// 대면 노트 0단계(2026-10-29 PoC) — 먼 사람 말 조각을 버리지 않는 낮은 기준, 조각은 길게 하되 서버 상한 안
+test('대면 노트 — 무음 기준·조각 길이·문맥 상한', () => {
+  assert.ok(VAD.noteLevel < VAD.level)
+  assert.equal(chunkHeard(0.006, 50), false) // 세미나 기준이면 버림
+  assert.equal(chunkHeard(0.006, 50, VAD.noteLevel), true) // 노트 기준이면 보냄
+  assert.equal(chunkHeard(0.002, 50, VAD.noteLevel), false) // 그래도 조용한 조각은 거른다
+  // 타이머·정지 지연으로 조각이 조금 길어져도 서버 chunkError('duration')에 걸리지 않게 0.5초 이상 여유
+  assert.ok(CHUNK_NOTE_MS > CHUNK_MS && CHUNK_NOTE_MS <= CHUNK_MAX_MS - 500)
+  assert.equal(chunkError({ type: 'audio/webm', bytes: WEBM, durMs: CHUNK_NOTE_MS + 400 }), null)
+  assert.ok(NOTE_CTX.title > 0 && NOTE_CTX.prev > 0 && NOTE_CTX.prev <= 500)
 })
 
 test('speechHalt — 대상 삭제·권한 잃음도 이번 켜기를 멈춘다(T02 r3 : 지워진 노트에 5초마다 거절 요청)', () => {

@@ -5,6 +5,10 @@
 export const CHUNK_MS = 5_000
 export const CHUNK_MIN_MS = 500
 export const CHUNK_MAX_MS = 10_000
+// 대면 노트 조각(0단계, 2026-10-29 PoC) — 5초 조각은 문맥이 짧아 말을 빠뜨리고 지어낸다(같은 녹음 CER 71→61%). 상한 10초에 1초 여유(타이머·정지 지연)
+export const CHUNK_NOTE_MS = 9_000
+// 대면 노트 전사 문맥 상한(글자) — 회의 제목·직전 문장. 화면이 자르고 서버도 자른다
+export const NOTE_CTX = { title: 100, prev: 300 }
 // 과금 하한 비트레이트(바이트/초) = 128kbps — 화면 녹음(opus 32kbps·aac 64~128kbps)보다 넉넉한 상한.
 //  보낸 바이트가 이 비트레이트로 신고 길이보다 길면 바이트 기준으로 과금(durMs 축소 신고 차단, billSec)
 export const BILL_BYTES_PER_SEC = 16_000
@@ -274,5 +278,6 @@ export const captionFresh = (lastTs: number, ts: number) => ts >= lastTs
 // 무음 조각 거르기(비용 절감, T03 r2) — 마이크가 켜진 채 아무도 말하지 않는 5초 조각을 외부 AI 로 보내지 않는다.
 //  level = 조각 동안 시간 영역 RMS 최대값 기준. 말하기 링(SPEAK.level 0.04)보다 낮게 잡아 작은 목소리는 보낸다 [확인중 : 마스터 실기기 — 마이크·AGC 마다 다름]
 //  minSamples = 측정 표본이 이보다 적으면(AudioContext 가 suspended·미지원 — Pi Browser 자동재생 정책 등) 판정하지 않고 보낸다(fail-open, 자막이 끊기지 않게)
-export const VAD = { level: 0.01, pollMs: 100, minSamples: 10 }
-export const chunkHeard = (peak: number, samples: number) => samples < VAD.minSamples || peak >= VAD.level
+//  noteLevel = 대면 노트 — 테이블 위 휴대폰에서 먼 사람 말이 조각째 버려지지 않게 더 낮춘다 [확인중 : 실기기]
+export const VAD = { level: 0.01, noteLevel: 0.004, pollMs: 100, minSamples: 10 }
+export const chunkHeard = (peak: number, samples: number, level = VAD.level) => samples < VAD.minSamples || peak >= level

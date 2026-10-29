@@ -131,10 +131,13 @@ function langName(code: string) {
 
 // 음성 조각(base64) → 글. 말이 없으면 text ''. langHint = 발표자가 고른 언어(없으면 자동 감지)
 // audioTokens = 외부 AI 가 센 입력 음성 토큰 — 호출부가 실제 길이로 선예약을 정산(speech-rules settleSec)
+// note = 대면 노트 문맥(제목·직전 문장) — 주면 '테이블 위 휴대폰·여러 사람' 상황과 문맥을 알려 조각 경계의 잘린 말·동음이의어를 덜 틀린다
+//  (2026-10-29 PoC 같은 녹음 CER 71→61%). 사용자 입력이라 «» 안 자료로만 넘긴다(구분자는 지움)
 export async function transcribe(
   audioB64: string,
   mime: string,
   langHint?: string | null,
+  note?: { title?: string | null; prev?: string | null },
 ): Promise<{
   text: string
   lang: string | null
@@ -144,6 +147,16 @@ export async function transcribe(
     langHint && LANG_RE.test(langHint)
       ? ` The speaker most likely uses ${langName(langHint)}.`
       : ''
+  const quote = (s?: string | null) => (s ?? '').replace(/[«»]/g, '').trim()
+  const title = quote(note?.title)
+  const prev = quote(note?.prev)
+  const ctx = note
+    ? ' The clip is one consecutive part of an in-person meeting recorded by a phone on a table; several people may speak, some far from the microphone.' +
+      (title ? ` Meeting title: «${title}».` : '') +
+      (prev
+        ? ` Previous transcript, for context only (do not repeat it; the clip may start mid-word): «${prev}»`
+        : '')
+    : ''
   const out = await interactJson<{ text?: unknown; lang?: unknown }>(
     {
       model: GEMINI_MODEL.text,
@@ -151,7 +164,7 @@ export async function transcribe(
         {
           type: 'text',
           text:
-            `Transcribe the speech in this short audio clip verbatim, in its original language.${hint} ` +
+            `Transcribe the speech in this ${note ? '' : 'short '}audio clip verbatim, in its original language.${hint}${ctx} ` +
             'Do not translate, summarize or add anything. If there is no intelligible speech, return an empty text. ' +
             'Also return the spoken language as a BCP-47 code.',
         },

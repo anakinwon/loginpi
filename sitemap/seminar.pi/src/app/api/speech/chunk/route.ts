@@ -26,6 +26,7 @@ import {
   chunkError,
   LANG_RE,
   MAX_CHUNK_BYTES,
+  NOTE_CTX,
   reserveSec,
   settleSec,
 } from '@/lib/speech-rules'
@@ -75,6 +76,13 @@ export const POST = withAuthGuard(
     const ntId = str(form.get('ntId'))
     const durMs = Number(form.get('durMs'))
     const lang = str(form.get('lang'))
+    // 대면 노트 전사 문맥(제목·직전 2문장) — 노트만 받고 길이로 자른다. 프롬프트에선 자료로만 다룬다(gemini transcribe)
+    const ctx = ntId
+      ? {
+          title: str(form.get('ctxTitle'))?.slice(0, NOTE_CTX.title),
+          prev: str(form.get('ctxPrev'))?.slice(-NOTE_CTX.prev),
+        }
+      : undefined
     // 대상은 정확히 하나(세미나 또는 대면 노트), uuid 는 소문자로 통일(입장권 라우트와 같은 규칙)
     if (
       !(audio instanceof Blob) ||
@@ -123,6 +131,7 @@ export const POST = withAuthGuard(
         Buffer.from(bytes).toString('base64'),
         aiMime(audio.type) as string,
         lang,
+        ctx,
       ),
       (target.p_smn_id
         ? ntQ.eq('smn_id', target.p_smn_id)
