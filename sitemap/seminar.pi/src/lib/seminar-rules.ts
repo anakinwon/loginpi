@@ -193,3 +193,22 @@ export function stateFromChat(text: string): Record<string, unknown> | undefined
     return undefined
   }
 }
+
+// 홈 세미나 달력(마스터 2026-10-30) — 지난 이력 포함(종료까지, 취소 제외), 한 번에 한 달 남짓·최대 CAL_MAX 건.
+//  화면은 지난 CAL_BACK_MONTHS ~ 앞 CAL_AHEAD_MONTHS 달만 넘긴다 — 서버도 같은 범위(+여유)만 받는다(종료 이력 전체 나열 방지)
+export const CAL_STS = ['SCHEDULED', 'LIVE', 'ENDED'] as const
+export const CAL_BACK_MONTHS = 12
+export const CAL_AHEAD_MONTHS = 12
+const DAY_MS = 24 * 60 * 60 * 1000
+export const CAL_SPAN_MAX_MS = 45 * DAY_MS
+export const CAL_MAX = 200
+export const calRangeOk = (from: number, to: number, now = Date.now()) =>
+  Number.isFinite(from) &&
+  Number.isFinite(to) &&
+  to > from &&
+  to - from <= CAL_SPAN_MAX_MS &&
+  from >= now - (CAL_BACK_MONTHS + 1) * 31 * DAY_MS &&
+  to <= now + (CAL_AHEAD_MONTHS + 2) * 31 * DAY_MS
+// 지난 세미나 — 종료, 또는 열리지 않고 시작이 지난 예정·하루 넘게 닫히지 않은 진행 중(상태 전이가 개최자 종료·요금제 소진뿐이라 남는다)
+export const smnPast = (status: string, startAt: string, now = Date.now()) =>
+  status === 'ENDED' || Date.parse(startAt) < now - (status === 'LIVE' ? DAY_MS : 0)

@@ -2,6 +2,9 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
+  calRangeOk,
+  CAL_SPAN_MAX_MS,
+  smnPast,
   capError,
   clampPage,
   FEE_RE,
@@ -137,4 +140,27 @@ test('stateFromChat — 녹화 고지 채팅 표식 해석', () => {
   assert.equal(stateFromChat('{"recording":true}'), undefined) // 표식 없음 = 일반 채팅
   assert.equal(stateFromChat(STATE_MARK + JSON.stringify({ x: 'a'.repeat(600) })), undefined) // 너무 큼
   assert.equal(STATE_MARK.charCodeAt(0), 0x2063) // 보이지 않는 구분 문자로 시작
+})
+
+test('홈 달력 기간 — 끝이 시작 뒤·45일 이하만', () => {
+  const a = Date.UTC(2026, 9, 1)
+  assert.equal(calRangeOk(a, a + 31 * 864e5, a), true)
+  assert.equal(calRangeOk(a, a + CAL_SPAN_MAX_MS, a), true)
+  assert.equal(calRangeOk(a, a + CAL_SPAN_MAX_MS + 1, a), false)
+  assert.equal(calRangeOk(a, a, a), false)
+  assert.equal(calRangeOk(NaN, a, a), false)
+  // 화면 범위(지난 12달 ~ 앞 12달) 밖은 서버도 거절 — 종료 이력 전체 나열 방지
+  assert.equal(calRangeOk(a - 365 * 864e5, a - 334 * 864e5, a), true)
+  assert.equal(calRangeOk(a - 450 * 864e5, a - 420 * 864e5, a), false)
+  assert.equal(calRangeOk(a + 420 * 864e5, a + 450 * 864e5, a), false)
+})
+
+test('지난 세미나 — 종료, 시작 지난 예정, 하루 넘은 진행 중', () => {
+  const now = Date.UTC(2026, 9, 30)
+  const iso = (ms) => new Date(ms).toISOString()
+  assert.equal(smnPast('ENDED', iso(now + 864e5), now), true)
+  assert.equal(smnPast('SCHEDULED', iso(now - 1000), now), true)
+  assert.equal(smnPast('SCHEDULED', iso(now + 1000), now), false)
+  assert.equal(smnPast('LIVE', iso(now - 3600e3), now), false)
+  assert.equal(smnPast('LIVE', iso(now - 2 * 864e5), now), true)
 })

@@ -4,8 +4,27 @@
     "description": "Pi 로 참여하는 실시간 화상 세미나"
   },
   "home": {
-    "title": "seminar.pi",
-    "description": "개최자가 세미나를 열고, 참가자는 Pi 로 입장해 실시간 화상으로 참여합니다."
+    "description": "개최자가 세미나를 열고, 참가자는 Pi 로 입장해 실시간 화상으로 참여합니다.",
+    "badge": "아름다운 섬에서 열리는 실시간 세미나",
+    "headline": "보고, 듣고, 함께 배우는 실시간 화상 세미나",
+    "ctaBrowse": "세미나 둘러보기",
+    "ctaPlan": "요금제 보기",
+    "features": {
+      "video": "실시간 화상",
+      "caption": "자막·번역",
+      "notes": "AI 회의록",
+      "pay": "Pi 로 결제"
+    },
+    "listTitle": "세미나",
+    "cal": {
+      "title": "세미나 달력",
+      "desc": "지난 세미나부터 다가올 세미나까지 — 날짜를 누르면 자세히 보여요.",
+      "legendSmn": "세미나",
+      "legendEnded": "지난 세미나",
+      "legendMine": "내 일정",
+      "failed": "세미나 일정을 불러오지 못했습니다. 잠시 후 다시 시도하세요.",
+      "open": "자세히 보기"
+    }
   },
   "nav": {
     "link": "계정 연동",
@@ -750,6 +769,8 @@
   },
   "host": {
     "gcal": {
+      "prev": "이전 달",
+      "next": "다음 달",
       "connect": "내 Google 일정 함께 보기",
       "change": "Google 일정 캘린더 관리({n}개)",
       "add": "추가",

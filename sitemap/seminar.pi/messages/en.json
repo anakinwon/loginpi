@@ -4,8 +4,27 @@
     "description": "Live video seminars you join with Pi"
   },
   "home": {
-    "title": "seminar.pi",
-    "description": "Hosts open seminars, and participants join live video sessions with Pi."
+    "description": "Hosts open seminars, and participants join live video sessions with Pi.",
+    "badge": "Live seminars on beautiful islands",
+    "headline": "Watch, listen, and learn together — live",
+    "ctaBrowse": "Browse seminars",
+    "ctaPlan": "See plans",
+    "features": {
+      "video": "Live video",
+      "caption": "Captions & translation",
+      "notes": "AI meeting notes",
+      "pay": "Pay with Pi"
+    },
+    "listTitle": "Seminars",
+    "cal": {
+      "title": "Seminar calendar",
+      "desc": "From past seminars to upcoming ones — tap a date for details.",
+      "legendSmn": "Seminars",
+      "legendEnded": "Past seminars",
+      "legendMine": "My events",
+      "failed": "Couldn't load seminar dates. Please try again later.",
+      "open": "View details"
+    }
   },
   "nav": {
     "link": "Link account",
@@ -750,6 +769,8 @@
   },
   "host": {
     "gcal": {
+      "prev": "Previous month",
+      "next": "Next month",
       "connect": "Show my Google Calendar",
       "change": "Manage Google calendars ({n})",
       "add": "Add",
@@ -760,7 +781,7 @@
       "full": "You can add up to {n} calendars.",
       "allDay": "All day",
       "day": "My events on this day",
-      "count": "{n} events",
+      "count": "{n, plural, one {# event} other {# events}}",
       "more": "+{n}",
       "picked": "This date is set as the start date. Pick the time below.",
       "s1": "Tap [Open Google Calendar settings] below.",

@@ -31,7 +31,7 @@ type Head = {
 }
 
 // 화면에 들어오기 직전(200px 앞) 한 번 true — 데이터 패칭 표준 ③
-function useVisible<T extends Element>() {
+export function useVisible<T extends Element>() {
   const ref = useRef<T>(null)
   const [seen, setSeen] = useState(false)
   useEffect(() => {
