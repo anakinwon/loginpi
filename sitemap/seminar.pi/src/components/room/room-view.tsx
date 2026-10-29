@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom'
 import { useLocale, useTranslations } from 'next-intl'
 import { LoginGate } from '@/components/login-gate'
 import { piFetch } from '@pi/auth/client'
+import { readApi } from '@/lib/client-api'
 import { Link } from '@/i18n/navigation'
 import { isUuid } from '@/lib/seminar-rules'
 import { ConnectionBadge, useConnectionCheck } from './connection-check'
@@ -65,17 +66,40 @@ export function RoomView({ room, wsUrl }: { room: string; wsUrl?: string }) {
   return (
     <LoginGate>
       {(user) => (
-        <Room
-          room={room}
-          wsUrl={wsUrl}
-          userId={user.userId}
-          name={user.displayName || user.username || ''}
-          // 발표 선택지 노출용 힌트일 뿐 — 실제 발표 권한은 입장권 API(isAdmin)가 서버에서 판정(13절 #8 : 지금은 관리자만)
-          canPresent={user.role === 'ADMIN' || user.role === 'MASTER'}
-        />
+        <PresentGate room={room} admin={user.role === 'ADMIN' || user.role === 'MASTER'}>
+          {(canPresent) => (
+            <Room
+              room={room}
+              wsUrl={wsUrl}
+              userId={user.userId}
+              name={user.displayName || user.username || ''}
+              // 발표 선택지 노출용 힌트일 뿐 — 실제 발표 권한은 입장권 API 가 서버에서 판정(ADMIN 또는 그 세미나 개최자, 요금제 2026-10-28)
+              canPresent={canPresent}
+            />
+          )}
+        </PresentGate>
       )}
     </LoginGate>
   )
+}
+
+// 발표 선택지 힌트 — ADMIN 이거나 이 세미나의 개최자(상세 API isHost). 개최자 판정 전에는 룸을 그리지 않는다
+//  (입장 역할 기본값이 첫 렌더에서 정해지므로 — 전에는 ADMIN 만 발표자 선택지가 보여 일반 개최자가 자기 세미나에서 청중으로 들어갔다, 2026-10-29 anakin3)
+//  조회 실패 = 청중 기본(서버 입장권이 정본). 실험실 방(uuid 아님)은 ADMIN 만
+function PresentGate({ room, admin, children }: { room: string; admin: boolean; children: (canPresent: boolean) => React.ReactNode }) {
+  const t = useTranslations('seminar')
+  const ask = !admin && isUuid(room)
+  const [host, setHost] = useState<boolean | null>(ask ? null : false)
+  useEffect(() => {
+    if (!ask) return
+    let live = true
+    void readApi<{ isHost: boolean }>(piFetch(`/api/seminars/${room}`)).then((r) => live && setHost(r.ok && r.data.isHost === true))
+    return () => {
+      live = false
+    }
+  }, [ask, room])
+  if (host === null) return <p className="text-muted-foreground text-sm">{t('loading')}</p>
+  return children(admin || host)
 }
 
 // 오류 코드별 다음 행동(설계서 7.3) — 정원·종료 = 홈으로(상세 S2 는 M5 전이라 홈), 중복 세션 = 안내 + 홈으로(다시 입장하면 다른 기기를

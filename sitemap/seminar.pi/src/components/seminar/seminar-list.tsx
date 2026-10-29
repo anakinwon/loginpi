@@ -25,9 +25,10 @@ const PLAN_KEY: Record<string, 'free' | 'monthly' | 'yearly'> = { FREE: 'free', 
 export function SeminarList() {
   const t = useTranslations('list')
   const [tab, setTab] = useState<Tab>('all')
-  // 개설 버튼 노출 힌트(실제 권한은 POST /api/seminars 가 서버에서 판정, PRD D-1)
+  // 개설 버튼 — Pi 로그인 사용자 누구나(요금제 2026-10-28, PRD D-1 개정 — 무료 1시간·월간·연간). 실제 판정은 POST /api/seminars(요금제 남은 시간)
+  //  전에는 ADMIN 만 보여 일반 사용자가 무료·유료 모두 개설 화면에 갈 수 없었다(2026-10-29 anakin3 — 월간 결제했는데 버튼 없음)
   const { user } = useAppUser()
-  const canHost = user?.role === 'ADMIN' || user?.role === 'MASTER'
+  const canHost = !!user
   // 탭 키보드(U3, WAI-ARIA 탭 패턴) — 좌우 화살표·Home·End 로 이동하며 바로 선택(선택 탭만 tabindex 0)
   function onTabKey(e: React.KeyboardEvent) {
     const i = TABS.indexOf(tab)
