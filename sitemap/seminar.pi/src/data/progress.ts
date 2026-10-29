@@ -200,7 +200,8 @@ export const FEATURES: Feature[] = [
         ref: ['Jitsi', 'LiveKit'],
         note: 'v1.3.2 ✓ · QA ✓ · engine swap …',
       },
-      { id: 'aiBase', status: 'doing', note: 'DB ✓ · QA ✓ · key ✓' },
+      // 남은 막힘 없음(DB·QA·키) — 완료, 마이크 동의 화면 실기기는 대기(device …)
+      { id: 'aiBase', status: 'done', date: '2026-10-29', note: 'DB ✓ · QA ✓ · key ✓ · device …' },
     ],
   },
   {
