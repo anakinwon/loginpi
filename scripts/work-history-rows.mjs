@@ -83,8 +83,9 @@ export function judgeLiveness({ mtimeMs, now = Date.now(), laterTurns = 0 }) {
  */
 export function buildCommand({ turn, mode, cwd, live = false, print = false, request = '' }) {
   const when = String(turn.ts_req || '').slice(0, 19).replace('T', ' ')
+  // 같은 세션에 뒤 요청이 이어졌을 수 있어 '직전 요청'이라 하지 않고 시각·원 요청문으로 대상을 못 박는다
   const prompt = mode === 'resume'
-    ? `직전 요청(${when})이 끝나지 않았습니다. 지금까지 한 작업(git status·변경 파일·마지막 응답)을 먼저 확인하고, 남은 일을 이어서 마무리해 주세요.`
+    ? `[재수행] 이 세션에서 ${when} 에 받은 아래 요청이 끝나지 않았습니다(마지막 요청이 아닐 수 있음 — 이 요청만 대상). 지금까지 한 작업(git status·변경 파일·그때의 응답)을 먼저 확인하고, 이 요청의 남은 일만 이어서 마무리해 주세요.\n\n--- 원 요청 ---\n${request}`
     : `[재수행] 아래 요청을 ${when} 에 시작했으나 끝나지 않았습니다(세션 ${turn.session || ''}). 먼저 이전 결과(git status·git log·변경 파일·work-history 기록)를 확인해 이미 된 부분은 건너뛰고, 남은 부분만 이어서 진행해 주세요.\n\n--- 원 요청 ---\n${request}`
   const args = [...(mode === 'resume' ? ['--resume', turn.session_id, ...(live ? ['--fork-session'] : [])] : []), ...(print ? ['-p'] : []), prompt]
   return { file: 'claude', args, cwd }
