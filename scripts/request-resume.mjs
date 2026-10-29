@@ -10,7 +10,7 @@ import readline from 'node:readline/promises'
 import { spawn } from 'node:child_process'
 import { loadRows } from './work-history-stats.mjs'
 import { makeRedactor } from './work-history-core.mjs'
-import { DEFAULT_FROM, projectRoot, buildTurns, resolveTarget, turnStatus, judgeLiveness, buildCommand, commandText } from './work-history-rows.mjs'
+import { DEFAULT_FROM, projectRoot, buildTurns, resolveTarget, turnStatus, judgeLiveness, buildCommand, commandText, isInterruptMarker } from './work-history-rows.mjs'
 
 const args = process.argv.slice(2), has = k => args.includes(k), argOf = (k, d) => has(k) ? args[args.indexOf(k) + 1] : d
 const target = args.find((a, i) => !a.startsWith('--') && !['--mode', '--from'].includes(args[i - 1]))
@@ -35,8 +35,10 @@ const sessFile = (() => { try { for (const d of fs.readdirSync(PROJECTS)) { cons
 const recs = sessFile ? fs.readFileSync(sessFile, 'utf8').split('\n').filter(Boolean).map(l => { try { return JSON.parse(l) } catch { return null } }).filter(Boolean) : []
 const textOf = c => typeof c === 'string' ? c : Array.isArray(c) ? c.filter(b => b?.type === 'text').map(b => b.text).join('\n') : ''
 const a = Date.parse(t.ts_req), main = recs.filter(j => !j.isSidechain)
-const users = main.filter(j => j.type === 'user' && !j.isMeta && textOf(j.message?.content).trim())
-const request = users.filter(u => Math.abs(Date.parse(u.timestamp) - a) <= 10e3).map(u => textOf(u.message.content))[0] || t.req_head || ''
+// 중단 표식은 사용자 요청이 아니라 뺀다 — 요청 직전(예 0.3초 앞)에 찍힌 표식을 요청문으로 잡던 문제(a7d862b1:27). 10초 안에서 가장 가까운 메시지
+const users = main.filter(j => j.type === 'user' && !j.isMeta && textOf(j.message?.content).trim() && !isInterruptMarker(textOf(j.message.content)))
+const near = u => Math.abs(Date.parse(u.timestamp) - a)
+const request = users.filter(u => near(u) <= 10e3).sort((x, y) => near(x) - near(y)).map(u => textOf(u.message.content))[0] || t.req_head || ''
 const nextUser = users.map(u => Date.parse(u.timestamp)).find(ts => ts > a + 10e3) ?? Infinity
 const end = t.ts_res ? Date.parse(t.ts_res) + 1000 : nextUser
 const lastText = main.filter(j => j.type === 'assistant' && Date.parse(j.timestamp) >= a && Date.parse(j.timestamp) <= end).map(j => textOf(j.message?.content)).filter(s => s.trim()).at(-1) || ''

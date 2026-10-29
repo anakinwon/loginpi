@@ -16,6 +16,9 @@ export const projectRoot = () => process.env.WORKSPACE_ROOT ? path.join(process.
 /** 턴 키 = 레코드 id 에서 part 를 뗀 <session_id>:<turn> */
 export const turnKey = r => (r.id || '').replace(/\.\d+$/, '') || r.ts_req
 
+/** Claude Code 가 자동으로 넣는 중단 표식(사용자 요청 아님) — 로거 work-history-logger.mjs 가 거르는 정규식과 같은 모양 */
+export const isInterruptMarker = s => /^\[Request interrupted by user[^\]]*\]$/.test(String(s || '').trim())
+
 /** loadRows 결과 → 대시보드 행 순서의 턴 목록 (part 합산, 서브에이전트 토큰 포함, 같은 시각+머리글 중복 제거, 최신순) */
 export function buildTurns(rows, fromMs = Date.parse(DEFAULT_FROM)) {
   const byKey = new Map()
@@ -31,8 +34,13 @@ export function buildTurns(rows, fromMs = Date.parse(DEFAULT_FROM)) {
     t.incomplete = r.incomplete; t.absorbed = r.absorbed   // 상태는 마지막 part 기준 (앞 part 가 끊겨도 뒤 part 가 응답하면 완료)
   }
   const seen = new Set()   // ponytail: 시각+요청 머리글 기준 중복 제거, 근본 대책은 로거의 이어받은 세션 재기록 방지
-  return [...byKey.values()].filter(t => { const k = t.ts_req + '|' + (t.req_head || ''); if (seen.has(k)) return false; seen.add(k); return true })
+  const list = [...byKey.values()].filter(t => { const k = t.ts_req + '|' + (t.req_head || ''); if (seen.has(k)) return false; seen.add(k); return true })
     .sort((a, b) => Date.parse(b.ts_req) - Date.parse(a.ts_req))
+  // 요청문이 중단 표식뿐인 턴 = 앞 턴의 중단 신호라 목록에서 뺀다(로거가 거르지만 읽기 쪽 방어). resolveTarget 이 그 id 를 받으면 앞 턴을 안내
+  const markers = []
+  const prevOf = t => list.find(x => x.session_id === t.session_id && Date.parse(x.ts_req) < Date.parse(t.ts_req) && !isInterruptMarker(x.req_head))   // list 최신순 → 첫 일치 = 바로 앞 턴
+  const out = list.filter(t => !isInterruptMarker(t.req_head) || !markers.push({ marker: t, prev: prevOf(t) }))
+  return Object.assign(out, { markers })
 }
 
 /**
@@ -64,8 +72,13 @@ export function resolveTarget(turns, input) {
   const m = s.match(/^([0-9a-f-]{4,36})(?::(\d+)(?:\.\d+)?)?$/i)
   if (!m) return { error: `해석할 수 없는 입력 : ${s}`, candidates: [] }
   const [, sid, turnNo] = m
-  const hits = turns.filter(t => (t.session_id || t.session || '').toLowerCase().startsWith(sid.toLowerCase()) && (turnNo == null || String(t.turn) === turnNo))
-  if (!hits.length) return { error: `일치하는 요청 없음 : ${s}`, candidates: [] }
+  const match = t => (t.session_id || t.session || '').toLowerCase().startsWith(sid.toLowerCase()) && (turnNo == null || String(t.turn) === turnNo)
+  const hits = turns.filter(match)
+  if (!hits.length) {
+    const mk = turnNo != null && (turns.markers || []).find(m => match(m.marker))
+    if (mk) return { error: `중단 표식 — 실제 요청은 ${mk.prev ? `${mk.prev.session}:${mk.prev.turn}` : '(앞 턴 기록 없음)'}`, candidates: mk.prev ? [mk.prev] : [] }
+    return { error: `일치하는 요청 없음 : ${s}`, candidates: [] }
+  }
   const sessions = new Set(hits.map(t => t.session_id))
   if (sessions.size > 1) return { error: `세션 앞부분 '${sid}' 가 세션 ${sessions.size}개와 일치 — 더 길게 입력`, candidates: hits.slice(0, 5) }
   return { turn: hits[0], no: turns.indexOf(hits[0]) + 1 }   // turns 가 최신순이라 hits[0] = 최신 턴
