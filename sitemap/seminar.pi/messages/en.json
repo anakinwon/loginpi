@@ -572,6 +572,7 @@
       "title": "Record",
       "badge": "Recording",
       "unsupported": "This browser cannot record. Please record from a regular browser on a computer.",
+      "piBrowserOnly": "Recording works only in a regular browser (computer or mobile). Pi Browser cannot save recording files — open this seminar in a computer or phone browser (seminarz.vercel.app) to record.",
       "audioSuspended": "Sound recording may not have started on this device. Only the picture may be recorded.",
       "notifyFailed": "Recording did not start because participants could not be notified. Please try again shortly.",
       "confirm": {

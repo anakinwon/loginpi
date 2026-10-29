@@ -10,13 +10,29 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
-import { piFetch } from '@pi/auth/client'
+import { piFetch, usePiAuth } from '@pi/auth/client'
 import { readApi } from '@/lib/client-api'
 import { isUuid } from '@/lib/seminar-rules'
-import { BADGE_SLOT_ID, TOAST_SLOT_ID, featureStore, useStageSlot, useStore, type RoomCtx, type RoomFeature } from '../../extensions'
+import {
+  BADGE_SLOT_ID,
+  TOAST_SLOT_ID,
+  featureStore,
+  useStageSlot,
+  useStore,
+  type RoomCtx,
+  type RoomFeature,
+} from '../../extensions'
 import { APP_RETRY, latestOnly, sendRetry } from '../../app-retry'
 import type { Recorder } from './recorder'
-import { applyRec, othersRecording, pruneRec, recFileName, saveVia, stopToast, type RecBy } from './rules'
+import {
+  applyRec,
+  othersRecording,
+  pruneRec,
+  recFileName,
+  saveVia,
+  stopToast,
+  type RecBy,
+} from './rules'
 
 const RESEND_MS = 1000 // 늦은 입장자 재알림 묶음(초당 2건 한도 안)
 const sendState = (ctx: RoomCtx, on: boolean, live: () => boolean) =>
@@ -61,7 +77,11 @@ async function beatRec() {
   if (!smn) return
   const r = await meter(smn, 'beat').catch(() => null)
   if (!r || smn !== meterSmn) return
-  const out = r.ok ? !!r.data.stop : ['PLAN_EXHAUSTED', 'REC_PAID_ONLY', 'SMN_CLOSED'].includes(r.body.code ?? '')
+  const out = r.ok
+    ? !!r.data.stop
+    : ['PLAN_EXHAUSTED', 'REC_PAID_ONLY', 'SMN_CLOSED'].includes(
+        r.body.code ?? '',
+      )
   if (!out) return
   const c = ctxNow?.() ?? null
   c?.notice('recording.planOut')
@@ -80,6 +100,9 @@ const paused = featureStore(false)
 const pausedAt = featureStore(0) // 지금 멈춘 시각(멈춤 중일 때)
 const pausedSum = featureStore(0) // 지난 멈춤 합(ms)
 const converting = featureStore<number | null>(null) // MP4 로 바꾸는 중 진행률(0~100), 아니면 null
+// Pi Browser(앱 안 WebView)는 공유 시트·<a download> 를 모두 막아 녹화 파일을 저장할 수 없다(2026-10-29 실기기) → 녹화는 일반 브라우저에서만(마스터 2026-10-29).
+//  판정 = usePiAuth().isInPiBrowser(authenticate 성공 신호, UA 아님) — 메뉴 onClick 은 훅을 못 쓰므로 Overlay 가 이 저장소에 옮겨 둔다
+const inPiBrowser = featureStore(false)
 
 // 지금 녹화 중인가(나 또는 다른 발표자) — 다른 기능이 녹화 동안 화면 요소를 감출 때(예 남은 시간 카운트다운, 마스터 2026-10-29)
 export function useRecordingNow() {
@@ -208,7 +231,11 @@ async function resumeRec(ctx: RoomCtx) {
 }
 
 // ac = 클릭 핸들러에서 동기로 만든 AudioContext(사용자 활성화). 시작하지 못하면 여기서 닫는다
-async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | null) {
+async function startRec(
+  ctx: RoomCtx,
+  stage: HTMLElement,
+  ac: AudioContext | null,
+) {
   if (recorder || busy.get() || !ac) {
     void ac?.close().catch(() => {})
     if (!ac) ctx.notice('recording.unsupported')
@@ -227,7 +254,8 @@ async function startRec(ctx: RoomCtx, stage: HTMLElement, ac: AudioContext | nul
     if (metered) {
       const m = await meter(ctx.seminarId, 'start').catch(() => null)
       if (g !== gen) return
-      if (!m?.ok) return ctx.notice(meterDeny(m && !m.ok ? m.body.code : undefined))
+      if (!m?.ok)
+        return ctx.notice(meterDeny(m && !m.ok ? m.body.code : undefined))
       meterOn = true
     }
     // 먼저 전원에게 알린다 — 실패하면 시작하지 않는다(M-4)
@@ -284,11 +312,17 @@ const REC_ICON = (
 const mmss = (ms: number) => {
   const s = Math.max(0, Math.floor(ms / 1000))
   const p = (n: number) => String(n).padStart(2, '0')
-  return s >= 3600 ? `${Math.floor(s / 3600)}:${p(Math.floor(s / 60) % 60)}:${p(s % 60)}` : `${p(Math.floor(s / 60))}:${p(s % 60)}`
+  return s >= 3600
+    ? `${Math.floor(s / 3600)}:${p(Math.floor(s / 60) % 60)}:${p(s % 60)}`
+    : `${p(Math.floor(s / 60))}:${p(s % 60)}`
 }
 
 function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   const t = useTranslations('room.recording')
+  const { isInPiBrowser } = usePiAuth()
+  useEffect(() => {
+    inPiBrowser.set(isInPiBrowser)
+  }, [isInPiBrowser])
   const anchor = useRef<HTMLSpanElement>(null)
   const dialog = useRef<HTMLDialogElement>(null)
   const mine = useStore(recOn)
@@ -370,18 +404,25 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
   })
   useEffect(() => {
     if (!mine) return
-    const timer = setTimeout(() => void sendState(ctxRef.current, true, recOn.get), RESEND_MS)
+    const timer = setTimeout(
+      () => void sendState(ctxRef.current, true, recOn.get),
+      RESEND_MS,
+    )
     return () => clearTimeout(timer)
   }, [mine, peerKey])
 
   // 녹화 중 주기 재알림 — 묶음 재알림이 한도에 걸렸거나 신호를 놓친 사람도 10초 안에 배지를 본다(M-4 고지 fail-open 방지)
   useEffect(() => {
     if (!mine) return
-    const timer = setInterval(() => void sendState(ctxRef.current, true, recOn.get), APP_RETRY.heartbeatMs)
+    const timer = setInterval(
+      () => void sendState(ctxRef.current, true, recOn.get),
+      APP_RETRY.heartbeatMs,
+    )
     return () => clearInterval(timer)
   }, [mine])
 
-  const btn = 'h-9 shrink-0 rounded-full px-4 text-sm font-semibold disabled:opacity-40'
+  const btn =
+    'h-9 shrink-0 rounded-full px-4 text-sm font-semibold disabled:opacity-40'
   return (
     <>
       <span ref={anchor} hidden />
@@ -392,9 +433,16 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
             role="status"
             className="bg-danger inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-semibold text-white"
           >
-            <span aria-hidden className={`size-2 rounded-full bg-white ${isPaused ? '' : 'animate-pulse'}`} />
+            <span
+              aria-hidden
+              className={`size-2 rounded-full bg-white ${isPaused ? '' : 'animate-pulse'}`}
+            />
             {t(mine && isPaused ? 'pausedBadge' : 'badge')}
-            {mine && since > 0 && <span className="tabular-nums">{mmss(now - since - pSum - (isPaused && pAt ? now - pAt : 0))}</span>}
+            {mine && since > 0 && (
+              <span className="tabular-nums">
+                {mmss(now - since - pSum - (isPaused && pAt ? now - pAt : 0))}
+              </span>
+            )}
           </div>,
           slot,
         )}
@@ -402,7 +450,11 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
       {mine &&
         slot &&
         createPortal(
-          <div role="group" aria-label={t('controls')} className="pointer-events-auto inline-flex h-6 items-center gap-1">
+          <div
+            role="group"
+            aria-label={t('controls')}
+            className="pointer-events-auto inline-flex h-6 items-center gap-1"
+          >
             <button
               type="button"
               disabled={isBusy}
@@ -433,7 +485,11 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
             className="bg-surface-raised pointer-events-auto inline-flex max-w-full items-center gap-1 rounded-full py-1 pr-1 pl-3 text-[13px] shadow"
           >
             <span className="truncate">{t('resave.label')}</span>
-            <button type="button" onClick={() => void resave()} className="bg-danger h-8 shrink-0 rounded-full px-3 font-semibold text-white">
+            <button
+              type="button"
+              onClick={() => void resave()}
+              className="bg-danger h-8 shrink-0 rounded-full px-3 font-semibold text-white"
+            >
               {t('resave.save')}
             </button>
             <button
@@ -451,15 +507,24 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
       {conv !== null &&
         toastSlot &&
         createPortal(
-          <div role="status" className="bg-surface-raised max-w-[92%] rounded-xl px-4 py-2 text-sm shadow">
-            {t('toast.converting')} <span aria-hidden className="tabular-nums">{conv}%</span>
+          <div
+            role="status"
+            className="bg-surface-raised max-w-[92%] rounded-xl px-4 py-2 text-sm shadow"
+          >
+            {t('toast.converting')}{' '}
+            <span aria-hidden className="tabular-nums">
+              {conv}%
+            </span>
           </div>,
           toastSlot,
         )}
       {msg &&
         toastSlot &&
         createPortal(
-          <div aria-hidden className="bg-surface-raised max-w-[92%] rounded-xl px-4 py-2 text-sm shadow">
+          <div
+            aria-hidden
+            className="bg-surface-raised max-w-[92%] rounded-xl px-4 py-2 text-sm shadow"
+          >
             {t(`toast.${msg}`)}
           </div>,
           toastSlot,
@@ -476,12 +541,22 @@ function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
         <h2 id="rec-title" className="mb-2 font-bold">
           {t('confirm.title')}
         </h2>
-        <p className="text-muted-foreground mb-2 text-sm">{t('confirm.body')}</p>
-        <p className="text-muted-foreground mb-2 text-xs">{t('confirm.download')}</p>
+        <p className="text-muted-foreground mb-2 text-sm">
+          {t('confirm.body')}
+        </p>
+        <p className="text-muted-foreground mb-2 text-xs">
+          {t('confirm.download')}
+        </p>
         {/* 녹화 시간 추가 차감 고지(sql/023) — 세미나 방만 */}
-        {isUuid(ctx.seminarId) && <p className="text-warning mb-4 text-xs">{t('confirm.charge')}</p>}
+        {isUuid(ctx.seminarId) && (
+          <p className="text-warning mb-4 text-xs">{t('confirm.charge')}</p>
+        )}
         <div className="flex flex-wrap justify-end gap-2">
-          <button type="button" onClick={() => confirmOpen.set(false)} className={`${btn} bg-surface-raised`}>
+          <button
+            type="button"
+            onClick={() => confirmOpen.set(false)}
+            className={`${btn} bg-surface-raised`}
+          >
             {t('confirm.cancel')}
           </button>
           <button
@@ -525,6 +600,8 @@ export const recording: RoomFeature = {
       onClick: (ctx) => {
         if (busy.get()) return
         if (recOn.get()) void stopRec(ctx)
+        else if (inPiBrowser.get())
+          ctx.notice('recording.piBrowserOnly') // 시작 전에 막는다 — 확인창·녹화 시간 차감 없음
         else confirmOpen.set(true)
       },
     },
