@@ -14,7 +14,7 @@ import { Link, useRouter } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
 import { formatFee, OPEN_STS, smnTitle, SUB_TTL_MAX } from '@/lib/seminar-rules'
 import { useDuration } from '@/components/plan/plan-board'
-import { ShareLinks } from './share-links'
+import { CreatedCalendar, ShareLinks } from './share-links'
 import {
   BTN,
   BTN_PRIMARY,
@@ -86,6 +86,7 @@ export function SeminarDetail({ id }: { id: string }) {
       <Link href="/" className="text-muted-foreground inline-flex min-h-6 items-center text-sm hover:underline">
         ← {t('back')}
       </Link>
+      {d.isHost && (OPEN_STS as readonly string[]).includes(d.status) && <CreatedCalendar d={d} />}
       <header className="space-y-2">
         <h1 className="text-2xl font-bold break-words">{d.title}</h1>
         {/* 부제 고치기 = 진행·예정 세미나만(종료·취소면 숨김, 서버도 409 — 마스터 2026-10-29) */}

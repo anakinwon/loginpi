@@ -14,6 +14,7 @@ import { readApi } from '@/lib/client-api'
 import { isPlanCd, pickPlan, startAtOk, type PlanCd } from '@/lib/seminar-rules'
 import { useDuration, useMoney, usePlan, usePlanPay } from '@/components/plan/plan-board'
 import { DateCalendar } from './date-calendar'
+import { markCreated } from './share-links'
 import { BTN_PRIMARY, useSeminarErrText } from './shared'
 
 const INPUT = 'bg-surface w-full rounded-lg border border-white/10 px-3 py-2'
@@ -87,7 +88,10 @@ function Form() {
         }),
       }),
     )
-    if (r.ok) return router.push(`/s/${r.data.id}`)
+    if (r.ok) {
+      markCreated(r.data.id) // 상세 첫 화면에 'Google 캘린더에 추가' 안내 1회
+      return router.push(`/s/${r.data.id}`)
+    }
     setBusy(false)
     setMsg(paid.current.has(plan) ? `${errText(r.body)} ${t('paidKept')}` : errText(r.body))
   }

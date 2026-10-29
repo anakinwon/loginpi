@@ -739,7 +739,10 @@
       "copied": "Link copied.",
       "copyFail": "Couldn't copy. Please copy the link from the address bar.",
       "share": "Share to another app",
-      "shareFail": "Couldn't share. Please use Copy link instead."
+      "shareFail": "Couldn't share. Please use Copy link instead.",
+      "created": "Your seminar is ready. Add its start time to your Google Calendar.",
+      "addGoogle": "Add to Google Calendar",
+      "later": "Later"
     },
     "attendance": "Attendance",
     "plan": "Plan",
