@@ -112,7 +112,8 @@
     "status": {
       "done": "Done",
       "doing": "In progress",
-      "todo": "Planned"
+      "todo": "Planned",
+      "drop": "Dropped"
     },
     "features": {
       "F01": {

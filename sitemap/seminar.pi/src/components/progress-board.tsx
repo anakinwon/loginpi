@@ -9,9 +9,10 @@ import {
   type StepStatus,
 } from '@/data/progress'
 
-const ORDER: StepStatus[] = ['done', 'doing', 'todo']
+const SORT: StepStatus[] = ['doing', 'done', 'todo', 'drop']
+const ORDER: StepStatus[] = ['done', 'doing', 'todo', 'drop']
 
-// 상태별 색 — 완료 녹색 / 진행 하늘 / 계획 회색
+// 상태별 색 — 완료 녹색 / 진행 하늘 / 계획 회색 / 드롭 흐린 점선
 const TONE: Record<StepStatus, { dot: string; text: string; ring: string }> = {
   done: {
     dot: 'bg-emerald-400',
@@ -27,6 +28,11 @@ const TONE: Record<StepStatus, { dot: string; text: string; ring: string }> = {
     dot: 'bg-white/25',
     text: 'text-muted-foreground',
     ring: 'border-white/10 bg-white/[0.03]',
+  },
+  drop: {
+    dot: 'bg-white/10',
+    text: 'text-muted-foreground line-through',
+    ring: 'border-dashed border-white/10 opacity-60',
   },
 }
 
@@ -54,7 +60,10 @@ export function ProgressBoard() {
   const withStatus = FEATURES.map((f) => ({ ...f, status: featureStatus(f) }))
   const count = (s: StepStatus) =>
     withStatus.filter((f) => f.status === s).length
-  const steps = FEATURES.flatMap((f) => f.steps)
+  // 진척률 = 드롭 단계를 뺀 단계 기준
+  const steps = FEATURES.flatMap((f) => f.steps).filter(
+    (s) => s.status !== 'drop',
+  )
   const doneSteps = steps.filter((s) => s.status === 'done').length
   const pct = Math.round((doneSteps / steps.length) * 100)
 
@@ -70,9 +79,12 @@ export function ProgressBoard() {
       </div>
 
       {/* 요약 — 기능 수(완료·진행·계획) + 전체 단계 진척률 */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {ORDER.map((s) => (
-          <div key={s} className={`rounded-lg border px-3 py-2 ${TONE[s].ring}`}>
+          <div
+            key={s}
+            className={`rounded-lg border px-3 py-2 ${TONE[s].ring}`}
+          >
             <div className={`text-xs ${TONE[s].text}`}>{t(`status.${s}`)}</div>
             <div className="text-2xl font-bold tabular-nums">
               {count(s)}
@@ -105,11 +117,7 @@ export function ProgressBoard() {
       {/* 기능별 워크플로 — 진행 → 완료 → 계획 순, 단계는 왼쪽부터 순서대로 */}
       <ol className="space-y-3">
         {[...withStatus]
-          .sort(
-            (a, b) =>
-              ['doing', 'done', 'todo'].indexOf(a.status) -
-              ['doing', 'done', 'todo'].indexOf(b.status),
-          )
+          .sort((a, b) => SORT.indexOf(a.status) - SORT.indexOf(b.status))
           .map((f) => {
             const done = f.steps.filter((s) => s.status === 'done').length
             const refs = featureRefs(f)
@@ -128,7 +136,9 @@ export function ProgressBoard() {
                       {f.prio}
                     </span>
                   </div>
-                  <span className={`text-xs font-semibold ${TONE[f.status].text}`}>
+                  <span
+                    className={`text-xs font-semibold ${TONE[f.status].text}`}
+                  >
                     {t(`status.${f.status}`)} · {done}/{f.steps.length}
                   </span>
                 </div>
@@ -137,7 +147,9 @@ export function ProgressBoard() {
                 </p>
                 {refs.length > 0 && (
                   <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                    <span className="text-muted-foreground">{t('refLabel')}</span>
+                    <span className="text-muted-foreground">
+                      {t('refLabel')}
+                    </span>
                     {refs.map((r) => (
                       <RefTag key={r} name={r} />
                     ))}

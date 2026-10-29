@@ -112,7 +112,8 @@
     "status": {
       "done": "완료",
       "doing": "진행",
-      "todo": "계획"
+      "todo": "계획",
+      "drop": "드롭"
     },
     "features": {
       "F01": {
