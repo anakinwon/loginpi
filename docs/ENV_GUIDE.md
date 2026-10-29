@@ -38,7 +38,7 @@ node scripts/tenant-env.mjs new yea.pi --port 3005   # 신규 테넌트 설정 �
 | **세 시스템이 같은 값** | `MON_INGEST_KEY`(보내는 쪽과 받는 쪽이 같은 값으로 비교), `MON_INGEST_URL`(= schema.pi 운영 `/api/mon/ingest`), `ADMIN_PI_USERNAMES` |
 | 공유해도 되는 값 | `ANTHROPIC_API_KEY`·`GEMINI_API_KEY`·`GITHUB_TOKEN`(계정 단위 키) |
 | **시스템마다 달라야 하는 값** | `PI_API_KEY`·`PI_WALLET_*`·`NEXT_PUBLIC_PI_APP_DOMAIN`(Pi 포털 앱마다 발급), `GOOGLE_CLIENT_ID`·`SECRET`(앱마다 OAuth 클라이언트), `AUTH_SECRET`·`PI_SESSION_SECRET`·`CRON_SECRET`(세션 위조를 막으려고 앱마다, 환경마다 따로) |
-| 비운영 DB 공유 | sitemap.pi·schema.pi·신규 앱의 dev·stg는 Supabase 프로젝트 **pi-nonprod** 하나를 같이 쓰고 `SUPABASE_SCHEMA`(`<앱>_dev`·`<앱>_stg`)로 나눈다. 운영은 앱마다 Supabase 프로젝트가 따로 있다 |
+| 비운영 DB 공유 | sitemap.pi·schema.pi·신규 앱의 dev·stg는 Supabase 프로젝트 **pi-nonprod** 하나를 같이 쓰고 `SUPABASE_SCHEMA`(`<앱>_dev`·`<앱>_stg`)로 나눈다. 운영은 앱마다 Supabase 프로젝트가 따로 있다. **예외 : seminar.pi 는 비운영 스키마 없이 운영 프로젝트 `public` 하나만 쓴다(마스터 결정 C 2026-10-29 — seminar PRD 7절 운영 규칙)** |
 
 ## 3. 키별 구하는 곳
 
@@ -154,4 +154,5 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | 2026-10-25 | seminar.pi `MEDIA_TOKEN_SECRET` 은 어디서 구하나 | 사이트 없음 — 직접 만드는 입장권 서명 키(3.1). **앱과 엔진이 같은 값**: 로컬 = `.env.local`, 운영 = `.env.vercel-prod` 값을 Vercel(Production)과 엔진 PC `C:galapagosun-engine.cmd` 에 넣는다(`media/docs/HOME_NODE_GUIDE.md`) |
 | 2026-10-26 | seminar.pi TURN 키(`CLOUDFLARE_TURN_*`·`TURN_HOST`·`TURN_SECRET`·`TURN_CREDENTIAL_TTL`)는 어디서 구하나 | 3.6 표. 전부 선택 — 없으면 `/api/media/turn` 이 STUN 만 준다. 이름은 cafe.pi 와 같다(같은 Cloudflare 키를 써도 되나 사용량이 합산됨) |
 | 2026-10-27 | seminar.pi `GEMINI_API_KEY`·`SPEECH_MAX_MIN` 은 어디서 구하나 | 3.6 표. 키는 기존 발급 키 그대로(계정 단위, 사용량 합산), 상한은 직접 정하는 값 |
+| 2026-10-29 | seminar.pi 가 쓰는 `public` 은 seminar 전용인가, `seminar_stg`·`seminar_dev` 는 왜 필요한가 | `public` = seminar 전용 프로젝트(`dwgu…`)의 기본 스키마(22개 테이블 전부 seminar 것). 비운영 스키마는 시험·리허설용 사본이었으나 API 미노출로 앱이 못 써 운영 오염의 원인이 됨 → **결정 C : 폐지하고 `public` 만**(2절 예외). Vercel Production `APP_TIER` 는 비우거나 `prod`, `SUPABASE_SCHEMA` 는 비움. seminar `.env.local` 의 오기 키 `SCHEMA_DATABASE_URL` → `SEMINAR_DATABASE_URL`(코드 사용처 없음, schema.pi 는 `.env.multi` 의 `SCHEMA_DATABASE_URL` 그대로) |
 | 이전 | `CRON_SECRET`이 뭔가 | Vercel 크론이 `Authorization: Bearer` 헤더로 보내는 비밀값이다. 직접 만들고 앱마다 따로 쓴다 → 3.1 |

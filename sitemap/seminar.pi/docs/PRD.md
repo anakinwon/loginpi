@@ -83,7 +83,8 @@
 
 ## 7. 데이터
 
-- DB : **Supabase 프로젝트 1개**(seminar 전용, 같은 ref) 안에서 스키마로 tier 를 나눈다 — `public` = prod tier(앱 `SUPABASE_SCHEMA=public`) · `seminar_dev` = dev · `seminar_stg` = stg. [확인중 : 마스터 — 운영 전용 프로젝트 분리 여부] · ⚠ 2026-10-27 확인 : `seminar_dev`·`seminar_stg` 가 PostgREST 노출 스키마에 없어 앱 tier 격리는 실제로 `public` 하나(9절 #10)
+- DB : **Supabase 프로젝트 1개**(seminar 전용 `dwgu…`)의 **`public` 하나만** 쓴다(마스터 결정 C 2026-10-29) — 로컬·스테이징·운영이 모두 같은 `public`. 비운영 스키마 `seminar_dev`·`seminar_stg` 는 폐지 — 이름만 `zz_retired_seminar_dev_20261029`·`zz_retired_seminar_stg_20261029` 로 바꿔 보관(되돌리기 = `ALTER SCHEMA … RENAME TO seminar_stg`, 완전 삭제는 마스터 확인 뒤)
+  - 운영 규칙(공유 DB 이므로) : ① 로컬·야간 시험 데이터는 제목에 `[QA-…]` 를 붙이고 시험 뒤 논리삭제 ② DB 변경(`sql/`)은 리허설 없이 운영에 바로 적용 — 적용 전 `--dry-run` 과 SQL 검토 필수, 2회 멱등 확인 ③ `db-migrate --app seminar --tier dev|stg` 는 더 쓰지 않음
 - 마이그레이션 : `packages/pi-db/sql` baseline + `sitemap/seminar.pi/sql/NNN_*.sql` → `node scripts/db-migrate.mjs --app seminar --tier dev|stg|prod --db-url <Session pooler>` (prod → `public`). `.env.local` 의 Direct 호스트는 IPv6 전용이라 Session pooler 사용(ROADMAP Phase 0)
 - 명명 : DA 표준(docs/da/데이터표준규칙.md), 시스템 칼럼 4개·논리삭제
 - 세미나 모델 : [`sql/004_seminar_smnr.sql`](../sql/004_seminar_smnr.sql) — 신규 접두사 `smn_`, 신규 표준단어 세미나 `SMN`·참가 `PTC`·입장 `ENT`·개최자 `HST`(아소카 결정, DA 사후 리뷰 — `ENT` 는 행안부 공통표준단어 '기업'과 동음)
@@ -123,7 +124,7 @@
 | 7 | 교육 공통 모듈과의 경계 — PRD_27 은 seminar 를 웨비나·강사 정산 공통 모듈(7개 사이트 재사용) 대상으로 기록. F-02(개설)·F-06(정산)을 공용 패키지로 만들지 여부 | 마스터 | [확인중 : 마스터] |
 | 8 | 세션 전 미완료 결제 복구(U7) — Pi `onIncompletePaymentFound` 는 `@pi/auth` 의 인증 부트스트랩(pi-auth-root) 안에서 세션 발급 **전**에 불릴 수 있어, complete·cancel 호출이 401 로 실패하고 결제가 APPROVED 로 남을 수 있다. 인증 부트스트랩은 이번 범위 밖(공용 패키지 변경 금지) — 세션 확보 후 재시도(대기열)를 `@pi/auth` 에 넣을지. 그 전까지 완화 = 다음 approve 의 이전 결제 정리(D-17)·상세 조회 복구(D-16) | 마스터 | [확인중 : 마스터] |
 | 9 | 운영 `LAB_ENABLED=1` 끄는 시점 — 실험실 방 코드는 세미나 DB 확인 없이 입장권이 나온다(D-14). 정식 운영 전 끄기 권장 | 마스터 | [확인중 : 마스터] |
-| 10 | `seminar_dev`·`seminar_stg` 를 PostgREST 노출 스키마에 넣을지(Supabase API 설정) — 지금은 앱 tier 격리가 `public` 하나(7절) | 마스터 | [확인중 : 마스터] |
+| 10 | `seminar_dev`·`seminar_stg` 를 PostgREST 노출 스키마에 넣을지(Supabase API 설정) — 지금은 앱 tier 격리가 `public` 하나(7절) | 마스터 | **결정(2026-10-29) : C — 비운영 스키마 폐지, `public` 만**(7절) |
 | 11 | SIGNAL_API 메시지 수 22·22 로 SIGNAL_API D-9 되돌릴 조건(메시지 20개 초과) 도달 — JSON Schema 전환 여부(NIGHT_REPORT 4절, UI 설계서 14.9) | 마스터 | [확인중 : 마스터] |
 | 12 | 개최자를 비관리자로 넓힐 때 발표 권한 정리 — 지금은 개최자 = 관리자라 차이 없음(개최자는 종료 가능·발표 불가 구조, D-1) | 마스터 | [확인중 : 마스터] — 개최자 확대 결정 때 함께 |
 | 13 | 회의 부가 기능(F-08~F-17) Pi Browser 실기기 — 자막·더빙 소리·녹화 다운로드·배경 성능·동의 화면(Android 2대 + iOS). 실기기 전 판정 최대 CONDITIONAL | 마스터 | [확인중 : 실기기] |
