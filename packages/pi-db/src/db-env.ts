@@ -2,6 +2,7 @@
 // 비운영 tier(dev/staging)는 자기 tier 자격증명이 없으면 운영으로 폴백하지 않고 미설정('') 반환 → 앱 503(KISA 2026-10-09, 운영 DB 오염 방지).
 // 출처: cafe.pi src/lib/db-env.ts 복사 추출 + SUPABASE_SCHEMA(PRD_28 §5 : 비운영은 pi-nonprod 프로젝트의 <site>_dev·<site>_stg 스키마).
 import 'server-only'
+import { isProdSchemaLeak } from './tier-guard'
 
 export type DbTier = 'dev' | 'staging' | 'prod'
 
@@ -37,7 +38,18 @@ function stagingTarget(): 'staging' | 'prod-ro' {
   return process.env.STAGING_DB_TARGET === 'prod-ro' ? 'prod-ro' : 'staging'
 }
 
+// 비운영 tier 가 운영 프로젝트의 public 을 가리키면 미설정('')으로 돌려 503 — 운영 데이터 오염 차단(tier-guard.ts)
+//  prod-ro(운영 읽기 전용)는 의도된 운영 연결이라 대상 아님
 export function resolveDbConfig(): DbConfig {
+  const c = resolveRawDbConfig()
+  if (!c.readOnly && isProdSchemaLeak(c.tier, c.url, c.schema, process.env.NEXT_PUBLIC_SUPABASE_URL ?? '')) {
+    console.error(`[pi-db] ${c.tier} tier 가 운영 DB 의 public 스키마를 가리켜 연결을 막았습니다 — SUPABASE_SCHEMA 를 <앱>_${c.tier === 'dev' ? 'dev' : 'stg'} 로`)
+    return { ...c, url: '', key: '' }
+  }
+  return c
+}
+
+function resolveRawDbConfig(): DbConfig {
   const tier = resolveDbTier()
   const schema = process.env.SUPABASE_SCHEMA || 'public'
 

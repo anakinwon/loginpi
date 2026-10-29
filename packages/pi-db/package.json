@@ -4,6 +4,9 @@
   "private": true,
   "description": "Pi 멀티사이트 공용 DB — Supabase admin(lazy·3-tier·스키마 옵션)·Pi 사용자(sys_user) 함수",
   "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.ts"
+  },
   "exports": {
     ".": "./src/index.ts"
   },
