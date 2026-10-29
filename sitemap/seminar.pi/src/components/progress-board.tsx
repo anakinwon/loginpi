@@ -36,19 +36,22 @@ const TONE: Record<StepStatus, { dot: string; text: string; ring: string }> = {
   },
 }
 
-// 참조 모델 색 — Galène 녹색 / mediasoup 파랑 / LiveKit 주황 / Jitsi 하늘 / 자체(1호 사이트) 보라
+// 참조 모델 색 — Galène 녹색 / mediasoup 파랑 / LiveKit 주황 / Jitsi 하늘 / 자체(1호 사이트) 보라 / UI 기준(seminar.pi) 분홍 점선 — 코드 참조와 구분
 const REF_TONE: Record<RefModel, string> = {
   Galène: 'border-emerald-400/50 text-emerald-300',
   mediasoup: 'border-indigo-400/50 text-indigo-300',
   LiveKit: 'border-orange-400/50 text-orange-300',
   Jitsi: 'border-sky-400/50 text-sky-300',
   'sitemap.pi': 'border-violet-400/50 text-violet-300',
+  'seminar.pi': 'border-dashed border-pink-400/60 text-pink-300',
 }
 
 function RefTag({ name }: { name: RefModel }) {
+  const t = useTranslations('progress')
   return (
     <span
       className={`rounded border px-1.5 py-px font-mono text-[11px] ${REF_TONE[name]}`}
+      title={name === 'seminar.pi' ? t('uiRef') : undefined}
     >
       {name}
     </span>

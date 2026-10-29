@@ -3,12 +3,14 @@
 export type StepStatus = 'done' | 'doing' | 'todo' | 'drop' // drop = 마스터 결정으로 범위 제외(진척률 분모에서 뺌)
 
 // 참조 모델(제품명) — 화상 엔진은 REA 분석 3종(PRD_02), 룸 화면은 오픈소스 소스 분석 2종(ui-design 14절), 로그인은 1호 사이트 구현(LOGIN_PLAYBOOK)
+//  'seminar.pi' = UI 기준 태그(점선) — 사용 1위 웹 화상회의 앱의 화면·기능 패턴(ui-design 2·3절). 공개 화면 상표 미표기 규칙(2026-10-27)으로 앱 이름 대신 표기(마스터 2026-10-29)
 export type RefModel =
   | 'Galène'
   | 'mediasoup'
   | 'LiveKit'
   | 'Jitsi'
   | 'sitemap.pi'
+  | 'seminar.pi'
 
 export interface FeatureStep {
   id: string
@@ -125,7 +127,7 @@ export const FEATURES: Feature[] = [
         status: 'done',
         stage: 'UI',
         date: '2026-10-29',
-        ref: ['LiveKit', 'Jitsi'],
+        ref: ['LiveKit', 'Jitsi', 'seminar.pi'],
         note: 'QA ✓ · device ✓',
       },
     ],
@@ -201,13 +203,25 @@ export const FEATURES: Feature[] = [
         note: 'v1.3.2 ✓ · QA ✓ · engine swap …',
       },
       // 남은 막힘 없음(DB·QA·키) — 완료, 마이크 동의 화면 실기기는 대기(device …)
-      { id: 'aiBase', status: 'done', date: '2026-10-29', note: 'DB ✓ · QA ✓ · key ✓ · device …' },
+      {
+        id: 'aiBase',
+        status: 'done',
+        date: '2026-10-29',
+        note: 'DB ✓ · QA ✓ · key ✓ · device …',
+      },
     ],
   },
   {
     id: 'F08',
     prio: 'P1',
-    steps: [{ id: 'shareLinks', status: 'doing', note: 'QA ✓ · device …' }],
+    steps: [
+      {
+        id: 'shareLinks',
+        status: 'doing',
+        ref: ['seminar.pi'],
+        note: 'QA ✓ · device …',
+      },
+    ],
   },
   {
     id: 'F09',
@@ -216,7 +230,7 @@ export const FEATURES: Feature[] = [
       {
         id: 'noiseLight',
         status: 'doing',
-        ref: ['Jitsi'],
+        ref: ['Jitsi', 'seminar.pi'],
         note: 'QA ✓ · device …',
       },
     ],
@@ -228,7 +242,7 @@ export const FEATURES: Feature[] = [
       {
         id: 'liveCaptions',
         status: 'doing',
-        ref: ['Jitsi'],
+        ref: ['Jitsi', 'seminar.pi'],
         note: 'QA ✓ · engine … · key ✓ · device …',
       },
     ],
@@ -241,7 +255,7 @@ export const FEATURES: Feature[] = [
         id: 'pollQnaAttend',
         status: 'done',
         date: '2026-10-29',
-        ref: ['Jitsi'],
+        ref: ['Jitsi', 'seminar.pi'],
         note: 'DB ✓ · QA ✓ · device …',
       },
     ],
@@ -254,7 +268,7 @@ export const FEATURES: Feature[] = [
         id: 'backgrounds',
         status: 'done',
         date: '2026-10-29',
-        ref: ['Jitsi', 'LiveKit'],
+        ref: ['Jitsi', 'LiveKit', 'seminar.pi'],
         note: 'model ✓ · QA ✓ · device …',
       },
     ],
@@ -267,7 +281,7 @@ export const FEATURES: Feature[] = [
         id: 'localRecording',
         status: 'done',
         date: '2026-10-29',
-        ref: ['Jitsi'],
+        ref: ['Jitsi', 'seminar.pi'],
         note: 'QA ✓ · pause ✓ · plan ✓ · device …',
       },
     ],
@@ -279,7 +293,7 @@ export const FEATURES: Feature[] = [
       {
         id: 'aiNotes',
         status: 'doing',
-        ref: ['Jitsi'],
+        ref: ['Jitsi', 'seminar.pi'],
         note: 'QA ✓ · key ✓ · device …',
       },
     ],
@@ -288,7 +302,12 @@ export const FEATURES: Feature[] = [
     id: 'F15',
     prio: 'P2',
     steps: [
-      { id: 'inPersonNotes', status: 'doing', note: 'QA ✓ · key ✓ · device …' },
+      {
+        id: 'inPersonNotes',
+        status: 'doing',
+        ref: ['seminar.pi'],
+        note: 'QA ✓ · key ✓ · device …',
+      },
     ],
   },
   {
@@ -298,7 +317,7 @@ export const FEATURES: Feature[] = [
       {
         id: 'captionTranslate',
         status: 'doing',
-        ref: ['Jitsi'],
+        ref: ['Jitsi', 'seminar.pi'],
         note: 'QA ✓ · engine … · key ✓ · device …',
       },
     ],
@@ -310,7 +329,7 @@ export const FEATURES: Feature[] = [
       {
         id: 'dubbing',
         status: 'doing',
-        ref: ['Jitsi'],
+        ref: ['Jitsi', 'seminar.pi'],
         note: 'QA ✓ · engine … · key ✓ · device …',
       },
     ],

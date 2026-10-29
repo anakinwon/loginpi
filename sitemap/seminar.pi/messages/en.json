@@ -221,7 +221,8 @@
       "captionTranslate": "Language choice and original/translated toggle",
       "dubbing": "Synthetic voice playback and lowered original audio"
     },
-    "refLabel": "Reference model"
+    "refLabel": "Reference model",
+    "uiRef": "UI baseline — screen and feature patterns of a widely used web video meeting app, adapted for seminar.pi"
   },
   "room": {
     "rename": {

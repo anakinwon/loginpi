@@ -221,7 +221,8 @@
       "captionTranslate": "언어 선택·원문/번역 전환",
       "dubbing": "합성 음성 재생·원래 소리 줄이기"
     },
-    "refLabel": "참조 모델"
+    "refLabel": "참조 모델",
+    "uiRef": "UI 기준 — 많이 쓰는 웹 화상회의 앱의 화면·기능 패턴을 seminar.pi 에 맞춰 적용"
   },
   "room": {
     "rename": {
