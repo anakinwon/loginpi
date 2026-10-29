@@ -23,7 +23,11 @@ LTE 휴대폰 ─ 신호 wss ─→ Cloudflare 임시 터널 ─(집 PC가 바�
    - `MEDIA_PUBLIC_IP` = 공유기 관리 화면(`http://192.168.0.1`) 시스템 요약 정보의 **외부 IP 주소**(2절 ②) — 숫자 4덩어리만
    - `MEDIA_TOKEN_SECRET` = 마스터 PC `sitemap/seminar.pi/.env.vercel-prod` 의 같은 키 값(Vercel 과 같은 값, 앞뒤 공백 없이)
    - `MEDIA_ALLOWED_ORIGINS=https://seminarz.vercel.app,https://seminar0532.pinet.com` — Pi 포털 래퍼(seminar0532.pinet.com)가 실제 앱을 **https://seminarz.vercel.app** 에서 불러오므로(2026-10-27 래퍼 HTML 확인) Pi Browser 의 Origin 은 앞의 값일 가능성이 높습니다. 실측 전이라 **둘 다** 넣습니다 [확인중 : Pi Browser Origin]
-   - `MEDIA_ADMIN_SECRET` 은 **넣지 않습니다** — 터널은 엔진의 모든 경로를 공개하므로, 넣으면 관리 API(`/admin/`)가 인터넷에 열립니다(없으면 `/admin/` 은 404)
+   - `MEDIA_ADMIN_SECRET` = **엔진과 Vercel `seminar` 양쪽에 같은 무작위 32바이트 이상 값을 넣거나, 양쪽 다 뺍니다** (2026-10-29 정정 — 이전 "넣지 않는다" 지침 대체). 값 만들기 : 마스터 PC `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`, Vercel 에 넣은 뒤 Redeploy
+     - 넣으면 : 터널이 엔진의 모든 경로를 공개하므로 `/admin/` 도 인터넷에서 닿지만, 요청마다 `Authorization: Bearer <키>` 를 상수 시간 비교하고 틀리면 지연 뒤 401 입니다(`media/internal/bora/admin.go:174-183`). 그래서 **짧거나 추측 가능한 값은 금지** — 엔진은 32바이트 미만이면 관리 API 전체를 404 로 끄고(`admin.go:129`·`:176-178`, `signal.MinSecret = 32` — `media/internal/signal/ticket.go:34`), Vercel 은 32자 미만이면 env 검증에서 막힙니다(`src/env.ts:44`)
+     - 빼면(양쪽 다) : 엔진 `/admin/` 404, 화면 서버는 관리 API 를 부르지 않습니다. 기본 입장·영상·자막은 동작하되 **두 가지가 꺼집니다** — ① 음성 자막 무대 관문(D-1) 생략 : `/api/speech/chunk` 가 엔진에 무대 역할을 묻지 않아(`src/lib/speech-gate.ts:113-117`) 청중 음성 조각도 DB 청중 몫(1/2) 상한까지만 막힘 ② 시간 소진 종료 때 엔진 방 강제 종료(`DELETE /admin/rooms/{id}`) 생략(`src/lib/plan.ts:86-95`) — DB 세미나만 ENDED
+     - ⚠ 한쪽만 넣으면 고장 : **Vercel 에만** 넣으면 엔진 `/admin/` 404 를 화면 서버가 "무대에 없음"으로 읽어(`speech-gate.ts:127`·`:131`) ADMIN 외 발표자·패널 음성 자막이 403 `SPEECH_STAGE_ONLY` 로 거절됩니다(`speech-gate.ts:137`). **두 값이 다르면** 엔진 401 → 503 `AI_UNAVAILABLE`(`speech-gate.ts:127-129`). 엔진에만 넣으면 관문 생략(빼는 것과 같음)
+     - 관리 API 주소는 `NEXT_PUBLIC_MEDIA_WS_URL` 에서 만듭니다(`speech-gate.ts:112`) — 터널 주소가 바뀌면 이 값도 바꾸고 Redeploy
 2. 방화벽 UDP 7882 규칙(4.3 첫 줄) 실행
 3. 엔진 켜기 / 값을 바꾼 뒤 다시 켜기 — 관리자 cmd 에서 세 줄(`/End` 만 하면 galapagos.exe 가 남아 포트를 잡고 있음) :
    ```
@@ -271,9 +275,12 @@ galapagos.exe
 3. 확인 : `http://127.0.0.1:7880/healthz` → `ok`, `C:\galapagos\engine.log` 마지막 줄 `Galápagos 대기 …`
 4. 파일 확인(선택) : PowerShell `Get-FileHash C:\galapagos\galapagos.exe` 가 빌드 기록의 SHA256 과 같은지
 
+`8ab7e634` 빌드는 저장소 밖 폴더에 교체 절차서가 함께 있습니다 : `C:/Users/anaki/workspace/galapagos-build/8ab7e634/SWAP.md` (파일 확인·백업·교체·env·정상 확인·되돌리기, 같은 폴더 `galapagos.exe`·`SHA256SUMS.txt`). `MEDIA_ADMIN_SECRET` 은 B-1 지침(양쪽 같은 값 또는 양쪽 다 뺌)을 따릅니다.
+
 | 빌드 | 커밋 | SHA256 |
 |---|---|---|
-| **2026-10-28 01:49 (v1.3.2 + 관리 API `GET /admin/rooms/{id}/peers/{sub}` 무대 역할·발표자 유무 조회 — 음성 자막 무대 관문 D-1)** — 새 빌드, 교체 대기(v1.3.2 대신 이것 설치. 엔진·Vercel 양쪽에 같은 `MEDIA_ADMIN_SECRET`(32자 이상)을 넣어야 관문이 켜짐, 미설정이면 관문 생략) | `27a18b31` (master 병합 커밋, 엔진 변경 야간 시험 r3 T03, `vcs.modified=false`, 깨끗한 임시 worktree 빌드) | `225efa5e6a21c1bd55b9c99221e6f03e946e991176c3e6b6afd9036af2cea83a` |
+| **2026-10-29 13:16 (`27a18b31` 이후 M3 ⑥ 비활성 레이어 제외 `05d63243` — 할당기 밖 녹화 Consumer 가 상위 레이어 끊김에 멈추던 경로 수정 · 호출자 없는 공개 `Room.Consume` 삭제 `ced50e83`)** — 새 빌드, 교체 대기(`27a18b31` 대신 이것 설치). 신호 프로토콜·env·관리 API 변경 없음, Go 1.27.0, 산출물 `C:/Users/anaki/workspace/galapagos-build/8ab7e634/galapagos.exe` · 실행 확인 [확인중 : 미검증 — 집 PC 교체 후 healthz·입장] | `8ab7e634` (master, `vcs.modified=false`, 깨끗한 작업 트리 빌드) | `ce249a33a54bb5b54e3b08cef14d0d4d1d155cc761afbb8410d6c402fd56b94f` |
+| 2026-10-28 01:49 (v1.3.2 + 관리 API `GET /admin/rooms/{id}/peers/{sub}` 무대 역할·발표자 유무 조회 — 음성 자막 무대 관문 D-1) — `8ab7e634` 빌드로 대체(관리 키는 B-1 지침) | `27a18b31` (master 병합 커밋, 엔진 변경 야간 시험 r3 T03, `vcs.modified=false`, 깨끗한 임시 worktree 빌드) | `225efa5e6a21c1bd55b9c99221e6f03e946e991176c3e6b6afd9036af2cea83a` |
 | 2026-10-27 23:40 (v1.3.2 `app.send` 'state' 속도 한도 자막과 분리 — 녹화·AI 기록 고지 RATE_LIMITED 차단) — v1.3.2 + 관리 API 빌드로 대체 | `cf2fe499` (master 병합 커밋, 엔진 변경 `8e178933`, `vcs.modified=false`) | `d76c6bc0bb371ec18f112e553abb78fe1aac7570d491d8221e73cf711e5b21ee` |
 | 2026-10-27 20:55 (v1.3.1 범용 중계 `app` + 잘못된 UTF-8 연결 종료) — v1.3.2 로 대체 | `4e33bbad` (브랜치 `feat/seminar-app-relay`, `vcs.modified=false`, 재현 확인) | `a11f7f367d84c03d1061458b4e1d9b8601b276848a4d71730524c7b8896df826` |
 | 2026-10-27 20:37 (v1.3) — **폐기, 설치 금지** : 잘못된 UTF-8 `app.send` 를 그대로 중계(청중 1명이 방 전원 연결을 끊을 수 있음, SIGNAL_API v1.3.1) | `21844766` (`vcs.modified=false`) | `45541466cd242d665285d45c161f3b62c4cd4cd8c2a04cea6d06fcbbdb104e98` |
@@ -306,7 +313,7 @@ galapagos.exe
 | 같은 집 와이파이 단말 | **영상(UDP 7882)** : 2026-10-27 수정 빌드부터 엔진이 공인 IP 와 함께 **LAN 주소(192.168.0.16 등)도 host 후보로 알립니다**(Append) — 집 안 단말(예 : 마스터 PC)은 헤어핀 NAT 없이 LAN 으로 직접 붙습니다. 이전 빌드는 공인 IP 만 알려, 헤어핀이 안 되면 PC 가 잠깐 접속 뒤 `ICE_FAILED` 로 끊깁니다(2026-10-27 PC 발표자 끊김의 유력 원인 [확인중 : 실기기 재시험]) → **새 빌드로 교체(4.7) 필요**. 엔진 PC 의 가상 어댑터(WSL·Hyper-V·VPN) 주소도 SDP 에 함께 노출됩니다. **신호(wss)** 는 cloudflared 터널이라 헤어핀과 무관 |
 | 공인 IP 변경 | 통신사가 IP 를 바꾸면 DuckDNS 는 5분 안에 따라가지만, 엔진의 `MEDIA_PUBLIC_IP` 는 수동 수정 + 엔진 재시작 필요(자동화는 후속) |
 | Pi Node 영향 | 영상 송출이 업로드 대역폭·CPU 를 나눠 씀 → 세미나 중 Pi Node 동작에 영향이 있을 수 있음 |
-| 노출 범위 | 0~4절 방식 : 공유기에서 TCP 443·UDP 7882 두 개만. ★현행(대안 1) : 공유기는 UDP 7882 하나, 신호는 터널이 엔진의 **모든 HTTP 경로**를 공개하므로 `MEDIA_ADMIN_SECRET` 을 넣지 않음(`/admin/` 404 유지). 그 PC 의 공유 폴더·원격 접속은 열지 않음 |
+| 노출 범위 | 0~4절 방식 : 공유기에서 TCP 443·UDP 7882 두 개만. ★현행(대안 1) : 공유기는 UDP 7882 하나, 신호는 터널이 엔진의 **모든 HTTP 경로**를 공개하므로 `/admin/` 도 닿음 — `MEDIA_ADMIN_SECRET` 은 B-1 지침대로 엔진·Vercel 양쪽에 같은 무작위 32바이트 이상 값(Bearer 없으면 401) 또는 양쪽 다 뺌(`/admin/` 404). 그 PC 의 공유 폴더·원격 접속은 열지 않음 |
 | 통신사 약관 | 가정용 회선에서 서버·상업 서비스 운영이 제한될 수 있음 [확인중 : 통신사 약관] — 시험용으로만, 운영은 VM |
 | 정전·재부팅 | 작업 스케줄러가 켜질 때 자동 실행. 정전이 잦으면 VM |
 
