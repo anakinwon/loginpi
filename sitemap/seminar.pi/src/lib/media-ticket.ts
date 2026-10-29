@@ -16,6 +16,7 @@ export interface MediaTicketInput {
   role: MediaRole
   cap?: number
   end?: number // 방 종료 시각(유닉스 초, 선택)
+  host?: string // 세미나 개최자 usr_id(선택, SIGNAL_API v1.3.3) — 엔진이 개최자가 6분 넘게 없으면 방을 닫는다
 }
 
 const b64url = (s: string | Buffer) => Buffer.from(s).toString('base64url')
@@ -40,6 +41,7 @@ export function signMediaTicket(
     exp: iat + MEDIA_TICKET_TTL_SEC,
     jti: randomBytes(16).toString('base64url'),
     ...(input.end ? { end: input.end } : {}),
+    ...(input.host ? { host: input.host } : {}),
   }
   const body = `${HEADER}.${b64url(JSON.stringify(claims))}`
   const sig = createHmac('sha256', secret).update(body).digest('base64url')

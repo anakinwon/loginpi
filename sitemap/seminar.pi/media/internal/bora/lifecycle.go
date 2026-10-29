@@ -196,6 +196,9 @@ func (r *Room) closePeer(peerID string) {
 	if p.offerTimer != nil {
 		p.offerTimer.Stop()
 	}
+	if r.host != "" && p.Ticket.Sub == r.host {
+		r.hostAt = time.Now() // 개최자 퇴장(나가기·끊김·중복 세션 교체 모두 여기를 지난다) — 부재 기준 시각
+	}
 	delete(r.peers, peerID)
 	r.speaker.forget(peerID)
 	r.queueLeft(peerID) // ④ 뒤 200ms 묶음 ntf peerLeft(v1.1)

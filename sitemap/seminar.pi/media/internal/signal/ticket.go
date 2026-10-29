@@ -53,6 +53,9 @@ type Ticket struct {
 	Exp  int64  `json:"exp"`
 	Jti  string `json:"jti"`           // 128비트 무작위
 	End  int64  `json:"end,omitempty"` // 방 종료 시각(선택)
+	// Host — 세미나 개최자 sub(선택, v1.3.3). 있으면 개최자가 방에 HostGrace 넘게 없을 때 방을 닫는다(bora Room.reapable).
+	//  화면 서버가 세미나 방 입장권 전부(발표·청중)에 개최자 id 를 넣는다 — 실험실 방은 없음 = 규칙 미적용(마스터 2026-10-29)
+	Host string `json:"host,omitempty"`
 }
 
 // Verifier — 서명 키 + jti 재사용 캐시(exp 까지). 여러 세션 고루틴이 부르므로 잠금으로 보호.

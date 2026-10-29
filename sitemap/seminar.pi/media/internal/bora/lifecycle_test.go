@@ -12,9 +12,10 @@ import (
 
 // fakeSession — 알림을 기록하고, 받는 순간 check 를 실행해 순서를 검증한다.
 type fakeSession struct {
-	id    string
-	got   []string
-	check func(n signal.Notification)
+	id     string
+	got    []string
+	check  func(n signal.Notification)
+	closed signal.ErrCode // Close 로 받은 코드(개최자 부재 정리 시험)
 }
 
 func (f *fakeSession) ID() string { return f.id }
@@ -24,7 +25,7 @@ func (f *fakeSession) Send(n signal.Notification) {
 		f.check(n)
 	}
 }
-func (f *fakeSession) Close(signal.ErrCode) {}
+func (f *fakeSession) Close(c signal.ErrCode) { f.closed = c }
 
 func closed(ch <-chan struct{}) bool {
 	select {

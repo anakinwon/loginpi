@@ -55,6 +55,7 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
   let roomCap: number | undefined
   let startLive = false
   let nickname: string | null = null // 세미나 별명(sql/014)
+  let host: string | undefined // 세미나 개최자 — 입장권 host 클레임(엔진 개최자 부재 정리, SIGNAL_API v1.3.3)
   if (isUuid(room)) {
     // 세미나·내 참가 — 서로 의존 없음 → 병렬(R-P1)
     const [smn, ptc, nck, plan] = await Promise.all([
@@ -118,6 +119,7 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
         return NextResponse.json({ error: 'host_away', code: 'HOST_AWAY' }, { status: 409, headers: noStore })
     }
     roomCap = smn.data.max_cnt + 1
+    host = smn.data.hst_usr_id
     startLive = cap === 'present' && smn.data.smn_sts_cd === 'SCHEDULED'
   } else if (!labOpen()) {
     return NextResponse.json({ error: 'not_found' }, { status: 404, headers: noStore })
@@ -130,6 +132,7 @@ export const POST = withAuthGuard(dbRoute(async (req) => {
     name: nickname || user.display_name || user.pi_username || '',
     role: cap === 'present' ? 'presenter' : 'audience',
     cap: roomCap,
+    host,
   })
   // wsUrl 은 참고값 — 시험 단계는 화면에서 엔진 주소(임시 터널)를 직접 넣으므로 없어도 발급
   if (!ticket)

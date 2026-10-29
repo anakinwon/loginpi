@@ -99,6 +99,10 @@ type Room struct {
 	reactTimer *time.Timer
 	// roles — peer.setRole 로 바뀐 역할(입장권 sub → 역할). 재입장 때 입장권 role(초기값) 대신 쓴다. panel|audience 만 담긴다(발표자 승격 불가), 방이 닫히면 사라진다.
 	roles map[string]signal.Role
+	// v1.3.3 개최자 부재 — host = 세미나 개최자 sub(처음 들어온 host 클레임, 덮어쓰지 않음), hostAt = 부재 기준 시각
+	//  (host 가 채워진 때·개최자 peer 가 나간 때). 개최자가 방에 없고 hostAt 뒤 HostGrace 가 지나면 reapable(마스터 2026-10-29)
+	host   string
+	hostAt time.Time
 	// v1.2(moderate.go) — 종류별 잠금(room.muteAll lock), 마지막 레이아웃(room.setLayout, 입장 응답에 실음), 발언자 판정
 	locks   signal.Locks
 	layout  *signal.Layout
@@ -176,7 +180,34 @@ func (r *Room) reapable(now time.Time) bool {
 	if !r.end.IsZero() && now.After(r.end) {
 		return true
 	}
+	if r.hostGone(now) {
+		return true
+	}
 	return !r.opened && len(r.peers) == 0
+}
+
+// HostGrace — 개최자가 방에 없어도 방을 유지하는 시간. 화면 서버의 재입장 차단(개최자 출석 하트비트 + 6분, engage-rules HOST_GRACE_MS)과 같게 —
+// 엔진이 더 일찍 닫으면 화면 서버가 아직 막지 않는 사이 참가자가 재입장해 새 방(개최자 없음)이 다시 열린다
+const HostGrace = 6 * time.Minute
+
+// noteHost — 입장권의 host 클레임을 방에 기록(비어 있을 때만 — 구 화면 서버가 만든 방도 뒤늦게 채운다). 채운 시각부터 부재를 센다
+func (r *Room) noteHost(host string, now time.Time) {
+	if r.host == "" && host != "" {
+		r.host, r.hostAt = host, now
+	}
+}
+
+// hostGone — 개최자 지정 방에 개최자 peer 가 없고 부재 기준 시각 뒤 HostGrace 가 지났는가. 존재 검사가 먼저(막 돌아온 개최자의 방을 닫지 않게)
+func (r *Room) hostGone(now time.Time) bool {
+	if r.host == "" {
+		return false
+	}
+	for _, p := range r.peers {
+		if p.Ticket.Sub == r.host {
+			return false
+		}
+	}
+	return now.Sub(r.hostAt) > HostGrace
 }
 
 // Join — 정원·역할·중복 sub(기존 세션 DUPLICATE_SESSION 종료) 검사 후 Peer 생성. 구독 PC 를 만들고 기존 Producer 를 자동 구독한다.
@@ -195,6 +226,7 @@ func (r *Room) join(t signal.Ticket, s signal.Session) (*Peer, *signal.Error) {
 	default:
 		return nil, signal.Errf(signal.CodeRoleForbidden, "알 수 없는 역할")
 	}
+	r.noteHost(t.Host, time.Now())
 	if t.Sub != "" {
 		for id, old := range r.peers {
 			if old.Ticket.Sub != t.Sub {

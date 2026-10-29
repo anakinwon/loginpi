@@ -151,3 +151,20 @@ func assertCode(t *testing.T, err error, want ErrCode) {
 		t.Fatalf("want %s, got %v", want, err)
 	}
 }
+
+// v1.3.3 host 클레임 — 서명·검증 뒤에도 보존(개최자 부재 정리 근거), 없으면 빈 값(구 화면 서버 호환)
+func TestVerifyKeepsHost(t *testing.T) {
+	now := time.Unix(1_800_000_000, 0)
+	v := NewVerifier(testSecret)
+	v.delay = 0
+	tk := goodTicket(now, "h1")
+	tk.Host = "host-uuid"
+	got, err := v.Verify(sign(t, tk), now)
+	if err != nil || got.Host != "host-uuid" {
+		t.Fatalf("host=%q err=%v", got.Host, err)
+	}
+	got, err = v.Verify(sign(t, goodTicket(now, "h2")), now)
+	if err != nil || got.Host != "" {
+		t.Fatalf("host 없는 입장권 host=%q err=%v", got.Host, err)
+	}
+}

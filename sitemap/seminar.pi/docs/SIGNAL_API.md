@@ -223,7 +223,7 @@
 | `ROOM_FULL` | 정원(`cap`) 초과 | `join` | 종료 |
 | `ROLE_FORBIDDEN` | audience 의 `transport.publish`·`produce`, v1.1·v1.2 권한 밖 요청(3.3 — `hand.set`·`hand.lowerAll`·`peer.setRole`·`room.end`, 3.5 — `peer.mute`·`room.muteAll`·`peer.askUnmute`·`room.setLayout`), 3.6 — 주제표의 역할 밖 `app.send`(v1.3) | 발행·관리 요청 | 유지 |
 | `LOCKED` | 발표자 잠금 중 `producer.resume`·잠긴 종류 `produce`·`peer.askUnmute`(3.5 E, v1.2) | 발행 요청 | 유지 |
-| `ROOM_CLOSED` | 방 종료(`end` 지남·관리자 종료·`room.end`)·닫힌 방에 요청 | 전부 · `ntf error` | 종료 |
+| `ROOM_CLOSED` | 방 종료(`end` 지남·관리자 종료·`room.end`·개최자 부재 `HostGrace` 초과 v1.3.3)·닫힌 방에 요청 | 전부 · `ntf error` | 종료 |
 | `DUPLICATE_SESSION` | 같은 방에 같은 `sub` 가 다시 입장 → **기존** 세션에 `ntf error` | `ntf error` | 기존 세션 종료 |
 | `SDP_INVALID` | SDP 파싱·적용 실패, 대기 중 offer 없이 온 `transport.subscribe.answer`, **요청 `d` 해석 실패(모든 요청)**, `produce` 의 잘못된 `kind`, `app.send` 의 `d` 4096바이트 초과(3.6, v1.3) [TBD : 일반 `BAD_REQUEST` 코드 분리 여부] | `transport.*` · 전부 | 유지 |
 | `NOT_FOUND` | 없는 메서드·producer·consumer, 남의 producer, 주제표에 없는 `app.send` `topic`(3.6, v1.3) | 전부 | 유지 |
@@ -245,6 +245,7 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 | `iat` · `exp` | 초 | 수명 60초, 오차 5초, `exp` 필수 |
 | `jti` | 128비트 무작위 | `exp` 까지 재사용 거부(메모리) |
 | `end` | 초(선택) | 지나면 `ROOM_CLOSED` |
+| `host` | 문자열(선택, v1.3.3) | 세미나 개최자 `sub` — 화면 서버가 세미나 방 입장권 전부에 넣는다. 방에 처음 들어온 값만 쓰고(덮어쓰지 않음), 개최자 `sub` 의 접속이 방에 없고 부재 기준 시각(값이 채워진 때·개최자가 나간 때) 뒤 `HostGrace`(6분)가 지나면 정리 주기(10초)에 방을 닫는다(전원 `ROOM_CLOSED`, 종료 표시 없음 — 개최자가 다시 들어오면 새 방). 없으면 규칙 미적용(실험실 방) |
 
 ## 7. 예시 — 발표자 발행
 
@@ -298,3 +299,4 @@ JWT 압축 직렬화, **HS256 고정**(헤더 `alg` 불신), 키 `MEDIA_TOKEN_SE
 | 2026-10-27 | **v1.2** — 후속 E·F·G(3.5, 설계서 14.7) : 요청 4(`peer.mute`·`room.muteAll`·`peer.askUnmute`·`room.setLayout`)·알림 5(`mutedBy`·`roomPolicy`·`askUnmute`·`layout`·`activeSpeaker`)·오류 코드 `LOCKED`, `join` 응답 `policy`·`layout`(필드 추가 = 하위 호환), `producer.resume` 잠금 검사. 잠금 → 일시정지 → 알림 한 처리, 해제 = `muteAll{lock:false}`, `video` = 카메라만, 엔진 RFC 6464 오디오 레벨 판정(100ms·−50 dBov·300ms·6 dB·1.5초·방당 500ms). D-9 메시지 수 22·22 — JSON Schema 전환은 [확인중 : 마스터]. 기존 이름·필드 변경 없음. 아소카 결정(마스터 위임 2026-10-26) |
 | 2026-10-27 | **v1.3** — 범용 중계(3.6, 계획서 A-2) : 요청 `app.send{topic, d}`·알림 `app{topic, d, from}` 1쌍. 주제표 `caption`=presenter·panel / `state`=presenter / `refresh`=전원(표 밖 `NOT_FOUND`, 역할 밖 `ROLE_FORBIDDEN`), `d` 4096바이트 이하(`SDP_INVALID`), 피어당 초당 2건 주제 합산(`RATE_LIMITED`), 검사 순서 주제→크기→역할→속도(거절은 한도 미사용), 받는 사람 = 보낸 본인 제외 전원, `from` = 엔진이 채운 peerId, 보관·재전송 없음, 잠금과 무관. 메시지 수 23·23. 신규 오류 코드·기존 이름·필드 변경 없음. 근거 REA_04 엔진편(`docs/rea/evidence/REA_04/engine-01-app-relay-anchors.json`). 아소카 결정(마스터 위임 2026-10-27) |
 | 2026-10-27 | **v1.3.1** (검토 지적, 이름·필드·오류 코드 변경 없음) — ① 1절 형식 : 잘못된 UTF-8 텍스트 프레임은 응답·중계 없이 연결 종료(`session.read` 공통 관문, RFC 6455 8.1). `json.RawMessage` 인 `app.send` `d` 가 잘못된 바이트를 그대로 중계해 청중 1명이 방 전원을 1007 로 끊을 수 있던 결함 수정(`chat.send` 는 Go 문자열 디코드로 U+FFFD 치환돼 해당 없음). 시험 `TestInvalidUTF8Closes`·`TestV13AppRelay` 끝 단계 ② 3.6 받는 쪽 : `refresh` 는 받은 화면이 1~2초 묶어 다시 읽고 진행 중 조회를 재사용(엔진 변경 없음) |
+| 2026-10-29 | **v1.3.3** 개최자 부재 정리(마스터 2026-10-29 — 개최자가 나간 뒤 참가자끼리 무제한 사용 차단) : 입장권 선택 클레임 `host`(6절) 추가, 개최자 접속이 `HostGrace` 6분 넘게 없으면 엔진 정리 주기가 방을 닫는다(`ROOM_CLOSED`). 6분 = 화면 서버 재입장 차단(개최자 출석 하트비트 + 6분)과 같게 — 엔진이 먼저 닫으면 차단 전 재입장으로 개최자 없는 새 방이 열린다. 구 엔진은 모르는 클레임을 무시(호환). 시험 `TestHost*`·`TestVerifyKeepsHost`. 메시지·오류 코드 변경 없음 |
