@@ -154,3 +154,4 @@
 | 2026-10-24 | cafe.pi | A | 일반 fetch(인증 필요) · 매치 61 중 대상 12 · 처리 12(부트스트랩·공개 호출 49 는 의도) / 관리자 P1·P2·P4 · 매치 6 · 처리 6 / links 서버 페이지네이션 · 처리 1 | `ebe81731` |
 | 2026-10-24 | cafe.pi·sitemap.pi·schema.pi·공용 | B | P4 외부 호출 타임아웃 · 매치 cafe 11파일·pi-auth 1·sitemap 1 · 처리 전부 / P1·P2 결제·권한 · 매치 schema 4·sitemap 5 · 처리 전부 — Pi Browser 실기기 검증 대기 | `ca73b24f`·`5cd4da85`·`9cd43d63` |
 | 2026-10-24 | cafe.pi·sitemap.pi | C | event N+1·feedback·nearby·stickers 집계 · 처리 4 / sitemap 조회수 SUM RPC·sweep 동시 5 · 처리 2 / 보류 3(2.7) | `0d915dc7`·`5cd4da85` |
+| 2026-10-29 | seminar.pi·공용(`@pi/db`) | A | **R-P5 위반으로 운영 장애 약 2시간** — 비운영 tier 운영 DB 오염 차단 가드가 운영 env 실값(운영이 `staging` tier 로 판정 [확인중 : 마스터]) 확인 없이 배포돼 운영 DB API 전부 503 · 매치 1(가드 `8ab7e634`) · 처리 1(되돌림 `603a9abb`, 복구 확인). 재도입 조건 = 운영 env 판정 결과 사전 확인 + 경고 로그 단계 선행 [확인중 : 마스터 — Production `APP_TIER` 정리]. 상세 seminar.pi TROUBLESHOOT 2026-10-29 | `8ab7e634` → `603a9abb` |
