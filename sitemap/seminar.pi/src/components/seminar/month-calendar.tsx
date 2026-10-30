@@ -146,7 +146,7 @@ export function MonthGrid({
   const pickable = picked !== undefined // 홈 달력 = 고르기 없음 → 일정 없는 날은 누를 것이 없다
   // 크기 — 기본(만들기 화면) / large(홈, 2배 : 칸 40→80·56→112px, 날짜 14→28px, 제목 10→20px(휴대폰 16px), 요일 12→24px)
   const z = large
-    ? { head: 'text-2xl', nav: 'h-14 w-14 text-3xl', week: 'text-2xl', cell: 'min-h-20', cellEv: 'min-h-28', day: 'text-[28px] py-2', chip: 'text-base sm:text-xl' }
+    ? { head: 'text-[17px]', nav: 'h-10 w-10 text-[21px]', week: 'text-[17px]', cell: 'min-h-14', cellEv: 'min-h-20', day: 'text-[20px] py-1.5', chip: 'text-[11px] sm:text-sm' }
     : { head: 'text-sm', nav: 'h-9 w-9', week: 'text-xs', cell: 'min-h-10', cellEv: 'min-h-14', day: 'py-1', chip: 'text-[10px]' }
 
   // 이번 달 칸 — 앞쪽 빈칸(요일 맞춤) + 날짜

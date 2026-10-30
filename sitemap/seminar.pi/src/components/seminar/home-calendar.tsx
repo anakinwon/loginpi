@@ -110,7 +110,7 @@ export function HomeCalendar() {
           <MonthGrid view={view} onView={setView} min={min} max={max} items={items} off={() => false} onDay={(_, k, n) => n && setDetail(k)} large />
         ) : (
           // 자리 표시 — 서버 HTML·첫 화면(달력이 들어갈 높이만)
-          <div aria-hidden className="h-[40rem]" />
+          <div aria-hidden className="h-[28rem]" />
         )}
         {smnErr && <p className="text-danger text-xs">{t('failed')}</p>}
         {mine && <GcalManager urls={urls} saveUrls={saveUrls} failed={failed} />}
