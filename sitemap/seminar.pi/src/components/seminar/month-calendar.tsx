@@ -123,6 +123,7 @@ export function MonthGrid({
   picked,
   off,
   onDay,
+  large = false,
 }: {
   view: Date
   onView: (v: Date) => void
@@ -132,6 +133,7 @@ export function MonthGrid({
   picked?: string
   off: (d: Date) => boolean
   onDay: (d: Date, k: string, n: number) => void
+  large?: boolean // 홈 달력 — 칸 높이·글자 2배(마스터 2026-10-30)
 }) {
   const locale = useLocale()
   const t = useTranslations('host.gcal')
@@ -142,6 +144,10 @@ export function MonthGrid({
   const title = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long' }).format(view)
   const todayKey = dayKey(new Date())
   const pickable = picked !== undefined // 홈 달력 = 고르기 없음 → 일정 없는 날은 누를 것이 없다
+  // 크기 — 기본(만들기 화면) / large(홈, 2배 : 칸 40→80·56→112px, 날짜 14→28px, 제목 10→20px(휴대폰 16px), 요일 12→24px)
+  const z = large
+    ? { head: 'text-2xl', nav: 'h-14 w-14 text-3xl', week: 'text-2xl', cell: 'min-h-20', cellEv: 'min-h-28', day: 'text-[28px] py-2', chip: 'text-base sm:text-xl' }
+    : { head: 'text-sm', nav: 'h-9 w-9', week: 'text-xs', cell: 'min-h-10', cellEv: 'min-h-14', day: 'py-1', chip: 'text-[10px]' }
 
   // 이번 달 칸 — 앞쪽 빈칸(요일 맞춤) + 날짜
   const cells: (Date | null)[] = Array(view.getDay()).fill(null)
@@ -155,19 +161,19 @@ export function MonthGrid({
   return (
     <>
       <div className="flex items-center justify-between">
-        <button type="button" onClick={() => move(-1)} disabled={!canPrev} aria-label={t('prev')} className="hover:bg-surface-raised h-9 w-9 rounded-full disabled:opacity-30">
+        <button type="button" onClick={() => move(-1)} disabled={!canPrev} aria-label={t('prev')} className={`hover:bg-surface-raised ${z.nav} rounded-full disabled:opacity-30`}>
           <span aria-hidden>‹</span>
         </button>
-        <span className="text-sm font-semibold" aria-live="polite">
+        <span className={`${z.head} font-semibold`} aria-live="polite">
           {title}
         </span>
-        <button type="button" onClick={() => move(1)} disabled={!canNext} aria-label={t('next')} className="hover:bg-surface-raised h-9 w-9 rounded-full disabled:opacity-30">
+        <button type="button" onClick={() => move(1)} disabled={!canNext} aria-label={t('next')} className={`hover:bg-surface-raised ${z.nav} rounded-full disabled:opacity-30`}>
           <span aria-hidden>›</span>
         </button>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-sm">
         {week.map((w, i) => (
-          <span key={i} className={`text-xs ${i === 0 ? 'text-danger' : 'text-muted-foreground'}`}>
+          <span key={i} className={`${z.week} ${i === 0 ? 'text-danger' : 'text-muted-foreground'}`}>
             {w}
           </span>
         ))}
@@ -186,19 +192,19 @@ export function MonthGrid({
               aria-pressed={picked === undefined ? undefined : isPicked}
               aria-label={ev.length ? `${d.toLocaleDateString(locale)} · ${t('count', { n: ev.length })}` : d.toLocaleDateString(locale)}
               onClick={() => onDay(d, k, ev.length)}
-              className={`flex min-h-10 min-w-0 flex-col items-stretch gap-0.5 rounded-lg p-0.5 leading-none ${pickable ? 'disabled:opacity-25' : ''} ${isOff ? 'opacity-40' : ''} ${ev.length ? 'min-h-14' : ''} ${
+              className={`flex ${z.cell} min-w-0 flex-col items-stretch gap-0.5 rounded-lg p-0.5 leading-none ${pickable ? 'disabled:opacity-25' : ''} ${isOff ? 'opacity-40' : ''} ${ev.length ? z.cellEv : ''} ${
                 isPicked ? 'bg-accent font-semibold text-white' : k === todayKey ? 'ring-accent ring-1' : 'hover:bg-surface-raised'
               }`}
             >
-              <span className="py-1">{d.getDate()}</span>
+              <span className={z.day}>{d.getDate()}</span>
               {/* 일정 제목 짧게(마스터 2026-10-30 — 점이 너무 작음), 넘치면 +N */}
               {ev.slice(0, CHIPS).map((e, j) => (
-                <span key={j} aria-hidden className={`truncate rounded px-0.5 py-px text-left text-[10px] font-normal ${e.tone}`}>
+                <span key={j} aria-hidden className={`truncate rounded px-0.5 py-px text-left ${z.chip} font-normal ${e.tone}`}>
                   {e.title}
                 </span>
               ))}
               {ev.length > CHIPS && (
-                <span aria-hidden className="text-left text-[10px] font-normal opacity-70">
+                <span aria-hidden className={`text-left ${z.chip} font-normal opacity-70`}>
                   {t('more', { n: ev.length - CHIPS })}
                 </span>
               )}
