@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { comboMatch } from '@/lib/combo-search'
 import { usePathname, useRouter } from '@/i18n/navigation'
-import { routing } from '@/i18n/routing'
 import { piFetch } from '@/lib/pi-fetch'
 import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 import {
@@ -154,30 +153,8 @@ export function LanguageSwitcher({
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
 
-  // 마지막 선택 언어 자동 적용 — 마운트 시 선호 locale로 1회 전환.
-  // 전환 후 URL locale = 선호값이 되어 재전환 루프가 생기지 않는다.
-  // admin 경로는 제외 — Pi Browser에서 pit-ticket 기반 hard navigation이 필요해
-  // 자동 전환이 인증 흐름과 충돌할 수 있다(수동 전환은 switchLocale이 안전 처리).
-  useEffect(() => {
-    if (pathname.startsWith('/admin')) return
-    // Pi Sign-In 콜백은 1회용 state 검증 중 — 자동 전환 네비게이션이 재마운트를 일으켜
-    // state 소거 경합을 만들므로 제외 (2026-07-08)
-    if (pathname.includes('/auth/pi/callback')) return
-    let pref: string | null = null
-    try {
-      pref = localStorage.getItem(PREF_LOCALE_KEY)
-    } catch {
-      pref = null
-    }
-    if (
-      pref &&
-      pref !== locale &&
-      (routing.locales as readonly string[]).includes(pref)
-    ) {
-      void switchLocale(pref)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // 마지막 선택 언어 자동 적용은 [locale]/layout 의 PreferredLocaleScript(@pi/i18n)가 하이드레이션 전에 맡는다(2026-11-01) —
+  //  마운트 뒤 switchLocale 자동 전환은 Pi 인증·결제 복구를 두 번 돌릴 수 있어 뺐다. 하루 첫 접속 IP 국가 언어 선택도 그 스크립트가 한다
 
   function applyData(d: Omit<SwitcherCache, 'ts'>) {
     setActiveLocales(d.locales)
@@ -245,6 +222,8 @@ export function LanguageSwitcher({
     // 선택 언어 기억 — 다음 접속 시 자동 적용 (실패해도 전환은 정상 진행)
     try {
       localStorage.setItem(PREF_LOCALE_KEY, next)
+      // 수동 선택 표시 — 다음 접속부터 IP 국가 자동 선택보다 우선(@pi/i18n 표준 6절 2-1)
+      localStorage.setItem(`${PREF_LOCALE_KEY}_src`, 'manual')
     } catch {
       // localStorage 차단 환경 — 기억 기능만 비활성
     }

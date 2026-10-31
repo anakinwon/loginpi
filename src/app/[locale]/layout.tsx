@@ -22,6 +22,8 @@ import { resolveDbTier } from '@/lib/db-env'
 import { computeShowPiValuation, computeIsProd } from '@/lib/feature-flags'
 import { FeatureFlagProvider } from '@/components/feature-flag-provider'
 import { MonRum } from '@/components/mon-rum'
+import { PreferredLocaleScript } from '@pi/i18n'
+import { routing } from '@/i18n/routing'
 import { getActiveFeeMode, getOpenPromoState } from '@/lib/fee-resolver'
 
 const geistSans = Geist({
@@ -114,6 +116,9 @@ export default async function LocaleLayout({
           } as React.CSSProperties
         }
       >
+        {/* 언어 자동 선택(@pi/i18n 표준 6절 2-1, 2026-11-01) — 하이드레이션·Pi SDK 전에 실행 : 수동 선택 언어 유지, 아니면 하루 첫 접속에 IP 국가 언어.
+            예전 스위처 마운트 effect 자동 전환을 대신한다(인증 이중 실행 방지). /admin·/auth/pi/callback 제외 */}
+        <PreferredLocaleScript locales={routing.locales} />
         {/* 전체 적용 테마 색상 주입 (GLOBAL 범위) — 핵심 색만 바꿔 배경·글자는 유지 */}
         {globalThemeCss && (
           <style dangerouslySetInnerHTML={{ __html: globalThemeCss }} />

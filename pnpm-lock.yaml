@@ -23,6 +23,9 @@ importers:
       '@googlemaps/markerclusterer':
         specifier: ^2.6.2
         version: 2.6.2
+      '@pi/i18n':
+        specifier: workspace:*
+        version: link:packages/pi-i18n
       '@pi/mon':
         specifier: workspace:*
         version: link:packages/pi-mon
