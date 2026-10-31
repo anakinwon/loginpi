@@ -45,3 +45,10 @@ export async function piPriceGET(): Promise<Response> {
     return Response.json({ usd: null })
   }
 }
+
+// 접속 국가(IP) — Vercel 이 붙여 주는 x-vercel-ip-country(ISO alpha-2). 로컬·미상 = null. 사람마다 다르므로 캐시 금지
+//  앱 : src/app/api/i18n/geo/route.ts → export { geoGET as GET } from '@pi/i18n/routes' + export const dynamic = 'force-dynamic'
+export function geoGET(req: Request): Response {
+  const c = req.headers.get('x-vercel-ip-country')
+  return Response.json({ country: c && /^[A-Za-z]{2}$/.test(c) ? c.toUpperCase() : null }, { headers: { 'Cache-Control': 'private, no-store' } })
+}

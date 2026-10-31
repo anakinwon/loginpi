@@ -10,6 +10,7 @@ export { LOCALE_CURRENCY } from './locale-currency'
 export { LOCALE_COUNTRY, ACTIVE_COUNTRY_CODES, getAlpha2 } from './locale-country'
 export { comboMatch } from './combo-search'
 export { PreferredLocaleScript, type PreferredLocaleScriptProps } from './preferred-locale'
+export { countryLocaleMap, countryToLocale } from './geo'
 
 export type LocaleDir = 'ltr' | 'rtl'
 

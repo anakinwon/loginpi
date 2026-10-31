@@ -15,7 +15,7 @@
     "pi-i18n": "./bin/pi-i18n.mjs"
   },
   "scripts": {
-    "test": "node --test \"test/*.test.mjs\""
+    "test": "node --import ./test/ts-register.mjs --test \"test/*.test.mjs\""
   },
   "dependencies": {
     "@formatjs/icu-messageformat-parser": "^3.5.11",

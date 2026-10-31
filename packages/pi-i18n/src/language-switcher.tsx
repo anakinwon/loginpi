@@ -241,6 +241,8 @@ export function createLanguageSwitcher({
       // 선택 언어 기억 — 다음 접속 시 자동 적용 (실패해도 전환은 정상 진행)
       try {
         localStorage.setItem(PREF_LOCALE_KEY, next)
+        // 수동 선택 표시 — 다음 접속부터 IP 국가 자동 선택보다 우선(@pi/i18n PreferredLocaleScript, 2026-11-01 — loginpi 원본 대비 추가 1줄)
+        localStorage.setItem(`${PREF_LOCALE_KEY}_src`, 'manual')
       } catch {
         // localStorage 차단 환경 — 기억 기능만 비활성
       }

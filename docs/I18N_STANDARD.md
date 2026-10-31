@@ -223,7 +223,10 @@ export const LOCALE_COUNTRY: Record<string, string>; export const ACTIVE_COUNTRY
 export function getAlpha2(locale_cd: string): string
 export function comboMatch(query: string, ...fields: (string | null | undefined)[]): boolean
 export function deepMerge(base, override): MessageRecord
-export function PreferredLocaleScript(p: { locales; defaultLocale?; exclude?; storageKey? }): JSX.Element
+export function PreferredLocaleScript(p: { locales; defaultLocale?; exclude?; storageKey?; geoUrl? /* 기본 '/api/i18n/geo', null = IP 자동 선택 끔 */ }): JSX.Element
+export function countryLocaleMap(locales: readonly string[]): Record<string, string>   // 국가(alpha-2 소문자) → locale, routing 순서상 첫 대표 locale(KR→ko·US→en·JP→ja)
+export function countryToLocale(country: string | null | undefined, locales: readonly string[]): string | null
+// @pi/i18n/routes : geoGET(req) → { country: 'KR' | null } (x-vercel-ip-country, Cache-Control private no-store)
 ```
 
 ### 4.2 `@pi/i18n/server`
@@ -371,6 +374,11 @@ validate 는 오류를 언어(또는 locale)·키별로 한 줄씩 출력하고,
    - 이유 : Pi Browser 는 `NEXT_LOCALE` 쿠키를 저장하지 않습니다. 그래서 감지를 켜 두면 방문할 때마다 Accept-Language 로 다시 `/en` 리다이렉트가 나갑니다. 사용자가 ko(접두사 없는 `/`)를 고르면 `/` → `/en` → 스위처가 `/` 로 되돌림 → … 처럼 **왕복 루프**가 생길 수 있습니다.
    - 결과 : URL 접두사(`/en/...`)와 localStorage `preferred_locale` 만 locale 을 정합니다. 접두사가 없으면 늘 ko 입니다.
 2. **기억은 localStorage `preferred_locale` 하나만** 쓰고, 다음 방문 때 `PreferredLocaleScript` 가 하이드레이션 전에 한 번 적용합니다(4.7절). sessionStorage·쿠키는 쓰지 않습니다. 접근은 모두 try/catch 로 감쌉니다(막힌 환경이면 기억 기능만 꺼짐).
+2-1. **하루 첫 접속 언어 자동 선택(IP 국가, 2026-11-01 마스터 지시)** — 판정 순서 :
+   ① 저장 언어가 **수동 선택**(스위처로 고름 — `preferred_locale_src='manual'`, 이전 저장값도 수동으로 봄)이면 그 언어로(= 마지막 접속 언어).
+   ② 아니면 하루 1번(`preferred_locale_day` 기기 날짜) 앱 `/api/i18n/geo`(Vercel `x-vercel-ip-country`)로 접속 국가를 묻고 `countryLocaleMap` 으로 그 나라 언어를 골라 저장(`src='geo'`)·이동. 같은 날 다시 오면 저장값 그대로.
+   ③ 주소에 locale 접두사가 있으면(`/en/…` 공유 링크) IP 로 바꾸지 않음. 조회 실패·대응 없는 나라 = 현재 언어 유지(그날 다시 안 물음).
+   앱 준비 : `src/app/api/i18n/geo/route.ts` = `export { geoGET as GET } from '@pi/i18n/routes'` + `export const dynamic = 'force-dynamic'`. 끄려면 `<PreferredLocaleScript geoUrl={null} />`.
 3. **자동 적용 제외 경로** : `/admin`(인증 경합), `/auth/pi/callback`(1회용 OAuth state 경합, 2026-07-08 사고)입니다. 앱에 경합하는 경로가 더 있으면 `PreferredLocaleScript` 의 `exclude` 에 더합니다.
 4. **사용자 전환은 클라이언트 내비게이션**(`router.replace`)으로 합니다. 예외는 둘 : 재방문 적용(`PreferredLocaleScript`)의 `location.replace`(하이드레이션 전이라 안전)와 loginpi 와 같은 `/admin` 전환의 `window.location.assign`(Pi Browser 는 쿠키가 없어 `adminTicketUrl` 로 받은 `_pit` 티켓을 URL 에 실어 첫 요청부터 인증 — 앱이 티켓 경로를 줄 때만). 마운트 뒤 자동 `router.replace` 는 금지합니다(인증 이중 실행). localStorage 의 `pi_token` 은 그대로이므로 `piFetch`(X-Pi-Token)는 영향을 받지 않습니다.
 5. **세션이 null 이어도 locale 때문에 redirect 하지 않습니다.** locale 처리는 미들웨어/proxy 의 next-intl 접두사 처리 하나뿐이고 인증 게이트와 섞지 않습니다.
@@ -521,6 +529,7 @@ const showPiValuation = process.env.NEXT_PUBLIC_FEATURE_PI_PRICE !== 'false' // 
 
 | 날짜 | 내용 |
 |---|---|
+| 2026-11-01 | v2.1.0 — 하루 첫 접속 IP 국가 언어 자동 선택(6절 2-1, `geoGET`·`countryLocaleMap`, 스위처 수동 선택 표시 1줄), 패키지 시험 해석 훅(test/ts-register.mjs) |
 | 2026-10-31 | v2.0.1 — validate 에 경로 세그먼트 ↔ routing locale 충돌 검사(8.1절, sitemap.pi `/me`·`/ad` 회귀), 헤더 한 줄 고정 규칙(4.6절 5) |
 | 2026-10-31 | **v2.0.0 loginpi 완전 동일화** (마스터 "흉내내지말고, 완전히 동일하게") — routing locale 219개(loginpi 목록·순서) + locale → 언어 매핑(내용 판정), 언어 소스 `messages/lang/` + `expand` CLI, DB 스냅숏(`snapshot` CLI, locales 188·countries 188·스위처 문구), loginpi LanguageSwitcher·PiPriceChip·locale-currency/country·comboMatch 이식, API 처리기 3종(`@pi/i18n/routes`, 2초 타임아웃), 배치·표시 규칙 4.6절(상단 헤더 맨 오른쪽·국기·환율 필수·하단 금지), 유일한 동작 차이 4.7절, 0.1 앱 이행 8.2절. 이전 v1.x 의 'locale = 언어코드(P1)'·'스위처는 네트워크 없음' 규칙은 폐기 |
 | 2026-10-31 | v1.0.3 최종 검토 반영 — 루트 not-found·내비게이션 교체, routing 타입 단언, `pnpm exec tsc`, loginpi 화면 차이(REA) |
