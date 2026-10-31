@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Vaihda kieli",
-      "search": "Hae kieltä",
-      "empty": "Ei tuloksia"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Hakemisto, josta löydät ja voit mainostaa Pi Networkiin rakennettuja .pi-sivustoja"

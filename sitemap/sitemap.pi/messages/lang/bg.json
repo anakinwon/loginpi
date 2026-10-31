@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Смяна на език",
-      "search": "Търсене на език",
-      "empty": "Няма резултати"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Директория за откриване и популяризиране на .pi сайтове, изградени в Pi Network"

@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "變更語言",
-      "search": "搜尋語言",
-      "empty": "沒有搜尋結果"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "探索並推廣在 Pi Network 上建立的 .pi 網站的目錄"

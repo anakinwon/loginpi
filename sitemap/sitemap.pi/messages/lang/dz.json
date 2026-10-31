@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "སྐད་ཡིག་བསྒྱུར་བ།",
-      "search": "སྐད་ཡིག་འཚོལ་བ།",
-      "empty": "འཚོལ་བའི་གྲུབ་འབྲས་མེད།"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network ཐོག་བཟོས་པའི་ .pi དྲ་ཚིགས་འཚོལ་བ་དང་ཁྱབ་བསྒྲགས་བྱེད་པའི་དཀར་ཆག"

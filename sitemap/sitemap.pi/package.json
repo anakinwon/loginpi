@@ -7,6 +7,7 @@
     "build": "pi-i18n validate && next build --turbopack",
     "start": "next start",
     "i18n:translate": "pi-i18n translate",
+    "i18n:expand": "pi-i18n expand",
     "i18n:validate": "pi-i18n validate",
     "i18n:audit": "pi-i18n audit"
   },

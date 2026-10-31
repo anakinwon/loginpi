@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Skift sprog",
-      "search": "Søg sprog",
-      "empty": "Ingen resultater"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "En oversigt til at opdage og promovere .pi-sider bygget på Pi Network"

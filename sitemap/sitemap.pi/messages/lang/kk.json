@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Тілді өзгерту",
-      "search": "Тілді іздеу",
-      "empty": "Нәтиже жоқ"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network-те жасалған .pi сайттарын табуға және насихаттауға арналған каталог"

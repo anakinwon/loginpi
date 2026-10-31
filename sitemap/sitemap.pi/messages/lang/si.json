@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "භාෂාව වෙනස් කරන්න",
-      "search": "භාෂාව සොයන්න",
-      "empty": "ප්‍රතිඵල නොමැත"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network මත ගොඩනගා ඇති .pi අඩවි සොයා ගැනීමට සහ ප්‍රවර්ධනය කිරීමට නාමාවලියක්"

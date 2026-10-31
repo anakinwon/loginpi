@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Verander taal",
-      "search": "Soek taal",
-      "empty": "Geen resultate"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "'n Gids om .pi-werwe wat op Pi Network gebou is, te ontdek en te bevorder"

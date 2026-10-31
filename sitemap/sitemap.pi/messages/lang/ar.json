@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "تغيير اللغة",
-      "search": "البحث عن اللغة",
-      "empty": "لا توجد نتائج"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "دليل لاكتشاف وترويج مواقع .pi المبنية على Pi Network"

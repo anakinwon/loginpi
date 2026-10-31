@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Tukar bahasa",
-      "search": "Cari bahasa",
-      "empty": "Tiada hasil"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Direktori untuk menemui dan mempromosikan tapak .pi yang dibina di Pi Network"

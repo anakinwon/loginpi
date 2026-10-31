@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Тағйир додани забон",
-      "search": "Ҷустуҷӯи забон",
-      "empty": "Натиҷае нест"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Феҳрист барои дарёфт ва таблиғи сайтҳои .pi, ки дар Pi Network сохта шудаанд"

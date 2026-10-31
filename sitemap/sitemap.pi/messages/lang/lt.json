@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Keisti kalbą",
-      "search": "Ieškoti kalbos",
-      "empty": "Nėra rezultatų"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Katalogas, skirtas atrasti ir reklamuoti .pi svetaines, sukurtas Pi Network"

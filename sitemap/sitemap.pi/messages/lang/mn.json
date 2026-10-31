@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Хэл солих",
-      "search": "Хэл хайх",
-      "empty": "Үр дүн олдсонгүй"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network дээр бүтээгдсэн .pi сайтуудыг нээх, сурталчлах лавлах"

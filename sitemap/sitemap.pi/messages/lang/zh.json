@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "更改语言",
-      "search": "搜索语言",
-      "empty": "无结果"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "一个发现和推广基于 Pi Network 构建的 .pi 站点的目录"

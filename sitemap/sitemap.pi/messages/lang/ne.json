@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "भाषा परिवर्तन गर्नुहोस्",
-      "search": "भाषा खोज्नुहोस्",
-      "empty": "कुनै परिणाम छैन"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network मा बनेका .pi साइटहरू पत्ता लगाउन र प्रवर्द्धन गर्नका लागि एउटा डाइरेक्टरी"

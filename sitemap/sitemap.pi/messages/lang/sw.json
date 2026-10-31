@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Badilisha lugha",
-      "search": "Tafuta lugha",
-      "empty": "Hakuna matokeo"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Saraka ya kugundua na kukuza tovuti za .pi zilizojengwa kwenye Pi Network"

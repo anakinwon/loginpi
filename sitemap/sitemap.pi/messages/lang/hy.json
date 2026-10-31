@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Փոխել լեզուն",
-      "search": "Որոնել լեզուն",
-      "empty": "Արդյունքներ չկան"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network-ի վրա կառուցված .pi կայքերը հայտնաբերելու և խթանելու տեղեկատու"

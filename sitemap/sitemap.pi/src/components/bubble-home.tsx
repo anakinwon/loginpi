@@ -95,12 +95,12 @@ export function BubbleHome() {
     [t],
   )
   const planName = useCallback((it: BubbleItem) => tp(it.plan), [tp])
-  // 가상 샘플은 비어 있는 자리 — 상세 대신 "이 자리에 내 사이트를" 안내(/ad?plan=)로 등록 유도(마스터 지시 2026-10-11).
+  // 가상 샘플은 비어 있는 자리 — 상세 대신 "이 자리에 내 사이트를" 안내(/slot?plan=)로 등록 유도(마스터 지시 2026-10-11).
   // 연결 주소(url)가 지정된 사이트는 상세 대신 이동 안내 후 그 주소로(외부 이동은 클릭 + 안내 필수, MAINNET A-6)
   const open = useCallback(
     (domain: string) => {
       const it = data?.items.find((x) => x.domain === domain)
-      if (it?.sample) return router.push(`/ad?plan=${it.plan}`)
+      if (it?.sample) return router.push(`/slot?plan=${it.plan}`)
       if (it?.url) {
         const next = { url: it.url, domain: it.domain, name: it.name }
         setLeave(next)
@@ -318,8 +318,8 @@ const SiteLink = ({
   children: React.ReactNode
 }) => (
   <Link
-    // 샘플은 비어 있는 자리 → 등록 안내(/ad), 실사이트는 상세
-    href={sample ? `/ad?plan=${plan}` : `/s/${domain}`}
+    // 샘플은 비어 있는 자리 → 등록 안내(/slot), 실사이트는 상세
+    href={sample ? `/slot?plan=${plan}` : `/s/${domain}`}
     className="flex items-center gap-2 hover:underline"
   >
     {children}

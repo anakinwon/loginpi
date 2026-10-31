@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "تغییر زبان",
-      "search": "جستجوی زبان",
-      "empty": "نتیجه‌ای یافت نشد"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "دایرکتوری برای کشف و ترویج سایت‌های .pi ساخته شده بر روی Pi Network"

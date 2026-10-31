@@ -55,6 +55,8 @@ export const env = createEnv({
     // '1' 이면 클라이언트에 Google 로그인 버튼 노출(서버 env 3종과 함께 설정)
     NEXT_PUBLIC_GOOGLE_LOGIN: z.enum(['1']).optional(),
     NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
+    // 헤더 언어 콤보의 통화·환율·π 시세칩 표시 — 미설정 = 표시, 'false' = 숨김(표준 4.6절)
+    NEXT_PUBLIC_FEATURE_PI_PRICE: z.enum(['true', 'false']).optional(),
   },
   runtimeEnv: {
     PI_SESSION_SECRET: process.env.PI_SESSION_SECRET,
@@ -88,6 +90,7 @@ export const env = createEnv({
     NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_PI_OAUTH_CLIENT_ID,
     NEXT_PUBLIC_PI_APP_DOMAIN: process.env.NEXT_PUBLIC_PI_APP_DOMAIN,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_FEATURE_PI_PRICE: process.env.NEXT_PUBLIC_FEATURE_PI_PRICE,
   },
   // 운영 tier(@pi/db resolveDbTier 와 같은 우선순위 : APP_TIER > VERCEL_ENV)에서 관리자 username 만 있고 uid 가 없으면 빌드 실패.
   // 런타임 이중 방어 = @pi/db grantEnvAdmin(운영 tier + uid 미설정 → 승격 안 함)

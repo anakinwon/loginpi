@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "ປ່ຽນພາສາ",
-      "search": "ຊອກຫາພາສາ",
-      "empty": "ບໍ່ມີຜົນການຊອກຫາ"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "ໄດເລັກທໍຣີເພື່ອຄົ້ນພົບ ແລະ ໂຄສະນາເວັບໄຊ .pi ທີ່ສ້າງຂຶ້ນໃນ Pi Network"

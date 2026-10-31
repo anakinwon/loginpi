@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Sprache ändern",
-      "search": "Sprache suchen",
-      "empty": "Keine Ergebnisse"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Ein Verzeichnis zum Entdecken und Bewerben von .pi-Seiten, die auf Pi Network erstellt wurden"

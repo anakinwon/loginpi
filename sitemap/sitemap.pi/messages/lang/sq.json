@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Ndrysho gjuhën",
-      "search": "Kërko gjuhën",
-      "empty": "Asnjë rezultat"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Një drejtori për të zbuluar dhe promovuar faqet .pi të ndërtuara në Pi Network"

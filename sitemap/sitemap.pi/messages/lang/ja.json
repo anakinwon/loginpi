@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "言語を変更",
-      "search": "言語を検索",
-      "empty": "検索結果なし"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network上に構築された.piサイトを発見し、宣伝するためのディレクトリ"

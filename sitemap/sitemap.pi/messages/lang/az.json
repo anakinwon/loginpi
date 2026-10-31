@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Dili dəyişdir",
-      "search": "Dil axtar",
-      "empty": "Nəticə yoxdur"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network üzərində qurulmuş .pi saytlarını kəşf etmək və tanıtmaq üçün bir qovluq"

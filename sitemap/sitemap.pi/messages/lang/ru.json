@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Изменить язык",
-      "search": "Поиск языка",
-      "empty": "Нет результатов"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Каталог для поиска и продвижения сайтов .pi, созданных в Pi Network"

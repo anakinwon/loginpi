@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Baguhin ang wika",
-      "search": "Maghanap ng wika",
-      "empty": "Walang resulta"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Isang direktoryo para matuklasan at i-promote ang mga .pi site na binuo sa Pi Network"

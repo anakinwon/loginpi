@@ -1,5 +1,5 @@
-// 빈 자리 안내 — 메인 버블의 가상 샘플(비어 있는 광고 자리)을 누르면 오는 화면. /ad?plan=<PLAN_CD>
-//  요금제 콤보(남은 슬롯이 있는 요금제만)와 "등록 → Pi 결제 → 자동 사용 시작 → 사용 기간 동안 노출" 순서를 안내한 뒤 /me 등록으로 보낸다.
+// 빈 자리 안내 — 메인 버블의 가상 샘플(비어 있는 광고 자리)을 누르면 오는 화면. /slot?plan=<PLAN_CD>
+//  요금제 콤보(남은 슬롯이 있는 요금제만)와 "등록 → Pi 결제 → 자동 사용 시작 → 사용 기간 동안 노출" 순서를 안내한 뒤 /my 등록으로 보낸다.
 //  가격·통화는 표기하지 않는다(유료 노출 판매는 PRD §9 #2 회신 전 — 어휘·가격 레드라인 A-5). 서버는 세션을 보지 않는다(redirect 금지)
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
@@ -60,7 +60,7 @@ export default async function AdPage({
       </ol>
       <div className="flex flex-wrap gap-2">
         {plan && (
-          <Link href="/me" className="btn btn-primary">
+          <Link href="/my" className="btn btn-primary">
             {t('cta')}
           </Link>
         )}

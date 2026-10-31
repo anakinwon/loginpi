@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Změnit jazyk",
-      "search": "Hledat jazyk",
-      "empty": "Žádné výsledky"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Adresář pro objevování a propagaci .pi stránek vytvořených na Pi Network"

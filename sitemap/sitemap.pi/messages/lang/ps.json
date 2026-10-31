@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "ژبه بدله کړئ",
-      "search": "ژبه وپلټئ",
-      "empty": "هیڅ پایلې نشته"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "د Pi Network پر بنسټ جوړ شوي .pi سایټونو موندلو او ترویج لپاره لارښود"

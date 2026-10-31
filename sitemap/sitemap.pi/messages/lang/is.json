@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Breyta tungumáli",
-      "search": "Leita tungumál",
-      "empty": "Engar niðurstöður"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Skrá til að uppgötva og kynna .pi síður byggðar á Pi Network"

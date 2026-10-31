@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Muuda keelt",
-      "search": "Otsi keelt",
-      "empty": "Tulemusi pole"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Kataloog Pi Networkis loodud .pi saitide avastamiseks ja reklaamimiseks"

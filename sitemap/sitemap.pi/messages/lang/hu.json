@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Nyelv váltása",
-      "search": "Nyelv keresése",
-      "empty": "Nincs találat"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Egy könyvtár a Pi Networkön épült .pi oldalak felfedezésére és népszerűsítésére"

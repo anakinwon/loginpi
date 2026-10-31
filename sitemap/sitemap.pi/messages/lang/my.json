@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "ဘာသာစကားပြောင်းရန်",
-      "search": "ဘာသာစကားရှာဖွေရန်",
-      "empty": "ရလဒ်မရှိပါ"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network တွင် တည်ဆောက်ထားသော .pi ဆိုက်များကို ရှာဖွေပြီး မြှင့်တင်ရန် လမ်းညွှန်"

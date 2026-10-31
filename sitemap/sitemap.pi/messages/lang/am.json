@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "ቋንቋ ቀይር",
-      "search": "ቋንቋ ፈልግ",
-      "empty": "ምንም ውጤት የለም"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "በPi Network ላይ የተገነቡ .pi ጣቢያዎችን ለማግኘት እና ለማስተዋወቅ ማውጫ"

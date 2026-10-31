@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Promeni jezik",
-      "search": "Pretraži jezik",
-      "empty": "Nema rezultata"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Direktorijum za otkrivanje i promociju .pi sajtova izgrađenih na Pi Networku"

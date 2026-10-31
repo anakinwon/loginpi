@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Đổi ngôn ngữ",
-      "search": "Tìm ngôn ngữ",
-      "empty": "Không có kết quả"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Một thư mục để khám phá và quảng bá các trang web .pi được xây dựng trên Pi Network"

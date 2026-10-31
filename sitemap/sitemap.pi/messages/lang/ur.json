@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "زبان تبدیل کریں",
-      "search": "زبان تلاش کریں",
-      "empty": "کوئی نتیجہ نہیں ملا"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network پر بنی .pi سائٹس کو دریافت کرنے اور فروغ دینے کے لیے ایک ڈائریکٹری"

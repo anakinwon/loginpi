@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Schimbă limba",
-      "search": "Căută limba",
-      "empty": "Niciun rezultat"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Un director pentru a descoperi și promova site-uri .pi construite pe Pi Network"

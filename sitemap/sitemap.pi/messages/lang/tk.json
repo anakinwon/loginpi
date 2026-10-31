@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Dil üýtgetmek",
-      "search": "Dil gözlemek",
-      "empty": "Netije ýok"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network-de gurlan .pi saýtlaryny tapmak we mahabatlandyrmak üçin katalog"

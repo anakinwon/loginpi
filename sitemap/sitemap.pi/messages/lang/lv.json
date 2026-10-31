@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Mainīt valodu",
-      "search": "Meklēt valodu",
-      "empty": "Nav rezultātu"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Katalogs, lai atklātu un popularizētu .pi vietnes, kas veidotas Pi Network"

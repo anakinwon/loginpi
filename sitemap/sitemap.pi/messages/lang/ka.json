@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "ენის შეცვლა",
-      "search": "ენის ძიება",
-      "empty": "შედეგი არ მოიძებნა"
-    }
-  },
   "meta": {
     "title": "sitemap.pi",
     "description": "Pi Network-ზე შექმნილი .pi საიტების აღმოჩენისა და პოპულარიზაციის დირექტორია"

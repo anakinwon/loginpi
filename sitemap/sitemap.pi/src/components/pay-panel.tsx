@@ -163,7 +163,7 @@ function PayPanelInner({ siteId, kind }: { siteId: string; kind: PayKind }) {
         </>
       )}
 
-      <Link className="btn w-fit" href="/me">
+      <Link className="btn w-fit" href="/my">
         {t('backToMe')}
       </Link>
     </div>
