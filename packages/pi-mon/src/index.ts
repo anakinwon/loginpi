@@ -1,8 +1,8 @@
 // @pi/mon 공용(브라우저·서버) — API·화면 경로 정규화와 앱 서버 → schema.pi 수집 API 전달(2026-10-24 마스터 지시 : cafe.pi·sitemap.pi 모니터링)
 // 새 시스템 연결 = ① 레이아웃에 <Rum send={…}/> ② /api/mon/app POST 에서 세션 확인 후 monForward(req, '<시스템코드>') ③ env MON_INGEST_URL·MON_INGEST_KEY ④ schema.pi sql 의 sys_cd CHECK·SYSTEMS 에 코드 추가
 
-// 시스템코드(schema.pi mon_app_hist.sys_cd, sql/075 CHECK 와 같아야 함)
-export const SYSTEMS = { SCHEMA: 'schema.pi', CAFE: 'cafe.pi', SITEMAP: 'sitemap.pi' } as const
+// 시스템코드(schema.pi mon_app_hist.sys_cd, sql/075·076 CHECK 와 같아야 함)
+export const SYSTEMS = { SCHEMA: 'schema.pi', CAFE: 'cafe.pi', SITEMAP: 'sitemap.pi', SEMINAR: 'seminar.pi' } as const
 export type SysCd = keyof typeof SYSTEMS
 export const isSys = (v: unknown): v is SysCd => typeof v === 'string' && v in SYSTEMS
 

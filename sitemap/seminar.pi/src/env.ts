@@ -42,6 +42,9 @@ export const env = createEnv({
     // 엔진 관리 API Bearer 키 — 엔진 MEDIA_ADMIN_SECRET 과 같은 값. 설정 = /api/speech/chunk 가 엔진에 무대 역할을 묻는다(D-1, 청중 음성 AI 호출 차단).
     //  미설정 = 무대 확인 없이 DB 청중 몫(1/2) 상한만(sql/010)
     MEDIA_ADMIN_SECRET: z.string().min(32).optional(),
+    // 애플리케이션 모니터링 → schema.pi 수집 API(M5, 2026-10-31) — 주소 = https://schem.vercel.app/api/mon/ingest, 키 = schema.pi MON_INGEST_KEY 와 같은 값. 미설정이면 전달 안 함
+    MON_INGEST_URL: z.string().url().optional(),
+    MON_INGEST_KEY: z.string().min(32).optional(),
     // TURN 단기 자격 증명(/api/media/turn, M2 ⑨) — 전부 서버 전용·선택. 1순위 Cloudflare Realtime TURN(둘 다 있어야 사용)
     CLOUDFLARE_TURN_TOKEN_ID: z.string().optional(),
     CLOUDFLARE_TURN_API_TOKEN: z.string().optional(),
@@ -107,6 +110,8 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     MEDIA_TOKEN_SECRET: process.env.MEDIA_TOKEN_SECRET,
     MEDIA_ADMIN_SECRET: process.env.MEDIA_ADMIN_SECRET,
+    MON_INGEST_URL: process.env.MON_INGEST_URL,
+    MON_INGEST_KEY: process.env.MON_INGEST_KEY,
     CLOUDFLARE_TURN_TOKEN_ID: process.env.CLOUDFLARE_TURN_TOKEN_ID,
     CLOUDFLARE_TURN_API_TOKEN: process.env.CLOUDFLARE_TURN_API_TOKEN,
     TURN_HOST: process.env.TURN_HOST,

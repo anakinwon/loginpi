@@ -1,10 +1,11 @@
-// locale 레이아웃 — 다국어·Pi SDK 로드·Pi 인증 Provider·Google 세션·헤더를 전 페이지에 제공(sitemap.pi 동일, 모니터링은 M5 에서)
+// locale 레이아웃 — 다국어·Pi SDK 로드·Pi 인증 Provider·Google 세션·헤더를 전 페이지에 제공·애플리케이션 모니터링(sitemap.pi 동일)
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { SessionProvider } from 'next-auth/react'
 import { PiSdkScript } from '@pi/auth/client'
+import { MonRum } from '@/components/mon-rum'
 import { PiAuthRoot } from '@/components/pi-auth-root'
 import { SiteHeader } from '@/components/site-header'
 import { routing } from '@/i18n/routing'
@@ -46,6 +47,8 @@ export default async function LocaleLayout({
             <PiAuthRoot>
               <SiteHeader />
               <main className="mx-auto max-w-3xl px-4 py-6 lg:max-w-none lg:px-8">{children}</main>
+              {/* 애플리케이션 모니터링 계측 → schema.pi 모니터링(운영만, M5 2026-10-31) */}
+              <MonRum />
             </PiAuthRoot>
           </SessionProvider>
         </NextIntlClientProvider>
