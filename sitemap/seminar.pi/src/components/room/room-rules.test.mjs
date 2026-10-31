@@ -28,6 +28,7 @@ import {
   groupTracks,
   handKey,
   handNotice,
+  handsWaiting,
   mainSlots,
   nextPin,
   nextSpeaking,
@@ -193,6 +194,13 @@ test('손든 사람 알림 쌓임 방지 — 1명 = 그 사람, 2명 이상 = �
   assert.deepEqual(handNotice(one, new Set([handKey(one[1])])), { kind: 'none' })
   // 무시한 뒤 다시 손을 들면(새 raisedTs) 다시 알린다
   assert.equal(handNotice([P('a', 'audience', 3000)], new Set([handKey(one[1])])).kind, 'one')
+})
+
+test('전체 화면 손들기 목록 — 손든 청중만, 무시한 손 제외, 알림 묶음과 같은 대상', () => {
+  const ps = [P('pr', 'presenter'), P('a', 'audience', 1000), P('pn', 'panel', 0), P('b', 'audience', 500), P('c', 'audience', 0)]
+  assert.deepEqual(handsWaiting(ps, new Set()).map((p) => p.peerId).sort(), ['a', 'b'])
+  assert.deepEqual(handsWaiting(ps, new Set([handKey(ps[1])])).map((p) => p.peerId), ['b'])
+  assert.equal(handsWaiting(ps, new Set()).length, handNotice(ps, new Set()).count)
 })
 
 test('하단 바 순서 — 역할별, 가장 좁은 청중은 채팅이 반응보다 앞', () => {

@@ -423,7 +423,8 @@ Jitsi 는 폭 임계값 표로 메인 버튼 수를 정하고 넘치는 것은 "
 | 채팅 | 내 메시지 즉시 표시 후 같은 id 수신으로 확정, 연속 발화자 이름 숨김·60초 미만 시각 숨김, 닫아도 언마운트 안 함(수신·배지 유지), 배지 9+, 메시지 500자, 폭 <580px 전체 화면 | LiveKit `chat.ts:303`, `Chat.tsx:120-133`, `VideoConference.tsx:160-165`, `useChatToggle.ts:29-33` / Jitsi `chat/constants.ts` |
 
 **승격(청중 → 무대) 흐름** — Jitsi av-moderation·visitors 를 단순화 :
-손들기 → presenter [무대로] → 서버가 역할 panel 로 변경 + 손 내림 → `ntf roleChanged` → 본인 화면에 **[마이크 켜기] 고정 알림(자동으로 켜지 않음)** → 본인이 켜면 발행. 강등은 서버가 그 사람 producer 전부 닫음(`producerClosed`). Jitsi `av-moderation/middleware.ts:224-277` "승인돼도 자동 송출 안 함" 원칙 — 동의 없는 마이크 노출 방지.
+손들기 → presenter [무대로] → 서버가 역할 panel 로 변경 + 손 내림 → `ntf roleChanged` → **카메라는 자동으로 켜서 발행**(마스터 결정 2026-10-31 — 영상 잠금이면 켜지 않음, 권한 거부면 실패 알림) + 본인 화면에 **[마이크 켜기] 고정 알림(마이크는 자동으로 켜지 않음)** → 본인이 켜면 발행. 강등은 서버가 그 사람 producer 전부 닫음(`producerClosed`). Jitsi `av-moderation/middleware.ts:224-277` "승인돼도 자동 송출 안 함" 원칙은 **마이크에만** 유지 — 동의(A-6) 없는 음성 노출 방지.
+발표자가 무대를 전체 화면으로 볼 때는 손든 청중을 무대 위에 최대 3명(+나머지 수)까지 [무대로]·[무시]와 함께 띄운다(참가자 패널이 화면 밖이라, 마스터 2026-10-31).
 
 ### 14.5 대기실·자동재생·연결 테스트
 

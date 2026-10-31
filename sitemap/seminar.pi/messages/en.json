@@ -439,7 +439,7 @@
     "stage": {
       "invite": "Invite to stage",
       "remove": "Move to audience",
-      "promoted": "You were invited to the stage. Turn on your mic to speak (it does not turn on automatically).",
+      "promoted": "You were invited to the stage. Your camera turns on automatically (unless locked or not permitted). Turn on your mic to speak (the mic does not turn on automatically).",
       "later": "Later"
     },
     "announce": {

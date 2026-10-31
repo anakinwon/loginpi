@@ -36,6 +36,7 @@ export type MoreItem = {
   app?: boolean // 엔진 app 중계가 있어야 쓸 수 있다 → 미지원·확인 전이면 숨김
   sheet?: boolean // 시트·대화상자를 연다(aria-haspopup="dialog")
   checked?: FeatureStore<boolean> // 있으면 켜기/끄기 항목(menuitemcheckbox, aria-checked)
+  hidden?: FeatureStore<boolean> // true 면 숨김(기기에서 못 쓰는 기능 — 예 효과)
   onClick: (ctx: RoomCtx) => void
 }
 

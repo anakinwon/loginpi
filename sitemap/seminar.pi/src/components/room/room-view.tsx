@@ -31,6 +31,7 @@ import { Floaters, ReactionMenu } from './reactions'
 import {
   handKey,
   handNotice,
+  handsWaiting,
   isBadGrade,
   layoutFor,
   lockedFor,
@@ -54,6 +55,8 @@ const MORE = FEATURES.flatMap((f) => f.more ?? [])
 const TABS = FEATURES.flatMap((f) => (f.tab ? [f.tab] : []))
 const ZERO = featureStore(0)
 const TAB_BADGES = TABS.map((x) => x.badge ?? ZERO)
+const SHOWN = featureStore(false)
+const MORE_HIDDEN = MORE.map((it) => it.hidden ?? SHOWN)
 const EFFECTS = FEATURES.flatMap((f) => (f.effect ? [f.effect] : [])).sort((a, b) => a.order - b.order)
 // 발언자 음성을 처리하는 기능이 있을 때만 마이크 동의·대기실 고지(A-6). 음성 조각은 동의한 사람만 돈다
 const CONSENT = FEATURES.some((f) => f.consent)
@@ -295,7 +298,12 @@ function Room({
     () => r.subscribeApp((m) => FEATURES.forEach((f) => f.onApp?.(m, ctxRef.current))),
     [], // eslint-disable-line react-hooks/exhaustive-deps
   )
-  const extra: BarItem[] = visibleExtras(MORE, role, r.appSupported).map((it) => ({
+  const moreHidden = useStores(MORE_HIDDEN)
+  const extra: BarItem[] = visibleExtras(
+    MORE.filter((_, i) => !moreHidden[i]),
+    role,
+    r.appSupported,
+  ).map((it) => ({
     id: `x:${it.id}`,
     node: (o) => <ExtraItem item={it} ctx={ctx} {...o} />,
   }))
@@ -314,7 +322,9 @@ function Room({
     if (!prev || !r.role || prev === r.role) return
     if (r.role === 'audience') say('demoted')
     setPromoHidden(false)
-  }, [r.role])
+    // 무대 승격 = 카메라 자동 켜기(마스터 2026-10-31). 마이크는 그대로 수동(설계서 14.4 — 동의 A-6 를 거쳐야 함). 영상 잠금이면 켜지 않는다
+    if (prev === 'audience' && r.role === 'panel' && !lockedFor(r.role, r.locks).video) void toggle('video', true)
+  }, [r.role]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 사회 알림(v1.2) — 음소거됨·잠금 바뀜은 5초 알림(발표자는 자기가 한 일이라 잠금 알림 생략), 켜기 요청은 고정 알림
   useEffect(() => {
@@ -457,6 +467,7 @@ function Room({
   }
 
   const hands = role === 'presenter' ? handNotice(r.peers, dismissed) : ({ kind: 'none' } as const)
+  const fullHands = role === 'presenter' ? handsWaiting(r.peers, dismissed) : []
   const promo = role === 'panel' && !has.audio && !promoHidden && r.state === 'joined'
   const ended = r.state === 'error' || r.state === 'closed'
   const btnS = 'h-9 shrink-0 rounded-full px-4 text-sm font-semibold'
@@ -621,6 +632,37 @@ function Room({
                   engineSpeaker={r.engineSpeaker}
                   layout={r.layout}
                   onPin={role === 'presenter' ? (k) => void pinForAll(k) : undefined}
+                  fullTop={
+                    fullHands.length > 0 && (
+                      // 전체 화면 손들기 알림(마스터 2026-10-31) — 참가자 패널이 화면 밖이라 손든 사람마다 [무대로]·[무시]를 바로 둔다(최대 3명 + 나머지 수)
+                      <ul role="status" className="w-full max-w-md space-y-1.5">
+                        {fullHands.slice(0, 3).map((p) => (
+                          <li key={handKey(p)} className="bg-surface-raised/95 flex items-center gap-2 rounded-xl p-2 text-sm shadow-lg">
+                            <p className="min-w-0 flex-1 truncate">✋ {t('hand.notice', { name: p.name })}</p>
+                            <button
+                              type="button"
+                              onClick={async () => sayErr(await r.setPeerRole(p.peerId, 'panel'), 'actionFailed')}
+                              className={`${btnS} bg-accent text-white`}
+                            >
+                              {t('stage.invite')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDismissed((s) => new Set(s).add(handKey(p)))}
+                              className={`${btnS} bg-surface`}
+                            >
+                              {t('hand.dismiss')}
+                            </button>
+                          </li>
+                        ))}
+                        {fullHands.length > 3 && (
+                          <li className="bg-surface-raised/95 rounded-xl p-2 text-center text-sm">
+                            ✋ {t('hand.waiting', { n: fullHands.length - 3 })}
+                          </li>
+                        )}
+                      </ul>
+                    )
+                  }
                 />
                 <Floaters reaction={r.reaction} />
                 {/* 배지 줄·토스트 줄(15.6) — 녹화·AI 기록 배지·토스트가 portal 로 나란히 붙는다(겹침 방지) */}

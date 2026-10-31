@@ -13,7 +13,7 @@ import {
   type RoomCtx,
   type RoomFeature,
 } from '../../extensions'
-import { canProcessVideo, useTrackLive } from '../../effects'
+import { canProcessVideo, fxBroken, useTrackLive } from '../../effects'
 import {
   autoOff,
   bgOn,
@@ -308,6 +308,16 @@ function AutoOffToast() {
 }
 
 function Overlay({ ctx }: { ctx: RoomCtx; barShown: boolean }) {
+  const broken = useStore(fxBroken)
+  // 처음부터 효과 버튼을 숨기는 기기 — 캔버스 송출·WebGL 없음(기능 탐지), 또는 터치 기기(휴대폰·태블릿 : 실기기에서 효과가 나타나지 않아
+  //  메모리·성능 한계로 판단, 마스터 결정 2026-10-31). 표시 게이팅만(UA 판정 아님) — PC 는 그대로
+  useEffect(() => {
+    if (!canProcessVideo() || !canSegment() || matchMedia('(pointer: coarse)').matches) fxBroken.set(true)
+  }, [])
+  // 쓰다가 못 쓰게 되면(프레임 멈춤·분리기 로드 실패·느려서 끔) 열린 시트도 닫는다 — 이유는 경고 토스트로
+  useEffect(() => {
+    if (broken) open.set(false)
+  }, [broken])
   return (
     <>
       <EffectsSheet ctx={ctx} />
@@ -325,6 +335,7 @@ export const backgrounds: RoomFeature = {
       icon: <span aria-hidden>✨</span>,
       roles: ['presenter', 'panel'],
       sheet: true,
+      hidden: fxBroken, // 이 기기에서 효과 불가로 판정되면 버튼 자체를 없앤다(마스터 2026-10-31)
       onClick: () => open.set(true),
     },
   ],

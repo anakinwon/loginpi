@@ -4,14 +4,20 @@
 // 근거(REA_04_UI_EXT R-E1·R-E2) : Jitsi·LiveKit 배포본 모두 효과 적용 = 같은 송신기의 replaceTrack, LiveKit 대체 경로 = captureStream + 워커 타이머
 // (숨은 탭에서도 프레임이 멈추지 않게). 코드는 옮기지 않았다(S-2)
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { useStores, type VideoEffect } from './extensions'
+import { featureStore, useStores, type VideoEffect } from './extensions'
 import { failHit, fxFrameDue, onTrackEnd, swapSender } from './room-rules'
 import { ticker } from './ticker'
 
 // 효과 1단계 — src(이전 단계 결과) 를 out 캔버스(w×h)에 그린다. 동기 함수(프레임마다 호출)
 export type EffectDraw = (out: CanvasRenderingContext2D, src: CanvasImageSource, w: number, h: number) => void
 
-export const FX = { fps: 30, failMax: 30 } // 연속 실패 상한 — 넘으면 그 효과를 끈다(Jitsi 배포본 30회 후 원본 통과, REA jitsi-04 ②)
+// 연속 실패 상한 — 넘으면 그 효과를 끈다(Jitsi 배포본 30회 후 원본 통과, REA jitsi-04 ②).
+// stallMs — 카메라가 켜져 있는데 이 시간 동안 새 프레임을 한 장도 못 그리면 이 기기는 효과 불가로 본다(모바일 2026-10-31 마스터 보고)
+export const FX = { fps: 30, failMax: 30, stallMs: 5000 }
+
+// 이 기기에서 효과를 쓸 수 없음(프레임 멈춤·분리기 로드 실패·느려서 자동 끔) — true 면 ⋯ 메뉴의 효과 버튼을 숨긴다(마스터 2026-10-31).
+// 기기 능력이라 퇴장해도 되돌리지 않는다(페이지를 새로 열면 다시 시도)
+export const fxBroken = featureStore(false)
 
 // 기능 탐지(UA 판정 금지) — 캔버스 송출이 없으면 효과를 켤 수 없다
 export const canProcessVideo = () =>
@@ -26,12 +32,19 @@ export function useTrackLive(t: MediaStreamTrack | null | undefined): boolean {
 }
 
 // 파이프라인 1개 — 켜진 효과 목록은 매 프레임 active() 로 읽는다(효과를 더하거나 빼도 송신 트랙을 다시 바꾸지 않아 원본이 새지 않음)
-function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[]) {
+function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[], onStall: () => void) {
   const video = document.createElement('video')
   video.muted = true
   video.playsInline = true
+  // 문서에 붙인다(거의 안 보이게) — 안드로이드 Chrome·WebView 는 화면 밖(문서에 없는) 무음 자동재생 영상을 멈추고, iOS 는 붙지 않은 영상의
+  // 프레임을 디코드하지 않는다 → currentTime 이 안 움직여 효과가 한 장도 안 그려졌다(모바일 효과 안 나타남, 마스터 2026-10-31)
+  video.setAttribute('aria-hidden', 'true')
+  video.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:0.01;pointer-events:none;z-index:-1'
+  document.body.appendChild(video)
   video.srcObject = new MediaStream([track])
   video.play().catch(() => {})
+  let drewAt = performance.now()
+  let stalled = false
   const out = document.createElement('canvas')
   const tmp: HTMLCanvasElement[] = []
   const fails = new Map<VideoEffect, number>()
@@ -41,7 +54,18 @@ function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[]) {
     const w = video.videoWidth
     const h = video.videoHeight
     // 새 프레임이고 카메라가 켜졌을 때만 그린다(타이머는 fps 의 2배로 돈다, 판정 room-rules fxFrameDue)
-    if (!fxFrameDue({ enabled: track.enabled, w, h, ready: video.readyState, time: video.currentTime, last })) return
+    if (!fxFrameDue({ enabled: track.enabled, w, h, ready: video.readyState, time: video.currentTime, last })) {
+      // 카메라가 켜져 있는데 프레임이 멈춤 — 이 기기는 효과 불가(1번만 알린다). 카메라를 끈 동안은 시계를 다시 맞춘다
+      const now = performance.now()
+      // 숨은 탭·앱 전환 중엔 브라우저가 영상 디코드를 멈출 수 있다 — 기기 불가로 오판하지 않게 그동안도 시계를 맞춘다
+      if (!track.enabled || track.readyState !== 'live' || document.visibilityState === 'hidden') drewAt = now
+      else if (!stalled && now - drewAt > FX.stallMs) {
+        stalled = true
+        onStall()
+      }
+      return
+    }
+    drewAt = performance.now()
     last = video.currentTime
     const list = active()
     // 마지막 효과가 막 꺼져 파이프라인이 닫히기 직전이면 원본을 그대로 통과(null 단계)
@@ -74,6 +98,7 @@ function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[]) {
       output.stop()
       video.pause()
       video.srcObject = null
+      video.remove()
     },
   }
 }
@@ -96,7 +121,15 @@ export function useVideoEffects(
   const [out, setOut] = useState<MediaStreamTrack | null>(null)
   useEffect(() => {
     if (!any || !track || track.readyState !== 'live') return
-    const p = startPipeline(track, () => activeRef.current)
+    // 멈춤 = 효과를 모두 끄고(원본 송출로 복귀) 효과 버튼을 숨긴다
+    const p = startPipeline(
+      track,
+      () => activeRef.current,
+      () => {
+        fxBroken.set(true)
+        for (const e of effects) e.on.set(false)
+      },
+    )
     setOut(p.track)
     const revert = swapSender(sender, p.track, () => (track.readyState === 'live' ? track : null))
     return () => {

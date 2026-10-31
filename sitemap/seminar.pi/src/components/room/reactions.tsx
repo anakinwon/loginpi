@@ -51,6 +51,7 @@ export function ReactionMenu({
 // 떠오르는 반응 — 큐 규칙은 room-rules enqueueReactions. 애니메이션이 끝나면 빼고, 끝 이벤트가 없어도(숨김·움직임 줄이기) 다음 수신 때 5초 지난 것은 정리된다
 export function Floaters({ reaction }: { reaction: { counts: Record<string, number>; seq: number } | null }) {
   const [queue, setQueue] = useState<Floater[]>([])
+  const [still, setStill] = useState<Record<string, number> | null>(null)
   const nextId = useRef(1)
   useEffect(() => {
     if (!reaction) return
@@ -59,7 +60,28 @@ export function Floaters({ reaction }: { reaction: { counts: Record<string, numb
       nextId.current = r.nextId
       return r.queue
     })
+    // 움직임 줄이기(휴대폰 절전·애니메이션 제거 설정 포함)면 떠오름 레이어가 숨는다 → 움직이지 않는 칩으로 STILL_MS 동안 보인다(모바일 '반응 무반응', 마스터 2026-10-31)
+    setStill(reaction.counts)
+    const id = setTimeout(() => setStill(null), STILL_MS)
+    return () => clearTimeout(id)
   }, [reaction])
+  return (
+    <>
+      {still && (
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-3 hidden justify-center motion-reduce:flex">
+          <span className="bg-surface-raised/90 rounded-full px-3 py-1 text-2xl shadow-lg">
+            {Object.entries(still).map(([e, n]) => (n > 1 ? `${e}×${n} ` : `${e} `))}
+          </span>
+        </div>
+      )}
+      <FloatLayer queue={queue} setQueue={setQueue} />
+    </>
+  )
+}
+
+const STILL_MS = 2500
+
+function FloatLayer({ queue, setQueue }: { queue: Floater[]; setQueue: (f: (q: Floater[]) => Floater[]) => void }) {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden motion-reduce:hidden">
       {queue.map((f) => (

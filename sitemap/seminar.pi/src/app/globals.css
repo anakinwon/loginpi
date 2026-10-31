@@ -38,7 +38,7 @@
   outline-offset: 2px;
 }
 
-/* 떠오르는 반응(설계서 14.4) — 5초, 레인(lane-0~3)마다 좌우 흔들림을 달리한다. 움직임 줄이기면 화면이 레이어를 숨긴다(reactions.tsx) */
+/* 떠오르는 반응(설계서 14.4) — 5초, 레인(lane-0~3)마다 좌우 흔들림을 달리한다. 움직임 줄이기면 화면이 레이어를 숨기고 정지 칩으로 대신 보인다(reactions.tsx) */
 @keyframes float-up {
   0% {
     transform: translate(0, 0) scale(0.6);

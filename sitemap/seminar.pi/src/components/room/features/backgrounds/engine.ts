@@ -4,6 +4,7 @@
 // 근거(REA mediapipe-01·04·05, jitsi-04 ②) : CPU 경로도 WebGL 필수, 인스턴스는 1개 재사용(만들 때마다 wasm 재다운로드),
 // 사용 지표를 odml.pa.googleapis.com 로 보내며 끄는 옵션이 없음(1회 실패면 주기 전송 중단). 코드는 옮기지 않았다(S-2)
 import type { ImageSegmenter } from '@mediapipe/tasks-vision'
+import { fxBroken } from '../../effects'
 import { featureStore } from '../../extensions'
 import { SCENES, SH, SW, type Scene, type SceneId } from './scenes'
 import { afterDelete, BG, coverRect, dropShown, edgeAlpha, failBack, keepShown, nextTs, pipelineKilled, slowerEvery, slowWatch } from './rules'
@@ -133,7 +134,11 @@ export async function choose(next: string, blob?: Blob): Promise<string | null> 
     const scene = next.startsWith('a:') ? (SCENES[next.slice(2) as SceneId] ?? null) : null
     if (next.startsWith('a:') && !scene) throw new Error('scene')
     const img = next.startsWith('p:') || blob ? await toBackdrop(next, blob) : null
-    await loadSegmenter()
+    // 분리기(wasm·모델)를 못 올림 = 메모리 부족 등 기기 한계 → 효과 버튼을 숨긴다(이미지 디코드 실패는 그 이미지만의 문제라 제외)
+    await loadSegmenter().catch((e) => {
+      fxBroken.set(true)
+      throw e
+    })
     if (my !== pick) return null
     anim = scene
     animAt = 0
@@ -184,7 +189,7 @@ bgOn.sub(() => {
   seg = null
   loading = null
   release()
-  autoOff.set('bgStopped')
+  autoOff.set(fxBroken.get() ? 'unsupported' : 'bgStopped') // 프레임 멈춤으로 파이프라인이 끈 것이면 '이 기기에서는 못 씀'
 })
 
 const EDGE = Uint8Array.from({ length: 256 }, (_, i) => edgeAlpha(i / 255)) // 프레임마다 3.7만 번 계산하지 않게 표로
@@ -279,6 +284,7 @@ export function draw(out: CanvasRenderingContext2D, src: CanvasImageSource, w: n
     if (every) return
     void choose('none')
     autoOff.set('autoOff')
+    fxBroken.set(true) // 가장 낮은 단계에서도 느림 = 이 기기에선 무리 → 효과 버튼 숨김
   }
 }
 

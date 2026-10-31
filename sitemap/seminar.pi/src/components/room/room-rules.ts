@@ -216,8 +216,11 @@ export function enqueueReactions(
 
 // 손든 사람 알림 쌓임 방지(설계서 14.4) — 0명 없음 / 1명 알림 안 [무대로]·[무시] / 2명 이상 "N명 대기" 하나(→ 참가자 패널)
 export type HandNotice<T> = { kind: 'none' } | { kind: 'one'; peer: T } | { kind: 'many'; count: number }
+// 무대로 올릴 수 있는 손든 청중(무시한 손 제외, 참가자 패널과 같은 순서) — 전체 화면 알림은 이 목록을 그대로 보여 준다(패널이 화면 밖이라)
+export const handsWaiting = <T extends PeerLike>(peers: T[], dismissed: ReadonlySet<string>): T[] =>
+  sortPeers(peers.filter((p) => p.role === 'audience' && p.raisedTs > 0 && !dismissed.has(handKey(p))))
 export function handNotice<T extends PeerLike>(peers: T[], dismissed: ReadonlySet<string>): HandNotice<T> {
-  const waiting = sortPeers(peers.filter((p) => p.role === 'audience' && p.raisedTs > 0 && !dismissed.has(handKey(p))))
+  const waiting = handsWaiting(peers, dismissed)
   if (!waiting.length) return { kind: 'none' }
   return waiting.length === 1 ? { kind: 'one', peer: waiting[0] } : { kind: 'many', count: waiting.length }
 }
