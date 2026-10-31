@@ -378,7 +378,7 @@ test('더빙 원음 볼륨 — 마지막 원격 자막이 듣는 언어와 같�
   const { readFile } = await import('node:fs/promises')
   const src = await readFile(new URL('../components/room/features/dubbing/index.tsx', import.meta.url), 'utf8')
   // 판정은 원격 자막(onApp)에서 — 내 음성(onSpeech)은 엔진이 되돌려 주지 않아 여기 안 온다
-  assert.match(src, /srcSame\.set\(sameLang\(c\.lang, dubLang\.get\(\)\)\)[^\n]*\n\s+enqueue\(ctx, c\.text, c\.lang, c\.sig\)/)
+  assert.match(src, /srcSame\.set\(sameLang\(c\.lang, dubLang\.get\(\)\)\)[^\n]*\n\s+enqueue\(ctx, c\.text, c\.lang, c\.sig(, preOf\(c, dubLang\.get\(\)\))?\)/) // 선번역(preOf)은 인자만 더해짐(A안)
   assert.match(src, /playFails = 0\n\s+srcSame\.set\(false\)/) // 끄기·언어 바꾸기(stopAll) = 판정 초기화
   assert.ok(src.includes('srcSame.reset()')) // 퇴장
   assert.ok(src.includes('}, [on, room, same])'))

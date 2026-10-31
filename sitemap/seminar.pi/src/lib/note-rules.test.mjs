@@ -372,7 +372,7 @@ test('noteGone — 켠 지 30초 지난 뒤의 rec=false 만 회의록 종료·�
 test('회의록 삭제·다른 곳 종료 감지 배선 — chunk 응답 rec·발표자 onSpeech 내리기·rec 는 자막 방송에 안 실림(r4 T07)', () => {
   const route = readFileSync(new URL('../app/api/speech/chunk/route.ts', import.meta.url), 'utf8')
   assert.match(route, /const rec = target\.p_smn_id && !nt\.error \? !!nt\.data : undefined/)
-  assert.match(route, /\{ text: r\.text, lang: r\.lang, ts, sig, rec \}/)
+  assert.match(route, /\{ text: r\.text, lang: r\.lang, ts, sig, rec(, \.\.\.\(tr \? \{ tr, trSig \} : \{\}\))? \}/) // 선번역 tr·trSig 는 서버가 만든 값이라 같이 실린다(A안 2026-10-31)
   const sp = readFileSync(new URL('../components/room/use-speech.ts', import.meta.url), 'utf8')
   const cast = sp.slice(sp.indexOf("l.sendApp('caption'"))
   assert.doesNotMatch(cast.slice(0, cast.indexOf('})')), /\.\.\.meta|rec/)

@@ -57,6 +57,8 @@ export type VideoEffect = {
 
 // 말하기 모드(A-1) — caption = 글로 바꾸고 엔진으로 자막 방송, quiet = 글로만(방송 없음 — 예 AI 회의록만 켬)
 export type SpeechMode = 'caption' | 'quiet'
+// 내 음성 조각 결과의 부가 정보 — lang 말한 언어, sig 서버 자막 서명, rec 기록 중 회의록 유무, tr·trSig 서버 선번역(언어별 글·서명, 마스터 A안 2026-10-31)
+export type SpeechMeta = { lang: string; sig: string | null; rec?: boolean; tr?: Record<string, string>; trSig?: Record<string, string> }
 
 export type RoomFeature = {
   id: string
@@ -65,7 +67,7 @@ export type RoomFeature = {
   Overlay?: ComponentType<{ ctx: RoomCtx; barShown: boolean }> // 무대 위(relative 상자 안). 시트·배지·자막·토스트
   effect?: VideoEffect
   onApp?: (m: AppMsg, ctx: RoomCtx) => void // ntf app 수신 — 자기 topic 만 처리
-  onSpeech?: (text: string, ts: number, ctx: RoomCtx, meta?: { lang: string; sig: string | null; rec?: boolean }) => void // 내 음성 조각이 글로 바뀜(내 화면용 — 방송은 use-speech 가 함)
+  onSpeech?: (text: string, ts: number, ctx: RoomCtx, meta?: SpeechMeta) => void // 내 음성 조각이 글로 바뀜(내 화면용 — 방송은 use-speech 가 함)
   consent?: boolean // 발언자 음성을 처리하는 기능 — 하나라도 있으면 마이크 동의·대기실 고지가 켜진다(A-6)
   onReset?: () => void // 퇴장·끊김 — 저장소를 처음 값으로
 }

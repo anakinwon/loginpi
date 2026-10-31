@@ -68,7 +68,8 @@ test('⑤ 외부 AI 를 부르는 라우트는 모두 speechGate 를 거치고, 
   for (const p of aiRoutes) {
     const k = kinds[rel(p).split('/')[4]]
     // 번역·합성은 shareMiss(판정 전 진행 중 Promise 캐시, r3 T09) 안에서 speechGate 를 부른다
-    assert.match(readFileSync(p, 'utf8'), new RegExp(`await (shareMiss\\(cache, key, \\(\\) => )?speechGate\\([^;]*'${k}'`), `${rel(p)} 에 speechGate ${k} 없음`)
+    // chunk 의 VC 판정은 선번역 언어 조회와 Promise.all 로 병렬(A안 2026-10-31)
+    assert.match(readFileSync(p, 'utf8'), new RegExp(`await (shareMiss\\(cache, key, \\(\\) => |Promise\\.all\\(\\[\\s*)?speechGate\\([^;]*'${k}'`), `${rel(p)} 에 speechGate ${k} 없음`)
   }
   const direct = srcFiles.filter(
     (p) => !rel(p).endsWith('lib/speech-gate.ts') && /rpc\(\s*'fn_use_smn_(ai|vc)'/.test(readFileSync(p, 'utf8')),
@@ -251,4 +252,21 @@ test('⑱-2 녹음 겹침 거부 기기 후퇴 — next() 실패면 serial 로 �
   const sp = read('src/components/room/use-speech.ts')
   assert.match(sp, /if \(!serial && !next\(\) && !stopped\) serial = true/)
   assert.match(sp, /if \(serial\) next\(\)/)
+})
+
+test('⑲ 서버 선번역·기기 합성(마스터 A안 2026-10-31) — chunk 가 transcribe 에 targets 를 넘기고 선번역은 말한 사람 TRANS 로 계량, 청중은 /api/speech/lang 으로 언어를 알리며, 더빙은 기기 목소리를 먼저 쓴다', () => {
+  const chunk = read('src/app/api/speech/chunk/route.ts')
+  assert.match(chunk, /transcribe\([\s\S]*?targets,\s*\)/)
+  assert.match(chunk, /speechGate\(\{ smnId: smn \}, user, 'TRANS', chars, \{ usrCap: false \}\)/) // 개인 상한 제외(세미나 상한만) — 팀장 지적 P2
+  assert.match(chunk, /langCache\.set\(smn, \{ until: Date\.now\(\) \+ TR_DENY_PAUSE_MS, langs: \[\] \}\)/) // 계량 거절이면 선번역을 쉰다(조각마다 비용 반복 방지)
+  assert.match(chunk, /capSig\(env\.PI_SESSION_SECRET, smn, v, trUse\(k\)\)/) // 언어별 서명 = 그 언어 더빙 전용
+  assert.ok(srcFiles.some((p) => rel(p) === 'src/app/api/speech/lang/route.ts'))
+  const cap = read('src/components/room/features/captions/index.tsx')
+  assert.match(cap, /piFetch\('\/api\/speech\/lang'/)
+  assert.match(cap, /setInterval\(post, TR_LANG_PING_MS\)/)
+  const dub = read('src/components/room/features/dubbing/index.tsx')
+  assert.match(dub, /const voice = localVoice\(lang\)/)
+  assert.match(dub, /speechSynthesis\.cancel\(\)/) // 끄기 때 기기 합성도 멈춘다
+  const sp = read('src/components/room/use-speech.ts')
+  assert.match(sp, /sendApp\('caption', fitCaption\(/) // 엔진 d 4KB 안
 })

@@ -135,20 +135,30 @@ function langName(code: string) {
 // audioTokens = 외부 AI 가 센 입력 음성 토큰 — 호출부가 실제 길이로 선예약을 정산(speech-rules settleSec)
 // note = 대면 노트 문맥(제목·직전 문장) — 주면 '테이블 위 휴대폰·여러 사람' 상황과 문맥을 알려 조각 경계의 잘린 말·동음이의어를 덜 틀린다
 //  (2026-10-29 PoC 같은 녹음 CER 71→61%). 사용자 입력이라 «» 안 자료로만 넘긴다(구분자는 지움)
+// targets = 같은 호출에서 번역까지 받을 언어 코드(세미나 청중이 보는 언어, chunk 라우트가 smn_trans_lang 에서 읽음) — 결과 tr[code].
+//  실측(2026-10-31) : 단독 1.5~2.1초 vs 번역 2개 포함 1.8~2.3초 — 청중 화면의 별도 번역 왕복(0.9초 + RTT 2회)을 없앤다(마스터 A안)
 export async function transcribe(
   audioB64: string,
   mime: string,
   langHint?: string | null,
   note?: { title?: string | null; prev?: string | null },
+  targets: readonly string[] = [],
 ): Promise<{
   text: string
   lang: string | null
   audioTokens: number | null
+  tr?: Record<string, string>
 } | null> {
   const hint =
     langHint && LANG_RE.test(langHint)
       ? ` The speaker most likely uses ${langName(langHint)}.`
       : ''
+  const tgt = targets.filter((c) => LANG_RE.test(c))
+  const trAsk = tgt.length
+    ? ` Then translate the transcript into each of these languages and return them under "tr" keyed by code: ${tgt
+        .map((c) => `${langName(c)} (${c})`)
+        .join(', ')}. If a target is the same language as the speech, return the transcript unchanged for it.`
+    : ''
   const quote = (s?: string | null) => (s ?? '').replace(/[«»]/g, '').trim()
   const title = quote(note?.title)
   const prev = quote(note?.prev)
@@ -167,23 +177,37 @@ export async function transcribe(
           type: 'text',
           text:
             `Transcribe the speech in this ${note ? '' : 'short '}audio clip verbatim, in its original language.${hint}${ctx} ` +
-            'Do not translate, summarize or add anything. If there is no intelligible speech, return an empty text. ' +
-            'Also return the spoken language as a BCP-47 code.',
+            `${tgt.length ? '' : 'Do not translate, '}Do not summarize or add anything. If there is no intelligible speech, return an empty text. ` +
+            'Also return the spoken language as a BCP-47 code.' +
+            trAsk,
         },
         { type: 'audio', data: audioB64, mime_type: mime },
       ],
     },
     {
       type: 'object',
-      properties: { text: { type: 'string' }, lang: { type: 'string' } },
+      properties: {
+        text: { type: 'string' },
+        lang: { type: 'string' },
+        ...(tgt.length
+          ? { tr: { type: 'object', properties: Object.fromEntries(tgt.map((c) => [c, { type: 'string' }])) } }
+          : {}),
+      },
       required: ['text'],
     },
   )
-  const r = out?.v
+  const r = out?.v as { text?: unknown; lang?: unknown; tr?: unknown } | undefined
   if (!out || !r || typeof r.text !== 'string') return null
   const lang =
     typeof r.lang === 'string' && LANG_RE.test(r.lang) ? r.lang : null
-  return { text: r.text.trim(), lang, audioTokens: out.audioTokens }
+  // 번역 — 요청한 언어만, 글이 있는 것만(되돌아온 구분자 제거). 없으면 키 자체를 빼 호출부가 '선번역 없음'으로 본다
+  let tr: Record<string, string> | undefined
+  if (tgt.length && r.tr && typeof r.tr === 'object') {
+    const m = r.tr as Record<string, unknown>
+    const got = tgt.flatMap((c) => (typeof m[c] === 'string' && unfence(m[c] as string).trim() ? [[c, unfence(m[c] as string).trim()] as const] : []))
+    if (got.length) tr = Object.fromEntries(got)
+  }
+  return { text: r.text.trim(), lang, audioTokens: out.audioTokens, tr }
 }
 
 // 문장 번역 → 대상 언어 문장. 캐시는 호출부(A-3, SA8 — 문장 해시×언어)

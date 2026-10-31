@@ -251,6 +251,17 @@ export function once<A extends unknown[]>(f: (...a: A) => void) {
 // backlog = 지금 문장 뒤에 기다리는 문장 수 — 1개당 DUB_CATCHUP 만큼 빨리 읽어 밀린 만큼 따라잡는다(보강 r6 T09 : 큐가 밀리면 원음과 점점 어긋나 결국 dubStale 로 버려졌다). 상한은 그대로 1.5
 // ponytail: 원문 길이를 조각 고정 길이로 봄 — 자막 메시지에 실제 durMs 가 실리면 그 값으로
 export const DUB_CATCHUP = 0.15
+// 기기 내 음성 합성(speechSynthesis, 마스터 A안 2026-10-31)은 재생 전엔 길이를 모른다 — 밀린 문장 수만큼만 빠르게(상한 1.5), 밀림 없으면 1
+export const localDubRate = (backlog: number) =>
+  Math.min(DUB_RATE_MAX, 1 + DUB_CATCHUP * Math.max(0, Math.floor(Number.isFinite(backlog) ? backlog : 0)))
+// 듣는 언어의 기기 목소리 고르기 — 정확히 같은 태그(zh-TW ↔ zh-TW) → 같은 기본 언어(en ↔ en-US, zh ↔ zh-CN) → 없으면 null(클라우드 합성). 태그의 '_' 는 '-' 로 본다
+export function pickVoice<V extends { lang: string }>(lang: string, list: readonly V[]): V | null {
+  if (!lang || !list.length) return null
+  const l = lang.toLowerCase()
+  const base = l.split('-')[0]
+  const norm = (v: string) => v.toLowerCase().replace('_', '-')
+  return list.find((v) => norm(v.lang) === l) ?? list.find((v) => norm(v.lang) === base || norm(v.lang).startsWith(`${base}-`)) ?? null
+}
 export function dubRate(dubSec: number, srcMs = CHUNK_MS, backlog = 0) {
   if (!Number.isFinite(dubSec) || dubSec <= 0 || srcMs <= 0) return 1
   const boost = 1 + DUB_CATCHUP * Math.max(0, Math.floor(Number.isFinite(backlog) ? backlog : 0))

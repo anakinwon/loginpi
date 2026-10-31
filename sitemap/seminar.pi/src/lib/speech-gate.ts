@@ -25,17 +25,26 @@ export type SpeechKind = 'VC' | 'TRANS' | 'TTS'
 export type SpeechTarget = { smnId: string | null; ntId?: string | null }
 
 // amount = VC 는 예약 초, TRANS·TTS 는 글자 수
-export async function speechGate(t: SpeechTarget, user: UserRow, kind: SpeechKind, amount: number): Promise<NextResponse | null> {
+// opts.usrCap = false : 사용자 1인 누적 글자 상한(감사 High 1)을 보지 않는다 — 서버 선번역(chunk, 마스터 A안 2026-10-31)은 말한 사람이 청중 전원 몫을 대신 지는
+//  것이라 10만 자 개인 상한이면 30~40분 만에 조용히 꺼진다(팀장 지적 P2). 세미나 누적·분당 상한(fn_use_smn_ai)은 그대로 본다
+export async function speechGate(
+  t: SpeechTarget,
+  user: UserRow,
+  kind: SpeechKind,
+  amount: number,
+  opts: { usrCap?: boolean } = {},
+): Promise<NextResponse | null> {
+  const usrCap = kind !== 'VC' && opts.usrCap !== false
   // 무료 개최자 세미나 = AI 제외(sql/015) — 계량보다 먼저(거절인데 계량되지 않게). 대부분 캐시 적중이라 직렬 비용 없음. 대면 노트(smnId 없음)는 대상 아님
   //  번역·합성은 사용자 누적 글자(감사 High 1)를 같은 때 병렬로 읽는다(R-P1) — 둘 다 읽기라 계량 전 거절이 남지 않는다
   if (t.smnId) {
     const [paid, used] = await Promise.all([
       planAiOk(t.smnId),
-      kind === 'VC' ? 0 : usrAiUsed(t.smnId, user.id, kind),
+      usrCap ? usrAiUsed(t.smnId, user.id, kind) : 0,
     ])
     if (paid instanceof Error || used instanceof Error) return apiError('DB_UNAVAILABLE', 503)
     if (!paid) return apiError('PLAN_AI_PAID', 402)
-    if (kind !== 'VC' && used + amount > usrAiMax(kind, kind === 'TRANS' ? env.SPEECH_USR_TRANS_CHR : env.SPEECH_USR_TTS_CHR))
+    if (usrCap && used + amount > usrAiMax(kind, kind === 'TRANS' ? env.SPEECH_USR_TRANS_CHR : env.SPEECH_USR_TTS_CHR))
       return apiError('SPEECH_USR_QUOTA', 429)
   }
   let q

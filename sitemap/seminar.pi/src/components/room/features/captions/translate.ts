@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
 import { hasWords, sameLang, shownOf, TR_LANG_SETTLE_MS, trStopOf, type TrOut, type TrStop } from '@/lib/translate-rules'
 import { featureStore, useStore } from '../../extensions'
+import { preOf } from './caption-rules'
 
 type Said = { text: string; sig: string | null }
 const local = new Map<string, Promise<Said | null>>() // ponytail: 100개 넘으면 통째로 비움 — 세미나 1회 안에선 충분
@@ -21,9 +22,16 @@ export function translateCaption(
   lang: string,
   smnId: string,
   sig: string | null,
+  pre: Said | null = null, // 서버 선번역(자막 d 의 tr·trSig, 마스터 A안 2026-10-31) — 있으면 요청 없이 그대로(캐시에도 둔다)
 ): Promise<Said | null> {
   // 같은 언어·글자 없는 자막(숫자·기호뿐, 보강 r6 T08) = 원문 그대로 — 번역 요청·계량 없음
   if (sameLang(src, lang) || !hasWords(text)) return Promise.resolve({ text, sig })
+  if (pre?.text) {
+    const p = Promise.resolve(pre)
+    if (local.size >= 100) local.clear()
+    local.set([smnId, lang, text].join('\n'), p)
+    return p
+  }
   if (!sig || trStop.get()) return Promise.resolve(null)
   const key = [smnId, lang, text].join('\n') // 결과 sig 가 세미나별이라 세미나도 키에
   let p = local.get(key)
@@ -54,7 +62,7 @@ export function translateCaption(
 
 // 보일 자막 글과 그 언어(lang 속성 — 한자 글꼴 선택·화면 낭독기 발음) — 번역 대기 중엔 직전 번역(shownOf), 실패·중단이면 원문과 원문 언어
 export function useTranslated(
-  cap: { text: string; lang: string; sig: string | null; at: number } | null,
+  cap: { text: string; lang: string; sig: string | null; at: number; tr?: Record<string, string>; trSig?: Record<string, string> } | null,
   on: boolean,
   lang: string,
   smnId: string,
@@ -74,7 +82,7 @@ export function useTranslated(
   useEffect(() => {
     if (!key || !cap) return
     let live = true
-    void translateCaption(cap.text, cap.lang, reqLang, smnId, cap.sig).then((t) => {
+    void translateCaption(cap.text, cap.lang, reqLang, smnId, cap.sig, preOf(cap, reqLang)).then((t) => {
       if (!live) return
       if (t === null) setFailKey(key)
       else setOut({ key, text: t.text, lang: reqLang, at: Date.now() })

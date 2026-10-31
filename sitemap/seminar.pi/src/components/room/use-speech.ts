@@ -13,6 +13,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
 import { isUuid } from '@/lib/seminar-rules'
 import { captionFresh, chunkHeard, chunkSendable, CHUNK_MS, NOTE_CTX, settleWithin, SPEECH_BPS, speechHalt, type SpeechHalt, VAD } from '@/lib/speech-rules'
+import type { SpeechMeta } from './extensions'
+import { fitCaption } from './features/captions/caption-rules'
 import { acquireCtx, releaseCtx } from './video-tile'
 
 export const UPLOAD_TIMEOUT_MS = 15_000 // 서버 외부 AI 10초(BUILD_DEFECTS 2.7) + 여유 — 넘으면 그 조각 포기
@@ -45,7 +47,7 @@ export function useSpeech({
   on: boolean
   broadcast: boolean // true = 자막 방송(caption), false = 글로만(onText)
   sendApp: (topic: string, d: unknown) => Promise<string | null>
-  onText?: (text: string, ts: number, meta: { lang: string; sig: string | null; rec?: boolean }) => void
+  onText?: (text: string, ts: number, meta: SpeechMeta) => void
   onNoAgr?: () => void // 서버에 동의 기록이 없다(SPEECH_NO_AGR) — 이 기기 기록을 지우고 다시 묻는다(consent.tsx)
   onHalt?: (why: SpeechHalt) => void // 서버가 멈추라고 했다(이번 켜기 끝) — 화면이 '기록 중'으로 남지 않게(대면 노트)
   chunkMs?: number // 조각 길이 — 대면 노트는 CHUNK_NOTE_MS(문맥이 길수록 덜 빠뜨린다)
@@ -120,7 +122,16 @@ export function useSpeech({
         signal: typeof AbortSignal.timeout === 'function' ? AbortSignal.timeout(UPLOAD_TIMEOUT_MS) : undefined,
       }).catch(() => null)
       if (!r) return
-      const j = (await r.json().catch(() => null)) as { text?: string; lang?: string; ts?: number; sig?: string | null; rec?: boolean; code?: string } | null
+      const j = (await r.json().catch(() => null)) as {
+        text?: string
+        lang?: string
+        ts?: number
+        sig?: string | null
+        rec?: boolean
+        tr?: Record<string, string>
+        trSig?: Record<string, string>
+        code?: string
+      } | null
       if (!r.ok) {
         const why = speechHalt(j?.code)
         if (halted || !why) return
@@ -136,14 +147,23 @@ export function useSpeech({
       if (said.length > 2) said.shift()
       const ts = typeof j?.ts === 'number' ? j.ts : Date.now() - durMs // 조각 시작 시각 — 서버 추정값 우선
       // sig = 서버 발급 자막 서명 — 번역·더빙 요청에 그대로 실어 보낸다(없으면 그 자막은 원문만)
-      const meta = { lang: j?.lang || l.lang, sig: typeof j?.sig === 'string' ? j.sig : null, rec: typeof j?.rec === 'boolean' ? j.rec : undefined }
+      // tr·trSig = 서버 선번역(청중이 보는 언어, 마스터 A안) — 서버가 만든 값이라 그대로 싣는다(받는 쪽 parseCaption 이 검사)
+      const obj = (v: unknown) => (v && typeof v === 'object' ? (v as Record<string, string>) : undefined)
+      const meta: SpeechMeta = {
+        lang: j?.lang || l.lang,
+        sig: typeof j?.sig === 'string' ? j.sig : null,
+        rec: typeof j?.rec === 'boolean' ? j.rec : undefined,
+        tr: obj(j?.tr),
+        trSig: obj(j?.trSig),
+      }
       // 방송 모드 = 늦게 온 옛 조각은 버린다(내 화면·남의 화면·더빙 모두 최신 1문장만 다룬다). 글로만 받는 쪽(대면 노트)은 전부 받는다
       if (l.broadcast) {
         if (!captionFresh(lastTs, ts)) return
         lastTs = ts
       }
       l.onText?.(text, ts, meta)
-      if (l.broadcast) void l.sendApp('caption', { text, ts, lang: meta.lang, sig: meta.sig }) // rec 는 내 화면용 — 방송하지 않는다
+      // rec 는 내 화면용 — 방송하지 않는다. 선번역은 엔진 d 4KB 안에 들게 뒤에서부터 덜어 낸다(fitCaption)
+      if (l.broadcast) void l.sendApp('caption', fitCaption({ text, ts, lang: meta.lang, sig: meta.sig, tr: meta.tr, trSig: meta.trSig }))
     }
 
     let serial = false // 겹침 시작이 거부된 기기 — 이전 방식(멈춘 뒤 onstop 에서 다음 시작)으로 후퇴(R-P5, 팀장 지적 2026-10-31)

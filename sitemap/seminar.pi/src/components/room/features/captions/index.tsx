@@ -18,7 +18,9 @@ import { Icon } from '../../control-bar'
 import { featureStore, speechWants, stageFullEl, useStore, wantSpeech, type RoomCtx, type RoomFeature } from '../../extensions'
 import { DubRow } from '../dubbing'
 import { Sheet, SwitchRow } from '../sheet'
-import { isTranslateLang, pickTrLang, prefLangs, TRANSLATE_LANGS } from '@/lib/translate-rules'
+import { piFetch } from '@pi/auth/client'
+import { isTranslateLang, pickTrLang, prefLangs, TR_LANG_PING_MS, TRANSLATE_LANGS } from '@/lib/translate-rules'
+import { isUuid } from '@/lib/seminar-rules'
 import { presenterGone, presenterResync } from '../../room-rules'
 import { pickAudioMime } from '../../use-speech'
 import { CAPTION, captionsState, parseCaption, SIZES, stepSize, type Size } from './caption-rules'
@@ -38,6 +40,8 @@ export const capLatest = featureStore<{
   text: string
   lang: string
   sig: string | null // 서버 발급 자막 서명 — 없으면 번역하지 않고 원문
+  tr?: Record<string, string> // 서버 선번역(언어별, 마스터 A안 2026-10-31) — 내 언어가 있으면 번역 요청 없이 바로
+  trSig?: Record<string, string>
   at: number
 } | null>(null)
 
@@ -118,6 +122,21 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   const lang = trLang || pickTrLang(typeof navigator === 'undefined' ? [] : navigator.languages, locale)
   // 내 화면 자막을 숨겼으면 번역 요청도 하지 않는다(보이지 않는 번역에 문장마다 외부 AI·DB 계량 — r4 T08 보강). 더빙은 translateCaption 을 따로 부른다
   const shown = useTranslated(latest, tr && show, lang, ctx.seminarId)
+  // 서버 선번역 언어 등록(마스터 A안) — 번역 자막을 보는 동안 내 언어를 세미나에 알린다(켤 때·언어 바꿀 때·4분마다). 발표자 조각 전사 때 서버가 이 언어로
+  //  같이 번역해 자막에 실어 보내므로 다음 자막부터 번역 요청 없이 바로 보인다. 실패는 조용히(이전 경로 = 자기 요청 번역이 그대로 동작)
+  useEffect(() => {
+    if (!(tr && show && room && lang && isUuid(ctx.seminarId))) return
+    const smnId = ctx.seminarId
+    const post = () =>
+      void piFetch('/api/speech/lang', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ smnId, lang }),
+      }).catch(() => {})
+    post()
+    const id = setInterval(post, TR_LANG_PING_MS)
+    return () => clearInterval(id)
+  }, [tr, show, room, lang, ctx.seminarId])
   const langs = useLangNames(locale)
   // 목록 앞 '내 언어'(브라우저 선호·UI·고른 언어) — 76개 목록을 다 훑지 않게(보강 r6 T08). 전체 목록에도 그대로 남긴다(선택값 1개만 표시되므로 중복 무해)
   const mine = prefLangs(typeof navigator === 'undefined' ? [] : navigator.languages, locale, lang)
@@ -313,6 +332,8 @@ export const captions: RoomFeature = {
           text: c.text,
           lang: c.lang,
           sig: c.sig,
+          tr: c.tr,
+          trSig: c.trSig,
           at: Date.now(),
         })
     } else if (m.topic === 'state') {
@@ -333,6 +354,8 @@ export const captions: RoomFeature = {
         text: c.text,
         lang: c.lang,
         sig: c.sig,
+        tr: c.tr,
+        trSig: c.trSig,
         at: Date.now(),
       })
   },

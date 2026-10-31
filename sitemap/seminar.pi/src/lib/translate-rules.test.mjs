@@ -448,7 +448,10 @@ test('사용자 누적 상한 — 서버 관문이 계량 전 거절(병렬 읽�
   ])
   // 누적 확인은 fn_use_smn_ai(계량) 보다 앞, 요금제 확인과 Promise.all(R-P1)
   assert.ok(gate.indexOf("apiError('SPEECH_USR_QUOTA', 429)") < gate.indexOf("rpc('fn_use_smn_ai'"))
-  assert.ok(/Promise\.all\(\[\s*planAiOk\(t\.smnId\),\s*kind === 'VC' \? 0 : usrAiUsed\(/.test(gate))
+  // usrCap = 'VC' 아님 && opts.usrCap !== false — 서버 선번역(chunk)만 개인 상한을 건너뛴다(A안, 팀장 지적 P2)
+  assert.ok(/const usrCap = kind !== 'VC' && opts\.usrCap !== false/.test(gate))
+  assert.ok(/Promise\.all\(\[\s*planAiOk\(t\.smnId\),\s*usrCap \? usrAiUsed\(/.test(gate))
+  assert.ok(/if \(usrCap && used \+ amount > usrAiMax\(/.test(gate))
   assert.ok(/\.select\(col\)\.eq\('smn_id', smnId\)\.eq\('usr_id', usrId\)/.test(gate)) // 칼럼 하나만(R-P3)
   for (const k of ['SPEECH_USR_TRANS_CHR', 'SPEECH_USR_TTS_CHR']) {
     assert.ok(env.includes(`${k}: z.coerce`) && env.includes(`${k}: process.env.${k}`), k)

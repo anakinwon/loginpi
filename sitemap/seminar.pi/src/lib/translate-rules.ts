@@ -228,6 +228,13 @@ export function trStopOf(status: number, code: unknown): TrStop | null {
 // 번역 언어를 바꾼 뒤 요청까지 기다리는 시간 — 닫힌 select 에서 화살표로 훑으면 언어마다 change 가 나서 언어 수만큼 외부 AI 를 부른다(R-P2 디바운스)
 export const TR_LANG_SETTLE_MS = 400
 
+// 서버 선번역 언어 등록(마스터 A안 2026-10-31, sql/026 smn_trans_lang) — 청중 화면이 번역 자막을 켠 동안 TR_LANG_PING_MS 마다 /api/speech/lang 에 알리고,
+//  음성 조각 전사(/api/speech/chunk)는 최근 TR_LANG_ACTIVE_MS 안 언어 최대 TR_LANG_MAX 개로 같이 번역한다(app.send d 4KB — 3개 × 500자면 fitCaption 이 덜어 냄). 코드의 TR_LANG_MAX 가 정본(sql/026 주석의 '최대 5'는 적용 당시 값)
+export const TR_LANG_PING_MS = 4 * 60_000
+export const TR_LANG_ACTIVE_MS = 10 * 60_000
+// 최대 3 — 참가자 1명이 언어를 돌려 등록해 말한 사람에게 번역 비용·지연을 강제하는 폭을 줄인다(검증 지적 P2 2026-10-31). 사용자당 1개 제한은 (세미나×사용자) 행으로 바꿀 때(후속)
+export const TR_LANG_MAX = 3
+
 // 번역 대기 중 표시(보강 r5 T08) — 새 자막이 오면 번역이 오는 1~2초 동안 원문(외국어)이 번쩍였다가 번역으로 바뀌었다(5초 조각마다).
 //  대기 중엔 직전 번역을 그대로 두고(새 자막이 직전 번역을 받은 뒤 TR_HOLD_MS 안에 왔을 때만)(실시간 통역처럼 한 박자 늦게), 번역 실패·언어 바뀜·오래됨이면 원문.
 //  key = '' 는 번역 안 함(꺼짐·같은 언어·서명 없음·중단). out = 마지막으로 받은 번역(key·언어·받은 시각), failKey = 실패한 key, capAt = 지금 자막을 받은 시각(렌더 중 Date.now 금지 — 순수)

@@ -15,13 +15,17 @@ import { translateCaption, trStop } from '../captions/translate'
 import { capRoom } from '../captions' // 순환 import — 렌더 안에서만 읽는다(모듈 평가 때 접근 없음)
 import { sameLang } from '@/lib/translate-rules'
 import { isUuid } from '@/lib/seminar-rules'
-import { DUB_FAIL_MAX, dubRate, dubStale, dubStop, dubVolume, once, pushDub, TTS_MAX_CHARS } from '@/lib/speech-rules'
+import { DUB_FAIL_MAX, dubRate, dubStale, dubStop, dubVolume, localDubRate, once, pickVoice, pushDub, TTS_MAX_CHARS } from '@/lib/speech-rules'
+import { preOf } from '../captions/caption-rules'
 
 export const dubOn = featureStore(false)
 const dubLang = featureStore('') // 듣는 언어('' = 원문 → 더빙 없음). 자막 시트 언어 선택을 DubRow 가 옮겨 담는다
 const srcSame = featureStore(false) // 마지막 원격 자막 언어 = 듣는 언어(더빙 안 하는 화자 → 원음 100%, dubVolume)
 
-type Item = { ac: AbortController; audio: Promise<Blob | null>; at: number } // at = 자막 받은 시각(dubStale)
+// 재생물 — 클라우드 합성 Blob 또는 기기 내 합성 지시(say + voice). 기기 내 합성(speechSynthesis)은 지연 0·과금 0 이라 **있으면 먼저**(마스터 A안 2026-10-31),
+//  그 언어 목소리가 없거나 기기가 못 하면(Android WebView 는 객체만 있고 목소리 0) 클라우드(/api/speech/tts). 목소리는 기기 표준 음성(M-3 의 '표준 합성 음성' 유지, 서비스 통일 음성은 아님)
+type Local = { say: string; voice: SpeechSynthesisVoice }
+type Item = { ac: AbortController; audio: Promise<Blob | Local | null>; at: number } // at = 자막 받은 시각(dubStale)
 let el: HTMLAudioElement | null = null
 let queue: Item[] = []
 let playing = false
@@ -30,6 +34,22 @@ let curUrl: string | null = null
 let playFails = 0 // 연속 재생 실패 수(DUB_FAIL_MAX) — 정상 재생 1번이면 0
 
 const canDub = () => typeof Audio !== 'undefined' && typeof URL !== 'undefined' && !!URL.createObjectURL
+
+// 기기 내 음성 합성 — 기능 탐지만(UA 아님). 목소리 목록은 비동기로 채워진다(voiceschanged). 한 번이라도 재생 오류가 나면 이 입장 동안 클라우드로 후퇴(localBroken)
+const canSpeak = () => typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined'
+let voices: SpeechSynthesisVoice[] = []
+let localBroken = false
+function loadVoices() {
+  if (!canSpeak()) return
+  voices = speechSynthesis.getVoices()
+  speechSynthesis.onvoiceschanged = () => {
+    voices = speechSynthesis.getVoices()
+  }
+}
+// 듣는 언어의 목소리(speech-rules pickVoice) — 재생 오류 뒤(localBroken)엔 null = 클라우드
+const localVoice = (lang: string) => (localBroken ? null : pickVoice(lang, voices))
+const isLocal = (b: Blob | Local | null): b is Local => !!b && typeof (b as Local).say === 'string'
+const LOCAL_SPEAK_MAX_MS = 20_000 // 기기 합성 1문장 상한(3초 조각 번역은 보통 2~6초) — 넘으면 끝 신호 누락으로 보고 다음으로
 
 // 무음 WAV(8kHz 8bit mono 0.05초) — 제스처 안 잠금 해제용
 function silentWav() {
@@ -52,8 +72,18 @@ function silentWav() {
   return URL.createObjectURL(new Blob([b.buffer], { type: 'audio/wav' }))
 }
 
-// 제스처 안에서만 부른다 — 요소를 만들고 무음 재생으로 잠금 해제
+// 제스처 안에서만 부른다 — 요소를 만들고 무음 재생으로 잠금 해제. 기기 내 합성도 같은 제스처에서 무음 1회(iOS 는 사용자 동작 뒤에만 말한다)
 function unlock(onBlocked: () => void) {
+  if (canSpeak()) {
+    loadVoices()
+    try {
+      const u = new SpeechSynthesisUtterance(' ')
+      u.volume = 0
+      speechSynthesis.speak(u)
+    } catch {
+      localBroken = true
+    }
+  }
   if (!el) el = new Audio()
   el.preservesPitch = true // 속도를 바꿔도 음높이 유지(기본값이지만 명시)
   const url = silentWav()
@@ -77,6 +107,7 @@ function stopAll() {
   playing = false
   playFails = 0
   srcSame.set(false)
+  if (canSpeak()) speechSynthesis.cancel()
   if (curUrl) URL.revokeObjectURL(curUrl)
   curUrl = null
   if (el) {
@@ -102,6 +133,43 @@ async function pump() {
   }
   // 기다리는 동안 큐 넘침으로 버려졌거나 실패했거나 너무 늦은(dubStale) 문장 → 다음으로
   if (queue[0] !== it || !blob || !el || dubStale(it.at, Date.now())) return done()
+  if (isLocal(blob)) {
+    // 기기 내 합성 — 길이를 미리 모르니 밀린 문장 수로만 가속. 오류(목소리 없음·정책) 1번이면 이 입장 동안 클라우드로
+    const fin = once((failed: boolean) => {
+      if (g !== gen) return
+      if (!failed) playFails = 0
+      else {
+        localBroken = true
+        if (++playFails >= DUB_FAIL_MAX) {
+          dubOn.set(false)
+          alertBlocked?.()
+          return
+        }
+      }
+      done()
+    })
+    // 끝 신호가 영영 안 오는 기기(onend 누락·백그라운드 정지)에 큐가 멈추지 않게 — 상한 안에 안 끝나면 실패로 보고 클라우드로 후퇴
+    const guard = setTimeout(() => {
+      if (canSpeak()) speechSynthesis.cancel()
+      fin(true)
+    }, LOCAL_SPEAK_MAX_MS)
+    const finish = (failed: boolean) => {
+      clearTimeout(guard)
+      fin(failed)
+    }
+    try {
+      const u = new SpeechSynthesisUtterance(blob.say)
+      u.voice = blob.voice
+      u.lang = blob.voice.lang
+      u.rate = localDubRate(queue.length - 1)
+      u.onend = () => finish(false)
+      u.onerror = (e) => finish(!(e.error === 'interrupted' || e.error === 'canceled')) // 끄기(cancel)로 끊긴 건 실패 아님
+      speechSynthesis.speak(u)
+    } catch {
+      finish(true)
+    }
+    return
+  }
   const a = el
   const url = URL.createObjectURL(blob)
   curUrl = url
@@ -129,15 +197,19 @@ async function pump() {
   a.play().catch(() => end(true))
 }
 
-function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null) {
+function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null, pre: { text: string; sig: string | null } | null = null) {
   const lang = dubLang.get()
   // 발표자 언어 = 듣는 언어면 원음 그대로(합성 과금·횟수 낭비 방지)
   if (!dubOn.get() || !lang || !sig || sameLang(src, lang) || !isUuid(ctx.seminarId)) return
   const ac = new AbortController()
-  // 번역은 자막 화면(SA8)과 같은 translateCaption — 같은 문장·언어는 번역 요청 1회(A-3). 서버는 받은 글을 그대로 읽기만 한다
-  const audio = translateCaption(text, src, lang, ctx.seminarId, sig)
-    .then((said) =>
-      said === null || !said.sig || ac.signal.aborted || said.text.trim().length > TTS_MAX_CHARS // 긴 문장은 서버가 400 — 요청 없이 건너뜀
+  // 번역은 자막 화면(SA8)과 같은 translateCaption — 같은 문장·언어는 번역 요청 1회(A-3), 서버 선번역(pre)이 있으면 요청 없음. 서버는 받은 글을 그대로 읽기만 한다
+  const audio = translateCaption(text, src, lang, ctx.seminarId, sig, pre)
+    .then((said): Promise<Blob | Local | null> | Local | null => {
+      if (said === null || ac.signal.aborted) return null
+      // 기기 내 합성이 되면 서명·상한과 무관하게 바로(과금·요청 없음)
+      const voice = localVoice(lang)
+      if (voice && said.text.trim()) return { say: said.text.trim(), voice }
+      return !said.sig || said.text.trim().length > TTS_MAX_CHARS // 긴 문장은 서버가 400 — 요청 없이 건너뜀
         ? null
         : piFetch('/api/speech/tts', {
             method: 'POST',
@@ -153,8 +225,8 @@ function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null) {
               ctx.notice(j?.code === 'SPEECH_USR_QUOTA' ? 'dubbing.usrQuota' : 'dubbing.stopped') // 내 누적 한도는 사유를 따로(감사 High 1)
             }
             return null // 분당 횟수·502 등은 그 문장만 건너뜀(자막은 그대로)
-          }),
-    )
+          })
+    })
     .catch(() => null)
   const r = pushDub(queue, { ac, audio, at: Date.now() })
   for (const d of r.dropped) d.ac.abort()
@@ -168,7 +240,10 @@ export function DubRow({ lang }: { lang: string }) {
   const on = useStore(dubOn)
   const stop = useStore(trStop)
   const [ok, setOk] = useState(false) // 기능 탐지는 마운트 뒤(서버 렌더와 어긋나지 않게)
-  useEffect(() => setOk(canDub()), [])
+  useEffect(() => {
+    setOk(canDub() || canSpeak())
+    loadVoices() // 목소리 목록을 미리 채운다(첫 문장부터 기기 내 합성이 잡히게)
+  }, [])
   useEffect(() => {
     // 언어를 바꾸면 이미 받은 이전 언어 음성은 버린다
     if (dubLang.get() !== lang) stopAll()
@@ -228,7 +303,7 @@ export const dubbing: RoomFeature = {
     const c = parseCaption(m.d)
     if (!c) return
     srcSame.set(sameLang(c.lang, dubLang.get())) // 엔진은 내 음성을 되돌려 주지 않는다 — 원격 화자만
-    enqueue(ctx, c.text, c.lang, c.sig)
+    enqueue(ctx, c.text, c.lang, c.sig, preOf(c, dubLang.get()))
   },
   onReset: () => {
     dubOn.reset()
