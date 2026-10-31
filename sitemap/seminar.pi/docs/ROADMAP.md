@@ -65,7 +65,7 @@
 - [x] (마스터) Vercel 프로젝트 생성(Root `sitemap/seminar.pi`) (2026-10-25)
 - [x] (마스터) Pi Browser 실기기 시험 — Android 2대 로그인·화면 연결 성공(2026-10-25)
 - [ ] (마스터) Pi Browser iOS 실기기 시험 — iOS ↔ Android 화면 연결(카메라 권한·영상 자동재생이 iOS WebView 에서 다를 수 있음)
-- [ ] (마스터) 호스팅 결정 — 시험 = **집 상시 PC 엔진**(신호 cloudflared 터널 + 영상 UDP 7882, `media/docs/HOME_NODE_GUIDE.md`, 비용 0원) 운영 중. 운영 호스팅(VM 리전·사양)은 [확인중 : 마스터] — 기한 : M1 외부(LTE) 시험 전까지 — 가정용 회선 약관·정전·Pi Node 대역폭 공유 때문에 운영은 VM 권장(가이드 7·8절)
+- [x] (마스터) 호스팅 결정 — **Vultr 서울 VPS 엔진 운영 중**(2026-10-31, `media/docs/VPS_GUIDE.md` — Caddy 443 신호 + UDP 7882 + 보조 TURN coturn 8절). 집 상시 PC 엔진(`HOME_NODE_GUIDE.md`)은 시험용·되돌리기 경로로만 유지(VPS_GUIDE 6절)
 
 ## Phase 1 — MVP
 
