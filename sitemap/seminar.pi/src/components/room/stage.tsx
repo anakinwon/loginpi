@@ -212,7 +212,7 @@ type StageProps = {
   layout: RoomLayout | null // 발표자 레이아웃(ntf layout) — 청중·패널은 follow 면 따라 본다
   onPin?: (key: string | null) => void // 발표자가 작은 타일을 고정 → room.setLayout(null = 자동 배치로 되돌림)
   fit?: boolean // PC 맞춤 — 감싸개가 크기 컨테이너(cq 단위)일 때만 켠다(아니면 cqh 가 화면 높이로 잡힌다)
-  fullTop?: ReactNode // 전체 화면일 때만 무대 위에 띄울 알림(손들기 등) — 전체 화면은 이 상자만 보여 바깥 알림이 가려진다
+  stageTop?: ReactNode // 무대 영상 위에 늘 띄울 알림(손들기 등) — 전체 화면(이 상자만 보임)·가로 화면·PC 맞춤 어디서나 보이게(마스터 2026-10-31)
 }
 
 // 레이아웃(설계서 6.2) — 발표자 고정(발행자 1) / 발표 + 패널(큰 무대 1 + 작은 타일 줄 : 모바일 가로 스크롤, 데스크톱 우하단) /
@@ -263,9 +263,9 @@ export function Stage(props: StageProps) {
           {t('tile.unpin')}
         </button>
       )}
-      {full && props.fullTop && (
+      {props.stageTop && (
         <div className="absolute inset-x-0 top-[calc(12px+env(safe-area-inset-top))] z-30 flex justify-center px-3">
-          {props.fullTop}
+          {props.stageTop}
         </div>
       )}
       {/* 대표 영상 더블클릭 = 전체 화면 토글, ESC = 원래대로 */}

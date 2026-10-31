@@ -30,7 +30,6 @@ import { Prejoin } from './prejoin'
 import { Floaters, ReactionMenu } from './reactions'
 import {
   handKey,
-  handNotice,
   handsWaiting,
   isBadGrade,
   layoutFor,
@@ -483,7 +482,6 @@ function Room({
     sayErr(await r.end(), 'endFailed')
   }
 
-  const hands = role === 'presenter' ? handNotice(r.peers, dismissed) : ({ kind: 'none' } as const)
   const fullHands = role === 'presenter' ? handsWaiting(r.peers, dismissed) : []
   const promo = role === 'panel' && !has.audio && !promoHidden && r.state === 'joined'
   const ended = r.state === 'error' || r.state === 'closed'
@@ -603,34 +601,6 @@ function Room({
                   </button>
                 </div>
               )}
-              {hands.kind === 'one' && (
-                <div className="bg-surface-raised flex flex-wrap items-center gap-2 rounded-xl p-3 text-sm">
-                  <p className="min-w-0 flex-1">✋ {t('hand.notice', { name: hands.peer.name })}</p>
-                  <button
-                    type="button"
-                    onClick={async () => sayErr(await r.setPeerRole(hands.peer.peerId, 'panel'), 'actionFailed')}
-                    className={`${btnS} bg-accent text-white`}
-                  >
-                    {t('stage.invite')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDismissed((s) => new Set(s).add(handKey(hands.peer)))}
-                    className={`${btnS} bg-surface`}
-                  >
-                    {t('hand.dismiss')}
-                  </button>
-                </div>
-              )}
-              {hands.kind === 'many' && (
-                <button
-                  type="button"
-                  onClick={() => openPanel('people')}
-                  className="bg-surface-raised w-full rounded-xl p-3 text-left text-sm"
-                >
-                  ✋ {t('hand.waiting', { n: hands.count })}
-                </button>
-              )}
               {/* PC 맞춤(fit) — 이 칸의 남은 높이를 크기 컨테이너로 두고 대표 영상 폭을 min(폭, 높이×16/9)로 → 창 스크롤 없음 */}
               <div className={fit.h ? 'relative min-h-0 flex-1 [container-type:size]' : 'relative'}>
                 <Stage
@@ -649,9 +619,9 @@ function Room({
                   engineSpeaker={r.engineSpeaker}
                   layout={r.layout}
                   onPin={role === 'presenter' ? (k) => void pinForAll(k) : undefined}
-                  fullTop={
+                  stageTop={
                     fullHands.length > 0 && (
-                      // 전체 화면 손들기 알림(마스터 2026-10-31) — 참가자 패널이 화면 밖이라 손든 사람마다 [무대로]·[무시]를 바로 둔다(최대 3명 + 나머지 수)
+                      // 손들기 알림(마스터 2026-10-31) — 무대 위에 늘. 손든 사람마다 [무대로]·[무시]를 바로 둔다(최대 3명 + 나머지는 참가자 패널로)
                       <ul role="status" className="w-full max-w-md space-y-1.5">
                         {fullHands.slice(0, 3).map((p) => (
                           <li key={handKey(p)} className="bg-surface-raised/95 flex items-center gap-2 rounded-xl p-2 text-sm shadow-lg">
@@ -673,8 +643,14 @@ function Room({
                           </li>
                         ))}
                         {fullHands.length > 3 && (
-                          <li className="bg-surface-raised/95 rounded-xl p-2 text-center text-sm">
-                            ✋ {t('hand.waiting', { n: fullHands.length - 3 })}
+                          <li>
+                            <button
+                              type="button"
+                              onClick={() => openPanel('people')}
+                              className="bg-surface-raised/95 w-full rounded-xl p-2 text-center text-sm"
+                            >
+                              ✋ {t('hand.waiting', { n: fullHands.length - 3 })}
+                            </button>
                           </li>
                         )}
                       </ul>
