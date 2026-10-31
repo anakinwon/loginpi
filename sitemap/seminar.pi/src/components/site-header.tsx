@@ -217,17 +217,20 @@ export function SiteHeader() {
   return (
     <>
       <header className="border-b border-white/10">
-        <div className="mx-auto flex max-w-3xl items-center gap-4 px-4 py-3 lg:max-w-none lg:px-8">
+        {/* 모바일 = 1줄 로고 + 언어 콤보·시세칩(최우상단 고정), 2줄 로그인 상태(오른쪽 정렬) — 한 줄에 다 넣으면 360px 에서 화면이 좌우로 밀려 가로 스크롤이 생김(2026-11-01).
+            sm 이상 = 한 줄 : 로고 … 로그인 상태 · 언어 콤보 · 시세칩(loginpi 순서) */}
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 lg:max-w-none lg:px-8">
           <Link href="/" className="text-lg font-bold">
             seminar.pi
           </Link>
-          <nav className="ml-auto flex items-center gap-3">
-            {/* 로그인 버튼 글자가 좁은 화면에서 두 줄로 꺾이지 않게 */}
-            <div className="[&_a]:whitespace-nowrap [&_button]:whitespace-nowrap">
-              <AuthStatus />
-            </div>
+          <div className="ml-auto flex shrink-0 items-center gap-2 sm:order-last sm:ml-0">
             <LanguageSwitcher locale={locale} showPiValuation={SHOW_PI_VALUATION} />
             {SHOW_PI_VALUATION && <PiPriceChip locale={locale} />}
+          </div>
+          {/* 로그인 버튼 글자가 좁은 화면에서 두 줄로 꺾이지 않게 */}
+          {/* 긴 사용자명·긴 locale 라벨(de·ru)이면 버튼 단위로 다음 줄로 넘김(버튼 글자 자체는 안 꺾음) — 어떤 경우도 화면 폭을 넘지 않게 */}
+          <nav className="order-last flex w-full min-w-0 justify-end sm:order-none sm:ml-auto sm:w-auto [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap [&>span]:flex-wrap [&>span]:justify-end">
+            <AuthStatus />
           </nav>
         </div>
       </header>
