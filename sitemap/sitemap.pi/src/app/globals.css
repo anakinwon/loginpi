@@ -319,18 +319,19 @@
     pointer-events: none;
     animation: ship-boom var(--fly) ease-out forwards;
   }
+  /* 소닉붐 링 — 크게 나타나 중심으로 모이며 작아짐(도착 연출 @pi/warp 의 모이는 링과 같은 방향, 마스터 2026-11-01 "동그라미가 작아지는 효과처럼") */
   @keyframes ship-boom {
     0%,
     36% {
-      transform: translate(-50%, -50%) scale(0.2);
+      transform: translate(-50%, -50%) scale(14);
       opacity: 0;
     }
     42% {
-      transform: translate(-50%, -50%) scale(0.8);
+      transform: translate(-50%, -50%) scale(10);
       opacity: 1;
     }
     100% {
-      transform: translate(-50%, -50%) scale(14);
+      transform: translate(-50%, -50%) scale(0.2);
       opacity: 0;
     }
   }
