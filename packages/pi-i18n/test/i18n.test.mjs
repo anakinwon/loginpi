@@ -85,8 +85,9 @@ test('PreferredLocaleScript : 저장값 적용 · 같으면 그대로 · 제외 
   assert.ok(!html.includes('</'), '</script> 조기 종료 방지')
   const run = (saved, pathname, search = '') => {
     let to = null
-    const location = { pathname, search, hash: '', replace: (u) => (to = u) }
-    new Function('localStorage', 'location', html)({ getItem: () => saved }, location)
+    // 이동 주소는 같은 출처 절대 주소(열린 리디렉트 차단) — 시험은 경로+질의만 비교. geoUrl 끔(이 시험은 저장값 적용만)
+    const location = { pathname, search, hash: '', origin: 'https://app.example', replace: (u) => { const x = new URL(u); to = x.origin === 'https://app.example' ? x.pathname + x.search : 'OTHER-ORIGIN' } }
+    new Function('localStorage', 'location', 'URL', html)({ getItem: (k) => (k === 'preferred_locale' ? saved : null), setItem: () => {} }, location, URL)
     return to
   }
   assert.equal(run('en', '/', '?x=1'), '/en?x=1')

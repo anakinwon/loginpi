@@ -26,9 +26,9 @@ async function run({ path = '/', store = {}, country = 'JP', delay = 0 }) {
   const out = { replaced: null, fetched: 0, ls }
   const ctx = {
     localStorage: { getItem: (k) => (k in ls ? ls[k] : null), setItem: (k, v) => { ls[k] = String(v) } },
-    location: { pathname: path, search: '', hash: '', replace: (u) => { out.replaced = u } },
+    location: { pathname: path, search: '', hash: '', origin: 'https://app.example', replace: (u) => { out.replaced = new URL(u).pathname } },
     fetch: () => { out.fetched++; return new Promise((r) => setTimeout(() => r({ json: () => Promise.resolve({ country }) }), delay)) },
-    Date, String,
+    Date, String, URL,
   }
   vm.runInNewContext(html, ctx)
   await new Promise((r) => setTimeout(r, delay + 10))
@@ -90,4 +90,18 @@ test('국가 응답이 1.5초 넘게 늦으면 이동하지 않고 저장만(다
   assert.equal(o.replaced, null)
   assert.equal(o.ls.preferred_locale, 'ja')
   assert.equal(o.ls.preferred_locale_src, 'geo')
+})
+
+test('열린 리디렉트 차단 : /en//evil.com 에서 저장 언어(ko)로 돌아갈 때 같은 출처 경로로만 이동', async () => {
+  const html = PreferredLocaleScript({ locales: ROUTING_LOCALES }).props.dangerouslySetInnerHTML.__html
+  const ls = { preferred_locale: 'ko', preferred_locale_src: 'manual' }
+  let replaced = null
+  for (const path of ['/en//evil.com', '/en/\evil.com', '/en///evil.com/x']) {
+    vm.runInNewContext(html, {
+      localStorage: { getItem: (k) => (k in ls ? ls[k] : null), setItem: () => {} },
+      location: { pathname: path, search: '', hash: '', origin: 'https://app.example', replace: (u) => { replaced = u } },
+      fetch: () => Promise.reject(new Error('no')), Date, String, URL,
+    })
+    assert.ok(replaced && new URL(replaced).origin === 'https://app.example', `${path} → ${replaced}`)
+  }
 })
