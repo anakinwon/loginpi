@@ -20,6 +20,7 @@
     "@pi/i18n": "workspace:*",
     "@pi/mon": "workspace:*",
     "@pi/payments": "workspace:*",
+    "@pi/warp": "workspace:*",
     "@supabase/supabase-js": "^2.107.0",
     "@t3-oss/env-nextjs": "^0.13.11",
     "mediabunny": "1.62.1",

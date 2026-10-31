@@ -8,6 +8,7 @@
 //  floating 이면 화면 하단 고정 + 뷰포트 전체 별(메인 버블), 아니면 인라인 + 카드 안 별(상세)
 import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { markWarp } from '@pi/warp'
 import { WarpField } from './warp-field'
 
 // 점프 연출 길이(ms) — 래퍼 인라인 --fly 로 CSS(.ship-jump / .ship-boom / .ship-hole / .hud-flash)에 전달하는 단일 소스. 1.0s → 1.4s(마스터 2026-10-16 "조금 늦춰")
@@ -41,7 +42,7 @@ export function LeaveDialog({
   // 실제 열기 — noopener 옵션은 반환값이 항상 null 이라 차단 여부를 알 수 없어, 창을 받은 뒤 opener 를 끊는다(referrer 는 전달됨: 차단 판별과 맞교환)
   const go = () => {
     onConfirm?.()
-    const w = window.open(url, '_blank')
+    const w = window.open(markWarp(url), '_blank') // 출발 표시(utm_source=sitemap.pi) — 도착 사이트가 '음속에서 감속해 멈추는' 반대 연출(@pi/warp WarpArrival)
     if (w) {
       w.opener = null
       onCancel()
@@ -132,7 +133,7 @@ export function LeaveDialog({
               {t('popupBlocked')}{' '}
               <a
                 className="font-semibold underline"
-                href={url}
+                href={markWarp(url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={onCancel}

@@ -26,6 +26,7 @@
     "@pi/guard": "workspace:*",
     "@pi/i18n": "workspace:*",
     "@pi/mon": "workspace:*",
+    "@pi/warp": "workspace:*",
     "@supabase/supabase-js": "^2.117.3",
     "@xyflow/react": "12.12.0",
     "codemirror": "6.0.2",

@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { SessionProvider } from 'next-auth/react'
 import { PiSdkScript } from '@pi/auth/client'
 import { getDir, PreferredLocaleScript } from '@pi/i18n'
+import { WarpArrival } from '@pi/warp/client'
 import { routing } from '@/i18n/routing'
 import { PiAuthRoot } from './pi-auth-root'
 import Rum from './rum'
@@ -32,6 +33,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
       <body className="min-h-screen antialiased">
         {/* 저장된 언어(preferred_locale) 적용 — 파싱 중 1회, 하이드레이션·Pi SDK·인증 시작 전(표준 6절) */}
         <PreferredLocaleScript locales={routing.locales} />
+        {/* sitemap.pi 에서 워프로 넘어온 방문 = 음속에서 감속해 멈추는 도착 연출(@pi/warp, 2026-11-01) */}
+        <WarpArrival />
         <PiSdkScript />
         <NextIntlClientProvider>
           {/* Google 미설정 환경은 /api/auth/* 가 404 라 세션 null — Pi 로그인만 동작 */}

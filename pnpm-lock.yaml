@@ -29,6 +29,9 @@ importers:
       '@pi/mon':
         specifier: workspace:*
         version: link:packages/pi-mon
+      '@pi/warp':
+        specifier: workspace:*
+        version: link:packages/pi-warp
       '@supabase/supabase-js':
         specifier: ^2.107.0
         version: 2.107.0
@@ -223,6 +226,12 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/pi-warp:
+    dependencies:
+      react:
+        specifier: ^19
+        version: 19.2.7
+
   sitemap/schema.pi:
     dependencies:
       '@anthropic-ai/sdk':
@@ -252,6 +261,9 @@ importers:
       '@pi/mon':
         specifier: workspace:*
         version: link:../../packages/pi-mon
+      '@pi/warp':
+        specifier: workspace:*
+        version: link:../../packages/pi-warp
       '@supabase/supabase-js':
         specifier: ^2.117.3
         version: 2.117.3
@@ -334,6 +346,9 @@ importers:
       '@pi/payments':
         specifier: workspace:*
         version: link:../../packages/pi-payments
+      '@pi/warp':
+        specifier: workspace:*
+        version: link:../../packages/pi-warp
       '@supabase/supabase-js':
         specifier: ^2.107.0
         version: 2.117.3
@@ -401,6 +416,9 @@ importers:
       '@pi/mon':
         specifier: workspace:*
         version: link:../../packages/pi-mon
+      '@pi/warp':
+        specifier: workspace:*
+        version: link:../../packages/pi-warp
       '@supabase/supabase-js':
         specifier: ^2.107.0
         version: 2.107.0

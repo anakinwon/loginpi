@@ -1,0 +1,17 @@
+{
+  "name": "@pi/warp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pi 멀티사이트 공용 워프 연출 — sitemap.pi 에서 떠날 때 음속 돌파(sitemap.pi leave-dialog)의 반대 : 도착 사이트에서 음속으로 접근해 멈추는 효과(WarpArrival) + 출발 표시(markWarp)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.tsx"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "peerDependencies": {
+    "react": "^19"
+  }
+}
