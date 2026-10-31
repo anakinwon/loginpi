@@ -85,10 +85,10 @@ export const FEATURES: Feature[] = [
       },
       {
         id: 'oneToTwo',
-        status: 'doing',
+        status: 'done',
         stage: 'M1',
         ref: ['Galène'],
-        note: 'LAN ✓ · WAN ✓ (VPS probe 4/4) · TURN ✓ (coturn relay) · LTE …',
+        note: 'LAN ✓ · WAN ✓ (VPS probe 4/4) · TURN ✓ (coturn relay) · master sign-off 10-31',
       },
       {
         id: 'recovery',
@@ -117,10 +117,10 @@ export const FEATURES: Feature[] = [
       },
       {
         id: 'roomService',
-        status: 'doing',
+        status: 'done',
         stage: 'M5',
         ref: ['Galène', 'LiveKit'],
-        note: 'ticket·status ✓ · host-away ✓ · room admin ✓ · device ✓ · mon env ✓ · sample …',
+        note: 'ticket·status ✓ · host-away ✓ · room admin ✓ · device ✓ · mon env ✓ · master sign-off 10-31',
       },
       // 룸 화면(S3·S4) — UI 설계서 v1.0(c16bc230) → M1~M2(a7affafb) → v1.1·v1.2(8eed64d2·74e2c7cd), 브라우저 QA ✓
       {
@@ -199,9 +199,9 @@ export const FEATURES: Feature[] = [
     steps: [
       {
         id: 'appRelay',
-        status: 'doing',
+        status: 'done',
         ref: ['Jitsi', 'LiveKit'],
-        note: 'v1.3.3 ✓ · QA ✓ · engine ✓ · WebView guards ✓ · device …',
+        note: 'v1.3.3 ✓ · QA ✓ · engine ✓ · WebView guards ✓ · master sign-off 10-31',
       },
       // 남은 막힘 없음(DB·QA·키) — 완료, 마이크 동의 화면 실기기는 대기(device …)
       {
@@ -218,9 +218,9 @@ export const FEATURES: Feature[] = [
     steps: [
       {
         id: 'shareLinks',
-        status: 'doing',
+        status: 'done',
         ref: ['seminar.pi'],
-        note: 'QA ✓ · Pi Browser path ✓ · device …',
+        note: 'QA ✓ · Pi Browser path ✓ · master sign-off 10-31',
       },
     ],
   },
@@ -230,9 +230,9 @@ export const FEATURES: Feature[] = [
     steps: [
       {
         id: 'noiseLight',
-        status: 'doing',
+        status: 'done',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · WebView guards ✓ · device …',
+        note: 'QA ✓ · WebView guards ✓ · master sign-off 10-31',
       },
     ],
   },
@@ -242,9 +242,9 @@ export const FEATURES: Feature[] = [
     steps: [
       {
         id: 'liveCaptions',
-        status: 'doing',
+        status: 'done',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · engine ✓ · key ✓ · device …',
+        note: 'QA ✓ · engine ✓ · key ✓ · master sign-off 10-31',
       },
     ],
   },
@@ -293,9 +293,9 @@ export const FEATURES: Feature[] = [
     steps: [
       {
         id: 'aiNotes',
-        status: 'doing',
+        status: 'done',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · engine ✓ · key ✓ · bucket ✓ · device …',
+        note: 'QA ✓ · engine ✓ · key ✓ · bucket ✓ · master sign-off 10-31',
       },
     ],
   },
@@ -305,9 +305,9 @@ export const FEATURES: Feature[] = [
     steps: [
       {
         id: 'inPersonNotes',
-        status: 'doing',
+        status: 'done',
         ref: ['seminar.pi'],
-        note: 'QA ✓ · key ✓ · STT v2 ✓ · M/F speakers ✓ · device …',
+        note: 'QA ✓ · key ✓ · STT v2 ✓ · M/F speakers ✓ · master sign-off 10-31',
       },
     ],
   },
@@ -317,9 +317,9 @@ export const FEATURES: Feature[] = [
     steps: [
       {
         id: 'captionTranslate',
-        status: 'doing',
+        status: 'done',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · engine ✓ · key ✓ · device …',
+        note: 'QA ✓ · engine ✓ · key ✓ · master sign-off 10-31',
       },
     ],
   },
@@ -329,9 +329,9 @@ export const FEATURES: Feature[] = [
     steps: [
       {
         id: 'dubbing',
-        status: 'doing',
+        status: 'done',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · engine ✓ · key ✓ · device …',
+        note: 'QA ✓ · engine ✓ · key ✓ · master sign-off 10-31',
       },
     ],
   },
