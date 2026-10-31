@@ -1,0 +1,1089 @@
+{
+  "common": {
+    "localeSwitcher": {
+      "button": "Schimbă limba",
+      "search": "Căută limba",
+      "empty": "Niciun rezultat"
+    }
+  },
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Seminarii video live la care te alături cu Pi"
+  },
+  "home": {
+    "description": "Gazdele deschid seminarii, iar participanții se alătură sesiunilor video live cu Pi.",
+    "badge": "Seminarii live pe insule frumoase",
+    "headline": "Urmăriți, ascultați și învățați împreună — live",
+    "ctaBrowse": "Răsfoiește seminarii",
+    "ctaPlan": "Vezi planurile",
+    "features": {
+      "video": "Video live",
+      "caption": "Subtitrări și traducere",
+      "notes": "Note de ședință AI",
+      "pay": "Plătește cu Pi"
+    },
+    "listTitle": "Seminarii",
+    "cal": {
+      "title": "Calendar seminarii",
+      "desc": "De la seminarii trecute la cele viitoare — atinge o dată pentru detalii.",
+      "legendSmn": "Seminarii",
+      "legendEnded": "Seminarii trecute",
+      "legendMine": "Evenimentele mele",
+      "failed": "Nu s-au putut încărca datele seminariilor. Te rugăm să încerci din nou mai târziu.",
+      "open": "Vezi detalii"
+    }
+  },
+  "nav": {
+    "link": "Conectează contul",
+    "privacy": "Confidențialitate",
+    "plan": "Planuri",
+    "rooms": "Camere",
+    "admin": "Administrator",
+    "users": "Utilizatori",
+    "home": "Acasă",
+    "privacyShort": "Confidențialitate",
+    "menu": "Meniu principal",
+    "fold": "Restrânge meniul",
+    "unfold": "Extinde meniul"
+  },
+  "auth": {
+    "checking": "Se verifică autentificarea…",
+    "signedIn": "{name}",
+    "inPerson": "Note în persoană",
+    "required": "Te rugăm să te autentifici cu contul tău Pi.",
+    "signIn": "Autentifică-te cu Pi",
+    "openInPiBrowser": "Deschide această pagină în Pi Browser pentru a te autentifica cu contul tău Pi.",
+    "authenticating": "Se autentifică…",
+    "google": "Autentifică-te cu Google",
+    "signOut": "Deconectare",
+    "or": "sau",
+    "linkRequired": "Ești autentificat cu Google, dar nu este încă legat de un cont Pi. Emite un cod de legătură în Pi Browser și introdu-l aici.",
+    "linkNeeded": "Este necesară conectarea contului Pi",
+    "linkCheckFailed": "Nu s-a putut verifica starea legăturii contului tău (eroare temporară a serverului). Te rugăm să reîmprospătezi în scurt timp."
+  },
+  "piOAuth": {
+    "signingIn": "Se autentifică cu contul tău Pi…",
+    "failed": "Autentificarea Pi a eșuat. Te rugăm să încerci din nou.",
+    "stateMismatch": "Nu s-a putut verifica această cerere de autentificare (expirată sau altă filă). Te rugăm să încerci din nou.",
+    "retry": "Reîncearcă",
+    "backHome": "Acasă"
+  },
+  "link": {
+    "title": "Conectează contul",
+    "intro": "Conectează contul cu care te-ai autentificat în Pi Browser la autentificarea Google într-un browser obișnuit. După conectare, poți utiliza același cont pe un browser de PC.",
+    "checking": "Se verifică autentificarea…",
+    "piIssueTitle": "Pentru a te autentifica și dintr-un browser obișnuit",
+    "codeHint": "Emite codul de mai jos, apoi autentifică-te cu Google pe un browser de PC și introdu-l pe pagina de conectare a contului (în 10 minute).",
+    "piIssue": "Emite cod de conectare",
+    "reissue": "Emite un cod nou",
+    "expiresIn": "Expiră în {min} min",
+    "enterTitle": "Introdu codul de conectare",
+    "enterHint": "În Pi Browser, deschide seminar.pi → Conectează contul → Emite cod de conectare, apoi introdu codul din 6 cifre.",
+    "codeLabel": "Cod de conectare",
+    "submit": "Conectează",
+    "done": "Conectat. Acum poți utiliza și autentificarea Google.",
+    "linked": "{name} este conectat la autentificarea Google."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Autentificarea este necesară",
+    "AUTH_PI_REQUIRED": "Autentificarea Pi este necesară",
+    "AUTH_PI_SESSION_INVALID": "Sesiunea ta a expirat. Te rugăm să te autentifici din nou",
+    "AUTH_PI_TOKEN_INVALID": "Verificarea autentificării Pi a eșuat",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Informațiile de autentificare Pi lipsesc",
+    "FORBIDDEN": "Nu ai permisiune",
+    "BAD_REQUEST": "Cerere incorectă",
+    "BAD_REQUEST_BODY": "Cerere incorectă",
+    "INVALID_INPUT": "Intrare invalidă",
+    "QUERY_FAILED": "Nu s-a putut încărca",
+    "SAVE_FAILED": "Nu s-a putut salva",
+    "INTERNAL": "Ceva nu a mers bine",
+    "SERVER_CONFIG": "Eroare de configurare a serverului. Te rugăm să contactezi operatorul",
+    "PI_API_CONNECT_FAILED": "Nu s-a putut ajunge la Pi Network",
+    "DB_UNAVAILABLE": "Datele sunt temporar indisponibile. Te rugăm să încerci din nou mai târziu",
+    "NOT_FOUND": "Nu a fost găsit",
+    "RATE_LIMITED": "Prea multe cereri. Te rugăm să încerci din nou în scurt timp",
+    "PAYLOAD_TOO_LARGE": "Cererea este prea mare",
+    "NETWORK": "Verifică-ți conexiunea la rețea",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Acest nume de utilizator Pi este deja înregistrat cu credențiale diferite. Te rugăm să contactezi administratorul",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Acest cont este inactiv. Te rugăm să contactezi administratorul",
+    "AUTH_GOOGLE_REQUIRED": "Autentificarea Google este necesară.",
+    "LINK_CODE_INVALID": "Codul de conectare este invalid sau a expirat. Emite unul nou în Pi Browser.",
+    "LINK_ALREADY_LINKED": "Acest cont este deja conectat.",
+    "LINK_CODE_GEN_FAILED": "Nu s-a putut crea un cod de conectare. Te rugăm să încerci din nou mai târziu.",
+    "AUTH_DB_UNAVAILABLE": "Nu s-a putut salva contul tău, deci autentificarea a eșuat. Te rugăm să încerci din nou mai târziu.",
+    "LINK_TRY_LIMIT": "Prea multe coduri de conectare incorecte. Încearcă din nou în 15 minute.",
+    "PRICE_UNAVAILABLE": "Nu s-a putut obține prețul Pi. Te rugăm să încerci din nou în scurt timp",
+    "QUOTE_EXPIRED": "Cotația de plată a expirat. Te rugăm să plătești din nou",
+    "PLAN_EXHAUSTED": "Ai folosit tot timpul alocat seminariilor. Reîncarcă pe pagina Planuri",
+    "HOST_AWAY": "Gazda nu este în cameră. Poți intra după ce gazda se alătură",
+    "PLAN_AI_PAID": "Funcțiile AI sunt disponibile pe planurile plătite",
+    "AI_UNAVAILABLE": "Funcțiile AI nu sunt disponibile momentan",
+    "SPEECH_CHUNK_INVALID": "Formatul fragmentului audio este invalid",
+    "SPEECH_NOT_LIVE": "Acest seminar nu este live",
+    "SPEECH_NO_AGR": "Este necesar consimțământul pentru procesarea vocală",
+    "SPEECH_RATE": "Prea multe cereri vocale. Te rugăm să încerci din nou în scurt timp",
+    "SPEECH_QUOTA": "Timpul de procesare vocală pentru acest seminar a fost epuizat",
+    "SPEECH_USR_QUOTA": "Ai epuizat limita de traducere și voce tradusă pentru acest seminar",
+    "SPEECH_FAILED": "Nu s-a putut converti vorbirea în text",
+    "SPEECH_STAGE_ONLY": "Doar persoanele de pe scenă pot folosi subtitrări vocale",
+    "TRANSLATE_FAILED": "Nu s-a putut traduce subtitrarea",
+    "POLL_CLOSED": "Acest sondaj este închis",
+    "NOTE_NOT_RECORDING": "Aceste note nu sunt înregistrate",
+    "NOTE_SHOT_INVALID": "Captură de ecran invalidă",
+    "NOTE_AUDIO_INVALID": "Fișier de înregistrare invalid",
+    "NOTE_SHOT_RATE": "Prea multe capturi de ecran",
+    "NOTE_RETRY_SOON": "Poți încerca din nou într-un minut",
+    "SPEECH_TTS_FAILED": "Nu s-a putut crea vocea tradusă",
+    "CAPTION_SIG_INVALID": "Această subtitrare nu a putut fi verificată, deci nu a fost tradusă",
+    "PLAN_EXPIRES_BEFORE_START": "Ora de începere este după expirarea abonamentului acestui plan",
+    "PAY_ALREADY_PAID": "O plată este încă în curs de procesare. Dacă semnai în portofel, încearcă din nou în 3 minute.",
+    "REC_PAID_ONLY": "Înregistrarea este disponibilă doar în seminariile cu plan lunar sau anual cu timp plătit rămas",
+    "REC_NOT_IN_ROOM": "Încă se confirmă că ești în cameră. Încearcă din nou într-un moment",
+    "ENGINE_OFF": "Cheia de administrare a serverului video nu este configurată",
+    "ENGINE_UNAVAILABLE": "Serverul video nu răspunde. Te rugăm să încerci din nou în scurt timp",
+    "ADJ_NOTHING": "Nu mai este timp rămas de redus"
+  },
+  "progress": {
+    "title": "Progresul construcției",
+    "subtitle": "Finalizat, în curs și planificat, pe funcționalități · începând cu {date}",
+    "overall": "Pași generali",
+    "stepsDone": "{done}/{total} pași finalizați ({pct}%)",
+    "featureUnit": "funcționalități",
+    "status": {
+      "done": "Finalizat",
+      "doing": "În curs",
+      "todo": "Planificat",
+      "drop": "Renunțat"
+    },
+    "features": {
+      "F01": {
+        "name": "Autentificare",
+        "desc": "Autentificare Pi Browser, autentificare Google în alte browsere și conectarea ambelor conturi"
+      },
+      "F05": {
+        "name": "Seminar video live",
+        "desc": "Propriul nostru motor video Galápagos — scopul este un prezentator care transmite către până la 30 de participanți"
+      },
+      "F02": {
+        "name": "Creează un seminar",
+        "desc": "Setează subtitlul, ora, capacitatea și taxa de seminar pentru a crea un seminar (nume = insulă, automat)"
+      },
+      "F03": {
+        "name": "Listă și detalii seminarii",
+        "desc": "Răsfoiește seminariile deschise pagină cu pagină și vizualizează detaliile acestora"
+      },
+      "F04": {
+        "name": "Plată intrare Pi",
+        "desc": "Plătește taxa de seminar în Pi; serverul verifică din nou suma înainte de a te lăsa să intri"
+      },
+      "F06": {
+        "name": "Plăți către gazde",
+        "desc": "Plătește veniturile din taxa de intrare către gazde în Pi"
+      },
+      "F07": {
+        "name": "Reluări",
+        "desc": "Urmărește seminariile înregistrate mai târziu"
+      },
+      "FU": {
+        "name": "Fundația pentru suplimente de întâlnire",
+        "desc": "Un canal de semnal pentru suplimente, conexiune AI, fragmente vocale, consimțământ microfon și tabele de date"
+      },
+      "F08": {
+        "name": "Program și partajare",
+        "desc": "Link calendar, fișier eveniment (.ics) și invitație prin e-mail pentru fiecare seminar"
+      },
+      "F09": {
+        "name": "Reducerea zgomotului și iluminare",
+        "desc": "Reduce zgomotul microfonului și luminează videoclipul camerei întunecate"
+      },
+      "F10": {
+        "name": "Subtitrări live",
+        "desc": "Transformă vorbirea prezentatorului în text sub scenă"
+      },
+      "F11": {
+        "name": "Sondaje, Întrebări și Răspunsuri și prezență",
+        "desc": "Organizează sondaje și întrebări în timpul unui seminar; gazdele descarcă lista de prezență"
+      },
+      "F12": {
+        "name": "Efecte de fundal",
+        "desc": "Estompează-ți fundalul sau înlocuiește-l cu o presetare sau cu propria imagine (procesată pe dispozitivul tău)"
+      },
+      "F13": {
+        "name": "Înregistrare locală",
+        "desc": "Prezentatorul înregistrează seminarul pe propriul dispozitiv și toată lumea vede că înregistrarea este activă"
+      },
+      "F14": {
+        "name": "Note de ședință AI",
+        "desc": "Când prezentatorul o activează, vorbirea și ecranele sunt înregistrate și rezumate în puncte cheie, decizii și sarcini"
+      },
+      "F15": {
+        "name": "Note de întâlnire în persoană",
+        "desc": "Înregistrează o întâlnire doar cu un microfon și obține note de întâlnire (administratori)"
+      },
+      "F16": {
+        "name": "Subtitrări traduse",
+        "desc": "Afișează subtitrările traduse în limba aleasă de tine"
+      },
+      "F17": {
+        "name": "Ascultă în traducere",
+        "desc": "Citește subtitrările traduse cu o voce sintetică, reducând în același timp volumul audio original"
+      }
+    },
+    "steps": {
+      "piLogin": "Autentificare Pi Browser",
+      "googleLogin": "Autentificare Google",
+      "accountLink": "Conectare cont",
+      "deviceTest": "Test dispozitiv cameră",
+      "oneToTwo": "Prezentator 1 → 2 participanți",
+      "recovery": "Recuperare blocare și stabilitate",
+      "structure": "Curățare structură motor",
+      "autoQuality": "Calitate automată, 30 de participanți",
+      "roomService": "Intrare în cameră și înregistrare",
+      "roomUi": "Ecran cameră (lobby·scenă·chat·ridică mâna·moderare)",
+      "createForm": "Ecran creare",
+      "list": "Listă",
+      "detail": "Detalii",
+      "payRequest": "Cerere de plată",
+      "payVerify": "Reverificare sumă și intrare",
+      "settle": "Plată",
+      "vod": "Reluare înregistrare",
+      "appRelay": "Canal de semnal suplimentar motor",
+      "aiBase": "AI, fragmente vocale, consimțământ și tabele de date",
+      "shareLinks": "Link calendar, .ics și invitație prin e-mail",
+      "noiseLight": "Reducerea zgomotului și iluminare",
+      "liveCaptions": "Subtitrări live",
+      "pollQnaAttend": "Sondaje, Întrebări și Răspunsuri și listă de prezență",
+      "backgrounds": "Estompare, presetări și propria imagine",
+      "localRecording": "Înregistrare prezentator și insignă înregistrare",
+      "aiNotes": "Înregistrare, rezumat și pagină de note",
+      "inPersonNotes": "Note doar cu microfon și notele mele",
+      "captionTranslate": "Alegere limbă și comutare original/tradus",
+      "dubbing": "Redare voce sintetică și audio original redus"
+    },
+    "refLabel": "Model de referință",
+    "uiRef": "Linia de bază a interfeței de utilizator — modele de ecran și funcționalități ale unei aplicații web de întâlniri video utilizate pe scară largă, adaptate pentru seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Numele a fost salvat, dar ceilalți nu au putut fi notificați acum. Îl vor vedea după ce te vei alătura din nou.",
+      "tile": "Click pentru a-mi schimba numele",
+      "menu": "Schimbă-mi numele",
+      "title": "Numele meu în acest seminar",
+      "hint": "Până la 30 de caractere. Folosit doar în acest seminar și se actualizează imediat pe ecranul tuturor.",
+      "save": "Salvează",
+      "saving": "Se salvează…",
+      "cancel": "Anulează",
+      "taken": "Acest nume este deja folosit de altcineva (gazdă sau participant). Alege altul.",
+      "failed": "Nu s-a putut salva numele tău. Încearcă din nou."
+    },
+    "roomTitle": {
+      "edit": "Click pentru a edita subtitlul",
+      "label": "Subtitlu",
+      "placeholder": "Subtitlu (până la 60)",
+      "save": "Salvează",
+      "cancel": "Anulează",
+      "failed": "Nu s-a putut salva subtitlul."
+    },
+    "mirror": "Oglindește-mi videoclipul",
+    "barPin": "Afișează întotdeauna bara de jos",
+    "barAuto": "Ascunde automat bara de jos",
+    "title": "Alătură-te seminarului · {room}",
+    "titleSeminar": "Sală de așteptare",
+    "noEngine": "Serverul video nu este încă pregătit.",
+    "joinAs": "Alătură-te ca",
+    "presenter": "Prezentator",
+    "audience": "Audiență",
+    "join": "Alătură-te acum",
+    "nameLabel": "Nume",
+    "audienceHint": "Membrii audienței nu folosesc o cameră sau un microfon. După ce te alături, vei vedea și auzi prezentatorul.",
+    "preview": {
+      "pending": "Se pregătesc camera și microfonul…",
+      "audioOnly": "Camera indisponibilă — se trimite doar audio.",
+      "none": "Camera și microfonul indisponibile. Verifică permisiunile (poți totuși să te alături fără media).",
+      "videoOnly": "Microfon indisponibil — se trimite doar video. Verifică permisiunea microfonului."
+    },
+    "mic": {
+      "on": "Oprește microfonul",
+      "off": "Pornește microfonul"
+    },
+    "cam": {
+      "on": "Oprește camera",
+      "off": "Pornește camera"
+    },
+    "controls": "Controale apel",
+    "leave": "Părăsește",
+    "enableSound": "Activează sunetul",
+    "state": {
+      "connecting": "Se conectează…",
+      "reconnecting": "Se reconectează…"
+    },
+    "waiting": "Se așteaptă prezentatorul.",
+    "rejoin": "Alătură-te din nou",
+    "err": {
+      "generic": "Ceva nu a mers bine. Te rugăm să te alături din nou.",
+      "CLOSED": "Conexiunea a fost pierdută.",
+      "NO_ENGINE": "Serverul video nu este încă pregătit.",
+      "TICKET_401": "Te rugăm să te autentifici.",
+      "TICKET_403": "Nu ai permisiunea de a prezenta. Alătură-te ca audiență.",
+      "TICKET_503": "Serverul video nu este încă configurat.",
+      "TICKET_NETWORK": "Verifică-ți conexiunea la rețea.",
+      "TICKET_INVALID": "Permisul tău de intrare a expirat.",
+      "TICKET_EXPIRED": "Permisul tău de intrare a expirat.",
+      "ROOM_FULL": "Acest seminar este plin.",
+      "ROOM_CLOSED": "Camera a fost închisă — seminarul s-a încheiat sau gazda a lipsit mai mult de 5 minute.",
+      "DUPLICATE_SESSION": "V-ați conectat de pe un alt dispozitiv, așa că această sesiune a fost deconectată.",
+      "ROLE_FORBIDDEN": "Nu aveți permisiunea de a prezenta.",
+      "WS_FAILED": "Nu s-a putut conecta la serverul video.",
+      "ICE_FAILED": "Conexiunea video a fost întreruptă. Verificați-vă rețeaua.",
+      "MEDIA_FAILED": "Nu s-a putut porni camera sau microfonul.",
+      "TIMEOUT": "Serverul video nu răspunde.",
+      "TICKET_402": "Acesta este un seminar plătit. Vă rugăm să plătiți pe pagina seminarului înainte de a intra.",
+      "TICKET_404": "Seminarul nu a fost găsit.",
+      "TICKET_409": "Acest seminar s-a încheiat sau a fost anulat.",
+      "TICKET_HOST_AWAY": "Gazda nu s-a alăturat încă sau a lipsit mai mult de 5 minute, așa că nu puteți intra. Vă rugăm să încercați din nou după ce gazda se alătură.",
+      "TICKET_PLAN_EXHAUSTED": "Planul acestui seminar nu mai are timp disponibil, așa că nu poate începe. Cumpărarea aceluiași plan adaugă timp (gratuit se reînnoiește cu 1 oră luna viitoare)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Nu s-a putut schimba microfonul. Vă rugăm să încercați din nou.",
+        "video": "Nu s-a putut schimba camera. Vă rugăm să încercați din nou."
+      },
+      "forbidden": "Nu aveți permisiunea de a prezenta, așa că veți continua ca public.",
+      "demoted": "Ați fost mutat înapoi la public.",
+      "endFailed": "Nu s-a putut încheia seminarul. Vă rugăm să încercați din nou.",
+      "chatFailed": "Mesajul nu a fost trimis.",
+      "actionFailed": "Nu s-a putut finaliza solicitarea. Vă rugăm să încercați din nou.",
+      "shareFailed": "Nu s-a putut începe partajarea ecranului.",
+      "err": {
+        "RATE_LIMITED": "Trimiteți prea repede. Vă rugăm să așteptați un moment.",
+        "ROLE_FORBIDDEN": "Nu aveți permisiunea de a face acest lucru.",
+        "MEDIA_FAILED": "Nu s-a putut porni microfonul sau camera. Vă rugăm să verificați permisiunile.",
+        "LOCKED": "Blocat de prezentator."
+      },
+      "mutedBy": {
+        "audio": "Prezentatorul v-a oprit microfonul.",
+        "video": "Prezentatorul v-a oprit camera."
+      },
+      "policy": {
+        "locked": "Prezentatorul a blocat microfoanele. Le puteți porni odată ce sunt deblocate.",
+        "unlocked": "Microfoanele sunt deblocate."
+      },
+      "consent": {
+        "saveFail": "Nu s-a putut salva consimțământul dumneavoastră. Verificați înregistrarea și porniți din nou microfonul."
+      }
+    },
+    "home": "Mergi la pagina principală",
+    "tile": {
+      "fullscreen": "Dublu-clic pentru ecran complet · Esc pentru a ieși",
+      "self": "{name} (tu)",
+      "presenter": "Prezentator",
+      "micOff": "Microfon oprit",
+      "screen": "Ecranul lui {name}",
+      "row": "Alți vorbitori",
+      "pin": "Arată {name} mare",
+      "unpin": "Aranjare automată"
+    },
+    "more": "Mai multe opțiuni",
+    "joinNoCam": "Intră fără cameră",
+    "net": {
+      "afterJoin": "Conexiunea dumneavoastră este verificată automat după ce vă alăturați.",
+      "measuring": "Verificarea conexiunii…",
+      "good": "Conexiune bună",
+      "fair": "Conexiune medie",
+      "poor": "Conexiune slabă",
+      "reason": {
+        "loss": {
+          "audio": "Se pierd {pct}% din datele audio.",
+          "video": "Se pierd {pct}% din datele video."
+        },
+        "rate": {
+          "audio": "Încărcarea audio este scăzută la {kbps} kbps.",
+          "video": "Încărcarea video este scăzută la {kbps} kbps. Calitatea poate scădea."
+        }
+      }
+    },
+    "people": "{n} în cameră",
+    "screen": {
+      "start": "Partajează ecranul",
+      "stop": "Oprește partajarea"
+    },
+    "panel": {
+      "title": "Chat · Întrebări și răspunsuri · Sondaje · Persoane",
+      "chat": "Chat",
+      "people": "Persoane",
+      "close": "Închide panoul",
+      "qna": "Întrebări și răspunsuri",
+      "polls": "Sondaje"
+    },
+    "chat": {
+      "empty": "Încă nu sunt mesaje. Chatul nu este salvat.",
+      "me": "Tu",
+      "failed": "Nu a fost trimis.",
+      "retry": "Reîncearcă",
+      "input": "Introduceți un mesaj",
+      "send": "Trimite"
+    },
+    "hand": {
+      "raise": "Ridică mâna",
+      "lower": "Lasă mâna jos",
+      "list": "Mâini ridicate",
+      "lowerAll": "Lasă toate mâinile jos",
+      "raised": "Mână ridicată",
+      "notice": "{name} a ridicat mâna.",
+      "dismiss": "Ignoră",
+      "waiting": "{n} persoane așteaptă să vorbească"
+    },
+    "react": {
+      "open": "Reacții",
+      "e0": "Îmi place",
+      "e1": "Aplauze",
+      "e2": "Râs",
+      "e3": "Surprins",
+      "e4": "Trist",
+      "e5": "Fără cuvinte",
+      "e6": "Iubire"
+    },
+    "quality": {
+      "label": "Calitate",
+      "auto": "Automat",
+      "high": "Înaltă",
+      "medium": "Medie",
+      "low": "Scăzută",
+      "unstable": "Rețeaua dumneavoastră este instabilă"
+    },
+    "roles": {
+      "presenter": "Prezentator",
+      "panel": "Panelist",
+      "audience": "Audiență"
+    },
+    "stage": {
+      "invite": "Invită pe scenă",
+      "remove": "Mută la audiență",
+      "promoted": "Ați fost invitat pe scenă. Dacă ați ridicat mâna, camera dumneavoastră se va porni automat (cu excepția cazului în care este blocată sau nu este permisă). Porniți microfonul pentru a vorbi (microfonul nu se pornește automat).",
+      "later": "Mai târziu"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} a ridicat mâna."
+    },
+    "leaveDialog": {
+      "title": "Părăsește seminarul",
+      "body": "Puteți pleca singur sau puteți încheia seminarul și deconecta pe toată lumea.",
+      "confirmTitle": "Încheiați seminarul?",
+      "confirmBody": "Toată lumea va fi deconectată și nimeni nu se va mai putea alătura acestui seminar.",
+      "cancel": "Anulează",
+      "end": "Încheie seminarul",
+      "endConfirm": "Încheie acum"
+    },
+    "mod": {
+      "muteAll": "Oprește microfoanele tuturor",
+      "lock": "Blochează microfoanele",
+      "unlock": "Deblochează microfoanele",
+      "locked": "Prezentatorul a blocat microfoanele",
+      "muteMic": "Oprește microfonul",
+      "askMic": "Cere să pornească microfonul",
+      "muteCam": "Oprește camera",
+      "muteMicOf": "Oprește microfonul lui {name}",
+      "askMicOf": "Cere lui {name} să pornească microfonul",
+      "muteCamOf": "Oprește camera lui {name}"
+    },
+    "ask": {
+      "audio": "Prezentatorul v-a cerut să porniți microfonul.",
+      "video": "Prezentatorul v-a cerut să porniți camera.",
+      "ignore": "Ignoră"
+    },
+    "toDetail": "Mergi la pagina seminarului",
+    "consent": {
+      "title": "Înainte de a porni microfonul",
+      "body": "Dacă în acest seminar sunt activate înregistrarea, subtitrările sau notele de întâlnire AI, vocea dumneavoastră poate fi convertită în text, stocată și tradusă. Procesarea vocii este realizată de un serviciu AI din afara țării dumneavoastră. Dacă nu sunteți de acord, microfonul dumneavoastră se va porni în continuare — doar vocea dumneavoastră va fi exclusă din procesare.",
+      "privacy": "Politica de confidențialitate",
+      "newTab": "(se deschide într-o filă nouă)",
+      "decline": "Nu sunt de acord",
+      "agree": "Sunt de acord și pornesc microfonul",
+      "notice": "Când înregistrarea, subtitrările sau notele de întâlnire AI sunt activate, vocile vorbitorilor sunt procesate. Vocile publicului nu sunt trimise.",
+      "saveFailClosed": "Acest seminar s-a încheiat, așa că acordul nu poate fi înregistrat."
+    },
+    "captions": {
+      "title": "Subtitrări",
+      "room": "Subtitrări live (întreaga cameră)",
+      "show": "Afișează subtitrări",
+      "size": {
+        "label": "Dimensiune text",
+        "sm": "Mică",
+        "md": "Medie",
+        "lg": "Mare"
+      },
+      "waiting": "Subtitrările apar când prezentatorul le activează",
+      "limit": "Limita de procesare a vorbirii a fost atinsă, așa că subtitrările și minutele AI au fost oprite",
+      "sendFail": "Nu s-au putut activa subtitrările. Vă rugăm să încercați din nou în scurt timp.",
+      "sendFailOff": "Nu s-au putut dezactiva subtitrările. Vă rugăm să încercați din nou în scurt timp.",
+      "region": "Subtitrări",
+      "translate": "Afișează subtitrări traduse",
+      "lang": "Limba de traducere",
+      "langMine": "Limbile mele",
+      "langAll": "Toate limbile",
+      "trStop": {
+        "forbidden": "Subtitrările traduse sunt disponibile doar pentru participanții înregistrați. Se afișează originalul.",
+        "unavailable": "Subtitrările traduse nu sunt disponibile momentan. Se afișează originalul.",
+        "quota": "Acest seminar a atins limita de traducere. Se afișează originalul.",
+        "usrQuota": "Ați epuizat limita de traducere pentru acest seminar. Se afișează originalul."
+      },
+      "unsupported": "Acest dispozitiv nu poate crea subtitrări live (browserul nu acceptă înregistrarea audio)"
+    },
+    "effects": {
+      "title": "Efecte",
+      "light": "Corecție lumină",
+      "noise": "Reducere zgomot",
+      "noiseFail": "Reducerea zgomotului nu poate fi modificată pe acest dispozitiv",
+      "close": "Închide",
+      "preview": "Previzualizarea mea",
+      "bg": "Fundal",
+      "bgNone": "Niciunul",
+      "bgBlur": "Estompare",
+      "scenes": {
+        "beach": "🏝️ Plaja Maldive",
+        "autumn": "🍁 Valea toamnei",
+        "fireplace": "🔥 Șemineu",
+        "xmas": "🎄 Sală de ședințe de Crăciun"
+      },
+      "bgs": {
+        "dusk": "Amurg",
+        "ocean": "Ocean",
+        "forest": "Pădure",
+        "studio": "Studio",
+        "grid": "Grilă",
+        "dots": "Puncte"
+      },
+      "myAdd": "Imaginea mea",
+      "myItem": "Imaginea mea {n}",
+      "myDel": "Șterge imaginea mea {n}",
+      "mySaveFail": "Fundalul este aplicat, dar nu a putut fi salvat pe acest dispozitiv (doar pentru această întâlnire)",
+      "bgStopped": "Efectul de fundal s-a oprit și a fost dezactivat. Alegeți-l din nou pentru a reporni.",
+      "myNote": "Imaginile dumneavoastră sunt stocate doar pe acest dispozitiv (până la 3, câte 2 MB fiecare)",
+      "mobileBlurOnly": "Pe telefoane, este disponibil doar fundalul estompat (fundalurile cu imagini funcționează pe PC)",
+      "myTooBig": "Se pot folosi doar imagini de până la 2 MB",
+      "preparing": "Se pregătește…",
+      "bgFailed": "Nu s-a putut încărca efectul de fundal",
+      "autoOff": "Dispozitivul dumneavoastră este prea lent, așa că efectul de fundal a fost dezactivat.",
+      "unsupported": "Efectele de fundal nu sunt disponibile pe acest dispozitiv.",
+      "noCam": "Porniți camera pentru a alege un fundal.",
+      "lightUnsupported": "Corecția luminii nu este disponibilă pe acest dispozitiv.",
+      "noiseUnsupported": "Setările de reducere a zgomotului nu sunt acceptate pe acest dispozitiv."
+    },
+    "sheetClose": "Închide",
+    "polls": {
+      "new": "Sondaj nou",
+      "question": "Întrebare",
+      "option": "Opțiunea {n}",
+      "remove": "Elimină opțiunea {n}",
+      "addOption": "Adaugă opțiune",
+      "start": "Începe sondajul",
+      "cancel": "Anulează",
+      "dup": "Opțiunile trebuie să fie diferite",
+      "vote": "Votează",
+      "change": "Schimbă votul",
+      "close": "Închide sondajul",
+      "closed": "Închis",
+      "mine": "Alegerea ta",
+      "result": "{pct}% ({n} voturi)",
+      "total": "Total {n} voturi",
+      "empty": "Încă nu sunt sondaje.",
+      "loading": "Se încarcă…",
+      "labOnly": "Sondajele sunt disponibile doar în sălile de seminar.",
+      "started": "Un nou sondaj a început",
+      "goVote": "Votează",
+      "votersNote": "Organizatorul poate vedea cine a votat pentru ce opțiune.",
+      "voters": "Au votat: {names}"
+    },
+    "qna": {
+      "sort": "Sortează",
+      "by": {
+        "top": "Top",
+        "new": "Cele mai noi"
+      },
+      "rcm": "Votează pozitiv ({n})",
+      "answered": "Răspuns",
+      "answer": "Marchează ca răspuns",
+      "unanswer": "Anulează marcarea ca răspuns",
+      "hide": "Ascunde",
+      "doneN": "{n} răspunsuri",
+      "backOpen": "Întrebări fără răspuns",
+      "empty": "Încă nu sunt întrebări.",
+      "emptyDone": "Nu sunt întrebări la care s-a răspuns.",
+      "loading": "Se încarcă…",
+      "input": "Pune o întrebare (500 caractere)",
+      "send": "Trimite",
+      "left": "{n} rămase",
+      "labOnly": "Întrebările și răspunsurile sunt disponibile doar în sălile de seminar."
+    },
+    "recording": {
+      "title": "Înregistrare",
+      "badge": "Înregistrare",
+      "unsupported": "Acest browser nu poate înregistra. Vă rugăm să înregistrați de pe un browser obișnuit de pe un computer.",
+      "piBrowserOnly": "Înregistrarea funcționează doar într-un browser obișnuit (PC sau mobil). Pi Browser nu poate salva fișierele de înregistrare — deschideți acest seminar într-un browser de computer sau telefon (seminarz.vercel.app) pentru a înregistra.",
+      "audioSuspended": "Este posibil ca înregistrarea sunetului să nu fi început pe acest dispozitiv. Doar imaginea poate fi înregistrată.",
+      "notifyFailed": "Înregistrarea nu a început deoarece participanții nu au putut fi notificați. Vă rugăm să încercați din nou în scurt timp.",
+      "confirm": {
+        "title": "Începeți înregistrarea?",
+        "body": "Când începe înregistrarea, toată lumea va vedea un indicator „Înregistrare”. Fișierul este salvat doar pe acest dispozitiv și nu este niciodată încărcat sau transferat în străinătate. Vă rugăm să informați participanții înainte de a începe.",
+        "download": "Când opriți, un fișier MP4 este salvat în folderul de descărcări (browserele care nu pot înregistra MP4 durează un moment pentru a-l converti; înregistrările mai lungi de aproximativ 45 de minute pot fi păstrate în formatul lor original). Browserele din aplicație pot bloca salvarea fișierelor, așa că înregistrați de pe un browser obișnuit de pe un computer.",
+        "cancel": "Anulează",
+        "start": "Începe înregistrarea",
+        "charge": "În timpul înregistrării, timpul de înregistrare este dedus din timpul plătit, pe lângă timpul camerei (2x în timpul înregistrării). Când timpul plătit se epuizează, înregistrarea se oprește și fișierul este salvat."
+      },
+      "resave": {
+        "label": "Fișier de înregistrare",
+        "save": "Salvează din nou",
+        "dismiss": "Închide salvarea din nou"
+      },
+      "toast": {
+        "started": "Înregistrarea a început — toată lumea o poate vedea",
+        "saved": "Înregistrarea a fost salvată. Verificați folderul de descărcări. Dacă nu s-a salvat nimic, atingeți [Salvează din nou] în partea de sus a ecranului.",
+        "autoStopped": "Înregistrarea s-a încheiat deoarece browserul a oprit-o sau limita de dimensiune a fost atinsă. Totul până în acel moment a fost salvat. Începeți din nou înregistrarea pentru a continua.",
+        "empty": "Nu s-a înregistrat nimic, așa că nu a fost creat niciun fișier.",
+        "saveFailed": "Nu s-a putut crea fișierul de înregistrare.",
+        "converting": "Se convertește înregistrarea în MP4. Vă rugăm să păstrați această fereastră deschisă.",
+        "savedOriginal": "Nu s-a putut converti în MP4, așa că înregistrarea a fost salvată în formatul său original (webm). Verificați folderul de descărcări.",
+        "startedBy": "Prezentatorul a început înregistrarea",
+        "stoppedBy": "Prezentatorul a oprit înregistrarea"
+      },
+      "paidOnly": "Înregistrarea este disponibilă doar în seminariile deschise cu un plan lunar sau anual, atâta timp cât mai este timp plătit.",
+      "planOut": "Timpul plătit s-a epuizat, așa că înregistrarea s-a oprit și fișierul a fost salvat.",
+      "notInRoom": "Încă se confirmă că sunteți în cameră. Începeți din nou înregistrarea într-un moment.",
+      "meterFailed": "Nu s-a putut verifica timpul de înregistrare, așa că înregistrarea nu a început. Încercați din nou într-un moment.",
+      "paidOut": "Nu a mai rămas timp plătit, așa că înregistrarea nu poate începe. Cumpărați din nou același plan pentru a înregistra.",
+      "pausedBadge": "Înregistrare întreruptă",
+      "controls": "Comenzi înregistrare",
+      "pause": "Pauză",
+      "resume": "Reia",
+      "stop": "Oprește înregistrarea"
+    },
+    "notes": {
+      "on": "Notițe AI",
+      "badge": "Notițe AI activate",
+      "started": "Prezentatorul a activat notițele AI",
+      "stopped": "Notițele AI au fost dezactivate",
+      "startedMine": "Notițe AI activate — vizibile pentru toți",
+      "stoppedMine": "Notițe AI dezactivate — se creează notițele",
+      "startFail": "Nu s-au putut porni notițele AI",
+      "gone": "Notițele AI au fost oprite — notițele au fost încheiate sau șterse în altă parte",
+      "unsupported": "Notițele AI nu pot fi activate aici (nu există suport pentru înregistrare audio)"
+    },
+    "dubbing": {
+      "listen": "Ascultă vocea tradusă",
+      "blocked": "Nu s-a putut reda vocea tradusă. Te rugăm să o activezi din nou",
+      "stopped": "Vocea tradusă nu este disponibilă momentan, așa că a fost dezactivată",
+      "usrQuota": "Ai epuizat limita de voce tradusă pentru acest seminar, așa că a fost dezactivată"
+    },
+    "plan": {
+      "warn": "Mai sunt {min} min din planul acestui seminar.",
+      "ended": "Timpul alocat seminarului a expirat, așa că seminarul s-a încheiat și ai părăsit camera.",
+      "left": "Timp rămas din seminar",
+      "closed": "Seminarul s-a încheiat, așa că ai părăsit camera.",
+      "hostAway": "Gazda a părăsit camera. Dacă nu revine în 5 minute, toți participanții vor fi eliminați.",
+      "hostGone": "Gazda nu a revenit în 5 minute, așa că ai părăsit camera. Poți intra din nou odată ce gazda se alătură."
+    },
+    "toLobby": "Sală de așteptare"
+  },
+  "list": {
+    "tabsLabel": "Vizualizare listă seminarii",
+    "tabs": {
+      "all": "Toate",
+      "hosted": "Găzduite de mine",
+      "joined": "La care am participat"
+    },
+    "empty": {
+      "all": "Nu există seminarii viitoare.",
+      "hosted": "Nu ai găzduit niciun seminar.",
+      "joined": "Nu ai participat la niciun seminar."
+    },
+    "loading": "Se încarcă…",
+    "retry": "Reîncearcă",
+    "free": "Gratuit",
+    "fee": "{amount} Pi",
+    "host": "Gazdă {name}",
+    "capacity": "Capacitate {n}",
+    "status": {
+      "SCHEDULED": "Programat",
+      "LIVE": "În direct",
+      "ENDED": "Încheiat",
+      "CANCELED": "Anulat"
+    },
+    "hostNew": "Creează un seminar",
+    "progress": "Progres",
+    "pager": "Paginație",
+    "prev": "Anterior",
+    "next": "Următor",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Subtitlu",
+      "placeholder": "Adaugă un subtitlu",
+      "save": "Salvează subtitlul",
+      "saving": "Se salvează…",
+      "saved": "Salvat."
+    },
+    "loading": "Se încarcă…",
+    "back": "Înapoi la listă",
+    "notFound": "Seminarul nu a fost găsit.",
+    "status": {
+      "SCHEDULED": "Programat",
+      "LIVE": "În direct",
+      "ENDED": "Încheiat",
+      "CANCELED": "Anulat"
+    },
+    "startAt": "Data",
+    "host": "Gazdă",
+    "seats": "Locuri rămase",
+    "seatsValue": "{left} / {max}",
+    "fee": "Taxă seminar",
+    "feeValue": "{amount} Pi",
+    "free": "Gratuit",
+    "enter": "Intră",
+    "payEnter": "Plătește cu Pi și intră ({amount} Pi)",
+    "paying": "Se procesează plata…",
+    "joining": "Se înregistrează…",
+    "registered": "Ești înregistrat.",
+    "full": "Acest seminar este plin.",
+    "closed": "Acest seminar s-a încheiat.",
+    "canceled": "Acest seminar a fost anulat.",
+    "roomLink": "Mergi la cameră (gazdă)",
+    "piBrowserOnly": "Plata este disponibilă în Pi Browser după autentificarea Pi.",
+    "payCancelled": "Plată anulată.",
+    "payStillWaiting": "Încă se așteaptă răspunsul portofelului. Dacă te-ai autentificat deja în Pi Wallet, te rugăm să aștepți un moment.",
+    "payFailed": "Plată eșuată.",
+    "err": {
+      "NAME_TAKEN": "Acest nume este deja folosit de altcineva. Alege altul.",
+      "CAL_READ_FAILED": "Nu s-au putut încărca evenimentele tale. Verifică adresa.",
+      "ISLAND_FULL": "Toate cele 100 de nume de insule sunt în uz acum. Poți deschide un nou seminar după ce unul viitor sau live se încheie sau este anulat.",
+      "SMN_FULL": "Acest seminar este plin.",
+      "SMN_CLOSED": "Acest seminar s-a încheiat sau a fost anulat.",
+      "SMN_ALREADY": "Ești deja înregistrat sau o plată este în curs.",
+      "SMN_FREE": "Seminariile gratuite nu necesită plată.",
+      "SMN_PAY_REQUIRED": "Acesta este un seminar plătit. Te rugăm să plătești pentru a intra.",
+      "SMN_PAY_INVALID": "Nu am putut verifica plata ta. Te rugăm să contactezi administratorul.",
+      "PAY_PI_FAILED": "Nu s-a putut contacta serverul de plată Pi. Te rugăm să încerci din nou în scurt timp.",
+      "PAY_MISMATCH": "Detaliile plății nu corespund.",
+      "PAY_AMOUNT_MISMATCH": "Suma plătită diferă de taxa seminarului.",
+      "PAY_CANCELLED": "Această plată a fost anulată.",
+      "PAY_ALREADY_PAID": "O plată este încă în curs de procesare. Dacă te autentificai în portofel, încearcă din nou în 3 minute.",
+      "PAY_INVALID_STATE": "Această plată nu poate fi procesată acum.",
+      "PAY_PI_CANCEL_REFUSED": "Plata este deja în curs și nu poate fi anulată. Te rugăm să verifici din nou în scurt timp."
+    },
+    "share": {
+      "title": "Programează și distribuie",
+      "calendar": "Adaugă în calendar",
+      "ics": "Fișier calendar",
+      "mail": "Invită prin e-mail",
+      "mailApp": "Trimite cu aplicația de e-mail implicită",
+      "mailSubject": "[Invitație seminar] {title}",
+      "mailBody": "{title}\nCând: {start}\n\nAlătură-te direct cu acest link.\nDesktop: {url}\nPi Browser: {piUrl}",
+      "copy": "Copiază linkul",
+      "copied": "Link copiat.",
+      "copyFail": "Nu s-a putut copia. Te rugăm să copiezi linkul din bara de adrese.",
+      "share": "Partajează către o altă aplicație",
+      "shareFail": "Nu s-a putut partaja. Te rugăm să folosești Copiază linkul în schimb.",
+      "created": "Seminarul tău este gata. Adaugă ora de începere în Google Calendar.",
+      "addGoogle": "Adaugă în Google Calendar",
+      "later": "Mai târziu",
+      "piBrowserOpen": "În Pi Browser, calendarul, e-mailul și fișierul calendar se deschid în browserul implicit al telefonului tău.",
+      "extFail": "Nu s-a putut deschide. Actualizează Pi Browser, sau folosește Copiază linkul și deschide-l într-un browser obișnuit (seminarz.vercel.app).",
+      "icsPiBrowser": "Fișierul calendar poate fi descărcat doar într-un browser obișnuit (computer sau mobil). În Pi Browser, folosește Adaugă în calendar în schimb."
+    },
+    "attendance": "Prezență",
+    "plan": "Plan",
+    "left": "Timp rămas"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Luna precedentă",
+      "next": "Luna următoare",
+      "connect": "Arată-mi Google Calendar",
+      "change": "Gestionează calendarele Google ({n})",
+      "add": "Adaugă",
+      "remove": "Elimină",
+      "close": "Închide",
+      "failed": "Nu s-au putut încărca evenimentele din {n} calendar(e). Verifică adresa.",
+      "badUrl": "Lipește „Adresa secretă în format iCal” (…/basic.ics) din setările Google Calendar, nu din bara de adrese a browserului.",
+      "full": "Poți adăuga până la {n} calendare.",
+      "allDay": "Toată ziua",
+      "day": "Evenimentele mele din această zi",
+      "count": "{n, plural, one {# eveniment} other {# evenimente}}",
+      "more": "+{n}",
+      "picked": "Această dată este setată ca dată de începere. Alege ora de mai jos.",
+      "s1": "Atinge [Deschide setările Google Calendar] de mai jos.",
+      "s2": "Sub „Setări pentru calendarele mele” din stânga, alege un calendar (ex. numele tău).",
+      "s3": "Derulează la „Integrare calendar” și copiază „Adresa secretă în format iCal”.",
+      "s4": "Lipește-o aici și atinge [Adaugă] — titlurile evenimentelor apar în calendar. Adaugă și alte calendare în același mod, până la 5.",
+      "open": "Deschide setările Google Calendar",
+      "privacy": "Această adresă este o cheie pentru calendarul tău — nu o partaja. Este stocată doar pe acest dispozitiv, niciodată pe serverul nostru."
+    },
+    "title": "Creează un seminar",
+    "name": "Să călătorim pe o insulă frumoasă!",
+    "subTitle": "Subtitlu (opțional, până la 60 de caractere)",
+    "startAt": "Ora de începere",
+    "maxCnt": "Capacitate (1–100)",
+    "submit": "Creează",
+    "submitting": "Se creează…",
+    "invalid": "Verifică datele introduse — o dată în decurs de un an de acum, capacitate 1–100.",
+    "attendance": {
+      "title": "Prezență",
+      "back": "Înapoi la seminar",
+      "loading": "Se încarcă…",
+      "forbidden": "Doar gazda și administratorii pot vizualiza prezența.",
+      "count": "{n} persoane",
+      "csv": "Descarcă CSV",
+      "empty": "Nimeni nu s-a alăturat încă.",
+      "online": "Online",
+      "left": "A părăsit",
+      "col": {
+        "name": "Nume",
+        "pi": "Nume de utilizator Pi",
+        "ent": "Prima alăturare",
+        "hb": "Ultima vizualizare",
+        "dur": "Timp participat",
+        "min": "Participat (min, timp absent exclus)",
+        "state": "Stare"
+      },
+      "durNote": "Timpul participat este de la prima alăturare până la ultima vizualizare, minus timpul absent (pauze mai lungi de 2,5 minute).",
+      "csvPiBrowser": "Descărcarea CSV funcționează doar într-un browser obișnuit (computer sau mobil). Pi Browser nu poate salva fișiere — deschide această foaie de prezență într-un browser de computer sau telefon (seminarz.vercel.app)."
+    },
+    "plan": "Plan",
+    "planFree": "Gratuit — {time} rămas luna aceasta · fără AI",
+    "planPaid": "{name} {time} · {price} — plătește la creare",
+    "planHint": "Un seminar deschis pe un plan plătit folosește mai întâi timpul acelui plan, apoi continuă pe timpul gratuit al acestei luni (fără AI în partea gratuită). Un plan activ se deschide fără plată; Planul lunar sau anual pe care nu îl ai este plătit în Pi când apeși Creare, apoi seminarul se deschide (Pi Browser). Participarea este întotdeauna gratuită pentru participanți.",
+    "planOwned": "{name} — activ · {time} rămas",
+    "planEnds": "Ora de începere este după expirarea abonamentului acestui plan. Mută ora de începere mai devreme sau alege un alt plan.",
+    "paidKept": "Abonamentul tău plătit este păstrat. Remediază problema și apasă din nou Creare (fără a doua plată)."
+  },
+  "privacy": {
+    "title": "Politica de confidențialitate — Funcții vocale și AI",
+    "effective": "În vigoare de la {date}",
+    "intro": "Această politică explică informațiile personale pe care le procesăm atunci când utilizați subtitrări live, subtitrări traduse, traducere vocală, notițe de întâlnire AI și notițe în persoană într-un seminar. Aceste funcții utilizează un serviciu AI extern, astfel încât informațiile sunt transferate în străinătate.",
+    "whoTitle": "Ale cui informații sunt procesate",
+    "who": [
+      "Prezentatori și participanți pe scenă: vă cerem consimțământul o singură dată, înainte de a porni microfonul pentru prima dată. Puteți participa la seminar fără a consimți.",
+      "Audiență: nu utilizați un microfon, deci nu este trimisă nicio voce. Vedeți doar subtitrări și notițe.",
+      "Notițe în persoană: un administrator înregistrează o întâlnire cu un microfon și confirmă că participanții au fost informați înainte de înregistrare."
+    ],
+    "xferTitle": "Transferul informațiilor personale în străinătate (Legea coreeană privind protecția informațiilor personale, Art. 28-8)",
+    "xfer": [
+      {
+        "k": "Destinatar",
+        "v": "Google LLC (Gemini API) — contact [TBD: contact confidențialitate Google]"
+      },
+      {
+        "k": "Țări",
+        "v": "Statele Unite și alte țări în care se află centrele de date Google [TBD: regiunea de procesare]"
+      },
+      {
+        "k": "Când și cum",
+        "v": "Aproximativ la fiecare 5 secunde în timp ce o funcție este activă, printr-o conexiune criptată (HTTPS). Pentru notițele în persoană, întreaga înregistrare este trimisă încă o dată în părți de 5 minute la încheierea notiței (transcriere precisă)."
+      },
+      {
+        "k": "Articole",
+        "v": "Voce, conținut vorbit (text), nume de afișare al vorbitorului (pentru rezumatele notițelor), capturi de ecran (când notițele AI sunt activate)"
+      },
+      {
+        "k": "Scop",
+        "v": "Vorbire în text, traducere, rezumate notițe de întâlnire, vorbire sintetică (voci standard, fără clonare vocală), separare vorbitori pentru notițe în persoană (vocile sunt diferențiate și etichetate după genul perceput, cum ar fi Masculin 1 / Feminin 1 — nu se inferă nume sau identități)"
+      },
+      {
+        "k": "Retenție",
+        "v": "Se încheie imediat ce rezultatul este returnat. Solicităm Google să nu stocheze cererile (store=false). Jurnalele de monitorizare a abuzurilor pot fi păstrate conform termenilor Google [TBD: perioada de retenție și statutul nivelului plătit]."
+      },
+      {
+        "k": "Cum să refuzi și ce se întâmplă",
+        "v": "Dacă nu consimți sau îți oprești microfonul, nu este trimisă nicio voce. Poți participa în continuare la seminar; doar subtitrările, traducerile și notițele propriei tale vorbiri nu sunt create. Poți retrage consimțământul în orice moment [TBD: unde se află butonul de retragere]."
+      }
+    ],
+    "keepTitle": "Ce păstrează acest serviciu",
+    "keep": [
+      "Audio original: pentru subtitrările seminarului și notițele de întâlnire AI nu este stocat; este eliminat imediat după conversia în text. Pentru notițele în persoană, înregistrarea este păstrată în stocare privată pentru a putea fi transcrisă din nou mai precis (cu vorbitori) după întâlnire și este ștearsă la curățarea zilnică odată ce a trecut 1 zi de la încheierea notiței (imediat dacă notița este ștearsă).",
+      "Subtitrări live: nu sunt stocate.",
+      "Notițe de întâlnire AI (când prezentatorul le activează): conținut vorbit, capturi de ecran și rezumatul, păstrate până la ștergerea notițelor [TBD: retenție maximă].",
+      "Înregistrări de consimțământ: ora consimțământului și versiunea politicii, păstrate ca dovadă [TBD: perioada de retenție].",
+      "Utilizare: numărul de cereri pe minut și timpul de procesare, utilizate pentru a impune limite de cost.",
+      "Prezență: ora la care te-ai alăturat, ora la care ai fost ultima dată conectat, numele tău de afișare și numele tău de utilizator Pi sunt stocate și furnizate gazdei ca listă de prezență (pe ecran și ca descărcare CSV). Păstrate până la ștergerea seminarului.",
+      "Întrebări și răspunsuri și sondaje: textul întrebării și numele de afișare al celui care a pus întrebarea (sau numele de utilizator Pi dacă nu există) sunt vizibile pentru fiecare participant. Voturile pozitive arată doar numărul, niciodată cine le-a dat. Voturile sondajului arată doar numărul pentru participanți; organizatorul și administratorii văd, pentru fiecare opțiune, numele de afișare (sau numele de utilizator Pi dacă nu există) al fiecărui votant. Păstrate, inclusiv întrebările ascunse, până la ștergerea seminarului."
+    ],
+    "recTitle": "Înregistrare",
+    "rec": "Înregistrările sunt salvate doar ca fișier pe dispozitivul prezentatorului. Nu sunt încărcate pe serverele noastre sau transferate în străinătate. În timp ce înregistrarea sau notițele AI sunt active, fiecare participant vede un indicator.",
+    "rightsTitle": "Drepturile tale",
+    "rights": "Poți solicita accesul, corectarea, ștergerea sau oprirea procesării informațiilor tale. Contact: [TBD: numele și contactul ofițerului de confidențialitate]"
+  },
+  "notes": {
+    "title": "Notițe",
+    "back": "Înapoi la seminar",
+    "loading": "Se încarcă…",
+    "meta": "Notițe · {date} · {min} min",
+    "aiWarn": "Rezumat generat de AI — poate conține greșeli",
+    "points": "Puncte cheie",
+    "decisions": "Decizii",
+    "todos": "Acțiuni",
+    "shots": "Capturi de ecran ({n})",
+    "transcript": "Transcris",
+    "download": "Descarcă Markdown",
+    "making": "Se creează notițele…",
+    "makingLong": "Durează mai mult. Te rugăm să reîmprospătezi mai târziu",
+    "recording": "Încă se înregistrează",
+    "failed": "Nu s-a putut crea rezumatul — transcrierea completă este mai jos",
+    "retry": "Încearcă din nou",
+    "finish": "Oprește înregistrarea și rezumă",
+    "none": "Nimic aici",
+    "blank": "Nimic de rezumat — nu a fost înregistrată nicio vorbire sau a fost prea scurtă",
+    "notFound": "Notițele nu au fost găsite",
+    "forbidden": "Nu ai acces la aceste notițe",
+    "shotAlt": "Captură de ecran la {at}",
+    "close": "Închide",
+    "view": "Vezi notițele",
+    "error": "Nu s-a putut încărca",
+    "mine": "Notițele mele",
+    "del": "Șterge notițele",
+    "delAsk": "Ștergi aceste notițe (rezumat, transcriere și capturi de ecran)? Nimeni nu le va mai putea vedea",
+    "delYes": "Șterge",
+    "delNo": "Anulează",
+    "delFail": "Nu s-a putut șterge",
+    "dlFail": "Nu s-a putut descărca — te rugăm să încerci din nou",
+    "recentNotes": "Notițe recente",
+    "empty": "Încă nu există notițe",
+    "newNote": "Începe notițe în persoană",
+    "inPerson": "Notițe întâlnire în persoană",
+    "inPersonTag": "În persoană",
+    "titleLabel": "Titlu",
+    "titlePh": "ex. Întâlnire săptămânală",
+    "told": "Am informat pe toți cei prezenți că aceasta va fi înregistrată și procesată de AI (obligatoriu)",
+    "toldWhy": "Înainte de a începe, informează pe toți cei prezenți că această conversație va fi înregistrată (înregistrarea este păstrată timp de 1 zi după încheierea notiței, iar vorbitorii sunt diferențiați după voce și etichetați după genul perceput) și transformată în text și un rezumat de către un AI extern.",
+    "start": "Începe înregistrarea",
+    "starting": "Se pregătește…",
+    "recBadge": "Înregistrare {time}",
+    "recentLines": "Ultimele rânduri",
+    "waiting": "Textul apare aici pe măsură ce oamenii vorbesc",
+    "end": "Finalizează și creează notițe",
+    "wakeWarn": "Înregistrarea se poate opri dacă ecranul se închide",
+    "adminOnly": "Doar administratorii pot folosi aceasta",
+    "aiOff": "Notițele AI nu sunt disponibile momentan (este necesară configurarea serverului). Notițele anterioare sunt listate mai jos",
+    "reload": "Reîncarcă",
+    "unsupported": "Înregistrarea nu este disponibilă pe acest dispozitiv",
+    "micDenied": "Nu se poate utiliza microfonul — verifică permisiunea",
+    "limited": "Limita de timp de procesare a fost epuizată — finalizează și creează notițele",
+    "noAgr": "Oprit: nu există confirmare de notificare la înregistrare — finalizează și pornește din nou",
+    "micLost": "Microfonul s-a deconectat și înregistrarea s-a oprit — atinge Reconectează microfonul sau finalizează notița",
+    "micRetry": "Reconectează microfonul",
+    "gone": "Această notiță a fost finalizată sau ștearsă în altă parte, așa că înregistrarea s-a oprit — folosește butonul de mai jos pentru a deschide notițele",
+    "finishing": "Se salvează ultimele cuvinte…",
+    "st": {
+      "RECORDING": "Înregistrare",
+      "SUMMARIZING": "Creare",
+      "DONE": "Gata",
+      "FAILED": "Eșuat"
+    },
+    "downloadPiBrowser": "Descărcarea Markdown funcționează doar într-un browser obișnuit (computer sau mobil). Pi Browser nu poate salva fișiere — deschide aceste notițe într-un browser de computer sau telefon (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Planuri",
+    "loading": "Se încarcă…",
+    "free": "Gratuit",
+    "freeDesc": "{time} de seminarii în fiecare lună (fără report)",
+    "monthly": "Lunar",
+    "yearly": "Anual",
+    "paidDesc": "{time} de seminarii, valabil {months} luni",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Se verifică prețul Pi",
+    "noAi": "Fără subtitrări AI, traducere, dublare sau rezumate de notițe",
+    "withAi": "Include subtitrări AI, traducere, dublare și rezumate de notițe",
+    "buy": "Plătește cu Pi",
+    "bought": "Plată efectuată. Timpul de seminar a fost adăugat.",
+    "meRemain": "Timp rămas: {time}",
+    "loginToBuy": "Conectează-te pentru a cumpăra un plan.",
+    "payNote": "Plata se face întotdeauna în Pi. Suma în moneda locală este doar o referință familiară; suma în Pi este stabilită la prețul Pi din momentul plății. Un seminar pe un plan plătit utilizează mai întâi permisele acelui plan (cele care expiră cel mai devreme), apoi continuă cu timpul gratuit din această lună.",
+    "charge": "Reîncarcă timp",
+    "hm": "{h} h {m} min",
+    "m": "{m} min",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (se verifică prețul Pi)",
+    "h": "{h} h"
+  },
+  "adminRooms": {
+    "title": "Gestionare camere",
+    "adminOnly": "Doar administratorii pot vizualiza această pagină.",
+    "refresh": "Reîmprospătează",
+    "count": "{n} camere deschise",
+    "empty": "Nu sunt camere deschise momentan.",
+    "lab": "Cameră de laborator",
+    "noSeminar": "Nicio înregistrare de seminar",
+    "peers": "{n} / {cap} conectați",
+    "producers": "{n} stream-uri",
+    "end": "Se termină {time}",
+    "stale": "Seminarul s-a încheiat, dar camera este încă deschisă pe serverul video — închideți forțat.",
+    "close": "Închide forțat",
+    "confirmSeminar": "Aceasta încheie seminarul și închide camera. Toți participanții vor fi deconectați.",
+    "confirmRoom": "Aceasta închide camera. Toți participanții vor fi deconectați.",
+    "confirmYes": "Închide",
+    "cancel": "Anulează",
+    "closing": "Se închide…",
+    "closed": "Camera închisă.",
+    "metrics": "Metricile serverului video (de la început)",
+    "metricsOff": "Nu s-au putut încărca metricile.",
+    "m": {
+      "packetsIn": "Pachete primite",
+      "packetsOut": "Pachete trimise",
+      "nackIn": "NACK-uri primite",
+      "nackOut": "NACK-uri trimise",
+      "retransmits": "Retransmisii",
+      "duplicateNack": "NACK-uri duplicate",
+      "cacheMiss": "Rateuri cache retransmisie",
+      "pliOut": "Solicitări cadre cheie (PLI)",
+      "keyframes": "Cadre cheie",
+      "layerSwitches": "Comutări calitate",
+      "queueDrops": "Eliminări din coadă"
+    }
+  },
+  "adminUsers": {
+    "title": "Utilizatori",
+    "adminOnly": "Doar administratorii pot vizualiza această pagină.",
+    "search": "Căutare după nume (minim 2 caractere)",
+    "searchBtn": "Căutare",
+    "refresh": "Reîmprospătează",
+    "count": "{n, plural, one {# utilizator} other {# utilizatori}}",
+    "empty": "Niciun utilizator.",
+    "admin": "Administrator",
+    "lastLogin": "Ultima conectare {time}",
+    "never": "Niciodată conectat",
+    "plan": {
+      "FREE": "Gratuit",
+      "M": "Lunar",
+      "Y": "Anual"
+    },
+    "until": "(până la {time})",
+    "manage": "Gestionează timpul",
+    "close": "Închide",
+    "planLabel": "Plan",
+    "hours": "Ore",
+    "minutes": "Minute",
+    "reason": "Motiv (opțional)",
+    "sub": "Redu",
+    "confirmSub": "Reduci timpul {plan} cu {time}.",
+    "confirmYes": "Confirmă",
+    "cancel": "Anulează",
+    "saving": "Se salvează…",
+    "done": "Aplicat. Timp {plan} rămas: {time}",
+    "invalid": "Introduceți o reducere între 1 minut și 1000 de ore (minute întregi 0–59).",
+    "history": "Ajustări recente",
+    "noHistory": "Nicio ajustare încă.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Acordă un permis de serviciu (timp gratuit)",
+    "svc": {
+      "H1": "Permis de 1 oră",
+      "D1": "Permis de 1 zi",
+      "M1": "Permis de 1 lună"
+    },
+    "svcNote": "Permisele de serviciu sunt timp din planul Gratuit. Ele pot fi utilizate de acum pentru acea perioadă (1 oră, 24 de ore, 1 lună) în seminarii gratuite și în partea gratuită a seminariilor plătite (fără funcții AI). Cu mai multe permise, acestea sunt utilizate automat în ordinea 1 oră → 1 zi → 1 lună.",
+    "subTitle": "Redu timpul",
+    "subNote": "Se ia mai întâi din permisele care expiră cel mai târziu. Dacă este mai mult decât ceea ce a rămas, se elimină doar timpul rămas.",
+    "confirmSvc": "Acordă un {svc}.",
+    "doneSvc": "Ai acordat un {svc}. Timp gratuit rămas: {time} (permisul expiră {end})"
+  }
+}

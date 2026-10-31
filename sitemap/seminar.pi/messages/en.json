@@ -1,4 +1,11 @@
 {
+  "common": {
+    "localeSwitcher": {
+      "button": "Change language",
+      "search": "Search language",
+      "empty": "No results"
+    }
+  },
   "meta": {
     "title": "seminar.pi",
     "description": "Live video seminars you join with Pi"
@@ -28,7 +35,6 @@
   },
   "nav": {
     "link": "Link account",
-    "switchLocale": "한국어",
     "privacy": "Privacy",
     "plan": "Plans",
     "rooms": "Rooms",

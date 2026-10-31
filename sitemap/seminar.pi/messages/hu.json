@@ -1,0 +1,1089 @@
+{
+  "common": {
+    "localeSwitcher": {
+      "button": "Nyelv módosítása",
+      "search": "Nyelv keresése",
+      "empty": "Nincs találat"
+    }
+  },
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Élő videós szemináriumok, amelyekhez Pi-vel csatlakozhatsz"
+  },
+  "home": {
+    "description": "A házigazdák nyílt szemináriumokat tartanak, a résztvevők pedig Pi-vel csatlakoznak élő videós foglalkozásokhoz.",
+    "badge": "Élő szemináriumok gyönyörű szigeteken",
+    "headline": "Nézz, hallgass és tanulj együtt — élőben",
+    "ctaBrowse": "Szemináriumok böngészése",
+    "ctaPlan": "Csomagok megtekintése",
+    "features": {
+      "video": "Élő videó",
+      "caption": "Feliratok és fordítás",
+      "notes": "AI értekezlet jegyzetek",
+      "pay": "Fizetés Pi-vel"
+    },
+    "listTitle": "Szemináriumok",
+    "cal": {
+      "title": "Szeminárium naptár",
+      "desc": "A múltbeli szemináriumoktól a közelgőekig — koppints egy dátumra a részletekért.",
+      "legendSmn": "Szemináriumok",
+      "legendEnded": "Múltbeli szemináriumok",
+      "legendMine": "Saját eseményeim",
+      "failed": "Nem sikerült betölteni a szeminárium dátumait. Kérjük, próbáld újra később.",
+      "open": "Részletek megtekintése"
+    }
+  },
+  "nav": {
+    "link": "Fiók összekapcsolása",
+    "privacy": "Adatvédelem",
+    "plan": "Csomagok",
+    "rooms": "Szobák",
+    "admin": "Admin",
+    "users": "Felhasználók",
+    "home": "Főoldal",
+    "privacyShort": "Adatvédelem",
+    "menu": "Főmenü",
+    "fold": "Menü összecsukása",
+    "unfold": "Menü kibontása"
+  },
+  "auth": {
+    "checking": "Bejelentkezés ellenőrzése…",
+    "signedIn": "{name}",
+    "inPerson": "Személyes jegyzetek",
+    "required": "Kérjük, jelentkezz be Pi fiókoddal.",
+    "signIn": "Bejelentkezés Pi-vel",
+    "openInPiBrowser": "Nyissa meg ezt az oldalt a Pi Browserben, hogy bejelentkezzen Pi-fiókjával.",
+    "authenticating": "Bejelentkezés…",
+    "google": "Bejelentkezés Google-lel",
+    "signOut": "Kijelentkezés",
+    "or": "vagy",
+    "linkRequired": "Bejelentkezett a Google-lal, de még nincs összekapcsolva egy Pi-fiókkal. Adjon ki egy összekapcsolási kódot a Pi Browserben, és írja be ide.",
+    "linkNeeded": "Pi fiók összekapcsolása szükséges",
+    "linkCheckFailed": "Nem sikerült ellenőrizni a fiókod összekapcsolási állapotát (átmeneti szerverhiba). Kérjük, frissítsd az oldalt egy pillanat múlva."
+  },
+  "piOAuth": {
+    "signingIn": "Bejelentkezés Pi fiókoddal…",
+    "failed": "Pi bejelentkezés sikertelen. Kérjük, próbáld újra.",
+    "stateMismatch": "Nem sikerült ellenőrizni ezt a bejelentkezési kérést (lejárt vagy másik lap). Kérjük, próbáld újra.",
+    "retry": "Újrapróbálkozás",
+    "backHome": "Főoldal"
+  },
+  "link": {
+    "title": "Fiók összekapcsolása",
+    "intro": "Kapcsolja össze a Pi Browserben bejelentkezett fiókját a Google-fiókjával egy normál böngészőben. Az összekapcsolás után ugyanazt a fiókot használhatja PC-böngészőben is.",
+    "checking": "Bejelentkezés ellenőrzése…",
+    "piIssueTitle": "Bejelentkezéshez normál böngészőből is",
+    "codeHint": "Generáld az alábbi kódot, majd jelentkezz be Google-lel egy PC böngészőben, és írd be az Összekapcsolás fiók oldalon (10 percen belül).",
+    "piIssue": "Összekapcsolási kód generálása",
+    "reissue": "Új kód generálása",
+    "expiresIn": "Lejár {min} perc múlva",
+    "enterTitle": "Összekapcsolási kód megadása",
+    "enterHint": "A Pi Browserben nyissa meg a seminar.pi → Fiók összekapcsolása → Összekapcsolási kód kiadása menüpontot, majd írja be a 6 jegyű kódot.",
+    "codeLabel": "Összekapcsolási kód",
+    "submit": "Összekapcsolás",
+    "done": "Összekapcsolva. Mostantól a Google bejelentkezést is használhatod.",
+    "linked": "{name} összekapcsolva a Google bejelentkezéssel."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Bejelentkezés szükséges",
+    "AUTH_PI_REQUIRED": "Pi bejelentkezés szükséges",
+    "AUTH_PI_SESSION_INVALID": "A munkamenet lejárt. Kérjük, jelentkezz be újra.",
+    "AUTH_PI_TOKEN_INVALID": "Pi bejelentkezés ellenőrzése sikertelen",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Hiányzik a Pi bejelentkezési információ",
+    "FORBIDDEN": "Nincs jogosultságod",
+    "BAD_REQUEST": "Hibás kérés",
+    "BAD_REQUEST_BODY": "Hibás kérés",
+    "INVALID_INPUT": "Érvénytelen bemenet",
+    "QUERY_FAILED": "Betöltés sikertelen",
+    "SAVE_FAILED": "Mentés sikertelen",
+    "INTERNAL": "Valami hiba történt",
+    "SERVER_CONFIG": "Szerver konfigurációs hiba. Kérjük, lépj kapcsolatba az üzemeltetővel.",
+    "PI_API_CONNECT_FAILED": "Nem sikerült elérni a Pi Networköt",
+    "DB_UNAVAILABLE": "Az adatok átmenetileg nem elérhetők. Kérjük, próbáld újra később.",
+    "NOT_FOUND": "Nem található",
+    "RATE_LIMITED": "Túl sok kérés. Kérjük, próbáld újra rövidesen.",
+    "PAYLOAD_TOO_LARGE": "A kérés túl nagy",
+    "NETWORK": "Ellenőrizd a hálózati kapcsolatot",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Ez a Pi felhasználónév már regisztrálva van más hitelesítő adatokkal. Kérjük, lépj kapcsolatba az adminisztrátorral.",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Ez a fiók inaktív. Kérjük, lépj kapcsolatba az adminisztrátorral.",
+    "AUTH_GOOGLE_REQUIRED": "Google bejelentkezés szükséges.",
+    "LINK_CODE_INVALID": "Az összekapcsolási kód érvénytelen vagy lejárt. Adjon ki egy újat a Pi Browserben.",
+    "LINK_ALREADY_LINKED": "Ez a fiók már össze van kapcsolva.",
+    "LINK_CODE_GEN_FAILED": "Nem sikerült összekapcsolási kódot létrehozni. Kérjük, próbáld újra később.",
+    "AUTH_DB_UNAVAILABLE": "Nem sikerült menteni a fiókodat, ezért a bejelentkezés sikertelen. Kérjük, próbáld újra később.",
+    "LINK_TRY_LIMIT": "Túl sok helytelen összekapcsolási kód. Próbáld újra 15 perc múlva.",
+    "PRICE_UNAVAILABLE": "Nem sikerült lekérni a Pi árát. Kérjük, próbáld újra rövidesen.",
+    "QUOTE_EXPIRED": "A fizetési ajánlat lejárt. Kérjük, fizess újra.",
+    "PLAN_EXHAUSTED": "Felhasználtad az összes szeminárium idődet. Töltsd fel a Csomagok oldalon.",
+    "HOST_AWAY": "A házigazda nincs a szobában. A házigazda csatlakozása után léphetsz be.",
+    "PLAN_AI_PAID": "Az AI funkciók fizetős csomagokban érhetők el.",
+    "AI_UNAVAILABLE": "Az AI funkciók jelenleg nem elérhetők.",
+    "SPEECH_CHUNK_INVALID": "Az audio darab formátuma érvénytelen.",
+    "SPEECH_NOT_LIVE": "Ez a szeminárium nem élő.",
+    "SPEECH_NO_AGR": "Hangfeldolgozási hozzájárulás szükséges.",
+    "SPEECH_RATE": "Túl sok hangkérés. Kérjük, próbáld újra rövidesen.",
+    "SPEECH_QUOTA": "A szeminárium hangfeldolgozási ideje kimerült.",
+    "SPEECH_USR_QUOTA": "Felhasználtad a fordítási és fordított hangkorlátodat ehhez a szemináriumhoz.",
+    "SPEECH_FAILED": "Nem sikerült a beszédet szöveggé alakítani.",
+    "SPEECH_STAGE_ONLY": "Csak a színpadon lévők használhatnak hangfeliratokat.",
+    "TRANSLATE_FAILED": "Nem sikerült lefordítani a feliratot.",
+    "POLL_CLOSED": "Ez a szavazás lezárult.",
+    "NOTE_NOT_RECORDING": "Ezek a jegyzetek nem rögzítenek.",
+    "NOTE_SHOT_INVALID": "Érvénytelen képernyőfelvétel.",
+    "NOTE_AUDIO_INVALID": "Érvénytelen felvételi fájl.",
+    "NOTE_SHOT_RATE": "Túl sok képernyőfelvétel.",
+    "NOTE_RETRY_SOON": "Egy perc múlva újra próbálkozhatsz.",
+    "SPEECH_TTS_FAILED": "Nem sikerült létrehozni a fordított hangot.",
+    "CAPTION_SIG_INVALID": "Ezt a feliratot nem sikerült ellenőrizni, ezért nem lett lefordítva.",
+    "PLAN_EXPIRES_BEFORE_START": "A kezdési időpont a csomag érvényességének lejárta után van.",
+    "PAY_ALREADY_PAID": "Egy fizetés még feldolgozás alatt van. Ha a pénztárcában írtál alá, próbáld újra 3 perc múlva.",
+    "REC_PAID_ONLY": "A felvétel csak havi vagy éves csomaggal rendelkező szemináriumokon érhető el, ahol van még fizetett idő.",
+    "REC_NOT_IN_ROOM": "Még ellenőrizzük, hogy a szobában vagy-e. Próbáld újra egy pillanat múlva.",
+    "ENGINE_OFF": "A videószerver adminisztrátori kulcsa nincs konfigurálva.",
+    "ENGINE_UNAVAILABLE": "A videószerver nem válaszol. Kérjük, próbáld újra rövidesen.",
+    "ADJ_NOTHING": "Nincs csökkenthető hátralévő idő."
+  },
+  "progress": {
+    "title": "Fejlesztési folyamat",
+    "subtitle": "Kész, folyamatban lévő és tervezett, funkciók szerint · {date} állapot",
+    "overall": "Összes lépés",
+    "stepsDone": "{done}/{total} lépés kész ({pct}%)",
+    "featureUnit": "funkció",
+    "status": {
+      "done": "Kész",
+      "doing": "Folyamatban",
+      "todo": "Tervezett",
+      "drop": "Elvetve"
+    },
+    "features": {
+      "F01": {
+        "name": "Bejelentkezés",
+        "desc": "Pi Browser bejelentkezés, Google bejelentkezés más böngészőkben, és mindkét fiók összekapcsolása"
+      },
+      "F05": {
+        "name": "Élő videós szeminárium",
+        "desc": "Saját videómotorunk, a Galápagos — a cél egy előadó streamelése akár 30 résztvevőnek"
+      },
+      "F02": {
+        "name": "Szeminárium létrehozása",
+        "desc": "Állítsd be az alcímet, időt, kapacitást és a szeminárium díját egy szeminárium létrehozásához (név = sziget, automatikus)"
+      },
+      "F03": {
+        "name": "Szeminárium lista és részletek",
+        "desc": "Böngéssz az nyitott szemináriumok között oldalanként, és tekintsd meg a részleteket"
+      },
+      "F04": {
+        "name": "Pi belépési díj fizetése",
+        "desc": "Fizesd ki a szeminárium díját Pi-ben; a szerver újra ellenőrzi az összeget, mielőtt beengedne"
+      },
+      "F06": {
+        "name": "Házigazda kifizetések",
+        "desc": "Fizesd ki a belépési díjból származó bevételt a házigazdáknak Pi-ben"
+      },
+      "F07": {
+        "name": "Ismétlések",
+        "desc": "Nézd meg a rögzített szemináriumokat később"
+      },
+      "FU": {
+        "name": "Értekezlet kiegészítők alapja",
+        "desc": "Egy jelcsatorna a kiegészítőknek, AI kapcsolat, hangdarabok, mikrofon hozzájárulás és adattáblák"
+      },
+      "F08": {
+        "name": "Ütemezés és megosztás",
+        "desc": "Naptár link, esemény fájl (.ics) és e-mail meghívó minden szemináriumhoz"
+      },
+      "F09": {
+        "name": "Zajcsökkentés és világítás",
+        "desc": "Csökkentsd a mikrofon zaját és világosítsd a sötét kamera videót"
+      },
+      "F10": {
+        "name": "Élő feliratok",
+        "desc": "Alakítsd az előadó beszédét szöveggé a színpad alatt"
+      },
+      "F11": {
+        "name": "Szavazások, Q&A és részvétel",
+        "desc": "Tarts szavazásokat és kérdéseket egy szeminárium során; a házigazdák letöltik a jelenléti listát"
+      },
+      "F12": {
+        "name": "Háttéreffektusok",
+        "desc": "Homályosítsd el a hátteredet, vagy cseréld le egy előre beállított vagy saját képre (az eszközödön feldolgozva)"
+      },
+      "F13": {
+        "name": "Helyi felvétel",
+        "desc": "Az előadó rögzíti a szemináriumot a saját eszközén, és mindenki látja, hogy a felvétel be van kapcsolva"
+      },
+      "F14": {
+        "name": "AI értekezlet jegyzetek",
+        "desc": "Amikor az előadó bekapcsolja, a beszéd és a képernyők rögzítésre kerülnek, és összefoglalásra kerülnek kulcspontokba, döntésekbe és teendőkbe"
+      },
+      "F15": {
+        "name": "Személyes értekezlet jegyzetek",
+        "desc": "Rögzíts egy értekezletet csak mikrofonnal, és kapj értekezlet jegyzeteket (adminok)"
+      },
+      "F16": {
+        "name": "Fordított feliratok",
+        "desc": "Mutasd a feliratokat az általad választott nyelvre fordítva"
+      },
+      "F17": {
+        "name": "Fordításban hallgatás",
+        "desc": "Olvasd fel a fordított feliratokat szintetikus hanggal, miközben csökkented az eredeti hangot"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser bejelentkezés",
+      "googleLogin": "Google bejelentkezés",
+      "accountLink": "Fiók összekapcsolása",
+      "deviceTest": "Kamera eszköz teszt",
+      "oneToTwo": "Előadó 1 → 2 résztvevő",
+      "recovery": "Fagyás helyreállítása és stabilitás",
+      "structure": "Motor szerkezet tisztítása",
+      "autoQuality": "Automatikus minőség, 30 résztvevő",
+      "roomService": "Szoba belépés és felvétel",
+      "roomUi": "Szoba képernyő (előszoba·színpad·chat·kézfeltartás·moderálás)",
+      "createForm": "Létrehozás képernyő",
+      "list": "Lista",
+      "detail": "Részletek",
+      "payRequest": "Fizetési kérés",
+      "payVerify": "Összeg újraellenőrzése és belépés",
+      "settle": "Kifizetés",
+      "vod": "Felvétel visszajátszás",
+      "appRelay": "Motor kiegészítő jelcsatorna",
+      "aiBase": "AI, hangdarabok, hozzájárulás és adattáblák",
+      "shareLinks": "Naptár link, .ics és e-mail meghívó",
+      "noiseLight": "Zajcsökkentés és világítás",
+      "liveCaptions": "Élő feliratok",
+      "pollQnaAttend": "Szavazások, Q&A és jelenléti lista",
+      "backgrounds": "Homályosítás, előre beállított és saját kép",
+      "localRecording": "Előadó felvétele és felvétel jelvény",
+      "aiNotes": "Felvétel, összefoglaló és jegyzetek oldal",
+      "inPersonNotes": "Csak mikrofonos jegyzetek és saját jegyzeteim",
+      "captionTranslate": "Nyelvválasztás és eredeti/fordított váltás",
+      "dubbing": "Szintetikus hang lejátszása és csökkentett eredeti hang"
+    },
+    "refLabel": "Referencia modell",
+    "uiRef": "UI alapvonal — egy széles körben használt webes videókonferencia alkalmazás képernyő- és funkció mintái, a seminar.pi-hez igazítva"
+  },
+  "room": {
+    "rename": {
+      "later": "Név mentve, de most nem lehetett értesíteni a többieket. Újra csatlakozás után látni fogják.",
+      "tile": "Kattints a nevem megváltoztatásához",
+      "menu": "Nevem megváltoztatása",
+      "title": "Nevem ebben a szemináriumban",
+      "hint": "Legfeljebb 30 karakter. Csak ebben a szemináriumban használatos, és azonnal frissül mindenki képernyőjén.",
+      "save": "Mentés",
+      "saving": "Mentés…",
+      "cancel": "Mégse",
+      "taken": "Ezt a nevet már használja valaki más (házigazda vagy résztvevő). Válassz másikat.",
+      "failed": "Nem sikerült menteni a nevedet. Próbáld újra."
+    },
+    "roomTitle": {
+      "edit": "Kattints az alcím szerkesztéséhez",
+      "label": "Alcím",
+      "placeholder": "Alcím (max. 60)",
+      "save": "Mentés",
+      "cancel": "Mégse",
+      "failed": "Nem sikerült menteni az alcímet."
+    },
+    "mirror": "Videóm tükrözése",
+    "barPin": "Mindig mutassa az alsó sávot",
+    "barAuto": "Alsó sáv automatikus elrejtése",
+    "title": "Csatlakozás szemináriumhoz · {room}",
+    "titleSeminar": "Váróterem",
+    "noEngine": "A videószerver még nem áll készen.",
+    "joinAs": "Csatlakozás mint",
+    "presenter": "Előadó",
+    "audience": "Közönség",
+    "join": "Csatlakozás most",
+    "nameLabel": "Név",
+    "audienceHint": "A közönség tagjai nem használnak kamerát vagy mikrofont. Csatlakozás után látni és hallani fogod az előadót.",
+    "preview": {
+      "pending": "Kamera és mikrofon előkészítése…",
+      "audioOnly": "Kamera nem elérhető — csak hang küldése.",
+      "none": "Kamera és mikrofon nem elérhető. Ellenőrizd az engedélyeket (még média nélkül is csatlakozhatsz).",
+      "videoOnly": "Mikrofon nem elérhető — csak videó küldése. Ellenőrizd a mikrofon engedélyét."
+    },
+    "mic": {
+      "on": "Mikrofon kikapcsolása",
+      "off": "Mikrofon bekapcsolása"
+    },
+    "cam": {
+      "on": "Kamera kikapcsolása",
+      "off": "Kamera bekapcsolása"
+    },
+    "controls": "Hívásvezérlők",
+    "leave": "Kilépés",
+    "enableSound": "Hang engedélyezése",
+    "state": {
+      "connecting": "Csatlakozás…",
+      "reconnecting": "Újracsatlakozás…"
+    },
+    "waiting": "Várakozás az előadóra.",
+    "rejoin": "Újra csatlakozás",
+    "err": {
+      "generic": "Valami hiba történt. Kérjük, csatlakozz újra.",
+      "CLOSED": "A kapcsolat megszakadt.",
+      "NO_ENGINE": "A videószerver még nem áll készen.",
+      "TICKET_401": "Kérjük, jelentkezz be.",
+      "TICKET_403": "Nincs jogosultságod az előadáshoz. Csatlakozz közönségként.",
+      "TICKET_503": "A videószerver még nincs konfigurálva.",
+      "TICKET_NETWORK": "Ellenőrizd a hálózati kapcsolatot.",
+      "TICKET_INVALID": "A belépési jegyed lejárt.",
+      "TICKET_EXPIRED": "A belépési jegyed lejárt.",
+      "ROOM_FULL": "Ez a szeminárium megtelt.",
+      "ROOM_CLOSED": "A szoba bezárult – a szeminárium véget ért, vagy a házigazda több mint 5 perce távol volt.",
+      "DUPLICATE_SESSION": "Másik eszközről csatlakozott, ezért ez a képernyő lekapcsolódott.",
+      "ROLE_FORBIDDEN": "Nincs jogosultsága a prezentáláshoz.",
+      "WS_FAILED": "Nem sikerült csatlakozni a videószerverhez.",
+      "ICE_FAILED": "A videókapcsolat megszakadt. Ellenőrizze a hálózatát.",
+      "MEDIA_FAILED": "Nem sikerült elindítani a kamerát vagy a mikrofont.",
+      "TIMEOUT": "A videószerver nem válaszol.",
+      "TICKET_402": "Ez egy fizetős szeminárium. Kérjük, fizessen a szeminárium oldalán, mielőtt belép.",
+      "TICKET_404": "A szeminárium nem található.",
+      "TICKET_409": "Ez a szeminárium véget ért vagy törölve lett.",
+      "TICKET_HOST_AWAY": "A házigazda még nem csatlakozott, vagy több mint 5 perce távol van, ezért nem tud belépni. Kérjük, próbálja újra, miután a házigazda csatlakozott.",
+      "TICKET_PLAN_EXHAUSTED": "Ennek a szemináriumnak a csomagjában nem maradt idő, ezért nem indulhat el. Ugyanazt a csomagot újra megvásárolva időt ad hozzá (az ingyenes a következő hónapban 1 órával megújul)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Nem sikerült megváltoztatni a mikrofont. Kérjük, próbálja újra.",
+        "video": "Nem sikerült megváltoztatni a kamerát. Kérjük, próbálja újra."
+      },
+      "forbidden": "Nincs jogosultsága a prezentáláshoz, ezért nézőként folytatja.",
+      "demoted": "Visszakerült a közönségbe.",
+      "endFailed": "Nem sikerült befejezni a szemináriumot. Kérjük, próbálja újra.",
+      "chatFailed": "Az üzenet nem lett elküldve.",
+      "actionFailed": "Nem sikerült teljesíteni a kérést. Kérjük, próbálja újra.",
+      "shareFailed": "Nem sikerült elindítani a képernyőmegosztást.",
+      "err": {
+        "RATE_LIMITED": "Túl gyorsan küld. Kérjük, várjon egy pillanatot.",
+        "ROLE_FORBIDDEN": "Nincs jogosultsága ehhez a művelethez.",
+        "MEDIA_FAILED": "Nem sikerült elindítani a mikrofonját vagy kameráját. Kérjük, ellenőrizze az engedélyeket.",
+        "LOCKED": "A prezentáló zárolta."
+      },
+      "mutedBy": {
+        "audio": "A prezentáló elnémította a mikrofonját.",
+        "video": "A prezentáló kikapcsolta a kameráját."
+      },
+      "policy": {
+        "locked": "A prezentáló zárolta a mikrofonokat. Akkor kapcsolhatja be a sajátját, ha feloldják.",
+        "unlocked": "A mikrofonok feloldva."
+      },
+      "consent": {
+        "saveFail": "Nem sikerült menteni a hozzájárulását. Ellenőrizze a regisztrációját, és kapcsolja be újra a mikrofont."
+      }
+    },
+    "home": "Főoldalra",
+    "tile": {
+      "fullscreen": "Kattintson duplán a teljes képernyőhöz · Esc a kilépéshez",
+      "self": "{name} (Ön)",
+      "presenter": "Előadó",
+      "micOff": "Mikrofon kikapcsolva",
+      "screen": "{name} képernyője",
+      "row": "Egyéb előadók",
+      "pin": "{name} nagyban mutatása",
+      "unpin": "Automatikus elrendezés"
+    },
+    "more": "További opciók",
+    "joinNoCam": "Csatlakozás kamera nélkül",
+    "net": {
+      "afterJoin": "A csatlakozás után a kapcsolat automatikusan ellenőrzésre kerül.",
+      "measuring": "Kapcsolat ellenőrzése…",
+      "good": "Jó kapcsolat",
+      "fair": "Közepes kapcsolat",
+      "poor": "Gyenge kapcsolat",
+      "reason": {
+        "loss": {
+          "audio": "Az audioadatok {pct}%-a elveszik.",
+          "video": "A videóadatok {pct}%-a elveszik."
+        },
+        "rate": {
+          "audio": "Az audiofeltöltés alacsony, {kbps} kbps.",
+          "video": "A videófeltöltés alacsony, {kbps} kbps. A minőség romolhat."
+        }
+      }
+    },
+    "people": "{n} a szobában",
+    "screen": {
+      "start": "Képernyő megosztása",
+      "stop": "Megosztás leállítása"
+    },
+    "panel": {
+      "title": "Csevegés · Kérdések és válaszok · Szavazások · Résztvevők",
+      "chat": "Csevegés",
+      "people": "Résztvevők",
+      "close": "Panel bezárása",
+      "qna": "Kérdések és válaszok",
+      "polls": "Szavazások"
+    },
+    "chat": {
+      "empty": "Még nincsenek üzenetek. A csevegés nem kerül mentésre.",
+      "me": "Ön",
+      "failed": "Nem küldve.",
+      "retry": "Újrapróbálkozás",
+      "input": "Üzenet írása",
+      "send": "Küldés"
+    },
+    "hand": {
+      "raise": "Kézfelemelés",
+      "lower": "Kéz leengedése",
+      "list": "Feltett kezek",
+      "lowerAll": "Minden kéz leengedése",
+      "raised": "Kéz felemelve",
+      "notice": "{name} felemelte a kezét.",
+      "dismiss": "Elvetés",
+      "waiting": "{n} ember vár a felszólalásra"
+    },
+    "react": {
+      "open": "Reakciók",
+      "e0": "Tetszik",
+      "e1": "Taps",
+      "e2": "Nevetés",
+      "e3": "Meglepett",
+      "e4": "Szomorú",
+      "e5": "Szótlan",
+      "e6": "Szerelem"
+    },
+    "quality": {
+      "label": "Minőség",
+      "auto": "Automatikus",
+      "high": "Magas",
+      "medium": "Közepes",
+      "low": "Alacsony",
+      "unstable": "A hálózata instabil"
+    },
+    "roles": {
+      "presenter": "Előadó",
+      "panel": "Panelista",
+      "audience": "Közönség"
+    },
+    "stage": {
+      "invite": "Meghívás a színpadra",
+      "remove": "Áthelyezés a közönségbe",
+      "promoted": "Meghívást kapott a színpadra. Ha felemelte a kezét, a kamerája automatikusan bekapcsol (hacsak nincs zárolva vagy nincs engedélyezve). Kapcsolja be a mikrofonját a beszédhez (a mikrofon nem kapcsol be automatikusan).",
+      "later": "Később"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} felemelte a kezét."
+    },
+    "leaveDialog": {
+      "title": "Kilépés a szemináriumból",
+      "body": "Kiléphet egyedül, vagy befejezheti a szemináriumot, és mindenkit leválaszthat.",
+      "confirmTitle": "Befejezi a szemináriumot?",
+      "confirmBody": "Mindenki lekapcsolódik, és senki sem csatlakozhat újra ehhez a szemináriumhoz.",
+      "cancel": "Mégse",
+      "end": "Szeminárium befejezése",
+      "endConfirm": "Befejezés most"
+    },
+    "mod": {
+      "muteAll": "Mindenki némítása",
+      "lock": "Mikrofonok zárolása",
+      "unlock": "Mikrofonok feloldása",
+      "locked": "Az előadó zárolta a mikrofonokat",
+      "muteMic": "Mikrofon némítása",
+      "askMic": "Némítás feloldásának kérése",
+      "muteCam": "Kamera kikapcsolása",
+      "muteMicOf": "{name} mikrofonjának némítása",
+      "askMicOf": "Kérje {name} némításának feloldását",
+      "muteCamOf": "{name} kamerájának kikapcsolása"
+    },
+    "ask": {
+      "audio": "Az előadó megkérte, hogy kapcsolja be a mikrofonját.",
+      "video": "Az előadó megkérte, hogy kapcsolja be a kameráját.",
+      "ignore": "Figyelmen kívül hagyás"
+    },
+    "toDetail": "Ugrás a szeminárium oldalára",
+    "consent": {
+      "title": "Mielőtt bekapcsolja a mikrofonját",
+      "body": "Ha a felvétel, feliratok vagy AI jegyzetek be vannak kapcsolva ebben a szemináriumban, a hangja szöveggé alakulhat, tárolódhat és lefordítható. A hangfeldolgozást az Ön országán kívüli AI szolgáltatás végzi. Ha nem ért egyet, a mikrofonja akkor is bekapcsol – csak a hangja marad ki a feldolgozásból.",
+      "privacy": "Adatvédelmi irányelvek",
+      "newTab": "(új lapon nyílik meg)",
+      "decline": "Nem értek egyet",
+      "agree": "Egyetértek és bekapcsolom a mikrofont",
+      "notice": "Amikor a felvétel, feliratok vagy AI jegyzetek be vannak kapcsolva, az előadók hangja feldolgozásra kerül. A közönség hangja nem kerül elküldésre.",
+      "saveFailClosed": "Ez a szeminárium véget ért, így a hozzájárulás nem rögzíthető."
+    },
+    "captions": {
+      "title": "Feliratok",
+      "room": "Élő feliratok (egész szoba)",
+      "show": "Feliratok megjelenítése",
+      "size": {
+        "label": "Szövegméret",
+        "sm": "Kicsi",
+        "md": "Közepes",
+        "lg": "Nagy"
+      },
+      "waiting": "A feliratok akkor jelennek meg, amikor az előadó bekapcsolja őket.",
+      "limit": "Elérte a beszédfeldolgozási korlátot, ezért a feliratok és az AI jegyzetek leálltak.",
+      "sendFail": "Nem sikerült bekapcsolni a feliratokat. Kérjük, próbálja újra rövidesen.",
+      "sendFailOff": "Nem sikerült kikapcsolni a feliratokat. Kérjük, próbálja újra rövidesen.",
+      "region": "Feliratok",
+      "translate": "Lefordított feliratok megjelenítése",
+      "lang": "Fordítás nyelve",
+      "langMine": "Saját nyelveim",
+      "langAll": "Minden nyelv",
+      "trStop": {
+        "forbidden": "A fordított feliratok csak a regisztrált résztvevők számára érhetők el. Az eredeti megjelenítése.",
+        "unavailable": "A fordított feliratok jelenleg nem érhetők el. Az eredeti megjelenítése.",
+        "quota": "Ez a szeminárium elérte a fordítási korlátját. Az eredeti megjelenítése.",
+        "usrQuota": "Felhasználta a fordítási korlátját ehhez a szemináriumhoz. Az eredeti megjelenítése."
+      },
+      "unsupported": "Ez az eszköz nem tud élő feliratokat készíteni (a böngésző nem támogatja az audiofelvételt)."
+    },
+    "effects": {
+      "title": "Effektek",
+      "light": "Fénykorrekció",
+      "noise": "Zajcsökkentés",
+      "noiseFail": "A zajcsökkentés nem módosítható ezen az eszközön.",
+      "close": "Bezárás",
+      "preview": "Saját előnézet",
+      "bg": "Háttér",
+      "bgNone": "Nincs",
+      "bgBlur": "Elmosás",
+      "scenes": {
+        "beach": "🏝️ Maldív-szigetek tengerpartja",
+        "autumn": "🍁 Őszi völgy",
+        "fireplace": "🔥 Kandalló",
+        "xmas": "🎄 Karácsonyi tárgyaló"
+      },
+      "bgs": {
+        "dusk": "Alkonyat",
+        "ocean": "Óceán",
+        "forest": "Erdő",
+        "studio": "Stúdió",
+        "grid": "Rács",
+        "dots": "Pontok"
+      },
+      "myAdd": "Saját kép",
+      "myItem": "Saját kép {n}",
+      "myDel": "Saját kép {n} törlése",
+      "mySaveFail": "A háttér alkalmazva lett, de nem sikerült menteni ezen az eszközön (csak ehhez a megbeszéléshez).",
+      "bgStopped": "A háttéreffekt leállt és kikapcsolódott. Válassza ki újra az újraindításhoz.",
+      "myNote": "A képei csak ezen az eszközön tárolódnak (max. 3 db, egyenként 2 MB).",
+      "mobileBlurOnly": "Telefonokon csak az elmosott háttér érhető el (a képhátterek PC-n működnek).",
+      "myTooBig": "Csak 2 MB-ig használható képek.",
+      "preparing": "Előkészítés…",
+      "bgFailed": "Nem sikerült betölteni a háttéreffektet.",
+      "autoOff": "Az eszköze túl lassú, ezért a háttéreffekt kikapcsolódott.",
+      "unsupported": "A háttéreffektek nem érhetők el ezen az eszközön.",
+      "noCam": "Kapcsolja be a kameráját a háttér kiválasztásához.",
+      "lightUnsupported": "A fénykorrekció nem érhető el ezen az eszközön.",
+      "noiseUnsupported": "A zajcsökkentési beállítások nem támogatottak ezen az eszközön."
+    },
+    "sheetClose": "Bezárás",
+    "polls": {
+      "new": "Új szavazás",
+      "question": "Kérdés",
+      "option": "Opció {n}",
+      "remove": "Opció {n} eltávolítása",
+      "addOption": "Opció hozzáadása",
+      "start": "Szavazás indítása",
+      "cancel": "Mégse",
+      "dup": "Az opcióknak különbözőnek kell lenniük.",
+      "vote": "Szavazás",
+      "change": "Szavazat módosítása",
+      "close": "Szavazás lezárása",
+      "closed": "Lezárva",
+      "mine": "Az Ön választása",
+      "result": "{pct}% ({n} szavazat)",
+      "total": "Összesen {n} szavazat",
+      "empty": "Még nincsenek szavazások.",
+      "loading": "Betöltés…",
+      "labOnly": "A szavazások csak szemináriumi szobákban érhetők el.",
+      "started": "Új szavazás indult.",
+      "goVote": "Szavazás",
+      "votersNote": "A szervező láthatja, ki melyik opcióra szavazott.",
+      "voters": "Szavazott: {names}"
+    },
+    "qna": {
+      "sort": "Rendezés",
+      "by": {
+        "top": "Legnépszerűbb",
+        "new": "Legújabb"
+      },
+      "rcm": "Felpontozás ({n})",
+      "answered": "Megválaszolva",
+      "answer": "Megválaszoltként jelölés",
+      "unanswer": "Megválaszolatlanra jelölés",
+      "hide": "Elrejtés",
+      "doneN": "{n} megválaszolva",
+      "backOpen": "Megválaszolatlan kérdések",
+      "empty": "Még nincsenek kérdések.",
+      "emptyDone": "Nincsenek megválaszolt kérdések.",
+      "loading": "Betöltés…",
+      "input": "Kérdés feltevése (500 karakter)",
+      "send": "Küldés",
+      "left": "{n} maradt",
+      "labOnly": "A Kérdések és válaszok csak szemináriumi szobákban érhetők el."
+    },
+    "recording": {
+      "title": "Felvétel",
+      "badge": "Felvétel",
+      "unsupported": "Ez a böngésző nem támogatja a felvételt. Kérjük, rögzítsen egy normál böngészőből számítógépen.",
+      "piBrowserOnly": "A felvétel csak normál böngészőben (PC vagy mobil) működik. A Pi Browser nem tudja menteni a felvételi fájlokat – nyissa meg ezt a szemináriumot számítógépes vagy telefonos böngészőben (seminarz.vercel.app) a felvételhez.",
+      "audioSuspended": "Lehet, hogy ezen az eszközön nem indult el a hangfelvétel. Csak a kép rögzülhet.",
+      "notifyFailed": "A felvétel nem indult el, mert a résztvevőket nem lehetett értesíteni. Kérjük, próbálja újra rövidesen.",
+      "confirm": {
+        "title": "Felvétel indítása?",
+        "body": "Amikor a felvétel elindul, mindenki látni fogja a „Felvétel” jelzést. A fájl csak ezen az eszközön tárolódik, és soha nem kerül feltöltésre vagy külföldre továbbításra. Kérjük, értesítse a résztvevőket, mielőtt elkezdi.",
+        "download": "Amikor leállítja, egy MP4 fájl mentésre kerül a letöltési mappájába (azok a böngészők, amelyek nem tudnak MP4-et rögzíteni, egy pillanatig konvertálják; a körülbelül 45 percnél hosszabb felvételek eredeti formátumban maradhatnak). Az alkalmazáson belüli böngészők blokkolhatják a fájlmentést, ezért rögzítsen egy normál böngészőből számítógépen.",
+        "cancel": "Mégse",
+        "start": "Felvétel indítása",
+        "charge": "Felvétel közben a felvételi idő a szoba idején felül még egyszer levonásra kerül a fizetett idejéből (2x felvétel közben). Amikor a fizetett idő lejár, a felvétel leáll, és a fájl mentésre kerül."
+      },
+      "resave": {
+        "label": "Felvételi fájl",
+        "save": "Mentés újra",
+        "dismiss": "Mentés újra bezárása"
+      },
+      "toast": {
+        "started": "A felvétel elindult – mindenki láthatja.",
+        "saved": "Felvétel mentve. Ellenőrizze a letöltési mappáját. Ha semmi sem mentődött, koppintson a képernyő tetején található [Mentés újra] gombra.",
+        "autoStopped": "A felvétel leállt, mert a böngésző leállította, vagy elérte a méretkorlátot. Addig minden mentve lett. Folytatáshoz indítsa újra a felvételt.",
+        "empty": "Semmi sem rögzült, ezért nem jött létre fájl.",
+        "saveFailed": "Nem sikerült létrehozni a felvételi fájlt.",
+        "converting": "A felvétel MP4-re konvertálása folyamatban. Kérjük, tartsa nyitva ezt az ablakot.",
+        "savedOriginal": "Nem sikerült MP4-re konvertálni, ezért a felvétel eredeti formátumban (webm) lett mentve. Ellenőrizze a letöltési mappáját.",
+        "startedBy": "Az előadó elindította a felvételt.",
+        "stoppedBy": "Az előadó leállította a felvételt."
+      },
+      "paidOnly": "A felvétel csak havi vagy éves csomaggal megnyitott szemináriumokon érhető el, amíg van fizetett idő.",
+      "planOut": "A fizetett idő lejárt, ezért a felvétel leállt, és a fájl mentésre került.",
+      "notInRoom": "Még mindig ellenőrizzük, hogy a szobában van-e. Indítsa újra a felvételt egy pillanat múlva.",
+      "meterFailed": "Nem sikerült ellenőrizni a felvételi időt, ezért a felvétel nem indult el. Próbálja újra egy pillanat múlva.",
+      "paidOut": "Nincs fizetett idő, ezért a felvétel nem indítható el. Vásárolja meg újra ugyanazt a csomagot a felvételhez.",
+      "pausedBadge": "Felvétel szüneteltetve",
+      "controls": "Felvétel vezérlők",
+      "pause": "Szüneteltetés",
+      "resume": "Folytatás",
+      "stop": "Felvétel leállítása"
+    },
+    "notes": {
+      "on": "AI jegyzetek",
+      "badge": "AI jegyzetek bekapcsolva",
+      "started": "Az előadó bekapcsolta az AI jegyzeteket",
+      "stopped": "Az AI jegyzetek kikapcsolva",
+      "startedMine": "AI jegyzetek bekapcsolva — mindenki számára látható",
+      "stoppedMine": "AI jegyzetek kikapcsolva — jegyzetek készítése folyamatban",
+      "startFail": "Nem sikerült elindítani az AI jegyzeteket",
+      "gone": "Az AI jegyzetek leálltak — a jegyzetek máshol lettek befejezve vagy törölve",
+      "unsupported": "Az AI jegyzetek itt nem kapcsolhatók be (nincs hangfelvétel támogatás)"
+    },
+    "dubbing": {
+      "listen": "Fordított hang hallgatása",
+      "blocked": "Nem sikerült lejátszani a fordított hangot. Kérjük, kapcsolja be újra",
+      "stopped": "A fordított hang jelenleg nem elérhető, ezért kikapcsoltuk",
+      "usrQuota": "Felhasználta a fordított hangra vonatkozó limitjét ehhez a seminarhoz, ezért kikapcsoltuk"
+    },
+    "plan": {
+      "warn": "{min} perc maradt a seminar tervéből.",
+      "ended": "Lejárt a seminar ideje, ezért a seminar befejeződött, és elhagyta a szobát.",
+      "left": "Hátralévő seminar idő",
+      "closed": "A seminar befejeződött, ezért elhagyta a szobát.",
+      "hostAway": "A házigazda elhagyta a szobát. Ha 5 percen belül nem tér vissza, minden résztvevő eltávolításra kerül.",
+      "hostGone": "A házigazda 5 percen belül nem tért vissza, ezért elhagyta a szobát. Újra beléphet, amint a házigazda csatlakozik."
+    },
+    "toLobby": "Váróterem"
+  },
+  "list": {
+    "tabsLabel": "Seminar lista nézet",
+    "tabs": {
+      "all": "Összes",
+      "hosted": "Általam szervezett",
+      "joined": "Csatlakozott"
+    },
+    "empty": {
+      "all": "Nincsenek közelgő seminárok.",
+      "hosted": "Még nem szervezett seminart.",
+      "joined": "Még nem csatlakozott egyetlen seminarhoz sem."
+    },
+    "loading": "Betöltés…",
+    "retry": "Újra",
+    "free": "Ingyenes",
+    "fee": "{amount} Pi",
+    "host": "Házigazda {name}",
+    "capacity": "Kapacitás {n}",
+    "status": {
+      "SCHEDULED": "Ütemezett",
+      "LIVE": "Élő",
+      "ENDED": "Befejezett",
+      "CANCELED": "Törölve"
+    },
+    "hostNew": "Seminar létrehozása",
+    "progress": "Folyamat",
+    "pager": "Oldalazás",
+    "prev": "Előző",
+    "next": "Következő",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Alcím",
+      "placeholder": "Adjon hozzá alcímet",
+      "save": "Alcím mentése",
+      "saving": "Mentés…",
+      "saved": "Mentve."
+    },
+    "loading": "Betöltés…",
+    "back": "Vissza a listához",
+    "notFound": "A seminar nem található.",
+    "status": {
+      "SCHEDULED": "Ütemezett",
+      "LIVE": "Élő",
+      "ENDED": "Befejezett",
+      "CANCELED": "Törölve"
+    },
+    "startAt": "Dátum",
+    "host": "Házigazda",
+    "seats": "Szabad helyek",
+    "seatsValue": "{left} / {max}",
+    "fee": "Seminar díj",
+    "feeValue": "{amount} Pi",
+    "free": "Ingyenes",
+    "enter": "Belépés",
+    "payEnter": "Fizetés Pi-vel és belépés ({amount} Pi)",
+    "paying": "Fizetés feldolgozása…",
+    "joining": "Regisztráció…",
+    "registered": "Regisztrálva van.",
+    "full": "Ez a seminar megtelt.",
+    "closed": "Ez a seminar befejeződött.",
+    "canceled": "Ez a seminar törölve lett.",
+    "roomLink": "Ugrás a szobába (házigazda)",
+    "piBrowserOnly": "A fizetés a Pi Browserben, Pi bejelentkezés után lehetséges.",
+    "payCancelled": "Fizetés törölve.",
+    "payStillWaiting": "Még mindig várjuk a pénztárca válaszát. Ha már bejelentkezett a Pi Walletbe, várjon egy pillanatot.",
+    "payFailed": "A fizetés sikertelen.",
+    "err": {
+      "NAME_TAKEN": "Ez a név már foglalt. Válasszon másikat.",
+      "CAL_READ_FAILED": "Nem sikerült betölteni az eseményeit. Ellenőrizze a címet.",
+      "ISLAND_FULL": "Jelenleg mind a 100 szigetnév használatban van. Új seminart akkor nyithat, ha egy közelgő vagy élő seminar befejeződik vagy törlésre kerül.",
+      "SMN_FULL": "Ez a seminar megtelt.",
+      "SMN_CLOSED": "Ez a seminar befejeződött vagy törölve lett.",
+      "SMN_ALREADY": "Már regisztrált, vagy a fizetés folyamatban van.",
+      "SMN_FREE": "Az ingyenes seminárok nem igényelnek fizetést.",
+      "SMN_PAY_REQUIRED": "Ez egy fizetős seminar. Kérjük, fizessen a belépéshez.",
+      "SMN_PAY_INVALID": "Nem tudtuk ellenőrizni a fizetését. Kérjük, lépjen kapcsolatba az adminisztrátorral.",
+      "PAY_PI_FAILED": "Nem sikerült elérni a Pi fizetési szervert. Kérjük, próbálja újra rövidesen.",
+      "PAY_MISMATCH": "A fizetési adatok nem egyeznek.",
+      "PAY_AMOUNT_MISMATCH": "A fizetett összeg eltér a seminar díjától.",
+      "PAY_CANCELLED": "Ez a fizetés törölve lett.",
+      "PAY_ALREADY_PAID": "Egy fizetés még folyamatban van. Ha a pénztárcába jelentkezett be, próbálja újra 3 perc múlva.",
+      "PAY_INVALID_STATE": "Ez a fizetés most nem dolgozható fel.",
+      "PAY_PI_CANCEL_REFUSED": "A fizetés már folyamatban van, és nem törölhető. Kérjük, ellenőrizze újra rövidesen."
+    },
+    "share": {
+      "title": "Ütemezés és megosztás",
+      "calendar": "Hozzáadás a naptárhoz",
+      "ics": "Naptárfájl",
+      "mail": "Meghívás e-mailben",
+      "mailApp": "Küldés alapértelmezett levelező alkalmazással",
+      "mailSubject": "[Seminar meghívó] {title}",
+      "mailBody": "{title}\nIdőpont: {start}\n\nCsatlakozzon közvetlenül ezzel a linkkel.\nAsztali: {url}\nPi Browser: {piUrl}",
+      "copy": "Link másolása",
+      "copied": "Link másolva.",
+      "copyFail": "Nem sikerült másolni. Kérjük, másolja ki a linket a címsorból.",
+      "share": "Megosztás más alkalmazással",
+      "shareFail": "Nem sikerült megosztani. Kérjük, használja a Link másolása funkciót.",
+      "created": "A seminar készen áll. Adja hozzá a kezdési időpontját a Google Naptárához.",
+      "addGoogle": "Hozzáadás a Google Naptárhoz",
+      "later": "Később",
+      "piBrowserOpen": "A Pi Browserben a naptár, az e-mail és a naptárfájl a telefon alapértelmezett böngészőjében nyílik meg.",
+      "extFail": "Nem sikerült megnyitni. Frissítse a Pi Browsert, vagy használja a Link másolása funkciót, és nyissa meg egy normál böngészőben (seminarz.vercel.app).",
+      "icsPiBrowser": "A naptárfájl csak normál böngészőben (számítógépen vagy mobilon) tölthető le. A Pi Browserben használja a [Hozzáadás a naptárhoz] lehetőséget."
+    },
+    "attendance": "Jelenlét",
+    "plan": "Terv",
+    "left": "Hátralévő idő"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Előző hónap",
+      "next": "Következő hónap",
+      "connect": "Google Naptáram megjelenítése",
+      "change": "Google naptárak kezelése ({n})",
+      "add": "Hozzáadás",
+      "remove": "Eltávolítás",
+      "close": "Bezárás",
+      "failed": "Nem sikerült betölteni az eseményeket {n} naptárból. Ellenőrizze a címet.",
+      "badUrl": "Illessze be a Google Naptár beállításaiból az 'iCal formátumú titkos címet' (…/basic.ics), ne a böngésző címsorát.",
+      "full": "Legfeljebb {n} naptárat adhat hozzá.",
+      "allDay": "Egész nap",
+      "day": "Eseményeim ezen a napon",
+      "count": "{n, plural, one {# esemény} other {# esemény}}",
+      "more": "+{n}",
+      "picked": "Ez a dátum van beállítva kezdő dátumként. Válassza ki az időt alább.",
+      "s1": "Érintse meg az alábbi [Google Naptár beállítások megnyitása] gombot.",
+      "s2": "A bal oldali 'Saját naptárak beállításai' alatt válasszon ki egy naptárat (pl. a nevét).",
+      "s3": "Görgessen az 'Naptár integrálása' részhez, és másolja ki az 'iCal formátumú titkos címet'.",
+      "s4": "Illessze be ide, és érintse meg a [Hozzáadás] gombot — az események címei megjelennek a naptárban. Más naptárakat is hozzáadhat ugyanígy, legfeljebb 5-öt.",
+      "open": "Google Naptár beállítások megnyitása",
+      "privacy": "Ez a cím a naptárához való kulcs – ne ossza meg. Csak ezen az eszközön tárolódik, soha nem a szerverünkön."
+    },
+    "title": "Seminar létrehozása",
+    "name": "Utazzunk el egy gyönyörű szigetre!",
+    "subTitle": "Alcím (opcionális, legfeljebb 60 karakter)",
+    "startAt": "Kezdési idő",
+    "maxCnt": "Kapacitás (1–100)",
+    "submit": "Létrehozás",
+    "submitting": "Létrehozás…",
+    "invalid": "Ellenőrizze a bemenetet – egy éven belüli dátum, kapacitás 1–100.",
+    "attendance": {
+      "title": "Jelenlét",
+      "back": "Vissza a seminarhoz",
+      "loading": "Betöltés…",
+      "forbidden": "Csak a házigazda és az adminisztrátorok tekinthetik meg a jelenlétet.",
+      "count": "{n} fő",
+      "csv": "CSV letöltése",
+      "empty": "Még senki sem csatlakozott.",
+      "online": "Online",
+      "left": "Elhagyta",
+      "col": {
+        "name": "Név",
+        "pi": "Pi felhasználónév",
+        "ent": "Első csatlakozás",
+        "hb": "Utolsó látott",
+        "dur": "Részvételi idő",
+        "min": "Részvétel (perc, távollét kizárva)",
+        "state": "Állapot"
+      },
+      "durNote": "A részvételi idő az első csatlakozástól az utolsó látottig tart, mínusz a távollét ideje (2,5 percnél hosszabb szünetek).",
+      "csvPiBrowser": "A CSV letöltés csak normál böngészőben (számítógép vagy mobil) működik. A Pi Browser nem tud fájlokat menteni – nyissa meg ezt a jelenléti ívet számítógépes vagy telefonos böngészőben (seminarz.vercel.app)."
+    },
+    "plan": "Terv",
+    "planFree": "Ingyenes – {time} maradt ebben a hónapban · nincs AI",
+    "planPaid": "{name} {time} · {price} – fizetés létrehozáskor",
+    "planHint": "A fizetős tervvel megnyitott seminar először a terv idejét használja, majd folytatódik az adott hónap ingyenes idejével (az ingyenes részben nincs AI). Az aktív terv fizetés nélkül nyílik meg; a havi vagy éves terv, amivel nem rendelkezik, Pi-ben fizetendő a Létrehozás gomb megnyomásakor, majd a seminar megnyílik (Pi Browser). A résztvevők számára a csatlakozás mindig ingyenes.",
+    "planOwned": "{name} – aktív · {time} maradt",
+    "planEnds": "A kezdési időpont a terv lejáratát követi. Helyezze előbbre a kezdési időpontot, vagy válasszon másik tervet.",
+    "paidKept": "A fizetett bérlete megmarad. Javítsa ki a problémát, és nyomja meg újra a Létrehozás gombot (nincs második fizetés)."
+  },
+  "privacy": {
+    "title": "Adatvédelmi irányelvek – Hang- és AI-funkciók",
+    "effective": "Hatályos: {date}",
+    "intro": "Ez az irányelv ismerteti azokat a személyes adatokat, amelyeket a valós idejű feliratok, fordított feliratok, hangfordítás, AI értekezletjegyzetek és személyes jegyzetek használatakor dolgozunk fel egy seminarban. Ezek a funkciók külső AI szolgáltatást használnak, ezért az információk külföldre kerülnek.",
+    "whoTitle": "Kinek az adatai kerülnek feldolgozásra",
+    "who": [
+      "Előadók és színpadon lévő résztvevők: egyszer kérjük a hozzájárulását, mielőtt először bekapcsolja a mikrofonját. A seminarhoz hozzájárulás nélkül is csatlakozhat.",
+      "Közönség: nem használ mikrofont, így hang nem kerül továbbításra. Csak feliratokat és jegyzeteket lát.",
+      "Személyes jegyzetek: egy adminisztrátor mikrofonnal rögzíti az értekezletet, és megerősíti, hogy a résztvevőket tájékoztatták a felvétel előtt."
+    ],
+    "xferTitle": "Személyes adatok külföldre továbbítása (koreai személyes adatok védelméről szóló törvény, 28-8. cikk)",
+    "xfer": [
+      {
+        "k": "Címzett",
+        "v": "Google LLC (Gemini API) – kapcsolat [TBD: Google adatvédelmi kapcsolattartó]"
+      },
+      {
+        "k": "Országok",
+        "v": "Egyesült Államok és más országok, ahol a Google adatközpontjai találhatók [TBD: feldolgozási régió]"
+      },
+      {
+        "k": "Mikor és hogyan",
+        "v": "Körülbelül 5 másodpercenként, amíg egy funkció be van kapcsolva, titkosított kapcsolaton (HTTPS) keresztül. Személyes jegyzetek esetén a teljes felvétel még egyszer elküldésre kerül 5 perces részekben, amikor a jegyzet véget ér (pontos átírás)."
+      },
+      {
+        "k": "Tételek",
+        "v": "Hang, beszélt tartalom (szöveg), előadó megjelenítési neve (jegyzetösszefoglalókhoz), képernyőmegosztási képernyőképek (amikor az AI jegyzetek be vannak kapcsolva)"
+      },
+      {
+        "k": "Cél",
+        "v": "Beszéd szöveggé alakítása, fordítás, értekezletjegyzet-összefoglalók, szintetikus beszéd (standard hangok, hangklónozás nélkül), előadó szétválasztása személyes jegyzetekhez (a hangokat megkülönböztetik és észlelt nemük szerint címkézik, például Férfi 1 / Nő 1 – nevek vagy identitások nem kerülnek kikövetkeztetésre)"
+      },
+      {
+        "k": "Megőrzés",
+        "v": "Azonnal megszűnik, amint az eredmény visszatér. Kérjük a Google-t, hogy ne tárolja a kéréseket (store=false). A visszaélés-figyelő naplók azonban a Google feltételei szerint továbbra is megőrizhetők [TBD: megőrzési időszak és fizetős szint státusza]."
+      },
+      {
+        "k": "Hogyan lehet megtagadni, és mi történik",
+        "v": "Ha nem járul hozzá, vagy kikapcsolja a mikrofonját, hang nem kerül továbbításra. Továbbra is részt vehet a seminarban; csak a saját beszédének feliratai, fordításai és jegyzetei nem készülnek el. A hozzájárulást bármikor visszavonhatja [TBD: hol található a visszavonás gomb]."
+      }
+    ],
+    "keepTitle": "Amit ez a szolgáltatás megőriz",
+    "keep": [
+      "Eredeti hang: a seminar feliratok és az AI értekezletjegyzetek esetében nem tárolódik; a szöveggé alakítás után azonnal törlődik. Személyes jegyzetek esetében a felvétel privát tárhelyen tárolódik, hogy az értekezlet után pontosabban (előadókkal együtt) átírható legyen, és a napi takarítás során törlődik, amint a jegyzet befejezése után 1 nap eltelt (azonnal, ha a jegyzet törlésre kerül).",
+      "Élő feliratok: nem tárolódnak.",
+      "AI értekezletjegyzetek (amikor az előadó bekapcsolja őket): beszélt tartalom, képernyőképek és az összefoglaló, a jegyzetek törléséig megőrizve [TBD: maximális megőrzési idő].",
+      "Hozzájárulási nyilvántartások: a hozzájárulás időpontja és az irányelv verziója, bizonyítékként megőrizve [TBD: megőrzési időszak].",
+      "Használat: percenkénti kérésszámok és feldolgozási idő, a költségkorlátok betartatására használva.",
+      "Jelenlét: a csatlakozás időpontja, az utolsó csatlakozás időpontja, a megjelenítési neve és a Pi felhasználóneve tárolódik, és a házigazdának átadásra kerül jelenléti listaként (képernyőn és CSV letöltésként). A seminar törléséig megőrizve.",
+      "Kérdések és válaszok, valamint szavazások: a kérdés szövege és a kérdező megjelenítési neve (vagy Pi felhasználóneve, ha nincs) minden résztvevő számára látható. A felvote-ok csak számokat mutatnak, soha nem azt, hogy ki adta le őket. A szavazások csak számokat mutatnak a résztvevőknek; a szervező és az adminisztrátorok minden opcióhoz látják az egyes szavazók megjelenítési nevét (vagy Pi felhasználónevét, ha nincs). Megőrizve, beleértve a rejtett kérdéseket is, amíg a seminar törlésre nem kerül."
+    ],
+    "recTitle": "Felvétel",
+    "rec": "A felvételek csak fájlként kerülnek mentésre az előadó eszközén. Nem kerülnek feltöltésre szervereinkre, és nem továbbítódnak külföldre. Felvétel vagy AI jegyzetek bekapcsolása esetén minden résztvevő lát egy jelzőt.",
+    "rightsTitle": "Az Ön jogai",
+    "rights": "Kérheti adataihoz való hozzáférést, azok helyesbítését, törlését vagy feldolgozásának leállítását. Kapcsolat: [TBD: adatvédelmi tisztviselő neve és elérhetősége]"
+  },
+  "notes": {
+    "title": "Jegyzetek",
+    "back": "Vissza a seminarhoz",
+    "loading": "Betöltés…",
+    "meta": "Jegyzetek · {date} · {min} perc",
+    "aiWarn": "AI által generált összefoglaló – hibákat tartalmazhat",
+    "points": "Főbb pontok",
+    "decisions": "Döntések",
+    "todos": "Feladatok",
+    "shots": "Képernyőfelvételek ({n})",
+    "transcript": "Átirat",
+    "download": "Markdown letöltése",
+    "making": "Jegyzetek készítése…",
+    "makingLong": "Ez eltart egy ideig. Kérjük, frissítse később",
+    "recording": "Még mindig felvétel",
+    "failed": "Nem sikerült elkészíteni az összefoglalót – a teljes átirat alább található",
+    "retry": "Újrapróbálkozás",
+    "finish": "Felvétel befejezése és összefoglalás",
+    "none": "Nincs itt semmi",
+    "blank": "Nincs összefoglalható tartalom – nem rögzítettek beszédet, vagy túl rövid volt",
+    "notFound": "Jegyzetek nem találhatók",
+    "forbidden": "Nincs hozzáférése ezekhez a jegyzetekhez",
+    "shotAlt": "Képernyőfelvétel ekkor: {at}",
+    "close": "Bezárás",
+    "view": "Jegyzetek megtekintése",
+    "error": "Nem sikerült betölteni",
+    "mine": "Saját jegyzeteim",
+    "del": "Jegyzetek törlése",
+    "delAsk": "Törli ezeket a jegyzeteket (összefoglaló, átirat és képernyőfelvételek)? Senki sem fogja látni őket",
+    "delYes": "Törlés",
+    "delNo": "Mégse",
+    "delFail": "Nem sikerült törölni",
+    "dlFail": "Nem sikerült letölteni – próbálja újra",
+    "recentNotes": "Legutóbbi jegyzetek",
+    "empty": "Még nincsenek jegyzetek",
+    "newNote": "Személyes jegyzetek indítása",
+    "inPerson": "Személyes értekezlet jegyzetek",
+    "inPersonTag": "Személyes",
+    "titleLabel": "Cím",
+    "titlePh": "pl. Heti értekezlet",
+    "told": "Minden jelenlévőnek elmondtam, hogy ez rögzítésre és AI általi feldolgozásra kerül (kötelező)",
+    "toldWhy": "Mielőtt elkezdi, mondja el minden jelenlévőnek, hogy ez a beszélgetés rögzítésre kerül (a felvétel a jegyzet befejezése után 1 napig megmarad, és az előadókat hang alapján különböztetik meg, és észlelt nemük szerint címkézik), és külső AI alakítja szöveggé és összefoglalóvá",
+    "start": "Felvétel indítása",
+    "starting": "Előkészületek…",
+    "recBadge": "Felvétel {time}",
+    "recentLines": "Legutóbbi sorok",
+    "waiting": "A szöveg itt jelenik meg, ahogy az emberek beszélnek",
+    "end": "Befejezés és jegyzetek készítése",
+    "wakeWarn": "A felvétel leállhat, ha a képernyő kikapcsol",
+    "adminOnly": "Csak adminok használhatják",
+    "aiOff": "Az AI jegyzetek jelenleg nem érhetők el (szerverbeállítás szükséges). A korábbi jegyzetek alább láthatók",
+    "reload": "Újratöltés",
+    "unsupported": "A felvétel nem érhető el ezen az eszközön",
+    "micDenied": "Nem használható a mikrofon — ellenőrizze az engedélyt",
+    "limited": "A feldolgozási időkeret kimerült — fejezze be és készítse el a jegyzeteket",
+    "noAgr": "Leállítva: nincs értesítési megerősítés a felvételhez — fejezze be és indítsa újra",
+    "micLost": "A mikrofon leválasztódott, és a felvétel leállt — koppintson a Mikrofon újracsatlakoztatása gombra, vagy fejezze be a jegyzetet",
+    "micRetry": "Mikrofon újracsatlakoztatása",
+    "gone": "Ez a jegyzet máshol befejeződött vagy törlődött, ezért a felvétel leállt — használja az alábbi gombot a jegyzetek megnyitásához",
+    "finishing": "Az utolsó szavak mentése…",
+    "st": {
+      "RECORDING": "Felvétel",
+      "SUMMARIZING": "Létrehozás",
+      "DONE": "Kész",
+      "FAILED": "Sikertelen"
+    },
+    "downloadPiBrowser": "A Markdown letöltése csak normál böngészőben (számítógépen vagy mobilon) működik. A Pi Browser nem tud fájlokat menteni — nyissa meg ezeket a jegyzeteket számítógépes vagy telefonos böngészőben (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Csomagok",
+    "loading": "Betöltés…",
+    "free": "Ingyenes",
+    "freeDesc": "{time} szeminárium havonta (nem vihető át)",
+    "monthly": "Havi",
+    "yearly": "Éves",
+    "paidDesc": "{time} szeminárium, {months} hónapig érvényes",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Pi ár ellenőrzése",
+    "noAi": "Nincs AI felirat, fordítás, szinkronizálás vagy jegyzetösszefoglaló",
+    "withAi": "Tartalmazza az AI feliratokat, fordítást, szinkronizálást és jegyzetösszefoglalókat",
+    "buy": "Fizetés Pi-vel",
+    "bought": "Fizetés kész. A szeminárium ideje hozzáadva.",
+    "meRemain": "Hátralévő idő: {time}",
+    "loginToBuy": "Jelentkezzen be a csomag megvásárlásához.",
+    "payNote": "A fizetés mindig Pi-ben történik. A helyi pénznemben megadott összeg csak tájékoztató jellegű; a Pi összeg a fizetéskor érvényes Pi árfolyamon kerül meghatározásra. A fizetős csomaggal indított szemináriumok először a csomaghoz tartozó bérleteket használják fel (a leghamarabb lejárókat), majd az aktuális hónap ingyenes idejével folytatódnak.",
+    "charge": "Idő feltöltése",
+    "hm": "{h} óra {m} perc",
+    "m": "{m} perc",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (Pi ár ellenőrzése)",
+    "h": "{h} óra"
+  },
+  "adminRooms": {
+    "title": "Szobakezelés",
+    "adminOnly": "Csak rendszergazdák tekinthetik meg ezt az oldalt.",
+    "refresh": "Frissítés",
+    "count": "{n} nyitott szoba",
+    "empty": "Jelenleg nincsenek nyitott szobák.",
+    "lab": "Labor szoba",
+    "noSeminar": "Nincs szeminárium felvétel",
+    "peers": "{n} / {cap} csatlakoztatva",
+    "producers": "{n} stream",
+    "end": "Vége {time}",
+    "stale": "A szeminárium véget ért, de a szoba még nyitva van a videószerveren — kényszerített bezárás.",
+    "close": "Kényszerített bezárás",
+    "confirmSeminar": "Ez befejezi a szemináriumot és bezárja a szobát. Mindenki le lesz választva.",
+    "confirmRoom": "Ez bezárja a szobát. Mindenki le lesz választva.",
+    "confirmYes": "Bezárás",
+    "cancel": "Mégse",
+    "closing": "Bezárás…",
+    "closed": "Szoba bezárva.",
+    "metrics": "Videószerver metrikák (kezdettől)",
+    "metricsOff": "Nem sikerült betölteni a metrikákat.",
+    "m": {
+      "packetsIn": "Bejövő csomagok",
+      "packetsOut": "Kimenő csomagok",
+      "nackIn": "Fogadott NACK-ok",
+      "nackOut": "Küldött NACK-ok",
+      "retransmits": "Újraküldések",
+      "duplicateNack": "Ismétlődő NACK-ok",
+      "cacheMiss": "Újraküldési gyorsítótár-találat hiány",
+      "pliOut": "Képkocka kérések (PLI)",
+      "keyframes": "Képkockák",
+      "layerSwitches": "Minőségi váltások",
+      "queueDrops": "Sorba ejtések"
+    }
+  },
+  "adminUsers": {
+    "title": "Felhasználók",
+    "adminOnly": "Csak rendszergazdák tekinthetik meg ezt az oldalt.",
+    "search": "Keresés név alapján (min. 2 karakter)",
+    "searchBtn": "Keresés",
+    "refresh": "Frissítés",
+    "count": "{n, plural, one {# felhasználó} other {# felhasználó}}",
+    "empty": "Nincsenek felhasználók.",
+    "admin": "Admin",
+    "lastLogin": "Utolsó bejelentkezés {time}",
+    "never": "Soha nem jelentkezett be",
+    "plan": {
+      "FREE": "Ingyenes",
+      "M": "Havi",
+      "Y": "Éves"
+    },
+    "until": "(eddig: {time})",
+    "manage": "Idő kezelése",
+    "close": "Bezárás",
+    "planLabel": "Csomag",
+    "hours": "Óra",
+    "minutes": "Perc",
+    "reason": "Ok (opcionális)",
+    "sub": "Csökkentés",
+    "confirmSub": "Csökkenti a(z) {plan} időt {time} értékkel.",
+    "confirmYes": "Megerősítés",
+    "cancel": "Mégse",
+    "saving": "Mentés…",
+    "done": "Alkalmazva. {plan} hátralévő idő: {time}",
+    "invalid": "Adjon meg egy csökkentést 1 perc és 1000 óra között (egész percek 0–59).",
+    "history": "Legutóbbi módosítások",
+    "noHistory": "Még nincsenek módosítások.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Szolgáltatási bérlet (ingyenes idő) adása",
+    "svc": {
+      "H1": "1 órás bérlet",
+      "D1": "1 napos bérlet",
+      "M1": "1 hónapos bérlet"
+    },
+    "svcNote": "A szolgáltatási bérletek ingyenes csomaghoz tartozó időt jelentenek. Mostantól az adott időszakra (1 óra, 24 óra, 1 hónap) használhatók ingyenes szemináriumokon és fizetős szemináriumok ingyenes részén (AI funkciók nélkül). Több bérlet esetén automatikusan felhasználódnak az 1 órás → 1 napos → 1 hónapos sorrendben.",
+    "subTitle": "Idő csökkentése",
+    "subNote": "Először a legkésőbb lejáró bérletekből vonja le. Ha ez több, mint a hátralévő idő, csak a hátralévő idő kerül eltávolításra.",
+    "confirmSvc": "Adjon egy {svc}-t.",
+    "doneSvc": "Adott egy {svc}-t. Hátralévő ingyenes idő: {time} (a bérlet lejár: {end})"
+  }
+}

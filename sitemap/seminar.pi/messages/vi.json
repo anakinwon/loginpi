@@ -1,0 +1,1089 @@
+{
+  "common": {
+    "localeSwitcher": {
+      "button": "Đổi ngôn ngữ",
+      "search": "Tìm ngôn ngữ",
+      "empty": "Không có kết quả"
+    }
+  },
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Các buổi seminar video trực tiếp bạn tham gia bằng Pi"
+  },
+  "home": {
+    "description": "Người tổ chức mở các buổi seminar, và người tham gia tham gia các buổi video trực tiếp bằng Pi.",
+    "badge": "Seminar trực tiếp trên những hòn đảo xinh đẹp",
+    "headline": "Cùng xem, nghe và học hỏi — trực tiếp",
+    "ctaBrowse": "Duyệt seminar",
+    "ctaPlan": "Xem gói",
+    "features": {
+      "video": "Video trực tiếp",
+      "caption": "Phụ đề & dịch thuật",
+      "notes": "Ghi chú cuộc họp AI",
+      "pay": "Thanh toán bằng Pi"
+    },
+    "listTitle": "Seminar",
+    "cal": {
+      "title": "Lịch seminar",
+      "desc": "Từ các buổi seminar đã qua đến các buổi sắp tới — chạm vào một ngày để xem chi tiết.",
+      "legendSmn": "Seminar",
+      "legendEnded": "Seminar đã qua",
+      "legendMine": "Sự kiện của tôi",
+      "failed": "Không thể tải ngày seminar. Vui lòng thử lại sau.",
+      "open": "Xem chi tiết"
+    }
+  },
+  "nav": {
+    "link": "Liên kết tài khoản",
+    "privacy": "Quyền riêng tư",
+    "plan": "Gói",
+    "rooms": "Phòng",
+    "admin": "Quản trị",
+    "users": "Người dùng",
+    "home": "Trang chủ",
+    "privacyShort": "Quyền riêng tư",
+    "menu": "Menu chính",
+    "fold": "Thu gọn menu",
+    "unfold": "Mở rộng menu"
+  },
+  "auth": {
+    "checking": "Đang kiểm tra đăng nhập…",
+    "signedIn": "{name}",
+    "inPerson": "Ghi chú trực tiếp",
+    "required": "Vui lòng đăng nhập bằng tài khoản Pi của bạn.",
+    "signIn": "Đăng nhập bằng Pi",
+    "openInPiBrowser": "Mở trang này trong Pi Browser để đăng nhập bằng tài khoản Pi của bạn.",
+    "authenticating": "Đang đăng nhập…",
+    "google": "Đăng nhập bằng Google",
+    "signOut": "Đăng xuất",
+    "or": "hoặc",
+    "linkRequired": "Bạn đã đăng nhập bằng Google, nhưng tài khoản này chưa được liên kết với tài khoản Pi. Vui lòng tạo mã liên kết trong Pi Browser và nhập vào đây.",
+    "linkNeeded": "Cần liên kết tài khoản Pi",
+    "linkCheckFailed": "Không thể kiểm tra trạng thái liên kết tài khoản của bạn (lỗi máy chủ tạm thời). Vui lòng làm mới sau một lát."
+  },
+  "piOAuth": {
+    "signingIn": "Đang đăng nhập bằng tài khoản Pi của bạn…",
+    "failed": "Đăng nhập Pi thất bại. Vui lòng thử lại.",
+    "stateMismatch": "Không thể xác minh yêu cầu đăng nhập này (đã hết hạn hoặc tab khác). Vui lòng thử lại.",
+    "retry": "Thử lại",
+    "backHome": "Trang chủ"
+  },
+  "link": {
+    "title": "Liên kết tài khoản",
+    "intro": "Kết nối tài khoản bạn đã đăng nhập trong Pi Browser với đăng nhập Google trong trình duyệt thông thường. Sau khi liên kết, bạn có thể sử dụng cùng một tài khoản trên trình duyệt PC.",
+    "checking": "Đang kiểm tra đăng nhập…",
+    "piIssueTitle": "Để đăng nhập từ trình duyệt thông thường",
+    "codeHint": "Tạo mã bên dưới, sau đó đăng nhập bằng Google trên trình duyệt PC và nhập mã đó vào trang Liên kết tài khoản (trong vòng 10 phút).",
+    "piIssue": "Tạo mã liên kết",
+    "reissue": "Tạo mã mới",
+    "expiresIn": "Hết hạn sau {min} phút",
+    "enterTitle": "Nhập mã liên kết",
+    "enterHint": "Trong Pi Browser, mở seminar.pi → Liên kết tài khoản → Tạo mã liên kết, sau đó nhập mã 6 chữ số.",
+    "codeLabel": "Mã liên kết",
+    "submit": "Liên kết",
+    "done": "Đã liên kết. Bây giờ bạn cũng có thể sử dụng đăng nhập Google.",
+    "linked": "{name} đã được liên kết với đăng nhập Google."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Yêu cầu đăng nhập",
+    "AUTH_PI_REQUIRED": "Yêu cầu đăng nhập Pi",
+    "AUTH_PI_SESSION_INVALID": "Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại",
+    "AUTH_PI_TOKEN_INVALID": "Xác minh đăng nhập Pi thất bại",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Thiếu thông tin đăng nhập Pi",
+    "FORBIDDEN": "Bạn không có quyền",
+    "BAD_REQUEST": "Yêu cầu không hợp lệ",
+    "BAD_REQUEST_BODY": "Yêu cầu không hợp lệ",
+    "INVALID_INPUT": "Đầu vào không hợp lệ",
+    "QUERY_FAILED": "Không thể tải",
+    "SAVE_FAILED": "Không thể lưu",
+    "INTERNAL": "Đã xảy ra lỗi",
+    "SERVER_CONFIG": "Lỗi cấu hình máy chủ. Vui lòng liên hệ nhà điều hành",
+    "PI_API_CONNECT_FAILED": "Không thể kết nối với Pi Network",
+    "DB_UNAVAILABLE": "Dữ liệu tạm thời không khả dụng. Vui lòng thử lại sau",
+    "NOT_FOUND": "Không tìm thấy",
+    "RATE_LIMITED": "Quá nhiều yêu cầu. Vui lòng thử lại sau ít phút",
+    "PAYLOAD_TOO_LARGE": "Yêu cầu quá lớn",
+    "NETWORK": "Kiểm tra kết nối mạng của bạn",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Tên người dùng Pi này đã được đăng ký với thông tin xác thực khác. Vui lòng liên hệ quản trị viên",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Tài khoản này không hoạt động. Vui lòng liên hệ quản trị viên",
+    "AUTH_GOOGLE_REQUIRED": "Yêu cầu đăng nhập Google.",
+    "LINK_CODE_INVALID": "Mã liên kết không hợp lệ hoặc đã hết hạn. Vui lòng tạo mã mới trong Pi Browser.",
+    "LINK_ALREADY_LINKED": "Tài khoản này đã được liên kết.",
+    "LINK_CODE_GEN_FAILED": "Không thể tạo mã liên kết. Vui lòng thử lại sau.",
+    "AUTH_DB_UNAVAILABLE": "Không thể lưu tài khoản của bạn, vì vậy đăng nhập thất bại. Vui lòng thử lại sau.",
+    "LINK_TRY_LIMIT": "Quá nhiều mã liên kết không chính xác. Thử lại sau 15 phút.",
+    "PRICE_UNAVAILABLE": "Không thể lấy giá Pi. Vui lòng thử lại sau ít phút",
+    "QUOTE_EXPIRED": "Báo giá thanh toán đã hết hạn. Vui lòng thanh toán lại",
+    "PLAN_EXHAUSTED": "Bạn đã sử dụng hết thời gian seminar của mình. Vui lòng nạp thêm trên trang Gói",
+    "HOST_AWAY": "Người tổ chức không có mặt trong phòng. Bạn có thể vào sau khi người tổ chức tham gia",
+    "PLAN_AI_PAID": "Tính năng AI có sẵn trên các gói trả phí",
+    "AI_UNAVAILABLE": "Tính năng AI hiện không khả dụng",
+    "SPEECH_CHUNK_INVALID": "Định dạng đoạn âm thanh không hợp lệ",
+    "SPEECH_NOT_LIVE": "Seminar này không trực tiếp",
+    "SPEECH_NO_AGR": "Cần có sự đồng ý xử lý giọng nói",
+    "SPEECH_RATE": "Quá nhiều yêu cầu giọng nói. Vui lòng thử lại sau ít phút",
+    "SPEECH_QUOTA": "Thời gian xử lý giọng nói cho seminar này đã hết",
+    "SPEECH_USR_QUOTA": "Bạn đã sử dụng hết giới hạn dịch và giọng nói đã dịch của mình cho seminar này",
+    "SPEECH_FAILED": "Không thể chuyển đổi giọng nói thành văn bản",
+    "SPEECH_STAGE_ONLY": "Chỉ những người trên sân khấu mới có thể sử dụng phụ đề giọng nói",
+    "TRANSLATE_FAILED": "Không thể dịch phụ đề",
+    "POLL_CLOSED": "Cuộc thăm dò này đã đóng",
+    "NOTE_NOT_RECORDING": "Những ghi chú này không được ghi lại",
+    "NOTE_SHOT_INVALID": "Chụp màn hình không hợp lệ",
+    "NOTE_AUDIO_INVALID": "Tệp ghi âm không hợp lệ",
+    "NOTE_SHOT_RATE": "Quá nhiều ảnh chụp màn hình",
+    "NOTE_RETRY_SOON": "Bạn có thể thử lại sau một phút",
+    "SPEECH_TTS_FAILED": "Không thể tạo giọng nói đã dịch",
+    "CAPTION_SIG_INVALID": "Phụ đề này không thể xác minh, vì vậy nó không được dịch",
+    "PLAN_EXPIRES_BEFORE_START": "Thời gian bắt đầu sau khi gói này hết hạn",
+    "PAY_ALREADY_PAID": "Một khoản thanh toán vẫn đang được xử lý. Nếu bạn đang đăng nhập ví, hãy thử lại sau 3 phút.",
+    "REC_PAID_ONLY": "Ghi âm chỉ khả dụng trong các buổi seminar gói hàng tháng hoặc hàng năm với thời gian trả phí còn lại",
+    "REC_NOT_IN_ROOM": "Vẫn đang xác nhận bạn có trong phòng. Thử lại sau một lát",
+    "ENGINE_OFF": "Khóa quản trị máy chủ video chưa được cấu hình",
+    "ENGINE_UNAVAILABLE": "Máy chủ video không phản hồi. Vui lòng thử lại sau ít phút",
+    "ADJ_NOTHING": "Không còn thời gian để giảm"
+  },
+  "progress": {
+    "title": "Tiến độ xây dựng",
+    "subtitle": "Đã hoàn thành, đang tiến hành và đã lên kế hoạch, theo tính năng · tính đến {date}",
+    "overall": "Các bước tổng thể",
+    "stepsDone": "Đã hoàn thành {done}/{total} bước ({pct}%)",
+    "featureUnit": "tính năng",
+    "status": {
+      "done": "Hoàn thành",
+      "doing": "Đang tiến hành",
+      "todo": "Đã lên kế hoạch",
+      "drop": "Đã bỏ"
+    },
+    "features": {
+      "F01": {
+        "name": "Đăng nhập",
+        "desc": "Đăng nhập Pi Browser, đăng nhập Google trong các trình duyệt khác và liên kết cả hai tài khoản"
+      },
+      "F05": {
+        "name": "Seminar video trực tiếp",
+        "desc": "Công cụ video riêng của chúng tôi Galápagos — mục tiêu là một người thuyết trình phát trực tuyến cho tối đa 30 người tham dự"
+      },
+      "F02": {
+        "name": "Tạo seminar",
+        "desc": "Đặt phụ đề, thời gian, sức chứa và phí seminar để tạo một seminar (tên = đảo, tự động)"
+      },
+      "F03": {
+        "name": "Danh sách và chi tiết seminar",
+        "desc": "Duyệt các buổi seminar đang mở từng trang và xem chi tiết của chúng"
+      },
+      "F04": {
+        "name": "Thanh toán phí vào cửa bằng Pi",
+        "desc": "Thanh toán phí seminar bằng Pi; máy chủ kiểm tra lại số tiền trước khi cho bạn vào"
+      },
+      "F06": {
+        "name": "Thanh toán cho người tổ chức",
+        "desc": "Thanh toán doanh thu phí vào cửa cho người tổ chức bằng Pi"
+      },
+      "F07": {
+        "name": "Phát lại",
+        "desc": "Xem lại các buổi seminar đã ghi sau này"
+      },
+      "FU": {
+        "name": "Nền tảng tiện ích bổ sung cuộc họp",
+        "desc": "Một kênh tín hiệu cho tiện ích bổ sung, kết nối AI, đoạn giọng nói, đồng ý micro và bảng dữ liệu"
+      },
+      "F08": {
+        "name": "Lịch trình và chia sẻ",
+        "desc": "Liên kết lịch, tệp sự kiện (.ics) và lời mời qua email cho mỗi seminar"
+      },
+      "F09": {
+        "name": "Giảm tiếng ồn và ánh sáng",
+        "desc": "Giảm tiếng ồn micro và làm sáng video camera tối"
+      },
+      "F10": {
+        "name": "Phụ đề trực tiếp",
+        "desc": "Chuyển lời nói của người thuyết trình thành văn bản dưới sân khấu"
+      },
+      "F11": {
+        "name": "Thăm dò ý kiến, Hỏi & Đáp và điểm danh",
+        "desc": "Thực hiện thăm dò ý kiến và câu hỏi trong một buổi seminar; người tổ chức tải xuống danh sách điểm danh"
+      },
+      "F12": {
+        "name": "Hiệu ứng nền",
+        "desc": "Làm mờ nền của bạn hoặc thay thế bằng một cài đặt sẵn hoặc hình ảnh của riêng bạn (được xử lý trên thiết bị của bạn)"
+      },
+      "F13": {
+        "name": "Ghi âm cục bộ",
+        "desc": "Người thuyết trình ghi lại buổi seminar trên thiết bị của họ và mọi người đều thấy rằng việc ghi âm đang diễn ra"
+      },
+      "F14": {
+        "name": "Ghi chú cuộc họp AI",
+        "desc": "Khi người thuyết trình bật, lời nói và màn hình được ghi lại và tóm tắt thành các điểm chính, quyết định và việc cần làm"
+      },
+      "F15": {
+        "name": "Ghi chú cuộc họp trực tiếp",
+        "desc": "Ghi lại một cuộc họp chỉ bằng micro và nhận ghi chú cuộc họp (quản trị viên)"
+      },
+      "F16": {
+        "name": "Phụ đề đã dịch",
+        "desc": "Hiển thị phụ đề đã dịch sang ngôn ngữ bạn chọn"
+      },
+      "F17": {
+        "name": "Nghe bản dịch",
+        "desc": "Đọc phụ đề đã dịch thành tiếng bằng giọng nói tổng hợp trong khi giảm âm thanh gốc"
+      }
+    },
+    "steps": {
+      "piLogin": "Đăng nhập Pi Browser",
+      "googleLogin": "Đăng nhập Google",
+      "accountLink": "Liên kết tài khoản",
+      "deviceTest": "Kiểm tra thiết bị camera",
+      "oneToTwo": "Người thuyết trình 1 → 2 người tham dự",
+      "recovery": "Khôi phục đóng băng và ổn định",
+      "structure": "Dọn dẹp cấu trúc engine",
+      "autoQuality": "Chất lượng tự động, 30 người tham dự",
+      "roomService": "Vào phòng và ghi âm",
+      "roomUi": "Màn hình phòng (sảnh·sân khấu·trò chuyện·giơ tay·kiểm duyệt)",
+      "createForm": "Màn hình tạo",
+      "list": "Danh sách",
+      "detail": "Chi tiết",
+      "payRequest": "Yêu cầu thanh toán",
+      "payVerify": "Kiểm tra lại số tiền và vào cửa",
+      "settle": "Thanh toán",
+      "vod": "Phát lại bản ghi",
+      "appRelay": "Kênh tín hiệu tiện ích bổ sung engine",
+      "aiBase": "AI, đoạn giọng nói, đồng ý và bảng dữ liệu",
+      "shareLinks": "Liên kết lịch, .ics và lời mời qua email",
+      "noiseLight": "Giảm tiếng ồn và ánh sáng",
+      "liveCaptions": "Phụ đề trực tiếp",
+      "pollQnaAttend": "Thăm dò ý kiến, Hỏi & Đáp và danh sách điểm danh",
+      "backgrounds": "Làm mờ, cài đặt sẵn và hình ảnh của riêng bạn",
+      "localRecording": "Người thuyết trình ghi âm và huy hiệu ghi âm",
+      "aiNotes": "Ghi âm, tóm tắt và trang ghi chú",
+      "inPersonNotes": "Ghi chú chỉ bằng micro và ghi chú của tôi",
+      "captionTranslate": "Chọn ngôn ngữ và chuyển đổi gốc/dịch",
+      "dubbing": "Phát lại giọng nói tổng hợp và giảm âm thanh gốc"
+    },
+    "refLabel": "Mô hình tham chiếu",
+    "uiRef": "Giao diện người dùng cơ bản — các mẫu màn hình và tính năng của một ứng dụng họp video web được sử dụng rộng rãi, được điều chỉnh cho seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Tên đã được lưu, nhưng không thể thông báo cho những người khác ngay bây giờ. Họ sẽ thấy tên đó sau khi bạn tham gia lại.",
+      "tile": "Nhấp để đổi tên của tôi",
+      "menu": "Đổi tên của tôi",
+      "title": "Tên của tôi trong seminar này",
+      "hint": "Tối đa 30 ký tự. Chỉ được sử dụng trong seminar này và cập nhật ngay lập tức trên màn hình của mọi người.",
+      "save": "Lưu",
+      "saving": "Đang lưu…",
+      "cancel": "Hủy",
+      "taken": "Tên đó đã được người khác (người tổ chức hoặc người tham dự) sử dụng. Vui lòng chọn tên khác.",
+      "failed": "Không thể lưu tên của bạn. Vui lòng thử lại."
+    },
+    "roomTitle": {
+      "edit": "Nhấp để chỉnh sửa phụ đề",
+      "label": "Phụ đề",
+      "placeholder": "Phụ đề (tối đa 60)",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "failed": "Không thể lưu phụ đề."
+    },
+    "mirror": "Phản chiếu video của tôi",
+    "barPin": "Luôn hiển thị thanh dưới cùng",
+    "barAuto": "Tự động ẩn thanh dưới cùng",
+    "title": "Tham gia seminar · {room}",
+    "titleSeminar": "Phòng chờ",
+    "noEngine": "Máy chủ video chưa sẵn sàng.",
+    "joinAs": "Tham gia với tư cách",
+    "presenter": "Người thuyết trình",
+    "audience": "Khán giả",
+    "join": "Tham gia ngay",
+    "nameLabel": "Tên",
+    "audienceHint": "Khán giả không sử dụng camera hoặc micro. Sau khi tham gia, bạn sẽ thấy và nghe người thuyết trình.",
+    "preview": {
+      "pending": "Đang chuẩn bị camera và micro…",
+      "audioOnly": "Camera không khả dụng — chỉ gửi âm thanh.",
+      "none": "Camera và micro không khả dụng. Kiểm tra quyền (bạn vẫn có thể tham gia mà không cần phương tiện).",
+      "videoOnly": "Micro không khả dụng — chỉ gửi video. Kiểm tra quyền micro."
+    },
+    "mic": {
+      "on": "Tắt micro",
+      "off": "Bật micro"
+    },
+    "cam": {
+      "on": "Tắt camera",
+      "off": "Bật camera"
+    },
+    "controls": "Điều khiển cuộc gọi",
+    "leave": "Rời đi",
+    "enableSound": "Bật âm thanh",
+    "state": {
+      "connecting": "Đang kết nối…",
+      "reconnecting": "Đang kết nối lại…"
+    },
+    "waiting": "Đang chờ người thuyết trình.",
+    "rejoin": "Tham gia lại",
+    "err": {
+      "generic": "Đã xảy ra lỗi. Vui lòng tham gia lại.",
+      "CLOSED": "Kết nối đã bị mất.",
+      "NO_ENGINE": "Máy chủ video chưa sẵn sàng.",
+      "TICKET_401": "Vui lòng đăng nhập.",
+      "TICKET_403": "Bạn không có quyền thuyết trình. Tham gia với tư cách khán giả.",
+      "TICKET_503": "Máy chủ video chưa được cấu hình.",
+      "TICKET_NETWORK": "Kiểm tra kết nối mạng của bạn.",
+      "TICKET_INVALID": "Vé vào cửa của bạn đã hết hạn.",
+      "TICKET_EXPIRED": "Vé vào cửa của bạn đã hết hạn.",
+      "ROOM_FULL": "Đã đủ số lượng người tham gia.",
+      "ROOM_CLOSED": "Phòng đã đóng — hội thảo đã kết thúc hoặc người chủ trì đã vắng mặt hơn 5 phút.",
+      "DUPLICATE_SESSION": "Bạn đã tham gia từ một thiết bị khác, nên màn hình này đã bị ngắt kết nối.",
+      "ROLE_FORBIDDEN": "Bạn không có quyền trình bày.",
+      "WS_FAILED": "Không thể kết nối với máy chủ video.",
+      "ICE_FAILED": "Kết nối video bị mất. Vui lòng kiểm tra mạng của bạn.",
+      "MEDIA_FAILED": "Không thể khởi động camera hoặc micrô.",
+      "TIMEOUT": "Máy chủ video không phản hồi.",
+      "TICKET_402": "Đây là hội thảo trả phí. Vui lòng thanh toán trên trang hội thảo trước khi vào.",
+      "TICKET_404": "Không tìm thấy hội thảo.",
+      "TICKET_409": "Hội thảo này đã kết thúc hoặc bị hủy.",
+      "TICKET_HOST_AWAY": "Người chủ trì chưa tham gia hoặc đã vắng mặt hơn 5 phút, nên bạn không thể vào. Vui lòng thử lại sau khi người chủ trì tham gia.",
+      "TICKET_PLAN_EXHAUSTED": "Gói hội thảo này đã hết thời gian sử dụng, nên không thể bắt đầu. Mua lại gói tương tự sẽ thêm thời gian (Gói miễn phí sẽ được gia hạn 1 giờ vào tháng tới)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Không thể thay đổi micrô. Vui lòng thử lại.",
+        "video": "Không thể thay đổi camera. Vui lòng thử lại."
+      },
+      "forbidden": "Bạn không có quyền trình bày, nên bạn sẽ tiếp tục với vai trò khán giả.",
+      "demoted": "Bạn đã bị chuyển lại thành khán giả.",
+      "endFailed": "Không thể kết thúc hội thảo. Vui lòng thử lại.",
+      "chatFailed": "Không gửi được tin nhắn.",
+      "actionFailed": "Không thể hoàn tất yêu cầu. Vui lòng thử lại.",
+      "shareFailed": "Không thể bắt đầu chia sẻ màn hình.",
+      "err": {
+        "RATE_LIMITED": "Bạn đang gửi quá nhanh. Vui lòng đợi một lát.",
+        "ROLE_FORBIDDEN": "Bạn không có quyền thực hiện thao tác này.",
+        "MEDIA_FAILED": "Không thể khởi động mic hoặc camera của bạn. Vui lòng kiểm tra quyền.",
+        "LOCKED": "Bị người trình bày khóa."
+      },
+      "mutedBy": {
+        "audio": "Người trình bày đã tắt micrô của bạn.",
+        "video": "Người trình bày đã tắt camera của bạn."
+      },
+      "policy": {
+        "locked": "Người trình bày đã khóa micrô. Bạn có thể bật micrô của mình khi chúng được mở khóa.",
+        "unlocked": "Micrô đã được mở khóa."
+      },
+      "consent": {
+        "saveFail": "Không thể lưu sự đồng ý của bạn. Vui lòng kiểm tra đăng ký của bạn và bật lại micrô."
+      }
+    },
+    "home": "Về trang chủ",
+    "tile": {
+      "fullscreen": "Nhấp đúp để toàn màn hình · Esc để thoát",
+      "self": "{name} (bạn)",
+      "presenter": "Người trình bày",
+      "micOff": "Micrô tắt",
+      "screen": "Màn hình của {name}",
+      "row": "Người nói khác",
+      "pin": "Hiển thị {name} lớn",
+      "unpin": "Bố cục tự động"
+    },
+    "more": "Tùy chọn khác",
+    "joinNoCam": "Tham gia không có camera",
+    "net": {
+      "afterJoin": "Kết nối của bạn sẽ được kiểm tra tự động sau khi bạn tham gia.",
+      "measuring": "Đang kiểm tra kết nối…",
+      "good": "Kết nối tốt",
+      "fair": "Kết nối khá",
+      "poor": "Kết nối kém",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% dữ liệu âm thanh đang bị mất.",
+          "video": "{pct}% dữ liệu video đang bị mất."
+        },
+        "rate": {
+          "audio": "Tốc độ tải lên âm thanh thấp ở mức {kbps} kbps.",
+          "video": "Tốc độ tải lên video thấp ở mức {kbps} kbps. Chất lượng có thể giảm."
+        }
+      }
+    },
+    "people": "{n} người trong phòng",
+    "screen": {
+      "start": "Chia sẻ màn hình",
+      "stop": "Dừng chia sẻ"
+    },
+    "panel": {
+      "title": "Trò chuyện · Hỏi & Đáp · Thăm dò ý kiến · Mọi người",
+      "chat": "Trò chuyện",
+      "people": "Mọi người",
+      "close": "Đóng bảng điều khiển",
+      "qna": "Hỏi & Đáp",
+      "polls": "Thăm dò ý kiến"
+    },
+    "chat": {
+      "empty": "Chưa có tin nhắn nào. Trò chuyện không được lưu.",
+      "me": "Bạn",
+      "failed": "Không gửi được.",
+      "retry": "Thử lại",
+      "input": "Nhập tin nhắn",
+      "send": "Gửi"
+    },
+    "hand": {
+      "raise": "Giơ tay",
+      "lower": "Hạ tay",
+      "list": "Người giơ tay",
+      "lowerAll": "Hạ tất cả các tay",
+      "raised": "Đã giơ tay",
+      "notice": "{name} đã giơ tay.",
+      "dismiss": "Bỏ qua",
+      "waiting": "{n} người đang chờ phát biểu"
+    },
+    "react": {
+      "open": "Phản ứng",
+      "e0": "Thích",
+      "e1": "Vỗ tay",
+      "e2": "Cười",
+      "e3": "Ngạc nhiên",
+      "e4": "Buồn",
+      "e5": "Không nói nên lời",
+      "e6": "Yêu"
+    },
+    "quality": {
+      "label": "Chất lượng",
+      "auto": "Tự động",
+      "high": "Cao",
+      "medium": "Trung bình",
+      "low": "Thấp",
+      "unstable": "Mạng của bạn không ổn định"
+    },
+    "roles": {
+      "presenter": "Người trình bày",
+      "panel": "Người tham gia hội đồng",
+      "audience": "Khán giả"
+    },
+    "stage": {
+      "invite": "Mời lên sân khấu",
+      "remove": "Chuyển xuống khán giả",
+      "promoted": "Bạn đã được mời lên sân khấu. Nếu bạn đã giơ tay, camera của bạn sẽ tự động bật (trừ khi bị khóa hoặc không được phép). Bật micrô của bạn để nói (micrô không tự động bật).",
+      "later": "Sau"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} đã giơ tay."
+    },
+    "leaveDialog": {
+      "title": "Rời khỏi hội thảo",
+      "body": "Bạn có thể tự rời đi, hoặc kết thúc hội thảo và ngắt kết nối tất cả mọi người.",
+      "confirmTitle": "Kết thúc hội thảo?",
+      "confirmBody": "Mọi người sẽ bị ngắt kết nối và không ai có thể tham gia lại hội thảo này.",
+      "cancel": "Hủy",
+      "end": "Kết thúc hội thảo",
+      "endConfirm": "Kết thúc ngay"
+    },
+    "mod": {
+      "muteAll": "Tắt tiếng tất cả mọi người",
+      "lock": "Khóa micrô",
+      "unlock": "Mở khóa micrô",
+      "locked": "Người trình bày đã khóa micrô",
+      "muteMic": "Tắt tiếng micrô",
+      "askMic": "Yêu cầu bật tiếng",
+      "muteCam": "Tắt camera",
+      "muteMicOf": "Tắt tiếng {name}",
+      "askMicOf": "Yêu cầu {name} bật tiếng",
+      "muteCamOf": "Tắt camera của {name}"
+    },
+    "ask": {
+      "audio": "Người trình bày đã yêu cầu bạn bật micrô.",
+      "video": "Người trình bày đã yêu cầu bạn bật camera.",
+      "ignore": "Bỏ qua"
+    },
+    "toDetail": "Đi đến trang hội thảo",
+    "consent": {
+      "title": "Trước khi bạn bật micrô",
+      "body": "Nếu tính năng ghi âm, phụ đề hoặc ghi chú cuộc họp AI được bật trong hội thảo này, giọng nói của bạn có thể được chuyển đổi thành văn bản, lưu trữ và dịch. Quá trình xử lý giọng nói được thực hiện bởi một dịch vụ AI bên ngoài quốc gia của bạn. Nếu bạn không đồng ý, micrô của bạn vẫn bật — chỉ giọng nói của bạn không được xử lý.",
+      "privacy": "Chính sách quyền riêng tư",
+      "newTab": "(mở trong tab mới)",
+      "decline": "Không đồng ý",
+      "agree": "Đồng ý và bật micrô",
+      "notice": "Khi ghi âm, phụ đề hoặc ghi chú cuộc họp AI được bật, giọng nói của người nói sẽ được xử lý. Giọng nói của khán giả không được gửi.",
+      "saveFailClosed": "Hội thảo này đã kết thúc, nên không thể ghi lại sự đồng ý"
+    },
+    "captions": {
+      "title": "Phụ đề",
+      "room": "Phụ đề trực tiếp (toàn bộ phòng)",
+      "show": "Hiển thị phụ đề",
+      "size": {
+        "label": "Cỡ chữ",
+        "sm": "Nhỏ",
+        "md": "Trung bình",
+        "lg": "Lớn"
+      },
+      "waiting": "Phụ đề sẽ xuất hiện khi người trình bày bật chúng",
+      "limit": "Đã đạt giới hạn xử lý giọng nói, nên phụ đề và ghi chú AI đã dừng",
+      "sendFail": "Không thể bật phụ đề. Vui lòng thử lại sau ít phút",
+      "sendFailOff": "Không thể tắt phụ đề. Vui lòng thử lại sau ít phút",
+      "region": "Phụ đề",
+      "translate": "Hiển thị phụ đề đã dịch",
+      "lang": "Ngôn ngữ dịch",
+      "langMine": "Ngôn ngữ của tôi",
+      "langAll": "Tất cả ngôn ngữ",
+      "trStop": {
+        "forbidden": "Phụ đề đã dịch chỉ dành cho những người tham gia đã đăng ký. Đang hiển thị bản gốc",
+        "unavailable": "Phụ đề đã dịch hiện không khả dụng. Đang hiển thị bản gốc",
+        "quota": "Hội thảo này đã đạt giới hạn dịch. Đang hiển thị bản gốc",
+        "usrQuota": "Bạn đã sử dụng hết giới hạn dịch của mình cho hội thảo này. Đang hiển thị bản gốc"
+      },
+      "unsupported": "Thiết bị này không thể tạo phụ đề trực tiếp (trình duyệt này không hỗ trợ ghi âm thanh)"
+    },
+    "effects": {
+      "title": "Hiệu ứng",
+      "light": "Chỉnh sửa ánh sáng",
+      "noise": "Giảm tiếng ồn",
+      "noiseFail": "Không thể thay đổi tính năng giảm tiếng ồn trên thiết bị này",
+      "close": "Đóng",
+      "preview": "Xem trước của tôi",
+      "bg": "Nền",
+      "bgNone": "Không",
+      "bgBlur": "Làm mờ",
+      "scenes": {
+        "beach": "🏝️ Bãi biển Maldives",
+        "autumn": "🍁 Thung lũng mùa thu",
+        "fireplace": "🔥 Lò sưởi",
+        "xmas": "🎄 Phòng họp Giáng sinh"
+      },
+      "bgs": {
+        "dusk": "Hoàng hôn",
+        "ocean": "Đại dương",
+        "forest": "Rừng",
+        "studio": "Studio",
+        "grid": "Lưới",
+        "dots": "Chấm"
+      },
+      "myAdd": "Ảnh của tôi",
+      "myItem": "Ảnh của tôi {n}",
+      "myDel": "Xóa ảnh của tôi {n}",
+      "mySaveFail": "Đã áp dụng nền nhưng không thể lưu trên thiết bị này (chỉ trong cuộc họp này)",
+      "bgStopped": "Hiệu ứng nền đã dừng và bị tắt. Chọn lại để khởi động lại",
+      "myNote": "Ảnh của bạn chỉ được lưu trữ trên thiết bị này (tối đa 3 ảnh, mỗi ảnh 2 MB)",
+      "mobileBlurOnly": "Trên điện thoại, chỉ có nền làm mờ khả dụng (nền ảnh hoạt động trên PC)",
+      "myTooBig": "Chỉ có thể sử dụng ảnh có kích thước tối đa 2 MB",
+      "preparing": "Đang chuẩn bị…",
+      "bgFailed": "Không thể tải hiệu ứng nền",
+      "autoOff": "Thiết bị của bạn quá chậm, nên hiệu ứng nền đã bị tắt",
+      "unsupported": "Hiệu ứng nền không khả dụng trên thiết bị này",
+      "noCam": "Bật camera của bạn để chọn nền",
+      "lightUnsupported": "Chỉnh sửa ánh sáng không khả dụng trên thiết bị này",
+      "noiseUnsupported": "Cài đặt giảm tiếng ồn không được hỗ trợ trên thiết bị này"
+    },
+    "sheetClose": "Đóng",
+    "polls": {
+      "new": "Thăm dò ý kiến mới",
+      "question": "Câu hỏi",
+      "option": "Tùy chọn {n}",
+      "remove": "Xóa tùy chọn {n}",
+      "addOption": "Thêm tùy chọn",
+      "start": "Bắt đầu thăm dò ý kiến",
+      "cancel": "Hủy",
+      "dup": "Các tùy chọn phải khác nhau",
+      "vote": "Bình chọn",
+      "change": "Thay đổi bình chọn",
+      "close": "Đóng thăm dò ý kiến",
+      "closed": "Đã đóng",
+      "mine": "Lựa chọn của bạn",
+      "result": "{pct}% ({n} phiếu)",
+      "total": "Tổng cộng {n} phiếu",
+      "empty": "Chưa có thăm dò ý kiến nào.",
+      "loading": "Đang tải…",
+      "labOnly": "Thăm dò ý kiến chỉ khả dụng trong các phòng hội thảo.",
+      "started": "Một cuộc thăm dò ý kiến mới đã bắt đầu",
+      "goVote": "Bình chọn",
+      "votersNote": "Người tổ chức có thể xem ai đã bình chọn cho tùy chọn nào.",
+      "voters": "Đã bình chọn: {names}"
+    },
+    "qna": {
+      "sort": "Sắp xếp",
+      "by": {
+        "top": "Hàng đầu",
+        "new": "Mới nhất"
+      },
+      "rcm": "Bình chọn lên ({n})",
+      "answered": "Đã trả lời",
+      "answer": "Đánh dấu đã trả lời",
+      "unanswer": "Bỏ đánh dấu đã trả lời",
+      "hide": "Ẩn",
+      "doneN": "Đã trả lời {n}",
+      "backOpen": "Câu hỏi chưa trả lời",
+      "empty": "Chưa có câu hỏi nào.",
+      "emptyDone": "Không có câu hỏi nào đã được trả lời.",
+      "loading": "Đang tải…",
+      "input": "Đặt câu hỏi (500 ký tự)",
+      "send": "Gửi",
+      "left": "Còn lại {n}",
+      "labOnly": "Hỏi & Đáp chỉ khả dụng trong các phòng hội thảo."
+    },
+    "recording": {
+      "title": "Ghi hình",
+      "badge": "Đang ghi hình",
+      "unsupported": "Trình duyệt này không thể ghi hình. Vui lòng ghi hình từ trình duyệt thông thường trên máy tính.",
+      "piBrowserOnly": "Ghi hình chỉ hoạt động trong trình duyệt thông thường (máy tính hoặc di động). Pi Browser không thể lưu tệp ghi hình — vui lòng mở hội thảo này trong trình duyệt máy tính hoặc điện thoại (seminarz.vercel.app) để ghi hình.",
+      "audioSuspended": "Ghi âm thanh có thể chưa bắt đầu trên thiết bị này. Chỉ có thể ghi hình ảnh.",
+      "notifyFailed": "Ghi hình không bắt đầu vì không thể thông báo cho người tham gia. Vui lòng thử lại sau ít phút.",
+      "confirm": {
+        "title": "Bắt đầu ghi hình?",
+        "body": "Khi ghi hình bắt đầu, mọi người sẽ thấy chỉ báo 'Đang ghi hình'. Tệp được lưu trữ chỉ trên thiết bị này và không bao giờ được tải lên hoặc chuyển ra nước ngoài. Vui lòng thông báo cho người tham gia trước khi bạn bắt đầu.",
+        "download": "Khi bạn dừng, một tệp MP4 sẽ được lưu vào thư mục tải xuống của bạn (các trình duyệt không thể ghi MP4 sẽ mất một chút thời gian để chuyển đổi; các bản ghi dài hơn khoảng 45 phút có thể được giữ ở định dạng gốc). Các trình duyệt trong ứng dụng có thể chặn lưu tệp, vì vậy hãy ghi hình từ trình duyệt thông thường trên máy tính.",
+        "cancel": "Hủy",
+        "start": "Bắt đầu ghi hình",
+        "charge": "Trong khi ghi hình, thời gian ghi hình sẽ được trừ vào thời gian trả phí của bạn ngoài thời gian phòng (gấp 2 lần khi ghi hình). Khi hết thời gian trả phí, ghi hình sẽ dừng và tệp sẽ được lưu."
+      },
+      "resave": {
+        "label": "Tệp ghi hình",
+        "save": "Lưu lại",
+        "dismiss": "Đóng lưu lại"
+      },
+      "toast": {
+        "started": "Đã bắt đầu ghi hình — mọi người đều có thể thấy",
+        "saved": "Đã lưu bản ghi. Kiểm tra thư mục tải xuống của bạn. Nếu không có gì được lưu, hãy nhấn [Lưu lại] ở đầu màn hình.",
+        "autoStopped": "Ghi hình đã kết thúc vì trình duyệt đã dừng hoặc đạt giới hạn kích thước. Mọi thứ cho đến thời điểm đó đã được lưu. Bắt đầu ghi hình lại để tiếp tục.",
+        "empty": "Không có gì được ghi lại, nên không có tệp nào được tạo.",
+        "saveFailed": "Không thể tạo tệp ghi hình.",
+        "converting": "Đang chuyển đổi bản ghi sang MP4. Vui lòng giữ cửa sổ này mở.",
+        "savedOriginal": "Không thể chuyển đổi sang MP4, nên bản ghi đã được lưu ở định dạng gốc (webm). Kiểm tra thư mục tải xuống của bạn.",
+        "startedBy": "Người trình bày đã bắt đầu ghi hình",
+        "stoppedBy": "Người trình bày đã dừng ghi hình"
+      },
+      "paidOnly": "Ghi hình chỉ khả dụng trong các hội thảo được mở bằng gói Hàng tháng hoặc Hàng năm, khi còn thời gian trả phí.",
+      "planOut": "Đã hết thời gian trả phí, nên ghi hình đã dừng và tệp đã được lưu.",
+      "notInRoom": "Vẫn đang xác nhận bạn đang ở trong phòng. Vui lòng bắt đầu ghi hình lại sau ít phút.",
+      "meterFailed": "Không thể kiểm tra thời gian ghi hình, nên ghi hình không bắt đầu. Vui lòng thử lại sau ít phút.",
+      "paidOut": "Không còn thời gian trả phí, nên không thể bắt đầu ghi hình. Mua lại gói tương tự để ghi hình.",
+      "pausedBadge": "Ghi hình tạm dừng",
+      "controls": "Điều khiển ghi hình",
+      "pause": "Tạm dừng",
+      "resume": "Tiếp tục",
+      "stop": "Dừng ghi hình"
+    },
+    "notes": {
+      "on": "Ghi chú AI",
+      "badge": "Đang ghi chú AI",
+      "started": "Người thuyết trình đã bật ghi chú AI",
+      "stopped": "Ghi chú AI đã tắt",
+      "startedMine": "Đã bật ghi chú AI — hiển thị cho mọi người",
+      "stoppedMine": "Đã tắt ghi chú AI — đang tạo ghi chú",
+      "startFail": "Không thể bắt đầu ghi chú AI",
+      "gone": "Ghi chú AI đã dừng — ghi chú đã bị kết thúc hoặc xóa ở nơi khác",
+      "unsupported": "Không thể bật ghi chú AI ở đây (không hỗ trợ ghi âm giọng nói)"
+    },
+    "dubbing": {
+      "listen": "Nghe giọng nói đã dịch",
+      "blocked": "Không thể phát giọng nói đã dịch. Vui lòng bật lại",
+      "stopped": "Giọng nói đã dịch hiện không khả dụng, vì vậy đã tắt",
+      "usrQuota": "Bạn đã sử dụng hết giới hạn giọng nói đã dịch cho hội thảo này, vì vậy đã tắt"
+    },
+    "plan": {
+      "warn": "Gói hội thảo này còn {min} phút.",
+      "ended": "Thời gian hội thảo của bạn đã hết, vì vậy hội thảo đã kết thúc và bạn đã rời khỏi phòng.",
+      "left": "Thời gian hội thảo còn lại",
+      "closed": "Hội thảo đã kết thúc, vì vậy bạn đã rời khỏi phòng.",
+      "hostAway": "Người chủ trì đã rời khỏi phòng. Nếu họ không quay lại trong vòng 5 phút, tất cả người tham gia sẽ bị xóa.",
+      "hostGone": "Người chủ trì đã không quay lại trong vòng 5 phút, vì vậy bạn đã rời khỏi phòng. Bạn có thể vào lại khi người chủ trì tham gia."
+    },
+    "toLobby": "Phòng chờ"
+  },
+  "list": {
+    "tabsLabel": "Xem danh sách hội thảo",
+    "tabs": {
+      "all": "Tất cả",
+      "hosted": "Do tôi tổ chức",
+      "joined": "Đã tham gia"
+    },
+    "empty": {
+      "all": "Không có hội thảo sắp tới.",
+      "hosted": "Bạn chưa tổ chức hội thảo nào.",
+      "joined": "Bạn chưa tham gia hội thảo nào."
+    },
+    "loading": "Đang tải…",
+    "retry": "Thử lại",
+    "free": "Miễn phí",
+    "fee": "{amount} Pi",
+    "host": "Chủ trì {name}",
+    "capacity": "Sức chứa {n}",
+    "status": {
+      "SCHEDULED": "Đã lên lịch",
+      "LIVE": "Trực tiếp",
+      "ENDED": "Đã kết thúc",
+      "CANCELED": "Đã hủy"
+    },
+    "hostNew": "Tạo hội thảo",
+    "progress": "Tiến độ",
+    "pager": "Phân trang",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Phụ đề",
+      "placeholder": "Thêm phụ đề",
+      "save": "Lưu phụ đề",
+      "saving": "Đang lưu…",
+      "saved": "Đã lưu."
+    },
+    "loading": "Đang tải…",
+    "back": "Quay lại danh sách",
+    "notFound": "Không tìm thấy hội thảo.",
+    "status": {
+      "SCHEDULED": "Đã lên lịch",
+      "LIVE": "Trực tiếp",
+      "ENDED": "Đã kết thúc",
+      "CANCELED": "Đã hủy"
+    },
+    "startAt": "Ngày",
+    "host": "Người chủ trì",
+    "seats": "Chỗ trống",
+    "seatsValue": "{left} / {max}",
+    "fee": "Phí hội thảo",
+    "feeValue": "{amount} Pi",
+    "free": "Miễn phí",
+    "enter": "Vào",
+    "payEnter": "Thanh toán bằng Pi và vào ({amount} Pi)",
+    "paying": "Đang xử lý thanh toán…",
+    "joining": "Đang đăng ký…",
+    "registered": "Bạn đã đăng ký.",
+    "full": "Hội thảo này đã đầy.",
+    "closed": "Hội thảo này đã kết thúc.",
+    "canceled": "Hội thảo này đã bị hủy.",
+    "roomLink": "Đi đến phòng (chủ trì)",
+    "piBrowserOnly": "Thanh toán khả dụng trong Pi Browser sau khi đăng nhập Pi.",
+    "payCancelled": "Đã hủy thanh toán.",
+    "payStillWaiting": "Vẫn đang chờ ví. Nếu bạn đã đăng nhập Pi Wallet, vui lòng đợi một lát.",
+    "payFailed": "Thanh toán thất bại.",
+    "err": {
+      "NAME_TAKEN": "Tên đó đã được người khác sử dụng. Vui lòng chọn tên khác.",
+      "CAL_READ_FAILED": "Không thể tải sự kiện của bạn. Kiểm tra địa chỉ.",
+      "ISLAND_FULL": "Tất cả 100 tên đảo hiện đang được sử dụng. Bạn có thể mở một hội thảo mới sau khi một hội thảo sắp tới hoặc đang diễn ra kết thúc hoặc bị hủy.",
+      "SMN_FULL": "Hội thảo này đã đầy.",
+      "SMN_CLOSED": "Hội thảo này đã kết thúc hoặc bị hủy.",
+      "SMN_ALREADY": "Bạn đã đăng ký hoặc đang trong quá trình thanh toán.",
+      "SMN_FREE": "Hội thảo miễn phí không yêu cầu thanh toán.",
+      "SMN_PAY_REQUIRED": "Đây là hội thảo trả phí. Vui lòng thanh toán để vào.",
+      "SMN_PAY_INVALID": "Chúng tôi không thể xác minh thanh toán của bạn. Vui lòng liên hệ quản trị viên.",
+      "PAY_PI_FAILED": "Không thể kết nối với máy chủ thanh toán Pi. Vui lòng thử lại sau.",
+      "PAY_MISMATCH": "Chi tiết thanh toán không khớp.",
+      "PAY_AMOUNT_MISMATCH": "Số tiền thanh toán khác với phí hội thảo.",
+      "PAY_CANCELLED": "Thanh toán này đã bị hủy.",
+      "PAY_ALREADY_PAID": "Một khoản thanh toán vẫn đang được xử lý. Nếu bạn đang đăng nhập ví, hãy thử lại sau 3 phút.",
+      "PAY_INVALID_STATE": "Thanh toán này không thể được xử lý ngay bây giờ.",
+      "PAY_PI_CANCEL_REFUSED": "Thanh toán đã được tiến hành và không thể hủy. Vui lòng kiểm tra lại sau."
+    },
+    "share": {
+      "title": "Lên lịch & chia sẻ",
+      "calendar": "Thêm vào lịch",
+      "ics": "Tệp lịch",
+      "mail": "Mời qua email",
+      "mailApp": "Gửi bằng ứng dụng thư mặc định",
+      "mailSubject": "[Lời mời hội thảo] {title}",
+      "mailBody": "{title}\nThời gian: {start}\n\nTham gia trực tiếp bằng liên kết này.\nMáy tính để bàn: {url}\nPi Browser: {piUrl}",
+      "copy": "Sao chép liên kết",
+      "copied": "Đã sao chép liên kết.",
+      "copyFail": "Không thể sao chép. Vui lòng sao chép liên kết từ thanh địa chỉ.",
+      "share": "Chia sẻ sang ứng dụng khác",
+      "shareFail": "Không thể chia sẻ. Vui lòng sử dụng Sao chép liên kết thay thế.",
+      "created": "Hội thảo của bạn đã sẵn sàng. Thêm thời gian bắt đầu vào Google Calendar của bạn.",
+      "addGoogle": "Thêm vào Google Calendar",
+      "later": "Sau",
+      "piBrowserOpen": "Trong Pi Browser, lịch, email và tệp lịch sẽ mở trong trình duyệt mặc định của điện thoại bạn.",
+      "extFail": "Không thể mở. Vui lòng cập nhật Pi Browser, hoặc sử dụng Sao chép liên kết và mở trong trình duyệt thông thường (seminarz.vercel.app).",
+      "icsPiBrowser": "Tệp lịch chỉ có thể được tải xuống trong trình duyệt thông thường (máy tính hoặc di động). Trong Pi Browser, vui lòng sử dụng Thêm vào lịch thay thế."
+    },
+    "attendance": "Điểm danh",
+    "plan": "Gói",
+    "left": "Thời gian còn lại"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Tháng trước",
+      "next": "Tháng sau",
+      "connect": "Hiển thị Google Calendar của tôi",
+      "change": "Quản lý lịch Google ({n})",
+      "add": "Thêm",
+      "remove": "Xóa",
+      "close": "Đóng",
+      "failed": "Không thể tải sự kiện từ {n} lịch. Kiểm tra địa chỉ.",
+      "badUrl": "Dán 'Địa chỉ bí mật ở định dạng iCal' (…/basic.ics) từ cài đặt Google Calendar, không phải thanh địa chỉ trình duyệt.",
+      "full": "Bạn có thể thêm tối đa {n} lịch.",
+      "allDay": "Cả ngày",
+      "day": "Sự kiện của tôi vào ngày này",
+      "count": "{n, plural, other {# sự kiện}}",
+      "more": "+{n}",
+      "picked": "Ngày này được đặt làm ngày bắt đầu. Chọn thời gian bên dưới.",
+      "s1": "Nhấn [Mở cài đặt Google Calendar] bên dưới.",
+      "s2": "Trong 'Cài đặt cho lịch của tôi' ở bên trái, chọn một lịch (ví dụ: tên của bạn).",
+      "s3": "Cuộn đến 'Tích hợp lịch' và sao chép 'Địa chỉ bí mật ở định dạng iCal'.",
+      "s4": "Dán vào đây và nhấn [Thêm] — tiêu đề sự kiện sẽ xuất hiện trên lịch. Thêm các lịch khác theo cùng cách, tối đa 5 lịch.",
+      "open": "Mở cài đặt Google Calendar",
+      "privacy": "Địa chỉ này là chìa khóa vào lịch của bạn — đừng chia sẻ nó. Nó chỉ được lưu trữ trên thiết bị này, không bao giờ trên máy chủ của chúng tôi."
+    },
+    "title": "Tạo hội thảo",
+    "name": "Hãy cùng du hành đến một hòn đảo xinh đẹp!",
+    "subTitle": "Phụ đề (tùy chọn, tối đa 60 ký tự)",
+    "startAt": "Thời gian bắt đầu",
+    "maxCnt": "Sức chứa (1–100)",
+    "submit": "Tạo",
+    "submitting": "Đang tạo…",
+    "invalid": "Kiểm tra đầu vào của bạn — ngày trong vòng một năm kể từ bây giờ, sức chứa 1–100.",
+    "attendance": {
+      "title": "Điểm danh",
+      "back": "Quay lại hội thảo",
+      "loading": "Đang tải…",
+      "forbidden": "Chỉ người chủ trì và quản trị viên mới có thể xem điểm danh.",
+      "count": "{n} người",
+      "csv": "Tải xuống CSV",
+      "empty": "Chưa có ai tham gia.",
+      "online": "Trực tuyến",
+      "left": "Đã rời đi",
+      "col": {
+        "name": "Tên",
+        "pi": "Tên người dùng Pi",
+        "ent": "Tham gia lần đầu",
+        "hb": "Lần cuối nhìn thấy",
+        "dur": "Thời gian tham dự",
+        "min": "Tham dự (phút, không bao gồm thời gian vắng mặt)",
+        "state": "Trạng thái"
+      },
+      "durNote": "Thời gian tham dự là từ lần tham gia đầu tiên đến lần cuối cùng nhìn thấy, trừ đi thời gian vắng mặt (khoảng trống dài hơn 2,5 phút).",
+      "csvPiBrowser": "Tải xuống CSV chỉ hoạt động trong trình duyệt thông thường (máy tính hoặc di động). Pi Browser không thể lưu tệp — vui lòng mở bảng điểm danh này trong trình duyệt máy tính hoặc điện thoại (seminarz.vercel.app)."
+    },
+    "plan": "Gói",
+    "planFree": "Miễn phí — còn {time} trong tháng này · không có AI",
+    "planPaid": "{name} {time} · {price} — thanh toán khi tạo",
+    "planHint": "Một hội thảo được mở trên gói trả phí sẽ sử dụng thời gian của gói đó trước, sau đó tiếp tục sử dụng thời gian miễn phí của tháng này (không có AI trong phần miễn phí). Một gói đang hoạt động sẽ mở mà không cần thanh toán; Gói hàng tháng hoặc hàng năm mà bạn không có sẽ được thanh toán bằng Pi khi bạn nhấn Tạo, sau đó hội thảo sẽ mở (Pi Browser). Việc tham gia luôn miễn phí cho người tham gia.",
+    "planOwned": "{name} — đang hoạt động · còn {time}",
+    "planEnds": "Thời gian bắt đầu sau khi gói này hết hạn. Di chuyển thời gian bắt đầu sớm hơn hoặc chọn gói khác.",
+    "paidKept": "Gói trả phí của bạn được giữ lại. Khắc phục sự cố và nhấn Tạo lại (không cần thanh toán lần thứ hai)."
+  },
+  "privacy": {
+    "title": "Chính sách quyền riêng tư — Tính năng giọng nói và AI",
+    "effective": "Có hiệu lực {date}",
+    "intro": "Chính sách này giải thích thông tin cá nhân mà chúng tôi xử lý khi bạn sử dụng phụ đề trực tiếp, phụ đề đã dịch, dịch giọng nói, ghi chú cuộc họp AI và ghi chú trực tiếp trong một hội thảo. Các tính năng này sử dụng dịch vụ AI bên ngoài, vì vậy thông tin được chuyển ra nước ngoài.",
+    "whoTitle": "Thông tin của ai được xử lý",
+    "who": [
+      "Người thuyết trình và người tham gia trên sân khấu: chúng tôi sẽ yêu cầu sự đồng ý của bạn một lần, trước khi bạn bật micrô lần đầu tiên. Bạn có thể tham gia hội thảo mà không cần đồng ý.",
+      "Khán giả: bạn không sử dụng micrô, vì vậy không có giọng nói nào được gửi. Bạn chỉ thấy phụ đề và ghi chú.",
+      "Ghi chú trực tiếp: quản trị viên ghi lại cuộc họp bằng micrô và xác nhận rằng những người tham dự đã được thông báo trước khi ghi."
+    ],
+    "xferTitle": "Chuyển thông tin cá nhân ra nước ngoài (Luật Bảo vệ Thông tin Cá nhân Hàn Quốc, Điều 28-8)",
+    "xfer": [
+      {
+        "k": "Người nhận",
+        "v": "Google LLC (Gemini API) — liên hệ [TBD: liên hệ quyền riêng tư của Google]"
+      },
+      {
+        "k": "Quốc gia",
+        "v": "Hoa Kỳ và các quốc gia khác nơi đặt trung tâm dữ liệu của Google [TBD: khu vực xử lý]"
+      },
+      {
+        "k": "Thời gian và cách thức",
+        "v": "Khoảng 5 giây một lần khi một tính năng được bật, qua kết nối được mã hóa (HTTPS). Đối với ghi chú trực tiếp, toàn bộ bản ghi được gửi thêm một lần nữa theo từng phần 5 phút khi ghi chú kết thúc (chuyển ngữ chính xác)."
+      },
+      {
+        "k": "Mục",
+        "v": "Giọng nói, nội dung nói (văn bản), tên hiển thị của người nói (để tóm tắt ghi chú), ảnh chụp màn hình chia sẻ (khi ghi chú AI được bật)"
+      },
+      {
+        "k": "Mục đích",
+        "v": "Chuyển giọng nói thành văn bản, dịch, tóm tắt ghi chú cuộc họp, giọng nói tổng hợp (giọng nói tiêu chuẩn, không sao chép giọng nói), phân tách người nói cho ghi chú trực tiếp (giọng nói được phân biệt và gắn nhãn theo giới tính nhận biết được, chẳng hạn như Nam 1 / Nữ 1 — không suy ra tên hoặc danh tính)"
+      },
+      {
+        "k": "Lưu giữ",
+        "v": "Kết thúc ngay sau khi kết quả được trả về. Chúng tôi yêu cầu Google không lưu trữ yêu cầu (store=false). Nhật ký giám sát lạm dụng vẫn có thể được giữ theo các điều khoản của Google [TBD: thời gian lưu giữ và trạng thái cấp độ trả phí]."
+      },
+      {
+        "k": "Cách từ chối và điều gì sẽ xảy ra",
+        "v": "Nếu bạn không đồng ý hoặc tắt micrô, không có giọng nói nào được gửi. Bạn vẫn có thể tham gia hội thảo; chỉ phụ đề, bản dịch và ghi chú về lời nói của bạn không được tạo. Bạn có thể rút lại sự đồng ý bất cứ lúc nào [TBD: vị trí nút rút lại]."
+      }
+    ],
+    "keepTitle": "Những gì dịch vụ này giữ lại",
+    "keep": [
+      "Âm thanh gốc: đối với phụ đề hội thảo và ghi chú cuộc họp AI, nó không được lưu trữ; nó bị loại bỏ ngay sau khi chuyển đổi thành văn bản. Đối với ghi chú trực tiếp, bản ghi được giữ trong bộ nhớ riêng tư để có thể được chuyển ngữ lại chính xác hơn (với người nói) sau cuộc họp, và nó sẽ bị xóa trong quá trình dọn dẹp hàng ngày sau 1 ngày kể từ khi ghi chú kết thúc (ngay lập tức nếu ghi chú bị xóa).",
+      "Phụ đề trực tiếp: không được lưu trữ.",
+      "Ghi chú cuộc họp AI (khi người thuyết trình bật): nội dung nói, ảnh chụp màn hình và tóm tắt, được giữ cho đến khi ghi chú bị xóa [TBD: thời gian lưu giữ tối đa].",
+      "Hồ sơ đồng ý: thời gian đồng ý và phiên bản chính sách, được giữ làm bằng chứng [TBD: thời gian lưu giữ].",
+      "Sử dụng: số lượng yêu cầu mỗi phút và thời gian xử lý, được sử dụng để thực thi giới hạn chi phí.",
+      "Điểm danh: thời gian bạn tham gia, thời gian bạn kết nối lần cuối, tên hiển thị và tên người dùng Pi của bạn được lưu trữ và cung cấp cho người chủ trì dưới dạng danh sách điểm danh (trên màn hình và dưới dạng tải xuống CSV). Được giữ cho đến khi hội thảo bị xóa.",
+      "Hỏi & Đáp và thăm dò ý kiến: văn bản câu hỏi và tên hiển thị của người hỏi (hoặc tên người dùng Pi nếu không có) hiển thị cho mọi người tham gia. Lượt thích chỉ hiển thị số lượng, không bao giờ hiển thị ai đã bỏ phiếu. Phiếu thăm dò ý kiến chỉ hiển thị số lượng cho người tham gia; người tổ chức và quản trị viên thấy, đối với mỗi tùy chọn, tên hiển thị (hoặc tên người dùng Pi nếu không có) của mỗi người bỏ phiếu. Được giữ, bao gồm các câu hỏi ẩn, cho đến khi hội thảo bị xóa."
+    ],
+    "recTitle": "Ghi hình",
+    "rec": "Bản ghi chỉ được lưu dưới dạng tệp trên thiết bị của người thuyết trình. Chúng không được tải lên máy chủ của chúng tôi hoặc chuyển ra nước ngoài. Trong khi ghi hình hoặc ghi chú AI được bật, mọi người tham gia đều thấy một chỉ báo.",
+    "rightsTitle": "Quyền của bạn",
+    "rights": "Bạn có thể yêu cầu truy cập, sửa chữa, xóa hoặc ngừng xử lý thông tin của bạn. Liên hệ: [TBD: tên và thông tin liên hệ của cán bộ bảo vệ quyền riêng tư]"
+  },
+  "notes": {
+    "title": "Ghi chú",
+    "back": "Quay lại hội thảo",
+    "loading": "Đang tải…",
+    "meta": "Ghi chú · {date} · {min} phút",
+    "aiWarn": "Tóm tắt do AI tạo — có thể chứa lỗi",
+    "points": "Điểm chính",
+    "decisions": "Quyết định",
+    "todos": "Mục hành động",
+    "shots": "Ảnh chụp màn hình ({n})",
+    "transcript": "Bản ghi",
+    "download": "Tải xuống Markdown",
+    "making": "Đang tạo ghi chú…",
+    "makingLong": "Việc này đang mất một lúc. Vui lòng làm mới sau",
+    "recording": "Vẫn đang ghi hình",
+    "failed": "Không thể tạo tóm tắt — bản ghi đầy đủ ở bên dưới",
+    "retry": "Thử lại",
+    "finish": "Kết thúc ghi hình và tóm tắt",
+    "none": "Không có gì ở đây",
+    "blank": "Không có gì để tóm tắt — không có giọng nói nào được ghi hoặc quá ngắn",
+    "notFound": "Không tìm thấy ghi chú",
+    "forbidden": "Bạn không có quyền truy cập vào các ghi chú này",
+    "shotAlt": "Ảnh chụp màn hình lúc {at}",
+    "close": "Đóng",
+    "view": "Xem ghi chú",
+    "error": "Không thể tải",
+    "mine": "Ghi chú của tôi",
+    "del": "Xóa ghi chú",
+    "delAsk": "Xóa các ghi chú này (tóm tắt, bản ghi và ảnh chụp màn hình)? Sẽ không ai có thể xem chúng",
+    "delYes": "Xóa",
+    "delNo": "Hủy",
+    "delFail": "Không thể xóa",
+    "dlFail": "Không thể tải xuống — vui lòng thử lại",
+    "recentNotes": "Ghi chú gần đây",
+    "empty": "Chưa có ghi chú nào",
+    "newNote": "Bắt đầu ghi chú trực tiếp",
+    "inPerson": "Ghi chú cuộc họp trực tiếp",
+    "inPersonTag": "Trực tiếp",
+    "titleLabel": "Tiêu đề",
+    "titlePh": "ví dụ: Cuộc họp hàng tuần",
+    "told": "Tôi đã thông báo cho tất cả những người có mặt rằng điều này sẽ được ghi lại và xử lý bởi AI (bắt buộc)",
+    "toldWhy": "Trước khi bạn bắt đầu, hãy thông báo cho tất cả những người có mặt rằng cuộc trò chuyện này sẽ được ghi lại (bản ghi được giữ trong 1 ngày sau khi ghi chú kết thúc, và người nói được phân biệt bằng giọng nói và gắn nhãn theo giới tính nhận biết được) và được chuyển thành văn bản và tóm tắt bởi một AI bên ngoài",
+    "start": "Bắt đầu ghi hình",
+    "starting": "Đang chuẩn bị…",
+    "recBadge": "Đang ghi hình {time}",
+    "recentLines": "Các dòng gần đây",
+    "waiting": "Văn bản sẽ xuất hiện ở đây khi mọi người nói",
+    "end": "Kết thúc và tạo ghi chú",
+    "wakeWarn": "Ghi âm có thể dừng nếu màn hình tắt",
+    "adminOnly": "Chỉ quản trị viên mới có thể sử dụng tính năng này",
+    "aiOff": "Ghi chú AI hiện không khả dụng (cần thiết lập máy chủ). Các ghi chú trước đây được liệt kê bên dưới",
+    "reload": "Tải lại",
+    "unsupported": "Không thể ghi âm trên thiết bị này",
+    "micDenied": "Không thể sử dụng micrô — vui lòng kiểm tra quyền",
+    "limited": "Đã hết giới hạn thời gian xử lý — hãy kết thúc và tạo ghi chú",
+    "noAgr": "Đã dừng: không có xác nhận thông báo khi ghi âm — hãy kết thúc và bắt đầu lại",
+    "micLost": "Micrô bị ngắt kết nối và ghi âm đã dừng — hãy nhấn Kết nối lại micrô hoặc kết thúc ghi chú",
+    "micRetry": "Kết nối lại micrô",
+    "gone": "Ghi chú này đã bị kết thúc hoặc xóa ở nơi khác, vì vậy ghi âm đã dừng — hãy sử dụng nút bên dưới để mở ghi chú",
+    "finishing": "Đang lưu những lời cuối cùng…",
+    "st": {
+      "RECORDING": "Đang ghi âm",
+      "SUMMARIZING": "Đang tạo",
+      "DONE": "Hoàn tất",
+      "FAILED": "Thất bại"
+    },
+    "downloadPiBrowser": "Tải xuống Markdown chỉ hoạt động trong trình duyệt thông thường (máy tính hoặc di động). Pi Browser không thể lưu tệp — hãy mở các ghi chú này trong trình duyệt máy tính hoặc điện thoại (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Gói dịch vụ",
+    "loading": "Đang tải…",
+    "free": "Miễn phí",
+    "freeDesc": "{time} hội thảo mỗi tháng (không cộng dồn)",
+    "monthly": "Hàng tháng",
+    "yearly": "Hàng năm",
+    "paidDesc": "{time} hội thảo, có giá trị trong {months} tháng",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Đang kiểm tra giá Pi",
+    "noAi": "Không có phụ đề, dịch, lồng tiếng hoặc tóm tắt ghi chú bằng AI",
+    "withAi": "Bao gồm phụ đề, dịch, lồng tiếng và tóm tắt ghi chú bằng AI",
+    "buy": "Thanh toán bằng Pi",
+    "bought": "Thanh toán hoàn tất. Thời gian hội thảo đã được thêm.",
+    "meRemain": "Thời gian còn lại: {time}",
+    "loginToBuy": "Đăng nhập để mua gói dịch vụ.",
+    "payNote": "Thanh toán luôn bằng Pi. Số tiền theo tiền tệ địa phương chỉ là tham chiếu quen thuộc; số Pi được đặt theo giá Pi tại thời điểm bạn thanh toán. Một hội thảo trong gói trả phí sẽ sử dụng lượt truy cập của gói đó trước (lượt hết hạn sớm nhất trước), sau đó tiếp tục bằng thời gian miễn phí của tháng này.",
+    "charge": "Nạp thêm thời gian",
+    "hm": "{h} giờ {m} phút",
+    "m": "{m} phút",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (đang kiểm tra giá Pi)",
+    "h": "{h} giờ"
+  },
+  "adminRooms": {
+    "title": "Quản lý phòng",
+    "adminOnly": "Chỉ quản trị viên mới có thể xem trang này.",
+    "refresh": "Làm mới",
+    "count": "{n} phòng đang mở",
+    "empty": "Hiện không có phòng nào đang mở.",
+    "lab": "Phòng thí nghiệm",
+    "noSeminar": "Không có bản ghi hội thảo",
+    "peers": "{n} / {cap} đã kết nối",
+    "producers": "{n} luồng",
+    "end": "Kết thúc {time}",
+    "stale": "Hội thảo đã kết thúc nhưng phòng vẫn mở trên máy chủ video — hãy buộc đóng.",
+    "close": "Buộc đóng",
+    "confirmSeminar": "Thao tác này sẽ kết thúc hội thảo và đóng phòng. Tất cả mọi người sẽ bị ngắt kết nối.",
+    "confirmRoom": "Thao tác này sẽ đóng phòng. Tất cả mọi người sẽ bị ngắt kết nối.",
+    "confirmYes": "Đóng",
+    "cancel": "Hủy",
+    "closing": "Đang đóng…",
+    "closed": "Phòng đã đóng.",
+    "metrics": "Số liệu máy chủ video (từ khi bắt đầu)",
+    "metricsOff": "Không thể tải số liệu.",
+    "m": {
+      "packetsIn": "Gói tin đến",
+      "packetsOut": "Gói tin đi",
+      "nackIn": "Yêu cầu NACK đã nhận",
+      "nackOut": "Yêu cầu NACK đã gửi",
+      "retransmits": "Truyền lại",
+      "duplicateNack": "Yêu cầu NACK trùng lặp",
+      "cacheMiss": "Thiếu bộ nhớ cache truyền lại",
+      "pliOut": "Yêu cầu khung hình chính (PLI)",
+      "keyframes": "Khung hình chính",
+      "layerSwitches": "Chuyển đổi chất lượng",
+      "queueDrops": "Hàng đợi bị loại bỏ"
+    }
+  },
+  "adminUsers": {
+    "title": "Người dùng",
+    "adminOnly": "Chỉ quản trị viên mới có thể xem trang này.",
+    "search": "Tìm kiếm theo tên (từ 2 ký tự trở lên)",
+    "searchBtn": "Tìm kiếm",
+    "refresh": "Làm mới",
+    "count": "{n, plural, other {# người dùng}}",
+    "empty": "Không có người dùng nào.",
+    "admin": "Quản trị viên",
+    "lastLogin": "Đăng nhập lần cuối {time}",
+    "never": "Chưa bao giờ đăng nhập",
+    "plan": {
+      "FREE": "Miễn phí",
+      "M": "Hàng tháng",
+      "Y": "Hàng năm"
+    },
+    "until": "(đến {time})",
+    "manage": "Quản lý thời gian",
+    "close": "Đóng",
+    "planLabel": "Gói dịch vụ",
+    "hours": "Giờ",
+    "minutes": "Phút",
+    "reason": "Lý do (tùy chọn)",
+    "sub": "Giảm",
+    "confirmSub": "Giảm thời gian {plan} đi {time}.",
+    "confirmYes": "Xác nhận",
+    "cancel": "Hủy",
+    "saving": "Đang lưu…",
+    "done": "Đã áp dụng. Thời gian {plan} còn lại: {time}",
+    "invalid": "Nhập thời gian giảm từ 1 phút đến 1000 giờ (số phút nguyên 0–59).",
+    "history": "Điều chỉnh gần đây",
+    "noHistory": "Chưa có điều chỉnh nào.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Cấp thẻ dịch vụ (thời gian miễn phí)",
+    "svc": {
+      "H1": "Thẻ 1 giờ",
+      "D1": "Thẻ 1 ngày",
+      "M1": "Thẻ 1 tháng"
+    },
+    "svcNote": "Thẻ dịch vụ là thời gian của gói Miễn phí. Chúng có thể được sử dụng từ bây giờ trong khoảng thời gian đó (1 giờ, 24 giờ, 1 tháng) trong các hội thảo miễn phí và trong phần miễn phí của các hội thảo trả phí (không có tính năng AI). Với nhiều thẻ, chúng sẽ được sử dụng tự động theo thứ tự 1 giờ → 1 ngày → 1 tháng.",
+    "subTitle": "Giảm thời gian",
+    "subNote": "Giảm từ các thẻ hết hạn muộn nhất trước. Nếu nhiều hơn thời gian còn lại, chỉ thời gian còn lại sẽ bị xóa.",
+    "confirmSvc": "Cấp {svc}.",
+    "doneSvc": "Đã cấp {svc}. Thời gian miễn phí còn lại: {time} (thẻ hết hạn {end})"
+  }
+}

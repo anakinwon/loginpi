@@ -1,0 +1,1089 @@
+{
+  "common": {
+    "localeSwitcher": {
+      "button": "Breyta tungumáli",
+      "search": "Leita tungumál",
+      "empty": "Engar niðurstöður"
+    }
+  },
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Lifandi myndbandsnámskeið sem þú tekur þátt í með Pi"
+  },
+  "home": {
+    "description": "Gestgjafar opna námskeið og þátttakendur taka þátt í lifandi myndbandsfundum með Pi.",
+    "badge": "Lifandi námskeið á fallegum eyjum",
+    "headline": "Horfa, hlusta og læra saman — í beinni",
+    "ctaBrowse": "Skoða námskeið",
+    "ctaPlan": "Sjá áætlanir",
+    "features": {
+      "video": "Lifandi myndband",
+      "caption": "Textar og þýðing",
+      "notes": "AI fundarskýrslur",
+      "pay": "Borga með Pi"
+    },
+    "listTitle": "Námskeið",
+    "cal": {
+      "title": "Dagatal námskeiða",
+      "desc": "Frá fyrri námskeiðum til komandi — bankaðu á dagsetningu fyrir nánari upplýsingar.",
+      "legendSmn": "Námskeið",
+      "legendEnded": "Fyrri námskeið",
+      "legendMine": "Mínir viðburðir",
+      "failed": "Gat ekki hlaðið dagsetningar námskeiða. Vinsamlegast reyndu aftur síðar.",
+      "open": "Sjá nánar"
+    }
+  },
+  "nav": {
+    "link": "Tengja reikning",
+    "privacy": "Persónuvernd",
+    "plan": "Áætlanir",
+    "rooms": "Herbergi",
+    "admin": "Stjórnandi",
+    "users": "Notendur",
+    "home": "Heim",
+    "privacyShort": "Persónuvernd",
+    "menu": "Aðalvalmynd",
+    "fold": "Fella valmynd",
+    "unfold": "Stækka valmynd"
+  },
+  "auth": {
+    "checking": "Athuga innskráningu…",
+    "signedIn": "{name}",
+    "inPerson": "Fundarskýrslur á staðnum",
+    "required": "Vinsamlegast skráðu þig inn með Pi reikningnum þínum.",
+    "signIn": "Skráðu þig inn með Pi",
+    "openInPiBrowser": "Opnaðu þessa síðu í Pi Browser til að skrá þig inn með Pi reikningnum þínum.",
+    "authenticating": "Skrái inn…",
+    "google": "Skráðu þig inn með Google",
+    "signOut": "Skrá út",
+    "or": "eða",
+    "linkRequired": "Þú ert skráð/ur inn með Google, en það er ekki tengt Pi reikningi ennþá. Gefðu út tengikóða í Pi Browser og sláðu hann inn hér.",
+    "linkNeeded": "Tengja Pi reikning",
+    "linkCheckFailed": "Gat ekki athugað stöðu reikningstengingar þinnar (tímabundin villu á netþjóni). Vinsamlegast endurhladdu eftir smá stund."
+  },
+  "piOAuth": {
+    "signingIn": "Skrái inn með Pi reikningnum þínum…",
+    "failed": "Pi innskráning mistókst. Vinsamlegast reyndu aftur.",
+    "stateMismatch": "Gat ekki staðfest þessa innskráningarbeiðni (útrunnin eða annar flipi). Vinsamlegast reyndu aftur.",
+    "retry": "Reyna aftur",
+    "backHome": "Heim"
+  },
+  "link": {
+    "title": "Tengja reikning",
+    "intro": "Tengdu reikninginn sem þú skráðir þig inn með í Pi Browser við Google innskráningu í venjulegum vafra. Eftir tengingu geturðu notað sama reikning á tölvuvafra.",
+    "checking": "Athuga innskráningu…",
+    "piIssueTitle": "Til að skrá þig inn úr venjulegum vafra líka",
+    "codeHint": "Gefðu út kóðann hér að neðan, skráðu þig síðan inn með Google á tölvuvafra og sláðu hann inn á Tengja reikning síðuna (innan 10 mínútna).",
+    "piIssue": "Gefa út tengikóða",
+    "reissue": "Gefa út nýjan kóða",
+    "expiresIn": "Rennur út eftir {min} mín",
+    "enterTitle": "Sláðu inn tengikóða",
+    "enterHint": "Í Pi Browser opnaðu seminar.pi → Tengja reikning → Gefa út tengikóða, sláðu síðan inn 6 stafa kóðann.",
+    "codeLabel": "Tengikóði",
+    "submit": "Tengja",
+    "done": "Tengt. Þú getur nú notað Google innskráningu líka.",
+    "linked": "{name} er tengt við Google innskráningu."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Innskráning nauðsynleg",
+    "AUTH_PI_REQUIRED": "Pi innskráning nauðsynleg",
+    "AUTH_PI_SESSION_INVALID": "Lotan þín rann út. Vinsamlegast skráðu þig inn aftur",
+    "AUTH_PI_TOKEN_INVALID": "Staðfesting Pi innskráningar mistókst",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Pi innskráningarupplýsingar vantar",
+    "FORBIDDEN": "Þú hefur ekki leyfi",
+    "BAD_REQUEST": "Slæm beiðni",
+    "BAD_REQUEST_BODY": "Slæm beiðni",
+    "INVALID_INPUT": "Ógild innsláttur",
+    "QUERY_FAILED": "Gat ekki hlaðið",
+    "SAVE_FAILED": "Gat ekki vistað",
+    "INTERNAL": "Eitthvað fór úrskeiðis",
+    "SERVER_CONFIG": "Villu í stillingum netþjóns. Vinsamlegast hafðu samband við rekstraraðila",
+    "PI_API_CONNECT_FAILED": "Gat ekki náð sambandi við Pi Network",
+    "DB_UNAVAILABLE": "Gögn eru tímabundið ófáanleg. Vinsamlegast reyndu aftur síðar",
+    "NOT_FOUND": "Fannst ekki",
+    "RATE_LIMITED": "Of margar beiðnir. Vinsamlegast reyndu aftur eftir smá stund",
+    "PAYLOAD_TOO_LARGE": "Beiðnin er of stór",
+    "NETWORK": "Athugaðu nettenginguna þína",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Þetta Pi notandanafn er þegar skráð með öðrum skilríkjum. Vinsamlegast hafðu samband við stjórnanda",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Þessi reikningur er óvirkur. Vinsamlegast hafðu samband við stjórnanda",
+    "AUTH_GOOGLE_REQUIRED": "Google innskráning er nauðsynleg.",
+    "LINK_CODE_INVALID": "Tengikóðinn er ógildur eða útrunninn. Gefðu út nýjan í Pi Browser.",
+    "LINK_ALREADY_LINKED": "Þessi reikningur er þegar tengdur.",
+    "LINK_CODE_GEN_FAILED": "Gat ekki búið til tengikóða. Vinsamlegast reyndu aftur síðar.",
+    "AUTH_DB_UNAVAILABLE": "Gat ekki vistað reikninginn þinn, svo innskráning mistókst. Vinsamlegast reyndu aftur síðar.",
+    "LINK_TRY_LIMIT": "Of margir rangir tengikóðar. Reyndu aftur eftir 15 mínútur.",
+    "PRICE_UNAVAILABLE": "Gat ekki fengið Pi verðið. Vinsamlegast reyndu aftur eftir smá stund",
+    "QUOTE_EXPIRED": "Greiðslutilboðið rann út. Vinsamlegast borgaðu aftur",
+    "PLAN_EXHAUSTED": "Þú hefur notað allan námskeiðstímann þinn. Fylltu á á Síðu áætlana",
+    "HOST_AWAY": "Gestgjafinn er ekki í herberginu. Þú getur farið inn eftir að gestgjafinn kemur inn",
+    "PLAN_AI_PAID": "AI eiginleikar eru í boði á greiddum áætlunum",
+    "AI_UNAVAILABLE": "AI eiginleikar eru ekki í boði núna",
+    "SPEECH_CHUNK_INVALID": "Snið hljóðbútsins er ógilt",
+    "SPEECH_NOT_LIVE": "Þetta námskeið er ekki í beinni",
+    "SPEECH_NO_AGR": "Samþykki fyrir raddvinnslu er nauðsynlegt",
+    "SPEECH_RATE": "Of margar raddbeiðnir. Vinsamlegast reyndu aftur eftir smá stund",
+    "SPEECH_QUOTA": "Raddvinnslutími fyrir þetta námskeið er uppurinn",
+    "SPEECH_USR_QUOTA": "Þú hefur notað upp þýðingar- og þýdda raddtakmörkun þína fyrir þetta námskeið",
+    "SPEECH_FAILED": "Gat ekki umbreytt tali í texta",
+    "SPEECH_STAGE_ONLY": "Aðeins fólk á sviðinu getur notað raddtexta",
+    "TRANSLATE_FAILED": "Gat ekki þýtt textann",
+    "POLL_CLOSED": "Þessi könnun er lokuð",
+    "NOTE_NOT_RECORDING": "Þessar athugasemdir eru ekki að taka upp",
+    "NOTE_SHOT_INVALID": "Ógild skjámynd",
+    "NOTE_AUDIO_INVALID": "Ógild upptökuskrá",
+    "NOTE_SHOT_RATE": "Of margar skjámyndir",
+    "NOTE_RETRY_SOON": "Þú getur reynt aftur eftir eina mínútu",
+    "SPEECH_TTS_FAILED": "Gat ekki búið til þýdda röddina",
+    "CAPTION_SIG_INVALID": "Þessi texti gat ekki verið staðfestur, svo hann var ekki þýddur",
+    "PLAN_EXPIRES_BEFORE_START": "Upphafstími er eftir að þessi áætlun rennur út",
+    "PAY_ALREADY_PAID": "Greiðsla er enn í vinnslu. Ef þú varst að skrá þig inn í veskið, reyndu aftur eftir 3 mínútur.",
+    "REC_PAID_ONLY": "Upptaka er aðeins í boði á mánaðarlegum eða árlegum áætlunum með greiddum tíma eftir",
+    "REC_NOT_IN_ROOM": "Er enn að staðfesta að þú sért í herberginu. Reyndu aftur eftir smá stund",
+    "ENGINE_OFF": "Stjórnandalykill myndbandsþjóns er ekki stilltur",
+    "ENGINE_UNAVAILABLE": "Myndbandsþjónninn svarar ekki. Vinsamlegast reyndu aftur eftir smá stund",
+    "ADJ_NOTHING": "Enginn tími eftir til að minnka"
+  },
+  "progress": {
+    "title": "Framvinda smíði",
+    "subtitle": "Lokið, í vinnslu og áætlað, eftir eiginleikum · frá og með {date}",
+    "overall": "Heildarskref",
+    "stepsDone": "{done}/{total} skref lokið ({pct}%)",
+    "featureUnit": "eiginleikar",
+    "status": {
+      "done": "Lokið",
+      "doing": "Í vinnslu",
+      "todo": "Áætlað",
+      "drop": "Hætt við"
+    },
+    "features": {
+      "F01": {
+        "name": "Innskráning",
+        "desc": "Pi Browser innskráning, Google innskráning í öðrum vöfrum og tenging beggja reikninga"
+      },
+      "F05": {
+        "name": "Lifandi myndbandsnámskeið",
+        "desc": "Okkar eigin myndbandsvél Galápagos — markmiðið er einn kynnir sem streymir til allt að 30 þátttakenda"
+      },
+      "F02": {
+        "name": "Búa til námskeið",
+        "desc": "Stilltu undirtitil, tíma, getu og námskeiðsgjald til að búa til námskeið (nafn = eyja, sjálfvirkt)"
+      },
+      "F03": {
+        "name": "Námskeiðslisti og upplýsingar",
+        "desc": "Skoðaðu opin námskeið síðu fyrir síðu og skoðaðu upplýsingar þeirra"
+      },
+      "F04": {
+        "name": "Pi aðgangsgreiðsla",
+        "desc": "Borgaðu námskeiðsgjaldið í Pi; netþjónninn athugar upphæðina aftur áður en þú færð aðgang"
+      },
+      "F06": {
+        "name": "Útborgun gestgjafa",
+        "desc": "Borgaðu tekjur af aðgangsgjöldum til gestgjafa í Pi"
+      },
+      "F07": {
+        "name": "Endurspilun",
+        "desc": "Horfðu á upptekin námskeið síðar"
+      },
+      "FU": {
+        "name": "Grunnur fyrir fundarviðbætur",
+        "desc": "Ein merkisrás fyrir viðbætur, AI tenging, raddbútar, samþykki fyrir hljóðnema og gagnatöflur"
+      },
+      "F08": {
+        "name": "Tímasetning og deiling",
+        "desc": "Dagatalstengill, viðburðarskrá (.ics) og tölvupóstboð fyrir hvert námskeið"
+      },
+      "F09": {
+        "name": "Hljóðdeyfð og lýsing",
+        "desc": "Minnkaðu hljóðnema hávaða og lýstu upp dökkt myndband úr myndavél"
+      },
+      "F10": {
+        "name": "Lifandi textar",
+        "desc": "Breyttu tali kynnis í texta undir sviðinu"
+      },
+      "F11": {
+        "name": "Kannanir, spurningar og svör og mæting",
+        "desc": "Gerðu kannanir og spurningar á meðan á námskeiði stendur; gestgjafar hlaða niður mætingarlista"
+      },
+      "F12": {
+        "name": "Bakgrunnsáhrif",
+        "desc": "Óskýrðu bakgrunninn þinn eða skiptu honum út fyrir forstillingu eða þína eigin mynd (unnið á tækinu þínu)"
+      },
+      "F13": {
+        "name": "Staðbundin upptaka",
+        "desc": "Kynnirinn tekur upp námskeiðið á eigin tæki og allir sjá að upptaka er í gangi"
+      },
+      "F14": {
+        "name": "AI fundarskýrslur",
+        "desc": "Þegar kynnirinn kveikir á því eru tal og skjáir teknir upp og dregnir saman í lykilatriði, ákvarðanir og verkefni"
+      },
+      "F15": {
+        "name": "Fundarskýrslur á staðnum",
+        "desc": "Taktu upp fund með aðeins hljóðnema og fáðu fundarskýrslur (stjórnendur)"
+      },
+      "F16": {
+        "name": "Þýddir textar",
+        "desc": "Sýndu texta þýdda á tungumálið sem þú velur"
+      },
+      "F17": {
+        "name": "Hlustaðu á þýðingu",
+        "desc": "Lestu þýdda texta upphátt með gervirödd á meðan upprunalega hljóðið er lækkað"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser innskráning",
+      "googleLogin": "Google innskráning",
+      "accountLink": "Reikningstenging",
+      "deviceTest": "Myndavélartækjapróf",
+      "oneToTwo": "Kynnir 1 → 2 þátttakendur",
+      "recovery": "Frystibati og stöðugleiki",
+      "structure": "Hreinsun vélarbyggingar",
+      "autoQuality": "Sjálfvirk gæði, 30 þátttakendur",
+      "roomService": "Aðgangur að herbergi og upptaka",
+      "roomUi": "Herbergisskjár (anddyri·svið·spjall·rétta upp hönd·stjórnun)",
+      "createForm": "Búa til skjá",
+      "list": "Listi",
+      "detail": "Upplýsingar",
+      "payRequest": "Greiðslubeiðni",
+      "payVerify": "Endurathugun upphæðar og aðgangur",
+      "settle": "Útborgun",
+      "vod": "Endurspilun upptöku",
+      "appRelay": "Merkisrás fyrir viðbætur vélar",
+      "aiBase": "AI, raddbútar, samþykki og gagnatöflur",
+      "shareLinks": "Dagatalstengill, .ics og tölvupóstboð",
+      "noiseLight": "Hljóðdeyfð og lýsing",
+      "liveCaptions": "Lifandi textar",
+      "pollQnaAttend": "Kannanir, spurningar og svör og mætingarlisti",
+      "backgrounds": "Óskýrð, forstillingar og þín eigin mynd",
+      "localRecording": "Upptaka kynnis og upptökumerki",
+      "aiNotes": "Upptaka, samantekt og athugasíða",
+      "inPersonNotes": "Aðeins hljóðnema athugasemdir og mínar athugasemdir",
+      "captionTranslate": "Tungumálaval og upprunaleg/þýdd skipting",
+      "dubbing": "Gerviraddspilun og lækkað upprunalegt hljóð"
+    },
+    "refLabel": "Viðmiðunarlíkan",
+    "uiRef": "Viðmótsgrunnur — skjá- og eiginleikamynstur víða notaðs vefmyndbandsfundarforrits, aðlagað fyrir seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Nafn vistað, en ekki var hægt að tilkynna öðrum núna. Þeir munu sjá það eftir að þú kemur aftur inn.",
+      "tile": "Smelltu til að breyta nafninu mínu",
+      "menu": "Breyta nafninu mínu",
+      "title": "Nafnið mitt á þessu námskeiði",
+      "hint": "Allt að 30 stafir. Aðeins notað á þessu námskeiði og uppfærist strax á skjá allra.",
+      "save": "Vista",
+      "saving": "Vista…",
+      "cancel": "Hætta við",
+      "taken": "Þetta nafn er þegar notað af einhverjum öðrum (gestgjafa eða þátttakanda). Veldu annað.",
+      "failed": "Gat ekki vistað nafnið þitt. Reyndu aftur."
+    },
+    "roomTitle": {
+      "edit": "Smelltu til að breyta undirtitli",
+      "label": "Undirtitill",
+      "placeholder": "Undirtitill (allt að 60)",
+      "save": "Vista",
+      "cancel": "Hætta við",
+      "failed": "Gat ekki vistað undirtitilinn."
+    },
+    "mirror": "Speglun myndbandsins míns",
+    "barPin": "Sýna neðri stiku alltaf",
+    "barAuto": "Fela neðri stiku sjálfkrafa",
+    "title": "Taka þátt í námskeiði · {room}",
+    "titleSeminar": "Biðstofa",
+    "noEngine": "Myndbandsþjónninn er ekki tilbúinn ennþá.",
+    "joinAs": "Taka þátt sem",
+    "presenter": "Kynnir",
+    "audience": "Áhorfendur",
+    "join": "Taka þátt núna",
+    "nameLabel": "Nafn",
+    "audienceHint": "Áhorfendur nota ekki myndavél eða hljóðnema. Eftir að þú tekur þátt muntu sjá og heyra kynninn.",
+    "preview": {
+      "pending": "Undirbýr myndavél og hljóðnema…",
+      "audioOnly": "Myndavél ófáanleg — sendi aðeins hljóð.",
+      "none": "Myndavél og hljóðnemi ófáanleg. Athugaðu heimildir (þú getur samt tekið þátt án miðla).",
+      "videoOnly": "Hljóðnemi ófáanlegur — sendi aðeins myndband. Athugaðu heimild fyrir hljóðnema."
+    },
+    "mic": {
+      "on": "Slökkva á hljóðnema",
+      "off": "Kveikja á hljóðnema"
+    },
+    "cam": {
+      "on": "Slökkva á myndavél",
+      "off": "Kveikja á myndavél"
+    },
+    "controls": "Stýringar símtals",
+    "leave": "Fara",
+    "enableSound": "Virkja hljóð",
+    "state": {
+      "connecting": "Tengist…",
+      "reconnecting": "Tengist aftur…"
+    },
+    "waiting": "Bíð eftir kynninum.",
+    "rejoin": "Taka þátt aftur",
+    "err": {
+      "generic": "Eitthvað fór úrskeiðis. Vinsamlegast taktu þátt aftur.",
+      "CLOSED": "Tengingin rofnaði.",
+      "NO_ENGINE": "Myndbandsþjónninn er ekki tilbúinn ennþá.",
+      "TICKET_401": "Vinsamlegast skráðu þig inn.",
+      "TICKET_403": "Þú hefur ekki leyfi til að kynna. Taktu þátt sem áhorfandi.",
+      "TICKET_503": "Myndbandsþjónninn er ekki stilltur ennþá.",
+      "TICKET_NETWORK": "Athugaðu nettenginguna þína.",
+      "TICKET_INVALID": "Aðgangspassinn þinn er útrunninn.",
+      "TICKET_EXPIRED": "Aðgangspassinn þinn er útrunninn.",
+      "ROOM_FULL": "Þessi seminar er full.",
+      "ROOM_CLOSED": "Herberginu var lokað — seminarinu lauk eða gestgjafinn var fjarverandi í meira en 5 mínútur.",
+      "DUPLICATE_SESSION": "Þú tókst þátt frá öðru tæki, svo þessi skjár var aftengdur.",
+      "ROLE_FORBIDDEN": "Þú hefur ekki leyfi til að kynna.",
+      "WS_FAILED": "Gat ekki tengst myndbandsþjóninum.",
+      "ICE_FAILED": "Myndbandstengingin rofnaði. Athugaðu netið þitt.",
+      "MEDIA_FAILED": "Gat ekki ræst myndavélina eða hljóðnemann.",
+      "TIMEOUT": "Myndbandsþjónninn svarar ekki.",
+      "TICKET_402": "Þetta er greiddur seminar. Vinsamlegast greiddu á seminarsíðunni áður en þú ferð inn.",
+      "TICKET_404": "Fann ekki seminar.",
+      "TICKET_409": "Þessu seminari er lokið eða því var aflýst.",
+      "TICKET_HOST_AWAY": "Gestgjafinn hefur ekki enn gengið til liðs við eða hefur verið fjarverandi í meira en 5 mínútur, svo þú getur ekki farið inn. Vinsamlegast reyndu aftur eftir að gestgjafinn gengur til liðs við.",
+      "TICKET_PLAN_EXHAUSTED": "Áætlun þessa seminars hefur engan tíma eftir, svo það getur ekki byrjað. Að kaupa sömu áætlun aftur bætir við tíma (ókeypis endurnýjast með 1 klukkustund næsta mánuð)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Gat ekki breytt hljóðnemanum. Vinsamlegast reyndu aftur.",
+        "video": "Gat ekki breytt myndavélinni. Vinsamlegast reyndu aftur."
+      },
+      "forbidden": "Þú hefur ekki leyfi til að kynna, svo þú heldur áfram sem áhorfandi.",
+      "demoted": "Þú varst færður aftur til áhorfenda.",
+      "endFailed": "Gat ekki lokið seminari. Vinsamlegast reyndu aftur.",
+      "chatFailed": "Skilaboð ekki send.",
+      "actionFailed": "Gat ekki lokið beiðninni. Vinsamlegast reyndu aftur.",
+      "shareFailed": "Gat ekki byrjað skjádeilingu.",
+      "err": {
+        "RATE_LIMITED": "Þú ert að senda of hratt. Vinsamlegast bíddu smá stund.",
+        "ROLE_FORBIDDEN": "Þú hefur ekki leyfi til að gera þetta.",
+        "MEDIA_FAILED": "Gat ekki ræst hljóðnemann eða myndavélina. Vinsamlegast athugaðu heimildir.",
+        "LOCKED": "Læst af kynni."
+      },
+      "mutedBy": {
+        "audio": "Kynnirinn slökkti á hljóðnemanum þínum.",
+        "video": "Kynnirinn slökkti á myndavélinni þinni."
+      },
+      "policy": {
+        "locked": "Kynnirinn læsti hljóðnemum. Þú getur kveikt á þínum þegar þeir eru opnaðir.",
+        "unlocked": "Hljóðnemar eru opnaðir."
+      },
+      "consent": {
+        "saveFail": "Gat ekki vistað samþykki þitt. Athugaðu skráningu þína og kveiktu aftur á hljóðnemanum."
+      }
+    },
+    "home": "Fara á heimasíðu",
+    "tile": {
+      "fullscreen": "Tvísmelltu fyrir fullan skjá · Esc til að hætta",
+      "self": "{name} (þú)",
+      "presenter": "Kynnir",
+      "micOff": "Hljóðnemi slökktur",
+      "screen": "Skjár {name}",
+      "row": "Aðrir ræðumenn",
+      "pin": "Sýna {name} stórt",
+      "unpin": "Sjálfvirk skipulagning"
+    },
+    "more": "Fleiri valkostir",
+    "joinNoCam": "Taka þátt án myndavélar",
+    "net": {
+      "afterJoin": "Tenging þín er sjálfkrafa athuguð eftir að þú tekur þátt.",
+      "measuring": "Athuga tengingu…",
+      "good": "Góð tenging",
+      "fair": "Sæmileg tenging",
+      "poor": "Léleg tenging",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% af hljóðgögnum tapast.",
+          "video": "{pct}% af myndbandsgögnum tapast."
+        },
+        "rate": {
+          "audio": "Hljóðupphleðsla er lág á {kbps} kbps.",
+          "video": "Myndbandsupphleðsla er lág á {kbps} kbps. Gæði geta minnkað."
+        }
+      }
+    },
+    "people": "{n} í herberginu",
+    "screen": {
+      "start": "Deila skjá",
+      "stop": "Hætta að deila"
+    },
+    "panel": {
+      "title": "Spjall · Spurningar og svör · Kannanir · Fólk",
+      "chat": "Spjall",
+      "people": "Fólk",
+      "close": "Loka spjaldi",
+      "qna": "Spurningar og svör",
+      "polls": "Kannanir"
+    },
+    "chat": {
+      "empty": "Engin skilaboð ennþá. Spjall er ekki vistað.",
+      "me": "Þú",
+      "failed": "Ekki sent.",
+      "retry": "Reyna aftur",
+      "input": "Sláðu inn skilaboð",
+      "send": "Senda"
+    },
+    "hand": {
+      "raise": "Rétta upp hönd",
+      "lower": "Lækka hönd",
+      "list": "Uppréttar hendur",
+      "lowerAll": "Lækka allar hendur",
+      "raised": "Hönd upprétt",
+      "notice": "{name} rétti upp hönd.",
+      "dismiss": "Hafna",
+      "waiting": "{n} manns bíða eftir að tala"
+    },
+    "react": {
+      "open": "Viðbrögð",
+      "e0": "Líka við",
+      "e1": "Klapp",
+      "e2": "Hlátur",
+      "e3": "Hisnaður",
+      "e4": "Sorglegt",
+      "e5": "Orðlaus",
+      "e6": "Ást"
+    },
+    "quality": {
+      "label": "Gæði",
+      "auto": "Sjálfvirkt",
+      "high": "Hátt",
+      "medium": "Miðlungs",
+      "low": "Lágt",
+      "unstable": "Netið þitt er óstöðugt"
+    },
+    "roles": {
+      "presenter": "Kynnir",
+      "panel": "Pallborðsmaður",
+      "audience": "Áhorfendur"
+    },
+    "stage": {
+      "invite": "Bjóða á svið",
+      "remove": "Færa til áhorfenda",
+      "promoted": "Þú varst boðinn á sviðið. Ef þú réttir upp höndina, kveikir myndavélin þín sjálfkrafa (nema læst eða ekki leyfilegt). Kveiktu á hljóðnemanum þínum til að tala (hljóðneminn kveikir ekki sjálfkrafa).",
+      "later": "Seinna"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} rétti upp hönd."
+    },
+    "leaveDialog": {
+      "title": "Fara úr seminari",
+      "body": "Þú getur farið út sjálfur, eða endað seminarið og aftengt alla.",
+      "confirmTitle": "Enda seminarið?",
+      "confirmBody": "Allir verða aftengdir og enginn getur tekið þátt í þessu seminari aftur.",
+      "cancel": "Hætta við",
+      "end": "Enda seminar",
+      "endConfirm": "Enda núna"
+    },
+    "mod": {
+      "muteAll": "Slökkva á öllum",
+      "lock": "Læsa hljóðnemum",
+      "unlock": "Opna hljóðnema",
+      "locked": "Kynnirinn hefur læst hljóðnemum",
+      "muteMic": "Slökkva á hljóðnema",
+      "askMic": "Biðja um að kveikja á hljóðnema",
+      "muteCam": "Slökkva á myndavél",
+      "muteMicOf": "Slökkva á hljóðnema {name}",
+      "askMicOf": "Biðja {name} um að kveikja á hljóðnema",
+      "muteCamOf": "Slökkva á myndavél {name}"
+    },
+    "ask": {
+      "audio": "Kynnirinn bað þig um að kveikja á hljóðnemanum þínum.",
+      "video": "Kynnirinn bað þig um að kveikja á myndavélinni þinni.",
+      "ignore": "Hunsa"
+    },
+    "toDetail": "Fara á seminarsíðu",
+    "consent": {
+      "title": "Áður en þú kveikir á hljóðnemanum þínum",
+      "body": "Ef upptaka, textar eða AI fundarskýrslur eru kveikt á í þessu seminari, getur rödd þín verið umbreytt í texta, vistuð og þýdd. Raddvinnsla er framkvæmd af AI þjónustu utan lands þíns. Ef þú samþykkir ekki, kveikir hljóðneminn þinn samt á — aðeins rödd þín er undanskilin vinnslu.",
+      "privacy": "Persónuverndarstefna",
+      "newTab": "(opnast í nýjum flipa)",
+      "decline": "Samþykki ekki",
+      "agree": "Samþykkja og kveikja á hljóðnema",
+      "notice": "Þegar upptaka, textar eða AI fundarskýrslur eru á, eru raddir ræðumanna unnar. Raddir áhorfenda eru ekki sendar.",
+      "saveFailClosed": "Þessu seminari er lokið, svo samþykki er ekki hægt að skrá."
+    },
+    "captions": {
+      "title": "Textar",
+      "room": "Lifandi textar (allt herbergið)",
+      "show": "Sýna texta",
+      "size": {
+        "label": "Textastærð",
+        "sm": "Lítil",
+        "md": "Miðlungs",
+        "lg": "Stór"
+      },
+      "waiting": "Textar birtast þegar kynnirinn kveikir á þeim",
+      "limit": "Mörk raddvinnslu náð, svo textar og AI mínútur stöðvuðust",
+      "sendFail": "Gat ekki kveikt á textum. Vinsamlegast reyndu aftur eftir smá stund.",
+      "sendFailOff": "Gat ekki slökkt á textum. Vinsamlegast reyndu aftur eftir smá stund.",
+      "region": "Textar",
+      "translate": "Sýna þýdda texta",
+      "lang": "Þýðingarmál",
+      "langMine": "Mín tungumál",
+      "langAll": "Öll tungumál",
+      "trStop": {
+        "forbidden": "Þýddir textar eru aðeins fyrir skráða þátttakendur. Sýni frumritið.",
+        "unavailable": "Þýddir textar eru ekki í boði núna. Sýni frumritið.",
+        "quota": "Þetta seminar hefur náð þýðingarmörkum sínum. Sýni frumritið.",
+        "usrQuota": "Þú hefur notað upp þýðingarmörk þín fyrir þetta seminar. Sýni frumritið."
+      },
+      "unsupported": "Þetta tæki getur ekki búið til lifandi texta (engin hljóðupptökustuðningur í þessum vafra)"
+    },
+    "effects": {
+      "title": "Áhrif",
+      "light": "Ljósleiðrétting",
+      "noise": "Draga úr hávaða",
+      "noiseFail": "Hávaðaminnkun er ekki hægt að breyta á þessu tæki",
+      "close": "Loka",
+      "preview": "Forskoðun mín",
+      "bg": "Bakgrunnur",
+      "bgNone": "Enginn",
+      "bgBlur": "Óskýrleiki",
+      "scenes": {
+        "beach": "🏝️ Maldíveyjarströnd",
+        "autumn": "🍁 Haustdalur",
+        "fireplace": "🔥 Arinn",
+        "xmas": "🎄 Jólafundarherbergi"
+      },
+      "bgs": {
+        "dusk": "Skuggsýni",
+        "ocean": "Haf",
+        "forest": "Skógur",
+        "studio": "Stúdíó",
+        "grid": "Rist",
+        "dots": "Punktar"
+      },
+      "myAdd": "Mín mynd",
+      "myItem": "Mín mynd {n}",
+      "myDel": "Eyða minni mynd {n}",
+      "mySaveFail": "Bakgrunnurinn er notaður en ekki hægt að vista á þessu tæki (aðeins þessi fundur)",
+      "bgStopped": "Bakgrunnsáhrifin stöðvuðust og voru slökkt. Veldu það aftur til að endurræsa.",
+      "myNote": "Myndirnar þínar eru aðeins vistaðar á þessu tæki (allt að 3, 2 MB hver)",
+      "mobileBlurOnly": "Á símum er aðeins óskýr bakgrunnur í boði (myndbakgrunnur virkar á tölvu)",
+      "myTooBig": "Aðeins myndir allt að 2 MB er hægt að nota",
+      "preparing": "Undirbýr…",
+      "bgFailed": "Gat ekki hlaðið bakgrunnsáhrifum",
+      "autoOff": "Tækið þitt er of hægt, svo bakgrunnsáhrifin voru slökkt.",
+      "unsupported": "Bakgrunnsáhrif eru ekki í boði á þessu tæki",
+      "noCam": "Kveiktu á myndavélinni þinni til að velja bakgrunn",
+      "lightUnsupported": "Ljósleiðrétting er ekki í boði á þessu tæki",
+      "noiseUnsupported": "Hávaðaminnkunarstillingar eru ekki studdar á þessu tæki"
+    },
+    "sheetClose": "Loka",
+    "polls": {
+      "new": "Ný könnun",
+      "question": "Spurning",
+      "option": "Valkostur {n}",
+      "remove": "Fjarlægja valkost {n}",
+      "addOption": "Bæta við valkosti",
+      "start": "Byrja könnun",
+      "cancel": "Hætta við",
+      "dup": "Valkostir verða að vera ólíkir",
+      "vote": "Kjósa",
+      "change": "Breyta atkvæði",
+      "close": "Loka könnun",
+      "closed": "Lokað",
+      "mine": "Val þitt",
+      "result": "{pct}% ({n} atkvæði)",
+      "total": "{n} atkvæði samtals",
+      "empty": "Engar kannanir ennþá.",
+      "loading": "Hleður…",
+      "labOnly": "Kannanir eru aðeins í boði í seminarherbergjum.",
+      "started": "Ný könnun hefur byrjað",
+      "goVote": "Kjósa",
+      "votersNote": "Skipuleggjandinn getur séð hver kaus hvaða valkost.",
+      "voters": "Kusu: {names}"
+    },
+    "qna": {
+      "sort": "Raða",
+      "by": {
+        "top": "Efst",
+        "new": "Nýjast"
+      },
+      "rcm": "Uppkjör ({n})",
+      "answered": "Svarað",
+      "answer": "Merkja svarað",
+      "unanswer": "Afmerkja svarað",
+      "hide": "Fela",
+      "doneN": "{n} svarað",
+      "backOpen": "Ósvaraðar spurningar",
+      "empty": "Engar spurningar ennþá.",
+      "emptyDone": "Engar svaraðar spurningar.",
+      "loading": "Hleður…",
+      "input": "Spurðu spurningu (500 stafir)",
+      "send": "Senda",
+      "left": "{n} eftir",
+      "labOnly": "Spurningar og svör eru aðeins í boði í seminarherbergjum."
+    },
+    "recording": {
+      "title": "Upptaka",
+      "badge": "Upptaka",
+      "unsupported": "Þessi vafri getur ekki tekið upp. Vinsamlegast taktu upp úr venjulegum vafra á tölvu.",
+      "piBrowserOnly": "Upptaka virkar aðeins í venjulegum vafra (tölvu eða farsíma). Pi Browser getur ekki vistað upptökuskrár — opnaðu þetta seminar í tölvu- eða símafara (seminarz.vercel.app) til að taka upp.",
+      "audioSuspended": "Hljóðupptaka gæti ekki hafa byrjað á þessu tæki. Aðeins myndin gæti verið tekin upp.",
+      "notifyFailed": "Upptaka byrjaði ekki vegna þess að ekki var hægt að tilkynna þátttakendum. Vinsamlegast reyndu aftur eftir smá stund.",
+      "confirm": {
+        "title": "Byrja upptöku?",
+        "body": "Þegar upptaka hefst munu allir sjá 'Upptaka' vísir. Skráin er aðeins vistuð á þessu tæki og er aldrei hlaðið upp eða flutt erlendis. Vinsamlegast segðu þátttakendum frá áður en þú byrjar.",
+        "download": "Þegar þú hættir er MP4 skrá vistuð í niðurhalsmöppuna þína (vafrar sem geta ekki tekið upp MP4 taka smá stund að umbreyta henni; upptökur lengri en um 45 mínútur geta verið geymdar í upprunalegu sniði). Vafrar í forritum geta hindrað skráarvistun, svo taktu upp úr venjulegum vafra á tölvu.",
+        "cancel": "Hætta við",
+        "start": "Byrja upptöku",
+        "charge": "Meðan á upptöku stendur er upptökutími dreginn frá greiddum tíma þínum auk herbergistíma (2x meðan á upptöku stendur). Þegar greiddur tími rennur út, stöðvast upptaka og skráin er vistuð."
+      },
+      "resave": {
+        "label": "Upptökuskrá",
+        "save": "Vista aftur",
+        "dismiss": "Loka vista aftur"
+      },
+      "toast": {
+        "started": "Upptaka hafin — allir geta séð hana",
+        "saved": "Upptaka vistuð. Athugaðu niðurhalsmöppuna þína. Ef ekkert var vistað, pikkaðu á [Vista aftur] efst á skjánum.",
+        "autoStopped": "Upptöku lauk vegna þess að vafrinn stöðvaði hana eða stærðarmörkum var náð. Allt fram að þeim tímapunkti var vistað. Byrjaðu upptöku aftur til að halda áfram.",
+        "empty": "Ekkert var tekið upp, svo engin skrá var búin til.",
+        "saveFailed": "Gat ekki búið til upptökuskrána.",
+        "converting": "Umbreytir upptökunni í MP4. Vinsamlegast haltu þessum glugga opnum.",
+        "savedOriginal": "Gat ekki umbreytt í MP4, svo upptakan var vistuð í upprunalegu sniði (webm). Athugaðu niðurhalsmöppuna þína.",
+        "startedBy": "Kynnirinn byrjaði upptöku",
+        "stoppedBy": "Kynnirinn stöðvaði upptöku"
+      },
+      "paidOnly": "Upptaka er aðeins í boði í seminörum sem opnuð eru með mánaðar- eða ársáætlun, meðan greiddur tími er eftir.",
+      "planOut": "Greiddur tími rann út, svo upptaka stöðvaðist og skráin var vistuð.",
+      "notInRoom": "Er enn að staðfesta að þú sért í herberginu. Byrjaðu upptöku aftur eftir smá stund.",
+      "meterFailed": "Gat ekki athugað upptökutíma, svo upptaka byrjaði ekki. Reyndu aftur eftir smá stund.",
+      "paidOut": "Enginn greiddur tími er eftir, svo upptaka getur ekki byrjað. Kauptu sömu áætlun aftur til að taka upp.",
+      "pausedBadge": "Upptöku hlé",
+      "controls": "Upptökustýringar",
+      "pause": "Hlé",
+      "resume": "Halda áfram",
+      "stop": "Stöðva upptöku"
+    },
+    "notes": {
+      "on": "AI minnispunktar",
+      "badge": "AI minnispunktar á",
+      "started": "Kynnir kveikti á AI minnispunktum",
+      "stopped": "AI minnispunktar slökktir",
+      "startedMine": "AI minnispunktar á — sýndir öllum",
+      "stoppedMine": "AI minnispunktar slökktir — verið að búa til minnispunktana",
+      "startFail": "Gat ekki ræst AI minnispunkta",
+      "gone": "AI minnispunktar stöðvaðir — minnispunktunum var lokið eða þeim eytt annars staðar",
+      "unsupported": "Ekki hægt að kveikja á AI minnispunktum hér (engin hljóðupptökustuðningur)"
+    },
+    "dubbing": {
+      "listen": "Hlusta á þýdda rödd",
+      "blocked": "Gat ekki spilað þýddu röddina. Vinsamlegast kveiktu aftur á henni",
+      "stopped": "Þýdd rödd er ekki tiltæk núna, svo hún var slökkt",
+      "usrQuota": "Þú hefur notað upp þýdda raddtakmörkun þína fyrir þetta seminar, svo hún var slökkt"
+    },
+    "plan": {
+      "warn": "{min} mínútur eftir af áætlun þessa seminars.",
+      "ended": "Tími seminarsins rann út, svo seminarinu er lokið og þú fórst úr herberginu.",
+      "left": "Tími eftir af seminari",
+      "closed": "Seminarinu er lokið, svo þú fórst úr herberginu.",
+      "hostAway": "Gestgjafinn hefur yfirgefið herbergið. Ef þeir snúa ekki aftur innan 5 mínútna verða allir þátttakendur fjarlægðir.",
+      "hostGone": "Gestgjafinn sneri ekki aftur innan 5 mínútna, svo þú fórst úr herberginu. Þú getur farið aftur inn þegar gestgjafinn kemur."
+    },
+    "toLobby": "Biðstofa"
+  },
+  "list": {
+    "tabsLabel": "Yfirlit yfir seminara",
+    "tabs": {
+      "all": "Allt",
+      "hosted": "Hýst af mér",
+      "joined": "Tekið þátt í"
+    },
+    "empty": {
+      "all": "Engin væntanleg seminör.",
+      "hosted": "Þú hefur ekki hýst nein seminör.",
+      "joined": "Þú hefur ekki tekið þátt í neinum seminörum."
+    },
+    "loading": "Hleðst…",
+    "retry": "Reyna aftur",
+    "free": "Ókeypis",
+    "fee": "{amount} Pi",
+    "host": "Gestgjafi {name}",
+    "capacity": "Fjöldi {n}",
+    "status": {
+      "SCHEDULED": "Áætlað",
+      "LIVE": "Í beinni",
+      "ENDED": "Lokið",
+      "CANCELED": "Hætt við"
+    },
+    "hostNew": "Búa til seminar",
+    "progress": "Framvinda",
+    "pager": "Síðuskipting",
+    "prev": "Fyrri",
+    "next": "Næsta",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Undirtitill",
+      "placeholder": "Bæta við undirtitli",
+      "save": "Vista undirtitil",
+      "saving": "Vistar…",
+      "saved": "Vistað."
+    },
+    "loading": "Hleðst…",
+    "back": "Til baka á lista",
+    "notFound": "Seminar fannst ekki.",
+    "status": {
+      "SCHEDULED": "Áætlað",
+      "LIVE": "Í beinni",
+      "ENDED": "Lokið",
+      "CANCELED": "Hætt við"
+    },
+    "startAt": "Dagsetning",
+    "host": "Gestgjafi",
+    "seats": "Laus sæti",
+    "seatsValue": "{left} / {max}",
+    "fee": "Seminargjald",
+    "feeValue": "{amount} Pi",
+    "free": "Ókeypis",
+    "enter": "Fara inn",
+    "payEnter": "Borga með Pi og fara inn ({amount} Pi)",
+    "paying": "Vinnur úr greiðslu…",
+    "joining": "Skráir…",
+    "registered": "Þú ert skráður.",
+    "full": "Þetta seminar er fullt.",
+    "closed": "Þessu seminari er lokið.",
+    "canceled": "Þessu seminari var hætt við.",
+    "roomLink": "Fara í herbergi (gestgjafi)",
+    "piBrowserOnly": "Greiðsla er í boði í Pi Browser eftir Pi innskráningu.",
+    "payCancelled": "Greiðslu hætt við.",
+    "payStillWaiting": "Bíð enn eftir veskinu. Ef þú hefur þegar skráð þig inn í Pi Wallet, vinsamlegast bíddu smá stund.",
+    "payFailed": "Greiðsla mistókst.",
+    "err": {
+      "NAME_TAKEN": "Þetta nafn er þegar í notkun hjá öðrum. Veldu annað.",
+      "CAL_READ_FAILED": "Gat ekki hlaðið viðburðum þínum. Athugaðu heimilisfangið.",
+      "ISLAND_FULL": "Öll 100 eyjanöfnin eru í notkun núna. Þú getur opnað nýtt seminar eftir að væntanlegt eða lifandi seminar lýkur eða er hætt við.",
+      "SMN_FULL": "Þetta seminar er fullt.",
+      "SMN_CLOSED": "Þessu seminari er lokið eða var hætt við.",
+      "SMN_ALREADY": "Þú ert þegar skráður eða greiðsla er í vinnslu.",
+      "SMN_FREE": "Ókeypis seminör taka ekki greiðslu.",
+      "SMN_PAY_REQUIRED": "Þetta er gjaldskyldur seminar. Vinsamlegast greiddu til að komast inn.",
+      "SMN_PAY_INVALID": "Við gátum ekki staðfest greiðslu þína. Vinsamlegast hafðu samband við stjórnanda.",
+      "PAY_PI_FAILED": "Gat ekki náð í Pi greiðsluþjóninn. Vinsamlegast reyndu aftur eftir smá stund.",
+      "PAY_MISMATCH": "Greiðsluupplýsingar passa ekki.",
+      "PAY_AMOUNT_MISMATCH": "Greiðsluupphæðin er frábrugðin seminargjaldinu.",
+      "PAY_CANCELLED": "Þessari greiðslu var hætt við.",
+      "PAY_ALREADY_PAID": "Greiðsla er enn í vinnslu. Ef þú varst að skrá þig inn í veskið, reyndu aftur eftir 3 mínútur.",
+      "PAY_INVALID_STATE": "Ekki er hægt að vinna úr þessari greiðslu núna.",
+      "PAY_PI_CANCEL_REFUSED": "Greiðsla er þegar í vinnslu og ekki hægt að hætta við hana. Vinsamlegast athugaðu aftur eftir smá stund."
+    },
+    "share": {
+      "title": "Tímasetja og deila",
+      "calendar": "Bæta við dagatal",
+      "ics": "Dagatalsskrá",
+      "mail": "Bjóða með tölvupósti",
+      "mailApp": "Senda með sjálfgefnu póstforriti",
+      "mailSubject": "[Seminar boð] {title}",
+      "mailBody": "{title}\nHvenær: {start}\n\nVertu með beint með þessum hlekk.\nSkjáborð: {url}\nPi Browser: {piUrl}",
+      "copy": "Afrita hlekk",
+      "copied": "Hlekkur afritaður.",
+      "copyFail": "Gat ekki afritað. Vinsamlegast afritaðu hlekkinn úr veffangastikunni.",
+      "share": "Deila í annað forrit",
+      "shareFail": "Gat ekki deilt. Vinsamlegast notaðu Afrita hlekk í staðinn.",
+      "created": "Seminarið þitt er tilbúið. Bættu upphafstíma þess við Google dagatalið þitt.",
+      "addGoogle": "Bæta við Google dagatal",
+      "later": "Seinna",
+      "piBrowserOpen": "Í Pi Browser opnast dagatal, tölvupóstur og dagatalsskrá í sjálfgefnum vafra símans þíns.",
+      "extFail": "Gat ekki opnað. Uppfærðu Pi Browser, eða notaðu Afrita hlekk og opnaðu hann í venjulegum vafra (seminarz.vercel.app).",
+      "icsPiBrowser": "Dagatalsskráin er aðeins hægt að hlaða niður í venjulegum vafra (tölvu eða farsíma). Í Pi Browser, notaðu Bæta við dagatal í staðinn."
+    },
+    "attendance": "Mæting",
+    "plan": "Áætlun",
+    "left": "Tími eftir"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Fyrri mánuður",
+      "next": "Næsti mánuður",
+      "connect": "Sýna Google dagatalið mitt",
+      "change": "Stjórna Google dagatölum ({n})",
+      "add": "Bæta við",
+      "remove": "Fjarlægja",
+      "close": "Loka",
+      "failed": "Gat ekki hlaðið viðburðum úr {n} dagatali(m). Athugaðu heimilisfangið.",
+      "badUrl": "Límdu 'Leyndarmál heimilisfang á iCal sniði' (…/basic.ics) úr Google dagatalsstillingum, ekki veffangastikunni.",
+      "full": "Þú getur bætt við allt að {n} dagatölum.",
+      "allDay": "Allan daginn",
+      "day": "Viðburðir mínir á þessum degi",
+      "count": "{n, plural, one {# viðburður} other {# viðburðir}}",
+      "more": "+{n}",
+      "picked": "Þessi dagsetning er stillt sem upphafsdagsetning. Veldu tímann hér að neðan.",
+      "s1": "Pikkaðu á [Opna Google dagatalsstillingar] hér að neðan.",
+      "s2": "Undir 'Stillingar fyrir dagatölin mín' til vinstri, veldu dagatal (t.d. nafnið þitt).",
+      "s3": "Skrunaðu að 'Samþætta dagatal' og afritaðu 'Leyndarmál heimilisfang á iCal sniði'.",
+      "s4": "Límdu það hér og pikkaðu á [Bæta við] — titlar viðburða birtast á dagatalinu. Bættu við öðrum dagatölum á sama hátt, allt að 5.",
+      "open": "Opna Google dagatalsstillingar",
+      "privacy": "Þetta heimilisfang er lykill að dagatalinu þínu — ekki deila því. Það er aðeins geymt á þessu tæki, aldrei á netþjóninum okkar."
+    },
+    "title": "Búa til seminar",
+    "name": "Förum í ferðalag til fallegra eyja!",
+    "subTitle": "Undirtitill (valfrjálst, allt að 60)",
+    "startAt": "Upphafstími",
+    "maxCnt": "Fjöldi (1–100)",
+    "submit": "Búa til",
+    "submitting": "Býr til…",
+    "invalid": "Athugaðu inntak þitt — dagsetning innan eins árs frá nú, fjöldi 1–100.",
+    "attendance": {
+      "title": "Mæting",
+      "back": "Til baka í seminar",
+      "loading": "Hleðst…",
+      "forbidden": "Aðeins gestgjafi og stjórnendur geta skoðað mætingu.",
+      "count": "{n} manns",
+      "csv": "Hlaða niður CSV",
+      "empty": "Enginn hefur enn tekið þátt.",
+      "online": "Á netinu",
+      "left": "Fór",
+      "col": {
+        "name": "Nafn",
+        "pi": "Pi notandanafn",
+        "ent": "Fyrst tekið þátt",
+        "hb": "Síðast séð",
+        "dur": "Tími mættur",
+        "min": "Mættur (mín, tími í burtu undanskilinn)",
+        "state": "Staða"
+      },
+      "durNote": "Tími mættur er frá fyrstu þátttöku til síðustu sýningar, mínus tími í burtu (bil lengri en 2,5 mínútur).",
+      "csvPiBrowser": "CSV niðurhal virkar aðeins í venjulegum vafra (tölvu eða farsíma). Pi Browser getur ekki vistað skrár — opnaðu þetta mætingarblað í tölvu- eða símafara (seminarz.vercel.app)."
+    },
+    "plan": "Áætlun",
+    "planFree": "Ókeypis — {time} eftir þennan mánuð · engin AI",
+    "planPaid": "{name} {time} · {price} — greiða við stofnun",
+    "planHint": "Seminar opnað á greiddri áætlun notar tíma þeirrar áætlunar fyrst, heldur síðan áfram á ókeypis tíma þessa mánaðar (engin AI í ókeypis hlutanum). Virk áætlun opnast án greiðslu; Mánaðarleg eða Árleg sem þú hefur ekki er greidd í Pi þegar þú ýtir á Búa til, þá opnast seminarið (Pi Browser). Þátttaka er alltaf ókeypis fyrir þátttakendur.",
+    "planOwned": "{name} — virk · {time} eftir",
+    "planEnds": "Upphafstíminn er eftir að þessi áætlun rennur út. Færðu upphafstímann fyrr eða veldu aðra áætlun.",
+    "paidKept": "Greiddur aðgangur þinn er geymdur. Lagfærðu vandamálið og ýttu aftur á Búa til (engin önnur greiðsla)."
+  },
+  "privacy": {
+    "title": "Persónuverndarstefna — Radd- og AI-eiginleikar",
+    "effective": "Gildistími {date}",
+    "intro": "Þessi stefna útskýrir persónuupplýsingarnar sem við vinnum þegar þú notar lifandi texta, þýdda texta, raddþýðingu, AI fundarminnispunkta og persónulega minnispunkta í seminari. Þessir eiginleikar nota ytri AI þjónustu, svo upplýsingarnar eru fluttar erlendis.",
+    "whoTitle": "Hvers upplýsingar eru unnar",
+    "who": [
+      "Kynnar og þátttakendur á sviði: við biðjum um samþykki þitt einu sinni, áður en þú kveikir fyrst á hljóðnemanum þínum. Þú getur tekið þátt í seminari án samþykkis.",
+      "Áhorfendur: þú notar ekki hljóðnema, svo engin rödd er send. Þú sérð aðeins texta og minnispunkta.",
+      "Persónulegir minnispunktar: stjórnandi tekur upp fund með hljóðnema og staðfestir að fundarmenn hafi verið upplýstir fyrir upptöku."
+    ],
+    "xferTitle": "Flutningur persónuupplýsinga erlendis (kóresk lög um persónuvernd, 28-8. gr.)",
+    "xfer": [
+      {
+        "k": "Viðtakandi",
+        "v": "Google LLC (Gemini API) — hafðu samband [TBD: Google persónuverndarsamband]"
+      },
+      {
+        "k": "Lönd",
+        "v": "Bandaríkin og önnur lönd þar sem Google gagnaver eru staðsett [TBD: vinnslusvæði]"
+      },
+      {
+        "k": "Hvenær og hvernig",
+        "v": "Um það bil á 5 sekúndna fresti á meðan eiginleiki er á, yfir dulkóðaða tengingu (HTTPS). Fyrir persónulega minnispunkta er öll upptakan send einu sinni enn í 5 mínútna hlutum þegar minnispunktur lýkur (nákvæm umritun)."
+      },
+      {
+        "k": "Atriði",
+        "v": "Rödd, talað efni (texti), birtingarnafn ræðumanns (fyrir samantektir minnispunkta), skjádeilingarmyndir (þegar AI minnispunktar eru á)"
+      },
+      {
+        "k": "Tilgangur",
+        "v": "Tal í texta, þýðing, samantektir fundarminnispunkta, gervital (staðlaðar raddir, engin raddklónun), aðskilnaður ræðumanna fyrir persónulega minnispunkta (raddir eru aðgreindar og merktar eftir skynjuðu kyni, svo sem Karl 1 / Kona 1 — engin nöfn eða auðkenni eru ályktuð)"
+      },
+      {
+        "k": "Varðveisla",
+        "v": "Lýkur um leið og niðurstaðan er skilað. Við biðjum Google að geyma ekki beiðnir (store=false). Misnotkunarvöktunarskrár kunna samt að vera geymdar samkvæmt skilmálum Google [TBD: varðveislutími og staða greidds stigs]."
+      },
+      {
+        "k": "Hvernig á að neita, og hvað gerist",
+        "v": "Ef þú samþykkir ekki eða slekkur á hljóðnemanum þínum er engin rödd send. Þú getur samt tekið þátt í seminari; aðeins textar, þýðingar og minnispunktar eigin ræðu eru ekki búnir til. Þú getur afturkallað samþykki hvenær sem er [TBD: hvar afturköllunarhnappurinn er]."
+      }
+    ],
+    "keepTitle": "Hvað þessi þjónusta geymir",
+    "keep": [
+      "Upprunalegt hljóð: fyrir seminartitla og AI fundarminnispunkta er það ekki geymt; því er hent strax eftir umbreytingu í texta. Fyrir persónulega minnispunkta er upptakan geymd í einkageymslu svo hægt sé að umrita hana aftur nákvæmar (með ræðumönnum) eftir fundinn, og henni er eytt við daglega hreinsun þegar 1 dagur er liðinn frá því að minnispunkturinn lauk (strax ef minnispunkturinn er eytt).",
+      "Lifandi textar: ekki geymdir.",
+      "AI fundarminnispunktar (þegar kynnir kveikir á þeim): talað efni, skjámyndir og samantektin, geymd þar til minnispunktunum er eytt [TBD: hámarks varðveisla].",
+      "Samþykkisskrár: tími samþykkis og útgáfa stefnunnar, geymd sem sönnun [TBD: varðveislutími].",
+      "Notkun: fjöldi beiðna á mínútu og vinnslutími, notað til að framfylgja kostnaðartakmörkunum.",
+      "Mæting: tíminn sem þú tókst þátt, tíminn sem þú varst síðast tengdur, birtingarnafn þitt og Pi notandanafn þitt eru geymd og gefin gestgjafanum sem mætingarlisti (á skjá og sem CSV niðurhal). Geymt þar til seminarið er eytt.",
+      "Spurningar og svör og kannanir: spurningatextinn og birtingarnafn spyrjanda (eða Pi notandanafn ef ekkert) eru sýnileg öllum þátttakendum. Uppkosningar sýna aðeins fjölda, aldrei hverjir kusu. Kannanir sýna aðeins fjölda fyrir þátttakendur; skipuleggjandi og stjórnendur sjá, fyrir hvern valkost, birtingarnafn (eða Pi notandanafn ef ekkert) hvers kjósanda. Geymt, þar á meðal faldar spurningar, þar til seminarið er eytt."
+    ],
+    "recTitle": "Upptaka",
+    "rec": "Upptökur eru aðeins vistaðar sem skrá á tæki kynnisins. Þær eru ekki hlaðnar upp á netþjóna okkar eða fluttar erlendis. Á meðan upptaka eða AI minnispunktar eru á, sér hver þátttakandi vísir.",
+    "rightsTitle": "Réttindi þín",
+    "rights": "Þú getur beðið um að fá aðgang að, leiðrétta, eyða eða stöðva vinnslu upplýsinga þinna. Hafðu samband: [TBD: nafn og tengiliður persónuverndarfulltrúa]"
+  },
+  "notes": {
+    "title": "Minnispunktar",
+    "back": "Til baka í seminar",
+    "loading": "Hleðst…",
+    "meta": "Minnispunktar · {date} · {min} mín",
+    "aiWarn": "AI-mynduð samantekt — hún gæti innihaldið villur",
+    "points": "Helstu atriði",
+    "decisions": "Ákvarðanir",
+    "todos": "Verkefni",
+    "shots": "Skjámyndir ({n})",
+    "transcript": "Umritun",
+    "download": "Hlaða niður Markdown",
+    "making": "Býr til minnispunktana…",
+    "makingLong": "Þetta tekur smá tíma. Vinsamlegast endurnýjaðu síðar",
+    "recording": "Enn að taka upp",
+    "failed": "Gat ekki búið til samantektina — öll umritunin er hér að neðan",
+    "retry": "Reyna aftur",
+    "finish": "Loka upptöku og draga saman",
+    "none": "Ekkert hér",
+    "blank": "Ekkert til að draga saman — engin ræða var tekin upp eða hún var of stutt",
+    "notFound": "Minnispunktar fundust ekki",
+    "forbidden": "Þú hefur ekki aðgang að þessum minnispunktum",
+    "shotAlt": "Skjámynd klukkan {at}",
+    "close": "Loka",
+    "view": "Skoða minnispunkta",
+    "error": "Gat ekki hlaðið",
+    "mine": "Minnispunktar mínir",
+    "del": "Eyða minnispunktum",
+    "delAsk": "Eyða þessum minnispunktum (samantekt, umritun og skjámyndir)? Enginn mun geta séð þá",
+    "delYes": "Eyða",
+    "delNo": "Hætta við",
+    "delFail": "Gat ekki eytt",
+    "dlFail": "Gat ekki hlaðið niður — vinsamlegast reyndu aftur",
+    "recentNotes": "Nýlegir minnispunktar",
+    "empty": "Engir minnispunktar ennþá",
+    "newNote": "Byrja persónulega minnispunkta",
+    "inPerson": "Persónulegir fundarminnispunktar",
+    "inPersonTag": "Í eigin persónu",
+    "titleLabel": "Titill",
+    "titlePh": "t.d. Vikulegur fundur",
+    "told": "Ég hef sagt öllum viðstöddum að þetta verði tekið upp og unnið af AI (nauðsynlegt)",
+    "toldWhy": "Áður en þú byrjar, segðu öllum viðstöddum að þetta samtal verði tekið upp (upptakan er geymd í 1 dag eftir að minnispunktur lýkur, og ræðumenn eru aðgreindir eftir rödd og merktir eftir skynjuðu kyni) og breytt í texta og samantekt af ytri AI",
+    "start": "Byrja upptöku",
+    "starting": "Undirbýr…",
+    "recBadge": "Upptaka {time}",
+    "recentLines": "Nýjustu línur",
+    "waiting": "Texti birtist hér þegar fólk talar",
+    "end": "Ljúka og búa til glósur",
+    "wakeWarn": "Upptaka gæti stöðvast ef slökkt er á skjánum",
+    "adminOnly": "Aðeins stjórnendur geta notað þetta",
+    "aiOff": "AI glósur eru ekki tiltækar núna (þarf að setja upp netþjón). Fyrri glósur eru taldar upp hér að neðan",
+    "reload": "Endurhlaða",
+    "unsupported": "Upptaka er ekki í boði á þessu tæki",
+    "micDenied": "Get ekki notað hljóðnemann — athugaðu heimildir",
+    "limited": "Vinnslutímatakmörkun er uppurin — ljúktu og búðu til glósurnar",
+    "noAgr": "Stöðvað: engin tilkynning staðfest við upptöku — ljúktu og byrjaðu aftur",
+    "micLost": "Hljóðneminn aftengdist og upptaka stöðvaðist — pikkaðu á Tengja hljóðnema aftur eða ljúktu glósunni",
+    "micRetry": "Tengja hljóðnema aftur",
+    "gone": "Þessari glósu var lokið eða henni eytt annars staðar, svo upptaka stöðvaðist — notaðu hnappinn hér að neðan til að opna glósurnar",
+    "finishing": "Vista síðustu orðin…",
+    "st": {
+      "RECORDING": "Tek upp",
+      "SUMMARIZING": "Bý til",
+      "DONE": "Lokið",
+      "FAILED": "Mistókst"
+    },
+    "downloadPiBrowser": "Niðurhal á Markdown virkar aðeins í venjulegum vafra (tölvu eða farsíma). Pi Browser getur ekki vistað skrár — opnaðu þessar glósur í tölvu- eða símafara (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Áætlanir",
+    "loading": "Hleð inn…",
+    "free": "Ókeypis",
+    "freeDesc": "{time} af námskeiðum í hverjum mánuði (ekki yfirfæranlegt)",
+    "monthly": "Mánaðarlega",
+    "yearly": "Árlega",
+    "paidDesc": "{time} af námskeiðum, gildir í {months} mánuði",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Athuga Pi verð",
+    "noAi": "Engir AI textar, þýðingar, talsetningar eða glósu samantektir",
+    "withAi": "Inniheldur AI texta, þýðingar, talsetningar og glósu samantektir",
+    "buy": "Borga með Pi",
+    "bought": "Greiðsla lokið. Námskeiðstími hefur verið bætt við.",
+    "meRemain": "Eftirstandandi tími: {time}",
+    "loginToBuy": "Skráðu þig inn til að kaupa áætlun.",
+    "payNote": "Greiðsla er alltaf í Pi. Upphæðin í staðbundinni mynt er aðeins til viðmiðunar; Pi upphæðin er ákveðin út frá Pi verði þegar þú borgar. Námskeið á greiddri áætlun notar fyrst passa þeirrar áætlunar (þá sem renna út fyrst), síðan heldur það áfram á ókeypis tíma þessa mánaðar.",
+    "charge": "Hlaða tíma",
+    "hm": "{h} klst. {m} mín.",
+    "m": "{m} mín.",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (athuga Pi verð)",
+    "h": "{h} klst."
+  },
+  "adminRooms": {
+    "title": "Herbergisstjórnun",
+    "adminOnly": "Aðeins stjórnendur geta skoðað þessa síðu.",
+    "refresh": "Endurhlaða",
+    "count": "{n} opin herbergi",
+    "empty": "Engin herbergi eru opin núna.",
+    "lab": "Rannsóknarherbergi",
+    "noSeminar": "Engin námskeiðsskrá",
+    "peers": "{n} / {cap} tengdir",
+    "producers": "{n} straumar",
+    "end": "Lýkur {time}",
+    "stale": "Námskeiðinu er lokið en herbergið er enn opið á myndbandsþjóninum — lokaðu því með valdi.",
+    "close": "Loka með valdi",
+    "confirmSeminar": "Þetta lýkur námskeiðinu og lokar herberginu. Allir verða aftengdir.",
+    "confirmRoom": "Þetta lokar herberginu. Allir verða aftengdir.",
+    "confirmYes": "Loka",
+    "cancel": "Hætta við",
+    "closing": "Loka…",
+    "closed": "Herbergi lokað.",
+    "metrics": "Mælingar myndbandsþjóns (frá upphafi)",
+    "metricsOff": "Gat ekki hlaðið mælingum.",
+    "m": {
+      "packetsIn": "Pakkar inn",
+      "packetsOut": "Pakkar út",
+      "nackIn": "NACKs móttekin",
+      "nackOut": "NACKs send",
+      "retransmits": "Endursendingar",
+      "duplicateNack": "Afrit NACKs",
+      "cacheMiss": "Endursendingar skyndiminni missir",
+      "pliOut": "Beiðnir um lykilramma (PLI)",
+      "keyframes": "Lykilrammar",
+      "layerSwitches": "Gæðaskiptingar",
+      "queueDrops": "Biðraðarfall"
+    }
+  },
+  "adminUsers": {
+    "title": "Notendur",
+    "adminOnly": "Aðeins stjórnendur geta skoðað þessa síðu.",
+    "search": "Leita eftir nafni (2+ stafir)",
+    "searchBtn": "Leita",
+    "refresh": "Endurhlaða",
+    "count": "{n, plural, one {# notandi} other {# notendur}}",
+    "empty": "Engir notendur.",
+    "admin": "Stjórnandi",
+    "lastLogin": "Síðasta innskráning {time}",
+    "never": "Aldrei skráð(ur) inn",
+    "plan": {
+      "FREE": "Ókeypis",
+      "M": "Mánaðarlega",
+      "Y": "Árlega"
+    },
+    "until": "(til {time})",
+    "manage": "Stjórna tíma",
+    "close": "Loka",
+    "planLabel": "Áætlun",
+    "hours": "Klukkustundir",
+    "minutes": "Mínútur",
+    "reason": "Ástæða (valfrjálst)",
+    "sub": "Minnka",
+    "confirmSub": "Minnka {plan} tíma um {time}.",
+    "confirmYes": "Staðfesta",
+    "cancel": "Hætta við",
+    "saving": "Vista…",
+    "done": "Beitt. {plan} tími eftir: {time}",
+    "invalid": "Sláðu inn minnkun á milli 1 mínútu og 1000 klukkustunda (heilar mínútur 0–59).",
+    "history": "Nýlegar aðlaganir",
+    "noHistory": "Engar aðlaganir ennþá.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Gefa þjónustupassa (ókeypis tíma)",
+    "svc": {
+      "H1": "1 klst. passa",
+      "D1": "1 dags passa",
+      "M1": "1 mánaðar passa"
+    },
+    "svcNote": "Þjónustupassar eru ókeypis tími áætlunar. Þeir geta verið notaðir frá og með núna í þann tíma (1 klukkustund, 24 klukkustundir, 1 mánuður) í ókeypis námskeiðum og í ókeypis hluta greiddra námskeiða (engar AI aðgerðir). Með nokkrum pösum eru þeir notaðir sjálfkrafa í röðinni 1 klukkustund → 1 dagur → 1 mánuður.",
+    "subTitle": "Minnka tíma",
+    "subNote": "Tekur fyrst af þeim pösum sem renna út síðast. Ef það er meira en það sem eftir er, er aðeins eftirstandandi tími fjarlægður.",
+    "confirmSvc": "Gefa {svc}.",
+    "doneSvc": "Gaf {svc}. Ókeypis tími eftir: {time} (passi rennur út {end})"
+  }
+}

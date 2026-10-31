@@ -63,12 +63,6 @@ export const IconNotebook = (p: SVGProps<SVGSVGElement>) => (
     <path d="M9 3v18M13 8h3M13 12h3" />
   </svg>
 )
-export const IconGlobe = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" />
-  </svg>
-)
 export const IconChevronDown = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}>
     <path d="m6 9 6 6 6-6" />

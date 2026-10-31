@@ -1,0 +1,5 @@
+{
+  "locales": "all",
+  "glossary": ["seminar.pi", "Vultr", "coturn", "WebRTC", "MediaPipe", "LiveKit", "Gemini", "Zoom"],
+  "audit": { "exclude": ["src/app/api/**", "**/*.test.ts"] }
+}

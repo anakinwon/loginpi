@@ -1,0 +1,1089 @@
+{
+  "common": {
+    "localeSwitcher": {
+      "button": "Keisti kalbą",
+      "search": "Ieškoti kalbos",
+      "empty": "Nėra rezultatų"
+    }
+  },
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Tiesioginiai vaizdo seminarai, kuriuose dalyvaujate su Pi"
+  },
+  "home": {
+    "description": "Vedėjai rengia seminarus, o dalyviai prisijungia prie tiesioginių vaizdo sesijų su Pi.",
+    "badge": "Tiesioginiai seminarai gražiose salose",
+    "headline": "Žiūrėkite, klausykitės ir mokykitės kartu – tiesiogiai",
+    "ctaBrowse": "Naršyti seminarus",
+    "ctaPlan": "Žiūrėti planus",
+    "features": {
+      "video": "Tiesioginis vaizdo įrašas",
+      "caption": "Antraštės ir vertimas",
+      "notes": "AI susitikimų užrašai",
+      "pay": "Mokėti su Pi"
+    },
+    "listTitle": "Seminarai",
+    "cal": {
+      "title": "Seminarų kalendorius",
+      "desc": "Nuo praėjusių iki būsimų seminarų – bakstelėkite datą, kad gautumėte išsamią informaciją.",
+      "legendSmn": "Seminarai",
+      "legendEnded": "Praėję seminarai",
+      "legendMine": "Mano renginiai",
+      "failed": "Nepavyko įkelti seminarų datų. Bandykite dar kartą vėliau.",
+      "open": "Žiūrėti detales"
+    }
+  },
+  "nav": {
+    "link": "Susieti paskyrą",
+    "privacy": "Privatumas",
+    "plan": "Planai",
+    "rooms": "Kambariai",
+    "admin": "Administratorius",
+    "users": "Vartotojai",
+    "home": "Pagrindinis",
+    "privacyShort": "Privatumas",
+    "menu": "Pagrindinis meniu",
+    "fold": "Sutraukti meniu",
+    "unfold": "Išskleisti meniu"
+  },
+  "auth": {
+    "checking": "Tikrinamas prisijungimas…",
+    "signedIn": "{name}",
+    "inPerson": "Asmeniniai užrašai",
+    "required": "Prašome prisijungti su savo Pi paskyra.",
+    "signIn": "Prisijungti su Pi",
+    "openInPiBrowser": "Atidarykite šį puslapį Pi Browser, kad prisijungtumėte su savo Pi paskyra.",
+    "authenticating": "Prisijungiama…",
+    "google": "Prisijungti su Google",
+    "signOut": "Atsijungti",
+    "or": "arba",
+    "linkRequired": "Esate prisijungę su Google, bet ji dar nesusieta su Pi paskyra. Išduokite susiejimo kodą Pi Browser ir įveskite jį čia.",
+    "linkNeeded": "Reikia susieti Pi paskyrą",
+    "linkCheckFailed": "Nepavyko patikrinti jūsų paskyros susiejimo būsenos (laikina serverio klaida). Prašome atnaujinti po kurio laiko."
+  },
+  "piOAuth": {
+    "signingIn": "Prisijungiama su jūsų Pi paskyra…",
+    "failed": "Pi prisijungimas nepavyko. Bandykite dar kartą.",
+    "stateMismatch": "Nepavyko patvirtinti šio prisijungimo užklausos (pasibaigęs laikas arba kitas skirtukas). Bandykite dar kartą.",
+    "retry": "Bandyti dar kartą",
+    "backHome": "Pagrindinis"
+  },
+  "link": {
+    "title": "Susieti paskyrą",
+    "intro": "Susiekite paskyrą, su kuria prisijungėte Pi Browser, su Google prisijungimu įprastoje naršyklėje. Susieję galėsite naudoti tą pačią paskyrą ir kompiuterio naršyklėje.",
+    "checking": "Tikrinamas prisijungimas…",
+    "piIssueTitle": "Norėdami prisijungti ir iš įprastos naršyklės",
+    "codeHint": "Išduokite žemiau esantį kodą, tada prisijunkite su Google kompiuterio naršyklėje ir įveskite jį paskyros susiejimo puslapyje (per 10 minučių).",
+    "piIssue": "Išduoti susiejimo kodą",
+    "reissue": "Išduoti naują kodą",
+    "expiresIn": "Baigiasi po {min} min",
+    "enterTitle": "Įveskite susiejimo kodą",
+    "enterHint": "Pi Browser atidarykite seminar.pi → Susieti paskyrą → Išduoti susiejimo kodą, tada įveskite 6 skaitmenų kodą.",
+    "codeLabel": "Susiejimo kodas",
+    "submit": "Susieti",
+    "done": "Susietas. Dabar galite naudoti ir Google prisijungimą.",
+    "linked": "{name} susieta su Google prisijungimu."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Reikalingas prisijungimas",
+    "AUTH_PI_REQUIRED": "Reikalingas Pi prisijungimas",
+    "AUTH_PI_SESSION_INVALID": "Jūsų sesija baigėsi. Prašome prisijungti iš naujo",
+    "AUTH_PI_TOKEN_INVALID": "Pi prisijungimo patvirtinimas nepavyko",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Trūksta Pi prisijungimo informacijos",
+    "FORBIDDEN": "Neturite leidimo",
+    "BAD_REQUEST": "Bloga užklausa",
+    "BAD_REQUEST_BODY": "Bloga užklausa",
+    "INVALID_INPUT": "Neteisinga įvestis",
+    "QUERY_FAILED": "Nepavyko įkelti",
+    "SAVE_FAILED": "Nepavyko išsaugoti",
+    "INTERNAL": "Kažkas nutiko",
+    "SERVER_CONFIG": "Serverio konfigūracijos klaida. Prašome susisiekti su operatoriumi",
+    "PI_API_CONNECT_FAILED": "Nepavyko pasiekti Pi Network",
+    "DB_UNAVAILABLE": "Duomenys laikinai nepasiekiami. Prašome bandyti dar kartą vėliau",
+    "NOT_FOUND": "Nerasta",
+    "RATE_LIMITED": "Per daug užklausų. Prašome bandyti dar kartą netrukus",
+    "PAYLOAD_TOO_LARGE": "Užklausa per didelė",
+    "NETWORK": "Patikrinkite tinklo ryšį",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Šis Pi vartotojo vardas jau užregistruotas su kitais prisijungimo duomenimis. Prašome susisiekti su administratoriumi",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Ši paskyra neaktyvi. Prašome susisiekti su administratoriumi",
+    "AUTH_GOOGLE_REQUIRED": "Reikalingas Google prisijungimas.",
+    "LINK_CODE_INVALID": "Susiejimo kodas neteisingas arba pasibaigęs. Išduokite naują Pi Browser.",
+    "LINK_ALREADY_LINKED": "Ši paskyra jau susieta.",
+    "LINK_CODE_GEN_FAILED": "Nepavyko sukurti susiejimo kodo. Prašome bandyti dar kartą vėliau.",
+    "AUTH_DB_UNAVAILABLE": "Nepavyko išsaugoti jūsų paskyros, todėl prisijungimas nepavyko. Prašome bandyti dar kartą vėliau.",
+    "LINK_TRY_LIMIT": "Per daug neteisingų susiejimo kodų. Bandykite dar kartą po 15 minučių.",
+    "PRICE_UNAVAILABLE": "Nepavyko gauti Pi kainos. Prašome bandyti dar kartą netrukus",
+    "QUOTE_EXPIRED": "Mokėjimo pasiūlymas baigėsi. Prašome mokėti iš naujo",
+    "PLAN_EXHAUSTED": "Išnaudojote visą savo seminaro laiką. Papildykite puslapyje „Planai“",
+    "HOST_AWAY": "Vedėjo nėra kambaryje. Galite įeiti, kai prisijungs vedėjas",
+    "PLAN_AI_PAID": "AI funkcijos prieinamos mokamuose planuose",
+    "AI_UNAVAILABLE": "AI funkcijos šiuo metu nepasiekiamos",
+    "SPEECH_CHUNK_INVALID": "Garso fragmento formatas neteisingas",
+    "SPEECH_NOT_LIVE": "Šis seminaras nėra tiesioginis",
+    "SPEECH_NO_AGR": "Reikalingas sutikimas apdoroti balsą",
+    "SPEECH_RATE": "Per daug balso užklausų. Prašome bandyti dar kartą netrukus",
+    "SPEECH_QUOTA": "Šio seminaro balso apdorojimo laikas išnaudotas",
+    "SPEECH_USR_QUOTA": "Išnaudojote savo vertimo ir išversto balso limitą šiam seminarui",
+    "SPEECH_FAILED": "Nepavyko konvertuoti kalbos į tekstą",
+    "SPEECH_STAGE_ONLY": "Tik scenoje esantys žmonės gali naudoti balso antraštes",
+    "TRANSLATE_FAILED": "Nepavyko išversti antraštės",
+    "POLL_CLOSED": "Ši apklausa uždaryta",
+    "NOTE_NOT_RECORDING": "Šie užrašai neįrašomi",
+    "NOTE_SHOT_INVALID": "Neteisingas ekrano fiksavimas",
+    "NOTE_AUDIO_INVALID": "Neteisingas įrašymo failas",
+    "NOTE_SHOT_RATE": "Per daug ekrano fiksavimų",
+    "NOTE_RETRY_SOON": "Galite bandyti dar kartą po minutės",
+    "SPEECH_TTS_FAILED": "Nepavyko sukurti išversto balso",
+    "CAPTION_SIG_INVALID": "Šios antraštės nepavyko patvirtinti, todėl ji nebuvo išversta",
+    "PLAN_EXPIRES_BEFORE_START": "Pradžios laikas yra po šio plano galiojimo pabaigos",
+    "PAY_ALREADY_PAID": "Mokėjimas vis dar apdorojamas. Jei prisijungėte prie piniginės, bandykite dar kartą po 3 minučių.",
+    "REC_PAID_ONLY": "Įrašymas galimas tik mėnesinio arba metinio plano seminaruose, turint likusio apmokėto laiko",
+    "REC_NOT_IN_ROOM": "Vis dar patvirtinama, kad esate kambaryje. Bandykite dar kartą po kurio laiko",
+    "ENGINE_OFF": "Vaizdo serverio administratoriaus raktas nesukonfigūruotas",
+    "ENGINE_UNAVAILABLE": "Vaizdo serveris neatsako. Prašome bandyti dar kartą netrukus",
+    "ADJ_NOTHING": "Nėra likusio laiko, kurį būtų galima sumažinti"
+  },
+  "progress": {
+    "title": "Kūrimo eiga",
+    "subtitle": "Atlikta, vykdoma ir planuojama, pagal funkciją · nuo {date}",
+    "overall": "Bendri žingsniai",
+    "stepsDone": "Atlikta {done}/{total} žingsnių ({pct}%)",
+    "featureUnit": "funkcijos",
+    "status": {
+      "done": "Atlikta",
+      "doing": "Vykdoma",
+      "todo": "Suplanuota",
+      "drop": "Atmesta"
+    },
+    "features": {
+      "F01": {
+        "name": "Prisijungimas",
+        "desc": "Pi Browser prisijungimas, Google prisijungimas kitose naršyklėse ir abiejų paskyrų susiejimas"
+      },
+      "F05": {
+        "name": "Tiesioginis vaizdo seminaras",
+        "desc": "Mūsų pačių vaizdo variklis Galápagos — tikslas yra vienas pranešėjas, transliuojantis iki 30 dalyvių"
+      },
+      "F02": {
+        "name": "Sukurti seminarą",
+        "desc": "Nustatykite paantraštę, laiką, talpą ir seminaro mokestį, kad sukurtumėte seminarą (pavadinimas = sala, automatinis)"
+      },
+      "F03": {
+        "name": "Seminarų sąrašas ir detalės",
+        "desc": "Naršykite atvirų seminarų puslapį po puslapio ir peržiūrėkite jų detales"
+      },
+      "F04": {
+        "name": "Pi įėjimo mokestis",
+        "desc": "Sumokėkite seminaro mokestį Pi; serveris dar kartą patikrina sumą prieš leisdamas jums įeiti"
+      },
+      "F06": {
+        "name": "Vedėjų išmokos",
+        "desc": "Išmokėti įėjimo mokesčio pajamas vedėjams Pi"
+      },
+      "F07": {
+        "name": "Pakartojimai",
+        "desc": "Žiūrėti įrašytus seminarus vėliau"
+      },
+      "FU": {
+        "name": "Susitikimų priedų pagrindas",
+        "desc": "Vienas signalo kanalas priedams, AI ryšys, balso fragmentai, mikrofono sutikimas ir duomenų lentelės"
+      },
+      "F08": {
+        "name": "Tvarkaraštis ir dalijimasis",
+        "desc": "Kalendoriaus nuoroda, renginio failas (.ics) ir el. pašto kvietimas kiekvienam seminarui"
+      },
+      "F09": {
+        "name": "Triukšmo mažinimas ir apšvietimas",
+        "desc": "Sumažinkite mikrofono triukšmą ir pašviesinkite tamsų kameros vaizdą"
+      },
+      "F10": {
+        "name": "Tiesioginės antraštės",
+        "desc": "Paverskite pranešėjo kalbą tekstu po scena"
+      },
+      "F11": {
+        "name": "Apklausos, klausimai ir atsakymai bei dalyvavimas",
+        "desc": "Vykdykite apklausas ir klausimus seminaro metu; vedėjai atsisiunčia dalyvių sąrašą"
+      },
+      "F12": {
+        "name": "Fono efektai",
+        "desc": "Suliekite foną arba pakeiskite jį iš anksto nustatytu arba savo atvaizdu (apdorojama jūsų įrenginyje)"
+      },
+      "F13": {
+        "name": "Vietinis įrašymas",
+        "desc": "Pranešėjas įrašo seminarą savo įrenginyje ir visi mato, kad įrašymas vyksta"
+      },
+      "F14": {
+        "name": "AI susitikimų užrašai",
+        "desc": "Kai pranešėjas įjungia, kalba ir ekranai įrašomi ir apibendrinami į pagrindinius punktus, sprendimus ir užduotis"
+      },
+      "F15": {
+        "name": "Asmeniniai susitikimų užrašai",
+        "desc": "Įrašykite susitikimą tik su mikrofonu ir gaukite susitikimų užrašus (administratoriai)"
+      },
+      "F16": {
+        "name": "Išverstos antraštės",
+        "desc": "Rodyti antraštes, išverstas į jūsų pasirinktą kalbą"
+      },
+      "F17": {
+        "name": "Klausytis vertimo",
+        "desc": "Skaityti išverstas antraštes balsu su sintetiniu balsu, sumažinant originalų garsą"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser prisijungimas",
+      "googleLogin": "Google prisijungimas",
+      "accountLink": "Paskyros susiejimas",
+      "deviceTest": "Kameros įrenginio testas",
+      "oneToTwo": "Pranešėjas 1 → 2 dalyviai",
+      "recovery": "Užšalimo atkūrimas ir stabilumas",
+      "structure": "Variklio struktūros valymas",
+      "autoQuality": "Automatinė kokybė, 30 dalyvių",
+      "roomService": "Įėjimas į kambarį ir įrašymas",
+      "roomUi": "Kambario ekranas (foyer·scena·pokalbis·pakelti ranką·moderavimas)",
+      "createForm": "Sukurti ekraną",
+      "list": "Sąrašas",
+      "detail": "Detalės",
+      "payRequest": "Mokėjimo užklausa",
+      "payVerify": "Sumos patikrinimas ir įėjimas",
+      "settle": "Išmoka",
+      "vod": "Įrašo pakartojimas",
+      "appRelay": "Variklio priedų signalo kanalas",
+      "aiBase": "AI, balso fragmentai, sutikimas ir duomenų lentelės",
+      "shareLinks": "Kalendoriaus nuoroda, .ics ir el. pašto kvietimas",
+      "noiseLight": "Triukšmo mažinimas ir apšvietimas",
+      "liveCaptions": "Tiesioginės antraštės",
+      "pollQnaAttend": "Apklausos, klausimai ir atsakymai bei dalyvių sąrašas",
+      "backgrounds": "Suliejimas, išankstiniai nustatymai ir jūsų nuotrauka",
+      "localRecording": "Pranešėjo įrašymas ir įrašymo ženklelis",
+      "aiNotes": "Įrašymas, santrauka ir užrašų puslapis",
+      "inPersonNotes": "Tik mikrofono užrašai ir mano užrašai",
+      "captionTranslate": "Kalbos pasirinkimas ir originalo/vertimo perjungimas",
+      "dubbing": "Sintetinio balso atkūrimas ir sumažintas originalus garsas"
+    },
+    "refLabel": "Nuorodos modelis",
+    "uiRef": "UI bazinė linija — plačiai naudojamos žiniatinklio vaizdo susitikimų programos ekrano ir funkcijų modeliai, pritaikyti seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Vardas išsaugotas, bet kitiems dabar negalėjo būti pranešta. Jie jį matys, kai vėl prisijungsite.",
+      "tile": "Spustelėkite, kad pakeistumėte mano vardą",
+      "menu": "Pakeisti mano vardą",
+      "title": "Mano vardas šiame seminare",
+      "hint": "Iki 30 simbolių. Naudojamas tik šiame seminare ir iš karto atnaujinamas visų ekrane.",
+      "save": "Išsaugoti",
+      "saving": "Išsaugoma…",
+      "cancel": "Atšaukti",
+      "taken": "Šį vardą jau naudoja kažkas kitas (vedėjas arba dalyvis). Pasirinkite kitą.",
+      "failed": "Nepavyko išsaugoti jūsų vardo. Bandykite dar kartą."
+    },
+    "roomTitle": {
+      "edit": "Spustelėkite, kad redaguotumėte paantraštę",
+      "label": "Paantraštė",
+      "placeholder": "Paantraštė (iki 60)",
+      "save": "Išsaugoti",
+      "cancel": "Atšaukti",
+      "failed": "Nepavyko išsaugoti paantraštės."
+    },
+    "mirror": "Atspindėti mano vaizdo įrašą",
+    "barPin": "Visada rodyti apatinę juostą",
+    "barAuto": "Automatiškai slėpti apatinę juostą",
+    "title": "Prisijungti prie seminaro · {room}",
+    "titleSeminar": "Laukiamasis kambarys",
+    "noEngine": "Vaizdo serveris dar neparuoštas.",
+    "joinAs": "Prisijungti kaip",
+    "presenter": "Pranešėjas",
+    "audience": "Auditorija",
+    "join": "Prisijungti dabar",
+    "nameLabel": "Vardas",
+    "audienceHint": "Auditorijos nariai nenaudoja kameros ar mikrofono. Prisijungę matysite ir girdėsite pranešėją.",
+    "preview": {
+      "pending": "Ruošiama kamera ir mikrofonas…",
+      "audioOnly": "Kamera nepasiekiama – siunčiamas tik garsas.",
+      "none": "Kamera ir mikrofonas nepasiekiami. Patikrinkite leidimus (vis tiek galite prisijungti be medijos).",
+      "videoOnly": "Mikrofonas nepasiekiamas – siunčiamas tik vaizdas. Patikrinkite mikrofono leidimą."
+    },
+    "mic": {
+      "on": "Išjungti mikrofoną",
+      "off": "Įjungti mikrofoną"
+    },
+    "cam": {
+      "on": "Išjungti kamerą",
+      "off": "Įjungti kamerą"
+    },
+    "controls": "Skambučio valdikliai",
+    "leave": "Išeiti",
+    "enableSound": "Įjungti garsą",
+    "state": {
+      "connecting": "Jungiamasi…",
+      "reconnecting": "Jungiamasi iš naujo…"
+    },
+    "waiting": "Laukiama pranešėjo.",
+    "rejoin": "Prisijungti iš naujo",
+    "err": {
+      "generic": "Kažkas nutiko. Prašome prisijungti iš naujo.",
+      "CLOSED": "Ryšys nutrūko.",
+      "NO_ENGINE": "Vaizdo serveris dar neparuoštas.",
+      "TICKET_401": "Prašome prisijungti.",
+      "TICKET_403": "Neturite leidimo pristatyti. Prisijunkite kaip auditorija.",
+      "TICKET_503": "Vaizdo serveris dar nesukonfigūruotas.",
+      "TICKET_NETWORK": "Patikrinkite tinklo ryšį.",
+      "TICKET_INVALID": "Jūsų įėjimo leidimas baigėsi.",
+      "TICKET_EXPIRED": "Jūsų įėjimo leidimas baigėsi.",
+      "ROOM_FULL": "Vietų nebėra.",
+      "ROOM_CLOSED": "Kambarys uždarytas – seminaras baigėsi arba vedėjas išėjo ilgiau nei 5 minutėms.",
+      "DUPLICATE_SESSION": "Prisijungėte iš kito įrenginio, todėl šis ekranas buvo atjungtas.",
+      "ROLE_FORBIDDEN": "Neturite leidimo pristatyti.",
+      "WS_FAILED": "Nepavyko prisijungti prie vaizdo serverio.",
+      "ICE_FAILED": "Vaizdo ryšys nutrūko. Patikrinkite tinklą.",
+      "MEDIA_FAILED": "Nepavyko paleisti kameros ar mikrofono.",
+      "TIMEOUT": "Vaizdo serveris neatsako.",
+      "TICKET_402": "Tai mokamas seminaras. Prieš įeidami, sumokėkite seminaro puslapyje.",
+      "TICKET_404": "Seminaras nerastas.",
+      "TICKET_409": "Šis seminaras baigėsi arba buvo atšauktas.",
+      "TICKET_HOST_AWAY": "Vedėjas dar neprisijungė arba išėjo ilgiau nei 5 minutėms, todėl negalite prisijungti. Bandykite dar kartą, kai prisijungs vedėjas.",
+      "TICKET_PLAN_EXHAUSTED": "Šio seminaro plano laikas baigėsi, todėl jis negali prasidėti. Dar kartą įsigijus tą patį planą, pridedamas laikas (nemokamas atnaujinamas su 1 valanda kitą mėnesį)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Nepavyko pakeisti mikrofono. Bandykite dar kartą.",
+        "video": "Nepavyko pakeisti kameros. Bandykite dar kartą."
+      },
+      "forbidden": "Neturite leidimo pristatyti, todėl tęsite kaip auditorija.",
+      "demoted": "Buvote perkeltas atgal į auditoriją.",
+      "endFailed": "Nepavyko užbaigti seminaro. Bandykite dar kartą.",
+      "chatFailed": "Žinutė neišsiųsta.",
+      "actionFailed": "Nepavyko įvykdyti užklausos. Bandykite dar kartą.",
+      "shareFailed": "Nepavyko pradėti ekrano bendrinimo.",
+      "err": {
+        "RATE_LIMITED": "Siunčiate per greitai. Palaukite.",
+        "ROLE_FORBIDDEN": "Neturite leidimo tai atlikti.",
+        "MEDIA_FAILED": "Nepavyko paleisti mikrofono ar kameros. Patikrinkite leidimus.",
+        "LOCKED": "Užrakinta pranešėjo."
+      },
+      "mutedBy": {
+        "audio": "Pranešėjas išjungė jūsų mikrofoną.",
+        "video": "Pranešėjas išjungė jūsų kamerą."
+      },
+      "policy": {
+        "locked": "Pranešėjas užrakino mikrofonus. Galėsite įjungti savo, kai jie bus atrakinti.",
+        "unlocked": "Mikrofonai atrakinti."
+      },
+      "consent": {
+        "saveFail": "Nepavyko išsaugoti jūsų sutikimo. Patikrinkite registraciją ir vėl įjunkite mikrofoną."
+      }
+    },
+    "home": "Eiti į pagrindinį puslapį",
+    "tile": {
+      "fullscreen": "Dukart spustelėkite, kad būtų viso ekrano režimas · Esc, kad išeitumėte",
+      "self": "{name} (jūs)",
+      "presenter": "Pranešėjas",
+      "micOff": "Mikrofonas išjungtas",
+      "screen": "{name} ekranas",
+      "row": "Kiti kalbėtojai",
+      "pin": "Rodyti {name} dideliu formatu",
+      "unpin": "Automatinis išdėstymas"
+    },
+    "more": "Daugiau parinkčių",
+    "joinNoCam": "Prisijungti be kameros",
+    "net": {
+      "afterJoin": "Jūsų ryšys automatiškai patikrinamas prisijungus.",
+      "measuring": "Tikrinamas ryšys…",
+      "good": "Geras ryšys",
+      "fair": "Vidutinis ryšys",
+      "poor": "Prastas ryšys",
+      "reason": {
+        "loss": {
+          "audio": "Prarandama {pct}% garso duomenų.",
+          "video": "Prarandama {pct}% vaizdo duomenų."
+        },
+        "rate": {
+          "audio": "Garso įkėlimo greitis mažas: {kbps} kbps.",
+          "video": "Vaizdo įkėlimo greitis mažas: {kbps} kbps. Kokybė gali pablogėti."
+        }
+      }
+    },
+    "people": "{n} kambaryje",
+    "screen": {
+      "start": "Bendrinti ekraną",
+      "stop": "Stabdyti bendrinimą"
+    },
+    "panel": {
+      "title": "Pokalbiai · Klausimai ir atsakymai · Apklausos · Žmonės",
+      "chat": "Pokalbiai",
+      "people": "Žmonės",
+      "close": "Uždaryti skydelį",
+      "qna": "Klausimai ir atsakymai",
+      "polls": "Apklausos"
+    },
+    "chat": {
+      "empty": "Dar nėra pranešimų. Pokalbiai neišsaugomi.",
+      "me": "Jūs",
+      "failed": "Neišsiųsta.",
+      "retry": "Bandyti dar kartą",
+      "input": "Įveskite žinutę",
+      "send": "Siųsti"
+    },
+    "hand": {
+      "raise": "Pakelti ranką",
+      "lower": "Nuleisti ranką",
+      "list": "Pakeltos rankos",
+      "lowerAll": "Nuleisti visas rankas",
+      "raised": "Ranka pakelta",
+      "notice": "{name} pakėlė ranką.",
+      "dismiss": "Atmesti",
+      "waiting": "{n} žmonės laukia, kol galės kalbėti"
+    },
+    "react": {
+      "open": "Reakcijos",
+      "e0": "Patinka",
+      "e1": "Plojimai",
+      "e2": "Juokas",
+      "e3": "Nustebęs",
+      "e4": "Liūdnas",
+      "e5": "Be žado",
+      "e6": "Meilė"
+    },
+    "quality": {
+      "label": "Kokybė",
+      "auto": "Automatinis",
+      "high": "Aukšta",
+      "medium": "Vidutinė",
+      "low": "Žema",
+      "unstable": "Jūsų tinklas nestabilus"
+    },
+    "roles": {
+      "presenter": "Pranešėjas",
+      "panel": "Diskusijos dalyvis",
+      "audience": "Auditorija"
+    },
+    "stage": {
+      "invite": "Pakviesti į sceną",
+      "remove": "Perkelti į auditoriją",
+      "promoted": "Buvote pakviestas į sceną. Jei pakėlėte ranką, jūsų kamera įsijungia automatiškai (nebent užrakinta arba neleidžiama). Įjunkite mikrofoną, kad kalbėtumėte (mikrofonas neįsijungia automatiškai).",
+      "later": "Vėliau"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} pakėlė ranką."
+    },
+    "leaveDialog": {
+      "title": "Palikti seminarą",
+      "body": "Galite išeiti vienas arba užbaigti seminarą ir atjungti visus.",
+      "confirmTitle": "Baigti seminarą?",
+      "confirmBody": "Visi bus atjungti ir niekas negalės vėl prisijungti prie šio seminaro.",
+      "cancel": "Atšaukti",
+      "end": "Baigti seminarą",
+      "endConfirm": "Baigti dabar"
+    },
+    "mod": {
+      "muteAll": "Nutildyti visus",
+      "lock": "Užrakinti mikrofonus",
+      "unlock": "Atrakinti mikrofonus",
+      "locked": "Pranešėjas užrakino mikrofonus",
+      "muteMic": "Nutildyti mikrofoną",
+      "askMic": "Prašyti įjungti garsą",
+      "muteCam": "Išjungti kamerą",
+      "muteMicOf": "Nutildyti {name}",
+      "askMicOf": "Paprašyti {name} įjungti garsą",
+      "muteCamOf": "Išjungti {name} kamerą"
+    },
+    "ask": {
+      "audio": "Pranešėjas paprašė jūsų įjungti mikrofoną.",
+      "video": "Pranešėjas paprašė jūsų įjungti kamerą.",
+      "ignore": "Ignoruoti"
+    },
+    "toDetail": "Eiti į seminaro puslapį",
+    "consent": {
+      "title": "Prieš įjungdami mikrofoną",
+      "body": "Jei šiame seminare įjungtas įrašymas, subtitrai ar AI susitikimo užrašai, jūsų balsas gali būti konvertuojamas į tekstą, saugomas ir verčiamas. Balso apdorojimą atlieka AI paslauga už jūsų šalies ribų. Jei nesutinkate, jūsų mikrofonas vis tiek įsijungs – tik jūsų balsas nebus apdorojamas.",
+      "privacy": "Privatumo politika",
+      "newTab": "(atidaroma naujame skirtuke)",
+      "decline": "Nesutinku",
+      "agree": "Sutinku ir įjungiu mikrofoną",
+      "notice": "Kai įjungtas įrašymas, subtitrai ar AI susitikimo užrašai, kalbėtojų balsai apdorojami. Auditorijos balsai nesiunčiami.",
+      "saveFailClosed": "Šis seminaras baigėsi, todėl sutikimo negalima įrašyti."
+    },
+    "captions": {
+      "title": "Subtitrai",
+      "room": "Tiesioginiai subtitrai (visas kambarys)",
+      "show": "Rodyti subtitrus",
+      "size": {
+        "label": "Teksto dydis",
+        "sm": "Mažas",
+        "md": "Vidutinis",
+        "lg": "Didelis"
+      },
+      "waiting": "Subtitrai pasirodys, kai pranešėjas juos įjungs",
+      "limit": "Pasiekta kalbos apdorojimo riba, todėl subtitrai ir AI minutės sustabdytos",
+      "sendFail": "Nepavyko įjungti subtitrų. Bandykite dar kartą po kurio laiko.",
+      "sendFailOff": "Nepavyko išjungti subtitrų. Bandykite dar kartą po kurio laiko.",
+      "region": "Subtitrai",
+      "translate": "Rodyti išverstus subtitrus",
+      "lang": "Vertimo kalba",
+      "langMine": "Mano kalbos",
+      "langAll": "Visos kalbos",
+      "trStop": {
+        "forbidden": "Išversti subtitrai skirti tik registruotiems dalyviams. Rodomas originalas.",
+        "unavailable": "Išversti subtitrai šiuo metu nepasiekiami. Rodomas originalas.",
+        "quota": "Šis seminaras pasiekė vertimo limitą. Rodomas originalas.",
+        "usrQuota": "Išnaudojote savo vertimo limitą šiam seminarui. Rodomas originalas."
+      },
+      "unsupported": "Šis įrenginys negali kurti tiesioginių subtitrų (šioje naršyklėje nepalaikomas garso įrašymas)"
+    },
+    "effects": {
+      "title": "Efektai",
+      "light": "Šviesos korekcija",
+      "noise": "Triukšmo mažinimas",
+      "noiseFail": "Triukšmo mažinimo negalima pakeisti šiame įrenginyje",
+      "close": "Uždaryti",
+      "preview": "Mano peržiūra",
+      "bg": "Fonas",
+      "bgNone": "Nėra",
+      "bgBlur": "Sulieti",
+      "scenes": {
+        "beach": "🏝️ Maldyvų paplūdimys",
+        "autumn": "🍁 Rudens slėnis",
+        "fireplace": "🔥 Židinys",
+        "xmas": "🎄 Kalėdų posėdžių kambarys"
+      },
+      "bgs": {
+        "dusk": "Prieblanda",
+        "ocean": "Vandenynas",
+        "forest": "Miškas",
+        "studio": "Studija",
+        "grid": "Tinklelis",
+        "dots": "Taškai"
+      },
+      "myAdd": "Mano paveikslėlis",
+      "myItem": "Mano paveikslėlis {n}",
+      "myDel": "Ištrinti mano paveikslėlį {n}",
+      "mySaveFail": "Fonas pritaikytas, bet nepavyko išsaugoti šiame įrenginyje (tik šiam susitikimui)",
+      "bgStopped": "Fono efektas sustojo ir buvo išjungtas. Pasirinkite jį dar kartą, kad paleistumėte iš naujo.",
+      "myNote": "Jūsų vaizdai saugomi tik šiame įrenginyje (iki 3, po 2 MB kiekvienas)",
+      "mobileBlurOnly": "Telefonuose galimas tik sulietas fonas (vaizdo fonai veikia kompiuteryje)",
+      "myTooBig": "Galima naudoti tik iki 2 MB dydžio vaizdus",
+      "preparing": "Ruošiama…",
+      "bgFailed": "Nepavyko įkelti fono efekto",
+      "autoOff": "Jūsų įrenginys per lėtas, todėl fono efektas buvo išjungtas",
+      "unsupported": "Fono efektai šiame įrenginyje nepasiekiami",
+      "noCam": "Įjunkite kamerą, kad pasirinktumėte foną",
+      "lightUnsupported": "Šviesos korekcija šiame įrenginyje nepasiekiama",
+      "noiseUnsupported": "Triukšmo mažinimo nustatymai šiame įrenginyje nepalaikomi"
+    },
+    "sheetClose": "Uždaryti",
+    "polls": {
+      "new": "Nauja apklausa",
+      "question": "Klausimas",
+      "option": "Parinktis {n}",
+      "remove": "Pašalinti parinktį {n}",
+      "addOption": "Pridėti parinktį",
+      "start": "Pradėti apklausą",
+      "cancel": "Atšaukti",
+      "dup": "Parinktys turi skirtis",
+      "vote": "Balsuoti",
+      "change": "Pakeisti balsą",
+      "close": "Uždaryti apklausą",
+      "closed": "Uždaryta",
+      "mine": "Jūsų pasirinkimas",
+      "result": "{pct}% ({n} balsų)",
+      "total": "Iš viso {n} balsų",
+      "empty": "Dar nėra apklausų.",
+      "loading": "Įkeliama…",
+      "labOnly": "Apklausos galimos tik seminarų kambariuose.",
+      "started": "Prasidėjo nauja apklausa",
+      "goVote": "Balsuoti",
+      "votersNote": "Organizatorius gali matyti, kas už kurią parinktį balsavo.",
+      "voters": "Balsavo: {names}"
+    },
+    "qna": {
+      "sort": "Rūšiuoti",
+      "by": {
+        "top": "Populiariausi",
+        "new": "Naujausi"
+      },
+      "rcm": "Patinka ({n})",
+      "answered": "Atsakyta",
+      "answer": "Pažymėti kaip atsakyta",
+      "unanswer": "Atžymėti kaip atsakyta",
+      "hide": "Slėpti",
+      "doneN": "{n} atsakyta",
+      "backOpen": "Neatsakyti klausimai",
+      "empty": "Dar nėra klausimų.",
+      "emptyDone": "Nėra atsakytų klausimų.",
+      "loading": "Įkeliama…",
+      "input": "Užduoti klausimą (500 simbolių)",
+      "send": "Siųsti",
+      "left": "Liko {n}",
+      "labOnly": "Klausimai ir atsakymai galimi tik seminarų kambariuose."
+    },
+    "recording": {
+      "title": "Įrašyti",
+      "badge": "Įrašoma",
+      "unsupported": "Ši naršyklė nepalaiko įrašymo. Įrašykite naudodami įprastą naršyklę kompiuteryje.",
+      "piBrowserOnly": "Įrašymas veikia tik įprastoje naršyklėje (kompiuteryje ar mobiliajame telefone). Pi Browser negali išsaugoti įrašymo failų – atidarykite šį seminarą kompiuterio ar telefono naršyklėje (seminarz.vercel.app), kad įrašytumėte.",
+      "audioSuspended": "Garso įrašymas šiame įrenginyje galėjo neprasidėti. Gali būti įrašomas tik vaizdas.",
+      "notifyFailed": "Įrašymas neprasidėjo, nes nepavyko pranešti dalyviams. Bandykite dar kartą po kurio laiko.",
+      "confirm": {
+        "title": "Pradėti įrašymą?",
+        "body": "Prasidėjus įrašymui, visi matys „Įrašoma“ indikatorių. Failas išsaugomas tik šiame įrenginyje ir niekada neįkeliamas ar neperkeliamas į užsienį. Prieš pradėdami, praneškite dalyviams.",
+        "download": "Kai sustabdysite, MP4 failas bus išsaugotas jūsų atsisiuntimų aplanke (naršyklėms, kurios negali įrašyti MP4, prireiks šiek tiek laiko konvertuoti; ilgesni nei maždaug 45 minučių įrašai gali būti išsaugoti originaliu formatu). Naršyklės programoje gali blokuoti failų išsaugojimą, todėl įrašykite naudodami įprastą naršyklę kompiuteryje.",
+        "cancel": "Atšaukti",
+        "start": "Pradėti įrašymą",
+        "charge": "Įrašymo metu įrašymo laikas atimamas iš jūsų apmokėto laiko, be kambario laiko (2x įrašymo metu). Kai apmokėtas laikas baigiasi, įrašymas sustabdomas ir failas išsaugomas."
+      },
+      "resave": {
+        "label": "Įrašymo failas",
+        "save": "Išsaugoti dar kartą",
+        "dismiss": "Uždaryti išsaugojimą dar kartą"
+      },
+      "toast": {
+        "started": "Įrašymas pradėtas – visi gali tai matyti",
+        "saved": "Įrašas išsaugotas. Patikrinkite atsisiuntimų aplanką. Jei nieko nebuvo išsaugota, bakstelėkite [Išsaugoti dar kartą] ekrano viršuje.",
+        "autoStopped": "Įrašymas baigėsi, nes naršyklė jį sustabdė arba buvo pasiekta dydžio riba. Viskas iki to momento buvo išsaugota. Norėdami tęsti, pradėkite įrašymą iš naujo.",
+        "empty": "Nieko nebuvo įrašyta, todėl failas nebuvo sukurtas.",
+        "saveFailed": "Nepavyko sukurti įrašymo failo.",
+        "converting": "Konvertuojamas įrašas į MP4. Prašome palikti šį langą atidarytą.",
+        "savedOriginal": "Nepavyko konvertuoti į MP4, todėl įrašas buvo išsaugotas originaliu formatu (webm). Patikrinkite atsisiuntimų aplanką.",
+        "startedBy": "Pranešėjas pradėjo įrašymą",
+        "stoppedBy": "Pranešėjas sustabdė įrašymą"
+      },
+      "paidOnly": "Įrašymas galimas tik seminaruose, atidarytuose pagal mėnesio ar metinį planą, kol liko apmokėto laiko.",
+      "planOut": "Apmokėtas laikas baigėsi, todėl įrašymas sustabdytas ir failas išsaugotas.",
+      "notInRoom": "Vis dar patvirtinama, kad esate kambaryje. Pradėkite įrašymą iš naujo po kurio laiko.",
+      "meterFailed": "Nepavyko patikrinti įrašymo laiko, todėl įrašymas neprasidėjo. Bandykite dar kartą po kurio laiko.",
+      "paidOut": "Nėra likusio apmokėto laiko, todėl įrašymas negali prasidėti. Norėdami įrašyti, vėl įsigykite tą patį planą.",
+      "pausedBadge": "Įrašymas pristabdytas",
+      "controls": "Įrašo valdymas",
+      "pause": "Pauzė",
+      "resume": "Tęsti",
+      "stop": "Stabdyti įrašymą"
+    },
+    "notes": {
+      "on": "AI užrašai",
+      "badge": "AI užrašai įjungti",
+      "started": "Pranešėjas įjungė AI užrašus",
+      "stopped": "AI užrašai išjungti",
+      "startedMine": "AI užrašai įjungti – rodomi visiems",
+      "stoppedMine": "AI užrašai išjungti – kuriami užrašai",
+      "startFail": "Nepavyko paleisti AI užrašų",
+      "gone": "AI užrašai sustabdyti – užrašai buvo baigti arba ištrinti kitur",
+      "unsupported": "AI užrašų čia negalima įjungti (nepalaikomas garso įrašymas)"
+    },
+    "dubbing": {
+      "listen": "Klausytis išverstu balsu",
+      "blocked": "Nepavyko paleisti išversto balso. Prašome vėl įjungti",
+      "stopped": "Išverstas balsas šiuo metu nepasiekiamas, todėl buvo išjungtas",
+      "usrQuota": "Išnaudojote šio seminaro išversto balso limitą, todėl jis buvo išjungtas"
+    },
+    "plan": {
+      "warn": "Liko {min} min. šio seminaro plane.",
+      "ended": "Jūsų seminaro laikas baigėsi, todėl seminaras baigėsi ir jūs išėjote iš kambario.",
+      "left": "Liko seminaro laiko",
+      "closed": "Seminaras baigėsi, todėl jūs išėjote iš kambario.",
+      "hostAway": "Vedėjas išėjo iš kambario. Jei jis negrįš per 5 minutes, visi dalyviai bus pašalinti.",
+      "hostGone": "Vedėjas negrįžo per 5 minutes, todėl jūs išėjote iš kambario. Galite vėl prisijungti, kai prisijungs vedėjas."
+    },
+    "toLobby": "Laukiamasis"
+  },
+  "list": {
+    "tabsLabel": "Seminarų sąrašo rodinys",
+    "tabs": {
+      "all": "Visi",
+      "hosted": "Mano vedami",
+      "joined": "Prisijungti"
+    },
+    "empty": {
+      "all": "Nėra būsimų seminarų.",
+      "hosted": "Jūs nevedėte jokių seminarų.",
+      "joined": "Jūs neprisijungėte prie jokių seminarų."
+    },
+    "loading": "Įkeliama…",
+    "retry": "Bandyti dar kartą",
+    "free": "Nemokamai",
+    "fee": "{amount} Pi",
+    "host": "Vedėjas {name}",
+    "capacity": "Vietų skaičius {n}",
+    "status": {
+      "SCHEDULED": "Suplanuota",
+      "LIVE": "Tiesiogiai",
+      "ENDED": "Baigta",
+      "CANCELED": "Atšaukta"
+    },
+    "hostNew": "Sukurti seminarą",
+    "progress": "Progresas",
+    "pager": "Puslapiavimas",
+    "prev": "Ankstesnis",
+    "next": "Kitas",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Paantraštė",
+      "placeholder": "Pridėti paantraštę",
+      "save": "Išsaugoti paantraštę",
+      "saving": "Išsaugoma…",
+      "saved": "Išsaugota."
+    },
+    "loading": "Įkeliama…",
+    "back": "Grįžti į sąrašą",
+    "notFound": "Seminaras nerastas.",
+    "status": {
+      "SCHEDULED": "Suplanuota",
+      "LIVE": "Tiesiogiai",
+      "ENDED": "Baigta",
+      "CANCELED": "Atšaukta"
+    },
+    "startAt": "Data",
+    "host": "Vedėjas",
+    "seats": "Liko vietų",
+    "seatsValue": "{left} / {max}",
+    "fee": "Seminaro mokestis",
+    "feeValue": "{amount} Pi",
+    "free": "Nemokamai",
+    "enter": "Įeiti",
+    "payEnter": "Mokėti su Pi ir įeiti ({amount} Pi)",
+    "paying": "Vykdomas mokėjimas…",
+    "joining": "Registruojama…",
+    "registered": "Jūs esate užsiregistravęs.",
+    "full": "Šis seminaras pilnas.",
+    "closed": "Šis seminaras baigėsi.",
+    "canceled": "Šis seminaras buvo atšauktas.",
+    "roomLink": "Eiti į kambarį (vedėjas)",
+    "piBrowserOnly": "Mokėjimas galimas Pi Browser po prisijungimo prie Pi.",
+    "payCancelled": "Mokėjimas atšauktas.",
+    "payStillWaiting": "Vis dar laukiama piniginės. Jei jau prisijungėte prie Pi Wallet, palaukite.",
+    "payFailed": "Mokėjimas nepavyko.",
+    "err": {
+      "NAME_TAKEN": "Šis vardas jau naudojamas kito asmens. Pasirinkite kitą.",
+      "CAL_READ_FAILED": "Nepavyko įkelti jūsų įvykių. Patikrinkite adresą.",
+      "ISLAND_FULL": "Visi 100 salų pavadinimų šiuo metu naudojami. Galite atidaryti naują seminarą, kai baigsis arba bus atšauktas būsimas ar tiesioginis seminaras.",
+      "SMN_FULL": "Šis seminaras pilnas.",
+      "SMN_CLOSED": "Šis seminaras baigėsi arba buvo atšauktas.",
+      "SMN_ALREADY": "Jūs jau esate užsiregistravęs arba vykdomas mokėjimas.",
+      "SMN_FREE": "Nemokami seminarai nereikalauja mokėjimo.",
+      "SMN_PAY_REQUIRED": "Tai mokamas seminaras. Prašome sumokėti, kad galėtumėte įeiti.",
+      "SMN_PAY_INVALID": "Nepavyko patikrinti jūsų mokėjimo. Prašome susisiekti su administratoriumi.",
+      "PAY_PI_FAILED": "Nepavyko pasiekti Pi mokėjimo serverio. Prašome bandyti dar kartą netrukus.",
+      "PAY_MISMATCH": "Mokėjimo duomenys nesutampa.",
+      "PAY_AMOUNT_MISMATCH": "Mokėjimo suma skiriasi nuo seminaro mokesčio.",
+      "PAY_CANCELLED": "Šis mokėjimas buvo atšauktas.",
+      "PAY_ALREADY_PAID": "Mokėjimas vis dar apdorojamas. Jei prisijungėte prie piniginės, bandykite dar kartą po 3 minučių.",
+      "PAY_INVALID_STATE": "Šis mokėjimas šiuo metu negali būti apdorotas.",
+      "PAY_PI_CANCEL_REFUSED": "Mokėjimas jau vykdomas ir negali būti atšauktas. Prašome patikrinti dar kartą netrukus."
+    },
+    "share": {
+      "title": "Tvarkaraštis ir bendrinimas",
+      "calendar": "Pridėti į kalendorių",
+      "ics": "Kalendoriaus failas",
+      "mail": "Pakviesti el. paštu",
+      "mailApp": "Siųsti su numatytąja pašto programa",
+      "mailSubject": "[Seminaro kvietimas] {title}",
+      "mailBody": "{title}\nKada: {start}\n\nPrisijunkite tiesiogiai naudodami šią nuorodą.\nKompiuteris: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopijuoti nuorodą",
+      "copied": "Nuoroda nukopijuota.",
+      "copyFail": "Nepavyko nukopijuoti. Prašome nukopijuoti nuorodą iš adreso juostos.",
+      "share": "Bendrinti su kita programa",
+      "shareFail": "Nepavyko bendrinti. Prašome naudoti „Kopijuoti nuorodą“.",
+      "created": "Jūsų seminaras paruoštas. Pridėkite jo pradžios laiką į savo Google kalendorių.",
+      "addGoogle": "Pridėti į Google kalendorių",
+      "later": "Vėliau",
+      "piBrowserOpen": "Pi Browser programoje kalendorius, el. paštas ir kalendoriaus failas atidaromi jūsų telefono numatytojoje naršyklėje.",
+      "extFail": "Nepavyko atidaryti. Atnaujinkite Pi Browser arba naudokite „Kopijuoti nuorodą“ ir atidarykite ją įprastoje naršyklėje (seminarz.vercel.app).",
+      "icsPiBrowser": "Kalendoriaus failą galima atsisiųsti tik įprastoje naršyklėje (kompiuteryje ar mobiliajame telefone). Pi Browser programoje naudokite „Pridėti į kalendorių“."
+    },
+    "attendance": "Dalyvavimas",
+    "plan": "Planas",
+    "left": "Liko laiko"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Ankstesnis mėnuo",
+      "next": "Kitas mėnuo",
+      "connect": "Rodyti mano Google kalendorių",
+      "change": "Tvarkyti Google kalendorius ({n})",
+      "add": "Pridėti",
+      "remove": "Pašalinti",
+      "close": "Uždaryti",
+      "failed": "Nepavyko įkelti įvykių iš {n} kalendoriaus (-ių). Patikrinkite adresą.",
+      "badUrl": "Įklijuokite „Slaptą adresą iCal formatu“ (…/basic.ics) iš Google kalendoriaus nustatymų, o ne naršyklės adreso juostos.",
+      "full": "Galite pridėti iki {n} kalendorių.",
+      "allDay": "Visą dieną",
+      "day": "Mano įvykiai šią dieną",
+      "count": "{n, plural, one {# įvykis} other {# įvykiai}}",
+      "more": "+{n}",
+      "picked": "Ši data nustatyta kaip pradžios data. Pasirinkite laiką žemiau.",
+      "s1": "Bakstelėkite [Atidaryti Google kalendoriaus nustatymus] žemiau.",
+      "s2": "Kairėje esančiame sąraše „Mano kalendorių nustatymai“ pasirinkite kalendorių (pvz., savo vardą).",
+      "s3": "Slinkite žemyn iki „Integruoti kalendorių“ ir nukopijuokite „Slaptą adresą iCal formatu“.",
+      "s4": "Įklijuokite jį čia ir bakstelėkite [Pridėti] – kalendoriaus datose pasirodys įvykių pavadinimai. Taip pat galite pridėti iki 5 kitų kalendorių.",
+      "open": "Atidaryti Google kalendoriaus nustatymus",
+      "privacy": "Šis adresas yra jūsų kalendoriaus raktas – nesidalinkite juo. Jis saugomas tik šiame įrenginyje, niekada mūsų serveryje."
+    },
+    "title": "Sukurti seminarą",
+    "name": "Keliaukime į gražią salą!",
+    "subTitle": "Paantraštė (neprivaloma, iki 60 simbolių)",
+    "startAt": "Pradžios laikas",
+    "maxCnt": "Vietų skaičius (1–100)",
+    "submit": "Sukurti",
+    "submitting": "Kuriama…",
+    "invalid": "Patikrinkite įvestį – data per vienerius metus nuo dabar, vietų skaičius 1–100.",
+    "attendance": {
+      "title": "Dalyvavimas",
+      "back": "Grįžti į seminarą",
+      "loading": "Įkeliama…",
+      "forbidden": "Dalyvavimą gali peržiūrėti tik vedėjas ir administratoriai.",
+      "count": "{n} žmonės",
+      "csv": "Atsisiųsti CSV",
+      "empty": "Dar niekas neprisijungė.",
+      "online": "Prisijungęs",
+      "left": "Išėjo",
+      "col": {
+        "name": "Vardas",
+        "pi": "Pi vartotojo vardas",
+        "ent": "Pirmą kartą prisijungė",
+        "hb": "Paskutinį kartą matytas",
+        "dur": "Dalyvavimo laikas",
+        "min": "Dalyvavo (min., neįskaitant laiko, praleisto neprisijungus)",
+        "state": "Būsena"
+      },
+      "durNote": "Dalyvavimo laikas skaičiuojamas nuo pirmo prisijungimo iki paskutinio matymo, atėmus laiką, praleistą neprisijungus (pertraukos ilgesnės nei 2,5 minutės).",
+      "csvPiBrowser": "CSV atsisiuntimas veikia tik įprastoje naršyklėje (kompiuteryje ar mobiliajame telefone). Pi Browser negali išsaugoti failų – atidarykite šį dalyvavimo lapą kompiuterio ar telefono naršyklėje (seminarz.vercel.app)."
+    },
+    "plan": "Planas",
+    "planFree": "Nemokamai – {time} liko šį mėnesį · be AI",
+    "planPaid": "{name} {time} · {price} – mokėti kuriant",
+    "planHint": "Seminaras, atidarytas su mokamu planu, pirmiausia naudoja to plano laiką, tada tęsiasi su šio mėnesio nemokamu laiku (nemokamoje dalyje AI išjungtas). Aktyvus planas atidaromas be mokėjimo; mėnesinis ar metinis, kurio neturite, apmokamas Pi, kai paspaudžiate „Sukurti“, tada seminaras atidaromas (Pi Browser). Dalyviams prisijungimas visada nemokamas.",
+    "planOwned": "{name} – aktyvus · liko {time}",
+    "planEnds": "Pradžios laikas yra po šio plano galiojimo pabaigos. Perkelkite pradžią anksčiau arba pasirinkite kitą planą.",
+    "paidKept": "Jūsų mokamas abonementas išsaugotas. Ištaisykite problemą ir vėl paspauskite „Sukurti“ (antras mokėjimas nereikalingas)."
+  },
+  "privacy": {
+    "title": "Privatumo politika – balso ir AI funkcijos",
+    "effective": "Galioja nuo {date}",
+    "intro": "Ši politika paaiškina asmeninę informaciją, kurią apdorojame, kai naudojate tiesioginius subtitrus, išverstus subtitrus, balso vertimą, AI susitikimų užrašus ir asmeninius užrašus seminare. Šios funkcijos naudoja išorinę AI paslaugą, todėl informacija perduodama į užsienį.",
+    "whoTitle": "Kieno informacija apdorojama",
+    "who": [
+      "Pranešėjai ir dalyviai scenoje: jūsų sutikimo prašome vieną kartą, prieš pirmą kartą įjungiant mikrofoną. Galite prisijungti prie seminaro be sutikimo.",
+      "Auditorija: jūs nenaudojate mikrofono, todėl balsas nesiunčiamas. Jūs matote tik subtitrus ir užrašus.",
+      "Asmeniniai užrašai: administratorius įrašo susitikimą su mikrofonu ir patvirtina, kad dalyviai buvo informuoti prieš įrašymą."
+    ],
+    "xferTitle": "Asmens duomenų perdavimas į užsienį (Korėjos asmens duomenų apsaugos įstatymas, 28-8 str.)",
+    "xfer": [
+      {
+        "k": "Gavėjas",
+        "v": "Google LLC (Gemini API) – kontaktas [TBD: Google privatumo kontaktas]"
+      },
+      {
+        "k": "Šalys",
+        "v": "Jungtinės Amerikos Valstijos ir kitos šalys, kuriose yra Google duomenų centrai [TBD: apdorojimo regionas]"
+      },
+      {
+        "k": "Kada ir kaip",
+        "v": "Maždaug kas 5 sekundes, kol funkcija įjungta, per šifruotą ryšį (HTTPS). Asmeniniams užrašams visas įrašas siunčiamas dar kartą 5 minučių dalimis, kai užrašas baigiasi (tikslus transkribavimas)."
+      },
+      {
+        "k": "Elementai",
+        "v": "Balsas, kalbamas turinys (tekstas), kalbėtojo rodomas vardas (užrašų santraukoms), ekrano bendrinimo ekrano nuotraukos (kai įjungti AI užrašai)"
+      },
+      {
+        "k": "Tikslas",
+        "v": "Kalbos į tekstą konvertavimas, vertimas, susitikimų užrašų santraukos, sintetinė kalba (standartiniai balsai, be balso klonavimo), kalbėtojų atskyrimas asmeniniams užrašams (balsai atskiriami ir žymimi pagal suvokiamą lytį, pvz., Vyras 1 / Moteris 1 – vardai ar tapatybės nenustatomos)"
+      },
+      {
+        "k": "Saugojimas",
+        "v": "Baigiasi, kai tik grąžinamas rezultatas. Prašome Google nesaugoti užklausų (store=false). Piktnaudžiavimo stebėjimo žurnalai vis dar gali būti saugomi pagal Google sąlygas [TBD: saugojimo laikotarpis ir mokamo lygio statusas]."
+      },
+      {
+        "k": "Kaip atsisakyti ir kas atsitiks",
+        "v": "Jei nesutinkate arba išjungiate mikrofoną, balsas nesiunčiamas. Vis tiek galite dalyvauti seminare; tik jūsų kalbos subtitrai, vertimai ir užrašai nekuriami. Sutikimą galite atšaukti bet kuriuo metu [TBD: kur yra atšaukimo mygtukas]."
+      }
+    ],
+    "keepTitle": "Ką saugo ši paslauga",
+    "keep": [
+      "Originalus garsas: seminaro subtitrams ir AI susitikimų užrašams jis nesaugomas; jis išmetamas iškart po konvertavimo į tekstą. Asmeniniams užrašams įrašas saugomas privačioje saugykloje, kad po susitikimo jį būtų galima tiksliau transkribuoti (su kalbėtojais), ir jis ištrinamas kasdienio valymo metu, praėjus 1 dienai po užrašo pabaigos (iškart, jei užrašas ištrinamas).",
+      "Tiesioginiai subtitrai: nesaugomi.",
+      "AI susitikimų užrašai (kai pranešėjas juos įjungia): kalbamas turinys, ekrano nuotraukos ir santrauka, saugomi, kol užrašai ištrinami [TBD: maksimalus saugojimo laikotarpis].",
+      "Sutikimo įrašai: sutikimo laikas ir politikos versija, saugomi kaip įrodymas [TBD: saugojimo laikotarpis].",
+      "Naudojimas: užklausų skaičius per minutę ir apdorojimo laikas, naudojami išlaidų limitams vykdyti.",
+      "Dalyvavimas: jūsų prisijungimo laikas, paskutinio prisijungimo laikas, rodomas vardas ir Pi vartotojo vardas yra saugomi ir pateikiami vedėjui kaip dalyvių sąrašas (ekrane ir kaip CSV atsisiuntimas). Saugojami, kol seminaras ištrinamas.",
+      "Klausimai ir atsakymai bei apklausos: klausimo tekstas ir klausėjo rodomas vardas (arba Pi vartotojo vardas, jei nėra) matomi kiekvienam dalyviui. Balsai „už“ rodo tik skaičius, niekada kas juos atidavė. Apklausos balsai dalyviams rodo tik skaičius; organizatorius ir administratoriai mato, kiekvienai parinkčiai, kiekvieno balsavusiojo rodomą vardą (arba Pi vartotojo vardą, jei nėra). Saugojami, įskaitant paslėptus klausimus, kol seminaras ištrinamas."
+    ],
+    "recTitle": "Įrašymas",
+    "rec": "Įrašai saugomi tik kaip failas pranešėjo įrenginyje. Jie neįkeliami į mūsų serverius ir neperduodami į užsienį. Kol vyksta įrašymas arba įjungti AI užrašai, kiekvienas dalyvis mato indikatorių.",
+    "rightsTitle": "Jūsų teisės",
+    "rights": "Galite prašyti prieigos, taisyti, ištrinti arba sustabdyti savo informacijos apdorojimą. Kontaktas: [TBD: privatumo pareigūno vardas ir kontaktas]"
+  },
+  "notes": {
+    "title": "Užrašai",
+    "back": "Grįžti į seminarą",
+    "loading": "Įkeliama…",
+    "meta": "Užrašai · {date} · {min} min",
+    "aiWarn": "AI sugeneruota santrauka – gali būti klaidų",
+    "points": "Pagrindiniai punktai",
+    "decisions": "Sprendimai",
+    "todos": "Veiksmų elementai",
+    "shots": "Ekrano nuotraukos ({n})",
+    "transcript": "Transkriptas",
+    "download": "Atsisiųsti Markdown",
+    "making": "Kuriama užrašai…",
+    "makingLong": "Tai užtrunka. Prašome atnaujinti vėliau",
+    "recording": "Vis dar įrašoma",
+    "failed": "Nepavyko sukurti santraukos – visas transkriptas yra žemiau",
+    "retry": "Bandyti dar kartą",
+    "finish": "Baigti įrašymą ir apibendrinti",
+    "none": "Nieko nėra",
+    "blank": "Nieko apibendrinti – nebuvo įrašyta kalbos arba ji buvo per trumpa",
+    "notFound": "Užrašai nerasti",
+    "forbidden": "Neturite prieigos prie šių užrašų",
+    "shotAlt": "Ekrano nuotrauka {at}",
+    "close": "Uždaryti",
+    "view": "Peržiūrėti užrašus",
+    "error": "Nepavyko įkelti",
+    "mine": "Mano užrašai",
+    "del": "Ištrinti užrašus",
+    "delAsk": "Ištrinti šiuos užrašus (santrauką, transkriptą ir ekrano nuotraukas)? Niekas negalės jų matyti",
+    "delYes": "Ištrinti",
+    "delNo": "Atšaukti",
+    "delFail": "Nepavyko ištrinti",
+    "dlFail": "Nepavyko atsisiųsti – prašome bandyti dar kartą",
+    "recentNotes": "Naujausi užrašai",
+    "empty": "Dar nėra užrašų",
+    "newNote": "Pradėti asmeninius užrašus",
+    "inPerson": "Asmeninio susitikimo užrašai",
+    "inPersonTag": "Asmeniškai",
+    "titleLabel": "Pavadinimas",
+    "titlePh": "pvz., Savaitinis susitikimas",
+    "told": "Informavau visus dalyvius, kad tai bus įrašoma ir apdorojama AI (privaloma)",
+    "toldWhy": "Prieš pradėdami, informuokite visus dalyvius, kad šis pokalbis bus įrašomas (įrašas saugomas 1 dieną po užrašo pabaigos, o kalbėtojai atskiriami pagal balsą ir žymimi pagal suvokiamą lytį) ir paverčiamas tekstu bei santrauka išorinės AI.",
+    "start": "Pradėti įrašymą",
+    "starting": "Ruošiamasi…",
+    "recBadge": "Įrašoma {time}",
+    "recentLines": "Naujausios eilutės",
+    "waiting": "Tekstas čia pasirodys, kai žmonės kalbės",
+    "end": "Baigti ir sukurti užrašus",
+    "wakeWarn": "Įrašymas gali sustoti, jei ekranas išsijungs",
+    "adminOnly": "Gali naudoti tik administratoriai",
+    "aiOff": "AI užrašai šiuo metu nepasiekiami (reikia serverio nustatymų). Ankstesni užrašai pateikiami žemiau",
+    "reload": "Įkelti iš naujo",
+    "unsupported": "Įrašymas šiame įrenginyje nepasiekiamas",
+    "micDenied": "Negalima naudoti mikrofono – patikrinkite leidimą",
+    "limited": "Išnaudotas apdorojimo laiko limitas – baigti ir sukurti užrašus",
+    "noAgr": "Sustabdyta: nepatvirtintas pranešimas apie įrašymą – baigti ir pradėti iš naujo",
+    "micLost": "Mikrofonas atsijungė ir įrašymas sustojo – bakstelėkite „Iš naujo prijungti mikrofoną“ arba baigti užrašą",
+    "micRetry": "Iš naujo prijungti mikrofoną",
+    "gone": "Šis užrašas buvo baigtas arba ištrintas kitur, todėl įrašymas sustojo – naudokite žemiau esantį mygtuką, kad atidarytumėte užrašus",
+    "finishing": "Paskutinių žodžių išsaugojimas…",
+    "st": {
+      "RECORDING": "Įrašoma",
+      "SUMMARIZING": "Kuriama",
+      "DONE": "Atlikta",
+      "FAILED": "Nepavyko"
+    },
+    "downloadPiBrowser": "Markdown atsisiuntimas veikia tik įprastoje naršyklėje (kompiuteryje ar mobiliajame telefone). Pi Browser negali išsaugoti failų – atidarykite šiuos užrašus kompiuterio ar telefono naršyklėje (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Planai",
+    "loading": "Įkeliama…",
+    "free": "Nemokamai",
+    "freeDesc": "{time} seminarų kas mėnesį (neperskeliama)",
+    "monthly": "Mėnesinis",
+    "yearly": "Metinis",
+    "paidDesc": "{time} seminarų, galioja {months} mėnesius",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Tikrinama Pi kaina",
+    "noAi": "Nėra AI subtitrų, vertimo, dubliavimo ar užrašų santraukų",
+    "withAi": "Apima AI subtitrus, vertimą, dubliavimą ir užrašų santraukas",
+    "buy": "Mokėti su Pi",
+    "bought": "Mokėjimas baigtas. Seminaro laikas pridėtas.",
+    "meRemain": "Liko laiko: {time}",
+    "loginToBuy": "Prisijunkite, kad įsigytumėte planą.",
+    "payNote": "Mokėjimas visada atliekamas Pi. Vietinės valiutos suma yra tik orientacinė; Pi suma nustatoma pagal Pi kainą mokėjimo metu. Seminare, vykstančiame pagal mokamą planą, pirmiausia naudojami to plano leidimai (pirmiausia tie, kurių galiojimo laikas baigiasi anksčiausiai), tada tęsiama naudojant šio mėnesio nemokamą laiką.",
+    "charge": "Papildyti laiką",
+    "hm": "{h} val. {m} min.",
+    "m": "{m} min.",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (tikrinama Pi kaina)",
+    "h": "{h} val."
+  },
+  "adminRooms": {
+    "title": "Kambarių valdymas",
+    "adminOnly": "Tik administratoriai gali peržiūrėti šį puslapį.",
+    "refresh": "Atnaujinti",
+    "count": "{n} atidarytų kambarių",
+    "empty": "Šiuo metu nėra atidarytų kambarių.",
+    "lab": "Laboratorijos kambarys",
+    "noSeminar": "Nėra seminaro įrašo",
+    "peers": "{n} / {cap} prisijungę",
+    "producers": "{n} srautai",
+    "end": "Baigiasi {time}",
+    "stale": "Seminaras baigėsi, bet kambarys vis dar atidarytas vaizdo serveryje – priverstinai uždarykite.",
+    "close": "Priverstinai uždaryti",
+    "confirmSeminar": "Tai baigia seminarą ir uždaro kambarį. Visi bus atjungti.",
+    "confirmRoom": "Tai uždaro kambarį. Visi bus atjungti.",
+    "confirmYes": "Uždaryti",
+    "cancel": "Atšaukti",
+    "closing": "Uždaroma…",
+    "closed": "Kambarys uždarytas.",
+    "metrics": "Vaizdo serverio metrika (nuo pradžios)",
+    "metricsOff": "Nepavyko įkelti metrikos.",
+    "m": {
+      "packetsIn": "Gauti paketai",
+      "packetsOut": "Išsiųsti paketai",
+      "nackIn": "Gauti NACK",
+      "nackOut": "Išsiųsti NACK",
+      "retransmits": "Pakartotiniai perdavimai",
+      "duplicateNack": "Dubliuoti NACK",
+      "cacheMiss": "Pakartotinio perdavimo talpyklos praleidimai",
+      "pliOut": "Kadrų atnaujinimo užklausos (PLI)",
+      "keyframes": "Kadrų atnaujinimai",
+      "layerSwitches": "Kokybės perjungimai",
+      "queueDrops": "Eilės praleidimai"
+    }
+  },
+  "adminUsers": {
+    "title": "Vartotojai",
+    "adminOnly": "Tik administratoriai gali peržiūrėti šį puslapį.",
+    "search": "Ieškoti pagal vardą (2+ simboliai)",
+    "searchBtn": "Ieškoti",
+    "refresh": "Atnaujinti",
+    "count": "{n, plural, one {# vartotojas} other {# vartotojai}}",
+    "empty": "Nėra vartotojų.",
+    "admin": "Administratorius",
+    "lastLogin": "Paskutinis prisijungimas {time}",
+    "never": "Niekada neprisijungė",
+    "plan": {
+      "FREE": "Nemokamai",
+      "M": "Mėnesinis",
+      "Y": "Metinis"
+    },
+    "until": "(iki {time})",
+    "manage": "Tvarkyti laiką",
+    "close": "Uždaryti",
+    "planLabel": "Planas",
+    "hours": "Valandos",
+    "minutes": "Minutės",
+    "reason": "Priežastis (neprivaloma)",
+    "sub": "Sumažinti",
+    "confirmSub": "Sumažinti {plan} laiką {time}.",
+    "confirmYes": "Patvirtinti",
+    "cancel": "Atšaukti",
+    "saving": "Išsaugoma…",
+    "done": "Pritaityta. {plan} likęs laikas: {time}",
+    "invalid": "Įveskite sumažinimą nuo 1 minutės iki 1000 valandų (visos minutės 0–59).",
+    "history": "Naujausi koregavimai",
+    "noHistory": "Dar nėra koregavimų.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Suteikti paslaugos leidimą (nemokamas laikas)",
+    "svc": {
+      "H1": "1 valandos leidimas",
+      "D1": "1 dienos leidimas",
+      "M1": "1 mėnesio leidimas"
+    },
+    "svcNote": "Paslaugų leidimai yra nemokamo plano laikas. Juos galima naudoti nuo šiol tam laikotarpiui (1 valanda, 24 valandos, 1 mėnuo) nemokamuose seminaruose ir mokamų seminarų nemokamoje dalyje (be AI funkcijų). Turint kelis leidimus, jie automatiškai sunaudojami tokia tvarka: 1 valandos → 1 dienos → 1 mėnesio.",
+    "subTitle": "Sumažinti laiką",
+    "subNote": "Pirmiausia atimama iš vėliausiai pasibaigiančių leidimų. Jei tai daugiau nei likęs laikas, pašalinamas tik likęs laikas.",
+    "confirmSvc": "Suteikti {svc}.",
+    "doneSvc": "Suteiktas {svc}. Liko nemokamo laiko: {time} (leidimas baigiasi {end})"
+  }
+}

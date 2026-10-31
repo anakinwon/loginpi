@@ -2,19 +2,19 @@
 
 // 상단 헤더 + 하단 폴더블 메뉴(마스터 지시 2026-10-31) —
 //  상단 : 로고 · 로그인 상태(사용자명, Pi 세션 OR Google 연동 세션, useAppUser 통합)만.
-//  하단 : 고정 메뉴 바 HOME | 요금제 | 개인정보 | 관리자(관리자만 — 위로 펼침 : 제작 현황·방 관리·사용자 관리·대면 노트) + 언어 전환 + 접기.
+//  하단 : 고정 메뉴 바 HOME | 요금제 | 개인정보 | 관리자(관리자만 — 위로 펼침 : 제작 현황·방 관리·사용자 관리·대면 노트) + 언어 전환(@pi/i18n 검색형 스위처) + 접기.
 //   접기 = 바를 작은 손잡이 하나로 줄임(상태는 localStorage, 읽기 실패해도 동작). 세미나 방(/s/*)은 방 조작 바가 하단을 쓰므로 숨김.
 //   아이콘은 정적 SVG(nav-icons) — 애니메이션 없음(Pi Browser 규칙)
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { useLocale, useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { Link, usePathname } from '@/i18n/navigation'
 import { AuthStatus } from './auth-status'
+import { AppLocaleSwitcher } from './locale-switcher'
 import { useAppUser } from './google-auth'
 import {
   IconActivity,
   IconCard,
   IconChevronDown,
-  IconGlobe,
   IconHome,
   IconMenu,
   IconNotebook,
@@ -106,7 +106,6 @@ function BottomNav({ admin }: { admin: boolean }) {
   const t = useTranslations('nav')
   const tl = useTranslations('list')
   const ta = useTranslations('auth')
-  const locale = useLocale()
   const pathname = usePathname()
   const here = useHere()
   const [folded, setFolded] = useState(false)
@@ -189,15 +188,7 @@ function BottomNav({ admin }: { admin: boolean }) {
           ))}
           {admin && <AdminMenu items={adminItems} label={t('admin')} />}
           <span aria-hidden className="mx-0.5 h-7 w-px bg-white/10" />
-          <Link
-            href={pathname}
-            locale={locale === 'ko' ? 'en' : 'ko'}
-            aria-label={t('switchLocale')}
-            title={t('switchLocale')}
-            className="text-muted-foreground hover:bg-surface-raised hover:text-foreground flex size-9 items-center justify-center rounded-xl"
-          >
-            <IconGlobe />
-          </Link>
+          <AppLocaleSwitcher className="text-muted-foreground" />
           <button
             type="button"
             onClick={toggle}

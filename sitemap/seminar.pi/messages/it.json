@@ -1,0 +1,1089 @@
+{
+  "common": {
+    "localeSwitcher": {
+      "button": "Cambia lingua",
+      "search": "Cerca lingua",
+      "empty": "Nessun risultato"
+    }
+  },
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Seminari video in diretta a cui partecipi con Pi"
+  },
+  "home": {
+    "description": "Gli host aprono seminari e i partecipanti si uniscono a sessioni video in diretta con Pi.",
+    "badge": "Seminari in diretta su splendide isole",
+    "headline": "Guarda, ascolta e impara insieme — in diretta",
+    "ctaBrowse": "Sfoglia seminari",
+    "ctaPlan": "Vedi piani",
+    "features": {
+      "video": "Video in diretta",
+      "caption": "Sottotitoli e traduzione",
+      "notes": "Note riunione AI",
+      "pay": "Paga con Pi"
+    },
+    "listTitle": "Seminari",
+    "cal": {
+      "title": "Calendario seminari",
+      "desc": "Dai seminari passati a quelli futuri — tocca una data per i dettagli.",
+      "legendSmn": "Seminari",
+      "legendEnded": "Seminari passati",
+      "legendMine": "I miei eventi",
+      "failed": "Impossibile caricare le date dei seminari. Riprova più tardi.",
+      "open": "Visualizza dettagli"
+    }
+  },
+  "nav": {
+    "link": "Collega account",
+    "privacy": "Privacy",
+    "plan": "Piani",
+    "rooms": "Stanze",
+    "admin": "Amministratore",
+    "users": "Utenti",
+    "home": "Home",
+    "privacyShort": "Privacy",
+    "menu": "Menu principale",
+    "fold": "Comprimi menu",
+    "unfold": "Espandi menu"
+  },
+  "auth": {
+    "checking": "Verifica accesso…",
+    "signedIn": "{name}",
+    "inPerson": "Note di persona",
+    "required": "Accedi con il tuo account Pi.",
+    "signIn": "Accedi con Pi",
+    "openInPiBrowser": "Apri questa pagina in Pi Browser per accedere con il tuo account Pi.",
+    "authenticating": "Accesso in corso…",
+    "google": "Accedi con Google",
+    "signOut": "Esci",
+    "or": "o",
+    "linkRequired": "Hai effettuato l'accesso con Google, ma non è ancora collegato a un account Pi. Genera un codice di collegamento in Pi Browser e inseriscilo qui.",
+    "linkNeeded": "Collegamento account Pi necessario",
+    "linkCheckFailed": "Impossibile verificare lo stato del collegamento del tuo account (errore temporaneo del server). Aggiorna tra un momento."
+  },
+  "piOAuth": {
+    "signingIn": "Accesso con il tuo account Pi…",
+    "failed": "Accesso Pi fallito. Riprova.",
+    "stateMismatch": "Impossibile verificare questa richiesta di accesso (scaduta o da un'altra scheda). Riprova.",
+    "retry": "Riprova",
+    "backHome": "Home"
+  },
+  "link": {
+    "title": "Collega account",
+    "intro": "Collega l'account con cui hai effettuato l'accesso in Pi Browser all'accesso Google in un browser normale. Dopo il collegamento potrai usare lo stesso account su un browser per PC.",
+    "checking": "Verifica accesso…",
+    "piIssueTitle": "Per accedere anche da un browser normale",
+    "codeHint": "Genera il codice qui sotto, quindi accedi con Google su un browser per PC e inseriscilo nella pagina Collega account (entro 10 minuti).",
+    "piIssue": "Genera codice di collegamento",
+    "reissue": "Genera un nuovo codice",
+    "expiresIn": "Scade tra {min} min",
+    "enterTitle": "Inserisci codice di collegamento",
+    "enterHint": "In Pi Browser apri seminar.pi → Collega account → Genera codice di collegamento, quindi inserisci il codice di 6 cifre.",
+    "codeLabel": "Codice di collegamento",
+    "submit": "Collega",
+    "done": "Collegato. Ora puoi usare anche l'accesso Google.",
+    "linked": "{name} è collegato all'accesso Google."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Accesso richiesto",
+    "AUTH_PI_REQUIRED": "Accesso Pi richiesto",
+    "AUTH_PI_SESSION_INVALID": "La tua sessione è scaduta. Accedi di nuovo",
+    "AUTH_PI_TOKEN_INVALID": "Verifica accesso Pi fallita",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Informazioni di accesso Pi mancanti",
+    "FORBIDDEN": "Non hai il permesso",
+    "BAD_REQUEST": "Richiesta non valida",
+    "BAD_REQUEST_BODY": "Richiesta non valida",
+    "INVALID_INPUT": "Input non valido",
+    "QUERY_FAILED": "Caricamento fallito",
+    "SAVE_FAILED": "Salvataggio fallito",
+    "INTERNAL": "Qualcosa è andato storto",
+    "SERVER_CONFIG": "Errore di configurazione del server. Contatta l'operatore",
+    "PI_API_CONNECT_FAILED": "Impossibile raggiungere Pi Network",
+    "DB_UNAVAILABLE": "Dati temporaneamente non disponibili. Riprova più tardi",
+    "NOT_FOUND": "Non trovato",
+    "RATE_LIMITED": "Troppe richieste. Riprova a breve",
+    "PAYLOAD_TOO_LARGE": "La richiesta è troppo grande",
+    "NETWORK": "Controlla la tua connessione di rete",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Questo nome utente Pi è già registrato con credenziali diverse. Contatta l'amministratore",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Questo account è inattivo. Contatta l'amministratore",
+    "AUTH_GOOGLE_REQUIRED": "Accesso Google richiesto.",
+    "LINK_CODE_INVALID": "Il codice di collegamento non è valido o è scaduto. Generane uno nuovo in Pi Browser.",
+    "LINK_ALREADY_LINKED": "Questo account è già collegato.",
+    "LINK_CODE_GEN_FAILED": "Impossibile creare un codice di collegamento. Riprova più tardi.",
+    "AUTH_DB_UNAVAILABLE": "Impossibile salvare il tuo account, quindi l'accesso è fallito. Riprova più tardi.",
+    "LINK_TRY_LIMIT": "Troppi codici di collegamento errati. Riprova tra 15 minuti.",
+    "PRICE_UNAVAILABLE": "Impossibile ottenere il prezzo Pi. Riprova a breve",
+    "QUOTE_EXPIRED": "La quotazione del pagamento è scaduta. Paga di nuovo",
+    "PLAN_EXHAUSTED": "Hai usato tutto il tempo del seminario. Ricarica sulla pagina Piani",
+    "HOST_AWAY": "L'host non è nella stanza. Puoi entrare dopo che l'host si è unito",
+    "PLAN_AI_PAID": "Le funzionalità AI sono disponibili con i piani a pagamento",
+    "AI_UNAVAILABLE": "Le funzionalità AI non sono disponibili al momento",
+    "SPEECH_CHUNK_INVALID": "Il formato del frammento audio non è valido",
+    "SPEECH_NOT_LIVE": "Questo seminario non è in diretta",
+    "SPEECH_NO_AGR": "È richiesto il consenso al trattamento vocale",
+    "SPEECH_RATE": "Troppe richieste vocali. Riprova a breve",
+    "SPEECH_QUOTA": "Il tempo di elaborazione vocale per questo seminario è esaurito",
+    "SPEECH_USR_QUOTA": "Hai esaurito il limite di traduzione e voce tradotta per questo seminario",
+    "SPEECH_FAILED": "Impossibile convertire il parlato in testo",
+    "SPEECH_STAGE_ONLY": "Solo le persone sul palco possono usare i sottotitoli vocali",
+    "TRANSLATE_FAILED": "Impossibile tradurre il sottotitolo",
+    "POLL_CLOSED": "Questo sondaggio è chiuso",
+    "NOTE_NOT_RECORDING": "Queste note non stanno registrando",
+    "NOTE_SHOT_INVALID": "Cattura schermo non valida",
+    "NOTE_AUDIO_INVALID": "File di registrazione non valido",
+    "NOTE_SHOT_RATE": "Troppe catture schermo",
+    "NOTE_RETRY_SOON": "Puoi riprovare tra un minuto",
+    "SPEECH_TTS_FAILED": "Impossibile creare la voce tradotta",
+    "CAPTION_SIG_INVALID": "Questo sottotitolo non è stato verificato, quindi non è stato tradotto",
+    "PLAN_EXPIRES_BEFORE_START": "L'ora di inizio è successiva alla scadenza del pass di questo piano",
+    "PAY_ALREADY_PAID": "Un pagamento è ancora in elaborazione. Se stavi firmando nel wallet, riprova tra 3 minuti.",
+    "REC_PAID_ONLY": "La registrazione è disponibile solo nei seminari con piano mensile o annuale con tempo a pagamento rimanente",
+    "REC_NOT_IN_ROOM": "Sto ancora confermando che sei nella stanza. Riprova tra un momento",
+    "ENGINE_OFF": "La chiave amministratore del server video non è configurata",
+    "ENGINE_UNAVAILABLE": "Il server video non risponde. Riprova a breve",
+    "ADJ_NOTHING": "Non c'è tempo rimanente da ridurre"
+  },
+  "progress": {
+    "title": "Avanzamento costruzione",
+    "subtitle": "Fatto, in corso e pianificato, per funzionalità · al {date}",
+    "overall": "Passi complessivi",
+    "stepsDone": "{done}/{total} passi fatti ({pct}%)",
+    "featureUnit": "funzionalità",
+    "status": {
+      "done": "Fatto",
+      "doing": "In corso",
+      "todo": "Pianificato",
+      "drop": "Abbandonato"
+    },
+    "features": {
+      "F01": {
+        "name": "Accesso",
+        "desc": "Accesso Pi Browser, accesso Google in altri browser e collegamento di entrambi gli account"
+      },
+      "F05": {
+        "name": "Seminario video in diretta",
+        "desc": "Il nostro motore video Galápagos — l'obiettivo è un presentatore che trasmette a un massimo di 30 partecipanti"
+      },
+      "F02": {
+        "name": "Crea un seminario",
+        "desc": "Imposta il sottotitolo, l'ora, la capacità e la quota del seminario per creare un seminario (nome = isola, automatico)"
+      },
+      "F03": {
+        "name": "Elenco e dettagli seminari",
+        "desc": "Sfoglia i seminari aperti pagina per pagina e visualizza i loro dettagli"
+      },
+      "F04": {
+        "name": "Pagamento ingresso Pi",
+        "desc": "Paga la quota del seminario in Pi; il server ricontrolla l'importo prima di farti entrare"
+      },
+      "F06": {
+        "name": "Pagamenti host",
+        "desc": "Paga i ricavi della quota d'ingresso agli host in Pi"
+      },
+      "F07": {
+        "name": "Repliche",
+        "desc": "Guarda i seminari registrati in seguito"
+      },
+      "FU": {
+        "name": "Fondazione componenti aggiuntivi riunione",
+        "desc": "Un canale di segnale per componenti aggiuntivi, connessione AI, frammenti vocali, consenso al microfono e tabelle dati"
+      },
+      "F08": {
+        "name": "Programma e condivisione",
+        "desc": "Link calendario, file evento (.ics) e invito via email per ogni seminario"
+      },
+      "F09": {
+        "name": "Riduzione rumore e illuminazione",
+        "desc": "Riduci il rumore del microfono e illumina i video scuri della fotocamera"
+      },
+      "F10": {
+        "name": "Sottotitoli in diretta",
+        "desc": "Trasforma il parlato del presentatore in testo sotto il palco"
+      },
+      "F11": {
+        "name": "Sondaggi, Q&A e partecipazione",
+        "desc": "Esegui sondaggi e domande durante un seminario; gli host scaricano l'elenco dei partecipanti"
+      },
+      "F12": {
+        "name": "Effetti di sfondo",
+        "desc": "Sfoca il tuo sfondo o sostituiscilo con un preset o la tua immagine (elaborata sul tuo dispositivo)"
+      },
+      "F13": {
+        "name": "Registrazione locale",
+        "desc": "Il presentatore registra il seminario sul proprio dispositivo e tutti vedono che la registrazione è attiva"
+      },
+      "F14": {
+        "name": "Note riunione AI",
+        "desc": "Quando il presentatore lo attiva, il parlato e gli schermi vengono registrati e riassunti in punti chiave, decisioni e cose da fare"
+      },
+      "F15": {
+        "name": "Note riunione di persona",
+        "desc": "Registra una riunione con solo un microfono e ottieni note della riunione (amministratori)"
+      },
+      "F16": {
+        "name": "Sottotitoli tradotti",
+        "desc": "Mostra i sottotitoli tradotti nella lingua che scegli"
+      },
+      "F17": {
+        "name": "Ascolta in traduzione",
+        "desc": "Leggi i sottotitoli tradotti ad alta voce con una voce sintetica abbassando l'audio originale"
+      }
+    },
+    "steps": {
+      "piLogin": "Accesso Pi Browser",
+      "googleLogin": "Accesso Google",
+      "accountLink": "Collegamento account",
+      "deviceTest": "Test dispositivo fotocamera",
+      "oneToTwo": "Presentatore 1 → 2 partecipanti",
+      "recovery": "Recupero blocco e stabilità",
+      "structure": "Pulizia struttura motore",
+      "autoQuality": "Qualità automatica, 30 partecipanti",
+      "roomService": "Ingresso stanza e registrazione",
+      "roomUi": "Schermata stanza (lobby·palco·chat·alza mano·moderazione)",
+      "createForm": "Schermata di creazione",
+      "list": "Elenco",
+      "detail": "Dettagli",
+      "payRequest": "Richiesta di pagamento",
+      "payVerify": "Ricontrollo importo e ingresso",
+      "settle": "Pagamento",
+      "vod": "Riproduzione registrazione",
+      "appRelay": "Canale segnale componente aggiuntivo motore",
+      "aiBase": "AI, frammenti vocali, consenso e tabelle dati",
+      "shareLinks": "Link calendario, .ics e invito via email",
+      "noiseLight": "Riduzione rumore e illuminazione",
+      "liveCaptions": "Sottotitoli in diretta",
+      "pollQnaAttend": "Sondaggi, Q&A e elenco partecipanti",
+      "backgrounds": "Sfocatura, preset e la tua immagine",
+      "localRecording": "Registrazione presentatore e badge registrazione",
+      "aiNotes": "Registrazione, riepilogo e pagina note",
+      "inPersonNotes": "Note solo microfono e le mie note",
+      "captionTranslate": "Scelta lingua e toggle originale/tradotto",
+      "dubbing": "Riproduzione voce sintetica e audio originale abbassato"
+    },
+    "refLabel": "Modello di riferimento",
+    "uiRef": "Baseline UI — schemi di schermo e funzionalità di un'app di videoconferenza web ampiamente utilizzata, adattata per seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Nome salvato, ma gli altri non sono stati avvisati ora. Lo vedranno dopo che ti sarai riunito.",
+      "tile": "Clicca per cambiare il mio nome",
+      "menu": "Cambia il mio nome",
+      "title": "Il mio nome in questo seminario",
+      "hint": "Fino a 30 caratteri. Usato solo in questo seminario e si aggiorna immediatamente sullo schermo di tutti.",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "cancel": "Annulla",
+      "taken": "Quel nome è già usato da qualcun altro (host o partecipante). Scegline un altro.",
+      "failed": "Impossibile salvare il tuo nome. Riprova."
+    },
+    "roomTitle": {
+      "edit": "Clicca per modificare il sottotitolo",
+      "label": "Sottotitolo",
+      "placeholder": "Sottotitolo (fino a 60)",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "failed": "Impossibile salvare il sottotitolo."
+    },
+    "mirror": "Specchia il mio video",
+    "barPin": "Mostra sempre la barra inferiore",
+    "barAuto": "Nascondi automaticamente la barra inferiore",
+    "title": "Partecipa al seminario · {room}",
+    "titleSeminar": "Sala d'attesa",
+    "noEngine": "Il server video non è ancora pronto.",
+    "joinAs": "Partecipa come",
+    "presenter": "Presentatore",
+    "audience": "Pubblico",
+    "join": "Partecipa ora",
+    "nameLabel": "Nome",
+    "audienceHint": "I membri del pubblico non usano una telecamera o un microfono. Dopo l'accesso vedrai e sentirai il presentatore.",
+    "preview": {
+      "pending": "Preparazione telecamera e microfono…",
+      "audioOnly": "Telecamera non disponibile — invio solo audio.",
+      "none": "Telecamera e microfono non disponibili. Controlla i permessi (puoi comunque partecipare senza media).",
+      "videoOnly": "Microfono non disponibile — invio solo video. Controlla il permesso del microfono."
+    },
+    "mic": {
+      "on": "Disattiva microfono",
+      "off": "Attiva microfono"
+    },
+    "cam": {
+      "on": "Disattiva telecamera",
+      "off": "Attiva telecamera"
+    },
+    "controls": "Controlli chiamata",
+    "leave": "Esci",
+    "enableSound": "Abilita audio",
+    "state": {
+      "connecting": "Connessione in corso…",
+      "reconnecting": "Riconnessione in corso…"
+    },
+    "waiting": "In attesa del presentatore.",
+    "rejoin": "Partecipa di nuovo",
+    "err": {
+      "generic": "Qualcosa è andato storto. Partecipa di nuovo.",
+      "CLOSED": "La connessione è stata persa.",
+      "NO_ENGINE": "Il server video non è ancora pronto.",
+      "TICKET_401": "Accedi.",
+      "TICKET_403": "Non hai il permesso di presentare. Partecipa come pubblico.",
+      "TICKET_503": "Il server video non è ancora configurato.",
+      "TICKET_NETWORK": "Controlla la tua connessione di rete.",
+      "TICKET_INVALID": "Il tuo pass d'ingresso è scaduto.",
+      "TICKET_EXPIRED": "Il tuo pass d'ingresso è scaduto.",
+      "ROOM_FULL": "Questo seminario è al completo.",
+      "ROOM_CLOSED": "La sala è stata chiusa — il seminario è terminato o l'organizzatore è stato assente per più di 5 minuti.",
+      "DUPLICATE_SESSION": "Hai effettuato l'accesso da un altro dispositivo, quindi questa schermata è stata disconnessa.",
+      "ROLE_FORBIDDEN": "Non hai il permesso di presentare.",
+      "WS_FAILED": "Impossibile connettersi al server video.",
+      "ICE_FAILED": "La connessione video è caduta. Controlla la tua rete.",
+      "MEDIA_FAILED": "Impossibile avviare la fotocamera o il microfono.",
+      "TIMEOUT": "Il server video non risponde.",
+      "TICKET_402": "Questo è un seminario a pagamento. Si prega di pagare sulla pagina del seminario prima di entrare.",
+      "TICKET_404": "Seminario non trovato.",
+      "TICKET_409": "Questo seminario è terminato o è stato annullato.",
+      "TICKET_HOST_AWAY": "L'organizzatore non si è ancora unito o è stato assente per più di 5 minuti, quindi non puoi entrare. Riprova dopo che l'organizzatore si è unito.",
+      "TICKET_PLAN_EXHAUSTED": "Il piano di questo seminario non ha più tempo disponibile, quindi non può iniziare. Acquistando nuovamente lo stesso piano si aggiunge tempo (il piano gratuito si rinnova con 1 ora il mese prossimo)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Impossibile cambiare il microfono. Riprova.",
+        "video": "Impossibile cambiare la fotocamera. Riprova."
+      },
+      "forbidden": "Non hai il permesso di presentare, quindi continuerai come pubblico.",
+      "demoted": "Sei stato spostato di nuovo tra il pubblico.",
+      "endFailed": "Impossibile terminare il seminario. Riprova.",
+      "chatFailed": "Messaggio non inviato.",
+      "actionFailed": "Impossibile completare la richiesta. Riprova.",
+      "shareFailed": "Impossibile avviare la condivisione dello schermo.",
+      "err": {
+        "RATE_LIMITED": "Stai inviando troppo velocemente. Attendi un momento.",
+        "ROLE_FORBIDDEN": "Non hai il permesso di fare questo.",
+        "MEDIA_FAILED": "Impossibile avviare il microfono o la fotocamera. Controlla i permessi.",
+        "LOCKED": "Bloccato dal presentatore."
+      },
+      "mutedBy": {
+        "audio": "Il presentatore ha disattivato il tuo microfono.",
+        "video": "Il presentatore ha spento la tua fotocamera."
+      },
+      "policy": {
+        "locked": "Il presentatore ha bloccato i microfoni. Puoi attivare il tuo una volta sbloccati.",
+        "unlocked": "I microfoni sono sbloccati."
+      },
+      "consent": {
+        "saveFail": "Impossibile salvare il tuo consenso. Controlla la tua registrazione e riattiva il microfono."
+      }
+    },
+    "home": "Vai alla home",
+    "tile": {
+      "fullscreen": "Doppio clic per schermo intero · Esc per uscire",
+      "self": "{name} (tu)",
+      "presenter": "Presentatore",
+      "micOff": "Microfono spento",
+      "screen": "Schermo di {name}",
+      "row": "Altri relatori",
+      "pin": "Mostra {name} in grande",
+      "unpin": "Layout automatico"
+    },
+    "more": "Altre opzioni",
+    "joinNoCam": "Partecipa senza fotocamera",
+    "net": {
+      "afterJoin": "La tua connessione viene controllata automaticamente dopo l'accesso.",
+      "measuring": "Controllo connessione…",
+      "good": "Buona connessione",
+      "fair": "Connessione discreta",
+      "poor": "Connessione scarsa",
+      "reason": {
+        "loss": {
+          "audio": "Il {pct}% dei dati audio viene perso.",
+          "video": "Il {pct}% dei dati video viene perso."
+        },
+        "rate": {
+          "audio": "Il caricamento audio è basso a {kbps} kbps.",
+          "video": "Il caricamento video è basso a {kbps} kbps. La qualità potrebbe diminuire."
+        }
+      }
+    },
+    "people": "{n} persone nella sala",
+    "screen": {
+      "start": "Condividi schermo",
+      "stop": "Interrompi condivisione"
+    },
+    "panel": {
+      "title": "Chat · Q&A · Sondaggi · Persone",
+      "chat": "Chat",
+      "people": "Persone",
+      "close": "Chiudi pannello",
+      "qna": "Q&A",
+      "polls": "Sondaggi"
+    },
+    "chat": {
+      "empty": "Ancora nessun messaggio. La chat non viene salvata.",
+      "me": "Tu",
+      "failed": "Non inviato.",
+      "retry": "Riprova",
+      "input": "Digita un messaggio",
+      "send": "Invia"
+    },
+    "hand": {
+      "raise": "Alza la mano",
+      "lower": "Abbassa la mano",
+      "list": "Mani alzate",
+      "lowerAll": "Abbassa tutte le mani",
+      "raised": "Mano alzata",
+      "notice": "{name} ha alzato la mano.",
+      "dismiss": "Ignora",
+      "waiting": "{n} persone in attesa di parlare"
+    },
+    "react": {
+      "open": "Reazioni",
+      "e0": "Mi piace",
+      "e1": "Applauso",
+      "e2": "Risata",
+      "e3": "Sorpreso",
+      "e4": "Triste",
+      "e5": "Senza parole",
+      "e6": "Amore"
+    },
+    "quality": {
+      "label": "Qualità",
+      "auto": "Auto",
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Bassa",
+      "unstable": "La tua rete è instabile"
+    },
+    "roles": {
+      "presenter": "Presentatore",
+      "panel": "Panelist",
+      "audience": "Pubblico"
+    },
+    "stage": {
+      "invite": "Invita sul palco",
+      "remove": "Sposta nel pubblico",
+      "promoted": "Sei stato invitato sul palco. Se hai alzato la mano, la tua fotocamera si accende automaticamente (a meno che non sia bloccata o non consentita). Attiva il microfono per parlare (il microfono non si accende automaticamente).",
+      "later": "Più tardi"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} ha alzato la mano."
+    },
+    "leaveDialog": {
+      "title": "Lascia il seminario",
+      "body": "Puoi uscire da solo, oppure terminare il seminario e disconnettere tutti.",
+      "confirmTitle": "Terminare il seminario?",
+      "confirmBody": "Tutti saranno disconnessi e nessuno potrà più rientrare in questo seminario.",
+      "cancel": "Annulla",
+      "end": "Termina seminario",
+      "endConfirm": "Termina ora"
+    },
+    "mod": {
+      "muteAll": "Disattiva l'audio di tutti",
+      "lock": "Blocca microfoni",
+      "unlock": "Sblocca microfoni",
+      "locked": "Il presentatore ha bloccato i microfoni",
+      "muteMic": "Disattiva microfono",
+      "askMic": "Chiedi di riattivare l'audio",
+      "muteCam": "Spegni fotocamera",
+      "muteMicOf": "Disattiva microfono di {name}",
+      "askMicOf": "Chiedi a {name} di riattivare l'audio",
+      "muteCamOf": "Spegni fotocamera di {name}"
+    },
+    "ask": {
+      "audio": "Il presentatore ti ha chiesto di attivare il microfono.",
+      "video": "Il presentatore ti ha chiesto di attivare la fotocamera.",
+      "ignore": "Ignora"
+    },
+    "toDetail": "Vai alla pagina del seminario",
+    "consent": {
+      "title": "Prima di attivare il microfono",
+      "body": "Se in questo seminario sono attivi la registrazione, i sottotitoli o le note di riunione AI, la tua voce potrebbe essere convertita in testo, archiviata e tradotta. L'elaborazione vocale è eseguita da un servizio AI al di fuori del tuo paese. Se non sei d'accordo, il tuo microfono si attiverà comunque — solo la tua voce sarà esclusa dall'elaborazione.",
+      "privacy": "Informativa sulla privacy",
+      "newTab": "(si apre in una nuova scheda)",
+      "decline": "Non sono d'accordo",
+      "agree": "Accetto e attivo il microfono",
+      "notice": "Quando la registrazione, i sottotitoli o le note di riunione AI sono attivi, le voci dei relatori vengono elaborate. Le voci del pubblico non vengono inviate.",
+      "saveFailClosed": "Questo seminario è terminato, quindi il consenso non può essere registrato."
+    },
+    "captions": {
+      "title": "Sottotitoli",
+      "room": "Sottotitoli in tempo reale (intera sala)",
+      "show": "Mostra sottotitoli",
+      "size": {
+        "label": "Dimensione testo",
+        "sm": "Piccolo",
+        "md": "Medio",
+        "lg": "Grande"
+      },
+      "waiting": "I sottotitoli appariranno quando il presentatore li attiverà",
+      "limit": "Limite di elaborazione vocale raggiunto, quindi sottotitoli e minuti AI sono stati interrotti",
+      "sendFail": "Impossibile attivare i sottotitoli. Riprova tra poco.",
+      "sendFailOff": "Impossibile disattivare i sottotitoli. Riprova tra poco.",
+      "region": "Sottotitoli",
+      "translate": "Mostra sottotitoli tradotti",
+      "lang": "Lingua di traduzione",
+      "langMine": "Le mie lingue",
+      "langAll": "Tutte le lingue",
+      "trStop": {
+        "forbidden": "I sottotitoli tradotti sono solo per i partecipanti registrati. Verrà mostrato l'originale.",
+        "unavailable": "I sottotitoli tradotti non sono disponibili al momento. Verrà mostrato l'originale.",
+        "quota": "Questo seminario ha raggiunto il limite di traduzione. Verrà mostrato l'originale.",
+        "usrQuota": "Hai esaurito il tuo limite di traduzione per questo seminario. Verrà mostrato l'originale."
+      },
+      "unsupported": "Questo dispositivo non può creare sottotitoli in tempo reale (nessun supporto per la registrazione audio in questo browser)"
+    },
+    "effects": {
+      "title": "Effetti",
+      "light": "Correzione luce",
+      "noise": "Riduci rumore",
+      "noiseFail": "La riduzione del rumore non può essere modificata su questo dispositivo",
+      "close": "Chiudi",
+      "preview": "La mia anteprima",
+      "bg": "Sfondo",
+      "bgNone": "Nessuno",
+      "bgBlur": "Sfocatura",
+      "scenes": {
+        "beach": "🏝️ Spiaggia delle Maldive",
+        "autumn": "🍁 Valle autunnale",
+        "fireplace": "🔥 Caminetto",
+        "xmas": "🎄 Sala riunioni di Natale"
+      },
+      "bgs": {
+        "dusk": "Crepuscolo",
+        "ocean": "Oceano",
+        "forest": "Foresta",
+        "studio": "Studio",
+        "grid": "Griglia",
+        "dots": "Punti"
+      },
+      "myAdd": "La mia immagine",
+      "myItem": "La mia immagine {n}",
+      "myDel": "Elimina la mia immagine {n}",
+      "mySaveFail": "Lo sfondo è stato applicato ma non è stato possibile salvarlo su questo dispositivo (solo per questa riunione)",
+      "bgStopped": "L'effetto sfondo si è interrotto ed è stato disattivato. Sceglilo di nuovo per riavviare.",
+      "myNote": "Le tue immagini sono memorizzate solo su questo dispositivo (fino a 3, 2 MB ciascuna)",
+      "mobileBlurOnly": "Sui telefoni, è disponibile solo lo sfondo sfocato (gli sfondi immagine funzionano su PC)",
+      "myTooBig": "Possono essere utilizzate solo immagini fino a 2 MB",
+      "preparing": "Preparazione…",
+      "bgFailed": "Impossibile caricare l'effetto sfondo",
+      "autoOff": "Il tuo dispositivo è troppo lento, quindi l'effetto sfondo è stato disattivato.",
+      "unsupported": "Gli effetti di sfondo non sono disponibili su questo dispositivo",
+      "noCam": "Attiva la fotocamera per scegliere uno sfondo",
+      "lightUnsupported": "La correzione della luce non è disponibile su questo dispositivo",
+      "noiseUnsupported": "Le impostazioni di riduzione del rumore non sono supportate su questo dispositivo"
+    },
+    "sheetClose": "Chiudi",
+    "polls": {
+      "new": "Nuovo sondaggio",
+      "question": "Domanda",
+      "option": "Opzione {n}",
+      "remove": "Rimuovi opzione {n}",
+      "addOption": "Aggiungi opzione",
+      "start": "Avvia sondaggio",
+      "cancel": "Annulla",
+      "dup": "Le opzioni devono essere diverse",
+      "vote": "Vota",
+      "change": "Cambia voto",
+      "close": "Chiudi sondaggio",
+      "closed": "Chiuso",
+      "mine": "La tua scelta",
+      "result": "{pct}% ({n} voti)",
+      "total": "{n} voti in totale",
+      "empty": "Ancora nessun sondaggio.",
+      "loading": "Caricamento…",
+      "labOnly": "I sondaggi sono disponibili solo nelle sale seminari.",
+      "started": "È iniziato un nuovo sondaggio",
+      "goVote": "Vota",
+      "votersNote": "L'organizzatore può vedere chi ha votato per quale opzione.",
+      "voters": "Hanno votato: {names}"
+    },
+    "qna": {
+      "sort": "Ordina",
+      "by": {
+        "top": "Più votati",
+        "new": "Più recenti"
+      },
+      "rcm": "Vota ({n})",
+      "answered": "Risposto",
+      "answer": "Segna come risposto",
+      "unanswer": "Annulla risposta",
+      "hide": "Nascondi",
+      "doneN": "{n} risposte",
+      "backOpen": "Domande senza risposta",
+      "empty": "Ancora nessuna domanda.",
+      "emptyDone": "Nessuna domanda con risposta.",
+      "loading": "Caricamento…",
+      "input": "Fai una domanda (500 caratteri)",
+      "send": "Invia",
+      "left": "{n} rimasti",
+      "labOnly": "Le Q&A sono disponibili solo nelle sale seminari."
+    },
+    "recording": {
+      "title": "Registra",
+      "badge": "Registrazione",
+      "unsupported": "Questo browser non può registrare. Si prega di registrare da un browser normale su un computer.",
+      "piBrowserOnly": "La registrazione funziona solo in un browser normale (computer o mobile). Pi Browser non può salvare i file di registrazione — apri questo seminario in un browser per computer o telefono (seminarz.vercel.app) per registrare.",
+      "audioSuspended": "La registrazione audio potrebbe non essere iniziata su questo dispositivo. Potrebbe essere registrata solo l'immagine.",
+      "notifyFailed": "La registrazione non è iniziata perché i partecipanti non sono stati avvisati. Riprova tra poco.",
+      "confirm": {
+        "title": "Avviare la registrazione?",
+        "body": "Quando la registrazione inizia, tutti vedranno un indicatore 'Registrazione'. Il file viene salvato solo su questo dispositivo e non viene mai caricato o trasferito all'estero. Si prega di informare i partecipanti prima di iniziare.",
+        "download": "Quando interrompi, un file MP4 viene salvato nella cartella dei download (i browser che non possono registrare MP4 impiegano un momento per convertirlo; le registrazioni più lunghe di circa 45 minuti possono essere mantenute nel loro formato originale). I browser in-app potrebbero bloccare il salvataggio dei file, quindi registra da un browser normale su un computer.",
+        "cancel": "Annulla",
+        "start": "Avvia registrazione",
+        "charge": "Durante la registrazione, il tempo di registrazione viene detratto dal tempo a pagamento in aggiunta al tempo della sala (2x durante la registrazione). Quando il tempo a pagamento si esaurisce, la registrazione si interrompe e il file viene salvato."
+      },
+      "resave": {
+        "label": "File di registrazione",
+        "save": "Salva di nuovo",
+        "dismiss": "Chiudi salva di nuovo"
+      },
+      "toast": {
+        "started": "Registrazione avviata — tutti possono vederla",
+        "saved": "Registrazione salvata. Controlla la cartella dei download. Se non è stato salvato nulla, tocca [Salva di nuovo] nella parte superiore dello schermo.",
+        "autoStopped": "La registrazione è terminata perché il browser l'ha interrotta o è stato raggiunto il limite di dimensione. Tutto fino a quel momento è stato salvato. Avvia di nuovo la registrazione per continuare.",
+        "empty": "Non è stato registrato nulla, quindi non è stato creato alcun file.",
+        "saveFailed": "Impossibile creare il file di registrazione.",
+        "converting": "Conversione della registrazione in MP4. Si prega di tenere aperta questa finestra.",
+        "savedOriginal": "Impossibile convertire in MP4, quindi la registrazione è stata salvata nel suo formato originale (webm). Controlla la cartella dei download.",
+        "startedBy": "Il presentatore ha avviato la registrazione",
+        "stoppedBy": "Il presentatore ha interrotto la registrazione"
+      },
+      "paidOnly": "La registrazione è disponibile solo nei seminari aperti con un piano mensile o annuale, finché rimane tempo a pagamento.",
+      "planOut": "Il tempo a pagamento è esaurito, quindi la registrazione si è interrotta e il file è stato salvato.",
+      "notInRoom": "Sto ancora confermando che sei nella sala. Avvia di nuovo la registrazione tra un momento.",
+      "meterFailed": "Impossibile controllare il tempo di registrazione, quindi la registrazione non è iniziata. Riprova tra un momento.",
+      "paidOut": "Non è rimasto tempo a pagamento, quindi la registrazione non può iniziare. Acquista di nuovo lo stesso piano per registrare.",
+      "pausedBadge": "Registrazione in pausa",
+      "controls": "Controlli registrazione",
+      "pause": "Pausa",
+      "resume": "Riprendi",
+      "stop": "Interrompi registrazione"
+    },
+    "notes": {
+      "on": "Note AI",
+      "badge": "Note AI attive",
+      "started": "Il presentatore ha attivato le note AI",
+      "stopped": "Note AI disattivate",
+      "startedMine": "Note AI attive — mostrate a tutti",
+      "stoppedMine": "Note AI disattivate — creazione delle note in corso",
+      "startFail": "Impossibile avviare le note AI",
+      "gone": "Le note AI sono state interrotte — le note sono state terminate o eliminate altrove",
+      "unsupported": "Le note AI non possono essere attivate qui (nessun supporto per la registrazione audio)"
+    },
+    "dubbing": {
+      "listen": "Ascolta con voce tradotta",
+      "blocked": "Impossibile riprodurre la voce tradotta. Riattivala",
+      "stopped": "La voce tradotta non è disponibile al momento, quindi è stata disattivata",
+      "usrQuota": "Hai esaurito il limite di voce tradotta per questo seminario, quindi è stata disattivata"
+    },
+    "plan": {
+      "warn": "Mancano {min} min al termine del piano di questo seminario.",
+      "ended": "Il tempo del tuo seminario è scaduto, quindi il seminario è terminato e hai lasciato la stanza.",
+      "left": "Tempo rimanente del seminario",
+      "closed": "Il seminario è terminato, quindi hai lasciato la stanza.",
+      "hostAway": "L'organizzatore ha lasciato la stanza. Se non torna entro 5 minuti, tutti i partecipanti verranno rimossi.",
+      "hostGone": "L'organizzatore non è tornato entro 5 minuti, quindi hai lasciato la stanza. Puoi rientrare una volta che l'organizzatore si unisce."
+    },
+    "toLobby": "Sala d'attesa"
+  },
+  "list": {
+    "tabsLabel": "Visualizzazione elenco seminari",
+    "tabs": {
+      "all": "Tutti",
+      "hosted": "Organizzati da me",
+      "joined": "Partecipati"
+    },
+    "empty": {
+      "all": "Nessun seminario in programma.",
+      "hosted": "Non hai organizzato alcun seminario.",
+      "joined": "Non hai partecipato ad alcun seminario."
+    },
+    "loading": "Caricamento…",
+    "retry": "Riprova",
+    "free": "Gratuito",
+    "fee": "{amount} Pi",
+    "host": "Organizzatore {name}",
+    "capacity": "Capacità {n}",
+    "status": {
+      "SCHEDULED": "Programmato",
+      "LIVE": "In diretta",
+      "ENDED": "Terminato",
+      "CANCELED": "Annullato"
+    },
+    "hostNew": "Crea un seminario",
+    "progress": "Progresso",
+    "pager": "Paginazione",
+    "prev": "Prec.",
+    "next": "Succ.",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Sottotitolo",
+      "placeholder": "Aggiungi un sottotitolo",
+      "save": "Salva sottotitolo",
+      "saving": "Salvataggio…",
+      "saved": "Salvato."
+    },
+    "loading": "Caricamento…",
+    "back": "Torna all'elenco",
+    "notFound": "Seminario non trovato.",
+    "status": {
+      "SCHEDULED": "Programmato",
+      "LIVE": "In diretta",
+      "ENDED": "Terminato",
+      "CANCELED": "Annullato"
+    },
+    "startAt": "Data",
+    "host": "Organizzatore",
+    "seats": "Posti rimanenti",
+    "seatsValue": "{left} / {max}",
+    "fee": "Costo del seminario",
+    "feeValue": "{amount} Pi",
+    "free": "Gratuito",
+    "enter": "Entra",
+    "payEnter": "Paga con Pi ed entra ({amount} Pi)",
+    "paying": "Elaborazione pagamento…",
+    "joining": "Registrazione…",
+    "registered": "Sei registrato.",
+    "full": "Questo seminario è al completo.",
+    "closed": "Questo seminario è terminato.",
+    "canceled": "Questo seminario è stato annullato.",
+    "roomLink": "Vai alla stanza (organizzatore)",
+    "piBrowserOnly": "Il pagamento è disponibile in Pi Browser dopo l'accesso a Pi.",
+    "payCancelled": "Pagamento annullato.",
+    "payStillWaiting": "Ancora in attesa del wallet. Se hai già effettuato l'accesso a Pi Wallet, attendi un momento.",
+    "payFailed": "Pagamento fallito.",
+    "err": {
+      "NAME_TAKEN": "Questo nome è già utilizzato da qualcun altro. Scegli un altro nome.",
+      "CAL_READ_FAILED": "Impossibile caricare i tuoi eventi. Controlla l'indirizzo.",
+      "ISLAND_FULL": "Tutti i 100 nomi delle isole sono attualmente in uso. Puoi aprire un nuovo seminario dopo che uno in programma o in diretta termina o viene annullato.",
+      "SMN_FULL": "Questo seminario è al completo.",
+      "SMN_CLOSED": "Questo seminario è terminato o è stato annullato.",
+      "SMN_ALREADY": "Sei già registrato o un pagamento è in corso.",
+      "SMN_FREE": "I seminari gratuiti non richiedono pagamento.",
+      "SMN_PAY_REQUIRED": "Questo è un seminario a pagamento. Paga per entrare.",
+      "SMN_PAY_INVALID": "Non siamo riusciti a verificare il tuo pagamento. Contatta l'amministratore.",
+      "PAY_PI_FAILED": "Impossibile raggiungere il server di pagamento Pi. Riprova a breve.",
+      "PAY_MISMATCH": "I dettagli del pagamento non corrispondono.",
+      "PAY_AMOUNT_MISMATCH": "L'importo del pagamento differisce dalla quota del seminario.",
+      "PAY_CANCELLED": "Questo pagamento è stato annullato.",
+      "PAY_ALREADY_PAID": "Un pagamento è ancora in elaborazione. Se stavi accedendo al wallet, riprova tra 3 minuti.",
+      "PAY_INVALID_STATE": "Questo pagamento non può essere elaborato ora.",
+      "PAY_PI_CANCEL_REFUSED": "Il pagamento è già in corso e non può essere annullato. Ricontrolla a breve."
+    },
+    "share": {
+      "title": "Programma e condividi",
+      "calendar": "Aggiungi al calendario",
+      "ics": "File calendario",
+      "mail": "Invita via email",
+      "mailApp": "Invia con l'app di posta predefinita",
+      "mailSubject": "[Invito al seminario] {title}",
+      "mailBody": "{title}\nQuando: {start}\n\nPartecipa direttamente con questo link.\nDesktop: {url}\nPi Browser: {piUrl}",
+      "copy": "Copia link",
+      "copied": "Link copiato.",
+      "copyFail": "Impossibile copiare. Copia il link dalla barra degli indirizzi.",
+      "share": "Condividi con un'altra app",
+      "shareFail": "Impossibile condividere. Utilizza invece Copia link.",
+      "created": "Il tuo seminario è pronto. Aggiungi l'ora di inizio al tuo Google Calendar.",
+      "addGoogle": "Aggiungi a Google Calendar",
+      "later": "Più tardi",
+      "piBrowserOpen": "In Pi Browser, calendario, email e il file del calendario si aprono nel browser predefinito del tuo telefono.",
+      "extFail": "Impossibile aprire. Aggiorna Pi Browser, oppure usa Copia link e aprilo in un browser normale (seminarz.vercel.app).",
+      "icsPiBrowser": "Il file del calendario può essere scaricato solo in un browser normale (computer o mobile). In Pi Browser, usa invece Aggiungi al calendario."
+    },
+    "attendance": "Presenze",
+    "plan": "Piano",
+    "left": "Tempo rimanente"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Mese precedente",
+      "next": "Mese successivo",
+      "connect": "Mostra il mio Google Calendar",
+      "change": "Gestisci calendari Google ({n})",
+      "add": "Aggiungi",
+      "remove": "Rimuovi",
+      "close": "Chiudi",
+      "failed": "Impossibile caricare gli eventi da {n} calendario/i. Controlla l'indirizzo.",
+      "badUrl": "Incolla l''Indirizzo segreto in formato iCal' (…/basic.ics) dalle impostazioni di Google Calendar, non la barra degli indirizzi del browser.",
+      "full": "Puoi aggiungere fino a {n} calendari.",
+      "allDay": "Tutto il giorno",
+      "day": "I miei eventi in questo giorno",
+      "count": "{n, plural, one {# evento} other {# eventi}}",
+      "more": "+{n}",
+      "picked": "Questa data è impostata come data di inizio. Scegli l'ora qui sotto.",
+      "s1": "Tocca [Apri impostazioni Google Calendar] qui sotto.",
+      "s2": "Sotto 'Impostazioni per i miei calendari' a sinistra, scegli un calendario (es. il tuo nome).",
+      "s3": "Scorri fino a 'Integra calendario' e copia 'Indirizzo segreto in formato iCal'.",
+      "s4": "Incollalo qui e tocca [Aggiungi] — i titoli degli eventi appariranno sul calendario. Aggiungi altri calendari allo stesso modo, fino a 5.",
+      "open": "Apri impostazioni Google Calendar",
+      "privacy": "Questo indirizzo è una chiave per il tuo calendario — non condividerlo. È memorizzato solo su questo dispositivo, mai sul nostro server."
+    },
+    "title": "Crea un seminario",
+    "name": "Viaggiamo verso una bellissima isola!",
+    "subTitle": "Sottotitolo (opzionale, fino a 60 caratteri)",
+    "startAt": "Ora di inizio",
+    "maxCnt": "Capacità (1–100)",
+    "submit": "Crea",
+    "submitting": "Creazione…",
+    "invalid": "Controlla il tuo input — una data entro un anno da oggi, capacità 1–100.",
+    "attendance": {
+      "title": "Presenze",
+      "back": "Torna al seminario",
+      "loading": "Caricamento…",
+      "forbidden": "Solo l'organizzatore e gli amministratori possono visualizzare le presenze.",
+      "count": "{n} persone",
+      "csv": "Scarica CSV",
+      "empty": "Nessuno si è ancora unito.",
+      "online": "Online",
+      "left": "Uscito",
+      "col": {
+        "name": "Nome",
+        "pi": "Nome utente Pi",
+        "ent": "Primo accesso",
+        "hb": "Ultima visualizzazione",
+        "dur": "Tempo di partecipazione",
+        "min": "Partecipato (min, tempo assente escluso)",
+        "state": "Stato"
+      },
+      "durNote": "Il tempo di partecipazione va dal primo accesso all'ultima visualizzazione, meno il tempo di assenza (interruzioni più lunghe di 2,5 minuti).",
+      "csvPiBrowser": "Il download CSV funziona solo in un browser normale (computer o mobile). Pi Browser non può salvare file — apri questo foglio presenze in un browser di computer o telefono (seminarz.vercel.app)."
+    },
+    "plan": "Piano",
+    "planFree": "Gratuito — {time} rimanenti questo mese · no AI",
+    "planPaid": "{name} {time} · {price} — paga al momento della creazione",
+    "planHint": "Un seminario aperto con un piano a pagamento utilizza prima il tempo di quel piano, quindi continua con il tempo gratuito di questo mese (nessuna AI nella parte gratuita). Un piano attivo si apre senza pagamento; Mensile o Annuale che non possiedi viene pagato in Pi quando premi Crea, quindi il seminario si apre (Pi Browser). L'adesione è sempre gratuita per i partecipanti.",
+    "planOwned": "{name} — attivo · {time} rimanenti",
+    "planEnds": "L'ora di inizio è successiva alla scadenza del pass di questo piano. Sposta l'inizio prima o scegli un altro piano.",
+    "paidKept": "Il tuo pass a pagamento è conservato. Risolvi il problema e premi di nuovo Crea (nessun secondo pagamento)."
+  },
+  "privacy": {
+    "title": "Informativa sulla privacy — Funzioni vocali e AI",
+    "effective": "In vigore dal {date}",
+    "intro": "Questa informativa spiega le informazioni personali che elaboriamo quando utilizzi sottotitoli in tempo reale, sottotitoli tradotti, traduzione vocale, note di riunione AI e note di persona in un seminario. Queste funzioni utilizzano un servizio AI esterno, quindi le informazioni vengono trasferite all'estero.",
+    "whoTitle": "Le informazioni di chi vengono elaborate",
+    "who": [
+      "Presentatori e partecipanti sul palco: chiediamo il tuo consenso una volta, prima di attivare il microfono per la prima volta. Puoi partecipare al seminario senza acconsentire.",
+      "Pubblico: non utilizzi un microfono, quindi nessuna voce viene inviata. Vedi solo sottotitoli e note.",
+      "Note di persona: un amministratore registra una riunione con un microfono e conferma che i partecipanti sono stati informati prima della registrazione."
+    ],
+    "xferTitle": "Trasferimento di informazioni personali all'estero (Legge coreana sulla protezione delle informazioni personali, Art. 28-8)",
+    "xfer": [
+      {
+        "k": "Destinatario",
+        "v": "Google LLC (Gemini API) — contatto [TBD: contatto privacy Google]"
+      },
+      {
+        "k": "Paesi",
+        "v": "Stati Uniti e altri paesi in cui si trovano i data center di Google [TBD: regione di elaborazione]"
+      },
+      {
+        "k": "Quando e come",
+        "v": "Circa ogni 5 secondi mentre una funzione è attiva, tramite una connessione crittografata (HTTPS). Per le note di persona, l'intera registrazione viene inviata una volta in parti di 5 minuti quando la nota termina (trascrizione accurata)."
+      },
+      {
+        "k": "Elementi",
+        "v": "Voce, contenuto parlato (testo), nome visualizzato dell'oratore (per i riassunti delle note), screenshot della condivisione dello schermo (quando le note AI sono attive)"
+      },
+      {
+        "k": "Scopo",
+        "v": "Discorso in testo, traduzione, riassunti delle note di riunione, sintesi vocale (voci standard, nessuna clonazione vocale), separazione degli oratori per le note di persona (le voci vengono distinte ed etichettate per genere percepito, come Uomo 1 / Donna 1 — nessun nome o identità vengono inferiti)"
+      },
+      {
+        "k": "Conservazione",
+        "v": "Termina non appena il risultato viene restituito. Chiediamo a Google di non memorizzare le richieste (store=false). I log di monitoraggio degli abusi potrebbero comunque essere conservati secondo i termini di Google [TBD: periodo di conservazione e stato del livello a pagamento]."
+      },
+      {
+        "k": "Come rifiutare e cosa succede",
+        "v": "Se non acconsenti o disattivi il microfono, nessuna voce viene inviata. Puoi comunque partecipare al seminario; solo i sottotitoli, le traduzioni e le note del tuo discorso non vengono creati. Puoi revocare il consenso in qualsiasi momento [TBD: dove si trova il pulsante di revoca]."
+      }
+    ],
+    "keepTitle": "Cosa conserva questo servizio",
+    "keep": [
+      "Audio originale: per i sottotitoli del seminario e le note di riunione AI non viene memorizzato; viene scartato subito dopo la conversione in testo. Per le note di persona, la registrazione viene conservata in un archivio privato in modo da poter essere trascritta di nuovo in modo più accurato (con gli oratori) dopo la riunione, ed è eliminata durante la pulizia giornaliera una volta trascorsi 1 giorno dalla fine della nota (immediatamente se la nota viene eliminata).",
+      "Sottotitoli in tempo reale: non memorizzati.",
+      "Note di riunione AI (quando il presentatore le attiva): contenuto parlato, screenshot e il riassunto, conservati fino all'eliminazione delle note [TBD: conservazione massima].",
+      "Registri di consenso: l'ora del consenso e la versione della politica, conservati come prova [TBD: periodo di conservazione].",
+      "Utilizzo: conteggi delle richieste al minuto e tempo di elaborazione, utilizzati per applicare i limiti di costo.",
+      "Presenze: l'ora in cui ti sei unito, l'ora dell'ultima connessione, il tuo nome visualizzato e il tuo nome utente Pi vengono memorizzati e forniti all'organizzatore come elenco presenze (su schermo e come download CSV). Conservati fino all'eliminazione del seminario.",
+      "Domande e risposte e sondaggi: il testo della domanda e il nome visualizzato del richiedente (o il nome utente Pi se non presente) sono visibili a tutti i partecipanti. I voti positivi mostrano solo i conteggi, mai chi li ha espressi. I voti dei sondaggi mostrano solo i conteggi ai partecipanti; l'organizzatore e gli amministratori vedono, per ogni opzione, il nome visualizzato (o il nome utente Pi se non presente) di ogni votante. Conservati, incluse le domande nascoste, fino all'eliminazione del seminario."
+    ],
+    "recTitle": "Registrazione",
+    "rec": "Le registrazioni vengono salvate solo come file sul dispositivo del presentatore. Non vengono caricate sui nostri server né trasferite all'estero. Durante la registrazione o l'attivazione delle note AI, ogni partecipante vede un indicatore.",
+    "rightsTitle": "I tuoi diritti",
+    "rights": "Puoi chiedere di accedere, correggere, eliminare o interrompere l'elaborazione delle tue informazioni. Contatto: [TBD: nome e contatto del responsabile della privacy]"
+  },
+  "notes": {
+    "title": "Note",
+    "back": "Torna al seminario",
+    "loading": "Caricamento…",
+    "meta": "Note · {date} · {min} min",
+    "aiWarn": "Riepilogo generato dall'AI — potrebbe contenere errori",
+    "points": "Punti chiave",
+    "decisions": "Decisioni",
+    "todos": "Elementi d'azione",
+    "shots": "Catture schermo ({n})",
+    "transcript": "Trascrizione",
+    "download": "Scarica Markdown",
+    "making": "Creazione delle note…",
+    "makingLong": "Ci sta mettendo un po'. Aggiorna più tardi",
+    "recording": "Ancora in registrazione",
+    "failed": "Impossibile creare il riepilogo — la trascrizione completa è qui sotto",
+    "retry": "Riprova",
+    "finish": "Termina registrazione e riassumi",
+    "none": "Nessun contenuto",
+    "blank": "Niente da riassumere — nessun discorso è stato registrato o era troppo breve",
+    "notFound": "Note non trovate",
+    "forbidden": "Non hai accesso a queste note",
+    "shotAlt": "Cattura schermo a {at}",
+    "close": "Chiudi",
+    "view": "Visualizza note",
+    "error": "Impossibile caricare",
+    "mine": "Le mie note",
+    "del": "Elimina note",
+    "delAsk": "Eliminare queste note (riepilogo, trascrizione e catture schermo)? Nessuno potrà vederle",
+    "delYes": "Elimina",
+    "delNo": "Annulla",
+    "delFail": "Impossibile eliminare",
+    "dlFail": "Impossibile scaricare — riprova",
+    "recentNotes": "Note recenti",
+    "empty": "Nessuna nota ancora",
+    "newNote": "Inizia note di persona",
+    "inPerson": "Note riunione di persona",
+    "inPersonTag": "Di persona",
+    "titleLabel": "Titolo",
+    "titlePh": "es. Riunione settimanale",
+    "told": "Ho informato tutti i presenti che questo verrà registrato ed elaborato dall'AI (obbligatorio)",
+    "toldWhy": "Prima di iniziare, informa tutti i presenti che questa conversazione verrà registrata (la registrazione viene conservata per 1 giorno dopo la fine della nota, e gli oratori vengono distinti per voce ed etichettati per genere percepito) e trasformata in testo e un riepilogo da un'AI esterna",
+    "start": "Inizia registrazione",
+    "starting": "Preparazione…",
+    "recBadge": "Registrazione {time}",
+    "recentLines": "Ultime righe",
+    "waiting": "Il testo appare qui mentre le persone parlano",
+    "end": "Termina e crea note",
+    "wakeWarn": "La registrazione potrebbe interrompersi se lo schermo si spegne",
+    "adminOnly": "Solo gli amministratori possono usarlo",
+    "aiOff": "Le note AI non sono disponibili al momento (è necessaria la configurazione del server). Le note precedenti sono elencate di seguito",
+    "reload": "Ricarica",
+    "unsupported": "La registrazione non è disponibile su questo dispositivo",
+    "micDenied": "Impossibile usare il microfono — controlla il permesso",
+    "limited": "Il limite di tempo di elaborazione è esaurito — termina e crea le note",
+    "noAgr": "Interrotto: nessuna conferma di avviso sulla registrazione — termina e riavvia",
+    "micLost": "Il microfono si è disconnesso e la registrazione si è interrotta — tocca Riconnetti microfono o termina la nota",
+    "micRetry": "Riconnetti microfono",
+    "gone": "Questa nota è stata terminata o eliminata altrove, quindi la registrazione si è interrotta — usa il pulsante qui sotto per aprire le note",
+    "finishing": "Salvataggio delle ultime parole…",
+    "st": {
+      "RECORDING": "Registrazione",
+      "SUMMARIZING": "Creazione",
+      "DONE": "Fatto",
+      "FAILED": "Fallito"
+    },
+    "downloadPiBrowser": "Il download di Markdown funziona solo in un browser normale (computer o mobile). Pi Browser non può salvare file — apri queste note in un browser per computer o telefono (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Piani",
+    "loading": "Caricamento…",
+    "free": "Gratuito",
+    "freeDesc": "{time} di seminari ogni mese (non cumulabile)",
+    "monthly": "Mensile",
+    "yearly": "Annuale",
+    "paidDesc": "{time} di seminari, valido per {months} mesi",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Verifica prezzo Pi",
+    "noAi": "Nessuna didascalia, traduzione, doppiaggio o riassunto note AI",
+    "withAi": "Include didascalie, traduzione, doppiaggio e riassunti note AI",
+    "buy": "Paga con Pi",
+    "bought": "Pagamento completato. Il tempo del seminario è stato aggiunto.",
+    "meRemain": "Tempo rimanente: {time}",
+    "loginToBuy": "Accedi per acquistare un piano.",
+    "payNote": "Il pagamento è sempre in Pi. L'importo in valuta locale è solo un riferimento familiare; l'importo in Pi è impostato al prezzo Pi al momento del pagamento. Un seminario su un piano a pagamento utilizza prima i pass di quel piano (quelli con scadenza più vicina), quindi continua con il tempo gratuito di questo mese.",
+    "charge": "Ricarica tempo",
+    "hm": "{h} h {m} min",
+    "m": "{m} min",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (verifica prezzo Pi)",
+    "h": "{h} h"
+  },
+  "adminRooms": {
+    "title": "Gestione stanze",
+    "adminOnly": "Solo gli amministratori possono visualizzare questa pagina.",
+    "refresh": "Aggiorna",
+    "count": "{n} stanze aperte",
+    "empty": "Nessuna stanza è aperta al momento.",
+    "lab": "Stanza laboratorio",
+    "noSeminar": "Nessun record seminario",
+    "peers": "{n} / {cap} connessi",
+    "producers": "{n} stream",
+    "end": "Termina {time}",
+    "stale": "Il seminario è terminato ma la stanza è ancora aperta sul server video — chiudila forzatamente.",
+    "close": "Chiudi forzatamente",
+    "confirmSeminar": "Questo termina il seminario e chiude la stanza. Tutti verranno disconnessi.",
+    "confirmRoom": "Questo chiude la stanza. Tutti verranno disconnessi.",
+    "confirmYes": "Chiudi",
+    "cancel": "Annulla",
+    "closing": "Chiusura…",
+    "closed": "Stanza chiusa.",
+    "metrics": "Metriche server video (dall'inizio)",
+    "metricsOff": "Impossibile caricare le metriche.",
+    "m": {
+      "packetsIn": "Pacchetti in entrata",
+      "packetsOut": "Pacchetti in uscita",
+      "nackIn": "NACK ricevuti",
+      "nackOut": "NACK inviati",
+      "retransmits": "Ritrasmissioni",
+      "duplicateNack": "NACK duplicati",
+      "cacheMiss": "Mancate corrispondenze cache ritrasmissione",
+      "pliOut": "Richieste keyframe (PLI)",
+      "keyframes": "Keyframe",
+      "layerSwitches": "Cambi di qualità",
+      "queueDrops": "Eliminazioni coda"
+    }
+  },
+  "adminUsers": {
+    "title": "Utenti",
+    "adminOnly": "Solo gli amministratori possono visualizzare questa pagina.",
+    "search": "Cerca per nome (2+ caratteri)",
+    "searchBtn": "Cerca",
+    "refresh": "Aggiorna",
+    "count": "{n, plural, one {# utente} other {# utenti}}",
+    "empty": "Nessun utente.",
+    "admin": "Amministratore",
+    "lastLogin": "Ultimo accesso {time}",
+    "never": "Mai effettuato l'accesso",
+    "plan": {
+      "FREE": "Gratuito",
+      "M": "Mensile",
+      "Y": "Annuale"
+    },
+    "until": "(fino a {time})",
+    "manage": "Gestisci tempo",
+    "close": "Chiudi",
+    "planLabel": "Piano",
+    "hours": "Ore",
+    "minutes": "Minuti",
+    "reason": "Motivo (opzionale)",
+    "sub": "Riduci",
+    "confirmSub": "Riduci il tempo {plan} di {time}.",
+    "confirmYes": "Conferma",
+    "cancel": "Annulla",
+    "saving": "Salvataggio…",
+    "done": "Applicato. Tempo {plan} rimanente: {time}",
+    "invalid": "Inserisci una riduzione tra 1 minuto e 1000 ore (minuti interi 0–59).",
+    "history": "Regolazioni recenti",
+    "noHistory": "Nessuna regolazione ancora.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Dai un pass di servizio (tempo gratuito)",
+    "svc": {
+      "H1": "Pass da 1 ora",
+      "D1": "Pass da 1 giorno",
+      "M1": "Pass da 1 mese"
+    },
+    "svcNote": "I pass di servizio sono tempo del piano gratuito. Possono essere utilizzati da ora per quel periodo (1 ora, 24 ore, 1 mese) nei seminari gratuiti e nella parte gratuita dei seminari a pagamento (nessuna funzione AI). Con più pass, vengono utilizzati automaticamente nell'ordine 1 ora → 1 giorno → 1 mese.",
+    "subTitle": "Riduci tempo",
+    "subNote": "Prende prima dai pass con scadenza più lontana. Se è più di quanto rimane, viene rimosso solo il tempo rimanente.",
+    "confirmSvc": "Dai un {svc}.",
+    "doneSvc": "Hai dato un {svc}. Tempo gratuito rimanente: {time} (il pass scade {end})"
+  }
+}

@@ -14,7 +14,11 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: repoRoot,
   poweredByHeader: false,
   // Pi 도메인 검증 파일(testnet 키)을 서버리스 번들에 포함 — src/app/validation-key.txt/route.ts 가 읽음
-  outputFileTracingIncludes: { '/validation-key.txt': ['./validation-key.txt'] },
+  // messages/*.json 은 @pi/i18n/server 가 readFile 로 읽으므로 전 경로 번들에 포함(빠지면 운영에서 ko 로만 보임 — 표준 7절 L9)
+  outputFileTracingIncludes: {
+    '/validation-key.txt': ['./validation-key.txt'],
+    '/**/*': ['./messages/*.json'],
+  },
   async headers() {
     return [
       {
