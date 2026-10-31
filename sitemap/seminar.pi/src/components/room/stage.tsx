@@ -443,7 +443,10 @@ function useFullscreen() {
     if (document.fullscreenElement) return void document.exitFullscreen().catch(() => {})
     if (css) return setCss(false)
     const el = box.current
-    if (el && document.fullscreenEnabled && el.requestFullscreen) el.requestFullscreen().catch(() => setCss(true))
+    // 터치 기기(휴대폰·태블릿)는 화면 고정 오버레이로 — Pi Browser 등 WebView 의 Fullscreen API 는 앱 전용 전체 화면 뷰로 넘어가
+    //  무대 위 손들기 알림·[무대로]가 그려지지 않았다(PC 는 보임, 모바일만 안 보임 — 마스터 2026-10-31). 표시 게이팅만(UA 판정 아님)
+    if (matchMedia('(pointer: coarse)').matches) setCss(true)
+    else if (el && document.fullscreenEnabled && el.requestFullscreen) el.requestFullscreen().catch(() => setCss(true))
     else setCss(true)
   }
   return {
