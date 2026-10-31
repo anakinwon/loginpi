@@ -1,4 +1,4 @@
-// 음성 조각 → 글 — POST multipart/form-data { audio: 5초 독립 오디오 파일(webm/ogg/mp4 — wav 는 받지 않음), smnId 또는 ntId, durMs, lang? } → { text, lang, ts, sig, rec? }.
+// 음성 조각 → 글 — POST multipart/form-data { audio: 3초(CHUNK_MS) 독립 오디오 파일(webm/ogg/mp4 — wav 는 받지 않음), smnId 또는 ntId, durMs, lang? } → { text, lang, ts, sig, rec? }.
 // rec = (세미나 조각만) 기록 중 AI 회의록이 있는가 — 발표자 화면의 회의록 종료·삭제 감지(note-rules noteGone)
 // sig = 세미나 자막 서명(translate-rules capSig, 대면 노트·빈 글·500자 초과는 null) — 자막 방송에 실어 번역·합성(/api/speech/translate·tts)이 서버가 만든 글만 받게(보안 검토 D-2)
 // 말하는 사람 자기 브라우저가 자기 마이크 조각을 보낸다(계획 A-1, piFetch — Pi Browser 는 쿠키가 없어 X-Pi-Token). 비로그인 401(redirect 없음).

@@ -1,6 +1,6 @@
 // 음성 번역 듣기(더빙, SA9) — POST JSON { smnId, text, lang } → 오디오 바이트(Content-Type = 합성 음성 MIME, 기본 audio/wav).
 // text = 화면이 SA8 번역(/api/speech/translate, 같은 캐시)으로 이미 듣는 언어로 바꾼 자막 문장, lang = 듣는 언어(TRANSLATE_LANGS). 서버는 번역하지 않고 읽기만 한다 — 같은 문장 번역 2중 과금·직렬 지연 방지(A-3, R-P2·R-P4). 표준 합성 음성만(M-3 목소리 복제 없음).
-// 순서 : 키 확인(없으면 503) → 세션·본문 병렬(R-P1) → 글자 300(TTS_MAX_CHARS) → 서버 발급 서명 확인(번역 결과·음성→글 결과만, 임의 글 403 — 보안 검토 D-2) → 사용자당 분당 30회(TTS_REQ_PER_MIN, hitRate)
+// 순서 : 키 확인(없으면 503) → 세션·본문 병렬(R-P1) → 글자 300(TTS_MAX_CHARS) → 서버 발급 서명 확인(번역 결과·음성→글 결과만, 임의 글 403 — 보안 검토 D-2) → 사용자당 분당 40회(TTS_REQ_PER_MIN, hitRate)
 //  → 자격 판정 1왕복을 오디오 내주기 전에 : 캐시 적중 = aiGate(개최자·ADMIN·활성 참가 + LIVE, 차감 없음) · 미스 = speechGate TTS(사용자 누적 글자 상한 SPEECH_USR_QUOTA + fn_use_smn_ai 같은 판정·사용자 분당·세미나 누적 글자, sql/010)
 //  → 외부 AI 10초(BUILD_DEFECTS 2.7) 실패 502 = 화면은 그 문장만 건너뜀. 적중을 무확인으로 내주면 비참가자·종료 세미나도 서명만으로 음성을 받는다(야간 시험 r2 T09 회귀)
 // 자막 1문장은 청중 전원에게 동시에 방송된다 — 진행 중 Promise 를 캐시해 같은 문장·언어 요청이 몰려도 외부 합성 1회(계획 A-3). 실패 결과는 캐시에서 지운다. 비로그인 401(redirect 없음, piFetch)

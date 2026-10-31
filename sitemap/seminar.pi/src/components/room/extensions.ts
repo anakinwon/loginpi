@@ -126,6 +126,10 @@ export function useStores<T>(list: readonly FeatureStore<T>[]): T[] {
 // 원음(원격 소리 <audio>) 볼륨 0~1 — 음성 번역 듣기(더빙)가 켜진 동안 낮춘다(설계서 15.4 덕킹). stage.tsx useRemoteAudio 가 반영
 export const remoteVolume = featureStore(1)
 
+// 전체 화면 중인 무대 상자(stage.tsx useFullscreen) — Fullscreen API 는 그 요소 바깥을 그리지 않고, 터치 기기의 화면 고정 대체(fixed z-50)는
+//  바깥 오버레이를 덮는다 → 자막 같은 오버레이는 이 요소 안으로 portal 한다(모바일 전체 화면에서 자막이 안 보이던 결함, 마스터 2026-10-31). null = 전체 화면 아님
+export const stageFullEl = featureStore<HTMLElement | null>(null)
+
 // 말하기 요청 — 기능별 모드(없으면 요청 안 함). room-view 가 1개의 use-speech 로 돌린다(자막·회의록이 같이 켜져도 녹음은 1번)
 export const speechWants = featureStore<Readonly<Record<string, SpeechMode>>>({})
 export function wantSpeech(featureId: string, mode: SpeechMode | null) {

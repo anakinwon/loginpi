@@ -1,8 +1,9 @@
 // 음성 처리 순수 규칙 — 5초 음성 조각 검사(형식·크기·길이·독립 파일 머리), 과금 초·정산, 사용 판정 결과 → apiError, 상한 계산, 합성 음성 속도 문구.
 // 서버·클라이언트 공용(server-only 없음 — 화면도 같은 상수로 조각을 만든다). 시험 : node --test src/lib/speech-rules.test.mjs
 
-// 조각 길이(계획 A-1 = 5초). 화면 녹음 오차를 감안해 0.5~10초 허용
-export const CHUNK_MS = 5_000
+// 조각 길이 — 3초(2026-10-31 마스터 "자막·통역 너무 늦다" : 조각 대기 평균 2.5→1.5초, 최대 5→3초. 실측 STT 2.1~2.3초·번역 0.7~1.0초·합성 2.4~3.2초라
+//  조각 대기가 가장 큰 몫이었다. 계획 A-1 의 5초에서 내림 — 조각이 짧으면 합성 문장도 짧아져 더빙도 빨라진다). 화면 녹음 오차를 감안해 0.5~10초 허용
+export const CHUNK_MS = 3_000
 export const CHUNK_MIN_MS = 500
 export const CHUNK_MAX_MS = 10_000
 // 대면 노트 조각(0단계, 2026-10-29 PoC) — 5초 조각은 문맥이 짧아 말을 빠뜨리고 지어낸다(같은 녹음 CER 71→61%). 상한 10초에 1초 여유(타이머·정지 지연)
@@ -18,10 +19,11 @@ export const MAX_CHUNK_BYTES = (CHUNK_MAX_MS / 1000) * BILL_BYTES_PER_SEC
 //  대면 노트 9초 조각이 MAX_CHUNK_BYTES 를 넘어 'size' 거절되던 것을 상한 안으로. note-rules AUD.bps(64kbps)는 원본 1일 보관용(정밀 전사)이라 용도가 다르다.
 //  브라우저가 값을 무시해도 무해 [확인중 : iOS 실기기]
 export const SPEECH_BPS = 32_000
-// 사용자당 분당 음성 조각 요청(계획 A-5) — 5초 조각이면 정상 12회
-export const MAX_REQ_PER_MIN = 20
-// 사용자당 분당 음성 초 상한(fn_use_smn_vc RATE) — 실시간 60초 + 분 경계 오차 10초. 요청 수 상한만으론 20회×10초 = 실시간 3.3배까지 허용됨
-export const MAX_SEC_PER_MIN = 70
+// 사용자당 분당 음성 조각 요청(계획 A-5) — 3초 조각이면 정상 20회, 타이머 흔들림 여유 1.5배
+export const MAX_REQ_PER_MIN = 30
+// 사용자당 분당 음성 초 상한(fn_use_smn_vc RATE) — 조각 초는 올림(chunkSec)이라 3.0x초 조각 = 4초 청구 → 분당 20조각 = 80초. 여기에 분 경계 오차 10초
+//  (5초 조각 때 70 = 6초×11). 요청 수 상한만으론 30회×10초 = 실시간 5배까지 허용되므로 초 상한이 실질 상한
+export const MAX_SEC_PER_MIN = 90
 // 외부 AI 음성 입력 토큰 = 초당 32(공식 문서 docs/audio 'each second of audio is represented as 32 tokens') — 호출 후 실제 길이로 정산
 export const AUDIO_TOKENS_PER_SEC = 32
 // 세미나(또는 대면 노트) 1건 음성 처리 상한 기본값(분) — env SPEECH_MAX_MIN 이 덮어쓴다
@@ -202,8 +204,8 @@ export function paceStyle(rate: number) {
 }
 
 // ── 음성 번역 듣기(더빙, SA9 — M-3 표준 합성 음성) ──
-// 사용자당 분당 합성 음성 요청(캐시 적중 포함, translate-rules hitRate 로 셈) — 발표자 1명 5초 조각이면 정상 12회, 패널 2명이 동시에 말해도 여유
-export const TTS_REQ_PER_MIN = 30
+// 사용자당 분당 합성 음성 요청(캐시 적중 포함, translate-rules hitRate 로 셈) — 발표자 1명 3초 조각이면 정상 20회, 패널이 번갈아 말해도 여유
+export const TTS_REQ_PER_MIN = 40
 // 합성 1문장 글자 상한 — 5초 자막 번역은 100자 안팎, 넘는 문장은 화면이 요청하지 않고 건너뜀(비용 상한, 보안 검토 D-2)
 export const TTS_MAX_CHARS = 300
 // 합성 응답이 이 상태면 이후 문장도 모두 실패한다 — 더빙을 끄고 알린다(문장마다 헛요청 반복 방지).
@@ -245,7 +247,7 @@ export function once<A extends unknown[]>(f: (...a: A) => void) {
   }
 }
 
-// 재생 속도 = 합성 음성 길이 ÷ 원문 발화 길이, 0.8~1.5 로 묶음. 원문 길이 = 자막 1개 = 음성 조각 1개(CHUNK_MS)
+// 재생 속도 = 합성 음성 길이 ÷ 원문 발화 길이, 0.8~1.5 로 묶음. 원문 길이 = 자막 1개 = 음성 조각 1개(CHUNK_MS — 3초, 조각이 바뀌면 같이 따라간다)
 // backlog = 지금 문장 뒤에 기다리는 문장 수 — 1개당 DUB_CATCHUP 만큼 빨리 읽어 밀린 만큼 따라잡는다(보강 r6 T09 : 큐가 밀리면 원음과 점점 어긋나 결국 dubStale 로 버려졌다). 상한은 그대로 1.5
 // ponytail: 원문 길이를 조각 고정 길이로 봄 — 자막 메시지에 실제 durMs 가 실리면 그 값으로
 export const DUB_CATCHUP = 0.15

@@ -1,5 +1,5 @@
 'use client'
-// 음성 조각 훅(계획서 A-1) — 말하는 사람 자기 브라우저가 자기 마이크 트랙을 5초씩 녹음 → POST /api/speech/chunk(piFetch) → 글 →
+// 음성 조각 훅(계획서 A-1) — 말하는 사람 자기 브라우저가 자기 마이크 트랙을 3초씩(CHUNK_MS) 녹음 → POST /api/speech/chunk(piFetch) → 글 →
 // (방송 모드면) 엔진 app.send{topic:'caption', d:{text, ts, lang}}. 켜고 끄기는 on, 실패는 조용히 건너뛴다(자막은 없어도 회의는 계속).
 // 조각마다 녹음기를 새로 시작한다 — start(timeslice) 의 2번째 조각부터는 머리(헤더)가 없어 단독 해독이 안 된다
 // (Jitsi 배포본은 start(5e3) 조각을 ts-ebml 로 이어 붙여 한 파일로 고친다 — REA_04_UI_EXT R-S1). 형식 탐지 순서 근거 R-S2.
@@ -146,15 +146,22 @@ export function useSpeech({
       if (l.broadcast) void l.sendApp('caption', { text, ts, lang: meta.lang, sig: meta.sig }) // rec 는 내 화면용 — 방송하지 않는다
     }
 
-    const next = () => {
-      if (stopped || track.readyState !== 'live') return
+    let serial = false // 겹침 시작이 거부된 기기 — 이전 방식(멈춘 뒤 onstop 에서 다음 시작)으로 후퇴(R-P5, 팀장 지적 2026-10-31)
+    const next = (): boolean => {
+      if (stopped || track.readyState !== 'live') return false
       const ts = Date.now()
       const parts: Blob[] = []
       // 꺼진 마이크(enabled=false)·무음 조각(chunkHeard)은 건너뛴다
       let spoke = track.enabled
       peak = 0
       samples = 0
-      const r = new MediaRecorder(stream, { mimeType: mime, audioBitsPerSecond: SPEECH_BPS })
+      let heard: { peak: number; samples: number } | null = null // 다음 녹음기가 peak 를 0 으로 되돌리기 전에 이 조각의 측정값을 떠 둔다
+      let r: MediaRecorder
+      try {
+        r = new MediaRecorder(stream, { mimeType: mime, audioBitsPerSecond: SPEECH_BPS })
+      } catch {
+        return false // 생성 실패 — 호출한 타이머가 이전 녹음기를 그대로 멈춰 마지막 조각은 올라간다
+      }
       rec = r
       r.ondataavailable = (e) => {
         if (e.data.size) parts.push(e.data)
@@ -163,22 +170,29 @@ export function useSpeech({
         spoke ||= track.enabled
         const dur = Date.now() - ts
         const blob = new Blob(parts, { type: r.mimeType || mime })
+        const h = heard ?? { peak, samples }
         // 서버 chunkError 와 같은 길이·크기 조건(chunkSendable) — 끄기 직전의 짧은 조각, 타이머가 밀린 긴 조각, 상한 넘는 큰 조각은 버린다
-        if (!halted && spoke && chunkHeard(peak, samples, vadLevel) && chunkSendable(dur, blob.size)) {
+        if (!halted && spoke && chunkHeard(h.peak, h.samples, vadLevel) && chunkSendable(dur, blob.size)) {
           const p = upload(blob, dur).catch(() => {})
           pending.current.add(p)
           void p.finally(() => pending.current.delete(p))
         }
-        next()
+        if (serial) next() // 후퇴 모드 — 멈춘 뒤에 다음 조각 시작(공백은 생기지만 끊기진 않는다)
       }
       try {
         r.start()
       } catch {
-        return // 트랙이 막 끝남 등 — 이번 켜기는 포기(다음 on·track 변화 때 다시)
+        return false // 트랙이 막 끝남 등 — 이번 켜기는 포기(다음 on·track 변화 때 다시)
       }
+      // 다음 녹음기를 먼저 시작한 뒤 이 녹음기를 멈춘다 — stop → onstop → start 순서로 돌리면 조각 사이에 100~300ms 가 비어 경계 낱말이
+      //  잘렸다(3초 조각은 경계가 더 잦다). 같은 스트림에 녹음기 2개가 잠깐 겹치는 것은 허용된다(2026-10-31)
+      //  겹침 시작이 거부되면(Safari·WebView 미검증) 직렬로 후퇴 — 이 조각의 onstop 이 다음을 시작한다. 거부가 없던 이전 방식에 없던 '첫 조각 뒤 영구 침묵' 차단
       timer = setTimeout(() => {
+        heard = { peak, samples }
+        if (!serial && !next() && !stopped) serial = true
         if (r.state === 'recording') r.stop()
       }, chunkMs)
+      return true
     }
     next()
     // flush 용 — 녹음 중인 조각을 지금 끊는다. onstop(속성 핸들러, 먼저 등록)이 업로드를 pending 에 올린 뒤 이 리스너가 돈다

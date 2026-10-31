@@ -235,3 +235,20 @@ test('⑰ 방 관리 API(/api/admin/**)는 모두 requireAdmin 을 먼저 거치
   assert.ok(upd >= 0 && close >= 0, 'DB ENDED 갱신·엔진 닫기 문구를 찾지 못함 — 관문을 함께 고칠 것')
   assert.ok(upd < close) // DB 정본 먼저(입장권 재발급 방지)
 })
+
+test('⑱ 전체 화면 자막 — stage 가 stageFullEl 을 공개하고 자막은 그 안으로 portal, 조각 3초(마스터 2026-10-31 지연·전체 화면)', () => {
+  const stage = read('src/components/room/stage.tsx')
+  assert.match(stage, /stageFullEl\.set\(full \? box\.current : null\)/)
+  const cap = read('src/components/room/features/captions/index.tsx')
+  assert.match(cap, /createPortal\(caption, fullEl\)/)
+  assert.match(cap, /barShown && !fullEl \? 12 :/) // 전체 화면이면 하단 바 기준이 아니라 안전 영역 기준
+  // 녹음기 교체 공백 0 — 다음 녹음기를 먼저 시작한 뒤 이전 것을 멈춘다
+  const sp = read('src/components/room/use-speech.ts')
+  assert.ok(sp.includes("heard = { peak, samples }\n        if (!serial && !next() && !stopped) serial = true\n        if (r.state === 'recording') r.stop()"))
+})
+
+test('⑱-2 녹음 겹침 거부 기기 후퇴 — next() 실패면 serial 로 바꾸고 onstop 이 다음 조각을 시작한다(R-P5)', () => {
+  const sp = read('src/components/room/use-speech.ts')
+  assert.match(sp, /if \(!serial && !next\(\) && !stopped\) serial = true/)
+  assert.match(sp, /if \(serial\) next\(\)/)
+})

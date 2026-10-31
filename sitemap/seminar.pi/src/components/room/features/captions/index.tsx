@@ -11,10 +11,11 @@
 // 이 기기가 음성 녹음을 못 하면(pickAudioMime null — MediaRecorder 없는 WebView) presenter 스위치를 잠그고 사유를 보인다 — 전원에게 state{captions:true}
 //  가 방송돼 배지만 뜨고 자막 0건이던 침묵 방지(F-U A2). panel 기기만 미지원이면 그 panel 자막만 빠진다(현행과 같음)
 import { useEffect, useMemo, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useLocale, useTranslations } from 'next-intl'
 import { latestOnly, sendRetry } from '../../app-retry'
 import { Icon } from '../../control-bar'
-import { featureStore, speechWants, useStore, wantSpeech, type RoomCtx, type RoomFeature } from '../../extensions'
+import { featureStore, speechWants, stageFullEl, useStore, wantSpeech, type RoomCtx, type RoomFeature } from '../../extensions'
 import { DubRow } from '../dubbing'
 import { Sheet, SwitchRow } from '../sheet'
 import { isTranslateLang, pickTrLang, prefLangs, TRANSLATE_LANGS } from '@/lib/translate-rules'
@@ -123,6 +124,9 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   const langLabel = (c: string) => langs.find(([k]) => k === c)?.[1] ?? c
   const stop = useStore(trStop)
   const canRecord = pickAudioMime() !== null // 기능 탐지(UA 아님) — 마운트 뒤 클라이언트에서만 그려지는 오버레이라 렌더 중 호출해도 SSR 불일치 없음
+  // 전체 화면(Fullscreen API·터치 기기 화면 고정) 중엔 무대 상자 안으로 portal — 바깥 오버레이는 안 그려지거나(API) 덮인다(fixed z-50).
+  //  그때 하단 바는 상자 밖이라 안전 영역 기준으로만 띄운다(모바일 전체 화면 자막 미표시, 마스터 2026-10-31)
+  const fullEl = useStore(stageFullEl)
 
   // 번역 중단(권한 없음·AI 미설정·한도) — 번역을 켠 사람에게 1번 알린다. 시트에도 사유를 남긴다
   useEffect(() => {
@@ -188,29 +192,30 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
     if (presenter) void sendCaps(sendRef.current, capTurn(), { captionsReason: 'limit' })
   }, [ctx.speechLimited]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const caption = show && latest && (
+    <div
+      role="region"
+      aria-label={t('region')}
+      className="pointer-events-none absolute inset-x-0 z-10 flex justify-center px-2 transition-[bottom] duration-200 motion-reduce:transition-none"
+      style={{
+        bottom: barShown && !fullEl ? 12 : 'calc(16px + env(safe-area-inset-bottom))',
+      }}
+    >
+      <p
+        className="text-foreground line-clamp-3 max-w-[min(92%,720px)] rounded-lg bg-black/75 px-2.5 py-1 leading-[1.4]"
+        style={{
+          fontSize: `calc(${SCALE[size]} * clamp(16px, min(4vh, 4.5vw), 32px))`,
+        }}
+      >
+        {latest.name && <span className="text-muted-foreground mr-2">{latest.name}</span>}
+        {/* bdi = 아랍어·히브리어 등 오른쪽→왼쪽 번역문이 이름 뒤에서 문장부호 순서가 뒤섞이지 않게, lang = 한자 글꼴(중·일)·낭독기 발음 */}
+        <bdi lang={shown?.lang || undefined}>{shown?.text}</bdi>
+      </p>
+    </div>
+  )
   return (
     <>
-      {show && latest && (
-        <div
-          role="region"
-          aria-label={t('region')}
-          className="pointer-events-none absolute inset-x-0 z-10 flex justify-center px-2 transition-[bottom] duration-200 motion-reduce:transition-none"
-          style={{
-            bottom: barShown ? 12 : 'calc(16px + env(safe-area-inset-bottom))',
-          }}
-        >
-          <p
-            className="text-foreground line-clamp-3 max-w-[min(92%,720px)] rounded-lg bg-black/75 px-2.5 py-1 leading-[1.4]"
-            style={{
-              fontSize: `calc(${SCALE[size]} * clamp(16px, min(4vh, 4.5vw), 32px))`,
-            }}
-          >
-            {latest.name && <span className="text-muted-foreground mr-2">{latest.name}</span>}
-            {/* bdi = 아랍어·히브리어 등 오른쪽→왼쪽 번역문이 이름 뒤에서 문장부호 순서가 뒤섞이지 않게, lang = 한자 글꼴(중·일)·낭독기 발음 */}
-            <bdi lang={shown?.lang || undefined}>{shown?.text}</bdi>
-          </p>
-        </div>
-      )}
+      {caption && (fullEl ? createPortal(caption, fullEl) : caption)}
       <Sheet open={open} onClose={() => capSheet.set(false)} title={t('title')} ctx={ctx}>
         {presenter ? (
           <>

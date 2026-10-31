@@ -3,7 +3,7 @@
 // → 자동재생 정책으로 소리가 막혀도 영상은 나온다(설계서 14.5)
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { useTranslations } from 'next-intl'
-import { remoteVolume, useStore } from './extensions'
+import { remoteVolume, stageFullEl, useStore } from './extensions'
 import { useLayerWatch } from './layer-watch'
 import { followKey, groupTracks, nextPin, ringFor, type Layer, type PinState, type RoomLayout } from './room-rules'
 import type { Peer, RemoteTrack, RoomState, SessionRole } from './use-room'
@@ -439,6 +439,12 @@ function useFullscreen() {
     window.addEventListener('keydown', key)
     return () => window.removeEventListener('keydown', key)
   }, [css])
+  // 전체 화면이면 무대 상자를 공개 — 자막 오버레이가 이 안으로 portal 한다(바깥은 안 그려지거나 덮인다)
+  const full = api || css
+  useEffect(() => {
+    stageFullEl.set(full ? box.current : null)
+    return () => stageFullEl.set(null)
+  }, [full])
   const toggle = () => {
     if (document.fullscreenElement) return void document.exitFullscreen().catch(() => {})
     if (css) return setCss(false)

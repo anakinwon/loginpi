@@ -30,6 +30,9 @@ import {
   VAD,
   speechHalt,
   CHUNK_MS,
+  MAX_REQ_PER_MIN,
+  TTS_REQ_PER_MIN,
+  MAX_SEC_PER_MIN,
   CHUNK_MAX_MS,
   CHUNK_NOTE_MS,
   NOTE_CTX,
@@ -164,12 +167,13 @@ test('더빙 — 끝 처리 1회·재생 속도·큐 넘침', () => {
   end() // 디코드 실패 = onerror
   end() // 같은 문장의 play() 거부
   assert.equal(n, 1)
+  // 원문 길이를 5초로 명시(기본값 CHUNK_MS 는 3초로 바뀜 — 비율 검사는 그대로)
 
-  assert.equal(dubRate(5), 1)
-  assert.equal(dubRate(6), 1.2)
-  assert.equal(dubRate(10), 1.5) // 상한
-  assert.equal(dubRate(2), 0.8) // 하한
-  assert.equal(dubRate(NaN), 1)
+  assert.equal(dubRate(5, 5000), 1)
+  assert.equal(dubRate(6, 5000), 1.2)
+  assert.equal(dubRate(10, 5000), 1.5) // 상한
+  assert.equal(dubRate(2, 5000), 0.8) // 하한
+  assert.equal(dubRate(NaN, 5000), 1)
 
   let q = []
   for (const x of [1, 2, 3]) q = pushDub(q, x).q
@@ -255,6 +259,17 @@ test('대면 노트 — 무음 기준·조각 길이·문맥 상한', () => {
   assert.ok(CHUNK_NOTE_MS > CHUNK_MS && CHUNK_NOTE_MS <= CHUNK_MAX_MS - 500)
   assert.equal(chunkError({ type: 'audio/webm', bytes: WEBM, durMs: CHUNK_NOTE_MS + 400 }), null)
   assert.ok(NOTE_CTX.title > 0 && NOTE_CTX.prev > 0 && NOTE_CTX.prev <= 500)
+})
+
+// 지연 단축(마스터 2026-10-31 "자막·통역 너무 늦다") — 조각 3초, 분당 한도는 조각 수의 1.5배 이상이어야 정상 발화가 RATE 에 막히지 않는다
+test('조각 3초 — 분당 요청·합성 한도가 조각 수(60/CHUNK_MS)의 1.5배 이상', () => {
+  assert.equal(CHUNK_MS, 3_000)
+  const perMin = 60_000 / CHUNK_MS
+  assert.ok(MAX_REQ_PER_MIN >= perMin * 1.5, `MAX_REQ_PER_MIN ${MAX_REQ_PER_MIN} < ${perMin * 1.5}`)
+  assert.ok(TTS_REQ_PER_MIN >= perMin * 1.5, `TTS_REQ_PER_MIN ${TTS_REQ_PER_MIN} < ${perMin * 1.5}`)
+  assert.ok(MAX_SEC_PER_MIN >= perMin * (CHUNK_MS / 1000 + 1), `MAX_SEC_PER_MIN ${MAX_SEC_PER_MIN}`) // 조각 초는 올림 청구(3.0x초 = 4초) — 분당 조각 수 × (길이+1) 이상
+  assert.equal(dubRate(4.5), 1.5) // 3초 원문을 4.5초로 읽으면 1.5배(상한)
+  assert.equal(dubRate(3), 1)
 })
 
 test('speechHalt — 대상 삭제·권한 잃음도 이번 켜기를 멈춘다(T02 r3 : 지워진 노트에 5초마다 거절 요청)', () => {
@@ -373,14 +388,14 @@ test('더빙 원음 볼륨 — 마지막 원격 자막이 듣는 언어와 같�
 test('더빙 따라잡기 — 대기 문장 수만큼 가속, 상한 1.5 유지, 이상한 값은 가속 없음', async () => {
   const { dubRate, DUB_CATCHUP, DUB_RATE_MAX } = await import('./speech-rules.ts')
   assert.equal(DUB_CATCHUP, 0.15)
-  assert.equal(dubRate(5, undefined, 0), 1)
-  assert.equal(dubRate(5, undefined, 1), 1.15)
-  assert.equal(dubRate(5, undefined, 2), 1.3)
-  assert.equal(dubRate(5, undefined, 9), DUB_RATE_MAX) // 상한
-  assert.equal(dubRate(6, undefined, 2), DUB_RATE_MAX) // 1.2 × 1.3 = 1.56 → 1.5
-  assert.equal(dubRate(3, undefined, 1), 0.8) // 0.6 × 1.15 = 0.69 → 하한 0.8
-  for (const b of [-1, NaN, Infinity]) assert.equal(dubRate(5, undefined, b), 1)
-  assert.equal(dubRate(NaN, undefined, 2), 1)
+  assert.equal(dubRate(5, 5000, 0), 1)
+  assert.equal(dubRate(5, 5000, 1), 1.15)
+  assert.equal(dubRate(5, 5000, 2), 1.3)
+  assert.equal(dubRate(5, 5000, 9), DUB_RATE_MAX) // 상한
+  assert.equal(dubRate(6, 5000, 2), DUB_RATE_MAX) // 1.2 × 1.3 = 1.56 → 1.5
+  assert.equal(dubRate(3, 5000, 1), 0.8) // 0.6 × 1.15 = 0.69 → 하한 0.8
+  for (const b of [-1, NaN, Infinity]) assert.equal(dubRate(5, 5000, b), 1)
+  assert.equal(dubRate(NaN, 5000, 2), 1)
   const { readFile } = await import('node:fs/promises')
   const src = await readFile(new URL('../components/room/features/dubbing/index.tsx', import.meta.url), 'utf8')
   assert.ok(src.includes('a.playbackRate = dubRate(a.duration, undefined, queue.length - 1)'))
