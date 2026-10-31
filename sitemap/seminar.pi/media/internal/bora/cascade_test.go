@@ -139,7 +139,7 @@ func TestJoinPausedProducerNotifyOrder(t *testing.T) {
 	}
 	var got []string
 	for end := time.Now().Add(3 * time.Second); time.Now().Before(end); time.Sleep(10 * time.Millisecond) {
-		f.r.exec(func() { got = slices.Clone(d.got) })
+		got = d.msgs() // trickle 은 pion 고루틴이 보내므로 방 고루틴(exec)만으로는 동기화되지 않는다
 		if slices.Contains(got, signal.NTransportSubscribe) {
 			break
 		}

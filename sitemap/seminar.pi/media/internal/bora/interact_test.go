@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -15,16 +16,26 @@ import (
 	"seminar.pi/media/internal/signal"
 )
 
-// recSession — 알림 전체를 기록(방 고루틴에서만 쓰고 읽는다).
+// recSession — 알림 전체를 기록. signal.Session 계약대로 Send 는 여러 고루틴 안전
+// (r.api 가 있으면 pion ICE 콜백이 ntf trickle 을 방 고루틴 밖에서 보낸다 — -race 2026-10-31).
 type recSession struct {
+	mu     sync.Mutex
 	id     string
 	got    []signal.Notification
 	closed signal.ErrCode // Close 로 받은 코드(빈 값 = 안 닫힘)
 }
 
-func (s *recSession) ID() string                 { return s.id }
-func (s *recSession) Send(n signal.Notification) { s.got = append(s.got, n) }
-func (s *recSession) Close(c signal.ErrCode)     { s.closed = c }
+func (s *recSession) ID() string { return s.id }
+func (s *recSession) Send(n signal.Notification) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.got = append(s.got, n)
+}
+func (s *recSession) Close(c signal.ErrCode) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.closed = c
+}
 
 // v11Room — P(presenter)·N(panel)·A1·A2(audience). N 은 producer pn 발행, A1 이 pn 구독.
 type v11Room struct {
@@ -62,7 +73,9 @@ func (v *v11Room) take() map[string][]signal.Notification {
 	out := map[string][]signal.Notification{}
 	v.r.exec(func() {
 		for id, s := range v.sess {
+			s.mu.Lock()
 			out[id], s.got = s.got, nil
+			s.mu.Unlock()
 		}
 	})
 	return out

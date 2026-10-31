@@ -2,6 +2,8 @@
 package bora
 
 import (
+	"slices"
+	"sync"
 	"testing"
 	"time"
 
@@ -11,7 +13,9 @@ import (
 )
 
 // fakeSession — 알림을 기록하고, 받는 순간 check 를 실행해 순서를 검증한다.
+// signal.Session 계약대로 Send 는 여러 고루틴 안전 — 방 고루틴과 pion ICE 콜백(trickleSender)이 함께 부른다(-race 2026-10-31).
 type fakeSession struct {
+	mu     sync.Mutex
 	id     string
 	got    []string
 	check  func(n signal.Notification)
@@ -20,12 +24,25 @@ type fakeSession struct {
 
 func (f *fakeSession) ID() string { return f.id }
 func (f *fakeSession) Send(n signal.Notification) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
 	f.got = append(f.got, n.M)
 	if f.check != nil {
 		f.check(n)
 	}
 }
-func (f *fakeSession) Close(c signal.ErrCode) { f.closed = c }
+func (f *fakeSession) Close(c signal.ErrCode) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.closed = c
+}
+
+// msgs — 다른 고루틴이 Send 중일 수 있을 때 쓰는 복사본.
+func (f *fakeSession) msgs() []string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return slices.Clone(f.got)
+}
 
 func closed(ch <-chan struct{}) bool {
 	select {

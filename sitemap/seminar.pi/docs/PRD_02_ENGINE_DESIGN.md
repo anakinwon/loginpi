@@ -282,7 +282,7 @@ type Allocator interface {                 // 구독자 구독 PC당 1개, 이�
 | S→C | `ntf transport.subscribe` | `{sdp}` (서버 offer) | M1 | 구독 PC 재협상. 트랙이 연달아 생기면 200ms 묶음 |
 | C→S | `transport.subscribe.answer` | `{sdp}` | M1 | |
 | 양방향 | `trickle` | `{pc:"pub"\|"sub", candidate}` | M1 | remote SDP 전 도착분은 보관 |
-| S→C | `ntf consumerCreated` | `{consumerId, producerId, mid, kind, paused}` | M1 (paused는 M3) | |
+| S→C | `ntf consumerCreated` | `{consumerId, producerId, mid, kind, paused}` | M1 (paused는 M3 → **보류 승인 2026-10-31**, 재검토 조건 media/docs/M3_STATUS.md 8.2) | |
 | C→S | `consumer.resume` | `{consumerId}` | M3 | 클라이언트가 수신 준비를 끝낸 신호. 서버가 즉시 키프레임 요청 |
 | C→S | `consumer.setLayer` | `{consumerId, maxSpatial, maxTemporal?}` | M3 정의·M4 사용 | 화면 크기 기반 **상한**만. 실제 레이어는 서버가 정한다. 100ms 디바운스 |
 | C→S | `producer.pause` / `producer.resume` / `producer.close` | `{producerId}` | M3 | 발행자 마이크·카메라 끄기 |
