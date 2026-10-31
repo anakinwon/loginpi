@@ -1,15 +1,14 @@
 'use client'
 
-// 상단 헤더 — 홈·검색·내 사이트·관리(관리자만)·언어 전환·로그인 상태
-import { useLocale, useTranslations } from 'next-intl'
-import { Link, usePathname } from '@/i18n/navigation'
+// 상단 헤더 — 홈·검색·내 사이트·관리(관리자만)·언어 선택(@pi/i18n 스위처)·로그인 상태
+import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import { AuthStatus } from './auth-status'
 import { useAppUser } from './google-auth'
+import { AppLocaleSwitcher } from './locale-switcher'
 
 export function SiteHeader() {
   const t = useTranslations('nav')
-  const locale = useLocale()
-  const pathname = usePathname()
   // 통합 사용자(Pi 세션 OR Google 연동 세션) — 관리 메뉴 노출 판정
   const { user } = useAppUser()
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'MASTER'
@@ -25,11 +24,9 @@ export function SiteHeader() {
           <Link href="/me">{t('mySites')}</Link>
           <Link href="/link">{t('link')}</Link>
           {isAdmin && <Link href="/admin">{t('admin')}</Link>}
-          <Link href={pathname} locale={locale === 'ko' ? 'en' : 'ko'}>
-            {t('switchLocale')}
-          </Link>
         </nav>
-        <div className="ml-auto">
+        <div className="ms-auto flex items-center gap-2">
+          <AppLocaleSwitcher />
           <AuthStatus />
         </div>
       </div>

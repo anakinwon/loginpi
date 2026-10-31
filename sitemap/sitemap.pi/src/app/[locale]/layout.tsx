@@ -6,14 +6,16 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
 import { SessionProvider } from 'next-auth/react'
 import { PiSdkScript } from '@pi/auth/client'
+import { getDir, PreferredLocaleScript } from '@pi/i18n'
 import { PiAuthRoot } from '@/components/pi-auth-root'
 import { routing } from '@/i18n/routing'
 import { SiteHeader } from '@/components/site-header'
 import { MonRum } from '@/components/mon-rum'
 import '../globals.css'
 
+// 사전 렌더는 ko·en 만 — 나머지 locale 은 첫 요청 때 렌더·캐시(67개 × 전 페이지 빌드 폭증 방지, 표준 7절)
 export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }))
+  return [{ locale: 'ko' }, { locale: 'en' }]
 }
 
 export async function generateMetadata({
@@ -38,8 +40,10 @@ export default async function LocaleLayout({
   setRequestLocale(locale)
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} dir={getDir(locale)} suppressHydrationWarning>
       <body className="bg-background text-foreground min-h-screen antialiased">
+        {/* 저장된 언어(preferred_locale) 적용 — 파싱 중 1회, 하이드레이션·Pi SDK·인증 시작 전(표준 6절) */}
+        <PreferredLocaleScript locales={routing.locales} />
         {/* <html> 직속이면 hydration 불일치 — 반드시 body 안 */}
         <PiSdkScript />
         <NextIntlClientProvider>

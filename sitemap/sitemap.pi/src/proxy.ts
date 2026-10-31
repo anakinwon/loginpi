@@ -44,7 +44,7 @@ export const config = {
   matcher: [
     '/((?!api|_next|_vercel|.*\\..*).*)',
     '/s/:path*',
-    '/(ko|en)/s/:path*',
+    '/:locale/s/:path*',
     '/api/sites/:path+',
   ],
 }

@@ -1,0 +1,7 @@
+{
+  "locales": "all",
+  "glossary": ["sitemap.pi", "Pi Developer Portal", "Supabase"],
+  "audit": {
+    "exclude": ["src/app/api/**", "src/lib/api.ts", "src/lib/payments.ts", "src/env.ts", "src/proxy.ts", "**/*.test.ts"]
+  }
+}

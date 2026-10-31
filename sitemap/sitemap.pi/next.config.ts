@@ -23,7 +23,11 @@ const nextConfig: NextConfig = {
   turbopack: { root: repoRoot },
   outputFileTracingRoot: repoRoot,
   // Portal 도메인 검증 키 파일(앱 루트, env 미설정 시 폴백)을 서버리스 번들에 포함
-  outputFileTracingIncludes: { '/validation-key.txt': ['./validation-key.txt'] },
+  // messages/*.json 은 @pi/i18n/server 가 readFile 로 읽으므로 전 경로 번들에 포함(빠지면 운영에서 ko 로만 보임 — 표준 7절 L9)
+  outputFileTracingIncludes: {
+    '/validation-key.txt': ['./validation-key.txt'],
+    '/**/*': ['./messages/*.json'],
+  },
   poweredByHeader: false,
   async headers() {
     return [

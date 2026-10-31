@@ -4,14 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start"
+    "build": "pi-i18n validate && next build --turbopack",
+    "start": "next start",
+    "i18n:translate": "pi-i18n translate",
+    "i18n:validate": "pi-i18n validate",
+    "i18n:audit": "pi-i18n audit"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@pi/auth": "workspace:*",
     "@pi/db": "workspace:*",
     "@pi/guard": "workspace:*",
+    "@pi/i18n": "workspace:*",
     "@pi/mon": "workspace:*",
     "@supabase/supabase-js": "^2.107.0",
     "@t3-oss/env-nextjs": "^0.13.11",

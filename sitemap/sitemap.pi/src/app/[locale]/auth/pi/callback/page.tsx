@@ -36,13 +36,13 @@ export default function PiOAuthCallbackPage() {
       if (pending?.next) nextRef.current = pending.next
 
       if (oauthError) {
-        console.warn('[pi-oauth] 인가 서버 오류:', oauthError)
+        console.warn('[pi-oauth] 인가 서버 오류:', oauthError) // i18n-ignore
         oauthHandled = false
         setError(t('failed'))
         return
       }
       if (!accessToken || !pending || state !== pending.state) {
-        console.warn('[pi-oauth] state 검증 실패:', {
+        console.warn('[pi-oauth] state 검증 실패:', { // i18n-ignore
           hasToken: !!accessToken,
           hasPending: !!pending,
           stateEchoed: !!state,
