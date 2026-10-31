@@ -36,7 +36,6 @@ export function WarpArrival() {
     let play = false
     try {
       play = isWarpArrival(location.href, document.referrer) && !sessionStorage.getItem(C.doneKey)
-      if (play) sessionStorage.setItem(C.doneKey, '1')
     } catch {
       play = isWarpArrival(location.href, document.referrer)
     }
@@ -44,7 +43,15 @@ export function WarpArrival() {
     if (clean) history.replaceState(history.state, '', clean)
     if (!play) return
     setOn(true) // eslint-disable-line react-hooks/set-state-in-effect -- 브라우저 전용 값(referrer·주소)으로 1번 판정
-    const t = window.setTimeout(() => setOn(false), C.ms)
+    // 재생 표시는 끝날 때 쓴다 — 시작 때 쓰면 개발 모드(StrictMode)의 effect 2번 실행에서 첫 타이머가 지워진 채 덮개가 남는다(검토 2026-11-01)
+    const t = window.setTimeout(() => {
+      setOn(false)
+      try {
+        sessionStorage.setItem(C.doneKey, '1')
+      } catch {
+        /* 저장소 차단 = 새로고침 재생 방지만 꺼짐 */
+      }
+    }, C.ms)
     return () => window.clearTimeout(t)
   }, [])
 
