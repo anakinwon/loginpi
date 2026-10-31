@@ -1,4 +1,4 @@
-// pi-i18n CLI 공용 함수 — 설정·카탈로그 읽기, 점 경로 펼침/조립, 해시, ICU 구조 비교, Gemini 키 찾기.
+// pi-i18n CLI 공용 함수 — 설정·카탈로그·routing locale(loginpi) 읽기, 언어 소스 파일 경로, 점 경로 펼침/조립, 해시, ICU 구조 비교, Gemini 키 찾기.
 // 순수 Node ESM(TS 런타임 불필요). 규칙 정본 : docs/I18N_STANDARD.md 4.4·5절
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
@@ -10,6 +10,12 @@ const require = createRequire(import.meta.url)
 export const CATALOG = require('../src/catalog.json')
 const BY_CODE = new Map(CATALOG.map((l) => [l.code, l]))
 export const getInfo = (code) => BY_CODE.get(code)
+// routing locale(loginpi 219개, 순서 그대로) → 언어 코드(null = 번역 파일 없음 → ko·en 폴백)
+export const LOCALE_LANG = require('../src/data/locale-lang.json')
+export const ROUTING = Object.keys(LOCALE_LANG)
+
+// 언어 소스 파일 — ko·en 은 messages/<code>.json, 나머지 언어는 messages/lang/<code>.json (routing locale 파일은 expand 가 만든다)
+export const sourceFile = (dir, lang) => (lang === 'ko' || lang === 'en' ? join(dir, `${lang}.json`) : join(dir, 'lang', `${lang}.json`))
 
 // 공용 용어집(표준 5.2) — 앱 i18n.config.json glossary 를 더한다
 export const BASE_GLOSSARY = [
@@ -22,21 +28,23 @@ export const BASE_GLOSSARY = [
 
 export const HANGUL = /[가-힣ㄱ-ㆎ]/
 
-// locales 를 카탈로그 순서로 고르고 검증 (src/index.ts resolveLocales 와 같은 규칙)
-export function resolveLocales(locales = 'all') {
-  const all = CATALOG.map((l) => l.code)
-  if (locales === 'all') return all
-  const unknown = locales.filter((c) => !BY_CODE.has(c))
-  if (unknown.length) throw new Error(`카탈로그에 없는 locale : ${unknown.join(', ')}`)
-  for (const must of ['ko', 'en']) if (!locales.includes(must)) throw new Error(`locales 에 '${must}' 가 반드시 있어야 합니다`)
-  return all.filter((c) => locales.includes(c))
+// 목록을 기준 순서로 고르고 검증 — routing locale(src/index.ts resolveLocales 와 같은 규칙) / 언어(카탈로그)
+function pick(list, all, known, what) {
+  if (list === 'all') return [...all]
+  const unknown = list.filter((c) => !known(c))
+  if (unknown.length) throw new Error(`${what}에 없는 코드 : ${unknown.join(', ')}`)
+  for (const must of ['ko', 'en']) if (!list.includes(must)) throw new Error(`목록에 '${must}' 가 반드시 있어야 합니다`)
+  return all.filter((c) => list.includes(c))
 }
+export const resolveLocales = (locales = 'all') => pick(locales, ROUTING, (c) => Object.hasOwn(LOCALE_LANG, c), 'routing(loginpi) 목록')
+export const resolveLanguages = (langs = 'all') => pick(langs, CATALOG.map((l) => l.code), (c) => BY_CODE.has(c), '언어 카탈로그')
 
 export function loadConfig(cwd) {
   const file = join(cwd, 'i18n.config.json')
   const raw = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {}
   return {
-    locales: resolveLocales(raw.locales ?? 'all'),
+    locales: resolveLocales(raw.locales ?? 'all'), // routing locale (expand·validate 대상)
+    languages: resolveLanguages(raw.languages ?? 'all'), // 번역 언어 (translate 대상)
     glossary: [...new Set([...BASE_GLOSSARY, ...(raw.glossary ?? [])])],
     exclude: raw.audit?.exclude ?? [],
     numericArgs: [...new Set([...BASE_NUMERIC_ARGS, ...(raw.numericArgs ?? [])])],

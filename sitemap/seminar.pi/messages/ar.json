@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "تغيير اللغة",
-      "search": "البحث عن اللغة",
-      "empty": "لا توجد نتائج"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "ندوات فيديو مباشرة تنضم إليها باستخدام Pi"

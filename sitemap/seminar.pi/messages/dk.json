@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Live video seminarer, du deltager i med Pi"
+  },
+  "home": {
+    "description": "Værter åbner seminarer, og deltagere deltager i live videosessioner med Pi.",
+    "badge": "Live seminarer på smukke øer",
+    "headline": "Se, lyt og lær sammen — live",
+    "ctaBrowse": "Gennemse seminarer",
+    "ctaPlan": "Se planer",
+    "features": {
+      "video": "Live video",
+      "caption": "Undertekster og oversættelse",
+      "notes": "AI-mødereferater",
+      "pay": "Betal med Pi"
+    },
+    "listTitle": "Seminarer",
+    "cal": {
+      "title": "Seminarkalender",
+      "desc": "Fra tidligere seminarer til kommende – tryk på en dato for detaljer.",
+      "legendSmn": "Seminarer",
+      "legendEnded": "Tidligere seminarer",
+      "legendMine": "Mine begivenheder",
+      "failed": "Kunne ikke indlæse seminardatoer. Prøv igen senere.",
+      "open": "Se detaljer"
+    }
+  },
+  "nav": {
+    "link": "Link konto",
+    "privacy": "Privatlivspolitik",
+    "plan": "Planer",
+    "rooms": "Rum",
+    "admin": "Admin",
+    "users": "Brugere",
+    "home": "Hjem",
+    "privacyShort": "Privatliv",
+    "menu": "Hovedmenu",
+    "fold": "Skjul menu",
+    "unfold": "Udvid menu"
+  },
+  "auth": {
+    "checking": "Kontrollerer login…",
+    "signedIn": "{name}",
+    "inPerson": "Personlige noter",
+    "required": "Log venligst ind med din Pi-konto.",
+    "signIn": "Log ind med Pi",
+    "openInPiBrowser": "Åbn denne side i Pi Browser for at logge ind med din Pi-konto.",
+    "authenticating": "Logger ind…",
+    "google": "Log ind med Google",
+    "signOut": "Log ud",
+    "or": "eller",
+    "linkRequired": "Du er logget ind med Google, men den er endnu ikke knyttet til en Pi-konto. Udsted en linkkode i Pi Browser og indtast den her.",
+    "linkNeeded": "Pi-konto skal linkes",
+    "linkCheckFailed": "Kunne ikke kontrollere din kontos linkstatus (midlertidig serverfejl). Opdater venligst om et øjeblik."
+  },
+  "piOAuth": {
+    "signingIn": "Logger ind med din Pi-konto…",
+    "failed": "Pi-login mislykkedes. Prøv igen.",
+    "stateMismatch": "Kunne ikke bekræfte denne loginanmodning (udløbet eller en anden fane). Prøv igen.",
+    "retry": "Prøv igen",
+    "backHome": "Hjem"
+  },
+  "link": {
+    "title": "Link konto",
+    "intro": "Forbind den konto, du loggede ind med i Pi Browser, til Google-login i en almindelig browser. Efter linking kan du bruge den samme konto på en pc-browser.",
+    "checking": "Kontrollerer login…",
+    "piIssueTitle": "For også at logge ind fra en almindelig browser",
+    "codeHint": "Udsted koden nedenfor, log derefter ind med Google på en pc-browser og indtast den på siden Link konto (inden for 10 minutter).",
+    "piIssue": "Udsted linkkode",
+    "reissue": "Udsted en ny kode",
+    "expiresIn": "Udløber om {min} min",
+    "enterTitle": "Indtast linkkode",
+    "enterHint": "I Pi Browser åbn seminar.pi → Link konto → Udsted linkkode, og indtast derefter den 6-cifrede kode.",
+    "codeLabel": "Linkkode",
+    "submit": "Link",
+    "done": "Linked. Du kan nu også bruge Google-login.",
+    "linked": "{name} er linket til Google-login."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Login påkrævet",
+    "AUTH_PI_REQUIRED": "Pi-login påkrævet",
+    "AUTH_PI_SESSION_INVALID": "Din session er udløbet. Log venligst ind igen",
+    "AUTH_PI_TOKEN_INVALID": "Pi-loginbekræftelse mislykkedes",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Pi-loginoplysninger mangler",
+    "FORBIDDEN": "Du har ikke tilladelse",
+    "BAD_REQUEST": "Ugyldig anmodning",
+    "BAD_REQUEST_BODY": "Ugyldig anmodning",
+    "INVALID_INPUT": "Ugyldig input",
+    "QUERY_FAILED": "Kunne ikke indlæse",
+    "SAVE_FAILED": "Kunne ikke gemme",
+    "INTERNAL": "Noget gik galt",
+    "SERVER_CONFIG": "Serverkonfigurationsfejl. Kontakt venligst operatøren",
+    "PI_API_CONNECT_FAILED": "Kunne ikke nå Pi Network",
+    "DB_UNAVAILABLE": "Data er midlertidigt utilgængelige. Prøv igen senere",
+    "NOT_FOUND": "Ikke fundet",
+    "RATE_LIMITED": "For mange anmodninger. Prøv igen om kort tid",
+    "PAYLOAD_TOO_LARGE": "Anmodningen er for stor",
+    "NETWORK": "Kontroller din netværksforbindelse",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Dette Pi-brugernavn er allerede registreret med forskellige legitimationsoplysninger. Kontakt venligst administratoren",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Denne konto er inaktiv. Kontakt venligst administratoren",
+    "AUTH_GOOGLE_REQUIRED": "Google-login er påkrævet.",
+    "LINK_CODE_INVALID": "Linkkoden er ugyldig eller udløbet. Udsted en ny i Pi Browser.",
+    "LINK_ALREADY_LINKED": "Denne konto er allerede linket.",
+    "LINK_CODE_GEN_FAILED": "Kunne ikke oprette en linkkode. Prøv igen senere.",
+    "AUTH_DB_UNAVAILABLE": "Kunne ikke gemme din konto, så login mislykkedes. Prøv igen senere.",
+    "LINK_TRY_LIMIT": "For mange forkerte linkkoder. Prøv igen om 15 minutter.",
+    "PRICE_UNAVAILABLE": "Kunne ikke få Pi-prisen. Prøv igen om kort tid",
+    "QUOTE_EXPIRED": "Betalingskvoten er udløbet. Betal venligst igen",
+    "PLAN_EXHAUSTED": "Du har brugt al din seminartid. Fyld op på siden Planer",
+    "HOST_AWAY": "Værten er ikke i rummet. Du kan komme ind, når værten er tilsluttet",
+    "PLAN_AI_PAID": "AI-funktioner er tilgængelige på betalte planer",
+    "AI_UNAVAILABLE": "AI-funktioner er ikke tilgængelige lige nu",
+    "SPEECH_CHUNK_INVALID": "Lydklumpformatet er ugyldigt",
+    "SPEECH_NOT_LIVE": "Dette seminar er ikke live",
+    "SPEECH_NO_AGR": "Samtykke til stemmebehandling er påkrævet",
+    "SPEECH_RATE": "For mange stemmeanmodninger. Prøv igen om kort tid",
+    "SPEECH_QUOTA": "Stemmebehandlingstiden for dette seminar er opbrugt",
+    "SPEECH_USR_QUOTA": "Du har brugt din grænse for oversættelse og oversat stemme for dette seminar",
+    "SPEECH_FAILED": "Kunne ikke konvertere tale til tekst",
+    "SPEECH_STAGE_ONLY": "Kun personer på scenen kan bruge stemmeundertekster",
+    "TRANSLATE_FAILED": "Kunne ikke oversætte underteksten",
+    "POLL_CLOSED": "Denne afstemning er lukket",
+    "NOTE_NOT_RECORDING": "Disse noter optager ikke",
+    "NOTE_SHOT_INVALID": "Ugyldig skærmoptagelse",
+    "NOTE_AUDIO_INVALID": "Ugyldig optagelsesfil",
+    "NOTE_SHOT_RATE": "For mange skærmoptagelser",
+    "NOTE_RETRY_SOON": "Du kan prøve igen om et minut",
+    "SPEECH_TTS_FAILED": "Kunne ikke oprette den oversatte stemme",
+    "CAPTION_SIG_INVALID": "Denne undertekst kunne ikke verificeres, så den blev ikke oversat",
+    "PLAN_EXPIRES_BEFORE_START": "Starttidspunktet er efter denne plans pas udløber",
+    "PAY_ALREADY_PAID": "En betaling behandles stadig. Hvis du loggede ind i tegnebogen, prøv igen om 3 minutter.",
+    "REC_PAID_ONLY": "Optagelse er kun tilgængelig i månedlige eller årlige seminarer med betalt tid tilbage",
+    "REC_NOT_IN_ROOM": "Bekræfter stadig, at du er i rummet. Prøv igen om et øjeblik",
+    "ENGINE_OFF": "Video serverens admin-nøgle er ikke konfigureret",
+    "ENGINE_UNAVAILABLE": "Videoserveren svarer ikke. Prøv igen om kort tid",
+    "ADJ_NOTHING": "Der er ingen resterende tid at reducere"
+  },
+  "progress": {
+    "title": "Byggefremgang",
+    "subtitle": "Udført, i gang og planlagt, efter funktion · pr. {date}",
+    "overall": "Overordnede trin",
+    "stepsDone": "{done}/{total} trin udført ({pct}%)",
+    "featureUnit": "funktioner",
+    "status": {
+      "done": "Udført",
+      "doing": "I gang",
+      "todo": "Planlagt",
+      "drop": "Droppet"
+    },
+    "features": {
+      "F01": {
+        "name": "Login",
+        "desc": "Pi Browser login, Google login i andre browsere, og linking af begge konti"
+      },
+      "F05": {
+        "name": "Live video seminar",
+        "desc": "Vores egen video engine Galápagos — målet er én præsentator, der streamer til op til 30 deltagere"
+      },
+      "F02": {
+        "name": "Opret et seminar",
+        "desc": "Indstil undertitel, tid, kapacitet og seminar gebyr for at oprette et seminar (navn = ø, automatisk)"
+      },
+      "F03": {
+        "name": "Seminarliste og detaljer",
+        "desc": "Gennemse åbne seminarer side for side og se deres detaljer"
+      },
+      "F04": {
+        "name": "Pi adgangsbetaling",
+        "desc": "Betal seminar gebyret i Pi; serveren genkontrollerer beløbet, før du får adgang"
+      },
+      "F06": {
+        "name": "Værtsudbetalinger",
+        "desc": "Udbetal adgangsgebyrindtægter til værter i Pi"
+      },
+      "F07": {
+        "name": "Genafspilninger",
+        "desc": "Se optagede seminarer senere"
+      },
+      "FU": {
+        "name": "Møde-tilføjelser grundlag",
+        "desc": "Én signalkanal til tilføjelser, AI-forbindelse, stemmeklumper, mikrofon samtykke og datatabeller"
+      },
+      "F08": {
+        "name": "Planlægning og deling",
+        "desc": "Kalenderlink, begivenhedsfil (.ics) og e-mail invitation til hvert seminar"
+      },
+      "F09": {
+        "name": "Støjreduktion og belysning",
+        "desc": "Reducer mikrofonstøj og lys mørk kameravideo op"
+      },
+      "F10": {
+        "name": "Live undertekster",
+        "desc": "Omdan præsentatorens tale til tekst under scenen"
+      },
+      "F11": {
+        "name": "Afstemninger, Q&A og deltagelse",
+        "desc": "Afhold afstemninger og spørgsmål under et seminar; værter downloader deltagerlisten"
+      },
+      "F12": {
+        "name": "Baggrundseffekter",
+        "desc": "Slør din baggrund eller erstat den med en forudindstilling eller dit eget billede (behandlet på din enhed)"
+      },
+      "F13": {
+        "name": "Lokal optagelse",
+        "desc": "Præsentatoren optager seminaret på deres egen enhed, og alle ser, at optagelsen er tændt"
+      },
+      "F14": {
+        "name": "AI-mødereferater",
+        "desc": "Når præsentatoren tænder det, optages tale og skærme og opsummeres til nøglepunkter, beslutninger og to-do's"
+      },
+      "F15": {
+        "name": "Personlige mødenoter",
+        "desc": "Optag et møde med kun en mikrofon og få mødenoter (administratorer)"
+      },
+      "F16": {
+        "name": "Oversatte undertekster",
+        "desc": "Vis undertekster oversat til det sprog, du vælger"
+      },
+      "F17": {
+        "name": "Lyt i oversættelse",
+        "desc": "Læs oversatte undertekster højt med en syntetisk stemme, mens den originale lyd sænkes"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser login",
+      "googleLogin": "Google login",
+      "accountLink": "Kontolinkning",
+      "deviceTest": "Kameraenhedstest",
+      "oneToTwo": "Præsentator 1 → 2 deltagere",
+      "recovery": "Frys gendannelse og stabilitet",
+      "structure": "Oprydning af motorstruktur",
+      "autoQuality": "Auto kvalitet, 30 deltagere",
+      "roomService": "Rumadgang og optagelse",
+      "roomUi": "Rumskærm (lobby·scene·chat·ræk hånd op·moderation)",
+      "createForm": "Opret skærm",
+      "list": "Liste",
+      "detail": "Detaljer",
+      "payRequest": "Betalingsanmodning",
+      "payVerify": "Beløb genkontrol og adgang",
+      "settle": "Udbetaling",
+      "vod": "Optagelsesgenafspilning",
+      "appRelay": "Motor tilføjelsessignalkanal",
+      "aiBase": "AI, stemmeklumper, samtykke og datatabeller",
+      "shareLinks": "Kalenderlink, .ics og e-mail invitation",
+      "noiseLight": "Støjreduktion og belysning",
+      "liveCaptions": "Live undertekster",
+      "pollQnaAttend": "Afstemninger, Q&A og deltagerliste",
+      "backgrounds": "Slør, forudindstillinger og dit eget billede",
+      "localRecording": "Præsentatoroptagelse og optagelsesbadge",
+      "aiNotes": "Optagelse, resumé og noteside",
+      "inPersonNotes": "Kun mikrofonnoter og mine noter",
+      "captionTranslate": "Sprogvalg og original/oversat skift",
+      "dubbing": "Syntetisk stemmeafspilning og sænket original lyd"
+    },
+    "refLabel": "Referencemodel",
+    "uiRef": "UI-baseline — skærm- og funktionsmønstre for en meget brugt web-videomødeapp, tilpasset til seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Navn gemt, men andre kunne ikke underrettes nu. De vil se det, når du genopretter forbindelse.",
+      "tile": "Klik for at ændre mit navn",
+      "menu": "Skift mit navn",
+      "title": "Mit navn i dette seminar",
+      "hint": "Op til 30 tegn. Bruges kun i dette seminar og opdateres med det samme på alles skærm.",
+      "save": "Gem",
+      "saving": "Gemmer…",
+      "cancel": "Annuller",
+      "taken": "Det navn bruges allerede af en anden (vært eller deltager). Vælg et andet.",
+      "failed": "Kunne ikke gemme dit navn. Prøv igen."
+    },
+    "roomTitle": {
+      "edit": "Klik for at redigere undertitlen",
+      "label": "Undertitel",
+      "placeholder": "Undertitel (op til 60)",
+      "save": "Gem",
+      "cancel": "Annuller",
+      "failed": "Kunne ikke gemme undertitlen."
+    },
+    "mirror": "Spejl min video",
+    "barPin": "Vis altid nederste bjælke",
+    "barAuto": "Skjul nederste bjælke automatisk",
+    "title": "Deltag i seminar · {room}",
+    "titleSeminar": "Venteværelse",
+    "noEngine": "Videoserveren er ikke klar endnu.",
+    "joinAs": "Deltag som",
+    "presenter": "Præsentator",
+    "audience": "Publikum",
+    "join": "Deltag nu",
+    "nameLabel": "Navn",
+    "audienceHint": "Publikum bruger ikke kamera eller mikrofon. Efter tilmelding vil du se og høre præsentatoren.",
+    "preview": {
+      "pending": "Forbereder kamera og mikrofon…",
+      "audioOnly": "Kamera utilgængeligt — sender kun lyd.",
+      "none": "Kamera og mikrofon utilgængelige. Kontroller tilladelser (du kan stadig deltage uden medier).",
+      "videoOnly": "Mikrofon utilgængelig — sender kun video. Kontroller mikrofontilladelse."
+    },
+    "mic": {
+      "on": "Slå mikrofon fra",
+      "off": "Slå mikrofon til"
+    },
+    "cam": {
+      "on": "Slå kamera fra",
+      "off": "Slå kamera til"
+    },
+    "controls": "Opkaldskontroller",
+    "leave": "Forlad",
+    "enableSound": "Aktiver lyd",
+    "state": {
+      "connecting": "Forbinder…",
+      "reconnecting": "Genopretter forbindelse…"
+    },
+    "waiting": "Venter på præsentatoren.",
+    "rejoin": "Deltag igen",
+    "err": {
+      "generic": "Noget gik galt. Deltag venligst igen.",
+      "CLOSED": "Forbindelsen blev tabt.",
+      "NO_ENGINE": "Videoserveren er ikke klar endnu.",
+      "TICKET_401": "Log venligst ind.",
+      "TICKET_403": "Du har ikke tilladelse til at præsentere. Deltag som publikum.",
+      "TICKET_503": "Videoserveren er ikke konfigureret endnu.",
+      "TICKET_NETWORK": "Kontroller din netværksforbindelse.",
+      "TICKET_INVALID": "Dit adgangskort er udløbet.",
+      "TICKET_EXPIRED": "Dit adgangskort er udløbet.",
+      "ROOM_FULL": "Dette seminar er fyldt.",
+      "ROOM_CLOSED": "Lokalet blev lukket — seminaret sluttede, eller værten var væk i mere end 5 minutter.",
+      "DUPLICATE_SESSION": "Du tilsluttede fra en anden enhed, så denne skærm blev afbrudt.",
+      "ROLE_FORBIDDEN": "Du har ikke tilladelse til at præsentere.",
+      "WS_FAILED": "Kunne ikke oprette forbindelse til videoserveren.",
+      "ICE_FAILED": "Videoforbindelsen blev afbrudt. Tjek dit netværk.",
+      "MEDIA_FAILED": "Kunne ikke starte kameraet eller mikrofonen.",
+      "TIMEOUT": "Videoserveren svarer ikke.",
+      "TICKET_402": "Dette er et betalt seminar. Betal venligst på seminarsiden, før du går ind.",
+      "TICKET_404": "Seminar ikke fundet.",
+      "TICKET_409": "Dette seminar er afsluttet eller annulleret.",
+      "TICKET_HOST_AWAY": "Værten er endnu ikke tilsluttet eller har været væk i mere end 5 minutter, så du kan ikke komme ind. Prøv igen, når værten er tilsluttet.",
+      "TICKET_PLAN_EXHAUSTED": "Denne seminars plan har ikke mere tid tilbage, så den kan ikke starte. At købe den samme plan igen tilføjer tid (Gratis fornyes med 1 time næste måned)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Kunne ikke ændre mikrofonen. Prøv igen.",
+        "video": "Kunne ikke ændre kameraet. Prøv igen."
+      },
+      "forbidden": "Du har ikke tilladelse til at præsentere, så du fortsætter som publikum.",
+      "demoted": "Du blev flyttet tilbage til publikum.",
+      "endFailed": "Kunne ikke afslutte seminaret. Prøv igen.",
+      "chatFailed": "Besked ikke sendt.",
+      "actionFailed": "Kunne ikke fuldføre anmodningen. Prøv igen.",
+      "shareFailed": "Kunne ikke starte skærmdeling.",
+      "err": {
+        "RATE_LIMITED": "Du sender for hurtigt. Vent et øjeblik.",
+        "ROLE_FORBIDDEN": "Du har ikke tilladelse til at gøre dette.",
+        "MEDIA_FAILED": "Kunne ikke starte din mikrofon eller dit kamera. Tjek tilladelser.",
+        "LOCKED": "Låst af præsentationsværten."
+      },
+      "mutedBy": {
+        "audio": "Præsentationsværten slukkede din mikrofon.",
+        "video": "Præsentationsværten slukkede dit kamera."
+      },
+      "policy": {
+        "locked": "Præsentationsværten har låst mikrofonerne. Du kan tænde din, når de er låst op.",
+        "unlocked": "Mikrofonerne er låst op."
+      },
+      "consent": {
+        "saveFail": "Kunne ikke gemme dit samtykke. Tjek din registrering og tænd mikrofonen igen."
+      }
+    },
+    "home": "Gå til hjem",
+    "tile": {
+      "fullscreen": "Dobbeltklik for fuld skærm · Esc for at afslutte",
+      "self": "{name} (dig)",
+      "presenter": "Præsentationsvært",
+      "micOff": "Mikrofon slukket",
+      "screen": "{name}s skærm",
+      "row": "Andre talere",
+      "pin": "Vis {name} stor",
+      "unpin": "Automatisk layout"
+    },
+    "more": "Flere muligheder",
+    "joinNoCam": "Deltag uden kamera",
+    "net": {
+      "afterJoin": "Din forbindelse kontrolleres automatisk, når du deltager.",
+      "measuring": "Kontrollerer forbindelse…",
+      "good": "God forbindelse",
+      "fair": "Rimelig forbindelse",
+      "poor": "Dårlig forbindelse",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% af lyddata går tabt.",
+          "video": "{pct}% af videodata går tabt."
+        },
+        "rate": {
+          "audio": "Lydoverførsel er lav med {kbps} kbps.",
+          "video": "Videooverførsel er lav med {kbps} kbps. Kvaliteten kan falde."
+        }
+      }
+    },
+    "people": "{n} i lokalet",
+    "screen": {
+      "start": "Del skærm",
+      "stop": "Stop deling"
+    },
+    "panel": {
+      "title": "Chat · Q&A · Afstemninger · Personer",
+      "chat": "Chat",
+      "people": "Personer",
+      "close": "Luk panel",
+      "qna": "Q&A",
+      "polls": "Afstemninger"
+    },
+    "chat": {
+      "empty": "Ingen beskeder endnu. Chat gemmes ikke.",
+      "me": "Dig",
+      "failed": "Ikke sendt.",
+      "retry": "Prøv igen",
+      "input": "Skriv en besked",
+      "send": "Send"
+    },
+    "hand": {
+      "raise": "Ræk hånden op",
+      "lower": "Sænk hånden",
+      "list": "Hævede hænder",
+      "lowerAll": "Sænk alle hænder",
+      "raised": "Hånd hævet",
+      "notice": "{name} rakte en hånd op.",
+      "dismiss": "Afvis",
+      "waiting": "{n} personer venter på at tale"
+    },
+    "react": {
+      "open": "Reaktioner",
+      "e0": "Synes godt om",
+      "e1": "Klap",
+      "e2": "Grin",
+      "e3": "Overrasket",
+      "e4": "Ked af det",
+      "e5": "Målløs",
+      "e6": "Kærlighed"
+    },
+    "quality": {
+      "label": "Kvalitet",
+      "auto": "Auto",
+      "high": "Høj",
+      "medium": "Medium",
+      "low": "Lav",
+      "unstable": "Dit netværk er ustabilt"
+    },
+    "roles": {
+      "presenter": "Præsentationsvært",
+      "panel": "Panelist",
+      "audience": "Publikum"
+    },
+    "stage": {
+      "invite": "Inviter til scenen",
+      "remove": "Flyt til publikum",
+      "promoted": "Du blev inviteret til scenen. Hvis du rakte hånden op, tændes dit kamera automatisk (medmindre det er låst eller ikke tilladt). Tænd din mikrofon for at tale (mikrofonen tændes ikke automatisk).",
+      "later": "Senere"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} rakte en hånd op."
+    },
+    "leaveDialog": {
+      "title": "Forlad seminaret",
+      "body": "Du kan forlade alene eller afslutte seminaret og afbryde alle.",
+      "confirmTitle": "Afslut seminaret?",
+      "confirmBody": "Alle vil blive afbrudt, og ingen kan genindtræde i dette seminar.",
+      "cancel": "Annuller",
+      "end": "Afslut seminar",
+      "endConfirm": "Afslut nu"
+    },
+    "mod": {
+      "muteAll": "Slå lyden fra for alle",
+      "lock": "Lås mikrofoner",
+      "unlock": "Lås mikrofoner op",
+      "locked": "Præsentationsværten har låst mikrofonerne",
+      "muteMic": "Slå mikrofon fra",
+      "askMic": "Bed om at slå lyden til",
+      "muteCam": "Sluk kamera",
+      "muteMicOf": "Slå lyden fra for {name}",
+      "askMicOf": "Bed {name} om at slå lyden til",
+      "muteCamOf": "Sluk kamera for {name}"
+    },
+    "ask": {
+      "audio": "Præsentationsværten bad dig om at tænde din mikrofon.",
+      "video": "Præsentationsværten bad dig om at tænde dit kamera.",
+      "ignore": "Ignorer"
+    },
+    "toDetail": "Gå til seminarside",
+    "consent": {
+      "title": "Før du tænder din mikrofon",
+      "body": "Hvis optagelse, undertekster eller AI-mødereferater er slået til i dette seminar, kan din stemme blive konverteret til tekst, gemt og oversat. Stemmebehandling udføres af en AI-tjeneste uden for dit land. Hvis du ikke er enig, tændes din mikrofon stadig – kun din stemme udelades fra behandlingen.",
+      "privacy": "Fortrolighedspolitik",
+      "newTab": "(åbner i en ny fane)",
+      "decline": "Ikke enig",
+      "agree": "Enig og tænd mikrofon",
+      "notice": "Når optagelse, undertekster eller AI-mødereferater er slået til, behandles talernes stemmer. Publikumstemmer sendes ikke.",
+      "saveFailClosed": "Dette seminar er afsluttet, så samtykke kan ikke registreres."
+    },
+    "captions": {
+      "title": "Undertekster",
+      "room": "Live undertekster (hele rummet)",
+      "show": "Vis undertekster",
+      "size": {
+        "label": "Tekststørrelse",
+        "sm": "Lille",
+        "md": "Medium",
+        "lg": "Stor"
+      },
+      "waiting": "Undertekster vises, når præsentationsværten tænder dem.",
+      "limit": "Grænsen for stemmebehandling er nået, så undertekster og AI-minutter er stoppet.",
+      "sendFail": "Kunne ikke tænde undertekster. Prøv igen om et øjeblik.",
+      "sendFailOff": "Kunne ikke slukke undertekster. Prøv igen om et øjeblik.",
+      "region": "Undertekster",
+      "translate": "Vis oversatte undertekster",
+      "lang": "Oversættelsessprog",
+      "langMine": "Mine sprog",
+      "langAll": "Alle sprog",
+      "trStop": {
+        "forbidden": "Oversatte undertekster er kun for registrerede deltagere. Viser originalen.",
+        "unavailable": "Oversatte undertekster er ikke tilgængelige lige nu. Viser originalen.",
+        "quota": "Dette seminar har nået sin oversættelsesgrænse. Viser originalen.",
+        "usrQuota": "Du har brugt din oversættelsesgrænse for dette seminar. Viser originalen."
+      },
+      "unsupported": "Denne enhed kan ikke oprette live undertekster (ingen understøttelse af lydoptagelse i denne browser)."
+    },
+    "effects": {
+      "title": "Effekter",
+      "light": "Lyskorrektion",
+      "noise": "Reducer støj",
+      "noiseFail": "Støjreduktion kan ikke ændres på denne enhed.",
+      "close": "Luk",
+      "preview": "Min forhåndsvisning",
+      "bg": "Baggrund",
+      "bgNone": "Ingen",
+      "bgBlur": "Sløring",
+      "scenes": {
+        "beach": "🏝️ Maldivernes strand",
+        "autumn": "🍁 Efterårsdal",
+        "fireplace": "🔥 Pejs",
+        "xmas": "🎄 Julemødelokale"
+      },
+      "bgs": {
+        "dusk": "Skumring",
+        "ocean": "Ocean",
+        "forest": "Skov",
+        "studio": "Studio",
+        "grid": "Gitter",
+        "dots": "Prikker"
+      },
+      "myAdd": "Mit billede",
+      "myItem": "Mit billede {n}",
+      "myDel": "Slet mit billede {n}",
+      "mySaveFail": "Baggrunden er anvendt, men kunne ikke gemmes på denne enhed (kun dette møde).",
+      "bgStopped": "Baggrundseffekten stoppede og blev slået fra. Vælg den igen for at genstarte.",
+      "myNote": "Dine billeder gemmes kun på denne enhed (op til 3, 2 MB hver).",
+      "mobileBlurOnly": "På telefoner er kun sløret baggrund tilgængelig (billedbaggrunde fungerer på PC).",
+      "myTooBig": "Kun billeder op til 2 MB kan bruges.",
+      "preparing": "Forbereder…",
+      "bgFailed": "Kunne ikke indlæse baggrundseffekten.",
+      "autoOff": "Din enhed er for langsom, så baggrundseffekten blev slået fra.",
+      "unsupported": "Baggrundseffekter er ikke tilgængelige på denne enhed.",
+      "noCam": "Tænd dit kamera for at vælge en baggrund.",
+      "lightUnsupported": "Lyskorrektion er ikke tilgængelig på denne enhed.",
+      "noiseUnsupported": "Støjreduktionsindstillinger understøttes ikke på denne enhed."
+    },
+    "sheetClose": "Luk",
+    "polls": {
+      "new": "Ny afstemning",
+      "question": "Spørgsmål",
+      "option": "Mulighed {n}",
+      "remove": "Fjern mulighed {n}",
+      "addOption": "Tilføj mulighed",
+      "start": "Start afstemning",
+      "cancel": "Annuller",
+      "dup": "Mulighederne skal være forskellige.",
+      "vote": "Stem",
+      "change": "Skift stemme",
+      "close": "Luk afstemning",
+      "closed": "Lukket",
+      "mine": "Dit valg",
+      "result": "{pct}% ({n} stemmer)",
+      "total": "{n} stemmer i alt",
+      "empty": "Ingen afstemninger endnu.",
+      "loading": "Indlæser…",
+      "labOnly": "Afstemninger er kun tilgængelige i seminarværelser.",
+      "started": "En ny afstemning er startet.",
+      "goVote": "Stem",
+      "votersNote": "Arrangøren kan se, hvem der stemte på hvilken mulighed.",
+      "voters": "Stemte: {names}"
+    },
+    "qna": {
+      "sort": "Sorter",
+      "by": {
+        "top": "Top",
+        "new": "Nyeste"
+      },
+      "rcm": "Upvote ({n})",
+      "answered": "Besvaret",
+      "answer": "Marker som besvaret",
+      "unanswer": "Fjern markering som besvaret",
+      "hide": "Skjul",
+      "doneN": "{n} besvaret",
+      "backOpen": "Ubesvarede spørgsmål",
+      "empty": "Ingen spørgsmål endnu.",
+      "emptyDone": "Ingen besvarede spørgsmål.",
+      "loading": "Indlæser…",
+      "input": "Stil et spørgsmål (500 tegn)",
+      "send": "Send",
+      "left": "{n} tilbage",
+      "labOnly": "Q&A er kun tilgængelig i seminarværelser."
+    },
+    "recording": {
+      "title": "Optag",
+      "badge": "Optager",
+      "unsupported": "Denne browser kan ikke optage. Optag venligst fra en almindelig browser på en computer.",
+      "piBrowserOnly": "Optagelse fungerer kun i en almindelig browser (computer eller mobil). Pi Browser kan ikke gemme optagelsesfiler — åbn dette seminar i en computer- eller telefonbrowser (seminarz.vercel.app) for at optage.",
+      "audioSuspended": "Lydoptagelse er muligvis ikke startet på denne enhed. Kun billedet optages muligvis.",
+      "notifyFailed": "Optagelse startede ikke, fordi deltagerne ikke kunne underrettes. Prøv igen om et øjeblik.",
+      "confirm": {
+        "title": "Start optagelse?",
+        "body": "Når optagelsen starter, vil alle se en 'Optager'-indikator. Filen gemmes kun på denne enhed og uploades eller overføres aldrig til udlandet. Fortæl venligst deltagerne, før du starter.",
+        "download": "Når du stopper, gemmes en MP4-fil i din downloads-mappe (browsere, der ikke kan optage MP4, tager et øjeblik at konvertere den; optagelser længere end ca. 45 minutter kan opbevares i deres originale format). In-app browsere kan blokere fillagring, så optag fra en almindelig browser på en computer.",
+        "cancel": "Annuller",
+        "start": "Start optagelse",
+        "charge": "Under optagelse trækkes optagetid fra din betalte tid ud over rumtid (2x under optagelse). Når den betalte tid løber ud, stopper optagelsen, og filen gemmes."
+      },
+      "resave": {
+        "label": "Optagelsesfil",
+        "save": "Gem igen",
+        "dismiss": "Luk gem igen"
+      },
+      "toast": {
+        "started": "Optagelse startet — alle kan se det.",
+        "saved": "Optagelse gemt. Tjek din downloads-mappe. Hvis intet blev gemt, tryk på [Gem igen] øverst på skærmen.",
+        "autoStopped": "Optagelsen sluttede, fordi browseren stoppede den, eller størrelsesgrænsen blev nået. Alt indtil da blev gemt. Start optagelsen igen for at fortsætte.",
+        "empty": "Intet blev optaget, så ingen fil blev oprettet.",
+        "saveFailed": "Kunne ikke oprette optagelsesfilen.",
+        "converting": "Konverterer optagelsen til MP4. Hold venligst dette vindue åbent.",
+        "savedOriginal": "Kunne ikke konvertere til MP4, så optagelsen blev gemt i sit originale format (webm). Tjek din downloads-mappe.",
+        "startedBy": "Præsentationsværten startede optagelsen.",
+        "stoppedBy": "Præsentationsværten stoppede optagelsen."
+      },
+      "paidOnly": "Optagelse er kun tilgængelig i seminarer, der er åbnet på en måneds- eller årsplan, mens der er betalt tid tilbage.",
+      "planOut": "Betalt tid løb ud, så optagelsen stoppede, og filen blev gemt.",
+      "notInRoom": "Bekræfter stadig, at du er i rummet. Start optagelsen igen om et øjeblik.",
+      "meterFailed": "Kunne ikke kontrollere optagetid, så optagelsen startede ikke. Prøv igen om et øjeblik.",
+      "paidOut": "Ingen betalt tid er tilbage, så optagelse kan ikke starte. Køb den samme plan igen for at optage.",
+      "pausedBadge": "Optagelse sat på pause",
+      "controls": "Optagelseskontroller",
+      "pause": "Pause",
+      "resume": "Genoptag",
+      "stop": "Stop optagelse"
+    },
+    "notes": {
+      "on": "AI-noter",
+      "badge": "AI-noter slået til",
+      "started": "Præsentationsvært slog AI-noter til",
+      "stopped": "AI-noter slået fra",
+      "startedMine": "AI-noter slået til – vises for alle",
+      "stoppedMine": "AI-noter slået fra – opretter noterne",
+      "startFail": "Kunne ikke starte AI-noter",
+      "gone": "AI-noter stoppet – noterne blev afsluttet eller slettet et andet sted",
+      "unsupported": "AI-noter kan ikke slås til her (ingen understøttelse af lydoptagelse)"
+    },
+    "dubbing": {
+      "listen": "Lyt med oversat stemme",
+      "blocked": "Kunne ikke afspille den oversatte stemme. Slå den venligst til igen",
+      "stopped": "Oversat stemme er ikke tilgængelig lige nu, så den blev slået fra",
+      "usrQuota": "Du har brugt din grænse for oversat stemme til dette seminar, så den blev slået fra"
+    },
+    "plan": {
+      "warn": "Der er {min} minutter tilbage af denne seminars plan.",
+      "ended": "Din seminartid løb ud, så seminaret er afsluttet, og du har forladt rummet.",
+      "left": "Resterende seminartid",
+      "closed": "Seminaret er afsluttet, så du har forladt rummet.",
+      "hostAway": "Værten har forladt rummet. Hvis de ikke vender tilbage inden for 5 minutter, vil alle deltagere blive fjernet.",
+      "hostGone": "Værten vendte ikke tilbage inden for 5 minutter, så du har forladt rummet. Du kan komme ind igen, når værten tilslutter sig."
+    },
+    "toLobby": "Venteværelse"
+  },
+  "list": {
+    "tabsLabel": "Seminarlisteoversigt",
+    "tabs": {
+      "all": "Alle",
+      "hosted": "Afholdt af mig",
+      "joined": "Deltaget"
+    },
+    "empty": {
+      "all": "Ingen kommende seminarer.",
+      "hosted": "Du har ikke afholdt nogen seminarer.",
+      "joined": "Du har ikke deltaget i nogen seminarer."
+    },
+    "loading": "Indlæser…",
+    "retry": "Prøv igen",
+    "free": "Gratis",
+    "fee": "{amount} Pi",
+    "host": "Vært {name}",
+    "capacity": "Kapacitet {n}",
+    "status": {
+      "SCHEDULED": "Planlagt",
+      "LIVE": "Live",
+      "ENDED": "Afsluttet",
+      "CANCELED": "Annulleret"
+    },
+    "hostNew": "Opret et seminar",
+    "progress": "Fremgang",
+    "pager": "Sideinddeling",
+    "prev": "Forrige",
+    "next": "Næste",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Undertitel",
+      "placeholder": "Tilføj en undertitel",
+      "save": "Gem undertitel",
+      "saving": "Gemmer…",
+      "saved": "Gemt."
+    },
+    "loading": "Indlæser…",
+    "back": "Tilbage til liste",
+    "notFound": "Seminar ikke fundet.",
+    "status": {
+      "SCHEDULED": "Planlagt",
+      "LIVE": "Live",
+      "ENDED": "Afsluttet",
+      "CANCELED": "Annulleret"
+    },
+    "startAt": "Dato",
+    "host": "Vært",
+    "seats": "Ledige pladser",
+    "seatsValue": "{left} / {max}",
+    "fee": "Seminar gebyr",
+    "feeValue": "{amount} Pi",
+    "free": "Gratis",
+    "enter": "Indtast",
+    "payEnter": "Betal med Pi og deltag ({amount} Pi)",
+    "paying": "Behandler betaling…",
+    "joining": "Registrerer…",
+    "registered": "Du er registreret.",
+    "full": "Dette seminar er fuldt.",
+    "closed": "Dette seminar er afsluttet.",
+    "canceled": "Dette seminar blev annulleret.",
+    "roomLink": "Gå til rum (vært)",
+    "piBrowserOnly": "Betaling er tilgængelig i Pi Browser efter Pi-login.",
+    "payCancelled": "Betaling annulleret.",
+    "payStillWaiting": "Venter stadig på tegnebogen. Hvis du allerede er logget ind på Pi Wallet, vent venligst et øjeblik.",
+    "payFailed": "Betaling mislykkedes.",
+    "err": {
+      "NAME_TAKEN": "Det navn er allerede i brug af en anden. Vælg et andet.",
+      "CAL_READ_FAILED": "Kunne ikke indlæse dine begivenheder. Tjek adressen.",
+      "ISLAND_FULL": "Alle 100 ø-navne er i brug lige nu. Du kan åbne et nyt seminar, når et kommende eller live seminar slutter eller annulleres.",
+      "SMN_FULL": "Dette seminar er fuldt.",
+      "SMN_CLOSED": "Dette seminar er afsluttet eller annulleret.",
+      "SMN_ALREADY": "Du er allerede registreret, eller en betaling er i gang.",
+      "SMN_FREE": "Gratis seminarer kræver ikke betaling.",
+      "SMN_PAY_REQUIRED": "Dette er et betalt seminar. Betal venligst for at deltage.",
+      "SMN_PAY_INVALID": "Vi kunne ikke bekræfte din betaling. Kontakt venligst administratoren.",
+      "PAY_PI_FAILED": "Kunne ikke nå Pi-betalingsserveren. Prøv venligst igen om kort tid.",
+      "PAY_MISMATCH": "Betalingsoplysninger stemmer ikke overens.",
+      "PAY_AMOUNT_MISMATCH": "Betalingsbeløbet afviger fra seminar gebyret.",
+      "PAY_CANCELLED": "Denne betaling blev annulleret.",
+      "PAY_ALREADY_PAID": "En betaling er stadig under behandling. Hvis du var ved at logge ind på tegnebogen, prøv igen om 3 minutter.",
+      "PAY_INVALID_STATE": "Denne betaling kan ikke behandles nu.",
+      "PAY_PI_CANCEL_REFUSED": "Betalingen er allerede i gang og kan ikke annulleres. Tjek venligst igen om kort tid."
+    },
+    "share": {
+      "title": "Planlæg & del",
+      "calendar": "Føj til kalender",
+      "ics": "Kalenderfil",
+      "mail": "Inviter via e-mail",
+      "mailApp": "Send med standard mail-app",
+      "mailSubject": "[Seminarinvitation] {title}",
+      "mailBody": "{title}\nHvornår: {start}\n\nDeltag direkte med dette link.\nDesktop: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopier link",
+      "copied": "Link kopieret.",
+      "copyFail": "Kunne ikke kopiere. Kopier venligst linket fra adresselinjen.",
+      "share": "Del til en anden app",
+      "shareFail": "Kunne ikke dele. Brug venligst Kopier link i stedet.",
+      "created": "Dit seminar er klar. Tilføj starttidspunktet til din Google Kalender.",
+      "addGoogle": "Føj til Google Kalender",
+      "later": "Senere",
+      "piBrowserOpen": "I Pi Browser åbnes kalender, e-mail og kalenderfilen i din telefons standardbrowser.",
+      "extFail": "Kunne ikke åbne. Opdater Pi Browser, eller brug Kopier link og åbn det i en almindelig browser (seminarz.vercel.app).",
+      "icsPiBrowser": "Kalenderfilen kan kun downloades i en almindelig browser (computer eller mobil). I Pi Browser skal du bruge Føj til kalender i stedet."
+    },
+    "attendance": "Deltagelse",
+    "plan": "Plan",
+    "left": "Tid tilbage"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Forrige måned",
+      "next": "Næste måned",
+      "connect": "Vis min Google Kalender",
+      "change": "Administrer Google-kalendere ({n})",
+      "add": "Tilføj",
+      "remove": "Fjern",
+      "close": "Luk",
+      "failed": "Kunne ikke indlæse begivenheder fra {n} kalender(e). Tjek adressen.",
+      "badUrl": "Indsæt den 'hemmelige adresse i iCal-format' (…/basic.ics) fra Google Kalender-indstillinger, ikke browserens adresselinje.",
+      "full": "Du kan tilføje op til {n} kalendere.",
+      "allDay": "Hele dagen",
+      "day": "Mine begivenheder denne dag",
+      "count": "{n, plural, one {# begivenhed} other {# begivenheder}}",
+      "more": "+{n}",
+      "picked": "Denne dato er indstillet som startdato. Vælg tidspunktet nedenfor.",
+      "s1": "Tryk på [Åbn Google Kalender-indstillinger] nedenfor.",
+      "s2": "Under 'Indstillinger for mine kalendere' til venstre skal du vælge en kalender (f.eks. dit navn).",
+      "s3": "Rul ned til 'Integrer kalender' og kopier 'Hemmelig adresse i iCal-format'.",
+      "s4": "Indsæt den her og tryk på [Tilføj] – begivenhedstitler vises i kalenderen. Tilføj andre kalendere på samme måde, op til 5.",
+      "open": "Åbn Google Kalender-indstillinger",
+      "privacy": "Denne adresse er en nøgle til din kalender – del den ikke. Den gemmes kun på denne enhed, aldrig på vores server."
+    },
+    "title": "Opret et seminar",
+    "name": "Lad os rejse til en smuk ø!",
+    "subTitle": "Undertitel (valgfri, op til 60)",
+    "startAt": "Starttidspunkt",
+    "maxCnt": "Kapacitet (1–100)",
+    "submit": "Opret",
+    "submitting": "Opretter…",
+    "invalid": "Tjek dit input – en dato inden for et år fra nu, kapacitet 1–100.",
+    "attendance": {
+      "title": "Deltagelse",
+      "back": "Tilbage til seminar",
+      "loading": "Indlæser…",
+      "forbidden": "Kun værten og administratorer kan se deltagelse.",
+      "count": "{n} personer",
+      "csv": "Download CSV",
+      "empty": "Ingen har tilsluttet sig endnu.",
+      "online": "Online",
+      "left": "Forladt",
+      "col": {
+        "name": "Navn",
+        "pi": "Pi brugernavn",
+        "ent": "Først tilsluttet",
+        "hb": "Sidst set",
+        "dur": "Tid deltaget",
+        "min": "Deltaget (min, tid væk ekskluderet)",
+        "state": "Status"
+      },
+      "durNote": "Tid deltaget er fra første tilslutning til sidst set, minus tid væk (huller længere end 2,5 minutter).",
+      "csvPiBrowser": "CSV-download fungerer kun i en almindelig browser (computer eller mobil). Pi Browser kan ikke gemme filer – åbn dette deltagerark i en computer- eller telefonbrowser (seminarz.vercel.app)."
+    },
+    "plan": "Plan",
+    "planFree": "Gratis – {time} tilbage denne måned · ingen AI",
+    "planPaid": "{name} {time} · {price} – betal ved oprettelse",
+    "planHint": "Et seminar åbnet på en betalt plan bruger først den plans tid, og fortsætter derefter på denne måneds gratis tid (ingen AI i den gratis del). En aktiv plan åbnes uden betaling; Månedlig eller Årlig du ikke har, betales i Pi, når du trykker på Opret, hvorefter seminaret åbnes (Pi Browser). Deltagelse er altid gratis for deltagere.",
+    "planOwned": "{name} – aktiv · {time} tilbage",
+    "planEnds": "Starttidspunktet er efter denne plans udløb. Flyt starten tidligere eller vælg en anden plan.",
+    "paidKept": "Dit betalte pas er beholdt. Ret problemet og tryk på Opret igen (ingen anden betaling)."
+  },
+  "privacy": {
+    "title": "Privatlivspolitik – Stemme- og AI-funktioner",
+    "effective": "Gældende {date}",
+    "intro": "Denne politik forklarer de personlige oplysninger, vi behandler, når du bruger live undertekster, oversatte undertekster, stemmeoversættelse, AI-mødenoter og personlige noter i et seminar. Disse funktioner bruger en ekstern AI-tjeneste, så oplysningerne overføres til udlandet.",
+    "whoTitle": "Hvis oplysninger behandles",
+    "who": [
+      "Præsentationsværter og deltagere på scenen: vi beder om dit samtykke én gang, før du første gang tænder din mikrofon. Du kan deltage i seminaret uden at give samtykke.",
+      "Publikum: du bruger ikke en mikrofon, så ingen stemme sendes. Du ser kun undertekster og noter.",
+      "Personlige noter: en administrator optager et møde med en mikrofon og bekræfter, at deltagerne blev informeret før optagelsen."
+    ],
+    "xferTitle": "Overførsel af personlige oplysninger til udlandet (Koreansk lov om beskyttelse af personlige oplysninger, art. 28-8)",
+    "xfer": [
+      {
+        "k": "Modtager",
+        "v": "Google LLC (Gemini API) – kontakt [TBD: Google privacy contact]"
+      },
+      {
+        "k": "Lande",
+        "v": "USA og andre lande, hvor Google-datacentre er placeret [TBD: processing region]"
+      },
+      {
+        "k": "Hvornår og hvordan",
+        "v": "Ca. hvert 5. sekund, mens en funktion er slået til, via en krypteret forbindelse (HTTPS). For personlige noter sendes hele optagelsen én gang mere i 5-minutters dele, når noten slutter (nøjagtig transskription)."
+      },
+      {
+        "k": "Elementer",
+        "v": "Stemme, talt indhold (tekst), talerens visningsnavn (til noteresuméer), skærmdelingsskærmbilleder (når AI-noter er slået til)"
+      },
+      {
+        "k": "Formål",
+        "v": "Tale til tekst, oversættelse, mødenoteresuméer, syntetisk tale (standardstemmer, ingen stemmekloning), talerseparation for personlige noter (stemmer adskilles og mærkes efter opfattet køn, f.eks. Mand 1 / Kvinde 1 – ingen navne eller identiteter udledes)"
+      },
+      {
+        "k": "Opbevaring",
+        "v": "Slutter, så snart resultatet returneres. Vi beder Google om ikke at gemme anmodninger (store=false). Misbrugsovervågningslogfiler kan stadig opbevares i henhold til Googles vilkår [TBD: retention period and paid-tier status]."
+      },
+      {
+        "k": "Sådan afvises, og hvad der sker",
+        "v": "Hvis du ikke giver samtykke eller slår din mikrofon fra, sendes ingen stemme. Du kan stadig deltage i seminaret; kun undertekster, oversættelser og noter af din egen tale oprettes ikke. Du kan til enhver tid trække samtykke tilbage [TBD: where the withdraw button is]."
+      }
+    ],
+    "keepTitle": "Hvad denne tjeneste beholder",
+    "keep": [
+      "Original lyd: for seminarundertekster og AI-mødenoter gemmes den ikke; den kasseres lige efter konvertering til tekst. For personlige noter opbevares optagelsen i privat lager, så den kan transskriberes igen mere nøjagtigt (med talere) efter mødet, og den slettes ved den daglige oprydning, når 1 dag er gået siden noten sluttede (øjeblikkeligt, hvis noten slettes).",
+      "Live undertekster: gemmes ikke.",
+      "AI-mødenoter (når præsentationsværten slår dem til): talt indhold, skærmbilleder og resuméet, opbevares indtil noterne slettes [TBD: maximum retention].",
+      "Samtykkeregistreringer: tidspunktet for samtykke og politikversionen, opbevares som bevis [TBD: retention period].",
+      "Brug: antal anmodninger pr. minut og behandlingstid, bruges til at håndhæve omkostningsgrænser.",
+      "Deltagelse: tidspunktet du tilsluttede dig, tidspunktet du sidst var forbundet, dit visningsnavn og dit Pi-brugernavn gemmes og gives til værten som en deltagerliste (på skærmen og som en CSV-download). Opbevares indtil seminaret slettes.",
+      "Q&A og afstemninger: spørgsmålsteksten og spørgerens visningsnavn (eller Pi-brugernavn, hvis ingen) er synlige for alle deltagere. Upvotes viser kun antal, aldrig hvem der afgav dem. Afstemningsstemmer viser kun antal til deltagere; arrangøren og administratorer ser, for hver mulighed, visningsnavnet (eller Pi-brugernavnet, hvis ingen) for hver vælger. Opbevares, inklusive skjulte spørgsmål, indtil seminaret slettes."
+    ],
+    "recTitle": "Optagelse",
+    "rec": "Optagelser gemmes kun som en fil på præsentationsværtens enhed. De uploades ikke til vores servere eller overføres til udlandet. Mens optagelse eller AI-noter er slået til, ser hver deltager en indikator.",
+    "rightsTitle": "Dine rettigheder",
+    "rights": "Du kan bede om at få adgang til, rette, slette eller stoppe behandlingen af dine oplysninger. Kontakt: [TBD: privacy officer name and contact]"
+  },
+  "notes": {
+    "title": "Noter",
+    "back": "Tilbage til seminar",
+    "loading": "Indlæser…",
+    "meta": "Noter · {date} · {min} min",
+    "aiWarn": "AI-genereret resumé – det kan indeholde fejl",
+    "points": "Nøglepunkter",
+    "decisions": "Beslutninger",
+    "todos": "Handlingspunkter",
+    "shots": "Skærmbilleder ({n})",
+    "transcript": "Transskription",
+    "download": "Download Markdown",
+    "making": "Opretter noterne…",
+    "makingLong": "Dette tager et stykke tid. Opdater venligst senere",
+    "recording": "Optager stadig",
+    "failed": "Kunne ikke oprette resuméet – den fulde transskription er nedenfor",
+    "retry": "Prøv igen",
+    "finish": "Afslut optagelse og opsummer",
+    "none": "Intet her",
+    "blank": "Intet at opsummere – ingen tale blev optaget, eller den var for kort",
+    "notFound": "Noter ikke fundet",
+    "forbidden": "Du har ikke adgang til disse noter",
+    "shotAlt": "Skærmbillede kl. {at}",
+    "close": "Luk",
+    "view": "Se noter",
+    "error": "Kunne ikke indlæse",
+    "mine": "Mine noter",
+    "del": "Slet noter",
+    "delAsk": "Slet disse noter (resumé, transskription og skærmbilleder)? Ingen vil kunne se dem",
+    "delYes": "Slet",
+    "delNo": "Annuller",
+    "delFail": "Kunne ikke slette",
+    "dlFail": "Kunne ikke downloade – prøv venligst igen",
+    "recentNotes": "Seneste noter",
+    "empty": "Ingen noter endnu",
+    "newNote": "Start personlige noter",
+    "inPerson": "Personlige mødenoter",
+    "inPersonTag": "Personligt",
+    "titleLabel": "Titel",
+    "titlePh": "f.eks. Ugentligt møde",
+    "told": "Jeg har fortalt alle tilstedeværende, at dette vil blive optaget og behandlet af AI (påkrævet)",
+    "toldWhy": "Før du starter, skal du fortælle alle tilstedeværende, at denne samtale vil blive optaget (optagelsen opbevares i 1 dag efter noten slutter, og talere adskilles efter stemme og mærkes efter opfattet køn) og omdannet til tekst og et resumé af en ekstern AI",
+    "start": "Start optagelse",
+    "starting": "Gør klar…",
+    "recBadge": "Optager {time}",
+    "recentLines": "Seneste linjer",
+    "waiting": "Tekst vises her, når folk taler",
+    "end": "Afslut og opret noter",
+    "wakeWarn": "Optagelsen kan stoppe, hvis skærmen slukker",
+    "adminOnly": "Kun administratorer kan bruge dette",
+    "aiOff": "AI-noter er ikke tilgængelige lige nu (serveropsætning nødvendig). Tidligere noter er listet nedenfor",
+    "reload": "Genindlæs",
+    "unsupported": "Optagelse er ikke tilgængelig på denne enhed",
+    "micDenied": "Kan ikke bruge mikrofonen — tjek tilladelsen",
+    "limited": "Behandlingstidsgrænsen er opbrugt — afslut og opret noterne",
+    "noAgr": "Stoppet: ingen meddelelsesbekræftelse ved optagelse — afslut og start igen",
+    "micLost": "Mikrofonen blev afbrudt, og optagelsen stoppede — tryk på Genopret mikrofon eller afslut noten",
+    "micRetry": "Genopret mikrofon",
+    "gone": "Denne note blev afsluttet eller slettet et andet sted, så optagelsen stoppede — brug knappen nedenfor til at åbne noterne",
+    "finishing": "Gemmer de sidste ord…",
+    "st": {
+      "RECORDING": "Optager",
+      "SUMMARIZING": "Opretter",
+      "DONE": "Udført",
+      "FAILED": "Mislykkedes"
+    },
+    "downloadPiBrowser": "Download af Markdown fungerer kun i en almindelig browser (computer eller mobil). Pi Browser kan ikke gemme filer — åbn disse noter i en computer- eller telefonbrowser (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Planer",
+    "loading": "Indlæser…",
+    "free": "Gratis",
+    "freeDesc": "{time} seminarer hver måned (ingen overførsel)",
+    "monthly": "Månedlig",
+    "yearly": "Årlig",
+    "paidDesc": "{time} seminarer, gyldig i {months} måneder",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Tjekker Pi-pris",
+    "noAi": "Ingen AI-undertekster, oversættelse, dubbing eller noteresuméer",
+    "withAi": "Inkluderer AI-undertekster, oversættelse, dubbing og noteresuméer",
+    "buy": "Betal med Pi",
+    "bought": "Betaling gennemført. Seminartid er tilføjet.",
+    "meRemain": "Resterende tid: {time}",
+    "loginToBuy": "Log ind for at købe en plan.",
+    "payNote": "Betaling sker altid i Pi. Beløbet i lokal valuta er kun en kendt reference; Pi-beløbet fastsættes til Pi-prisen, når du betaler. Et seminar på en betalt plan bruger først den plans pas (først udløbende først), og fortsætter derefter på denne måneds gratis tid.",
+    "charge": "Fyld tid op",
+    "hm": "{h} t {m} min",
+    "m": "{m} min",
+    "won": "KRW {n}",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (tjekker Pi-pris)",
+    "h": "{h} t"
+  },
+  "adminRooms": {
+    "title": "Rumstyring",
+    "adminOnly": "Kun administratorer kan se denne side.",
+    "refresh": "Opdater",
+    "count": "{n} åbne rum",
+    "empty": "Ingen rum er åbne lige nu.",
+    "lab": "Laboratorierum",
+    "noSeminar": "Ingen seminarregistrering",
+    "peers": "{n} / {cap} forbundet",
+    "producers": "{n} streams",
+    "end": "Slutter {time}",
+    "stale": "Seminaret er afsluttet, men rummet er stadig åbent på videoserveren — luk det med magt.",
+    "close": "Gennemtving lukning",
+    "confirmSeminar": "Dette afslutter seminaret og lukker rummet. Alle vil blive afbrudt.",
+    "confirmRoom": "Dette lukker rummet. Alle vil blive afbrudt.",
+    "confirmYes": "Luk",
+    "cancel": "Annuller",
+    "closing": "Lukker…",
+    "closed": "Rum lukket.",
+    "metrics": "Videoservermålinger (siden start)",
+    "metricsOff": "Kunne ikke indlæse målinger.",
+    "m": {
+      "packetsIn": "Pakker ind",
+      "packetsOut": "Pakker ud",
+      "nackIn": "NACK'er modtaget",
+      "nackOut": "NACK'er sendt",
+      "retransmits": "Gentransmissioner",
+      "duplicateNack": "Duplikerede NACK'er",
+      "cacheMiss": "Retransmit cache misses",
+      "pliOut": "Keyframe-anmodninger (PLI)",
+      "keyframes": "Keyframes",
+      "layerSwitches": "Kvalitetsskift",
+      "queueDrops": "Kø-drops"
+    }
+  },
+  "adminUsers": {
+    "title": "Brugere",
+    "adminOnly": "Kun administratorer kan se denne side.",
+    "search": "Søg efter navn (2+ tegn)",
+    "searchBtn": "Søg",
+    "refresh": "Opdater",
+    "count": "{n, plural, one {# bruger} other {# brugere}}",
+    "empty": "Ingen brugere.",
+    "admin": "Administrator",
+    "lastLogin": "Sidste login {time}",
+    "never": "Aldrig logget ind",
+    "plan": {
+      "FREE": "Gratis",
+      "M": "Månedlig",
+      "Y": "Årlig"
+    },
+    "until": "(indtil {time})",
+    "manage": "Administrer tid",
+    "close": "Luk",
+    "planLabel": "Plan",
+    "hours": "Timer",
+    "minutes": "Minutter",
+    "reason": "Årsag (valgfrit)",
+    "sub": "Reducer",
+    "confirmSub": "Reducer {plan}-tiden med {time}.",
+    "confirmYes": "Bekræft",
+    "cancel": "Annuller",
+    "saving": "Gemmer…",
+    "done": "Anvendt. {plan} resterende tid: {time}",
+    "invalid": "Indtast en reduktion mellem 1 minut og 1000 timer (hele minutter 0–59).",
+    "history": "Seneste justeringer",
+    "noHistory": "Ingen justeringer endnu.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Giv et servicepas (gratis tid)",
+    "svc": {
+      "H1": "1-times pas",
+      "D1": "1-dags pas",
+      "M1": "1-måneds pas"
+    },
+    "svcNote": "Servicepas er gratis plantid. De kan bruges fra nu i den periode (1 time, 24 timer, 1 måned) i gratis seminarer og i den gratis del af betalte seminarer (ingen AI-funktioner). Med flere pas bruges de automatisk i rækkefølgen 1-time → 1-dag → 1-måned.",
+    "subTitle": "Reducer tid",
+    "subNote": "Tager først fra de senest udløbende pas. Hvis det er mere end det resterende, fjernes kun den resterende tid.",
+    "confirmSvc": "Giv et {svc}.",
+    "doneSvc": "Gav et {svc}. Gratis resterende tid: {time} (pas udløber {end})"
+  }
+}

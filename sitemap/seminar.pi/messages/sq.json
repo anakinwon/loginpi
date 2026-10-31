@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Ndrysho gjuhën",
-      "search": "Kërko gjuhën",
-      "empty": "Asnjë rezultat"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Seminare video live ku bashkoheni me Pi"

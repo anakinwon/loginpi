@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Breyta tungumáli",
-      "search": "Leita tungumál",
-      "empty": "Engar niðurstöður"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Lifandi myndbandsnámskeið sem þú tekur þátt í með Pi"

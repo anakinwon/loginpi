@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "भाषा बदलें",
-      "search": "भाषा खोजें",
-      "empty": "कोई परिणाम नहीं"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Pi के साथ शामिल होने वाले लाइव वीडियो सेमिनार"

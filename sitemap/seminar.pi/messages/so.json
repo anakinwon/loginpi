@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Beddel luqadda",
-      "search": "Raadi luqadda",
-      "empty": "Natiijo ma jirto"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Siminaaro fiidiyoow toos ah oo aad ku biirto Pi"

@@ -1,0 +1,1694 @@
+[
+  {
+    "country_cd": "KR",
+    "dis_ord_seq": 1,
+    "country_eng_nm": "Korea, South",
+    "country_mot_nm": "대한민국 (Daehanminguk)",
+    "currency_cd": "KRW",
+    "locale_cd": "ko",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "US",
+    "dis_ord_seq": 2,
+    "country_eng_nm": "United States",
+    "country_mot_nm": "United States of America",
+    "currency_cd": "USD",
+    "locale_cd": "en",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CN",
+    "dis_ord_seq": 3,
+    "country_eng_nm": "China",
+    "country_mot_nm": "中国 (Zhōngguó / 中華人民共和国)",
+    "currency_cd": "CNY",
+    "locale_cd": "zh",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "JP",
+    "dis_ord_seq": 4,
+    "country_eng_nm": "Japan",
+    "country_mot_nm": "日本 (Nihon / Nippon)",
+    "currency_cd": "JPY",
+    "locale_cd": "ja",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "VN",
+    "dis_ord_seq": 5,
+    "country_eng_nm": "Vietnam",
+    "country_mot_nm": "Việt Nam",
+    "currency_cd": "VND",
+    "locale_cd": "vi",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "IN",
+    "dis_ord_seq": 6,
+    "country_eng_nm": "India",
+    "country_mot_nm": "भारत (Bhārat)",
+    "currency_cd": "INR",
+    "locale_cd": "hi",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "NG",
+    "dis_ord_seq": 7,
+    "country_eng_nm": "Nigeria",
+    "country_mot_nm": "Nigeria",
+    "currency_cd": "NGN",
+    "locale_cd": "ng",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "ID",
+    "dis_ord_seq": 8,
+    "country_eng_nm": "Indonesia",
+    "country_mot_nm": "Indonesia",
+    "currency_cd": "IDR",
+    "locale_cd": "id",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "PH",
+    "dis_ord_seq": 9,
+    "country_eng_nm": "Philippines",
+    "country_mot_nm": "Pilipinas / Philippines",
+    "currency_cd": "PHP",
+    "locale_cd": "fil",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "DE",
+    "dis_ord_seq": 10,
+    "country_eng_nm": "Germany",
+    "country_mot_nm": "Deutschland",
+    "currency_cd": "EUR",
+    "locale_cd": "de",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TH",
+    "dis_ord_seq": 11,
+    "country_eng_nm": "Thailand",
+    "country_mot_nm": "ประเทศไทย (Prathet Thai)",
+    "currency_cd": "THB",
+    "locale_cd": "th",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MY",
+    "dis_ord_seq": 12,
+    "country_eng_nm": "Malaysia",
+    "country_mot_nm": "Malaysia",
+    "currency_cd": "MYR",
+    "locale_cd": "ms",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "AF",
+    "dis_ord_seq": 13,
+    "country_eng_nm": "Afghanistan",
+    "country_mot_nm": "افغانستان",
+    "currency_cd": "AFN",
+    "locale_cd": "ps",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "AL",
+    "dis_ord_seq": 14,
+    "country_eng_nm": "Albania",
+    "country_mot_nm": "Shqipëria",
+    "currency_cd": "ALL",
+    "locale_cd": "sq",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "DZ",
+    "dis_ord_seq": 15,
+    "country_eng_nm": "Algeria",
+    "country_mot_nm": "الجزائر",
+    "currency_cd": "DZD",
+    "locale_cd": "dz",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "AD",
+    "dis_ord_seq": 16,
+    "country_eng_nm": "Andorra",
+    "country_mot_nm": "Andorra",
+    "currency_cd": "EUR",
+    "locale_cd": "ad",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "AO",
+    "dis_ord_seq": 17,
+    "country_eng_nm": "Angola",
+    "country_mot_nm": "Angola",
+    "currency_cd": "AOA",
+    "locale_cd": "ao",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "AR",
+    "dis_ord_seq": 18,
+    "country_eng_nm": "Argentina",
+    "country_mot_nm": "Argentina",
+    "currency_cd": "ARS",
+    "locale_cd": "ar-AR",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "AM",
+    "dis_ord_seq": 19,
+    "country_eng_nm": "Armenia",
+    "country_mot_nm": "Հայաստան",
+    "currency_cd": "AMD",
+    "locale_cd": "am",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "AU",
+    "dis_ord_seq": 20,
+    "country_eng_nm": "Australia",
+    "country_mot_nm": "Australia",
+    "currency_cd": "AUD",
+    "locale_cd": "au",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "AT",
+    "dis_ord_seq": 21,
+    "country_eng_nm": "Austria",
+    "country_mot_nm": "Österreich",
+    "currency_cd": "EUR",
+    "locale_cd": "at",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "AZ",
+    "dis_ord_seq": 22,
+    "country_eng_nm": "Azerbaijan",
+    "country_mot_nm": "Azərbaycan",
+    "currency_cd": "AZN",
+    "locale_cd": "az",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BS",
+    "dis_ord_seq": 23,
+    "country_eng_nm": "Bahamas",
+    "country_mot_nm": "Bahamas",
+    "currency_cd": "BSD",
+    "locale_cd": "bs",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BH",
+    "dis_ord_seq": 24,
+    "country_eng_nm": "Bahrain",
+    "country_mot_nm": "البحرين",
+    "currency_cd": "BHD",
+    "locale_cd": "bh",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BD",
+    "dis_ord_seq": 25,
+    "country_eng_nm": "Bangladesh",
+    "country_mot_nm": "বাংলাদেশ (Bangladesh)",
+    "currency_cd": "BDT",
+    "locale_cd": "bd",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BB",
+    "dis_ord_seq": 26,
+    "country_eng_nm": "Barbados",
+    "country_mot_nm": "Barbados",
+    "currency_cd": "BBD",
+    "locale_cd": "bb",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BY",
+    "dis_ord_seq": 27,
+    "country_eng_nm": "Belarus",
+    "country_mot_nm": "Беларусь (Belarus)",
+    "currency_cd": "BYN",
+    "locale_cd": "by",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BE",
+    "dis_ord_seq": 28,
+    "country_eng_nm": "Belgium",
+    "country_mot_nm": "België / Belgique / Belgien",
+    "currency_cd": "EUR",
+    "locale_cd": "be",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BZ",
+    "dis_ord_seq": 29,
+    "country_eng_nm": "Belize",
+    "country_mot_nm": "Belize",
+    "currency_cd": "BZD",
+    "locale_cd": "bz",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BJ",
+    "dis_ord_seq": 30,
+    "country_eng_nm": "Benin",
+    "country_mot_nm": "Bénin",
+    "currency_cd": "XOF",
+    "locale_cd": "bj",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BT",
+    "dis_ord_seq": 31,
+    "country_eng_nm": "Bhutan",
+    "country_mot_nm": "འབྲུག (Druk)",
+    "currency_cd": "BTN",
+    "locale_cd": "bt",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BO",
+    "dis_ord_seq": 32,
+    "country_eng_nm": "Bolivia",
+    "country_mot_nm": "Bolivia / Buliwya / Volívia",
+    "currency_cd": "BOB",
+    "locale_cd": "bo",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BA",
+    "dis_ord_seq": 33,
+    "country_eng_nm": "Bosnia",
+    "country_mot_nm": "Bosna i Hercegovina",
+    "currency_cd": "BAM",
+    "locale_cd": "ba",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BW",
+    "dis_ord_seq": 34,
+    "country_eng_nm": "Botswana",
+    "country_mot_nm": "Botswana",
+    "currency_cd": "BWP",
+    "locale_cd": "bw",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BR",
+    "dis_ord_seq": 35,
+    "country_eng_nm": "Brazil",
+    "country_mot_nm": "Brasil",
+    "currency_cd": "BRL",
+    "locale_cd": "br",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BN",
+    "dis_ord_seq": 36,
+    "country_eng_nm": "Brunei",
+    "country_mot_nm": "Brunei Darussalam",
+    "currency_cd": "BND",
+    "locale_cd": "bn",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BG",
+    "dis_ord_seq": 37,
+    "country_eng_nm": "Bulgaria",
+    "country_mot_nm": "България (Bulgaria)",
+    "currency_cd": "BGN",
+    "locale_cd": "bg",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BF",
+    "dis_ord_seq": 38,
+    "country_eng_nm": "Burkina Faso",
+    "country_mot_nm": "Burkina Faso",
+    "currency_cd": "XOF",
+    "locale_cd": "bf",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "BI",
+    "dis_ord_seq": 39,
+    "country_eng_nm": "Burundi",
+    "country_mot_nm": "Uburundi / Burundi / Burundi",
+    "currency_cd": "BIF",
+    "locale_cd": "bi",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CV",
+    "dis_ord_seq": 40,
+    "country_eng_nm": "Cabo Verde",
+    "country_mot_nm": "Cabo Verde",
+    "currency_cd": "CVE",
+    "locale_cd": "cv",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "KH",
+    "dis_ord_seq": 41,
+    "country_eng_nm": "Cambodia",
+    "country_mot_nm": "កម្ពុជា (Kâmpŭchéa)",
+    "currency_cd": "KHR",
+    "locale_cd": "kh",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CM",
+    "dis_ord_seq": 42,
+    "country_eng_nm": "Cameroon",
+    "country_mot_nm": "Cameroun / Cameroon",
+    "currency_cd": "XAF",
+    "locale_cd": "cm",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CA",
+    "dis_ord_seq": 43,
+    "country_eng_nm": "Canada",
+    "country_mot_nm": "Canada",
+    "currency_cd": "CAD",
+    "locale_cd": "ca",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CF",
+    "dis_ord_seq": 44,
+    "country_eng_nm": "Central African Republic",
+    "country_mot_nm": "République Centrafricaine",
+    "currency_cd": "XAF",
+    "locale_cd": "cf",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TD",
+    "dis_ord_seq": 45,
+    "country_eng_nm": "Chad",
+    "country_mot_nm": "Tchad / تشاد",
+    "currency_cd": "XAF",
+    "locale_cd": "td",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CL",
+    "dis_ord_seq": 46,
+    "country_eng_nm": "Chile",
+    "country_mot_nm": "Chile",
+    "currency_cd": "CLP",
+    "locale_cd": "cl",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CO",
+    "dis_ord_seq": 47,
+    "country_eng_nm": "Colombia",
+    "country_mot_nm": "Colombia",
+    "currency_cd": "COP",
+    "locale_cd": "co",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "KM",
+    "dis_ord_seq": 48,
+    "country_eng_nm": "Comoros",
+    "country_mot_nm": "Komori / Comores / جزر القمر",
+    "currency_cd": "KMF",
+    "locale_cd": "km",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CG",
+    "dis_ord_seq": 49,
+    "country_eng_nm": "Congo",
+    "country_mot_nm": "République du Congo",
+    "currency_cd": "XAF",
+    "locale_cd": "cg",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CD",
+    "dis_ord_seq": 50,
+    "country_eng_nm": "Congo, Democratic Republic",
+    "country_mot_nm": "République Démocratique du Congo",
+    "currency_cd": "CDF",
+    "locale_cd": "cd",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CR",
+    "dis_ord_seq": 51,
+    "country_eng_nm": "Costa Rica",
+    "country_mot_nm": "Costa Rica",
+    "currency_cd": "CRC",
+    "locale_cd": "cr",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "HR",
+    "dis_ord_seq": 52,
+    "country_eng_nm": "Croatia",
+    "country_mot_nm": "Hrvatska",
+    "currency_cd": "EUR",
+    "locale_cd": "hr",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CU",
+    "dis_ord_seq": 53,
+    "country_eng_nm": "Cuba",
+    "country_mot_nm": "Cuba",
+    "currency_cd": "CUP",
+    "locale_cd": "cu",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CY",
+    "dis_ord_seq": 54,
+    "country_eng_nm": "Cyprus",
+    "country_mot_nm": "Κύπρος / Kıbrıs",
+    "currency_cd": "EUR",
+    "locale_cd": "cy",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CZ",
+    "dis_ord_seq": 55,
+    "country_eng_nm": "Czech Republic",
+    "country_mot_nm": "Česká republika",
+    "currency_cd": "CZK",
+    "locale_cd": "cz",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "DK",
+    "dis_ord_seq": 56,
+    "country_eng_nm": "Denmark",
+    "country_mot_nm": "Danmark",
+    "currency_cd": "DKK",
+    "locale_cd": "dk",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "DJ",
+    "dis_ord_seq": 57,
+    "country_eng_nm": "Djibouti",
+    "country_mot_nm": "Djibouti / جيبوتي",
+    "currency_cd": "DJF",
+    "locale_cd": "dj",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "DO",
+    "dis_ord_seq": 58,
+    "country_eng_nm": "Dominican Republic",
+    "country_mot_nm": "República Dominicana",
+    "currency_cd": "DOP",
+    "locale_cd": "do",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "EC",
+    "dis_ord_seq": 59,
+    "country_eng_nm": "Ecuador",
+    "country_mot_nm": "Ecuador",
+    "currency_cd": "USD",
+    "locale_cd": "ec",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "EG",
+    "dis_ord_seq": 60,
+    "country_eng_nm": "Egypt",
+    "country_mot_nm": "مصر (Misr)",
+    "currency_cd": "EGP",
+    "locale_cd": "eg",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SV",
+    "dis_ord_seq": 61,
+    "country_eng_nm": "El Salvador",
+    "country_mot_nm": "El Salvador",
+    "currency_cd": "USD",
+    "locale_cd": "sv",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GQ",
+    "dis_ord_seq": 62,
+    "country_eng_nm": "Equatorial Guinea",
+    "country_mot_nm": "Guinea Ecuatorial / Guinée Équatoriale",
+    "currency_cd": "XAF",
+    "locale_cd": "gq",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "ER",
+    "dis_ord_seq": 63,
+    "country_eng_nm": "Eritrea",
+    "country_mot_nm": "ኤርትራ / إريتريا",
+    "currency_cd": "ERN",
+    "locale_cd": "er",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "EE",
+    "dis_ord_seq": 64,
+    "country_eng_nm": "Estonia",
+    "country_mot_nm": "Eesti",
+    "currency_cd": "EUR",
+    "locale_cd": "ee",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "ET",
+    "dis_ord_seq": 65,
+    "country_eng_nm": "Ethiopia",
+    "country_mot_nm": "ኢትዮጵያ (Ityopia)",
+    "currency_cd": "ETB",
+    "locale_cd": "et",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "FJ",
+    "dis_ord_seq": 66,
+    "country_eng_nm": "Fiji",
+    "country_mot_nm": "Fiji",
+    "currency_cd": "FJD",
+    "locale_cd": "fj",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "FI",
+    "dis_ord_seq": 67,
+    "country_eng_nm": "Finland",
+    "country_mot_nm": "Suomi",
+    "currency_cd": "EUR",
+    "locale_cd": "fi",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "FR",
+    "dis_ord_seq": 68,
+    "country_eng_nm": "France",
+    "country_mot_nm": "France",
+    "currency_cd": "EUR",
+    "locale_cd": "fr",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GA",
+    "dis_ord_seq": 69,
+    "country_eng_nm": "Gabon",
+    "country_mot_nm": "Gabon",
+    "currency_cd": "XAF",
+    "locale_cd": "ga",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GM",
+    "dis_ord_seq": 70,
+    "country_eng_nm": "Gambia",
+    "country_mot_nm": "Gambia",
+    "currency_cd": "GMD",
+    "locale_cd": "gm",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GE",
+    "dis_ord_seq": 71,
+    "country_eng_nm": "Georgia",
+    "country_mot_nm": "საქართველო (Sakartvelo)",
+    "currency_cd": "GEL",
+    "locale_cd": "ge",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GH",
+    "dis_ord_seq": 72,
+    "country_eng_nm": "Ghana",
+    "country_mot_nm": "Ghana",
+    "currency_cd": "GHS",
+    "locale_cd": "gh",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GR",
+    "dis_ord_seq": 73,
+    "country_eng_nm": "Greece",
+    "country_mot_nm": "Ελλάδα (Ellada)",
+    "currency_cd": "EUR",
+    "locale_cd": "gr",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GT",
+    "dis_ord_seq": 74,
+    "country_eng_nm": "Guatemala",
+    "country_mot_nm": "Guatemala",
+    "currency_cd": "GTQ",
+    "locale_cd": "gt",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GN",
+    "dis_ord_seq": 75,
+    "country_eng_nm": "Guinea",
+    "country_mot_nm": "Guinée",
+    "currency_cd": "GNF",
+    "locale_cd": "gn",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GW",
+    "dis_ord_seq": 76,
+    "country_eng_nm": "Guinea-Bissau",
+    "country_mot_nm": "Guiné-Bissau",
+    "currency_cd": "XOF",
+    "locale_cd": "gw",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GY",
+    "dis_ord_seq": 77,
+    "country_eng_nm": "Guyana",
+    "country_mot_nm": "Guyana",
+    "currency_cd": "GYD",
+    "locale_cd": "gy",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "HT",
+    "dis_ord_seq": 78,
+    "country_eng_nm": "Haiti",
+    "country_mot_nm": "Haïti / Ayiti",
+    "currency_cd": "HTG",
+    "locale_cd": "ht",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "HN",
+    "dis_ord_seq": 79,
+    "country_eng_nm": "Honduras",
+    "country_mot_nm": "Honduras",
+    "currency_cd": "HNL",
+    "locale_cd": "hn",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "HU",
+    "dis_ord_seq": 80,
+    "country_eng_nm": "Hungary",
+    "country_mot_nm": "Magyarország",
+    "currency_cd": "HUF",
+    "locale_cd": "hu",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "IS",
+    "dis_ord_seq": 81,
+    "country_eng_nm": "Iceland",
+    "country_mot_nm": "Ísland",
+    "currency_cd": "ISK",
+    "locale_cd": "is",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "IR",
+    "dis_ord_seq": 82,
+    "country_eng_nm": "Iran",
+    "country_mot_nm": "ایران (Iran)",
+    "currency_cd": "IRR",
+    "locale_cd": "ir",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "IQ",
+    "dis_ord_seq": 83,
+    "country_eng_nm": "Iraq",
+    "country_mot_nm": "العراق (Al-Iraq)",
+    "currency_cd": "IQD",
+    "locale_cd": "iq",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "IE",
+    "dis_ord_seq": 84,
+    "country_eng_nm": "Ireland",
+    "country_mot_nm": "Éire / Ireland",
+    "currency_cd": "EUR",
+    "locale_cd": "ie",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "IL",
+    "dis_ord_seq": 85,
+    "country_eng_nm": "Israel",
+    "country_mot_nm": "יִשְׂרָאֵל / إسرائيل",
+    "currency_cd": "ILS",
+    "locale_cd": "il",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "IT",
+    "dis_ord_seq": 86,
+    "country_eng_nm": "Italy",
+    "country_mot_nm": "Italia",
+    "currency_cd": "EUR",
+    "locale_cd": "it",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "JM",
+    "dis_ord_seq": 87,
+    "country_eng_nm": "Jamaica",
+    "country_mot_nm": "Jamaica",
+    "currency_cd": "JMD",
+    "locale_cd": "jm",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "JO",
+    "dis_ord_seq": 88,
+    "country_eng_nm": "Jordan",
+    "country_mot_nm": "الأردن (Al-Urdun)",
+    "currency_cd": "JOD",
+    "locale_cd": "jo",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "KZ",
+    "dis_ord_seq": 89,
+    "country_eng_nm": "Kazakhstan",
+    "country_mot_nm": "Қазақстан (Kazakhstan)",
+    "currency_cd": "KZT",
+    "locale_cd": "kz",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "KE",
+    "dis_ord_seq": 90,
+    "country_eng_nm": "Kenya",
+    "country_mot_nm": "Kenya",
+    "currency_cd": "KES",
+    "locale_cd": "ke",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "KI",
+    "dis_ord_seq": 91,
+    "country_eng_nm": "Kiribati",
+    "country_mot_nm": "Kiribati",
+    "currency_cd": "AUD",
+    "locale_cd": "ki",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "KW",
+    "dis_ord_seq": 92,
+    "country_eng_nm": "Kuwait",
+    "country_mot_nm": "الكويت (Al-Kuwayt)",
+    "currency_cd": "KWD",
+    "locale_cd": "kw",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "KG",
+    "dis_ord_seq": 93,
+    "country_eng_nm": "Kyrgyzstan",
+    "country_mot_nm": "Кыргызстан (Kyrgyzstan)",
+    "currency_cd": "KGS",
+    "locale_cd": "kg",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LA",
+    "dis_ord_seq": 94,
+    "country_eng_nm": "Laos",
+    "country_mot_nm": "ລາວ (Lao)",
+    "currency_cd": "LAK",
+    "locale_cd": "la",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LV",
+    "dis_ord_seq": 95,
+    "country_eng_nm": "Latvia",
+    "country_mot_nm": "Latvija",
+    "currency_cd": "EUR",
+    "locale_cd": "lv",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LB",
+    "dis_ord_seq": 96,
+    "country_eng_nm": "Lebanon",
+    "country_mot_nm": "لبنان (Lubnan)",
+    "currency_cd": "LBP",
+    "locale_cd": "lb",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LS",
+    "dis_ord_seq": 97,
+    "country_eng_nm": "Lesotho",
+    "country_mot_nm": "Lesotho",
+    "currency_cd": "LSL",
+    "locale_cd": "ls",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LR",
+    "dis_ord_seq": 98,
+    "country_eng_nm": "Liberia",
+    "country_mot_nm": "Liberia",
+    "currency_cd": "LRD",
+    "locale_cd": "lr",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LY",
+    "dis_ord_seq": 99,
+    "country_eng_nm": "Libya",
+    "country_mot_nm": "ليبيا (Libya)",
+    "currency_cd": "LYD",
+    "locale_cd": "ly",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LI",
+    "dis_ord_seq": 100,
+    "country_eng_nm": "Liechtenstein",
+    "country_mot_nm": "Liechtenstein",
+    "currency_cd": "CHF",
+    "locale_cd": "li",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LT",
+    "dis_ord_seq": 101,
+    "country_eng_nm": "Lithuania",
+    "country_mot_nm": "Lietuva",
+    "currency_cd": "EUR",
+    "locale_cd": "lt",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LU",
+    "dis_ord_seq": 102,
+    "country_eng_nm": "Luxembourg",
+    "country_mot_nm": "Lëtzebuerg / Luxembourg / Luxemburg",
+    "currency_cd": "EUR",
+    "locale_cd": "lu",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MG",
+    "dis_ord_seq": 103,
+    "country_eng_nm": "Madagascar",
+    "country_mot_nm": "Madagasikara / Madagascar",
+    "currency_cd": "MGA",
+    "locale_cd": "mg",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MW",
+    "dis_ord_seq": 104,
+    "country_eng_nm": "Malawi",
+    "country_mot_nm": "Malawi",
+    "currency_cd": "MWK",
+    "locale_cd": "mw",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MV",
+    "dis_ord_seq": 105,
+    "country_eng_nm": "Maldives",
+    "country_mot_nm": "ދިވެހިރާއްޖެ (Dhivehi Raajje)",
+    "currency_cd": "MVR",
+    "locale_cd": "mv",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "ML",
+    "dis_ord_seq": 106,
+    "country_eng_nm": "Mali",
+    "country_mot_nm": "Mali",
+    "currency_cd": "XOF",
+    "locale_cd": "ml",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MT",
+    "dis_ord_seq": 107,
+    "country_eng_nm": "Malta",
+    "country_mot_nm": "Malta",
+    "currency_cd": "EUR",
+    "locale_cd": "mt",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MH",
+    "dis_ord_seq": 108,
+    "country_eng_nm": "Marshall Islands",
+    "country_mot_nm": "Marshall Islands",
+    "currency_cd": "USD",
+    "locale_cd": "mh",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MR",
+    "dis_ord_seq": 109,
+    "country_eng_nm": "Mauritania",
+    "country_mot_nm": "موريتانيا (Muritaniya)",
+    "currency_cd": "MRU",
+    "locale_cd": "mr",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MU",
+    "dis_ord_seq": 110,
+    "country_eng_nm": "Mauritius",
+    "country_mot_nm": "Mauritius",
+    "currency_cd": "MUR",
+    "locale_cd": "mu",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MX",
+    "dis_ord_seq": 111,
+    "country_eng_nm": "Mexico",
+    "country_mot_nm": "México",
+    "currency_cd": "MXN",
+    "locale_cd": "mx",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "FM",
+    "dis_ord_seq": 112,
+    "country_eng_nm": "Micronesia",
+    "country_mot_nm": "Micronesia",
+    "currency_cd": "USD",
+    "locale_cd": "fm",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MD",
+    "dis_ord_seq": 113,
+    "country_eng_nm": "Moldova",
+    "country_mot_nm": "Moldova",
+    "currency_cd": "MDL",
+    "locale_cd": "md",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MC",
+    "dis_ord_seq": 114,
+    "country_eng_nm": "Monaco",
+    "country_mot_nm": "Monaco",
+    "currency_cd": "EUR",
+    "locale_cd": "mc",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MN",
+    "dis_ord_seq": 115,
+    "country_eng_nm": "Mongolia",
+    "country_mot_nm": "Монгол Улс (Mongol Uls)",
+    "currency_cd": "MNT",
+    "locale_cd": "mn",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "ME",
+    "dis_ord_seq": 116,
+    "country_eng_nm": "Montenegro",
+    "country_mot_nm": "Crna Gora",
+    "currency_cd": "EUR",
+    "locale_cd": "me",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MA",
+    "dis_ord_seq": 117,
+    "country_eng_nm": "Morocco",
+    "country_mot_nm": "المغرب (Al-Maghrib) / Maroc",
+    "currency_cd": "MAD",
+    "locale_cd": "ma",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MZ",
+    "dis_ord_seq": 118,
+    "country_eng_nm": "Mozambique",
+    "country_mot_nm": "Moçambique",
+    "currency_cd": "MZN",
+    "locale_cd": "mz",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "MM",
+    "dis_ord_seq": 119,
+    "country_eng_nm": "Myanmar",
+    "country_mot_nm": "မြန်မာ (Myanmar)",
+    "currency_cd": "MMK",
+    "locale_cd": "mm",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "NA",
+    "dis_ord_seq": 120,
+    "country_eng_nm": "Namibia",
+    "country_mot_nm": "Namibia",
+    "currency_cd": "NAD",
+    "locale_cd": "af",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "NR",
+    "dis_ord_seq": 121,
+    "country_eng_nm": "Nauru",
+    "country_mot_nm": "Nauru",
+    "currency_cd": "AUD",
+    "locale_cd": "nr",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "NP",
+    "dis_ord_seq": 122,
+    "country_eng_nm": "Nepal",
+    "country_mot_nm": "नेपाल (Nepal)",
+    "currency_cd": "NPR",
+    "locale_cd": "np",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "NL",
+    "dis_ord_seq": 123,
+    "country_eng_nm": "Netherlands",
+    "country_mot_nm": "Nederland",
+    "currency_cd": "EUR",
+    "locale_cd": "nl",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "NZ",
+    "dis_ord_seq": 124,
+    "country_eng_nm": "New Zealand",
+    "country_mot_nm": "New Zealand / Aotearoa",
+    "currency_cd": "NZD",
+    "locale_cd": "nz",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "NI",
+    "dis_ord_seq": 125,
+    "country_eng_nm": "Nicaragua",
+    "country_mot_nm": "Nicaragua",
+    "currency_cd": "NIO",
+    "locale_cd": "ni",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "NE",
+    "dis_ord_seq": 126,
+    "country_eng_nm": "Niger",
+    "country_mot_nm": "Niger",
+    "currency_cd": "XOF",
+    "locale_cd": "ne",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "NO",
+    "dis_ord_seq": 127,
+    "country_eng_nm": "Norway",
+    "country_mot_nm": "Norge",
+    "currency_cd": "NOK",
+    "locale_cd": "no",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "OM",
+    "dis_ord_seq": 128,
+    "country_eng_nm": "Oman",
+    "country_mot_nm": "عُمان (Uman)",
+    "currency_cd": "OMR",
+    "locale_cd": "om",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "PK",
+    "dis_ord_seq": 129,
+    "country_eng_nm": "Pakistan",
+    "country_mot_nm": "پاکستان (Pakistan)",
+    "currency_cd": "PKR",
+    "locale_cd": "pk",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "PW",
+    "dis_ord_seq": 130,
+    "country_eng_nm": "Palau",
+    "country_mot_nm": "Palau",
+    "currency_cd": "USD",
+    "locale_cd": "pw",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "PA",
+    "dis_ord_seq": 131,
+    "country_eng_nm": "Panama",
+    "country_mot_nm": "Panamá",
+    "currency_cd": "PAB",
+    "locale_cd": "pa",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "PG",
+    "dis_ord_seq": 132,
+    "country_eng_nm": "Papua New Guinea",
+    "country_mot_nm": "Papua New Guinea",
+    "currency_cd": "PGK",
+    "locale_cd": "pg",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "PY",
+    "dis_ord_seq": 133,
+    "country_eng_nm": "Paraguay",
+    "country_mot_nm": "Paraguay / Paraguái",
+    "currency_cd": "PYG",
+    "locale_cd": "py",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "PE",
+    "dis_ord_seq": 134,
+    "country_eng_nm": "Peru",
+    "country_mot_nm": "Perú",
+    "currency_cd": "PEN",
+    "locale_cd": "pe",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "PL",
+    "dis_ord_seq": 135,
+    "country_eng_nm": "Poland",
+    "country_mot_nm": "Polska",
+    "currency_cd": "PLN",
+    "locale_cd": "pl",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "PT",
+    "dis_ord_seq": 136,
+    "country_eng_nm": "Portugal",
+    "country_mot_nm": "Portugal",
+    "currency_cd": "EUR",
+    "locale_cd": "pt",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "QA",
+    "dis_ord_seq": 137,
+    "country_eng_nm": "Qatar",
+    "country_mot_nm": "قطر (Qatar)",
+    "currency_cd": "QAR",
+    "locale_cd": "qa",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "RO",
+    "dis_ord_seq": 138,
+    "country_eng_nm": "Romania",
+    "country_mot_nm": "România",
+    "currency_cd": "RON",
+    "locale_cd": "ro",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "RU",
+    "dis_ord_seq": 139,
+    "country_eng_nm": "Russia",
+    "country_mot_nm": "Россия (Rossiya)",
+    "currency_cd": "RUB",
+    "locale_cd": "ru",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "RW",
+    "dis_ord_seq": 140,
+    "country_eng_nm": "Rwanda",
+    "country_mot_nm": "Rwanda / u Rwanda",
+    "currency_cd": "RWF",
+    "locale_cd": "rw",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "KN",
+    "dis_ord_seq": 141,
+    "country_eng_nm": "Saint Kitts and Nevis",
+    "country_mot_nm": "Saint Kitts and Nevis",
+    "currency_cd": "XCD",
+    "locale_cd": "kn",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LC",
+    "dis_ord_seq": 142,
+    "country_eng_nm": "Saint Lucia",
+    "country_mot_nm": "Saint Lucia",
+    "currency_cd": "XCD",
+    "locale_cd": "lc",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "VC",
+    "dis_ord_seq": 143,
+    "country_eng_nm": "Saint Vincent",
+    "country_mot_nm": "Saint Vincent and the Grenadines",
+    "currency_cd": "XCD",
+    "locale_cd": "vc",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "WS",
+    "dis_ord_seq": 144,
+    "country_eng_nm": "Samoa",
+    "country_mot_nm": "Samoa",
+    "currency_cd": "WST",
+    "locale_cd": "ws",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SM",
+    "dis_ord_seq": 145,
+    "country_eng_nm": "San Marino",
+    "country_mot_nm": "San Marino",
+    "currency_cd": "EUR",
+    "locale_cd": "sm",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "ST",
+    "dis_ord_seq": 146,
+    "country_eng_nm": "Sao Tome and Principe",
+    "country_mot_nm": "São Tomé e Príncipe",
+    "currency_cd": "STN",
+    "locale_cd": "st",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SA",
+    "dis_ord_seq": 147,
+    "country_eng_nm": "Saudi Arabia",
+    "country_mot_nm": "المملكة العربية السعودية",
+    "currency_cd": "SAR",
+    "locale_cd": "sa",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SN",
+    "dis_ord_seq": 148,
+    "country_eng_nm": "Senegal",
+    "country_mot_nm": "Sénégal",
+    "currency_cd": "XOF",
+    "locale_cd": "sn",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "RS",
+    "dis_ord_seq": 149,
+    "country_eng_nm": "Serbia",
+    "country_mot_nm": "Србија (Srbija)",
+    "currency_cd": "RSD",
+    "locale_cd": "rs",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SC",
+    "dis_ord_seq": 150,
+    "country_eng_nm": "Seychelles",
+    "country_mot_nm": "Seychelles",
+    "currency_cd": "SCR",
+    "locale_cd": "sc",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SL",
+    "dis_ord_seq": 151,
+    "country_eng_nm": "Sierra Leone",
+    "country_mot_nm": "Sierra Leone",
+    "currency_cd": "SLE",
+    "locale_cd": "sl",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SG",
+    "dis_ord_seq": 152,
+    "country_eng_nm": "Singapore",
+    "country_mot_nm": "Singapore / Singapura / 新加坡 / சிங்கப்பூர்",
+    "currency_cd": "SGD",
+    "locale_cd": "sg",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SK",
+    "dis_ord_seq": 153,
+    "country_eng_nm": "Slovakia",
+    "country_mot_nm": "Slovensko",
+    "currency_cd": "EUR",
+    "locale_cd": "sk",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SI",
+    "dis_ord_seq": 154,
+    "country_eng_nm": "Slovenia",
+    "country_mot_nm": "Slovenija",
+    "currency_cd": "EUR",
+    "locale_cd": "si",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SB",
+    "dis_ord_seq": 155,
+    "country_eng_nm": "Solomon Islands",
+    "country_mot_nm": "Solomon Islands",
+    "currency_cd": "SBD",
+    "locale_cd": "sb",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SO",
+    "dis_ord_seq": 156,
+    "country_eng_nm": "Somalia",
+    "country_mot_nm": "Soomaaliya / الصومال",
+    "currency_cd": "SOS",
+    "locale_cd": "so",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "ZA",
+    "dis_ord_seq": 157,
+    "country_eng_nm": "South Africa",
+    "country_mot_nm": "South Africa / Afrika Borwa / iNingizimu Afrika / Suid-Afrika",
+    "currency_cd": "ZAR",
+    "locale_cd": "en-ZA",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SS",
+    "dis_ord_seq": 158,
+    "country_eng_nm": "South Sudan",
+    "country_mot_nm": "South Sudan",
+    "currency_cd": "SSP",
+    "locale_cd": "ss",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "ES",
+    "dis_ord_seq": 159,
+    "country_eng_nm": "Spain",
+    "country_mot_nm": "España",
+    "currency_cd": "EUR",
+    "locale_cd": "es",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "LK",
+    "dis_ord_seq": 160,
+    "country_eng_nm": "Sri Lanka",
+    "country_mot_nm": "ශ්‍රී ලංකාව / இலங்கை",
+    "currency_cd": "LKR",
+    "locale_cd": "lk",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SD",
+    "dis_ord_seq": 161,
+    "country_eng_nm": "Sudan",
+    "country_mot_nm": "السودان (As-Sudan)",
+    "currency_cd": "SDG",
+    "locale_cd": "sd",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SR",
+    "dis_ord_seq": 162,
+    "country_eng_nm": "Suriname",
+    "country_mot_nm": "Suriname",
+    "currency_cd": "SRD",
+    "locale_cd": "sr",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SE",
+    "dis_ord_seq": 163,
+    "country_eng_nm": "Sweden",
+    "country_mot_nm": "Sverige",
+    "currency_cd": "SEK",
+    "locale_cd": "se",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "CH",
+    "dis_ord_seq": 164,
+    "country_eng_nm": "Switzerland",
+    "country_mot_nm": "Schweiz / Suisse / Svizzera / Svizra",
+    "currency_cd": "CHF",
+    "locale_cd": "ch",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "SY",
+    "dis_ord_seq": 165,
+    "country_eng_nm": "Syria",
+    "country_mot_nm": "سوريا (Suriya)",
+    "currency_cd": "SYP",
+    "locale_cd": "sy",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TW",
+    "dis_ord_seq": 166,
+    "country_eng_nm": "Taiwan",
+    "country_mot_nm": "台灣 (Táiwān)",
+    "currency_cd": "TWD",
+    "locale_cd": "tw",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TJ",
+    "dis_ord_seq": 167,
+    "country_eng_nm": "Tajikistan",
+    "country_mot_nm": "Тоҷикистон (Tojikiston)",
+    "currency_cd": "TJS",
+    "locale_cd": "tj",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TZ",
+    "dis_ord_seq": 168,
+    "country_eng_nm": "Tanzania",
+    "country_mot_nm": "Tanzania",
+    "currency_cd": "TZS",
+    "locale_cd": "tz",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TL",
+    "dis_ord_seq": 169,
+    "country_eng_nm": "Timor-Leste",
+    "country_mot_nm": "Timor-Leste",
+    "currency_cd": "USD",
+    "locale_cd": "tl",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TG",
+    "dis_ord_seq": 170,
+    "country_eng_nm": "Togo",
+    "country_mot_nm": "Togo",
+    "currency_cd": "XOF",
+    "locale_cd": "tg",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TO",
+    "dis_ord_seq": 171,
+    "country_eng_nm": "Tonga",
+    "country_mot_nm": "Tonga",
+    "currency_cd": "TOP",
+    "locale_cd": "to",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TT",
+    "dis_ord_seq": 172,
+    "country_eng_nm": "Trinidad and Tobago",
+    "country_mot_nm": "Trinidad and Tobago",
+    "currency_cd": "TTD",
+    "locale_cd": "tt",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TN",
+    "dis_ord_seq": 173,
+    "country_eng_nm": "Tunisia",
+    "country_mot_nm": "تونس (Tunis)",
+    "currency_cd": "TND",
+    "locale_cd": "tn",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TR",
+    "dis_ord_seq": 174,
+    "country_eng_nm": "Turkey",
+    "country_mot_nm": "Türkiye",
+    "currency_cd": "TRY",
+    "locale_cd": "tr",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TM",
+    "dis_ord_seq": 175,
+    "country_eng_nm": "Turkmenistan",
+    "country_mot_nm": "Türkmenistan",
+    "currency_cd": "TMT",
+    "locale_cd": "tm",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "TV",
+    "dis_ord_seq": 176,
+    "country_eng_nm": "Tuvalu",
+    "country_mot_nm": "Tuvalu",
+    "currency_cd": "AUD",
+    "locale_cd": "tv",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "UG",
+    "dis_ord_seq": 177,
+    "country_eng_nm": "Uganda",
+    "country_mot_nm": "Uganda",
+    "currency_cd": "UGX",
+    "locale_cd": "ug",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "UA",
+    "dis_ord_seq": 178,
+    "country_eng_nm": "Ukraine",
+    "country_mot_nm": "Україна (Ukraina)",
+    "currency_cd": "UAH",
+    "locale_cd": "ua",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "AE",
+    "dis_ord_seq": 179,
+    "country_eng_nm": "United Arab Emirates",
+    "country_mot_nm": "الإمارات العربية المتحدة",
+    "currency_cd": "AED",
+    "locale_cd": "ae",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "GB",
+    "dis_ord_seq": 180,
+    "country_eng_nm": "United Kingdom",
+    "country_mot_nm": "United Kingdom of Great Britain and Northern Ireland",
+    "currency_cd": "GBP",
+    "locale_cd": "gb",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "UY",
+    "dis_ord_seq": 181,
+    "country_eng_nm": "Uruguay",
+    "country_mot_nm": "Uruguay",
+    "currency_cd": "UYU",
+    "locale_cd": "uy",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "UZ",
+    "dis_ord_seq": 182,
+    "country_eng_nm": "Uzbekistan",
+    "country_mot_nm": "Oʻzbekiston",
+    "currency_cd": "UZS",
+    "locale_cd": "uz",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "VU",
+    "dis_ord_seq": 183,
+    "country_eng_nm": "Vanuatu",
+    "country_mot_nm": "Vanuatu",
+    "currency_cd": "VUV",
+    "locale_cd": "vu",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "VE",
+    "dis_ord_seq": 184,
+    "country_eng_nm": "Venezuela",
+    "country_mot_nm": "Venezuela",
+    "currency_cd": "VES",
+    "locale_cd": "ve",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "YE",
+    "dis_ord_seq": 185,
+    "country_eng_nm": "Yemen",
+    "country_mot_nm": "اليَمَن (Al-Yaman)",
+    "currency_cd": "YER",
+    "locale_cd": "ye",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "ZM",
+    "dis_ord_seq": 186,
+    "country_eng_nm": "Zambia",
+    "country_mot_nm": "Zambia",
+    "currency_cd": "ZMW",
+    "locale_cd": "zm",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "ZW",
+    "dis_ord_seq": 187,
+    "country_eng_nm": "Zimbabwe",
+    "country_mot_nm": "Zimbabwe",
+    "currency_cd": "ZWL",
+    "locale_cd": "zw",
+    "use_yn": "Y"
+  },
+  {
+    "country_cd": "PS",
+    "dis_ord_seq": 188,
+    "country_eng_nm": "Palestine",
+    "country_mot_nm": "فلسطين",
+    "currency_cd": "ILS",
+    "locale_cd": "ar",
+    "use_yn": "Y"
+  }
+]

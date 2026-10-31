@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "言語を変更",
-      "search": "言語を検索",
-      "empty": "検索結果なし"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Pi で参加するライブ動画セミナー"

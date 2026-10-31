@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Dili değiştir",
-      "search": "Dil ara",
-      "empty": "Sonuç bulunamadı"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Pi ile katıldığınız canlı video seminerleri"

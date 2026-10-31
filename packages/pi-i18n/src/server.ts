@@ -1,9 +1,14 @@
 // @pi/i18n/server — 요청별 메시지 로딩(ko → en → locale 깊은 병합)·next-intl getRequestConfig 래퍼. fs 사용(서버 전용)
-// en·locale 은 readFile(빌드 트레이싱 outputFileTracingIncludes 필수 — 표준 7절), ko 는 앱이 정적 import 로 넘긴다
+// en·locale 은 readFile(빌드 트레이싱 outputFileTracingIncludes 필수 — 표준 7절), ko 는 앱이 정적 import 로 넘긴다.
+// 언어 콤보 문구(langSwitcher.*·common.fetching)는 loginpi 각 locale 원문 스냅숏(data/switcher-messages.json)을 바탕에 깔고 앱 메시지가 덮는다 — 앱 messages 에 키 추가 불필요
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { getRequestConfig } from 'next-intl/server'
 import { deepMerge, type MessageRecord } from './merge'
+import switcherMessages from './data/switcher-messages.json' with { type: 'json' }
+
+const SWITCHER = switcherMessages as Record<string, MessageRecord>
+const withSwitcher = (locale: string, m: MessageRecord) => deepMerge(SWITCHER[locale] ?? {}, m)
 
 export interface GetMessagesOptions {
   loadSource: () => Promise<MessageRecord | { default: MessageRecord }>
@@ -28,11 +33,11 @@ async function readJson(dir: string, locale: string): Promise<MessageRecord> {
 async function load(locale: string, options: GetMessagesOptions): Promise<MessageRecord> {
   const src = await options.loadSource()
   const ko = stripMeta(('default' in src && typeof src.default === 'object' ? src.default : src) as MessageRecord)
-  if (locale === 'ko') return ko
+  if (locale === 'ko') return withSwitcher('ko', ko)
   const dir = options.messagesDir ?? join(process.cwd(), 'messages')
   const [en, own] = await Promise.all([readJson(dir, 'en'), locale === 'en' ? null : readJson(dir, locale)])
-  const base = deepMerge(ko, stripMeta(en))
-  return own ? deepMerge(base, stripMeta(own)) : base
+  const base = deepMerge(withSwitcher('ko', ko), withSwitcher('en', stripMeta(en)))
+  return own ? deepMerge(base, withSwitcher(locale, stripMeta(own))) : base
 }
 
 export function getMessages(locale: string, options: GetMessagesOptions): Promise<MessageRecord> {

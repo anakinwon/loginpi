@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Siminaaro fiidiyoow toos ah oo aad ku biirto Pi"
+  },
+  "home": {
+    "description": "Martigeliyayaashu waxay furaan siminaaro, ka qaybgalayaashuna waxay ku biiraan fadhiyada fiidiyoowga tooska ah ee Pi.",
+    "badge": "Siminaaro toos ah oo ka dhacaya jasiiradaha quruxda badan",
+    "headline": "Daawo, dhegeyso, oo wada baro — si toos ah",
+    "ctaBrowse": "Baadh siminaarada",
+    "ctaPlan": "Eeg qorshayaasha",
+    "features": {
+      "video": "Fiidiyoow toos ah",
+      "caption": "Qoraallo & turjumaad",
+      "notes": "Qoraallada kulanka AI",
+      "pay": "Ku bixi Pi"
+    },
+    "listTitle": "Siminaaro",
+    "cal": {
+      "title": "Jadwalka siminaarka",
+      "desc": "Laga soo bilaabo siminaaradii hore ilaa kuwa soo socda — taabo taariikhda si aad u hesho faahfaahin.",
+      "legendSmn": "Siminaaro",
+      "legendEnded": "Siminaaradii hore",
+      "legendMine": "Dhacdooyinkayga",
+      "failed": "Lama soo shubin karin taariikhaha siminaarka. Fadlan isku day mar dambe.",
+      "open": "Eeg faahfaahinta"
+    }
+  },
+  "nav": {
+    "link": "Xiriiri akoon",
+    "privacy": "Asturnaanta",
+    "plan": "Qorshayaasha",
+    "rooms": "Qolalka",
+    "admin": "Maamule",
+    "users": "Isticmaalayaasha",
+    "home": "Bogga hore",
+    "privacyShort": "Asturnaanta",
+    "menu": "Menu-ga ugu muhiimsan",
+    "fold": "Laab menu-ga",
+    "unfold": "Fidi menu-ga"
+  },
+  "auth": {
+    "checking": "Hubinaya galitaanka…",
+    "signedIn": "{name}",
+    "inPerson": "Qoraallada shakhsi ahaaneed",
+    "required": "Fadlan ku gal akoonkaaga Pi.",
+    "signIn": "Ku gal Pi",
+    "openInPiBrowser": "Fur boggan Pi Browser si aad ugu gasho akoonkaaga Pi.",
+    "authenticating": "Galitaanka…",
+    "google": "Ku gal Google",
+    "signOut": "Ka bax",
+    "or": "ama",
+    "linkRequired": "Waxaad ku gashay Google, laakiin weli kuma xirna akoon Pi. Soo saar kood xiriiriye Pi Browser oo halkan geli.",
+    "linkNeeded": "Xiriirinta akoonka Pi ayaa loo baahan yahay",
+    "linkCheckFailed": "Lama hubin karin heerka xiriirinta akoonkaaga (qalad server ku meel gaar ah). Fadlan dib u cusboonaysii daqiiqad gudaheed."
+  },
+  "piOAuth": {
+    "signingIn": "Ku galitaanka akoonkaaga Pi…",
+    "failed": "Galitaanka Pi wuu fashilmay. Fadlan isku day mar kale.",
+    "stateMismatch": "Lama xaqiijin karin codsigan galitaanka (dhacay ama tab kale). Fadlan isku day mar kale.",
+    "retry": "Isku day mar kale",
+    "backHome": "Bogga hore"
+  },
+  "link": {
+    "title": "Xiriiri akoon",
+    "intro": "Ku xir akoonka aad ku gashay Pi Browser galitaanka Google ee browser caadi ah. Ka dib xiriirinta waxaad isticmaali kartaa akoon isku mid ah browser PC.",
+    "checking": "Hubinaya galitaanka…",
+    "piIssueTitle": "Si aad uga gasho browser caadi ah sidoo kale",
+    "codeHint": "Soo saar koodka hoose, ka dibna ku gal Google browser PC oo geli bogga Xiriiri akoon (10 daqiiqo gudahood).",
+    "piIssue": "Soo saar kood xiriiriye",
+    "reissue": "Soo saar kood cusub",
+    "expiresIn": "Wuxuu dhacayaa {min} daqiiqo gudahood",
+    "enterTitle": "Geli koodka xiriirinta",
+    "enterHint": "Pi Browser ka fur seminar.pi → Xiriiri akoon → Soo saar kood xiriiriye, ka dibna geli koodka 6-da lambar ah.",
+    "codeLabel": "Koodka xiriirinta",
+    "submit": "Xiriiri",
+    "done": "Waa la xiray. Hadda waxaad isticmaali kartaa galitaanka Google sidoo kale.",
+    "linked": "{name} wuxuu ku xiran yahay galitaanka Google."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Galitaanka ayaa loo baahan yahay",
+    "AUTH_PI_REQUIRED": "Galitaanka Pi ayaa loo baahan yahay",
+    "AUTH_PI_SESSION_INVALID": "Fadhigaagu wuu dhacay. Fadlan mar kale gal",
+    "AUTH_PI_TOKEN_INVALID": "Xaqiijinta galitaanka Pi wuu fashilmay",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Macluumaadka galitaanka Pi ayaa maqan",
+    "FORBIDDEN": "Ma lihid ogolaansho",
+    "BAD_REQUEST": "Codsiga xun",
+    "BAD_REQUEST_BODY": "Codsiga xun",
+    "INVALID_INPUT": "Gelinta aan sax ahayn",
+    "QUERY_FAILED": "Lama soo shubin karin",
+    "SAVE_FAILED": "Lama kaydin karin",
+    "INTERNAL": "Wax baa qaldamay",
+    "SERVER_CONFIG": "Qaladka qaabeynta server-ka. Fadlan la xiriir hawlwadeenka",
+    "PI_API_CONNECT_FAILED": "Lama gaari karin Pi Network",
+    "DB_UNAVAILABLE": "Xogta si ku meel gaar ah uma heli karto. Fadlan isku day mar dambe",
+    "NOT_FOUND": "Lama helin",
+    "RATE_LIMITED": "Codsiyo badan. Fadlan isku day mar dhow",
+    "PAYLOAD_TOO_LARGE": "Codsiga ayaa aad u weyn",
+    "NETWORK": "Hubi xiriirkaaga shabakadda",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Magacan isticmaale ee Pi wuxuu horey u diiwaan gashan yahay aqoonsiyo kala duwan. Fadlan la xiriir maamulaha",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Akoonkan waa mid aan shaqaynayn. Fadlan la xiriir maamulaha",
+    "AUTH_GOOGLE_REQUIRED": "Galitaanka Google ayaa loo baahan yahay.",
+    "LINK_CODE_INVALID": "Koodka xiriirinta waa mid aan sax ahayn ama wuu dhacay. Soo saar mid cusub Pi Browser.",
+    "LINK_ALREADY_LINKED": "Akoonkan wuu horey u xiran yahay.",
+    "LINK_CODE_GEN_FAILED": "Lama abuuri karin kood xiriiriye. Fadlan isku day mar dambe.",
+    "AUTH_DB_UNAVAILABLE": "Lama kaydin karin akoonkaaga, sidaa darteed galitaanka wuu fashilmay. Fadlan isku day mar dambe.",
+    "LINK_TRY_LIMIT": "Koodadka xiriirinta ee khaldan ayaa aad u badan. Isku day mar kale 15 daqiiqo gudahood.",
+    "PRICE_UNAVAILABLE": "Lama heli karin qiimaha Pi. Fadlan isku day mar dhow",
+    "QUOTE_EXPIRED": "Qiimaha lacag bixinta wuu dhacay. Fadlan mar kale bixi",
+    "PLAN_EXHAUSTED": "Waxaad isticmaashay dhammaan wakhtigaaga siminaarka. Ku shub bogga Qorshayaasha",
+    "HOST_AWAY": "Martigeliyaha ma joogo qolka. Waxaad geli kartaa ka dib marka martigeliyaha uu ku biiro",
+    "PLAN_AI_PAID": "Astaamaha AI waxay ku heli karaan qorshayaasha lacagta ah",
+    "AI_UNAVAILABLE": "Astaamaha AI hadda ma heli karaan",
+    "SPEECH_CHUNK_INVALID": "Qaabka qaybta codka waa mid aan sax ahayn",
+    "SPEECH_NOT_LIVE": "Siminaarkan ma aha mid toos ah",
+    "SPEECH_NO_AGR": "Ogolaanshaha habaynta codka ayaa loo baahan yahay",
+    "SPEECH_RATE": "Codsiyo badan oo cod ah. Fadlan isku day mar dhow",
+    "SPEECH_QUOTA": "Wakhtiga habaynta codka ee siminaarkan wuu dhammaaday",
+    "SPEECH_USR_QUOTA": "Waxaad isticmaashay dhammaan xadkaaga turjumaadda iyo codka la turjumay ee siminaarkan",
+    "SPEECH_FAILED": "Lama beddeli karin hadalka qoraal",
+    "SPEECH_STAGE_ONLY": "Kaliya dadka masraxa jooga ayaa isticmaali kara qoraallada codka",
+    "TRANSLATE_FAILED": "Lama turjumi karin qoraalka",
+    "POLL_CLOSED": "Cod bixintan waa la xiray",
+    "NOTE_NOT_RECORDING": "Qoraalladan ma diiwaan gelinayaan",
+    "NOTE_SHOT_INVALID": "Qabashada shaashadda oo aan sax ahayn",
+    "NOTE_AUDIO_INVALID": "Faylka duubista oo aan sax ahayn",
+    "NOTE_SHOT_RATE": "Qabashada shaashadda oo aad u badan",
+    "NOTE_RETRY_SOON": "Waxaad isku dayi kartaa mar kale daqiiqad gudaheed",
+    "SPEECH_TTS_FAILED": "Lama abuuri karin codka la turjumay",
+    "CAPTION_SIG_INVALID": "Qoraalkan lama xaqiijin karin, sidaa darteed lama turjumin",
+    "PLAN_EXPIRES_BEFORE_START": "Wakhtiga bilowga wuxuu ka dambeeyaa marka uu dhaco qorshahan",
+    "PAY_ALREADY_PAID": "Lacag bixin ayaa weli socota. Haddii aad ku galaysay boorsada, isku day mar kale 3 daqiiqo gudahood.",
+    "REC_PAID_ONLY": "Duubista waxay ku heli kartaa oo kaliya siminaarada qorshaha bilaha ah ama sanadlaha ah ee wakhti lacag ah uu ka hadhay",
+    "REC_NOT_IN_ROOM": "Weli waxaan xaqiijinaynaa inaad qolka joogto. Isku day mar dhow",
+    "ENGINE_OFF": "Furaha maamulka server-ka fiidiyoowga lama qaabayn",
+    "ENGINE_UNAVAILABLE": "Server-ka fiidiyoowga ma jawaabayo. Fadlan isku day mar dhow",
+    "ADJ_NOTHING": "Ma jiro wakhti hadhay oo la yareeyo"
+  },
+  "progress": {
+    "title": "Horumarka dhismaha",
+    "subtitle": "La qabtay, socda iyo la qorsheeyay, marka loo eego astaanta · laga bilaabo {date}",
+    "overall": "Tallaabooyinka guud",
+    "stepsDone": "{done}/{total} tallaabooyin la qabtay ({pct}%)",
+    "featureUnit": "astaamaha",
+    "status": {
+      "done": "La qabtay",
+      "doing": "Socda",
+      "todo": "La qorsheeyay",
+      "drop": "La tuuray"
+    },
+    "features": {
+      "F01": {
+        "name": "Galitaanka",
+        "desc": "Galitaanka Pi Browser, galitaanka Google ee browserada kale, iyo xiriirinta labada akoon"
+      },
+      "F05": {
+        "name": "Siminaar fiidiyoow toos ah",
+        "desc": "Mashiinka fiidiyoowga ee annaga Galápagos — ujeedadu waa hal soo bandhige oo u gudbinaya ilaa 30 ka qaybgalayaal"
+      },
+      "F02": {
+        "name": "Abuur siminaar",
+        "desc": "Deji cinwaanka hoose, wakhtiga, awoodda iyo khidmadda siminaarka si aad u abuurto siminaar (magaca = jasiirad, si toos ah)"
+      },
+      "F03": {
+        "name": "Liiska siminaarka iyo faahfaahinta",
+        "desc": "Baadh bogga siminaarada furan bog bog ah oo eeg faahfaahintooda"
+      },
+      "F04": {
+        "name": "Lacag bixinta gelitaanka Pi",
+        "desc": "Ku bixi khidmadda siminaarka Pi; server-ka wuxuu mar kale hubiyaa lacagta ka hor inta aanu kuu ogolaan inaad gasho"
+      },
+      "F06": {
+        "name": "Lacag bixinta martigeliyaha",
+        "desc": "Ku bixi dakhliga khidmadda gelitaanka martigeliyayaasha Pi"
+      },
+      "F07": {
+        "name": "Dib u ciyaarista",
+        "desc": "Daawo siminaarada la duubay mar dambe"
+      },
+      "FU": {
+        "name": "Aasaaska waxyaabaha lagu daro kulanka",
+        "desc": "Hal kanaal signal oo loogu talagalay waxyaabaha lagu daro, xiriirka AI, qaybaha codka, ogolaanshaha makarafoonka iyo miisaska xogta"
+      },
+      "F08": {
+        "name": "Jadwalka iyo wadaagista",
+        "desc": "Xiriirka jadwalka, faylka dhacdada (.ics) iyo martiqaadka emailka ee siminaar kasta"
+      },
+      "F09": {
+        "name": "Yaraynta buuqa iyo iftiinka",
+        "desc": "Yaree buuqa makarafoonka oo iftiimi fiidiyoowga kamarada madow"
+      },
+      "F10": {
+        "name": "Qoraallada tooska ah",
+        "desc": "U beddel hadalka soo bandhigaha qoraal hoosta masraxa"
+      },
+      "F11": {
+        "name": "Cod bixinta, Q&A iyo joogitaanka",
+        "desc": "Samee cod bixin iyo su'aalo inta lagu jiro siminaar; martigeliyayaashu waxay soo dejiyaan liiska joogitaanka"
+      },
+      "F12": {
+        "name": "Saamaynta asalka",
+        "desc": "Blur asalkaaga ama ku beddel mid hore loo dejiyay ama sawirkaaga (lagu habaynayo qalabkaaga)"
+      },
+      "F13": {
+        "name": "Duubista deegaanka",
+        "desc": "Soo bandhigaha wuxuu duubaa siminaarka qalabkiisa oo qof kasta wuxuu arkaa in duubista ay socoto"
+      },
+      "F14": {
+        "name": "Qoraallada kulanka ee AI",
+        "desc": "Marka soo bandhigaha uu shido, hadalka iyo shaashadaha waa la duubaa oo la soo koobaa qodobbada muhiimka ah, go'aamada iyo waxyaabaha la qabanayo"
+      },
+      "F15": {
+        "name": "Qoraallada kulanka shakhsi ahaaneed",
+        "desc": "Duub kulan makarafoon kaliya oo hel qoraallada kulanka (maamulayaasha)"
+      },
+      "F16": {
+        "name": "Qoraallada la turjumay",
+        "desc": "Tus qoraallada la turjumay luqadda aad dooratay"
+      },
+      "F17": {
+        "name": "Dhegeyso turjumaad",
+        "desc": "Akhri qoraallada la turjumay si cod macmal ah iyadoo la yareynayo codka asalka ah"
+      }
+    },
+    "steps": {
+      "piLogin": "Galitaanka Pi Browser",
+      "googleLogin": "Galitaanka Google",
+      "accountLink": "Xiriirinta akoonka",
+      "deviceTest": "Tijaabada qalabka kamarada",
+      "oneToTwo": "Soo bandhige 1 → 2 ka qaybgalayaal",
+      "recovery": "Soo kabashada barafoobista iyo xasilloonida",
+      "structure": "Nadiifinta qaab dhismeedka mashiinka",
+      "autoQuality": "Tayada otomaatiga ah, 30 ka qaybgalayaal",
+      "roomService": "Gelitaanka qolka iyo duubista",
+      "roomUi": "Shaashadda qolka (lobby·masraxa·sheekaysiga·kor u qaadista gacanta·dhexdhexaadinta)",
+      "createForm": "Abuur shaashadda",
+      "list": "Liiska",
+      "detail": "Faahfaahin",
+      "payRequest": "Codsiga lacag bixinta",
+      "payVerify": "Hubinta lacagta mar kale iyo gelitaanka",
+      "settle": "Lacag bixinta",
+      "vod": "Dib u ciyaarista duubista",
+      "appRelay": "Kanaalka signalada ee waxyaabaha lagu daro mashiinka",
+      "aiBase": "AI, qaybaha codka, ogolaanshaha iyo miisaska xogta",
+      "shareLinks": "Xiriirka jadwalka, .ics iyo martiqaadka emailka",
+      "noiseLight": "Yaraynta buuqa iyo iftiinka",
+      "liveCaptions": "Qoraallada tooska ah",
+      "pollQnaAttend": "Cod bixinta, Q&A iyo liiska joogitaanka",
+      "backgrounds": "Blur, hore loo dejiyay iyo sawirkaaga",
+      "localRecording": "Duubista soo bandhigaha iyo calaamadda duubista",
+      "aiNotes": "Duubista, soo koobista iyo bogga qoraallada",
+      "inPersonNotes": "Qoraallada makarafoon kaliya iyo qoraalladayda",
+      "captionTranslate": "Dooro luqadda iyo beddelka asalka/turjumaadda",
+      "dubbing": "Ciyaarista codka macmal ah iyo codka asalka oo la yareeyay"
+    },
+    "refLabel": "Qaabka tixraaca",
+    "uiRef": "Aasaaska UI — qaababka shaashadda iyo astaamaha ee app kulanka fiidiyoowga webka ee si ballaaran loo isticmaalo, oo loo habeeyay seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Magaca waa la kaydiyay, laakiin kuwa kale lama ogeysiin karin hadda. Waxay arki doonaan ka dib marka aad mar kale ku biirto.",
+      "tile": "Guji si aad u beddesho magacayga",
+      "menu": "Beddel magacayga",
+      "title": "Magacayga siminaarkan",
+      "hint": "Ilaa 30 xaraf. Waxaa loo isticmaalaa oo kaliya siminaarkan oo isla markiiba wuxuu ku cusbooneysiinayaa shaashadda qof kasta.",
+      "save": "Kaydi",
+      "saving": "Kaydinaya…",
+      "cancel": "Jooji",
+      "taken": "Magacaas waxaa horey u isticmaalay qof kale (martigeliyaha ama ka qaybgalaha). Dooro mid kale.",
+      "failed": "Lama kaydin karin magacaaga. Isku day mar kale."
+    },
+    "roomTitle": {
+      "edit": "Guji si aad u beddesho cinwaanka hoose",
+      "label": "Cinwaanka hoose",
+      "placeholder": "Cinwaanka hoose (ilaa 60)",
+      "save": "Kaydi",
+      "cancel": "Jooji",
+      "failed": "Lama kaydin karin cinwaanka hoose."
+    },
+    "mirror": "Muraayadee fiidiyoowgayga",
+    "barPin": "Had iyo jeer tus baarka hoose",
+    "barAuto": "Si otomaatig ah u qari baarka hoose",
+    "title": "Ku biir siminaar · {room}",
+    "titleSeminar": "Qolka sugitaanka",
+    "noEngine": "Server-ka fiidiyoowga weli diyaar ma aha.",
+    "joinAs": "Ku biir sidii",
+    "presenter": "Soo bandhige",
+    "audience": "Dhagaystayaal",
+    "join": "Ku biir hadda",
+    "nameLabel": "Magaca",
+    "audienceHint": "Xubnaha dhagaystayaashu ma isticmaalaan kamarad ama makarafoon. Ka dib marka aad ku biirto waxaad arki doontaa oo maqli doontaa soo bandhigaha.",
+    "preview": {
+      "pending": "Diyaarinta kamarada iyo makarafoonka…",
+      "audioOnly": "Kamarada ma heli karto — cod kaliya ayaa la dirayaa.",
+      "none": "Kamarada iyo makarafoonka ma heli karaan. Hubi ogolaanshaha (waxaad weli ku biiri kartaa iyada oo aan warbaahin lahayn).",
+      "videoOnly": "Makarafoonka ma heli karo — fiidiyoow kaliya ayaa la dirayaa. Hubi ogolaanshaha makarafoonka."
+    },
+    "mic": {
+      "on": "Demi makarafoonka",
+      "off": "Shid makarafoonka"
+    },
+    "cam": {
+      "on": "Demi kamarada",
+      "off": "Shid kamarada"
+    },
+    "controls": "Xakamaynta wicitaanka",
+    "leave": "Ka tag",
+    "enableSound": "Daar codka",
+    "state": {
+      "connecting": "Ku xiraya…",
+      "reconnecting": "Dib u xiraya…"
+    },
+    "waiting": "Sugaya soo bandhigaha.",
+    "rejoin": "Ku biir mar kale",
+    "err": {
+      "generic": "Wax baa qaldamay. Fadlan mar kale ku biir.",
+      "CLOSED": "Xiriirka wuu lumay.",
+      "NO_ENGINE": "Server-ka fiidiyoowga weli diyaar ma aha.",
+      "TICKET_401": "Fadlan gal.",
+      "TICKET_403": "Ma lihid ogolaansho aad ku soo bandhigto. Ku biir sidii dhagaystayaal.",
+      "TICKET_503": "Qaabeynta server-ka fiidiyoowga weli lama dhammaystirin.",
+      "TICKET_NETWORK": "Hubi xiriirkaaga shabakadda.",
+      "TICKET_INVALID": "Baaskaaga gelitaanka wuu dhacay.",
+      "TICKET_EXPIRED": "Baaskaaga gelitaanka wuu dhacay.",
+      "ROOM_FULL": "Seminar-kan waa buuxa.",
+      "ROOM_CLOSED": "Qolka waa la xiray — seminar-ku wuu dhammaaday ama martigeliyuhu wuxuu maqnaa in ka badan 5 daqiiqo.",
+      "DUPLICATE_SESSION": "Waxaad ka soo biirtay qalab kale, sidaa darteed shaashadan waa la jaray.",
+      "ROLE_FORBIDDEN": "Ma lihid ogolaansho aad ku soo bandhigto.",
+      "WS_FAILED": "Kuma xirnaan karin server-ka fiidiyowga.",
+      "ICE_FAILED": "Xiriirka fiidiyowga wuu go'ay. Hubi shabakadaada.",
+      "MEDIA_FAILED": "Kuma bilaabi karin kamarada ama makarafoonka.",
+      "TIMEOUT": "Server-ka fiidiyowga ma jawaabayo.",
+      "TICKET_402": "Kani waa seminar lacag ah. Fadlan ku bixi bogga seminar-ka ka hor intaadan gelin.",
+      "TICKET_404": "Seminar-ka lama helin.",
+      "TICKET_409": "Seminar-kan wuu dhammaaday ama waa la joojiyay.",
+      "TICKET_HOST_AWAY": "Martigeliyuhu wali ma soo biirin ama wuxuu maqnaa in ka badan 5 daqiiqo, sidaa darteed ma geli kartid. Fadlan isku day mar kale ka dib marka martigeliyuhu soo biiro.",
+      "TICKET_PLAN_EXHAUSTED": "Qorshaha seminar-kan ma jiro waqti dambe, sidaa darteed ma bilaaban karo. Iibsashada qorshe isku mid ah mar kale waxay ku daraysaa waqti (Bilaash wuxuu ku cusboonaysiinayaa 1 saac bisha soo socota)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Kuma beddeli karin makarafoonka. Fadlan isku day mar kale.",
+        "video": "Kuma beddeli karin kamarada. Fadlan isku day mar kale."
+      },
+      "forbidden": "Ma lihid ogolaansho aad ku soo bandhigto, sidaa darteed waxaad sii wadi doontaa sidii dhagayste.",
+      "demoted": "Waxaa lagu celiyay dhagaystayaasha.",
+      "endFailed": "Kuma dhammaan karin seminar-ka. Fadlan isku day mar kale.",
+      "chatFailed": "Fariinta lama dirin.",
+      "actionFailed": "Kuma dhammayn karin codsiga. Fadlan isku day mar kale.",
+      "shareFailed": "Kuma bilaabi karin wadaagista shaashada.",
+      "err": {
+        "RATE_LIMITED": "Si degdeg ah ayaad u diraysaa. Fadlan sug cabbaar.",
+        "ROLE_FORBIDDEN": "Ma lihid ogolaansho aad tan ku samayso.",
+        "MEDIA_FAILED": "Kuma bilaabi karin makarafoonkaaga ama kamaradaada. Fadlan hubi ogolaanshaha.",
+        "LOCKED": "Waxa xiray soo bandhigaha."
+      },
+      "mutedBy": {
+        "audio": "Soo bandhiguhu wuxuu damiyay makarafoonkaaga.",
+        "video": "Soo bandhiguhu wuxuu damiyay kamaradaada."
+      },
+      "policy": {
+        "locked": "Soo bandhiguhu wuxuu xiray makarafoonada. Waxaad shidi kartaa kaaga marka la furo.",
+        "unlocked": "Makarafoonada waa la furay."
+      },
+      "consent": {
+        "saveFail": "Kuma kaydin karin ogolaanshahaaga. Hubi diiwaangelintaada oo mar kale shid makarafoonka."
+      }
+    },
+    "home": "Tag bogga hore",
+    "tile": {
+      "fullscreen": "Laba jeer guji shaashad buuxda · Esc si aad uga baxdo",
+      "self": "{name} (adiga)",
+      "presenter": "Soo bandhige",
+      "micOff": "Makarafoonka dansan",
+      "screen": "Shaashada {name}",
+      "row": "Kuwa kale ee hadlaya",
+      "pin": "Tus {name} weyn",
+      "unpin": "Habayn otomaatig ah"
+    },
+    "more": "Doorashooyin dheeraad ah",
+    "joinNoCam": "Ku biir kamarad la'aan",
+    "net": {
+      "afterJoin": "Xiriirkaaga si otomaatig ah ayaa loo hubiyaa ka dib marka aad soo biirto.",
+      "measuring": "Hubinta xiriirka…",
+      "good": "Xiriir wanaagsan",
+      "fair": "Xiriir dhexdhexaad ah",
+      "poor": "Xiriir liita",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% ee xogta codka ayaa lumaysa.",
+          "video": "{pct}% ee xogta fiidiyowga ayaa lumaysa."
+        },
+        "rate": {
+          "audio": "Soo gelinta codka waa hooseeysaa {kbps} kbps.",
+          "video": "Soo gelinta fiidiyowga waa hooseeysaa {kbps} kbps. Tayada ayaa hoos u dhici karta."
+        }
+      }
+    },
+    "people": "{n} qof ayaa qolka ku jira",
+    "screen": {
+      "start": "Wadaag shaashada",
+      "stop": "Jooji wadaagista"
+    },
+    "panel": {
+      "title": "Chat · Q&A · Cod-bixin · Dadka",
+      "chat": "Chat",
+      "people": "Dadka",
+      "close": "Xir guddiga",
+      "qna": "Q&A",
+      "polls": "Cod-bixin"
+    },
+    "chat": {
+      "empty": "Wali ma jiraan fariimo. Chat-ka lama kaydiyo.",
+      "me": "Adiga",
+      "failed": "Lama dirin.",
+      "retry": "Isku day mar kale",
+      "input": "Ku qor fariin",
+      "send": "Dir"
+    },
+    "hand": {
+      "raise": "Kor u qaad gacanta",
+      "lower": "Hoos u dhig gacanta",
+      "list": "Gacmaha kor loo qaaday",
+      "lowerAll": "Dhammaan gacmaha hoos u dhig",
+      "raised": "Gacanta kor loo qaaday",
+      "notice": "{name} wuxuu kor u qaaday gacan.",
+      "dismiss": "Iska indho tir",
+      "waiting": "{n} qof ayaa sugaya inay hadlaan"
+    },
+    "react": {
+      "open": "Falcelin",
+      "e0": "Jecel",
+      "e1": "Sacab",
+      "e2": "Qosol",
+      "e3": "Layaab",
+      "e4": "Murugo",
+      "e5": "Hadalla'aan",
+      "e6": "Jaceyl"
+    },
+    "quality": {
+      "label": "Tayada",
+      "auto": "Otomaatig",
+      "high": "Sare",
+      "medium": "Dhexdhexaad",
+      "low": "Hoose",
+      "unstable": "Shabakadaada waa mid aan degganayn"
+    },
+    "roles": {
+      "presenter": "Soo bandhige",
+      "panel": "Xubin guddiga",
+      "audience": "Dhagayste"
+    },
+    "stage": {
+      "invite": "Ku martiqaad masraxa",
+      "remove": "U wareeji dhagaystayaasha",
+      "promoted": "Waxaa lagu casuumay masraxa. Haddii aad gacanta kor u qaaday, kamaradaada si otomaatig ah ayay u shidmaysaa (haddii aan la xirin ama aan la ogolaan). Shid makarafoonkaaga si aad u hadasho (makarafoonka si otomaatig ah uma shidmo).",
+      "later": "Goor dambe"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} wuxuu kor u qaaday gacan."
+    },
+    "leaveDialog": {
+      "title": "Ka bax seminar-ka",
+      "body": "Waxaad ka bixi kartaa kaligaa, ama waxaad soo afjari kartaa seminar-ka oo aad ka jartaa qof walba.",
+      "confirmTitle": "Ma soo afjari seminar-ka?",
+      "confirmBody": "Qof walba waa la jari doonaa oo qofna kuma soo biiri karo seminar-kan mar kale.",
+      "cancel": "Jooji",
+      "end": "Soo afjar seminar-ka",
+      "endConfirm": "Soo afjar hadda"
+    },
+    "mod": {
+      "muteAll": "Dhammaan aamus",
+      "lock": "Xir makarafoonada",
+      "unlock": "Fur makarafoonada",
+      "locked": "Soo bandhiguhu wuxuu xiray makarafoonada",
+      "muteMic": "Dami makarafoonka",
+      "askMic": "Codsiga in la furo",
+      "muteCam": "Dami kamarada",
+      "muteMicOf": "Dami makarafoonka {name}",
+      "askMicOf": "Codsiga {name} inuu furo",
+      "muteCamOf": "Dami kamarada {name}"
+    },
+    "ask": {
+      "audio": "Soo bandhiguhu wuxuu kaa codsaday inaad shid makarafoonkaaga.",
+      "video": "Soo bandhiguhu wuxuu kaa codsaday inaad shid kamaradaada.",
+      "ignore": "Iska indho tir"
+    },
+    "toDetail": "Tag bogga seminar-ka",
+    "consent": {
+      "title": "Ka hor intaadan shidin makarafoonkaaga",
+      "body": "Haddii duubista, qoraalada, ama qoraalada kulanka AI ay shidan yihiin seminar-kan, codkaaga waxaa loo beddeli karaa qoraal, waa la kaydin karaa, waana la turjumi karaa. Habaynta codka waxaa sameeya adeeg AI oo ka baxsan dalkaaga. Haddii aadan ogolaan, makarafoonkaaga wali wuu shidmayaa — kaliya codkaaga ayaa laga reebayaa habaynta.",
+      "privacy": "Siyaasadda gaarka ah",
+      "newTab": "(wuxuu ku furmayaa tab cusub)",
+      "decline": "Ma ogoli",
+      "agree": "Ogolaaw oo shid makarafoonka",
+      "notice": "Marka duubista, qoraalada, ama qoraalada kulanka AI ay shidan yihiin, codadka kuwa hadlaya waa la habaynayaa. Codadka dhagaystayaasha lama diro.",
+      "saveFailClosed": "Seminar-kan wuu dhammaaday, sidaa darteed ogolaanshaha lama duubi karo"
+    },
+    "captions": {
+      "title": "Qoraalo",
+      "room": "Qoraalo toos ah (qolka oo dhan)",
+      "show": "Tus qoraalada",
+      "size": {
+        "label": "Cabbirka qoraalka",
+        "sm": "Yar",
+        "md": "Dhexdhexaad",
+        "lg": "Weyn"
+      },
+      "waiting": "Qoraalada waxay soo muuqanayaan marka soo bandhiguhu shido",
+      "limit": "Xadka habaynta hadalka waa la gaaray, sidaa darteed qoraalada iyo daqiiqadaha AI waa la joojiyay",
+      "sendFail": "Kuma shidi karin qoraalada. Fadlan isku day mar kale goor dhow",
+      "sendFailOff": "Kuma damin karin qoraalada. Fadlan isku day mar kale goor dhow",
+      "region": "Qoraalo",
+      "translate": "Tus qoraalada la turjumay",
+      "lang": "Luqadda turjumaada",
+      "langMine": "Luqadahayga",
+      "langAll": "Dhammaan luqadaha",
+      "trStop": {
+        "forbidden": "Qoraalada la turjumay waxay kaliya u yihiin ka qaybgalayaasha diiwaangashan. Waxaa la tusayaa asalka",
+        "unavailable": "Qoraalada la turjumay hadda lama heli karo. Waxaa la tusayaa asalka",
+        "quota": "Seminar-kan wuxuu gaaray xadkiisa turjumaada. Waxaa la tusayaa asalka",
+        "usrQuota": "Waxaad isticmaashay dhammaan xadkaaga turjumaada ee seminar-kan. Waxaa la tusayaa asalka"
+      },
+      "unsupported": "Qalabkan ma abuuri karo qoraalo toos ah (ma jiro taageero duubista codka ee browser-kan)"
+    },
+    "effects": {
+      "title": "Saamaynta",
+      "light": "Sixitaanka iftiinka",
+      "noise": "Yaree buuqa",
+      "noiseFail": "Yaraynta buuqa lama beddeli karo qalabkan",
+      "close": "Xir",
+      "preview": "Hordhacayga",
+      "bg": "Asalka",
+      "bgNone": "Midna",
+      "bgBlur": "Mugdi",
+      "scenes": {
+        "beach": "🏝️ Xeebta Maldives",
+        "autumn": "🍁 Dooxada Dayrta",
+        "fireplace": "🔥 Goobta dabka",
+        "xmas": "🎄 Qolka kulanka Kirismaska"
+      },
+      "bgs": {
+        "dusk": "Habeen",
+        "ocean": "Badweyn",
+        "forest": "Keyn",
+        "studio": "Istiyuudiyo",
+        "grid": "Shabag",
+        "dots": "Dhibco"
+      },
+      "myAdd": "Sawirkayga",
+      "myItem": "Sawirkayga {n}",
+      "myDel": "Tirtir sawirkayga {n}",
+      "mySaveFail": "Asalka waa la codsaday laakiin lama kaydin karin qalabkan (kulankan oo kaliya)",
+      "bgStopped": "Saamaynta asalka ayaa istaagtay oo waa la damiyay. Mar kale dooro si aad dib u bilowdo",
+      "myNote": "Sawiradaada waxaa lagu kaydiyaa kaliya qalabkan (ilaa 3, 2 MB midkiiba)",
+      "mobileBlurOnly": "Telefoonada, kaliya asalka mugdiga ah ayaa la heli karaa (sawirada asalka ah waxay ka shaqeeyaan PC)",
+      "myTooBig": "Kaliya sawirada ilaa 2 MB ayaa la isticmaali karaa",
+      "preparing": "Diyaarinta…",
+      "bgFailed": "Kuma soo shubin karin saamaynta asalka",
+      "autoOff": "Qalabkaaga waa gaabis, sidaa darteed saamaynta asalka waa la damiyay",
+      "unsupported": "Saamaynta asalka lama heli karo qalabkan",
+      "noCam": "Shid kamaradaada si aad u doorato asal",
+      "lightUnsupported": "Sixitaanka iftiinka lama heli karo qalabkan",
+      "noiseUnsupported": "Dejinta yaraynta buuqa lama taageero qalabkan"
+    },
+    "sheetClose": "Xir",
+    "polls": {
+      "new": "Cod-bixin cusub",
+      "question": "Su'aal",
+      "option": "Doorasho {n}",
+      "remove": "Ka saar doorashada {n}",
+      "addOption": "Ku dar doorasho",
+      "start": "Bilow cod-bixin",
+      "cancel": "Jooji",
+      "dup": "Doorashooyinka waa inay kala duwanaadaan",
+      "vote": "Cod-bixin",
+      "change": "Beddel codka",
+      "close": "Xir cod-bixinta",
+      "closed": "Xiran",
+      "mine": "Doorashadaada",
+      "result": "{pct}% ({n} cod)",
+      "total": "{n} cod guud ahaan",
+      "empty": "Wali ma jiraan cod-bixin.",
+      "loading": "Soo shubid…",
+      "labOnly": "Cod-bixinta waxaa laga heli karaa qolalka seminar-ka oo kaliya.",
+      "started": "Cod-bixin cusub ayaa bilaabatay",
+      "goVote": "Cod-bixin",
+      "votersNote": "Qabanqaabiyaha wuxuu arki karaa cidda u codeysay doorasho kasta.",
+      "voters": "Kuwa codeeyay: {names}"
+    },
+    "qna": {
+      "sort": "Kala saar",
+      "by": {
+        "top": "Sare",
+        "new": "Ugu cusub"
+      },
+      "rcm": "Kor u qaad ({n})",
+      "answered": "Waa la jawaabay",
+      "answer": "Calaamadee in la jawaabay",
+      "unanswer": "Ka saar calaamadda in la jawaabay",
+      "hide": "Qari",
+      "doneN": "{n} waa la jawaabay",
+      "backOpen": "Su'aalo aan la jawaabin",
+      "empty": "Wali ma jiraan su'aalo.",
+      "emptyDone": "Ma jiraan su'aalo la jawaabay.",
+      "loading": "Soo shubid…",
+      "input": "Weydii su'aal (500 xaraf)",
+      "send": "Dir",
+      "left": "{n} ayaa hadhay",
+      "labOnly": "Q&A waxaa laga heli karaa qolalka seminar-ka oo kaliya."
+    },
+    "recording": {
+      "title": "Duub",
+      "badge": "Duubista",
+      "unsupported": "Browser-kan ma duubi karo. Fadlan ka duub browser caadi ah oo ku yaal kombuyuutar.",
+      "piBrowserOnly": "Duubista waxay ka shaqaysaa kaliya browser caadi ah (kombuyuutar ama moobil). Pi Browser ma kaydin karo faylasha duubista — fur seminar-kan browser kombuyuutar ama telefoon (seminarz.vercel.app) si aad u duubto.",
+      "audioSuspended": "Duubista codka waxaa laga yaabaa inaanay ka bilaaban qalabkan. Kaliya sawirka ayaa la duubi karaa.",
+      "notifyFailed": "Duubista ma bilaaban sababtoo ah ka qaybgalayaasha lama ogeysiin karin. Fadlan isku day mar kale goor dhow.",
+      "confirm": {
+        "title": "Ma bilownaa duubista?",
+        "body": "Marka duubista bilaabato, qof walba wuxuu arki doonaa calaamadda 'Duubista'. Faylka waxaa lagu kaydiyaa kaliya qalabkan mana la soo gelinayo ama lama wareejinayo dibadda. Fadlan u sheeg ka qaybgalayaasha ka hor intaadan bilaabin.",
+        "download": "Marka aad joojiso, faylka MP4 ah ayaa lagu kaydiyaa galka soo dejintaada (browser-yada aan duubi karin MP4 waxay qaadanayaan cabbaar si ay u beddelaan; duubista ka dheer 45 daqiiqo waxaa laga yaabaa in lagu hayo qaabkooda asalka ah). Browser-yada gudaha app-ka ah ayaa laga yaabaa inay xiraan kaydinta faylka, sidaa darteed ka duub browser caadi ah oo ku yaal kombuyuutar.",
+        "cancel": "Jooji",
+        "start": "Bilow duubista",
+        "charge": "Inta lagu jiro duubista, waqtiga duubista waxaa laga jarayaa waqtigaaga lacagta ah marka lagu daro waqtiga qolka (2x inta lagu jiro duubista). Marka waqtiga lacagta ah uu dhammaado, duubista way istaagtaa oo faylka waa la kaydiyaa."
+      },
+      "resave": {
+        "label": "Faylka duubista",
+        "save": "Mar kale kaydi",
+        "dismiss": "Xir mar kale kaydi"
+      },
+      "toast": {
+        "started": "Duubista waa la bilaabay — qof walba wuu arki karaa",
+        "saved": "Duubista waa la kaydiyay. Hubi galka soo dejintaada. Haddii aan waxba la kaydin, taabo [Mar kale kaydi] xagga sare ee shaashada.",
+        "autoStopped": "Duubista waa dhammaatay sababtoo ah browser-ka ayaa joojiyay ama xadka cabbirka waa la gaaray. Wax kasta oo ilaa hadda la duubay waa la kaydiyay. Bilow duubista mar kale si aad u sii wadato.",
+        "empty": "Waxba lama duubin, sidaa darteed lama abuurin fayl.",
+        "saveFailed": "Kuma abuuri karin faylka duubista.",
+        "converting": "Duubista waxaa loo beddelayaa MP4. Fadlan daaqadan ha xirin.",
+        "savedOriginal": "Kuma beddeli karin MP4, sidaa darteed duubista waxaa lagu kaydiyay qaabkeeda asalka ah (webm). Hubi galka soo dejintaada.",
+        "startedBy": "Soo bandhiguhu wuxuu bilaabay duubista",
+        "stoppedBy": "Soo bandhiguhu wuxuu joojiyay duubista"
+      },
+      "paidOnly": "Duubista waxaa laga heli karaa kaliya seminar-yada lagu furay qorshe bil kasta ah ama sanadle ah, inta waqtiga lacagta ah uu hadhay.",
+      "planOut": "Waqtiga lacagta ah wuu dhammaaday, sidaa darteed duubista way istaagtay oo faylka waa la kaydiyay.",
+      "notInRoom": "Wali waxaan xaqiijinaynaa inaad qolka ku jirto. Bilow duubista mar kale cabbaar ka dib.",
+      "meterFailed": "Kuma hubin karin waqtiga duubista, sidaa darteed duubista ma bilaaban. Isku day mar kale cabbaar ka dib.",
+      "paidOut": "Ma jiro waqti lacag ah oo hadhay, sidaa darteed duubista ma bilaaban karto. Iibso qorshe isku mid ah mar kale si aad u duubto.",
+      "pausedBadge": "Duubista waa la hakiyay",
+      "controls": "Xakamaynta duubista",
+      "pause": "Hakin",
+      "resume": "Dib u bilow",
+      "stop": "Jooji duubista"
+    },
+    "notes": {
+      "on": "Qoraallada AI",
+      "badge": "Qoraallada AI shidan",
+      "started": "Soojeediyuhu wuxuu shiday qoraallada AI",
+      "stopped": "Qoraallada AI waa la damiyay",
+      "startedMine": "Qoraallada AI shidan — qof walba waa u muuqdaa",
+      "stoppedMine": "Qoraallada AI damisan — qoraallada ayaa la abuurayaa",
+      "startFail": "Lama bilaabi karin qoraallada AI",
+      "gone": "Qoraallada AI waa la joojiyay — qoraallada waa la soo gabagabeeyay ama meel kale ayaa laga tirtiray",
+      "unsupported": "Qoraallada AI lama shidi karo halkan (ma jiro taageero duubista codka)"
+    },
+    "dubbing": {
+      "listen": "Ku dhegeyso cod la turjumay",
+      "blocked": "Lama ciyaari karin codka la turjumay. Fadlan dib u shid",
+      "stopped": "Codka la turjumay hadda lama heli karo, sidaa darteed waa la damiyay",
+      "usrQuota": "Waxaad isticmaashay dhammaan xadka codka la turjumay ee seminaarkan, sidaa darteed waa la damiyay"
+    },
+    "plan": {
+      "warn": "{min} daqiiqo ayaa ka hartay qorshaha seminaarkan.",
+      "ended": "Waqtigii seminaarkaaga wuu dhamaaday, sidaa darteed seminaarku wuu dhammaaday waxaadna ka baxday qolka.",
+      "left": "Waqtiga seminaarka ka haray",
+      "closed": "Seminaarku wuu dhammaaday, sidaa darteed waxaad ka baxday qolka.",
+      "hostAway": "Martigeliyuhu wuu ka baxay qolka. Haddii uusan ku soo laaban 5 daqiiqo gudahood, dhammaan ka qaybgalayaasha waa la saari doonaa.",
+      "hostGone": "Martigeliyuhu kuma soo laaban 5 daqiiqo gudahood, sidaa darteed waxaad ka baxday qolka. Waxaad dib u geli kartaa marka martigeliyuhu soo biiro."
+    },
+    "toLobby": "Qolka sugitaanka"
+  },
+  "list": {
+    "tabsLabel": "Muuqaalka liiska seminaarka",
+    "tabs": {
+      "all": "Dhammaan",
+      "hosted": "Anigaa martigeliyay",
+      "joined": "Ku biiray"
+    },
+    "empty": {
+      "all": "Ma jiraan seminaaro soo socda.",
+      "hosted": "Ma aadan martigelin wax seminaaro ah.",
+      "joined": "Ma aadan ku biirin wax seminaaro ah."
+    },
+    "loading": "Xogta oo la soo shubayo…",
+    "retry": "Iskuday mar kale",
+    "free": "Bilaash",
+    "fee": "{amount} Pi",
+    "host": "Martigeliye {name}",
+    "capacity": "Awoodda {n}",
+    "status": {
+      "SCHEDULED": "La qorsheeyay",
+      "LIVE": "Toos",
+      "ENDED": "Dhammaaday",
+      "CANCELED": "La baajiyay"
+    },
+    "hostNew": "Abuur seminaar",
+    "progress": "Horumar",
+    "pager": "Bog-wareejin",
+    "prev": "Hore",
+    "next": "Xiga",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Cinwaan hoosaad",
+      "placeholder": "Ku dar cinwaan hoosaad",
+      "save": "Keydi cinwaan hoosaad",
+      "saving": "Keydinayaa…",
+      "saved": "Waa la keydiyay."
+    },
+    "loading": "Xogta oo la soo shubayo…",
+    "back": "Ku noqo liiska",
+    "notFound": "Seminaarka lama helin.",
+    "status": {
+      "SCHEDULED": "La qorsheeyay",
+      "LIVE": "Toos",
+      "ENDED": "Dhammaaday",
+      "CANCELED": "La baajiyay"
+    },
+    "startAt": "Taariikh",
+    "host": "Martigeliye",
+    "seats": "Kuraasta ka hartay",
+    "seatsValue": "{left} / {max}",
+    "fee": "Khidmadda seminaarka",
+    "feeValue": "{amount} Pi",
+    "free": "Bilaash",
+    "enter": "Geli",
+    "payEnter": "Ku bixi Pi oo geli ({amount} Pi)",
+    "paying": "Lacag bixinta oo socota…",
+    "joining": "Diiwaangelinayaa…",
+    "registered": "Waa lagu diiwaangeliyay.",
+    "full": "Seminaarkan wuu buuxsamay.",
+    "closed": "Seminaarkan wuu dhammaaday.",
+    "canceled": "Seminaarkan waa la baajiyay.",
+    "roomLink": "Tag qolka (martigeliye)",
+    "piBrowserOnly": "Lacag bixinta waxaa laga heli karaa Pi Browser ka dib marka la galo Pi.",
+    "payCancelled": "Lacag bixinta waa la baajiyay.",
+    "payStillWaiting": "Weli waxaan sugaynaa boorsada. Haddii aad horey u gashay Pi Wallet, fadlan sug in yar.",
+    "payFailed": "Lacag bixinta way fashilantay.",
+    "err": {
+      "NAME_TAKEN": "Magacaas waxaa horey u isticmaalay qof kale. Mid kale dooro.",
+      "CAL_READ_FAILED": "Lama soo shubi karin dhacdooyinkaaga. Hubi cinwaanka.",
+      "ISLAND_FULL": "Dhammaan 100 magac oo jasiirad ah ayaa hadda la isticmaalayaa. Waxaad furi kartaa seminaar cusub ka dib marka mid soo socda ama mid toos ah uu dhammaado ama la baajiyo.",
+      "SMN_FULL": "Seminaarkan wuu buuxsamay.",
+      "SMN_CLOSED": "Seminaarkan wuu dhammaaday ama waa la baajiyay.",
+      "SMN_ALREADY": "Waxaa horey laguugu diiwaangeliyay ama lacag bixin ayaa socota.",
+      "SMN_FREE": "Seminaarada bilaashka ah lacag kama qaataan.",
+      "SMN_PAY_REQUIRED": "Kani waa seminaar lacag ah. Fadlan bixi si aad u gasho.",
+      "SMN_PAY_INVALID": "Lama xaqiijin karin lacag bixintaada. Fadlan la xiriir maamulaha.",
+      "PAY_PI_FAILED": "Lama gaari karin server-ka lacag bixinta Pi. Fadlan isku day mar kale dhawaan.",
+      "PAY_MISMATCH": "Faahfaahinta lacag bixinta isma waafaqsana.",
+      "PAY_AMOUNT_MISMATCH": "Lacagta la bixiyay way ka duwan tahay khidmadda seminaarka.",
+      "PAY_CANCELLED": "Lacag bixintan waa la baajiyay.",
+      "PAY_ALREADY_PAID": "Lacag bixin ayaa weli socota. Haddii aad ku saxiixaysay boorsada, isku day mar kale 3 daqiiqo gudahood.",
+      "PAY_INVALID_STATE": "Lacag bixintan lama farsamayn karo hadda.",
+      "PAY_PI_CANCEL_REFUSED": "Lacag bixinta ayaa horey u socota lamana baajin karo. Fadlan hubi mar kale dhawaan."
+    },
+    "share": {
+      "title": "Qorshee & wadaag",
+      "calendar": "Ku dar jadwalka",
+      "ics": "Faylka jadwalka",
+      "mail": "Ku casuun email ahaan",
+      "mailApp": "Ku dir app-ka emailka asalka ah",
+      "mailSubject": "[Casuumaadda seminaarka] {title}",
+      "mailBody": "{title}\nWaqtiga: {start}\n\nSi toos ah ugu biir linkigan.\nDesktop: {url}\nPi Browser: {piUrl}",
+      "copy": "Koobiyeey linkiga",
+      "copied": "Linkiga waa la koobiyeeyay.",
+      "copyFail": "Lama koobiyeeyin. Fadlan koobiyeey linkiga ka soo barta cinwaanka.",
+      "share": "Ku wadaag app kale",
+      "shareFail": "Lama wadaagin. Fadlan isticmaal Koobiyeey linkiga beddelkeeda.",
+      "created": "Seminaarkaaga waa diyaar. Ku dar waqtiga bilowga Google Calendar-kaaga.",
+      "addGoogle": "Ku dar Google Calendar",
+      "later": "Goor dambe",
+      "piBrowserOpen": "Gudaha Pi Browser, jadwalka, emailka iyo faylka jadwalka waxay ku furmaan browser-ka asalka ah ee taleefankaaga.",
+      "extFail": "Lama furi karin. Cusboonaysii Pi Browser, ama isticmaal Koobiyeey linkiga oo ku fur browser caadi ah (seminarz.vercel.app).",
+      "icsPiBrowser": "Faylka jadwalka waxaa lagu soo dejisan karaa oo kaliya browser caadi ah (kombuyuutar ama mobil). Gudaha Pi Browser, isticmaal Ku dar jadwalka beddelkeeda."
+    },
+    "attendance": "Joogitaanka",
+    "plan": "Qorshe",
+    "left": "Waqtiga ka haray"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Bishii hore",
+      "next": "Bisha xigta",
+      "connect": "Tus Google Calendar-kayga",
+      "change": "Maamul Google calendars ({n})",
+      "add": "Ku dar",
+      "remove": "Ka saar",
+      "close": "Xidh",
+      "failed": "Lama soo shubi karin dhacdooyinka {n} calendar(s). Hubi cinwaanka.",
+      "badUrl": "Ku dheji 'Cinwaanka qarsoon ee qaabka iCal' (…/basic.ics) ee goobaha Google Calendar, ma aha barta cinwaanka browser-ka.",
+      "full": "Waxaad ku dari kartaa ilaa {n} calendars.",
+      "allDay": "Maalin dhan",
+      "day": "Dhacdooyinkayga maalintan",
+      "count": "{n, plural, one {# dhacdo} other {# dhacdooyin}}",
+      "more": "+{n}",
+      "picked": "Taariikhdan ayaa loo dejiyay taariikhda bilowga. Dooro waqtiga hoose.",
+      "s1": "Taabo [Fur goobaha Google Calendar] hoose.",
+      "s2": "Hoosta 'Goobaha calendars-kayga' ee bidixda, dooro calendar (tusaale ahaan magacaaga).",
+      "s3": "Hoos u rog 'Ku dar calendar' oo koobiyeey 'Cinwaanka qarsoon ee qaabka iCal'.",
+      "s4": "Ku dheji halkan oo taabo [Ku dar] — cinwaanada dhacdooyinka ayaa ka soo muuqan doona jadwalka. Ku dar calendars kale si la mid ah, ilaa 5.",
+      "open": "Fur goobaha Google Calendar",
+      "privacy": "Cinwaankani waa furaha jadwalkaaga — ha la wadaagin. Waxaa lagu kaydiyaa qalabkan oo kaliya, waligiisna kuma jiro server-kayaga."
+    },
+    "title": "Abuur seminaar",
+    "name": "Aan u safarno jasiirad qurux badan!",
+    "subTitle": "Cinwaan hoosaad (ikhtiyaari, ilaa 60)",
+    "startAt": "Waqtiga bilowga",
+    "maxCnt": "Awoodda (1–100)",
+    "submit": "Abuur",
+    "submitting": "Abuurayaa…",
+    "invalid": "Hubi wax gelintaada — taariikh hal sano gudahood ah, awoodda 1–100.",
+    "attendance": {
+      "title": "Joogitaanka",
+      "back": "Ku noqo seminaarka",
+      "loading": "Xogta oo la soo shubayo…",
+      "forbidden": "Kaliya martigeliyaha iyo maamulayaasha ayaa arki kara joogitaanka.",
+      "count": "{n} qof",
+      "csv": "Soo dejiso CSV",
+      "empty": "Weli qofna ma soo biirin.",
+      "online": "Online",
+      "left": "Ka tagay",
+      "col": {
+        "name": "Magac",
+        "pi": "Magaca isticmaalaha Pi",
+        "ent": "Markii ugu horreysay ee la soo biiro",
+        "hb": "Markii ugu dambeysay ee la arko",
+        "dur": "Waqtiga la joogay",
+        "min": "La joogay (daqiiqado, waqtiga maqnaanshaha laga reebay)",
+        "state": "Xaalad"
+      },
+      "durNote": "Waqtiga la joogay waa laga bilaabo markii ugu horreysay ee la soo biiro ilaa markii ugu dambeysay ee la arko, laga jaray waqtiga maqnaanshaha (farqiga ka badan 2.5 daqiiqo).",
+      "csvPiBrowser": "Soo dejinta CSV waxay ka shaqeysaa oo kaliya browser caadi ah (kombuyuutar ama mobil). Pi Browser ma keydin karo faylasha — fur xaashidan joogitaanka kombuyuutar ama taleefan browser (seminarz.vercel.app)."
+    },
+    "plan": "Qorshe",
+    "planFree": "Bilaash — {time} ayaa ka hartay bishan · ma jiro AI",
+    "planPaid": "{name} {time} · {price} — bixi marka la abuurayo",
+    "planHint": "Seminaar lagu furay qorshe lacag ah wuxuu marka hore isticmaalaa waqtiga qorshahaas, ka dibna wuxuu ku sii socdaa waqtiga bilaashka ah ee bishan (ma jiro AI qaybta bilaashka ah). Qorshe firfircoon wuxuu furmaa lacag la'aan; Bil kasta ama Sannad kasta oo aadan haysan waxaa lagu bixiyaa Pi marka aad riixdo Abuur, ka dibna seminaarku wuu furmaa (Pi Browser). Ku biirista mar walba waa bilaash ka qaybgalayaasha.",
+    "planOwned": "{name} — firfircoon · {time} ayaa ka hartay",
+    "planEnds": "Waqtiga bilowga waa ka dib marka uu dhaco qorshahan. U dhaqaaji bilowga hore ama dooro qorshe kale.",
+    "paidKept": "Baaskaaga lacagta ah waa la haystaa. Hagaaji arrinta oo riix Abuur mar kale (ma jiro lacag bixin labaad)."
+  },
+  "privacy": {
+    "title": "Siyaasadda Qarsoodiga — Codka iyo Astaamaha AI",
+    "effective": "Waxay dhaqan galeysaa {date}",
+    "intro": "Siyaasaddani waxay sharxaysaa macluumaadka shakhsiyeed ee aan farsamayno marka aad isticmaasho qoraallada tooska ah, qoraallada la turjumay, turjumaadda codka, qoraallada kulanka AI iyo qoraallada shakhsi ahaaneed ee seminaar. Astaamahan waxay isticmaalaan adeeg AI dibadeed, sidaa darteed macluumaadka waxaa loo wareejiyaa dibadda.",
+    "whoTitle": "Macluumaadka qofka la farsameeyo",
+    "who": [
+      "Soojeediyeyaasha iyo ka qaybgalayaasha masraxa: waxaan ku weydiinaynaa ogolaanshahaaga hal mar, ka hor intaadan shidin makarafoonkaaga. Waxaad ku biiri kartaa seminaarka adoon ogolaan.",
+      "Dhagaystayaasha: ma isticmaashid makarafoon, sidaa darteed ma jiro cod la dirayo. Waxaad aragtaa oo kaliya qoraallada iyo qoraallada.",
+      "Qoraallada shakhsi ahaaneed: maamule wuxuu duubaa kulan makarafoon wuxuuna xaqiijiyaa in ka qaybgalayaasha la ogeysiiyay ka hor inta aan la duubin."
+    ],
+    "xferTitle": "Wareejinta macluumaadka shakhsiyeed ee dibadda (Sharciga Ilaalinta Macluumaadka Shakhsiyeed ee Kuuriya, Qodobka 28-8)",
+    "xfer": [
+      {
+        "k": "Qaataha",
+        "v": "Google LLC (Gemini API) — la xiriir [TBD: Google privacy contact]"
+      },
+      {
+        "k": "Wadamada",
+        "v": "Mareykanka iyo wadamada kale ee ay ku yaalaan xarumaha xogta Google [TBD: processing region]"
+      },
+      {
+        "k": "Goorma iyo sidee",
+        "v": "Qiyaastii 5 ilbiriqsi kasta inta astaanta ay shidan tahay, iyada oo loo marayo xiriir sir ah (HTTPS). Qoraallada shakhsi ahaaneed, duubista oo dhan waxaa la diraa mar kale qaybo 5-daqiiqo ah marka qoraalka uu dhammaado (qoraal sax ah)."
+      },
+      {
+        "k": "Alaabada",
+        "v": "Codka, waxa la hadlay (qoraal), magaca bandhigga qofka hadlaya (koobitaanka qoraallada), shaashadda la wadaago (marka qoraallada AI ay shidan yihiin)"
+      },
+      {
+        "k": "Ujeeddo",
+        "v": "Codka oo loo beddelo qoraal, turjumaad, koobitaanka qoraallada kulanka, hadalka synthetic (codadka caadiga ah, ma jiro cod la koobiyeeyay), kala soocidda qofka hadlaya ee qoraallada shakhsi ahaaneed (codadka waa la kala saaraa oo lagu calaamadiyaa jinsiga la dareemay, sida Lab 1 / Dheddig 1 — ma jiro magacyo ama aqoonsi la soo saaray)"
+      },
+      {
+        "k": "Haynta",
+        "v": "Wuxuu dhammaadaa isla marka natiijada la soo celiyo. Waxaan ka codsanaynaa Google inuusan kaydin codsiyada (store=false). Diiwaannada la socodka xadgudubka ayaa weli lagu hayn karaa shuruudaha Google [TBD: retention period and paid-tier status]."
+      },
+      {
+        "k": "Sida loo diido, iyo waxa dhacaya",
+        "v": "Haddii aadan ogolaan ama aad damiso makarafoonkaaga, ma jiro cod la dirayo. Waxaad weli ka qayb qaadan kartaa seminaarka; kaliya qoraallada, turjumaadaha iyo qoraallada hadalkaaga gaarka ah lama abuurayo. Waxaad ka noqon kartaa ogolaanshaha wakhti kasta [TBD: where the withdraw button is]."
+      }
+    ],
+    "keepTitle": "Waxa adeeggan uu haysto",
+    "keep": [
+      "Codka asalka ah: qoraallada seminaarka iyo qoraallada kulanka AI lama kaydiyo; waa la tuuraa isla marka la beddelo qoraal. Qoraallada shakhsi ahaaneed, duubista waxaa lagu hayaa kayd gaar ah si dib loogu qoro si sax ah (oo ay la socdaan kuwa hadlaya) kulanka ka dib, waxaana la tirtiraa nadiifinta maalinlaha ah marka 1 maalin ay ka soo wareegto tan iyo markii qoraalka uu dhammaaday (isla markiiba haddii qoraalka la tirtiro).",
+      "Qoraallada tooska ah: lama kaydiyo.",
+      "Qoraallada kulanka AI (marka soojeediyuhu shido): waxa la hadlay, shaashadda la wadaago iyo koobitaanka, waxaa la hayaa ilaa qoraallada la tirtiro [TBD: maximum retention].",
+      "Diiwaannada ogolaanshaha: waqtiga ogolaanshaha iyo nooca siyaasadda, waxaa loo hayaa caddayn ahaan [TBD: retention period].",
+      "Isticmaalka: tirada codsiyada daqiiqad kasta iyo waqtiga farsamaynta, waxaa loo isticmaalaa in lagu dhaqan geliyo xadka kharashka.",
+      "Joogitaanka: waqtiga aad soo biirtay, waqtiga aad ugu dambeysay ee aad ku xirnayd, magacaaga bandhigga iyo magacaaga isticmaalaha Pi waa la kaydiyaa waxaana la siiyaa martigeliyaha liiska joogitaanka (shaashadda iyo soo dejinta CSV). Waxaa la hayaa ilaa seminaarka la tirtiro.",
+      "Su'aalaha iyo codbixinta: qoraalka su'aasha iyo magaca bandhigga qofka wax weydiiyay (ama magaca isticmaalaha Pi haddii uusan jirin) ayaa u muuqda ka qaybgalayaasha oo dhan. Codadka kor u qaadista waxay muujiyaan oo kaliya tirada, waligoodna ma muujiyaan cidda bixisay. Codadka codbixinta waxay muujiyaan oo kaliya tirada ka qaybgalayaasha; qabanqaabiyaha iyo maamulayaasha waxay arkaan, ikhtiyaar kasta, magaca bandhigga (ama magaca isticmaalaha Pi haddii uusan jirin) ee codbixiye kasta. Waxaa la hayaa, oo ay ku jiraan su'aalaha qarsoon, ilaa seminaarka la tirtiro."
+    ],
+    "recTitle": "Duubista",
+    "rec": "Duubista waxaa lagu kaydiyaa oo kaliya fayl ahaan qalabka soojeediyaha. Lama soo gelin server-kayaga ama lama wareejiyo dibadda. Inta duubista ama qoraallada AI ay shidan yihiin, ka qaybgalayaasha oo dhan waxay arkaan tilmaame.",
+    "rightsTitle": "Xuquuqdaada",
+    "rights": "Waxaad codsan kartaa inaad gasho, saxdo, tirtirto ama joojiso farsamaynta macluumaadkaaga. La xiriir: [TBD: privacy officer name and contact]"
+  },
+  "notes": {
+    "title": "Qoraallada",
+    "back": "Ku noqo seminaarka",
+    "loading": "Xogta oo la soo shubayo…",
+    "meta": "Qoraallada · {date} · {min} daqiiqo",
+    "aiWarn": "Koobitaan ay AI soo saartay — waxaa laga yaabaa inay ku jiraan khaladaad",
+    "points": "Qodobbada muhiimka ah",
+    "decisions": "Go'aamada",
+    "todos": "Waxyaabaha la qabanayo",
+    "shots": "Sawirada shaashadda ({n})",
+    "transcript": "Qoraal dhamaystiran",
+    "download": "Soo dejiso Markdown",
+    "making": "Abuurayaa qoraallada…",
+    "makingLong": "Tani waxay qaadanaysaa wakhti. Fadlan dib u cusboonaysii goor dambe",
+    "recording": "Weli waa la duubayaa",
+    "failed": "Lama abuuri karin koobitaanka — qoraalka oo dhan wuxuu ku yaalaa hoose",
+    "retry": "Iskuday mar kale",
+    "finish": "Jooji duubista oo koobiyeey",
+    "none": "Waxba ma jiraan halkan",
+    "blank": "Waxba lama koobiyeeyo — ma jiro hadal la duubay ama wuu gaabnaa",
+    "notFound": "Qoraallada lama helin",
+    "forbidden": "Ma lihid ogolaansho aad ku aragto qoraalladan",
+    "shotAlt": "Sawirka shaashadda {at}",
+    "close": "Xidh",
+    "view": "Fiiri qoraallada",
+    "error": "Lama soo shubi karin",
+    "mine": "Qoraalladayda",
+    "del": "Tirtir qoraallada",
+    "delAsk": "Ma tirtirtaa qoraalladan (koobitaan, qoraal dhamaystiran iyo sawirada shaashadda)? Qofna ma arki doono",
+    "delYes": "Tirtir",
+    "delNo": "Jooji",
+    "delFail": "Lama tirtiri karin",
+    "dlFail": "Lama soo dejisan karin — fadlan isku day mar kale",
+    "recentNotes": "Qoraallada dhowaan",
+    "empty": "Weli ma jiraan qoraallo",
+    "newNote": "Bilow qoraallada shakhsi ahaaneed",
+    "inPerson": "Qoraallada kulanka shakhsi ahaaneed",
+    "inPersonTag": "Shakhsi ahaan",
+    "titleLabel": "Cinwaan",
+    "titlePh": "tusaale ahaan Kulanka toddobaadlaha ah",
+    "told": "Waxaan u sheegay dhammaan dadka jooga in tan la duubi doono oo ay farsamayn doonto AI (waa qasab)",
+    "toldWhy": "Ka hor intaadan bilaabin, u sheeg dhammaan dadka jooga in wadahadalkan la duubi doono (duubista waxaa la hayaa 1 maalin ka dib marka qoraalka uu dhammaado, waxaana kuwa hadlaya lagu kala saaraa codka waxaana lagu calaamadiyaa jinsiga la dareemay) waxaana loo beddeli doonaa qoraal iyo koobitaan AI dibadeed",
+    "start": "Bilow duubista",
+    "starting": "Diyaarinayaa…",
+    "recBadge": "Duubista {time}",
+    "recentLines": "Khadadka ugu dambeeyay",
+    "waiting": "Qoraalka ayaa halkan ka soo muuqan doona marka dadku hadlaan",
+    "end": "Dhamee oo qor qoraallo",
+    "wakeWarn": "Duubista way joogsan kartaa haddii shaashadu damto",
+    "adminOnly": "Maamulayaasha kaliya ayaa isticmaali kara tan",
+    "aiOff": "Qoraallada AI hadda lama heli karo (waxay u baahan tahay dejin server). Qoraalladii hore ayaa hoos ku qoran",
+    "reload": "Dib u soo shub",
+    "unsupported": "Duubista lagama heli karo qalabkan",
+    "micDenied": "Ma isticmaali karo makarafoonka — hubi ogolaanshaha",
+    "limited": "Waqtiga xaddidan ee habaynta waa la isticmaalay — dhamee oo samee qoraallada",
+    "noAgr": "Waa la joojiyay: ma jiro xaqiijin ogeysiis ah oo duubista ah — dhamee oo dib u bilow",
+    "micLost": "Makarafoonku wuu go'ay oo duubistii way joogsatay — taabo Dib u xidh makarafoonka ama dhamee qoraalka",
+    "micRetry": "Dib u xidh makarafoonka",
+    "gone": "Qoraalkan waa la soo gabagabeeyay ama meel kale ayaa laga tirtiray, sidaa darteed duubistii way joogsatay — isticmaal badhanka hoose si aad u furto qoraallada",
+    "finishing": "Kaydinta ereyadii ugu dambeeyay…",
+    "st": {
+      "RECORDING": "Duubista",
+      "SUMMARIZING": "Samaynta",
+      "DONE": "La sameeyay",
+      "FAILED": "Guuldarro"
+    },
+    "downloadPiBrowser": "Soo dejinta Markdown waxay ka shaqeysaa oo kaliya biraawsar caadi ah (kombuyuutar ama moobayl). Pi Browser ma kaydin karo faylasha — fur qoraalladan kombuyuutar ama biraawsar taleefan (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Qorshayaasha",
+    "loading": "Soo shubid…",
+    "free": "Bilaash",
+    "freeDesc": "{time} oo siminaarro ah bil kasta (ma jiro wareejin)",
+    "monthly": "Bil kasta",
+    "yearly": "Sannadle",
+    "paidDesc": "{time} oo siminaarro ah, oo shaqaynaya {months} bilood",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Hubinta qiimaha Pi",
+    "noAi": "Ma jiro qoraallo AI ah, tarjumaad, dubbing ama soo koobid qoraal",
+    "withAi": "Waxaa ku jira qoraallo AI ah, tarjumaad, dubbing iyo soo koobid qoraal",
+    "buy": "Ku bixi Pi",
+    "bought": "Lacag bixinta waa la dhammaystiray. Waqtiga siminaarka waa la kordhiyay.",
+    "meRemain": "Waqtiga harsan: {time}",
+    "loginToBuy": "Soo gal si aad u iibsato qorshe.",
+    "payNote": "Lacag bixinta had iyo jeer waa Pi. Lacagta deegaanka waa tixraac la yaqaan oo kaliya; qaddarka Pi waxaa lagu dejiyay qiimaha Pi marka aad bixiso. Siminaar ku jira qorshe lacag ah wuxuu marka hore isticmaalaa baasaska qorshahaas (kuwa ugu horreeya ee dhacaya), ka dibna wuxuu ku sii socdaa waqtiga bilaashka ah ee bishan.",
+    "charge": "Ku shub waqti",
+    "hm": "{h} saac {m} daqiiqo",
+    "m": "{m} daqiiqo",
+    "won": "KRW {n}",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (hubinta qiimaha Pi)",
+    "h": "{h} saac"
+  },
+  "adminRooms": {
+    "title": "Maareynta qolka",
+    "adminOnly": "Maamulayaasha kaliya ayaa arki kara boggan.",
+    "refresh": "Dib u cusboonaysii",
+    "count": "{n} qol oo furan",
+    "empty": "Ma jiraan qolal furan hadda.",
+    "lab": "Qolka shaybaarka",
+    "noSeminar": "Ma jiro diiwaan siminaar",
+    "peers": "{n} / {cap} ku xiran",
+    "producers": "{n} durdurro",
+    "end": "Wuxuu dhammaanayaa {time}",
+    "stale": "Siminaarku wuu dhammaaday laakiin qolku weli wuu furan yahay server-ka fiidiyowga — si qasab ah u xidh.",
+    "close": "Si qasab ah u xidh",
+    "confirmSeminar": "Tani waxay soo gabagabaynaysaa siminaarka waxayna xidhaysaa qolka. Qof kasta waa la go'doomin doonaa.",
+    "confirmRoom": "Tani waxay xidhaysaa qolka. Qof kasta waa la go'doomin doonaa.",
+    "confirmYes": "Xidh",
+    "cancel": "Jooji",
+    "closing": "Xidhitaanka…",
+    "closed": "Qolka waa la xidhay.",
+    "metrics": "Cabbirrada server-ka fiidiyowga (tan iyo bilowgii)",
+    "metricsOff": "Lama soo shubin cabbirrada.",
+    "m": {
+      "packetsIn": "Baakadaha soo galay",
+      "packetsOut": "Baakadaha baxay",
+      "nackIn": "NACKs la helay",
+      "nackOut": "NACKs la diray",
+      "retransmits": "Dib u gudbinta",
+      "duplicateNack": "NACKs nuqul ah",
+      "cacheMiss": "Dib u gudbi kaydka maqan",
+      "pliOut": "Codsiyada keyframe (PLI)",
+      "keyframes": "Keyframes",
+      "layerSwitches": "Beddelka tayada",
+      "queueDrops": "Hoos u dhaca safka"
+    }
+  },
+  "adminUsers": {
+    "title": "Isticmaalayaasha",
+    "adminOnly": "Maamulayaasha kaliya ayaa arki kara boggan.",
+    "search": "Ku raadi magac (2+ xaraf)",
+    "searchBtn": "Raadi",
+    "refresh": "Dib u cusboonaysii",
+    "count": "{n, plural, one {# isticmaale} other {# isticmaalayaal}}",
+    "empty": "Ma jiraan isticmaalayaal.",
+    "admin": "Maamule",
+    "lastLogin": "Soo galitaankii ugu dambeeyay {time}",
+    "never": "Marnaba ma soo gelin",
+    "plan": {
+      "FREE": "Bilaash",
+      "M": "Bil kasta",
+      "Y": "Sannadle"
+    },
+    "until": "(ilaa {time})",
+    "manage": "Maaree waqtiga",
+    "close": "Xidh",
+    "planLabel": "Qorshe",
+    "hours": "Saacado",
+    "minutes": "Daqiiqado",
+    "reason": "Sabab (ikhtiyaari)",
+    "sub": "Yaree",
+    "confirmSub": "Yaree {plan} waqtiga {time}.",
+    "confirmYes": "Xaqiiji",
+    "cancel": "Jooji",
+    "saving": "Kaydinta…",
+    "done": "La codsaday. {plan} waqtiga harsan: {time}",
+    "invalid": "Geli hoos u dhac u dhexeeya 1 daqiiqo iyo 1000 saac (daqiiqado dhan 0–59).",
+    "history": "Hagaajintii ugu dambeysay",
+    "noHistory": "Ma jiraan hagaajin weli.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Sii baas adeeg (waqti bilaash ah)",
+    "svc": {
+      "H1": "Baas 1-saac ah",
+      "D1": "Baas 1-maalmood ah",
+      "M1": "Baas 1-bilood ah"
+    },
+    "svcNote": "Baasaska adeegga waa waqti qorshe bilaash ah. Waxaa la isticmaali karaa hadda laga bilaabo muddadaas (1 saac, 24 saac, 1 bil) siminaarrada bilaashka ah iyo qaybta bilaashka ah ee siminaarrada lacagta ah (ma jiraan astaamo AI ah). Haddii ay jiraan dhowr baas, si toos ah ayaa loo isticmaalaa siday u kala horreeyaan 1-saac → 1-maalmood → 1-bilood.",
+    "subTitle": "Yaree waqtiga",
+    "subNote": "Waxay marka hore ka qaadataa baasaska ugu dambeeya ee dhacaya. Haddii taasi ka badan tahay waxa harsan, kaliya waqtiga harsan ayaa la saaraa.",
+    "confirmSvc": "Sii {svc}.",
+    "doneSvc": "Waxa la siiyay {svc}. Waqtiga bilaashka ah ee harsan: {time} (baaska wuxuu dhacayaa {end})"
+  }
+}

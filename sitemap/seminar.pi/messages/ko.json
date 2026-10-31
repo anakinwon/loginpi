@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "언어 변경",
-      "search": "언어 검색",
-      "empty": "검색 결과 없음"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Pi 로 참여하는 실시간 화상 세미나"

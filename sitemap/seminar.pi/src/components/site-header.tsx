@@ -1,16 +1,18 @@
 'use client'
 
 // 상단 헤더 + 하단 폴더블 메뉴(마스터 지시 2026-10-31) —
-//  상단 : 로고 · 로그인 상태(사용자명, Pi 세션 OR Google 연동 세션, useAppUser 통합)만.
-//  하단 : 고정 메뉴 바 HOME | 요금제 | 개인정보 | 관리자(관리자만 — 위로 펼침 : 제작 현황·방 관리·사용자 관리·대면 노트) + 언어 전환(@pi/i18n 검색형 스위처) + 접기.
+//  상단 : 로고 · 로그인 상태(사용자명, Pi 세션 OR Google 연동 세션, useAppUser 통합) · 맨 오른쪽 끝 = 언어 콤보(국기·환율) → π 시세칩
+//   (loginpi header.tsx 와 같은 순서, 다국어 표준 4.6 — 언어 콤보는 하단 바·푸터 금지).
+//  하단 : 고정 메뉴 바 HOME | 요금제 | 개인정보 | 관리자(관리자만 — 위로 펼침 : 제작 현황·방 관리·사용자 관리·대면 노트) + 접기.
 //   접기 = 바를 작은 손잡이 하나로 줄임(상태는 localStorage, 읽기 실패해도 동작). 세미나 방(/s/*)은 방 조작 바가 하단을 쓰므로 숨김.
 //   아이콘은 정적 SVG(nav-icons) — 애니메이션 없음(Pi Browser 규칙)
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
+import { PiPriceChip } from '@pi/i18n/client'
 import { Link, usePathname } from '@/i18n/navigation'
 import { AuthStatus } from './auth-status'
-import { AppLocaleSwitcher } from './locale-switcher'
 import { useAppUser } from './google-auth'
+import { LanguageSwitcher } from './language-switcher'
 import {
   IconActivity,
   IconCard,
@@ -25,6 +27,8 @@ import {
 } from './nav-icons'
 
 const FOLD_KEY = 'smn_nav_fold'
+// Pi 가치(언어 콤보 Pi 환산·π 시세칩) — 기본 표시(마스터 지시 '반드시 표시'), 'false' 면 숨김(loginpi override 와 같은 이름)
+const SHOW_PI_VALUATION = process.env.NEXT_PUBLIC_FEATURE_PI_PRICE !== 'false'
 type Item = { href: string; label: string; icon: ReactNode }
 
 // 메뉴 항목 공통 모양 — 아이콘 위·짧은 글자 아래, 현재 화면은 강조색
@@ -188,7 +192,6 @@ function BottomNav({ admin }: { admin: boolean }) {
           ))}
           {admin && <AdminMenu items={adminItems} label={t('admin')} />}
           <span aria-hidden className="mx-0.5 h-7 w-px bg-white/10" />
-          <AppLocaleSwitcher className="text-muted-foreground" />
           <button
             type="button"
             onClick={toggle}
@@ -207,6 +210,7 @@ function BottomNav({ admin }: { admin: boolean }) {
 
 export function SiteHeader() {
   const { user } = useAppUser()
+  const locale = useLocale()
   // 표시 게이팅만 — 제작 현황 화면은 정적 안내(조회·쓰기 없음), 방 관리·사용자 관리·대면 노트는 API 가 ADMIN 을 다시 확인
   const admin = user?.role === 'ADMIN' || user?.role === 'MASTER'
 
@@ -217,10 +221,14 @@ export function SiteHeader() {
           <Link href="/" className="text-lg font-bold">
             seminar.pi
           </Link>
-          {/* 로그인 버튼 글자가 좁은 화면에서 두 줄로 꺾이지 않게 */}
-          <div className="ml-auto [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap">
-            <AuthStatus />
-          </div>
+          <nav className="ml-auto flex items-center gap-3">
+            {/* 로그인 버튼 글자가 좁은 화면에서 두 줄로 꺾이지 않게 */}
+            <div className="[&_a]:whitespace-nowrap [&_button]:whitespace-nowrap">
+              <AuthStatus />
+            </div>
+            <LanguageSwitcher locale={locale} showPiValuation={SHOW_PI_VALUATION} />
+            {SHOW_PI_VALUATION && <PiPriceChip locale={locale} />}
+          </nav>
         </div>
       </header>
       <BottomNav admin={admin} />

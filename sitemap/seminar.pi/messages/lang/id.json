@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Seminar video langsung yang Anda ikuti dengan Pi"
+  },
+  "home": {
+    "description": "Penyelenggara membuka seminar, dan peserta bergabung dalam sesi video langsung dengan Pi.",
+    "badge": "Seminar langsung di pulau-pulau indah",
+    "headline": "Tonton, dengarkan, dan belajar bersama — langsung",
+    "ctaBrowse": "Jelajahi seminar",
+    "ctaPlan": "Lihat paket",
+    "features": {
+      "video": "Video langsung",
+      "caption": "Teks & terjemahan",
+      "notes": "Catatan rapat AI",
+      "pay": "Bayar dengan Pi"
+    },
+    "listTitle": "Seminar",
+    "cal": {
+      "title": "Kalender seminar",
+      "desc": "Dari seminar yang lalu hingga yang akan datang — ketuk tanggal untuk detail.",
+      "legendSmn": "Seminar",
+      "legendEnded": "Seminar yang lalu",
+      "legendMine": "Acara saya",
+      "failed": "Tidak dapat memuat tanggal seminar. Silakan coba lagi nanti.",
+      "open": "Lihat detail"
+    }
+  },
+  "nav": {
+    "link": "Tautkan akun",
+    "privacy": "Privasi",
+    "plan": "Paket",
+    "rooms": "Ruangan",
+    "admin": "Admin",
+    "users": "Pengguna",
+    "home": "Beranda",
+    "privacyShort": "Privasi",
+    "menu": "Menu utama",
+    "fold": "Ciutkan menu",
+    "unfold": "Perluas menu"
+  },
+  "auth": {
+    "checking": "Memeriksa masuk…",
+    "signedIn": "{name}",
+    "inPerson": "Catatan tatap muka",
+    "required": "Harap masuk dengan akun Pi Anda.",
+    "signIn": "Masuk dengan Pi",
+    "openInPiBrowser": "Buka halaman ini di Pi Browser untuk masuk dengan akun Pi Anda.",
+    "authenticating": "Masuk…",
+    "google": "Masuk dengan Google",
+    "signOut": "Keluar",
+    "or": "atau",
+    "linkRequired": "Anda telah masuk dengan Google, tetapi belum tertaut ke akun Pi. Buat kode tautan di Pi Browser dan masukkan di sini.",
+    "linkNeeded": "Perlu menautkan akun Pi",
+    "linkCheckFailed": "Tidak dapat memeriksa status tautan akun Anda (kesalahan server sementara). Harap segarkan sebentar lagi."
+  },
+  "piOAuth": {
+    "signingIn": "Masuk dengan akun Pi Anda…",
+    "failed": "Gagal masuk Pi. Silakan coba lagi.",
+    "stateMismatch": "Tidak dapat memverifikasi permintaan masuk ini (kedaluwarsa atau tab lain). Silakan coba lagi.",
+    "retry": "Coba lagi",
+    "backHome": "Beranda"
+  },
+  "link": {
+    "title": "Tautkan akun",
+    "intro": "Hubungkan akun yang Anda gunakan untuk masuk di Pi Browser ke masuk Google di browser biasa. Setelah menautkan, Anda dapat menggunakan akun yang sama di browser PC.",
+    "checking": "Memeriksa masuk…",
+    "piIssueTitle": "Untuk masuk dari browser biasa juga",
+    "codeHint": "Buat kode di bawah, lalu masuk dengan Google di browser PC dan masukkan di halaman Tautkan akun (dalam 10 menit).",
+    "piIssue": "Buat kode tautan",
+    "reissue": "Buat kode baru",
+    "expiresIn": "Kedaluwarsa dalam {min} menit",
+    "enterTitle": "Masukkan kode tautan",
+    "enterHint": "Di Pi Browser, buka seminar.pi → Tautkan akun → Buat kode tautan, lalu masukkan kode 6 digit.",
+    "codeLabel": "Kode tautan",
+    "submit": "Tautkan",
+    "done": "Tertaut. Anda sekarang juga dapat menggunakan masuk Google.",
+    "linked": "{name} tertaut ke masuk Google."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Perlu masuk",
+    "AUTH_PI_REQUIRED": "Perlu masuk Pi",
+    "AUTH_PI_SESSION_INVALID": "Sesi Anda kedaluwarsa. Harap masuk lagi",
+    "AUTH_PI_TOKEN_INVALID": "Verifikasi masuk Pi gagal",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Informasi masuk Pi tidak ada",
+    "FORBIDDEN": "Anda tidak memiliki izin",
+    "BAD_REQUEST": "Permintaan buruk",
+    "BAD_REQUEST_BODY": "Permintaan buruk",
+    "INVALID_INPUT": "Masukan tidak valid",
+    "QUERY_FAILED": "Gagal memuat",
+    "SAVE_FAILED": "Gagal menyimpan",
+    "INTERNAL": "Terjadi kesalahan",
+    "SERVER_CONFIG": "Kesalahan konfigurasi server. Harap hubungi operator",
+    "PI_API_CONNECT_FAILED": "Tidak dapat menjangkau Pi Network",
+    "DB_UNAVAILABLE": "Data sementara tidak tersedia. Silakan coba lagi nanti",
+    "NOT_FOUND": "Tidak ditemukan",
+    "RATE_LIMITED": "Terlalu banyak permintaan. Silakan coba lagi sebentar lagi",
+    "PAYLOAD_TOO_LARGE": "Permintaan terlalu besar",
+    "NETWORK": "Periksa koneksi jaringan Anda",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Nama pengguna Pi ini sudah terdaftar dengan kredensial yang berbeda. Harap hubungi admin",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Akun ini tidak aktif. Harap hubungi admin",
+    "AUTH_GOOGLE_REQUIRED": "Diperlukan masuk Google.",
+    "LINK_CODE_INVALID": "Kode tautan tidak valid atau kedaluwarsa. Buat yang baru di Pi Browser.",
+    "LINK_ALREADY_LINKED": "Akun ini sudah tertaut.",
+    "LINK_CODE_GEN_FAILED": "Tidak dapat membuat kode tautan. Silakan coba lagi nanti.",
+    "AUTH_DB_UNAVAILABLE": "Tidak dapat menyimpan akun Anda, jadi masuk gagal. Silakan coba lagi nanti.",
+    "LINK_TRY_LIMIT": "Terlalu banyak kode tautan yang salah. Coba lagi dalam 15 menit.",
+    "PRICE_UNAVAILABLE": "Tidak dapat mendapatkan harga Pi. Silakan coba lagi sebentar lagi",
+    "QUOTE_EXPIRED": "Kutipan pembayaran kedaluwarsa. Harap bayar lagi",
+    "PLAN_EXHAUSTED": "Anda telah menggunakan semua waktu seminar Anda. Isi ulang di halaman Paket",
+    "HOST_AWAY": "Penyelenggara tidak ada di ruangan. Anda dapat masuk setelah penyelenggara bergabung",
+    "PLAN_AI_PAID": "Fitur AI tersedia di paket berbayar",
+    "AI_UNAVAILABLE": "Fitur AI tidak tersedia saat ini",
+    "SPEECH_CHUNK_INVALID": "Format potongan audio tidak valid",
+    "SPEECH_NOT_LIVE": "Seminar ini tidak langsung",
+    "SPEECH_NO_AGR": "Persetujuan untuk pemrosesan suara diperlukan",
+    "SPEECH_RATE": "Terlalu banyak permintaan suara. Silakan coba lagi sebentar lagi",
+    "SPEECH_QUOTA": "Waktu pemrosesan suara untuk seminar ini sudah habis",
+    "SPEECH_USR_QUOTA": "Anda telah menggunakan batas terjemahan dan suara terjemahan Anda untuk seminar ini",
+    "SPEECH_FAILED": "Tidak dapat mengubah ucapan menjadi teks",
+    "SPEECH_STAGE_ONLY": "Hanya orang di panggung yang dapat menggunakan teks suara",
+    "TRANSLATE_FAILED": "Tidak dapat menerjemahkan teks",
+    "POLL_CLOSED": "Jajak pendapat ini ditutup",
+    "NOTE_NOT_RECORDING": "Catatan ini tidak merekam",
+    "NOTE_SHOT_INVALID": "Tangkapan layar tidak valid",
+    "NOTE_AUDIO_INVALID": "File rekaman tidak valid",
+    "NOTE_SHOT_RATE": "Terlalu banyak tangkapan layar",
+    "NOTE_RETRY_SOON": "Anda dapat mencoba lagi dalam satu menit",
+    "SPEECH_TTS_FAILED": "Tidak dapat membuat suara terjemahan",
+    "CAPTION_SIG_INVALID": "Teks ini tidak dapat diverifikasi, jadi tidak diterjemahkan",
+    "PLAN_EXPIRES_BEFORE_START": "Waktu mulai setelah masa berlaku paket ini kedaluwarsa",
+    "PAY_ALREADY_PAID": "Pembayaran masih diproses. Jika Anda masuk ke dompet, coba lagi dalam 3 menit.",
+    "REC_PAID_ONLY": "Perekaman hanya tersedia di seminar paket Bulanan atau Tahunan dengan sisa waktu berbayar",
+    "REC_NOT_IN_ROOM": "Masih mengonfirmasi Anda ada di ruangan. Coba lagi sebentar lagi",
+    "ENGINE_OFF": "Kunci admin server video tidak dikonfigurasi",
+    "ENGINE_UNAVAILABLE": "Server video tidak merespons. Silakan coba lagi sebentar lagi",
+    "ADJ_NOTHING": "Tidak ada sisa waktu untuk dikurangi"
+  },
+  "progress": {
+    "title": "Kemajuan pembangunan",
+    "subtitle": "Selesai, sedang berlangsung, dan direncanakan, berdasarkan fitur · per {date}",
+    "overall": "Langkah keseluruhan",
+    "stepsDone": "{done}/{total} langkah selesai ({pct}%)",
+    "featureUnit": "fitur",
+    "status": {
+      "done": "Selesai",
+      "doing": "Sedang berlangsung",
+      "todo": "Direncakan",
+      "drop": "Dibatalkan"
+    },
+    "features": {
+      "F01": {
+        "name": "Masuk",
+        "desc": "Masuk Pi Browser, masuk Google di browser lain, dan menautkan kedua akun"
+      },
+      "F05": {
+        "name": "Seminar video langsung",
+        "desc": "Mesin video kami sendiri Galápagos — tujuannya adalah satu presenter streaming hingga 30 peserta"
+      },
+      "F02": {
+        "name": "Buat seminar",
+        "desc": "Atur subtitle, waktu, kapasitas, dan biaya seminar untuk membuat seminar (nama = pulau, otomatis)"
+      },
+      "F03": {
+        "name": "Daftar dan detail seminar",
+        "desc": "Jelajahi halaman seminar terbuka halaman demi halaman dan lihat detailnya"
+      },
+      "F04": {
+        "name": "Pembayaran masuk Pi",
+        "desc": "Bayar biaya seminar dalam Pi; server memeriksa ulang jumlah sebelum mengizinkan Anda masuk"
+      },
+      "F06": {
+        "name": "Pembayaran host",
+        "desc": "Bayar pendapatan biaya masuk kepada host dalam Pi"
+      },
+      "F07": {
+        "name": "Putar ulang",
+        "desc": "Tonton seminar yang direkam nanti"
+      },
+      "FU": {
+        "name": "Dasar tambahan rapat",
+        "desc": "Satu saluran sinyal untuk tambahan, koneksi AI, potongan suara, persetujuan mikrofon, dan tabel data"
+      },
+      "F08": {
+        "name": "Jadwal dan berbagi",
+        "desc": "Tautan kalender, file acara (.ics), dan undangan email untuk setiap seminar"
+      },
+      "F09": {
+        "name": "Pengurangan kebisingan dan pencahayaan",
+        "desc": "Kurangi kebisingan mikrofon dan cerahkan video kamera yang gelap"
+      },
+      "F10": {
+        "name": "Teks langsung",
+        "desc": "Ubah ucapan presenter menjadi teks di bawah panggung"
+      },
+      "F11": {
+        "name": "Jajak pendapat, Tanya Jawab, dan kehadiran",
+        "desc": "Jalankan jajak pendapat dan pertanyaan selama seminar; host mengunduh daftar kehadiran"
+      },
+      "F12": {
+        "name": "Efek latar belakang",
+        "desc": "Buramkan latar belakang Anda atau ganti dengan preset atau gambar Anda sendiri (diproses di perangkat Anda)"
+      },
+      "F13": {
+        "name": "Perekaman lokal",
+        "desc": "Presenter merekam seminar di perangkat mereka sendiri dan semua orang melihat bahwa perekaman sedang berlangsung"
+      },
+      "F14": {
+        "name": "Catatan rapat AI",
+        "desc": "Ketika presenter menyalakannya, ucapan dan layar direkam dan diringkas menjadi poin-poin penting, keputusan, dan daftar tugas"
+      },
+      "F15": {
+        "name": "Catatan rapat tatap muka",
+        "desc": "Rekam rapat hanya dengan mikrofon dan dapatkan catatan rapat (admin)"
+      },
+      "F16": {
+        "name": "Teks terjemahan",
+        "desc": "Tampilkan teks yang diterjemahkan ke bahasa yang Anda pilih"
+      },
+      "F17": {
+        "name": "Dengarkan dalam terjemahan",
+        "desc": "Baca teks terjemahan dengan suara sintetis sambil menurunkan audio asli"
+      }
+    },
+    "steps": {
+      "piLogin": "Masuk Pi Browser",
+      "googleLogin": "Masuk Google",
+      "accountLink": "Penautan akun",
+      "deviceTest": "Uji perangkat kamera",
+      "oneToTwo": "Presenter 1 → 2 peserta",
+      "recovery": "Pemulihan dan stabilitas pembekuan",
+      "structure": "Pembersihan struktur mesin",
+      "autoQuality": "Kualitas otomatis, 30 peserta",
+      "roomService": "Masuk ruangan dan perekaman",
+      "roomUi": "Layar ruangan (lobi·panggung·obrolan·angkat tangan·moderasi)",
+      "createForm": "Buat layar",
+      "list": "Daftar",
+      "detail": "Detail",
+      "payRequest": "Permintaan pembayaran",
+      "payVerify": "Pemeriksaan ulang jumlah dan masuk",
+      "settle": "Pembayaran",
+      "vod": "Putar ulang rekaman",
+      "appRelay": "Saluran sinyal tambahan mesin",
+      "aiBase": "AI, potongan suara, persetujuan, dan tabel data",
+      "shareLinks": "Tautan kalender, .ics, dan undangan email",
+      "noiseLight": "Pengurangan kebisingan dan pencahayaan",
+      "liveCaptions": "Teks langsung",
+      "pollQnaAttend": "Jajak pendapat, Tanya Jawab, dan daftar kehadiran",
+      "backgrounds": "Buram, preset, dan gambar Anda sendiri",
+      "localRecording": "Perekaman presenter dan lencana perekaman",
+      "aiNotes": "Perekaman, ringkasan, dan halaman catatan",
+      "inPersonNotes": "Catatan hanya mikrofon dan catatan saya",
+      "captionTranslate": "Pilihan bahasa dan alih asli/terjemahan",
+      "dubbing": "Pemutaran suara sintetis dan audio asli yang diturunkan"
+    },
+    "refLabel": "Model referensi",
+    "uiRef": "Dasar UI — pola layar dan fitur aplikasi rapat video web yang banyak digunakan, diadaptasi untuk seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Nama disimpan, tetapi orang lain tidak dapat diberitahu sekarang. Mereka akan melihatnya setelah Anda bergabung kembali.",
+      "tile": "Klik untuk mengubah nama saya",
+      "menu": "Ubah nama saya",
+      "title": "Nama saya di seminar ini",
+      "hint": "Maksimal 30 karakter. Hanya digunakan di seminar ini dan segera diperbarui di layar semua orang.",
+      "save": "Simpan",
+      "saving": "Menyimpan…",
+      "cancel": "Batal",
+      "taken": "Nama itu sudah digunakan oleh orang lain (host atau peserta). Pilih yang lain.",
+      "failed": "Tidak dapat menyimpan nama Anda. Coba lagi."
+    },
+    "roomTitle": {
+      "edit": "Klik untuk mengedit subtitle",
+      "label": "Subtitle",
+      "placeholder": "Subtitle (maksimal 60)",
+      "save": "Simpan",
+      "cancel": "Batal",
+      "failed": "Tidak dapat menyimpan subtitle."
+    },
+    "mirror": "Cerminkan video saya",
+    "barPin": "Selalu tampilkan bilah bawah",
+    "barAuto": "Sembunyikan bilah bawah secara otomatis",
+    "title": "Gabung seminar · {room}",
+    "titleSeminar": "Ruang tunggu",
+    "noEngine": "Server video belum siap.",
+    "joinAs": "Gabung sebagai",
+    "presenter": "Presenter",
+    "audience": "Audiens",
+    "join": "Gabung sekarang",
+    "nameLabel": "Nama",
+    "audienceHint": "Anggota audiens tidak menggunakan kamera atau mikrofon. Setelah bergabung, Anda akan melihat dan mendengar presenter.",
+    "preview": {
+      "pending": "Menyiapkan kamera dan mikrofon…",
+      "audioOnly": "Kamera tidak tersedia — hanya mengirim audio.",
+      "none": "Kamera dan mikrofon tidak tersedia. Periksa izin (Anda masih bisa bergabung tanpa media).",
+      "videoOnly": "Mikrofon tidak tersedia — hanya mengirim video. Periksa izin mikrofon."
+    },
+    "mic": {
+      "on": "Matikan mikrofon",
+      "off": "Nyalakan mikrofon"
+    },
+    "cam": {
+      "on": "Matikan kamera",
+      "off": "Nyalakan kamera"
+    },
+    "controls": "Kontrol panggilan",
+    "leave": "Keluar",
+    "enableSound": "Aktifkan suara",
+    "state": {
+      "connecting": "Menghubungkan…",
+      "reconnecting": "Menghubungkan kembali…"
+    },
+    "waiting": "Menunggu presenter.",
+    "rejoin": "Gabung lagi",
+    "err": {
+      "generic": "Terjadi kesalahan. Harap bergabung lagi.",
+      "CLOSED": "Koneksi terputus.",
+      "NO_ENGINE": "Server video belum siap.",
+      "TICKET_401": "Harap masuk.",
+      "TICKET_403": "Anda tidak memiliki izin untuk presentasi. Bergabunglah sebagai audiens.",
+      "TICKET_503": "Konfigurasi server video belum selesai.",
+      "TICKET_NETWORK": "Periksa koneksi jaringan Anda.",
+      "TICKET_INVALID": "Tiket masuk Anda telah kedaluwarsa.",
+      "TICKET_EXPIRED": "Tiket masuk Anda telah kedaluwarsa.",
+      "ROOM_FULL": "Seminar ini penuh.",
+      "ROOM_CLOSED": "Ruangan ditutup — seminar berakhir atau host tidak ada selama lebih dari 5 menit.",
+      "DUPLICATE_SESSION": "Anda bergabung dari perangkat lain, jadi layar ini terputus.",
+      "ROLE_FORBIDDEN": "Anda tidak memiliki izin untuk presentasi.",
+      "WS_FAILED": "Tidak dapat terhubung ke server video.",
+      "ICE_FAILED": "Koneksi video terputus. Periksa jaringan Anda.",
+      "MEDIA_FAILED": "Tidak dapat memulai kamera atau mikrofon.",
+      "TIMEOUT": "Server video tidak merespons.",
+      "TICKET_402": "Ini adalah seminar berbayar. Harap bayar di halaman seminar sebelum masuk.",
+      "TICKET_404": "Seminar tidak ditemukan.",
+      "TICKET_409": "Seminar ini telah berakhir atau dibatalkan.",
+      "TICKET_HOST_AWAY": "Host belum bergabung atau telah pergi selama lebih dari 5 menit, jadi Anda tidak dapat masuk. Silakan coba lagi setelah host bergabung.",
+      "TICKET_PLAN_EXHAUSTED": "Paket seminar ini tidak memiliki sisa waktu, jadi tidak dapat dimulai. Membeli paket yang sama lagi akan menambah waktu (Gratis diperbarui dengan 1 jam bulan depan)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Tidak dapat mengubah mikrofon. Silakan coba lagi.",
+        "video": "Tidak dapat mengubah kamera. Silakan coba lagi."
+      },
+      "forbidden": "Anda tidak memiliki izin untuk presentasi, jadi Anda akan melanjutkan sebagai audiens.",
+      "demoted": "Anda dipindahkan kembali ke audiens.",
+      "endFailed": "Tidak dapat mengakhiri seminar. Silakan coba lagi.",
+      "chatFailed": "Pesan tidak terkirim.",
+      "actionFailed": "Tidak dapat menyelesaikan permintaan. Silakan coba lagi.",
+      "shareFailed": "Tidak dapat memulai berbagi layar.",
+      "err": {
+        "RATE_LIMITED": "Anda mengirim terlalu cepat. Harap tunggu sebentar.",
+        "ROLE_FORBIDDEN": "Anda tidak memiliki izin untuk melakukan ini.",
+        "MEDIA_FAILED": "Tidak dapat memulai mikrofon atau kamera Anda. Harap periksa izin.",
+        "LOCKED": "Dikunci oleh presenter."
+      },
+      "mutedBy": {
+        "audio": "Presenter mematikan mikrofon Anda.",
+        "video": "Presenter mematikan kamera Anda."
+      },
+      "policy": {
+        "locked": "Presenter mengunci mikrofon. Anda dapat menyalakannya setelah dibuka kuncinya.",
+        "unlocked": "Mikrofon tidak terkunci."
+      },
+      "consent": {
+        "saveFail": "Tidak dapat menyimpan persetujuan Anda. Periksa pendaftaran Anda dan nyalakan mikrofon lagi"
+      }
+    },
+    "home": "Ke beranda",
+    "tile": {
+      "fullscreen": "Klik dua kali untuk layar penuh · Esc untuk keluar",
+      "self": "{name} (Anda)",
+      "presenter": "Presenter",
+      "micOff": "Mikrofon mati",
+      "screen": "Layar {name}",
+      "row": "Pembicara lain",
+      "pin": "Tampilkan {name} besar",
+      "unpin": "Tata letak otomatis"
+    },
+    "more": "Opsi lainnya",
+    "joinNoCam": "Gabung tanpa kamera",
+    "net": {
+      "afterJoin": "Koneksi Anda diperiksa secara otomatis setelah Anda bergabung.",
+      "measuring": "Memeriksa koneksi…",
+      "good": "Koneksi bagus",
+      "fair": "Koneksi sedang",
+      "poor": "Koneksi buruk",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% data audio hilang.",
+          "video": "{pct}% data video hilang."
+        },
+        "rate": {
+          "audio": "Unggahan audio rendah pada {kbps} kbps.",
+          "video": "Unggahan video rendah pada {kbps} kbps. Kualitas mungkin menurun."
+        }
+      }
+    },
+    "people": "{n} di ruangan",
+    "screen": {
+      "start": "Bagikan layar",
+      "stop": "Berhenti berbagi"
+    },
+    "panel": {
+      "title": "Obrolan · Tanya Jawab · Polling · Orang",
+      "chat": "Obrolan",
+      "people": "Orang",
+      "close": "Tutup panel",
+      "qna": "Tanya Jawab",
+      "polls": "Polling"
+    },
+    "chat": {
+      "empty": "Belum ada pesan. Obrolan tidak disimpan.",
+      "me": "Anda",
+      "failed": "Tidak terkirim.",
+      "retry": "Coba lagi",
+      "input": "Ketik pesan",
+      "send": "Kirim"
+    },
+    "hand": {
+      "raise": "Angkat tangan",
+      "lower": "Turunkan tangan",
+      "list": "Tangan terangkat",
+      "lowerAll": "Turunkan semua tangan",
+      "raised": "Tangan terangkat",
+      "notice": "{name} mengangkat tangan.",
+      "dismiss": "Abaikan",
+      "waiting": "{n} orang menunggu untuk berbicara"
+    },
+    "react": {
+      "open": "Reaksi",
+      "e0": "Suka",
+      "e1": "Tepuk tangan",
+      "e2": "Tertawa",
+      "e3": "Terkejut",
+      "e4": "Sedih",
+      "e5": "Tidak bisa berkata-kata",
+      "e6": "Cinta"
+    },
+    "quality": {
+      "label": "Kualitas",
+      "auto": "Otomatis",
+      "high": "Tinggi",
+      "medium": "Sedang",
+      "low": "Rendah",
+      "unstable": "Jaringan Anda tidak stabil"
+    },
+    "roles": {
+      "presenter": "Presenter",
+      "panel": "Panelis",
+      "audience": "Audiens"
+    },
+    "stage": {
+      "invite": "Undang ke panggung",
+      "remove": "Pindahkan ke audiens",
+      "promoted": "Anda diundang ke panggung. Jika Anda mengangkat tangan, kamera Anda akan menyala secara otomatis (kecuali terkunci atau tidak diizinkan). Nyalakan mikrofon Anda untuk berbicara (mikrofon tidak menyala secara otomatis).",
+      "later": "Nanti"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} mengangkat tangan."
+    },
+    "leaveDialog": {
+      "title": "Tinggalkan seminar",
+      "body": "Anda dapat pergi sendiri, atau mengakhiri seminar dan memutuskan semua orang.",
+      "confirmTitle": "Akhiri seminar?",
+      "confirmBody": "Semua orang akan terputus dan tidak ada yang bisa bergabung kembali ke seminar ini.",
+      "cancel": "Batal",
+      "end": "Akhiri seminar",
+      "endConfirm": "Akhiri sekarang"
+    },
+    "mod": {
+      "muteAll": "Matikan suara semua orang",
+      "lock": "Kunci mikrofon",
+      "unlock": "Buka kunci mikrofon",
+      "locked": "Presenter telah mengunci mikrofon",
+      "muteMic": "Matikan mikrofon",
+      "askMic": "Minta untuk menyalakan suara",
+      "muteCam": "Matikan kamera",
+      "muteMicOf": "Matikan mikrofon {name}",
+      "askMicOf": "Minta {name} untuk menyalakan suara",
+      "muteCamOf": "Matikan kamera {name}"
+    },
+    "ask": {
+      "audio": "Presenter meminta Anda untuk menyalakan mikrofon Anda.",
+      "video": "Presenter meminta Anda untuk menyalakan kamera Anda.",
+      "ignore": "Abaikan"
+    },
+    "toDetail": "Buka halaman seminar",
+    "consent": {
+      "title": "Sebelum Anda menyalakan mikrofon Anda",
+      "body": "Jika perekaman, teks, atau catatan rapat AI diaktifkan di seminar ini, suara Anda dapat diubah menjadi teks, disimpan, dan diterjemahkan. Pemrosesan suara dilakukan oleh layanan AI di luar negara Anda. Jika Anda tidak setuju, mikrofon Anda tetap menyala — hanya suara Anda yang tidak diproses.",
+      "privacy": "Kebijakan privasi",
+      "newTab": "(terbuka di tab baru)",
+      "decline": "Tidak setuju",
+      "agree": "Setuju dan nyalakan mikrofon",
+      "notice": "Saat perekaman, teks, atau catatan rapat AI diaktifkan, suara pembicara diproses. Suara audiens tidak dikirim.",
+      "saveFailClosed": "Seminar ini telah berakhir, jadi persetujuan tidak dapat direkam"
+    },
+    "captions": {
+      "title": "Teks",
+      "room": "Teks langsung (seluruh ruangan)",
+      "show": "Tampilkan teks",
+      "size": {
+        "label": "Ukuran teks",
+        "sm": "Kecil",
+        "md": "Sedang",
+        "lg": "Besar"
+      },
+      "waiting": "Teks muncul saat presenter menyalakannya",
+      "limit": "Batas pemrosesan ucapan tercapai, jadi teks dan menit AI berhenti",
+      "sendFail": "Tidak dapat menyalakan teks. Silakan coba lagi sebentar lagi",
+      "sendFailOff": "Tidak dapat mematikan teks. Silakan coba lagi sebentar lagi",
+      "region": "Teks",
+      "translate": "Tampilkan teks terjemahan",
+      "lang": "Bahasa terjemahan",
+      "langMine": "Bahasa saya",
+      "langAll": "Semua bahasa",
+      "trStop": {
+        "forbidden": "Teks terjemahan hanya untuk peserta terdaftar. Menampilkan yang asli",
+        "unavailable": "Teks terjemahan tidak tersedia saat ini. Menampilkan yang asli",
+        "quota": "Seminar ini telah mencapai batas terjemahan. Menampilkan yang asli",
+        "usrQuota": "Anda telah menggunakan batas terjemahan Anda untuk seminar ini. Menampilkan yang asli"
+      },
+      "unsupported": "Perangkat ini tidak dapat membuat teks langsung (tidak ada dukungan perekaman audio di browser ini)"
+    },
+    "effects": {
+      "title": "Efek",
+      "light": "Koreksi cahaya",
+      "noise": "Kurangi kebisingan",
+      "noiseFail": "Pengurangan kebisingan tidak dapat diubah pada perangkat ini",
+      "close": "Tutup",
+      "preview": "Pratinjau saya",
+      "bg": "Latar belakang",
+      "bgNone": "Tidak ada",
+      "bgBlur": "Buram",
+      "scenes": {
+        "beach": "🏝️ Pantai Maladewa",
+        "autumn": "🍁 Lembah Musim Gugur",
+        "fireplace": "🔥 Perapian",
+        "xmas": "🎄 Ruang rapat Natal"
+      },
+      "bgs": {
+        "dusk": "Senja",
+        "ocean": "Samudra",
+        "forest": "Hutan",
+        "studio": "Studio",
+        "grid": "Kisi",
+        "dots": "Titik"
+      },
+      "myAdd": "Gambar saya",
+      "myItem": "Gambar saya {n}",
+      "myDel": "Hapus gambar saya {n}",
+      "mySaveFail": "Latar belakang diterapkan tetapi tidak dapat disimpan di perangkat ini (hanya rapat ini)",
+      "bgStopped": "Efek latar belakang berhenti dan dimatikan. Pilih lagi untuk memulai ulang",
+      "myNote": "Gambar Anda hanya disimpan di perangkat ini (hingga 3, masing-masing 2 MB)",
+      "mobileBlurOnly": "Di ponsel, hanya latar belakang buram yang tersedia (latar belakang gambar berfungsi di PC)",
+      "myTooBig": "Hanya gambar hingga 2 MB yang dapat digunakan",
+      "preparing": "Mempersiapkan…",
+      "bgFailed": "Tidak dapat memuat efek latar belakang",
+      "autoOff": "Perangkat Anda terlalu lambat, jadi efek latar belakang dimatikan",
+      "unsupported": "Efek latar belakang tidak tersedia di perangkat ini",
+      "noCam": "Nyalakan kamera Anda untuk memilih latar belakang",
+      "lightUnsupported": "Koreksi cahaya tidak tersedia di perangkat ini",
+      "noiseUnsupported": "Pengaturan pengurangan kebisingan tidak didukung di perangkat ini"
+    },
+    "sheetClose": "Tutup",
+    "polls": {
+      "new": "Polling baru",
+      "question": "Pertanyaan",
+      "option": "Opsi {n}",
+      "remove": "Hapus opsi {n}",
+      "addOption": "Tambahkan opsi",
+      "start": "Mulai polling",
+      "cancel": "Batal",
+      "dup": "Opsi harus berbeda",
+      "vote": "Pilih",
+      "change": "Ubah suara",
+      "close": "Tutup polling",
+      "closed": "Ditutup",
+      "mine": "Pilihan Anda",
+      "result": "{pct}% ({n} suara)",
+      "total": "Total {n} suara",
+      "empty": "Belum ada polling.",
+      "loading": "Memuat…",
+      "labOnly": "Polling hanya tersedia di ruang seminar.",
+      "started": "Polling baru telah dimulai",
+      "goVote": "Pilih",
+      "votersNote": "Penyelenggara dapat melihat siapa yang memilih opsi mana.",
+      "voters": "Memilih: {names}"
+    },
+    "qna": {
+      "sort": "Urutkan",
+      "by": {
+        "top": "Teratas",
+        "new": "Terbaru"
+      },
+      "rcm": "Sukai ({n})",
+      "answered": "Dijawab",
+      "answer": "Tandai dijawab",
+      "unanswer": "Batalkan tanda dijawab",
+      "hide": "Sembunyikan",
+      "doneN": "{n} dijawab",
+      "backOpen": "Pertanyaan yang belum dijawab",
+      "empty": "Belum ada pertanyaan.",
+      "emptyDone": "Tidak ada pertanyaan yang dijawab.",
+      "loading": "Memuat…",
+      "input": "Ajukan pertanyaan (500 karakter)",
+      "send": "Kirim",
+      "left": "Sisa {n}",
+      "labOnly": "Tanya Jawab hanya tersedia di ruang seminar."
+    },
+    "recording": {
+      "title": "Rekam",
+      "badge": "Merekam",
+      "unsupported": "Browser ini tidak dapat merekam. Harap rekam dari browser biasa di komputer.",
+      "piBrowserOnly": "Perekaman hanya berfungsi di browser biasa (PC atau seluler). Pi Browser tidak dapat menyimpan file rekaman — buka seminar ini di browser komputer atau ponsel (seminarz.vercel.app) untuk merekam.",
+      "audioSuspended": "Perekaman suara mungkin belum dimulai di perangkat ini. Hanya gambar yang mungkin direkam.",
+      "notifyFailed": "Perekaman tidak dimulai karena peserta tidak dapat diberitahu. Silakan coba lagi sebentar lagi.",
+      "confirm": {
+        "title": "Mulai merekam?",
+        "body": "Saat perekaman dimulai, semua orang akan melihat indikator 'Merekam'. File hanya disimpan di perangkat ini dan tidak pernah diunggah atau ditransfer ke luar negeri. Harap beritahu peserta sebelum Anda memulai.",
+        "download": "Saat Anda berhenti, file MP4 akan disimpan ke folder unduhan Anda (browser yang tidak dapat merekam MP4 membutuhkan waktu sebentar untuk mengonversinya; rekaman yang lebih panjang dari sekitar 45 menit dapat disimpan dalam format aslinya). Browser dalam aplikasi dapat memblokir penyimpanan file, jadi rekam dari browser biasa di komputer.",
+        "cancel": "Batal",
+        "start": "Mulai merekam",
+        "charge": "Saat merekam, waktu perekaman dikurangi dari waktu berbayar Anda selain waktu ruangan (2x saat merekam). Saat waktu berbayar habis, perekaman berhenti dan file disimpan."
+      },
+      "resave": {
+        "label": "File rekaman",
+        "save": "Simpan lagi",
+        "dismiss": "Tutup simpan lagi"
+      },
+      "toast": {
+        "started": "Perekaman dimulai — semua orang dapat melihatnya",
+        "saved": "Perekaman disimpan. Periksa folder unduhan Anda. Jika tidak ada yang disimpan, ketuk [Simpan lagi] di bagian atas layar.",
+        "autoStopped": "Perekaman berakhir karena browser menghentikannya atau batas ukuran tercapai. Semua yang sampai saat itu disimpan. Mulai merekam lagi untuk melanjutkan.",
+        "empty": "Tidak ada yang direkam, jadi tidak ada file yang dibuat.",
+        "saveFailed": "Tidak dapat membuat file rekaman.",
+        "converting": "Mengonversi rekaman ke MP4. Harap biarkan jendela ini tetap terbuka.",
+        "savedOriginal": "Tidak dapat mengonversi ke MP4, jadi rekaman disimpan dalam format aslinya (webm). Periksa folder unduhan Anda.",
+        "startedBy": "Presenter memulai perekaman",
+        "stoppedBy": "Presenter menghentikan perekaman"
+      },
+      "paidOnly": "Perekaman hanya tersedia di seminar yang dibuka dengan paket Bulanan atau Tahunan, selama waktu berbayar tersisa.",
+      "planOut": "Waktu berbayar habis, jadi perekaman berhenti dan file disimpan.",
+      "notInRoom": "Masih mengonfirmasi Anda berada di ruangan. Mulai merekam lagi sebentar lagi.",
+      "meterFailed": "Tidak dapat memeriksa waktu perekaman, jadi perekaman tidak dimulai. Coba lagi sebentar lagi.",
+      "paidOut": "Tidak ada waktu berbayar yang tersisa, jadi perekaman tidak dapat dimulai. Beli paket yang sama lagi untuk merekam.",
+      "pausedBadge": "Perekaman dijeda",
+      "controls": "Kontrol perekaman",
+      "pause": "Jeda",
+      "resume": "Lanjutkan",
+      "stop": "Hentikan perekaman"
+    },
+    "notes": {
+      "on": "Catatan AI",
+      "badge": "Catatan AI aktif",
+      "started": "Penyaji mengaktifkan catatan AI",
+      "stopped": "Catatan AI dimatikan",
+      "startedMine": "Catatan AI aktif — ditampilkan kepada semua orang",
+      "stoppedMine": "Catatan AI mati — membuat catatan",
+      "startFail": "Tidak dapat memulai catatan AI",
+      "gone": "Catatan AI berhenti — catatan diakhiri atau dihapus di tempat lain",
+      "unsupported": "Catatan AI tidak dapat diaktifkan di sini (tidak ada dukungan perekaman audio)"
+    },
+    "dubbing": {
+      "listen": "Dengarkan dalam suara terjemahan",
+      "blocked": "Tidak dapat memutar suara terjemahan. Harap aktifkan lagi",
+      "stopped": "Suara terjemahan tidak tersedia saat ini, jadi dimatikan",
+      "usrQuota": "Anda telah menggunakan batas suara terjemahan Anda untuk seminar ini, jadi dimatikan"
+    },
+    "plan": {
+      "warn": "Sisa {min} menit pada paket seminar ini.",
+      "ended": "Waktu seminar Anda habis, jadi seminar telah berakhir dan Anda meninggalkan ruangan.",
+      "left": "Sisa waktu seminar",
+      "closed": "Seminar telah berakhir, jadi Anda meninggalkan ruangan.",
+      "hostAway": "Host telah meninggalkan ruangan. Jika mereka tidak kembali dalam 5 menit, semua peserta akan dikeluarkan.",
+      "hostGone": "Host tidak kembali dalam 5 menit, jadi Anda meninggalkan ruangan. Anda dapat masuk lagi setelah host bergabung."
+    },
+    "toLobby": "Ruang tunggu"
+  },
+  "list": {
+    "tabsLabel": "Tampilan daftar seminar",
+    "tabs": {
+      "all": "Semua",
+      "hosted": "Diselenggarakan oleh saya",
+      "joined": "Bergabung"
+    },
+    "empty": {
+      "all": "Tidak ada seminar mendatang.",
+      "hosted": "Anda belum menyelenggarakan seminar apa pun.",
+      "joined": "Anda belum bergabung dengan seminar apa pun."
+    },
+    "loading": "Memuat…",
+    "retry": "Coba lagi",
+    "free": "Gratis",
+    "fee": "{amount} Pi",
+    "host": "Host {name}",
+    "capacity": "Kapasitas {n}",
+    "status": {
+      "SCHEDULED": "Terjadwal",
+      "LIVE": "Langsung",
+      "ENDED": "Berakhir",
+      "CANCELED": "Dibatalkan"
+    },
+    "hostNew": "Buat seminar",
+    "progress": "Progres",
+    "pager": "Penomoran halaman",
+    "prev": "Sebelumnya",
+    "next": "Berikutnya",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Subjudul",
+      "placeholder": "Tambahkan subjudul",
+      "save": "Simpan subjudul",
+      "saving": "Menyimpan…",
+      "saved": "Tersimpan."
+    },
+    "loading": "Memuat…",
+    "back": "Kembali ke daftar",
+    "notFound": "Seminar tidak ditemukan.",
+    "status": {
+      "SCHEDULED": "Terjadwal",
+      "LIVE": "Langsung",
+      "ENDED": "Berakhir",
+      "CANCELED": "Dibatalkan"
+    },
+    "startAt": "Tanggal",
+    "host": "Host",
+    "seats": "Kursi tersisa",
+    "seatsValue": "{left} / {max}",
+    "fee": "Biaya seminar",
+    "feeValue": "{amount} Pi",
+    "free": "Gratis",
+    "enter": "Masuk",
+    "payEnter": "Bayar dengan Pi dan masuk ({amount} Pi)",
+    "paying": "Memproses pembayaran…",
+    "joining": "Mendaftar…",
+    "registered": "Anda sudah terdaftar.",
+    "full": "Seminar ini penuh.",
+    "closed": "Seminar ini telah berakhir.",
+    "canceled": "Seminar ini dibatalkan.",
+    "roomLink": "Pergi ke ruangan (host)",
+    "piBrowserOnly": "Pembayaran tersedia di Pi Browser setelah masuk Pi.",
+    "payCancelled": "Pembayaran dibatalkan.",
+    "payStillWaiting": "Masih menunggu dompet. Jika Anda sudah masuk Pi Wallet, harap tunggu sebentar.",
+    "payFailed": "Pembayaran gagal.",
+    "err": {
+      "NAME_TAKEN": "Nama itu sudah digunakan oleh orang lain. Pilih yang lain.",
+      "CAL_READ_FAILED": "Tidak dapat memuat acara Anda. Periksa alamatnya.",
+      "ISLAND_FULL": "Semua 100 nama pulau sedang digunakan saat ini. Anda dapat membuka seminar baru setelah seminar yang akan datang atau yang sedang berlangsung berakhir atau dibatalkan.",
+      "SMN_FULL": "Seminar ini penuh.",
+      "SMN_CLOSED": "Seminar ini telah berakhir atau dibatalkan.",
+      "SMN_ALREADY": "Anda sudah terdaftar atau pembayaran sedang diproses.",
+      "SMN_FREE": "Seminar gratis tidak memerlukan pembayaran.",
+      "SMN_PAY_REQUIRED": "Ini adalah seminar berbayar. Harap bayar untuk masuk.",
+      "SMN_PAY_INVALID": "Kami tidak dapat memverifikasi pembayaran Anda. Harap hubungi admin.",
+      "PAY_PI_FAILED": "Tidak dapat menjangkau server pembayaran Pi. Harap coba lagi sebentar lagi.",
+      "PAY_MISMATCH": "Detail pembayaran tidak cocok.",
+      "PAY_AMOUNT_MISMATCH": "Jumlah pembayaran berbeda dari biaya seminar.",
+      "PAY_CANCELLED": "Pembayaran ini dibatalkan.",
+      "PAY_ALREADY_PAID": "Pembayaran masih diproses. Jika Anda masuk ke dompet, coba lagi dalam 3 menit.",
+      "PAY_INVALID_STATE": "Pembayaran ini tidak dapat diproses sekarang.",
+      "PAY_PI_CANCEL_REFUSED": "Pembayaran sudah berlangsung dan tidak dapat dibatalkan. Harap periksa lagi sebentar lagi."
+    },
+    "share": {
+      "title": "Jadwalkan & bagikan",
+      "calendar": "Tambahkan ke kalender",
+      "ics": "File kalender",
+      "mail": "Undang melalui email",
+      "mailApp": "Kirim dengan aplikasi email default",
+      "mailSubject": "[Undangan seminar] {title}",
+      "mailBody": "{title}\nKapan: {start}\n\nBergabung langsung dengan tautan ini.\nDesktop: {url}\nPi Browser: {piUrl}",
+      "copy": "Salin tautan",
+      "copied": "Tautan disalin.",
+      "copyFail": "Tidak dapat menyalin. Harap salin tautan dari bilah alamat.",
+      "share": "Bagikan ke aplikasi lain",
+      "shareFail": "Tidak dapat berbagi. Harap gunakan Salin tautan sebagai gantinya.",
+      "created": "Seminar Anda siap. Tambahkan waktu mulainya ke Google Kalender Anda.",
+      "addGoogle": "Tambahkan ke Google Kalender",
+      "later": "Nanti",
+      "piBrowserOpen": "Di Pi Browser, kalender, email, dan file kalender terbuka di browser default ponsel Anda.",
+      "extFail": "Tidak dapat membuka. Perbarui Pi Browser, atau gunakan Salin tautan dan buka di browser biasa (seminarz.vercel.app).",
+      "icsPiBrowser": "File kalender hanya dapat diunduh di browser biasa (komputer atau seluler). Di Pi Browser, gunakan Tambahkan ke kalender sebagai gantinya."
+    },
+    "attendance": "Kehadiran",
+    "plan": "Paket",
+    "left": "Waktu tersisa"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Bulan sebelumnya",
+      "next": "Bulan berikutnya",
+      "connect": "Tampilkan Google Kalender saya",
+      "change": "Kelola kalender Google ({n})",
+      "add": "Tambahkan",
+      "remove": "Hapus",
+      "close": "Tutup",
+      "failed": "Tidak dapat memuat acara dari {n} kalender. Periksa alamatnya.",
+      "badUrl": "Tempel 'Alamat rahasia dalam format iCal' (…/basic.ics) dari pengaturan Google Kalender, bukan bilah alamat browser.",
+      "full": "Anda dapat menambahkan hingga {n} kalender.",
+      "allDay": "Sepanjang hari",
+      "day": "Acara saya pada hari ini",
+      "count": "{n, plural, other {# acara}}",
+      "more": "+{n}",
+      "picked": "Tanggal ini ditetapkan sebagai tanggal mulai. Pilih waktu di bawah.",
+      "s1": "Ketuk [Buka pengaturan Google Kalender] di bawah.",
+      "s2": "Di bawah 'Pengaturan untuk kalender saya' di sebelah kiri, pilih kalender (misalnya nama Anda).",
+      "s3": "Gulir ke 'Integrasikan kalender' dan salin 'Alamat rahasia dalam format iCal'.",
+      "s4": "Tempel di sini dan ketuk [Tambahkan] — judul acara muncul di kalender. Tambahkan kalender lain dengan cara yang sama, hingga 5.",
+      "open": "Buka pengaturan Google Kalender",
+      "privacy": "Alamat ini adalah kunci ke kalender Anda — jangan bagikan. Ini hanya disimpan di perangkat ini, tidak pernah di server kami."
+    },
+    "title": "Buat seminar",
+    "name": "Mari bepergian ke pulau yang indah!",
+    "subTitle": "Subjudul (opsional, hingga 60)",
+    "startAt": "Waktu mulai",
+    "maxCnt": "Kapasitas (1–100)",
+    "submit": "Buat",
+    "submitting": "Membuat…",
+    "invalid": "Periksa masukan Anda — tanggal dalam satu tahun dari sekarang, kapasitas 1–100.",
+    "attendance": {
+      "title": "Kehadiran",
+      "back": "Kembali ke seminar",
+      "loading": "Memuat…",
+      "forbidden": "Hanya host dan admin yang dapat melihat kehadiran.",
+      "count": "{n} orang",
+      "csv": "Unduh CSV",
+      "empty": "Belum ada yang bergabung.",
+      "online": "Online",
+      "left": "Keluar",
+      "col": {
+        "name": "Nama",
+        "pi": "Nama pengguna Pi",
+        "ent": "Pertama bergabung",
+        "hb": "Terakhir terlihat",
+        "dur": "Waktu kehadiran",
+        "min": "Hadir (menit, waktu tidak hadir dikecualikan)",
+        "state": "Status"
+      },
+      "durNote": "Waktu kehadiran adalah dari pertama bergabung hingga terakhir terlihat, dikurangi waktu tidak hadir (celah lebih dari 2,5 menit).",
+      "csvPiBrowser": "Unduhan CSV hanya berfungsi di browser biasa (komputer atau seluler). Pi Browser tidak dapat menyimpan file — buka lembar kehadiran ini di browser komputer atau ponsel (seminarz.vercel.app)."
+    },
+    "plan": "Paket",
+    "planFree": "Gratis — sisa {time} bulan ini · tanpa AI",
+    "planPaid": "{name} {time} · {price} — bayar saat membuat",
+    "planHint": "Seminar yang dibuka dengan paket berbayar menggunakan waktu paket tersebut terlebih dahulu, kemudian dilanjutkan dengan waktu gratis bulan ini (tanpa AI di bagian gratis). Paket aktif dibuka tanpa pembayaran; Bulanan atau Tahunan yang tidak Anda miliki dibayar dalam Pi saat Anda menekan Buat, kemudian seminar dibuka (Pi Browser). Bergabung selalu gratis untuk peserta.",
+    "planOwned": "{name} — aktif · sisa {time}",
+    "planEnds": "Waktu mulai setelah masa berlaku paket ini berakhir. Pindahkan waktu mulai lebih awal atau pilih paket lain.",
+    "paidKept": "Tiket berbayar Anda tetap disimpan. Perbaiki masalah dan tekan Buat lagi (tanpa pembayaran kedua)."
+  },
+  "privacy": {
+    "title": "Kebijakan Privasi — Fitur Suara dan AI",
+    "effective": "Berlaku {date}",
+    "intro": "Kebijakan ini menjelaskan informasi pribadi yang kami proses saat Anda menggunakan teks langsung, teks terjemahan, terjemahan suara, catatan rapat AI, dan catatan tatap muka dalam seminar. Fitur-fitur ini menggunakan layanan AI eksternal, sehingga informasi ditransfer ke luar negeri.",
+    "whoTitle": "Informasi siapa yang diproses",
+    "who": [
+      "Penyaji dan peserta di panggung: kami meminta persetujuan Anda sekali, sebelum Anda pertama kali mengaktifkan mikrofon Anda. Anda dapat bergabung dengan seminar tanpa menyetujui.",
+      "Audiens: Anda tidak menggunakan mikrofon, jadi tidak ada suara yang dikirim. Anda hanya melihat teks dan catatan.",
+      "Catatan tatap muka: seorang admin merekam rapat dengan mikrofon dan mengonfirmasi bahwa peserta telah diberitahu sebelum merekam."
+    ],
+    "xferTitle": "Transfer informasi pribadi ke luar negeri (Undang-Undang Perlindungan Informasi Pribadi Korea, Pasal 28-8)",
+    "xfer": [
+      {
+        "k": "Penerima",
+        "v": "Google LLC (Gemini API) — kontak [TBD: kontak privasi Google]"
+      },
+      {
+        "k": "Negara",
+        "v": "Amerika Serikat dan negara lain tempat pusat data Google berada [TBD: wilayah pemrosesan]"
+      },
+      {
+        "k": "Kapan dan bagaimana",
+        "v": "Sekitar setiap 5 detik saat fitur aktif, melalui koneksi terenkripsi (HTTPS). Untuk catatan tatap muka, seluruh rekaman dikirim sekali lagi dalam bagian 5 menit saat catatan berakhir (transkripsi akurat)."
+      },
+      {
+        "k": "Item",
+        "v": "Suara, konten lisan (teks), nama tampilan pembicara (untuk ringkasan catatan), tangkapan layar berbagi layar (saat catatan AI aktif)"
+      },
+      {
+        "k": "Tujuan",
+        "v": "Ucapan ke teks, terjemahan, ringkasan catatan rapat, ucapan sintetis (suara standar, tanpa kloning suara), pemisahan pembicara untuk catatan tatap muka (suara dibedakan dan diberi label berdasarkan jenis kelamin yang dirasakan, seperti Pria 1 / Wanita 1 — tidak ada nama atau identitas yang disimpulkan)"
+      },
+      {
+        "k": "Retensi",
+        "v": "Berakhir segera setelah hasilnya dikembalikan. Kami meminta Google untuk tidak menyimpan permintaan (store=false). Log pemantauan penyalahgunaan mungkin masih disimpan berdasarkan persyaratan Google [TBD: periode retensi dan status tingkat berbayar]."
+      },
+      {
+        "k": "Cara menolak, dan apa yang terjadi",
+        "v": "Jika Anda tidak menyetujui atau mematikan mikrofon Anda, tidak ada suara yang dikirim. Anda masih dapat mengambil bagian dalam seminar; hanya teks, terjemahan, dan catatan ucapan Anda sendiri yang tidak dibuat. Anda dapat menarik persetujuan kapan saja [TBD: di mana tombol penarikan berada]."
+      }
+    ],
+    "keepTitle": "Apa yang disimpan layanan ini",
+    "keep": [
+      "Audio asli: untuk teks seminar dan catatan rapat AI tidak disimpan; dibuang segera setelah konversi ke teks. Untuk catatan tatap muka, rekaman disimpan dalam penyimpanan pribadi sehingga dapat ditranskripsi lagi dengan lebih akurat (dengan pembicara) setelah rapat, dan dihapus pada pembersihan harian setelah 1 hari berlalu sejak catatan berakhir (segera jika catatan dihapus).",
+      "Teks langsung: tidak disimpan.",
+      "Catatan rapat AI (saat penyaji mengaktifkannya): konten lisan, tangkapan layar, dan ringkasan, disimpan hingga catatan dihapus [TBD: retensi maksimum].",
+      "Catatan persetujuan: waktu persetujuan dan versi kebijakan, disimpan sebagai bukti [TBD: periode retensi].",
+      "Penggunaan: jumlah permintaan per menit dan waktu pemrosesan, digunakan untuk menegakkan batas biaya.",
+      "Kehadiran: waktu Anda bergabung, waktu terakhir Anda terhubung, nama tampilan Anda, dan nama pengguna Pi Anda disimpan dan diberikan kepada host sebagai daftar kehadiran (di layar dan sebagai unduhan CSV). Disimpan hingga seminar dihapus.",
+      "Tanya Jawab dan jajak pendapat: teks pertanyaan dan nama tampilan penanya (atau nama pengguna Pi jika tidak ada) terlihat oleh setiap peserta. Upvote hanya menunjukkan jumlah, tidak pernah siapa yang memberikan. Suara jajak pendapat hanya menunjukkan jumlah kepada peserta; penyelenggara dan admin melihat, untuk setiap opsi, nama tampilan (atau nama pengguna Pi jika tidak ada) dari setiap pemilih. Disimpan, termasuk pertanyaan tersembunyi, hingga seminar dihapus."
+    ],
+    "recTitle": "Perekaman",
+    "rec": "Rekaman hanya disimpan sebagai file di perangkat penyaji. Mereka tidak diunggah ke server kami atau ditransfer ke luar negeri. Saat perekaman atau catatan AI aktif, setiap peserta melihat indikator.",
+    "rightsTitle": "Hak Anda",
+    "rights": "Anda dapat meminta untuk mengakses, mengoreksi, menghapus, atau menghentikan pemrosesan informasi Anda. Kontak: [TBD: nama dan kontak petugas privasi]"
+  },
+  "notes": {
+    "title": "Catatan",
+    "back": "Kembali ke seminar",
+    "loading": "Memuat…",
+    "meta": "Catatan · {date} · {min} menit",
+    "aiWarn": "Ringkasan yang dihasilkan AI — mungkin mengandung kesalahan",
+    "points": "Poin-poin penting",
+    "decisions": "Keputusan",
+    "todos": "Item tindakan",
+    "shots": "Tangkapan layar ({n})",
+    "transcript": "Transkrip",
+    "download": "Unduh Markdown",
+    "making": "Membuat catatan…",
+    "makingLong": "Ini memakan waktu cukup lama. Harap segarkan nanti",
+    "recording": "Masih merekam",
+    "failed": "Tidak dapat membuat ringkasan — transkrip lengkap ada di bawah",
+    "retry": "Coba lagi",
+    "finish": "Akhiri perekaman dan ringkas",
+    "none": "Tidak ada di sini",
+    "blank": "Tidak ada yang bisa diringkas — tidak ada ucapan yang direkam atau terlalu singkat",
+    "notFound": "Catatan tidak ditemukan",
+    "forbidden": "Anda tidak memiliki akses ke catatan ini",
+    "shotAlt": "Tangkapan layar pada {at}",
+    "close": "Tutup",
+    "view": "Lihat catatan",
+    "error": "Tidak dapat memuat",
+    "mine": "Catatan saya",
+    "del": "Hapus catatan",
+    "delAsk": "Hapus catatan ini (ringkasan, transkrip, dan tangkapan layar)? Tidak ada yang akan dapat melihatnya",
+    "delYes": "Hapus",
+    "delNo": "Batal",
+    "delFail": "Tidak dapat menghapus",
+    "dlFail": "Tidak dapat mengunduh — harap coba lagi",
+    "recentNotes": "Catatan terbaru",
+    "empty": "Belum ada catatan",
+    "newNote": "Mulai catatan tatap muka",
+    "inPerson": "Catatan rapat tatap muka",
+    "inPersonTag": "Tatap muka",
+    "titleLabel": "Judul",
+    "titlePh": "mis. Rapat mingguan",
+    "told": "Saya telah memberitahu semua yang hadir bahwa ini akan direkam dan diproses oleh AI (wajib)",
+    "toldWhy": "Sebelum Anda memulai, beritahu semua yang hadir bahwa percakapan ini akan direkam (rekaman disimpan selama 1 hari setelah catatan berakhir, dan pembicara dibedakan berdasarkan suara dan diberi label berdasarkan jenis kelamin yang dirasakan) dan diubah menjadi teks dan ringkasan oleh AI eksternal",
+    "start": "Mulai merekam",
+    "starting": "Bersiap…",
+    "recBadge": "Merekam {time}",
+    "recentLines": "Baris terbaru",
+    "waiting": "Teks muncul di sini saat orang berbicara",
+    "end": "Akhiri dan buat catatan",
+    "wakeWarn": "Perekaman dapat berhenti jika layar mati",
+    "adminOnly": "Hanya admin yang dapat menggunakan ini",
+    "aiOff": "Catatan AI tidak tersedia saat ini (perlu pengaturan server). Catatan sebelumnya tercantum di bawah",
+    "reload": "Muat ulang",
+    "unsupported": "Perekaman tidak tersedia di perangkat ini",
+    "micDenied": "Tidak dapat menggunakan mikrofon — periksa izin",
+    "limited": "Batas waktu pemrosesan telah habis — akhiri dan buat catatan",
+    "noAgr": "Berhenti: tidak ada konfirmasi pemberitahuan pada rekaman — akhiri dan mulai lagi",
+    "micLost": "Mikrofon terputus dan perekaman berhenti — ketuk Sambungkan kembali mikrofon atau akhiri catatan",
+    "micRetry": "Sambungkan kembali mikrofon",
+    "gone": "Catatan ini diakhiri atau dihapus di tempat lain, jadi perekaman berhenti — gunakan tombol di bawah untuk membuka catatan",
+    "finishing": "Menyimpan kata-kata terakhir…",
+    "st": {
+      "RECORDING": "Merekam",
+      "SUMMARIZING": "Membuat",
+      "DONE": "Selesai",
+      "FAILED": "Gagal"
+    },
+    "downloadPiBrowser": "Pengunduhan Markdown hanya berfungsi di browser biasa (komputer atau seluler). Pi Browser tidak dapat menyimpan file — buka catatan ini di browser komputer atau ponsel (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Paket",
+    "loading": "Memuat…",
+    "free": "Gratis",
+    "freeDesc": "{time} seminar setiap bulan (tidak dapat diakumulasikan)",
+    "monthly": "Bulanan",
+    "yearly": "Tahunan",
+    "paidDesc": "{time} seminar, berlaku selama {months} bulan",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Memeriksa harga Pi",
+    "noAi": "Tidak ada teks AI, terjemahan, sulih suara, atau ringkasan catatan",
+    "withAi": "Termasuk teks AI, terjemahan, sulih suara, dan ringkasan catatan",
+    "buy": "Bayar dengan Pi",
+    "bought": "Pembayaran selesai. Waktu seminar telah ditambahkan.",
+    "meRemain": "Sisa waktu: {time}",
+    "loginToBuy": "Masuk untuk membeli paket.",
+    "payNote": "Pembayaran selalu dalam Pi. Jumlah mata uang lokal hanya sebagai referensi; jumlah Pi ditetapkan pada harga Pi saat Anda membayar. Seminar pada paket berbayar menggunakan izin paket tersebut terlebih dahulu (yang paling cepat kedaluwarsa terlebih dahulu), lalu dilanjutkan dengan waktu gratis bulan ini.",
+    "charge": "Isi ulang waktu",
+    "hm": "{h} jam {m} menit",
+    "m": "{m} menit",
+    "won": "KRW {n}",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (memeriksa harga Pi)",
+    "h": "{h} jam"
+  },
+  "adminRooms": {
+    "title": "Manajemen ruang",
+    "adminOnly": "Hanya administrator yang dapat melihat halaman ini.",
+    "refresh": "Segarkan",
+    "count": "{n} ruang terbuka",
+    "empty": "Tidak ada ruang yang terbuka saat ini.",
+    "lab": "Ruang lab",
+    "noSeminar": "Tidak ada catatan seminar",
+    "peers": "{n} / {cap} terhubung",
+    "producers": "{n} aliran",
+    "end": "Berakhir {time}",
+    "stale": "Seminar telah berakhir tetapi ruang masih terbuka di server video — paksa tutup.",
+    "close": "Paksa tutup",
+    "confirmSeminar": "Ini mengakhiri seminar dan menutup ruang. Semua orang akan terputus.",
+    "confirmRoom": "Ini menutup ruang. Semua orang akan terputus.",
+    "confirmYes": "Tutup",
+    "cancel": "Batal",
+    "closing": "Menutup…",
+    "closed": "Ruang ditutup.",
+    "metrics": "Metrik server video (sejak awal)",
+    "metricsOff": "Tidak dapat memuat metrik.",
+    "m": {
+      "packetsIn": "Paket masuk",
+      "packetsOut": "Paket keluar",
+      "nackIn": "NACK diterima",
+      "nackOut": "NACK dikirim",
+      "retransmits": "Retransmisi",
+      "duplicateNack": "NACK duplikat",
+      "cacheMiss": "Cache retransmisi tidak ditemukan",
+      "pliOut": "Permintaan keyframe (PLI)",
+      "keyframes": "Keyframe",
+      "layerSwitches": "Perubahan kualitas",
+      "queueDrops": "Penurunan antrean"
+    }
+  },
+  "adminUsers": {
+    "title": "Pengguna",
+    "adminOnly": "Hanya administrator yang dapat melihat halaman ini.",
+    "search": "Cari berdasarkan nama (minimal 2 karakter)",
+    "searchBtn": "Cari",
+    "refresh": "Segarkan",
+    "count": "{n, plural, other {# pengguna}}",
+    "empty": "Tidak ada pengguna.",
+    "admin": "Admin",
+    "lastLogin": "Terakhir masuk {time}",
+    "never": "Tidak pernah masuk",
+    "plan": {
+      "FREE": "Gratis",
+      "M": "Bulanan",
+      "Y": "Tahunan"
+    },
+    "until": "(sampai {time})",
+    "manage": "Kelola waktu",
+    "close": "Tutup",
+    "planLabel": "Paket",
+    "hours": "Jam",
+    "minutes": "Menit",
+    "reason": "Alasan (opsional)",
+    "sub": "Kurangi",
+    "confirmSub": "Kurangi waktu {plan} sebesar {time}.",
+    "confirmYes": "Konfirmasi",
+    "cancel": "Batal",
+    "saving": "Menyimpan…",
+    "done": "Diterapkan. Sisa waktu {plan}: {time}",
+    "invalid": "Masukkan pengurangan antara 1 menit dan 1000 jam (menit penuh 0–59).",
+    "history": "Penyesuaian terbaru",
+    "noHistory": "Belum ada penyesuaian.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Berikan izin layanan (waktu gratis)",
+    "svc": {
+      "H1": "Izin 1 jam",
+      "D1": "Izin 1 hari",
+      "M1": "Izin 1 bulan"
+    },
+    "svcNote": "Izin layanan adalah waktu paket Gratis. Izin ini dapat digunakan mulai sekarang untuk periode tersebut (1 jam, 24 jam, 1 bulan) di seminar gratis dan di bagian gratis seminar berbayar (tanpa fitur AI). Dengan beberapa izin, izin tersebut akan habis secara otomatis dalam urutan 1 jam → 1 hari → 1 bulan.",
+    "subTitle": "Kurangi waktu",
+    "subNote": "Mengambil dari izin yang paling lambat kedaluwarsa terlebih dahulu. Jika lebih dari yang tersisa, hanya waktu yang tersisa yang dihapus.",
+    "confirmSvc": "Berikan {svc}.",
+    "doneSvc": "Memberikan {svc}. Sisa waktu gratis: {time} (izin kedaluwarsa {end})"
+  }
+}

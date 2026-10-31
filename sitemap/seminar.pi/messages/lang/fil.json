@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Mga live na video seminar na sinasalihan mo gamit ang Pi"
+  },
+  "home": {
+    "description": "Nagho-host ang mga tagapag-ayos ng mga bukas na seminar, at sumasali ang mga kalahok sa mga live na video session gamit ang Pi.",
+    "badge": "Mga live na seminar sa magagandang isla",
+    "headline": "Manood, makinig, at matuto nang magkasama — live",
+    "ctaBrowse": "Mag-browse ng mga seminar",
+    "ctaPlan": "Tingnan ang mga plano",
+    "features": {
+      "video": "Live na video",
+      "caption": "Mga caption at pagsasalin",
+      "notes": "Mga tala ng pulong ng AI",
+      "pay": "Magbayad gamit ang Pi"
+    },
+    "listTitle": "Mga Seminar",
+    "cal": {
+      "title": "Kalendaryo ng Seminar",
+      "desc": "Mula sa mga nakaraang seminar hanggang sa mga paparating — i-tap ang petsa para sa mga detalye.",
+      "legendSmn": "Mga Seminar",
+      "legendEnded": "Mga nakaraang seminar",
+      "legendMine": "Aking mga kaganapan",
+      "failed": "Hindi ma-load ang mga petsa ng seminar. Pakisubukang muli mamaya.",
+      "open": "Tingnan ang mga detalye"
+    }
+  },
+  "nav": {
+    "link": "I-link ang account",
+    "privacy": "Privacy",
+    "plan": "Mga Plano",
+    "rooms": "Mga Kuwarto",
+    "admin": "Admin",
+    "users": "Mga User",
+    "home": "Home",
+    "privacyShort": "Privacy",
+    "menu": "Pangunahing menu",
+    "fold": "I-collapse ang menu",
+    "unfold": "I-expand ang menu"
+  },
+  "auth": {
+    "checking": "Sinusuri ang pag-sign in…",
+    "signedIn": "{name}",
+    "inPerson": "Mga tala sa personal",
+    "required": "Kinakailangan ang pag-sign in sa Pi account.",
+    "signIn": "Mag-sign in gamit ang Pi",
+    "openInPiBrowser": "Buksan ang pahinang ito sa Pi Browser para mag-sign in gamit ang iyong Pi account.",
+    "authenticating": "Nag-sa-sign in…",
+    "google": "Mag-sign in gamit ang Google",
+    "signOut": "Mag-sign out",
+    "or": "o",
+    "linkRequired": "Naka-sign in ka sa Google, ngunit hindi pa ito naka-link sa isang Pi account. Mag-isyu ng link code sa Pi Browser at ilagay ito dito.",
+    "linkNeeded": "Kailangan ng pag-link ng Pi account",
+    "linkCheckFailed": "Hindi masuri ang status ng link ng iyong account (pansamantalang error sa server). Paki-refresh sa ilang sandali."
+  },
+  "piOAuth": {
+    "signingIn": "Nag-sa-sign in gamit ang iyong Pi account…",
+    "failed": "Nabigo ang pag-sign in sa Pi. Pakisubukang muli.",
+    "stateMismatch": "Hindi ma-verify ang kahilingan sa pag-sign in na ito (nag-expire o ibang tab). Pakisubukang muli.",
+    "retry": "Subukang muli",
+    "backHome": "Home"
+  },
+  "link": {
+    "title": "I-link ang account",
+    "intro": "Ikonekta ang account na ginamit mo sa pag-sign in sa Pi Browser sa pag-sign in sa Google sa isang regular na browser. Pagkatapos mag-link, magagamit mo ang parehong account sa isang PC browser.",
+    "checking": "Sinusuri ang pag-sign in…",
+    "piIssueTitle": "Para mag-sign in din mula sa isang regular na browser",
+    "codeHint": "I-isyu ang code sa ibaba, pagkatapos ay mag-sign in gamit ang Google sa isang PC browser at ilagay ito sa pahina ng I-link ang account (sa loob ng 10 minuto).",
+    "piIssue": "Mag-isyu ng link code",
+    "reissue": "Mag-isyu ng bagong code",
+    "expiresIn": "Mag-e-expire sa {min} min",
+    "enterTitle": "Ilagay ang link code",
+    "enterHint": "Sa Pi Browser, buksan ang seminar.pi → I-link ang account → Mag-isyu ng link code, pagkatapos ay ilagay ang 6-digit na code.",
+    "codeLabel": "Link code",
+    "submit": "I-link",
+    "done": "Naka-link. Maaari mo na ring gamitin ang pag-sign in sa Google.",
+    "linked": "Naka-link ang {name} sa pag-sign in sa Google."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Kinakailangan ang pag-sign in",
+    "AUTH_PI_REQUIRED": "Kinakailangan ang pag-sign in sa Pi",
+    "AUTH_PI_SESSION_INVALID": "Nag-expire ang iyong session. Pakisubukang mag-sign in muli",
+    "AUTH_PI_TOKEN_INVALID": "Nabigo ang pag-verify ng pag-sign in sa Pi",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Nawawala ang impormasyon sa pag-sign in sa Pi",
+    "FORBIDDEN": "Wala kang pahintulot",
+    "BAD_REQUEST": "Masamang kahilingan",
+    "BAD_REQUEST_BODY": "Masamang kahilingan",
+    "INVALID_INPUT": "Di-wastong input",
+    "QUERY_FAILED": "Nabigong mag-load",
+    "SAVE_FAILED": "Nabigong mag-save",
+    "INTERNAL": "May nangyaring mali",
+    "SERVER_CONFIG": "Error sa configuration ng server. Mangyaring makipag-ugnayan sa operator",
+    "PI_API_CONNECT_FAILED": "Hindi maabot ang Pi Network",
+    "DB_UNAVAILABLE": "Pansamantalang hindi available ang data. Pakisubukang muli mamaya",
+    "NOT_FOUND": "Hindi natagpuan",
+    "RATE_LIMITED": "Masyadong maraming kahilingan. Pakisubukang muli sa ilang sandali",
+    "PAYLOAD_TOO_LARGE": "Masyadong malaki ang kahilingan",
+    "NETWORK": "Suriin ang iyong koneksyon sa network",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Ang Pi username na ito ay nakarehistro na sa ibang credentials. Mangyaring makipag-ugnayan sa admin",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Hindi aktibo ang account na ito. Mangyaring makipag-ugnayan sa admin",
+    "AUTH_GOOGLE_REQUIRED": "Kinakailangan ang pag-sign in sa Google.",
+    "LINK_CODE_INVALID": "Ang link code ay di-wasto o nag-expire. Mag-isyu ng bago sa Pi Browser.",
+    "LINK_ALREADY_LINKED": "Naka-link na ang account na ito.",
+    "LINK_CODE_GEN_FAILED": "Hindi makagawa ng link code. Pakisubukang muli mamaya.",
+    "AUTH_DB_UNAVAILABLE": "Hindi ma-save ang iyong account, kaya nabigo ang pag-sign in. Pakisubukang muli mamaya.",
+    "LINK_TRY_LIMIT": "Masyadong maraming maling link code. Subukang muli sa loob ng 15 minuto.",
+    "PRICE_UNAVAILABLE": "Hindi makuha ang presyo ng Pi. Pakisubukang muli sa ilang sandali",
+    "QUOTE_EXPIRED": "Nag-expire ang quote ng pagbabayad. Pakisubukang magbayad muli",
+    "PLAN_EXHAUSTED": "Nagagamit mo na ang lahat ng iyong oras ng seminar. Mag-top up sa pahina ng Mga Plano",
+    "HOST_AWAY": "Wala ang host sa kuwarto. Maaari kang pumasok pagkatapos sumali ng host",
+    "PLAN_AI_PAID": "Available ang mga feature ng AI sa mga bayad na plano",
+    "AI_UNAVAILABLE": "Hindi available ang mga feature ng AI sa ngayon",
+    "SPEECH_CHUNK_INVALID": "Di-wasto ang format ng audio chunk",
+    "SPEECH_NOT_LIVE": "Hindi live ang seminar na ito",
+    "SPEECH_NO_AGR": "Kinakailangan ang pahintulot sa pagproseso ng boses",
+    "SPEECH_RATE": "Masyadong maraming kahilingan sa boses. Pakisubukang muli sa ilang sandali",
+    "SPEECH_QUOTA": "Naubos na ang oras ng pagproseso ng boses para sa seminar na ito",
+    "SPEECH_USR_QUOTA": "Naubos mo na ang iyong limitasyon sa pagsasalin at isinaling boses para sa seminar na ito",
+    "SPEECH_FAILED": "Hindi ma-convert ang speech sa text",
+    "SPEECH_STAGE_ONLY": "Ang mga nasa stage lang ang makakagamit ng mga voice caption",
+    "TRANSLATE_FAILED": "Hindi maisalin ang caption",
+    "POLL_CLOSED": "Sarado na ang poll na ito",
+    "NOTE_NOT_RECORDING": "Hindi nagre-record ang mga tala na ito",
+    "NOTE_SHOT_INVALID": "Di-wastong screen capture",
+    "NOTE_AUDIO_INVALID": "Di-wastong recording file",
+    "NOTE_SHOT_RATE": "Masyadong maraming screen capture",
+    "NOTE_RETRY_SOON": "Maaari kang sumubok muli sa loob ng isang minuto",
+    "SPEECH_TTS_FAILED": "Hindi makagawa ng isinaling boses",
+    "CAPTION_SIG_INVALID": "Hindi ma-verify ang caption na ito, kaya hindi ito isinalin",
+    "PLAN_EXPIRES_BEFORE_START": "Ang oras ng pagsisimula ay pagkatapos mag-expire ang pass ng planong ito",
+    "PAY_ALREADY_PAID": "May pagbabayad pa ring pinoproseso. Kung nag-sa-sign in ka sa wallet, subukang muli sa loob ng 3 minuto.",
+    "REC_PAID_ONLY": "Available lang ang recording sa mga seminar ng Monthly o Yearly plan na may natitirang bayad na oras",
+    "REC_NOT_IN_ROOM": "Kinukumpirma pa rin na nasa kuwarto ka. Subukang muli sa ilang sandali",
+    "ENGINE_OFF": "Hindi naka-configure ang admin key ng video server",
+    "ENGINE_UNAVAILABLE": "Hindi tumutugon ang video server. Pakisubukang muli sa ilang sandali",
+    "ADJ_NOTHING": "Walang natitirang oras na babawasan"
+  },
+  "progress": {
+    "title": "Progress ng pagbuo",
+    "subtitle": "Tapos na, kasalukuyang ginagawa at pinaplano, ayon sa feature · mula {date}",
+    "overall": "Pangkalahatang hakbang",
+    "stepsDone": "{done}/{total} hakbang na tapos ({pct}%)",
+    "featureUnit": "mga feature",
+    "status": {
+      "done": "Tapos na",
+      "doing": "Kasalukuyang ginagawa",
+      "todo": "Pinaplano",
+      "drop": "Ibinaba"
+    },
+    "features": {
+      "F01": {
+        "name": "Pag-sign in",
+        "desc": "Pag-sign in sa Pi Browser, pag-sign in sa Google sa ibang mga browser, at pag-link ng parehong account"
+      },
+      "F05": {
+        "name": "Live na video seminar",
+        "desc": "Ang aming sariling video engine na Galápagos — ang layunin ay isang presenter na nag-stream sa hanggang 30 kalahok"
+      },
+      "F02": {
+        "name": "Gumawa ng seminar",
+        "desc": "Itakda ang subtitle, oras, kapasidad at bayad sa seminar para makagawa ng seminar (pangalan = isla, awtomatiko)"
+      },
+      "F03": {
+        "name": "Listahan at detalye ng seminar",
+        "desc": "Mag-browse ng mga bukas na seminar pahina-pahina at tingnan ang kanilang mga detalye"
+      },
+      "F04": {
+        "name": "Pagbabayad ng Pi entry",
+        "desc": "Bayaran ang bayad sa seminar sa Pi; muling susuriin ng server ang halaga bago ka papasukin"
+      },
+      "F06": {
+        "name": "Mga payout ng host",
+        "desc": "Bayaran ang kita sa entry-fee sa mga host sa Pi"
+      },
+      "F07": {
+        "name": "Mga replay",
+        "desc": "Manood ng mga na-record na seminar mamaya"
+      },
+      "FU": {
+        "name": "Pundasyon ng mga add-on ng pulong",
+        "desc": "Isang signal channel para sa mga add-on, koneksyon ng AI, voice chunks, pahintulot sa mikropono at mga data table"
+      },
+      "F08": {
+        "name": "Iskedyul at pagbabahagi",
+        "desc": "Link ng kalendaryo, file ng kaganapan (.ics) at imbitasyon sa email para sa bawat seminar"
+      },
+      "F09": {
+        "name": "Pagbawas ng ingay at pag-iilaw",
+        "desc": "Bawasan ang ingay ng mikropono at paliwanagin ang madilim na video ng camera"
+      },
+      "F10": {
+        "name": "Mga live na caption",
+        "desc": "Gawing text ang speech ng presenter sa ilalim ng stage"
+      },
+      "F11": {
+        "name": "Mga poll, Q&A at pagdalo",
+        "desc": "Magpatakbo ng mga poll at tanong sa panahon ng seminar; dina-download ng mga host ang listahan ng pagdalo"
+      },
+      "F12": {
+        "name": "Mga epekto sa background",
+        "desc": "I-blur ang iyong background o palitan ito ng preset o ng iyong sariling larawan (pinoproseso sa iyong device)"
+      },
+      "F13": {
+        "name": "Lokal na recording",
+        "desc": "Ire-record ng presenter ang seminar sa kanilang sariling device at makikita ng lahat na naka-on ang recording"
+      },
+      "F14": {
+        "name": "Mga tala ng pulong ng AI",
+        "desc": "Kapag binuksan ito ng presenter, ire-record ang speech at mga screen at isasama sa mga pangunahing punto, desisyon at to-dos"
+      },
+      "F15": {
+        "name": "Mga tala ng pulong sa personal",
+        "desc": "Mag-record ng pulong gamit lang ang mikropono at kumuha ng mga tala ng pulong (mga admin)"
+      },
+      "F16": {
+        "name": "Mga isinaling caption",
+        "desc": "Ipakita ang mga caption na isinalin sa wikang pinili mo"
+      },
+      "F17": {
+        "name": "Makinig sa pagsasalin",
+        "desc": "Basahin nang malakas ang mga isinaling caption gamit ang synthetic voice habang binababa ang orihinal na audio"
+      }
+    },
+    "steps": {
+      "piLogin": "Pag-sign in sa Pi Browser",
+      "googleLogin": "Pag-sign in sa Google",
+      "accountLink": "Pag-link ng account",
+      "deviceTest": "Pagsubok ng device ng camera",
+      "oneToTwo": "Presenter 1 → 2 kalahok",
+      "recovery": "Pagbawi sa pag-freeze at stability",
+      "structure": "Paglilinis ng istraktura ng engine",
+      "autoQuality": "Auto quality, 30 kalahok",
+      "roomService": "Pagpasok sa kuwarto at recording",
+      "roomUi": "Screen ng kuwarto (lobby·stage·chat·raise hand·moderation)",
+      "createForm": "Gumawa ng screen",
+      "list": "Listahan",
+      "detail": "Mga Detalye",
+      "payRequest": "Kahilingan sa pagbabayad",
+      "payVerify": "Muling pagsusuri ng halaga at pagpasok",
+      "settle": "Payout",
+      "vod": "Replay ng recording",
+      "appRelay": "Signal channel ng add-on ng engine",
+      "aiBase": "AI, voice chunks, pahintulot at mga data table",
+      "shareLinks": "Link ng kalendaryo, .ics at imbitasyon sa email",
+      "noiseLight": "Pagbawas ng ingay at pag-iilaw",
+      "liveCaptions": "Mga live na caption",
+      "pollQnaAttend": "Mga poll, Q&A at listahan ng pagdalo",
+      "backgrounds": "Blur, mga preset at iyong sariling larawan",
+      "localRecording": "Recording ng presenter at badge ng recording",
+      "aiNotes": "Recording, buod at pahina ng mga tala",
+      "inPersonNotes": "Mga tala na mikropono lang at aking mga tala",
+      "captionTranslate": "Pagpili ng wika at toggle ng orihinal/isinalin",
+      "dubbing": "Pag-playback ng synthetic voice at binabang orihinal na audio"
+    },
+    "refLabel": "Reference model",
+    "uiRef": "UI baseline — mga pattern ng screen at feature ng isang malawakang ginagamit na web video meeting app, inangkop para sa seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Na-save ang pangalan, ngunit hindi maabisuhan ang iba ngayon. Makikita nila ito pagkatapos mong sumali muli.",
+      "tile": "I-click para baguhin ang aking pangalan",
+      "menu": "Baguhin ang aking pangalan",
+      "title": "Aking pangalan sa seminar na ito",
+      "hint": "Hanggang 30 character. Ginagamit lang sa seminar na ito at agad na nag-a-update sa screen ng lahat.",
+      "save": "I-save",
+      "saving": "Nagse-save…",
+      "cancel": "Kanselahin",
+      "taken": "Ginagamit na ang pangalan na iyan ng iba (host o kalahok). Pumili ng iba.",
+      "failed": "Hindi ma-save ang iyong pangalan. Subukang muli."
+    },
+    "roomTitle": {
+      "edit": "I-click para i-edit ang subtitle",
+      "label": "Subtitle",
+      "placeholder": "Subtitle (hanggang 60)",
+      "save": "I-save",
+      "cancel": "Kanselahin",
+      "failed": "Hindi ma-save ang subtitle."
+    },
+    "mirror": "I-mirror ang aking video",
+    "barPin": "Palaging ipakita ang bottom bar",
+    "barAuto": "Awtomatikong itago ang bottom bar",
+    "title": "Sumali sa seminar · {room}",
+    "titleSeminar": "Waiting room",
+    "noEngine": "Hindi pa handa ang video server.",
+    "joinAs": "Sumali bilang",
+    "presenter": "Presenter",
+    "audience": "Audience",
+    "join": "Sumali ngayon",
+    "nameLabel": "Pangalan",
+    "audienceHint": "Hindi gumagamit ng camera o mikropono ang mga miyembro ng audience. Pagkatapos sumali, makikita at maririnig mo ang presenter.",
+    "preview": {
+      "pending": "Inihahanda ang camera at mikropono…",
+      "audioOnly": "Hindi available ang camera — nagpapadala lang ng audio.",
+      "none": "Hindi available ang camera at mikropono. Suriin ang mga pahintulot (maaari ka pa ring sumali nang walang media).",
+      "videoOnly": "Hindi available ang mikropono — nagpapadala lang ng video. Suriin ang pahintulot sa mikropono."
+    },
+    "mic": {
+      "on": "I-off ang mikropono",
+      "off": "I-on ang mikropono"
+    },
+    "cam": {
+      "on": "I-off ang camera",
+      "off": "I-on ang camera"
+    },
+    "controls": "Mga kontrol sa tawag",
+    "leave": "Umalis",
+    "enableSound": "Paganahin ang tunog",
+    "state": {
+      "connecting": "Kumokonekta…",
+      "reconnecting": "Muling kumokonekta…"
+    },
+    "waiting": "Naghihintay sa presenter.",
+    "rejoin": "Sumali muli",
+    "err": {
+      "generic": "May nangyaring mali. Pakisubukang sumali muli.",
+      "CLOSED": "Nawala ang koneksyon.",
+      "NO_ENGINE": "Hindi pa handa ang video server.",
+      "TICKET_401": "Pakisubukang mag-sign in.",
+      "TICKET_403": "Wala kang pahintulot na mag-present. Sumali bilang audience.",
+      "TICKET_503": "Hindi pa naka-configure ang video server.",
+      "TICKET_NETWORK": "Suriin ang iyong koneksyon sa network.",
+      "TICKET_INVALID": "Nag-expire ang iyong entry pass.",
+      "TICKET_EXPIRED": "Nag-expire ang iyong entry pass.",
+      "ROOM_FULL": "Puno na ang seminar na ito.",
+      "ROOM_CLOSED": "Isinara ang room — natapos ang seminar o wala ang host nang higit sa 5 minuto.",
+      "DUPLICATE_SESSION": "Sumali ka mula sa ibang device, kaya na-disconnect ang screen na ito.",
+      "ROLE_FORBIDDEN": "Wala kang pahintulot na mag-present.",
+      "WS_FAILED": "Hindi makakonekta sa video server.",
+      "ICE_FAILED": "Nawala ang koneksyon sa video. Suriin ang iyong network.",
+      "MEDIA_FAILED": "Hindi masimulan ang camera o mikropono.",
+      "TIMEOUT": "Hindi tumutugon ang video server.",
+      "TICKET_402": "Ito ay isang bayad na seminar. Mangyaring magbayad sa pahina ng seminar bago pumasok.",
+      "TICKET_404": "Hindi makita ang seminar.",
+      "TICKET_409": "Natapos na o nakansela ang seminar na ito.",
+      "TICKET_HOST_AWAY": "Hindi pa nakakasali ang host o wala siya nang higit sa 5 minuto, kaya hindi ka makakapasok. Pakisubukang muli pagkatapos sumali ng host.",
+      "TICKET_PLAN_EXHAUSTED": "Naubos na ang oras ng plan ng seminar na ito, kaya hindi ito masisimulan. Ang pagbili muli ng parehong plan ay magdaragdag ng oras (Ang libre ay nagre-renew ng 1 oras sa susunod na buwan)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Hindi mabago ang mikropono. Pakisubukang muli.",
+        "video": "Hindi mabago ang camera. Pakisubukang muli."
+      },
+      "forbidden": "Wala kang pahintulot na mag-present, kaya magpapatuloy ka bilang audience.",
+      "demoted": "Ibinalik ka sa audience.",
+      "endFailed": "Hindi matapos ang seminar. Pakisubukang muli.",
+      "chatFailed": "Hindi naipadala ang mensahe.",
+      "actionFailed": "Hindi makumpleto ang kahilingan. Pakisubukang muli.",
+      "shareFailed": "Hindi masimulan ang pagbabahagi ng screen.",
+      "err": {
+        "RATE_LIMITED": "Masyado kang mabilis magpadala. Mangyaring maghintay sandali.",
+        "ROLE_FORBIDDEN": "Wala kang pahintulot na gawin ito.",
+        "MEDIA_FAILED": "Hindi masimulan ang iyong mic o camera. Pakisuri ang mga pahintulot.",
+        "LOCKED": "Naka-lock ng presenter."
+      },
+      "mutedBy": {
+        "audio": "Pinatahimik ng presenter ang iyong mikropono.",
+        "video": "Pinatay ng presenter ang iyong camera."
+      },
+      "policy": {
+        "locked": "Ni-lock ng presenter ang mga mikropono. Maaari mong i-on ang sa iyo kapag na-unlock na ang mga ito.",
+        "unlocked": "Naka-unlock na ang mga mikropono."
+      },
+      "consent": {
+        "saveFail": "Hindi na-save ang iyong pahintulot. Suriin ang iyong pagpaparehistro at i-on muli ang mic"
+      }
+    },
+    "home": "Pumunta sa home",
+    "tile": {
+      "fullscreen": "I-double-click para sa full screen · Esc para lumabas",
+      "self": "{name} (ikaw)",
+      "presenter": "Presenter",
+      "micOff": "Naka-off ang mikropono",
+      "screen": "Screen ni {name}",
+      "row": "Iba pang mga speaker",
+      "pin": "Ipakita nang malaki si {name}",
+      "unpin": "Auto layout"
+    },
+    "more": "Higit pang opsyon",
+    "joinNoCam": "Sumali nang walang camera",
+    "net": {
+      "afterJoin": "Awtomatikong sinusuri ang iyong koneksyon pagkatapos mong sumali.",
+      "measuring": "Sinusuri ang koneksyon…",
+      "good": "Magandang koneksyon",
+      "fair": "Katamtamang koneksyon",
+      "poor": "Mahinang koneksyon",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% ng data ng audio ang nawawala.",
+          "video": "{pct}% ng data ng video ang nawawala."
+        },
+        "rate": {
+          "audio": "Mababa ang pag-upload ng audio sa {kbps} kbps.",
+          "video": "Mababa ang pag-upload ng video sa {kbps} kbps. Maaaring bumaba ang kalidad."
+        }
+      }
+    },
+    "people": "{n} sa room",
+    "screen": {
+      "start": "Ibahagi ang screen",
+      "stop": "Ihinto ang pagbabahagi"
+    },
+    "panel": {
+      "title": "Chat · Q&A · Polls · Mga Tao",
+      "chat": "Chat",
+      "people": "Mga Tao",
+      "close": "Isara ang panel",
+      "qna": "Q&A",
+      "polls": "Mga Poll"
+    },
+    "chat": {
+      "empty": "Wala pang mensahe. Hindi naka-save ang chat.",
+      "me": "Ikaw",
+      "failed": "Hindi naipadala.",
+      "retry": "Subukang muli",
+      "input": "Mag-type ng mensahe",
+      "send": "Ipadala"
+    },
+    "hand": {
+      "raise": "Itaas ang kamay",
+      "lower": "Ibaba ang kamay",
+      "list": "Mga nakataas na kamay",
+      "lowerAll": "Ibaba ang lahat ng kamay",
+      "raised": "Nakataas ang kamay",
+      "notice": "Nagtaas ng kamay si {name}.",
+      "dismiss": "Balewalain",
+      "waiting": "{n} tao ang naghihintay magsalita"
+    },
+    "react": {
+      "open": "Mga Reaksyon",
+      "e0": "Like",
+      "e1": "Palakpak",
+      "e2": "Tawa",
+      "e3": "Nagulat",
+      "e4": "Malungkot",
+      "e5": "Walang masabi",
+      "e6": "Pag-ibig"
+    },
+    "quality": {
+      "label": "Kalidad",
+      "auto": "Auto",
+      "high": "Mataas",
+      "medium": "Katamtaman",
+      "low": "Mababa",
+      "unstable": "Hindi stable ang iyong network"
+    },
+    "roles": {
+      "presenter": "Presenter",
+      "panel": "Panelist",
+      "audience": "Audience"
+    },
+    "stage": {
+      "invite": "Imbitahan sa stage",
+      "remove": "Ilipat sa audience",
+      "promoted": "Naanyayahan ka sa stage. Kung nagtaas ka ng kamay, awtomatikong bubukas ang iyong camera (maliban kung naka-lock o hindi pinapayagan). I-on ang iyong mic para magsalita (hindi awtomatikong bubukas ang mic).",
+      "later": "Mamaya"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "Nagtaas ng kamay si {name}."
+    },
+    "leaveDialog": {
+      "title": "Umalis sa seminar",
+      "body": "Maaari kang umalis nang mag-isa, o tapusin ang seminar at idiskonekta ang lahat.",
+      "confirmTitle": "Tapusin ang seminar?",
+      "confirmBody": "Madi-disconnect ang lahat at walang sinuman ang makakasali muli sa seminar na ito.",
+      "cancel": "Kanselahin",
+      "end": "Tapusin ang seminar",
+      "endConfirm": "Tapusin ngayon"
+    },
+    "mod": {
+      "muteAll": "Patahimikin ang lahat",
+      "lock": "I-lock ang mga mic",
+      "unlock": "I-unlock ang mga mic",
+      "locked": "Ni-lock ng presenter ang mga mikropono",
+      "muteMic": "Patahimikin ang mic",
+      "askMic": "Hilinging i-unmute",
+      "muteCam": "Patayin ang camera",
+      "muteMicOf": "Patahimikin si {name}",
+      "askMicOf": "Hilingin kay {name} na i-unmute",
+      "muteCamOf": "Patayin ang camera ni {name}"
+    },
+    "ask": {
+      "audio": "Hiniling sa iyo ng presenter na i-on ang iyong mikropono.",
+      "video": "Hiniling sa iyo ng presenter na i-on ang iyong camera.",
+      "ignore": "Balewalain"
+    },
+    "toDetail": "Pumunta sa pahina ng seminar",
+    "consent": {
+      "title": "Bago mo i-on ang iyong mikropono",
+      "body": "Kung naka-on ang recording, captions o AI meeting notes sa seminar na ito, ang iyong boses ay maaaring ma-convert sa text, maiimbak at maisalin. Ang pagproseso ng boses ay ginagawa ng isang AI service sa labas ng iyong bansa. Kung hindi ka sumasang-ayon, bubukas pa rin ang iyong mic — ang iyong boses lang ang hindi isasama sa pagproseso.",
+      "privacy": "Patakaran sa privacy",
+      "newTab": "(bubukas sa bagong tab)",
+      "decline": "Hindi sumasang-ayon",
+      "agree": "Sumasang-ayon at i-on ang mic",
+      "notice": "Kapag naka-on ang recording, captions o AI meeting notes, pinoproseso ang mga boses ng mga nagsasalita. Hindi ipinapadala ang mga boses ng audience.",
+      "saveFailClosed": "Natapos na ang seminar na ito, kaya hindi maitala ang pahintulot"
+    },
+    "captions": {
+      "title": "Mga Caption",
+      "room": "Mga live caption (buong room)",
+      "show": "Ipakita ang mga caption",
+      "size": {
+        "label": "Laki ng text",
+        "sm": "Maliit",
+        "md": "Katamtaman",
+        "lg": "Malaki"
+      },
+      "waiting": "Lalabas ang mga caption kapag binuksan ng presenter ang mga ito",
+      "limit": "Naabot ang limitasyon sa pagproseso ng pagsasalita, kaya huminto ang mga caption at AI minutes",
+      "sendFail": "Hindi ma-on ang mga caption. Pakisubukang muli sa ilang sandali",
+      "sendFailOff": "Hindi ma-off ang mga caption. Pakisubukang muli sa ilang sandali",
+      "region": "Mga Caption",
+      "translate": "Ipakita ang mga isinaling caption",
+      "lang": "Wika ng pagsasalin",
+      "langMine": "Aking mga wika",
+      "langAll": "Lahat ng wika",
+      "trStop": {
+        "forbidden": "Ang mga isinaling caption ay para lamang sa mga rehistradong kalahok. Ipinapakita ang orihinal",
+        "unavailable": "Hindi available ang mga isinaling caption sa ngayon. Ipinapakita ang orihinal",
+        "quota": "Naabot na ng seminar na ito ang limitasyon sa pagsasalin. Ipinapakita ang orihinal",
+        "usrQuota": "Naubos mo na ang iyong limitasyon sa pagsasalin para sa seminar na ito. Ipinapakita ang orihinal"
+      },
+      "unsupported": "Hindi makagawa ng live caption ang device na ito (walang suporta sa pag-record ng audio sa browser na ito)"
+    },
+    "effects": {
+      "title": "Mga Epekto",
+      "light": "Pagwawasto ng ilaw",
+      "noise": "Bawasan ang ingay",
+      "noiseFail": "Hindi mabago ang pagbabawas ng ingay sa device na ito",
+      "close": "Isara",
+      "preview": "Aking preview",
+      "bg": "Background",
+      "bgNone": "Wala",
+      "bgBlur": "Blur",
+      "scenes": {
+        "beach": "🏝️ Maldives beach",
+        "autumn": "🍁 Autumn valley",
+        "fireplace": "🔥 Fireplace",
+        "xmas": "🎄 Christmas meeting room"
+      },
+      "bgs": {
+        "dusk": "Takipsilim",
+        "ocean": "Karagatan",
+        "forest": "Gubat",
+        "studio": "Studio",
+        "grid": "Grid",
+        "dots": "Mga Tulduk-tuldok"
+      },
+      "myAdd": "Aking larawan",
+      "myItem": "Aking larawan {n}",
+      "myDel": "Tanggalin ang aking larawan {n}",
+      "mySaveFail": "Na-apply ang background ngunit hindi na-save sa device na ito (para lang sa meeting na ito)",
+      "bgStopped": "Huminto ang background effect at pinatay. Piliin itong muli para i-restart",
+      "myNote": "Ang iyong mga larawan ay nakaimbak lamang sa device na ito (hanggang 3, 2 MB bawat isa)",
+      "mobileBlurOnly": "Sa mga telepono, blur background lang ang available (gumagana ang mga background ng larawan sa PC)",
+      "myTooBig": "Mga larawan lang na hanggang 2 MB ang maaaring gamitin",
+      "preparing": "Inihahanda…",
+      "bgFailed": "Hindi ma-load ang background effect",
+      "autoOff": "Masyadong mabagal ang iyong device, kaya pinatay ang background effect",
+      "unsupported": "Hindi available ang mga background effect sa device na ito",
+      "noCam": "I-on ang iyong camera para pumili ng background",
+      "lightUnsupported": "Hindi available ang light correction sa device na ito",
+      "noiseUnsupported": "Hindi suportado ang mga setting ng noise reduction sa device na ito"
+    },
+    "sheetClose": "Isara",
+    "polls": {
+      "new": "Bagong poll",
+      "question": "Tanong",
+      "option": "Opsyon {n}",
+      "remove": "Alisin ang opsyon {n}",
+      "addOption": "Magdagdag ng opsyon",
+      "start": "Simulan ang poll",
+      "cancel": "Kanselahin",
+      "dup": "Dapat magkaiba ang mga opsyon",
+      "vote": "Bumoto",
+      "change": "Baguhin ang boto",
+      "close": "Isara ang poll",
+      "closed": "Sarado",
+      "mine": "Ang iyong pinili",
+      "result": "{pct}% ({n} boto)",
+      "total": "{n} boto sa kabuuan",
+      "empty": "Wala pang poll.",
+      "loading": "Naglo-load…",
+      "labOnly": "Available lang ang mga poll sa mga seminar room.",
+      "started": "Nagsimula ang isang bagong poll",
+      "goVote": "Bumoto",
+      "votersNote": "Makikita ng organizer kung sino ang bumoto sa aling opsyon.",
+      "voters": "Bumoto: {names}"
+    },
+    "qna": {
+      "sort": "Pagbukud-bukurin",
+      "by": {
+        "top": "Nangunguna",
+        "new": "Pinakabago"
+      },
+      "rcm": "I-upvote ({n})",
+      "answered": "Nasagot",
+      "answer": "Markahan bilang nasagot",
+      "unanswer": "Alisin ang marka bilang nasagot",
+      "hide": "Itago",
+      "doneN": "{n} nasagot",
+      "backOpen": "Mga hindi nasagot na tanong",
+      "empty": "Wala pang tanong.",
+      "emptyDone": "Walang nasagot na tanong.",
+      "loading": "Naglo-load…",
+      "input": "Magtanong (500 chars)",
+      "send": "Ipadala",
+      "left": "{n} natitira",
+      "labOnly": "Available lang ang Q&A sa mga seminar room."
+    },
+    "recording": {
+      "title": "I-record",
+      "badge": "Nagre-record",
+      "unsupported": "Hindi kayang mag-record ng browser na ito. Mangyaring mag-record mula sa isang regular na browser sa isang computer.",
+      "piBrowserOnly": "Gumagana lang ang recording sa isang regular na browser (computer o mobile). Hindi kayang mag-save ng Pi Browser ng mga recording file — buksan ang seminar na ito sa isang computer o phone browser (seminarz.vercel.app) para mag-record.",
+      "audioSuspended": "Maaaring hindi nagsimula ang pag-record ng tunog sa device na ito. Ang larawan lang ang maaaring ma-record.",
+      "notifyFailed": "Hindi nagsimula ang recording dahil hindi maabisuhan ang mga kalahok. Pakisubukang muli sa ilang sandali.",
+      "confirm": {
+        "title": "Simulan ang recording?",
+        "body": "Kapag nagsimula ang recording, makikita ng lahat ang indicator na 'Nagre-record'. Ang file ay nai-save lamang sa device na ito at hindi kailanman ina-upload o inililipat sa ibang bansa. Mangyaring sabihin sa mga kalahok bago ka magsimula.",
+        "download": "Kapag huminto ka, isang MP4 file ang nai-save sa iyong downloads folder (ang mga browser na hindi kayang mag-record ng MP4 ay tumatagal ng ilang sandali upang i-convert ito; ang mga recording na mas mahaba sa humigit-kumulang 45 minuto ay maaaring panatilihin sa kanilang orihinal na format). Maaaring harangan ng mga in-app browser ang pag-save ng file, kaya mag-record mula sa isang regular na browser sa isang computer.",
+        "cancel": "Kanselahin",
+        "start": "Simulan ang recording",
+        "charge": "Habang nagre-record, ibinabawas ang oras ng recording mula sa iyong bayad na oras bukod pa sa oras ng room (2x habang nagre-record). Kapag naubos ang bayad na oras, humihinto ang recording at nai-save ang file."
+      },
+      "resave": {
+        "label": "Recording file",
+        "save": "I-save muli",
+        "dismiss": "Isara ang i-save muli"
+      },
+      "toast": {
+        "started": "Nagsimula ang recording — makikita ito ng lahat",
+        "saved": "Nai-save ang recording. Suriin ang iyong downloads folder. Kung walang nai-save, i-tap ang [I-save muli] sa tuktok ng screen.",
+        "autoStopped": "Natapos ang recording dahil pinahinto ito ng browser o naabot ang limitasyon sa laki. Nai-save ang lahat hanggang sa puntong iyon. Simulan muli ang recording para magpatuloy.",
+        "empty": "Walang na-record, kaya walang nagawang file.",
+        "saveFailed": "Hindi makagawa ng recording file.",
+        "converting": "Ikino-convert ang recording sa MP4. Mangyaring panatilihing bukas ang window na ito.",
+        "savedOriginal": "Hindi ma-convert sa MP4, kaya nai-save ang recording sa orihinal nitong format (webm). Suriin ang iyong downloads folder.",
+        "startedBy": "Sinimulan ng presenter ang recording",
+        "stoppedBy": "Pinahinto ng presenter ang recording"
+      },
+      "paidOnly": "Available lang ang recording sa mga seminar na binuksan sa Monthly o Yearly plan, habang may natitira pang bayad na oras.",
+      "planOut": "Naubos ang bayad na oras, kaya huminto ang recording at nai-save ang file.",
+      "notInRoom": "Kinukumpirma pa rin na nasa room ka. Simulan muli ang recording sa ilang sandali.",
+      "meterFailed": "Hindi masuri ang oras ng recording, kaya hindi nagsimula ang recording. Subukang muli sa ilang sandali.",
+      "paidOut": "Walang natitirang bayad na oras, kaya hindi masisimulan ang recording. Bilhin muli ang parehong plan para mag-record.",
+      "pausedBadge": "Naka-pause ang recording",
+      "controls": "Mga kontrol sa pagre-record",
+      "pause": "I-pause",
+      "resume": "Ipagpatuloy",
+      "stop": "Ihinto ang pagre-record"
+    },
+    "notes": {
+      "on": "Mga tala ng AI",
+      "badge": "Naka-on ang mga tala ng AI",
+      "started": "Binuksan ng presenter ang mga tala ng AI",
+      "stopped": "Naka-off ang mga tala ng AI",
+      "startedMine": "Naka-on ang mga tala ng AI — ipinapakita sa lahat",
+      "stoppedMine": "Naka-off ang mga tala ng AI — ginagawa ang mga tala",
+      "startFail": "Hindi masimulan ang mga tala ng AI",
+      "gone": "Huminto ang mga tala ng AI — tinapos o tinanggal ang mga tala sa ibang lugar",
+      "unsupported": "Hindi mabubuksan ang mga tala ng AI dito (walang suporta sa pagre-record ng audio)"
+    },
+    "dubbing": {
+      "listen": "Makinig sa isinaling boses",
+      "blocked": "Hindi ma-play ang isinaling boses. Paki-on itong muli",
+      "stopped": "Hindi available ang isinaling boses ngayon, kaya ito ay naka-off",
+      "usrQuota": "Naubos mo na ang iyong limitasyon sa isinaling boses para sa seminar na ito, kaya ito ay naka-off"
+    },
+    "plan": {
+      "warn": "{min} min na lang ang natitira sa plano ng seminar na ito.",
+      "ended": "Naubos ang oras ng iyong seminar, kaya natapos ang seminar at umalis ka sa silid.",
+      "left": "Natitirang oras ng seminar",
+      "closed": "Natapos ang seminar, kaya umalis ka sa silid.",
+      "hostAway": "Umalis ang host sa silid. Kung hindi sila babalik sa loob ng 5 minuto, aalisin ang lahat ng kalahok.",
+      "hostGone": "Hindi bumalik ang host sa loob ng 5 minuto, kaya umalis ka sa silid. Maaari kang pumasok muli kapag sumali na ang host."
+    },
+    "toLobby": "Waiting room"
+  },
+  "list": {
+    "tabsLabel": "View ng listahan ng seminar",
+    "tabs": {
+      "all": "Lahat",
+      "hosted": "Hosted ko",
+      "joined": "Sinalihan"
+    },
+    "empty": {
+      "all": "Walang paparating na seminar.",
+      "hosted": "Wala kang na-host na seminar.",
+      "joined": "Wala kang sinalihan na seminar."
+    },
+    "loading": "Naglo-load…",
+    "retry": "Subukang muli",
+    "free": "Libre",
+    "fee": "{amount} Pi",
+    "host": "Host {name}",
+    "capacity": "Kapasidad {n}",
+    "status": {
+      "SCHEDULED": "Naka-iskedyul",
+      "LIVE": "Live",
+      "ENDED": "Tapos na",
+      "CANCELED": "Kinansela"
+    },
+    "hostNew": "Gumawa ng seminar",
+    "progress": "Progress",
+    "pager": "Pagpapahina",
+    "prev": "Nakaraan",
+    "next": "Susunod",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Subtitle",
+      "placeholder": "Magdagdag ng subtitle",
+      "save": "I-save ang subtitle",
+      "saving": "Nagse-save…",
+      "saved": "Na-save."
+    },
+    "loading": "Naglo-load…",
+    "back": "Bumalik sa listahan",
+    "notFound": "Hindi makita ang seminar.",
+    "status": {
+      "SCHEDULED": "Naka-iskedyul",
+      "LIVE": "Live",
+      "ENDED": "Tapos na",
+      "CANCELED": "Kinansela"
+    },
+    "startAt": "Petsa",
+    "host": "Host",
+    "seats": "Natitirang upuan",
+    "seatsValue": "{left} / {max}",
+    "fee": "Bayad sa seminar",
+    "feeValue": "{amount} Pi",
+    "free": "Libre",
+    "enter": "Pumasok",
+    "payEnter": "Magbayad gamit ang Pi at pumasok ({amount} Pi)",
+    "paying": "Pinoproseso ang bayad…",
+    "joining": "Nagre-rehistro…",
+    "registered": "Ikaw ay rehistrado.",
+    "full": "Puno na ang seminar na ito.",
+    "closed": "Tapos na ang seminar na ito.",
+    "canceled": "Kinansela ang seminar na ito.",
+    "roomLink": "Pumunta sa silid (host)",
+    "piBrowserOnly": "Available ang pagbabayad sa Pi Browser pagkatapos ng Pi sign-in.",
+    "payCancelled": "Kinansela ang pagbabayad.",
+    "payStillWaiting": "Naghihintay pa rin sa wallet. Kung naka-sign in ka na sa Pi Wallet, mangyaring maghintay sandali.",
+    "payFailed": "Nabigo ang pagbabayad.",
+    "err": {
+      "NAME_TAKEN": "Ginagamit na ng iba ang pangalang iyan. Pumili ng iba.",
+      "CAL_READ_FAILED": "Hindi ma-load ang iyong mga event. Suriin ang address.",
+      "ISLAND_FULL": "Lahat ng 100 pangalan ng isla ay ginagamit ngayon. Maaari kang magbukas ng bagong seminar pagkatapos matapos o makansela ang paparating o live na seminar.",
+      "SMN_FULL": "Puno na ang seminar na ito.",
+      "SMN_CLOSED": "Natapos na o kinansela ang seminar na ito.",
+      "SMN_ALREADY": "Nakarehistro ka na o may pagbabayad na isinasagawa.",
+      "SMN_FREE": "Hindi tumatanggap ng bayad ang mga libreng seminar.",
+      "SMN_PAY_REQUIRED": "Ito ay isang bayad na seminar. Mangyaring magbayad upang makapasok.",
+      "SMN_PAY_INVALID": "Hindi namin ma-verify ang iyong bayad. Mangyaring makipag-ugnayan sa admin.",
+      "PAY_PI_FAILED": "Hindi maabot ang Pi payment server. Mangyaring subukang muli sa ilang sandali.",
+      "PAY_MISMATCH": "Hindi tugma ang mga detalye ng pagbabayad.",
+      "PAY_AMOUNT_MISMATCH": "Iba ang halaga ng pagbabayad sa bayad sa seminar.",
+      "PAY_CANCELLED": "Kinansela ang pagbabayad na ito.",
+      "PAY_ALREADY_PAID": "May pagbabayad pa ring pinoproseso. Kung nag-sign in ka sa wallet, subukang muli sa loob ng 3 minuto.",
+      "PAY_INVALID_STATE": "Hindi maproseso ang pagbabayad na ito ngayon.",
+      "PAY_PI_CANCEL_REFUSED": "Isinasagawa na ang pagbabayad at hindi ito maaaring kanselahin. Mangyaring suriin muli sa ilang sandali."
+    },
+    "share": {
+      "title": "Iskedyul at ibahagi",
+      "calendar": "Idagdag sa kalendaryo",
+      "ics": "File ng kalendaryo",
+      "mail": "Imbitahan sa email",
+      "mailApp": "Ipadala gamit ang default na mail app",
+      "mailSubject": "[Imbitasyon sa seminar] {title}",
+      "mailBody": "{title}\nKailan: {start}\n\nSumali nang direkta gamit ang link na ito.\nDesktop: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopyahin ang link",
+      "copied": "Nakopya ang link.",
+      "copyFail": "Hindi makopya. Mangyaring kopyahin ang link mula sa address bar.",
+      "share": "Ibahagi sa ibang app",
+      "shareFail": "Hindi maibahagi. Mangyaring gamitin ang Kopyahin ang link sa halip.",
+      "created": "Handa na ang iyong seminar. Idagdag ang oras ng pagsisimula nito sa iyong Google Calendar.",
+      "addGoogle": "Idagdag sa Google Calendar",
+      "later": "Mamaya",
+      "piBrowserOpen": "Sa Pi Browser, ang kalendaryo, email at ang file ng kalendaryo ay bubuksan sa default na browser ng iyong telepono.",
+      "extFail": "Hindi mabuksan. I-update ang Pi Browser, o gamitin ang Kopyahin ang link at buksan ito sa isang regular na browser (seminarz.vercel.app).",
+      "icsPiBrowser": "Maaaring i-download ang file ng kalendaryo sa isang regular na browser (computer o mobile) lamang. Sa Pi Browser, gamitin ang Idagdag sa kalendaryo sa halip."
+    },
+    "attendance": "Attendance",
+    "plan": "Plano",
+    "left": "Natitirang oras"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Nakaraang buwan",
+      "next": "Susunod na buwan",
+      "connect": "Ipakita ang aking Google Calendar",
+      "change": "Pamahalaan ang mga Google calendar ({n})",
+      "add": "Idagdag",
+      "remove": "Alisin",
+      "close": "Isara",
+      "failed": "Hindi ma-load ang mga event mula sa {n} (mga) kalendaryo. Suriin ang address.",
+      "badUrl": "Idikit ang 'Secret address in iCal format' (…/basic.ics) mula sa mga setting ng Google Calendar, hindi ang address bar ng browser.",
+      "full": "Maaari kang magdagdag ng hanggang {n} na kalendaryo.",
+      "allDay": "Buong araw",
+      "day": "Aking mga event sa araw na ito",
+      "count": "{n, plural, one {# event} other {# events}}",
+      "more": "+{n}",
+      "picked": "Ang petsang ito ay itinakda bilang petsa ng pagsisimula. Piliin ang oras sa ibaba.",
+      "s1": "I-tap ang [Buksan ang mga setting ng Google Calendar] sa ibaba.",
+      "s2": "Sa ilalim ng 'Mga setting para sa aking mga kalendaryo' sa kaliwa, pumili ng kalendaryo (hal. ang iyong pangalan).",
+      "s3": "Mag-scroll sa 'Isama ang kalendaryo' at kopyahin ang 'Secret address in iCal format'.",
+      "s4": "Idikit ito dito at i-tap ang [Idagdag] — lalabas ang mga pamagat ng event sa kalendaryo. Idagdag ang iba pang kalendaryo sa parehong paraan, hanggang 5.",
+      "open": "Buksan ang mga setting ng Google Calendar",
+      "privacy": "Ang address na ito ay isang susi sa iyong kalendaryo — huwag itong ibahagi. Ito ay nakaimbak sa device na ito lamang, hindi kailanman sa aming server."
+    },
+    "title": "Gumawa ng seminar",
+    "name": "Maglakbay tayo sa isang magandang isla!",
+    "subTitle": "Subtitle (opsyonal, hanggang 60)",
+    "startAt": "Oras ng pagsisimula",
+    "maxCnt": "Kapasidad (1–100)",
+    "submit": "Gumawa",
+    "submitting": "Gumagawa…",
+    "invalid": "Suriin ang iyong input — isang petsa sa loob ng isang taon mula ngayon, kapasidad 1–100.",
+    "attendance": {
+      "title": "Attendance",
+      "back": "Bumalik sa seminar",
+      "loading": "Naglo-load…",
+      "forbidden": "Ang host at mga admin lang ang makakakita ng attendance.",
+      "count": "{n} tao",
+      "csv": "I-download ang CSV",
+      "empty": "Wala pang sumasali.",
+      "online": "Online",
+      "left": "Umalis",
+      "col": {
+        "name": "Pangalan",
+        "pi": "Pi username",
+        "ent": "Unang sumali",
+        "hb": "Huling nakita",
+        "dur": "Oras ng pagdalo",
+        "min": "Dumalo (min, hindi kasama ang oras na wala)",
+        "state": "Status"
+      },
+      "durNote": "Ang oras ng pagdalo ay mula sa unang sumali hanggang sa huling nakita, minus ang oras na wala (mga agwat na mas mahaba sa 2.5 minuto).",
+      "csvPiBrowser": "Gumagana lang ang pag-download ng CSV sa isang regular na browser (computer o mobile). Hindi makapag-save ng mga file ang Pi Browser — buksan ang attendance sheet na ito sa isang computer o phone browser (seminarz.vercel.app)."
+    },
+    "plan": "Plano",
+    "planFree": "Libre — {time} natitira ngayong buwan · walang AI",
+    "planPaid": "{name} {time} · {price} — magbayad kapag gumagawa",
+    "planHint": "Ang isang seminar na binuksan sa isang bayad na plano ay gumagamit muna ng oras ng planong iyon, pagkatapos ay nagpapatuloy sa libreng oras ngayong buwan (walang AI sa libreng bahagi). Ang isang aktibong plano ay bubukas nang walang bayad; Ang Buwanan o Taunan na wala ka ay binabayaran sa Pi kapag pinindot mo ang Gumawa, pagkatapos ay bubukas ang seminar (Pi Browser). Ang pagsali ay palaging libre para sa mga kalahok.",
+    "planOwned": "{name} — aktibo · {time} natitira",
+    "planEnds": "Ang oras ng pagsisimula ay pagkatapos ng pag-expire ng pass ng planong ito. Ilipat ang pagsisimula nang mas maaga o pumili ng ibang plano.",
+    "paidKept": "Ang iyong bayad na pass ay pinananatili. Ayusin ang isyu at pindutin muli ang Gumawa (walang pangalawang bayad)."
+  },
+  "privacy": {
+    "title": "Patakaran sa Privacy — Mga Tampok ng Boses at AI",
+    "effective": "Epektibo {date}",
+    "intro": "Ipinaliliwanag ng patakarang ito ang personal na impormasyon na pinoproseso namin kapag ginagamit mo ang live na caption, isinaling caption, pagsasalin ng boses, mga tala ng pulong ng AI at mga personal na tala sa isang seminar. Gumagamit ang mga tampok na ito ng panlabas na serbisyo ng AI, kaya inililipat ang impormasyon sa ibang bansa.",
+    "whoTitle": "Kaninong impormasyon ang pinoproseso",
+    "who": [
+      "Mga presenter at kalahok sa entablado: humihingi kami ng iyong pahintulot nang isang beses, bago mo unang buksan ang iyong mikropono. Maaari kang sumali sa seminar nang walang pahintulot.",
+      "Audience: hindi ka gumagamit ng mikropono, kaya walang boses na ipinapadala. Nakikita mo lang ang mga caption at tala.",
+      "Mga personal na tala: isang admin ang nagre-record ng pulong gamit ang mikropono at kinukumpirma na naipaalam sa mga dumalo bago mag-record."
+    ],
+    "xferTitle": "Paglilipat ng personal na impormasyon sa ibang bansa (Batas sa Proteksyon ng Personal na Impormasyon ng Korea, Art. 28-8)",
+    "xfer": [
+      {
+        "k": "Tumatanggap",
+        "v": "Google LLC (Gemini API) — contact [TBD: Google privacy contact]"
+      },
+      {
+        "k": "Mga Bansa",
+        "v": "United States at iba pang bansa kung saan matatagpuan ang mga data center ng Google [TBD: processing region]"
+      },
+      {
+        "k": "Kailan at paano",
+        "v": "Humigit-kumulang bawat 5 segundo habang naka-on ang isang tampok, sa pamamagitan ng isang naka-encrypt na koneksyon (HTTPS). Para sa mga personal na tala, ang buong recording ay ipinapadala nang isang beses pa sa 5-minutong bahagi kapag natapos ang tala (tumpak na transkripsyon)."
+      },
+      {
+        "k": "Mga Item",
+        "v": "Boses, sinasalitang nilalaman (teksto), pangalan ng display ng nagsasalita (para sa mga buod ng tala), mga screenshot ng screen-share (kapag naka-on ang mga tala ng AI)"
+      },
+      {
+        "k": "Layunin",
+        "v": "Speech to text, pagsasalin, mga buod ng tala ng pulong, sintetikong pagsasalita (standard na boses, walang voice cloning), paghihiwalay ng nagsasalita para sa mga personal na tala (ang mga boses ay pinaghihiwalay at nilalagyan ng label ayon sa nakikitang kasarian, tulad ng Lalaki 1 / Babae 1 — walang mga pangalan o pagkakakilanlan na ipinapalagay)"
+      },
+      {
+        "k": "Pagpapanatili",
+        "v": "Nagtatapos sa sandaling maibalik ang resulta. Hinihiling namin sa Google na huwag mag-imbak ng mga kahilingan (store=false). Maaaring panatilihin pa rin ang mga log ng pagsubaybay sa pang-aabuso sa ilalim ng mga tuntunin ng Google [TBD: retention period and paid-tier status]."
+      },
+      {
+        "k": "Paano tumanggi, at ano ang mangyayari",
+        "v": "Kung hindi ka pumayag o i-off ang iyong mikropono, walang boses na ipinapadala. Maaari ka pa ring makilahok sa seminar; tanging ang mga caption, pagsasalin at tala ng iyong sariling pagsasalita ang hindi nilikha. Maaari mong bawiin ang pahintulot anumang oras [TBD: where the withdraw button is]."
+      }
+    ],
+    "keepTitle": "Ano ang pinananatili ng serbisyong ito",
+    "keep": [
+      "Orihinal na audio: para sa mga caption ng seminar at mga tala ng pulong ng AI hindi ito nakaimbak; ito ay itinatapon kaagad pagkatapos ng conversion sa teksto. Para sa mga personal na tala, ang recording ay pinananatili sa pribadong imbakan upang ito ay muling ma-transcribe nang mas tumpak (kasama ang mga nagsasalita) pagkatapos ng pulong, at ito ay tinatanggal sa pang-araw-araw na paglilinis kapag lumipas na ang 1 araw mula nang matapos ang tala (kaagad kung tinanggal ang tala).",
+      "Mga live na caption: hindi nakaimbak.",
+      "Mga tala ng pulong ng AI (kapag binuksan ng presenter): sinasalitang nilalaman, mga screenshot at ang buod, pinananatili hanggang sa matanggal ang mga tala [TBD: maximum retention].",
+      "Mga tala ng pahintulot: ang oras ng pahintulot at ang bersyon ng patakaran, pinananatili bilang patunay [TBD: retention period].",
+      "Paggamit: bawat minutong bilang ng kahilingan at oras ng pagproseso, ginagamit upang ipatupad ang mga limitasyon sa gastos.",
+      "Attendance: ang oras na sumali ka, ang oras na huling nakakonekta ka, ang iyong pangalan ng display at ang iyong Pi username ay nakaimbak at ibinibigay sa host bilang isang listahan ng attendance (sa screen at bilang isang CSV download). Pinananatili hanggang sa matanggal ang seminar.",
+      "Q&A at mga poll: ang teksto ng tanong at ang pangalan ng display ng nagtanong (o Pi username kung wala) ay nakikita ng bawat kalahok. Ang mga upvote ay nagpapakita lamang ng mga bilang, hindi kailanman kung sino ang nagbigay nito. Ang mga boto sa poll ay nagpapakita lamang ng mga bilang sa mga kalahok; nakikita ng organizer at mga admin, para sa bawat opsyon, ang pangalan ng display (o Pi username kung wala) ng bawat botante. Pinananatili, kasama ang mga nakatagong tanong, hanggang sa matanggal ang seminar."
+    ],
+    "recTitle": "Pagre-record",
+    "rec": "Ang mga recording ay nai-save lamang bilang isang file sa device ng presenter. Hindi sila ina-upload sa aming mga server o inililipat sa ibang bansa. Habang naka-on ang recording o mga tala ng AI, nakikita ng bawat kalahok ang isang indicator.",
+    "rightsTitle": "Ang iyong mga karapatan",
+    "rights": "Maaari kang humiling na i-access, itama, tanggalin o ihinto ang pagproseso ng iyong impormasyon. Makipag-ugnayan sa: [TBD: privacy officer name and contact]"
+  },
+  "notes": {
+    "title": "Mga Tala",
+    "back": "Bumalik sa seminar",
+    "loading": "Naglo-load…",
+    "meta": "Mga Tala · {date} · {min} min",
+    "aiWarn": "Buod na binuo ng AI — maaaring may mga pagkakamali",
+    "points": "Mga pangunahing punto",
+    "decisions": "Mga Desisyon",
+    "todos": "Mga item ng aksyon",
+    "shots": "Mga screen capture ({n})",
+    "transcript": "Transcript",
+    "download": "I-download ang Markdown",
+    "making": "Ginagawa ang mga tala…",
+    "makingLong": "Matagal ito. Mangyaring i-refresh mamaya",
+    "recording": "Nagre-record pa rin",
+    "failed": "Hindi makagawa ng buod — ang buong transcript ay nasa ibaba",
+    "retry": "Subukang muli",
+    "finish": "Tapusin ang pagre-record at buod",
+    "none": "Walang laman dito",
+    "blank": "Walang maibubuod — walang boses na naitala o masyadong maikli",
+    "notFound": "Hindi makita ang mga tala",
+    "forbidden": "Wala kang access sa mga talang ito",
+    "shotAlt": "Screen capture sa {at}",
+    "close": "Isara",
+    "view": "Tingnan ang mga tala",
+    "error": "Hindi ma-load",
+    "mine": "Aking mga tala",
+    "del": "Tanggalin ang mga tala",
+    "delAsk": "Tanggalin ang mga talang ito (buod, transcript at mga screen capture)? Walang sinuman ang makakakita sa kanila",
+    "delYes": "Tanggalin",
+    "delNo": "Kanselahin",
+    "delFail": "Hindi matanggal",
+    "dlFail": "Hindi ma-download — mangyaring subukang muli",
+    "recentNotes": "Mga kamakailang tala",
+    "empty": "Wala pang tala",
+    "newNote": "Magsimula ng mga personal na tala",
+    "inPerson": "Mga tala ng personal na pulong",
+    "inPersonTag": "Personal",
+    "titleLabel": "Pamagat",
+    "titlePh": "hal. Lingguhang pulong",
+    "told": "Naipaalam ko na sa lahat ng naroroon na ito ay ire-record at ipoproseso ng AI (kinakailangan)",
+    "toldWhy": "Bago ka magsimula, sabihin sa lahat ng naroroon na ang pag-uusap na ito ay ire-record (ang recording ay pinananatili sa loob ng 1 araw pagkatapos matapos ang tala, at ang mga nagsasalita ay pinaghihiwalay ayon sa boses at nilalagyan ng label ayon sa nakikitang kasarian) at gagawing teksto at buod ng isang panlabas na AI",
+    "start": "Simulan ang pagre-record",
+    "starting": "Naghahanda…",
+    "recBadge": "Nagre-record {time}",
+    "recentLines": "Mga pinakabagong linya",
+    "waiting": "Lalabas ang teksto dito habang nagsasalita ang mga tao",
+    "end": "Tapusin at gumawa ng mga tala",
+    "wakeWarn": "Maaaring huminto ang pagre-record kung mag-off ang screen",
+    "adminOnly": "Mga admin lang ang makakagamit nito",
+    "aiOff": "Hindi available ang mga tala ng AI sa ngayon (kailangan ng server setup). Nakalista sa ibaba ang mga nakaraang tala",
+    "reload": "I-reload",
+    "unsupported": "Hindi available ang pagre-record sa device na ito",
+    "micDenied": "Hindi magamit ang mikropono — suriin ang pahintulot",
+    "limited": "Naubos ang limitasyon sa oras ng pagproseso — tapusin at gawin ang mga tala",
+    "noAgr": "Huminto: walang kumpirmasyon ng abiso sa record — tapusin at simulan muli",
+    "micLost": "Na-disconnect ang mikropono at huminto ang pagre-record — i-tap ang Ikonekta muli ang mikropono o tapusin ang tala",
+    "micRetry": "Ikonekta muli ang mikropono",
+    "gone": "Ang tala na ito ay tinapos o tinanggal sa ibang lugar, kaya huminto ang pagre-record — gamitin ang button sa ibaba upang buksan ang mga tala",
+    "finishing": "Sinisave ang mga huling salita…",
+    "st": {
+      "RECORDING": "Nagre-record",
+      "SUMMARIZING": "Gumagawa",
+      "DONE": "Tapos na",
+      "FAILED": "Nabigo"
+    },
+    "downloadPiBrowser": "Gumagana lang ang pag-download ng Markdown sa isang regular na browser (computer o mobile). Hindi makapag-save ng mga file ang Pi Browser — buksan ang mga tala na ito sa isang computer o phone browser (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Mga Plano",
+    "loading": "Naglo-load…",
+    "free": "Libre",
+    "freeDesc": "{time} ng mga seminar bawat buwan (walang carry-over)",
+    "monthly": "Buwanan",
+    "yearly": "Taunan",
+    "paidDesc": "{time} ng mga seminar, valid sa loob ng {months} buwan",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Sinusuri ang presyo ng Pi",
+    "noAi": "Walang AI captions, translation, dubbing o note summaries",
+    "withAi": "Kasama ang AI captions, translation, dubbing at note summaries",
+    "buy": "Magbayad gamit ang Pi",
+    "bought": "Kumpleto na ang bayad. Naidagdag na ang oras ng seminar.",
+    "meRemain": "Natitirang oras: {time}",
+    "loginToBuy": "Mag-log in para bumili ng plano.",
+    "payNote": "Ang bayad ay palaging sa Pi. Ang halaga sa lokal na pera ay isang pamilyar na reference lamang; ang halaga ng Pi ay itinakda sa presyo ng Pi kapag nagbayad ka. Ang isang seminar sa isang bayad na plano ay gumagamit muna ng mga pass ng planong iyon (pinakaunang mag-e-expire muna), pagkatapos ay magpapatuloy sa libreng oras ngayong buwan.",
+    "charge": "Mag-top up ng oras",
+    "hm": "{h} oras {m} min",
+    "m": "{m} min",
+    "won": "KRW {n}",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (sinusuri ang presyo ng Pi)",
+    "h": "{h} oras"
+  },
+  "adminRooms": {
+    "title": "Pamamahala ng Kwarto",
+    "adminOnly": "Mga administrator lang ang makakatingin sa pahinang ito.",
+    "refresh": "I-refresh",
+    "count": "{n} bukas na kwarto",
+    "empty": "Walang bukas na kwarto sa ngayon.",
+    "lab": "Lab room",
+    "noSeminar": "Walang record ng seminar",
+    "peers": "{n} / {cap} konektado",
+    "producers": "{n} stream",
+    "end": "Magtatapos {time}",
+    "stale": "Tapos na ang seminar ngunit bukas pa rin ang kwarto sa video server — piliting isara ito.",
+    "close": "Piliting isara",
+    "confirmSeminar": "Magtatapos ito sa seminar at isasara ang kwarto. Lahat ay madidiskonekta.",
+    "confirmRoom": "Isasara nito ang kwarto. Lahat ay madidiskonekta.",
+    "confirmYes": "Isara",
+    "cancel": "Kanselahin",
+    "closing": "Isinasara…",
+    "closed": "Isinara ang kwarto.",
+    "metrics": "Mga sukatan ng video server (mula nang magsimula)",
+    "metricsOff": "Hindi ma-load ang mga sukatan.",
+    "m": {
+      "packetsIn": "Mga packet na pumasok",
+      "packetsOut": "Mga packet na lumabas",
+      "nackIn": "Mga NACK na natanggap",
+      "nackOut": "Mga NACK na ipinadala",
+      "retransmits": "Mga muling pagpapadala",
+      "duplicateNack": "Mga duplicate na NACK",
+      "cacheMiss": "Mga retransmit cache miss",
+      "pliOut": "Mga kahilingan sa keyframe (PLI)",
+      "keyframes": "Mga keyframe",
+      "layerSwitches": "Mga paglipat ng kalidad",
+      "queueDrops": "Mga pagbagsak ng queue"
+    }
+  },
+  "adminUsers": {
+    "title": "Mga User",
+    "adminOnly": "Mga administrator lang ang makakatingin sa pahinang ito.",
+    "search": "Maghanap ayon sa pangalan (2+ character)",
+    "searchBtn": "Maghanap",
+    "refresh": "I-refresh",
+    "count": "{n, plural, one {# user} other {# users}}",
+    "empty": "Walang user.",
+    "admin": "Admin",
+    "lastLogin": "Huling pag-sign in {time}",
+    "never": "Hindi kailanman nag-sign in",
+    "plan": {
+      "FREE": "Libre",
+      "M": "Buwanan",
+      "Y": "Taunan"
+    },
+    "until": "(hanggang {time})",
+    "manage": "Pamahalaan ang oras",
+    "close": "Isara",
+    "planLabel": "Plano",
+    "hours": "Mga Oras",
+    "minutes": "Mga Minuto",
+    "reason": "Dahilan (opsyonal)",
+    "sub": "Bawasan",
+    "confirmSub": "Bawasan ang oras ng {plan} ng {time}.",
+    "confirmYes": "Kumpirmahin",
+    "cancel": "Kanselahin",
+    "saving": "Nagsa-save…",
+    "done": "Na-apply. Natitirang oras ng {plan}: {time}",
+    "invalid": "Maglagay ng pagbawas sa pagitan ng 1 minuto at 1000 oras (buong minuto 0–59).",
+    "history": "Mga kamakailang pagsasaayos",
+    "noHistory": "Wala pang pagsasaayos.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Magbigay ng service pass (libreng oras)",
+    "svc": {
+      "H1": "1-oras na pass",
+      "D1": "1-araw na pass",
+      "M1": "1-buwan na pass"
+    },
+    "svcNote": "Ang mga service pass ay oras ng Libreng plano. Maaari itong gamitin mula ngayon para sa panahong iyon (1 oras, 24 oras, 1 buwan) sa mga libreng seminar at sa libreng bahagi ng mga bayad na seminar (walang AI features). Sa ilang pass, awtomatiko itong nauubos sa pagkakasunud-sunod na 1-oras → 1-araw → 1-buwan.",
+    "subTitle": "Bawasan ang oras",
+    "subNote": "Kinukuha muna mula sa mga pinakahuling mag-e-expire na pass. Kung mas marami iyon kaysa sa natitira, ang natitirang oras lang ang aalisin.",
+    "confirmSvc": "Magbigay ng {svc}.",
+    "doneSvc": "Nagbigay ng {svc}. Natitirang libreng oras: {time} (mag-e-expire ang pass {end})"
+  }
+}

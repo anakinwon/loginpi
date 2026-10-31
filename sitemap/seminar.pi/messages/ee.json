@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Reaalajas videoseminarid, millega liitud Pi-ga"
+  },
+  "home": {
+    "description": "Korraldajad avavad seminare ja osalejad liituvad reaalajas videoseanssidega Pi-ga.",
+    "badge": "Reaalajas seminarid kaunitel saartel",
+    "headline": "Vaata, kuula ja õpi koos – otseülekandes",
+    "ctaBrowse": "Sirvi seminare",
+    "ctaPlan": "Vaata pakette",
+    "features": {
+      "video": "Reaalajas video",
+      "caption": "Subtiitrid ja tõlge",
+      "notes": "AI koosoleku märkmed",
+      "pay": "Maksa Pi-ga"
+    },
+    "listTitle": "Seminarid",
+    "cal": {
+      "title": "Seminari kalender",
+      "desc": "Alates möödunud seminaridest kuni tulevasteni – üksikasjade nägemiseks puuduta kuupäeva.",
+      "legendSmn": "Seminarid",
+      "legendEnded": "Möödunud seminarid",
+      "legendMine": "Minu sündmused",
+      "failed": "Seminari kuupäevade laadimine ebaõnnestus. Palun proovi hiljem uuesti.",
+      "open": "Vaata üksikasju"
+    }
+  },
+  "nav": {
+    "link": "Lingi konto",
+    "privacy": "Privaatsuspoliitika",
+    "plan": "Paketid",
+    "rooms": "Tubade haldus",
+    "admin": "Administraator",
+    "users": "Kasutajate haldus",
+    "home": "Avaleht",
+    "privacyShort": "Privaatsus",
+    "menu": "Peamenüü",
+    "fold": "Ahenda menüü",
+    "unfold": "Laienda menüü"
+  },
+  "auth": {
+    "checking": "Sisselogimise kontrollimine…",
+    "signedIn": "{name}",
+    "inPerson": "Isiklikud märkmed",
+    "required": "Palun logi sisse oma Pi kontoga.",
+    "signIn": "Logi sisse Pi-ga",
+    "openInPiBrowser": "Selle lehe avamine Pi Browseris võimaldab teil Pi kontoga sisse logida.",
+    "authenticating": "Autentimine…",
+    "google": "Logi sisse Google'iga",
+    "signOut": "Logi välja",
+    "or": "või",
+    "linkRequired": "Olete sisse logitud Google'iga, kuid see pole veel Pi kontoga lingitud. Väljastage Pi Browseris linkimiskood ja sisestage see siia.",
+    "linkNeeded": "Vaja Pi konto linkimist",
+    "linkCheckFailed": "Konto linkimise olekut ei saanud kontrollida (ajutine serveri viga). Palun värskenda lehte mõne aja pärast."
+  },
+  "piOAuth": {
+    "signingIn": "Pi kontoga sisselogimine…",
+    "failed": "Pi sisselogimine ebaõnnestus. Palun proovi uuesti.",
+    "stateMismatch": "Sisselogimistaotlust ei saanud kinnitada (aegunud või teine vaheleht). Palun proovi uuesti.",
+    "retry": "Proovi uuesti",
+    "backHome": "Avalehele"
+  },
+  "link": {
+    "title": "Lingi konto",
+    "intro": "Ühendage Pi Browseris sisse logitud konto tavalises brauseris Google'i sisselogimisega. Pärast linkimist saate sama kontot kasutada ka arvutibrauseris.",
+    "checking": "Sisselogimise kontrollimine…",
+    "piIssueTitle": "Tavalises brauseris sisselogimiseks",
+    "codeHint": "Väljasta allolev kood, seejärel logi arvutibrauseris Google'iga sisse ja sisesta see konto linkimise lehele (10 minuti jooksul).",
+    "piIssue": "Väljasta linkimiskood",
+    "reissue": "Väljasta uus kood",
+    "expiresIn": "Aegub {min} minuti pärast",
+    "enterTitle": "Sisesta linkimiskood",
+    "enterHint": "Avage Pi Browseris seminar.pi → Lingi konto → Väljasta linkimiskood, seejärel sisestage 6-kohaline kood.",
+    "codeLabel": "Linkimiskood",
+    "submit": "Lingi",
+    "done": "Lingitud. Nüüd saad kasutada ka Google'i sisselogimist.",
+    "linked": "{name} konto on lingitud Google'i sisselogimisega."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Sisselogimine on vajalik",
+    "AUTH_PI_REQUIRED": "Pi sisselogimine on vajalik",
+    "AUTH_PI_SESSION_INVALID": "Sinu seanss aegus. Palun logi uuesti sisse",
+    "AUTH_PI_TOKEN_INVALID": "Pi sisselogimise kinnitamine ebaõnnestus",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Pi sisselogimise teave puudub",
+    "FORBIDDEN": "Sul puudub luba",
+    "BAD_REQUEST": "Vigane päring",
+    "BAD_REQUEST_BODY": "Vigane päring",
+    "INVALID_INPUT": "Vigane sisend",
+    "QUERY_FAILED": "Laadimine ebaõnnestus",
+    "SAVE_FAILED": "Salvestamine ebaõnnestus",
+    "INTERNAL": "Midagi läks valesti",
+    "SERVER_CONFIG": "Serveri konfiguratsiooniviga. Palun võta ühendust operaatoriga",
+    "PI_API_CONNECT_FAILED": "Pi Networkiga ühenduse loomine ebaõnnestus",
+    "DB_UNAVAILABLE": "Andmed pole ajutiselt saadaval. Palun proovi hiljem uuesti",
+    "NOT_FOUND": "Ei leitud",
+    "RATE_LIMITED": "Liiga palju päringuid. Palun proovi varsti uuesti",
+    "PAYLOAD_TOO_LARGE": "Päring on liiga suur",
+    "NETWORK": "Kontrolli oma võrguühendust",
+    "AUTH_PI_ACCOUNT_CONFLICT": "See Pi kasutajanimi on juba registreeritud erinevate mandaatidega. Palun võta ühendust administraatoriga",
+    "AUTH_PI_ACCOUNT_INACTIVE": "See konto on passiivne. Palun võta ühendust administraatoriga",
+    "AUTH_GOOGLE_REQUIRED": "Google'i sisselogimine on vajalik.",
+    "LINK_CODE_INVALID": "Linkimiskood on vale või aegunud. Väljastage Pi Browseris uus.",
+    "LINK_ALREADY_LINKED": "See konto on juba lingitud.",
+    "LINK_CODE_GEN_FAILED": "Linkimiskoodi loomine ebaõnnestus. Palun proovi hiljem uuesti.",
+    "AUTH_DB_UNAVAILABLE": "Sinu kontot ei saanud salvestada, seega sisselogimine ebaõnnestus. Palun proovi hiljem uuesti.",
+    "LINK_TRY_LIMIT": "Liiga palju valesid linkimiskoode. Proovi uuesti 15 minuti pärast.",
+    "PRICE_UNAVAILABLE": "Pi hinda ei õnnestunud saada. Palun proovi varsti uuesti",
+    "QUOTE_EXPIRED": "Maksepakkumine aegus. Palun maksa uuesti",
+    "PLAN_EXHAUSTED": "Oled kasutanud kogu oma seminariaja. Täienda pakettide lehel",
+    "HOST_AWAY": "Korraldaja pole toas. Saad siseneda pärast korraldaja liitumist",
+    "PLAN_AI_PAID": "AI funktsioonid on saadaval tasulistes pakettides",
+    "AI_UNAVAILABLE": "AI funktsioonid pole praegu saadaval",
+    "SPEECH_CHUNK_INVALID": "Helitüki formaat on vigane",
+    "SPEECH_NOT_LIVE": "See seminar ei ole otseülekanne",
+    "SPEECH_NO_AGR": "Nõusolek hääletöötluseks on vajalik",
+    "SPEECH_RATE": "Liiga palju häälepäringuid. Palun proovi varsti uuesti",
+    "SPEECH_QUOTA": "Selle seminari hääletöötlusaeg on ära kasutatud",
+    "SPEECH_USR_QUOTA": "Oled selle seminari jaoks ära kasutanud oma tõlke- ja tõlgitud hääle limiidi",
+    "SPEECH_FAILED": "Kõnet tekstiks teisendamine ebaõnnestus",
+    "SPEECH_STAGE_ONLY": "Ainult laval olevad inimesed saavad kasutada hääle subtiitreid",
+    "TRANSLATE_FAILED": "Subtiitrite tõlkimine ebaõnnestus",
+    "POLL_CLOSED": "See küsitlus on suletud",
+    "NOTE_NOT_RECORDING": "Need märkmed ei salvesta",
+    "NOTE_SHOT_INVALID": "Vigane ekraanipilt",
+    "NOTE_AUDIO_INVALID": "Vigane salvestusfail",
+    "NOTE_SHOT_RATE": "Liiga palju ekraanipilte",
+    "NOTE_RETRY_SOON": "Saad uuesti proovida minuti pärast",
+    "SPEECH_TTS_FAILED": "Tõlgitud hääle loomine ebaõnnestus",
+    "CAPTION_SIG_INVALID": "Seda subtiitrit ei saanud kinnitada, seega seda ei tõlgitud",
+    "PLAN_EXPIRES_BEFORE_START": "Algusaeg on pärast selle paketi kehtivuse lõppemist",
+    "PAY_ALREADY_PAID": "Makse on veel töötlemisel. Kui logisid rahakotti sisse, proovi uuesti 3 minuti pärast.",
+    "REC_PAID_ONLY": "Salvestamine on saadaval ainult kuu- või aastapaketi seminaridel, millel on tasulist aega jäänud",
+    "REC_NOT_IN_ROOM": "Kinnitame endiselt, et olete toas. Proovige mõne aja pärast uuesti",
+    "ENGINE_OFF": "Videoserveri administraatori võti pole konfigureeritud",
+    "ENGINE_UNAVAILABLE": "Videoverver ei vasta. Palun proovi varsti uuesti",
+    "ADJ_NOTHING": "Vähendamiseks pole jäänud aega"
+  },
+  "progress": {
+    "title": "Arenduse edenemine",
+    "subtitle": "Valmis, pooleli ja planeeritud, funktsioonide kaupa · seisuga {date}",
+    "overall": "Üldised sammud",
+    "stepsDone": "{done}/{total} sammu tehtud ({pct}%)",
+    "featureUnit": "funktsiooni",
+    "status": {
+      "done": "Valmis",
+      "doing": "Pooleli",
+      "todo": "Planeeritud",
+      "drop": "Katkestatud"
+    },
+    "features": {
+      "F01": {
+        "name": "Sisselogimine",
+        "desc": "Pi Browseri sisselogimine, Google'i sisselogimine teistes brauserites ja mõlema konto linkimine"
+      },
+      "F05": {
+        "name": "Reaalajas videoseminar",
+        "desc": "Meie oma video mootor Galápagos — eesmärk on üks esineja, kes edastab kuni 30 osalejale"
+      },
+      "F02": {
+        "name": "Loo seminar",
+        "desc": "Määra alapealkiri, aeg, maht ja seminari tasu seminari loomiseks (nimi = saar, automaatne)"
+      },
+      "F03": {
+        "name": "Seminaride loend ja üksikasjad",
+        "desc": "Sirvi avatud seminare lehekülgede kaupa ja vaata nende üksikasju"
+      },
+      "F04": {
+        "name": "Pi sisenemise makse",
+        "desc": "Maksa seminari tasu Pi-s; server kontrollib summat uuesti enne sisenemist"
+      },
+      "F06": {
+        "name": "Korraldaja väljamaksed",
+        "desc": "Maksa sisenemistasu tulu korraldajatele Pi-s"
+      },
+      "F07": {
+        "name": "Kordused",
+        "desc": "Vaata salvestatud seminare hiljem"
+      },
+      "FU": {
+        "name": "Koosoleku lisade alus",
+        "desc": "Üks signaalikanal lisadele, AI ühendus, hääletükid, mikrofoni nõusolek ja andmetabelid"
+      },
+      "F08": {
+        "name": "Ajakava ja jagamine",
+        "desc": "Kalendri link, sündmuse fail (.ics) ja e-posti kutse iga seminari jaoks"
+      },
+      "F09": {
+        "name": "Müra vähendamine ja valgustus",
+        "desc": "Vähenda mikrofoni müra ja heledamaks tumedat kaamera videot"
+      },
+      "F10": {
+        "name": "Reaalajas subtiitrid",
+        "desc": "Muuda esineja kõne tekstiks lava all"
+      },
+      "F11": {
+        "name": "Küsitlused, Q&A ja osavõtt",
+        "desc": "Korralda seminari ajal küsitlusi ja küsimusi; korraldajad laadivad alla osalejate nimekirja"
+      },
+      "F12": {
+        "name": "Taustiefektid",
+        "desc": "Hägusta oma tausta või asenda see eelseadistatud või oma pildiga (töödeldud sinu seadmes)"
+      },
+      "F13": {
+        "name": "Kohalik salvestamine",
+        "desc": "Esineja salvestab seminari oma seadmesse ja kõik näevad, et salvestamine on sisse lülitatud"
+      },
+      "F14": {
+        "name": "AI koosoleku märkmed",
+        "desc": "Kui esineja selle sisse lülitab, salvestatakse kõne ja ekraanid ning võetakse kokku põhipunktideks, otsusteks ja ülesanneteks"
+      },
+      "F15": {
+        "name": "Isiklikud koosoleku märkmed",
+        "desc": "Salvesta koosolek ainult mikrofoniga ja saa koosoleku märkmeid (administraatorid)"
+      },
+      "F16": {
+        "name": "Tõlgitud subtiitrid",
+        "desc": "Näita subtiitreid tõlgituna valitud keelde"
+      },
+      "F17": {
+        "name": "Kuula tõlkes",
+        "desc": "Loe tõlgitud subtiitreid sünteetilise häälega valjusti, samal ajal algset heli vaigistades"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browseri sisselogimine",
+      "googleLogin": "Google'i sisselogimine",
+      "accountLink": "Konto linkimine",
+      "deviceTest": "Kaamera seadme test",
+      "oneToTwo": "Esineja 1 → 2 osalejat",
+      "recovery": "Külmumise taastamine ja stabiilsus",
+      "structure": "Mootori struktuuri puhastamine",
+      "autoQuality": "Automaatne kvaliteet, 30 osalejat",
+      "roomService": "Tuppa sisenemine ja salvestamine",
+      "roomUi": "Toa ekraan (fuajee·lava·vestlus·käe tõstmine·modereerimine)",
+      "createForm": "Loomise ekraan",
+      "list": "Loend",
+      "detail": "Üksikasjad",
+      "payRequest": "Maksetaotlus",
+      "payVerify": "Summa uuesti kontrollimine ja sisenemine",
+      "settle": "Väljamakse",
+      "vod": "Salvestuse kordus",
+      "appRelay": "Mootori lisasignaalikanal",
+      "aiBase": "AI, hääletükid, nõusolek ja andmetabelid",
+      "shareLinks": "Kalendri link, .ics ja e-posti kutse",
+      "noiseLight": "Müra vähendamine ja valgustus",
+      "liveCaptions": "Reaalajas subtiitrid",
+      "pollQnaAttend": "Küsitlused, Q&A ja osalejate nimekiri",
+      "backgrounds": "Hägusus, eelseaded ja oma pilt",
+      "localRecording": "Esineja salvestamine ja salvestamise märk",
+      "aiNotes": "Salvestamine, kokkuvõte ja märkmete leht",
+      "inPersonNotes": "Ainult mikrofoni märkmed ja minu märkmed",
+      "captionTranslate": "Keele valik ja algse/tõlgitud vahetamine",
+      "dubbing": "Sünteetilise hääle taasesitus ja algse heli vaigistamine"
+    },
+    "refLabel": "Viitemudel",
+    "uiRef": "Kasutajaliidese baasjoon — laialdaselt kasutatava veebivideokoosoleku rakenduse ekraani- ja funktsioonimustrid, kohandatud seminar.pi jaoks"
+  },
+  "room": {
+    "rename": {
+      "later": "Nimi salvestati, kuid teisi ei saanud praegu teavitada. Nad näevad seda pärast sinu uuesti liitumist.",
+      "tile": "Klõpsa minu nime muutmiseks",
+      "menu": "Muuda minu nime",
+      "title": "Minu nimi selles seminaris",
+      "hint": "Kuni 30 märki. Kasutatakse ainult selles seminaris ja uuendatakse koheselt kõigi ekraanidel.",
+      "save": "Salvesta",
+      "saving": "Salvestamine…",
+      "cancel": "Tühista",
+      "taken": "See nimi on juba kellegi teise (korraldaja või osaleja) poolt kasutusel. Vali teine.",
+      "failed": "Sinu nime ei saanud salvestada. Proovi uuesti."
+    },
+    "roomTitle": {
+      "edit": "Klõpsa alapealkirja muutmiseks",
+      "label": "Alapealkiri",
+      "placeholder": "Alapealkiri (kuni 60)",
+      "save": "Salvesta",
+      "cancel": "Tühista",
+      "failed": "Alapealkirja ei saanud salvestada."
+    },
+    "mirror": "Peegelda minu videot",
+    "barPin": "Näita alumist riba alati",
+    "barAuto": "Peida alumine riba automaatselt",
+    "title": "Liitu seminariga · {room}",
+    "titleSeminar": "Ooteruum",
+    "noEngine": "Videoverver pole veel valmis.",
+    "joinAs": "Liitu kui",
+    "presenter": "Esineja",
+    "audience": "Publik",
+    "join": "Liitu kohe",
+    "nameLabel": "Nimi",
+    "audienceHint": "Publiku liikmed ei kasuta kaamerat ega mikrofoni. Pärast liitumist näed ja kuuled esinejat.",
+    "preview": {
+      "pending": "Kaamera ja mikrofoni ettevalmistamine…",
+      "audioOnly": "Kaamera pole saadaval – saadan ainult heli.",
+      "none": "Kaamera ja mikrofon pole saadaval. Kontrolli õigusi (saad siiski liituda ilma meediata).",
+      "videoOnly": "Mikrofon pole saadaval – saadan ainult videot. Kontrolli mikrofoni õigust."
+    },
+    "mic": {
+      "on": "Lülita mikrofon välja",
+      "off": "Lülita mikrofon sisse"
+    },
+    "cam": {
+      "on": "Lülita kaamera välja",
+      "off": "Lülita kaamera sisse"
+    },
+    "controls": "Kõne juhtnupud",
+    "leave": "Lahku",
+    "enableSound": "Lülita heli sisse",
+    "state": {
+      "connecting": "Ühendamine…",
+      "reconnecting": "Uuesti ühendamine…"
+    },
+    "waiting": "Ootan esinejat.",
+    "rejoin": "Liitu uuesti",
+    "err": {
+      "generic": "Midagi läks valesti. Palun liitu uuesti.",
+      "CLOSED": "Ühendus katkes.",
+      "NO_ENGINE": "Videoverver pole veel valmis.",
+      "TICKET_401": "Palun logi sisse.",
+      "TICKET_403": "Sul pole esitamiseks luba. Liitu publikuna.",
+      "TICKET_503": "Videoververi konfiguratsioon pole veel lõpetatud.",
+      "TICKET_NETWORK": "Kontrolli oma võrguühendust.",
+      "TICKET_INVALID": "Sinu sisenemispääse on aegunud.",
+      "TICKET_EXPIRED": "Sinu sisenemispääse on aegunud.",
+      "ROOM_FULL": "See seminar on täis.",
+      "ROOM_CLOSED": "Ruum suleti — seminar lõppes või korraldaja oli eemal üle 5 minuti.",
+      "DUPLICATE_SESSION": "Liitusite teisest seadmest, seega see ekraan ühendati lahti.",
+      "ROLE_FORBIDDEN": "Teil pole esitamiseks luba.",
+      "WS_FAILED": "Videoserveriga ei õnnestunud ühendust luua.",
+      "ICE_FAILED": "Videoühendus katkes. Kontrollige oma võrku.",
+      "MEDIA_FAILED": "Kaamerat või mikrofoni ei õnnestunud käivitada.",
+      "TIMEOUT": "Videoserver ei vasta.",
+      "TICKET_402": "See on tasuline seminar. Palun tasuge enne sisenemist seminari lehel.",
+      "TICKET_404": "Seminari ei leitud.",
+      "TICKET_409": "See seminar on lõppenud või tühistatud.",
+      "TICKET_HOST_AWAY": "Korraldaja pole veel liitunud või on olnud eemal üle 5 minuti, seega te ei saa siseneda. Palun proovige uuesti pärast korraldaja liitumist.",
+      "TICKET_PLAN_EXHAUSTED": "Selle seminari plaanil pole aega järel, seega ei saa see alata. Sama plaani uuesti ostmine lisab aega (tasuta uueneb järgmisel kuul 1 tunniga)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Mikrofoni ei õnnestunud muuta. Palun proovige uuesti.",
+        "video": "Kaamerat ei õnnestunud muuta. Palun proovige uuesti."
+      },
+      "forbidden": "Teil pole esitamiseks luba, seega jätkate publikuna.",
+      "demoted": "Teid viidi tagasi publiku hulka.",
+      "endFailed": "Seminari ei õnnestunud lõpetada. Palun proovige uuesti.",
+      "chatFailed": "Sõnumit ei saadetud.",
+      "actionFailed": "Päringut ei õnnestunud täita. Palun proovige uuesti.",
+      "shareFailed": "Ekraani jagamist ei õnnestunud alustada.",
+      "err": {
+        "RATE_LIMITED": "Saadate liiga kiiresti. Palun oodake hetk.",
+        "ROLE_FORBIDDEN": "Teil pole selleks tegevuseks luba.",
+        "MEDIA_FAILED": "Mikrofoni või kaamerat ei õnnestunud käivitada. Palun kontrollige õigusi.",
+        "LOCKED": "Esineja lukustas."
+      },
+      "mutedBy": {
+        "audio": "Esineja vaigistas teie mikrofoni.",
+        "video": "Esineja lülitas teie kaamera välja."
+      },
+      "policy": {
+        "locked": "Esineja lukustas mikrofonid. Saate oma sisse lülitada, kui need on avatud.",
+        "unlocked": "Mikrofonid on avatud."
+      },
+      "consent": {
+        "saveFail": "Teie nõusolekut ei õnnestunud salvestada. Kontrollige oma registreerimist ja lülitage mikrofon uuesti sisse."
+      }
+    },
+    "home": "Avalehele",
+    "tile": {
+      "fullscreen": "Topeltklõps täisekraanile · Esc väljumiseks",
+      "self": "{name} (sina)",
+      "presenter": "Esineja",
+      "micOff": "Mikrofon väljas",
+      "screen": "{name} ekraan",
+      "row": "Teised esinejad",
+      "pin": "Näita {name} suurelt",
+      "unpin": "Automaatne paigutus"
+    },
+    "more": "Rohkem valikuid",
+    "joinNoCam": "Liitu ilma kaamerata",
+    "net": {
+      "afterJoin": "Teie ühendust kontrollitakse automaatselt pärast liitumist.",
+      "measuring": "Ühenduse kontrollimine…",
+      "good": "Hea ühendus",
+      "fair": "Rahuldav ühendus",
+      "poor": "Nõrk ühendus",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% helisignaalist läheb kaduma.",
+          "video": "{pct}% videosignaalist läheb kaduma."
+        },
+        "rate": {
+          "audio": "Heli üleslaadimine on madal {kbps} kbps.",
+          "video": "Video üleslaadimine on madal {kbps} kbps. Kvaliteet võib langeda."
+        }
+      }
+    },
+    "people": "{n} ruumis",
+    "screen": {
+      "start": "Jaga ekraani",
+      "stop": "Lõpeta jagamine"
+    },
+    "panel": {
+      "title": "Vestlus · K&V · Küsitlused · Inimesed",
+      "chat": "Vestlus",
+      "people": "Inimesed",
+      "close": "Sulge paneel",
+      "qna": "K&V",
+      "polls": "Küsitlused"
+    },
+    "chat": {
+      "empty": "Sõnumeid veel pole. Vestlust ei salvestata.",
+      "me": "Sina",
+      "failed": "Ei saadetud.",
+      "retry": "Proovi uuesti",
+      "input": "Sisesta sõnum",
+      "send": "Saada"
+    },
+    "hand": {
+      "raise": "Tõsta käsi",
+      "lower": "Lase käsi alla",
+      "list": "Tõstetud käed",
+      "lowerAll": "Lase kõik käed alla",
+      "raised": "Käsi tõstetud",
+      "notice": "{name} tõstis käe.",
+      "dismiss": "Jäta tähelepanuta",
+      "waiting": "{n} inimest ootab sõna"
+    },
+    "react": {
+      "open": "Reaktsioonid",
+      "e0": "Meeldib",
+      "e1": "Aplaus",
+      "e2": "Naer",
+      "e3": "Üllatunud",
+      "e4": "Kurb",
+      "e5": "Sõnatu",
+      "e6": "Armastus"
+    },
+    "quality": {
+      "label": "Kvaliteet",
+      "auto": "Auto",
+      "high": "Kõrge",
+      "medium": "Keskmine",
+      "low": "Madal",
+      "unstable": "Teie võrk on ebastabiilne"
+    },
+    "roles": {
+      "presenter": "Esineja",
+      "panel": "Paneeliliige",
+      "audience": "Publik"
+    },
+    "stage": {
+      "invite": "Kutsu lavale",
+      "remove": "Liiguta publiku hulka",
+      "promoted": "Teid kutsuti lavale. Kui tõstsite käe, lülitub teie kaamera automaatselt sisse (välja arvatud juhul, kui see on lukustatud või pole lubatud). Lülitage mikrofon sisse, et rääkida (mikrofon ei lülitu automaatselt sisse).",
+      "later": "Hiljem"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} tõstis käe."
+    },
+    "leaveDialog": {
+      "title": "Lahku seminarilt",
+      "body": "Saate lahkuda ise või lõpetada seminari ja ühendada kõik lahti.",
+      "confirmTitle": "Lõpetada seminar?",
+      "confirmBody": "Kõik ühendatakse lahti ja keegi ei saa sellele seminarile uuesti liituda.",
+      "cancel": "Tühista",
+      "end": "Lõpeta seminar",
+      "endConfirm": "Lõpeta kohe"
+    },
+    "mod": {
+      "muteAll": "Vaigista kõik",
+      "lock": "Lukusta mikrofonid",
+      "unlock": "Ava mikrofonid",
+      "locked": "Esineja on mikrofonid lukustanud",
+      "muteMic": "Vaigista mikrofon",
+      "askMic": "Paluge vaigistus maha võtta",
+      "muteCam": "Lülita kaamera välja",
+      "muteMicOf": "Vaigista {name}",
+      "askMicOf": "Paluge {name} vaigistus maha võtta",
+      "muteCamOf": "Lülita {name} kaamera välja"
+    },
+    "ask": {
+      "audio": "Esineja palus teil mikrofoni sisse lülitada.",
+      "video": "Esineja palus teil kaamera sisse lülitada.",
+      "ignore": "Ignoreeri"
+    },
+    "toDetail": "Mine seminari lehele",
+    "consent": {
+      "title": "Enne mikrofoni sisselülitamist",
+      "body": "Kui selles seminaris on sisse lülitatud salvestamine, subtiitrid või AI koosoleku märkmed, võidakse teie hääl tekstiks teisendada, salvestada ja tõlkida. Hääletöötlust teostab AI teenus väljaspool teie riiki. Kui te ei nõustu, lülitub teie mikrofon siiski sisse – ainult teie häält ei töödelda.",
+      "privacy": "Privaatsuspoliitika",
+      "newTab": "(avaneb uuel vahelehel)",
+      "decline": "Ei nõustu",
+      "agree": "Nõustun ja lülitan mikrofoni sisse",
+      "notice": "Kui salvestamine, subtiitrid või AI koosoleku märkmed on sisse lülitatud, töödeldakse esinejate hääli. Publiku hääli ei saadeta.",
+      "saveFailClosed": "See seminar on lõppenud, seega nõusolekut ei saa salvestada."
+    },
+    "captions": {
+      "title": "Subtiitrid",
+      "room": "Reaalajas subtiitrid (kogu ruum)",
+      "show": "Näita subtiitreid",
+      "size": {
+        "label": "Teksti suurus",
+        "sm": "Väike",
+        "md": "Keskmine",
+        "lg": "Suur"
+      },
+      "waiting": "Subtiitrid ilmuvad, kui esineja need sisse lülitab.",
+      "limit": "Kõnetöötluse piirang on saavutatud, seega subtiitrid ja AI protokollid peatati.",
+      "sendFail": "Subtiitreid ei õnnestunud sisse lülitada. Palun proovige varsti uuesti.",
+      "sendFailOff": "Subtiitreid ei õnnestunud välja lülitada. Palun proovige varsti uuesti.",
+      "region": "Subtiitrid",
+      "translate": "Näita tõlgitud subtiitreid",
+      "lang": "Tõlke keel",
+      "langMine": "Minu keeled",
+      "langAll": "Kõik keeled",
+      "trStop": {
+        "forbidden": "Tõlgitud subtiitrid on ainult registreeritud osalejatele. Näitan originaali.",
+        "unavailable": "Tõlgitud subtiitrid pole praegu saadaval. Näitan originaali.",
+        "quota": "See seminar on saavutanud tõlkepiirangu. Näitan originaali.",
+        "usrQuota": "Olete selle seminari tõlkepiirangu ära kasutanud. Näitan originaali."
+      },
+      "unsupported": "See seade ei saa luua reaalajas subtiitreid (brauser ei toeta helisalvestust)."
+    },
+    "effects": {
+      "title": "Efektid",
+      "light": "Valguse korrigeerimine",
+      "noise": "Vähenda müra",
+      "noiseFail": "Müra vähendamist ei saa sellel seadmel muuta.",
+      "close": "Sulge",
+      "preview": "Minu eelvaade",
+      "bg": "Taust",
+      "bgNone": "Puudub",
+      "bgBlur": "Hägusta",
+      "scenes": {
+        "beach": "🏝️ Maldiivide rand",
+        "autumn": "🍁 Sügisorg",
+        "fireplace": "🔥 Kamin",
+        "xmas": "🎄 Jõulude koosolekuruum"
+      },
+      "bgs": {
+        "dusk": "Hämarik",
+        "ocean": "Ookean",
+        "forest": "Mets",
+        "studio": "Stuudio",
+        "grid": "Võrk",
+        "dots": "Punktid"
+      },
+      "myAdd": "Minu pilt",
+      "myItem": "Minu pilt {n}",
+      "myDel": "Kustuta minu pilt {n}",
+      "mySaveFail": "Taust on rakendatud, kuid seda ei õnnestunud sellele seadmele salvestada (ainult selleks koosolekuks).",
+      "bgStopped": "Taustaefekt peatus ja lülitati välja. Valige see uuesti, et taaskäivitada.",
+      "myNote": "Teie pildid salvestatakse ainult sellele seadmele (kuni 3, igaüks 2 MB).",
+      "mobileBlurOnly": "Telefonides on saadaval ainult hägune taust (pilditaustad töötavad arvutis).",
+      "myTooBig": "Kasutada saab ainult kuni 2 MB suuruseid pilte.",
+      "preparing": "Valmistumine…",
+      "bgFailed": "Taustaefekti ei õnnestunud laadida.",
+      "autoOff": "Teie seade on liiga aeglane, seega lülitati taustaefekt välja.",
+      "unsupported": "Taustaefektid pole sellel seadmel saadaval.",
+      "noCam": "Lülitage kaamera sisse, et valida taust.",
+      "lightUnsupported": "Valguse korrigeerimine pole sellel seadmel saadaval.",
+      "noiseUnsupported": "Müra vähendamise seaded pole sellel seadmel toetatud."
+    },
+    "sheetClose": "Sulge",
+    "polls": {
+      "new": "Uus küsitlus",
+      "question": "Küsimus",
+      "option": "Valik {n}",
+      "remove": "Eemalda valik {n}",
+      "addOption": "Lisa valik",
+      "start": "Alusta küsitlust",
+      "cancel": "Tühista",
+      "dup": "Valikud peavad olema erinevad.",
+      "vote": "Hääleta",
+      "change": "Muuda häält",
+      "close": "Sulge küsitlus",
+      "closed": "Suletud",
+      "mine": "Teie valik",
+      "result": "{pct}% ({n} häält)",
+      "total": "Kokku {n} häält",
+      "empty": "Küsitlusi veel pole.",
+      "loading": "Laadimine…",
+      "labOnly": "Küsitlused on saadaval ainult seminariruumides.",
+      "started": "Uus küsitlus on alanud.",
+      "goVote": "Hääleta",
+      "votersNote": "Korraldaja näeb, kes millise valiku poolt hääletas.",
+      "voters": "Hääletasid: {names}"
+    },
+    "qna": {
+      "sort": "Sorteeri",
+      "by": {
+        "top": "Populaarsemad",
+        "new": "Uusimad"
+      },
+      "rcm": "Poolt hääletatud ({n})",
+      "answered": "Vastatud",
+      "answer": "Märgi vastatuks",
+      "unanswer": "Tühista vastatuks märkimine",
+      "hide": "Peida",
+      "doneN": "{n} vastatud",
+      "backOpen": "Vastamata küsimused",
+      "empty": "Küsimusi veel pole.",
+      "emptyDone": "Vastatud küsimusi pole.",
+      "loading": "Laadimine…",
+      "input": "Esita küsimus (500 märki)",
+      "send": "Saada",
+      "left": "{n} järel",
+      "labOnly": "K&V on saadaval ainult seminariruumides."
+    },
+    "recording": {
+      "title": "Salvesta",
+      "badge": "Salvestamine",
+      "unsupported": "See brauser ei toeta salvestamist. Palun salvestage tavalise brauseriga arvutis.",
+      "piBrowserOnly": "Salvestamine töötab ainult tavalises brauseris (PC või mobiil). Pi Browser ei saa salvestusfaile salvestada – avage see seminar arvuti või telefoni brauseris (seminarz.vercel.app), et salvestada.",
+      "audioSuspended": "Helisalvestus ei pruugi sellel seadmel alata. Salvestada võidakse ainult pilti.",
+      "notifyFailed": "Salvestamine ei alanud, kuna osalejaid ei saanud teavitada. Palun proovige varsti uuesti.",
+      "confirm": {
+        "title": "Alustada salvestamist?",
+        "body": "Kui salvestamine algab, näevad kõik „Salvestamine“ indikaatorit. Fail salvestatakse ainult sellele seadmele ja seda ei laadita kunagi üles ega edastata välismaale. Palun teavitage osalejaid enne alustamist.",
+        "download": "Kui lõpetate, salvestatakse MP4-fail teie allalaadimiste kausta (brauserid, mis ei saa MP4-i salvestada, võtavad selle teisendamiseks hetke; üle umbes 45 minuti kestvad salvestused võidakse säilitada algses vormingus). Rakendusesisesed brauserid võivad failide salvestamise blokeerida, seega salvestage tavalise brauseriga arvutis.",
+        "cancel": "Tühista",
+        "start": "Alusta salvestamist",
+        "charge": "Salvestamise ajal arvestatakse salvestusaeg lisaks ruumi ajale teie tasulisest ajast maha (2x salvestamise ajal). Kui tasuline aeg otsa saab, salvestamine peatub ja fail salvestatakse."
+      },
+      "resave": {
+        "label": "Salvestusfail",
+        "save": "Salvesta uuesti",
+        "dismiss": "Sulge salvesta uuesti"
+      },
+      "toast": {
+        "started": "Salvestamine algas – kõik näevad seda.",
+        "saved": "Salvestus salvestatud. Kontrollige oma allalaadimiste kausta. Kui midagi ei salvestatud, puudutage ekraani ülaosas [Salvesta uuesti].",
+        "autoStopped": "Salvestamine lõppes, kuna brauser peatas selle või saavutati suuruse piirang. Kõik kuni selle hetkeni salvestati. Jätkamiseks alustage salvestamist uuesti.",
+        "empty": "Midagi ei salvestatud, seega faili ei loodud.",
+        "saveFailed": "Salvestusfaili ei õnnestunud luua.",
+        "converting": "Salvestuse teisendamine MP4-ks. Palun hoidke see aken avatuna.",
+        "savedOriginal": "MP4-ks teisendamine ebaõnnestus, seega salvestati salvestus algses vormingus (webm). Kontrollige oma allalaadimiste kausta.",
+        "startedBy": "Esineja alustas salvestamist.",
+        "stoppedBy": "Esineja lõpetas salvestamise."
+      },
+      "paidOnly": "Salvestamine on saadaval ainult seminarides, mis on avatud kuu- või aastaplaaniga, kui tasulist aega on järel.",
+      "planOut": "Tasuline aeg sai otsa, seega salvestamine peatus ja fail salvestati.",
+      "notInRoom": "Ikka kinnitame, et olete ruumis. Alustage salvestamist hetke pärast uuesti.",
+      "meterFailed": "Salvestusaega ei õnnestunud kontrollida, seega salvestamine ei alanud. Proovige hetke pärast uuesti.",
+      "paidOut": "Tasulist aega pole järel, seega salvestamine ei saa alata. Salvestamiseks ostke sama plaan uuesti.",
+      "pausedBadge": "Salvestamine peatatud",
+      "controls": "Salvestamise juhtnupud",
+      "pause": "Peata",
+      "resume": "Jätka",
+      "stop": "Lõpeta salvestamine"
+    },
+    "notes": {
+      "on": "AI märkmed",
+      "badge": "AI märkmed sees",
+      "started": "Esineja lülitas AI märkmed sisse",
+      "stopped": "AI märkmed välja lülitatud",
+      "startedMine": "AI märkmed sees — näidatakse kõigile",
+      "stoppedMine": "AI märkmed välja lülitatud — märkmete loomine",
+      "startFail": "AI märkmeid ei saanud käivitada",
+      "gone": "AI märkmed peatati — märkmed lõpetati või kustutati mujal",
+      "unsupported": "AI märkmeid ei saa siin sisse lülitada (heli salvestamise tugi puudub)"
+    },
+    "dubbing": {
+      "listen": "Kuula tõlgitud häälega",
+      "blocked": "Tõlgitud häält ei saanud esitada. Palun lülita see uuesti sisse",
+      "stopped": "Tõlgitud hääl pole praegu saadaval, seega lülitati see välja",
+      "usrQuota": "Olete selle seminari tõlgitud hääle limiidi ära kasutanud, seega lülitati see välja"
+    },
+    "plan": {
+      "warn": "Selle seminari plaanist on jäänud {min} min.",
+      "ended": "Teie seminari aeg sai otsa, seega seminar lõppes ja te lahkusite ruumist.",
+      "left": "Seminari jäänud aeg",
+      "closed": "Seminar on lõppenud, seega lahkusite ruumist.",
+      "hostAway": "Host on ruumist lahkunud. Kui ta 5 minuti jooksul tagasi ei tule, eemaldatakse kõik osalejad.",
+      "hostGone": "Host ei tulnud 5 minuti jooksul tagasi, seega lahkusite ruumist. Saate uuesti siseneda, kui host liitub."
+    },
+    "toLobby": "Ooteruum"
+  },
+  "list": {
+    "tabsLabel": "Seminari loendi vaade",
+    "tabs": {
+      "all": "Kõik",
+      "hosted": "Minu korraldatud",
+      "joined": "Liitutud"
+    },
+    "empty": {
+      "all": "Eelseisvaid seminare pole.",
+      "hosted": "Te pole ühtegi seminari korraldanud.",
+      "joined": "Te pole ühtegi seminariga liitunud."
+    },
+    "loading": "Laadimine…",
+    "retry": "Proovi uuesti",
+    "free": "Tasuta",
+    "fee": "{amount} Pi",
+    "host": "Host {name}",
+    "capacity": "Mahutavus {n}",
+    "status": {
+      "SCHEDULED": "Planeeritud",
+      "LIVE": "Otseülekanne",
+      "ENDED": "Lõppenud",
+      "CANCELED": "Tühistatud"
+    },
+    "hostNew": "Loo seminar",
+    "progress": "Edenemine",
+    "pager": "Lehekülgede nummerdamine",
+    "prev": "Eelmine",
+    "next": "Järgmine",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Subtiiter",
+      "placeholder": "Lisa subtiiter",
+      "save": "Salvesta subtiiter",
+      "saving": "Salvestamine…",
+      "saved": "Salvestatud."
+    },
+    "loading": "Laadimine…",
+    "back": "Tagasi loendisse",
+    "notFound": "Seminari ei leitud.",
+    "status": {
+      "SCHEDULED": "Planeeritud",
+      "LIVE": "Otseülekanne",
+      "ENDED": "Lõppenud",
+      "CANCELED": "Tühistatud"
+    },
+    "startAt": "Kuupäev",
+    "host": "Host",
+    "seats": "Vabu kohti",
+    "seatsValue": "{left} / {max}",
+    "fee": "Seminari tasu",
+    "feeValue": "{amount} Pi",
+    "free": "Tasuta",
+    "enter": "Sisene",
+    "payEnter": "Maksa Pi-ga ja sisene ({amount} Pi)",
+    "paying": "Makse töötlemine…",
+    "joining": "Registreerimine…",
+    "registered": "Olete registreeritud.",
+    "full": "See seminar on täis.",
+    "closed": "See seminar on lõppenud.",
+    "canceled": "See seminar tühistati.",
+    "roomLink": "Mine ruumi (host)",
+    "piBrowserOnly": "Makse on võimalik Pi Browseris pärast Pi sisselogimist.",
+    "payCancelled": "Makse tühistati.",
+    "payStillWaiting": "Ootame endiselt rahakoti vastust. Kui olete juba Pi Walletisse sisse loginud, palun oodake hetk.",
+    "payFailed": "Makse ebaõnnestus.",
+    "err": {
+      "NAME_TAKEN": "See nimi on juba kellegi teise poolt kasutusel. Valige mõni teine.",
+      "CAL_READ_FAILED": "Teie sündmusi ei saanud laadida. Kontrollige aadressi.",
+      "ISLAND_FULL": "Kõik 100 saare nime on praegu kasutusel. Saate avada uue seminari pärast eelseisva või toimuva seminari lõppemist või tühistamist.",
+      "SMN_FULL": "See seminar on täis.",
+      "SMN_CLOSED": "See seminar on lõppenud või tühistatud.",
+      "SMN_ALREADY": "Olete juba registreeritud või makse on pooleli.",
+      "SMN_FREE": "Tasuta seminarid ei nõua makset.",
+      "SMN_PAY_REQUIRED": "See on tasuline seminar. Palun makske sisenemiseks.",
+      "SMN_PAY_INVALID": "Teie makset ei saanud kinnitada. Palun võtke ühendust administraatoriga.",
+      "PAY_PI_FAILED": "Pi makseserveriga ei saanud ühendust. Palun proovige varsti uuesti.",
+      "PAY_MISMATCH": "Makseandmed ei ühti.",
+      "PAY_AMOUNT_MISMATCH": "Makse summa erineb seminari tasust.",
+      "PAY_CANCELLED": "See makse tühistati.",
+      "PAY_ALREADY_PAID": "Makse on veel töötlemisel. Kui logisite rahakotti sisse, proovige 3 minuti pärast uuesti.",
+      "PAY_INVALID_STATE": "Seda makset ei saa praegu töödelda.",
+      "PAY_PI_CANCEL_REFUSED": "Makse on juba pooleli ja seda ei saa tühistada. Palun kontrollige varsti uuesti."
+    },
+    "share": {
+      "title": "Ajakava ja jagamine",
+      "calendar": "Lisa kalendrisse",
+      "ics": "Kalendrifail",
+      "mail": "Kutsu e-posti teel",
+      "mailApp": "Saada vaikimisi meilirakendusega",
+      "mailSubject": "[Seminari kutse] {title}",
+      "mailBody": "{title}\nAeg: {start}\n\nLiitu otse selle lingiga.\nLauaarvuti: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopeeri link",
+      "copied": "Link kopeeritud.",
+      "copyFail": "Ei saanud kopeerida. Palun kopeerige link aadressiribalt.",
+      "share": "Jaga teise rakendusega",
+      "shareFail": "Ei saanud jagada. Palun kasutage selle asemel linki kopeerimist.",
+      "created": "Teie seminar on valmis. Lisage selle algusaeg oma Google'i kalendrisse.",
+      "addGoogle": "Lisa Google'i kalendrisse",
+      "later": "Hiljem",
+      "piBrowserOpen": "Pi Browseris avanevad kalender, e-post ja kalendrifail teie telefoni vaikebrauseris.",
+      "extFail": "Ei õnnestunud avada. Värskendage Pi Browserit või kasutage linki Kopeeri ja avage see tavalises brauseris (seminarz.vercel.app).",
+      "icsPiBrowser": "Kalendrifaili saab alla laadida ainult tavalises brauseris (arvuti või mobiil). Pi Browseris kasutage selle asemel valikut [Lisa kalendrisse]."
+    },
+    "attendance": "Kohalolek",
+    "plan": "Plaan",
+    "left": "Jäänud aeg"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Eelmine kuu",
+      "next": "Järgmine kuu",
+      "connect": "Näita minu Google'i kalendrit",
+      "change": "Halda Google'i kalendreid ({n})",
+      "add": "Lisa",
+      "remove": "Eemalda",
+      "close": "Sulge",
+      "failed": "Ei saanud laadida sündmusi {n} kalendrist/kalendritest. Kontrollige aadressi.",
+      "badUrl": "Kleepige Google'i kalendri seadetest 'Salajane aadress iCal-vormingus' (…/basic.ics), mitte brauseri aadressiribalt.",
+      "full": "Saate lisada kuni {n} kalendrit.",
+      "allDay": "Kogu päev",
+      "day": "Minu sündmused sel päeval",
+      "count": "{n, plural, one {# sündmus} other {# sündmust}}",
+      "more": "+{n}",
+      "picked": "See kuupäev on määratud alguskuupäevaks. Valige aeg allpool.",
+      "s1": "Puudutage allpool [Ava Google'i kalendri seaded].",
+      "s2": "Vasakul jaotises „Minu kalendrite seaded” valige kalender (nt teie nimi).",
+      "s3": "Kerige jaotiseni „Integreeri kalender” ja kopeerige „Salajane aadress iCal-vormingus”.",
+      "s4": "Kleepige see siia ja puudutage [Lisa] — sündmuste pealkirjad ilmuvad kalendrisse. Lisage samamoodi teisi kalendreid, kuni 5.",
+      "open": "Ava Google'i kalendri seaded",
+      "privacy": "See aadress on teie kalendri võti – ärge jagage seda. See salvestatakse ainult sellesse seadmesse, mitte kunagi meie serverisse."
+    },
+    "title": "Loo seminar",
+    "name": "Reisime kaunile saarele!",
+    "subTitle": "Subtiiter (valikuline, kuni 60)",
+    "startAt": "Algusaeg",
+    "maxCnt": "Mahutavus (1–100)",
+    "submit": "Loo",
+    "submitting": "Loomine…",
+    "invalid": "Kontrollige oma sisestust – kuupäev ühe aasta jooksul alates tänasest, mahutavus 1–100.",
+    "attendance": {
+      "title": "Kohalolek",
+      "back": "Tagasi seminari juurde",
+      "loading": "Laadimine…",
+      "forbidden": "Kohalolekut saavad vaadata ainult host ja administraatorid.",
+      "count": "{n} inimest",
+      "csv": "Laadi alla CSV",
+      "empty": "Keegi pole veel liitunud.",
+      "online": "Online",
+      "left": "Lahkunud",
+      "col": {
+        "name": "Nimi",
+        "pi": "Pi kasutajanimi",
+        "ent": "Esmakordselt liitunud",
+        "hb": "Viimati nähtud",
+        "dur": "Osavõtu aeg",
+        "min": "Osales (min, eemaloleku aeg välja arvatud)",
+        "state": "Olek"
+      },
+      "durNote": "Osavõtu aeg on esimesest liitumisest viimase nägemiseni, miinus eemaloleku aeg (üle 2,5 minuti pikkused lüngad).",
+      "csvPiBrowser": "CSV allalaadimine töötab ainult tavalises brauseris (arvuti või mobiil). Pi Browser ei saa faile salvestada – avage see kohalolekuleht arvuti või telefoni brauseris (seminarz.vercel.app)."
+    },
+    "plan": "Plaan",
+    "planFree": "Tasuta — {time} jäänud sel kuul · AI puudub",
+    "planPaid": "{name} {time} · {price} — maksa loomisel",
+    "planHint": "Tasulise plaaniga avatud seminar kasutab esmalt selle plaani aega, seejärel jätkab selle kuu tasuta ajaga (tasuta osas AI puudub). Aktiivne plaan avaneb ilma makseta; Kuu- või Aastaplaan, mida teil pole, makstakse Pi-ga, kui vajutate Loo, seejärel avaneb seminar (Pi Browser). Osalejatele on liitumine alati tasuta.",
+    "planOwned": "{name} — aktiivne · {time} jäänud",
+    "planEnds": "Algusaeg on pärast selle plaani kehtivuse lõppemist. Liigutage algusaega varasemaks või valige teine plaan.",
+    "paidKept": "Teie tasuline pääse on alles. Parandage probleem ja vajutage uuesti Loo (teist makset pole)."
+  },
+  "privacy": {
+    "title": "Privaatsuspoliitika — Hääle- ja AI-funktsioonid",
+    "effective": "Kehtiv alates {date}",
+    "intro": "See poliitika selgitab isikuandmeid, mida me töötleme, kui kasutate seminaril reaalajas subtiitreid, tõlgitud subtiitreid, häältõlget, AI koosolekumärkmeid ja kohapealseid märkmeid. Need funktsioonid kasutavad välist AI-teenust, seega edastatakse teave välismaale.",
+    "whoTitle": "Kelle teavet töödeldakse",
+    "who": [
+      "Esinejad ja laval olevad osalejad: küsime teie nõusolekut üks kord, enne kui lülitate esimest korda mikrofoni sisse. Saate seminariga liituda ilma nõusolekuta.",
+      "Publik: te ei kasuta mikrofoni, seega heli ei edastata. Näete ainult subtiitreid ja märkmeid.",
+      "Kohapealsed märkmed: administraator salvestab koosoleku mikrofoniga ja kinnitab, et osalejaid teavitati enne salvestamist."
+    ],
+    "xferTitle": "Isikuandmete edastamine välismaale (Korea isikuandmete kaitse seadus, art. 28-8)",
+    "xfer": [
+      {
+        "k": "Saaja",
+        "v": "Google LLC (Gemini API) — kontakt [TBD: Google'i privaatsuskontakt]"
+      },
+      {
+        "k": "Riigid",
+        "v": "Ameerika Ühendriigid ja teised riigid, kus asuvad Google'i andmekeskused [TBD: töötlemispiirkond]"
+      },
+      {
+        "k": "Millal ja kuidas",
+        "v": "Umbes iga 5 sekundi järel, kui funktsioon on sisse lülitatud, krüpteeritud ühenduse kaudu (HTTPS). Kohapealsete märkmete puhul saadetakse kogu salvestis veel kord 5-minutiliste osadena, kui märge lõpeb (täpne transkriptsioon)."
+      },
+      {
+        "k": "Üksused",
+        "v": "Hääl, räägitud sisu (tekst), kõneleja kuvatav nimi (märkmete kokkuvõtete jaoks), ekraanijagamise ekraanipildid (kui AI märkmed on sisse lülitatud)"
+      },
+      {
+        "k": "Eesmärk",
+        "v": "Kõne tekstiks muutmine, tõlkimine, koosolekumärkmete kokkuvõtted, sünteetiline kõne (standardhääled, hääle kloonimist pole), kõneleja eraldamine kohapealsete märkmete jaoks (hääled eristatakse ja märgistatakse tajutud soo järgi, näiteks Mees 1 / Naine 1 — nimesid ega identiteete ei tuletata)"
+      },
+      {
+        "k": "Säilitamine",
+        "v": "Lõpeb kohe, kui tulemus tagastatakse. Palume Google'il päringuid mitte salvestada (store=false). Kuritarvituste jälgimise logisid võidakse siiski säilitada Google'i tingimuste kohaselt [TBD: säilitamisperiood ja tasulise taseme staatus]."
+      },
+      {
+        "k": "Kuidas keelduda ja mis juhtub",
+        "v": "Kui te ei nõustu või lülitate mikrofoni välja, siis heli ei edastata. Saate siiski seminaril osaleda; ainult teie enda kõne subtiitreid, tõlkeid ja märkmeid ei looda. Nõusoleku saate igal ajal tagasi võtta [TBD: kus on tagasivõtmise nupp]."
+      }
+    ],
+    "keepTitle": "Mida see teenus säilitab",
+    "keep": [
+      "Algne heli: seminari subtiitrite ja AI koosolekumärkmete jaoks seda ei salvestata; see visatakse ära kohe pärast tekstiks teisendamist. Kohapealsete märkmete puhul hoitakse salvestist privaatses salvestusruumis, et seda saaks pärast koosolekut täpsemalt (kõnelejatega) uuesti transkribeerida, ja see kustutatakse igapäevase puhastuse käigus, kui märkmest on möödunud 1 päev (kohe, kui märge kustutatakse).",
+      "Reaalajas subtiitrid: ei salvestata.",
+      "AI koosolekumärkmed (kui esineja need sisse lülitab): räägitud sisu, ekraanipildid ja kokkuvõte, säilitatakse kuni märkmete kustutamiseni [TBD: maksimaalne säilitamine].",
+      "Nõusoleku andmed: nõusoleku aeg ja poliitika versioon, säilitatakse tõendina [TBD: säilitamisperiood].",
+      "Kasutus: minuti kohta päringute arv ja töötlemisaeg, mida kasutatakse kululimiitide jõustamiseks.",
+      "Kohalolek: teie liitumise aeg, viimase ühenduse aeg, teie kuvatav nimi ja teie Pi kasutajanimi salvestatakse ja antakse hostile kohaloleku nimekirjana (ekraanil ja CSV allalaadimisena). Säilitatakse kuni seminari kustutamiseni.",
+      "Küsimused ja vastused ning küsitlused: küsimuse tekst ja küsija kuvatav nimi (või Pi kasutajanimi, kui seda pole) on nähtavad kõigile osalejatele. Hääletused näitavad ainult arvu, mitte kunagi seda, kes need andis. Küsitluse hääletused näitavad osalejatele ainult arvu; korraldaja ja administraatorid näevad iga valiku kohta iga hääletaja kuvatavat nime (või Pi kasutajanime, kui seda pole). Säilitatakse, sealhulgas peidetud küsimused, kuni seminari kustutamiseni."
+    ],
+    "recTitle": "Salvestamine",
+    "rec": "Salvestised salvestatakse ainult failina esineja seadmesse. Neid ei laadita meie serveritesse ega edastata välismaale. Salvestamise või AI märkmete sisselülitamise ajal näeb iga osaleja indikaatorit.",
+    "rightsTitle": "Teie õigused",
+    "rights": "Saate paluda oma teabele juurdepääsu, seda parandada, kustutada või selle töötlemise peatada. Kontakt: [TBD: privaatsusametniku nimi ja kontakt]"
+  },
+  "notes": {
+    "title": "Märkmed",
+    "back": "Tagasi seminari juurde",
+    "loading": "Laadimine…",
+    "meta": "Märkmed · {date} · {min} min",
+    "aiWarn": "AI loodud kokkuvõte — see võib sisaldada vigu",
+    "points": "Põhipunktid",
+    "decisions": "Otsused",
+    "todos": "Tegevused",
+    "shots": "Ekraanipildid ({n})",
+    "transcript": "Transkriptsioon",
+    "download": "Laadi alla Markdown",
+    "making": "Märkmete loomine…",
+    "makingLong": "See võtab aega. Palun värskendage hiljem",
+    "recording": "Ikka salvestab",
+    "failed": "Kokkuvõtet ei saanud luua — täielik transkriptsioon on allpool",
+    "retry": "Proovi uuesti",
+    "finish": "Lõpeta salvestamine ja tee kokkuvõte",
+    "none": "Siin pole midagi",
+    "blank": "Midagi kokku võtta pole — kõnet ei salvestatud või see oli liiga lühike",
+    "notFound": "Märkmeid ei leitud",
+    "forbidden": "Teil pole nendele märkmetele juurdepääsu",
+    "shotAlt": "Ekraanipilt kell {at}",
+    "close": "Sulge",
+    "view": "Vaata märkmeid",
+    "error": "Ei saanud laadida",
+    "mine": "Minu märkmed",
+    "del": "Kustuta märkmed",
+    "delAsk": "Kustutada need märkmed (kokkuvõte, transkriptsioon ja ekraanipildid)? Keegi ei saa neid enam näha",
+    "delYes": "Kustuta",
+    "delNo": "Tühista",
+    "delFail": "Ei saanud kustutada",
+    "dlFail": "Ei saanud alla laadida — palun proovige uuesti",
+    "recentNotes": "Hiljutised märkmed",
+    "empty": "Märkmeid pole veel",
+    "newNote": "Alusta kohapealseid märkmeid",
+    "inPerson": "Kohapealse koosoleku märkmed",
+    "inPersonTag": "Kohapeal",
+    "titleLabel": "Pealkiri",
+    "titlePh": "nt Iganädalane koosolek",
+    "told": "Olen teavitanud kõiki kohalviibijaid, et seda salvestatakse ja töödeldakse AI abil (nõutav)",
+    "toldWhy": "Enne alustamist teavitage kõiki kohalviibijaid, et see vestlus salvestatakse (salvestis säilitatakse 1 päev pärast märkme lõppemist ja kõnelejad eristatakse hääle järgi ning märgistatakse tajutud soo järgi) ja muudetakse välise AI abil tekstiks ja kokkuvõtteks",
+    "start": "Alusta salvestamist",
+    "starting": "Valmistumine…",
+    "recBadge": "Salvestamine {time}",
+    "recentLines": "Viimased read",
+    "waiting": "Tekst ilmub siia, kui inimesed räägivad",
+    "end": "Lõpeta ja loo märkmed",
+    "wakeWarn": "Salvestamine võib ekraani väljalülitamisel peatuda",
+    "adminOnly": "Ainult administraatorid saavad seda kasutada",
+    "aiOff": "AI märkmed pole praegu saadaval (vajalik serveri seadistamine). Varasemad märkmed on loetletud allpool",
+    "reload": "Laadi uuesti",
+    "unsupported": "Salvestamine pole selles seadmes saadaval",
+    "micDenied": "Mikrofoni ei saa kasutada – kontrolli luba",
+    "limited": "Töötlusaja piirang on täis – lõpeta ja loo märkmed",
+    "noAgr": "Peatatud: salvestamisel pole teavitust kinnitatud – lõpeta ja alusta uuesti",
+    "micLost": "Mikrofon ühendati lahti ja salvestamine peatus – puuduta „Ühenda mikrofon uuesti” või lõpeta märge",
+    "micRetry": "Ühenda mikrofon uuesti",
+    "gone": "See märge lõpetati või kustutati mujal, seega salvestamine peatus – kasuta allolevat nuppu märkmete avamiseks",
+    "finishing": "Viimaste sõnade salvestamine…",
+    "st": {
+      "RECORDING": "Salvestamine",
+      "SUMMARIZING": "Loomine",
+      "DONE": "Valmis",
+      "FAILED": "Ebaõnnestus"
+    },
+    "downloadPiBrowser": "Märkmefaili allalaadimine töötab ainult tavalises brauseris (arvutis või mobiilis). Pi Browser ei saa faile salvestada – ava need märkmed arvuti või telefoni brauseris (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Paketid",
+    "loading": "Laadimine…",
+    "free": "Tasuta",
+    "freeDesc": "{time} seminare iga kuu (ei kandu edasi)",
+    "monthly": "Igakuine",
+    "yearly": "Aastane",
+    "paidDesc": "{time} seminare, kehtib {months} kuud",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Pi hinna kontrollimine",
+    "noAi": "Puuduvad AI subtiitrid, tõlge, dubleerimine ega märkmete kokkuvõtted",
+    "withAi": "Sisaldab AI subtiitreid, tõlget, dubleerimist ja märkmete kokkuvõtteid",
+    "buy": "Maksa Pi-ga",
+    "bought": "Makse on lõpetatud. Seminari aeg on lisatud.",
+    "meRemain": "Aega jäänud: {time}",
+    "loginToBuy": "Logi sisse, et paketti osta.",
+    "payNote": "Makse toimub alati Pi-ga. Kohaliku valuuta summa on ainult tuttav viide; Pi summa määratakse Pi hinnaga maksmise hetkel. Tasulise paketiga seminar kasutab esmalt selle paketi pääsmeid (esimesena aeguvad esimesena), seejärel jätkab selle kuu tasuta ajaga.",
+    "charge": "Laadi aega",
+    "hm": "{h} t {m} min",
+    "m": "{m} min",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (Pi hinna kontrollimine)",
+    "h": "{h} t"
+  },
+  "adminRooms": {
+    "title": "Ruumi haldamine",
+    "adminOnly": "Ainult administraatorid saavad seda lehte vaadata.",
+    "refresh": "Värskenda",
+    "count": "{n} avatud tuba",
+    "empty": "Praegu pole ühtegi avatud tuba.",
+    "lab": "Labori ruum",
+    "noSeminar": "Seminari kirjet pole",
+    "peers": "{n} / {cap} ühendatud",
+    "producers": "{n} voogu",
+    "end": "Lõpeb {time}",
+    "stale": "Seminar on lõppenud, kuid ruum on videoververis endiselt avatud – sulge see jõuga.",
+    "close": "Sulge jõuga",
+    "confirmSeminar": "See lõpetab seminari ja sulgeb ruumi. Kõik ühendatakse lahti.",
+    "confirmRoom": "See sulgeb ruumi. Kõik ühendatakse lahti.",
+    "confirmYes": "Sulge",
+    "cancel": "Tühista",
+    "closing": "Sulgemine…",
+    "closed": "Ruum suletud.",
+    "metrics": "Videoververi mõõdikud (alates algusest)",
+    "metricsOff": "Mõõdikuid ei õnnestunud laadida.",
+    "m": {
+      "packetsIn": "Paketid sisse",
+      "packetsOut": "Paketid välja",
+      "nackIn": "NACK-id vastu võetud",
+      "nackOut": "NACK-id saadetud",
+      "retransmits": "Uuesti edastamised",
+      "duplicateNack": "Dublikaat NACK-id",
+      "cacheMiss": "Uuesti edastamise vahemälu möödalaskmised",
+      "pliOut": "Võtmekaadri päringud (PLI)",
+      "keyframes": "Võtmekaadrid",
+      "layerSwitches": "Kvaliteedi lülitused",
+      "queueDrops": "Järjekorra katkestused"
+    }
+  },
+  "adminUsers": {
+    "title": "Kasutajad",
+    "adminOnly": "Ainult administraatorid saavad seda lehte vaadata.",
+    "search": "Otsi nime järgi (2+ märki)",
+    "searchBtn": "Otsi",
+    "refresh": "Värskenda",
+    "count": "{n, plural, one {# kasutaja} other {# kasutajat}}",
+    "empty": "Kasutajaid pole.",
+    "admin": "Admin",
+    "lastLogin": "Viimane sisselogimine {time}",
+    "never": "Pole kunagi sisse loginud",
+    "plan": {
+      "FREE": "Tasuta",
+      "M": "Igakuine",
+      "Y": "Aastane"
+    },
+    "until": "(kuni {time})",
+    "manage": "Halda aega",
+    "close": "Sulge",
+    "planLabel": "Pakett",
+    "hours": "Tunnid",
+    "minutes": "Minutid",
+    "reason": "Põhjus (valikuline)",
+    "sub": "Vähenda",
+    "confirmSub": "Vähenda {plan} aega {time} võrra.",
+    "confirmYes": "Kinnita",
+    "cancel": "Tühista",
+    "saving": "Salvestamine…",
+    "done": "Rakendatud. {plan} aega jäänud: {time}",
+    "invalid": "Sisesta vähendus vahemikus 1 minut kuni 1000 tundi (täisminutid 0–59).",
+    "history": "Hiljutised kohandused",
+    "noHistory": "Kohandusi pole veel tehtud.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Anna teenusepääse (tasuta aeg)",
+    "svc": {
+      "H1": "1-tunni pääse",
+      "D1": "1-päeva pääse",
+      "M1": "1-kuu pääse"
+    },
+    "svcNote": "Teenusepääsmed on tasuta paketi aeg. Neid saab kasutada alates praegusest selle perioodi jooksul (1 tund, 24 tundi, 1 kuu) tasuta seminaridel ja tasuliste seminaride tasuta osas (AI funktsioonid puuduvad). Mitme pääsme korral kasutatakse need automaatselt ära järjekorras 1-tund → 1-päev → 1-kuu.",
+    "subTitle": "Vähenda aega",
+    "subNote": "Võtab esmalt kõige hiljem aeguvatelt pääsmetelt. Kui see on rohkem kui jäänud, eemaldatakse ainult jäänud aeg.",
+    "confirmSvc": "Anna {svc}.",
+    "doneSvc": "Andis {svc}. Tasuta aega jäänud: {time} (pääse aegub {end})"
+  }
+}

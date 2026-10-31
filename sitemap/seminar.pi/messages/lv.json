@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Mainīt valodu",
-      "search": "Meklēt valodu",
-      "empty": "Nav rezultātu"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Tiešraides video semināri, kuriem pievienojaties ar Pi"

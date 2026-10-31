@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Keisti kalbą",
-      "search": "Ieškoti kalbos",
-      "empty": "Nėra rezultatų"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Tiesioginiai vaizdo seminarai, kuriuose dalyvaujate su Pi"

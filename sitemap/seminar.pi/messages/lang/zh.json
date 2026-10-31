@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "通过 Pi 参与的实时视频研讨会"
+  },
+  "home": {
+    "description": "主持人开设研讨会，参与者使用 Pi 加入实时视频会议。",
+    "badge": "在美丽岛屿上举办的实时研讨会",
+    "headline": "观看、聆听、共同学习 — 实时",
+    "ctaBrowse": "浏览研讨会",
+    "ctaPlan": "查看计划",
+    "features": {
+      "video": "实时视频",
+      "caption": "字幕与翻译",
+      "notes": "AI 会议记录",
+      "pay": "用 Pi 支付"
+    },
+    "listTitle": "研讨会",
+    "cal": {
+      "title": "研讨会日历",
+      "desc": "从过去的研讨会到即将举行的研讨会 — 点击日期查看详情。",
+      "legendSmn": "研讨会",
+      "legendEnded": "过去的研讨会",
+      "legendMine": "我的活动",
+      "failed": "无法加载研讨会日期。请稍后重试。",
+      "open": "查看详情"
+    }
+  },
+  "nav": {
+    "link": "关联账户",
+    "privacy": "隐私政策",
+    "plan": "计划",
+    "rooms": "房间管理",
+    "admin": "管理员",
+    "users": "用户管理",
+    "home": "首页",
+    "privacyShort": "隐私",
+    "menu": "主菜单",
+    "fold": "折叠菜单",
+    "unfold": "展开菜单"
+  },
+  "auth": {
+    "checking": "正在检查登录…",
+    "signedIn": "{name}",
+    "inPerson": "面对面笔记",
+    "required": "需要 Pi 账户登录。",
+    "signIn": "用 Pi 登录",
+    "openInPiBrowser": "在 Pi Browser 中打开此页面，以使用您的 Pi 账户登录。",
+    "authenticating": "正在认证…",
+    "google": "用 Google 登录",
+    "signOut": "退出登录",
+    "or": "或",
+    "linkRequired": "您已通过 Google 登录，但尚未关联 Pi 账户。请在 Pi Browser 中生成关联代码并在此处输入。",
+    "linkNeeded": "需要关联 Pi 账户",
+    "linkCheckFailed": "无法检查您的账户关联状态（临时服务器错误）。请稍后刷新。"
+  },
+  "piOAuth": {
+    "signingIn": "正在使用您的 Pi 账户登录…",
+    "failed": "Pi 登录失败。请重试。",
+    "stateMismatch": "无法验证此登录请求（已过期或在其他标签页）。请重试。",
+    "retry": "重试",
+    "backHome": "首页"
+  },
+  "link": {
+    "title": "关联账户",
+    "intro": "将您在 Pi Browser 中登录的账户与常规浏览器中的 Google 登录关联。关联后，您可以在 PC 浏览器上使用同一账户。",
+    "checking": "正在检查登录…",
+    "piIssueTitle": "若要在常规浏览器中登录",
+    "codeHint": "生成以下代码，然后在 PC 等常规浏览器中通过 Google 登录，并在“关联账户”页面输入（10 分钟内有效）。",
+    "piIssue": "生成关联代码",
+    "reissue": "重新生成代码",
+    "expiresIn": "{min} 分钟后过期",
+    "enterTitle": "输入关联代码",
+    "enterHint": "在 Pi Browser 中打开 seminar.pi → 关联账户 → 生成关联代码，然后输入 6 位数代码。",
+    "codeLabel": "关联代码",
+    "submit": "关联",
+    "done": "已关联。您现在也可以使用 Google 登录。",
+    "linked": "{name} 账户已与 Google 登录关联。"
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "需要登录",
+    "AUTH_PI_REQUIRED": "需要 Pi 登录",
+    "AUTH_PI_SESSION_INVALID": "您的会话已过期。请重新登录",
+    "AUTH_PI_TOKEN_INVALID": "Pi 登录验证失败",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "缺少 Pi 登录信息",
+    "FORBIDDEN": "您没有权限",
+    "BAD_REQUEST": "请求错误",
+    "BAD_REQUEST_BODY": "请求错误",
+    "INVALID_INPUT": "输入无效",
+    "QUERY_FAILED": "加载失败",
+    "SAVE_FAILED": "保存失败",
+    "INTERNAL": "处理过程中发生错误",
+    "SERVER_CONFIG": "服务器配置错误。请联系管理员",
+    "PI_API_CONNECT_FAILED": "无法连接 Pi Network",
+    "DB_UNAVAILABLE": "数据暂时不可用。请稍后重试",
+    "NOT_FOUND": "未找到",
+    "RATE_LIMITED": "请求过多。请稍后重试",
+    "PAYLOAD_TOO_LARGE": "请求过大",
+    "NETWORK": "检查您的网络连接",
+    "AUTH_PI_ACCOUNT_CONFLICT": "此 Pi 用户名已使用不同的凭据注册。请联系管理员",
+    "AUTH_PI_ACCOUNT_INACTIVE": "此账户已停用。请联系管理员",
+    "AUTH_GOOGLE_REQUIRED": "需要 Google 登录。",
+    "LINK_CODE_INVALID": "关联代码无效或已过期。请在 Pi Browser 中重新生成。",
+    "LINK_ALREADY_LINKED": "此账户已关联。",
+    "LINK_CODE_GEN_FAILED": "无法生成关联代码。请稍后重试。",
+    "AUTH_DB_UNAVAILABLE": "无法保存您的账户，因此登录失败。请稍后重试。",
+    "LINK_TRY_LIMIT": "关联代码输入错误次数过多。请在 15 分钟后重试",
+    "PRICE_UNAVAILABLE": "无法获取 Pi 价格。请稍后重试",
+    "QUOTE_EXPIRED": "支付报价已过期。请重新支付",
+    "PLAN_EXHAUSTED": "您已用完所有研讨会时间。请在“计划”页面充值",
+    "HOST_AWAY": "主持人不在房间。主持人加入后方可进入",
+    "PLAN_AI_PAID": "AI 功能在付费计划中可用",
+    "AI_UNAVAILABLE": "AI 功能目前不可用",
+    "SPEECH_CHUNK_INVALID": "音频块格式无效",
+    "SPEECH_NOT_LIVE": "此研讨会未在直播",
+    "SPEECH_NO_AGR": "需要同意语音处理",
+    "SPEECH_RATE": "语音请求过多。请稍后重试",
+    "SPEECH_QUOTA": "此研讨会的语音处理时间已用尽",
+    "SPEECH_USR_QUOTA": "您已用尽此研讨会的翻译和语音翻译限额",
+    "SPEECH_FAILED": "无法将语音转换为文本",
+    "SPEECH_STAGE_ONLY": "只有在舞台上的人才能使用语音字幕",
+    "TRANSLATE_FAILED": "无法翻译字幕",
+    "POLL_CLOSED": "此投票已结束",
+    "NOTE_NOT_RECORDING": "此笔记未在录制",
+    "NOTE_SHOT_INVALID": "屏幕截图无效",
+    "NOTE_AUDIO_INVALID": "录音文件无效",
+    "NOTE_SHOT_RATE": "屏幕截图过于频繁",
+    "NOTE_RETRY_SOON": "您可以稍后（1 分钟后）重试",
+    "SPEECH_TTS_FAILED": "无法创建翻译语音",
+    "CAPTION_SIG_INVALID": "此字幕无法验证，因此未翻译",
+    "PLAN_EXPIRES_BEFORE_START": "开始时间在此计划通行证过期之后",
+    "PAY_ALREADY_PAID": "有正在处理的付款。如果您正在钱包中签名，请在 3 分钟后重试。",
+    "REC_PAID_ONLY": "录制功能仅在月度或年度计划研讨会中，且有剩余付费时间时可用",
+    "REC_NOT_IN_ROOM": "仍在确认您是否在房间内。请稍后重试",
+    "ENGINE_OFF": "视频服务器管理密钥未配置",
+    "ENGINE_UNAVAILABLE": "视频服务器无响应。请稍后重试",
+    "ADJ_NOTHING": "没有剩余时间可减少"
+  },
+  "progress": {
+    "title": "开发进度",
+    "subtitle": "按功能划分的已完成、进行中和计划中 · 截至 {date}",
+    "overall": "整体步骤",
+    "stepsDone": "已完成 {done}/{total} 步 ({pct}%)",
+    "featureUnit": "个功能",
+    "status": {
+      "done": "已完成",
+      "doing": "进行中",
+      "todo": "计划中",
+      "drop": "已放弃"
+    },
+    "features": {
+      "F01": {
+        "name": "登录",
+        "desc": "Pi Browser 登录、常规浏览器 Google 登录以及两个账户的关联"
+      },
+      "F05": {
+        "name": "实时视频研讨会",
+        "desc": "我们自己的视频引擎 Galápagos — 目标是 1 位演示者向最多 30 位参与者进行流式传输"
+      },
+      "F02": {
+        "name": "创建研讨会",
+        "desc": "设置副标题、时间、容量和研讨会费用以创建研讨会（名称 = 岛屿，自动）"
+      },
+      "F03": {
+        "name": "研讨会列表和详情",
+        "desc": "逐页浏览开放的研讨会并查看其详情"
+      },
+      "F04": {
+        "name": "Pi 入场支付",
+        "desc": "用 Pi 支付研讨会费用；服务器会在您进入前重新检查金额"
+      },
+      "F06": {
+        "name": "主持人收益结算",
+        "desc": "将入场费收入以 Pi 支付给主持人"
+      },
+      "F07": {
+        "name": "重播",
+        "desc": "稍后观看录制的研讨会"
+      },
+      "FU": {
+        "name": "会议附加功能基础",
+        "desc": "附加功能的一个信号通道、AI 连接、语音块、麦克风同意和数据表"
+      },
+      "F08": {
+        "name": "日程和分享",
+        "desc": "每个研讨会的日历链接、事件文件 (.ics) 和电子邮件邀请"
+      },
+      "F09": {
+        "name": "降噪和照明",
+        "desc": "降低麦克风噪音并提亮暗淡的摄像头视频"
+      },
+      "F10": {
+        "name": "实时字幕",
+        "desc": "将演示者的语音转换为舞台下方的文本"
+      },
+      "F11": {
+        "name": "投票、问答和考勤",
+        "desc": "在研讨会期间进行投票和提问；主持人下载考勤列表"
+      },
+      "F12": {
+        "name": "背景效果",
+        "desc": "模糊您的背景或用预设或您自己的图像替换（在您的设备上处理）"
+      },
+      "F13": {
+        "name": "本地录制",
+        "desc": "演示者在自己的设备上录制研讨会，所有人都会看到正在录制"
+      },
+      "F14": {
+        "name": "AI 会议记录",
+        "desc": "当演示者开启时，语音和屏幕会被录制并总结为要点、决定和待办事项"
+      },
+      "F15": {
+        "name": "面对面会议记录",
+        "desc": "仅用麦克风录制会议并获取会议记录（管理员）"
+      },
+      "F16": {
+        "name": "翻译字幕",
+        "desc": "显示翻译成您选择语言的字幕"
+      },
+      "F17": {
+        "name": "听取翻译",
+        "desc": "用合成语音朗读翻译字幕，同时降低原始音频音量"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser 登录",
+      "googleLogin": "Google 登录",
+      "accountLink": "账户关联",
+      "deviceTest": "摄像头设备测试",
+      "oneToTwo": "演示者 1 → 2 位参与者",
+      "recovery": "冻结恢复和稳定性",
+      "structure": "引擎结构清理",
+      "autoQuality": "自动质量，30 位参与者",
+      "roomService": "房间进入和录制",
+      "roomUi": "房间屏幕（大厅·舞台·聊天·举手·主持）",
+      "createForm": "创建屏幕",
+      "list": "列表",
+      "detail": "详情",
+      "payRequest": "支付请求",
+      "payVerify": "金额重新检查和进入",
+      "settle": "结算",
+      "vod": "录制重播",
+      "appRelay": "引擎附加功能信号通道",
+      "aiBase": "AI、语音块、同意和数据表",
+      "shareLinks": "日历链接、.ics 和电子邮件邀请",
+      "noiseLight": "降噪和照明",
+      "liveCaptions": "实时字幕",
+      "pollQnaAttend": "投票、问答和考勤列表",
+      "backgrounds": "模糊、预设和您自己的图像",
+      "localRecording": "演示者录制和录制徽章",
+      "aiNotes": "录制、摘要和笔记页面",
+      "inPersonNotes": "仅麦克风笔记和我的笔记",
+      "captionTranslate": "语言选择和原文/翻译切换",
+      "dubbing": "合成语音播放和降低原始音频"
+    },
+    "refLabel": "参考模型",
+    "uiRef": "UI 基线 — 广泛使用的网络视频会议应用的屏幕和功能模式，适用于 seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "姓名已保存，但目前无法通知其他人。他们将在您重新加入后看到。",
+      "tile": "点击更改我的姓名",
+      "menu": "更改我的姓名",
+      "title": "此研讨会中的我的姓名",
+      "hint": "最多 30 个字符。仅在此研讨会中使用，并立即在所有人的屏幕上更新。",
+      "save": "保存",
+      "saving": "正在保存…",
+      "cancel": "取消",
+      "taken": "该姓名已被其他人（主持人或参与者）使用。请选择其他姓名。",
+      "failed": "无法保存您的姓名。请重试。"
+    },
+    "roomTitle": {
+      "edit": "点击编辑副标题",
+      "label": "副标题",
+      "placeholder": "副标题（最多 60 个字符）",
+      "save": "保存",
+      "cancel": "取消",
+      "failed": "无法保存副标题。"
+    },
+    "mirror": "镜像我的视频",
+    "barPin": "始终显示底部栏",
+    "barAuto": "自动隐藏底部栏",
+    "title": "加入研讨会 · {room}",
+    "titleSeminar": "等候室",
+    "noEngine": "视频服务器尚未准备就绪。",
+    "joinAs": "以身份加入",
+    "presenter": "演示者",
+    "audience": "观众",
+    "join": "立即加入",
+    "nameLabel": "姓名",
+    "audienceHint": "观众不使用摄像头或麦克风。加入后您将看到并听到演示者。",
+    "preview": {
+      "pending": "正在准备摄像头和麦克风…",
+      "audioOnly": "摄像头不可用 — 仅发送音频。",
+      "none": "摄像头和麦克风不可用。检查权限（您仍然可以在没有媒体的情况下加入）。",
+      "videoOnly": "麦克风不可用 — 仅发送视频。检查麦克风权限。"
+    },
+    "mic": {
+      "on": "关闭麦克风",
+      "off": "打开麦克风"
+    },
+    "cam": {
+      "on": "关闭摄像头",
+      "off": "打开摄像头"
+    },
+    "controls": "通话控制",
+    "leave": "离开",
+    "enableSound": "启用声音",
+    "state": {
+      "connecting": "正在连接…",
+      "reconnecting": "正在重新连接…"
+    },
+    "waiting": "正在等待演示者。",
+    "rejoin": "重新加入",
+    "err": {
+      "generic": "发生了一些错误。请重新加入。",
+      "CLOSED": "连接已断开。",
+      "NO_ENGINE": "视频服务器尚未准备就绪。",
+      "TICKET_401": "请登录。",
+      "TICKET_403": "您没有演示权限。请以观众身份加入。",
+      "TICKET_503": "视频服务器尚未配置。",
+      "TICKET_NETWORK": "检查您的网络连接。",
+      "TICKET_INVALID": "您的入场通行证已过期。",
+      "TICKET_EXPIRED": "您的入场通行证已过期。",
+      "ROOM_FULL": "此研讨会已满员。",
+      "ROOM_CLOSED": "房间已关闭 — 研讨会已结束或主持人离开超过 5 分钟。",
+      "DUPLICATE_SESSION": "您从其他设备加入，因此此屏幕已断开连接。",
+      "ROLE_FORBIDDEN": "您没有演示权限。",
+      "WS_FAILED": "无法连接到视频服务器。",
+      "ICE_FAILED": "视频连接已断开。请检查您的网络。",
+      "MEDIA_FAILED": "无法启动摄像头或麦克风。",
+      "TIMEOUT": "视频服务器无响应。",
+      "TICKET_402": "这是付费研讨会。请在研讨会页面支付后进入。",
+      "TICKET_404": "未找到研讨会。",
+      "TICKET_409": "此研讨会已结束或已取消。",
+      "TICKET_HOST_AWAY": "主持人尚未加入或已离开超过 5 分钟，因此您无法进入。请在主持人加入后重试。",
+      "TICKET_PLAN_EXHAUSTED": "此研讨会的套餐时间已用完，无法开始。再次购买相同套餐可增加时间（免费套餐下个月续订 1 小时）。"
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "无法更改麦克风。请重试。",
+        "video": "无法更改摄像头。请重试。"
+      },
+      "forbidden": "您没有演示权限，因此将继续作为观众。",
+      "demoted": "您已回到观众席。",
+      "endFailed": "无法结束研讨会。请重试。",
+      "chatFailed": "消息未发送。",
+      "actionFailed": "无法完成请求。请重试。",
+      "shareFailed": "无法开始屏幕共享。",
+      "err": {
+        "RATE_LIMITED": "您发送过快。请稍候。",
+        "ROLE_FORBIDDEN": "您没有执行此操作的权限。",
+        "MEDIA_FAILED": "无法启动麦克风或摄像头。请检查权限。",
+        "LOCKED": "被演示者锁定。"
+      },
+      "mutedBy": {
+        "audio": "演示者已将您的麦克风静音。",
+        "video": "演示者已关闭您的摄像头。"
+      },
+      "policy": {
+        "locked": "演示者已锁定麦克风。解锁后您可以打开麦克风。",
+        "unlocked": "麦克风已解锁。"
+      },
+      "consent": {
+        "saveFail": "无法保存您的同意。请检查您的注册并重新打开麦克风。"
+      }
+    },
+    "home": "前往主页",
+    "tile": {
+      "fullscreen": "双击全屏 · 按 Esc 退出",
+      "self": "{name} (您)",
+      "presenter": "演示者",
+      "micOff": "麦克风关闭",
+      "screen": "{name} 的屏幕",
+      "row": "其他发言人",
+      "pin": "显示 {name} 大图",
+      "unpin": "自动布局"
+    },
+    "more": "更多选项",
+    "joinNoCam": "不带摄像头加入",
+    "net": {
+      "afterJoin": "加入后会自动检查您的连接。",
+      "measuring": "正在检查连接…",
+      "good": "连接良好",
+      "fair": "连接一般",
+      "poor": "连接不佳",
+      "reason": {
+        "loss": {
+          "audio": "音频数据丢失 {pct}%。",
+          "video": "视频数据丢失 {pct}%。"
+        },
+        "rate": {
+          "audio": "音频上传速度低，为 {kbps} kbps。",
+          "video": "视频上传速度低，为 {kbps} kbps。质量可能会下降。"
+        }
+      }
+    },
+    "people": "{n} 人在房间内",
+    "screen": {
+      "start": "共享屏幕",
+      "stop": "停止共享"
+    },
+    "panel": {
+      "title": "聊天 · 问答 · 投票 · 人员",
+      "chat": "聊天",
+      "people": "人员",
+      "close": "关闭面板",
+      "qna": "问答",
+      "polls": "投票"
+    },
+    "chat": {
+      "empty": "暂无消息。聊天不保存。",
+      "me": "您",
+      "failed": "未发送。",
+      "retry": "重试",
+      "input": "输入消息",
+      "send": "发送"
+    },
+    "hand": {
+      "raise": "举手",
+      "lower": "放下手",
+      "list": "举手者",
+      "lowerAll": "放下所有手",
+      "raised": "已举手",
+      "notice": "{name} 举手了。",
+      "dismiss": "忽略",
+      "waiting": "{n} 人等待发言"
+    },
+    "react": {
+      "open": "反应",
+      "e0": "喜欢",
+      "e1": "鼓掌",
+      "e2": "大笑",
+      "e3": "惊讶",
+      "e4": "悲伤",
+      "e5": "无语",
+      "e6": "爱心"
+    },
+    "quality": {
+      "label": "质量",
+      "auto": "自动",
+      "high": "高",
+      "medium": "中",
+      "low": "低",
+      "unstable": "您的网络不稳定"
+    },
+    "roles": {
+      "presenter": "演示者",
+      "panel": "小组成员",
+      "audience": "观众"
+    },
+    "stage": {
+      "invite": "邀请上台",
+      "remove": "移至观众席",
+      "promoted": "您被邀请上台。如果您举手了，您的摄像头会自动打开（除非被锁定或不允许）。打开麦克风即可发言（麦克风不会自动打开）。",
+      "later": "稍后"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} 举手了。"
+    },
+    "leaveDialog": {
+      "title": "离开研讨会",
+      "body": "您可以自行离开，或结束研讨会并断开所有人的连接。",
+      "confirmTitle": "结束研讨会？",
+      "confirmBody": "所有人都将断开连接，并且无法重新加入此研讨会。",
+      "cancel": "取消",
+      "end": "结束研讨会",
+      "endConfirm": "立即结束"
+    },
+    "mod": {
+      "muteAll": "所有人静音",
+      "lock": "锁定麦克风",
+      "unlock": "解锁麦克风",
+      "locked": "演示者已锁定麦克风",
+      "muteMic": "静音麦克风",
+      "askMic": "请求解除静音",
+      "muteCam": "关闭摄像头",
+      "muteMicOf": "将 {name} 静音",
+      "askMicOf": "请求 {name} 解除静音",
+      "muteCamOf": "关闭 {name} 的摄像头"
+    },
+    "ask": {
+      "audio": "演示者要求您打开麦克风。",
+      "video": "演示者要求您打开摄像头。",
+      "ignore": "忽略"
+    },
+    "toDetail": "前往研讨会页面",
+    "consent": {
+      "title": "在您打开麦克风之前",
+      "body": "如果此研讨会中开启了录音、字幕或 AI 会议记录，您的声音可能会被转换为文本、存储和翻译。语音处理由您所在国家/地区以外的 AI 服务完成。如果您不同意，您的麦克风仍会打开 — 只有您的声音不会被处理。",
+      "privacy": "隐私政策",
+      "newTab": "(在新标签页中打开)",
+      "decline": "不同意",
+      "agree": "同意并打开麦克风",
+      "notice": "当录音、字幕或 AI 会议记录开启时，发言者的声音会被处理。观众的声音不会发送。",
+      "saveFailClosed": "此研讨会已结束，因此无法记录同意。"
+    },
+    "captions": {
+      "title": "字幕",
+      "room": "实时字幕（整个房间）",
+      "show": "显示字幕",
+      "size": {
+        "label": "文字大小",
+        "sm": "小",
+        "md": "中",
+        "lg": "大"
+      },
+      "waiting": "演示者开启字幕后显示",
+      "limit": "语音处理限制已达到，因此字幕和 AI 纪要已停止",
+      "sendFail": "无法开启字幕。请稍后重试。",
+      "sendFailOff": "无法关闭字幕。请稍后重试。",
+      "region": "字幕",
+      "translate": "显示翻译字幕",
+      "lang": "翻译语言",
+      "langMine": "我的语言",
+      "langAll": "所有语言",
+      "trStop": {
+        "forbidden": "翻译字幕仅供注册参与者使用。显示原文。",
+        "unavailable": "翻译字幕目前不可用。显示原文。",
+        "quota": "此研讨会已达到翻译限制。显示原文。",
+        "usrQuota": "您已用完此研讨会的翻译限制。显示原文。"
+      },
+      "unsupported": "此设备无法创建实时字幕（此浏览器不支持音频录制）"
+    },
+    "effects": {
+      "title": "效果",
+      "light": "光线校正",
+      "noise": "降噪",
+      "noiseFail": "此设备无法更改降噪设置",
+      "close": "关闭",
+      "preview": "我的预览",
+      "bg": "背景",
+      "bgNone": "无",
+      "bgBlur": "模糊",
+      "scenes": {
+        "beach": "🏝️ 马尔代夫海滩",
+        "autumn": "🍁 秋日山谷",
+        "fireplace": "🔥 壁炉",
+        "xmas": "🎄 圣诞会议室"
+      },
+      "bgs": {
+        "dusk": "黄昏",
+        "ocean": "海洋",
+        "forest": "森林",
+        "studio": "工作室",
+        "grid": "网格",
+        "dots": "点"
+      },
+      "myAdd": "我的图片",
+      "myItem": "我的图片 {n}",
+      "myDel": "删除我的图片 {n}",
+      "mySaveFail": "背景已应用，但无法保存到此设备（仅限本次会议）",
+      "bgStopped": "背景效果已停止并关闭。请重新选择以重新启动。",
+      "myNote": "您的图片仅存储在此设备上（最多 3 张，每张 2 MB）",
+      "mobileBlurOnly": "在手机上，仅提供模糊背景（图片背景在 PC 上可用）",
+      "myTooBig": "只能使用 2 MB 以下的图片",
+      "preparing": "准备中…",
+      "bgFailed": "无法加载背景效果",
+      "autoOff": "您的设备速度过慢，因此背景效果已关闭。",
+      "unsupported": "此设备不支持背景效果。",
+      "noCam": "打开摄像头以选择背景。",
+      "lightUnsupported": "此设备不支持光线校正。",
+      "noiseUnsupported": "此设备不支持降噪设置。"
+    },
+    "sheetClose": "关闭",
+    "polls": {
+      "new": "新投票",
+      "question": "问题",
+      "option": "选项 {n}",
+      "remove": "移除选项 {n}",
+      "addOption": "添加选项",
+      "start": "开始投票",
+      "cancel": "取消",
+      "dup": "选项必须不同",
+      "vote": "投票",
+      "change": "更改投票",
+      "close": "关闭投票",
+      "closed": "已关闭",
+      "mine": "您的选择",
+      "result": "{pct}% ({n} 票)",
+      "total": "共 {n} 票",
+      "empty": "暂无投票。",
+      "loading": "加载中…",
+      "labOnly": "投票仅在研讨会房间内可用。",
+      "started": "新投票已开始",
+      "goVote": "投票",
+      "votersNote": "组织者可以看到谁投票给了哪个选项。",
+      "voters": "已投票：{names}"
+    },
+    "qna": {
+      "sort": "排序",
+      "by": {
+        "top": "热门",
+        "new": "最新"
+      },
+      "rcm": "赞成 ({n})",
+      "answered": "已回答",
+      "answer": "标记为已回答",
+      "unanswer": "取消标记已回答",
+      "hide": "隐藏",
+      "doneN": "已回答 {n} 个",
+      "backOpen": "未回答的问题",
+      "empty": "暂无问题。",
+      "emptyDone": "暂无已回答的问题。",
+      "loading": "加载中…",
+      "input": "提问 (500 字)",
+      "send": "发送",
+      "left": "还剩 {n} 字",
+      "labOnly": "问答仅在研讨会房间内可用。"
+    },
+    "recording": {
+      "title": "录制",
+      "badge": "录制中",
+      "unsupported": "此浏览器不支持录制。请在电脑上的常规浏览器中录制。",
+      "piBrowserOnly": "录制仅在常规浏览器（电脑或移动设备）中可用。Pi Browser 无法保存录制文件 — 请在电脑或手机浏览器 (seminarz.vercel.app) 中打开此研讨会进行录制。",
+      "audioSuspended": "此设备可能未开始录音。可能只录制了画面。",
+      "notifyFailed": "由于无法通知参与者，录制未开始。请稍后重试。",
+      "confirm": {
+        "title": "开始录制？",
+        "body": "录制开始后，所有人都会看到“录制中”指示。文件仅保存在此设备上，绝不会上传或传输到国外。请在开始前告知参与者。",
+        "download": "停止时，MP4 文件将保存到您的下载文件夹（无法录制 MP4 的浏览器需要一段时间才能转换；超过约 45 分钟的录制可能会以原始格式保存）。应用内浏览器可能会阻止文件保存，因此请在电脑上的常规浏览器中录制。",
+        "cancel": "取消",
+        "start": "开始录制",
+        "charge": "录制期间，录制时间将从您的付费时间中扣除，此外还会扣除房间时间（录制期间双倍消耗）。当付费时间用完时，录制停止并保存文件。"
+      },
+      "resave": {
+        "label": "录制文件",
+        "save": "再次保存",
+        "dismiss": "关闭再次保存"
+      },
+      "toast": {
+        "started": "录制已开始 — 所有人可见",
+        "saved": "录制已保存。请检查您的下载文件夹。如果未保存任何内容，请点击屏幕顶部的 [再次保存]。",
+        "autoStopped": "由于浏览器停止录制或达到大小限制，录制已结束。之前的所有内容都已保存。请重新开始录制以继续。",
+        "empty": "未录制任何内容，因此未创建文件。",
+        "saveFailed": "无法创建录制文件。",
+        "converting": "正在将录制转换为 MP4。请保持此窗口打开。",
+        "savedOriginal": "无法转换为 MP4，因此录制以原始格式 (webm) 保存。请检查您的下载文件夹。",
+        "startedBy": "演示者已开始录制",
+        "stoppedBy": "演示者已停止录制"
+      },
+      "paidOnly": "录制仅在按月或按年套餐开启的研讨会中可用，且有剩余付费时间。",
+      "planOut": "付费时间已用完，因此录制已停止并保存文件。",
+      "notInRoom": "仍在确认您是否在房间内。请稍后重新开始录制。",
+      "meterFailed": "无法检查录制时间，因此录制未开始。请稍后重试。",
+      "paidOut": "没有剩余付费时间，因此无法开始录制。请再次购买相同套餐以进行录制。",
+      "pausedBadge": "录制已暂停",
+      "controls": "录制控制",
+      "pause": "暂停",
+      "resume": "恢复",
+      "stop": "停止录制"
+    },
+    "notes": {
+      "on": "AI 笔记",
+      "badge": "AI 笔记开启",
+      "started": "演示者开启了 AI 笔记",
+      "stopped": "AI 笔记已关闭",
+      "startedMine": "AI 笔记已开启 — 向所有人显示",
+      "stoppedMine": "AI 笔记已关闭 — 正在创建笔记",
+      "startFail": "无法启动 AI 笔记",
+      "gone": "AI 笔记已停止 — 笔记已在其他地方结束或删除",
+      "unsupported": "此处无法开启 AI 笔记（不支持录音）"
+    },
+    "dubbing": {
+      "listen": "收听翻译语音",
+      "blocked": "无法播放翻译语音。请重新开启",
+      "stopped": "翻译语音暂时不可用，已关闭",
+      "usrQuota": "您已用完本次研讨会的翻译语音限额，已关闭"
+    },
+    "plan": {
+      "warn": "本次研讨会套餐剩余 {min} 分钟。",
+      "ended": "您的研讨会时间已用完，研讨会已结束，您已离开房间。",
+      "left": "研讨会剩余时间",
+      "closed": "研讨会已结束，您已离开房间。",
+      "hostAway": "主持人已离开房间。如果他们在 5 分钟内未返回，所有参与者将被移除。",
+      "hostGone": "主持人 5 分钟内未返回，您已离开房间。主持人加入后您可以再次进入。"
+    },
+    "toLobby": "等候室"
+  },
+  "list": {
+    "tabsLabel": "研讨会列表视图",
+    "tabs": {
+      "all": "全部",
+      "hosted": "我主持的",
+      "joined": "我加入的"
+    },
+    "empty": {
+      "all": "没有即将开始的研讨会。",
+      "hosted": "您尚未主持任何研讨会。",
+      "joined": "您尚未加入任何研讨会。"
+    },
+    "loading": "加载中…",
+    "retry": "重试",
+    "free": "免费",
+    "fee": "{amount} Pi",
+    "host": "主持人 {name}",
+    "capacity": "容量 {n}",
+    "status": {
+      "SCHEDULED": "已安排",
+      "LIVE": "直播中",
+      "ENDED": "已结束",
+      "CANCELED": "已取消"
+    },
+    "hostNew": "创建研讨会",
+    "progress": "进度",
+    "pager": "分页",
+    "prev": "上一页",
+    "next": "下一页",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "副标题",
+      "placeholder": "添加副标题",
+      "save": "保存副标题",
+      "saving": "保存中…",
+      "saved": "已保存。"
+    },
+    "loading": "加载中…",
+    "back": "返回列表",
+    "notFound": "未找到研讨会。",
+    "status": {
+      "SCHEDULED": "已安排",
+      "LIVE": "直播中",
+      "ENDED": "已结束",
+      "CANCELED": "已取消"
+    },
+    "startAt": "日期",
+    "host": "主持人",
+    "seats": "剩余座位",
+    "seatsValue": "{left} / {max}",
+    "fee": "研讨会费用",
+    "feeValue": "{amount} Pi",
+    "free": "免费",
+    "enter": "进入",
+    "payEnter": "用 Pi 支付并进入 ({amount} Pi)",
+    "paying": "正在处理付款…",
+    "joining": "正在注册…",
+    "registered": "您已注册。",
+    "full": "本次研讨会已满员。",
+    "closed": "本次研讨会已结束。",
+    "canceled": "本次研讨会已取消。",
+    "roomLink": "前往房间（主持人）",
+    "piBrowserOnly": "付款可在 Pi Browser 中登录 Pi 后进行。",
+    "payCancelled": "付款已取消。",
+    "payStillWaiting": "仍在等待钱包响应。如果您已在 Pi Wallet 中登录，请稍候片刻。",
+    "payFailed": "付款失败。",
+    "err": {
+      "NAME_TAKEN": "该名称已被他人使用。请选择其他名称。",
+      "CAL_READ_FAILED": "无法加载您的日程。请检查地址。",
+      "ISLAND_FULL": "目前所有 100 个岛屿名称都在使用中。您可以在即将开始或正在进行的研讨会结束或取消后开启新的研讨会。",
+      "SMN_FULL": "本次研讨会已满员。",
+      "SMN_CLOSED": "本次研讨会已结束或已取消。",
+      "SMN_ALREADY": "您已注册或正在付款。",
+      "SMN_FREE": "免费研讨会无需付款。",
+      "SMN_PAY_REQUIRED": "这是付费研讨会。请付款后进入。",
+      "SMN_PAY_INVALID": "我们无法验证您的付款。请联系管理员。",
+      "PAY_PI_FAILED": "无法连接到 Pi 支付服务器。请稍后重试。",
+      "PAY_MISMATCH": "付款详情不匹配。",
+      "PAY_AMOUNT_MISMATCH": "付款金额与研讨会费用不符。",
+      "PAY_CANCELLED": "此付款已取消。",
+      "PAY_ALREADY_PAID": "正在处理付款。如果您正在钱包中登录，请在 3 分钟后重试。",
+      "PAY_INVALID_STATE": "此付款现在无法处理。",
+      "PAY_PI_CANCEL_REFUSED": "付款已在进行中，无法取消。请稍后再次检查。"
+    },
+    "share": {
+      "title": "日程与分享",
+      "calendar": "添加到日历",
+      "ics": "日历文件",
+      "mail": "通过电子邮件邀请",
+      "mailApp": "使用默认邮件应用发送",
+      "mailSubject": "[研讨会邀请] {title}",
+      "mailBody": "{title}\n时间：{start}\n\n通过此链接直接加入。\n桌面版：{url}\nPi Browser：{piUrl}",
+      "copy": "复制链接",
+      "copied": "链接已复制。",
+      "copyFail": "无法复制。请从地址栏复制链接。",
+      "share": "分享到其他应用",
+      "shareFail": "无法分享。请改用复制链接。",
+      "created": "您的研讨会已准备就绪。将其开始时间添加到您的 Google 日历。",
+      "addGoogle": "添加到 Google 日历",
+      "later": "稍后",
+      "piBrowserOpen": "在 Pi Browser 中，日历、电子邮件和日历文件会在您手机的默认浏览器中打开。",
+      "extFail": "无法打开。请更新 Pi Browser，或使用复制链接并在常规浏览器 (seminarz.vercel.app) 中打开。",
+      "icsPiBrowser": "日历文件只能在常规浏览器（电脑或手机）中下载。在 Pi Browser 中，请改用“添加到日历”。"
+    },
+    "attendance": "出勤",
+    "plan": "套餐",
+    "left": "剩余时间"
+  },
+  "host": {
+    "gcal": {
+      "prev": "上个月",
+      "next": "下个月",
+      "connect": "显示我的 Google 日历",
+      "change": "管理 Google 日历 ({n})",
+      "add": "添加",
+      "remove": "移除",
+      "close": "关闭",
+      "failed": "无法从 {n} 个日历加载事件。请检查地址。",
+      "badUrl": "请粘贴 Google 日历设置中的“iCal 格式的秘密地址”（…/basic.ics），而不是浏览器地址栏中的地址。",
+      "full": "您最多可以添加 {n} 个日历。",
+      "allDay": "全天",
+      "day": "我这一天的活动",
+      "count": "{n} 个活动",
+      "more": "+{n}",
+      "picked": "此日期已设置为开始日期。请在下方选择时间。",
+      "s1": "点击下方的 [打开 Google 日历设置]。",
+      "s2": "在左侧“我的日历设置”下，选择一个日历（例如您的姓名）。",
+      "s3": "滚动到“集成日历”并复制“iCal 格式的秘密地址”。",
+      "s4": "将其粘贴到此处并点击 [添加] — 事件标题将显示在日历上。以相同方式添加其他日历，最多 5 个。",
+      "open": "打开 Google 日历设置",
+      "privacy": "此地址是您日历的密钥 — 请勿分享。它仅存储在此设备上，绝不存储在我们的服务器上。"
+    },
+    "title": "创建研讨会",
+    "name": "让我们去一个美丽的岛屿旅行吧！",
+    "subTitle": "副标题（可选，最多 60 个字符）",
+    "startAt": "开始时间",
+    "maxCnt": "容量 (1–100)",
+    "submit": "创建",
+    "submitting": "正在创建…",
+    "invalid": "请检查您的输入 — 从现在起一年内的日期，容量 1-100。",
+    "attendance": {
+      "title": "出勤",
+      "back": "返回研讨会",
+      "loading": "加载中…",
+      "forbidden": "只有主持人和管理员才能查看出勤情况。",
+      "count": "{n} 人",
+      "csv": "下载 CSV",
+      "empty": "尚未有人加入。",
+      "online": "在线",
+      "left": "已离开",
+      "col": {
+        "name": "姓名",
+        "pi": "Pi 用户名",
+        "ent": "首次加入",
+        "hb": "最后上线",
+        "dur": "出席时间",
+        "min": "出席（分钟，不含离开时间）",
+        "state": "状态"
+      },
+      "durNote": "出席时间是从首次加入到最后上线的时间，减去离开时间（超过 2.5 分钟的间隔）。",
+      "csvPiBrowser": "CSV 下载仅适用于常规浏览器（电脑或手机）。Pi Browser 无法保存文件 — 请在电脑或手机浏览器 (seminarz.vercel.app) 中打开此出勤表。"
+    },
+    "plan": "套餐",
+    "planFree": "免费 — 本月剩余 {time} · 无 AI",
+    "planPaid": "{name} {time} · {price} — 创建时支付",
+    "planHint": "使用付费套餐开启的研讨会会优先使用该套餐的时间，然后继续使用本月的免费时间（免费部分无 AI）。已激活的套餐无需支付即可开启；您未拥有的月度或年度套餐在您点击创建时以 Pi 支付，然后研讨会开启（Pi Browser）。参与者加入始终免费。",
+    "planOwned": "{name} — 活跃 · 剩余 {time}",
+    "planEnds": "开始时间在此套餐通行证到期之后。请将开始时间提前或选择其他套餐。",
+    "paidKept": "您的付费通行证已保留。请修复问题并再次点击创建（无需二次支付）。"
+  },
+  "privacy": {
+    "title": "隐私政策 — 语音和 AI 功能",
+    "effective": "生效日期 {date}",
+    "intro": "本政策解释了当您在研讨会中使用实时字幕、翻译字幕、语音翻译、AI 会议笔记和现场笔记功能时，我们处理的个人信息。这些功能使用外部 AI 服务，因此信息会传输到国外。",
+    "whoTitle": "谁的信息被处理",
+    "who": [
+      "演示者和舞台上的参与者：在您首次开启麦克风之前，我们会征求您的同意。您可以在不同意的情况下加入研讨会。",
+      "听众：您不使用麦克风，因此不会发送语音。您只能看到字幕和笔记。",
+      "现场笔记：管理员使用麦克风记录会议，并确认在录制前已告知与会者。"
+    ],
+    "xferTitle": "个人信息跨境传输（韩国个人信息保护法第 28-8 条）",
+    "xfer": [
+      {
+        "k": "接收方",
+        "v": "Google LLC (Gemini API) — 联系方式 [待定：Google 隐私联系方式]"
+      },
+      {
+        "k": "国家",
+        "v": "美国和 Google 数据中心所在的其他国家 [待定：处理区域]"
+      },
+      {
+        "k": "时间和方式",
+        "v": "在功能开启期间，大约每 5 秒通过加密连接 (HTTPS) 传输一次。对于现场笔记，当笔记结束时，整个录音会以 5 分钟为单位再次发送一次（准确转录）。"
+      },
+      {
+        "k": "项目",
+        "v": "语音、口语内容（文本）、发言者显示名称（用于笔记摘要）、屏幕共享截图（当 AI 笔记开启时）"
+      },
+      {
+        "k": "目的",
+        "v": "语音转文本、翻译、会议笔记摘要、合成语音（标准语音，无语音克隆）、现场笔记的发言者分离（通过感知到的性别区分和标记发言者，例如男性 1 / 女性 1 — 不推断姓名或身份）"
+      },
+      {
+        "k": "保留",
+        "v": "结果返回后立即结束。我们要求 Google 不存储请求 (store=false)。滥用监控日志仍可能根据 Google 的条款保留 [待定：保留期限和付费层级状态]。"
+      },
+      {
+        "k": "如何拒绝以及后果",
+        "v": "如果您不同意或关闭麦克风，则不会发送语音。您仍然可以参加研讨会；只会不创建您自己讲话的字幕、翻译和笔记。您可以随时撤回同意 [待定：撤回按钮的位置]。"
+      }
+    ],
+    "keepTitle": "本服务保留的信息",
+    "keep": [
+      "原始音频：对于研讨会字幕和 AI 会议笔记，不存储；转换为文本后立即丢弃。对于现场笔记，录音保存在私人存储中，以便会议结束后可以更准确地再次转录（带发言者），并在笔记结束后 1 天的每日清理时删除（如果笔记被删除则立即删除）。",
+      "实时字幕：不存储。",
+      "AI 会议笔记（当演示者开启时）：口语内容、截图和摘要，保留直到笔记被删除 [待定：最大保留期限]。",
+      "同意记录：同意时间和政策版本，作为证据保留 [待定：保留期限]。",
+      "使用情况：每分钟请求计数和处理时间，用于强制执行成本限制。",
+      "出勤：您加入的时间、您最后连接的时间、您的显示名称和您的 Pi 用户名被存储并作为出勤列表（屏幕上和 CSV 下载）提供给主持人。保留直到研讨会删除。",
+      "问答和投票：问题文本和提问者的显示名称（如果没有则为 Pi 用户名）对所有参与者可见。点赞只显示数量，从不显示谁点赞。投票只向参与者显示数量；组织者和管理员可以看到每个选项的每个投票者的显示名称（如果没有则为 Pi 用户名）。包括隐藏问题在内，保留直到研讨会删除。"
+    ],
+    "recTitle": "录制",
+    "rec": "录制仅作为文件保存在演示者的设备上。它们不会上传到我们的服务器或传输到国外。在录制或 AI 笔记开启时，每个参与者都会看到一个指示器。",
+    "rightsTitle": "您的权利",
+    "rights": "您可以要求访问、更正、删除或停止处理您的信息。联系方式：[待定：隐私官姓名和联系方式]"
+  },
+  "notes": {
+    "title": "笔记",
+    "back": "返回研讨会",
+    "loading": "加载中…",
+    "meta": "笔记 · {date} · {min} 分钟",
+    "aiWarn": "AI 生成的摘要 — 可能包含错误",
+    "points": "要点",
+    "decisions": "决定",
+    "todos": "待办事项",
+    "shots": "屏幕截图 ({n})",
+    "transcript": "转录",
+    "download": "下载 Markdown",
+    "making": "正在创建笔记…",
+    "makingLong": "这需要一些时间。请稍后刷新",
+    "recording": "仍在录制",
+    "failed": "无法创建摘要 — 完整转录在下方",
+    "retry": "重试",
+    "finish": "结束录制并摘要",
+    "none": "此处无内容",
+    "blank": "无内容可摘要 — 未录制语音或语音太短",
+    "notFound": "未找到笔记",
+    "forbidden": "您无权访问这些笔记",
+    "shotAlt": "{at} 的屏幕截图",
+    "close": "关闭",
+    "view": "查看笔记",
+    "error": "无法加载",
+    "mine": "我的笔记",
+    "del": "删除笔记",
+    "delAsk": "删除这些笔记（摘要、转录和屏幕截图）？没有人能够看到它们",
+    "delYes": "删除",
+    "delNo": "取消",
+    "delFail": "无法删除",
+    "dlFail": "无法下载 — 请重试",
+    "recentNotes": "最近笔记",
+    "empty": "暂无笔记",
+    "newNote": "开始现场笔记",
+    "inPerson": "现场会议笔记",
+    "inPersonTag": "现场",
+    "titleLabel": "标题",
+    "titlePh": "例如：每周会议",
+    "told": "我已告知所有在场人员这将进行录制和 AI 处理（必需）",
+    "toldWhy": "在开始之前，请告知所有在场人员，本次对话将被录制（录音在笔记结束后保留 1 天，并通过语音区分发言者并按感知到的性别标记）并由外部 AI 转换为文本和摘要",
+    "start": "开始录制",
+    "starting": "准备中…",
+    "recBadge": "正在录制 {time}",
+    "recentLines": "最新行",
+    "waiting": "当人们说话时，文本会显示在这里",
+    "end": "结束并创建笔记",
+    "wakeWarn": "屏幕关闭时录音可能会停止",
+    "adminOnly": "仅管理员可用",
+    "aiOff": "AI 笔记目前不可用（需要服务器设置）。过去的笔记列在下方",
+    "reload": "重新加载",
+    "unsupported": "此设备不支持录音",
+    "micDenied": "无法使用麦克风 — 请检查权限",
+    "limited": "处理时间已用尽 — 结束并创建笔记",
+    "noAgr": "已停止：未确认录音通知 — 请结束并重新开始",
+    "micLost": "麦克风已断开连接，录音已停止 — 点击“重新连接麦克风”或结束笔记",
+    "micRetry": "重新连接麦克风",
+    "gone": "此笔记已在其他地方结束或删除，因此录音已停止 — 请使用下方按钮打开笔记",
+    "finishing": "正在保存最后的话…",
+    "st": {
+      "RECORDING": "录音中",
+      "SUMMARIZING": "创建中",
+      "DONE": "完成",
+      "FAILED": "失败"
+    },
+    "downloadPiBrowser": "Markdown 下载仅适用于普通浏览器（电脑或手机）。Pi Browser 无法保存文件 — 请在电脑或手机浏览器 (seminarz.vercel.app) 中打开这些笔记。"
+  },
+  "plan": {
+    "title": "套餐",
+    "loading": "加载中…",
+    "free": "免费",
+    "freeDesc": "每月 {time} 的研讨会（不可结转）",
+    "monthly": "每月",
+    "yearly": "每年",
+    "paidDesc": "{time} 的研讨会，有效期 {months} 个月",
+    "pi": "{amount} Pi",
+    "priceUnknown": "正在检查 Pi 价格",
+    "noAi": "无 AI 字幕、翻译、配音或笔记摘要",
+    "withAi": "包括 AI 字幕、翻译、配音和笔记摘要",
+    "buy": "用 Pi 支付",
+    "bought": "支付完成。研讨会时间已增加。",
+    "meRemain": "剩余时间：{time}",
+    "loginToBuy": "登录以购买套餐。",
+    "payNote": "支付始终使用 Pi。当地货币金额仅供参考；Pi 金额在您支付时根据 Pi 价格确定。付费套餐的研讨会优先使用该套餐的通行证（最早到期的优先），然后继续使用本月的免费时间。",
+    "charge": "充值时间",
+    "hm": "{h} 小时 {m} 分钟",
+    "m": "{m} 分钟",
+    "won": "韩元 {n}",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (正在检查 Pi 价格)",
+    "h": "{h} 小时"
+  },
+  "adminRooms": {
+    "title": "房间管理",
+    "adminOnly": "仅管理员可查看此页面。",
+    "refresh": "刷新",
+    "count": "{n} 个开放房间",
+    "empty": "目前没有开放的房间。",
+    "lab": "实验室房间",
+    "noSeminar": "无研讨会记录",
+    "peers": "已连接 {n} / {cap}",
+    "producers": "{n} 个流",
+    "end": "结束于 {time}",
+    "stale": "研讨会已结束，但房间仍在视频服务器上开放 — 强制关闭它。",
+    "close": "强制关闭",
+    "confirmSeminar": "这将结束研讨会并关闭房间。所有人将被断开连接。",
+    "confirmRoom": "这将关闭房间。所有人将被断开连接。",
+    "confirmYes": "关闭",
+    "cancel": "取消",
+    "closing": "正在关闭…",
+    "closed": "房间已关闭。",
+    "metrics": "视频服务器指标（自开始以来）",
+    "metricsOff": "无法加载指标。",
+    "m": {
+      "packetsIn": "接收数据包",
+      "packetsOut": "发送数据包",
+      "nackIn": "收到 NACK",
+      "nackOut": "发送 NACK",
+      "retransmits": "重传",
+      "duplicateNack": "重复 NACK",
+      "cacheMiss": "重传缓存未命中",
+      "pliOut": "关键帧请求 (PLI)",
+      "keyframes": "关键帧",
+      "layerSwitches": "质量切换",
+      "queueDrops": "队列丢弃"
+    }
+  },
+  "adminUsers": {
+    "title": "用户",
+    "adminOnly": "仅管理员可查看此页面。",
+    "search": "按名称搜索（2个以上字符）",
+    "searchBtn": "搜索",
+    "refresh": "刷新",
+    "count": "{n} 位用户",
+    "empty": "没有用户。",
+    "admin": "管理员",
+    "lastLogin": "上次登录 {time}",
+    "never": "从未登录",
+    "plan": {
+      "FREE": "免费",
+      "M": "每月",
+      "Y": "每年"
+    },
+    "until": "(直到 {time})",
+    "manage": "管理时间",
+    "close": "关闭",
+    "planLabel": "套餐",
+    "hours": "小时",
+    "minutes": "分钟",
+    "reason": "原因（可选）",
+    "sub": "减少",
+    "confirmSub": "将 {plan} 时间减少 {time}。",
+    "confirmYes": "确认",
+    "cancel": "取消",
+    "saving": "正在保存…",
+    "done": "已应用。{plan} 剩余时间：{time}",
+    "invalid": "请输入 1 分钟到 1000 小时之间的减少量（分钟为 0-59 的整数）。",
+    "history": "最近调整",
+    "noHistory": "暂无调整。",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "发放服务通行证（免费时间）",
+    "svc": {
+      "H1": "1小时通行证",
+      "D1": "1天通行证",
+      "M1": "1个月通行证"
+    },
+    "svcNote": "服务通行证是免费套餐时间。它们可以从现在开始在该期间（1小时、24小时、1个月）内用于免费研讨会和付费研讨会的免费部分（无 AI 功能）。如果有多个通行证，它们将按 1小时 → 1天 → 1个月的顺序自动使用。",
+    "subTitle": "减少时间",
+    "subNote": "优先从最晚到期的通行证中扣除。如果超过剩余时间，则只扣除剩余时间。",
+    "confirmSvc": "发放 {svc}。",
+    "doneSvc": "已发放 {svc}。免费剩余时间：{time}（通行证到期 {end}）"
+  }
+}

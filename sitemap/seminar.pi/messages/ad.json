@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Seminaris de vídeo en directe als quals t'uneixes amb Pi"
+  },
+  "home": {
+    "description": "Els amfitrions obren seminaris i els participants s'uneixen a sessions de vídeo en directe amb Pi.",
+    "badge": "Seminaris en directe a illes precioses",
+    "headline": "Mira, escolta i aprèn junts — en directe",
+    "ctaBrowse": "Explorar seminaris",
+    "ctaPlan": "Veure plans",
+    "features": {
+      "video": "Vídeo en directe",
+      "caption": "Subtítols i traducció",
+      "notes": "Notes de reunió amb IA",
+      "pay": "Pagar amb Pi"
+    },
+    "listTitle": "Seminaris",
+    "cal": {
+      "title": "Calendari de seminaris",
+      "desc": "Des de seminaris passats fins als propers — toca una data per a més detalls.",
+      "legendSmn": "Seminaris",
+      "legendEnded": "Seminaris passats",
+      "legendMine": "Els meus esdeveniments",
+      "failed": "No s'han pogut carregar les dates del seminari. Torna-ho a provar més tard.",
+      "open": "Veure detalls"
+    }
+  },
+  "nav": {
+    "link": "Enllaçar compte",
+    "privacy": "Privadesa",
+    "plan": "Plans",
+    "rooms": "Sales",
+    "admin": "Administrador",
+    "users": "Usuaris",
+    "home": "Inici",
+    "privacyShort": "Privadesa",
+    "menu": "Menú principal",
+    "fold": "Plegar menú",
+    "unfold": "Desplegar menú"
+  },
+  "auth": {
+    "checking": "Comprovant l'inici de sessió…",
+    "signedIn": "{name}",
+    "inPerson": "Notes presencials",
+    "required": "Cal iniciar sessió amb el teu compte Pi.",
+    "signIn": "Inicia sessió amb Pi",
+    "openInPiBrowser": "Obre aquesta pàgina a Pi Browser per iniciar sessió amb el teu compte Pi.",
+    "authenticating": "Iniciant sessió…",
+    "google": "Inicia sessió amb Google",
+    "signOut": "Tancar sessió",
+    "or": "o",
+    "linkRequired": "Has iniciat sessió amb Google, però encara no està vinculat a un compte Pi. Emet un codi d'enllaç a Pi Browser i introdueix-lo aquí.",
+    "linkNeeded": "Cal enllaçar el compte Pi",
+    "linkCheckFailed": "No s'ha pogut comprovar l'estat de l'enllaç del teu compte (error temporal del servidor). Actualitza la pàgina d'aquí a un moment."
+  },
+  "piOAuth": {
+    "signingIn": "Iniciant sessió amb el teu compte Pi…",
+    "failed": "L'inici de sessió amb Pi ha fallat. Torna-ho a provar.",
+    "stateMismatch": "No s'ha pogut verificar aquesta sol·licitud d'inici de sessió (caducada o una altra pestanya). Torna-ho a provar.",
+    "retry": "Torna-ho a provar",
+    "backHome": "Inici"
+  },
+  "link": {
+    "title": "Enllaçar compte",
+    "intro": "Connecta el compte amb què has iniciat sessió a Pi Browser amb l'inici de sessió de Google en un navegador normal. Després de l'enllaç, podràs utilitzar el mateix compte en un navegador d'ordinador.",
+    "checking": "Comprovant l'inici de sessió…",
+    "piIssueTitle": "Per iniciar sessió també des d'un navegador normal",
+    "codeHint": "Emet el codi següent i, a continuació, inicia sessió amb Google en un navegador d'ordinador i introdueix-lo a la pàgina Enllaçar compte (en un termini de 10 minuts).",
+    "piIssue": "Emetre codi d'enllaç",
+    "reissue": "Emetre un nou codi",
+    "expiresIn": "Caduca en {min} min",
+    "enterTitle": "Introduir codi d'enllaç",
+    "enterHint": "A Pi Browser, obre seminar.pi → Enllaçar compte → Emetre codi d'enllaç i, a continuació, introdueix el codi de 6 dígits.",
+    "codeLabel": "Codi d'enllaç",
+    "submit": "Enllaçar",
+    "done": "Enllaçat. Ara també pots utilitzar l'inici de sessió de Google.",
+    "linked": "{name} està enllaçat a l'inici de sessió de Google."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Cal iniciar sessió",
+    "AUTH_PI_REQUIRED": "Cal iniciar sessió amb Pi",
+    "AUTH_PI_SESSION_INVALID": "La teva sessió ha caducat. Torna a iniciar sessió",
+    "AUTH_PI_TOKEN_INVALID": "La verificació de l'inici de sessió amb Pi ha fallat",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Falta informació d'inici de sessió amb Pi",
+    "FORBIDDEN": "No tens permís",
+    "BAD_REQUEST": "Sol·licitud incorrecta",
+    "BAD_REQUEST_BODY": "Sol·licitud incorrecta",
+    "INVALID_INPUT": "Entrada no vàlida",
+    "QUERY_FAILED": "No s'ha pogut carregar",
+    "SAVE_FAILED": "No s'ha pogut desar",
+    "INTERNAL": "Alguna cosa ha anat malament",
+    "SERVER_CONFIG": "Error de configuració del servidor. Contacta amb l'operador",
+    "PI_API_CONNECT_FAILED": "No s'ha pogut contactar amb Pi Network",
+    "DB_UNAVAILABLE": "Les dades no estan disponibles temporalment. Torna-ho a provar més tard",
+    "NOT_FOUND": "No trobat",
+    "RATE_LIMITED": "Massa sol·licituds. Torna-ho a provar d'aquí a poc",
+    "PAYLOAD_TOO_LARGE": "La sol·licitud és massa gran",
+    "NETWORK": "Comprova la teva connexió de xarxa",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Aquest nom d'usuari Pi ja està registrat amb credencials diferents. Contacta amb l'administrador",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Aquest compte està inactiu. Contacta amb l'administrador",
+    "AUTH_GOOGLE_REQUIRED": "Cal iniciar sessió amb Google.",
+    "LINK_CODE_INVALID": "El codi d'enllaç no és vàlid o ha caducat. Emet-ne un de nou a Pi Browser.",
+    "LINK_ALREADY_LINKED": "Aquest compte ja està enllaçat.",
+    "LINK_CODE_GEN_FAILED": "No s'ha pogut crear un codi d'enllaç. Torna-ho a provar més tard.",
+    "AUTH_DB_UNAVAILABLE": "No s'ha pogut desar el teu compte, per la qual cosa l'inici de sessió ha fallat. Torna-ho a provar més tard.",
+    "LINK_TRY_LIMIT": "Massa codis d'enllaç incorrectes. Torna-ho a provar d'aquí a 15 minuts.",
+    "PRICE_UNAVAILABLE": "No s'ha pogut obtenir el preu de Pi. Torna-ho a provar d'aquí a poc",
+    "QUOTE_EXPIRED": "La cotització de pagament ha caducat. Torna a pagar",
+    "PLAN_EXHAUSTED": "Has utilitzat tot el temps del seminari. Recarrega a la pàgina Plans",
+    "HOST_AWAY": "L'amfitrió no és a la sala. Pots entrar després que l'amfitrió s'uneixi",
+    "PLAN_AI_PAID": "Les funcions d'IA estan disponibles en plans de pagament",
+    "AI_UNAVAILABLE": "Les funcions d'IA no estan disponibles ara mateix",
+    "SPEECH_CHUNK_INVALID": "El format del fragment d'àudio no és vàlid",
+    "SPEECH_NOT_LIVE": "Aquest seminari no és en directe",
+    "SPEECH_NO_AGR": "Cal el consentiment per al processament de veu",
+    "SPEECH_RATE": "Massa sol·licituds de veu. Torna-ho a provar d'aquí a poc",
+    "SPEECH_QUOTA": "El temps de processament de veu per a aquest seminari s'ha esgotat",
+    "SPEECH_USR_QUOTA": "Has esgotat el teu límit de traducció i veu traduïda per a aquest seminari",
+    "SPEECH_FAILED": "No s'ha pogut convertir la veu a text",
+    "SPEECH_STAGE_ONLY": "Només les persones a l'escenari poden utilitzar subtítols de veu",
+    "TRANSLATE_FAILED": "No s'ha pogut traduir el subtítol",
+    "POLL_CLOSED": "Aquesta enquesta està tancada",
+    "NOTE_NOT_RECORDING": "Aquestes notes no s'estan gravant",
+    "NOTE_SHOT_INVALID": "Captura de pantalla no vàlida",
+    "NOTE_AUDIO_INVALID": "Fitxer de gravació no vàlid",
+    "NOTE_SHOT_RATE": "Massa captures de pantalla",
+    "NOTE_RETRY_SOON": "Pots tornar-ho a provar d'aquí a un minut",
+    "SPEECH_TTS_FAILED": "No s'ha pogut crear la veu traduïda",
+    "CAPTION_SIG_INVALID": "Aquest subtítol no s'ha pogut verificar, per la qual cosa no s'ha traduït",
+    "PLAN_EXPIRES_BEFORE_START": "L'hora d'inici és posterior a la caducitat d'aquest pla",
+    "PAY_ALREADY_PAID": "Hi ha un pagament en curs. Si estaves iniciant sessió a la cartera, torna-ho a provar d'aquí a 3 minuts.",
+    "REC_PAID_ONLY": "La gravació només està disponible en seminaris amb plans mensuals o anuals amb temps de pagament restant",
+    "REC_NOT_IN_ROOM": "Encara estem confirmant que ets a la sala. Torna-ho a provar d'aquí a un moment",
+    "ENGINE_OFF": "La clau d'administrador del servidor de vídeo no està configurada",
+    "ENGINE_UNAVAILABLE": "El servidor de vídeo no respon. Torna-ho a provar d'aquí a poc",
+    "ADJ_NOTHING": "No hi ha temps restant per reduir"
+  },
+  "progress": {
+    "title": "Progrés de la construcció",
+    "subtitle": "Fet, en curs i planificat, per funció · a partir de {date}",
+    "overall": "Passos generals",
+    "stepsDone": "{done}/{total} passos fets ({pct}%)",
+    "featureUnit": "funcions",
+    "status": {
+      "done": "Fet",
+      "doing": "En curs",
+      "todo": "Planificat",
+      "drop": "Abandonat"
+    },
+    "features": {
+      "F01": {
+        "name": "Inici de sessió",
+        "desc": "Inici de sessió a Pi Browser, inici de sessió a Google en altres navegadors i enllaç dels dos comptes"
+      },
+      "F05": {
+        "name": "Seminari de vídeo en directe",
+        "desc": "El nostre propi motor de vídeo Galápagos — l'objectiu és un presentador que transmeti a fins a 30 assistents"
+      },
+      "F02": {
+        "name": "Crear un seminari",
+        "desc": "Estableix el subtítol, l'hora, la capacitat i la tarifa del seminari per crear un seminari (nom = illa, automàtic)"
+      },
+      "F03": {
+        "name": "Llista i detalls del seminari",
+        "desc": "Explora els seminaris oberts pàgina per pàgina i consulta'n els detalls"
+      },
+      "F04": {
+        "name": "Pagament d'entrada amb Pi",
+        "desc": "Paga la tarifa del seminari amb Pi; el servidor torna a comprovar l'import abans de deixar-te entrar"
+      },
+      "F06": {
+        "name": "Pagaments als amfitrions",
+        "desc": "Paga els ingressos de la tarifa d'entrada als amfitrions amb Pi"
+      },
+      "F07": {
+        "name": "Reproduccions",
+        "desc": "Mira els seminaris gravats més tard"
+      },
+      "FU": {
+        "name": "Base d'add-ons de reunió",
+        "desc": "Un canal de senyal per a add-ons, connexió d'IA, fragments de veu, consentiment del micròfon i taules de dades"
+      },
+      "F08": {
+        "name": "Programació i compartició",
+        "desc": "Enllaç del calendari, fitxer d'esdeveniment (.ics) i invitació per correu electrònic per a cada seminari"
+      },
+      "F09": {
+        "name": "Reducció de soroll i il·luminació",
+        "desc": "Redueix el soroll del micròfon i il·lumina el vídeo fosc de la càmera"
+      },
+      "F10": {
+        "name": "Subtítols en directe",
+        "desc": "Converteix la parla del presentador en text sota l'escenari"
+      },
+      "F11": {
+        "name": "Enquestes, preguntes i respostes i assistència",
+        "desc": "Realitza enquestes i preguntes durant un seminari; els amfitrions descarreguen la llista d'assistència"
+      },
+      "F12": {
+        "name": "Efectes de fons",
+        "desc": "Difumina el teu fons o substitueix-lo per un predefinit o la teva pròpia imatge (processat al teu dispositiu)"
+      },
+      "F13": {
+        "name": "Gravació local",
+        "desc": "El presentador grava el seminari al seu propi dispositiu i tothom veu que la gravació està activada"
+      },
+      "F14": {
+        "name": "Notes de reunió amb IA",
+        "desc": "Quan el presentador l'activa, la parla i les pantalles es graven i es resumeixen en punts clau, decisions i tasques pendents"
+      },
+      "F15": {
+        "name": "Notes de reunió presencials",
+        "desc": "Grava una reunió només amb un micròfon i obtén notes de reunió (administradors)"
+      },
+      "F16": {
+        "name": "Subtítols traduïts",
+        "desc": "Mostra els subtítols traduïts a l'idioma que triïs"
+      },
+      "F17": {
+        "name": "Escoltar en traducció",
+        "desc": "Llegeix els subtítols traduïts en veu alta amb una veu sintètica mentre es redueix l'àudio original"
+      }
+    },
+    "steps": {
+      "piLogin": "Inici de sessió a Pi Browser",
+      "googleLogin": "Inici de sessió a Google",
+      "accountLink": "Enllaç de comptes",
+      "deviceTest": "Prova de dispositiu de càmera",
+      "oneToTwo": "Presentador 1 → 2 assistents",
+      "recovery": "Recuperació de congelació i estabilitat",
+      "structure": "Neteja de l'estructura del motor",
+      "autoQuality": "Qualitat automàtica, 30 assistents",
+      "roomService": "Entrada a la sala i gravació",
+      "roomUi": "Pantalla de la sala (vestíbul·escenari·xat·aixecar la mà·moderació)",
+      "createForm": "Pantalla de creació",
+      "list": "Llista",
+      "detail": "Detalls",
+      "payRequest": "Sol·licitud de pagament",
+      "payVerify": "Recomprovació de l'import i entrada",
+      "settle": "Pagament",
+      "vod": "Reproducció de gravació",
+      "appRelay": "Canal de senyal d'add-on del motor",
+      "aiBase": "IA, fragments de veu, consentiment i taules de dades",
+      "shareLinks": "Enllaç del calendari, .ics i invitació per correu electrònic",
+      "noiseLight": "Reducció de soroll i il·luminació",
+      "liveCaptions": "Subtítols en directe",
+      "pollQnaAttend": "Enquestes, preguntes i respostes i llista d'assistència",
+      "backgrounds": "Difuminat, predefinits i la teva pròpia imatge",
+      "localRecording": "Gravació del presentador i distintiu de gravació",
+      "aiNotes": "Gravació, resum i pàgina de notes",
+      "inPersonNotes": "Notes només amb micròfon i les meves notes",
+      "captionTranslate": "Elecció d'idioma i commutació original/traduït",
+      "dubbing": "Reproducció de veu sintètica i àudio original reduït"
+    },
+    "refLabel": "Model de referència",
+    "uiRef": "Línia base de la interfície d'usuari — patrons de pantalla i funcions d'una aplicació de reunió de vídeo web àmpliament utilitzada, adaptada per a seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Nom desat, però no s'ha pogut notificar als altres ara. El veuran després que tornis a unir-te.",
+      "tile": "Fes clic per canviar el meu nom",
+      "menu": "Canviar el meu nom",
+      "title": "El meu nom en aquest seminari",
+      "hint": "Fins a 30 caràcters. S'utilitza només en aquest seminari i s'actualitza a la pantalla de tothom immediatament.",
+      "save": "Desar",
+      "saving": "Desant…",
+      "cancel": "Cancel·lar",
+      "taken": "Aquest nom ja l'utilitza una altra persona (amfitrió o assistent). Tria'n un altre.",
+      "failed": "No s'ha pogut desar el teu nom. Torna-ho a provar."
+    },
+    "roomTitle": {
+      "edit": "Fes clic per editar el subtítol",
+      "label": "Subtítol",
+      "placeholder": "Subtítol (fins a 60)",
+      "save": "Desar",
+      "cancel": "Cancel·lar",
+      "failed": "No s'ha pogut desar el subtítol."
+    },
+    "mirror": "Mirall del meu vídeo",
+    "barPin": "Mostrar sempre la barra inferior",
+    "barAuto": "Amagar automàticament la barra inferior",
+    "title": "Unir-se al seminari · {room}",
+    "titleSeminar": "Sala d'espera",
+    "noEngine": "El servidor de vídeo encara no està preparat.",
+    "joinAs": "Unir-se com a",
+    "presenter": "Presentador",
+    "audience": "Públic",
+    "join": "Unir-se ara",
+    "nameLabel": "Nom",
+    "audienceHint": "Els membres del públic no utilitzen càmera ni micròfon. Després d'unir-te, veuràs i sentiràs el presentador.",
+    "preview": {
+      "pending": "Preparant càmera i micròfon…",
+      "audioOnly": "Càmera no disponible — enviant només àudio.",
+      "none": "Càmera i micròfon no disponibles. Comprova els permisos (encara pots unir-te sense mitjans).",
+      "videoOnly": "Micròfon no disponible — enviant només vídeo. Comprova el permís del micròfon."
+    },
+    "mic": {
+      "on": "Desactivar micròfon",
+      "off": "Activar micròfon"
+    },
+    "cam": {
+      "on": "Desactivar càmera",
+      "off": "Activar càmera"
+    },
+    "controls": "Controls de trucada",
+    "leave": "Sortir",
+    "enableSound": "Activar so",
+    "state": {
+      "connecting": "Connectant…",
+      "reconnecting": "Reconnectant…"
+    },
+    "waiting": "Esperant el presentador.",
+    "rejoin": "Unir-se de nou",
+    "err": {
+      "generic": "Alguna cosa ha anat malament. Torna a unir-te.",
+      "CLOSED": "La connexió s'ha perdut.",
+      "NO_ENGINE": "El servidor de vídeo encara no està preparat.",
+      "TICKET_401": "Cal iniciar sessió.",
+      "TICKET_403": "No tens permís per presentar. Uneix-te com a públic.",
+      "TICKET_503": "El servidor de vídeo encara no està configurat.",
+      "TICKET_NETWORK": "Comprova la teva connexió de xarxa.",
+      "TICKET_INVALID": "El teu passi d'entrada ha caducat.",
+      "TICKET_EXPIRED": "El teu passi d'entrada ha caducat.",
+      "ROOM_FULL": "Aquest seminari està ple.",
+      "ROOM_CLOSED": "La sala s'ha tancat — el seminari ha acabat o l'amfitrió ha estat absent més de 5 minuts.",
+      "DUPLICATE_SESSION": "Has entrat des d'un altre dispositiu, així que aquesta pantalla s'ha desconnectat.",
+      "ROLE_FORBIDDEN": "No tens permís per presentar.",
+      "WS_FAILED": "No s'ha pogut connectar al servidor de vídeo.",
+      "ICE_FAILED": "La connexió de vídeo s'ha perdut. Comprova la teva xarxa.",
+      "MEDIA_FAILED": "No s'ha pogut iniciar la càmera o el micròfon.",
+      "TIMEOUT": "El servidor de vídeo no respon.",
+      "TICKET_402": "Aquest és un seminari de pagament. Si us plau, paga a la pàgina del seminari abans d'entrar.",
+      "TICKET_404": "Seminari no trobat.",
+      "TICKET_409": "Aquest seminari ha acabat o s'ha cancel·lat.",
+      "TICKET_HOST_AWAY": "L'amfitrió encara no s'ha unit o ha estat absent més de 5 minuts, així que no pots entrar. Torna-ho a provar després que l'amfitrió s'uneixi.",
+      "TICKET_PLAN_EXHAUSTED": "El pla d'aquest seminari no té temps restant, així que no es pot iniciar. Comprar el mateix pla de nou afegeix temps (el pla gratuït es renova amb 1 hora el mes que ve)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "No s'ha pogut canviar el micròfon. Torna-ho a provar.",
+        "video": "No s'ha pogut canviar la càmera. Torna-ho a provar."
+      },
+      "forbidden": "No tens permís per presentar, així que continuaràs com a públic.",
+      "demoted": "Has tornat a ser públic.",
+      "endFailed": "No s'ha pogut finalitzar el seminari. Torna-ho a provar.",
+      "chatFailed": "Missatge no enviat.",
+      "actionFailed": "No s'ha pogut completar la sol·licitud. Torna-ho a provar.",
+      "shareFailed": "No s'ha pogut iniciar la compartició de pantalla.",
+      "err": {
+        "RATE_LIMITED": "Estàs enviant massa ràpid. Espera un moment.",
+        "ROLE_FORBIDDEN": "No tens permís per fer això.",
+        "MEDIA_FAILED": "No s'ha pogut iniciar el micròfon o la càmera. Comprova els permisos.",
+        "LOCKED": "Bloquejat pel presentador."
+      },
+      "mutedBy": {
+        "audio": "El presentador ha silenciat el teu micròfon.",
+        "video": "El presentador ha apagat la teva càmera."
+      },
+      "policy": {
+        "locked": "El presentador ha bloquejat els micròfons. Pots activar el teu un cop estiguin desbloquejats.",
+        "unlocked": "Els micròfons estan desbloquejats."
+      },
+      "consent": {
+        "saveFail": "No s'ha pogut desar el teu consentiment. Comprova el teu registre i torna a activar el micròfon."
+      }
+    },
+    "home": "Anar a l'inici",
+    "tile": {
+      "fullscreen": "Doble clic per a pantalla completa · Esc per sortir",
+      "self": "{name} (tu)",
+      "presenter": "Presentador",
+      "micOff": "Micròfon apagat",
+      "screen": "Pantalla de {name}",
+      "row": "Altres ponents",
+      "pin": "Mostra {name} gran",
+      "unpin": "Disposició automàtica"
+    },
+    "more": "Més opcions",
+    "joinNoCam": "Unir-se sense càmera",
+    "net": {
+      "afterJoin": "La teva connexió es comprova automàticament després d'unir-te.",
+      "measuring": "Comprovant connexió…",
+      "good": "Connexió bona",
+      "fair": "Connexió regular",
+      "poor": "Connexió dolenta",
+      "reason": {
+        "loss": {
+          "audio": "Es perd el {pct}% de les dades d'àudio.",
+          "video": "Es perd el {pct}% de les dades de vídeo."
+        },
+        "rate": {
+          "audio": "La pujada d'àudio és baixa a {kbps} kbps.",
+          "video": "La pujada de vídeo és baixa a {kbps} kbps. La qualitat pot disminuir."
+        }
+      }
+    },
+    "people": "{n} a la sala",
+    "screen": {
+      "start": "Compartir pantalla",
+      "stop": "Deixar de compartir"
+    },
+    "panel": {
+      "title": "Xat · Preguntes i respostes · Enquestes · Persones",
+      "chat": "Xat",
+      "people": "Persones",
+      "close": "Tancar panell",
+      "qna": "Preguntes i respostes",
+      "polls": "Enquestes"
+    },
+    "chat": {
+      "empty": "Encara no hi ha missatges. El xat no es guarda.",
+      "me": "Tu",
+      "failed": "No enviat.",
+      "retry": "Torna a intentar-ho",
+      "input": "Escriu un missatge",
+      "send": "Enviar"
+    },
+    "hand": {
+      "raise": "Aixecar la mà",
+      "lower": "Baixar la mà",
+      "list": "Mans aixecades",
+      "lowerAll": "Baixar totes les mans",
+      "raised": "Mà aixecada",
+      "notice": "{name} ha aixecat la mà.",
+      "dismiss": "Ignorar",
+      "waiting": "{n} persones esperant per parlar"
+    },
+    "react": {
+      "open": "Reaccions",
+      "e0": "M'agrada",
+      "e1": "Aplaudir",
+      "e2": "Riure",
+      "e3": "Sorprès",
+      "e4": "Trist",
+      "e5": "Sense paraules",
+      "e6": "Amor"
+    },
+    "quality": {
+      "label": "Qualitat",
+      "auto": "Automàtic",
+      "high": "Alta",
+      "medium": "Mitjana",
+      "low": "Baixa",
+      "unstable": "La teva xarxa és inestable"
+    },
+    "roles": {
+      "presenter": "Presentador",
+      "panel": "Panelista",
+      "audience": "Públic"
+    },
+    "stage": {
+      "invite": "Convida a l'escenari",
+      "remove": "Moure a l'audiència",
+      "promoted": "Has estat convidat a l'escenari. Si has aixecat la mà, la teva càmera s'encén automàticament (a menys que estigui bloquejada o no estigui permesa). Activa el micròfon per parlar (el micròfon no s'encén automàticament).",
+      "later": "Més tard"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} ha aixecat la mà."
+    },
+    "leaveDialog": {
+      "title": "Sortir del seminari",
+      "body": "Pots sortir pel teu compte, o finalitzar el seminari i desconnectar a tothom.",
+      "confirmTitle": "Finalitzar el seminari?",
+      "confirmBody": "Tothom es desconnectarà i ningú podrà tornar a unir-se a aquest seminari.",
+      "cancel": "Cancel·lar",
+      "end": "Finalitzar seminari",
+      "endConfirm": "Finalitzar ara"
+    },
+    "mod": {
+      "muteAll": "Silenciar a tothom",
+      "lock": "Bloquejar micròfons",
+      "unlock": "Desbloquejar micròfons",
+      "locked": "El presentador ha bloquejat els micròfons",
+      "muteMic": "Silenciar micròfon",
+      "askMic": "Demanar que s'activi el so",
+      "muteCam": "Apagar càmera",
+      "muteMicOf": "Silenciar {name}",
+      "askMicOf": "Demanar a {name} que activi el so",
+      "muteCamOf": "Apagar càmera de {name}"
+    },
+    "ask": {
+      "audio": "El presentador t'ha demanat que activis el micròfon.",
+      "video": "El presentador t'ha demanat que activis la càmera.",
+      "ignore": "Ignorar"
+    },
+    "toDetail": "Anar a la pàgina del seminari",
+    "consent": {
+      "title": "Abans d'activar el micròfon",
+      "body": "Si la gravació, els subtítols o les notes de reunió d'IA estan activats en aquest seminari, la teva veu es pot convertir a text, emmagatzemar i traduir. El processament de veu es realitza mitjançant un servei d'IA fora del teu país. Si no hi estàs d'acord, el teu micròfon s'activarà igualment, però la teva veu no es processarà.",
+      "privacy": "Política de privadesa",
+      "newTab": "(s'obre en una pestanya nova)",
+      "decline": "No accepto",
+      "agree": "Accepto i activo el micròfon",
+      "notice": "Quan la gravació, els subtítols o les notes de reunió d'IA estan activats, les veus dels ponents es processen. Les veus del públic no s'envien.",
+      "saveFailClosed": "Aquest seminari ha acabat, així que el consentiment no es pot registrar."
+    },
+    "captions": {
+      "title": "Subtítols",
+      "room": "Subtítols en directe (tota la sala)",
+      "show": "Mostra subtítols",
+      "size": {
+        "label": "Mida del text",
+        "sm": "Petita",
+        "md": "Mitjana",
+        "lg": "Gran"
+      },
+      "waiting": "Els subtítols apareixen quan el presentador els activa",
+      "limit": "S'ha arribat al límit de processament de veu, així que els subtítols i les notes d'IA s'han aturat.",
+      "sendFail": "No s'han pogut activar els subtítols. Torna-ho a provar d'aquí a poc.",
+      "sendFailOff": "No s'han pogut desactivar els subtítols. Torna-ho a provar d'aquí a poc.",
+      "region": "Subtítols",
+      "translate": "Mostra subtítols traduïts",
+      "lang": "Idioma de traducció",
+      "langMine": "Els meus idiomes",
+      "langAll": "Tots els idiomes",
+      "trStop": {
+        "forbidden": "Els subtítols traduïts són només per a participants registrats. Es mostra l'original.",
+        "unavailable": "Els subtítols traduïts no estan disponibles ara mateix. Es mostra l'original.",
+        "quota": "Aquest seminari ha arribat al seu límit de traducció. Es mostra l'original.",
+        "usrQuota": "Has esgotat el teu límit de traducció per a aquest seminari. Es mostra l'original."
+      },
+      "unsupported": "Aquest dispositiu no pot crear subtítols en directe (aquest navegador no admet la gravació d'àudio)."
+    },
+    "effects": {
+      "title": "Efectes",
+      "light": "Correcció de llum",
+      "noise": "Reduir soroll",
+      "noiseFail": "La reducció de soroll no es pot canviar en aquest dispositiu.",
+      "close": "Tancar",
+      "preview": "La meva previsualització",
+      "bg": "Fons",
+      "bgNone": "Cap",
+      "bgBlur": "Desenfocar",
+      "scenes": {
+        "beach": "🏝️ Platja de les Maldives",
+        "autumn": "🍁 Vall de tardor",
+        "fireplace": "🔥 Llar de foc",
+        "xmas": "🎄 Sala de reunions de Nadal"
+      },
+      "bgs": {
+        "dusk": "Capvespre",
+        "ocean": "Oceà",
+        "forest": "Bosc",
+        "studio": "Estudi",
+        "grid": "Quadrícula",
+        "dots": "Punts"
+      },
+      "myAdd": "La meva imatge",
+      "myItem": "La meva imatge {n}",
+      "myDel": "Suprimeix la meva imatge {n}",
+      "mySaveFail": "El fons s'ha aplicat però no s'ha pogut desar en aquest dispositiu (només per a aquesta reunió).",
+      "bgStopped": "L'efecte de fons s'ha aturat i s'ha desactivat. Tria'l de nou per reiniciar.",
+      "myNote": "Les teves imatges només s'emmagatzemen en aquest dispositiu (fins a 3, 2 MB cadascuna).",
+      "mobileBlurOnly": "Als telèfons, només està disponible el fons desenfocat (els fons d'imatge funcionen a PC).",
+      "myTooBig": "Només es poden utilitzar imatges de fins a 2 MB.",
+      "preparing": "Preparant…",
+      "bgFailed": "No s'ha pogut carregar l'efecte de fons.",
+      "autoOff": "El teu dispositiu és massa lent, així que l'efecte de fons s'ha desactivat.",
+      "unsupported": "Els efectes de fons no estan disponibles en aquest dispositiu.",
+      "noCam": "Activa la càmera per triar un fons.",
+      "lightUnsupported": "La correcció de llum no està disponible en aquest dispositiu.",
+      "noiseUnsupported": "La configuració de reducció de soroll no és compatible amb aquest dispositiu."
+    },
+    "sheetClose": "Tancar",
+    "polls": {
+      "new": "Nova enquesta",
+      "question": "Pregunta",
+      "option": "Opció {n}",
+      "remove": "Eliminar opció {n}",
+      "addOption": "Afegir opció",
+      "start": "Iniciar enquesta",
+      "cancel": "Cancel·lar",
+      "dup": "Les opcions han de ser diferents.",
+      "vote": "Votar",
+      "change": "Canviar vot",
+      "close": "Tancar enquesta",
+      "closed": "Tancada",
+      "mine": "La teva elecció",
+      "result": "{pct}% ({n} vots)",
+      "total": "{n} vots en total",
+      "empty": "Encara no hi ha enquestes.",
+      "loading": "Carregant…",
+      "labOnly": "Les enquestes només estan disponibles a les sales de seminari.",
+      "started": "S'ha iniciat una nova enquesta.",
+      "goVote": "Votar",
+      "votersNote": "L'organitzador pot veure qui ha votat per cada opció.",
+      "voters": "Han votat: {names}"
+    },
+    "qna": {
+      "sort": "Ordenar",
+      "by": {
+        "top": "Més votades",
+        "new": "Més noves"
+      },
+      "rcm": "Votar positivament ({n})",
+      "answered": "Respostes",
+      "answer": "Marcar com a resposta",
+      "unanswer": "Desmarcar com a resposta",
+      "hide": "Amagar",
+      "doneN": "{n} respostes",
+      "backOpen": "Preguntes sense respondre",
+      "empty": "Encara no hi ha preguntes.",
+      "emptyDone": "No hi ha preguntes respostes.",
+      "loading": "Carregant…",
+      "input": "Fes una pregunta (500 caràcters)",
+      "send": "Enviar",
+      "left": "Queden {n}",
+      "labOnly": "Les preguntes i respostes només estan disponibles a les sales de seminari."
+    },
+    "recording": {
+      "title": "Gravar",
+      "badge": "Gravant",
+      "unsupported": "Aquest navegador no pot gravar. Si us plau, grava des d'un navegador normal en un ordinador.",
+      "piBrowserOnly": "La gravació només funciona en un navegador normal (PC o mòbil). Pi Browser no pot desar fitxers de gravació — obre aquest seminari en un navegador d'ordinador o telèfon (seminarz.vercel.app) per gravar.",
+      "audioSuspended": "És possible que la gravació de so no s'hagi iniciat en aquest dispositiu. Només es pot gravar la imatge.",
+      "notifyFailed": "La gravació no s'ha iniciat perquè no s'ha pogut notificar als participants. Torna-ho a provar d'aquí a poc.",
+      "confirm": {
+        "title": "Iniciar gravació?",
+        "body": "Quan s'iniciï la gravació, tothom veurà un indicador de 'Gravant'. El fitxer només es desa en aquest dispositiu i mai es puja ni es transfereix a l'estranger. Si us plau, informa els participants abans de començar.",
+        "download": "Quan aturis, es desarà un fitxer MP4 a la teva carpeta de descàrregues (els navegadors que no poden gravar MP4 triguen un moment a convertir-lo; les gravacions de més de 45 minuts es poden mantenir en el seu format original). Els navegadors integrats a l'aplicació poden bloquejar l'emmagatzematge de fitxers, així que grava des d'un navegador normal en un ordinador.",
+        "cancel": "Cancel·lar",
+        "start": "Iniciar gravació",
+        "charge": "Mentre es grava, el temps de gravació es dedueix del teu temps pagat a més del temps de la sala (2x mentre es grava). Quan s'esgota el temps pagat, la gravació s'atura i el fitxer es desa."
+      },
+      "resave": {
+        "label": "Fitxer de gravació",
+        "save": "Torna a desar",
+        "dismiss": "Tancar torna a desar"
+      },
+      "toast": {
+        "started": "Gravació iniciada — tothom la pot veure.",
+        "saved": "Gravació desada. Comprova la teva carpeta de descàrregues. Si no s'ha desat res, toca [Torna a desar] a la part superior de la pantalla.",
+        "autoStopped": "La gravació ha finalitzat perquè el navegador l'ha aturat o s'ha arribat al límit de mida. Tot el que s'havia gravat fins a aquest punt s'ha desat. Inicia la gravació de nou per continuar.",
+        "empty": "No s'ha gravat res, així que no s'ha creat cap fitxer.",
+        "saveFailed": "No s'ha pogut crear el fitxer de gravació.",
+        "converting": "Convertint la gravació a MP4. Si us plau, mantén aquesta finestra oberta.",
+        "savedOriginal": "No s'ha pogut convertir a MP4, així que la gravació s'ha desat en el seu format original (webm). Comprova la teva carpeta de descàrregues.",
+        "startedBy": "El presentador ha iniciat la gravació.",
+        "stoppedBy": "El presentador ha aturat la gravació."
+      },
+      "paidOnly": "La gravació només està disponible en seminaris oberts amb un pla mensual o anual, mentre quedi temps pagat.",
+      "planOut": "El temps pagat s'ha esgotat, així que la gravació s'ha aturat i el fitxer s'ha desat.",
+      "notInRoom": "Encara estem confirmant que ets a la sala. Torna a iniciar la gravació d'aquí a un moment.",
+      "meterFailed": "No s'ha pogut comprovar el temps de gravació, així que la gravació no s'ha iniciat. Torna-ho a provar d'aquí a un moment.",
+      "paidOut": "No queda temps pagat, així que la gravació no es pot iniciar. Compra el mateix pla de nou per gravar.",
+      "pausedBadge": "Gravació en pausa",
+      "controls": "Controls de gravació",
+      "pause": "Pausa",
+      "resume": "Reprèn",
+      "stop": "Atura la gravació"
+    },
+    "notes": {
+      "on": "Notes d'IA",
+      "badge": "Notes d'IA activades",
+      "started": "El presentador ha activat les notes d'IA",
+      "stopped": "Les notes d'IA s'han desactivat",
+      "startedMine": "Notes d'IA activades — es mostren a tothom",
+      "stoppedMine": "Notes d'IA desactivades — creant les notes",
+      "startFail": "No s'han pogut iniciar les notes d'IA",
+      "gone": "Les notes d'IA s'han aturat — les notes s'han acabat o s'han eliminat en un altre lloc",
+      "unsupported": "Les notes d'IA no es poden activar aquí (no hi ha suport per a la gravació d'àudio)"
+    },
+    "dubbing": {
+      "listen": "Escoltar amb veu traduïda",
+      "blocked": "No s'ha pogut reproduir la veu traduïda. Torna-la a activar",
+      "stopped": "La veu traduïda no està disponible ara mateix, per tant s'ha desactivat",
+      "usrQuota": "Has esgotat el teu límit de veu traduïda per a aquest seminar, per tant s'ha desactivat"
+    },
+    "plan": {
+      "warn": "Queden {min} minuts del pla d'aquest seminar.",
+      "ended": "El temps del teu seminar s'ha esgotat, per tant el seminar ha finalitzat i has sortit de la sala.",
+      "left": "Temps restant del seminar",
+      "closed": "El seminar ha finalitzat, per tant has sortit de la sala.",
+      "hostAway": "L'amfitrió ha sortit de la sala. Si no torna en 5 minuts, tots els participants seran expulsats.",
+      "hostGone": "L'amfitrió no ha tornat en 5 minuts, per tant has sortit de la sala. Pots tornar a entrar un cop l'amfitrió s'uneixi."
+    },
+    "toLobby": "Sala d'espera"
+  },
+  "list": {
+    "tabsLabel": "Vista de llista de seminars",
+    "tabs": {
+      "all": "Tots",
+      "hosted": "Organitzats per mi",
+      "joined": "Units"
+    },
+    "empty": {
+      "all": "No hi ha seminars propers.",
+      "hosted": "No has organitzat cap seminar.",
+      "joined": "No t'has unit a cap seminar."
+    },
+    "loading": "Carregant…",
+    "retry": "Torna a intentar-ho",
+    "free": "Gratuït",
+    "fee": "{amount} Pi",
+    "host": "Amfitrió {name}",
+    "capacity": "Capacitat {n}",
+    "status": {
+      "SCHEDULED": "Programat",
+      "LIVE": "En directe",
+      "ENDED": "Finalitzat",
+      "CANCELED": "Cancel·lat"
+    },
+    "hostNew": "Crea un seminar",
+    "progress": "Progrés",
+    "pager": "Paginació",
+    "prev": "Anterior",
+    "next": "Següent",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Subtítol",
+      "placeholder": "Afegeix un subtítol",
+      "save": "Desa el subtítol",
+      "saving": "Desant…",
+      "saved": "Desat."
+    },
+    "loading": "Carregant…",
+    "back": "Torna a la llista",
+    "notFound": "Seminar no trobat.",
+    "status": {
+      "SCHEDULED": "Programat",
+      "LIVE": "En directe",
+      "ENDED": "Finalitzat",
+      "CANCELED": "Cancel·lat"
+    },
+    "startAt": "Data",
+    "host": "Amfitrió",
+    "seats": "Seients lliures",
+    "seatsValue": "{left} / {max}",
+    "fee": "Quota del seminar",
+    "feeValue": "{amount} Pi",
+    "free": "Gratuït",
+    "enter": "Entra",
+    "payEnter": "Paga amb Pi i entra ({amount} Pi)",
+    "paying": "Processant pagament…",
+    "joining": "Registrant-se…",
+    "registered": "Estàs registrat.",
+    "full": "Aquest seminar està ple.",
+    "closed": "Aquest seminar ha finalitzat.",
+    "canceled": "Aquest seminar ha estat cancel·lat.",
+    "roomLink": "Ves a la sala (amfitrió)",
+    "piBrowserOnly": "El pagament està disponible a Pi Browser després d'iniciar sessió a Pi.",
+    "payCancelled": "Pagament cancel·lat.",
+    "payStillWaiting": "Encara esperant la cartera. Si ja has iniciat sessió a Pi Wallet, espera un moment.",
+    "payFailed": "El pagament ha fallat.",
+    "err": {
+      "NAME_TAKEN": "Aquest nom ja l'utilitza una altra persona. Tria'n un altre.",
+      "CAL_READ_FAILED": "No s'han pogut carregar els teus esdeveniments. Comprova l'adreça.",
+      "ISLAND_FULL": "Tots els 100 noms d'illa estan en ús ara mateix. Pots obrir un nou seminar després que un de proper o en directe finalitzi o sigui cancel·lat.",
+      "SMN_FULL": "Aquest seminar està ple.",
+      "SMN_CLOSED": "Aquest seminar ha finalitzat o ha estat cancel·lat.",
+      "SMN_ALREADY": "Ja estàs registrat o hi ha un pagament en curs.",
+      "SMN_FREE": "Els seminars gratuïts no requereixen pagament.",
+      "SMN_PAY_REQUIRED": "Aquest és un seminar de pagament. Si us plau, paga per entrar.",
+      "SMN_PAY_INVALID": "No hem pogut verificar el teu pagament. Si us plau, contacta amb l'administrador.",
+      "PAY_PI_FAILED": "No s'ha pogut contactar amb el servidor de pagament de Pi. Torna-ho a provar en breu.",
+      "PAY_MISMATCH": "Les dades de pagament no coincideixen.",
+      "PAY_AMOUNT_MISMATCH": "L'import del pagament difereix de la quota del seminar.",
+      "PAY_CANCELLED": "Aquest pagament ha estat cancel·lat.",
+      "PAY_ALREADY_PAID": "Hi ha un pagament en curs. Si estaves iniciant sessió a la cartera, torna-ho a provar en 3 minuts.",
+      "PAY_INVALID_STATE": "Aquest pagament no es pot processar ara.",
+      "PAY_PI_CANCEL_REFUSED": "El pagament ja està en curs i no es pot cancel·lar. Torna-ho a comprovar en breu."
+    },
+    "share": {
+      "title": "Programa i comparteix",
+      "calendar": "Afegeix al calendari",
+      "ics": "Fitxer de calendari",
+      "mail": "Invita per correu electrònic",
+      "mailApp": "Envia amb l'aplicació de correu predeterminada",
+      "mailSubject": "[Invitació a seminar] {title}",
+      "mailBody": "{title}\nQuan: {start}\n\nUneix-te directament amb aquest enllaç.\nEscriptori: {url}\nPi Browser: {piUrl}",
+      "copy": "Copia l'enllaç",
+      "copied": "Enllaç copiat.",
+      "copyFail": "No s'ha pogut copiar. Si us plau, copia l'enllaç de la barra d'adreces.",
+      "share": "Comparteix amb una altra aplicació",
+      "shareFail": "No s'ha pogut compartir. Si us plau, utilitza Copia l'enllaç en el seu lloc.",
+      "created": "El teu seminar està a punt. Afegeix la seva hora d'inici al teu Google Calendar.",
+      "addGoogle": "Afegeix a Google Calendar",
+      "later": "Més tard",
+      "piBrowserOpen": "A Pi Browser, el calendari, el correu electrònic i el fitxer de calendari s'obren al navegador predeterminat del teu telèfon.",
+      "extFail": "No s'ha pogut obrir. Actualitza Pi Browser, o utilitza Copia l'enllaç i obre'l en un navegador normal (seminarz.vercel.app).",
+      "icsPiBrowser": "El fitxer de calendari només es pot descarregar en un navegador normal (ordinador o mòbil). A Pi Browser, utilitza Afegeix al calendari en el seu lloc."
+    },
+    "attendance": "Assistència",
+    "plan": "Pla",
+    "left": "Temps restant"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Mes anterior",
+      "next": "Mes següent",
+      "connect": "Mostra el meu Google Calendar",
+      "change": "Gestiona els calendaris de Google ({n})",
+      "add": "Afegeix",
+      "remove": "Elimina",
+      "close": "Tanca",
+      "failed": "No s'han pogut carregar els esdeveniments de {n} calendari(s). Comprova l'adreça.",
+      "badUrl": "Enganxa l''Adreça secreta en format iCal' (…/basic.ics) de la configuració de Google Calendar, no la barra d'adreces del navegador.",
+      "full": "Pots afegir fins a {n} calendaris.",
+      "allDay": "Tot el dia",
+      "day": "Els meus esdeveniments d'aquest dia",
+      "count": "{n, plural, one {# esdeveniment} other {# esdeveniments}}",
+      "more": "+{n}",
+      "picked": "Aquesta data s'ha establert com a data d'inici. Tria l'hora a continuació.",
+      "s1": "Toca [Obre la configuració de Google Calendar] a continuació.",
+      "s2": "A 'Configuració dels meus calendaris' a l'esquerra, tria un calendari (p. ex., el teu nom).",
+      "s3": "Desplaça't fins a 'Integra el calendari' i copia l''Adreça secreta en format iCal'.",
+      "s4": "Enganxa-la aquí i toca [Afegeix] — els títols dels esdeveniments apareixen al calendari. Afegeix altres calendaris de la mateixa manera, fins a 5.",
+      "open": "Obre la configuració de Google Calendar",
+      "privacy": "Aquesta adreça és una clau del teu calendari — no la comparteixis. S'emmagatzema només en aquest dispositiu, mai al nostre servidor."
+    },
+    "title": "Crea un seminar",
+    "name": "Viatgem a una illa preciosa!",
+    "subTitle": "Subtítol (opcional, fins a 60)",
+    "startAt": "Hora d'inici",
+    "maxCnt": "Capacitat (1–100)",
+    "submit": "Crea",
+    "submitting": "Creant…",
+    "invalid": "Comprova la teva entrada — una data dins d'un any a partir d'ara, capacitat 1–100.",
+    "attendance": {
+      "title": "Assistència",
+      "back": "Torna al seminar",
+      "loading": "Carregant…",
+      "forbidden": "Només l'amfitrió i els administradors poden veure l'assistència.",
+      "count": "{n} persones",
+      "csv": "Descarrega CSV",
+      "empty": "Encara ningú s'ha unit.",
+      "online": "En línia",
+      "left": "Ha marxat",
+      "col": {
+        "name": "Nom",
+        "pi": "Nom d'usuari de Pi",
+        "ent": "Primera unió",
+        "hb": "Última vegada vist",
+        "dur": "Temps assistit",
+        "min": "Assistit (min, temps absent exclòs)",
+        "state": "Estat"
+      },
+      "durNote": "El temps assistit és des de la primera unió fins a l'última vegada vist, menys el temps absent (interrupcions de més de 2,5 minuts).",
+      "csvPiBrowser": "La descàrrega de CSV només funciona en un navegador normal (ordinador o mòbil). Pi Browser no pot desar fitxers — obre aquesta fulla d'assistència en un navegador d'ordinador o telèfon (seminarz.vercel.app)."
+    },
+    "plan": "Pla",
+    "planFree": "Gratuït — {time} restant aquest mes · sense IA",
+    "planPaid": "{name} {time} · {price} — paga en crear",
+    "planHint": "Un seminar obert amb un pla de pagament utilitza primer el temps d'aquest pla, després continua amb el temps gratuït d'aquest mes (sense IA a la part gratuïta). Un pla actiu s'obre sense pagament; Mensual o Anual que no tinguis es paga en Pi quan prems Crea, llavors s'obre el seminar (Pi Browser). Unir-se sempre és gratuït per als participants.",
+    "planOwned": "{name} — actiu · {time} restant",
+    "planEnds": "L'hora d'inici és posterior a la caducitat d'aquest pla. Mou l'inici abans o tria un altre pla.",
+    "paidKept": "El teu passi de pagament es manté. Soluciona el problema i prem Crea de nou (sense segon pagament)."
+  },
+  "privacy": {
+    "title": "Política de privadesa — Funcions de veu i IA",
+    "effective": "Vigent des del {date}",
+    "intro": "Aquesta política explica la informació personal que processem quan utilitzes subtítols en directe, subtítols traduïts, traducció de veu, notes de reunió d'IA i notes presencials en un seminar. Aquestes funcions utilitzen un servei d'IA extern, per tant la informació es transfereix a l'estranger.",
+    "whoTitle": "De qui es processa la informació",
+    "who": [
+      "Presentadors i participants a l'escenari: et demanem el teu consentiment una vegada, abans que activis el teu micròfon per primera vegada. Pots unir-te al seminar sense consentir.",
+      "Audiència: no utilitzes un micròfon, per tant no s'envia cap veu. Només veus subtítols i notes.",
+      "Notes presencials: un administrador grava una reunió amb un micròfon i confirma que els assistents van ser informats abans de la gravació."
+    ],
+    "xferTitle": "Transferència d'informació personal a l'estranger (Llei de protecció de la informació personal de Corea, Art. 28-8)",
+    "xfer": [
+      {
+        "k": "Destinatari",
+        "v": "Google LLC (API Gemini) — contacte [TBD: contacte de privadesa de Google]"
+      },
+      {
+        "k": "Països",
+        "v": "Estats Units i altres països on es troben els centres de dades de Google [TBD: regió de processament]"
+      },
+      {
+        "k": "Quan i com",
+        "v": "Aproximadament cada 5 segons mentre una funció està activada, mitjançant una connexió xifrada (HTTPS). Per a les notes presencials, tota la gravació s'envia una vegada més en parts de 5 minuts quan la nota finalitza (transcripció precisa)."
+      },
+      {
+        "k": "Elements",
+        "v": "Veu, contingut parlat (text), nom de visualització de l'orador (per a resums de notes), captures de pantalla compartides (quan les notes d'IA estan activades)"
+      },
+      {
+        "k": "Propòsit",
+        "v": "Veu a text, traducció, resums de notes de reunió, veu sintètica (veus estàndard, sense clonació de veu), separació d'oradors per a notes presencials (les veus es distingeixen i s'etiqueten per gènere percebut, com ara Home 1 / Dona 1 — no s'infereixen noms ni identitats)"
+      },
+      {
+        "k": "Retenció",
+        "v": "Finalitza tan aviat com es retorna el resultat. Demanem a Google que no emmagatzemi les sol·licituds (store=false). Els registres de monitorització d'abusos encara es poden conservar segons els termes de Google [TBD: període de retenció i estat de nivell de pagament]."
+      },
+      {
+        "k": "Com rebutjar i què passa",
+        "v": "Si no consents o desactives el teu micròfon, no s'envia cap veu. Encara pots participar en el seminar; només no es creen subtítols, traduccions i notes del teu propi discurs. Pots retirar el consentiment en qualsevol moment [TBD: on es troba el botó de retirada]."
+      }
+    ],
+    "keepTitle": "Què conserva aquest servei",
+    "keep": [
+      "Àudio original: per als subtítols del seminar i les notes de reunió d'IA no s'emmagatzema; es descarta immediatament després de la conversió a text. Per a les notes presencials, la gravació es conserva en un emmagatzematge privat perquè es pugui transcriure de nou amb més precisió (amb oradors) després de la reunió, i s'elimina a la neteja diària un cop ha passat 1 dia des que la nota va finalitzar (immediatament si la nota s'elimina).",
+      "Subtítols en directe: no s'emmagatzemen.",
+      "Notes de reunió d'IA (quan el presentador les activa): contingut parlat, captures de pantalla i el resum, conservats fins que les notes s'eliminen [TBD: retenció màxima].",
+      "Registres de consentiment: l'hora del consentiment i la versió de la política, conservats com a prova [TBD: període de retenció].",
+      "Ús: recomptes de sol·licituds per minut i temps de processament, utilitzats per aplicar límits de cost.",
+      "Assistència: l'hora en què et vas unir, l'hora en què vas estar connectat per última vegada, el teu nom de visualització i el teu nom d'usuari de Pi s'emmagatzemen i es proporcionen a l'amfitrió com a llista d'assistència (en pantalla i com a descàrrega de CSV). Conservats fins que el seminar s'elimina.",
+      "Preguntes i respostes i enquestes: el text de la pregunta i el nom de visualització de l'autor (o el nom d'usuari de Pi si no n'hi ha) són visibles per a tots els participants. Els vots positius només mostren recomptes, mai qui els va emetre. Els vots de les enquestes només mostren recomptes als participants; l'organitzador i els administradors veuen, per a cada opció, el nom de visualització (o el nom d'usuari de Pi si no n'hi ha) de cada votant. Conservats, incloses les preguntes ocultes, fins que el seminar s'elimina."
+    ],
+    "recTitle": "Gravació",
+    "rec": "Les gravacions es guarden només com a fitxer al dispositiu del presentador. No es carreguen als nostres servidors ni es transfereixen a l'estranger. Mentre la gravació o les notes d'IA estan activades, tots els participants veuen un indicador.",
+    "rightsTitle": "Els teus drets",
+    "rights": "Pots sol·licitar accedir, corregir, eliminar o aturar el processament de la teva informació. Contacte: [TBD: nom i contacte de l'oficial de privadesa]"
+  },
+  "notes": {
+    "title": "Notes",
+    "back": "Torna al seminar",
+    "loading": "Carregant…",
+    "meta": "Notes · {date} · {min} min",
+    "aiWarn": "Resum generat per IA — pot contenir errors",
+    "points": "Punts clau",
+    "decisions": "Decisions",
+    "todos": "Elements d'acció",
+    "shots": "Captures de pantalla ({n})",
+    "transcript": "Transcripció",
+    "download": "Descarrega Markdown",
+    "making": "Creant les notes…",
+    "makingLong": "Això està trigant una mica. Si us plau, actualitza més tard",
+    "recording": "Encara gravant",
+    "failed": "No s'ha pogut crear el resum — la transcripció completa és a continuació",
+    "retry": "Torna a intentar-ho",
+    "finish": "Finalitza la gravació i resumeix",
+    "none": "Res aquí",
+    "blank": "Res a resumir — no es va gravar cap discurs o va ser massa curt",
+    "notFound": "Notes no trobades",
+    "forbidden": "No tens accés a aquestes notes",
+    "shotAlt": "Captura de pantalla a les {at}",
+    "close": "Tanca",
+    "view": "Veure notes",
+    "error": "No s'ha pogut carregar",
+    "mine": "Les meves notes",
+    "del": "Elimina notes",
+    "delAsk": "Vols eliminar aquestes notes (resum, transcripció i captures de pantalla)? Ningú les podrà veure",
+    "delYes": "Elimina",
+    "delNo": "Cancel·la",
+    "delFail": "No s'ha pogut eliminar",
+    "dlFail": "No s'ha pogut descarregar — torna a intentar-ho",
+    "recentNotes": "Notes recents",
+    "empty": "Encara no hi ha notes",
+    "newNote": "Inicia notes presencials",
+    "inPerson": "Notes de reunió presencial",
+    "inPersonTag": "Presencial",
+    "titleLabel": "Títol",
+    "titlePh": "p. ex. Reunió setmanal",
+    "told": "He informat a tots els presents que això es gravarà i processarà per IA (obligatori)",
+    "toldWhy": "Abans de començar, informa a tots els presents que aquesta conversa es gravarà (la gravació es conserva durant 1 dia després que la nota finalitzi, i els oradors es distingeixen per veu i s'etiqueten per gènere percebut) i es convertirà en text i un resum per una IA externa",
+    "start": "Inicia la gravació",
+    "starting": "Preparant-se…",
+    "recBadge": "Gravant {time}",
+    "recentLines": "Últimes línies",
+    "waiting": "El text apareix aquí a mesura que la gent parla",
+    "end": "Finalitza i crea notes",
+    "wakeWarn": "L'enregistrament es pot aturar si la pantalla s'apaga",
+    "adminOnly": "Només els administradors poden utilitzar-ho",
+    "aiOff": "Les notes d'IA no estan disponibles ara mateix (cal configurar el servidor). Les notes anteriors es mostren a continuació",
+    "reload": "Torna a carregar",
+    "unsupported": "L'enregistrament no està disponible en aquest dispositiu",
+    "micDenied": "No es pot utilitzar el micròfon — comprova el permís",
+    "limited": "S'ha esgotat el límit de temps de processament — finalitza i crea les notes",
+    "noAgr": "Aturat: no hi ha confirmació d'avís a l'enregistrament — finalitza i torna a començar",
+    "micLost": "El micròfon s'ha desconnectat i l'enregistrament s'ha aturat — toca Reconnecta el micròfon o finalitza la nota",
+    "micRetry": "Reconnecta el micròfon",
+    "gone": "Aquesta nota s'ha finalitzat o s'ha eliminat en un altre lloc, de manera que l'enregistrament s'ha aturat — utilitza el botó següent per obrir les notes",
+    "finishing": "Desant les últimes paraules…",
+    "st": {
+      "RECORDING": "Enregistrant",
+      "SUMMARIZING": "Creant",
+      "DONE": "Fet",
+      "FAILED": "Ha fallat"
+    },
+    "downloadPiBrowser": "La descàrrega de Markdown només funciona en un navegador normal (ordinador o mòbil). Pi Browser no pot desar fitxers — obre aquestes notes en un navegador d'ordinador o telèfon (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Plans",
+    "loading": "Carregant…",
+    "free": "Gratuït",
+    "freeDesc": "{time} de seminaris cada mes (no acumulable)",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "paidDesc": "{time} de seminaris, vàlid per a {months} mesos",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Comprovant el preu de Pi",
+    "noAi": "Sense subtítols, traducció, doblatge ni resums de notes amb IA",
+    "withAi": "Inclou subtítols, traducció, doblatge i resums de notes amb IA",
+    "buy": "Paga amb Pi",
+    "bought": "Pagament completat. S'ha afegit temps de seminari.",
+    "meRemain": "Temps restant: {time}",
+    "loginToBuy": "Inicia la sessió per comprar un pla.",
+    "payNote": "El pagament sempre es fa en Pi. L'import en moneda local és només una referència familiar; l'import en Pi es fixa al preu de Pi en el moment del pagament. Un seminari amb un pla de pagament utilitza primer els abonaments d'aquest pla (els que caduquen abans), i després continua amb el temps gratuït d'aquest mes.",
+    "charge": "Recarregar temps",
+    "hm": "{h} h {m} min",
+    "m": "{m} min",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (comprovant el preu de Pi)",
+    "h": "{h} h"
+  },
+  "adminRooms": {
+    "title": "Gestió de sales",
+    "adminOnly": "Només els administradors poden veure aquesta pàgina.",
+    "refresh": "Actualitza",
+    "count": "{n} sales obertes",
+    "empty": "No hi ha sales obertes ara mateix.",
+    "lab": "Sala de laboratori",
+    "noSeminar": "Sense registre de seminari",
+    "peers": "{n} / {cap} connectats",
+    "producers": "{n} transmissions",
+    "end": "Finalitza {time}",
+    "stale": "El seminari ha acabat, però la sala encara està oberta al servidor de vídeo — tanca-la forçadament.",
+    "close": "Tanca forçadament",
+    "confirmSeminar": "Això finalitza el seminari i tanca la sala. Tothom es desconnectarà.",
+    "confirmRoom": "Això tanca la sala. Tothom es desconnectarà.",
+    "confirmYes": "Tanca",
+    "cancel": "Cancel·la",
+    "closing": "Tancant…",
+    "closed": "Sala tancada.",
+    "metrics": "Mètriques del servidor de vídeo (des de l'inici)",
+    "metricsOff": "No s'han pogut carregar les mètriques.",
+    "m": {
+      "packetsIn": "Paquets d'entrada",
+      "packetsOut": "Paquets de sortida",
+      "nackIn": "NACKs rebuts",
+      "nackOut": "NACKs enviats",
+      "retransmits": "Retransmissions",
+      "duplicateNack": "NACKs duplicats",
+      "cacheMiss": "Errors de memòria cau de retransmissió",
+      "pliOut": "Sol·licituds de fotogrames clau (PLI)",
+      "keyframes": "Fotogrames clau",
+      "layerSwitches": "Canvis de qualitat",
+      "queueDrops": "Descàrregues de cua"
+    }
+  },
+  "adminUsers": {
+    "title": "Usuaris",
+    "adminOnly": "Només els administradors poden veure aquesta pàgina.",
+    "search": "Cerca per nom (2+ caràcters)",
+    "searchBtn": "Cerca",
+    "refresh": "Actualitza",
+    "count": "{n, plural, one {# usuari} other {# usuaris}}",
+    "empty": "No hi ha usuaris.",
+    "admin": "Administrador",
+    "lastLogin": "Últim inici de sessió {time}",
+    "never": "Mai ha iniciat sessió",
+    "plan": {
+      "FREE": "Gratuït",
+      "M": "Mensual",
+      "Y": "Anual"
+    },
+    "until": "(fins a {time})",
+    "manage": "Gestiona el temps",
+    "close": "Tanca",
+    "planLabel": "Pla",
+    "hours": "Hores",
+    "minutes": "Minuts",
+    "reason": "Motiu (opcional)",
+    "sub": "Redueix",
+    "confirmSub": "Redueix el temps de {plan} en {time}.",
+    "confirmYes": "Confirma",
+    "cancel": "Cancel·la",
+    "saving": "Desant…",
+    "done": "Aplicat. Temps restant de {plan}: {time}",
+    "invalid": "Introdueix una reducció entre 1 minut i 1000 hores (minuts sencers 0–59).",
+    "history": "Ajustos recents",
+    "noHistory": "Encara no hi ha ajustos.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Dona un abonament de servei (temps gratuït)",
+    "svc": {
+      "H1": "Abonament d'1 hora",
+      "D1": "Abonament d'1 dia",
+      "M1": "Abonament d'1 mes"
+    },
+    "svcNote": "Els abonaments de servei són temps del pla gratuït. Es poden utilitzar a partir d'ara durant aquest període (1 hora, 24 hores, 1 mes) en seminaris gratuïts i en la part gratuïta dels seminaris de pagament (sense funcions d'IA). Amb diversos abonaments, s'esgoten automàticament en l'ordre 1 hora → 1 dia → 1 mes.",
+    "subTitle": "Redueix el temps",
+    "subNote": "Es pren dels abonaments que caduquen més tard. Si això és més del que queda, només s'elimina el temps restant.",
+    "confirmSvc": "Dona un {svc}.",
+    "doneSvc": "S'ha donat un {svc}. Temps gratuït restant: {time} (l'abonament caduca {end})"
+  }
+}

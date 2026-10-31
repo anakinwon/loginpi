@@ -186,6 +186,9 @@ importers:
       '@formatjs/icu-messageformat-parser':
         specifier: ^3.5.11
         version: 3.5.11
+      flag-icons:
+        specifier: ^7.5.0
+        version: 7.5.0
       next:
         specifier: ^16
         version: 16.2.7(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)

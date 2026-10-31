@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Nyelv módosítása",
-      "search": "Nyelv keresése",
-      "empty": "Nincs találat"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Élő videós szemináriumok, amelyekhez Pi-vel csatlakozhatsz"

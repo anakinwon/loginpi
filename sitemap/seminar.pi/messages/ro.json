@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Schimbă limba",
-      "search": "Căută limba",
-      "empty": "Niciun rezultat"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Seminarii video live la care te alături cu Pi"

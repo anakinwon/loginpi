@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Živé video semináre, ku ktorým sa pripojíte s Pi"
+  },
+  "home": {
+    "description": "Hostitelia otvárajú semináre a účastníci sa pripájajú k živým video reláciám s Pi.",
+    "badge": "Živé semináre na krásnych ostrovoch",
+    "headline": "Sledujte, počúvajte a učte sa spoločne — naživo",
+    "ctaBrowse": "Prehliadať semináre",
+    "ctaPlan": "Zobraziť plány",
+    "features": {
+      "video": "Živé video",
+      "caption": "Titulky a preklad",
+      "notes": "Poznámky zo stretnutia AI",
+      "pay": "Platiť s Pi"
+    },
+    "listTitle": "Semináre",
+    "cal": {
+      "title": "Kalendár seminárov",
+      "desc": "Od minulých seminárov po nadchádzajúce — klepnite na dátum pre podrobnosti.",
+      "legendSmn": "Semináre",
+      "legendEnded": "Minulé semináre",
+      "legendMine": "Moje udalosti",
+      "failed": "Nepodarilo sa načítať dátumy seminárov. Skúste to znova neskôr.",
+      "open": "Zobraziť podrobnosti"
+    }
+  },
+  "nav": {
+    "link": "Prepojiť účet",
+    "privacy": "Ochrana osobných údajov",
+    "plan": "Plány",
+    "rooms": "Miestnosti",
+    "admin": "Administrátor",
+    "users": "Používatelia",
+    "home": "Domov",
+    "privacyShort": "Súkromie",
+    "menu": "Hlavné menu",
+    "fold": "Zbaliť menu",
+    "unfold": "Rozbaliť menu"
+  },
+  "auth": {
+    "checking": "Kontrolujem prihlásenie…",
+    "signedIn": "{name}",
+    "inPerson": "Osobné poznámky",
+    "required": "Prosím, prihláste sa pomocou svojho Pi účtu.",
+    "signIn": "Prihlásiť sa s Pi",
+    "openInPiBrowser": "Otvorte túto stránku v Pi Browseri, aby ste sa prihlásili pomocou svojho Pi účtu.",
+    "authenticating": "Prihlasujem sa…",
+    "google": "Prihlásiť sa s Google",
+    "signOut": "Odhlásiť sa",
+    "or": "alebo",
+    "linkRequired": "Ste prihlásení cez Google, ale ešte to nie je prepojené s Pi účtom. Vydajte prepojovací kód v Pi Browseri a zadajte ho sem.",
+    "linkNeeded": "Vyžaduje sa prepojenie Pi účtu",
+    "linkCheckFailed": "Nepodarilo sa skontrolovať stav prepojenia vášho účtu (dočasná chyba servera). Obnovte stránku o chvíľu."
+  },
+  "piOAuth": {
+    "signingIn": "Prihlasujem sa pomocou vášho Pi účtu…",
+    "failed": "Prihlásenie Pi zlyhalo. Skúste to znova.",
+    "stateMismatch": "Nepodarilo sa overiť túto žiadosť o prihlásenie (vypršala platnosť alebo iná karta). Skúste to znova.",
+    "retry": "Skúsiť znova",
+    "backHome": "Domov"
+  },
+  "link": {
+    "title": "Prepojiť účet",
+    "intro": "Prepojte účet, s ktorým ste sa prihlásili v Pi Browseri, s prihlásením cez Google v bežnom prehliadači. Po prepojení môžete používať rovnaký účet aj v PC prehliadači.",
+    "checking": "Kontrolujem prihlásenie…",
+    "piIssueTitle": "Ak sa chcete prihlásiť aj z bežného prehliadača",
+    "codeHint": "Vydajte kód nižšie, potom sa prihláste pomocou Google v prehliadači na PC a zadajte ho na stránke Prepojiť účet (do 10 minút).",
+    "piIssue": "Vydajte prepojovací kód",
+    "reissue": "Vydajte nový kód",
+    "expiresIn": "Vyprší za {min} min",
+    "enterTitle": "Zadajte prepojovací kód",
+    "enterHint": "V Pi Browseri otvorte seminar.pi → Prepojiť účet → Vydajte prepojovací kód a potom zadajte 6-miestny kód.",
+    "codeLabel": "Prepojovací kód",
+    "submit": "Prepojiť",
+    "done": "Prepojené. Teraz môžete použiť aj prihlásenie Google.",
+    "linked": "{name} je prepojený s prihlásením Google."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Vyžaduje sa prihlásenie",
+    "AUTH_PI_REQUIRED": "Vyžaduje sa prihlásenie Pi",
+    "AUTH_PI_SESSION_INVALID": "Vaša relácia vypršala. Prihláste sa znova",
+    "AUTH_PI_TOKEN_INVALID": "Overenie prihlásenia Pi zlyhalo",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Chýbajú informácie o prihlásení Pi",
+    "FORBIDDEN": "Nemáte povolenie",
+    "BAD_REQUEST": "Chybná požiadavka",
+    "BAD_REQUEST_BODY": "Chybná požiadavka",
+    "INVALID_INPUT": "Neplatný vstup",
+    "QUERY_FAILED": "Nepodarilo sa načítať",
+    "SAVE_FAILED": "Nepodarilo sa uložiť",
+    "INTERNAL": "Niečo sa pokazilo",
+    "SERVER_CONFIG": "Chyba konfigurácie servera. Kontaktujte operátora",
+    "PI_API_CONNECT_FAILED": "Nepodarilo sa pripojiť k Pi Network",
+    "DB_UNAVAILABLE": "Dáta sú dočasne nedostupné. Skúste to znova neskôr",
+    "NOT_FOUND": "Nenájdené",
+    "RATE_LIMITED": "Príliš veľa požiadaviek. Skúste to znova o chvíľu",
+    "PAYLOAD_TOO_LARGE": "Požiadavka je príliš veľká",
+    "NETWORK": "Skontrolujte svoje sieťové pripojenie",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Toto používateľské meno Pi je už zaregistrované s inými povereniami. Kontaktujte správcu",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Tento účet je neaktívny. Kontaktujte správcu",
+    "AUTH_GOOGLE_REQUIRED": "Vyžaduje sa prihlásenie Google.",
+    "LINK_CODE_INVALID": "Prepojovací kód je neplatný alebo vypršal. Vydajte nový v Pi Browseri.",
+    "LINK_ALREADY_LINKED": "Tento účet je už prepojený.",
+    "LINK_CODE_GEN_FAILED": "Nepodarilo sa vytvoriť prepojovací kód. Skúste to znova neskôr.",
+    "AUTH_DB_UNAVAILABLE": "Nepodarilo sa uložiť váš účet, takže prihlásenie zlyhalo. Skúste to znova neskôr.",
+    "LINK_TRY_LIMIT": "Príliš veľa nesprávnych prepojovacích kódov. Skúste to znova o 15 minút.",
+    "PRICE_UNAVAILABLE": "Nepodarilo sa získať cenu Pi. Skúste to znova o chvíľu",
+    "QUOTE_EXPIRED": "Platnosť cenovej ponuky vypršala. Zaplaťte znova",
+    "PLAN_EXHAUSTED": "Vyčerpali ste všetok čas na seminár. Doplňte si ho na stránke Plány",
+    "HOST_AWAY": "Hostiteľ nie je v miestnosti. Môžete vstúpiť, keď sa hostiteľ pripojí",
+    "PLAN_AI_PAID": "Funkcie AI sú dostupné v platených plánoch",
+    "AI_UNAVAILABLE": "Funkcie AI momentálne nie sú dostupné",
+    "SPEECH_CHUNK_INVALID": "Formát zvukového bloku je neplatný",
+    "SPEECH_NOT_LIVE": "Tento seminár nie je naživo",
+    "SPEECH_NO_AGR": "Vyžaduje sa súhlas so spracovaním hlasu",
+    "SPEECH_RATE": "Príliš veľa hlasových požiadaviek. Skúste to znova o chvíľu",
+    "SPEECH_QUOTA": "Čas spracovania hlasu pre tento seminár je vyčerpaný",
+    "SPEECH_USR_QUOTA": "Vyčerpali ste limit prekladu a preloženého hlasu pre tento seminár",
+    "SPEECH_FAILED": "Nepodarilo sa previesť reč na text",
+    "SPEECH_STAGE_ONLY": "Iba ľudia na pódiu môžu používať hlasové titulky",
+    "TRANSLATE_FAILED": "Nepodarilo sa preložiť titulok",
+    "POLL_CLOSED": "Táto anketa je uzavretá",
+    "NOTE_NOT_RECORDING": "Tieto poznámky sa nenahrávajú",
+    "NOTE_SHOT_INVALID": "Neplatné zachytenie obrazovky",
+    "NOTE_AUDIO_INVALID": "Neplatný nahrávací súbor",
+    "NOTE_SHOT_RATE": "Príliš veľa zachytení obrazovky",
+    "NOTE_RETRY_SOON": "Môžete to skúsiť znova o minútu",
+    "SPEECH_TTS_FAILED": "Nepodarilo sa vytvoriť preložený hlas",
+    "CAPTION_SIG_INVALID": "Tento titulok sa nepodarilo overiť, takže nebol preložený",
+    "PLAN_EXPIRES_BEFORE_START": "Čas začiatku je po vypršaní platnosti tohto plánu",
+    "PAY_ALREADY_PAID": "Platba sa stále spracováva. Ak ste sa prihlasovali do peňaženky, skúste to znova o 3 minúty.",
+    "REC_PAID_ONLY": "Nahrávanie je dostupné len v seminároch s mesačným alebo ročným plánom s zostávajúcim plateným časom",
+    "REC_NOT_IN_ROOM": "Stále potvrdzujem, že ste v miestnosti. Skúste to znova o chvíľu",
+    "ENGINE_OFF": "Kľúč správcu video servera nie je nakonfigurovaný",
+    "ENGINE_UNAVAILABLE": "Video server neodpovedá. Skúste to znova o chvíľu",
+    "ADJ_NOTHING": "Nezostáva žiadny čas na zníženie"
+  },
+  "progress": {
+    "title": "Priebeh výstavby",
+    "subtitle": "Hotové, prebiehajúce a plánované, podľa funkcie · k {date}",
+    "overall": "Celkové kroky",
+    "stepsDone": "{done}/{total} krokov hotových ({pct}%)",
+    "featureUnit": "funkcie",
+    "status": {
+      "done": "Hotovo",
+      "doing": "Prebieha",
+      "todo": "Plánované",
+      "drop": "Zrušené"
+    },
+    "features": {
+      "F01": {
+        "name": "Prihlásenie",
+        "desc": "Prihlásenie Pi Browser, prihlásenie Google v iných prehliadačoch a prepojenie oboch účtov"
+      },
+      "F05": {
+        "name": "Živý video seminár",
+        "desc": "Náš vlastný video engine Galápagos — cieľom je jeden prezentujúci streamujúci až 30 účastníkom"
+      },
+      "F02": {
+        "name": "Vytvoriť seminár",
+        "desc": "Nastavte podtitul, čas, kapacitu a poplatok za seminár, aby ste vytvorili seminár (názov = ostrov, automaticky)"
+      },
+      "F03": {
+        "name": "Zoznam a podrobnosti seminárov",
+        "desc": "Prehliadajte otvorené semináre stránku po stránke a zobrazte ich podrobnosti"
+      },
+      "F04": {
+        "name": "Platba za vstup Pi",
+        "desc": "Zaplaťte poplatok za seminár v Pi; server znova skontroluje sumu pred povolením vstupu"
+      },
+      "F06": {
+        "name": "Výplaty hostiteľom",
+        "desc": "Vyplácajte príjmy z vstupného hostiteľom v Pi"
+      },
+      "F07": {
+        "name": "Opakované prehrávanie",
+        "desc": "Pozrite si nahrané semináre neskôr"
+      },
+      "FU": {
+        "name": "Základ pre doplnky stretnutí",
+        "desc": "Jeden signálny kanál pre doplnky, pripojenie AI, hlasové bloky, súhlas s mikrofónom a dátové tabuľky"
+      },
+      "F08": {
+        "name": "Plán a zdieľanie",
+        "desc": "Odkaz na kalendár, súbor udalosti (.ics) a pozvánka e-mailom pre každý seminár"
+      },
+      "F09": {
+        "name": "Redukcia šumu a osvetlenie",
+        "desc": "Znížte šum mikrofónu a rozjasnite tmavé video z kamery"
+      },
+      "F10": {
+        "name": "Živé titulky",
+        "desc": "Premeňte reč prezentujúceho na text pod pódiom"
+      },
+      "F11": {
+        "name": "Ankety, Q&A a účasť",
+        "desc": "Spúšťajte ankety a otázky počas seminára; hostitelia si stiahnu zoznam účastníkov"
+      },
+      "F12": {
+        "name": "Efekty pozadia",
+        "desc": "Rozmažte svoje pozadie alebo ho nahraďte prednastaveným alebo vlastným obrázkom (spracované na vašom zariadení)"
+      },
+      "F13": {
+        "name": "Lokálne nahrávanie",
+        "desc": "Prezentujúci nahráva seminár na svoje vlastné zariadenie a všetci vidia, že nahrávanie prebieha"
+      },
+      "F14": {
+        "name": "Poznámky zo stretnutí s AI",
+        "desc": "Keď prezentujúci zapne, reč a obrazovky sa nahrávajú a sumarizujú do kľúčových bodov, rozhodnutí a úloh"
+      },
+      "F15": {
+        "name": "Osobné poznámky zo stretnutia",
+        "desc": "Nahrávajte stretnutie iba s mikrofónom a získajte poznámky zo stretnutia (správcovia)"
+      },
+      "F16": {
+        "name": "Preložené titulky",
+        "desc": "Zobrazte titulky preložené do vami zvoleného jazyka"
+      },
+      "F17": {
+        "name": "Počúvajte v preklade",
+        "desc": "Čítajte preložené titulky nahlas syntetickým hlasom, zatiaľ čo pôvodný zvuk sa zníži"
+      }
+    },
+    "steps": {
+      "piLogin": "Prihlásenie Pi Browser",
+      "googleLogin": "Prihlásenie Google",
+      "accountLink": "Prepojenie účtu",
+      "deviceTest": "Test kamery zariadenia",
+      "oneToTwo": "Prezentujúci 1 → 2 účastníci",
+      "recovery": "Obnova po zamrznutí a stabilita",
+      "structure": "Vyčistenie štruktúry enginu",
+      "autoQuality": "Automatická kvalita, 30 účastníkov",
+      "roomService": "Vstup do miestnosti a nahrávanie",
+      "roomUi": "Obrazovka miestnosti (lobby·pódium·chat·zdvihnúť ruku·moderovanie)",
+      "createForm": "Obrazovka vytvorenia",
+      "list": "Zoznam",
+      "detail": "Podrobnosti",
+      "payRequest": "Žiadosť o platbu",
+      "payVerify": "Opätovná kontrola sumy a vstup",
+      "settle": "Vyplatenie",
+      "vod": "Prehrávanie záznamu",
+      "appRelay": "Signálny kanál doplnku enginu",
+      "aiBase": "AI, hlasové bloky, súhlas a dátové tabuľky",
+      "shareLinks": "Odkaz na kalendár, .ics a pozvánka e-mailom",
+      "noiseLight": "Redukcia šumu a osvetlenie",
+      "liveCaptions": "Živé titulky",
+      "pollQnaAttend": "Ankety, Q&A a zoznam účastníkov",
+      "backgrounds": "Rozostrenie, predvoľby a vlastný obrázok",
+      "localRecording": "Nahrávanie prezentujúceho a odznak nahrávania",
+      "aiNotes": "Nahrávanie, súhrn a stránka poznámok",
+      "inPersonNotes": "Poznámky len z mikrofónu a moje poznámky",
+      "captionTranslate": "Výber jazyka a prepínanie pôvodného/preloženého",
+      "dubbing": "Prehrávanie syntetického hlasu a znížený pôvodný zvuk"
+    },
+    "refLabel": "Referenčný model",
+    "uiRef": "Základ UI — vzory obrazoviek a funkcií široko používanej webovej aplikácie pre videostretnutia, prispôsobené pre seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Meno bolo uložené, ale ostatní nemohli byť teraz upozornení. Uvidia ho po vašom opätovnom pripojení.",
+      "tile": "Kliknite pre zmenu môjho mena",
+      "menu": "Zmeniť moje meno",
+      "title": "Moje meno v tomto seminári",
+      "hint": "Maximálne 30 znakov. Používa sa len v tomto seminári a okamžite sa aktualizuje na obrazovke všetkých.",
+      "save": "Uložiť",
+      "saving": "Ukladám…",
+      "cancel": "Zrušiť",
+      "taken": "Toto meno už používa niekto iný (hostiteľ alebo účastník). Vyberte si iné.",
+      "failed": "Nepodarilo sa uložiť vaše meno. Skúste to znova."
+    },
+    "roomTitle": {
+      "edit": "Kliknite pre úpravu podtitulu",
+      "label": "Podtitul",
+      "placeholder": "Podtitul (max. 60)",
+      "save": "Uložiť",
+      "cancel": "Zrušiť",
+      "failed": "Nepodarilo sa uložiť podtitul."
+    },
+    "mirror": "Zrkadliť moje video",
+    "barPin": "Vždy zobraziť spodnú lištu",
+    "barAuto": "Automaticky skryť spodnú lištu",
+    "title": "Pripojiť sa k semináru · {room}",
+    "titleSeminar": "Čakáreň",
+    "noEngine": "Video server ešte nie je pripravený.",
+    "joinAs": "Pripojiť sa ako",
+    "presenter": "Prezentujúci",
+    "audience": "Publikum",
+    "join": "Pripojiť sa teraz",
+    "nameLabel": "Meno",
+    "audienceHint": "Členovia publika nepoužívajú kameru ani mikrofón. Po pripojení uvidíte a budete počuť prezentujúceho.",
+    "preview": {
+      "pending": "Pripravujem kameru a mikrofón…",
+      "audioOnly": "Kamera nedostupná — posielam iba zvuk.",
+      "none": "Kamera a mikrofón nedostupné. Skontrolujte povolenia (stále sa môžete pripojiť bez médií).",
+      "videoOnly": "Mikrofón nedostupný — posielam iba video. Skontrolujte povolenie mikrofónu."
+    },
+    "mic": {
+      "on": "Vypnúť mikrofón",
+      "off": "Zapnúť mikrofón"
+    },
+    "cam": {
+      "on": "Vypnúť kameru",
+      "off": "Zapnúť kameru"
+    },
+    "controls": "Ovládanie hovoru",
+    "leave": "Opustiť",
+    "enableSound": "Zapnúť zvuk",
+    "state": {
+      "connecting": "Pripájam sa…",
+      "reconnecting": "Znova sa pripájam…"
+    },
+    "waiting": "Čakám na prezentujúceho.",
+    "rejoin": "Pripojiť sa znova",
+    "err": {
+      "generic": "Niečo sa pokazilo. Pripojte sa znova.",
+      "CLOSED": "Spojenie bolo stratené.",
+      "NO_ENGINE": "Video server ešte nie je pripravený.",
+      "TICKET_401": "Prosím, prihláste sa.",
+      "TICKET_403": "Nemáte povolenie prezentovať. Pripojte sa ako publikum.",
+      "TICKET_503": "Video server ešte nie je nakonfigurovaný.",
+      "TICKET_NETWORK": "Skontrolujte svoje sieťové pripojenie.",
+      "TICKET_INVALID": "Váš vstupný preukaz vypršal.",
+      "TICKET_EXPIRED": "Váš vstupný preukaz vypršal.",
+      "ROOM_FULL": "Tento seminár je plný.",
+      "ROOM_CLOSED": "Miestnosť bola zatvorená — seminár sa skončil alebo hostiteľ bol preč viac ako 5 minút.",
+      "DUPLICATE_SESSION": "Pripojili ste sa z iného zariadenia, takže táto obrazovka bola odpojená.",
+      "ROLE_FORBIDDEN": "Nemáte povolenie prezentovať.",
+      "WS_FAILED": "Nepodarilo sa pripojiť k video serveru.",
+      "ICE_FAILED": "Video pripojenie bolo prerušené. Skontrolujte svoju sieť.",
+      "MEDIA_FAILED": "Nepodarilo sa spustiť kameru alebo mikrofón.",
+      "TIMEOUT": "Video server neodpovedá.",
+      "TICKET_402": "Toto je platený seminár. Pred vstupom zaplaťte na stránke seminára.",
+      "TICKET_404": "Seminár sa nenašiel.",
+      "TICKET_409": "Tento seminár sa skončil alebo bol zrušený.",
+      "TICKET_HOST_AWAY": "Hostiteľ sa ešte nepripojil alebo bol preč viac ako 5 minút, takže nemôžete vstúpiť. Skúste to znova, keď sa hostiteľ pripojí.",
+      "TICKET_PLAN_EXHAUSTED": "Plán tohto seminára vypršal, takže sa nemôže začať. Opätovné zakúpenie rovnakého plánu pridá čas (bezplatné obnovenie s 1 hodinou budúci mesiac)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Nepodarilo sa zmeniť mikrofón. Skúste to znova.",
+        "video": "Nepodarilo sa zmeniť kameru. Skúste to znova."
+      },
+      "forbidden": "Nemáte povolenie prezentovať, takže budete pokračovať ako divák.",
+      "demoted": "Boli ste presunutý späť medzi divákov.",
+      "endFailed": "Nepodarilo sa ukončiť seminár. Skúste to znova.",
+      "chatFailed": "Správa nebola odoslaná.",
+      "actionFailed": "Nepodarilo sa dokončiť požiadavku. Skúste to znova.",
+      "shareFailed": "Nepodarilo sa spustiť zdieľanie obrazovky.",
+      "err": {
+        "RATE_LIMITED": "Posielate príliš rýchlo. Chvíľu počkajte.",
+        "ROLE_FORBIDDEN": "Nemáte povolenie na vykonanie tejto akcie.",
+        "MEDIA_FAILED": "Nepodarilo sa spustiť mikrofón alebo kameru. Skontrolujte povolenia.",
+        "LOCKED": "Zamknuté prezentujúcim."
+      },
+      "mutedBy": {
+        "audio": "Prezentujúci stlmil váš mikrofón.",
+        "video": "Prezentujúci vypol vašu kameru."
+      },
+      "policy": {
+        "locked": "Prezentujúci zamkol mikrofóny. Môžete si zapnúť svoj, keď budú odomknuté.",
+        "unlocked": "Mikrofóny sú odomknuté."
+      },
+      "consent": {
+        "saveFail": "Nepodarilo sa uložiť váš súhlas. Skontrolujte svoju registráciu a znova zapnite mikrofón."
+      }
+    },
+    "home": "Prejsť na domovskú stránku",
+    "tile": {
+      "fullscreen": "Dvojitým kliknutím na celú obrazovku · Esc pre ukončenie",
+      "self": "{name} (vy)",
+      "presenter": "Prezentujúci",
+      "micOff": "Mikrofón vypnutý",
+      "screen": "Obrazovka používateľa {name}",
+      "row": "Ostatní rečníci",
+      "pin": "Zobraziť {name} vo veľkom",
+      "unpin": "Automatické rozloženie"
+    },
+    "more": "Ďalšie možnosti",
+    "joinNoCam": "Pripojiť sa bez kamery",
+    "net": {
+      "afterJoin": "Vaše pripojenie sa automaticky skontroluje po pripojení.",
+      "measuring": "Kontroluje sa pripojenie…",
+      "good": "Dobré pripojenie",
+      "fair": "Primerané pripojenie",
+      "poor": "Slabé pripojenie",
+      "reason": {
+        "loss": {
+          "audio": "Stratí sa {pct}% zvukových dát.",
+          "video": "Stratí sa {pct}% video dát."
+        },
+        "rate": {
+          "audio": "Nahrávanie zvuku je nízke pri {kbps} kbps.",
+          "video": "Nahrávanie videa je nízke pri {kbps} kbps. Kvalita môže klesnúť."
+        }
+      }
+    },
+    "people": "{n} v miestnosti",
+    "screen": {
+      "start": "Zdieľať obrazovku",
+      "stop": "Zastaviť zdieľanie"
+    },
+    "panel": {
+      "title": "Chat · Otázky a odpovede · Ankety · Ľudia",
+      "chat": "Chat",
+      "people": "Ľudia",
+      "close": "Zavrieť panel",
+      "qna": "Otázky a odpovede",
+      "polls": "Ankety"
+    },
+    "chat": {
+      "empty": "Zatiaľ žiadne správy. Chat sa neukladá.",
+      "me": "Vy",
+      "failed": "Neodoslané.",
+      "retry": "Skúsiť znova",
+      "input": "Napíšte správu",
+      "send": "Odoslať"
+    },
+    "hand": {
+      "raise": "Zdvihnúť ruku",
+      "lower": "Spustiť ruku",
+      "list": "Zdvihnuté ruky",
+      "lowerAll": "Spustiť všetky ruky",
+      "raised": "Ruka zdvihnutá",
+      "notice": "{name} zdvihol ruku.",
+      "dismiss": "Zrušiť",
+      "waiting": "{n} ľudí čaká na slovo"
+    },
+    "react": {
+      "open": "Reakcie",
+      "e0": "Páči sa mi",
+      "e1": "Tlieskať",
+      "e2": "Smiať sa",
+      "e3": "Prekvapený",
+      "e4": "Smutný",
+      "e5": "Bez slov",
+      "e6": "Láska"
+    },
+    "quality": {
+      "label": "Kvalita",
+      "auto": "Automaticky",
+      "high": "Vysoká",
+      "medium": "Stredná",
+      "low": "Nízka",
+      "unstable": "Vaša sieť je nestabilná"
+    },
+    "roles": {
+      "presenter": "Prezentujúci",
+      "panel": "Panelista",
+      "audience": "Divák"
+    },
+    "stage": {
+      "invite": "Pozvať na pódium",
+      "remove": "Presunúť medzi divákov",
+      "promoted": "Boli ste pozvaní na pódium. Ak ste zdvihli ruku, vaša kamera sa automaticky zapne (pokiaľ nie je zamknutá alebo nepovolená). Zapnite si mikrofón, aby ste mohli hovoriť (mikrofón sa nezapne automaticky).",
+      "later": "Neskôr"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} zdvihol ruku."
+    },
+    "leaveDialog": {
+      "title": "Opustiť seminár",
+      "body": "Môžete odísť sami, alebo ukončiť seminár a odpojiť všetkých.",
+      "confirmTitle": "Ukončiť seminár?",
+      "confirmBody": "Všetci budú odpojení a nikto sa už nebude môcť znova pripojiť k tomuto semináru.",
+      "cancel": "Zrušiť",
+      "end": "Ukončiť seminár",
+      "endConfirm": "Ukončiť teraz"
+    },
+    "mod": {
+      "muteAll": "Stlmiť všetkých",
+      "lock": "Zamknúť mikrofóny",
+      "unlock": "Odomknúť mikrofóny",
+      "locked": "Prezentujúci zamkol mikrofóny",
+      "muteMic": "Stlmiť mikrofón",
+      "askMic": "Požiadať o zapnutie mikrofónu",
+      "muteCam": "Vypnúť kameru",
+      "muteMicOf": "Stlmiť mikrofón používateľa {name}",
+      "askMicOf": "Požiadať {name} o zapnutie mikrofónu",
+      "muteCamOf": "Vypnúť kameru používateľa {name}"
+    },
+    "ask": {
+      "audio": "Prezentujúci vás požiadal, aby ste si zapli mikrofón.",
+      "video": "Prezentujúci vás požiadal, aby ste si zapli kameru.",
+      "ignore": "Ignorovať"
+    },
+    "toDetail": "Prejsť na stránku seminára",
+    "consent": {
+      "title": "Pred zapnutím mikrofónu",
+      "body": "Ak je v tomto seminári zapnuté nahrávanie, titulky alebo poznámky zo stretnutia AI, váš hlas môže byť prevedený na text, uložený a preložený. Spracovanie hlasu vykonáva služba AI mimo vašej krajiny. Ak nesúhlasíte, váš mikrofón sa stále zapne — iba váš hlas nebude spracovaný.",
+      "privacy": "Zásady ochrany osobných údajov",
+      "newTab": "(otvorí sa v novej karte)",
+      "decline": "Nesúhlasím",
+      "agree": "Súhlasím a zapnúť mikrofón",
+      "notice": "Keď sú zapnuté nahrávanie, titulky alebo poznámky zo stretnutia AI, hlasy rečníkov sa spracúvajú. Hlasy publika sa neodosielajú.",
+      "saveFailClosed": "Tento seminár sa skončil, takže súhlas nemožno zaznamenať."
+    },
+    "captions": {
+      "title": "Titulky",
+      "room": "Živé titulky (celá miestnosť)",
+      "show": "Zobraziť titulky",
+      "size": {
+        "label": "Veľkosť textu",
+        "sm": "Malá",
+        "md": "Stredná",
+        "lg": "Veľká"
+      },
+      "waiting": "Titulky sa zobrazia, keď ich prezentujúci zapne",
+      "limit": "Dosiahnutý limit spracovania reči, takže titulky a AI minúty boli zastavené",
+      "sendFail": "Nepodarilo sa zapnúť titulky. Skúste to znova o chvíľu.",
+      "sendFailOff": "Nepodarilo sa vypnúť titulky. Skúste to znova o chvíľu.",
+      "region": "Titulky",
+      "translate": "Zobraziť preložené titulky",
+      "lang": "Jazyk prekladu",
+      "langMine": "Moje jazyky",
+      "langAll": "Všetky jazyky",
+      "trStop": {
+        "forbidden": "Preložené titulky sú len pre registrovaných účastníkov. Zobrazuje sa originál.",
+        "unavailable": "Preložené titulky momentálne nie sú k dispozícii. Zobrazuje sa originál.",
+        "quota": "Tento seminár dosiahol svoj prekladový limit. Zobrazuje sa originál.",
+        "usrQuota": "Využili ste svoj prekladový limit pre tento seminár. Zobrazuje sa originál."
+      },
+      "unsupported": "Toto zariadenie nemôže vytvárať živé titulky (prehliadač nepodporuje nahrávanie zvuku)."
+    },
+    "effects": {
+      "title": "Efekty",
+      "light": "Korekcia svetla",
+      "noise": "Znížiť hluk",
+      "noiseFail": "Redukciu šumu nemožno na tomto zariadení zmeniť.",
+      "close": "Zavrieť",
+      "preview": "Môj náhľad",
+      "bg": "Pozadie",
+      "bgNone": "Žiadne",
+      "bgBlur": "Rozostrenie",
+      "scenes": {
+        "beach": "🏝️ Pláž Maledivy",
+        "autumn": "🍁 Jesenné údolie",
+        "fireplace": "🔥 Krb",
+        "xmas": "🎄 Vianočná zasadacia miestnosť"
+      },
+      "bgs": {
+        "dusk": "Súmrak",
+        "ocean": "Oceán",
+        "forest": "Les",
+        "studio": "Štúdio",
+        "grid": "Mriežka",
+        "dots": "Bodky"
+      },
+      "myAdd": "Môj obrázok",
+      "myItem": "Môj obrázok {n}",
+      "myDel": "Odstrániť môj obrázok {n}",
+      "mySaveFail": "Pozadie je aplikované, ale nepodarilo sa ho uložiť na toto zariadenie (iba pre toto stretnutie).",
+      "bgStopped": "Efekt pozadia sa zastavil a bol vypnutý. Vyberte ho znova, aby ste ho reštartovali.",
+      "myNote": "Vaše obrázky sú uložené iba na tomto zariadení (až 3, každý 2 MB).",
+      "mobileBlurOnly": "Na telefónoch je k dispozícii iba rozostrené pozadie (obrázkové pozadia fungujú na PC).",
+      "myTooBig": "Použiť možno iba obrázky do 2 MB.",
+      "preparing": "Pripravuje sa…",
+      "bgFailed": "Nepodarilo sa načítať efekt pozadia.",
+      "autoOff": "Vaše zariadenie je príliš pomalé, takže efekt pozadia bol vypnutý.",
+      "unsupported": "Efekty pozadia nie sú na tomto zariadení k dispozícii.",
+      "noCam": "Zapnite si kameru, aby ste si mohli vybrať pozadie.",
+      "lightUnsupported": "Korekcia svetla nie je na tomto zariadení k dispozícii.",
+      "noiseUnsupported": "Nastavenia redukcie šumu nie sú na tomto zariadení podporované."
+    },
+    "sheetClose": "Zavrieť",
+    "polls": {
+      "new": "Nová anketa",
+      "question": "Otázka",
+      "option": "Možnosť {n}",
+      "remove": "Odstrániť možnosť {n}",
+      "addOption": "Pridať možnosť",
+      "start": "Spustiť anketu",
+      "cancel": "Zrušiť",
+      "dup": "Možnosti musia byť odlišné",
+      "vote": "Hlasovať",
+      "change": "Zmeniť hlas",
+      "close": "Zavrieť anketu",
+      "closed": "Zatvorené",
+      "mine": "Váš výber",
+      "result": "{pct}% ({n} hlasov)",
+      "total": "Spolu {n} hlasov",
+      "empty": "Zatiaľ žiadne ankety.",
+      "loading": "Načítava sa…",
+      "labOnly": "Ankety sú k dispozícii iba v seminárnych miestnostiach.",
+      "started": "Nová anketa bola spustená",
+      "goVote": "Hlasovať",
+      "votersNote": "Organizátor vidí, kto hlasoval za ktorú možnosť.",
+      "voters": "Hlasovali: {names}"
+    },
+    "qna": {
+      "sort": "Zoradiť",
+      "by": {
+        "top": "Najlepšie",
+        "new": "Najnovšie"
+      },
+      "rcm": "Hlasovať za ({n})",
+      "answered": "Odpovedané",
+      "answer": "Označiť ako zodpovedané",
+      "unanswer": "Zrušiť označenie ako zodpovedané",
+      "hide": "Skryť",
+      "doneN": "{n} zodpovedaných",
+      "backOpen": "Nezodpovedané otázky",
+      "empty": "Zatiaľ žiadne otázky.",
+      "emptyDone": "Žiadne zodpovedané otázky.",
+      "loading": "Načítava sa…",
+      "input": "Položte otázku (500 znakov)",
+      "send": "Odoslať",
+      "left": "Zostáva {n}",
+      "labOnly": "Otázky a odpovede sú k dispozícii iba v seminárnych miestnostiach."
+    },
+    "recording": {
+      "title": "Nahrávanie",
+      "badge": "Nahráva sa",
+      "unsupported": "Tento prehliadač nepodporuje nahrávanie. Nahrávajte prosím z bežného prehliadača na počítači.",
+      "piBrowserOnly": "Nahrávanie funguje iba v bežnom prehliadači (PC alebo mobil). Pi Browser nemôže ukladať nahrávacie súbory — otvorte tento seminár v prehliadači počítača alebo telefónu (seminarz.vercel.app) na nahrávanie.",
+      "audioSuspended": "Nahrávanie zvuku sa na tomto zariadení nemuselo spustiť. Môže sa nahrávať iba obraz.",
+      "notifyFailed": "Nahrávanie sa nespustilo, pretože účastníci nemohli byť upozornení. Skúste to znova o chvíľu.",
+      "confirm": {
+        "title": "Spustiť nahrávanie?",
+        "body": "Po spustení nahrávania uvidia všetci indikátor „Nahráva sa“. Súbor sa uloží iba na toto zariadenie a nikdy sa nenahrá ani neprenesie do zahraničia. Pred spustením prosím informujte účastníkov.",
+        "download": "Po zastavení sa súbor MP4 uloží do priečinka stiahnutých súborov (prehliadače, ktoré nedokážu nahrávať MP4, potrebujú chvíľu na konverziu; nahrávky dlhšie ako približne 45 minút môžu byť uložené v pôvodnom formáte). Prehliadače v aplikácii môžu blokovať ukladanie súborov, preto nahrávajte z bežného prehliadača na počítači.",
+        "cancel": "Zrušiť",
+        "start": "Spustiť nahrávanie",
+        "charge": "Počas nahrávania sa čas nahrávania odpočíta z vášho plateného času navyše k času miestnosti (2x počas nahrávania). Keď sa platený čas minie, nahrávanie sa zastaví a súbor sa uloží."
+      },
+      "resave": {
+        "label": "Nahrávací súbor",
+        "save": "Uložiť znova",
+        "dismiss": "Zavrieť uložiť znova"
+      },
+      "toast": {
+        "started": "Nahrávanie sa spustilo — všetci to vidia",
+        "saved": "Nahrávanie uložené. Skontrolujte priečinok stiahnutých súborov. Ak sa nič neuložilo, klepnite na [Uložiť znova] v hornej časti obrazovky.",
+        "autoStopped": "Nahrávanie sa skončilo, pretože ho prehliadač zastavil alebo bol dosiahnutý limit veľkosti. Všetko do tohto bodu bolo uložené. Ak chcete pokračovať, spustite nahrávanie znova.",
+        "empty": "Nič nebolo zaznamenané, takže nebol vytvorený žiadny súbor.",
+        "saveFailed": "Nepodarilo sa vytvoriť nahrávací súbor.",
+        "converting": "Konvertuje sa nahrávka na MP4. Nechajte toto okno otvorené.",
+        "savedOriginal": "Nepodarilo sa previesť na MP4, takže nahrávka bola uložená v pôvodnom formáte (webm). Skontrolujte priečinok stiahnutých súborov.",
+        "startedBy": "Prezentujúci spustil nahrávanie",
+        "stoppedBy": "Prezentujúci zastavil nahrávanie"
+      },
+      "paidOnly": "Nahrávanie je k dispozícii iba v seminároch otvorených s mesačným alebo ročným plánom, kým zostáva platený čas.",
+      "planOut": "Platený čas vypršal, takže nahrávanie sa zastavilo a súbor bol uložený.",
+      "notInRoom": "Stále sa potvrdzuje, že ste v miestnosti. Spustite nahrávanie znova o chvíľu.",
+      "meterFailed": "Nepodarilo sa skontrolovať čas nahrávania, takže nahrávanie sa nespustilo. Skúste to znova o chvíľu.",
+      "paidOut": "Nezostáva žiadny platený čas, takže nahrávanie sa nemôže spustiť. Ak chcete nahrávať, zakúpte si rovnaký plán znova.",
+      "pausedBadge": "Nahrávanie pozastavené",
+      "controls": "Ovládanie nahrávania",
+      "pause": "Pozastaviť",
+      "resume": "Pokračovať",
+      "stop": "Zastaviť nahrávanie"
+    },
+    "notes": {
+      "on": "Poznámky AI",
+      "badge": "Poznámky AI zapnuté",
+      "started": "Prezentujúci zapol poznámky AI",
+      "stopped": "Poznámky AI vypnuté",
+      "startedMine": "Poznámky AI zapnuté — zobrazené všetkým",
+      "stoppedMine": "Poznámky AI vypnuté — vytvárajú sa poznámky",
+      "startFail": "Nepodarilo sa spustiť poznámky AI",
+      "gone": "Poznámky AI zastavené — poznámky boli ukončené alebo odstránené inde",
+      "unsupported": "Poznámky AI tu nemožno zapnúť (nepodporuje nahrávanie zvuku)"
+    },
+    "dubbing": {
+      "listen": "Počúvať preložený hlas",
+      "blocked": "Nepodarilo sa prehrať preložený hlas. Zapnite ho znova",
+      "stopped": "Preložený hlas momentálne nie je k dispozícii, preto bol vypnutý",
+      "usrQuota": "Využili ste svoj limit preloženého hlasu pre tento seminár, preto bol vypnutý"
+    },
+    "plan": {
+      "warn": "Zostáva {min} minút z plánu tohto seminára.",
+      "ended": "Čas vášho seminára vypršal, seminár sa skončil a opustili ste miestnosť.",
+      "left": "Zostávajúci čas seminára",
+      "closed": "Seminár sa skončil, takže ste opustili miestnosť.",
+      "hostAway": "Hostiteľ opustil miestnosť. Ak sa nevráti do 5 minút, všetci účastníci budú odstránení.",
+      "hostGone": "Hostiteľ sa nevrátil do 5 minút, takže ste opustili miestnosť. Môžete znova vstúpiť, keď sa hostiteľ pripojí."
+    },
+    "toLobby": "Čakáreň"
+  },
+  "list": {
+    "tabsLabel": "Zobrazenie zoznamu seminárov",
+    "tabs": {
+      "all": "Všetky",
+      "hosted": "Hostené mnou",
+      "joined": "Pripojené"
+    },
+    "empty": {
+      "all": "Žiadne nadchádzajúce semináre.",
+      "hosted": "Nehostili ste žiadne semináre.",
+      "joined": "Nepripojili ste sa k žiadnym seminárom."
+    },
+    "loading": "Načítava sa…",
+    "retry": "Skúsiť znova",
+    "free": "Zadarmo",
+    "fee": "{amount} Pi",
+    "host": "Hostiteľ {name}",
+    "capacity": "Kapacita {n}",
+    "status": {
+      "SCHEDULED": "Naplánované",
+      "LIVE": "Naživo",
+      "ENDED": "Ukončené",
+      "CANCELED": "Zrušené"
+    },
+    "hostNew": "Vytvoriť seminár",
+    "progress": "Priebeh",
+    "pager": "Stránkovanie",
+    "prev": "Predchádzajúce",
+    "next": "Ďalšie",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Podtitul",
+      "placeholder": "Pridať podtitul",
+      "save": "Uložiť podtitul",
+      "saving": "Ukladá sa…",
+      "saved": "Uložené."
+    },
+    "loading": "Načítava sa…",
+    "back": "Späť na zoznam",
+    "notFound": "Seminár sa nenašiel.",
+    "status": {
+      "SCHEDULED": "Naplánované",
+      "LIVE": "Naživo",
+      "ENDED": "Ukončené",
+      "CANCELED": "Zrušené"
+    },
+    "startAt": "Dátum",
+    "host": "Hostiteľ",
+    "seats": "Voľné miesta",
+    "seatsValue": "{left} / {max}",
+    "fee": "Poplatok za seminár",
+    "feeValue": "{amount} Pi",
+    "free": "Zadarmo",
+    "enter": "Vstúpiť",
+    "payEnter": "Zaplaťte pomocou Pi a vstúpte ({amount} Pi)",
+    "paying": "Spracováva sa platba…",
+    "joining": "Registruje sa…",
+    "registered": "Ste zaregistrovaní.",
+    "full": "Tento seminár je plný.",
+    "closed": "Tento seminár sa skončil.",
+    "canceled": "Tento seminár bol zrušený.",
+    "roomLink": "Prejsť do miestnosti (hostiteľ)",
+    "piBrowserOnly": "Platba je k dispozícii v Pi Browser po prihlásení do Pi.",
+    "payCancelled": "Platba zrušená.",
+    "payStillWaiting": "Stále čakám na peňaženku. Ak ste sa už prihlásili do Pi Wallet, počkajte chvíľu.",
+    "payFailed": "Platba zlyhala.",
+    "err": {
+      "NAME_TAKEN": "Toto meno už používa niekto iný. Vyberte si iné.",
+      "CAL_READ_FAILED": "Nepodarilo sa načítať vaše udalosti. Skontrolujte adresu.",
+      "ISLAND_FULL": "Všetkých 100 názvov ostrovov je momentálne obsadených. Nový seminár môžete otvoriť po skončení alebo zrušení nadchádzajúceho alebo živého seminára.",
+      "SMN_FULL": "Tento seminár je plný.",
+      "SMN_CLOSED": "Tento seminár sa skončil alebo bol zrušený.",
+      "SMN_ALREADY": "Už ste zaregistrovaní alebo prebieha platba.",
+      "SMN_FREE": "Bezplatné semináre nevyžadujú platbu.",
+      "SMN_PAY_REQUIRED": "Toto je platený seminár. Zaplaťte, aby ste mohli vstúpiť.",
+      "SMN_PAY_INVALID": "Nepodarilo sa overiť vašu platbu. Kontaktujte správcu.",
+      "PAY_PI_FAILED": "Nepodarilo sa spojiť s platobným serverom Pi. Skúste to znova o chvíľu.",
+      "PAY_MISMATCH": "Podrobnosti o platbe sa nezhodujú.",
+      "PAY_AMOUNT_MISMATCH": "Výška platby sa líši od poplatku za seminár.",
+      "PAY_CANCELLED": "Táto platba bola zrušená.",
+      "PAY_ALREADY_PAID": "Platba sa stále spracováva. Ak ste sa prihlasovali do peňaženky, skúste to znova o 3 minúty.",
+      "PAY_INVALID_STATE": "Túto platbu nemožno teraz spracovať.",
+      "PAY_PI_CANCEL_REFUSED": "Platba už prebieha a nemožno ju zrušiť. Skontrolujte to znova o chvíľu."
+    },
+    "share": {
+      "title": "Naplánovať a zdieľať",
+      "calendar": "Pridať do kalendára",
+      "ics": "Súbor kalendára",
+      "mail": "Pozvať e-mailom",
+      "mailApp": "Odoslať pomocou predvolenej e-mailovej aplikácie",
+      "mailSubject": "[Pozvánka na seminár] {title}",
+      "mailBody": "{title}\nKedy: {start}\n\nPripojte sa priamo pomocou tohto odkazu.\nDesktop: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopírovať odkaz",
+      "copied": "Odkaz skopírovaný.",
+      "copyFail": "Nepodarilo sa skopírovať. Skopírujte odkaz z adresného riadka.",
+      "share": "Zdieľať do inej aplikácie",
+      "shareFail": "Nepodarilo sa zdieľať. Namiesto toho použite Kopírovať odkaz.",
+      "created": "Váš seminár je pripravený. Pridajte jeho začiatok do vášho Kalendára Google.",
+      "addGoogle": "Pridať do Kalendára Google",
+      "later": "Neskôr",
+      "piBrowserOpen": "V Pi Browser sa kalendár, e-mail a súbor kalendára otvoria v predvolenom prehliadači vášho telefónu.",
+      "extFail": "Nepodarilo sa otvoriť. Aktualizujte Pi Browser, alebo použite Kopírovať odkaz a otvorte ho v bežnom prehliadači (seminarz.vercel.app).",
+      "icsPiBrowser": "Súbor kalendára je možné stiahnuť iba v bežnom prehliadači (počítač alebo mobil). V Pi Browser namiesto toho použite Pridať do kalendára."
+    },
+    "attendance": "Účasť",
+    "plan": "Plán",
+    "left": "Zostávajúci čas"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Predchádzajúci mesiac",
+      "next": "Ďalší mesiac",
+      "connect": "Zobraziť môj Kalendár Google",
+      "change": "Spravovať Kalendáre Google ({n})",
+      "add": "Pridať",
+      "remove": "Odstrániť",
+      "close": "Zavrieť",
+      "failed": "Nepodarilo sa načítať udalosti z {n} kalendára/ov. Skontrolujte adresu.",
+      "badUrl": "Vložte „Tajná adresa vo formáte iCal“ (…/basic.ics) z nastavení Kalendára Google, nie z adresného riadka prehliadača.",
+      "full": "Môžete pridať až {n} kalendárov.",
+      "allDay": "Celý deň",
+      "day": "Moje udalosti v tento deň",
+      "count": "{n, plural, one {# udalosť} few {# udalosti} many {# udalostí} other {# udalostí}}",
+      "more": "+{n}",
+      "picked": "Tento dátum je nastavený ako dátum začiatku. Vyberte čas nižšie.",
+      "s1": "Ťuknite na [Otvoriť nastavenia Kalendára Google] nižšie.",
+      "s2": "V časti „Nastavenia pre moje kalendáre“ vľavo vyberte kalendár (napr. vaše meno).",
+      "s3": "Prejdite na „Integrovať kalendár“ a skopírujte „Tajná adresa vo formáte iCal“.",
+      "s4": "Vložte ju sem a ťuknite na [Pridať] — názvy udalostí sa zobrazia v kalendári. Pridajte ďalšie kalendáre rovnakým spôsobom, až do 5.",
+      "open": "Otvoriť nastavenia Kalendára Google",
+      "privacy": "Táto adresa je kľúčom k vášmu kalendáru — nezdieľajte ju. Ukladá sa iba na tomto zariadení, nikdy na našom serveri."
+    },
+    "title": "Vytvoriť seminár",
+    "name": "Cestujme na krásny ostrov!",
+    "subTitle": "Podtitul (voliteľné, do 60 znakov)",
+    "startAt": "Čas začiatku",
+    "maxCnt": "Kapacita (1–100)",
+    "submit": "Vytvoriť",
+    "submitting": "Vytvára sa…",
+    "invalid": "Skontrolujte svoj vstup — dátum do jedného roka odteraz, kapacita 1–100.",
+    "attendance": {
+      "title": "Účasť",
+      "back": "Späť na seminár",
+      "loading": "Načítava sa…",
+      "forbidden": "Účasť môžu zobraziť iba hostiteľ a správcovia.",
+      "count": "{n} ľudí",
+      "csv": "Stiahnuť CSV",
+      "empty": "Zatiaľ sa nikto nepripojil.",
+      "online": "Online",
+      "left": "Odišiel",
+      "col": {
+        "name": "Meno",
+        "pi": "Používateľské meno Pi",
+        "ent": "Prvé pripojenie",
+        "hb": "Naposledy videný",
+        "dur": "Čas účasti",
+        "min": "Účasť (min, čas mimo vylúčený)",
+        "state": "Stav"
+      },
+      "durNote": "Čas účasti je od prvého pripojenia po posledné videnie, mínus čas mimo (medzery dlhšie ako 2,5 minúty).",
+      "csvPiBrowser": "Stiahnutie CSV funguje iba v bežnom prehliadači (počítač alebo mobil). Pi Browser nemôže ukladať súbory — otvorte tento zoznam účastníkov v prehliadači počítača alebo telefónu (seminarz.vercel.app)."
+    },
+    "plan": "Plán",
+    "planFree": "Zadarmo — {time} zostáva tento mesiac · bez AI",
+    "planPaid": "{name} {time} · {price} — zaplaťte pri vytváraní",
+    "planHint": "Seminár otvorený na platenom pláne najprv využíva čas tohto plánu, potom pokračuje na bezplatnom čase tohto mesiaca (bez AI v bezplatnej časti). Aktívny plán sa otvára bez platby; mesačný alebo ročný, ktorý nemáte, sa platí v Pi, keď stlačíte Vytvoriť, potom sa seminár otvorí (Pi Browser). Pripojenie je pre účastníkov vždy bezplatné.",
+    "planOwned": "{name} — aktívny · {time} zostáva",
+    "planEnds": "Čas začiatku je po vypršaní platnosti tohto plánu. Posuňte začiatok skôr alebo vyberte iný plán.",
+    "paidKept": "Váš platený preukaz je zachovaný. Opravte problém a znova stlačte Vytvoriť (bez druhej platby)."
+  },
+  "privacy": {
+    "title": "Zásady ochrany osobných údajov — Hlasové a AI funkcie",
+    "effective": "Platné od {date}",
+    "intro": "Tieto zásady vysvetľujú osobné údaje, ktoré spracovávame, keď používate živé titulky, preložené titulky, hlasový preklad, poznámky zo stretnutí AI a osobné poznámky na seminári. Tieto funkcie používajú externú službu AI, takže informácie sa prenášajú do zahraničia.",
+    "whoTitle": "Čie informácie sa spracovávajú",
+    "who": [
+      "Prezentujúci a účastníci na pódiu: požiadame vás o súhlas raz, predtým, ako prvýkrát zapnete mikrofón. K semináru sa môžete pripojiť aj bez súhlasu.",
+      "Publikum: nepoužívate mikrofón, takže sa neodosiela žiadny hlas. Vidíte iba titulky a poznámky.",
+      "Osobné poznámky: správca nahráva stretnutie mikrofónom a potvrdzuje, že účastníci boli informovaní pred nahrávaním."
+    ],
+    "xferTitle": "Prenos osobných údajov do zahraničia (kórejský zákon o ochrane osobných údajov, čl. 28-8)",
+    "xfer": [
+      {
+        "k": "Príjemca",
+        "v": "Google LLC (Gemini API) — kontakt [TBD: Google privacy contact]"
+      },
+      {
+        "k": "Krajiny",
+        "v": "Spojené štáty a ďalšie krajiny, kde sa nachádzajú dátové centrá Google [TBD: processing region]"
+      },
+      {
+        "k": "Kedy a ako",
+        "v": "Približne každých 5 sekúnd, keď je funkcia zapnutá, prostredníctvom šifrovaného pripojenia (HTTPS). Pre osobné poznámky sa celá nahrávka odošle ešte raz v 5-minútových častiach, keď sa poznámka skončí (presný prepis)."
+      },
+      {
+        "k": "Položky",
+        "v": "Hlas, hovorený obsah (text), zobrazované meno hovorcu (pre súhrny poznámok), snímky obrazovky (keď sú zapnuté poznámky AI)"
+      },
+      {
+        "k": "Účel",
+        "v": "Prevod reči na text, preklad, súhrny poznámok zo stretnutí, syntetická reč (štandardné hlasy, žiadne klonovanie hlasu), oddelenie hovorcov pre osobné poznámky (hlasy sa rozlišujú a označujú podľa vnímaného pohlavia, napríklad Muž 1 / Žena 1 — neodvodzujú sa žiadne mená ani identity)"
+      },
+      {
+        "k": "Uchovávanie",
+        "v": "Končí sa hneď, ako sa vráti výsledok. Žiadame Google, aby neukladal požiadavky (store=false). Záznamy monitorovania zneužitia môžu byť stále uchovávané podľa podmienok Google [TBD: retention period and paid-tier status]."
+      },
+      {
+        "k": "Ako odmietnuť a čo sa stane",
+        "v": "Ak nesúhlasíte alebo vypnete mikrofón, neodosiela sa žiadny hlas. Stále sa môžete zúčastniť seminára; nevytvárajú sa iba titulky, preklady a poznámky vašej vlastnej reči. Súhlas môžete kedykoľvek odvolať [TBD: where the withdraw button is]."
+      }
+    ],
+    "keepTitle": "Čo táto služba uchováva",
+    "keep": [
+      "Pôvodný zvuk: pre titulky seminára a poznámky zo stretnutí AI sa neukladá; zahodí sa hneď po konverzii na text. Pre osobné poznámky sa nahrávka uchováva v súkromnom úložisku, aby sa mohla po stretnutí znova presnejšie prepísať (s hovorcami), a vymaže sa pri dennom čistení, keď uplynie 1 deň od ukončenia poznámky (okamžite, ak sa poznámka vymaže).",
+      "Živé titulky: neukladajú sa.",
+      "Poznámky zo stretnutí AI (keď ich prezentujúci zapne): hovorený obsah, snímky obrazovky a súhrn, uchovávané, kým sa poznámky nevymažú [TBD: maximum retention].",
+      "Záznamy súhlasu: čas súhlasu a verzia zásad, uchovávané ako dôkaz [TBD: retention period].",
+      "Použitie: počty požiadaviek za minútu a čas spracovania, používané na vynútenie nákladových limitov.",
+      "Účasť: čas, kedy ste sa pripojili, čas, kedy ste boli naposledy pripojení, vaše zobrazované meno a vaše používateľské meno Pi sa ukladajú a poskytujú hostiteľovi ako zoznam účastníkov (na obrazovke a ako stiahnutie CSV). Uchovávané, kým sa seminár nevymaže.",
+      "Otázky a odpovede a ankety: text otázky a zobrazované meno pýtajúceho sa (alebo používateľské meno Pi, ak žiadne nie je) sú viditeľné pre každého účastníka. Hlasy za zobrazujú iba počty, nikdy nie, kto ich odovzdal. Hlasy v anketách zobrazujú účastníkom iba počty; organizátor a správcovia vidia pre každú možnosť zobrazované meno (alebo používateľské meno Pi, ak žiadne nie je) každého voliča. Uchovávané, vrátane skrytých otázok, kým sa seminár nevymaže."
+    ],
+    "recTitle": "Nahrávanie",
+    "rec": "Nahrávky sa ukladajú iba ako súbor na zariadení prezentujúceho. Nenahrávajú sa na naše servery ani sa neprenášajú do zahraničia. Počas nahrávania alebo zapnutých poznámok AI vidí každý účastník indikátor.",
+    "rightsTitle": "Vaše práva",
+    "rights": "Môžete požiadať o prístup, opravu, vymazanie alebo zastavenie spracovania vašich informácií. Kontakt: [TBD: privacy officer name and contact]"
+  },
+  "notes": {
+    "title": "Poznámky",
+    "back": "Späť na seminár",
+    "loading": "Načítava sa…",
+    "meta": "Poznámky · {date} · {min} min",
+    "aiWarn": "Súhrn generovaný AI — môže obsahovať chyby",
+    "points": "Kľúčové body",
+    "decisions": "Rozhodnutia",
+    "todos": "Úlohy",
+    "shots": "Snímky obrazovky ({n})",
+    "transcript": "Prepis",
+    "download": "Stiahnuť Markdown",
+    "making": "Vytvárajú sa poznámky…",
+    "makingLong": "Trvá to dlhšie. Obnovte stránku neskôr",
+    "recording": "Stále sa nahráva",
+    "failed": "Nepodarilo sa vytvoriť súhrn — celý prepis je nižšie",
+    "retry": "Skúsiť znova",
+    "finish": "Ukončiť nahrávanie a zhrnúť",
+    "none": "Nič tu",
+    "blank": "Nič na zhrnutie — nebola nahraná žiadna reč alebo bola príliš krátka",
+    "notFound": "Poznámky sa nenašli",
+    "forbidden": "Nemáte prístup k týmto poznámkam",
+    "shotAlt": "Snímka obrazovky o {at}",
+    "close": "Zavrieť",
+    "view": "Zobraziť poznámky",
+    "error": "Nepodarilo sa načítať",
+    "mine": "Moje poznámky",
+    "del": "Odstrániť poznámky",
+    "delAsk": "Odstrániť tieto poznámky (súhrn, prepis a snímky obrazovky)? Nikto ich nebude môcť vidieť",
+    "delYes": "Odstrániť",
+    "delNo": "Zrušiť",
+    "delFail": "Nepodarilo sa odstrániť",
+    "dlFail": "Nepodarilo sa stiahnuť — skúste to znova",
+    "recentNotes": "Nedávne poznámky",
+    "empty": "Zatiaľ žiadne poznámky",
+    "newNote": "Spustiť osobné poznámky",
+    "inPerson": "Poznámky z osobného stretnutia",
+    "inPersonTag": "Osobne",
+    "titleLabel": "Názov",
+    "titlePh": "napr. Týždenné stretnutie",
+    "told": "Všetkým prítomným som oznámil, že toto bude nahrávané a spracované AI (povinné)",
+    "toldWhy": "Predtým, ako začnete, povedzte všetkým prítomným, že táto konverzácia bude nahrávaná (nahrávka sa uchováva 1 deň po skončení poznámky a hovorcovia sa rozlišujú podľa hlasu a označujú podľa vnímaného pohlavia) a premenená na text a súhrn externou AI",
+    "start": "Spustiť nahrávanie",
+    "starting": "Pripravuje sa…",
+    "recBadge": "Nahráva sa {time}",
+    "recentLines": "Najnovšie riadky",
+    "waiting": "Text sa tu objaví, keď ľudia hovoria",
+    "end": "Ukončiť a vytvoriť poznámky",
+    "wakeWarn": "Nahrávanie sa môže zastaviť, ak sa obrazovka vypne",
+    "adminOnly": "Môžu používať iba správcovia",
+    "aiOff": "AI poznámky momentálne nie sú k dispozícii (potrebné nastavenie servera). Minulé poznámky sú uvedené nižšie",
+    "reload": "Znova načítať",
+    "unsupported": "Nahrávanie nie je na tomto zariadení k dispozícii",
+    "micDenied": "Mikrofón sa nedá použiť – skontrolujte povolenia",
+    "limited": "Limit času spracovania je vyčerpaný – ukončite a vytvorte poznámky",
+    "noAgr": "Zastavené: žiadne potvrdenie upozornenia pri nahrávaní – ukončite a začnite znova",
+    "micLost": "Mikrofón sa odpojil a nahrávanie sa zastavilo – ťuknite na Znova pripojiť mikrofón alebo ukončite poznámku",
+    "micRetry": "Znova pripojiť mikrofón",
+    "gone": "Táto poznámka bola ukončená alebo odstránená inde, takže nahrávanie sa zastavilo – použite tlačidlo nižšie na otvorenie poznámok",
+    "finishing": "Ukladanie posledných slov…",
+    "st": {
+      "RECORDING": "Nahrávanie",
+      "SUMMARIZING": "Vytváranie",
+      "DONE": "Hotovo",
+      "FAILED": "Zlyhalo"
+    },
+    "downloadPiBrowser": "Stiahnutie Markdown funguje iba v bežnom prehliadači (počítač alebo mobil). Pi Browser nemôže ukladať súbory – otvorte tieto poznámky v prehliadači počítača alebo telefónu (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Plány",
+    "loading": "Načítava sa…",
+    "free": "Zadarmo",
+    "freeDesc": "{time} seminárov každý mesiac (neprenáša sa)",
+    "monthly": "Mesačne",
+    "yearly": "Ročne",
+    "paidDesc": "{time} seminárov, platné {months} mesiacov",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Kontroluje sa cena Pi",
+    "noAi": "Žiadne AI titulky, preklad, dabing ani súhrny poznámok",
+    "withAi": "Zahŕňa AI titulky, preklad, dabing a súhrny poznámok",
+    "buy": "Zaplatiť pomocou Pi",
+    "bought": "Platba dokončená. Čas seminára bol pridaný.",
+    "meRemain": "Zostávajúci čas: {time}",
+    "loginToBuy": "Prihláste sa, ak chcete kúpiť plán.",
+    "payNote": "Platba je vždy v Pi. Suma v miestnej mene je len orientačná; suma Pi je stanovená podľa ceny Pi v čase platby. Seminár na platenom pláne najprv použije preukazy tohto plánu (najskôr tie, ktorým vyprší platnosť), potom pokračuje s voľným časom tohto mesiaca.",
+    "charge": "Dobiť čas",
+    "hm": "{h} h {m} min",
+    "m": "{m} min",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (kontroluje sa cena Pi)",
+    "h": "{h} h"
+  },
+  "adminRooms": {
+    "title": "Správa miestností",
+    "adminOnly": "Túto stránku môžu zobraziť iba administrátori.",
+    "refresh": "Obnoviť",
+    "count": "{n} otvorených miestností",
+    "empty": "Momentálne nie sú otvorené žiadne miestnosti.",
+    "lab": "Laboratórna miestnosť",
+    "noSeminar": "Žiadny záznam seminára",
+    "peers": "{n} / {cap} pripojených",
+    "producers": "{n} streamov",
+    "end": "Končí {time}",
+    "stale": "Seminár sa skončil, ale miestnosť je stále otvorená na video serveri – vynútene ju zatvorte.",
+    "close": "Vynútene zatvoriť",
+    "confirmSeminar": "Tým sa ukončí seminár a zatvorí miestnosť. Všetci budú odpojení.",
+    "confirmRoom": "Tým sa zatvorí miestnosť. Všetci budú odpojení.",
+    "confirmYes": "Zatvoriť",
+    "cancel": "Zrušiť",
+    "closing": "Zatvára sa…",
+    "closed": "Miestnosť zatvorená.",
+    "metrics": "Metriky video servera (od začiatku)",
+    "metricsOff": "Metriky sa nepodarilo načítať.",
+    "m": {
+      "packetsIn": "Prijaté pakety",
+      "packetsOut": "Odoslané pakety",
+      "nackIn": "Prijaté NACKy",
+      "nackOut": "Odoslané NACKy",
+      "retransmits": "Opakované prenosy",
+      "duplicateNack": "Duplicitné NACKy",
+      "cacheMiss": "Chyby vyrovnávacej pamäte opakovaného prenosu",
+      "pliOut": "Požiadavky na kľúčové snímky (PLI)",
+      "keyframes": "Kľúčové snímky",
+      "layerSwitches": "Prepínače kvality",
+      "queueDrops": "Zahodené v rade"
+    }
+  },
+  "adminUsers": {
+    "title": "Používatelia",
+    "adminOnly": "Túto stránku môžu zobraziť iba administrátori.",
+    "search": "Hľadať podľa mena (2+ znaky)",
+    "searchBtn": "Hľadať",
+    "refresh": "Obnoviť",
+    "count": "{n, plural, one {# používateľ} few {# používatelia} many {# používateľov} other {# používateľov}}",
+    "empty": "Žiadni používatelia.",
+    "admin": "Správca",
+    "lastLogin": "Posledné prihlásenie {time}",
+    "never": "Nikdy sa neprihlásil",
+    "plan": {
+      "FREE": "Zadarmo",
+      "M": "Mesačne",
+      "Y": "Ročne"
+    },
+    "until": "(do {time})",
+    "manage": "Spravovať čas",
+    "close": "Zatvoriť",
+    "planLabel": "Plán",
+    "hours": "Hodiny",
+    "minutes": "Minúty",
+    "reason": "Dôvod (voliteľné)",
+    "sub": "Znížiť",
+    "confirmSub": "Znížiť čas {plan} o {time}.",
+    "confirmYes": "Potvrdiť",
+    "cancel": "Zrušiť",
+    "saving": "Ukladá sa…",
+    "done": "Použité. Zostávajúci čas {plan}: {time}",
+    "invalid": "Zadajte zníženie medzi 1 minútou a 1000 hodinami (celé minúty 0–59).",
+    "history": "Posledné úpravy",
+    "noHistory": "Zatiaľ žiadne úpravy.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Poskytnúť servisný preukaz (voľný čas)",
+    "svc": {
+      "H1": "1-hodinový preukaz",
+      "D1": "1-dňový preukaz",
+      "M1": "1-mesačný preukaz"
+    },
+    "svcNote": "Servisné preukazy sú časom bezplatného plánu. Môžu sa použiť odteraz na toto obdobie (1 hodina, 24 hodín, 1 mesiac) v bezplatných seminároch a v bezplatnej časti platených seminárov (bez funkcií AI). Pri viacerých preukazoch sa automaticky spotrebujú v poradí 1-hodinový → 1-dňový → 1-mesačný.",
+    "subTitle": "Znížiť čas",
+    "subNote": "Najprv sa odoberie z preukazov s najneskoršou platnosťou. Ak je to viac ako zostáva, odstráni sa iba zostávajúci čas.",
+    "confirmSvc": "Poskytnúť {svc}.",
+    "doneSvc": "Poskytnutý {svc}. Zostávajúci voľný čas: {time} (platnosť preukazu vyprší {end})"
+  }
+}

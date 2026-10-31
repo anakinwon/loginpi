@@ -8,6 +8,7 @@
     "start": "next start -p 3003",
     "test": "node --test \"src/**/*.test.mjs\"",
     "i18n:translate": "pi-i18n translate",
+    "i18n:expand": "pi-i18n expand",
     "i18n:validate": "pi-i18n validate",
     "i18n:audit": "pi-i18n audit"
   },

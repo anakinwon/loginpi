@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Tukar bahasa",
-      "search": "Cari bahasa",
-      "empty": "Tiada hasil"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Seminar video langsung yang anda sertai dengan Pi"

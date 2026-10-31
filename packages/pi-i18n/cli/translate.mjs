@@ -1,9 +1,11 @@
-// pi-i18n translate — ko.json 기준 증분 번역(Gemini). 대상 = locale 에 없는 키 ∪ ko 원문 해시가 바뀐 키.
+// pi-i18n translate — ko.json 기준 증분 번역(Gemini). 단위 = 언어(카탈로그 67개 — en 은 messages/en.json, 나머지는 messages/lang/<언어>.json).
+// 대상 = 언어 파일에 없는 키 ∪ ko 원문 해시가 바뀐 키. 끝나면 expand 로 routing locale 파일(messages/<locale>.json)을 다시 펼친다.
 // 배치마다 locale 파일·상태(messages/.i18n-state.json)를 바로 저장 → 중단돼도 다시 실행하면 이어서. 검증 탈락 키는 쓰지 않음(폴백이 메움)
-// 실행 : 앱 폴더에서 pnpm i18n:translate [--locales a,b] [--force] [--dry-run] [--batch 250] [--concurrency 6] [--model gemini-2.5-flash]
-import { writeFileSync } from 'node:fs'
+// 실행 : 앱 폴더에서 pnpm i18n:translate [--langs a,b] [--force] [--dry-run] [--batch 250] [--concurrency 6] [--model gemini-2.5-flash]
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { checkValue, findGeminiKey, flatten, getInfo, hash, loadConfig, parseArgs, pickLocales, readJson, rebuild } from './lib.mjs'
+import { expand } from './expand.mjs'
+import { checkValue, findGeminiKey, flatten, getInfo, hash, loadConfig, parseArgs, pickLocales, readJson, rebuild, sourceFile } from './lib.mjs'
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
@@ -79,7 +81,8 @@ export async function run(argv, cwd = process.cwd()) {
   const enFlat = flatten(readJson(join(dir, 'en.json'), {}))
   const statePath = join(dir, '.i18n-state.json')
   const state = readJson(statePath, {})
-  const locales = pickLocales(args.locales, cfg.locales).filter((l) => l !== 'ko')
+  // --langs(구 --locales 도 받음) = 언어 코드. 상태 파일 키도 언어 코드
+  const locales = pickLocales(args.langs ?? args.locales, cfg.languages).filter((l) => l !== 'ko')
   const batch = Number(args.batch ?? 250)
   const model = typeof args.model === 'string' ? args.model : 'gemini-2.5-flash'
   // 키를 정렬해 저장 — git diff 가 번역 순서에 따라 흔들리지 않게
@@ -87,14 +90,15 @@ export async function run(argv, cwd = process.cwd()) {
   const saveState = () =>
     writeFileSync(statePath, `${JSON.stringify(Object.fromEntries(Object.entries(sorted(state)).map(([l, s]) => [l, sorted(s)])), null, 2)}\n`)
 
-  const bad = locales.filter((l) => !cfg.locales.includes(l))
-  if (bad.length) throw new Error(`설정(i18n.config.json)에 없는 locale : ${bad.join(', ')}`)
+  const bad = locales.filter((l) => !cfg.languages.includes(l))
+  if (bad.length) throw new Error(`언어 카탈로그·i18n.config.json languages 에 없는 언어 : ${bad.join(', ')}`)
+  mkdirSync(join(dir, 'lang'), { recursive: true })
 
   const jobs = []
   const summary = {}
   const files = {}
   for (const locale of locales) {
-    const file = join(dir, `${locale}.json`)
+    const file = sourceFile(dir, locale)
     const flat = flatten(readJson(file, {}))
     const st = (state[locale] ??= {})
     let removed = 0
@@ -169,5 +173,9 @@ export async function run(argv, cwd = process.cwd()) {
     console.log(args['dry-run'] ? `${l}\t${s.targets}` : `${l}\t${s.targets}\t${s.done}\t${s.rejected}\t${s.removed}`)
   }
   const left = Object.values(summary).reduce((n, s) => n + s.rejected, 0)
+  if (!args['dry-run']) {
+    const e = expand(cwd)
+    console.log(`\nexpand : routing locale 파일 갱신 ${e.written.length}개`)
+  }
   if (!args['dry-run']) console.log(left ? `\n남은 키 ${left}개 — 다시 실행하면 재시도합니다` : '\n완료 — 남은 키 없음')
 }

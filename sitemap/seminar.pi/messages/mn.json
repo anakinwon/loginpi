@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Хэл солих",
-      "search": "Хэл хайх",
-      "empty": "Үр дүн олдсонгүй"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Pi-ээр оролцох шууд видео семинар"

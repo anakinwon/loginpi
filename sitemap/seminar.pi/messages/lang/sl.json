@@ -1,0 +1,1081 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Video seminarji v živo, ki se jim pridružite s Pi"
+  },
+  "home": {
+    "description": "Gostitelji odprejo seminarje, udeleženci pa se pridružijo video sejam v živo s Pi.",
+    "badge": "Seminarji v živo na čudovitih otokih",
+    "headline": "Glejte, poslušajte in se učite skupaj — v živo",
+    "ctaBrowse": "Brskaj po seminarjih",
+    "ctaPlan": "Oglejte si načrte",
+    "features": {
+      "video": "Video v živo",
+      "caption": "Napisi in prevod",
+      "notes": "AI zapiski srečanja",
+      "pay": "Plačaj s Pi"
+    },
+    "listTitle": "Seminarji",
+    "cal": {
+      "title": "Koledar seminarjev",
+      "desc": "Od preteklih do prihajajočih seminarjev — tapnite datum za podrobnosti.",
+      "legendSmn": "Seminarji",
+      "legendEnded": "Pretekli seminarji",
+      "legendMine": "Moji dogodki",
+      "failed": "Datumi seminarjev niso bili naloženi. Poskusite znova pozneje.",
+      "open": "Poglej podrobnosti"
+    }
+  },
+  "nav": {
+    "link": "Poveži račun",
+    "privacy": "Zasebnost",
+    "plan": "Načrti",
+    "rooms": "Sobe",
+    "admin": "Skrbnik",
+    "users": "Uporabniki",
+    "home": "Domov",
+    "privacyShort": "Zasebnost",
+    "menu": "Glavni meni",
+    "fold": "Strni meni",
+    "unfold": "Razširi meni"
+  },
+  "auth": {
+    "checking": "Preverjanje prijave…",
+    "signedIn": "{name}",
+    "inPerson": "Zapiski v živo",
+    "required": "Prijavite se s svojim Pi računom.",
+    "signIn": "Prijava s Pi",
+    "openInPiBrowser": "Odprite to stran v brskalniku Pi Browser, da se prijavite s svojim računom Pi.",
+    "authenticating": "Prijavljanje…",
+    "google": "Prijava z Google",
+    "signOut": "Odjava",
+    "or": "ali",
+    "linkRequired": "Prijavljeni ste z Google računom, vendar še ni povezan z računom Pi. Izdajte povezovalno kodo v brskalniku Pi Browser in jo vnesite tukaj.",
+    "linkNeeded": "Potrebna je povezava Pi računa",
+    "linkCheckFailed": "Statusa povezave računa ni bilo mogoče preveriti (začasna napaka strežnika). Osvežite stran čez trenutek."
+  },
+  "piOAuth": {
+    "signingIn": "Prijavljanje z vašim Pi računom…",
+    "failed": "Prijava s Pi ni uspela. Poskusite znova.",
+    "stateMismatch": "Zahteve za prijavo ni bilo mogoče preveriti (potekla ali drug zavihek). Poskusite znova.",
+    "retry": "Poskusi znova",
+    "backHome": "Domov"
+  },
+  "link": {
+    "title": "Poveži račun",
+    "intro": "Povežite račun, s katerim ste se prijavili v brskalniku Pi Browser, z Google prijavo v običajnem brskalniku. Po povezavi lahko isti račun uporabljate tudi v brskalniku na osebnem računalniku.",
+    "checking": "Preverjanje prijave…",
+    "piIssueTitle": "Za prijavo tudi iz običajnega brskalnika",
+    "codeHint": "Izdajte spodnjo kodo, nato se prijavite z Google v brskalniku na računalniku in jo vnesite na strani Poveži račun (v 10 minutah).",
+    "piIssue": "Izdaj povezovalno kodo",
+    "reissue": "Izdaj novo kodo",
+    "expiresIn": "Poteče čez {min} min",
+    "enterTitle": "Vnesite povezovalno kodo",
+    "enterHint": "V brskalniku Pi Browser odprite seminar.pi → Poveži račun → Izdaj povezovalno kodo, nato vnesite 6-mestno kodo.",
+    "codeLabel": "Povezovalna koda",
+    "submit": "Poveži",
+    "done": "Povezano. Zdaj lahko uporabljate tudi Google prijavo.",
+    "linked": "{name} je povezan z Google prijavo."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Prijava je obvezna",
+    "AUTH_PI_REQUIRED": "Prijava s Pi je obvezna",
+    "AUTH_PI_SESSION_INVALID": "Vaša seja je potekla. Prijavite se znova.",
+    "AUTH_PI_TOKEN_INVALID": "Preverjanje prijave s Pi ni uspelo",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Podatki za prijavo s Pi manjkajo",
+    "FORBIDDEN": "Nimate dovoljenja",
+    "BAD_REQUEST": "Slaba zahteva",
+    "BAD_REQUEST_BODY": "Slaba zahteva",
+    "INVALID_INPUT": "Neveljaven vnos",
+    "QUERY_FAILED": "Nalaganje ni uspelo",
+    "SAVE_FAILED": "Shranjevanje ni uspelo",
+    "INTERNAL": "Nekaj je šlo narobe",
+    "SERVER_CONFIG": "Napaka konfiguracije strežnika. Obrnite se na operaterja.",
+    "PI_API_CONNECT_FAILED": "Ni bilo mogoče doseči Pi Network",
+    "DB_UNAVAILABLE": "Podatki so začasno nedostopni. Poskusite znova pozneje.",
+    "NOT_FOUND": "Ni najdeno",
+    "RATE_LIMITED": "Preveč zahtev. Poskusite znova čez nekaj časa.",
+    "PAYLOAD_TOO_LARGE": "Zahteva je prevelika",
+    "NETWORK": "Preverite svojo omrežno povezavo",
+    "AUTH_PI_ACCOUNT_CONFLICT": "To uporabniško ime Pi je že registrirano z drugimi poverilnicami. Obrnite se na skrbnika.",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Ta račun je neaktiven. Obrnite se na skrbnika.",
+    "AUTH_GOOGLE_REQUIRED": "Prijava z Google je obvezna.",
+    "LINK_CODE_INVALID": "Povezovalna koda je neveljavna ali potekla. Izdajte novo v brskalniku Pi Browser.",
+    "LINK_ALREADY_LINKED": "Ta račun je že povezan.",
+    "LINK_CODE_GEN_FAILED": "Povezovalne kode ni bilo mogoče ustvariti. Poskusite znova pozneje.",
+    "AUTH_DB_UNAVAILABLE": "Vašega računa ni bilo mogoče shraniti, zato prijava ni uspela. Poskusite znova pozneje.",
+    "LINK_TRY_LIMIT": "Preveč napačnih povezovalnih kod. Poskusite znova čez 15 minut.",
+    "PRICE_UNAVAILABLE": "Cene Pi ni bilo mogoče pridobiti. Poskusite znova čez nekaj časa.",
+    "QUOTE_EXPIRED": "Ponudba za plačilo je potekla. Prosimo, plačajte znova.",
+    "PLAN_EXHAUSTED": "Porabili ste ves čas za seminarje. Napolnite ga na strani Načrti.",
+    "HOST_AWAY": "Gostitelja ni v sobi. Vstopite lahko, ko se gostitelj pridruži.",
+    "PLAN_AI_PAID": "Funkcije AI so na voljo v plačljivih načrtih.",
+    "AI_UNAVAILABLE": "Funkcije AI trenutno niso na voljo.",
+    "SPEECH_CHUNK_INVALID": "Format zvočnega dela je neveljaven.",
+    "SPEECH_NOT_LIVE": "Ta seminar ni v živo.",
+    "SPEECH_NO_AGR": "Potrebno je soglasje za obdelavo glasu.",
+    "SPEECH_RATE": "Preveč glasovnih zahtev. Poskusite znova čez nekaj časa.",
+    "SPEECH_QUOTA": "Čas obdelave glasu za ta seminar je porabljen.",
+    "SPEECH_USR_QUOTA": "Porabili ste svojo omejitev prevajanja in prevedenega glasu za ta seminar.",
+    "SPEECH_FAILED": "Govora ni bilo mogoče pretvoriti v besedilo.",
+    "SPEECH_STAGE_ONLY": "Samo osebe na odru lahko uporabljajo glasovne napise.",
+    "TRANSLATE_FAILED": "Napisa ni bilo mogoče prevesti.",
+    "POLL_CLOSED": "Ta anketa je zaprta.",
+    "NOTE_NOT_RECORDING": "Ti zapiski se ne snemajo.",
+    "NOTE_SHOT_INVALID": "Neveljaven posnetek zaslona.",
+    "NOTE_AUDIO_INVALID": "Neveljavna snemalna datoteka.",
+    "NOTE_SHOT_RATE": "Preveč posnetkov zaslona.",
+    "NOTE_RETRY_SOON": "Poskusite lahko znova čez minuto.",
+    "SPEECH_TTS_FAILED": "Prevedenega glasu ni bilo mogoče ustvariti.",
+    "CAPTION_SIG_INVALID": "Tega napisa ni bilo mogoče preveriti, zato ni bil preveden.",
+    "PLAN_EXPIRES_BEFORE_START": "Začetni čas je po izteku te naročnine.",
+    "PAY_ALREADY_PAID": "Plačilo je še v obdelavi. Če ste se prijavljali v denarnico, poskusite znova čez 3 minute.",
+    "REC_PAID_ONLY": "Snemanje je na voljo samo v seminarjih z mesečnim ali letnim načrtom, kjer je ostalo plačljivega časa.",
+    "REC_NOT_IN_ROOM": "Še vedno potrjujemo, da ste v sobi. Poskusite znova čez trenutek.",
+    "ENGINE_OFF": "Skrbniški ključ video strežnika ni konfiguriran.",
+    "ENGINE_UNAVAILABLE": "Video strežnik se ne odziva. Poskusite znova čez nekaj časa.",
+    "ADJ_NOTHING": "Ni preostalega časa za zmanjšanje."
+  },
+  "progress": {
+    "title": "Napredek gradnje",
+    "subtitle": "Končano, v teku in načrtovano, po funkcijah · od {date}",
+    "overall": "Celotni koraki",
+    "stepsDone": "{done}/{total} korakov končanih ({pct}%)",
+    "featureUnit": "funkcij",
+    "status": {
+      "done": "Končano",
+      "doing": "V teku",
+      "todo": "Načrtovano",
+      "drop": "Opustil"
+    },
+    "features": {
+      "F01": {
+        "name": "Prijava",
+        "desc": "Prijava v Pi Browser, prijava z Google v drugih brskalnikih in povezovanje obeh računov"
+      },
+      "F05": {
+        "name": "Video seminar v živo",
+        "desc": "Naš lastni video motor Galápagos — cilj je en predavatelj, ki prenaša do 30 udeležencem"
+      },
+      "F02": {
+        "name": "Ustvari seminar",
+        "desc": "Nastavite podnaslov, čas, kapaciteto in pristojbino za seminar, da ustvarite seminar (ime = otok, samodejno)"
+      },
+      "F03": {
+        "name": "Seznam in podrobnosti seminarjev",
+        "desc": "Brskajte po odprtih seminarjih stran za stranjo in si oglejte njihove podrobnosti"
+      },
+      "F04": {
+        "name": "Plačilo vstopnine s Pi",
+        "desc": "Plačajte pristojbino za seminar v Pi; strežnik ponovno preveri znesek, preden vam omogoči vstop"
+      },
+      "F06": {
+        "name": "Izplačila gostiteljem",
+        "desc": "Izplačajte prihodke od vstopnin gostiteljem v Pi"
+      },
+      "F07": {
+        "name": "Ponovitve",
+        "desc": "Oglejte si posnete seminarje pozneje"
+      },
+      "FU": {
+        "name": "Osnova za dodatke za srečanja",
+        "desc": "En signalni kanal za dodatke, AI povezavo, glasovne dele, soglasje za mikrofon in podatkovne tabele"
+      },
+      "F08": {
+        "name": "Urnik in deljenje",
+        "desc": "Povezava do koledarja, datoteka dogodka (.ics) in povabilo po e-pošti za vsak seminar"
+      },
+      "F09": {
+        "name": "Zmanjšanje hrupa in osvetlitev",
+        "desc": "Zmanjšajte hrup mikrofona in osvetlite temen video kamere"
+      },
+      "F10": {
+        "name": "Napisi v živo",
+        "desc": "Pretvorite govor predavatelja v besedilo pod odrom"
+      },
+      "F11": {
+        "name": "Ankete, vprašanja in odgovori ter prisotnost",
+        "desc": "Izvedite ankete in vprašanja med seminarjem; gostitelji prenesejo seznam prisotnosti"
+      },
+      "F12": {
+        "name": "Učinki ozadja",
+        "desc": "Zameglite ozadje ali ga zamenjajte s prednastavitvijo ali lastno sliko (obdelano na vaši napravi)"
+      },
+      "F13": {
+        "name": "Lokalno snemanje",
+        "desc": "Predavatelj snema seminar na svoji napravi in vsi vidijo, da snemanje poteka"
+      },
+      "F14": {
+        "name": "Zapiski sestankov z umetno inteligenco",
+        "desc": "Ko ga predavatelj vklopi, se govor in zasloni posnamejo in povzamejo v ključne točke, odločitve in naloge"
+      },
+      "F15": {
+        "name": "Zapiski srečanja v živo",
+        "desc": "Posnemite srečanje samo z mikrofonom in pridobite zapiske srečanja (skrbniki)"
+      },
+      "F16": {
+        "name": "Prevedeni napisi",
+        "desc": "Prikažite napise, prevedene v izbrani jezik"
+      },
+      "F17": {
+        "name": "Poslušajte v prevodu",
+        "desc": "Preberite prevedene napise na glas s sintetičnim glasom, medtem ko znižate originalni zvok"
+      }
+    },
+    "steps": {
+      "piLogin": "Prijava v Pi Browser",
+      "googleLogin": "Prijava z Google",
+      "accountLink": "Povezovanje računa",
+      "deviceTest": "Preizkus kamere",
+      "oneToTwo": "Predavatelj 1 → 2 udeleženca",
+      "recovery": "Obnovitev zamrznitve in stabilnost",
+      "structure": "Čiščenje strukture motorja",
+      "autoQuality": "Samodejna kakovost, 30 udeležencev",
+      "roomService": "Vstop v sobo in snemanje",
+      "roomUi": "Zaslon sobe (preddverje·oder·klepet·dvig roke·moderiranje)",
+      "createForm": "Ustvari zaslon",
+      "list": "Seznam",
+      "detail": "Podrobnosti",
+      "payRequest": "Zahteva za plačilo",
+      "payVerify": "Ponovna preverba zneska in vstop",
+      "settle": "Izplačilo",
+      "vod": "Ponovitev posnetka",
+      "appRelay": "Signalni kanal za dodatke motorja",
+      "aiBase": "AI, glasovni deli, soglasje in podatkovne tabele",
+      "shareLinks": "Povezava do koledarja, .ics in povabilo po e-pošti",
+      "noiseLight": "Zmanjšanje hrupa in osvetlitev",
+      "liveCaptions": "Napisi v živo",
+      "pollQnaAttend": "Ankete, vprašanja in odgovori ter seznam prisotnosti",
+      "backgrounds": "Zameglitev, prednastavitve in lastna slika",
+      "localRecording": "Snemanje predavatelja in značka snemanja",
+      "aiNotes": "Snemanje, povzetek in stran z zapiski",
+      "inPersonNotes": "Zapiski samo z mikrofonom in moji zapiski",
+      "captionTranslate": "Izbira jezika in preklop med izvirnikom/prevodom",
+      "dubbing": "Predvajanje sintetičnega glasu in znižan originalni zvok"
+    },
+    "refLabel": "Referenčni model",
+    "uiRef": "Osnovni UI — vzorci zaslonov in funkcij široko uporabljane spletne aplikacije za video srečanja, prilagojeni za seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Ime je shranjeno, vendar drugih ni bilo mogoče obvestiti. Videli ga bodo, ko se ponovno pridružite.",
+      "tile": "Kliknite za spremembo mojega imena",
+      "menu": "Spremeni moje ime",
+      "title": "Moje ime v tem seminarju",
+      "hint": "Do 30 znakov. Uporablja se samo v tem seminarju in se takoj posodobi na zaslonu vseh.",
+      "save": "Shrani",
+      "saving": "Shranjevanje…",
+      "cancel": "Prekliči",
+      "taken": "To ime že uporablja nekdo drug (gostitelj ali udeleženec). Izberite drugo.",
+      "failed": "Imena ni bilo mogoče shraniti. Poskusite znova."
+    },
+    "roomTitle": {
+      "edit": "Kliknite za urejanje podnaslova",
+      "label": "Podnaslov",
+      "placeholder": "Podnaslov (do 60 znakov)",
+      "save": "Shrani",
+      "cancel": "Prekliči",
+      "failed": "Podnaslova ni bilo mogoče shraniti."
+    },
+    "mirror": "Zrcali moj video",
+    "barPin": "Vedno prikaži spodnjo vrstico",
+    "barAuto": "Samodejno skrij spodnjo vrstico",
+    "title": "Pridruži se seminarju · {room}",
+    "titleSeminar": "Čakalnica",
+    "noEngine": "Video strežnik še ni pripravljen.",
+    "joinAs": "Pridruži se kot",
+    "presenter": "Predavatelj",
+    "audience": "Občinstvo",
+    "join": "Pridruži se zdaj",
+    "nameLabel": "Ime",
+    "audienceHint": "Člani občinstva ne uporabljajo kamere ali mikrofona. Po pridružitvi boste videli in slišali predavatelja.",
+    "preview": {
+      "pending": "Pripravljam kamero in mikrofon…",
+      "audioOnly": "Kamera ni na voljo — pošiljam samo zvok.",
+      "none": "Kamera in mikrofon nista na voljo. Preverite dovoljenja (še vedno se lahko pridružite brez medijev).",
+      "videoOnly": "Mikrofon ni na voljo — pošiljam samo video. Preverite dovoljenje za mikrofon."
+    },
+    "mic": {
+      "on": "Izklopi mikrofon",
+      "off": "Vklopi mikrofon"
+    },
+    "cam": {
+      "on": "Izklopi kamero",
+      "off": "Vklopi kamero"
+    },
+    "controls": "Kontrole klica",
+    "leave": "Zapusti",
+    "enableSound": "Omogoči zvok",
+    "state": {
+      "connecting": "Povezovanje…",
+      "reconnecting": "Ponovno povezovanje…"
+    },
+    "waiting": "Čakam na predavatelja.",
+    "rejoin": "Ponovno se pridruži",
+    "err": {
+      "generic": "Nekaj je šlo narobe. Prosimo, pridružite se znova.",
+      "CLOSED": "Povezava je bila izgubljena.",
+      "NO_ENGINE": "Video strežnik še ni pripravljen.",
+      "TICKET_401": "Prosimo, prijavite se.",
+      "TICKET_403": "Nimate dovoljenja za predstavitev. Pridružite se kot občinstvo.",
+      "TICKET_503": "Video strežnik še ni konfiguriran.",
+      "TICKET_NETWORK": "Preverite svojo omrežno povezavo.",
+      "TICKET_INVALID": "Vaša vstopnica je potekla.",
+      "TICKET_EXPIRED": "Vaša vstopnica je potekla.",
+      "ROOM_FULL": "Ta seminar je poln.",
+      "ROOM_CLOSED": "Soba je bila zaprta — seminar se je končal ali pa je bil gostitelj odsoten več kot 5 minut.",
+      "DUPLICATE_SESSION": "Pridružili ste se iz druge naprave, zato je bila ta povezava prekinjena.",
+      "ROLE_FORBIDDEN": "Nimate dovoljenja za predstavitev.",
+      "WS_FAILED": "Povezava z video strežnikom ni uspela.",
+      "ICE_FAILED": "Video povezava je prekinjena. Preverite omrežje.",
+      "MEDIA_FAILED": "Kamere ali mikrofona ni bilo mogoče zagnati.",
+      "TIMEOUT": "Video strežnik se ne odziva.",
+      "TICKET_402": "To je plačljiv seminar. Pred vstopom plačajte na strani seminarja.",
+      "TICKET_404": "Seminarja ni mogoče najti.",
+      "TICKET_409": "Ta seminar se je končal ali je bil preklican.",
+      "TICKET_HOST_AWAY": "Gostitelj se še ni pridružil ali pa je bil odsoten več kot 5 minut, zato ne morete vstopiti. Poskusite znova, ko se gostitelj pridruži.",
+      "TICKET_PLAN_EXHAUSTED": "Čas za ta seminar je potekel, zato se ne more začeti. Ponovni nakup istega paketa doda čas (brezplačno se podaljša za 1 uro naslednji mesec)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Mikrofona ni bilo mogoče spremeniti. Poskusite znova.",
+        "video": "Kamere ni bilo mogoče spremeniti. Poskusite znova."
+      },
+      "forbidden": "Nimate dovoljenja za predstavitev, zato boste nadaljevali kot občinstvo.",
+      "demoted": "Premaknjeni ste bili nazaj med občinstvo.",
+      "endFailed": "Seminarja ni bilo mogoče končati. Poskusite znova.",
+      "chatFailed": "Sporočilo ni bilo poslano.",
+      "actionFailed": "Zahteve ni bilo mogoče dokončati. Poskusite znova.",
+      "shareFailed": "Skupne rabe zaslona ni bilo mogoče zagnati.",
+      "err": {
+        "RATE_LIMITED": "Prehitro pošiljate. Počakajte trenutek.",
+        "ROLE_FORBIDDEN": "Nimate dovoljenja za to dejanje.",
+        "MEDIA_FAILED": "Mikrofona ali kamere ni bilo mogoče zagnati. Preverite dovoljenja.",
+        "LOCKED": "Zaklenjeno s strani predavatelja."
+      },
+      "mutedBy": {
+        "audio": "Predavatelj je izklopil vaš mikrofon.",
+        "video": "Predavatelj je izklopil vašo kamero."
+      },
+      "policy": {
+        "locked": "Predavatelj je zaklenil mikrofone. Svojega lahko vklopite, ko bodo odklenjeni.",
+        "unlocked": "Mikrofoni so odklenjeni."
+      },
+      "consent": {
+        "saveFail": "Vašega soglasja ni bilo mogoče shraniti. Preverite svojo registracijo in znova vklopite mikrofon."
+      }
+    },
+    "home": "Pojdi na domov",
+    "tile": {
+      "fullscreen": "Dvoklik za celozaslonski način · Esc za izhod",
+      "self": "{name} (vi)",
+      "presenter": "Predavatelj",
+      "micOff": "Mikrofon izklopljen",
+      "screen": "Zaslon uporabnika {name}",
+      "row": "Drugi govorci",
+      "pin": "Pokaži {name} veliko",
+      "unpin": "Samodejna postavitev"
+    },
+    "more": "Več možnosti",
+    "joinNoCam": "Pridruži se brez kamere",
+    "net": {
+      "afterJoin": "Vaša povezava se samodejno preveri po pridružitvi.",
+      "measuring": "Preverjanje povezave…",
+      "good": "Dobra povezava",
+      "fair": "Zadostna povezava",
+      "poor": "Slaba povezava",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% zvočnih podatkov se izgublja.",
+          "video": "{pct}% video podatkov se izgublja."
+        },
+        "rate": {
+          "audio": "Nalaganje zvoka je nizko pri {kbps} kbps.",
+          "video": "Nalaganje videa je nizko pri {kbps} kbps. Kakovost se lahko poslabša."
+        }
+      }
+    },
+    "people": "{n} v sobi",
+    "screen": {
+      "start": "Deli zaslon",
+      "stop": "Ustavi deljenje"
+    },
+    "panel": {
+      "title": "Klepet · Vprašanja in odgovori · Ankete · Ljudje",
+      "chat": "Klepet",
+      "people": "Ljudje",
+      "close": "Zapri ploščo",
+      "qna": "Vprašanja in odgovori",
+      "polls": "Ankete"
+    },
+    "chat": {
+      "empty": "Še ni sporočil. Klepet se ne shranjuje.",
+      "me": "Vi",
+      "failed": "Ni poslano.",
+      "retry": "Poskusi znova",
+      "input": "Vnesite sporočilo",
+      "send": "Pošlji"
+    },
+    "hand": {
+      "raise": "Dvigni roko",
+      "lower": "Spusti roko",
+      "list": "Dvignjene roke",
+      "lowerAll": "Spusti vse roke",
+      "raised": "Roka dvignjena",
+      "notice": "{name} je dvignil roko.",
+      "dismiss": "Zavrni",
+      "waiting": "{n} ljudi čaka na govorjenje"
+    },
+    "react": {
+      "open": "Reakcije",
+      "e0": "Všeč mi je",
+      "e1": "Ploskaj",
+      "e2": "Smeh",
+      "e3": "Presenečen",
+      "e4": "Žalosten",
+      "e5": "Brez besed",
+      "e6": "Ljubezen"
+    },
+    "quality": {
+      "label": "Kakovost",
+      "auto": "Samodejno",
+      "high": "Visoka",
+      "medium": "Srednja",
+      "low": "Nizka",
+      "unstable": "Vaše omrežje je nestabilno"
+    },
+    "roles": {
+      "presenter": "Predavatelj",
+      "panel": "Panelist",
+      "audience": "Občinstvo"
+    },
+    "stage": {
+      "invite": "Povabi na oder",
+      "remove": "Premakni v občinstvo",
+      "promoted": "Bili ste povabljeni na oder. Če ste dvignili roko, se vaša kamera samodejno vklopi (razen če je zaklenjena ali ni dovoljena). Vklopite mikrofon za govorjenje (mikrofon se ne vklopi samodejno).",
+      "later": "Kasneje"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} je dvignil roko."
+    },
+    "leaveDialog": {
+      "title": "Zapusti seminar",
+      "body": "Lahko odidete sami ali pa končate seminar in prekinete povezavo vsem.",
+      "confirmTitle": "Končati seminar?",
+      "confirmBody": "Vsem bo prekinjena povezava in nihče se ne bo mogel znova pridružiti temu seminarju.",
+      "cancel": "Prekliči",
+      "end": "Končaj seminar",
+      "endConfirm": "Končaj zdaj"
+    },
+    "mod": {
+      "muteAll": "Izklopi zvok vsem",
+      "lock": "Zakleni mikrofone",
+      "unlock": "Odkleni mikrofone",
+      "locked": "Predavatelj je zaklenil mikrofone",
+      "muteMic": "Izklopi mikrofon",
+      "askMic": "Prosi za vklop zvoka",
+      "muteCam": "Izklopi kamero",
+      "muteMicOf": "Izklopi mikrofon uporabnika {name}",
+      "askMicOf": "Prosi {name} za vklop zvoka",
+      "muteCamOf": "Izklopi kamero uporabnika {name}"
+    },
+    "ask": {
+      "audio": "Predavatelj vas je prosil, da vklopite mikrofon.",
+      "video": "Predavatelj vas je prosil, da vklopite kamero.",
+      "ignore": "Prezri"
+    },
+    "toDetail": "Pojdi na stran seminarja",
+    "consent": {
+      "title": "Preden vklopite mikrofon",
+      "body": "Če so v tem seminarju vključeni snemanje, podnapisi ali AI zapiski srečanja, se lahko vaš glas pretvori v besedilo, shrani in prevede. Obdelava glasu poteka s storitvijo AI zunaj vaše države. Če se ne strinjate, se vaš mikrofon vseeno vklopi – le vaš glas bo izključen iz obdelave.",
+      "privacy": "Politika zasebnosti",
+      "newTab": "(odpre se v novem zavihku)",
+      "decline": "Ne strinjam se",
+      "agree": "Strinjam se in vklopi mikrofon",
+      "notice": "Ko so vključeni snemanje, podnapisi ali AI zapiski srečanja, se obdelujejo glasovi govorcev. Glasovi občinstva se ne pošiljajo.",
+      "saveFailClosed": "Ta seminar se je končal, zato soglasja ni mogoče zabeležiti."
+    },
+    "captions": {
+      "title": "Podnapisi",
+      "room": "Podnapisi v živo (celotna soba)",
+      "show": "Pokaži podnapise",
+      "size": {
+        "label": "Velikost besedila",
+        "sm": "Majhna",
+        "md": "Srednja",
+        "lg": "Velika"
+      },
+      "waiting": "Podnapisi se prikažejo, ko jih predavatelj vklopi.",
+      "limit": "Dosežena je omejitev obdelave govora, zato so se podnapisi in AI zapiski ustavili.",
+      "sendFail": "Podnapisov ni bilo mogoče vklopiti. Poskusite znova čez nekaj časa.",
+      "sendFailOff": "Podnapisov ni bilo mogoče izklopiti. Poskusite znova čez nekaj časa.",
+      "region": "Podnapisi",
+      "translate": "Pokaži prevedene podnapise",
+      "lang": "Jezik prevoda",
+      "langMine": "Moji jeziki",
+      "langAll": "Vsi jeziki",
+      "trStop": {
+        "forbidden": "Prevedeni podnapisi so samo za registrirane udeležence. Prikazujem izvirnik.",
+        "unavailable": "Prevedeni podnapisi trenutno niso na voljo. Prikazujem izvirnik.",
+        "quota": "Ta seminar je dosegel omejitev prevajanja. Prikazujem izvirnik.",
+        "usrQuota": "Porabili ste svojo omejitev prevajanja za ta seminar. Prikazujem izvirnik."
+      },
+      "unsupported": "Ta naprava ne more ustvarjati podnapisov v živo (ta brskalnik ne podpira snemanja zvoka)."
+    },
+    "effects": {
+      "title": "Učinki",
+      "light": "Popravek svetlobe",
+      "noise": "Zmanjšaj hrup",
+      "noiseFail": "Zmanjšanja hrupa ni mogoče spremeniti na tej napravi.",
+      "close": "Zapri",
+      "preview": "Moj predogled",
+      "bg": "Ozadje",
+      "bgNone": "Brez",
+      "bgBlur": "Zameglitev",
+      "scenes": {
+        "beach": "🏝️ Maldivi plaža",
+        "autumn": "🍁 Jesenska dolina",
+        "fireplace": "🔥 Kamin",
+        "xmas": "🎄 Božična sejna soba"
+      },
+      "bgs": {
+        "dusk": "Mrak",
+        "ocean": "Ocean",
+        "forest": "Gozd",
+        "studio": "Studio",
+        "grid": "Mreža",
+        "dots": "Pike"
+      },
+      "myAdd": "Moja slika",
+      "myItem": "Moja slika {n}",
+      "myDel": "Izbriši mojo sliko {n}",
+      "mySaveFail": "Ozadje je bilo uporabljeno, vendar ga ni bilo mogoče shraniti na tej napravi (samo za to srečanje).",
+      "bgStopped": "Učinek ozadja se je ustavil in bil izklopljen. Izberite ga znova za ponovni zagon.",
+      "myNote": "Vaše slike so shranjene samo na tej napravi (do 3, vsaka 2 MB).",
+      "mobileBlurOnly": "Na telefonih je na voljo samo zamegljeno ozadje (slikovna ozadja delujejo na PC-ju).",
+      "myTooBig": "Uporabite lahko samo slike do 2 MB.",
+      "preparing": "Pripravljam…",
+      "bgFailed": "Učinka ozadja ni bilo mogoče naložiti.",
+      "autoOff": "Vaša naprava je prepočasna, zato je bil učinek ozadja izklopljen.",
+      "unsupported": "Učinki ozadja niso na voljo na tej napravi.",
+      "noCam": "Vklopite kamero, da izberete ozadje.",
+      "lightUnsupported": "Popravek svetlobe ni na voljo na tej napravi.",
+      "noiseUnsupported": "Nastavitve za zmanjšanje hrupa niso podprte na tej napravi."
+    },
+    "sheetClose": "Zapri",
+    "polls": {
+      "new": "Nova anketa",
+      "question": "Vprašanje",
+      "option": "Možnost {n}",
+      "remove": "Odstrani možnost {n}",
+      "addOption": "Dodaj možnost",
+      "start": "Začni anketo",
+      "cancel": "Prekliči",
+      "dup": "Možnosti morajo biti različne.",
+      "vote": "Glasuj",
+      "change": "Spremeni glas",
+      "close": "Zapri anketo",
+      "closed": "Zaprt",
+      "mine": "Vaša izbira",
+      "result": "{pct}% ({n} glasov)",
+      "total": "Skupaj {n} glasov",
+      "empty": "Še ni anket.",
+      "loading": "Nalaganje…",
+      "labOnly": "Ankete so na voljo samo v seminarjih.",
+      "started": "Začela se je nova anketa.",
+      "goVote": "Glasuj",
+      "votersNote": "Organizator lahko vidi, kdo je glasoval za katero možnost.",
+      "voters": "Glasovali: {names}"
+    },
+    "qna": {
+      "sort": "Razvrsti",
+      "by": {
+        "top": "Najboljše",
+        "new": "Najnovejše"
+      },
+      "rcm": "Glasuj za ({n})",
+      "answered": "Odgovorjeno",
+      "answer": "Označi kot odgovorjeno",
+      "unanswer": "Odznači kot odgovorjeno",
+      "hide": "Skrij",
+      "doneN": "{n} odgovorjenih",
+      "backOpen": "Neodgovorjena vprašanja",
+      "empty": "Še ni vprašanj.",
+      "emptyDone": "Ni odgovorjenih vprašanj.",
+      "loading": "Nalaganje…",
+      "input": "Postavi vprašanje (500 znakov)",
+      "send": "Pošlji",
+      "left": "{n} preostalih",
+      "labOnly": "Vprašanja in odgovori so na voljo samo v seminarjih."
+    },
+    "recording": {
+      "title": "Snemanje",
+      "badge": "Snemanje",
+      "unsupported": "Ta brskalnik ne more snemati. Prosimo, snemajte z običajnim brskalnikom na računalniku.",
+      "piBrowserOnly": "Snemanje deluje samo v običajnem brskalniku (računalnik ali mobilni telefon). Pi Browser ne more shranjevati posnetkov – odprite ta seminar v brskalniku na računalniku ali telefonu (seminarz.vercel.app) za snemanje.",
+      "audioSuspended": "Snemanje zvoka se morda ni začelo na tej napravi. Morda se snema samo slika.",
+      "notifyFailed": "Snemanje se ni začelo, ker udeležencev ni bilo mogoče obvestiti. Poskusite znova čez nekaj časa.",
+      "confirm": {
+        "title": "Začeti snemanje?",
+        "body": "Ko se snemanje začne, bodo vsi videli indikator 'Snemanje'. Datoteka se shrani samo na to napravo in se nikoli ne naloži ali prenese v tujino. Prosimo, obvestite udeležence, preden začnete.",
+        "download": "Ko ustavite, se datoteka MP4 shrani v mapo za prenose (brskalniki, ki ne morejo snemati MP4, potrebujejo trenutek za pretvorbo; posnetki, daljši od približno 45 minut, se lahko shranijo v izvirni obliki). Brskalniki v aplikaciji lahko blokirajo shranjevanje datotek, zato snemajte z običajnim brskalnikom na računalniku.",
+        "cancel": "Prekliči",
+        "start": "Začni snemanje",
+        "charge": "Med snemanjem se čas snemanja odšteje od vašega plačanega časa poleg časa sobe (2x med snemanjem). Ko plačani čas poteče, se snemanje ustavi in datoteka se shrani."
+      },
+      "resave": {
+        "label": "Datoteka posnetka",
+        "save": "Shrani znova",
+        "dismiss": "Zapri shranjevanje znova"
+      },
+      "toast": {
+        "started": "Snemanje se je začelo — vsi ga lahko vidijo.",
+        "saved": "Posnetek shranjen. Preverite mapo za prenose. Če nič ni bilo shranjeno, tapnite [Shrani znova] na vrhu zaslona.",
+        "autoStopped": "Snemanje se je končalo, ker ga je brskalnik ustavil ali pa je bila dosežena omejitev velikosti. Vse do takrat je bilo shranjeno. Za nadaljevanje znova začnite snemanje.",
+        "empty": "Nič ni bilo posneto, zato datoteka ni bila ustvarjena.",
+        "saveFailed": "Datoteke posnetka ni bilo mogoče ustvariti.",
+        "converting": "Pretvarjanje posnetka v MP4. Prosimo, pustite to okno odprto.",
+        "savedOriginal": "Ni bilo mogoče pretvoriti v MP4, zato je bil posnetek shranjen v izvirni obliki (webm). Preverite mapo za prenose.",
+        "startedBy": "Predavatelj je začel snemanje.",
+        "stoppedBy": "Predavatelj je ustavil snemanje."
+      },
+      "paidOnly": "Snemanje je na voljo samo v seminarjih, odprtih z mesečnim ali letnim paketom, dokler je na voljo plačani čas.",
+      "planOut": "Plačani čas je potekel, zato se je snemanje ustavilo in datoteka je bila shranjena.",
+      "notInRoom": "Še vedno potrjujemo, da ste v sobi. Znova začnite snemanje čez trenutek.",
+      "meterFailed": "Časa snemanja ni bilo mogoče preveriti, zato se snemanje ni začelo. Poskusite znova čez trenutek.",
+      "paidOut": "Ni preostalega plačanega časa, zato se snemanje ne more začeti. Kupite isti paket znova za snemanje.",
+      "pausedBadge": "Snemanje začasno ustavljeno",
+      "controls": "Kontrole snemanja",
+      "pause": "Premor",
+      "resume": "Nadaljuj",
+      "stop": "Ustavi snemanje"
+    },
+    "notes": {
+      "on": "AI zapiski",
+      "badge": "AI zapiski vklopljeni",
+      "started": "Predavatelj je vklopil AI zapiske",
+      "stopped": "AI zapiski izklopljeni",
+      "startedMine": "AI zapiski vklopljeni — prikazani vsem",
+      "stoppedMine": "AI zapiski izklopljeni — ustvarjanje zapiskov",
+      "startFail": "AI zapiskov ni bilo mogoče zagnati",
+      "gone": "AI zapiski so se ustavili — zapiski so bili končani ali izbrisani drugje",
+      "unsupported": "AI zapiskov ni mogoče vklopiti tukaj (ni podpore za zvočno snemanje)"
+    },
+    "dubbing": {
+      "listen": "Poslušajte v prevedenem glasu",
+      "blocked": "Prevedenega glasu ni bilo mogoče predvajati. Prosimo, vklopite ga ponovno.",
+      "stopped": "Prevedeni glas trenutno ni na voljo, zato je bil izklopljen",
+      "usrQuota": "Porabili ste omejitev prevedenega glasu za ta seminar, zato je bil izklopljen"
+    },
+    "plan": {
+      "warn": "Do konca načrta za ta seminar je ostalo še {min} min.",
+      "ended": "Čas za seminar je potekel, zato se je seminar končal in zapustili ste sobo.",
+      "left": "Preostali čas seminarja",
+      "closed": "Seminar se je končal, zato ste zapustili sobo.",
+      "hostAway": "Gostitelj je zapustil sobo. Če se ne vrne v 5 minutah, bodo vsi udeleženci odstranjeni.",
+      "hostGone": "Gostitelj se ni vrnil v 5 minutah, zato ste zapustili sobo. Ponovno lahko vstopite, ko se gostitelj pridruži."
+    },
+    "toLobby": "Čakalnica"
+  },
+  "list": {
+    "tabsLabel": "Pogled seznama seminarjev",
+    "tabs": {
+      "all": "Vsi",
+      "hosted": "Gostil sem jaz",
+      "joined": "Pridruženi"
+    },
+    "empty": {
+      "all": "Ni prihajajočih seminarjev.",
+      "hosted": "Niste gostili nobenega seminarja.",
+      "joined": "Niste se pridružili nobenemu seminarju."
+    },
+    "loading": "Nalaganje…",
+    "retry": "Poskusi znova",
+    "free": "Brezplačno",
+    "fee": "{amount} Pi",
+    "host": "Gostitelj {name}",
+    "capacity": "Kapaciteta {n}",
+    "status": {
+      "SCHEDULED": "Načrtovano",
+      "LIVE": "V živo",
+      "ENDED": "Končano",
+      "CANCELED": "Preklicano"
+    },
+    "hostNew": "Ustvari seminar",
+    "progress": "Napredek",
+    "pager": "Oštevilčenje strani",
+    "prev": "Prejšnja",
+    "next": "Naslednja",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Podnaslov",
+      "placeholder": "Dodaj podnaslov",
+      "save": "Shrani podnaslov",
+      "saving": "Shranjevanje…",
+      "saved": "Shranjeno."
+    },
+    "loading": "Nalaganje…",
+    "back": "Nazaj na seznam",
+    "notFound": "Seminarja ni mogoče najti.",
+    "status": {
+      "SCHEDULED": "Načrtovano",
+      "LIVE": "V živo",
+      "ENDED": "Končano",
+      "CANCELED": "Preklicano"
+    },
+    "startAt": "Datum",
+    "host": "Gostitelj",
+    "seats": "Prostih mest",
+    "seatsValue": "{left} / {max}",
+    "fee": "Cena seminarja",
+    "feeValue": "{amount} Pi",
+    "free": "Brezplačno",
+    "enter": "Vstopi",
+    "payEnter": "Plačaj s Pi in vstopi ({amount} Pi)",
+    "paying": "Obdelava plačila…",
+    "joining": "Registracija…",
+    "registered": "Registrirani ste.",
+    "full": "Ta seminar je poln.",
+    "closed": "Ta seminar se je končal.",
+    "canceled": "Ta seminar je bil preklican.",
+    "roomLink": "Pojdi v sobo (gostitelj)",
+    "piBrowserOnly": "Plačilo je na voljo v brskalniku Pi Browser po prijavi v Pi.",
+    "payCancelled": "Plačilo preklicano.",
+    "payStillWaiting": "Še vedno čakamo na denarnico. Če ste se že prijavili v Pi Wallet, počakajte trenutek.",
+    "payFailed": "Plačilo ni uspelo.",
+    "err": {
+      "NAME_TAKEN": "To ime že uporablja nekdo drug. Izberite drugo.",
+      "CAL_READ_FAILED": "Vaših dogodkov ni bilo mogoče naložiti. Preverite naslov.",
+      "ISLAND_FULL": "Vseh 100 imen otokov je trenutno v uporabi. Nov seminar lahko odprete, ko se prihajajoči ali živi seminar konča ali prekliče.",
+      "SMN_FULL": "Ta seminar je poln.",
+      "SMN_CLOSED": "Ta seminar se je končal ali je bil preklican.",
+      "SMN_ALREADY": "Že ste registrirani ali pa je plačilo v teku.",
+      "SMN_FREE": "Brezplačni seminarji ne zahtevajo plačila.",
+      "SMN_PAY_REQUIRED": "To je plačljiv seminar. Prosimo, plačajte za vstop.",
+      "SMN_PAY_INVALID": "Vašega plačila nismo mogli preveriti. Prosimo, kontaktirajte skrbnika.",
+      "PAY_PI_FAILED": "Ni bilo mogoče doseči plačilnega strežnika Pi. Prosimo, poskusite znova čez nekaj časa.",
+      "PAY_MISMATCH": "Podrobnosti plačila se ne ujemajo.",
+      "PAY_AMOUNT_MISMATCH": "Znesek plačila se razlikuje od cene seminarja.",
+      "PAY_CANCELLED": "To plačilo je bilo preklicano.",
+      "PAY_ALREADY_PAID": "Plačilo je še vedno v obdelavi. Če ste se prijavljali v denarnico, poskusite znova čez 3 minute.",
+      "PAY_INVALID_STATE": "Tega plačila trenutno ni mogoče obdelati.",
+      "PAY_PI_CANCEL_REFUSED": "Plačilo je že v teku in ga ni mogoče preklicati. Prosimo, preverite znova čez nekaj časa."
+    },
+    "share": {
+      "title": "Urnik in deljenje",
+      "calendar": "Dodaj v koledar",
+      "ics": "Datoteka koledarja",
+      "mail": "Povabi po e-pošti",
+      "mailApp": "Pošlji s privzeto e-poštno aplikacijo",
+      "mailSubject": "[Vabilo na seminar] {title}",
+      "mailBody": "{title}\nKdaj: {start}\n\nPridružite se neposredno s to povezavo.\nNamizje: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopiraj povezavo",
+      "copied": "Povezava kopirana.",
+      "copyFail": "Kopiranje ni uspelo. Prosimo, kopirajte povezavo iz naslovne vrstice.",
+      "share": "Deli z drugo aplikacijo",
+      "shareFail": "Deljenje ni uspelo. Namesto tega uporabite Kopiraj povezavo.",
+      "created": "Vaš seminar je pripravljen. Dodajte začetni čas v svoj Google Koledar.",
+      "addGoogle": "Dodaj v Google Koledar",
+      "later": "Kasneje",
+      "piBrowserOpen": "V brskalniku Pi Browser se koledar, e-pošta in datoteka koledarja odprejo v privzetem brskalniku vašega telefona.",
+      "extFail": "Ni bilo mogoče odpreti. Posodobite Pi Browser ali uporabite Kopiraj povezavo in jo odprite v običajnem brskalniku (seminarz.vercel.app).",
+      "icsPiBrowser": "Datoteko koledarja lahko prenesete samo v običajnem brskalniku (računalnik ali mobilni telefon). V brskalniku Pi Browser namesto tega uporabite [Dodaj v koledar]."
+    },
+    "attendance": "Prisotnost",
+    "plan": "Načrt",
+    "left": "Preostali čas"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Prejšnji mesec",
+      "next": "Naslednji mesec",
+      "connect": "Pokaži moj Google Koledar",
+      "change": "Upravljaj Google koledarje ({n})",
+      "add": "Dodaj",
+      "remove": "Odstrani",
+      "close": "Zapri",
+      "failed": "Ni bilo mogoče naložiti dogodkov iz {n} koledarja(-ev). Preverite naslov.",
+      "badUrl": "Prilepite 'Skrivni naslov v formatu iCal' (…/basic.ics) iz nastavitev Google Koledarja, ne naslovne vrstice brskalnika.",
+      "full": "Dodate lahko do {n} koledarjev.",
+      "allDay": "Cel dan",
+      "day": "Moji dogodki na ta dan",
+      "count": "{n, plural, one {# dogodek} two {# dogodka} few {# dogodki} other {# dogodkov}}",
+      "more": "+{n}",
+      "picked": "Ta datum je nastavljen kot začetni datum. Izberite čas spodaj.",
+      "s1": "Tapnite [Odpri nastavitve Google Koledarja] spodaj.",
+      "s2": "Pod 'Nastavitve za moje koledarje' na levi izberite koledar (npr. vaše ime).",
+      "s3": "Pomaknite se do 'Integriraj koledar' in kopirajte 'Skrivni naslov v formatu iCal'.",
+      "s4": "Prilepite ga sem in tapnite [Dodaj] — naslovi dogodkov se prikažejo v koledarju. Dodajte druge koledarje na enak način, do 5.",
+      "open": "Odpri nastavitve Google Koledarja",
+      "privacy": "Ta naslov je ključ do vašega koledarja — ne delite ga. Shranjen je samo na tej napravi, nikoli na našem strežniku."
+    },
+    "title": "Ustvari seminar",
+    "name": "Potujmo na čudovit otok!",
+    "subTitle": "Podnaslov (neobvezno, do 60 znakov)",
+    "startAt": "Začetni čas",
+    "maxCnt": "Kapaciteta (1–100)",
+    "submit": "Ustvari",
+    "submitting": "Ustvarjanje…",
+    "invalid": "Preverite vnos — datum v enem letu od zdaj, kapaciteta 1–100.",
+    "attendance": {
+      "title": "Prisotnost",
+      "back": "Nazaj na seminar",
+      "loading": "Nalaganje…",
+      "forbidden": "Samo gostitelj in skrbniki si lahko ogledajo prisotnost.",
+      "count": "{n} oseb",
+      "csv": "Prenesi CSV",
+      "empty": "Nihče se še ni pridružil.",
+      "online": "Na spletu",
+      "left": "Zapustil",
+      "col": {
+        "name": "Ime",
+        "pi": "Pi uporabniško ime",
+        "ent": "Prvič se je pridružil",
+        "hb": "Nazadnje viden",
+        "dur": "Čas prisotnosti",
+        "min": "Prisoten (min, čas odsotnosti izključen)",
+        "state": "Status"
+      },
+      "durNote": "Čas prisotnosti je od prvega pridružitve do zadnjega videnja, minus čas odsotnosti (vrzeli daljše od 2,5 minute).",
+      "csvPiBrowser": "Prenos CSV deluje samo v običajnem brskalniku (računalnik ali mobilni telefon). Pi Browser ne more shranjevati datotek — odprite ta seznam prisotnosti v brskalniku računalnika ali telefona (seminarz.vercel.app)."
+    },
+    "plan": "Načrt",
+    "planFree": "Brezplačno — {time} preostalo ta mesec · brez AI",
+    "planPaid": "{name} {time} · {price} — plačaj ob ustvarjanju",
+    "planHint": "Seminar, odprt z plačljivim načrtom, najprej porabi čas tega načrta, nato pa nadaljuje z brezplačnim časom tega meseca (brez AI v brezplačnem delu). Aktiven načrt se odpre brez plačila; mesečni ali letni načrt, ki ga nimate, se plača v Pi, ko pritisnete Ustvari, nato se seminar odpre (Pi Browser). Pridružitev je za udeležence vedno brezplačna.",
+    "planOwned": "{name} — aktivno · {time} preostalo",
+    "planEnds": "Začetni čas je po izteku tega načrta. Premaknite začetek prej ali izberite drug načrt.",
+    "paidKept": "Vaša plačana vstopnica je ohranjena. Odpravite težavo in znova pritisnite Ustvari (brez drugega plačila)."
+  },
+  "privacy": {
+    "title": "Politika zasebnosti — Glasovne in AI funkcije",
+    "effective": "Velja od {date}",
+    "intro": "Ta politika pojasnjuje osebne podatke, ki jih obdelujemo, ko uporabljate podnapise v živo, prevedene podnapise, glasovno prevajanje, AI zapiske sestankov in osebne zapiske na seminarju. Te funkcije uporabljajo zunanjo storitev AI, zato se informacije prenašajo v tujino.",
+    "whoTitle": "Čigave informacije se obdelujejo",
+    "who": [
+      "Predavatelji in udeleženci na odru: enkrat vas prosimo za soglasje, preden prvič vklopite mikrofon. Seminarju se lahko pridružite brez soglasja.",
+      "Občinstvo: ne uporabljate mikrofona, zato se glas ne pošilja. Vidite samo podnapise in zapiske.",
+      "Osebni zapiski: skrbnik snema sestanek z mikrofonom in potrdi, da so bili udeleženci obveščeni pred snemanjem."
+    ],
+    "xferTitle": "Prenos osebnih podatkov v tujino (Zakon o varstvu osebnih podatkov Republike Koreje, člen 28-8)",
+    "xfer": [
+      {
+        "k": "Prejemnik",
+        "v": "Google LLC (Gemini API) — kontakt [TBD: Google kontakt za zasebnost]"
+      },
+      {
+        "k": "Države"
+      },
+      {
+        "k": "Kdaj in kako",
+        "v": "Približno vsakih 5 sekund, medtem ko je funkcija vklopljena, prek šifrirane povezave (HTTPS). Za osebne zapiske se celoten posnetek pošlje še enkrat v 5-minutnih delih, ko se zapisek konča (natančen prepis)."
+      },
+      {
+        "k": "Predmeti",
+        "v": "Glas, govorjena vsebina (besedilo), prikazno ime govorca (za povzetke zapiskov), posnetki zaslona (ko so AI zapiski vklopljeni)"
+      },
+      {
+        "k": "Namen",
+        "v": "Govor v besedilo, prevajanje, povzetki zapiskov sestankov, sintetični govor (standardni glasovi, brez kloniranja glasu), ločevanje govorcev za osebne zapiske (glasovi so ločeni in označeni po zaznanem spolu, kot je Moški 1 / Ženska 1 — imena ali identitete se ne sklepajo)"
+      },
+      {
+        "k": "Hramba",
+        "v": "Konča se takoj, ko je rezultat vrnjen. Google prosimo, naj ne shranjuje zahtev (store=false). Dnevniki spremljanja zlorab se lahko še vedno hranijo v skladu z Googlovimi pogoji [TBD: obdobje hrambe in status plačljivega nivoja]."
+      },
+      {
+        "k": "Kako zavrniti in kaj se zgodi",
+        "v": "Če ne privolite ali izklopite mikrofona, se glas ne pošlje. Še vedno lahko sodelujete na seminarju; ustvarjajo se samo podnapisi, prevodi in zapiski vašega govora. Soglasje lahko kadar koli prekličete [TBD: kje je gumb za preklic]."
+      }
+    ],
+    "keepTitle": "Kaj ta storitev hrani",
+    "keep": [
+      "Izvirni zvok: za podnapise seminarja in AI zapiske sestankov se ne shranjuje; zavrže se takoj po pretvorbi v besedilo. Za osebne zapiske se posnetek hrani v zasebnem shrambi, da ga je mogoče po sestanku natančneje prepisati (z govorci), in se izbriše pri dnevnem čiščenju, ko preteče 1 dan od konca zapiskov (takoj, če je zapisek izbrisan).",
+      "Podnapisi v živo: se ne shranjujejo.",
+      "AI zapiski sestankov (ko jih predavatelj vklopi): govorjena vsebina, posnetki zaslona in povzetek, hranjeni, dokler se zapiski ne izbrišejo [TBD: največje obdobje hrambe].",
+      "Zapisi soglasja: čas soglasja in različica politike, hranjeni kot dokaz [TBD: obdobje hrambe].",
+      "Uporaba: število zahtev na minuto in čas obdelave, uporabljeno za uveljavljanje omejitev stroškov.",
+      "Prisotnost: čas, ko ste se pridružili, čas, ko ste bili nazadnje povezani, vaše prikazno ime in vaše Pi uporabniško ime so shranjeni in posredovani gostitelju kot seznam prisotnosti (na zaslonu in kot prenos CSV). Hranjeno, dokler se seminar ne izbriše.",
+      "Vprašanja in ankete: besedilo vprašanja in prikazno ime spraševalca (ali Pi uporabniško ime, če ga ni) so vidni vsem udeležencem. Glasovi za prikazujejo samo število, nikoli kdo jih je oddal. Glasovi v anketah prikazujejo samo število udeležencem; organizator in skrbniki vidijo za vsako možnost prikazno ime (ali Pi uporabniško ime, če ga ni) vsakega glasovalca. Hranjeno, vključno s skritimi vprašanji, dokler se seminar ne izbriše."
+    ],
+    "recTitle": "Snemanje",
+    "rec": "Posnetki se shranijo samo kot datoteka na napravi predavatelja. Ne naložijo se na naše strežnike ali prenesejo v tujino. Med snemanjem ali vklopljenimi AI zapiski vsi udeleženci vidijo indikator.",
+    "rightsTitle": "Vaše pravice",
+    "rights": "Lahko zahtevate dostop, popravek, izbris ali prekinitev obdelave vaših podatkov. Kontakt: [TBD: ime in kontakt pooblaščene osebe za varstvo podatkov]"
+  },
+  "notes": {
+    "title": "Zapiski",
+    "back": "Nazaj na seminar",
+    "loading": "Nalaganje…",
+    "meta": "Zapiski · {date} · {min} min",
+    "aiWarn": "Povzetek, ki ga je ustvarila AI — lahko vsebuje napake",
+    "points": "Ključne točke",
+    "decisions": "Odločitve",
+    "todos": "Naloge",
+    "shots": "Zajemi zaslona ({n})",
+    "transcript": "Prepis",
+    "download": "Prenesi Markdown",
+    "making": "Ustvarjanje zapiskov…",
+    "makingLong": "To traja nekaj časa. Prosimo, osvežite pozneje.",
+    "recording": "Še vedno snemanje",
+    "failed": "Povzetka ni bilo mogoče ustvariti — celoten prepis je spodaj",
+    "retry": "Poskusi znova",
+    "finish": "Končaj snemanje in povzemi",
+    "none": "Nič tukaj",
+    "blank": "Nič za povzeti — ni bilo posnetega govora ali pa je bil prekratek",
+    "notFound": "Zapiskov ni mogoče najti",
+    "forbidden": "Nimate dostopa do teh zapiskov",
+    "shotAlt": "Zajem zaslona ob {at}",
+    "close": "Zapri",
+    "view": "Ogled zapiskov",
+    "error": "Ni bilo mogoče naložiti",
+    "mine": "Moji zapiski",
+    "del": "Izbriši zapiske",
+    "delAsk": "Izbrišem te zapiske (povzetek, prepis in zajemi zaslona)? Nihče jih ne bo mogel videti.",
+    "delYes": "Izbriši",
+    "delNo": "Prekliči",
+    "delFail": "Ni bilo mogoče izbrisati",
+    "dlFail": "Ni bilo mogoče prenesti — prosimo, poskusite znova",
+    "recentNotes": "Nedavni zapiski",
+    "empty": "Še ni zapiskov",
+    "newNote": "Začni osebne zapiske",
+    "inPerson": "Zapiski osebnega sestanka",
+    "inPersonTag": "Osebno",
+    "titleLabel": "Naslov",
+    "titlePh": "npr. Tedenski sestanek",
+    "told": "Vsem prisotnim sem povedal, da bo to posneto in obdelano z AI (obvezno)",
+    "toldWhy": "Preden začnete, vsem prisotnim povejte, da bo ta pogovor posnet (posnetek se hrani 1 dan po koncu zapiskov, govorci pa se ločijo po glasu in označijo po zaznanem spolu) in pretvorjen v besedilo in povzetek z zunanjo AI.",
+    "start": "Začni snemanje",
+    "starting": "Pripravljanje…",
+    "recBadge": "Snemanje {time}",
+    "recentLines": "Zadnje vrstice",
+    "waiting": "Besedilo se prikaže tukaj, ko ljudje govorijo",
+    "end": "Končaj in ustvari zapiske",
+    "wakeWarn": "Snemanje se lahko ustavi, če se zaslon izklopi",
+    "adminOnly": "To lahko uporabljajo samo skrbniki",
+    "aiOff": "AI zapiski trenutno niso na voljo (potrebna je nastavitev strežnika). Pretekli zapiski so navedeni spodaj",
+    "reload": "Ponovno naloži",
+    "unsupported": "Snemanje na tej napravi ni na voljo",
+    "micDenied": "Mikrofona ni mogoče uporabiti — preverite dovoljenje",
+    "limited": "Časovna omejitev obdelave je porabljena — končajte in ustvarite zapiske",
+    "noAgr": "Ustavljeno: ni potrditve obvestila o snemanju — končajte in začnite znova",
+    "micLost": "Mikrofon je bil odklopljen in snemanje se je ustavilo — tapnite Ponovno poveži mikrofon ali končajte zapisek",
+    "micRetry": "Ponovno poveži mikrofon",
+    "gone": "Ta zapisek je bil končan ali izbrisan drugje, zato se je snemanje ustavilo — uporabite spodnji gumb za odprtje zapiskov",
+    "finishing": "Shranjevanje zadnjih besed…",
+    "st": {
+      "RECORDING": "Snemanje",
+      "SUMMARIZING": "Ustvarjanje",
+      "DONE": "Končano",
+      "FAILED": "Neuspešno"
+    },
+    "downloadPiBrowser": "Prenos Markdown deluje samo v običajnem brskalniku (računalnik ali mobilni telefon). Pi Browser ne more shranjevati datotek — odprite te zapiske v brskalniku računalnika ali telefona (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Paketi",
+    "loading": "Nalaganje…",
+    "free": "Brezplačno",
+    "freeDesc": "{time} seminarjev vsak mesec (brez prenosa)",
+    "monthly": "Mesečno",
+    "yearly": "Letno",
+    "paidDesc": "{time} seminarjev, veljavno {months} mesecev",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Preverjanje cene Pi",
+    "noAi": "Brez AI podnapisov, prevodov, sinhronizacije ali povzetkov zapiskov",
+    "withAi": "Vključuje AI podnapise, prevode, sinhronizacijo in povzetke zapiskov",
+    "buy": "Plačaj s Pi",
+    "bought": "Plačilo je zaključeno. Čas seminarja je bil dodan.",
+    "meRemain": "Preostali čas: {time}",
+    "loginToBuy": "Prijavite se za nakup paketa.",
+    "payNote": "Plačilo je vedno v Pi. Znesek v lokalni valuti je samo referenca; znesek Pi je določen po ceni Pi ob plačilu. Seminar na plačljivem paketu najprej porabi preostale ure tega paketa (najprej tiste, ki jim poteče veljavnost), nato pa nadaljuje z brezplačnim časom tega meseca.",
+    "charge": "Dopolni čas",
+    "hm": "{h} h {m} min",
+    "m": "{m} min",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (preverjanje cene Pi)",
+    "h": "{h} h"
+  },
+  "adminRooms": {
+    "title": "Upravljanje sob",
+    "adminOnly": "To stran si lahko ogledajo samo skrbniki.",
+    "refresh": "Osveži",
+    "count": "{n} odprtih sob",
+    "empty": "Trenutno ni odprtih sob.",
+    "lab": "Laboratorijska soba",
+    "noSeminar": "Ni zapisa seminarja",
+    "peers": "{n} / {cap} povezanih",
+    "producers": "{n} tokov",
+    "end": "Konča {time}",
+    "stale": "Seminar se je končal, vendar je soba še vedno odprta na video strežniku — prisilno jo zaprite.",
+    "close": "Prisilno zapri",
+    "confirmSeminar": "To konča seminar in zapre sobo. Vsi bodo odklopljeni.",
+    "confirmRoom": "To zapre sobo. Vsi bodo odklopljeni.",
+    "confirmYes": "Zapri",
+    "cancel": "Prekliči",
+    "closing": "Zapiranje…",
+    "closed": "Soba zaprta.",
+    "metrics": "Metrike video strežnika (od začetka)",
+    "metricsOff": "Metrik ni bilo mogoče naložiti.",
+    "m": {
+      "packetsIn": "Prejeti paketi",
+      "packetsOut": "Poslani paketi",
+      "nackIn": "Prejeti NACK-i",
+      "nackOut": "Poslani NACK-i",
+      "retransmits": "Ponovni prenosi",
+      "duplicateNack": "Podvojeni NACK-i",
+      "cacheMiss": "Zgrešeni predpomnilnik ponovnega prenosa",
+      "pliOut": "Zahteve za ključne sličice (PLI)",
+      "keyframes": "Ključne sličice",
+      "layerSwitches": "Preklopi kakovosti",
+      "queueDrops": "Opustitve čakalne vrste"
+    }
+  },
+  "adminUsers": {
+    "title": "Uporabniki",
+    "adminOnly": "To stran si lahko ogledajo samo skrbniki.",
+    "search": "Išči po imenu (2+ znaka)",
+    "searchBtn": "Išči",
+    "refresh": "Osveži",
+    "count": "{n, plural, one {# uporabnik} other {# uporabnikov}}",
+    "empty": "Ni uporabnikov.",
+    "admin": "Skrbnik",
+    "lastLogin": "Zadnja prijava {time}",
+    "never": "Nikoli se ni prijavil",
+    "plan": {
+      "FREE": "Brezplačno",
+      "M": "Mesečno",
+      "Y": "Letno"
+    },
+    "until": "(do {time})",
+    "manage": "Upravljaj čas",
+    "close": "Zapri",
+    "planLabel": "Paket",
+    "hours": "Ure",
+    "minutes": "Minute",
+    "reason": "Razlog (neobvezno)",
+    "sub": "Zmanjšaj",
+    "confirmSub": "Zmanjšaj čas paketa {plan} za {time}.",
+    "confirmYes": "Potrdi",
+    "cancel": "Prekliči",
+    "saving": "Shranjevanje…",
+    "done": "Uporabljeno. Preostali čas paketa {plan}: {time}",
+    "invalid": "Vnesite zmanjšanje med 1 minuto in 1000 urami (cele minute 0–59).",
+    "history": "Nedavne prilagoditve",
+    "noHistory": "Ni prilagoditev.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Podeli storitveno kartico (brezplačen čas)",
+    "svc": {
+      "H1": "1-urna kartica",
+      "D1": "1-dnevna kartica",
+      "M1": "1-mesečna kartica"
+    },
+    "svcNote": "Storitvene kartice so čas brezplačnega paketa. Uporabljajo se lahko od zdaj za to obdobje (1 ura, 24 ur, 1 mesec) v brezplačnih seminarjih in v brezplačnem delu plačljivih seminarjev (brez AI funkcij). Če jih je več, se samodejno porabijo v vrstnem redu 1-urna → 1-dnevna → 1-mesečna.",
+    "subTitle": "Zmanjšaj čas",
+    "subNote": "Najprej se odšteje od kartic z najkasnejšim potekom. Če je to več kot preostali čas, se odstrani samo preostali čas.",
+    "confirmSvc": "Podeli {svc}.",
+    "doneSvc": "Podeljena {svc}. Preostali brezplačni čas: {time} (kartica poteče {end})"
+  }
+}

@@ -83,6 +83,8 @@ export const env = createEnv({
     // 요금제 화면 원화 참고 환산 표시 — '1'(기본) 보임, '0' 숨김(결제는 언제나 Pi, 원화는 표시용)
     NEXT_PUBLIC_PLAN_KRW_REF: z.enum(['0', '1']).optional(),
     NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
+    // 상단 언어 콤보 Pi 환산·π 시세칩 — 미설정·'true' = 표시(기본), 'false' = 숨김(loginpi override 와 같은 이름, 다국어 표준 4.6)
+    NEXT_PUBLIC_FEATURE_PI_PRICE: z.enum(['true', 'false']).optional(),
   },
   runtimeEnv: {
     LAB_ENABLED: process.env.LAB_ENABLED,
@@ -130,6 +132,7 @@ export const env = createEnv({
     NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_PI_OAUTH_CLIENT_ID,
     NEXT_PUBLIC_PI_APP_DOMAIN: process.env.NEXT_PUBLIC_PI_APP_DOMAIN,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_FEATURE_PI_PRICE: process.env.NEXT_PUBLIC_FEATURE_PI_PRICE,
   },
   // 운영 tier(@pi/db resolveDbTier 와 같은 우선순위 : APP_TIER > VERCEL_ENV)에서 관리자 username 만 있고 uid 가 없으면 빌드 실패.
   // 런타임 이중 방어 = @pi/db grantEnvAdmin(운영 tier + uid 미설정 → 승격 안 함)

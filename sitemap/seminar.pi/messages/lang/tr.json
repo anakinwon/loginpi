@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Pi ile katıldığınız canlı video seminerleri"
+  },
+  "home": {
+    "description": "Ev sahipleri seminerler düzenler ve katılımcılar Pi ile canlı video oturumlarına katılır.",
+    "badge": "Güzel adalarda canlı seminerler",
+    "headline": "İzleyin, dinleyin ve birlikte öğrenin — canlı",
+    "ctaBrowse": "Seminerlere göz at",
+    "ctaPlan": "Planları gör",
+    "features": {
+      "video": "Canlı video",
+      "caption": "Altyazılar ve çeviri",
+      "notes": "AI toplantı notları",
+      "pay": "Pi ile öde"
+    },
+    "listTitle": "Seminerler",
+    "cal": {
+      "title": "Seminer takvimi",
+      "desc": "Geçmiş seminerlerden gelecektekilere — ayrıntılar için bir tarihe dokunun.",
+      "legendSmn": "Seminerler",
+      "legendEnded": "Geçmiş seminerler",
+      "legendMine": "Etkinliklerim",
+      "failed": "Seminer tarihleri yüklenemedi. Lütfen daha sonra tekrar deneyin.",
+      "open": "Ayrıntıları görüntüle"
+    }
+  },
+  "nav": {
+    "link": "Hesabı bağla",
+    "privacy": "Gizlilik",
+    "plan": "Planlar",
+    "rooms": "Odalar",
+    "admin": "Yönetici",
+    "users": "Kullanıcılar",
+    "home": "Ana Sayfa",
+    "privacyShort": "Gizlilik",
+    "menu": "Ana menü",
+    "fold": "Menüyü daralt",
+    "unfold": "Menüyü genişlet"
+  },
+  "auth": {
+    "checking": "Oturum açılıyor kontrol ediliyor…",
+    "signedIn": "{name}",
+    "inPerson": "Yüz yüze notlar",
+    "required": "Pi hesabınızla oturum açmanız gerekiyor.",
+    "signIn": "Pi ile oturum aç",
+    "openInPiBrowser": "Pi hesabınızla oturum açmak için bu sayfayı Pi Browser'da açın.",
+    "authenticating": "Oturum açılıyor…",
+    "google": "Google ile oturum aç",
+    "signOut": "Oturumu kapat",
+    "or": "veya",
+    "linkRequired": "Google ile oturum açtınız, ancak henüz bir Pi hesabına bağlı değil. Pi Browser'da bir bağlantı kodu oluşturun ve buraya girin.",
+    "linkNeeded": "Pi hesabı bağlantısı gerekli",
+    "linkCheckFailed": "Hesap bağlantı durumunuz kontrol edilemedi (geçici sunucu hatası). Lütfen bir süre sonra yenileyin."
+  },
+  "piOAuth": {
+    "signingIn": "Pi hesabınızla oturum açılıyor…",
+    "failed": "Pi oturum açma başarısız oldu. Lütfen tekrar deneyin.",
+    "stateMismatch": "Bu oturum açma isteği doğrulanamadı (süresi dolmuş veya başka bir sekme). Lütfen tekrar deneyin.",
+    "retry": "Tekrar dene",
+    "backHome": "Ana Sayfa"
+  },
+  "link": {
+    "title": "Hesabı bağla",
+    "intro": "Pi Browser'da oturum açtığınız hesabı, normal bir tarayıcıdaki Google oturum açma ile bağlayın. Bağlantıdan sonra aynı hesabı bir PC tarayıcısında da kullanabilirsiniz.",
+    "checking": "Oturum açılıyor kontrol ediliyor…",
+    "piIssueTitle": "Normal bir tarayıcıdan da oturum açmak için",
+    "codeHint": "Aşağıdaki kodu oluşturun, ardından bir PC tarayıcısında Google ile oturum açın ve Bağlantı hesabı sayfasına girin (10 dakika içinde).",
+    "piIssue": "Bağlantı kodu oluştur",
+    "reissue": "Yeni bir kod oluştur",
+    "expiresIn": "{min} dakika içinde sona erer",
+    "enterTitle": "Bağlantı kodunu girin",
+    "enterHint": "Pi Browser'da seminar.pi → Hesabı bağla → Bağlantı kodu oluştur'u açın, ardından 6 haneli kodu girin.",
+    "codeLabel": "Bağlantı kodu",
+    "submit": "Bağla",
+    "done": "Bağlandı. Artık Google ile oturum açmayı da kullanabilirsiniz.",
+    "linked": "{name} Google oturum açma ile bağlı."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Oturum açma gerekli",
+    "AUTH_PI_REQUIRED": "Pi oturum açma gerekli",
+    "AUTH_PI_SESSION_INVALID": "Oturumunuzun süresi doldu. Lütfen tekrar oturum açın",
+    "AUTH_PI_TOKEN_INVALID": "Pi oturum açma doğrulaması başarısız oldu",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Pi oturum açma bilgileri eksik",
+    "FORBIDDEN": "İzniniz yok",
+    "BAD_REQUEST": "Hatalı istek",
+    "BAD_REQUEST_BODY": "Hatalı istek",
+    "INVALID_INPUT": "Geçersiz giriş",
+    "QUERY_FAILED": "Yüklenemedi",
+    "SAVE_FAILED": "Kaydedilemedi",
+    "INTERNAL": "Bir şeyler ters gitti",
+    "SERVER_CONFIG": "Sunucu yapılandırma hatası. Lütfen operatörle iletişime geçin",
+    "PI_API_CONNECT_FAILED": "Pi Network'e ulaşılamadı",
+    "DB_UNAVAILABLE": "Veriler geçici olarak kullanılamıyor. Lütfen daha sonra tekrar deneyin",
+    "NOT_FOUND": "Bulunamadı",
+    "RATE_LIMITED": "Çok fazla istek. Lütfen kısa süre sonra tekrar deneyin",
+    "PAYLOAD_TOO_LARGE": "İstek çok büyük",
+    "NETWORK": "Ağ bağlantınızı kontrol edin",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Bu Pi kullanıcı adı farklı kimlik bilgileriyle zaten kayıtlı. Lütfen yöneticiyle iletişime geçin",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Bu hesap etkin değil. Lütfen yöneticiyle iletişime geçin",
+    "AUTH_GOOGLE_REQUIRED": "Google ile oturum açma gerekli.",
+    "LINK_CODE_INVALID": "Bağlantı kodu geçersiz veya süresi dolmuş. Pi Browser'da yeni bir tane oluşturun.",
+    "LINK_ALREADY_LINKED": "Bu hesap zaten bağlı.",
+    "LINK_CODE_GEN_FAILED": "Bağlantı kodu oluşturulamadı. Lütfen daha sonra tekrar deneyin.",
+    "AUTH_DB_UNAVAILABLE": "Hesabınız kaydedilemedi, bu yüzden oturum açma başarısız oldu. Lütfen daha sonra tekrar deneyin.",
+    "LINK_TRY_LIMIT": "Çok fazla yanlış bağlantı kodu. 15 dakika sonra tekrar deneyin.",
+    "PRICE_UNAVAILABLE": "Pi fiyatı alınamadı. Lütfen kısa süre sonra tekrar deneyin",
+    "QUOTE_EXPIRED": "Ödeme teklifinin süresi doldu. Lütfen tekrar ödeme yapın",
+    "PLAN_EXHAUSTED": "Tüm seminer sürenizi kullandınız. Planlar sayfasından yükleme yapın",
+    "HOST_AWAY": "Ev sahibi odada değil. Ev sahibi katıldıktan sonra girebilirsiniz",
+    "PLAN_AI_PAID": "AI özellikleri ücretli planlarda mevcuttur",
+    "AI_UNAVAILABLE": "AI özellikleri şu anda kullanılamıyor",
+    "SPEECH_CHUNK_INVALID": "Ses parçası formatı geçersiz",
+    "SPEECH_NOT_LIVE": "Bu seminer canlı değil",
+    "SPEECH_NO_AGR": "Ses işleme onayı gerekli",
+    "SPEECH_RATE": "Çok fazla ses isteği. Lütfen kısa süre sonra tekrar deneyin",
+    "SPEECH_QUOTA": "Bu seminer için ses işleme süresi doldu",
+    "SPEECH_USR_QUOTA": "Bu seminer için çeviri ve çevrilmiş ses limitinizi kullandınız",
+    "SPEECH_FAILED": "Konuşma metne dönüştürülemedi",
+    "SPEECH_STAGE_ONLY": "Sadece sahnede olanlar sesli altyazıları kullanabilir",
+    "TRANSLATE_FAILED": "Altyazı çevrilemedi",
+    "POLL_CLOSED": "Bu anket kapalı",
+    "NOTE_NOT_RECORDING": "Bu notlar kaydedilmiyor",
+    "NOTE_SHOT_INVALID": "Geçersiz ekran yakalama",
+    "NOTE_AUDIO_INVALID": "Geçersiz kayıt dosyası",
+    "NOTE_SHOT_RATE": "Çok fazla ekran yakalama",
+    "NOTE_RETRY_SOON": "Bir dakika içinde tekrar deneyebilirsiniz",
+    "SPEECH_TTS_FAILED": "Çevrilmiş ses oluşturulamadı",
+    "CAPTION_SIG_INVALID": "Bu altyazı doğrulanamadı, bu yüzden çevrilmedi",
+    "PLAN_EXPIRES_BEFORE_START": "Başlangıç zamanı, bu planın geçiş süresinin dolmasından sonra",
+    "PAY_ALREADY_PAID": "Bir ödeme hala işleniyor. Cüzdanda oturum açıyorsanız, 3 dakika sonra tekrar deneyin.",
+    "REC_PAID_ONLY": "Kayıt, yalnızca ücretli süresi kalan Aylık veya Yıllık plan seminerlerinde kullanılabilir",
+    "REC_NOT_IN_ROOM": "Hala odada olduğunuz onaylanıyor. Bir süre sonra tekrar deneyin",
+    "ENGINE_OFF": "Video sunucusu yönetici anahtarı yapılandırılmamış",
+    "ENGINE_UNAVAILABLE": "Video sunucusu yanıt vermiyor. Lütfen kısa süre sonra tekrar deneyin",
+    "ADJ_NOTHING": "Azaltılacak kalan süre yok"
+  },
+  "progress": {
+    "title": "Gelişim ilerlemesi",
+    "subtitle": "Özelliğe göre tamamlanan, devam eden ve planlanan · {date} itibarıyla",
+    "overall": "Genel adımlar",
+    "stepsDone": "{done}/{total} adım tamamlandı (%{pct})",
+    "featureUnit": "özellik",
+    "status": {
+      "done": "Tamamlandı",
+      "doing": "Devam ediyor",
+      "todo": "Planlandı",
+      "drop": "Bırakıldı"
+    },
+    "features": {
+      "F01": {
+        "name": "Oturum açma",
+        "desc": "Pi Browser oturum açma, diğer tarayıcılarda Google oturum açma ve her iki hesabı bağlama"
+      },
+      "F05": {
+        "name": "Canlı video semineri",
+        "desc": "Kendi video motorumuz Galápagos — hedef, bir sunucunun 30 katılımcıya kadar yayın yapmasıdır"
+      },
+      "F02": {
+        "name": "Seminer oluştur",
+        "desc": "Bir seminer oluşturmak için alt başlığı, zamanı, kapasiteyi ve seminer ücretini ayarlayın (ad = ada, otomatik)"
+      },
+      "F03": {
+        "name": "Seminer listesi ve ayrıntıları",
+        "desc": "Açık seminerleri sayfa sayfa gezinin ve ayrıntılarını görüntüleyin"
+      },
+      "F04": {
+        "name": "Pi giriş ödemesi",
+        "desc": "Seminer ücretini Pi ile ödeyin; sunucu içeri girmenize izin vermeden önce miktarı tekrar kontrol eder"
+      },
+      "F06": {
+        "name": "Ev sahibi ödemeleri",
+        "desc": "Giriş ücreti gelirini ev sahiplerine Pi olarak ödeyin"
+      },
+      "F07": {
+        "name": "Tekrarlar",
+        "desc": "Kaydedilmiş seminerleri daha sonra izleyin"
+      },
+      "FU": {
+        "name": "Toplantı eklentileri temeli",
+        "desc": "Eklentiler için tek bir sinyal kanalı, AI bağlantısı, ses parçaları, mikrofon onayı ve veri tabloları"
+      },
+      "F08": {
+        "name": "Program ve paylaşım",
+        "desc": "Her seminer için takvim bağlantısı, etkinlik dosyası (.ics) ve e-posta daveti"
+      },
+      "F09": {
+        "name": "Gürültü azaltma ve aydınlatma",
+        "desc": "Mikrofon gürültüsünü azaltın ve karanlık kamera videosunu aydınlatın"
+      },
+      "F10": {
+        "name": "Canlı altyazılar",
+        "desc": "Sunucunun konuşmasını sahnenin altında metne dönüştürün"
+      },
+      "F11": {
+        "name": "Anketler, Soru-Cevap ve katılım",
+        "desc": "Bir seminer sırasında anketler ve sorular düzenleyin; ev sahipleri katılım listesini indirir"
+      },
+      "F12": {
+        "name": "Arka plan efektleri",
+        "desc": "Arka planınızı bulanıklaştırın veya ön ayarlı bir görüntüyle veya kendi görüntünüzle değiştirin (cihazınızda işlenir)"
+      },
+      "F13": {
+        "name": "Yerel kayıt",
+        "desc": "Sunucu semineri kendi cihazına kaydeder ve herkes kaydın açık olduğunu görür"
+      },
+      "F14": {
+        "name": "AI toplantı notları",
+        "desc": "Sunucu açtığında, konuşma ve ekranlar kaydedilir ve ana noktalara, kararlara ve yapılacaklar listesine özetlenir"
+      },
+      "F15": {
+        "name": "Yüz yüze toplantı notları",
+        "desc": "Sadece bir mikrofonla bir toplantıyı kaydedin ve toplantı notları alın (yöneticiler)"
+      },
+      "F16": {
+        "name": "Çevrilmiş altyazılar",
+        "desc": "Seçtiğiniz dile çevrilmiş altyazıları gösterin"
+      },
+      "F17": {
+        "name": "Çeviriyle dinle",
+        "desc": "Orijinal sesi kısarken çevrilmiş altyazıları sentetik bir sesle yüksek sesle okuyun"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser oturum açma",
+      "googleLogin": "Google ile oturum açma",
+      "accountLink": "Hesap bağlama",
+      "deviceTest": "Kamera cihazı testi",
+      "oneToTwo": "Sunucu 1 → 2 katılımcı",
+      "recovery": "Donma kurtarma ve kararlılık",
+      "structure": "Motor yapısı temizliği",
+      "autoQuality": "Otomatik kalite, 30 katılımcı",
+      "roomService": "Oda girişi ve kayıt",
+      "roomUi": "Oda ekranı (lobi·sahne·sohbet·el kaldırma·moderasyon)",
+      "createForm": "Oluşturma ekranı",
+      "list": "Liste",
+      "detail": "Ayrıntılar",
+      "payRequest": "Ödeme isteği",
+      "payVerify": "Miktar tekrar kontrolü ve giriş",
+      "settle": "Ödeme",
+      "vod": "Kayıt tekrarı",
+      "appRelay": "Motor eklenti sinyal kanalı",
+      "aiBase": "AI, ses parçaları, onay ve veri tabloları",
+      "shareLinks": "Takvim bağlantısı, .ics ve e-posta daveti",
+      "noiseLight": "Gürültü azaltma ve aydınlatma",
+      "liveCaptions": "Canlı altyazılar",
+      "pollQnaAttend": "Anketler, Soru-Cevap ve katılım listesi",
+      "backgrounds": "Bulanıklık, ön ayarlar ve kendi görüntünüz",
+      "localRecording": "Sunucu kaydı ve kayıt rozeti",
+      "aiNotes": "Kayıt, özet ve notlar sayfası",
+      "inPersonNotes": "Sadece mikrofon notları ve notlarım",
+      "captionTranslate": "Dil seçimi ve orijinal/çevrilmiş geçişi",
+      "dubbing": "Sentetik ses çalma ve kısılmış orijinal ses"
+    },
+    "refLabel": "Referans model",
+    "uiRef": "UI temel çizgisi — yaygın olarak kullanılan bir web video toplantı uygulamasının ekran ve özellik desenleri, seminar.pi için uyarlanmıştır"
+  },
+  "room": {
+    "rename": {
+      "later": "Ad kaydedildi, ancak diğerlerine şu anda bildirim gönderilemedi. Tekrar katıldıktan sonra görecekler.",
+      "tile": "Adımı değiştirmek için tıklayın",
+      "menu": "Adımı değiştir",
+      "title": "Bu seminerdeki adım",
+      "hint": "30 karaktere kadar. Sadece bu seminerde kullanılır ve herkesin ekranında hemen güncellenir.",
+      "save": "Kaydet",
+      "saving": "Kaydediliyor…",
+      "cancel": "İptal",
+      "taken": "Bu ad zaten başka biri (ev sahibi veya katılımcı) tarafından kullanılıyor. Başka bir ad seçin.",
+      "failed": "Adınız kaydedilemedi. Tekrar deneyin."
+    },
+    "roomTitle": {
+      "edit": "Alt başlığı düzenlemek için tıklayın",
+      "label": "Alt başlık",
+      "placeholder": "Alt başlık (60 karaktere kadar)",
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "failed": "Alt başlık kaydedilemedi."
+    },
+    "mirror": "Videomu aynala",
+    "barPin": "Alt çubuğu her zaman göster",
+    "barAuto": "Alt çubuğu otomatik gizle",
+    "title": "Seminere katıl · {room}",
+    "titleSeminar": "Bekleme odası",
+    "noEngine": "Video sunucusu henüz hazır değil.",
+    "joinAs": "Şu şekilde katıl",
+    "presenter": "Sunucu olarak",
+    "audience": "İzleyici olarak",
+    "join": "Şimdi katıl",
+    "nameLabel": "Ad",
+    "audienceHint": "İzleyiciler kamera veya mikrofon kullanmaz. Katıldıktan sonra sunucuyu görecek ve duyacaksınız.",
+    "preview": {
+      "pending": "Kamera ve mikrofon hazırlanıyor…",
+      "audioOnly": "Kamera kullanılamıyor — sadece ses gönderiliyor.",
+      "none": "Kamera ve mikrofon kullanılamıyor. İzinleri kontrol edin (medya olmadan da katılabilirsiniz).",
+      "videoOnly": "Mikrofon kullanılamıyor — sadece video gönderiliyor. Mikrofon iznini kontrol edin."
+    },
+    "mic": {
+      "on": "Mikrofonu kapat",
+      "off": "Mikrofonu aç"
+    },
+    "cam": {
+      "on": "Kamerayı kapat",
+      "off": "Kamerayı aç"
+    },
+    "controls": "Çağrı kontrolleri",
+    "leave": "Ayrıl",
+    "enableSound": "Sesi etkinleştir",
+    "state": {
+      "connecting": "Bağlanıyor…",
+      "reconnecting": "Yeniden bağlanıyor…"
+    },
+    "waiting": "Sunucu bekleniyor.",
+    "rejoin": "Tekrar katıl",
+    "err": {
+      "generic": "Bir şeyler ters gitti. Lütfen tekrar katılın.",
+      "CLOSED": "Bağlantı kesildi.",
+      "NO_ENGINE": "Video sunucusu henüz hazır değil.",
+      "TICKET_401": "Lütfen oturum açın.",
+      "TICKET_403": "Sunum yapma izniniz yok. İzleyici olarak katılın.",
+      "TICKET_503": "Video sunucusu henüz yapılandırılmadı.",
+      "TICKET_NETWORK": "Ağ bağlantınızı kontrol edin.",
+      "TICKET_INVALID": "Giriş geçişinizin süresi doldu.",
+      "TICKET_EXPIRED": "Giriş geçişinizin süresi doldu.",
+      "ROOM_FULL": "Bu seminer dolu.",
+      "ROOM_CLOSED": "Oda kapatıldı — seminer sona erdi veya sunucu 5 dakikadan fazla uzaktaydı.",
+      "DUPLICATE_SESSION": "Başka bir cihazdan katıldığınız için bu ekranın bağlantısı kesildi.",
+      "ROLE_FORBIDDEN": "Sunum yapma izniniz yok.",
+      "WS_FAILED": "Video sunucusuna bağlanılamadı.",
+      "ICE_FAILED": "Video bağlantısı kesildi. Ağınızı kontrol edin.",
+      "MEDIA_FAILED": "Kamera veya mikrofon başlatılamadı.",
+      "TIMEOUT": "Video sunucusu yanıt vermiyor.",
+      "TICKET_402": "Bu ücretli bir seminerdir. Lütfen girmeden önce seminer sayfasından ödeme yapın.",
+      "TICKET_404": "Seminer bulunamadı.",
+      "TICKET_409": "Bu seminer sona erdi veya iptal edildi.",
+      "TICKET_HOST_AWAY": "Sunucu henüz katılmadı veya 5 dakikadan fazla uzakta olduğu için giremezsiniz. Lütfen sunucu katıldıktan sonra tekrar deneyin.",
+      "TICKET_PLAN_EXHAUSTED": "Bu seminerin planının süresi doldu, bu yüzden başlayamaz. Aynı planı tekrar satın almak süre ekler (Ücretsiz, gelecek ay 1 saat ile yenilenir)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Mikrofon değiştirilemedi. Lütfen tekrar deneyin.",
+        "video": "Kamera değiştirilemedi. Lütfen tekrar deneyin."
+      },
+      "forbidden": "Sunum yapma izniniz olmadığı için izleyici olarak devam edeceksiniz.",
+      "demoted": "İzleyici konumuna geri alındınız.",
+      "endFailed": "Seminer sonlandırılamadı. Lütfen tekrar deneyin.",
+      "chatFailed": "Mesaj gönderilemedi.",
+      "actionFailed": "İstek tamamlanamadı. Lütfen tekrar deneyin.",
+      "shareFailed": "Ekran paylaşımı başlatılamadı.",
+      "err": {
+        "RATE_LIMITED": "Çok hızlı gönderiyorsunuz. Lütfen bir süre bekleyin.",
+        "ROLE_FORBIDDEN": "Bunu yapma izniniz yok.",
+        "MEDIA_FAILED": "Mikrofonunuz veya kameranız başlatılamadı. Lütfen izinleri kontrol edin.",
+        "LOCKED": "Sunucu tarafından kilitlendi."
+      },
+      "mutedBy": {
+        "audio": "Sunucu mikrofonunuzu kapattı.",
+        "video": "Sunucu kameranızı kapattı."
+      },
+      "policy": {
+        "locked": "Sunucu mikrofonları kilitledi. Kilidi açılana kadar sizinkini açamazsınız.",
+        "unlocked": "Mikrofonların kilidi açıldı."
+      },
+      "consent": {
+        "saveFail": "Onayınız kaydedilemedi. Kaydınızı kontrol edin ve mikrofonu tekrar açın."
+      }
+    },
+    "home": "Ana sayfaya git",
+    "tile": {
+      "fullscreen": "Tam ekran için çift tıklayın · Çıkmak için Esc",
+      "self": "{name} (siz)",
+      "presenter": "Sunucu",
+      "micOff": "Mikrofon kapalı",
+      "screen": "{name} ekranı",
+      "row": "Diğer konuşmacılar",
+      "pin": "{name} büyük göster",
+      "unpin": "Otomatik düzen"
+    },
+    "more": "Daha fazla seçenek",
+    "joinNoCam": "Kamerasız katıl",
+    "net": {
+      "afterJoin": "Bağlantınız katıldıktan sonra otomatik olarak kontrol edilir.",
+      "measuring": "Bağlantı kontrol ediliyor…",
+      "good": "İyi bağlantı",
+      "fair": "Orta bağlantı",
+      "poor": "Kötü bağlantı",
+      "reason": {
+        "loss": {
+          "audio": "Ses verilerinin %{pct}'si kayboluyor.",
+          "video": "Video verilerinin %{pct}'si kayboluyor."
+        },
+        "rate": {
+          "audio": "Ses yükleme hızı {kbps} kbps ile düşük.",
+          "video": "Video yükleme hızı {kbps} kbps ile düşük. Kalite düşebilir."
+        }
+      }
+    },
+    "people": "Odada {n} kişi",
+    "screen": {
+      "start": "Ekranı paylaş",
+      "stop": "Paylaşımı durdur"
+    },
+    "panel": {
+      "title": "Sohbet · Soru-Cevap · Anketler · Kişiler",
+      "chat": "Sohbet",
+      "people": "Kişiler",
+      "close": "Paneli kapat",
+      "qna": "Soru-Cevap",
+      "polls": "Anketler"
+    },
+    "chat": {
+      "empty": "Henüz mesaj yok. Sohbet kaydedilmez.",
+      "me": "Siz",
+      "failed": "Gönderilemedi.",
+      "retry": "Tekrar dene",
+      "input": "Mesaj yazın",
+      "send": "Gönder"
+    },
+    "hand": {
+      "raise": "El kaldır",
+      "lower": "El indir",
+      "list": "El kaldıranlar",
+      "lowerAll": "Tüm elleri indir",
+      "raised": "El kaldırıldı",
+      "notice": "{name} el kaldırdı.",
+      "dismiss": "Reddet",
+      "waiting": "{n} kişi konuşmak için bekliyor"
+    },
+    "react": {
+      "open": "Tepkiler",
+      "e0": "Beğen",
+      "e1": "Alkışla",
+      "e2": "Gül",
+      "e3": "Şaşırdı",
+      "e4": "Üzgün",
+      "e5": "Şaşkın",
+      "e6": "Sevgi"
+    },
+    "quality": {
+      "label": "Kalite",
+      "auto": "Otomatik",
+      "high": "Yüksek",
+      "medium": "Orta",
+      "low": "Düşük",
+      "unstable": "Ağınız kararsız"
+    },
+    "roles": {
+      "presenter": "Sunucu",
+      "panel": "Panelist",
+      "audience": "İzleyici"
+    },
+    "stage": {
+      "invite": "Sahneye davet et",
+      "remove": "İzleyiciye taşı",
+      "promoted": "Sahneye davet edildiniz. El kaldırdıysanız, kameranız otomatik olarak açılır (kilitli veya izin verilmemişse açılmaz). Konuşmak için mikrofonunuzu açın (mikrofon otomatik olarak açılmaz).",
+      "later": "Daha sonra"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} el kaldırdı."
+    },
+    "leaveDialog": {
+      "title": "Seminerden ayrıl",
+      "body": "Kendi başınıza ayrılabilir veya semineri sonlandırıp herkesin bağlantısını kesebilirsiniz.",
+      "confirmTitle": "Semineri sonlandıralım mı?",
+      "confirmBody": "Herkesin bağlantısı kesilecek ve kimse bu seminere tekrar katılamayacak.",
+      "cancel": "İptal",
+      "end": "Semineri sonlandır",
+      "endConfirm": "Şimdi bitir"
+    },
+    "mod": {
+      "muteAll": "Herkesin sesini kapat",
+      "lock": "Mikrofonları kilitle",
+      "unlock": "Mikrofonların kilidini aç",
+      "locked": "Sunucu mikrofonları kilitledi",
+      "muteMic": "Mikrofonu kapat",
+      "askMic": "Sesi açmayı iste",
+      "muteCam": "Kamerayı kapat",
+      "muteMicOf": "{name} mikrofonunu kapat",
+      "askMicOf": "{name} sesini açmasını iste",
+      "muteCamOf": "{name} kamerasını kapat"
+    },
+    "ask": {
+      "audio": "Sunucu mikrofonunuzu açmanızı istedi.",
+      "video": "Sunucu kameranızı açmanızı istedi.",
+      "ignore": "Yoksay"
+    },
+    "toDetail": "Seminer sayfasına git",
+    "consent": {
+      "title": "Mikrofonunuzu açmadan önce",
+      "body": "Bu seminerde kayıt, altyazı veya yapay zeka toplantı notları açıksa, sesiniz metne dönüştürülebilir, saklanabilir ve çevrilebilir. Ses işleme, ülkeniz dışındaki bir yapay zeka hizmeti tarafından yapılır. Kabul etmezseniz, mikrofonunuz yine de açılır — sadece sesiniz işleme dahil edilmez.",
+      "privacy": "Gizlilik politikası",
+      "newTab": "(yeni sekmede açılır)",
+      "decline": "Kabul etmiyorum",
+      "agree": "Kabul et ve mikrofonu aç",
+      "notice": "Kayıt, altyazı veya yapay zeka toplantı notları açıkken, konuşmacıların sesleri işlenir. İzleyicilerin sesleri gönderilmez.",
+      "saveFailClosed": "Bu seminer sona erdi, bu nedenle onay kaydedilemez."
+    },
+    "captions": {
+      "title": "Altyazılar",
+      "room": "Canlı altyazılar (tüm oda)",
+      "show": "Altyazıları göster",
+      "size": {
+        "label": "Metin boyutu",
+        "sm": "Küçük",
+        "md": "Orta",
+        "lg": "Büyük"
+      },
+      "waiting": "Altyazılar sunucu açtığında görünür",
+      "limit": "Konuşma işleme limitine ulaşıldı, bu nedenle altyazılar ve yapay zeka dakikaları durduruldu.",
+      "sendFail": "Altyazılar açılamadı. Lütfen kısa süre sonra tekrar deneyin.",
+      "sendFailOff": "Altyazılar kapatılamadı. Lütfen kısa süre sonra tekrar deneyin.",
+      "region": "Altyazılar",
+      "translate": "Çevrilmiş altyazıları göster",
+      "lang": "Çeviri dili",
+      "langMine": "Dillerim",
+      "langAll": "Tüm diller",
+      "trStop": {
+        "forbidden": "Çevrilmiş altyazılar yalnızca kayıtlı katılımcılar içindir. Orijinal gösteriliyor.",
+        "unavailable": "Çevrilmiş altyazılar şu anda mevcut değil. Orijinal gösteriliyor.",
+        "quota": "Bu seminerin çeviri limitine ulaşıldı. Orijinal gösteriliyor.",
+        "usrQuota": "Bu seminer için çeviri limitinizi kullandınız. Orijinal gösteriliyor."
+      },
+      "unsupported": "Bu cihaz canlı altyazı oluşturamaz (bu tarayıcıda ses kaydı desteği yok)"
+    },
+    "effects": {
+      "title": "Efektler",
+      "light": "Işık düzeltme",
+      "noise": "Gürültüyü azalt",
+      "noiseFail": "Bu cihazda gürültü azaltma değiştirilemez",
+      "close": "Kapat",
+      "preview": "Önizlemem",
+      "bg": "Arka plan",
+      "bgNone": "Yok",
+      "bgBlur": "Bulanıklaştır",
+      "scenes": {
+        "beach": "🏝️ Maldivler plajı",
+        "autumn": "🍁 Sonbahar vadisi",
+        "fireplace": "🔥 Şömine",
+        "xmas": "🎄 Noel toplantı odası"
+      },
+      "bgs": {
+        "dusk": "Alacakaranlık",
+        "ocean": "Okyanus",
+        "forest": "Orman",
+        "studio": "Stüdyo",
+        "grid": "Izgara",
+        "dots": "Noktalar"
+      },
+      "myAdd": "Resmim",
+      "myItem": "Resmim {n}",
+      "myDel": "Resmim {n} sil",
+      "mySaveFail": "Arka plan uygulandı ancak bu cihaza kaydedilemedi (yalnızca bu toplantı)",
+      "bgStopped": "Arka plan efekti durdu ve kapatıldı. Yeniden başlatmak için tekrar seçin.",
+      "myNote": "Resimleriniz yalnızca bu cihaza kaydedilir (en fazla 3 adet, her biri 2 MB).",
+      "mobileBlurOnly": "Telefonlarda yalnızca bulanık arka plan mevcuttur (resim arka planları PC'de çalışır).",
+      "myTooBig": "Yalnızca 2 MB'a kadar resimler kullanılabilir.",
+      "preparing": "Hazırlanıyor…",
+      "bgFailed": "Arka plan efekti yüklenemedi.",
+      "autoOff": "Cihazınız çok yavaş, bu nedenle arka plan efekti kapatıldı.",
+      "unsupported": "Bu cihazda arka plan efektleri mevcut değil.",
+      "noCam": "Arka plan seçmek için kameranızı açın.",
+      "lightUnsupported": "Bu cihazda ışık düzeltme mevcut değil.",
+      "noiseUnsupported": "Bu cihazda gürültü azaltma ayarları desteklenmiyor."
+    },
+    "sheetClose": "Kapat",
+    "polls": {
+      "new": "Yeni anket",
+      "question": "Soru",
+      "option": "Seçenek {n}",
+      "remove": "Seçenek {n} kaldır",
+      "addOption": "Seçenek ekle",
+      "start": "Anketi başlat",
+      "cancel": "İptal",
+      "dup": "Seçenekler farklı olmalı",
+      "vote": "Oy ver",
+      "change": "Oyu değiştir",
+      "close": "Anketi kapat",
+      "closed": "Kapalı",
+      "mine": "Seçiminiz",
+      "result": "%{pct} ({n} oy)",
+      "total": "Toplam {n} oy",
+      "empty": "Henüz anket yok.",
+      "loading": "Yükleniyor…",
+      "labOnly": "Anketler yalnızca seminer odalarında mevcuttur.",
+      "started": "Yeni bir anket başladı",
+      "goVote": "Oy ver",
+      "votersNote": "Organizatör, kimin hangi seçeneğe oy verdiğini görebilir.",
+      "voters": "Oy verenler: {names}"
+    },
+    "qna": {
+      "sort": "Sırala",
+      "by": {
+        "top": "En popüler",
+        "new": "En yeni"
+      },
+      "rcm": "Yukarı oy ({n})",
+      "answered": "Cevaplandı",
+      "answer": "Cevaplandı olarak işaretle",
+      "unanswer": "Cevaplandı işaretini kaldır",
+      "hide": "Gizle",
+      "doneN": "{n} cevaplandı",
+      "backOpen": "Cevaplanmamış sorular",
+      "empty": "Henüz soru yok.",
+      "emptyDone": "Cevaplanmış soru yok.",
+      "loading": "Yükleniyor…",
+      "input": "Soru sorun (500 karakter)",
+      "send": "Gönder",
+      "left": "{n} kaldı",
+      "labOnly": "Soru-Cevap yalnızca seminer odalarında mevcuttur."
+    },
+    "recording": {
+      "title": "Kaydet",
+      "badge": "Kaydediliyor",
+      "unsupported": "Bu tarayıcı kayıt yapamaz. Lütfen bir bilgisayardaki normal bir tarayıcıdan kayıt yapın.",
+      "piBrowserOnly": "Kayıt yalnızca normal bir tarayıcıda (bilgisayar veya mobil) çalışır. Pi Browser kayıt dosyalarını kaydedemez — kayıt yapmak için bu semineri bir bilgisayar veya telefon tarayıcısında (seminarz.vercel.app) açın.",
+      "audioSuspended": "Bu cihazda ses kaydı başlamamış olabilir. Yalnızca görüntü kaydedilebilir.",
+      "notifyFailed": "Katılımcılar bilgilendirilemediği için kayıt başlamadı. Lütfen kısa süre sonra tekrar deneyin.",
+      "confirm": {
+        "title": "Kaydı başlatalım mı?",
+        "body": "Kayıt başladığında, herkes 'Kaydediliyor' göstergesini görecektir. Dosya yalnızca bu cihaza kaydedilir ve asla yüklenmez veya yurt dışına aktarılmaz. Lütfen başlamadan önce katılımcılara bildirin.",
+        "download": "Durdurduğunuzda, bir MP4 dosyası indirme klasörünüze kaydedilir (MP4 kaydedemeyen tarayıcılar dönüştürmek için biraz zaman alır; yaklaşık 45 dakikadan uzun kayıtlar orijinal formatlarında tutulabilir). Uygulama içi tarayıcılar dosya kaydetmeyi engelleyebilir, bu nedenle bir bilgisayardaki normal bir tarayıcıdan kayıt yapın.",
+        "cancel": "İptal",
+        "start": "Kaydı başlat",
+        "charge": "Kayıt sırasında, oda süresine ek olarak kayıt süresi de ücretli sürenizden düşülür (kayıt sırasında 2 kat). Ücretli süre bittiğinde kayıt durur ve dosya kaydedilir."
+      },
+      "resave": {
+        "label": "Kayıt dosyası",
+        "save": "Tekrar kaydet",
+        "dismiss": "Tekrar kaydetmeyi kapat"
+      },
+      "toast": {
+        "started": "Kayıt başladı — herkes görebilir",
+        "saved": "Kayıt kaydedildi. İndirme klasörünüzü kontrol edin. Hiçbir şey kaydedilmediyse, ekranın üstündeki [Tekrar kaydet] düğmesine dokunun.",
+        "autoStopped": "Tarayıcı kaydı durdurduğu veya boyut limitine ulaşıldığı için kayıt sona erdi. O ana kadar her şey kaydedildi. Devam etmek için kaydı tekrar başlatın.",
+        "empty": "Hiçbir şey kaydedilmediği için dosya oluşturulmadı.",
+        "saveFailed": "Kayıt dosyası oluşturulamadı.",
+        "converting": "Kayıt MP4'e dönüştürülüyor. Lütfen bu pencereyi açık tutun.",
+        "savedOriginal": "MP4'e dönüştürülemediği için kayıt orijinal formatında (webm) kaydedildi. İndirme klasörünüzü kontrol edin.",
+        "startedBy": "Sunucu kaydı başlattı",
+        "stoppedBy": "Sunucu kaydı durdurdu"
+      },
+      "paidOnly": "Kayıt, yalnızca Aylık veya Yıllık planla açılan seminerlerde, ücretli süre kaldığı sürece kullanılabilir.",
+      "planOut": "Ücretli süre bittiği için kayıt durduruldu ve dosya kaydedildi.",
+      "notInRoom": "Hala odada olduğunuz onaylanıyor. Lütfen kısa süre sonra tekrar kayıt başlatın.",
+      "meterFailed": "Kayıt süresi kontrol edilemediği için kayıt başlamadı. Kısa süre sonra tekrar deneyin.",
+      "paidOut": "Ücretli süre kalmadığı için kayıt başlatılamaz. Kayıt yapmak için aynı planı tekrar satın alın.",
+      "pausedBadge": "Kayıt duraklatıldı",
+      "controls": "Kayıt kontrolleri",
+      "pause": "Duraklat",
+      "resume": "Devam et",
+      "stop": "Kaydı durdur"
+    },
+    "notes": {
+      "on": "AI notları",
+      "badge": "AI notları açık",
+      "started": "Sunucu AI notlarını açtı",
+      "stopped": "AI notları kapatıldı",
+      "startedMine": "AI notları açık — herkese gösteriliyor",
+      "stoppedMine": "AI notları kapalı — notlar oluşturuluyor",
+      "startFail": "AI notları başlatılamadı",
+      "gone": "AI notları durduruldu — notlar başka bir yerde sonlandırıldı veya silindi",
+      "unsupported": "AI notları burada açılamaz (ses kaydı desteği yok)"
+    },
+    "dubbing": {
+      "listen": "Çevrilmiş sesle dinle",
+      "blocked": "Çevrilmiş ses oynatılamadı. Lütfen tekrar açın",
+      "stopped": "Çevrilmiş ses şu anda kullanılamıyor, bu yüzden kapatıldı",
+      "usrQuota": "Bu seminer için çevrilmiş ses limitinizi doldurdunuz, bu yüzden kapatıldı"
+    },
+    "plan": {
+      "warn": "Bu seminer planının {min} dakikası kaldı.",
+      "ended": "Seminer süreniz doldu, bu yüzden seminer sona erdi ve odadan ayrıldınız.",
+      "left": "Seminer kalan süre",
+      "closed": "Seminer sona erdi, bu yüzden odadan ayrıldınız.",
+      "hostAway": "Ev sahibi odadan ayrıldı. 5 dakika içinde dönmezse tüm katılımcılar çıkarılacaktır.",
+      "hostGone": "Ev sahibi 5 dakika içinde dönmedi, bu yüzden odadan ayrıldınız. Ev sahibi katıldığında tekrar girebilirsiniz."
+    },
+    "toLobby": "Bekleme odası"
+  },
+  "list": {
+    "tabsLabel": "Seminer listesi görünümü",
+    "tabs": {
+      "all": "Tümü",
+      "hosted": "Benim düzenlediklerim",
+      "joined": "Katıldıklarım"
+    },
+    "empty": {
+      "all": "Yaklaşan seminer yok.",
+      "hosted": "Hiç seminer düzenlemediniz.",
+      "joined": "Hiç seminere katılmadınız."
+    },
+    "loading": "Yükleniyor…",
+    "retry": "Tekrar dene",
+    "free": "Ücretsiz",
+    "fee": "{amount} Pi",
+    "host": "Ev sahibi {name}",
+    "capacity": "Kapasite {n}",
+    "status": {
+      "SCHEDULED": "Planlandı",
+      "LIVE": "Canlı",
+      "ENDED": "Sona Erdi",
+      "CANCELED": "İptal Edildi"
+    },
+    "hostNew": "Seminer oluştur",
+    "progress": "İlerleme",
+    "pager": "Sayfalama",
+    "prev": "Önceki",
+    "next": "Sonraki",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Alt başlık",
+      "placeholder": "Bir alt başlık ekle",
+      "save": "Alt başlığı kaydet",
+      "saving": "Kaydediliyor…",
+      "saved": "Kaydedildi."
+    },
+    "loading": "Yükleniyor…",
+    "back": "Listeye geri dön",
+    "notFound": "Seminer bulunamadı.",
+    "status": {
+      "SCHEDULED": "Planlandı",
+      "LIVE": "Canlı",
+      "ENDED": "Sona Erdi",
+      "CANCELED": "İptal Edildi"
+    },
+    "startAt": "Tarih",
+    "host": "Ev sahibi",
+    "seats": "Kalan koltuklar",
+    "seatsValue": "{left} / {max}",
+    "fee": "Seminer ücreti",
+    "feeValue": "{amount} Pi",
+    "free": "Ücretsiz",
+    "enter": "Gir",
+    "payEnter": "Pi ile öde ve gir ({amount} Pi)",
+    "paying": "Ödeme işleniyor…",
+    "joining": "Kaydolunuyor…",
+    "registered": "Kaydoldunuz.",
+    "full": "Bu seminer dolu.",
+    "closed": "Bu seminer sona erdi.",
+    "canceled": "Bu seminer iptal edildi.",
+    "roomLink": "Odaya git (ev sahibi)",
+    "piBrowserOnly": "Ödeme, Pi Browser'da Pi oturumu açtıktan sonra yapılabilir.",
+    "payCancelled": "Ödeme iptal edildi.",
+    "payStillWaiting": "Hala cüzdan bekleniyor. Pi Wallet'ta zaten oturum açtıysanız, lütfen bir süre bekleyin.",
+    "payFailed": "Ödeme başarısız oldu.",
+    "err": {
+      "NAME_TAKEN": "Bu isim zaten başka biri tarafından kullanılıyor. Başka bir isim seçin.",
+      "CAL_READ_FAILED": "Etkinlikleriniz yüklenemedi. Adresi kontrol edin.",
+      "ISLAND_FULL": "Şu anda 100 ada isminin tamamı kullanılıyor. Yaklaşan veya canlı bir seminer sona erdiğinde veya iptal edildiğinde yeni bir seminer açabilirsiniz.",
+      "SMN_FULL": "Bu seminer dolu.",
+      "SMN_CLOSED": "Bu seminer sona erdi veya iptal edildi.",
+      "SMN_ALREADY": "Zaten kayıtlısınız veya bir ödeme işlemi devam ediyor.",
+      "SMN_FREE": "Ücretsiz seminerler ödeme almaz.",
+      "SMN_PAY_REQUIRED": "Bu ücretli bir seminerdir. Girmek için lütfen ödeme yapın.",
+      "SMN_PAY_INVALID": "Ödemeniz doğrulanamadı. Lütfen yöneticiyle iletişime geçin.",
+      "PAY_PI_FAILED": "Pi ödeme sunucusuna ulaşılamadı. Lütfen kısa süre sonra tekrar deneyin.",
+      "PAY_MISMATCH": "Ödeme detayları eşleşmiyor.",
+      "PAY_AMOUNT_MISMATCH": "Ödeme miktarı seminer ücretinden farklı.",
+      "PAY_CANCELLED": "Bu ödeme iptal edildi.",
+      "PAY_ALREADY_PAID": "Bir ödeme hala işleniyor. Cüzdanda oturum açıyorsanız, 3 dakika sonra tekrar deneyin.",
+      "PAY_INVALID_STATE": "Bu ödeme şu anda işlenemiyor.",
+      "PAY_PI_CANCEL_REFUSED": "Ödeme zaten devam ediyor ve iptal edilemez. Lütfen kısa süre sonra tekrar kontrol edin."
+    },
+    "share": {
+      "title": "Planla ve paylaş",
+      "calendar": "Takvime ekle",
+      "ics": "Takvim dosyası",
+      "mail": "E-posta ile davet et",
+      "mailApp": "Varsayılan e-posta uygulamasıyla gönder",
+      "mailSubject": "[Seminer daveti] {title}",
+      "mailBody": "{title}\nNe zaman: {start}\n\nBu bağlantıyla doğrudan katılın.\nMasaüstü: {url}\nPi Browser: {piUrl}",
+      "copy": "Bağlantıyı kopyala",
+      "copied": "Bağlantı kopyalandı.",
+      "copyFail": "Kopyalanamadı. Lütfen bağlantıyı adres çubuğundan kopyalayın.",
+      "share": "Başka bir uygulamayla paylaş",
+      "shareFail": "Paylaşılamadı. Lütfen bunun yerine Bağlantıyı kopyala'yı kullanın.",
+      "created": "Semineriniz hazır. Başlangıç zamanını Google Takviminize ekleyin.",
+      "addGoogle": "Google Takvim'e ekle",
+      "later": "Daha sonra",
+      "piBrowserOpen": "Pi Browser'da takvim, e-posta ve takvim dosyası telefonunuzun varsayılan tarayıcısında açılır.",
+      "extFail": "Açılamadı. Pi Browser'ı güncelleyin veya Bağlantıyı kopyala'yı kullanın ve normal bir tarayıcıda (seminarz.vercel.app) açın.",
+      "icsPiBrowser": "Takvim dosyası yalnızca normal bir tarayıcıda (bilgisayar veya mobil) indirilebilir. Pi Browser'da bunun yerine Takvime ekle'yi kullanın."
+    },
+    "attendance": "Katılım",
+    "plan": "Plan",
+    "left": "Kalan süre"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Önceki ay",
+      "next": "Sonraki ay",
+      "connect": "Google Takvimimi göster",
+      "change": "Google takvimlerini yönet ({n})",
+      "add": "Ekle",
+      "remove": "Kaldır",
+      "close": "Kapat",
+      "failed": "{n} takvimden etkinlikler yüklenemedi. Adresi kontrol edin.",
+      "badUrl": "Google Takvim ayarlarından 'iCal biçimindeki gizli adresi' (…/basic.ics) yapıştırın, tarayıcı adres çubuğunu değil.",
+      "full": "{n} takvime kadar ekleyebilirsiniz.",
+      "allDay": "Tüm gün",
+      "day": "Bu gündeki etkinliklerim",
+      "count": "{n, plural, one {# etkinlik} other {# etkinlik}}",
+      "more": "+{n}",
+      "picked": "Bu tarih başlangıç tarihi olarak ayarlandı. Saati aşağıdan seçin.",
+      "s1": "Aşağıdaki [Google Takvim ayarlarını aç] düğmesine dokunun.",
+      "s2": "Soldaki 'Takvimlerim için ayarlar' altında bir takvim seçin (örn. adınız).",
+      "s3": "'Takvimi entegre et' bölümüne ilerleyin ve 'iCal biçimindeki gizli adres'i kopyalayın.",
+      "s4": "Buraya yapıştırın ve [Ekle] düğmesine dokunun — etkinlik başlıkları takvimde görünür. Diğer takvimleri de aynı şekilde, en fazla 5 tane ekleyebilirsiniz.",
+      "open": "Google Takvim ayarlarını aç",
+      "privacy": "Bu adres takviminizin anahtarıdır — kimseyle paylaşmayın. Yalnızca bu cihazda saklanır, sunucumuzda asla saklanmaz."
+    },
+    "title": "Seminer oluştur",
+    "name": "Güzel bir adaya seyahat edelim!",
+    "subTitle": "Alt başlık (isteğe bağlı, 60 karaktere kadar)",
+    "startAt": "Başlangıç zamanı",
+    "maxCnt": "Kapasite (1–100)",
+    "submit": "Oluştur",
+    "submitting": "Oluşturuluyor…",
+    "invalid": "Girişinizi kontrol edin — bugünden itibaren bir yıl içinde bir tarih, kapasite 1–100.",
+    "attendance": {
+      "title": "Katılım",
+      "back": "Seminere geri dön",
+      "loading": "Yükleniyor…",
+      "forbidden": "Katılımı yalnızca ev sahibi ve yöneticiler görüntüleyebilir.",
+      "count": "{n} kişi",
+      "csv": "CSV indir",
+      "empty": "Henüz kimse katılmadı.",
+      "online": "Çevrimiçi",
+      "left": "Ayrıldı",
+      "col": {
+        "name": "Ad",
+        "pi": "Pi kullanıcı adı",
+        "ent": "İlk katılım",
+        "hb": "Son görülme",
+        "dur": "Katılım süresi",
+        "min": "Katılım (dakika, uzakta geçirilen süre hariç)",
+        "state": "Durum"
+      },
+      "durNote": "Katılım süresi, ilk katılımdan son görülmeye kadar olan süredir, uzakta geçirilen süre (2,5 dakikadan uzun boşluklar) çıkarılmıştır.",
+      "csvPiBrowser": "CSV indirme yalnızca normal bir tarayıcıda (bilgisayar veya mobil) çalışır. Pi Browser dosyaları kaydedemez — bu katılım sayfasını bir bilgisayar veya telefon tarayıcısında (seminarz.vercel.app) açın."
+    },
+    "plan": "Plan",
+    "planFree": "Ücretsiz — bu ay {time} kaldı · AI yok",
+    "planPaid": "{name} {time} · {price} — oluştururken öde",
+    "planHint": "Ücretli bir planla açılan bir seminer, önce o planın süresini kullanır, ardından bu ayın ücretsiz süresiyle devam eder (ücretsiz kısımda AI yok). Aktif bir plan ödeme yapmadan açılır; sahip olmadığınız Aylık veya Yıllık plan, Oluştur'a bastığınızda Pi ile ödenir, ardından seminer açılır (Pi Browser). Katılımcılar için katılım her zaman ücretsizdir.",
+    "planOwned": "{name} — aktif · {time} kaldı",
+    "planEnds": "Başlangıç zamanı bu planın süresi dolduktan sonradır. Başlangıcı daha erkene alın veya başka bir plan seçin.",
+    "paidKept": "Ücretli geçişiniz saklanır. Sorunu düzeltin ve tekrar Oluştur'a basın (ikinci ödeme yok)."
+  },
+  "privacy": {
+    "title": "Gizlilik Politikası — Ses ve AI özellikleri",
+    "effective": "Yürürlük tarihi {date}",
+    "intro": "Bu politika, bir seminerde canlı altyazılar, çevrilmiş altyazılar, sesli çeviri, AI toplantı notları ve yüz yüze notlar kullandığınızda işlediğimiz kişisel bilgileri açıklar. Bu özellikler harici bir AI hizmeti kullandığından, bilgiler yurt dışına aktarılır.",
+    "whoTitle": "Kimlerin bilgileri işlenir",
+    "who": [
+      "Sunucular ve sahnede bulunan katılımcılar: Mikrofonunuzu ilk açmadan önce bir kez onayınızı isteriz. Onay vermeden seminere katılabilirsiniz.",
+      "Dinleyiciler: Mikrofon kullanmadığınız için ses gönderilmez. Sadece altyazıları ve notları görürsünüz.",
+      "Yüz yüze notlar: Bir yönetici bir toplantıyı mikrofonla kaydeder ve kayıttan önce katılımcıların bilgilendirildiğini onaylar."
+    ],
+    "xferTitle": "Kişisel bilgilerin yurt dışına aktarılması (Kore Kişisel Bilgileri Koruma Yasası, Madde 28-8)",
+    "xfer": [
+      {
+        "k": "Alıcı",
+        "v": "Google LLC (Gemini API) — iletişim [TBD: Google gizlilik iletişim]"
+      },
+      {
+        "k": "Ülkeler",
+        "v": "Amerika Birleşik Devletleri ve Google veri merkezlerinin bulunduğu diğer ülkeler [TBD: işleme bölgesi]"
+      },
+      {
+        "k": "Ne zaman ve nasıl",
+        "v": "Bir özellik açıkken yaklaşık her 5 saniyede bir, şifreli bir bağlantı (HTTPS) üzerinden. Yüz yüze notlar için, not sona erdiğinde tüm kayıt 5 dakikalık parçalar halinde bir kez daha gönderilir (doğru transkripsiyon)."
+      },
+      {
+        "k": "Öğeler",
+        "v": "Ses, konuşulan içerik (metin), konuşmacı görünen adı (not özetleri için), ekran paylaşımı ekran görüntüleri (AI notları açıkken)"
+      },
+      {
+        "k": "Amaç",
+        "v": "Konuşmayı metne dönüştürme, çeviri, toplantı notu özetleri, sentetik konuşma (standart sesler, ses klonlama yok), yüz yüze notlar için konuşmacı ayrımı (sesler birbirinden ayrılır ve algılanan cinsiyete göre etiketlenir, örneğin Erkek 1 / Kadın 1 — isimler veya kimlikler çıkarılmaz)"
+      },
+      {
+        "k": "Saklama",
+        "v": "Sonuç döndürülür dönmez sona erer. Google'dan istekleri saklamamasını isteriz (store=false). Kötüye kullanım izleme günlükleri Google'ın şartları altında saklanabilir [TBD: saklama süresi ve ücretli katman durumu]."
+      },
+      {
+        "k": "Reddetme ve sonuçları",
+        "v": "Onay vermezseniz veya mikrofonunuzu kapatırsanız, ses gönderilmez. Seminere katılmaya devam edebilirsiniz; yalnızca kendi konuşmanızın altyazıları, çevirileri ve notları oluşturulmaz. Onayınızı istediğiniz zaman geri çekebilirsiniz [TBD: geri çekme düğmesinin konumu]."
+      }
+    ],
+    "keepTitle": "Bu hizmetin sakladığı bilgiler",
+    "keep": [
+      "Orijinal ses: seminer altyazıları ve AI toplantı notları için saklanmaz; metne dönüştürüldükten hemen sonra atılır. Yüz yüze notlar için, kayıt özel depolamada saklanır, böylece toplantıdan sonra daha doğru bir şekilde (konuşmacılarla birlikte) tekrar yazıya dökülebilir ve not sona erdikten 1 gün sonra günlük temizlikte silinir (not silinirse hemen).",
+      "Canlı altyazılar: saklanmaz.",
+      "AI toplantı notları (sunucu açtığında): konuşulan içerik, ekran görüntüleri ve özet, notlar silinene kadar saklanır [TBD: maksimum saklama süresi].",
+      "Onay kayıtları: onay zamanı ve politika sürümü, kanıt olarak saklanır [TBD: saklama süresi].",
+      "Kullanım: dakika başına istek sayıları ve işlem süresi, maliyet limitlerini uygulamak için kullanılır.",
+      "Katılım: katıldığınız zaman, son bağlandığınız zaman, görünen adınız ve Pi kullanıcı adınız saklanır ve ev sahibine katılım listesi olarak verilir (ekranda ve CSV indirme olarak). Seminer silinene kadar saklanır.",
+      "Soru-Cevap ve anketler: soru metni ve soranın görünen adı (veya yoksa Pi kullanıcı adı) tüm katılımcılara görünür. Beğeniler yalnızca sayıları gösterir, kimin oy verdiğini asla göstermez. Anket oyları katılımcılara yalnızca sayıları gösterir; düzenleyici ve yöneticiler, her seçenek için her seçmenin görünen adını (veya yoksa Pi kullanıcı adını) görür. Gizli sorular dahil olmak üzere seminer silinene kadar saklanır."
+    ],
+    "recTitle": "Kayıt",
+    "rec": "Kayıtlar yalnızca sunucunun cihazında bir dosya olarak kaydedilir. Sunucularımıza yüklenmez veya yurt dışına aktarılmaz. Kayıt veya AI notları açıkken, her katılımcı bir gösterge görür.",
+    "rightsTitle": "Haklarınız",
+    "rights": "Bilgilerinizin erişimini, düzeltilmesini, silinmesini veya işlenmesinin durdurulmasını talep edebilirsiniz. İletişim: [TBD: gizlilik görevlisi adı ve iletişim]"
+  },
+  "notes": {
+    "title": "Notlar",
+    "back": "Seminere geri dön",
+    "loading": "Yükleniyor…",
+    "meta": "Notlar · {date} · {min} dak",
+    "aiWarn": "AI tarafından oluşturulan özet — hatalar içerebilir",
+    "points": "Ana noktalar",
+    "decisions": "Kararlar",
+    "todos": "Yapılacaklar",
+    "shots": "Ekran görüntüleri ({n})",
+    "transcript": "Transkript",
+    "download": "Markdown indir",
+    "making": "Notlar oluşturuluyor…",
+    "makingLong": "Bu biraz zaman alıyor. Lütfen daha sonra yenileyin",
+    "recording": "Hala kaydediliyor",
+    "failed": "Özet oluşturulamadı — tam transkript aşağıdadır",
+    "retry": "Tekrar dene",
+    "finish": "Kaydı bitir ve özetle",
+    "none": "Burada hiçbir şey yok",
+    "blank": "Özetlenecek bir şey yok — konuşma kaydedilmedi veya çok kısaydı",
+    "notFound": "Notlar bulunamadı",
+    "forbidden": "Bu notlara erişim izniniz yok",
+    "shotAlt": "{at} ekran görüntüsü",
+    "close": "Kapat",
+    "view": "Notları görüntüle",
+    "error": "Yüklenemedi",
+    "mine": "Notlarım",
+    "del": "Notları sil",
+    "delAsk": "Bu notları (özet, transkript ve ekran görüntüleri) silmek istiyor musunuz? Kimse göremeyecek",
+    "delYes": "Sil",
+    "delNo": "İptal",
+    "delFail": "Silinemedi",
+    "dlFail": "İndirilemedi — lütfen tekrar deneyin",
+    "recentNotes": "Son notlar",
+    "empty": "Henüz not yok",
+    "newNote": "Yüz yüze notları başlat",
+    "inPerson": "Yüz yüze toplantı notları",
+    "inPersonTag": "Yüz yüze",
+    "titleLabel": "Başlık",
+    "titlePh": "örn. Haftalık toplantı",
+    "told": "Mevcut herkese bunun kaydedileceğini ve AI tarafından işleneceğini bildirdim (gerekli)",
+    "toldWhy": "Başlamadan önce, mevcut herkese bu konuşmanın kaydedileceğini (kayıt, not sona erdikten sonra 1 gün saklanır ve konuşmacılar sesleriyle ayırt edilir ve algılanan cinsiyete göre etiketlenir) ve harici bir AI tarafından metne ve özete dönüştürüleceğini bildirin.",
+    "start": "Kaydı başlat",
+    "starting": "Hazırlanıyor…",
+    "recBadge": "Kaydediliyor {time}",
+    "recentLines": "Son satırlar",
+    "waiting": "İnsanlar konuştukça metin burada görünür",
+    "end": "Bitir ve notları oluştur",
+    "wakeWarn": "Ekran kapanırsa kayıt durabilir",
+    "adminOnly": "Sadece yöneticiler kullanabilir",
+    "aiOff": "AI notları şu anda kullanılamıyor (sunucu kurulumu gerekli). Geçmiş notlar aşağıda listelenmiştir",
+    "reload": "Yeniden yükle",
+    "unsupported": "Bu cihazda kayıt yapılamıyor",
+    "micDenied": "Mikrofon kullanılamıyor — izni kontrol edin",
+    "limited": "İşlem süresi sınırı doldu — bitir ve notları oluştur",
+    "noAgr": "Durduruldu: kayıtta bildirim onayı yok — bitir ve tekrar başlat",
+    "micLost": "Mikrofon bağlantısı kesildi ve kayıt durdu — Mikrofonu yeniden bağla'ya dokunun veya notu bitirin",
+    "micRetry": "Mikrofonu yeniden bağla",
+    "gone": "Bu not başka bir yerde sonlandırıldı veya silindi, bu yüzden kayıt durdu — notları açmak için aşağıdaki düğmeyi kullanın",
+    "finishing": "Son sözler kaydediliyor…",
+    "st": {
+      "RECORDING": "Kaydediliyor",
+      "SUMMARIZING": "Oluşturuluyor",
+      "DONE": "Tamamlandı",
+      "FAILED": "Başarısız"
+    },
+    "downloadPiBrowser": "Markdown indirme işlemi yalnızca normal bir tarayıcıda (bilgisayar veya mobil) çalışır. Pi Browser dosyaları kaydedemez — bu notları bir bilgisayar veya telefon tarayıcısında (seminarz.vercel.app) açın."
+  },
+  "plan": {
+    "title": "Planlar",
+    "loading": "Yükleniyor…",
+    "free": "Ücretsiz",
+    "freeDesc": "Her ay {time} seminer (devretmez)",
+    "monthly": "Aylık",
+    "yearly": "Yıllık",
+    "paidDesc": "{time} seminer, {months} ay geçerli",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Pi fiyatı kontrol ediliyor",
+    "noAi": "AI altyazı, çeviri, dublaj veya not özetleri yok",
+    "withAi": "AI altyazı, çeviri, dublaj ve not özetleri içerir",
+    "buy": "Pi ile öde",
+    "bought": "Ödeme tamamlandı. Seminer süresi eklendi.",
+    "meRemain": "Kalan süre: {time}",
+    "loginToBuy": "Plan satın almak için giriş yapın.",
+    "payNote": "Ödeme her zaman Pi ile yapılır. Yerel para birimi miktarı sadece tanıdık bir referanstır; Pi miktarı, ödeme anındaki Pi fiyatına göre belirlenir. Ücretli bir planla açılan bir seminer, önce o planın geçişlerini kullanır (ilk süresi dolanlar önce), ardından bu ayın ücretsiz süresiyle devam eder.",
+    "charge": "Süre yükle",
+    "hm": "{h} sa {m} dk",
+    "m": "{m} dk",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (Pi fiyatı kontrol ediliyor)",
+    "h": "{h} sa"
+  },
+  "adminRooms": {
+    "title": "Oda yönetimi",
+    "adminOnly": "Bu sayfayı yalnızca yöneticiler görüntüleyebilir.",
+    "refresh": "Yenile",
+    "count": "{n} açık oda",
+    "empty": "Şu anda açık oda yok.",
+    "lab": "Laboratuvar odası",
+    "noSeminar": "Seminer kaydı yok",
+    "peers": "{n} / {cap} bağlı",
+    "producers": "{n} akış",
+    "end": "Bitiş {time}",
+    "stale": "Seminer sona erdi ancak oda video sunucusunda hala açık — zorla kapatın.",
+    "close": "Zorla kapat",
+    "confirmSeminar": "Bu, semineri sonlandırır ve odayı kapatır. Herkesin bağlantısı kesilecektir.",
+    "confirmRoom": "Bu, odayı kapatır. Herkesin bağlantısı kesilecektir.",
+    "confirmYes": "Kapat",
+    "cancel": "İptal",
+    "closing": "Kapatılıyor…",
+    "closed": "Oda kapatıldı.",
+    "metrics": "Video sunucusu metrikleri (başlangıçtan beri)",
+    "metricsOff": "Metrikler yüklenemedi.",
+    "m": {
+      "packetsIn": "Gelen paketler",
+      "packetsOut": "Giden paketler",
+      "nackIn": "Alınan NACK'ler",
+      "nackOut": "Gönderilen NACK'ler",
+      "retransmits": "Yeniden iletimler",
+      "duplicateNack": "Yinelenen NACK'ler",
+      "cacheMiss": "Yeniden iletim önbellek kaçırmaları",
+      "pliOut": "Anahtar kare istekleri (PLI)",
+      "keyframes": "Anahtar kareler",
+      "layerSwitches": "Kalite geçişleri",
+      "queueDrops": "Kuyruk düşüşleri"
+    }
+  },
+  "adminUsers": {
+    "title": "Kullanıcılar",
+    "adminOnly": "Bu sayfayı yalnızca yöneticiler görüntüleyebilir.",
+    "search": "Ada göre ara (2+ karakter)",
+    "searchBtn": "Ara",
+    "refresh": "Yenile",
+    "count": "{n, plural, one {# kullanıcı} other {# kullanıcı}}",
+    "empty": "Kullanıcı yok.",
+    "admin": "Yönetici",
+    "lastLogin": "Son giriş {time}",
+    "never": "Hiç giriş yapmadı",
+    "plan": {
+      "FREE": "Ücretsiz",
+      "M": "Aylık",
+      "Y": "Yıllık"
+    },
+    "until": "({time} tarihine kadar)",
+    "manage": "Süre yönetimi",
+    "close": "Kapat",
+    "planLabel": "Plan",
+    "hours": "Saat",
+    "minutes": "Dakika",
+    "reason": "Sebep (isteğe bağlı)",
+    "sub": "Azalt",
+    "confirmSub": "{plan} süresini {time} azalt.",
+    "confirmYes": "Onayla",
+    "cancel": "İptal",
+    "saving": "Kaydediliyor…",
+    "done": "Uygulandı. {plan} kalan süre: {time}",
+    "invalid": "1 dakika ile 1000 saat arasında bir azaltma girin (tam dakikalar 0–59).",
+    "history": "Son ayarlamalar",
+    "noHistory": "Henüz ayarlama yok.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Hizmet geçişi ver (ücretsiz süre)",
+    "svc": {
+      "H1": "1 saatlik geçiş",
+      "D1": "1 günlük geçiş",
+      "M1": "1 aylık geçiş"
+    },
+    "svcNote": "Hizmet geçişleri Ücretsiz plan süresidir. Bu süre boyunca (1 saat, 24 saat, 1 ay) ücretsiz seminerlerde ve ücretli seminerlerin ücretsiz bölümünde kullanılabilirler (AI özellikleri yok). Birden fazla geçiş olduğunda, otomatik olarak 1 saatlik → 1 günlük → 1 aylık sırasıyla kullanılırlar.",
+    "subTitle": "Süreyi azalt",
+    "subNote": "Önce en geç süresi dolan geçişlerden alır. Kalan süreden fazlaysa, yalnızca kalan süre kaldırılır.",
+    "confirmSvc": "Bir {svc} ver.",
+    "doneSvc": "Bir {svc} verildi. Kalan ücretsiz süre: {time} (geçiş süresi {end})"
+  }
+}

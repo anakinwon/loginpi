@@ -1,0 +1,2837 @@
+{
+  "ko": {
+    "langSwitcher": {
+      "label": "언어 선택",
+      "listLabel": "언어 목록",
+      "activeLangs": "활성 언어",
+      "allCountries": "전체 국가",
+      "activeCount": "{count}개",
+      "inactiveCount": "{count}개 · 비활성",
+      "searchPlaceholder": "검색 — 국가·언어·통화",
+      "noResults": "검색 결과가 없습니다"
+    },
+    "common": {
+      "fetching": "불러오는 중…"
+    }
+  },
+  "en": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "zh": {
+    "langSwitcher": {
+      "activeCount": "{count}个",
+      "activeLangs": "活跃语言",
+      "allCountries": "所有国家",
+      "inactiveCount": "{count}个 · 非活跃",
+      "label": "选择语言",
+      "listLabel": "语言列表",
+      "noResults": "无搜索结果",
+      "searchPlaceholder": "搜索 — 国家·语言·货币"
+    },
+    "common": {
+      "fetching": "获取中…"
+    }
+  },
+  "ja": {
+    "langSwitcher": {
+      "activeCount": "{count}個",
+      "activeLangs": "アクティブな言語",
+      "allCountries": "すべての国",
+      "inactiveCount": "{count}個 · 非アクティブ",
+      "label": "言語選択",
+      "listLabel": "言語リスト",
+      "noResults": "検索結果がありません",
+      "searchPlaceholder": "検索 — 国・言語・通貨"
+    },
+    "common": {
+      "fetching": "取得中..."
+    }
+  },
+  "hi": {
+    "langSwitcher": {
+      "activeCount": "{count} सक्रिय",
+      "activeLangs": "सक्रिय भाषाएँ",
+      "allCountries": "सभी देश",
+      "inactiveCount": "{count} · निष्क्रिय",
+      "label": "भाषा चुनें",
+      "listLabel": "भाषा सूची",
+      "noResults": "कोई परिणाम नहीं मिला",
+      "searchPlaceholder": "खोजें — देश • भाषा • मुद्रा"
+    },
+    "common": {
+      "fetching": "फ़ेच हो रहा है…"
+    }
+  },
+  "vi": {
+    "langSwitcher": {
+      "activeCount": "{count} mục",
+      "activeLangs": "Ngôn ngữ hoạt động",
+      "allCountries": "Tất cả các quốc gia",
+      "inactiveCount": "{count} mục · không hoạt động",
+      "label": "Chọn ngôn ngữ",
+      "listLabel": "Danh sách ngôn ngữ",
+      "noResults": "Không có kết quả tìm kiếm",
+      "searchPlaceholder": "Tìm kiếm — Quốc gia, Ngôn ngữ, Tiền tệ"
+    },
+    "common": {
+      "fetching": "Đang tải…"
+    }
+  },
+  "af": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Aktiewe tale",
+      "allCountries": "Alle lande",
+      "inactiveCount": "{count} · Onaktief",
+      "label": "Kies taal",
+      "listLabel": "Taallys",
+      "noResults": "Geen resultate",
+      "searchPlaceholder": "Soek — Land · Taal · Geldeenheid"
+    },
+    "common": {
+      "fetching": "Haal tans..."
+    }
+  },
+  "fil": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Mga Aktibong Wika",
+      "allCountries": "Lahat ng Bansa",
+      "inactiveCount": "{count} · Hindi Aktibo",
+      "label": "Pumili ng Wika",
+      "listLabel": "Listahan ng Wika",
+      "noResults": "Walang resulta ng paghahanap",
+      "searchPlaceholder": "Maghanap — Bansa, Wika, Pera"
+    },
+    "common": {
+      "fetching": "Kinukuha…"
+    }
+  },
+  "th": {
+    "langSwitcher": {
+      "activeCount": "{count} รายการ",
+      "activeLangs": "ภาษาที่ใช้งานอยู่",
+      "allCountries": "ทุกประเทศ",
+      "inactiveCount": "{count} รายการ · ไม่ใช้งาน",
+      "label": "เลือกภาษา",
+      "listLabel": "รายการภาษา",
+      "noResults": "ไม่มีผลการค้นหา",
+      "searchPlaceholder": "ค้นหา — ประเทศ·ภาษา·สกุลเงิน"
+    },
+    "common": {
+      "fetching": "กำลังดึงข้อมูล..."
+    }
+  },
+  "id": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Bahasa Aktif",
+      "allCountries": "Semua Negara",
+      "inactiveCount": "{count} · Tidak aktif",
+      "label": "Pilih Bahasa",
+      "listLabel": "Daftar Bahasa",
+      "noResults": "Tidak ada hasil pencarian",
+      "searchPlaceholder": "Cari — Negara, Bahasa, Mata Uang"
+    },
+    "common": {
+      "fetching": "Mengambil..."
+    }
+  },
+  "ms": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Bahasa Aktif",
+      "allCountries": "Semua Negara",
+      "inactiveCount": "{count} · Tidak aktif",
+      "label": "Pilih Bahasa",
+      "listLabel": "Senarai Bahasa",
+      "noResults": "Tiada hasil carian",
+      "searchPlaceholder": "Cari — Negara, Bahasa, Mata Wang"
+    },
+    "common": {
+      "fetching": "Mengambil..."
+    }
+  },
+  "es": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "fr": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "de": {
+    "langSwitcher": {
+      "activeCount": "{count} aktiv",
+      "activeLangs": "Aktive Sprachen",
+      "allCountries": "Alle Länder",
+      "inactiveCount": "{count} · inaktiv",
+      "label": "Sprache auswählen",
+      "listLabel": "Sprachliste",
+      "noResults": "Keine Suchergebnisse",
+      "searchPlaceholder": "Suchen — Land, Sprache, Währung"
+    },
+    "common": {
+      "fetching": "Wird geladen..."
+    }
+  },
+  "it": {
+    "langSwitcher": {
+      "activeCount": "{count} attivi",
+      "activeLangs": "Lingue attive",
+      "allCountries": "Tutti i paesi",
+      "inactiveCount": "{count} · Inattivi",
+      "label": "Seleziona lingua",
+      "listLabel": "Elenco lingue",
+      "noResults": "Nessun risultato",
+      "searchPlaceholder": "Cerca — Paese, Lingua, Valuta"
+    },
+    "common": {
+      "fetching": "Caricamento in corso..."
+    }
+  },
+  "ru": {
+    "langSwitcher": {
+      "activeCount": "{count} шт.",
+      "activeLangs": "Активные языки",
+      "allCountries": "Все страны",
+      "inactiveCount": "{count} шт. · Неактивно",
+      "label": "Выбрать язык",
+      "listLabel": "Список языков",
+      "noResults": "Нет результатов",
+      "searchPlaceholder": "Поиск — страна, язык, валюта"
+    },
+    "common": {
+      "fetching": "Получение..."
+    }
+  },
+  "pt": {
+    "langSwitcher": {
+      "activeCount": "{count} ativos",
+      "activeLangs": "Idiomas ativos",
+      "allCountries": "Todos os países",
+      "inactiveCount": "{count} · inativos",
+      "label": "Selecionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "Nenhum resultado encontrado",
+      "searchPlaceholder": "Pesquisar — País, Idioma, Moeda"
+    },
+    "common": {
+      "fetching": "Buscando..."
+    }
+  },
+  "ar": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "dz": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "ao": {
+    "langSwitcher": {
+      "activeCount": "{count} ativos",
+      "activeLangs": "Idiomas ativos",
+      "allCountries": "Todos os países",
+      "inactiveCount": "{count} · inativos",
+      "label": "Selecionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "Nenhum resultado encontrado",
+      "searchPlaceholder": "Pesquisar — País, Idioma, Moeda"
+    },
+    "common": {
+      "fetching": "Buscando..."
+    }
+  },
+  "bj": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "bw": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "bf": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "bi": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "cv": {
+    "langSwitcher": {
+      "activeCount": "{count} ativos",
+      "activeLangs": "Idiomas ativos",
+      "allCountries": "Todos os países",
+      "inactiveCount": "{count} · inativos",
+      "label": "Selecionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "Nenhum resultado encontrado",
+      "searchPlaceholder": "Pesquisar — País, Idioma, Moeda"
+    },
+    "common": {
+      "fetching": "Buscando..."
+    }
+  },
+  "cm": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "cf": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "td": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "km": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "cg": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "cd": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "dj": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "eg": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "gq": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "er": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "et": {
+    "langSwitcher": {
+      "activeCount": "{count} ንቁ",
+      "activeLangs": "ንቁ ቋንቋዎች",
+      "allCountries": "ሁሉም አገሮች",
+      "inactiveCount": "{count} · ንቁ ያልሆኑ",
+      "label": "ቋንቋ ምረጥ",
+      "listLabel": "የቋንቋ ዝርዝር",
+      "noResults": "የፍለጋ ውጤት የለም",
+      "searchPlaceholder": "ፍለጋ — ሀገር፣ ቋንቋ፣ ምንዛሪ"
+    },
+    "common": {
+      "fetching": "እየተጫነ ነው…"
+    }
+  },
+  "ga": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "gm": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "gh": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "gn": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "gw": {
+    "langSwitcher": {
+      "activeCount": "{count} ativos",
+      "activeLangs": "Idiomas ativos",
+      "allCountries": "Todos os países",
+      "inactiveCount": "{count} · inativos",
+      "label": "Selecionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "Nenhum resultado encontrado",
+      "searchPlaceholder": "Pesquisar — País, Idioma, Moeda"
+    },
+    "common": {
+      "fetching": "Buscando..."
+    }
+  },
+  "ke": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "ls": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "lr": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "ly": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "mg": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "mw": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "ml": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "mr": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "mu": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "ma": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "mz": {
+    "langSwitcher": {
+      "activeCount": "{count} ativos",
+      "activeLangs": "Idiomas ativos",
+      "allCountries": "Todos os países",
+      "inactiveCount": "{count} · inativos",
+      "label": "Selecionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "Nenhum resultado encontrado",
+      "searchPlaceholder": "Pesquisar — País, Idioma, Moeda"
+    },
+    "common": {
+      "fetching": "Buscando..."
+    }
+  },
+  "na": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "ne": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "ng": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "rw": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "st": {
+    "langSwitcher": {
+      "activeCount": "{count} ativos",
+      "activeLangs": "Idiomas ativos",
+      "allCountries": "Todos os países",
+      "inactiveCount": "{count} · inativos",
+      "label": "Selecionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "Nenhum resultado encontrado",
+      "searchPlaceholder": "Pesquisar — País, Idioma, Moeda"
+    },
+    "common": {
+      "fetching": "Buscando..."
+    }
+  },
+  "sn": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "sc": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "sl": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "so": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Luqadaha firfircoon",
+      "allCountries": "Dhammaan waddamada",
+      "inactiveCount": "{count} · aan firfircoonayn",
+      "label": "Dooro luqadda",
+      "listLabel": "Liiska luqadaha",
+      "noResults": "Natiijooyin raadin ma jiraan",
+      "searchPlaceholder": "Raadi — Waddan, Luqad, Lacag"
+    },
+    "common": {
+      "fetching": "Waa la soo dejinayaa…"
+    }
+  },
+  "ss": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "sd": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "tz": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Lugha Zinazotumika",
+      "allCountries": "Nchi Zote",
+      "inactiveCount": "{count} · Hazitumiki",
+      "label": "Chagua Lugha",
+      "listLabel": "Orodha ya Lugha",
+      "noResults": "Hakuna matokeo ya utafutaji",
+      "searchPlaceholder": "Tafuta — Nchi, Lugha, Sarafu"
+    },
+    "common": {
+      "fetching": "Inapakia…"
+    }
+  },
+  "tg": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "tn": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "ug": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "zm": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "zw": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "am": {
+    "langSwitcher": {
+      "activeCount": "{count} հատ",
+      "activeLangs": "Ակտիվ լեզուներ",
+      "allCountries": "Բոլոր երկրները",
+      "inactiveCount": "{count} հատ · Ոչ ակտիվ",
+      "label": "Լեզվի ընտրություն",
+      "listLabel": "Լեզուների ցուցակ",
+      "noResults": "Որոնման արդյունքներ չկան",
+      "searchPlaceholder": "Որոնել — Երկիր, Լեզու, Արժույթ"
+    },
+    "common": {
+      "fetching": "Բեռնվում է…"
+    }
+  },
+  "az": {
+    "langSwitcher": {
+      "activeCount": "{count} ədəd",
+      "activeLangs": "Aktiv dillər",
+      "allCountries": "Bütün ölkələr",
+      "inactiveCount": "{count} ədəd · Qeyri-aktiv",
+      "label": "Dil seçimi",
+      "listLabel": "Dillər siyahısı",
+      "noResults": "Axtarış nəticələri yoxdur",
+      "searchPlaceholder": "Axtarış — Ölkə, Dil, Valyuta"
+    },
+    "common": {
+      "fetching": "Yüklənir…"
+    }
+  },
+  "bn": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Bahasa Aktif",
+      "allCountries": "Semua Negara",
+      "inactiveCount": "{count} · Tidak aktif",
+      "label": "Pilih Bahasa",
+      "listLabel": "Senarai Bahasa",
+      "noResults": "Tiada hasil carian",
+      "searchPlaceholder": "Cari — Negara, Bahasa, Mata Wang"
+    },
+    "common": {
+      "fetching": "Mengambil..."
+    }
+  },
+  "bt": {
+    "langSwitcher": {
+      "activeCount": "{count} གཅིག",
+      "activeLangs": "ལག་ལེན་འཐབ་བཞིན་པའི་སྐད་ཡིག",
+      "allCountries": "རྒྱལ་ཁབ་ཆ་མཉམ།",
+      "inactiveCount": "{count} གཅིག · ལག་ལེན་མེད་པ།",
+      "label": "སྐད་ཡིག་གདམ་ཁ།",
+      "listLabel": "སྐད་ཡིག་གི་ཐོ་བ།",
+      "noResults": "འཚོལ་ཞིབ་ཀྱི་གྲུབ་འབྲས་མེད།",
+      "searchPlaceholder": "འཚོལ་ཞིབ། — རྒྱལ་ཁབ། · སྐད་ཡིག། · དངུལ་ལོར།"
+    },
+    "common": {
+      "fetching": "འཐུ་བཞིན་པ་…"
+    }
+  },
+  "ge": {
+    "langSwitcher": {
+      "activeCount": "{count} ენა",
+      "activeLangs": "აქტიური ენები",
+      "allCountries": "ყველა ქვეყანა",
+      "inactiveCount": "{count} ენა · არააქტიური",
+      "label": "ენის არჩევა",
+      "listLabel": "ენების სია",
+      "noResults": "შედეგები არ მოიძებნა",
+      "searchPlaceholder": "ძიება — ქვეყანა, ენა, ვალუტა"
+    },
+    "common": {
+      "fetching": "იტვირთება…"
+    }
+  },
+  "iq": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "ir": {
+    "langSwitcher": {
+      "activeCount": "{count} عدد",
+      "activeLangs": "زبان‌های فعال",
+      "allCountries": "همه کشورها",
+      "inactiveCount": "{count} عدد · غیرفعال",
+      "label": "انتخاب زبان",
+      "listLabel": "لیست زبان‌ها",
+      "noResults": "نتیجه‌ای یافت نشد",
+      "searchPlaceholder": "جستجو — کشور، زبان، ارز"
+    },
+    "common": {
+      "fetching": "در حال بارگذاری…"
+    }
+  },
+  "jo": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "kz": {
+    "langSwitcher": {
+      "activeCount": "{count} дана",
+      "activeLangs": "Белсенді тілдер",
+      "allCountries": "Барлық елдер",
+      "inactiveCount": "{count} дана · белсенді емес",
+      "label": "Тілді таңдау",
+      "listLabel": "Тілдер тізімі",
+      "noResults": "Ешқандай нәтиже табылмады",
+      "searchPlaceholder": "Іздеу — Ел · Тіл · Валюта"
+    },
+    "common": {
+      "fetching": "Жүктелуде…"
+    }
+  },
+  "kh": {
+    "langSwitcher": {
+      "activeCount": "{count} ភាសា",
+      "activeLangs": "ភាសាដែលកំពុងប្រើ",
+      "allCountries": "គ្រប់ប្រទេស",
+      "inactiveCount": "{count} ភាសា · មិនដំណើរការ",
+      "label": "ជ្រើសរើសភាសា",
+      "listLabel": "បញ្ជីភាសា",
+      "noResults": "មិនមានលទ្ធផលស្វែងរក",
+      "searchPlaceholder": "ស្វែងរក — ប្រទេស • ភាសា • រូបិយប័ណ្ណ"
+    },
+    "common": {
+      "fetching": "កំពុងទាញយក…"
+    }
+  },
+  "kg": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Активдүү тилдер",
+      "allCountries": "Бардык өлкөлөр",
+      "inactiveCount": "{count} · Активдүү эмес",
+      "label": "Тил тандоо",
+      "listLabel": "Тилдер тизмеси",
+      "noResults": "Издөө натыйжалары жок",
+      "searchPlaceholder": "Издөө — Өлкө·Тил·Валюта"
+    },
+    "common": {
+      "fetching": "Жүктөлүүдө…"
+    }
+  },
+  "la": {
+    "langSwitcher": {
+      "activeCount": "{count} ອັນ",
+      "activeLangs": "ພາສາທີ່ໃຊ້ງານ",
+      "allCountries": "ທຸກປະເທດ",
+      "inactiveCount": "{count} ອັນ · ບໍ່ໃຊ້ງານ",
+      "label": "ເລືອກພາສາ",
+      "listLabel": "ລາຍການພາສາ",
+      "noResults": "ບໍ່ມີຜົນການຄົ້ນຫາ",
+      "searchPlaceholder": "ຄົ້ນຫາ — ປະເທດ, ພາສາ, ສະກຸນເງິນ"
+    },
+    "common": {
+      "fetching": "ກຳລັງໂຫຼດ…"
+    }
+  },
+  "lb": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "mv": {
+    "langSwitcher": {
+      "activeCount": "{count} އަދަދު",
+      "activeLangs": "ހީކުރެވިފައިވާ ބަސްތައް",
+      "allCountries": "ހުރިހާ ގައުމުތައް",
+      "inactiveCount": "{count} އަދަދު · ހީނުކުރެވިފައި",
+      "label": "ބަސް ހޮވާ",
+      "listLabel": "ބަސްތަކުގެ ލިސްޓު",
+      "noResults": "ހޯދުމުގެ ނަތީޖާއެއް ނެތް",
+      "searchPlaceholder": "ހޯދާ — ޤައުމު، ބަސް، ފައިސާ"
+    },
+    "common": {
+      "fetching": "ލޯޑުކުރަނީ…"
+    }
+  },
+  "mn": {
+    "langSwitcher": {
+      "activeCount": "{count} ширхэг",
+      "activeLangs": "Идэвхтэй хэл",
+      "allCountries": "Бүх улс",
+      "inactiveCount": "{count} ширхэг · Идэвхгүй",
+      "label": "Хэл сонгох",
+      "listLabel": "Хэлний жагсаалт",
+      "noResults": "Хайлтын үр дүн байхгүй байна",
+      "searchPlaceholder": "Хайх — Улс·Хэл·Валют"
+    },
+    "common": {
+      "fetching": "Татаж байна…"
+    }
+  },
+  "mm": {
+    "langSwitcher": {
+      "activeCount": "{count} ခု",
+      "activeLangs": "အသက်ဝင်သော ဘာသာစကားများ",
+      "allCountries": "နိုင်ငံအားလုံး",
+      "inactiveCount": "{count} ခု · အသက်မဝင်ပါ",
+      "label": "ဘာသာစကား ရွေးချယ်ပါ",
+      "listLabel": "ဘာသာစကား စာရင်း",
+      "noResults": "ရှာဖွေမှုရလဒ် မရှိပါ",
+      "searchPlaceholder": "ရှာဖွေ — နိုင်ငံ၊ ဘာသာစကား၊ ငွေကြေး"
+    },
+    "common": {
+      "fetching": "ဆွဲယူနေသည်..."
+    }
+  },
+  "np": {
+    "langSwitcher": {
+      "activeCount": "{count} वटा",
+      "activeLangs": "सक्रिय भाषाहरू",
+      "allCountries": "सबै देशहरू",
+      "inactiveCount": "{count} वटा · निष्क्रिय",
+      "label": "भाषा चयन गर्नुहोस्",
+      "listLabel": "भाषा सूची",
+      "noResults": "कुनै नतिजा फेला परेन",
+      "searchPlaceholder": "खोज — देश·भाषा·मुद्रा"
+    },
+    "common": {
+      "fetching": "लोड हुँदैछ…"
+    }
+  },
+  "om": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "pk": {
+    "langSwitcher": {
+      "activeCount": "{count} فعال",
+      "activeLangs": "فعال زبانیں",
+      "allCountries": "تمام ممالک",
+      "inactiveCount": "{count} غیر فعال",
+      "label": "زبان منتخب کریں",
+      "listLabel": "زبانوں کی فہرست",
+      "noResults": "کوئی تلاش کے نتائج نہیں",
+      "searchPlaceholder": "تلاش کریں — ملک، زبان، کرنسی"
+    },
+    "common": {
+      "fetching": "لوڈ ہو رہا ہے…"
+    }
+  },
+  "ps": {
+    "langSwitcher": {
+      "activeCount": "{count} فعال",
+      "activeLangs": "فعالې ژبې",
+      "allCountries": "ټول هیوادونه",
+      "inactiveCount": "{count} · غیر فعال",
+      "label": "د ژبې انتخاب",
+      "listLabel": "د ژبو لیست",
+      "noResults": "د لټون پایلې نشته",
+      "searchPlaceholder": "لټون — هېواد·ژبه·اسعار"
+    },
+    "common": {
+      "fetching": "راوړل کیږي..."
+    }
+  },
+  "qa": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "sa": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "sg": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "lk": {
+    "langSwitcher": {
+      "activeCount": "{count}ක්",
+      "activeLangs": "ක්‍රියාකාරී භාෂා",
+      "allCountries": "සියලුම රටවල්",
+      "inactiveCount": "{count}ක් · අක්‍රියයි",
+      "label": "භාෂාව තෝරන්න",
+      "listLabel": "භාෂා ලැයිස්තුව",
+      "noResults": "සෙවුම් ප්‍රතිඵල නොමැත",
+      "searchPlaceholder": "සෙවීම — රට, භාෂාව, මුදල්"
+    },
+    "common": {
+      "fetching": "ගෙන එමින් පවතී…"
+    }
+  },
+  "sy": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "tw": {
+    "langSwitcher": {
+      "activeCount": "{count} 個",
+      "activeLangs": "啟用語言",
+      "allCountries": "所有國家",
+      "inactiveCount": "{count} 個 · 未啟用",
+      "label": "選擇語言",
+      "listLabel": "語言列表",
+      "noResults": "沒有搜尋結果",
+      "searchPlaceholder": "搜尋 — 國家・語言・貨幣"
+    },
+    "common": {
+      "fetching": "載入中…"
+    }
+  },
+  "tj": {
+    "langSwitcher": {
+      "activeCount": "{count} адад",
+      "activeLangs": "Забонҳои фаъол",
+      "allCountries": "Ҳамаи кишварҳо",
+      "inactiveCount": "{count} адад · Ғайрифаъол",
+      "label": "Интихоби забон",
+      "listLabel": "Рӯйхати забонҳо",
+      "noResults": "Натиҷаҳо ёфт нашуд",
+      "searchPlaceholder": "Ҷустуҷӯ — Кишвар, Забон, Асъор"
+    },
+    "common": {
+      "fetching": "Дар ҳоли боркунӣ…"
+    }
+  },
+  "tl": {
+    "langSwitcher": {
+      "activeCount": "{count} ativos",
+      "activeLangs": "Idiomas ativos",
+      "allCountries": "Todos os países",
+      "inactiveCount": "{count} · inativos",
+      "label": "Selecionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "Nenhum resultado encontrado",
+      "searchPlaceholder": "Pesquisar — País, Idioma, Moeda"
+    },
+    "common": {
+      "fetching": "Buscando..."
+    }
+  },
+  "tm": {
+    "langSwitcher": {
+      "activeCount": "{count} sany",
+      "activeLangs": "Işjeň diller",
+      "allCountries": "Ähli ýurtlar",
+      "inactiveCount": "{count} sany · Işjeň däl",
+      "label": "Dil saýla",
+      "listLabel": "Diller sanawy",
+      "noResults": "Gözleg netijeleri ýok",
+      "searchPlaceholder": "Gözleg — Ýurt · Dil · Walýuta"
+    },
+    "common": {
+      "fetching": "Ýüklenýär…"
+    }
+  },
+  "ae": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "uz": {
+    "langSwitcher": {
+      "activeCount": "{count} ta",
+      "activeLangs": "Faol tillar",
+      "allCountries": "Barcha davlatlar",
+      "inactiveCount": "{count} ta · Faol emas",
+      "label": "Tilni tanlash",
+      "listLabel": "Tillar ro'yxati",
+      "noResults": "Natijalar topilmadi",
+      "searchPlaceholder": "Qidiruv — Davlat · Til · Valyuta"
+    },
+    "common": {
+      "fetching": "Yuklanmoqda…"
+    }
+  },
+  "ye": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "ad": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Idiomes actius",
+      "allCountries": "Tots els països",
+      "inactiveCount": "{count} · Inactiu",
+      "label": "Seleccionar idioma",
+      "listLabel": "Llista d'idiomes",
+      "noResults": "No hi ha resultats",
+      "searchPlaceholder": "Cerca — país, idioma, moneda"
+    },
+    "common": {
+      "fetching": "Carregant…"
+    }
+  },
+  "at": {
+    "langSwitcher": {
+      "activeCount": "{count} aktiv",
+      "activeLangs": "Aktive Sprachen",
+      "allCountries": "Alle Länder",
+      "inactiveCount": "{count} · inaktiv",
+      "label": "Sprache auswählen",
+      "listLabel": "Sprachliste",
+      "noResults": "Keine Suchergebnisse",
+      "searchPlaceholder": "Suchen — Land, Sprache, Währung"
+    },
+    "common": {
+      "fetching": "Wird geladen..."
+    }
+  },
+  "by": {
+    "langSwitcher": {
+      "activeCount": "{count} шт.",
+      "activeLangs": "Активные языки",
+      "allCountries": "Все страны",
+      "inactiveCount": "{count} шт. · Неактивно",
+      "label": "Выбрать язык",
+      "listLabel": "Список языков",
+      "noResults": "Нет результатов",
+      "searchPlaceholder": "Поиск — страна, язык, валюта"
+    },
+    "common": {
+      "fetching": "Получение..."
+    }
+  },
+  "be": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Actieve talen",
+      "allCountries": "Alle landen",
+      "inactiveCount": "{count} · Inactief",
+      "label": "Taal selecteren",
+      "listLabel": "Talenlijst",
+      "noResults": "Geen zoekresultaten",
+      "searchPlaceholder": "Zoeken — Land, Taal, Valuta"
+    },
+    "common": {
+      "fetching": "Bezig met laden…"
+    }
+  },
+  "ba": {
+    "langSwitcher": {
+      "activeCount": "{count} aktivnih",
+      "activeLangs": "Aktivni jezici",
+      "allCountries": "Sve zemlje",
+      "inactiveCount": "{count} · neaktivnih",
+      "label": "Odabir jezika",
+      "listLabel": "Lista jezika",
+      "noResults": "Nema rezultata pretrage",
+      "searchPlaceholder": "Pretražite — Država, Jezik, Valuta"
+    },
+    "common": {
+      "fetching": "Dohvaća se…"
+    }
+  },
+  "bg": {
+    "langSwitcher": {
+      "activeCount": "{count} броя",
+      "activeLangs": "Активни езици",
+      "allCountries": "Всички държави",
+      "inactiveCount": "{count} броя · неактивни",
+      "label": "Избор на език",
+      "listLabel": "Списък с езици",
+      "noResults": "Няма резултати",
+      "searchPlaceholder": "Търсене — Държава · Език · Валута"
+    },
+    "common": {
+      "fetching": "Зарежда се..."
+    }
+  },
+  "hr": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Aktivni jezici",
+      "allCountries": "Sve zemlje",
+      "inactiveCount": "{count} · Neaktivno",
+      "label": "Odabir jezika",
+      "listLabel": "Popis jezika",
+      "noResults": "Nema rezultata pretraživanja",
+      "searchPlaceholder": "Pretraži — država·jezik·valuta"
+    },
+    "common": {
+      "fetching": "Učitavanje…"
+    }
+  },
+  "cy": {
+    "langSwitcher": {
+      "activeCount": "{count} ενεργά",
+      "activeLangs": "Ενεργές γλώσσες",
+      "allCountries": "Όλες οι χώρες",
+      "inactiveCount": "{count} · Ανενεργά",
+      "label": "Επιλογή γλώσσας",
+      "listLabel": "Λίστα γλωσσών",
+      "noResults": "Δεν υπάρχουν αποτελέσματα",
+      "searchPlaceholder": "Αναζήτηση — Χώρα, Γλώσσα, Νόμισμα"
+    },
+    "common": {
+      "fetching": "Φόρτωση…"
+    }
+  },
+  "cz": {
+    "langSwitcher": {
+      "activeCount": "{count} aktivních",
+      "activeLangs": "Aktivní jazyky",
+      "allCountries": "Všechny země",
+      "inactiveCount": "{count} neaktivních",
+      "label": "Vybrat jazyk",
+      "listLabel": "Seznam jazyků",
+      "noResults": "Žádné výsledky",
+      "searchPlaceholder": "Hledat — Země, jazyk, měna"
+    },
+    "common": {
+      "fetching": "Načítá se…"
+    }
+  },
+  "dk": {
+    "langSwitcher": {
+      "activeCount": "{count} aktive",
+      "activeLangs": "Aktive sprog",
+      "allCountries": "Alle lande",
+      "inactiveCount": "{count} inaktive",
+      "label": "Vælg sprog",
+      "listLabel": "Sprogliste",
+      "noResults": "Ingen søgeresultater",
+      "searchPlaceholder": "Søg — Land·Sprog·Valuta"
+    },
+    "common": {
+      "fetching": "Henter..."
+    }
+  },
+  "ee": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Aktiivsed keeled",
+      "allCountries": "Kõik riigid",
+      "inactiveCount": "{count} · mitteaktiivne",
+      "label": "Keele valik",
+      "listLabel": "Keeleloend",
+      "noResults": "Otsingutulemusi pole",
+      "searchPlaceholder": "Otsi — riik, keel, valuuta"
+    },
+    "common": {
+      "fetching": "Laadimine..."
+    }
+  },
+  "fi": {
+    "langSwitcher": {
+      "activeCount": "{count} kieltä",
+      "activeLangs": "Aktiiviset kielet",
+      "allCountries": "Kaikki maat",
+      "inactiveCount": "{count} kieltä · Ei aktiivinen",
+      "label": "Valitse kieli",
+      "listLabel": "Kieliluettelo",
+      "noResults": "Ei hakutuloksia",
+      "searchPlaceholder": "Hae — Maa, kieli, valuutta"
+    },
+    "common": {
+      "fetching": "Haetaan…"
+    }
+  },
+  "gr": {
+    "langSwitcher": {
+      "activeCount": "{count} ενεργά",
+      "activeLangs": "Ενεργές γλώσσες",
+      "allCountries": "Όλες οι χώρες",
+      "inactiveCount": "{count} · Ανενεργά",
+      "label": "Επιλογή γλώσσας",
+      "listLabel": "Λίστα γλωσσών",
+      "noResults": "Δεν υπάρχουν αποτελέσματα",
+      "searchPlaceholder": "Αναζήτηση — Χώρα, Γλώσσα, Νόμισμα"
+    },
+    "common": {
+      "fetching": "Φόρτωση…"
+    }
+  },
+  "hu": {
+    "langSwitcher": {
+      "activeCount": "{count} db",
+      "activeLangs": "Aktív nyelvek",
+      "allCountries": "Összes ország",
+      "inactiveCount": "{count} db · Inaktív",
+      "label": "Nyelv kiválasztása",
+      "listLabel": "Nyelvek listája",
+      "noResults": "Nincs találat",
+      "searchPlaceholder": "Keresés — Ország·Nyelv·Pénznem"
+    },
+    "common": {
+      "fetching": "Betöltés folyamatban…"
+    }
+  },
+  "is": {
+    "langSwitcher": {
+      "activeCount": "{count} virk",
+      "activeLangs": "Virk tungumál",
+      "allCountries": "Öll lönd",
+      "inactiveCount": "{count} · óvirk",
+      "label": "Veldu tungumál",
+      "listLabel": "Tungumálalisti",
+      "noResults": "Engar leitarniðurstöður",
+      "searchPlaceholder": "Leit — Land·Tungumál·Gjaldmiðill"
+    },
+    "common": {
+      "fetching": "Sækir..."
+    }
+  },
+  "ie": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "li": {
+    "langSwitcher": {
+      "activeCount": "{count} aktiv",
+      "activeLangs": "Aktive Sprachen",
+      "allCountries": "Alle Länder",
+      "inactiveCount": "{count} · inaktiv",
+      "label": "Sprache auswählen",
+      "listLabel": "Sprachliste",
+      "noResults": "Keine Suchergebnisse",
+      "searchPlaceholder": "Suchen — Land, Sprache, Währung"
+    },
+    "common": {
+      "fetching": "Wird geladen..."
+    }
+  },
+  "lt": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Aktyvios kalbos",
+      "allCountries": "Visos šalys",
+      "inactiveCount": "{count} · Neaktyvus",
+      "label": "Pasirinkti kalbą",
+      "listLabel": "Kalbos sąrašas",
+      "noResults": "Nėra rezultatų",
+      "searchPlaceholder": "Ieškoti — Šalis · Kalba · Valiuta"
+    },
+    "common": {
+      "fetching": "Įkeliama…"
+    }
+  },
+  "lu": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "mt": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "md": {
+    "langSwitcher": {
+      "activeCount": "{count} · Active",
+      "activeLangs": "Limbi active",
+      "allCountries": "Toate țările",
+      "inactiveCount": "{count} · Inactive",
+      "label": "Selectează limba",
+      "listLabel": "Lista de limbi",
+      "noResults": "Nu există rezultate",
+      "searchPlaceholder": "Căutare — Țară·Limbă·Monedă"
+    },
+    "common": {
+      "fetching": "Se încarcă..."
+    }
+  },
+  "mc": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "me": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Aktivni jezici",
+      "allCountries": "Sve zemlje",
+      "inactiveCount": "{count} · neaktivno",
+      "label": "Izbor jezika",
+      "listLabel": "Lista jezika",
+      "noResults": "Nema rezultata pretrage",
+      "searchPlaceholder": "Pretraga — Zemlja·Jezik·Valuta"
+    },
+    "common": {
+      "fetching": "Učitava se…"
+    }
+  },
+  "nl": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Actieve talen",
+      "allCountries": "Alle landen",
+      "inactiveCount": "{count} · Inactief",
+      "label": "Taal selecteren",
+      "listLabel": "Talenlijst",
+      "noResults": "Geen zoekresultaten",
+      "searchPlaceholder": "Zoeken — Land, Taal, Valuta"
+    },
+    "common": {
+      "fetching": "Bezig met laden…"
+    }
+  },
+  "no": {
+    "langSwitcher": {
+      "activeCount": "{count} aktive",
+      "activeLangs": "Aktive språk",
+      "allCountries": "Alle land",
+      "inactiveCount": "{count} inaktive",
+      "label": "Velg språk",
+      "listLabel": "Språkliste",
+      "noResults": "Ingen søkeresultater",
+      "searchPlaceholder": "Søk — land, språk, valuta"
+    },
+    "common": {
+      "fetching": "Henter…"
+    }
+  },
+  "pl": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Aktywne języki",
+      "allCountries": "Wszystkie kraje",
+      "inactiveCount": "{count} · nieaktywne",
+      "label": "Wybierz język",
+      "listLabel": "Lista języków",
+      "noResults": "Brak wyników wyszukiwania",
+      "searchPlaceholder": "Szukaj — kraj, język, waluta"
+    },
+    "common": {
+      "fetching": "Pobieranie…"
+    }
+  },
+  "ro": {
+    "langSwitcher": {
+      "activeCount": "{count} · Active",
+      "activeLangs": "Limbi active",
+      "allCountries": "Toate țările",
+      "inactiveCount": "{count} · Inactive",
+      "label": "Selectează limba",
+      "listLabel": "Lista de limbi",
+      "noResults": "Nu există rezultate",
+      "searchPlaceholder": "Căutare — Țară·Limbă·Monedă"
+    },
+    "common": {
+      "fetching": "Se încarcă..."
+    }
+  },
+  "rs": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Aktivni jezici",
+      "allCountries": "Sve zemlje",
+      "inactiveCount": "{count} · neaktivno",
+      "label": "Izbor jezika",
+      "listLabel": "Lista jezika",
+      "noResults": "Nema rezultata pretrage",
+      "searchPlaceholder": "Pretraga — Zemlja·Jezik·Valuta"
+    },
+    "common": {
+      "fetching": "Učitava se…"
+    }
+  },
+  "sk": {
+    "langSwitcher": {
+      "activeCount": "{count} aktívnych",
+      "activeLangs": "Aktívne jazyky",
+      "allCountries": "Všetky krajiny",
+      "inactiveCount": "{count} · Neaktívne",
+      "label": "Výber jazyka",
+      "listLabel": "Zoznam jazykov",
+      "noResults": "Žiadne výsledky vyhľadávania",
+      "searchPlaceholder": "Hľadať — krajina · jazyk · mena"
+    },
+    "common": {
+      "fetching": "Načítava sa…"
+    }
+  },
+  "si": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Aktivni jeziki",
+      "allCountries": "Vse države",
+      "inactiveCount": "{count} · Neaktivno",
+      "label": "Izbira jezika",
+      "listLabel": "Seznam jezikov",
+      "noResults": "Ni rezultatov iskanja",
+      "searchPlaceholder": "Iskanje — država, jezik, valuta"
+    },
+    "common": {
+      "fetching": "Pridobivam…"
+    }
+  },
+  "se": {
+    "langSwitcher": {
+      "activeCount": "{count} st",
+      "activeLangs": "Aktiva språk",
+      "allCountries": "Alla länder",
+      "inactiveCount": "{count} st · Inaktiva",
+      "label": "Välj språk",
+      "listLabel": "Språklista",
+      "noResults": "Inga sökresultat",
+      "searchPlaceholder": "Sök — Land, språk, valuta"
+    },
+    "common": {
+      "fetching": "Hämtar..."
+    }
+  },
+  "ch": {
+    "langSwitcher": {
+      "activeCount": "{count} aktiv",
+      "activeLangs": "Aktive Sprachen",
+      "allCountries": "Alle Länder",
+      "inactiveCount": "{count} · inaktiv",
+      "label": "Sprache auswählen",
+      "listLabel": "Sprachliste",
+      "noResults": "Keine Suchergebnisse",
+      "searchPlaceholder": "Suchen — Land, Sprache, Währung"
+    },
+    "common": {
+      "fetching": "Wird geladen..."
+    }
+  },
+  "tr": {
+    "langSwitcher": {
+      "activeCount": "{count} adet",
+      "activeLangs": "Aktif Diller",
+      "allCountries": "Tüm Ülkeler",
+      "inactiveCount": "{count} adet · Devre Dışı",
+      "label": "Dil Seçimi",
+      "listLabel": "Dil Listesi",
+      "noResults": "Arama sonucu bulunamadı",
+      "searchPlaceholder": "Ara — Ülke·Dil·Para Birimi"
+    },
+    "common": {
+      "fetching": "Yükleniyor…"
+    }
+  },
+  "ua": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Активні мови",
+      "allCountries": "Усі країни",
+      "inactiveCount": "{count} · Неактивні",
+      "label": "Вибір мови",
+      "listLabel": "Список мов",
+      "noResults": "Немає результатів пошуку",
+      "searchPlaceholder": "Пошук — країна, мова, валюта"
+    },
+    "common": {
+      "fetching": "Завантаження…"
+    }
+  },
+  "gb": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "bs": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "bb": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "bz": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "bo": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "br": {
+    "langSwitcher": {
+      "activeCount": "{count} ativos",
+      "activeLangs": "Idiomas ativos",
+      "allCountries": "Todos os países",
+      "inactiveCount": "{count} · inativos",
+      "label": "Selecionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "Nenhum resultado encontrado",
+      "searchPlaceholder": "Pesquisar — País, Idioma, Moeda"
+    },
+    "common": {
+      "fetching": "Buscando..."
+    }
+  },
+  "ca": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "cl": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "co": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "cr": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "cu": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "do": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "ec": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "sv": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "gt": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "gy": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "ht": {
+    "langSwitcher": {
+      "activeCount": "{count} actifs",
+      "activeLangs": "Langues actives",
+      "allCountries": "Tous les pays",
+      "inactiveCount": "{count} inactifs",
+      "label": "Sélection de la langue",
+      "listLabel": "Liste des langues",
+      "noResults": "Aucun résultat",
+      "searchPlaceholder": "Rechercher — Pays • Langue • Devise"
+    },
+    "common": {
+      "fetching": "Chargement en cours…"
+    }
+  },
+  "hn": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "jm": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "mx": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "ni": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "pa": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "py": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "pe": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "kn": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "lc": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "vc": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "sr": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Actieve talen",
+      "allCountries": "Alle landen",
+      "inactiveCount": "{count} · Inactief",
+      "label": "Taal selecteren",
+      "listLabel": "Talenlijst",
+      "noResults": "Geen zoekresultaten",
+      "searchPlaceholder": "Zoeken — Land, Taal, Valuta"
+    },
+    "common": {
+      "fetching": "Bezig met laden…"
+    }
+  },
+  "tt": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "uy": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "ve": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  },
+  "au": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · Inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Fetching…"
+    }
+  },
+  "fj": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "fm": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "ki": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "mh": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "nr": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "nz": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "pw": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "pg": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "ws": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "sb": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "to": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "tv": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "vu": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "il": {
+    "langSwitcher": {
+      "activeCount": "{count} פעילים",
+      "activeLangs": "שפות פעילות",
+      "allCountries": "כל המדינות",
+      "inactiveCount": "{count} · לא פעילים",
+      "label": "בחירת שפה",
+      "listLabel": "רשימת שפות",
+      "noResults": "אין תוצאות חיפוש",
+      "searchPlaceholder": "חיפוש — מדינה·שפה·מטבע"
+    },
+    "common": {
+      "fetching": "מאחזר..."
+    }
+  },
+  "sq": {
+    "langSwitcher": {
+      "activeCount": "{count} aktive",
+      "activeLangs": "Gjuhët aktive",
+      "allCountries": "Të gjitha vendet",
+      "inactiveCount": "{count} · Joaktive",
+      "label": "Zgjidh gjuhën",
+      "listLabel": "Lista e gjuhëve",
+      "noResults": "Nuk ka rezultate kërkimi",
+      "searchPlaceholder": "Kërko — Shteti·Gjuha·Monedha"
+    },
+    "common": {
+      "fetching": "Duke marrë…"
+    }
+  },
+  "bd": {
+    "langSwitcher": {
+      "activeCount": "{count}টি",
+      "activeLangs": "সক্রিয় ভাষা",
+      "allCountries": "সমস্ত দেশ",
+      "inactiveCount": "{count}টি · নিষ্ক্রিয়",
+      "label": "ভাষা নির্বাচন করুন",
+      "listLabel": "ভাষার তালিকা",
+      "noResults": "কোনো ফলাফল পাওয়া যায়নি",
+      "searchPlaceholder": "অনুসন্ধান — দেশ, ভাষা, মুদ্রা"
+    },
+    "common": {
+      "fetching": "আনা হচ্ছে…"
+    }
+  },
+  "bh": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "en-ZA": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Active Languages",
+      "allCountries": "All Countries",
+      "inactiveCount": "{count} · inactive",
+      "label": "Select Language",
+      "listLabel": "Language List",
+      "noResults": "No search results",
+      "searchPlaceholder": "Search — Country · Language · Currency"
+    },
+    "common": {
+      "fetching": "Loading…"
+    }
+  },
+  "kw": {
+    "langSwitcher": {
+      "activeCount": "{count} عنصر",
+      "activeLangs": "لغات نشطة",
+      "allCountries": "كل الدول",
+      "inactiveCount": "{count} عنصر · غير نشط",
+      "label": "اختيار لغة",
+      "listLabel": "قائمة اللغات",
+      "noResults": "لا توجد نتائج بحث",
+      "searchPlaceholder": "بحث — البلد واللغة والعملة"
+    },
+    "common": {
+      "fetching": "جاري التحميل..."
+    }
+  },
+  "lv": {
+    "langSwitcher": {
+      "activeCount": "{count}",
+      "activeLangs": "Aktīvās valodas",
+      "allCountries": "Visas valstis",
+      "inactiveCount": "{count} · neaktīvas",
+      "label": "Valodas izvēle",
+      "listLabel": "Valodu saraksts",
+      "noResults": "Nav meklēšanas rezultātu",
+      "searchPlaceholder": "Meklēt — Valsts, valoda, valūta"
+    },
+    "common": {
+      "fetching": "Ielādē…"
+    }
+  },
+  "sm": {
+    "langSwitcher": {
+      "activeCount": "{count} attivi",
+      "activeLangs": "Lingue attive",
+      "allCountries": "Tutti i paesi",
+      "inactiveCount": "{count} · Inattivi",
+      "label": "Seleziona lingua",
+      "listLabel": "Elenco lingue",
+      "noResults": "Nessun risultato",
+      "searchPlaceholder": "Cerca — Paese, Lingua, Valuta"
+    },
+    "common": {
+      "fetching": "Caricamento in corso..."
+    }
+  },
+  "ar-AR": {
+    "langSwitcher": {
+      "activeCount": "{count} activos",
+      "activeLangs": "Idiomas activos",
+      "allCountries": "Todos los países",
+      "inactiveCount": "{count} · inactivos",
+      "label": "Seleccionar idioma",
+      "listLabel": "Lista de idiomas",
+      "noResults": "No hay resultados de búsqueda",
+      "searchPlaceholder": "Buscar — País·Idioma·Moneda"
+    },
+    "common": {
+      "fetching": "Cargando..."
+    }
+  }
+}

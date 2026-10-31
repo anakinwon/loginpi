@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Seminare video live ku bashkoheni me Pi"
+  },
+  "home": {
+    "description": "Hostët hapin seminare, dhe pjesëmarrësit bashkohen në sesione video live me Pi.",
+    "badge": "Seminare live në ishuj të bukur",
+    "headline": "Shikoni, dëgjoni dhe mësoni së bashku — live",
+    "ctaBrowse": "Shfleto seminaret",
+    "ctaPlan": "Shiko planet",
+    "features": {
+      "video": "Video live",
+      "caption": "Titrat dhe përkthimi",
+      "notes": "Shënime takimi me AI",
+      "pay": "Paguaj me Pi"
+    },
+    "listTitle": "Seminare",
+    "cal": {
+      "title": "Kalendari i seminareve",
+      "desc": "Nga seminaret e kaluara te ato të ardhshme — prekni një datë për detaje.",
+      "legendSmn": "Seminare",
+      "legendEnded": "Seminare të kaluara",
+      "legendMine": "Ngjarjet e mia",
+      "failed": "Nuk mund të ngarkoheshin datat e seminarit. Ju lutemi provoni përsëri më vonë.",
+      "open": "Shiko detajet"
+    }
+  },
+  "nav": {
+    "link": "Lidh llogarinë",
+    "privacy": "Privatësia",
+    "plan": "Planet",
+    "rooms": "Dhomat",
+    "admin": "Admin",
+    "users": "Përdoruesit",
+    "home": "Kreu",
+    "privacyShort": "Privatësia",
+    "menu": "Menuja kryesore",
+    "fold": "Palos menunë",
+    "unfold": "Zgjero menunë"
+  },
+  "auth": {
+    "checking": "Duke kontrolluar hyrjen…",
+    "signedIn": "{name}",
+    "inPerson": "Shënime personale",
+    "required": "Ju lutemi identifikohuni me llogarinë tuaj Pi.",
+    "signIn": "Identifikohu me Pi",
+    "openInPiBrowser": "Hapni këtë faqe në Pi Browser për t'u identifikuar me llogarinë tuaj Pi.",
+    "authenticating": "Duke u identifikuar…",
+    "google": "Identifikohu me Google",
+    "signOut": "Dil",
+    "or": "ose",
+    "linkRequired": "Jeni identifikuar me Google, por nuk është lidhur ende me një llogari Pi. Lëshoni një kod lidhjeje në Pi Browser dhe futeni këtu.",
+    "linkNeeded": "Lidh llogarinë Pi",
+    "linkCheckFailed": "Nuk mund të kontrollohej statusi i lidhjes së llogarisë tuaj (gabim i përkohshëm i serverit). Ju lutemi rifreskoni pas pak."
+  },
+  "piOAuth": {
+    "signingIn": "Duke u identifikuar me llogarinë tuaj Pi…",
+    "failed": "Identifikimi me Pi dështoi. Ju lutemi provoni përsëri.",
+    "stateMismatch": "Nuk mund të verifikohej kjo kërkesë identifikimi (e skaduar ose një skedë tjetër). Ju lutemi provoni përsëri.",
+    "retry": "Provo përsëri",
+    "backHome": "Kreu"
+  },
+  "link": {
+    "title": "Lidh llogarinë",
+    "intro": "Lidhni llogarinë me të cilën jeni identifikuar në Pi Browser me identifikimin e Google në një shfletues të rregullt. Pas lidhjes mund të përdorni të njëjtën llogari në një shfletues PC.",
+    "checking": "Duke kontrolluar hyrjen…",
+    "piIssueTitle": "Për t'u identifikuar edhe nga një shfletues i rregullt",
+    "codeHint": "Lëshoni kodin më poshtë, pastaj identifikohuni me Google në një shfletues PC dhe futeni atë në faqen Lidh llogarinë (brenda 10 minutash).",
+    "piIssue": "Lësho kodin e lidhjes",
+    "reissue": "Lësho një kod të ri",
+    "expiresIn": "Skadon pas {min} min",
+    "enterTitle": "Fut kodin e lidhjes",
+    "enterHint": "Në Pi Browser hapni seminar.pi → Lidh llogarinë → Lësho kodin e lidhjes, pastaj futni kodin 6-shifror.",
+    "codeLabel": "Kodi i lidhjes",
+    "submit": "Lidh",
+    "done": "Lidhur. Tani mund të përdorni edhe identifikimin me Google.",
+    "linked": "{name} është lidhur me identifikimin e Google."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Kërkohet identifikimi",
+    "AUTH_PI_REQUIRED": "Kërkohet identifikimi me Pi",
+    "AUTH_PI_SESSION_INVALID": "Sesioni juaj skadoi. Ju lutemi identifikohuni përsëri",
+    "AUTH_PI_TOKEN_INVALID": "Verifikimi i identifikimit me Pi dështoi",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Informacioni i identifikimit me Pi mungon",
+    "FORBIDDEN": "Nuk keni leje",
+    "BAD_REQUEST": "Kërkesë e gabuar",
+    "BAD_REQUEST_BODY": "Kërkesë e gabuar",
+    "INVALID_INPUT": "Hyrje e pavlefshme",
+    "QUERY_FAILED": "Dështoi ngarkimi",
+    "SAVE_FAILED": "Dështoi ruajtja",
+    "INTERNAL": "Diçka shkoi keq",
+    "SERVER_CONFIG": "Gabim konfigurimi i serverit. Ju lutemi kontaktoni operatorin",
+    "PI_API_CONNECT_FAILED": "Nuk mund të arrihej Pi Network",
+    "DB_UNAVAILABLE": "Të dhënat janë të padisponueshme përkohësisht. Ju lutemi provoni përsëri më vonë",
+    "NOT_FOUND": "Nuk u gjet",
+    "RATE_LIMITED": "Shumë kërkesa. Ju lutemi provoni përsëri pas pak",
+    "PAYLOAD_TOO_LARGE": "Kërkesa është shumë e madhe",
+    "NETWORK": "Kontrolloni lidhjen tuaj të rrjetit",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Ky emër përdoruesi Pi është regjistruar tashmë me kredenciale të ndryshme. Ju lutemi kontaktoni administratorin",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Kjo llogari është joaktive. Ju lutemi kontaktoni administratorin",
+    "AUTH_GOOGLE_REQUIRED": "Kërkohet identifikimi me Google.",
+    "LINK_CODE_INVALID": "Kodi i lidhjes është i pavlefshëm ose ka skaduar. Lëshoni një të ri në Pi Browser.",
+    "LINK_ALREADY_LINKED": "Kjo llogari është lidhur tashmë.",
+    "LINK_CODE_GEN_FAILED": "Nuk mund të krijohej një kod lidhjeje. Ju lutemi provoni përsëri më vonë.",
+    "AUTH_DB_UNAVAILABLE": "Nuk mund të ruhej llogaria juaj, kështu që identifikimi dështoi. Ju lutemi provoni përsëri më vonë.",
+    "LINK_TRY_LIMIT": "Shumë kode lidhjeje të pasakta. Provoni përsëri pas 15 minutash.",
+    "PRICE_UNAVAILABLE": "Nuk mund të merrej çmimi i Pi. Ju lutemi provoni përsëri pas pak",
+    "QUOTE_EXPIRED": "Kuotimi i pagesës skadoi. Ju lutemi paguani përsëri",
+    "PLAN_EXHAUSTED": "Keni përdorur të gjithë kohën tuaj të seminarit. Plotësoni në faqen e Planeve",
+    "HOST_AWAY": "Hosti nuk është në dhomë. Mund të hyni pasi të bashkohet hosti",
+    "PLAN_AI_PAID": "Funksionet e AI janë të disponueshme në planet me pagesë",
+    "AI_UNAVAILABLE": "Funksionet e AI nuk janë të disponueshme tani",
+    "SPEECH_CHUNK_INVALID": "Formati i copës së audios është i pavlefshëm",
+    "SPEECH_NOT_LIVE": "Ky seminar nuk është live",
+    "SPEECH_NO_AGR": "Kërkohet pëlqimi për përpunimin e zërit",
+    "SPEECH_RATE": "Shumë kërkesa zëri. Ju lutemi provoni përsëri pas pak",
+    "SPEECH_QUOTA": "Koha e përpunimit të zërit për këtë seminar është shpenzuar",
+    "SPEECH_USR_QUOTA": "Keni përdorur të gjithë limitin tuaj të përkthimit dhe zërit të përkthyer për këtë seminar",
+    "SPEECH_FAILED": "Nuk mund të konvertohej zëri në tekst",
+    "SPEECH_STAGE_ONLY": "Vetëm personat në skenë mund të përdorin titrat e zërit",
+    "TRANSLATE_FAILED": "Nuk mund të përkthehej titri",
+    "POLL_CLOSED": "Ky sondazh është mbyllur",
+    "NOTE_NOT_RECORDING": "Këto shënime nuk po regjistrohen",
+    "NOTE_SHOT_INVALID": "Kapje e pavlefshme e ekranit",
+    "NOTE_AUDIO_INVALID": "Skedar regjistrimi i pavlefshëm",
+    "NOTE_SHOT_RATE": "Shumë kapje ekrani",
+    "NOTE_RETRY_SOON": "Mund të provoni përsëri pas një minute",
+    "SPEECH_TTS_FAILED": "Nuk mund të krijohej zëri i përkthyer",
+    "CAPTION_SIG_INVALID": "Ky titër nuk mund të verifikohej, kështu që nuk u përkthye",
+    "PLAN_EXPIRES_BEFORE_START": "Ora e fillimit është pas skadimit të kalimit të këtij plani",
+    "PAY_ALREADY_PAID": "Një pagesë është ende në proces. Nëse po identifikoheshit në portofol, provoni përsëri pas 3 minutash.",
+    "REC_PAID_ONLY": "Regjistrimi është i disponueshëm vetëm në seminaret e planit Mujor ose Vjetor me kohë të paguar të mbetur",
+    "REC_NOT_IN_ROOM": "Ende po konfirmohet që jeni në dhomë. Provoni përsëri pas pak",
+    "ENGINE_OFF": "Çelësi i administratorit të serverit video nuk është konfiguruar",
+    "ENGINE_UNAVAILABLE": "Serveri video nuk po përgjigjet. Ju lutemi provoni përsëri pas pak",
+    "ADJ_NOTHING": "Nuk ka kohë të mbetur për të reduktuar"
+  },
+  "progress": {
+    "title": "Progresi i ndërtimit",
+    "subtitle": "E bërë, në progres dhe e planifikuar, sipas funksionit · që nga {date}",
+    "overall": "Hapat e përgjithshëm",
+    "stepsDone": "{done}/{total} hapa të kryer ({pct}%)",
+    "featureUnit": "funksione",
+    "status": {
+      "done": "Kryer",
+      "doing": "Në progres",
+      "todo": "Planifikuar",
+      "drop": "Hedhur poshtë"
+    },
+    "features": {
+      "F01": {
+        "name": "Identifikimi",
+        "desc": "Identifikimi në Pi Browser, identifikimi në Google në shfletues të tjerë dhe lidhja e të dy llogarive"
+      },
+      "F05": {
+        "name": "Seminar video live",
+        "desc": "Motori ynë i videos Galápagos — qëllimi është një prezantues që transmeton deri në 30 pjesëmarrës"
+      },
+      "F02": {
+        "name": "Krijo një seminar",
+        "desc": "Vendosni nëntitullin, kohën, kapacitetin dhe tarifën e seminarit për të krijuar një seminar (emri = ishull, automatik)"
+      },
+      "F03": {
+        "name": "Lista dhe detajet e seminarit",
+        "desc": "Shfletoni seminaret e hapura faqe pas faqe dhe shikoni detajet e tyre"
+      },
+      "F04": {
+        "name": "Pagesa e hyrjes me Pi",
+        "desc": "Paguani tarifën e seminarit në Pi; serveri rikontrollon shumën para se t'ju lejojë të hyni"
+      },
+      "F06": {
+        "name": "Pagesat e hostit",
+        "desc": "Paguani të ardhurat e tarifës së hyrjes hostëve në Pi"
+      },
+      "F07": {
+        "name": "Rishikimet",
+        "desc": "Shikoni seminaret e regjistruara më vonë"
+      },
+      "FU": {
+        "name": "Themelimi i shtesave të takimit",
+        "desc": "Një kanal sinjali për shtesa, lidhje AI, copa zëri, pëlqim mikrofoni dhe tabela të dhënash"
+      },
+      "F08": {
+        "name": "Orari dhe ndarja",
+        "desc": "Lidhja e kalendarit, skedari i ngjarjes (.ics) dhe ftesa me email për çdo seminar"
+      },
+      "F09": {
+        "name": "Reduktimi i zhurmës dhe ndriçimi",
+        "desc": "Reduktoni zhurmën e mikrofonit dhe ndriçoni videon e errët të kamerës"
+      },
+      "F10": {
+        "name": "Titrat live",
+        "desc": "Ktheni fjalimin e prezantuesit në tekst nën skenë"
+      },
+      "F11": {
+        "name": "Sondazhe, Pyetje & Përgjigje dhe pjesëmarrje",
+        "desc": "Kryeni sondazhe dhe pyetje gjatë një seminari; hostët shkarkojnë listën e pjesëmarrjes"
+      },
+      "F12": {
+        "name": "Efektet e sfondit",
+        "desc": "Turbulloni sfondin tuaj ose zëvendësojeni atë me një paracaktim ose imazhin tuaj (përpunohet në pajisjen tuaj)"
+      },
+      "F13": {
+        "name": "Regjistrimi lokal",
+        "desc": "Prezantuesi regjistron seminarin në pajisjen e tij dhe të gjithë shohin se regjistrimi është aktiv"
+      },
+      "F14": {
+        "name": "Shënime takimi me AI",
+        "desc": "Kur prezantuesi e ndez, fjalimi dhe ekranet regjistrohen dhe përmblidhen në pika kyçe, vendime dhe detyra"
+      },
+      "F15": {
+        "name": "Shënime takimi personale",
+        "desc": "Regjistroni një takim vetëm me një mikrofon dhe merrni shënime takimi (administratorët)"
+      },
+      "F16": {
+        "name": "Titrat e përkthyer",
+        "desc": "Shfaqni titrat e përkthyer në gjuhën që zgjidhni"
+      },
+      "F17": {
+        "name": "Dëgjoni në përkthim",
+        "desc": "Lexoni titrat e përkthyer me zë të lartë me një zë sintetik duke ulur audion origjinale"
+      }
+    },
+    "steps": {
+      "piLogin": "Identifikimi në Pi Browser",
+      "googleLogin": "Identifikimi në Google",
+      "accountLink": "Lidhja e llogarisë",
+      "deviceTest": "Testi i pajisjes së kamerës",
+      "oneToTwo": "Prezantuesi 1 → 2 pjesëmarrës",
+      "recovery": "Rikuperimi nga ngrirja dhe stabiliteti",
+      "structure": "Pastrimi i strukturës së motorit",
+      "autoQuality": "Cilësi automatike, 30 pjesëmarrës",
+      "roomService": "Hyrja në dhomë dhe regjistrimi",
+      "roomUi": "Ekrani i dhomës (pritje·skenë·bisedë·ngritje dore·moderim)",
+      "createForm": "Krijo ekranin",
+      "list": "Lista",
+      "detail": "Detajet",
+      "payRequest": "Kërkesë pagese",
+      "payVerify": "Rikontrollimi i shumës dhe hyrja",
+      "settle": "Pagesa",
+      "vod": "Rishikimi i regjistrimit",
+      "appRelay": "Kanali i sinjalit të shtesës së motorit",
+      "aiBase": "AI, copa zëri, pëlqim dhe tabela të dhënash",
+      "shareLinks": "Lidhja e kalendarit, .ics dhe ftesa me email",
+      "noiseLight": "Reduktimi i zhurmës dhe ndriçimi",
+      "liveCaptions": "Titrat live",
+      "pollQnaAttend": "Sondazhe, Pyetje & Përgjigje dhe lista e pjesëmarrjes",
+      "backgrounds": "Turbullim, paracaktimet dhe imazhi juaj",
+      "localRecording": "Regjistrimi i prezantuesit dhe shenja e regjistrimit",
+      "aiNotes": "Regjistrimi, përmbledhja dhe faqja e shënimeve",
+      "inPersonNotes": "Shënime vetëm me mikrofon dhe shënimet e mia",
+      "captionTranslate": "Zgjedhja e gjuhës dhe ndërrimi origjinal/i përkthyer",
+      "dubbing": "Luajtja e zërit sintetik dhe audio origjinale e ulur"
+    },
+    "refLabel": "Modeli i referencës",
+    "uiRef": "Baza e UI — modelet e ekranit dhe funksioneve të një aplikacioni të përdorur gjerësisht për takime video në ueb, të përshtatura për seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Emri u ruajt, por të tjerët nuk mund të njoftoheshin tani. Ata do ta shohin atë pasi të bashkoheni përsëri.",
+      "tile": "Kliko për të ndryshuar emrin tim",
+      "menu": "Ndrysho emrin tim",
+      "title": "Emri im në këtë seminar",
+      "hint": "Deri në 30 karaktere. Përdoret vetëm në këtë seminar dhe përditësohet menjëherë në ekranin e të gjithëve.",
+      "save": "Ruaj",
+      "saving": "Duke ruajtur…",
+      "cancel": "Anulo",
+      "taken": "Ky emër është përdorur tashmë nga dikush tjetër (host ose pjesëmarrës). Zgjidhni një tjetër.",
+      "failed": "Nuk mund të ruhej emri juaj. Provoni përsëri."
+    },
+    "roomTitle": {
+      "edit": "Kliko për të redaktuar nëntitullin",
+      "label": "Nëntitulli",
+      "placeholder": "Nëntitulli (deri në 60)",
+      "save": "Ruaj",
+      "cancel": "Anulo",
+      "failed": "Nuk mund të ruhej nëntitulli."
+    },
+    "mirror": "Pasqyro videon time",
+    "barPin": "Shfaq gjithmonë shiritin e poshtëm",
+    "barAuto": "Fsheh automatikisht shiritin e poshtëm",
+    "title": "Bashkohu seminarit · {room}",
+    "titleSeminar": "Dhoma e pritjes",
+    "noEngine": "Serveri video nuk është gati ende.",
+    "joinAs": "Bashkohu si",
+    "presenter": "Prezantues",
+    "audience": "Audiencë",
+    "join": "Bashkohu tani",
+    "nameLabel": "Emri",
+    "audienceHint": "Anëtarët e audiencës nuk përdorin kamera ose mikrofon. Pas bashkimit do të shihni dhe dëgjoni prezantuesin.",
+    "preview": {
+      "pending": "Duke përgatitur kamerën dhe mikrofonin…",
+      "audioOnly": "Kamera e padisponueshme — duke dërguar vetëm audio.",
+      "none": "Kamera dhe mikrofoni të padisponueshme. Kontrolloni lejet (mund të bashkoheni ende pa media).",
+      "videoOnly": "Mikrofoni i padisponueshëm — duke dërguar vetëm video. Kontrolloni lejen e mikrofonit."
+    },
+    "mic": {
+      "on": "Fik mikrofonin",
+      "off": "Ndez mikrofonin"
+    },
+    "cam": {
+      "on": "Fik kamerën",
+      "off": "Ndez kamerën"
+    },
+    "controls": "Kontrollet e thirrjes",
+    "leave": "Largohem",
+    "enableSound": "Aktivizo zërin",
+    "state": {
+      "connecting": "Duke u lidhur…",
+      "reconnecting": "Duke u rilidhur…"
+    },
+    "waiting": "Duke pritur prezantuesin.",
+    "rejoin": "Bashkohu përsëri",
+    "err": {
+      "generic": "Diçka shkoi keq. Ju lutemi bashkohuni përsëri.",
+      "CLOSED": "Lidhja u humb.",
+      "NO_ENGINE": "Serveri video nuk është gati ende.",
+      "TICKET_401": "Ju lutemi identifikohuni.",
+      "TICKET_403": "Nuk keni leje për të prezantuar. Bashkohuni si audiencë.",
+      "TICKET_503": "Konfigurimi i serverit video nuk ka përfunduar ende.",
+      "TICKET_NETWORK": "Kontrolloni lidhjen tuaj të rrjetit.",
+      "TICKET_INVALID": "Karta juaj e hyrjes ka skaduar.",
+      "TICKET_EXPIRED": "Karta juaj e hyrjes ka skaduar.",
+      "ROOM_FULL": "Ky seminar është plot.",
+      "ROOM_CLOSED": "Dhoma u mbyll — seminari përfundoi ose prezantuesi mungoi për më shumë se 5 minuta.",
+      "DUPLICATE_SESSION": "U bashkuat nga një pajisje tjetër, kështu që ky ekran u shkëput.",
+      "ROLE_FORBIDDEN": "Nuk keni leje për të prezantuar.",
+      "WS_FAILED": "Nuk mund të lidhej me serverin e videos.",
+      "ICE_FAILED": "Lidhja e videos u ndërpre. Kontrolloni rrjetin tuaj.",
+      "MEDIA_FAILED": "Nuk mund të niste kamera ose mikrofoni.",
+      "TIMEOUT": "Serveri i videos nuk po përgjigjet.",
+      "TICKET_402": "Ky është një seminar me pagesë. Ju lutemi paguani në faqen e seminarit para se të hyni.",
+      "TICKET_404": "Seminari nuk u gjet.",
+      "TICKET_409": "Ky seminar ka përfunduar ose është anuluar.",
+      "TICKET_HOST_AWAY": "Prezantuesi nuk është bashkuar ende ose ka munguar për më shumë se 5 minuta, kështu që nuk mund të hyni. Ju lutemi provoni përsëri pasi të bashkohet prezantuesi.",
+      "TICKET_PLAN_EXHAUSTED": "Plani i këtij seminari nuk ka më kohë, kështu që nuk mund të fillojë. Blerja e të njëjtit plan shton kohë (Falashitja rinovohet me 1 orë muajin tjetër)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Nuk mund të ndryshohej mikrofoni. Ju lutemi provoni përsëri.",
+        "video": "Nuk mund të ndryshohej kamera. Ju lutemi provoni përsëri."
+      },
+      "forbidden": "Nuk keni leje për të prezantuar, kështu që do të vazhdoni si audiencë.",
+      "demoted": "U zhvendosët përsëri në audiencë.",
+      "endFailed": "Nuk mund të përfundonte seminari. Ju lutemi provoni përsëri.",
+      "chatFailed": "Mesazhi nuk u dërgua.",
+      "actionFailed": "Nuk mund të përfundonte kërkesa. Ju lutemi provoni përsëri.",
+      "shareFailed": "Nuk mund të niste ndarja e ekranit.",
+      "err": {
+        "RATE_LIMITED": "Po dërgoni shumë shpejt. Ju lutemi prisni një moment.",
+        "ROLE_FORBIDDEN": "Nuk keni leje për ta bërë këtë.",
+        "MEDIA_FAILED": "Nuk mund të niste mikrofoni ose kamera juaj. Ju lutemi kontrolloni lejet.",
+        "LOCKED": "E kyçur nga prezantuesi."
+      },
+      "mutedBy": {
+        "audio": "Prezantuesi e mbylli mikrofonin tuaj.",
+        "video": "Prezantuesi e fiku kamerën tuaj."
+      },
+      "policy": {
+        "locked": "Prezantuesi i kyçi mikrofonat. Mund ta ndizni tuajin pasi të zhbllokohen.",
+        "unlocked": "Mikrofonat janë zhbllokuar."
+      },
+      "consent": {
+        "saveFail": "Nuk mund të ruhej pëlqimi juaj. Kontrolloni regjistrimin tuaj dhe ndizni mikrofonin përsëri."
+      }
+    },
+    "home": "Shko te faqja kryesore",
+    "tile": {
+      "fullscreen": "Klikoni dy herë për ekran të plotë · Esc për të dalë",
+      "self": "{name} (ju)",
+      "presenter": "Prezantues",
+      "micOff": "Mikrofoni i fikur",
+      "screen": "Ekrani i {name}",
+      "row": "Folës të tjerë",
+      "pin": "Shfaq {name} të madh",
+      "unpin": "Renditje automatike"
+    },
+    "more": "Më shumë opsione",
+    "joinNoCam": "Bashkohuni pa kamerë",
+    "net": {
+      "afterJoin": "Lidhja juaj kontrollohet automatikisht pasi të bashkoheni.",
+      "measuring": "Duke kontrolluar lidhjen…",
+      "good": "Lidhje e mirë",
+      "fair": "Lidhje e pranueshme",
+      "poor": "Lidhje e dobët",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% e të dhënave audio po humbasin.",
+          "video": "{pct}% e të dhënave video po humbasin."
+        },
+        "rate": {
+          "audio": "Ngarkimi i audios është i ulët në {kbps} kbps.",
+          "video": "Ngarkimi i videos është i ulët në {kbps} kbps. Cilësia mund të bjerë."
+        }
+      }
+    },
+    "people": "{n} në dhomë",
+    "screen": {
+      "start": "Ndarja e ekranit",
+      "stop": "Ndalo ndarjen"
+    },
+    "panel": {
+      "title": "Bisedë · Pyetje & Përgjigje · Sondazhe · Njerëz",
+      "chat": "Bisedë",
+      "people": "Njerëz",
+      "close": "Mbyll panelin",
+      "qna": "Pyetje & Përgjigje",
+      "polls": "Sondazhe"
+    },
+    "chat": {
+      "empty": "Ende nuk ka mesazhe. Biseda nuk ruhet.",
+      "me": "Ju",
+      "failed": "Nuk u dërgua.",
+      "retry": "Provo përsëri",
+      "input": "Shkruani një mesazh",
+      "send": "Dërgo"
+    },
+    "hand": {
+      "raise": "Ngri dorën",
+      "lower": "Ule dorën",
+      "list": "Duart e ngritura",
+      "lowerAll": "Ulni të gjitha duart",
+      "raised": "Dora e ngritur",
+      "notice": "{name} ngriti dorën.",
+      "dismiss": "Hiq",
+      "waiting": "{n} persona presin të flasin"
+    },
+    "react": {
+      "open": "Reagimet",
+      "e0": "Pëlqej",
+      "e1": "Duartrokitje",
+      "e2": "Qesh",
+      "e3": "I befasuar",
+      "e4": "I trishtuar",
+      "e5": "Pa fjalë",
+      "e6": "Dashuri"
+    },
+    "quality": {
+      "label": "Cilësia",
+      "auto": "Auto",
+      "high": "Lartë",
+      "medium": "Mesatare",
+      "low": "Ulët",
+      "unstable": "Rrjeti juaj është i paqëndrueshëm"
+    },
+    "roles": {
+      "presenter": "Prezantues",
+      "panel": "Panelist",
+      "audience": "Audiencë"
+    },
+    "stage": {
+      "invite": "Fto në skenë",
+      "remove": "Zhvendos në audiencë",
+      "promoted": "Jeni ftuar në skenë. Nëse keni ngritur dorën, kamera juaj ndizet automatikisht (përveç nëse është e kyçur ose nuk lejohet). Ndizni mikrofonin tuaj për të folur (mikrofoni nuk ndizet automatikisht).",
+      "later": "Më vonë"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} ngriti dorën."
+    },
+    "leaveDialog": {
+      "title": "Largoje seminarin",
+      "body": "Mund të largoheni vetë, ose të përfundoni seminarin dhe të shkëputni të gjithë.",
+      "confirmTitle": "Përfundo seminarin?",
+      "confirmBody": "Të gjithë do të shkëputen dhe askush nuk mund të bashkohet përsëri në këtë seminar.",
+      "cancel": "Anulo",
+      "end": "Përfundo seminarin",
+      "endConfirm": "Përfundo tani"
+    },
+    "mod": {
+      "muteAll": "Mbyll mikrofonin të gjithëve",
+      "lock": "Kyç mikrofonat",
+      "unlock": "Zhblloko mikrofonat",
+      "locked": "Prezantuesi ka kyçur mikrofonat",
+      "muteMic": "Mbyll mikrofonin",
+      "askMic": "Kërko të zhbllokohet",
+      "muteCam": "Fik kamerën",
+      "muteMicOf": "Mbyll mikrofonin e {name}",
+      "askMicOf": "Kërko {name} të zhbllokojë mikrofonin",
+      "muteCamOf": "Fik kamerën e {name}"
+    },
+    "ask": {
+      "audio": "Prezantuesi ju kërkoi të ndizni mikrofonin tuaj.",
+      "video": "Prezantuesi ju kërkoi të ndizni kamerën tuaj.",
+      "ignore": "Injoro"
+    },
+    "toDetail": "Shko te faqja e seminarit",
+    "consent": {
+      "title": "Para se të ndizni mikrofonin tuaj",
+      "body": "Nëse regjistrimi, titrat ose shënimet e takimit me AI janë të ndezura në këtë seminar, zëri juaj mund të konvertohet në tekst, të ruhet dhe të përkthehet. Përpunimi i zërit bëhet nga një shërbim AI jashtë vendit tuaj. Nëse nuk jeni dakord, mikrofoni juaj do të ndizet – vetëm zëri juaj nuk do të përpunohet.",
+      "privacy": "Politika e privatësisë",
+      "newTab": "(hapet në një skedë të re)",
+      "decline": "Nuk jam dakord",
+      "agree": "Jam dakord dhe ndiz mikrofonin",
+      "notice": "Kur regjistrimi, titrat ose shënimet e takimit me AI janë të ndezura, zërat e folësve përpunohen. Zërat e audiencës nuk dërgohen.",
+      "saveFailClosed": "Ky seminar ka përfunduar, kështu që pëlqimi nuk mund të regjistrohet."
+    },
+    "captions": {
+      "title": "Titrat",
+      "room": "Titrat live (e gjithë dhoma)",
+      "show": "Shfaq titrat",
+      "size": {
+        "label": "Madhësia e tekstit",
+        "sm": "E vogël",
+        "md": "Mesatare",
+        "lg": "E madhe"
+      },
+      "waiting": "Titrat shfaqen kur prezantuesi i ndez ato",
+      "limit": "Kufiri i përpunimit të të folurit u arrit, kështu që titrat dhe minutat e AI u ndalën",
+      "sendFail": "Nuk mund të ndizeshin titrat. Ju lutemi provoni përsëri pas pak.",
+      "sendFailOff": "Nuk mund të fikeshin titrat. Ju lutemi provoni përsëri pas pak.",
+      "region": "Titrat",
+      "translate": "Shfaq titrat e përkthyer",
+      "lang": "Gjuha e përkthimit",
+      "langMine": "Gjuhët e mia",
+      "langAll": "Të gjitha gjuhët",
+      "trStop": {
+        "forbidden": "Titrat e përkthyer janë vetëm për pjesëmarrësit e regjistruar. Po shfaqet origjinali.",
+        "unavailable": "Titrat e përkthyer nuk janë të disponueshëm tani. Po shfaqet origjinali.",
+        "quota": "Ky seminar ka arritur kufirin e përkthimit. Po shfaqet origjinali.",
+        "usrQuota": "Keni përdorur kufirin tuaj të përkthimit për këtë seminar. Po shfaqet origjinali."
+      },
+      "unsupported": "Kjo pajisje nuk mund të krijojë titra live (nuk ka mbështetje për regjistrimin audio në këtë shfletues)"
+    },
+    "effects": {
+      "title": "Efektet",
+      "light": "Korrigjimi i dritës",
+      "noise": "Redukto zhurmën",
+      "noiseFail": "Reduktimi i zhurmës nuk mund të ndryshohet në këtë pajisje",
+      "close": "Mbyll",
+      "preview": "Parashikimi im",
+      "bg": "Sfondi",
+      "bgNone": "Asnjë",
+      "bgBlur": "Turbullo",
+      "scenes": {
+        "beach": "🏝️ Plazhi i Maldiveve",
+        "autumn": "🍁 Lugina e vjeshtës",
+        "fireplace": "🔥 Oxhaku",
+        "xmas": "🎄 Dhoma e takimit të Krishtlindjeve"
+      },
+      "bgs": {
+        "dusk": "Muzg",
+        "ocean": "Oqean",
+        "forest": "Pyll",
+        "studio": "Studio",
+        "grid": "Rrjetë",
+        "dots": "Pika"
+      },
+      "myAdd": "Imazhi im",
+      "myItem": "Imazhi im {n}",
+      "myDel": "Fshij imazhin tim {n}",
+      "mySaveFail": "Sfondi u aplikua, por nuk mund të ruhej në këtë pajisje (vetëm për këtë takim)",
+      "bgStopped": "Efekti i sfondit u ndal dhe u fik. Zgjidhni përsëri për të rifilluar.",
+      "myNote": "Imazhet tuaja ruhen vetëm në këtë pajisje (deri në 3, 2 MB secila)",
+      "mobileBlurOnly": "Në telefona, është i disponueshëm vetëm sfondi i turbullt (sfondet e imazheve funksionojnë në PC)",
+      "myTooBig": "Mund të përdoren vetëm imazhe deri në 2 MB",
+      "preparing": "Duke u përgatitur…",
+      "bgFailed": "Nuk mund të ngarkohej efekti i sfondit",
+      "autoOff": "Pajisja juaj është shumë e ngadaltë, kështu që efekti i sfondit u fik",
+      "unsupported": "Efektet e sfondit nuk janë të disponueshme në këtë pajisje",
+      "noCam": "Ndizni kamerën tuaj për të zgjedhur një sfond",
+      "lightUnsupported": "Korrigjimi i dritës nuk është i disponueshëm në këtë pajisje",
+      "noiseUnsupported": "Cilësimet e reduktimit të zhurmës nuk mbështeten në këtë pajisje"
+    },
+    "sheetClose": "Mbyll",
+    "polls": {
+      "new": "Sondazh i ri",
+      "question": "Pyetje",
+      "option": "Opsioni {n}",
+      "remove": "Hiq opsionin {n}",
+      "addOption": "Shto opsion",
+      "start": "Fillo sondazhin",
+      "cancel": "Anulo",
+      "dup": "Opsionet duhet të jenë të ndryshme",
+      "vote": "Voto",
+      "change": "Ndrysho votën",
+      "close": "Mbyll sondazhin",
+      "closed": "Mbyllur",
+      "mine": "Zgjedhja juaj",
+      "result": "{pct}% ({n} vota)",
+      "total": "{n} vota gjithsej",
+      "empty": "Ende nuk ka sondazhe.",
+      "loading": "Duke u ngarkuar…",
+      "labOnly": "Sondazhet janë të disponueshme vetëm në dhomat e seminarit.",
+      "started": "Një sondazh i ri ka filluar",
+      "goVote": "Voto",
+      "votersNote": "Organizatori mund të shohë kush votoi për cilin opsion.",
+      "voters": "Votuan: {names}"
+    },
+    "qna": {
+      "sort": "Rendit",
+      "by": {
+        "top": "Më të mirat",
+        "new": "Më të rejat"
+      },
+      "rcm": "Voto lart ({n})",
+      "answered": "U përgjigj",
+      "answer": "Shëno si të përgjigjur",
+      "unanswer": "Hiq shënimin si të përgjigjur",
+      "hide": "Fsheh",
+      "doneN": "{n} u përgjigjën",
+      "backOpen": "Pyetje pa përgjigje",
+      "empty": "Ende nuk ka pyetje.",
+      "emptyDone": "Nuk ka pyetje të përgjigjura.",
+      "loading": "Duke u ngarkuar…",
+      "input": "Bëj një pyetje (500 karaktere)",
+      "send": "Dërgo",
+      "left": "{n} të mbetura",
+      "labOnly": "Pyetjet dhe Përgjigjet janë të disponueshme vetëm në dhomat e seminarit."
+    },
+    "recording": {
+      "title": "Regjistro",
+      "badge": "Duke regjistruar",
+      "unsupported": "Ky shfletues nuk mund të regjistrojë. Ju lutemi regjistroni nga një shfletues i rregullt në një kompjuter.",
+      "piBrowserOnly": "Regjistrimi funksionon vetëm në një shfletues të rregullt (PC ose celular). Pi Browser nuk mund të ruajë skedarët e regjistrimit — hapeni këtë seminar në një shfletues kompjuteri ose telefoni (seminarz.vercel.app) për të regjistruar.",
+      "audioSuspended": "Regjistrimi i zërit mund të mos ketë filluar në këtë pajisje. Mund të regjistrohet vetëm pamja.",
+      "notifyFailed": "Regjistrimi nuk filloi sepse pjesëmarrësit nuk mund të njoftoheshin. Ju lutemi provoni përsëri pas pak.",
+      "confirm": {
+        "title": "Fillo regjistrimin?",
+        "body": "Kur fillon regjistrimi, të gjithë do të shohin një tregues 'Duke regjistruar'. Skedari ruhet vetëm në këtë pajisje dhe nuk ngarkohet ose transferohet kurrë jashtë vendit. Ju lutemi informoni pjesëmarrësit para se të filloni.",
+        "download": "Kur të ndaloni, një skedar MP4 ruhet në dosjen tuaj të shkarkimeve (shfletuesit që nuk mund të regjistrojnë MP4 kërkojnë një moment për ta konvertuar; regjistrimet më të gjata se rreth 45 minuta mund të ruhen në formatin e tyre origjinal). Shfletuesit brenda aplikacionit mund të bllokojnë ruajtjen e skedarëve, prandaj regjistroni nga një shfletues i rregullt në një kompjuter.",
+        "cancel": "Anulo",
+        "start": "Fillo regjistrimin",
+        "charge": "Gjatë regjistrimit, koha e regjistrimit zbritet nga koha juaj e paguar përveç kohës së dhomës (2x gjatë regjistrimit). Kur mbaron koha e paguar, regjistrimi ndalon dhe skedari ruhet."
+      },
+      "resave": {
+        "label": "Skedari i regjistrimit",
+        "save": "Ruaj përsëri",
+        "dismiss": "Mbyll ruaj përsëri"
+      },
+      "toast": {
+        "started": "Regjistrimi filloi — të gjithë mund ta shohin",
+        "saved": "Regjistrimi u ruajt. Kontrolloni dosjen tuaj të shkarkimeve. Nëse asgjë nuk u ruajt, prekni [Ruaj përsëri] në krye të ekranit.",
+        "autoStopped": "Regjistrimi përfundoi sepse shfletuesi e ndaloi ose u arrit kufiri i madhësisë. Gjithçka deri në atë pikë u ruajt. Fillo regjistrimin përsëri për të vazhduar.",
+        "empty": "Asgjë nuk u regjistrua, kështu që nuk u krijua asnjë skedar.",
+        "saveFailed": "Nuk mund të krijohej skedari i regjistrimit.",
+        "converting": "Duke konvertuar regjistrimin në MP4. Ju lutemi mbajeni këtë dritare të hapur.",
+        "savedOriginal": "Nuk mund të konvertohej në MP4, kështu që regjistrimi u ruajt në formatin e tij origjinal (webm). Kontrolloni dosjen tuaj të shkarkimeve.",
+        "startedBy": "Prezantuesi filloi regjistrimin",
+        "stoppedBy": "Prezantuesi ndaloi regjistrimin"
+      },
+      "paidOnly": "Regjistrimi është i disponueshëm vetëm në seminaret e hapura me një plan mujor ose vjetor, ndërsa ka kohë të paguar të mbetur.",
+      "planOut": "Koha e paguar mbaroi, kështu që regjistrimi ndaloi dhe skedari u ruajt.",
+      "notInRoom": "Ende po konfirmohet që jeni në dhomë. Fillo regjistrimin përsëri pas pak.",
+      "meterFailed": "Nuk mund të kontrollohej koha e regjistrimit, kështu që regjistrimi nuk filloi. Provo përsëri pas pak.",
+      "paidOut": "Nuk ka kohë të paguar të mbetur, kështu që regjistrimi nuk mund të fillojë. Blini të njëjtin plan përsëri për të regjistruar.",
+      "pausedBadge": "Regjistrimi i ndërprerë",
+      "controls": "Kontrollet e regjistrimit",
+      "pause": "Pauzë",
+      "resume": "Rifillo",
+      "stop": "Ndalo regjistrimin"
+    },
+    "notes": {
+      "on": "Shënime AI",
+      "badge": "Shënime AI aktive",
+      "started": "Prezantuesi aktivizoi shënimet AI",
+      "stopped": "Shënimet AI u çaktivizuan",
+      "startedMine": "Shënimet AI aktive — shfaqen për të gjithë",
+      "stoppedMine": "Shënimet AI joaktive — po krijohen shënimet",
+      "startFail": "Nuk mund të fillonin shënimet AI",
+      "gone": "Shënimet AI u ndaluan — shënimet u mbyllën ose u fshinë diku tjetër",
+      "unsupported": "Shënimet AI nuk mund të aktivizohen këtu (nuk mbështetet regjistrimi audio)"
+    },
+    "dubbing": {
+      "listen": "Dëgjo me zë të përkthyer",
+      "blocked": "Nuk mund të luhej zëri i përkthyer. Ju lutemi aktivizojeni përsëri",
+      "stopped": "Zëri i përkthyer nuk është i disponueshëm tani, prandaj u çaktivizua",
+      "usrQuota": "Keni përdorur limitin tuaj të zërit të përkthyer për këtë seminar, prandaj u çaktivizua"
+    },
+    "plan": {
+      "warn": "Kanë mbetur {min} min nga plani i këtij seminari.",
+      "ended": "Koha e seminarit tuaj mbaroi, prandaj seminari ka përfunduar dhe ju keni dalë nga dhoma.",
+      "left": "Koha e mbetur e seminarit",
+      "closed": "Seminari ka përfunduar, prandaj ju keni dalë nga dhoma.",
+      "hostAway": "Hosti ka dalë nga dhoma. Nëse nuk kthehet brenda 5 minutave, të gjithë pjesëmarrësit do të largohen.",
+      "hostGone": "Hosti nuk u kthye brenda 5 minutave, prandaj ju keni dalë nga dhoma. Mund të hyni përsëri pasi të bashkohet hosti."
+    },
+    "toLobby": "Dhoma e pritjes"
+  },
+  "list": {
+    "tabsLabel": "Pamja e listës së seminareve",
+    "tabs": {
+      "all": "Të gjitha",
+      "hosted": "Organizuar nga unë",
+      "joined": "Bashkuar"
+    },
+    "empty": {
+      "all": "Nuk ka seminare të ardhshme.",
+      "hosted": "Nuk keni organizuar asnjë seminar.",
+      "joined": "Nuk jeni bashkuar në asnjë seminar."
+    },
+    "loading": "Po ngarkohet…",
+    "retry": "Provo përsëri",
+    "free": "Falas",
+    "fee": "{amount} Pi",
+    "host": "Host {name}",
+    "capacity": "Kapaciteti {n}",
+    "status": {
+      "SCHEDULED": "E planifikuar",
+      "LIVE": "Live",
+      "ENDED": "Përfunduar",
+      "CANCELED": "Anuluar"
+    },
+    "hostNew": "Krijo një seminar",
+    "progress": "Progresi",
+    "pager": "Faqosja",
+    "prev": "Para",
+    "next": "Pas",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Nëntitulli",
+      "placeholder": "Shto një nëntitull",
+      "save": "Ruaj nëntitullin",
+      "saving": "Po ruhet…",
+      "saved": "U ruajt."
+    },
+    "loading": "Po ngarkohet…",
+    "back": "Kthehu te lista",
+    "notFound": "Seminari nuk u gjet.",
+    "status": {
+      "SCHEDULED": "E planifikuar",
+      "LIVE": "Live",
+      "ENDED": "Përfunduar",
+      "CANCELED": "Anuluar"
+    },
+    "startAt": "Data",
+    "host": "Host",
+    "seats": "Vende të lira",
+    "seatsValue": "{left} / {max}",
+    "fee": "Tarifa e seminarit",
+    "feeValue": "{amount} Pi",
+    "free": "Falas",
+    "enter": "Hyr",
+    "payEnter": "Paguaj me Pi dhe hyr ({amount} Pi)",
+    "paying": "Po përpunohet pagesa…",
+    "joining": "Po regjistrohet…",
+    "registered": "Jeni regjistruar.",
+    "full": "Ky seminar është plot.",
+    "closed": "Ky seminar ka përfunduar.",
+    "canceled": "Ky seminar u anulua.",
+    "roomLink": "Shko në dhomë (host)",
+    "piBrowserOnly": "Pagesa është e disponueshme në Pi Browser pas hyrjes në Pi.",
+    "payCancelled": "Pagesa u anulua.",
+    "payStillWaiting": "Ende po presim portofolin. Nëse jeni identifikuar tashmë në Pi Wallet, ju lutemi prisni një moment.",
+    "payFailed": "Pagesa dështoi.",
+    "err": {
+      "NAME_TAKEN": "Ky emër është tashmë i përdorur nga dikush tjetër. Zgjidhni një tjetër.",
+      "CAL_READ_FAILED": "Nuk mund të ngarkoheshin ngjarjet tuaja. Kontrolloni adresën.",
+      "ISLAND_FULL": "Të gjitha 100 emrat e ishujve janë në përdorim tani. Mund të hapni një seminar të ri pasi një seminar i ardhshëm ose live të përfundojë ose të anulohet.",
+      "SMN_FULL": "Ky seminar është plot.",
+      "SMN_CLOSED": "Ky seminar ka përfunduar ose u anulua.",
+      "SMN_ALREADY": "Jeni tashmë i regjistruar ose një pagesë është në proces.",
+      "SMN_FREE": "Seminarët falas nuk kërkojnë pagesë.",
+      "SMN_PAY_REQUIRED": "Ky është një seminar me pagesë. Ju lutemi paguani për të hyrë.",
+      "SMN_PAY_INVALID": "Nuk mundëm të verifikonim pagesën tuaj. Ju lutemi kontaktoni administratorin.",
+      "PAY_PI_FAILED": "Nuk mund të arrihej serveri i pagesave Pi. Ju lutemi provoni përsëri pas pak.",
+      "PAY_MISMATCH": "Detajet e pagesës nuk përputhen.",
+      "PAY_AMOUNT_MISMATCH": "Shuma e pagesës ndryshon nga tarifa e seminarit.",
+      "PAY_CANCELLED": "Kjo pagesë u anulua.",
+      "PAY_ALREADY_PAID": "Një pagesë është ende në proces. Nëse po identifikoheshit në portofol, provoni përsëri pas 3 minutash.",
+      "PAY_INVALID_STATE": "Kjo pagesë nuk mund të përpunohet tani.",
+      "PAY_PI_CANCEL_REFUSED": "Pagesa është tashmë në proces dhe nuk mund të anulohet. Ju lutemi kontrolloni përsëri pas pak."
+    },
+    "share": {
+      "title": "Planifiko dhe ndaj",
+      "calendar": "Shto në kalendar",
+      "ics": "Skedar kalendari",
+      "mail": "Fto me email",
+      "mailApp": "Dërgo me aplikacionin e paracaktuar të postës",
+      "mailSubject": "[Ftesë seminari] {title}",
+      "mailBody": "{title}\nKur: {start}\n\nBashkohuni direkt me këtë lidhje.\nDesktop: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopjo lidhjen",
+      "copied": "Lidhja u kopjua.",
+      "copyFail": "Nuk mund të kopjohej. Ju lutemi kopjoni lidhjen nga shiriti i adresave.",
+      "share": "Ndaj në një aplikacion tjetër",
+      "shareFail": "Nuk mund të ndahej. Ju lutemi përdorni Kopjo lidhjen në vend të kësaj.",
+      "created": "Seminari juaj është gati. Shtoni kohën e fillimit në Google Calendar tuaj.",
+      "addGoogle": "Shto në Google Calendar",
+      "later": "Më vonë",
+      "piBrowserOpen": "Në Pi Browser, kalendari, emaili dhe skedari i kalendarit hapen në shfletuesin e paracaktuar të telefonit tuaj.",
+      "extFail": "Nuk mund të hapej. Përditësoni Pi Browser, ose përdorni Kopjo lidhjen dhe hapeni në një shfletues të rregullt (seminarz.vercel.app).",
+      "icsPiBrowser": "Skedari i kalendarit mund të shkarkohet vetëm në një shfletues të rregullt (kompjuter ose celular). Në Pi Browser, përdorni Shto në kalendar në vend të kësaj."
+    },
+    "attendance": "Pjesëmarrja",
+    "plan": "Plani",
+    "left": "Koha e mbetur"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Muaji i kaluar",
+      "next": "Muaji tjetër",
+      "connect": "Shfaq Google Calendar tim",
+      "change": "Menaxho kalendarët e Google ({n})",
+      "add": "Shto",
+      "remove": "Hiq",
+      "close": "Mbyll",
+      "failed": "Nuk mund të ngarkoheshin ngjarjet nga {n} kalendar(ë). Kontrolloni adresën.",
+      "badUrl": "Ngjisni 'Adresën sekrete në formatin iCal' (…/basic.ics) nga cilësimet e Google Calendar, jo shiritin e adresave të shfletuesit.",
+      "full": "Mund të shtoni deri në {n} kalendarë.",
+      "allDay": "Gjithë ditën",
+      "day": "Ngjarjet e mia në këtë ditë",
+      "count": "{n, plural, one {# ngjarje} other {# ngjarje}}",
+      "more": "+{n}",
+      "picked": "Kjo datë është vendosur si data e fillimit. Zgjidhni orën më poshtë.",
+      "s1": "Prekni [Hap cilësimet e Google Calendar] më poshtë.",
+      "s2": "Nën 'Cilësimet për kalendarët e mi' në të majtë, zgjidhni një kalendar (p.sh. emrin tuaj).",
+      "s3": "Lëvizni poshtë te 'Integroni kalendarin' dhe kopjoni 'Adresën sekrete në formatin iCal'.",
+      "s4": "Ngjisni këtu dhe prekni [Shto] — titujt e ngjarjeve shfaqen në kalendar. Shtoni kalendarë të tjerë në të njëjtën mënyrë, deri në 5.",
+      "open": "Hap cilësimet e Google Calendar",
+      "privacy": "Kjo adresë është një çelës për kalendarin tuaj — mos e ndani. Ajo ruhet vetëm në këtë pajisje, kurrë në serverin tonë."
+    },
+    "title": "Krijo një seminar",
+    "name": "Le të udhëtojmë në një ishull të bukur!",
+    "subTitle": "Nëntitulli (opsional, deri në 60 karaktere)",
+    "startAt": "Koha e fillimit",
+    "maxCnt": "Kapaciteti (1–100)",
+    "submit": "Krijo",
+    "submitting": "Po krijohet…",
+    "invalid": "Kontrolloni të dhënat tuaja — një datë brenda një viti nga tani, kapaciteti 1–100.",
+    "attendance": {
+      "title": "Pjesëmarrja",
+      "back": "Kthehu te seminari",
+      "loading": "Po ngarkohet…",
+      "forbidden": "Vetëm hosti dhe administratorët mund të shohin pjesëmarrjen.",
+      "count": "{n} persona",
+      "csv": "Shkarko CSV",
+      "empty": "Askush nuk është bashkuar ende.",
+      "online": "Online",
+      "left": "U largua",
+      "col": {
+        "name": "Emri",
+        "pi": "Emri i përdoruesit Pi",
+        "ent": "Bashkimi i parë",
+        "hb": "Parë për herë të fundit",
+        "dur": "Koha e pjesëmarrjes",
+        "min": "Pjesëmarrës (min, koha jashtë e përjashtuar)",
+        "state": "Statusi"
+      },
+      "durNote": "Koha e pjesëmarrjes është nga bashkimi i parë deri në shikimin e fundit, minus kohën jashtë (boshllëqe më të gjata se 2.5 minuta).",
+      "csvPiBrowser": "Shkarkimi i CSV funksionon vetëm në një shfletues të rregullt (kompjuter ose celular). Pi Browser nuk mund të ruajë skedarë — hapni këtë fletë pjesëmarrjeje në një shfletues kompjuteri ose telefoni (seminarz.vercel.app)."
+    },
+    "plan": "Plani",
+    "planFree": "Falas — {time} mbetur këtë muaj · pa AI",
+    "planPaid": "{name} {time} · {price} — paguaj gjatë krijimit",
+    "planHint": "Një seminar i hapur me një plan me pagesë përdor kohën e atij plani së pari, pastaj vazhdon me kohën falas të këtij muaji (pa AI në pjesën falas). Një plan aktiv hapet pa pagesë; Mujor ose Vjetor që nuk keni paguhet në Pi kur shtypni Krijo, pastaj seminari hapet (Pi Browser). Bashkimi është gjithmonë falas për pjesëmarrësit.",
+    "planOwned": "{name} — aktiv · {time} mbetur",
+    "planEnds": "Koha e fillimit është pas skadimit të këtij plani. Lëvizni fillimin më herët ose zgjidhni një plan tjetër.",
+    "paidKept": "Abonimi juaj me pagesë ruhet. Rregulloni problemin dhe shtypni Krijo përsëri (pa pagesë të dytë)."
+  },
+  "privacy": {
+    "title": "Politika e Privatësisë — Funksionet e Zërit dhe AI",
+    "effective": "Në fuqi më {date}",
+    "intro": "Kjo politikë shpjegon informacionin personal që ne përpunojmë kur përdorni titrat live, titrat e përkthyer, përkthimin zanor, shënimet e takimeve me AI dhe shënimet personale në një seminar. Këto funksione përdorin një shërbim të jashtëm AI, prandaj informacioni transferohet jashtë vendit.",
+    "whoTitle": "Informacioni i kujt përpunohet",
+    "who": [
+      "Prezantuesit dhe pjesëmarrësit në skenë: ne kërkojmë pëlqimin tuaj një herë, para se të ndizni mikrofonin tuaj për herë të parë. Mund të bashkoheni në seminar pa dhënë pëlqimin.",
+      "Audienca: ju nuk përdorni mikrofon, prandaj nuk dërgohet zë. Ju shihni vetëm titrat dhe shënimet.",
+      "Shënimet personale: një administrator regjistron një takim me një mikrofon dhe konfirmon se pjesëmarrësit janë informuar para regjistrimit."
+    ],
+    "xferTitle": "Transferimi i informacionit personal jashtë vendit (Ligji Korean për Mbrojtjen e Informacionit Personal, Neni 28-8)",
+    "xfer": [
+      {
+        "k": "Marrësi",
+        "v": "Google LLC (Gemini API) — kontaktoni [TBD: kontakti i privatësisë së Google]"
+      },
+      {
+        "k": "Vendet",
+        "v": "Shtetet e Bashkuara dhe vende të tjera ku ndodhen qendrat e të dhënave të Google [TBD: rajoni i përpunimit]"
+      },
+      {
+        "k": "Kur dhe si",
+        "v": "Rreth çdo 5 sekonda ndërsa një funksion është aktiv, përmes një lidhjeje të koduar (HTTPS). Për shënimet personale, i gjithë regjistrimi dërgohet edhe një herë në pjesë 5-minutëshe kur shënimi përfundon (transkriptim i saktë)."
+      },
+      {
+        "k": "Artikujt",
+        "v": "Zëri, përmbajtja e folur (teksti), emri i shfaqur i folësit (për përmbledhjet e shënimeve), pamjet e ekranit (kur shënimet AI janë aktive)"
+      },
+      {
+        "k": "Qëllimi",
+        "v": "Fjalë në tekst, përkthim, përmbledhje të shënimeve të takimit, fjalim sintetik (zëra standardë, pa klonim zëri), ndarje e folësve për shënimet personale (zërat dallohen dhe etiketohen sipas gjinisë së perceptuar, si Mashkull 1 / Femër 1 — nuk nxirren emra ose identitete)"
+      },
+      {
+        "k": "Ruajtja",
+        "v": "Përfundon sapo rezultati të kthehet. Ne i kërkojmë Google të mos ruajë kërkesat (store=false). Regjistrat e monitorimit të abuzimit mund të ruhen ende sipas kushteve të Google [TBD: periudha e ruajtjes dhe statusi i nivelit me pagesë]."
+      },
+      {
+        "k": "Si të refuzoni, dhe çfarë ndodh",
+        "v": "Nëse nuk jepni pëlqimin ose fikni mikrofonin tuaj, nuk dërgohet zë. Mund të merrni pjesë ende në seminar; vetëm titrat, përkthimet dhe shënimet e fjalimit tuaj nuk krijohen. Mund të tërhiqni pëlqimin në çdo kohë [TBD: ku është butoni i tërheqjes]."
+      }
+    ],
+    "keepTitle": "Çfarë ruan ky shërbim",
+    "keep": [
+      "Audio origjinale: për titrat e seminarit dhe shënimet e takimeve me AI nuk ruhet; ajo hidhet menjëherë pas konvertimit në tekst. Për shënimet personale, regjistrimi ruhet në ruajtje private në mënyrë që të transkriptohet përsëri më saktë (me folës) pas takimit, dhe fshihet gjatë pastrimit ditor pasi të ketë kaluar 1 ditë nga përfundimi i shënimit (menjëherë nëse shënimi fshihet).",
+      "Titrat live: nuk ruhen.",
+      "Shënimet e takimeve me AI (kur prezantuesi i aktivizon): përmbajtja e folur, pamjet e ekranit dhe përmbledhja, ruhen derisa shënimet të fshihen [TBD: ruajtja maksimale].",
+      "Regjistrat e pëlqimit: koha e pëlqimit dhe versioni i politikës, ruhen si provë [TBD: periudha e ruajtjes].",
+      "Përdorimi: numri i kërkesave për minutë dhe koha e përpunimit, përdoren për të zbatuar kufizimet e kostos.",
+      "Pjesëmarrja: koha kur jeni bashkuar, koha kur jeni lidhur për herë të fundit, emri juaj i shfaqur dhe emri juaj i përdoruesit Pi ruhen dhe i jepen hostit si një listë pjesëmarrjeje (në ekran dhe si shkarkim CSV). Ruhet derisa seminari të fshihet.",
+      "Pyetje dhe përgjigje dhe sondazhe: teksti i pyetjes dhe emri i shfaqur i pyetësit (ose emri i përdoruesit Pi nëse nuk ka) janë të dukshme për çdo pjesëmarrës. Votat pozitive shfaqin vetëm numrin, kurrë kush i ka dhënë. Votat e sondazheve shfaqin vetëm numrin për pjesëmarrësit; organizatori dhe administratorët shohin, për çdo opsion, emrin e shfaqur (ose emrin e përdoruesit Pi nëse nuk ka) të çdo votuesi. Ruhet, duke përfshirë pyetjet e fshehura, derisa seminari të fshihet."
+    ],
+    "recTitle": "Regjistrimi",
+    "rec": "Regjistrimet ruhen vetëm si skedar në pajisjen e prezantuesit. Ato nuk ngarkohen në serverët tanë ose nuk transferohen jashtë vendit. Ndërsa regjistrimi ose shënimet AI janë aktive, çdo pjesëmarrës sheh një tregues.",
+    "rightsTitle": "Të drejtat tuaja",
+    "rights": "Mund të kërkoni të aksesoni, korrigjoni, fshini ose ndaloni përpunimin e informacionit tuaj. Kontakt: [TBD: emri dhe kontakti i oficerit të privatësisë]"
+  },
+  "notes": {
+    "title": "Shënime",
+    "back": "Kthehu te seminari",
+    "loading": "Po ngarkohet…",
+    "meta": "Shënime · {date} · {min} min",
+    "aiWarn": "Përmbledhje e gjeneruar nga AI — mund të përmbajë gabime",
+    "points": "Pikat kryesore",
+    "decisions": "Vendimet",
+    "todos": "Artikujt e veprimit",
+    "shots": "Kapje ekrani ({n})",
+    "transcript": "Transkripti",
+    "download": "Shkarko Markdown",
+    "making": "Po krijohen shënimet…",
+    "makingLong": "Kjo po zgjat pak. Ju lutemi rifreskoni më vonë",
+    "recording": "Ende po regjistrohet",
+    "failed": "Nuk mund të krijohej përmbledhja — transkripti i plotë është më poshtë",
+    "retry": "Provo përsëri",
+    "finish": "Përfundo regjistrimin dhe përmblidh",
+    "none": "Asgjë këtu",
+    "blank": "Asgjë për të përmbledhur — nuk u regjistrua asnjë fjalim ose ishte shumë i shkurtër",
+    "notFound": "Shënimet nuk u gjetën",
+    "forbidden": "Nuk keni akses në këto shënime",
+    "shotAlt": "Kapje ekrani në {at}",
+    "close": "Mbyll",
+    "view": "Shiko shënimet",
+    "error": "Nuk mund të ngarkohej",
+    "mine": "Shënimet e mia",
+    "del": "Fshi shënimet",
+    "delAsk": "Fshi këto shënime (përmbledhje, transkript dhe kapje ekrani)? Askush nuk do të mund t'i shohë",
+    "delYes": "Fshi",
+    "delNo": "Anulo",
+    "delFail": "Nuk mund të fshihej",
+    "dlFail": "Nuk mund të shkarkohej — ju lutemi provoni përsëri",
+    "recentNotes": "Shënimet e fundit",
+    "empty": "Ende nuk ka shënime",
+    "newNote": "Fillo shënimet personale",
+    "inPerson": "Shënime takimi personal",
+    "inPersonTag": "Personal",
+    "titleLabel": "Titulli",
+    "titlePh": "p.sh. Takimi javor",
+    "told": "Kam njoftuar të gjithë të pranishmit se kjo do të regjistrohet dhe përpunohet nga AI (e detyrueshme)",
+    "toldWhy": "Para se të filloni, njoftoni të gjithë të pranishmit se kjo bisedë do të regjistrohet (regjistrimi ruhet për 1 ditë pasi të përfundojë shënimi, dhe folësit dallohen nga zëri dhe etiketohen sipas gjinisë së perceptuar) dhe do të shndërrohet në tekst dhe një përmbledhje nga një AI e jashtme",
+    "start": "Fillo regjistrimin",
+    "starting": "Po përgatitet…",
+    "recBadge": "Po regjistrohet {time}",
+    "recentLines": "Linjat e fundit",
+    "waiting": "Teksti shfaqet këtu ndërsa njerëzit flasin",
+    "end": "Përfundo dhe krijo shënime",
+    "wakeWarn": "Regjistrimi mund të ndalojë nëse ekrani fiket",
+    "adminOnly": "Vetëm administratorët mund ta përdorin këtë",
+    "aiOff": "Shënimet AI nuk janë të disponueshme tani (nevojitet konfigurimi i serverit). Shënimet e kaluara janë renditur më poshtë",
+    "reload": "Rifresko",
+    "unsupported": "Regjistrimi nuk është i disponueshëm në këtë pajisje",
+    "micDenied": "Nuk mund të përdoret mikrofoni — kontrolloni lejen",
+    "limited": "Kufiri i kohës së përpunimit është shpenzuar — përfundo dhe krijo shënimet",
+    "noAgr": "Ndaloi: nuk ka konfirmim njoftimi në regjistrim — përfundo dhe fillo përsëri",
+    "micLost": "Mikrofoni u shkëput dhe regjistrimi u ndal — prek Rikonekt mikrofoni ose përfundo shënimin",
+    "micRetry": "Rikonekt mikrofoni",
+    "gone": "Ky shënim u përfundua ose u fshi diku tjetër, kështu që regjistrimi u ndal — përdor butonin më poshtë për të hapur shënimet",
+    "finishing": "Duke ruajtur fjalët e fundit…",
+    "st": {
+      "RECORDING": "Duke regjistruar",
+      "SUMMARIZING": "Duke krijuar",
+      "DONE": "U krye",
+      "FAILED": "Dështoi"
+    },
+    "downloadPiBrowser": "Shkarkimi i Markdown funksionon vetëm në një shfletues të rregullt (kompjuter ose celular). Pi Browser nuk mund të ruajë skedarë — hapni këto shënime në një shfletues kompjuteri ose telefoni (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Plane",
+    "loading": "Duke u ngarkuar…",
+    "free": "Falas",
+    "freeDesc": "{time} seminare çdo muaj (nuk transferohet)",
+    "monthly": "Mujore",
+    "yearly": "Vjetore",
+    "paidDesc": "{time} seminare, të vlefshme për {months} muaj",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Duke kontrolluar çmimin e Pi",
+    "noAi": "Pa titra AI, përkthim, dublim ose përmbledhje shënimesh",
+    "withAi": "Përfshin titra AI, përkthim, dublim dhe përmbledhje shënimesh",
+    "buy": "Paguaj me Pi",
+    "bought": "Pagesa u krye. Koha e seminarit është shtuar.",
+    "meRemain": "Koha e mbetur: {time}",
+    "loginToBuy": "Identifikohu për të blerë një plan.",
+    "payNote": "Pagesa bëhet gjithmonë në Pi. Shuma në monedhën lokale është vetëm një referencë e njohur; shuma e Pi vendoset sipas çmimit të Pi në momentin e pagesës. Një seminar në një plan me pagesë përdor së pari kalimet e atij plani (ato që skadojnë më herët), pastaj vazhdon me kohën falas të këtij muaji.",
+    "charge": "Rimbush kohën",
+    "hm": "{h} orë {m} min",
+    "m": "{m} min",
+    "won": "KRW {n}",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (duke kontrolluar çmimin e Pi)",
+    "h": "{h} orë"
+  },
+  "adminRooms": {
+    "title": "Menaxhimi i dhomës",
+    "adminOnly": "Vetëm administratorët mund ta shohin këtë faqe.",
+    "refresh": "Rifresko",
+    "count": "{n} dhoma të hapura",
+    "empty": "Nuk ka dhoma të hapura tani.",
+    "lab": "Dhoma e laboratorit",
+    "noSeminar": "Nuk ka regjistrim seminari",
+    "peers": "{n} / {cap} të lidhur",
+    "producers": "{n} transmetime",
+    "end": "Mbaron {time}",
+    "stale": "Seminari ka përfunduar, por dhoma është ende e hapur në serverin e videos — mbylleni me forcë.",
+    "close": "Mbyll me forcë",
+    "confirmSeminar": "Kjo përfundon seminarin dhe mbyll dhomën. Të gjithë do të shkëputen.",
+    "confirmRoom": "Kjo mbyll dhomën. Të gjithë do të shkëputen.",
+    "confirmYes": "Mbyll",
+    "cancel": "Anulo",
+    "closing": "Duke u mbyllur…",
+    "closed": "Dhoma u mbyll.",
+    "metrics": "Metrikat e serverit të videos (që nga fillimi)",
+    "metricsOff": "Nuk mund të ngarkoheshin metrikat.",
+    "m": {
+      "packetsIn": "Paketa hyrëse",
+      "packetsOut": "Paketa dalëse",
+      "nackIn": "NACK të marra",
+      "nackOut": "NACK të dërguara",
+      "retransmits": "Ritransmetime",
+      "duplicateNack": "NACK të dyfishta",
+      "cacheMiss": "Mungesa e cache-it të ritransmetimit",
+      "pliOut": "Kërkesa për kornizë kyçe (PLI)",
+      "keyframes": "Korniza kyçe",
+      "layerSwitches": "Ndryshime cilësie",
+      "queueDrops": "Rënie në radhë"
+    }
+  },
+  "adminUsers": {
+    "title": "Përdoruesit",
+    "adminOnly": "Vetëm administratorët mund ta shohin këtë faqe.",
+    "search": "Kërko sipas emrit (2+ karaktere)",
+    "searchBtn": "Kërko",
+    "refresh": "Rifresko",
+    "count": "{n, plural, one {# përdorues} other {# përdorues}}",
+    "empty": "Nuk ka përdorues.",
+    "admin": "Administrator",
+    "lastLogin": "Hyrja e fundit {time}",
+    "never": "Asnjëherë nuk është identifikuar",
+    "plan": {
+      "FREE": "Falas",
+      "M": "Mujore",
+      "Y": "Vjetore"
+    },
+    "until": "(deri në {time})",
+    "manage": "Menaxho kohën",
+    "close": "Mbyll",
+    "planLabel": "Plani",
+    "hours": "Orë",
+    "minutes": "Minuta",
+    "reason": "Arsyeja (opsionale)",
+    "sub": "Redukto",
+    "confirmSub": "Redukto kohën e {plan} me {time}.",
+    "confirmYes": "Konfirmo",
+    "cancel": "Anulo",
+    "saving": "Duke ruajtur…",
+    "done": "U aplikua. Koha e mbetur e {plan}: {time}",
+    "invalid": "Futni një reduktim midis 1 minute dhe 1000 orëve (minuta të plota 0–59).",
+    "history": "Rregullimet e fundit",
+    "noHistory": "Nuk ka rregullime ende.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Jepni një kalim shërbimi (kohë falas)",
+    "svc": {
+      "H1": "Kalim 1-orësh",
+      "D1": "Kalim 1-ditor",
+      "M1": "Kalim 1-mujor"
+    },
+    "svcNote": "Kalimet e shërbimit janë kohë e planit Falas. Ato mund të përdoren nga tani për atë periudhë (1 orë, 24 orë, 1 muaj) në seminare falas dhe në pjesën falas të seminareve me pagesë (pa funksione AI). Me disa kalime, ato përdoren automatikisht në rendin 1-orësh → 1-ditor → 1-mujor.",
+    "subTitle": "Redukto kohën",
+    "subNote": "Merr nga kalimet që skadojnë më vonë së pari. Nëse kjo është më shumë se ajo që mbetet, hiqet vetëm koha e mbetur.",
+    "confirmSvc": "Jepni një {svc}.",
+    "doneSvc": "Dha një {svc}. Koha e mbetur falas: {time} (kalimi skadon {end})"
+  }
+}

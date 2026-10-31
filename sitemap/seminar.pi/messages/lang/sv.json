@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Liveseminarier du deltar i med Pi"
+  },
+  "home": {
+    "description": "Värdar öppnar seminarier, och deltagare ansluter till livevideosessioner med Pi.",
+    "badge": "Liveseminarier på vackra öar",
+    "headline": "Titta, lyssna och lär tillsammans — live",
+    "ctaBrowse": "Bläddra bland seminarier",
+    "ctaPlan": "Se planer",
+    "features": {
+      "video": "Livevideo",
+      "caption": "Undertexter & översättning",
+      "notes": "AI-mötesanteckningar",
+      "pay": "Betala med Pi"
+    },
+    "listTitle": "Seminarier",
+    "cal": {
+      "title": "Seminarkalender",
+      "desc": "Från tidigare seminarier till kommande — tryck på ett datum för detaljer.",
+      "legendSmn": "Seminarier",
+      "legendEnded": "Tidigare seminarier",
+      "legendMine": "Mina evenemang",
+      "failed": "Kunde inte ladda seminariedatum. Försök igen senare.",
+      "open": "Visa detaljer"
+    }
+  },
+  "nav": {
+    "link": "Länka konto",
+    "privacy": "Integritetspolicy",
+    "plan": "Planer",
+    "rooms": "Rum",
+    "admin": "Admin",
+    "users": "Användare",
+    "home": "Hem",
+    "privacyShort": "Integritet",
+    "menu": "Huvudmeny",
+    "fold": "Fäll ihop meny",
+    "unfold": "Fäll ut meny"
+  },
+  "auth": {
+    "checking": "Kontrollerar inloggning…",
+    "signedIn": "{name}",
+    "inPerson": "Personliga anteckningar",
+    "required": "Logga in med ditt Pi-konto.",
+    "signIn": "Logga in med Pi",
+    "openInPiBrowser": "Öppna denna sida i Pi Browser för att logga in med ditt Pi-konto.",
+    "authenticating": "Loggar in…",
+    "google": "Logga in med Google",
+    "signOut": "Logga ut",
+    "or": "eller",
+    "linkRequired": "Du är inloggad med Google, men det är inte länkat till ett Pi-konto än. Utfärda en länk-kod i Pi Browser och ange den här.",
+    "linkNeeded": "Länka Pi-konto",
+    "linkCheckFailed": "Kunde inte kontrollera din kontolänkstatus (tillfälligt serverfel). Uppdatera om en stund."
+  },
+  "piOAuth": {
+    "signingIn": "Loggar in med ditt Pi-konto…",
+    "failed": "Pi-inloggning misslyckades. Försök igen.",
+    "stateMismatch": "Kunde inte verifiera denna inloggningsförfrågan (utgången eller annan flik). Försök igen.",
+    "retry": "Försök igen",
+    "backHome": "Hem"
+  },
+  "link": {
+    "title": "Länka konto",
+    "intro": "Anslut kontot du loggade in med i Pi Browser till Google-inloggning i en vanlig webbläsare. Efter länkning kan du använda samma konto på en PC-webbläsare.",
+    "checking": "Kontrollerar inloggning…",
+    "piIssueTitle": "För att logga in från en vanlig webbläsare också",
+    "codeHint": "Utfärda koden nedan, logga sedan in med Google i en PC-webbläsare och ange den på sidan Länka konto (inom 10 minuter).",
+    "piIssue": "Utfärda länk-kod",
+    "reissue": "Utfärda en ny kod",
+    "expiresIn": "Går ut om {min} min",
+    "enterTitle": "Ange länk-kod",
+    "enterHint": "I Pi Browser öppnar du seminar.pi → Länka konto → Utfärda länk-kod, ange sedan den 6-siffriga koden.",
+    "codeLabel": "Länk-kod",
+    "submit": "Länka",
+    "done": "Länkat. Du kan nu även använda Google-inloggning.",
+    "linked": "{name} är länkat till Google-inloggning."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Inloggning krävs",
+    "AUTH_PI_REQUIRED": "Pi-inloggning krävs",
+    "AUTH_PI_SESSION_INVALID": "Din session har gått ut. Logga in igen",
+    "AUTH_PI_TOKEN_INVALID": "Pi-inloggningsverifiering misslyckades",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Pi-inloggningsinformation saknas",
+    "FORBIDDEN": "Du har inte behörighet",
+    "BAD_REQUEST": "Felaktig förfrågan",
+    "BAD_REQUEST_BODY": "Felaktig förfrågan",
+    "INVALID_INPUT": "Ogiltig inmatning",
+    "QUERY_FAILED": "Kunde inte ladda",
+    "SAVE_FAILED": "Kunde inte spara",
+    "INTERNAL": "Något gick fel",
+    "SERVER_CONFIG": "Serverkonfigurationsfel. Kontakta operatören",
+    "PI_API_CONNECT_FAILED": "Kunde inte nå Pi Network",
+    "DB_UNAVAILABLE": "Data är tillfälligt otillgänglig. Försök igen senare",
+    "NOT_FOUND": "Hittades inte",
+    "RATE_LIMITED": "För många förfrågningar. Försök igen snart",
+    "PAYLOAD_TOO_LARGE": "Förfrågan är för stor",
+    "NETWORK": "Kontrollera din nätverksanslutning",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Detta Pi-användarnamn är redan registrerat med andra uppgifter. Kontakta administratören",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Detta konto är inaktivt. Kontakta administratören",
+    "AUTH_GOOGLE_REQUIRED": "Google-inloggning krävs.",
+    "LINK_CODE_INVALID": "Länk-koden är ogiltig eller har gått ut. Utfärda en ny i Pi Browser.",
+    "LINK_ALREADY_LINKED": "Detta konto är redan länkat.",
+    "LINK_CODE_GEN_FAILED": "Kunde inte skapa en länk-kod. Försök igen senare.",
+    "AUTH_DB_UNAVAILABLE": "Kunde inte spara ditt konto, så inloggningen misslyckades. Försök igen senare.",
+    "LINK_TRY_LIMIT": "För många felaktiga länk-koder. Försök igen om 15 minuter.",
+    "PRICE_UNAVAILABLE": "Kunde inte hämta Pi-priset. Försök igen snart",
+    "QUOTE_EXPIRED": "Betalningskvoten har gått ut. Betala igen",
+    "PLAN_EXHAUSTED": "Du har använt all din seminarietid. Fyll på på sidan Planer",
+    "HOST_AWAY": "Värden är inte i rummet. Du kan komma in efter att värden har anslutit",
+    "PLAN_AI_PAID": "AI-funktioner är tillgängliga på betalda planer",
+    "AI_UNAVAILABLE": "AI-funktioner är inte tillgängliga just nu",
+    "SPEECH_CHUNK_INVALID": "Ljudbitformatet är ogiltigt",
+    "SPEECH_NOT_LIVE": "Detta seminarium är inte live",
+    "SPEECH_NO_AGR": "Samtycke till röstbehandling krävs",
+    "SPEECH_RATE": "För många röstförfrågningar. Försök igen snart",
+    "SPEECH_QUOTA": "Röstbehandlingstiden för detta seminarium är slut",
+    "SPEECH_USR_QUOTA": "Du har använt upp din gräns för översättning och översatt röst för detta seminarium",
+    "SPEECH_FAILED": "Kunde inte konvertera tal till text",
+    "SPEECH_STAGE_ONLY": "Endast personer på scenen kan använda röstundertexter",
+    "TRANSLATE_FAILED": "Kunde inte översätta undertexten",
+    "POLL_CLOSED": "Denna omröstning är stängd",
+    "NOTE_NOT_RECORDING": "Dessa anteckningar spelas inte in",
+    "NOTE_SHOT_INVALID": "Ogiltig skärmdump",
+    "NOTE_AUDIO_INVALID": "Ogiltig inspelningsfil",
+    "NOTE_SHOT_RATE": "För många skärmdumpar",
+    "NOTE_RETRY_SOON": "Du kan försöka igen om en minut",
+    "SPEECH_TTS_FAILED": "Kunde inte skapa den översatta rösten",
+    "CAPTION_SIG_INVALID": "Denna undertext kunde inte verifieras, så den översattes inte",
+    "PLAN_EXPIRES_BEFORE_START": "Starttiden är efter att denna plans pass går ut",
+    "PAY_ALREADY_PAID": "En betalning behandlas fortfarande. Om du loggade in i plånboken, försök igen om 3 minuter.",
+    "REC_PAID_ONLY": "Inspelning är endast tillgänglig i månads- eller årsplanseminarier med betald tid kvar",
+    "REC_NOT_IN_ROOM": "Bekräftar fortfarande att du är i rummet. Försök igen om en stund",
+    "ENGINE_OFF": "Videoserverns administratörsnyckel är inte konfigurerad",
+    "ENGINE_UNAVAILABLE": "Videoservern svarar inte. Försök igen snart",
+    "ADJ_NOTHING": "Det finns ingen återstående tid att minska"
+  },
+  "progress": {
+    "title": "Byggförlopp",
+    "subtitle": "Klart, pågående och planerat, per funktion · per {date}",
+    "overall": "Övergripande steg",
+    "stepsDone": "{done}/{total} steg klara ({pct}%)",
+    "featureUnit": "funktioner",
+    "status": {
+      "done": "Klart",
+      "doing": "Pågående",
+      "todo": "Planerat",
+      "drop": "Släppt"
+    },
+    "features": {
+      "F01": {
+        "name": "Inloggning",
+        "desc": "Pi Browser-inloggning, Google-inloggning i andra webbläsare och länkning av båda kontona"
+      },
+      "F05": {
+        "name": "Live videoseminarium",
+        "desc": "Vår egen videomotor Galápagos — målet är en presentatör som streamar till upp till 30 deltagare"
+      },
+      "F02": {
+        "name": "Skapa ett seminarium",
+        "desc": "Ange undertitel, tid, kapacitet och seminarieavgift för att skapa ett seminarium (namn = ö, automatiskt)"
+      },
+      "F03": {
+        "name": "Seminarielista och detaljer",
+        "desc": "Bläddra bland öppna seminarier sida för sida och se deras detaljer"
+      },
+      "F04": {
+        "name": "Pi inträdesbetalning",
+        "desc": "Betala seminarieavgiften i Pi; servern kontrollerar beloppet igen innan du släpps in"
+      },
+      "F06": {
+        "name": "Värdutbetalningar",
+        "desc": "Betala inträdesavgiftsintäkter till värdar i Pi"
+      },
+      "F07": {
+        "name": "Reprisförfrågningar",
+        "desc": "Titta på inspelade seminarier senare"
+      },
+      "FU": {
+        "name": "Grund för mötestillägg",
+        "desc": "En signalkanal för tillägg, AI-anslutning, röstbitar, mikrofonmedgivande och datatabeller"
+      },
+      "F08": {
+        "name": "Schema och delning",
+        "desc": "Kalenderlänk, evenemangsfil (.ics) och e-postinbjudan för varje seminarium"
+      },
+      "F09": {
+        "name": "Brusreducering och belysning",
+        "desc": "Minska mikrofonbrus och ljusa upp mörk kameravideo"
+      },
+      "F10": {
+        "name": "Liveundertexter",
+        "desc": "Omvandla presentatörens tal till text under scenen"
+      },
+      "F11": {
+        "name": "Omröstningar, Q&A och närvaro",
+        "desc": "Kör omröstningar och frågor under ett seminarium; värdar laddar ner närvarolistan"
+      },
+      "F12": {
+        "name": "Bakgrundseffekter",
+        "desc": "Suddiga din bakgrund eller ersätt den med en förinställd eller din egen bild (bearbetas på din enhet)"
+      },
+      "F13": {
+        "name": "Lokal inspelning",
+        "desc": "Presentatören spelar in seminariet på sin egen enhet och alla ser att inspelning pågår"
+      },
+      "F14": {
+        "name": "AI-mötesanteckningar",
+        "desc": "När presentatören slår på det spelas tal och skärmar in och sammanfattas till nyckelpunkter, beslut och att-göra-listor"
+      },
+      "F15": {
+        "name": "Personliga mötesanteckningar",
+        "desc": "Spela in ett möte med endast en mikrofon och få mötesanteckningar (administratörer)"
+      },
+      "F16": {
+        "name": "Översatta undertexter",
+        "desc": "Visa undertexter översatta till det språk du väljer"
+      },
+      "F17": {
+        "name": "Lyssna på översättning",
+        "desc": "Läs översatta undertexter högt med en syntetisk röst samtidigt som originalljudet sänks"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser-inloggning",
+      "googleLogin": "Google-inloggning",
+      "accountLink": "Kontolänkning",
+      "deviceTest": "Test av kameraenhet",
+      "oneToTwo": "Presentatör 1 → 2 deltagare",
+      "recovery": "Frysåterställning och stabilitet",
+      "structure": "Rengöring av motorstruktur",
+      "autoQuality": "Automatisk kvalitet, 30 deltagare",
+      "roomService": "Rumsinmatning och inspelning",
+      "roomUi": "Rumsskärm (lobby·scen·chatt·räck upp handen·moderering)",
+      "createForm": "Skapa skärm",
+      "list": "Lista",
+      "detail": "Detaljer",
+      "payRequest": "Betalningsförfrågan",
+      "payVerify": "Beloppskontroll och inträde",
+      "settle": "Utbetalning",
+      "vod": "Inspelning av repris",
+      "appRelay": "Motor tilläggssignalkanal",
+      "aiBase": "AI, röstbitar, samtycke och datatabeller",
+      "shareLinks": "Kalenderlänk, .ics och e-postinbjudan",
+      "noiseLight": "Brusreducering och belysning",
+      "liveCaptions": "Liveundertexter",
+      "pollQnaAttend": "Omröstningar, Q&A och närvarolista",
+      "backgrounds": "Suddig, förinställda och egen bild",
+      "localRecording": "Presentatörsinspelning och inspelningsmärke",
+      "aiNotes": "Inspelning, sammanfattning och anteckningssida",
+      "inPersonNotes": "Endast mikrofonanteckningar och mina anteckningar",
+      "captionTranslate": "Språkval och original/översatt växling",
+      "dubbing": "Syntetisk röstuppspelning och sänkt originalljud"
+    },
+    "refLabel": "Referensmodell",
+    "uiRef": "UI-baslinje — skärm- och funktionsmönster för en allmänt använd webbvideomötesapp, anpassad för seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Namnet sparades, men andra kunde inte meddelas nu. De kommer att se det efter att du har återanslutit.",
+      "tile": "Klicka för att ändra mitt namn",
+      "menu": "Ändra mitt namn",
+      "title": "Mitt namn i detta seminarium",
+      "hint": "Upp till 30 tecken. Används endast i detta seminarium och uppdateras omedelbart på allas skärm.",
+      "save": "Spara",
+      "saving": "Sparar…",
+      "cancel": "Avbryt",
+      "taken": "Det namnet används redan av någon annan (värd eller deltagare). Välj ett annat.",
+      "failed": "Kunde inte spara ditt namn. Försök igen."
+    },
+    "roomTitle": {
+      "edit": "Klicka för att redigera undertiteln",
+      "label": "Undertitel",
+      "placeholder": "Undertitel (upp till 60)",
+      "save": "Spara",
+      "cancel": "Avbryt",
+      "failed": "Kunde inte spara undertiteln."
+    },
+    "mirror": "Spegelvänd min video",
+    "barPin": "Visa alltid nedre fältet",
+    "barAuto": "Dölj nedre fältet automatiskt",
+    "title": "Gå med i seminarium · {room}",
+    "titleSeminar": "Väntrum",
+    "noEngine": "Videoservern är inte redo än.",
+    "joinAs": "Gå med som",
+    "presenter": "Presentatör",
+    "audience": "Publik",
+    "join": "Gå med nu",
+    "nameLabel": "Namn",
+    "audienceHint": "Publikmedlemmar använder inte kamera eller mikrofon. Efter att du har anslutit kommer du att se och höra presentatören.",
+    "preview": {
+      "pending": "Förbereder kamera och mikrofon…",
+      "audioOnly": "Kamera otillgänglig — skickar endast ljud.",
+      "none": "Kamera och mikrofon otillgängliga. Kontrollera behörigheter (du kan fortfarande ansluta utan media).",
+      "videoOnly": "Mikrofon otillgänglig — skickar endast video. Kontrollera mikrofonbehörighet."
+    },
+    "mic": {
+      "on": "Stäng av mikrofon",
+      "off": "Slå på mikrofon"
+    },
+    "cam": {
+      "on": "Stäng av kamera",
+      "off": "Slå på kamera"
+    },
+    "controls": "Samtalskontroller",
+    "leave": "Lämna",
+    "enableSound": "Aktivera ljud",
+    "state": {
+      "connecting": "Ansluter…",
+      "reconnecting": "Återansluter…"
+    },
+    "waiting": "Väntar på presentatören.",
+    "rejoin": "Gå med igen",
+    "err": {
+      "generic": "Något gick fel. Vänligen anslut igen.",
+      "CLOSED": "Anslutningen bröts.",
+      "NO_ENGINE": "Videoservern är inte redo än.",
+      "TICKET_401": "Vänligen logga in.",
+      "TICKET_403": "Du har inte behörighet att presentera. Gå med som publik.",
+      "TICKET_503": "Videoservern är inte konfigurerad än.",
+      "TICKET_NETWORK": "Kontrollera din nätverksanslutning.",
+      "TICKET_INVALID": "Ditt inträdespass har gått ut.",
+      "TICKET_EXPIRED": "Ditt inträdespass har gått ut.",
+      "ROOM_FULL": "Detta seminarie är fullt.",
+      "ROOM_CLOSED": "Rummet stängdes – seminariet avslutades eller värden var borta i mer än 5 minuter.",
+      "DUPLICATE_SESSION": "Du anslöt från en annan enhet, så den här skärmen kopplades bort.",
+      "ROLE_FORBIDDEN": "Du har inte behörighet att presentera.",
+      "WS_FAILED": "Kunde inte ansluta till videoservern.",
+      "ICE_FAILED": "Videouppkopplingen bröts. Kontrollera ditt nätverk.",
+      "MEDIA_FAILED": "Kunde inte starta kamera eller mikrofon.",
+      "TIMEOUT": "Videoservern svarar inte.",
+      "TICKET_402": "Detta är ett betalt seminarie. Betala på seminariesidan innan du går in.",
+      "TICKET_404": "Seminariet hittades inte.",
+      "TICKET_409": "Detta seminarie har avslutats eller avbrutits.",
+      "TICKET_HOST_AWAY": "Värden har inte anslutit än eller har varit borta i mer än 5 minuter, så du kan inte komma in. Försök igen efter att värden har anslutit.",
+      "TICKET_PLAN_EXHAUSTED": "Denna seminars plan har ingen tid kvar, så den kan inte starta. Att köpa samma plan igen lägger till tid (Gratis förnyas med 1 timme nästa månad)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Kunde inte ändra mikrofonen. Försök igen.",
+        "video": "Kunde inte ändra kameran. Försök igen."
+      },
+      "forbidden": "Du har inte behörighet att presentera, så du fortsätter som åhörare.",
+      "demoted": "Du flyttades tillbaka till publiken.",
+      "endFailed": "Kunde inte avsluta seminariet. Försök igen.",
+      "chatFailed": "Meddelandet skickades inte.",
+      "actionFailed": "Kunde inte slutföra begäran. Försök igen.",
+      "shareFailed": "Kunde inte starta skärmdelning.",
+      "err": {
+        "RATE_LIMITED": "Du skickar för snabbt. Vänta ett ögonblick.",
+        "ROLE_FORBIDDEN": "Du har inte behörighet att göra detta.",
+        "MEDIA_FAILED": "Kunde inte starta din mikrofon eller kamera. Kontrollera behörigheter.",
+        "LOCKED": "Låst av presentatören."
+      },
+      "mutedBy": {
+        "audio": "Presentatören stängde av din mikrofon.",
+        "video": "Presentatören stängde av din kamera."
+      },
+      "policy": {
+        "locked": "Presentatören låste mikrofonerna. Du kan slå på din när de är upplåsta.",
+        "unlocked": "Mikrofonerna är upplåsta."
+      },
+      "consent": {
+        "saveFail": "Kunde inte spara ditt samtycke. Kontrollera din registrering och slå på mikrofonen igen."
+      }
+    },
+    "home": "Gå till startsidan",
+    "tile": {
+      "fullscreen": "Dubbelklicka för helskärm · Esc för att avsluta",
+      "self": "{name} (du)",
+      "presenter": "Presentatör",
+      "micOff": "Mikrofon av",
+      "screen": "{name}s skärm",
+      "row": "Andra talare",
+      "pin": "Visa {name} stor",
+      "unpin": "Automatisk layout"
+    },
+    "more": "Fler alternativ",
+    "joinNoCam": "Gå med utan kamera",
+    "net": {
+      "afterJoin": "Din anslutning kontrolleras automatiskt efter att du har anslutit.",
+      "measuring": "Kontrollerar anslutning…",
+      "good": "Bra anslutning",
+      "fair": "Måttlig anslutning",
+      "poor": "Dålig anslutning",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% av ljuddata går förlorad.",
+          "video": "{pct}% av videodata går förlorad."
+        },
+        "rate": {
+          "audio": "Ljuduppladdningen är låg med {kbps} kbps.",
+          "video": "Videouppladdningen är låg med {kbps} kbps. Kvaliteten kan försämras."
+        }
+      }
+    },
+    "people": "{n} i rummet",
+    "screen": {
+      "start": "Dela skärm",
+      "stop": "Sluta dela"
+    },
+    "panel": {
+      "title": "Chatt · Frågor och svar · Omröstningar · Personer",
+      "chat": "Chatt",
+      "people": "Personer",
+      "close": "Stäng panel",
+      "qna": "Frågor och svar",
+      "polls": "Omröstningar"
+    },
+    "chat": {
+      "empty": "Inga meddelanden än. Chatten sparas inte.",
+      "me": "Du",
+      "failed": "Skickades inte.",
+      "retry": "Försök igen",
+      "input": "Skriv ett meddelande",
+      "send": "Skicka"
+    },
+    "hand": {
+      "raise": "Räck upp handen",
+      "lower": "Sänk handen",
+      "list": "Uppräckta händer",
+      "lowerAll": "Sänk alla händer",
+      "raised": "Handen uppräckt",
+      "notice": "{name} räckte upp en hand.",
+      "dismiss": "Avfärda",
+      "waiting": "{n} personer väntar på att tala"
+    },
+    "react": {
+      "open": "Reaktioner",
+      "e0": "Gilla",
+      "e1": "Klappa",
+      "e2": "Skratta",
+      "e3": "Förvånad",
+      "e4": "Ledsen",
+      "e5": "Mållös",
+      "e6": "Kärlek"
+    },
+    "quality": {
+      "label": "Kvalitet",
+      "auto": "Auto",
+      "high": "Hög",
+      "medium": "Medel",
+      "low": "Låg",
+      "unstable": "Ditt nätverk är instabilt"
+    },
+    "roles": {
+      "presenter": "Presentatör",
+      "panel": "Panelist",
+      "audience": "Publik"
+    },
+    "stage": {
+      "invite": "Bjud in till scenen",
+      "remove": "Flytta till publiken",
+      "promoted": "Du blev inbjuden till scenen. Om du räckte upp handen slås din kamera på automatiskt (om den inte är låst eller inte tillåten). Slå på din mikrofon för att tala (mikrofonen slås inte på automatiskt).",
+      "later": "Senare"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} räckte upp en hand."
+    },
+    "leaveDialog": {
+      "title": "Lämna seminariet",
+      "body": "Du kan lämna själv, eller avsluta seminariet och koppla bort alla.",
+      "confirmTitle": "Avsluta seminariet?",
+      "confirmBody": "Alla kommer att kopplas bort och ingen kan återansluta till detta seminarie.",
+      "cancel": "Avbryt",
+      "end": "Avsluta seminariet",
+      "endConfirm": "Avsluta nu"
+    },
+    "mod": {
+      "muteAll": "Stäng av allas mikrofoner",
+      "lock": "Lås mikrofoner",
+      "unlock": "Lås upp mikrofoner",
+      "locked": "Presentatören har låst mikrofonerna",
+      "muteMic": "Stäng av mikrofon",
+      "askMic": "Be att slå på mikrofon",
+      "muteCam": "Stäng av kamera",
+      "muteMicOf": "Stäng av {name}s mikrofon",
+      "askMicOf": "Be {name} att slå på mikrofon",
+      "muteCamOf": "Stäng av {name}s kamera"
+    },
+    "ask": {
+      "audio": "Presentatören bad dig att slå på din mikrofon.",
+      "video": "Presentatören bad dig att slå på din kamera.",
+      "ignore": "Ignorera"
+    },
+    "toDetail": "Gå till seminariesidan",
+    "consent": {
+      "title": "Innan du slår på din mikrofon",
+      "body": "Om inspelning, undertexter eller AI-mötesanteckningar är påslagna i detta seminarie, kan din röst omvandlas till text, lagras och översättas. Röstbehandling utförs av en AI-tjänst utanför ditt land. Om du inte samtycker, slås din mikrofon fortfarande på – endast din röst utelämnas från behandlingen.",
+      "privacy": "Integritetspolicy",
+      "newTab": "(öppnas i en ny flik)",
+      "decline": "Samtycker inte",
+      "agree": "Samtyck och slå på mikrofon",
+      "notice": "När inspelning, undertexter eller AI-mötesanteckningar är på, behandlas talarnas röster. Publikens röster skickas inte.",
+      "saveFailClosed": "Detta seminarie har avslutats, så samtycke kan inte registreras."
+    },
+    "captions": {
+      "title": "Undertexter",
+      "room": "Liveundertexter (hela rummet)",
+      "show": "Visa undertexter",
+      "size": {
+        "label": "Textstorlek",
+        "sm": "Liten",
+        "md": "Medel",
+        "lg": "Stor"
+      },
+      "waiting": "Undertexter visas när presentatören slår på dem.",
+      "limit": "Gränsen för talbehandling har nåtts, så undertexter och AI-minuter stoppades.",
+      "sendFail": "Kunde inte slå på undertexter. Försök igen snart.",
+      "sendFailOff": "Kunde inte stänga av undertexter. Försök igen snart.",
+      "region": "Undertexter",
+      "translate": "Visa översatta undertexter",
+      "lang": "Översättningsspråk",
+      "langMine": "Mina språk",
+      "langAll": "Alla språk",
+      "trStop": {
+        "forbidden": "Översatta undertexter är endast för registrerade deltagare. Visar originalet.",
+        "unavailable": "Översatta undertexter är inte tillgängliga just nu. Visar originalet.",
+        "quota": "Detta seminarie har nått sin översättningsgräns. Visar originalet.",
+        "usrQuota": "Du har använt upp din översättningsgräns för detta seminarie. Visar originalet."
+      },
+      "unsupported": "Denna enhet kan inte skapa liveundertexter (inget stöd för ljudinspelning i denna webbläsare)."
+    },
+    "effects": {
+      "title": "Effekter",
+      "light": "Ljuskorrigering",
+      "noise": "Minska brus",
+      "noiseFail": "Brusreducering kan inte ändras på denna enhet.",
+      "close": "Stäng",
+      "preview": "Min förhandsvisning",
+      "bg": "Bakgrund",
+      "bgNone": "Ingen",
+      "bgBlur": "Oskärpa",
+      "scenes": {
+        "beach": "🏝️ Maldivernas strand",
+        "autumn": "🍁 Höstdal",
+        "fireplace": "🔥 Öppen spis",
+        "xmas": "🎄 Julmötesrum"
+      },
+      "bgs": {
+        "dusk": "Skymning",
+        "ocean": "Hav",
+        "forest": "Skog",
+        "studio": "Studio",
+        "grid": "Rutnät",
+        "dots": "Prickar"
+      },
+      "myAdd": "Min bild",
+      "myItem": "Min bild {n}",
+      "myDel": "Ta bort min bild {n}",
+      "mySaveFail": "Bakgrunden är tillämpad men kunde inte sparas på denna enhet (endast detta möte).",
+      "bgStopped": "Bakgrundseffekten stoppades och stängdes av. Välj den igen för att starta om.",
+      "myNote": "Dina bilder lagras endast på denna enhet (upp till 3, 2 MB vardera).",
+      "mobileBlurOnly": "På telefoner är endast oskärpa bakgrund tillgänglig (bildbakgrunder fungerar på PC).",
+      "myTooBig": "Endast bilder upp till 2 MB kan användas.",
+      "preparing": "Förbereder…",
+      "bgFailed": "Kunde inte ladda bakgrundseffekten.",
+      "autoOff": "Din enhet är för långsam, så bakgrundseffekten stängdes av.",
+      "unsupported": "Bakgrundseffekter är inte tillgängliga på denna enhet.",
+      "noCam": "Slå på din kamera för att välja en bakgrund.",
+      "lightUnsupported": "Ljuskorrigering är inte tillgänglig på denna enhet.",
+      "noiseUnsupported": "Inställningar för brusreducering stöds inte på denna enhet."
+    },
+    "sheetClose": "Stäng",
+    "polls": {
+      "new": "Ny omröstning",
+      "question": "Fråga",
+      "option": "Alternativ {n}",
+      "remove": "Ta bort alternativ {n}",
+      "addOption": "Lägg till alternativ",
+      "start": "Starta omröstning",
+      "cancel": "Avbryt",
+      "dup": "Alternativen måste vara olika.",
+      "vote": "Rösta",
+      "change": "Ändra röst",
+      "close": "Stäng omröstning",
+      "closed": "Stängd",
+      "mine": "Ditt val",
+      "result": "{pct}% ({n} röster)",
+      "total": "Totalt {n} röster",
+      "empty": "Inga omröstningar än.",
+      "loading": "Laddar…",
+      "labOnly": "Omröstningar är endast tillgängliga i seminarierum.",
+      "started": "En ny omröstning har startat",
+      "goVote": "Rösta",
+      "votersNote": "Arrangören kan se vem som röstade på vilket alternativ.",
+      "voters": "Röstade: {names}"
+    },
+    "qna": {
+      "sort": "Sortera",
+      "by": {
+        "top": "Topp",
+        "new": "Nyast"
+      },
+      "rcm": "Upprösta ({n})",
+      "answered": "Besvarad",
+      "answer": "Markera som besvarad",
+      "unanswer": "Avmarkera som besvarad",
+      "hide": "Dölj",
+      "doneN": "{n} besvarade",
+      "backOpen": "Obesvarade frågor",
+      "empty": "Inga frågor än.",
+      "emptyDone": "Inga besvarade frågor.",
+      "loading": "Laddar…",
+      "input": "Ställ en fråga (500 tecken)",
+      "send": "Skicka",
+      "left": "{n} kvar",
+      "labOnly": "Frågor och svar är endast tillgängligt i seminarierum."
+    },
+    "recording": {
+      "title": "Spela in",
+      "badge": "Spelar in",
+      "unsupported": "Denna webbläsare kan inte spela in. Spela in från en vanlig webbläsare på en dator.",
+      "piBrowserOnly": "Inspelning fungerar endast i en vanlig webbläsare (dator eller mobil). Pi Browser kan inte spara inspelningsfiler – öppna detta seminarie i en dator- eller telefonwebbläsare (seminarz.vercel.app) för att spela in.",
+      "audioSuspended": "Ljudinspelning kanske inte har startat på denna enhet. Endast bilden kan spelas in.",
+      "notifyFailed": "Inspelningen startade inte eftersom deltagarna inte kunde meddelas. Försök igen snart.",
+      "confirm": {
+        "title": "Starta inspelning?",
+        "body": "När inspelningen startar kommer alla att se en 'Spelar in'-indikator. Filen sparas endast på denna enhet och laddas aldrig upp eller överförs utomlands. Berätta för deltagarna innan du börjar.",
+        "download": "När du stoppar sparas en MP4-fil i din nedladdningsmapp (webbläsare som inte kan spela in MP4 tar en stund att konvertera den; inspelningar längre än cirka 45 minuter kan behållas i sitt ursprungliga format). Webbläsare i appar kan blockera filsparande, så spela in från en vanlig webbläsare på en dator.",
+        "cancel": "Avbryt",
+        "start": "Starta inspelning",
+        "charge": "Under inspelning dras inspelningstid från din betalda tid utöver rumstiden (2x under inspelning). När den betalda tiden tar slut stoppas inspelningen och filen sparas."
+      },
+      "resave": {
+        "label": "Inspelningsfil",
+        "save": "Spara igen",
+        "dismiss": "Stäng spara igen"
+      },
+      "toast": {
+        "started": "Inspelning startade – alla kan se det.",
+        "saved": "Inspelning sparad. Kontrollera din nedladdningsmapp. Om inget sparades, tryck på [Spara igen] högst upp på skärmen.",
+        "autoStopped": "Inspelningen avslutades eftersom webbläsaren stoppade den eller storleksgränsen nåddes. Allt fram till dess sparades. Starta inspelningen igen för att fortsätta.",
+        "empty": "Inget spelades in, så ingen fil skapades.",
+        "saveFailed": "Kunde inte skapa inspelningsfilen.",
+        "converting": "Konverterar inspelningen till MP4. Håll detta fönster öppet.",
+        "savedOriginal": "Kunde inte konvertera till MP4, så inspelningen sparades i sitt ursprungliga format (webm). Kontrollera din nedladdningsmapp.",
+        "startedBy": "Presentatören startade inspelningen.",
+        "stoppedBy": "Presentatören stoppade inspelningen."
+      },
+      "paidOnly": "Inspelning är endast tillgänglig i seminarier som öppnats med en månads- eller årsplan, medan betald tid finns kvar.",
+      "planOut": "Betald tid tog slut, så inspelningen stoppades och filen sparades.",
+      "notInRoom": "Bekräftar fortfarande att du är i rummet. Starta inspelningen igen om en stund.",
+      "meterFailed": "Kunde inte kontrollera inspelningstiden, så inspelningen startade inte. Försök igen om en stund.",
+      "paidOut": "Ingen betald tid finns kvar, så inspelningen kan inte starta. Köp samma plan igen för att spela in.",
+      "pausedBadge": "Inspelning pausad",
+      "controls": "Inspelning kontroller",
+      "pause": "Pausa",
+      "resume": "Återuppta",
+      "stop": "Stoppa inspelning"
+    },
+    "notes": {
+      "on": "AI-anteckningar",
+      "badge": "AI-anteckningar på",
+      "started": "Presentatören slog på AI-anteckningar",
+      "stopped": "AI-anteckningar avstängda",
+      "startedMine": "AI-anteckningar på — visas för alla",
+      "stoppedMine": "AI-anteckningar avstängda — skapar anteckningarna",
+      "startFail": "Kunde inte starta AI-anteckningar",
+      "gone": "AI-anteckningar stoppades — anteckningarna avslutades eller raderades någon annanstans",
+      "unsupported": "AI-anteckningar kan inte slås på här (inget stöd för ljudinspelning)"
+    },
+    "dubbing": {
+      "listen": "Lyssna med översatt röst",
+      "blocked": "Kunde inte spela upp den översatta rösten. Vänligen slå på den igen",
+      "stopped": "Översatt röst är inte tillgänglig just nu, så den stängdes av",
+      "usrQuota": "Du har använt upp din gräns för översatt röst för detta seminar, så den stängdes av"
+    },
+    "plan": {
+      "warn": "{min} minuter kvar på detta seminars plan.",
+      "ended": "Din seminartid tog slut, så seminariet har avslutats och du lämnade rummet.",
+      "left": "Seminartid kvar",
+      "closed": "Seminariet har avslutats, så du lämnade rummet.",
+      "hostAway": "Värden har lämnat rummet. Om de inte återvänder inom 5 minuter kommer alla deltagare att tas bort.",
+      "hostGone": "Värden återvände inte inom 5 minuter, så du lämnade rummet. Du kan gå in igen när värden ansluter."
+    },
+    "toLobby": "Väntrum"
+  },
+  "list": {
+    "tabsLabel": "Seminarlisvy",
+    "tabs": {
+      "all": "Alla",
+      "hosted": "Jag är värd för",
+      "joined": "Jag har deltagit i"
+    },
+    "empty": {
+      "all": "Inga kommande seminarier.",
+      "hosted": "Du har inte varit värd för några seminarier.",
+      "joined": "Du har inte deltagit i några seminarier."
+    },
+    "loading": "Laddar…",
+    "retry": "Försök igen",
+    "free": "Gratis",
+    "fee": "{amount} Pi",
+    "host": "Värd {name}",
+    "capacity": "Kapacitet {n}",
+    "status": {
+      "SCHEDULED": "Schemalagd",
+      "LIVE": "Live",
+      "ENDED": "Avslutad",
+      "CANCELED": "Avbruten"
+    },
+    "hostNew": "Skapa ett seminar",
+    "progress": "Framsteg",
+    "pager": "Sidnumrering",
+    "prev": "Föregående",
+    "next": "Nästa",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Undertitel",
+      "placeholder": "Lägg till en undertitel",
+      "save": "Spara undertitel",
+      "saving": "Sparar…",
+      "saved": "Sparat."
+    },
+    "loading": "Laddar…",
+    "back": "Tillbaka till lista",
+    "notFound": "Seminar hittades inte.",
+    "status": {
+      "SCHEDULED": "Schemalagd",
+      "LIVE": "Live",
+      "ENDED": "Avslutad",
+      "CANCELED": "Avbruten"
+    },
+    "startAt": "Datum",
+    "host": "Värd",
+    "seats": "Platser kvar",
+    "seatsValue": "{left} / {max}",
+    "fee": "Seminaravgift",
+    "feeValue": "{amount} Pi",
+    "free": "Gratis",
+    "enter": "Gå in",
+    "payEnter": "Betala med Pi och gå in ({amount} Pi)",
+    "paying": "Behandlar betalning…",
+    "joining": "Registrerar…",
+    "registered": "Du är registrerad.",
+    "full": "Detta seminar är fullt.",
+    "closed": "Detta seminar har avslutats.",
+    "canceled": "Detta seminar avbröts.",
+    "roomLink": "Gå till rum (värd)",
+    "piBrowserOnly": "Betalning är tillgänglig i Pi Browser efter Pi-inloggning.",
+    "payCancelled": "Betalning avbruten.",
+    "payStillWaiting": "Väntar fortfarande på plånboken. Om du redan loggade in i Pi Wallet, vänligen vänta ett ögonblick.",
+    "payFailed": "Betalning misslyckades.",
+    "err": {
+      "NAME_TAKEN": "Det namnet används redan av någon annan. Välj ett annat.",
+      "CAL_READ_FAILED": "Kunde inte ladda dina händelser. Kontrollera adressen.",
+      "ISLAND_FULL": "Alla 100 önamn används just nu. Du kan öppna ett nytt seminar efter att ett kommande eller live-seminar avslutas eller avbryts.",
+      "SMN_FULL": "Detta seminar är fullt.",
+      "SMN_CLOSED": "Detta seminar har avslutats eller avbrutits.",
+      "SMN_ALREADY": "Du är redan registrerad eller en betalning pågår.",
+      "SMN_FREE": "Gratis seminarier tar inte betalt.",
+      "SMN_PAY_REQUIRED": "Detta är ett betalt seminar. Vänligen betala för att komma in.",
+      "SMN_PAY_INVALID": "Vi kunde inte verifiera din betalning. Vänligen kontakta administratören.",
+      "PAY_PI_FAILED": "Kunde inte nå Pi-betalningsservern. Vänligen försök igen snart.",
+      "PAY_MISMATCH": "Betalningsuppgifterna stämmer inte överens.",
+      "PAY_AMOUNT_MISMATCH": "Betalningsbeloppet skiljer sig från seminaravgiften.",
+      "PAY_CANCELLED": "Denna betalning avbröts.",
+      "PAY_ALREADY_PAID": "En betalning behandlas fortfarande. Om du loggade in i plånboken, försök igen om 3 minuter.",
+      "PAY_INVALID_STATE": "Denna betalning kan inte behandlas nu.",
+      "PAY_PI_CANCEL_REFUSED": "Betalningen pågår redan och kan inte avbrytas. Vänligen kontrollera igen snart."
+    },
+    "share": {
+      "title": "Schema & dela",
+      "calendar": "Lägg till i kalender",
+      "ics": "Kalenderfil",
+      "mail": "Bjud in via e-post",
+      "mailApp": "Skicka med standard e-postapp",
+      "mailSubject": "[Seminarinbjudan] {title}",
+      "mailBody": "{title}\nNär: {start}\n\nGå med direkt med denna länk.\nDator: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopiera länk",
+      "copied": "Länk kopierad.",
+      "copyFail": "Kunde inte kopiera. Vänligen kopiera länken från adressfältet.",
+      "share": "Dela till en annan app",
+      "shareFail": "Kunde inte dela. Vänligen använd Kopiera länk istället.",
+      "created": "Ditt seminar är klart. Lägg till dess starttid i din Google Kalender.",
+      "addGoogle": "Lägg till i Google Kalender",
+      "later": "Senare",
+      "piBrowserOpen": "I Pi Browser öppnas kalender, e-post och kalenderfilen i telefonens standardwebbläsare.",
+      "extFail": "Kunde inte öppna. Uppdatera Pi Browser, eller använd Kopiera länk och öppna den i en vanlig webbläsare (seminarz.vercel.app).",
+      "icsPiBrowser": "Kalenderfilen kan endast laddas ner i en vanlig webbläsare (dator eller mobil). I Pi Browser, använd Lägg till i kalender istället."
+    },
+    "attendance": "Närvaro",
+    "plan": "Plan",
+    "left": "Tid kvar"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Föregående månad",
+      "next": "Nästa månad",
+      "connect": "Visa min Google Kalender",
+      "change": "Hantera Google-kalendrar ({n})",
+      "add": "Lägg till",
+      "remove": "Ta bort",
+      "close": "Stäng",
+      "failed": "Kunde inte ladda händelser från {n} kalender(ar). Kontrollera adressen.",
+      "badUrl": "Klistra in 'Hemlig adress i iCal-format' (…/basic.ics) från Google Kalender-inställningarna, inte webbläsarens adressfält.",
+      "full": "Du kan lägga till upp till {n} kalendrar.",
+      "allDay": "Hela dagen",
+      "day": "Mina händelser denna dag",
+      "count": "{n, plural, one {# händelse} other {# händelser}}",
+      "more": "+{n}",
+      "picked": "Detta datum är inställt som startdatum. Välj tid nedan.",
+      "s1": "Tryck på [Öppna Google Kalender-inställningar] nedan.",
+      "s2": "Under 'Inställningar för mina kalendrar' till vänster, välj en kalender (t.ex. ditt namn).",
+      "s3": "Scrolla till 'Integrera kalender' och kopiera 'Hemlig adress i iCal-format'.",
+      "s4": "Klistra in den här och tryck på [Lägg till] — händelsetitlar visas i kalendern. Lägg till andra kalendrar på samma sätt, upp till 5.",
+      "open": "Öppna Google Kalender-inställningar",
+      "privacy": "Denna adress är en nyckel till din kalender — dela den inte. Den lagras endast på denna enhet, aldrig på vår server."
+    },
+    "title": "Skapa ett seminar",
+    "name": "Låt oss resa till en vacker ö!",
+    "subTitle": "Undertitel (valfritt, upp till 60)",
+    "startAt": "Starttid",
+    "maxCnt": "Kapacitet (1–100)",
+    "submit": "Skapa",
+    "submitting": "Skapar…",
+    "invalid": "Kontrollera din inmatning — ett datum inom ett år från nu, kapacitet 1–100.",
+    "attendance": {
+      "title": "Närvaro",
+      "back": "Tillbaka till seminar",
+      "loading": "Laddar…",
+      "forbidden": "Endast värden och administratörer kan se närvaro.",
+      "count": "{n} personer",
+      "csv": "Ladda ner CSV",
+      "empty": "Ingen har anslutit ännu.",
+      "online": "Online",
+      "left": "Lämnade",
+      "col": {
+        "name": "Namn",
+        "pi": "Pi användarnamn",
+        "ent": "Först ansluten",
+        "hb": "Senast sedd",
+        "dur": "Tid närvarande",
+        "min": "Närvarande (min, tid borta exkluderad)",
+        "state": "Status"
+      },
+      "durNote": "Tid närvarande är från första anslutning till senast sedd, minus tid borta (luckor längre än 2,5 minuter).",
+      "csvPiBrowser": "CSV-nedladdning fungerar endast i en vanlig webbläsare (dator eller mobil). Pi Browser kan inte spara filer — öppna detta närvaroblad i en dator- eller telefonwebbläsare (seminarz.vercel.app)."
+    },
+    "plan": "Plan",
+    "planFree": "Gratis — {time} kvar denna månad · ingen AI",
+    "planPaid": "{name} {time} · {price} — betala vid skapande",
+    "planHint": "Ett seminar som öppnas med en betald plan använder den planens tid först, fortsätter sedan med denna månads gratistid (ingen AI i gratisdelen). En aktiv plan öppnas utan betalning; Månadsvis eller Årsvis som du inte har betalas i Pi när du trycker på Skapa, sedan öppnas seminariet (Pi Browser). Att delta är alltid gratis för deltagare.",
+    "planOwned": "{name} — aktiv · {time} kvar",
+    "planEnds": "Starttiden är efter att denna plans pass löper ut. Flytta starttiden tidigare eller välj en annan plan.",
+    "paidKept": "Ditt betalda pass behålls. Åtgärda problemet och tryck på Skapa igen (ingen andra betalning)."
+  },
+  "privacy": {
+    "title": "Integritetspolicy — Röst- och AI-funktioner",
+    "effective": "Gäller från {date}",
+    "intro": "Denna policy förklarar den personliga information vi behandlar när du använder live-undertexter, översatta undertexter, röstöversättning, AI-mötesanteckningar och personliga anteckningar i ett seminar. Dessa funktioner använder en extern AI-tjänst, så informationen överförs utomlands.",
+    "whoTitle": "Vems information behandlas",
+    "who": [
+      "Presentatörer och deltagare på scen: vi ber om ditt samtycke en gång, innan du först slår på din mikrofon. Du kan delta i seminariet utan att samtycka.",
+      "Publik: du använder inte en mikrofon, så ingen röst skickas. Du ser bara undertexter och anteckningar.",
+      "Personliga anteckningar: en administratör spelar in ett möte med en mikrofon och bekräftar att deltagarna informerades innan inspelning."
+    ],
+    "xferTitle": "Överföring av personlig information utomlands (Koreanska personuppgiftslagen, Art. 28-8)",
+    "xfer": [
+      {
+        "k": "Mottagare",
+        "v": "Google LLC (Gemini API) — kontakt [TBD: Google privacy contact]"
+      },
+      {
+        "k": "Länder",
+        "v": "USA och andra länder där Googles datacenter finns [TBD: bearbetningsregion]"
+      },
+      {
+        "k": "När och hur",
+        "v": "Ungefär var 5:e sekund medan en funktion är på, över en krypterad anslutning (HTTPS). För personliga anteckningar skickas hela inspelningen en gång till i 5-minutersdelar när anteckningen avslutas (noggrann transkription)."
+      },
+      {
+        "k": "Objekt",
+        "v": "Röst, talat innehåll (text), högtalarens visningsnamn (för anteckningssammanfattningar), skärmdelningsskärmdumpar (när AI-anteckningar är på)"
+      },
+      {
+        "k": "Syfte",
+        "v": "Tal till text, översättning, mötesanteckningssammanfattningar, syntetiskt tal (standardröster, ingen röstkloning), högtalarseparation för personliga anteckningar (röster skiljs åt och märks med upplevt kön, såsom Man 1 / Kvinna 1 — inga namn eller identiteter härleds)"
+      },
+      {
+        "k": "Lagring",
+        "v": "Avslutas så snart resultatet returneras. Vi ber Google att inte lagra förfrågningar (store=false). Loggar för missbruksövervakning kan fortfarande behållas enligt Googles villkor [TBD: retention period and paid-tier status]."
+      },
+      {
+        "k": "Hur man vägrar, och vad som händer",
+        "v": "Om du inte samtycker eller stänger av din mikrofon skickas ingen röst. Du kan fortfarande delta i seminariet; endast undertexter, översättningar och anteckningar av ditt eget tal skapas inte. Du kan när som helst dra tillbaka samtycket [TBD: where the withdraw button is]."
+      }
+    ],
+    "keepTitle": "Vad denna tjänst behåller",
+    "keep": [
+      "Original ljud: för seminarundertexter och AI-mötesanteckningar lagras det inte; det kasseras direkt efter konvertering till text. För personliga anteckningar behålls inspelningen i privat lagring så att den kan transkriberas igen mer noggrant (med högtalare) efter mötet, och den raderas vid den dagliga rensningen när 1 dag har gått sedan anteckningen avslutades (omedelbart om anteckningen raderas).",
+      "Live-undertexter: lagras inte.",
+      "AI-mötesanteckningar (när presentatören slår på dem): talat innehåll, skärmdumpar och sammanfattningen, behålls tills anteckningarna raderas [TBD: maximum retention].",
+      "Samtyckesregister: tidpunkten för samtycke och policyversionen, behålls som bevis [TBD: retention period].",
+      "Användning: per-minut förfrågningsantal och behandlingstid, används för att upprätthålla kostnadsgränser.",
+      "Närvaro: tiden du anslöt, tiden du senast var ansluten, ditt visningsnamn och ditt Pi-användarnamn lagras och ges till värden som en närvarolista (på skärmen och som en CSV-nedladdning). Behålls tills seminariet raderas.",
+      "Frågor och svar och omröstningar: frågetexten och frågeställarens visningsnamn (eller Pi-användarnamn om inget) är synliga för varje deltagare. Uppröster visar endast antal, aldrig vem som röstade. Omröstningsröster visar endast antal för deltagare; arrangören och administratörerna ser, för varje alternativ, visningsnamnet (eller Pi-användarnamn om inget) för varje väljare. Behålls, inklusive dolda frågor, tills seminariet raderas."
+    ],
+    "recTitle": "Inspelning",
+    "rec": "Inspelningar sparas endast som en fil på presentatörens enhet. De laddas inte upp till våra servrar eller överförs utomlands. Medan inspelning eller AI-anteckningar är på, ser varje deltagare en indikator.",
+    "rightsTitle": "Dina rättigheter",
+    "rights": "Du kan begära att få tillgång till, korrigera, radera eller stoppa behandlingen av din information. Kontakt: [TBD: privacy officer name and contact]"
+  },
+  "notes": {
+    "title": "Anteckningar",
+    "back": "Tillbaka till seminar",
+    "loading": "Laddar…",
+    "meta": "Anteckningar · {date} · {min} min",
+    "aiWarn": "AI-genererad sammanfattning — den kan innehålla fel",
+    "points": "Nyckelpunkter",
+    "decisions": "Beslut",
+    "todos": "Åtgärdspunkter",
+    "shots": "Skärmdumpar ({n})",
+    "transcript": "Transkription",
+    "download": "Ladda ner Markdown",
+    "making": "Skapar anteckningarna…",
+    "makingLong": "Detta tar ett tag. Vänligen uppdatera senare",
+    "recording": "Spelar fortfarande in",
+    "failed": "Kunde inte skapa sammanfattningen — hela transkriptionen finns nedan",
+    "retry": "Försök igen",
+    "finish": "Avsluta inspelning och sammanfatta",
+    "none": "Inget här",
+    "blank": "Inget att sammanfatta — inget tal spelades in eller det var för kort",
+    "notFound": "Anteckningar hittades inte",
+    "forbidden": "Du har inte åtkomst till dessa anteckningar",
+    "shotAlt": "Skärmdump vid {at}",
+    "close": "Stäng",
+    "view": "Visa anteckningar",
+    "error": "Kunde inte ladda",
+    "mine": "Mina anteckningar",
+    "del": "Radera anteckningar",
+    "delAsk": "Radera dessa anteckningar (sammanfattning, transkription och skärmdumpar)? Ingen kommer att kunna se dem",
+    "delYes": "Radera",
+    "delNo": "Avbryt",
+    "delFail": "Kunde inte radera",
+    "dlFail": "Kunde inte ladda ner — försök igen",
+    "recentNotes": "Senaste anteckningar",
+    "empty": "Inga anteckningar ännu",
+    "newNote": "Starta personliga anteckningar",
+    "inPerson": "Personliga mötesanteckningar",
+    "inPersonTag": "Personligen",
+    "titleLabel": "Titel",
+    "titlePh": "t.ex. Veckomöte",
+    "told": "Jag har informerat alla närvarande att detta kommer att spelas in och behandlas av AI (obligatoriskt)",
+    "toldWhy": "Innan du börjar, informera alla närvarande att denna konversation kommer att spelas in (inspelningen behålls i 1 dag efter att anteckningen avslutas, och talare skiljs åt med röst och märks med upplevt kön) och omvandlas till text och en sammanfattning av en extern AI",
+    "start": "Starta inspelning",
+    "starting": "Förbereder…",
+    "recBadge": "Spelar in {time}",
+    "recentLines": "Senaste rader",
+    "waiting": "Text visas här när folk talar",
+    "end": "Avsluta och skapa anteckningar",
+    "wakeWarn": "Inspelningen kan stoppas om skärmen släcks",
+    "adminOnly": "Endast administratörer kan använda detta",
+    "aiOff": "AI-anteckningar är inte tillgängliga just nu (serverinställning behövs). Tidigare anteckningar listas nedan",
+    "reload": "Ladda om",
+    "unsupported": "Inspelning är inte tillgänglig på den här enheten",
+    "micDenied": "Kan inte använda mikrofonen – kontrollera behörigheten",
+    "limited": "Tidsgränsen för bearbetning är förbrukad – avsluta och skapa anteckningarna",
+    "noAgr": "Stoppad: ingen bekräftelse på inspelning – avsluta och starta igen",
+    "micLost": "Mikrofonen kopplades bort och inspelningen stoppades – tryck på Återanslut mikrofon eller avsluta anteckningen",
+    "micRetry": "Återanslut mikrofon",
+    "gone": "Denna anteckning avslutades eller raderades någon annanstans, så inspelningen stoppades – använd knappen nedan för att öppna anteckningarna",
+    "finishing": "Sparar de sista orden…",
+    "st": {
+      "RECORDING": "Spelar in",
+      "SUMMARIZING": "Skapar",
+      "DONE": "Klar",
+      "FAILED": "Misslyckades"
+    },
+    "downloadPiBrowser": "Nedladdning av Markdown fungerar endast i en vanlig webbläsare (dator eller mobil). Pi Browser kan inte spara filer – öppna dessa anteckningar i en dator- eller telefonwebbläsare (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Planer",
+    "loading": "Laddar…",
+    "free": "Gratis",
+    "freeDesc": "{time} seminarier varje månad (ingen överföring)",
+    "monthly": "Månadsvis",
+    "yearly": "Årsvis",
+    "paidDesc": "{time} seminarier, giltiga i {months} månader",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Kontrollerar Pi-pris",
+    "noAi": "Inga AI-undertexter, översättning, dubbning eller anteckningssammanfattningar",
+    "withAi": "Inkluderar AI-undertexter, översättning, dubbning och anteckningssammanfattningar",
+    "buy": "Betala med Pi",
+    "bought": "Betalning slutförd. Seminarietid har lagts till.",
+    "meRemain": "Återstående tid: {time}",
+    "loginToBuy": "Logga in för att köpa en plan.",
+    "payNote": "Betalning sker alltid i Pi. Beloppet i lokal valuta är endast en referens; Pi-beloppet fastställs till Pi-priset vid betalningstillfället. Ett seminarium på en betald plan använder först den planens pass (tidigast utgående först), och fortsätter sedan med denna månads gratistid.",
+    "charge": "Fyll på tid",
+    "hm": "{h} tim {m} min",
+    "m": "{m} min",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (kontrollerar Pi-pris)",
+    "h": "{h} tim"
+  },
+  "adminRooms": {
+    "title": "Rumsadministration",
+    "adminOnly": "Endast administratörer kan se denna sida.",
+    "refresh": "Uppdatera",
+    "count": "{n} öppna rum",
+    "empty": "Inga rum är öppna just nu.",
+    "lab": "Laboratorierum",
+    "noSeminar": "Ingen seminarieregistrering",
+    "peers": "{n} / {cap} anslutna",
+    "producers": "{n} strömmar",
+    "end": "Slutar {time}",
+    "stale": "Seminariet har avslutats men rummet är fortfarande öppet på videoservern – tvinga stäng det.",
+    "close": "Tvinga stäng",
+    "confirmSeminar": "Detta avslutar seminariet och stänger rummet. Alla kommer att kopplas bort.",
+    "confirmRoom": "Detta stänger rummet. Alla kommer att kopplas bort.",
+    "confirmYes": "Stäng",
+    "cancel": "Avbryt",
+    "closing": "Stänger…",
+    "closed": "Rummet stängt.",
+    "metrics": "Videoservermått (sedan start)",
+    "metricsOff": "Kunde inte ladda mått.",
+    "m": {
+      "packetsIn": "Paket in",
+      "packetsOut": "Paket ut",
+      "nackIn": "Mottagna NACKs",
+      "nackOut": "Skickade NACKs",
+      "retransmits": "Återsändningar",
+      "duplicateNack": "Dubbla NACKs",
+      "cacheMiss": "Cachemissar vid återsändning",
+      "pliOut": "Nyckelbildsförfrågningar (PLI)",
+      "keyframes": "Nyckelbilder",
+      "layerSwitches": "Kvalitetsväxlingar",
+      "queueDrops": "Kösläpp"
+    }
+  },
+  "adminUsers": {
+    "title": "Användare",
+    "adminOnly": "Endast administratörer kan se denna sida.",
+    "search": "Sök efter namn (minst 2 tecken)",
+    "searchBtn": "Sök",
+    "refresh": "Uppdatera",
+    "count": "{n, plural, one {# användare} other {# användare}}",
+    "empty": "Inga användare.",
+    "admin": "Admin",
+    "lastLogin": "Senaste inloggning {time}",
+    "never": "Aldrig inloggad",
+    "plan": {
+      "FREE": "Gratis",
+      "M": "Månadsvis",
+      "Y": "Årsvis"
+    },
+    "until": "(till {time})",
+    "manage": "Hantera tid",
+    "close": "Stäng",
+    "planLabel": "Plan",
+    "hours": "Timmar",
+    "minutes": "Minuter",
+    "reason": "Anledning (valfritt)",
+    "sub": "Minska",
+    "confirmSub": "Minska {plan}-tiden med {time}.",
+    "confirmYes": "Bekräfta",
+    "cancel": "Avbryt",
+    "saving": "Sparar…",
+    "done": "Tillämpat. {plan} återstående tid: {time}",
+    "invalid": "Ange en minskning mellan 1 minut och 1000 timmar (hela minuter 0–59).",
+    "history": "Senaste justeringar",
+    "noHistory": "Inga justeringar ännu.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Ge ett servicepass (gratis tid)",
+    "svc": {
+      "H1": "1-timmespass",
+      "D1": "1-dagspass",
+      "M1": "1-månadspass"
+    },
+    "svcNote": "Servicepass är gratistid. De kan användas från och med nu under den perioden (1 timme, 24 timmar, 1 månad) i gratis seminarier och i den gratis delen av betalda seminarier (inga AI-funktioner). Med flera pass används de automatiskt i ordningen 1-timme → 1-dag → 1-månad.",
+    "subTitle": "Minska tid",
+    "subNote": "Tar först från de senast utgående passen. Om det är mer än vad som återstår, tas endast den återstående tiden bort.",
+    "confirmSvc": "Ge ett {svc}.",
+    "doneSvc": "Gav ett {svc}. Återstående gratistid: {time} (passet går ut {end})"
+  }
+}

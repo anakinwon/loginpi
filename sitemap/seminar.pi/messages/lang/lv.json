@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Tiešraides video semināri, kuriem pievienojaties ar Pi"
+  },
+  "home": {
+    "description": "Rīkotāji atver seminārus, un dalībnieki pievienojas tiešraides video sesijām ar Pi.",
+    "badge": "Tiešraides semināri skaistās salās",
+    "headline": "Skatieties, klausieties un mācieties kopā — tiešraidē",
+    "ctaBrowse": "Pārlūkot seminārus",
+    "ctaPlan": "Skatīt plānus",
+    "features": {
+      "video": "Tiešraides video",
+      "caption": "Paraksti un tulkojums",
+      "notes": "AI sanāksmju piezīmes",
+      "pay": "Maksāt ar Pi"
+    },
+    "listTitle": "Semināri",
+    "cal": {
+      "title": "Semināru kalendārs",
+      "desc": "No pagātnes semināriem līdz gaidāmajiem — pieskarieties datumam, lai iegūtu sīkāku informāciju.",
+      "legendSmn": "Semināri",
+      "legendEnded": "Pagājušie semināri",
+      "legendMine": "Mani pasākumi",
+      "failed": "Nevarēja ielādēt semināru datumus. Lūdzu, mēģiniet vēlāk.",
+      "open": "Skatīt detaļas"
+    }
+  },
+  "nav": {
+    "link": "Saistīt kontu",
+    "privacy": "Privātums",
+    "plan": "Plāni",
+    "rooms": "Telpas",
+    "admin": "Administrators",
+    "users": "Lietotāji",
+    "home": "Sākums",
+    "privacyShort": "Privātums",
+    "menu": "Galvenā izvēlne",
+    "fold": "Sakļaut izvēlni",
+    "unfold": "Izvērst izvēlni"
+  },
+  "auth": {
+    "checking": "Pārbauda pierakstīšanos…",
+    "signedIn": "{name}",
+    "inPerson": "Klātienes piezīmes",
+    "required": "Lūdzu, pierakstieties ar savu Pi kontu.",
+    "signIn": "Pierakstīties ar Pi",
+    "openInPiBrowser": "Atveriet šo lapu Pi Browser, lai pierakstītos ar savu Pi kontu.",
+    "authenticating": "Notiek autentifikācija…",
+    "google": "Pierakstīties ar Google",
+    "signOut": "Izrakstīties",
+    "or": "vai",
+    "linkRequired": "Jūs esat pierakstījies ar Google, taču tas vēl nav saistīts ar Pi kontu. Izsniedziet saites kodu Pi Browser un ievadiet to šeit.",
+    "linkNeeded": "Nepieciešama Pi konta saistīšana",
+    "linkCheckFailed": "Nevarēja pārbaudīt jūsu konta saites statusu (īslaicīga servera kļūda). Lūdzu, atsvaidziniet pēc brīža."
+  },
+  "piOAuth": {
+    "signingIn": "Notiek pierakstīšanās ar jūsu Pi kontu…",
+    "failed": "Pi pierakstīšanās neizdevās. Lūdzu, mēģiniet vēlreiz.",
+    "stateMismatch": "Nevarēja pārbaudīt šo pierakstīšanās pieprasījumu (termiņš beidzies vai cita cilne). Lūdzu, mēģiniet vēlreiz.",
+    "retry": "Mēģināt vēlreiz",
+    "backHome": "Sākums"
+  },
+  "link": {
+    "title": "Saistīt kontu",
+    "intro": "Savienojiet kontu, ar kuru pierakstījāties Pi Browser, ar Google pierakstīšanos parastā pārlūkprogrammā. Pēc saistīšanas varat izmantot to pašu kontu arī datora pārlūkprogrammā.",
+    "checking": "Pārbauda pierakstīšanos…",
+    "piIssueTitle": "Lai pierakstītos arī no parastas pārlūkprogrammas",
+    "codeHint": "Izsniedziet zemāk redzamo kodu, pēc tam pierakstieties ar Google datora pārlūkprogrammā un ievadiet to lapā “Saistīt kontu” (10 minūšu laikā).",
+    "piIssue": "Izsniegt saites kodu",
+    "reissue": "Izsniegt jaunu kodu",
+    "expiresIn": "Termiņš beidzas pēc {min} min",
+    "enterTitle": "Ievadiet saites kodu",
+    "enterHint": "Pi Browser atveriet seminar.pi → Konta saistīšana → Izsniegt saites kodu, pēc tam ievadiet 6 ciparu kodu.",
+    "codeLabel": "Saites kods",
+    "submit": "Saistīt",
+    "done": "Saistīts. Tagad varat izmantot arī Google pierakstīšanos.",
+    "linked": "{name} ir saistīts ar Google pierakstīšanos."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Nepieciešama pierakstīšanās",
+    "AUTH_PI_REQUIRED": "Nepieciešama Pi pierakstīšanās",
+    "AUTH_PI_SESSION_INVALID": "Jūsu sesijas termiņš ir beidzies. Lūdzu, pierakstieties vēlreiz",
+    "AUTH_PI_TOKEN_INVALID": "Pi pierakstīšanās pārbaude neizdevās",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Trūkst Pi pierakstīšanās informācijas",
+    "FORBIDDEN": "Jums nav atļaujas",
+    "BAD_REQUEST": "Nepareizs pieprasījums",
+    "BAD_REQUEST_BODY": "Nepareizs pieprasījums",
+    "INVALID_INPUT": "Nederīga ievade",
+    "QUERY_FAILED": "Neizdevās ielādēt",
+    "SAVE_FAILED": "Neizdevās saglabāt",
+    "INTERNAL": "Kaut kas nogāja greizi",
+    "SERVER_CONFIG": "Servera konfigurācijas kļūda. Lūdzu, sazinieties ar operatoru",
+    "PI_API_CONNECT_FAILED": "Nevarēja sasniegt Pi Network",
+    "DB_UNAVAILABLE": "Dati īslaicīgi nav pieejami. Lūdzu, mēģiniet vēlāk",
+    "NOT_FOUND": "Nav atrasts",
+    "RATE_LIMITED": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc brīža",
+    "PAYLOAD_TOO_LARGE": "Pieprasījums ir pārāk liels",
+    "NETWORK": "Pārbaudiet tīkla savienojumu",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Šis Pi lietotājvārds jau ir reģistrēts ar citiem akreditācijas datiem. Lūdzu, sazinieties ar administratoru",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Šis konts ir neaktīvs. Lūdzu, sazinieties ar administratoru",
+    "AUTH_GOOGLE_REQUIRED": "Nepieciešama Google pierakstīšanās.",
+    "LINK_CODE_INVALID": "Saites kods nav derīgs vai ir beidzies tā derīguma termiņš. Izsniedziet jaunu Pi Browser.",
+    "LINK_ALREADY_LINKED": "Šis konts jau ir saistīts.",
+    "LINK_CODE_GEN_FAILED": "Nevarēja izveidot saites kodu. Lūdzu, mēģiniet vēlāk.",
+    "AUTH_DB_UNAVAILABLE": "Nevarēja saglabāt jūsu kontu, tāpēc pierakstīšanās neizdevās. Lūdzu, mēģiniet vēlāk.",
+    "LINK_TRY_LIMIT": "Pārāk daudz nepareizu saites kodu. Mēģiniet vēlreiz pēc 15 minūtēm.",
+    "PRICE_UNAVAILABLE": "Nevarēja iegūt Pi cenu. Lūdzu, mēģiniet vēlreiz pēc brīža",
+    "QUOTE_EXPIRED": "Maksājuma piedāvājuma termiņš ir beidzies. Lūdzu, maksājiet vēlreiz",
+    "PLAN_EXHAUSTED": "Jūs esat izmantojis visu savu semināra laiku. Papildiniet to lapā “Plāni”",
+    "HOST_AWAY": "Rīkotājs nav telpā. Jūs varat ieiet pēc tam, kad rīkotājs ir pievienojies",
+    "PLAN_AI_PAID": "AI funkcijas ir pieejamas maksas plānos",
+    "AI_UNAVAILABLE": "AI funkcijas pašlaik nav pieejamas",
+    "SPEECH_CHUNK_INVALID": "Audio fragmenta formāts ir nederīgs",
+    "SPEECH_NOT_LIVE": "Šis seminārs nav tiešraidē",
+    "SPEECH_NO_AGR": "Nepieciešama piekrišana balss apstrādei",
+    "SPEECH_RATE": "Pārāk daudz balss pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc brīža",
+    "SPEECH_QUOTA": "Šī semināra balss apstrādes laiks ir izmantots",
+    "SPEECH_USR_QUOTA": "Jūs esat izmantojis savu tulkošanas un tulkotās balss limitu šim semināram",
+    "SPEECH_FAILED": "Nevarēja pārvērst runu tekstā",
+    "SPEECH_STAGE_ONLY": "Tikai cilvēki uz skatuves var izmantot balss parakstus",
+    "TRANSLATE_FAILED": "Nevarēja iztulkot parakstu",
+    "POLL_CLOSED": "Šī aptauja ir slēgta",
+    "NOTE_NOT_RECORDING": "Šīs piezīmes netiek ierakstītas",
+    "NOTE_SHOT_INVALID": "Nederīgs ekrāna tveršanas attēls",
+    "NOTE_AUDIO_INVALID": "Nederīgs ieraksta fails",
+    "NOTE_SHOT_RATE": "Pārāk daudz ekrāna tveršanas attēlu",
+    "NOTE_RETRY_SOON": "Varat mēģināt vēlreiz pēc minūtes",
+    "SPEECH_TTS_FAILED": "Nevarēja izveidot tulkoto balsi",
+    "CAPTION_SIG_INVALID": "Šo parakstu nevarēja pārbaudīt, tāpēc tas netika tulkots",
+    "PLAN_EXPIRES_BEFORE_START": "Sākuma laiks ir pēc šī plāna caurlaides termiņa beigām",
+    "PAY_ALREADY_PAID": "Maksājums joprojām tiek apstrādāts. Ja parakstījāties makā, mēģiniet vēlreiz pēc 3 minūtēm.",
+    "REC_PAID_ONLY": "Ierakstīšana ir pieejama tikai ikmēneša vai gada plāna semināros ar atlikušo apmaksāto laiku",
+    "REC_NOT_IN_ROOM": "Joprojām tiek apstiprināts, ka esat telpā. Mēģiniet vēlreiz pēc brīža",
+    "ENGINE_OFF": "Video servera administratora atslēga nav konfigurēta",
+    "ENGINE_UNAVAILABLE": "Video serveris neatbild. Lūdzu, mēģiniet vēlreiz pēc brīža",
+    "ADJ_NOTHING": "Nav atlikušā laika, ko samazināt"
+  },
+  "progress": {
+    "title": "Izstrādes gaita",
+    "subtitle": "Pabeigts, notiek un plānots, pēc funkcijas · no {date}",
+    "overall": "Kopējie soļi",
+    "stepsDone": "Pabeigti {done}/{total} soļi ({pct}%)",
+    "featureUnit": "funkcijas",
+    "status": {
+      "done": "Pabeigts",
+      "doing": "Notiek",
+      "todo": "Plānots",
+      "drop": "Atmests"
+    },
+    "features": {
+      "F01": {
+        "name": "Pierakstīšanās",
+        "desc": "Pi Browser pierakstīšanās, Google pierakstīšanās citās pārlūkprogrammās un abu kontu saistīšana"
+      },
+      "F05": {
+        "name": "Tiešraides video seminārs",
+        "desc": "Mūsu pašu video dzinējs Galápagos — mērķis ir viens prezentētājs, kas straumē līdz 30 dalībniekiem"
+      },
+      "F02": {
+        "name": "Izveidot semināru",
+        "desc": "Iestatiet subtitrus, laiku, ietilpību un semināra maksu, lai izveidotu semināru (nosaukums = sala, automātiski)"
+      },
+      "F03": {
+        "name": "Semināru saraksts un detaļas",
+        "desc": "Pārlūkojiet atvērtos seminārus pa lapām un skatiet to detaļas"
+      },
+      "F04": {
+        "name": "Pi ieejas maksājums",
+        "desc": "Maksājiet semināra maksu Pi; serveris vēlreiz pārbauda summu pirms ielaišanas"
+      },
+      "F06": {
+        "name": "Rīkotāja izmaksas",
+        "desc": "Izmaksājiet ieejas maksas ieņēmumus rīkotājiem Pi"
+      },
+      "F07": {
+        "name": "Atkārtojumi",
+        "desc": "Skatīties ierakstītos seminārus vēlāk"
+      },
+      "FU": {
+        "name": "Sanāksmju papildinājumu pamats",
+        "desc": "Viens signāla kanāls papildinājumiem, AI savienojums, balss fragmenti, mikrofona piekrišana un datu tabulas"
+      },
+      "F08": {
+        "name": "Grafiks un koplietošana",
+        "desc": "Kalendāra saite, pasākuma fails (.ics) un e-pasta ielūgums katram semināram"
+      },
+      "F09": {
+        "name": "Trokšņu samazināšana un apgaismojums",
+        "desc": "Samaziniet mikrofona troksni un padariet gaišāku tumšu kameras video"
+      },
+      "F10": {
+        "name": "Tiešraides paraksti",
+        "desc": "Pārvērtiet prezentētāja runu tekstā zem skatuves"
+      },
+      "F11": {
+        "name": "Aptaujas, jautājumi un atbildes un apmeklējums",
+        "desc": "Veiciet aptaujas un jautājumus semināra laikā; rīkotāji lejupielādē apmeklējumu sarakstu"
+      },
+      "F12": {
+        "name": "Fona efekti",
+        "desc": "Aizmiglojiet fonu vai aizstājiet to ar iepriekš iestatītu vai savu attēlu (apstrādāts jūsu ierīcē)"
+      },
+      "F13": {
+        "name": "Vietējā ierakstīšana",
+        "desc": "Prezentētājs ieraksta semināru savā ierīcē, un visi redz, ka ierakstīšana ir ieslēgta"
+      },
+      "F14": {
+        "name": "AI sanāksmju piezīmes",
+        "desc": "Kad prezentētājs to ieslēdz, runa un ekrāni tiek ierakstīti un apkopoti galvenajos punktos, lēmumos un darāmajos darbos"
+      },
+      "F15": {
+        "name": "Klātienes sanāksmju piezīmes",
+        "desc": "Ierakstiet sanāksmi tikai ar mikrofonu un saņemiet sanāksmju piezīmes (administratori)"
+      },
+      "F16": {
+        "name": "Tulkotie paraksti",
+        "desc": "Rādīt parakstus, kas tulkoti jūsu izvēlētajā valodā"
+      },
+      "F17": {
+        "name": "Klausīties tulkojumā",
+        "desc": "Lasīt tulkotos parakstus skaļi ar sintētisku balsi, vienlaikus samazinot oriģinālo audio"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser pierakstīšanās",
+      "googleLogin": "Google pierakstīšanās",
+      "accountLink": "Konta saistīšana",
+      "deviceTest": "Kameras ierīces tests",
+      "oneToTwo": "Prezentētājs 1 → 2 dalībnieki",
+      "recovery": "Sasalšanas atjaunošana un stabilitāte",
+      "structure": "Dzinēja struktūras tīrīšana",
+      "autoQuality": "Automātiska kvalitāte, 30 dalībnieki",
+      "roomService": "Ieeja telpā un ierakstīšana",
+      "roomUi": "Telpas ekrāns (vestibils·skatuve·tērzēšana·pacelt roku·moderācija)",
+      "createForm": "Izveidot ekrānu",
+      "list": "Saraksts",
+      "detail": "Detaļas",
+      "payRequest": "Maksājuma pieprasījums",
+      "payVerify": "Summas atkārtota pārbaude un ieeja",
+      "settle": "Izmaksa",
+      "vod": "Ieraksta atkārtojums",
+      "appRelay": "Dzinēja papildinājuma signāla kanāls",
+      "aiBase": "AI, balss fragmenti, piekrišana un datu tabulas",
+      "shareLinks": "Kalendāra saite, .ics un e-pasta ielūgums",
+      "noiseLight": "Trokšņu samazināšana un apgaismojums",
+      "liveCaptions": "Tiešraides paraksti",
+      "pollQnaAttend": "Aptaujas, jautājumi un atbildes un apmeklējumu saraksts",
+      "backgrounds": "Aizmiglojums, iepriekš iestatīti un jūsu pašu attēli",
+      "localRecording": "Prezentētāja ierakstīšana un ierakstīšanas emblēma",
+      "aiNotes": "Ierakstīšana, kopsavilkums un piezīmju lapa",
+      "inPersonNotes": "Tikai mikrofona piezīmes un manas piezīmes",
+      "captionTranslate": "Valodas izvēle un oriģināla/tulkojuma pārslēgšana",
+      "dubbing": "Sintētiskās balss atskaņošana un samazināts oriģinālais audio"
+    },
+    "refLabel": "Atsauces modelis",
+    "uiRef": "UI bāzes līnija — plaši izmantotas tīmekļa video sanāksmju lietotnes ekrāna un funkciju modeļi, pielāgoti seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Vārds saglabāts, taču citiem pašlaik nevarēja paziņot. Viņi to redzēs pēc jūsu atkārtotas pievienošanās.",
+      "tile": "Noklikšķiniet, lai mainītu manu vārdu",
+      "menu": "Mainīt manu vārdu",
+      "title": "Mans vārds šajā seminārā",
+      "hint": "Līdz 30 rakstzīmēm. Izmanto tikai šajā seminārā un uzreiz atjauninās visu ekrānos.",
+      "save": "Saglabāt",
+      "saving": "Notiek saglabāšana…",
+      "cancel": "Atcelt",
+      "taken": "Šo vārdu jau izmanto kāds cits (rīkotājs vai dalībnieks). Izvēlieties citu.",
+      "failed": "Nevarēja saglabāt jūsu vārdu. Mēģiniet vēlreiz."
+    },
+    "roomTitle": {
+      "edit": "Noklikšķiniet, lai rediģētu subtitrus",
+      "label": "Subtitri",
+      "placeholder": "Subtitri (līdz 60)",
+      "save": "Saglabāt",
+      "cancel": "Atcelt",
+      "failed": "Nevarēja saglabāt subtitrus."
+    },
+    "mirror": "Spoguļot manu video",
+    "barPin": "Vienmēr rādīt apakšējo joslu",
+    "barAuto": "Automātiski paslēpt apakšējo joslu",
+    "title": "Pievienoties semināram · {room}",
+    "titleSeminar": "Gaidīšanas telpa",
+    "noEngine": "Video serveris vēl nav gatavs.",
+    "joinAs": "Pievienoties kā",
+    "presenter": "Prezentētājs",
+    "audience": "Auditorija",
+    "join": "Pievienoties tagad",
+    "nameLabel": "Vārds",
+    "audienceHint": "Auditorijas dalībnieki neizmanto kameru vai mikrofonu. Pēc pievienošanās jūs redzēsiet un dzirdēsiet prezentētāju.",
+    "preview": {
+      "pending": "Notiek kameras un mikrofona sagatavošana…",
+      "audioOnly": "Kamera nav pieejama — tiek sūtīts tikai audio.",
+      "none": "Kamera un mikrofons nav pieejami. Pārbaudiet atļaujas (joprojām varat pievienoties bez multivides).",
+      "videoOnly": "Mikrofons nav pieejams — tiek sūtīts tikai video. Pārbaudiet mikrofona atļauju."
+    },
+    "mic": {
+      "on": "Izslēgt mikrofonu",
+      "off": "Ieslēgt mikrofonu"
+    },
+    "cam": {
+      "on": "Izslēgt kameru",
+      "off": "Ieslēgt kameru"
+    },
+    "controls": "Zvana vadīklas",
+    "leave": "Atstāt",
+    "enableSound": "Ieslēgt skaņu",
+    "state": {
+      "connecting": "Savienojas…",
+      "reconnecting": "Atkārtoti savienojas…"
+    },
+    "waiting": "Gaida prezentētāju.",
+    "rejoin": "Pievienoties vēlreiz",
+    "err": {
+      "generic": "Kaut kas nogāja greizi. Lūdzu, pievienojieties vēlreiz.",
+      "CLOSED": "Savienojums tika zaudēts.",
+      "NO_ENGINE": "Video serveris vēl nav gatavs.",
+      "TICKET_401": "Lūdzu, pierakstieties.",
+      "TICKET_403": "Jums nav atļaujas prezentēt. Pievienojieties kā auditorija.",
+      "TICKET_503": "Video serveris vēl nav konfigurēts.",
+      "TICKET_NETWORK": "Pārbaudiet tīkla savienojumu.",
+      "TICKET_INVALID": "Jūsu ieejas caurlaides termiņš ir beidzies.",
+      "TICKET_EXPIRED": "Jūsu ieejas caurlaides termiņš ir beidzies.",
+      "ROOM_FULL": "Šis seminārs ir pilns.",
+      "ROOM_CLOSED": "Telpa tika slēgta — seminārs beidzās vai vadītājs bija prom ilgāk par 5 minūtēm.",
+      "DUPLICATE_SESSION": "Jūs pievienojāties no citas ierīces, tāpēc šis ekrāns tika atvienots.",
+      "ROLE_FORBIDDEN": "Jums nav atļaujas prezentēt.",
+      "WS_FAILED": "Nevarēja izveidot savienojumu ar video serveri.",
+      "ICE_FAILED": "Video savienojums tika pārtraukts. Pārbaudiet savu tīklu.",
+      "MEDIA_FAILED": "Nevarēja iedarbināt kameru vai mikrofonu.",
+      "TIMEOUT": "Video serveris neatbild.",
+      "TICKET_402": "Šis ir maksas seminārs. Lūdzu, samaksājiet semināra lapā pirms ieiešanas.",
+      "TICKET_404": "Seminārs nav atrasts.",
+      "TICKET_409": "Šis seminārs ir beidzies vai atcelts.",
+      "TICKET_HOST_AWAY": "Vadītājs vēl nav pievienojies vai ir bijis prom ilgāk par 5 minūtēm, tāpēc jūs nevarat ieiet. Lūdzu, mēģiniet vēlreiz pēc tam, kad vadītājs ir pievienojies.",
+      "TICKET_PLAN_EXHAUSTED": "Šī semināra plānam nav atlicis laiks, tāpēc to nevar sākt. Atkārtoti iegādājoties to pašu plānu, tiek pievienots laiks (bezmaksas atjaunojas ar 1 stundu nākamajā mēnesī)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Nevarēja mainīt mikrofonu. Lūdzu, mēģiniet vēlreiz.",
+        "video": "Nevarēja mainīt kameru. Lūdzu, mēģiniet vēlreiz."
+      },
+      "forbidden": "Jums nav atļaujas prezentēt, tāpēc jūs turpināsiet kā klausītājs.",
+      "demoted": "Jūs tikāt pārvietots atpakaļ uz klausītāju lomu.",
+      "endFailed": "Nevarēja beigt semināru. Lūdzu, mēģiniet vēlreiz.",
+      "chatFailed": "Ziņojums netika nosūtīts.",
+      "actionFailed": "Nevarēja izpildīt pieprasījumu. Lūdzu, mēģiniet vēlreiz.",
+      "shareFailed": "Nevarēja sākt ekrāna koplietošanu.",
+      "err": {
+        "RATE_LIMITED": "Jūs sūtāt pārāk ātri. Lūdzu, pagaidiet brīdi.",
+        "ROLE_FORBIDDEN": "Jums nav atļaujas to darīt.",
+        "MEDIA_FAILED": "Nevarēja iedarbināt mikrofonu vai kameru. Lūdzu, pārbaudiet atļaujas.",
+        "LOCKED": "Bloķējis prezentētājs."
+      },
+      "mutedBy": {
+        "audio": "Prezentētājs izslēdza jūsu mikrofonu.",
+        "video": "Prezentētājs izslēdza jūsu kameru."
+      },
+      "policy": {
+        "locked": "Prezentētājs bloķēja mikrofonus. Jūs varat ieslēgt savu, kad tie ir atbloķēti.",
+        "unlocked": "Mikrofoni ir atbloķēti."
+      },
+      "consent": {
+        "saveFail": "Nevarēja saglabāt jūsu piekrišanu. Pārbaudiet savu reģistrāciju un vēlreiz ieslēdziet mikrofonu."
+      }
+    },
+    "home": "Doties uz sākumlapu",
+    "tile": {
+      "fullscreen": "Divreiz noklikšķiniet, lai iegūtu pilnekrāna režīmu · Esc, lai izietu",
+      "self": "{name} (jūs)",
+      "presenter": "Prezentētājs",
+      "micOff": "Mikrofons izslēgts",
+      "screen": "{name} ekrāns",
+      "row": "Citi runātāji",
+      "pin": "Rādīt {name} lielā izmērā",
+      "unpin": "Automātisks izkārtojums"
+    },
+    "more": "Vairāk iespēju",
+    "joinNoCam": "Pievienoties bez kameras",
+    "net": {
+      "afterJoin": "Jūsu savienojums tiek automātiski pārbaudīts pēc pievienošanās.",
+      "measuring": "Pārbauda savienojumu…",
+      "good": "Labs savienojums",
+      "fair": "Viduvējs savienojums",
+      "poor": "Slikts savienojums",
+      "reason": {
+        "loss": {
+          "audio": "Tiek zaudēti {pct}% audio datu.",
+          "video": "Tiek zaudēti {pct}% video datu."
+        },
+        "rate": {
+          "audio": "Audio augšupielādes ātrums ir zems — {kbps} kbps.",
+          "video": "Video augšupielādes ātrums ir zems — {kbps} kbps. Kvalitāte var pasliktināties."
+        }
+      }
+    },
+    "people": "{n} telpā",
+    "screen": {
+      "start": "Kopīgot ekrānu",
+      "stop": "Pārtraukt kopīgošanu"
+    },
+    "panel": {
+      "title": "Tērzēšana · Jautājumi un atbildes · Aptaujas · Cilvēki",
+      "chat": "Tērzēšana",
+      "people": "Cilvēki",
+      "close": "Aizvērt paneli",
+      "qna": "Jautājumi un atbildes",
+      "polls": "Aptaujas"
+    },
+    "chat": {
+      "empty": "Vēl nav ziņojumu. Tērzēšana netiek saglabāta.",
+      "me": "Jūs",
+      "failed": "Nav nosūtīts.",
+      "retry": "Mēģināt vēlreiz",
+      "input": "Ievadiet ziņojumu",
+      "send": "Sūtīt"
+    },
+    "hand": {
+      "raise": "Pacelt roku",
+      "lower": "Nolaist roku",
+      "list": "Paceltās rokas",
+      "lowerAll": "Nolaist visas rokas",
+      "raised": "Roka pacelta",
+      "notice": "{name} pacēla roku.",
+      "dismiss": "Atlaist",
+      "waiting": "{n} cilvēki gaida, lai runātu"
+    },
+    "react": {
+      "open": "Reakcijas",
+      "e0": "Patīk",
+      "e1": "Aplausi",
+      "e2": "Smieties",
+      "e3": "Pārsteigts",
+      "e4": "Bēdīgs",
+      "e5": "Bez vārdiem",
+      "e6": "Mīlestība"
+    },
+    "quality": {
+      "label": "Kvalitāte",
+      "auto": "Automātiski",
+      "high": "Augsta",
+      "medium": "Vidēja",
+      "low": "Zema",
+      "unstable": "Jūsu tīkls ir nestabils"
+    },
+    "roles": {
+      "presenter": "Prezentētājs",
+      "panel": "Paneļa dalībnieks",
+      "audience": "Klausītājs"
+    },
+    "stage": {
+      "invite": "Uzaicināt uz skatuves",
+      "remove": "Pārvietot uz klausītāju lomu",
+      "promoted": "Jūs tikāt uzaicināts uz skatuves. Ja pacēlāt roku, jūsu kamera ieslēdzas automātiski (ja vien nav bloķēta vai nav atļauta). Ieslēdziet mikrofonu, lai runātu (mikrofons neieslēdzas automātiski).",
+      "later": "Vēlāk"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} pacēla roku."
+    },
+    "leaveDialog": {
+      "title": "Pamest semināru",
+      "body": "Jūs varat iziet pats vai beigt semināru un atvienot visus.",
+      "confirmTitle": "Beigt semināru?",
+      "confirmBody": "Visi tiks atvienoti, un neviens nevarēs atkārtoti pievienoties šim semināram.",
+      "cancel": "Atcelt",
+      "end": "Beigt semināru",
+      "endConfirm": "Beigt tagad"
+    },
+    "mod": {
+      "muteAll": "Izslēgt visus",
+      "lock": "Bloķēt mikrofonus",
+      "unlock": "Atbloķēt mikrofonus",
+      "locked": "Prezentētājs ir bloķējis mikrofonus",
+      "muteMic": "Izslēgt mikrofonu",
+      "askMic": "Lūgt ieslēgt mikrofonu",
+      "muteCam": "Izslēgt kameru",
+      "muteMicOf": "Izslēgt {name} mikrofonu",
+      "askMicOf": "Lūgt {name} ieslēgt mikrofonu",
+      "muteCamOf": "Izslēgt {name} kameru"
+    },
+    "ask": {
+      "audio": "Prezentētājs lūdza ieslēgt jūsu mikrofonu.",
+      "video": "Prezentētājs lūdza ieslēgt jūsu kameru.",
+      "ignore": "Ignorēt"
+    },
+    "toDetail": "Doties uz semināra lapu",
+    "consent": {
+      "title": "Pirms ieslēdzat mikrofonu",
+      "body": "Ja šajā seminārā ir ieslēgta ierakstīšana, subtitri vai AI sanāksmju piezīmes, jūsu balss var tikt pārveidota tekstā, saglabāta un tulkota. Balss apstrādi veic AI pakalpojums ārpus jūsu valsts. Ja nepiekrītat, jūsu mikrofons joprojām ieslēdzas — tikai jūsu balss netiek apstrādāta.",
+      "privacy": "Privātuma politika",
+      "newTab": "(atveras jaunā cilnē)",
+      "decline": "Nepiekrītu",
+      "agree": "Piekrītu un ieslēgt mikrofonu",
+      "notice": "Kad ir ieslēgta ierakstīšana, subtitri vai AI sanāksmju piezīmes, runātāju balsis tiek apstrādātas. Klausītāju balsis netiek sūtītas.",
+      "saveFailClosed": "Šis seminārs ir beidzies, tāpēc piekrišanu nevar ierakstīt."
+    },
+    "captions": {
+      "title": "Subtitri",
+      "room": "Tiešraides subtitri (visai telpai)",
+      "show": "Rādīt subtitrus",
+      "size": {
+        "label": "Teksta izmērs",
+        "sm": "Mazs",
+        "md": "Vidējs",
+        "lg": "Liels"
+      },
+      "waiting": "Subtitri parādās, kad prezentētājs tos ieslēdz",
+      "limit": "Sasniegts runas apstrādes ierobežojums, tāpēc subtitri un AI minūtes tika apturētas",
+      "sendFail": "Nevarēja ieslēgt subtitrus. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "sendFailOff": "Nevarēja izslēgt subtitrus. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "region": "Subtitri",
+      "translate": "Rādīt tulkotus subtitrus",
+      "lang": "Tulkošanas valoda",
+      "langMine": "Manas valodas",
+      "langAll": "Visas valodas",
+      "trStop": {
+        "forbidden": "Tulkotie subtitri ir pieejami tikai reģistrētiem dalībniekiem. Tiek rādīts oriģināls.",
+        "unavailable": "Tulkotie subtitri pašlaik nav pieejami. Tiek rādīts oriģināls.",
+        "quota": "Šis seminārs ir sasniedzis tulkošanas ierobežojumu. Tiek rādīts oriģināls.",
+        "usrQuota": "Jūs esat izmantojis savu tulkošanas ierobežojumu šim semināram. Tiek rādīts oriģināls."
+      },
+      "unsupported": "Šī ierīce nevar izveidot tiešraides subtitrus (šajā pārlūkprogrammā nav audio ierakstīšanas atbalsta)"
+    },
+    "effects": {
+      "title": "Efekti",
+      "light": "Gaismas korekcija",
+      "noise": "Samazināt troksni",
+      "noiseFail": "Trokšņu samazināšanu nevar mainīt šajā ierīcē",
+      "close": "Aizvērt",
+      "preview": "Mans priekšskatījums",
+      "bg": "Fons",
+      "bgNone": "Nav",
+      "bgBlur": "Aizmiglot",
+      "scenes": {
+        "beach": "🏝️ Maldivu pludmale",
+        "autumn": "🍁 Rudens ieleja",
+        "fireplace": "🔥 Kamīns",
+        "xmas": "🎄 Ziemassvētku sanāksmju telpa"
+      },
+      "bgs": {
+        "dusk": "Krēsla",
+        "ocean": "Okeāns",
+        "forest": "Mežs",
+        "studio": "Studija",
+        "grid": "Režģis",
+        "dots": "Punkti"
+      },
+      "myAdd": "Mans attēls",
+      "myItem": "Mans attēls {n}",
+      "myDel": "Dzēst manu attēlu {n}",
+      "mySaveFail": "Fons ir piemērots, bet to nevarēja saglabāt šajā ierīcē (tikai šai sanāksmei)",
+      "bgStopped": "Fona efekts apstājās un tika izslēgts. Izvēlieties to vēlreiz, lai restartētu.",
+      "myNote": "Jūsu attēli tiek glabāti tikai šajā ierīcē (līdz 3, katrs 2 MB)",
+      "mobileBlurOnly": "Tālruņos ir pieejams tikai aizmiglots fons (attēlu foni darbojas datorā)",
+      "myTooBig": "Var izmantot tikai attēlus līdz 2 MB",
+      "preparing": "Gatavo…",
+      "bgFailed": "Nevarēja ielādēt fona efektu",
+      "autoOff": "Jūsu ierīce ir pārāk lēna, tāpēc fona efekts tika izslēgts",
+      "unsupported": "Fona efekti nav pieejami šajā ierīcē",
+      "noCam": "Ieslēdziet kameru, lai izvēlētos fonu",
+      "lightUnsupported": "Gaismas korekcija nav pieejama šajā ierīcē",
+      "noiseUnsupported": "Trokšņu samazināšanas iestatījumi netiek atbalstīti šajā ierīcē"
+    },
+    "sheetClose": "Aizvērt",
+    "polls": {
+      "new": "Jauna aptauja",
+      "question": "Jautājums",
+      "option": "Opcija {n}",
+      "remove": "Noņemt opciju {n}",
+      "addOption": "Pievienot opciju",
+      "start": "Sākt aptauju",
+      "cancel": "Atcelt",
+      "dup": "Opcijām jābūt atšķirīgām",
+      "vote": "Balsot",
+      "change": "Mainīt balsojumu",
+      "close": "Aizvērt aptauju",
+      "closed": "Slēgts",
+      "mine": "Jūsu izvēle",
+      "result": "{pct}% ({n} balsis)",
+      "total": "Kopā {n} balsis",
+      "empty": "Vēl nav aptauju.",
+      "loading": "Ielādē…",
+      "labOnly": "Aptaujas ir pieejamas tikai semināru telpās.",
+      "started": "Ir sākusies jauna aptauja",
+      "goVote": "Balsot",
+      "votersNote": "Organizators var redzēt, kurš balsoja par kuru opciju.",
+      "voters": "Balsoja: {names}"
+    },
+    "qna": {
+      "sort": "Kārtot",
+      "by": {
+        "top": "Populārākie",
+        "new": "Jaunākie"
+      },
+      "rcm": "Balsot par ({n})",
+      "answered": "Atbildēts",
+      "answer": "Atzīmēt kā atbildētu",
+      "unanswer": "Atcelt atzīmi kā atbildētu",
+      "hide": "Paslēpt",
+      "doneN": "Atbildēts {n}",
+      "backOpen": "Neatbildētie jautājumi",
+      "empty": "Vēl nav jautājumu.",
+      "emptyDone": "Nav atbildētu jautājumu.",
+      "loading": "Ielādē…",
+      "input": "Uzdodiet jautājumu (500 rakstzīmes)",
+      "send": "Sūtīt",
+      "left": "Atlikuši {n}",
+      "labOnly": "Jautājumi un atbildes ir pieejamas tikai semināru telpās."
+    },
+    "recording": {
+      "title": "Ierakstīt",
+      "badge": "Ieraksta",
+      "unsupported": "Šī pārlūkprogramma neatbalsta ierakstīšanu. Lūdzu, ierakstiet no parastas pārlūkprogrammas datorā.",
+      "piBrowserOnly": "Ierakstīšana darbojas tikai parastā pārlūkprogrammā (datorā vai mobilajā ierīcē). Pi Browser nevar saglabāt ierakstu failus — atveriet šo semināru datora vai tālruņa pārlūkprogrammā (seminarz.vercel.app), lai ierakstītu.",
+      "audioSuspended": "Iespējams, ka šajā ierīcē nav sākta skaņas ierakstīšana. Var tikt ierakstīts tikai attēls.",
+      "notifyFailed": "Ierakstīšana netika sākta, jo dalībniekus nevarēja paziņot. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "confirm": {
+        "title": "Sākt ierakstīšanu?",
+        "body": "Kad sāksies ierakstīšana, visi redzēs indikatoru 'Ieraksta'. Fails tiek saglabāts tikai šajā ierīcē un nekad netiek augšupielādēts vai pārsūtīts uz ārzemēm. Lūdzu, informējiet dalībniekus pirms sākšanas.",
+        "download": "Kad pārtrauksiet, MP4 fails tiks saglabāts jūsu lejupielāžu mapē (pārlūkprogrammas, kas nevar ierakstīt MP4, prasa brīdi, lai to konvertētu; ieraksti, kas ir garāki par aptuveni 45 minūtēm, var tikt saglabāti to sākotnējā formātā). Lietotnes pārlūkprogrammas var bloķēt failu saglabāšanu, tāpēc ierakstiet no parastas pārlūkprogrammas datorā.",
+        "cancel": "Atcelt",
+        "start": "Sākt ierakstīšanu",
+        "charge": "Ierakstīšanas laikā ierakstīšanas laiks tiek atskaitīts no jūsu apmaksātā laika papildus telpas laikam (2x ierakstīšanas laikā). Kad apmaksātais laiks beidzas, ierakstīšana apstājas un fails tiek saglabāts."
+      },
+      "resave": {
+        "label": "Ieraksta fails",
+        "save": "Saglabāt vēlreiz",
+        "dismiss": "Aizvērt saglabāšanu vēlreiz"
+      },
+      "toast": {
+        "started": "Ierakstīšana sākta — visi to redz",
+        "saved": "Ieraksts saglabāts. Pārbaudiet savu lejupielāžu mapi. Ja nekas netika saglabāts, pieskarieties [Saglabāt vēlreiz] ekrāna augšdaļā.",
+        "autoStopped": "Ierakstīšana beidzās, jo pārlūkprogramma to apturēja vai tika sasniegts izmēra ierobežojums. Viss līdz tam brīdim tika saglabāts. Sāciet ierakstīšanu vēlreiz, lai turpinātu.",
+        "empty": "Nekas netika ierakstīts, tāpēc fails netika izveidots.",
+        "saveFailed": "Nevarēja izveidot ieraksta failu.",
+        "converting": "Konvertē ierakstu uz MP4. Lūdzu, turiet šo logu atvērtu.",
+        "savedOriginal": "Nevarēja konvertēt uz MP4, tāpēc ieraksts tika saglabāts sākotnējā formātā (webm). Pārbaudiet savu lejupielāžu mapi.",
+        "startedBy": "Prezentētājs sāka ierakstīšanu",
+        "stoppedBy": "Prezentētājs pārtrauca ierakstīšanu"
+      },
+      "paidOnly": "Ierakstīšana ir pieejama tikai semināros, kas atvērti ar Mēneša vai Gada plānu, kamēr ir atlicis apmaksātais laiks.",
+      "planOut": "Apmaksātais laiks beidzās, tāpēc ierakstīšana apstājās un fails tika saglabāts.",
+      "notInRoom": "Joprojām tiek apstiprināts, ka esat telpā. Sāciet ierakstīšanu vēlreiz pēc brīža.",
+      "meterFailed": "Nevarēja pārbaudīt ierakstīšanas laiku, tāpēc ierakstīšana netika sākta. Mēģiniet vēlreiz pēc brīža.",
+      "paidOut": "Nav atlicis apmaksātais laiks, tāpēc ierakstīšanu nevar sākt. Iegādājieties to pašu plānu vēlreiz, lai ierakstītu.",
+      "pausedBadge": "Ierakstīšana apturēta",
+      "controls": "Ierakstīšanas vadīklas",
+      "pause": "Pauzēt",
+      "resume": "Atsākt",
+      "stop": "Apturēt ierakstīšanu"
+    },
+    "notes": {
+      "on": "AI piezīmes",
+      "badge": "AI piezīmes ieslēgtas",
+      "started": "Prezentētājs ieslēdza AI piezīmes",
+      "stopped": "AI piezīmes izslēgtas",
+      "startedMine": "AI piezīmes ieslēgtas — redzamas visiem",
+      "stoppedMine": "AI piezīmes izslēgtas — tiek veidotas piezīmes",
+      "startFail": "Neizdevās ieslēgt AI piezīmes",
+      "gone": "AI piezīmes apturētas — piezīmes tika beigtas vai dzēstas citur",
+      "unsupported": "AI piezīmes šeit nevar ieslēgt (nav audio ierakstīšanas atbalsta)"
+    },
+    "dubbing": {
+      "listen": "Klausīties tulkotā balsī",
+      "blocked": "Neizdevās atskaņot tulkoto balsi. Lūdzu, ieslēdziet to vēlreiz",
+      "stopped": "Tulkotā balss pašlaik nav pieejama, tāpēc tā tika izslēgta",
+      "usrQuota": "Jūs esat izmantojis savu tulkotās balss limitu šim semināram, tāpēc tā tika izslēgta"
+    },
+    "plan": {
+      "warn": "Šī semināra plānā atlikušas {min} min.",
+      "ended": "Jūsu semināra laiks beidzās, tāpēc seminārs ir beidzies un jūs atstājāt telpu.",
+      "left": "Atlikušais semināra laiks",
+      "closed": "Seminārs ir beidzies, tāpēc jūs atstājāt telpu.",
+      "hostAway": "Vadītājs ir atstājis telpu. Ja viņš neatgriezīsies 5 minūšu laikā, visi dalībnieki tiks izņemti.",
+      "hostGone": "Vadītājs neatgriezās 5 minūšu laikā, tāpēc jūs atstājāt telpu. Jūs varat atkal ienākt, kad vadītājs pievienosies."
+    },
+    "toLobby": "Gaidīšanas telpa"
+  },
+  "list": {
+    "tabsLabel": "Semināru saraksta skats",
+    "tabs": {
+      "all": "Visi",
+      "hosted": "Mani rīkotie",
+      "joined": "Pievienotie"
+    },
+    "empty": {
+      "all": "Nav gaidāmo semināru.",
+      "hosted": "Jūs neesat rīkojis nevienu semināru.",
+      "joined": "Jūs neesat pievienojies nevienam semināram."
+    },
+    "loading": "Ielādē…",
+    "retry": "Mēģināt vēlreiz",
+    "free": "Bezmaksas",
+    "fee": "{amount} Pi",
+    "host": "Vadītājs {name}",
+    "capacity": "Ietilpība {n}",
+    "status": {
+      "SCHEDULED": "Ieplānots",
+      "LIVE": "Tiešraidē",
+      "ENDED": "Beidzies",
+      "CANCELED": "Atcelts"
+    },
+    "hostNew": "Izveidot semināru",
+    "progress": "Progress",
+    "pager": "Lappušu numerācija",
+    "prev": "Iepriekšējais",
+    "next": "Nākamais",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Apakšvirsraksts",
+      "placeholder": "Pievienot apakšvirsrakstu",
+      "save": "Saglabāt apakšvirsrakstu",
+      "saving": "Saglabā…",
+      "saved": "Saglabāts."
+    },
+    "loading": "Ielādē…",
+    "back": "Atpakaļ uz sarakstu",
+    "notFound": "Seminārs nav atrasts.",
+    "status": {
+      "SCHEDULED": "Ieplānots",
+      "LIVE": "Tiešraidē",
+      "ENDED": "Beidzies",
+      "CANCELED": "Atcelts"
+    },
+    "startAt": "Datums",
+    "host": "Vadītājs",
+    "seats": "Atlikušās vietas",
+    "seatsValue": "{left} / {max}",
+    "fee": "Semināra maksa",
+    "feeValue": "{amount} Pi",
+    "free": "Bezmaksas",
+    "enter": "Ienākt",
+    "payEnter": "Maksāt ar Pi un ienākt ({amount} Pi)",
+    "paying": "Apstrādā maksājumu…",
+    "joining": "Reģistrējas…",
+    "registered": "Jūs esat reģistrēts.",
+    "full": "Šis seminārs ir pilns.",
+    "closed": "Šis seminārs ir beidzies.",
+    "canceled": "Šis seminārs tika atcelts.",
+    "roomLink": "Doties uz telpu (vadītājs)",
+    "piBrowserOnly": "Maksājums ir pieejams Pi Browser pēc Pi pieteikšanās.",
+    "payCancelled": "Maksājums atcelts.",
+    "payStillWaiting": "Joprojām gaida maku. Ja jau esat pieteicies Pi Wallet, lūdzu, pagaidiet brīdi.",
+    "payFailed": "Maksājums neizdevās.",
+    "err": {
+      "NAME_TAKEN": "Šis vārds jau tiek izmantots. Izvēlieties citu.",
+      "CAL_READ_FAILED": "Neizdevās ielādēt jūsu notikumus. Pārbaudiet adresi.",
+      "ISLAND_FULL": "Visi 100 salu nosaukumi pašlaik tiek izmantoti. Jūs varat atvērt jaunu semināru pēc tam, kad gaidāmais vai tiešraides seminārs beidzas vai tiek atcelts.",
+      "SMN_FULL": "Šis seminārs ir pilns.",
+      "SMN_CLOSED": "Šis seminārs ir beidzies vai tika atcelts.",
+      "SMN_ALREADY": "Jūs jau esat reģistrēts vai maksājums tiek apstrādāts.",
+      "SMN_FREE": "Bezmaksas semināriem nav jāmaksā.",
+      "SMN_PAY_REQUIRED": "Šis ir maksas seminārs. Lūdzu, samaksājiet, lai ienāktu.",
+      "SMN_PAY_INVALID": "Mēs nevarējām pārbaudīt jūsu maksājumu. Lūdzu, sazinieties ar administratoru.",
+      "PAY_PI_FAILED": "Neizdevās sasniegt Pi maksājumu serveri. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "PAY_MISMATCH": "Maksājuma detaļas nesakrīt.",
+      "PAY_AMOUNT_MISMATCH": "Maksājuma summa atšķiras no semināra maksas.",
+      "PAY_CANCELLED": "Šis maksājums tika atcelts.",
+      "PAY_ALREADY_PAID": "Maksājums joprojām tiek apstrādāts. Ja jūs pieteicāties makā, mēģiniet vēlreiz pēc 3 minūtēm.",
+      "PAY_INVALID_STATE": "Šo maksājumu pašlaik nevar apstrādāt.",
+      "PAY_PI_CANCEL_REFUSED": "Maksājums jau tiek apstrādāts un to nevar atcelt. Lūdzu, pārbaudiet vēlreiz pēc brīža."
+    },
+    "share": {
+      "title": "Ieplānot un kopīgot",
+      "calendar": "Pievienot kalendāram",
+      "ics": "Kalendāra fails",
+      "mail": "Uzaicināt pa e-pastu",
+      "mailApp": "Sūtīt ar noklusējuma e-pasta lietotni",
+      "mailSubject": "[Semināra ielūgums] {title}",
+      "mailBody": "{title}\nKad: {start}\n\nPievienojieties tieši ar šo saiti.\nDators: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopēt saiti",
+      "copied": "Saite nokopēta.",
+      "copyFail": "Neizdevās nokopēt. Lūdzu, nokopējiet saiti no adreses joslas.",
+      "share": "Kopīgot citā lietotnē",
+      "shareFail": "Neizdevās kopīgot. Lūdzu, izmantojiet Kopēt saiti.",
+      "created": "Jūsu seminārs ir gatavs. Pievienojiet tā sākuma laiku savam Google kalendāram.",
+      "addGoogle": "Pievienot Google kalendāram",
+      "later": "Vēlāk",
+      "piBrowserOpen": "Pi Browser kalendārs, e-pasts un kalendāra fails tiek atvērti jūsu tālruņa noklusējuma pārlūkprogrammā.",
+      "extFail": "Neizdevās atvērt. Atjauniniet Pi Browser vai izmantojiet Kopēt saiti un atveriet to parastā pārlūkprogrammā (seminarz.vercel.app).",
+      "icsPiBrowser": "Kalendāra failu var lejupielādēt tikai parastā pārlūkprogrammā (datorā vai mobilajā ierīcē). Pi Browser vietā izmantojiet Pievienot kalendāram."
+    },
+    "attendance": "Apmeklējums",
+    "plan": "Plāns",
+    "left": "Atlikušais laiks"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Iepriekšējais mēnesis",
+      "next": "Nākamais mēnesis",
+      "connect": "Rādīt manu Google kalendāru",
+      "change": "Pārvaldīt Google kalendārus ({n})",
+      "add": "Pievienot",
+      "remove": "Noņemt",
+      "close": "Aizvērt",
+      "failed": "Neizdevās ielādēt notikumus no {n} kalendāra(-iem). Pārbaudiet adresi.",
+      "badUrl": "Ielīmējiet 'Slepeno adresi iCal formātā' (…/basic.ics) no Google kalendāra iestatījumiem, nevis pārlūkprogrammas adreses joslas.",
+      "full": "Jūs varat pievienot līdz {n} kalendāriem.",
+      "allDay": "Visu dienu",
+      "day": "Mani notikumi šajā dienā",
+      "count": "{n, plural, one {# notikums} other {# notikumi}}",
+      "more": "+{n}",
+      "picked": "Šis datums ir iestatīts kā sākuma datums. Izvēlieties laiku zemāk.",
+      "s1": "Pieskarieties [Atvērt Google kalendāra iestatījumus] zemāk.",
+      "s2": "Kreisajā pusē sadaļā 'Mani kalendāra iestatījumi' izvēlieties kalendāru (piemēram, jūsu vārdu).",
+      "s3": "Ritiniet līdz 'Integrēt kalendāru' un nokopējiet 'Slepeno adresi iCal formātā'.",
+      "s4": "Ielīmējiet to šeit un pieskarieties [Pievienot] — notikumu nosaukumi parādīsies kalendārā. Pievienojiet citus kalendārus tādā pašā veidā, līdz 5.",
+      "open": "Atvērt Google kalendāra iestatījumus",
+      "privacy": "Šī adrese ir jūsu kalendāra atslēga — nedalieties ar to. Tā tiek glabāta tikai šajā ierīcē, nekad mūsu serverī."
+    },
+    "title": "Izveidot semināru",
+    "name": "Ceļosim uz skaistu salu!",
+    "subTitle": "Apakšvirsraksts (pēc izvēles, līdz 60)",
+    "startAt": "Sākuma laiks",
+    "maxCnt": "Ietilpība (1–100)",
+    "submit": "Izveidot",
+    "submitting": "Veido…",
+    "invalid": "Pārbaudiet ievadi — datums viena gada laikā no šodienas, ietilpība 1–100.",
+    "attendance": {
+      "title": "Apmeklējums",
+      "back": "Atpakaļ uz semināru",
+      "loading": "Ielādē…",
+      "forbidden": "Tikai vadītājs un administratori var apskatīt apmeklējumu.",
+      "count": "{n} cilvēki",
+      "csv": "Lejupielādēt CSV",
+      "empty": "Neviens vēl nav pievienojies.",
+      "online": "Tiešsaistē",
+      "left": "Atstāja",
+      "col": {
+        "name": "Vārds",
+        "pi": "Pi lietotājvārds",
+        "ent": "Pirmoreiz pievienojās",
+        "hb": "Pēdējo reizi redzēts",
+        "dur": "Apmeklētais laiks",
+        "min": "Apmeklēts (min, izņemot prombūtnes laiku)",
+        "state": "Statuss"
+      },
+      "durNote": "Apmeklētais laiks ir no pirmās pievienošanās līdz pēdējai redzēšanai, mīnus prombūtnes laiks (pārtraukumi, kas ilgāki par 2,5 minūtēm).",
+      "csvPiBrowser": "CSV lejupielāde darbojas tikai parastā pārlūkprogrammā (datorā vai mobilajā ierīcē). Pi Browser nevar saglabāt failus — atveriet šo apmeklējumu lapu datora vai tālruņa pārlūkprogrammā (seminarz.vercel.app)."
+    },
+    "plan": "Plāns",
+    "planFree": "Bezmaksas — {time} atlicis šomēnes · bez AI",
+    "planPaid": "{name} {time} · {price} — maksāt, veidojot",
+    "planHint": "Seminārs, kas atvērts ar maksas plānu, vispirms izmanto šī plāna laiku, pēc tam turpina ar šī mēneša bezmaksas laiku (bez AI bezmaksas daļā). Aktīvs plāns tiek atvērts bez maksājuma; Mēneša vai Gada plāns, kas jums nav, tiek apmaksāts ar Pi, nospiežot Izveidot, pēc tam seminārs tiek atvērts (Pi Browser). Dalībniekiem pievienošanās vienmēr ir bez maksas.",
+    "planOwned": "{name} — aktīvs · atlicis {time}",
+    "planEnds": "Sākuma laiks ir pēc šī plāna derīguma termiņa beigām. Pārvietojiet sākumu agrāk vai izvēlieties citu plānu.",
+    "paidKept": "Jūsu apmaksātā caurlaide tiek saglabāta. Novērsiet problēmu un vēlreiz nospiediet Izveidot (bez otrā maksājuma)."
+  },
+  "privacy": {
+    "title": "Privātuma politika — Balss un AI funkcijas",
+    "effective": "Spēkā no {date}",
+    "intro": "Šī politika izskaidro personas informāciju, ko mēs apstrādājam, kad jūs izmantojat tiešraides subtitrus, tulkotos subtitrus, balss tulkošanu, AI sanāksmju piezīmes un klātienes piezīmes seminārā. Šīs funkcijas izmanto ārēju AI pakalpojumu, tāpēc informācija tiek pārsūtīta uz ārzemēm.",
+    "whoTitle": "Kuras personas informācija tiek apstrādāta",
+    "who": [
+      "Prezentētāji un dalībnieki uz skatuves: mēs lūdzam jūsu piekrišanu vienu reizi, pirms jūs pirmo reizi ieslēdzat mikrofonu. Jūs varat pievienoties semināram bez piekrišanas.",
+      "Auditorija: jūs neizmantojat mikrofonu, tāpēc balss netiek nosūtīta. Jūs redzat tikai subtitrus un piezīmes.",
+      "Klātienes piezīmes: administrators ieraksta sanāksmi ar mikrofonu un apstiprina, ka apmeklētāji tika informēti pirms ierakstīšanas."
+    ],
+    "xferTitle": "Personas informācijas pārsūtīšana uz ārzemēm (Korejas Personas datu aizsardzības likums, 28.-8. pants)",
+    "xfer": [
+      {
+        "k": "Saņēmējs",
+        "v": "Google LLC (Gemini API) — kontakts [TBD: Google privātuma kontakts]"
+      },
+      {
+        "k": "Valstis",
+        "v": "Amerikas Savienotās Valstis un citas valstis, kurās atrodas Google datu centri [TBD: apstrādes reģions]"
+      },
+      {
+        "k": "Kad un kā",
+        "v": "Aptuveni ik pēc 5 sekundēm, kamēr funkcija ir ieslēgta, izmantojot šifrētu savienojumu (HTTPS). Klātienes piezīmēm viss ieraksts tiek nosūtīts vēlreiz 5 minūšu daļās, kad piezīme beidzas (precīza transkripcija)."
+      },
+      {
+        "k": "Vienumi",
+        "v": "Balss, runātais saturs (teksts), runātāja displeja vārds (piezīmju kopsavilkumiem), ekrāna koplietošanas ekrānuzņēmumi (kad AI piezīmes ir ieslēgtas)"
+      },
+      {
+        "k": "Mērķis",
+        "v": "Runas pārvēršana tekstā, tulkošana, sanāksmju piezīmju kopsavilkumi, sintētiskā runa (standarta balsis, bez balss klonēšanas), runātāju atdalīšana klātienes piezīmēm (balsis tiek atšķirtas un marķētas pēc uztvertā dzimuma, piemēram, Vīrietis 1 / Sieviete 1 — netiek secināti vārdi vai identitātes)"
+      },
+      {
+        "k": "Saglabāšana",
+        "v": "Beidzas, tiklīdz tiek atgriezts rezultāts. Mēs lūdzam Google neglabāt pieprasījumus (store=false). Tomēr ļaunprātīgas izmantošanas uzraudzības žurnāli var tikt saglabāti saskaņā ar Google noteikumiem [TBD: saglabāšanas periods un maksas līmeņa statuss]."
+      },
+      {
+        "k": "Kā atteikties un kas notiek",
+        "v": "Ja jūs nepiekrītat vai izslēdzat mikrofonu, balss netiek nosūtīta. Jūs joprojām varat piedalīties seminārā; netiek veidoti tikai jūsu runas subtitri, tulkojumi un piezīmes. Jūs varat atsaukt piekrišanu jebkurā laikā [TBD: kur atrodas atsaukšanas poga]."
+      }
+    ],
+    "keepTitle": "Ko šis pakalpojums saglabā",
+    "keep": [
+      "Oriģinālais audio: semināra subtitriem un AI sanāksmju piezīmēm tas netiek glabāts; tas tiek izmests tūlīt pēc pārvēršanas tekstā. Klātienes piezīmēm ieraksts tiek glabāts privātā krātuvē, lai to varētu precīzāk pārrakstīt (ar runātājiem) pēc sanāksmes, un tas tiek dzēsts ikdienas tīrīšanas laikā, kad ir pagājusi 1 diena kopš piezīmes beigām (nekavējoties, ja piezīme tiek dzēsta).",
+      "Tiešraides subtitri: netiek glabāti.",
+      "AI sanāksmju piezīmes (kad prezentētājs tās ieslēdz): runātais saturs, ekrānuzņēmumi un kopsavilkums, tiek glabāti, līdz piezīmes tiek dzēstas [TBD: maksimālais saglabāšanas laiks].",
+      "Piekrišanas ieraksti: piekrišanas laiks un politikas versija, tiek glabāti kā pierādījums [TBD: saglabāšanas periods].",
+      "Lietojums: pieprasījumu skaits minūtē un apstrādes laiks, ko izmanto izmaksu ierobežojumu ievērošanai.",
+      "Apmeklējums: jūsu pievienošanās laiks, pēdējā savienojuma laiks, jūsu displeja vārds un jūsu Pi lietotājvārds tiek glabāti un nodoti vadītājam kā apmeklējumu saraksts (ekrānā un kā CSV lejupielāde). Glabāts, līdz seminārs tiek dzēsts.",
+      "Jautājumi un atbildes un aptaujas: jautājuma teksts un jautātāja displeja vārds (vai Pi lietotājvārds, ja nav) ir redzami katram dalībniekam. Atbalsta balsis rāda tikai skaitu, nekad to, kurš tās nodeva. Aptaujas balsis dalībniekiem rāda tikai skaitu; organizators un administratori katrai opcijai redz katra vēlētāja displeja vārdu (vai Pi lietotājvārdu, ja nav). Glabāts, ieskaitot slēptos jautājumus, līdz seminārs tiek dzēsts."
+    ],
+    "recTitle": "Ierakstīšana",
+    "rec": "Ieraksti tiek saglabāti tikai kā fails prezentētāja ierīcē. Tie netiek augšupielādēti mūsu serveros vai pārsūtīti uz ārzemēm. Kamēr ierakstīšana vai AI piezīmes ir ieslēgtas, katrs dalībnieks redz indikatoru.",
+    "rightsTitle": "Jūsu tiesības",
+    "rights": "Jūs varat lūgt piekļūt, labot, dzēst vai apturēt jūsu informācijas apstrādi. Kontakts: [TBD: privātuma amatpersonas vārds un kontakts]"
+  },
+  "notes": {
+    "title": "Piezīmes",
+    "back": "Atpakaļ uz semināru",
+    "loading": "Ielādē…",
+    "meta": "Piezīmes · {date} · {min} min",
+    "aiWarn": "AI ģenerēts kopsavilkums — tas var saturēt kļūdas",
+    "points": "Galvenie punkti",
+    "decisions": "Lēmumi",
+    "todos": "Darbības vienumi",
+    "shots": "Ekrāna tveršana ({n})",
+    "transcript": "Transkripts",
+    "download": "Lejupielādēt Markdown",
+    "making": "Veido piezīmes…",
+    "makingLong": "Tas aizņem laiku. Lūdzu, atsvaidziniet vēlāk",
+    "recording": "Joprojām ieraksta",
+    "failed": "Neizdevās izveidot kopsavilkumu — pilns transkripts ir zemāk",
+    "retry": "Mēģināt vēlreiz",
+    "finish": "Beigt ierakstīšanu un apkopot",
+    "none": "Nekas šeit",
+    "blank": "Nav ko apkopot — netika ierakstīta runa vai tā bija pārāk īsa",
+    "notFound": "Piezīmes nav atrastas",
+    "forbidden": "Jums nav piekļuves šīm piezīmēm",
+    "shotAlt": "Ekrāna tveršana plkst. {at}",
+    "close": "Aizvērt",
+    "view": "Skatīt piezīmes",
+    "error": "Neizdevās ielādēt",
+    "mine": "Manas piezīmes",
+    "del": "Dzēst piezīmes",
+    "delAsk": "Dzēst šīs piezīmes (kopsavilkumu, transkriptu un ekrāna tveršanu)? Neviens tās nevarēs redzēt",
+    "delYes": "Dzēst",
+    "delNo": "Atcelt",
+    "delFail": "Neizdevās dzēst",
+    "dlFail": "Neizdevās lejupielādēt — lūdzu, mēģiniet vēlreiz",
+    "recentNotes": "Jaunākās piezīmes",
+    "empty": "Vēl nav piezīmju",
+    "newNote": "Sākt klātienes piezīmes",
+    "inPerson": "Klātienes sanāksmju piezīmes",
+    "inPersonTag": "Klātienē",
+    "titleLabel": "Nosaukums",
+    "titlePh": "piem. Iknedēļas sanāksme",
+    "told": "Esmu informējis visus klātesošos, ka tas tiks ierakstīts un apstrādāts ar AI (obligāti)",
+    "toldWhy": "Pirms sākat, informējiet visus klātesošos, ka šī saruna tiks ierakstīta (ieraksts tiek glabāts 1 dienu pēc piezīmes beigām, un runātāji tiek atšķirti pēc balss un marķēti pēc uztvertā dzimuma) un pārvērsta tekstā un kopsavilkumā ar ārēju AI",
+    "start": "Sākt ierakstīšanu",
+    "starting": "Gatavojas…",
+    "recBadge": "Ieraksta {time}",
+    "recentLines": "Jaunākās rindas",
+    "waiting": "Teksts parādīsies šeit, kad cilvēki runās",
+    "end": "Beigt un izveidot piezīmes",
+    "wakeWarn": "Ierakstīšana var apstāties, ja ekrāns izslēdzas",
+    "adminOnly": "Var izmantot tikai administratori",
+    "aiOff": "AI piezīmes pašlaik nav pieejamas (nepieciešama servera iestatīšana). Iepriekšējās piezīmes ir uzskaitītas zemāk",
+    "reload": "Pārlādēt",
+    "unsupported": "Ierakstīšana šajā ierīcē nav pieejama",
+    "micDenied": "Nevar izmantot mikrofonu — pārbaudiet atļauju",
+    "limited": "Apstrādes laika ierobežojums ir izmantots — beidziet un izveidojiet piezīmes",
+    "noAgr": "Apturēts: nav paziņojuma apstiprinājuma ierakstā — beidziet un sāciet no jauna",
+    "micLost": "Mikrofons atvienojās un ierakstīšana apstājās — pieskarieties pievienot mikrofonu vai beidziet piezīmi",
+    "micRetry": "Atkārtoti pievienot mikrofonu",
+    "gone": "Šī piezīme tika beigta vai dzēsta citur, tāpēc ierakstīšana apstājās — izmantojiet zemāk esošo pogu, lai atvērtu piezīmes",
+    "finishing": "Saglabā pēdējos vārdus…",
+    "st": {
+      "RECORDING": "Ierakstīšana",
+      "SUMMARIZING": "Veido",
+      "DONE": "Pabeigts",
+      "FAILED": "Neizdevās"
+    },
+    "downloadPiBrowser": "Markdown lejupielāde darbojas tikai parastā pārlūkprogrammā (datorā vai mobilajā ierīcē). Pi Browser nevar saglabāt failus — atveriet šīs piezīmes datora vai tālruņa pārlūkprogrammā (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Plāni",
+    "loading": "Ielādē…",
+    "free": "Bezmaksas",
+    "freeDesc": "{time} semināru katru mēnesi (netiek pārcelts)",
+    "monthly": "Mēnesī",
+    "yearly": "Gadā",
+    "paidDesc": "{time} semināru, derīgs {months} mēnešus",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Pārbauda Pi cenu",
+    "noAi": "Nav AI subtitru, tulkošanas, dublēšanas vai piezīmju kopsavilkumu",
+    "withAi": "Ietver AI subtitrus, tulkošanu, dublēšanu un piezīmju kopsavilkumus",
+    "buy": "Maksāt ar Pi",
+    "bought": "Maksājums pabeigts. Semināra laiks ir pievienots.",
+    "meRemain": "Atlicis laiks: {time}",
+    "loginToBuy": "Piesakieties, lai iegādātos plānu.",
+    "payNote": "Maksājums vienmēr ir Pi. Vietējās valūtas summa ir tikai pazīstama atsauce; Pi summa tiek noteikta pēc Pi cenas maksājuma brīdī. Seminārs ar maksas plānu vispirms izmanto šī plāna caurlaides (vispirms tās, kurām beidzas derīguma termiņš), pēc tam turpina ar šī mēneša bezmaksas laiku.",
+    "charge": "Papildināt laiku",
+    "hm": "{h} h {m} min",
+    "m": "{m} min",
+    "won": "KRW {n}",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (pārbauda Pi cenu)",
+    "h": "{h} h"
+  },
+  "adminRooms": {
+    "title": "Telpu pārvaldība",
+    "adminOnly": "Tikai administratori var skatīt šo lapu.",
+    "refresh": "Atsvaidzināt",
+    "count": "{n} atvērtas telpas",
+    "empty": "Pašlaik nav atvērtu telpu.",
+    "lab": "Laboratorijas telpa",
+    "noSeminar": "Nav semināra ieraksta",
+    "peers": "{n} / {cap} savienoti",
+    "producers": "{n} straumes",
+    "end": "Beidzas {time}",
+    "stale": "Seminārs ir beidzies, bet telpa joprojām ir atvērta video serverī — piespiedu kārtā aizveriet to.",
+    "close": "Piespiedu aizvēršana",
+    "confirmSeminar": "Tas beidz semināru un aizver telpu. Visi tiks atvienoti.",
+    "confirmRoom": "Tas aizver telpu. Visi tiks atvienoti.",
+    "confirmYes": "Aizvērt",
+    "cancel": "Atcelt",
+    "closing": "Aizver…",
+    "closed": "Telpa aizvērta.",
+    "metrics": "Video servera metrika (kopš sākuma)",
+    "metricsOff": "Nevarēja ielādēt metriku.",
+    "m": {
+      "packetsIn": "Ienākošās paketes",
+      "packetsOut": "Izejošās paketes",
+      "nackIn": "Saņemti NACK",
+      "nackOut": "Nosūtīti NACK",
+      "retransmits": "Atkārtotas pārraides",
+      "duplicateNack": "Dublēti NACK",
+      "cacheMiss": "Atkārtotas pārraides kešatmiņas trūkumi",
+      "pliOut": "Kadru pieprasījumi (PLI)",
+      "keyframes": "Kadri",
+      "layerSwitches": "Kvalitātes pārslēgšanās",
+      "queueDrops": "Rindas kritumi"
+    }
+  },
+  "adminUsers": {
+    "title": "Lietotāji",
+    "adminOnly": "Tikai administratori var skatīt šo lapu.",
+    "search": "Meklēt pēc vārda (2+ rakstzīmes)",
+    "searchBtn": "Meklēt",
+    "refresh": "Atsvaidzināt",
+    "count": "{n, plural, one {# lietotājs} other {# lietotāji}}",
+    "empty": "Nav lietotāju.",
+    "admin": "Administrators",
+    "lastLogin": "Pēdējā pieteikšanās {time}",
+    "never": "Nekad nav pieteicies",
+    "plan": {
+      "FREE": "Bezmaksas",
+      "M": "Mēnesī",
+      "Y": "Gadā"
+    },
+    "until": "(līdz {time})",
+    "manage": "Pārvaldīt laiku",
+    "close": "Aizvērt",
+    "planLabel": "Plāns",
+    "hours": "Stundas",
+    "minutes": "Minūtes",
+    "reason": "Iemesls (pēc izvēles)",
+    "sub": "Samazināt",
+    "confirmSub": "Samazināt {plan} laiku par {time}.",
+    "confirmYes": "Apstiprināt",
+    "cancel": "Atcelt",
+    "saving": "Saglabā…",
+    "done": "Piemērots. {plan} atlicis laiks: {time}",
+    "invalid": "Ievadiet samazinājumu no 1 minūtes līdz 1000 stundām (veselas minūtes 0–59).",
+    "history": "Jaunākie pielāgojumi",
+    "noHistory": "Vēl nav pielāgojumu.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Piešķirt pakalpojuma caurlaidi (bezmaksas laiks)",
+    "svc": {
+      "H1": "1 stundas caurlaide",
+      "D1": "1 dienas caurlaide",
+      "M1": "1 mēneša caurlaide"
+    },
+    "svcNote": "Pakalpojuma caurlaides ir bezmaksas plāna laiks. Tās var izmantot no šī brīža uz šo periodu (1 stunda, 24 stundas, 1 mēnesis) bezmaksas semināros un maksas semināru bezmaksas daļā (bez AI funkcijām). Ja ir vairākas caurlaides, tās tiek izmantotas automātiski secībā 1 stunda → 1 diena → 1 mēnesis.",
+    "subTitle": "Samazināt laiku",
+    "subNote": "Vispirms tiek ņemtas vērā vēlāk beidzamās caurlaides. Ja tas ir vairāk nekā atlicis, tiek noņemts tikai atlikušais laiks.",
+    "confirmSvc": "Piešķirt {svc}.",
+    "doneSvc": "Piešķirta {svc}. Atlicis bezmaksas laiks: {time} (caurlaide beidzas {end})"
+  }
+}

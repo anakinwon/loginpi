@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "ژبه بدله کړئ",
-      "search": "ژبه لټون کړئ",
-      "empty": "هیڅ پایله نشته"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "ژوندۍ ویډیو سیمینارونه چې تاسو د Pi سره یوځای کیږئ"

@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Изменить язык",
-      "search": "Поиск языка",
-      "empty": "Нет результатов"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Онлайн-семинары, к которым вы присоединяетесь с помощью Pi"

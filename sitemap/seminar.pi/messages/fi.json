@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Vaihda kieli",
-      "search": "Hae kieltä",
-      "empty": "Ei tuloksia"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Live-videoseminaareja, joihin liityt Pi:llä"

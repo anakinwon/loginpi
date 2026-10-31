@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Tilni oʻzgartirish",
-      "search": "Tilni qidirish",
-      "empty": "Natija topilmadi"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Pi orqali qoʻshiladigan jonli video seminarlar"

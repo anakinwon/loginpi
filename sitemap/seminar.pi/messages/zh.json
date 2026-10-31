@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "更改语言",
-      "search": "搜索语言",
-      "empty": "无结果"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "通过 Pi 参与的实时视频研讨会"

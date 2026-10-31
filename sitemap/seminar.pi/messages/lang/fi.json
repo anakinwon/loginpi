@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Live-videoseminaareja, joihin liityt Pi:llä"
+  },
+  "home": {
+    "description": "Isännät järjestävät avoimia seminaareja, ja osallistujat liittyvät live-videoistuntoihin Pi:llä.",
+    "badge": "Live-seminaareja kauniilla saarilla",
+    "headline": "Katso, kuuntele ja opi yhdessä – livenä",
+    "ctaBrowse": "Selaa seminaareja",
+    "ctaPlan": "Katso suunnitelmat",
+    "features": {
+      "video": "Live-video",
+      "caption": "Tekstitykset ja käännös",
+      "notes": "AI-kokousmuistiinpanot",
+      "pay": "Maksa Pi:llä"
+    },
+    "listTitle": "Seminaarit",
+    "cal": {
+      "title": "Seminaarikalenteri",
+      "desc": "Menneistä seminaareista tuleviin – napauta päivämäärää saadaksesi lisätietoja.",
+      "legendSmn": "Seminaarit",
+      "legendEnded": "Menneet seminaarit",
+      "legendMine": "Omat tapahtumat",
+      "failed": "Seminaaripäivämäärien lataaminen epäonnistui. Yritä myöhemmin uudelleen.",
+      "open": "Näytä tiedot"
+    }
+  },
+  "nav": {
+    "link": "Linkitä tili",
+    "privacy": "Tietosuoja",
+    "plan": "Suunnitelmat",
+    "rooms": "Huoneet",
+    "admin": "Ylläpitäjä",
+    "users": "Käyttäjät",
+    "home": "Etusivu",
+    "privacyShort": "Tietosuoja",
+    "menu": "Päävalikko",
+    "fold": "Kutista valikko",
+    "unfold": "Laajenna valikko"
+  },
+  "auth": {
+    "checking": "Kirjautumista tarkistetaan…",
+    "signedIn": "{name}",
+    "inPerson": "Henkilökohtaiset muistiinpanot",
+    "required": "Kirjaudu sisään Pi-tililläsi.",
+    "signIn": "Kirjaudu sisään Pi:llä",
+    "openInPiBrowser": "Avaa tämä sivu Pi Browserissa kirjautuaksesi sisään Pi-tililläsi.",
+    "authenticating": "Kirjaudutaan sisään…",
+    "google": "Kirjaudu sisään Googlella",
+    "signOut": "Kirjaudu ulos",
+    "or": "tai",
+    "linkRequired": "Olet kirjautunut sisään Googlella, mutta sitä ei ole vielä linkitetty Pi-tiliin. Luo linkityskoodi Pi Browserissa ja syötä se tähän.",
+    "linkNeeded": "Pi-tilin linkitys tarvitaan",
+    "linkCheckFailed": "Tilin linkityksen tilaa ei voitu tarkistaa (väliaikainen palvelinvirhe). Päivitä sivu hetken kuluttua."
+  },
+  "piOAuth": {
+    "signingIn": "Kirjaudutaan sisään Pi-tililläsi…",
+    "failed": "Pi-kirjautuminen epäonnistui. Yritä uudelleen.",
+    "stateMismatch": "Kirjautumispyyntöä ei voitu vahvistaa (vanhentunut tai toinen välilehti). Yritä uudelleen.",
+    "retry": "Yritä uudelleen",
+    "backHome": "Etusivulle"
+  },
+  "link": {
+    "title": "Linkitä tili",
+    "intro": "Yhdistä Pi Browserissa sisäänkirjautumasi tili tavallisen selaimen Google-kirjautumiseen. Linkityksen jälkeen voit käyttää samaa tiliä myös PC-selaimella.",
+    "checking": "Kirjautumista tarkistetaan…",
+    "piIssueTitle": "Kirjautuaksesi myös tavallisella selaimella",
+    "codeHint": "Luo alla oleva koodi, kirjaudu sitten sisään Googlella PC-selaimella ja syötä se Linkitä tili -sivulle (10 minuutin kuluessa).",
+    "piIssue": "Luo linkkikoodi",
+    "reissue": "Luo uusi koodi",
+    "expiresIn": "Vanhenee {min} minuutin kuluttua",
+    "enterTitle": "Syötä linkkikoodi",
+    "enterHint": "Avaa Pi Browserissa seminar.pi → Linkitä tili → Luo linkityskoodi ja syötä sitten 6-numeroinen koodi.",
+    "codeLabel": "Linkkikoodi",
+    "submit": "Linkitä",
+    "done": "Linkitetty. Voit nyt käyttää myös Google-kirjautumista.",
+    "linked": "{name} on linkitetty Google-kirjautumiseen."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Kirjautuminen vaaditaan",
+    "AUTH_PI_REQUIRED": "Pi-kirjautuminen vaaditaan",
+    "AUTH_PI_SESSION_INVALID": "Istuntosi vanhentui. Kirjaudu sisään uudelleen.",
+    "AUTH_PI_TOKEN_INVALID": "Pi-kirjautumisen vahvistus epäonnistui",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Pi-kirjautumistiedot puuttuvat",
+    "FORBIDDEN": "Sinulla ei ole lupaa",
+    "BAD_REQUEST": "Virheellinen pyyntö",
+    "BAD_REQUEST_BODY": "Virheellinen pyyntö",
+    "INVALID_INPUT": "Virheellinen syöte",
+    "QUERY_FAILED": "Lataus epäonnistui",
+    "SAVE_FAILED": "Tallennus epäonnistui",
+    "INTERNAL": "Jotain meni pieleen",
+    "SERVER_CONFIG": "Palvelimen määritysvirhe. Ota yhteyttä ylläpitäjään.",
+    "PI_API_CONNECT_FAILED": "Yhteys Pi Networkiin epäonnistui",
+    "DB_UNAVAILABLE": "Tiedot eivät ole väliaikaisesti saatavilla. Yritä myöhemmin uudelleen.",
+    "NOT_FOUND": "Ei löydy",
+    "RATE_LIMITED": "Liian monta pyyntöä. Yritä hetken kuluttua uudelleen.",
+    "PAYLOAD_TOO_LARGE": "Pyyntö on liian suuri",
+    "NETWORK": "Tarkista verkkoyhteytesi",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Tämä Pi-käyttäjätunnus on jo rekisteröity eri tunnuksilla. Ota yhteyttä ylläpitäjään.",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Tämä tili on passiivinen. Ota yhteyttä ylläpitäjään.",
+    "AUTH_GOOGLE_REQUIRED": "Google-kirjautuminen vaaditaan.",
+    "LINK_CODE_INVALID": "Linkityskoodi on virheellinen tai vanhentunut. Luo uusi Pi Browserissa.",
+    "LINK_ALREADY_LINKED": "Tämä tili on jo linkitetty.",
+    "LINK_CODE_GEN_FAILED": "Linkkikoodia ei voitu luoda. Yritä myöhemmin uudelleen.",
+    "AUTH_DB_UNAVAILABLE": "Tiliäsi ei voitu tallentaa, joten kirjautuminen epäonnistui. Yritä myöhemmin uudelleen.",
+    "LINK_TRY_LIMIT": "Liian monta virheellistä linkkikoodia. Yritä uudelleen 15 minuutin kuluttua.",
+    "PRICE_UNAVAILABLE": "Pi-hintaa ei voitu hakea. Yritä hetken kuluttua uudelleen.",
+    "QUOTE_EXPIRED": "Maksutarjous vanhentui. Maksa uudelleen.",
+    "PLAN_EXHAUSTED": "Olet käyttänyt kaiken seminaariaikasi. Täydennä Asetukset-sivulla.",
+    "HOST_AWAY": "Isäntä ei ole huoneessa. Voit tulla sisään isännän liityttyä.",
+    "PLAN_AI_PAID": "AI-ominaisuudet ovat saatavilla maksullisissa paketeissa.",
+    "AI_UNAVAILABLE": "AI-ominaisuudet eivät ole tällä hetkellä saatavilla.",
+    "SPEECH_CHUNK_INVALID": "Äänipalan muoto on virheellinen.",
+    "SPEECH_NOT_LIVE": "Tämä seminaari ei ole live-tilassa.",
+    "SPEECH_NO_AGR": "Suostumus äänenkäsittelyyn vaaditaan.",
+    "SPEECH_RATE": "Liian monta äänipyyntöä. Yritä hetken kuluttua uudelleen.",
+    "SPEECH_QUOTA": "Tämän seminaarin äänenkäsittelyaika on käytetty loppuun.",
+    "SPEECH_USR_QUOTA": "Olet käyttänyt tämän seminaarin käännös- ja käännetyn äänen rajan loppuun.",
+    "SPEECH_FAILED": "Puhetta ei voitu muuntaa tekstiksi.",
+    "SPEECH_STAGE_ONLY": "Vain lavalla olevat voivat käyttää äänitekstityksiä.",
+    "TRANSLATE_FAILED": "Tekstitystä ei voitu kääntää.",
+    "POLL_CLOSED": "Tämä kysely on suljettu.",
+    "NOTE_NOT_RECORDING": "Näitä muistiinpanoja ei tallenneta.",
+    "NOTE_SHOT_INVALID": "Virheellinen näyttökaappaus.",
+    "NOTE_AUDIO_INVALID": "Virheellinen tallennustiedosto.",
+    "NOTE_SHOT_RATE": "Liian monta näyttökaappausta.",
+    "NOTE_RETRY_SOON": "Voit yrittää uudelleen minuutin kuluttua.",
+    "SPEECH_TTS_FAILED": "Käännettyä ääntä ei voitu luoda.",
+    "CAPTION_SIG_INVALID": "Tätä tekstitystä ei voitu vahvistaa, joten sitä ei käännetty.",
+    "PLAN_EXPIRES_BEFORE_START": "Aloitusaika on tämän suunnitelman passin vanhenemisen jälkeen.",
+    "PAY_ALREADY_PAID": "Maksu on edelleen käsittelyssä. Jos olit kirjautumassa lompakkoon, yritä uudelleen 3 minuutin kuluttua.",
+    "REC_PAID_ONLY": "Tallennus on saatavilla vain kuukausi- tai vuosisuunnitelman seminaareissa, joissa on maksullista aikaa jäljellä.",
+    "REC_NOT_IN_ROOM": "Vahvistetaan edelleen, että olet huoneessa. Yritä hetken kuluttua uudelleen.",
+    "ENGINE_OFF": "Videopalvelimen järjestelmänvalvojan avainta ei ole määritetty.",
+    "ENGINE_UNAVAILABLE": "Videopalvelin ei vastaa. Yritä hetken kuluttua uudelleen.",
+    "ADJ_NOTHING": "Ei jäljellä olevaa aikaa vähennettäväksi."
+  },
+  "progress": {
+    "title": "Rakentamisen edistyminen",
+    "subtitle": "Valmiit, käynnissä olevat ja suunnitellut ominaisuudet · {date}",
+    "overall": "Yleiset vaiheet",
+    "stepsDone": "{done}/{total} vaihetta valmiina ({pct}%)",
+    "featureUnit": "ominaisuutta",
+    "status": {
+      "done": "Valmis",
+      "doing": "Käynnissä",
+      "todo": "Suunniteltu",
+      "drop": "Poistettu"
+    },
+    "features": {
+      "F01": {
+        "name": "Kirjautuminen",
+        "desc": "Pi Browser -kirjautuminen, Google-kirjautuminen muissa selaimissa ja molempien tilien linkitys"
+      },
+      "F05": {
+        "name": "Live-videoseminaari",
+        "desc": "Oma videojärjestelmämme Galápagos – tavoitteena on yksi esiintyjä, joka striimaa jopa 30 osallistujalle"
+      },
+      "F02": {
+        "name": "Luo seminaari",
+        "desc": "Määritä alaotsikko, aika, kapasiteetti ja seminaarimaksu luodaksesi seminaarin (nimi = saari, automaattinen)"
+      },
+      "F03": {
+        "name": "Seminaarilista ja tiedot",
+        "desc": "Selaa avoimia seminaareja sivu kerrallaan ja katso niiden tiedot"
+      },
+      "F04": {
+        "name": "Pi-sisäänpääsymaksu",
+        "desc": "Maksa seminaarimaksu Pi:llä; palvelin tarkistaa summan uudelleen ennen sisäänpääsyä"
+      },
+      "F06": {
+        "name": "Isännän maksut",
+        "desc": "Maksa sisäänpääsymaksut isännille Pi:llä"
+      },
+      "F07": {
+        "name": "Uusinnat",
+        "desc": "Katso tallennettuja seminaareja myöhemmin"
+      },
+      "FU": {
+        "name": "Kokouksen lisäosien perusta",
+        "desc": "Yksi signaalikanava lisäosille, AI-yhteys, äänipalat, mikrofonin suostumus ja datataulukot"
+      },
+      "F08": {
+        "name": "Aikataulu ja jakaminen",
+        "desc": "Kalenterilinkki, tapahtumatiedosto (.ics) ja sähköpostikutsu jokaiselle seminaarille"
+      },
+      "F09": {
+        "name": "Melunvaimennus ja valaistus",
+        "desc": "Vähennä mikrofonin melua ja kirkasta tummaa kameravideota"
+      },
+      "F10": {
+        "name": "Live-tekstitykset",
+        "desc": "Muunna esiintyjän puhe tekstiksi lavan alle"
+      },
+      "F11": {
+        "name": "Kyselyt, Q&A ja osallistuminen",
+        "desc": "Järjestä kyselyitä ja kysymyksiä seminaarin aikana; isännät lataavat osallistujalistan"
+      },
+      "F12": {
+        "name": "Taustatehosteet",
+        "desc": "Sumenta taustasi tai korvaa se esiasetuksella tai omalla kuvallasi (käsitellään laitteellasi)"
+      },
+      "F13": {
+        "name": "Paikallinen tallennus",
+        "desc": "Esiintyjä tallentaa seminaarin omalle laitteelleen ja kaikki näkevät, että tallennus on päällä"
+      },
+      "F14": {
+        "name": "AI-kokousmuistiinpanot",
+        "desc": "Kun esiintyjä kytkee sen päälle, puhe ja näytöt tallennetaan ja tiivistetään avainkohdiksi, päätöksiksi ja tehtäviksi"
+      },
+      "F15": {
+        "name": "Henkilökohtaiset kokousmuistiinpanot",
+        "desc": "Tallenna kokous vain mikrofonilla ja hanki kokousmuistiinpanot (ylläpitäjät)"
+      },
+      "F16": {
+        "name": "Käännetyt tekstitykset",
+        "desc": "Näytä tekstitykset käännettynä valitsemallesi kielelle"
+      },
+      "F17": {
+        "name": "Kuuntele käännöksenä",
+        "desc": "Lue käännetyt tekstitykset ääneen synteettisellä äänellä samalla kun alkuperäinen ääni vaimennetaan"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser -kirjautuminen",
+      "googleLogin": "Google-kirjautuminen",
+      "accountLink": "Tilin linkitys",
+      "deviceTest": "Kameran laitetesti",
+      "oneToTwo": "Esiintyjä 1 → 2 osallistujaa",
+      "recovery": "Jäätymisen palautus ja vakaus",
+      "structure": "Moottorin rakenteen puhdistus",
+      "autoQuality": "Automaattinen laatu, 30 osallistujaa",
+      "roomService": "Huoneeseen pääsy ja tallennus",
+      "roomUi": "Huoneen näyttö (aula·lava·chat·käden nosto·moderointi)",
+      "createForm": "Luo näyttö",
+      "list": "Lista",
+      "detail": "Tiedot",
+      "payRequest": "Maksupyyntö",
+      "payVerify": "Summan uudelleentarkistus ja sisäänpääsy",
+      "settle": "Maksu",
+      "vod": "Tallenteen uusinta",
+      "appRelay": "Moottorin lisäosan signaalikanava",
+      "aiBase": "AI, äänipalat, suostumus ja datataulukot",
+      "shareLinks": "Kalenterilinkki, .ics ja sähköpostikutsu",
+      "noiseLight": "Melunvaimennus ja valaistus",
+      "liveCaptions": "Live-tekstitykset",
+      "pollQnaAttend": "Kyselyt, Q&A ja osallistujalista",
+      "backgrounds": "Sumennus, esiasetukset ja oma kuva",
+      "localRecording": "Esiintyjän tallennus ja tallennusmerkki",
+      "aiNotes": "Tallennus, yhteenveto ja muistiinpanosivu",
+      "inPersonNotes": "Vain mikrofoni-muistiinpanot ja omat muistiinpanot",
+      "captionTranslate": "Kielen valinta ja alkuperäisen/käännetyn vaihtaminen",
+      "dubbing": "Synteettisen äänen toisto ja alkuperäisen äänen vaimennus"
+    },
+    "refLabel": "Viitemalli",
+    "uiRef": "Käyttöliittymän perusta – laajalti käytetyn verkkokokoussovelluksen näyttö- ja ominaisuusmallit, jotka on mukautettu seminar.pi:lle"
+  },
+  "room": {
+    "rename": {
+      "later": "Nimi tallennettu, mutta muita ei voitu ilmoittaa nyt. He näkevät sen, kun liityt uudelleen.",
+      "tile": "Napsauta muuttaaksesi nimeäni",
+      "menu": "Vaihda nimeni",
+      "title": "Nimeni tässä seminaarissa",
+      "hint": "Enintään 30 merkkiä. Käytetään vain tässä seminaarissa ja päivittyy kaikkien näytöllä heti.",
+      "save": "Tallenna",
+      "saving": "Tallennetaan…",
+      "cancel": "Peruuta",
+      "taken": "Tämä nimi on jo jonkun muun (isännän tai osallistujan) käytössä. Valitse toinen.",
+      "failed": "Nimeäsi ei voitu tallentaa. Yritä uudelleen."
+    },
+    "roomTitle": {
+      "edit": "Napsauta muokataksesi alaotsikkoa",
+      "label": "Alaotsikko",
+      "placeholder": "Alaotsikko (enintään 60)",
+      "save": "Tallenna",
+      "cancel": "Peruuta",
+      "failed": "Alaotsikkoa ei voitu tallentaa."
+    },
+    "mirror": "Peilaa videoni",
+    "barPin": "Näytä alapalkki aina",
+    "barAuto": "Piilota alapalkki automaattisesti",
+    "title": "Liity seminaariin · {room}",
+    "titleSeminar": "Odotushuone",
+    "noEngine": "Videopalvelin ei ole vielä valmis.",
+    "joinAs": "Liity nimellä",
+    "presenter": "Esittäjä",
+    "audience": "Yleisö",
+    "join": "Liity nyt",
+    "nameLabel": "Nimi",
+    "audienceHint": "Yleisön jäsenet eivät käytä kameraa tai mikrofonia. Liityttyäsi näet ja kuulet esiintyjän.",
+    "preview": {
+      "pending": "Valmistellaan kameraa ja mikrofonia…",
+      "audioOnly": "Kamera ei ole käytettävissä – lähetetään vain ääntä.",
+      "none": "Kamera ja mikrofoni eivät ole käytettävissä. Tarkista käyttöoikeudet (voit silti liittyä ilman mediaa).",
+      "videoOnly": "Mikrofoni ei ole käytettävissä – lähetetään vain videota. Tarkista mikrofonin käyttöoikeus."
+    },
+    "mic": {
+      "on": "Sammuta mikrofoni",
+      "off": "Kytke mikrofoni päälle"
+    },
+    "cam": {
+      "on": "Sammuta kamera",
+      "off": "Kytke kamera päälle"
+    },
+    "controls": "Puhelun hallinta",
+    "leave": "Poistu",
+    "enableSound": "Ota ääni käyttöön",
+    "state": {
+      "connecting": "Yhdistetään…",
+      "reconnecting": "Yhdistetään uudelleen…"
+    },
+    "waiting": "Odotetaan esiintyjää.",
+    "rejoin": "Liity uudelleen",
+    "err": {
+      "generic": "Jotain meni pieleen. Liity uudelleen.",
+      "CLOSED": "Yhteys katkesi.",
+      "NO_ENGINE": "Videopalvelin ei ole vielä valmis.",
+      "TICKET_401": "Kirjautuminen vaaditaan.",
+      "TICKET_403": "Sinulla ei ole lupaa esittää. Liity yleisöksi.",
+      "TICKET_503": "Videopalvelimen asetuksia ei ole vielä tehty.",
+      "TICKET_NETWORK": "Tarkista verkkoyhteytesi.",
+      "TICKET_INVALID": "Sisäänpääsylippusi on vanhentunut.",
+      "TICKET_EXPIRED": "Sisäänpääsylippusi on vanhentunut.",
+      "ROOM_FULL": "Tämä seminaari on täynnä.",
+      "ROOM_CLOSED": "Huone suljettiin – seminaari päättyi tai isäntä oli poissa yli 5 minuuttia.",
+      "DUPLICATE_SESSION": "Liityit toisella laitteella, joten tämä näyttö katkaistiin.",
+      "ROLE_FORBIDDEN": "Sinulla ei ole esitysoikeutta.",
+      "WS_FAILED": "Videopalvelimeen ei saatu yhteyttä.",
+      "ICE_FAILED": "Videoyhteys katkesi. Tarkista verkkoyhteytesi.",
+      "MEDIA_FAILED": "Kameraa tai mikrofonia ei voitu käynnistää.",
+      "TIMEOUT": "Videopalvelin ei vastaa.",
+      "TICKET_402": "Tämä on maksullinen seminaari. Maksa seminaarisivulla ennen sisäänpääsyä.",
+      "TICKET_404": "Seminaaria ei löydy.",
+      "TICKET_409": "Tämä seminaari on päättynyt tai peruutettu.",
+      "TICKET_HOST_AWAY": "Isäntä ei ole vielä liittynyt tai on ollut poissa yli 5 minuuttia, joten et voi liittyä. Yritä uudelleen isännän liityttyä.",
+      "TICKET_PLAN_EXHAUSTED": "Tämän seminaarin suunnitelman aika on loppunut, joten sitä ei voi aloittaa. Ostamalla saman suunnitelman uudelleen lisäät aikaa (ilmainen uusiutuu 1 tunnilla ensi kuussa)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Mikrofonia ei voitu vaihtaa. Yritä uudelleen.",
+        "video": "Kameraa ei voitu vaihtaa. Yritä uudelleen."
+      },
+      "forbidden": "Sinulla ei ole esitysoikeutta, joten jatkat yleisönä.",
+      "demoted": "Sinut siirrettiin takaisin yleisöön.",
+      "endFailed": "Seminaaria ei voitu lopettaa. Yritä uudelleen.",
+      "chatFailed": "Viestiä ei lähetetty.",
+      "actionFailed": "Pyyntöä ei voitu suorittaa. Yritä uudelleen.",
+      "shareFailed": "Näytön jakamista ei voitu aloittaa.",
+      "err": {
+        "RATE_LIMITED": "Lähetät liian nopeasti. Odota hetki.",
+        "ROLE_FORBIDDEN": "Sinulla ei ole oikeutta tehdä tätä.",
+        "MEDIA_FAILED": "Mikrofonia tai kameraa ei voitu käynnistää. Tarkista käyttöoikeudet.",
+        "LOCKED": "Esittäjä lukitsi."
+      },
+      "mutedBy": {
+        "audio": "Esittäjä mykisti mikrofonisi.",
+        "video": "Esittäjä sammutti kamerasi."
+      },
+      "policy": {
+        "locked": "Esittäjä lukitsi mikrofonit. Voit kytkeä omasi päälle, kun ne on avattu.",
+        "unlocked": "Mikrofonit on avattu."
+      },
+      "consent": {
+        "saveFail": "Suostumustasi ei voitu tallentaa. Tarkista rekisteröitymisesi ja kytke mikrofoni uudelleen päälle."
+      }
+    },
+    "home": "Siirry etusivulle",
+    "tile": {
+      "fullscreen": "Kaksoisnapsauta koko näyttöä varten · Esc poistuaksesi",
+      "self": "{name} (sinä)",
+      "presenter": "Esittäjä",
+      "micOff": "Mikrofoni pois päältä",
+      "screen": "{name} näyttö",
+      "row": "Muut puhujat",
+      "pin": "Näytä {name} suurena",
+      "unpin": "Automaattinen asettelu"
+    },
+    "more": "Lisää vaihtoehtoja",
+    "joinNoCam": "Liity ilman kameraa",
+    "net": {
+      "afterJoin": "Yhteytesi tarkistetaan automaattisesti liittymisen jälkeen.",
+      "measuring": "Tarkistetaan yhteyttä…",
+      "good": "Hyvä yhteys",
+      "fair": "Kohtalainen yhteys",
+      "poor": "Huono yhteys",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% äänidatasta katoaa.",
+          "video": "{pct}% videodatasta katoaa."
+        },
+        "rate": {
+          "audio": "Äänen lähetysnopeus on alhainen ({kbps} kbps).",
+          "video": "Videon lähetysnopeus on alhainen ({kbps} kbps). Laatu voi heikentyä."
+        }
+      }
+    },
+    "people": "{n} huoneessa",
+    "screen": {
+      "start": "Jaa näyttö",
+      "stop": "Lopeta jakaminen"
+    },
+    "panel": {
+      "title": "Chat · Kysymykset ja vastaukset · Kyselyt · Ihmiset",
+      "chat": "Chat",
+      "people": "Ihmiset",
+      "close": "Sulje paneeli",
+      "qna": "Kysymykset ja vastaukset",
+      "polls": "Kyselyt"
+    },
+    "chat": {
+      "empty": "Ei viestejä vielä. Chatia ei tallenneta.",
+      "me": "Sinä",
+      "failed": "Ei lähetetty.",
+      "retry": "Yritä uudelleen",
+      "input": "Kirjoita viesti",
+      "send": "Lähetä"
+    },
+    "hand": {
+      "raise": "Nosta käsi",
+      "lower": "Laske käsi",
+      "list": "Kädet nostettuina",
+      "lowerAll": "Laske kaikki kädet",
+      "raised": "Käsi nostettu",
+      "notice": "{name} nosti kätensä.",
+      "dismiss": "Hylkää",
+      "waiting": "{n} henkilöä odottaa puheenvuoroa"
+    },
+    "react": {
+      "open": "Reaktiot",
+      "e0": "Tykkää",
+      "e1": "Taputus",
+      "e2": "Nauru",
+      "e3": "Yllättynyt",
+      "e4": "Surullinen",
+      "e5": "Sanaton",
+      "e6": "Rakkaus"
+    },
+    "quality": {
+      "label": "Laatu",
+      "auto": "Auto",
+      "high": "Korkea",
+      "medium": "Keskiverto",
+      "low": "Matala",
+      "unstable": "Verkkosi on epävakaa"
+    },
+    "roles": {
+      "presenter": "Esittäjä",
+      "panel": "Panelisti",
+      "audience": "Yleisö"
+    },
+    "stage": {
+      "invite": "Kutsu lavalle",
+      "remove": "Siirrä yleisöön",
+      "promoted": "Sinut kutsuttiin lavalle. Jos nostit kätesi, kamerasi käynnistyy automaattisesti (ellei lukittu tai sallittu). Kytke mikrofoni päälle puhuaksesi (mikrofoni ei käynnisty automaattisesti).",
+      "later": "Myöhemmin"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} nosti kätensä."
+    },
+    "leaveDialog": {
+      "title": "Poistu seminaarista",
+      "body": "Voit poistua itse tai lopettaa seminaarin ja katkaista kaikkien yhteyden.",
+      "confirmTitle": "Lopetetaanko seminaari?",
+      "confirmBody": "Kaikkien yhteys katkaistaan, eikä kukaan voi liittyä tähän seminaariin uudelleen.",
+      "cancel": "Peruuta",
+      "end": "Lopeta seminaari",
+      "endConfirm": "Lopeta nyt"
+    },
+    "mod": {
+      "muteAll": "Mykistä kaikki",
+      "lock": "Lukitse mikrofonit",
+      "unlock": "Avaa mikrofonien lukitus",
+      "locked": "Esittäjä on lukinnut mikrofonit",
+      "muteMic": "Mykistä mikrofoni",
+      "askMic": "Pyydä avaamaan mykistys",
+      "muteCam": "Sammuta kamera",
+      "muteMicOf": "Mykistä {name}",
+      "askMicOf": "Pyydä {name} avaamaan mykistys",
+      "muteCamOf": "Sammuta {name} kamera"
+    },
+    "ask": {
+      "audio": "Esittäjä pyysi sinua kytkemään mikrofonisi päälle.",
+      "video": "Esittäjä pyysi sinua kytkemään kamerasi päälle.",
+      "ignore": "Ohita"
+    },
+    "toDetail": "Siirry seminaarisivulle",
+    "consent": {
+      "title": "Ennen kuin kytket mikrofonisi päälle",
+      "body": "Jos tässä seminaarissa on päällä tallennus, tekstitykset tai tekoälypohjaiset kokousmuistiinpanot, äänesi voidaan muuntaa tekstiksi, tallentaa ja kääntää. Äänenkäsittely tapahtuu maasi ulkopuolisessa tekoälypalvelussa. Jos et hyväksy, mikrofonisi kytkeytyy silti päälle – vain äänesi jätetään käsittelyn ulkopuolelle.",
+      "privacy": "Tietosuojakäytäntö",
+      "newTab": "(avautuu uudessa välilehdessä)",
+      "decline": "En hyväksy",
+      "agree": "Hyväksy ja kytke mikrofoni päälle",
+      "notice": "Kun tallennus, tekstitykset tai tekoälypohjaiset kokousmuistiinpanot ovat päällä, puhujien äänet käsitellään. Yleisön ääniä ei lähetetä.",
+      "saveFailClosed": "Tämä seminaari on päättynyt, joten suostumusta ei voida tallentaa."
+    },
+    "captions": {
+      "title": "Tekstitykset",
+      "room": "Live-tekstitykset (koko huone)",
+      "show": "Näytä tekstitykset",
+      "size": {
+        "label": "Tekstin koko",
+        "sm": "Pieni",
+        "md": "Keskikokoinen",
+        "lg": "Suuri"
+      },
+      "waiting": "Tekstitykset ilmestyvät, kun esittäjä kytkee ne päälle.",
+      "limit": "Puheenkäsittelyn raja saavutettu, joten tekstitykset ja tekoälymuistiinpanot pysäytettiin.",
+      "sendFail": "Tekstityksiä ei voitu kytkeä päälle. Yritä uudelleen hetken kuluttua.",
+      "sendFailOff": "Tekstityksiä ei voitu kytkeä pois päältä. Yritä uudelleen hetken kuluttua.",
+      "region": "Tekstitykset",
+      "translate": "Näytä käännetyt tekstitykset",
+      "lang": "Käännöskieli",
+      "langMine": "Omat kielet",
+      "langAll": "Kaikki kielet",
+      "trStop": {
+        "forbidden": "Käännetyt tekstitykset ovat vain rekisteröityneille osallistujille. Näytetään alkuperäinen.",
+        "unavailable": "Käännetyt tekstitykset eivät ole tällä hetkellä saatavilla. Näytetään alkuperäinen.",
+        "quota": "Tämän seminaarin käännösraja on saavutettu. Näytetään alkuperäinen.",
+        "usrQuota": "Olet käyttänyt käännösrajasi tälle seminaarille. Näytetään alkuperäinen."
+      },
+      "unsupported": "Tämä laite ei voi luoda live-tekstityksiä (selain ei tue äänen tallennusta)."
+    },
+    "effects": {
+      "title": "Efektit",
+      "light": "Valon korjaus",
+      "noise": "Vähennä melua",
+      "noiseFail": "Melunvaimennusta ei voi muuttaa tällä laitteella.",
+      "close": "Sulje",
+      "preview": "Oma esikatselu",
+      "bg": "Tausta",
+      "bgNone": "Ei mitään",
+      "bgBlur": "Sumenna",
+      "scenes": {
+        "beach": "🏝️ Malediivien ranta",
+        "autumn": "🍁 Syksyinen laakso",
+        "fireplace": "🔥 Takka",
+        "xmas": "🎄 Joulukokoushuone"
+      },
+      "bgs": {
+        "dusk": "Hämärä",
+        "ocean": "Meri",
+        "forest": "Metsä",
+        "studio": "Studio",
+        "grid": "Ruudukko",
+        "dots": "Pisteet"
+      },
+      "myAdd": "Oma kuva",
+      "myItem": "Oma kuva {n}",
+      "myDel": "Poista oma kuva {n}",
+      "mySaveFail": "Tausta on käytössä, mutta sitä ei voitu tallentaa tälle laitteelle (vain tämä kokous).",
+      "bgStopped": "Taustatehoste pysähtyi ja sammutettiin. Valitse se uudelleen käynnistääksesi.",
+      "myNote": "Kuvasi tallennetaan vain tälle laitteelle (enintään 3, kukin 2 Mt).",
+      "mobileBlurOnly": "Puhelimissa on käytettävissä vain sumea tausta (kuvataustat toimivat PC:llä).",
+      "myTooBig": "Vain enintään 2 Mt:n kuvia voi käyttää.",
+      "preparing": "Valmistellaan…",
+      "bgFailed": "Taustatehostetta ei voitu ladata.",
+      "autoOff": "Laitteesi on liian hidas, joten taustatehoste sammutettiin.",
+      "unsupported": "Taustatehosteet eivät ole käytettävissä tällä laitteella.",
+      "noCam": "Kytke kamera päälle valitaksesi taustan.",
+      "lightUnsupported": "Valon korjaus ei ole käytettävissä tällä laitteella.",
+      "noiseUnsupported": "Melunvaimennusasetukset eivät ole tuettuja tällä laitteella."
+    },
+    "sheetClose": "Sulje",
+    "polls": {
+      "new": "Uusi kysely",
+      "question": "Kysymys",
+      "option": "Vaihtoehto {n}",
+      "remove": "Poista vaihtoehto {n}",
+      "addOption": "Lisää vaihtoehto",
+      "start": "Aloita kysely",
+      "cancel": "Peruuta",
+      "dup": "Vaihtoehtojen on oltava erilaisia.",
+      "vote": "Äänestä",
+      "change": "Vaihda ääntä",
+      "close": "Sulje kysely",
+      "closed": "Suljettu",
+      "mine": "Valintasi",
+      "result": "{pct}% ({n} ääntä)",
+      "total": "Yhteensä {n} ääntä",
+      "empty": "Ei kyselyitä vielä.",
+      "loading": "Ladataan…",
+      "labOnly": "Kyselyt ovat saatavilla vain seminaarihuoneissa.",
+      "started": "Uusi kysely on alkanut.",
+      "goVote": "Äänestä",
+      "votersNote": "Järjestäjä näkee, kuka äänesti mitäkin vaihtoehtoa.",
+      "voters": "Äänestäneet: {names}"
+    },
+    "qna": {
+      "sort": "Lajittele",
+      "by": {
+        "top": "Suosituimmat",
+        "new": "Uusimmat"
+      },
+      "rcm": "Ylä-ääni ({n})",
+      "answered": "Vastattu",
+      "answer": "Merkitse vastatuksi",
+      "unanswer": "Poista merkintä vastatuksi",
+      "hide": "Piilota",
+      "doneN": "{n} vastattu",
+      "backOpen": "Vastaamattomat kysymykset",
+      "empty": "Ei kysymyksiä vielä.",
+      "emptyDone": "Ei vastattuja kysymyksiä.",
+      "loading": "Ladataan…",
+      "input": "Kysy kysymys (500 merkkiä)",
+      "send": "Lähetä",
+      "left": "{n} jäljellä",
+      "labOnly": "Kysymykset ja vastaukset ovat saatavilla vain seminaarihuoneissa."
+    },
+    "recording": {
+      "title": "Tallennus",
+      "badge": "Tallennetaan",
+      "unsupported": "Tämä selain ei tue tallennusta. Tallennathan tietokoneen tavallisella selaimella.",
+      "piBrowserOnly": "Tallennus toimii vain tavallisessa selaimessa (PC tai mobiili). Pi Browser ei voi tallentaa tallennustiedostoja – avaa tämä seminaari tietokoneen tai puhelimen selaimella (seminarz.vercel.app) tallentaaksesi.",
+      "audioSuspended": "Äänen tallennus ei ehkä ole alkanut tällä laitteella. Vain kuva voidaan tallentaa.",
+      "notifyFailed": "Tallennusta ei aloitettu, koska osallistujia ei voitu ilmoittaa. Yritä uudelleen hetken kuluttua.",
+      "confirm": {
+        "title": "Aloitetaanko tallennus?",
+        "body": "Kun tallennus alkaa, kaikki näkevät 'Tallennetaan'-ilmaisimen. Tiedosto tallennetaan vain tälle laitteelle, eikä sitä koskaan ladata tai siirretä ulkomaille. Kerro osallistujille ennen aloittamista.",
+        "download": "Kun lopetat, MP4-tiedosto tallennetaan latauskansioosi (selaimet, jotka eivät voi tallentaa MP4-tiedostoja, muuntavat sen hetken; yli 45 minuutin tallenteet voidaan säilyttää alkuperäisessä muodossaan). Sovelluksen sisäiset selaimet voivat estää tiedostojen tallennuksen, joten tallenna tavallisella selaimella tietokoneella.",
+        "cancel": "Peruuta",
+        "start": "Aloita tallennus",
+        "charge": "Tallennuksen aikana tallennusaika vähennetään maksetusta ajasta huoneajan lisäksi (2x tallennuksen aikana). Kun maksettu aika loppuu, tallennus pysähtyy ja tiedosto tallennetaan."
+      },
+      "resave": {
+        "label": "Tallennustiedosto",
+        "save": "Tallenna uudelleen",
+        "dismiss": "Sulje tallenna uudelleen"
+      },
+      "toast": {
+        "started": "Tallennus aloitettu – kaikki näkevät sen.",
+        "saved": "Tallennus tallennettu. Tarkista latauskansiosi. Jos mitään ei tallennettu, napauta [Tallenna uudelleen] näytön yläreunassa.",
+        "autoStopped": "Tallennus päättyi, koska selain pysäytti sen tai kokoraja saavutettiin. Kaikki siihen asti tallennettiin. Aloita tallennus uudelleen jatkaaksesi.",
+        "empty": "Mitään ei tallennettu, joten tiedostoa ei luotu.",
+        "saveFailed": "Tallennustiedostoa ei voitu luoda.",
+        "converting": "Muunnetaan tallennusta MP4-muotoon. Pidä tämä ikkuna auki.",
+        "savedOriginal": "MP4-muotoon muuntaminen epäonnistui, joten tallennus tallennettiin alkuperäisessä muodossaan (webm). Tarkista latauskansiosi.",
+        "startedBy": "Esittäjä aloitti tallennuksen.",
+        "stoppedBy": "Esittäjä lopetti tallennuksen."
+      },
+      "paidOnly": "Tallennus on käytettävissä vain kuukausi- tai vuosisuunnitelmalla avatuissa seminaareissa, kun maksettua aikaa on jäljellä.",
+      "planOut": "Maksettu aika loppui, joten tallennus pysähtyi ja tiedosto tallennettiin.",
+      "notInRoom": "Vahvistetaan edelleen, että olet huoneessa. Aloita tallennus uudelleen hetken kuluttua.",
+      "meterFailed": "Tallennusaikaa ei voitu tarkistaa, joten tallennus ei alkanut. Yritä uudelleen hetken kuluttua.",
+      "paidOut": "Maksettua aikaa ei ole jäljellä, joten tallennusta ei voi aloittaa. Osta sama suunnitelma uudelleen tallentaaksesi.",
+      "pausedBadge": "Tallennus keskeytetty",
+      "controls": "Tallennuksen hallinta",
+      "pause": "Tauko",
+      "resume": "Jatka",
+      "stop": "Lopeta tallennus"
+    },
+    "notes": {
+      "on": "AI-muistiinpanot",
+      "badge": "AI-muistiinpanot päällä",
+      "started": "Esittäjä käynnisti AI-muistiinpanot",
+      "stopped": "AI-muistiinpanot pois päältä",
+      "startedMine": "AI-muistiinpanot päällä — näkyvät kaikille",
+      "stoppedMine": "AI-muistiinpanot pois päältä — luodaan muistiinpanoja",
+      "startFail": "AI-muistiinpanojen käynnistys epäonnistui",
+      "gone": "AI-muistiinpanot pysäytettiin — muistiinpanot lopetettiin tai poistettiin muualla",
+      "unsupported": "AI-muistiinpanoja ei voi käynnistää täällä (ei äänitallennustukea)"
+    },
+    "dubbing": {
+      "listen": "Kuuntele käännetyllä äänellä",
+      "blocked": "Käännettyä ääntä ei voitu toistaa. Käynnistä se uudelleen",
+      "stopped": "Käännetty ääni ei ole tällä hetkellä saatavilla, joten se kytkettiin pois päältä",
+      "usrQuota": "Olet käyttänyt tämän seminaarin käännetyn äänen rajan, joten se kytkettiin pois päältä"
+    },
+    "plan": {
+      "warn": "Tämän seminaarin suunnitelmasta on jäljellä {min} min.",
+      "ended": "Seminaariaikasi loppui, joten seminaari on päättynyt ja poistuit huoneesta.",
+      "left": "Seminaariaikaa jäljellä",
+      "closed": "Seminaari on päättynyt, joten poistuit huoneesta.",
+      "hostAway": "Isäntä on poistunut huoneesta. Jos hän ei palaa 5 minuutin kuluessa, kaikki osallistujat poistetaan.",
+      "hostGone": "Isäntä ei palannut 5 minuutin kuluessa, joten poistuit huoneesta. Voit tulla uudelleen sisään, kun isäntä liittyy."
+    },
+    "toLobby": "Odotushuone"
+  },
+  "list": {
+    "tabsLabel": "Seminaarilistanäkymä",
+    "tabs": {
+      "all": "Kaikki",
+      "hosted": "Minun isännöimäni",
+      "joined": "Liitytty"
+    },
+    "empty": {
+      "all": "Ei tulevia seminaareja.",
+      "hosted": "Et ole isännöinyt yhtään seminaaria.",
+      "joined": "Et ole liittynyt yhteenkään seminaariin."
+    },
+    "loading": "Ladataan…",
+    "retry": "Yritä uudelleen",
+    "free": "Ilmainen",
+    "fee": "{amount} Pi",
+    "host": "Isäntä {name}",
+    "capacity": "Kapasiteetti {n}",
+    "status": {
+      "SCHEDULED": "Ajastettu",
+      "LIVE": "Live",
+      "ENDED": "Päättynyt",
+      "CANCELED": "Peruutettu"
+    },
+    "hostNew": "Luo seminaari",
+    "progress": "Edistyminen",
+    "pager": "Sivutus",
+    "prev": "Edellinen",
+    "next": "Seuraava",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Alaotsikko",
+      "placeholder": "Lisää alaotsikko",
+      "save": "Tallenna alaotsikko",
+      "saving": "Tallennetaan…",
+      "saved": "Tallennettu."
+    },
+    "loading": "Ladataan…",
+    "back": "Takaisin listaan",
+    "notFound": "Seminaaria ei löydy.",
+    "status": {
+      "SCHEDULED": "Ajastettu",
+      "LIVE": "Live",
+      "ENDED": "Päättynyt",
+      "CANCELED": "Peruutettu"
+    },
+    "startAt": "Päivämäärä",
+    "host": "Isäntä",
+    "seats": "Paikkoja jäljellä",
+    "seatsValue": "{left} / {max}",
+    "fee": "Seminaarimaksu",
+    "feeValue": "{amount} Pi",
+    "free": "Ilmainen",
+    "enter": "Sisään",
+    "payEnter": "Maksa Pi:llä ja astu sisään ({amount} Pi)",
+    "paying": "Maksua käsitellään…",
+    "joining": "Rekisteröidään…",
+    "registered": "Olet rekisteröitynyt.",
+    "full": "Tämä seminaari on täynnä.",
+    "closed": "Tämä seminaari on päättynyt.",
+    "canceled": "Tämä seminaari peruttiin.",
+    "roomLink": "Siirry huoneeseen (isäntä)",
+    "piBrowserOnly": "Maksu on mahdollista Pi Browserissa Pi-kirjautumisen jälkeen.",
+    "payCancelled": "Maksu peruutettu.",
+    "payStillWaiting": "Odotetaan edelleen lompakkoa. Jos olet jo kirjautunut Pi Walletiin, odota hetki.",
+    "payFailed": "Maksu epäonnistui.",
+    "err": {
+      "NAME_TAKEN": "Nimi on jo käytössä. Valitse toinen.",
+      "CAL_READ_FAILED": "Tapahtumiasi ei voitu ladata. Tarkista osoite.",
+      "ISLAND_FULL": "Kaikki 100 saaren nimeä ovat tällä hetkellä käytössä. Voit avata uuden seminaarin, kun tuleva tai käynnissä oleva seminaari päättyy tai peruutetaan.",
+      "SMN_FULL": "Tämä seminaari on täynnä.",
+      "SMN_CLOSED": "Tämä seminaari on päättynyt tai peruutettu.",
+      "SMN_ALREADY": "Olet jo rekisteröitynyt tai maksu on käynnissä.",
+      "SMN_FREE": "Ilmaiset seminaarit eivät vaadi maksua.",
+      "SMN_PAY_REQUIRED": "Tämä on maksullinen seminaari. Maksa päästäksesi sisään.",
+      "SMN_PAY_INVALID": "Emme voineet vahvistaa maksuasi. Ota yhteyttä ylläpitäjään.",
+      "PAY_PI_FAILED": "Pi-maksupalvelimeen ei saatu yhteyttä. Yritä uudelleen hetken kuluttua.",
+      "PAY_MISMATCH": "Maksutiedot eivät täsmää.",
+      "PAY_AMOUNT_MISMATCH": "Maksun summa eroaa seminaarimaksusta.",
+      "PAY_CANCELLED": "Tämä maksu peruutettiin.",
+      "PAY_ALREADY_PAID": "Maksua käsitellään edelleen. Jos olit kirjautumassa lompakkoon, yritä uudelleen 3 minuutin kuluttua.",
+      "PAY_INVALID_STATE": "Tätä maksua ei voida käsitellä nyt.",
+      "PAY_PI_CANCEL_REFUSED": "Maksu on jo käynnissä, eikä sitä voi peruuttaa. Tarkista uudelleen hetken kuluttua."
+    },
+    "share": {
+      "title": "Aikataulu ja jakaminen",
+      "calendar": "Lisää kalenteriin",
+      "ics": "Kalenteritiedosto",
+      "mail": "Kutsu sähköpostilla",
+      "mailApp": "Lähetä oletussähköpostisovelluksella",
+      "mailSubject": "[Seminaarikutsu] {title}",
+      "mailBody": "{title}\nAika: {start}\n\nLiity suoraan tällä linkillä.\nPöytäkone: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopioi linkki",
+      "copied": "Linkki kopioitu.",
+      "copyFail": "Kopiointi epäonnistui. Kopioi linkki osoiteriviltä.",
+      "share": "Jaa toiseen sovellukseen",
+      "shareFail": "Jakaminen epäonnistui. Käytä sen sijaan Kopioi linkki -toimintoa.",
+      "created": "Seminaarisi on valmis. Lisää sen alkamisaika Google-kalenteriisi.",
+      "addGoogle": "Lisää Google-kalenteriin",
+      "later": "Myöhemmin",
+      "piBrowserOpen": "Pi Browserissa kalenteri, sähköposti ja kalenteritiedosto avautuvat puhelimesi oletusselaimessa.",
+      "extFail": "Avaaminen epäonnistui. Päivitä Pi Browser tai käytä Kopioi linkki -toimintoa ja avaa se tavallisessa selaimessa (seminarz.vercel.app).",
+      "icsPiBrowser": "Kalenteritiedoston voi ladata vain tavallisella selaimella (tietokone tai mobiili). Käytä Pi Browserissa [Lisää kalenteriin] -toimintoa."
+    },
+    "attendance": "Läsnäolo",
+    "plan": "Suunnitelma",
+    "left": "Aikaa jäljellä"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Edellinen kuukausi",
+      "next": "Seuraava kuukausi",
+      "connect": "Näytä Google-kalenterini",
+      "change": "Hallitse Google-kalentereita ({n})",
+      "add": "Lisää",
+      "remove": "Poista",
+      "close": "Sulje",
+      "failed": "Tapahtumia ei voitu ladata {n} kalenterista. Tarkista osoite.",
+      "badUrl": "Liitä Google-kalenterin asetuksista 'Salainen osoite iCal-muodossa' (…/basic.ics), ei selaimen osoiterivin osoitetta.",
+      "full": "Voit lisätä enintään {n} kalenteria.",
+      "allDay": "Koko päivä",
+      "day": "Omat tapahtumani tälle päivälle",
+      "count": "{n, plural, one {# tapahtuma} other {# tapahtumaa}}",
+      "more": "+{n}",
+      "picked": "Tämä päivämäärä on asetettu alkamispäiväksi. Valitse aika alta.",
+      "s1": "Napauta alla olevaa [Avaa Google-kalenterin asetukset].",
+      "s2": "Valitse vasemmalla olevasta 'Omien kalentereiden asetukset' -kohdasta kalenteri (esim. nimesi).",
+      "s3": "Vieritä kohtaan 'Integroi kalenteri' ja kopioi 'Salainen osoite iCal-muodossa'.",
+      "s4": "Liitä se tähän ja napauta [Lisää] – tapahtumien otsikot ilmestyvät kalenteriin. Lisää muita kalentereita samalla tavalla, enintään 5.",
+      "open": "Avaa Google-kalenterin asetukset",
+      "privacy": "Tämä osoite on avain kalenteriisi – älä jaa sitä. Se tallennetaan vain tähän laitteeseen, ei koskaan palvelimellemme."
+    },
+    "title": "Luo seminaari",
+    "name": "Matkustetaan kauniille saarelle!",
+    "subTitle": "Alaotsikko (valinnainen, enintään 60 merkkiä)",
+    "startAt": "Aloitusaika",
+    "maxCnt": "Kapasiteetti (1–100)",
+    "submit": "Luo",
+    "submitting": "Luodaan…",
+    "invalid": "Tarkista syötteesi – päivämäärä vuoden sisällä tästä päivästä, kapasiteetti 1–100.",
+    "attendance": {
+      "title": "Läsnäolo",
+      "back": "Takaisin seminaariin",
+      "loading": "Ladataan…",
+      "forbidden": "Vain isäntä ja ylläpitäjät voivat tarkastella läsnäoloa.",
+      "count": "{n} henkilöä",
+      "csv": "Lataa CSV",
+      "empty": "Kukaan ei ole vielä liittynyt.",
+      "online": "Online",
+      "left": "Poistunut",
+      "col": {
+        "name": "Nimi",
+        "pi": "Pi-käyttäjänimi",
+        "ent": "Liittyi ensimmäisen kerran",
+        "hb": "Viimeksi nähty",
+        "dur": "Osallistumisaika",
+        "min": "Osallistunut (min, poissaoloaika pois lukien)",
+        "state": "Tila"
+      },
+      "durNote": "Osallistumisaika on ensimmäisestä liittymisestä viimeiseen nähtyyn, miinus poissaoloaika (yli 2,5 minuutin katkokset).",
+      "csvPiBrowser": "CSV-lataus toimii vain tavallisessa selaimessa (tietokone tai mobiili). Pi Browser ei voi tallentaa tiedostoja – avaa tämä läsnäololuettelo tietokoneen tai puhelimen selaimessa (seminarz.vercel.app)."
+    },
+    "plan": "Suunnitelma",
+    "planFree": "Ilmainen — {time} jäljellä tässä kuussa · ei AI:ta",
+    "planPaid": "{name} {time} · {price} — maksa luodessa",
+    "planHint": "Maksullisella suunnitelmalla avattu seminaari käyttää ensin kyseisen suunnitelman aikaa, sitten jatkaa tämän kuun ilmaisella ajalla (ei AI:ta ilmaisessa osassa). Aktiivinen suunnitelma avautuu ilman maksua; kuukausi- tai vuosisuunnitelma, jota sinulla ei ole, maksetaan Pi:llä, kun painat Luo, sitten seminaari avautuu (Pi Browser). Liittyminen on aina ilmaista osallistujille.",
+    "planOwned": "{name} — aktiivinen · {time} jäljellä",
+    "planEnds": "Aloitusaika on tämän suunnitelman voimassaolon päättymisen jälkeen. Siirrä aloitusta aikaisemmaksi tai valitse toinen suunnitelma.",
+    "paidKept": "Maksullinen passisi säilytetään. Korjaa ongelma ja paina Luo uudelleen (ei toista maksua)."
+  },
+  "privacy": {
+    "title": "Tietosuojakäytäntö — Ääni- ja tekoälyominaisuudet",
+    "effective": "Voimassa {date}",
+    "intro": "Tämä käytäntö selittää, mitä henkilötietoja käsittelemme, kun käytät seminaarissa reaaliaikaisia tekstityksiä, käännettyjä tekstityksiä, äänikäännöstä, tekoälypohjaisia kokousmuistiinpanoja ja henkilökohtaisia muistiinpanoja. Nämä ominaisuudet käyttävät ulkoista tekoälypalvelua, joten tiedot siirretään ulkomaille.",
+    "whoTitle": "Kenen tietoja käsitellään",
+    "who": [
+      "Esittäjät ja lavalla olevat osallistujat: pyydämme suostumuksesi kerran, ennen kuin käynnistät mikrofonisi ensimmäisen kerran. Voit osallistua seminaariin ilman suostumusta.",
+      "Yleisö: et käytä mikrofonia, joten ääntä ei lähetetä. Näet vain tekstitykset ja muistiinpanot.",
+      "Henkilökohtaiset muistiinpanot: ylläpitäjä tallentaa kokouksen mikrofonilla ja vahvistaa, että osallistujille on ilmoitettu ennen tallennusta."
+    ],
+    "xferTitle": "Henkilötietojen siirto ulkomaille (Korean henkilötietojen suojalaki, 28-8 §)",
+    "xfer": [
+      {
+        "k": "Vastaanottaja",
+        "v": "Google LLC (Gemini API) — yhteystiedot [TBD: Googlen tietosuojayhteyshenkilö]"
+      },
+      {
+        "k": "Maat",
+        "v": "Yhdysvallat ja muut maat, joissa Googlen datakeskukset sijaitsevat [TBD: käsittelyalue]"
+      },
+      {
+        "k": "Milloin ja miten",
+        "v": "Noin 5 sekunnin välein ominaisuuden ollessa päällä, salatun yhteyden (HTTPS) kautta. Henkilökohtaisten muistiinpanojen osalta koko tallenne lähetetään vielä kerran 5 minuutin osissa, kun muistiinpano päättyy (tarkka transkriptio)."
+      },
+      {
+        "k": "Kohteet",
+        "v": "Ääni, puhuttu sisältö (teksti), puhujan näyttönimi (muistiinpanoyhteenvetoja varten), näytön jakamisen kuvakaappaukset (kun AI-muistiinpanot ovat päällä)"
+      },
+      {
+        "k": "Tarkoitus",
+        "v": "Puhe tekstiksi, käännös, kokousmuistiinpanoyhteenvedot, synteettinen puhe (standardiäänet, ei äänen kloonausta), puhujan erottelu henkilökohtaisissa muistiinpanoissa (äänet erotellaan ja merkitään havaitun sukupuolen mukaan, kuten Mies 1 / Nainen 1 – nimiä tai identiteettejä ei päätellä)"
+      },
+      {
+        "k": "Säilytys",
+        "v": "Päättyy heti, kun tulos palautetaan. Pyydämme Googlea olemaan tallentamatta pyyntöjä (store=false). Väärinkäytön valvontalokit voidaan kuitenkin säilyttää Googlen ehtojen mukaisesti [TBD: säilytysaika ja maksullisen tason tila]."
+      },
+      {
+        "k": "Miten kieltäytyä ja mitä tapahtuu",
+        "v": "Jos et suostu tai sammutat mikrofonisi, ääntä ei lähetetä. Voit silti osallistua seminaariin; vain oman puheesi tekstityksiä, käännöksiä ja muistiinpanoja ei luoda. Voit peruuttaa suostumuksesi milloin tahansa [TBD: peruutusnapin sijainti]."
+      }
+    ],
+    "keepTitle": "Mitä tämä palvelu säilyttää",
+    "keep": [
+      "Alkuperäinen ääni: seminaarin tekstitysten ja AI-kokousmuistiinpanojen osalta sitä ei tallenneta; se hävitetään heti tekstiksi muuntamisen jälkeen. Henkilökohtaisten muistiinpanojen osalta tallenne säilytetään yksityisessä tallennustilassa, jotta se voidaan transkriptoida uudelleen tarkemmin (puhujien kanssa) kokouksen jälkeen, ja se poistetaan päivittäisessä siivouksessa, kun 1 päivä on kulunut muistiinpanon päättymisestä (välittömästi, jos muistiinpano poistetaan).",
+      "Reaaliaikaiset tekstitykset: ei tallenneta.",
+      "AI-kokousmuistiinpanot (kun esittäjä käynnistää ne): puhuttu sisältö, kuvakaappaukset ja yhteenveto säilytetään, kunnes muistiinpanot poistetaan [TBD: enimmäissäilytysaika].",
+      "Suostumusrekisterit: suostumuksen aika ja käytäntöversio, säilytetään todisteena [TBD: säilytysaika].",
+      "Käyttö: minuuttikohtaiset pyyntöjen määrät ja käsittelyaika, käytetään kustannusrajojen valvontaan.",
+      "Läsnäolo: aika, jolloin liityit, aika, jolloin olit viimeksi yhteydessä, näyttönimesi ja Pi-käyttäjänimesi tallennetaan ja annetaan isännälle läsnäololistana (näytöllä ja CSV-latauksena). Säilytetään, kunnes seminaari poistetaan.",
+      "Kysymykset ja kyselyt: kysymyksen teksti ja kysyjän näyttönimi (tai Pi-käyttäjänimi, jos ei näyttönimeä) ovat näkyvissä kaikille osallistujille. Tykkäykset näyttävät vain määrät, eivät koskaan sitä, kuka ne antoi. Kyselyjen äänet näyttävät vain määrät osallistujille; järjestäjä ja ylläpitäjät näkevät jokaisesta vaihtoehdosta kunkin äänestäjän näyttönimen (tai Pi-käyttäjänimen, jos ei näyttönimeä). Säilytetään, mukaan lukien piilotetut kysymykset, kunnes seminaari poistetaan."
+    ],
+    "recTitle": "Tallennus",
+    "rec": "Tallenteet tallennetaan vain tiedostona esittäjän laitteelle. Niitä ei ladata palvelimillemme tai siirretä ulkomaille. Tallennuksen tai AI-muistiinpanojen ollessa päällä jokainen osallistuja näkee ilmaisimen.",
+    "rightsTitle": "Oikeutesi",
+    "rights": "Voit pyytää tietojesi tarkastelua, korjaamista, poistamista tai käsittelyn lopettamista. Yhteystiedot: [TBD: tietosuojavastaavan nimi ja yhteystiedot]"
+  },
+  "notes": {
+    "title": "Muistiinpanot",
+    "back": "Takaisin seminaariin",
+    "loading": "Ladataan…",
+    "meta": "Muistiinpanot · {date} · {min} min",
+    "aiWarn": "Tekoälyn luoma yhteenveto – se voi sisältää virheitä",
+    "points": "Avainkohdat",
+    "decisions": "Päätökset",
+    "todos": "Toimintakohteet",
+    "shots": "Näyttökuvat ({n})",
+    "transcript": "Transkriptio",
+    "download": "Lataa Markdown",
+    "making": "Luodaan muistiinpanoja…",
+    "makingLong": "Tämä kestää jonkin aikaa. Päivitä myöhemmin",
+    "recording": "Tallennetaan edelleen",
+    "failed": "Yhteenvedon luominen epäonnistui – koko transkriptio on alla",
+    "retry": "Yritä uudelleen",
+    "finish": "Lopeta tallennus ja tee yhteenveto",
+    "none": "Ei sisältöä",
+    "blank": "Ei yhteenvedettävää – puhetta ei tallennettu tai se oli liian lyhyt",
+    "notFound": "Muistiinpanoja ei löydy",
+    "forbidden": "Sinulla ei ole oikeutta nähdä näitä muistiinpanoja",
+    "shotAlt": "Näyttökuva klo {at}",
+    "close": "Sulje",
+    "view": "Näytä muistiinpanot",
+    "error": "Lataaminen epäonnistui",
+    "mine": "Omat muistiinpanoni",
+    "del": "Poista muistiinpanot",
+    "delAsk": "Poistetaanko nämä muistiinpanot (yhteenveto, transkriptio ja näyttökuvat)? Kukaan ei voi nähdä niitä",
+    "delYes": "Poista",
+    "delNo": "Peruuta",
+    "delFail": "Poistaminen epäonnistui",
+    "dlFail": "Lataaminen epäonnistui – yritä uudelleen",
+    "recentNotes": "Viimeisimmät muistiinpanot",
+    "empty": "Ei vielä muistiinpanoja",
+    "newNote": "Aloita henkilökohtaiset muistiinpanot",
+    "inPerson": "Henkilökohtaiset kokousmuistiinpanot",
+    "inPersonTag": "Henkilökohtainen",
+    "titleLabel": "Otsikko",
+    "titlePh": "esim. Viikkokokous",
+    "told": "Olen kertonut kaikille läsnäolijoille, että tämä tallennetaan ja käsitellään tekoälyllä (pakollinen)",
+    "toldWhy": "Ennen aloittamista kerro kaikille läsnäolijoille, että tämä keskustelu tallennetaan (tallenne säilytetään 1 päivän ajan muistiinpanon päättymisen jälkeen, ja puhujat erotellaan äänellä ja merkitään havaitun sukupuolen mukaan) ja muutetaan tekstiksi ja yhteenvedoksi ulkoisen tekoälyn toimesta.",
+    "start": "Aloita tallennus",
+    "starting": "Valmistellaan…",
+    "recBadge": "Tallennetaan {time}",
+    "recentLines": "Viimeisimmät rivit",
+    "waiting": "Teksti ilmestyy tähän, kun ihmiset puhuvat",
+    "end": "Lopeta ja luo muistiinpanot",
+    "wakeWarn": "Tallennus saattaa keskeytyä, jos näyttö sammuu",
+    "adminOnly": "Vain järjestelmänvalvojat voivat käyttää tätä",
+    "aiOff": "AI-muistiinpanot eivät ole käytettävissä juuri nyt (palvelimen asetukset tarvitaan). Aiemmat muistiinpanot on lueteltu alla",
+    "reload": "Lataa uudelleen",
+    "unsupported": "Tallennus ei ole käytettävissä tällä laitteella",
+    "micDenied": "Mikrofonia ei voi käyttää – tarkista lupa",
+    "limited": "Käsittelyajan raja on käytetty – lopeta ja luo muistiinpanot",
+    "noAgr": "Pysäytetty: tallennuksen ilmoitusvahvistusta ei ole – lopeta ja aloita uudelleen",
+    "micLost": "Mikrofoni irrotettiin ja tallennus pysähtyi – napauta Yhdistä mikrofoni uudelleen tai lopeta muistiinpano",
+    "micRetry": "Yhdistä mikrofoni uudelleen",
+    "gone": "Tämä muistiinpano lopetettiin tai poistettiin muualla, joten tallennus pysähtyi – avaa muistiinpanot alla olevalla painikkeella",
+    "finishing": "Viimeisten sanojen tallentaminen…",
+    "st": {
+      "RECORDING": "Tallennetaan",
+      "SUMMARIZING": "Luodaan",
+      "DONE": "Valmis",
+      "FAILED": "Epäonnistui"
+    },
+    "downloadPiBrowser": "Markdown-lataus toimii vain tavallisessa selaimessa (tietokone tai mobiili). Pi Browser ei voi tallentaa tiedostoja – avaa nämä muistiinpanot tietokoneen tai puhelimen selaimella (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Suunnitelmat",
+    "loading": "Ladataan…",
+    "free": "Ilmainen",
+    "freeDesc": "{time} seminaareja joka kuukausi (ei siirry seuraavalle kuukaudelle)",
+    "monthly": "Kuukausittain",
+    "yearly": "Vuosittain",
+    "paidDesc": "{time} seminaareja, voimassa {months} kuukautta",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Tarkistetaan Pi-hintaa",
+    "noAi": "Ei tekoälytekstityksiä, käännöksiä, dubbauksia tai muistiinpanojen yhteenvetoja",
+    "withAi": "Sisältää tekoälytekstitykset, käännökset, dubbaukset ja muistiinpanojen yhteenvedot",
+    "buy": "Maksa Pi:llä",
+    "bought": "Maksu suoritettu. Seminaariaikaa on lisätty.",
+    "meRemain": "Aikaa jäljellä: {time}",
+    "loginToBuy": "Kirjaudu sisään ostaaksesi suunnitelman.",
+    "payNote": "Maksu suoritetaan aina Pi:llä. Paikallisen valuutan summa on vain viite; Pi-summa määräytyy Pi-hinnan mukaan maksuhetkellä. Maksullisella suunnitelmalla järjestetty seminaari käyttää ensin kyseisen suunnitelman passeja (aikaisimmin vanhenevat ensin), ja jatkaa sitten tämän kuukauden ilmaisella ajalla.",
+    "charge": "Lataa aikaa",
+    "hm": "{h} t {m} min",
+    "m": "{m} min",
+    "won": "{n} KRW",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (tarkistetaan Pi-hintaa)",
+    "h": "{h} t"
+  },
+  "adminRooms": {
+    "title": "Huoneiden hallinta",
+    "adminOnly": "Vain järjestelmänvalvojat voivat tarkastella tätä sivua.",
+    "refresh": "Päivitä",
+    "count": "{n} avointa huonetta",
+    "empty": "Tällä hetkellä ei ole avoimia huoneita.",
+    "lab": "Laboratoriohuone",
+    "noSeminar": "Ei seminaaritietuetta",
+    "peers": "{n} / {cap} yhdistetty",
+    "producers": "{n} striimiä",
+    "end": "Päättyy {time}",
+    "stale": "Seminaari on päättynyt, mutta huone on edelleen auki videopalvelimella – pakota se sulkeutumaan.",
+    "close": "Pakota sulkeutumaan",
+    "confirmSeminar": "Tämä päättää seminaarin ja sulkee huoneen. Kaikki yhteydet katkaistaan.",
+    "confirmRoom": "Tämä sulkee huoneen. Kaikki yhteydet katkaistaan.",
+    "confirmYes": "Sulje",
+    "cancel": "Peruuta",
+    "closing": "Suljetaan…",
+    "closed": "Huone suljettu.",
+    "metrics": "Videopalvelimen mittarit (alusta alkaen)",
+    "metricsOff": "Mittareita ei voitu ladata.",
+    "m": {
+      "packetsIn": "Paketit sisään",
+      "packetsOut": "Paketit ulos",
+      "nackIn": "NACK-pyynnöt vastaanotettu",
+      "nackOut": "NACK-pyynnöt lähetetty",
+      "retransmits": "Uudelleenlähetykset",
+      "duplicateNack": "Kaksois-NACK-pyynnöt",
+      "cacheMiss": "Uudelleenlähetysvälimuistin puutteet",
+      "pliOut": "Avainkuvapyyntö (PLI)",
+      "keyframes": "Avainkuvat",
+      "layerSwitches": "Laadunvaihdot",
+      "queueDrops": "Jonon pudotukset"
+    }
+  },
+  "adminUsers": {
+    "title": "Käyttäjät",
+    "adminOnly": "Vain järjestelmänvalvojat voivat tarkastella tätä sivua.",
+    "search": "Hae nimellä (vähintään 2 merkkiä)",
+    "searchBtn": "Hae",
+    "refresh": "Päivitä",
+    "count": "{n, plural, one {# käyttäjä} other {# käyttäjää}}",
+    "empty": "Ei käyttäjiä.",
+    "admin": "Järjestelmänvalvoja",
+    "lastLogin": "Viimeisin kirjautuminen {time}",
+    "never": "Ei kirjautumishistoriaa",
+    "plan": {
+      "FREE": "Ilmainen",
+      "M": "Kuukausittain",
+      "Y": "Vuosittain"
+    },
+    "until": "(asti {time})",
+    "manage": "Hallitse aikaa",
+    "close": "Sulje",
+    "planLabel": "Suunnitelma",
+    "hours": "Tunnit",
+    "minutes": "Minuutit",
+    "reason": "Syy (valinnainen)",
+    "sub": "Vähennä",
+    "confirmSub": "Vähennä {plan}-aikaa {time}.",
+    "confirmYes": "Vahvista",
+    "cancel": "Peruuta",
+    "saving": "Tallennetaan…",
+    "done": "Soveltettu. {plan}-aikaa jäljellä: {time}",
+    "invalid": "Anna vähennys 1 minuutin ja 1000 tunnin välillä (kokonaiset minuutit 0–59).",
+    "history": "Viimeisimmät säädöt",
+    "noHistory": "Ei säätöjä vielä.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Anna palvelupassi (ilmainen aika)",
+    "svc": {
+      "H1": "1 tunnin passi",
+      "D1": "1 päivän passi",
+      "M1": "1 kuukauden passi"
+    },
+    "svcNote": "Palvelupassit ovat ilmaisen suunnitelman aikaa. Niitä voi käyttää tästä hetkestä alkaen kyseisen ajanjakson (1 tunti, 24 tuntia, 1 kuukausi) ajan ilmaisissa seminaareissa ja maksullisten seminaarien ilmaisessa osassa (ei tekoälyominaisuuksia). Jos passeja on useita, ne käytetään automaattisesti järjestyksessä 1 tunti → 1 päivä → 1 kuukausi.",
+    "subTitle": "Vähennä aikaa",
+    "subNote": "Vähentää ensin myöhemmin vanhenevista passeista. Jos se on enemmän kuin jäljellä oleva aika, poistetaan vain jäljellä oleva aika.",
+    "confirmSvc": "Anna {svc}.",
+    "doneSvc": "Annettu {svc}. Vapaata aikaa jäljellä: {time} (passi vanhenee {end})"
+  }
+}

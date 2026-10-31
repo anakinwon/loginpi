@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Baguhin ang wika",
-      "search": "Maghanap ng wika",
-      "empty": "Walang resulta"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Mga live na video seminar na sinasalihan mo gamit ang Pi"

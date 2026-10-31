@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Pi ilə qoşulduğunuz canlı video seminarlar"
+  },
+  "home": {
+    "description": "Təşkilatçılar seminarlar açır, iştirakçılar isə Pi ilə canlı video sessiyalara qoşulurlar.",
+    "badge": "Gözəl adalarda canlı seminarlar",
+    "headline": "Birlikdə izləyin, dinləyin və öyrənin — canlı",
+    "ctaBrowse": "Seminarlara baxın",
+    "ctaPlan": "Planlara baxın",
+    "features": {
+      "video": "Canlı video",
+      "caption": "Altyazılar və tərcümə",
+      "notes": "AI iclas qeydləri",
+      "pay": "Pi ilə ödəyin"
+    },
+    "listTitle": "Seminarlar",
+    "cal": {
+      "title": "Seminar təqvimi",
+      "desc": "Keçmiş seminarlardan gələcək seminarlara qədər — ətraflı məlumat üçün tarixə toxunun.",
+      "legendSmn": "Seminarlar",
+      "legendEnded": "Keçmiş seminarlar",
+      "legendMine": "Mənim tədbirlərim",
+      "failed": "Seminar tarixləri yüklənmədi. Zəhmət olmasa, bir az sonra yenidən cəhd edin.",
+      "open": "Ətraflı baxın"
+    }
+  },
+  "nav": {
+    "link": "Hesabı əlaqələndirin",
+    "privacy": "Məxfilik",
+    "plan": "Planlar",
+    "rooms": "Otaqlar",
+    "admin": "Admin",
+    "users": "İstifadəçilər",
+    "home": "Ana səhifə",
+    "privacyShort": "Məxfilik",
+    "menu": "Əsas menyu",
+    "fold": "Menyunu yığ",
+    "unfold": "Menyunu aç"
+  },
+  "auth": {
+    "checking": "Daxil olma yoxlanılır…",
+    "signedIn": "{name}",
+    "inPerson": "Şəxsi qeydlər",
+    "required": "Zəhmət olmasa, Pi hesabınızla daxil olun.",
+    "signIn": "Pi ilə daxil olun",
+    "openInPiBrowser": "Pi hesabınızla daxil olmaq üçün bu səhifəni Pi Browser-də açın.",
+    "authenticating": "Daxil olunur…",
+    "google": "Google ilə daxil olun",
+    "signOut": "Çıxış edin",
+    "or": "və ya",
+    "linkRequired": "Google ilə daxil oldunuz, lakin hələ Pi hesabı ilə əlaqələndirilməyib. Pi Browser-də əlaqə kodu yaradın və buraya daxil edin.",
+    "linkNeeded": "Pi hesabı əlaqələndirilməlidir",
+    "linkCheckFailed": "Hesabınızın əlaqə statusu yoxlanıla bilmədi (müvəqqəti server xətası). Zəhmət olmasa, bir az sonra yeniləyin."
+  },
+  "piOAuth": {
+    "signingIn": "Pi hesabınızla daxil olunur…",
+    "failed": "Pi ilə daxil olma uğursuz oldu. Zəhmət olmasa, yenidən cəhd edin.",
+    "stateMismatch": "Bu daxil olma sorğusu təsdiqlənə bilmədi (müddəti bitmiş və ya başqa tab). Zəhmət olmasa, yenidən cəhd edin.",
+    "retry": "Yenidən cəhd edin",
+    "backHome": "Ana səhifə"
+  },
+  "link": {
+    "title": "Hesabı əlaqələndirin",
+    "intro": "Pi Browser-də daxil olduğunuz hesabı adi brauzerdə Google daxil olma ilə əlaqələndirin. Əlaqələndirdikdən sonra eyni hesabı PC brauzerində də istifadə edə bilərsiniz.",
+    "checking": "Daxil olma yoxlanılır…",
+    "piIssueTitle": "Adi brauzerdən də daxil olmaq üçün",
+    "codeHint": "Aşağıdakı kodu yaradın, sonra PC brauzerində Google ilə daxil olun və onu Hesabı əlaqələndir səhifəsinə daxil edin (10 dəqiqə ərzində).",
+    "piIssue": "Əlaqə kodu yaradın",
+    "reissue": "Yeni kod yaradın",
+    "expiresIn": "{min} dəqiqə sonra bitir",
+    "enterTitle": "Əlaqə kodunu daxil edin",
+    "enterHint": "Pi Browser-də seminar.pi → Hesabı əlaqələndir → Əlaqə kodu yarat bölməsinə keçin, sonra 6 rəqəmli kodu daxil edin.",
+    "codeLabel": "Əlaqə kodu",
+    "submit": "Əlaqələndirin",
+    "done": "Əlaqələndirildi. İndi Google daxil olma ilə də istifadə edə bilərsiniz.",
+    "linked": "{name} Google daxil olma ilə əlaqələndirilib."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Daxil olma tələb olunur",
+    "AUTH_PI_REQUIRED": "Pi ilə daxil olma tələb olunur",
+    "AUTH_PI_SESSION_INVALID": "Sessiyanızın müddəti bitdi. Zəhmət olmasa, yenidən daxil olun",
+    "AUTH_PI_TOKEN_INVALID": "Pi ilə daxil olma təsdiqlənmədi",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Pi ilə daxil olma məlumatları çatışmır",
+    "FORBIDDEN": "İcazəniz yoxdur",
+    "BAD_REQUEST": "Yanlış sorğu",
+    "BAD_REQUEST_BODY": "Yanlış sorğu",
+    "INVALID_INPUT": "Yanlış giriş",
+    "QUERY_FAILED": "Yüklənmədi",
+    "SAVE_FAILED": "Saxlanılmadı",
+    "INTERNAL": "Nəsə səhv getdi",
+    "SERVER_CONFIG": "Server konfiqurasiya xətası. Zəhmət olmasa, operatorla əlaqə saxlayın",
+    "PI_API_CONNECT_FAILED": "Pi Network-ə qoşula bilmədi",
+    "DB_UNAVAILABLE": "Məlumat müvəqqəti olaraq mövcud deyil. Zəhmət olmasa, bir az sonra yenidən cəhd edin",
+    "NOT_FOUND": "Tapılmadı",
+    "RATE_LIMITED": "Çox sayda sorğu. Zəhmət olmasa, bir az sonra yenidən cəhd edin",
+    "PAYLOAD_TOO_LARGE": "Sorğu çox böyükdür",
+    "NETWORK": "Şəbəkə bağlantınızı yoxlayın",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Bu Pi istifadəçi adı artıq fərqli etimadnamələrlə qeydiyyatdan keçib. Zəhmət olmasa, adminlə əlaqə saxlayın",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Bu hesab aktiv deyil. Zəhmət olmasa, adminlə əlaqə saxlayın",
+    "AUTH_GOOGLE_REQUIRED": "Google ilə daxil olma tələb olunur.",
+    "LINK_CODE_INVALID": "Əlaqə kodu yanlışdır və ya müddəti bitib. Pi Browser-də yenisini yaradın.",
+    "LINK_ALREADY_LINKED": "Bu hesab artıq əlaqələndirilib.",
+    "LINK_CODE_GEN_FAILED": "Əlaqə kodu yaradıla bilmədi. Zəhmət olmasa, bir az sonra yenidən cəhd edin.",
+    "AUTH_DB_UNAVAILABLE": "Hesabınız saxlanıla bilmədi, buna görə də daxil olma uğursuz oldu. Zəhmət olmasa, bir az sonra yenidən cəhd edin.",
+    "LINK_TRY_LIMIT": "Çox sayda yanlış əlaqə kodu. 15 dəqiqə sonra yenidən cəhd edin.",
+    "PRICE_UNAVAILABLE": "Pi qiyməti əldə edilə bilmədi. Zəhmət olmasa, bir az sonra yenidən cəhd edin",
+    "QUOTE_EXPIRED": "Ödəniş təklifinin müddəti bitdi. Zəhmət olmasa, yenidən ödəyin",
+    "PLAN_EXHAUSTED": "Bütün seminar vaxtınızı istifadə etdiniz. Planlar səhifəsində doldurun",
+    "HOST_AWAY": "Təşkilatçı otaqda deyil. Təşkilatçı qoşulduqdan sonra daxil ola bilərsiniz",
+    "PLAN_AI_PAID": "AI funksiyaları ödənişli planlarda mövcuddur",
+    "AI_UNAVAILABLE": "AI funksiyaları hazırda mövcud deyil",
+    "SPEECH_CHUNK_INVALID": "Audio hissə formatı yanlışdır",
+    "SPEECH_NOT_LIVE": "Bu seminar canlı deyil",
+    "SPEECH_NO_AGR": "Səs emalına razılıq tələb olunur",
+    "SPEECH_RATE": "Çox sayda səs sorğusu. Zəhmət olmasa, bir az sonra yenidən cəhd edin",
+    "SPEECH_QUOTA": "Bu seminar üçün səs emal vaxtı bitdi",
+    "SPEECH_USR_QUOTA": "Bu seminar üçün tərcümə və tərcümə edilmiş səs limitinizi istifadə etdiniz",
+    "SPEECH_FAILED": "Səs mətnə çevrilə bilmədi",
+    "SPEECH_STAGE_ONLY": "Yalnız səhnədə olanlar səs altyazılarından istifadə edə bilər",
+    "TRANSLATE_FAILED": "Altyazı tərcümə edilə bilmədi",
+    "POLL_CLOSED": "Bu sorğu bağlıdır",
+    "NOTE_NOT_RECORDING": "Bu qeydlər qeyd edilmir",
+    "NOTE_SHOT_INVALID": "Yanlış ekran görüntüsü",
+    "NOTE_AUDIO_INVALID": "Yanlış qeyd faylı",
+    "NOTE_SHOT_RATE": "Çox sayda ekran görüntüsü",
+    "NOTE_RETRY_SOON": "Bir dəqiqə sonra yenidən cəhd edə bilərsiniz",
+    "SPEECH_TTS_FAILED": "Tərcümə edilmiş səs yaradıla bilmədi",
+    "CAPTION_SIG_INVALID": "Bu altyazı təsdiqlənmədi, buna görə də tərcümə edilmədi",
+    "PLAN_EXPIRES_BEFORE_START": "Başlama vaxtı bu planın keçidinin bitmə vaxtından sonradır",
+    "PAY_ALREADY_PAID": "Ödəniş hələ də işlənir. Əgər cüzdanda daxil olurdunuzsa, 3 dəqiqə sonra yenidən cəhd edin.",
+    "REC_PAID_ONLY": "Qeyd yalnız ödənişli vaxtı qalan Aylıq və ya İllik plan seminarlarında mövcuddur",
+    "REC_NOT_IN_ROOM": "Hələ də otaqda olduğunuz təsdiqlənir. Bir az sonra yenidən cəhd edin",
+    "ENGINE_OFF": "Video server admin açarı konfiqurasiya edilməyib",
+    "ENGINE_UNAVAILABLE": "Video server cavab vermir. Zəhmət olmasa, bir az sonra yenidən cəhd edin",
+    "ADJ_NOTHING": "Azaldılacaq qalan vaxt yoxdur"
+  },
+  "progress": {
+    "title": "İnkişafın gedişatı",
+    "subtitle": "Tamamlanmış, davam edən və planlaşdırılan, xüsusiyyətlərə görə · {date} tarixinə qədər",
+    "overall": "Ümumi addımlar",
+    "stepsDone": "{done}/{total} addım tamamlandı ({pct}%)",
+    "featureUnit": "xüsusiyyətlər",
+    "status": {
+      "done": "Tamamlandı",
+      "doing": "Davam edir",
+      "todo": "Planlaşdırılıb",
+      "drop": "Buraxıldı"
+    },
+    "features": {
+      "F01": {
+        "name": "Daxil olun",
+        "desc": "Pi Browser ilə daxil olma, digər brauzerlərdə Google ilə daxil olma və hər iki hesabı əlaqələndirmə"
+      },
+      "F05": {
+        "name": "Canlı video seminar",
+        "desc": "Öz video mühərrikimiz Galápagos — məqsəd bir təqdimatçının 30-a qədər iştirakçıya yayımlanmasıdır"
+      },
+      "F02": {
+        "name": "Seminar yarat",
+        "desc": "Seminar yaratmaq üçün altbaşlığı, vaxtı, tutumu və seminar haqqını təyin edin (adı = ada, avtomatik)"
+      },
+      "F03": {
+        "name": "Seminar siyahısı və detalları",
+        "desc": "Açıq seminarlara səhifə-səhifə baxın və onların detallarını görün"
+      },
+      "F04": {
+        "name": "Pi giriş ödənişi",
+        "desc": "Seminar haqqını Pi ilə ödəyin; server sizi içəri buraxmadan əvvəl məbləği yenidən yoxlayır"
+      },
+      "F06": {
+        "name": "Təşkilatçı ödənişləri",
+        "desc": "Giriş haqqı gəlirlərini təşkilatçılara Pi ilə ödəyin"
+      },
+      "F07": {
+        "name": "Təkrar izləmələr",
+        "desc": "Qeydə alınmış seminarları sonra izləyin"
+      },
+      "FU": {
+        "name": "İclas əlavələrinin əsası",
+        "desc": "Əlavələr üçün bir siqnal kanalı, AI bağlantısı, səs hissələri, mikrofon razılığı və məlumat cədvəlləri"
+      },
+      "F08": {
+        "name": "Cədvəl və paylaşım",
+        "desc": "Hər seminar üçün təqvim bağlantısı, tədbir faylı (.ics) və e-poçt dəvəti"
+      },
+      "F09": {
+        "name": "Səs-küyün azaldılması və işıqlandırma",
+        "desc": "Mikrofon səs-küyünü azaldın və qaranlıq kamera videosunu işıqlandırın"
+      },
+      "F10": {
+        "name": "Canlı altyazılar",
+        "desc": "Təqdimatçının nitqini səhnənin altında mətnə çevirin"
+      },
+      "F11": {
+        "name": "Sorğular, Sual-Cavab və iştirak",
+        "desc": "Seminar zamanı sorğular və suallar keçirin; təşkilatçılar iştirak siyahısını yükləyirlər"
+      },
+      "F12": {
+        "name": "Fon effektləri",
+        "desc": "Fonunuzu bulanıqlaşdırın və ya onu əvvəlcədən təyin edilmiş və ya öz şəklinizlə əvəz edin (cihazınızda işlənir)"
+      },
+      "F13": {
+        "name": "Yerli qeyd",
+        "desc": "Təqdimatçı seminarı öz cihazında qeyd edir və hər kəs qeydin açıq olduğunu görür"
+      },
+      "F14": {
+        "name": "AI iclas qeydləri",
+        "desc": "Təqdimatçı onu açdıqda, nitq və ekranlar qeyd edilir və əsas məqamlar, qərarlar və görüləcək işlər şəklində ümumiləşdirilir"
+      },
+      "F15": {
+        "name": "Şəxsi iclas qeydləri",
+        "desc": "Yalnız mikrofonla iclası qeyd edin və iclas qeydləri əldə edin (adminlər)"
+      },
+      "F16": {
+        "name": "Tərcümə edilmiş altyazılar",
+        "desc": "Seçdiyiniz dilə tərcümə edilmiş altyazıları göstərin"
+      },
+      "F17": {
+        "name": "Tərcümədə dinləyin",
+        "desc": "Tərcümə edilmiş altyazıları sintetik səslə ucadan oxuyun, orijinal səsi isə azaldın"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser ilə daxil olma",
+      "googleLogin": "Google ilə daxil olma",
+      "accountLink": "Hesab əlaqələndirmə",
+      "deviceTest": "Kamera cihaz testi",
+      "oneToTwo": "Təqdimatçı 1 → 2 iştirakçı",
+      "recovery": "Donma bərpası və sabitlik",
+      "structure": "Mühərrik strukturunun təmizlənməsi",
+      "autoQuality": "Avtomatik keyfiyyət, 30 iştirakçı",
+      "roomService": "Otağa giriş və qeyd",
+      "roomUi": "Otaq ekranı (lobi·səhnə·çat·əl qaldır·moderasiya)",
+      "createForm": "Yarat ekranı",
+      "list": "Siyahı",
+      "detail": "Detallar",
+      "payRequest": "Ödəniş sorğusu",
+      "payVerify": "Məbləğin yenidən yoxlanılması və giriş",
+      "settle": "Ödəniş",
+      "vod": "Qeydin təkrar izlənməsi",
+      "appRelay": "Mühərrik əlavə siqnal kanalı",
+      "aiBase": "AI, səs hissələri, razılıq və məlumat cədvəlləri",
+      "shareLinks": "Təqvim bağlantısı, .ics və e-poçt dəvəti",
+      "noiseLight": "Səs-küyün azaldılması və işıqlandırma",
+      "liveCaptions": "Canlı altyazılar",
+      "pollQnaAttend": "Sorğular, Sual-Cavab və iştirak siyahısı",
+      "backgrounds": "Bulanıqlaşdırma, əvvəlcədən təyin edilmiş və öz şəkliniz",
+      "localRecording": "Təqdimatçı qeydi və qeyd nişanı",
+      "aiNotes": "Qeyd, xülasə və qeydlər səhifəsi",
+      "inPersonNotes": "Yalnız mikrofon qeydləri və mənim qeydlərim",
+      "captionTranslate": "Dil seçimi və orijinal/tərcümə keçidi",
+      "dubbing": "Sintetik səs oxutma və azaldılmış orijinal səs"
+    },
+    "refLabel": "İstinad modeli",
+    "uiRef": "UI əsası — geniş istifadə olunan veb video iclas tətbiqinin ekran və funksiya nümunələri, seminar.pi üçün uyğunlaşdırılmışdır"
+  },
+  "room": {
+    "rename": {
+      "later": "Ad saxlanıldı, lakin digərlərinə indi bildiriş göndərilə bilmədi. Onlar yenidən qoşulduqdan sonra görəcəklər.",
+      "tile": "Adımı dəyişmək üçün klikləyin",
+      "menu": "Adımı dəyişdirin",
+      "title": "Bu seminarda mənim adım",
+      "hint": "30 simvola qədər. Yalnız bu seminarda istifadə olunur və hər kəsin ekranında dərhal yenilənir.",
+      "save": "Saxla",
+      "saving": "Saxlanılır…",
+      "cancel": "Ləğv et",
+      "taken": "Bu ad artıq başqası (təşkilatçı və ya iştirakçı) tərəfindən istifadə olunur. Başqa birini seçin.",
+      "failed": "Adınız saxlanıla bilmədi. Yenidən cəhd edin."
+    },
+    "roomTitle": {
+      "edit": "Altbaşlığı redaktə etmək üçün klikləyin",
+      "label": "Altbaşlıq",
+      "placeholder": "Altbaşlıq (60-a qədər)",
+      "save": "Saxla",
+      "cancel": "Ləğv et",
+      "failed": "Altbaşlıq saxlanıla bilmədi."
+    },
+    "mirror": "Videomu güzgülə",
+    "barPin": "Aşağı paneli həmişə göstər",
+    "barAuto": "Aşağı paneli avtomatik gizlət",
+    "title": "Seminara qoşulun · {room}",
+    "titleSeminar": "Gözləmə otağı",
+    "noEngine": "Video server hələ hazır deyil.",
+    "joinAs": "Kimi qoşul",
+    "presenter": "Təqdimatçı",
+    "audience": "İştirakçı",
+    "join": "İndi qoşul",
+    "nameLabel": "Ad",
+    "audienceHint": "İştirakçılar kamera və ya mikrofondan istifadə etmirlər. Qoşulduqdan sonra təqdimatçını görəcək və eşidəcəksiniz.",
+    "preview": {
+      "pending": "Kamera və mikrofon hazırlanır…",
+      "audioOnly": "Kamera mövcud deyil — yalnız səs göndərilir.",
+      "none": "Kamera və mikrofon mövcud deyil. İcazələri yoxlayın (mediasız da qoşula bilərsiniz).",
+      "videoOnly": "Mikrofon mövcud deyil — yalnız video göndərilir. Mikrofon icazəsini yoxlayın."
+    },
+    "mic": {
+      "on": "Mikrofonu söndür",
+      "off": "Mikrofonu aç"
+    },
+    "cam": {
+      "on": "Kameranı söndür",
+      "off": "Kameranı aç"
+    },
+    "controls": "Zəng idarəetmələri",
+    "leave": "Çıxın",
+    "enableSound": "Səsi aktivləşdirin",
+    "state": {
+      "connecting": "Qoşulur…",
+      "reconnecting": "Yenidən qoşulur…"
+    },
+    "waiting": "Təqdimatçı gözlənilir.",
+    "rejoin": "Yenidən qoşul",
+    "err": {
+      "generic": "Nəsə səhv getdi. Zəhmət olmasa, yenidən qoşulun.",
+      "CLOSED": "Bağlantı kəsildi.",
+      "NO_ENGINE": "Video server hələ hazır deyil.",
+      "TICKET_401": "Zəhmət olmasa, daxil olun.",
+      "TICKET_403": "Təqdim etmək üçün icazəniz yoxdur. İştirakçı kimi qoşulun.",
+      "TICKET_503": "Video server hələ konfiqurasiya edilməyib.",
+      "TICKET_NETWORK": "Şəbəkə bağlantınızı yoxlayın.",
+      "TICKET_INVALID": "Giriş icazənizin müddəti bitdi.",
+      "TICKET_EXPIRED": "Giriş icazənizin müddəti bitdi.",
+      "ROOM_FULL": "Bu seminar doludur.",
+      "ROOM_CLOSED": "Otaq bağlandı — seminar bitdi və ya aparıcı 5 dəqiqədən çox müddətə uzaqlaşdı.",
+      "DUPLICATE_SESSION": "Başqa cihazdan qoşulduğunuz üçün bu ekranın bağlantısı kəsildi.",
+      "ROLE_FORBIDDEN": "Təqdim etmək üçün icazəniz yoxdur.",
+      "WS_FAILED": "Video serverə qoşulmaq mümkün olmadı.",
+      "ICE_FAILED": "Video bağlantısı kəsildi. Şəbəkənizi yoxlayın.",
+      "MEDIA_FAILED": "Kamera və ya mikrofonu işə salmaq mümkün olmadı.",
+      "TIMEOUT": "Video server cavab vermir.",
+      "TICKET_402": "Bu, ödənişli seminardır. Zəhmət olmasa, daxil olmazdan əvvəl seminar səhifəsində ödəniş edin.",
+      "TICKET_404": "Seminar tapılmadı.",
+      "TICKET_409": "Bu seminar bitmiş və ya ləğv edilmişdir.",
+      "TICKET_HOST_AWAY": "Aparıcı hələ qoşulmayıb və ya 5 dəqiqədən çox müddətə uzaqlaşıb, buna görə də daxil ola bilməzsiniz. Zəhmət olmasa, aparıcı qoşulduqdan sonra yenidən cəhd edin.",
+      "TICKET_PLAN_EXHAUSTED": "Bu seminarın planının vaxtı bitib, buna görə də başlaya bilməz. Eyni planı yenidən almaq vaxt əlavə edir (Pulsuz növbəti ay 1 saatla yenilənir)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Mikrofonu dəyişmək mümkün olmadı. Zəhmət olmasa, yenidən cəhd edin.",
+        "video": "Kameranı dəyişmək mümkün olmadı. Zəhmət olmasa, yenidən cəhd edin."
+      },
+      "forbidden": "Təqdim etmək üçün icazəniz yoxdur, buna görə də dinləyici kimi davam edəcəksiniz.",
+      "demoted": "Dinləyici sırasına qaytarıldınız.",
+      "endFailed": "Seminarı bitirmək mümkün olmadı. Zəhmət olmasa, yenidən cəhd edin.",
+      "chatFailed": "Mesaj göndərilmədi.",
+      "actionFailed": "Sorğunu tamamlamaq mümkün olmadı. Zəhmət olmasa, yenidən cəhd edin.",
+      "shareFailed": "Ekran paylaşımını başlamaq mümkün olmadı.",
+      "err": {
+        "RATE_LIMITED": "Çox sürətli göndərirsiniz. Zəhmət olmasa, bir az gözləyin.",
+        "ROLE_FORBIDDEN": "Bunu etmək üçün icazəniz yoxdur.",
+        "MEDIA_FAILED": "Mikrofonunuzu və ya kameranızı işə salmaq mümkün olmadı. Zəhmət olmasa, icazələri yoxlayın.",
+        "LOCKED": "Təqdimatçı tərəfindən kilidlənib."
+      },
+      "mutedBy": {
+        "audio": "Təqdimatçı mikrofonunuzu səssizə aldı.",
+        "video": "Təqdimatçı kameranızı söndürdü."
+      },
+      "policy": {
+        "locked": "Təqdimatçı mikrofonları kilidlədi. Kilid açıldıqdan sonra siz özünüzünkünü yandıra bilərsiniz.",
+        "unlocked": "Mikrofonların kilidi açıldı."
+      },
+      "consent": {
+        "saveFail": "Razılığınızı saxlamaq mümkün olmadı. Qeydiyyatınızı yoxlayın və mikrofonu yenidən yandırın."
+      }
+    },
+    "home": "Ana səhifəyə keçin",
+    "tile": {
+      "fullscreen": "Tam ekran üçün iki dəfə klikləyin · Çıxmaq üçün Esc",
+      "self": "{name} (siz)",
+      "presenter": "Təqdimatçı",
+      "micOff": "Mikrofon bağlıdır",
+      "screen": "{name} ekranı",
+      "row": "Digər spikerlər",
+      "pin": "{name} böyük göstər",
+      "unpin": "Avtomatik düzülüş"
+    },
+    "more": "Daha çox seçim",
+    "joinNoCam": "Kamerasız qoşulun",
+    "net": {
+      "afterJoin": "Qoşulduqdan sonra bağlantınız avtomatik yoxlanılır.",
+      "measuring": "Bağlantı yoxlanılır…",
+      "good": "Yaxşı bağlantı",
+      "fair": "Orta bağlantı",
+      "poor": "Zəif bağlantı",
+      "reason": {
+        "loss": {
+          "audio": "Audio məlumatların {pct}%-i itirilir.",
+          "video": "Video məlumatların {pct}%-i itirilir."
+        },
+        "rate": {
+          "audio": "Audio yükləmə sürəti {kbps} kbps ilə aşağıdır.",
+          "video": "Video yükləmə sürəti {kbps} kbps ilə aşağıdır. Keyfiyyət düşə bilər."
+        }
+      }
+    },
+    "people": "Otaqda {n} nəfər",
+    "screen": {
+      "start": "Ekranı paylaş",
+      "stop": "Paylaşımı dayandır"
+    },
+    "panel": {
+      "title": "Çat · Sual-Cavab · Sorğular · İştirakçılar",
+      "chat": "Çat",
+      "people": "İştirakçılar",
+      "close": "Paneli bağla",
+      "qna": "Sual-Cavab",
+      "polls": "Sorğular"
+    },
+    "chat": {
+      "empty": "Hələ mesaj yoxdur. Çat saxlanılmır.",
+      "me": "Siz",
+      "failed": "Göndərilmədi.",
+      "retry": "Yenidən cəhd edin",
+      "input": "Mesaj yazın",
+      "send": "Göndər"
+    },
+    "hand": {
+      "raise": "Əl qaldır",
+      "lower": "Əli endir",
+      "list": "Əl qaldıranlar",
+      "lowerAll": "Bütün əlləri endir",
+      "raised": "Əl qaldırıldı",
+      "notice": "{name} əl qaldırdı.",
+      "dismiss": "Rədd et",
+      "waiting": "{n} nəfər danışmaq üçün gözləyir"
+    },
+    "react": {
+      "open": "Reaksiyalar",
+      "e0": "Bəyən",
+      "e1": "Alqış",
+      "e2": "Gülüş",
+      "e3": "Təəccüblü",
+      "e4": "Kədərli",
+      "e5": "Sözsüz",
+      "e6": "Sevgi"
+    },
+    "quality": {
+      "label": "Keyfiyyət",
+      "auto": "Avtomatik",
+      "high": "Yüksək",
+      "medium": "Orta",
+      "low": "Aşağı",
+      "unstable": "Şəbəkəniz qeyri-sabitdir"
+    },
+    "roles": {
+      "presenter": "Təqdimatçı",
+      "panel": "Panelist",
+      "audience": "Dinləyici"
+    },
+    "stage": {
+      "invite": "Səhnəyə dəvət et",
+      "remove": "Dinləyici sırasına keçir",
+      "promoted": "Səhnəyə dəvət olundunuz. Əl qaldırmısınızsa, kameranız avtomatik olaraq açılır (kilidli deyilsə və ya icazə yoxdursa). Danışmaq üçün mikrofonunuzu yandırın (mikrofon avtomatik olaraq açılmır).",
+      "later": "Sonra"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} əl qaldırdı."
+    },
+    "leaveDialog": {
+      "title": "Seminardan çıxın",
+      "body": "Siz tək çıxa bilərsiniz və ya seminarı bitirib hər kəsin bağlantısını kəsə bilərsiniz.",
+      "confirmTitle": "Seminarı bitirək?",
+      "confirmBody": "Hər kəsin bağlantısı kəsiləcək və heç kim bu seminara yenidən qoşula bilməyəcək.",
+      "cancel": "Ləğv et",
+      "end": "Seminarı bitir",
+      "endConfirm": "İndi bitir"
+    },
+    "mod": {
+      "muteAll": "Hər kəsi səssizə al",
+      "lock": "Mikrofonları kilidlə",
+      "unlock": "Mikrofonların kilidini aç",
+      "locked": "Təqdimatçı mikrofonları kilidlədi",
+      "muteMic": "Mikrofonu səssizə al",
+      "askMic": "Səssizdən çıxarmağı xahiş et",
+      "muteCam": "Kameranı söndür",
+      "muteMicOf": "{name} mikrofonunu səssizə al",
+      "askMicOf": "{name} səssizdən çıxarmağı xahiş et",
+      "muteCamOf": "{name} kamerasını söndür"
+    },
+    "ask": {
+      "audio": "Təqdimatçı mikrofonunuzu yandırmağınızı xahiş etdi.",
+      "video": "Təqdimatçı kameranızı yandırmağınızı xahiş etdi.",
+      "ignore": "Rədd et"
+    },
+    "toDetail": "Seminar səhifəsinə keçin",
+    "consent": {
+      "title": "Mikrofonunuzu yandırmadan əvvəl",
+      "body": "Bu seminarda qeyd, başlıqlar və ya AI iclas qeydləri açıqdırsa, səsiniz mətnə çevrilə, saxlanıla və tərcümə edilə bilər. Səs emalı ölkənizdən kənarda bir AI xidməti tərəfindən həyata keçirilir. Razılaşmasanız belə, mikrofonunuz yenə də açılır — yalnız səsiniz emaldan kənarda qalır.",
+      "privacy": "Məxfilik siyasəti",
+      "newTab": "(yeni tabda açılır)",
+      "decline": "Razılaşmıram",
+      "agree": "Razıyam və mikrofonu yandır",
+      "notice": "Qeyd, başlıqlar və ya AI iclas qeydləri açıq olduqda, spikerlərin səsləri emal edilir. Dinləyicilərin səsləri göndərilmir.",
+      "saveFailClosed": "Bu seminar bitib, buna görə də razılıq qeyd edilə bilməz"
+    },
+    "captions": {
+      "title": "Başlıqlar",
+      "room": "Canlı başlıqlar (bütün otaq)",
+      "show": "Başlıqları göstər",
+      "size": {
+        "label": "Mətn ölçüsü",
+        "sm": "Kiçik",
+        "md": "Orta",
+        "lg": "Böyük"
+      },
+      "waiting": "Başlıqlar təqdimatçı onları yandırdıqda görünür",
+      "limit": "Nitq emalı limiti çatdı, buna görə də başlıqlar və AI dəqiqələri dayandırıldı",
+      "sendFail": "Başlıqları yandırmaq mümkün olmadı. Zəhmət olmasa, bir azdan yenidən cəhd edin",
+      "sendFailOff": "Başlıqları söndürmək mümkün olmadı. Zəhmət olmasa, bir azdan yenidən cəhd edin",
+      "region": "Başlıqlar",
+      "translate": "Tərcümə edilmiş başlıqları göstər",
+      "lang": "Tərcümə dili",
+      "langMine": "Mənim dillərim",
+      "langAll": "Bütün dillər",
+      "trStop": {
+        "forbidden": "Tərcümə edilmiş başlıqlar yalnız qeydiyyatdan keçmiş iştirakçılar üçündür. Orijinal göstərilir",
+        "unavailable": "Tərcümə edilmiş başlıqlar hazırda mövcud deyil. Orijinal göstərilir",
+        "quota": "Bu seminarın tərcümə limiti çatdı. Orijinal göstərilir",
+        "usrQuota": "Bu seminar üçün tərcümə limitinizi istifadə etdiniz. Orijinal göstərilir"
+      },
+      "unsupported": "Bu cihaz canlı başlıqlar yarada bilmir (bu brauzerdə audio qeyd dəstəyi yoxdur)"
+    },
+    "effects": {
+      "title": "Effektlər",
+      "light": "İşıq korreksiyası",
+      "noise": "Səs-küyü azalt",
+      "noiseFail": "Bu cihazda səs-küyün azaldılması dəyişdirilə bilməz",
+      "close": "Bağla",
+      "preview": "Mənim önizləməm",
+      "bg": "Fon",
+      "bgNone": "Yoxdur",
+      "bgBlur": "Bulanıq",
+      "scenes": {
+        "beach": "🏝️ Maldiv çimərliyi",
+        "autumn": "🍁 Payız vadisi",
+        "fireplace": "🔥 Kamin",
+        "xmas": "🎄 Milad iclas otağı"
+      },
+      "bgs": {
+        "dusk": "Alatoran",
+        "ocean": "Okean",
+        "forest": "Meşə",
+        "studio": "Studiya",
+        "grid": "Şəbəkə",
+        "dots": "Nöqtələr"
+      },
+      "myAdd": "Mənim şəklim",
+      "myItem": "Mənim şəklim {n}",
+      "myDel": "Mənim şəklimi {n} sil",
+      "mySaveFail": "Fon tətbiq edildi, lakin bu cihazda saxlanıla bilmədi (yalnız bu görüş üçün)",
+      "bgStopped": "Fon effekti dayandırıldı və söndürüldü. Yenidən başlamaq üçün onu yenidən seçin",
+      "myNote": "Şəkilləriniz yalnız bu cihazda saxlanılır (hər biri 2 MB-a qədər, 3-ə qədər)",
+      "mobileBlurOnly": "Telefonlarda yalnız bulanıq fon mövcuddur (şəkil fonları PC-də işləyir)",
+      "myTooBig": "Yalnız 2 MB-a qədər şəkillərdən istifadə edilə bilər",
+      "preparing": "Hazırlanır…",
+      "bgFailed": "Fon effektini yükləmək mümkün olmadı",
+      "autoOff": "Cihazınız çox yavaşdır, buna görə də fon effekti söndürüldü",
+      "unsupported": "Bu cihazda fon effektləri mövcud deyil",
+      "noCam": "Fon seçmək üçün kameranızı yandırın",
+      "lightUnsupported": "Bu cihazda işıq korreksiyası mövcud deyil",
+      "noiseUnsupported": "Bu cihazda səs-küyün azaldılması parametrləri dəstəklənmir"
+    },
+    "sheetClose": "Bağla",
+    "polls": {
+      "new": "Yeni sorğu",
+      "question": "Sual",
+      "option": "Seçim {n}",
+      "remove": "Seçim {n} sil",
+      "addOption": "Seçim əlavə et",
+      "start": "Sorğuya başla",
+      "cancel": "Ləğv et",
+      "dup": "Seçimlər fərqli olmalıdır",
+      "vote": "Səs ver",
+      "change": "Səsi dəyiş",
+      "close": "Sorğunu bağla",
+      "closed": "Bağlıdır",
+      "mine": "Sizin seçiminiz",
+      "result": "{pct}% ({n} səs)",
+      "total": "Cəmi {n} səs",
+      "empty": "Hələ sorğu yoxdur.",
+      "loading": "Yüklənir…",
+      "labOnly": "Sorğular yalnız seminar otaqlarında mövcuddur.",
+      "started": "Yeni sorğu başladı",
+      "goVote": "Səs ver",
+      "votersNote": "Təşkilatçı kimin hansı seçimə səs verdiyini görə bilər.",
+      "voters": "Səs verənlər: {names}"
+    },
+    "qna": {
+      "sort": "Sırala",
+      "by": {
+        "top": "Ən yaxşı",
+        "new": "Ən yeni"
+      },
+      "rcm": "Bəyən ({n})",
+      "answered": "Cavablandırıldı",
+      "answer": "Cavablandırıldı kimi qeyd et",
+      "unanswer": "Cavablandırılmadı kimi qeyd et",
+      "hide": "Gizlət",
+      "doneN": "{n} cavablandırıldı",
+      "backOpen": "Cavablandırılmamış suallar",
+      "empty": "Hələ sual yoxdur.",
+      "emptyDone": "Cavablandırılmış sual yoxdur.",
+      "loading": "Yüklənir…",
+      "input": "Sual verin (500 simvol)",
+      "send": "Göndər",
+      "left": "{n} qaldı",
+      "labOnly": "Sual-Cavab yalnız seminar otaqlarında mövcuddur."
+    },
+    "recording": {
+      "title": "Qeyd et",
+      "badge": "Qeyd edilir",
+      "unsupported": "Bu brauzer qeydi dəstəkləmir. Zəhmət olmasa, kompüterdə adi brauzerdən qeyd edin.",
+      "piBrowserOnly": "Qeyd yalnız adi brauzerdə (PC və ya mobil) işləyir. Pi Browser qeyd fayllarını saxlaya bilməz — qeyd etmək üçün bu seminarı kompüter və ya telefon brauzerində (seminarz.vercel.app) açın.",
+      "audioSuspended": "Bu cihazda səs qeydi başlamamış ola bilər. Yalnız şəkil qeyd edilə bilər.",
+      "notifyFailed": "İştirakçılara bildiriş göndərilə bilmədiyi üçün qeyd başlamadı. Zəhmət olmasa, bir azdan yenidən cəhd edin.",
+      "confirm": {
+        "title": "Qeydə başlayaq?",
+        "body": "Qeyd başladıqda, hər kəs 'Qeyd edilir' göstəricisini görəcək. Fayl yalnız bu cihazda saxlanılır və heç vaxt yüklənmir və ya xaricə ötürülmür. Zəhmət olmasa, başlamazdan əvvəl iştirakçılara bildirin.",
+        "download": "Dayandırdığınız zaman MP4 faylı yükləmələr qovluğunuzda saxlanılır (MP4 qeyd edə bilməyən brauzerlər onu çevirmək üçün bir az vaxt sərf edir; təxminən 45 dəqiqədən uzun qeydlər orijinal formatında saxlanıla bilər). Tətbiqdaxili brauzerlər faylın saxlanmasını bloklaya bilər, buna görə də kompüterdə adi brauzerdən qeyd edin.",
+        "cancel": "Ləğv et",
+        "start": "Qeydə başla",
+        "charge": "Qeyd zamanı otaq vaxtına əlavə olaraq qeyd vaxtı ödənişli vaxtınızdan bir dəfə də çıxılır (qeyd zamanı 2x sərfiyyat). Ödənişli vaxt bitdikdə, qeyd dayanır və fayl saxlanılır."
+      },
+      "resave": {
+        "label": "Qeyd faylı",
+        "save": "Yenidən saxla",
+        "dismiss": "Yenidən saxlamağı bağla"
+      },
+      "toast": {
+        "started": "Qeyd başladı — hər kəs görə bilər",
+        "saved": "Qeyd saxlanıldı. Yükləmələr qovluğunuzu yoxlayın. Heç nə saxlanılmayıbsa, ekranın yuxarısındakı [Yenidən saxla] düyməsinə toxunun.",
+        "autoStopped": "Brauzer qeydi dayandırdığı və ya ölçü limiti çatdığı üçün qeyd bitdi. O ana qədər hər şey saxlanıldı. Davam etmək üçün qeydə yenidən başlayın.",
+        "empty": "Heç nə qeyd edilmədiyi üçün fayl yaradılmadı.",
+        "saveFailed": "Qeyd faylını yaratmaq mümkün olmadı.",
+        "converting": "Qeyd MP4-ə çevrilir. Zəhmət olmasa, bu pəncərəni açıq saxlayın.",
+        "savedOriginal": "MP4-ə çevirmək mümkün olmadı, buna görə də qeyd orijinal formatında (webm) saxlanıldı. Yükləmələr qovluğunuzu yoxlayın.",
+        "startedBy": "Təqdimatçı qeydə başladı",
+        "stoppedBy": "Təqdimatçı qeydi dayandırdı"
+      },
+      "paidOnly": "Qeyd yalnız Aylıq və ya İllik planla açılan seminarlarda, ödənişli vaxt qaldığı müddətdə mövcuddur.",
+      "planOut": "Ödənişli vaxt bitdi, buna görə də qeyd dayandırıldı və fayl saxlanıldı.",
+      "notInRoom": "Hələ də otaqda olduğunuz təsdiqlənir. Bir azdan yenidən qeydə başlayın.",
+      "meterFailed": "Qeyd vaxtını yoxlamaq mümkün olmadı, buna görə də qeyd başlamadı. Bir azdan yenidən cəhd edin.",
+      "paidOut": "Ödənişli vaxt qalmadığı üçün qeydə başlamaq mümkün deyil. Qeyd etmək üçün eyni planı yenidən alın.",
+      "pausedBadge": "Qeyd dayandırıldı",
+      "controls": "Yazma nəzarəti",
+      "pause": "Fasilə",
+      "resume": "Davam et",
+      "stop": "Yazmanı dayandır"
+    },
+    "notes": {
+      "on": "AI qeydləri",
+      "badge": "AI qeydləri aktivdir",
+      "started": "Təqdimatçı AI qeydlərini aktivləşdirdi",
+      "stopped": "AI qeydləri deaktiv edildi",
+      "startedMine": "AI qeydləri aktivdir — hamıya göstərilir",
+      "stoppedMine": "AI qeydləri deaktiv edildi — qeydlər yaradılır",
+      "startFail": "AI qeydlərini başlada bilmədi",
+      "gone": "AI qeydləri dayandırıldı — qeydlər başqa yerdə bitirildi və ya silindi",
+      "unsupported": "AI qeydləri burada aktivləşdirilə bilməz (səs yazma dəstəyi yoxdur)"
+    },
+    "dubbing": {
+      "listen": "Tərcümə edilmiş səslə dinləyin",
+      "blocked": "Tərcümə edilmiş səsi oxutmaq mümkün olmadı. Zəhmət olmasa, yenidən aktivləşdirin",
+      "stopped": "Tərcümə edilmiş səs hazırda mövcud deyil, buna görə də deaktiv edildi",
+      "usrQuota": "Bu seminar üçün tərcümə edilmiş səs limitinizi doldurduğunuz üçün deaktiv edildi"
+    },
+    "plan": {
+      "warn": "Bu seminar planında {min} dəqiqə qalıb.",
+      "ended": "Seminar vaxtınız bitdi, buna görə də seminar başa çatdı və siz otaqdan çıxdınız.",
+      "left": "Seminar vaxtı qalıb",
+      "closed": "Seminar başa çatdı, buna görə də siz otaqdan çıxdınız.",
+      "hostAway": "Ev sahibi otaqdan çıxdı. Əgər 5 dəqiqə ərzində qayıtmasa, bütün iştirakçılar çıxarılacaq.",
+      "hostGone": "Ev sahibi 5 dəqiqə ərzində qayıtmadı, buna görə də siz otaqdan çıxdınız. Ev sahibi qoşulduqdan sonra yenidən daxil ola bilərsiniz."
+    },
+    "toLobby": "Gözləmə otağı"
+  },
+  "list": {
+    "tabsLabel": "Seminar siyahısı görünüşü",
+    "tabs": {
+      "all": "Hamısı",
+      "hosted": "Mənim təşkil etdiklərim",
+      "joined": "Qoşulduğum"
+    },
+    "empty": {
+      "all": "Yaxınlaşan seminar yoxdur.",
+      "hosted": "Heç bir seminar təşkil etməmisiniz.",
+      "joined": "Heç bir seminara qoşulmamısınız."
+    },
+    "loading": "Yüklənir…",
+    "retry": "Yenidən cəhd edin",
+    "free": "Pulsuz",
+    "fee": "{amount} Pi",
+    "host": "Ev sahibi {name}",
+    "capacity": "Tutumu {n}",
+    "status": {
+      "SCHEDULED": "Planlaşdırılıb",
+      "LIVE": "Canlı",
+      "ENDED": "Bitdi",
+      "CANCELED": "Ləğv edildi"
+    },
+    "hostNew": "Seminar yarat",
+    "progress": "Tərəqqi",
+    "pager": "Səhifələmə",
+    "prev": "Əvvəlki",
+    "next": "Növbəti",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Altyazı",
+      "placeholder": "Altyazı əlavə edin",
+      "save": "Altyazını yadda saxla",
+      "saving": "Saxlanılır…",
+      "saved": "Saxlanıldı."
+    },
+    "loading": "Yüklənir…",
+    "back": "Siyahıya qayıt",
+    "notFound": "Seminar tapılmadı.",
+    "status": {
+      "SCHEDULED": "Planlaşdırılıb",
+      "LIVE": "Canlı",
+      "ENDED": "Bitdi",
+      "CANCELED": "Ləğv edildi"
+    },
+    "startAt": "Tarix",
+    "host": "Ev sahibi",
+    "seats": "Boş yerlər",
+    "seatsValue": "{left} / {max}",
+    "fee": "Seminar haqqı",
+    "feeValue": "{amount} Pi",
+    "free": "Pulsuz",
+    "enter": "Daxil ol",
+    "payEnter": "Pi ilə ödəyin və daxil olun ({amount} Pi)",
+    "paying": "Ödəniş emal edilir…",
+    "joining": "Qeydiyyatdan keçirilir…",
+    "registered": "Siz qeydiyyatdan keçmisiniz.",
+    "full": "Bu seminar doludur.",
+    "closed": "Bu seminar başa çatdı.",
+    "canceled": "Bu seminar ləğv edildi.",
+    "roomLink": "Otağa get (ev sahibi)",
+    "piBrowserOnly": "Ödəniş Pi Browser-də Pi ilə daxil olduqdan sonra mümkündür.",
+    "payCancelled": "Ödəniş ləğv edildi.",
+    "payStillWaiting": "Hələ də cüzdan gözlənilir. Əgər Pi Wallet-ə daxil olmusunuzsa, zəhmət olmasa bir az gözləyin.",
+    "payFailed": "Ödəniş uğursuz oldu.",
+    "err": {
+      "NAME_TAKEN": "Bu ad artıq başqası tərəfindən istifadə olunur. Başqa birini seçin.",
+      "CAL_READ_FAILED": "Tədbirlərinizi yükləmək mümkün olmadı. Ünvanı yoxlayın.",
+      "ISLAND_FULL": "Hazırda bütün 100 ada adı istifadə olunur. Yaxınlaşan və ya canlı seminar bitdikdən və ya ləğv edildikdən sonra yeni seminar aça bilərsiniz.",
+      "SMN_FULL": "Bu seminar doludur.",
+      "SMN_CLOSED": "Bu seminar başa çatdı və ya ləğv edildi.",
+      "SMN_ALREADY": "Siz artıq qeydiyyatdan keçmisiniz və ya ödəniş prosesi davam edir.",
+      "SMN_FREE": "Pulsuz seminarlar ödəniş tələb etmir.",
+      "SMN_PAY_REQUIRED": "Bu, ödənişli seminardır. Daxil olmaq üçün ödəniş edin.",
+      "SMN_PAY_INVALID": "Ödənişinizi təsdiq edə bilmədik. Zəhmət olmasa, administratorla əlaqə saxlayın.",
+      "PAY_PI_FAILED": "Pi ödəniş serverinə çatmaq mümkün olmadı. Zəhmət olmasa, qısa müddətdə yenidən cəhd edin.",
+      "PAY_MISMATCH": "Ödəniş detalları uyğun gəlmir.",
+      "PAY_AMOUNT_MISMATCH": "Ödəniş məbləği seminar haqqından fərqlənir.",
+      "PAY_CANCELLED": "Bu ödəniş ləğv edildi.",
+      "PAY_ALREADY_PAID": "Ödəniş hələ də emal edilir. Əgər cüzdana daxil olurdunuzsa, 3 dəqiqə sonra yenidən cəhd edin.",
+      "PAY_INVALID_STATE": "Bu ödəniş hazırda emal edilə bilməz.",
+      "PAY_PI_CANCEL_REFUSED": "Ödəniş artıq davam edir və ləğv edilə bilməz. Zəhmət olmasa, qısa müddətdə yenidən yoxlayın."
+    },
+    "share": {
+      "title": "Cədvəl və paylaş",
+      "calendar": "Təqvimə əlavə et",
+      "ics": "Təqvim faylı",
+      "mail": "E-poçtla dəvət et",
+      "mailApp": "Varsayılan e-poçt tətbiqi ilə göndər",
+      "mailSubject": "[Seminar dəvəti] {title}",
+      "mailBody": "{title}\nNə vaxt: {start}\n\nBu linklə birbaşa qoşulun.\nİş masası: {url}\nPi Browser: {piUrl}",
+      "copy": "Link kopyala",
+      "copied": "Link kopyalandı.",
+      "copyFail": "Kopyalamaq mümkün olmadı. Zəhmət olmasa, linki ünvan çubuğundan kopyalayın.",
+      "share": "Başqa tətbiqə paylaş",
+      "shareFail": "Paylaşmaq mümkün olmadı. Zəhmət olmasa, bunun əvəzinə Linki kopyalayın.",
+      "created": "Seminarınız hazırdır. Başlama vaxtını Google Təqviminizə əlavə edin.",
+      "addGoogle": "Google Təqvimə əlavə et",
+      "later": "Daha sonra",
+      "piBrowserOpen": "Pi Browser-də təqvim, e-poçt və təqvim faylı telefonunuzun standart brauzerində açılır.",
+      "extFail": "Açmaq mümkün olmadı. Pi Browser-i yeniləyin və ya Linki kopyalayın və onu adi brauzerdə açın (seminarz.vercel.app).",
+      "icsPiBrowser": "Təqvim faylı yalnız adi brauzerdə (kompüter və ya mobil) yüklənə bilər. Pi Browser-də bunun əvəzinə Təqvimə əlavə et funksiyasından istifadə edin."
+    },
+    "attendance": "İştirak",
+    "plan": "Plan",
+    "left": "Qalan vaxt"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Əvvəlki ay",
+      "next": "Növbəti ay",
+      "connect": "Google Təqvimimi göstər",
+      "change": "Google təqvimlərini idarə et ({n})",
+      "add": "Əlavə et",
+      "remove": "Sil",
+      "close": "Bağla",
+      "failed": "{n} təqvimdən tədbirləri yükləmək mümkün olmadı. Ünvanı yoxlayın.",
+      "badUrl": "Google Təqvim parametrlərindən 'iCal formatında gizli ünvanı' (…/basic.ics) yapışdırın, brauzer ünvan çubuğunu yox.",
+      "full": "{n} təqvimə qədər əlavə edə bilərsiniz.",
+      "allDay": "Bütün gün",
+      "day": "Bu gün mənim tədbirlərim",
+      "count": "{n, plural, one {# tədbir} other {# tədbir}}",
+      "more": "+{n}",
+      "picked": "Bu tarix başlanğıc tarixi olaraq təyin edildi. Aşağıda vaxtı seçin.",
+      "s1": "Aşağıdakı [Google Təqvim parametrlərini aç] düyməsinə toxunun.",
+      "s2": "Solda 'Təqvimlərim üçün parametrlər' altında bir təqvim seçin (məsələn, adınız).",
+      "s3": "'Təqvimi inteqrasiya et' bölməsinə keçin və 'iCal formatında gizli ünvanı' kopyalayın.",
+      "s4": "Onu bura yapışdırın və [Əlavə et] düyməsinə toxunun — tədbir başlıqları təqvimdə görünəcək. Digər təqvimləri də eyni şəkildə, 5-ə qədər əlavə edin.",
+      "open": "Google Təqvim parametrlərini aç",
+      "privacy": "Bu ünvan təqviminizin açarıdır — onu paylaşmayın. O, yalnız bu cihazda saxlanılır, heç vaxt serverimizdə saxlanılmır."
+    },
+    "title": "Seminar yarat",
+    "name": "Gözəl bir adaya səyahət edək!",
+    "subTitle": "Altyazı (isteğe bağlı, 60-a qədər)",
+    "startAt": "Başlama vaxtı",
+    "maxCnt": "Tutumu (1–100)",
+    "submit": "Yarat",
+    "submitting": "Yaradılır…",
+    "invalid": "Girişinizi yoxlayın — indidən bir il ərzində bir tarix, tutum 1–100.",
+    "attendance": {
+      "title": "İştirak",
+      "back": "Seminara qayıt",
+      "loading": "Yüklənir…",
+      "forbidden": "Yalnız ev sahibi və administratorlar iştirakı görə bilər.",
+      "count": "{n} nəfər",
+      "csv": "CSV yüklə",
+      "empty": "Hələ heç kim qoşulmayıb.",
+      "online": "Onlayn",
+      "left": "Çıxdı",
+      "col": {
+        "name": "Ad",
+        "pi": "Pi istifadəçi adı",
+        "ent": "İlk qoşulma",
+        "hb": "Son görünmə",
+        "dur": "İştirak müddəti",
+        "min": "İştirak (dəqiqə, uzaqda olma vaxtı istisna olmaqla)",
+        "state": "Status"
+      },
+      "durNote": "İştirak müddəti ilk qoşulmadan son görünməyə qədərdir, uzaqda olma vaxtı (2.5 dəqiqədən uzun fasilələr) çıxarılır.",
+      "csvPiBrowser": "CSV yükləmə yalnız adi brauzerdə (kompüter və ya mobil) işləyir. Pi Browser faylları saxlaya bilməz — bu iştirak vərəqini kompüter və ya telefon brauzerində açın (seminarz.vercel.app)."
+    },
+    "plan": "Plan",
+    "planFree": "Pulsuz — bu ay {time} qalıb · AI yoxdur",
+    "planPaid": "{name} {time} · {price} — yaradarkən ödəyin",
+    "planHint": "Ödənişli planla açılan seminar əvvəlcə həmin planın vaxtını istifadə edir, sonra bu ayın pulsuz vaxtı ilə davam edir (pulsuz hissədə AI yoxdur). Aktiv plan ödənişsiz açılır; Aylıq və ya İllik planınız yoxdursa, Yarat düyməsini basdığınız zaman Pi ilə ödənilir, sonra seminar açılır (Pi Browser). İştirakçılar üçün qoşulmaq həmişə pulsuzdur.",
+    "planOwned": "{name} — aktiv · {time} qalıb",
+    "planEnds": "Başlama vaxtı bu planın müddəti bitdikdən sonradır. Başlama vaxtını daha erkən təyin edin və ya başqa plan seçin.",
+    "paidKept": "Ödənişli keçidiniz saxlanılır. Problemi düzəldin və yenidən Yarat düyməsini basın (ikinci ödəniş yoxdur)."
+  },
+  "privacy": {
+    "title": "Məxfilik Siyasəti — Səs və AI xüsusiyyətləri",
+    "effective": "Qüvvəyə minmə tarixi {date}",
+    "intro": "Bu siyasət seminarda canlı altyazılar, tərcümə edilmiş altyazılar, səs tərcüməsi, AI iclas qeydləri və şəxsi qeydlər istifadə etdiyiniz zaman emal etdiyimiz şəxsi məlumatları izah edir. Bu xüsusiyyətlər xarici AI xidmətindən istifadə etdiyi üçün məlumatlar xaricə ötürülür.",
+    "whoTitle": "Kimlərin məlumatları emal edilir",
+    "who": [
+      "Təqdimatçılar və səhnədəki iştirakçılar: mikrofonunuzu ilk dəfə açmadan əvvəl bir dəfə razılığınızı istəyirik. Razılıq vermədən seminara qoşula bilərsiniz.",
+      "Auditoriya: mikrofon istifadə etmirsiniz, buna görə də səs göndərilmir. Siz yalnız altyazıları və qeydləri görürsünüz.",
+      "Şəxsi qeydlər: administrator iclası mikrofonla qeyd edir və qeyd etməzdən əvvəl iştirakçıların məlumatlandırıldığını təsdiqləyir."
+    ],
+    "xferTitle": "Şəxsi məlumatların xaricə ötürülməsi (Koreya Şəxsi Məlumatların Qorunması Qanunu, Maddə 28-8)",
+    "xfer": [
+      {
+        "k": "Alıcı",
+        "v": "Google LLC (Gemini API) — əlaqə [TBD: Google məxfilik əlaqəsi]"
+      },
+      {
+        "k": "Ölkələr",
+        "v": "Amerika Birləşmiş Ştatları və Google məlumat mərkəzlərinin yerləşdiyi digər ölkələr [TBD: emal regionu]"
+      },
+      {
+        "k": "Nə vaxt və necə",
+        "v": "Xüsusiyyət aktiv olduqda təxminən hər 5 saniyədən bir, şifrələnmiş əlaqə (HTTPS) vasitəsilə. Şəxsi qeydlər üçün, qeyd bitdikdə bütün qeyd 5 dəqiqəlik hissələrlə bir daha göndərilir (dəqiq transkripsiya)."
+      },
+      {
+        "k": "Maddələr",
+        "v": "Səs, danışıq məzmunu (mətn), spikerin göstərilən adı (qeyd xülasələri üçün), ekran paylaşımı skrinşotları (AI qeydləri aktiv olduqda)"
+      },
+      {
+        "k": "Məqsəd",
+        "v": "Nitqdən mətnə çevirmə, tərcümə, iclas qeydlərinin xülasələri, sintetik nitq (standart səslər, səs klonlaması yoxdur), şəxsi qeydlər üçün spiker ayrılması (səslər fərqləndirilir və qəbul edilən cinsə görə etiketlənir, məsələn, Kişi 1 / Qadın 1 — adlar və ya şəxsiyyətlər müəyyən edilmir)"
+      },
+      {
+        "k": "Saxlama",
+        "v": "Nəticə qaytarılan kimi başa çatır. Google-dan sorğuları saxlamamasını xahiş edirik (store=false). Sui-istifadəyə nəzarət jurnalları Google-un şərtlərinə əsasən saxlanıla bilər [TBD: saxlama müddəti və ödənişli səviyyə statusu]."
+      },
+      {
+        "k": "İmtina etmək üsulu və nəticələri",
+        "v": "Razılıq verməsəniz və ya mikrofonunuzu söndürsəniz, səs göndərilməyəcək. Siz hələ də seminarda iştirak edə bilərsiniz; yalnız öz nitqinizin altyazıları, tərcümələri və qeydləri yaradılmayacaq. Razılığı istənilən vaxt geri götürə bilərsiniz [TBD: geri götürmə düyməsinin yeri]."
+      }
+    ],
+    "keepTitle": "Bu xidmətin saxladığı məlumatlar",
+    "keep": [
+      "Orijinal səs: seminar altyazıları və AI iclas qeydləri üçün saxlanılmır; mətnə çevrildikdən dərhal sonra atılır. Şəxsi qeydlər üçün, qeyd iclasdan sonra daha dəqiq (spikerlərlə) transkripsiya edilə bilməsi üçün şəxsi yaddaşda saxlanılır və qeyd bitdikdən 1 gün sonra gündəlik təmizləmə zamanı silinir (qeyd silinərsə dərhal).",
+      "Canlı altyazılar: saxlanılmır.",
+      "AI iclas qeydləri (təqdimatçı onları aktivləşdirdikdə): danışıq məzmunu, skrinşotlar və xülasə, qeydlər silinənə qədər saxlanılır [TBD: maksimum saxlama müddəti].",
+      "Razılıq qeydləri: razılıq vaxtı və siyasət versiyası, sübut olaraq saxlanılır [TBD: saxlama müddəti].",
+      "İstifadə: dəqiqəlik sorğu sayları və emal vaxtı, xərc limitlərini tətbiq etmək üçün istifadə olunur.",
+      "İştirak: qoşulduğunuz vaxt, son qoşulduğunuz vaxt, göstərilən adınız və Pi istifadəçi adınız saxlanılır və ev sahibinə iştirak siyahısı (ekranda və CSV yükləmə kimi) olaraq verilir. Seminar silinənə qədər saxlanılır.",
+      "Sual-cavab və sorğular: sual mətni və soruşanın göstərilən adı (yoxdursa Pi istifadəçi adı) hər bir iştirakçıya görünür. Bəyənmələr yalnız sayları göstərir, kimin bəyəndiyini heç vaxt göstərmir. Sorğu səsləri iştirakçılara yalnız sayları göstərir; təşkilatçı və administratorlar hər bir seçim üçün hər bir səs verənin göstərilən adını (yoxdursa Pi istifadəçi adı) görürlər. Gizli suallar daxil olmaqla, seminar silinənə qədər saxlanılır."
+    ],
+    "recTitle": "Yazma",
+    "rec": "Yazmalar yalnız təqdimatçının cihazında fayl olaraq saxlanılır. Onlar serverlərimizə yüklənmir və ya xaricə ötürülmür. Yazma və ya AI qeydləri aktiv olduqda, hər bir iştirakçı bir göstərici görür.",
+    "rightsTitle": "Hüquqlarınız",
+    "rights": "Məlumatlarınıza daxil olmaq, düzəltmək, silmək və ya emalını dayandırmaq üçün müraciət edə bilərsiniz. Əlaqə: [TBD: məxfilik məmurunun adı və əlaqə məlumatları]"
+  },
+  "notes": {
+    "title": "Qeydlər",
+    "back": "Seminara qayıt",
+    "loading": "Yüklənir…",
+    "meta": "Qeydlər · {date} · {min} dəq",
+    "aiWarn": "AI tərəfindən yaradılmış xülasə — səhvlər ola bilər",
+    "points": "Əsas məqamlar",
+    "decisions": "Qərarlar",
+    "todos": "Fəaliyyət maddələri",
+    "shots": "Ekran çəkilişləri ({n})",
+    "transcript": "Transkripsiya",
+    "download": "Markdown yüklə",
+    "making": "Qeydlər yaradılır…",
+    "makingLong": "Bu, bir az vaxt aparır. Zəhmət olmasa, daha sonra yeniləyin",
+    "recording": "Hələ də yazılır",
+    "failed": "Xülasə yaratmaq mümkün olmadı — tam transkripsiya aşağıdadır",
+    "retry": "Yenidən cəhd edin",
+    "finish": "Yazmanı bitir və xülasə et",
+    "none": "Burada heç nə yoxdur",
+    "blank": "Xülasə etmək üçün heç nə yoxdur — heç bir nitq yazılmadı və ya çox qısa idi",
+    "notFound": "Qeydlər tapılmadı",
+    "forbidden": "Bu qeydlərə giriş icazəniz yoxdur",
+    "shotAlt": "{at} ekran çəkilişi",
+    "close": "Bağla",
+    "view": "Qeydlərə bax",
+    "error": "Yükləmək mümkün olmadı",
+    "mine": "Mənim qeydlərim",
+    "del": "Qeydləri sil",
+    "delAsk": "Bu qeydləri (xülasə, transkripsiya və ekran çəkilişləri) silmək istəyirsiniz? Heç kim onları görə bilməyəcək",
+    "delYes": "Sil",
+    "delNo": "Ləğv et",
+    "delFail": "Silmək mümkün olmadı",
+    "dlFail": "Yükləmək mümkün olmadı — zəhmət olmasa, yenidən cəhd edin",
+    "recentNotes": "Son qeydlər",
+    "empty": "Hələ heç bir qeyd yoxdur",
+    "newNote": "Şəxsi qeydlərə başla",
+    "inPerson": "Şəxsi iclas qeydləri",
+    "inPersonTag": "Şəxsi",
+    "titleLabel": "Başlıq",
+    "titlePh": "məsələn, Həftəlik iclas",
+    "told": "İştirak edən hər kəsə bunun qeyd ediləcəyini və AI tərəfindən emal ediləcəyini bildirdim (tələb olunur)",
+    "toldWhy": "Başlamazdan əvvəl, iştirak edən hər kəsə bu söhbətin qeyd ediləcəyini (qeyd qeyd bitdikdən sonra 1 gün saxlanılır və spikerlər səslərinə görə fərqləndirilir və qəbul edilən cinsə görə etiketlənir) və xarici AI tərəfindən mətnə və xülasəyə çevriləcəyini bildirin",
+    "start": "Yazmağa başla",
+    "starting": "Hazırlanır…",
+    "recBadge": "Yazılır {time}",
+    "recentLines": "Son sətirlər",
+    "waiting": "İnsanlar danışdıqca mətn burada görünəcək",
+    "end": "Bitir və qeydlər yarat",
+    "wakeWarn": "Ekran sönərsə qeyd dayana bilər",
+    "adminOnly": "Yalnız administratorlar istifadə edə bilər",
+    "aiOff": "AI qeydləri hazırda mövcud deyil (server quraşdırılması tələb olunur). Keçmiş qeydlər aşağıda sadalanır",
+    "reload": "Yenidən yüklə",
+    "unsupported": "Bu cihazda qeyd mövcud deyil",
+    "micDenied": "Mikrofondan istifadə etmək mümkün deyil — icazəni yoxlayın",
+    "limited": "Emal müddəti limiti bitdi — bitir və qeydləri yarat",
+    "noAgr": "Dayandırıldı: qeyddə bildiriş təsdiqi yoxdur — bitir və yenidən başla",
+    "micLost": "Mikrofon bağlantısı kəsildi və qeyd dayandı — Mikrofonu yenidən qoş düyməsinə toxunun və ya qeydi bitirin",
+    "micRetry": "Mikrofonu yenidən qoş",
+    "gone": "Bu qeyd başqa yerdə bitirildi və ya silindi, buna görə qeyd dayandı — qeydləri açmaq üçün aşağıdakı düymədən istifadə edin",
+    "finishing": "Son sözləri yadda saxlayır…",
+    "st": {
+      "RECORDING": "Qeyd edilir",
+      "SUMMARIZING": "Yaradılır",
+      "DONE": "Hazırdır",
+      "FAILED": "Uğursuz oldu"
+    },
+    "downloadPiBrowser": "Markdown yükləmə yalnız adi brauzerdə (kompüter və ya mobil) işləyir. Pi Browser faylları saxlaya bilməz — bu qeydləri kompüter və ya telefon brauzerində (seminarz.vercel.app) açın."
+  },
+  "plan": {
+    "title": "Planlar",
+    "loading": "Yüklənir…",
+    "free": "Pulsuz",
+    "freeDesc": "Hər ay {time} seminar (növbəti aya keçmir)",
+    "monthly": "Aylıq",
+    "yearly": "İllik",
+    "paidDesc": "{time} seminar, {months} ay müddətində etibarlıdır",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Pi qiyməti yoxlanılır",
+    "noAi": "AI altyazı, tərcümə, dublyaj və ya qeyd xülasələri yoxdur",
+    "withAi": "AI altyazı, tərcümə, dublyaj və qeyd xülasələri daxildir",
+    "buy": "Pi ilə ödəyin",
+    "bought": "Ödəniş tamamlandı. Seminar vaxtı əlavə edildi.",
+    "meRemain": "Qalan vaxt: {time}",
+    "loginToBuy": "Plan almaq üçün daxil olun.",
+    "payNote": "Ödəniş həmişə Pi ilədir. Yerli valyuta məbləği yalnız tanış bir istinaddır; Pi məbləği ödəniş zamanı Pi qiyməti ilə müəyyən edilir. Ödənişli plan üzrə seminar əvvəlcə həmin planın keçidlərindən istifadə edir (ən tez bitən birinci), sonra bu ayın pulsuz vaxtı ilə davam edir.",
+    "charge": "Vaxtı artır",
+    "hm": "{h} saat {m} dəq",
+    "m": "{m} dəq",
+    "won": "KRW {n}",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (Pi qiyməti yoxlanılır)",
+    "h": "{h} saat"
+  },
+  "adminRooms": {
+    "title": "Otaq idarəetməsi",
+    "adminOnly": "Yalnız administratorlar bu səhifəni görə bilər.",
+    "refresh": "Yenilə",
+    "count": "{n} açıq otaq",
+    "empty": "Hazırda açıq otaq yoxdur.",
+    "lab": "Laboratoriya otağı",
+    "noSeminar": "Seminar qeydi yoxdur",
+    "peers": "{n} / {cap} qoşulub",
+    "producers": "{n} axın",
+    "end": "Bitir {time}",
+    "stale": "Seminar bitdi, lakin otaq hələ də video serverdə açıqdır — onu məcburi bağlayın.",
+    "close": "Məcburi bağla",
+    "confirmSeminar": "Bu, seminarı bitirir və otağı bağlayır. Hər kəs əlaqədən kəsiləcək.",
+    "confirmRoom": "Bu, otağı bağlayır. Hər kəs əlaqədən kəsiləcək.",
+    "confirmYes": "Bağla",
+    "cancel": "Ləğv et",
+    "closing": "Bağlanır…",
+    "closed": "Otaq bağlandı.",
+    "metrics": "Video server metrikaları (başlanğıcdan bəri)",
+    "metricsOff": "Metrikaları yükləmək mümkün olmadı.",
+    "m": {
+      "packetsIn": "Daxil olan paketlər",
+      "packetsOut": "Gedən paketlər",
+      "nackIn": "Alınan NACK-lər",
+      "nackOut": "Göndərilən NACK-lər",
+      "retransmits": "Yenidən ötürmələr",
+      "duplicateNack": "Dublikat NACK-lər",
+      "cacheMiss": "Yenidən ötürmə keş yoxlamaları",
+      "pliOut": "Açar kadr tələbləri (PLI)",
+      "keyframes": "Açar kadrlar",
+      "layerSwitches": "Keyfiyyət dəyişiklikləri",
+      "queueDrops": "Növbə düşmələri"
+    }
+  },
+  "adminUsers": {
+    "title": "İstifadəçilər",
+    "adminOnly": "Yalnız administratorlar bu səhifəni görə bilər.",
+    "search": "Ada görə axtar (2+ simvol)",
+    "searchBtn": "Axtar",
+    "refresh": "Yenilə",
+    "count": "{n, plural, one {# istifadəçi} other {# istifadəçi}}",
+    "empty": "İstifadəçi yoxdur.",
+    "admin": "Administrator",
+    "lastLogin": "Son giriş {time}",
+    "never": "Heç vaxt daxil olmayıb",
+    "plan": {
+      "FREE": "Pulsuz",
+      "M": "Aylıq",
+      "Y": "İllik"
+    },
+    "until": "({time} qədər)",
+    "manage": "Vaxtı idarə et",
+    "close": "Bağla",
+    "planLabel": "Plan",
+    "hours": "Saat",
+    "minutes": "Dəqiqə",
+    "reason": "Səbəb (isteğe bağlı)",
+    "sub": "Azalt",
+    "confirmSub": "{plan} vaxtını {time} azalt.",
+    "confirmYes": "Təsdiqlə",
+    "cancel": "Ləğv et",
+    "saving": "Saxlanılır…",
+    "done": "Tətbiq edildi. {plan} qalan vaxt: {time}",
+    "invalid": "Azaltma müddətini 1 dəqiqə ilə 1000 saat arasında daxil edin (tam dəqiqələr 0–59).",
+    "history": "Son tənzimləmələr",
+    "noHistory": "Hələ heç bir tənzimləmə yoxdur.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Xidmət keçidi ver (pulsuz vaxt)",
+    "svc": {
+      "H1": "1 saatlıq keçid",
+      "D1": "1 günlük keçid",
+      "M1": "1 aylıq keçid"
+    },
+    "svcNote": "Xidmət keçidləri Pulsuz plan vaxtıdır. Onlar indidən həmin müddət (1 saat, 24 saat, 1 ay) ərzində pulsuz seminarlarda və ödənişli seminarların pulsuz hissəsində istifadə edilə bilər (AI xüsusiyyətləri yoxdur). Bir neçə keçid olduqda, onlar avtomatik olaraq 1 saat → 1 gün → 1 ay ardıcıllığı ilə istifadə olunur.",
+    "subTitle": "Vaxtı azalt",
+    "subNote": "Ən son bitən keçidlərdən əvvəlcə götürür. Əgər bu, qalan vaxtdan çoxdursa, yalnız qalan vaxt silinir.",
+    "confirmSvc": "{svc} ver.",
+    "doneSvc": "{svc} verildi. Qalan pulsuz vaxt: {time} (keçid {end} bitir)"
+  }
+}

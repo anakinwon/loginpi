@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Zmeniť jazyk",
-      "search": "Vyhľadať jazyk",
-      "empty": "Žiadne výsledky"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Živé video semináre, ku ktorým sa pripojíte s Pi"

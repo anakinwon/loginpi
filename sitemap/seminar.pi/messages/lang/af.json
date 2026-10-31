@@ -1,0 +1,1082 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Regstreekse videoseminare waaraan jy met Pi deelneem"
+  },
+  "home": {
+    "description": "Gashere open seminare, en deelnemers sluit aan by regstreekse videosessies met Pi.",
+    "badge": "Regstreekse seminare op pragtige eilande",
+    "headline": "Kyk, luister en leer saam — regstreeks",
+    "ctaBrowse": "Blaai deur seminare",
+    "ctaPlan": "Sien planne",
+    "features": {
+      "video": "Regstreekse video",
+      "caption": "Onderskrifte en vertaling",
+      "notes": "KI-vergaderingnotas",
+      "pay": "Betaal met Pi"
+    },
+    "listTitle": "Seminare",
+    "cal": {
+      "title": "Seminaarkalender",
+      "desc": "Van vorige seminare tot komende seminare — tik 'n datum vir besonderhede.",
+      "legendSmn": "Seminare",
+      "legendEnded": "Vorige seminare",
+      "legendMine": "My geleenthede",
+      "failed": "Kon nie seminaardatums laai nie. Probeer asseblief later weer.",
+      "open": "Sien besonderhede"
+    }
+  },
+  "nav": {
+    "link": "Koppel rekening",
+    "privacy": "Privaatheid",
+    "plan": "Planne",
+    "rooms": "Kamers",
+    "admin": "Admin",
+    "users": "Gebruikers",
+    "home": "Tuis",
+    "privacyShort": "Privaatheid",
+    "menu": "Hoofkieslys",
+    "fold": "Vou kieslys toe",
+    "unfold": "Vou kieslys oop"
+  },
+  "auth": {
+    "checking": "Meld aan…",
+    "signedIn": "{name}",
+    "inPerson": "Persoonlike notas",
+    "required": "Meld asseblief aan met jou Pi-rekening.",
+    "signIn": "Meld aan met Pi",
+    "openInPiBrowser": "Maak hierdie bladsy in Pi Browser oop om met jou Pi-rekening aan te meld.",
+    "authenticating": "Meld aan…",
+    "google": "Meld aan met Google",
+    "signOut": "Meld af",
+    "or": "of",
+    "linkRequired": "Jy is aangemeld met Google, maar dit is nog nie aan 'n Pi-rekening gekoppel nie. Reik 'n skakelkode in Pi Browser uit en voer dit hier in.",
+    "linkNeeded": "Koppel Pi-rekening",
+    "linkCheckFailed": "Kon nie jou rekeningkoppelingstatus nagaan nie (tydelike bedienerfout). Verfris asseblief oor 'n oomblik."
+  },
+  "piOAuth": {
+    "signingIn": "Meld aan met jou Pi-rekening…",
+    "failed": "Pi-aanmelding het misluk. Probeer asseblief weer.",
+    "stateMismatch": "Kon nie hierdie aanmeldversoek verifieer nie (verval of 'n ander oortjie). Probeer asseblief weer.",
+    "retry": "Probeer weer",
+    "backHome": "Tuis"
+  },
+  "link": {
+    "title": "Koppel rekening",
+    "intro": "Koppel die rekening waarmee jy in Pi Browser aangemeld het aan Google-aanmelding in 'n gewone blaaier. Na koppeling kan jy dieselfde rekening op 'n rekenaarblaaier gebruik.",
+    "checking": "Meld aan…",
+    "piIssueTitle": "Om ook vanaf 'n gewone blaaier aan te meld",
+    "codeHint": "Reik die kode hieronder uit, meld dan aan met Google op 'n rekenaarblaaier en voer dit op die Koppel rekening-bladsy in (binne 10 minute).",
+    "piIssue": "Reik skakelkode uit",
+    "reissue": "Reik 'n nuwe kode uit",
+    "expiresIn": "Verval oor {min} min",
+    "enterTitle": "Voer skakelkode in",
+    "enterHint": "Maak in Pi Browser seminar.pi → Koppel rekening → Reik skakelkode uit oop, en voer dan die 6-syfer kode in.",
+    "codeLabel": "Skakelkode",
+    "submit": "Koppel",
+    "done": "Gekoppel. Jy kan nou ook Google-aanmelding gebruik.",
+    "linked": "{name} is aan Google-aanmelding gekoppel."
+  },
+  "apiErrors": {
+    "AUTH_REQUIRED": "Aanmelding vereis",
+    "AUTH_PI_REQUIRED": "Pi-aanmelding vereis",
+    "AUTH_PI_SESSION_INVALID": "Jou sessie het verval. Meld asseblief weer aan",
+    "AUTH_PI_TOKEN_INVALID": "Pi-aanmeldverifikasie het misluk",
+    "AUTH_ACCESS_TOKEN_REQUIRED": "Pi-aanmeldinligting ontbreek",
+    "FORBIDDEN": "Jy het nie toestemming nie",
+    "BAD_REQUEST": "Slegte versoek",
+    "BAD_REQUEST_BODY": "Slegte versoek",
+    "INVALID_INPUT": "Ongeldige invoer",
+    "QUERY_FAILED": "Kon nie laai nie",
+    "SAVE_FAILED": "Kon nie stoor nie",
+    "INTERNAL": "Iets het verkeerd geloop",
+    "SERVER_CONFIG": "Bedienerkonfigurasiefout. Kontak asseblief die operateur",
+    "PI_API_CONNECT_FAILED": "Kon nie Pi Network bereik nie",
+    "DB_UNAVAILABLE": "Data is tydelik onbeskikbaar. Probeer asseblief later weer",
+    "NOT_FOUND": "Nie gevind nie",
+    "RATE_LIMITED": "Te veel versoeke. Probeer asseblief binnekort weer",
+    "PAYLOAD_TOO_LARGE": "Versoek is te groot",
+    "NETWORK": "Kontroleer jou netwerkverbinding",
+    "AUTH_PI_ACCOUNT_CONFLICT": "Hierdie Pi-gebruikersnaam is reeds met verskillende geloofsbriewe geregistreer. Kontak asseblief die admin",
+    "AUTH_PI_ACCOUNT_INACTIVE": "Hierdie rekening is onaktief. Kontak asseblief die admin",
+    "AUTH_GOOGLE_REQUIRED": "Google-aanmelding word vereis.",
+    "LINK_CODE_INVALID": "Die skakelkode is ongeldig of het verval. Reik 'n nuwe een in Pi Browser uit.",
+    "LINK_ALREADY_LINKED": "Hierdie rekening is reeds gekoppel.",
+    "LINK_CODE_GEN_FAILED": "Kon nie 'n skakelkode skep nie. Probeer asseblief later weer.",
+    "AUTH_DB_UNAVAILABLE": "Kon nie jou rekening stoor nie, so aanmelding het misluk. Probeer asseblief later weer.",
+    "LINK_TRY_LIMIT": "Te veel verkeerde skakelkodes. Probeer weer oor 15 minute.",
+    "PRICE_UNAVAILABLE": "Kon nie die Pi-prys kry nie. Probeer asseblief binnekort weer",
+    "QUOTE_EXPIRED": "Die betalingskwotasie het verval. Betaal asseblief weer",
+    "PLAN_EXHAUSTED": "Jy het al jou seminaartyd opgebruik. Vul aan op die Planne-bladsy",
+    "HOST_AWAY": "Die gasheer is nie in die kamer nie. Jy kan ingaan nadat die gasheer aangesluit het",
+    "PLAN_AI_PAID": "KI-funksies is op betaalde planne beskikbaar",
+    "AI_UNAVAILABLE": "KI-funksies is tans nie beskikbaar nie",
+    "SPEECH_CHUNK_INVALID": "Die oudiostukformaat is ongeldig",
+    "SPEECH_NOT_LIVE": "Hierdie seminaar is nie regstreeks nie",
+    "SPEECH_NO_AGR": "Toestemming vir stemverwerking word vereis",
+    "SPEECH_RATE": "Te veel stemversoeke. Probeer asseblief binnekort weer",
+    "SPEECH_QUOTA": "Stemverwerkingstyd vir hierdie seminaar is opgebruik",
+    "SPEECH_USR_QUOTA": "Jy het jou vertaal- en vertaalde stemlimiet vir hierdie seminaar opgebruik",
+    "SPEECH_FAILED": "Kon nie spraak na teks omskakel nie",
+    "SPEECH_STAGE_ONLY": "Slegs mense op die verhoog kan stemonderskrifte gebruik",
+    "TRANSLATE_FAILED": "Kon nie die onderskrif vertaal nie",
+    "POLL_CLOSED": "Hierdie peiling is gesluit",
+    "NOTE_NOT_RECORDING": "Hierdie notas neem nie op nie",
+    "NOTE_SHOT_INVALID": "Ongeldige skermopname",
+    "NOTE_AUDIO_INVALID": "Ongeldige opnamelêer",
+    "NOTE_SHOT_RATE": "Te veel skermopnames",
+    "NOTE_RETRY_SOON": "Jy kan oor 'n minuut weer probeer",
+    "SPEECH_TTS_FAILED": "Kon nie die vertaalde stem skep nie",
+    "CAPTION_SIG_INVALID": "Hierdie onderskrif kon nie geverifieer word nie, so dit is nie vertaal nie",
+    "PLAN_EXPIRES_BEFORE_START": "Die begintyd is na hierdie plan se pas verval",
+    "PAY_ALREADY_PAID": "'n Betaling word nog verwerk. As jy by die beursie aangemeld het, probeer weer oor 3 minute.",
+    "REC_PAID_ONLY": "Opname is slegs beskikbaar in maandelikse of jaarlikse planseminare met betaalde tyd oor",
+    "REC_NOT_IN_ROOM": "Bevestig nog dat jy in die kamer is. Probeer oor 'n oomblik weer",
+    "ENGINE_OFF": "Die videobediener-admin-sleutel is nie gekonfigureer nie",
+    "ENGINE_UNAVAILABLE": "Die videobediener reageer nie. Probeer asseblief binnekort weer",
+    "ADJ_NOTHING": "Daar is geen oorblywende tyd om te verminder nie"
+  },
+  "progress": {
+    "title": "Bou vordering",
+    "subtitle": "Gedoen, aan die gang en beplan, volgens funksie · vanaf {date}",
+    "overall": "Algehele stappe",
+    "stepsDone": "{done}/{total} stappe gedoen ({pct}%)",
+    "featureUnit": "funksies",
+    "status": {
+      "done": "Gedoen",
+      "doing": "Aan die gang",
+      "todo": "Beplan",
+      "drop": "Gedaal"
+    },
+    "features": {
+      "F01": {
+        "name": "Meld aan",
+        "desc": "Pi Browser-aanmelding, Google-aanmelding in ander blaaiers, en koppeling van beide rekeninge"
+      },
+      "F05": {
+        "name": "Regstreekse videoseminar",
+        "desc": "Ons eie video-enjin Galápagos — die doel is een aanbieder wat na tot 30 deelnemers stroom"
+      },
+      "F02": {
+        "name": "Skep 'n seminaar",
+        "desc": "Stel die subtitel, tyd, kapasiteit en seminaarfooi in om 'n seminaar te skep (naam = eiland, outomaties)"
+      },
+      "F03": {
+        "name": "Seminaarlys en -besonderhede",
+        "desc": "Blaai deur oop seminare bladsy vir bladsy en bekyk hul besonderhede"
+      },
+      "F04": {
+        "name": "Pi-inskrywingsbetaling",
+        "desc": "Betaal die seminaarfooi in Pi; die bediener herkontroleer die bedrag voordat jy ingelaat word"
+      },
+      "F06": {
+        "name": "Gasheeruitbetalings",
+        "desc": "Betaal inskrywingsfooi-inkomste aan gashere in Pi uit"
+      },
+      "F07": {
+        "name": "Herhalings",
+        "desc": "Kyk later opgeneemde seminare"
+      },
+      "FU": {
+        "name": "Vergadering-byvoegingsgrondslag",
+        "desc": "Een seinkanaal vir byvoegings, KI-verbinding, stemstukke, mikrofoontoestemming en datatabelle"
+      },
+      "F08": {
+        "name": "Skedule en deel",
+        "desc": "Kalenderkoppeling, gebeurtenislêer (.ics) en e-posuitnodiging vir elke seminaar"
+      },
+      "F09": {
+        "name": "Geraasvermindering en beligting",
+        "desc": "Verminder mikrofoongeraas en verhelder donker kameravideo"
+      },
+      "F10": {
+        "name": "Regstreekse onderskrifte",
+        "desc": "Verander die aanbieder se spraak in teks onder die verhoog"
+      },
+      "F11": {
+        "name": "Peilings, V&A en bywoning",
+        "desc": "Hou peilings en vrae tydens 'n seminaar; gashere laai die bywoningslys af"
+      },
+      "F12": {
+        "name": "Agtergrond-effekte",
+        "desc": "Vervaag jou agtergrond of vervang dit met 'n voorafinstelling of jou eie beeld (verwerk op jou toestel)"
+      },
+      "F13": {
+        "name": "Plaaslike opname",
+        "desc": "Die aanbieder neem die seminaar op hul eie toestel op en almal sien dat opname aan is"
+      },
+      "F14": {
+        "name": "KI-vergaderingnotas",
+        "desc": "Wanneer die aanbieder dit aanskakel, word spraak en skerms opgeneem en opgesom in sleutelpunte, besluite en take"
+      },
+      "F15": {
+        "name": "Persoonlike vergaderingnotas",
+        "desc": "Neem 'n vergadering op met slegs 'n mikrofoon en kry vergaderingnotas (admins)"
+      },
+      "F16": {
+        "name": "Vertaalde onderskrifte",
+        "desc": "Wys onderskrifte vertaal in die taal wat jy kies"
+      },
+      "F17": {
+        "name": "Luister in vertaling",
+        "desc": "Lees vertaalde onderskrifte hardop met 'n sintetiese stem terwyl die oorspronklike oudio verlaag word"
+      }
+    },
+    "steps": {
+      "piLogin": "Pi Browser-aanmelding",
+      "googleLogin": "Google-aanmelding",
+      "accountLink": "Rekeningkoppeling",
+      "deviceTest": "Kamera-toets",
+      "oneToTwo": "Aanbieder 1 → 2 deelnemers",
+      "recovery": "Vriesherstel en stabiliteit",
+      "structure": "Enjinstruktuur skoonmaak",
+      "autoQuality": "Outo-kwaliteit, 30 deelnemers",
+      "roomService": "Kamerinskrywing en opname",
+      "roomUi": "Kamer-skerm (voorportaal·verhoog·klets·steek hand op·moderering)",
+      "createForm": "Skep skerm",
+      "list": "Lys",
+      "detail": "Besonderhede",
+      "payRequest": "Betalingsversoek",
+      "payVerify": "Bedrag herkontroleer en inskrywing",
+      "settle": "Uitbetaling",
+      "vod": "Opname-herhaling",
+      "appRelay": "Enjin-byvoeging seinkanaal",
+      "aiBase": "KI, stemstukke, toestemming en datatabelle",
+      "shareLinks": "Kalenderkoppeling, .ics en e-posuitnodiging",
+      "noiseLight": "Geraasvermindering en beligting",
+      "liveCaptions": "Regstreekse onderskrifte",
+      "pollQnaAttend": "Peilings, V&A en bywoningslys",
+      "backgrounds": "Vervaag, voorafinstellings en jou eie beeld",
+      "localRecording": "Aanbiederopname en opnamekenteken",
+      "aiNotes": "Opname, opsomming en notasbladsy",
+      "inPersonNotes": "Slegs mikrofoonnotas en my notas",
+      "captionTranslate": "Taalkeuse en oorspronklike/vertaalde skakelaar",
+      "dubbing": "Sintetiese stemweergawe en verlaagde oorspronklike oudio"
+    },
+    "refLabel": "Verwysingsmodel",
+    "uiRef": "UI-basislyn — skerm- en funksiepatrone van 'n wyd gebruikte webvideo-vergaderingtoepassing, aangepas vir seminar.pi"
+  },
+  "room": {
+    "rename": {
+      "later": "Naam gestoor, maar ander kon nie nou in kennis gestel word nie. Hulle sal dit sien nadat jy weer aangesluit het.",
+      "tile": "Klik om my naam te verander",
+      "menu": "Verander my naam",
+      "title": "My naam in hierdie seminaar",
+      "hint": "Tot 30 karakters. Slegs in hierdie seminaar gebruik en werk dadelik op almal se skerm op.",
+      "save": "Stoor",
+      "saving": "Stoor tans…",
+      "cancel": "Kanselleer",
+      "taken": "Daardie naam word reeds deur iemand anders gebruik (gasheer of deelnemer). Kies 'n ander een.",
+      "failed": "Kon nie jou naam stoor nie. Probeer weer."
+    },
+    "roomTitle": {
+      "edit": "Klik om die subtitel te wysig",
+      "label": "Subtitel",
+      "placeholder": "Subtitel (tot 60)",
+      "save": "Stoor",
+      "cancel": "Kanselleer",
+      "failed": "Kon nie die subtitel stoor nie."
+    },
+    "mirror": "Spieël my video",
+    "barPin": "Wys altyd onderste balk",
+    "barAuto": "Versteek onderste balk outomaties",
+    "title": "Sluit aan by seminaar · {room}",
+    "titleSeminar": "Wagkamer",
+    "noEngine": "Die videobediener is nog nie gereed nie.",
+    "joinAs": "Sluit aan as",
+    "presenter": "Aanbieder",
+    "audience": "Gehoor",
+    "join": "Sluit nou aan",
+    "nameLabel": "Naam",
+    "audienceHint": "Gehoorlede gebruik nie 'n kamera of mikrofoon nie. Nadat jy aangesluit het, sal jy die aanbieder sien en hoor.",
+    "preview": {
+      "pending": "Berei kamera en mikrofoon voor…",
+      "audioOnly": "Kamera onbeskikbaar — stuur slegs oudio.",
+      "none": "Kamera en mikrofoon onbeskikbaar. Kontroleer toestemmings (jy kan steeds sonder media aansluit).",
+      "videoOnly": "Mikrofoon onbeskikbaar — stuur slegs video. Kontroleer mikrofoontoestemming."
+    },
+    "mic": {
+      "on": "Skakel mikrofoon af",
+      "off": "Skakel mikrofoon aan"
+    },
+    "cam": {
+      "on": "Skakel kamera af",
+      "off": "Skakel kamera aan"
+    },
+    "controls": "Oproepkontroles",
+    "leave": "Verlaat",
+    "enableSound": "Aktiveer klank",
+    "state": {
+      "connecting": "Koppel tans…",
+      "reconnecting": "Herkoppel tans…"
+    },
+    "waiting": "Wag vir die aanbieder.",
+    "rejoin": "Sluit weer aan",
+    "err": {
+      "generic": "Iets het verkeerd geloop. Sluit asseblief weer aan.",
+      "CLOSED": "Die verbinding is verloor.",
+      "NO_ENGINE": "Die videobediener is nog nie gereed nie.",
+      "TICKET_401": "Meld asseblief aan.",
+      "TICKET_403": "Jy het nie toestemming om aan te bied nie. Sluit aan as gehoor.",
+      "TICKET_503": "Die videobediener is nog nie gekonfigureer nie.",
+      "TICKET_NETWORK": "Kontroleer jou netwerkverbinding.",
+      "TICKET_INVALID": "Jou toegangspas het verval.",
+      "TICKET_EXPIRED": "Jou toegangspas het verval.",
+      "ROOM_FULL": "Hierdie seminaar is vol.",
+      "ROOM_CLOSED": "Die kamer is gesluit — die seminaar het geëindig of die gasheer was langer as 5 minute weg.",
+      "DUPLICATE_SESSION": "Jy het van 'n ander toestel af aangesluit, so hierdie skerm is ontkoppel.",
+      "ROLE_FORBIDDEN": "Jy het nie toestemming om aan te bied nie.",
+      "WS_FAILED": "Kon nie aan die videobedienner koppel nie.",
+      "ICE_FAILED": "Die videoverbinding het geval. Kontroleer jou netwerk.",
+      "MEDIA_FAILED": "Kon nie die kamera of mikrofoon begin nie.",
+      "TIMEOUT": "Die videobedienner reageer nie.",
+      "TICKET_402": "Hierdie is 'n betaalde seminaar. Betaal asseblief op die seminaarbladsy voordat jy ingaan.",
+      "TICKET_404": "Seminaar nie gevind nie.",
+      "TICKET_409": "Hierdie seminaar het geëindig of is gekanselleer.",
+      "TICKET_HOST_AWAY": "Die gasheer het nog nie aangesluit nie of was langer as 5 minute weg, so jy kan nie ingaan nie. Probeer asseblief weer nadat die gasheer aangesluit het.",
+      "TICKET_PLAN_EXHAUSTED": "Hierdie seminaar se plan het geen tyd oor nie, so dit kan nie begin nie. Om dieselfde plan weer te koop, voeg tyd by (Gratis hernu met 1 uur volgende maand)."
+    },
+    "notice": {
+      "toggleFailed": {
+        "audio": "Kon nie die mikrofoon verander nie. Probeer asseblief weer.",
+        "video": "Kon nie die kamera verander nie. Probeer asseblief weer."
+      },
+      "forbidden": "Jy het nie toestemming om aan te bied nie, so jy sal as gehoor voortgaan.",
+      "demoted": "Jy is teruggeskuif na die gehoor.",
+      "endFailed": "Kon nie die seminaar beëindig nie. Probeer asseblief weer.",
+      "chatFailed": "Boodskap nie gestuur nie.",
+      "actionFailed": "Kon nie die versoek voltooi nie. Probeer asseblief weer.",
+      "shareFailed": "Kon nie skermdeling begin nie.",
+      "err": {
+        "RATE_LIMITED": "Jy stuur te vinnig. Wag asseblief 'n oomblik.",
+        "ROLE_FORBIDDEN": "Jy het nie toestemming om dit te doen nie.",
+        "MEDIA_FAILED": "Kon nie jou mikrofoon of kamera begin nie. Kontroleer asseblief toestemmings.",
+        "LOCKED": "Gesluit deur die aanbieder."
+      },
+      "mutedBy": {
+        "audio": "Die aanbieder het jou mikrofoon gedemp.",
+        "video": "Die aanbieder het jou kamera afgeskakel."
+      },
+      "policy": {
+        "locked": "Die aanbieder het mikrofone gesluit. Jy kan joune aanskakel sodra dit ontsluit is.",
+        "unlocked": "Mikrofone is ontsluit."
+      },
+      "consent": {
+        "saveFail": "Kon nie jou toestemming stoor nie. Kontroleer jou registrasie en skakel die mikrofoon weer aan."
+      }
+    },
+    "home": "Gaan na tuisblad",
+    "tile": {
+      "fullscreen": "Dubbelklik vir volskerm · Esc om te verlaat",
+      "self": "{name} (jy)",
+      "presenter": "Aanbieder",
+      "micOff": "Mikrofoon af",
+      "screen": "{name} se skerm",
+      "row": "Ander sprekers",
+      "pin": "Wys {name} groot",
+      "unpin": "Outo-uitleg"
+    },
+    "more": "Meer opsies",
+    "joinNoCam": "Sluit aan sonder kamera",
+    "net": {
+      "afterJoin": "Jou verbinding word outomaties nagegaan nadat jy aangesluit het.",
+      "measuring": "Kontroleer verbinding…",
+      "good": "Goeie verbinding",
+      "fair": "Redelike verbinding",
+      "poor": "Swak verbinding",
+      "reason": {
+        "loss": {
+          "audio": "{pct}% van oudiodata gaan verlore.",
+          "video": "{pct}% van videodata gaan verlore."
+        },
+        "rate": {
+          "audio": "Oudio-oplaai is laag teen {kbps} kbps.",
+          "video": "Video-oplaai is laag teen {kbps} kbps. Kwaliteit kan daal."
+        }
+      }
+    },
+    "people": "{n} in die kamer",
+    "screen": {
+      "start": "Deel skerm",
+      "stop": "Stop deel"
+    },
+    "panel": {
+      "title": "Klets · V&A · Peilings · Mense",
+      "chat": "Klets",
+      "people": "Mense",
+      "close": "Sluit paneel",
+      "qna": "V&A",
+      "polls": "Peilings"
+    },
+    "chat": {
+      "empty": "Nog geen boodskappe nie. Klets word nie gestoor nie.",
+      "me": "Jy",
+      "failed": "Nie gestuur nie.",
+      "retry": "Probeer weer",
+      "input": "Tik 'n boodskap",
+      "send": "Stuur"
+    },
+    "hand": {
+      "raise": "Steek hand op",
+      "lower": "Laat sak hand",
+      "list": "Hande opgesteek",
+      "lowerAll": "Laat sak alle hande",
+      "raised": "Hand opgesteek",
+      "notice": "{name} het 'n hand opgesteek.",
+      "dismiss": "Ignoreer",
+      "waiting": "{n} mense wag om te praat"
+    },
+    "react": {
+      "open": "Reaksies",
+      "e0": "Hou van",
+      "e1": "Klap",
+      "e2": "Lag",
+      "e3": "Verras",
+      "e4": "Hartseer",
+      "e5": "Sprakeloos",
+      "e6": "Liefde"
+    },
+    "quality": {
+      "label": "Kwaliteit",
+      "auto": "Outo",
+      "high": "Hoog",
+      "medium": "Medium",
+      "low": "Laag",
+      "unstable": "Jou netwerk is onstabiel"
+    },
+    "roles": {
+      "presenter": "Aanbieder",
+      "panel": "Paneellid",
+      "audience": "Gehoor"
+    },
+    "stage": {
+      "invite": "Nooi na verhoog",
+      "remove": "Skuif na gehoor",
+      "promoted": "Jy is na die verhoog genooi. As jy jou hand opgesteek het, skakel jou kamera outomaties aan (tensy gesluit of nie toegelaat nie). Skakel jou mikrofoon aan om te praat (die mikrofoon skakel nie outomaties aan nie).",
+      "later": "Later"
+    },
+    "announce": {
+      "chat": "{name}: {text}",
+      "hand": "{name} het 'n hand opgesteek."
+    },
+    "leaveDialog": {
+      "title": "Verlaat die seminaar",
+      "body": "Jy kan self vertrek, of die seminaar beëindig en almal ontkoppel.",
+      "confirmTitle": "Beëindig die seminaar?",
+      "confirmBody": "Almal sal ontkoppel word en niemand kan weer by hierdie seminaar aansluit nie.",
+      "cancel": "Kanselleer",
+      "end": "Beëindig seminaar",
+      "endConfirm": "Beëindig nou"
+    },
+    "mod": {
+      "muteAll": "Demp almal",
+      "lock": "Sluit mikrofone",
+      "unlock": "Ontsluit mikrofone",
+      "locked": "Die aanbieder het mikrofone gesluit",
+      "muteMic": "Demp mikrofoon",
+      "askMic": "Vra om te ontdemp",
+      "muteCam": "Skakel kamera af",
+      "muteMicOf": "Demp {name}",
+      "askMicOf": "Vra {name} om te ontdemp",
+      "muteCamOf": "Skakel kamera van {name} af"
+    },
+    "ask": {
+      "audio": "Die aanbieder het jou gevra om jou mikrofoon aan te skakel.",
+      "video": "Die aanbieder het jou gevra om jou kamera aan te skakel.",
+      "ignore": "Ignoreer"
+    },
+    "toDetail": "Gaan na seminaarbladsy",
+    "consent": {
+      "title": "Voordat jy jou mikrofoon aanskakel",
+      "body": "As opname, onderskrifte of AI-vergaderingnotas in hierdie seminaar aangeskakel is, kan jou stem na teks omgeskakel, gestoor en vertaal word. Stemverwerking word deur 'n AI-diens buite jou land gedoen. As jy nie saamstem nie, skakel jou mikrofoon steeds aan — slegs jou stem word uit verwerking gelaat.",
+      "privacy": "Privaatheidsbeleid",
+      "newTab": "(maak in 'n nuwe oortjie oop)",
+      "decline": "Stem nie saam nie",
+      "agree": "Stem saam en skakel mikrofoon aan",
+      "notice": "Wanneer opname, onderskrifte of AI-vergaderingnotas aan is, word sprekers se stemme verwerk. Gehoorstemme word nie gestuur nie.",
+      "saveFailClosed": "Hierdie seminaar het geëindig, so toestemming kan nie opgeneem word nie."
+    },
+    "captions": {
+      "title": "Onderskrifte",
+      "room": "Regstreekse onderskrifte (hele kamer)",
+      "show": "Wys onderskrifte",
+      "size": {
+        "label": "Teks grootte",
+        "sm": "Klein",
+        "md": "Medium",
+        "lg": "Groot"
+      },
+      "waiting": "Onderskrifte verskyn wanneer die aanbieder dit aanskakel",
+      "limit": "Spraakverwerkingslimiet bereik, so onderskrifte en AI-minute het gestop",
+      "sendFail": "Kon nie onderskrifte aanskakel nie. Probeer asseblief binnekort weer.",
+      "sendFailOff": "Kon nie onderskrifte afskakel nie. Probeer asseblief binnekort weer.",
+      "region": "Onderskrifte",
+      "translate": "Wys vertaalde onderskrifte",
+      "lang": "Vertaaltaal",
+      "langMine": "My tale",
+      "langAll": "Alle tale",
+      "trStop": {
+        "forbidden": "Vertaalde onderskrifte is slegs vir geregistreerde deelnemers. Wys die oorspronklike.",
+        "unavailable": "Vertaalde onderskrifte is tans nie beskikbaar nie. Wys die oorspronklike.",
+        "quota": "Hierdie seminaar het sy vertaallimiet bereik. Wys die oorspronklike.",
+        "usrQuota": "Jy het jou vertaallimiet vir hierdie seminaar opgebruik. Wys die oorspronklike."
+      },
+      "unsupported": "Hierdie toestel kan nie regstreekse onderskrifte skep nie (geen oudio-opname-ondersteuning in hierdie blaaier nie)"
+    },
+    "effects": {
+      "title": "Effekte",
+      "light": "Ligkorreksie",
+      "noise": "Verminder geraas",
+      "noiseFail": "Geraasvermindering kan nie op hierdie toestel verander word nie",
+      "close": "Sluit",
+      "preview": "My voorskou",
+      "bg": "Agtergrond",
+      "bgNone": "Geen",
+      "bgBlur": "Vervaag",
+      "scenes": {
+        "beach": "🏝️ Maldive-strand",
+        "autumn": "🍁 Herfsvallei",
+        "fireplace": "🔥 Kaggel",
+        "xmas": "🎄 Kersfees-vergaderkamer"
+      },
+      "bgs": {
+        "dusk": "Skemer",
+        "ocean": "Oseaan",
+        "forest": "Woud",
+        "studio": "Studio",
+        "grid": "Rooster",
+        "dots": "Stippels"
+      },
+      "myAdd": "My beeld",
+      "myItem": "My beeld {n}",
+      "myDel": "Vee my beeld {n} uit",
+      "mySaveFail": "Die agtergrond is toegepas, maar kon nie op hierdie toestel gestoor word nie (slegs hierdie vergadering)",
+      "bgStopped": "Die agtergrondeffek het gestop en is afgeskakel. Kies dit weer om te herbegin.",
+      "myNote": "Jou beelde word slegs op hierdie toestel gestoor (tot 3, 2 MB elk)",
+      "mobileBlurOnly": "Op fone is slegs die vervaag-agtergrond beskikbaar (beeldagtergronde werk op rekenaar)",
+      "myTooBig": "Slegs beelde tot 2 MB kan gebruik word",
+      "preparing": "Besig om voor te berei…",
+      "bgFailed": "Kon nie die agtergrondeffek laai nie",
+      "autoOff": "Jou toestel is te stadig, so die agtergrondeffek is afgeskakel",
+      "unsupported": "Agtergrondeffekte is nie op hierdie toestel beskikbaar nie",
+      "noCam": "Skakel jou kamera aan om 'n agtergrond te kies",
+      "lightUnsupported": "Ligkorreksie is nie op hierdie toestel beskikbaar nie",
+      "noiseUnsupported": "Geraasvermindering-instellings word nie op hierdie toestel ondersteun nie"
+    },
+    "sheetClose": "Sluit",
+    "polls": {
+      "new": "Nuwe peiling",
+      "question": "Vraag",
+      "option": "Opsie {n}",
+      "remove": "Verwyder opsie {n}",
+      "addOption": "Voeg opsie by",
+      "start": "Begin peiling",
+      "cancel": "Kanselleer",
+      "dup": "Opsies moet verskil",
+      "vote": "Stem",
+      "change": "Verander stem",
+      "close": "Sluit peiling",
+      "closed": "Gesluit",
+      "mine": "Jou keuse",
+      "result": "{pct}% ({n} stemme)",
+      "total": "{n} stemme in totaal",
+      "empty": "Nog geen peilings nie.",
+      "loading": "Laai…",
+      "labOnly": "Peilings is slegs in seminaarkamers beskikbaar.",
+      "started": "'n Nuwe peiling het begin",
+      "goVote": "Stem",
+      "votersNote": "Die organiseerder kan sien wie vir watter opsie gestem het.",
+      "voters": "Gestem: {names}"
+    },
+    "qna": {
+      "sort": "Sorteer",
+      "by": {
+        "top": "Top",
+        "new": "Nuutste"
+      },
+      "rcm": "Stem op ({n})",
+      "answered": "Beantwoord",
+      "answer": "Merk as beantwoord",
+      "unanswer": "Ontmerk as beantwoord",
+      "hide": "Versteek",
+      "doneN": "{n} beantwoord",
+      "backOpen": "Onbeantwoorde vrae",
+      "empty": "Nog geen vrae nie.",
+      "emptyDone": "Geen beantwoorde vrae nie.",
+      "loading": "Laai…",
+      "input": "Stel 'n vraag (500 karakters)",
+      "send": "Stuur",
+      "left": "{n} oor",
+      "labOnly": "V&A is slegs in seminaarkamers beskikbaar."
+    },
+    "recording": {
+      "title": "Opneem",
+      "badge": "Neem op",
+      "unsupported": "Hierdie blaaier kan nie opneem nie. Neem asseblief op vanaf 'n gewone blaaier op 'n rekenaar.",
+      "piBrowserOnly": "Opname werk slegs in 'n gewone blaaier (rekenaar of selfoon). Pi Browser kan nie opname lêers stoor nie — maak hierdie seminaar oop in 'n rekenaar- of telefoonblaaier (seminarz.vercel.app) om op te neem.",
+      "audioSuspended": "Klankopname het moontlik nie op hierdie toestel begin nie. Slegs die prentjie mag opgeneem word.",
+      "notifyFailed": "Opname het nie begin nie omdat deelnemers nie in kennis gestel kon word nie. Probeer asseblief binnekort weer.",
+      "confirm": {
+        "title": "Begin opneem?",
+        "body": "Wanneer opname begin, sal almal 'n 'Neem op'-aanwyser sien. Die lêer word slegs op hierdie toestel gestoor en word nooit opgelaai of oorsee oorgedra nie. Vertel asseblief deelnemers voordat jy begin.",
+        "download": "Wanneer jy stop, word 'n MP4-lêer in jou aflaai-lêergids gestoor (blaaiers wat nie MP4 kan opneem nie, neem 'n oomblik om dit om te skakel; opnames langer as ongeveer 45 minute kan in hul oorspronklike formaat gehou word). In-app-blaaiers kan lêerstoor blokkeer, so neem op vanaf 'n gewone blaaier op 'n rekenaar.",
+        "cancel": "Kanselleer",
+        "start": "Begin opneem",
+        "charge": "Terwyl jy opneem, word opnametyd van jou betaalde tyd afgetrek benewens kamertyd (2x terwyl jy opneem). Wanneer betaalde tyd opraak, stop opname en word die lêer gestoor."
+      },
+      "resave": {
+        "label": "Opname lêer",
+        "save": "Stoor weer",
+        "dismiss": "Sluit stoor weer"
+      },
+      "toast": {
+        "started": "Opname begin — almal kan dit sien",
+        "saved": "Opname gestoor. Kontroleer jou aflaai-lêergids. As niks gestoor is nie, tik [Stoor weer] bo-aan die skerm.",
+        "autoStopped": "Opname het geëindig omdat die blaaier dit gestop het of die grootte limiet bereik is. Alles tot op daardie punt is gestoor. Begin weer opneem om voort te gaan.",
+        "empty": "Niks is opgeneem nie, so geen lêer is geskep nie.",
+        "saveFailed": "Kon nie die opname lêer skep nie.",
+        "converting": "Besig om die opname na MP4 om te skakel. Hou asseblief hierdie venster oop.",
+        "savedOriginal": "Kon nie na MP4 omskakel nie, so die opname is in sy oorspronklike formaat (webm) gestoor. Kontroleer jou aflaai-lêergids.",
+        "startedBy": "Die aanbieder het opname begin",
+        "stoppedBy": "Die aanbieder het opname gestop"
+      },
+      "paidOnly": "Opname is slegs beskikbaar in seminare wat op 'n Maandelikse of Jaarlikse plan oopgemaak is, terwyl betaalde tyd oor is.",
+      "planOut": "Betaalde tyd het opgeraak, so opname het gestop en die lêer is gestoor.",
+      "notInRoom": "Bevestig steeds dat jy in die kamer is. Begin opneem weer oor 'n oomblik.",
+      "meterFailed": "Kon nie opnametyd nagaan nie, so opname het nie begin nie. Probeer weer oor 'n oomblik.",
+      "paidOut": "Geen betaalde tyd is oor nie, so opname kan nie begin nie. Koop dieselfde plan weer om op te neem.",
+      "pausedBadge": "Opname onderbreek",
+      "controls": "Opnamekontroles",
+      "pause": "Pouse",
+      "resume": "Hervat",
+      "stop": "Stop opname"
+    },
+    "notes": {
+      "on": "AI-aantekeninge",
+      "badge": "AI-aantekeninge aan",
+      "started": "Die aanbieder het AI-aantekeninge aangeskakel",
+      "stopped": "AI-aantekeninge afgeskakel",
+      "startedMine": "AI-aantekeninge aan — vir almal gewys",
+      "stoppedMine": "AI-aantekeninge af — besig om die aantekeninge te skep",
+      "startFail": "Kon nie AI-aantekeninge begin nie",
+      "gone": "AI-aantekeninge gestop — die aantekeninge is elders beëindig of uitgevee",
+      "unsupported": "AI-aantekeninge kan nie hier aangeskakel word nie (geen oudio-opname-ondersteuning)"
+    },
+    "dubbing": {
+      "listen": "Luister in vertaalde stem",
+      "blocked": "Kon nie die vertaalde stem speel nie. Skakel dit asseblief weer aan",
+      "stopped": "Vertaalde stem is tans nie beskikbaar nie, so dit is afgeskakel",
+      "usrQuota": "Jy het jou vertaalde stemlimiet vir hierdie seminaar opgebruik, so dit is afgeskakel"
+    },
+    "plan": {
+      "warn": "{min} min oor op hierdie seminaar se plan.",
+      "ended": "Jou seminartyd het opgeraak, so die seminaar is beëindig en jy het die kamer verlaat.",
+      "left": "Seminartyd oor",
+      "closed": "Die seminaar is beëindig, so jy het die kamer verlaat.",
+      "hostAway": "Die gasheer het die kamer verlaat. As hulle nie binne 5 minute terugkeer nie, sal alle deelnemers verwyder word.",
+      "hostGone": "Die gasheer het nie binne 5 minute teruggekeer nie, so jy het die kamer verlaat. Jy kan weer ingaan sodra die gasheer aansluit."
+    },
+    "toLobby": "Wagkamer"
+  },
+  "list": {
+    "tabsLabel": "Seminaarlys-aansig",
+    "tabs": {
+      "all": "Alles",
+      "hosted": "Deur my aangebied",
+      "joined": "Aangesluit"
+    },
+    "empty": {
+      "all": "Geen opkomende seminare nie.",
+      "hosted": "Jy het geen seminare aangebied nie.",
+      "joined": "Jy het geen seminare bygewoon nie."
+    },
+    "loading": "Laai tans…",
+    "retry": "Probeer weer",
+    "free": "Gratis",
+    "fee": "{amount} Pi",
+    "host": "Gasheer {name}",
+    "capacity": "Kapasiteit {n}",
+    "status": {
+      "SCHEDULED": "Geskeduleer",
+      "LIVE": "Regstreeks",
+      "ENDED": "Geëindig",
+      "CANCELED": "Gekanselleer"
+    },
+    "hostNew": "Skep 'n seminaar",
+    "progress": "Vordering",
+    "pager": "Paginering",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "pageOf": "{page} / {pages}"
+  },
+  "seminar": {
+    "subTitle": {
+      "label": "Subtitel",
+      "placeholder": "Voeg 'n subtitel by",
+      "save": "Stoor subtitel",
+      "saving": "Stoor tans…",
+      "saved": "Gestoorde."
+    },
+    "loading": "Laai tans…",
+    "back": "Terug na lys",
+    "notFound": "Seminaar nie gevind nie.",
+    "status": {
+      "SCHEDULED": "Geskeduleer",
+      "LIVE": "Regstreeks",
+      "ENDED": "Geëindig",
+      "CANCELED": "Gekanselleer"
+    },
+    "startAt": "Datum",
+    "host": "Gasheer",
+    "seats": "Sitplekke oor",
+    "seatsValue": "{left} / {max}",
+    "fee": "Seminaarfooi",
+    "feeValue": "{amount} Pi",
+    "free": "Gratis",
+    "enter": "Gaan in",
+    "payEnter": "Betaal met Pi en gaan in ({amount} Pi)",
+    "paying": "Verwerk betaling…",
+    "joining": "Registreer tans…",
+    "registered": "Jy is geregistreer.",
+    "full": "Hierdie seminaar is vol.",
+    "closed": "Hierdie seminaar is beëindig.",
+    "canceled": "Hierdie seminaar is gekanselleer.",
+    "roomLink": "Gaan na kamer (gasheer)",
+    "piBrowserOnly": "Betaling is beskikbaar in Pi Browser na Pi-aanmelding.",
+    "payCancelled": "Betaling gekanselleer.",
+    "payStillWaiting": "Wag steeds vir die beursie. As jy reeds by Pi Wallet aangemeld het, wag asseblief 'n oomblik.",
+    "payFailed": "Betaling het misluk.",
+    "err": {
+      "NAME_TAKEN": "Daardie naam word reeds deur iemand anders gebruik. Kies 'n ander een.",
+      "CAL_READ_FAILED": "Kon nie jou gebeure laai nie. Kontroleer die adres.",
+      "ISLAND_FULL": "Al 100 eilandname is tans in gebruik. Jy kan 'n nuwe seminaar oopmaak nadat 'n opkomende of regstreekse een eindig of gekanselleer word.",
+      "SMN_FULL": "Hierdie seminaar is vol.",
+      "SMN_CLOSED": "Hierdie seminaar is beëindig of gekanselleer.",
+      "SMN_ALREADY": "Jy is reeds geregistreer of 'n betaling is aan die gang.",
+      "SMN_FREE": "Gratis seminare neem nie betaling nie.",
+      "SMN_PAY_REQUIRED": "Dit is 'n betaalde seminaar. Betaal asseblief om in te gaan.",
+      "SMN_PAY_INVALID": "Ons kon nie jou betaling verifieer nie. Kontak asseblief die administrateur.",
+      "PAY_PI_FAILED": "Kon nie die Pi-betalingsbediener bereik nie. Probeer asseblief binnekort weer.",
+      "PAY_MISMATCH": "Betalingsbesonderhede stem nie ooreen nie.",
+      "PAY_AMOUNT_MISMATCH": "Die betaalbedrag verskil van die seminaarfooi.",
+      "PAY_CANCELLED": "Hierdie betaling is gekanselleer.",
+      "PAY_ALREADY_PAID": "'n Betaling word steeds verwerk. As jy by die beursie aangemeld het, probeer weer oor 3 minute.",
+      "PAY_INVALID_STATE": "Hierdie betaling kan nou nie verwerk word nie.",
+      "PAY_PI_CANCEL_REFUSED": "Die betaling is reeds aan die gang en kan nie gekanselleer word nie. Kontroleer asseblief binnekort weer."
+    },
+    "share": {
+      "title": "Skeduleer en deel",
+      "calendar": "Voeg by kalender",
+      "ics": "Kalenderlêer",
+      "mail": "Nooi per e-pos",
+      "mailApp": "Stuur met verstek posprogram",
+      "mailSubject": "[Seminaaruitnodiging] {title}",
+      "mailBody": "{title}\nWanneer: {start}\n\nSluit direk aan met hierdie skakel.\nDesktop: {url}\nPi Browser: {piUrl}",
+      "copy": "Kopieer skakel",
+      "copied": "Skakel gekopieer.",
+      "copyFail": "Kon nie kopieer nie. Kopieer asseblief die skakel uit die adresbalk.",
+      "share": "Deel na 'n ander program",
+      "shareFail": "Kon nie deel nie. Gebruik asseblief Kopieer skakel in plaas daarvan.",
+      "created": "Jou seminaar is gereed. Voeg die begintyd by jou Google Kalender.",
+      "addGoogle": "Voeg by Google Kalender",
+      "later": "Later",
+      "piBrowserOpen": "In Pi Browser, kalender, e-pos en die kalenderlêer word in jou foon se verstekblaaier oopgemaak.",
+      "extFail": "Kon nie oopmaak nie. Dateer Pi Browser op, of gebruik Kopieer skakel en maak dit in 'n gewone blaaier oop (seminarz.vercel.app).",
+      "icsPiBrowser": "Die kalenderlêer kan slegs in 'n gewone blaaier (rekenaar of selfoon) afgelaai word. In Pi Browser, gebruik Voeg by kalender in plaas daarvan."
+    },
+    "attendance": "Bywoning",
+    "plan": "Plan",
+    "left": "Tyd oor"
+  },
+  "host": {
+    "gcal": {
+      "prev": "Vorige maand",
+      "next": "Volgende maand",
+      "connect": "Wys my Google Kalender",
+      "change": "Bestuur Google-kalenders ({n})",
+      "add": "Voeg by",
+      "remove": "Verwyder",
+      "close": "Sluit",
+      "failed": "Kon nie gebeure van {n} kalender(s) laai nie. Kontroleer die adres.",
+      "badUrl": "Plak die 'Geheime adres in iCal-formaat' (…/basic.ics) uit Google Kalender-instellings, nie die blaaier se adresbalk nie.",
+      "full": "Jy kan tot {n} kalenders byvoeg.",
+      "allDay": "Heeldag",
+      "day": "My gebeure op hierdie dag",
+      "count": "{n, plural, one {# gebeurtenis} other {# gebeurtenisse}}",
+      "more": "+{n}",
+      "picked": "Hierdie datum is as die begindatum gestel. Kies die tyd hieronder.",
+      "s1": "Tik [Maak Google Kalender-instellings oop] hieronder.",
+      "s2": "Onder 'Instellings vir my kalenders' aan die linkerkant, kies 'n kalender (bv. jou naam).",
+      "s3": "Rollees na 'Integreer kalender' en kopieer 'Geheime adres in iCal-formaat'.",
+      "s4": "Plak dit hier en tik [Voeg by] — gebeurtenistitels verskyn op die kalender. Voeg ander kalenders op dieselfde manier by, tot 5.",
+      "open": "Maak Google Kalender-instellings oop",
+      "privacy": "Hierdie adres is 'n sleutel tot jou kalender — moenie dit deel nie. Dit word slegs op hierdie toestel gestoor, nooit op ons bediener nie."
+    },
+    "title": "Skep 'n seminaar",
+    "name": "Kom ons reis na 'n pragtige eiland!",
+    "subTitle": "Subtitel (opsioneel, tot 60)",
+    "startAt": "Begintyd",
+    "maxCnt": "Kapasiteit (1–100)",
+    "submit": "Skep",
+    "submitting": "Skep tans…",
+    "invalid": "Kontroleer jou invoer — 'n datum binne een jaar van nou af, kapasiteit 1–100.",
+    "attendance": {
+      "title": "Bywoning",
+      "back": "Terug na seminaar",
+      "loading": "Laai tans…",
+      "forbidden": "Slegs die gasheer en administrateurs kan bywoning sien.",
+      "count": "{n} mense",
+      "csv": "Laai CSV af",
+      "empty": "Niemand het nog aangesluit nie.",
+      "online": "Aanlyn",
+      "left": "Verlaat",
+      "col": {
+        "name": "Naam",
+        "pi": "Pi gebruikersnaam",
+        "ent": "Eerste aangesluit",
+        "hb": "Laas gesien",
+        "dur": "Tyd bygewoon",
+        "min": "Bygewoon (min, tyd weg uitgesluit)",
+        "state": "Status"
+      },
+      "durNote": "Tyd bygewoon is van eerste aangesluit tot laas gesien, minus tyd weg (gapings langer as 2.5 minute).",
+      "csvPiBrowser": "CSV-aflaai werk slegs in 'n gewone blaaier (rekenaar of selfoon). Pi Browser kan nie lêers stoor nie — maak hierdie bywoningsblad in 'n rekenaar- of foonblaaier oop (seminarz.vercel.app)."
+    },
+    "plan": "Plan",
+    "planFree": "Gratis — {time} oor hierdie maand · geen AI",
+    "planPaid": "{name} {time} · {price} — betaal wanneer geskep",
+    "planHint": "'n Seminaar wat op 'n betaalde plan oopgemaak word, gebruik eers daardie plan se tyd, en gaan dan voort op hierdie maand se gratis tyd (geen AI in die gratis deel nie). 'n Aktiewe plan word sonder betaling oopgemaak; Maandeliks of Jaarliks wat jy nie het nie, word in Pi betaal wanneer jy Skep druk, dan word die seminaar oopgemaak (Pi Browser). Aansluiting is altyd gratis vir deelnemers.",
+    "planOwned": "{name} — aktief · {time} oor",
+    "planEnds": "Die begintyd is nadat hierdie plan se pas verval. Skuif die begin vroeër of kies 'n ander plan.",
+    "paidKept": "Jou betaalde pas word behou. Herstel die probleem en druk weer Skep (geen tweede betaling nie)."
+  },
+  "privacy": {
+    "title": "Privaatheidsbeleid — Stem- en AI-funksies",
+    "effective": "Van krag {date}",
+    "intro": "Hierdie beleid verduidelik die persoonlike inligting wat ons verwerk wanneer jy lewendige onderskrifte, vertaalde onderskrifte, stemvertaling, AI-vergaderingnotas en persoonlike notas in 'n seminaar gebruik. Hierdie funksies gebruik 'n eksterne AI-diens, so die inligting word na die buiteland oorgedra.",
+    "whoTitle": "Wie se inligting word verwerk",
+    "who": [
+      "Aanbieders en deelnemers op die verhoog: ons vra een keer vir jou toestemming, voordat jy jou mikrofoon vir die eerste keer aanskakel. Jy kan by die seminaar aansluit sonder om toestemming te gee.",
+      "Gehoor: jy gebruik nie 'n mikrofoon nie, so geen stem word gestuur nie. Jy sien slegs onderskrifte en notas.",
+      "Persoonlike notas: 'n administrateur neem 'n vergadering op met 'n mikrofoon en bevestig dat deelnemers ingelig is voor opname."
+    ],
+    "xferTitle": "Oordrag van persoonlike inligting na die buiteland (Koreaanse Wet op die Beskerming van Persoonlike Inligting, Art. 28-8)",
+    "xfer": [
+      {
+        "k": "Ontvanger",
+        "v": "Google LLC (Gemini API) — kontak [TBD: Google privaatheidskontak]"
+      },
+      {
+        "k": "Lande",
+        "v": "Verenigde State en ander lande waar Google-datasentrums geleë is [TBD: verwerkingsstreek]"
+      },
+      {
+        "k": "Wanneer en hoe",
+        "v": "Ongeveer elke 5 sekondes terwyl 'n funksie aan is, oor 'n geënkripteerde verbinding (HTTPS). Vir persoonlike notas word die hele opname nog een keer in 5-minuut dele gestuur wanneer die nota eindig (akkurate transkripsie)."
+      },
+      {
+        "k": "Items",
+        "v": "Stem, gesproke inhoud (teks), spreker se vertoonnaam (vir nota-opsommings), skermdeel-skermkiekies (wanneer AI-notas aan is)"
+      },
+      {
+        "k": "Doel",
+        "v": "Spraak na teks, vertaling, vergaderingnota-opsommings, sintetiese spraak (standaardstemme, geen stemkloning), spreker-skeiding vir persoonlike notas (stemme word onderskei en geëtiketteer volgens waargenome geslag, soos Man 1 / Vrou 1 — geen name of identiteite word afgelei nie)"
+      },
+      {
+        "k": "Behoud",
+        "v": "Eindig sodra die resultaat terugbesorg is. Ons vra Google om nie versoeke te stoor nie (store=false). Misbruikmonitering-logs kan steeds onder Google se bepalings gehou word [TBD: retensietydperk en betaalde-vlak-status]."
+      },
+      {
+        "k": "Hoe om te weier, en wat gebeur",
+        "v": "As jy nie toestemming gee nie of jou mikrofoon afskakel, word geen stem gestuur nie. Jy kan steeds aan die seminaar deelneem; slegs onderskrifte, vertalings en notas van jou eie spraak word nie geskep nie. Jy kan toestemming enige tyd terugtrek [TBD: waar die terugtrek-knoppie is]."
+      }
+    ],
+    "keepTitle": "Wat hierdie diens behou",
+    "keep": [
+      "Oorspronklike oudio: vir seminaaronderskrifte en AI-vergaderingnotas word dit nie gestoor nie; dit word onmiddellik na omskakeling na teks weggegooi. Vir persoonlike notas word die opname in private stoor gehou sodat dit weer meer akkuraat (met sprekers) na die vergadering getranskribeer kan word, en dit word by die daaglikse skoonmaak uitgevee sodra 1 dag verloop het sedert die nota geëindig het (onmiddellik as die nota uitgevee word).",
+      "Lewendige onderskrifte: nie gestoor nie.",
+      "AI-vergaderingnotas (wanneer die aanbieder dit aanskakel): gesproke inhoud, skermkiekies en die opsomming, gehou totdat die notas uitgevee word [TBD: maksimum retensie].",
+      "Toestemmingsrekords: die tyd van toestemming en die beleidsweergawe, gehou as bewys [TBD: retensietydperk].",
+      "Gebruik: per-minuut versoektellings en verwerkingstyd, gebruik om kostelimiete af te dwing.",
+      "Bywoning: die tyd wat jy aangesluit het, die tyd wat jy laas gekoppel was, jou vertoonnaam en jou Pi-gebruikersnaam word gestoor en aan die gasheer gegee as 'n bywoningslys (op die skerm en as 'n CSV-aflaai). Gehou totdat die seminaar uitgevee word.",
+      "V&A en peilings: die vrae-teks en die vraesteller se vertoonnaam (of Pi-gebruikersnaam indien geen) is vir elke deelnemer sigbaar. Opstemme wys slegs tellings, nooit wie dit gegooi het nie. Peilingstemme wys slegs tellings aan deelnemers; die organiseerder en administrateurs sien, vir elke opsie, die vertoonnaam (of Pi-gebruikersnaam indien geen) van elke stemmer. Gehou, insluitend verborge vrae, totdat die seminaar uitgevee word."
+    ],
+    "recTitle": "Opname",
+    "rec": "Opnames word slegs as 'n lêer op die aanbieder se toestel gestoor. Dit word nie na ons bedieners opgelaai of na die buiteland oorgedra nie. Terwyl opname of AI-notas aan is, sien elke deelnemer 'n aanwyser.",
+    "rightsTitle": "Jou regte",
+    "rights": "Jy kan vra om toegang te verkry tot, te korrigeer, te verwyder of die verwerking van jou inligting te stop. Kontak: [TBD: privaatheidsbeampte se naam en kontak]"
+  },
+  "notes": {
+    "title": "Notas",
+    "back": "Terug na seminaar",
+    "loading": "Laai tans…",
+    "meta": "Notas · {date} · {min} min",
+    "aiWarn": "AI-gegenereerde opsomming — dit mag foute bevat",
+    "points": "Sleutelpunte",
+    "decisions": "Besluite",
+    "todos": "Aksie-items",
+    "shots": "Skermopnames ({n})",
+    "transcript": "Transkripsie",
+    "download": "Laai Markdown af",
+    "making": "Skep tans die notas…",
+    "makingLong": "Dit neem 'n rukkie. Verfris asseblief later",
+    "recording": "Neem steeds op",
+    "failed": "Kon nie die opsomming skep nie — die volledige transkripsie is hieronder",
+    "retry": "Probeer weer",
+    "finish": "Beëindig opname en som op",
+    "none": "Niks hier nie",
+    "blank": "Niks om op te som nie — geen spraak is opgeneem nie of dit was te kort",
+    "notFound": "Notas nie gevind nie",
+    "forbidden": "Jy het nie toegang tot hierdie notas nie",
+    "shotAlt": "Skermopname by {at}",
+    "close": "Sluit",
+    "view": "Bekyk notas",
+    "error": "Kon nie laai nie",
+    "mine": "My notas",
+    "del": "Vee notas uit",
+    "delAsk": "Vee hierdie notas (opsomming, transkripsie en skermopnames) uit? Niemand sal dit kan sien nie",
+    "delYes": "Vee uit",
+    "delNo": "Kanselleer",
+    "delFail": "Kon nie uitvee nie",
+    "dlFail": "Kon nie aflaai nie — probeer asseblief weer",
+    "recentNotes": "Onlangse notas",
+    "empty": "Nog geen notas nie",
+    "newNote": "Begin persoonlike notas",
+    "inPerson": "Persoonlike vergaderingnotas",
+    "inPersonTag": "Persoonlik",
+    "titleLabel": "Titel",
+    "titlePh": "bv. Weeklikse vergadering",
+    "told": "Ek het almal teenwoordig ingelig dat dit opgeneem en deur AI verwerk sal word (vereis)",
+    "toldWhy": "Voordat jy begin, lig almal teenwoordig in dat hierdie gesprek opgeneem sal word (die opname word vir 1 dag gehou nadat die nota eindig, en sprekers word onderskei deur stem en geëtiketteer volgens waargenome geslag) en deur 'n eksterne AI in teks en 'n opsomming omskep sal word",
+    "start": "Begin opname",
+    "starting": "Maak gereed…",
+    "recBadge": "Neem op {time}",
+    "recentLines": "Nuutste reëls",
+    "waiting": "Teks verskyn hier soos mense praat",
+    "end": "Eindig en skep notas",
+    "wakeWarn": "Opname kan stop as die skerm afskakel",
+    "adminOnly": "Slegs administrateurs kan dit gebruik",
+    "aiOff": "AI-notas is tans nie beskikbaar nie (bedieneropstelling benodig). Vorige notas word hieronder gelys",
+    "reload": "Herlaai",
+    "unsupported": "Opname is nie op hierdie toestel beskikbaar nie",
+    "micDenied": "Kan nie die mikrofoon gebruik nie — kontroleer die toestemming",
+    "limited": "Die verwerkingstydperk is opgebruik — eindig en skep die notas",
+    "noAgr": "Gestop: geen kennisgewingbevestiging op rekord nie — eindig en begin weer",
+    "micLost": "Die mikrofoon het ontkoppel en opname het gestop — tik Herkoppel mikrofoon of eindig die nota",
+    "micRetry": "Herkoppel mikrofoon",
+    "gone": "Hierdie nota is elders beëindig of uitgevee, so opname het gestop — gebruik die knoppie hieronder om die notas oop te maak",
+    "finishing": "Besig om die laaste woorde te stoor…",
+    "st": {
+      "RECORDING": "Besig om op te neem",
+      "SUMMARIZING": "Besig om te skep",
+      "DONE": "Klaar",
+      "FAILED": "Misluk"
+    },
+    "downloadPiBrowser": "Aflaai van Markdown werk slegs in 'n gewone blaaier (rekenaar of selfoon). Pi Browser kan nie lêers stoor nie — maak hierdie notas oop in 'n rekenaar- of telefoonblaaier (seminarz.vercel.app)."
+  },
+  "plan": {
+    "title": "Planne",
+    "loading": "Besig om te laai…",
+    "free": "Gratis",
+    "freeDesc": "{time} se seminars elke maand (geen oordrag)",
+    "monthly": "Maandeliks",
+    "yearly": "Jaarliks",
+    "paidDesc": "{time} se seminars, geldig vir {months} maande",
+    "pi": "{amount} Pi",
+    "priceUnknown": "Besig om Pi-prys na te gaan",
+    "noAi": "Geen AI-onderskrifte, vertaling, oorklanking of nota-opsommings nie",
+    "withAi": "Sluit AI-onderskrifte, vertaling, oorklanking en nota-opsommings in",
+    "buy": "Betaal met Pi",
+    "bought": "Betaling voltooi. Seminaartyd is bygevoeg.",
+    "meRemain": "Tyd oor: {time}",
+    "loginToBuy": "Meld aan om 'n plan te koop.",
+    "payNote": "Betaling is altyd in Pi. Die plaaslike-geldeenheidbedrag is slegs 'n bekende verwysing; die Pi-bedrag word vasgestel teen die Pi-prys wanneer jy betaal. 'n Seminaar op 'n betaalde plan gebruik eers daardie plan se passe (vroegste-verval eers), en gaan dan voort met hierdie maand se gratis tyd.",
+    "charge": "Vul tyd aan",
+    "hm": "{h} u {m} min",
+    "m": "{m} min",
+    "won": "KRW {n}",
+    "money": "{fiat} ({pi} Pi)",
+    "moneyNoPi": "{fiat} (besig om Pi-prys na te gaan)",
+    "h": "{h} u"
+  },
+  "adminRooms": {
+    "title": "Kamerbestuur",
+    "adminOnly": "Slegs administrateurs kan hierdie bladsy sien.",
+    "refresh": "Verfris",
+    "count": "{n} oop kamers",
+    "empty": "Geen kamers is tans oop nie.",
+    "lab": "Laboratoriumkamer",
+    "noSeminar": "Geen seminaarrekord",
+    "peers": "{n} / {cap} gekoppel",
+    "producers": "{n} strome",
+    "end": "Eindig {time}",
+    "stale": "Die seminaar het geëindig, maar die kamer is nog oop op die videobediener — dwing dit om te sluit.",
+    "close": "Dwing sluiting",
+    "confirmSeminar": "Dit beëindig die seminaar en sluit die kamer. Almal sal ontkoppel word.",
+    "confirmRoom": "Dit sluit die kamer. Almal sal ontkoppel word.",
+    "confirmYes": "Sluit",
+    "cancel": "Kanselleer",
+    "closing": "Besig om te sluit…",
+    "closed": "Kamer gesluit.",
+    "metrics": "Videobedienerstatistieke (sedert begin)",
+    "metricsOff": "Kon nie statistieke laai nie.",
+    "m": {
+      "packetsIn": "Pakkies in",
+      "packetsOut": "Pakkies uit",
+      "nackIn": "NACKs ontvang",
+      "nackOut": "NACKs gestuur",
+      "retransmits": "Hertoestuurings",
+      "duplicateNack": "Duplikaat NACKs",
+      "cacheMiss": "Hertoestuur kas missers",
+      "pliOut": "Sleutelraamversoeke (PLI)",
+      "keyframes": "Sleutelrame",
+      "layerSwitches": "Kwaliteitskakelaars",
+      "queueDrops": "Wagry-druppels"
+    }
+  },
+  "adminUsers": {
+    "title": "Gebruikers",
+    "adminOnly": "Slegs administrateurs kan hierdie bladsy sien.",
+    "search": "Soek volgens naam (2+ karakters)",
+    "searchBtn": "Soek",
+    "refresh": "Verfris",
+    "count": "{n, plural, one {# gebruiker} other {# gebruikers}}",
+    "empty": "Geen gebruikers.",
+    "admin": "Admin",
+    "lastLogin": "Laaste aanmelding {time}",
+    "never": "Nooit aangemeld nie",
+    "plan": {
+      "FREE": "Gratis",
+      "M": "Maandeliks",
+      "Y": "Jaarliks"
+    },
+    "until": "(tot {time})",
+    "manage": "Bestuur tyd",
+    "close": "Sluit",
+    "planLabel": "Plan",
+    "hours": "Ure",
+    "minutes": "Minute",
+    "reason": "Rede (opsioneel)",
+    "sub": "Verminder",
+    "confirmSub": "Verminder {plan} tyd met {time}.",
+    "confirmYes": "Bevestig",
+    "cancel": "Kanselleer",
+    "saving": "Besig om te stoor…",
+    "done": "Toegepas. {plan} tyd oor: {time}",
+    "invalid": "Voer 'n vermindering tussen 1 minuut en 1000 uur in (hele minute 0–59).",
+    "history": "Onlangse aanpassings",
+    "noHistory": "Geen aanpassings nog nie.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Gee 'n dienspas (gratis tyd)",
+    "svc": {
+      "H1": "1-uur pas",
+      "D1": "1-dag pas",
+      "M1": "1-maand pas"
+    },
+    "svcNote": "Dienspasse is Gratis-plan tyd. Hulle kan van nou af vir daardie tydperk (1 uur, 24 uur, 1 maand) in gratis seminars en in die gratis deel van betaalde seminars gebruik word (geen AI-funksies nie). Met verskeie passe word hulle outomaties opgebruik in die volgorde 1-uur → 1-dag → 1-maand.",
+    "subTitle": "Verminder tyd",
+    "subNote": "Neem eers van die passe wat die laaste verval. As dit meer is as wat oor is, word slegs die oorblywende tyd verwyder.",
+    "confirmSvc": "Gee 'n {svc}.",
+    "doneSvc": "Het 'n {svc} gegee. Gratis tyd oor: {time} (pas verval {end})"
+  }
+}

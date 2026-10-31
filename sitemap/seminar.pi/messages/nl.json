@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Taal wijzigen",
-      "search": "Taal zoeken",
-      "empty": "Geen resultaten"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Live videoseminars die je bijwoont met Pi"

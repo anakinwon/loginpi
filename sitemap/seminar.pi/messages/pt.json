@@ -1,11 +1,4 @@
 {
-  "common": {
-    "localeSwitcher": {
-      "button": "Mudar idioma",
-      "search": "Pesquisar idioma",
-      "empty": "Sem resultados"
-    }
-  },
   "meta": {
     "title": "seminar.pi",
     "description": "Seminários em vídeo ao vivo que você participa com Pi"
