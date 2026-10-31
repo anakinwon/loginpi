@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Tietostandardisanakirjan metajärjestelmä"
+  },
+  "common": {
+    "loading": "Ladataan…",
+    "requestFailed": "Pyyntö epäonnistui",
+    "home": "Etusivu",
+    "goHome": "Siirry etusivulle"
+  },
+  "home": {
+    "subtitle": "Tietostandardisanakirjan metajärjestelmä"
+  },
+  "auth": {
+    "checking": "Tarkistetaan kirjautumista…",
+    "googleUnlinked": "Olet kirjautunut sisään Googlella, mutta sitä ei ole vielä linkitetty Pi-tiliisi.",
+    "required": "Kirjautuminen vaaditaan.",
+    "requiredHint": "Kirjautuminen vaaditaan. Kirjaudu sisään Pi-tililläsi Pi Browserissa tai Googlella (Pi-tilin linkitys vaaditaan) tavallisessa selaimessa.",
+    "piSignIn": "Kirjaudu sisään Pi-tilillä",
+    "googleSignIn": "Kirjaudu sisään Googlella",
+    "signOut": "Kirjaudu ulos",
+    "linkCheckFailed": "Linkityksen tilan tarkistus epäonnistui (väliaikainen virhe). Päivitä sivu hetken kuluttua."
+  },
+  "link": {
+    "title": "Tilien linkitys",
+    "desc": "Linkittää Pi-tilisi Pi Browserissa Google-tiliisi tavallisessa selaimessa samana käyttäjänä. Linkityksen jälkeen voit työskennellä tietokoneella kirjautumalla sisään vain Googlella.",
+    "codeFormTitle": "Anna Pi-tilin linkityskoodi",
+    "codeFormHint": "Kirjauduttuasi sisään Pi Browserissa, anna tilin linkitysnäytöllä annettu 6-numeroinen koodi 10 minuutin kuluessa.",
+    "codeLabel": "Linkityskoodi",
+    "linked": "Linkitetty.",
+    "submit": "Linkitä",
+    "issuerTitle": "Anna Google-tilin linkityskoodi",
+    "issuerHint": "Kirjauduttuasi sisään Googlella tavallisessa selaimessa, anna tämä koodi linkittääksesi samana käyttäjänä (voimassa 10 minuuttia).",
+    "minutesLeft": "Noin {minutes} minuuttia jäljellä",
+    "issue": "Anna koodi",
+    "reissue": "Anna uudelleen",
+    "linkedAs": "Google-tilisi on linkitetty Pi-käyttäjään <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Tietostandardisanakirjan metajärjestelmä",
+    "headline1": "Ilman standardeja et voi nimetä,",
+    "headline2": "ilman malleja et voi taulukoida.",
+    "lead": "Luo termejä hyväksytyillä standardisanoilla, piirrä malleja näillä termeillä ja luo DDL-tiedostoja malleista. Ihmiset päättävät, työkalut valvovat sääntöjä.",
+    "flowTitle": "Näin se yhdistyy",
+    "step": "Vaihe {n}",
+    "flow": {
+      "words": {
+        "nm": "Standardisanat",
+        "desc": "Sanat · Lyhenteet · Kielletyt sanat"
+      },
+      "domains": {
+        "nm": "Standardialueet",
+        "desc": "Tyyppi · Pituussäännöt"
+      },
+      "terms": {
+        "nm": "Standarditermit",
+        "desc": "Sanojen yhdistely · Hyväksyntä"
+      },
+      "model": {
+        "nm": "Tietomalli",
+        "desc": "Käsitteellinen · Looginen · Fyysinen"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Aihealueittain · Versioiden vertailu"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Luo DBMS:n mukaan · Hyväksy suoritus"
+      }
+    },
+    "roleTitle": "Mitä voit tehdä roolin mukaan",
+    "planTitle": "Hinnoittelusuunnitelmat",
+    "planNote": "— Pi-maksu luokitusjärjestelmän yksikköä kohti, hinta vahvistetaan maksunäytöllä",
+    "menu": {
+      "MENU_STD": "Standardisanakirja",
+      "MENU_SQL": "SQL-editori",
+      "MENU_SET": "Asetukset · Historia",
+      "MENU_BAN": "Kielletyt sanat",
+      "MENU_MODEL": "Malli · ERD · DDL",
+      "MENU_CHK": "Standarditarkistus",
+      "MENU_ADM": "Jäsenet · Hyväksynnät"
+    },
+    "viewOnly": "{menu} (Vain katselu)",
+    "footer": "Kirjaudu sisään yllä nähdäksesi luokitusjärjestelmäsi tehtävät heti."
+  },
+  "dashboard": {
+    "loadFailed": "Kojelaudan lataus epäonnistui",
+    "myAreas": "Omat luokitusjärjestelmät",
+    "planLine": "Suunnitelma {plan}",
+    "until": " · {date} asti",
+    "grace": "(Armonaika)",
+    "openArea": "Avaa luokitusjärjestelmä →",
+    "todoTitle": "Minun vuoroni",
+    "todoEmpty": "Vain katseluoikeus – selaa standardeja alla olevien tilojen ja pikakuvakkeiden avulla.",
+    "apvWait": "Standardin hyväksyntä odottaa",
+    "apvWaitSub": "Sana · Verkkotunnus · Termi · Koodihakemus",
+    "ddlWait": "DDL-suorituksen hyväksyntä odottaa",
+    "mineWait": "Omat hakemukset odottavat",
+    "mineRejected": "{count} hylätty viimeisten 30 päivän aikana",
+    "model": "Tietomalli",
+    "modelSub": "Projektit · {count} entiteettiä",
+    "stdTitle": "Standardisanakirjan tila",
+    "stdBasis": "Hyväksytty perusta",
+    "shortcuts": "Pikakuvakkeet",
+    "recentTitle": "Viimeisimmät muutokset",
+    "allHistory": "Koko historia",
+    "noHistory": "Ei muutoshistoriaa vielä",
+    "justNow": "Juuri nyt",
+    "minutesAgo": "{n} minuuttia sitten",
+    "hoursAgo": "{n} tuntia sitten",
+    "daysAgo": "{n} päivää sitten",
+    "areaList": "Luokitusjärjestelmäluettelo · Luo uusi"
+  },
+  "areaHome": {
+    "title": "Omat standardiluokitusjärjestelmät",
+    "loading": "Ladataan",
+    "empty": "Ei osallistuvia luokitusjärjestelmiä",
+    "open": "Avaa",
+    "newTitle": "Uusi luokitusjärjestelmä",
+    "namePlaceholder": "Luokitusjärjestelmän nimi (pakollinen)",
+    "descPlaceholder": "Kuvaus",
+    "create": "Luo",
+    "created": "Luokitusjärjestelmä {name} luotu"
+  },
+  "nav": {
+    "label": "Luokitusjärjestelmän valikko",
+    "expand": "Laajenna alavalikko",
+    "expandWith": "Laajenna alavalikko ({menu})",
+    "collapse": "Kutista alavalikko",
+    "subOf": "{menu} alitoiminnot",
+    "groupTech": "Valvonta · SQL-editori",
+    "groupStd": "Standardisanakirja",
+    "groupModel": "Malli",
+    "groupSet": "Asetukset",
+    "groupPlan": "Maksu",
+    "words": "Standardisanat",
+    "bulk": "Massarekisteröinti",
+    "domains": "Standardialueet",
+    "keyDomains": "Avainalueet",
+    "domainGroups": "Alueryhmät",
+    "terms": "Standarditermit",
+    "codes": "Standardikoodit",
+    "model": "Käsitteellinen malli",
+    "prj": "Projektit",
+    "subj": "Aihealueet",
+    "coreEnt": "Ydinentiteetit",
+    "entityClasses": "Entiteettiluokittelijat",
+    "logical": "Looginen malli",
+    "physical": "Fyysinen malli",
+    "erd": "ERD",
+    "ddl": "DDL-generointi",
+    "monitor": "Valvonta",
+    "monApp": "Sovellus",
+    "monSrv": "Palvelin",
+    "monDb": "Tietokanta",
+    "monUrl": "URL",
+    "monFix": "AI-korjaushistoria",
+    "sql": "SQL-editori",
+    "settings": "Asetukset",
+    "history": "Historia",
+    "forbidden": "Kielletyt sanat",
+    "banBulk": "Kiellettyjen sanojen massarekisteröinti",
+    "check": "Standarditarkistus",
+    "reverse": "Käänteissuunnittelu",
+    "members": "Jäsenet",
+    "approvals": "Hyväksynnät",
+    "plan": "Maksu"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Järjestelmänvalvoja",
+      "DA": "Tietoarkkitehti",
+      "STD": "Standardipäällikkö",
+      "MDL": "Mallintaja",
+      "QLT": "Laatupäällikkö",
+      "MIG": "Siirtopäällikkö",
+      "VIEWER": "Katselija"
+    },
+    "roleDesc": {
+      "SYS": "Hallitse luokitusjärjestelmän asetuksia · toimialueryhmiä · lyhenteitä · jäseniä, hakemuksia · hyväksyntöjä (mukaan lukien välitön hyväksyntä), massarekisteröintiä, SQL-kirjoitusta, kaikki valikot",
+      "DA": "Yleinen standardipolitiikka: Hae · hyväksy sanoja · toimialueita · termejä (voi valita välittömän hyväksynnän hakemuksen yhteydessä), massarekisteröinti, hallitse asetuksia · jäseniä, SQL-kirjoitus, kaikki valikot",
+      "STD": "Hae sanoja · toimialueita · termejä, massarekisteröinti, asetukset, SQL-kirjoitus, kaikki valikot (ei hyväksyntäoikeuksia)",
+      "MDL": "Hae sanojen · toimialueiden · termien · mallien rekisteröintiä · muokkausta · poistoa, massarekisteröinti, asetukset, SQL-kirjoitus, kaikki valikot (ei hyväksyntäoikeuksia)",
+      "QLT": "Hae · SQL-kirjoitus, SQL-editori · mallinnus · asetukset-valikot (laadun diagnostiikkaominaisuudet tulevissa vaiheissa)",
+      "MIG": "Hae · SQL-kirjoitus, SQL-editori-valikko (siirtokartoitusta varten)",
+      "VIEWER": "Vain standardisanakirjan katselu"
+    },
+    "plan": {
+      "FREE": "Ilmainen (katselu)",
+      "P1": "Kehittäjä",
+      "P2": "Standardipäällikkö",
+      "P3": "Mallintaja",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Rekisteröi",
+      "UPD": "Muokkaa",
+      "DEL": "Poista"
+    },
+    "tgt": {
+      "AREA": "Luokitusjärjestelmä",
+      "MBR": "Jäsen",
+      "DIC": "Sana",
+      "DOM": "Toimialue",
+      "DOM_GRP": "Toimialueryhmä",
+      "TERM": "Termi",
+      "CD": "Standardikoodi",
+      "CD_VAL": "Koodiarvo",
+      "ABBR": "Lyhenne",
+      "PRJ": "Projekti",
+      "SUBJ": "Aihealue",
+      "ENT": "Entiteetti",
+      "REL": "Suhde",
+      "ATTR": "Attribuutti",
+      "VER": "Malliversio",
+      "PHY": "Fyysinen malli",
+      "DDL": "DDL-suoritus",
+      "RVS": "Käänteissuunnittelu",
+      "SQL": "SQL",
+      "DBCN": "DB-yhteys",
+      "AGT": "Agentti",
+      "MONURL": "URL-valvonta"
+    }
+  }
+}

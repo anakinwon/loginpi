@@ -4,11 +4,6 @@
     "description": "Meta sistem rečnika standarda podataka"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Promeni jezik",
-      "search": "Pretraži jezik",
-      "empty": "Nema rezultata pretrage"
-    },
     "loading": "Učitavanje…",
     "requestFailed": "Zahtev nije uspeo",
     "home": "Početna",

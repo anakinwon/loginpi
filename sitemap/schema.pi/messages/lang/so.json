@@ -4,11 +4,6 @@
     "description": "Nidaamka Meta ee Qaamuuska Heerka Xogta"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Beddel Luqadda",
-      "search": "Raadi Luqadda",
-      "empty": "Ma jiraan natiijooyin raadin ah"
-    },
     "loading": "Xogta oo la soo shubayo…",
     "requestFailed": "Codsiga wuu fashilmay",
     "home": "Bogga hore",

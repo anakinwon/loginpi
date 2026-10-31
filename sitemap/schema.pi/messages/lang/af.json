@@ -4,11 +4,6 @@
     "description": "Datastandaardwoordeboek Metasisteem"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Verander Taal",
-      "search": "Soek Taal",
-      "empty": "Geen soekresultate nie"
-    },
     "loading": "Laai tans…",
     "requestFailed": "Versoek het misluk",
     "home": "Tuis",

@@ -4,11 +4,6 @@
     "description": "Data Standard Dictionary Meta System"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Change Language",
-      "search": "Search Language",
-      "empty": "No search results"
-    },
     "loading": "Loading…",
     "requestFailed": "Request failed",
     "home": "Home",

@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Mfumo wa Meta wa Kamusi ya Viwango vya Data"
+  },
+  "common": {
+    "loading": "Inapakia…",
+    "requestFailed": "Ombi limeshindwa",
+    "home": "Nyumbani",
+    "goHome": "Nenda Nyumbani"
+  },
+  "home": {
+    "subtitle": "Mfumo wa Meta wa Kamusi ya Viwango vya Data"
+  },
+  "auth": {
+    "checking": "Inakagua kuingia…",
+    "googleUnlinked": "Umeingia na Google, lakini bado haijaunganishwa na akaunti yako ya Pi.",
+    "required": "Kuingia kunahitajika.",
+    "requiredHint": "Kuingia kunahitajika. Tafadhali ingia na akaunti yako ya Pi katika Pi Browser, au na Google (kuunganisha akaunti ya Pi kunahitajika) katika kivinjari cha kawaida.",
+    "piSignIn": "Ingia na akaunti ya Pi",
+    "googleSignIn": "Ingia na Google",
+    "signOut": "Toka",
+    "linkCheckFailed": "Imeshindwa kukagua hali ya kuunganisha (hitilafu ya muda). Tafadhali onyesha upya baada ya muda mfasihi."
+  },
+  "link": {
+    "title": "Kuunganisha Akaunti",
+    "desc": "Inaunganisha akaunti yako ya Pi katika Pi Browser na akaunti yako ya Google katika kivinjari cha kawaida kama mtumiaji mmoja. Baada ya kuunganisha, unaweza kufanya kazi kwenye PC kwa kuingia tu na Google.",
+    "codeFormTitle": "Weka Msimbo wa Kuunganisha Akaunti ya Pi",
+    "codeFormHint": "Baada ya kuingia na Pi Browser, weka msimbo wa tarakimu 6 uliotolewa kwenye skrini ya kuunganisha akaunti ndani ya dakika 10.",
+    "codeLabel": "Msimbo wa Kuunganisha",
+    "linked": "Imeunganishwa.",
+    "submit": "Unganisha",
+    "issuerTitle": "Toa Msimbo wa Kuunganisha Akaunti ya Google",
+    "issuerHint": "Baada ya kuingia na Google katika kivinjari cha kawaida, weka msimbo huu ili kuunganisha kama mtumiaji mmoja (halali kwa dakika 10).",
+    "minutesLeft": "Takriban dakika {minutes} zimesalia",
+    "issue": "Toa Msimbo",
+    "reissue": "Toa Upya",
+    "linkedAs": "Akaunti yako ya Google imeunganishwa na mtumiaji wa Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Mfumo wa Meta wa Kamusi ya Viwango vya Data",
+    "headline1": "Bila viwango, huwezi kutaja,",
+    "headline2": "bila mifano, huwezi kuunda jedwali.",
+    "lead": "Unda maneno na maneno ya kawaida yaliyoidhinishwa, chora mifano na maneno hayo, na utengeneze DDL kutoka kwa mifano. Binadamu huamua, zana hutekeleza sheria.",
+    "flowTitle": "Hivi ndivyo inavyounganisha",
+    "step": "Hatua ya {n}",
+    "flow": {
+      "words": {
+        "nm": "Maneno ya Kawaida",
+        "desc": "Maneno · Vifupisho · Maneno Yaliyokatazwa"
+      },
+      "domains": {
+        "nm": "Vikoa vya Kawaida",
+        "desc": "Aina · Sheria za Urefu"
+      },
+      "terms": {
+        "nm": "Masharti ya Kawaida",
+        "desc": "Mchanganyiko wa Maneno · Idhini"
+      },
+      "model": {
+        "nm": "Mfumo wa Data",
+        "desc": "Kiwazo · Kimantiki · Kimwili"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Kwa Eneo la Somo · Ulinganisho wa Toleo"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Tengeneza kwa DBMS · Idhinisha Utekelezaji"
+      }
+    },
+    "roleTitle": "Unachoweza kufanya kwa jukumu",
+    "planTitle": "Mipango ya Bei",
+    "planNote": "— Malipo ya Pi kwa kila kitengo cha mfumo wa uainishaji, bei imethibitishwa kwenye skrini ya malipo",
+    "menu": {
+      "MENU_STD": "Kamusi ya Kawaida",
+      "MENU_SQL": "Kihariri cha SQL",
+      "MENU_SET": "Mipangilio · Historia",
+      "MENU_BAN": "Maneno Yaliyokatazwa",
+      "MENU_MODEL": "Mfumo · ERD · DDL",
+      "MENU_CHK": "Ukaguzi wa Kawaida",
+      "MENU_ADM": "Wanachama · Idhini"
+    },
+    "viewOnly": "{menu} (Tazama Tu)",
+    "footer": "Ingia hapo juu ili kuona kazi zako za mfumo wako wa uainishaji mara moja."
+  },
+  "dashboard": {
+    "loadFailed": "Imeshindwa kupakia dashibodi",
+    "myAreas": "Mifumo Yangu ya Uainishaji",
+    "planLine": "Mpango {plan}",
+    "until": " · Hadi {date}",
+    "grace": "(Kipindi cha neema)",
+    "openArea": "Fungua Mfumo wa Uainishaji →",
+    "todoTitle": "Zamu Yangu",
+    "todoEmpty": "Ruhusa ya kutazama tu — tafadhali vinjari viwango kwa kutumia hali na njia za mkato hapa chini.",
+    "apvWait": "Idhini ya Kawaida Inasubiri",
+    "apvWaitSub": "Neno · Kikoa · Neno · Maombi ya Msimbo",
+    "ddlWait": "Idhini ya Utekelezaji wa DDL Inasubiri",
+    "mineWait": "Maombi Yangu Yanasubiri",
+    "mineRejected": "{count} yamekataliwa katika siku 30 zilizopita",
+    "model": "Mfumo wa Data",
+    "modelSub": "Miradi · {count} Vyombo",
+    "stdTitle": "Hali ya Kamusi ya Kawaida",
+    "stdBasis": "Msingi Ulioidhinishwa",
+    "shortcuts": "Njia za Mkato",
+    "recentTitle": "Mabadiliko ya Hivi Karibuni",
+    "allHistory": "Historia Kamili",
+    "noHistory": "Hakuna historia ya mabadiliko bado",
+    "justNow": "Sasa hivi",
+    "minutesAgo": "Dakika {n} zilizopita",
+    "hoursAgo": "Saa {n} zilizopita",
+    "daysAgo": "Siku {n} zilizopita",
+    "areaList": "Orodha ya Mfumo wa Uainishaji · Unda Mpya"
+  },
+  "areaHome": {
+    "title": "Mifumo Yangu ya Uainishaji ya Kawaida",
+    "loading": "Inapakia",
+    "empty": "Hakuna mifumo ya uainishaji inayoshiriki",
+    "open": "Fungua",
+    "newTitle": "Mfumo Mpya wa Uainishaji",
+    "namePlaceholder": "Jina la Mfumo wa Uainishaji (linahitajika)",
+    "descPlaceholder": "Maelezo",
+    "create": "Unda",
+    "created": "Mfumo wa uainishaji {name} umeundwa"
+  },
+  "nav": {
+    "label": "Menyu ya Mfumo wa Uainishaji",
+    "expand": "Panua menyu ya chini",
+    "expandWith": "Panua menyu ya chini ({menu})",
+    "collapse": "Kunja menyu ya chini",
+    "subOf": "{menu} Vitendaji vidogo",
+    "groupTech": "Ufuatiliaji · Kihariri cha SQL",
+    "groupStd": "Kamusi ya Kawaida",
+    "groupModel": "Mfumo",
+    "groupSet": "Mipangilio",
+    "groupPlan": "Malipo",
+    "words": "Maneno ya Kawaida",
+    "bulk": "Usajili wa Wingi",
+    "domains": "Vikoa vya Kawaida",
+    "keyDomains": "Vikoa Muhimu",
+    "domainGroups": "Vikundi vya Kikoa",
+    "terms": "Masharti ya Kawaida",
+    "codes": "Misimbo ya Kawaida",
+    "model": "Mfumo wa Dhana",
+    "prj": "Miradi",
+    "subj": "Maeneo ya Somo",
+    "coreEnt": "Vyombo Vikuu",
+    "entityClasses": "Viainishi vya Vyombo",
+    "logical": "Mfumo wa Kimantiki",
+    "physical": "Mfumo wa Kimwili",
+    "erd": "ERD",
+    "ddl": "Uundaji wa DDL",
+    "monitor": "Ufuatiliaji",
+    "monApp": "Maombi",
+    "monSrv": "Seva",
+    "monDb": "Hifadhidata",
+    "monUrl": "URL",
+    "monFix": "Historia ya Marekebisho ya AI",
+    "sql": "Kihariri cha SQL",
+    "settings": "Mipangilio",
+    "history": "Historia",
+    "forbidden": "Maneno Yaliyokatazwa",
+    "banBulk": "Usajili wa Wingi wa Maneno Yaliyokatazwa",
+    "check": "Ukaguzi wa Kawaida",
+    "reverse": "Uhandisi wa Kinyume",
+    "members": "Wanachama",
+    "approvals": "Idhini",
+    "plan": "Malipo"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Msimamizi wa Mfumo",
+      "DA": "Mbuni wa Data",
+      "STD": "Meneja wa Kawaida",
+      "MDL": "Mwanamitindo",
+      "QLT": "Meneja wa Ubora",
+      "MIG": "Meneja wa Uhamiaji",
+      "VIEWER": "Mwangalizi"
+    },
+    "roleDesc": {
+      "SYS": "Dhibiti mipangilio ya mfumo wa uainishaji · vikundi vya kikoa · vifupisho · wanachama, maombi · idhini (pamoja na idhini ya haraka), usajili wa wingi, uandishi wa SQL, menyu zote",
+      "DA": "Sera ya jumla ya kawaida: Omba · idhinisha maneno · vikoa · masharti (inaweza kuchagua idhini ya haraka wakati wa kuomba), usajili wa wingi, dhibiti mipangilio · wanachama, uandishi wa SQL, menyu zote",
+      "STD": "Omba maneno · vikoa · masharti, usajili wa wingi, mipangilio, uandishi wa SQL, menyu zote (hakuna haki za idhini)",
+      "MDL": "Omba usajili · marekebisho · kufuta maneno · vikoa · masharti · mifano, usajili wa wingi, mipangilio, uandishi wa SQL, menyu zote (hakuna haki za idhini)",
+      "QLT": "Omba · uandishi wa SQL, kihariri cha SQL · uundaji wa mifano · menyu za mipangilio (vipengele vya uchunguzi wa ubora katika hatua za baadaye)",
+      "MIG": "Omba · uandishi wa SQL, menyu ya kihariri cha SQL (kwa ramani ya uhamiaji)",
+      "VIEWER": "Tazama kamusi ya kawaida tu"
+    },
+    "plan": {
+      "FREE": "Bure (Tazama)",
+      "P1": "Msanidi Programu",
+      "P2": "Meneja wa Kawaida",
+      "P3": "Mwanamitindo",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Sajili",
+      "UPD": "Rekebisha",
+      "DEL": "Futa"
+    },
+    "tgt": {
+      "AREA": "Mfumo wa Uainishaji",
+      "MBR": "Mwanachama",
+      "DIC": "Neno",
+      "DOM": "Kikoa",
+      "DOM_GRP": "Kikundi cha Kikoa",
+      "TERM": "Neno",
+      "CD": "Msimbo wa Kawaida",
+      "CD_VAL": "Thamani ya Msimbo",
+      "ABBR": "Kifupisho",
+      "PRJ": "Mradi",
+      "SUBJ": "Eneo la Somo",
+      "ENT": "Chombo",
+      "REL": "Uhusiano",
+      "ATTR": "Sifa",
+      "VER": "Toleo la Mfumo",
+      "PHY": "Mfumo wa Kimwili",
+      "DDL": "Utekelezaji wa DDL",
+      "RVS": "Uhandisi wa Kinyume",
+      "SQL": "SQL",
+      "DBCN": "Muunganisho wa DB",
+      "AGT": "Wakala",
+      "MONURL": "Ufuatiliaji wa URL"
+    }
+  }
+}

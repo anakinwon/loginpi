@@ -4,11 +4,6 @@
     "description": "Maʼlumotlar standarti lugʻati meta tizimi"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Tilni oʻzgartirish",
-      "search": "Tilni qidirish",
-      "empty": "Qidiruv natijalari yoʻq"
-    },
     "loading": "Yuklanmoqda…",
     "requestFailed": "Soʻrov bajarilmadi",
     "home": "Bosh sahifa",

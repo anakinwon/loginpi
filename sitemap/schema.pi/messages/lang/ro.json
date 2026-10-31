@@ -4,11 +4,6 @@
     "description": "Sistem meta dicționar standard de date"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Schimbă limba",
-      "search": "Căutare limbă",
-      "empty": "Nu există rezultate ale căutării"
-    },
     "loading": "Se încarcă…",
     "requestFailed": "Solicitarea a eșuat",
     "home": "Acasă",

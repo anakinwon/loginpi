@@ -4,11 +4,6 @@
     "description": "Sistem Meta Kamus Standar Data"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Ubah Bahasa",
-      "search": "Cari Bahasa",
-      "empty": "Tidak ada hasil pencarian"
-    },
     "loading": "Memuat…",
     "requestFailed": "Permintaan gagal",
     "home": "Beranda",

@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Datastandaardwoordeboek Metasisteem"
+  },
+  "common": {
+    "loading": "Laai tans…",
+    "requestFailed": "Versoek het misluk",
+    "home": "Tuis",
+    "goHome": "Gaan Tuis"
+  },
+  "home": {
+    "subtitle": "Datastandaardwoordeboek Metasisteem"
+  },
+  "auth": {
+    "checking": "Meld aan word nagegaan…",
+    "googleUnlinked": "U is aangemeld met Google, maar dit is nog nie aan u Pi-rekening gekoppel nie.",
+    "required": "Aanmelding word vereis.",
+    "requiredHint": "Aanmelding word vereis. Meld asseblief aan met u Pi-rekening in Pi Browser, of met Google (Pi-rekeningkoppeling word vereis) in 'n gewone blaaier.",
+    "piSignIn": "Meld aan met Pi-rekening",
+    "googleSignIn": "Meld aan met Google",
+    "signOut": "Meld af",
+    "linkCheckFailed": "Kon nie koppelstatus nagaan nie (tydelike fout). Verfris asseblief binnekort."
+  },
+  "link": {
+    "title": "Rekeningkoppeling",
+    "desc": "Koppel u Pi-rekening in Pi Browser met u Google-rekening in 'n gewone blaaier as dieselfde gebruiker. Na koppeling kan u op 'n rekenaar werk deur slegs met Google aan te meld.",
+    "codeFormTitle": "Voer Pi-rekeningkoppelkode in",
+    "codeFormHint": "Nadat u in Pi Browser aangemeld het, voer die 6-syfer kode wat op die rekeningkoppelingskerm uitgereik is, binne 10 minute in.",
+    "codeLabel": "Koppelkode",
+    "linked": "Gekoppel.",
+    "submit": "Koppel",
+    "issuerTitle": "Reik Google-rekeningkoppelkode uit",
+    "issuerHint": "Nadat u in 'n gewone blaaier met Google aangemeld het, voer hierdie kode in om as dieselfde gebruiker te koppel (geldig vir 10 minute).",
+    "minutesLeft": "Ongeveer {minutes} minute oor",
+    "issue": "Reik Kode uit",
+    "reissue": "Heruitreik",
+    "linkedAs": "U Google-rekening is gekoppel aan Pi-gebruiker <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Datastandaardwoordeboek Metasisteem",
+    "headline1": "Sonder standaarde kan jy nie name gee nie,",
+    "headline2": "sonder modelle kan jy nie tabelle skep nie.",
+    "lead": "Skep terme met goedgekeurde standaardwoorde, teken modelle met daardie terme, en genereer DDL uit die modelle. Mense besluit, gereedskap dwing reëls af.",
+    "flowTitle": "So verbind dit",
+    "step": "Stap {n}",
+    "flow": {
+      "words": {
+        "nm": "Standaardwoorde",
+        "desc": "Woorde · Afkortings · Verbode Woorde"
+      },
+      "domains": {
+        "nm": "Standaarddomeine",
+        "desc": "Tipe · Lengte Reëls"
+      },
+      "terms": {
+        "nm": "Standaardterme",
+        "desc": "Woordkombinasie · Goedkeuring"
+      },
+      "model": {
+        "nm": "Datamodel",
+        "desc": "Konseptueel · Logies · Fisies"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Volgens Onderwerpgebied · Weergawevergelyking"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Genereer volgens DBME · Keur Uitvoering goed"
+      }
+    },
+    "roleTitle": "Wat jy per rol kan doen",
+    "planTitle": "Prysplanne",
+    "planNote": "— Pi-betaling per klassifikasiestelsel-eenheid, prys bevestig op betaalskerm",
+    "menu": {
+      "MENU_STD": "Standaardwoordeboek",
+      "MENU_SQL": "SQL-redigeerder",
+      "MENU_SET": "Instellings · Geskiedenis",
+      "MENU_BAN": "Verbode Woorde",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Standaardkontrole",
+      "MENU_ADM": "Lede · Goedkeurings"
+    },
+    "viewOnly": "{menu} (Slegs Besigtig)",
+    "footer": "Meld hierbo aan om u take vir u klassifikasiestelsel onmiddellik te sien."
+  },
+  "dashboard": {
+    "loadFailed": "Kon nie paneelbord laai nie",
+    "myAreas": "My Klassifikasiestelsels",
+    "planLine": "Plan {plan}",
+    "until": " · Tot {date}",
+    "grace": "(Grasieperiode)",
+    "openArea": "Maak Klassifikasiestelsel oop →",
+    "todoTitle": "My Beurt",
+    "todoEmpty": "Slegs besigtigingsregte — blaai asseblief deur standaarde met die status en kortpaaie hieronder.",
+    "apvWait": "Standaardgoedkeuring hangende",
+    "apvWaitSub": "Woord · Domein · Term · Kode Aansoek",
+    "ddlWait": "DDL-uitvoering goedkeuring hangende",
+    "mineWait": "My Aansoeke hangende",
+    "mineRejected": "{count} afgekeur in laaste 30 dae",
+    "model": "Datamodel",
+    "modelSub": "Projekte · {count} Entiteite",
+    "stdTitle": "Standaardwoordeboekstatus",
+    "stdBasis": "Goedgekeurde Basis",
+    "shortcuts": "Kortpaaie",
+    "recentTitle": "Onlangse Veranderinge",
+    "allHistory": "Volledige Geskiedenis",
+    "noHistory": "Nog geen veranderingsgeskiedenis nie",
+    "justNow": "Net nou",
+    "minutesAgo": "{n} minute gelede",
+    "hoursAgo": "{n} uur gelede",
+    "daysAgo": "{n} dae gelede",
+    "areaList": "Klassifikasiestelsellys · Skep Nuwe"
+  },
+  "areaHome": {
+    "title": "My Standaardklassifikasiestelsels",
+    "loading": "Laai tans",
+    "empty": "Geen klassifikasiestelsels waaraan deelgeneem word nie",
+    "open": "Maak oop",
+    "newTitle": "Nuwe Klassifikasiestelsel",
+    "namePlaceholder": "Klassifikasiestelselnaam (vereis)",
+    "descPlaceholder": "Beskrywing",
+    "create": "Skep",
+    "created": "Klassifikasiestelsel {name} geskep"
+  },
+  "nav": {
+    "label": "Klassifikasiestelselmenu",
+    "expand": "Vou onderste spyskaart uit",
+    "expandWith": "Vou onderste spyskaart uit ({menu})",
+    "collapse": "Vou onderste spyskaart in",
+    "subOf": "{menu} Subfunksies",
+    "groupTech": "Monitering · SQL-redigeerder",
+    "groupStd": "Standaardwoordeboek",
+    "groupModel": "Model",
+    "groupSet": "Instellings",
+    "groupPlan": "Betaling",
+    "words": "Standaardwoorde",
+    "bulk": "Massaregistrasie",
+    "domains": "Standaarddomeine",
+    "keyDomains": "Sleuteldomeine",
+    "domainGroups": "Domeingroepe",
+    "terms": "Standaardterme",
+    "codes": "Standaardkodes",
+    "model": "Konseptuele Model",
+    "prj": "Projekte",
+    "subj": "Onderwerpgebiede",
+    "coreEnt": "Kernentiteite",
+    "entityClasses": "Entiteitklassifiseerders",
+    "logical": "Logiese Model",
+    "physical": "Fisiese Model",
+    "erd": "ERD",
+    "ddl": "DDL-generering",
+    "monitor": "Monitering",
+    "monApp": "Toepassing",
+    "monSrv": "Bediener",
+    "monDb": "Databasis",
+    "monUrl": "URL",
+    "monFix": "AI-korreksiegeskiedenis",
+    "sql": "SQL-redigeerder",
+    "settings": "Instellings",
+    "history": "Geskiedenis",
+    "forbidden": "Verbode Woorde",
+    "banBulk": "Massaregistrasie van Verbode Woorde",
+    "check": "Standaardkontrole",
+    "reverse": "Omgekeerde Ingenieurswese",
+    "members": "Lede",
+    "approvals": "Goedkeurings",
+    "plan": "Betaling"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Stelseladministrateur",
+      "DA": "Data-argitek",
+      "STD": "Standaardbestuurder",
+      "MDL": "Modelleerder",
+      "QLT": "Kwaliteitbestuurder",
+      "MIG": "Migrasiebestuurder",
+      "VIEWER": "Besigtiger"
+    },
+    "roleDesc": {
+      "SYS": "Bestuur klassifikasiestelselinstellings · domeingroepe · afkortings · lede, aansoeke · goedkeurings (insluitend onmiddellike goedkeuring), massaregistrasie, SQL-skryf, alle spyskaarte",
+      "DA": "Algehele standaardbeleid: Pas toe · keur woorde · domeine · terme goed (kan onmiddellike goedkeuring kies by aansoek), massaregistrasie, bestuur instellings · lede, SQL-skryf, alle spyskaarte",
+      "STD": "Doen aansoek vir woorde · domeine · terme, massaregistrasie, instellings, SQL-skryf, alle spyskaarte (geen goedkeuringsregte nie)",
+      "MDL": "Doen aansoek vir registrasie · wysiging · skrapping van woorde · domeine · terme · modelle, massaregistrasie, instellings, SQL-skryf, alle spyskaarte (geen goedkeuringsregte nie)",
+      "QLT": "Doen aansoek · SQL-skryf, SQL-redigeerder · modellering · instellings-spyskaarte (kwaliteitdiagnostiekfunksies in toekomstige stadiums)",
+      "MIG": "Doen aansoek · SQL-skryf, SQL-redigeerder-spyskaart (vir migrasiekartering)",
+      "VIEWER": "Slegs standaardwoordeboek besigtig"
+    },
+    "plan": {
+      "FREE": "Gratis (Besigtig)",
+      "P1": "Ontwikkelaar",
+      "P2": "Standaardbestuurder",
+      "P3": "Modelleerder",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registreer",
+      "UPD": "Wysig",
+      "DEL": "Skrap"
+    },
+    "tgt": {
+      "AREA": "Klassifikasiestelsel",
+      "MBR": "Lid",
+      "DIC": "Woord",
+      "DOM": "Domein",
+      "DOM_GRP": "Domeingroep",
+      "TERM": "Term",
+      "CD": "Standaardkode",
+      "CD_VAL": "Kode Waarde",
+      "ABBR": "Afkorting",
+      "PRJ": "Projek",
+      "SUBJ": "Onderwerpgebied",
+      "ENT": "Entiteit",
+      "REL": "Verhouding",
+      "ATTR": "Attribuut",
+      "VER": "Modelweergawe",
+      "PHY": "Fisiese Model",
+      "DDL": "DDL-uitvoering",
+      "RVS": "Omgekeerde Ingenieurswese",
+      "SQL": "SQL",
+      "DBCN": "DB-verbinding",
+      "AGT": "Agent",
+      "MONURL": "URL-monitering"
+    }
+  }
+}

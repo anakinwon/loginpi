@@ -4,11 +4,6 @@
     "description": "Metasustav standardnog rječnika podataka"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Promijeni jezik",
-      "search": "Pretraži jezik",
-      "empty": "Nema rezultata pretraživanja"
-    },
     "loading": "Učitavanje…",
     "requestFailed": "Zahtjev nije uspio",
     "home": "Početna",

@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Gagnastaðlaorðabók Meta Kerfi"
+  },
+  "common": {
+    "loading": "Hleður…",
+    "requestFailed": "Beiðni mistókst",
+    "home": "Heim",
+    "goHome": "Fara heim"
+  },
+  "home": {
+    "subtitle": "Gagnastaðlaorðabók Meta Kerfi"
+  },
+  "auth": {
+    "checking": "Athuga innskráningu…",
+    "googleUnlinked": "Þú ert innskráður með Google, en það er ekki enn tengt við Pi reikninginn þinn.",
+    "required": "Innskráning nauðsynleg.",
+    "requiredHint": "Innskráning nauðsynleg. Vinsamlegast skráðu þig inn með Pi reikningnum þínum í Pi Browser, eða með Google (Pi reikningstenging nauðsynleg) í venjulegum vafra.",
+    "piSignIn": "Skráðu þig inn með Pi reikningi",
+    "googleSignIn": "Skráðu þig inn með Google",
+    "signOut": "Skrá út",
+    "linkCheckFailed": "Tókst ekki að athuga tengingarstöðu (tímabundin villa). Vinsamlegast endurhladdu eftir smá stund."
+  },
+  "link": {
+    "title": "Reikningstenging",
+    "desc": "Tengir Pi reikninginn þinn í Pi Browser við Google reikninginn þinn í venjulegum vafra sem sama notanda. Eftir tengingu geturðu unnið á tölvu með því að skrá þig einfaldlega inn með Google.",
+    "codeFormTitle": "Sláðu inn Pi reikningstengingarkóða",
+    "codeFormHint": "Eftir að þú hefur skráð þig inn í Pi Browser skaltu slá inn 6 stafa kóðann sem gefinn var út á reikningstengingarskjánum innan 10 mínútna.",
+    "codeLabel": "Tengingarkóði",
+    "linked": "Tengt.",
+    "submit": "Tengja",
+    "issuerTitle": "Gefa út Google reikningstengingarkóða",
+    "issuerHint": "Eftir að þú hefur skráð þig inn með Google í venjulegum vafra skaltu slá inn þennan kóða til að tengja sem sama notanda (gildir í 10 mínútur).",
+    "minutesLeft": "U.þ.b. {minutes} mínútur eftir",
+    "issue": "Gefa út kóða",
+    "reissue": "Endurútgefa",
+    "linkedAs": "Google reikningurinn þinn er tengdur við Pi notanda <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Gagnastaðlaorðabók Meta Kerfi",
+    "headline1": "Án staðla geturðu ekki nefnt,",
+    "headline2": "án líkana geturðu ekki töflað.",
+    "lead": "Búðu til hugtök með samþykktum staðlaorðum, teiknaðu líkön með þeim hugtökum og búðu til DDL úr líkönunum. Mannfólkið ákveður, verkfæri framfylgja reglum.",
+    "flowTitle": "Svona tengist þetta",
+    "step": "Skref {n}",
+    "flow": {
+      "words": {
+        "nm": "Staðlaorð",
+        "desc": "Orð · Skammstafanir · Bönnuð orð"
+      },
+      "domains": {
+        "nm": "Staðlaðir lén",
+        "desc": "Tegund · Lengdarreglur"
+      },
+      "terms": {
+        "nm": "Staðlaðir hugtök",
+        "desc": "Orðasamsetning · Samþykki"
+      },
+      "model": {
+        "nm": "Gagnamódel",
+        "desc": "Huglægt · Rökrétt · Líkamlegt"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Eftir efnisflokki · Útgáfusamanburður"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Búa til eftir DBMS · Samþykkja framkvæmd"
+      }
+    },
+    "roleTitle": "Hvað þú getur gert eftir hlutverki",
+    "planTitle": "Verðáætlanir",
+    "planNote": "— Pi greiðsla á flokkunarkerfiseiningu, verð staðfest á greiðsluskjá",
+    "menu": {
+      "MENU_STD": "Staðlaorðabók",
+      "MENU_SQL": "SQL ritill",
+      "MENU_SET": "Stillingar · Saga",
+      "MENU_BAN": "Bönnuð orð",
+      "MENU_MODEL": "Módel · ERD · DDL",
+      "MENU_CHK": "Staðlaathugun",
+      "MENU_ADM": "Meðlimir · Samþykki"
+    },
+    "viewOnly": "{menu} (Aðeins skoðun)",
+    "footer": "Skráðu þig inn hér að ofan til að sjá verkefnin þín fyrir flokkunarkerfið þitt strax."
+  },
+  "dashboard": {
+    "loadFailed": "Tókst ekki að hlaða mælaborð",
+    "myAreas": "Mín flokkunarkerfi",
+    "planLine": "Áætlun {plan}",
+    "until": " · Til {date}",
+    "grace": "(Náðartími)",
+    "openArea": "Opna flokkunarkerfi →",
+    "todoTitle": "Mín röð",
+    "todoEmpty": "Aðeins skoðunarheimild — vinsamlegast skoðaðu staðla með því að nota stöðuna og flýtileiðirnar hér að neðan.",
+    "apvWait": "Staðlað samþykki í bið",
+    "apvWaitSub": "Orð · Lén · Hugtak · Kóðaumsókn",
+    "ddlWait": "DDL framkvæmd samþykki í bið",
+    "mineWait": "Mínar umsóknir í bið",
+    "mineRejected": "{count} hafnað síðustu 30 daga",
+    "model": "Gagnamódel",
+    "modelSub": "Verkefni · {count} einingar",
+    "stdTitle": "Staða staðlaorðabókar",
+    "stdBasis": "Samþykktur grunnur",
+    "shortcuts": "Flýtileiðir",
+    "recentTitle": "Nýlegar breytingar",
+    "allHistory": "Öll saga",
+    "noHistory": "Engin breytingasaga ennþá",
+    "justNow": "Rétt í þessu",
+    "minutesAgo": "Fyrir {n} mínútum",
+    "hoursAgo": "Fyrir {n} klukkustundum",
+    "daysAgo": "Fyrir {n} dögum",
+    "areaList": "Listi yfir flokkunarkerfi · Búa til nýtt"
+  },
+  "areaHome": {
+    "title": "Mín staðlaða flokkunarkerfi",
+    "loading": "Hleður",
+    "empty": "Engin flokkunarkerfi í þátttöku",
+    "open": "Opna",
+    "newTitle": "Nýtt flokkunarkerfi",
+    "namePlaceholder": "Nafn flokkunarkerfis (nauðsynlegt)",
+    "descPlaceholder": "Lýsing",
+    "create": "Búa til",
+    "created": "Flokkunarkerfi {name} búið til"
+  },
+  "nav": {
+    "label": "Valmynd flokkunarkerfis",
+    "expand": "Stækka neðri valmynd",
+    "expandWith": "Stækka neðri valmynd ({menu})",
+    "collapse": "Fella saman neðri valmynd",
+    "subOf": "{menu} Undirvirkni",
+    "groupTech": "Vöktun · SQL ritill",
+    "groupStd": "Staðlaorðabók",
+    "groupModel": "Módel",
+    "groupSet": "Stillingar",
+    "groupPlan": "Greiðsla",
+    "words": "Staðlaorð",
+    "bulk": "Magnskráning",
+    "domains": "Staðlaðir lén",
+    "keyDomains": "Lykillén",
+    "domainGroups": "Lénhópar",
+    "terms": "Staðlaðir hugtök",
+    "codes": "Staðlaðir kóðar",
+    "model": "Huglægt módel",
+    "prj": "Verkefni",
+    "subj": "Efnisflokkar",
+    "coreEnt": "Kjarnaeiningar",
+    "entityClasses": "Einingaflokkar",
+    "logical": "Rökrétt módel",
+    "physical": "Líkamlegt módel",
+    "erd": "ERD",
+    "ddl": "DDL kynslóð",
+    "monitor": "Vöktun",
+    "monApp": "Umsókn",
+    "monSrv": "Þjónn",
+    "monDb": "Gagnagrunnur",
+    "monUrl": "URL",
+    "monFix": "AI leiðréttingarsaga",
+    "sql": "SQL ritill",
+    "settings": "Stillingar",
+    "history": "Saga",
+    "forbidden": "Bönnuð orð",
+    "banBulk": "Magnskráning bannaðra orða",
+    "check": "Staðlaathugun",
+    "reverse": "Öfug verkfræði",
+    "members": "Meðlimir",
+    "approvals": "Samþykki",
+    "plan": "Greiðsla"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Kerfisstjóri",
+      "DA": "Gagnaarkitekt",
+      "STD": "Staðlastjóri",
+      "MDL": "Módelari",
+      "QLT": "Gæðastjóri",
+      "MIG": "Flutningsstjóri",
+      "VIEWER": "Skoðandi"
+    },
+    "roleDesc": {
+      "SYS": "Stjórna flokkunarkerfisstillingum · lénhópum · skammstöfunum · meðlimum, umsóknum · samþykktum (þar á meðal tafarlausu samþykki), magnskráningu, SQL skrifum, öllum valmyndum",
+      "DA": "Heildarstaðlastefna: Sækja um · samþykkja orð · lén · hugtök (getur valið tafarlaust samþykki við umsókn), magnskráning, stjórna stillingum · meðlimum, SQL skrifum, öllum valmyndum",
+      "STD": "Sækja um orð · lén · hugtök, magnskráning, stillingar, SQL skrif, allar valmyndir (engin samþykkisréttindi)",
+      "MDL": "Sækja um skráningu · breytingu · eyðingu orða · léna · hugtaka · líkana, magnskráningu, stillingar, SQL skrif, allar valmyndir (engin samþykkisréttindi)",
+      "QLT": "Sækja um · SQL skrif, SQL ritill · líkanagerð · stillingarvalmyndir (gæðagreiningaraðgerðir á síðari stigum)",
+      "MIG": "Sækja um · SQL skrif, SQL ritill valmynd (fyrir flutningakortlagningu)",
+      "VIEWER": "Aðeins skoða staðlaorðabók"
+    },
+    "plan": {
+      "FREE": "Ókeypis (Skoða)",
+      "P1": "Hönnuður",
+      "P2": "Staðlastjóri",
+      "P3": "Módelari",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Skrá",
+      "UPD": "Breyta",
+      "DEL": "Eyða"
+    },
+    "tgt": {
+      "AREA": "Flokkunarkerfi",
+      "MBR": "Meðlimur",
+      "DIC": "Orð",
+      "DOM": "Lén",
+      "DOM_GRP": "Lénhópur",
+      "TERM": "Hugtak",
+      "CD": "Staðlaður kóði",
+      "CD_VAL": "Kóðagildi",
+      "ABBR": "Skammstöfun",
+      "PRJ": "Verkefni",
+      "SUBJ": "Efnisflokkur",
+      "ENT": "Eining",
+      "REL": "Samband",
+      "ATTR": "Eiginleiki",
+      "VER": "Módelútgáfa",
+      "PHY": "Líkamlegt módel",
+      "DDL": "DDL framkvæmd",
+      "RVS": "Öfug verkfræði",
+      "SQL": "SQL",
+      "DBCN": "DB tenging",
+      "AGT": "Umboðsmaður",
+      "MONURL": "URL vöktun"
+    }
+  }
+}

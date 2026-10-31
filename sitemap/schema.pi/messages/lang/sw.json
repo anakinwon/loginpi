@@ -4,11 +4,6 @@
     "description": "Mfumo wa Meta wa Kamusi ya Viwango vya Data"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Badilisha Lugha",
-      "search": "Tafuta Lugha",
-      "empty": "Hakuna matokeo ya utafutaji"
-    },
     "loading": "Inapakia…",
     "requestFailed": "Ombi limeshindwa",
     "home": "Nyumbani",

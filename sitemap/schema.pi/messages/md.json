@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Sistem meta dicționar standard de date"
+  },
+  "common": {
+    "loading": "Se încarcă…",
+    "requestFailed": "Solicitarea a eșuat",
+    "home": "Acasă",
+    "goHome": "Mergi acasă"
+  },
+  "home": {
+    "subtitle": "Sistem meta dicționar standard de date"
+  },
+  "auth": {
+    "checking": "Se verifică autentificarea…",
+    "googleUnlinked": "Sunteți autentificat cu Google, dar nu este încă legat de contul dvs. Pi.",
+    "required": "Autentificarea este necesară.",
+    "requiredHint": "Autentificarea este necesară. Vă rugăm să vă autentificați cu contul dvs. Pi în Pi Browser, sau cu Google (este necesară legarea contului Pi) într-un browser obișnuit.",
+    "piSignIn": "Autentificați-vă cu contul Pi",
+    "googleSignIn": "Autentificați-vă cu Google",
+    "signOut": "Deconectare",
+    "linkCheckFailed": "Nu s-a putut verifica starea de legare (eroare temporară). Vă rugăm să reîmprospătați în scurt timp."
+  },
+  "link": {
+    "title": "Legare cont",
+    "desc": "Leagă contul dvs. Pi din Pi Browser cu contul dvs. Google dintr-un browser obișnuit ca fiind același utilizator. După legare, puteți lucra pe PC doar autentificându-vă cu Google.",
+    "codeFormTitle": "Introduceți codul de legare a contului Pi",
+    "codeFormHint": "După autentificarea în Pi Browser, introduceți codul de 6 cifre emis pe ecranul de legare a contului în decurs de 10 minute.",
+    "codeLabel": "Cod de legare",
+    "linked": "Legat.",
+    "submit": "Leagă",
+    "issuerTitle": "Emite cod de legare a contului Google",
+    "issuerHint": "După autentificarea cu Google într-un browser obișnuit, introduceți acest cod pentru a vă conecta ca același utilizator (valid 10 minute).",
+    "minutesLeft": "Aproximativ {minutes} minute rămase",
+    "issue": "Emite cod",
+    "reissue": "Reemite",
+    "linkedAs": "Contul dvs. Google este legat de utilizatorul Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Sistem meta dicționar standard de date",
+    "headline1": "Fără standarde, nu poți denumi,",
+    "headline2": "fără modele, nu poți tabela.",
+    "lead": "Creați termeni cu cuvinte standard aprobate, desenați modele cu acești termeni și generați DDL din modele. Oamenii decid, instrumentele aplică regulile.",
+    "flowTitle": "Așa se conectează",
+    "step": "Pasul {n}",
+    "flow": {
+      "words": {
+        "nm": "Cuvinte standard",
+        "desc": "Cuvinte · Abrevieri · Cuvinte interzise"
+      },
+      "domains": {
+        "nm": "Domenii standard",
+        "desc": "Tip · Reguli de lungime"
+      },
+      "terms": {
+        "nm": "Termeni standard",
+        "desc": "Combinație de cuvinte · Aprobare"
+      },
+      "model": {
+        "nm": "Model de date",
+        "desc": "Conceptual · Logic · Fizic"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Pe zonă de subiect · Comparație versiuni"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generare pe DBMS · Aprobare execuție"
+      }
+    },
+    "roleTitle": "Ce puteți face pe rol",
+    "planTitle": "Planuri de prețuri",
+    "planNote": "— Plată Pi pe unitate de sistem de clasificare, prețul confirmat pe ecranul de plată",
+    "menu": {
+      "MENU_STD": "Dicționar standard",
+      "MENU_SQL": "Editor SQL",
+      "MENU_SET": "Setări · Istoric",
+      "MENU_BAN": "Cuvinte interzise",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Verificare standard",
+      "MENU_ADM": "Membri · Aprobări"
+    },
+    "viewOnly": "{menu} (Doar vizualizare)",
+    "footer": "Autentificați-vă mai sus pentru a vedea imediat sarcinile dvs. pentru sistemul dvs. de clasificare."
+  },
+  "dashboard": {
+    "loadFailed": "Nu s-a putut încărca tabloul de bord",
+    "myAreas": "Sistemele mele de clasificare",
+    "planLine": "Plan {plan}",
+    "until": " · Până la {date}",
+    "grace": "(Perioadă de grație)",
+    "openArea": "Deschide sistemul de clasificare →",
+    "todoTitle": "Rândul meu",
+    "todoEmpty": "Doar permisiune de vizualizare — vă rugăm să navigați prin standarde folosind starea și scurtăturile de mai jos.",
+    "apvWait": "Aprobare standard în așteptare",
+    "apvWaitSub": "Cuvânt · Domeniu · Termen · Cerere cod",
+    "ddlWait": "Aprobare execuție DDL în așteptare",
+    "mineWait": "Cererile mele în așteptare",
+    "mineRejected": "{count} respinse în ultimele 30 de zile",
+    "model": "Model de date",
+    "modelSub": "Proiecte · {count} Entități",
+    "stdTitle": "Starea dicționarului standard",
+    "stdBasis": "Bază aprobată",
+    "shortcuts": "Scurtături",
+    "recentTitle": "Modificări recente",
+    "allHistory": "Istoric complet",
+    "noHistory": "Încă nu există istoric de modificări",
+    "justNow": "Chiar acum",
+    "minutesAgo": "Acum {n} minute",
+    "hoursAgo": "Acum {n} ore",
+    "daysAgo": "Acum {n} zile",
+    "areaList": "Listă sisteme de clasificare · Creare nouă"
+  },
+  "areaHome": {
+    "title": "Sistemele mele de clasificare standard",
+    "loading": "Se încarcă",
+    "empty": "Nu există sisteme de clasificare la care să participați",
+    "open": "Deschide",
+    "newTitle": "Sistem de clasificare nou",
+    "namePlaceholder": "Nume sistem de clasificare (obligatoriu)",
+    "descPlaceholder": "Descriere",
+    "create": "Creează",
+    "created": "Sistemul de clasificare {name} a fost creat"
+  },
+  "nav": {
+    "label": "Meniu sistem de clasificare",
+    "expand": "Extinde meniul de jos",
+    "expandWith": "Extinde meniul de jos ({menu})",
+    "collapse": "Restrânge meniul de jos",
+    "subOf": "Sub-funcții {menu}",
+    "groupTech": "Monitorizare · Editor SQL",
+    "groupStd": "Dicționar standard",
+    "groupModel": "Model",
+    "groupSet": "Setări",
+    "groupPlan": "Plată",
+    "words": "Cuvinte standard",
+    "bulk": "Înregistrare în masă",
+    "domains": "Domenii standard",
+    "keyDomains": "Domenii cheie",
+    "domainGroups": "Grupuri de domenii",
+    "terms": "Termeni standard",
+    "codes": "Coduri standard",
+    "model": "Model conceptual",
+    "prj": "Proiecte",
+    "subj": "Zone de subiect",
+    "coreEnt": "Entități de bază",
+    "entityClasses": "Clasificatoare de entități",
+    "logical": "Model logic",
+    "physical": "Model fizic",
+    "erd": "ERD",
+    "ddl": "Generare DDL",
+    "monitor": "Monitorizare",
+    "monApp": "Aplicație",
+    "monSrv": "Server",
+    "monDb": "Bază de date",
+    "monUrl": "URL",
+    "monFix": "Istoric corecții AI",
+    "sql": "Editor SQL",
+    "settings": "Setări",
+    "history": "Istoric",
+    "forbidden": "Cuvinte interzise",
+    "banBulk": "Înregistrare în masă cuvinte interzise",
+    "check": "Verificare standard",
+    "reverse": "Inginerie inversă",
+    "members": "Membri",
+    "approvals": "Aprobări",
+    "plan": "Plată"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Administrator de sistem",
+      "DA": "Arhitect de date",
+      "STD": "Manager de standarde",
+      "MDL": "Modelator",
+      "QLT": "Manager de calitate",
+      "MIG": "Manager de migrație",
+      "VIEWER": "Vizualizator"
+    },
+    "roleDesc": {
+      "SYS": "Gestionează setările sistemului de clasificare · grupuri de domenii · abrevieri · membri, aplicații · aprobări (inclusiv aprobare imediată), înregistrare în masă, scriere SQL, toate meniurile",
+      "DA": "Politica generală de standarde: Aplică · aprobă cuvinte · domenii · termeni (poate selecta aprobare imediată la aplicare), înregistrare în masă, gestionează setări · membri, scriere SQL, toate meniurile",
+      "STD": "Aplică pentru cuvinte · domenii · termeni, înregistrare în masă, setări, scriere SQL, toate meniurile (fără drepturi de aprobare)",
+      "MDL": "Aplică pentru înregistrare · modificare · ștergere de cuvinte · domenii · termeni · modele, înregistrare în masă, setări, scriere SQL, toate meniurile (fără drepturi de aprobare)",
+      "QLT": "Aplică · scriere SQL, meniuri editor SQL · modelare · setări (funcțiile de diagnosticare a calității în etapele viitoare)",
+      "MIG": "Aplică · scriere SQL, meniul editor SQL (pentru maparea migrației)",
+      "VIEWER": "Doar vizualizare dicționar standard"
+    },
+    "plan": {
+      "FREE": "Gratuit (Vizualizare)",
+      "P1": "Dezvoltator",
+      "P2": "Manager de standarde",
+      "P3": "Modelator",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Înregistrează",
+      "UPD": "Modifică",
+      "DEL": "Șterge"
+    },
+    "tgt": {
+      "AREA": "Sistem de clasificare",
+      "MBR": "Membru",
+      "DIC": "Cuvânt",
+      "DOM": "Domeniu",
+      "DOM_GRP": "Grup de domenii",
+      "TERM": "Termen",
+      "CD": "Cod standard",
+      "CD_VAL": "Valoare cod",
+      "ABBR": "Abreviere",
+      "PRJ": "Proiect",
+      "SUBJ": "Zonă de subiect",
+      "ENT": "Entitate",
+      "REL": "Relație",
+      "ATTR": "Atribut",
+      "VER": "Versiune model",
+      "PHY": "Model fizic",
+      "DDL": "Execuție DDL",
+      "RVS": "Inginerie inversă",
+      "SQL": "SQL",
+      "DBCN": "Conexiune DB",
+      "AGT": "Agent",
+      "MONURL": "Monitorizare URL"
+    }
+  }
+}

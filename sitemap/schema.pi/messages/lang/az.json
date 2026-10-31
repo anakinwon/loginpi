@@ -4,11 +4,6 @@
     "description": "Məlumat Standart Lüğət Meta Sistemi"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Dili dəyişdir",
-      "search": "Dil axtar",
-      "empty": "Axtarış nəticəsi yoxdur"
-    },
     "loading": "Yüklənir…",
     "requestFailed": "Sorğu uğursuz oldu",
     "home": "Ana səhifə",

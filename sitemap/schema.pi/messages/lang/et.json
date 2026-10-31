@@ -4,11 +4,6 @@
     "description": "Andmestandardite sõnastiku metasüsteem"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Muuda keelt",
-      "search": "Otsi keelt",
-      "empty": "Otsingutulemusi ei leitud"
-    },
     "loading": "Laadimine…",
     "requestFailed": "Päring ebaõnnestus",
     "home": "Avaleht",

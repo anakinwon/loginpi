@@ -4,11 +4,6 @@
     "description": "Metasystem för datastandardordbok"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Ändra språk",
-      "search": "Sök språk",
-      "empty": "Inga sökresultat"
-    },
     "loading": "Laddar…",
     "requestFailed": "Begäran misslyckades",
     "home": "Hem",

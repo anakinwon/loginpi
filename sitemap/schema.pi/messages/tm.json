@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Maglumat Standart Sözlügi Meta Ulgamy"
+  },
+  "common": {
+    "loading": "Ýüklenýär…",
+    "requestFailed": "Haýyş şowsuz boldy",
+    "home": "Baş sahypa",
+    "goHome": "Baş sahypa git"
+  },
+  "home": {
+    "subtitle": "Maglumat Standart Sözlügi Meta Ulgamy"
+  },
+  "auth": {
+    "checking": "Giriş barlanylýar…",
+    "googleUnlinked": "Google bilen girdiňiz, ýöne ol entek Pi hasabyňyz bilen baglanyşykly däl.",
+    "required": "Giriş talap edilýär.",
+    "requiredHint": "Giriş talap edilýär. Pi Browser-de Pi hasabyňyz bilen ýa-da adaty brauzerde Google (Pi hasaby baglanyşdyrmak talap edilýär) bilen giriň.",
+    "piSignIn": "Pi hasaby bilen giriň",
+    "googleSignIn": "Google bilen giriň",
+    "signOut": "Çykyş",
+    "linkCheckFailed": "Baglanyşyk ýagdaýyny barlamak şowsuz boldy (wagtlaýyn ýalňyşlyk). Biraz wagtdan täzeläň."
+  },
+  "link": {
+    "title": "Hasaby baglanyşdyrmak",
+    "desc": "Pi Browser-daky Pi hasabyňyzy adaty brauzerdäki Google hasabyňyz bilen bir ulanyjy hökmünde birikdirýär. Baglanyşdyrylandan soň, kompýuterde diňe Google bilen girip işläp bilersiňiz.",
+    "codeFormTitle": "Pi hasabyny baglanyşdyrmak koduny giriziň",
+    "codeFormHint": "Pi Browser-de gireniňizden soň, hasaby baglanyşdyrmak ekranynda berlen 6 belgili kody 10 minudyň içinde giriziň.",
+    "codeLabel": "Baglanyşyk kody",
+    "linked": "Baglanyşdyryldy.",
+    "submit": "Baglanyşdyr",
+    "issuerTitle": "Google hasabyny baglanyşdyrmak koduny beriň",
+    "issuerHint": "Adaty brauzerde Google bilen gireniňizden soň, bu kody giriziň we bir ulanyjy hökmünde birikdiriň (10 minut dowamly).",
+    "minutesLeft": "Takmynan {minutes} minut galdy",
+    "issue": "Kody beriň",
+    "reissue": "Täzeden beriň",
+    "linkedAs": "Siziň Google hasabyňyz Pi ulanyjysy <b>{name}</b> bilen baglanyşykly."
+  },
+  "intro": {
+    "kicker": "Maglumat Standart Sözlügi Meta Ulgamy",
+    "headline1": "Standartlar bolmasa, at berip bilmersiňiz,",
+    "headline2": "modeller bolmasa, tablisalar döredip bilmersiňiz.",
+    "lead": "Tassyklanan standart sözler bilen terminleri dörediň, şol terminler bilen modelleri çyzyň we modellerden DDL dörediň. Adamlar karar berýär, gurallar düzgünleri ýerine ýetirýär.",
+    "flowTitle": "Şeýle birikdirilýär",
+    "step": "Ädim {n}",
+    "flow": {
+      "words": {
+        "nm": "Standart Sözler",
+        "desc": "Sözler · Gysgaltmalar · Gadagan edilen sözler"
+      },
+      "domains": {
+        "nm": "Standart Domenler",
+        "desc": "Görnüş · Uzynlyk Düzgünleri"
+      },
+      "terms": {
+        "nm": "Standart Terminler",
+        "desc": "Söz Birleşmesi · Tassyklama"
+      },
+      "model": {
+        "nm": "Maglumat Modeli",
+        "desc": "Konseptual · Logiki · Fiziki"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Tema Boýunça · Wersiýa Deňeşdirmesi"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "DBMS boýunça döretmek · Ýerine ýetirmegi tassyklamak"
+      }
+    },
+    "roleTitle": "Rollar boýunça näme edip bilersiňiz",
+    "planTitle": "Nyrh meýilnamalary",
+    "planNote": "— Klassifikasiýa ulgamynyň birligi üçin Pi tölegi, töleg ekranynda tassyklanan baha",
+    "menu": {
+      "MENU_STD": "Standart Sözlük",
+      "MENU_SQL": "SQL Redaktor",
+      "MENU_SET": "Sazlamalar · Taryh",
+      "MENU_BAN": "Gadagan edilen sözler",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Standart Barlag",
+      "MENU_ADM": "Agzalar · Tassyklamalar"
+    },
+    "viewOnly": "{menu} (Diňe görmek)",
+    "footer": "Ýokarda giriň we klassifikasiýa ulgamyňyz üçin wezipeleriňizi derrew görüň."
+  },
+  "dashboard": {
+    "loadFailed": "Dolandyryş panelini ýüklemek şowsuz boldy",
+    "myAreas": "Meniň Klassifikasiýa Ulgamlarym",
+    "planLine": "Meýilnama {plan}",
+    "until": " · {date} çenli",
+    "grace": "(Ýeňillik döwri)",
+    "openArea": "Klassifikasiýa ulgamyny aç →",
+    "todoTitle": "Meniň nobatym",
+    "todoEmpty": "Diňe görmek ygtyýarnamasy — aşakdaky ýagdaý we gysga ýollar arkaly standartlary gözläň.",
+    "apvWait": "Standart tassyklamaga garaşylýar",
+    "apvWaitSub": "Söz · Domen · Termin · Kod arza",
+    "ddlWait": "DDL ýerine ýetirmegi tassyklamaga garaşylýar",
+    "mineWait": "Meniň arzalarym garaşylýar",
+    "mineRejected": "Soňky 30 günde {count} ret edildi",
+    "model": "Maglumat Modeli",
+    "modelSub": "Taslamalar · {count} Entitet",
+    "stdTitle": "Standart Sözlük Ýagdaýy",
+    "stdBasis": "Tassyklanan Esas",
+    "shortcuts": "Gysga ýollar",
+    "recentTitle": "Soňky Üýtgeşmeler",
+    "allHistory": "Doly Taryh",
+    "noHistory": "Entäk üýtgeşme taryhy ýok",
+    "justNow": "Häzirki wagtda",
+    "minutesAgo": "{n} minut öň",
+    "hoursAgo": "{n} sagat öň",
+    "daysAgo": "{n} gün öň",
+    "areaList": "Klassifikasiýa Ulgamynyň Sanawy · Täze döretmek"
+  },
+  "areaHome": {
+    "title": "Meniň Standart Klassifikasiýa Ulgamlarym",
+    "loading": "Ýüklenýär",
+    "empty": "Gatnaşýan klassifikasiýa ulgamy ýok",
+    "open": "Aç",
+    "newTitle": "Täze Klassifikasiýa Ulgamy",
+    "namePlaceholder": "Klassifikasiýa ulgamynyň ady (hökmany)",
+    "descPlaceholder": "Beýan",
+    "create": "Döret",
+    "created": "Klassifikasiýa ulgamy {name} döredildi"
+  },
+  "nav": {
+    "label": "Klassifikasiýa Ulgamynyň Menýusy",
+    "expand": "Aşaky menýuny giňeltmek",
+    "expandWith": "Aşaky menýuny giňeltmek ({menu})",
+    "collapse": "Aşaky menýuny ýygnamak",
+    "subOf": "{menu} Kiçi funksiýalar",
+    "groupTech": "Gözegçilik · SQL Redaktor",
+    "groupStd": "Standart Sözlük",
+    "groupModel": "Model",
+    "groupSet": "Sazlamalar",
+    "groupPlan": "Töleg",
+    "words": "Standart Sözler",
+    "bulk": "Toplaýyn Hasaba Alyş",
+    "domains": "Standart Domenler",
+    "keyDomains": "Esasy Domenler",
+    "domainGroups": "Domen Toparlary",
+    "terms": "Standart Terminler",
+    "codes": "Standart Kodlar",
+    "model": "Konseptual Model",
+    "prj": "Taslamalar",
+    "subj": "Tema Bölekleri",
+    "coreEnt": "Esasy Entitetler",
+    "entityClasses": "Entitet Klassifikatorlary",
+    "logical": "Logiki Model",
+    "physical": "Fiziki Model",
+    "erd": "ERD",
+    "ddl": "DDL Döretmek",
+    "monitor": "Gözegçilik",
+    "monApp": "Programma",
+    "monSrv": "Serwer",
+    "monDb": "Maglumat bazasy",
+    "monUrl": "URL",
+    "monFix": "AI Düzediş Taryhy",
+    "sql": "SQL Redaktor",
+    "settings": "Sazlamalar",
+    "history": "Taryh",
+    "forbidden": "Gadagan edilen sözler",
+    "banBulk": "Toplaýyn Gadagan edilen sözleri hasaba alyş",
+    "check": "Standart Barlag",
+    "reverse": "Revers Inženerçilik",
+    "members": "Agzalar",
+    "approvals": "Tassyklamalar",
+    "plan": "Töleg"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Ulgam Dolandyryjysy",
+      "DA": "Maglumat Arhitektor",
+      "STD": "Standart Dolandyryjysy",
+      "MDL": "Modeller",
+      "QLT": "Hili Dolandyryjysy",
+      "MIG": "Göçüriş Dolandyryjysy",
+      "VIEWER": "Görkeziji"
+    },
+    "roleDesc": {
+      "SYS": "Klassifikasiýa ulgamynyň sazlamalaryny · domen toparlaryny · gysgaltmalary · agzalary, arzalary · tassyklamalary (derrew tassyklamany goşmak bilen), toplaýyn hasaba alyşy, SQL ýazmagy, ähli menýulary dolandyrmak",
+      "DA": "Umumy standart syýasaty: Sözleri · domenleri · terminleri ulanmak · tassyklamak (arza berilende derrew tassyklamany saýlap bolýar), toplaýyn hasaba alyş, sazlamalary · agzalary dolandyrmak, SQL ýazmak, ähli menýular",
+      "STD": "Sözler · domenler · terminler üçin arza bermek, toplaýyn hasaba alyş, sazlamalar, SQL ýazmak, ähli menýular (tassyklama hukugy ýok)",
+      "MDL": "Sözleri · domenleri · terminleri · modelleri hasaba almak · üýtgetmek · pozmak üçin arza bermek, toplaýyn hasaba alyş, sazlamalar, SQL ýazmak, ähli menýular (tassyklama hukugy ýok)",
+      "QLT": "Arza bermek · SQL ýazmak, SQL redaktor · modelleme · sazlamalar menýulary (hil diagnostika funksiýalary geljekki tapgyrlarda)",
+      "MIG": "Arza bermek · SQL ýazmak, SQL redaktor menýusy (göçüriş kartalaşdyrmak üçin)",
+      "VIEWER": "Diňe standart sözlügi görmek"
+    },
+    "plan": {
+      "FREE": "Mugt (Görkez)",
+      "P1": "Öndüriji",
+      "P2": "Standart Dolandyryjysy",
+      "P3": "Modeller",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Hasaba al",
+      "UPD": "Üýtget",
+      "DEL": "Poz"
+    },
+    "tgt": {
+      "AREA": "Klassifikasiýa Ulgamy",
+      "MBR": "Agza",
+      "DIC": "Söz",
+      "DOM": "Domen",
+      "DOM_GRP": "Domen Topary",
+      "TERM": "Termin",
+      "CD": "Standart Kod",
+      "CD_VAL": "Kod Baha",
+      "ABBR": "Gysgaltma",
+      "PRJ": "Taslama",
+      "SUBJ": "Tema Bölegi",
+      "ENT": "Entitet",
+      "REL": "Gatnaşyk",
+      "ATTR": "Atribut",
+      "VER": "Model Wersiýasy",
+      "PHY": "Fiziki Model",
+      "DDL": "DDL Ýerine ýetirmek",
+      "RVS": "Revers Inženerçilik",
+      "SQL": "SQL",
+      "DBCN": "DB Birikmesi",
+      "AGT": "Agent",
+      "MONURL": "URL Gözegçiligi"
+    }
+  }
+}

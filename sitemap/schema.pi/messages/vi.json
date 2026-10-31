@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Hệ thống siêu dữ liệu từ điển tiêu chuẩn"
+  },
+  "common": {
+    "loading": "Đang tải…",
+    "requestFailed": "Yêu cầu thất bại",
+    "home": "Trang chủ",
+    "goHome": "Về trang chủ"
+  },
+  "home": {
+    "subtitle": "Hệ thống siêu dữ liệu từ điển tiêu chuẩn"
+  },
+  "auth": {
+    "checking": "Đang kiểm tra đăng nhập…",
+    "googleUnlinked": "Bạn đã đăng nhập Google nhưng chưa liên kết với tài khoản Pi.",
+    "required": "Cần đăng nhập.",
+    "requiredHint": "Cần đăng nhập. Vui lòng đăng nhập bằng tài khoản Pi trong Pi Browser, hoặc bằng Google (cần liên kết tài khoản Pi) trong trình duyệt thông thường.",
+    "piSignIn": "Đăng nhập bằng tài khoản Pi",
+    "googleSignIn": "Đăng nhập Google",
+    "signOut": "Đăng xuất",
+    "linkCheckFailed": "Không thể kiểm tra trạng thái liên kết (lỗi tạm thời). Vui lòng làm mới sau một lát."
+  },
+  "link": {
+    "title": "Liên kết tài khoản",
+    "desc": "Liên kết tài khoản Pi trong Pi Browser với tài khoản Google trong trình duyệt thông thường dưới cùng một người dùng. Sau khi liên kết, bạn có thể làm việc trên PC chỉ bằng cách đăng nhập Google.",
+    "codeFormTitle": "Nhập mã liên kết tài khoản Pi",
+    "codeFormHint": "Sau khi đăng nhập trong Pi Browser, vui lòng nhập mã 6 chữ số được cấp trên màn hình liên kết tài khoản trong vòng 10 phút.",
+    "codeLabel": "Mã liên kết",
+    "linked": "Đã liên kết.",
+    "submit": "Liên kết",
+    "issuerTitle": "Cấp mã liên kết tài khoản Google",
+    "issuerHint": "Sau khi đăng nhập Google trong trình duyệt thông thường, nhập mã này để liên kết dưới cùng một người dùng (có hiệu lực 10 phút).",
+    "minutesLeft": "Còn khoảng {minutes} phút",
+    "issue": "Cấp mã",
+    "reissue": "Cấp lại",
+    "linkedAs": "Tài khoản Google đã được liên kết với người dùng Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Hệ thống siêu dữ liệu từ điển tiêu chuẩn",
+    "headline1": "Nếu không có tiêu chuẩn, không thể tạo tên,",
+    "headline2": "Nếu không có mô hình, không thể tạo bảng.",
+    "lead": "Tạo thuật ngữ bằng các từ tiêu chuẩn đã được phê duyệt, vẽ mô hình bằng các thuật ngữ đó và tạo DDL từ mô hình. Con người đưa ra quyết định và công cụ tuân thủ các quy tắc.",
+    "flowTitle": "Quy trình như sau",
+    "step": "Bước {n}",
+    "flow": {
+      "words": {
+        "nm": "Từ tiêu chuẩn",
+        "desc": "Từ · Viết tắt · Từ cấm"
+      },
+      "domains": {
+        "nm": "Miền tiêu chuẩn",
+        "desc": "Quy tắc kiểu · độ dài"
+      },
+      "terms": {
+        "nm": "Thuật ngữ tiêu chuẩn",
+        "desc": "Kết hợp từ · Phê duyệt"
+      },
+      "model": {
+        "nm": "Mô hình dữ liệu",
+        "desc": "Khái niệm · Logic · Vật lý"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Theo lĩnh vực chủ đề · So sánh phiên bản"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Tạo theo DBMS · Thực thi phê duyệt"
+      }
+    },
+    "roleTitle": "Những việc có thể làm theo vai trò",
+    "planTitle": "Gói cước",
+    "planNote": "— Thanh toán Pi theo đơn vị phân loại, giá cả xem trên màn hình thanh toán",
+    "menu": {
+      "MENU_STD": "Từ điển tiêu chuẩn",
+      "MENU_SQL": "Trình chỉnh sửa SQL",
+      "MENU_SET": "Cài đặt · Lịch sử",
+      "MENU_BAN": "Từ cấm",
+      "MENU_MODEL": "Mô hình · ERD · DDL",
+      "MENU_CHK": "Kiểm tra tiêu chuẩn",
+      "MENU_ADM": "Thành viên · Phê duyệt"
+    },
+    "viewOnly": "{menu} (Chỉ xem)",
+    "footer": "Đăng nhập ở trên để xem ngay công việc của phân loại của tôi."
+  },
+  "dashboard": {
+    "loadFailed": "Không thể tải bảng điều khiển",
+    "myAreas": "Phân loại của tôi",
+    "planLine": "Gói cước {plan}",
+    "until": " · Đến {date}",
+    "grace": "(Đang trong thời gian gia hạn)",
+    "openArea": "Mở phân loại →",
+    "todoTitle": "Đến lượt tôi",
+    "todoEmpty": "Đây là quyền xem — vui lòng tìm kiếm tiêu chuẩn bằng trạng thái và lối tắt bên dưới.",
+    "apvWait": "Chờ phê duyệt tiêu chuẩn",
+    "apvWaitSub": "Đăng ký từ · miền · thuật ngữ · mã",
+    "ddlWait": "Chờ phê duyệt thực thi DDL",
+    "mineWait": "Đăng ký của tôi đang chờ",
+    "mineRejected": "{count} mục bị từ chối trong 30 ngày qua",
+    "model": "Mô hình dữ liệu",
+    "modelSub": "Dự án · {count} thực thể",
+    "stdTitle": "Trạng thái từ điển tiêu chuẩn",
+    "stdBasis": "Dựa trên phê duyệt hoàn tất",
+    "shortcuts": "Lối tắt",
+    "recentTitle": "Thay đổi gần đây",
+    "allHistory": "Toàn bộ lịch sử",
+    "noHistory": "Chưa có lịch sử thay đổi nào",
+    "justNow": "Vừa xong",
+    "minutesAgo": "{n} phút trước",
+    "hoursAgo": "{n} giờ trước",
+    "daysAgo": "{n} ngày trước",
+    "areaList": "Danh sách phân loại · Tạo mới"
+  },
+  "areaHome": {
+    "title": "Phân loại tiêu chuẩn của tôi",
+    "loading": "Đang tải",
+    "empty": "Không có phân loại nào đang tham gia",
+    "open": "Mở",
+    "newTitle": "Phân loại mới",
+    "namePlaceholder": "Tên phân loại (bắt buộc)",
+    "descPlaceholder": "Mô tả",
+    "create": "Tạo",
+    "created": "Đã tạo phân loại {name}"
+  },
+  "nav": {
+    "label": "Menu phân loại",
+    "expand": "Mở rộng menu dưới",
+    "expandWith": "Mở rộng menu dưới ({menu})",
+    "collapse": "Thu gọn menu dưới",
+    "subOf": "Chức năng con của {menu}",
+    "groupTech": "Giám sát · Trình chỉnh sửa SQL",
+    "groupStd": "Từ điển tiêu chuẩn",
+    "groupModel": "Mô hình",
+    "groupSet": "Cài đặt",
+    "groupPlan": "Thanh toán",
+    "words": "Từ tiêu chuẩn",
+    "bulk": "Đăng ký hàng loạt",
+    "domains": "Miền tiêu chuẩn",
+    "keyDomains": "Miền chính",
+    "domainGroups": "Nhóm miền",
+    "terms": "Thuật ngữ tiêu chuẩn",
+    "codes": "Mã tiêu chuẩn",
+    "model": "Mô hình khái niệm",
+    "prj": "Dự án",
+    "subj": "Lĩnh vực chủ đề",
+    "coreEnt": "Thực thể cốt lõi",
+    "entityClasses": "Phân loại thực thể",
+    "logical": "Mô hình logic",
+    "physical": "Mô hình vật lý",
+    "erd": "ERD",
+    "ddl": "Tạo DDL",
+    "monitor": "Giám sát",
+    "monApp": "Ứng dụng",
+    "monSrv": "Máy chủ",
+    "monDb": "Cơ sở dữ liệu",
+    "monUrl": "URL",
+    "monFix": "Lịch sử sửa lỗi AI",
+    "sql": "Trình chỉnh sửa SQL",
+    "settings": "Cài đặt",
+    "history": "Lịch sử",
+    "forbidden": "Từ cấm",
+    "banBulk": "Đăng ký từ cấm hàng loạt",
+    "check": "Kiểm tra tiêu chuẩn",
+    "reverse": "Thiết kế ngược",
+    "members": "Thành viên",
+    "approvals": "Phê duyệt",
+    "plan": "Thanh toán"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Người quản lý hệ thống",
+      "DA": "Kiến trúc sư dữ liệu",
+      "STD": "Người quản lý tiêu chuẩn",
+      "MDL": "Người tạo mô hình",
+      "QLT": "Người quản lý chất lượng",
+      "MIG": "Người quản lý di chuyển",
+      "VIEWER": "Người xem"
+    },
+    "roleDesc": {
+      "SYS": "Quản lý cài đặt phân loại · nhóm miền · viết tắt · thành viên, đăng ký · phê duyệt (bao gồm phê duyệt ngay lập tức), đăng ký hàng loạt, viết SQL, tất cả các menu",
+      "DA": "Tổng hợp chính sách tiêu chuẩn: Đăng ký · phê duyệt từ · miền · thuật ngữ (có thể chọn phê duyệt ngay lập tức khi đăng ký), đăng ký hàng loạt, quản lý cài đặt · thành viên, viết SQL, tất cả các menu",
+      "STD": "Đăng ký từ · miền · thuật ngữ, đăng ký hàng loạt, cài đặt, viết SQL, tất cả các menu (không có quyền phê duyệt)",
+      "MDL": "Đăng ký · sửa đổi · xóa từ · miền · thuật ngữ · mô hình, đăng ký hàng loạt, cài đặt, viết SQL, tất cả các menu (không có quyền phê duyệt)",
+      "QLT": "Đăng ký · viết SQL, menu trình chỉnh sửa SQL · mô hình hóa · cài đặt (chức năng chẩn đoán chất lượng sẽ có trong giai đoạn sau)",
+      "MIG": "Đăng ký · viết SQL, menu trình chỉnh sửa SQL (dùng cho ánh xạ di chuyển)",
+      "VIEWER": "Chỉ xem từ điển tiêu chuẩn"
+    },
+    "plan": {
+      "FREE": "Miễn phí (chỉ xem)",
+      "P1": "Nhà phát triển",
+      "P2": "Người quản lý tiêu chuẩn",
+      "P3": "Người tạo mô hình",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Đăng ký",
+      "UPD": "Sửa đổi",
+      "DEL": "Xóa"
+    },
+    "tgt": {
+      "AREA": "Phân loại",
+      "MBR": "Thành viên",
+      "DIC": "Từ",
+      "DOM": "Miền",
+      "DOM_GRP": "Nhóm miền",
+      "TERM": "Thuật ngữ",
+      "CD": "Mã tiêu chuẩn",
+      "CD_VAL": "Giá trị mã",
+      "ABBR": "Viết tắt",
+      "PRJ": "Dự án",
+      "SUBJ": "Lĩnh vực chủ đề",
+      "ENT": "Thực thể",
+      "REL": "Quan hệ",
+      "ATTR": "Thuộc tính",
+      "VER": "Phiên bản mô hình",
+      "PHY": "Mô hình vật lý",
+      "DDL": "Thực thi DDL",
+      "RVS": "Thiết kế ngược",
+      "SQL": "SQL",
+      "DBCN": "Kết nối DB",
+      "AGT": "Tác nhân",
+      "MONURL": "Giám sát URL"
+    }
+  }
+}

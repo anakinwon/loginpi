@@ -4,11 +4,6 @@
     "description": "Tietostandardisanakirjan metajärjestelmä"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Vaihda kieli",
-      "search": "Hae kieltä",
-      "empty": "Ei hakutuloksia"
-    },
     "loading": "Ladataan…",
     "requestFailed": "Pyyntö epäonnistui",
     "home": "Etusivu",

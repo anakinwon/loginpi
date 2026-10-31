@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Data Standard Dictionary Meta System"
+  },
+  "common": {
+    "loading": "Loading…",
+    "requestFailed": "Request failed",
+    "home": "Home",
+    "goHome": "Go Home"
+  },
+  "home": {
+    "subtitle": "Data Standard Dictionary Meta System"
+  },
+  "auth": {
+    "checking": "Checking login…",
+    "googleUnlinked": "You are logged in with Google, but it is not yet linked to your Pi account.",
+    "required": "Login required.",
+    "requiredHint": "Login required. Please log in with your Pi account in Pi Browser, or with Google (Pi account linking required) in a regular browser.",
+    "piSignIn": "Sign in with Pi account",
+    "googleSignIn": "Sign in with Google",
+    "signOut": "Sign out",
+    "linkCheckFailed": "Failed to check linking status (temporary error). Please refresh shortly."
+  },
+  "link": {
+    "title": "Account Linking",
+    "desc": "Links your Pi account in Pi Browser with your Google account in a regular browser as the same user. After linking, you can work on PC by just logging in with Google.",
+    "codeFormTitle": "Enter Pi Account Linking Code",
+    "codeFormHint": "After logging in with Pi Browser, enter the 6-digit code issued on the account linking screen within 10 minutes.",
+    "codeLabel": "Linking Code",
+    "linked": "Linked.",
+    "submit": "Link",
+    "issuerTitle": "Issue Google Account Linking Code",
+    "issuerHint": "After logging in with Google in a regular browser, enter this code to link as the same user (valid for 10 minutes).",
+    "minutesLeft": "Approx. {minutes} minutes left",
+    "issue": "Issue Code",
+    "reissue": "Reissue",
+    "linkedAs": "Your Google account is linked to Pi user <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Data Standard Dictionary Meta System",
+    "headline1": "Without standards, you cannot create names;",
+    "headline2": "without models, you cannot create tables.",
+    "lead": "Create terms with approved standard words, draw models with those terms, and generate DDL from the models. Humans decide, tools enforce rules.",
+    "flowTitle": "This is how it connects",
+    "step": "Step {n}",
+    "flow": {
+      "words": {
+        "nm": "Standard Words",
+        "desc": "Words · Abbreviations · Forbidden Words"
+      },
+      "domains": {
+        "nm": "Standard Domains",
+        "desc": "Type · Length Rules"
+      },
+      "terms": {
+        "nm": "Standard Terms",
+        "desc": "Word Combination · Approval"
+      },
+      "model": {
+        "nm": "Data Model",
+        "desc": "Conceptual · Logical · Physical"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "By Subject Area · Version Comparison"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generate by DBMS · Approve Execution"
+      }
+    },
+    "roleTitle": "What you can do by role",
+    "planTitle": "Pricing Plans",
+    "planNote": "— Pi payment per classification system unit, price confirmed on payment screen",
+    "menu": {
+      "MENU_STD": "Standard Dictionary",
+      "MENU_SQL": "SQL Editor",
+      "MENU_SET": "Settings · History",
+      "MENU_BAN": "Forbidden Words",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Standard Check",
+      "MENU_ADM": "Members · Approvals"
+    },
+    "viewOnly": "{menu} (View Only)",
+    "footer": "Log in above to see your tasks for your classification system immediately."
+  },
+  "dashboard": {
+    "loadFailed": "Failed to load dashboard",
+    "myAreas": "My Classification Systems",
+    "planLine": "Plan {plan}",
+    "until": " · Until {date}",
+    "grace": "(Grace period)",
+    "openArea": "Open Classification System →",
+    "todoTitle": "My Turn",
+    "todoEmpty": "View permission only — please browse standards using the status and shortcuts below.",
+    "apvWait": "Standard Approval Pending",
+    "apvWaitSub": "Word · Domain · Term · Code Application",
+    "ddlWait": "DDL Execution Approval Pending",
+    "mineWait": "My Applications Pending",
+    "mineRejected": "{count} rejected in last 30 days",
+    "model": "Data Model",
+    "modelSub": "Projects · {count} Entities",
+    "stdTitle": "Standard Dictionary Status",
+    "stdBasis": "Approved Basis",
+    "shortcuts": "Shortcuts",
+    "recentTitle": "Recent Changes",
+    "allHistory": "Full History",
+    "noHistory": "No change history yet",
+    "justNow": "Just now",
+    "minutesAgo": "{n} minutes ago",
+    "hoursAgo": "{n} hours ago",
+    "daysAgo": "{n} days ago",
+    "areaList": "Classification System List · Create New"
+  },
+  "areaHome": {
+    "title": "My Standard Classification Systems",
+    "loading": "Loading",
+    "empty": "No classification systems participating",
+    "open": "Open",
+    "newTitle": "New Classification System",
+    "namePlaceholder": "Classification System Name (required)",
+    "descPlaceholder": "Description",
+    "create": "Create",
+    "created": "Classification system {name} created"
+  },
+  "nav": {
+    "label": "Classification System Menu",
+    "expand": "Expand bottom menu",
+    "expandWith": "Expand bottom menu ({menu})",
+    "collapse": "Collapse bottom menu",
+    "subOf": "{menu} Sub-functions",
+    "groupTech": "Monitoring · SQL Editor",
+    "groupStd": "Standard Dictionary",
+    "groupModel": "Model",
+    "groupSet": "Settings",
+    "groupPlan": "Payment",
+    "words": "Standard Words",
+    "bulk": "Bulk Registration",
+    "domains": "Standard Domains",
+    "keyDomains": "Key Domains",
+    "domainGroups": "Domain Groups",
+    "terms": "Standard Terms",
+    "codes": "Standard Codes",
+    "model": "Conceptual Model",
+    "prj": "Projects",
+    "subj": "Subject Areas",
+    "coreEnt": "Core Entities",
+    "entityClasses": "Entity Classifiers",
+    "logical": "Logical Model",
+    "physical": "Physical Model",
+    "erd": "ERD",
+    "ddl": "DDL Generation",
+    "monitor": "Monitoring",
+    "monApp": "Application",
+    "monSrv": "Server",
+    "monDb": "Database",
+    "monUrl": "URL",
+    "monFix": "AI Correction History",
+    "sql": "SQL Editor",
+    "settings": "Settings",
+    "history": "History",
+    "forbidden": "Forbidden Words",
+    "banBulk": "Bulk Forbidden Words Registration",
+    "check": "Standard Check",
+    "reverse": "Reverse Engineering",
+    "members": "Members",
+    "approvals": "Approvals",
+    "plan": "Payment"
+  },
+  "codes": {
+    "role": {
+      "SYS": "System Administrator",
+      "DA": "Data Architect",
+      "STD": "Standard Manager",
+      "MDL": "Modeler",
+      "QLT": "Quality Manager",
+      "MIG": "Migration Manager",
+      "VIEWER": "Viewer"
+    },
+    "roleDesc": {
+      "SYS": "Manage classification system settings · domain groups · abbreviations · members, applications · approvals (including immediate approval), bulk registration, SQL writing, all menus",
+      "DA": "Overall standard policy: Apply · approve words · domains · terms (can select immediate approval upon application), bulk registration, manage settings · members, SQL writing, all menus",
+      "STD": "Apply for words · domains · terms, bulk registration, settings, SQL writing, all menus (no approval rights)",
+      "MDL": "Apply for registration · modification · deletion of words · domains · terms · models, bulk registration, settings, SQL writing, all menus (no approval rights)",
+      "QLT": "Apply · SQL writing, SQL editor · modeling · settings menus (quality diagnostics features in future stages)",
+      "MIG": "Apply · SQL writing, SQL editor menu (for migration mapping)",
+      "VIEWER": "View standard dictionary only"
+    },
+    "plan": {
+      "FREE": "Free (View)",
+      "P1": "Developer",
+      "P2": "Standard Manager",
+      "P3": "Modeler",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Register",
+      "UPD": "Modify",
+      "DEL": "Delete"
+    },
+    "tgt": {
+      "AREA": "Classification System",
+      "MBR": "Member",
+      "DIC": "Word",
+      "DOM": "Domain",
+      "DOM_GRP": "Domain Group",
+      "TERM": "Term",
+      "CD": "Standard Code",
+      "CD_VAL": "Code Value",
+      "ABBR": "Abbreviation",
+      "PRJ": "Project",
+      "SUBJ": "Subject Area",
+      "ENT": "Entity",
+      "REL": "Relationship",
+      "ATTR": "Attribute",
+      "VER": "Model Version",
+      "PHY": "Physical Model",
+      "DDL": "DDL Execution",
+      "RVS": "Reverse Engineering",
+      "SQL": "SQL",
+      "DBCN": "DB Connection",
+      "AGT": "Agent",
+      "MONURL": "URL Monitoring"
+    }
+  }
+}

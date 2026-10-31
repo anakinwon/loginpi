@@ -4,11 +4,6 @@
     "description": "データ標準辞書メタシステム"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "言語変更",
-      "search": "言語検索",
-      "empty": "検索結果がありません"
-    },
     "loading": "読み込み中…",
     "requestFailed": "リクエストに失敗しました",
     "home": "ホーム",

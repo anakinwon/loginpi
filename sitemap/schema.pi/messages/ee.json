@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Andmestandardite sõnastiku metasüsteem"
+  },
+  "common": {
+    "loading": "Laadimine…",
+    "requestFailed": "Päring ebaõnnestus",
+    "home": "Avaleht",
+    "goHome": "Mine avalehele"
+  },
+  "home": {
+    "subtitle": "Andmestandardite sõnastiku metasüsteem"
+  },
+  "auth": {
+    "checking": "Sisselogimise kontrollimine…",
+    "googleUnlinked": "Olete sisse logitud Google'iga, kuid see pole veel teie Pi kontoga lingitud.",
+    "required": "Sisselogimine on vajalik.",
+    "requiredHint": "Sisselogimine on vajalik. Palun logige sisse oma Pi kontoga Pi Browseris või Google'iga (vajalik Pi konto linkimine) tavalises brauseris.",
+    "piSignIn": "Logi sisse Pi kontoga",
+    "googleSignIn": "Logi sisse Google'iga",
+    "signOut": "Logi välja",
+    "linkCheckFailed": "Linkimise oleku kontrollimine ebaõnnestus (ajutine viga). Palun värskendage lehte varsti."
+  },
+  "link": {
+    "title": "Konto linkimine",
+    "desc": "Lingib teie Pi konto Pi Browseris teie Google'i kontoga tavalises brauseris sama kasutajana. Pärast linkimist saate arvutis töötada lihtsalt Google'iga sisse logides.",
+    "codeFormTitle": "Sisesta Pi konto linkimiskood",
+    "codeFormHint": "Pärast Pi Browseris sisselogimist sisestage 6-kohaline kood, mis väljastati konto linkimise ekraanil 10 minuti jooksul.",
+    "codeLabel": "Linkimiskood",
+    "linked": "Lingitud.",
+    "submit": "Lingi",
+    "issuerTitle": "Väljasta Google'i konto linkimiskood",
+    "issuerHint": "Pärast Google'iga sisselogimist tavalises brauseris sisestage see kood, et linkida sama kasutajana (kehtib 10 minutit).",
+    "minutesLeft": "Umbes {minutes} minutit jäänud",
+    "issue": "Väljasta kood",
+    "reissue": "Väljasta uuesti",
+    "linkedAs": "Teie Google'i konto on lingitud Pi kasutajaga <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Andmestandardite sõnastiku metasüsteem",
+    "headline1": "Ilma standarditeta ei saa nimesid luua,",
+    "headline2": "ilma mudeliteta ei saa tabeleid luua.",
+    "lead": "Looge termineid heakskiidetud standardsete sõnadega, joonistage mudeleid nende terminitega ja genereerige mudelitest DDL. Inimesed otsustavad, tööriistad jõustavad reegleid.",
+    "flowTitle": "Nii see ühendub",
+    "step": "Samm {n}",
+    "flow": {
+      "words": {
+        "nm": "Standardsed sõnad",
+        "desc": "Sõnad · Lühendid · Keelatud sõnad"
+      },
+      "domains": {
+        "nm": "Standardsed domeenid",
+        "desc": "Tüüp · Pikkuse reeglid"
+      },
+      "terms": {
+        "nm": "Standardsed terminid",
+        "desc": "Sõnade kombinatsioon · Heakskiit"
+      },
+      "model": {
+        "nm": "Andmemudel",
+        "desc": "Kontseptuaalne · Loogiline · Füüsiline"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Teemaala järgi · Versioonide võrdlus"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Genereeri DBMS-i järgi · Kinnita täitmine"
+      }
+    },
+    "roleTitle": "Mida saate rolli järgi teha",
+    "planTitle": "Hinnaplaanid",
+    "planNote": "— Pi makse klassifitseerimissüsteemi ühiku kohta, hind kinnitatakse makseekraanil",
+    "menu": {
+      "MENU_STD": "Standardne sõnastik",
+      "MENU_SQL": "SQL-redaktor",
+      "MENU_SET": "Seaded · Ajalugu",
+      "MENU_BAN": "Keelatud sõnad",
+      "MENU_MODEL": "Mudel · ERD · DDL",
+      "MENU_CHK": "Standardkontroll",
+      "MENU_ADM": "Liikmed · Kinnitused"
+    },
+    "viewOnly": "{menu} (ainult vaatamiseks)",
+    "footer": "Logige ülal sisse, et näha koheselt oma klassifitseerimissüsteemi ülesandeid."
+  },
+  "dashboard": {
+    "loadFailed": "Armatuurlaua laadimine ebaõnnestus",
+    "myAreas": "Minu klassifitseerimissüsteemid",
+    "planLine": "Plaan {plan}",
+    "until": " · Kuni {date}",
+    "grace": "(Armuaeg)",
+    "openArea": "Ava klassifitseerimissüsteem →",
+    "todoTitle": "Minu kord",
+    "todoEmpty": "Ainult vaatamise õigus — palun sirvige standardeid allolevate olekute ja otseteede abil.",
+    "apvWait": "Standardi kinnituse ootel",
+    "apvWaitSub": "Sõna · Domeen · Termin · Koodi rakendus",
+    "ddlWait": "DDL-i täitmise kinnituse ootel",
+    "mineWait": "Minu taotlused ootel",
+    "mineRejected": "Viimase 30 päeva jooksul tagasi lükatud {count}",
+    "model": "Andmemudel",
+    "modelSub": "Projektid · {count} üksust",
+    "stdTitle": "Standardse sõnastiku olek",
+    "stdBasis": "Heakskiidetud alus",
+    "shortcuts": "Otseteed",
+    "recentTitle": "Viimased muudatused",
+    "allHistory": "Täielik ajalugu",
+    "noHistory": "Muudatuste ajalugu veel puudub",
+    "justNow": "Just praegu",
+    "minutesAgo": "{n} minutit tagasi",
+    "hoursAgo": "{n} tundi tagasi",
+    "daysAgo": "{n} päeva tagasi",
+    "areaList": "Klassifitseerimissüsteemide loend · Loo uus"
+  },
+  "areaHome": {
+    "title": "Minu standardklassifitseerimissüsteemid",
+    "loading": "Laadimine",
+    "empty": "Puuduvad klassifitseerimissüsteemid, milles osalete",
+    "open": "Ava",
+    "newTitle": "Uus klassifitseerimissüsteem",
+    "namePlaceholder": "Klassifitseerimissüsteemi nimi (kohustuslik)",
+    "descPlaceholder": "Kirjeldus",
+    "create": "Loo",
+    "created": "Klassifitseerimissüsteem {name} loodud"
+  },
+  "nav": {
+    "label": "Klassifitseerimissüsteemi menüü",
+    "expand": "Laienda alumist menüüd",
+    "expandWith": "Laienda alumist menüüd ({menu})",
+    "collapse": "Ahenda alumine menüü",
+    "subOf": "{menu} alamfunktsioonid",
+    "groupTech": "Monitooring · SQL-redaktor",
+    "groupStd": "Standardne sõnastik",
+    "groupModel": "Mudel",
+    "groupSet": "Seaded",
+    "groupPlan": "Makse",
+    "words": "Standardsed sõnad",
+    "bulk": "Hulgiregistreerimine",
+    "domains": "Standardsed domeenid",
+    "keyDomains": "Võtmedomeenid",
+    "domainGroups": "Domeenigrupid",
+    "terms": "Standardsed terminid",
+    "codes": "Standardsed koodid",
+    "model": "Kontseptuaalne mudel",
+    "prj": "Projektid",
+    "subj": "Teemaalad",
+    "coreEnt": "Põhiüksused",
+    "entityClasses": "Üksuste klassifikaatorid",
+    "logical": "Loogiline mudel",
+    "physical": "Füüsiline mudel",
+    "erd": "ERD",
+    "ddl": "DDL genereerimine",
+    "monitor": "Monitooring",
+    "monApp": "Rakendus",
+    "monSrv": "Server",
+    "monDb": "Andmebaas",
+    "monUrl": "URL",
+    "monFix": "AI paranduste ajalugu",
+    "sql": "SQL-redaktor",
+    "settings": "Seaded",
+    "history": "Ajalugu",
+    "forbidden": "Keelatud sõnad",
+    "banBulk": "Keelatud sõnade hulgiregistreerimine",
+    "check": "Standardkontroll",
+    "reverse": "Pöördprojekteerimine",
+    "members": "Liikmed",
+    "approvals": "Kinnitused",
+    "plan": "Makse"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Süsteemiadministraator",
+      "DA": "Andmearhitekt",
+      "STD": "Standardihaldur",
+      "MDL": "Modelleerija",
+      "QLT": "Kvaliteedijuht",
+      "MIG": "Migratsioonihaldur",
+      "VIEWER": "Vaataja"
+    },
+    "roleDesc": {
+      "SYS": "Halda klassifitseerimissüsteemi seadeid · domeenigruppe · lühendeid · liikmeid, taotlusi · kinnitusi (sh kohene kinnitus), hulgiregistreerimist, SQL-i kirjutamist, kõiki menüüsid",
+      "DA": "Üldine standardipoliitika: Rakenda · kinnita sõnu · domeene · termineid (saab valida kohese kinnituse taotlemisel), hulgiregistreerimine, halda seadeid · liikmeid, SQL-i kirjutamine, kõik menüüd",
+      "STD": "Taotle sõnu · domeene · termineid, hulgiregistreerimine, seaded, SQL-i kirjutamine, kõik menüüd (puuduvad kinnitusõigused)",
+      "MDL": "Taotle sõnade · domeenide · terminite · mudelite registreerimist · muutmist · kustutamist, hulgiregistreerimine, seaded, SQL-i kirjutamine, kõik menüüd (puuduvad kinnitusõigused)",
+      "QLT": "Taotle · SQL-i kirjutamine, SQL-redaktori · modelleerimise · seadete menüüd (kvaliteedidiagnostika funktsioonid tulevastes etappides)",
+      "MIG": "Taotle · SQL-i kirjutamine, SQL-redaktori menüü (migratsioonikaardistamiseks)",
+      "VIEWER": "Ainult standardse sõnastiku vaatamine"
+    },
+    "plan": {
+      "FREE": "Tasuta (vaatamine)",
+      "P1": "Arendaja",
+      "P2": "Standardihaldur",
+      "P3": "Modelleerija",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registreeri",
+      "UPD": "Muuda",
+      "DEL": "Kustuta"
+    },
+    "tgt": {
+      "AREA": "Klassifitseerimissüsteem",
+      "MBR": "Liige",
+      "DIC": "Sõna",
+      "DOM": "Domeen",
+      "DOM_GRP": "Domeenigrupp",
+      "TERM": "Termin",
+      "CD": "Standardkood",
+      "CD_VAL": "Koodi väärtus",
+      "ABBR": "Lühend",
+      "PRJ": "Projekt",
+      "SUBJ": "Teemaala",
+      "ENT": "Üksus",
+      "REL": "Seos",
+      "ATTR": "Atribuut",
+      "VER": "Mudeli versioon",
+      "PHY": "Füüsiline mudel",
+      "DDL": "DDL-i täitmine",
+      "RVS": "Pöördprojekteerimine",
+      "SQL": "SQL",
+      "DBCN": "DB ühendus",
+      "AGT": "Agent",
+      "MONURL": "URL-i monitooring"
+    }
+  }
+}

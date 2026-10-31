@@ -4,11 +4,6 @@
     "description": "Sistema Meta del Diccionario de Estándares de Datos"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Cambiar idioma",
-      "search": "Buscar idioma",
-      "empty": "No hay resultados de búsqueda"
-    },
     "loading": "Cargando…",
     "requestFailed": "La solicitud falló",
     "home": "Inicio",

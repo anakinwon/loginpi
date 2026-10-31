@@ -4,11 +4,6 @@
     "description": "Maglumat Standart Sözlügi Meta Ulgamy"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Dil üýtgetmek",
-      "search": "Dil gözlemek",
-      "empty": "Gözleg netijesi ýok"
-    },
     "loading": "Ýüklenýär…",
     "requestFailed": "Haýyş şowsuz boldy",
     "home": "Baş sahypa",

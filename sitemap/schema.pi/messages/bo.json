@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Sistema Meta del Diccionario de Estándares de Datos"
+  },
+  "common": {
+    "loading": "Cargando…",
+    "requestFailed": "La solicitud falló",
+    "home": "Inicio",
+    "goHome": "Ir a inicio"
+  },
+  "home": {
+    "subtitle": "Sistema Meta del Diccionario de Estándares de Datos"
+  },
+  "auth": {
+    "checking": "Comprobando inicio de sesión…",
+    "googleUnlinked": "Ha iniciado sesión con Google, pero aún no está vinculado a su cuenta Pi.",
+    "required": "Se requiere iniciar sesión.",
+    "requiredHint": "Se requiere iniciar sesión. Inicie sesión con su cuenta Pi en Pi Browser, o con Google (se requiere vincular la cuenta Pi) en un navegador normal.",
+    "piSignIn": "Iniciar sesión con la cuenta Pi",
+    "googleSignIn": "Iniciar sesión con Google",
+    "signOut": "Cerrar sesión",
+    "linkCheckFailed": "No se pudo verificar el estado de la vinculación (error temporal). Actualice en breve."
+  },
+  "link": {
+    "title": "Vinculación de cuenta",
+    "desc": "Vincula su cuenta Pi en Pi Browser con su cuenta de Google en un navegador normal como el mismo usuario. Después de la vinculación, puede trabajar en PC simplemente iniciando sesión con Google.",
+    "codeFormTitle": "Introducir código de vinculación de cuenta Pi",
+    "codeFormHint": "Después de iniciar sesión en Pi Browser, introduzca el código de 6 dígitos emitido en la pantalla de vinculación de cuenta en un plazo de 10 minutos.",
+    "codeLabel": "Código de vinculación",
+    "linked": "Vinculado.",
+    "submit": "Vincular",
+    "issuerTitle": "Emitir código de vinculación de cuenta de Google",
+    "issuerHint": "Después de iniciar sesión con Google en un navegador normal, introduzca este código para vincularse como el mismo usuario (válido por 10 minutos).",
+    "minutesLeft": "Aprox. {minutes} minutos restantes",
+    "issue": "Emitir código",
+    "reissue": "Reemitir",
+    "linkedAs": "Su cuenta de Google está vinculada al usuario Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Sistema Meta del Diccionario de Estándares de Datos",
+    "headline1": "Sin estándares, no se puede nombrar,",
+    "headline2": "sin modelos, no se puede tabular.",
+    "lead": "Cree términos con palabras estándar aprobadas, dibuje modelos con esos términos y genere DDL a partir de los modelos. Los humanos deciden, las herramientas aplican las reglas.",
+    "flowTitle": "Así es como se conecta",
+    "step": "Paso {n}",
+    "flow": {
+      "words": {
+        "nm": "Palabras estándar",
+        "desc": "Palabras · Abreviaturas · Palabras prohibidas"
+      },
+      "domains": {
+        "nm": "Dominios estándar",
+        "desc": "Tipo · Reglas de longitud"
+      },
+      "terms": {
+        "nm": "Términos estándar",
+        "desc": "Combinación de palabras · Aprobación"
+      },
+      "model": {
+        "nm": "Modelo de datos",
+        "desc": "Conceptual · Lógico · Físico"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Por área temática · Comparación de versiones"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generar por DBMS · Aprobar ejecución"
+      }
+    },
+    "roleTitle": "Lo que puede hacer por rol",
+    "planTitle": "Planes de precios",
+    "planNote": "— Pago Pi por unidad de sistema de clasificación, precio confirmado en la pantalla de pago",
+    "menu": {
+      "MENU_STD": "Diccionario estándar",
+      "MENU_SQL": "Editor SQL",
+      "MENU_SET": "Configuración · Historial",
+      "MENU_BAN": "Palabras prohibidas",
+      "MENU_MODEL": "Modelo · ERD · DDL",
+      "MENU_CHK": "Verificación estándar",
+      "MENU_ADM": "Miembros · Aprobaciones"
+    },
+    "viewOnly": "{menu} (Solo vista)",
+    "footer": "Inicie sesión arriba para ver sus tareas para su sistema de clasificación inmediatamente."
+  },
+  "dashboard": {
+    "loadFailed": "No se pudo cargar el panel",
+    "myAreas": "Mis sistemas de clasificación",
+    "planLine": "Plan {plan}",
+    "until": " · Hasta {date}",
+    "grace": "(Período de gracia)",
+    "openArea": "Abrir sistema de clasificación →",
+    "todoTitle": "Mi turno",
+    "todoEmpty": "Permiso de solo vista — por favor, explore los estándares usando el estado y los accesos directos a continuación.",
+    "apvWait": "Aprobación estándar pendiente",
+    "apvWaitSub": "Solicitud de palabra · dominio · término · código",
+    "ddlWait": "Aprobación de ejecución de DDL pendiente",
+    "mineWait": "Mis solicitudes pendientes",
+    "mineRejected": "{count} rechazados en los últimos 30 días",
+    "model": "Modelo de datos",
+    "modelSub": "Proyectos · {count} Entidades",
+    "stdTitle": "Estado del diccionario estándar",
+    "stdBasis": "Base aprobada",
+    "shortcuts": "Accesos directos",
+    "recentTitle": "Cambios recientes",
+    "allHistory": "Historial completo",
+    "noHistory": "Aún no hay historial de cambios",
+    "justNow": "Ahora mismo",
+    "minutesAgo": "Hace {n} minutos",
+    "hoursAgo": "Hace {n} horas",
+    "daysAgo": "Hace {n} días",
+    "areaList": "Lista de sistemas de clasificación · Crear nuevo"
+  },
+  "areaHome": {
+    "title": "Mis sistemas de clasificación estándar",
+    "loading": "Cargando",
+    "empty": "No hay sistemas de clasificación participantes",
+    "open": "Abrir",
+    "newTitle": "Nuevo sistema de clasificación",
+    "namePlaceholder": "Nombre del sistema de clasificación (obligatorio)",
+    "descPlaceholder": "Descripción",
+    "create": "Crear",
+    "created": "Sistema de clasificación {name} creado"
+  },
+  "nav": {
+    "label": "Menú del sistema de clasificación",
+    "expand": "Expandir menú inferior",
+    "expandWith": "Expandir menú inferior ({menu})",
+    "collapse": "Contraer menú inferior",
+    "subOf": "Subfunciones de {menu}",
+    "groupTech": "Monitoreo · Editor SQL",
+    "groupStd": "Diccionario estándar",
+    "groupModel": "Modelo",
+    "groupSet": "Configuración",
+    "groupPlan": "Pago",
+    "words": "Palabras estándar",
+    "bulk": "Registro masivo",
+    "domains": "Dominios estándar",
+    "keyDomains": "Dominios clave",
+    "domainGroups": "Grupos de dominio",
+    "terms": "Términos estándar",
+    "codes": "Códigos estándar",
+    "model": "Modelo conceptual",
+    "prj": "Proyectos",
+    "subj": "Áreas temáticas",
+    "coreEnt": "Entidades centrales",
+    "entityClasses": "Clasificadores de entidad",
+    "logical": "Modelo lógico",
+    "physical": "Modelo físico",
+    "erd": "ERD",
+    "ddl": "Generación de DDL",
+    "monitor": "Monitoreo",
+    "monApp": "Aplicación",
+    "monSrv": "Servidor",
+    "monDb": "Base de datos",
+    "monUrl": "URL",
+    "monFix": "Historial de corrección de IA",
+    "sql": "Editor SQL",
+    "settings": "Configuración",
+    "history": "Historial",
+    "forbidden": "Palabras prohibidas",
+    "banBulk": "Registro masivo de palabras prohibidas",
+    "check": "Verificación estándar",
+    "reverse": "Ingeniería inversa",
+    "members": "Miembros",
+    "approvals": "Aprobaciones",
+    "plan": "Pago"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Administrador del sistema",
+      "DA": "Arquitecto de datos",
+      "STD": "Gestor de estándares",
+      "MDL": "Modelador",
+      "QLT": "Gestor de calidad",
+      "MIG": "Gestor de migración",
+      "VIEWER": "Visor"
+    },
+    "roleDesc": {
+      "SYS": "Gestionar configuración del sistema de clasificación · grupos de dominio · abreviaturas · miembros, solicitudes · aprobaciones (incluida la aprobación inmediata), registro masivo, escritura SQL, todos los menús",
+      "DA": "Política estándar general: Solicitar · aprobar palabras · dominios · términos (puede seleccionar aprobación inmediata al solicitar), registro masivo, gestionar configuración · miembros, escritura SQL, todos los menús",
+      "STD": "Solicitar palabras · dominios · términos, registro masivo, configuración, escritura SQL, todos los menús (sin derechos de aprobación)",
+      "MDL": "Solicitar registro · modificación · eliminación de palabras · dominios · términos · modelos, registro masivo, configuración, escritura SQL, todos los menús (sin derechos de aprobación)",
+      "QLT": "Solicitar · escritura SQL, menús de editor SQL · modelado · configuración (funciones de diagnóstico de calidad en futuras etapas)",
+      "MIG": "Solicitar · escritura SQL, menú de editor SQL (para mapeo de migración)",
+      "VIEWER": "Solo ver diccionario estándar"
+    },
+    "plan": {
+      "FREE": "Gratis (Ver)",
+      "P1": "Desarrollador",
+      "P2": "Gestor de estándares",
+      "P3": "Modelador",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registrar",
+      "UPD": "Modificar",
+      "DEL": "Eliminar"
+    },
+    "tgt": {
+      "AREA": "Sistema de clasificación",
+      "MBR": "Miembro",
+      "DIC": "Palabra",
+      "DOM": "Dominio",
+      "DOM_GRP": "Grupo de dominio",
+      "TERM": "Término",
+      "CD": "Código estándar",
+      "CD_VAL": "Valor de código",
+      "ABBR": "Abreviatura",
+      "PRJ": "Proyecto",
+      "SUBJ": "Área temática",
+      "ENT": "Entidad",
+      "REL": "Relación",
+      "ATTR": "Atributo",
+      "VER": "Versión del modelo",
+      "PHY": "Modelo físico",
+      "DDL": "Ejecución de DDL",
+      "RVS": "Ingeniería inversa",
+      "SQL": "SQL",
+      "DBCN": "Conexión DB",
+      "AGT": "Agente",
+      "MONURL": "Monitoreo de URL"
+    }
+  }
+}

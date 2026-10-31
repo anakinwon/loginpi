@@ -4,11 +4,6 @@
     "description": "Sistem Meta Kamus Standard Data"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Tukar Bahasa",
-      "search": "Cari Bahasa",
-      "empty": "Tiada hasil carian"
-    },
     "loading": "Memuatkan…",
     "requestFailed": "Permintaan gagal",
     "home": "Utama",

@@ -4,11 +4,6 @@
     "description": "Sistem Meta i Fjalorit Standard të të Dhënave"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Ndrysho Gjuhën",
-      "search": "Kërko Gjuhën",
-      "empty": "Asnjë rezultat kërkimi"
-    },
     "loading": "Po ngarkohet…",
     "requestFailed": "Kërkesa dështoi",
     "home": "Kreu",

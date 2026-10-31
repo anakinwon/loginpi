@@ -4,11 +4,6 @@
     "description": "Sistema Meta Dizionario Standard Dati"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Cambia lingua",
-      "search": "Cerca lingua",
-      "empty": "Nessun risultato di ricerca"
-    },
     "loading": "Caricamento…",
     "requestFailed": "Richiesta fallita",
     "home": "Home",

@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Sistema Meta Dizionario Standard Dati"
+  },
+  "common": {
+    "loading": "Caricamento…",
+    "requestFailed": "Richiesta fallita",
+    "home": "Home",
+    "goHome": "Vai alla Home"
+  },
+  "home": {
+    "subtitle": "Sistema Meta Dizionario Standard Dati"
+  },
+  "auth": {
+    "checking": "Verifica accesso in corso…",
+    "googleUnlinked": "Hai effettuato l'accesso con Google, ma non è ancora collegato al tuo account Pi.",
+    "required": "Accesso richiesto.",
+    "requiredHint": "Accesso richiesto. Accedi con il tuo account Pi in Pi Browser, o con Google (è richiesto il collegamento dell'account Pi) in un browser normale.",
+    "piSignIn": "Accedi con l'account Pi",
+    "googleSignIn": "Accedi con Google",
+    "signOut": "Esci",
+    "linkCheckFailed": "Impossibile verificare lo stato del collegamento (errore temporaneo). Aggiorna a breve."
+  },
+  "link": {
+    "title": "Collegamento account",
+    "desc": "Collega il tuo account Pi in Pi Browser con il tuo account Google in un browser normale come lo stesso utente. Dopo il collegamento, puoi lavorare su PC semplicemente accedendo con Google.",
+    "codeFormTitle": "Inserisci il codice di collegamento dell'account Pi",
+    "codeFormHint": "Dopo aver effettuato l'accesso con Pi Browser, inserisci il codice a 6 cifre rilasciato nella schermata di collegamento dell'account entro 10 minuti.",
+    "codeLabel": "Codice di collegamento",
+    "linked": "Collegato.",
+    "submit": "Collega",
+    "issuerTitle": "Emetti codice di collegamento account Google",
+    "issuerHint": "Dopo aver effettuato l'accesso con Google in un browser normale, inserisci questo codice per collegarti come lo stesso utente (valido per 10 minuti).",
+    "minutesLeft": "Circa {minutes} minuti rimanenti",
+    "issue": "Emetti codice",
+    "reissue": "Riemetti",
+    "linkedAs": "Il tuo account Google è collegato all'utente Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Sistema Meta Dizionario Standard Dati",
+    "headline1": "Senza standard, non puoi nominare,",
+    "headline2": "senza modelli, non puoi tabellare.",
+    "lead": "Crea termini con parole standard approvate, disegna modelli con quei termini e genera DDL dai modelli. Gli esseri umani decidono, gli strumenti applicano le regole.",
+    "flowTitle": "Ecco come si collega",
+    "step": "Passo {n}",
+    "flow": {
+      "words": {
+        "nm": "Parole Standard",
+        "desc": "Parole · Abbreviazioni · Parole Proibite"
+      },
+      "domains": {
+        "nm": "Domini Standard",
+        "desc": "Tipo · Regole di Lunghezza"
+      },
+      "terms": {
+        "nm": "Termini Standard",
+        "desc": "Combinazione di Parole · Approvazione"
+      },
+      "model": {
+        "nm": "Modello Dati",
+        "desc": "Concettuale · Logico · Fisico"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Per Area Tematica · Confronto Versioni"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Genera per DBMS · Approva Esecuzione"
+      }
+    },
+    "roleTitle": "Cosa puoi fare per ruolo",
+    "planTitle": "Piani Tariffari",
+    "planNote": "— Pagamento Pi per unità di sistema di classificazione, prezzo confermato nella schermata di pagamento",
+    "menu": {
+      "MENU_STD": "Dizionario Standard",
+      "MENU_SQL": "Editor SQL",
+      "MENU_SET": "Impostazioni · Cronologia",
+      "MENU_BAN": "Parole Proibite",
+      "MENU_MODEL": "Modello · ERD · DDL",
+      "MENU_CHK": "Controllo Standard",
+      "MENU_ADM": "Membri · Approvazioni"
+    },
+    "viewOnly": "{menu} (Sola Lettura)",
+    "footer": "Accedi qui sopra per vedere immediatamente le tue attività per il tuo sistema di classificazione."
+  },
+  "dashboard": {
+    "loadFailed": "Impossibile caricare la dashboard",
+    "myAreas": "I miei Sistemi di Classificazione",
+    "planLine": "Piano {plan}",
+    "until": " · Fino al {date}",
+    "grace": "(Periodo di grazia)",
+    "openArea": "Apri Sistema di Classificazione →",
+    "todoTitle": "Il mio turno",
+    "todoEmpty": "Solo permesso di visualizzazione — consulta gli standard usando lo stato e le scorciatoie qui sotto.",
+    "apvWait": "Approvazione Standard in Sospeso",
+    "apvWaitSub": "Richiesta Parola · Dominio · Termine · Codice",
+    "ddlWait": "Approvazione Esecuzione DDL in Sospeso",
+    "mineWait": "Le mie Richieste in Sospeso",
+    "mineRejected": "{count} rifiutati negli ultimi 30 giorni",
+    "model": "Modello Dati",
+    "modelSub": "Progetti · {count} Entità",
+    "stdTitle": "Stato Dizionario Standard",
+    "stdBasis": "Base Approvata",
+    "shortcuts": "Scorciatoie",
+    "recentTitle": "Modifiche Recenti",
+    "allHistory": "Cronologia Completa",
+    "noHistory": "Ancora nessuna cronologia delle modifiche",
+    "justNow": "Adesso",
+    "minutesAgo": "{n} minuti fa",
+    "hoursAgo": "{n} ore fa",
+    "daysAgo": "{n} giorni fa",
+    "areaList": "Elenco Sistemi di Classificazione · Crea Nuovo"
+  },
+  "areaHome": {
+    "title": "I miei Sistemi di Classificazione Standard",
+    "loading": "Caricamento",
+    "empty": "Nessun sistema di classificazione partecipante",
+    "open": "Apri",
+    "newTitle": "Nuovo Sistema di Classificazione",
+    "namePlaceholder": "Nome Sistema di Classificazione (obbligatorio)",
+    "descPlaceholder": "Descrizione",
+    "create": "Crea",
+    "created": "Sistema di classificazione {name} creato"
+  },
+  "nav": {
+    "label": "Menu Sistema di Classificazione",
+    "expand": "Espandi menu inferiore",
+    "expandWith": "Espandi menu inferiore ({menu})",
+    "collapse": "Comprimi menu inferiore",
+    "subOf": "Sottofunzioni di {menu}",
+    "groupTech": "Monitoraggio · Editor SQL",
+    "groupStd": "Dizionario Standard",
+    "groupModel": "Modello",
+    "groupSet": "Impostazioni",
+    "groupPlan": "Pagamento",
+    "words": "Parole Standard",
+    "bulk": "Registrazione in Blocco",
+    "domains": "Domini Standard",
+    "keyDomains": "Domini Chiave",
+    "domainGroups": "Gruppi di Domini",
+    "terms": "Termini Standard",
+    "codes": "Codici Standard",
+    "model": "Modello Concettuale",
+    "prj": "Progetti",
+    "subj": "Aree Tematiche",
+    "coreEnt": "Entità Core",
+    "entityClasses": "Classificatori di Entità",
+    "logical": "Modello Logico",
+    "physical": "Modello Fisico",
+    "erd": "ERD",
+    "ddl": "Generazione DDL",
+    "monitor": "Monitoraggio",
+    "monApp": "Applicazione",
+    "monSrv": "Server",
+    "monDb": "Database",
+    "monUrl": "URL",
+    "monFix": "Cronologia Correzioni AI",
+    "sql": "Editor SQL",
+    "settings": "Impostazioni",
+    "history": "Cronologia",
+    "forbidden": "Parole Proibite",
+    "banBulk": "Registrazione in Blocco Parole Proibite",
+    "check": "Controllo Standard",
+    "reverse": "Reverse Engineering",
+    "members": "Membri",
+    "approvals": "Approvazioni",
+    "plan": "Pagamento"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Amministratore di Sistema",
+      "DA": "Architetto Dati",
+      "STD": "Responsabile Standard",
+      "MDL": "Modellatore",
+      "QLT": "Responsabile Qualità",
+      "MIG": "Responsabile Migrazione",
+      "VIEWER": "Visualizzatore"
+    },
+    "roleDesc": {
+      "SYS": "Gestisci impostazioni sistema di classificazione · gruppi di domini · abbreviazioni · membri, applicazioni · approvazioni (inclusa approvazione immediata), registrazione in blocco, scrittura SQL, tutti i menu",
+      "DA": "Politica standard generale: Applica · approva parole · domini · termini (può selezionare approvazione immediata al momento della richiesta), registrazione in blocco, gestisci impostazioni · membri, scrittura SQL, tutti i menu",
+      "STD": "Richiedi parole · domini · termini, registrazione in blocco, impostazioni, scrittura SQL, tutti i menu (nessun diritto di approvazione)",
+      "MDL": "Richiedi registrazione · modifica · eliminazione di parole · domini · termini · modelli, registrazione in blocco, impostazioni, scrittura SQL, tutti i menu (nessun diritto di approvazione)",
+      "QLT": "Richiedi · scrittura SQL, menu editor SQL · modellazione · impostazioni (funzionalità di diagnostica della qualità nelle fasi future)",
+      "MIG": "Richiedi · scrittura SQL, menu editor SQL (per mappatura migrazione)",
+      "VIEWER": "Solo visualizzazione dizionario standard"
+    },
+    "plan": {
+      "FREE": "Gratuito (Visualizzazione)",
+      "P1": "Sviluppatore",
+      "P2": "Responsabile Standard",
+      "P3": "Modellatore",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registra",
+      "UPD": "Modifica",
+      "DEL": "Elimina"
+    },
+    "tgt": {
+      "AREA": "Sistema di Classificazione",
+      "MBR": "Membro",
+      "DIC": "Parola",
+      "DOM": "Dominio",
+      "DOM_GRP": "Gruppo di Domini",
+      "TERM": "Termine",
+      "CD": "Codice Standard",
+      "CD_VAL": "Valore Codice",
+      "ABBR": "Abbreviazione",
+      "PRJ": "Progetto",
+      "SUBJ": "Area Tematica",
+      "ENT": "Entità",
+      "REL": "Relazione",
+      "ATTR": "Attributo",
+      "VER": "Versione Modello",
+      "PHY": "Modello Fisico",
+      "DDL": "Esecuzione DDL",
+      "RVS": "Reverse Engineering",
+      "SQL": "SQL",
+      "DBCN": "Connessione DB",
+      "AGT": "Agente",
+      "MONURL": "Monitoraggio URL"
+    }
+  }
+}

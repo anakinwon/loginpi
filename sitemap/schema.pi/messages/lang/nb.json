@@ -4,11 +4,6 @@
     "description": "Metasystem for datastandardordbok"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Endre språk",
-      "search": "Søk språk",
-      "empty": "Ingen søkeresultater"
-    },
     "loading": "Laster inn …",
     "requestFailed": "Forespørselen mislyktes",
     "home": "Hjem",

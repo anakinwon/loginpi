@@ -4,11 +4,6 @@
     "description": "د ډیټا معیاري قاموس میټا سیسټم"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "ژبه بدله کړئ",
-      "search": "ژبه وپلټئ",
-      "empty": "د لټون پایلې نشته"
-    },
     "loading": "بارول…",
     "requestFailed": "غوښتنه ناکامه شوه",
     "home": "کور",

@@ -4,11 +4,6 @@
     "description": "डेटा मानक शब्दकोश मेटासिस्टम"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "भाषा बदलें",
-      "search": "भाषा खोजें",
-      "empty": "कोई खोज परिणाम नहीं"
-    },
     "loading": "लोड हो रहा है…",
     "requestFailed": "अनुरोध विफल रहा",
     "home": "होम",

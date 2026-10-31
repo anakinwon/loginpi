@@ -4,11 +4,6 @@
     "description": "Metasystem Słownika Standardów Danych"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Zmień język",
-      "search": "Szukaj języka",
-      "empty": "Brak wyników wyszukiwania"
-    },
     "loading": "Ładowanie…",
     "requestFailed": "Żądanie nie powiodło się",
     "home": "Strona główna",

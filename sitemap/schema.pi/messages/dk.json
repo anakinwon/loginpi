@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Metasystem for datastandardordbog"
+  },
+  "common": {
+    "loading": "Indlæser…",
+    "requestFailed": "Anmodning mislykkedes",
+    "home": "Hjem",
+    "goHome": "Gå til hjem"
+  },
+  "home": {
+    "subtitle": "Metasystem for datastandardordbog"
+  },
+  "auth": {
+    "checking": "Kontrollerer login…",
+    "googleUnlinked": "Du er logget ind med Google, men den er endnu ikke knyttet til din Pi-konto.",
+    "required": "Login påkrævet.",
+    "requiredHint": "Login påkrævet. Log venligst ind med din Pi-konto i Pi Browser, eller med Google (Pi-kontolink påkrævet) i en almindelig browser.",
+    "piSignIn": "Log ind med Pi-konto",
+    "googleSignIn": "Log ind med Google",
+    "signOut": "Log ud",
+    "linkCheckFailed": "Kunne ikke kontrollere linkstatus (midlertidig fejl). Opdater venligst om et øjeblik."
+  },
+  "link": {
+    "title": "Kontolink",
+    "desc": "Forbinder din Pi-konto i Pi Browser med din Google-konto i en almindelig browser som den samme bruger. Efter linkning kan du arbejde på pc ved blot at logge ind med Google.",
+    "codeFormTitle": "Indtast Pi-kontolinkkode",
+    "codeFormHint": "Efter login med Pi Browser skal du indtaste den 6-cifrede kode, der er udstedt på kontolinkskærmen, inden for 10 minutter.",
+    "codeLabel": "Linkkode",
+    "linked": "Linket.",
+    "submit": "Link",
+    "issuerTitle": "Udsted Google-kontolinkkode",
+    "issuerHint": "Efter login med Google i en almindelig browser skal du indtaste denne kode for at linke som den samme bruger (gyldig i 10 minutter).",
+    "minutesLeft": "Ca. {minutes} minutter tilbage",
+    "issue": "Udsted kode",
+    "reissue": "Udsted igen",
+    "linkedAs": "Din Google-konto er knyttet til Pi-bruger <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Metasystem for datastandardordbog",
+    "headline1": "Uden standarder kan du ikke navngive,",
+    "headline2": "uden modeller kan du ikke tabel.",
+    "lead": "Opret termer med godkendte standardord, tegn modeller med disse termer, og generer DDL fra modellerne. Mennesker beslutter, værktøjer håndhæver regler.",
+    "flowTitle": "Sådan forbinder det",
+    "step": "Trin {n}",
+    "flow": {
+      "words": {
+        "nm": "Standardord",
+        "desc": "Ord · Forkortelser · Forbudte ord"
+      },
+      "domains": {
+        "nm": "Standarddomæner",
+        "desc": "Type · Længderegler"
+      },
+      "terms": {
+        "nm": "Standardtermer",
+        "desc": "Ord kombination · Godkendelse"
+      },
+      "model": {
+        "nm": "Datamodel",
+        "desc": "Konceptuel · Logisk · Fysisk"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Efter emneområde · Versionssammenligning"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generer efter DBMS · Godkend udførelse"
+      }
+    },
+    "roleTitle": "Hvad du kan gøre efter rolle",
+    "planTitle": "Prisplaner",
+    "planNote": "— Pi-betaling pr. klassifikationssystemenhed, pris bekræftes på betalingsskærmen",
+    "menu": {
+      "MENU_STD": "Standardordbog",
+      "MENU_SQL": "SQL-editor",
+      "MENU_SET": "Indstillinger · Historik",
+      "MENU_BAN": "Forbudte ord",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Standardkontrol",
+      "MENU_ADM": "Medlemmer · Godkendelser"
+    },
+    "viewOnly": "{menu} (Kun visning)",
+    "footer": "Log ind ovenfor for at se dine opgaver for dit klassifikationssystem med det samme."
+  },
+  "dashboard": {
+    "loadFailed": "Kunne ikke indlæse dashboard",
+    "myAreas": "Mine klassifikationssystemer",
+    "planLine": "Plan {plan}",
+    "until": " · Indtil {date}",
+    "grace": "(Fristperiode)",
+    "openArea": "Åbn klassifikationssystem →",
+    "todoTitle": "Min tur",
+    "todoEmpty": "Kun visningstilladelse — gennemse venligst standarder ved hjælp af status og genveje nedenfor.",
+    "apvWait": "Standardgodkendelse afventer",
+    "apvWaitSub": "Ord · Domæne · Term · Kodeansøgning",
+    "ddlWait": "DDL-udførelsesgodkendelse afventer",
+    "mineWait": "Mine ansøgninger afventer",
+    "mineRejected": "{count} afvist inden for de sidste 30 dage",
+    "model": "Datamodel",
+    "modelSub": "Projekter · {count} entiteter",
+    "stdTitle": "Standardordbogsstatus",
+    "stdBasis": "Godkendt grundlag",
+    "shortcuts": "Genveje",
+    "recentTitle": "Seneste ændringer",
+    "allHistory": "Fuld historik",
+    "noHistory": "Ingen ændringshistorik endnu",
+    "justNow": "Lige nu",
+    "minutesAgo": "{n} minutter siden",
+    "hoursAgo": "{n} timer siden",
+    "daysAgo": "{n} dage siden",
+    "areaList": "Klassifikationssystemliste · Opret ny"
+  },
+  "areaHome": {
+    "title": "Mine standardklassifikationssystemer",
+    "loading": "Indlæser",
+    "empty": "Ingen klassifikationssystemer deltager",
+    "open": "Åbn",
+    "newTitle": "Nyt klassifikationssystem",
+    "namePlaceholder": "Klassifikationssystemnavn (påkrævet)",
+    "descPlaceholder": "Beskrivelse",
+    "create": "Opret",
+    "created": "Klassifikationssystem {name} oprettet"
+  },
+  "nav": {
+    "label": "Klassifikationssystemmenu",
+    "expand": "Udvid bundmenu",
+    "expandWith": "Udvid bundmenu ({menu})",
+    "collapse": "Skjul bundmenu",
+    "subOf": "{menu} Underfunktioner",
+    "groupTech": "Overvågning · SQL-editor",
+    "groupStd": "Standardordbog",
+    "groupModel": "Model",
+    "groupSet": "Indstillinger",
+    "groupPlan": "Betaling",
+    "words": "Standardord",
+    "bulk": "Masseoprettelse",
+    "domains": "Standarddomæner",
+    "keyDomains": "Nøgledomæner",
+    "domainGroups": "Domænegrupper",
+    "terms": "Standardtermer",
+    "codes": "Standardkoder",
+    "model": "Konceptuel model",
+    "prj": "Projekter",
+    "subj": "Emneområder",
+    "coreEnt": "Kerneentiteter",
+    "entityClasses": "Entitetsklassificeringer",
+    "logical": "Logisk model",
+    "physical": "Fysisk model",
+    "erd": "ERD",
+    "ddl": "DDL-generering",
+    "monitor": "Overvågning",
+    "monApp": "Applikation",
+    "monSrv": "Server",
+    "monDb": "Database",
+    "monUrl": "URL",
+    "monFix": "AI-korrektionshistorik",
+    "sql": "SQL-editor",
+    "settings": "Indstillinger",
+    "history": "Historik",
+    "forbidden": "Forbudte ord",
+    "banBulk": "Masseoprettelse af forbudte ord",
+    "check": "Standardkontrol",
+    "reverse": "Reverse Engineering",
+    "members": "Medlemmer",
+    "approvals": "Godkendelser",
+    "plan": "Betaling"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Systemadministrator",
+      "DA": "Dataarkitekt",
+      "STD": "Standardansvarlig",
+      "MDL": "Modeller",
+      "QLT": "Kvalitetsansvarlig",
+      "MIG": "Migrationsansvarlig",
+      "VIEWER": "Viser"
+    },
+    "roleDesc": {
+      "SYS": "Administrer klassifikationssystemindstillinger · domænegrupper · forkortelser · medlemmer, ansøgninger · godkendelser (inklusive øjeblikkelig godkendelse), masseoprettelse, SQL-skrivning, alle menuer",
+      "DA": "Overordnet standardpolitik: Ansøg · godkend ord · domæner · termer (kan vælge øjeblikkelig godkendelse ved ansøgning), masseoprettelse, administrer indstillinger · medlemmer, SQL-skrivning, alle menuer",
+      "STD": "Ansøg om ord · domæner · termer, masseoprettelse, indstillinger, SQL-skrivning, alle menuer (ingen godkendelsesrettigheder)",
+      "MDL": "Ansøg om registrering · ændring · sletning af ord · domæner · termer · modeller, masseoprettelse, indstillinger, SQL-skrivning, alle menuer (ingen godkendelsesrettigheder)",
+      "QLT": "Ansøg · SQL-skrivning, SQL-editor · modellering · indstillingsmenuer (kvalitetsdiagnosefunktioner i fremtidige faser)",
+      "MIG": "Ansøg · SQL-skrivning, SQL-editormenu (til migrationsmapping)",
+      "VIEWER": "Kun visning af standardordbog"
+    },
+    "plan": {
+      "FREE": "Gratis (Visning)",
+      "P1": "Udvikler",
+      "P2": "Standardansvarlig",
+      "P3": "Modeller",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registrer",
+      "UPD": "Rediger",
+      "DEL": "Slet"
+    },
+    "tgt": {
+      "AREA": "Klassifikationssystem",
+      "MBR": "Medlem",
+      "DIC": "Ord",
+      "DOM": "Domæne",
+      "DOM_GRP": "Domænegruppe",
+      "TERM": "Term",
+      "CD": "Standardkode",
+      "CD_VAL": "Kodeværdi",
+      "ABBR": "Forkortelse",
+      "PRJ": "Projekt",
+      "SUBJ": "Emneområde",
+      "ENT": "Entitet",
+      "REL": "Relation",
+      "ATTR": "Attribut",
+      "VER": "Modelversion",
+      "PHY": "Fysisk model",
+      "DDL": "DDL-udførelse",
+      "RVS": "Reverse Engineering",
+      "SQL": "SQL",
+      "DBCN": "DB-forbindelse",
+      "AGT": "Agent",
+      "MONURL": "URL-overvågning"
+    }
+  }
+}

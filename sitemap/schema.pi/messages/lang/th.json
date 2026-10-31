@@ -4,11 +4,6 @@
     "description": "ระบบเมตาพจนานุกรมมาตรฐานข้อมูล"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "เปลี่ยนภาษา",
-      "search": "ค้นหาภาษา",
-      "empty": "ไม่มีผลการค้นหา"
-    },
     "loading": "กำลังโหลด…",
     "requestFailed": "คำขอไม่สำเร็จ",
     "home": "หน้าหลัก",

@@ -4,11 +4,6 @@
     "description": "Duomenų standarto žodyno metaduomenų sistema"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Keisti kalbą",
-      "search": "Ieškoti kalbos",
-      "empty": "Nėra paieškos rezultatų"
-    },
     "loading": "Įkeliama…",
     "requestFailed": "Užklausa nepavyko",
     "home": "Pradžia",

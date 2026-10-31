@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Veri Standardı Sözlük Meta Sistemi"
+  },
+  "common": {
+    "loading": "Yükleniyor…",
+    "requestFailed": "İstek başarısız oldu",
+    "home": "Ana Sayfa",
+    "goHome": "Ana Sayfaya Git"
+  },
+  "home": {
+    "subtitle": "Veri Standardı Sözlük Meta Sistemi"
+  },
+  "auth": {
+    "checking": "Giriş kontrol ediliyor…",
+    "googleUnlinked": "Google ile giriş yaptınız, ancak henüz Pi hesabınızla bağlantılı değil.",
+    "required": "Giriş yapılması gerekiyor.",
+    "requiredHint": "Giriş yapılması gerekiyor. Lütfen Pi Browser'da Pi hesabınızla veya normal bir tarayıcıda Google (Pi hesabı bağlantısı gerekli) ile giriş yapın.",
+    "piSignIn": "Pi hesabı ile giriş yap",
+    "googleSignIn": "Google ile giriş yap",
+    "signOut": "Çıkış yap",
+    "linkCheckFailed": "Bağlantı durumu kontrol edilemedi (geçici hata). Lütfen kısa süre sonra yenileyin."
+  },
+  "link": {
+    "title": "Hesap Bağlantısı",
+    "desc": "Pi Browser'daki Pi hesabınızı normal bir tarayıcıdaki Google hesabınızla aynı kullanıcı olarak bağlar. Bağlantıdan sonra, sadece Google ile giriş yaparak PC'de çalışabilirsiniz.",
+    "codeFormTitle": "Pi Hesabı Bağlantı Kodunu Girin",
+    "codeFormHint": "Pi Browser'da giriş yaptıktan sonra, hesap bağlama ekranında verilen 6 haneli kodu 10 dakika içinde girin.",
+    "codeLabel": "Bağlantı Kodu",
+    "linked": "Bağlandı.",
+    "submit": "Bağla",
+    "issuerTitle": "Google Hesabı Bağlantı Kodu Ver",
+    "issuerHint": "Normal bir tarayıcıda Google ile giriş yaptıktan sonra, bu kodu girerek aynı kullanıcı olarak bağlanın (10 dakika geçerlidir).",
+    "minutesLeft": "Yaklaşık {minutes} dakika kaldı",
+    "issue": "Kod Ver",
+    "reissue": "Yeniden Ver",
+    "linkedAs": "Google hesabınız Pi kullanıcısı <b>{name}</b> ile bağlantılıdır."
+  },
+  "intro": {
+    "kicker": "Veri Standardı Sözlük Meta Sistemi",
+    "headline1": "Standartlar olmadan adlandıramazsınız,",
+    "headline2": "modeller olmadan tablo oluşturamazsınız.",
+    "lead": "Onaylanmış standart kelimelerle terimler oluşturun, bu terimlerle modeller çizin ve modellerden DDL oluşturun. İnsanlar karar verir, araçlar kuralları uygular.",
+    "flowTitle": "Böyle bağlanır",
+    "step": "Adım {n}",
+    "flow": {
+      "words": {
+        "nm": "Standart Kelimeler",
+        "desc": "Kelimeler · Kısaltmalar · Yasaklı Kelimeler"
+      },
+      "domains": {
+        "nm": "Standart Alanlar",
+        "desc": "Tip · Uzunluk Kuralları"
+      },
+      "terms": {
+        "nm": "Standart Terimler",
+        "desc": "Kelime Kombinasyonu · Onay"
+      },
+      "model": {
+        "nm": "Veri Modeli",
+        "desc": "Kavramsal · Mantıksal · Fiziksel"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Konu Alanına Göre · Sürüm Karşılaştırması"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "DBMS'ye Göre Oluştur · Yürütmeyi Onayla"
+      }
+    },
+    "roleTitle": "Role göre yapabilecekleriniz",
+    "planTitle": "Fiyatlandırma Planları",
+    "planNote": "— Sınıflandırma sistemi birimi başına Pi ödemesi, fiyat ödeme ekranında onaylanır",
+    "menu": {
+      "MENU_STD": "Standart Sözlük",
+      "MENU_SQL": "SQL Düzenleyici",
+      "MENU_SET": "Ayarlar · Geçmiş",
+      "MENU_BAN": "Yasaklı Kelimeler",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Standart Kontrol",
+      "MENU_ADM": "Üyeler · Onaylar"
+    },
+    "viewOnly": "{menu} (Sadece Görüntüle)",
+    "footer": "Yukarıdan giriş yaparak sınıflandırma sisteminiz için görevlerinizi hemen görün."
+  },
+  "dashboard": {
+    "loadFailed": "Kontrol paneli yüklenemedi",
+    "myAreas": "Sınıflandırma Sistemlerim",
+    "planLine": "Plan {plan}",
+    "until": " · {date} tarihine kadar",
+    "grace": "(Ödemesiz dönem)",
+    "openArea": "Sınıflandırma Sistemini Aç →",
+    "todoTitle": "Sıra Bende",
+    "todoEmpty": "Sadece görüntüleme izni — lütfen aşağıdaki durum ve kısayolları kullanarak standartlara göz atın.",
+    "apvWait": "Standart Onay Bekleniyor",
+    "apvWaitSub": "Kelime · Alan · Terim · Kod Başvurusu",
+    "ddlWait": "DDL Yürütme Onayı Bekleniyor",
+    "mineWait": "Bekleyen Başvurularım",
+    "mineRejected": "Son 30 günde {count} reddedildi",
+    "model": "Veri Modeli",
+    "modelSub": "Projeler · {count} Varlık",
+    "stdTitle": "Standart Sözlük Durumu",
+    "stdBasis": "Onaylanmış Temel",
+    "shortcuts": "Kısayollar",
+    "recentTitle": "Son Değişiklikler",
+    "allHistory": "Tüm Geçmiş",
+    "noHistory": "Henüz değişiklik geçmişi yok",
+    "justNow": "Şimdi",
+    "minutesAgo": "{n} dakika önce",
+    "hoursAgo": "{n} saat önce",
+    "daysAgo": "{n} gün önce",
+    "areaList": "Sınıflandırma Sistemi Listesi · Yeni Oluştur"
+  },
+  "areaHome": {
+    "title": "Standart Sınıflandırma Sistemlerim",
+    "loading": "Yükleniyor",
+    "empty": "Katıldığınız sınıflandırma sistemi yok",
+    "open": "Aç",
+    "newTitle": "Yeni Sınıflandırma Sistemi",
+    "namePlaceholder": "Sınıflandırma Sistemi Adı (gerekli)",
+    "descPlaceholder": "Açıklama",
+    "create": "Oluştur",
+    "created": "{name} sınıflandırma sistemi oluşturuldu"
+  },
+  "nav": {
+    "label": "Sınıflandırma Sistemi Menüsü",
+    "expand": "Alt menüyü genişlet",
+    "expandWith": "Alt menüyü genişlet ({menu})",
+    "collapse": "Alt menüyü daralt",
+    "subOf": "{menu} Alt fonksiyonları",
+    "groupTech": "İzleme · SQL Düzenleyici",
+    "groupStd": "Standart Sözlük",
+    "groupModel": "Model",
+    "groupSet": "Ayarlar",
+    "groupPlan": "Ödeme",
+    "words": "Standart Kelimeler",
+    "bulk": "Toplu Kayıt",
+    "domains": "Standart Alanlar",
+    "keyDomains": "Ana Alanlar",
+    "domainGroups": "Alan Grupları",
+    "terms": "Standart Terimler",
+    "codes": "Standart Kodlar",
+    "model": "Kavramsal Model",
+    "prj": "Projeler",
+    "subj": "Konu Alanları",
+    "coreEnt": "Çekirdek Varlıklar",
+    "entityClasses": "Varlık Sınıflandırıcıları",
+    "logical": "Mantıksal Model",
+    "physical": "Fiziksel Model",
+    "erd": "ERD",
+    "ddl": "DDL Oluşturma",
+    "monitor": "İzleme",
+    "monApp": "Uygulama",
+    "monSrv": "Sunucu",
+    "monDb": "Veritabanı",
+    "monUrl": "URL",
+    "monFix": "AI Düzeltme Geçmişi",
+    "sql": "SQL Düzenleyici",
+    "settings": "Ayarlar",
+    "history": "Geçmiş",
+    "forbidden": "Yasaklı Kelimeler",
+    "banBulk": "Toplu Yasaklı Kelime Kaydı",
+    "check": "Standart Kontrol",
+    "reverse": "Tersine Mühendislik",
+    "members": "Üyeler",
+    "approvals": "Onaylar",
+    "plan": "Ödeme"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Sistem Yöneticisi",
+      "DA": "Veri Mimarı",
+      "STD": "Standart Yöneticisi",
+      "MDL": "Modelleyici",
+      "QLT": "Kalite Yöneticisi",
+      "MIG": "Geçiş Yöneticisi",
+      "VIEWER": "Görüntüleyici"
+    },
+    "roleDesc": {
+      "SYS": "Sınıflandırma sistemi ayarlarını · alan gruplarını · kısaltmaları · üyeleri, başvuruları · onayları (anında onay dahil), toplu kaydı, SQL yazmayı, tüm menüleri yönetin",
+      "DA": "Genel standart politikası: Kelimeleri · alanları · terimleri uygula · onayla (başvuruda anında onay seçilebilir), toplu kayıt, ayarları · üyeleri yönet, SQL yaz, tüm menüler",
+      "STD": "Kelimeler · alanlar · terimler için başvur, toplu kayıt, ayarlar, SQL yaz, tüm menüler (onay hakkı yok)",
+      "MDL": "Kelimeler · alanlar · terimler · modellerin kaydı · değiştirilmesi · silinmesi için başvur, toplu kayıt, ayarlar, SQL yaz, tüm menüler (onay hakkı yok)",
+      "QLT": "Başvur · SQL yaz, SQL düzenleyici · modelleme · ayarlar menüleri (kalite teşhis özellikleri gelecekteki aşamalarda)",
+      "MIG": "Başvur · SQL yaz, SQL düzenleyici menüsü (geçiş eşlemesi için)",
+      "VIEWER": "Sadece standart sözlüğü görüntüle"
+    },
+    "plan": {
+      "FREE": "Ücretsiz (Görüntüle)",
+      "P1": "Geliştirici",
+      "P2": "Standart Yöneticisi",
+      "P3": "Modelleyici",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Kaydet",
+      "UPD": "Değiştir",
+      "DEL": "Sil"
+    },
+    "tgt": {
+      "AREA": "Sınıflandırma Sistemi",
+      "MBR": "Üye",
+      "DIC": "Kelime",
+      "DOM": "Alan",
+      "DOM_GRP": "Alan Grubu",
+      "TERM": "Terim",
+      "CD": "Standart Kod",
+      "CD_VAL": "Kod Değeri",
+      "ABBR": "Kısaltma",
+      "PRJ": "Proje",
+      "SUBJ": "Konu Alanı",
+      "ENT": "Varlık",
+      "REL": "İlişki",
+      "ATTR": "Özellik",
+      "VER": "Model Sürümü",
+      "PHY": "Fiziksel Model",
+      "DDL": "DDL Yürütme",
+      "RVS": "Tersine Mühendislik",
+      "SQL": "SQL",
+      "DBCN": "DB Bağlantısı",
+      "AGT": "Aracı",
+      "MONURL": "URL İzleme"
+    }
+  }
+}

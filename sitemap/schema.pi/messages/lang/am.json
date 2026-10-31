@@ -4,11 +4,6 @@
     "description": "የውሂብ መደበኛ መዝገበ ቃላት ሜታ ሲስተም"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "ቋንቋ ቀይር",
-      "search": "ቋንቋ ፈልግ",
-      "empty": "የፍለጋ ውጤቶች የሉም"
-    },
     "loading": "በመጫን ላይ…",
     "requestFailed": "ጥያቄው አልተሳካም",
     "home": "መነሻ",

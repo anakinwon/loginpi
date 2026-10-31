@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Metasystém datového standardního slovníku"
+  },
+  "common": {
+    "loading": "Načítání…",
+    "requestFailed": "Požadavek selhal",
+    "home": "Domů",
+    "goHome": "Přejít na domovskou stránku"
+  },
+  "home": {
+    "subtitle": "Metasystém datového standardního slovníku"
+  },
+  "auth": {
+    "checking": "Kontrola přihlášení…",
+    "googleUnlinked": "Jste přihlášeni pomocí Google, ale účet ještě není propojen s vaším účtem Pi.",
+    "required": "Je vyžadováno přihlášení.",
+    "requiredHint": "Je vyžadováno přihlášení. Přihlaste se prosím pomocí svého účtu Pi v Pi Browseru, nebo pomocí Google (vyžaduje propojení s účtem Pi) v běžném prohlížeči.",
+    "piSignIn": "Přihlásit se pomocí účtu Pi",
+    "googleSignIn": "Přihlásit se pomocí Google",
+    "signOut": "Odhlásit se",
+    "linkCheckFailed": "Nepodařilo se zkontrolovat stav propojení (dočasná chyba). Zkuste to prosím za chvíli znovu."
+  },
+  "link": {
+    "title": "Propojení účtu",
+    "desc": "Propojí váš účet Pi v Pi Browseru s vaším účtem Google v běžném prohlížeči jako stejného uživatele. Po propojení můžete pracovat na PC pouhým přihlášením pomocí Google.",
+    "codeFormTitle": "Zadejte kód pro propojení účtu Pi",
+    "codeFormHint": "Po přihlášení v Pi Browseru zadejte 6místný kód vydaný na obrazovce propojení účtu do 10 minut.",
+    "codeLabel": "Propojovací kód",
+    "linked": "Propojeno.",
+    "submit": "Propojit",
+    "issuerTitle": "Vydat kód pro propojení účtu Google",
+    "issuerHint": "Po přihlášení pomocí Google v běžném prohlížeči zadejte tento kód pro propojení jako stejného uživatele (platí 10 minut).",
+    "minutesLeft": "Zbývá přibližně {minutes} minut",
+    "issue": "Vydat kód",
+    "reissue": "Vydat znovu",
+    "linkedAs": "Váš účet Google je propojen s uživatelem Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Metasystém datového standardního slovníku",
+    "headline1": "Bez standardů nemůžete pojmenovat,",
+    "headline2": "bez modelů nemůžete tabulkovat.",
+    "lead": "Vytvářejte termíny se schválenými standardními slovy, kreslete modely s těmito termíny a generujte DDL z modelů. Lidé rozhodují, nástroje vynucují pravidla.",
+    "flowTitle": "Takto se to propojuje",
+    "step": "Krok {n}",
+    "flow": {
+      "words": {
+        "nm": "Standardní slova",
+        "desc": "Slova · Zkratky · Zakázaná slova"
+      },
+      "domains": {
+        "nm": "Standardní domény",
+        "desc": "Typ · Pravidla délky"
+      },
+      "terms": {
+        "nm": "Standardní termíny",
+        "desc": "Kombinace slov · Schválení"
+      },
+      "model": {
+        "nm": "Datový model",
+        "desc": "Konceptuální · Logický · Fyzický"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Podle tematické oblasti · Porovnání verzí"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generovat podle DBMS · Schválit provedení"
+      }
+    },
+    "roleTitle": "Co můžete dělat podle role",
+    "planTitle": "Cenové plány",
+    "planNote": "— Platba Pi za jednotku klasifikačního systému, cena potvrzena na platební obrazovce",
+    "menu": {
+      "MENU_STD": "Standardní slovník",
+      "MENU_SQL": "SQL Editor",
+      "MENU_SET": "Nastavení · Historie",
+      "MENU_BAN": "Zakázaná slova",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Kontrola standardu",
+      "MENU_ADM": "Členové · Schválení"
+    },
+    "viewOnly": "{menu} (pouze pro zobrazení)",
+    "footer": "Přihlaste se výše, abyste okamžitě viděli své úkoly pro váš klasifikační systém."
+  },
+  "dashboard": {
+    "loadFailed": "Nepodařilo se načíst řídicí panel",
+    "myAreas": "Moje klasifikační systémy",
+    "planLine": "Plán {plan}",
+    "until": " · Do {date}",
+    "grace": "(Odkladná lhůta)",
+    "openArea": "Otevřít klasifikační systém →",
+    "todoTitle": "Na řadě jsem já",
+    "todoEmpty": "Pouze oprávnění k zobrazení — projděte si standardy pomocí níže uvedeného stavu a zkratek.",
+    "apvWait": "Čeká se na schválení standardu",
+    "apvWaitSub": "Žádost o slovo · doménu · termín · kód",
+    "ddlWait": "Čeká se na schválení provedení DDL",
+    "mineWait": "Čekají na mé žádosti",
+    "mineRejected": "{count} {count, plural, one {zamítnuta} few {zamítnuty} many {zamítnuto} other {zamítnuto}} za posledních 30 dní",
+    "model": "Datový model",
+    "modelSub": "Projekty · {count} {count, plural, one {entita} few {entity} many {entit} other {entit}}",
+    "stdTitle": "Stav standardního slovníku",
+    "stdBasis": "Základ schválen",
+    "shortcuts": "Zkratky",
+    "recentTitle": "Poslední změny",
+    "allHistory": "Celá historie",
+    "noHistory": "Zatím žádná historie změn",
+    "justNow": "Právě teď",
+    "minutesAgo": "Před {n} {n, plural, one {minutou} few {minutami} many {minutami} other {minutami}}",
+    "hoursAgo": "Před {n} {n, plural, one {hodinou} few {hodinami} many {hodinami} other {hodinami}}",
+    "daysAgo": "Před {n} {n, plural, one {dnem} few {dny} many {dny} other {dny}}",
+    "areaList": "Seznam klasifikačních systémů · Vytvořit nový"
+  },
+  "areaHome": {
+    "title": "Moje standardní klasifikační systémy",
+    "loading": "Načítání",
+    "empty": "Žádné klasifikační systémy, kterých se účastníte",
+    "open": "Otevřít",
+    "newTitle": "Nový klasifikační systém",
+    "namePlaceholder": "Název klasifikačního systému (povinné)",
+    "descPlaceholder": "Popis",
+    "create": "Vytvořit",
+    "created": "Klasifikační systém {name} vytvořen"
+  },
+  "nav": {
+    "label": "Menu klasifikačního systému",
+    "expand": "Rozbalit spodní menu",
+    "expandWith": "Rozbalit spodní menu ({menu})",
+    "collapse": "Sbalit spodní menu",
+    "subOf": "Podfunkce {menu}",
+    "groupTech": "Monitorování · SQL Editor",
+    "groupStd": "Standardní slovník",
+    "groupModel": "Model",
+    "groupSet": "Nastavení",
+    "groupPlan": "Platba",
+    "words": "Standardní slova",
+    "bulk": "Hromadná registrace",
+    "domains": "Standardní domény",
+    "keyDomains": "Klíčové domény",
+    "domainGroups": "Skupiny domén",
+    "terms": "Standardní termíny",
+    "codes": "Standardní kódy",
+    "model": "Konceptuální model",
+    "prj": "Projekty",
+    "subj": "Tematické oblasti",
+    "coreEnt": "Základní entity",
+    "entityClasses": "Klasifikátory entit",
+    "logical": "Logický model",
+    "physical": "Fyzický model",
+    "erd": "ERD",
+    "ddl": "Generování DDL",
+    "monitor": "Monitorování",
+    "monApp": "Aplikace",
+    "monSrv": "Server",
+    "monDb": "Databáze",
+    "monUrl": "URL",
+    "monFix": "Historie oprav AI",
+    "sql": "SQL Editor",
+    "settings": "Nastavení",
+    "history": "Historie",
+    "forbidden": "Zakázaná slova",
+    "banBulk": "Hromadná registrace zakázaných slov",
+    "check": "Kontrola standardu",
+    "reverse": "Reverzní inženýrství",
+    "members": "Členové",
+    "approvals": "Schválení",
+    "plan": "Platba"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Správce systému",
+      "DA": "Datový architekt",
+      "STD": "Správce standardů",
+      "MDL": "Modelář",
+      "QLT": "Manažer kvality",
+      "MIG": "Manažer migrace",
+      "VIEWER": "Prohlížeč"
+    },
+    "roleDesc": {
+      "SYS": "Správa nastavení klasifikačního systému · skupin domén · zkratek · členů, žádostí · schválení (včetně okamžitého schválení), hromadná registrace, psaní SQL, všechna menu",
+      "DA": "Celková standardní politika: Aplikace · schvalování slov · domén · termínů (lze vybrat okamžité schválení při aplikaci), hromadná registrace, správa nastavení · členů, psaní SQL, všechna menu",
+      "STD": "Žádost o slova · domény · termíny, hromadná registrace, nastavení, psaní SQL, všechna menu (bez práv schválení)",
+      "MDL": "Žádost o registraci · úpravu · smazání slov · domén · termínů · modelů, hromadná registrace, nastavení, psaní SQL, všechna menu (bez práv schválení)",
+      "QLT": "Aplikace · psaní SQL, menu SQL editoru · modelování · nastavení (funkce diagnostiky kvality v budoucích fázích)",
+      "MIG": "Aplikace · psaní SQL, menu SQL editoru (pro mapování migrace)",
+      "VIEWER": "Pouze zobrazení standardního slovníku"
+    },
+    "plan": {
+      "FREE": "Zdarma (zobrazení)",
+      "P1": "Vývojář",
+      "P2": "Správce standardů",
+      "P3": "Modelář",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registrovat",
+      "UPD": "Upravit",
+      "DEL": "Smazat"
+    },
+    "tgt": {
+      "AREA": "Klasifikační systém",
+      "MBR": "Člen",
+      "DIC": "Slovo",
+      "DOM": "Doména",
+      "DOM_GRP": "Skupina domén",
+      "TERM": "Termín",
+      "CD": "Standardní kód",
+      "CD_VAL": "Hodnota kódu",
+      "ABBR": "Zkratka",
+      "PRJ": "Projekt",
+      "SUBJ": "Tematická oblast",
+      "ENT": "Entita",
+      "REL": "Vztah",
+      "ATTR": "Atribut",
+      "VER": "Verze modelu",
+      "PHY": "Fyzický model",
+      "DDL": "Provedení DDL",
+      "RVS": "Reverzní inženýrství",
+      "SQL": "SQL",
+      "DBCN": "Připojení k DB",
+      "AGT": "Agent",
+      "MONURL": "Monitorování URL"
+    }
+  }
+}

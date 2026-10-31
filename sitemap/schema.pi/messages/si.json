@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Metasistem podatkovnega standardnega slovarja"
+  },
+  "common": {
+    "loading": "Nalaganje…",
+    "requestFailed": "Zahteva ni uspela",
+    "home": "Domov",
+    "goHome": "Pojdi domov"
+  },
+  "home": {
+    "subtitle": "Metasistem podatkovnega standardnega slovarja"
+  },
+  "auth": {
+    "checking": "Preverjanje prijave…",
+    "googleUnlinked": "Prijavljeni ste z Google, vendar še ni povezan z vašim Pi računom.",
+    "required": "Prijava je obvezna.",
+    "requiredHint": "Prijava je obvezna. Prijavite se s svojim Pi računom v Pi Browserju ali z Google (potrebna je povezava Pi računa) v običajnem brskalniku.",
+    "piSignIn": "Prijava s Pi računom",
+    "googleSignIn": "Prijava z Google",
+    "signOut": "Odjava",
+    "linkCheckFailed": "Preverjanje statusa povezave ni uspelo (začasna napaka). Osvežite stran čez nekaj časa."
+  },
+  "link": {
+    "title": "Povezovanje računov",
+    "desc": "Poveže vaš Pi račun v Pi Browserju z vašim Google računom v običajnem brskalniku kot istega uporabnika. Po povezavi lahko delate na računalniku samo z Google prijavo.",
+    "codeFormTitle": "Vnesite kodo za povezavo Pi računa",
+    "codeFormHint": "Po prijavi v Pi Browser vnesite 6-mestno kodo, izdano na zaslonu za povezavo računa, v 10 minutah.",
+    "codeLabel": "Koda za povezavo",
+    "linked": "Povezano.",
+    "submit": "Poveži",
+    "issuerTitle": "Izdaja kode za povezavo Google računa",
+    "issuerHint": "Po prijavi z Google v običajnem brskalniku vnesite to kodo za povezavo kot istega uporabnika (velja 10 minut).",
+    "minutesLeft": "Pribl. {minutes} minut preostalih",
+    "issue": "Izdaj kodo",
+    "reissue": "Ponovno izda",
+    "linkedAs": "Vaš Google račun je povezan z uporabnikom Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Metasistem podatkovnega standardnega slovarja",
+    "headline1": "Brez standardov ne morete poimenovati,",
+    "headline2": "brez modelov ne morete tabelirati.",
+    "lead": "Ustvarite izraze z odobrenimi standardnimi besedami, narišite modele s temi izrazi in ustvarite DDL iz modelov. Ljudje odločajo, orodja uveljavljajo pravila.",
+    "flowTitle": "Tako se povezuje",
+    "step": "Korak {n}",
+    "flow": {
+      "words": {
+        "nm": "Standardne besede",
+        "desc": "Besede · Okrajšave · Prepovedane besede"
+      },
+      "domains": {
+        "nm": "Standardne domene",
+        "desc": "Pravila za tip · dolžino"
+      },
+      "terms": {
+        "nm": "Standardni izrazi",
+        "desc": "Kombinacija besed · Odobritev"
+      },
+      "model": {
+        "nm": "Podatkovni model",
+        "desc": "Konceptualni · Logični · Fizični"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Po predmetnem področju · Primerjava različic"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generiraj po DBMS · Odobri izvedbo"
+      }
+    },
+    "roleTitle": "Kaj lahko storite po vlogi",
+    "planTitle": "Cenovni načrti",
+    "planNote": "— Pi plačilo na enoto klasifikacijskega sistema, cena potrjena na plačilnem zaslonu",
+    "menu": {
+      "MENU_STD": "Standardni slovar",
+      "MENU_SQL": "SQL urejevalnik",
+      "MENU_SET": "Nastavitve · Zgodovina",
+      "MENU_BAN": "Prepovedane besede",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Preverjanje standardov",
+      "MENU_ADM": "Člani · Odobritve"
+    },
+    "viewOnly": "{menu} (Samo za ogled)",
+    "footer": "Prijavite se zgoraj, da takoj vidite svoje naloge za vaš klasifikacijski sistem."
+  },
+  "dashboard": {
+    "loadFailed": "Nalaganje nadzorne plošče ni uspelo",
+    "myAreas": "Moji klasifikacijski sistemi",
+    "planLine": "Načrt {plan}",
+    "until": " · Do {date}",
+    "grace": "(Milostno obdobje)",
+    "openArea": "Odpri klasifikacijski sistem →",
+    "todoTitle": "Na vrsti sem jaz",
+    "todoEmpty": "Samo dovoljenje za ogled — prosimo, brskajte po standardih z uporabo spodnjega statusa in bližnjic.",
+    "apvWait": "Čakanje na odobritev standarda",
+    "apvWaitSub": "Prijava besede · domene · izraza · kode",
+    "ddlWait": "Čakanje na odobritev izvedbe DDL",
+    "mineWait": "Moje čakajoče prijave",
+    "mineRejected": "{count} zavrnjenih v zadnjih 30 dneh",
+    "model": "Podatkovni model",
+    "modelSub": "Projekti · {count} entitet",
+    "stdTitle": "Status standardnega slovarja",
+    "stdBasis": "Odobrena osnova",
+    "shortcuts": "Bližnjice",
+    "recentTitle": "Nedavne spremembe",
+    "allHistory": "Celotna zgodovina",
+    "noHistory": "Še ni zgodovine sprememb",
+    "justNow": "Pravkar",
+    "minutesAgo": "pred {n} minutami",
+    "hoursAgo": "pred {n} urami",
+    "daysAgo": "pred {n} dnevi",
+    "areaList": "Seznam klasifikacijskih sistemov · Ustvari novo"
+  },
+  "areaHome": {
+    "title": "Moji standardni klasifikacijski sistemi",
+    "loading": "Nalaganje",
+    "empty": "Ni sodelujočih klasifikacijskih sistemov",
+    "open": "Odpri",
+    "newTitle": "Nov klasifikacijski sistem",
+    "namePlaceholder": "Ime klasifikacijskega sistema (obvezno)",
+    "descPlaceholder": "Opis",
+    "create": "Ustvari",
+    "created": "Klasifikacijski sistem {name} ustvarjen"
+  },
+  "nav": {
+    "label": "Meni klasifikacijskega sistema",
+    "expand": "Razširi spodnji meni",
+    "expandWith": "Razširi spodnji meni ({menu})",
+    "collapse": "Skrči spodnji meni",
+    "subOf": "Podfunkcije {menu}",
+    "groupTech": "Spremljanje · SQL urejevalnik",
+    "groupStd": "Standardni slovar",
+    "groupModel": "Model",
+    "groupSet": "Nastavitve",
+    "groupPlan": "Plačilo",
+    "words": "Standardne besede",
+    "bulk": "Množična registracija",
+    "domains": "Standardne domene",
+    "keyDomains": "Ključne domene",
+    "domainGroups": "Skupine domen",
+    "terms": "Standardni izrazi",
+    "codes": "Standardne kode",
+    "model": "Konceptualni model",
+    "prj": "Projekti",
+    "subj": "Predmetna področja",
+    "coreEnt": "Osnovne entitete",
+    "entityClasses": "Klasifikatorji entitet",
+    "logical": "Logični model",
+    "physical": "Fizični model",
+    "erd": "ERD",
+    "ddl": "Generiranje DDL",
+    "monitor": "Spremljanje",
+    "monApp": "Aplikacija",
+    "monSrv": "Strežnik",
+    "monDb": "Baza podatkov",
+    "monUrl": "URL",
+    "monFix": "Zgodovina popravkov AI",
+    "sql": "SQL urejevalnik",
+    "settings": "Nastavitve",
+    "history": "Zgodovina",
+    "forbidden": "Prepovedane besede",
+    "banBulk": "Množična registracija prepovedanih besed",
+    "check": "Preverjanje standardov",
+    "reverse": "Obratno inženirstvo",
+    "members": "Člani",
+    "approvals": "Odobritve",
+    "plan": "Plačilo"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Skrbnik sistema",
+      "DA": "Podatkovni arhitekt",
+      "STD": "Upravitelj standardov",
+      "MDL": "Modelar",
+      "QLT": "Upravitelj kakovosti",
+      "MIG": "Upravitelj migracij",
+      "VIEWER": "Pregledovalec"
+    },
+    "roleDesc": {
+      "SYS": "Upravljanje nastavitev klasifikacijskega sistema · skupin domen · okrajšav · članov, aplikacij · odobritev (vključno s takojšnjo odobritvijo), množična registracija, pisanje SQL, vsi meniji",
+      "DA": "Celotna standardna politika: Uporabi · odobri besede · domene · izraze (lahko izbere takojšnjo odobritev ob prijavi), množična registracija, upravljanje nastavitev · članov, pisanje SQL, vsi meniji",
+      "STD": "Prijavi besede · domene · izraze, množična registracija, nastavitve, pisanje SQL, vsi meniji (brez pravic odobritve)",
+      "MDL": "Prijavi registracijo · spremembo · izbris besed · domen · izrazov · modelov, množična registracija, nastavitve, pisanje SQL, vsi meniji (brez pravic odobritve)",
+      "QLT": "Prijavi · pisanje SQL, meniji SQL urejevalnika · modeliranja · nastavitev (funkcije diagnostike kakovosti v prihodnjih fazah)",
+      "MIG": "Prijavi · pisanje SQL, meni SQL urejevalnika (za preslikavo migracij)",
+      "VIEWER": "Samo ogled standardnega slovarja"
+    },
+    "plan": {
+      "FREE": "Brezplačno (Ogled)",
+      "P1": "Razvijalec",
+      "P2": "Upravitelj standardov",
+      "P3": "Modelar",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registriraj",
+      "UPD": "Spremeni",
+      "DEL": "Izbriši"
+    },
+    "tgt": {
+      "AREA": "Klasifikacijski sistem",
+      "MBR": "Član",
+      "DIC": "Beseda",
+      "DOM": "Domena",
+      "DOM_GRP": "Skupina domen",
+      "TERM": "Izraz",
+      "CD": "Standardna koda",
+      "CD_VAL": "Vrednost kode",
+      "ABBR": "Okrajšava",
+      "PRJ": "Projekt",
+      "SUBJ": "Predmetno področje",
+      "ENT": "Entiteta",
+      "REL": "Razmerje",
+      "ATTR": "Atribut",
+      "VER": "Različica modela",
+      "PHY": "Fizični model",
+      "DDL": "Izvedba DDL",
+      "RVS": "Obratno inženirstvo",
+      "SQL": "SQL",
+      "DBCN": "DB povezava",
+      "AGT": "Agent",
+      "MONURL": "Spremljanje URL-jev"
+    }
+  }
+}

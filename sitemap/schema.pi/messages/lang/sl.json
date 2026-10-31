@@ -4,11 +4,6 @@
     "description": "Metasistem podatkovnega standardnega slovarja"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Spremeni jezik",
-      "search": "Išči jezik",
-      "empty": "Ni rezultatov iskanja"
-    },
     "loading": "Nalaganje…",
     "requestFailed": "Zahteva ni uspela",
     "home": "Domov",

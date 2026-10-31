@@ -4,11 +4,6 @@
     "description": "Metasystem für Datenstandardwörterbücher"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Sprache ändern",
-      "search": "Sprache suchen",
-      "empty": "Keine Suchergebnisse"
-    },
     "loading": "Wird geladen…",
     "requestFailed": "Anfrage fehlgeschlagen",
     "home": "Startseite",

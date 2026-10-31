@@ -531,7 +531,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   const btn = 'rounded border border-white/40 bg-white/10 px-2 py-0.5 hover:bg-white/20 disabled:opacity-40'
   const sel = 'rounded border border-white/40 bg-[#1f3a68] px-1 py-0.5 text-white'
   return (
-    <main className="fixed inset-x-0 top-0 z-30 flex flex-col overflow-hidden bg-white" style={{ bottom: 'var(--area-nav-h, 4rem)' }}>
+    <main className="fixed inset-x-0 z-30 flex flex-col overflow-hidden bg-white" style={{ top: 'var(--area-head-h, 3rem)', bottom: 'var(--area-nav-h, 4rem)' }}>
       <div className="flex shrink-0 items-center gap-2 border-b px-2 py-1">
         <Link href="/" className="shrink-0 text-xs text-blue-700 underline">
           ← 분류체계 목록

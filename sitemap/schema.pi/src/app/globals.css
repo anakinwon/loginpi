@@ -1,11 +1,28 @@
 /* schema.pi 전역 스타일 — Tailwind v4 CSS-first 진입점(config 파일 없음) */
 @import 'tailwindcss';
-/* 공용 패키지 컴포넌트(@pi/i18n LocaleSwitcher)는 앱 밖이라 자동 탐지가 안 됨 — 명시 */
+/* 공용 패키지 컴포넌트(@pi/i18n 언어 콤보·π 시세칩)는 앱 밖이라 자동 탐지가 안 됨 — 명시 */
 @source '../../../../packages/pi-i18n/src';
+
+/* 언어 콤보·π 시세칩(@pi/i18n, loginpi 동일 className)이 쓰는 shadcn 토큰 → Tailwind 색 유틸리티 */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+}
 
 :root {
   --background: #ffffff;
   --foreground: #1f2937;
+  /* shadcn 토큰 — 밝은 단일 테마(회색 계열 + 앱 남색 강조) */
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --border: #e5e7eb;
+  --primary: #2b4c86;
+  /* 분류체계 화면 상단 헤더 높이(site-header h-12) — #area-scroll·SQL 편집기 고정 틀의 top */
+  --area-head-h: 3rem;
 }
 
 body {

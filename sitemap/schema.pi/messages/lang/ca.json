@@ -4,11 +4,6 @@
     "description": "Sistema Meta del Diccionari Estàndard de Dades"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Canviar idioma",
-      "search": "Cercar idioma",
-      "empty": "No hi ha resultats de cerca"
-    },
     "loading": "Carregant…",
     "requestFailed": "La sol·licitud ha fallat",
     "home": "Inici",

@@ -4,11 +4,6 @@
     "description": "نظام بيانات قاموس المعايير الوصفية"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "تغيير اللغة",
-      "search": "البحث عن اللغة",
-      "empty": "لا توجد نتائج بحث"
-    },
     "loading": "جارٍ التحميل…",
     "requestFailed": "فشل الطلب",
     "home": "الرئيسية",

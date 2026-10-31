@@ -4,11 +4,6 @@
     "description": "Hệ thống siêu dữ liệu từ điển tiêu chuẩn"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Đổi ngôn ngữ",
-      "search": "Tìm ngôn ngữ",
-      "empty": "Không có kết quả tìm kiếm"
-    },
     "loading": "Đang tải…",
     "requestFailed": "Yêu cầu thất bại",
     "home": "Trang chủ",

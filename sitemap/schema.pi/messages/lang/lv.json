@@ -4,11 +4,6 @@
     "description": "Datu standarta vārdnīcas metasistēma"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Mainīt valodu",
-      "search": "Meklēt valodu",
-      "empty": "Nav meklēšanas rezultātu"
-    },
     "loading": "Ielādē…",
     "requestFailed": "Pieprasījums neizdevās",
     "home": "Sākums",

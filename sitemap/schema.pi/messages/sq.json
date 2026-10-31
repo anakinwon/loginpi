@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Sistem Meta i Fjalorit Standard të të Dhënave"
+  },
+  "common": {
+    "loading": "Po ngarkohet…",
+    "requestFailed": "Kërkesa dështoi",
+    "home": "Kreu",
+    "goHome": "Shko në Kreu"
+  },
+  "home": {
+    "subtitle": "Sistem Meta i Fjalorit Standard të të Dhënave"
+  },
+  "auth": {
+    "checking": "Po kontrollohet hyrja…",
+    "googleUnlinked": "Jeni identifikuar me Google, por ende nuk është lidhur me llogarinë tuaj Pi.",
+    "required": "Kërkohet identifikimi.",
+    "requiredHint": "Kërkohet identifikimi. Ju lutemi identifikohuni me llogarinë tuaj Pi në Pi Browser, ose me Google (kërkohet lidhja e llogarisë Pi) në një shfletues të rregullt.",
+    "piSignIn": "Identifikohu me llogarinë Pi",
+    "googleSignIn": "Identifikohu me Google",
+    "signOut": "Dil",
+    "linkCheckFailed": "Dështoi kontrolli i statusit të lidhjes (gabim i përkohshëm). Ju lutemi rifreskoni së shpejti."
+  },
+  "link": {
+    "title": "Lidhja e Llogarisë",
+    "desc": "Lidh llogarinë tuaj Pi në Pi Browser me llogarinë tuaj Google në një shfletues të rregullt si i njëjti përdorues. Pas lidhjes, mund të punoni në PC duke u identifikuar vetëm me Google.",
+    "codeFormTitle": "Vendos Kodin e Lidhjes së Llogarisë Pi",
+    "codeFormHint": "Pasi të identifikoheni në Pi Browser, vendosni kodin 6-shifror të lëshuar në ekranin e lidhjes së llogarisë brenda 10 minutash.",
+    "codeLabel": "Kodi i Lidhjes",
+    "linked": "Lidhur.",
+    "submit": "Lidh",
+    "issuerTitle": "Lësho Kodin e Lidhjes së Llogarisë Google",
+    "issuerHint": "Pasi të identifikoheni me Google në një shfletues të rregullt, vendosni këtë kod për t'u lidhur si i njëjti përdorues (i vlefshëm për 10 minuta).",
+    "minutesLeft": "Afërsisht {minutes} minuta të mbetura",
+    "issue": "Lësho Kodin",
+    "reissue": "Rilësho",
+    "linkedAs": "Llogaria juaj Google është lidhur me përdoruesin Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Sistem Meta i Fjalorit Standard të të Dhënave",
+    "headline1": "Pa standarde, nuk mund të emërtosh,",
+    "headline2": "pa modele, nuk mund të tabelosh.",
+    "lead": "Krijoni terma me fjalë standarde të miratuara, vizatoni modele me ato terma dhe gjeneroni DDL nga modelet. Njerëzit vendosin, mjetet zbatojnë rregullat.",
+    "flowTitle": "Kështu lidhet",
+    "step": "Hapi {n}",
+    "flow": {
+      "words": {
+        "nm": "Fjalë Standarde",
+        "desc": "Fjalë · Shkurtime · Fjalë të Ndaluara"
+      },
+      "domains": {
+        "nm": "Domain-e Standarde",
+        "desc": "Lloji · Rregullat e Gjatësisë"
+      },
+      "terms": {
+        "nm": "Terma Standarde",
+        "desc": "Kombinim Fjalësh · Miratim"
+      },
+      "model": {
+        "nm": "Modeli i të Dhënave",
+        "desc": "Konceptual · Logjik · Fizik"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Sipas Zonës së Subjektit · Krahasimi i Versionit"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Gjenero sipas DBMS · Mirato Ekzekutimin"
+      }
+    },
+    "roleTitle": "Çfarë mund të bëni sipas rolit",
+    "planTitle": "Planet e Çmimeve",
+    "planNote": "— Pagesa Pi për njësi të sistemit të klasifikimit, çmimi konfirmohet në ekranin e pagesës",
+    "menu": {
+      "MENU_STD": "Fjalor Standard",
+      "MENU_SQL": "Redaktues SQL",
+      "MENU_SET": "Cilësimet · Historia",
+      "MENU_BAN": "Fjalë të Ndaluara",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Kontrolli Standard",
+      "MENU_ADM": "Anëtarët · Miratimet"
+    },
+    "viewOnly": "{menu} (Vetëm Shikim)",
+    "footer": "Identifikohu më lart për të parë menjëherë detyrat tuaja për sistemin tuaj të klasifikimit."
+  },
+  "dashboard": {
+    "loadFailed": "Dështoi ngarkimi i panelit",
+    "myAreas": "Sistemet e Mia të Klasifikimit",
+    "planLine": "Plani {plan}",
+    "until": " · Deri më {date}",
+    "grace": "(Periudhë hiri)",
+    "openArea": "Hap Sistemin e Klasifikimit →",
+    "todoTitle": "Rradha Ime",
+    "todoEmpty": "Vetëm leje shikimi — ju lutemi shfletoni standardet duke përdorur statusin dhe shkurtoret më poshtë.",
+    "apvWait": "Në pritje të Miratimit Standard",
+    "apvWaitSub": "Aplikimi i Fjalës · Domain-it · Termit · Kodit",
+    "ddlWait": "Në pritje të Miratimit të Ekzekutimit të DDL",
+    "mineWait": "Aplikimet e Mia në Pritje",
+    "mineRejected": "{count} të refuzuara në 30 ditët e fundit",
+    "model": "Modeli i të Dhënave",
+    "modelSub": "Projekte · {count} Entitete",
+    "stdTitle": "Statusi i Fjalorit Standard",
+    "stdBasis": "Baza e Miratuar",
+    "shortcuts": "Shkurtore",
+    "recentTitle": "Ndryshimet e Fundit",
+    "allHistory": "Historia e Plotë",
+    "noHistory": "Ende nuk ka histori ndryshimesh",
+    "justNow": "Tani",
+    "minutesAgo": "{n} minuta më parë",
+    "hoursAgo": "{n} orë më parë",
+    "daysAgo": "{n} ditë më parë",
+    "areaList": "Lista e Sistemeve të Klasifikimit · Krijo të Ri"
+  },
+  "areaHome": {
+    "title": "Sistemet e Mia Standarde të Klasifikimit",
+    "loading": "Po ngarkohet",
+    "empty": "Asnjë sistem klasifikimi në të cilin merrni pjesë",
+    "open": "Hap",
+    "newTitle": "Sistem i Ri Klasifikimi",
+    "namePlaceholder": "Emri i Sistemit të Klasifikimit (i detyrueshëm)",
+    "descPlaceholder": "Përshkrimi",
+    "create": "Krijo",
+    "created": "Sistemi i klasifikimit {name} u krijua"
+  },
+  "nav": {
+    "label": "Menyja e Sistemit të Klasifikimit",
+    "expand": "Zgjero menunë e poshtme",
+    "expandWith": "Zgjero menunë e poshtme ({menu})",
+    "collapse": "Palos menunë e poshtme",
+    "subOf": "Nënfunksionet e {menu}",
+    "groupTech": "Monitorimi · Redaktues SQL",
+    "groupStd": "Fjalor Standard",
+    "groupModel": "Modeli",
+    "groupSet": "Cilësimet",
+    "groupPlan": "Pagesa",
+    "words": "Fjalë Standarde",
+    "bulk": "Regjistrim Masiv",
+    "domains": "Domain-e Standarde",
+    "keyDomains": "Domain-e Kryesore",
+    "domainGroups": "Grupet e Domain-eve",
+    "terms": "Terma Standarde",
+    "codes": "Kode Standarde",
+    "model": "Model Konceptual",
+    "prj": "Projekte",
+    "subj": "Zona të Subjektit",
+    "coreEnt": "Entitete Kryesore",
+    "entityClasses": "Klasifikuesit e Entiteteve",
+    "logical": "Model Logjik",
+    "physical": "Model Fizik",
+    "erd": "ERD",
+    "ddl": "Gjenerimi i DDL",
+    "monitor": "Monitorimi",
+    "monApp": "Aplikacioni",
+    "monSrv": "Serveri",
+    "monDb": "Baza e të Dhënave",
+    "monUrl": "URL",
+    "monFix": "Historia e Korrigjimeve të AI",
+    "sql": "Redaktues SQL",
+    "settings": "Cilësimet",
+    "history": "Historia",
+    "forbidden": "Fjalë të Ndaluara",
+    "banBulk": "Regjistrim Masiv i Fjalëve të Ndaluara",
+    "check": "Kontrolli Standard",
+    "reverse": "Inxhinieri e Kthyer",
+    "members": "Anëtarët",
+    "approvals": "Miratimet",
+    "plan": "Pagesa"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Administrator Sistemi",
+      "DA": "Arkitekt të Dhënash",
+      "STD": "Menaxher Standardesh",
+      "MDL": "Modelues",
+      "QLT": "Menaxher Cilësie",
+      "MIG": "Menaxher Migrimi",
+      "VIEWER": "Shikues"
+    },
+    "roleDesc": {
+      "SYS": "Menaxho cilësimet e sistemit të klasifikimit · grupet e domain-eve · shkurtimet · anëtarët, aplikimet · miratimet (përfshirë miratimin e menjëhershëm), regjistrimin masiv, shkrimin SQL, të gjitha menutë",
+      "DA": "Politika e përgjithshme standarde: Apliko · mirato fjalë · domain-e · terma (mund të zgjedhë miratimin e menjëhershëm pas aplikimit), regjistrim masiv, menaxho cilësimet · anëtarët, shkrim SQL, të gjitha menutë",
+      "STD": "Apliko për fjalë · domain-e · terma, regjistrim masiv, cilësime, shkrim SQL, të gjitha menutë (pa të drejta miratimi)",
+      "MDL": "Apliko për regjistrim · modifikim · fshirje të fjalëve · domain-eve · termave · modeleve, regjistrim masiv, cilësime, shkrim SQL, të gjitha menutë (pa të drejta miratimi)",
+      "QLT": "Apliko · shkrim SQL, redaktues SQL · modelim · menutë e cilësimeve (funksionet e diagnostikimit të cilësisë në fazat e ardhshme)",
+      "MIG": "Apliko · shkrim SQL, menyja e redaktuesit SQL (për hartimin e migrimit)",
+      "VIEWER": "Vetëm shikim i fjalorit standard"
+    },
+    "plan": {
+      "FREE": "Falas (Shikim)",
+      "P1": "Zhvillues",
+      "P2": "Menaxher Standardesh",
+      "P3": "Modelues",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Regjistro",
+      "UPD": "Modifiko",
+      "DEL": "Fshi"
+    },
+    "tgt": {
+      "AREA": "Sistemi i Klasifikimit",
+      "MBR": "Anëtar",
+      "DIC": "Fjalë",
+      "DOM": "Domain",
+      "DOM_GRP": "Grup Domain-esh",
+      "TERM": "Term",
+      "CD": "Kod Standard",
+      "CD_VAL": "Vlera e Kodit",
+      "ABBR": "Shkurtim",
+      "PRJ": "Projekt",
+      "SUBJ": "Zona e Subjektit",
+      "ENT": "Entitet",
+      "REL": "Marrëdhënie",
+      "ATTR": "Atribut",
+      "VER": "Versioni i Modelit",
+      "PHY": "Model Fizik",
+      "DDL": "Ekzekutimi i DDL",
+      "RVS": "Inxhinieri e Kthyer",
+      "SQL": "SQL",
+      "DBCN": "Lidhja me DB",
+      "AGT": "Agjent",
+      "MONURL": "Monitorimi i URL-së"
+    }
+  }
+}

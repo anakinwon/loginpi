@@ -4,11 +4,6 @@
     "description": "Metasysteem voor datastandaardwoordenboek"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Taal wijzigen",
-      "search": "Taal zoeken",
-      "empty": "Geen zoekresultaten"
-    },
     "loading": "Laden…",
     "requestFailed": "Verzoek mislukt",
     "home": "Startpagina",

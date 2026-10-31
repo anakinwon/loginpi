@@ -4,11 +4,6 @@
     "description": "資料標準字典中繼系統"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "變更語言",
-      "search": "搜尋語言",
-      "empty": "無搜尋結果"
-    },
     "loading": "載入中…",
     "requestFailed": "請求失敗",
     "home": "首頁",

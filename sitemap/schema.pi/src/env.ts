@@ -20,6 +20,8 @@ const schema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   // Google 버튼 노출 플래그(클라이언트 인라인) — 서버 3종이 없으면 버튼만 보이고 404 가 나므로 함께 설정
   NEXT_PUBLIC_GOOGLE_LOGIN: z.enum(['1']).optional(),
+  // 상단 헤더 π 시세(언어 콤보 1π 환산·시세칩, @pi/i18n 표준 4.6절) — 기본 표시, 'false' 만 숨김(loginpi 시세 표시 스위치와 같은 역할)
+  NEXT_PUBLIC_FEATURE_PI_PRICE: z.enum(['true', 'false']).optional(),
   // 개념 모델 AI 추천(프로젝트명·설명, src/lib/modelpi/project-ai.ts) — 없으면 업종 템플릿 문장으로 대체(외부 전송 없음)
   ANTHROPIC_API_KEY: z.string().optional(),
   // 모니터링 AI 원인 분석 — 설정에 등록한 제공사별 키(sql/070 mon_ai_mdl, 키는 DB 에 저장하지 않음). 없으면 그 제공사 모델은 분석 불가(503)

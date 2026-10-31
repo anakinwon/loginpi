@@ -4,11 +4,6 @@
     "description": "数据标准字典元系统"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "更改语言",
-      "search": "搜索语言",
-      "empty": "无搜索结果"
-    },
     "loading": "加载中…",
     "requestFailed": "请求失败",
     "home": "首页",

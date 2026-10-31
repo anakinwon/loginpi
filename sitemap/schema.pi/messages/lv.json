@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Datu standarta vārdnīcas metasistēma"
+  },
+  "common": {
+    "loading": "Ielādē…",
+    "requestFailed": "Pieprasījums neizdevās",
+    "home": "Sākums",
+    "goHome": "Doties uz sākumu"
+  },
+  "home": {
+    "subtitle": "Datu standarta vārdnīcas metasistēma"
+  },
+  "auth": {
+    "checking": "Pārbauda pieteikšanos…",
+    "googleUnlinked": "Jūs esat pieteicies ar Google, taču tas vēl nav saistīts ar jūsu Pi kontu.",
+    "required": "Nepieciešama pieteikšanās.",
+    "requiredHint": "Nepieciešama pieteikšanās. Lūdzu, piesakieties ar savu Pi kontu Pi Browser, vai ar Google (nepieciešama Pi konta saistīšana) parastā pārlūkprogrammā.",
+    "piSignIn": "Pieteikties ar Pi kontu",
+    "googleSignIn": "Pieteikties ar Google",
+    "signOut": "Izrakstīties",
+    "linkCheckFailed": "Neizdevās pārbaudīt saistīšanas statusu (pagaidu kļūda). Lūdzu, drīz atsvaidziniet."
+  },
+  "link": {
+    "title": "Konta saistīšana",
+    "desc": "Saista jūsu Pi kontu Pi Browser ar jūsu Google kontu parastā pārlūkprogrammā kā vienu un to pašu lietotāju. Pēc saistīšanas varat strādāt datorā, vienkārši piesakoties ar Google.",
+    "codeFormTitle": "Ievadiet Pi konta saistīšanas kodu",
+    "codeFormHint": "Pēc pieteikšanās Pi Browser, ievadiet 6 ciparu kodu, kas izsniegts konta saistīšanas ekrānā, 10 minūšu laikā.",
+    "codeLabel": "Saistīšanas kods",
+    "linked": "Saistīts.",
+    "submit": "Saistīt",
+    "issuerTitle": "Izsniegt Google konta saistīšanas kodu",
+    "issuerHint": "Pēc pieteikšanās ar Google parastā pārlūkprogrammā, ievadiet šo kodu, lai saistītu kā vienu un to pašu lietotāju (derīgs 10 minūtes).",
+    "minutesLeft": "Apm. {minutes} minūtes atlikušas",
+    "issue": "Izsniegt kodu",
+    "reissue": "Izsniegt atkārtoti",
+    "linkedAs": "Jūsu Google konts ir saistīts ar Pi lietotāju <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Datu standarta vārdnīcas metasistēma",
+    "headline1": "Bez standartiem nevar nosaukt,",
+    "headline2": "bez modeļiem nevar izveidot tabulas.",
+    "lead": "Izveidojiet terminus ar apstiprinātiem standarta vārdiem, zīmējiet modeļus ar šiem terminiem un ģenerējiet DDL no modeļiem. Cilvēki lemj, rīki nodrošina noteikumu ievērošanu.",
+    "flowTitle": "Šādi tas savienojas",
+    "step": "{n}. solis",
+    "flow": {
+      "words": {
+        "nm": "Standarta vārdi",
+        "desc": "Vārdi · Saīsinājumi · Aizliegtie vārdi"
+      },
+      "domains": {
+        "nm": "Standarta domēni",
+        "desc": "Tips · Garuma noteikumi"
+      },
+      "terms": {
+        "nm": "Standarta termini",
+        "desc": "Vārdu kombinācija · Apstiprināšana"
+      },
+      "model": {
+        "nm": "Datu modelis",
+        "desc": "Konceptuāls · Loģisks · Fizisks"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Pēc tēmas apgabala · Versiju salīdzināšana"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Ģenerēt pēc DBVS · Apstiprināt izpildi"
+      }
+    },
+    "roleTitle": "Ko varat darīt pēc lomas",
+    "planTitle": "Cenu plāni",
+    "planNote": "— Pi maksājums par klasifikācijas sistēmas vienību, cena apstiprināta maksājuma ekrānā",
+    "menu": {
+      "MENU_STD": "Standarta vārdnīca",
+      "MENU_SQL": "SQL redaktors",
+      "MENU_SET": "Iestatījumi · Vēsture",
+      "MENU_BAN": "Aizliegtie vārdi",
+      "MENU_MODEL": "Modelis · ERD · DDL",
+      "MENU_CHK": "Standarta pārbaude",
+      "MENU_ADM": "Dalībnieki · Apstiprinājumi"
+    },
+    "viewOnly": "{menu} (Tikai skatīšanās)",
+    "footer": "Piesakieties augstāk, lai nekavējoties redzētu savus uzdevumus savai klasifikācijas sistēmai."
+  },
+  "dashboard": {
+    "loadFailed": "Neizdevās ielādēt informācijas paneli",
+    "myAreas": "Manas klasifikācijas sistēmas",
+    "planLine": "Plāns {plan}",
+    "until": " · Līdz {date}",
+    "grace": "(Atliktais periods)",
+    "openArea": "Atvērt klasifikācijas sistēmu →",
+    "todoTitle": "Mana kārta",
+    "todoEmpty": "Tikai skatīšanās atļauja — lūdzu, pārlūkojiet standartus, izmantojot zemāk redzamo statusu un saīsnes.",
+    "apvWait": "Standarta apstiprinājums gaida",
+    "apvWaitSub": "Vārdu · Domēnu · Terminu · Kodu pieteikums",
+    "ddlWait": "DDL izpildes apstiprinājums gaida",
+    "mineWait": "Mani pieteikumi gaida",
+    "mineRejected": "{count} noraidīti pēdējās 30 dienās",
+    "model": "Datu modelis",
+    "modelSub": "Projekti · {count} entītijas",
+    "stdTitle": "Standarta vārdnīcas statuss",
+    "stdBasis": "Apstiprināts pamats",
+    "shortcuts": "Saīsnes",
+    "recentTitle": "Jaunākās izmaiņas",
+    "allHistory": "Pilna vēsture",
+    "noHistory": "Vēl nav izmaiņu vēstures",
+    "justNow": "Tikko",
+    "minutesAgo": "Pirms {n} minūtēm",
+    "hoursAgo": "Pirms {n} stundām",
+    "daysAgo": "Pirms {n} dienām",
+    "areaList": "Klasifikācijas sistēmu saraksts · Izveidot jaunu"
+  },
+  "areaHome": {
+    "title": "Manas standarta klasifikācijas sistēmas",
+    "loading": "Ielādē",
+    "empty": "Nav klasifikācijas sistēmu, kurās piedalāties",
+    "open": "Atvērt",
+    "newTitle": "Jauna klasifikācijas sistēma",
+    "namePlaceholder": "Klasifikācijas sistēmas nosaukums (obligāts)",
+    "descPlaceholder": "Apraksts",
+    "create": "Izveidot",
+    "created": "Klasifikācijas sistēma {name} izveidota"
+  },
+  "nav": {
+    "label": "Klasifikācijas sistēmas izvēlne",
+    "expand": "Izvērst apakšējo izvēlni",
+    "expandWith": "Izvērst apakšējo izvēlni ({menu})",
+    "collapse": "Sakļaut apakšējo izvēlni",
+    "subOf": "{menu} apakšfunkcijas",
+    "groupTech": "Uzraudzība · SQL redaktors",
+    "groupStd": "Standarta vārdnīca",
+    "groupModel": "Modelis",
+    "groupSet": "Iestatījumi",
+    "groupPlan": "Maksājums",
+    "words": "Standarta vārdi",
+    "bulk": "Masveida reģistrācija",
+    "domains": "Standarta domēni",
+    "keyDomains": "Galvenie domēni",
+    "domainGroups": "Domēnu grupas",
+    "terms": "Standarta termini",
+    "codes": "Standarta kodi",
+    "model": "Konceptuālais modelis",
+    "prj": "Projekti",
+    "subj": "Tēmas apgabali",
+    "coreEnt": "Galvenās entītijas",
+    "entityClasses": "Entītiju klasifikatori",
+    "logical": "Loģiskais modelis",
+    "physical": "Fiziskais modelis",
+    "erd": "ERD",
+    "ddl": "DDL ģenerēšana",
+    "monitor": "Uzraudzība",
+    "monApp": "Lietojumprogramma",
+    "monSrv": "Serveris",
+    "monDb": "Datu bāze",
+    "monUrl": "URL",
+    "monFix": "AI labojumu vēsture",
+    "sql": "SQL redaktors",
+    "settings": "Iestatījumi",
+    "history": "Vēsture",
+    "forbidden": "Aizliegtie vārdi",
+    "banBulk": "Masveida aizliegto vārdu reģistrācija",
+    "check": "Standarta pārbaude",
+    "reverse": "Reversā inženierija",
+    "members": "Dalībnieki",
+    "approvals": "Apstiprinājumi",
+    "plan": "Maksājums"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Sistēmas administrators",
+      "DA": "Datu arhitekts",
+      "STD": "Standarta pārvaldnieks",
+      "MDL": "Modelētājs",
+      "QLT": "Kvalitātes pārvaldnieks",
+      "MIG": "Migrācijas pārvaldnieks",
+      "VIEWER": "Skatītājs"
+    },
+    "roleDesc": {
+      "SYS": "Pārvaldīt klasifikācijas sistēmas iestatījumus · domēnu grupas · saīsinājumus · dalībniekus, pieteikumus · apstiprinājumus (ieskaitot tūlītēju apstiprināšanu), masveida reģistrāciju, SQL rakstīšanu, visas izvēlnes",
+      "DA": "Vispārējā standarta politika: Pieteikt · apstiprināt vārdus · domēnus · terminus (var izvēlēties tūlītēju apstiprināšanu pēc pieteikuma), masveida reģistrācija, pārvaldīt iestatījumus · dalībniekus, SQL rakstīšana, visas izvēlnes",
+      "STD": "Pieteikt vārdus · domēnus · terminus, masveida reģistrācija, iestatījumi, SQL rakstīšana, visas izvēlnes (nav apstiprināšanas tiesību)",
+      "MDL": "Pieteikt vārdu · domēnu · terminu · modeļu reģistrāciju · modifikāciju · dzēšanu, masveida reģistrācija, iestatījumi, SQL rakstīšana, visas izvēlnes (nav apstiprināšanas tiesību)",
+      "QLT": "Pieteikt · SQL rakstīšana, SQL redaktora · modelēšanas · iestatījumu izvēlnes (kvalitātes diagnostikas funkcijas nākamajos posmos)",
+      "MIG": "Pieteikt · SQL rakstīšana, SQL redaktora izvēlne (migrācijas kartēšanai)",
+      "VIEWER": "Tikai standarta vārdnīcas skatīšanās"
+    },
+    "plan": {
+      "FREE": "Bezmaksas (Skatīšanās)",
+      "P1": "Izstrādātājs",
+      "P2": "Standarta pārvaldnieks",
+      "P3": "Modelētājs",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Reģistrēt",
+      "UPD": "Modificēt",
+      "DEL": "Dzēst"
+    },
+    "tgt": {
+      "AREA": "Klasifikācijas sistēma",
+      "MBR": "Dalībnieks",
+      "DIC": "Vārds",
+      "DOM": "Domēns",
+      "DOM_GRP": "Domēnu grupa",
+      "TERM": "Termins",
+      "CD": "Standarta kods",
+      "CD_VAL": "Koda vērtība",
+      "ABBR": "Saīsinājums",
+      "PRJ": "Projekts",
+      "SUBJ": "Tēmas apgabals",
+      "ENT": "Entītija",
+      "REL": "Attiecības",
+      "ATTR": "Atribūts",
+      "VER": "Modeļa versija",
+      "PHY": "Fiziskais modelis",
+      "DDL": "DDL izpilde",
+      "RVS": "Reversā inženierija",
+      "SQL": "SQL",
+      "DBCN": "DB savienojums",
+      "AGT": "Aģents",
+      "MONURL": "URL uzraudzība"
+    }
+  }
+}

@@ -4,11 +4,6 @@
     "description": "Metasystém datového standardního slovníku"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Změnit jazyk",
-      "search": "Hledat jazyk",
-      "empty": "Žádné výsledky hledání"
-    },
     "loading": "Načítání…",
     "requestFailed": "Požadavek selhal",
     "home": "Domů",

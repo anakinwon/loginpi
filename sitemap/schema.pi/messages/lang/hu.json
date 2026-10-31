@@ -4,11 +4,6 @@
     "description": "Adatstandard szótár meta rendszer"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Nyelv módosítása",
-      "search": "Nyelv keresése",
-      "empty": "Nincs találat"
-    },
     "loading": "Betöltés…",
     "requestFailed": "A kérés sikertelen",
     "home": "Főoldal",

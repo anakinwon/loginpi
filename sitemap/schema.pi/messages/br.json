@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Sistema Meta de Dicionário de Padrões de Dados"
+  },
+  "common": {
+    "loading": "Carregando…",
+    "requestFailed": "A solicitação falhou",
+    "home": "Início",
+    "goHome": "Ir para o Início"
+  },
+  "home": {
+    "subtitle": "Sistema Meta de Dicionário de Padrões de Dados"
+  },
+  "auth": {
+    "checking": "Verificando login…",
+    "googleUnlinked": "Você está logado com o Google, mas ainda não está vinculado à sua conta Pi.",
+    "required": "Login necessário.",
+    "requiredHint": "Login necessário. Faça login com sua conta Pi no Pi Browser, ou com o Google (é necessário vincular a conta Pi) em um navegador comum.",
+    "piSignIn": "Entrar com a conta Pi",
+    "googleSignIn": "Entrar com o Google",
+    "signOut": "Sair",
+    "linkCheckFailed": "Falha ao verificar o status do vínculo (erro temporário). Atualize em breve."
+  },
+  "link": {
+    "title": "Vinculação de Conta",
+    "desc": "Vincula sua conta Pi no Pi Browser com sua conta Google em um navegador comum como o mesmo usuário. Após a vinculação, você pode trabalhar no PC apenas fazendo login com o Google.",
+    "codeFormTitle": "Inserir Código de Vinculação da Conta Pi",
+    "codeFormHint": "Após fazer login no Pi Browser, insira o código de 6 dígitos emitido na tela de vinculação de conta em até 10 minutos.",
+    "codeLabel": "Código de Vinculação",
+    "linked": "Vinculado.",
+    "submit": "Vincular",
+    "issuerTitle": "Emitir Código de Vinculação da Conta Google",
+    "issuerHint": "Após fazer login com o Google em um navegador comum, insira este código para vincular como o mesmo usuário (válido por 10 minutos).",
+    "minutesLeft": "Aprox. {minutes} minutos restantes",
+    "issue": "Emitir Código",
+    "reissue": "Reemitir",
+    "linkedAs": "Sua conta Google está vinculada ao usuário Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Sistema Meta de Dicionário de Padrões de Dados",
+    "headline1": "Sem padrões, você não pode nomear,",
+    "headline2": "sem modelos, você não pode tabelar.",
+    "lead": "Crie termos com palavras padrão aprovadas, desenhe modelos com esses termos e gere DDL a partir dos modelos. Humanos decidem, ferramentas impõem regras.",
+    "flowTitle": "É assim que se conecta",
+    "step": "Etapa {n}",
+    "flow": {
+      "words": {
+        "nm": "Palavras Padrão",
+        "desc": "Palavras · Abreviações · Palavras Proibidas"
+      },
+      "domains": {
+        "nm": "Domínios Padrão",
+        "desc": "Tipo · Regras de Comprimento"
+      },
+      "terms": {
+        "nm": "Termos Padrão",
+        "desc": "Combinação de Palavras · Aprovação"
+      },
+      "model": {
+        "nm": "Modelo de Dados",
+        "desc": "Conceitual · Lógico · Físico"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Por Área Temática · Comparação de Versões"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Gerar por DBMS · Aprovar Execução"
+      }
+    },
+    "roleTitle": "O que você pode fazer por função",
+    "planTitle": "Planos de Preço",
+    "planNote": "— Pagamento Pi por unidade do sistema de classificação, preço confirmado na tela de pagamento",
+    "menu": {
+      "MENU_STD": "Dicionário Padrão",
+      "MENU_SQL": "Editor SQL",
+      "MENU_SET": "Configurações · Histórico",
+      "MENU_BAN": "Palavras Proibidas",
+      "MENU_MODEL": "Modelo · ERD · DDL",
+      "MENU_CHK": "Verificação Padrão",
+      "MENU_ADM": "Membros · Aprovações"
+    },
+    "viewOnly": "{menu} (Somente Visualização)",
+    "footer": "Faça login acima para ver suas tarefas para seu sistema de classificação imediatamente."
+  },
+  "dashboard": {
+    "loadFailed": "Falha ao carregar o painel",
+    "myAreas": "Meus Sistemas de Classificação",
+    "planLine": "Plano {plan}",
+    "until": " · Até {date}",
+    "grace": "(Período de carência)",
+    "openArea": "Abrir Sistema de Classificação →",
+    "todoTitle": "Minha Vez",
+    "todoEmpty": "Permissão de visualização apenas — por favor, navegue pelos padrões usando o status e os atalhos abaixo.",
+    "apvWait": "Aprovação Padrão Pendente",
+    "apvWaitSub": "Aplicação de Palavra · Domínio · Termo · Código",
+    "ddlWait": "Aprovação de Execução DDL Pendente",
+    "mineWait": "Minhas Aplicações Pendentes",
+    "mineRejected": "{count} rejeitados nos últimos 30 dias",
+    "model": "Modelo de Dados",
+    "modelSub": "Projetos · {count} Entidades",
+    "stdTitle": "Status do Dicionário Padrão",
+    "stdBasis": "Base Aprovada",
+    "shortcuts": "Atalhos",
+    "recentTitle": "Alterações Recentes",
+    "allHistory": "Histórico Completo",
+    "noHistory": "Nenhum histórico de alterações ainda",
+    "justNow": "Agora mesmo",
+    "minutesAgo": "Há {n} minutos",
+    "hoursAgo": "Há {n} horas",
+    "daysAgo": "Há {n} dias",
+    "areaList": "Lista de Sistemas de Classificação · Criar Novo"
+  },
+  "areaHome": {
+    "title": "Meus Sistemas de Classificação Padrão",
+    "loading": "Carregando",
+    "empty": "Nenhum sistema de classificação participante",
+    "open": "Abrir",
+    "newTitle": "Novo Sistema de Classificação",
+    "namePlaceholder": "Nome do Sistema de Classificação (obrigatório)",
+    "descPlaceholder": "Descrição",
+    "create": "Criar",
+    "created": "Sistema de classificação {name} criado"
+  },
+  "nav": {
+    "label": "Menu do Sistema de Classificação",
+    "expand": "Expandir menu inferior",
+    "expandWith": "Expandir menu inferior ({menu})",
+    "collapse": "Recolher menu inferior",
+    "subOf": "Subfunções de {menu}",
+    "groupTech": "Monitoramento · Editor SQL",
+    "groupStd": "Dicionário Padrão",
+    "groupModel": "Modelo",
+    "groupSet": "Configurações",
+    "groupPlan": "Pagamento",
+    "words": "Palavras Padrão",
+    "bulk": "Registro em Massa",
+    "domains": "Domínios Padrão",
+    "keyDomains": "Domínios Chave",
+    "domainGroups": "Grupos de Domínios",
+    "terms": "Termos Padrão",
+    "codes": "Códigos Padrão",
+    "model": "Modelo Conceitual",
+    "prj": "Projetos",
+    "subj": "Áreas Temáticas",
+    "coreEnt": "Entidades Centrais",
+    "entityClasses": "Classificadores de Entidades",
+    "logical": "Modelo Lógico",
+    "physical": "Modelo Físico",
+    "erd": "ERD",
+    "ddl": "Geração DDL",
+    "monitor": "Monitoramento",
+    "monApp": "Aplicação",
+    "monSrv": "Servidor",
+    "monDb": "Banco de Dados",
+    "monUrl": "URL",
+    "monFix": "Histórico de Correção de IA",
+    "sql": "Editor SQL",
+    "settings": "Configurações",
+    "history": "Histórico",
+    "forbidden": "Palavras Proibidas",
+    "banBulk": "Registro em Massa de Palavras Proibidas",
+    "check": "Verificação Padrão",
+    "reverse": "Engenharia Reversa",
+    "members": "Membros",
+    "approvals": "Aprovações",
+    "plan": "Pagamento"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Administrador de Sistema",
+      "DA": "Arquiteto de Dados",
+      "STD": "Gerente de Padrões",
+      "MDL": "Modelador",
+      "QLT": "Gerente de Qualidade",
+      "MIG": "Gerente de Migração",
+      "VIEWER": "Visualizador"
+    },
+    "roleDesc": {
+      "SYS": "Gerenciar configurações do sistema de classificação · grupos de domínio · abreviações · membros, aplicações · aprovações (incluindo aprovação imediata), registro em massa, escrita SQL, todos os menus",
+      "DA": "Política padrão geral: Aplicar · aprovar palavras · domínios · termos (pode selecionar aprovação imediata na aplicação), registro em massa, gerenciar configurações · membros, escrita SQL, todos os menus",
+      "STD": "Aplicar para palavras · domínios · termos, registro em massa, configurações, escrita SQL, todos os menus (sem direitos de aprovação)",
+      "MDL": "Aplicar para registro · modificação · exclusão de palavras · domínios · termos · modelos, registro em massa, configurações, escrita SQL, todos os menus (sem direitos de aprovação)",
+      "QLT": "Aplicar · escrita SQL, menus de editor SQL · modelagem · configurações (recursos de diagnóstico de qualidade em fases futuras)",
+      "MIG": "Aplicar · escrita SQL, menu de editor SQL (para mapeamento de migração)",
+      "VIEWER": "Somente visualização do dicionário padrão"
+    },
+    "plan": {
+      "FREE": "Grátis (Visualização)",
+      "P1": "Desenvolvedor",
+      "P2": "Gerente de Padrões",
+      "P3": "Modelador",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registrar",
+      "UPD": "Modificar",
+      "DEL": "Excluir"
+    },
+    "tgt": {
+      "AREA": "Sistema de Classificação",
+      "MBR": "Membro",
+      "DIC": "Palavra",
+      "DOM": "Domínio",
+      "DOM_GRP": "Grupo de Domínios",
+      "TERM": "Termo",
+      "CD": "Código Padrão",
+      "CD_VAL": "Valor do Código",
+      "ABBR": "Abreviação",
+      "PRJ": "Projeto",
+      "SUBJ": "Área Temática",
+      "ENT": "Entidade",
+      "REL": "Relacionamento",
+      "ATTR": "Atributo",
+      "VER": "Versão do Modelo",
+      "PHY": "Modelo Físico",
+      "DDL": "Execução DDL",
+      "RVS": "Engenharia Reversa",
+      "SQL": "SQL",
+      "DBCN": "Conexão DB",
+      "AGT": "Agente",
+      "MONURL": "Monitoramento de URL"
+    }
+  }
+}

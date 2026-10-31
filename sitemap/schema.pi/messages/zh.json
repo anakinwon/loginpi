@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "数据标准字典元系统"
+  },
+  "common": {
+    "loading": "加载中…",
+    "requestFailed": "请求失败",
+    "home": "首页",
+    "goHome": "返回首页"
+  },
+  "home": {
+    "subtitle": "数据标准字典元系统"
+  },
+  "auth": {
+    "checking": "正在检查登录状态…",
+    "googleUnlinked": "已登录 Google，但尚未与 Pi 帐户关联。",
+    "required": "需要登录。",
+    "requiredHint": "需要登录。在 Pi Browser 中使用 Pi 帐户登录，在普通浏览器中通过 Google 登录（需要关联 Pi 帐户）。",
+    "piSignIn": "使用 Pi 帐户登录",
+    "googleSignIn": "Google 登录",
+    "signOut": "退出登录",
+    "linkCheckFailed": "未能检查关联状态（临时错误）。请稍后刷新。"
+  },
+  "link": {
+    "title": "帐户关联",
+    "desc": "将 Pi Browser 中的 Pi 帐户与普通浏览器中的 Google 帐户关联为同一用户。关联后，您只需在 PC 上登录 Google 即可操作。",
+    "codeFormTitle": "输入 Pi 帐户关联代码",
+    "codeFormHint": "在 Pi Browser 中登录后，在帐户关联屏幕上获取的 6 位代码，请在 10 分钟内输入。",
+    "codeLabel": "关联代码",
+    "linked": "已关联。",
+    "submit": "关联",
+    "issuerTitle": "获取 Google 帐户关联代码",
+    "issuerHint": "在普通浏览器中登录 Google 后输入此代码，即可关联为同一用户（10 分钟内有效）。",
+    "minutesLeft": "剩余时间约 {minutes} 分钟",
+    "issue": "获取代码",
+    "reissue": "重新获取",
+    "linkedAs": "Google 帐户已与 Pi 用户 <b>{name}</b> 关联。"
+  },
+  "intro": {
+    "kicker": "数据标准字典元系统",
+    "headline1": "无标准则无法命名，",
+    "headline2": "无模型则无法建表。",
+    "lead": "使用已批准的标准词创建术语，用这些术语绘制模型，并从模型生成 DDL。人做决策，工具遵守规则。",
+    "flowTitle": "流程如下",
+    "step": "第 {n} 步",
+    "flow": {
+      "words": {
+        "nm": "标准词",
+        "desc": "词语·缩写·禁用词"
+      },
+      "domains": {
+        "nm": "标准域",
+        "desc": "类型·长度规则"
+      },
+      "terms": {
+        "nm": "标准术语",
+        "desc": "词语组合·批准"
+      },
+      "model": {
+        "nm": "数据模型",
+        "desc": "概念·逻辑·物理"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "按主题区域·版本比较"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "按 DBMS 生成·批准执行"
+      }
+    },
+    "roleTitle": "按角色可执行的操作",
+    "planTitle": "套餐",
+    "planNote": "— 按分类体系单位 Pi 支付，价格请在支付页面查看",
+    "menu": {
+      "MENU_STD": "标准字典",
+      "MENU_SQL": "SQL 编辑器",
+      "MENU_SET": "设置·历史",
+      "MENU_BAN": "禁用词",
+      "MENU_MODEL": "模型·ERD·DDL",
+      "MENU_CHK": "标准检查",
+      "MENU_ADM": "成员·批准"
+    },
+    "viewOnly": "{menu}（查看）",
+    "footer": "登录后，您将立即看到我的分类体系中的待办事项。"
+  },
+  "dashboard": {
+    "loadFailed": "无法加载仪表板",
+    "myAreas": "我的分类体系",
+    "planLine": "套餐 {plan}",
+    "until": " · 截至 {date}",
+    "grace": "(宽限期)",
+    "openArea": "打开分类体系 →",
+    "todoTitle": "我的待办事项",
+    "todoEmpty": "您只有查看权限 — 请通过以下状态和快捷方式查找标准。",
+    "apvWait": "等待标准批准",
+    "apvWaitSub": "词语·域·术语·代码申请",
+    "ddlWait": "等待 DDL 执行批准",
+    "mineWait": "我的申请待处理",
+    "mineRejected": "最近 30 天驳回 {count} 项",
+    "model": "数据模型",
+    "modelSub": "项目 · 实体 {count} 个",
+    "stdTitle": "标准字典状态",
+    "stdBasis": "基于已批准",
+    "shortcuts": "快捷方式",
+    "recentTitle": "最近更改",
+    "allHistory": "所有历史",
+    "noHistory": "暂无更改历史",
+    "justNow": "刚刚",
+    "minutesAgo": "{n} 分钟前",
+    "hoursAgo": "{n} 小时前",
+    "daysAgo": "{n} 天前",
+    "areaList": "分类体系列表 · 新建"
+  },
+  "areaHome": {
+    "title": "我的标准分类体系",
+    "loading": "加载中",
+    "empty": "您未参与任何分类体系",
+    "open": "打开",
+    "newTitle": "新建分类体系",
+    "namePlaceholder": "分类体系名称（必填）",
+    "descPlaceholder": "描述",
+    "create": "创建",
+    "created": "已创建分类体系 {name}"
+  },
+  "nav": {
+    "label": "分类体系菜单",
+    "expand": "展开底部菜单",
+    "expandWith": "展开底部菜单 ({menu})",
+    "collapse": "折叠底部菜单",
+    "subOf": "{menu} 的子功能",
+    "groupTech": "监控·SQL 编辑器",
+    "groupStd": "标准字典",
+    "groupModel": "模型",
+    "groupSet": "设置",
+    "groupPlan": "支付",
+    "words": "标准词",
+    "bulk": "批量注册",
+    "domains": "标准域",
+    "keyDomains": "代表域",
+    "domainGroups": "域组",
+    "terms": "标准术语",
+    "codes": "标准代码",
+    "model": "概念模型",
+    "prj": "项目",
+    "subj": "主题区域",
+    "coreEnt": "核心实体",
+    "entityClasses": "实体分类词",
+    "logical": "逻辑模型",
+    "physical": "物理模型",
+    "erd": "ERD",
+    "ddl": "DDL 生成",
+    "monitor": "监控",
+    "monApp": "应用程序",
+    "monSrv": "服务器",
+    "monDb": "数据库",
+    "monUrl": "URL",
+    "monFix": "AI 修正历史",
+    "sql": "SQL 编辑器",
+    "settings": "设置",
+    "history": "历史",
+    "forbidden": "禁用词",
+    "banBulk": "禁用词批量注册",
+    "check": "标准检查",
+    "reverse": "逆向工程",
+    "members": "成员",
+    "approvals": "批准",
+    "plan": "支付"
+  },
+  "codes": {
+    "role": {
+      "SYS": "系统管理员",
+      "DA": "数据架构师",
+      "STD": "标准管理员",
+      "MDL": "建模师",
+      "QLT": "质量管理员",
+      "MIG": "迁移管理员",
+      "VIEWER": "查看者"
+    },
+    "roleDesc": {
+      "SYS": "分类体系设置·域组·缩写·成员管理，申请·批准（包括即时批准），批量注册，SQL 写入，所有菜单",
+      "DA": "标准策略总览：词语·域·术语申请·批准（申请时可选择即时批准），批量注册，设置·成员管理，SQL 写入，所有菜单",
+      "STD": "词语·域·术语申请，批量注册，设置，SQL 写入，所有菜单（无批准权限）",
+      "MDL": "词语·域·术语·模型注册·修改·删除申请，批量注册，设置，SQL 写入，所有菜单（无批准权限）",
+      "QLT": "申请·SQL 写入，SQL 编辑器·建模·设置菜单（质量诊断功能将在后续阶段提供）",
+      "MIG": "申请·SQL 写入，SQL 编辑器菜单（用于迁移映射）",
+      "VIEWER": "仅查看标准字典"
+    },
+    "plan": {
+      "FREE": "免费（查看）",
+      "P1": "开发者",
+      "P2": "标准管理员",
+      "P3": "建模师",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "注册",
+      "UPD": "修改",
+      "DEL": "删除"
+    },
+    "tgt": {
+      "AREA": "分类体系",
+      "MBR": "成员",
+      "DIC": "词语",
+      "DOM": "域",
+      "DOM_GRP": "域组",
+      "TERM": "术语",
+      "CD": "标准代码",
+      "CD_VAL": "代码值",
+      "ABBR": "缩写",
+      "PRJ": "项目",
+      "SUBJ": "主题区域",
+      "ENT": "实体",
+      "REL": "关系",
+      "ATTR": "属性",
+      "VER": "模型版本",
+      "PHY": "物理模型",
+      "DDL": "DDL 执行",
+      "RVS": "逆向工程",
+      "SQL": "SQL",
+      "DBCN": "DB 连接",
+      "AGT": "代理",
+      "MONURL": "URL 监控"
+    }
+  }
+}

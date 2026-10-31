@@ -4,11 +4,6 @@
     "description": "Sistema Meta de Dicionário de Padrões de Dados"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Alterar Idioma",
-      "search": "Pesquisar Idioma",
-      "empty": "Sem resultados de pesquisa"
-    },
     "loading": "Carregando…",
     "requestFailed": "A solicitação falhou",
     "home": "Início",

@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Data Standard Dictionary Meta System"
+  },
+  "common": {
+    "loading": "Naglo-load…",
+    "requestFailed": "Nabigo ang kahilingan",
+    "home": "Home",
+    "goHome": "Umuwi"
+  },
+  "home": {
+    "subtitle": "Data Standard Dictionary Meta System"
+  },
+  "auth": {
+    "checking": "Sinusuri ang pag-login…",
+    "googleUnlinked": "Naka-log in ka sa Google, ngunit hindi pa ito naka-link sa iyong Pi account.",
+    "required": "Kinakailangan ang pag-login.",
+    "requiredHint": "Kinakailangan ang pag-login. Mangyaring mag-log in gamit ang iyong Pi account sa Pi Browser, o sa Google (kinakailangan ang pag-link ng Pi account) sa isang regular na browser.",
+    "piSignIn": "Mag-sign in gamit ang Pi account",
+    "googleSignIn": "Mag-sign in gamit ang Google",
+    "signOut": "Mag-sign out",
+    "linkCheckFailed": "Nabigo ang pagsusuri sa status ng pag-link (pansamantalang error). Mangyaring i-refresh sa ilang sandali."
+  },
+  "link": {
+    "title": "Pag-link ng Account",
+    "desc": "Ini-link ang iyong Pi account sa Pi Browser sa iyong Google account sa isang regular na browser bilang parehong user. Pagkatapos mag-link, maaari kang magtrabaho sa PC sa pamamagitan lamang ng pag-log in sa Google.",
+    "codeFormTitle": "Ilagay ang Pi Account Linking Code",
+    "codeFormHint": "Pagkatapos mag-log in sa Pi Browser, ilagay ang 6-digit na code na inisyu sa screen ng pag-link ng account sa loob ng 10 minuto.",
+    "codeLabel": "Linking Code",
+    "linked": "Naka-link.",
+    "submit": "I-link",
+    "issuerTitle": "Mag-isyu ng Google Account Linking Code",
+    "issuerHint": "Pagkatapos mag-log in sa Google sa isang regular na browser, ilagay ang code na ito upang mag-link bilang parehong user (valid sa loob ng 10 minuto).",
+    "minutesLeft": "Tinatayang {minutes} minuto na lang",
+    "issue": "Mag-isyu ng Code",
+    "reissue": "Muling I-isyu",
+    "linkedAs": "Ang iyong Google account ay naka-link sa Pi user na si <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Data Standard Dictionary Meta System",
+    "headline1": "Kung walang pamantayan, hindi ka makakapagpangalan,",
+    "headline2": "kung walang modelo, hindi ka makakapag-table.",
+    "lead": "Gumawa ng mga termino gamit ang mga aprubadong standard na salita, gumuhit ng mga modelo gamit ang mga terminong iyon, at bumuo ng DDL mula sa mga modelo. Ang mga tao ang nagpapasya, ang mga tool ang nagpapatupad ng mga patakaran.",
+    "flowTitle": "Ganito ito kumokonekta",
+    "step": "Hakbang {n}",
+    "flow": {
+      "words": {
+        "nm": "Mga Standard na Salita",
+        "desc": "Mga Salita · Mga Pagpapaikli · Mga Ipinagbabawal na Salita"
+      },
+      "domains": {
+        "nm": "Mga Standard na Domain",
+        "desc": "Uri · Mga Panuntunan sa Haba"
+      },
+      "terms": {
+        "nm": "Mga Standard na Termino",
+        "desc": "Kumbinasyon ng Salita · Pag-apruba"
+      },
+      "model": {
+        "nm": "Data Model",
+        "desc": "Konseptwal · Lohikal · Pisikal"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Ayon sa Subject Area · Paghahambing ng Bersyon"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Bumuo ayon sa DBMS · Aprubahan ang Pagpapatupad"
+      }
+    },
+    "roleTitle": "Ano ang magagawa mo ayon sa tungkulin",
+    "planTitle": "Mga Plano ng Pagpepresyo",
+    "planNote": "— Pi payment per classification system unit, presyo na kumpirmado sa screen ng pagbabayad",
+    "menu": {
+      "MENU_STD": "Standard Dictionary",
+      "MENU_SQL": "SQL Editor",
+      "MENU_SET": "Mga Setting · Kasaysayan",
+      "MENU_BAN": "Mga Ipinagbabawal na Salita",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Pagsusuri ng Pamantayan",
+      "MENU_ADM": "Mga Miyembro · Mga Pag-apruba"
+    },
+    "viewOnly": "{menu} (Tingnan Lamang)",
+    "footer": "Mag-log in sa itaas upang makita agad ang iyong mga gawain para sa iyong sistema ng pag-uuri."
+  },
+  "dashboard": {
+    "loadFailed": "Nabigo ang pag-load ng dashboard",
+    "myAreas": "Aking Mga Sistema ng Pag-uuri",
+    "planLine": "Plano {plan}",
+    "until": " · Hanggang {date}",
+    "grace": "(Panahon ng palugit)",
+    "openArea": "Buksan ang Sistema ng Pag-uuri →",
+    "todoTitle": "Aking Turno",
+    "todoEmpty": "Pahintulot sa pagtingin lamang — mangyaring mag-browse ng mga pamantayan gamit ang status at mga shortcut sa ibaba.",
+    "apvWait": "Nakabinbing Pag-apruba ng Pamantayan",
+    "apvWaitSub": "Aplikasyon ng Salita · Domain · Termino · Code",
+    "ddlWait": "Nakabinbing Pag-apruba ng Pagpapatupad ng DDL",
+    "mineWait": "Aking Mga Aplikasyon na Nakabinbin",
+    "mineRejected": "{count} tinanggihan sa huling 30 araw",
+    "model": "Data Model",
+    "modelSub": "Mga Proyekto · {count} na Entity",
+    "stdTitle": "Status ng Standard Dictionary",
+    "stdBasis": "Aprubadong Batayan",
+    "shortcuts": "Mga Shortcut",
+    "recentTitle": "Mga Kamakailang Pagbabago",
+    "allHistory": "Buong Kasaysayan",
+    "noHistory": "Wala pang kasaysayan ng pagbabago",
+    "justNow": "Ngayon lang",
+    "minutesAgo": "{n} minuto na ang nakalipas",
+    "hoursAgo": "{n} oras na ang nakalipas",
+    "daysAgo": "{n} araw na ang nakalipas",
+    "areaList": "Listahan ng Sistema ng Pag-uuri · Gumawa ng Bago"
+  },
+  "areaHome": {
+    "title": "Aking Mga Standard na Sistema ng Pag-uuri",
+    "loading": "Naglo-load",
+    "empty": "Walang mga sistema ng pag-uuri na kalahok",
+    "open": "Buksan",
+    "newTitle": "Bagong Sistema ng Pag-uuri",
+    "namePlaceholder": "Pangalan ng Sistema ng Pag-uuri (kinakailangan)",
+    "descPlaceholder": "Deskripsyon",
+    "create": "Gumawa",
+    "created": "Nilikha ang sistema ng pag-uuri na {name}"
+  },
+  "nav": {
+    "label": "Menu ng Sistema ng Pag-uuri",
+    "expand": "Palawakin ang menu sa ibaba",
+    "expandWith": "Palawakin ang menu sa ibaba ({menu})",
+    "collapse": "I-collapse ang menu sa ibaba",
+    "subOf": "{menu} Mga Sub-function",
+    "groupTech": "Pagsubaybay · SQL Editor",
+    "groupStd": "Standard Dictionary",
+    "groupModel": "Model",
+    "groupSet": "Mga Setting",
+    "groupPlan": "Pagbabayad",
+    "words": "Mga Standard na Salita",
+    "bulk": "Maramihang Pagpaparehistro",
+    "domains": "Mga Standard na Domain",
+    "keyDomains": "Mga Pangunahing Domain",
+    "domainGroups": "Mga Grupo ng Domain",
+    "terms": "Mga Standard na Termino",
+    "codes": "Mga Standard na Code",
+    "model": "Konseptwal na Modelo",
+    "prj": "Mga Proyekto",
+    "subj": "Mga Subject Area",
+    "coreEnt": "Mga Core Entity",
+    "entityClasses": "Mga Entity Classifier",
+    "logical": "Lohikal na Modelo",
+    "physical": "Pisikal na Modelo",
+    "erd": "ERD",
+    "ddl": "Pagbuo ng DDL",
+    "monitor": "Pagsubaybay",
+    "monApp": "Aplikasyon",
+    "monSrv": "Server",
+    "monDb": "Database",
+    "monUrl": "URL",
+    "monFix": "Kasaysayan ng Pagwawasto ng AI",
+    "sql": "SQL Editor",
+    "settings": "Mga Setting",
+    "history": "Kasaysayan",
+    "forbidden": "Mga Ipinagbabawal na Salita",
+    "banBulk": "Maramihang Pagpaparehistro ng Ipinagbabawal na Salita",
+    "check": "Pagsusuri ng Pamantayan",
+    "reverse": "Reverse Engineering",
+    "members": "Mga Miyembro",
+    "approvals": "Mga Pag-apruba",
+    "plan": "Pagbabayad"
+  },
+  "codes": {
+    "role": {
+      "SYS": "System Administrator",
+      "DA": "Data Architect",
+      "STD": "Standard Manager",
+      "MDL": "Modeler",
+      "QLT": "Quality Manager",
+      "MIG": "Migration Manager",
+      "VIEWER": "Viewer"
+    },
+    "roleDesc": {
+      "SYS": "Pamahalaan ang mga setting ng sistema ng pag-uuri · mga grupo ng domain · mga pagpapaikli · mga miyembro, mga aplikasyon · mga pag-apruba (kabilang ang agarang pag-apruba), maramihang pagpaparehistro, pagsusulat ng SQL, lahat ng menu",
+      "DA": "Pangkalahatang patakaran ng pamantayan: Mag-apply · aprubahan ang mga salita · mga domain · mga termino (maaaring pumili ng agarang pag-apruba sa aplikasyon), maramihang pagpaparehistro, pamahalaan ang mga setting · mga miyembro, pagsusulat ng SQL, lahat ng menu",
+      "STD": "Mag-apply para sa mga salita · mga domain · mga termino, maramihang pagpaparehistro, mga setting, pagsusulat ng SQL, lahat ng menu (walang karapatan sa pag-apruba)",
+      "MDL": "Mag-apply para sa pagpaparehistro · pagbabago · pagtanggal ng mga salita · mga domain · mga termino · mga modelo, maramihang pagpaparehistro, mga setting, pagsusulat ng SQL, lahat ng menu (walang karapatan sa pag-apruba)",
+      "QLT": "Mag-apply · pagsusulat ng SQL, SQL editor · modeling · mga menu ng setting (mga tampok ng kalidad ng diagnostic sa mga susunod na yugto)",
+      "MIG": "Mag-apply · pagsusulat ng SQL, menu ng SQL editor (para sa migration mapping)",
+      "VIEWER": "Tingnan lamang ang standard dictionary"
+    },
+    "plan": {
+      "FREE": "Libre (Tingnan)",
+      "P1": "Developer",
+      "P2": "Standard Manager",
+      "P3": "Modeler",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Magrehistro",
+      "UPD": "Baguhin",
+      "DEL": "Tanggalin"
+    },
+    "tgt": {
+      "AREA": "Sistema ng Pag-uuri",
+      "MBR": "Miyembro",
+      "DIC": "Salita",
+      "DOM": "Domain",
+      "DOM_GRP": "Grupo ng Domain",
+      "TERM": "Termino",
+      "CD": "Standard Code",
+      "CD_VAL": "Halaga ng Code",
+      "ABBR": "Pagpapaikli",
+      "PRJ": "Proyekto",
+      "SUBJ": "Subject Area",
+      "ENT": "Entity",
+      "REL": "Relasyon",
+      "ATTR": "Attribute",
+      "VER": "Bersyon ng Modelo",
+      "PHY": "Pisikal na Modelo",
+      "DDL": "Pagpapatupad ng DDL",
+      "RVS": "Reverse Engineering",
+      "SQL": "SQL",
+      "DBCN": "Koneksyon sa DB",
+      "AGT": "Agent",
+      "MONURL": "Pagsubaybay sa URL"
+    }
+  }
+}

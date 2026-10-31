@@ -4,11 +4,6 @@
     "description": "Data Standard Dictionary Meta System"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Baguhin ang Wika",
-      "search": "Maghanap ng Wika",
-      "empty": "Walang resulta ng paghahanap"
-    },
     "loading": "Naglo-load…",
     "requestFailed": "Nabigo ang kahilingan",
     "home": "Home",

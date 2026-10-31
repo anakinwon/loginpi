@@ -4,11 +4,6 @@
     "description": "Gagnastaðlaorðabók Meta Kerfi"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Breyta tungumáli",
-      "search": "Leita tungumál",
-      "empty": "Engar leitarniðurstöður"
-    },
     "loading": "Hleður…",
     "requestFailed": "Beiðni mistókst",
     "home": "Heim",

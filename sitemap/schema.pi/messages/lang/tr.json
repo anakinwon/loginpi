@@ -4,11 +4,6 @@
     "description": "Veri Standardı Sözlük Meta Sistemi"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "Dili Değiştir",
-      "search": "Dil Ara",
-      "empty": "Arama sonucu yok"
-    },
     "loading": "Yükleniyor…",
     "requestFailed": "İstek başarısız oldu",
     "home": "Ana Sayfa",

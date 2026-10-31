@@ -4,11 +4,6 @@
     "description": "מערכת מטא למילון תקני נתונים"
   },
   "common": {
-    "localeSwitcher": {
-      "button": "שנה שפה",
-      "search": "חפש שפה",
-      "empty": "אין תוצאות חיפוש"
-    },
     "loading": "טוען…",
     "requestFailed": "הבקשה נכשלה",
     "home": "בית",

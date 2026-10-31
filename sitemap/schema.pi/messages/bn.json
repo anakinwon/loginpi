@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Sistem Meta Kamus Standard Data"
+  },
+  "common": {
+    "loading": "Memuatkan…",
+    "requestFailed": "Permintaan gagal",
+    "home": "Utama",
+    "goHome": "Pergi ke Utama"
+  },
+  "home": {
+    "subtitle": "Sistem Meta Kamus Standard Data"
+  },
+  "auth": {
+    "checking": "Menyemak log masuk…",
+    "googleUnlinked": "Anda telah log masuk dengan Google, tetapi ia belum dipautkan ke akaun Pi anda.",
+    "required": "Log masuk diperlukan.",
+    "requiredHint": "Log masuk diperlukan. Sila log masuk dengan akaun Pi anda dalam Pi Browser, atau dengan Google (pemautan akaun Pi diperlukan) dalam pelayar biasa.",
+    "piSignIn": "Log masuk dengan akaun Pi",
+    "googleSignIn": "Log masuk dengan Google",
+    "signOut": "Log keluar",
+    "linkCheckFailed": "Gagal menyemak status pemautan (ralat sementara). Sila muat semula sebentar lagi."
+  },
+  "link": {
+    "title": "Pemautan Akaun",
+    "desc": "Memautkan akaun Pi anda dalam Pi Browser dengan akaun Google anda dalam pelayar biasa sebagai pengguna yang sama. Selepas pemautan, anda boleh bekerja di PC hanya dengan log masuk menggunakan Google.",
+    "codeFormTitle": "Masukkan Kod Pemautan Akaun Pi",
+    "codeFormHint": "Selepas log masuk dengan Pi Browser, masukkan kod 6 digit yang dikeluarkan pada skrin pemautan akaun dalam masa 10 minit.",
+    "codeLabel": "Kod Pemautan",
+    "linked": "Dipautkan.",
+    "submit": "Pautkan",
+    "issuerTitle": "Keluarkan Kod Pemautan Akaun Google",
+    "issuerHint": "Selepas log masuk dengan Google dalam pelayar biasa, masukkan kod ini untuk memautkan sebagai pengguna yang sama (sah selama 10 minit).",
+    "minutesLeft": "Lebih kurang {minutes} minit lagi",
+    "issue": "Keluarkan Kod",
+    "reissue": "Keluarkan Semula",
+    "linkedAs": "Akaun Google anda dipautkan kepada pengguna Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Sistem Meta Kamus Standard Data",
+    "headline1": "Tanpa piawaian, anda tidak boleh menamakan,",
+    "headline2": "tanpa model, anda tidak boleh membuat jadual.",
+    "lead": "Cipta istilah dengan perkataan standard yang diluluskan, lukis model dengan istilah tersebut, dan jana DDL daripada model. Manusia membuat keputusan, alat menguatkuasakan peraturan.",
+    "flowTitle": "Begini cara ia bersambung",
+    "step": "Langkah {n}",
+    "flow": {
+      "words": {
+        "nm": "Perkataan Standard",
+        "desc": "Perkataan · Singkatan · Perkataan Terlarang"
+      },
+      "domains": {
+        "nm": "Domain Standard",
+        "desc": "Jenis · Peraturan Panjang"
+      },
+      "terms": {
+        "nm": "Istilah Standard",
+        "desc": "Gabungan Perkataan · Kelulusan"
+      },
+      "model": {
+        "nm": "Model Data",
+        "desc": "Konseptual · Logik · Fizikal"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Mengikut Kawasan Subjek · Perbandingan Versi"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Jana mengikut DBMS · Luluskan Pelaksanaan"
+      }
+    },
+    "roleTitle": "Apa yang anda boleh lakukan mengikut peranan",
+    "planTitle": "Pelan Harga",
+    "planNote": "— Pembayaran Pi setiap unit sistem klasifikasi, harga disahkan pada skrin pembayaran",
+    "menu": {
+      "MENU_STD": "Kamus Standard",
+      "MENU_SQL": "Editor SQL",
+      "MENU_SET": "Tetapan · Sejarah",
+      "MENU_BAN": "Perkataan Terlarang",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Semakan Standard",
+      "MENU_ADM": "Ahli · Kelulusan"
+    },
+    "viewOnly": "{menu} (Lihat Sahaja)",
+    "footer": "Log masuk di atas untuk melihat tugas anda untuk sistem klasifikasi anda dengan segera."
+  },
+  "dashboard": {
+    "loadFailed": "Gagal memuatkan papan pemuka",
+    "myAreas": "Sistem Klasifikasi Saya",
+    "planLine": "Pelan {plan}",
+    "until": " · Sehingga {date}",
+    "grace": "(Tempoh tangguh)",
+    "openArea": "Buka Sistem Klasifikasi →",
+    "todoTitle": "Giliran Saya",
+    "todoEmpty": "Kebenaran melihat sahaja — sila semak piawaian menggunakan status dan pintasan di bawah.",
+    "apvWait": "Menunggu Kelulusan Standard",
+    "apvWaitSub": "Permohonan Perkataan · Domain · Istilah · Kod",
+    "ddlWait": "Menunggu Kelulusan Pelaksanaan DDL",
+    "mineWait": "Permohonan Saya Menunggu",
+    "mineRejected": "{count} ditolak dalam 30 hari terakhir",
+    "model": "Model Data",
+    "modelSub": "Projek · {count} Entiti",
+    "stdTitle": "Status Kamus Standard",
+    "stdBasis": "Berdasarkan yang Diluluskan",
+    "shortcuts": "Pintasan",
+    "recentTitle": "Perubahan Terkini",
+    "allHistory": "Sejarah Penuh",
+    "noHistory": "Tiada sejarah perubahan lagi",
+    "justNow": "Baru sahaja",
+    "minutesAgo": "{n} minit yang lalu",
+    "hoursAgo": "{n} jam yang lalu",
+    "daysAgo": "{n} hari yang lalu",
+    "areaList": "Senarai Sistem Klasifikasi · Cipta Baharu"
+  },
+  "areaHome": {
+    "title": "Sistem Klasifikasi Standard Saya",
+    "loading": "Memuatkan",
+    "empty": "Tiada sistem klasifikasi yang mengambil bahagian",
+    "open": "Buka",
+    "newTitle": "Sistem Klasifikasi Baharu",
+    "namePlaceholder": "Nama Sistem Klasifikasi (diperlukan)",
+    "descPlaceholder": "Penerangan",
+    "create": "Cipta",
+    "created": "Sistem klasifikasi {name} dicipta"
+  },
+  "nav": {
+    "label": "Menu Sistem Klasifikasi",
+    "expand": "Kembangkan menu bawah",
+    "expandWith": "Kembangkan menu bawah ({menu})",
+    "collapse": "Lipat menu bawah",
+    "subOf": "Fungsi Sub {menu}",
+    "groupTech": "Pemantauan · Editor SQL",
+    "groupStd": "Kamus Standard",
+    "groupModel": "Model",
+    "groupSet": "Tetapan",
+    "groupPlan": "Pembayaran",
+    "words": "Perkataan Standard",
+    "bulk": "Pendaftaran Pukal",
+    "domains": "Domain Standard",
+    "keyDomains": "Domain Utama",
+    "domainGroups": "Kumpulan Domain",
+    "terms": "Istilah Standard",
+    "codes": "Kod Standard",
+    "model": "Model Konseptual",
+    "prj": "Projek",
+    "subj": "Kawasan Subjek",
+    "coreEnt": "Entiti Teras",
+    "entityClasses": "Pengelas Entiti",
+    "logical": "Model Logik",
+    "physical": "Model Fizikal",
+    "erd": "ERD",
+    "ddl": "Penjanaan DDL",
+    "monitor": "Pemantauan",
+    "monApp": "Aplikasi",
+    "monSrv": "Pelayan",
+    "monDb": "Pangkalan Data",
+    "monUrl": "URL",
+    "monFix": "Sejarah Pembetulan AI",
+    "sql": "Editor SQL",
+    "settings": "Tetapan",
+    "history": "Sejarah",
+    "forbidden": "Perkataan Terlarang",
+    "banBulk": "Pendaftaran Pukal Perkataan Terlarang",
+    "check": "Semakan Standard",
+    "reverse": "Kejuruteraan Songsang",
+    "members": "Ahli",
+    "approvals": "Kelulusan",
+    "plan": "Pembayaran"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Pentadbir Sistem",
+      "DA": "Arkitek Data",
+      "STD": "Pengurus Standard",
+      "MDL": "Pemodel",
+      "QLT": "Pengurus Kualiti",
+      "MIG": "Pengurus Migrasi",
+      "VIEWER": "Penonton"
+    },
+    "roleDesc": {
+      "SYS": "Urus tetapan sistem klasifikasi · kumpulan domain · singkatan · ahli, permohonan · kelulusan (termasuk kelulusan segera), pendaftaran pukal, penulisan SQL, semua menu",
+      "DA": "Dasar standard keseluruhan: Mohon · luluskan perkataan · domain · istilah (boleh memilih kelulusan segera semasa permohonan), pendaftaran pukal, urus tetapan · ahli, penulisan SQL, semua menu",
+      "STD": "Mohon perkataan · domain · istilah, pendaftaran pukal, tetapan, penulisan SQL, semua menu (tiada hak kelulusan)",
+      "MDL": "Mohon pendaftaran · pengubahsuaian · penghapusan perkataan · domain · istilah · model, pendaftaran pukal, tetapan, penulisan SQL, semua menu (tiada hak kelulusan)",
+      "QLT": "Mohon · penulisan SQL, editor SQL · pemodelan · menu tetapan (ciri diagnostik kualiti dalam peringkat akan datang)",
+      "MIG": "Mohon · penulisan SQL, menu editor SQL (untuk pemetaan migrasi)",
+      "VIEWER": "Lihat kamus standard sahaja"
+    },
+    "plan": {
+      "FREE": "Percuma (Lihat)",
+      "P1": "Pembangun",
+      "P2": "Pengurus Standard",
+      "P3": "Pemodel",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Daftar",
+      "UPD": "Ubah suai",
+      "DEL": "Padam"
+    },
+    "tgt": {
+      "AREA": "Sistem Klasifikasi",
+      "MBR": "Ahli",
+      "DIC": "Perkataan",
+      "DOM": "Domain",
+      "DOM_GRP": "Kumpulan Domain",
+      "TERM": "Istilah",
+      "CD": "Kod Standard",
+      "CD_VAL": "Nilai Kod",
+      "ABBR": "Singkatan",
+      "PRJ": "Projek",
+      "SUBJ": "Kawasan Subjek",
+      "ENT": "Entiti",
+      "REL": "Hubungan",
+      "ATTR": "Atribut",
+      "VER": "Versi Model",
+      "PHY": "Model Fizikal",
+      "DDL": "Pelaksanaan DDL",
+      "RVS": "Kejuruteraan Songsang",
+      "SQL": "SQL",
+      "DBCN": "Sambungan DB",
+      "AGT": "Ejen",
+      "MONURL": "Pemantauan URL"
+    }
+  }
+}
