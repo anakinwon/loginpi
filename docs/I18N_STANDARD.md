@@ -1,7 +1,7 @@
 # Pi 앱 다국어 표준 (`@pi/i18n`) v2.0.1
 
 > 정본. **loginpi(cafe.pi, https://loginpi.vercel.app/)의 다국어를 흉내내지 않고 똑같이** 다른 Pi 앱에 옮기는 표준입니다(마스터 지시 2026-10-31 "loginpi를 흉내내지말고, 완전히 동일하게 구현해줘").
-> 같은 것 : routing locale 219개(국가코드 위주, 순서 그대로)·locale → 언어 매핑·DB 활성 locale 189(스냅숏)·국가마스터 188·상단 헤더 언어 콤보(국기·통화·환율)·π 시세칩·API 3종·스위처 문구.
+> 같은 것 : routing locale 219개(국가코드 위주, 순서 그대로)·locale → 언어 매핑·DB 활성 locale 188(스냅숏)·국가마스터 188·상단 헤더 언어 콤보(국기·통화·환율)·π 시세칩·API 3종·스위처 문구.
 > 입력 자료 : `docs/i18n/LOGINPI_I18N_ANALYSIS.md`(loginpi 분석). 짧은 안내는 `packages/pi-i18n/README.md`.
 
 ---
