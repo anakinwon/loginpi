@@ -45,7 +45,7 @@ export interface Feature {
   steps: FeatureStep[]
 }
 
-export const PROGRESS_UPDATED = '2026-10-30'
+export const PROGRESS_UPDATED = '2026-10-31'
 
 export const FEATURES: Feature[] = [
   {
@@ -88,7 +88,7 @@ export const FEATURES: Feature[] = [
         status: 'doing',
         stage: 'M1',
         ref: ['Galène'],
-        note: 'LAN ✓ · LAN fix ✓ · retest … · LTE …',
+        note: 'LAN ✓ · WAN ✓ (VPS probe 4/4) · LTE …',
       },
       {
         id: 'recovery',
@@ -100,10 +100,11 @@ export const FEATURES: Feature[] = [
       },
       {
         id: 'structure',
-        status: 'doing',
+        status: 'done',
         stage: 'M3',
+        date: '2026-10-31',
         ref: ['mediasoup'],
-        note: 'gate ✓ · v1.2 ✓ · v1.3.3 ✓',
+        note: 'gate ✓ · -race ✓ · v1.3.3 ✓',
       },
       // M4 청중 30 시험 = 마스터 결정 2026-10-29 생략(테스터 30명 모집 불가) — 통과가 아니라 면제
       {
@@ -119,7 +120,7 @@ export const FEATURES: Feature[] = [
         status: 'doing',
         stage: 'M5',
         ref: ['Galène', 'LiveKit'],
-        note: 'ticket·status ✓ · host-away ✓ · device …',
+        note: 'ticket·status ✓ · host-away ✓ · room admin ✓ · device …',
       },
       // 룸 화면(S3·S4) — UI 설계서 v1.0(c16bc230) → M1~M2(a7affafb) → v1.1·v1.2(8eed64d2·74e2c7cd), 브라우저 QA ✓
       {
