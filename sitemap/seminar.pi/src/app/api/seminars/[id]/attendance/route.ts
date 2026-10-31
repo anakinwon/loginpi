@@ -1,6 +1,6 @@
 // 출석(SubAgent4) — POST = 룸 입장 기록 + 60초 하트비트(같은 호출), GET ?page= = 개최자·ADMIN 출석부(50명 단위), ?all=1 = CSV 용 전체(상한 ATD_CSV_MAX).
 //  POST 는 자격·상태 확인(gate, 병렬 2조회) 뒤에만 쓴다 — 종료·취소·삭제된 세미나·유료 참가 취소면 갱신하지 않고 409/404/402(야간 시험 T04 : 종료 뒤 마지막 시각이 늘던 결함).
-//  출석 갱신(없으면 INSERT, 첫 입장 시각 보존)·LIVE 개최자 시간 계량은 fn_hb_smn_hst(sql/015) 한 번 — 응답 remainSec, 소진이면 세미나 종료(endByPlan). CSV 는 화면이 번역된 머리글로 만든다(engage-rules toCsv).
+//  출석 갱신(없으면 INSERT, 첫 입장 시각 보존)·LIVE 개최자 시간 계량은 fn_hb_smn_hst(sql/015) 한 번 — 응답 remainSec, 소진이면 세미나 종료(endSeminar). CSV 는 화면이 번역된 머리글로 만든다(engage-rules toCsv).
 //  방 남은 시간(sql/018) — 응답 plan·left·paid·free 는 개최자 본인에게만 : 룸 카운트다운. 남이 연 방에 들어온 참가자(ADMIN 포함)는
 //  무조건 무료 입장·카운트다운 없음(마스터 2026-10-29 — 전에는 개최자 남은 시간을 참가자에게도 보내 카운트다운이 돌았다) → { ok } 만.
 //  계량·소진 종료는 개최자 본인 하트비트만(개최자가 없으면 시간도 줄지 않는다).
@@ -11,7 +11,7 @@ import { withAuthGuard } from '@pi/guard'
 import { apiError, db, dbFail, dbRoute } from '@/lib/api'
 import { closed, gate, noStore, who } from '@/lib/engage'
 import { ATD_CSV_MAX, ATD_PAGE, hostState } from '@/lib/engage-rules'
-import { closeEngineRoom, endByPlan, hostPlan, planLeft, planPools } from '@/lib/plan'
+import { closeEngineRoom, endSeminar, hostPlan, planLeft, planPools } from '@/lib/plan'
 import { parsePage } from '@/lib/seminar-rules'
 
 type AtdRow = {
@@ -62,7 +62,7 @@ export const POST = withAuthGuard(
     const pools = hp ? planPools(hp, g.planCd) : null
     const left = remainSec ?? (hp ? planLeft(hp, g.planCd) : null)
     if (left !== null && left <= 0) {
-      await endByPlan(w.smnId, w.user.id)
+      await endSeminar(w.smnId, w.user.id)
       return NextResponse.json({ ok: true, remainSec: 0, left: 0, plan: g.planCd, ended: true, code: 'PLAN_EXHAUSTED' }, { headers: noStore })
     }
     return NextResponse.json({ ok: true, remainSec, left, plan: g.planCd, paid: pools?.paid ?? null, free: pools?.free ?? null, ticking }, { headers: noStore })

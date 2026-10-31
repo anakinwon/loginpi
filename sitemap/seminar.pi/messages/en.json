@@ -30,7 +30,8 @@
     "link": "Link account",
     "switchLocale": "한국어",
     "privacy": "Privacy",
-    "plan": "Plans"
+    "plan": "Plans",
+    "rooms": "Rooms"
   },
   "auth": {
     "checking": "Checking sign-in…",
@@ -124,7 +125,9 @@
     "PLAN_EXPIRES_BEFORE_START": "The start time is after this plan's pass expires",
     "PAY_ALREADY_PAID": "A payment is still being processed. If you were signing in the wallet, try again in 3 minutes.",
     "REC_PAID_ONLY": "Recording is available only in Monthly or Yearly plan seminars with paid time left",
-    "REC_NOT_IN_ROOM": "Still confirming you are in the room. Try again in a moment"
+    "REC_NOT_IN_ROOM": "Still confirming you are in the room. Try again in a moment",
+    "ENGINE_OFF": "The video server admin key is not configured",
+    "ENGINE_UNAVAILABLE": "The video server is not responding. Please try again shortly"
   },
   "progress": {
     "title": "Build progress",
@@ -975,5 +978,40 @@
     "money": "{fiat} ({pi} Pi)",
     "moneyNoPi": "{fiat} (checking Pi price)",
     "h": "{h} h"
+  },
+  "adminRooms": {
+    "title": "Room management",
+    "adminOnly": "Only administrators can view this page.",
+    "refresh": "Refresh",
+    "count": "{n} open rooms",
+    "empty": "No rooms are open right now.",
+    "lab": "Lab room",
+    "noSeminar": "No seminar record",
+    "peers": "{n} / {cap} connected",
+    "producers": "{n} streams",
+    "end": "Ends {time}",
+    "stale": "The seminar has ended but the room is still open on the video server — force close it.",
+    "close": "Force close",
+    "confirmSeminar": "This ends the seminar and closes the room. Everyone will be disconnected.",
+    "confirmRoom": "This closes the room. Everyone will be disconnected.",
+    "confirmYes": "Close",
+    "cancel": "Cancel",
+    "closing": "Closing…",
+    "closed": "Room closed.",
+    "metrics": "Video server metrics (since start)",
+    "metricsOff": "Could not load metrics.",
+    "m": {
+      "packetsIn": "Packets in",
+      "packetsOut": "Packets out",
+      "nackIn": "NACKs received",
+      "nackOut": "NACKs sent",
+      "retransmits": "Retransmissions",
+      "duplicateNack": "Duplicate NACKs",
+      "cacheMiss": "Retransmit cache misses",
+      "pliOut": "Keyframe requests (PLI)",
+      "keyframes": "Keyframes",
+      "layerSwitches": "Quality switches",
+      "queueDrops": "Queue drops"
+    }
   }
 }

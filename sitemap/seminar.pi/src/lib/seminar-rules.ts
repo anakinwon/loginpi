@@ -22,6 +22,18 @@ export const parsePage = (v: string | null | undefined): number => {
 export const pageCount = (total: number) =>
   Math.max(1, Math.ceil(total / PAGE_SIZE))
 
+// 엔진 방 요약(관리 API GET /admin/rooms) — end 는 Go time.Time 이라 omitempty 가 듣지 않아 미설정이면 0001-01-01 로 온다
+export type EngineRoom = { id: string; cap: number; peers: number; producers: number; end?: string | null }
+// 방 관리 화면 쪽 나눔(엔진은 전량을 준다, MaxRooms 200) — 접속자 많은 방 먼저, 같으면 ID 순(쪽 경계 고정). 미설정 종료 시각 = null
+export function roomPage(rooms: EngineRoom[], page: number) {
+  const sorted = [...rooms].sort((a, b) => b.peers - a.peers || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+  const p = clampPage(page, pageCount(sorted.length))
+  const rows = sorted
+    .slice((p - 1) * PAGE_SIZE, p * PAGE_SIZE)
+    .map((r) => ({ ...r, end: r.end && Date.parse(r.end) > 0 ? r.end : null }))
+  return { rows, total: sorted.length, page: p }
+}
+
 // 한 줄 이름(세미나·회의록 제목) — 제어문자(줄바꿈·NUL 등) 금지. 화면 입력칸은 한 줄이라 API 직접 호출만 걸린다.
 //  제목은 .ics·메일 제목·Markdown 머리로 흘러가므로 들어오는 곳에서 막는다(야간 시험 T01 r4). TAB 은 붙여넣기에 섞여 오므로 허용(.ics 도 TAB 보존)
 //  C1 제어문자(U+0080~009F, NEL 포함)·줄/문단 구분자(U+2028·2029)도 줄바꿈으로 읽는 처리기가 있어 함께 막는다(T01 r6)

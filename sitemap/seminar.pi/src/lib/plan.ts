@@ -70,24 +70,34 @@ export const planLeft = (h: HostPlan | null, cd: string) => {
   return (p.paid ?? 0) + p.free
 }
 
-// 엔진 방 강제 종료(DELETE /admin/rooms/{id} — 접속자 전원 ROOM_CLOSED, 종료 표시는 남기지 않아 다시 들어오면 새로 열린다).
-//  관리 키·엔진 주소가 있을 때만, 2초 제한(R-P4). 실패는 기록만(시간 소진 종료·개최자 부재 퇴장이 같이 쓴다)
-export async function closeEngineRoom(smnId: string): Promise<void> {
+// 엔진 관리 API 호출 공용 — 시그널링 주소와 같은 호스트의 /admin/*(Bearer MEDIA_ADMIN_SECRET), 2초 제한(R-P4)·캐시 없음.
+//  키·주소 미설정이거나 네트워크 실패·시간 초과 = null(미설정 구분은 engineAdminOn). 무대 관문(speech-gate stageGate)은 미설정 = 확인 생략이라 따로 부른다
+export const engineAdminOn = () => !!engineAdminBase(env.NEXT_PUBLIC_MEDIA_WS_URL) && !!env.MEDIA_ADMIN_SECRET
+export async function engineAdmin(path: string, method: 'GET' | 'DELETE' = 'GET'): Promise<Response | null> {
   const base = engineAdminBase(env.NEXT_PUBLIC_MEDIA_WS_URL)
-  if (!base || !env.MEDIA_ADMIN_SECRET) return
-  await fetch(`${base}/admin/rooms/${encodeURIComponent(smnId)}`, {
-    method: 'DELETE',
+  if (!base || !env.MEDIA_ADMIN_SECRET) return null
+  return fetch(`${base}${path}`, {
+    method,
     headers: { Authorization: `Bearer ${env.MEDIA_ADMIN_SECRET}` },
     cache: 'no-store',
     signal: AbortSignal.timeout(2_000),
-  })
-    .then((r) => r.status !== 204 && r.status !== 404 && console.error('[plan] 엔진 방 종료 실패', r.status))
-    .catch(() => console.error('[plan] 엔진 방 종료 실패 network'))
+  }).catch(() => null)
 }
 
-// 시간 소진 종료 — 세미나 ENDED(열린 상태일 때만, 조건부 갱신 = 멱등 — api/seminars/[id]/end 와 같은 규칙) +
-//  응답 뒤(after) 남은 회의록 마무리·엔진 방 강제 종료(DELETE /admin/rooms/{id}, 관리 키·엔진 주소가 있을 때만, 2초 제한 R-P4)
-export async function endByPlan(smnId: string, usrId: string): Promise<void> {
+// 엔진 방 강제 종료(DELETE /admin/rooms/{id} — 접속자 전원 ROOM_CLOSED, 종료 표시는 남기지 않아 다시 들어오면 새로 열린다).
+//  관리 키·엔진 주소가 있을 때만. 결과 = 방이 없어졌는가(204·404). 실패는 기록만(시간 소진 종료·개최자 부재 퇴장·방 관리가 같이 쓴다)
+export async function closeEngineRoom(smnId: string): Promise<boolean> {
+  if (!engineAdminOn()) return false
+  const r = await engineAdmin(`/admin/rooms/${encodeURIComponent(smnId)}`, 'DELETE')
+  if (r?.status === 204 || r?.status === 404) return true
+  console.error('[plan] 엔진 방 종료 실패', r?.status ?? 'network')
+  return false
+}
+
+// 세미나 종료(시간 소진·관리자 강제 종료) — 세미나 ENDED 를 먼저(열린 상태일 때만, 조건부 갱신 = 멱등 — api/seminars/[id]/end 와 같은 규칙) :
+//  엔진만 닫으면 DB 가 열린 상태라 입장권이 다시 나가 방이 새로 열린다. 응답 뒤(after) 남은 회의록 마무리.
+//  엔진 방 강제 종료 = 기본 after(하트비트 응답을 늦추지 않게), awaitEngine = 기다려 결과를 돌려준다(방 관리 화면이 바로 목록을 다시 읽음)
+export async function endSeminar(smnId: string, usrId: string, awaitEngine = false): Promise<boolean> {
   const { error } = await db()
     .from('smn_mst')
     .update({ smn_sts_cd: 'ENDED', end_dtm: new Date().toISOString(), modr_id: usrId })
@@ -97,9 +107,10 @@ export async function endByPlan(smnId: string, usrId: string): Promise<void> {
   after(async () => {
     const [notes] = await Promise.all([
       db().from('smn_nt').select('nt_id').eq('smn_id', smnId).eq('nt_sts_cd', 'RECORDING').eq('del_yn', 'N'),
-      closeEngineRoom(smnId),
+      awaitEngine ? null : closeEngineRoom(smnId),
     ])
     if (notes.error) return console.error('[plan] 회의록 조회 실패', notes.error.code)
     await Promise.all((notes.data ?? []).map((x) => finishNote(x.nt_id, 'RECORDING', usrId)))
   })
+  return awaitEngine ? closeEngineRoom(smnId) : true
 }

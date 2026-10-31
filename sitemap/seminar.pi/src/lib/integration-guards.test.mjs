@@ -216,3 +216,22 @@ test('⑯ 글자 링크도 터치 대상 높이 24px 이상(WCAG 2.5.8) — 헤�
   assert.match(read('src/components/seminar/share-links.tsx'), /text-xs \[&>\*\]:inline-flex \[&>\*\]:min-h-6/)
   assert.match(read('src/components/seminar/seminar-detail.tsx'), /inline-flex min-h-6 items-center text-sm hover:underline">\s*← /)
 })
+
+test('⑰ 방 관리 API(/api/admin/**)는 모두 requireAdmin 을 먼저 거치고, 세미나 방 강제 종료는 DB 종료(endSeminar)가 엔진 닫기보다 먼저다(M5)', () => {
+  const routes = srcFiles.filter((p) => rel(p).startsWith('src/app/api/admin/'))
+  assert.ok(routes.length >= 2, `방 관리 라우트를 찾지 못함 : ${routes.map(rel)}`)
+  for (const p of routes) {
+    const s = readFileSync(p, 'utf8')
+    const gate = s.indexOf('requireAdmin(req)')
+    assert.ok(gate > 0, `${rel(p)} 에 requireAdmin 없음`)
+    assert.ok(!/engineAdmin\(|closeEngineRoom\(|endSeminar\(/.test(s.slice(0, gate)), `${rel(p)} : 권한 확인 전 엔진 호출`)
+  }
+  assert.match(read('src/app/api/admin/rooms/[id]/route.ts'), /isUuid\(id\) \? await endSeminar\(/)
+  // endSeminar 는 DB 갱신(update) 뒤에야 엔진을 닫는다
+  const plan = read('src/lib/plan.ts')
+  const body = plan.slice(plan.indexOf('export async function endSeminar'))
+  const upd = body.indexOf(".update({ smn_sts_cd: 'ENDED'")
+  const close = body.indexOf('closeEngineRoom(')
+  assert.ok(upd >= 0 && close >= 0, 'DB ENDED 갱신·엔진 닫기 문구를 찾지 못함 — 관문을 함께 고칠 것')
+  assert.ok(upd < close) // DB 정본 먼저(입장권 재발급 방지)
+})

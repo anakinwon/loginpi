@@ -17,6 +17,7 @@ import {
   ONE_LINE_RE,
   prejoinHeading,
   pageCount,
+  roomPage,
   parsePage,
   parseTab,
   payErrorCode,
@@ -163,4 +164,19 @@ test('지난 세미나 — 종료, 시작 지난 예정, 하루 넘은 진행 �
   assert.equal(smnPast('SCHEDULED', iso(now + 1000), now), false)
   assert.equal(smnPast('LIVE', iso(now - 3600e3), now), false)
   assert.equal(smnPast('LIVE', iso(now - 2 * 864e5), now), true)
+})
+
+test('방 관리 쪽 나눔 — 접속자 많은 순·같으면 ID 순, 12개씩, 미설정 종료 시각 null', () => {
+  const room = (id, peers, end) => ({ id, cap: 31, peers, producers: 1, end })
+  const rooms = Array.from({ length: 13 }, (_, i) => room(`r${String(i).padStart(2, '0')}`, 1))
+  rooms.push(room('zz', 5, '2026-10-31T09:00:00Z'), room('aa', 5, '0001-01-01T00:00:00Z'))
+  const p1 = roomPage(rooms, 1)
+  assert.equal(p1.total, 15)
+  assert.equal(p1.rows.length, 12)
+  assert.deepEqual(p1.rows.slice(0, 3).map((r) => r.id), ['aa', 'zz', 'r00'])
+  assert.equal(p1.rows[0].end, null) // Go 영(0) 시각
+  assert.equal(p1.rows[1].end, '2026-10-31T09:00:00Z')
+  assert.deepEqual(roomPage(rooms, 2).rows.map((r) => r.id), ['r10', 'r11', 'r12'])
+  assert.equal(roomPage(rooms, 9).page, 2) // 넘친 쪽 = 마지막 쪽
+  assert.deepEqual(roomPage([], 1), { rows: [], total: 0, page: 1 })
 })

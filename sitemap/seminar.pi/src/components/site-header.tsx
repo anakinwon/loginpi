@@ -1,6 +1,6 @@
 'use client'
 
-// 상단 헤더 — 홈·제작 현황(관리자만)·요금제·계정 연동(미연동만)·개인정보 처리방침·언어 전환·로그인 상태(Pi 세션 OR Google 연동 세션, useAppUser 통합)
+// 상단 헤더 — 홈·제작 현황·방 관리(관리자만)·요금제·계정 연동(미연동만)·개인정보 처리방침·언어 전환·로그인 상태(Pi 세션 OR Google 연동 세션, useAppUser 통합)
 import { useEffect, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
@@ -33,7 +33,7 @@ export function SiteHeader() {
   const locale = useLocale()
   const pathname = usePathname()
   const { user, source } = useAppUser()
-  // 표시 게이팅만 — 제작 현황 화면은 정적 안내(조회·쓰기 없음)
+  // 표시 게이팅만 — 제작 현황 화면은 정적 안내(조회·쓰기 없음), 방 관리는 API 가 ADMIN 을 다시 확인
   const admin = user?.role === 'ADMIN' || user?.role === 'MASTER'
   const linked = useLinked(user?.userId ?? null, source === 'google')
 
@@ -46,6 +46,7 @@ export function SiteHeader() {
         {/* 글자 링크도 터치 대상 높이 24px 이상(WCAG 2.5.8, 360px 폭에서 줄바꿈돼 위아래로 붙을 때) */}
         <nav className="flex flex-wrap items-center gap-3 text-sm [&>a]:inline-flex [&>a]:min-h-6 [&>a]:items-center">
           {admin && <Link href="/progress">{tl('progress')}</Link>}
+          {admin && <Link href="/admin/rooms">{t('rooms')}</Link>}
           <Link href="/plan">{t('plan')}</Link>
           {!linked && <Link href="/link">{t('link')}</Link>}
           <Link href="/privacy">{t('privacy')}</Link>

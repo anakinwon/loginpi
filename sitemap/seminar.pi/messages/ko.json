@@ -30,7 +30,8 @@
     "link": "계정 연동",
     "switchLocale": "English",
     "privacy": "개인정보 처리방침",
-    "plan": "요금제"
+    "plan": "요금제",
+    "rooms": "방 관리"
   },
   "auth": {
     "checking": "로그인 확인 중…",
@@ -124,7 +125,9 @@
     "PLAN_EXPIRES_BEFORE_START": "시작 일시가 이 요금제 이용권 만료 뒤입니다",
     "PAY_ALREADY_PAID": "처리 중인 결제가 있습니다. 지갑에서 서명 중이었다면 3분 뒤 다시 시도하세요.",
     "REC_PAID_ONLY": "녹화는 월간·연간 요금제 세미나에서 유료 시간이 남아 있을 때만 쓸 수 있습니다",
-    "REC_NOT_IN_ROOM": "룸 입장 확인 중입니다. 잠시 뒤 다시 시도하세요"
+    "REC_NOT_IN_ROOM": "룸 입장 확인 중입니다. 잠시 뒤 다시 시도하세요",
+    "ENGINE_OFF": "화상 서버 관리 키가 설정되지 않았습니다",
+    "ENGINE_UNAVAILABLE": "화상 서버가 응답하지 않습니다. 잠시 후 다시 시도하세요"
   },
   "progress": {
     "title": "제작 진행 현황",
@@ -975,5 +978,40 @@
     "money": "{fiat} ({pi} Pi)",
     "moneyNoPi": "{fiat} (Pi 시세 확인 중)",
     "h": "{h}시간"
+  },
+  "adminRooms": {
+    "title": "방 관리",
+    "adminOnly": "관리자만 볼 수 있습니다.",
+    "refresh": "새로고침",
+    "count": "열린 방 {n}개",
+    "empty": "지금 열린 방이 없습니다.",
+    "lab": "실험실 방",
+    "noSeminar": "세미나 정보 없음",
+    "peers": "접속 {n} / {cap}명",
+    "producers": "송출 {n}개",
+    "end": "종료 예정 {time}",
+    "stale": "세미나는 끝났는데 화상 서버에 방이 남아 있습니다 — 강제 종료하세요.",
+    "close": "강제 종료",
+    "confirmSeminar": "세미나를 종료하고 방을 닫습니다. 접속자 전원이 나갑니다.",
+    "confirmRoom": "방을 닫습니다. 접속자 전원이 나갑니다.",
+    "confirmYes": "종료",
+    "cancel": "취소",
+    "closing": "닫는 중…",
+    "closed": "방을 닫았습니다.",
+    "metrics": "화상 서버 지표(시작 뒤 누적)",
+    "metricsOff": "지표를 불러오지 못했습니다.",
+    "m": {
+      "packetsIn": "받은 패킷",
+      "packetsOut": "보낸 패킷",
+      "nackIn": "재전송 요청 받음",
+      "nackOut": "재전송 요청 보냄",
+      "retransmits": "재전송",
+      "duplicateNack": "중복 재전송 요청",
+      "cacheMiss": "재전송 캐시 없음",
+      "pliOut": "화면 갱신 요청(PLI)",
+      "keyframes": "키프레임",
+      "layerSwitches": "화질 전환",
+      "queueDrops": "대기열 버림"
+    }
   }
 }
