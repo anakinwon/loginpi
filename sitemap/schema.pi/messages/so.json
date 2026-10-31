@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Nidaamka Meta ee Qaamuuska Heerka Xogta"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Beddel Luqadda",
+      "search": "Raadi Luqadda",
+      "empty": "Ma jiraan natiijooyin raadin ah"
+    },
+    "loading": "Xogta oo la soo shubayo…",
+    "requestFailed": "Codsiga wuu fashilmay",
+    "home": "Bogga hore",
+    "goHome": "Tag Bogga Hore"
+  },
+  "home": {
+    "subtitle": "Nidaamka Meta ee Qaamuuska Heerka Xogta"
+  },
+  "auth": {
+    "checking": "Hubinta gelitaanka…",
+    "googleUnlinked": "Waxaad ku gashay Google, laakiin weli kuma xirna akoonkaaga Pi.",
+    "required": "Gelitaan ayaa loo baahan yahay.",
+    "requiredHint": "Gelitaan ayaa loo baahan yahay. Fadlan ku gal akoonkaaga Pi ee Pi Browser, ama Google (waxaa loo baahan yahay isku xirka akoonka Pi) biraawsar caadi ah.",
+    "piSignIn": "Ku gal akoonka Pi",
+    "googleSignIn": "Ku gal Google",
+    "signOut": "Ka bax",
+    "linkCheckFailed": "Wuu fashilmay in la hubiyo xaaladda isku xirka (qalad ku meel gaar ah). Fadlan dib u cusboonaysii wax yar ka dib."
+  },
+  "link": {
+    "title": "Isku xirka Akoonka",
+    "desc": "Wuxuu isku xiraa akoonkaaga Pi ee Pi Browser iyo akoonkaaga Google ee biraawsar caadi ah sida isticmaale isku mid ah. Ka dib isku xirka, waxaad ku shaqayn kartaa PC adigoo kaliya ku galaya Google.",
+    "codeFormTitle": "Geli Koodhka Isku xirka Akoonka Pi",
+    "codeFormHint": "Ka dib markaad ku gasho Pi Browser, geli koodhka 6-da lambar ah ee lagu soo saaray shaashadda isku xirka akoonka 10 daqiiqo gudahood.",
+    "codeLabel": "Koodhka Isku xirka",
+    "linked": "Waa la isku xiray.",
+    "submit": "Isku xir",
+    "issuerTitle": "Soo saar Koodhka Isku xirka Akoonka Google",
+    "issuerHint": "Ka dib markaad ku gasho Google biraawsar caadi ah, geli koodhkan si aad isugu xirto sida isticmaale isku mid ah (wuxuu shaqaynayaa 10 daqiiqo).",
+    "minutesLeft": "Qiyaastii {minutes} daqiiqo ayaa ka hartay",
+    "issue": "Soo saar Koodh",
+    "reissue": "Dib u soo saar",
+    "linkedAs": "Akoonkaaga Google wuxuu ku xiran yahay isticmaalaha Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Nidaamka Meta ee Qaamuuska Heerka Xogta",
+    "headline1": "Heerar la'aan, ma magacaabi kartid,",
+    "headline2": "moodello la'aan, ma samayn kartid miis.",
+    "lead": "Abuur ereyo leh ereyo heer sare ah oo la ansixiyay, ku sawir moodello ereyadaas, oo ka soo saar DDL moodellada. Dadku way go'aamiyaan, qalabkuna wuxuu dhaqan geliyaa xeerarka.",
+    "flowTitle": "Sidan ayay isugu xiran tahay",
+    "step": "Tallaabada {n}",
+    "flow": {
+      "words": {
+        "nm": "Erayada Heerka",
+        "desc": "Erayada · Soo gaabinta · Erayada la mamnuucay"
+      },
+      "domains": {
+        "nm": "Domainyada Heerka",
+        "desc": "Nooca · Xeerarka Dhererka"
+      },
+      "terms": {
+        "nm": "Erayada Heerka",
+        "desc": "Isku darka Erayada · Ansixinta"
+      },
+      "model": {
+        "nm": "Moodelka Xogta",
+        "desc": "Fikrad · Macquul · Jir ahaan"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Marka loo eego Goobta Mawduuca · Isbarbardhigga Nooca"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Ku soo saar DBMS · Ansixi Fulinta"
+      }
+    },
+    "roleTitle": "Waxa aad ku qaban karto door kasta",
+    "planTitle": "Qorshayaasha Qiimaha",
+    "planNote": "— Bixinta Pi ee unugga nidaamka kala soocidda, qiimaha waxaa lagu xaqiijinayaa shaashadda lacag bixinta",
+    "menu": {
+      "MENU_STD": "Qaamuuska Heerka",
+      "MENU_SQL": "Tifaftiraha SQL",
+      "MENU_SET": "Dejinta · Taariikhda",
+      "MENU_BAN": "Erayada la mamnuucay",
+      "MENU_MODEL": "Moodel · ERD · DDL",
+      "MENU_CHK": "Hubinta Heerka",
+      "MENU_ADM": "Xubnaha · Ansixinta"
+    },
+    "viewOnly": "{menu} (Daawasho Kaliya)",
+    "footer": "Ku gal kore si aad isla markiiba u aragto hawlahaaga nidaamkaaga kala soocidda."
+  },
+  "dashboard": {
+    "loadFailed": "Wuu fashilmay in la soo shubo dashboardka",
+    "myAreas": "Nidaamyadayda Kala soocidda",
+    "planLine": "Qorshaha {plan}",
+    "until": " · Ilaa {date}",
+    "grace": "(Muddada nimcada)",
+    "openArea": "Fur Nidaamka Kala soocidda →",
+    "todoTitle": "Waa markayga",
+    "todoEmpty": "Ogolaanshaha daawashada kaliya — fadlan ka baadh heerarka adigoo isticmaalaya xaaladda iyo jid-gaabyada hoose.",
+    "apvWait": "Ansixinta Heerka oo Sugaysa",
+    "apvWaitSub": "Codsi Eray · Domain · Eray · Koodh",
+    "ddlWait": "Ansixinta Fulinta DDL oo Sugaysa",
+    "mineWait": "Codsiyadayda oo Sugaysa",
+    "mineRejected": "{count} waa la diiday 30-kii maalmood ee la soo dhaafay",
+    "model": "Moodelka Xogta",
+    "modelSub": "Mashaariicda · {count} Hay'ado",
+    "stdTitle": "Xaaladda Qaamuuska Heerka",
+    "stdBasis": "Saldhigga la Ansixiyay",
+    "shortcuts": "Jid-gaabyada",
+    "recentTitle": "Isbeddellada Dhawaan",
+    "allHistory": "Taariikhda oo dhan",
+    "noHistory": "Weli ma jiraan taariikh isbeddel ah",
+    "justNow": "Hadda uun",
+    "minutesAgo": "{n} daqiiqo ka hor",
+    "hoursAgo": "{n} saacadood ka hor",
+    "daysAgo": "{n} maalmood ka hor",
+    "areaList": "Liiska Nidaamka Kala soocidda · Abuur Mid Cusub"
+  },
+  "areaHome": {
+    "title": "Nidaamyadayda Kala soocidda Heerka",
+    "loading": "Xogta oo la soo shubayo",
+    "empty": "Ma jiraan nidaamyo kala soocid ah oo la isku xiray",
+    "open": "Fur",
+    "newTitle": "Nidaamka Kala soocidda Cusub",
+    "namePlaceholder": "Magaca Nidaamka Kala soocidda (loo baahan yahay)",
+    "descPlaceholder": "Sharaxaad",
+    "create": "Abuur",
+    "created": "Nidaamka kala soocidda {name} waa la abuuray"
+  },
+  "nav": {
+    "label": "Menu-ga Nidaamka Kala soocidda",
+    "expand": "Ballaari menu-ga hoose",
+    "expandWith": "Ballaari menu-ga hoose ({menu})",
+    "collapse": "Laabi menu-ga hoose",
+    "subOf": "{menu} Hawlaha hoose",
+    "groupTech": "La socodka · Tifaftiraha SQL",
+    "groupStd": "Qaamuuska Heerka",
+    "groupModel": "Moodel",
+    "groupSet": "Dejinta",
+    "groupPlan": "Lacag bixinta",
+    "words": "Erayada Heerka",
+    "bulk": "Diiwaangelin Ballaran",
+    "domains": "Domainyada Heerka",
+    "keyDomains": "Domainyada Muhiimka ah",
+    "domainGroups": "Kooxaha Domainyada",
+    "terms": "Erayada Heerka",
+    "codes": "Koodhadhka Heerka",
+    "model": "Moodelka Fikradaha",
+    "prj": "Mashaariicda",
+    "subj": "Goobaha Mawduuca",
+    "coreEnt": "Hay'adaha Muhiimka ah",
+    "entityClasses": "Kala soocayaasha Hay'adaha",
+    "logical": "Moodelka Macquulka ah",
+    "physical": "Moodelka Jir ahaan",
+    "erd": "ERD",
+    "ddl": "Soo saarista DDL",
+    "monitor": "La socodka",
+    "monApp": "Codsiga",
+    "monSrv": "Server",
+    "monDb": "Database",
+    "monUrl": "URL",
+    "monFix": "Taariikhda Sixitaanka AI",
+    "sql": "Tifaftiraha SQL",
+    "settings": "Dejinta",
+    "history": "Taariikhda",
+    "forbidden": "Erayada la mamnuucay",
+    "banBulk": "Diiwaangelinta Erayada la mamnuucay ee Ballaran",
+    "check": "Hubinta Heerka",
+    "reverse": "Injineernimada Dib u celinta",
+    "members": "Xubnaha",
+    "approvals": "Ansixinta",
+    "plan": "Lacag bixinta"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Maamulaha Nidaamka",
+      "DA": "Naqshadeeyaha Xogta",
+      "STD": "Maamulaha Heerka",
+      "MDL": "Moodel-sameeyaha",
+      "QLT": "Maamulaha Tayada",
+      "MIG": "Maamulaha Socdaalka",
+      "VIEWER": "Daawade"
+    },
+    "roleDesc": {
+      "SYS": "Maamul dejinta nidaamka kala soocidda · kooxaha domainyada · soo gaabinta · xubnaha, codsiyada · ansixinta (oo ay ku jiraan ansixinta degdegga ah), diiwaangelinta ballaran, qorista SQL, dhammaan menu-yada",
+      "DA": "Siyaasadda heerka guud: Codso · ansixi ereyada · domainyada · ereyada (waxaa la dooran karaa ansixinta degdegga ah marka la codsanayo), diiwaangelinta ballaran, maamul dejinta · xubnaha, qorista SQL, dhammaan menu-yada",
+      "STD": "Codso ereyada · domainyada · ereyada, diiwaangelinta ballaran, dejinta, qorista SQL, dhammaan menu-yada (ma laha xuquuq ansixin)",
+      "MDL": "Codso diiwaangelinta · wax ka beddelka · tirtiridda ereyada · domainyada · ereyada · moodellada, diiwaangelinta ballaran, dejinta, qorista SQL, dhammaan menu-yada (ma laha xuquuq ansixin)",
+      "QLT": "Codso · qorista SQL, tifaftiraha SQL · moodellada · menu-yada dejinta (astaamaha ogaanshaha tayada ee marxaladaha mustaqbalka)",
+      "MIG": "Codso · qorista SQL, menu-ga tifaftiraha SQL (loogu talagalay khariidadda socdaalka)",
+      "VIEWER": "Kaliya daawo qaamuuska heerka"
+    },
+    "plan": {
+      "FREE": "Bilaash (Daawasho)",
+      "P1": "Horumariye",
+      "P2": "Maamulaha Heerka",
+      "P3": "Moodel-sameeyaha",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Diiwaangeli",
+      "UPD": "Wax ka beddel",
+      "DEL": "Tirtir"
+    },
+    "tgt": {
+      "AREA": "Nidaamka Kala soocidda",
+      "MBR": "Xubin",
+      "DIC": "Eray",
+      "DOM": "Domain",
+      "DOM_GRP": "Kooxda Domainyada",
+      "TERM": "Eray",
+      "CD": "Koodhka Heerka",
+      "CD_VAL": "Qiimaha Koodhka",
+      "ABBR": "Soo gaabin",
+      "PRJ": "Mashruuc",
+      "SUBJ": "Goobta Mawduuca",
+      "ENT": "Hay'ad",
+      "REL": "Xiriir",
+      "ATTR": "Tilmaame",
+      "VER": "Nooca Moodelka",
+      "PHY": "Moodelka Jir ahaan",
+      "DDL": "Fulinta DDL",
+      "RVS": "Injineernimada Dib u celinta",
+      "SQL": "SQL",
+      "DBCN": "Xiriirka DB",
+      "AGT": "Wakiil",
+      "MONURL": "La socodka URL"
+    }
+  }
+}

@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Məlumat Standart Lüğət Meta Sistemi"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Dili dəyişdir",
+      "search": "Dil axtar",
+      "empty": "Axtarış nəticəsi yoxdur"
+    },
+    "loading": "Yüklənir…",
+    "requestFailed": "Sorğu uğursuz oldu",
+    "home": "Ana səhifə",
+    "goHome": "Ana səhifəyə get"
+  },
+  "home": {
+    "subtitle": "Məlumat Standart Lüğət Meta Sistemi"
+  },
+  "auth": {
+    "checking": "Giriş yoxlanılır…",
+    "googleUnlinked": "Google ilə daxil olmusunuz, lakin hələ Pi hesabınızla əlaqələndirilməyib.",
+    "required": "Giriş tələb olunur.",
+    "requiredHint": "Giriş tələb olunur. Pi Browser-də Pi hesabınızla, adi brauzerdə isə Google (Pi hesabı ilə əlaqələndirmə tələb olunur) ilə daxil olun.",
+    "piSignIn": "Pi hesabı ilə daxil olun",
+    "googleSignIn": "Google ilə daxil olun",
+    "signOut": "Çıxış",
+    "linkCheckFailed": "Əlaqələndirmə statusu yoxlanıla bilmədi (müvəqqəti xəta). Zəhmət olmasa, bir azdan yeniləyin."
+  },
+  "link": {
+    "title": "Hesabın əlaqələndirilməsi",
+    "desc": "Pi Browser-dəki Pi hesabınızı adi brauzerdəki Google hesabınızla eyni istifadəçi kimi əlaqələndirir. Əlaqələndirdikdən sonra PC-də yalnız Google ilə daxil olaraq işləyə bilərsiniz.",
+    "codeFormTitle": "Pi Hesabını Əlaqələndirmə Kodunu daxil edin",
+    "codeFormHint": "Pi Browser-də daxil olduqdan sonra hesab əlaqələndirmə ekranında verilmiş 6 rəqəmli kodu 10 dəqiqə ərzində daxil edin.",
+    "codeLabel": "Əlaqələndirmə Kodu",
+    "linked": "Əlaqələndirildi.",
+    "submit": "Əlaqələndir",
+    "issuerTitle": "Google Hesabını Əlaqələndirmə Kodunu verin",
+    "issuerHint": "Adi brauzerdə Google ilə daxil olduqdan sonra bu kodu daxil etsəniz, eyni istifadəçi kimi əlaqələndiriləcək (10 dəqiqə etibarlıdır).",
+    "minutesLeft": "Təxminən {minutes} dəqiqə qalıb",
+    "issue": "Kod ver",
+    "reissue": "Yenidən ver",
+    "linkedAs": "Google hesabınız Pi istifadəçisi <b>{name}</b> ilə əlaqələndirilib."
+  },
+  "intro": {
+    "kicker": "Məlumat Standart Lüğət Meta Sistemi",
+    "headline1": "Standartlar olmadan ad verə bilməzsiniz,",
+    "headline2": "modellər olmadan cədvəl yarada bilməzsiniz.",
+    "lead": "Təsdiq edilmiş standart sözlərlə terminlər yaradın, bu terminlərlə modellər çəkin və modellərdən DDL yaradın. İnsanlar qərar verir, alətlər qaydalara riayət edir.",
+    "flowTitle": "Belə birləşir",
+    "step": "Addım {n}",
+    "flow": {
+      "words": {
+        "nm": "Standart Sözlər",
+        "desc": "Sözlər · Qısaltmalar · Qadağan olunmuş Sözlər"
+      },
+      "domains": {
+        "nm": "Standart Domenlər",
+        "desc": "Növ · Uzunluq Qaydaları"
+      },
+      "terms": {
+        "nm": "Standart Terminlər",
+        "desc": "Söz Kombinasiyası · Təsdiq"
+      },
+      "model": {
+        "nm": "Məlumat Modeli",
+        "desc": "Konseptual · Məntiqi · Fiziki"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Mövzu Sahəsinə görə · Versiya Müqayisəsi"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "DBMS-ə görə yarat · İcraya icazə ver"
+      }
+    },
+    "roleTitle": "Rol üzrə edə biləcəyiniz işlər",
+    "planTitle": "Qiymət Planları",
+    "planNote": "— Təsnifat sistemi vahidi üçün Pi ödənişi, qiymət ödəniş ekranında təsdiqlənir",
+    "menu": {
+      "MENU_STD": "Standart Lüğət",
+      "MENU_SQL": "SQL Redaktoru",
+      "MENU_SET": "Parametrlər · Tarixçə",
+      "MENU_BAN": "Qadağan olunmuş Sözlər",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Standart Yoxlama",
+      "MENU_ADM": "Üzvlər · Təsdiqlər"
+    },
+    "viewOnly": "{menu} (Yalnız Baxış)",
+    "footer": "Yuxarıda daxil olun ki, təsnifat sisteminiz üçün tapşırıqlarınızı dərhal görəsiniz."
+  },
+  "dashboard": {
+    "loadFailed": "İdarəetmə paneli yüklənə bilmədi",
+    "myAreas": "Mənim Təsnifat Sistemlərim",
+    "planLine": "Plan {plan}",
+    "until": " · {date} tarixinə qədər",
+    "grace": "(Güzəşt müddəti)",
+    "openArea": "Təsnifat Sistemini aç →",
+    "todoTitle": "Mənim növbəm",
+    "todoEmpty": "Yalnız baxış icazəsi — zəhmət olmasa, aşağıdakı status və qısa yollarla standartları nəzərdən keçirin.",
+    "apvWait": "Standart Təsdiq Gözləyir",
+    "apvWaitSub": "Söz · Domen · Termin · Kod Tətbiqi",
+    "ddlWait": "DDL İcra Təsdiqi Gözləyir",
+    "mineWait": "Mənim Tətbiqlərim Gözləyir",
+    "mineRejected": "Son 30 gündə {count} rədd edildi",
+    "model": "Məlumat Modeli",
+    "modelSub": "Layihələr · {count} Varlıq",
+    "stdTitle": "Standart Lüğət Statusu",
+    "stdBasis": "Təsdiq edilmiş Əsas",
+    "shortcuts": "Qısa yollar",
+    "recentTitle": "Son Dəyişikliklər",
+    "allHistory": "Tam Tarixçə",
+    "noHistory": "Hələ dəyişiklik tarixçəsi yoxdur",
+    "justNow": "İndi",
+    "minutesAgo": "{n} dəqiqə əvvəl",
+    "hoursAgo": "{n} saat əvvəl",
+    "daysAgo": "{n} gün əvvəl",
+    "areaList": "Təsnifat Sistemi Siyahısı · Yeni yarat"
+  },
+  "areaHome": {
+    "title": "Mənim Standart Təsnifat Sistemlərim",
+    "loading": "Yüklənir",
+    "empty": "İştirak etdiyiniz təsnifat sistemi yoxdur",
+    "open": "Aç",
+    "newTitle": "Yeni Təsnifat Sistemi",
+    "namePlaceholder": "Təsnifat Sistemi Adı (tələb olunur)",
+    "descPlaceholder": "Təsvir",
+    "create": "Yarat",
+    "created": "Təsnifat sistemi {name} yaradıldı"
+  },
+  "nav": {
+    "label": "Təsnifat Sistemi Menyu",
+    "expand": "Aşağı menyunu genişləndir",
+    "expandWith": "Aşağı menyunu genişləndir ({menu})",
+    "collapse": "Aşağı menyunu yığ",
+    "subOf": "{menu} Alt funksiyaları",
+    "groupTech": "Monitorinq · SQL Redaktoru",
+    "groupStd": "Standart Lüğət",
+    "groupModel": "Model",
+    "groupSet": "Parametrlər",
+    "groupPlan": "Ödəniş",
+    "words": "Standart Sözlər",
+    "bulk": "Toplu Qeydiyyat",
+    "domains": "Standart Domenlər",
+    "keyDomains": "Əsas Domenlər",
+    "domainGroups": "Domen Qrupları",
+    "terms": "Standart Terminlər",
+    "codes": "Standart Kodlar",
+    "model": "Konseptual Model",
+    "prj": "Layihələr",
+    "subj": "Mövzu Sahələri",
+    "coreEnt": "Əsas Varlıqlar",
+    "entityClasses": "Varlıq Təsnifatçıları",
+    "logical": "Məntiqi Model",
+    "physical": "Fiziki Model",
+    "erd": "ERD",
+    "ddl": "DDL Yaradılması",
+    "monitor": "Monitorinq",
+    "monApp": "Tətbiq",
+    "monSrv": "Server",
+    "monDb": "Verilənlər Bazasında",
+    "monUrl": "URL",
+    "monFix": "AI Düzəliş Tarixçəsi",
+    "sql": "SQL Redaktoru",
+    "settings": "Parametrlər",
+    "history": "Tarixçə",
+    "forbidden": "Qadağan olunmuş Sözlər",
+    "banBulk": "Toplu Qadağan olunmuş Sözlər Qeydiyyatı",
+    "check": "Standart Yoxlama",
+    "reverse": "Tərs Mühəndislik",
+    "members": "Üzvlər",
+    "approvals": "Təsdiqlər",
+    "plan": "Ödəniş"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Sistem Administratoru",
+      "DA": "Məlumat Arxitektoru",
+      "STD": "Standart Menecer",
+      "MDL": "Modelləşdirici",
+      "QLT": "Keyfiyyət Meneceri",
+      "MIG": "Miqrasiya Meneceri",
+      "VIEWER": "Baxıcı"
+    },
+    "roleDesc": {
+      "SYS": "Təsnifat sistemi parametrlərini · domen qruplarını · qısaltmaları · üzvləri, tətbiqləri · təsdiqləri (o cümlədən dərhal təsdiq), toplu qeydiyyatı, SQL yazmağı, bütün menyuları idarə edin",
+      "DA": "Ümumi standart siyasət: Sözləri · domenləri · terminləri tətbiq edin · təsdiqləyin (tətbiq zamanı dərhal təsdiqi seçə bilərsiniz), toplu qeydiyyat, parametrləri · üzvləri idarə edin, SQL yazın, bütün menyular",
+      "STD": "Sözlər · domenlər · terminlər üçün müraciət edin, toplu qeydiyyat, parametrlər, SQL yazma, bütün menyular (təsdiq hüququ yoxdur)",
+      "MDL": "Sözlər · domenlər · terminlər · modellərin qeydiyyatı · dəyişdirilməsi · silinməsi üçün müraciət edin, toplu qeydiyyat, parametrlər, SQL yazma, bütün menyular (təsdiq hüququ yoxdur)",
+      "QLT": "Müraciət · SQL yazma, SQL redaktoru · modelləşdirmə · parametrlər menyuları (keyfiyyət diaqnostikası xüsusiyyətləri gələcək mərhələlərdə)",
+      "MIG": "Müraciət · SQL yazma, SQL redaktoru menyusu (miqrasiya xəritəçəkməsi üçün)",
+      "VIEWER": "Yalnız standart lüğətə baxın"
+    },
+    "plan": {
+      "FREE": "Pulsuz (Baxış)",
+      "P1": "Tərtibatçı",
+      "P2": "Standart Menecer",
+      "P3": "Modelləşdirici",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Qeydiyyatdan keç",
+      "UPD": "Dəyişdir",
+      "DEL": "Sil"
+    },
+    "tgt": {
+      "AREA": "Təsnifat Sistemi",
+      "MBR": "Üzv",
+      "DIC": "Söz",
+      "DOM": "Domen",
+      "DOM_GRP": "Domen Qrupu",
+      "TERM": "Termin",
+      "CD": "Standart Kod",
+      "CD_VAL": "Kod Dəyəri",
+      "ABBR": "Qısaltma",
+      "PRJ": "Layihə",
+      "SUBJ": "Mövzu Sahəsi",
+      "ENT": "Varlıq",
+      "REL": "Əlaqə",
+      "ATTR": "Atribut",
+      "VER": "Model Versiyası",
+      "PHY": "Fiziki Model",
+      "DDL": "DDL İcrası",
+      "RVS": "Tərs Mühəndislik",
+      "SQL": "SQL",
+      "DBCN": "DB Qoşulması",
+      "AGT": "Agent",
+      "MONURL": "URL Monitorinqi"
+    }
+  }
+}

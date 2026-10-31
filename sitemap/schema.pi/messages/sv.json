@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Metasystem för datastandardordbok"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Ändra språk",
+      "search": "Sök språk",
+      "empty": "Inga sökresultat"
+    },
+    "loading": "Laddar…",
+    "requestFailed": "Begäran misslyckades",
+    "home": "Hem",
+    "goHome": "Gå hem"
+  },
+  "home": {
+    "subtitle": "Metasystem för datastandardordbok"
+  },
+  "auth": {
+    "checking": "Kontrollerar inloggning…",
+    "googleUnlinked": "Du är inloggad med Google, men det är ännu inte länkat till ditt Pi-konto.",
+    "required": "Inloggning krävs.",
+    "requiredHint": "Inloggning krävs. Logga in med ditt Pi-konto i Pi Browser, eller med Google (Pi-kontolänkning krävs) i en vanlig webbläsare.",
+    "piSignIn": "Logga in med Pi-konto",
+    "googleSignIn": "Logga in med Google",
+    "signOut": "Logga ut",
+    "linkCheckFailed": "Kunde inte kontrollera länkningsstatus (tillfälligt fel). Uppdatera snart."
+  },
+  "link": {
+    "title": "Kontolänkning",
+    "desc": "Länkar ditt Pi-konto i Pi Browser med ditt Google-konto i en vanlig webbläsare som samma användare. Efter länkning kan du arbeta på PC genom att bara logga in med Google.",
+    "codeFormTitle": "Ange Pi-kontolänkningskod",
+    "codeFormHint": "Efter att ha loggat in med Pi Browser, ange den 6-siffriga koden som utfärdades på kontolänkningsskärmen inom 10 minuter.",
+    "codeLabel": "Länkningskod",
+    "linked": "Länkad.",
+    "submit": "Länka",
+    "issuerTitle": "Utfärda Google-kontolänkningskod",
+    "issuerHint": "Efter att ha loggat in med Google i en vanlig webbläsare, ange denna kod för att länka som samma användare (giltig i 10 minuter).",
+    "minutesLeft": "Cirka {minutes} minuter kvar",
+    "issue": "Utfärda kod",
+    "reissue": "Utfärda igen",
+    "linkedAs": "Ditt Google-konto är länkat till Pi-användaren <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Metasystem för datastandardordbok",
+    "headline1": "Utan standarder kan du inte namnge,",
+    "headline2": "utan modeller kan du inte tabellera.",
+    "lead": "Skapa termer med godkända standardord, rita modeller med dessa termer och generera DDL från modellerna. Människor bestämmer, verktyg upprätthåller regler.",
+    "flowTitle": "Så här ansluter det",
+    "step": "Steg {n}",
+    "flow": {
+      "words": {
+        "nm": "Standardord",
+        "desc": "Ord · Förkortningar · Förbjudna ord"
+      },
+      "domains": {
+        "nm": "Standarddomäner",
+        "desc": "Typ · Längdregler"
+      },
+      "terms": {
+        "nm": "Standardtermer",
+        "desc": "Ordkombination · Godkännande"
+      },
+      "model": {
+        "nm": "Datamodell",
+        "desc": "Konceptuell · Logisk · Fysisk"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Per ämnesområde · Versionsjämförelse"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generera per DBMS · Godkänn körning"
+      }
+    },
+    "roleTitle": "Vad du kan göra per roll",
+    "planTitle": "Prisplaner",
+    "planNote": "— Pi-betalning per klassificeringssystemenhet, pris bekräftas på betalningsskärmen",
+    "menu": {
+      "MENU_STD": "Standardordbok",
+      "MENU_SQL": "SQL-redigerare",
+      "MENU_SET": "Inställningar · Historik",
+      "MENU_BAN": "Förbjudna ord",
+      "MENU_MODEL": "Modell · ERD · DDL",
+      "MENU_CHK": "Standardkontroll",
+      "MENU_ADM": "Medlemmar · Godkännanden"
+    },
+    "viewOnly": "{menu} (Endast visning)",
+    "footer": "Logga in ovan för att omedelbart se dina uppgifter för ditt klassificeringssystem."
+  },
+  "dashboard": {
+    "loadFailed": "Kunde inte ladda instrumentpanelen",
+    "myAreas": "Mina klassificeringssystem",
+    "planLine": "Plan {plan}",
+    "until": " · Till {date}",
+    "grace": "(Anståndsperiod)",
+    "openArea": "Öppna klassificeringssystem →",
+    "todoTitle": "Min tur",
+    "todoEmpty": "Endast visningsbehörighet — vänligen bläddra bland standarder med hjälp av status och genvägar nedan.",
+    "apvWait": "Standardgodkännande väntar",
+    "apvWaitSub": "Ansökan om ord · domän · term · kod",
+    "ddlWait": "DDL-körningsgodkännande väntar",
+    "mineWait": "Mina ansökningar väntar",
+    "mineRejected": "{count} avvisade under de senaste 30 dagarna",
+    "model": "Datamodell",
+    "modelSub": "Projekt · {count} entiteter",
+    "stdTitle": "Standardordboksstatus",
+    "stdBasis": "Godkänd grund",
+    "shortcuts": "Genvägar",
+    "recentTitle": "Senaste ändringar",
+    "allHistory": "Fullständig historik",
+    "noHistory": "Ingen ändringshistorik ännu",
+    "justNow": "Precis nu",
+    "minutesAgo": "{n} minuter sedan",
+    "hoursAgo": "{n} timmar sedan",
+    "daysAgo": "{n} dagar sedan",
+    "areaList": "Klassificeringssystemlista · Skapa ny"
+  },
+  "areaHome": {
+    "title": "Mina standardklassificeringssystem",
+    "loading": "Laddar",
+    "empty": "Inga klassificeringssystem deltar",
+    "open": "Öppna",
+    "newTitle": "Nytt klassificeringssystem",
+    "namePlaceholder": "Namn på klassificeringssystem (obligatoriskt)",
+    "descPlaceholder": "Beskrivning",
+    "create": "Skapa",
+    "created": "Klassificeringssystem {name} skapat"
+  },
+  "nav": {
+    "label": "Klassificeringssystemmeny",
+    "expand": "Expandera nedre menyn",
+    "expandWith": "Expandera nedre menyn ({menu})",
+    "collapse": "Fäll ihop nedre menyn",
+    "subOf": "{menu} Underfunktioner",
+    "groupTech": "Övervakning · SQL-redigerare",
+    "groupStd": "Standardordbok",
+    "groupModel": "Modell",
+    "groupSet": "Inställningar",
+    "groupPlan": "Betalning",
+    "words": "Standardord",
+    "bulk": "Massregistrering",
+    "domains": "Standarddomäner",
+    "keyDomains": "Nyckeldomäner",
+    "domainGroups": "Domängrupper",
+    "terms": "Standardtermer",
+    "codes": "Standardkoder",
+    "model": "Konceptuell modell",
+    "prj": "Projekt",
+    "subj": "Ämnesområden",
+    "coreEnt": "Kärnentiteter",
+    "entityClasses": "Entitetsklassificerare",
+    "logical": "Logisk modell",
+    "physical": "Fysisk modell",
+    "erd": "ERD",
+    "ddl": "DDL-generering",
+    "monitor": "Övervakning",
+    "monApp": "Applikation",
+    "monSrv": "Server",
+    "monDb": "Databas",
+    "monUrl": "URL",
+    "monFix": "AI-korrigeringshistorik",
+    "sql": "SQL-redigerare",
+    "settings": "Inställningar",
+    "history": "Historik",
+    "forbidden": "Förbjudna ord",
+    "banBulk": "Massregistrering av förbjudna ord",
+    "check": "Standardkontroll",
+    "reverse": "Omvänd konstruktion",
+    "members": "Medlemmar",
+    "approvals": "Godkännanden",
+    "plan": "Betalning"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Systemadministratör",
+      "DA": "Dataarkitekt",
+      "STD": "Standardansvarig",
+      "MDL": "Modellerare",
+      "QLT": "Kvalitetsansvarig",
+      "MIG": "Migreringsansvarig",
+      "VIEWER": "Visare"
+    },
+    "roleDesc": {
+      "SYS": "Hantera klassificeringssysteminställningar · domängrupper · förkortningar · medlemmar, ansökningar · godkännanden (inklusive omedelbart godkännande), massregistrering, SQL-skrivning, alla menyer",
+      "DA": "Övergripande standardpolicy: Ansök · godkänn ord · domäner · termer (kan välja omedelbart godkännande vid ansökan), massregistrering, hantera inställningar · medlemmar, SQL-skrivning, alla menyer",
+      "STD": "Ansök om ord · domäner · termer, massregistrering, inställningar, SQL-skrivning, alla menyer (inga godkännanderättigheter)",
+      "MDL": "Ansök om registrering · ändring · radering av ord · domäner · termer · modeller, massregistrering, inställningar, SQL-skrivning, alla menyer (inga godkännanderättigheter)",
+      "QLT": "Ansök · SQL-skrivning, SQL-redigerare · modellering · inställningsmenyer (kvalitetsdiagnostikfunktioner i framtida steg)",
+      "MIG": "Ansök · SQL-skrivning, SQL-redigeringsmeny (för migreringsmappning)",
+      "VIEWER": "Endast visning av standardordbok"
+    },
+    "plan": {
+      "FREE": "Gratis (visning)",
+      "P1": "Utvecklare",
+      "P2": "Standardansvarig",
+      "P3": "Modellerare",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registrera",
+      "UPD": "Ändra",
+      "DEL": "Radera"
+    },
+    "tgt": {
+      "AREA": "Klassificeringssystem",
+      "MBR": "Medlem",
+      "DIC": "Ord",
+      "DOM": "Domän",
+      "DOM_GRP": "Domängrupp",
+      "TERM": "Term",
+      "CD": "Standardkod",
+      "CD_VAL": "Kodvärde",
+      "ABBR": "Förkortning",
+      "PRJ": "Projekt",
+      "SUBJ": "Ämnesområde",
+      "ENT": "Entitet",
+      "REL": "Relation",
+      "ATTR": "Attribut",
+      "VER": "Modellversion",
+      "PHY": "Fysisk modell",
+      "DDL": "DDL-körning",
+      "RVS": "Omvänd konstruktion",
+      "SQL": "SQL",
+      "DBCN": "DB-anslutning",
+      "AGT": "Agent",
+      "MONURL": "URL-övervakning"
+    }
+  }
+}

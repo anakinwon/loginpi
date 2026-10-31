@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Sistem Meta Kamus Standar Data"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Ubah Bahasa",
+      "search": "Cari Bahasa",
+      "empty": "Tidak ada hasil pencarian"
+    },
+    "loading": "Memuat…",
+    "requestFailed": "Permintaan gagal",
+    "home": "Beranda",
+    "goHome": "Ke Beranda"
+  },
+  "home": {
+    "subtitle": "Sistem Meta Kamus Standar Data"
+  },
+  "auth": {
+    "checking": "Memeriksa login…",
+    "googleUnlinked": "Anda telah login ke Google, tetapi belum menautkannya ke akun Pi Anda.",
+    "required": "Login diperlukan.",
+    "requiredHint": "Login diperlukan. Silakan login dengan akun Pi Anda di Pi Browser, atau dengan Google (memerlukan penautan akun Pi) di browser biasa.",
+    "piSignIn": "Login dengan akun Pi",
+    "googleSignIn": "Login dengan Google",
+    "signOut": "Keluar",
+    "linkCheckFailed": "Gagal memeriksa status penautan (kesalahan sementara). Harap segarkan sebentar lagi."
+  },
+  "link": {
+    "title": "Penautan Akun",
+    "desc": "Menghubungkan akun Pi Anda di Pi Browser dengan akun Google Anda di browser biasa sebagai pengguna yang sama. Setelah ditautkan, Anda dapat bekerja di PC hanya dengan login Google.",
+    "codeFormTitle": "Masukkan Kode Penautan Akun Pi",
+    "codeFormHint": "Setelah login di Pi Browser, masukkan kode 6 digit yang dikeluarkan dari layar penautan akun dalam waktu 10 menit.",
+    "codeLabel": "Kode Penautan",
+    "linked": "Berhasil ditautkan.",
+    "submit": "Tautkan",
+    "issuerTitle": "Keluarkan Kode Penautan Akun Google",
+    "issuerHint": "Setelah login Google di browser biasa, masukkan kode ini untuk menghubungkan sebagai pengguna yang sama (berlaku 10 menit).",
+    "minutesLeft": "Sisa waktu sekitar {minutes} menit",
+    "issue": "Keluarkan Kode",
+    "reissue": "Keluarkan Ulang",
+    "linkedAs": "Akun Google ditautkan dengan pengguna Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Sistem Meta Kamus Standar Data",
+    "headline1": "Tanpa standar, nama tidak dapat dibuat,",
+    "headline2": "tanpa model, tabel tidak dapat dibuat.",
+    "lead": "Buat istilah dengan kata standar yang disetujui, gambar model dengan istilah tersebut, dan hasilkan DDL dari model. Manusia memutuskan, alat mematuhi aturan.",
+    "flowTitle": "Alur Kerja",
+    "step": "Langkah {n}",
+    "flow": {
+      "words": {
+        "nm": "Kata Standar",
+        "desc": "Kata · Singkatan · Kata Terlarang"
+      },
+      "domains": {
+        "nm": "Domain Standar",
+        "desc": "Aturan Tipe · Panjang"
+      },
+      "terms": {
+        "nm": "Istilah Standar",
+        "desc": "Kombinasi Kata · Persetujuan"
+      },
+      "model": {
+        "nm": "Model Data",
+        "desc": "Konseptual · Logis · Fisik"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Berdasarkan Area Subjek · Perbandingan Versi"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Pembuatan Berdasarkan DBMS · Eksekusi Persetujuan"
+      }
+    },
+    "roleTitle": "Apa yang dapat dilakukan berdasarkan peran",
+    "planTitle": "Paket Harga",
+    "planNote": "— Pembayaran Pi per unit taksonomi, harga dapat dilihat di layar pembayaran",
+    "menu": {
+      "MENU_STD": "Kamus Standar",
+      "MENU_SQL": "Editor SQL",
+      "MENU_SET": "Pengaturan · Riwayat",
+      "MENU_BAN": "Kata Terlarang",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Pemeriksaan Standar",
+      "MENU_ADM": "Anggota · Persetujuan"
+    },
+    "viewOnly": "{menu} (Lihat Saja)",
+    "footer": "Setelah login di atas, Anda akan langsung melihat tugas-tugas taksonomi Anda."
+  },
+  "dashboard": {
+    "loadFailed": "Gagal memuat dasbor",
+    "myAreas": "Taksonomi Saya",
+    "planLine": "Paket {plan}",
+    "until": " · Hingga {date}",
+    "grace": "(Dalam masa tenggang)",
+    "openArea": "Buka Taksonomi →",
+    "todoTitle": "Giliran Saya",
+    "todoEmpty": "Ini adalah hak akses lihat saja — silakan cari standar menggunakan status di bawah dan pintasan.",
+    "apvWait": "Menunggu Persetujuan Standar",
+    "apvWaitSub": "Permintaan Kata · Domain · Istilah · Kode",
+    "ddlWait": "Menunggu Persetujuan Eksekusi DDL",
+    "mineWait": "Menunggu Permintaan Saya",
+    "mineRejected": "{count} ditolak dalam 30 hari terakhir",
+    "model": "Model Data",
+    "modelSub": "Proyek · {count} Entitas",
+    "stdTitle": "Status Kamus Standar",
+    "stdBasis": "Berdasarkan Persetujuan Selesai",
+    "shortcuts": "Pintasan",
+    "recentTitle": "Perubahan Terbaru",
+    "allHistory": "Semua Riwayat",
+    "noHistory": "Belum ada riwayat perubahan",
+    "justNow": "Baru saja",
+    "minutesAgo": "{n} menit yang lalu",
+    "hoursAgo": "{n} jam yang lalu",
+    "daysAgo": "{n} hari yang lalu",
+    "areaList": "Daftar Taksonomi · Buat Baru"
+  },
+  "areaHome": {
+    "title": "Taksonomi Standar Saya",
+    "loading": "Memuat",
+    "empty": "Tidak ada taksonomi yang diikuti",
+    "open": "Buka",
+    "newTitle": "Taksonomi Baru",
+    "namePlaceholder": "Nama Taksonomi (Wajib)",
+    "descPlaceholder": "Deskripsi",
+    "create": "Buat",
+    "created": "Taksonomi {name} dibuat"
+  },
+  "nav": {
+    "label": "Menu Taksonomi",
+    "expand": "Perluas Menu Bawah",
+    "expandWith": "Perluas Menu Bawah ({menu})",
+    "collapse": "Ciutkan Menu Bawah",
+    "subOf": "Fungsi Sub {menu}",
+    "groupTech": "Pemantauan · Editor SQL",
+    "groupStd": "Kamus Standar",
+    "groupModel": "Model",
+    "groupSet": "Pengaturan",
+    "groupPlan": "Pembayaran",
+    "words": "Kata Standar",
+    "bulk": "Pendaftaran Massal",
+    "domains": "Domain Standar",
+    "keyDomains": "Domain Utama",
+    "domainGroups": "Grup Domain",
+    "terms": "Istilah Standar",
+    "codes": "Kode Standar",
+    "model": "Model Konseptual",
+    "prj": "Proyek",
+    "subj": "Area Subjek",
+    "coreEnt": "Entitas Inti",
+    "entityClasses": "Pengklasifikasi Entitas",
+    "logical": "Model Logis",
+    "physical": "Model Fisik",
+    "erd": "ERD",
+    "ddl": "Pembuatan DDL",
+    "monitor": "Pemantauan",
+    "monApp": "Aplikasi",
+    "monSrv": "Server",
+    "monDb": "Database",
+    "monUrl": "URL",
+    "monFix": "Riwayat Perbaikan AI",
+    "sql": "Editor SQL",
+    "settings": "Pengaturan",
+    "history": "Riwayat",
+    "forbidden": "Kata Terlarang",
+    "banBulk": "Pendaftaran Massal Kata Terlarang",
+    "check": "Pemeriksaan Standar",
+    "reverse": "Reverse Engineering",
+    "members": "Anggota",
+    "approvals": "Persetujuan",
+    "plan": "Pembayaran"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Administrator Sistem",
+      "DA": "Arsitek Data",
+      "STD": "Manajer Standar",
+      "MDL": "Pemodel",
+      "QLT": "Manajer Kualitas",
+      "MIG": "Manajer Migrasi",
+      "VIEWER": "Penampil"
+    },
+    "roleDesc": {
+      "SYS": "Pengaturan taksonomi · Grup domain · Singkatan · Manajemen anggota, Permintaan · Persetujuan (termasuk persetujuan instan), Pendaftaran massal, Penulisan SQL, Semua menu",
+      "DA": "Manajemen kebijakan standar secara keseluruhan: Permintaan · Persetujuan kata · domain · istilah (dapat memilih persetujuan instan saat mengajukan), Pendaftaran massal, Pengaturan · Manajemen anggota, Penulisan SQL, Semua menu",
+      "STD": "Permintaan kata · domain · istilah, Pendaftaran massal, Pengaturan, Penulisan SQL, Semua menu (tanpa hak persetujuan)",
+      "MDL": "Permintaan pendaftaran · modifikasi · penghapusan kata · domain · istilah · model, Pendaftaran massal, Pengaturan, Penulisan SQL, Semua menu (tanpa hak persetujuan)",
+      "QLT": "Permintaan · Penulisan SQL, Editor SQL · Pemodelan · Menu pengaturan (fungsi diagnostik kualitas akan datang di tahap selanjutnya)",
+      "MIG": "Permintaan · Penulisan SQL, Menu editor SQL (untuk pemetaan migrasi)",
+      "VIEWER": "Hanya melihat kamus standar"
+    },
+    "plan": {
+      "FREE": "Gratis (Lihat Saja)",
+      "P1": "Pengembang",
+      "P2": "Manajer Standar",
+      "P3": "Pemodel",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Daftar",
+      "UPD": "Ubah",
+      "DEL": "Hapus"
+    },
+    "tgt": {
+      "AREA": "Taksonomi",
+      "MBR": "Anggota",
+      "DIC": "Kata",
+      "DOM": "Domain",
+      "DOM_GRP": "Grup Domain",
+      "TERM": "Istilah",
+      "CD": "Kode Standar",
+      "CD_VAL": "Nilai Kode",
+      "ABBR": "Singkatan",
+      "PRJ": "Proyek",
+      "SUBJ": "Area Subjek",
+      "ENT": "Entitas",
+      "REL": "Hubungan",
+      "ATTR": "Atribut",
+      "VER": "Versi Model",
+      "PHY": "Model Fisik",
+      "DDL": "Eksekusi DDL",
+      "RVS": "Reverse Engineering",
+      "SQL": "SQL",
+      "DBCN": "Koneksi DB",
+      "AGT": "Agen",
+      "MONURL": "Pemantauan URL"
+    }
+  }
+}

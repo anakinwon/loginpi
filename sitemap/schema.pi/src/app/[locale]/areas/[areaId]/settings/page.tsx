@@ -1,7 +1,7 @@
 'use client'
 // 설정 화면 — 분류체계 설정(이름·설명·구분자·사용여부)·도메인그룹·약어. 변경은 분류체계 관리자만, 그 외 역할은 조회
 //  AI 분석 모델 탭(2026-10-21) = schema.pi 전역 설정(전역 관리자만, 그 외는 안내 문구)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useState } from 'react'
 import AiMdlForm from './ai-mdl-form'
 import AreaForm from './area-form'

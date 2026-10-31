@@ -1,10 +1,9 @@
-// schema.pi 프록시 — 요청 가공 없음(NextResponse.next). 존재 이유 : next.config 의 outputFileTracingRoot 가 저장소 루트(loginpi)라
-// Next 16(Turbopack)이 루트 src/middleware.ts(cafe.pi next-intl, 189 locale)를 이 앱의 미들웨어로 잡아 / 를 /ko 로 rewrite 해 404 가 난다.
-// 앱 안에 proxy 가 있으면 그것이 엔트리가 되어 루트 미들웨어가 번들되지 않는다. matcher 는 실제 요청과 겹치지 않는 경로 하나만
-import { NextResponse } from 'next/server'
+// schema.pi 프록시 — next-intl locale 접두사 처리만(as-needed, 감지·쿠키 끔 = Pi Browser 표준 6절). 인증 게이트와 섞지 않는다(redirect 금지 원칙).
+// 앱 안 proxy 가 엔트리여야 저장소 루트 src/middleware.ts(cafe.pi)가 이 앱에 번들되지 않는다(next.config 주석) — 삭제 금지.
+// API·정적 파일(점 포함 경로 — validation-key.txt·templates/*.xlsx)은 matcher 제외
+import createMiddleware from 'next-intl/middleware'
+import { routing } from './i18n/routing'
 
-export function proxy() {
-  return NextResponse.next()
-}
+export const proxy = createMiddleware(routing)
 
-export const config = { matcher: ['/__proxy_noop__'] }
+export const config = { matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'] }

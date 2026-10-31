@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Metasystem für Datenstandardwörterbücher"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Sprache ändern",
+      "search": "Sprache suchen",
+      "empty": "Keine Suchergebnisse"
+    },
+    "loading": "Wird geladen…",
+    "requestFailed": "Anfrage fehlgeschlagen",
+    "home": "Startseite",
+    "goHome": "Zur Startseite"
+  },
+  "home": {
+    "subtitle": "Metasystem für Datenstandardwörterbücher"
+  },
+  "auth": {
+    "checking": "Login wird überprüft…",
+    "googleUnlinked": "Sie sind mit Google angemeldet, aber es ist noch nicht mit Ihrem Pi Konto verknüpft.",
+    "required": "Login erforderlich.",
+    "requiredHint": "Login erforderlich. Bitte melden Sie sich im Pi Browser mit Ihrem Pi Konto an oder in einem regulären Browser mit Google (Pi Konto-Verknüpfung erforderlich).",
+    "piSignIn": "Mit Pi Konto anmelden",
+    "googleSignIn": "Mit Google anmelden",
+    "signOut": "Abmelden",
+    "linkCheckFailed": "Verknüpfungsstatus konnte nicht überprüft werden (temporärer Fehler). Bitte aktualisieren Sie die Seite in Kürze."
+  },
+  "link": {
+    "title": "Kontoverknüpfung",
+    "desc": "Verknüpft Ihr Pi Konto im Pi Browser mit Ihrem Google Konto in einem regulären Browser als denselben Benutzer. Nach der Verknüpfung können Sie am PC arbeiten, indem Sie sich einfach mit Google anmelden.",
+    "codeFormTitle": "Pi Konto-Verknüpfungscode eingeben",
+    "codeFormHint": "Nach der Anmeldung im Pi Browser geben Sie den 6-stelligen Code, der auf dem Bildschirm zur Kontoverknüpfung ausgegeben wurde, innerhalb von 10 Minuten ein.",
+    "codeLabel": "Verknüpfungscode",
+    "linked": "Verknüpft.",
+    "submit": "Verknüpfen",
+    "issuerTitle": "Google Konto-Verknüpfungscode ausstellen",
+    "issuerHint": "Nach der Anmeldung mit Google in einem regulären Browser geben Sie diesen Code ein, um sich als derselbe Benutzer zu verknüpfen (10 Minuten gültig).",
+    "minutesLeft": "Ca. {minutes} Minuten verbleibend",
+    "issue": "Code ausstellen",
+    "reissue": "Neu ausstellen",
+    "linkedAs": "Ihr Google Konto ist mit dem Pi Benutzer <b>{name}</b> verknüpft."
+  },
+  "intro": {
+    "kicker": "Metasystem für Datenstandardwörterbücher",
+    "headline1": "Ohne Standards kann man nicht benennen,",
+    "headline2": "ohne Modelle kann man keine Tabellen erstellen.",
+    "lead": "Erstellen Sie Begriffe mit genehmigten Standardwörtern, zeichnen Sie Modelle mit diesen Begriffen und generieren Sie DDL aus den Modellen. Menschen entscheiden, Tools setzen Regeln durch.",
+    "flowTitle": "So funktioniert es",
+    "step": "Schritt {n}",
+    "flow": {
+      "words": {
+        "nm": "Standardwörter",
+        "desc": "Wörter · Abkürzungen · Verbotene Wörter"
+      },
+      "domains": {
+        "nm": "Standarddomänen",
+        "desc": "Typ · Längenregeln"
+      },
+      "terms": {
+        "nm": "Standardbegriffe",
+        "desc": "Wortkombination · Genehmigung"
+      },
+      "model": {
+        "nm": "Datenmodell",
+        "desc": "Konzeptuell · Logisch · Physisch"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Nach Themenbereich · Versionsvergleich"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generieren nach DBMS · Ausführung genehmigen"
+      }
+    },
+    "roleTitle": "Was Sie je nach Rolle tun können",
+    "planTitle": "Preispläne",
+    "planNote": "— Pi-Zahlung pro Klassifizierungssystemeinheit, Preis auf dem Zahlungsbildschirm bestätigt",
+    "menu": {
+      "MENU_STD": "Standardwörterbuch",
+      "MENU_SQL": "SQL Editor",
+      "MENU_SET": "Einstellungen · Verlauf",
+      "MENU_BAN": "Verbotene Wörter",
+      "MENU_MODEL": "Modell · ERD · DDL",
+      "MENU_CHK": "Standardprüfung",
+      "MENU_ADM": "Mitglieder · Genehmigungen"
+    },
+    "viewOnly": "{menu} (Nur Ansicht)",
+    "footer": "Melden Sie sich oben an, um Ihre Aufgaben für Ihr Klassifizierungssystem sofort zu sehen."
+  },
+  "dashboard": {
+    "loadFailed": "Dashboard konnte nicht geladen werden",
+    "myAreas": "Meine Klassifizierungssysteme",
+    "planLine": "Plan {plan}",
+    "until": " · Bis {date}",
+    "grace": "(Kulanzzeitraum)",
+    "openArea": "Klassifizierungssystem öffnen →",
+    "todoTitle": "Meine Reihe",
+    "todoEmpty": "Nur Ansichtsberechtigung — bitte durchsuchen Sie die Standards über den Status und die Verknüpfungen unten.",
+    "apvWait": "Standardgenehmigung ausstehend",
+    "apvWaitSub": "Wort · Domäne · Begriff · Code-Antrag",
+    "ddlWait": "DDL-Ausführungsgenehmigung ausstehend",
+    "mineWait": "Meine Anträge ausstehend",
+    "mineRejected": "{count} in den letzten 30 Tagen abgelehnt",
+    "model": "Datenmodell",
+    "modelSub": "Projekte · {count} Entitäten",
+    "stdTitle": "Status des Standardwörterbuchs",
+    "stdBasis": "Genehmigte Basis",
+    "shortcuts": "Verknüpfungen",
+    "recentTitle": "Letzte Änderungen",
+    "allHistory": "Gesamter Verlauf",
+    "noHistory": "Noch kein Änderungsverlauf",
+    "justNow": "Gerade eben",
+    "minutesAgo": "vor {n} Minuten",
+    "hoursAgo": "vor {n} Stunden",
+    "daysAgo": "vor {n} Tagen",
+    "areaList": "Liste der Klassifizierungssysteme · Neu erstellen"
+  },
+  "areaHome": {
+    "title": "Meine Standard-Klassifizierungssysteme",
+    "loading": "Wird geladen",
+    "empty": "Keine Klassifizierungssysteme, an denen Sie teilnehmen",
+    "open": "Öffnen",
+    "newTitle": "Neues Klassifizierungssystem",
+    "namePlaceholder": "Name des Klassifizierungssystems (erforderlich)",
+    "descPlaceholder": "Beschreibung",
+    "create": "Erstellen",
+    "created": "Klassifizierungssystem {name} erstellt"
+  },
+  "nav": {
+    "label": "Menü des Klassifizierungssystems",
+    "expand": "Unteres Menü erweitern",
+    "expandWith": "Unteres Menü erweitern ({menu})",
+    "collapse": "Unteres Menü einklappen",
+    "subOf": "{menu} Unterfunktionen",
+    "groupTech": "Überwachung · SQL Editor",
+    "groupStd": "Standardwörterbuch",
+    "groupModel": "Modell",
+    "groupSet": "Einstellungen",
+    "groupPlan": "Zahlung",
+    "words": "Standardwörter",
+    "bulk": "Massenregistrierung",
+    "domains": "Standarddomänen",
+    "keyDomains": "Schlüsseldomänen",
+    "domainGroups": "Domänengruppen",
+    "terms": "Standardbegriffe",
+    "codes": "Standardcodes",
+    "model": "Konzeptuelles Modell",
+    "prj": "Projekte",
+    "subj": "Themenbereiche",
+    "coreEnt": "Kernentitäten",
+    "entityClasses": "Entitätsklassifizierer",
+    "logical": "Logisches Modell",
+    "physical": "Physisches Modell",
+    "erd": "ERD",
+    "ddl": "DDL-Generierung",
+    "monitor": "Überwachung",
+    "monApp": "Anwendung",
+    "monSrv": "Server",
+    "monDb": "Datenbank",
+    "monUrl": "URL",
+    "monFix": "AI Korrekturverlauf",
+    "sql": "SQL Editor",
+    "settings": "Einstellungen",
+    "history": "Verlauf",
+    "forbidden": "Verbotene Wörter",
+    "banBulk": "Massenregistrierung verbotener Wörter",
+    "check": "Standardprüfung",
+    "reverse": "Reverse Engineering",
+    "members": "Mitglieder",
+    "approvals": "Genehmigungen",
+    "plan": "Zahlung"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Systemadministrator",
+      "DA": "Datenarchitekt",
+      "STD": "Standardmanager",
+      "MDL": "Modellierer",
+      "QLT": "Qualitätsmanager",
+      "MIG": "Migrationsmanager",
+      "VIEWER": "Betrachter"
+    },
+    "roleDesc": {
+      "SYS": "Verwaltung von Klassifizierungssystemeinstellungen · Domänengruppen · Abkürzungen · Mitgliedern, Anträgen · Genehmigungen (einschließlich sofortiger Genehmigung), Massenregistrierung, SQL-Schreiben, alle Menüs",
+      "DA": "Gesamte Standardrichtlinie: Wörter · Domänen · Begriffe beantragen · genehmigen (sofortige Genehmigung bei Antragstellung wählbar), Massenregistrierung, Einstellungen · Mitglieder verwalten, SQL-Schreiben, alle Menüs",
+      "STD": "Wörter · Domänen · Begriffe beantragen, Massenregistrierung, Einstellungen, SQL-Schreiben, alle Menüs (keine Genehmigungsrechte)",
+      "MDL": "Antrag auf Registrierung · Änderung · Löschung von Wörtern · Domänen · Begriffen · Modellen, Massenregistrierung, Einstellungen, SQL-Schreiben, alle Menüs (keine Genehmigungsrechte)",
+      "QLT": "Antrag · SQL-Schreiben, SQL Editor · Modellierung · Einstellungsmenüs (Qualitätsdiagnosefunktionen in zukünftigen Phasen)",
+      "MIG": "Antrag · SQL-Schreiben, SQL Editor-Menü (für Migrations-Mapping)",
+      "VIEWER": "Nur Standardwörterbuch anzeigen"
+    },
+    "plan": {
+      "FREE": "Kostenlos (Ansicht)",
+      "P1": "Entwickler",
+      "P2": "Standardmanager",
+      "P3": "Modellierer",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registrieren",
+      "UPD": "Ändern",
+      "DEL": "Löschen"
+    },
+    "tgt": {
+      "AREA": "Klassifizierungssystem",
+      "MBR": "Mitglied",
+      "DIC": "Wort",
+      "DOM": "Domäne",
+      "DOM_GRP": "Domänengruppe",
+      "TERM": "Begriff",
+      "CD": "Standardcode",
+      "CD_VAL": "Codewert",
+      "ABBR": "Abkürzung",
+      "PRJ": "Projekt",
+      "SUBJ": "Themenbereich",
+      "ENT": "Entität",
+      "REL": "Beziehung",
+      "ATTR": "Attribut",
+      "VER": "Modellversion",
+      "PHY": "Physisches Modell",
+      "DDL": "DDL-Ausführung",
+      "RVS": "Reverse Engineering",
+      "SQL": "SQL",
+      "DBCN": "DB-Verbindung",
+      "AGT": "Agent",
+      "MONURL": "URL-Überwachung"
+    }
+  }
+}

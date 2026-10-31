@@ -111,6 +111,7 @@
 ## 3단계 : 확장
 
 - [x] 표준코드(reqst.md FR-14 = 제안서 P04, 2026-10-19) : `sql/057` `std_cd`(코드 = 코드형(CD) 도메인의 확정 표준용어 1개, 코드명·물리명 = 용어, 코드분류명·사용여부, 분류체계 안 용어당 1개)·`std_cd_val`(코드값·코드값명·정렬순서·사용여부, 코드 안 유일·길이 ≤ 용어 도메인 길이), `src/lib/std-code.ts`(simpleCrud — 조회 STD_VIEW·쓰기 STD_REQ, 승인 절차 없이 직접 반영·감사 이력 CD·CD_VAL, 용어 교체·코드 이동 불가, 코드값 있는 코드 삭제 불가), API `/codes`·`/code-values?cd_id=`, 화면 `/codes`(표준용어 › 표준코드, 용어 검색 선택·코드값 표). simpleCrud `listBy`·ItemTable `parent` 추가. PGlite 7건·API 15건 통과, 시험 데이터 논리 삭제. 승인 절차 적용 여부 [확인중 : 마스터]
+- [x] 다국어 기반(2026-10-31, 루트 `docs/I18N_STANDARD.md` 2차 구축 D8) : `@pi/i18n`·next-intl, 화면을 `src/app/[locale]/` 로 이동(`app/api` 그대로, as-needed — ko 접두사 없음, 감지·쿠키 끔), `src/proxy.ts` = next-intl 처리, 공통 화면(레이아웃·홈·로그인·소개·대시보드·분류체계 목록·계정 연동·하단 메뉴) 문구 182키 → 67개 언어 번역, 홈·계정 연동에 언어 스위처, 모니터링 화면 메뉴명은 locale 접두사를 떼고 판정. 나머지 화면 = `docs/I18N_BACKLOG.md`. Pi Browser 실기기(로그인·결제·언어 전환·재방문) 미확인
 - [ ] P23 영향 분석 확장(모델 속성 사용처), P25 카탈로그 검색
 - [ ] 자동 갱신 구독(Pi SDK 계약 호출 공식 지원 이후)
 - [ ] 운영 Supabase 프로젝트·도메인 `schema.pi` 연결

@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Metasystem for datastandardordbok"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Endre språk",
+      "search": "Søk språk",
+      "empty": "Ingen søkeresultater"
+    },
+    "loading": "Laster inn …",
+    "requestFailed": "Forespørselen mislyktes",
+    "home": "Hjem",
+    "goHome": "Gå hjem"
+  },
+  "home": {
+    "subtitle": "Metasystem for datastandardordbok"
+  },
+  "auth": {
+    "checking": "Sjekker pålogging …",
+    "googleUnlinked": "Du er logget inn med Google, men den er ikke koblet til Pi-kontoen din ennå.",
+    "required": "Pålogging kreves.",
+    "requiredHint": "Pålogging kreves. Logg inn med Pi-kontoen din i Pi Browser, eller med Google (Pi-kontokobling kreves) i en vanlig nettleser.",
+    "piSignIn": "Logg inn med Pi-konto",
+    "googleSignIn": "Logg inn med Google",
+    "signOut": "Logg ut",
+    "linkCheckFailed": "Kunne ikke sjekke koblingsstatus (midlertidig feil). Vennligst oppdater om kort tid."
+  },
+  "link": {
+    "title": "Kontokobling",
+    "desc": "Kobler Pi-kontoen din i Pi Browser med Google-kontoen din i en vanlig nettleser som samme bruker. Etter kobling kan du jobbe på PC ved å bare logge inn med Google.",
+    "codeFormTitle": "Skriv inn Pi-kontokoblingskode",
+    "codeFormHint": "Etter å ha logget inn med Pi Browser, skriv inn den 6-sifrede koden som ble utstedt på kontokoblingsskjermen innen 10 minutter.",
+    "codeLabel": "Koblingskode",
+    "linked": "Koblet.",
+    "submit": "Koble",
+    "issuerTitle": "Utsted Google-kontokoblingskode",
+    "issuerHint": "Etter å ha logget inn med Google i en vanlig nettleser, skriv inn denne koden for å koble som samme bruker (gyldig i 10 minutter).",
+    "minutesLeft": "Ca. {minutes} minutter igjen",
+    "issue": "Utsted kode",
+    "reissue": "Utsted på nytt",
+    "linkedAs": "Google-kontoen din er koblet til Pi-bruker <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Metasystem for datastandardordbok",
+    "headline1": "Uten standarder kan du ikke navngi,",
+    "headline2": "uten modeller kan du ikke tabellere.",
+    "lead": "Lag termer med godkjente standardord, tegn modeller med disse termene, og generer DDL fra modellene. Mennesker bestemmer, verktøy håndhever regler.",
+    "flowTitle": "Slik kobles det sammen",
+    "step": "Trinn {n}",
+    "flow": {
+      "words": {
+        "nm": "Standardord",
+        "desc": "Ord · Forkortelser · Forbudte ord"
+      },
+      "domains": {
+        "nm": "Standarddomener",
+        "desc": "Type · Lengderegler"
+      },
+      "terms": {
+        "nm": "Standardtermer",
+        "desc": "Ordkombinasjon · Godkjenning"
+      },
+      "model": {
+        "nm": "Datamodell",
+        "desc": "Konseptuell · Logisk · Fysisk"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Etter fagområde · Versjonssammenligning"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generer etter DBMS · Godkjenn utførelse"
+      }
+    },
+    "roleTitle": "Hva du kan gjøre etter rolle",
+    "planTitle": "Prisplaner",
+    "planNote": "— Pi-betaling per klassifiseringssystemenhet, pris bekreftes på betalingsskjermen",
+    "menu": {
+      "MENU_STD": "Standardordbok",
+      "MENU_SQL": "SQL-redigerer",
+      "MENU_SET": "Innstillinger · Historikk",
+      "MENU_BAN": "Forbudte ord",
+      "MENU_MODEL": "Modell · ERD · DDL",
+      "MENU_CHK": "Standardsjekk",
+      "MENU_ADM": "Medlemmer · Godkjenninger"
+    },
+    "viewOnly": "{menu} (kun visning)",
+    "footer": "Logg inn ovenfor for å se oppgavene dine for klassifiseringssystemet ditt umiddelbart."
+  },
+  "dashboard": {
+    "loadFailed": "Kunne ikke laste inn dashbord",
+    "myAreas": "Mine klassifiseringssystemer",
+    "planLine": "Plan {plan}",
+    "until": " · Til {date}",
+    "grace": "(Utsatt periode)",
+    "openArea": "Åpne klassifiseringssystem →",
+    "todoTitle": "Min tur",
+    "todoEmpty": "Kun visningstillatelse — vennligst bla gjennom standarder ved hjelp av status og snarveier nedenfor.",
+    "apvWait": "Standardgodkjenning venter",
+    "apvWaitSub": "Ord · Domene · Term · Kodeapplikasjon",
+    "ddlWait": "DDL-utførelsesgodkjenning venter",
+    "mineWait": "Mine søknader venter",
+    "mineRejected": "{count} avvist de siste 30 dagene",
+    "model": "Datamodell",
+    "modelSub": "Prosjekter · {count} entiteter",
+    "stdTitle": "Standardordbokstatus",
+    "stdBasis": "Godkjent grunnlag",
+    "shortcuts": "Snarveier",
+    "recentTitle": "Nylige endringer",
+    "allHistory": "Full historikk",
+    "noHistory": "Ingen endringshistorikk ennå",
+    "justNow": "Akkurat nå",
+    "minutesAgo": "{n} minutter siden",
+    "hoursAgo": "{n} timer siden",
+    "daysAgo": "{n} dager siden",
+    "areaList": "Klassifiseringssystemliste · Opprett ny"
+  },
+  "areaHome": {
+    "title": "Mine standardklassifiseringssystemer",
+    "loading": "Laster inn",
+    "empty": "Ingen klassifiseringssystemer deltar",
+    "open": "Åpne",
+    "newTitle": "Nytt klassifiseringssystem",
+    "namePlaceholder": "Navn på klassifiseringssystem (obligatorisk)",
+    "descPlaceholder": "Beskrivelse",
+    "create": "Opprett",
+    "created": "Klassifiseringssystem {name} opprettet"
+  },
+  "nav": {
+    "label": "Klassifiseringssystemmeny",
+    "expand": "Utvid bunnmeny",
+    "expandWith": "Utvid bunnmeny ({menu})",
+    "collapse": "Skjul bunnmeny",
+    "subOf": "{menu} Underfunksjoner",
+    "groupTech": "Overvåking · SQL-redigerer",
+    "groupStd": "Standardordbok",
+    "groupModel": "Modell",
+    "groupSet": "Innstillinger",
+    "groupPlan": "Betaling",
+    "words": "Standardord",
+    "bulk": "Masse registrering",
+    "domains": "Standarddomener",
+    "keyDomains": "Nøkkeldomener",
+    "domainGroups": "Domene grupper",
+    "terms": "Standardtermer",
+    "codes": "Standardkoder",
+    "model": "Konseptuell modell",
+    "prj": "Prosjekter",
+    "subj": "Fagområder",
+    "coreEnt": "Kjerneentiteter",
+    "entityClasses": "Entitetsklassifiseringer",
+    "logical": "Logisk modell",
+    "physical": "Fysisk modell",
+    "erd": "ERD",
+    "ddl": "DDL-generering",
+    "monitor": "Overvåking",
+    "monApp": "Applikasjon",
+    "monSrv": "Server",
+    "monDb": "Database",
+    "monUrl": "URL",
+    "monFix": "AI-korrigeringshistorikk",
+    "sql": "SQL-redigerer",
+    "settings": "Innstillinger",
+    "history": "Historikk",
+    "forbidden": "Forbudte ord",
+    "banBulk": "Masse registrering av forbudte ord",
+    "check": "Standardsjekk",
+    "reverse": "Reverse Engineering",
+    "members": "Medlemmer",
+    "approvals": "Godkjenninger",
+    "plan": "Betaling"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Systemadministrator",
+      "DA": "Dataarkitekt",
+      "STD": "Standardansvarlig",
+      "MDL": "Modellerer",
+      "QLT": "Kvalitetsansvarlig",
+      "MIG": "Migreringsansvarlig",
+      "VIEWER": "Viser"
+    },
+    "roleDesc": {
+      "SYS": "Administrer klassifiseringssysteminnstillinger · domenegrupper · forkortelser · medlemmer, applikasjoner · godkjenninger (inkludert umiddelbar godkjenning), masseregistrering, SQL-skriving, alle menyer",
+      "DA": "Overordnet standardpolicy: Søk · godkjenn ord · domener · termer (kan velge umiddelbar godkjenning ved søknad), masseregistrering, administrer innstillinger · medlemmer, SQL-skriving, alle menyer",
+      "STD": "Søk om ord · domener · termer, masseregistrering, innstillinger, SQL-skriving, alle menyer (ingen godkjenningsrettigheter)",
+      "MDL": "Søk om registrering · modifikasjon · sletting av ord · domener · termer · modeller, masseregistrering, innstillinger, SQL-skriving, alle menyer (ingen godkjenningsrettigheter)",
+      "QLT": "Søk · SQL-skriving, SQL-redigerer · modellering · innstillingsmenyer (kvalitetsdiagnosefunksjoner i fremtidige stadier)",
+      "MIG": "Søk · SQL-skriving, SQL-redigerermeny (for migreringskartlegging)",
+      "VIEWER": "Kun visning av standardordbok"
+    },
+    "plan": {
+      "FREE": "Gratis (visning)",
+      "P1": "Utvikler",
+      "P2": "Standardansvarlig",
+      "P3": "Modellerer",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registrer",
+      "UPD": "Endre",
+      "DEL": "Slett"
+    },
+    "tgt": {
+      "AREA": "Klassifiseringssystem",
+      "MBR": "Medlem",
+      "DIC": "Ord",
+      "DOM": "Domene",
+      "DOM_GRP": "Domenegruppe",
+      "TERM": "Term",
+      "CD": "Standardkode",
+      "CD_VAL": "Kodeverdi",
+      "ABBR": "Forkortelse",
+      "PRJ": "Prosjekt",
+      "SUBJ": "Fagområde",
+      "ENT": "Entitet",
+      "REL": "Relasjon",
+      "ATTR": "Attributt",
+      "VER": "Modellversjon",
+      "PHY": "Fysisk modell",
+      "DDL": "DDL-utførelse",
+      "RVS": "Reverse Engineering",
+      "SQL": "SQL",
+      "DBCN": "DB-tilkobling",
+      "AGT": "Agent",
+      "MONURL": "URL-overvåking"
+    }
+  }
+}

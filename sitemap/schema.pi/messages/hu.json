@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Adatstandard szótár meta rendszer"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Nyelv módosítása",
+      "search": "Nyelv keresése",
+      "empty": "Nincs találat"
+    },
+    "loading": "Betöltés…",
+    "requestFailed": "A kérés sikertelen",
+    "home": "Főoldal",
+    "goHome": "Ugrás a főoldalra"
+  },
+  "home": {
+    "subtitle": "Adatstandard szótár meta rendszer"
+  },
+  "auth": {
+    "checking": "Bejelentkezés ellenőrzése…",
+    "googleUnlinked": "Google-fiókkal be van jelentkezve, de még nincs összekapcsolva a Pi-fiókjával.",
+    "required": "Bejelentkezés szükséges.",
+    "requiredHint": "Bejelentkezés szükséges. Jelentkezzen be Pi-fiókjával a Pi Browserben, vagy Google-fiókjával (Pi-fiók összekapcsolása szükséges) egy hagyományos böngészőben.",
+    "piSignIn": "Bejelentkezés Pi-fiókkal",
+    "googleSignIn": "Bejelentkezés Google-fiókkal",
+    "signOut": "Kijelentkezés",
+    "linkCheckFailed": "Nem sikerült ellenőrizni az összekapcsolás állapotát (átmeneti hiba). Kérjük, frissítse az oldalt hamarosan."
+  },
+  "link": {
+    "title": "Fiók összekapcsolása",
+    "desc": "Összekapcsolja a Pi Browserben lévő Pi-fiókját a hagyományos böngészőben lévő Google-fiókjával, ugyanazon felhasználóként. Az összekapcsolás után PC-n is dolgozhat, egyszerűen Google-fiókkal bejelentkezve.",
+    "codeFormTitle": "Pi-fiók összekapcsolási kód megadása",
+    "codeFormHint": "Miután bejelentkezett a Pi Browserbe, adja meg a fiók összekapcsolási képernyőn kiadott 6 jegyű kódot 10 percen belül.",
+    "codeLabel": "Összekapcsolási kód",
+    "linked": "Összekapcsolva.",
+    "submit": "Összekapcsolás",
+    "issuerTitle": "Google-fiók összekapcsolási kód kiadása",
+    "issuerHint": "Miután bejelentkezett Google-fiókkal egy hagyományos böngészőben, adja meg ezt a kódot az összekapcsoláshoz ugyanazon felhasználóként (10 percig érvényes).",
+    "minutesLeft": "Kb. {minutes} perc maradt",
+    "issue": "Kód kiadása",
+    "reissue": "Újra kiadása",
+    "linkedAs": "Google-fiókja összekapcsolva a Pi felhasználóval: <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Adatstandard szótár meta rendszer",
+    "headline1": "Standardok nélkül nem lehet elnevezni,",
+    "headline2": "modellek nélkül nem lehet táblázatot készíteni.",
+    "lead": "Hozzon létre kifejezéseket jóváhagyott standard szavakkal, rajzoljon modelleket ezekkel a kifejezésekkel, és generáljon DDL-t a modellekből. Az emberek döntenek, az eszközök betartatják a szabályokat.",
+    "flowTitle": "Így kapcsolódik",
+    "step": "{n}. lépés",
+    "flow": {
+      "words": {
+        "nm": "Standard szavak",
+        "desc": "Szavak · Rövidítések · Tiltott szavak"
+      },
+      "domains": {
+        "nm": "Standard domainek",
+        "desc": "Típus · Hosszúsági szabályok"
+      },
+      "terms": {
+        "nm": "Standard kifejezések",
+        "desc": "Szókombináció · Jóváhagyás"
+      },
+      "model": {
+        "nm": "Adatmodell",
+        "desc": "Koncepcionális · Logikai · Fizikai"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Tárgyterületenként · Verzió összehasonlítás"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "DBMS szerinti generálás · Végrehajtás jóváhagyása"
+      }
+    },
+    "roleTitle": "Amit szerepkörönként tehet",
+    "planTitle": "Árazási tervek",
+    "planNote": "— Pi fizetés osztályozási rendszer egységenként, az ár a fizetési képernyőn ellenőrizhető",
+    "menu": {
+      "MENU_STD": "Standard szótár",
+      "MENU_SQL": "SQL szerkesztő",
+      "MENU_SET": "Beállítások · Előzmények",
+      "MENU_BAN": "Tiltott szavak",
+      "MENU_MODEL": "Modell · ERD · DDL",
+      "MENU_CHK": "Standard ellenőrzés",
+      "MENU_ADM": "Tagok · Jóváhagyások"
+    },
+    "viewOnly": "{menu} (Csak megtekintés)",
+    "footer": "Jelentkezzen be fent, hogy azonnal lássa a feladatait az osztályozási rendszeréhez."
+  },
+  "dashboard": {
+    "loadFailed": "Nem sikerült betölteni a műszerfalat",
+    "myAreas": "Saját osztályozási rendszerek",
+    "planLine": "{plan} csomag",
+    "until": " · {date} -ig",
+    "grace": "(Türelmi időszak)",
+    "openArea": "Osztályozási rendszer megnyitása →",
+    "todoTitle": "Én jövök",
+    "todoEmpty": "Csak megtekintési jogosultság — kérjük, böngéssze a standardokat az alábbi állapot és gyorsbillentyűk segítségével.",
+    "apvWait": "Standard jóváhagyás függőben",
+    "apvWaitSub": "Szó · Domain · Kifejezés · Kód alkalmazás",
+    "ddlWait": "DDL végrehajtás jóváhagyás függőben",
+    "mineWait": "Saját kérelmek függőben",
+    "mineRejected": "{count} elutasítva az elmúlt 30 napban",
+    "model": "Adatmodell",
+    "modelSub": "Projektek · {count} entitás",
+    "stdTitle": "Standard szótár állapota",
+    "stdBasis": "Jóváhagyott alap",
+    "shortcuts": "Gyorsbillentyűk",
+    "recentTitle": "Legutóbbi változások",
+    "allHistory": "Teljes előzmények",
+    "noHistory": "Még nincs változási előzmény",
+    "justNow": "Épp most",
+    "minutesAgo": "{n} perce",
+    "hoursAgo": "{n} órája",
+    "daysAgo": "{n} napja",
+    "areaList": "Osztályozási rendszerek listája · Új létrehozása"
+  },
+  "areaHome": {
+    "title": "Saját standard osztályozási rendszerek",
+    "loading": "Betöltés",
+    "empty": "Nincs résztvevő osztályozási rendszer",
+    "open": "Megnyitás",
+    "newTitle": "Új osztályozási rendszer",
+    "namePlaceholder": "Osztályozási rendszer neve (kötelező)",
+    "descPlaceholder": "Leírás",
+    "create": "Létrehozás",
+    "created": "Osztályozási rendszer {name} létrehozva"
+  },
+  "nav": {
+    "label": "Osztályozási rendszer menü",
+    "expand": "Alsó menü kibontása",
+    "expandWith": "Alsó menü kibontása ({menu})",
+    "collapse": "Alsó menü összecsukása",
+    "subOf": "{menu} Alfunkciók",
+    "groupTech": "Felügyelet · SQL szerkesztő",
+    "groupStd": "Standard szótár",
+    "groupModel": "Modell",
+    "groupSet": "Beállítások",
+    "groupPlan": "Fizetés",
+    "words": "Standard szavak",
+    "bulk": "Tömeges regisztráció",
+    "domains": "Standard domainek",
+    "keyDomains": "Kulcs domainek",
+    "domainGroups": "Domain csoportok",
+    "terms": "Standard kifejezések",
+    "codes": "Standard kódok",
+    "model": "Koncepcionális modell",
+    "prj": "Projektek",
+    "subj": "Tárgyterületek",
+    "coreEnt": "Alap entitások",
+    "entityClasses": "Entitás osztályozók",
+    "logical": "Logikai modell",
+    "physical": "Fizikai modell",
+    "erd": "ERD",
+    "ddl": "DDL generálás",
+    "monitor": "Felügyelet",
+    "monApp": "Alkalmazás",
+    "monSrv": "Szerver",
+    "monDb": "Adatbázis",
+    "monUrl": "URL",
+    "monFix": "AI javítási előzmények",
+    "sql": "SQL szerkesztő",
+    "settings": "Beállítások",
+    "history": "Előzmények",
+    "forbidden": "Tiltott szavak",
+    "banBulk": "Tiltott szavak tömeges regisztrációja",
+    "check": "Standard ellenőrzés",
+    "reverse": "Reverse Engineering",
+    "members": "Tagok",
+    "approvals": "Jóváhagyások",
+    "plan": "Fizetés"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Rendszergazda",
+      "DA": "Adatarchitekt",
+      "STD": "Standard menedzser",
+      "MDL": "Modellező",
+      "QLT": "Minőségirányítási menedzser",
+      "MIG": "Migrációs menedzser",
+      "VIEWER": "Megtekintő"
+    },
+    "roleDesc": {
+      "SYS": "Osztályozási rendszer beállításainak kezelése · domain csoportok · rövidítések · tagok, alkalmazások · jóváhagyások (beleértve az azonnali jóváhagyást), tömeges regisztráció, SQL írás, minden menü",
+      "DA": "Általános standard politika: Szavak · domainek · kifejezések alkalmazása · jóváhagyása (azonnali jóváhagyás választható az alkalmazáskor), tömeges regisztráció, beállítások · tagok kezelése, SQL írás, minden menü",
+      "STD": "Szavak · domainek · kifejezések alkalmazása, tömeges regisztráció, beállítások, SQL írás, minden menü (nincs jóváhagyási jog)",
+      "MDL": "Szavak · domainek · kifejezések · modellek regisztrációjának · módosításának · törlésének alkalmazása, tömeges regisztráció, beállítások, SQL írás, minden menü (nincs jóváhagyási jog)",
+      "QLT": "Alkalmazás · SQL írás, SQL szerkesztő · modellezés · beállítások menük (minőségdiagnosztikai funkciók a jövőbeni szakaszokban)",
+      "MIG": "Alkalmazás · SQL írás, SQL szerkesztő menü (migrációs leképezéshez)",
+      "VIEWER": "Csak standard szótár megtekintése"
+    },
+    "plan": {
+      "FREE": "Ingyenes (Megtekintés)",
+      "P1": "Fejlesztő",
+      "P2": "Standard menedzser",
+      "P3": "Modellező",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Regisztrálás",
+      "UPD": "Módosítás",
+      "DEL": "Törlés"
+    },
+    "tgt": {
+      "AREA": "Osztályozási rendszer",
+      "MBR": "Tag",
+      "DIC": "Szó",
+      "DOM": "Domain",
+      "DOM_GRP": "Domain csoport",
+      "TERM": "Kifejezés",
+      "CD": "Standard kód",
+      "CD_VAL": "Kódérték",
+      "ABBR": "Rövidítés",
+      "PRJ": "Projekt",
+      "SUBJ": "Tárgyterület",
+      "ENT": "Entitás",
+      "REL": "Kapcsolat",
+      "ATTR": "Attribútum",
+      "VER": "Modell verzió",
+      "PHY": "Fizikai modell",
+      "DDL": "DDL végrehajtás",
+      "RVS": "Reverse Engineering",
+      "SQL": "SQL",
+      "DBCN": "DB kapcsolat",
+      "AGT": "Ügynök",
+      "MONURL": "URL felügyelet"
+    }
+  }
+}

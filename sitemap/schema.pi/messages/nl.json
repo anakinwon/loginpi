@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Metasysteem voor datastandaardwoordenboek"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Taal wijzigen",
+      "search": "Taal zoeken",
+      "empty": "Geen zoekresultaten"
+    },
+    "loading": "Laden…",
+    "requestFailed": "Verzoek mislukt",
+    "home": "Startpagina",
+    "goHome": "Naar startpagina"
+  },
+  "home": {
+    "subtitle": "Metasysteem voor datastandaardwoordenboek"
+  },
+  "auth": {
+    "checking": "Inloggen controleren…",
+    "googleUnlinked": "U bent ingelogd met Google, maar dit is nog niet gekoppeld aan uw Pi-account.",
+    "required": "Inloggen vereist.",
+    "requiredHint": "Inloggen vereist. Log in met uw Pi-account in Pi Browser, of met Google (Pi-accountkoppeling vereist) in een reguliere browser.",
+    "piSignIn": "Inloggen met Pi-account",
+    "googleSignIn": "Inloggen met Google",
+    "signOut": "Uitloggen",
+    "linkCheckFailed": "Koppelingstatus kon niet worden gecontroleerd (tijdelijke fout). Vernieuw de pagina zo dadelijk."
+  },
+  "link": {
+    "title": "Accountkoppeling",
+    "desc": "Koppelt uw Pi-account in Pi Browser met uw Google-account in een reguliere browser als dezelfde gebruiker. Na koppeling kunt u op pc werken door alleen in te loggen met Google.",
+    "codeFormTitle": "Voer Pi-accountkoppelingscode in",
+    "codeFormHint": "Nadat u bent ingelogd in Pi Browser, voert u de 6-cijferige code in die binnen 10 minuten op het accountkoppelingsscherm is uitgegeven.",
+    "codeLabel": "Koppelingscode",
+    "linked": "Gekoppeld.",
+    "submit": "Koppelen",
+    "issuerTitle": "Google-accountkoppelingscode uitgeven",
+    "issuerHint": "Nadat u bent ingelogd met Google in een reguliere browser, voert u deze code in om als dezelfde gebruiker te koppelen (geldig voor 10 minuten).",
+    "minutesLeft": "Nog ongeveer {minutes} minuten",
+    "issue": "Code uitgeven",
+    "reissue": "Opnieuw uitgeven",
+    "linkedAs": "Uw Google-account is gekoppeld aan Pi-gebruiker <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Metasysteem voor datastandaardwoordenboek",
+    "headline1": "Zonder standaarden kunt u geen namen maken,",
+    "headline2": "zonder modellen kunt u geen tabellen maken.",
+    "lead": "Creëer termen met goedgekeurde standaardwoorden, teken modellen met die termen en genereer DDL vanuit de modellen. Mensen beslissen, tools handhaven regels.",
+    "flowTitle": "Zo werkt het",
+    "step": "Stap {n}",
+    "flow": {
+      "words": {
+        "nm": "Standaardwoorden",
+        "desc": "Woorden · Afkortingen · Verboden woorden"
+      },
+      "domains": {
+        "nm": "Standaarddomeinen",
+        "desc": "Type · Lengteregels"
+      },
+      "terms": {
+        "nm": "Standaardtermen",
+        "desc": "Woordcombinatie · Goedkeuring"
+      },
+      "model": {
+        "nm": "Datamodel",
+        "desc": "Conceptueel · Logisch · Fysiek"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Per onderwerpgebied · Versievergelijking"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Genereren per DBMS · Uitvoering goedkeuren"
+      }
+    },
+    "roleTitle": "Wat u per rol kunt doen",
+    "planTitle": "Prijsplannen",
+    "planNote": "— Pi-betaling per classificatiesysteemeenheid, prijs bevestigd op betalingsscherm",
+    "menu": {
+      "MENU_STD": "Standaardwoordenboek",
+      "MENU_SQL": "SQL-editor",
+      "MENU_SET": "Instellingen · Geschiedenis",
+      "MENU_BAN": "Verboden woorden",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Standaardcontrole",
+      "MENU_ADM": "Leden · Goedkeuringen"
+    },
+    "viewOnly": "{menu} (alleen bekijken)",
+    "footer": "Log hierboven in om direct uw taken voor uw classificatiesysteem te zien."
+  },
+  "dashboard": {
+    "loadFailed": "Dashboard kon niet worden geladen",
+    "myAreas": "Mijn classificatiesystemen",
+    "planLine": "Plan {plan}",
+    "until": " · Tot {date}",
+    "grace": "(Respijtperiode)",
+    "openArea": "Classificatiesysteem openen →",
+    "todoTitle": "Mijn beurt",
+    "todoEmpty": "Alleen weergavebevoegdheid — blader door standaarden via de status en snelkoppelingen hieronder.",
+    "apvWait": "Standaardgoedkeuring in afwachting",
+    "apvWaitSub": "Woord · Domein · Term · Codeaanvraag",
+    "ddlWait": "DDL-uitvoering goedkeuring in afwachting",
+    "mineWait": "Mijn aanvragen in afwachting",
+    "mineRejected": "{count} afgewezen in de afgelopen 30 dagen",
+    "model": "Datamodel",
+    "modelSub": "Projecten · {count} entiteiten",
+    "stdTitle": "Status standaardwoordenboek",
+    "stdBasis": "Goedgekeurde basis",
+    "shortcuts": "Snelkoppelingen",
+    "recentTitle": "Recente wijzigingen",
+    "allHistory": "Volledige geschiedenis",
+    "noHistory": "Nog geen wijzigingsgeschiedenis",
+    "justNow": "Zojuist",
+    "minutesAgo": "{n} minuten geleden",
+    "hoursAgo": "{n} uur geleden",
+    "daysAgo": "{n} dagen geleden",
+    "areaList": "Lijst met classificatiesystemen · Nieuw aanmaken"
+  },
+  "areaHome": {
+    "title": "Mijn standaardclassificatiesystemen",
+    "loading": "Laden",
+    "empty": "Geen deelnemende classificatiesystemen",
+    "open": "Openen",
+    "newTitle": "Nieuw classificatiesysteem",
+    "namePlaceholder": "Naam classificatiesysteem (vereist)",
+    "descPlaceholder": "Beschrijving",
+    "create": "Aanmaken",
+    "created": "Classificatiesysteem {name} aangemaakt"
+  },
+  "nav": {
+    "label": "Classificatiesysteemmenu",
+    "expand": "Ondermenu uitvouwen",
+    "expandWith": "Ondermenu uitvouwen ({menu})",
+    "collapse": "Ondermenu inklappen",
+    "subOf": "{menu} Subfuncties",
+    "groupTech": "Monitoring · SQL-editor",
+    "groupStd": "Standaardwoordenboek",
+    "groupModel": "Model",
+    "groupSet": "Instellingen",
+    "groupPlan": "Betaling",
+    "words": "Standaardwoorden",
+    "bulk": "Bulkregistratie",
+    "domains": "Standaarddomeinen",
+    "keyDomains": "Sleuteldomeinen",
+    "domainGroups": "Domeingroepen",
+    "terms": "Standaardtermen",
+    "codes": "Standaardcodes",
+    "model": "Conceptueel model",
+    "prj": "Projecten",
+    "subj": "Onderwerpgebieden",
+    "coreEnt": "Kernentiteiten",
+    "entityClasses": "Entiteitsclassificaties",
+    "logical": "Logisch model",
+    "physical": "Fysiek model",
+    "erd": "ERD",
+    "ddl": "DDL-generatie",
+    "monitor": "Monitoring",
+    "monApp": "Applicatie",
+    "monSrv": "Server",
+    "monDb": "Database",
+    "monUrl": "URL",
+    "monFix": "AI-correctiegeschiedenis",
+    "sql": "SQL-editor",
+    "settings": "Instellingen",
+    "history": "Geschiedenis",
+    "forbidden": "Verboden woorden",
+    "banBulk": "Bulkregistratie verboden woorden",
+    "check": "Standaardcontrole",
+    "reverse": "Reverse Engineering",
+    "members": "Leden",
+    "approvals": "Goedkeuringen",
+    "plan": "Betaling"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Systeembeheerder",
+      "DA": "Data Architect",
+      "STD": "Standaardbeheerder",
+      "MDL": "Modelleur",
+      "QLT": "Kwaliteitsmanager",
+      "MIG": "Migratiemanager",
+      "VIEWER": "Kijker"
+    },
+    "roleDesc": {
+      "SYS": "Beheer classificatiesysteeminstellingen · domeingroepen · afkortingen · leden, aanvragen · goedkeuringen (inclusief directe goedkeuring), bulkregistratie, SQL schrijven, alle menu's",
+      "DA": "Algemeen standaardbeleid: Woorden · domeinen · termen aanvragen · goedkeuren (kan directe goedkeuring selecteren bij aanvraag), bulkregistratie, instellingen · leden beheren, SQL schrijven, alle menu's",
+      "STD": "Woorden · domeinen · termen aanvragen, bulkregistratie, instellingen, SQL schrijven, alle menu's (geen goedkeuringsrechten)",
+      "MDL": "Registratie · wijziging · verwijdering van woorden · domeinen · termen · modellen aanvragen, bulkregistratie, instellingen, SQL schrijven, alle menu's (geen goedkeuringsrechten)",
+      "QLT": "Aanvragen · SQL schrijven, SQL-editor · modellering · instellingenmenu's (kwaliteitsdiagnosefuncties in toekomstige fasen)",
+      "MIG": "Aanvragen · SQL schrijven, SQL-editor menu (voor migratiemapping)",
+      "VIEWER": "Alleen standaardwoordenboek bekijken"
+    },
+    "plan": {
+      "FREE": "Gratis (bekijken)",
+      "P1": "Ontwikkelaar",
+      "P2": "Standaardbeheerder",
+      "P3": "Modelleur",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registreren",
+      "UPD": "Wijzigen",
+      "DEL": "Verwijderen"
+    },
+    "tgt": {
+      "AREA": "Classificatiesysteem",
+      "MBR": "Lid",
+      "DIC": "Woord",
+      "DOM": "Domein",
+      "DOM_GRP": "Domeingroep",
+      "TERM": "Term",
+      "CD": "Standaardcode",
+      "CD_VAL": "Codewaarde",
+      "ABBR": "Afkorting",
+      "PRJ": "Project",
+      "SUBJ": "Onderwerpgebied",
+      "ENT": "Entiteit",
+      "REL": "Relatie",
+      "ATTR": "Attribuut",
+      "VER": "Modelversie",
+      "PHY": "Fysiek model",
+      "DDL": "DDL-uitvoering",
+      "RVS": "Reverse Engineering",
+      "SQL": "SQL",
+      "DBCN": "DB-verbinding",
+      "AGT": "Agent",
+      "MONURL": "URL-monitoring"
+    }
+  }
+}

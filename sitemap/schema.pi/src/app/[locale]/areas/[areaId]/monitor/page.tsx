@@ -4,8 +4,9 @@
 //  앱 경계상 dbms.pi 영역 — 마스터 선택으로 schema.pi 에 두고 dbms.pi 가 생기면 이전(MASTER_ROADMAP §3-10)
 import { piFetch } from '@pi/auth/client'
 import { Activity, AppWindow, Database, GitPullRequest, Globe, Pause, Play, Server } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Link } from '@/i18n/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { use, useEffect, useState } from 'react'
 import type { Perm } from '@/lib/roles'
 import AppTab from './app-tab'

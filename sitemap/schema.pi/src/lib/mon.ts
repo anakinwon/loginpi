@@ -162,4 +162,10 @@ const PAGE: [string, string][] = [
   [`${P}/approvals`, '승인'],
   [`${P}/plan`, '결제'],
 ]
-export const pageMenu = (scr: string | null | undefined): string => (scr ? (PAGE.find(([p]) => scr === p || (p !== '/' && scr.startsWith(`${p}/`)))?.[1] ?? '기타') : '기타')
+// 다국어 접두사(/en/… — @pi/i18n as-needed, ko 는 접두사 없음)는 떼고 비교. 최상위 화면(/link·/areas)은 2~3자 소문자가 아니라 겹치지 않음
+const noLocale = (scr: string) => scr.replace(/^\/[a-z]{2,3}(?:-[A-Z]{2})?(?=\/|$)/, '') || '/'
+export const pageMenu = (scr: string | null | undefined): string => {
+  if (!scr) return '기타'
+  const s = noLocale(scr)
+  return PAGE.find(([p]) => s === p || (p !== '/' && s.startsWith(`${p}/`)))?.[1] ?? '기타'
+}

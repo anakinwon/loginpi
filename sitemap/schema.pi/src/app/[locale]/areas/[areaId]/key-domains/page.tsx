@@ -1,5 +1,5 @@
 // 대표도메인 관리 화면 — 지정·해제 신청(단어 수정 승인 절차), 지정 목록·사용 도메인 수
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import KeyDomainBoard from './key-domain-board'
 
 export default async function KeyDomainsPage({ params }: { params: Promise<{ areaId: string }> }) {

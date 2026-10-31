@@ -1,0 +1,5 @@
+{
+  "locales": "all",
+  "glossary": ["schema.pi", "METAPi", "ModelPi", "PiErd", "PiMig", "PiCDC", "PipeLine", "PiAnal", "DA#", "DAP", "Supabase", "PostgreSQL", "Oracle", "Tibero", "MySQL", "Claude", "Gemini", "OpenAI"],
+  "audit": { "exclude": ["src/app/api/**", "**/*.test.ts"] }
+}

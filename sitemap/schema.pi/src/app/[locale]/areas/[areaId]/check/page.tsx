@@ -1,7 +1,7 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
 // 표준 점검 화면(P17~P19) — 점검 실행 → 대상 유형별 준수율·등급별·규칙별 건수, 위반 목록(등급·규칙 필터, 100건씩), CSV 내려받기
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useMemo, useState } from 'react'
 
 interface Rule {

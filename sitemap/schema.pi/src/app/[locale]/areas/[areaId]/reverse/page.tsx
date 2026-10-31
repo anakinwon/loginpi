@@ -3,7 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // 리버스 화면(PRD_PiErd S4 R1~R4) — DDL 붙여넣기·파일 또는 카탈로그 조회 CSV → 스테이징(표준 용어 역매핑·엔터티 단어·관계 후보) → 선택 테이블을 모델에 반영
 //  반영 = 기존 API 를 순서대로 호출(엔터티 → 속성 → 관계 → FK 연결)해 표준 검증을 그대로 받음, 결과 ID 는 스테이징에 출처로 기록. 반영 후 ERD 화면이 새 엔터티를 자동 배치
 //  미매핑 칼럼(용어 없음)·미등록 단어 테이블은 반영하지 않고 표준 신청 후보로 보여 줌. 서버는 고객 DB 에 접속하지 않는다(카탈로그 SQL 은 사용자가 실행)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
 import { type MbrRole, type Perm } from '@/lib/roles'

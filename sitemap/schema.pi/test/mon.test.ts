@@ -77,6 +77,10 @@ test('화면 메뉴명 : 메인·분류체계 메뉴·하위 경로·모르면 �
   assert.equal(pageMenu('/areas/:id'), '기타')
   assert.equal(pageMenu('/unknown'), '기타')
   assert.equal(pageMenu(null), '기타')
+  // 다국어 접두사(as-needed)는 떼고 비교
+  assert.equal(pageMenu('/en'), '메인')
+  assert.equal(pageMenu('/zh-TW/areas/:id/terms'), '표준용어')
+  assert.equal(pageMenu('/fil/link'), '계정 연동')
 })
 
 test('이벤트 판정 : 오류 우선(0·4xx·5xx), 느림 1초 이상, 정상은 저장 안 함', () => {

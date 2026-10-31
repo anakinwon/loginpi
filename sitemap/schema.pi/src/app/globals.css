@@ -1,5 +1,7 @@
 /* schema.pi 전역 스타일 — Tailwind v4 CSS-first 진입점(config 파일 없음) */
 @import 'tailwindcss';
+/* 공용 패키지 컴포넌트(@pi/i18n LocaleSwitcher)는 앱 밖이라 자동 탐지가 안 됨 — 명시 */
+@source '../../../../packages/pi-i18n/src';
 
 :root {
   --background: #ffffff;

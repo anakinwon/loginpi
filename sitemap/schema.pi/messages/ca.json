@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Sistema Meta del Diccionari Estàndard de Dades"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Canviar idioma",
+      "search": "Cercar idioma",
+      "empty": "No hi ha resultats de cerca"
+    },
+    "loading": "Carregant…",
+    "requestFailed": "La sol·licitud ha fallat",
+    "home": "Inici",
+    "goHome": "Anar a l'inici"
+  },
+  "home": {
+    "subtitle": "Sistema Meta del Diccionari Estàndard de Dades"
+  },
+  "auth": {
+    "checking": "Comprovant l'inici de sessió…",
+    "googleUnlinked": "Heu iniciat sessió amb Google, però encara no està vinculat al vostre compte Pi.",
+    "required": "Cal iniciar sessió.",
+    "requiredHint": "Cal iniciar sessió. Inicieu sessió amb el vostre compte Pi a Pi Browser, o amb Google (cal vincular el compte Pi) en un navegador normal.",
+    "piSignIn": "Inicia sessió amb el compte Pi",
+    "googleSignIn": "Inicia sessió amb Google",
+    "signOut": "Tancar sessió",
+    "linkCheckFailed": "No s'ha pogut comprovar l'estat de la vinculació (error temporal). Actualitzeu la pàgina en breu."
+  },
+  "link": {
+    "title": "Vinculació de comptes",
+    "desc": "Vincula el vostre compte Pi a Pi Browser amb el vostre compte de Google en un navegador normal com el mateix usuari. Després de la vinculació, podeu treballar a l'ordinador només iniciant sessió amb Google.",
+    "codeFormTitle": "Introduïu el codi de vinculació del compte Pi",
+    "codeFormHint": "Després d'iniciar sessió a Pi Browser, introduïu el codi de 6 dígits emès a la pantalla de vinculació del compte en un termini de 10 minuts.",
+    "codeLabel": "Codi de vinculació",
+    "linked": "Vinculat.",
+    "submit": "Vincula",
+    "issuerTitle": "Emetre codi de vinculació del compte de Google",
+    "issuerHint": "Després d'iniciar sessió amb Google en un navegador normal, introduïu aquest codi per vincular-lo com el mateix usuari (vàlid durant 10 minuts).",
+    "minutesLeft": "Queden aproximadament {minutes} minuts",
+    "issue": "Emetre codi",
+    "reissue": "Torna a emetre",
+    "linkedAs": "El vostre compte de Google està vinculat a l'usuari Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Sistema Meta del Diccionari Estàndard de Dades",
+    "headline1": "Sense estàndards, no es pot anomenar,",
+    "headline2": "sense models, no es pot tabular.",
+    "lead": "Creeu termes amb paraules estàndard aprovades, dibuixeu models amb aquests termes i genereu DDL a partir dels models. Els humans decideixen, les eines apliquen les regles.",
+    "flowTitle": "Així és com es connecta",
+    "step": "Pas {n}",
+    "flow": {
+      "words": {
+        "nm": "Paraules estàndard",
+        "desc": "Paraules · Abreviatures · Paraules prohibides"
+      },
+      "domains": {
+        "nm": "Dominis estàndard",
+        "desc": "Tipus · Regles de longitud"
+      },
+      "terms": {
+        "nm": "Termes estàndard",
+        "desc": "Combinació de paraules · Aprovació"
+      },
+      "model": {
+        "nm": "Model de dades",
+        "desc": "Conceptual · Lògic · Físic"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Per àrea temàtica · Comparació de versions"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generar per DBMS · Aprovar execució"
+      }
+    },
+    "roleTitle": "Què podeu fer per rol",
+    "planTitle": "Plans de preus",
+    "planNote": "— Pagament Pi per unitat de sistema de classificació, preu confirmat a la pantalla de pagament",
+    "menu": {
+      "MENU_STD": "Diccionari estàndard",
+      "MENU_SQL": "Editor SQL",
+      "MENU_SET": "Configuració · Historial",
+      "MENU_BAN": "Paraules prohibides",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Comprovació d'estàndards",
+      "MENU_ADM": "Membres · Aprovacions"
+    },
+    "viewOnly": "{menu} (Només visualització)",
+    "footer": "Inicieu sessió a dalt per veure immediatament les vostres tasques per al vostre sistema de classificació."
+  },
+  "dashboard": {
+    "loadFailed": "No s'ha pogut carregar el tauler",
+    "myAreas": "Els meus sistemes de classificació",
+    "planLine": "Pla {plan}",
+    "until": " · Fins al {date}",
+    "grace": "(Període de gràcia)",
+    "openArea": "Obrir sistema de classificació →",
+    "todoTitle": "El meu torn",
+    "todoEmpty": "Només permís de visualització — si us plau, navegueu pels estàndards utilitzant l'estat i les dreceres següents.",
+    "apvWait": "Aprovació d'estàndards pendent",
+    "apvWaitSub": "Sol·licitud de paraula · domini · terme · codi",
+    "ddlWait": "Aprovació d'execució DDL pendent",
+    "mineWait": "Les meves sol·licituds pendents",
+    "mineRejected": "{count} rebutjades en els últims 30 dies",
+    "model": "Model de dades",
+    "modelSub": "Projectes · {count} Entitats",
+    "stdTitle": "Estat del diccionari estàndard",
+    "stdBasis": "Base aprovada",
+    "shortcuts": "Dreceres",
+    "recentTitle": "Canvis recents",
+    "allHistory": "Historial complet",
+    "noHistory": "Encara no hi ha historial de canvis",
+    "justNow": "Ara mateix",
+    "minutesAgo": "Fa {n} minuts",
+    "hoursAgo": "Fa {n} hores",
+    "daysAgo": "Fa {n} dies",
+    "areaList": "Llista de sistemes de classificació · Crear nou"
+  },
+  "areaHome": {
+    "title": "Els meus sistemes de classificació estàndard",
+    "loading": "Carregant",
+    "empty": "No hi ha sistemes de classificació participants",
+    "open": "Obrir",
+    "newTitle": "Nou sistema de classificació",
+    "namePlaceholder": "Nom del sistema de classificació (obligatori)",
+    "descPlaceholder": "Descripció",
+    "create": "Crear",
+    "created": "Sistema de classificació {name} creat"
+  },
+  "nav": {
+    "label": "Menú del sistema de classificació",
+    "expand": "Expandir menú inferior",
+    "expandWith": "Expandir menú inferior ({menu})",
+    "collapse": "Reduir menú inferior",
+    "subOf": "Subfuncions de {menu}",
+    "groupTech": "Monitorització · Editor SQL",
+    "groupStd": "Diccionari estàndard",
+    "groupModel": "Model",
+    "groupSet": "Configuració",
+    "groupPlan": "Pagament",
+    "words": "Paraules estàndard",
+    "bulk": "Registre massiu",
+    "domains": "Dominis estàndard",
+    "keyDomains": "Dominis clau",
+    "domainGroups": "Grups de dominis",
+    "terms": "Termes estàndard",
+    "codes": "Codis estàndard",
+    "model": "Model conceptual",
+    "prj": "Projectes",
+    "subj": "Àrees temàtiques",
+    "coreEnt": "Entitats principals",
+    "entityClasses": "Classificadors d'entitats",
+    "logical": "Model lògic",
+    "physical": "Model físic",
+    "erd": "ERD",
+    "ddl": "Generació DDL",
+    "monitor": "Monitorització",
+    "monApp": "Aplicació",
+    "monSrv": "Servidor",
+    "monDb": "Base de dades",
+    "monUrl": "URL",
+    "monFix": "Historial de correccions d'IA",
+    "sql": "Editor SQL",
+    "settings": "Configuració",
+    "history": "Historial",
+    "forbidden": "Paraules prohibides",
+    "banBulk": "Registre massiu de paraules prohibides",
+    "check": "Comprovació d'estàndards",
+    "reverse": "Enginyeria inversa",
+    "members": "Membres",
+    "approvals": "Aprovacions",
+    "plan": "Pagament"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Administrador del sistema",
+      "DA": "Arquitecte de dades",
+      "STD": "Gestor d'estàndards",
+      "MDL": "Modelador",
+      "QLT": "Gestor de qualitat",
+      "MIG": "Gestor de migracions",
+      "VIEWER": "Visualitzador"
+    },
+    "roleDesc": {
+      "SYS": "Gestionar la configuració del sistema de classificació · grups de dominis · abreviatures · membres, sol·licituds · aprovacions (inclosa l'aprovació immediata), registre massiu, escriptura SQL, tots els menús",
+      "DA": "Política estàndard general: Sol·licitar · aprovar paraules · dominis · termes (pot seleccionar l'aprovació immediata en la sol·licitud), registre massiu, gestionar la configuració · membres, escriptura SQL, tots els menús",
+      "STD": "Sol·licitar paraules · dominis · termes, registre massiu, configuració, escriptura SQL, tots els menús (sense drets d'aprovació)",
+      "MDL": "Sol·licitar el registre · modificació · eliminació de paraules · dominis · termes · models, registre massiu, configuració, escriptura SQL, tots els menús (sense drets d'aprovació)",
+      "QLT": "Sol·licitar · escriptura SQL, menús d'editor SQL · modelatge · configuració (les funcions de diagnòstic de qualitat en futures etapes)",
+      "MIG": "Sol·licitar · escriptura SQL, menú d'editor SQL (per a la correspondència de migració)",
+      "VIEWER": "Només visualitzar el diccionari estàndard"
+    },
+    "plan": {
+      "FREE": "Gratuït (Visualització)",
+      "P1": "Desenvolupador",
+      "P2": "Gestor d'estàndards",
+      "P3": "Modelador",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registrar",
+      "UPD": "Modificar",
+      "DEL": "Suprimir"
+    },
+    "tgt": {
+      "AREA": "Sistema de classificació",
+      "MBR": "Membre",
+      "DIC": "Paraula",
+      "DOM": "Domini",
+      "DOM_GRP": "Grup de dominis",
+      "TERM": "Terme",
+      "CD": "Codi estàndard",
+      "CD_VAL": "Valor del codi",
+      "ABBR": "Abreviatura",
+      "PRJ": "Projecte",
+      "SUBJ": "Àrea temàtica",
+      "ENT": "Entitat",
+      "REL": "Relació",
+      "ATTR": "Atribut",
+      "VER": "Versió del model",
+      "PHY": "Model físic",
+      "DDL": "Execució DDL",
+      "RVS": "Enginyeria inversa",
+      "SQL": "SQL",
+      "DBCN": "Connexió DB",
+      "AGT": "Agent",
+      "MONURL": "Monitorització d'URL"
+    }
+  }
+}

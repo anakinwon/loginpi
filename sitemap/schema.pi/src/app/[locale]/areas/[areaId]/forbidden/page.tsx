@@ -1,7 +1,7 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
 // 금칙어 관리 화면(P05) — 표준단어별 대체 표기(금칙어·이음동의어) 등록·삭제·조회. 원칙 : 동의어는 표준단어로 쓰지 않고 이 목록으로만 관리(sql/016)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, noEnterSubmit } from '../words/word-board'

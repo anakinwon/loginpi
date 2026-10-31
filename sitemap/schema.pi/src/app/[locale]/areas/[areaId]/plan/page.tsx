@@ -2,7 +2,7 @@
 // 요금제 화면(2026-10-19) — 현재 요금제·만료·유효 기간, 요금제 4종 카드(월/년 Pi·권한·메뉴·업그레이드 일할계산), Pi 결제(시스템담당자·데이터아키텍트), 결제 이력(페이지 단위)
 //  결제 = Pi Browser 에서만(판정 = usePiAuth().isInPiBrowser — authenticate 성공 신호, UA 판정 금지). prepare → createPayment → approve → complete(piFetch)
 import { piFetch, usePiAuth } from '@pi/auth/client'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useRef, useState } from 'react'
 import { PLAN_NM, PLAN_PERMS, ROLE_NM, type MbrRole, type PlanCd } from '@/lib/roles'
 

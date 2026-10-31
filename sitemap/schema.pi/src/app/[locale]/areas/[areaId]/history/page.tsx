@@ -1,7 +1,7 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
 // 변경 이력 화면 — 대상·동작·사용자·기간 조건 조회, 행을 펼치면 변경 전후 값 비교(바뀐 항목만)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
 import { auditDiff } from '@/lib/audit-diff'
 import { ACT_NM, AUDIT_NM_KEYS, TGT_NM } from '@/lib/roles'

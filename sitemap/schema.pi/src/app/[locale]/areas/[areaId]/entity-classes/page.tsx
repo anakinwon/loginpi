@@ -2,7 +2,7 @@
 import { piFetch } from '@pi/auth/client'
 // 엔터티 분류어 관리 화면 — 단어에 엔터티 분류어 지정·테이블 접미어 지정·변경·해제 신청(단어 수정 승인 절차, sql/017), 목록 조회
 // 기준 : 정의서 §8.4 데이터 성격 접미어 + 기관 확장(2026-10-16 마스터 확정), 단어 물리명(컬럼용)과 테이블 접미어(테이블명용)는 별도
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, ApvFields, ApvLink, StsCell, StsFilter, noEnterSubmit } from '../words/word-board'

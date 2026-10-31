@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "資料標準字典中繼系統"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "變更語言",
+      "search": "搜尋語言",
+      "empty": "無搜尋結果"
+    },
+    "loading": "載入中…",
+    "requestFailed": "請求失敗",
+    "home": "首頁",
+    "goHome": "前往首頁"
+  },
+  "home": {
+    "subtitle": "資料標準字典中繼系統"
+  },
+  "auth": {
+    "checking": "正在檢查登入…",
+    "googleUnlinked": "您已登入 Google，但尚未與 Pi 帳戶連結。",
+    "required": "需要登入。",
+    "requiredHint": "需要登入。請在 Pi Browser 中使用 Pi 帳戶登入，或在一般瀏覽器中透過 Google 登入（需要連結 Pi 帳戶）。",
+    "piSignIn": "使用 Pi 帳戶登入",
+    "googleSignIn": "使用 Google 登入",
+    "signOut": "登出",
+    "linkCheckFailed": "無法檢查連結狀態（暫時錯誤）。請稍後重新整理。"
+  },
+  "link": {
+    "title": "帳戶連結",
+    "desc": "將 Pi Browser 中的 Pi 帳戶與一般瀏覽器中的 Google 帳戶連結為同一使用者。連結後，您只需在 PC 上登入 Google 即可工作。",
+    "codeFormTitle": "輸入 Pi 帳戶連結碼",
+    "codeFormHint": "在 Pi Browser 中登入後，請在 10 分鐘內輸入帳戶連結畫面上發出的 6 位數代碼。",
+    "codeLabel": "連結碼",
+    "linked": "已連結。",
+    "submit": "連結",
+    "issuerTitle": "發出 Google 帳戶連結碼",
+    "issuerHint": "在一般瀏覽器中登入 Google 後，輸入此代碼即可連結為同一使用者（10 分鐘內有效）。",
+    "minutesLeft": "約剩餘 {minutes} 分鐘",
+    "issue": "發出代碼",
+    "reissue": "重新發出",
+    "linkedAs": "您的 Google 帳戶已連結至 Pi 使用者 <b>{name}</b>。"
+  },
+  "intro": {
+    "kicker": "資料標準字典中繼系統",
+    "headline1": "沒有標準，就無法命名，",
+    "headline2": "沒有模型，就無法建立表格。",
+    "lead": "使用已核准的標準詞彙建立術語，使用這些術語繪製模型，並從模型產生 DDL。人類決定，工具執行規則。",
+    "flowTitle": "連接方式如下",
+    "step": "步驟 {n}",
+    "flow": {
+      "words": {
+        "nm": "標準詞彙",
+        "desc": "詞彙 · 縮寫 · 禁用詞"
+      },
+      "domains": {
+        "nm": "標準網域",
+        "desc": "類型 · 長度規則"
+      },
+      "terms": {
+        "nm": "標準術語",
+        "desc": "詞彙組合 · 核准"
+      },
+      "model": {
+        "nm": "資料模型",
+        "desc": "概念 · 邏輯 · 實體"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "依主題領域 · 版本比較"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "依 DBMS 產生 · 核准執行"
+      }
+    },
+    "roleTitle": "依角色可執行的工作",
+    "planTitle": "定價方案",
+    "planNote": "— 依分類系統單位支付 Pi，價格在付款畫面確認",
+    "menu": {
+      "MENU_STD": "標準字典",
+      "MENU_SQL": "SQL 編輯器",
+      "MENU_SET": "設定 · 歷史記錄",
+      "MENU_BAN": "禁用詞",
+      "MENU_MODEL": "模型 · ERD · DDL",
+      "MENU_CHK": "標準檢查",
+      "MENU_ADM": "成員 · 核准"
+    },
+    "viewOnly": "{menu} (僅限檢視)",
+    "footer": "在上方登入即可立即查看您的分類系統任務。"
+  },
+  "dashboard": {
+    "loadFailed": "無法載入儀表板",
+    "myAreas": "我的分類系統",
+    "planLine": "方案 {plan}",
+    "until": " · 至 {date}",
+    "grace": "(寬限期)",
+    "openArea": "開啟分類系統 →",
+    "todoTitle": "輪到我了",
+    "todoEmpty": "僅限檢視權限 — 請使用下方狀態和捷徑瀏覽標準。",
+    "apvWait": "標準核准待處理",
+    "apvWaitSub": "詞彙 · 網域 · 術語 · 代碼申請",
+    "ddlWait": "DDL 執行核准待處理",
+    "mineWait": "我的申請待處理",
+    "mineRejected": "最近 30 天內有 {count} 個被拒絕",
+    "model": "資料模型",
+    "modelSub": "專案 · {count} 個實體",
+    "stdTitle": "標準字典狀態",
+    "stdBasis": "已核准基準",
+    "shortcuts": "捷徑",
+    "recentTitle": "最近變更",
+    "allHistory": "完整歷史記錄",
+    "noHistory": "尚無變更歷史記錄",
+    "justNow": "剛才",
+    "minutesAgo": "{n} 分鐘前",
+    "hoursAgo": "{n} 小時前",
+    "daysAgo": "{n} 天前",
+    "areaList": "分類系統列表 · 建立新項目"
+  },
+  "areaHome": {
+    "title": "我的標準分類系統",
+    "loading": "載入中",
+    "empty": "沒有參與中的分類系統",
+    "open": "開啟",
+    "newTitle": "新分類系統",
+    "namePlaceholder": "分類系統名稱（必填）",
+    "descPlaceholder": "描述",
+    "create": "建立",
+    "created": "已建立分類系統 {name}"
+  },
+  "nav": {
+    "label": "分類系統選單",
+    "expand": "展開底部選單",
+    "expandWith": "展開底部選單 ({menu})",
+    "collapse": "收合底部選單",
+    "subOf": "{menu} 子功能",
+    "groupTech": "監控 · SQL 編輯器",
+    "groupStd": "標準字典",
+    "groupModel": "模型",
+    "groupSet": "設定",
+    "groupPlan": "付款",
+    "words": "標準詞彙",
+    "bulk": "批次註冊",
+    "domains": "標準網域",
+    "keyDomains": "主要網域",
+    "domainGroups": "網域群組",
+    "terms": "標準術語",
+    "codes": "標準代碼",
+    "model": "概念模型",
+    "prj": "專案",
+    "subj": "主題領域",
+    "coreEnt": "核心實體",
+    "entityClasses": "實體分類器",
+    "logical": "邏輯模型",
+    "physical": "實體模型",
+    "erd": "ERD",
+    "ddl": "DDL 產生",
+    "monitor": "監控",
+    "monApp": "應用程式",
+    "monSrv": "伺服器",
+    "monDb": "資料庫",
+    "monUrl": "URL",
+    "monFix": "AI 修正歷史記錄",
+    "sql": "SQL 編輯器",
+    "settings": "設定",
+    "history": "歷史記錄",
+    "forbidden": "禁用詞",
+    "banBulk": "批次禁用詞註冊",
+    "check": "標準檢查",
+    "reverse": "逆向工程",
+    "members": "成員",
+    "approvals": "核准",
+    "plan": "付款"
+  },
+  "codes": {
+    "role": {
+      "SYS": "系統管理員",
+      "DA": "資料架構師",
+      "STD": "標準管理員",
+      "MDL": "建模師",
+      "QLT": "品質管理員",
+      "MIG": "遷移管理員",
+      "VIEWER": "檢視者"
+    },
+    "roleDesc": {
+      "SYS": "管理分類系統設定 · 網域群組 · 縮寫 · 成員、申請 · 核准（包括即時核准）、批次註冊、SQL 寫入、所有選單",
+      "DA": "整體標準政策：申請 · 核准詞彙 · 網域 · 術語（申請時可選擇即時核准）、批次註冊、管理設定 · 成員、SQL 寫入、所有選單",
+      "STD": "申請詞彙 · 網域 · 術語、批次註冊、設定、SQL 寫入、所有選單（無核准權限）",
+      "MDL": "申請詞彙 · 網域 · 術語 · 模型註冊 · 修改 · 刪除、批次註冊、設定、SQL 寫入、所有選單（無核准權限）",
+      "QLT": "申請 · SQL 寫入、SQL 編輯器 · 建模 · 設定選單（品質診斷功能將在未來階段推出）",
+      "MIG": "申請 · SQL 寫入、SQL 編輯器選單（用於遷移映射）",
+      "VIEWER": "僅檢視標準字典"
+    },
+    "plan": {
+      "FREE": "免費（檢視）",
+      "P1": "開發人員",
+      "P2": "標準管理員",
+      "P3": "建模師",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "註冊",
+      "UPD": "修改",
+      "DEL": "刪除"
+    },
+    "tgt": {
+      "AREA": "分類系統",
+      "MBR": "成員",
+      "DIC": "詞彙",
+      "DOM": "網域",
+      "DOM_GRP": "網域群組",
+      "TERM": "術語",
+      "CD": "標準代碼",
+      "CD_VAL": "代碼值",
+      "ABBR": "縮寫",
+      "PRJ": "專案",
+      "SUBJ": "主題領域",
+      "ENT": "實體",
+      "REL": "關係",
+      "ATTR": "屬性",
+      "VER": "模型版本",
+      "PHY": "實體模型",
+      "DDL": "DDL 執行",
+      "RVS": "逆向工程",
+      "SQL": "SQL",
+      "DBCN": "DB 連線",
+      "AGT": "代理程式",
+      "MONURL": "URL 監控"
+    }
+  }
+}

@@ -5,7 +5,7 @@ import { piFetch } from '@pi/auth/client'
 // 물리명은 물리 모델 전환 전까지 항상 대문자(PRD §2.6). 순서 = ▲▼(주식별자는 앞 묶음 안에서만, 일반 속성은 그 뒤에서만 이동, PUT …/attributes/order)
 // 자유 추가·용어 교체 = 승인 표준용어 검색(GET /terms?q=&sts=CNFM, 2글자 이상·0.3초 지연·20건), 없으면 용어 신청. 관계 상속 속성은 용어 교체 잠금(설명만)
 // 항목설정(마스터 지시 2026-10-18, DA# 엔터티 편집 › 항목설정) : 표 칸을 주요 항목(표시·순서)/보조 항목(숨김)으로 — 순서·속성명·처리는 고정, 이 브라우저에 기억
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { confirmSave } from '../words/word-board'
 

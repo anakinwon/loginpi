@@ -1,5 +1,5 @@
 // 승인 화면 — 대기·승인·반려·취소 요청 목록, 승인권자(roles.ts 권한표)의 건별·선택 승인·반려, 신청자의 취소
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import ApprovalBoard from './approval-board'
 
 // 첫 진입 필터 : ?sts=REQ|APV|RJCT|CNCL&tp=DIC|DOM|TERM|CD(목록 화면의 "사유 보기" 링크), 그 외 값은 무시

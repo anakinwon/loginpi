@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Duomenų standarto žodyno metaduomenų sistema"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Keisti kalbą",
+      "search": "Ieškoti kalbos",
+      "empty": "Nėra paieškos rezultatų"
+    },
+    "loading": "Įkeliama…",
+    "requestFailed": "Užklausa nepavyko",
+    "home": "Pradžia",
+    "goHome": "Eiti į pradžią"
+  },
+  "home": {
+    "subtitle": "Duomenų standarto žodyno metaduomenų sistema"
+  },
+  "auth": {
+    "checking": "Tikrinamas prisijungimas…",
+    "googleUnlinked": "Prisijungėte su Google, bet paskyra dar nesusietas su Pi paskyra.",
+    "required": "Reikalingas prisijungimas.",
+    "requiredHint": "Reikalingas prisijungimas. Prisijunkite su savo Pi paskyra Pi Browser, arba su Google (reikalingas Pi paskyros susiejimas) įprastoje naršyklėje.",
+    "piSignIn": "Prisijungti su Pi paskyra",
+    "googleSignIn": "Prisijungti su Google",
+    "signOut": "Atsijungti",
+    "linkCheckFailed": "Nepavyko patikrinti susiejimo būsenos (laikina klaida). Netrukus atnaujinkite."
+  },
+  "link": {
+    "title": "Paskyros susiejimas",
+    "desc": "Susieja jūsų Pi paskyrą Pi Browser su jūsų Google paskyra įprastoje naršyklėje kaip tą patį vartotoją. Po susiejimo galite dirbti kompiuteryje tiesiog prisijungę su Google.",
+    "codeFormTitle": "Įveskite Pi paskyros susiejimo kodą",
+    "codeFormHint": "Prisijungę Pi Browser, įveskite 6 skaitmenų kodą, išduotą paskyros susiejimo ekrane, per 10 minučių.",
+    "codeLabel": "Susiejimo kodas",
+    "linked": "Susietas.",
+    "submit": "Susieti",
+    "issuerTitle": "Išduoti Google paskyros susiejimo kodą",
+    "issuerHint": "Prisijungę su Google įprastoje naršyklėje, įveskite šį kodą, kad susietumėte kaip tą patį vartotoją (galioja 10 minučių).",
+    "minutesLeft": "Liko apie {minutes} min.",
+    "issue": "Išduoti kodą",
+    "reissue": "Išduoti iš naujo",
+    "linkedAs": "Jūsų Google paskyra susieta su Pi vartotoju <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Duomenų standarto žodyno metaduomenų sistema",
+    "headline1": "Be standartų negalite pavadinti,",
+    "headline2": "be modelių negalite sudaryti lentelių.",
+    "lead": "Kurkite terminus su patvirtintais standartiniais žodžiais, pieškite modelius su tais terminais ir generuokite DDL iš modelių. Žmonės sprendžia, įrankiai užtikrina taisykles.",
+    "flowTitle": "Štai kaip tai susiję",
+    "step": "{n} žingsnis",
+    "flow": {
+      "words": {
+        "nm": "Standartiniai žodžiai",
+        "desc": "Žodžiai · Santrumpos · Draudžiami žodžiai"
+      },
+      "domains": {
+        "nm": "Standartiniai domenai",
+        "desc": "Tipas · Ilgio taisyklės"
+      },
+      "terms": {
+        "nm": "Standartiniai terminai",
+        "desc": "Žodžių jungimas · Patvirtinimas"
+      },
+      "model": {
+        "nm": "Duomenų modelis",
+        "desc": "Konceptualus · Loginis · Fizinis"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Pagal dalykinę sritį · Versijų palyginimas"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generuoti pagal DBMS · Patvirtinti vykdymą"
+      }
+    },
+    "roleTitle": "Ką galite daryti pagal vaidmenį",
+    "planTitle": "Kainodaros planai",
+    "planNote": "— Pi mokėjimas už klasifikavimo sistemos vienetą, kaina patvirtinama mokėjimo ekrane",
+    "menu": {
+      "MENU_STD": "Standartinis žodynas",
+      "MENU_SQL": "SQL redaktorius",
+      "MENU_SET": "Nustatymai · Istorija",
+      "MENU_BAN": "Draudžiami žodžiai",
+      "MENU_MODEL": "Modelis · ERD · DDL",
+      "MENU_CHK": "Standarto patikra",
+      "MENU_ADM": "Nariai · Patvirtinimai"
+    },
+    "viewOnly": "{menu} (tik peržiūra)",
+    "footer": "Prisijunkite aukščiau, kad iškart pamatytumėte savo užduotis savo klasifikavimo sistemai."
+  },
+  "dashboard": {
+    "loadFailed": "Nepavyko įkelti prietaisų skydelio",
+    "myAreas": "Mano klasifikavimo sistemos",
+    "planLine": "Planas {plan}",
+    "until": " · Iki {date}",
+    "grace": "(Lengvatinis laikotarpis)",
+    "openArea": "Atidaryti klasifikavimo sistemą →",
+    "todoTitle": "Mano eilė",
+    "todoEmpty": "Tik peržiūros teisė – naršykite standartus naudodami toliau pateiktą būseną ir nuorodas.",
+    "apvWait": "Laukiama standarto patvirtinimo",
+    "apvWaitSub": "Žodžio · Domeno · Termino · Kodo paraiška",
+    "ddlWait": "Laukiama DDL vykdymo patvirtinimo",
+    "mineWait": "Mano paraiškos laukia",
+    "mineRejected": "{count} atmesta per pastarąsias 30 dienų",
+    "model": "Duomenų modelis",
+    "modelSub": "Projektai · {count} entitetų",
+    "stdTitle": "Standartinio žodyno būsena",
+    "stdBasis": "Patvirtintas pagrindas",
+    "shortcuts": "Nuorodos",
+    "recentTitle": "Paskutiniai pakeitimai",
+    "allHistory": "Visa istorija",
+    "noHistory": "Dar nėra pakeitimų istorijos",
+    "justNow": "Ką tik",
+    "minutesAgo": "Prieš {n} min.",
+    "hoursAgo": "Prieš {n} val.",
+    "daysAgo": "Prieš {n} d.",
+    "areaList": "Klasifikavimo sistemų sąrašas · Sukurti naują"
+  },
+  "areaHome": {
+    "title": "Mano standartinės klasifikavimo sistemos",
+    "loading": "Įkeliama",
+    "empty": "Nėra dalyvaujančių klasifikavimo sistemų",
+    "open": "Atidaryti",
+    "newTitle": "Nauja klasifikavimo sistema",
+    "namePlaceholder": "Klasifikavimo sistemos pavadinimas (būtinas)",
+    "descPlaceholder": "Aprašymas",
+    "create": "Sukurti",
+    "created": "Klasifikavimo sistema {name} sukurta"
+  },
+  "nav": {
+    "label": "Klasifikavimo sistemos meniu",
+    "expand": "Išskleisti apatinį meniu",
+    "expandWith": "Išskleisti apatinį meniu ({menu})",
+    "collapse": "Sutraukti apatinį meniu",
+    "subOf": "{menu} papildomos funkcijos",
+    "groupTech": "Stebėjimas · SQL redaktorius",
+    "groupStd": "Standartinis žodynas",
+    "groupModel": "Modelis",
+    "groupSet": "Nustatymai",
+    "groupPlan": "Mokėjimas",
+    "words": "Standartiniai žodžiai",
+    "bulk": "Masinis registravimas",
+    "domains": "Standartiniai domenai",
+    "keyDomains": "Pagrindiniai domenai",
+    "domainGroups": "Domenų grupės",
+    "terms": "Standartiniai terminai",
+    "codes": "Standartiniai kodai",
+    "model": "Konceptualus modelis",
+    "prj": "Projektai",
+    "subj": "Dalykinės sritys",
+    "coreEnt": "Pagrindiniai entitetai",
+    "entityClasses": "Entitetų klasifikatoriai",
+    "logical": "Loginis modelis",
+    "physical": "Fizinis modelis",
+    "erd": "ERD",
+    "ddl": "DDL generavimas",
+    "monitor": "Stebėjimas",
+    "monApp": "Programa",
+    "monSrv": "Serveris",
+    "monDb": "Duomenų bazė",
+    "monUrl": "URL",
+    "monFix": "AI korekcijų istorija",
+    "sql": "SQL redaktorius",
+    "settings": "Nustatymai",
+    "history": "Istorija",
+    "forbidden": "Draudžiami žodžiai",
+    "banBulk": "Masinis draudžiamų žodžių registravimas",
+    "check": "Standarto patikra",
+    "reverse": "Atvirkštinė inžinerija",
+    "members": "Nariai",
+    "approvals": "Patvirtinimai",
+    "plan": "Mokėjimas"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Sistemos administratorius",
+      "DA": "Duomenų architektas",
+      "STD": "Standartų valdytojas",
+      "MDL": "Modeliuotojas",
+      "QLT": "Kokybės valdytojas",
+      "MIG": "Migracijos valdytojas",
+      "VIEWER": "Peržiūros vartotojas"
+    },
+    "roleDesc": {
+      "SYS": "Tvarkyti klasifikavimo sistemos nustatymus · domenų grupes · santrumpas · narius, paraiškas · patvirtinimus (įskaitant tiesioginį patvirtinimą), masinį registravimą, SQL rašymą, visus meniu",
+      "DA": "Bendra standartų politika: Taikyti · patvirtinti žodžius · domenus · terminus (galima pasirinkti tiesioginį patvirtinimą pateikiant paraišką), masinis registravimas, tvarkyti nustatymus · narius, SQL rašymas, visus meniu",
+      "STD": "Pateikti paraišką dėl žodžių · domenų · terminų, masinis registravimas, nustatymai, SQL rašymas, visi meniu (neturi patvirtinimo teisių)",
+      "MDL": "Pateikti paraišką dėl žodžių · domenų · terminų · modelių registravimo · modifikavimo · ištrynimo, masinis registravimas, nustatymai, SQL rašymas, visi meniu (neturi patvirtinimo teisių)",
+      "QLT": "Pateikti paraišką · SQL rašymas, SQL redaktoriaus · modeliavimo · nustatymų meniu (kokybės diagnostikos funkcijos bus vėlesniuose etapuose)",
+      "MIG": "Pateikti paraišką · SQL rašymas, SQL redaktoriaus meniu (migracijos susiejimui)",
+      "VIEWER": "Tik peržiūrėti standartinį žodyną"
+    },
+    "plan": {
+      "FREE": "Nemokamai (peržiūra)",
+      "P1": "Kūrėjas",
+      "P2": "Standartų valdytojas",
+      "P3": "Modeliuotojas",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registruoti",
+      "UPD": "Keisti",
+      "DEL": "Ištrinti"
+    },
+    "tgt": {
+      "AREA": "Klasifikavimo sistema",
+      "MBR": "Narys",
+      "DIC": "Žodis",
+      "DOM": "Domenas",
+      "DOM_GRP": "Domenų grupė",
+      "TERM": "Terminas",
+      "CD": "Standartinis kodas",
+      "CD_VAL": "Kodo reikšmė",
+      "ABBR": "Santrumpa",
+      "PRJ": "Projektas",
+      "SUBJ": "Dalykinė sritis",
+      "ENT": "Entitetas",
+      "REL": "Ryšys",
+      "ATTR": "Atributas",
+      "VER": "Modelio versija",
+      "PHY": "Fizinis modelis",
+      "DDL": "DDL vykdymas",
+      "RVS": "Atvirkštinė inžinerija",
+      "SQL": "SQL",
+      "DBCN": "DB prisijungimas",
+      "AGT": "Agentas",
+      "MONURL": "URL stebėjimas"
+    }
+  }
+}

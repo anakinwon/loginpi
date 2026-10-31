@@ -3,7 +3,8 @@
 //  useAppUser : 두 세션을 하나의 user 로 합친다(Pi 우선). Google 은 Pi 계정과 연동(sys_usr_auth_lnk)된 경우에만 user 가 된다.
 //  연동 흐름 : Pi Browser 로그인 사용자가 코드 발급(PiLinkCodeIssuer) → 일반 브라우저 Google 세션이 코드 입력(LinkCodeForm) → update() 로 세션 갱신.
 //  Google 버튼은 NEXT_PUBLIC_GOOGLE_LOGIN=1 일 때만 노출. UA 판정 없음
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { piFetch, usePiAuth, type PiSessionUser } from '@pi/auth/client'
@@ -12,10 +13,10 @@ export const googleLoginEnabled = process.env.NEXT_PUBLIC_GOOGLE_LOGIN === '1'
 
 type MeUser = { id: string; username: string | null; displayName: string; role: string }
 
-// API 오류 본문 → 표시 문구(schema.pi apiError {message} / @pi/guard {error})
-const errText = (b: unknown) => {
+// API 오류 본문 → 표시 문구(schema.pi apiError {message} / @pi/guard {error}), 없으면 화면이 넘긴 번역 문구(fallback)
+const errText = (b: unknown, fallback: string) => {
   const o = b as { message?: string; error?: string } | null
-  return o?.message ?? o?.error ?? '요청에 실패했습니다'
+  return o?.message ?? o?.error ?? fallback
 }
 async function readJson<T>(p: Promise<Response>): Promise<{ ok: true; data: T } | { ok: false; body: unknown }> {
   try {
@@ -23,7 +24,7 @@ async function readJson<T>(p: Promise<Response>): Promise<{ ok: true; data: T } 
     const body = (await r.json().catch(() => null)) as unknown
     return r.ok ? { ok: true, data: body as T } : { ok: false, body }
   } catch (e) {
-    return { ok: false, body: { message: e instanceof Error ? e.message : '네트워크 오류' } }
+    return { ok: false, body: { message: e instanceof Error ? e.message : undefined } }
   }
 }
 
@@ -98,26 +99,29 @@ const BTN = 'rounded border border-gray-300 px-3 py-1.5 text-sm'
 const BTN_PRIMARY = 'rounded bg-black px-3 py-1.5 text-sm text-white disabled:opacity-50'
 
 export function GoogleLoginButton({ className = BTN }: { className?: string }) {
+  const t = useTranslations('auth')
   if (!googleLoginEnabled) return null
   return (
     <button type="button" className={className} onClick={() => void signIn('google')}>
-      Google 로그인
+      {t('googleSignIn')}
     </button>
   )
 }
 
 export function GoogleSignOutButton() {
+  const t = useTranslations('auth')
   return (
     <button type="button" className={BTN} onClick={() => void signOut({ callbackUrl: '/' })}>
-      로그아웃
+      {t('signOut')}
     </button>
   )
 }
 
 export function LinkCheckFailed() {
+  const t = useTranslations('auth')
   return (
     <p className="text-sm text-red-600" role="alert">
-      연동 상태를 확인하지 못했습니다(일시 오류). 잠시 뒤 새로고침하십시오.
+      {t('linkCheckFailed')}
     </p>
   )
 }
@@ -125,6 +129,7 @@ export function LinkCheckFailed() {
 // 일반 브라우저(Google 세션, 미연동) — 연동 코드 입력
 export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
   const { refreshGoogle, googleEmail } = useAppUser()
+  const t = useTranslations()
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
@@ -139,16 +144,16 @@ export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
           piFetch('/api/auth/link-complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) }),
         )
         if (r.ok) {
-          setMsg({ ok: true, text: '연동되었습니다.' })
+          setMsg({ ok: true, text: t('link.linked') })
           await refreshGoogle()
           onLinked?.()
-        } else setMsg({ ok: false, text: errText(r.body) })
+        } else setMsg({ ok: false, text: errText(r.body, t('common.requestFailed')) })
         setBusy(false)
       }}
     >
-      <p className="font-medium">Pi 계정 연동 코드 입력</p>
+      <p className="font-medium">{t('link.codeFormTitle')}</p>
       {googleEmail && <p className="text-xs text-gray-500">{googleEmail}</p>}
-      <p className="text-sm">Pi Browser 에서 로그인한 뒤 계정 연동 화면에서 발급한 6자리 코드를 10분 안에 입력하십시오.</p>
+      <p className="text-sm">{t('link.codeFormHint')}</p>
       <input
         className="rounded border border-gray-300 px-2 py-1 font-mono tracking-widest"
         inputMode="numeric"
@@ -157,7 +162,7 @@ export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
         placeholder="000000"
         value={code}
         onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-        aria-label="연동 코드"
+        aria-label={t('link.codeLabel')}
         required
       />
       {msg && (
@@ -167,7 +172,7 @@ export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
       )}
       <div className="flex gap-2">
         <button className={BTN_PRIMARY} disabled={busy || code.length !== 6}>
-          연동
+          {t('link.submit')}
         </button>
         <GoogleSignOutButton />
       </div>
@@ -177,6 +182,7 @@ export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
 
 // Pi Browser(Pi 세션) — 연동 코드 발급
 export function PiLinkCodeIssuer() {
+  const t = useTranslations()
   const [issued, setIssued] = useState<{ code: string; expiresAt: string } | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -192,14 +198,14 @@ export function PiLinkCodeIssuer() {
 
   return (
     <div className="flex max-w-sm flex-col gap-2 rounded border border-gray-200 p-4">
-      <p className="font-medium">Google 계정 연동 코드 발급</p>
-      <p className="text-sm">일반 브라우저에서 Google 로그인 뒤 이 코드를 입력하면 같은 사용자로 연결됩니다(10분 유효).</p>
+      <p className="font-medium">{t('link.issuerTitle')}</p>
+      <p className="text-sm">{t('link.issuerHint')}</p>
       {issued && (
         <>
           <p className="font-mono text-3xl tracking-widest" aria-live="polite">
             {issued.code}
           </p>
-          <p className="text-xs text-gray-500">남은 시간 약 {minutesLeft}분</p>
+          <p className="text-xs text-gray-500">{t('link.minutesLeft', { minutes: minutesLeft })}</p>
         </>
       )}
       {error && (
@@ -216,11 +222,11 @@ export function PiLinkCodeIssuer() {
             setError(null)
             const r = await readJson<{ code: string; expiresAt: string }>(piFetch('/api/auth/link-start', { method: 'POST' }))
             if (r.ok) setIssued(r.data)
-            else setError(errText(r.body))
+            else setError(errText(r.body, t('common.requestFailed')))
             setBusy(false)
           }}
         >
-          {issued ? '다시 발급' : '코드 발급'}
+          {issued ? t('link.reissue') : t('link.issue')}
         </button>
       </div>
     </div>
@@ -230,25 +236,26 @@ export function PiLinkCodeIssuer() {
 // 계정 연동 패널(/link) — 세션 종류별 분기 : Pi 세션 = 코드 발급 / Google 미연동 = 코드 입력 / Google 연동됨 = 완료 / 없음 = 로그인 안내
 export function LinkPanel() {
   const { user, source, isLoading, googleUnlinked, googleLinkError, piSignIn, piError } = useAppUser()
-  if (isLoading && !user) return <p className="text-sm text-gray-600">로그인 확인 중…</p>
+  const t = useTranslations()
+  if (isLoading && !user) return <p className="text-sm text-gray-600">{t('auth.checking')}</p>
   if (googleLinkError) return <LinkCheckFailed />
   if (googleUnlinked) return <LinkCodeForm />
   if (user && source === 'google')
     return (
       <p className="text-sm" role="status">
-        Google 계정이 Pi 사용자 <b>{user.username ?? user.displayName}</b> 와 연동되어 있습니다.{' '}
+        {t.rich('link.linkedAs', { name: user.username ?? user.displayName, b: (c) => <b>{c}</b> })}{' '}
         <Link href="/" className="underline">
-          홈으로
+          {t('common.goHome')}
         </Link>
       </p>
     )
   if (user && source === 'pi') return <PiLinkCodeIssuer />
   return (
     <div className="flex flex-col items-start gap-2">
-      <p className="text-sm">로그인이 필요합니다.</p>
+      <p className="text-sm">{t('auth.required')}</p>
       <div className="flex gap-2">
         <button type="button" className={BTN_PRIMARY} onClick={() => void piSignIn()}>
-          Pi 계정으로 로그인
+          {t('auth.piSignIn')}
         </button>
         <GoogleLoginButton />
       </div>

@@ -4,7 +4,7 @@
 //  오른쪽 탭 : 미리보기(+실행 요청) / 요청·승인·실행 결과 / 접속 관리 — 실행은 DA 승인 후(자기 승인 금지), 서버 직접(PostgreSQL·Oracle) 또는 로컬 에이전트
 // ponytail: 테이블 목록은 물리 모델 전체를 한 번 받아 화면에서 페이지 나눔(DDL 생성에 전체가 필요) — 수천 개 모델이면 서버 페이지 조회로
 import { piFetch } from '@pi/auth/client'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useEffect, useMemo, useState } from 'react'
 import { dbmsList } from '@/lib/modelpi/dbms'
 import ConnPanel, { type Conn } from './conn-panel'

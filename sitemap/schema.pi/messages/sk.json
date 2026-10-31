@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Meta systém dátového štandardného slovníka"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Zmeniť jazyk",
+      "search": "Vyhľadať jazyk",
+      "empty": "Žiadne výsledky vyhľadávania"
+    },
+    "loading": "Načítava sa…",
+    "requestFailed": "Požiadavka zlyhala",
+    "home": "Domov",
+    "goHome": "Prejsť na domovskú stránku"
+  },
+  "home": {
+    "subtitle": "Meta systém dátového štandardného slovníka"
+  },
+  "auth": {
+    "checking": "Kontroluje sa prihlásenie…",
+    "googleUnlinked": "Ste prihlásení cez Google, ale účet ešte nie je prepojený s vaším Pi účtom.",
+    "required": "Vyžaduje sa prihlásenie.",
+    "requiredHint": "Vyžaduje sa prihlásenie. Prihláste sa pomocou svojho Pi účtu v Pi Browseri, alebo pomocou Google (vyžaduje sa prepojenie s Pi účtom) v bežnom prehliadači.",
+    "piSignIn": "Prihlásiť sa pomocou Pi účtu",
+    "googleSignIn": "Prihlásiť sa pomocou Google",
+    "signOut": "Odhlásiť sa",
+    "linkCheckFailed": "Nepodarilo sa skontrolovať stav prepojenia (dočasná chyba). Obnovte stránku o chvíľu."
+  },
+  "link": {
+    "title": "Prepojenie účtu",
+    "desc": "Prepojí váš Pi účet v Pi Browseri s vaším Google účtom v bežnom prehliadači ako toho istého používateľa. Po prepojení môžete pracovať na PC jednoduchým prihlásením sa cez Google.",
+    "codeFormTitle": "Zadajte kód pre prepojenie Pi účtu",
+    "codeFormHint": "Po prihlásení sa v Pi Browseri zadajte 6-miestny kód vydaný na obrazovke prepojenia účtu do 10 minút.",
+    "codeLabel": "Kód pre prepojenie",
+    "linked": "Prepojené.",
+    "submit": "Prepojiť",
+    "issuerTitle": "Vydanie kódu pre prepojenie Google účtu",
+    "issuerHint": "Po prihlásení sa cez Google v bežnom prehliadači zadajte tento kód na prepojenie ako toho istého používateľa (platí 10 minút).",
+    "minutesLeft": "Zostáva približne {minutes} minút",
+    "issue": "Vystaviť kód",
+    "reissue": "Znovu vystaviť",
+    "linkedAs": "Váš Google účet je prepojený s Pi používateľom <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Meta systém dátového štandardného slovníka",
+    "headline1": "Bez štandardov nemôžete pomenovať,",
+    "headline2": "bez modelov nemôžete tabuľkovať.",
+    "lead": "Vytvárajte termíny so schválenými štandardnými slovami, kreslite modely s týmito termínmi a generujte DDL z modelov. Ľudia rozhodujú, nástroje presadzujú pravidlá.",
+    "flowTitle": "Takto sa to spája",
+    "step": "Krok {n}",
+    "flow": {
+      "words": {
+        "nm": "Štandardné slová",
+        "desc": "Slová · Skratky · Zakázané slová"
+      },
+      "domains": {
+        "nm": "Štandardné domény",
+        "desc": "Typ · Pravidlá dĺžky"
+      },
+      "terms": {
+        "nm": "Štandardné termíny",
+        "desc": "Kombinácia slov · Schválenie"
+      },
+      "model": {
+        "nm": "Dátový model",
+        "desc": "Konceptuálny · Logický · Fyzický"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Podľa predmetnej oblasti · Porovnanie verzií"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generovať podľa DBMS · Schváliť vykonanie"
+      }
+    },
+    "roleTitle": "Čo môžete robiť podľa role",
+    "planTitle": "Cenové plány",
+    "planNote": "— Platba Pi za jednotku klasifikačného systému, cena potvrdená na platobnej obrazovke",
+    "menu": {
+      "MENU_STD": "Štandardný slovník",
+      "MENU_SQL": "SQL Editor",
+      "MENU_SET": "Nastavenia · História",
+      "MENU_BAN": "Zakázané slová",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Kontrola štandardov",
+      "MENU_ADM": "Členovia · Schválenia"
+    },
+    "viewOnly": "{menu} (len na zobrazenie)",
+    "footer": "Prihláste sa vyššie, aby ste okamžite videli svoje úlohy pre váš klasifikačný systém."
+  },
+  "dashboard": {
+    "loadFailed": "Nepodarilo sa načítať informačný panel",
+    "myAreas": "Moje klasifikačné systémy",
+    "planLine": "Plán {plan}",
+    "until": " · Do {date}",
+    "grace": "(Obdobie odkladu)",
+    "openArea": "Otvoriť klasifikačný systém →",
+    "todoTitle": "Môj ťah",
+    "todoEmpty": "Len povolenie na zobrazenie — prehliadajte štandardy pomocou stavu a skratiek nižšie.",
+    "apvWait": "Čaká sa na schválenie štandardu",
+    "apvWaitSub": "Žiadosť o slovo · doménu · termín · kód",
+    "ddlWait": "Čaká sa na schválenie vykonania DDL",
+    "mineWait": "Moje čakajúce žiadosti",
+    "mineRejected": "{count} zamietnutých za posledných 30 dní",
+    "model": "Dátový model",
+    "modelSub": "Projekty · {count} entít",
+    "stdTitle": "Stav štandardného slovníka",
+    "stdBasis": "Schválený základ",
+    "shortcuts": "Skratky",
+    "recentTitle": "Posledné zmeny",
+    "allHistory": "Celá história",
+    "noHistory": "Zatiaľ žiadna história zmien",
+    "justNow": "Práve teraz",
+    "minutesAgo": "pred {n} minútami",
+    "hoursAgo": "pred {n} hodinami",
+    "daysAgo": "pred {n} dňami",
+    "areaList": "Zoznam klasifikačných systémov · Vytvoriť nový"
+  },
+  "areaHome": {
+    "title": "Moje štandardné klasifikačné systémy",
+    "loading": "Načítava sa",
+    "empty": "Nezúčastňujete sa žiadnych klasifikačných systémov",
+    "open": "Otvoriť",
+    "newTitle": "Nový klasifikačný systém",
+    "namePlaceholder": "Názov klasifikačného systému (povinné)",
+    "descPlaceholder": "Popis",
+    "create": "Vytvoriť",
+    "created": "Klasifikačný systém {name} bol vytvorený"
+  },
+  "nav": {
+    "label": "Menu klasifikačného systému",
+    "expand": "Rozbaliť spodné menu",
+    "expandWith": "Rozbaliť spodné menu ({menu})",
+    "collapse": "Zbaliť spodné menu",
+    "subOf": "Podfunkcie {menu}",
+    "groupTech": "Monitorovanie · SQL Editor",
+    "groupStd": "Štandardný slovník",
+    "groupModel": "Model",
+    "groupSet": "Nastavenia",
+    "groupPlan": "Platba",
+    "words": "Štandardné slová",
+    "bulk": "Hromadná registrácia",
+    "domains": "Štandardné domény",
+    "keyDomains": "Kľúčové domény",
+    "domainGroups": "Skupiny domén",
+    "terms": "Štandardné termíny",
+    "codes": "Štandardné kódy",
+    "model": "Konceptuálny model",
+    "prj": "Projekty",
+    "subj": "Predmetné oblasti",
+    "coreEnt": "Základné entity",
+    "entityClasses": "Klasifikátory entít",
+    "logical": "Logický model",
+    "physical": "Fyzický model",
+    "erd": "ERD",
+    "ddl": "Generovanie DDL",
+    "monitor": "Monitorovanie",
+    "monApp": "Aplikácia",
+    "monSrv": "Server",
+    "monDb": "Databáza",
+    "monUrl": "URL",
+    "monFix": "História opráv AI",
+    "sql": "SQL Editor",
+    "settings": "Nastavenia",
+    "history": "História",
+    "forbidden": "Zakázané slová",
+    "banBulk": "Hromadná registrácia zakázaných slov",
+    "check": "Kontrola štandardov",
+    "reverse": "Reverzné inžinierstvo",
+    "members": "Členovia",
+    "approvals": "Schválenia",
+    "plan": "Platba"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Systémový administrátor",
+      "DA": "Dátový architekt",
+      "STD": "Manažér štandardov",
+      "MDL": "Modelár",
+      "QLT": "Manažér kvality",
+      "MIG": "Manažér migrácie",
+      "VIEWER": "Prehliadač"
+    },
+    "roleDesc": {
+      "SYS": "Spravovať nastavenia klasifikačného systému · skupiny domén · skratky · členov, aplikácie · schválenia (vrátane okamžitého schválenia), hromadnú registráciu, písanie SQL, všetky menu",
+      "DA": "Celková štandardná politika: Aplikovať · schvaľovať slová · domény · termíny (môže vybrať okamžité schválenie pri aplikácii), hromadnú registráciu, spravovať nastavenia · členov, písanie SQL, všetky menu",
+      "STD": "Požiadať o slová · domény · termíny, hromadnú registráciu, nastavenia, písanie SQL, všetky menu (bez práv na schvaľovanie)",
+      "MDL": "Požiadať o registráciu · úpravu · vymazanie slov · domén · termínov · modelov, hromadnú registráciu, nastavenia, písanie SQL, všetky menu (bez práv na schvaľovanie)",
+      "QLT": "Aplikovať · písanie SQL, menu SQL editor · modelovanie · nastavenia (funkcie diagnostiky kvality v budúcich fázach)",
+      "MIG": "Aplikovať · písanie SQL, menu SQL editor (pre mapovanie migrácie)",
+      "VIEWER": "Len zobrazenie štandardného slovníka"
+    },
+    "plan": {
+      "FREE": "Zadarmo (zobrazenie)",
+      "P1": "Vývojár",
+      "P2": "Manažér štandardov",
+      "P3": "Modelár",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Registrovať",
+      "UPD": "Upraviť",
+      "DEL": "Vymazať"
+    },
+    "tgt": {
+      "AREA": "Klasifikačný systém",
+      "MBR": "Člen",
+      "DIC": "Slovo",
+      "DOM": "Doména",
+      "DOM_GRP": "Skupina domén",
+      "TERM": "Termín",
+      "CD": "Štandardný kód",
+      "CD_VAL": "Hodnota kódu",
+      "ABBR": "Skratka",
+      "PRJ": "Projekt",
+      "SUBJ": "Predmetná oblasť",
+      "ENT": "Entita",
+      "REL": "Vzťah",
+      "ATTR": "Atribút",
+      "VER": "Verzia modelu",
+      "PHY": "Fyzický model",
+      "DDL": "Vykonanie DDL",
+      "RVS": "Reverzné inžinierstvo",
+      "SQL": "SQL",
+      "DBCN": "DB pripojenie",
+      "AGT": "Agent",
+      "MONURL": "Monitorovanie URL"
+    }
+  }
+}

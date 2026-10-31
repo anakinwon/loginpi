@@ -2,7 +2,7 @@
 import { piFetch } from '@pi/auth/client'
 // 멤버 화면 — 분류체계 참여자 목록·역할 즉시 변경(PATCH), 멤버 추가(가입된 Pi 사용자명 기준), 역할·요금제 권한표(2026-10-18 마스터 표)
 //  변경·추가 = 설정 권한(역할 ∩ 요금제), 본인 역할보다 권한이 많은 역할은 고를 수 없음(canAssign)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
 import { canAssign, PLAN_NM, PLAN_PERMS, PLANS, ROLE_DESC, ROLE_NM, ROLE_PERMS, ROLES, type MbrRole, type Perm } from '@/lib/roles'
 

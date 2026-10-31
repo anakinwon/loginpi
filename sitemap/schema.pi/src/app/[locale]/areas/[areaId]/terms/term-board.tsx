@@ -1,7 +1,7 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
 // 표준용어 조회·등록·수정·삭제(클라이언트) — /terms/analyze(분해 후보), /terms(목록 : page·size·상태 필터, 등록), /terms/[termId](도메인·설명 수정, 삭제 : ver_no), /domains(도메인 선택지 : 승인완료만)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, ApvFields, ApvLink, SeCell, SeFilter, SeSelect, StsCell, StsFilter, confirmSave, noEnterSubmit } from '../words/word-board'

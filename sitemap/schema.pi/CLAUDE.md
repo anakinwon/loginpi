@@ -45,7 +45,8 @@ corepack pnpm@11.4.0 db:seed [-- --dry-run]      # DA#_META/SQLiteDB_v5.db → D
 | `scripts/` | `db-migrate.mjs`, `db-seed.mjs` |
 | `src/lib/` | `db.ts`(서버 전용 클라이언트), `api.ts`(오류 카탈로그·역할 확인·감사 이력), 업무 규칙(`dom-name`·`term-split`·`term`·`domain`·`change`·`settings`·`simple-crud`) |
 | `src/app/api/` | REST 라우트(파일은 HTTP 메서드 함수만 export : 공용 스키마·함수는 `src/lib`) |
-| `src/app/areas/[areaId]/` | 화면(words·domains·terms·approvals·members·settings) |
+| `src/app/[locale]/areas/[areaId]/` | 화면(words·domains·terms·approvals·members·settings) — 화면은 전부 `[locale]` 아래(다국어, 2026-10-31) |
+| `messages/` · `i18n.config.json` · `src/i18n/` | 다국어(`@pi/i18n` 표준, 루트 `docs/I18N_STANDARD.md`) : `ko.json` 정본 → `pnpm i18n:translate`(바뀐 키만 Gemini) → `pnpm i18n:validate`(build 에 포함). 하드코딩 한글 백로그 `docs/I18N_BACKLOG.md`(`pnpm i18n:audit`) |
 | `test/` | 업무 규칙 단위 테스트 |
 
 ## 업무 규칙(구현 기준)
@@ -83,5 +84,5 @@ corepack pnpm@11.4.0 db:seed [-- --dry-run]      # DA#_META/SQLiteDB_v5.db → D
 - **prettier·포맷 명령 금지**(2026-10-24 사고) : 이 앱은 prettier 를 쓰지 않는 긴 줄 스타일 — 루트 `.prettierrc`(printWidth 80)로 돌리면 파일 전체가 재포맷된다(18개 파일 +3263/−647). 수정은 주변 줄 모양 그대로, 커밋 전 `git diff --stat` 로 변경량이 수정 내용과 맞는지 확인
 - 이 PC DRM이 새로 생성된 Office·PDF·일부 파일을 `.exs`로 암호화 : `.exs`·`" 2.exs"` 파일은 스테이징 금지, 파일은 개별 지정 스테이징
 - 폴더명 `DA#_META`의 `#` : SQLite를 `file:` URI로 열면 `#` 뒤가 잘려 빈 DB가 생성됨 → 일반 경로로 연다
-- 로그인(2026-10-16) : Pi Browser = Pi SDK(`src/lib/auth.ts` `getSessionUser`, `@pi/auth` 세션 ↔ `sys_user`, `pi_usr_nm` 불변키) / 일반 브라우저 = Google NextAuth(`src/auth.ts`, sitemap.pi 방식) — **Google 단독 계정 생성 없음**, Pi Browser에서 발급한 6자리 연동 코드(`/link`, `sql/020` `sys_auth_lnk_cd`)를 입력해 `sys_usr_auth_lnk`로 결합. 통합 판정은 `getAppUser`(Pi 우선) → `currentUser()`. 클라이언트는 `useAppUser`(`src/app/google-auth.tsx`)·`LoginGate`(UA 판정 금지·redirect 금지). API 호출은 `fetch` 대신 **`piFetch`**. Pi Sign-In(OAuth)은 미구현. env : `AUTH_SECRET`·`GOOGLE_CLIENT_ID`·`GOOGLE_CLIENT_SECRET`(셋 모두, 버튼 플래그 `NEXT_PUBLIC_GOOGLE_LOGIN`은 next.config 가 셋에서 빌드 때 파생), Google Console Redirect URI `<origin>/api/auth/callback/google`
-- `src/proxy.ts` 는 무동작 자리표시자 — 삭제 금지(저장소 루트 `src/middleware.ts` 가 이 앱 미들웨어로 번들돼 `/` 404, next.config 주석 참조)
+- 로그인(2026-10-16) : Pi Browser = Pi SDK(`src/lib/auth.ts` `getSessionUser`, `@pi/auth` 세션 ↔ `sys_user`, `pi_usr_nm` 불변키) / 일반 브라우저 = Google NextAuth(`src/auth.ts`, sitemap.pi 방식) — **Google 단독 계정 생성 없음**, Pi Browser에서 발급한 6자리 연동 코드(`/link`, `sql/020` `sys_auth_lnk_cd`)를 입력해 `sys_usr_auth_lnk`로 결합. 통합 판정은 `getAppUser`(Pi 우선) → `currentUser()`. 클라이언트는 `useAppUser`(`src/app/[locale]/google-auth.tsx`)·`LoginGate`(UA 판정 금지·redirect 금지). API 호출은 `fetch` 대신 **`piFetch`**. Pi Sign-In(OAuth)은 미구현. env : `AUTH_SECRET`·`GOOGLE_CLIENT_ID`·`GOOGLE_CLIENT_SECRET`(셋 모두, 버튼 플래그 `NEXT_PUBLIC_GOOGLE_LOGIN`은 next.config 가 셋에서 빌드 때 파생), Google Console Redirect URI `<origin>/api/auth/callback/google`
+- `src/proxy.ts` = next-intl locale 접두사 처리(2026-10-31, 이전 무동작 자리표시자) — 삭제 금지(없으면 저장소 루트 `src/middleware.ts` 가 이 앱 미들웨어로 번들돼 `/` 404, next.config 주석 참조). 화면 링크는 `next/link` 대신 `@/i18n/navigation` 의 `Link`·`useRouter`·`usePathname`(locale 접두사 유지)

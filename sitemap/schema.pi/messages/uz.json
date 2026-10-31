@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Maʼlumotlar standarti lugʻati meta tizimi"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Tilni oʻzgartirish",
+      "search": "Tilni qidirish",
+      "empty": "Qidiruv natijalari yoʻq"
+    },
+    "loading": "Yuklanmoqda…",
+    "requestFailed": "Soʻrov bajarilmadi",
+    "home": "Bosh sahifa",
+    "goHome": "Bosh sahifaga oʻtish"
+  },
+  "home": {
+    "subtitle": "Maʼlumotlar standarti lugʻati meta tizimi"
+  },
+  "auth": {
+    "checking": "Kirish tekshirilmoqda…",
+    "googleUnlinked": "Google orqali kirdingiz, ammo u hali Pi hisobingizga ulanmagan.",
+    "required": "Kirish talab qilinadi.",
+    "requiredHint": "Kirish talab qilinadi. Pi Browser da Pi hisobingiz orqali yoki oddiy brauzerda Google (Pi hisobini ulash talab qilinadi) orqali kiring.",
+    "piSignIn": "Pi hisobi orqali kirish",
+    "googleSignIn": "Google orqali kirish",
+    "signOut": "Chiqish",
+    "linkCheckFailed": "Ulanish holatini tekshirib boʻlmadi (vaqtinchalik xato). Iltimos, birozdan keyin sahifani yangilang."
+  },
+  "link": {
+    "title": "Hisobni ulash",
+    "desc": "Pi Browser dagi Pi hisobingizni oddiy brauzerdagi Google hisobingiz bilan bir xil foydalanuvchi sifatida bogʻlaydi. Ulangandan soʻng, kompyuterda faqat Google orqali kirish orqali ishlashingiz mumkin.",
+    "codeFormTitle": "Pi hisobini ulash kodini kiriting",
+    "codeFormHint": "Pi Browser da kirganingizdan soʻng, hisobni ulash ekranida berilgan 6 xonali kodni 10 daqiqa ichida kiriting.",
+    "codeLabel": "Ulash kodi",
+    "linked": "Ulandi.",
+    "submit": "Ulash",
+    "issuerTitle": "Google hisobini ulash kodini berish",
+    "issuerHint": "Oddiy brauzerda Google orqali kirganingizdan soʻng, ushbu kodni kiritib, bir xil foydalanuvchi sifatida ulanasiz (10 daqiqa davomida amal qiladi).",
+    "minutesLeft": "Taxminan {minutes} daqiqa qoldi",
+    "issue": "Kod berish",
+    "reissue": "Qayta berish",
+    "linkedAs": "Google hisobingiz Pi foydalanuvchisi <b>{name}</b> bilan bogʻlangan."
+  },
+  "intro": {
+    "kicker": "Maʼlumotlar standarti lugʻati meta tizimi",
+    "headline1": "Standartlarsiz nom bera olmaysiz,",
+    "headline2": "modellarsiz jadval yarata olmaysiz.",
+    "lead": "Tasdiqlangan standart soʻzlar bilan atamalar yarating, shu atamalar bilan modellar chizing va modellardan DDL yarating. Odamlar qaror qiladi, vositalar qoidalarga rioya qiladi.",
+    "flowTitle": "Bu shunday bogʻlanadi",
+    "step": "{n}-qadam",
+    "flow": {
+      "words": {
+        "nm": "Standart soʻzlar",
+        "desc": "Soʻzlar · Qisqartmalar · Taqiqlangan soʻzlar"
+      },
+      "domains": {
+        "nm": "Standart domenlar",
+        "desc": "Tur · Uzunlik qoidalari"
+      },
+      "terms": {
+        "nm": "Standart atamalar",
+        "desc": "Soʻz birikmasi · Tasdiqlash"
+      },
+      "model": {
+        "nm": "Maʼlumotlar modeli",
+        "desc": "Konseptual · Mantiqiy · Fizik"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Mavzu sohasi boʻyicha · Versiyalarni taqqoslash"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "DBMS boʻyicha yaratish · Bajarishni tasdiqlash"
+      }
+    },
+    "roleTitle": "Rol boʻyicha nimalar qila olasiz",
+    "planTitle": "Narxlar rejalari",
+    "planNote": "— Tasniflash tizimi birligi uchun Pi toʻlovi, narx toʻlov ekranida tasdiqlanadi",
+    "menu": {
+      "MENU_STD": "Standart lugʻat",
+      "MENU_SQL": "SQL muharriri",
+      "MENU_SET": "Sozlamalar · Tarix",
+      "MENU_BAN": "Taqiqlangan soʻzlar",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Standartni tekshirish",
+      "MENU_ADM": "Aʼzolar · Tasdiqlashlar"
+    },
+    "viewOnly": "{menu} (Faqat koʻrish)",
+    "footer": "Yuqorida kirsangiz, tasniflash tizimingiz uchun vazifalaringizni darhol koʻrasiz."
+  },
+  "dashboard": {
+    "loadFailed": "Boshqaruv panelini yuklab boʻlmadi",
+    "myAreas": "Mening tasniflash tizimlarim",
+    "planLine": "Reja {plan}",
+    "until": " · {date} gacha",
+    "grace": "(Imtiyozli davr)",
+    "openArea": "Tasniflash tizimini ochish →",
+    "todoTitle": "Mening navbatim",
+    "todoEmpty": "Faqat koʻrish ruxsati — iltimos, quyidagi holat va yorliqlar orqali standartlarni koʻrib chiqing.",
+    "apvWait": "Standart tasdiqlash kutilmoqda",
+    "apvWaitSub": "Soʻz · Domen · Atama · Kod arizasi",
+    "ddlWait": "DDL bajarish tasdiqlash kutilmoqda",
+    "mineWait": "Mening arizalarim kutilmoqda",
+    "mineRejected": "Oxirgi 30 kunda {count} ta rad etildi",
+    "model": "Maʼlumotlar modeli",
+    "modelSub": "Loyihalar · {count} ta obyekt",
+    "stdTitle": "Standart lugʻat holati",
+    "stdBasis": "Tasdiqlangan asos",
+    "shortcuts": "Yorliqlar",
+    "recentTitle": "Soʻnggi oʻzgarishlar",
+    "allHistory": "Toʻliq tarix",
+    "noHistory": "Hali oʻzgarishlar tarixi yoʻq",
+    "justNow": "Hozirgina",
+    "minutesAgo": "{n} daqiqa oldin",
+    "hoursAgo": "{n} soat oldin",
+    "daysAgo": "{n} kun oldin",
+    "areaList": "Tasniflash tizimi roʻyxati · Yangi yaratish"
+  },
+  "areaHome": {
+    "title": "Mening standart tasniflash tizimlarim",
+    "loading": "Yuklanmoqda",
+    "empty": "Ishtirok etayotgan tasniflash tizimlari yoʻq",
+    "open": "Ochish",
+    "newTitle": "Yangi tasniflash tizimi",
+    "namePlaceholder": "Tasniflash tizimi nomi (majburiy)",
+    "descPlaceholder": "Tavsif",
+    "create": "Yaratish",
+    "created": "Tasniflash tizimi {name} yaratildi"
+  },
+  "nav": {
+    "label": "Tasniflash tizimi menyusi",
+    "expand": "Pastki menyuni kengaytirish",
+    "expandWith": "Pastki menyuni kengaytirish ({menu})",
+    "collapse": "Pastki menyuni yigʻish",
+    "subOf": "{menu} kichik funksiyalari",
+    "groupTech": "Monitoring · SQL muharriri",
+    "groupStd": "Standart lugʻat",
+    "groupModel": "Model",
+    "groupSet": "Sozlamalar",
+    "groupPlan": "Toʻlov",
+    "words": "Standart soʻzlar",
+    "bulk": "Ommaviy roʻyxatdan oʻtkazish",
+    "domains": "Standart domenlar",
+    "keyDomains": "Asosiy domenlar",
+    "domainGroups": "Domen guruhlari",
+    "terms": "Standart atamalar",
+    "codes": "Standart kodlar",
+    "model": "Konseptual model",
+    "prj": "Loyihalar",
+    "subj": "Mavzu sohalari",
+    "coreEnt": "Asosiy obyektlar",
+    "entityClasses": "Obyekt tasniflagichlari",
+    "logical": "Mantiqiy model",
+    "physical": "Fizik model",
+    "erd": "ERD",
+    "ddl": "DDL yaratish",
+    "monitor": "Monitoring",
+    "monApp": "Ilova",
+    "monSrv": "Server",
+    "monDb": "Maʼlumotlar bazasi",
+    "monUrl": "URL",
+    "monFix": "AI tuzatish tarixi",
+    "sql": "SQL muharriri",
+    "settings": "Sozlamalar",
+    "history": "Tarix",
+    "forbidden": "Taqiqlangan soʻzlar",
+    "banBulk": "Taqiqlangan soʻzlarni ommaviy roʻyxatdan oʻtkazish",
+    "check": "Standartni tekshirish",
+    "reverse": "Teskari muhandislik",
+    "members": "Aʼzolar",
+    "approvals": "Tasdiqlashlar",
+    "plan": "Toʻlov"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Tizim administratori",
+      "DA": "Maʼlumotlar arxitektori",
+      "STD": "Standart menejeri",
+      "MDL": "Modellashtiruvchi",
+      "QLT": "Sifat menejeri",
+      "MIG": "Migratsiya menejeri",
+      "VIEWER": "Tomoshabin"
+    },
+    "roleDesc": {
+      "SYS": "Tasniflash tizimi sozlamalari · domen guruhlari · qisqartmalar · aʼzolarni boshqarish, arizalar · tasdiqlashlar (shu jumladan darhol tasdiqlash), ommaviy roʻyxatdan oʻtkazish, SQL yozish, barcha menyular",
+      "DA": "Umumiy standart siyosat: Soʻzlar · domenlar · atamalarni qoʻllash · tasdiqlash (ariza berishda darhol tasdiqlashni tanlash mumkin), ommaviy roʻyxatdan oʻtkazish, sozlamalar · aʼzolarni boshqarish, SQL yozish, barcha menyular",
+      "STD": "Soʻzlar · domenlar · atamalar uchun ariza berish, ommaviy roʻyxatdan oʻtkazish, sozlamalar, SQL yozish, barcha menyular (tasdiqlash huquqisiz)",
+      "MDL": "Soʻzlar · domenlar · atamalar · modellarni roʻyxatdan oʻtkazish · oʻzgartirish · oʻchirish uchun ariza berish, ommaviy roʻyxatdan oʻtkazish, sozlamalar, SQL yozish, barcha menyular (tasdiqlash huquqisiz)",
+      "QLT": "Ariza berish · SQL yozish, SQL muharriri · modellashtirish · sozlamalar menyulari (sifat diagnostikasi funksiyalari keyingi bosqichlarda)",
+      "MIG": "Ariza berish · SQL yozish, SQL muharriri menyusi (migratsiya xaritalash uchun)",
+      "VIEWER": "Faqat standart lugʻatni koʻrish"
+    },
+    "plan": {
+      "FREE": "Bepul (Koʻrish)",
+      "P1": "Dasturchi",
+      "P2": "Standart menejeri",
+      "P3": "Modellashtiruvchi",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Roʻyxatdan oʻtkazish",
+      "UPD": "Oʻzgartirish",
+      "DEL": "Oʻchirish"
+    },
+    "tgt": {
+      "AREA": "Tasniflash tizimi",
+      "MBR": "Aʼzo",
+      "DIC": "Soʻz",
+      "DOM": "Domen",
+      "DOM_GRP": "Domen guruhi",
+      "TERM": "Atama",
+      "CD": "Standart kod",
+      "CD_VAL": "Kod qiymati",
+      "ABBR": "Qisqartma",
+      "PRJ": "Loyihalar",
+      "SUBJ": "Mavzu sohasi",
+      "ENT": "Obyekt",
+      "REL": "Munosabat",
+      "ATTR": "Atribut",
+      "VER": "Model versiyasi",
+      "PHY": "Fizik model",
+      "DDL": "DDL bajarish",
+      "RVS": "Teskari muhandislik",
+      "SQL": "SQL",
+      "DBCN": "DB ulanishi",
+      "AGT": "Agent",
+      "MONURL": "URL monitoringi"
+    }
+  }
+}

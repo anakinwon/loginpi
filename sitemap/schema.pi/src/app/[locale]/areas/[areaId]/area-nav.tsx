@@ -15,13 +15,16 @@
 //   · 요금제 = 설정 오른쪽 독립 메인 메뉴, 권한 무관(멤버면 항상 — 결제 전에도 들어가야 함, 마스터 지시 2026-10-19)
 //  좁은 화면은 가로 스크롤(줄바꿈 없이 한 줄 유지)
 import { piFetch } from '@pi/auth/client'
-import Link from 'next/link'
-import { useParams, usePathname, useSearchParams } from 'next/navigation'
+import { Link } from '@/i18n/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
+import { usePathname } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronUp, type LucideIcon } from 'lucide-react'
 import { MENU_ICON as I, TONE, type Tone } from '@/lib/menu-icons'
 import type { Perm } from '@/lib/roles'
 
+// nm = 화면 이름의 번역 키(messages nav.<nm>)
 interface Item {
   seg: string
   nm: string
@@ -33,41 +36,41 @@ interface Item {
 const CORE: Item[] = [
   {
     seg: 'words',
-    nm: '표준단어',
+    nm: 'words',
     icon: I.words,
     subs: [
-      { seg: 'words', nm: '표준단어' },
-      { seg: 'bulk', nm: '일괄등록', perm: 'BULK', tab: 'words' },
+      { seg: 'words', nm: 'words' },
+      { seg: 'bulk', nm: 'bulk', perm: 'BULK', tab: 'words' },
     ],
   },
   {
     seg: 'domains',
-    nm: '표준도메인',
+    nm: 'domains',
     icon: I.domains,
     subs: [
-      { seg: 'domains', nm: '표준도메인' },
-      { seg: 'key-domains', nm: '대표도메인' },
-      { seg: 'domain-groups', nm: '도메인그룹' },
-      { seg: 'bulk', nm: '일괄등록', perm: 'BULK', tab: 'domains' },
+      { seg: 'domains', nm: 'domains' },
+      { seg: 'key-domains', nm: 'keyDomains' },
+      { seg: 'domain-groups', nm: 'domainGroups' },
+      { seg: 'bulk', nm: 'bulk', perm: 'BULK', tab: 'domains' },
     ],
   },
   {
     seg: 'terms',
-    nm: '표준용어',
+    nm: 'terms',
     icon: I.terms,
     subs: [
-      { seg: 'terms', nm: '표준용어' },
-      { seg: 'bulk', nm: '일괄등록', perm: 'BULK', tab: 'terms' },
+      { seg: 'terms', nm: 'terms' },
+      { seg: 'bulk', nm: 'bulk', perm: 'BULK', tab: 'terms' },
     ],
   },
   // 표준코드(공통코드) = 표준용어 오른쪽 독립 메인 메뉴, 서브 = 표준코드·일괄등록(마스터 지시 2026-10-20)
   {
     seg: 'codes',
-    nm: '표준코드',
+    nm: 'codes',
     icon: I.codes,
     subs: [
-      { seg: 'codes', nm: '표준코드' },
-      { seg: 'bulk', nm: '일괄등록', perm: 'BULK', tab: 'codes' },
+      { seg: 'codes', nm: 'codes' },
+      { seg: 'bulk', nm: 'bulk', perm: 'BULK', tab: 'codes' },
     ],
   },
 ]
@@ -76,24 +79,24 @@ const CORE: Item[] = [
 const MODEL: Item[] = [
   {
     seg: 'model',
-    nm: '개념 모델',
+    nm: 'model',
     icon: I.model,
     subs: [
-      { seg: 'model', nm: '프로젝트', tab: 'prj' },
-      { seg: 'model', nm: '주제영역', tab: 'subj' },
-      { seg: 'model', nm: '핵심엔터티', tab: 'ent' },
-      { seg: 'entity-classes', nm: '엔터티 분류어' },
+      { seg: 'model', nm: 'prj', tab: 'prj' },
+      { seg: 'model', nm: 'subj', tab: 'subj' },
+      { seg: 'model', nm: 'coreEnt', tab: 'ent' },
+      { seg: 'entity-classes', nm: 'entityClasses' },
     ],
   },
-  { seg: 'logical', nm: '논리 모델', icon: I.logical },
+  { seg: 'logical', nm: 'logical', icon: I.logical },
   {
     seg: 'physical',
-    nm: '물리 모델',
+    nm: 'physical',
     icon: I.physical,
     subs: [
-      { seg: 'physical', nm: '물리 모델' },
-      { seg: 'erd', nm: 'ERD' },
-      { seg: 'ddl', nm: 'DDL 생성' },
+      { seg: 'physical', nm: 'physical' },
+      { seg: 'erd', nm: 'erd' },
+      { seg: 'ddl', nm: 'ddl' },
     ],
   },
 ]
@@ -103,20 +106,20 @@ const SQLED: Item[] = [
   // 모니터링(2026-10-21, WhaTap 4종 심플) — 기술 메뉴라 SQL 편집기 옆, 권한 MON_VIEW(요금제1~ SQL 메뉴 보유 역할)
   {
     seg: 'monitor',
-    nm: '모니터링',
+    nm: 'monitor',
     icon: I.monitor,
     perm: 'MON_VIEW',
     subs: [
-      { seg: 'monitor', nm: '애플리케이션', perm: 'MON_AI', tab: 'app' },
-      { seg: 'monitor', nm: '서버', tab: 'srv' },
-      { seg: 'monitor', nm: '데이터베이스', tab: 'db' },
-      { seg: 'monitor', nm: 'URL', tab: 'url' },
-      { seg: 'monitor', nm: 'AI 수정 이력', perm: 'MON_AI', tab: 'fix' },
+      { seg: 'monitor', nm: 'monApp', perm: 'MON_AI', tab: 'app' },
+      { seg: 'monitor', nm: 'monSrv', tab: 'srv' },
+      { seg: 'monitor', nm: 'monDb', tab: 'db' },
+      { seg: 'monitor', nm: 'monUrl', tab: 'url' },
+      { seg: 'monitor', nm: 'monFix', perm: 'MON_AI', tab: 'fix' },
     ],
   },
   {
     seg: 'sql',
-    nm: 'SQL 편집기',
+    nm: 'sql',
     icon: I.sql,
     perm: 'SQL_QUERY',
   },
@@ -125,29 +128,29 @@ const SQLED: Item[] = [
 const REST: Item[] = [
   {
     seg: 'settings',
-    nm: '설정',
+    nm: 'settings',
     icon: I.settings,
     subs: [
       // 설정 서브메뉴 × 요금제(마스터 표 2026-10-19) : 개발자 설정·이력 / 표준담당자 + 금칙어·일괄 / 모델러 + 표준 점검·리버스 / DA + 멤버·승인
-      { seg: 'settings', nm: '설정', perm: 'SET_VIEW' },
-      { seg: 'history', nm: '이력', perm: 'SET_VIEW' },
-      { seg: 'forbidden', nm: '금칙어', perm: 'BAN_VIEW' },
+      { seg: 'settings', nm: 'settings', perm: 'SET_VIEW' },
+      { seg: 'history', nm: 'history', perm: 'SET_VIEW' },
+      { seg: 'forbidden', nm: 'forbidden', perm: 'BAN_VIEW' },
       {
         seg: 'bulk',
-        nm: '금칙어 일괄등록',
+        nm: 'banBulk',
         perm: 'BAN_EDIT',
         tab: 'forbidden',
       },
-      { seg: 'check', nm: '표준 점검', perm: 'CHK_VIEW' },
-      { seg: 'reverse', nm: '리버스', perm: 'CHK_VIEW' },
-      { seg: 'members', nm: '멤버', perm: 'ADM_VIEW' },
-      { seg: 'approvals', nm: '승인', perm: 'ADM_VIEW' },
+      { seg: 'check', nm: 'check', perm: 'CHK_VIEW' },
+      { seg: 'reverse', nm: 'reverse', perm: 'CHK_VIEW' },
+      { seg: 'members', nm: 'members', perm: 'ADM_VIEW' },
+      { seg: 'approvals', nm: 'approvals', perm: 'ADM_VIEW' },
     ],
   },
 ]
 
 // 요금제 — 권한 무관 독립 메뉴(설정 오른쪽)
-const PLAN_ITEM: Item = { seg: 'plan', nm: '결제', icon: I.plan }
+const PLAN_ITEM: Item = { seg: 'plan', nm: 'plan', icon: I.plan }
 
 // 메뉴 묶음 박스 — 묶음별 무채색 계열 색감(마스터 지시 2026-10-21, src/lib/menu-icons TONE)
 const group = (t: Tone) => `flex shrink-0 gap-1 rounded-md border p-0.5 ${t.box}`
@@ -166,6 +169,7 @@ export default function AreaNav() {
   const pathname = usePathname()
   const curTab = useSearchParams().get('tab')
   const [perms, setPerms] = useState<Perm[]>([])
+  const t = useTranslations('nav')
 
   useEffect(() => {
     let alive = true
@@ -270,18 +274,18 @@ export default function AreaNav() {
     }
   }, [])
 
-  const item = (t: Tone) => (m: Item) => (
+  const item = (tone: Tone) => (m: Item) => (
     <li key={m.seg}>
       <Link
         href={hrefOf(m)}
         aria-current={isOn(m) ? 'page' : undefined}
-        className={tab(isOn(m), t)}
-        title={m.nm}
+        className={tab(isOn(m), tone)}
+        title={t(m.nm)}
       >
-        <span aria-hidden className={tile(isOn(m), t)}>
+        <span aria-hidden className={tile(isOn(m), tone)}>
           <m.icon className="h-4 w-4" strokeWidth={1.5} />
         </span>
-        <span className="text-[11px] leading-none">{m.nm}</span>
+        <span className="text-[11px] leading-none">{t(m.nm)}</span>
       </Link>
     </li>
   )
@@ -289,7 +293,7 @@ export default function AreaNav() {
   return (
     <nav
       ref={navRef}
-      aria-label="분류체계 메뉴"
+      aria-label={t('label')}
       className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 backdrop-blur"
     >
       {/* 접기·펼치기 손잡이 — 본문과 하단 메뉴 사이 선 중앙에 화살표만(마스터 지시 2026-10-20), 서브 바를 가리지 않게 선 위에 얹음 */}
@@ -299,10 +303,12 @@ export default function AreaNav() {
         aria-expanded={!fold}
         aria-label={
           fold
-            ? `하단 메뉴 펼치기${cur ? ` (${cur.nm})` : ''}`
-            : '하단 메뉴 접기'
+            ? cur
+              ? t('expandWith', { menu: t(cur.nm) })
+              : t('expand')
+            : t('collapse')
         }
-        title={fold ? '하단 메뉴 펼치기' : '하단 메뉴 접기'}
+        title={fold ? t('expand') : t('collapse')}
         className="absolute bottom-full left-1/2 flex h-4 w-12 -translate-x-1/2 items-center justify-center rounded-t-md border border-b-0 bg-white text-gray-500 shadow-[0_-1px_2px_rgba(15,23,42,0.06)] hover:bg-gray-100 hover:text-gray-800"
       >
         {fold ? (
@@ -315,7 +321,7 @@ export default function AreaNav() {
         <div className="relative h-9">
           <ul
             ref={subRef}
-            aria-label={`${active.nm} 하위 기능`}
+            aria-label={t('subOf', { menu: t(active.nm) })}
             style={{
               left: subX ?? 0,
               visibility: subX == null ? 'hidden' : undefined,
@@ -329,7 +335,7 @@ export default function AreaNav() {
                   aria-current={subOn(s) ? 'page' : undefined}
                   className={`block rounded px-2.5 py-1 ${subOn(s) ? `${subTone.on} font-semibold text-white` : `${subTone.text} hover:bg-white/70`}`}
                 >
-                  {s.nm}
+                  {t(s.nm)}
                 </Link>
               </li>
             ))}
@@ -340,27 +346,27 @@ export default function AreaNav() {
         <div ref={rowRef} className="w-full overflow-x-auto px-2 py-1.5">
           <div className="mx-auto flex w-max items-center gap-2 whitespace-nowrap">
             {visible(SQLED).length > 0 && (
-              <ul aria-label="모니터링·SQL 편집기" data-sub-align="item" className={group(TONE.tech)}>
+              <ul aria-label={t('groupTech')} data-sub-align="item" className={group(TONE.tech)}>
                 {visible(SQLED).map(item(TONE.tech))}
               </ul>
             )}
             {/* 메뉴 묶음 = 메뉴 권한(2 표준·3 모델링·4 설정)이 있을 때만 — 역할 ∩ 요금제 */}
             {allowed('STD_VIEW') && (
-              <ul aria-label="표준사전" data-sub-align="left" className={group(TONE.std)}>
+              <ul aria-label={t('groupStd')} data-sub-align="left" className={group(TONE.std)}>
                 {visible(CORE).map(item(TONE.std))}
               </ul>
             )}
             {allowed('MODEL_VIEW') && (
-              <ul aria-label="모델" data-sub-align="right" className={group(TONE.model)}>
+              <ul aria-label={t('groupModel')} data-sub-align="right" className={group(TONE.model)}>
                 {visible(MODEL).map(item(TONE.model))}
               </ul>
             )}
             {allowed('SET_VIEW') && (
-              <ul aria-label="설정" data-sub-align="right" className={group(TONE.set)}>
+              <ul aria-label={t('groupSet')} data-sub-align="right" className={group(TONE.set)}>
                 {visible(REST).map(item(TONE.set))}
               </ul>
             )}
-            <ul aria-label="결제" className={group(TONE.plan)}>
+            <ul aria-label={t('groupPlan')} className={group(TONE.plan)}>
               {item(TONE.plan)(PLAN_ITEM)}
             </ul>
           </div>

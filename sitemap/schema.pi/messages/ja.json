@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "データ標準辞書メタシステム"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "言語変更",
+      "search": "言語検索",
+      "empty": "検索結果がありません"
+    },
+    "loading": "読み込み中…",
+    "requestFailed": "リクエストに失敗しました",
+    "home": "ホーム",
+    "goHome": "ホームへ"
+  },
+  "home": {
+    "subtitle": "データ標準辞書メタシステム"
+  },
+  "auth": {
+    "checking": "ログイン確認中…",
+    "googleUnlinked": "Googleログインは完了しましたが、Piアカウントとまだ連携されていません。",
+    "required": "ログインが必要です。",
+    "requiredHint": "ログインが必要です。Pi BrowserではPiアカウントで、通常のブラウザではGoogle（Piアカウント連携が必要）でログインしてください。",
+    "piSignIn": "Piアカウントでログイン",
+    "googleSignIn": "Googleログイン",
+    "signOut": "ログアウト",
+    "linkCheckFailed": "連携状態を確認できませんでした（一時的なエラー）。しばらくしてから再読み込みしてください。"
+  },
+  "link": {
+    "title": "アカウント連携",
+    "desc": "Pi BrowserのPiアカウントと、通常のブラウザのGoogleアカウントを同じユーザーとして連携します。連携後はPCでGoogleログインのみで作業できます。",
+    "codeFormTitle": "Piアカウント連携コード入力",
+    "codeFormHint": "Pi Browserでログイン後、アカウント連携画面で発行された6桁のコードを10分以内に入力してください。",
+    "codeLabel": "連携コード",
+    "linked": "連携されました。",
+    "submit": "連携",
+    "issuerTitle": "Googleアカウント連携コード発行",
+    "issuerHint": "通常のブラウザでGoogleログイン後、このコードを入力すると同じユーザーとして連携されます（10分間有効）。",
+    "minutesLeft": "残り時間 約 {minutes}分",
+    "issue": "コード発行",
+    "reissue": "再発行",
+    "linkedAs": "GoogleアカウントはPiユーザー <b>{name}</b> と連携されています。"
+  },
+  "intro": {
+    "kicker": "データ標準辞書メタシステム",
+    "headline1": "標準がなければ名前は作れず、",
+    "headline2": "モデルがなければテーブルは作れません。",
+    "lead": "承認された標準単語で用語を作成し、その用語でモデルを描き、モデルからDDLを生成します。人が決定し、ツールはルールを守ります。",
+    "flowTitle": "このように続きます",
+    "step": "{n}ステップ",
+    "flow": {
+      "words": {
+        "nm": "標準単語",
+        "desc": "単語・略語・禁止語"
+      },
+      "domains": {
+        "nm": "標準ドメイン",
+        "desc": "タイプ・長さ規則"
+      },
+      "terms": {
+        "nm": "標準用語",
+        "desc": "単語結合・承認"
+      },
+      "model": {
+        "nm": "データモデル",
+        "desc": "概念・論理・物理"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "主題領域別・バージョン比較"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "DBMS別生成・承認実行"
+      }
+    },
+    "roleTitle": "役割別にできること",
+    "planTitle": "料金プラン",
+    "planNote": "— 分類体系単位でPi決済、価格は決済画面で確認",
+    "menu": {
+      "MENU_STD": "標準辞書",
+      "MENU_SQL": "SQLエディタ",
+      "MENU_SET": "設定・履歴",
+      "MENU_BAN": "禁止語",
+      "MENU_MODEL": "モデル・ERD・DDL",
+      "MENU_CHK": "標準点検",
+      "MENU_ADM": "メンバー・承認"
+    },
+    "viewOnly": "{menu}（閲覧）",
+    "footer": "上記でログインすると、自分の分類体系のToDoがすぐに表示されます。"
+  },
+  "dashboard": {
+    "loadFailed": "ダッシュボードを読み込めませんでした",
+    "myAreas": "自分の分類体系",
+    "planLine": "料金プラン {plan}",
+    "until": " · {date}まで",
+    "grace": "(期限切れ猶予中)",
+    "openArea": "分類体系を開く →",
+    "todoTitle": "自分の番",
+    "todoEmpty": "閲覧権限です — 下記の状況とショートカットで標準を検索してください。",
+    "apvWait": "標準承認待ち",
+    "apvWaitSub": "単語・ドメイン・用語・コード申請",
+    "ddlWait": "DDL実行承認待ち",
+    "mineWait": "自分の申請待ち",
+    "mineRejected": "過去30日間の却下 {count}件",
+    "model": "データモデル",
+    "modelSub": "プロジェクト・エンティティ {count}個",
+    "stdTitle": "標準辞書状況",
+    "stdBasis": "承認完了基準",
+    "shortcuts": "ショートカット",
+    "recentTitle": "最近の変更",
+    "allHistory": "全履歴",
+    "noHistory": "まだ変更履歴がありません",
+    "justNow": "たった今",
+    "minutesAgo": "{n}分前",
+    "hoursAgo": "{n}時間前",
+    "daysAgo": "{n}日前",
+    "areaList": "分類体系リスト・新規作成"
+  },
+  "areaHome": {
+    "title": "自分の標準分類体系",
+    "loading": "読み込み中",
+    "empty": "参加中の分類体系がありません",
+    "open": "開く",
+    "newTitle": "新しい分類体系",
+    "namePlaceholder": "分類体系名（必須）",
+    "descPlaceholder": "説明",
+    "create": "作成",
+    "created": "分類体系 {name} を作成"
+  },
+  "nav": {
+    "label": "分類体系メニュー",
+    "expand": "下部メニューを展開",
+    "expandWith": "下部メニューを展開 ({menu})",
+    "collapse": "下部メニューを折りたたむ",
+    "subOf": "{menu} の下位機能",
+    "groupTech": "モニタリング・SQLエディタ",
+    "groupStd": "標準辞書",
+    "groupModel": "モデル",
+    "groupSet": "設定",
+    "groupPlan": "決済",
+    "words": "標準単語",
+    "bulk": "一括登録",
+    "domains": "標準ドメイン",
+    "keyDomains": "代表ドメイン",
+    "domainGroups": "ドメイングループ",
+    "terms": "標準用語",
+    "codes": "標準コード",
+    "model": "概念モデル",
+    "prj": "プロジェクト",
+    "subj": "主題領域",
+    "coreEnt": "コアエンティティ",
+    "entityClasses": "エンティティ分類語",
+    "logical": "論理モデル",
+    "physical": "物理モデル",
+    "erd": "ERD",
+    "ddl": "DDL生成",
+    "monitor": "モニタリング",
+    "monApp": "アプリケーション",
+    "monSrv": "サーバー",
+    "monDb": "データベース",
+    "monUrl": "URL",
+    "monFix": "AI修正履歴",
+    "sql": "SQLエディタ",
+    "settings": "設定",
+    "history": "履歴",
+    "forbidden": "禁止語",
+    "banBulk": "禁止語一括登録",
+    "check": "標準点検",
+    "reverse": "リバース",
+    "members": "メンバー",
+    "approvals": "承認",
+    "plan": "決済"
+  },
+  "codes": {
+    "role": {
+      "SYS": "システム担当者",
+      "DA": "データアーキテクト",
+      "STD": "標準担当者",
+      "MDL": "モデラー",
+      "QLT": "品質担当者",
+      "MIG": "移行担当者",
+      "VIEWER": "閲覧者"
+    },
+    "roleDesc": {
+      "SYS": "分類体系設定・ドメイングループ・略語・メンバー管理、申請・承認（即時承認含む）、一括登録、SQL書き込み、すべてのメニュー",
+      "DA": "標準ポリシー統括：単語・ドメイン・用語申請・承認（申請時に即時承認選択可能）、一括登録、設定・メンバー管理、SQL書き込み、すべてのメニュー",
+      "STD": "単語・ドメイン・用語申請、一括登録、設定、SQL書き込み、すべてのメニュー（承認権なし）",
+      "MDL": "単語・ドメイン・用語・モデル登録・修正・削除申請、一括登録、設定、SQL書き込み、すべてのメニュー（承認権なし）",
+      "QLT": "申請・SQL書き込み、SQLエディタ・モデリング・設定メニュー（品質診断機能は今後の段階）",
+      "MIG": "申請・SQL書き込み、SQLエディタメニュー（移行マッピング用）",
+      "VIEWER": "標準辞書閲覧のみ"
+    },
+    "plan": {
+      "FREE": "無料（閲覧）",
+      "P1": "開発者",
+      "P2": "標準担当者",
+      "P3": "モデラー",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "登録",
+      "UPD": "修正",
+      "DEL": "削除"
+    },
+    "tgt": {
+      "AREA": "分類体系",
+      "MBR": "メンバー",
+      "DIC": "単語",
+      "DOM": "ドメイン",
+      "DOM_GRP": "ドメイングループ",
+      "TERM": "用語",
+      "CD": "標準コード",
+      "CD_VAL": "コード値",
+      "ABBR": "略語",
+      "PRJ": "プロジェクト",
+      "SUBJ": "主題領域",
+      "ENT": "エンティティ",
+      "REL": "関係",
+      "ATTR": "属性",
+      "VER": "モデルバージョン",
+      "PHY": "物理モデル",
+      "DDL": "DDL実行",
+      "RVS": "リバース設計",
+      "SQL": "SQL",
+      "DBCN": "DB接続",
+      "AGT": "エージェント",
+      "MONURL": "URLモニタリング"
+    }
+  }
+}

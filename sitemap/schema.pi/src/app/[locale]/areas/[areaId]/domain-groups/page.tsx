@@ -1,7 +1,7 @@
 'use client'
 // 도메인그룹 화면(마스터 지시 2026-10-18) — 하단 메뉴 표준도메인 › 도메인그룹. 설정 화면 도메인그룹 탭과 같은 표·API(/domain-groups)
 // 조회는 전원, 등록·수정·삭제는 설정 권한(시스템담당자·데이터아키텍트, API 확인). 도메인에서 쓰는 그룹은 삭제 불가
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use } from 'react'
 import ItemTable, { GRP_CFG } from '../settings/item-table'
 

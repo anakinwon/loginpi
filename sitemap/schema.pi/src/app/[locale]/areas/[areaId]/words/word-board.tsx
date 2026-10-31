@@ -1,5 +1,6 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
+import { Link } from '@/i18n/navigation'
 // 표준단어 조회·등록·수정·삭제(클라이언트) — /api/areas/[areaId]/words(목록·등록·상태 필터), /words/[dicId](수정·삭제, ver_no 낙관적 잠금), /check(입력 중 중복 검사), /suggest(논리명 입력 시 물리명·영문풀네임·한자·설명 자동 채움, 저장 안 함)
 // 승인 절차 : 등록·수정·삭제는 승인 신청, 즉시 승인 선택은 SYS·DA(요금제4)만(기본 끔), 조회 전용 역할은 등록 영역 비활성
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -238,18 +239,18 @@ export default function WordBoard({ areaId }: { areaId: string }) {
           {text('dic_chn_nm', '한자', { maxLength: 200 })}
           <p className="self-center text-xs text-gray-500 md:col-span-2">
             금칙어·이음동의어(이 단어 대신 쓰지 않는 표기)는{' '}
-            <a href={`/areas/${areaId}/forbidden`} className="text-blue-700 underline">
+            <Link href={`/areas/${areaId}/forbidden`} className="text-blue-700 underline">
               금칙어 관리
-            </a>
+            </Link>
             에서 등록합니다
           </p>
           <div className="md:col-span-2">{text('dic_desc', '설명', { maxLength: 4000 })}</div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2">
           {flag('ent_clss_yn', '엔터티 분류어')}
-          <a href={`/areas/${areaId}/entity-classes`} className="mr-3 text-xs text-blue-700 underline" title="테이블 접미어는 엔터티 분류어 화면에서 지정">
+          <Link href={`/areas/${areaId}/entity-classes`} className="mr-3 text-xs text-blue-700 underline" title="테이블 접미어는 엔터티 분류어 화면에서 지정">
             접미어 지정
-          </a>
+          </Link>
           {flag('attr_clss_yn', '속성 분류어 (도메인 사용)')}
           {flag('forbid_yn', '금칙어')}
           <SeSelect value={form.std_se_cd} onChange={(v) => setForm({ ...form, std_se_cd: v })} />

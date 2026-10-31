@@ -2,7 +2,7 @@
 import { piFetch } from '@pi/auth/client'
 // 엔터티 등록·수정 폼(논리 모델 화면용, sql/026 모델 단계) — 주제영역·엔터티명 → 승인 표준단어 분해 후보·물리명 미리보기(GET …/entities/analyze) → 유형·설명·단계
 // 등록 = 논리 엔터티(LGCL), 수정 = 이름(분해 후보 다시 선택)·유형·설명·주제영역(같은 프로젝트)·단계(논리 ↔ 핵심 승격). 이름은 서버가 표준단어로 다시 만든다(클라이언트 값 불신)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { ENT_TP, ENT_TP_DESC } from '@/lib/model-name'
 import { confirmSave } from '../words/word-board'

@@ -4,7 +4,7 @@ import { piFetch } from '@pi/auth/client'
 // 주제영역명 입력 시 약어 3자·설명 자동 채움(/subjects/suggest, 저장 안 함), 선택 주제영역의 핵심 엔터티 추천 칩(누르면 엔터티명 채움)
 // 탭(?tab=, 하단 메뉴 서브 탭) : prj 프로젝트(기본) · subj 주제영역 · ent 핵심엔터티(주제영역 목록으로 소속 선택 + 관계) — 엔터티 분류어는 별도 화면(/entity-classes)
 // 엔터티 이름은 승인완료 표준단어로만 생성(미등록 단어는 표준단어 신청), 끝 단어 엔터티 분류어 → 테이블 접미어(TB_주제영역_단어_접미어)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useRef, useState } from 'react'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, noEnterSubmit } from '../words/word-board'

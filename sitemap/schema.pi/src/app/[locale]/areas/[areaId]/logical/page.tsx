@@ -5,7 +5,7 @@ import { piFetch } from '@pi/auth/client'
 //  왼쪽 : 주제영역 콤보(선택한 주제영역 1개, 물리 화면과 선택 공유) + 엔터티(🔑·4종 n/4·속성 수·이슈 배지) / 오른쪽 : 선택 엔터티 — 부모·자식 관계, FK 전파 누락(체크 → 적용), 정규화 의심(적용 = 이동·제거), 속성 패널(개념 모델과 공용)
 //  반자동 : 점검은 저장 없음(GET …/projects/[prjId]/logical), 적용은 속성 API. 이름은 물리 전환 전까지 대문자
 //  편집(sql/026) : 논리 엔터티 추가(LGCL)·엔터티 수정(이름·유형·설명·주제영역·핵심 승격)·삭제(속성·관계 연쇄), 관계 편집 패널(개념 모델 공용)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import Attrs from '../model/attrs'

@@ -3,7 +3,7 @@
 //  코드기본 : 코드상세 = 1:N — 위 등록 폼, 아래 조회(표준용어 조회와 같은 표·페이지 단위 조회), 코드기본을 고르면 맨 아래 코드상세(코드값) 표. 그 외 코드는 공통코드 아님 → 별도 기본테이블(기준 엔터티)
 //  조회 = 표준 메뉴 권한, 등록·수정·삭제 = 표준 신청 권한. 코드기본은 단어·용어와 같은 승인 절차(신청 → 승인완료 후 사용, 즉시 승인 = SELF_APPROVE), 코드상세는 바로 반영
 import { piFetch } from '@pi/auth/client'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
 import { CD_KIND, cdKind, type CdKind } from '@/lib/std-code-rule'
 import { ApvFields, ApvLink, StsCell, StsFilter } from '../words/word-board'

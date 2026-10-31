@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Metasystem Słownika Standardów Danych"
+  },
+  "common": {
+    "localeSwitcher": {
+      "button": "Zmień język",
+      "search": "Szukaj języka",
+      "empty": "Brak wyników wyszukiwania"
+    },
+    "loading": "Ładowanie…",
+    "requestFailed": "Żądanie nie powiodło się",
+    "home": "Strona główna",
+    "goHome": "Przejdź do strony głównej"
+  },
+  "home": {
+    "subtitle": "Metasystem Słownika Standardów Danych"
+  },
+  "auth": {
+    "checking": "Sprawdzanie logowania…",
+    "googleUnlinked": "Jesteś zalogowany(-a) za pomocą Google, ale konto nie jest jeszcze połączone z kontem Pi.",
+    "required": "Wymagane logowanie.",
+    "requiredHint": "Wymagane logowanie. Zaloguj się za pomocą konta Pi w Pi Browser lub za pomocą Google (wymagane połączenie z kontem Pi) w zwykłej przeglądarce.",
+    "piSignIn": "Zaloguj się za pomocą konta Pi",
+    "googleSignIn": "Zaloguj się za pomocą Google",
+    "signOut": "Wyloguj się",
+    "linkCheckFailed": "Nie udało się sprawdzić statusu połączenia (tymczasowy błąd). Odśwież stronę za chwilę."
+  },
+  "link": {
+    "title": "Łączenie kont",
+    "desc": "Łączy Twoje konto Pi w Pi Browser z kontem Google w zwykłej przeglądarce jako tego samego użytkownika. Po połączeniu możesz pracować na komputerze, logując się tylko za pomocą Google.",
+    "codeFormTitle": "Wprowadź kod łączenia konta Pi",
+    "codeFormHint": "Po zalogowaniu się w Pi Browser wprowadź 6-cyfrowy kod wydany na ekranie łączenia kont w ciągu 10 minut.",
+    "codeLabel": "Kod łączenia",
+    "linked": "Połączono.",
+    "submit": "Połącz",
+    "issuerTitle": "Wydaj kod łączenia konta Google",
+    "issuerHint": "Po zalogowaniu się za pomocą Google w zwykłej przeglądarce wprowadź ten kod, aby połączyć się jako ten sam użytkownik (ważny przez 10 minut).",
+    "minutesLeft": "Pozostało około {minutes} minut",
+    "issue": "Wydaj kod",
+    "reissue": "Wydaj ponownie",
+    "linkedAs": "Twoje konto Google jest połączone z użytkownikiem Pi <b>{name}</b>."
+  },
+  "intro": {
+    "kicker": "Metasystem Słownika Standardów Danych",
+    "headline1": "Bez standardów nie można nazywać,",
+    "headline2": "bez modeli nie można tworzyć tabel.",
+    "lead": "Twórz terminy z zatwierdzonych słów standardowych, rysuj modele za pomocą tych terminów i generuj DDL z modeli. Ludzie decydują, narzędzia egzekwują zasady.",
+    "flowTitle": "Tak to się łączy",
+    "step": "Krok {n}",
+    "flow": {
+      "words": {
+        "nm": "Słowa standardowe",
+        "desc": "Słowa · Skróty · Słowa zabronione"
+      },
+      "domains": {
+        "nm": "Domeny standardowe",
+        "desc": "Typ · Reguły długości"
+      },
+      "terms": {
+        "nm": "Terminy standardowe",
+        "desc": "Kombinacja słów · Zatwierdzenie"
+      },
+      "model": {
+        "nm": "Model danych",
+        "desc": "Koncepcyjny · Logiczny · Fizyczny"
+      },
+      "erd": {
+        "nm": "ERD",
+        "desc": "Według obszaru tematycznego · Porównanie wersji"
+      },
+      "ddl": {
+        "nm": "DDL",
+        "desc": "Generuj według DBMS · Zatwierdź wykonanie"
+      }
+    },
+    "roleTitle": "Co możesz zrobić według roli",
+    "planTitle": "Plany cenowe",
+    "planNote": "— Płatność Pi za jednostkę systemu klasyfikacji, cena potwierdzona na ekranie płatności",
+    "menu": {
+      "MENU_STD": "Słownik standardów",
+      "MENU_SQL": "Edytor SQL",
+      "MENU_SET": "Ustawienia · Historia",
+      "MENU_BAN": "Słowa zabronione",
+      "MENU_MODEL": "Model · ERD · DDL",
+      "MENU_CHK": "Sprawdzenie standardów",
+      "MENU_ADM": "Członkowie · Zatwierdzenia"
+    },
+    "viewOnly": "{menu} (tylko podgląd)",
+    "footer": "Zaloguj się powyżej, aby natychmiast zobaczyć swoje zadania dla systemu klasyfikacji."
+  },
+  "dashboard": {
+    "loadFailed": "Nie udało się załadować pulpitu nawigacyjnego",
+    "myAreas": "Moje systemy klasyfikacji",
+    "planLine": "Plan {plan}",
+    "until": " · Do {date}",
+    "grace": "(Okres karencji)",
+    "openArea": "Otwórz system klasyfikacji →",
+    "todoTitle": "Moja kolej",
+    "todoEmpty": "Tylko uprawnienia do podglądu — przeglądaj standardy, korzystając z poniższego statusu i skrótów.",
+    "apvWait": "Oczekiwanie na zatwierdzenie standardu",
+    "apvWaitSub": "Słowo · Domena · Termin · Aplikacja kodu",
+    "ddlWait": "Oczekiwanie na zatwierdzenie wykonania DDL",
+    "mineWait": "Moje wnioski oczekujące",
+    "mineRejected": "{count, plural, one {# odrzucony} few {# odrzucone} many {# odrzuconych} other {# odrzuconych}} w ciągu ostatnich 30 dni",
+    "model": "Model danych",
+    "modelSub": "Projekty · {count, plural, one {# Encja} few {# Encje} many {# Encji} other {# Encji}}",
+    "stdTitle": "Status słownika standardów",
+    "stdBasis": "Podstawa zatwierdzona",
+    "shortcuts": "Skróty",
+    "recentTitle": "Ostatnie zmiany",
+    "allHistory": "Pełna historia",
+    "noHistory": "Brak historii zmian",
+    "justNow": "Przed chwilą",
+    "minutesAgo": "{n, plural, one {# minuta temu} few {# minuty temu} many {# minut temu} other {# minut temu}}",
+    "hoursAgo": "{n, plural, one {# godzina temu} few {# godziny temu} many {# godzin temu} other {# godzin temu}}",
+    "daysAgo": "{n, plural, one {# dzień temu} few {# dni temu} many {# dni temu} other {# dni temu}}",
+    "areaList": "Lista systemów klasyfikacji · Utwórz nowy"
+  },
+  "areaHome": {
+    "title": "Moje standardowe systemy klasyfikacji",
+    "loading": "Ładowanie",
+    "empty": "Brak uczestniczących systemów klasyfikacji",
+    "open": "Otwórz",
+    "newTitle": "Nowy system klasyfikacji",
+    "namePlaceholder": "Nazwa systemu klasyfikacji (wymagane)",
+    "descPlaceholder": "Opis",
+    "create": "Utwórz",
+    "created": "Utworzono system klasyfikacji {name}"
+  },
+  "nav": {
+    "label": "Menu systemu klasyfikacji",
+    "expand": "Rozwiń dolne menu",
+    "expandWith": "Rozwiń dolne menu ({menu})",
+    "collapse": "Zwiń dolne menu",
+    "subOf": "{menu} Podfunkcje",
+    "groupTech": "Monitorowanie · Edytor SQL",
+    "groupStd": "Słownik standardów",
+    "groupModel": "Model",
+    "groupSet": "Ustawienia",
+    "groupPlan": "Płatność",
+    "words": "Słowa standardowe",
+    "bulk": "Rejestracja masowa",
+    "domains": "Domeny standardowe",
+    "keyDomains": "Domeny kluczowe",
+    "domainGroups": "Grupy domen",
+    "terms": "Terminy standardowe",
+    "codes": "Kody standardowe",
+    "model": "Model koncepcyjny",
+    "prj": "Projekty",
+    "subj": "Obszary tematyczne",
+    "coreEnt": "Encje podstawowe",
+    "entityClasses": "Klasyfikatory encji",
+    "logical": "Model logiczny",
+    "physical": "Model fizyczny",
+    "erd": "ERD",
+    "ddl": "Generowanie DDL",
+    "monitor": "Monitorowanie",
+    "monApp": "Aplikacja",
+    "monSrv": "Serwer",
+    "monDb": "Baza danych",
+    "monUrl": "URL",
+    "monFix": "Historia korekt AI",
+    "sql": "Edytor SQL",
+    "settings": "Ustawienia",
+    "history": "Historia",
+    "forbidden": "Słowa zabronione",
+    "banBulk": "Masowa rejestracja słów zabronionych",
+    "check": "Sprawdzenie standardów",
+    "reverse": "Inżynieria wsteczna",
+    "members": "Członkowie",
+    "approvals": "Zatwierdzenia",
+    "plan": "Płatność"
+  },
+  "codes": {
+    "role": {
+      "SYS": "Administrator systemu",
+      "DA": "Architekt danych",
+      "STD": "Menedżer standardów",
+      "MDL": "Modeler",
+      "QLT": "Menedżer jakości",
+      "MIG": "Menedżer migracji",
+      "VIEWER": "Przeglądający"
+    },
+    "roleDesc": {
+      "SYS": "Zarządzaj ustawieniami systemu klasyfikacji · grupami domen · skrótami · członkami, aplikacjami · zatwierdzeniami (w tym natychmiastowym zatwierdzeniem), rejestracją masową, pisaniem SQL, wszystkimi menu",
+      "DA": "Ogólna polityka standardów: Zastosuj · zatwierdź słowa · domeny · terminy (można wybrać natychmiastowe zatwierdzenie po złożeniu wniosku), rejestracja masowa, zarządzaj ustawieniami · członkami, pisanie SQL, wszystkie menu",
+      "STD": "Złóż wniosek o słowa · domeny · terminy, rejestracja masowa, ustawienia, pisanie SQL, wszystkie menu (brak praw do zatwierdzania)",
+      "MDL": "Złóż wniosek o rejestrację · modyfikację · usunięcie słów · domen · terminów · modeli, rejestracja masowa, ustawienia, pisanie SQL, wszystkie menu (brak praw do zatwierdzania)",
+      "QLT": "Złóż wniosek · pisanie SQL, edytor SQL · modelowanie · menu ustawień (funkcje diagnostyki jakości w przyszłych etapach)",
+      "MIG": "Złóż wniosek · pisanie SQL, menu edytora SQL (do mapowania migracji)",
+      "VIEWER": "Tylko podgląd słownika standardów"
+    },
+    "plan": {
+      "FREE": "Darmowy (podgląd)",
+      "P1": "Deweloper",
+      "P2": "Menedżer standardów",
+      "P3": "Modeler",
+      "P4": "DA"
+    },
+    "act": {
+      "INS": "Zarejestruj",
+      "UPD": "Modyfikuj",
+      "DEL": "Usuń"
+    },
+    "tgt": {
+      "AREA": "System klasyfikacji",
+      "MBR": "Członek",
+      "DIC": "Słowo",
+      "DOM": "Domena",
+      "DOM_GRP": "Grupa domen",
+      "TERM": "Termin",
+      "CD": "Kod standardowy",
+      "CD_VAL": "Wartość kodu",
+      "ABBR": "Skrót",
+      "PRJ": "Projekt",
+      "SUBJ": "Obszar tematyczny",
+      "ENT": "Encja",
+      "REL": "Relacja",
+      "ATTR": "Atrybut",
+      "VER": "Wersja modelu",
+      "PHY": "Model fizyczny",
+      "DDL": "Wykonanie DDL",
+      "RVS": "Inżynieria wsteczna",
+      "SQL": "SQL",
+      "DBCN": "Połączenie DB",
+      "AGT": "Agent",
+      "MONURL": "Monitorowanie URL"
+    }
+  }
+}

@@ -3,7 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // 대표도메인 관리(클라이언트) — 지정 = 승인완료 속성 분류어 단어에 key_dom_yn Y 수정 신청, 해제 = N 수정 신청(사용 도메인 0건만)
 // 목록 /api/areas/[areaId]/key-domains, 신청 PATCH /api/areas/[areaId]/words/[dicId] (승인 절차·DA 즉시 승인 공용, sql/013)
 import { useCallback, useEffect, useState } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, ApvFields, ApvLink, StsCell, StsFilter, noEnterSubmit } from '../words/word-board'
 

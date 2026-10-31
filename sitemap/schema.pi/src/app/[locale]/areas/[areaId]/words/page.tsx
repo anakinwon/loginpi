@@ -1,5 +1,5 @@
 // 표준단어 화면 — 조회(검색명)·등록(입력 중 중복 검사)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import WordBoard from './word-board'
 
 export default async function WordsPage({ params }: { params: Promise<{ areaId: string }> }) {

@@ -7,7 +7,7 @@ import { piFetch } from '@pi/auth/client'
 //  주제영역 콤보(논리 화면과 선택 공유) : 테이블 목록·단계 패널을 선택한 주제영역 1개로 한정
 //  논리 변경 반영(S5) = 동기화(순서·NULL·기본값 편집 유지) + 변경분 DDL(ALTER) 내려받기. 삭제 후 재전환도 가능(편집값 사라짐)
 //  인덱스(S5, sql/063) : 테이블 상세 아래 목록·추가(칼럼을 고른 순서 = 인덱스 칼럼 순서)·삭제, 테이블 작성완료면 읽기 전용
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { DBMS_PRFL, dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
 import { type MbrRole, type Perm } from '@/lib/roles'

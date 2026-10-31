@@ -1,5 +1,5 @@
 // 표준도메인 화면 — 조회(검색명)·등록(도메인명 자동생성 미리보기·중복 표시)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import DomainBoard from './domain-board'
 
 export default async function DomainsPage({ params }: { params: Promise<{ areaId: string }> }) {

@@ -1,5 +1,6 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
+import { Link } from '@/i18n/navigation'
 // 표준도메인 조회·등록·수정·삭제(클라이언트) — /api/areas/[areaId]/domains(목록·등록·상태 필터), /domains/[domId](수정·삭제, ver_no), /name-preview, /api/types
 import { useCallback, useEffect, useState } from 'react'
 import { type MbrRole, type Perm } from '@/lib/roles'
@@ -281,9 +282,9 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
           {keyWords.length === 0 && (
             <p className="mt-2 text-red-700">
               속성 분류어로 지정된 표준단어가 없습니다 :{' '}
-              <a href={`/areas/${areaId}/words`} className="underline">
+              <Link href={`/areas/${areaId}/words`} className="underline">
                 표준단어 등록
-              </a>
+              </Link>
               에서 &apos;속성 분류어 (도메인 사용)&apos;을 선택해 먼저 등록하십시오
             </p>
           )}
@@ -310,9 +311,9 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
           </div>
           <p className="mt-2 text-xs text-gray-500">
             대표도메인명은 지정된 대표도메인만 고를 수 있습니다 :{' '}
-            <a href={`/areas/${areaId}/key-domains`} className="text-blue-700 underline">
+            <Link href={`/areas/${areaId}/key-domains`} className="text-blue-700 underline">
               대표도메인 관리
-            </a>
+            </Link>
           </p>
           {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 등록·수정·삭제는 신청 권한(역할·요금제)이 있어야 합니다</p>}
           {msg && (

@@ -1,5 +1,5 @@
 // 표준용어 화면 — 조회(검색명)·등록(용어명 분해 후보 → 단어 조합 선택 → 용어명 자동 생성 → 도메인 지정)
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import TermBoard from './term-board'
 
 export default async function TermsPage({ params }: { params: Promise<{ areaId: string }> }) {
