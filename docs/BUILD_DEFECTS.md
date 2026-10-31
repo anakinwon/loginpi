@@ -145,6 +145,20 @@
 | seminar.pi Gemini 회의록 요약(같은 파일 `summarize`) | **30초** | 같은 결정. 종료 시 1회·사람이 기다리는 화면(요약 중)이라 실시간 경로가 아니고, 2시간 회의 조각 전체를 한 번에 보내므로 10초로는 끊긴다(기존 예외 'Gemini 번역 30초'와 같은 값) | `null` → 회의록 상태 FAILED, 조각 원문은 남고 다시 요약 가능(SA7) |
 | seminar.pi Gemini 대면 노트 정밀 전사(같은 파일 `transcribeMeeting`) | **150초**(창 1개) | 2026-10-29 마스터 결정(STT PoC 1단계, 모델 3.5-flash). 종료 뒤 1회·5분 녹음 창 1개 전사에 PoC 40초, 여유 포함. 첫 창(화자 기준) 뒤 나머지 창 6개 동시, 전체 예산 240초 — 창마다 남은 예산으로 호출 시간을 줄이고 30초도 안 남으면 그 창은 건너뛰어 함수 상한(300초) 안에 요약까지 끝낸다 | `null` → 그 창은 실시간 초안을 그대로 둔다(기록 유실 0) |
 
+## 2.8 seminar.pi 첫 운영 체크리스트(1절, 2026-10-31 — 운영 중 소급 등재)
+
+1절 3항 `--scan sitemap/seminar.pi/src` = **R-P3 12건, 전부 의도** — `count:'exact'` 는 목록 페이지네이션 총건수(표준 ①: seminars 3·notes·qna·polls·attendance) 또는 `head:true` 건수만(연동 실패 횟수 제한·사진 상한·답변 수·참가자 수). 서브에이전트 P1~P6 점검 1회(route 24개 + `src/lib`) = **확신 높음 결함 0**, 경미·수용 5건 :
+
+| P | 위치 | 내용 | 등급 | 상태 |
+|---|---|---|---|---|
+| P4 | `packages/pi-mon/src/index.ts` `monForward` | 수집 전달을 await(최대 2초) — 브라우저 keepalive 비콘 응답이라 화면을 막지 않음, cafe·sitemap 공용 동작 | A | 수용(3시스템 공통, 바꾸면 `after()`로 일괄) |
+| P5 | `seminar.pi/src/app/api/seminars/[id]/ncknm/route.ts:50` | 별명 사칭 확인 ↔ upsert 경합(표시용 이름, 인증 무관) | C | 수용 |
+| P5 | `…/api/notes/route.ts:88` | 회의록 동시 시작 시 RECORDING 2건 가능(코드 `ponytail:` 수용 사유 있음) | C | 수용 — 실사용 중복 발견 시 부분 유일 인덱스 |
+| P2 | `…/seminars/[id]/ncknm/route.ts:22` | gate 와 별도로 `smn_mst` 1회 더(개최자 이름 조인) | C | 수용(저빈도) |
+| P3 | `…/api/media/ticket/route.ts:348` | 발표 권한 ADMIN 에게도 `hostPlan` RPC 후 폐기(입장 1회 1건) | A | 수용 |
+
+[확인중 : 부하] 출석 하트비트(60초) = 참가자당 DB 3~4왕복(병렬화 완료) — 100명이면 분당 300~400, Supabase 풀러 한도와 실측으로 판단. 1절 5항 모니터링 = 2026-10-31 연결(`@pi/mon` SEMINAR · schema.pi `sql/076`), 운영 env·schema.pi 승격 뒤 첫 주 느림·오류를 3절에 기록.
+
 ## 3. 수정 이력
 
 | 날짜 | 시스템 | 등급 | 처리(패턴 · 매치 N · 처리 N) | 커밋 |

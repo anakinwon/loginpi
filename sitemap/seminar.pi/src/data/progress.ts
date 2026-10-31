@@ -120,7 +120,7 @@ export const FEATURES: Feature[] = [
         status: 'doing',
         stage: 'M5',
         ref: ['Galène', 'LiveKit'],
-        note: 'ticket·status ✓ · host-away ✓ · room admin ✓ · device …',
+        note: 'ticket·status ✓ · host-away ✓ · room admin ✓ · device ✓ · monitor …',
       },
       // 룸 화면(S3·S4) — UI 설계서 v1.0(c16bc230) → M1~M2(a7affafb) → v1.1·v1.2(8eed64d2·74e2c7cd), 브라우저 QA ✓
       {
