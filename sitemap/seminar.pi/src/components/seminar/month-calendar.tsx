@@ -2,11 +2,13 @@
 
 // 월 달력 공용(마스터 2026-10-30) — 세미나 만들기 시작일시(date-calendar)·홈 세미나 달력(home-calendar)이 같이 쓴다.
 //  달 넘기기 · 날짜 칸에 짧은 제목(2개 + N) · 날짜 상세 창(<dialog>) · 내 Google 일정(비공개 iCal 주소 최대 GCAL_MAX 개, 이 기기에만 저장)
+//  Google 캘린더 설정 링크는 Pi Browser(isInPiBrowser)면 시스템 브라우저로(F-08 형제 — target=_blank 무반응, share-links clickExternal)
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { piFetch } from '@pi/auth/client'
+import { piFetch, usePiAuth } from '@pi/auth/client'
 import { readApi } from '@/lib/client-api'
 import { NewTab } from '@/components/room/consent'
+import { clickExternal } from '@/components/seminar/share-links'
 import { icsLabel, icsUrlOk, type IcsEvent } from '@/lib/ics-read'
 
 export const pad = (n: number) => String(n).padStart(2, '0')
@@ -274,6 +276,9 @@ export function GcalList({ events, urls }: { events: GcalEvent[]; urls: string[]
 export function GcalManager({ urls, saveUrls, failed }: { urls: string[]; saveUrls: (u: string[]) => void; failed: number }) {
   const t = useTranslations('host.gcal')
   const tr = useTranslations('room')
+  const ts = useTranslations('seminar.share')
+  const { isInPiBrowser } = usePiAuth()
+  const [extFail, setExtFail] = useState(false)
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState('')
   const [badUrl, setBadUrl] = useState(false)
@@ -298,9 +303,16 @@ export function GcalManager({ urls, saveUrls, failed }: { urls: string[]; saveUr
               <li key={k}>{t(k)}</li>
             ))}
           </ol>
-          <a href="https://calendar.google.com/calendar/r/settings" target="_blank" rel="noopener" className="text-accent inline-block hover:underline">
+          <a
+            href="https://calendar.google.com/calendar/r/settings"
+            target="_blank"
+            rel="noopener"
+            className="text-accent inline-block hover:underline"
+            onClick={(e) => clickExternal(e, isInPiBrowser ? window.Pi : undefined, (v) => setExtFail(v === 'fail'))}
+          >
             {t('open')} <NewTab label={tr('consent.newTab')} />
           </a>
+          {isInPiBrowser && <p className="text-muted-foreground">{extFail ? ts('extFail') : ts('piBrowserOpen')}</p>}
           <p className="text-muted-foreground">🔒 {t('privacy')}</p>
           {urls.length > 0 && (
             <ul className="space-y-1">

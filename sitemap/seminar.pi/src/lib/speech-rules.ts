@@ -14,6 +14,10 @@ export const NOTE_CTX = { title: 100, prev: 300 }
 export const BILL_BYTES_PER_SEC = 16_000
 // 조각 최대 크기 = 최대 길이 10초 × 128kbps = 160KB(5초 opus ≈ 20~40KB, aac ≈ 40~80KB). wav(16kHz mono 5초 ≈ 160KB)는 받지 않는다
 export const MAX_CHUNK_BYTES = (CHUNK_MAX_MS / 1000) * BILL_BYTES_PER_SEC
+// 화면 음성 조각 녹음 비트레이트(MediaRecorder audioBitsPerSecond) = 32kbps — 음성 전사엔 충분(opus 기본과 같음), iOS AAC 기본값(128~192kbps)이면
+//  대면 노트 9초 조각이 MAX_CHUNK_BYTES 를 넘어 'size' 거절되던 것을 상한 안으로. note-rules AUD.bps(64kbps)는 원본 1일 보관용(정밀 전사)이라 용도가 다르다.
+//  브라우저가 값을 무시해도 무해 [확인중 : iOS 실기기]
+export const SPEECH_BPS = 32_000
 // 사용자당 분당 음성 조각 요청(계획 A-5) — 5초 조각이면 정상 12회
 export const MAX_REQ_PER_MIN = 20
 // 사용자당 분당 음성 초 상한(fn_use_smn_vc RATE) — 실시간 60초 + 분 경계 오차 10초. 요청 수 상한만으론 20회×10초 = 실시간 3.3배까지 허용됨
@@ -82,6 +86,11 @@ export function chunkError(c: {
   if (sniffBox(c.bytes) !== MIME[m].box) return 'header'
   return null
 }
+
+// 화면이 조각을 보낼지(서버 chunkError 의 길이·크기 조건과 같은 상수) — 끄기 직전의 짧은 조각, 백그라운드 복귀로 타이머가 밀려 10초를 넘은 조각,
+//  상한을 넘는 큰 조각(iOS AAC)은 서버가 400 으로 거절하므로 보내지 않는다(데이터 낭비·거절 반복 차단, F-U A1)
+export const chunkSendable = (durMs: number, bytes: number) =>
+  durMs >= CHUNK_MIN_MS && durMs <= CHUNK_MAX_MS && bytes >= 1 && bytes <= MAX_CHUNK_BYTES
 
 // 사용량에 올릴 초(올림) — 0.5초 조각도 1초
 export const chunkSec = (durMs: number) => Math.ceil(durMs / 1000)

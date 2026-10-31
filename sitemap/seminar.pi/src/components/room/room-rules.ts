@@ -115,6 +115,10 @@ export function consentPlan(server: { agreed?: boolean; stored?: boolean } | nul
   if (!server?.stored) return local ? 'mark' : 'ask'
   return local ? 'repost' : 'ask'
 }
+// 동의 기록 POST 가 실패했을 때 이 기기 기록·동의 상태를 남길지(consent.tsx answer/repost). 서버를 모르는 실패(네트워크 0·5xx·세션 미복원 401)는 남긴다
+//  (DB 미적용·일시 장애 폴백, 다음 입장 때 다시 기록). 서버가 거절한 4xx(403 참가 등록 없음·404·409 종료)는 지운다 — 남기면 음성 조각 SPEECH_NO_AGR →
+//  reset → 다시 묻기가 동의할 때마다 반복됐다(F-U A3). 호출부는 지운 뒤 '저장 실패' 1회 알림
+export const consentKeepLocal = (status: number) => status === 0 || status === 401 || status >= 500
 
 // 부가 ⋯ 항목 거르기(15.1) — 내 역할에 보이는 것만, app 중계가 필요한 항목은 엔진 지원이 확인됐을 때만(확인 중 null·구 엔진 false = 숨김)
 export function visibleExtras<T extends { roles: readonly PeerRole[]; app?: boolean }>(

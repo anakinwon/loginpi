@@ -76,6 +76,10 @@ declare global {
       onIncompletePaymentFound: (payment: PaymentDTO) => void,
     ): Promise<PiAuthResult>
     createPayment(data: PaymentData, callbacks: PaymentCallbacks): void
+    // 공식 유틸(SDK_reference) — 구 Pi Browser 엔 없을 수 있어 선택(?) : 호출 전 기능 탐지, reject('No minimal requirements' 등)·무반응 양쪽 처리
+    openUrlInSystemBrowser?(url: string): Promise<void> // Pi Browser 를 벗어나 시스템 브라우저로(외부 이동 — 사용자 클릭 + 고지)
+    openShareDialog?(title: string, message: string): void | Promise<void> // OS 공유창(메일·메신저 포함)
+    copyText?(text: string): Promise<void> // 클립보드 복사(WebView navigator.clipboard 대안)
   }
 
   interface Window {

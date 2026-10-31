@@ -247,6 +247,9 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
   }
 
   function request<T>(m: string, d: unknown): Promise<T> {
+    // 세션 경계 — WS 가 열려 있지 않으면(퇴장·끊김 뒤 늦은 재시도) 보내지 않고 바로 LEFT. send 가 무음이라 10초 TIMEOUT 을 기다리고
+    //  재시도(app-retry)가 그 사이 재입장한 새 세션으로 옛 state 를 흘려보내던 결함(F-U A5). LEFT 는 재시도 대상이 아니라 즉시 멈춘다
+    if (wsRef.current?.readyState !== WebSocket.OPEN) return Promise.reject(new SignalError('LEFT', m))
     const id = nextId.current++
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {

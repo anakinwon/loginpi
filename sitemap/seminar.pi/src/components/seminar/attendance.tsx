@@ -2,13 +2,13 @@
 // 출석부(SubAgent4) — 개최자·ADMIN. 50명 단위 페이지, 이름·입장·마지막 확인·참석 시간·상태(접속 중/나감), [CSV 내려받기].
 //  조회는 piFetch(X-Pi-Token — Pi Browser 는 쿠키 없음), 비로그인 = LoginGate(redirect 없음), 권한 없음 = 403 문구.
 //  CSV 는 <a href> 직접 내려받기가 X-Pi-Token 을 못 붙이므로 piFetch 로 받아 화면에서 만든다(번역된 머리글, 수식 주입 방지 — engage-rules toCsv).
-//  Pi Browser 의 Blob 내려받기 동작은 [확인중 : 실기기]
+//  Pi Browser 는 <a download>·공유 시트를 모두 막아 파일을 저장할 수 없다(F-13 실기기 2026-10-29) → isInPiBrowser 면 버튼 대신 '일반 브라우저에서만' 안내(F-08 형제)
 //  화면이 보이는 동안 10초(POLL_MS)마다 + 탭으로 돌아온 순간 지금 쪽을 다시 읽는다 — 새 입장자가 하트비트 간격(60초)만큼 늦게 보이거나
 //  다른 화면에 다녀와야 보이던 것 보강(마스터 2026-10-28, T04 r4). 서버 응답은 no-store
 //  다시 읽기 실패는 표를 지우지 않는다(처음 읽기 실패만 오류 화면)
 import { useEffect, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
-import { piFetch } from '@pi/auth/client'
+import { piFetch, usePiAuth } from '@pi/auth/client'
 import { LoginGate } from '@/components/login-gate'
 import { Link } from '@/i18n/navigation'
 import { readApi } from '@/lib/client-api'
@@ -38,6 +38,7 @@ function Sheet({ id }: { id: string }) {
   const [err, setErr] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [now, setNow] = useState(0)
+  const { isInPiBrowser } = usePiAuth()
   const [tick, setTick] = useState(0)
 
   useEffect(() => {
@@ -108,9 +109,13 @@ function Sheet({ id }: { id: string }) {
             {d.title} · {t('count', { n: d.total })}
           </p>
         </div>
-        <button type="button" className={BTN} disabled={busy || !d.total} onClick={() => void csv()}>
-          {t('csv')}
-        </button>
+        {isInPiBrowser ? (
+          <p className="text-muted-foreground max-w-prose text-xs">{t('csvPiBrowser')}</p>
+        ) : (
+          <button type="button" className={BTN} disabled={busy || !d.total} onClick={() => void csv()}>
+            {t('csv')}
+          </button>
+        )}
       </header>
       {!d.items.length ? (
         <p className="bg-surface rounded-xl p-4 text-sm">{t('empty')}</p>

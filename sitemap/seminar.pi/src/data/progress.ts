@@ -88,7 +88,7 @@ export const FEATURES: Feature[] = [
         status: 'doing',
         stage: 'M1',
         ref: ['Galène'],
-        note: 'LAN ✓ · WAN ✓ (VPS probe 4/4) · LTE …',
+        note: 'LAN ✓ · WAN ✓ (VPS probe 4/4) · TURN ✓ (coturn relay) · LTE …',
       },
       {
         id: 'recovery',
@@ -120,7 +120,7 @@ export const FEATURES: Feature[] = [
         status: 'doing',
         stage: 'M5',
         ref: ['Galène', 'LiveKit'],
-        note: 'ticket·status ✓ · host-away ✓ · room admin ✓ · device ✓ · monitor …',
+        note: 'ticket·status ✓ · host-away ✓ · room admin ✓ · device ✓ · mon env ✓ · sample …',
       },
       // 룸 화면(S3·S4) — UI 설계서 v1.0(c16bc230) → M1~M2(a7affafb) → v1.1·v1.2(8eed64d2·74e2c7cd), 브라우저 QA ✓
       {
@@ -201,7 +201,7 @@ export const FEATURES: Feature[] = [
         id: 'appRelay',
         status: 'doing',
         ref: ['Jitsi', 'LiveKit'],
-        note: 'v1.3.3 ✓ · QA ✓ · engine ✓ · device …',
+        note: 'v1.3.3 ✓ · QA ✓ · engine ✓ · WebView guards ✓ · device …',
       },
       // 남은 막힘 없음(DB·QA·키) — 완료, 마이크 동의 화면 실기기는 대기(device …)
       {
@@ -220,7 +220,7 @@ export const FEATURES: Feature[] = [
         id: 'shareLinks',
         status: 'doing',
         ref: ['seminar.pi'],
-        note: 'QA ✓ · device …',
+        note: 'QA ✓ · Pi Browser path ✓ · device …',
       },
     ],
   },
@@ -232,7 +232,7 @@ export const FEATURES: Feature[] = [
         id: 'noiseLight',
         status: 'doing',
         ref: ['Jitsi', 'seminar.pi'],
-        note: 'QA ✓ · device …',
+        note: 'QA ✓ · WebView guards ✓ · device …',
       },
     ],
   },

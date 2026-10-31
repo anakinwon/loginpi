@@ -14,6 +14,7 @@ import {
   icsSeq,
   inViewerTz,
   mailtoUrl,
+  openExternal,
   utcStamp,
   ZONED,
   viewerTz,
@@ -226,4 +227,45 @@ test('공유 칸 — 고정 높이 대신 min-h(글자 확대·360px 줄접힘),
   assert.match(src, /'[^']*\bmin-h-10\b[^']*'/)
   assert.ok(!/'[^'\n]*[\s']h-10\b/.test(src))
   assert.match(src, /\/ics\?hl=/)
+})
+
+// ── Pi Browser 대안(F-08) — Pi SDK 유틸은 주입(pi), 없으면 브라우저 기본 동작 ──
+const never = () => new Promise(() => {})
+
+test('openExternal — 유틸 없음·일반 브라우저 = null(앵커 기본 동작), 성공 ok, reject·무반응 fail', async () => {
+  assert.equal(openExternal('https://x', undefined), null)
+  assert.equal(openExternal('https://x', {}), null)
+  const got = []
+  assert.equal(await openExternal('https://x', { openUrlInSystemBrowser: async (u) => void got.push(u) }), 'ok')
+  assert.deepEqual(got, ['https://x'])
+  assert.equal(await openExternal('https://x', { openUrlInSystemBrowser: () => Promise.reject(new Error('No minimal requirements')) }), 'fail')
+  assert.equal(await openExternal('https://x', { openUrlInSystemBrowser: never }, 20), 'fail')
+})
+
+test('copyText — Pi.copyText 우선, reject 면 clipboard 폴백, 둘 다 없으면 false(기존 경로 회귀)', async () => {
+  const clipGot = []
+  const clip = { writeText: async (s) => void clipGot.push(s) }
+  const piGot = []
+  assert.equal(await copyText('a', clip, { copyText: async (s) => void piGot.push(s) }), true)
+  assert.deepEqual([piGot, clipGot], [['a'], []])
+  assert.equal(await copyText('b', clip, { copyText: () => Promise.reject(new Error('x')) }), true)
+  assert.deepEqual(clipGot, ['b'])
+  assert.equal(await copyText('c', undefined, { copyText: () => Promise.reject(new Error('x')) }), false)
+  assert.equal(await copyText('d', clip, undefined), true)
+  assert.equal(canCopy(undefined, { copyText: async () => {} }), true)
+  assert.equal(canCopy(undefined, {}), false)
+  assert.equal(canCopy(clip, {}), true)
+})
+
+test('shareLink — Pi.openShareDialog(제목, 본문+링크) 우선·void 반환도 ok, throw 는 fail, 없으면 Web Share 경로', async () => {
+  let got = null
+  assert.equal(await shareLink({ title: 'T', text: '본문', url: 'https://x' }, undefined, { openShareDialog: (t, m) => void (got = [t, m]) }), 'ok')
+  assert.deepEqual(got, ['T', '본문\nhttps://x'])
+  assert.equal(await shareLink({ url: 'https://x' }, undefined, { openShareDialog: async (t, m) => void (got = [t, m]) }), 'ok')
+  assert.deepEqual(got, ['', 'https://x'])
+  assert.equal(await shareLink({ url: 'https://x' }, undefined, { openShareDialog: () => { throw new Error('x') } }), 'fail')
+  assert.equal(await shareLink({ url: 'https://x' }, { share: async () => {} }, {}), 'ok')
+  assert.equal(await shareLink({ url: 'https://x' }, undefined, {}), 'fail')
+  assert.equal(canShare(undefined, { openShareDialog: () => {} }), true)
+  assert.equal(canShare(undefined, {}), false)
 })

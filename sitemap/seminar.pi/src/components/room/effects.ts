@@ -3,6 +3,7 @@
 // 카메라 송신기 RTCRtpSender.replaceTrack(재협상 없음). 켜진 효과가 0개면 아무것도 만들지 않고 원본 그대로 보낸다(회귀 0).
 // 근거(REA_04_UI_EXT R-E1·R-E2) : Jitsi·LiveKit 배포본 모두 효과 적용 = 같은 송신기의 replaceTrack, LiveKit 대체 경로 = captureStream + 워커 타이머
 // (숨은 탭에서도 프레임이 멈추지 않게). 코드는 옮기지 않았다(S-2)
+// 실패 경로(R-P5) : captureStream 등이 던지면 fxBroken·효과 끔·원본 트랙 유지(송신기 미변경), 앱 전환 복귀 땐 숨은 <video> 를 다시 재생해 거짓 멈춤을 막는다
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { featureStore, useStores, type VideoEffect } from './extensions'
 import { failHit, fxFrameDue, onTrackEnd, swapSender } from './room-rules'
@@ -33,6 +34,9 @@ export function useTrackLive(t: MediaStreamTrack | null | undefined): boolean {
 
 // 파이프라인 1개 — 켜진 효과 목록은 매 프레임 active() 로 읽는다(효과를 더하거나 빼도 송신 트랙을 다시 바꾸지 않아 원본이 새지 않음)
 function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[], onStall: () => void) {
+  // 던질 수 있는 captureStream 을 맨 먼저 — DOM 부착·리스너 등록 전에 실패해야 호출자 catch 뒤에 숨은 <video>·리스너가 남지 않는다(검토 2026-10-31)
+  const out = document.createElement('canvas')
+  const output = out.captureStream(FX.fps).getVideoTracks()[0]
   const video = document.createElement('video')
   video.muted = true
   video.playsInline = true
@@ -42,13 +46,17 @@ function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[], onS
   video.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:0.01;pointer-events:none;z-index:-1'
   document.body.appendChild(video)
   video.srcObject = new MediaStream([track])
-  video.play().catch(() => {})
+  const play = () => video.play().catch(() => {})
+  play()
+  // 앱 전환·탭 숨김에서 돌아오면 WebView(특히 iOS)가 숨은 영상을 paused 로 남길 수 있다 — 다시 재생하지 않으면 stallMs 뒤 거짓 멈춤 판정
+  const onVis = () => {
+    if (document.visibilityState === 'visible') play()
+  }
+  document.addEventListener('visibilitychange', onVis)
   let drewAt = performance.now()
   let stalled = false
-  const out = document.createElement('canvas')
   const tmp: HTMLCanvasElement[] = []
   const fails = new Map<VideoEffect, number>()
-  const output = out.captureStream(FX.fps).getVideoTracks()[0]
   let last = -1
   const frame = () => {
     const w = video.videoWidth
@@ -95,6 +103,7 @@ function startPipeline(track: MediaStreamTrack, active: () => VideoEffect[], onS
     track: output,
     stop() {
       stopTick()
+      document.removeEventListener('visibilitychange', onVis)
       output.stop()
       video.pause()
       video.srcObject = null
@@ -122,14 +131,18 @@ export function useVideoEffects(
   useEffect(() => {
     if (!any || !track || track.readyState !== 'live') return
     // 멈춤 = 효과를 모두 끄고(원본 송출로 복귀) 효과 버튼을 숨긴다
-    const p = startPipeline(
-      track,
-      () => activeRef.current,
-      () => {
-        fxBroken.set(true)
-        for (const e of effects) e.on.set(false)
-      },
-    )
+    const broken = () => {
+      fxBroken.set(true)
+      for (const e of effects) e.on.set(false)
+    }
+    let p: ReturnType<typeof startPipeline>
+    try {
+      p = startPipeline(track, () => activeRef.current, broken)
+    } catch {
+      // captureStream 이 있어도 던지는 WebView — 룸을 깨뜨리지 않고(미처리 예외 금지) 원본 트랙 그대로 보낸다
+      broken()
+      return
+    }
     setOut(p.track)
     const revert = swapSender(sender, p.track, () => (track.readyState === 'live' ? track : null))
     return () => {

@@ -8,6 +8,8 @@
 // 음성 한도 소진 = presenter 가 state{captions:false, captionsReason:'limit'} 방송 → 전원 알림(설계서 15.4)
 // 번역 자막(SA8) = 개인 설정 — '번역 자막 보기'(원문/번역 토글) + 언어 선택(TRANSLATE_LANGS, 표시명 Intl.DisplayNames). 기본 언어 = UI locale, localStorage 에 함께 저장
 // 음성 번역 듣기(SA9 DubRow) = 번역 자막이 켜졌을 때만, 같은 언어(lang)로 — 꺼짐(원문)이면 숨김
+// 이 기기가 음성 녹음을 못 하면(pickAudioMime null — MediaRecorder 없는 WebView) presenter 스위치를 잠그고 사유를 보인다 — 전원에게 state{captions:true}
+//  가 방송돼 배지만 뜨고 자막 0건이던 침묵 방지(F-U A2). panel 기기만 미지원이면 그 panel 자막만 빠진다(현행과 같음)
 import { useEffect, useMemo, useRef } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { latestOnly, sendRetry } from '../../app-retry'
@@ -17,6 +19,7 @@ import { DubRow } from '../dubbing'
 import { Sheet, SwitchRow } from '../sheet'
 import { isTranslateLang, pickTrLang, prefLangs, TRANSLATE_LANGS } from '@/lib/translate-rules'
 import { presenterGone, presenterResync } from '../../room-rules'
+import { pickAudioMime } from '../../use-speech'
 import { CAPTION, captionsState, parseCaption, SIZES, stepSize, type Size } from './caption-rules'
 import { trStop, useTranslated } from './translate'
 
@@ -47,6 +50,7 @@ const sendCaps = (send: RoomCtx['sendApp'], live: () => boolean, extra?: object)
 
 // presenter 토글 — 재시도해도 방송 실패면 되돌린다(전원에게 알리지 못하면 바꾸지 않는다, 15.1). 그사이 다시 눌렀으면(CANCELLED) 손대지 않는다
 async function toggleRoom(on: boolean, ctx: RoomCtx) {
+  if (on && !pickAudioMime()) return ctx.notice('captions.unsupported') // 스위치가 잠겨 있어도 한 번 더(R-P5 — 화면이 먼저 막는다)
   capRoom.set(on)
   const live = capTurn()
   const err = await sendCaps(ctx.sendApp, live)
@@ -118,6 +122,7 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
   const mine = prefLangs(typeof navigator === 'undefined' ? [] : navigator.languages, locale, lang)
   const langLabel = (c: string) => langs.find(([k]) => k === c)?.[1] ?? c
   const stop = useStore(trStop)
+  const canRecord = pickAudioMime() !== null // 기능 탐지(UA 아님) — 마운트 뒤 클라이언트에서만 그려지는 오버레이라 렌더 중 호출해도 SSR 불일치 없음
 
   // 번역 중단(권한 없음·AI 미설정·한도) — 번역을 켠 사람에게 1번 알린다. 시트에도 사유를 남긴다
   useEffect(() => {
@@ -208,7 +213,10 @@ function CaptionsOverlay({ ctx, barShown }: { ctx: RoomCtx; barShown: boolean })
       )}
       <Sheet open={open} onClose={() => capSheet.set(false)} title={t('title')} ctx={ctx}>
         {presenter ? (
-          <SwitchRow label={t('room')} on={room} onChange={(v) => void toggleRoom(v, ctx)} />
+          <>
+            <SwitchRow label={t('room')} on={room} onChange={(v) => void toggleRoom(v, ctx)} disabled={!canRecord} />
+            {!canRecord && <p className="text-muted-foreground">{t('unsupported')}</p>}
+          </>
         ) : (
           !room && <p className="text-muted-foreground">{t('waiting')}</p>
         )}

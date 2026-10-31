@@ -5,6 +5,7 @@
 //  화면공유 중이면 1초마다 64×36 축소 프레임을 마지막 캡처와 비교 → 많이 바뀌면 캡처(분당 2장) → POST /api/notes/[id]/shot.
 //  끄기 : state {notes:false} → POST /api/notes/[id]/end(요약, 기다리지 않음). 늦게 들어온 사람에겐 발표자가 참가자 수가 늘 때 1초 묶어 다시 방송(SIGNAL_API 3.6).
 //  엔진 app 미지원이면 항목을 숨긴다(app:true — 전원 고지를 못 하면 시작하지 않는다 15.1). 호출은 전부 piFetch(Pi Browser 쿠키 없음)
+//  이 기기가 음성 녹음을 못 하면(pickAudioMime null — MediaRecorder 없는 WebView) 켜지 않고 알린다 — 배지만 뜨고 기록 0건인 침묵 방지(F-U A2)
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
@@ -34,6 +35,7 @@ import {
   shotAllowed,
 } from '@/lib/note-rules'
 import { presenterGone, presenterResync } from '../../room-rules'
+import { pickAudioMime } from '../../use-speech'
 
 const TOAST_MS = 3000
 const RESEND_MS = 1000
@@ -77,6 +79,7 @@ async function toggle(ctx: RoomCtx) {
       ctx.notice('notes.stoppedMine')
       return
     }
+    if (!pickAudioMime()) return ctx.notice('notes.unsupported') // 기능 탐지(UA 아님) — 녹음 못 하는 기기에선 시작하지 않는다
     const r = await piFetch('/api/notes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -251,8 +251,10 @@ function Room({
 
   // ── 부가 기능(extensions.ts) ──
   const locale = useLocale()
-  // 마이크 동의 — 음성 처리 기능이 있고 내가 말할 수 있을 때만(발표 가능·무대 역할)
-  const consent = useConsent(room, userId, CONSENT && (canPresent || role !== 'audience'))
+  // 마이크 동의 — 음성 처리 기능이 있고 내가 말할 수 있을 때만(발표 가능·무대 역할). 서버가 기록을 거절하면 1회 알림(409 = 종료된 세미나, 그 밖 = 참가 등록 확인)
+  const consent = useConsent(room, userId, CONSENT && (canPresent || role !== 'audience'), (status) =>
+    status === 409 ? setNotice({ key: 'consent.saveFailClosed' }) : say('consent.saveFail'),
+  )
   // 음성 조각(A-1) — 기능들의 말하기 요청을 합쳐 녹음기 1개로. 동의한 무대 역할의 내 마이크만(청중 음성은 나가지 않는다)
   const wants = Object.values(useStore(speechWants))
   const speech = useSpeech({

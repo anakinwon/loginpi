@@ -4,7 +4,8 @@
 // 소음 = 마이크 트랙 applyConstraints(noiseSuppression·autoGainControl 토글, echoCancellation 늘 켬 — 끄면 하울링). 못 바꾸면(Chromium) 새 제약으로 마이크 재획득 + replaceTrack(noise.ts).
 // 판단(REA jitsi-03 ①) : Jitsi 도 기본은 브라우저 내장 처리(noiseSuppression·echoCancellation·autoGainControl true)이고 RNNoise(wasm 워클릿)는
 // 더보기의 '추가' 옵션일 뿐이다 → 우리는 브라우저 내장으로 충분하다고 보고 RNNoise·워클릿을 넣지 않는다(번들·CPU 0). 실기기 음질이 모자라면 그때 검토.
-// 기능 탐지만(UA 판정 금지) : 조명 = captureStream + ctx.filter, 소음 = getSupportedConstraints().noiseSuppression
+// 기능 탐지만(UA 판정 금지) : 조명 = captureStream + ctx.filter 실동작 프로브(1×1 캔버스, 1회 캐시 — WebKit 은 플래그 뒤에서 속성만 노출하고 무효과),
+// 소음 = getSupportedConstraints().noiseSuppression. 미지원이면 줄을 숨기지 않고 까닭 문구(lightUnsupported·noiseUnsupported)를 보인다(F-13 패턴)
 import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { canProcessVideo, useTrackLive, type EffectDraw } from '../../effects'
@@ -22,9 +23,28 @@ export const lightOn = featureStore(false)
 export const noiseOn = featureStore(true) // 기본 켬 = 브라우저 기본값과 같다(getUserMedia audio:true)
 
 // ── 조명 ──
-const canFilter = () =>
-  typeof CanvasRenderingContext2D !== 'undefined' &&
-  'filter' in CanvasRenderingContext2D.prototype
+// 'filter' in prototype 은 기능 검사가 아니다 — 흰 픽셀을 brightness(0) 으로 칠해 검정이 되는지 1회만 실제로 본다(engine.ts canSegment 와 같은 캐시 패턴)
+let filterOk: boolean | undefined
+const canFilter = () => {
+  if (typeof document === 'undefined') return false
+  if (filterOk === undefined) {
+    try {
+      const c = document.createElement('canvas')
+      c.width = c.height = 1
+      const ctx = c.getContext('2d', { willReadFrequently: true })
+      if (!ctx) filterOk = false
+      else {
+        ctx.filter = 'brightness(0)'
+        ctx.fillStyle = '#fff'
+        ctx.fillRect(0, 0, 1, 1)
+        filterOk = ctx.getImageData(0, 0, 1, 1).data[0] === 0
+      }
+    } catch {
+      filterOk = false
+    }
+  }
+  return filterOk
+}
 export const canLight = () => canProcessVideo() && canFilter()
 
 const light = lightTracker(lightOn) // 끄면 배율 1 로(다시 켤 때 옛 장면 배율로 시작하지 않게)
@@ -88,7 +108,7 @@ function FxOverlay({ ctx }: { ctx: RoomCtx }) {
   return null
 }
 
-// 효과 시트(backgrounds) 안의 조명·소음 줄 — 카메라 있으면 조명, 마이크 있으면 소음
+// 효과 시트(backgrounds) 안의 조명·소음 줄 — 카메라 있으면 조명, 마이크 있으면 소음. 장치는 있는데 기기가 못 하면 스위치 자리에 까닭 문구
 export function FxRows({ ctx }: { ctx: RoomCtx }) {
   const t = useTranslations('room.effects')
   const light = useStore(lightOn)
@@ -98,17 +118,24 @@ export function FxRows({ ctx }: { ctx: RoomCtx }) {
       ? (ctx.r.localStream?.getVideoTracks()[0] ?? null)
       : null
   const camLive = useTrackLive(cam) // 끝난 카메라는 조명 보정이 적용되지 않는다 — 줄을 숨긴다(배경 '카메라를 켜면…' 안내와 같은 판정)
+  const mic = !!micOf(ctx)
   const showLight = camLive && canLight()
-  const showNoise = !!micOf(ctx) && canNoise()
-  if (!showLight && !showNoise) return null
+  const showNoise = mic && canNoise()
+  if (!camLive && !mic) return null
   return (
     <div className="mt-3 space-y-1 text-sm">
-      {showLight && (
-        <SwitchRow label={t('light')} on={light} onChange={lightOn.set} />
-      )}
-      {showNoise && (
-        <SwitchRow label={t('noise')} on={noise} onChange={noiseOn.set} />
-      )}
+      {camLive &&
+        (showLight ? (
+          <SwitchRow label={t('light')} on={light} onChange={lightOn.set} />
+        ) : (
+          <p className="text-muted-foreground">{t('lightUnsupported')}</p>
+        ))}
+      {mic &&
+        (showNoise ? (
+          <SwitchRow label={t('noise')} on={noise} onChange={noiseOn.set} />
+        ) : (
+          <p className="text-muted-foreground">{t('noiseUnsupported')}</p>
+        ))}
     </div>
   )
 }

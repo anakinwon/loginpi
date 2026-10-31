@@ -361,6 +361,9 @@
       "policy": {
         "locked": "The presenter locked microphones. You can turn yours on once they are unlocked.",
         "unlocked": "Microphones are unlocked."
+      },
+      "consent": {
+        "saveFail": "Couldn't save your consent. Check your registration and turn the mic on again"
       }
     },
     "home": "Go to home",
@@ -491,7 +494,8 @@
       "newTab": "(opens in a new tab)",
       "decline": "Don't agree",
       "agree": "Agree and turn on mic",
-      "notice": "When recording, captions or AI meeting notes are on, speakers’ voices are processed. Audience voices are not sent."
+      "notice": "When recording, captions or AI meeting notes are on, speakers’ voices are processed. Audience voices are not sent.",
+      "saveFailClosed": "This seminar has ended, so consent can't be recorded"
     },
     "captions": {
       "title": "Captions",
@@ -517,7 +521,8 @@
         "unavailable": "Translated captions are not available right now. Showing the original",
         "quota": "This seminar has reached its translation limit. Showing the original",
         "usrQuota": "You have used up your translation limit for this seminar. Showing the original"
-      }
+      },
+      "unsupported": "This device can't create live captions (no audio recording support in this browser)"
     },
     "effects": {
       "title": "Effects",
@@ -555,7 +560,9 @@
       "bgFailed": "Could not load the background effect",
       "autoOff": "Your device is too slow, so the background effect was turned off",
       "unsupported": "Background effects are not available on this device",
-      "noCam": "Turn on your camera to choose a background"
+      "noCam": "Turn on your camera to choose a background",
+      "lightUnsupported": "Light correction is not available on this device",
+      "noiseUnsupported": "Noise reduction settings are not supported on this device"
     },
     "sheetClose": "Close",
     "polls": {
@@ -653,7 +660,8 @@
       "startedMine": "AI notes on — shown to everyone",
       "stoppedMine": "AI notes off — creating the notes",
       "startFail": "Couldn't start AI notes",
-      "gone": "AI notes stopped — the notes were ended or deleted elsewhere"
+      "gone": "AI notes stopped — the notes were ended or deleted elsewhere",
+      "unsupported": "AI notes can't be turned on here (no audio recording support)"
     },
     "dubbing": {
       "listen": "Listen in translated voice",
@@ -772,7 +780,10 @@
       "shareFail": "Couldn't share. Please use Copy link instead.",
       "created": "Your seminar is ready. Add its start time to your Google Calendar.",
       "addGoogle": "Add to Google Calendar",
-      "later": "Later"
+      "later": "Later",
+      "piBrowserOpen": "In Pi Browser, calendar, email and the calendar file open in your phone's default browser.",
+      "extFail": "Couldn't open. Update Pi Browser, or use Copy link and open it in a regular browser (seminarz.vercel.app).",
+      "icsPiBrowser": "The calendar file can be downloaded only in a regular browser (computer or mobile). In Pi Browser, use Add to calendar instead."
     },
     "attendance": "Attendance",
     "plan": "Plan",
@@ -829,7 +840,8 @@
         "min": "Attended (min, time away excluded)",
         "state": "Status"
       },
-      "durNote": "Time attended is from first joined to last seen, minus time away (gaps longer than 2.5 minutes)."
+      "durNote": "Time attended is from first joined to last seen, minus time away (gaps longer than 2.5 minutes).",
+      "csvPiBrowser": "CSV download works only in a regular browser (computer or mobile). Pi Browser cannot save files — open this attendance sheet in a computer or phone browser (seminarz.vercel.app)."
     },
     "plan": "Plan",
     "planFree": "Free — {time} left this month · no AI",
@@ -960,7 +972,8 @@
       "SUMMARIZING": "Creating",
       "DONE": "Done",
       "FAILED": "Failed"
-    }
+    },
+    "downloadPiBrowser": "Download Markdown works only in a regular browser (computer or mobile). Pi Browser cannot save files — open these notes in a computer or phone browser (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Plans",

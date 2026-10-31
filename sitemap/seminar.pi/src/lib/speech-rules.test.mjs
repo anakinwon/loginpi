@@ -11,6 +11,8 @@ import {
   reserveSec,
   settleSec,
   chunkError,
+  chunkSendable,
+  SPEECH_BPS,
   chunkSec,
   LANG_RE,
   MAX_CHUNK_BYTES,
@@ -382,4 +384,20 @@ test('더빙 따라잡기 — 대기 문장 수만큼 가속, 상한 1.5 유지,
   const { readFile } = await import('node:fs/promises')
   const src = await readFile(new URL('../components/room/features/dubbing/index.tsx', import.meta.url), 'utf8')
   assert.ok(src.includes('a.playbackRate = dubRate(a.duration, undefined, queue.length - 1)'))
+})
+
+// F-U A1 — 화면이 보내기 전 검사(서버 chunkError 와 같은 상수) : 길이 0.5~10초·크기 1~160KB. 백그라운드 복귀로 밀린 긴 조각·iOS AAC 큰 조각은 보내지 않는다
+test('조각 보내기 판정 — 길이·크기 경계, 녹음 비트레이트 32kbps', async () => {
+  assert.equal(chunkSendable(5000, 40_000), true)
+  assert.equal(chunkSendable(500, 1), true) // 하한 포함
+  assert.equal(chunkSendable(10_000, MAX_CHUNK_BYTES), true) // 상한 포함
+  assert.equal(chunkSendable(499, 40_000), false) // 끄기 직전 짧은 조각
+  assert.equal(chunkSendable(10_001, 40_000), false) // 타이머 밀림(앱 전환 뒤 복귀)
+  assert.equal(chunkSendable(5000, 0), false) // 빈 조각
+  assert.equal(chunkSendable(5000, MAX_CHUNK_BYTES + 1), false) // iOS AAC 큰 조각
+  assert.equal(SPEECH_BPS, 32_000)
+  const { readFile } = await import('node:fs/promises')
+  const src = await readFile(new URL('../components/room/use-speech.ts', import.meta.url), 'utf8')
+  assert.ok(src.includes('new MediaRecorder(stream, { mimeType: mime, audioBitsPerSecond: SPEECH_BPS })'))
+  assert.ok(src.includes('chunkSendable(dur, blob.size)'))
 })

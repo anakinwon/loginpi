@@ -1,4 +1,6 @@
-// 일정·공유 순수 규칙(계획 SA1, M-2 OAuth 없는 링크) — 캘린더 추가 링크·웹 메일 작성 링크·mailto·.ics(RFC 5545) 생성.
+// 일정·공유 순수 규칙(계획 SA1, M-2 OAuth 없는 링크) — 캘린더 추가 링크·웹 메일 작성 링크·mailto·.ics(RFC 5545) 생성
+//  + Pi Browser(WebView) 대안 : Pi SDK 공식 유틸(openUrlInSystemBrowser·openShareDialog·copyText)을 기능 탐지로 우선 쓰고 없으면 브라우저 기본 동작.
+//  유틸은 인자로 주입(pi) — 화면이 isInPiBrowser(authenticate 성공 신호, UA 아님)일 때만 window.Pi 를 넘긴다(일반 브라우저에도 window.Pi 가 주입되므로)
 // 서버·클라이언트 공용(server-only 없음). 시험 : node --test src/lib/calendar-rules.test.mjs (Node 24 타입 제거로 .ts 직접 읽음)
 
 // 세미나에 예정 종료일시가 없다(smn_mst.end_dtm = 실제 종료) → 일정 길이는 1시간으로 둔다
@@ -79,27 +81,66 @@ export function webMailUrl(subject: string, body: string) {
 export const mailtoUrl = (subject: string, body: string) =>
   `mailto:?subject=${encodeURIComponent(oneLine(subject))}&body=${encodeURIComponent(body.replace(/\r\n|\r|\n/g, '\r\n'))}`
 
-// 링크 복사 — 외부 링크·mailto 가 안 열리는 환경(Pi Browser [확인중 : 실기기])의 대안. 클립보드 없음·거부 = false(화면이 안내)
+// Pi SDK 유틸 — 전역 PiSDK 타입과 같은 모양(이 파일은 node 시험이 직접 읽어 전역 선언에 기대지 않는다)
+export type PiUtil =
+  | {
+      openUrlInSystemBrowser?: (url: string) => Promise<void>
+      openShareDialog?: (title: string, message: string) => void | Promise<void>
+      copyText?: (text: string) => Promise<void>
+    }
+  | undefined
+
+// 외부 열기 응답 대기 상한 — 네이티브 브리지는 바로 응답하므로 넘기면 '무반응'(구 Pi Browser)으로 보고 안내한다
+// ponytail: 고정 3초, 시스템 브라우저로 나간 뒤 타이머가 늦게 깨어 안내가 겹칠 수 있음 — 실기기에서 보이면 visibilitychange 로 취소
+export const EXT_TIMEOUT_MS = 3_000
+const timeout = (ms: number) => new Promise<'fail'>((ok) => setTimeout(() => ok('fail'), ms))
+
+// 외부 링크(캘린더·웹 메일·.ics) — Pi Browser 는 target=_blank 가 무반응일 수 있어(WKWebView·Android WebView) 시스템 브라우저로 연다(외부 이동 = 사용자 클릭 + 캡션 고지).
+//  유틸이 없으면 null 을 동기 반환(앵커 기본 동작) — 화면은 null 이 아닐 때만 preventDefault. reject('No minimal requirements' 등)·무반응 = 'fail'(화면이 안내)
+export function openExternal(url: string, pi: PiUtil, ms = EXT_TIMEOUT_MS) {
+  if (typeof pi?.openUrlInSystemBrowser !== 'function') return null
+  const open = pi.openUrlInSystemBrowser
+  // 동기 throw 도 reject 와 같이(then 안에서 호출)
+  return Promise.race([Promise.resolve().then(() => open(url)).then(() => 'ok' as const, () => 'fail' as const), timeout(ms)])
+}
+
+// 링크 복사 — 외부 링크·mailto 가 안 열리는 환경(Pi Browser)의 대안. Pi.copyText 우선, 실패·없음이면 navigator.clipboard, 둘 다 없음·거부 = false(화면이 안내)
 type Clip = { writeText: (s: string) => Promise<void> } | undefined
-export const canCopy = (clip: Clip = globalThis.navigator?.clipboard) => typeof clip?.writeText === 'function'
-export async function copyText(text: string, clip: Clip = globalThis.navigator?.clipboard) {
-  if (!canCopy(clip)) return false
+export const canCopy = (clip: Clip = globalThis.navigator?.clipboard, pi?: PiUtil) =>
+  typeof pi?.copyText === 'function' || typeof clip?.writeText === 'function'
+export async function copyText(text: string, clip: Clip = globalThis.navigator?.clipboard, pi?: PiUtil) {
+  if (typeof pi?.copyText === 'function') {
+    try {
+      await pi.copyText(text)
+      return true
+    } catch {} // 구 SDK reject → 클립보드로
+  }
+  if (typeof clip?.writeText !== 'function') return false
   try {
-    await clip!.writeText(text)
+    await clip.writeText(text)
     return true
   } catch {
     return false
   }
 }
 
-// 기기 공유 시트(Web Share) — 메신저 등 설치 앱으로 바로 보낸다(메일·클립보드가 막힌 WebView 의 대안). 기능 탐지(UA 판정 아님).
-//  'cancel' = 사용자가 시트를 닫음(안내 없음), 'fail' = 미지원·거부(화면이 링크 복사로 안내)
+// 기기 공유 시트 — Pi Browser 는 Pi.openShareDialog(OS 공유창, 메일 앱 포함 — mailto 대체), 그 밖은 Web Share. 기능 탐지(UA 판정 아님).
+//  'cancel' = 사용자가 시트를 닫음(안내 없음), 'fail' = 미지원·거부(화면이 링크 복사로 안내). openShareDialog 는 닫힘을 알려 주지 않아 'ok'
 type Sharer = { share?: (d: { title?: string; text?: string; url?: string }) => Promise<void> } | undefined
-export const canShare = (nav: Sharer = globalThis.navigator) => typeof nav?.share === 'function'
-export async function shareLink(d: { title?: string; text?: string; url: string }, nav: Sharer = globalThis.navigator) {
-  if (!canShare(nav)) return 'fail' as const
+export const canShare = (nav: Sharer = globalThis.navigator, pi?: PiUtil) =>
+  typeof pi?.openShareDialog === 'function' || typeof nav?.share === 'function'
+export async function shareLink(d: { title?: string; text?: string; url: string }, nav: Sharer = globalThis.navigator, pi?: PiUtil) {
+  if (typeof pi?.openShareDialog === 'function') {
+    try {
+      await pi.openShareDialog(d.title ?? '', [d.text, d.url].filter(Boolean).join('\n'))
+      return 'ok' as const
+    } catch {
+      return 'fail' as const
+    }
+  }
+  if (typeof nav?.share !== 'function') return 'fail' as const
   try {
-    await nav!.share!(d)
+    await nav.share(d)
     return 'ok' as const
   } catch (e) {
     return (e as { name?: string } | null)?.name === 'AbortError' ? ('cancel' as const) : ('fail' as const)

@@ -7,10 +7,12 @@
 //  멈춤 = SPEECH_QUOTA(429, 세미나 한도 소진 — 이 세션 끝)·SPEECH_NOT_LIVE(409, 이번 켜기 끝)·SPEECH_NO_AGR(403, 서버에 동의 없음 → onNoAgr 로 다시 묻기)
 //  ·NOT_FOUND·FORBIDDEN(대상 삭제·권한 잃음, 이번 켜기 끝) — 판정 = speechHalt, 멈추면 onHalt 로 알린다.
 //  그 밖(SPEECH_RATE·SPEECH_FAILED·네트워크·15초 초과)은 그 조각만 건너뛴다. 실험실 방(UUID 아님)은 서버 기록이 없어 보내지 않는다
+// 보내기 전 검사 = chunkSendable(길이 0.5~10초·크기 ≤160KB, 서버 chunkError 와 같은 상수) — 백그라운드 복귀로 길어진 조각·iOS AAC 큰 조각은 보내지 않는다.
+//  녹음 비트레이트는 SPEECH_BPS(32kbps) 고정(F-U A1)
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { piFetch } from '@pi/auth/client'
 import { isUuid } from '@/lib/seminar-rules'
-import { captionFresh, chunkHeard, CHUNK_MIN_MS, CHUNK_MS, NOTE_CTX, settleWithin, speechHalt, type SpeechHalt, VAD } from '@/lib/speech-rules'
+import { captionFresh, chunkHeard, chunkSendable, CHUNK_MS, NOTE_CTX, settleWithin, SPEECH_BPS, speechHalt, type SpeechHalt, VAD } from '@/lib/speech-rules'
 import { acquireCtx, releaseCtx } from './video-tile'
 
 export const UPLOAD_TIMEOUT_MS = 15_000 // 서버 외부 AI 10초(BUILD_DEFECTS 2.7) + 여유 — 넘으면 그 조각 포기
@@ -152,16 +154,18 @@ export function useSpeech({
       let spoke = track.enabled
       peak = 0
       samples = 0
-      const r = new MediaRecorder(stream, { mimeType: mime })
+      const r = new MediaRecorder(stream, { mimeType: mime, audioBitsPerSecond: SPEECH_BPS })
       rec = r
       r.ondataavailable = (e) => {
         if (e.data.size) parts.push(e.data)
       }
       r.onstop = () => {
         spoke ||= track.enabled
-        const dur = Date.now() - ts // 서버 chunkError 가 요구하는 조각 길이(0.5~10초) — 끄기 직전의 짧은 조각은 버린다
-        if (!halted && parts.length && spoke && chunkHeard(peak, samples, vadLevel) && dur >= CHUNK_MIN_MS) {
-          const p = upload(new Blob(parts, { type: r.mimeType || mime }), dur).catch(() => {})
+        const dur = Date.now() - ts
+        const blob = new Blob(parts, { type: r.mimeType || mime })
+        // 서버 chunkError 와 같은 길이·크기 조건(chunkSendable) — 끄기 직전의 짧은 조각, 타이머가 밀린 긴 조각, 상한 넘는 큰 조각은 버린다
+        if (!halted && spoke && chunkHeard(peak, samples, vadLevel) && chunkSendable(dur, blob.size)) {
+          const p = upload(blob, dur).catch(() => {})
           pending.current.add(p)
           void p.finally(() => pending.current.delete(p))
         }

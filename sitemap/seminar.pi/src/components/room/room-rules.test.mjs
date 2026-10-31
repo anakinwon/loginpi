@@ -41,6 +41,7 @@ import {
   APP_PROBE,
   appSupportedBy,
   consentPlan,
+  consentKeepLocal,
 } from './room-rules.ts'
 import { failHit, topDialog } from './room-rules.ts'
 
@@ -446,6 +447,12 @@ test('동의 서버·기기 맞추기', () => {
   assert.equal(consentPlan({ agreed: false, stored: false }, false), 'ask')
   assert.equal(consentPlan(null, true), 'mark') // 네트워크·오류
   assert.equal(consentPlan(null, false), 'ask')
+})
+
+// F-U A3 — 동의 POST 실패 뒤 이 기기 기록을 남길지 : 서버를 모르는 실패만 남기고, 서버가 거절한 4xx 는 지운다(NO_AGR → 다시 묻기 순환 차단)
+test('동의 저장 실패 — 네트워크·5xx·401 은 로컬 유지, 403·404·409 는 삭제', () => {
+  for (const s of [0, 401, 500, 502, 503]) assert.equal(consentKeepLocal(s), true, String(s))
+  for (const s of [400, 403, 404, 409, 429]) assert.equal(consentKeepLocal(s), false, String(s))
 })
 
 test('발표자가 방에 있을 때만 panel 음성 처리(자막·AI 회의록) — 발표자가 끊김 신호 없이 사라지면 멈춘다', () => {

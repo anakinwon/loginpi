@@ -1,11 +1,12 @@
 'use client'
 // 회의록 화면(설계서 15.9) — 머리(제목·시각·길이·AI 고지) → 요약(요점·결정·할 일) → 화면 캡처(화면에 들어오기 직전 조회) → 전체 기록(50줄 쪽, 같은 방식)
 //  → [Markdown 내려받기](piFetch → Blob → 객체 URL — <a download> 는 X-Pi-Token 을 못 붙인다). 비로그인 = LoginGate(redirect 없음).
+//    Pi Browser 는 <a download>·공유 시트를 막아 저장 불가(F-13 실기기) → isInPiBrowser 면 버튼 대신 '일반 브라우저에서만' 안내(F-08 형제)
 //  상태 : 만드는 중 = 5초 간격 조회·최대 2분(넘으면 새로 고침 안내) / 실패 = 안내 + 관리 권한자에게 [다시 만들기] / 완료
 //  [회의록 삭제] = 기록 시작자·ADMIN(head.del) — 두 번 눌러 확인(window.confirm 은 WebView 가 막을 수 있어 쓰지 않음) → DELETE → 내 회의록 목록
 import { useEffect, useRef, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { piFetch } from '@pi/auth/client'
+import { piFetch, usePiAuth } from '@pi/auth/client'
 import { LoginGate } from '@/components/login-gate'
 import { Pagination } from '@/components/seminar/pagination'
 import { BTN, BTN_PRIMARY } from '@/components/seminar/shared'
@@ -87,6 +88,7 @@ function Note({ id }: { id: string }) {
   const [busy, setBusy] = useState(false)
   const [delErr, setDelErr] = useState(false)
   const [dlErr, setDlErr] = useState(false)
+  const { isInPiBrowser } = usePiAuth()
   const loaded = useRef(false)
 
   useEffect(() => {
@@ -273,14 +275,18 @@ function Note({ id }: { id: string }) {
       <Shots id={id} />
       <Transcript id={id} />
 
-      <button
-        type="button"
-        className={BTN_PRIMARY}
-        onClick={() => void download()}
-      >
-        {t('download')}
-      </button>
-      {dlErr && (
+      {isInPiBrowser ? (
+        <p className="text-muted-foreground text-sm">{t('downloadPiBrowser')}</p>
+      ) : (
+        <button
+          type="button"
+          className={BTN_PRIMARY}
+          onClick={() => void download()}
+        >
+          {t('download')}
+        </button>
+      )}
+      {dlErr && !isInPiBrowser && (
         <p role="alert" className="text-sm">
           {t('dlFail')}
         </p>
