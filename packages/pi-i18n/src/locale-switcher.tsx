@@ -75,6 +75,7 @@ export function LocaleSwitcher({
   const choose = (code: string) => {
     try {
       localStorage.setItem(storageKey, code)
+      localStorage.setItem(`${storageKey}_src`, 'manual') // 수동 선택 — IP 자동 선택보다 우선(language-switcher 와 같은 규칙, R-P0)
     } catch {
       /* 저장 실패해도 전환은 진행 */
     }

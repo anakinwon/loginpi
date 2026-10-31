@@ -20,18 +20,18 @@ test('국가 → locale : 언어 locale 우선(KR→ko, US→en, JP→ja), 국�
 
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}` }
 // 인라인 스크립트 실행 — fetch 는 country 를 돌려주는 가짜, 결과 = 저장소·이동 주소·조회 횟수
-async function run({ path = '/', store = {}, country = 'JP' }) {
+async function run({ path = '/', store = {}, country = 'JP', delay = 0 }) {
   const html = PreferredLocaleScript({ locales: ROUTING_LOCALES }).props.dangerouslySetInnerHTML.__html
   const ls = { ...store }
   const out = { replaced: null, fetched: 0, ls }
   const ctx = {
     localStorage: { getItem: (k) => (k in ls ? ls[k] : null), setItem: (k, v) => { ls[k] = String(v) } },
     location: { pathname: path, search: '', hash: '', replace: (u) => { out.replaced = u } },
-    fetch: () => { out.fetched++; return Promise.resolve({ json: () => Promise.resolve({ country }) }) },
+    fetch: () => { out.fetched++; return new Promise((r) => setTimeout(() => r({ json: () => Promise.resolve({ country }) }), delay)) },
     Date, String,
   }
   vm.runInNewContext(html, ctx)
-  await new Promise((r) => setTimeout(r, 10))
+  await new Promise((r) => setTimeout(r, delay + 10))
   return out
 }
 
@@ -82,4 +82,12 @@ test('제외 경로(/admin·/auth/pi/callback)는 아무것도 안 함', async (
   const o = await run({ path: '/admin/users' })
   assert.equal(o.fetched, 0)
   assert.equal(o.replaced, null)
+})
+
+test('국가 응답이 1.5초 넘게 늦으면 이동하지 않고 저장만(다음 접속에 적용)', async () => {
+  const o = await run({ delay: 1600 })
+  assert.equal(o.fetched, 1)
+  assert.equal(o.replaced, null)
+  assert.equal(o.ls.preferred_locale, 'ja')
+  assert.equal(o.ls.preferred_locale_src, 'geo')
 })
