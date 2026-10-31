@@ -254,6 +254,8 @@ export const routing = defineRouting({
   // Accept-Language·NEXT_LOCALE 쿠키 감지 끔(@pi/i18n 표준 6절 1항, 2026-11-01) — Pi Browser 는 쿠키를 저장하지 않아 감지가 매번 Accept-Language 로 가고,
   //  저장 언어(PreferredLocaleScript)가 ko 인데 기기 언어가 en 이면 '/' → 307 /en → 스크립트 '/' 로 되돌림 … 무한 왕복(팀장 검토 REJECTED 재현).
   //  첫 접속 언어는 하루 첫 접속 IP 국가 자동 선택이 대신 정한다
+  // hreflang Link 헤더 끔 — locale 219개면 응답 헤더 약 16KB(링크 미리보기 봇·Node 기본 16KB 한도 초과로 공유 미리보기 실패, 2026-11-01 운영 실측)
+  alternateLinks: false,
   localeDetection: false,
   localeCookie: false,
 })

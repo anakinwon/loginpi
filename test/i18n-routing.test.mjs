@@ -8,4 +8,5 @@ test('routing : localeDetection·localeCookie 끔 (@pi/i18n 표준 6절 1항)', 
   const src = readFileSync(new URL('../src/i18n/routing.ts', import.meta.url), 'utf8')
   assert.match(src, /localeDetection:\s*false/)
   assert.match(src, /localeCookie:\s*false/)
+  assert.match(src, /alternateLinks:\s*false/) // locale 219개 hreflang Link 헤더 16KB 방지
 })

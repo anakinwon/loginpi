@@ -74,6 +74,8 @@ export function createRouting(options: CreateRoutingOptions = {}) {
     locales: resolveLocales(options.locales),
     defaultLocale: options.defaultLocale ?? DEFAULT_LOCALE,
     localePrefix: 'as-needed',
+    // hreflang Link 헤더 끔 — locale 219개면 응답 헤더 약 16KB(링크 미리보기 봇·Node 기본 16KB 한도 초과로 공유 미리보기 실패, 2026-11-01 운영 실측)
+    alternateLinks: false,
     localeDetection: false,
     localeCookie: false,
   })
