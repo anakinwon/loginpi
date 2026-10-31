@@ -1,0 +1,27 @@
+{
+  "name": "@pi/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pi 멀티사이트 공용 다국어 표준 — 언어 카탈로그·next-intl 라우팅/요청 설정 팩토리·LocaleSwitcher·번역/검증/감사 CLI (docs/I18N_STANDARD.md)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts",
+    "./client": "./src/client.tsx",
+    "./catalog.json": "./src/catalog.json"
+  },
+  "bin": {
+    "pi-i18n": "./bin/pi-i18n.mjs"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@formatjs/icu-messageformat-parser": "^3.5.11"
+  },
+  "peerDependencies": {
+    "next": "^16",
+    "next-intl": "^4",
+    "react": "^19"
+  }
+}
