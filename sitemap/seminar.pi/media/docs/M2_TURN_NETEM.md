@@ -4,7 +4,7 @@
 
 ## 1. TURN 경유 (M2 ⑨)
 
-- 자격 증명은 cafe.pi `POST /api/voice/turn-credentials` 방식을 그대로 쓴다(PRD_01 51행) — 우선순위 Cloudflare Realtime TURN → HMAC(coturn, SHA-1) → STUN 만. **구현 : seminar.pi `POST /api/media/turn`(2026-10-26 `a786ccfd`)** — 실험실 화면 연결·실제 TURN 중계 미검증. 영구 비밀은 서버에만, 클라이언트엔 단기 자격 증명만.
+- 자격 증명은 cafe.pi `POST /api/voice/turn-credentials` 방식을 그대로 쓴다(PRD_01 51행) — 우선순위 Cloudflare Realtime TURN → HMAC(coturn, SHA-1) → STUN 만. **구현 : seminar.pi `POST /api/media/turn`(2026-10-26 `a786ccfd`)** — 룸 입장 때 연결(`a7affafb`). **실제 TURN 중계 = 2026-10-31 실증** : Vultr VPS 에 coturn(`media/scripts/vps-turn-setup.sh`, 3478 udp/tcp, TLS 없음 — 라우트의 `turns:443` 은 Caddy 가 점유해 무해하게 실패), `turnutils_uclient` udp·tcp 80/80 무손실, PC Chromium `iceTransportPolicy:'relay'` 데이터채널에서 relay 후보 3개(udp 1·tcp 2), Vercel `TURN_HOST=158.247.243.145.sslip.io`·`TURN_SECRET` 등록. 운영·되돌리기 = `VPS_GUIDE.md` 8절. 남은 것 = LTE 실기기(Pi Browser 청중)에서 relay 실사용 확인. 영구 비밀은 서버에만, 클라이언트엔 단기 자격 증명만.
 - 시험 화면이 `/api/media/turn` 에서 받은 `iceServers` 를 `RTCPeerConnection` 에 넣는다 [TBD : 실험실 화면 연결].
 - 엔진 쪽은 TURN 서버가 아니라 **ICE 후보 상대**일 뿐이다. 엔진 join 응답의 `iceServers`(`MEDIA_ICE_SERVERS`, JSON 배열 `[{urls, username?, credential?}]`)는 정적 STUN 용이고, TURN 단기 자격 증명은 화면 서버가 직접 준다. [TBD : 엔진 응답에 TURN 을 실을지 — 실으면 엔진이 HMAC 비밀을 알아야 함]
 - 강제 경유 시험 : 브라우저에서 `iceTransportPolicy: 'relay'` 로 연결해 relay 후보만으로 화면이 나오는지 본다(Galène relay 전용 시험 옵션 개념, REA_01 6.2 8).

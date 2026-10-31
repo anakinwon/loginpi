@@ -28,8 +28,8 @@ node scripts/tenant-env.mjs new yea.pi --port 3005   # 신규 테넌트 설정 �
 |---|---|---|---|---|
 | cafe.pi | 루트 | https://cafepi.vercel.app | cafe (`production`) · 스테이징 loginpi (`master`, https://loginpi.vercel.app) | :3000 |
 | sitemap.pi | `sitemap/sitemap.pi` | [확인중] | sitemaps (`prod/sitemap`) · 스테이징 https://sitemapst.vercel.app | :3001 |
-| schema.pi | `sitemap/schema.pi` | https://schem.vercel.app | schema (`prod/schema`) | :3002 |
-| seminar.pi | `sitemap/seminar.pi` | 없음(미배포) | 없음 — 예정 `prod/seminar` | :3003 |
+| schema.pi | `sitemap/schema.pi` | https://schem.vercel.app | schema (운영 브랜치 = `master` — Vercel 프로젝트 설정 실측 2026-10-31, 구 `prod/schema` 표기는 사문) | :3002 |
+| seminar.pi | `sitemap/seminar.pi` | https://seminarz.vercel.app | seminar (운영 브랜치 = `master`, 별도 승격 없음 — 2026-10-31 확인) | :3003 |
 
 **같아야 하는 값과 달라야 하는 값** (2026-10-24 실측)
 
@@ -106,7 +106,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 
 - https://vercel.com/dashboard → 프로젝트(cafe·sitemaps·schema·loginpi) → **Settings → Environment Variables**
   - 환경을 **Production**으로 지정해 등록한 뒤 **재배포**해야 반영된다.
-- ⚠ 스테이징 loginpi도 `VERCEL_ENV=production`이다. `MON_INGEST_*`는 **운영 프로젝트(cafe·sitemaps·schema)에만** 등록한다.
+- ⚠ 스테이징 loginpi도 `VERCEL_ENV=production`이다. `MON_INGEST_*`는 **운영 프로젝트(cafe·sitemaps·schema·seminar)에만** 등록한다(seminar 는 2026-10-31 등록, production+preview).
 - `VERCEL_API_TOKEN`: https://vercel.com/account/tokens
 
 ### 3.6 그 밖의 외부 서비스 (앱 전용)
@@ -122,7 +122,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | `RESEND_API_KEY` · `RESEND_FROM_EMAIL` | https://resend.com/api-keys (발신 도메인 인증 필요) |
 | `GOOGLE_MAPS_API_KEY` · `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | https://console.cloud.google.com/google/maps-apis/credentials (공개 키는 HTTP 리퍼러로 제한한다) |
 | `CLOUDFLARE_TURN_TOKEN_ID` · `CLOUDFLARE_TURN_API_TOKEN` (cafe.pi·seminar.pi) | https://dash.cloudflare.com → **Realtime → TURN Server → Create**(키 생성) → 화면의 **Turn Token ID**·**API Token** 복사. API Token 은 생성 직후 한 번만 보인다 [확인중 : 대시보드 메뉴 이름 — Cloudflare 개편 잦음]. 로컬·운영 다른 키 권장 |
-| `TURN_HOST` · `TURN_SECRET` (cafe.pi·seminar.pi) | 직접 운영하는 coturn 서버 주소(호스트만)와 그 서버 `turnserver.conf` 의 `use-auth-secret` + `static-auth-secret=<값>`(값은 3.1 처럼 직접 생성). seminar.pi 는 HMAC-SHA1(coturn 기본), cafe.pi 는 SHA-256 으로 서명 [확인중 : cafe.pi 쪽이 coturn 기본과 맞는지]. Metered 관리형은 HMAC 비밀을 주지 않는 방식일 수 있음 [확인중]. 응답에 `turns:<호스트>:443` 이 포함되므로 coturn 은 **인증서를 두고 TLS 443 을 열어야** 함(아니면 그 주소만 실패) [확인중 : 실제 서버 구성] |
+| `TURN_HOST` · `TURN_SECRET` (cafe.pi·seminar.pi) | 직접 운영하는 coturn 서버 주소(호스트만)와 그 서버 `turnserver.conf` 의 `use-auth-secret` + `static-auth-secret=<값>`(값은 3.1 처럼 직접 생성). seminar.pi 는 HMAC-SHA1(coturn 기본), cafe.pi 는 SHA-256 으로 서명 [확인중 : cafe.pi 쪽이 coturn 기본과 맞는지]. Metered 관리형은 HMAC 비밀을 주지 않는 방식일 수 있음 [확인중]. 응답에 `turns:<호스트>:443` 이 포함되지만 TLS 를 안 열면 **그 주소만 무해하게 실패**하고 `turn:3478` udp·tcp 로 중계된다. **seminar.pi 실제 구성(2026-10-31)** : Vultr 서울 VPS 의 coturn(`sitemap/seminar.pi/media/scripts/vps-turn-setup.sh`, 3478 udp+tcp, 중계 49160~49200/udp, TLS 없음 — 443 은 Caddy 가 씀), `TURN_HOST=158.247.243.145.sslip.io`(IP 리터럴 대신 호스트명 — iOS LTE DNS64/NAT64 대비, 포트·스킴 붙이지 말 것), 비밀은 `openssl rand -hex 32` 로 생성해 VPS `turnserver.conf` 와 Vercel 에만 둔다. 절차·되돌리기 = `media/docs/VPS_GUIDE.md` 8절 |
 | `TURN_CREDENTIAL_TTL` | 값 직접 지정(초, 기본 3600) — 비밀 아님 |
 
 ## 4. 신규 테넌트 추가 체크리스트
