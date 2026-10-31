@@ -46,7 +46,10 @@ export default async function LocaleLayout({
           <SessionProvider>
             <PiAuthRoot>
               <SiteHeader />
-              <main className="mx-auto max-w-3xl px-4 py-6 lg:max-w-none lg:px-8">{children}</main>
+              {/* 아래 여백 = 하단 고정 메뉴 바 높이(site-header BottomNav) — 마지막 내용이 가려지지 않게 */}
+              <main className="mx-auto max-w-3xl px-4 py-6 pb-28 lg:max-w-none lg:px-8">
+                {children}
+              </main>
               {/* 애플리케이션 모니터링 계측 → schema.pi 모니터링(운영만, M5 2026-10-31) */}
               <MonRum />
             </PiAuthRoot>

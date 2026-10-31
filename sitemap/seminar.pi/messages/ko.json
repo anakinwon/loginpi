@@ -33,7 +33,12 @@
     "plan": "요금제",
     "rooms": "방 관리",
     "admin": "관리자",
-    "users": "사용자 관리"
+    "users": "사용자 관리",
+    "home": "홈",
+    "privacyShort": "개인정보",
+    "menu": "주 메뉴",
+    "fold": "메뉴 접기",
+    "unfold": "메뉴 펼치기"
   },
   "auth": {
     "checking": "로그인 확인 중…",

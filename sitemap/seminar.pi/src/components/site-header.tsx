@@ -1,36 +1,48 @@
 'use client'
 
-// 상단 헤더 — 홈·관리자 메뉴(관리자만 — 제작 현황·방 관리·사용자 관리)·요금제·계정 연동(미연동만)·개인정보 처리방침·언어 전환·로그인 상태(Pi 세션 OR Google 연동 세션, useAppUser 통합)
-import { useEffect, useRef, useState } from 'react'
+// 상단 헤더 + 하단 폴더블 메뉴(마스터 지시 2026-10-31) —
+//  상단 : 로고 · 로그인 상태(사용자명, Pi 세션 OR Google 연동 세션, useAppUser 통합)만.
+//  하단 : 고정 메뉴 바 HOME | 요금제 | 개인정보 | 관리자(관리자만 — 위로 펼침 : 제작 현황·방 관리·사용자 관리·대면 노트) + 언어 전환 + 접기.
+//   접기 = 바를 작은 손잡이 하나로 줄임(상태는 localStorage, 읽기 실패해도 동작). 세미나 방(/s/*)은 방 조작 바가 하단을 쓰므로 숨김.
+//   아이콘은 정적 SVG(nav-icons) — 애니메이션 없음(Pi Browser 규칙)
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { piFetch } from '@pi/auth/client'
 import { Link, usePathname } from '@/i18n/navigation'
-import { readApi } from '@/lib/client-api'
 import { AuthStatus } from './auth-status'
 import { useAppUser } from './google-auth'
+import {
+  IconActivity,
+  IconCard,
+  IconChevronDown,
+  IconGlobe,
+  IconHome,
+  IconMenu,
+  IconNotebook,
+  IconShield,
+  IconSliders,
+  IconUsers,
+  IconVideo,
+} from './nav-icons'
 
-// Google 연동 완료 여부 — Google 세션 사용자는 연동돼야만 user 가 되므로 항상 true, Pi 세션은 /api/auth/me linked 로 확인
-function useLinked(userId: string | null, google: boolean) {
-  const [linked, setLinked] = useState<string | null>(null) // 연동 확인된 userId
-  useEffect(() => {
-    if (google || !userId) return
-    let live = true
-    void readApi<{ user: { linked?: boolean } | null }>(
-      piFetch('/api/auth/me', { cache: 'no-store' }),
-    ).then((r) => {
-      if (live && r.ok && r.data.user?.linked) setLinked(userId)
-    })
-    return () => {
-      live = false
-    }
-  }, [userId, google])
-  return google || (!!userId && linked === userId)
+const FOLD_KEY = 'smn_nav_fold'
+type Item = { href: string; label: string; icon: ReactNode }
+
+// 메뉴 항목 공통 모양 — 아이콘 위·짧은 글자 아래, 현재 화면은 강조색
+const ITEM =
+  'flex min-w-14 flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-[11px] leading-none text-muted-foreground hover:bg-surface-raised hover:text-foreground aria-[current=page]:text-accent'
+
+function useHere() {
+  const pathname = usePathname()
+  return (href: string) =>
+    href === '/'
+      ? pathname === '/'
+      : pathname === href || pathname.startsWith(`${href}/`)
 }
 
-// 관리자 메뉴 — 네이티브 펼침(details, 키보드·화면 낭독 기본 지원). 항목 이동·바깥 탭·포커스 이탈·Esc = 닫기(Esc 는 여는 버튼으로 포커스 복귀)
-function AdminMenu({ items }: { items: [string, string][] }) {
-  const t = useTranslations('nav')
+// 관리자 메뉴 — 네이티브 펼침(details, 위로 열림). 항목 이동·바깥 탭·포커스 이탈·Esc = 닫기(Esc 는 여는 버튼으로 포커스 복귀)
+function AdminMenu({ items, label }: { items: Item[]; label: string }) {
   const pathname = usePathname()
+  const here = useHere()
   const ref = useRef<HTMLDetailsElement>(null)
   const close = () => {
     if (ref.current) ref.current.open = false
@@ -52,7 +64,7 @@ function AdminMenu({ items }: { items: [string, string][] }) {
       window.removeEventListener('keydown', key)
     }
   }, [])
-  const here = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
+  const active = items.some((it) => here(it.href))
   return (
     <details
       ref={ref}
@@ -64,23 +76,23 @@ function AdminMenu({ items }: { items: [string, string][] }) {
       }}
     >
       <summary
-        className={`inline-flex min-h-6 cursor-pointer list-none items-center gap-1 [&::-webkit-details-marker]:hidden ${items.some(([h]) => here(h)) ? 'font-semibold' : ''}`}
+        aria-current={active ? 'page' : undefined}
+        className={`${ITEM} cursor-pointer list-none [&::-webkit-details-marker]:hidden`}
       >
-        {t('admin')}
-        <span aria-hidden className="text-xs">
-          ▾
-        </span>
+        <IconSliders />
+        {label}
       </summary>
-      <ul className="bg-surface absolute top-full left-0 z-40 mt-2 min-w-40 rounded-xl p-1 shadow-xl">
-        {items.map(([href, label]) => (
-          <li key={href}>
+      <ul className="bg-surface absolute bottom-full left-1/2 z-40 mb-3 min-w-44 -translate-x-1/2 rounded-xl p-1 shadow-xl ring-1 ring-white/10">
+        {items.map((it) => (
+          <li key={it.href}>
             <Link
-              href={href}
+              href={it.href}
               onClick={close}
-              aria-current={here(href) ? 'page' : undefined}
-              className="hover:bg-surface-raised aria-[current=page]:bg-surface-raised block rounded-lg px-3 py-2"
+              aria-current={here(it.href) ? 'page' : undefined}
+              className="hover:bg-surface-raised aria-[current=page]:bg-surface-raised aria-[current=page]:text-accent flex items-center gap-2 rounded-lg px-3 py-2 text-sm"
             >
-              {label}
+              {it.icon}
+              {it.label}
             </Link>
           </li>
         ))}
@@ -89,44 +101,138 @@ function AdminMenu({ items }: { items: [string, string][] }) {
   )
 }
 
-export function SiteHeader() {
+// 하단 폴더블 메뉴 바
+function BottomNav({ admin }: { admin: boolean }) {
   const t = useTranslations('nav')
   const tl = useTranslations('list')
+  const ta = useTranslations('auth')
   const locale = useLocale()
   const pathname = usePathname()
-  const { user, source } = useAppUser()
-  // 표시 게이팅만 — 제작 현황 화면은 정적 안내(조회·쓰기 없음), 방 관리·사용자 관리는 API 가 ADMIN 을 다시 확인
-  const admin = user?.role === 'ADMIN' || user?.role === 'MASTER'
-  const linked = useLinked(user?.userId ?? null, source === 'google')
+  const here = useHere()
+  const [folded, setFolded] = useState(false)
+  useEffect(() => {
+    try {
+      setFolded(localStorage.getItem(FOLD_KEY) === '1')
+    } catch {
+      /* 저장소 차단 환경 — 펼침 기본 */
+    }
+  }, [])
+  const toggle = () =>
+    setFolded((f) => {
+      const next = !f
+      try {
+        localStorage.setItem(FOLD_KEY, next ? '1' : '0')
+      } catch {
+        /* 무시 */
+      }
+      return next
+    })
+
+  // 세미나 방·상세(/s/*)는 방 조작 바(control-bar, fixed bottom)가 하단을 쓴다 — 겹치지 않게 숨김
+  if (pathname.startsWith('/s/')) return null
+
+  const items: Item[] = [
+    { href: '/', label: t('home'), icon: <IconHome /> },
+    { href: '/plan', label: t('plan'), icon: <IconCard /> },
+    { href: '/privacy', label: t('privacyShort'), icon: <IconShield /> },
+  ]
+  const adminItems: Item[] = [
+    {
+      href: '/progress',
+      label: tl('progress'),
+      icon: <IconActivity width={18} height={18} />,
+    },
+    {
+      href: '/admin/rooms',
+      label: t('rooms'),
+      icon: <IconVideo width={18} height={18} />,
+    },
+    {
+      href: '/admin/users',
+      label: t('users'),
+      icon: <IconUsers width={18} height={18} />,
+    },
+    {
+      href: '/notes',
+      label: ta('inPerson'),
+      icon: <IconNotebook width={18} height={18} />,
+    },
+  ]
 
   return (
-    <header className="border-b border-white/10">
-      <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 lg:max-w-none lg:px-8">
-        <Link href="/" className="text-lg font-bold">
-          seminar.pi
-        </Link>
-        {/* 글자 링크도 터치 대상 높이 24px 이상(WCAG 2.5.8, 360px 폭에서 줄바꿈돼 위아래로 붙을 때) */}
-        <nav className="flex flex-wrap items-center gap-3 text-sm [&>a]:inline-flex [&>a]:min-h-6 [&>a]:items-center">
-          {admin && (
-            <AdminMenu
-              items={[
-                ['/progress', tl('progress')],
-                ['/admin/rooms', t('rooms')],
-                ['/admin/users', t('users')],
-              ]}
-            />
-          )}
-          <Link href="/plan">{t('plan')}</Link>
-          {!linked && <Link href="/link">{t('link')}</Link>}
-          <Link href="/privacy">{t('privacy')}</Link>
-          <Link href={pathname} locale={locale === 'ko' ? 'en' : 'ko'}>
-            {t('switchLocale')}
+    <nav
+      aria-label={t('menu')}
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-3 pb-[max(12px,env(safe-area-inset-bottom))]"
+    >
+      {folded ? (
+        <button
+          type="button"
+          onClick={toggle}
+          aria-expanded={false}
+          aria-label={t('unfold')}
+          className="bg-surface/95 hover:bg-surface-raised pointer-events-auto ml-auto flex size-11 items-center justify-center rounded-full shadow-xl ring-1 ring-white/10 backdrop-blur"
+        >
+          <IconMenu />
+        </button>
+      ) : (
+        <div className="bg-surface/95 pointer-events-auto flex items-center gap-1 rounded-2xl p-1.5 shadow-xl ring-1 ring-white/10 backdrop-blur">
+          {items.map((it) => (
+            <Link
+              key={it.href}
+              href={it.href}
+              aria-current={here(it.href) ? 'page' : undefined}
+              className={ITEM}
+            >
+              {it.icon}
+              {it.label}
+            </Link>
+          ))}
+          {admin && <AdminMenu items={adminItems} label={t('admin')} />}
+          <span aria-hidden className="mx-0.5 h-7 w-px bg-white/10" />
+          <Link
+            href={pathname}
+            locale={locale === 'ko' ? 'en' : 'ko'}
+            aria-label={t('switchLocale')}
+            title={t('switchLocale')}
+            className="text-muted-foreground hover:bg-surface-raised hover:text-foreground flex size-9 items-center justify-center rounded-xl"
+          >
+            <IconGlobe />
           </Link>
-        </nav>
-        <div className="ml-auto">
-          <AuthStatus />
+          <button
+            type="button"
+            onClick={toggle}
+            aria-expanded
+            aria-label={t('fold')}
+            title={t('fold')}
+            className="text-muted-foreground hover:bg-surface-raised hover:text-foreground flex size-9 items-center justify-center rounded-xl"
+          >
+            <IconChevronDown />
+          </button>
         </div>
-      </div>
-    </header>
+      )}
+    </nav>
+  )
+}
+
+export function SiteHeader() {
+  const { user } = useAppUser()
+  // 표시 게이팅만 — 제작 현황 화면은 정적 안내(조회·쓰기 없음), 방 관리·사용자 관리·대면 노트는 API 가 ADMIN 을 다시 확인
+  const admin = user?.role === 'ADMIN' || user?.role === 'MASTER'
+
+  return (
+    <>
+      <header className="border-b border-white/10">
+        <div className="mx-auto flex max-w-3xl items-center gap-4 px-4 py-3 lg:max-w-none lg:px-8">
+          <Link href="/" className="text-lg font-bold">
+            seminar.pi
+          </Link>
+          {/* 로그인 버튼 글자가 좁은 화면에서 두 줄로 꺾이지 않게 */}
+          <div className="ml-auto [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap">
+            <AuthStatus />
+          </div>
+        </div>
+      </header>
+      <BottomNav admin={admin} />
+    </>
   )
 }

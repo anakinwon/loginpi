@@ -33,7 +33,12 @@
     "plan": "Plans",
     "rooms": "Rooms",
     "admin": "Admin",
-    "users": "Users"
+    "users": "Users",
+    "home": "Home",
+    "privacyShort": "Privacy",
+    "menu": "Main menu",
+    "fold": "Collapse menu",
+    "unfold": "Expand menu"
   },
   "auth": {
     "checking": "Checking sign-in…",

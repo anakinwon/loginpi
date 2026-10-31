@@ -24,12 +24,7 @@ export function AuthStatus() {
   if (user)
     return (
       <span className="flex items-center gap-2 text-sm">
-        {/* 대면 노트는 ADMIN 만(서버 POST 도 403) — 표시 게이팅만, 화면 자체도 클라이언트 게이트 */}
-        {(user.role === 'ADMIN' || user.role === 'MASTER') && (
-          <Link href="/notes/new" className="hover:underline">
-            {t('inPerson')}
-          </Link>
-        )}
+        {/* 대면 노트 진입은 하단 메뉴 '관리자'로 이동(2026-10-31) — 상단은 사용자명만 */}
         <Link href="/link" className="hover:underline">
           {t('signedIn', { name: user.displayName || user.username || '' })}
         </Link>
@@ -45,11 +40,7 @@ export function AuthStatus() {
     )
   return (
     <span className="flex items-center gap-2 text-sm">
-      <button
-        className={BTN}
-        disabled={busy}
-        onClick={() => void login()}
-      >
+      <button className={BTN} disabled={busy} onClick={() => void login()}>
         {busy ? t('authenticating') : t('signIn')}
       </button>
       {googleLoginEnabled && <GoogleLoginButton className={BTN} />}
