@@ -31,7 +31,9 @@
     "switchLocale": "English",
     "privacy": "개인정보 처리방침",
     "plan": "요금제",
-    "rooms": "방 관리"
+    "rooms": "방 관리",
+    "admin": "관리자",
+    "users": "사용자 관리"
   },
   "auth": {
     "checking": "로그인 확인 중…",
@@ -127,7 +129,8 @@
     "REC_PAID_ONLY": "녹화는 월간·연간 요금제 세미나에서 유료 시간이 남아 있을 때만 쓸 수 있습니다",
     "REC_NOT_IN_ROOM": "룸 입장 확인 중입니다. 잠시 뒤 다시 시도하세요",
     "ENGINE_OFF": "화상 서버 관리 키가 설정되지 않았습니다",
-    "ENGINE_UNAVAILABLE": "화상 서버가 응답하지 않습니다. 잠시 후 다시 시도하세요"
+    "ENGINE_UNAVAILABLE": "화상 서버가 응답하지 않습니다. 잠시 후 다시 시도하세요",
+    "ADJ_NOTHING": "줄일 남은 시간이 없습니다"
   },
   "progress": {
     "title": "제작 진행 현황",
@@ -1013,5 +1016,50 @@
       "layerSwitches": "화질 전환",
       "queueDrops": "대기열 버림"
     }
+  },
+  "adminUsers": {
+    "title": "사용자 관리",
+    "adminOnly": "관리자만 볼 수 있습니다.",
+    "search": "이름 검색(2글자 이상)",
+    "searchBtn": "검색",
+    "refresh": "새로고침",
+    "count": "사용자 {n}명",
+    "empty": "사용자가 없습니다.",
+    "admin": "관리자",
+    "lastLogin": "최근 로그인 {time}",
+    "never": "로그인 기록 없음",
+    "plan": {
+      "FREE": "무료",
+      "M": "월간",
+      "Y": "연간"
+    },
+    "until": "(~{time})",
+    "manage": "시간 관리",
+    "close": "닫기",
+    "planLabel": "요금제",
+    "hours": "시간",
+    "minutes": "분",
+    "reason": "사유(선택)",
+    "sub": "축소",
+    "confirmSub": "{plan} 시간을 {time} 축소합니다.",
+    "confirmYes": "확인",
+    "cancel": "취소",
+    "saving": "처리 중…",
+    "done": "반영했습니다. {plan} 남은 시간 {time}",
+    "invalid": "축소 시간은 1분 ~ 1000시간(분은 0~59 정수)으로 입력하세요.",
+    "history": "최근 조정 이력",
+    "noHistory": "조정 이력이 없습니다.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "서비스권 지급(무료 시간)",
+    "svc": {
+      "H1": "1시간권",
+      "D1": "1일권",
+      "M1": "1개월권"
+    },
+    "svcNote": "서비스권은 무료 요금제 시간입니다. 지금부터 그 기간(1시간·24시간·1개월) 동안 쓸 수 있고, 무료 세미나와 유료 세미나의 무료 구간에서 쓰입니다(AI 기능 없음).",
+    "subTitle": "시간 축소",
+    "subNote": "만료가 늦은 이용권부터 줄입니다. 남은 시간보다 많으면 남은 만큼만 줄입니다.",
+    "confirmSvc": "{svc}을 지급합니다.",
+    "doneSvc": "{svc}을 지급했습니다. 무료 남은 시간 {time} (서비스권 만료 {end})"
   }
 }

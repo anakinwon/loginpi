@@ -55,6 +55,8 @@ export const apiError = createApiError({
   // 방 관리(api/admin/rooms) — 엔진 관리 API(src/lib/plan.ts engineAdmin)
   ENGINE_OFF: '화상 서버 관리 키가 설정되지 않았습니다',
   ENGINE_UNAVAILABLE: '화상 서버가 응답하지 않습니다. 잠시 후 다시 시도하세요',
+  // 사용자관리 시간 축소(sql/024 fn_adj_smn_plan) — 그 요금제에 줄일 남은 시간이 없음
+  ADJ_NOTHING: '줄일 남은 시간이 없습니다',
   PLAN_AI_PAID: 'AI 기능은 유료 요금제에서 쓸 수 있습니다',
   PLAN_EXPIRES_BEFORE_START: '시작 일시가 이 요금제 이용권 만료 뒤입니다',
   // 녹화(sql/023) — 로컬 저장, 월간·연간 세미나만, 녹화 시간 추가 차감

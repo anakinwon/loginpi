@@ -31,7 +31,9 @@
     "switchLocale": "한국어",
     "privacy": "Privacy",
     "plan": "Plans",
-    "rooms": "Rooms"
+    "rooms": "Rooms",
+    "admin": "Admin",
+    "users": "Users"
   },
   "auth": {
     "checking": "Checking sign-in…",
@@ -127,7 +129,8 @@
     "REC_PAID_ONLY": "Recording is available only in Monthly or Yearly plan seminars with paid time left",
     "REC_NOT_IN_ROOM": "Still confirming you are in the room. Try again in a moment",
     "ENGINE_OFF": "The video server admin key is not configured",
-    "ENGINE_UNAVAILABLE": "The video server is not responding. Please try again shortly"
+    "ENGINE_UNAVAILABLE": "The video server is not responding. Please try again shortly",
+    "ADJ_NOTHING": "There is no remaining time to reduce"
   },
   "progress": {
     "title": "Build progress",
@@ -1013,5 +1016,50 @@
       "layerSwitches": "Quality switches",
       "queueDrops": "Queue drops"
     }
+  },
+  "adminUsers": {
+    "title": "Users",
+    "adminOnly": "Only administrators can view this page.",
+    "search": "Search by name (2+ characters)",
+    "searchBtn": "Search",
+    "refresh": "Refresh",
+    "count": "{n, plural, one {# user} other {# users}}",
+    "empty": "No users.",
+    "admin": "Admin",
+    "lastLogin": "Last sign-in {time}",
+    "never": "Never signed in",
+    "plan": {
+      "FREE": "Free",
+      "M": "Monthly",
+      "Y": "Yearly"
+    },
+    "until": "(until {time})",
+    "manage": "Manage time",
+    "close": "Close",
+    "planLabel": "Plan",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "reason": "Reason (optional)",
+    "sub": "Reduce",
+    "confirmSub": "Reduce {plan} time by {time}.",
+    "confirmYes": "Confirm",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "done": "Applied. {plan} time remaining: {time}",
+    "invalid": "Enter a reduction between 1 minute and 1000 hours (whole minutes 0–59).",
+    "history": "Recent adjustments",
+    "noHistory": "No adjustments yet.",
+    "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
+    "svcTitle": "Give a service pass (free time)",
+    "svc": {
+      "H1": "1-hour pass",
+      "D1": "1-day pass",
+      "M1": "1-month pass"
+    },
+    "svcNote": "Service passes are Free-plan time. They can be used from now for that period (1 hour, 24 hours, 1 month) in free seminars and in the free part of paid seminars (no AI features).",
+    "subTitle": "Reduce time",
+    "subNote": "Takes from the latest-expiring passes first. If that is more than what remains, only the remaining time is removed.",
+    "confirmSvc": "Give a {svc}.",
+    "doneSvc": "Gave a {svc}. Free time remaining: {time} (pass expires {end})"
   }
 }

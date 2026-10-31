@@ -224,3 +224,42 @@ export const calRangeOk = (from: number, to: number, now = Date.now()) =>
 // 지난 세미나 — 종료, 또는 열리지 않고 시작이 지난 예정·하루 넘게 닫히지 않은 진행 중(상태 전이가 개최자 종료·요금제 소진뿐이라 남는다)
 export const smnPast = (status: string, startAt: string, now = Date.now()) =>
   status === 'ENDED' || Date.parse(startAt) < now - (status === 'LIVE' ? DAY_MS : 0)
+
+// 관리자 시간 관리(사용자관리, sql/024) — 요금제별 남은 시간을 이용권 행에서 계산(목록 화면 — 행마다 fn_rem_smn_plan_cd 를 부르면 무료 이용권을 만들어 버려 읽기만).
+//  이번 달 무료 이용권이 아직 없으면(로그인만 하고 개최 안 함) 무료 1시간이 있는 것으로 보인다(첫 개최·조정 때 DB 가 만든다). 유효 = 시작 ≤ 지금 < 만료
+export const ADJ_PLANS = ['FREE', 'M', 'Y'] as const
+export type AdjPlan = (typeof ADJ_PLANS)[number]
+export const ADJ_FREE_SEC = 3600 // 이번 달 무료 = plan-rules PLAN.freeSec·sql/015 와 같은 값(plan-rules 는 node:crypto 라 화면에서 못 읽음)
+export const ADJ_MAX_MIN = 60_000 // 축소 1회 최대 1000시간(fn_adj_smn_plan 3,600,000초와 같다)
+// 관리자 서비스권(마스터 2026-10-31) = 무료 시간 — H1 1시간권 · D1 1일권 · M1 1개월권(지금부터 그 기간, sql/024 fn_svc_smn_plan)
+export const SVC_CDS = ['H1', 'D1', 'M1'] as const
+export type SvcCd = (typeof SVC_CDS)[number]
+export type PassRow = { plan_cd: string; grnt_sec_cnt: number; use_sec_cnt: number; strt_dtm: string; end_dtm: string; grnt_rsn_cd: string }
+export type PlanTime = { sec: number; endAt: string | null }
+export const monthStartUtc = (nowMs: number) => {
+  const d = new Date(nowMs)
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)
+}
+export function planTimes(rows: PassRow[], nowMs: number): Record<AdjPlan, PlanTime> {
+  const out: Record<AdjPlan, PlanTime> = { FREE: { sec: 0, endAt: null }, M: { sec: 0, endAt: null }, Y: { sec: 0, endAt: null } }
+  const mon = monthStartUtc(nowMs)
+  let freeIssued = false
+  for (const r of rows) {
+    const cd = r.plan_cd as AdjPlan
+    if (!(ADJ_PLANS as readonly string[]).includes(cd)) continue
+    const strt = Date.parse(r.strt_dtm)
+    const end = Date.parse(r.end_dtm)
+    if (r.grnt_rsn_cd === 'FREE' && strt === mon) freeIssued = true
+    const left = r.grnt_sec_cnt - r.use_sec_cnt
+    if (!(strt <= nowMs && end > nowMs) || left <= 0) continue // 소진된 이용권은 만료 계산에서도 뺀다(fn_rem_smn_plan_cd 와 같다)
+    out[cd].sec += left
+    if (!out[cd].endAt || end > Date.parse(out[cd].endAt!)) out[cd].endAt = new Date(end).toISOString()
+  }
+  if (!freeIssued) {
+    out.FREE.sec += ADJ_FREE_SEC
+    const next = new Date(mon)
+    next.setUTCMonth(next.getUTCMonth() + 1)
+    if (!out.FREE.endAt || next.getTime() > Date.parse(out.FREE.endAt)) out.FREE.endAt = next.toISOString()
+  }
+  return out
+}

@@ -180,3 +180,30 @@ test('방 관리 쪽 나눔 — 접속자 많은 순·같으면 ID 순, 12개씩
   assert.equal(roomPage(rooms, 9).page, 2) // 넘친 쪽 = 마지막 쪽
   assert.deepEqual(roomPage([], 1), { rows: [], total: 0, page: 1 })
 })
+
+test('관리자 시간 관리 — 요금제별 남은 시간 합·늦은 만료, 이번 달 무료 미발급이면 1시간, 만료·미시작 제외', async () => {
+  const { planTimes, monthStartUtc } = await import('./seminar-rules.ts')
+  const now = Date.parse('2026-10-31T12:00:00Z')
+  const mon = new Date(monthStartUtc(now)).toISOString()
+  assert.equal(mon, '2026-10-01T00:00:00.000Z')
+  const row = (plan_cd, grnt, use, strt, end, rsn) => ({ plan_cd, grnt_sec_cnt: grnt, use_sec_cnt: use, strt_dtm: strt, end_dtm: end, grnt_rsn_cd: rsn })
+  // 아무 이용권 없음 = 무료 1시간(다음 달 초 만료)
+  assert.deepEqual(planTimes([], now).FREE, { sec: 3600, endAt: '2026-11-01T00:00:00.000Z' })
+  const t = planTimes(
+    [
+      row('FREE', 3600, 3000, mon, '2026-11-01T00:00:00Z', 'FREE'), // 이번 달 무료 발급됨 → 600
+      row('FREE', 1800, 0, '2026-10-30T00:00:00Z', '2026-11-01T00:00:00Z', 'ADM'), // 관리자 연장 +1800
+      row('M', 108000, 8000, '2026-10-05T00:00:00Z', '2026-11-05T00:00:00Z', 'PAY'),
+      row('M', 3600, 0, '2026-10-31T00:00:00Z', '2026-11-05T00:00:00Z', 'ADM'),
+      row('M', 108000, 0, '2026-09-01T00:00:00Z', '2026-10-01T00:00:00Z', 'PAY'), // 만료 — 제외
+      row('Y', 1440000, 0, '2026-11-02T00:00:00Z', '2027-11-02T00:00:00Z', 'PAY'), // 미시작 — 제외
+    ],
+    now,
+  )
+  assert.deepEqual(t.FREE, { sec: 2400, endAt: '2026-11-01T00:00:00.000Z' })
+  assert.deepEqual(t.M, { sec: 103600, endAt: '2026-11-05T00:00:00.000Z' })
+  assert.deepEqual(t.Y, { sec: 0, endAt: null })
+  // 늦게 끝나는 이용권이 소진(관리자 축소)되면 만료는 남은 이용권 기준
+  const u = planTimes([row('M', 108000, 0, '2026-10-01T00:00:00Z', '2026-11-01T00:00:00Z', 'PAY'), row('M', 108000, 108000, '2026-10-15T00:00:00Z', '2026-11-15T00:00:00Z', 'PAY')], now)
+  assert.deepEqual(u.M, { sec: 108000, endAt: '2026-11-01T00:00:00.000Z' })
+})
