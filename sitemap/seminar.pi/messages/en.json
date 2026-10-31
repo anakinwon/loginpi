@@ -1061,7 +1061,7 @@
       "D1": "1-day pass",
       "M1": "1-month pass"
     },
-    "svcNote": "Service passes are Free-plan time. They can be used from now for that period (1 hour, 24 hours, 1 month) in free seminars and in the free part of paid seminars (no AI features).",
+    "svcNote": "Service passes are Free-plan time. They can be used from now for that period (1 hour, 24 hours, 1 month) in free seminars and in the free part of paid seminars (no AI features). With several passes, they are used up automatically in the order 1-hour → 1-day → 1-month.",
     "subTitle": "Reduce time",
     "subNote": "Takes from the latest-expiring passes first. If that is more than what remains, only the remaining time is removed.",
     "confirmSvc": "Give a {svc}.",

@@ -231,7 +231,8 @@ export const ADJ_PLANS = ['FREE', 'M', 'Y'] as const
 export type AdjPlan = (typeof ADJ_PLANS)[number]
 export const ADJ_FREE_SEC = 3600 // 이번 달 무료 = plan-rules PLAN.freeSec·sql/015 와 같은 값(plan-rules 는 node:crypto 라 화면에서 못 읽음)
 export const ADJ_MAX_MIN = 60_000 // 축소 1회 최대 1000시간(fn_adj_smn_plan 3,600,000초와 같다)
-// 관리자 서비스권(마스터 2026-10-31) = 무료 시간 — H1 1시간권 · D1 1일권 · M1 1개월권(지금부터 그 기간, sql/024 fn_svc_smn_plan)
+// 관리자 서비스권(마스터 2026-10-31) = 무료 시간 — H1 1시간권 · D1 1일권 · M1 1개월권(지금부터 그 기간, sql/024 fn_svc_smn_plan).
+//  소진은 시간권 → 일권 → 월권 순 자동(이용권 기간 짧은 것부터 차감, sql/025 fn_hb_smn_hst)
 export const SVC_CDS = ['H1', 'D1', 'M1'] as const
 export type SvcCd = (typeof SVC_CDS)[number]
 export type PassRow = { plan_cd: string; grnt_sec_cnt: number; use_sec_cnt: number; strt_dtm: string; end_dtm: string; grnt_rsn_cd: string }
