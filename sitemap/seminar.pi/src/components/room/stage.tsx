@@ -78,7 +78,19 @@ export function useRemoteAudio(ref: RefObject<HTMLAudioElement | null>, stream: 
         },
       )
     attempt()
-    return () => clearTimeout(timer)
+    // 마이크·카메라를 켜는 순간(getUserMedia) 휴대폰이 오디오 세션을 바꾸며 재생 중인 소리 요소를 멈춘다(iOS WebKit·안드로이드 WebView) —
+    // 스트림은 그대로라 위 효과가 다시 돌지 않아 상대 소리가 계속 안 들렸다(무대 참가자만 발표자 소리 무음, 마스터 2026-10-31). 멈추면 다시 재생 시도
+    const onPause = () => {
+      if (el.srcObject !== stream) return
+      tries = 0
+      clearTimeout(timer)
+      timer = setTimeout(attempt, 300)
+    }
+    el.addEventListener('pause', onPause)
+    return () => {
+      clearTimeout(timer)
+      el.removeEventListener('pause', onPause)
+    }
   }, [ref, stream])
   const enable = () =>
     ref.current?.play().then(

@@ -56,6 +56,7 @@ const TABS = FEATURES.flatMap((f) => (f.tab ? [f.tab] : []))
 const ZERO = featureStore(0)
 const TAB_BADGES = TABS.map((x) => x.badge ?? ZERO)
 const SHOWN = featureStore(false)
+const HAND_GRACE_MS = 10_000 // 손 내림 알림이 승격 알림보다 먼저 와도 '손 든 사람'으로 보는 시간
 const MORE_HIDDEN = MORE.map((it) => it.hidden ?? SHOWN)
 const EFFECTS = FEATURES.flatMap((f) => (f.effect ? [f.effect] : [])).sort((a, b) => a.order - b.order)
 // 발언자 음성을 처리하는 기능이 있을 때만 마이크 동의·대기실 고지(A-6). 음성 조각은 동의한 사람만 돈다
@@ -314,6 +315,15 @@ function Room({
     if (r.forbidden) say('forbidden')
   }, [r.forbidden])
 
+  // 내 손 상태 — 무대 승격 때 '손을 들었던 사람인가' 판정용. 서버가 승격하며 손을 내리는데 그 알림이 역할 알림보다 먼저 올 수 있어
+  //  내린 시각을 기억해 HAND_GRACE_MS 안이면 든 것으로 본다(아래 승격 효과보다 먼저 선언 — 같은 커밋에서 먼저 돈다)
+  const hand = useRef({ up: false, loweredAt: 0 })
+  const myRaised = (me?.raisedTs ?? 0) > 0
+  useEffect(() => {
+    if (myRaised) hand.current.up = true
+    else if (hand.current.up) hand.current = { up: false, loweredAt: Date.now() }
+  }, [myRaised])
+
   // 역할 변경 알림 — 승격은 고정 알림(아래 promo), 강등은 5초 알림. 입장 직후 첫 역할은 알리지 않는다
   const prevRole = useRef<SessionRole | null>(null)
   useEffect(() => {
@@ -322,8 +332,10 @@ function Room({
     if (!prev || !r.role || prev === r.role) return
     if (r.role === 'audience') say('demoted')
     setPromoHidden(false)
-    // 무대 승격 = 카메라 자동 켜기(마스터 2026-10-31). 마이크는 그대로 수동(설계서 14.4 — 동의 A-6 를 거쳐야 함). 영상 잠금이면 켜지 않는다
-    if (prev === 'audience' && r.role === 'panel' && !lockedFor(r.role, r.locks).video) void toggle('video', true)
+    // 무대 승격 = 카메라 자동 켜기 — 손을 든 사람만(본인이 발언을 청한 경우, 마스터 2026-10-31 : 안 든 사람 얼굴이 본인 모르게 송출되지 않게).
+    //  마이크는 그대로 수동(설계서 14.4 — 동의 A-6). 영상 잠금이면 켜지 않는다
+    const askedHand = hand.current.up || Date.now() - hand.current.loweredAt < HAND_GRACE_MS
+    if (prev === 'audience' && r.role === 'panel' && askedHand && !lockedFor(r.role, r.locks).video) void toggle('video', true)
   }, [r.role]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 사회 알림(v1.2) — 음소거됨·잠금 바뀜은 5초 알림(발표자는 자기가 한 일이라 잠금 알림 생략), 켜기 요청은 고정 알림
@@ -419,8 +431,13 @@ function Room({
     // 마이크를 처음 켜기 직전 동의(A-6) — 동의 안 함이어도 마이크는 켠다(음성 처리만 빠짐, consent.agreed 로 막힘). 닫기(Esc)만 켜기 취소
     if (kind === 'audio' && on && consent.needed && (await consent.ask()) === null) return
     // 아직 없는 마이크·카메라(승격된 panel·카메라 없이 들어온 발표자) = 이 탭으로 켜서 발행. 자동으로 켜지 않는다(설계서 14.4)
-    if (!has[kind]) return sayErr(await r.addMedia(kind), `toggleFailed.${kind}`)
-    if (!(await r.setMedia(kind, on))) say(`toggleFailed.${kind}`)
+    try {
+      if (!has[kind]) return sayErr(await r.addMedia(kind), `toggleFailed.${kind}`)
+      if (!(await r.setMedia(kind, on))) say(`toggleFailed.${kind}`)
+    } finally {
+      // 장치를 켜면 휴대폰이 상대 소리 재생을 멈출 수 있다 — 탭(사용자 조작) 직후라 다시 재생이 허용된다(useRemoteAudio 의 pause 재시도와 짝)
+      void sound.enable()
+    }
   }
 
   function openPanel(next: PanelTab) {
