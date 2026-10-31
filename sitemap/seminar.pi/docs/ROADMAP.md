@@ -14,13 +14,13 @@
 | 2 | 수익 | **드롭 — F-06 개최자 수익 정산·F-07 다시보기 범위 제외(마스터 2026-10-29)**. R1 입장료는 참가자 무료 결정(2026-10-28)으로 중지, 수익은 Phase P 요금제 |
 | 3 | 등재(A-1~A-7·실기기) | 대기 |
 
-## 지금 막힌 것 — 마스터 확인 순서 (2026-10-30 갱신)
+## 지금 막힌 것 — 마스터 확인 순서 (2026-10-31 갱신)
 
 | # | 할 일 | 어디서 | 왜 |
 |---|---|---|---|
 | 1 | ~~집 PC 엔진 교체~~ **완료(2026-10-30) — `1f23d219` 빌드(#6)로 교체**, 이전 기록 : 집 PC 엔진을 **`8ab7e634` 빌드(sha256 `ce249a33a54bb5b54e3b08cef14d0d4d1d155cc761afbb8410d6c402fd56b94f`)**로 교체 — LAN 후보(`9d8eea86`) 포함 | `media/docs/HOME_NODE_GUIDE.md` 4.7 | 2026-10-27 실기기 시험에서 같은 집 PC 발표자가 잠깐 접속 뒤 `ICE_FAILED` 로 끊기고 청중 영상이 없었음 → 엔진이 LAN 주소도 host 후보로 알리도록 수정(Append) — 유력 원인 [확인중 : 실기기 재시험] |
-| 2 | 엔진 `MEDIA_ALLOWED_ORIGINS` 에 `https://seminarz.vercel.app` | 같은 가이드 B-1 | Pi 포털 래퍼가 실제 앱을 이 주소에서 불러옴 [확인중 : Pi Browser Origin 실측] |
-| 3 | Pi Browser 실기기 점검 10항목(Android 2대 + 가능하면 iOS) · 회의 부가 기능 F-08~F-17 점검표(엔진 무관 F-08·09·15 는 지금 바로) | [NIGHT_REPORT](NIGHT_REPORT_2026-10-27.md) 1절 · [DEVICE_TEST_F08-F17](DEVICE_TEST_F08-F17.md) | Phase 1·M5 통과 조건 — 인증·결제·페이지 변경은 실기기 전 완료로 보지 않음 |
+| 2 | **VPS 이전 때 같은 값으로 설정(VPS_GUIDE 7절, 2026-10-31)** — 실기기 403 "origin 불허" 가 나면 `journalctl -u galapagos` 의 Origin 값을 추가. 이전 : 엔진 `MEDIA_ALLOWED_ORIGINS` 에 `https://seminarz.vercel.app` | 같은 가이드 B-1 | Pi 포털 래퍼가 실제 앱을 이 주소에서 불러옴 [확인중 : Pi Browser Origin 실측] |
+| 3 | **완료 판정 10건(마스터 2026-10-31) → 운영 관찰로 전환** — 점검표는 그대로 두고 실패 관측 시 TROUBLESHOOT + 재작업. 이전 : Pi Browser 실기기 점검 10항목(Android 2대 + 가능하면 iOS) · 회의 부가 기능 F-08~F-17 점검표(엔진 무관 F-08·09·15 는 지금 바로) | [NIGHT_REPORT](NIGHT_REPORT_2026-10-27.md) 1절 · [DEVICE_TEST_F08-F17](DEVICE_TEST_F08-F17.md) | Phase 1·M5 통과 조건 — 인증·결제·페이지 변경은 실기기 전 완료로 보지 않음 |
 | 4 | 위임 결정 검토(PRD 11절 D-1~D-19, 11.1절 D-20~D-28) · 확인 질문(PRD 9절) | PRD | 바꿀 결정만 지시 |
 | 5 | ~~**MediaPipe 모델 파일 커밋**~~ **완료(`9ca1b26c`, 2026-10-27 — build·Vercel success)** — `public/mediapipe/models/selfie_segmenter_landscape.tflite`(`scripts/copy-mediapipe.mjs` 머리 주석의 curl 1줄) | 저장소 | 없으면 `pnpm build` 가 막혀 **Vercel 배포 실패**(이전 배포가 계속 서빙) |
 | 6 | **완료(마스터 2026-10-30) — `1f23d219` 빌드(v1.3.3 = `8ab7e634` + 개최자 부재 정리, sha256 `d2dcbbd735ef4d88dc9b5768c11a20ea8dbe53e0c65e6d188342f543ed548dd9`) 교체, `MEDIA_ADMIN_SECRET` 엔진·Vercel 같은 값, 임시 터널 주소 바뀜 → Vercel `NEXT_PUBLIC_MEDIA_WS_URL` 갱신 후 접속 확인(마스터).** 이전 기록 : 집 PC 엔진을 **`8ab7e634` 빌드(v1.3.2 + 관리 API 무대 역할 조회 + M3 ⑥, sha256 `ce249a33a54bb5b54e3b08cef14d0d4d1d155cc761afbb8410d6c402fd56b94f`)**로 교체(절차 `galapagos-build/8ab7e634/SWAP.md`) + `MEDIA_ADMIN_SECRET` 은 **엔진·Vercel 양쪽에 같은 무작위 32바이트 이상 값, 또는 양쪽 다 뺌**(빼면 음성 자막 무대 관문 D-1·시간 소진 때 엔진 방 강제 종료가 꺼짐, 한쪽만 넣으면 발표자 자막 403·불일치 503 — 가이드 B-1) — `27a18b31`·v1.3.2 단독(`cf2fe499`)·v1.3.1 대체, v1.3(`45541466…`) 설치 금지 | `media/docs/HOME_NODE_GUIDE.md` 4.7·B-1 | `app.send` 중계 — 교체 전엔 자막·녹화·AI 회의록·번역·더빙이 숨겨짐(#1 을 대체) |
@@ -29,9 +29,13 @@
 | 9 | **구현(2026-10-29, `8ca821c7`) — 사용자별 상한 번역 10만·더빙 2만 자(env 조절), 번역 결과 서명 `smn-tr:<언어>` 분리. 기본값 확정(마스터 2026-10-29). 남은 위험 : 다계정 10개·동시 요청 1분치 초과** · **번역·더빙 사용자별 누적 상한 + 서명 용도 분리 결정**(감사 High 1) | NIGHT_REPORT_2026-10-28 ④ A-1 | 계정 몇 개로 세미나 번역·더빙 할당량을 다 써서 전원 기능을 끌 수 있음 — #7 키 설정 전 권장 |
 | 10 | **종결(2026-10-29) — 마스터 결정 C : 비운영 스키마 폐지, `public` 만 사용**(PRD 7절 운영 규칙 : 시험 데이터 `[QA-…]`·논리삭제, `sql/` 운영 직접 적용 전 검토). `seminar_dev`·`seminar_stg` 는 `zz_retired_…_20261029` 로 이름만 바꿔 보관. 남은 일(마스터) : Vercel Production `APP_TIER` 비우기(현재 staging 추정)·Preview 의 `SUPABASE_SCHEMA=seminar_stg` 가 있으면 삭제 · 이전 기록 : 원인 확정(2026-10-29) — 로컬 `.env.local` STAGING 이 운영 프로젝트 `public` 을 가리킴 + `seminar_dev`·`seminar_stg` Exposed schemas 미등록·GRANT 부재(유력). 조치(마스터) : Vercel 운영 env 확인 → Exposed schemas·GRANT → `.env.local` 정정 · 배포본이 로컬 STAGING 과 같은 DB 를 읽는 원인 확인 + Exposed schemas(`seminar_dev`·`seminar_stg`) | Vercel env · Supabase API 설정 | 야간 E2E r1 : 시험 세미나가 운영 목록에 노출(논리삭제로 내림) [확인중 : 마스터] |
 | 11 | 마스터 결정 묶음 A~F · 처리방침 [확인중 : 마스터] 6종 | NIGHT_REPORT_2026-10-28 ④ | 구현하지 않고 결정 대기 [확인중 : 마스터] |
-| 12 | Vercel `seminar` 에 **`CRON_SECRET`** 있는지 확인(로컬 `.env.local` 에는 있음) — 없으면 같은 값 추가·Redeploy | Vercel 설정 | 대면 노트 원본 음성 매일 정리 크론(`/api/cron/note-audio`, 03:00 KST) — 없으면 503 으로 실행 안 됨(종료 때 정리는 동작) |
+| 12 | **확인 완료(2026-10-31, Vercel env 목록 : `CRON_SECRET` production·preview 있음)** · 이전 : Vercel `seminar` 에 **`CRON_SECRET`** 있는지 확인(로컬 `.env.local` 에는 있음) — 없으면 같은 값 추가·Redeploy | Vercel 설정 | 대면 노트 원본 음성 매일 정리 크론(`/api/cron/note-audio`, 03:00 KST) — 없으면 503 으로 실행 안 됨(종료 때 정리는 동작) |
 | 13 | Pi Browser 실기기 확인 — 개최자 부재 6분 뒤 "룸이 닫혔습니다"·참가자 재입장 409 `HOST_AWAY` 차단·개최자가 돌아오면 새 방 / 참가자 카운트다운 없음 / 일반 사용자 개설 버튼 / 대면 노트 정밀 전사(남N·녀N — 운영 기록 ✓ 2026-10-29, Pi Browser 에서 재확인) / 헤더 메뉴(제작 현황 = 관리자만, 계정 연동 = 미연동만) | 실기기 | 2026-10-29~30 배포분, 실기기 전 최대 CONDITIONAL |
-| 14 | 임시 터널(`trycloudflare.com`) 주소는 cloudflared 재시작마다 바뀜 → 그때마다 Vercel env 갱신·Redeploy. 고정 터널(도메인) [확인중 : 마스터 — 도메인] | HOME_NODE_GUIDE C | 2026-10-30 엔진 교체 때 "화상 서버에 연결하지 못했습니다"(`WS_FAILED`) 원인(마스터 보고) |
+| 14 | **종결(2026-10-31) — 엔진을 Vultr VPS 로 옮겨 고정 주소(sslip.io, VPS_GUIDE)**. 이전 : 임시 터널(`trycloudflare.com`) 주소는 cloudflared 재시작마다 바뀜 → 그때마다 Vercel env 갱신·Redeploy. 고정 터널(도메인) [확인중 : 마스터 — 도메인] | HOME_NODE_GUIDE C | 2026-10-30 엔진 교체 때 "화상 서버에 연결하지 못했습니다"(`WS_FAILED`) 원인(마스터 보고) |
+| 15 | **아소카 결정 8건 사후 검토(2026-10-31 위임 구간)** — ① TURN_HOST sslip 호스트명·TLS 보류 ② coturn 엔진 IP 만 허용·username TTL 칸 고정 ③ F-08 외부 이동 고지 = 캡션 1줄·mailto 숨김·.ics 안내만 ④ F-U 자동 재입장 없음·401 로컬 유지 ⑤ F-09 터치 기기 효과 숨김 유지 ⑥ M5 prod/schema 전제 폐기 ⑦ 검토 기각 2건 ⑧ 헤더 가드 정정 | 이 문서·커밋 메시지 | 번복할 것만 지시 |
+| 16 | 더빙 추가 단축 3안 중 택(PRD 9절 #19) · 올림 청구 허용 오차(#20) · 휴대폰 소음 토글(#21) | PRD 9절 | 결정 뒤 구현 |
+| 17 | 운영 관찰 1순위 : M5 모니터링 표본(Pi Browser 20초 탐색 → schema.pi 모니터링에 SEMINAR 행) · M1 LTE(DEVICE_TEST M1 절, VPS `journalctl -u coturn` ALLOCATE) | DEVICE_TEST_F08-F17 | 5분 |
+| 18 | 기술 후속(결정 불필요, 다음 세션) : `turns:443` 주소 제거 여부(Caddy 점유로 항상 실패 — webrtc-internals 경고만), `showModal` 기능 탐지 나머지 7곳, i18n 문구 호스트 리터럴 → `webBase()`, TTS WAV 전송 크기, `SPEECH_MAX_MIN` env 명시 | 코드 | 묶어서 1커밋 |
 
 ## Phase 0 — 선결
 
@@ -64,7 +68,7 @@
 - [x] (마스터) Vercel env : `LAB_ENABLED=1`, `NEXT_PUBLIC_LAB_SUPABASE_URL`·`NEXT_PUBLIC_LAB_SUPABASE_PUBLISHABLE_KEY`(pi-nonprod — ENV_GUIDE 3.4)
 - [x] (마스터) Vercel 프로젝트 생성(Root `sitemap/seminar.pi`) (2026-10-25)
 - [x] (마스터) Pi Browser 실기기 시험 — Android 2대 로그인·화면 연결 성공(2026-10-25)
-- [ ] (마스터) Pi Browser iOS 실기기 시험 — iOS ↔ Android 화면 연결(카메라 권한·영상 자동재생이 iOS WebView 에서 다를 수 있음)
+- [x] (마스터) Pi Browser iOS 실기기 시험 — iOS 1대 시험 완료(2026-10-27, 마스터 보고 — 진행률 표 M0)
 - [x] (마스터) 호스팅 결정 — **Vultr 서울 VPS 엔진 운영 중**(2026-10-31, `media/docs/VPS_GUIDE.md` — Caddy 443 신호 + UDP 7882 + 보조 TURN coturn 8절). 집 상시 PC 엔진(`HOME_NODE_GUIDE.md`)은 시험용·되돌리기 경로로만 유지(VPS_GUIDE 6절)
 
 ## Phase 1 — MVP
@@ -74,7 +78,7 @@
 - [x] 화면 5종 — S1 목록(탭 3·페이지 이동)·S2 상세·S3/S4 룸·S5 개최(Pi 로그인 사용자 전원, 2026-10-28) — 브라우저 QA 2차 7/7 ✓(2026-10-27), 실기기 ✓(마스터 2026-10-29)
 - [x] Pi 입장 결제 — approve/complete/cancel, 서버 금액 재검증, 결제 완료+참가 등록 한 트랜잭션(sql/007)·이중 결제 인덱스(sql/006) — 실기기 ✓(마스터 2026-10-29). 새 세미나는 참가자 무료(2026-10-28), 결제는 개최자 요금제(Phase P)로
 - [x] **Pi Browser 실기기 결제·입장** ✓(마스터 2026-10-29)
-- [ ] 모니터링 연결(TODO 7단계) — 미착수(`@pi/mon` 미배선)
+- [x] 모니터링 연결(TODO 7단계) — `@pi/mon` 배선·`/api/mon/app`·Vercel env 주입 확인(401, 2026-10-31). 표본 확인은 운영 관찰(M5 행)
 
 ## Phase P — 개최자 요금제 (마스터 2026-10-28~30, 규칙 정본 = PRD 5.2절)
 
@@ -86,7 +90,7 @@
 - [x] 참가자 무료·카운트다운 없음(남이 연 방)(`f4ef8014`, 2026-10-29)
 - [x] 개최자 부재 5분 → 참가자 전원 강제 퇴장 — 앱(`659aed34`·`879f1781`) + 엔진 6분 판정 `ROOM_CLOSED`(`1f23d219`, SIGNAL_API v1.3.3, 엔진 교체 2026-10-30)
 - [x] 헤더 메뉴 — 제작 현황 = 관리자만, 계정 연동 = 미연동 사용자만(`a825df01`, 2026-10-30)
-- [ ] Pi Browser 실기기 확인(막힌 것 #13)
+- [x] Pi Browser 실기기 확인(막힌 것 #13) — 완료 판정(마스터 2026-10-31), 운영 관찰
 
 ## Phase X — 회의 부가 기능(v2)
 
@@ -112,6 +116,20 @@
 - [x] ~~엔진 교체~~(`1f23d219` 2026-10-30 완료)·~~`MEDIA_ADMIN_SECRET`~~(2026-10-30 완료) · ~~sql/008·009·010 적용~~(2026-10-27 완료) · ~~`GEMINI_API_KEY`~~(2026-10-29 완료) · ~~`smn-note` 버킷~~(2026-10-30 확인) — 선행 조건 전부 완료
 - [x] 야간 시험 r1~r6(2026-10-27 23:06 ~ 10-28 04:51) — 테스터 10명 59건 병합, 라운드마다 build·Vercel success, E2E r5 39/39·r6 38/39(재시험 통과), REA 3장면 회귀 오류 0([NIGHT_REPORT_2026-10-28](NIGHT_REPORT_2026-10-28.md))
 - [x] 브라우저 QA(가짜 카메라 3창 — 자막·번역·더빙·설문·Q&A·녹화·배경·회의록·대면 노트·캘린더 링크)
-- [ ] Pi Browser 실기기(Android 2대 + iOS) — 실기기 전 판정 최대 CONDITIONAL
+- [x] Pi Browser 실기기(Android 2대 + iOS) — 완료 판정(마스터 2026-10-31), 운영 관찰(DEVICE_TEST_F08-F17 점검표 유지)
 - [x] pi-mainnet-listing-auditor·kisa-web-security-auditor 점검(2026-10-28) — 레드라인 0 · KISA High 2·Medium 2·Low 4 중 High 1·2 남음(막힌 것 #9·#6)
 - [x] 관리자 메뉴(2026-10-31, 마스터) — 상단 '관리자 ▾'(관리자만) 아래 제작 현황·방 관리·**사용자 관리**(`/admin/users` : 요금제별 남은 시간·만료, **서비스권 1시간권·1일권·1개월권** = 무료 시간 지급, 시간 축소, 최근 조정 이력 10건 — `sql/024` ADM 이용권·`smn_pln_adj_hist`·`fn_svc_smn_plan`·`fn_adj_smn_plan`, 사용자별 직렬 잠금). **서비스권 소진 순서 = 1시간권 → 1일권 → 1개월권 자동**(`sql/025` — 이용권 기간 짧은 것부터 차감, 축소는 거울상, 마스터 2026-10-31). 실기기 확인 대기
+
+## 남은 일정 (2026-10-31 기준 — 제작은 전부 완료, 남은 것은 결정·운영 관찰·기술 후속)
+
+| 순서 | 할 일 | 누가 | 소요 | 근거 |
+|---|---|---|---|---|
+| 1 | **운영 관찰 5분** — M5 모니터링 표본(Pi Browser 로그인 → 20초 탐색 + 앱 전환 → schema.pi 모니터링 SEMINAR 행) · M1 LTE 청중 1대(영상·음성 + coturn ALLOCATE) | 마스터 | 5분 | 막힌 것 #17 · DEVICE_TEST M1 절 |
+| 2 | **자막·통역 체감 확인** — 원문 자막 말 끝 +2.5~4초, 번역 +0.7~1.0초, 더빙 +7~8초, 휴대폰 전체 화면 자막, 2분 연속 발화 끊김·429 없음, iOS Safari 녹음기 겹침 | 마스터 | 10분 | `b22a412a` · TROUBLESHOOT 2026-10-31 |
+| 3 | **결정 3건** — 더빙 추가 단축 ①②③(PRD 9절 #19) · 올림 청구 허용 오차(#20) · 휴대폰 소음 토글(#21) + 아소카 결정 8건 번복 여부(막힌 것 #15) | 마스터 | 결정만 | PRD 9절 |
+| 4 | 결정 반영 구현 — 더빙 단축안(①은 반나절, ②는 과금 설계 포함 1일, ③은 반나절) · 소음 토글 분리(1시간) | 아소카 | 결정 뒤 | — |
+| 5 | 기술 후속 1커밋 — `turns:443` 제거, `showModal` 탐지 7곳, i18n 호스트 리터럴, `SPEECH_MAX_MIN` env 명시 | 아소카 | 반나절 | 막힌 것 #18 |
+| 6 | 남은 마스터 확인 — PRD 9절 #3(수수료율·정산 — F-06 드롭으로 보류 가능) · #5(VOD — F-07 드롭) · #7(공용 패키지 경계) · #9(운영 `LAB_ENABLED` 끄는 시점 — 지금 production 에 켜져 있음) · #11(SIGNAL_API JSON Schema) · 막힌 것 #4·#11(결정 묶음 A~F·처리방침 6종) | 마스터 | 결정만 | PRD 9절 |
+| 7 | 실기기 실패 관측 시 — TROUBLESHOOT 에 적고 재작업(완료 판정은 유지, 결함으로 처리) | 둘 다 | 건별 | 완료 판정 규칙(마스터 2026-10-31) |
+
+범위 밖(드롭 확정) : F-06 정산·F-07 VOD(마스터 2026-10-29). 메인넷 등재 준비는 상위 플랜(PRD_28) 일정에 따른다.
