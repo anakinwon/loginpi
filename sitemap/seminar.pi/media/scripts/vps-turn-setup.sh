@@ -57,18 +57,12 @@ no-cli
 no-rfc5780
 no-stun-backward-compatibility
 response-origin-only-with-rfc5780
-# 중계 상대는 공인 엔진뿐 — 사설·링크로컬·CGNAT·loopback 대역 차단
-denied-peer-ip=0.0.0.0-0.255.255.255
-denied-peer-ip=10.0.0.0-10.255.255.255
-denied-peer-ip=100.64.0.0-100.127.255.255
-denied-peer-ip=127.0.0.0-127.255.255.255
-denied-peer-ip=169.254.0.0-169.254.255.255
-denied-peer-ip=172.16.0.0-172.31.255.255
-denied-peer-ip=192.168.0.0-192.168.255.255
-denied-peer-ip=::1
-denied-peer-ip=fe80::-febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff
-denied-peer-ip=fc00::-fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
-# 1 vCPU·가용 ~700MB — 사용자명(입장 1회)당 8 세션, 전체 40, 세션당 3Mbps(720p VP8 + Opus)
+# 중계 상대는 이 VPS 의 엔진(SFU)뿐 — 브라우저끼리 직접 붙지 않는다. 전부 거부 + 엔진 공인 IP 만 허용(allowed 가 denied 보다 우선, 보안 검토 2026-10-31)
+#  엔진이 다른 호스트로 가면 allowed-peer-ip 를 그 IP 로 추가/교체한다
+denied-peer-ip=0.0.0.0-255.255.255.255
+denied-peer-ip=::-ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+allowed-peer-ip=$IP
+# 1 vCPU·가용 ~700MB — 사용자명(= 사용자 × TTL 칸, route.ts 가 칸 경계로 고정)당 8 세션, 전체 40, 세션당 3Mbps(720p VP8 + Opus)
 user-quota=8
 total-quota=40
 max-bps=3000000

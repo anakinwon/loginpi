@@ -75,12 +75,14 @@ async function cloudflareIce(
 }
 
 // coturn use-auth-secret 규약 : username = 만료epoch:사용자, credential = base64(HMAC-SHA1(secret, username)).
-// cafe.pi 는 SHA-256 을 쓰지만 coturn 기본(REST API 초안)은 SHA-1 [확인중 : 실제 TURN 서버 설정과 맞출 것]
+// cafe.pi 는 SHA-256 을 쓰지만 coturn 기본(REST API 초안)은 SHA-1 — 운영 coturn(media/scripts/vps-turn-setup.sh) 과 일치 확인(2026-10-31 relay 실증)
+// 만료는 TTL 칸 경계로 맞춘다(같은 칸 안의 재요청 = 같은 username) — coturn user-quota 가 username 단위라, 매번 새 만료를 쓰면
+//  재요청만으로 사용자당 할당 상한을 비껴간다(보안 검토 2026-10-31). 실제 유효 기간은 ttl 이상 2·ttl 미만, 클라이언트엔 보수적으로 ttl 을 알린다
 function hmacIce(ttl: number, userId: string): IceServer[] | null {
   const host = process.env.TURN_HOST
   const secret = process.env.TURN_SECRET
   if (!host || !secret) return null
-  const username = `${Math.floor(Date.now() / 1000) + ttl}:${userId}`
+  const username = `${(Math.floor(Date.now() / 1000 / ttl) + 2) * ttl}:${userId}`
   const credential = createHmac('sha1', secret).update(username).digest('base64')
   return [
     STUN,
