@@ -206,9 +206,9 @@ function enqueue(ctx: RoomCtx, text: string, src: string, sig: string | null, pr
   const audio = translateCaption(text, src, lang, ctx.seminarId, sig, pre)
     .then((said): Promise<Blob | Local | null> | Local | null => {
       if (said === null || ac.signal.aborted) return null
-      // 기기 내 합성이 되면 서명·상한과 무관하게 바로(과금·요청 없음)
+      // 기기 내 합성이 되면 바로(과금·요청 없음) — 서명 있는 글만(클라우드 경로와 같은 조건). 자막 글 자체는 무대 역할의 발화와 같은 신뢰 수준이라 서버 재검증은 두지 않는다(보안 검토 2026-10-31 — 선번역 조작은 그 자막 1개에 한정)
       const voice = localVoice(lang)
-      if (voice && said.text.trim()) return { say: said.text.trim(), voice }
+      if (voice && said.sig && said.text.trim()) return { say: said.text.trim(), voice }
       return !said.sig || said.text.trim().length > TTS_MAX_CHARS // 긴 문장은 서버가 400 — 요청 없이 건너뜀
         ? null
         : piFetch('/api/speech/tts', {

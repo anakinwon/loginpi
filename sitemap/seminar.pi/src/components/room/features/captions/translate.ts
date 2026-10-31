@@ -26,12 +26,8 @@ export function translateCaption(
 ): Promise<Said | null> {
   // 같은 언어·글자 없는 자막(숫자·기호뿐, 보강 r6 T08) = 원문 그대로 — 번역 요청·계량 없음
   if (sameLang(src, lang) || !hasWords(text)) return Promise.resolve({ text, sig })
-  if (pre?.text) {
-    const p = Promise.resolve(pre)
-    if (local.size >= 100) local.clear()
-    local.set([smnId, lang, text].join('\n'), p)
-    return p
-  }
+  // 선번역은 캐시에 넣지 않는다 — 자막 d 는 무대 역할이 보낸 값이라, 캐시하면 조작된 번역이 같은 원문의 다음 자막까지 덮는다(보안 검토 2026-10-31). 그 자막 1개에만 쓴다
+  if (pre?.text) return Promise.resolve(pre)
   if (!sig || trStop.get()) return Promise.resolve(null)
   const key = [smnId, lang, text].join('\n') // 결과 sig 가 세미나별이라 세미나도 키에
   let p = local.get(key)
