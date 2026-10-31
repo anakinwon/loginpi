@@ -1,10 +1,27 @@
 // pi-i18n validate — 빌드 게이트(네트워크 없음). 언어 소스(messages/en.json·lang/<언어>.json)를 검사하고, routing locale 파일(messages/<locale>.json)은
 // 언어 소스를 그대로 펼친 것(expand)인지 확인한다. ICU 구조 불일치·extra 키·빈 값·카탈로그/routing 밖 파일·expand 미동기 = 오류, 누락·용어·한글 = 경고.
 // 실행 : 앱 폴더에서 pnpm i18n:validate [--langs a,b] [--strict] [--verbose]  → 오류 1건 이상이면 종료코드 1
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { plan, strays } from './expand.mjs'
 import { checkValue, flatten, icuShape, loadConfig, parseArgs, pickLocales, sourceFile } from './lib.mjs'
+
+// src/app/[locale]/ 바로 아래 경로 세그먼트(라우트 그룹 '(x)' 는 안으로 들어가 본다) — locale 코드와 같으면 as-needed 접두사로 오인된다
+//  (예: /me = 몬테네그로 locale 'me', /ad = 안도라 'ad' → 기본 locale 사용자가 그 페이지 대신 그 언어 홈을 본다)
+export function segmentCollisions(cwd, locales) {
+  const root = join(cwd, 'src', 'app', '[locale]')
+  const hits = []
+  const walk = (d) => {
+    if (!existsSync(d)) return
+    for (const n of readdirSync(d)) {
+      if (!statSync(join(d, n)).isDirectory()) continue
+      if (/^\(.*\)$/.test(n)) walk(join(d, n))
+      else if (locales.includes(n)) hits.push(n)
+    }
+  }
+  walk(root)
+  return hits
+}
 
 export function validate(cwd, argv = []) {
   const args = parseArgs(argv)
@@ -64,6 +81,9 @@ export function validate(cwd, argv = []) {
     if (missing && args.strict) err(l, '*', `누락 키 ${missing}개(--strict)`)
     rows.push([l, missing, errorCount - before, warns])
   }
+
+  // ⓪ 앱 경로 세그먼트 ↔ routing locale 충돌 금지
+  for (const n of segmentCollisions(cwd, cfg.locales)) err(n, `src/app/[locale]/${n}`, 'routing locale 코드와 같은 경로 세그먼트 — 경로 이름을 바꿀 것(locale 로 해석됨)')
 
   // ② routing locale 파일 — 언어 소스와 바이트 동일해야(expand 동기), routing 밖 파일 금지
   for (const f of strays(dir, cfg.locales)) err(f.slice(0, -5), f, 'routing(loginpi) 목록에 없는 파일 — 언어 소스면 messages/lang/ 으로 옮길 것')

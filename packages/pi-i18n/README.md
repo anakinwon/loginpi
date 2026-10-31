@@ -8,7 +8,7 @@ Pi 앱 공용 다국어 표준 패키지 — **loginpi(cafe.pi)와 완전히 같
 | `@pi/i18n/server` | `createRequestConfig`·`getMessages` — 스위처 문구(loginpi 원문) ⊕ ko → en → locale 깊은 병합 |
 | `@pi/i18n/client` | `createLanguageSwitcher({ usePathname, useRouter, fetcher?, adminTicketUrl? })`·`PiPriceChip` — loginpi 컴포넌트 이식(상단 헤더 맨 끝 2항목, 하단 금지) |
 | `@pi/i18n/routes` | `countriesGET`(loginpi DB 스냅숏)·`exchangeRatesGET`·`piPriceGET` — 앱 route.ts 가 재수출 + `revalidate` 600/900/300 |
-| `pi-i18n` (bin) | `translate`(언어 단위 Gemini 증분 → expand 자동) · `expand`(언어 → routing locale 파일) · `validate`(빌드 게이트) · `audit` · `snapshot`(loginpi DB·routing·문구 복제) |
+| `pi-i18n` (bin) | `translate`(언어 단위 Gemini 증분 → expand 자동) · `expand`(언어 → routing locale 파일) · `validate`(빌드 게이트 — 경로 세그먼트가 locale 코드와 같으면 오류, 예 `/me`·`/ad`) · `audit` · `snapshot`(loginpi DB·routing·문구 복제) |
 
 ```bash
 # 앱 폴더에서

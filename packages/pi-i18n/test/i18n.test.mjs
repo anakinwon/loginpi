@@ -220,6 +220,15 @@ test('expand · validate : 언어 소스 → routing locale 복사, 미동기·r
     assert.equal(v.errorCount, 2)
     assert.ok(v.lines.some((l) => l.includes('[am]') && l.includes('expand')))
     assert.ok(v.lines.some((l) => l.includes('hy.json') && l.includes('lang/')))
+    // 경로 세그먼트 = locale 코드(/me = 몬테네그로) → 오류, 라우트 그룹 안도 검사, locale 아닌 이름은 통과
+    const seg = (p) => mkdirSync(join(app, 'src', 'app', '[locale]', p), { recursive: true })
+    seg('my')
+    seg('me')
+    seg('(shop)/ad')
+    seg('(shop)/slot')
+    const { segmentCollisions } = await import('../cli/validate.mjs')
+    assert.deepEqual(segmentCollisions(app, ROUTING).sort(), ['ad', 'me'])
+    assert.equal(validate(app).errorCount, 4)
   } finally {
     rmSync(app, { recursive: true, force: true })
   }

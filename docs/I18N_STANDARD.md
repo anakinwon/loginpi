@@ -1,4 +1,4 @@
-# Pi 앱 다국어 표준 (`@pi/i18n`) v2.0.0
+# Pi 앱 다국어 표준 (`@pi/i18n`) v2.0.1
 
 > 정본. **loginpi(cafe.pi, https://loginpi.vercel.app/)의 다국어를 흉내내지 않고 똑같이** 다른 Pi 앱에 옮기는 표준입니다(마스터 지시 2026-10-31 "loginpi를 흉내내지말고, 완전히 동일하게 구현해줘").
 > 같은 것 : routing locale 219개(국가코드 위주, 순서 그대로)·locale → 언어 매핑·DB 활성 locale 189(스냅숏)·국가마스터 188·상단 헤더 언어 콤보(국기·통화·환율)·π 시세칩·API 3종·스위처 문구.
@@ -281,7 +281,7 @@ pi-i18n translate [--langs <a,b>] [--force] [--dry-run] [--batch 250] [--concurr
 pi-i18n expand
   routing locale 마다 언어 소스를 messages/<locale>.json 으로 복사(내용이 같으면 안 씀). 소스 없는 언어·매핑 null locale 은 만들지 않음(폴백)
 pi-i18n validate [--langs <a,b>] [--strict] [--verbose]
-  언어 소스 검사(5.4절) + locale 파일이 소스와 바이트 같음(아니면 '… pnpm i18n:expand' 오류) + routing·카탈로그 밖 파일 오류. 오류 1건 이상 = 종료코드 1
+  언어 소스 검사(5.4절) + locale 파일이 소스와 바이트 같음(아니면 '… pnpm i18n:expand' 오류) + routing·카탈로그 밖 파일 오류 + `src/app/[locale]/` 경로 세그먼트가 routing locale 코드와 같으면 오류(8.1절). 오류 1건 이상 = 종료코드 1
 pi-i18n audit [--src src] [--md <file>] [--json]
 pi-i18n snapshot [--root <loginpi 루트>]      (저장소 루트에서, 패키지 관리자만) — 2.3절
 ```
@@ -292,6 +292,7 @@ pi-i18n snapshot [--root <loginpi 루트>]      (저장소 루트에서, 패키�
 2. **하단 메뉴 바·푸터·사이드 메뉴에 두지 않습니다.** (화면 아래쪽 버튼은 드롭다운이 위로 잘림 — loginpi 는 상단 고정)
 3. **국기와 환율을 반드시 표시합니다.** 버튼 = 국기 + 코드, 목록 = 국기 + 이름 + 통화 + 1 USD 환율. `showPiValuation` 은 기본 `true` — 앱 헤더가 `process.env.NEXT_PUBLIC_FEATURE_PI_PRICE !== 'false'` 로 넘깁니다(`'false'` = 통화·환율·시세칩 숨김 비상 스위치). loginpi 는 같은 env 를 긴급 override 로 쓰고 기본은 tier(운영 숨김 — 등재 레드라인 A-5)로 판정합니다 — 메인넷 등재 심사 때 같은 판단이 필요하면 env 로 끕니다.
 4. 원화 등 법정화폐는 **표시용 환산**이고 결제·청구는 Pi 금액만입니다(메모리 규칙).
+5. **헤더는 한 줄 고정**(loginpi `h-14`·줄바꿈 없음). `flex-wrap` 금지 — 줄이 늘면 콤보가 최우상단에서 내려가고, 모바일 드롭다운(`fixed top-[3.75rem]` = 한 줄 헤더 기준)이 헤더 아래 줄을 덮습니다. 폭이 모자라면 가운데 텍스트 메뉴를 줄이거나 가로 스크롤(`min-w-0 flex-1 overflow-x-auto whitespace-nowrap`)로 두고, 콤보·시세칩 묶음은 `shrink-0` 으로 줄이지 않습니다(예 : sitemap.pi `site-header.tsx`). 드롭다운이 잘리므로 콤보를 `overflow` 컨테이너 안에 넣지 않습니다.
 
 ### 4.7 loginpi 와 다른 유일한 동작 — 재방문 자동 전환
 
@@ -410,6 +411,7 @@ validate 는 오류를 언어(또는 locale)·키별로 한 줄씩 출력하고,
 - [ ] `globals.css` : `@source '<앱에서 packages 까지>/pi-i18n/src';` + shadcn 토큰(`--background`·`--foreground`·`--muted`·`--muted-foreground`·`--border`·`--primary`)이 정의돼 있어야 콤보가 loginpi 와 같은 색으로 보입니다.
 
 **3단계 — 라우팅·레이아웃·API**
+- [ ] **경로 세그먼트 이름이 routing locale 코드(2.2절 219개)와 겹치면 안 됩니다** — `localePrefix: 'as-needed'` 라 `/me`(몬테네그로)·`/ad`(안도라)·`/am`·`/in` 등은 locale 로 해석돼 기본 locale 사용자가 그 언어 홈을 봅니다. `validate` 가 `src/app/[locale]/` 바로 아래(라우트 그룹 `(x)` 안 포함) 이름을 검사해 오류로 막습니다(sitemap.pi `/me`→`/my`, `/ad`→`/slot` 개명 사례).
 - [ ] 페이지를 `src/app/[locale]/` 아래로(`app/api` 는 밖). 루트 layout 은 `return children`, 루트 `not-found.tsx` 는 `<html><body>` 포함.
 - [ ] 화면 코드의 `next/link`·`next/navigation` 을 `@/i18n/navigation` 으로.
 - [ ] `[locale]/layout.tsx` : `<html lang={locale} dir={getDir(locale)}>`·`setRequestLocale`·`NextIntlClientProvider`·`generateStaticParams`(ko·en), `<body>` 맨 앞 `<PreferredLocaleScript locales={routing.locales} />`. (flag-icons CSS 는 스위처가 직접 불러오므로 layout import 불필요 — 넣어도 무해)
@@ -519,6 +521,7 @@ const showPiValuation = process.env.NEXT_PUBLIC_FEATURE_PI_PRICE !== 'false' // 
 
 | 날짜 | 내용 |
 |---|---|
+| 2026-10-31 | v2.0.1 — validate 에 경로 세그먼트 ↔ routing locale 충돌 검사(8.1절, sitemap.pi `/me`·`/ad` 회귀), 헤더 한 줄 고정 규칙(4.6절 5) |
 | 2026-10-31 | **v2.0.0 loginpi 완전 동일화** (마스터 "흉내내지말고, 완전히 동일하게") — routing locale 219개(loginpi 목록·순서) + locale → 언어 매핑(내용 판정), 언어 소스 `messages/lang/` + `expand` CLI, DB 스냅숏(`snapshot` CLI, locales 188·countries 188·스위처 문구), loginpi LanguageSwitcher·PiPriceChip·locale-currency/country·comboMatch 이식, API 처리기 3종(`@pi/i18n/routes`, 2초 타임아웃), 배치·표시 규칙 4.6절(상단 헤더 맨 오른쪽·국기·환율 필수·하단 금지), 유일한 동작 차이 4.7절, 0.1 앱 이행 8.2절. 이전 v1.x 의 'locale = 언어코드(P1)'·'스위처는 네트워크 없음' 규칙은 폐기 |
 | 2026-10-31 | v1.0.3 최종 검토 반영 — 루트 not-found·내비게이션 교체, routing 타입 단언, `pnpm exec tsc`, loginpi 화면 차이(REA) |
 | 2026-10-31 | v1.0.2 — 재방문 적용을 `PreferredLocaleScript`(하이드레이션 전)로 이동, `numericArgs`, 옛 en 참조 제외 |
