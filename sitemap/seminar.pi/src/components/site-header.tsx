@@ -29,7 +29,7 @@ type Item = { href: string; label: string; icon: ReactNode }
 
 // 메뉴 항목 공통 모양 — 아이콘 위·짧은 글자 아래, 현재 화면은 강조색
 const ITEM =
-  'flex min-w-14 flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-[11px] leading-none text-muted-foreground hover:bg-surface-raised hover:text-foreground aria-[current=page]:text-accent'
+  'flex min-h-11 min-w-14 flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-1.5 text-[11px] leading-none text-muted-foreground hover:bg-surface-raised hover:text-foreground aria-[current=page]:text-accent'
 
 function useHere() {
   const pathname = usePathname()

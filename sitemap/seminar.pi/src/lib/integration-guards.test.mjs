@@ -27,7 +27,7 @@ test('① smn_agr 에 넣는 라우트는 모두 agreeGate 를 거친다', () =>
 })
 
 test('② 헤더에 /privacy 링크, nav.privacy 가 ko·en 모두 있다', () => {
-  assert.match(read('src/components/site-header.tsx'), /href="\/privacy"/)
+  assert.match(read('src/components/site-header.tsx'), /href: '\/privacy'/) // 하단 폴더블 메뉴 items(8b83e7a3)
   for (const l of ['ko', 'en']) {
     const m = JSON.parse(read(`messages/${l}.json`))
     assert.ok(m.nav?.privacy?.trim(), `${l} nav.privacy 비어 있음`)
@@ -212,7 +212,7 @@ test('⑮ 360px 폭 — 제작 현황 단계 칸은 줄바꿈된다(비고 글�
 })
 
 test('⑯ 글자 링크도 터치 대상 높이 24px 이상(WCAG 2.5.8) — 헤더 메뉴·상세 공유 줄·목록으로', () => {
-  assert.match(read('src/components/site-header.tsx'), /<nav className="[^"]*\[&>a\]:min-h-6/)
+  assert.match(read('src/components/site-header.tsx'), /^const ITEM =\s*'[^']*\bmin-h-11\b/m) // 하단 메뉴 항목 44px(8b83e7a3)
   assert.match(read('src/components/seminar/share-links.tsx'), /text-xs \[&>\*\]:inline-flex \[&>\*\]:min-h-6/)
   assert.match(read('src/components/seminar/seminar-detail.tsx'), /inline-flex min-h-6 items-center text-sm hover:underline">\s*← /)
 })
