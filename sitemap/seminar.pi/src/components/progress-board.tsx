@@ -124,27 +124,35 @@ export function ProgressBoard() {
           .map((f) => {
             const done = f.steps.filter((s) => s.status === 'done').length
             const refs = featureRefs(f)
-            return (
-              <li
-                key={f.id}
-                className={`space-y-3 rounded-xl border p-4 ${TONE[f.status].ring}`}
-              >
-                <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                  <div className="flex min-w-0 items-baseline gap-2">
-                    <span className="text-muted-foreground font-mono text-xs">
-                      {f.id.replace('F', 'F-')}
+            const folded = f.status === 'done' // 완료 기능은 제목 줄만 — 네이티브 details 로 접고 펼친다(마스터 2026-10-31, JS 없음)
+            const header = (
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <div className="flex min-w-0 items-baseline gap-2">
+                  {folded && (
+                    <span
+                      aria-hidden
+                      className="text-muted-foreground inline-block text-xs group-open:rotate-90"
+                    >
+                      ▶
                     </span>
-                    <h3 className="font-bold">{t(`features.${f.id}.name`)}</h3>
-                    <span className="text-muted-foreground text-xs">
-                      {f.prio}
-                    </span>
-                  </div>
-                  <span
-                    className={`text-xs font-semibold ${TONE[f.status].text}`}
-                  >
-                    {t(`status.${f.status}`)} · {done}/{f.steps.length}
+                  )}
+                  <span className="text-muted-foreground font-mono text-xs">
+                    {f.id.replace('F', 'F-')}
+                  </span>
+                  <h3 className="font-bold">{t(`features.${f.id}.name`)}</h3>
+                  <span className="text-muted-foreground text-xs">
+                    {f.prio}
                   </span>
                 </div>
+                <span
+                  className={`text-xs font-semibold ${TONE[f.status].text}`}
+                >
+                  {t(`status.${f.status}`)} · {done}/{f.steps.length}
+                </span>
+              </div>
+            )
+            const body = (
+              <>
                 <p className="text-muted-foreground text-sm">
                   {t(`features.${f.id}.desc`)}
                 </p>
@@ -189,6 +197,26 @@ export function ProgressBoard() {
                     </li>
                   ))}
                 </ol>
+              </>
+            )
+            return (
+              <li
+                key={f.id}
+                className={`rounded-xl border p-4 ${TONE[f.status].ring}`}
+              >
+                {folded ? (
+                  <details className="group">
+                    <summary className="cursor-pointer list-none rounded-md [&::-webkit-details-marker]:hidden">
+                      {header}
+                    </summary>
+                    <div className="mt-3 space-y-3">{body}</div>
+                  </details>
+                ) : (
+                  <div className="space-y-3">
+                    {header}
+                    {body}
+                  </div>
+                )}
               </li>
             )
           })}
