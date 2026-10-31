@@ -123,3 +123,6 @@ ruvector.db
 
 # 분석용 로컬 영상(대용량 — 커밋 금지)
 mypoplist/videos/
+
+# VPS 접속 메모(루트 비밀번호 포함) — 커밋 금지(2026-10-31)
+sitemap/seminar.pi/docs/vultr.com.md
