@@ -46,8 +46,10 @@ Phase 0 ─▶ 1 MVP ─▶ 2 등재
 - [ ] (고객) pi-nonprod Exposed schemas `dbms_dev`·`dbms_stg` → (서비스) `db-migrate.mjs --app dbms --tier dev`
 - [x] (고객) Vercel 프로젝트 `dbms` 생성(Root Directory `sitemap/dbms.pi`, 주소 https://dbmspi.vercel.app) · GitHub 연동(커밋 상태 `Vercel – dbms` 기록 확인) — 2026-11-01
 - [x] (서비스) 운영 브랜치 `prod/dbms` 생성(`promote-to-prod.mjs --app dbms`, 2026-11-01)
-- [ ] (고객) Vercel Production Branch = `prod/dbms` 설정 · 환경변수 Production·Preview 등록 · 첫 빌드 success 확인
-- [ ] (고객) Google OAuth 클라이언트
+- [x] (고객) Vercel Production Branch = `prod/dbms` · 환경변수 등록 → `Vercel – dbms: success`(8063c0ac, 2026-11-01)
+- [x] (고객) Google OAuth 클라이언트 — 운영 signin 302 → accounts.google.com, redirect_uri `https://dbmspi.vercel.app/api/auth/callback/google` 확인(2026-11-01)
+- [x] (서비스) DB 적용 — 전용 Supabase public 에 baseline 2 + sql/001~003 (`db-migrate.mjs --app dbms --tier prod`, DA 조건부 승인 2026-11-01), 재실행 "변경 없음" 확인
+- [ ] (고객) Pi Developer Portal 앱 등록 → Pi 로그인·연동 코드 발급 → Google 로그인 + 코드 입력 실기기 확인
 - [ ] PRD_28 §1.1-2·LOGIN_PLAYBOOK Google 예외 등재(dbms.pi, schema.pi 함께)
 
 **완료 기준** : PRD v1.0 · Pi 앱 ID · 비운영 DB · 스테이징 URL
