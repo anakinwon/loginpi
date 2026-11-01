@@ -284,6 +284,7 @@
     );
     animation: ship-hole-spin 0.5s linear infinite;
   }
+  /* 블랙홀 — 열리고(48%) 우주선을 삼킨 뒤(78%) 가운데에서 화면 전체로 줌인(100%, 96px × 30 ≈ 2,900px 로 대각선까지 덮음)해 그 속으로 들어가는 느낌(마스터 2026-11-01 "가운데 동그라미가 zoom in"). 이 검은 화면 뒤에 window.open */
   @keyframes ship-hole {
     0%,
     34% {
@@ -294,8 +295,12 @@
       transform: scale(1.1);
       opacity: 1;
     }
-    100% {
+    78% {
       transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(30);
       opacity: 1;
     }
   }
