@@ -45,7 +45,7 @@
 | 경계 항목 | 판정 |
 |---|---|
 | SQL 편집기 | 조회·DDL 적용 = schema.pi, 실행계획·성능 분석 = dbms.pi |
-| DB 접속·에이전트 | 접속 정보 공유 단일 출처(복제 금지), 화면은 양쪽 |
+| DB 접속·에이전트 | 접속 정보 공유 단일 출처(복제 금지), 화면은 양쪽 — **2026-11-01 마스터 결정 : dbms.pi 는 별도 DB + schema.pi 연결 API 로 읽음, 접속 비밀 복호화는 schema.pi 에서만**(dbms.pi `docs/PRD.md` §5) |
 | DBMS 프로파일·타입 매핑(sql/024) | schema.pi 정본, dbms.pi 읽기 |
 | 인덱스·파티션 | 설계안 = schema.pi, 운영·효과 측정 = dbms.pi |
 | PiMig(5단계) | 매핑·규칙 = schema.pi, 실행·모니터 = dbms.pi |
@@ -182,6 +182,7 @@ METAPi ─표준(CNFM)─▶ ModelPi ─모델─▶ PiErd ─물리 모델─�
 | 2026-10-17 | 반자동 원칙(§3-8) 추가, §6 업종 추천·MD1 관계 완료 표시 |
 | 2026-10-17 | 마스터 결정 반영 : PipeLine 표기 확정, Pi 접두 제품명 추후 재검토, 단계별 앱 분리(§3-5), 착수 순서 2단계 ModelPi → 3단계 PiErd(§6) |
 | 2026-10-17 | 2단계 ModelPi MD1·MD2·MD3·MD5 1차, 3단계 PiErd ERD-1~3, 4단계 DDL 생성·역설계 1차 완료 표시(`PRD_PiErd.md` S0~S5 1차) |
+| 2026-11-01 | dbms.pi 착수(sitemap/dbms.pi, 포트 3004) — 연결 방식 = 별도 DB + schema.pi 연결 API(§3-10 DB 접속 행), 로그인 Pi + Google 연동. §2 상태 열은 10-17~19 기준이며 이후 진행(인덱스·ERD-4·PNG/SVG·SQL 탭·모니터링 AI·다중 수집)은 `ROADMAP.md` 정본 [갱신 필요] |
 | 2026-10-19 | 앱 경계 원칙(§3-10) 추가 — Database 전문지식을 schema.pi(설계·DAP)와 dbms.pi(엔진·운영·DBA/SQLP)로 2분할, 판정 질문 3개·경계 항목 7건 |
 
 ## 8. 확인 필요(마스터)
