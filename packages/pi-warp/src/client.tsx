@@ -1,7 +1,7 @@
 'use client'
 
 // 도착 워프 — sitemap.pi 에서 음속 돌파로 떠난 사용자가 도착 사이트에서 '음속으로 접근해 멈추는' 반대 연출(마스터 지시 2026-11-01).
-//  1.6초 : 0~ 소닉붐 링이 크게 퍼진 채 중심으로 모이며 사라짐 + 플래시(감속 충격파) → 별이 최고속(줄무늬)에서 0 으로 감속(canvas) → 1.1초부터 어둠이 걷히며 화면이 드러남 → 해제.
+//  1.6초 : 0~ 떠날 때 블랙홀과 같은 3겹 고리가 크게 퍼진 채 중심으로 모이며 사라짐 + 플래시(감속 충격파) → 별이 최고속(줄무늬)에서 0 으로 감속(canvas) → 1.1초부터 어둠이 걷히며 화면이 드러남 → 해제.
 //  판정·표시 규칙은 index.ts(utm_source=sitemap.pi 또는 referrer). 재생 뒤 주소의 표시를 지우고 sessionStorage 로 새로고침 재생을 막는다.
 //  입력을 막지 않는다(pointer-events none) — Pi 로그인·결제 진행과 무관. sitemap.pi 워프처럼 움직임 줄이기 설정에도 재생(마스터 2026-10-16 "모바일도 동일").
 //  HTML canvas·요소 CSS 만 사용(모바일 WebView SVG transform 금지 철칙 무관), 저사양 보호 : DPR 캡 1.5, 끝나면 rAF 정지·언마운트
@@ -21,8 +21,15 @@ const C = {
 
 type Star = { x: number; y: number; z: number; pz: number }
 
+// 감속 충격파 고리 3겹 — 떠날 때 블랙홀(sitemap.pi globals.css .ship-hole)의 겹과 같은 색·비율(안 → 밖 : 시안 띠 0.64R · 도는 흰·보라 conic 0.84R · 시안·남보라 글로우 가장자리 R, 마스터 2026-11-01 "나가는 효과 갯수랑 같도록")
+const RING = { position: 'absolute', inset: 0, borderRadius: '50%' } as const
+const CONIC =
+  'conic-gradient(from 0deg, transparent 0 20%, rgba(224,242,254,.9) 30%, transparent 42%, rgba(196,181,253,.8) 62%, transparent 72%, rgba(224,242,254,.7) 88%, transparent 100%)'
+const CONIC_MASK = 'radial-gradient(closest-side, transparent 0 86%, #000 90% 100%)' // 가장자리 얇은 띠만 남김
+
 const CSS = `
 @keyframes pi-warp-boom { 0% { transform: translate(-50%,-50%) scale(1.6); opacity: .9 } 100% { transform: translate(-50%,-50%) scale(.1); opacity: 0 } }
+@keyframes pi-warp-spin { to { transform: rotate(360deg) } }
 @keyframes pi-warp-flash { 0% { opacity: .85 } 100% { opacity: 0 } }
 @keyframes pi-warp-reveal { 0% { opacity: 1 } 100% { opacity: 0 } }
 `
@@ -117,7 +124,7 @@ export function WarpArrival() {
       >
         <canvas ref={ref} style={{ width: '100%', height: '100%', display: 'block' }} />
       </div>
-      {/* 감속 충격파 — 떠날 때 소닉붐(퍼지는 링)의 역재생 : 크게 퍼진 링이 중심으로 모이며 사라짐 */}
+      {/* 감속 충격파 — 떠날 때 블랙홀 고리 3겹의 역재생 : 크게 퍼진 3겹 고리가 함께 중심으로 모이며 사라짐 */}
       <div
         style={{
           position: 'fixed',
@@ -125,12 +132,38 @@ export function WarpArrival() {
           left: '50%',
           width: '60vmin',
           height: '60vmin',
-          borderRadius: '50%',
-          border: '3px solid rgba(200,225,255,.8)',
-          boxShadow: '0 0 40px rgba(120,170,255,.6), inset 0 0 40px rgba(120,170,255,.4)',
           animation: 'pi-warp-boom 700ms ease-out forwards',
         }}
-      />
+      >
+        {/* ① 가장자리 — 시안 고리 + 시안·남보라 글로우 */}
+        <div
+          style={{
+            ...RING,
+            border: '2px solid rgba(103,232,249,.85)',
+            boxShadow: '0 0 16px 4px rgba(103,232,249,.6), 0 0 48px 14px rgba(129,140,248,.3)',
+          }}
+        />
+        {/* ② 가운데 — 도는 흰·보라 고리(conic, 블랙홀과 같은 0.5초 회전) */}
+        <div
+          style={{
+            ...RING,
+            inset: '8%',
+            background: CONIC,
+            mask: CONIC_MASK,
+            WebkitMask: CONIC_MASK,
+            animation: 'pi-warp-spin .5s linear infinite',
+          }}
+        />
+        {/* ③ 안쪽 — 시안 띠 */}
+        <div
+          style={{
+            ...RING,
+            inset: '18%', // 0.64R — ② 띠(0.72~0.84R)와 떨어져 작아져도 두 겹이 갈라져 보이게
+            border: '3px solid rgba(56,189,248,.6)',
+            boxShadow: '0 0 14px rgba(56,189,248,.45), inset 0 0 14px rgba(56,189,248,.35)',
+          }}
+        />
+      </div>
       <div style={{ ...fill, background: 'rgba(220,235,255,.9)', animation: 'pi-warp-flash 350ms ease-out forwards' }} />
     </div>
   )
