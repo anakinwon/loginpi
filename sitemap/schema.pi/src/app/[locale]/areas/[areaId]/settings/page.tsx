@@ -6,6 +6,7 @@ import { use, useState } from 'react'
 import AiMdlForm from './ai-mdl-form'
 import AreaForm from './area-form'
 import ItemTable, { GRP_CFG as GRP, type ItemCfg } from './item-table'
+import LinkTokenPanel from './link-token-panel'
 
 const ABBR: ItemCfg = {
   path: 'abbreviations',
@@ -22,6 +23,7 @@ const TABS = [
   ['grp', '도메인그룹'],
   ['abbr', '약어'],
   ['ai', 'AI 분석 모델'],
+  ['link', '사이트 연결'],
 ] as const
 
 export default function SettingsPage({ params }: { params: Promise<{ areaId: string }> }) {
@@ -45,6 +47,7 @@ export default function SettingsPage({ params }: { params: Promise<{ areaId: str
         {tab === 'grp' && <ItemTable areaId={areaId} cfg={GRP} />}
         {tab === 'abbr' && <ItemTable areaId={areaId} cfg={ABBR} />}
         {tab === 'ai' && <AiMdlForm />}
+        {tab === 'link' && <LinkTokenPanel areaId={areaId} />}
       </div>
     </main>
   )
