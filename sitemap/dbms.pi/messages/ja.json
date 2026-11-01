@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "DBエンジンを高速かつ安全に運用するためのDBA・SQLPワークベンチ"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "DBエンジンでデータを高速かつ安全に実行",
+    "description": "実行計画、統計、パフォーマンスを扱うDBA・SQLPワークベンチです。設計・標準はschema.piが担当し、dbms.piはそのパートナーとしてエンジン側を担当します。",
+    "welcome": "{name}様、ようこそ。",
+    "featTitle": "機能",
+    "featDesc": {
+      "connect": "schema.pi接続トークンを登録し、接続ステータスを確認します",
+      "sqlLab": "実行計画ツリー、警告、比較、標準ドメインとの対照アンチパターンチェック",
+      "perf": "遅いクエリTop-N、テーブル/インデックスの健全性、容量トレンド予測、アクティビティ/ロック",
+      "monitor": "アプリ・DB・URL指標の要約と閾値ルールアラート",
+      "drift": "schema.piモデル・DDL履歴と実際のカタログの対照、インデックス効果の測定",
+      "migration": "関係位相整列ロード順序、チャンク、チェックリスト、検証SQL",
+      "pipeline": "変更キャプチャ事前チェックとソース→変換→ターゲットパイプライン定義",
+      "analytics": "KPIダッシュボード、レイク3層マッピング、データセットカタログ",
+      "ops": "パラメータ、アカウント権限、バックアップ、レプリケーションDRの読み取り専用診断",
+      "learn": "SQLP・DAP演習問題、チューニング事例集、DBMS比較辞書"
+    }
+  },
   "auth": {
     "checking": "サインインを確認中…",
     "signedIn": "{name}様",
@@ -64,5 +87,838 @@
     "LINK_CODE_GEN_FAILED": "連携コードを作成できませんでした。しばらくしてからもう一度お試しください。",
     "AUTH_DB_UNAVAILABLE": "アカウントを保存できなかったため、サインインに失敗しました。しばらくしてからもう一度お試しください。",
     "LINK_TRY_LIMIT": "連携コードの入力回数が多すぎます。15分後にもう一度お試しください"
+  },
+  "analytics": {
+    "title": "分析・レイク",
+    "intro": "dbmsアクティビティKPI、レイク3層設計、データセットカタログ連携を1画面で確認します。",
+    "storageNotice": "レイクストレージ（顧客側ストレージまたはクラウド）はまだ決定されていません（PRDセクション10 #7）。現在は設計と名前マッピングのみを保存し、行データは保存しません。",
+    "noLink": "まずschema.pi接続を選択または登録してください。",
+    "goConnect": "接続を登録",
+    "loading": "読み込み中…",
+    "refresh": "更新",
+    "kpi": {
+      "title": "KPIダッシュボード",
+      "updatedAt": "{area} · {time}時点",
+      "notBuilt": "未構築",
+      "keys": {
+        "links": "マイ接続",
+        "perf": "パフォーマンス収集",
+        "drift": "整合性検出",
+        "mig": "移行計画",
+        "pipe": "パイプライン",
+        "lake": "レイクデータセット"
+      },
+      "countsChart": "機能別累積件数",
+      "trendTitle": "過去14日間のパフォーマンス収集回数",
+      "trendItem": "{day} : {cnt}回",
+      "trendEmpty": "過去14日間にパフォーマンス収集はありません。",
+      "monTitle": "schema.piモニター概要（過去1時間）",
+      "monTps": "1秒あたりのリクエスト",
+      "monErr": "エラー率",
+      "monAvg": "平均応答（ms）",
+      "monDb": "DB接続数",
+      "monFail": "モニター概要を読み込めませんでした: {msg}"
+    },
+    "lake": {
+      "title": "レイク3層設計",
+      "raw": "Raw",
+      "rawDesc": "ソースDBの列名と型をそのままロードします。",
+      "std": "標準化",
+      "stdDesc": "列名をschema.pi承認の標準用語に変更します。",
+      "cur": "キュレーション",
+      "curDesc": "エンティティごとにグループ化された分析データセットです。",
+      "loadProjects": "プロジェクトを読み込む",
+      "project": "プロジェクト",
+      "pickProject": "プロジェクトを選択してください",
+      "noProjects": "この分類体系にプロジェクトはありません。",
+      "noTables": "このプロジェクトモデルにテーブルがありません。",
+      "conform": "標準適合率 {pct}%",
+      "tableSummary": "{tbl} → {std} · 列 {cnt}個 · 適合率 {pct}%",
+      "colSrc": "ソース列",
+      "colStd": "標準層列",
+      "colType": "型",
+      "colOk": "形式",
+      "ok": "適合",
+      "ng": "チェック",
+      "pk": "PK",
+      "selectAll": "すべて選択",
+      "selected": "{cnt}個選択",
+      "save": "レイク設計に追加",
+      "saved": "{cnt}個をカタログに追加しました。"
+    },
+    "catalog": {
+      "title": "データセットカタログ",
+      "schemaCard": "分析データセットの定義・メタ検索・用語集はschema.piが正本です。ここではレイクのロード状態と鮮度のみを確認します。",
+      "openSchema": "schema.piで定義を表示",
+      "empty": "まだレイク設計に追加されたテーブルはありません。",
+      "status": {
+        "DSGN": "設計のみ",
+        "LOADED": "ロード済み",
+        "FAIL": "ロード失敗"
+      },
+      "lastLoad": "最終ロード {time}",
+      "neverLoaded": "ロード履歴なし",
+      "remove": "除外",
+      "removeConfirm": "{tbl}をカタログから除外しますか？",
+      "prev": "前へ",
+      "next": "次へ",
+      "page": "{page}ページ"
+    },
+    "errors": {
+      "LINK_REQUIRED": "まず接続を選択してください。",
+      "NOT_FOUND": "対象が見つかりません。モデルが変更されたか確認してください。"
+    }
+  },
+  "drift": {
+    "title": "モデル↔DBドリフト",
+    "intro": "schema.piの設計モデル・DDL適用履歴と実際のDBカタログを対照してずれを見つけ、設計したインデックスが実際に使用されているかを測定します。顧客DBの行データは読み取ったり保存したりしません。",
+    "needLink": "まず上でschema.pi接続を選択してください。接続がない場合は、「接続」メニューでトークンを登録してください。",
+    "needConn": "比較するDB接続を上で選択してください。",
+    "project": "プロジェクト",
+    "projectPick": "プロジェクトを選択",
+    "loading": "読み込み中…",
+    "run": "ドリフト検出を実行",
+    "running": "比較中…",
+    "readOnly": "読み取り専用のカタログ・統計クエリのみを実行します。",
+    "applyInSchema": "ずれの反映（モデル編集、DDL生成、適用）は正本であるschema.piで行ってください。",
+    "history": "検出履歴",
+    "prev": "前へ",
+    "next": "次へ",
+    "none": "なし",
+    "model": "モデル",
+    "reqNo": "リクエスト {id}",
+    "notSaved": "検出結果を履歴に保存できませんでした（結果表示は正常）。",
+    "capped": "項目が多すぎるため、セクションごとに最初の{cap}件のみ表示しています（件数は完全です）。",
+    "statsMissing": "インデックス使用統計が利用できなかったため、使用状況を判断できませんでした。",
+    "sum": {
+      "missingTables": "DBにないテーブル",
+      "extraTables": "モデルにないテーブル",
+      "colMismatches": "列の不一致",
+      "missingIndexes": "DBにない設計インデックス",
+      "extraIndexes": "モデルにないインデックス",
+      "ddlMissing": "適用後に消滅したオブジェクト",
+      "unusedIndexes": "未使用の設計インデックス"
+    },
+    "sec": {
+      "ddlMissing": "DDL適用済みだがDBにない",
+      "missingTables": "モデルにはあるがDBにないテーブル",
+      "extraTables": "DBにはあるがモデルにないテーブル",
+      "colMismatches": "列の型・NULLの不一致",
+      "missingIndexes": "設計したがDBにないインデックス",
+      "extraIndexes": "DBにのみあるインデックス（PKを除く）",
+      "idxUsage": "設計インデックスの使用効果"
+    },
+    "hint": {
+      "ddlMissing": "schema.piで適用済みと記録されたオブジェクトがありません — 手動削除またはロールバックを疑ってください。",
+      "extraTables": "この接続の他のプロジェクトまたはシステムテーブルである可能性があります。",
+      "idxUsage": "統計リセット以降のスキャン数が0の場合、未使用です。削除前に統計収集期間を確認してください。"
+    },
+    "kind": {
+      "MISSING": "DBにない",
+      "EXTRA": "モデルにない",
+      "TYPE": "型が異なる",
+      "NULL": "NULL許容が異なる"
+    },
+    "col": {
+      "idx": "インデックス",
+      "scans": "スキャン数",
+      "size": "サイズ",
+      "status": "判定"
+    },
+    "usage": {
+      "USED": "使用中",
+      "UNUSED": "未使用の設計インデックス",
+      "NO_STATS": "統計なし"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi接続機能を準備中です。しばらくしてからもう一度お試しください。",
+      "LINK_DOWN": "schema.piに接続できません。しばらくしてからもう一度お試しください。",
+      "LINK_AUTH": "接続トークンの有効期限が切れているか、取り消されています。schema.piで新しいトークンを発行し、再度登録してください。",
+      "LINK_NOT_FOUND": "接続が見つかりません。接続を再度選択してください。",
+      "LINK_SCOPE": "この接続はリンクの分類体系に属していません。",
+      "CONN_UNSUPPORTED": "サポートされていない接続です（現在はPostgreSQLサーバー接続のみ）。",
+      "TIMEOUT": "リクエストがタイムアウトしました。しばらくしてからもう一度お試しください。",
+      "RATE": "リクエストが多すぎます。1分後にもう一度お試しください。"
+    }
+  },
+  "learn": {
+    "title": "DBA学習",
+    "intro": "SQLP・DAP演習問題、チューニング事例集、Oracle・Tibero・PostgreSQL比較辞書を提供します。接続なしでも学習でき、接続を選択するとschema.piの標準タイプマッピングも一緒に見ることができます。",
+    "loading": "読み込み中…",
+    "tabs": {
+      "quiz": "演習問題",
+      "cases": "チューニング事例集",
+      "dict": "DBMS比較辞書"
+    },
+    "topics": {
+      "INDEX": "インデックススキャン",
+      "JOIN": "結合方式",
+      "PARTITION": "パーティションプルーニング",
+      "NORMAL": "正規化",
+      "NAMING": "標準命名",
+      "ISOLATION": "分離レベル",
+      "LOCK": "ロック"
+    },
+    "levels": {
+      "1": "基礎",
+      "2": "中級",
+      "3": "実践"
+    },
+    "quiz": {
+      "score": "私の進捗",
+      "scoreLine": "{total}問中{solved}問解答 · 正解{correct}個",
+      "right": "正解です",
+      "wrong": "不正解です",
+      "retry": "もう一度解く",
+      "prevRight": "前回の正解",
+      "prevWrong": "前回の不正解"
+    },
+    "cases": {
+      "notice": "すべての事例は学習用の自作例であり、数値は説明用の例示値です（顧客データではありません）。",
+      "problem": "問題SQL",
+      "plan": "実行計画の要旨",
+      "cause": "原因",
+      "fix": "修正SQL",
+      "effect": "効果"
+    },
+    "cats": {
+      "ALL": "すべて",
+      "TYPE": "データ型",
+      "FUNC": "関数",
+      "PAGING": "ページング",
+      "SEQ": "シーケンス",
+      "DATE": "日付",
+      "SYNTAX": "構文"
+    },
+    "dict": {
+      "search": "検索（例: NVL, LIMIT）",
+      "item": "項目",
+      "note": "備考",
+      "empty": "該当項目がありません",
+      "loading": "読み込み中…",
+      "liveTitle": "私の分類体系の標準タイプマッピング",
+      "liveIntro": "接続を選択すると、schema.piのDBMSプロファイル（論理型 → 物理型）が読み込まれます。接続がなくても上記の辞書はそのまま使用できます。",
+      "liveLoad": "タイプマッピングを読み込む",
+      "lgcType": "論理型"
+    }
+  },
+  "link2": {
+    "title": "schema.pi接続",
+    "intro": "schema.pi分類体系のDB接続をdbms.piで使用するには、接続トークンを登録してください。トークンは暗号化して保管され、お客様のDB行データは保存されません。",
+    "howTitle": "接続トークンの発行方法",
+    "how1": "schema.piにログインし、接続する分類体系を開きます",
+    "how2": "分類体系 → 設定 → 接続トークン で「トークン発行」を押します（分類体系管理者・DA権限）",
+    "how3": "発行されたslk_で始まるトークンをコピーします — 原文は発行時に一度だけ表示されます",
+    "how4": "下の欄に貼り付けて登録します",
+    "openSchema": "schema.piを開く",
+    "registerTitle": "接続登録",
+    "tokenLabel": "接続トークン",
+    "tokenPlaceholder": "slk_…",
+    "register": "登録",
+    "registering": "確認中…",
+    "registered": "'{area}'分類体系が接続されました",
+    "replaced": "'{area}'分類体系のトークンを新しいトークンに置き換えました",
+    "myLinks": "マイ接続",
+    "empty": "登録された接続はありません",
+    "loading": "読み込み中…",
+    "regDtm": "登録 {dtm}",
+    "remove": "接続解除",
+    "removeConfirm": "'{area}'接続を解除しますか？この接続を使用している画面では、アクセスできなくなります。",
+    "prev": "前へ",
+    "next": "次へ",
+    "statusTitle": "接続ステータス",
+    "noConns": "この分類体系にDB接続が登録されていません（schema.piで接続を追加してください）",
+    "colConn": "接続",
+    "colDbms": "DBMS",
+    "colMthd": "方式",
+    "colHost": "ホスト",
+    "colTest": "最終テスト",
+    "colAgent": "エージェント最終確認",
+    "never": "なし",
+    "retry": "再試行",
+    "pickerLink": "リンク",
+    "pickerConn": "接続",
+    "pickerEmpty": "接続がありません —",
+    "pickerGo": "/connectで接続を登録",
+    "errors": {
+      "LINK_AUTH": "接続トークンの有効期限が切れているか、取り消されています。schema.piで新しいトークンを発行し、再度登録してください",
+      "LINK_SCOPE": "この接続はリンクの分類体系に属していません",
+      "LINK_DOWN": "schema.piに接続できません。しばらくしてからもう一度お試しください",
+      "LINK_NOT_FOUND": "接続が見つかりません",
+      "LINK_DUP": "すでに登録中です。もう一度お試しください",
+      "CONN_UNSUPPORTED": "サポートされていない接続です（現在はPostgreSQLサーバー接続のみ）",
+      "Q_UNKNOWN": "不明なクエリです",
+      "SQL_NOT_SELECT": "SELECT（またはWITH）文は1つだけ実行できます",
+      "PGSS_MISSING": "対象DBにpg_stat_statements拡張機能がインストールされていません",
+      "TIMEOUT": "リクエストがタイムアウトしました",
+      "RATE": "リクエストが多すぎます。1分後にもう一度お試しください",
+      "INVALID_INPUT": "slk_で始まる接続トークンを正確に貼り付けてください"
+    }
+  },
+  "migration": {
+    "title": "データ移行 (PiMig)",
+    "intro": "schema.pi設計モデルの関係からテーブルのロード順序を計算し、チャンクサイズ、並列度、カットオーバーチェックリストを整理し、ソースとターゲットで自分で実行する検証SQLを生成します。この画面は計画とチェックのみを行い、データを移動したり、顧客DBの行を読み取ったりしません。",
+    "needLink": "まず上でschema.pi接続を選択してください。接続がない場合は、「接続」メニューでトークンを登録してください。",
+    "loading": "読み込み中…",
+    "newPlan": "新しい移行計画",
+    "project": "プロジェクト",
+    "projectPick": "プロジェクトを選択",
+    "planNm": "計画名",
+    "planNmHint": "プロジェクト名がデフォルト",
+    "create": "計画を作成",
+    "creating": "作成中…",
+    "snapHint": "作成時点の設計（テーブル、列、関係名）はスナップショットとして固定されます。モデルが変更された場合は、新しい計画を作成してください。",
+    "plans": "移行計画",
+    "prev": "前へ",
+    "next": "次へ",
+    "sts": {
+      "DRAFT": "ドラフト",
+      "READY": "準備完了"
+    },
+    "del": "削除",
+    "delConfirm": "この計画を削除しますか？",
+    "snapInfo": "スナップショット：テーブル {tables}個 · 関係 {rels}個",
+    "dropped": "(物理テーブルがまだない関係 {n}個は順序計算から除外)",
+    "chunkSize": "チャンクサイズ（行/コミット）",
+    "parallel": "並列度（同時テーブル）",
+    "saveOpts": "オプションを保存",
+    "optsHint": "並列度は、同じレベル内で同時にロードするテーブルの数です。チャンクサイズは、実行エンジンが使用するコミット単位（行数）です。",
+    "order": "ロード順序",
+    "orderHint": "親テーブルが先にくるように、設計上の関係（物理FKではない）でトポロジカルソートされています。同じレベルのテーブルは互いに依存しないため、並列ロードが可能です。",
+    "cycles": "循環グループ {n}個 — 同じレベルに配置しました。ロード順序を手動で設定し、参照チェックはロード後に延期してください。",
+    "selfRefs": "自己参照（階層）テーブル — 同じテーブル内で親行を先にロード",
+    "level": "レベル {n}",
+    "checklist": "カットオーバーチェックリスト",
+    "toReady": "準備完了としてマーク",
+    "toDraft": "ドラフトに戻す",
+    "readyNeedAll": "計画を準備完了としてマークする前に、すべての項目を確認してください。",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDCハンドオフポイント",
+        "desc": "初期ロード開始前にソースの一貫した時点（PG LSN · Oracle/Tibero SCN · ポーリングの場合は開始時刻 − 重複ウィンドウ）を記録し、その時点からCDCを開始して、ハンドオフウィンドウの重複をupsertで吸収します。"
+      },
+      "valueConv": {
+        "title": "値変換",
+        "desc": "空文字列 = NULL、CHAR空白埋め、精度なしNUMBER → NUMERIC、時刻を含むDATE → TIMESTAMP、VARCHAR2 BYTE ↔ CHAR長、LONG·RAWの処理ルールを設定しました。"
+      },
+      "charset": {
+        "title": "文字セット",
+        "desc": "ソース文字セット（KO16MSWIN949、UTF8など）を確認し、マルチバイト増加により長さがオーバーフローするカラムと、変換不可能な文字の分離方法を決定しました。"
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOBはストリーミングチャンク（サイズとメモリ制限）で転送され、長さ + ハッシュで検証されます。"
+      },
+      "seqResync": {
+        "title": "シーケンス再同期",
+        "desc": "ロード後、ターゲットシーケンス·identityをmax(キー)+1に設定します。"
+      },
+      "timezone": {
+        "title": "タイムゾーン·システムカラム",
+        "desc": "タイムゾーンのない値の解釈タイムゾーン（例：Asia/Seoul）を設定し、ロード中に変更日時トリガーがソースタイムスタンプを上書きしないようにし、作成者/変更者の置換ルールを設定しました。"
+      },
+      "backpressure": {
+        "title": "バックプレッシャー·ターゲット負荷",
+        "desc": "ターゲットの遅延、WALの増加、ロック待機時にチャンクサイズと並列度を減らし、非PKインデックスはロード後に作成し、ロード後にANALYZE·VACUUMを実行します。"
+      }
+    },
+    "verify": "検証SQL生成",
+    "verifyHint": "ロード順序に従って、テーブルごとに件数、数値カラム合計、重複キー、キーハッシュのクエリを生成します。ソースとターゲットでそれぞれ手動で実行し、結果を比較してください（この画面では実行しません）。",
+    "noHashOracle": "Oracle·Tiberoはハッシュ関数·文字表現がPostgreSQLと異なるため、ハッシュクエリは省略します — 件数·合計·キー重複で比較してください。",
+    "copy": "コピー",
+    "copied": "コピーしました",
+    "copyFail": "コピーできませんでした。テキストを選択して手動でコピーしてください。",
+    "engine": {
+      "title": "実行·再起動 · リハーサル·ロールバック",
+      "body": "実際の移行実行（チェックポイント、バックプレッシャー、エラー行分離）とリハーサル、ロールバック、CDC開始地点の記録は、ワーカーエージェントセキュリティモデル（A10）確定後に提供します。現在は計画、チェック、検証SQLまでです。"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi 接続機能を準備中です。しばらくしてからもう一度お試しください。",
+      "LINK_DOWN": "schema.pi に接続できません。しばらくしてからもう一度お試しください。",
+      "LINK_AUTH": "接続トークンの有効期限が切れているか、取り消されています。schema.pi で新しいトークンを発行し、再度登録してください。",
+      "LINK_NOT_FOUND": "接続が見つかりません。もう一度接続を選択してください。",
+      "LINK_SCOPE": "このプロジェクトは、この接続のタクソノミーに属していません。",
+      "TIMEOUT": "応答時間がタイムアウトしました。しばらくしてからもう一度お試しください。",
+      "RATE": "リクエストが多すぎます。1分後にもう一度お試しください。",
+      "MIG_NO_TABLES": "このプロジェクトには移行する物理テーブルがありません。まずschema.piで物理変換を行ってください。",
+      "MIG_CHECK_INCOMPLETE": "カットオーバーチェックリストのすべての項目を確認してから、計画を準備完了としてマークしてください。",
+      "NOT_FOUND": "計画が見つかりません。"
+    }
+  },
+  "monitor": {
+    "title": "モニタリングセンター",
+    "collectNote": "収集はschema.piで実行されます — 移行予定（D7）。このページはschema.piモニターの概要を読み込んで表示します。",
+    "noLink": "まずschema.pi接続を選択または登録してください。",
+    "goConnect": "接続を登録",
+    "period": "期間",
+    "periods": {
+      "30": "30分",
+      "60": "1時間",
+      "360": "6時間",
+      "1440": "24時間"
+    },
+    "refresh": "更新",
+    "loading": "読み込み中…",
+    "updatedAt": "{area} · {time}時点（30秒ごとに自動更新）",
+    "appTitle": "アプリのパフォーマンス",
+    "dbTitle": "接続ごとのDBステータス",
+    "urlTitle": "URLチェック",
+    "empty": "表示するデータがありません。",
+    "breachTitle": "しきい値超過 {n}件",
+    "rulesTitle": "しきい値ルール",
+    "rulesNote": "ルールはこの接続に保存され、受信した概要に対してすぐに評価され、超過項目は赤い枠で表示されます（通知は次の段階）。",
+    "metric": "メトリック",
+    "conn": "接続",
+    "allConns": "すべての接続",
+    "op": "比較",
+    "threshold": "しきい値",
+    "thrInvalid": "しきい値には数値を入力してください。",
+    "addRule": "ルールを追加",
+    "noRules": "登録されたルールはありません。",
+    "enable": "有効にする",
+    "disable": "無効にする",
+    "delete": "削除",
+    "delConfirm": "このルールを削除しますか？",
+    "aiNote": "AI障害分析·修正承認はまだschema.piモニターで実行されます。",
+    "aiLink": "schema.piモニターを開く",
+    "metrics": {
+      "APP_TPS": "TPS（リクエスト/秒）",
+      "APP_ERR_PCT": "エラー率（%）",
+      "APP_SLOW_CNT": "遅いリクエスト数",
+      "APP_AVG_MS": "平均応答（ms）",
+      "DB_SESS_CNT": "セッション数",
+      "DB_LOCK_WAIT_CNT": "ロック待機数",
+      "DB_CACHE_HIT_PCT": "キャッシュヒット率（%）",
+      "DB_SIZE_MB": "DBサイズ（MB）",
+      "URL_RSP_MS": "URL応答（ms）",
+      "URL_FAIL_CNT": "URL失敗数"
+    },
+    "errors": {
+      "LINK_REQUIRED": "まず接続を選択してください。",
+      "NOT_IMPLEMENTED": "schema.pi 接続機能を準備中です。しばらくしてからもう一度お試しください。",
+      "LINK_AUTH": "接続トークンが無効または期限切れです。schema.pi で新しいトークンを発行し、登録してください。",
+      "LINK_SCOPE": "この接続ではそのタクソノミーにアクセスできません。",
+      "RATE": "リクエストが多すぎます。しばらくしてからもう一度お試しください。",
+      "TIMEOUT": "schema.pi の応答が遅いです。しばらくしてからもう一度お試しください。",
+      "RULE_LIMIT": "接続あたりのルールは最大50個です。",
+      "NOT_FOUND": "ルールが見つかりません。"
+    }
+  },
+  "ops": {
+    "title": "DB運用安全",
+    "intro": "接続したPostgreSQL接続のパラメータ、アカウント権限、バックアップ、レプリケーションの状態を読み取り専用で診断します。設定は変更せず、判定の要約のみを保存し、顧客DBの行データは保存しません",
+    "loading": "読み込み中…",
+    "pickFirst": "まず上で接続と接続先を選択してください",
+    "run": "診断を実行",
+    "running": "診断中…",
+    "noRun": "まだ診断記録がありません。「診断を実行」を押してください",
+    "lastRun": "最終診断 {dtm}",
+    "readOnly": "診断は読み取り専用です（SELECT）。推奨事項はガイドであり、サーバーのメモリ、負荷、ワークロードによって異なる場合があります。",
+    "truncated": "対象が多すぎるため、最初の500件のみをチェックしました。",
+    "paramsNote": "サーバーの総メモリは不明なため、shared_buffers ≈ RAMの25%の慣例で推定します。random_page_costはSSD基準です。",
+    "auditNote": "RLS（行セキュリティ）がオフのテーブルと未使用のアカウントのチェックは、接続クエリがサポートされたら追加されます。",
+    "replNote": "一次基準はActive-Standby（A-S）— Primary 1台 + Standby。replay遅延5秒以上で警告、60秒以上で危険（RPO実測参考値）",
+    "lagIdle": "変更なし",
+    "pager": "ページ移動",
+    "prev": "前へ",
+    "next": "次へ",
+    "tabs": {
+      "params": "パラメータ",
+      "audit": "アカウント·権限",
+      "backup": "バックアップ·リカバリ",
+      "repl": "レプリケーション·DR",
+      "history": "履歴"
+    },
+    "level": {
+      "OK": "正常",
+      "WARN": "警告",
+      "RISK": "危険"
+    },
+    "role": {
+      "primary": "この接続 = Primary",
+      "standby": "この接続 = Standby",
+      "unknown": "役割不明"
+    },
+    "col": {
+      "level": "判定",
+      "item": "項目",
+      "value": "値",
+      "reason": "説明",
+      "standby": "Standby",
+      "state": "状態",
+      "sync": "同期",
+      "lag": "replay遅延"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLSロール",
+      "bypass_ok": "BYPASSRLSロール",
+      "no_expiry": "パスワード有効期限",
+      "expiry_ok": "パスワード有効期限",
+      "public_grant": "PUBLIC権限",
+      "public_ok": "PUBLIC権限",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "最終WALアーカイブ",
+      "arc_stale": "最終WALアーカイブ",
+      "arc_recent": "最終WALアーカイブ",
+      "arc_failing": "WALアーカイブ失敗"
+    },
+    "rules": {
+      "sb_default": "デフォルト（128MB）レベルです。専用サーバーであればメモリの25%前後を推奨します。",
+      "sb_ok": "デフォルトより大きく設定されています。",
+      "wm_over": "max_connections × work_memが推定メモリを超過しています。同時ソートが集中するとメモリ不足（OOM）のリスクがあります。",
+      "wm_default": "デフォルト（4MB）レベルです。大きなソート·ハッシュがディスクにスピルする可能性があります。",
+      "wm_ok": "適切な範囲です。",
+      "mwm_default": "デフォルト（64MB）レベルです。VACUUM·インデックス作成が遅くなる可能性があるため、256MB以上を検討してください。",
+      "mwm_ok": "デフォルトより大きく設定されています。",
+      "av_on": "autovacuumがオンになっています。",
+      "av_off": "autovacuumがオフになっています。テーブルの肥大化とトランザクションIDのラップアラウンドのリスクが高いです。",
+      "conn_high": "最大接続数が多いです。接続ごとにメモリを使用するため、コネクションプーラー（PgBouncerなど）を推奨します。",
+      "conn_ok": "適切な範囲です。",
+      "lmd_off": "スロークエリログがオフになっています（-1）。1000ms前後の設定を推奨します。",
+      "lmd_all": "すべてのクエリがログに記録されます（0）。ログの負荷が大きいです。",
+      "lmd_ok": "スロークエリログがオンになっています。",
+      "st_off": "サーバー全体のステートメントタイムアウトがありません（0）。ロール·アプリケーション単位での制限を推奨します。",
+      "st_ok": "ステートメントタイムアウトが設定されています。",
+      "iit_off": "トランザクション中のアイドルセッションタイムアウトがありません（0）。ロック保持と肥大化の原因となる可能性があります。",
+      "iit_ok": "トランザクション中のアイドルセッションタイムアウトが設定されています。",
+      "ckpt_short": "チェックポイント間隔が5分以下です。書き込みが多い場合は10～15分を検討してください。",
+      "ckpt_ok": "適切な範囲です。",
+      "wal_minimal": "wal_level=minimalではPITR·レプリケーションが不可能です。replica以上に設定してください。",
+      "wal_ok": "PITR·レプリケーションが可能なWALレベルです。",
+      "rpc_hdd": "HDDの基準値（4）です。SSDであれば1.1～2を推奨します。",
+      "rpc_ok": "SSDに適した値です。",
+      "super_many": "superuserが2つ以上あります。管理用を1つだけ残し、他には必要な権限のみを付与してください。",
+      "super_ok": "superuserが1つ以下です。",
+      "bypass_rls": "superuserではないが、行セキュリティ（RLS）をバイパスするロールが存在します。",
+      "bypass_ok": "RLSバイパスロールはありません。",
+      "no_expiry": "パスワード有効期限がないログインロールです。個人アカウントにはVALID UNTILの設定を推奨します。",
+      "expiry_ok": "すべてのログインロールに有効期限があります。",
+      "public_grant": "PUBLIC（すべてのロール）にテーブル権限があります。書き込み権限は危険です。",
+      "public_ok": "PUBLICに付与されたテーブル権限はありません。",
+      "arc_on": "WALアーカイブ（archive_mode）がオンになっています。",
+      "arc_off": "WALアーカイブがオフになっているため、ポイントインタイムリカバリ（PITR）は不可能です。",
+      "arc_cmd_empty": "archive_modeはオンですが、archive_command·archive_libraryが空です。",
+      "arc_never": "まだアーカイブされたWALがありません。",
+      "arc_stale": "最終WALアーカイブが24時間以上経過しています。",
+      "arc_recent": "過去24時間以内にWALがアーカイブされました。",
+      "arc_failing": "WALアーカイブが現在失敗しています。ディスク、権限、ターゲットパスを確認してください。",
+      "repl_is_standby": "この接続はStandby（リカバリモード）です。遅延はPrimary接続で確認してください。",
+      "repl_none": "接続されたStandbyがありません。災害復旧（DR）構成がない状態です。",
+      "repl_ok": "Standbyが正常にストリーミング中です。",
+      "repl_lag": "Standbyレプリケーションが遅延しているか、ストリーミング状態ではありません。"
+    },
+    "manual": {
+      "title": "手動チェックリスト",
+      "intro": "自動で確認できないバックアップ·リカバリ運用事項です。確認したらチェックし、根拠をメモしてください。",
+      "memo": "メモ（例：ツール、周期、最終確認日）",
+      "save": "保存",
+      "updated": "更新 {dtm}",
+      "items": {
+        "base_backup": "過去7日以内にフルバックアップ（pg_basebackupなど）が成功した",
+        "offsite_copy": "バックアップコピーが別の場所（別のリージョン·ストレージ）に保管されている",
+        "restore_rehearsal": "今四半期中にリカバリリハーサルを実施し、所要時間を記録した",
+        "pitr_target": "ポイントインタイムリカバリ（PITR）手順と目標RPO·RTOが文書化されている",
+        "backup_encrypt": "バックアップファイルが暗号化され、アクセス権限が制限されている",
+        "retention": "バックアップ保持期間と削除ポリシーが定義されている"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi 接続機能を準備中です。しばらくしてからもう一度お試しください。",
+      "CONN_UNSUPPORTED": "この接続はまだサポートされていません（PostgreSQL直接接続のみサポート）。",
+      "TIMEOUT": "対象DBの応答が遅いため中断しました。しばらくしてからもう一度お試しください。",
+      "RATE": "呼び出しが多すぎます。1分後にもう一度お試しください。",
+      "Q_UNKNOWN": "サポートされていないクエリです。schema.pi 接続APIバージョンを確認してください。",
+      "INVALID_INPUT": "接続·接続先の選択が正しくありません。"
+    }
+  },
+  "perf": {
+    "title": "パフォーマンス観測",
+    "intro": "接続したPostgreSQL接続のクエリ、テーブル、インデックスの統計を収集し、遅いクエリ、テーブル/インデックスの健全性、容量の推移を表示します。統計数値のみを保存し、顧客DBの行データは保存しません",
+    "loading": "読み込み中…",
+    "pickFirst": "まず上で接続と接続先を選択してください",
+    "pager": "ページ移動",
+    "tabs": {
+      "collect": "収集",
+      "top": "遅いクエリ",
+      "health": "テーブル·インデックスの状態",
+      "trend": "容量の傾向",
+      "activity": "アクティビティ·ロック"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi 接続機能を準備中です。しばらくしてからもう一度お試しください。",
+      "PGSS_MISSING": "このDBにpg_stat_statements拡張機能がインストールされていないため、クエリ統計を表示できません。",
+      "CONN_UNSUPPORTED": "この接続はまだサポートされていません（PostgreSQL直接接続のみサポート）。",
+      "TIMEOUT": "対象DBの応答が遅いため中断しました。しばらくしてからもう一度お試しください",
+      "RATE": "リクエストが多すぎます。1分後にもう一度お試しください。",
+      "LINK_AUTH": "接続トークンの有効期限が切れているか、取り消されています。接続画面でトークンを再度登録してください。",
+      "LINK_SCOPE": "この接続は、この接続の対象領域に属していません。",
+      "Q_UNKNOWN": "サポートされていないクエリです。schema.pi 接続APIバージョンを確認してください。",
+      "INVALID_INPUT": "接続または接続先の値が正しくありません。"
+    },
+    "pgss": {
+      "title": "pg_stat_statementsを有効にする方法",
+      "body": "スロークエリTop-Nにはpg_stat_statements拡張機能が必要です。DB管理者アカウントで以下のステートメントを実行してください。Supabaseでは、ダッシュボードのDatabase → Extensionsで有効にできます。",
+      "note": "自己ホスト型PostgreSQLも、postgresql.confのshared_preload_librariesにpg_stat_statementsを追加して再起動する必要があります。テーブル·インデックス·サイズ統計は拡張機能なしでも収集されます。"
+    },
+    "collect": {
+      "intro": "「今すぐ収集」をクリックすると、上位クエリ統計、テーブル、インデックス、サイズを一度読み込み、スナップショットとして保存します。変更とサイズ傾向を確認するには、2回以上収集する必要があります。",
+      "run": "今すぐ収集",
+      "running": "収集中…",
+      "done": "{dtm} 収集完了 — クエリ {qry}件 · テーブル {tbl}個 · インデックス {idx}個"
+    },
+    "top": {
+      "sort": "ソート",
+      "sortTotal": "合計実行時間",
+      "sortMean": "平均実行時間",
+      "sortCalls": "呼び出し数",
+      "empty": "収集記録がありません。収集タブで「今すぐ収集」をクリックしてください。",
+      "range": "{from} → {to}間の増減",
+      "first": "{dtm} 最初の収集 — 累積値です（次の収集から増減）",
+      "query": "クエリ（リテラルはマスク済み）",
+      "calls": "呼び出し",
+      "totalMs": "合計ms",
+      "meanMs": "平均 ms",
+      "rows": "行",
+      "reset": "統計リセットを検出 — 累積値として表示"
+    },
+    "health": {
+      "empty": "収集履歴がありません。「収集」タブで「今すぐ収集」を押してください",
+      "basis": "{dtm} 収集基準",
+      "unusedIdx": "未使用インデックス",
+      "unusedIdxHint": "統計リセット以降一度も使用されていないインデックス（サイズ順）。PK・ユニーク制約インデックスは削除しないでください",
+      "fullScan": "過剰なフルスキャン",
+      "fullScanHint": "有効行1,000以上でフルスキャンが半分以上のテーブル — 条件カラムのインデックスを確認してください",
+      "dead": "過剰なデッドタプル",
+      "deadHint": "デッドタプル比率20%以上 — VACUUM・autovacuum設定を確認してください",
+      "none": "該当なし",
+      "scans": "回"
+    },
+    "trend": {
+      "limit": "しきい値容量",
+      "empty": "過去30日間の収集履歴がありません",
+      "chart": "過去30日間のDBサイズ推移",
+      "now": "現在のサイズ",
+      "perDay": "1日あたりの増加量",
+      "needMore": "2回以上の収集が必要",
+      "daysLeft": "{gb}GB到達予想",
+      "noGrowth": "増加傾向なし",
+      "days": "約{n}日後"
+    },
+    "activity": {
+      "refresh": "更新",
+      "live": "リアルタイム照会 — 保存しません",
+      "sessions": "セッション活動",
+      "locks": "ロック",
+      "none": "なし"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC・パイプライン",
+    "intro": "ソースDBが変更データキャプチャ(CDC)に適しているかを確認し、ソース → 変換 → ターゲットパイプラインを設計します。この段階では確認・設計のみを行い、顧客DBの行データは読み取ったり保存したりしません。",
+    "needLink": "まず上でschema.pi接続を選択してください。接続がない場合は、「接続」メニューでトークンを登録してください。",
+    "needConn": "確認するDB接続を上で選択してください。",
+    "loading": "読み込み中…",
+    "pager": "ページ移動",
+    "prev": "前へ",
+    "next": "次へ",
+    "runTitle": "実行・監視 (7-3・7-4)",
+    "runBody": "パイプラインの実行・遅延監視・再処理は、ワーカーエージェントとセキュリティモデルが確定した後に提供されます。現時点では、定義を下書き(DRAFT)として保存してください。",
+    "pre": {
+      "title": "ソース事前確認",
+      "intro": "テーブルごとに変更時刻カラム・論理削除カラム・PKを確認して推奨収集方式(アダプター)を選択し、WAL論理レプリケーションの準備状況を確認します。読み取り専用のカタログ・設定照会のみ実行します。",
+      "schema": "スキーマ(オプション)",
+      "schemaPh": "すべて",
+      "run": "事前確認",
+      "running": "確認中…",
+      "sum": "テーブル{tables}個 · PKなし{noPk}個 · 削除捕捉不可{deleteUnseen}個",
+      "truncated": "カタログ照会が500行の上限に達したため、一部のテーブルが欠落している可能性があります。スキーマを指定して再度確認してください。",
+      "empty": "確認するテーブルがありません",
+      "colTable": "テーブル",
+      "colChg": "変更時刻カラム",
+      "colDel": "論理削除カラム",
+      "colAdapter": "推奨方式・根拠",
+      "toDraft": "選択した{n}個でパイプライン下書きを作成"
+    },
+    "ready": {
+      "ok": "WAL論理レプリケーション準備完了 — PKがあるテーブルはLOGICAL方式を使用できます",
+      "no": "WAL論理レプリケーション準備未完了 — ポーリング・キー比較方式で収集します",
+      "senders": "レプリケーション接続{n}個"
+    },
+    "adapter": {
+      "LOGICAL": "論理レプリケーション(WAL)",
+      "POLL": "変更時刻ポーリング",
+      "KEY_DIFF": "キー スナップショット比較",
+      "NONE": "全量再ロードのみ"
+    },
+    "reason": {
+      "HAS_CHG_COL": "変更時刻カラムあり",
+      "NO_CHG_COL": "変更時刻カラムなし",
+      "HAS_SOFT_DEL": "論理削除カラムあり",
+      "NO_SOFT_DEL": "論理削除カラムなし",
+      "HAS_PK": "PKあり",
+      "NO_PK": "PKなし — 変更行を識別できません",
+      "DELETE_UNSEEN": "ポーリングは物理DELETEを捕捉できません（論理削除カラムを推奨）",
+      "LOGICAL_NOT_READY": "WAL論理レプリケーションが準備できたらLOGICALに切り替えられます",
+      "FULL_RELOAD_ONLY": "PK・変更時刻がないため増分収集不可 — PK追加を推奨",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_levelがlogicalではありません（変更にはDB再起動が必要）",
+      "NO_SLOTS": "max_replication_slotsが0",
+      "NO_SENDERS": "max_wal_sendersが0",
+      "IS_STANDBY": "スタンバイサーバー — 論理レプリケーションはプライマリサーバーから取得してください",
+      "SETTINGS_UNKNOWN": "設定を照会できなかったため準備状況不明"
+    },
+    "ed": {
+      "title": "パイプライン定義",
+      "draftOnly": "設計専用 — 下書き(DRAFT)としてのみ保存",
+      "new": "新規パイプライン",
+      "empty": "保存されたパイプラインがありません",
+      "manual": "手動",
+      "edit": "編集",
+      "remove": "削除",
+      "removeConfirm": "'{name}' パイプラインを削除しますか？",
+      "name": "名前",
+      "adapter": "収集方式",
+      "srcConn": "ソース接続",
+      "useCurrentConn": "上で選択した接続に切り替える",
+      "sched": "スケジュール(cron 5フィールド、空白は手動)",
+      "target": "ターゲット",
+      "targetPh": "例: 分析DB analytics.public / レイク s3://…",
+      "tables": "ソーステーブル(改行・カンマ区切り)",
+      "steps": "ステップ (ソース → 変換 → ターゲット)",
+      "op": "操作",
+      "notePh": "説明・条件(オプション)",
+      "addTransform": "変換ステップを追加",
+      "save": "保存",
+      "saving": "保存中…",
+      "saved": "保存しました",
+      "close": "閉じる"
+    },
+    "kind": {
+      "SOURCE": "ソース",
+      "TRANSFORM": "変換",
+      "TARGET": "ターゲット"
+    },
+    "sts": {
+      "DRAFT": "下書き"
+    },
+    "check": {
+      "NAME_REQUIRED": "名前を入力してください",
+      "CONN_REQUIRED": "ソース接続を選択してください",
+      "CRON_INVALID": "スケジュールはcron 5フィールド（分 時 日 月 曜日、数字・*・,・-・/）で入力してください",
+      "OP_REQUIRED": "すべてのステップの操作を入力してください",
+      "STEPS_TOO_FEW": "ソースとターゲットのステップが必要です",
+      "STEPS_TOO_MANY": "ステップは20個までです",
+      "STEP_FIRST_SOURCE": "最初のステップはソースである必要があります",
+      "STEP_LAST_TARGET": "最後のステップはターゲットである必要があります",
+      "STEP_MIDDLE_TRANSFORM": "中間のステップは変換のみ配置できます"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "同じ名前のパイプラインがすでに存在します。別の名前を使用してください",
+      "CONN_UNSUPPORTED": "この接続はまだ確認できません（現在はPostgreSQLサーバー直接接続のみ）"
+    }
+  },
+  "sqlLab": {
+    "title": "SQLチューニングラボ",
+    "intro": "接続を選択し、SQLを入力すると、実行計画をツリーで表示し、遅延の原因（フルスキャン、ネストループ、大規模ソート）とSQLアンチパターンをschema.pi標準ドメインと照合して通知します。実際の実行（ANALYZE）は行いません。",
+    "needLink": "実行計画は、上で接続と接続を選択した後に表示できます。確認は接続なしでも可能です。",
+    "sqlLabel": "SQL (SELECT または WITH 1文)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "実行計画を表示",
+    "explaining": "照会中…",
+    "save": "計画を保存",
+    "saving": "保存中…",
+    "saveName": "ラベル (例: インデックス追加前)",
+    "saveNote": "保存時にSQLと条件式の定数値は?でマスクされて保管されます。",
+    "plan": {
+      "title": "実行計画",
+      "summary": "総コスト {cost} · {ms}ms",
+      "cost": "コスト",
+      "rows": "行",
+      "width": "幅"
+    },
+    "warn": {
+      "none": "目立った警告はありません。",
+      "SEQ_SCAN_LARGE": "{relation}テーブルをフルスキャンします（予想{rows}行） — 条件カラムのインデックスを検討してください。",
+      "NESTED_LOOP_HIGH": "ネストループの結果が予想{rows}行です — ハッシュ・マージ結合または結合条件インデックスを検討してください。",
+      "SORT_SPILL": "ソートサイズが約{kb}KBでwork_memのデフォルト値（4MB）を超えており、ディスクソートになる可能性があります。"
+    },
+    "lint": {
+      "run": "アンチパターン確認",
+      "title": "SQLアンチパターン確認",
+      "none": "発見されたアンチパターンはありません。",
+      "domainsOff": "標準ドメインを読み込めなかったため、カラム接尾辞のデフォルトルールのみで確認しました。",
+      "types": {
+        "num": "数値",
+        "date": "日付",
+        "char": "文字"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — 必要なカラムのみを選択してください（不要なI/O・カバリングインデックス不可）。",
+        "FUNC_ON_COLUMN": "条件カラム{column}が関数・演算で加工されているためインデックスを使用できません — 定数側を加工してください。",
+        "LEADING_WILDCARD": "先頭に%が付くLIKEはB-treeインデックスを使用できません — pg_trgm GINインデックスを検討してください。",
+        "OR_DIFF_COLUMNS": "異なるカラムの条件がORで結合されています — UNION ALLでの分離またはカラムごとのインデックスを検討してください。",
+        "IMPLICIT_CAST": "{column}が引用符付きの数値と比較されています — カラム型と定数型を一致させてください（暗黙的型変換）。",
+        "NOT_IN_SUBQUERY": "NOT IN (副問い合わせ)はNULLが混ざると結果が空になり遅いです — NOT EXISTSに置き換えてください。",
+        "NO_WHERE": "WHERE条件がありません — 大規模テーブルではフルスキャンになります（LIMITまたは条件を追加）。",
+        "DOMAIN_MISMATCH": "{column}は標準ドメイン上{expected}型ですが、異なる型の定数と比較されています — 暗黙的型変換によりインデックスを使用できない可能性があります。"
+      }
+    },
+    "saved": {
+      "title": "保存した計画 · 比較",
+      "empty": "保存された計画がありません。実行計画を表示した後、保存してください。",
+      "pick": "比較する計画を選択",
+      "pick2": "比較する計画を2つ選択してください。",
+      "compare": "2つの計画を比較",
+      "delete": "削除",
+      "cost": "コスト",
+      "prev": "前へ",
+      "next": "次へ",
+      "page": "{page}ページ"
+    },
+    "diff": {
+      "cost": "総コスト {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "2つの計画のSQLが異なります（正規化基準）。",
+      "scan": "{relation} : {a} → {b}",
+      "type": "{nodeType} : {a}個 → {b}個",
+      "none": "ノード構成の変化はありません。",
+      "before": "前",
+      "after": "後"
+    },
+    "ai": {
+      "title": "AIチューニング推奨",
+      "badge": "準備中",
+      "body": "準備中（承認・効果測定手順後） — 定数をマスクしたSQLで推奨を作成し、DA承認と効果測定を経てから適用完了として記録します。"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi接続機能を準備中です。しばらくしてから再度お試しください。",
+      "LINK_AUTH": "接続トークンが期限切れまたは失効しています。schema.piで新しいトークンを発行し、再度登録してください。",
+      "LINK_SCOPE": "この接続ではその接続を使用できません（異なる分類体系）。",
+      "CONN_UNSUPPORTED": "この接続方式はまだサポートされていません（現在はPostgreSQLサーバー接続のみ）。",
+      "Q_UNKNOWN": "サポートされていない照会です。",
+      "SQL_NOT_SELECT": "SELECTまたはWITHで始まる1文のみ実行計画を表示できます。",
+      "TIMEOUT": "応答時間がタイムアウトしました（5秒）。SQLを短くするか、しばらくしてから再度お試しください。",
+      "RATE": "リクエストが多すぎます。1分後に再度お試しください。",
+      "PAYLOAD_TOO_LARGE": "計画が大きすぎるため保存できません。",
+      "LINK_NOT_FOUND": "接続が見つかりません。接続を再度選択してください。"
+    }
+  },
+  "nav": {
+    "label": "機能メニュー",
+    "connect": "接続",
+    "sqlLab": "SQLチューニング",
+    "perf": "パフォーマンス",
+    "monitor": "モニタリング",
+    "drift": "整合",
+    "migration": "移行",
+    "pipeline": "パイプライン",
+    "analytics": "分析",
+    "ops": "運用安全",
+    "learn": "学習"
   }
 }

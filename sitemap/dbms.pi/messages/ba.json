@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "DBA i SQLP radno okruženje za brzo i sigurno pokretanje DB motora"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Učinite da vaš DB motor brzo i sigurno obrađuje vaše podatke",
+    "description": "DBA i SQLP radno okruženje za planove izvršenja, statistiku i performanse. schema.pi se bavi dizajnom i standardima; dbms.pi je njegov partner na strani motora.",
+    "welcome": "Dobrodošli, {name}.",
+    "featTitle": "Značajke",
+    "featDesc": {
+      "connect": "Registrirajte schema.pi token veze i provjerite status veze",
+      "sqlLab": "Stablo plana, upozorenja, usporedba i provjere anti-uzoraka u odnosu na standardne domene",
+      "perf": "Spori upiti Top-N, zdravlje tablica/indeksa, predviđanje kapaciteta, aktivnosti i zaključavanja",
+      "monitor": "Sažetak metrika aplikacije, DB-a i URL-a s upozorenjima o pragovima",
+      "drift": "Usporedite schema.pi model i povijest DDL-a sa stvarnim katalogom, izmjerite učinak indeksa",
+      "migration": "Topološki redoslijed učitavanja, dijelovi, kontrolna lista i SQL za provjeru",
+      "pipeline": "Predprovjera snimanja promjena i definicije cjevovoda izvor→transformacija→cilj",
+      "analytics": "KPI nadzorna ploča, trostruko mapiranje jezera i katalog skupova podataka",
+      "ops": "Dijagnostika samo za čitanje parametara, uloga, sigurnosne kopije i replikacije DR",
+      "learn": "SQLP/DAP pitanja za vježbu, slučajevi podešavanja i rječnik usporedbe DBMS-a"
+    }
+  },
   "auth": {
     "checking": "Provjera prijave…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "Nije moguće kreirati kod za povezivanje. Pokušajte ponovo kasnije.",
     "AUTH_DB_UNAVAILABLE": "Nije moguće sačuvati vaš račun, pa prijava nije uspjela. Pokušajte ponovo kasnije.",
     "LINK_TRY_LIMIT": "Previše netačnih kodova za povezivanje. Pokušajte ponovo za 15 minuta."
+  },
+  "analytics": {
+    "title": "Analitika i jezero",
+    "intro": "KPI-jevi aktivnosti dbms-a, trostruki dizajn jezera i katalog skupova podataka na jednom mjestu.",
+    "storageNotice": "Skladište jezera (na strani korisnika ili u oblaku) još nije odlučeno (PRD odjeljak 10 #7). Za sada se pohranjuju samo dizajni i mapiranja imena — nema podataka o redovima.",
+    "noLink": "Prvo odaberite ili registrirajte schema.pi vezu.",
+    "goConnect": "Registrirajte vezu",
+    "loading": "Učitavanje…",
+    "refresh": "Osvježi",
+    "kpi": {
+      "title": "KPI nadzorna ploča",
+      "updatedAt": "{area} · od {time}",
+      "notBuilt": "Nije izgrađeno",
+      "keys": {
+        "links": "Moje veze",
+        "perf": "Snimke performansi",
+        "drift": "Pokretanja drifta",
+        "mig": "Planovi migracije",
+        "pipe": "Cjevovodi",
+        "lake": "Skupovi podataka jezera"
+      },
+      "countsChart": "Ukupno po značajci",
+      "trendTitle": "Snimke performansi u posljednjih 14 dana",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Nema snimaka performansi u posljednjih 14 dana.",
+      "monTitle": "schema.pi sažetak monitora (posljednji sat)",
+      "monTps": "Zahtjeva/s",
+      "monErr": "Stopa grešaka",
+      "monAvg": "Prosječan odgovor (ms)",
+      "monDb": "DB veze",
+      "monFail": "Nije moguće učitati sažetak monitora: {msg}"
+    },
+    "lake": {
+      "title": "Trostruki dizajn jezera",
+      "raw": "Sirovo",
+      "rawDesc": "Učitava nazive i tipove stupaca izvornog DB-a kakvi jesu.",
+      "std": "Standardizirano",
+      "stdDesc": "Preimenuje stupce u schema.pi odobrene standardne termine.",
+      "cur": "Kustosirano",
+      "curDesc": "Skupovi podataka za analizu grupirani po entitetima.",
+      "loadProjects": "Učitaj projekte",
+      "project": "Projekt",
+      "pickProject": "Odaberite projekt",
+      "noProjects": "Nema projekata u ovom području.",
+      "noTables": "Model ovog projekta nema tablica.",
+      "conform": "Standardna usklađenost {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} stupaca · {pct}% usklađeno",
+      "colSrc": "Izvorni stupac",
+      "colStd": "Standardizirani stupac",
+      "colType": "Tip",
+      "colOk": "Format",
+      "ok": "U redu",
+      "ng": "Provjeri",
+      "pk": "PK",
+      "selectAll": "Odaberi sve",
+      "selected": "Odabrano {cnt}",
+      "save": "Dodaj u dizajn jezera",
+      "saved": "Dodano {cnt} u katalog."
+    },
+    "catalog": {
+      "title": "Katalog skupova podataka",
+      "schemaCard": "schema.pi je izvor istine za definicije skupova podataka za analizu, pretraživanje metapodataka i rječnik. Ovdje vidite samo status učitavanja jezera i svježinu.",
+      "openSchema": "Prikaži definicije u schema.pi",
+      "empty": "Nema tablica dodanih u dizajn jezera.",
+      "status": {
+        "DSGN": "Samo dizajn",
+        "LOADED": "Učitano",
+        "FAIL": "Učitavanje neuspješno"
+      },
+      "lastLoad": "Posljednje učitavanje {time}",
+      "neverLoaded": "Nikad učitano",
+      "remove": "Ukloni",
+      "removeConfirm": "Ukloniti {tbl} iz kataloga?",
+      "prev": "Prethodno",
+      "next": "Sljedeće",
+      "page": "Stranica {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Prvo odaberite vezu.",
+      "NOT_FOUND": "Nije pronađeno. Provjerite je li se model promijenio."
+    }
+  },
+  "drift": {
+    "title": "Model ↔ DB odstupanje",
+    "intro": "Usporedite schema.pi dizajn modela i povijest primjene DDL-a s katalogom DB-a uživo kako biste pronašli odstupanja i izmjerili jesu li dizajnirani indeksi stvarno korišteni. Podaci o redovima korisnika se nikada ne čitaju niti pohranjuju.",
+    "needLink": "Prvo odaberite schema.pi vezu iznad. Ako nemate nijednu, registrirajte token u izborniku 'Veza'.",
+    "needConn": "Odaberite DB vezu za usporedbu iznad.",
+    "project": "Projekt",
+    "projectPick": "Odaberite projekt",
+    "loading": "Učitavanje…",
+    "run": "Pokreni detekciju odstupanja",
+    "running": "Uspoređivanje…",
+    "readOnly": "Pokreću se samo upiti kataloga i statistike samo za čitanje.",
+    "applyInSchema": "Primijenite popravke (uređivanje modela, generiranje i izvršavanje DDL-a) u schema.pi, izvoru istine.",
+    "history": "Povijest detekcije",
+    "prev": "Prethodno",
+    "next": "Sljedeće",
+    "none": "Nijedno",
+    "model": "Model",
+    "reqNo": "Zahtjev {id}",
+    "notSaved": "Nije moguće spremiti ovo pokretanje u povijest (rezultati su prikazani normalno).",
+    "capped": "Previše stavki — prikazuje se prvih {cap} po odjeljku (brojke su potpune).",
+    "statsMissing": "Statistika korištenja indeksa nije bila dostupna, pa se korištenje nije moglo procijeniti.",
+    "sum": {
+      "missingTables": "Tablice koje nedostaju u DB-u",
+      "extraTables": "Tablice koje nisu u modelu",
+      "colMismatches": "Nepodudarnosti stupaca",
+      "missingIndexes": "Dizajnirani indeksi koji nedostaju u DB-u",
+      "extraIndexes": "Indeksi koji nisu u modelu",
+      "ddlMissing": "Objekti nestali nakon primjene",
+      "unusedIndexes": "Nekorišteni dizajnirani indeksi"
+    },
+    "sec": {
+      "ddlMissing": "DDL primijenjen, ali nedostaje u DB-u",
+      "missingTables": "Tablice u modelu, ali nedostaju u DB-u",
+      "extraTables": "Tablice u DB-u, ali ne u modelu",
+      "colMismatches": "Nepodudarnosti tipa stupca / NULL",
+      "missingIndexes": "Dizajnirani indeksi koji nedostaju u DB-u",
+      "extraIndexes": "Indeksi samo u DB-u (isključujući PK)",
+      "idxUsage": "Učinkovitost dizajniranog indeksa"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi je zabilježio ove objekte kao primijenjene, ali su nestali — sumnjajte na ručno brisanje ili povrat.",
+      "extraTables": "Ovo može pripadati drugim projektima ili sistemskim tablicama na ovoj vezi.",
+      "idxUsage": "Nula skeniranja od posljednjeg resetiranja statistike znači neiskorišteno. Provjerite prozor statistike prije brisanja."
+    },
+    "kind": {
+      "MISSING": "nedostaje u DB-u",
+      "EXTRA": "nije u modelu",
+      "TYPE": "tip se razlikuje",
+      "NULL": "razlikuje se mogućnost NULL-a"
+    },
+    "col": {
+      "idx": "Indeks",
+      "scans": "Skeniranja",
+      "size": "Veličina",
+      "status": "Presuda"
+    },
+    "usage": {
+      "USED": "U upotrebi",
+      "UNUSED": "Nekorišteni dizajnirani indeks",
+      "NO_STATS": "Nema statistike"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi veza još nije spremna. Pokušajte ponovo uskoro.",
+      "LINK_DOWN": "Nije moguće doći do schema.pi. Pokušajte ponovo uskoro.",
+      "LINK_AUTH": "Token veze je istekao ili je opozvan. Izdajte novi token u schema.pi i ponovo ga registrirajte.",
+      "LINK_NOT_FOUND": "Veza nije pronađena. Ponovo odaberite vezu.",
+      "LINK_SCOPE": "Ova veza ne pripada taksonomiji veze.",
+      "CONN_UNSUPPORTED": "Nepodržana veza (za sada samo PostgreSQL serverske veze).",
+      "TIMEOUT": "Zahtjev je istekao. Pokušajte ponovo uskoro.",
+      "RATE": "Previše zahtjeva. Pokušajte ponovo za minutu."
+    }
+  },
+  "learn": {
+    "title": "DBA učenje",
+    "intro": "SQLP/DAP pitanja za vježbu, priručnik za podešavanje i rječnik usporedbe Oracle/Tibero/PostgreSQL. Radi bez veze; odaberite vezu da biste vidjeli i mapiranje standardnog tipa schema.pi.",
+    "loading": "Učitavanje…",
+    "tabs": {
+      "quiz": "Vježba",
+      "cases": "Slučajevi podešavanja",
+      "dict": "DBMS rječnik"
+    },
+    "topics": {
+      "INDEX": "Skeniranje indeksa",
+      "JOIN": "Metode spajanja",
+      "PARTITION": "Obrezivanje particija",
+      "NORMAL": "Normalizacija",
+      "NAMING": "Standardno imenovanje",
+      "ISOLATION": "Razine izolacije",
+      "LOCK": "Zaključavanja"
+    },
+    "levels": {
+      "1": "Osnovno",
+      "2": "Srednje",
+      "3": "Napredno"
+    },
+    "quiz": {
+      "score": "Moj napredak",
+      "scoreLine": "Riješeno {solved} od {total} · {correct} tačnih",
+      "right": "Tačno",
+      "wrong": "Netačno",
+      "retry": "Pokušaj ponovo",
+      "prevRight": "Prethodno tačno",
+      "prevWrong": "Prethodno netačno"
+    },
+    "cases": {
+      "notice": "Svi slučajevi su samostalno napisani primjeri za učenje; brojevi su ilustrativni (nema korisničkih podataka).",
+      "problem": "Problem SQL",
+      "plan": "Sažetak plana",
+      "cause": "Uzrok",
+      "fix": "Popravljen SQL",
+      "effect": "Efekt"
+    },
+    "cats": {
+      "ALL": "Sve",
+      "TYPE": "Tipovi podataka",
+      "FUNC": "Funkcije",
+      "PAGING": "Paginacija",
+      "SEQ": "Sekvence",
+      "DATE": "Datumi",
+      "SYNTAX": "Sintaksa"
+    },
+    "dict": {
+      "search": "Pretraži (npr. NVL, LIMIT)",
+      "item": "Stavka",
+      "note": "Napomena",
+      "empty": "Nema podudarnih stavki",
+      "loading": "Učitavanje…",
+      "liveTitle": "Standardno mapiranje tipova mog područja predmeta",
+      "liveIntro": "Odaberite vezu za učitavanje schema.pi DBMS profila (logički → fizički tip). Rječnik iznad radi bez veze.",
+      "liveLoad": "Učitaj mapiranje tipova",
+      "lgcType": "Logički tip"
+    }
+  },
+  "link2": {
+    "title": "schema.pi veza",
+    "intro": "Registrirajte token veze da biste koristili DB veze schema.pi područja predmeta u dbms.pi. Tokeni se pohranjuju šifrirani, a podaci o redovima iz vaših baza podataka se ne pohranjuju.",
+    "howTitle": "Kako izdati token veze",
+    "how1": "Prijavite se na schema.pi i otvorite područje predmeta za povezivanje",
+    "how2": "Idite na Područje predmeta → Postavke → Token veze i pritisnite 'Izdaj token' (administrator područja ili DA uloga)",
+    "how3": "Kopirajte token koji počinje s slk_ — prikazuje se samo jednom kada se izda",
+    "how4": "Zalijepite ga ispod i registrirajte",
+    "openSchema": "Otvori schema.pi",
+    "registerTitle": "Registriraj vezu",
+    "tokenLabel": "Token veze",
+    "tokenPlaceholder": "slk_…",
+    "register": "Registriraj",
+    "registering": "Provjeravam…",
+    "registered": "Područje predmeta '{area}' je sada povezano",
+    "replaced": "Zamijenjen token područja predmeta '{area}'",
+    "myLinks": "Moje veze",
+    "empty": "Nema registriranih veza",
+    "loading": "Učitavanje…",
+    "regDtm": "Registrirano {dtm}",
+    "remove": "Prekini vezu",
+    "removeConfirm": "Prekinuti vezu '{area}'? Ekrani koji koriste ovu vezu više joj neće moći pristupiti.",
+    "prev": "Prethodno",
+    "next": "Sljedeće",
+    "statusTitle": "Status veze",
+    "noConns": "Nema DB veza u ovom području predmeta (dodajte jednu u schema.pi)",
+    "colConn": "Veza",
+    "colDbms": "DBMS",
+    "colMthd": "Metoda",
+    "colHost": "Host",
+    "colTest": "Posljednji test",
+    "colAgent": "Agent posljednji put viđen",
+    "never": "Nijedno",
+    "retry": "Pokušaj ponovo",
+    "pickerLink": "Veza",
+    "pickerConn": "Veza",
+    "pickerEmpty": "Nema veza —",
+    "pickerGo": "registrirajte jednu na /connect",
+    "errors": {
+      "LINK_AUTH": "Token veze je istekao ili je opozvan. Izdajte novi token u schema.pi i ponovo ga registrirajte",
+      "LINK_SCOPE": "Ova veza ne pripada povezanom području predmeta",
+      "LINK_DOWN": "Nije moguće doći do schema.pi. Pokušajte ponovo uskoro",
+      "LINK_NOT_FOUND": "Veza nije pronađena",
+      "LINK_DUP": "Registracija je već u toku. Pokušajte ponovo",
+      "CONN_UNSUPPORTED": "Nepodržana veza (za sada samo PostgreSQL serverske veze)",
+      "Q_UNKNOWN": "Nepoznat upit",
+      "SQL_NOT_SELECT": "Može se pokrenuti samo jedna SELECT (ili WITH) izjava",
+      "PGSS_MISSING": "Proširenje pg_stat_statements nije instalirano na ciljnom DB-u",
+      "TIMEOUT": "Zahtjev je istekao",
+      "RATE": "Previše zahtjeva. Pokušajte ponovo za minutu",
+      "INVALID_INPUT": "Zalijepite cijeli token veze koji počinje s slk_"
+    }
+  },
+  "migration": {
+    "title": "Migracija podataka (PiMig)",
+    "intro": "Izračunava redoslijed učitavanja tablica iz odnosa u vašem schema.pi dizajnerskom modelu, organizira veličinu dijelova, paralelizam i kontrolnu listu za prebacivanje, te generira SQL za provjeru koji sami pokrećete na izvoru i cilju. Ovaj ekran samo planira i provjerava — ne premješta podatke niti čita redove korisničkih DB-a.",
+    "needLink": "Prvo odaberite schema.pi vezu iznad. Ako nemate nijednu, registrirajte token pod 'Poveži'.",
+    "loading": "Učitavanje…",
+    "newPlan": "Novi plan migracije",
+    "project": "Projekt",
+    "projectPick": "Odaberite projekt",
+    "planNm": "Naziv plana",
+    "planNmHint": "Zadano je naziv projekta",
+    "create": "Kreiraj plan",
+    "creating": "Kreiranje…",
+    "snapHint": "Dizajn u ovom trenutku (nazivi tablica, stupaca i odnosa) zamrznut je kao snimka. Kreirajte novi plan kada se model promijeni.",
+    "plans": "Planovi migracije",
+    "prev": "Prethodno",
+    "next": "Sljedeće",
+    "sts": {
+      "DRAFT": "Nacrt",
+      "READY": "Spremno"
+    },
+    "del": "Izbriši",
+    "delConfirm": "Izbrisati ovaj plan?",
+    "snapInfo": "Snimak: {tables} tabela · {rels} relacija",
+    "dropped": "({n} relacija bez fizičkih tabela isključeno iz redoslijeda)",
+    "chunkSize": "Veličina bloka (redova/commit)",
+    "parallel": "Paralelizam (tabela odjednom)",
+    "saveOpts": "Sačuvaj opcije",
+    "optsHint": "Paralelizam je broj tabela koje se istovremeno učitavaju unutar nivoa. Veličina bloka je jedinica commit-a (redovi) koju će koristiti izvršni mehanizam.",
+    "order": "Redoslijed učitavanja",
+    "orderHint": "Topološki sortirano po projektnim relacijama (ne fizičkim FK-ovima) tako da roditeljske tabele dolaze prve. Tabele na istom nivou ne zavise jedna od druge i mogu se učitavati paralelno.",
+    "cycles": "{n} kružna grupa(e) — postavljena(e) na isti nivo. Ručno postavite njihov redoslijed i odgodite provjere referenci do nakon učitavanja.",
+    "selfRefs": "Tabele sa samoreferenciranjem (hijerarhijske) — prvo učitajte roditeljske redove unutar tabele",
+    "level": "Nivo {n}",
+    "checklist": "Kontrolna lista za prelazak",
+    "toReady": "Označi kao spremno",
+    "toDraft": "Nazad na nacrt",
+    "readyNeedAll": "Provjerite svaku stavku prije nego što plan označite kao spreman.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC tačka predaje",
+        "desc": "Zabilježite konzistentnu izvornu tačku prije početnog učitavanja (PG LSN · Oracle/Tibero SCN · za anketiranje, vrijeme početka minus prozor preklapanja), pokrenite CDC od nje i apsorbirajte duplikate u prozoru predaje sa upsertima."
+      },
+      "valueConv": {
+        "title": "Konverzija vrijednosti",
+        "desc": "Pravila su postavljena za prazan string = NULL, CHAR popunjavanje prazninama, NUMBER bez preciznosti → NUMERIC, DATE sa vremenom → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR dužina, i LONG·RAW."
+      },
+      "charset": {
+        "title": "Skup znakova",
+        "desc": "Potvrđen je izvorni skup znakova (KO16MSWIN949, UTF8, …), sa kolonama koje se prelijevaju zbog rasta višebajtnih znakova i odlučena je izolacija nekonvertibilnih znakova."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB se streamuju u blokovima (ograničenja veličine i memorije) i provjeravaju po dužini + hash-u."
+      },
+      "seqResync": {
+        "title": "Resinhronizacija sekvence",
+        "desc": "Nakon učitavanja, ciljne sekvence·identiteti se postavljaju na max(ključ)+1."
+      },
+      "timezone": {
+        "title": "Vremenska zona · sistemske kolone",
+        "desc": "Postavljena je vremenska zona interpretacije za vrijednosti bez nje (npr. Asia/Seoul), okidači za vrijeme izmjene neće prepisati izvorne vremenske oznake tokom učitavanja, i postavljena su pravila zamjene kreatora/modifikatora."
+      },
+      "backpressure": {
+        "title": "Povratni pritisak · ciljno opterećenje",
+        "desc": "Smanjite veličinu bloka i paralelizam pri kašnjenju cilja, rastu WAL-a ili čekanju zaključavanja; izgradite ne-PK indekse nakon učitavanja i pokrenite ANALYZE·VACUUM nakon toga."
+      }
+    },
+    "verify": "SQL za provjeru",
+    "verifyHint": "Generiše upite za broj, sumu numeričkih kolona, duplirane ključeve i hash ključa po tabeli u redoslijedu učitavanja. Pokrenite ih sami na izvoru i cilju i uporedite (ovaj ekran ih ne izvršava).",
+    "noHashOracle": "Oracle·Tibero hash funkcije i prikaz teksta se razlikuju od PostgreSQL-a, tako da su hash upiti izostavljeni — uporedite brojeve, sume i duplirane ključeve.",
+    "copy": "Kopiraj",
+    "copied": "Kopirano",
+    "copyFail": "Nije moguće kopirati. Odaberite tekst i kopirajte ga ručno.",
+    "engine": {
+      "title": "Izvršavanje·ponovno pokretanje · proba·povratak",
+      "body": "Stvarno izvršavanje migracije (kontrolne tačke, povratni pritisak, izolacija redova grešaka) i proba, povratak i snimanje početne tačke CDC-a biće dostupni nakon finalizacije sigurnosnog modela radnog agenta (A10). Za sada ovo pokriva planiranje, provjere i SQL za provjeru."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi veza se priprema. Pokušajte ponovo uskoro.",
+      "LINK_DOWN": "Nije moguće doći do schema.pi. Pokušajte ponovo uskoro.",
+      "LINK_AUTH": "Token veze je istekao ili je opozvan. Izdajte novi token u schema.pi i ponovo ga registrujte.",
+      "LINK_NOT_FOUND": "Veza nije pronađena. Molimo ponovo odaberite vezu.",
+      "LINK_SCOPE": "Ovaj projekat ne pripada taksonomiji veze.",
+      "TIMEOUT": "Zahtjev je istekao. Pokušajte ponovo uskoro.",
+      "RATE": "Previše zahtjeva. Pokušajte ponovo za minutu.",
+      "MIG_NO_TABLES": "Ovaj projekat nema fizičke tabele za migraciju. Prvo konvertujte u fizičke u schema.pi.",
+      "MIG_CHECK_INCOMPLETE": "Provjerite svaku stavku kontrolne liste za prelazak prije nego što plan označite kao spreman.",
+      "NOT_FOUND": "Plan nije pronađen."
+    }
+  },
+  "monitor": {
+    "title": "Centar za nadzor",
+    "collectNote": "Prikupljanje se vrši u schema.pi — migracija planirana (D7). Ova stranica čita sažetak monitora schema.pi.",
+    "noLink": "Prvo odaberite ili registrujte schema.pi vezu.",
+    "goConnect": "Registrujte vezu",
+    "period": "Period",
+    "periods": {
+      "30": "30 min",
+      "60": "1 sat",
+      "360": "6 sati",
+      "1440": "24 sata"
+    },
+    "refresh": "Osvježi",
+    "loading": "Učitavanje…",
+    "updatedAt": "{area} · od {time} (automatsko osvježavanje svakih 30s)",
+    "appTitle": "Performanse aplikacije",
+    "dbTitle": "Status DB-a po vezi",
+    "urlTitle": "Provjere URL-a",
+    "empty": "Nema podataka za prikaz.",
+    "breachTitle": "{n} prekoračenja praga",
+    "rulesTitle": "Pravila praga",
+    "rulesNote": "Pravila se spremaju za ovu vezu i procjenjuju se prema primljenom sažetku; prekoračenja dobijaju crveni okvir (obavještenja dolaze kasnije).",
+    "metric": "Metrika",
+    "conn": "Veza",
+    "allConns": "Sve veze",
+    "op": "Uporedi",
+    "threshold": "Prag",
+    "thrInvalid": "Unesite broj za prag.",
+    "addRule": "Dodaj pravilo",
+    "noRules": "Još nema pravila.",
+    "enable": "Omogući",
+    "disable": "Onemogući",
+    "delete": "Izbriši",
+    "delConfirm": "Izbrisati ovo pravilo?",
+    "aiNote": "AI analiza incidenata i odobrenje popravki i dalje se dešavaju u schema.pi monitoru.",
+    "aiLink": "Otvori schema.pi monitor",
+    "metrics": {
+      "APP_TPS": "TPS (zahtjeva/s)",
+      "APP_ERR_PCT": "Stopa grešaka (%)",
+      "APP_SLOW_CNT": "Spori zahtjevi",
+      "APP_AVG_MS": "Prosječan odgovor (ms)",
+      "DB_SESS_CNT": "Sesije",
+      "DB_LOCK_WAIT_CNT": "Čekanja zaključavanja",
+      "DB_CACHE_HIT_PCT": "Pogodak keša (%)",
+      "DB_SIZE_MB": "Veličina DB (MB)",
+      "URL_RSP_MS": "URL odgovor (ms)",
+      "URL_FAIL_CNT": "URL greške"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Prvo odaberite vezu.",
+      "NOT_IMPLEMENTED": "schema.pi veza se priprema. Pokušajte ponovo kasnije.",
+      "LINK_AUTH": "Token veze je nevažeći ili istekao. Izdajte novi token u schema.pi i registrujte ga.",
+      "LINK_SCOPE": "Ova veza ne može pristupiti toj taksonomiji.",
+      "RATE": "Previše zahtjeva. Pokušajte ponovo uskoro.",
+      "TIMEOUT": "schema.pi sporo odgovara. Pokušajte ponovo uskoro.",
+      "RULE_LIMIT": "Do 50 pravila po vezi.",
+      "NOT_FOUND": "Pravilo nije pronađeno."
+    }
+  },
+  "ops": {
+    "title": "Sigurnost DB operacija",
+    "loading": "Učitavanje…",
+    "pickFirst": "Prvo odaberite vezu i konekciju iznad",
+    "run": "Pokreni dijagnozu",
+    "running": "Dijagnosticiranje…",
+    "noRun": "Još nema dijagnoze. Pritisnite \"Pokreni dijagnozu\"",
+    "lastRun": "Posljednja dijagnoza {dtm}",
+    "readOnly": "Dijagnoza samo čita (SELECT). Savjet je smjernica i zavisi od memorije servera, opterećenja i radnog opterećenja",
+    "truncated": "Previše objekata — provjereno je samo prvih 500",
+    "paramsNote": "Ukupna memorija servera je nepoznata, pa se procjenjuje iz shared_buffers ≈ 25% RAM-a. random_page_cost pretpostavlja SSD",
+    "auditNote": "Tabele sa isključenim RLS-om i neiskorišteni računi biće provjereni kada upit veze to podrži",
+    "replNote": "Osnovna linija je Active-Standby (A-S) — jedan primarni + standby. Kašnjenje ponavljanja ≥ 5s = upozorenje, ≥ 60s = rizik (izmjerena RPO referenca)",
+    "lagIdle": "Nema promjena",
+    "pager": "Paginacija",
+    "prev": "Prethodno",
+    "next": "Sljedeće",
+    "tabs": {
+      "params": "Parametri",
+      "audit": "Računi i privilegije",
+      "backup": "Backup i oporavak",
+      "repl": "Replikacija i DR",
+      "history": "Historija"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Upozorenje",
+      "RISK": "Rizik"
+    },
+    "role": {
+      "primary": "Ova veza = Primarna",
+      "standby": "Ova veza = Standby",
+      "unknown": "Uloga nepoznata"
+    },
+    "col": {
+      "level": "Presuda",
+      "item": "Stavka",
+      "value": "Vrijednost",
+      "reason": "Detalji",
+      "standby": "Standby",
+      "state": "Stanje",
+      "sync": "Sinhronizacija",
+      "lag": "Kašnjenje ponavljanja"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLS uloge",
+      "bypass_ok": "BYPASSRLS uloge",
+      "no_expiry": "Istek lozinke",
+      "expiry_ok": "Istek lozinke",
+      "public_grant": "PUBLIC privilegije",
+      "public_ok": "PUBLIC privilegije",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Posljednji arhivirani WAL",
+      "arc_stale": "Posljednji arhivirani WAL",
+      "arc_recent": "Posljednji arhivirani WAL",
+      "arc_failing": "Neuspjeh arhiviranja WAL-a"
+    },
+    "rules": {
+      "sb_default": "Na zadanoj vrijednosti (128MB). Na namjenskom serveru preporučuje se oko 25% RAM-a",
+      "sb_ok": "Postavljeno iznad zadane vrijednosti",
+      "wm_over": "max_connections × work_mem premašuje procijenjenu memoriju. Istovremena sortiranja rizikuju nedostatak memorije",
+      "wm_default": "Na zadanoj vrijednosti (4MB). Velika sortiranja i hash-ovi mogu se preliti na disk",
+      "wm_ok": "Unutar razumnog raspona",
+      "mwm_default": "Na zadanoj vrijednosti (64MB). VACUUM i izgradnja indeksa mogu biti spori; razmislite o 256MB ili više",
+      "mwm_ok": "Postavljeno iznad zadane vrijednosti",
+      "av_on": "autovacuum je uključen",
+      "av_off": "autovacuum je isključen. Visok rizik od nadutosti tabele i prelijevanja ID-a transakcije",
+      "conn_high": "max_connections je visok. Svaka veza koristi memoriju; preporučuje se pooler (PgBouncer itd.)",
+      "conn_ok": "Unutar razumnog raspona",
+      "lmd_off": "Sporo evidentiranje upita je isključeno (-1). Preporučuje se oko 1000ms",
+      "lmd_all": "Svaka izjava se evidentira (0). Veliki troškovi evidentiranja",
+      "lmd_ok": "Sporo evidentiranje upita je uključeno",
+      "st_off": "Nema vremenskog ograničenja izjave na nivou servera (0). Postavite ograničenja po ulozi ili aplikaciji",
+      "st_ok": "Postavljeno je vremensko ograničenje izjave",
+      "iit_off": "Nema vremenskog ograničenja za neaktivnost u transakciji (0). Može uzrokovati zadržavanje zaključavanja i nadutost",
+      "iit_ok": "Postavljeno je vremensko ograničenje za neaktivnost u transakciji",
+      "ckpt_short": "Interval kontrolne tačke je 5 minuta ili manje. Razmislite o 10–15 minuta za opterećenja sa mnogo pisanja",
+      "ckpt_ok": "Unutar razumnog raspona",
+      "wal_minimal": "wal_level=minimal onemogućava PITR i replikaciju. Koristite replica ili više",
+      "wal_ok": "WAL nivo podržava PITR i replikaciju",
+      "rpc_hdd": "Zadana vrijednost HDD-a (4). Za SSD, preporučuje se 1.1–2",
+      "rpc_ok": "Pogodno za SSD",
+      "super_many": "Dva ili više superkorisnika. Zadržite jednog za administraciju i dodijelite samo potrebne privilegije drugima",
+      "super_ok": "Najviše jedan superkorisnik",
+      "bypass_rls": "Postoje uloge koje nisu superkorisnici, a zaobilaze sigurnost na nivou reda",
+      "bypass_ok": "Nema uloga koje zaobilaze RLS",
+      "no_expiry": "Uloge za prijavu bez isteka lozinke. Postavite VALID UNTIL za lične račune",
+      "expiry_ok": "Sve uloge za prijavu imaju istek",
+      "public_grant": "PUBLIC (svaka uloga) ima privilegije tabele. Privilegije pisanja su rizične",
+      "public_ok": "Nema privilegija tabele dodijeljenih PUBLIC-u",
+      "arc_on": "WAL arhiviranje (archive_mode) je uključeno",
+      "arc_off": "WAL arhiviranje je isključeno, tako da oporavak u određenom trenutku (PITR) nije moguć",
+      "arc_cmd_empty": "archive_mode je uključen, ali archive_command i archive_library su prazni",
+      "arc_never": "Još nijedan WAL nije arhiviran",
+      "arc_stale": "Posljednja WAL arhiva je starija od 24 sata",
+      "arc_recent": "WAL arhiviran u posljednja 24 sata",
+      "arc_failing": "WAL arhiviranje trenutno ne uspijeva. Provjerite disk, dozvole i ciljnu putanju",
+      "repl_is_standby": "Ova veza je standby (način oporavka). Provjerite kašnjenje sa primarne veze",
+      "repl_none": "Nema povezanog standby-a. Nema postavke za oporavak od katastrofe (DR)",
+      "repl_ok": "Standby-i normalno streamuju",
+      "repl_lag": "Standby kasni ili ne streamuje"
+    },
+    "manual": {
+      "title": "Ručna kontrolna lista",
+      "intro": "Prakse sigurnosnog kopiranja i oporavka koje se ne mogu automatski provjeriti. Označite kada je potvrđeno i zabilježite dokaz",
+      "memo": "Bilješka (npr. alat, raspored, posljednja provjera)",
+      "save": "Sačuvaj",
+      "updated": "Ažurirano {dtm}",
+      "items": {
+        "base_backup": "Potpuna sigurnosna kopija (pg_basebackup itd.) uspjela je u posljednjih 7 dana",
+        "offsite_copy": "Kopija sigurnosne kopije se čuva van lokacije (druga regija ili skladište)",
+        "restore_rehearsal": "Proba oporavka je obavljena ovog kvartala i zabilježeno je njeno trajanje",
+        "pitr_target": "PITR procedura i ciljni RPO/RTO su dokumentovani",
+        "backup_encrypt": "Datoteke sigurnosne kopije su šifrovane i pristup je ograničen",
+        "retention": "Definisan je period zadržavanja sigurnosne kopije i politika brisanja"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi veza se priprema. Pokušajte ponovo uskoro",
+      "CONN_UNSUPPORTED": "Ova veza još nije podržana (samo direktni PostgreSQL)",
+      "TIMEOUT": "Odgovor ciljanog DB-a je bio prespor. Pokušajte ponovo uskoro",
+      "RATE": "Previše poziva. Pokušajte ponovo za minutu",
+      "Q_UNKNOWN": "Nepodržan upit. Provjerite verziju API-ja schema.pi veze",
+      "INVALID_INPUT": "Nevažeći odabir veze ili konekcije"
+    }
+  },
+  "perf": {
+    "title": "Performanse",
+    "loading": "Učitavanje…",
+    "pickFirst": "Prvo odaberite vezu i konekciju iznad",
+    "pager": "Paginacija",
+    "tabs": {
+      "collect": "Prikupljanje",
+      "top": "Spori upiti",
+      "health": "Stanje tabela i indeksa",
+      "trend": "Trend veličine",
+      "activity": "Aktivnost i zaključavanja"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi veza se priprema. Pokušajte ponovo kasnije",
+      "CONN_UNSUPPORTED": "Ova veza još nije podržana (samo direktne PostgreSQL veze)",
+      "RATE": "Previše zahtjeva. Pokušajte ponovo za minutu",
+      "LINK_AUTH": "Token veze je istekao ili je opozvan. Ponovo registrujte token na stranici Povezivanje",
+      "LINK_SCOPE": "Ova veza ne pripada predmetnom području veze",
+      "Q_UNKNOWN": "Nepodržan upit. Provjerite verziju API-ja schema.pi veze",
+      "INVALID_INPUT": "Vrijednost veze ili konekcije je nevažeća"
+    },
+    "pgss": {
+      "title": "Kako omogućiti pg_stat_statements",
+      "note": "Samostalno hostovani PostgreSQL također zahtijeva pg_stat_statements u shared_preload_libraries (postgresql.conf) i ponovno pokretanje. Statistike tabela, indeksa i veličine rade bez toga"
+    },
+    "collect": {
+      "intro": "Sada prikupljanje čita statistike najboljih upita, tabele, indekse i veličine jednom i pohranjuje ih kao snimak. Prikupljajte barem dva puta da biste vidjeli promjene i trendove veličine",
+      "run": "Prikupljaj sada",
+      "running": "Prikupljanje…",
+      "done": "Prikupljeno u {dtm} — {qry} upita · {tbl} tabela · {idx} indeksa"
+    },
+    "top": {
+      "sort": "Sortiraj",
+      "sortTotal": "Ukupno vrijeme",
+      "sortMean": "Prosječno vrijeme",
+      "sortCalls": "Pozivi",
+      "empty": "Još nema snimaka. Pritisnite Prikupljaj sada na kartici Prikupljanje",
+      "range": "Promjena između {from} → {to}",
+      "first": "Prvi snimak u {dtm} — kumulativne vrijednosti (promjene od sljedećeg snimka)",
+      "query": "Upit (literali maskirani)",
+      "calls": "Pozivi",
+      "totalMs": "Ukupno ms",
+      "meanMs": "Prosječno ms",
+      "rows": "Redovi",
+      "reset": "Otkriveno resetovanje statistike — prikazano kao kumulativno"
+    },
+    "health": {
+      "empty": "Još nema snimaka. Pritisnite „Prikupi sada“ na kartici „Prikupi“",
+      "basis": "Na osnovu snimka u {dtm}",
+      "unusedIdx": "Neiskorišteni indeksi",
+      "unusedIdxHint": "Indeksi nikada nisu korišteni od posljednjeg resetovanja statistike (po veličini). Nemojte ispuštati PK ili indekse jedinstvenih ograničenja",
+      "fullScan": "Prekomjerna potpuna skeniranja",
+      "fullScanHint": "Tabele sa 1.000+ živih redova gdje su potpuna skeniranja najmanje pola — pregledajte indekse na kolonama filtera",
+      "dead": "Prekomjerni mrtvi slogovi",
+      "deadHint": "Omjer mrtvih slogova 20% ili više — provjerite postavke VACUUM i autovacuum",
+      "none": "Nijedno",
+      "scans": "skeniranja"
+    },
+    "trend": {
+      "limit": "Prag veličine",
+      "empty": "Nema snimaka u posljednjih 30 dana",
+      "now": "Trenutna veličina",
+      "perDay": "Dnevni rast",
+      "needMore": "Potrebna su 2+ snimka",
+      "daysLeft": "Dostiže {gb} GB",
+      "noGrowth": "Nema trenda rasta",
+      "days": "za otprilike {n} dana"
+    },
+    "activity": {
+      "refresh": "Osvježi",
+      "live": "Upit uživo — nije pohranjen",
+      "sessions": "Aktivnost sesije",
+      "locks": "Zaključavanja",
+      "none": "Nijedno"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Cjevovodi",
+    "intro": "Provjerite je li izvorna DB spremna za snimanje promjena podataka (CDC) i dizajnirajte cjevovode izvor → transformacija → cilj. Ova faza samo provjerava i dizajnira; podaci o redovima korisnika se ne čitaju niti pohranjuju.",
+    "needLink": "Prvo odaberite schema.pi vezu iznad. Ako nemate nijednu, registrirajte token u meniju 'Veza'.",
+    "needConn": "Odaberite DB vezu za provjeru iznad.",
+    "loading": "Učitavanje…",
+    "pager": "Stranice",
+    "prev": "Prethodno",
+    "next": "Sljedeće",
+    "runTitle": "Pokreni i nadgledaj (7-3 · 7-4)",
+    "runBody": "Izvršavanje cjevovoda, nadgledanje kašnjenja i ponovna obrada stižu kada se finaliziraju radni agent i sigurnosni model. Za sada, sačuvajte definicije kao nacrte (DRAFT).",
+    "pre": {
+      "title": "Prethodna provjera izvora",
+      "intro": "Za svaku tabelu, provjerava kolone vremena promjene, kolone za soft-delete i primarni ključ kako bi preporučio metodu snimanja (adapter), te provjerava spremnost WAL logičke replikacije. Izvršavaju se samo upiti kataloga i postavki samo za čitanje.",
+      "schema": "Shema (opcionalno)",
+      "schemaPh": "Sve",
+      "run": "Pokreni prethodnu provjeru",
+      "running": "Provjeravam…",
+      "sum": "{tables} tabela · {noPk} bez PK · {deleteUnseen} ne može uhvatiti brisanja",
+      "truncated": "Upit kataloga je dostigao ograničenje od 500 redova, tako da neke tabele možda nedostaju. Navedite shemu i ponovo provjerite.",
+      "empty": "Nema tabela za provjeru",
+      "colTable": "Tabela",
+      "colChg": "Kolona vremena promjene",
+      "colDel": "Kolona za soft-delete",
+      "colAdapter": "Preporučena metoda · razlozi",
+      "toDraft": "Kreiraj nacrt cjevovoda od {n} odabranih"
+    },
+    "ready": {
+      "ok": "WAL logička replikacija spremna — tabele sa PK mogu koristiti LOGICAL",
+      "no": "WAL logička replikacija nije spremna — snimanje putem anketiranja ili poređenja ključeva",
+      "senders": "{n} replikacijskih veza"
+    },
+    "adapter": {
+      "LOGICAL": "Logička replikacija (WAL)",
+      "POLL": "Anketiranje vremena promjene",
+      "KEY_DIFF": "Razlika snimka ključa",
+      "NONE": "Samo potpuno ponovno učitavanje"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Ima kolonu vremena promjene",
+      "NO_CHG_COL": "Nema kolone vremena promjene",
+      "HAS_SOFT_DEL": "Ima kolonu za soft-delete",
+      "NO_SOFT_DEL": "Nema kolone za soft-delete",
+      "HAS_PK": "Ima primarni ključ",
+      "NO_PK": "Nema primarnog ključa — promijenjeni redovi se ne mogu identificirati",
+      "DELETE_UNSEEN": "Anketiranje ne može uhvatiti fizičke DELETE-ove (preporučuje se kolona za soft-delete)",
+      "LOGICAL_NOT_READY": "Može se prebaciti na LOGICAL kada WAL logička replikacija bude spremna",
+      "FULL_RELOAD_ONLY": "Nema PK ili kolone vremena promjene, tako da nema inkrementalnog snimanja — dodajte PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level nije logical (promjena zahtijeva ponovno pokretanje DB-a)",
+      "NO_SLOTS": "max_replication_slots je 0",
+      "NO_SENDERS": "max_wal_senders je 0",
+      "IS_STANDBY": "Standby server — uzmite logičku replikaciju od primarnog",
+      "SETTINGS_UNKNOWN": "Nije moguće pročitati postavke, spremnost nepoznata"
+    },
+    "ed": {
+      "title": "Definicije cjevovoda",
+      "draftOnly": "Samo dizajn — spremljeno kao nacrti (DRAFT)",
+      "new": "Novi cjevovod",
+      "empty": "Nema spremljenih cjevovoda",
+      "manual": "Ručno",
+      "edit": "Uredi",
+      "remove": "Izbriši",
+      "removeConfirm": "Izbrisati cjevovod '{name}'?",
+      "name": "Naziv",
+      "adapter": "Metoda snimanja",
+      "srcConn": "Izvorna veza",
+      "useCurrentConn": "Koristi vezu odabranu iznad",
+      "sched": "Raspored (cron sa 5 polja, prazno = ručno)",
+      "target": "Cilj",
+      "targetPh": "npr. analitička DB analytics.public / jezero s3://…",
+      "tables": "Izvorne tabele (odvojene novim redom ili zarezom)",
+      "steps": "Koraci (izvor → transformacija → cilj)",
+      "op": "Operacija",
+      "notePh": "Opis · uslov (opcionalno)",
+      "addTransform": "Dodaj korak transformacije",
+      "save": "Sačuvaj",
+      "saving": "Spremanje…",
+      "saved": "Sačuvano",
+      "close": "Zatvori"
+    },
+    "kind": {
+      "SOURCE": "Izvor",
+      "TRANSFORM": "Transformacija",
+      "TARGET": "Cilj"
+    },
+    "sts": {
+      "DRAFT": "Nacrt"
+    },
+    "check": {
+      "NAME_REQUIRED": "Unesite naziv",
+      "CONN_REQUIRED": "Odaberite izvornu vezu",
+      "CRON_INVALID": "Unesite raspored kao cron sa 5 polja (min sat dan mjesec dan_u_sedmici; cifre, *, ',', -, /)",
+      "OP_REQUIRED": "Unesite operaciju za svaki korak",
+      "STEPS_TOO_FEW": "Potrebni su izvorni i ciljni koraci",
+      "STEPS_TOO_MANY": "Do 20 koraka",
+      "STEP_FIRST_SOURCE": "Prvi korak mora biti izvor",
+      "STEP_LAST_TARGET": "Posljednji korak mora biti cilj",
+      "STEP_MIDDLE_TRANSFORM": "Samo koraci transformacije mogu biti između"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Cjevovod s ovim nazivom već postoji. Koristite drugi naziv",
+      "CONN_UNSUPPORTED": "Ova veza se još ne može provjeriti (trenutno samo direktne veze PostgreSQL servera)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL laboratorija za podešavanje",
+    "intro": "Odaberite vezu i unesite SQL da biste vidjeli plan izvršenja kao stablo, sa uzrocima usporavanja (potpuna skeniranja, ugniježđene petlje, velika sortiranja) i SQL anti-uzorcima provjerenim prema standardnim domenama schema.pi. Upiti se nikada zapravo ne izvršavaju (nema ANALYZE).",
+    "needLink": "Odaberite vezu i konekciju iznad da biste vidjeli planove. Provjera anti-uzoraka radi bez veze.",
+    "sqlLabel": "SQL (jedna SELECT ili WITH izjava)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Prikaži plan",
+    "explaining": "Učitavanje…",
+    "save": "Sačuvaj plan",
+    "saving": "Spremanje…",
+    "saveName": "Oznaka (npr. prije dodavanja indeksa)",
+    "saveNote": "Konstantne vrijednosti u SQL-u i uslovima plana maskiraju se kao ? kada se sačuvaju.",
+    "plan": {
+      "title": "Plan izvršenja",
+      "summary": "Ukupni trošak {cost} · {ms}ms",
+      "cost": "trošak",
+      "rows": "redovi",
+      "width": "širina"
+    },
+    "warn": {
+      "none": "Nema značajnih upozorenja.",
+      "SEQ_SCAN_LARGE": "Potpuno skeniranje na {relation} (oko {rows} redova) — razmislite o indeksu na kolonama filtera.",
+      "NESTED_LOOP_HIGH": "Ugniježđena petlja proizvodi oko {rows} redova — razmislite o hash ili merge joinu, ili indeksu na uslovu spajanja.",
+      "SORT_SPILL": "Veličina sortiranja je oko {kb}KB, iznad podrazumijevane work_mem (4MB); može se preliti na disk."
+    },
+    "lint": {
+      "run": "Provjeri anti-uzorke",
+      "title": "Provjera SQL anti-uzoraka",
+      "none": "Nisu pronađeni anti-uzorci.",
+      "domainsOff": "Standardne domene nisu mogle biti učitane; provjereno samo sa podrazumijevanim pravilima sufiksa kolona.",
+      "types": {
+        "num": "numerički",
+        "date": "datum",
+        "char": "znak"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — odaberite samo kolone koje trebate (dodatni I/O, nema pokrivajućeg indeksa).",
+        "FUNC_ON_COLUMN": "Kolona filtera {column} je umotana u funkciju ili izraz, tako da se njen indeks ne može koristiti — umjesto toga transformirajte konstantu.",
+        "LEADING_WILDCARD": "LIKE sa vodećim % ne može koristiti B-stablo indeks — razmislite o pg_trgm GIN indeksu.",
+        "OR_DIFF_COLUMNS": "Uslovi na različitim kolonama su kombinovani sa OR — razmislite o UNION ALL ili indeksima po kolonama.",
+        "IMPLICIT_CAST": "{column} se poredi sa brojem pod navodnicima — uskladite tipove kolona i konstanti (implicitno castovanje).",
+        "NOT_IN_SUBQUERY": "NOT IN (podupit) ne vraća ništa kada su prisutni NULL-ovi i spor je — koristite NOT EXISTS.",
+        "NO_WHERE": "Nema WHERE klauzule — na velikoj tabeli ovo je potpuno skeniranje (dodajte uslov ili LIMIT).",
+        "DOMAIN_MISMATCH": "{column} je {expected} tip prema standardnoj domeni, ali se poredi sa konstantom drugog tipa — implicitno castovanje može spriječiti korištenje indeksa."
+      }
+    },
+    "saved": {
+      "title": "Sačuvani planovi · Uporedi",
+      "empty": "Nema sačuvanih planova. Pregledajte plan, a zatim ga sačuvajte.",
+      "pick": "Odaberite plan za poređenje",
+      "pick2": "Odaberite dva plana za poređenje.",
+      "compare": "Uporedi dva plana",
+      "delete": "Izbriši",
+      "cost": "trošak",
+      "prev": "Prethodno",
+      "next": "Sljedeće",
+      "page": "Stranica {page}"
+    },
+    "diff": {
+      "cost": "Ukupni trošak {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Dva plana su za različite SQL (nakon normalizacije).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Nema promjene u čvorovima plana.",
+      "before": "Prije",
+      "after": "Poslije"
+    },
+    "ai": {
+      "title": "AI savjeti za podešavanje",
+      "badge": "Uskoro",
+      "body": "Uskoro (nakon procedura odobrenja i mjerenja uticaja) — savjeti će se generisati iz SQL-a sa maskiranim konstantama i bilježiti kao primijenjeni tek nakon odobrenja DA i izmjerenog uticaja."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Funkcija povezivanja schema.pi se priprema. Pokušajte ponovo uskoro.",
+      "LINK_AUTH": "Token veze je istekao ili je opozvan. Izdajte novi token u schema.pi i ponovo ga registrirajte.",
+      "LINK_SCOPE": "Ova veza ne može koristiti tu konekciju (različita šema klasifikacije).",
+      "CONN_UNSUPPORTED": "Ovaj tip veze još nije podržan (trenutno samo veze PostgreSQL servera).",
+      "Q_UNKNOWN": "Nepodržan upit.",
+      "SQL_NOT_SELECT": "Planovi su dostupni samo za jednu izjavu koja počinje sa SELECT ili WITH.",
+      "TIMEOUT": "Zahtjev je istekao (5 sekundi). Skratite SQL ili pokušajte ponovo kasnije.",
+      "RATE": "Previše zahtjeva. Pokušajte ponovo za minutu.",
+      "PAYLOAD_TOO_LARGE": "Plan je prevelik za spremanje.",
+      "LINK_NOT_FOUND": "Veza nije pronađena. Molimo ponovo odaberite vezu."
+    }
+  },
+  "nav": {
+    "label": "Funkcije",
+    "connect": "Poveži",
+    "sqlLab": "SQL podešavanje",
+    "perf": "Performanse",
+    "monitor": "Praćenje",
+    "drift": "Drift",
+    "migration": "Migracija",
+    "pipeline": "Cjevovod",
+    "analytics": "Analitika",
+    "ops": "Sigurnost operacija",
+    "learn": "Učenje"
   }
 }

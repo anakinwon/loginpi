@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "DBA un SQLP darbstacija DB dzinēju ātrai un drošai darbībai"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Panāciet, lai jūsu DB dzinējs ātri un droši apstrādātu jūsu datus",
+    "description": "DBA un SQLP darbstacija izpildes plāniem, statistikai un veiktspējai. schema.pi apstrādā dizainu un standartus; dbms.pi ir tā partneris dzinēja pusē.",
+    "welcome": "Sveicināti, {name}.",
+    "featTitle": "Funkcijas",
+    "featDesc": {
+      "connect": "Reģistrējiet schema.pi saites marķieri un pārbaudiet savienojuma statusu",
+      "sqlLab": "Plāna koks, brīdinājumi, salīdzinājumi un pret-modeļu pārbaudes pret standarta domēniem",
+      "perf": "Lēnu vaicājumu Top-N, tabulas/indeksa veselība, kapacitātes prognoze, aktivitāte un bloķēšana",
+      "monitor": "Lietotnes, DB un URL metrikas kopsavilkums ar sliekšņa brīdinājumiem",
+      "drift": "Salīdziniet schema.pi modeli un DDL vēsturi ar reālo katalogu, novērtējiet indeksa efektu",
+      "migration": "Topoloģiskā ielādes secība, bloki, kontrolsaraksts un verifikācijas SQL",
+      "pipeline": "Izmaiņu uztveršanas priekšpārbaude un avota→transformācijas→mērķa cauruļvadu definīcijas",
+      "analytics": "KPI informācijas panelis, 3 slāņu ezera kartēšana un datu kopu katalogs",
+      "ops": "Tikai lasāma parametru, lomu, dublējumu un replikācijas DR diagnostika",
+      "learn": "SQLP/DAP prakses jautājumi, pielāgošanas gadījumi un DBMS salīdzināšanas vārdnīca"
+    }
+  },
   "auth": {
     "checking": "Pārbauda pierakstīšanos…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "Nevarēja izveidot saites kodu. Lūdzu, mēģiniet vēlāk.",
     "AUTH_DB_UNAVAILABLE": "Nevarēja saglabāt jūsu kontu, tāpēc pierakstīšanās neizdevās. Lūdzu, mēģiniet vēlāk.",
     "LINK_TRY_LIMIT": "Pārāk daudz nepareizu saites kodu. Mēģiniet vēlreiz pēc 15 minūtēm."
+  },
+  "analytics": {
+    "title": "Analītika un ezers",
+    "intro": "dbms aktivitātes KPI, trīsslāņu ezera dizains un datu kopu katalogs vienuviet.",
+    "storageNotice": "Ezera krātuve (klienta vai mākoņa) vēl nav izlemta (PRD 10. sadaļa #7). Pagaidām tiek glabāti tikai dizaini un nosaukumu kartējumi — nav rindu datu.",
+    "noLink": "Vispirms atlasiet vai reģistrējiet schema.pi saiti.",
+    "goConnect": "Reģistrēt saiti",
+    "loading": "Ielādē…",
+    "refresh": "Atsvaidzināt",
+    "kpi": {
+      "title": "KPI informācijas panelis",
+      "updatedAt": "{area} · uz {time}",
+      "notBuilt": "Nav izveidots",
+      "keys": {
+        "links": "Manas saites",
+        "perf": "Veiktspējas momentuzņēmumi",
+        "drift": "Novirzes palaišanas reizes",
+        "mig": "Migrācijas plāni",
+        "pipe": "Cauruļvadi",
+        "lake": "Ezera datu kopas"
+      },
+      "countsChart": "Kopsummas pēc funkcijas",
+      "trendTitle": "Veiktspējas momentuzņēmumi pēdējās 14 dienās",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Pēdējās 14 dienās nav veiktspējas momentuzņēmumu.",
+      "monTitle": "schema.pi monitora kopsavilkums (pēdējā stunda)",
+      "monTps": "Pieprasījumi/s",
+      "monErr": "Kļūdu līmenis",
+      "monAvg": "Vidējā atbilde (ms)",
+      "monDb": "DB savienojumi",
+      "monFail": "Nevarēja ielādēt monitora kopsavilkumu: {msg}"
+    },
+    "lake": {
+      "title": "Trīsslāņu ezera dizains",
+      "raw": "Neapstrādāts",
+      "rawDesc": "Ielādē avota DB kolonnu nosaukumus un tipus tādus, kādi tie ir.",
+      "std": "Standartizēts",
+      "stdDesc": "Pārdēvē kolonnas uz schema.pi apstiprinātiem standarta terminiem.",
+      "cur": "Apkopots",
+      "curDesc": "Analīzes datu kopas, kas sagrupētas pēc entītijas.",
+      "loadProjects": "Ielādēt projektus",
+      "project": "Projekts",
+      "pickProject": "Izvēlieties projektu",
+      "noProjects": "Šajā apgabalā nav projektu.",
+      "noTables": "Šī projekta modelī nav tabulu.",
+      "conform": "Standarta atbilstība {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} kolonnas · {pct}% atbilstošs",
+      "colSrc": "Avota kolonna",
+      "colStd": "Standartizēta kolonna",
+      "colType": "Tips",
+      "colOk": "Formāts",
+      "ok": "Labi",
+      "ng": "Pārbaudīt",
+      "pk": "PK",
+      "selectAll": "Atlasīt visus",
+      "selected": "Atlasīti {cnt}",
+      "save": "Pievienot ezera dizainam",
+      "saved": "Katalogam pievienoti {cnt}."
+    },
+    "catalog": {
+      "title": "Datu kopu katalogs",
+      "schemaCard": "schema.pi ir analīzes datu kopu definīciju, metadatu meklēšanas un glosārija patiesības avots. Šeit jūs redzat tikai ezera ielādes statusu un svaigumu.",
+      "openSchema": "Skatīt definīcijas schema.pi",
+      "empty": "Vēl nav pievienotas tabulas ezera dizainam.",
+      "status": {
+        "DSGN": "Tikai dizains",
+        "LOADED": "Ielādēts",
+        "FAIL": "Ielāde neizdevās"
+      },
+      "lastLoad": "Pēdējā ielāde {time}",
+      "neverLoaded": "Nekad nav ielādēts",
+      "remove": "Noņemt",
+      "removeConfirm": "Noņemt {tbl} no kataloga?",
+      "prev": "Iepriekšējais",
+      "next": "Nākamais",
+      "page": "Lapa {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Vispirms atlasiet saiti.",
+      "NOT_FOUND": "Nav atrasts. Pārbaudiet, vai modelis nav mainījies."
+    }
+  },
+  "drift": {
+    "title": "Modelis ↔ DB novirze",
+    "intro": "Salīdziniet schema.pi dizaina modeli un DDL lietošanas vēsturi ar tiešraides DB katalogu, lai atrastu novirzes, un novērtējiet, vai izstrādātie indeksi tiek faktiski izmantoti. Klientu rindu dati nekad netiek lasīti vai glabāti.",
+    "needLink": "Vispirms izvēlieties schema.pi saiti. Ja jums nav nevienas, reģistrējiet marķieri izvēlnē 'Saite'.",
+    "needConn": "Izvēlieties DB savienojumu, ko salīdzināt.",
+    "project": "Projekts",
+    "projectPick": "Izvēlieties projektu",
+    "loading": "Ielādē…",
+    "run": "Palaist novirzes noteikšanu",
+    "running": "Salīdzina…",
+    "readOnly": "Tiek palaisti tikai lasāmi kataloga un statistikas vaicājumi.",
+    "applyInSchema": "Lietojiet labojumus (modeļa rediģēšana, DDL ģenerēšana un izpilde) schema.pi, kas ir patiesības avots.",
+    "history": "Noteikšanas vēsture",
+    "prev": "Iepriekšējais",
+    "next": "Nākamais",
+    "none": "Nav",
+    "model": "Modelis",
+    "reqNo": "Pieprasījums {id}",
+    "notSaved": "Nevarēja saglabāt šo palaišanu vēsturē (rezultāti tiek rādīti normāli).",
+    "capped": "Pārāk daudz vienumu — tiek rādīti pirmie {cap} katrā sadaļā (skaits ir pilnīgs).",
+    "statsMissing": "Indeksa lietošanas statistika nebija pieejama, tāpēc lietošanu nevarēja novērtēt.",
+    "sum": {
+      "missingTables": "Tabulas trūkst DB",
+      "extraTables": "Tabulas nav modelī",
+      "colMismatches": "Kolonnu neatbilstības",
+      "missingIndexes": "Izstrādātie indeksi trūkst DB",
+      "extraIndexes": "Indeksi nav modelī",
+      "ddlMissing": "Objekti pazuduši pēc lietošanas",
+      "unusedIndexes": "Neizmantoti izstrādātie indeksi"
+    },
+    "sec": {
+      "ddlMissing": "DDL lietots, bet trūkst DB",
+      "missingTables": "Tabulas modelī, bet trūkst DB",
+      "extraTables": "Tabulas DB, bet nav modelī",
+      "colMismatches": "Kolonnu tipa / NULL neatbilstības",
+      "missingIndexes": "Izstrādātie indeksi trūkst DB",
+      "extraIndexes": "Indeksi tikai DB (izņemot PK)",
+      "idxUsage": "Izstrādātā indeksa efektivitāte"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi reģistrēja šos objektus kā lietotus, bet tie ir pazuduši — aizdomas par manuālu dzēšanu vai atcelšanu.",
+      "extraTables": "Tie var piederēt citiem projektiem vai sistēmas tabulām šajā savienojumā.",
+      "idxUsage": "Nulle skenēšanas kopš pēdējās statistikas atiestatīšanas nozīmē neizmantots. Pirms dzēšanas pārbaudiet statistikas logu."
+    },
+    "kind": {
+      "MISSING": "trūkst DB",
+      "EXTRA": "nav modelī",
+      "TYPE": "tips atšķiras",
+      "NULL": "NULL atļauja atšķiras"
+    },
+    "col": {
+      "idx": "Indekss",
+      "scans": "Skenēšanas reizes",
+      "size": "Izmērs",
+      "status": "Spriedums"
+    },
+    "usage": {
+      "USED": "Tiek izmantots",
+      "UNUSED": "Neizmantots izstrādātais indekss",
+      "NO_STATS": "Nav statistikas"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi savienojums vēl nav gatavs. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "LINK_DOWN": "Nevar sasniegt schema.pi. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "LINK_AUTH": "Savienojuma marķieris ir beidzies vai atsaukts. Izsniedziet jaunu marķieri schema.pi un reģistrējiet to vēlreiz.",
+      "LINK_NOT_FOUND": "Saite nav atrasta. Lūdzu, izvēlieties saiti vēlreiz.",
+      "LINK_SCOPE": "Šis savienojums nepieder saites taksonomijai.",
+      "CONN_UNSUPPORTED": "Neatbalstīts savienojums (pagaidām tikai PostgreSQL servera savienojumi).",
+      "TIMEOUT": "Pieprasījuma laiks ir beidzies. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "RATE": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc minūtes."
+    }
+  },
+  "learn": {
+    "title": "DBA mācības",
+    "intro": "SQLP/DAP prakses jautājumi, pielāgošanas gadījumu grāmata un Oracle/Tibero/PostgreSQL salīdzināšanas vārdnīca. Darbojas bez saites; izvēlieties saiti, lai redzētu arī jūsu schema.pi standarta tipa kartējumu.",
+    "loading": "Ielādē…",
+    "tabs": {
+      "quiz": "Prakses jautājumi",
+      "cases": "Pielāgošanas gadījumi",
+      "dict": "DBMS vārdnīca"
+    },
+    "topics": {
+      "INDEX": "Indeksu skenēšana",
+      "JOIN": "Savienošanas metodes",
+      "PARTITION": "Partīciju apgriešana",
+      "NORMAL": "Normalizācija",
+      "NAMING": "Standarta nosaukšana",
+      "ISOLATION": "Izolācijas līmeņi",
+      "LOCK": "Bloķēšana"
+    },
+    "levels": {
+      "1": "Pamata",
+      "2": "Vidējais",
+      "3": "Padziļināts"
+    },
+    "quiz": {
+      "score": "Mans progress",
+      "scoreLine": "Atrisināti {solved} no {total} · {correct} pareizi",
+      "right": "Pareizi",
+      "wrong": "Nepareizi",
+      "retry": "Mēģināt vēlreiz",
+      "prevRight": "Iepriekš pareizi",
+      "prevWrong": "Iepriekš nepareizi"
+    },
+    "cases": {
+      "notice": "Visi gadījumi ir pašu rakstīti mācību piemēri; skaitļi ir ilustratīvi (nav klientu datu).",
+      "problem": "Problēmas SQL",
+      "plan": "Plāna kopsavilkums",
+      "cause": "Cēlonis",
+      "fix": "Izlabots SQL",
+      "effect": "Efekts"
+    },
+    "cats": {
+      "ALL": "Visi",
+      "TYPE": "Datu tipi",
+      "FUNC": "Funkcijas",
+      "PAGING": "Lapu numerācija",
+      "SEQ": "Sekvences",
+      "DATE": "Datumi",
+      "SYNTAX": "Sintakse"
+    },
+    "dict": {
+      "search": "Meklēt (piemēram, NVL, LIMIT)",
+      "item": "Vienums",
+      "note": "Piezīme",
+      "empty": "Nav atbilstošu vienumu",
+      "loading": "Ielādē…",
+      "liveTitle": "Manas tēmas standarta tipa kartējums",
+      "liveIntro": "Izvēlieties saiti, lai ielādētu schema.pi DBMS profilu (loģiskais → fiziskais tips). Vārdnīca darbojas bez saites.",
+      "liveLoad": "Ielādēt tipa kartējumu",
+      "lgcType": "Loģiskais tips"
+    }
+  },
+  "link2": {
+    "title": "schema.pi savienojums",
+    "intro": "Reģistrējiet savienojuma marķieri, lai izmantotu schema.pi tēmas DB savienojumus dbms.pi. Marķieri tiek glabāti šifrēti, un netiek glabāti nekādi rindu dati no jūsu datu bāzēm.",
+    "howTitle": "Kā izsniegt savienojuma marķieri",
+    "how1": "Piesakieties schema.pi un atveriet tēmu, ar kuru vēlaties izveidot savienojumu",
+    "how2": "Dodieties uz Tēma → Iestatījumi → Savienojuma marķieris un nospiediet 'Izsniegt marķieri' (apgabala administrators vai DA loma)",
+    "how3": "Kopējiet marķieri, kas sākas ar slk_ — tas tiek parādīts tikai vienu reizi, kad tas tiek izsniegts",
+    "how4": "Ielīmējiet to zemāk un reģistrējiet",
+    "openSchema": "Atvērt schema.pi",
+    "registerTitle": "Reģistrēt savienojumu",
+    "tokenLabel": "Savienojuma marķieris",
+    "tokenPlaceholder": "slk_…",
+    "register": "Reģistrēt",
+    "registering": "Pārbauda…",
+    "registered": "Tēma '{area}' tagad ir savienota",
+    "replaced": "Aizstāts tēmas '{area}' marķieris",
+    "myLinks": "Mani savienojumi",
+    "empty": "Nav reģistrētu savienojumu",
+    "loading": "Ielādē…",
+    "regDtm": "Reģistrēts {dtm}",
+    "remove": "Atvienot",
+    "removeConfirm": "Atvienot '{area}'? Ekrāni, kas izmanto šo savienojumu, vairs nevarēs tam piekļūt.",
+    "prev": "Iepriekšējais",
+    "next": "Nākamais",
+    "statusTitle": "Savienojuma statuss",
+    "noConns": "Šajā tēmā nav DB savienojumu (pievienojiet vienu schema.pi)",
+    "colConn": "Savienojums",
+    "colDbms": "DBMS",
+    "colMthd": "Metode",
+    "colHost": "Resursdators",
+    "colTest": "Pēdējais tests",
+    "colAgent": "Aģents pēdējo reizi redzēts",
+    "never": "Nav",
+    "retry": "Mēģināt vēlreiz",
+    "pickerLink": "Saite",
+    "pickerConn": "Savienojums",
+    "pickerEmpty": "Nav savienojumu —",
+    "pickerGo": "reģistrējiet vienu vietnē /connect",
+    "errors": {
+      "LINK_AUTH": "Savienojuma marķieris ir beidzies vai atsaukts. Izsniedziet jaunu marķieri schema.pi un reģistrējiet to vēlreiz",
+      "LINK_SCOPE": "Šis savienojums nepieder saistītajai tēmai",
+      "LINK_DOWN": "Nevar sasniegt schema.pi. Lūdzu, mēģiniet vēlreiz pēc brīža",
+      "LINK_NOT_FOUND": "Savienojums nav atrasts",
+      "LINK_DUP": "Reģistrācija jau notiek. Lūdzu, mēģiniet vēlreiz",
+      "CONN_UNSUPPORTED": "Neatbalstīts savienojums (pagaidām tikai PostgreSQL servera savienojumi)",
+      "Q_UNKNOWN": "Nezināms vaicājums",
+      "SQL_NOT_SELECT": "Var palaist tikai vienu SELECT (vai WITH) paziņojumu",
+      "PGSS_MISSING": "Mērķa DB nav instalēts pg_stat_statements paplašinājums",
+      "TIMEOUT": "Pieprasījuma laiks ir beidzies",
+      "RATE": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc minūtes",
+      "INVALID_INPUT": "Ielīmējiet pilnu savienojuma marķieri, kas sākas ar slk_"
+    }
+  },
+  "migration": {
+    "title": "Datu migrācija (PiMig)",
+    "intro": "Aprēķina tabulas ielādes secību no attiecībām jūsu schema.pi dizaina modelī, organizē bloku izmēru, paralēlismu un pārejas kontrolsarakstu, kā arī ģenerē verifikācijas SQL, ko jūs pats palaižat avotā un mērķī. Šis ekrāns tikai plāno un pārbauda — tas nepārvieto datus un nelasa klientu DB rindas.",
+    "needLink": "Vispirms izvēlieties schema.pi saiti. Ja jums nav nevienas, reģistrējiet marķieri sadaļā 'Savienot'.",
+    "loading": "Ielādē…",
+    "newPlan": "Jauns migrācijas plāns",
+    "project": "Projekts",
+    "projectPick": "Izvēlieties projektu",
+    "planNm": "Plāna nosaukums",
+    "planNmHint": "Pēc noklusējuma projekta nosaukums",
+    "create": "Izveidot plānu",
+    "creating": "Veido…",
+    "snapHint": "Dizains šajā brīdī (tabulu, kolonnu un attiecību nosaukumi) tiek fiksēts kā momentuzņēmums. Izveidojiet jaunu plānu, kad modelis mainās.",
+    "plans": "Migrācijas plāni",
+    "prev": "Iepriekšējais",
+    "next": "Nākamais",
+    "sts": {
+      "DRAFT": "Melnraksts",
+      "READY": "Gatavs"
+    },
+    "del": "Dzēst",
+    "delConfirm": "Dzēst šo plānu?",
+    "snapInfo": "Momentuzņēmums: {tables} tabulas · {rels} attiecības",
+    "dropped": "({n} attiecības bez fiziskām tabulām ir izslēgtas no pasūtīšanas)",
+    "chunkSize": "Bloka izmērs (rindas/izpilde)",
+    "parallel": "Paralēlisms (tabulas vienlaikus)",
+    "saveOpts": "Saglabāt opcijas",
+    "optsHint": "Paralēlisms ir vienlaikus ielādējamo tabulu skaits vienā līmenī. Bloka izmērs ir izpildes dzinēja izmantotā izpildes vienība (rindas).",
+    "order": "Ielādes secība",
+    "orderHint": "Topoloģiski sakārtots pēc dizaina attiecībām (nevis fiziskām FK), lai vecāktabulas būtu pirmās. Tabulas vienā līmenī nav atkarīgas viena no otras un var ielādēt paralēli.",
+    "cycles": "{n} cirkulāras grupas — ievietotas vienā līmenī. Iestatiet to secību manuāli un atlieciet atsauču pārbaudes līdz pēc ielādes.",
+    "selfRefs": "Pašatsauces (hierarhiskas) tabulas — vispirms ielādējiet vecākrindas tabulā",
+    "level": "Līmenis {n}",
+    "checklist": "Pārejas kontrolsaraksts",
+    "toReady": "Atzīmēt kā gatavu",
+    "toDraft": "Atpakaļ uz melnrakstu",
+    "readyNeedAll": "Pirms plāna atzīmēšanas kā gatava pārbaudiet katru vienumu.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC nodošanas punkts",
+        "desc": "Pirms sākotnējās ielādes ierakstiet konsekventu avota punktu (PG LSN · Oracle/Tibero SCN · aptaujai, sākuma laiks mīnus pārklāšanās logs), sāciet CDC no tā un absorbējiet dublikātus nodošanas logā ar upsertiem."
+      },
+      "valueConv": {
+        "title": "Vērtību konvertēšana",
+        "desc": "Noteikumi ir iestatīti tukšai virknei = NULL, CHAR tukšumu aizpildīšanai, NUMBER bez precizitātes → NUMERIC, DATE ar laiku → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR garums un LONG·RAW."
+      },
+      "charset": {
+        "title": "Rakstzīmju kopa",
+        "desc": "Avota rakstzīmju kopa (KO16MSWIN949, UTF8, …) ir apstiprināta, ar kolonnām, kas pārpildās daudzbaitu pieauguma dēļ, un nekonvertējamu rakstzīmju izolāciju."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB tiek straumēti blokos (izmēra un atmiņas ierobežojumi) un pārbaudīti pēc garuma + jaucējvērtības."
+      },
+      "seqResync": {
+        "title": "Sekvences atkārtota sinhronizācija",
+        "desc": "Pēc ielādes mērķa sekvences·identitātes tiek iestatītas uz max(atslēga)+1."
+      },
+      "timezone": {
+        "title": "Laika josla · sistēmas kolonnas",
+        "desc": "Tiek iestatīta interpretācijas laika josla vērtībām bez tās (piemēram, Asia/Seoul), modificēšanas laika trigeri ielādes laikā nepārrakstīs avota laika zīmogus, un tiek iestatīti izveidotāja/modificētāja aizstāšanas noteikumi."
+      },
+      "backpressure": {
+        "title": "Pretspiediens · mērķa slodze",
+        "desc": "Samaziniet bloka izmēru un paralēlismu mērķa aizkavēšanās, WAL pieauguma vai bloķēšanas gaidīšanas gadījumā; veidojiet ne-PK indeksus pēc ielādes un pēc tam palaidiet ANALYZE·VACUUM."
+      }
+    },
+    "verify": "Verifikācijas SQL",
+    "verifyHint": "Ģenerē skaitīšanas, skaitliskās kolonnas summas, dublikātu atslēgu un atslēgu jaucējvērtību vaicājumus katrai tabulai ielādes secībā. Palaidiet tos paši avotā un mērķī un salīdziniet (šis ekrāns tos neizpilda).",
+    "noHashOracle": "Oracle·Tibero jaucējfunkcijas un teksta atveidošana atšķiras no PostgreSQL, tāpēc jaucējvaicājumi tiek izlaisti — salīdziniet skaitījumus, summas un dublikātu atslēgas.",
+    "copy": "Kopēt",
+    "copied": "Nokopēts",
+    "copyFail": "Nevarēja kopēt. Atlasiet tekstu un nokopējiet to manuāli.",
+    "engine": {
+      "title": "Izpilde·restartēšana · mēģinājums·atcelšana",
+      "body": "Faktiskā migrācijas izpilde (kontrolpunkti, pretspiediens, kļūdu rindu izolācija) un mēģinājums, atcelšana un CDC sākuma punkta ierakstīšana tiks nodrošināta pēc darbinieka aģenta drošības modeļa (A10) pabeigšanas. Pašlaik tas aptver plānošanu, pārbaudes un verifikācijas SQL."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi saite tiek sagatavota. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "LINK_DOWN": "Nevar sasniegt schema.pi. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "LINK_AUTH": "Saites pilnvaras derīguma termiņš ir beidzies vai tā ir atsaukta. Izsniedziet jaunu pilnvaru schema.pi un reģistrējiet to vēlreiz.",
+      "LINK_NOT_FOUND": "Saite nav atrasta. Lūdzu, izvēlieties saiti vēlreiz.",
+      "LINK_SCOPE": "Šis projekts nepieder saites taksonomijai.",
+      "TIMEOUT": "Pieprasījuma laiks ir beidzies. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "RATE": "Pārāk daudz pieprasījumu. Mēģiniet vēlreiz pēc minūtes.",
+      "MIG_NO_TABLES": "Šim projektam nav fizisku tabulu, ko migrēt. Vispirms konvertējiet uz fizisku schema.pi.",
+      "MIG_CHECK_INCOMPLETE": "Pirms plāna atzīmēšanas kā gatava pārbaudiet katru pārejas kontrolsaraksta vienumu.",
+      "NOT_FOUND": "Plāns nav atrasts."
+    }
+  },
+  "monitor": {
+    "title": "Uzraudzības centrs",
+    "collectNote": "Datu vākšana notiek schema.pi — migrācija plānota (D7). Šī lapa nolasa schema.pi monitora kopsavilkumu.",
+    "noLink": "Vispirms atlasiet vai reģistrējiet schema.pi saiti.",
+    "goConnect": "Reģistrēt saiti",
+    "period": "Periods",
+    "periods": {
+      "30": "30 min",
+      "60": "1 stunda",
+      "360": "6 stundas",
+      "1440": "24 stundas"
+    },
+    "refresh": "Atsvaidzināt",
+    "loading": "Ielādē…",
+    "updatedAt": "{area} · no {time} (automātiska atsvaidzināšana ik pēc 30s)",
+    "appTitle": "Lietotnes veiktspēja",
+    "dbTitle": "DB statuss pēc savienojuma",
+    "urlTitle": "URL pārbaudes",
+    "empty": "Nav datu, ko parādīt.",
+    "breachTitle": "{n} sliekšņa pārkāpumi",
+    "rulesTitle": "Sliekšņa noteikumi",
+    "rulesNote": "Noteikumi tiek saglabāti šai saitei un tiek novērtēti pret saņemto kopsavilkumu; pārkāpumi tiek apzīmēti ar sarkanu apmali (paziņojumi tiks saņemti vēlāk).",
+    "metric": "Metrika",
+    "conn": "Savienojums",
+    "allConns": "Visi savienojumi",
+    "op": "Salīdzināt",
+    "threshold": "Slieksnis",
+    "thrInvalid": "Ievadiet skaitli slieksnim.",
+    "addRule": "Pievienot noteikumu",
+    "noRules": "Vēl nav noteikumu.",
+    "enable": "Iespējot",
+    "disable": "Atspējot",
+    "delete": "Dzēst",
+    "delConfirm": "Dzēst šo noteikumu?",
+    "aiNote": "AI incidentu analīze un labojumu apstiprināšana joprojām notiek schema.pi monitorā.",
+    "aiLink": "Atvērt schema.pi monitoru",
+    "metrics": {
+      "APP_TPS": "TPS (pieprasījumi/s)",
+      "APP_ERR_PCT": "Kļūdu līmenis (%)",
+      "APP_SLOW_CNT": "Lēni pieprasījumi",
+      "APP_AVG_MS": "Vidējā atbilde (ms)",
+      "DB_SESS_CNT": "Sesijas",
+      "DB_LOCK_WAIT_CNT": "Bloķēšanas gaidīšanas",
+      "DB_CACHE_HIT_PCT": "Kešatmiņas trāpījums (%)",
+      "DB_SIZE_MB": "DB izmērs (MB)",
+      "URL_RSP_MS": "URL atbilde (ms)",
+      "URL_FAIL_CNT": "URL kļūmes"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Vispirms atlasiet saiti.",
+      "NOT_IMPLEMENTED": "schema.pi saite tiek sagatavota. Lūdzu, mēģiniet vēlreiz vēlāk.",
+      "LINK_AUTH": "Saites pilnvaras ir nederīgas vai tās derīguma termiņš ir beidzies. Izsniedziet jaunu pilnvaru schema.pi un reģistrējiet to.",
+      "LINK_SCOPE": "Šī saite nevar piekļūt šai taksonomijai.",
+      "RATE": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "TIMEOUT": "schema.pi atbild lēni. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "RULE_LIMIT": "Līdz 50 noteikumiem katrai saitei.",
+      "NOT_FOUND": "Noteikums nav atrasts."
+    }
+  },
+  "ops": {
+    "title": "DB operāciju drošība",
+    "loading": "Ielādē…",
+    "pickFirst": "Vispirms atlasiet saiti un savienojumu augstāk",
+    "run": "Palaist diagnostiku",
+    "running": "Diagnostika…",
+    "noRun": "Vēl nav diagnostikas. Nospiediet \"Palaist diagnostiku\"",
+    "lastRun": "Pēdējā diagnostika {dtm}",
+    "readOnly": "Diagnostika tikai nolasa (SELECT). Padoms ir ceļvedis un ir atkarīgs no servera atmiņas, slodzes un darba slodzes",
+    "truncated": "Pārāk daudz objektu — tika pārbaudīti tikai pirmie 500",
+    "paramsNote": "Kopējā servera atmiņa nav zināma, tāpēc tā tiek aprēķināta no shared_buffers ≈ 25% no RAM. random_page_cost pieņem SSD",
+    "auditNote": "Tabulas ar izslēgtu RLS un neizmantoti konti tiks pārbaudīti, tiklīdz saites vaicājums tos atbalstīs",
+    "replNote": "Bāzes līnija ir Active-Standby (A-S) — viens primārais + gaidīšanas režīms. Atkārtošanas aizkave ≥ 5s = brīdinājums, ≥ 60s = risks (izmērītā RPO atsauce)",
+    "lagIdle": "Nav izmaiņu",
+    "pager": "Lapu numerācija",
+    "prev": "Iepriekšējais",
+    "next": "Nākamais",
+    "tabs": {
+      "params": "Parametri",
+      "audit": "Konti un privilēģijas",
+      "backup": "Dublēšana un atjaunošana",
+      "repl": "Replikācija un DR",
+      "history": "Vēsture"
+    },
+    "level": {
+      "OK": "Labi",
+      "WARN": "Brīdinājums",
+      "RISK": "Risks"
+    },
+    "role": {
+      "primary": "Šis savienojums = Primārais",
+      "standby": "Šis savienojums = Gaidīšanas režīms",
+      "unknown": "Loma nav zināma"
+    },
+    "col": {
+      "level": "Spriedums",
+      "item": "Vienums",
+      "value": "Vērtība",
+      "reason": "Detaļas",
+      "standby": "Gaidīšanas režīms",
+      "state": "Statuss",
+      "sync": "Sinhronizācija",
+      "lag": "Atkārtošanas aizkave"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLS lomas",
+      "bypass_ok": "BYPASSRLS lomas",
+      "no_expiry": "Paroles derīguma termiņš",
+      "expiry_ok": "Paroles derīguma termiņš",
+      "public_grant": "PUBLIC piešķīrumi",
+      "public_ok": "PUBLIC piešķīrumi",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Pēdējais arhivētais WAL",
+      "arc_stale": "Pēdējais arhivētais WAL",
+      "arc_recent": "Pēdējais arhivētais WAL",
+      "arc_failing": "WAL arhivēšanas kļūme"
+    },
+    "rules": {
+      "sb_default": "Pēc noklusējuma (128 MB). Uz īpaša servera ieteicams aptuveni 25% no RAM",
+      "sb_ok": "Iestatīts virs noklusējuma",
+      "wm_over": "max_connections × work_mem pārsniedz aprēķināto atmiņu. Vienlaicīgas kārtošanas risks, ka beigsies atmiņa",
+      "wm_default": "Pēc noklusējuma (4 MB). Lielas kārtošanas un jaucējvērtības var pārpildīties uz disku",
+      "wm_ok": "Saprātīgā diapazonā",
+      "mwm_default": "Pēc noklusējuma (64 MB). VACUUM un indeksu veidošana var būt lēna; apsveriet 256 MB vai vairāk",
+      "mwm_ok": "Iestatīts virs noklusējuma",
+      "av_on": "autovacuum ir ieslēgts",
+      "av_off": "autovacuum ir izslēgts. Augsts tabulas uzpūšanās un transakciju ID aptīšanas risks",
+      "conn_high": "max_connections ir augsts. Katrs savienojums izmanto atmiņu; ieteicams izmantot savienojumu pūlu (PgBouncer utt.)",
+      "conn_ok": "Saprātīgā diapazonā",
+      "lmd_off": "Lēnu vaicājumu reģistrēšana ir izslēgta (-1). Ieteicams ap 1000 ms",
+      "lmd_all": "Katrs paziņojums tiek reģistrēts (0). Liela reģistrēšanas slodze",
+      "lmd_ok": "Lēnu vaicājumu reģistrēšana ir ieslēgta",
+      "st_off": "Nav servera mēroga paziņojumu taimauta (0). Iestatiet ierobežojumus katrai lomai vai lietojumprogrammai",
+      "st_ok": "Paziņojumu taimauts ir iestatīts",
+      "iit_off": "Nav dīkstāves transakcijā taimauta (0). Var izraisīt bloķēšanu un uzpūšanos",
+      "iit_ok": "Dīkstāves transakcijā taimauts ir iestatīts",
+      "ckpt_short": "Kontrolpunkta intervāls ir 5 minūtes vai mazāk. Apsveriet 10–15 minūtes lielas rakstīšanas slodzes gadījumā",
+      "ckpt_ok": "Saprātīgā diapazonā",
+      "wal_minimal": "wal_level=minimal padara PITR un replikāciju neiespējamu. Izmantojiet replica vai augstāku",
+      "wal_ok": "WAL līmenis atbalsta PITR un replikāciju",
+      "rpc_hdd": "HDD noklusējums (4). SSD gadījumā ieteicams 1.1–2",
+      "rpc_ok": "Piemērots SSD",
+      "super_many": "Divi vai vairāk superuseri. Saglabājiet vienu administrēšanai un piešķiriet citiem tikai nepieciešamās privilēģijas",
+      "super_ok": "Ne vairāk kā viens superuser",
+      "bypass_rls": "Pastāv lomas, kas nav superuseri un apiet rindu līmeņa drošību",
+      "bypass_ok": "Nav RLS apietošu lomu",
+      "no_expiry": "Pieteikšanās lomas bez paroles derīguma termiņa. Iestatiet VALID UNTIL personīgajiem kontiem",
+      "expiry_ok": "Visām pieteikšanās lomām ir derīguma termiņš",
+      "public_grant": "PUBLIC (katrai lomai) ir tabulas privilēģijas. Rakstīšanas privilēģijas ir riskantas",
+      "public_ok": "Nav tabulas privilēģiju, kas piešķirtas PUBLIC",
+      "arc_on": "WAL arhivēšana (archive_mode) ir ieslēgta",
+      "arc_off": "WAL arhivēšana ir izslēgta, tāpēc punktā-laikā atjaunošana (PITR) nav iespējama",
+      "arc_cmd_empty": "archive_mode ir ieslēgts, bet archive_command un archive_library ir tukši",
+      "arc_never": "Vēl nav arhivēts neviens WAL",
+      "arc_stale": "Pēdējais WAL arhīvs ir vecāks par 24 stundām",
+      "arc_recent": "WAL arhivēts pēdējo 24 stundu laikā",
+      "arc_failing": "WAL arhivēšana pašlaik neizdodas. Pārbaudiet disku, atļaujas un mērķa ceļu",
+      "repl_is_standby": "Šis savienojums ir gaidīšanas režīmā (atjaunošanas režīms). Pārbaudiet aizkavi no primārā savienojuma",
+      "repl_none": "Nav pievienots gaidīšanas režīms. Nav katastrofu atjaunošanas (DR) iestatījumu",
+      "repl_ok": "Gaidīšanas režīmi straumē normāli",
+      "repl_lag": "Gaidīšanas režīms atpaliek vai nestraumē"
+    },
+    "manual": {
+      "title": "Manuālais kontrolsaraksts",
+      "intro": "Dublēšanas un atjaunošanas prakses, kuras nevar pārbaudīt automātiski. Atzīmējiet, kad apstiprināts, un atzīmējiet pierādījumus",
+      "memo": "Piezīme (piemēram, rīks, grafiks, pēdējā pārbaude)",
+      "save": "Saglabāt",
+      "updated": "Atjaunināts {dtm}",
+      "items": {
+        "base_backup": "Pilna dublēšana (pg_basebackup utt.) veiksmīgi pabeigta pēdējo 7 dienu laikā",
+        "offsite_copy": "Dublējuma kopija tiek glabāta ārpus vietas (citā reģionā vai krātuvē)",
+        "restore_rehearsal": "Šajā ceturksnī tika veikta atjaunošanas mēģinājums un reģistrēts tā ilgums",
+        "pitr_target": "PITR procedūra un mērķa RPO/RTO ir dokumentēti",
+        "backup_encrypt": "Dublējuma faili ir šifrēti un piekļuve ir ierobežota",
+        "retention": "Dublējuma glabāšanas periods un dzēšanas politika ir definēti"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi saite tiek sagatavota. Lūdzu, mēģiniet vēlreiz pēc brīža",
+      "CONN_UNSUPPORTED": "Šis savienojums vēl netiek atbalstīts (tikai tiešs PostgreSQL)",
+      "TIMEOUT": "Mērķa DB atbildēja pārāk lēni. Lūdzu, mēģiniet vēlreiz pēc brīža",
+      "RATE": "Pārāk daudz zvanu. Mēģiniet vēlreiz pēc minūtes",
+      "Q_UNKNOWN": "Neatbalstīts vaicājums. Pārbaudiet schema.pi saites API versiju",
+      "INVALID_INPUT": "Nederīga saites vai savienojuma izvēle"
+    }
+  },
+  "perf": {
+    "title": "Veiktspēja",
+    "loading": "Ielādē…",
+    "pickFirst": "Vispirms atlasiet saiti un savienojumu augstāk",
+    "pager": "Lapu numerācija",
+    "tabs": {
+      "collect": "Apkopot",
+      "top": "Lēni vaicājumi",
+      "health": "Tabulu un indeksu veselība",
+      "trend": "Izmēru tendence",
+      "activity": "Aktivitāte un bloķēšana"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi saite tiek sagatavota. Lūdzu, mēģiniet vēlreiz vēlāk",
+      "CONN_UNSUPPORTED": "Šis savienojums vēl netiek atbalstīts (tikai tiešie PostgreSQL savienojumi)",
+      "RATE": "Pārāk daudz pieprasījumu. Mēģiniet vēlreiz pēc minūtes",
+      "LINK_AUTH": "Saites pilnvaras derīguma termiņš ir beidzies vai tā ir atsaukta. Reģistrējiet pilnvaru vēlreiz savienojuma lapā",
+      "LINK_SCOPE": "Šis savienojums nepieder saites tēmai",
+      "Q_UNKNOWN": "Neatbalstīts vaicājums. Pārbaudiet schema.pi saites API versiju",
+      "INVALID_INPUT": "Saites vai savienojuma vērtība ir nederīga"
+    },
+    "pgss": {
+      "title": "Kā iespējot pg_stat_statements",
+      "note": "Pašmitinātam PostgreSQL ir nepieciešams arī pg_stat_statements shared_preload_libraries (postgresql.conf) un restartēšana. Tabulu, indeksu un izmēru statistika darbojas bez tā"
+    },
+    "collect": {
+      "intro": "Nospiežot \"Apkopot tagad\", vienreiz tiek nolasīta augstākā vaicājumu statistika, tabulas, indeksi un izmēri un saglabāti kā momentuzņēmums. Apkopojiet vismaz divas reizes, lai redzētu izmaiņas un izmēru tendences",
+      "run": "Apkopot tagad",
+      "running": "Apkopo…",
+      "done": "Apkopots {dtm} — {qry} vaicājumi · {tbl} tabulas · {idx} indeksi"
+    },
+    "top": {
+      "sort": "Kārtot",
+      "sortTotal": "Kopējais laiks",
+      "sortMean": "Vidējais laiks",
+      "sortCalls": "Izsaukumi",
+      "empty": "Vēl nav momentuzņēmumu. Nospiediet \"Apkopot tagad\" cilnē \"Apkopot\"",
+      "range": "Izmaiņas starp {from} → {to}",
+      "first": "Pirmais momentuzņēmums {dtm} — kumulatīvās vērtības (izmaiņas no nākamā momentuzņēmuma)",
+      "query": "Vaicājums (literāļi maskēti)",
+      "calls": "Izsaukumi",
+      "totalMs": "Kopējais ms",
+      "meanMs": "Vidējais ms",
+      "rows": "Rindas",
+      "reset": "Konstatēta statistikas atiestatīšana — rādīts kā kumulatīvs"
+    },
+    "health": {
+      "empty": "Vēl nav momentuzņēmumu. Cilnē Vākt nospiediet Vākt tūlīt",
+      "basis": "Balstīts uz momentuzņēmumu plkst. {dtm}",
+      "unusedIdx": "Neizmantoti indeksi",
+      "unusedIdxHint": "Indeksi, kas nekad nav izmantoti kopš pēdējās statistikas atiestatīšanas (pēc lieluma). Nenometiet PK vai unikālo ierobežojumu indeksus",
+      "fullScan": "Pārmērīga pilna skenēšana",
+      "fullScanHint": "Tabulas ar 1000+ aktīvām rindām, kurās pilna skenēšana ir vismaz puse — pārskatiet indeksus filtra kolonnās",
+      "dead": "Pārmērīgas mirušās korteles",
+      "deadHint": "Mirušo kortelu attiecība 20% vai vairāk — pārbaudiet VACUUM un autovacuum iestatījumus",
+      "none": "Nav",
+      "scans": "skenēšanas"
+    },
+    "trend": {
+      "limit": "Lieluma slieksnis",
+      "empty": "Nav momentuzņēmumu pēdējās 30 dienās",
+      "now": "Pašreizējais lielums",
+      "perDay": "Pieaugums dienā",
+      "needMore": "Nepieciešami 2+ momentuzņēmumi",
+      "daysLeft": "Sasniegs {gb} GB",
+      "noGrowth": "Nav pieauguma tendences",
+      "days": "aptuveni pēc {n} dienām"
+    },
+    "activity": {
+      "refresh": "Atsvaidzināt",
+      "live": "Tiešraides vaicājums — netiek saglabāts",
+      "sessions": "Sesijas aktivitāte",
+      "locks": "Bloķēšanas",
+      "none": "Nav"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Cauruļvadi",
+    "intro": "Pārbaudiet, vai avota DB ir gatava izmaiņu datu uztveršanai (CDC), un izveidojiet avota → transformācijas → mērķa cauruļvadus. Šajā posmā tiek veikta tikai pārbaude un projektēšana; klientu rindu dati netiek lasīti vai glabāti.",
+    "needLink": "Vispirms izvēlieties schema.pi saiti iepriekš. Ja jums nav nevienas, reģistrējiet marķieri izvēlnē 'Saite'.",
+    "needConn": "Izvēlieties pārbaudāmo DB savienojumu iepriekš.",
+    "loading": "Ielādē…",
+    "pager": "Lapas",
+    "prev": "Iepriekšējais",
+    "next": "Nākamais",
+    "runTitle": "Palaist un uzraudzīt (7-3 · 7-4)",
+    "runBody": "Cauruļvada izpilde, aizkaves uzraudzība un atkārtota apstrāde būs pieejama pēc darbinieka aģenta un drošības modeļa pabeigšanas. Pagaidām saglabājiet definīcijas kā melnrakstus (DRAFT).",
+    "pre": {
+      "title": "Avota iepriekšēja pārbaude",
+      "intro": "Katrā tabulā tiek pārbaudītas izmaiņu laika kolonnas, mīkstās dzēšanas kolonnas un primārā atslēga, lai ieteiktu uztveršanas metodi (adapteri), un tiek pārbaudīta WAL loģiskās replikācijas gatavība. Tiek izpildīti tikai lasīšanas režīma kataloga un iestatījumu vaicājumi.",
+      "schema": "Shēma (pēc izvēles)",
+      "schemaPh": "Visi",
+      "run": "Veikt iepriekšēju pārbaudi",
+      "running": "Pārbauda…",
+      "sum": "{tables} tabulas · {noPk} bez PK · {deleteUnseen} nevar uztvert dzēšanas",
+      "truncated": "Kataloga vaicājums sasniedza 500 rindu limitu, tāpēc dažas tabulas var trūkt. Norādiet shēmu un pārbaudiet vēlreiz.",
+      "empty": "Nav tabulu, ko pārbaudīt",
+      "colTable": "Tabula",
+      "colChg": "Izmaiņu laika kolonna",
+      "colDel": "Mīkstās dzēšanas kolonna",
+      "colAdapter": "Ieteicamā metode · iemesli",
+      "toDraft": "Izveidot cauruļvada melnrakstu no {n} atlasītajiem"
+    },
+    "ready": {
+      "ok": "WAL loģiskā replikācija gatava — tabulas ar PK var izmantot LOGICAL",
+      "no": "WAL loģiskā replikācija nav gatava — uztveršana, izmantojot aptauju vai atslēgu salīdzināšanu",
+      "senders": "{n} replikācijas savienojumi"
+    },
+    "adapter": {
+      "LOGICAL": "Loģiskā replikācija (WAL)",
+      "POLL": "Izmaiņu laika aptauja",
+      "KEY_DIFF": "Atslēgu momentuzņēmuma atšķirība",
+      "NONE": "Tikai pilna atkārtota ielāde"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Ir izmaiņu laika kolonna",
+      "NO_CHG_COL": "Nav izmaiņu laika kolonnas",
+      "HAS_SOFT_DEL": "Ir mīkstās dzēšanas kolonna",
+      "NO_SOFT_DEL": "Nav mīkstās dzēšanas kolonnas",
+      "HAS_PK": "Ir primārā atslēga",
+      "NO_PK": "Nav primārās atslēgas — nevar identificēt mainītās rindas",
+      "DELETE_UNSEEN": "Aptauja nevar uztvert fiziskās DELETE (ieteicama mīkstās dzēšanas kolonna)",
+      "LOGICAL_NOT_READY": "Var pārslēgties uz LOGICAL, kad WAL loģiskā replikācija ir gatava",
+      "FULL_RELOAD_ONLY": "Nav PK vai izmaiņu laika kolonnas, tāpēc nav inkrementālās uztveršanas — pievienojiet PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level nav logical (tā maiņai nepieciešama DB restartēšana)",
+      "NO_SLOTS": "max_replication_slots ir 0",
+      "NO_SENDERS": "max_wal_senders ir 0",
+      "IS_STANDBY": "Gaidstāves serveris — veiciet loģisko replikāciju no primārā servera",
+      "SETTINGS_UNKNOWN": "Nevarēja nolasīt iestatījumus, gatavība nav zināma"
+    },
+    "ed": {
+      "title": "Cauruļvada definīcijas",
+      "draftOnly": "Tikai projektēšana — saglabāts kā melnraksts (DRAFT)",
+      "new": "Jauns cauruļvads",
+      "empty": "Nav saglabātu cauruļvadu",
+      "manual": "Manuāli",
+      "edit": "Rediģēt",
+      "remove": "Dzēst",
+      "removeConfirm": "Dzēst cauruļvadu '{name}'?",
+      "name": "Nosaukums",
+      "adapter": "Uztveršanas metode",
+      "srcConn": "Avota savienojums",
+      "useCurrentConn": "Izmantot iepriekš izvēlēto savienojumu",
+      "sched": "Grafiks (5 lauku cron, tukšs = manuāli)",
+      "target": "Mērķis",
+      "targetPh": "piem., analītikas DB analytics.public / ezers s3://…",
+      "tables": "Avota tabulas (atdalītas ar jaunu rindu vai komatu)",
+      "steps": "Soļi (avots → transformācija → mērķis)",
+      "op": "Darbība",
+      "notePh": "Apraksts · nosacījums (pēc izvēles)",
+      "addTransform": "Pievienot transformācijas soli",
+      "save": "Saglabāt",
+      "saving": "Saglabā…",
+      "saved": "Saglabāts",
+      "close": "Aizvērt"
+    },
+    "kind": {
+      "SOURCE": "Avots",
+      "TRANSFORM": "Transformācija",
+      "TARGET": "Mērķis"
+    },
+    "sts": {
+      "DRAFT": "Melnraksts"
+    },
+    "check": {
+      "NAME_REQUIRED": "Ievadiet nosaukumu",
+      "CONN_REQUIRED": "Izvēlieties avota savienojumu",
+      "CRON_INVALID": "Ievadiet grafiku kā 5 lauku cron (min stunda diena mēnesis nedēļas diena; cipari, *, ',', -, /)",
+      "OP_REQUIRED": "Ievadiet darbību katram solim",
+      "STEPS_TOO_FEW": "Nepieciešami avota un mērķa soļi",
+      "STEPS_TOO_MANY": "Līdz 20 soļiem",
+      "STEP_FIRST_SOURCE": "Pirmajam solim jābūt avotam",
+      "STEP_LAST_TARGET": "Pēdējam solim jābūt mērķim",
+      "STEP_MIDDLE_TRANSFORM": "Pa vidu var būt tikai transformācijas soļi"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Cauruļvads ar šādu nosaukumu jau pastāv. Izmantojiet citu nosaukumu",
+      "CONN_UNSUPPORTED": "Šo savienojumu vēl nevar pārbaudīt (pagaidām tikai PostgreSQL tiešie servera savienojumi)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL pielāgošanas laboratorija",
+    "intro": "Izvēlieties savienojumu un ievadiet SQL, lai redzētu izpildes plānu kā koku, ar palēninājuma cēloņiem (pilna skenēšana, ligzdotas cilpas, lieli kārtojumi) un SQL anti-modeļiem, kas pārbaudīti pret schema.pi standarta domēniem. Vaicājumi faktiski netiek izpildīti (nav ANALYZE).",
+    "needLink": "Izvēlieties saiti un savienojumu iepriekš, lai skatītu plānus. Anti-modeļa pārbaude darbojas bez saites.",
+    "sqlLabel": "SQL (viens SELECT vai WITH paziņojums)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Rādīt plānu",
+    "explaining": "Ielādē…",
+    "save": "Saglabāt plānu",
+    "saving": "Saglabā…",
+    "saveName": "Etiķete (piem., pirms indeksa pievienošanas)",
+    "saveNote": "Konstantās vērtības SQL un plāna nosacījumos tiek maskētas kā ? saglabājot.",
+    "plan": {
+      "title": "Izpildes plāns",
+      "summary": "Kopējās izmaksas {cost} · {ms}ms",
+      "cost": "izmaksas",
+      "rows": "rindas",
+      "width": "platums"
+    },
+    "warn": {
+      "none": "Nav ievērojamu brīdinājumu.",
+      "SEQ_SCAN_LARGE": "Pilna skenēšana uz {relation} (aptuveni {rows} rindas) — apsveriet indeksu filtra kolonnās.",
+      "NESTED_LOOP_HIGH": "Ligzdotā cilpa rada aptuveni {rows} rindas — apsveriet jaukšanas vai sapludināšanas savienojumu, vai indeksu savienojuma nosacījumā.",
+      "SORT_SPILL": "Kārtošanas lielums ir aptuveni {kb}KB, virs noklusējuma work_mem (4MB); tas var izplūst uz diska."
+    },
+    "lint": {
+      "run": "Pārbaudīt anti-modeļus",
+      "title": "SQL anti-modeļu pārbaude",
+      "none": "Nav atrasti anti-modeļi.",
+      "domainsOff": "Standarta domēnus nevarēja ielādēt; pārbaudīts tikai ar noklusējuma kolonnu sufiksu noteikumiem.",
+      "types": {
+        "num": "ciparu",
+        "date": "datums",
+        "char": "rakstzīme"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — atlasiet tikai nepieciešamās kolonnas (papildu I/O, nav aptveroša indeksa).",
+        "FUNC_ON_COLUMN": "Filtra kolonna {column} ir iekļauta funkcijā vai izteiksmē, tāpēc tās indeksu nevar izmantot — tā vietā transformējiet konstanti.",
+        "LEADING_WILDCARD": "LIKE ar sākuma % nevar izmantot B-tree indeksu — apsveriet pg_trgm GIN indeksu.",
+        "OR_DIFF_COLUMNS": "Nosacījumi dažādās kolonnās ir apvienoti ar OR — apsveriet UNION ALL vai indeksus katrai kolonnai.",
+        "IMPLICIT_CAST": "{column} tiek salīdzināts ar citētu skaitli — saskaņojiet kolonnas un konstantes tipus (netieša tipa pārveidošana).",
+        "NOT_IN_SUBQUERY": "NOT IN (apakšvaicājums) neatgriež neko, ja ir NULL vērtības, un ir lēns — izmantojiet NOT EXISTS.",
+        "NO_WHERE": "Nav WHERE klauzulas — lielā tabulā tas ir pilna skenēšana (pievienojiet nosacījumu vai LIMIT).",
+        "DOMAIN_MISMATCH": "{column} ir {expected} tips pēc standarta domēna, bet tiek salīdzināts ar cita tipa konstanti — netiešā tipa pārveidošana var novērst indeksa izmantošanu."
+      }
+    },
+    "saved": {
+      "title": "Saglabātie plāni · Salīdzināt",
+      "empty": "Nav saglabātu plānu. Skatiet plānu, pēc tam saglabājiet to.",
+      "pick": "Atlasīt plānu salīdzināšanai",
+      "pick2": "Atlasiet divus plānus salīdzināšanai.",
+      "compare": "Salīdzināt divus plānus",
+      "delete": "Dzēst",
+      "cost": "izmaksas",
+      "prev": "Iepriekšējais",
+      "next": "Nākamais",
+      "page": "Lapa {page}"
+    },
+    "diff": {
+      "cost": "Kopējās izmaksas {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Abi plāni ir paredzēti dažādiem SQL (pēc normalizācijas).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Nav izmaiņu plāna mezglos.",
+      "before": "Pirms",
+      "after": "Pēc"
+    },
+    "ai": {
+      "title": "AI pielāgošanas padomi",
+      "badge": "Drīzumā",
+      "body": "Drīzumā (pēc apstiprināšanas un ietekmes mērīšanas procedūrām) — padomi tiks ģenerēti no SQL ar maskētām konstantēm un reģistrēti kā piemēroti tikai pēc DA apstiprināšanas un izmērītas ietekmes."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi saites funkcija tiek sagatavota. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+      "LINK_AUTH": "Saites marķieris ir beidzies vai atsaukts. Izsniedziet jaunu marķieri schema.pi un reģistrējiet to vēlreiz.",
+      "LINK_SCOPE": "Šī saite nevar izmantot šo savienojumu (atšķirīga klasifikācijas shēma).",
+      "CONN_UNSUPPORTED": "Šis savienojuma veids vēl netiek atbalstīts (tikai PostgreSQL servera savienojumi).",
+      "Q_UNKNOWN": "Neatbalstīts vaicājums.",
+      "SQL_NOT_SELECT": "Plāni ir pieejami tikai vienam paziņojumam, kas sākas ar SELECT vai WITH.",
+      "TIMEOUT": "Pieprasījuma laiks ir beidzies (5 sekundes). Saīsiniet SQL vai mēģiniet vēlreiz vēlāk.",
+      "RATE": "Pārāk daudz pieprasījumu. Mēģiniet vēlreiz pēc minūtes.",
+      "PAYLOAD_TOO_LARGE": "Plāns ir pārāk liels, lai to saglabātu.",
+      "LINK_NOT_FOUND": "Saite nav atrasta. Lūdzu, atlasiet saiti vēlreiz."
+    }
+  },
+  "nav": {
+    "label": "Funkcijas",
+    "connect": "Savienot",
+    "sqlLab": "SQL pielāgošana",
+    "perf": "Veiktspēja",
+    "monitor": "Uzraudzība",
+    "drift": "Novirze",
+    "migration": "Migrācija",
+    "pipeline": "Cauruļvads",
+    "analytics": "Analītika",
+    "ops": "Darbības drošība",
+    "learn": "Mācīties"
   }
 }

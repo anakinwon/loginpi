@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Un entorn de treball de DBA i SQLP per executar motors de DB de manera ràpida i segura"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Fes que el teu motor de DB executi les teves dades de manera ràpida i segura",
+    "description": "Un entorn de treball de DBA i SQLP per a plans d'execució, estadístiques i rendiment. schema.pi s'encarrega del disseny i els estàndards; dbms.pi és el seu soci en el costat del motor.",
+    "welcome": "Benvingut/da, {name}.",
+    "featTitle": "Funcions",
+    "featDesc": {
+      "connect": "Registra un testimoni d'enllaç de schema.pi i comprova l'estat de la connexió",
+      "sqlLab": "Arbre de planificació, advertiments, comparació i comprovacions anti-patró contra dominis estàndard",
+      "perf": "Consultes lentes Top-N, salut de taules/índexs, previsió de capacitat, activitat i bloquejos",
+      "monitor": "Resum de mètriques d'aplicacions, DB i URL amb alertes de llindar",
+      "drift": "Compara el model de schema.pi i l'historial de DDL amb el catàleg real, mesura l'efecte de l'índex",
+      "migration": "Ordre de càrrega topològica, fragments, llista de comprovació i SQL de verificació",
+      "pipeline": "Comprovació prèvia de captura de canvis i definicions de pipeline origen→transformació→destí",
+      "analytics": "Tauler de KPI, mapeig de llac de 3 capes i catàleg de conjunts de dades",
+      "ops": "Diagnòstic de només lectura de paràmetres, rols, còpies de seguretat i DR de replicació",
+      "learn": "Preguntes de pràctica de SQLP/DAP, casos d'ajust i diccionari de comparació de DBMS"
+    }
+  },
   "auth": {
     "checking": "Comprovant l'inici de sessió…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "No s'ha pogut crear un codi d'enllaç. Torna-ho a provar més tard.",
     "AUTH_DB_UNAVAILABLE": "No s'ha pogut desar el teu compte, per la qual cosa l'inici de sessió ha fallat. Torna-ho a provar més tard.",
     "LINK_TRY_LIMIT": "Massa codis d'enllaç incorrectes. Torna-ho a provar d'aquí a 15 minuts."
+  },
+  "analytics": {
+    "title": "Analítiques i Llac",
+    "intro": "KPIs d'activitat de dbms, disseny de llac de tres capes i catàleg de conjunts de dades en un sol lloc.",
+    "storageNotice": "L'emmagatzematge del llac (del client o al núvol) encara no s'ha decidit (secció 10 #7 del PRD). De moment només s'emmagatzemen dissenys i mapes de noms, no dades de fila.",
+    "noLink": "Selecciona o registra primer un enllaç de schema.pi.",
+    "goConnect": "Registra un enllaç",
+    "loading": "Carregant…",
+    "refresh": "Actualitza",
+    "kpi": {
+      "title": "Tauler de KPI",
+      "updatedAt": "{area} · a data de {time}",
+      "notBuilt": "No construït",
+      "keys": {
+        "links": "Els meus enllaços",
+        "perf": "Instantànies de rendiment",
+        "drift": "Execucions de deriva",
+        "mig": "Plans de migració",
+        "pipe": "Pipelines",
+        "lake": "Conjunts de dades del llac"
+      },
+      "countsChart": "Totals per funció",
+      "trendTitle": "Instantànies de rendiment dels últims 14 dies",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "No hi ha instantànies de rendiment en els últims 14 dies.",
+      "monTitle": "Resum del monitor de schema.pi (última hora)",
+      "monTps": "Sol·licituds/s",
+      "monErr": "Taxa d'errors",
+      "monAvg": "Resposta mitjana (ms)",
+      "monDb": "Connexions DB",
+      "monFail": "No s'ha pogut carregar el resum del monitor: {msg}"
+    },
+    "lake": {
+      "title": "Disseny de llac de tres capes",
+      "raw": "Raw",
+      "rawDesc": "Carrega els noms i tipus de columnes de la DB d'origen tal com són.",
+      "std": "Estandarditzat",
+      "stdDesc": "Canvia el nom de les columnes a termes estàndard aprovats per schema.pi.",
+      "cur": "Curated",
+      "curDesc": "Conjunts de dades d'anàlisi agrupats per entitat.",
+      "loadProjects": "Carrega projectes",
+      "project": "Projecte",
+      "pickProject": "Tria un projecte",
+      "noProjects": "No hi ha projectes en aquesta àrea.",
+      "noTables": "El model d'aquest projecte no té taules.",
+      "conform": "Conformitat estàndard {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} columnes · {pct}% conforme",
+      "colSrc": "Columna d'origen",
+      "colStd": "Columna estandarditzada",
+      "colType": "Tipus",
+      "colOk": "Format",
+      "ok": "OK",
+      "ng": "Comprova",
+      "pk": "PK",
+      "selectAll": "Selecciona-ho tot",
+      "selected": "{cnt} seleccionats",
+      "save": "Afegeix al disseny del llac",
+      "saved": "S'han afegit {cnt} al catàleg."
+    },
+    "catalog": {
+      "title": "Catàleg de conjunts de dades",
+      "schemaCard": "schema.pi és la font de veritat per a les definicions de conjunts de dades d'anàlisi, la cerca de metadades i el glossari. Aquí només veuràs l'estat de càrrega del llac i la frescor.",
+      "openSchema": "Mostra les definicions a schema.pi",
+      "empty": "Encara no s'han afegit taules al disseny del llac.",
+      "status": {
+        "DSGN": "Només disseny",
+        "LOADED": "Carregat",
+        "FAIL": "Error de càrrega"
+      },
+      "lastLoad": "Última càrrega {time}",
+      "neverLoaded": "Mai carregat",
+      "remove": "Elimina",
+      "removeConfirm": "Vols eliminar {tbl} del catàleg?",
+      "prev": "Anterior",
+      "next": "Següent",
+      "page": "Pàgina {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Selecciona primer un enllaç.",
+      "NOT_FOUND": "No trobat. Comprova si el model ha canviat."
+    }
+  },
+  "drift": {
+    "title": "Deriva Model ↔ DB",
+    "intro": "Compara el model de disseny de schema.pi i l'historial d'aplicació de DDL amb el catàleg de DB en viu per trobar la deriva, i mesura si els índexs dissenyats s'utilitzen realment. Les dades de fila del client mai es llegeixen ni s'emmagatzemen.",
+    "needLink": "Tria primer un enllaç de schema.pi a dalt. Si no en tens cap, registra un testimoni al menú 'Enllaç'.",
+    "needConn": "Tria la connexió de DB per comparar a dalt.",
+    "project": "Projecte",
+    "projectPick": "Selecciona un projecte",
+    "loading": "Carregant…",
+    "run": "Executa la detecció de deriva",
+    "running": "Comparant…",
+    "readOnly": "Només s'executen consultes de catàleg i estadístiques de només lectura.",
+    "applyInSchema": "Aplica les correccions (edicions del model, generació i execució de DDL) a schema.pi, la font de veritat.",
+    "history": "Historial de detecció",
+    "prev": "Anterior",
+    "next": "Següent",
+    "none": "Cap",
+    "model": "Model",
+    "reqNo": "Sol·licitud {id}",
+    "notSaved": "No s'ha pogut desar aquesta execució a l'historial (els resultats es mostren normalment).",
+    "capped": "Massa elements: es mostren els primers {cap} per secció (els recomptes són complets).",
+    "statsMissing": "Les estadístiques d'ús de l'índex no estaven disponibles, per la qual cosa no es va poder jutjar l'ús.",
+    "sum": {
+      "missingTables": "Taules que falten a la DB",
+      "extraTables": "Taules que no estan al model",
+      "colMismatches": "Discrepàncies de columnes",
+      "missingIndexes": "Índexs dissenyats que falten a la DB",
+      "extraIndexes": "Índexs que no estan al model",
+      "ddlMissing": "Objectes desapareguts després de l'aplicació",
+      "unusedIndexes": "Índexs dissenyats no utilitzats"
+    },
+    "sec": {
+      "ddlMissing": "DDL aplicat però que falta a la DB",
+      "missingTables": "Taules al model però que falten a la DB",
+      "extraTables": "Taules a la DB però que no estan al model",
+      "colMismatches": "Discrepàncies de tipus de columna / NULL",
+      "missingIndexes": "Índexs dissenyats que falten a la DB",
+      "extraIndexes": "Índexs només a la DB (excloent PK)",
+      "idxUsage": "Eficàcia de l'índex dissenyat"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi va registrar aquests objectes com a aplicats, però han desaparegut; sospita d'una eliminació manual o una reversió.",
+      "extraTables": "Aquests poden pertànyer a altres projectes o taules del sistema en aquesta connexió.",
+      "idxUsage": "Zero escanejos des de l'últim restabliment d'estadístiques significa no utilitzat. Comprova la finestra d'estadístiques abans d'eliminar."
+    },
+    "kind": {
+      "MISSING": "falta a la DB",
+      "EXTRA": "no al model",
+      "TYPE": "el tipus difereix",
+      "NULL": "la nul·labilitat difereix"
+    },
+    "col": {
+      "idx": "Índex",
+      "scans": "Escanejos",
+      "size": "Mida",
+      "status": "Veredicte"
+    },
+    "usage": {
+      "USED": "En ús",
+      "UNUSED": "Índex dissenyat no utilitzat",
+      "NO_STATS": "Sense estadístiques"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "La funció d'enllaç de schema.pi encara no està a punt. Torna-ho a provar d'aquí a poc.",
+      "LINK_DOWN": "No es pot arribar a schema.pi. Torna-ho a provar d'aquí a poc.",
+      "LINK_AUTH": "El testimoni d'enllaç ha caducat o ha estat revocat. Emet un nou testimoni a schema.pi i registra'l de nou.",
+      "LINK_NOT_FOUND": "Enllaç no trobat. Torna a triar l'enllaç.",
+      "LINK_SCOPE": "Aquesta connexió no pertany a la taxonomia de l'enllaç.",
+      "CONN_UNSUPPORTED": "Connexió no compatible (només connexions de servidor PostgreSQL per ara).",
+      "TIMEOUT": "La sol·licitud ha caducat. Torna-ho a provar d'aquí a poc.",
+      "RATE": "Massa sol·licituds. Torna-ho a provar d'aquí a un minut."
+    }
+  },
+  "learn": {
+    "title": "Aprenentatge de DBA",
+    "intro": "Preguntes de pràctica de SQLP/DAP, un llibre de casos d'ajust i un diccionari de comparació d'Oracle/Tibero/PostgreSQL. Funciona sense enllaç; tria un enllaç per veure també el teu mapeig de tipus estàndard de schema.pi.",
+    "loading": "Carregant…",
+    "tabs": {
+      "quiz": "Pràctica",
+      "cases": "Casos d'ajust",
+      "dict": "Diccionari DBMS"
+    },
+    "topics": {
+      "INDEX": "Escanejos d'índex",
+      "JOIN": "Mètodes de join",
+      "PARTITION": "Poda de particions",
+      "NORMAL": "Normalització",
+      "NAMING": "Nomenclatura estàndard",
+      "ISOLATION": "Nivells d'aïllament",
+      "LOCK": "Bloquejos"
+    },
+    "levels": {
+      "1": "Bàsic",
+      "2": "Intermedi",
+      "3": "Avançat"
+    },
+    "quiz": {
+      "score": "El meu progrés",
+      "scoreLine": "{solved} de {total} resolts · {correct} correctes",
+      "right": "Correcte",
+      "wrong": "Incorrecte",
+      "retry": "Torna a provar",
+      "prevRight": "Anteriorment correcte",
+      "prevWrong": "Anteriorment incorrecte"
+    },
+    "cases": {
+      "notice": "Tots els casos són exemples d'aprenentatge autoescrits; els números són il·lustratius (sense dades de clients).",
+      "problem": "SQL del problema",
+      "plan": "Resum del pla",
+      "cause": "Causa",
+      "fix": "SQL corregit",
+      "effect": "Efecte"
+    },
+    "cats": {
+      "ALL": "Tots",
+      "TYPE": "Tipus de dades",
+      "FUNC": "Funcions",
+      "PAGING": "Paginació",
+      "SEQ": "Seqüències",
+      "DATE": "Dates",
+      "SYNTAX": "Sintaxi"
+    },
+    "dict": {
+      "search": "Cerca (p. ex. NVL, LIMIT)",
+      "item": "Element",
+      "note": "Nota",
+      "empty": "No hi ha elements coincidents",
+      "loading": "Carregant…",
+      "liveTitle": "Mapeig de tipus estàndard de la meva àrea temàtica",
+      "liveIntro": "Tria un enllaç per carregar el perfil de DBMS de schema.pi (tipus lògic → tipus físic). El diccionari anterior funciona sense enllaç.",
+      "liveLoad": "Carrega el mapeig de tipus",
+      "lgcType": "Tipus lògic"
+    }
+  },
+  "link2": {
+    "title": "Connexió a schema.pi",
+    "intro": "Registra un testimoni de connexió per utilitzar les connexions de DB d'una àrea temàtica de schema.pi a dbms.pi. Els testimonis s'emmagatzemen xifrats i no s'emmagatzemen dades de fila de les teves bases de dades.",
+    "howTitle": "Com emetre un testimoni de connexió",
+    "how1": "Inicia sessió a schema.pi i obre l'àrea temàtica a la qual et vols connectar",
+    "how2": "Ves a Àrea temàtica → Configuració → Testimoni de connexió i prem 'Emetre testimoni' (rol d'administrador d'àrea o DA)",
+    "how3": "Copia el testimoni que comença per slk_ — només es mostra una vegada quan s'emet",
+    "how4": "Enganxa'l a continuació i registra'l",
+    "openSchema": "Obre schema.pi",
+    "registerTitle": "Registra la connexió",
+    "tokenLabel": "Testimoni de connexió",
+    "tokenPlaceholder": "slk_…",
+    "register": "Registra",
+    "registering": "Comprovant…",
+    "registered": "L'àrea temàtica '{area}' ja està connectada",
+    "replaced": "S'ha substituït el testimoni de l'àrea temàtica '{area}'",
+    "myLinks": "Les meves connexions",
+    "empty": "No hi ha connexions registrades",
+    "loading": "Carregant…",
+    "regDtm": "Registrat {dtm}",
+    "remove": "Desconnecta",
+    "removeConfirm": "Vols desconnectar '{area}'? Les pantalles que utilitzen aquesta connexió ja no hi podran accedir.",
+    "prev": "Anterior",
+    "next": "Següent",
+    "statusTitle": "Estat de la connexió",
+    "noConns": "No hi ha connexions de DB en aquesta àrea temàtica (afegeix-ne una a schema.pi)",
+    "colConn": "Connexió",
+    "colDbms": "DBMS",
+    "colMthd": "Mètode",
+    "colHost": "Host",
+    "colTest": "Última prova",
+    "colAgent": "Agent vist per última vegada",
+    "never": "Cap",
+    "retry": "Torna a provar",
+    "pickerLink": "Enllaç",
+    "pickerConn": "Connexió",
+    "pickerEmpty": "No hi ha connexions —",
+    "pickerGo": "registra'n una a /connect",
+    "errors": {
+      "LINK_AUTH": "El testimoni de connexió ha caducat o ha estat revocat. Emet un nou testimoni a schema.pi i registra'l de nou",
+      "LINK_SCOPE": "Aquesta connexió no pertany a l'àrea temàtica enllaçada",
+      "LINK_DOWN": "No es pot arribar a schema.pi. Torna-ho a provar d'aquí a poc",
+      "LINK_NOT_FOUND": "Connexió no trobada",
+      "LINK_DUP": "El registre ja està en curs. Torna-ho a provar",
+      "CONN_UNSUPPORTED": "Connexió no compatible (només connexions de servidor PostgreSQL per ara)",
+      "Q_UNKNOWN": "Consulta desconeguda",
+      "SQL_NOT_SELECT": "Només es pot executar una única sentència SELECT (o WITH)",
+      "PGSS_MISSING": "L'extensió pg_stat_statements no està instal·lada a la DB de destí",
+      "TIMEOUT": "La sol·licitud ha caducat",
+      "RATE": "Massa sol·licituds. Torna-ho a provar d'aquí a un minut",
+      "INVALID_INPUT": "Enganxa el testimoni de connexió complet que comença per slk_"
+    }
+  },
+  "migration": {
+    "title": "Migració de dades (PiMig)",
+    "intro": "Calcula l'ordre de càrrega de la taula a partir de les relacions del teu model de disseny de schema.pi, organitza la mida del fragment, el paral·lelisme i la llista de comprovació de la transició, i genera SQL de verificació que executes tu mateix a l'origen i al destí. Aquesta pantalla només planifica i comprova, no mou dades ni llegeix files de la DB del client.",
+    "needLink": "Tria primer un enllaç de schema.pi a dalt. Si no en tens cap, registra un testimoni a 'Connecta'.",
+    "loading": "Carregant…",
+    "newPlan": "Nou pla de migració",
+    "project": "Projecte",
+    "projectPick": "Selecciona un projecte",
+    "planNm": "Nom del pla",
+    "planNmHint": "Per defecte, el nom del projecte",
+    "create": "Crea un pla",
+    "creating": "Creant…",
+    "snapHint": "El disseny en aquest moment (noms de taules, columnes i relacions) es congela com una instantània. Crea un nou pla quan el model canviï.",
+    "plans": "Plans de migració",
+    "prev": "Anterior",
+    "next": "Següent",
+    "sts": {
+      "DRAFT": "Esborrany",
+      "READY": "A punt"
+    },
+    "del": "Suprimeix",
+    "delConfirm": "Vols suprimir aquest pla?",
+    "snapInfo": "Instantània: {tables} taules · {rels} relacions",
+    "dropped": "({n} relacions sense taules físiques s'exclouen de l'ordenació)",
+    "chunkSize": "Mida del bloc (files/commit)",
+    "parallel": "Paral·lelisme (taules alhora)",
+    "saveOpts": "Desa les opcions",
+    "optsHint": "El paral·lelisme és el nombre de taules que es carreguen al mateix temps dins d'un nivell. La mida del bloc és la unitat de commit (files) que utilitzarà el motor d'execució.",
+    "order": "Ordre de càrrega",
+    "orderHint": "Ordenat topològicament per relacions de disseny (no FK físiques) perquè les taules pare vinguin primer. Les taules del mateix nivell no depenen les unes de les altres i es poden carregar en paral·lel.",
+    "cycles": "{n} grup(s) circular(s) — col·locats al mateix nivell. Estableix el seu ordre manualment i posposa les comprovacions de referència fins després de la càrrega.",
+    "selfRefs": "Taules autoreferenciades (jeràrquiques) — carrega primer les files pare dins de la taula",
+    "level": "Nivell {n}",
+    "checklist": "Llista de comprovació de transició",
+    "toReady": "Marca com a a punt",
+    "toDraft": "Torna a esborrany",
+    "readyNeedAll": "Comprova tots els elements abans de marcar el pla com a a punt.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "Punt de lliurament de CDC",
+        "desc": "Registra un punt d'origen coherent abans de la càrrega inicial (PG LSN · Oracle/Tibero SCN · per a l'enquesta, hora d'inici menys una finestra de superposició), inicia CDC des d'aquest punt i absorbeix els duplicats a la finestra de lliurament amb upserts."
+      },
+      "valueConv": {
+        "title": "Conversió de valors",
+        "desc": "S'estableixen regles per a cadena buida = NULL, farciment en blanc CHAR, NUMBER sense precisió → NUMERIC, DATE amb hora → TIMESTAMP, longitud VARCHAR2 BYTE ↔ CHAR i LONG·RAW."
+      },
+      "charset": {
+        "title": "Joc de caràcters",
+        "desc": "S'ha confirmat el joc de caràcters d'origen (KO16MSWIN949, UTF8, …), amb columnes que desborden a causa del creixement multibyte i l'aïllament de caràcters no convertibles decidits."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB es transmeten en blocs (mida i límits de memòria) i es verifiquen per longitud + hash."
+      },
+      "seqResync": {
+        "title": "Resincronització de seqüències",
+        "desc": "Després de la càrrega, les seqüències·identitats de destinació s'estableixen a max(key)+1."
+      },
+      "timezone": {
+        "title": "Zona horària · columnes del sistema",
+        "desc": "S'estableix la zona horària d'interpretació per a valors sense una (p. ex., Asia/Seoul), els triggers d'hora de modificació no sobreescriuran les marques de temps d'origen durant la càrrega i s'estableixen les regles de substitució de creador/modificador."
+      },
+      "backpressure": {
+        "title": "Contrapressió · càrrega de destinació",
+        "desc": "Redueix la mida del bloc i el paral·lelisme en el retard de destinació, el creixement de WAL o les esperes de bloqueig; crea índexs no PK després de la càrrega i executa ANALYZE·VACUUM després."
+      }
+    },
+    "verify": "SQL de verificació",
+    "verifyHint": "Genera consultes de recompte, suma de columnes numèriques, clau duplicada i hash de clau per taula en ordre de càrrega. Executa-les tu mateix a l'origen i a la destinació i compara (aquesta pantalla no les executa).",
+    "noHashOracle": "Les funcions hash i la representació de text d'Oracle·Tibero difereixen de PostgreSQL, de manera que s'ometen les consultes hash — compara els recomptes, les sumes i les claus duplicades.",
+    "copy": "Copia",
+    "copied": "Copiat",
+    "copyFail": "No s'ha pogut copiar. Selecciona el text i copia'l manualment.",
+    "engine": {
+      "title": "Execució·reinici · assaig·retrocés",
+      "body": "L'execució real de la migració (punts de control, contrapressió, aïllament de files d'error) i l'assaig, el retrocés i el registre del punt d'inici de CDC estaran disponibles un cop finalitzat el model de seguretat de l'agent de treball (A10). Per ara, això cobreix la planificació, les comprovacions i el SQL de verificació."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "El vincle schema.pi s'està preparant. Torna-ho a provar en breu.",
+      "LINK_DOWN": "No es pot accedir a schema.pi. Torna-ho a provar en breu.",
+      "LINK_AUTH": "El testimoni del vincle ha caducat o ha estat revocat. Emet un nou testimoni a schema.pi i registra'l de nou.",
+      "LINK_NOT_FOUND": "Vincle no trobat. Torna a triar el vincle.",
+      "LINK_SCOPE": "Aquest projecte no pertany a la taxonomia del vincle.",
+      "TIMEOUT": "La sol·licitud ha caducat. Torna-ho a provar en breu.",
+      "RATE": "Massa sol·licituds. Torna-ho a provar en un minut.",
+      "MIG_NO_TABLES": "Aquest projecte no té taules físiques per migrar. Converteix a físic a schema.pi primer.",
+      "MIG_CHECK_INCOMPLETE": "Comprova tots els elements de la llista de comprovació de transició abans de marcar el pla com a a punt.",
+      "NOT_FOUND": "Pla no trobat."
+    }
+  },
+  "monitor": {
+    "title": "Centre de monitorització",
+    "collectNote": "La recollida s'executa a schema.pi — migració planificada (D7). Aquesta pàgina llegeix el resum del monitor de schema.pi.",
+    "noLink": "Selecciona o registra primer un vincle schema.pi.",
+    "goConnect": "Registra un vincle",
+    "period": "Període",
+    "periods": {
+      "30": "30 min",
+      "60": "1 hora",
+      "360": "6 hores",
+      "1440": "24 hores"
+    },
+    "refresh": "Actualitza",
+    "loading": "Carregant…",
+    "updatedAt": "{area} · a partir de {time} (actualització automàtica cada 30s)",
+    "appTitle": "Rendiment de l'aplicació",
+    "dbTitle": "Estat de la DB per connexió",
+    "urlTitle": "Comprovacions d'URL",
+    "empty": "No hi ha dades per mostrar.",
+    "breachTitle": "{n} infraccions de llindar",
+    "rulesTitle": "Regles de llindar",
+    "rulesNote": "Les regles es guarden per a aquest vincle i s'avaluen respecte al resum rebut; les infraccions reben una vora vermella (les notificacions arribaran més tard).",
+    "metric": "Mètrica",
+    "conn": "Connexió",
+    "allConns": "Totes les connexions",
+    "op": "Compara",
+    "threshold": "Llindar",
+    "thrInvalid": "Introdueix un número per al llindar.",
+    "addRule": "Afegeix una regla",
+    "noRules": "Encara no hi ha regles.",
+    "enable": "Activa",
+    "disable": "Desactiva",
+    "delete": "Suprimeix",
+    "delConfirm": "Vols suprimir aquesta regla?",
+    "aiNote": "L'anàlisi d'incidències d'IA i l'aprovació de correccions encara es fan al monitor de schema.pi.",
+    "aiLink": "Obre el monitor de schema.pi",
+    "metrics": {
+      "APP_TPS": "TPS (sol·licituds/s)",
+      "APP_ERR_PCT": "Taxa d'errors (%)",
+      "APP_SLOW_CNT": "Sol·licituds lentes",
+      "APP_AVG_MS": "Resposta mitjana (ms)",
+      "DB_SESS_CNT": "Sessions",
+      "DB_LOCK_WAIT_CNT": "Esperes de bloqueig",
+      "DB_CACHE_HIT_PCT": "Encerts de memòria cau (%)",
+      "DB_SIZE_MB": "Mida de la DB (MB)",
+      "URL_RSP_MS": "Resposta d'URL (ms)",
+      "URL_FAIL_CNT": "Errors d'URL"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Selecciona primer un vincle.",
+      "NOT_IMPLEMENTED": "El vincle schema.pi s'està preparant. Torna-ho a provar més tard.",
+      "LINK_AUTH": "El testimoni del vincle no és vàlid o ha caducat. Emet un nou testimoni a schema.pi i registra'l.",
+      "LINK_SCOPE": "Aquest vincle no pot accedir a aquesta taxonomia.",
+      "RATE": "Massa sol·licituds. Torna-ho a provar en breu.",
+      "TIMEOUT": "schema.pi respon lentament. Torna-ho a provar en breu.",
+      "RULE_LIMIT": "Fins a 50 regles per vincle.",
+      "NOT_FOUND": "Regla no trobada."
+    }
+  },
+  "ops": {
+    "title": "Seguretat de les operacions de la DB",
+    "loading": "Carregant…",
+    "pickFirst": "Selecciona primer un vincle i una connexió a dalt",
+    "run": "Executa el diagnòstic",
+    "running": "Diagnosticant…",
+    "noRun": "Encara no hi ha diagnòstic. Prem \"Executa el diagnòstic\"",
+    "lastRun": "Últim diagnòstic {dtm}",
+    "readOnly": "El diagnòstic només llegeix (SELECT). L'assessorament és una guia i depèn de la memòria del servidor, la càrrega i la càrrega de treball.",
+    "truncated": "Massa objectes — només s'han comprovat els primers 500",
+    "paramsNote": "La memòria total del servidor és desconeguda, per la qual cosa s'estima a partir de shared_buffers ≈ 25% de la RAM. random_page_cost assumeix SSD.",
+    "auditNote": "Les taules amb RLS desactivat i els comptes no utilitzats es comprovaran un cop la consulta del vincle els admeti.",
+    "replNote": "La línia base és Active-Standby (A-S) — un primari + en espera. Retard de reproducció ≥ 5s = advertència, ≥ 60s = risc (referència RPO mesurada).",
+    "lagIdle": "Sense canvis",
+    "pager": "Paginació",
+    "prev": "Anterior",
+    "next": "Següent",
+    "tabs": {
+      "params": "Paràmetres",
+      "audit": "Comptes i privilegis",
+      "backup": "Còpia de seguretat i recuperació",
+      "repl": "Replicació i DR",
+      "history": "Historial"
+    },
+    "level": {
+      "OK": "Correcte",
+      "WARN": "Advertència",
+      "RISK": "Risc"
+    },
+    "role": {
+      "primary": "Aquesta connexió = Primària",
+      "standby": "Aquesta connexió = En espera",
+      "unknown": "Rol desconegut"
+    },
+    "col": {
+      "level": "Veredicte",
+      "item": "Element",
+      "value": "Valor",
+      "reason": "Detalls",
+      "standby": "En espera",
+      "state": "Estat",
+      "sync": "Sincronització",
+      "lag": "Retard de reproducció"
+    },
+    "item": {
+      "super_many": "superusuari",
+      "super_ok": "superusuari",
+      "bypass_rls": "Rols BYPASSRLS",
+      "bypass_ok": "Rols BYPASSRLS",
+      "no_expiry": "Caducitat de la contrasenya",
+      "expiry_ok": "Caducitat de la contrasenya",
+      "public_grant": "Concessions PUBLIC",
+      "public_ok": "Concessions PUBLIC",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Últim WAL arxivat",
+      "arc_stale": "Últim WAL arxivat",
+      "arc_recent": "Últim WAL arxivat",
+      "arc_failing": "Error d'arxiu de WAL"
+    },
+    "rules": {
+      "sb_default": "Al valor per defecte (128MB). En un servidor dedicat es recomana al voltant del 25% de la RAM.",
+      "sb_ok": "Establert per sobre del valor per defecte.",
+      "wm_over": "max_connections × work_mem supera la memòria estimada. Les ordenacions concurrents comporten risc de manca de memòria.",
+      "wm_default": "Al valor per defecte (4MB). Les ordenacions i hashes grans poden desbordar-se al disc.",
+      "wm_ok": "Dins d'un rang raonable.",
+      "mwm_default": "Al valor per defecte (64MB). VACUUM i les construccions d'índexs poden ser lentes; considera 256MB o més.",
+      "mwm_ok": "Establert per sobre del valor per defecte.",
+      "av_on": "autovacuum està activat.",
+      "av_off": "autovacuum està desactivat. Alt risc d'inflació de taules i desbordament d'ID de transacció.",
+      "conn_high": "max_connections és alt. Cada connexió utilitza memòria; es recomana un pooler (PgBouncer, etc.).",
+      "conn_ok": "Dins d'un rang raonable.",
+      "lmd_off": "El registre de consultes lentes està desactivat (-1). Es recomana al voltant de 1000ms.",
+      "lmd_all": "Totes les sentències es registren (0). Gran sobrecàrrega de registre.",
+      "lmd_ok": "El registre de consultes lentes està activat.",
+      "st_off": "No hi ha temps d'espera de sentència a nivell de servidor (0). Estableix límits per rol o aplicació.",
+      "st_ok": "S'ha establert un temps d'espera de sentència.",
+      "iit_off": "No hi ha temps d'espera d'inactivitat en transacció (0). Pot causar retenció de bloquejos i inflació.",
+      "iit_ok": "S'ha establert un temps d'espera d'inactivitat en transacció.",
+      "ckpt_short": "L'interval de punt de control és de 5 minuts o menys. Considera 10-15 minuts per a càrregues amb moltes escriptures.",
+      "ckpt_ok": "Dins d'un rang raonable.",
+      "wal_minimal": "wal_level=minimal fa impossible PITR i la replicació. Utilitza replica o superior.",
+      "wal_ok": "El nivell WAL admet PITR i la replicació.",
+      "rpc_hdd": "Valor per defecte de HDD (4). Per a SSD, es recomana 1.1-2.",
+      "rpc_ok": "Adequat per a SSD.",
+      "super_many": "Dos o més superusuaris. Mantingues un per a l'administració i concedeix només els privilegis necessaris als altres.",
+      "super_ok": "Com a màxim un superusuari.",
+      "bypass_rls": "Existeixen rols no superusuaris que ignoren la seguretat a nivell de fila.",
+      "bypass_ok": "No hi ha rols que ignorin RLS.",
+      "no_expiry": "Rols d'inici de sessió sense caducitat de contrasenya. Estableix VALID UNTIL per a comptes personals.",
+      "expiry_ok": "Tots els rols d'inici de sessió tenen una caducitat.",
+      "public_grant": "PUBLIC (tots els rols) té privilegis de taula. Els privilegis d'escriptura són arriscats.",
+      "public_ok": "No s'han concedit privilegis de taula a PUBLIC.",
+      "arc_on": "L'arxivament de WAL (archive_mode) està activat.",
+      "arc_off": "L'arxivament de WAL està desactivat, per la qual cosa la recuperació a un punt en el temps (PITR) és impossible.",
+      "arc_cmd_empty": "archive_mode està activat, però archive_command i archive_library estan buits.",
+      "arc_never": "Encara no s'ha arxivat cap WAL.",
+      "arc_stale": "L'últim arxiu WAL té més de 24 hores.",
+      "arc_recent": "WAL arxivat en les últimes 24 hores.",
+      "arc_failing": "L'arxivament de WAL està fallant actualment. Comprova el disc, els permisos i la ruta de destinació.",
+      "repl_is_standby": "Aquesta connexió és una còpia de seguretat (mode de recuperació). Comprova el retard des de la connexió primària.",
+      "repl_none": "No hi ha cap còpia de seguretat connectada. No hi ha configuració de recuperació de desastres (DR).",
+      "repl_ok": "Les còpies de seguretat estan transmetent normalment.",
+      "repl_lag": "Una còpia de seguretat està endarrerida o no està transmetent."
+    },
+    "manual": {
+      "title": "Llista de comprovació manual",
+      "intro": "Pràctiques de còpia de seguretat i recuperació que no es poden comprovar automàticament. Marca quan estigui confirmat i anota l'evidència.",
+      "memo": "Nota (p. ex., eina, programació, última comprovació)",
+      "save": "Desa",
+      "updated": "Actualitzat {dtm}",
+      "items": {
+        "base_backup": "S'ha realitzat una còpia de seguretat completa (pg_basebackup, etc.) amb èxit en els últims 7 dies.",
+        "offsite_copy": "Es conserva una còpia de seguretat fora del lloc (una altra regió o emmagatzematge).",
+        "restore_rehearsal": "S'ha realitzat un assaig de restauració aquest trimestre i se n'ha registrat la durada.",
+        "pitr_target": "El procediment PITR i l'RPO/RTO objectiu estan documentats.",
+        "backup_encrypt": "Els fitxers de còpia de seguretat estan xifrats i l'accés està restringit.",
+        "retention": "El període de retenció de la còpia de seguretat i la política d'eliminació estan definits."
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "El vincle schema.pi s'està preparant. Torna-ho a provar en breu.",
+      "CONN_UNSUPPORTED": "Aquesta connexió encara no és compatible (només PostgreSQL directe).",
+      "TIMEOUT": "La DB de destinació ha respost massa lentament. Torneu-ho a provar d'aquí a una estona",
+      "RATE": "Massa trucades. Torna-ho a provar en un minut.",
+      "Q_UNKNOWN": "Consulta no compatible. Comprova la versió de l'API del vincle schema.pi.",
+      "INVALID_INPUT": "Selecció de vincle o connexió no vàlida."
+    }
+  },
+  "perf": {
+    "title": "Rendiment",
+    "loading": "Carregant…",
+    "pickFirst": "Selecciona primer un vincle i una connexió a dalt.",
+    "pager": "Paginació",
+    "tabs": {
+      "collect": "Recull",
+      "top": "Consultes lentes",
+      "health": "Estat de taules i índexs",
+      "trend": "Tendència de mida",
+      "activity": "Activitat i bloquejos"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "El vincle schema.pi s'està preparant. Torna-ho a provar més tard.",
+      "CONN_UNSUPPORTED": "Aquesta connexió encara no és compatible (només connexions PostgreSQL directes).",
+      "RATE": "Massa sol·licituds. Torna-ho a provar en un minut.",
+      "LINK_AUTH": "El testimoni del vincle ha caducat o ha estat revocat. Registra el testimoni de nou a la pàgina de connexió.",
+      "LINK_SCOPE": "Aquesta connexió no pertany a l'àrea temàtica del vincle.",
+      "Q_UNKNOWN": "Consulta no compatible. Comprova la versió de l'API del vincle schema.pi.",
+      "INVALID_INPUT": "El valor del vincle o de la connexió no és vàlid."
+    },
+    "pgss": {
+      "title": "Com habilitar pg_stat_statements",
+      "note": "PostgreSQL autoallotjat també necessita pg_stat_statements a shared_preload_libraries (postgresql.conf) i un reinici. Les estadístiques de taules, índexs i mida funcionen sense ella."
+    },
+    "collect": {
+      "intro": "Recull ara llegeix les estadístiques de consultes principals, taules, índexs i mides una vegada i les emmagatzema com a instantània. Recull almenys dues vegades per veure els canvis i les tendències de mida.",
+      "run": "Recull ara",
+      "running": "Recollint…",
+      "done": "Recollit a {dtm} — {qry} consultes · {tbl} taules · {idx} índexs"
+    },
+    "top": {
+      "sort": "Ordena",
+      "sortTotal": "Temps total",
+      "sortMean": "Temps mitjà",
+      "sortCalls": "Crides",
+      "empty": "Encara no hi ha instantànies. Prem Recull ara a la pestanya Recull.",
+      "range": "Canvi entre {from} → {to}",
+      "first": "Primera instantània a {dtm} — valors acumulats (canvis a partir de la següent instantània)",
+      "query": "Consulta (literals emmascarats)",
+      "calls": "Crides",
+      "totalMs": "Total ms",
+      "meanMs": "Mitjana ms",
+      "rows": "Files",
+      "reset": "Detecció de restabliment d'estadístiques — es mostra com a acumulatiu"
+    },
+    "health": {
+      "empty": "Encara no hi ha instantànies. Premeu Recull ara a la pestanya Recull",
+      "basis": "Basat en la instantània a {dtm}",
+      "unusedIdx": "Índexs no utilitzats",
+      "unusedIdxHint": "Índexs mai utilitzats des de l'últim restabliment d'estadístiques (per mida). No elimineu els índexs de PK o de restricció única",
+      "fullScan": "Escanejos complets excessius",
+      "fullScanHint": "Taules amb més de 1.000 files actives on els escanejos complets són almenys la meitat — reviseu els índexs a les columnes de filtre",
+      "dead": "Tuples mortes excessives",
+      "deadHint": "Relació de tuples mortes del 20% o més — comproveu la configuració de VACUUM i autovacuum",
+      "none": "Cap",
+      "scans": "escanejos"
+    },
+    "trend": {
+      "limit": "Llindar de mida",
+      "empty": "No hi ha instantànies en els últims 30 dies",
+      "now": "Mida actual",
+      "perDay": "Creixement per dia",
+      "needMore": "Necessita 2 o més instantànies",
+      "daysLeft": "Arriba a {gb} GB",
+      "noGrowth": "Sense tendència de creixement",
+      "days": "en uns {n} dies"
+    },
+    "activity": {
+      "refresh": "Actualitza",
+      "live": "Consulta en viu — no s'emmagatzema",
+      "sessions": "Activitat de la sessió",
+      "locks": "Bloquejos",
+      "none": "Cap"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pipelines",
+    "intro": "Comprova si una DB d'origen està preparada per a la captura de dades de canvi (CDC) i dissenya pipelines d'origen → transformació → destinació. Aquesta etapa només comprova i dissenya; no es llegeixen ni s'emmagatzemen dades de les files dels clients.",
+    "needLink": "Primer, trieu un enllaç schema.pi a dalt. Si no en teniu cap, registreu un testimoni al menú 'Enllaç'.",
+    "needConn": "Trieu la connexió de la DB que voleu comprovar a dalt.",
+    "loading": "Carregant…",
+    "pager": "Pàgines",
+    "prev": "Anterior",
+    "next": "Següent",
+    "runTitle": "Executa i monitoritza (7-3 · 7-4)",
+    "runBody": "L'execució de pipelines, la monitorització de retards i el reprocessament arribaran un cop finalitzats l'agent de treball i el model de seguretat. De moment, deseu les definicions com a esborranys (DRAFT).",
+    "pre": {
+      "title": "Comprovació prèvia de l'origen",
+      "intro": "Per a cada taula, comprova les columnes de temps de canvi, les columnes de supressió suau i la clau primària per recomanar un mètode de captura (adaptador), i comprova la preparació de la replicació lògica WAL. Només consultes de catàleg i configuració de només lectura.",
+      "schema": "Esquema (opcional)",
+      "schemaPh": "Tot",
+      "run": "Executa la comprovació prèvia",
+      "running": "Comprovant…",
+      "sum": "{tables} taules · {noPk} sense PK · {deleteUnseen} no pot capturar supressions",
+      "truncated": "Una consulta de catàleg va arribar al límit de 500 files, de manera que algunes taules poden faltar. Especifiqueu un esquema i torneu a comprovar.",
+      "empty": "No hi ha taules per comprovar",
+      "colTable": "Taula",
+      "colChg": "Columna de temps de canvi",
+      "colDel": "Columna de supressió suau",
+      "colAdapter": "Mètode recomanat · raons",
+      "toDraft": "Crea un esborrany de pipeline a partir de {n} seleccionats"
+    },
+    "ready": {
+      "ok": "Replicació lògica WAL preparada — les taules amb PK poden utilitzar LOGICAL",
+      "no": "Replicació lògica WAL no preparada — captura mitjançant sondeig o comparació de claus",
+      "senders": "{n} connexions de replicació"
+    },
+    "adapter": {
+      "LOGICAL": "Replicació lògica (WAL)",
+      "POLL": "Sondeig de temps de canvi",
+      "KEY_DIFF": "Diferència d'instantània de clau",
+      "NONE": "Només recàrrega completa"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Té columna de temps de canvi",
+      "NO_CHG_COL": "No té columna de temps de canvi",
+      "HAS_SOFT_DEL": "Té columna de supressió suau",
+      "NO_SOFT_DEL": "No té columna de supressió suau",
+      "HAS_PK": "Té clau primària",
+      "NO_PK": "No té clau primària — no es poden identificar les files canviades",
+      "DELETE_UNSEEN": "El sondeig no pot capturar DELETEs físics (es recomana columna de supressió suau)",
+      "LOGICAL_NOT_READY": "Pot canviar a LOGICAL un cop la replicació lògica WAL estigui preparada",
+      "FULL_RELOAD_ONLY": "Sense PK ni columna de temps de canvi, per tant, sense captura incremental — afegiu una PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level no és logical (canviar-lo requereix un reinici de la DB)",
+      "NO_SLOTS": "max_replication_slots és 0",
+      "NO_SENDERS": "max_wal_senders és 0",
+      "IS_STANDBY": "Servidor en espera — preneu la replicació lògica del primari",
+      "SETTINGS_UNKNOWN": "No s'han pogut llegir les configuracions, l'estat de preparació és desconegut"
+    },
+    "ed": {
+      "title": "Definicions de pipeline",
+      "draftOnly": "Només disseny — desat com a esborranys (DRAFT)",
+      "new": "Nou pipeline",
+      "empty": "No hi ha pipelines desats",
+      "manual": "Manual",
+      "edit": "Edita",
+      "remove": "Suprimeix",
+      "removeConfirm": "Suprimir el pipeline '{name}'?",
+      "name": "Nom",
+      "adapter": "Mètode de captura",
+      "srcConn": "Connexió d'origen",
+      "useCurrentConn": "Utilitza la connexió seleccionada a dalt",
+      "sched": "Programació (cron de 5 camps, en blanc = manual)",
+      "target": "Destí",
+      "targetPh": "p. ex. DB d'anàlisi analytics.public / lake s3://…",
+      "tables": "Taules d'origen (separades per salt de línia o coma)",
+      "steps": "Passos (origen → transformació → destí)",
+      "op": "Operació",
+      "notePh": "Descripció · condició (opcional)",
+      "addTransform": "Afegeix pas de transformació",
+      "save": "Desa",
+      "saving": "Desant…",
+      "saved": "Desat",
+      "close": "Tanca"
+    },
+    "kind": {
+      "SOURCE": "Origen",
+      "TRANSFORM": "Transformació",
+      "TARGET": "Destí"
+    },
+    "sts": {
+      "DRAFT": "Esborrany"
+    },
+    "check": {
+      "NAME_REQUIRED": "Introduïu un nom",
+      "CONN_REQUIRED": "Trieu una connexió d'origen",
+      "CRON_INVALID": "Introduïu la programació com a cron de 5 camps (min hora dia mes dia de la setmana; dígits, *, ',', -, /)",
+      "OP_REQUIRED": "Introduïu una operació per a cada pas",
+      "STEPS_TOO_FEW": "Es requereixen passos d'origen i destí",
+      "STEPS_TOO_MANY": "Fins a 20 passos",
+      "STEP_FIRST_SOURCE": "El primer pas ha de ser l'origen",
+      "STEP_LAST_TARGET": "L'últim pas ha de ser el destí",
+      "STEP_MIDDLE_TRANSFORM": "Només els passos de transformació poden anar entremig"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Ja existeix un pipeline amb aquest nom. Utilitzeu un altre nom",
+      "CONN_UNSUPPORTED": "Aquesta connexió encara no es pot comprovar (només connexions directes a servidors PostgreSQL de moment)"
+    }
+  },
+  "sqlLab": {
+    "title": "Laboratori de Tuning SQL",
+    "intro": "Trieu una connexió i introduïu SQL per veure el pla d'execució com un arbre, amb les causes de la lentitud (escanejos complets, bucles niuats, ordenacions grans) i els anti-patrons SQL comprovats amb els dominis estàndard de schema.pi. Les consultes mai s'executen realment (sense ANALYZE).",
+    "needLink": "Seleccioneu un enllaç i una connexió a dalt per veure els plans. La comprovació d'anti-patrons funciona sense enllaç.",
+    "sqlLabel": "SQL (una única sentència SELECT o WITH)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Mostra el pla",
+    "explaining": "Carregant…",
+    "save": "Desa el pla",
+    "saving": "Desant…",
+    "saveName": "Etiqueta (p. ex. abans d'afegir l'índex)",
+    "saveNote": "Els valors constants a les condicions de SQL i del pla es mascaregen com a ? quan es guarden.",
+    "plan": {
+      "title": "Pla d'execució",
+      "summary": "Cost total {cost} · {ms}ms",
+      "cost": "cost",
+      "rows": "files",
+      "width": "amplada"
+    },
+    "warn": {
+      "none": "Sense advertències notables.",
+      "SEQ_SCAN_LARGE": "Escaneig complet a {relation} (aproximadament {rows} files) — considereu un índex a les columnes de filtre.",
+      "NESTED_LOOP_HIGH": "El bucle niuat produeix aproximadament {rows} files — considereu una unió hash o merge, o un índex a la condició de la unió.",
+      "SORT_SPILL": "La mida de l'ordenació és d'aproximadament {kb}KB, per sobre del work_mem predeterminat (4MB); pot desbordar-se al disc."
+    },
+    "lint": {
+      "run": "Comprova anti-patrons",
+      "title": "Comprovació d'anti-patrons SQL",
+      "none": "No s'han trobat anti-patrons.",
+      "domainsOff": "No s'han pogut carregar els dominis estàndard; comprovat només amb les regles de sufix de columna predeterminades.",
+      "types": {
+        "num": "numèric",
+        "date": "data",
+        "char": "caràcter"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — seleccioneu només les columnes que necessiteu (E/S extra, sense índex de cobertura).",
+        "FUNC_ON_COLUMN": "La columna de filtre {column} està encapsulada en una funció o expressió, de manera que el seu índex no es pot utilitzar — transformeu la constant en el seu lloc.",
+        "LEADING_WILDCARD": "LIKE amb un % inicial no pot utilitzar un índex B-tree — considereu un índex GIN de pg_trgm.",
+        "OR_DIFF_COLUMNS": "Les condicions en columnes diferents es combinen amb OR — considereu UNION ALL o índexs per columna.",
+        "IMPLICIT_CAST": "{column} es compara amb un número entre cometes — feu coincidir els tipus de columna i constant (conversió implícita).",
+        "NOT_IN_SUBQUERY": "NOT IN (subconsulta) no retorna res quan hi ha NULLs i és lent — utilitzeu NOT EXISTS.",
+        "NO_WHERE": "Sense clàusula WHERE — en una taula gran això és un escaneig complet (afegiu una condició o LIMIT).",
+        "DOMAIN_MISMATCH": "{column} és de tipus {expected} segons el domini estàndard, però es compara amb una constant d'un altre tipus — la conversió implícita pot impedir l'ús de l'índex."
+      }
+    },
+    "saved": {
+      "title": "Plans desats · Compara",
+      "empty": "No hi ha plans desats. Vegeu un pla i després deseu-lo.",
+      "pick": "Selecciona el pla a comparar",
+      "pick2": "Selecciona dos plans per comparar.",
+      "compare": "Compara dos plans",
+      "delete": "Suprimeix",
+      "cost": "cost",
+      "prev": "Anterior",
+      "next": "Següent",
+      "page": "Pàgina {page}"
+    },
+    "diff": {
+      "cost": "Cost total {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Els dos plans són per a SQL diferents (després de la normalització).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Sense canvis en els nodes del pla.",
+      "before": "Abans",
+      "after": "Després"
+    },
+    "ai": {
+      "title": "Consells de tuning amb IA",
+      "badge": "Properament",
+      "body": "Properament (després dels procediments d'aprovació i mesura d'impacte) — els consells es generaran a partir de SQL amb constants emmascarades i es registraran com a aplicats només després de l'aprovació de DA i l'impacte mesurat."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "La funció d'enllaç schema.pi s'està preparant. Torneu-ho a provar en breu.",
+      "LINK_AUTH": "El testimoni d'enllaç ha caducat o ha estat revocat. Emeteu un nou testimoni a schema.pi i torneu-lo a registrar.",
+      "LINK_SCOPE": "Aquest enllaç no pot utilitzar aquesta connexió (esquema de classificació diferent).",
+      "CONN_UNSUPPORTED": "Aquest tipus de connexió encara no és compatible (només connexions a servidors PostgreSQL).",
+      "Q_UNKNOWN": "Consulta no compatible.",
+      "SQL_NOT_SELECT": "Els plans només estan disponibles per a una única sentència que comenci amb SELECT o WITH.",
+      "TIMEOUT": "La sol·licitud ha caducat (5 segons). Escurceu el SQL o torneu-ho a provar més tard.",
+      "RATE": "Massa sol·licituds. Torneu-ho a provar en un minut.",
+      "PAYLOAD_TOO_LARGE": "El pla és massa gran per desar-lo.",
+      "LINK_NOT_FOUND": "Enllaç no trobat. Torneu a seleccionar l'enllaç."
+    }
+  },
+  "nav": {
+    "label": "Funcions",
+    "connect": "Connecta",
+    "sqlLab": "Tuning SQL",
+    "perf": "Rendiment",
+    "monitor": "Monitorització",
+    "drift": "Deriva",
+    "migration": "Migració",
+    "pipeline": "Pipeline",
+    "analytics": "Analítica",
+    "ops": "Seguretat d'operacions",
+    "learn": "Aprèn"
   }
 }

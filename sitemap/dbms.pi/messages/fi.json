@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "DBA- ja SQLP-työpöytä DB-moottoreiden nopeaan ja turvalliseen käyttöön"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Anna DB-moottorisi käsitellä tietojasi nopeasti ja turvallisesti",
+    "description": "DBA- ja SQLP-työpöytä suoritussuunnitelmille, tilastoille ja suorituskyvylle. schema.pi hoitaa suunnittelun ja standardit; dbms.pi on sen kumppani moottoripuolella.",
+    "welcome": "Tervetuloa, {name}.",
+    "featTitle": "Ominaisuudet",
+    "featDesc": {
+      "connect": "Rekisteröi schema.pi-linkkitunnus ja tarkista yhteystila",
+      "sqlLab": "Suunnitelmapuu, varoitukset, vertailu ja anti-pattern-tarkistukset standardidomainien suhteen",
+      "perf": "Hitaat kyselyt Top-N, taulukon/indeksin kunto, kapasiteetin ennuste, aktiivisuus ja lukitukset",
+      "monitor": "Sovelluksen, DB:n ja URL-mittareiden yhteenveto kynnyshälytyksillä",
+      "drift": "Vertaa schema.pi-mallia ja DDL-historiaa todelliseen luetteloon, mittaa indeksin vaikutusta",
+      "migration": "Topologinen latausjärjestys, palat, tarkistuslista ja varmennus-SQL",
+      "pipeline": "Muutosten sieppauksen esitarkistus ja lähde→muunnos→kohde-putkilinjojen määritykset",
+      "analytics": "KPI-hallintapaneeli, 3-kerroksinen järvikartoitus ja tietojoukkoluettelo",
+      "ops": "Parametrien, roolien, varmuuskopioinnin ja replikoinnin DR:n vain luku -diagnoosi",
+      "learn": "SQLP/DAP-harjoituskysymykset, viritystapaukset ja DBMS-vertailusanakirja"
+    }
+  },
   "auth": {
     "checking": "Kirjautumista tarkistetaan…",
     "signedIn": "{name}",
@@ -64,5 +87,824 @@
     "LINK_CODE_GEN_FAILED": "Linkkikoodia ei voitu luoda. Yritä myöhemmin uudelleen.",
     "AUTH_DB_UNAVAILABLE": "Tiliäsi ei voitu tallentaa, joten kirjautuminen epäonnistui. Yritä myöhemmin uudelleen.",
     "LINK_TRY_LIMIT": "Liian monta virheellistä linkkikoodia. Yritä uudelleen 15 minuutin kuluttua."
+  },
+  "analytics": {
+    "title": "Analytiikka ja järvi",
+    "intro": "dbms-toiminnan KPI:t, kolmikerroksinen järvisuunnittelu ja tietojoukkoluettelo yhdessä paikassa.",
+    "storageNotice": "Järven tallennustila (asiakaspuolella tai pilvessä) ei ole vielä päätetty (PRD-osio 10 #7). Toistaiseksi tallennetaan vain suunnitelmat ja nimikartoitukset – ei rivitietoja.",
+    "noLink": "Valitse tai rekisteröi ensin schema.pi-linkki.",
+    "goConnect": "Rekisteröi linkki",
+    "loading": "Ladataan…",
+    "refresh": "Päivitä",
+    "kpi": {
+      "title": "KPI-hallintapaneeli",
+      "updatedAt": "{area} · {time} tilanne",
+      "notBuilt": "Ei rakennettu",
+      "keys": {
+        "links": "Omat linkit",
+        "perf": "Suorituskykykuvat",
+        "drift": "Drift-ajot",
+        "mig": "Siirtosuunnitelmat",
+        "pipe": "Putkilinjat",
+        "lake": "Järven tietojoukot"
+      },
+      "countsChart": "Kokonaisluvut ominaisuuksittain",
+      "trendTitle": "Suorituskykykuvat viimeisten 14 päivän aikana",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Ei suorituskykykuvia viimeisten 14 päivän aikana.",
+      "monTitle": "schema.pi-monitorin yhteenveto (viimeinen tunti)",
+      "monTps": "Pyynnöt/s",
+      "monErr": "Virheprosentti",
+      "monAvg": "Keskim. vastaus (ms)",
+      "monDb": "DB-yhteydet",
+      "monFail": "Monitorin yhteenvetoa ei voitu ladata: {msg}"
+    },
+    "lake": {
+      "title": "Kolmikerroksinen järvisuunnittelu",
+      "raw": "Raaka",
+      "rawDesc": "Lataa lähde-DB-sarakkeiden nimet ja tyypit sellaisenaan.",
+      "std": "Standardisoitu",
+      "stdDesc": "Nimeää sarakkeet uudelleen schema.pi:n hyväksymien standarditermien mukaisiksi.",
+      "cur": "Kuratoitu",
+      "curDesc": "Analyysitietojoukot ryhmiteltynä entiteetin mukaan.",
+      "loadProjects": "Lataa projektit",
+      "project": "Projekti",
+      "pickProject": "Valitse projekti",
+      "noProjects": "Tällä alueella ei ole projekteja.",
+      "noTables": "Tämän projektin mallissa ei ole taulukoita.",
+      "conform": "Standardinmukaisuus {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} saraketta · {pct}% standardinmukainen",
+      "colSrc": "Lähdesarake",
+      "colStd": "Standardisoitu sarake",
+      "colType": "Tyyppi",
+      "colOk": "Muoto",
+      "ok": "OK",
+      "ng": "Tarkista",
+      "pk": "PK",
+      "selectAll": "Valitse kaikki",
+      "selected": "{cnt} valittu",
+      "save": "Lisää järvisuunnitteluun",
+      "saved": "Lisätty {cnt} luetteloon."
+    },
+    "catalog": {
+      "title": "Tietojoukkoluettelo",
+      "schemaCard": "schema.pi on analyysitietojoukon määritysten, metatietojen haun ja sanaston lähde. Tässä näet vain järven lataustilan ja tuoreuden.",
+      "openSchema": "Näytä määritykset schema.pi:ssä",
+      "empty": "Järvisuunnitteluun ei ole vielä lisätty taulukoita.",
+      "status": {
+        "DSGN": "Vain suunnittelu",
+        "LOADED": "Ladattu",
+        "FAIL": "Lataus epäonnistui"
+      },
+      "lastLoad": "Viimeisin lataus {time}",
+      "neverLoaded": "Ei koskaan ladattu",
+      "remove": "Poista",
+      "removeConfirm": "Poistetaanko {tbl} luettelosta?",
+      "prev": "Edellinen",
+      "next": "Seuraava",
+      "page": "Sivu {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Valitse ensin linkki.",
+      "NOT_FOUND": "Ei löydy. Tarkista, onko malli muuttunut."
+    }
+  },
+  "drift": {
+    "title": "Malli ↔ DB-drift",
+    "intro": "Vertaa schema.pi-suunnittelumallia ja DDL-sovellushistoriaa live-DB-luetteloon löytääksesi driftin ja mittaa, käytetäänkö suunniteltuja indeksejä todella. Asiakkaan rivitietoja ei koskaan lueta tai tallenneta.",
+    "needLink": "Valitse ensin schema.pi-linkki ylhäältä. Jos sinulla ei ole sellaista, rekisteröi tunnus 'Linkki'-valikossa.",
+    "needConn": "Valitse ylhäältä vertailtava DB-yhteys.",
+    "project": "Projekti",
+    "projectPick": "Valitse projekti",
+    "loading": "Ladataan…",
+    "run": "Suorita driftin tunnistus",
+    "running": "Vertailu käynnissä…",
+    "readOnly": "Vain vain luku -luettelo- ja tilastokyselyt suoritetaan.",
+    "applyInSchema": "Tee korjaukset (mallin muokkaukset, DDL-generointi ja suoritus) schema.pi:ssä, joka on totuuden lähde.",
+    "history": "Tunnistushistoria",
+    "prev": "Edellinen",
+    "next": "Seuraava",
+    "none": "Ei mitään",
+    "model": "Malli",
+    "reqNo": "Pyynnön {id}",
+    "notSaved": "Tätä ajoa ei voitu tallentaa historiaan (tulokset näytetään normaalisti).",
+    "capped": "Liian monta kohdetta – näytetään ensimmäiset {cap} per osio (määrät ovat täydellisiä).",
+    "statsMissing": "Indeksin käyttötilastoja ei ollut saatavilla, joten käyttöä ei voitu arvioida.",
+    "sum": {
+      "missingTables": "Taulukot puuttuvat DB:stä",
+      "extraTables": "Taulukot, jotka eivät ole mallissa",
+      "colMismatches": "Sarakkeiden yhteensopimattomuudet",
+      "missingIndexes": "Suunnitellut indeksit puuttuvat DB:stä",
+      "extraIndexes": "Indeksit, jotka eivät ole mallissa",
+      "ddlMissing": "Objektit kadonneet soveltamisen jälkeen",
+      "unusedIndexes": "Käyttämättömät suunnitellut indeksit"
+    },
+    "sec": {
+      "ddlMissing": "DDL sovellettu, mutta puuttuu DB:stä",
+      "missingTables": "Taulukot mallissa, mutta puuttuvat DB:stä",
+      "extraTables": "Taulukot DB:ssä, mutta eivät mallissa",
+      "colMismatches": "Saraketyypin / NULL-yhteensopimattomuudet",
+      "missingIndexes": "Suunnitellut indeksit puuttuvat DB:stä",
+      "extraIndexes": "Indeksit vain DB:ssä (pois lukien PK)",
+      "idxUsage": "Suunnitellun indeksin tehokkuus"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi kirjasi nämä objektit sovelletuiksi, mutta ne ovat kadonneet – epäile manuaalista poistoa tai palautusta.",
+      "extraTables": "Nämä voivat kuulua muihin projekteihin tai järjestelmätaulukoihin tällä yhteydellä.",
+      "idxUsage": "Nolla skannausta viimeisimmän tilastojen nollauksen jälkeen tarkoittaa käyttämätöntä. Tarkista tilastoikkuna ennen poistamista."
+    },
+    "kind": {
+      "MISSING": "puuttuu DB:stä",
+      "EXTRA": "ei mallissa",
+      "TYPE": "tyyppi eroaa",
+      "NULL": "null-sallivuus eroaa"
+    },
+    "col": {
+      "idx": "Indeksi",
+      "scans": "Skannaukset",
+      "size": "Koko",
+      "status": "Tuomio"
+    },
+    "usage": {
+      "USED": "Käytössä",
+      "UNUSED": "Käyttämätön suunniteltu indeksi",
+      "NO_STATS": "Ei tilastoja"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi-yhteysominaisuutta valmistellaan. Yritä uudelleen hetken kuluttua.",
+      "LINK_DOWN": "schema.pi:hin ei saada yhteyttä. Yritä uudelleen hetken kuluttua.",
+      "LINK_AUTH": "Yhteystunnus on vanhentunut tai peruutettu. Myönnä uusi tunnus schema.pi:ssä ja rekisteröi se uudelleen.",
+      "LINK_NOT_FOUND": "Linkkiä ei löydy. Valitse linkki uudelleen.",
+      "LINK_SCOPE": "Tämä yhteys ei kuulu linkin taksonomiaan.",
+      "CONN_UNSUPPORTED": "Yhteyttä ei tueta (toistaiseksi vain PostgreSQL-palvelinyhteydet).",
+      "TIMEOUT": "Pyynnön aikakatkaisu. Yritä uudelleen hetken kuluttua.",
+      "RATE": "Liian monta pyyntöä. Yritä uudelleen minuutin kuluttua."
+    }
+  },
+  "learn": {
+    "title": "DBA-oppiminen",
+    "intro": "SQLP/DAP-harjoituskysymyksiä, viritystapauskirja ja Oracle/Tibero/PostgreSQL-vertailusanakirja. Toimii ilman linkkiä; valitse linkki nähdäksesi myös schema.pi-standardityyppikartoituksesi.",
+    "loading": "Ladataan…",
+    "tabs": {
+      "quiz": "Harjoitus",
+      "cases": "Viritystapaukset",
+      "dict": "DBMS-sanakirja"
+    },
+    "topics": {
+      "INDEX": "Indeksiskannaukset",
+      "JOIN": "Liitosmenetelmät",
+      "PARTITION": "Osioiden karsinta",
+      "NORMAL": "Normalisointi",
+      "NAMING": "Standardin nimeäminen",
+      "ISOLATION": "Eristystasot",
+      "LOCK": "Lukitukset"
+    },
+    "levels": {
+      "1": "Perus",
+      "2": "Keskitaso",
+      "3": "Edistynyt"
+    },
+    "quiz": {
+      "score": "Edistymiseni",
+      "scoreLine": "{solved} / {total} ratkaistu · {correct} oikein",
+      "right": "Oikein",
+      "wrong": "Väärin",
+      "retry": "Yritä uudelleen",
+      "prevRight": "Edellinen oikein",
+      "prevWrong": "Edellinen väärin"
+    },
+    "cases": {
+      "notice": "Kaikki tapaukset ovat itse kirjoitettuja oppimisesimerkkejä; luvut ovat havainnollistavia (ei asiakastietoja).",
+      "problem": "Ongelma-SQL",
+      "plan": "Suunnitelman yhteenveto",
+      "cause": "Syy",
+      "fix": "Korjattu SQL",
+      "effect": "Vaikutus"
+    },
+    "cats": {
+      "ALL": "Kaikki",
+      "TYPE": "Tietotyypit",
+      "FUNC": "Funktiot",
+      "PAGING": "Sivutus",
+      "SEQ": "Sekvenssit",
+      "DATE": "Päivämäärät",
+      "SYNTAX": "Syntaksi"
+    },
+    "dict": {
+      "search": "Haku (esim. NVL, LIMIT)",
+      "item": "Kohde",
+      "note": "Huomautus",
+      "empty": "Ei vastaavia kohteita",
+      "loading": "Ladataan…",
+      "liveTitle": "Aihealueeni standardityyppikartoitus",
+      "liveIntro": "Valitse linkki ladataksesi schema.pi DBMS-profiilin (looginen → fyysinen tyyppi). Yllä oleva sanakirja toimii ilman linkkiä.",
+      "liveLoad": "Lataa tyyppikartoitus",
+      "lgcType": "Looginen tyyppi"
+    }
+  },
+  "link2": {
+    "title": "schema.pi-yhteys",
+    "intro": "Rekisteröi yhteystunnus käyttääksesi schema.pi-aihealueen DB-yhteyksiä dbms.pi:ssä. Tunnukset tallennetaan salattuna, eikä tietokantojesi rivitietoja tallenneta.",
+    "howTitle": "Yhteystunnuksen myöntäminen",
+    "how1": "Kirjaudu schema.pi:hin ja avaa yhdistettävä aihealue",
+    "how2": "Siirry kohtaan Aihealue → Asetukset → Yhteystunnus ja paina 'Myönnä tunnus' (alueen järjestelmänvalvoja tai DA-rooli)",
+    "how3": "Kopioi slk_-alkuinen tunnus – se näytetään vain kerran myönnettäessä",
+    "how4": "Liitä se alle ja rekisteröi",
+    "openSchema": "Avaa schema.pi",
+    "registerTitle": "Rekisteröi yhteys",
+    "tokenLabel": "Yhteystunnus",
+    "tokenPlaceholder": "slk_…",
+    "register": "Rekisteröi",
+    "registering": "Tarkistetaan…",
+    "registered": "Aihealue '{area}' on nyt yhdistetty",
+    "replaced": "Aihealueen '{area}' tunnus korvattiin",
+    "myLinks": "Omat yhteydet",
+    "empty": "Ei rekisteröityjä yhteyksiä",
+    "loading": "Ladataan…",
+    "regDtm": "Rekisteröity {dtm}",
+    "remove": "Katkaise yhteys",
+    "removeConfirm": "Katkaistaanko yhteys '{area}'? Tätä yhteyttä käyttävät näytöt eivät enää pääse siihen käsiksi.",
+    "prev": "Edellinen",
+    "next": "Seuraava",
+    "statusTitle": "Yhteystila",
+    "noConns": "Tällä aihealueella ei ole DB-yhteyksiä (lisää yksi schema.pi:ssä)",
+    "colConn": "Yhteys",
+    "colDbms": "DBMS",
+    "colMthd": "Menetelmä",
+    "colHost": "Isäntä",
+    "colTest": "Viimeisin testi",
+    "colAgent": "Agentti viimeksi nähty",
+    "never": "Ei mitään",
+    "retry": "Yritä uudelleen",
+    "pickerLink": "Linkki",
+    "pickerConn": "Yhteys",
+    "pickerEmpty": "Ei yhteyksiä –",
+    "pickerGo": "rekisteröi osoitteessa /connect",
+    "errors": {
+      "LINK_AUTH": "Yhteystunnus on vanhentunut tai peruutettu. Myönnä uusi tunnus schema.pi:ssä ja rekisteröi uudelleen",
+      "LINK_SCOPE": "Tämä yhteys ei kuulu linkitetyn aihealueen taksonomiaan",
+      "LINK_DOWN": "schema.pi:hin ei saada yhteyttä. Yritä uudelleen hetken kuluttua",
+      "LINK_NOT_FOUND": "Yhteyttä ei löydy",
+      "LINK_DUP": "Rekisteröinti on jo käynnissä. Yritä uudelleen",
+      "CONN_UNSUPPORTED": "Yhteyttä ei tueta (toistaiseksi vain PostgreSQL-palvelinyhteydet)",
+      "Q_UNKNOWN": "Tuntematon kysely",
+      "SQL_NOT_SELECT": "Vain yksi SELECT (tai WITH) -lauseke voidaan suorittaa",
+      "PGSS_MISSING": "pg_stat_statements-laajennusta ei ole asennettu kohde-DB:hen",
+      "TIMEOUT": "Pyynnön aikakatkaisu",
+      "RATE": "Liian monta pyyntöä. Yritä uudelleen minuutin kuluttua",
+      "INVALID_INPUT": "Liitä koko yhteystunnus, joka alkaa slk_"
+    }
+  },
+  "migration": {
+    "title": "Tietojen siirto (PiMig)",
+    "intro": "Laskee taulukon latausjärjestyksen schema.pi-suunnittelumallisi suhteista, järjestää palakoon, rinnakkaisuuden ja siirtymän tarkistuslistan sekä luo varmennus-SQL:n, jonka suoritat itse lähteessä ja kohteessa. Tämä näyttö vain suunnittelee ja tarkistaa – se ei siirrä tietoja tai lue asiakkaan DB-rivejä.",
+    "needLink": "Valitse ensin schema.pi-linkki ylhäältä. Jos sinulla ei ole sellaista, rekisteröi tunnus 'Yhdistä'-valikossa.",
+    "loading": "Ladataan…",
+    "newPlan": "Uusi siirtosuunnitelma",
+    "project": "Projekti",
+    "projectPick": "Valitse projekti",
+    "planNm": "Suunnitelman nimi",
+    "planNmHint": "Oletuksena projektin nimi",
+    "create": "Luo suunnitelma",
+    "creating": "Luodaan…",
+    "snapHint": "Tämän hetken suunnittelu (taulukon, sarakkeen ja suhteiden nimet) jäädytetään tilannekuvaksi. Luo uusi suunnitelma, kun malli muuttuu.",
+    "plans": "Siirtosuunnitelmat",
+    "prev": "Edellinen",
+    "next": "Seuraava",
+    "sts": {
+      "DRAFT": "Luonnos",
+      "READY": "Valmis"
+    },
+    "del": "Poista",
+    "delConfirm": "Poistetaanko tämä suunnitelma?",
+    "snapInfo": "Tilannekuva: {tables} taulua · {rels} suhdetta",
+    "dropped": "({n} suhdetta ilman fyysisiä tauluja on jätetty pois järjestyksestä)",
+    "chunkSize": "Palakoko (rivit/commit)",
+    "parallel": "Rinnakkaisuus (tauluja kerrallaan)",
+    "saveOpts": "Tallenna asetukset",
+    "optsHint": "Rinnakkaisuus on samanaikaisesti ladattavien taulujen määrä samalla tasolla. Palakoko on suoritusmoottorin käyttämä commit-yksikkö (rivit).",
+    "order": "Latausjärjestys",
+    "orderHint": "Topologisesti järjestetty suunnittelusuhteiden (ei fyysisten FK:iden) mukaan, joten vanhemmat taulut tulevat ensin. Samalla tasolla olevat taulut eivät riipu toisistaan ja ne voidaan ladata rinnakkain.",
+    "cycles": "{n} sykliryhmää — sijoitettu samalle tasolle. Aseta niiden järjestys manuaalisesti ja lykkää viite tarkistuksia latauksen jälkeiseen aikaan.",
+    "selfRefs": "Itsensä viittaavat (hierarkkiset) taulut — lataa vanhemmat rivit ensin taulun sisällä",
+    "level": "Taso {n}",
+    "checklist": "Siirtymän tarkistuslista",
+    "toReady": "Merkitse valmiiksi",
+    "toDraft": "Takaisin luonnokseksi",
+    "readyNeedAll": "Tarkista kaikki kohdat ennen kuin merkitset suunnitelman valmiiksi.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC-siirtymäpiste",
+        "desc": "Tallenna johdonmukainen lähdepiste ennen alkuperäistä latausta (PG LSN · Oracle/Tibero SCN · kyselyä varten, aloitusaika miinus päällekkäisyysikkuna), aloita CDC siitä ja absorboi päällekkäisyydet siirtymäikkunassa upsert-toiminnoilla."
+      },
+      "valueConv": {
+        "title": "Arvon muunnos",
+        "desc": "Säännöt on asetettu tyhjälle merkkijonolle = NULL, CHAR-tyhjä täyttö, NUMBER ilman tarkkuutta → NUMERIC, DATE ajalla → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR-pituus ja LONG·RAW."
+      },
+      "charset": {
+        "title": "Merkistö",
+        "desc": "Lähdemerkistö (KO16MSWIN949, UTF8, …) on vahvistettu, ja monibyte-kasvun vuoksi ylivuotoavat sarakkeet ja muuntamattomien merkkien eristys on päätetty."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB suoratoistetaan paloina (koko- ja muistirajoitukset) ja tarkistetaan pituuden + hashin avulla."
+      },
+      "seqResync": {
+        "title": "Sekvenssin uudelleensynkronointi",
+        "desc": "Latauksen jälkeen kohdesekvenssit·identiteetit asetetaan arvoon max(avain)+1."
+      },
+      "timezone": {
+        "title": "Aikavyöhyke · järjestelmäsarakkeet",
+        "desc": "Aika-arvojen tulkinta-aikavyöhyke (esim. Asia/Seoul) on asetettu, muokkausajan triggerit eivät korvaa lähdeaikaleimoja latauksen aikana, ja luojan/muokkaajan korvaussäännöt on asetettu."
+      },
+      "backpressure": {
+        "title": "Vastapaine · kohdelataus",
+        "desc": "Vähennä palakokoa ja rinnakkaisuutta kohdeviiveen, WAL-kasvun tai lukitusodotusten yhteydessä; rakenna ei-PK-indeksit latauksen jälkeen ja suorita ANALYZE·VACUUM sen jälkeen."
+      }
+    },
+    "verify": "Vahvistus-SQL",
+    "verifyHint": "Luo laskenta-, numeerisen sarakkeen summan, kaksoiskappaleavaimen ja avaimen hash-kyselyt taulukoittain latausjärjestyksessä. Suorita ne itse lähteessä ja kohteessa ja vertaa (tämä näyttö ei suorita niitä).",
+    "noHashOracle": "Oracle·Tibero-hash-funktiot ja tekstin renderöinti eroavat PostgreSQL:stä, joten hash-kyselyt jätetään pois — vertaa määriä, summia ja kaksoiskappaleavaimia.",
+    "copy": "Kopioi",
+    "copied": "Kopioitu",
+    "copyFail": "Kopiointi epäonnistui. Valitse teksti ja kopioi se manuaalisesti.",
+    "engine": {
+      "title": "Suoritus·uudelleenkäynnistys · harjoitus·palautus",
+      "body": "Todellinen siirron suoritus (tarkistuspisteet, vastapaine, virherivien eristys) ja harjoitus, palautus ja CDC:n aloituspisteen tallennus tulevat saataville, kun työntekijäagentin tietoturvamalli (A10) on viimeistelty. Toistaiseksi tämä kattaa suunnittelun, tarkistukset ja vahvistus-SQL:n."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi-yhteys on valmisteilla. Yritä uudelleen hetken kuluttua.",
+      "LINK_DOWN": "schema.pi-yhteyttä ei voida muodostaa. Yritä uudelleen hetken kuluttua.",
+      "LINK_AUTH": "Linkkitunnus on vanhentunut tai peruutettu. Luo uusi tunnus schema.pi:ssä ja rekisteröi se uudelleen.",
+      "LINK_NOT_FOUND": "Linkkiä ei löytynyt. Valitse linkki uudelleen.",
+      "LINK_SCOPE": "Tämä projekti ei kuulu linkin taksonomiaan.",
+      "TIMEOUT": "Pyynnön aikakatkaisu. Yritä uudelleen hetken kuluttua.",
+      "RATE": "Liian monta pyyntöä. Yritä uudelleen minuutin kuluttua.",
+      "MIG_NO_TABLES": "Tässä projektissa ei ole fyysisiä tauluja siirrettäväksi. Muunna ensin fyysiseksi schema.pi:ssä.",
+      "MIG_CHECK_INCOMPLETE": "Tarkista kaikki siirtymän tarkistuslistan kohdat ennen kuin merkitset suunnitelman valmiiksi.",
+      "NOT_FOUND": "Suunnitelmaa ei löytynyt."
+    }
+  },
+  "monitor": {
+    "title": "Valvontakeskus",
+    "collectNote": "Keräys suoritetaan schema.pi:ssä — siirto suunniteltu (D7). Tämä sivu lukee schema.pi-valvonnan yhteenvedon.",
+    "noLink": "Valitse tai rekisteröi ensin schema.pi-linkki.",
+    "goConnect": "Rekisteröi linkki",
+    "period": "Jakso",
+    "periods": {
+      "30": "30 min",
+      "60": "1 tunti",
+      "360": "6 tuntia",
+      "1440": "24 tuntia"
+    },
+    "refresh": "Päivitä",
+    "loading": "Ladataan…",
+    "updatedAt": "{area} · {time} (automaattinen päivitys 30s välein)",
+    "appTitle": "Sovelluksen suorituskyky",
+    "urlTitle": "URL-tarkistukset",
+    "empty": "Ei näytettäviä tietoja.",
+    "breachTitle": "{n} kynnysarvon ylitystä",
+    "rulesTitle": "Kynnyssäännöt",
+    "rulesNote": "Säännöt tallennetaan tälle linkille ja arvioidaan vastaanotettua yhteenvetoa vasten; ylitykset saavat punaisen reunuksen (ilmoitukset tulevat myöhemmin).",
+    "metric": "Mittari",
+    "conn": "Yhteys",
+    "allConns": "Kaikki yhteydet",
+    "op": "Vertaa",
+    "threshold": "Kynnysarvo",
+    "thrInvalid": "Anna numero kynnysarvoksi.",
+    "addRule": "Lisää sääntö",
+    "noRules": "Ei sääntöjä vielä.",
+    "enable": "Ota käyttöön",
+    "disable": "Poista käytöstä",
+    "delete": "Poista",
+    "delConfirm": "Poistetaanko tämä sääntö?",
+    "aiNote": "AI-tapahtuma-analyysi ja korjaushyväksyntä tapahtuvat edelleen schema.pi-monitorissa.",
+    "aiLink": "Avaa schema.pi-monitori",
+    "metrics": {
+      "APP_TPS": "TPS (pyyntöä/s)",
+      "APP_ERR_PCT": "Virheprosentti (%)",
+      "APP_SLOW_CNT": "Hitaat pyynnöt",
+      "APP_AVG_MS": "Keskimääräinen vastaus (ms)",
+      "DB_SESS_CNT": "Istunnot",
+      "DB_LOCK_WAIT_CNT": "Lukitusodotukset",
+      "DB_CACHE_HIT_PCT": "Välimuistin osumaprosentti (%)",
+      "URL_RSP_MS": "URL-vastaus (ms)",
+      "URL_FAIL_CNT": "URL-virheet"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Valitse ensin linkki.",
+      "NOT_IMPLEMENTED": "schema.pi-yhteys on valmisteilla. Yritä uudelleen myöhemmin.",
+      "LINK_AUTH": "Linkkitunnus on virheellinen tai vanhentunut. Luo uusi tunnus schema.pi:ssä ja rekisteröi se.",
+      "LINK_SCOPE": "Tämä linkki ei voi käyttää kyseistä taksonomiaa.",
+      "RATE": "Liian monta pyyntöä. Yritä uudelleen hetken kuluttua.",
+      "TIMEOUT": "schema.pi vastaa hitaasti. Yritä uudelleen hetken kuluttua.",
+      "RULE_LIMIT": "Enintään 50 sääntöä linkkiä kohden.",
+      "NOT_FOUND": "Sääntöä ei löytynyt."
+    }
+  },
+  "ops": {
+    "loading": "Ladataan…",
+    "pickFirst": "Valitse ensin linkki ja yhteys ylhäältä",
+    "run": "Suorita diagnoosi",
+    "running": "Diagnosoidaan…",
+    "noRun": "Ei diagnoosia vielä. Paina \"Suorita diagnoosi\"",
+    "lastRun": "Viimeisin diagnoosi {dtm}",
+    "readOnly": "Diagnoosi lukee vain (SELECT). Neuvot ovat ohjeellisia ja riippuvat palvelimen muistista, kuormituksesta ja työkuormasta.",
+    "truncated": "Liian monta kohdetta – vain ensimmäiset 500 tarkistettiin",
+    "paramsNote": "Palvelimen kokonaismuisti on tuntematon, joten se arvioidaan shared_buffers ≈ 25% RAM-muistista. random_page_cost olettaa SSD:n.",
+    "auditNote": "Taulut, joissa RLS on pois päältä, ja käyttämättömät tilit tarkistetaan, kun linkkikysely tukee niitä.",
+    "replNote": "Perustaso on Active-Standby (A-S) — yksi ensisijainen + valmiustila. Toistoviive ≥ 5s = varoitus, ≥ 60s = riski (mitattu RPO-viite).",
+    "lagIdle": "Ei muutoksia",
+    "pager": "Sivutus",
+    "prev": "Edellinen",
+    "next": "Seuraava",
+    "tabs": {
+      "params": "Parametrit",
+      "audit": "Tilit ja oikeudet",
+      "backup": "Varmuuskopiointi ja palautus",
+      "repl": "Replikointi ja DR",
+      "history": "Historia"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Varoitus",
+      "RISK": "Riski"
+    },
+    "role": {
+      "primary": "Tämä yhteys = Primary",
+      "standby": "Tämä yhteys = Standby",
+      "unknown": "Rooli tuntematon"
+    },
+    "col": {
+      "level": "Tuomio",
+      "item": "Kohde",
+      "value": "Arvo",
+      "reason": "Tiedot",
+      "standby": "Valmiustila",
+      "state": "Tila",
+      "sync": "Synkronointi",
+      "lag": "Toistoviive"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLS-roolit",
+      "bypass_ok": "BYPASSRLS-roolit",
+      "no_expiry": "Salasanan vanheneminen",
+      "expiry_ok": "Salasanan vanheneminen",
+      "public_grant": "PUBLIC-oikeudet",
+      "public_ok": "PUBLIC-oikeudet",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Viimeksi arkistoitu WAL",
+      "arc_stale": "Viimeksi arkistoitu WAL",
+      "arc_recent": "Viimeksi arkistoitu WAL",
+      "arc_failing": "WAL-arkistointi epäonnistui"
+    },
+    "rules": {
+      "sb_default": "Oletusarvossa (128MB). Erillisellä palvelimella noin 25% RAM-muistista on suositeltavaa.",
+      "sb_ok": "Asetettu oletusarvoa korkeammaksi",
+      "wm_over": "max_connections × work_mem ylittää arvioidun muistin. Samanaikaiset lajittelut aiheuttavat muistin loppumisen riskin.",
+      "wm_default": "Oletusarvossa (4MB). Suuret lajittelut ja hajautukset voivat valua levylle.",
+      "wm_ok": "Kohtuullisella alueella",
+      "mwm_default": "Oletusarvossa (64MB). VACUUM ja indeksien rakentaminen voivat olla hitaita; harkitse 256MB tai enemmän.",
+      "mwm_ok": "Asetettu oletusarvoa korkeammaksi",
+      "av_on": "autovacuum on päällä",
+      "av_off": "autovacuum on pois päältä. Suuri riski taulun turpoamiselle ja transaktion ID:n ylivuodolle.",
+      "conn_high": "max_connections on korkea. Jokainen yhteys käyttää muistia; pooleri (PgBouncer jne.) on suositeltavaa.",
+      "conn_ok": "Kohtuullisella alueella",
+      "lmd_off": "Hidas kyselyjen lokitus on pois päältä (-1). Noin 1000ms on suositeltavaa.",
+      "lmd_all": "Jokainen lauseke kirjataan (0). Raskas lokituskuorma.",
+      "lmd_ok": "Hidas kyselyjen lokitus on päällä.",
+      "st_off": "Ei palvelimen laajuista lausekkeen aikakatkaisua (0). Aseta rajoitukset roolille tai sovellukselle.",
+      "st_ok": "Lausekkeen aikakatkaisu on asetettu.",
+      "iit_off": "Ei idle-in-transaction-aikakatkaisua (0). Voi aiheuttaa lukituksen pitämistä ja turpoamista.",
+      "iit_ok": "Idle-in-transaction-aikakatkaisu on asetettu.",
+      "ckpt_short": "Tarkistuspisteen väli on 5 minuuttia tai vähemmän. Harkitse 10–15 minuuttia kirjoitusintensiivisille kuormille.",
+      "ckpt_ok": "Kohtuullisella alueella",
+      "wal_minimal": "wal_level=minimal tekee PITR:n ja replikoinnin mahdottomaksi. Käytä replicaa tai korkeampaa.",
+      "wal_ok": "WAL-taso tukee PITR:ää ja replikointia.",
+      "rpc_hdd": "HDD-oletus (4). SSD:lle suositellaan 1.1–2.",
+      "rpc_ok": "Sopii SSD:lle.",
+      "super_many": "Kaksi tai useampi superuseria. Pidä yksi hallinnointia varten ja myönnä vain tarvittavat oikeudet muille.",
+      "super_ok": "Enintään yksi superuser.",
+      "bypass_rls": "Ei-superuser-rooleja, jotka ohittavat rivitason turvallisuuden, on olemassa.",
+      "bypass_ok": "Ei RLS-ohittavia rooleja.",
+      "no_expiry": "Kirjautumisroolit ilman salasanan vanhenemista. Aseta VALID UNTIL henkilökohtaisille tileille.",
+      "expiry_ok": "Kaikilla kirjautumisrooleilla on vanheneminen.",
+      "public_grant": "PUBLIC (jokaisella roolilla) on tauluoikeudet. Kirjoitusoikeudet ovat riskialttiita.",
+      "public_ok": "PUBLICille ei ole myönnetty tauluoikeuksia.",
+      "arc_on": "WAL-arkistointi (archive_mode) on päällä.",
+      "arc_off": "WAL-arkistointi on pois päältä, joten point-in-time recovery (PITR) on mahdotonta.",
+      "arc_cmd_empty": "archive_mode on päällä, mutta archive_command ja archive_library ovat tyhjiä.",
+      "arc_never": "WAL-tiedostoja ei ole vielä arkistoitu.",
+      "arc_stale": "Viimeisin WAL-arkisto on yli 24 tuntia vanha.",
+      "arc_recent": "WAL arkistoitu viimeisen 24 tunnin aikana.",
+      "arc_failing": "WAL-arkistointi epäonnistuu tällä hetkellä. Tarkista levy, oikeudet ja kohdepolku.",
+      "repl_is_standby": "Tämä yhteys on valmiustila (palautustila). Tarkista viive ensisijaisesta yhteydestä.",
+      "repl_none": "Ei valmiustilaa yhdistetty. Katastrofipalautus (DR) -asetusta ei ole.",
+      "repl_ok": "Valmiustilat suoratoistavat normaalisti.",
+      "repl_lag": "Valmiustila viivästyy tai ei suoratoista."
+    },
+    "manual": {
+      "title": "Manuaalinen tarkistuslista",
+      "intro": "Varmuuskopiointi- ja palautuskäytännöt, joita ei voida tarkistaa automaattisesti. Rastita, kun vahvistettu, ja merkitse todisteet.",
+      "memo": "Muistio (esim. työkalu, aikataulu, viimeksi tarkistettu)",
+      "save": "Tallenna",
+      "updated": "Päivitetty {dtm}",
+      "items": {
+        "base_backup": "Täydellinen varmuuskopio (pg_basebackup jne.) on onnistunut viimeisten 7 päivän aikana.",
+        "offsite_copy": "Varmuuskopio on säilytetty toisessa paikassa (toinen alue tai tallennustila).",
+        "restore_rehearsal": "Palautusharjoitus on tehty tällä neljänneksellä ja sen kesto on kirjattu.",
+        "pitr_target": "PITR-menettely ja tavoite-RPO/RTO on dokumentoitu.",
+        "backup_encrypt": "Varmuuskopiotiedostot on salattu ja pääsyä on rajoitettu.",
+        "retention": "Varmuuskopioiden säilytysaika ja poistokäytäntö on määritelty."
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi-yhteys on valmisteilla. Yritä uudelleen hetken kuluttua.",
+      "CONN_UNSUPPORTED": "Tätä yhteyttä ei vielä tueta (vain suora PostgreSQL).",
+      "RATE": "Liian monta kutsua. Yritä uudelleen minuutin kuluttua.",
+      "Q_UNKNOWN": "Tuntematon kysely. Tarkista schema.pi-linkin API-versio.",
+      "INVALID_INPUT": "Virheellinen linkin tai yhteyden valinta."
+    }
+  },
+  "perf": {
+    "title": "Suorituskyky",
+    "loading": "Ladataan…",
+    "pickFirst": "Valitse ensin linkki ja yhteys ylhäältä",
+    "pager": "Sivutus",
+    "tabs": {
+      "collect": "Kerää",
+      "top": "Hitaat kyselyt",
+      "health": "Taulun ja indeksin kunto",
+      "trend": "Kokotrendi",
+      "activity": "Toiminta ja lukitukset"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi-yhteys on valmisteilla. Yritä uudelleen myöhemmin.",
+      "CONN_UNSUPPORTED": "Tätä yhteyttä ei vielä tueta (vain suorat PostgreSQL-yhteydet).",
+      "RATE": "Liian monta pyyntöä. Yritä uudelleen minuutin kuluttua.",
+      "LINK_AUTH": "Linkkitunnus on vanhentunut tai peruutettu. Rekisteröi tunnus uudelleen Yhdistä-sivulla.",
+      "LINK_SCOPE": "Tämä yhteys ei kuulu linkin aihealueeseen.",
+      "Q_UNKNOWN": "Tuntematon kysely. Tarkista schema.pi-linkin API-versio.",
+      "INVALID_INPUT": "Linkin tai yhteyden arvo on virheellinen."
+    },
+    "pgss": {
+      "title": "Miten pg_stat_statements otetaan käyttöön",
+      "note": "Itse isännöity PostgreSQL tarvitsee myös pg_stat_statementsin shared_preload_libraries-tiedostoon (postgresql.conf) ja uudelleenkäynnistyksen. Taulu-, indeksi- ja kokotilastot toimivat ilman sitä."
+    },
+    "collect": {
+      "intro": "Kerää nyt lukee tärkeimmät kyselytilastot, taulut, indeksit ja koot kerran ja tallentaa ne tilannekuvana. Kerää vähintään kahdesti nähdäksesi muutokset ja kokotrendit.",
+      "run": "Kerää nyt",
+      "running": "Kerätään…",
+      "done": "Kerätty {dtm} — {qry} kyselyä · {tbl} taulua · {idx} indeksiä"
+    },
+    "top": {
+      "sort": "Lajittele",
+      "sortTotal": "Kokonaisaika",
+      "sortMean": "Keskimääräinen aika",
+      "sortCalls": "Kutsut",
+      "empty": "Ei tilannekuvia vielä. Paina Kerää nyt Kerää-välilehdellä.",
+      "range": "Muutos välillä {from} → {to}",
+      "first": "Ensimmäinen tilannekuva {dtm} — kumulatiiviset arvot (muutokset seuraavasta tilannekuvasta).",
+      "query": "Kysely (literaalit maskattu)",
+      "calls": "Kutsut",
+      "totalMs": "Kokonais-ms",
+      "meanMs": "Keskim. ms",
+      "rows": "Rivit",
+      "reset": " Tilastojen nollaus havaittu – näytetään kumulatiivisena"
+    },
+    "health": {
+      "empty": "Ei tilannekuvia vielä. Paina Kerää nyt Kerää-välilehdellä",
+      "basis": "Perustuu tilannekuvaan {dtm}",
+      "unusedIdx": "Käyttämättömät indeksit",
+      "unusedIdxHint": "Indeksit, joita ei ole käytetty tilastojen viimeisen nollauksen jälkeen (koon mukaan). Älä poista PK- tai yksilöllisen rajoituksen indeksejä",
+      "fullScan": "Liialliset täydet skannaukset",
+      "fullScanHint": "Taulukot, joissa on yli 1 000 aktiivista riviä ja joissa täydet skannaukset ovat vähintään puolet – tarkista suodatuskolumnien indeksit",
+      "dead": "Liialliset kuolleet tuplet",
+      "deadHint": "Kuolleiden tuplien suhde 20 % tai enemmän – tarkista VACUUM- ja autovacuum-asetukset",
+      "none": "Ei mitään",
+      "scans": "skannausta"
+    },
+    "trend": {
+      "limit": "Kokoraja",
+      "empty": "Ei tilannekuvia viimeisten 30 päivän aikana",
+      "now": "Nykyinen koko",
+      "perDay": "Kasvu päivässä",
+      "needMore": "Tarvitaan vähintään 2 tilannekuvaa",
+      "daysLeft": "Saavuttaa {gb} Gt",
+      "noGrowth": "Ei kasvutrendiä",
+      "days": "noin {n} päivän kuluttua"
+    },
+    "activity": {
+      "refresh": "Päivitä",
+      "live": "Live-kysely – ei tallennettu",
+      "sessions": "Istunnon aktiviteetti",
+      "locks": "Lukot",
+      "none": "Ei mitään"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Putket",
+    "needLink": "Valitse ensin schema.pi-linkki yllä. Jos sinulla ei ole linkkiä, rekisteröi tunnus 'Linkki'-valikossa.",
+    "loading": "Ladataan…",
+    "pager": "Sivut",
+    "prev": "Edellinen",
+    "next": "Seuraava",
+    "runTitle": "Suorita ja valvo (7-3 · 7-4)",
+    "runBody": "Putkien suoritus, viiveen valvonta ja uudelleenkäsittely tulevat saataville, kun työntekijäagentti ja tietoturvamalli on viimeistelty. Tallenna toistaiseksi määritykset luonnoksina (DRAFT).",
+    "pre": {
+      "title": "Lähteen esitarkistus",
+      "intro": "Tarkistaa jokaisen taulukon muutosajankohdan sarakkeet, pehmeän poiston sarakkeet ja ensisijaisen avaimen suositellun kaappausmenetelmän (sovittimen) valitsemiseksi ja tarkistaa WAL-loogisen replikoinnin valmiuden. Vain lukukatalogi ja asetuskyselyt.",
+      "schema": "Skeema (valinnainen)",
+      "schemaPh": "Kaikki",
+      "run": "Suorita esitarkistus",
+      "running": "Tarkistetaan…",
+      "sum": "{tables} taulukkoa · {noPk} ilman PK:ta · {deleteUnseen} ei voi kaapata poistoja",
+      "truncated": "Katalogikysely saavutti 500 rivin rajan, joten joitakin taulukoita saattaa puuttua. Määritä skeema ja tarkista uudelleen.",
+      "empty": "Ei tarkistettavia taulukoita",
+      "colTable": "Taulukko",
+      "colChg": "Muutosajankohdan sarake",
+      "colDel": "Pehmeän poiston sarake",
+      "colAdapter": "Suositeltu menetelmä · syyt",
+      "toDraft": "Luo putkiluonnos {n} valitusta"
+    },
+    "ready": {
+      "ok": "WAL-looginen replikointi valmis – taulukot, joissa on PK, voivat käyttää LOGICAL-menetelmää",
+      "no": "WAL-looginen replikointi ei valmis – kaappaa kyselyllä tai avainten vertailulla",
+      "senders": "{n} replikointiyhteyttä"
+    },
+    "adapter": {
+      "LOGICAL": "Looginen replikointi (WAL)",
+      "POLL": "Muutosajankohdan kysely",
+      "KEY_DIFF": "Avaimen tilannekuvan ero",
+      "NONE": "Vain täysi uudelleenlataus"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Sisältää muutosajankohdan sarakkeen",
+      "NO_CHG_COL": "Ei muutosajankohdan saraketta",
+      "HAS_SOFT_DEL": "Sisältää pehmeän poiston sarakkeen",
+      "NO_SOFT_DEL": "Ei pehmeän poiston saraketta",
+      "HAS_PK": "Sisältää ensisijaisen avaimen",
+      "NO_PK": "Ei ensisijaista avainta – muutettuja rivejä ei voida tunnistaa",
+      "DELETE_UNSEEN": "Kysely ei voi kaapata fyysisiä DELETE-komentoja (pehmeän poiston sarake suositellaan)",
+      "LOGICAL_NOT_READY": "Voidaan vaihtaa LOGICAL-tilaan, kun WAL-looginen replikointi on valmis",
+      "FULL_RELOAD_ONLY": "Ei PK:ta tai muutosajankohdan saraketta, joten ei inkrementaalista kaappausta – lisää PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "NO_SLOTS": "max_replication_slots on 0",
+      "NO_SENDERS": "max_wal_senders on 0",
+      "IS_STANDBY": "Valmiustilapalvelin – ota looginen replikointi ensisijaisesta",
+      "SETTINGS_UNKNOWN": "Asetuksia ei voitu lukea, valmius tuntematon"
+    },
+    "ed": {
+      "title": "Putkimääritykset",
+      "draftOnly": "Vain suunnittelu – tallennettu luonnoksina (DRAFT)",
+      "new": "Uusi putki",
+      "empty": "Ei tallennettuja putkia",
+      "manual": "Manuaalinen",
+      "edit": "Muokkaa",
+      "remove": "Poista",
+      "removeConfirm": "Poistetaanko putki '{name}'?",
+      "name": "Nimi",
+      "adapter": "Kaappausmenetelmä",
+      "srcConn": "Lähdeyhteys",
+      "useCurrentConn": "Käytä yllä valittua yhteyttä",
+      "sched": "Aikataulu (cron 5-kenttä, tyhjä = manuaalinen)",
+      "target": "Kohde",
+      "tables": "Lähdetaulukot (rivinvaihdolla tai pilkulla eroteltuna)",
+      "steps": "Vaiheet (lähde → muunnos → kohde)",
+      "op": "Toiminto",
+      "notePh": "Kuvaus · ehto (valinnainen)",
+      "addTransform": "Lisää muunnosvaihe",
+      "save": "Tallenna",
+      "saving": "Tallennetaan…",
+      "saved": "Tallennettu",
+      "close": "Sulje"
+    },
+    "kind": {
+      "SOURCE": "Lähde",
+      "TRANSFORM": "Muunnos",
+      "TARGET": "Kohde"
+    },
+    "sts": {
+      "DRAFT": "Luonnos"
+    },
+    "check": {
+      "NAME_REQUIRED": "Anna nimi",
+      "CONN_REQUIRED": "Valitse lähdeyhteys",
+      "CRON_INVALID": "Anna aikataulu 5-kenttäisenä cron-muodossa (minuutti tunti päivä kuukausi viikonpäivä; numerot, *, ',', -, /)",
+      "OP_REQUIRED": "Anna toiminto jokaiselle vaiheelle",
+      "STEPS_TOO_FEW": "Lähde- ja kohdevaiheet ovat pakollisia",
+      "STEPS_TOO_MANY": "Enintään 20 vaihetta",
+      "STEP_FIRST_SOURCE": "Ensimmäisen vaiheen on oltava lähde",
+      "STEP_LAST_TARGET": "Viimeisen vaiheen on oltava kohde",
+      "STEP_MIDDLE_TRANSFORM": "Vain muunnosvaiheet voivat olla välissä"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Samanniminen putki on jo olemassa. Käytä toista nimeä",
+      "CONN_UNSUPPORTED": "Tätä yhteyttä ei voi vielä tarkistaa (vain PostgreSQL-suorat palvelinyhteydet toistaiseksi)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL-virityslaboratorio",
+    "intro": "Valitse yhteys ja syötä SQL nähdäksesi suoritus suunnitelman puuna, hidastumisen syineen (täydet skannaukset, sisäkkäiset silmukat, suuret lajittelut) ja SQL-antipatterit tarkistettuna schema.pi-standardidomainien mukaisesti. Kyselyjä ei todellisuudessa suoriteta (ei ANALYZE).",
+    "needLink": "Valitse linkki ja yhteys yllä nähdäksesi suunnitelmat. Antipatteritarkistus toimii ilman linkkiä.",
+    "sqlLabel": "SQL (yksi SELECT- tai WITH-lause)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Näytä suunnitelma",
+    "explaining": "Ladataan…",
+    "save": "Tallenna suunnitelma",
+    "saving": "Tallennetaan…",
+    "saveName": "Nimi (esim. ennen indeksin lisäämistä)",
+    "saveNote": "SQL:n ja suunnitelman ehtojen vakiot arvot peitetään kysymysmerkillä (?) tallennettaessa.",
+    "plan": {
+      "title": "Suoritus suunnitelma",
+      "summary": "Kokonaiskustannus {cost} · {ms}ms",
+      "cost": "kustannus",
+      "rows": "rivit",
+      "width": "leveys"
+    },
+    "warn": {
+      "none": "Ei merkittäviä varoituksia.",
+      "SEQ_SCAN_LARGE": "Täysi skannaus taulukossa {relation} (noin {rows} riviä) – harkitse indeksin lisäämistä suodatuskolumneihin.",
+      "NESTED_LOOP_HIGH": "Sisäkkäinen silmukka tuottaa noin {rows} riviä – harkitse hash- tai merge-liitosta tai indeksiä liitosehtoon.",
+      "SORT_SPILL": "Lajittelun koko on noin {kb}KB, mikä ylittää oletusarvoisen work_mem (4MB); se voi vuotaa levylle."
+    },
+    "lint": {
+      "run": "Tarkista antipatterit",
+      "title": "SQL-antipatteritarkistus",
+      "none": "Antipattereita ei löytynyt.",
+      "domainsOff": "Standardidomainien lataaminen epäonnistui; tarkistettu vain oletusarvoisilla sarakkeen jälkiliitesäännöillä.",
+      "types": {
+        "num": "numeerinen",
+        "date": "päivämäärä",
+        "char": "merkki"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * – valitse vain tarvitsemasi sarakkeet (ylimääräinen I/O, ei kattavaa indeksiä).",
+        "FUNC_ON_COLUMN": "Suodatuskolumni {column} on kääritty funktioon tai lausekkeeseen, joten sen indeksiä ei voi käyttää – muunna sen sijaan vakio.",
+        "LEADING_WILDCARD": "LIKE, jossa on edessä %, ei voi käyttää B-puuindeksiä – harkitse pg_trgm GIN-indeksiä.",
+        "OR_DIFF_COLUMNS": "Eri sarakkeiden ehdot yhdistetään OR-operaattorilla – harkitse UNION ALL -operaattoria tai sarakekohtaisia indeksejä.",
+        "IMPLICIT_CAST": "{column} verrataan lainattuun numeroon – vastaa sarakkeen ja vakion tyyppejä (implisiittinen tyyppimuunnos).",
+        "NOT_IN_SUBQUERY": "NOT IN (aläkysely) ei palauta mitään, kun NULL-arvoja on läsnä, ja on hidas – käytä NOT EXISTS -operaattoria.",
+        "NO_WHERE": "Ei WHERE-lausetta – suuressa taulukossa tämä on täysi skannaus (lisää ehto tai LIMIT).",
+        "DOMAIN_MISMATCH": "{column} on standardidomainin mukaan {expected}-tyyppiä, mutta sitä verrataan toisen tyyppiseen vakioon – implisiittinen tyyppimuunnos voi estää indeksin käytön."
+      }
+    },
+    "saved": {
+      "title": "Tallennetut suunnitelmat · Vertaa",
+      "empty": "Ei tallennettuja suunnitelmia. Tarkastele suunnitelmaa ja tallenna se sitten.",
+      "pick": "Valitse vertailtava suunnitelma",
+      "pick2": "Valitse kaksi suunnitelmaa vertailtavaksi.",
+      "compare": "Vertaa kahta suunnitelmaa",
+      "delete": "Poista",
+      "cost": "kustannus",
+      "prev": "Edellinen",
+      "next": "Seuraava",
+      "page": "Sivu {page}"
+    },
+    "diff": {
+      "cost": "Kokonaiskustannus {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Nämä kaksi suunnitelmaa ovat eri SQL-lauseille (normalisoinnin jälkeen).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Ei muutoksia suunnitelman solmuissa.",
+      "before": "Ennen",
+      "after": "Jälkeen"
+    },
+    "ai": {
+      "title": "AI-viritysneuvoja",
+      "badge": "Tulossa pian",
+      "body": "Tulossa pian (hyväksyntä- ja vaikutustenmittausmenettelyjen jälkeen) – neuvoja luodaan SQL:stä peitetyillä vakioilla ja kirjataan sovelletuksi vasta DA:n hyväksynnän ja mitatun vaikutuksen jälkeen."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi-linkkiominaisuutta valmistellaan. Yritä uudelleen hetken kuluttua.",
+      "LINK_AUTH": "Linkkitunnus on vanhentunut tai peruutettu. Myönnä uusi tunnus schema.pi:ssä ja rekisteröi se uudelleen.",
+      "LINK_SCOPE": "Tämä linkki ei voi käyttää kyseistä yhteyttä (eri luokitusjärjestelmä).",
+      "CONN_UNSUPPORTED": "Tätä yhteystyyppiä ei vielä tueta (vain PostgreSQL-palvelinyhteydet).",
+      "Q_UNKNOWN": "Tuntematon kysely.",
+      "SQL_NOT_SELECT": "Suunnitelmat ovat saatavilla vain yhdelle SELECT- tai WITH-alkuiselle lauseelle.",
+      "TIMEOUT": "Pyynnön aikakatkaisu (5 sekuntia). Lyhennä SQL:ää tai yritä uudelleen myöhemmin.",
+      "RATE": "Liian monta pyyntöä. Yritä uudelleen minuutin kuluttua.",
+      "PAYLOAD_TOO_LARGE": "Suunnitelma on liian suuri tallennettavaksi.",
+      "LINK_NOT_FOUND": "Linkkiä ei löytynyt. Valitse linkki uudelleen."
+    }
+  },
+  "nav": {
+    "label": "Ominaisuudet",
+    "connect": "Yhdistä",
+    "sqlLab": "SQL-viritys",
+    "perf": "Suorituskyky",
+    "monitor": "Valvonta",
+    "drift": "Poikkeama",
+    "migration": "Siirto",
+    "pipeline": "Putki",
+    "analytics": "Analytiikka",
+    "ops": "Toimintojen turvallisuus",
+    "learn": "Opi"
   }
 }

@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "DBA 和 SQLP 的工作平台，用於快速安全地運行 DB 引擎"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "讓您的 DB 引擎快速安全地運行您的資料",
+    "description": "一個用於執行計畫、統計和效能的 DBA 和 SQLP 工作平台。schema.pi 負責設計和標準；dbms.pi 則是其在引擎端的合作夥伴。",
+    "welcome": "歡迎，{name}。",
+    "featTitle": "功能",
+    "featDesc": {
+      "connect": "註冊 schema.pi 連結權杖並檢查連線狀態",
+      "sqlLab": "計畫樹、警告、比較和針對標準領域的反模式檢查",
+      "perf": "慢速查詢 Top-N、資料表/索引健康狀況、容量預測、活動和鎖定",
+      "monitor": "應用程式、DB 和 URL 指標摘要，附帶閾值警報",
+      "drift": "比較 schema.pi 模型和 DDL 歷史記錄與實際目錄，測量索引效果",
+      "migration": "拓撲載入順序、區塊、檢查清單和驗證 SQL",
+      "pipeline": "變更捕獲預檢和來源→轉換→目標管道定義",
+      "analytics": "KPI 儀表板、三層資料湖映射和資料集目錄",
+      "ops": "參數、角色、備份和複製 DR 的唯讀診斷",
+      "learn": "SQLP/DAP 練習題、調優案例和 DBMS 比較字典"
+    }
+  },
   "auth": {
     "checking": "正在檢查登入…",
     "signedIn": "{name}",
@@ -64,5 +87,838 @@
     "LINK_CODE_GEN_FAILED": "無法建立連結代碼。請稍後再試。",
     "AUTH_DB_UNAVAILABLE": "無法儲存您的帳戶，因此登入失敗。請稍後再試。",
     "LINK_TRY_LIMIT": "連結代碼錯誤次數過多。請在 15 分鐘後再試。"
+  },
+  "analytics": {
+    "title": "分析與資料湖",
+    "intro": "dbms 活動 KPI、三層資料湖設計和資料集目錄集中於一處。",
+    "storageNotice": "資料湖儲存（客戶端或雲端）尚未決定（PRD 第 10 節 #7）。目前僅儲存設計和名稱映射 — 不儲存列資料。",
+    "noLink": "請先選擇或註冊 schema.pi 連結。",
+    "goConnect": "註冊連結",
+    "loading": "載入中…",
+    "refresh": "重新整理",
+    "kpi": {
+      "title": "KPI 儀表板",
+      "updatedAt": "{area} · 截至 {time}",
+      "notBuilt": "未建置",
+      "keys": {
+        "links": "我的連結",
+        "perf": "效能快照",
+        "drift": "漂移執行",
+        "mig": "遷移計畫",
+        "pipe": "管道",
+        "lake": "資料湖資料集"
+      },
+      "countsChart": "按功能劃分的總計",
+      "trendTitle": "過去 14 天的效能快照",
+      "trendItem": "{day}：{cnt}",
+      "trendEmpty": "過去 14 天沒有效能快照。",
+      "monTitle": "schema.pi 監控摘要（過去一小時）",
+      "monTps": "請求/秒",
+      "monErr": "錯誤率",
+      "monAvg": "平均回應 (ms)",
+      "monDb": "DB 連線數",
+      "monFail": "無法載入監控摘要：{msg}"
+    },
+    "lake": {
+      "title": "三層資料湖設計",
+      "raw": "原始",
+      "rawDesc": "按原樣載入來源 DB 欄位名稱和類型。",
+      "std": "標準化",
+      "stdDesc": "將欄位重新命名為 schema.pi 批准的標準術語。",
+      "cur": "精選",
+      "curDesc": "按實體分組的分析資料集。",
+      "loadProjects": "載入專案",
+      "project": "專案",
+      "pickProject": "選擇一個專案",
+      "noProjects": "此區域沒有專案。",
+      "noTables": "此專案模型沒有資料表。",
+      "conform": "標準符合度 {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} 個欄位 · {pct}% 符合",
+      "colSrc": "來源欄位",
+      "colStd": "標準化欄位",
+      "colType": "類型",
+      "colOk": "格式",
+      "ok": "正常",
+      "ng": "檢查",
+      "pk": "PK",
+      "selectAll": "全選",
+      "selected": "已選取 {cnt} 個",
+      "save": "新增至資料湖設計",
+      "saved": "已將 {cnt} 個新增至目錄。"
+    },
+    "catalog": {
+      "title": "資料集目錄",
+      "schemaCard": "schema.pi 是分析資料集定義、中繼資料搜尋和詞彙表的真實來源。您在此處只會看到資料湖載入狀態和新鮮度。",
+      "openSchema": "在 schema.pi 中查看定義",
+      "empty": "尚未將任何資料表新增至資料湖設計。",
+      "status": {
+        "DSGN": "僅設計",
+        "LOADED": "已載入",
+        "FAIL": "載入失敗"
+      },
+      "lastLoad": "上次載入 {time}",
+      "neverLoaded": "從未載入",
+      "remove": "移除",
+      "removeConfirm": "從目錄中移除 {tbl}？",
+      "prev": "上一個",
+      "next": "下一個",
+      "page": "第 {page} 頁"
+    },
+    "errors": {
+      "LINK_REQUIRED": "請先選擇一個連結。",
+      "NOT_FOUND": "找不到。請檢查模型是否已變更。"
+    }
+  },
+  "drift": {
+    "title": "模型 ↔ DB 漂移",
+    "intro": "比較 schema.pi 設計模型和 DDL 應用歷史記錄與即時 DB 目錄，以找出漂移，並測量設計的索引是否實際使用。絕不讀取或儲存客戶列資料。",
+    "needLink": "請先在上方選擇一個 schema.pi 連結。如果沒有，請在「連結」選單中註冊一個權杖。",
+    "needConn": "請在上方選擇要比較的 DB 連線。",
+    "project": "專案",
+    "projectPick": "選擇一個專案",
+    "loading": "載入中…",
+    "run": "執行漂移偵測",
+    "running": "正在比較…",
+    "readOnly": "僅執行唯讀目錄和統計查詢。",
+    "applyInSchema": "在 schema.pi（真實來源）中應用修復（模型編輯、DDL 生成和執行）。",
+    "history": "偵測歷史",
+    "prev": "上一個",
+    "next": "下一個",
+    "none": "無",
+    "model": "模型",
+    "reqNo": "請求 {id}",
+    "notSaved": "無法將此執行儲存到歷史記錄（結果正常顯示）。",
+    "capped": "項目過多 — 每個部分顯示前 {cap} 個（計數是完整的）。",
+    "statsMissing": "索引使用統計資料不可用，因此無法判斷使用情況。",
+    "sum": {
+      "missingTables": "DB 中缺少的資料表",
+      "extraTables": "模型中沒有的資料表",
+      "colMismatches": "欄位不匹配",
+      "missingIndexes": "DB 中缺少的設計索引",
+      "extraIndexes": "模型中沒有的索引",
+      "ddlMissing": "應用後消失的物件",
+      "unusedIndexes": "未使用的設計索引"
+    },
+    "sec": {
+      "ddlMissing": "DDL 已應用但在 DB 中缺失",
+      "missingTables": "模型中有但在 DB 中缺失的資料表",
+      "extraTables": "DB 中有但在模型中沒有的資料表",
+      "colMismatches": "欄位類型 / NULL 不匹配",
+      "missingIndexes": "DB 中缺少的設計索引",
+      "extraIndexes": "僅在 DB 中的索引（不包括 PK）",
+      "idxUsage": "設計索引的有效性"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi 記錄這些物件已應用，但它們已消失 — 懷疑是手動刪除或回滾。",
+      "extraTables": "這些可能屬於此連線上的其他專案或系統資料表。",
+      "idxUsage": "自上次統計資料重設以來掃描次數為零表示未使用。在刪除之前檢查統計資料視窗。"
+    },
+    "kind": {
+      "MISSING": "DB 中缺失",
+      "EXTRA": "模型中沒有",
+      "TYPE": "類型不同",
+      "NULL": "可為空性不同"
+    },
+    "col": {
+      "idx": "索引",
+      "scans": "掃描次數",
+      "size": "大小",
+      "status": "判斷"
+    },
+    "usage": {
+      "USED": "使用中",
+      "UNUSED": "未使用的設計索引",
+      "NO_STATS": "無統計資料"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi 連結尚未準備好。請稍後再試。",
+      "LINK_DOWN": "無法連線到 schema.pi。請稍後再試。",
+      "LINK_AUTH": "連結權杖已過期或已撤銷。請在 schema.pi 中發行新權杖並重新註冊。",
+      "LINK_NOT_FOUND": "找不到連結。請重新選擇連結。",
+      "LINK_SCOPE": "此連線不屬於連結的分類。",
+      "CONN_UNSUPPORTED": "不支援的連線（目前僅支援 PostgreSQL 伺服器連線）。",
+      "TIMEOUT": "請求逾時。請稍後再試。",
+      "RATE": "請求過多。請在一分鐘後再試。"
+    }
+  },
+  "learn": {
+    "title": "DBA 學習",
+    "intro": "SQLP/DAP 練習題、調優案例集和 Oracle/Tibero/PostgreSQL 比較字典。無需連結即可運作；選擇連結也可查看您的 schema.pi 標準類型映射。",
+    "loading": "載入中…",
+    "tabs": {
+      "quiz": "練習",
+      "cases": "調優案例",
+      "dict": "DBMS 字典"
+    },
+    "topics": {
+      "INDEX": "索引掃描",
+      "JOIN": "連接方法",
+      "PARTITION": "分區修剪",
+      "NORMAL": "正規化",
+      "NAMING": "標準命名",
+      "ISOLATION": "隔離級別",
+      "LOCK": "鎖定"
+    },
+    "levels": {
+      "1": "基礎",
+      "2": "中級",
+      "3": "進階"
+    },
+    "quiz": {
+      "score": "我的進度",
+      "scoreLine": "已解決 {total} 題中的 {solved} 題 · {correct} 題正確",
+      "right": "正確",
+      "wrong": "不正確",
+      "retry": "再試一次",
+      "prevRight": "上次正確",
+      "prevWrong": "上次不正確"
+    },
+    "cases": {
+      "notice": "所有案例均為自編學習範例；數字僅供說明（非客戶資料）。",
+      "problem": "問題 SQL",
+      "plan": "計畫摘要",
+      "cause": "原因",
+      "fix": "已修復的 SQL",
+      "effect": "效果"
+    },
+    "cats": {
+      "ALL": "全部",
+      "TYPE": "資料類型",
+      "FUNC": "函數",
+      "PAGING": "分頁",
+      "SEQ": "序列",
+      "DATE": "日期",
+      "SYNTAX": "語法"
+    },
+    "dict": {
+      "search": "搜尋（例如 NVL, LIMIT）",
+      "item": "項目",
+      "note": "備註",
+      "empty": "沒有符合的項目",
+      "loading": "載入中…",
+      "liveTitle": "我的主題區域標準類型映射",
+      "liveIntro": "選擇連結以載入 schema.pi DBMS 設定檔（邏輯 → 實體類型）。上述字典無需連結即可運作。",
+      "liveLoad": "載入類型映射",
+      "lgcType": "邏輯類型"
+    }
+  },
+  "link2": {
+    "title": "schema.pi 連線",
+    "intro": "註冊連線權杖以在 dbms.pi 中使用 schema.pi 主題區域的 DB 連線。權杖會加密儲存，且不會儲存您資料庫中的任何列資料。",
+    "howTitle": "如何發行連線權杖",
+    "how1": "登入 schema.pi 並開啟要連線的主題區域",
+    "how2": "前往「主題區域」→「設定」→「連線權杖」並按下「發行權杖」（區域管理員或 DA 角色）",
+    "how3": "複製以 slk_ 開頭的權杖 — 它只會在發行時顯示一次",
+    "how4": "將其貼到下方並註冊",
+    "openSchema": "開啟 schema.pi",
+    "registerTitle": "註冊連線",
+    "tokenLabel": "連線權杖",
+    "tokenPlaceholder": "slk_…",
+    "register": "註冊",
+    "registering": "正在檢查…",
+    "registered": "'{area}' 分類體系已連接",
+    "replaced": "已將 '{area}' 分類體系的權杖替換為新權杖",
+    "myLinks": "我的連線",
+    "empty": "未註冊任何連線",
+    "loading": "載入中…",
+    "regDtm": "已註冊 {dtm}",
+    "remove": "中斷連線",
+    "removeConfirm": "要解除 '{area}' 的連接嗎？使用此連接的畫面將無法再存取。",
+    "prev": "上一個",
+    "next": "下一個",
+    "statusTitle": "連線狀態",
+    "noConns": "此主題區域中沒有 DB 連線（請在 schema.pi 中新增一個）",
+    "colConn": "連線",
+    "colDbms": "DBMS",
+    "colMthd": "方法",
+    "colHost": "主機",
+    "colTest": "上次測試",
+    "colAgent": "代理程式上次出現",
+    "never": "無",
+    "retry": "重試",
+    "pickerLink": "連結",
+    "pickerConn": "連線",
+    "pickerEmpty": "沒有連線 —",
+    "pickerGo": "在 /connect 註冊一個",
+    "errors": {
+      "LINK_AUTH": "連線權杖已過期或已撤銷。請在 schema.pi 中發行新權杖並重新註冊",
+      "LINK_SCOPE": "此連線不屬於連結的主題區域",
+      "LINK_DOWN": "無法連線到 schema.pi。請稍後再試",
+      "LINK_NOT_FOUND": "找不到連線",
+      "LINK_DUP": "正在註冊中。請再試一次",
+      "CONN_UNSUPPORTED": "不支援的連線（目前僅支援 PostgreSQL 伺服器連線）",
+      "Q_UNKNOWN": "未知查詢",
+      "SQL_NOT_SELECT": "只能執行單一 SELECT（或 WITH）語句",
+      "PGSS_MISSING": "目標 DB 上未安裝 pg_stat_statements 擴充功能",
+      "TIMEOUT": "請求逾時",
+      "RATE": "請求過多。請在一分鐘後再試",
+      "INVALID_INPUT": "請貼上以 slk_ 開頭的完整連線權杖"
+    }
+  },
+  "migration": {
+    "title": "資料遷移 (PiMig)",
+    "intro": "根據 schema.pi 設計模型中的關係計算資料表載入順序，組織區塊大小、平行度和切換檢查清單，並生成您在來源和目標上自行執行的驗證 SQL。此畫面僅用於規劃和檢查 — 它不移動資料或讀取客戶 DB 列。",
+    "needLink": "請先在上方選擇一個 schema.pi 連結。如果沒有，請在「連線」選單下註冊一個權杖。",
+    "loading": "載入中…",
+    "newPlan": "新遷移計畫",
+    "project": "專案",
+    "projectPick": "選擇一個專案",
+    "planNm": "計畫名稱",
+    "planNmHint": "預設為專案名稱",
+    "create": "建立計畫",
+    "creating": "正在建立…",
+    "snapHint": "此刻的設計（資料表、欄位和關係名稱）會凍結為快照。當模型變更時，請建立新計畫。",
+    "plans": "遷移計畫",
+    "prev": "上一個",
+    "next": "下一個",
+    "sts": {
+      "DRAFT": "草稿",
+      "READY": "準備就緒"
+    },
+    "del": "刪除",
+    "delConfirm": "要刪除此計畫嗎？",
+    "snapInfo": "快照：{tables} 個資料表 · {rels} 個關係",
+    "dropped": "(尚無實體資料表的 {n} 個關係已從排序中排除)",
+    "chunkSize": "區塊大小 (列/提交)",
+    "parallel": "平行處理 (同時處理的資料表)",
+    "saveOpts": "儲存選項",
+    "optsHint": "平行處理是指在同一層級中同時載入的資料表數量。區塊大小是執行引擎將使用的提交單位 (列數)。",
+    "order": "載入順序",
+    "orderHint": "依設計關係 (非實體 FK) 進行拓撲排序，因此父資料表會先載入。同一層級中的資料表彼此不依賴，可以平行載入。",
+    "cycles": "{n} 個循環群組 — 放在同一層級。請手動設定其順序，並將參考檢查延遲到載入之後。",
+    "selfRefs": "自我參考 (階層式) 資料表 — 在資料表內先載入父列",
+    "level": "層級 {n}",
+    "checklist": "轉換檢查清單",
+    "toReady": "標記為準備就緒",
+    "toDraft": "返回草稿",
+    "readyNeedAll": "請檢查所有項目，然後才能將計畫標記為準備就緒。",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC 交接點",
+        "desc": "在初始載入之前記錄一致的來源點 (PG LSN · Oracle/Tibero SCN · 對於輪詢，開始時間減去重疊視窗)，從該點開始 CDC，並使用 upsert 吸收交接視窗中的重複項。"
+      },
+      "valueConv": {
+        "title": "值轉換",
+        "desc": "已設定空字串 = NULL、CHAR 空白填充、無精確度的 NUMBER → NUMERIC、帶時間的 DATE → TIMESTAMP、VARCHAR2 BYTE ↔ CHAR 長度以及 LONG·RAW 的規則。"
+      },
+      "charset": {
+        "title": "字元集",
+        "desc": "已確認來源字元集 (KO16MSWIN949、UTF8 等)，並決定因多位元組增長而溢位的欄位以及不可轉換字元的隔離。"
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB 以區塊 (大小和記憶體限制) 串流，並透過長度 + 雜湊進行驗證。"
+      },
+      "seqResync": {
+        "title": "序列重新同步",
+        "desc": "載入後，目標序列·身分會設定為 max(key)+1。"
+      },
+      "timezone": {
+        "title": "時區 · 系統欄位",
+        "desc": "已設定沒有時區的值的解釋時區 (例如 Asia/Seoul)，載入期間修改時間觸發器不會覆寫來源時間戳記，並設定建立者/修改者替換規則。"
+      },
+      "backpressure": {
+        "title": "背壓 · 目標載入",
+        "desc": "在目標延遲、WAL 增長或鎖定等待時減少區塊大小和平行處理；在載入後建立非 PK 索引，並在之後執行 ANALYZE·VACUUM。"
+      }
+    },
+    "verify": "驗證 SQL",
+    "verifyHint": "依載入順序為每個資料表產生計數、數字欄位總和、重複鍵和鍵雜湊查詢。請在來源和目標上自行執行並比較 (此畫面不會執行它們)。",
+    "noHashOracle": "Oracle·Tibero 的雜湊函數和文字呈現與 PostgreSQL 不同，因此省略雜湊查詢 — 請比較計數、總和和重複鍵。",
+    "copy": "複製",
+    "copied": "已複製",
+    "copyFail": "無法複製。請選取文字並手動複製。",
+    "engine": {
+      "title": "執行·重新啟動 · 演練·回溯",
+      "body": "實際移轉執行 (檢查點、背壓、錯誤列隔離) 和演練、回溯以及 CDC 起始點記錄將在工作代理程式安全模型 (A10) 最終確定後提供。目前這涵蓋了規劃、檢查和驗證 SQL。"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi 連結功能正在準備中。請稍後再試。",
+      "LINK_DOWN": "無法連線到 schema.pi。請稍後再試。",
+      "LINK_AUTH": "連結權杖已過期或已撤銷。請在 schema.pi 中發行新權杖並重新註冊。",
+      "LINK_NOT_FOUND": "找不到連結。請重新選擇連結。",
+      "LINK_SCOPE": "此專案不屬於該連結的分類法。",
+      "TIMEOUT": "請求逾時。請稍後再試。",
+      "RATE": "請求過多。請在一分鐘後再試。",
+      "MIG_NO_TABLES": "此專案沒有要移轉的實體資料表。請先在 schema.pi 中轉換為實體。",
+      "MIG_CHECK_INCOMPLETE": "請檢查所有轉換檢查清單項目，然後才能將計畫標記為準備就緒。",
+      "NOT_FOUND": "找不到計畫。"
+    }
+  },
+  "monitor": {
+    "title": "監控中心",
+    "collectNote": "收集在 schema.pi 中執行 — 移轉已規劃 (D7)。此頁面讀取 schema.pi 監控摘要。",
+    "noLink": "請先選擇或註冊 schema.pi 連結。",
+    "goConnect": "註冊連結",
+    "period": "期間",
+    "periods": {
+      "30": "30 分鐘",
+      "60": "1 小時",
+      "360": "6 小時",
+      "1440": "24 小時"
+    },
+    "refresh": "重新整理",
+    "loading": "載入中…",
+    "updatedAt": "{area} · 截至 {time} (每 30 秒自動重新整理)",
+    "appTitle": "應用程式效能",
+    "dbTitle": "依 DB 連線狀態",
+    "urlTitle": "URL 檢查",
+    "empty": "沒有資料可顯示。",
+    "breachTitle": "{n} 個閾值違規",
+    "rulesTitle": "閾值規則",
+    "rulesNote": "規則會儲存在此連結中，並根據收到的摘要進行評估；違規會顯示紅色邊框 (通知稍後會發送)。",
+    "metric": "指標",
+    "conn": "連線",
+    "allConns": "所有連線",
+    "op": "比較",
+    "threshold": "閾值",
+    "thrInvalid": "請輸入數字作為閾值。",
+    "addRule": "新增規則",
+    "noRules": "尚無規則。",
+    "enable": "啟用",
+    "disable": "停用",
+    "delete": "刪除",
+    "delConfirm": "要刪除此規則嗎？",
+    "aiNote": "AI 事件分析和修復核准仍在 schema.pi 監控器中進行。",
+    "aiLink": "開啟 schema.pi 監控器",
+    "metrics": {
+      "APP_TPS": "TPS (請求/秒)",
+      "APP_ERR_PCT": "錯誤率 (%)",
+      "APP_SLOW_CNT": "慢速請求",
+      "APP_AVG_MS": "平均回應 (毫秒)",
+      "DB_SESS_CNT": "會話數",
+      "DB_LOCK_WAIT_CNT": "鎖定等待數",
+      "DB_CACHE_HIT_PCT": "快取命中率 (%)",
+      "DB_SIZE_MB": "DB 大小 (MB)",
+      "URL_RSP_MS": "URL 回應 (毫秒)",
+      "URL_FAIL_CNT": "URL 失敗數"
+    },
+    "errors": {
+      "LINK_REQUIRED": "請先選擇連結。",
+      "NOT_IMPLEMENTED": "schema.pi 連結功能正在準備中。請稍後再試。",
+      "LINK_AUTH": "連結權杖無效或已過期。請在 schema.pi 中發行新權杖並註冊。",
+      "LINK_SCOPE": "此連結無法存取該分類法。",
+      "RATE": "請求過多。請稍後再試。",
+      "TIMEOUT": "schema.pi 回應緩慢。請稍後再試。",
+      "RULE_LIMIT": "每個連結最多 50 個規則。",
+      "NOT_FOUND": "找不到規則。"
+    }
+  },
+  "ops": {
+    "title": "DB 操作安全",
+    "intro": "以唯讀方式診斷已連接 PostgreSQL 連線的參數、帳戶權限、備份和複製狀態。不更改設定，僅儲存判斷摘要，不儲存客戶 DB 列資料",
+    "loading": "載入中…",
+    "pickFirst": "請先在上方選擇連結和連線",
+    "run": "執行診斷",
+    "running": "診斷中…",
+    "noRun": "尚無診斷。請按一下「執行診斷」",
+    "lastRun": "上次診斷 {dtm}",
+    "readOnly": "診斷僅讀取 (SELECT)。建議僅供參考，並取決於伺服器記憶體、負載和工作負載",
+    "truncated": "物件過多 — 僅檢查前 500 個",
+    "paramsNote": "伺服器總記憶體未知，因此根據 shared_buffers ≈ RAM 的 25% 進行估計。random_page_cost 假設為 SSD",
+    "auditNote": "當連結查詢支援時，將檢查 RLS 關閉的資料表和未使用的帳戶",
+    "replNote": "基準是 Active-Standby (A-S) — 一個主要 + 備用。重播延遲 ≥ 5 秒 = 警告，≥ 60 秒 = 風險 (測量的 RPO 參考)",
+    "lagIdle": "無變更",
+    "pager": "分頁",
+    "prev": "上一個",
+    "next": "下一個",
+    "tabs": {
+      "params": "參數",
+      "audit": "帳戶與權限",
+      "backup": "備份與復原",
+      "repl": "複製與災難復原",
+      "history": "歷史記錄"
+    },
+    "level": {
+      "OK": "正常",
+      "WARN": "警告",
+      "RISK": "風險"
+    },
+    "role": {
+      "primary": "此連線 = 主要",
+      "standby": "此連線 = 備用",
+      "unknown": "角色未知"
+    },
+    "col": {
+      "level": "判斷",
+      "item": "項目",
+      "value": "值",
+      "reason": "詳細資料",
+      "standby": "備用",
+      "state": "狀態",
+      "sync": "同步",
+      "lag": "重播延遲"
+    },
+    "item": {
+      "super_many": "超級使用者",
+      "super_ok": "超級使用者",
+      "bypass_rls": "BYPASSRLS 角色",
+      "bypass_ok": "BYPASSRLS 角色",
+      "no_expiry": "密碼到期",
+      "expiry_ok": "密碼到期",
+      "public_grant": "PUBLIC 授權",
+      "public_ok": "PUBLIC 授權",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "上次封存的 WAL",
+      "arc_stale": "上次封存的 WAL",
+      "arc_recent": "上次封存的 WAL",
+      "arc_failing": "WAL 封存失敗"
+    },
+    "rules": {
+      "sb_default": "預設值 (128MB)。在專用伺服器上，建議約為 RAM 的 25%",
+      "sb_ok": "設定高於預設值",
+      "wm_over": "max_connections × work_mem 超過估計記憶體。並行排序有記憶體不足的風險",
+      "wm_default": "預設值 (4MB)。大型排序和雜湊可能會溢出到磁碟",
+      "wm_ok": "在合理範圍內",
+      "mwm_default": "預設值 (64MB)。VACUUM 和索引建立可能很慢；考慮 256MB 或更多",
+      "mwm_ok": "設定高於預設值",
+      "av_on": "autovacuum 已開啟",
+      "av_off": "autovacuum 已關閉。資料表膨脹和交易 ID 循環的風險很高",
+      "conn_high": "max_connections 很高。每個連線都會使用記憶體；建議使用連線池 (PgBouncer 等)",
+      "conn_ok": "在合理範圍內",
+      "lmd_off": "慢速查詢日誌已關閉 (-1)。建議設定約 1000 毫秒",
+      "lmd_all": "每個語句都已記錄 (0)。日誌記錄開銷很大",
+      "lmd_ok": "慢速查詢日誌已開啟",
+      "st_off": "沒有伺服器範圍的語句逾時 (0)。請設定每個角色或應用程式的限制",
+      "st_ok": "已設定語句逾時",
+      "iit_off": "沒有交易中閒置逾時 (0)。可能會導致鎖定持有和膨脹",
+      "iit_ok": "已設定交易中閒置逾時",
+      "ckpt_short": "檢查點間隔為 5 分鐘或更短。對於寫入繁重的工作負載，請考慮 10-15 分鐘",
+      "ckpt_ok": "在合理範圍內",
+      "wal_minimal": "wal_level=minimal 使 PITR 和複製不可能。請使用 replica 或更高版本",
+      "wal_ok": "WAL 層級支援 PITR 和複製",
+      "rpc_hdd": "HDD 預設值 (4)。對於 SSD，建議 1.1-2",
+      "rpc_ok": "適用於 SSD",
+      "super_many": "兩個或更多超級使用者。保留一個用於管理，並僅授予其他人所需的權限",
+      "super_ok": "最多一個超級使用者",
+      "bypass_rls": "存在繞過列級安全性 (RLS) 的非超級使用者角色",
+      "bypass_ok": "沒有繞過 RLS 的角色",
+      "no_expiry": "沒有密碼到期日的登入角色。建議為個人帳戶設定 VALID UNTIL",
+      "expiry_ok": "所有登入角色都有到期日",
+      "public_grant": "PUBLIC (所有角色) 具有資料表權限。寫入權限有風險",
+      "public_ok": "沒有授予 PUBLIC 的資料表權限",
+      "arc_on": "WAL 封存 (archive_mode) 已開啟",
+      "arc_off": "WAL 封存已關閉，因此無法進行時間點復原 (PITR)",
+      "arc_cmd_empty": "archive_mode 已開啟，但 archive_command 和 archive_library 為空",
+      "arc_never": "尚未封存任何 WAL",
+      "arc_stale": "上次 WAL 封存已超過 24 小時",
+      "arc_recent": "WAL 已在過去 24 小時內封存",
+      "arc_failing": "WAL 封存目前失敗。請檢查磁碟、權限和目標路徑",
+      "repl_is_standby": "此連線是備用 (復原模式)。請從主要連線檢查延遲",
+      "repl_none": "沒有連線的備用。沒有災難復原 (DR) 設定",
+      "repl_ok": "備用正在正常串流",
+      "repl_lag": "備用正在延遲或未串流"
+    },
+    "manual": {
+      "title": "手動檢查清單",
+      "intro": "無法自動檢查的備份和復原實踐。確認後勾選並記錄證據",
+      "memo": "備忘錄 (例如工具、排程、上次檢查時間)",
+      "save": "儲存",
+      "updated": "已更新 {dtm}",
+      "items": {
+        "base_backup": "在過去 7 天內，完整備份 (pg_basebackup 等) 已成功",
+        "offsite_copy": "備份副本儲存在異地 (另一個區域或儲存空間)",
+        "restore_rehearsal": "本季度已進行復原演練並記錄其持續時間",
+        "pitr_target": "PITR 程序和目標 RPO/RTO 已記錄",
+        "backup_encrypt": "備份檔案已加密且存取受限",
+        "retention": "已定義備份保留期限和刪除策略"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi 連結功能正在準備中。請稍後再試。",
+      "CONN_UNSUPPORTED": "此連線尚不支援 (僅限直接 PostgreSQL)",
+      "TIMEOUT": "目標 DB 回應過慢，已中斷。請稍後再試",
+      "RATE": "呼叫過多。請在一分鐘後再試。",
+      "Q_UNKNOWN": "不支援的查詢。請檢查 schema.pi 連結 API 版本",
+      "INVALID_INPUT": "連結或連線選擇無效"
+    }
+  },
+  "perf": {
+    "title": "效能",
+    "intro": "收集已連接 PostgreSQL 連線的查詢、資料表和索引統計資料，以顯示慢速查詢、資料表/索引健康狀況和容量趨勢。僅儲存統計數值，不儲存客戶 DB 列資料",
+    "loading": "載入中…",
+    "pickFirst": "請先在上方選擇連結和連線",
+    "pager": "分頁",
+    "tabs": {
+      "collect": "收集",
+      "top": "慢速查詢",
+      "health": "資料表與索引健康狀況",
+      "trend": "大小趨勢",
+      "activity": "活動與鎖定"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi 連結功能正在準備中。請稍後再試。",
+      "PGSS_MISSING": "此 DB 未安裝 pg_stat_statements 擴充功能，因此無法查看查詢統計資料",
+      "CONN_UNSUPPORTED": "此連線尚不支援 (僅限直接 PostgreSQL 連線)",
+      "TIMEOUT": "目標 DB 回應過慢，已中斷。請稍後再試",
+      "RATE": "請求過多。請在一分鐘後再試。",
+      "LINK_AUTH": "連結權杖已過期或已撤銷。請在連線頁面重新註冊權杖",
+      "LINK_SCOPE": "此連線不屬於該連結的主題區域",
+      "Q_UNKNOWN": "不支援的查詢。請檢查 schema.pi 連結 API 版本",
+      "INVALID_INPUT": "連結或連線值無效"
+    },
+    "pgss": {
+      "title": "如何啟用 pg_stat_statements",
+      "body": "慢速查詢 Top-N 需要 pg_stat_statements 擴充功能。請以 DB 管理員帳戶執行以下語句。Supabase 可以在儀表板的 Database → Extensions 中啟用",
+      "note": "自行託管的 PostgreSQL 也需要在 shared_preload_libraries (postgresql.conf) 中包含 pg_stat_statements 並重新啟動。資料表、索引和大小統計資料無需它即可運作"
+    },
+    "collect": {
+      "intro": "立即收集會一次讀取頂級查詢統計資料、資料表、索引和大小，並將其儲存為快照。至少收集兩次才能查看變更和大小趨勢",
+      "run": "立即收集",
+      "running": "收集中…",
+      "done": "已於 {dtm} 收集 — {qry} 個查詢 · {tbl} 個資料表 · {idx} 個索引"
+    },
+    "top": {
+      "sort": "排序",
+      "sortTotal": "總時間",
+      "sortMean": "平均時間",
+      "sortCalls": "呼叫數",
+      "empty": "尚無快照。請在「收集」分頁上按一下「立即收集」",
+      "range": "{from} → {to} 之間的變更",
+      "first": "首次快照於 {dtm} — 累積值 (從下一個快照開始的變更)",
+      "query": "查詢 (常值已遮罩)",
+      "calls": "呼叫",
+      "totalMs": "總毫秒",
+      "meanMs": "平均毫秒",
+      "rows": "列",
+      "reset": "偵測到統計資料重設 — 顯示為累計"
+    },
+    "health": {
+      "empty": "尚無快照。請在「收集」分頁上按一下「立即收集」",
+      "basis": "依據 {dtm} 的快照",
+      "unusedIdx": "未使用的索引",
+      "unusedIdxHint": "自上次統計資料重設後從未使用的索引（依大小）。請勿刪除 PK 或唯一約束索引",
+      "fullScan": "過多的全表掃描",
+      "fullScanHint": "具有 1,000 個以上即時列且全表掃描至少佔一半的資料表 — 請檢閱篩選欄上的索引",
+      "dead": "過多的無效元組",
+      "deadHint": "無效元組比例達 20% 或以上 — 請檢查 VACUUM 和 autovacuum 設定",
+      "none": "無",
+      "scans": "次"
+    },
+    "trend": {
+      "limit": "大小閾值",
+      "empty": "最近 30 天沒有快照",
+      "chart": "最近 30 天 DB 大小趨勢",
+      "now": "目前大小",
+      "perDay": "每日成長量",
+      "needMore": "需要 2 個以上快照",
+      "daysLeft": "預計達到 {gb} GB",
+      "noGrowth": "無成長趨勢",
+      "days": "約 {n} 天後"
+    },
+    "activity": {
+      "refresh": "重新整理",
+      "live": "即時查詢 — 不儲存",
+      "sessions": "工作階段活動",
+      "locks": "鎖定",
+      "none": "無"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · 管道",
+    "intro": "檢查來源 DB 是否符合變更資料擷取 (CDC) 並設計來源 → 轉換 → 目標管線。此階段僅進行檢查和設計，不讀取或儲存客戶 DB 列資料。",
+    "needLink": "請先從上方選擇 schema.pi 連結。如果沒有，請在「連結」選單中註冊權杖。",
+    "needConn": "請在上方選擇要檢查的 DB 連線。",
+    "loading": "載入中…",
+    "pager": "頁面",
+    "prev": "上一個",
+    "next": "下一個",
+    "runTitle": "執行與監控 (7-3 · 7-4)",
+    "runBody": "管道執行、延遲監控和重新處理將在工作代理程式和安全模型最終確定後提供。目前，請將定義儲存為草稿 (DRAFT)。",
+    "pre": {
+      "title": "來源預檢",
+      "intro": "針對每個資料表，檢查變更時間欄、軟刪除欄和主鍵以建議擷取方法（轉接器），並檢查 WAL 邏輯複製準備狀態。僅執行唯讀目錄和設定查詢。",
+      "schema": "結構描述 (選填)",
+      "schemaPh": "全部",
+      "run": "執行預檢",
+      "running": "檢查中…",
+      "sum": "{tables} 個資料表 · {noPk} 個無 PK · {deleteUnseen} 個無法擷取刪除",
+      "truncated": "目錄查詢達到 500 列限制，因此某些資料表可能遺失。請指定結構描述並再次檢查。",
+      "empty": "沒有要檢查的資料表",
+      "colTable": "資料表",
+      "colChg": "變更時間欄",
+      "colDel": "軟刪除欄",
+      "colAdapter": "建議方法 · 原因",
+      "toDraft": "從選取的 {n} 個建立管道草稿"
+    },
+    "ready": {
+      "ok": "WAL 邏輯複製已就緒 — 具有 PK 的資料表可以使用 LOGICAL",
+      "no": "WAL 邏輯複製未就緒 — 透過輪詢或金鑰比較擷取",
+      "senders": "{n} 個複製連線"
+    },
+    "adapter": {
+      "LOGICAL": "邏輯複製 (WAL)",
+      "POLL": "變更時間輪詢",
+      "KEY_DIFF": "金鑰快照差異",
+      "NONE": "僅完整重新載入"
+    },
+    "reason": {
+      "HAS_CHG_COL": "有變更時間欄",
+      "NO_CHG_COL": "無變更時間欄",
+      "HAS_SOFT_DEL": "有軟刪除欄",
+      "NO_SOFT_DEL": "無軟刪除欄",
+      "HAS_PK": "有主鍵",
+      "NO_PK": "無主鍵 — 無法識別變更的列",
+      "DELETE_UNSEEN": "輪詢無法擷取實體 DELETE（建議使用軟刪除欄）",
+      "LOGICAL_NOT_READY": "WAL 邏輯複製就緒後可切換至 LOGICAL",
+      "FULL_RELOAD_ONLY": "無 PK 或變更時間欄，因此無法增量擷取 — 請新增 PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level 不是 logical (更改需要重新啟動 DB)",
+      "NO_SLOTS": "max_replication_slots 為 0",
+      "NO_SENDERS": "max_wal_senders 為 0",
+      "IS_STANDBY": "備用伺服器 — 從主要伺服器進行邏輯複製",
+      "SETTINGS_UNKNOWN": "無法讀取設定，準備狀態未知"
+    },
+    "ed": {
+      "title": "管道定義",
+      "draftOnly": "僅設計 — 儲存為草稿 (DRAFT)",
+      "new": "新管道",
+      "empty": "沒有儲存的管道",
+      "manual": "手動",
+      "edit": "編輯",
+      "remove": "刪除",
+      "removeConfirm": "要刪除 '{name}' 管線嗎？",
+      "name": "名稱",
+      "adapter": "擷取方法",
+      "srcConn": "來源連線",
+      "useCurrentConn": "使用上方選擇的連線",
+      "sched": "排程 (cron 5 欄位，空白 = 手動)",
+      "target": "目標",
+      "targetPh": "例如：分析 DB analytics.public / 資料湖 s3://…",
+      "tables": "來源資料表（換行或逗號分隔）",
+      "steps": "步驟（來源 → 轉換 → 目標）",
+      "op": "操作",
+      "notePh": "說明 · 條件 (選填)",
+      "addTransform": "新增轉換步驟",
+      "save": "儲存",
+      "saving": "儲存中…",
+      "saved": "已儲存",
+      "close": "關閉"
+    },
+    "kind": {
+      "SOURCE": "來源",
+      "TRANSFORM": "轉換",
+      "TARGET": "目標"
+    },
+    "sts": {
+      "DRAFT": "草稿"
+    },
+    "check": {
+      "NAME_REQUIRED": "請輸入名稱",
+      "CONN_REQUIRED": "請選擇來源連線",
+      "CRON_INVALID": "請輸入 5 欄位 cron 排程（分 時 日 月 週；數字、*、,、-、/）",
+      "OP_REQUIRED": "請輸入每個步驟的操作",
+      "STEPS_TOO_FEW": "需要來源和目標步驟",
+      "STEPS_TOO_MANY": "最多 20 個步驟",
+      "STEP_FIRST_SOURCE": "第一個步驟必須是來源",
+      "STEP_LAST_TARGET": "最後一個步驟必須是目標",
+      "STEP_MIDDLE_TRANSFORM": "中間只能是轉換步驟"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "此名稱的管道已存在。請使用其他名稱",
+      "CONN_UNSUPPORTED": "此連線尚無法檢查（目前僅支援 PostgreSQL 直接伺服器連線）"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL 調整實驗室",
+    "intro": "選擇連線並輸入 SQL，以樹狀結構查看執行計畫，並檢查減速原因（全表掃描、巢狀迴圈、大型排序）和 SQL 反模式與 schema.pi 標準網域的對應情況。查詢從未實際執行（無 ANALYZE）。",
+    "needLink": "請先選擇上方的連結和連線以查看計畫。反模式檢查無需連結即可運作。",
+    "sqlLabel": "SQL（單一 SELECT 或 WITH 陳述式）",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "顯示計畫",
+    "explaining": "載入中…",
+    "save": "儲存計畫",
+    "saving": "儲存中…",
+    "saveName": "標籤（例如：新增索引前）",
+    "saveNote": "儲存時，SQL 和計畫條件中的常數值會以 ? 遮罩。",
+    "plan": {
+      "title": "執行計畫",
+      "summary": "總成本 {cost} · {ms} 毫秒",
+      "cost": "成本",
+      "rows": "列",
+      "width": "寬度"
+    },
+    "warn": {
+      "none": "無顯著警告。",
+      "SEQ_SCAN_LARGE": "對 {relation} 進行全表掃描（約 {rows} 列）— 請考慮在篩選欄上建立索引。",
+      "NESTED_LOOP_HIGH": "巢狀迴圈產生約 {rows} 列 — 請考慮雜湊或合併連接，或在連接條件上建立索引。",
+      "SORT_SPILL": "排序大小約 {kb}KB，超過預設 work_mem (4MB)；可能會溢出到磁碟。"
+    },
+    "lint": {
+      "run": "檢查反模式",
+      "title": "SQL 反模式檢查",
+      "none": "未發現反模式。",
+      "domainsOff": "無法載入標準網域；僅使用預設欄位後綴規則進行檢查。",
+      "types": {
+        "num": "數字",
+        "date": "日期",
+        "char": "字元"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — 僅選擇您需要的欄位（額外 I/O，無覆蓋索引）。",
+        "FUNC_ON_COLUMN": "篩選欄 {column} 被函數或表達式包裝，因此無法使用其索引 — 請改為轉換常數。",
+        "LEADING_WILDCARD": "帶有前導 % 的 LIKE 無法使用 B-tree 索引 — 請考慮 pg_trgm GIN 索引。",
+        "OR_DIFF_COLUMNS": "不同欄位上的條件與 OR 結合 — 請考慮 UNION ALL 或按欄位建立索引。",
+        "IMPLICIT_CAST": "{column} 與帶引號的數字進行比較 — 請匹配欄位和常數類型（隱式轉換）。",
+        "NOT_IN_SUBQUERY": "NOT IN (子查詢) 在存在 NULL 時不返回任何內容且速度慢 — 請使用 NOT EXISTS。",
+        "NO_WHERE": "無 WHERE 子句 — 在大型資料表上這是全表掃描（新增條件或 LIMIT）。",
+        "DOMAIN_MISMATCH": "{column} 依標準網域是 {expected} 類型，但與另一種類型的常數進行比較 — 隱式轉換可能會阻止索引使用。"
+      }
+    },
+    "saved": {
+      "title": "已儲存的計畫 · 比較",
+      "empty": "沒有儲存的計畫。請查看計畫，然後儲存。",
+      "pick": "選擇要比較的計畫",
+      "pick2": "選擇兩個要比較的計畫。",
+      "compare": "比較兩個計畫",
+      "delete": "刪除",
+      "cost": "成本",
+      "prev": "上一個",
+      "next": "下一個",
+      "page": "第 {page} 頁"
+    },
+    "diff": {
+      "cost": "總成本 {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "兩個計畫的 SQL 不同（經過正規化後）。",
+      "scan": "{relation}：{a} → {b}",
+      "type": "{nodeType}：{a} → {b}",
+      "none": "計畫節點沒有變化。",
+      "before": "之前",
+      "after": "之後"
+    },
+    "ai": {
+      "title": "AI 調整建議",
+      "badge": "即將推出",
+      "body": "即將推出（經批准和影響衡量程序後）— 建議將從帶有遮罩常數的 SQL 生成，並僅在 DA 批准和衡量影響後記錄為已應用。"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi 連結功能正在準備中。請稍後再試。",
+      "LINK_AUTH": "連結權杖已過期或已撤銷。請在 schema.pi 中發行新權杖並重新註冊。",
+      "LINK_SCOPE": "此連結無法使用該連線（不同的分類方案）。",
+      "CONN_UNSUPPORTED": "此連線類型尚不支援（目前僅支援 PostgreSQL 伺服器連線）。",
+      "Q_UNKNOWN": "不支援的查詢。",
+      "SQL_NOT_SELECT": "計畫僅適用於以 SELECT 或 WITH 開頭的單一陳述式。",
+      "TIMEOUT": "請求逾時（5 秒）。請縮短 SQL 或稍後再試。",
+      "RATE": "請求過多。請在一分鐘後再試。",
+      "PAYLOAD_TOO_LARGE": "計畫太大，無法儲存。",
+      "LINK_NOT_FOUND": "找不到連結。請重新選擇連結。"
+    }
+  },
+  "nav": {
+    "label": "功能選單",
+    "connect": "連線",
+    "sqlLab": "SQL 調整",
+    "perf": "效能",
+    "monitor": "監控",
+    "drift": "漂移",
+    "migration": "遷移",
+    "pipeline": "管道",
+    "analytics": "分析",
+    "ops": "營運安全",
+    "learn": "學習"
   }
 }

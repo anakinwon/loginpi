@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "DB mühərriklərini sürətli və təhlükəsiz idarə etmək üçün DBA·SQLP iş proqramı"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Məlumatlarınızı DB mühərriki ilə sürətli və təhlükəsiz idarə edin",
+    "description": "İcra planları, statistika və performansı idarə edən DBA·SQLP iş proqramıdır. Dizayn və standartlar schema.pi-yə, dbms.pi isə onun tərəfdaşı olaraq mühərrik tərəfinə cavabdehdir.",
+    "welcome": "Xoş gəlmisiniz, {name}.",
+    "featTitle": "Xüsusiyyətlər",
+    "featDesc": {
+      "connect": "schema.pi bağlantı tokenini qeyd edin və əlaqə vəziyyətini yoxlayın",
+      "sqlLab": "İcra planı ağacı, xəbərdarlıqlar, müqayisə və standart domenlərə qarşı anti-nümunə yoxlamaları",
+      "perf": "Yavaş sorğu Top-N, cədvəl/indeks sağlamlığı, tutum proqnozu, fəaliyyət və kilidlər",
+      "monitor": "Tətbiq, DB və URL metrik xülasəsi hədd siqnalları ilə",
+      "drift": "schema.pi modeli və DDL tarixçəsini real kataloqla müqayisə edin, indeks effektini ölçün",
+      "migration": "Topoloji yükləmə ardıcıllığı, hissələr, yoxlama siyahısı və doğrulama SQL",
+      "pipeline": "Dəyişiklikləri ələ keçirmə ön yoxlaması və mənbə→çevirmə→hədəf boru kəməri tərifləri",
+      "analytics": "KPI paneli, 3 qatlı göl xəritəsi və məlumat dəsti kataloqu",
+      "ops": "Parametrlərin, rolların, ehtiyat nüsxəsinin və replikasiya DR-nin yalnız oxuma diaqnozu",
+      "learn": "SQLP·DAP təcrübə sualları, tənzimləmə halları və DBMS müqayisə lüğəti"
+    }
+  },
   "auth": {
     "checking": "Daxil olma yoxlanılır…",
     "signedIn": "{name}",
@@ -64,5 +87,837 @@
     "LINK_CODE_GEN_FAILED": "Əlaqə kodu yaradıla bilmədi. Zəhmət olmasa, bir az sonra yenidən cəhd edin.",
     "AUTH_DB_UNAVAILABLE": "Hesabınız saxlanıla bilmədi, buna görə də daxil olma uğursuz oldu. Zəhmət olmasa, bir az sonra yenidən cəhd edin.",
     "LINK_TRY_LIMIT": "Çox sayda yanlış əlaqə kodu. 15 dəqiqə sonra yenidən cəhd edin."
+  },
+  "analytics": {
+    "title": "Analitika və Göl",
+    "intro": "dbms fəaliyyət KPI-ları, üç qatlı göl dizaynı və məlumat dəsti kataloqu bir yerdə.",
+    "storageNotice": "Göl yaddaşı (müştəri tərəfində və ya buludda) hələ müəyyən edilməyib (PRD bölmə 10 #7). Hələlik yalnız dizaynlar və ad xəritələri saxlanılır — sətir məlumatları yoxdur.",
+    "noLink": "Əvvəlcə schema.pi bağlantısını seçin və ya qeyd edin.",
+    "goConnect": "Bağlantı qeyd edin",
+    "loading": "Yüklənir…",
+    "refresh": "Yenilə",
+    "kpi": {
+      "title": "KPI paneli",
+      "updatedAt": "{area} · {time} tarixinə",
+      "notBuilt": "Qurulmayıb",
+      "keys": {
+        "links": "Mənim bağlantılarım",
+        "perf": "Performans anlıq görüntüləri",
+        "drift": "Drift işləri",
+        "mig": "Miqrasiya planları",
+        "pipe": "Boru kəmərləri",
+        "lake": "Göl məlumat dəstləri"
+      },
+      "countsChart": "Xüsusiyyətlərə görə cəmlər",
+      "trendTitle": "Son 14 gündə performans anlıq görüntüləri",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Son 14 gündə performans anlıq görüntüləri yoxdur.",
+      "monTitle": "schema.pi monitor xülasəsi (son 1 saat)",
+      "monTps": "Sorğular/s",
+      "monErr": "Səhv dərəcəsi",
+      "monAvg": "Orta cavab (ms)",
+      "monDb": "DB bağlantıları",
+      "monFail": "Monitor xülasəsini yükləmək mümkün olmadı: {msg}"
+    },
+    "lake": {
+      "title": "Üç qatlı göl dizaynı",
+      "raw": "Xam",
+      "rawDesc": "Mənbə DB sütun adlarını və tiplərini olduğu kimi yükləyir.",
+      "std": "Standartlaşdırılmış",
+      "stdDesc": "Sütun adlarını schema.pi tərəfindən təsdiq edilmiş standart terminlərə dəyişir.",
+      "cur": "Kürasiya edilmiş",
+      "curDesc": "Varlıq üzrə qruplaşdırılmış analiz məlumat dəstləri.",
+      "loadProjects": "Layihələri yükləyin",
+      "project": "Layihə",
+      "pickProject": "Bir layihə seçin",
+      "noProjects": "Bu sahədə layihələr yoxdur.",
+      "noTables": "Bu layihənin modelində cədvəllər yoxdur.",
+      "conform": "Standart uyğunluq {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} sütun · {pct}% uyğun",
+      "colSrc": "Mənbə sütunu",
+      "colStd": "Standartlaşdırılmış sütun",
+      "colType": "Tip",
+      "colOk": "Format",
+      "ok": "OK",
+      "ng": "Yoxla",
+      "pk": "PK",
+      "selectAll": "Hamısını seç",
+      "selected": "{cnt} seçildi",
+      "save": "Göl dizaynına əlavə et",
+      "saved": "Kataloqa {cnt} əlavə edildi."
+    },
+    "catalog": {
+      "title": "Məlumat dəsti kataloqu",
+      "schemaCard": "Analiz məlumat dəsti tərifləri, meta məlumat axtarışı və qlossari üçün schema.pi həqiqət mənbəyidir. Burada yalnız göl yükləmə statusu və təzəliyi görünür.",
+      "openSchema": "Təriflərə schema.pi-də baxın",
+      "empty": "Göl dizaynına hələ heç bir cədvəl əlavə edilməyib.",
+      "status": {
+        "DSGN": "Yalnız dizayn",
+        "LOADED": "Yükləndi",
+        "FAIL": "Yükləmə uğursuz oldu"
+      },
+      "lastLoad": "Son yükləmə {time}",
+      "neverLoaded": "Heç vaxt yüklənməyib",
+      "remove": "Sil",
+      "removeConfirm": "{tbl} kataloqdan silinsin?",
+      "prev": "Əvvəlki",
+      "next": "Növbəti",
+      "page": "Səhifə {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Əvvəlcə bir bağlantı seçin.",
+      "NOT_FOUND": "Tapılmadı. Modelin dəyişib-dəyişmədiyini yoxlayın."
+    }
+  },
+  "drift": {
+    "title": "Model ↔ DB Drift",
+    "intro": "schema.pi dizayn modelini və DDL tətbiq tarixçəsini canlı DB kataloqu ilə müqayisə edərək drifti tapın və dizayn edilmiş indekslərin həqiqətən istifadə edilib-edilmədiyini ölçün. Müştəri sətir məlumatları heç vaxt oxunmur və ya saxlanılmır.",
+    "needLink": "Əvvəlcə yuxarıdan bir schema.pi bağlantısı seçin. Əgər yoxdursa, 'Bağlantı' menyusunda bir token qeyd edin.",
+    "needConn": "Yuxarıdan müqayisə etmək üçün DB bağlantısını seçin.",
+    "project": "Layihə",
+    "projectPick": "Layihə seçin",
+    "loading": "Yüklənir…",
+    "run": "Drift aşkarlanmasını işə salın",
+    "running": "Müqayisə edilir…",
+    "readOnly": "Yalnız oxuma kataloqu və statistika sorğuları işə salınır.",
+    "applyInSchema": "Düzəlişləri (model redaktələri, DDL generasiyası və icrası) həqiqət mənbəyi olan schema.pi-də tətbiq edin.",
+    "history": "Aşkarlama tarixçəsi",
+    "prev": "Əvvəlki",
+    "next": "Növbəti",
+    "none": "Yoxdur",
+    "model": "Model",
+    "reqNo": "Sorğu {id}",
+    "notSaved": "Bu işi tarixçəyə saxlamaq mümkün olmadı (nəticələr normal göstərilir).",
+    "capped": "Çoxlu element var — hər bölmə üçün ilk {cap} göstərilir (saylar tamdır).",
+    "statsMissing": "İndeks istifadə statistikası mövcud deyildi, buna görə də istifadəni qiymətləndirmək mümkün olmadı.",
+    "sum": {
+      "missingTables": "DB-də olmayan cədvəllər",
+      "extraTables": "Modeldə olmayan cədvəllər",
+      "colMismatches": "Sütun uyğunsuzluqları",
+      "missingIndexes": "DB-də olmayan dizayn edilmiş indekslər",
+      "extraIndexes": "Modeldə olmayan indekslər",
+      "ddlMissing": "Tətbiqdən sonra itən obyektlər",
+      "unusedIndexes": "İstifadə olunmayan dizayn edilmiş indekslər"
+    },
+    "sec": {
+      "ddlMissing": "DDL tətbiq edildi, lakin DB-də yoxdur",
+      "missingTables": "Modeldə olan, lakin DB-də olmayan cədvəllər",
+      "extraTables": "DB-də olan, lakin modeldə olmayan cədvəllər",
+      "colMismatches": "Sütun tipi / NULL uyğunsuzluqları",
+      "missingIndexes": "DB-də olmayan dizayn edilmiş indekslər",
+      "extraIndexes": "Yalnız DB-də olan indekslər (PK istisna olmaqla)",
+      "idxUsage": "Dizayn edilmiş indeksin effektivliyi"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi bu obyektləri tətbiq edilmiş kimi qeyd etdi, lakin onlar yoxdur — əl ilə silinmə və ya geri qaytarılmadan şübhələnin.",
+      "extraTables": "Bunlar bu bağlantıdakı digər layihələrə və ya sistem cədvəllərinə aid ola bilər.",
+      "idxUsage": "Son statistika sıfırlanmasından bəri sıfır skan istifadə olunmadığı deməkdir. Silməzdən əvvəl statistika pəncərəsini yoxlayın."
+    },
+    "kind": {
+      "MISSING": "DB-də yoxdur",
+      "EXTRA": "modeldə yoxdur",
+      "TYPE": "tip fərqlidir",
+      "NULL": "NULL icazəsi fərqlidir"
+    },
+    "col": {
+      "idx": "İndeks",
+      "scans": "Skanlar",
+      "size": "Ölçü",
+      "status": "Hökm"
+    },
+    "usage": {
+      "USED": "İstifadədədir",
+      "UNUSED": "İstifadə olunmayan dizayn edilmiş indeks",
+      "NO_STATS": "Statistika yoxdur"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi bağlantı funksiyası hazırlanır. Zəhmət olmasa, qısa müddətdən sonra yenidən cəhd edin.",
+      "LINK_DOWN": "schema.pi-yə qoşulmaq mümkün deyil. Zəhmət olmasa, qısa müddətdən sonra yenidən cəhd edin.",
+      "LINK_AUTH": "Bağlantı tokeninin müddəti bitmiş və ya ləğv edilmişdir. schema.pi-də yeni token verin və yenidən qeyd edin.",
+      "LINK_NOT_FOUND": "Bağlantı tapılmadı. Zəhmət olmasa, bağlantını yenidən seçin.",
+      "LINK_SCOPE": "Bu bağlantı linkin taksonomiyasına aid deyil.",
+      "CONN_UNSUPPORTED": "Dəstəklənməyən bağlantı (hələlik yalnız PostgreSQL server bağlantıları).",
+      "TIMEOUT": "Sorğunun vaxtı bitdi. Zəhmət olmasa, qısa müddətdən sonra yenidən cəhd edin.",
+      "RATE": "Çoxlu sorğu var. Zəhmət olmasa, bir dəqiqədən sonra yenidən cəhd edin."
+    }
+  },
+  "learn": {
+    "title": "DBA Təlimi",
+    "intro": "SQLP·DAP təcrübə sualları, tənzimləmə halları kitabı və Oracle·Tibero·PostgreSQL müqayisə lüğəti təqdim edir. Bağlantı olmadan da işləyir; bağlantı seçsəniz, schema.pi standart tip xəritəsini də görə bilərsiniz.",
+    "loading": "Yüklənir…",
+    "tabs": {
+      "quiz": "Təcrübə sualları",
+      "cases": "Tənzimləmə halları",
+      "dict": "DBMS müqayisə lüğəti"
+    },
+    "topics": {
+      "INDEX": "İndeks skanları",
+      "JOIN": "Birləşmə üsulları",
+      "PARTITION": "Bölmə budanması",
+      "NORMAL": "Normallaşdırma",
+      "NAMING": "Standart adlandırma",
+      "ISOLATION": "İzolyasiya səviyyələri",
+      "LOCK": "Kilidlər"
+    },
+    "levels": {
+      "1": "Əsas",
+      "2": "Orta",
+      "3": "Qabaqcıl"
+    },
+    "quiz": {
+      "score": "Mənim irəliləyişim",
+      "scoreLine": "{total} sualdan {solved} həll edildi · {correct} düzgün",
+      "right": "Düzgündür",
+      "wrong": "Səhvdir",
+      "retry": "Yenidən cəhd edin",
+      "prevRight": "Əvvəlki düzgün",
+      "prevWrong": "Əvvəlki səhv"
+    },
+    "cases": {
+      "notice": "Bütün hallar öz-özünə yazılmış öyrənmə nümunələridir; rəqəmlər illüstrativdir (müştəri məlumatları deyil).",
+      "problem": "Problem SQL",
+      "plan": "Plan xülasəsi",
+      "cause": "Səbəb",
+      "fix": "Düzəldilmiş SQL",
+      "effect": "Effekt"
+    },
+    "cats": {
+      "ALL": "Hamısı",
+      "TYPE": "Məlumat tipləri",
+      "FUNC": "Funksiyalar",
+      "PAGING": "Səhifələmə",
+      "SEQ": "Sıralamalar",
+      "DATE": "Tarixlər",
+      "SYNTAX": "Sintaksis"
+    },
+    "dict": {
+      "search": "Axtarış (məsələn, NVL, LIMIT)",
+      "item": "Element",
+      "note": "Qeyd",
+      "empty": "Uyğun element yoxdur",
+      "loading": "Yüklənir…",
+      "liveTitle": "Mənim mövzu sahəmin standart tip xəritəsi",
+      "liveIntro": "schema.pi DBMS profilini (məntiqi → fiziki tip) yükləmək üçün bir bağlantı seçin. Yuxarıdakı lüğət bağlantı olmadan da işləyir.",
+      "liveLoad": "Tip xəritəsini yükləyin",
+      "lgcType": "Məntiqi tip"
+    }
+  },
+  "link2": {
+    "title": "schema.pi bağlantısı",
+    "intro": "schema.pi mövzu sahəsinin DB bağlantılarını dbms.pi-də istifadə etmək üçün bağlantı tokenini qeyd edin. Tokenlər şifrələnmiş şəkildə saxlanılır və verilənlər bazalarınızdan heç bir sətir məlumatı saxlanılmır.",
+    "howTitle": "Bağlantı tokenini necə vermək olar",
+    "how1": "schema.pi-yə daxil olun və qoşulmaq üçün mövzu sahəsini açın",
+    "how2": "Mövzu sahəsi → Parametrlər → Bağlantı tokeni bölməsinə keçin və 'Token ver' düyməsini basın (sahə admini və ya DA rolu)",
+    "how3": "slk_ ilə başlayan tokeni kopyalayın — o, yalnız verildikdə bir dəfə göstərilir",
+    "how4": "Aşağıya yapışdırın və qeyd edin",
+    "openSchema": "schema.pi açın",
+    "registerTitle": "Bağlantı qeyd edin",
+    "tokenLabel": "Bağlantı tokeni",
+    "tokenPlaceholder": "slk_…",
+    "register": "Qeyd edin",
+    "registering": "Yoxlanılır…",
+    "registered": "'{area}' mövzu sahəsi indi qoşulub",
+    "replaced": "'{area}' mövzu sahəsinin tokeni dəyişdirildi",
+    "myLinks": "Mənim bağlantılarım",
+    "empty": "Qeyd edilmiş bağlantı yoxdur",
+    "loading": "Yüklənir…",
+    "regDtm": "Qeyd edildi {dtm}",
+    "remove": "Bağlantını kəs",
+    "removeConfirm": "'{area}' bağlantısı kəsilsin? Bu bağlantıdan istifadə edən ekranlar artıq ona daxil ola bilməyəcək.",
+    "prev": "Əvvəlki",
+    "next": "Növbəti",
+    "statusTitle": "Bağlantı statusu",
+    "noConns": "Bu mövzu sahəsində DB bağlantıları yoxdur (schema.pi-də birini əlavə edin)",
+    "colConn": "Bağlantı",
+    "colDbms": "DBMS",
+    "colMthd": "Metod",
+    "colHost": "Host",
+    "colTest": "Son test",
+    "colAgent": "Agent son görüldü",
+    "never": "Heç vaxt",
+    "retry": "Yenidən cəhd edin",
+    "pickerLink": "Bağlantı",
+    "pickerConn": "Bağlantı",
+    "pickerEmpty": "Bağlantı yoxdur —",
+    "pickerGo": "/connect ünvanında birini qeyd edin",
+    "errors": {
+      "LINK_AUTH": "Bağlantı tokeninin müddəti bitmiş və ya ləğv edilmişdir. schema.pi-də yeni token verin və yenidən qeyd edin",
+      "LINK_SCOPE": "Bu bağlantı bağlı mövzu sahəsinə aid deyil",
+      "LINK_DOWN": "schema.pi-yə qoşulmaq mümkün deyil. Zəhmət olmasa, qısa müddətdən sonra yenidən cəhd edin",
+      "LINK_NOT_FOUND": "Bağlantı tapılmadı",
+      "LINK_DUP": "Qeydiyyat artıq davam edir. Zəhmət olmasa, yenidən cəhd edin",
+      "CONN_UNSUPPORTED": "Dəstəklənməyən bağlantı (hələlik yalnız PostgreSQL server bağlantıları)",
+      "Q_UNKNOWN": "Naməlum sorğu",
+      "SQL_NOT_SELECT": "Yalnız bir SELECT (və ya WITH) ifadəsi işə salına bilər",
+      "PGSS_MISSING": "Hədəf DB-də pg_stat_statements genişləndirməsi quraşdırılmayıb",
+      "TIMEOUT": "Sorğunun vaxtı bitdi",
+      "RATE": "Çoxlu sorğu var. Zəhmət olmasa, bir dəqiqədən sonra yenidən cəhd edin",
+      "INVALID_INPUT": "slk_ ilə başlayan tam bağlantı tokenini yapışdırın"
+    }
+  },
+  "migration": {
+    "title": "Məlumat Miqrasiyası (PiMig)",
+    "intro": "schema.pi dizayn modelinizdəki əlaqələrdən cədvəl yükləmə ardıcıllığını hesablayır, hissə ölçüsünü, paralelliyi və kəsmə yoxlama siyahısını təşkil edir və mənbə və hədəfdə özünüz işə salacağınız doğrulama SQL-i yaradır. Bu ekran yalnız planlaşdırır və yoxlayır — məlumatları köçürmür və ya müştəri DB sətirlərini oxumur.",
+    "needLink": "Əvvəlcə yuxarıdan bir schema.pi bağlantısı seçin. Əgər yoxdursa, 'Bağlantı' menyusunda bir token qeyd edin.",
+    "loading": "Yüklənir…",
+    "newPlan": "Yeni miqrasiya planı",
+    "project": "Layihə",
+    "projectPick": "Layihə seçin",
+    "planNm": "Plan adı",
+    "planNmHint": "Layihə adına görə standart",
+    "create": "Plan yarat",
+    "creating": "Yaradılır…",
+    "snapHint": "Bu anda dizayn (cədvəl, sütun və əlaqə adları) anlıq görüntü kimi dondurulur. Model dəyişdikdə yeni plan yaradın.",
+    "plans": "Miqrasiya planları",
+    "prev": "Əvvəlki",
+    "next": "Növbəti",
+    "sts": {
+      "DRAFT": "Qaralama",
+      "READY": "Hazırdır"
+    },
+    "del": "Sil",
+    "delConfirm": "Bu planı silmək istəyirsiniz?",
+    "snapInfo": "Anlıq görüntü: {tables} cədvəl · {rels} əlaqə",
+    "dropped": "(Fiziki cədvəlləri olmayan {n} əlaqə sifarişdən xaric edilib)",
+    "chunkSize": "Blok ölçüsü (sətir/komit)",
+    "parallel": "Paralellik (eyni anda cədvəllər)",
+    "saveOpts": "Seçimləri yadda saxla",
+    "optsHint": "Paralellik eyni səviyyədə eyni anda yüklənən cədvəllərin sayıdır. Blok ölçüsü icra mühərrikinin istifadə edəcəyi komit vahididir (sətirlər).",
+    "order": "Yükləmə sırası",
+    "orderHint": "Parent cədvəllərinin əvvəldə gəlməsi üçün dizayn əlaqələri (fiziki FK-lar deyil) ilə topoloji olaraq sıralanmışdır. Eyni səviyyədəki cədvəllər bir-birindən asılı deyil və paralel yüklənə bilər.",
+    "cycles": "{n} dövri qrup(lar) — eyni səviyyədə yerləşdirilib. Onların sırasını əl ilə təyin edin və yükləmədən sonra istinad yoxlamalarını təxirə salın.",
+    "selfRefs": "Özünə istinad edən (hierarxik) cədvəllər — cədvəl daxilində əvvəlcə parent sətirlərini yükləyin",
+    "level": "Səviyyə {n}",
+    "checklist": "Keçid yoxlama siyahısı",
+    "toReady": "Hazır olaraq qeyd et",
+    "toDraft": "Qaralamaya qayıt",
+    "readyNeedAll": "Planı hazır olaraq qeyd etməzdən əvvəl hər bir maddəni yoxlayın.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC ötürmə nöqtəsi",
+        "desc": "İlkin yükləmədən əvvəl ardıcıl mənbə nöqtəsini qeyd edin (PG LSN · Oracle/Tibero SCN · sorğu üçün, başlama vaxtı çıxılsın üst-üstə düşmə pəncərəsi), CDC-ni ondan başlayın və ötürmə pəncərəsindəki dublikatları upsert-lərlə udun."
+      },
+      "valueConv": {
+        "title": "Dəyər çevrilməsi",
+        "desc": "Boş sətir = NULL, CHAR boşluq doldurma, dəqiqliyi olmayan NUMBER → NUMERIC, vaxtı olan DATE → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR uzunluğu və LONG·RAW üçün qaydalar təyin edilib."
+      },
+      "charset": {
+        "title": "Simvol dəsti",
+        "desc": "Mənbə simvol dəsti (KO16MSWIN949, UTF8, …) təsdiqlənib, çoxbaytlı böyümə səbəbindən daşan sütunlar və çevrilməyən simvolların təcrid edilməsi qərarlaşdırılıb."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB bloklar şəklində (ölçü və yaddaş limitləri) axın edilir və uzunluq + heş ilə yoxlanılır."
+      },
+      "seqResync": {
+        "title": "Sıra yenidən sinxronizasiyası",
+        "desc": "Yükləmədən sonra, hədəf sıraları·identifikasiyaları max(açar)+1 olaraq təyin edilir."
+      },
+      "timezone": {
+        "title": "Saat qurşağı · sistem sütunları",
+        "desc": "Saat qurşağı olmayan dəyərlər üçün şərh saat qurşağı (məs. Asia/Seoul) təyin edilir, yükləmə zamanı dəyişdirilmiş vaxt triggerləri mənbə vaxt möhürlərini yazmayacaq və yaradıcı/dəyişdirici əvəzetmə qaydaları təyin edilir."
+      },
+      "backpressure": {
+        "title": "Əks təzyiq · hədəf yükləmə",
+        "desc": "Hədəf gecikməsi, WAL böyüməsi və ya kilid gözləmələri zamanı blok ölçüsünü və paralelliyi azaldın; yükləmədən sonra qeyri-PK indekslərini qurun və sonra ANALYZE·VACUUM işlədin."
+      }
+    },
+    "verify": "Doğrulama SQL",
+    "verifyHint": "Yükləmə sırasına görə hər cədvəl üçün say, rəqəmsal sütun cəmi, dublikat açar və açar heş sorğuları yaradır. Onları mənbə və hədəfdə özünüz işlədin və müqayisə edin (bu ekran onları icra etmir).",
+    "noHashOracle": "Oracle·Tibero heş funksiyaları və mətn göstərilməsi PostgreSQL-dən fərqlənir, buna görə heş sorğuları buraxılır — sayları, cəmləri və dublikat açarları müqayisə edin.",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı",
+    "copyFail": "Kopyalamaq mümkün olmadı. Mətni seçin və əl ilə kopyalayın.",
+    "engine": {
+      "title": "İcra·yenidən başlama · məşq·geri qaytarma",
+      "body": "Faktiki miqrasiya icrası (nəzarət nöqtələri, əks təzyiq, səhv sətir təcridi) və məşq, geri qaytarma və CDC başlanğıc nöqtəsinin qeydə alınması işçi agent təhlükəsizlik modeli (A10) yekunlaşdıqdan sonra təmin ediləcəkdir. Hazırda bu, planlaşdırma, yoxlamalar və doğrulama SQL-ni əhatə edir."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi bağlantısı hazırlanır. Zəhmət olmasa, qısa müddət sonra yenidən cəhd edin.",
+      "LINK_DOWN": "schema.pi-yə qoşulmaq mümkün deyil. Zəhmət olmasa, qısa müddət sonra yenidən cəhd edin.",
+      "LINK_AUTH": "Bağlantı tokeninin müddəti bitmiş və ya ləğv edilmişdir. schema.pi-də yeni token verin və yenidən qeydiyyatdan keçirin.",
+      "LINK_NOT_FOUND": "Bağlantı tapılmadı. Zəhmət olmasa, bağlantını yenidən seçin.",
+      "LINK_SCOPE": "Bu layihə bağlantının taksonomiyasına aid deyil.",
+      "TIMEOUT": "Sorğunun vaxtı bitdi. Zəhmət olmasa, qısa müddət sonra yenidən cəhd edin.",
+      "RATE": "Çox sayda sorğu. Bir dəqiqə sonra yenidən cəhd edin.",
+      "MIG_NO_TABLES": "Bu layihədə miqrasiya ediləcək fiziki cədvəllər yoxdur. Əvvəlcə schema.pi-də fiziki cədvəllərə çevirin.",
+      "MIG_CHECK_INCOMPLETE": "Planı hazır olaraq qeyd etməzdən əvvəl hər bir keçid yoxlama siyahısı maddəsini yoxlayın.",
+      "NOT_FOUND": "Plan tapılmadı."
+    }
+  },
+  "monitor": {
+    "title": "Monitorinq Mərkəzi",
+    "collectNote": "Toplama schema.pi-də işləyir — miqrasiya planlaşdırılıb (D7). Bu səhifə schema.pi monitorunun xülasəsini oxuyur.",
+    "noLink": "Əvvəlcə schema.pi bağlantısını seçin və ya qeydiyyatdan keçirin.",
+    "goConnect": "Bağlantı qeydiyyatdan keçir",
+    "period": "Dövr",
+    "periods": {
+      "30": "30 dəq",
+      "60": "1 saat",
+      "360": "6 saat",
+      "1440": "24 saat"
+    },
+    "refresh": "Yenilə",
+    "loading": "Yüklənir…",
+    "updatedAt": "{area} · {time} tarixinə (hər 30 saniyədən bir avtomatik yenilənmə)",
+    "appTitle": "Tətbiq performansı",
+    "dbTitle": "Bağlantıya görə DB statusu",
+    "urlTitle": "URL yoxlamaları",
+    "empty": "Göstəriləcək məlumat yoxdur.",
+    "breachTitle": "{n} həddin aşılması",
+    "rulesTitle": "Hədd qaydaları",
+    "rulesNote": "Qaydalar bu bağlantı üçün saxlanılır və alınan xülasəyə qarşı qiymətləndirilir; həddi aşanlar qırmızı haşiyə ilə göstərilir (bildirişlər daha sonra gələcək).",
+    "metric": "Metrik",
+    "conn": "Bağlantı",
+    "allConns": "Bütün bağlantılar",
+    "op": "Müqayisə et",
+    "threshold": "Hədd",
+    "thrInvalid": "Hədd üçün bir rəqəm daxil edin.",
+    "addRule": "Qayda əlavə et",
+    "noRules": "Hələ heç bir qayda yoxdur.",
+    "enable": "Aktivləşdir",
+    "disable": "Deaktivləşdir",
+    "delete": "Sil",
+    "delConfirm": "Bu qaydanı silmək istəyirsiniz?",
+    "aiNote": "AI insident analizi və düzəliş təsdiqi hələ də schema.pi monitorunda baş verir.",
+    "aiLink": "schema.pi monitorunu aç",
+    "metrics": {
+      "APP_TPS": "TPS (sorğu/s)",
+      "APP_ERR_PCT": "Xəta dərəcəsi (%)",
+      "APP_SLOW_CNT": "Yavaş sorğular",
+      "APP_AVG_MS": "Orta cavab (ms)",
+      "DB_SESS_CNT": "Sessiyalar",
+      "DB_LOCK_WAIT_CNT": "Kilid gözləmələri",
+      "DB_CACHE_HIT_PCT": "Keş hit (%)",
+      "DB_SIZE_MB": "DB ölçüsü (MB)",
+      "URL_RSP_MS": "URL cavabı (ms)",
+      "URL_FAIL_CNT": "URL uğursuzluqları"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Əvvəlcə bir bağlantı seçin.",
+      "NOT_IMPLEMENTED": "schema.pi bağlantısı hazırlanır. Zəhmət olmasa, daha sonra yenidən cəhd edin.",
+      "LINK_AUTH": "Bağlantı tokeni etibarsızdır və ya müddəti bitmişdir. schema.pi-də yeni token verin və qeydiyyatdan keçirin.",
+      "LINK_SCOPE": "Bu bağlantı həmin taksonomiyaya daxil ola bilməz.",
+      "RATE": "Çox sayda sorğu. Zəhmət olmasa, qısa müddət sonra yenidən cəhd edin.",
+      "TIMEOUT": "schema.pi yavaş cavab verir. Zəhmət olmasa, qısa müddət sonra yenidən cəhd edin.",
+      "RULE_LIMIT": "Hər bağlantı üçün 50 qaydaya qədər.",
+      "NOT_FOUND": "Qayda tapılmadı."
+    }
+  },
+  "ops": {
+    "title": "DB Əməliyyat Təhlükəsizliyi",
+    "intro": "Qoşulmuş PostgreSQL bağlantısının parametrlərinin, hesab imtiyazlarının, ehtiyat nüsxəsinin və replikasiya vəziyyətinin yalnız oxunması diaqnostikası. Parametrlər dəyişdirilmir, yalnız qərar xülasələri saxlanılır və müştəri DB sıra məlumatları heç vaxt saxlanılmır",
+    "loading": "Yüklənir…",
+    "pickFirst": "Əvvəlcə yuxarıdan bir bağlantı və əlaqə seçin",
+    "run": "Diaqnozu işə sal",
+    "running": "Diaqnoz edilir…",
+    "noRun": "Hələ diaqnoz yoxdur. \"Diaqnozu işə sal\" düyməsini basın",
+    "lastRun": "Son diaqnoz {dtm}",
+    "readOnly": "Diaqnoz yalnız oxuyur (SELECT). Məsləhət bir bələdçidir və server yaddaşından, yükündən və iş yükündən asılıdır",
+    "truncated": "Çox obyekt var — yalnız ilk 500 yoxlanıldı",
+    "paramsNote": "Ümumi server yaddaşı məlum deyil, buna görə shared_buffers ≈ RAM-ın 25%-i ilə təxmin edilir. random_page_cost SSD-ni nəzərdə tutur",
+    "auditNote": "RLS-i söndürülmüş cədvəllər və istifadə olunmayan hesablar bağlantı sorğusu onları dəstəklədikdən sonra yoxlanılacaq",
+    "replNote": "Baza Active-Standby (A-S) — bir əsas + gözləmə. Replay gecikməsi ≥ 5s = xəbərdarlıq, ≥ 60s = risk (ölçülmüş RPO istinadı)",
+    "lagIdle": "Dəyişiklik yoxdur",
+    "pager": "Səhifələmə",
+    "prev": "Əvvəlki",
+    "next": "Növbəti",
+    "tabs": {
+      "params": "Parametrlər",
+      "audit": "Hesablar və imtiyazlar",
+      "backup": "Ehtiyat nüsxəsi və bərpa",
+      "repl": "Replikasiya və DR",
+      "history": "Tarix"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Xəbərdarlıq",
+      "RISK": "Risk"
+    },
+    "role": {
+      "primary": "Bu bağlantı = Primary",
+      "standby": "Bu bağlantı = Standby",
+      "unknown": "Rol məlum deyil"
+    },
+    "col": {
+      "level": "Qərar",
+      "item": "Maddə",
+      "value": "Dəyər",
+      "reason": "Təfərrüatlar",
+      "standby": "Standby",
+      "state": "Vəziyyət",
+      "sync": "Sinxronizasiya",
+      "lag": "Replay gecikməsi"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLS rolları",
+      "bypass_ok": "BYPASSRLS rolları",
+      "no_expiry": "Parolun müddəti",
+      "expiry_ok": "Parolun müddəti",
+      "public_grant": "PUBLIC qrantları",
+      "public_ok": "PUBLIC qrantları",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Son arxivlənmiş WAL",
+      "arc_stale": "Son arxivlənmiş WAL",
+      "arc_recent": "Son arxivlənmiş WAL",
+      "arc_failing": "WAL arxivləşdirmə uğursuzluğu"
+    },
+    "rules": {
+      "sb_default": "Varsayılan (128MB) səviyyəsindədir. Xüsusi serverdə RAM-ın təxminən 25%-i tövsiyə olunur",
+      "sb_ok": "Varsayılandan yuxarı təyin edilib",
+      "wm_over": "max_connections × work_mem təxmini yaddaşı aşır. Eyni vaxtda sıralamalar yaddaş çatışmazlığı riskini yaradır",
+      "wm_default": "Varsayılan (4MB) səviyyəsindədir. Böyük sıralamalar və heşlər diskə yazıla bilər",
+      "wm_ok": "Məqbul diapazonda",
+      "mwm_default": "Varsayılan (64MB) səviyyəsindədir. VACUUM və indeks qurulması yavaş ola bilər; 256MB və ya daha çoxunu nəzərdən keçirin",
+      "mwm_ok": "Varsayılandan yuxarı təyin edilib",
+      "av_on": "autovacuum aktivdir",
+      "av_off": "autovacuum deaktivdir. Cədvəl şişməsi və əməliyyat ID-sinin dövrə vurması riski yüksəkdir",
+      "conn_high": "max_connections yüksəkdir. Hər bağlantı yaddaş istifadə edir; bir pooler (PgBouncer və s.) tövsiyə olunur",
+      "conn_ok": "Məqbul diapazonda",
+      "lmd_off": "Yavaş sorğu qeydi deaktivdir (-1). Təxminən 1000ms tövsiyə olunur",
+      "lmd_all": "Hər bir ifadə qeyd edilir (0). Yüksək qeyd yükü",
+      "lmd_ok": "Yavaş sorğu qeydi aktivdir",
+      "st_off": "Server miqyasında ifadə vaxt aşımı yoxdur (0). Rol və ya tətbiq üçün limitlər təyin edin",
+      "st_ok": "İfadə vaxt aşımı təyin edilib",
+      "iit_off": "Əməliyyatda boş vaxt aşımı yoxdur (0). Kilidlərin tutulmasına və şişməyə səbəb ola bilər",
+      "iit_ok": "Əməliyyatda boş vaxt aşımı təyin edilib",
+      "ckpt_short": "Nəzarət nöqtəsi intervalı 5 dəqiqə və ya daha azdır. Yazı yükləri çox olduqda 10-15 dəqiqə nəzərdən keçirin",
+      "ckpt_ok": "Məqbul diapazonda",
+      "wal_minimal": "wal_level=minimal PITR və replikasiyanı qeyri-mümkün edir. replica və ya daha yüksək istifadə edin",
+      "wal_ok": "WAL səviyyəsi PITR və replikasiyanı dəstəkləyir",
+      "rpc_hdd": "HDD varsayılanı (4). SSD üçün 1.1–2 tövsiyə olunur",
+      "rpc_ok": "SSD üçün uyğundur",
+      "super_many": "İki və ya daha çox superuser. İdarəetmə üçün birini saxlayın və digərlərinə yalnız lazım olan imtiyazları verin",
+      "super_ok": "Ən çox bir superuser",
+      "bypass_rls": "Sətir səviyyəli təhlükəsizliyi keçən qeyri-superuser rolları mövcuddur",
+      "bypass_ok": "RLS-i keçən rollar yoxdur",
+      "no_expiry": "Parolun müddəti bitməyən giriş rolları. Şəxsi hesablar üçün VALID UNTIL təyin edin",
+      "expiry_ok": "Bütün giriş rollarının müddəti var",
+      "public_grant": "PUBLIC (hər rol) cədvəl imtiyazlarına malikdir. Yazı imtiyazları risklidir",
+      "public_ok": "PUBLIC-ə heç bir cədvəl imtiyazı verilməyib",
+      "arc_on": "WAL arxivləşdirmə (archive_mode) aktivdir",
+      "arc_off": "WAL arxivləşdirmə deaktivdir, buna görə də vaxtında bərpa (PITR) mümkün deyil",
+      "arc_cmd_empty": "archive_mode aktivdir, lakin archive_command və archive_library boşdur",
+      "arc_never": "Hələ heç bir WAL arxivləşdirilməyib",
+      "arc_stale": "Son WAL arxivi 24 saatdan köhnədir",
+      "arc_recent": "Son 24 saat ərzində WAL arxivləşdirilmişdir",
+      "arc_failing": "WAL arxivləşdirmə hazırda uğursuzdur. Diski, icazələri və hədəf yolunu yoxlayın",
+      "repl_is_standby": "Bu bağlantı Standby (bərpa rejimi)dir. Gecikməni Primary bağlantıdan yoxlayın",
+      "repl_none": "Heç bir Standby qoşulmayıb. Fəlakətdən bərpa (DR) qurulması yoxdur",
+      "repl_ok": "Standbylar normal axın edir",
+      "repl_lag": "Bir Standby gecikir və ya axın etmir"
+    },
+    "manual": {
+      "title": "Əl ilə yoxlama siyahısı",
+      "intro": "Avtomatik yoxlanıla bilməyən ehtiyat nüsxəsi və bərpa təcrübələri. Təsdiqləndikdə qeyd edin və sübutu qeyd edin",
+      "memo": "Memo (məs. alət, cədvəl, son yoxlama)",
+      "save": "Yadda saxla",
+      "updated": "{dtm} yeniləndi",
+      "items": {
+        "base_backup": "Son 7 gün ərzində tam ehtiyat nüsxəsi (pg_basebackup və s.) uğurla tamamlandı",
+        "offsite_copy": "Ehtiyat nüsxəsinin bir nüsxəsi başqa yerdə (başqa bölgə və ya saxlama) saxlanılır",
+        "restore_rehearsal": "Bu rübdə bərpa məşqi edildi və müddəti qeydə alındı",
+        "pitr_target": "PITR proseduru və hədəf RPO/RTO sənədləşdirilmişdir",
+        "backup_encrypt": "Ehtiyat nüsxəsi faylları şifrələnib və giriş məhdudlaşdırılıb",
+        "retention": "Ehtiyat nüsxəsinin saxlama müddəti və silmə siyasəti müəyyən edilib"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi bağlantısı hazırlanır. Zəhmət olmasa, qısa müddət sonra yenidən cəhd edin",
+      "CONN_UNSUPPORTED": "Bu bağlantı hələ dəstəklənmir (yalnız birbaşa PostgreSQL)",
+      "TIMEOUT": "Hədəf DB çox yavaş cavab verdi. Zəhmət olmasa, qısa müddət sonra yenidən cəhd edin",
+      "RATE": "Çox sayda zəng. Bir dəqiqə sonra yenidən cəhd edin",
+      "Q_UNKNOWN": "Dəstəklənməyən sorğu. schema.pi bağlantı API versiyasını yoxlayın",
+      "INVALID_INPUT": "Yanlış bağlantı və ya əlaqə seçimi"
+    }
+  },
+  "perf": {
+    "title": "Performans",
+    "intro": "Yavaş sorğuları, cədvəl/indeks sağlamlığını və ölçü tendensiyalarını göstərmək üçün qoşulmuş PostgreSQL bağlantısından sorğu, cədvəl və indeks statistikalarını toplayır. Yalnız statistik göstəricilər saxlanılır və müştəri DB sıra məlumatları heç vaxt saxlanılmır",
+    "loading": "Yüklənir…",
+    "pickFirst": "Əvvəlcə yuxarıdan bir bağlantı və əlaqə seçin",
+    "pager": "Səhifələmə",
+    "tabs": {
+      "collect": "Topla",
+      "top": "Yavaş sorğular",
+      "health": "Cədvəl və indeks sağlamlığı",
+      "trend": "Ölçü tendensiyası",
+      "activity": "Fəaliyyət və kilidlər"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi bağlantısı hazırlanır. Zəhmət olmasa, daha sonra yenidən cəhd edin",
+      "PGSS_MISSING": "Bu DB-də pg_stat_statements genişlənməsi quraşdırılmayıb, buna görə sorğu statistikası mövcud deyil",
+      "CONN_UNSUPPORTED": "Bu bağlantı hələ dəstəklənmir (yalnız birbaşa PostgreSQL bağlantıları)",
+      "TIMEOUT": "Hədəf DB-nin cavabı çox ləng idi. Zəhmət olmasa, bir az sonra yenidən cəhd edin",
+      "RATE": "Çox sayda sorğu. Bir dəqiqə sonra yenidən cəhd edin",
+      "LINK_AUTH": "Bağlantı tokeninin müddəti bitmiş və ya ləğv edilmişdir. Bağlantı səhifəsində tokeni yenidən qeydiyyatdan keçirin",
+      "LINK_SCOPE": "Bu bağlantı bağlantının mövzu sahəsinə aid deyil",
+      "Q_UNKNOWN": "Dəstəklənməyən sorğu. schema.pi bağlantı API versiyasını yoxlayın",
+      "INVALID_INPUT": "Bağlantı və ya əlaqə dəyəri etibarsızdır"
+    },
+    "pgss": {
+      "title": "pg_stat_statements necə aktivləşdirilir",
+      "note": "Öz-özünə host edilmiş PostgreSQL üçün də shared_preload_libraries (postgresql.conf) daxilində pg_stat_statements və yenidən başlama lazımdır. Cədvəl, indeks və ölçü statistikası onsuz da işləyir"
+    },
+    "collect": {
+      "intro": "İndi topla düyməsini basmaqla ən yaxşı sorğu statistikalarını, cədvəlləri, indeksləri və ölçüləri bir dəfə oxuyur və onları anlıq görüntü kimi saxlayır. Dəyişiklikləri və ölçü tendensiyalarını görmək üçün ən azı iki dəfə toplayın",
+      "run": "İndi topla",
+      "running": "Toplanır…",
+      "done": "{dtm} tarixində toplandı — {qry} sorğu · {tbl} cədvəl · {idx} indeks"
+    },
+    "top": {
+      "sort": "Sırala",
+      "sortTotal": "Ümumi vaxt",
+      "sortMean": "Orta vaxt",
+      "sortCalls": "Zənglər",
+      "empty": "Hələ heç bir anlıq görüntü yoxdur. Topla sekmesinde İndi topla düyməsini basın",
+      "range": "{from} → {to} arasında dəyişiklik",
+      "first": "{dtm} tarixində ilk anlıq görüntü — kumulyativ dəyərlər (növbəti anlıq görüntüdən dəyişikliklər)",
+      "query": "Sorğu (literallar maskalanmışdır)",
+      "calls": "Zənglər",
+      "totalMs": "Ümumi ms",
+      "meanMs": "Orta ms",
+      "rows": "Sətirlər",
+      "reset": "Statistika sıfırlanması aşkarlandı — kümülatif olaraq göstərilir"
+    },
+    "health": {
+      "empty": "Hələ heç bir anlıq görüntü yoxdur. Topla sekmesinde İndi topla düyməsini basın",
+      "basis": "{dtm} anlıq görüntüsünə əsasən",
+      "unusedIdx": "İstifadə olunmayan indekslər",
+      "unusedIdxHint": "Son statistika sıfırlanmasından bəri heç vaxt istifadə olunmayan indekslər (ölçüyə görə). PK və ya unikal məhdudiyyət indekslərini silməyin",
+      "fullScan": "Həddindən artıq tam skanlar",
+      "fullScanHint": "1000-dən çox canlı sətri olan və tam skanların ən azı yarısını təşkil edən cədvəllər — filtr sütunlarındakı indeksləri nəzərdən keçirin",
+      "dead": "Həddindən artıq ölü tuple",
+      "deadHint": "Ölü tuple nisbəti 20% və ya daha çox — VACUUM və autovacuum parametrlərini yoxlayın",
+      "none": "Heç biri",
+      "scans": "skanlar"
+    },
+    "trend": {
+      "limit": "Ölçü həddi",
+      "empty": "Son 30 gündə anlıq görüntü yoxdur",
+      "chart": "Son 30 gündə DB ölçüsü tendensiyası",
+      "now": "Cari ölçü",
+      "perDay": "Gündəlik artım",
+      "needMore": "2+ anlıq görüntü tələb olunur",
+      "daysLeft": "{gb} GB-a çatır",
+      "noGrowth": "Artım tendensiyası yoxdur",
+      "days": "təxminən {n} günə"
+    },
+    "activity": {
+      "refresh": "Yenilə",
+      "live": "Canlı sorğu — saxlanılmır",
+      "sessions": "Sessiya fəaliyyəti",
+      "locks": "Kilidlər",
+      "none": "Heç biri"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Boru kəmərləri",
+    "intro": "Mənbə DB-nin dəyişiklik məlumatlarının tutulması (CDC) üçün hazır olub olmadığını yoxlayın və mənbə → çevrilmə → hədəf boru kəmərlərini dizayn edin. Bu mərhələ yalnız yoxlayır və dizayn edir; müştəri sətri məlumatları oxunmur və ya saxlanılmır.",
+    "needLink": "Əvvəlcə yuxarıdakı schema.pi bağlantısını seçin. Əgər heç biriniz yoxdursa, 'Bağlantı' menyusunda bir token qeyd edin.",
+    "needConn": "Yoxlamaq üçün yuxarıdakı DB bağlantısını seçin.",
+    "loading": "Yüklənir…",
+    "pager": "Səhifələr",
+    "prev": "Əvvəlki",
+    "next": "Növbəti",
+    "runTitle": "İşlət və izlə (7-3 · 7-4)",
+    "runBody": "Boru kəmərinin icrası, gecikmənin monitorinqi və yenidən işlənməsi işçi agenti və təhlükəsizlik modeli tamamlandıqdan sonra gələcək. Hələlik, tərifləri qaralama (DRAFT) kimi saxlayın.",
+    "pre": {
+      "title": "Mənbə ilkin yoxlaması",
+      "intro": "Hər bir cədvəl üçün dəyişiklik vaxtı sütunlarını, yumşaq silmə sütunlarını və əsas açarı yoxlayaraq tutma metodunu (adapter) tövsiyə edir və WAL məntiqi replikasiya hazırlığını yoxlayır. Yalnız oxumaq üçün kataloq və parametrlər sorğuları.",
+      "schema": "Sxem (isteğe bağlı)",
+      "schemaPh": "Hamısı",
+      "run": "İlkin yoxlamanı işə sal",
+      "running": "Yoxlanılır…",
+      "sum": "{tables} cədvəl · PK-siz {noPk} · silinmələri tuta bilməyən {deleteUnseen}",
+      "truncated": "Kataloq sorğusu 500 sətirlik limiti keçdi, buna görə bəzi cədvəllər əskik ola bilər. Bir sxem təyin edin və yenidən yoxlayın.",
+      "empty": "Yoxlanılacaq cədvəl yoxdur",
+      "colTable": "Cədvəl",
+      "colChg": "Dəyişiklik vaxtı sütunu",
+      "colDel": "Yumşaq silmə sütunu",
+      "colAdapter": "Tövsiyə olunan metod · səbəblər",
+      "toDraft": "Seçilmiş {n} ədədindən boru kəməri qaralaması yarat"
+    },
+    "ready": {
+      "ok": "WAL məntiqi replikasiya hazırdır — PK olan cədvəllər LOGICAL istifadə edə bilər",
+      "no": "WAL məntiqi replikasiya hazır deyil — sorğu və ya açar müqayisəsi ilə tutun",
+      "senders": "{n} replikasiya bağlantısı"
+    },
+    "adapter": {
+      "LOGICAL": "Məntiqi replikasiya (WAL)",
+      "POLL": "Dəyişiklik vaxtı sorğusu",
+      "KEY_DIFF": "Açar anlıq görüntü fərqi",
+      "NONE": "Yalnız tam yenidən yükləmə"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Dəyişiklik vaxtı sütunu var",
+      "NO_CHG_COL": "Dəyişiklik vaxtı sütunu yoxdur",
+      "HAS_SOFT_DEL": "Yumşaq silmə sütunu var",
+      "NO_SOFT_DEL": "Yumşaq silmə sütunu yoxdur",
+      "HAS_PK": "Əsas açar var",
+      "NO_PK": "Əsas açar yoxdur — dəyişdirilmiş sətirlər müəyyən edilə bilməz",
+      "DELETE_UNSEEN": "Sorğu fiziki DELETE-ləri tuta bilməz (yumşaq silmə sütunu tövsiyə olunur)",
+      "LOGICAL_NOT_READY": "WAL məntiqi replikasiya hazır olduqdan sonra LOGICAL-a keçə bilər",
+      "FULL_RELOAD_ONLY": "PK və ya dəyişiklik vaxtı sütunu yoxdur, buna görə artan tutma yoxdur — PK əlavə edin",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level logical deyil (dəyişdirmək DB-nin yenidən başlamasını tələb edir)",
+      "NO_SLOTS": "max_replication_slots 0-dır",
+      "NO_SENDERS": "max_wal_senders 0-dır",
+      "IS_STANDBY": "Gözləmə serveri — əsasdan məntiqi replikasiya götürün",
+      "SETTINGS_UNKNOWN": "Parametrlər oxuna bilmədi, hazırlıq vəziyyəti naməlumdur"
+    },
+    "ed": {
+      "title": "Boru kəməri tərifləri",
+      "draftOnly": "Yalnız dizayn — qaralama (DRAFT) kimi saxlanılır",
+      "new": "Yeni boru kəməri",
+      "empty": "Saxlanmış boru kəmərləri yoxdur",
+      "manual": "Əl ilə",
+      "edit": "Redaktə et",
+      "remove": "Sil",
+      "removeConfirm": "'{name}' boru kəmərini silmək istəyirsinizmi?",
+      "name": "Ad",
+      "adapter": "Tutma metodu",
+      "srcConn": "Mənbə bağlantısı",
+      "useCurrentConn": "Yuxarıda seçilmiş bağlantıdan istifadə edin",
+      "sched": "Cədvəl (5 sahəli cron, boş = əl ilə)",
+      "target": "Hədəf",
+      "targetPh": "məsələn, analitika DB analytics.public / lake s3://…",
+      "tables": "Mənbə cədvəlləri (yeni sətir və ya vergüllə ayrılmış)",
+      "steps": "Addımlar (mənbə → çevrilmə → hədəf)",
+      "op": "Əməliyyat",
+      "notePh": "Təsvir · şərt (isteğe bağlı)",
+      "addTransform": "Çevrilmə addımı əlavə et",
+      "save": "Saxla",
+      "saving": "Saxlanılır…",
+      "saved": "Saxlanıldı",
+      "close": "Bağla"
+    },
+    "kind": {
+      "SOURCE": "Mənbə",
+      "TRANSFORM": "Çevrilmə",
+      "TARGET": "Hədəf"
+    },
+    "sts": {
+      "DRAFT": "Qaralama"
+    },
+    "check": {
+      "NAME_REQUIRED": "Bir ad daxil edin",
+      "CONN_REQUIRED": "Bir mənbə bağlantısı seçin",
+      "CRON_INVALID": "Cədvəli 5 sahəli cron kimi daxil edin (dəqiqə saat gün ay həftənin günü; rəqəmlər, *, ',', -, /)",
+      "OP_REQUIRED": "Hər addım üçün bir əməliyyat daxil edin",
+      "STEPS_TOO_FEW": "Mənbə və hədəf addımları tələb olunur",
+      "STEPS_TOO_MANY": "20-yə qədər addım",
+      "STEP_FIRST_SOURCE": "İlk addım mənbə olmalıdır",
+      "STEP_LAST_TARGET": "Son addım hədəf olmalıdır",
+      "STEP_MIDDLE_TRANSFORM": "Yalnız çevrilmə addımları aralıqda ola bilər"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Bu adla bir boru kəməri artıq mövcuddur. Başqa bir ad istifadə edin",
+      "CONN_UNSUPPORTED": "Bu bağlantı hələ yoxlana bilməz (hələlik yalnız PostgreSQL birbaşa server bağlantıları)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL Tuning Lab",
+    "intro": "Bir bağlantı seçin və SQL daxil edin ki, icra planını ağac kimi görəsiniz, yavaşlama səbəbləri (tam skanlar, iç-içə dövrələr, böyük sıralamalar) və SQL anti-nümunələri schema.pi standart domenlərinə qarşı yoxlanılır. Sorğular heç vaxt həqiqətən icra edilmir (ANALİZ yoxdur).",
+    "needLink": "Planları görmək üçün yuxarıda bir bağlantı və əlaqə seçin. Anti-nümunə yoxlaması bağlantı olmadan işləyir.",
+    "sqlLabel": "SQL (tək bir SELECT və ya WITH ifadəsi)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Planı göstər",
+    "explaining": "Yüklənir…",
+    "save": "Planı saxla",
+    "saving": "Saxlanılır…",
+    "saveName": "Etiket (məsələn, indeks əlavə etməzdən əvvəl)",
+    "saveNote": "SQL və plan şərtlərindəki sabit dəyərlər saxlanarkən ? kimi maskalanır.",
+    "plan": {
+      "title": "İcra planı",
+      "summary": "Ümumi xərc {cost} · {ms}ms",
+      "cost": "xərc",
+      "rows": "sətirlər",
+      "width": "eni"
+    },
+    "warn": {
+      "none": "Qeyri-adi xəbərdarlıq yoxdur.",
+      "SEQ_SCAN_LARGE": "{relation} üzərində tam skan (təxminən {rows} sətir) — filtr sütunlarında bir indeks nəzərdən keçirin.",
+      "NESTED_LOOP_HIGH": "İç-içə dövrə təxminən {rows} sətir istehsal edir — bir hash və ya birləşmə birləşməsi, ya da birləşmə şərtində bir indeks nəzərdən keçirin.",
+      "SORT_SPILL": "Sıralama ölçüsü təxminən {kb}KB-dır, standart work_mem (4MB) üzərindədir; diskə yayıla bilər."
+    },
+    "lint": {
+      "run": "Anti-nümunələri yoxla",
+      "title": "SQL anti-nümunə yoxlaması",
+      "none": "Anti-nümunələr tapılmadı.",
+      "domainsOff": "Standart domenlər yüklənə bilmədi; yalnız standart sütun-şəkil qaydaları ilə yoxlanıldı.",
+      "types": {
+        "num": "rəqəmsal",
+        "date": "tarix",
+        "char": "simvol"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — yalnız ehtiyac duyduğunuz sütunları seçin (əlavə I/O, əhatə edən indeks yoxdur).",
+        "FUNC_ON_COLUMN": "Filtr sütunu {column} bir funksiya və ya ifadəyə bükülmüşdür, buna görə indeksi istifadə edilə bilməz — əvəzinə sabiti çevirin.",
+        "LEADING_WILDCARD": "Önündə % olan LIKE B-tree indeksini istifadə edə bilməz — pg_trgm GIN indeksini nəzərdən keçirin.",
+        "OR_DIFF_COLUMNS": "Fərqli sütunlardakı şərtlər OR ilə birləşdirilmişdir — UNION ALL və ya sütun başına indeksləri nəzərdən keçirin.",
+        "IMPLICIT_CAST": "{column} dırnaq içindəki bir rəqəmlə müqayisə edilir — sütun və sabit tiplərini uyğunlaşdırın (örtülü çevrilmə).",
+        "NOT_IN_SUBQUERY": "NOT IN (alt sorğu) NULL-lar mövcud olduqda heç nə qaytarmır və yavaşdır — NOT EXISTS istifadə edin.",
+        "NO_WHERE": "WHERE bəndi yoxdur — böyük bir cədvəldə bu tam skandır (bir şərt və ya LIMIT əlavə edin).",
+        "DOMAIN_MISMATCH": "{column} standart domenə görə {expected} tipidir, lakin başqa bir tip sabitlə müqayisə edilir — örtülü çevrilmə indeks istifadəsini əngəlləyə bilər."
+      }
+    },
+    "saved": {
+      "title": "Saxlanmış planlar · Müqayisə et",
+      "empty": "Saxlanmış plan yoxdur. Bir planı görün, sonra saxlayın.",
+      "pick": "Müqayisə etmək üçün plan seçin",
+      "pick2": "Müqayisə etmək üçün iki plan seçin.",
+      "compare": "İki planı müqayisə et",
+      "delete": "Sil",
+      "cost": "xərc",
+      "prev": "Əvvəlki",
+      "next": "Növbəti",
+      "page": "Səhifə {page}"
+    },
+    "diff": {
+      "cost": "Ümumi xərc {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "İki plan fərqli SQL üçündür (normallaşdırmadan sonra).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Plan düyünlərində dəyişiklik yoxdur.",
+      "before": "Əvvəl",
+      "after": "Sonra"
+    },
+    "ai": {
+      "title": "AI tənzimləmə məsləhəti",
+      "badge": "Tezliklə",
+      "body": "Tezliklə (təsdiq və təsir ölçmə prosedurlarından sonra) — məsləhətlər maskalanmış sabitlərlə SQL-dən yaradılacaq və yalnız DA təsdiqindən və ölçülmüş təsirdən sonra tətbiq edilmiş kimi qeyd ediləcək."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi bağlantı funksiyası hazırlanır. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
+      "LINK_AUTH": "Bağlantı tokeninin müddəti bitmiş və ya ləğv edilmişdir. schema.pi-də yeni bir token verin və yenidən qeyd edin.",
+      "LINK_SCOPE": "Bu bağlantı həmin əlaqəni istifadə edə bilməz (fərqli təsnifat sxemi).",
+      "CONN_UNSUPPORTED": "Bu bağlantı növü hələ dəstəklənmir (hələlik yalnız PostgreSQL server bağlantıları).",
+      "Q_UNKNOWN": "Dəstəklənməyən sorğu.",
+      "SQL_NOT_SELECT": "Planlar yalnız SELECT və ya WITH ilə başlayan tək bir ifadə üçün mövcuddur.",
+      "TIMEOUT": "Sorğu vaxtı bitdi (5 saniyə). SQL-i qısaldın və ya sonra yenidən cəhd edin.",
+      "RATE": "Çox sayda sorğu. Bir dəqiqə sonra yenidən cəhd edin.",
+      "PAYLOAD_TOO_LARGE": "Plan saxlamaq üçün çox böyükdür.",
+      "LINK_NOT_FOUND": "Bağlantı tapılmadı. Zəhmət olmasa bağlantını yenidən seçin."
+    }
+  },
+  "nav": {
+    "label": "Xüsusiyyətlər",
+    "connect": "Bağlan",
+    "sqlLab": "SQL Tuning",
+    "perf": "Performans",
+    "monitor": "Monitorinq",
+    "drift": "Sürüşmə",
+    "migration": "Miqrasiya",
+    "pipeline": "Boru kəməri",
+    "analytics": "Analitika",
+    "ops": "Əməliyyat Təhlükəsizliyi",
+    "learn": "Öyrən"
   }
 }

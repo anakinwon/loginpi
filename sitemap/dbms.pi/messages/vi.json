@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Ứng dụng làm việc DBA·SQLP để vận hành DB engine nhanh chóng và an toàn"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Giúp DB engine vận hành dữ liệu của bạn nhanh chóng và an toàn",
+    "description": "Đây là ứng dụng làm việc DBA·SQLP để xử lý kế hoạch thực thi, thống kê và hiệu suất. schema.pi đảm nhiệm thiết kế và tiêu chuẩn, dbms.pi là đối tác phụ trách phía engine.",
+    "welcome": "Chào mừng, {name}.",
+    "featTitle": "Tính năng",
+    "featDesc": {
+      "connect": "Đăng ký token liên kết schema.pi và kiểm tra trạng thái kết nối",
+      "sqlLab": "Cây kế hoạch thực thi, cảnh báo, so sánh và kiểm tra anti-pattern đối với các miền tiêu chuẩn",
+      "perf": "Top-N truy vấn chậm, tình trạng bảng/chỉ mục, dự báo dung lượng, hoạt động và khóa",
+      "monitor": "Tóm tắt chỉ số ứng dụng, DB và URL với cảnh báo ngưỡng",
+      "drift": "So sánh mô hình schema.pi và lịch sử áp dụng DDL với danh mục thực tế, đo lường hiệu quả chỉ mục",
+      "migration": "Thứ tự tải theo cấu trúc liên kết, khối, danh sách kiểm tra và SQL xác minh",
+      "pipeline": "Kiểm tra trước thay đổi và định nghĩa pipeline nguồn→chuyển đổi→đích",
+      "analytics": "Bảng điều khiển KPI, ánh xạ hồ dữ liệu 3 lớp và danh mục tập dữ liệu",
+      "ops": "Chẩn đoán chỉ đọc các tham số, vai trò, sao lưu và DR sao chép",
+      "learn": "Câu hỏi thực hành SQLP·DAP, các trường hợp điều chỉnh và từ điển so sánh DBMS"
+    }
+  },
   "auth": {
     "checking": "Đang kiểm tra đăng nhập…",
     "signedIn": "{name}",
@@ -64,5 +87,836 @@
     "LINK_CODE_GEN_FAILED": "Không thể tạo mã liên kết. Vui lòng thử lại sau.",
     "AUTH_DB_UNAVAILABLE": "Không thể lưu tài khoản của bạn, vì vậy đăng nhập thất bại. Vui lòng thử lại sau.",
     "LINK_TRY_LIMIT": "Quá nhiều mã liên kết không chính xác. Thử lại sau 15 phút."
+  },
+  "analytics": {
+    "title": "Phân tích·Hồ dữ liệu",
+    "intro": "Xem KPI hoạt động dbms, thiết kế hồ dữ liệu 3 lớp và danh mục tập dữ liệu trên một màn hình.",
+    "storageNotice": "Kho lưu trữ hồ dữ liệu (phía khách hàng hoặc đám mây) vẫn chưa được quyết định (PRD mục 10 #7). Hiện tại chỉ lưu trữ thiết kế và ánh xạ tên — không có dữ liệu hàng.",
+    "noLink": "Trước tiên, hãy chọn hoặc đăng ký liên kết schema.pi.",
+    "goConnect": "Đăng ký liên kết",
+    "loading": "Đang tải…",
+    "refresh": "Làm mới",
+    "kpi": {
+      "title": "Bảng điều khiển KPI",
+      "updatedAt": "{area} · tính đến {time}",
+      "notBuilt": "Chưa xây dựng",
+      "keys": {
+        "links": "Liên kết của tôi",
+        "perf": "Ảnh chụp hiệu suất",
+        "drift": "Chạy kiểm tra độ lệch",
+        "mig": "Kế hoạch di chuyển",
+        "pipe": "Pipeline",
+        "lake": "Tập dữ liệu hồ dữ liệu"
+      },
+      "countsChart": "Tổng số theo tính năng",
+      "trendTitle": "Số lần thu thập hiệu suất trong 14 ngày qua",
+      "trendItem": "{day}: {cnt} lần",
+      "trendEmpty": "Không có ảnh chụp hiệu suất nào trong 14 ngày qua.",
+      "monTitle": "Tóm tắt giám sát schema.pi (1 giờ qua)",
+      "monTps": "Yêu cầu/giây",
+      "monErr": "Tỷ lệ lỗi",
+      "monAvg": "Phản hồi trung bình (ms)",
+      "monDb": "Số kết nối DB",
+      "monFail": "Không thể tải tóm tắt giám sát: {msg}"
+    },
+    "lake": {
+      "title": "Thiết kế hồ dữ liệu 3 lớp",
+      "raw": "Thô (raw)",
+      "rawDesc": "Tải tên và kiểu cột DB nguồn nguyên trạng.",
+      "std": "Tiêu chuẩn hóa (standardized)",
+      "stdDesc": "Đổi tên cột thành các thuật ngữ tiêu chuẩn được schema.pi phê duyệt.",
+      "cur": "Đã tuyển chọn (curated)",
+      "curDesc": "Tập dữ liệu phân tích được nhóm theo thực thể.",
+      "loadProjects": "Tải dự án",
+      "project": "Dự án",
+      "pickProject": "Chọn một dự án",
+      "noProjects": "Không có dự án nào trong khu vực này.",
+      "noTables": "Mô hình dự án này không có bảng.",
+      "conform": "Tỷ lệ tuân thủ tiêu chuẩn {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} cột · {pct}% tuân thủ",
+      "colSrc": "Cột nguồn",
+      "colStd": "Cột tiêu chuẩn hóa",
+      "colType": "Kiểu",
+      "colOk": "Định dạng",
+      "ok": "OK",
+      "ng": "Kiểm tra",
+      "pk": "PK",
+      "selectAll": "Chọn tất cả",
+      "selected": "Đã chọn {cnt}",
+      "save": "Thêm vào thiết kế hồ dữ liệu",
+      "saved": "Đã thêm {cnt} vào danh mục."
+    },
+    "catalog": {
+      "title": "Danh mục tập dữ liệu",
+      "schemaCard": "schema.pi là nguồn đáng tin cậy cho các định nghĩa tập dữ liệu phân tích, tìm kiếm siêu dữ liệu và bảng chú giải. Tại đây bạn chỉ thấy trạng thái tải và độ tươi mới của hồ dữ liệu.",
+      "openSchema": "Xem định nghĩa trong schema.pi",
+      "empty": "Chưa có bảng nào được thêm vào thiết kế hồ dữ liệu.",
+      "status": {
+        "DSGN": "Chỉ thiết kế",
+        "LOADED": "Đã tải",
+        "FAIL": "Tải thất bại"
+      },
+      "lastLoad": "Lần tải cuối {time}",
+      "neverLoaded": "Chưa từng tải",
+      "remove": "Xóa",
+      "removeConfirm": "Xóa {tbl} khỏi danh mục?",
+      "prev": "Trước",
+      "next": "Tiếp",
+      "page": "Trang {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Trước tiên, hãy chọn một liên kết.",
+      "NOT_FOUND": "Không tìm thấy. Kiểm tra xem mô hình có thay đổi không."
+    }
+  },
+  "drift": {
+    "title": "Độ lệch Mô hình ↔ DB",
+    "intro": "So sánh mô hình thiết kế schema.pi và lịch sử áp dụng DDL với danh mục DB trực tiếp để tìm độ lệch, và đo lường xem các chỉ mục đã thiết kế có thực sự được sử dụng hay không. Dữ liệu hàng của khách hàng không bao giờ được đọc hoặc lưu trữ.",
+    "needLink": "Trước tiên, hãy chọn một liên kết schema.pi ở trên. Nếu bạn chưa có, hãy đăng ký một token trong menu 'Liên kết'.",
+    "needConn": "Chọn kết nối DB để so sánh ở trên.",
+    "project": "Dự án",
+    "projectPick": "Chọn một dự án",
+    "loading": "Đang tải…",
+    "run": "Chạy phát hiện độ lệch",
+    "running": "Đang so sánh…",
+    "readOnly": "Chỉ chạy các truy vấn danh mục và thống kê chỉ đọc.",
+    "applyInSchema": "Áp dụng các bản sửa lỗi (chỉnh sửa mô hình, tạo và thực thi DDL) trong schema.pi, nguồn đáng tin cậy.",
+    "history": "Lịch sử phát hiện",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "none": "Không có",
+    "model": "Mô hình",
+    "reqNo": "Yêu cầu {id}",
+    "notSaved": "Không thể lưu lần chạy này vào lịch sử (kết quả vẫn hiển thị bình thường).",
+    "capped": "Quá nhiều mục — hiển thị {cap} mục đầu tiên mỗi phần (số lượng đầy đủ).",
+    "statsMissing": "Không có thống kê sử dụng chỉ mục, nên không thể đánh giá việc sử dụng.",
+    "sum": {
+      "missingTables": "Bảng thiếu trong DB",
+      "extraTables": "Bảng không có trong mô hình",
+      "colMismatches": "Không khớp cột",
+      "missingIndexes": "Chỉ mục đã thiết kế thiếu trong DB",
+      "extraIndexes": "Chỉ mục không có trong mô hình",
+      "ddlMissing": "Đối tượng đã biến mất sau khi áp dụng",
+      "unusedIndexes": "Chỉ mục đã thiết kế không được sử dụng"
+    },
+    "sec": {
+      "ddlMissing": "DDL đã áp dụng nhưng thiếu trong DB",
+      "missingTables": "Bảng có trong mô hình nhưng thiếu trong DB",
+      "extraTables": "Bảng có trong DB nhưng không có trong mô hình",
+      "colMismatches": "Không khớp kiểu cột / NULL",
+      "missingIndexes": "Chỉ mục đã thiết kế thiếu trong DB",
+      "extraIndexes": "Chỉ mục chỉ có trong DB (trừ PK)",
+      "idxUsage": "Hiệu quả sử dụng chỉ mục đã thiết kế"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi đã ghi nhận các đối tượng này đã được áp dụng, nhưng chúng đã biến mất — nghi ngờ bị xóa thủ công hoặc rollback.",
+      "extraTables": "Những bảng này có thể thuộc về các dự án khác hoặc bảng hệ thống trên kết nối này.",
+      "idxUsage": "Số lần quét bằng 0 kể từ lần đặt lại thống kê cuối cùng có nghĩa là không được sử dụng. Kiểm tra cửa sổ thống kê trước khi xóa."
+    },
+    "kind": {
+      "MISSING": "thiếu trong DB",
+      "EXTRA": "không có trong mô hình",
+      "TYPE": "kiểu khác nhau",
+      "NULL": "khả năng NULL khác nhau"
+    },
+    "col": {
+      "idx": "Chỉ mục",
+      "scans": "Số lần quét",
+      "size": "Kích thước",
+      "status": "Phán quyết"
+    },
+    "usage": {
+      "USED": "Đang sử dụng",
+      "UNUSED": "Chỉ mục đã thiết kế không được sử dụng",
+      "NO_STATS": "Không có thống kê"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Tính năng liên kết schema.pi đang được chuẩn bị. Vui lòng thử lại sau.",
+      "LINK_DOWN": "Không thể kết nối với schema.pi. Vui lòng thử lại sau.",
+      "LINK_AUTH": "Token liên kết đã hết hạn hoặc bị thu hồi. Vui lòng cấp một token mới trong schema.pi và đăng ký lại.",
+      "LINK_NOT_FOUND": "Không tìm thấy liên kết. Vui lòng chọn lại liên kết.",
+      "LINK_SCOPE": "Kết nối này không thuộc phân loại của liên kết.",
+      "CONN_UNSUPPORTED": "Kết nối không được hỗ trợ (hiện tại chỉ hỗ trợ kết nối máy chủ PostgreSQL).",
+      "TIMEOUT": "Yêu cầu đã hết thời gian. Vui lòng thử lại sau.",
+      "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau một phút."
+    }
+  },
+  "learn": {
+    "title": "Học tập DBA",
+    "intro": "Cung cấp các câu hỏi thực hành SQLP·DAP, sổ tay các trường hợp điều chỉnh và từ điển so sánh Oracle·Tibero·PostgreSQL. Có thể học mà không cần liên kết; nếu chọn một liên kết, bạn cũng có thể xem ánh xạ kiểu tiêu chuẩn schema.pi của mình.",
+    "loading": "Đang tải…",
+    "tabs": {
+      "quiz": "Bài tập thực hành",
+      "cases": "Các trường hợp điều chỉnh",
+      "dict": "Từ điển DBMS"
+    },
+    "topics": {
+      "INDEX": "Quét chỉ mục",
+      "JOIN": "Phương pháp nối",
+      "PARTITION": "Cắt bỏ phân vùng",
+      "NORMAL": "Chuẩn hóa",
+      "NAMING": "Đặt tên tiêu chuẩn",
+      "ISOLATION": "Mức độ cô lập",
+      "LOCK": "Khóa"
+    },
+    "levels": {
+      "1": "Cơ bản",
+      "2": "Trung cấp",
+      "3": "Nâng cao"
+    },
+    "quiz": {
+      "score": "Tiến độ của tôi",
+      "scoreLine": "Đã giải {solved} trên {total} câu · {correct} câu đúng",
+      "right": "Đúng",
+      "wrong": "Sai",
+      "retry": "Thử lại",
+      "prevRight": "Đúng lần trước",
+      "prevWrong": "Sai lần trước"
+    },
+    "cases": {
+      "notice": "Tất cả các trường hợp là ví dụ học tập tự viết; các số liệu chỉ mang tính minh họa (không phải dữ liệu khách hàng).",
+      "problem": "SQL vấn đề",
+      "plan": "Tóm tắt kế hoạch",
+      "cause": "Nguyên nhân",
+      "fix": "SQL đã sửa",
+      "effect": "Hiệu quả"
+    },
+    "cats": {
+      "ALL": "Tất cả",
+      "TYPE": "Kiểu dữ liệu",
+      "FUNC": "Hàm",
+      "PAGING": "Phân trang",
+      "SEQ": "Chuỗi",
+      "DATE": "Ngày",
+      "SYNTAX": "Cú pháp"
+    },
+    "dict": {
+      "search": "Tìm kiếm (ví dụ: NVL, LIMIT)",
+      "item": "Mục",
+      "note": "Ghi chú",
+      "empty": "Không có mục phù hợp",
+      "loading": "Đang tải…",
+      "liveTitle": "Ánh xạ kiểu tiêu chuẩn của lĩnh vực chủ đề của tôi",
+      "liveIntro": "Chọn một liên kết để tải hồ sơ DBMS của schema.pi (kiểu logic → kiểu vật lý). Từ điển ở trên hoạt động mà không cần liên kết.",
+      "liveLoad": "Tải ánh xạ kiểu",
+      "lgcType": "Kiểu logic"
+    }
+  },
+  "link2": {
+    "title": "Kết nối schema.pi",
+    "intro": "Đăng ký token kết nối để sử dụng các kết nối DB của một lĩnh vực chủ đề schema.pi trong dbms.pi. Token được lưu trữ mã hóa và không có dữ liệu hàng nào từ cơ sở dữ liệu của bạn được lưu trữ.",
+    "howTitle": "Cách cấp token kết nối",
+    "how1": "Đăng nhập vào schema.pi và mở lĩnh vực chủ đề để kết nối",
+    "how2": "Đi tới Lĩnh vực chủ đề → Cài đặt → Token kết nối và nhấn 'Cấp token' (quản trị viên lĩnh vực hoặc vai trò DA)",
+    "how3": "Sao chép token bắt đầu bằng slk_ — nó chỉ hiển thị một lần khi được cấp",
+    "how4": "Dán vào bên dưới và đăng ký",
+    "openSchema": "Mở schema.pi",
+    "registerTitle": "Đăng ký kết nối",
+    "tokenLabel": "Token kết nối",
+    "tokenPlaceholder": "slk_…",
+    "register": "Đăng ký",
+    "registering": "Đang kiểm tra…",
+    "registered": "Lĩnh vực chủ đề '{area}' hiện đã được kết nối",
+    "replaced": "Đã thay thế token của lĩnh vực chủ đề '{area}'",
+    "myLinks": "Các kết nối của tôi",
+    "empty": "Chưa có kết nối nào được đăng ký",
+    "loading": "Đang tải…",
+    "regDtm": "Đã đăng ký {dtm}",
+    "remove": "Ngắt kết nối",
+    "removeConfirm": "Ngắt kết nối '{area}'? Các màn hình sử dụng kết nối này sẽ không còn truy cập được nữa.",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "statusTitle": "Trạng thái kết nối",
+    "noConns": "Không có kết nối DB nào trong lĩnh vực chủ đề này (thêm một kết nối trong schema.pi)",
+    "colConn": "Kết nối",
+    "colDbms": "DBMS",
+    "colMthd": "Phương thức",
+    "colHost": "Máy chủ",
+    "colTest": "Lần kiểm tra cuối",
+    "colAgent": "Agent nhìn thấy lần cuối",
+    "never": "Không có",
+    "retry": "Thử lại",
+    "pickerLink": "Liên kết",
+    "pickerConn": "Kết nối",
+    "pickerEmpty": "Không có kết nối —",
+    "pickerGo": "đăng ký một cái tại /connect",
+    "errors": {
+      "LINK_AUTH": "Token kết nối đã hết hạn hoặc bị thu hồi. Vui lòng cấp một token mới trong schema.pi và đăng ký lại",
+      "LINK_SCOPE": "Kết nối này không thuộc lĩnh vực chủ đề đã liên kết",
+      "LINK_DOWN": "Không thể kết nối với schema.pi. Vui lòng thử lại sau",
+      "LINK_NOT_FOUND": "Không tìm thấy kết nối",
+      "LINK_DUP": "Đang trong quá trình đăng ký. Vui lòng thử lại",
+      "CONN_UNSUPPORTED": "Kết nối không được hỗ trợ (hiện tại chỉ hỗ trợ kết nối máy chủ PostgreSQL)",
+      "Q_UNKNOWN": "Truy vấn không xác định",
+      "SQL_NOT_SELECT": "Chỉ có thể chạy một câu lệnh SELECT (hoặc WITH) duy nhất",
+      "PGSS_MISSING": "Tiện ích mở rộng pg_stat_statements chưa được cài đặt trên DB đích",
+      "TIMEOUT": "Yêu cầu đã hết thời gian",
+      "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau một phút",
+      "INVALID_INPUT": "Dán toàn bộ token kết nối bắt đầu bằng slk_"
+    }
+  },
+  "migration": {
+    "title": "Di chuyển dữ liệu (PiMig)",
+    "intro": "Tính toán thứ tự tải bảng từ các mối quan hệ trong mô hình thiết kế schema.pi của bạn, tổ chức kích thước khối, song song và danh sách kiểm tra chuyển đổi, đồng thời tạo SQL xác minh mà bạn tự chạy trên nguồn và đích. Màn hình này chỉ lập kế hoạch và kiểm tra — nó không di chuyển dữ liệu hoặc đọc các hàng DB của khách hàng.",
+    "needLink": "Trước tiên, hãy chọn một liên kết schema.pi ở trên. Nếu bạn chưa có, hãy đăng ký một token trong menu 'Kết nối'.",
+    "loading": "Đang tải…",
+    "newPlan": "Kế hoạch di chuyển mới",
+    "project": "Dự án",
+    "projectPick": "Chọn một dự án",
+    "planNm": "Tên kế hoạch",
+    "planNmHint": "Mặc định là tên dự án",
+    "create": "Tạo kế hoạch",
+    "creating": "Đang tạo…",
+    "snapHint": "Thiết kế tại thời điểm này (tên bảng, cột và mối quan hệ) được đóng băng dưới dạng ảnh chụp nhanh. Tạo một kế hoạch mới khi mô hình thay đổi.",
+    "plans": "Kế hoạch di chuyển",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "sts": {
+      "DRAFT": "Đang soạn thảo",
+      "READY": "Sẵn sàng"
+    },
+    "del": "Xóa",
+    "delConfirm": "Xóa kế hoạch này?",
+    "snapInfo": "Ảnh chụp nhanh: {tables} bảng · {rels} mối quan hệ",
+    "dropped": "({n} mối quan hệ không có bảng vật lý bị loại khỏi thứ tự)",
+    "chunkSize": "Kích thước khối (hàng/commit)",
+    "parallel": "Song song (số bảng cùng lúc)",
+    "saveOpts": "Lưu tùy chọn",
+    "optsHint": "Song song là số lượng bảng được tải cùng lúc trong một cấp độ. Kích thước khối là đơn vị commit (số hàng) mà công cụ thực thi sẽ sử dụng.",
+    "order": "Thứ tự tải",
+    "orderHint": "Được sắp xếp theo cấu trúc liên kết bởi các mối quan hệ thiết kế (không phải FK vật lý) để các bảng cha đến trước. Các bảng trong cùng một cấp độ không phụ thuộc vào nhau và có thể tải song song.",
+    "cycles": "{n} nhóm tuần hoàn — được đặt ở cùng cấp độ. Đặt thứ tự thủ công và hoãn kiểm tra tham chiếu cho đến sau khi tải.",
+    "selfRefs": "Bảng tự tham chiếu (phân cấp) — tải các hàng cha trước trong bảng",
+    "level": "Cấp độ {n}",
+    "checklist": "Danh sách kiểm tra chuyển đổi",
+    "toReady": "Đánh dấu là sẵn sàng",
+    "toDraft": "Quay lại bản nháp",
+    "readyNeedAll": "Kiểm tra mọi mục trước khi đánh dấu kế hoạch sẵn sàng.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "Điểm chuyển giao CDC",
+        "desc": "Ghi lại một điểm nguồn nhất quán trước khi tải ban đầu (PG LSN · Oracle/Tibero SCN · đối với thăm dò, thời gian bắt đầu trừ đi một cửa sổ chồng chéo), bắt đầu CDC từ đó và hấp thụ các bản sao trong cửa sổ chuyển giao bằng upsert."
+      },
+      "valueConv": {
+        "title": "Chuyển đổi giá trị",
+        "desc": "Các quy tắc được đặt cho chuỗi trống = NULL, đệm khoảng trắng CHAR, NUMBER không có độ chính xác → NUMERIC, DATE có thời gian → TIMESTAMP, độ dài VARCHAR2 BYTE ↔ CHAR và LONG·RAW."
+      },
+      "charset": {
+        "title": "Bộ ký tự",
+        "desc": "Bộ ký tự nguồn (KO16MSWIN949, UTF8, …) được xác nhận, với các cột bị tràn do tăng trưởng đa byte và việc cách ly các ký tự không thể chuyển đổi đã được quyết định."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB được truyền theo khối (kích thước và giới hạn bộ nhớ) và được xác minh bằng độ dài + hàm băm."
+      },
+      "seqResync": {
+        "title": "Đồng bộ lại chuỗi",
+        "desc": "Sau khi tải, các chuỗi·định danh đích được đặt thành max(khóa)+1."
+      },
+      "timezone": {
+        "title": "Múi giờ · cột hệ thống",
+        "desc": "Múi giờ diễn giải cho các giá trị không có múi giờ (ví dụ: Asia/Seoul) được đặt, các trigger thời gian sửa đổi sẽ không ghi đè lên dấu thời gian nguồn trong quá trình tải và các quy tắc thay thế người tạo/người sửa đổi được đặt."
+      },
+      "backpressure": {
+        "title": "Áp suất ngược · tải đích",
+        "desc": "Giảm kích thước khối và song song khi đích bị trễ, WAL tăng trưởng hoặc chờ khóa; xây dựng các chỉ mục không phải PK sau khi tải và chạy ANALYZE·VACUUM sau đó."
+      }
+    },
+    "verify": "SQL xác minh",
+    "verifyHint": "Tạo các truy vấn đếm, tổng cột số, khóa trùng lặp và băm khóa cho mỗi bảng theo thứ tự tải. Tự chạy chúng trên nguồn và đích và so sánh (màn hình này không thực thi chúng).",
+    "noHashOracle": "Các hàm băm và hiển thị văn bản của Oracle·Tibero khác với PostgreSQL, vì vậy các truy vấn băm bị bỏ qua — so sánh số lượng, tổng và khóa trùng lặp.",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép",
+    "copyFail": "Không thể sao chép. Chọn văn bản và sao chép thủ công.",
+    "engine": {
+      "title": "Thực thi·khởi động lại · diễn tập·hoàn tác",
+      "body": "Việc thực thi di chuyển thực tế (điểm kiểm tra, áp suất ngược, cách ly hàng lỗi) và diễn tập, hoàn tác và ghi điểm bắt đầu CDC sẽ được cung cấp sau khi mô hình bảo mật tác nhân worker (A10) được hoàn thiện. Hiện tại, điều này bao gồm lập kế hoạch, kiểm tra và SQL xác minh."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Chức năng liên kết schema.pi đang được chuẩn bị. Vui lòng thử lại sau.",
+      "LINK_DOWN": "Không thể kết nối với schema.pi. Vui lòng thử lại sau.",
+      "LINK_AUTH": "Mã thông báo liên kết đã hết hạn hoặc bị thu hồi. Vui lòng cấp mã thông báo mới trong schema.pi và đăng ký lại.",
+      "LINK_NOT_FOUND": "Không tìm thấy liên kết. Vui lòng chọn lại liên kết.",
+      "LINK_SCOPE": "Dự án này không thuộc phân loại của liên kết.",
+      "TIMEOUT": "Yêu cầu đã hết thời gian chờ. Vui lòng thử lại sau.",
+      "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau một phút.",
+      "MIG_NO_TABLES": "Dự án này không có bảng vật lý nào để di chuyển. Vui lòng chuyển đổi sang vật lý trong schema.pi trước.",
+      "MIG_CHECK_INCOMPLETE": "Kiểm tra mọi mục trong danh sách kiểm tra chuyển đổi trước khi đánh dấu kế hoạch sẵn sàng.",
+      "NOT_FOUND": "Không tìm thấy kế hoạch."
+    }
+  },
+  "monitor": {
+    "title": "Trung tâm giám sát",
+    "collectNote": "Thu thập chạy trong schema.pi — di chuyển đã lên kế hoạch (D7). Trang này đọc tóm tắt giám sát schema.pi.",
+    "noLink": "Vui lòng chọn hoặc đăng ký liên kết schema.pi trước.",
+    "goConnect": "Đăng ký liên kết",
+    "period": "Thời gian",
+    "periods": {
+      "30": "30 phút",
+      "60": "1 giờ",
+      "360": "6 giờ",
+      "1440": "24 giờ"
+    },
+    "refresh": "Làm mới",
+    "loading": "Đang tải…",
+    "updatedAt": "{area} · tính đến {time} (tự động làm mới mỗi 30 giây)",
+    "appTitle": "Hiệu suất ứng dụng",
+    "dbTitle": "Trạng thái DB theo kết nối",
+    "urlTitle": "Kiểm tra URL",
+    "empty": "Không có dữ liệu để hiển thị.",
+    "breachTitle": "{n} vi phạm ngưỡng",
+    "rulesTitle": "Quy tắc ngưỡng",
+    "rulesNote": "Các quy tắc được lưu cho liên kết này và được đánh giá dựa trên tóm tắt đã nhận; các vi phạm sẽ có viền đỏ (thông báo sẽ đến sau).",
+    "metric": "Chỉ số",
+    "conn": "Kết nối",
+    "allConns": "Tất cả kết nối",
+    "op": "So sánh",
+    "threshold": "Ngưỡng",
+    "thrInvalid": "Nhập một số cho ngưỡng.",
+    "addRule": "Thêm quy tắc",
+    "noRules": "Chưa có quy tắc nào.",
+    "enable": "Bật",
+    "disable": "Tắt",
+    "delete": "Xóa",
+    "delConfirm": "Xóa quy tắc này?",
+    "aiNote": "Phân tích sự cố AI và phê duyệt sửa lỗi vẫn diễn ra trong trình giám sát schema.pi.",
+    "aiLink": "Mở trình giám sát schema.pi",
+    "metrics": {
+      "APP_TPS": "TPS (yêu cầu/giây)",
+      "APP_ERR_PCT": "Tỷ lệ lỗi (%)",
+      "APP_SLOW_CNT": "Yêu cầu chậm",
+      "APP_AVG_MS": "Phản hồi trung bình (ms)",
+      "DB_SESS_CNT": "Phiên",
+      "DB_LOCK_WAIT_CNT": "Chờ khóa",
+      "DB_CACHE_HIT_PCT": "Tỷ lệ truy cập bộ nhớ cache (%)",
+      "DB_SIZE_MB": "Kích thước DB (MB)",
+      "URL_RSP_MS": "Phản hồi URL (ms)",
+      "URL_FAIL_CNT": "Số lần URL thất bại"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Vui lòng chọn một liên kết trước.",
+      "NOT_IMPLEMENTED": "Chức năng liên kết schema.pi đang được chuẩn bị. Vui lòng thử lại sau.",
+      "LINK_AUTH": "Mã thông báo liên kết không hợp lệ hoặc đã hết hạn. Vui lòng cấp mã thông báo mới trong schema.pi và đăng ký.",
+      "LINK_SCOPE": "Liên kết này không thể truy cập phân loại đó.",
+      "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
+      "TIMEOUT": "schema.pi đang phản hồi chậm. Vui lòng thử lại sau.",
+      "RULE_LIMIT": "Tối đa 50 quy tắc cho mỗi liên kết.",
+      "NOT_FOUND": "Không tìm thấy quy tắc."
+    }
+  },
+  "ops": {
+    "title": "An toàn hoạt động DB",
+    "loading": "Đang tải…",
+    "pickFirst": "Vui lòng chọn một liên kết và kết nối ở trên trước",
+    "run": "Chạy chẩn đoán",
+    "running": "Đang chẩn đoán…",
+    "noRun": "Chưa có chẩn đoán nào. Nhấn \"Chạy chẩn đoán\"",
+    "lastRun": "Chẩn đoán cuối cùng {dtm}",
+    "readOnly": "Chẩn đoán chỉ đọc (SELECT). Lời khuyên là một hướng dẫn và phụ thuộc vào bộ nhớ máy chủ, tải và khối lượng công việc",
+    "truncated": "Quá nhiều đối tượng — chỉ 500 đối tượng đầu tiên được kiểm tra",
+    "paramsNote": "Tổng bộ nhớ máy chủ không xác định, vì vậy nó được ước tính từ shared_buffers ≈ 25% RAM. random_page_cost giả định SSD",
+    "auditNote": "Các bảng có RLS tắt và tài khoản không sử dụng sẽ được kiểm tra khi truy vấn liên kết hỗ trợ chúng",
+    "replNote": "Cơ sở là Active-Standby (A-S) — một primary + standby. Độ trễ phát lại ≥ 5 giây = cảnh báo, ≥ 60 giây = rủi ro (tham chiếu RPO đo được)",
+    "lagIdle": "Không có thay đổi",
+    "pager": "Phân trang",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "tabs": {
+      "params": "Tham số",
+      "audit": "Tài khoản & đặc quyền",
+      "backup": "Sao lưu & phục hồi",
+      "repl": "Sao chép & DR",
+      "history": "Lịch sử"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Cảnh báo",
+      "RISK": "Rủi ro"
+    },
+    "role": {
+      "primary": "Kết nối này = Primary",
+      "standby": "Kết nối này = Standby",
+      "unknown": "Vai trò không xác định"
+    },
+    "col": {
+      "level": "Phán quyết",
+      "item": "Mục",
+      "value": "Giá trị",
+      "reason": "Chi tiết",
+      "standby": "Standby",
+      "state": "Trạng thái",
+      "sync": "Đồng bộ hóa",
+      "lag": "Độ trễ phát lại"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "Vai trò BYPASSRLS",
+      "bypass_ok": "Vai trò BYPASSRLS",
+      "no_expiry": "Hết hạn mật khẩu",
+      "expiry_ok": "Hết hạn mật khẩu",
+      "public_grant": "Quyền PUBLIC",
+      "public_ok": "Quyền PUBLIC",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "WAL được lưu trữ cuối cùng",
+      "arc_stale": "WAL được lưu trữ cuối cùng",
+      "arc_recent": "WAL được lưu trữ cuối cùng",
+      "arc_failing": "Lưu trữ WAL thất bại"
+    },
+    "rules": {
+      "sb_default": "Ở mức mặc định (128MB). Trên một máy chủ chuyên dụng, khoảng 25% RAM được khuyến nghị",
+      "sb_ok": "Được đặt cao hơn mức mặc định",
+      "wm_over": "max_connections × work_mem vượt quá bộ nhớ ước tính. Các sắp xếp đồng thời có nguy cơ hết bộ nhớ",
+      "wm_default": "Ở mức mặc định (4MB). Các sắp xếp và băm lớn có thể tràn ra đĩa",
+      "wm_ok": "Trong một phạm vi hợp lý",
+      "mwm_default": "Ở mức mặc định (64MB). VACUUM và xây dựng chỉ mục có thể chậm; xem xét 256MB trở lên",
+      "mwm_ok": "Được đặt cao hơn mức mặc định",
+      "av_on": "autovacuum đang bật",
+      "av_off": "autovacuum đang tắt. Nguy cơ cao về phình bảng và tràn ID giao dịch",
+      "conn_high": "max_connections cao. Mỗi kết nối sử dụng bộ nhớ; một bộ kết nối (PgBouncer, v.v.) được khuyến nghị",
+      "conn_ok": "Trong một phạm vi hợp lý",
+      "lmd_off": "Ghi nhật ký truy vấn chậm đang tắt (-1). Khoảng 1000ms được khuyến nghị",
+      "lmd_all": "Mọi câu lệnh đều được ghi nhật ký (0). Chi phí ghi nhật ký nặng",
+      "lmd_ok": "Ghi nhật ký truy vấn chậm đang bật",
+      "st_off": "Không có thời gian chờ câu lệnh toàn máy chủ (0). Đặt giới hạn cho mỗi vai trò hoặc ứng dụng",
+      "st_ok": "Đã đặt thời gian chờ câu lệnh",
+      "iit_off": "Không có thời gian chờ không hoạt động trong giao dịch (0). Có thể gây giữ khóa và phình to",
+      "iit_ok": "Đã đặt thời gian chờ không hoạt động trong giao dịch",
+      "ckpt_short": "Khoảng thời gian kiểm tra là 5 phút hoặc ít hơn. Xem xét 10–15 phút cho các tải ghi nặng",
+      "ckpt_ok": "Trong một phạm vi hợp lý",
+      "wal_minimal": "wal_level=minimal làm cho PITR và sao chép không thể thực hiện được. Sử dụng replica hoặc cao hơn",
+      "wal_ok": "Mức WAL hỗ trợ PITR và sao chép",
+      "rpc_hdd": "Mặc định HDD (4). Đối với SSD, 1.1–2 được khuyến nghị",
+      "rpc_ok": "Phù hợp với SSD",
+      "super_many": "Hai hoặc nhiều superuser. Giữ một cho quản trị và chỉ cấp các đặc quyền cần thiết cho những người khác",
+      "super_ok": "Tối đa một superuser",
+      "bypass_rls": "Tồn tại các vai trò không phải superuser bỏ qua bảo mật cấp hàng",
+      "bypass_ok": "Không có vai trò bỏ qua RLS",
+      "no_expiry": "Các vai trò đăng nhập không có ngày hết hạn mật khẩu. Đặt VALID UNTIL cho các tài khoản cá nhân",
+      "expiry_ok": "Tất cả các vai trò đăng nhập đều có ngày hết hạn",
+      "public_grant": "PUBLIC (mọi vai trò) có đặc quyền bảng. Đặc quyền ghi là rủi ro",
+      "public_ok": "Không có đặc quyền bảng nào được cấp cho PUBLIC",
+      "arc_on": "Lưu trữ WAL (archive_mode) đang bật",
+      "arc_off": "Lưu trữ WAL đang tắt, vì vậy không thể phục hồi tại một thời điểm (PITR)",
+      "arc_cmd_empty": "archive_mode đang bật nhưng archive_command và archive_library trống",
+      "arc_never": "Chưa có WAL nào được lưu trữ",
+      "arc_stale": "Bản lưu trữ WAL cuối cùng đã cũ hơn 24 giờ",
+      "arc_recent": "WAL được lưu trữ trong vòng 24 giờ qua",
+      "arc_failing": "Lưu trữ WAL hiện đang thất bại. Kiểm tra đĩa, quyền và đường dẫn đích",
+      "repl_is_standby": "Kết nối này là một standby (chế độ phục hồi). Kiểm tra độ trễ từ kết nối primary",
+      "repl_none": "Không có standby nào được kết nối. Không có thiết lập phục hồi thảm họa (DR)",
+      "repl_ok": "Các standby đang truyền dữ liệu bình thường",
+      "repl_lag": "Một standby đang bị trễ hoặc không truyền dữ liệu"
+    },
+    "manual": {
+      "title": "Danh sách kiểm tra thủ công",
+      "intro": "Các thực hành sao lưu và phục hồi không thể kiểm tra tự động. Đánh dấu khi đã xác nhận và ghi chú bằng chứng",
+      "memo": "Ghi nhớ (ví dụ: công cụ, lịch trình, lần kiểm tra cuối cùng)",
+      "save": "Lưu",
+      "updated": "Cập nhật {dtm}",
+      "items": {
+        "base_backup": "Một bản sao lưu đầy đủ (pg_basebackup, v.v.) đã thành công trong vòng 7 ngày qua",
+        "offsite_copy": "Một bản sao lưu được giữ ngoài địa điểm (khu vực hoặc bộ nhớ khác)",
+        "restore_rehearsal": "Một buổi diễn tập phục hồi đã được thực hiện trong quý này và thời lượng của nó đã được ghi lại",
+        "pitr_target": "Quy trình PITR và RPO/RTO mục tiêu đã được ghi lại",
+        "backup_encrypt": "Các tệp sao lưu được mã hóa và quyền truy cập bị hạn chế",
+        "retention": "Thời gian lưu giữ sao lưu và chính sách xóa đã được xác định"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Chức năng liên kết schema.pi đang được chuẩn bị. Vui lòng thử lại sau",
+      "CONN_UNSUPPORTED": "Kết nối này chưa được hỗ trợ (chỉ PostgreSQL trực tiếp)",
+      "TIMEOUT": "DB đích phản hồi quá chậm. Vui lòng thử lại sau",
+      "RATE": "Quá nhiều cuộc gọi. Vui lòng thử lại sau một phút",
+      "Q_UNKNOWN": "Truy vấn không được hỗ trợ. Kiểm tra phiên bản API liên kết schema.pi",
+      "INVALID_INPUT": "Lựa chọn liên kết hoặc kết nối không hợp lệ"
+    }
+  },
+  "perf": {
+    "title": "Hiệu suất",
+    "loading": "Đang tải…",
+    "pickFirst": "Vui lòng chọn một liên kết và kết nối ở trên trước",
+    "pager": "Phân trang",
+    "tabs": {
+      "collect": "Thu thập",
+      "top": "Truy vấn chậm",
+      "health": "Tình trạng bảng & chỉ mục",
+      "trend": "Xu hướng kích thước",
+      "activity": "Hoạt động & khóa"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Chức năng liên kết schema.pi đang được chuẩn bị. Vui lòng thử lại sau",
+      "PGSS_MISSING": "Không cài đặt tiện ích mở rộng pg_stat_statements trên DB này, nên không thể xem số liệu thống kê truy vấn",
+      "CONN_UNSUPPORTED": "Kết nối này chưa được hỗ trợ (chỉ kết nối PostgreSQL trực tiếp)",
+      "TIMEOUT": "DB đích phản hồi quá chậm. Vui lòng thử lại sau",
+      "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau một phút",
+      "LINK_AUTH": "Mã thông báo liên kết đã hết hạn hoặc bị thu hồi. Vui lòng đăng ký lại mã thông báo trên trang Kết nối",
+      "LINK_SCOPE": "Kết nối này không thuộc khu vực chủ đề của liên kết",
+      "Q_UNKNOWN": "Truy vấn không được hỗ trợ. Kiểm tra phiên bản API liên kết schema.pi",
+      "INVALID_INPUT": "Giá trị liên kết hoặc kết nối không hợp lệ"
+    },
+    "pgss": {
+      "title": "Cách bật pg_stat_statements",
+      "body": "Top-N truy vấn chậm cần tiện ích mở rộng pg_stat_statements. Chạy câu lệnh dưới đây với tài khoản quản trị viên DB. Trên Supabase, bạn có thể bật nó trong Bảng điều khiển Database → Extensions",
+      "note": "PostgreSQL tự lưu trữ cũng cần pg_stat_statements trong shared_preload_libraries (postgresql.conf) và khởi động lại. Số liệu thống kê bảng, chỉ mục và kích thước hoạt động mà không cần nó"
+    },
+    "collect": {
+      "intro": "Thu thập ngay bây giờ đọc số liệu thống kê truy vấn hàng đầu, bảng, chỉ mục và kích thước một lần và lưu chúng dưới dạng ảnh chụp nhanh. Thu thập ít nhất hai lần để xem các thay đổi và xu hướng kích thước",
+      "run": "Thu thập ngay",
+      "running": "Đang thu thập…",
+      "done": "Đã thu thập lúc {dtm} — {qry} truy vấn · {tbl} bảng · {idx} chỉ mục"
+    },
+    "top": {
+      "sort": "Sắp xếp",
+      "sortTotal": "Tổng thời gian",
+      "sortMean": "Thời gian trung bình",
+      "sortCalls": "Số lần gọi",
+      "empty": "Chưa có ảnh chụp nhanh nào. Nhấn Thu thập ngay trên tab Thu thập",
+      "range": "Thay đổi giữa {from} → {to}",
+      "first": "Ảnh chụp nhanh đầu tiên lúc {dtm} — giá trị tích lũy (thay đổi từ ảnh chụp nhanh tiếp theo)",
+      "query": "Truy vấn (ký tự được che)",
+      "calls": "Số lần gọi",
+      "totalMs": "Tổng ms",
+      "meanMs": "Trung bình ms",
+      "rows": "Hàng",
+      "reset": "Đã phát hiện đặt lại số liệu thống kê — hiển thị dưới dạng tích lũy"
+    },
+    "health": {
+      "empty": "Chưa có ảnh chụp nhanh nào. Nhấn Thu thập ngay trên tab Thu thập",
+      "basis": "Dựa trên ảnh chụp nhanh lúc {dtm}",
+      "unusedIdx": "Chỉ mục không sử dụng",
+      "unusedIdxHint": "Các chỉ mục chưa bao giờ được sử dụng kể từ lần đặt lại số liệu thống kê gần nhất (theo kích thước). Không xóa PK hoặc chỉ mục ràng buộc duy nhất",
+      "fullScan": "Quét toàn bộ quá mức",
+      "fullScanHint": "Các bảng có hơn 1.000 hàng đang hoạt động mà việc quét toàn bộ chiếm ít nhất một nửa — xem lại các chỉ mục trên các cột bộ lọc",
+      "dead": "Các tuple chết quá mức",
+      "deadHint": "Tỷ lệ tuple chết từ 20% trở lên — kiểm tra cài đặt VACUUM và autovacuum",
+      "none": "Không có",
+      "scans": "lần quét"
+    },
+    "trend": {
+      "limit": "Ngưỡng kích thước",
+      "empty": "Không có ảnh chụp nhanh nào trong 30 ngày qua",
+      "chart": "Xu hướng kích thước DB trong 30 ngày qua",
+      "now": "Kích thước hiện tại",
+      "perDay": "Tăng trưởng mỗi ngày",
+      "needMore": "Cần 2+ ảnh chụp nhanh",
+      "daysLeft": "Đạt {gb} GB",
+      "noGrowth": "Không có xu hướng tăng trưởng",
+      "days": "trong khoảng {n} ngày"
+    },
+    "activity": {
+      "refresh": "Làm mới",
+      "live": "Truy vấn trực tiếp — không được lưu trữ",
+      "sessions": "Hoạt động phiên",
+      "locks": "Khóa",
+      "none": "Không có"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pipelines",
+    "intro": "Kiểm tra xem DB nguồn đã sẵn sàng cho việc thu thập dữ liệu thay đổi (CDC) chưa và thiết kế các pipeline nguồn → chuyển đổi → đích. Giai đoạn này chỉ kiểm tra và thiết kế; không có dữ liệu hàng của khách hàng nào được đọc hoặc lưu trữ.",
+    "needLink": "Trước tiên, hãy chọn một liên kết schema.pi ở trên. Nếu bạn chưa có, hãy đăng ký một token trong menu 'Liên kết'.",
+    "needConn": "Chọn kết nối DB để kiểm tra ở trên.",
+    "loading": "Đang tải…",
+    "pager": "Trang",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "runTitle": "Chạy & giám sát (7-3 · 7-4)",
+    "runBody": "Việc thực thi pipeline, giám sát độ trễ và xử lý lại sẽ có sau khi tác nhân worker và mô hình bảo mật được hoàn thiện. Hiện tại, hãy lưu các định nghĩa dưới dạng bản nháp (DRAFT).",
+    "pre": {
+      "title": "Kiểm tra trước nguồn",
+      "intro": "Đối với mỗi bảng, kiểm tra các cột thời gian thay đổi, các cột xóa mềm và khóa chính để đề xuất phương pháp thu thập (bộ điều hợp), và kiểm tra trạng thái sẵn sàng sao chép logic WAL. Chỉ thực hiện các truy vấn danh mục và cài đặt chỉ đọc.",
+      "schema": "Schema (tùy chọn)",
+      "schemaPh": "Tất cả",
+      "run": "Chạy kiểm tra trước",
+      "running": "Đang kiểm tra…",
+      "sum": "{tables} bảng · {noPk} không có PK · {deleteUnseen} không thể thu thập các bản xóa",
+      "truncated": "Một truy vấn danh mục đã đạt giới hạn 500 hàng, vì vậy một số bảng có thể bị thiếu. Chỉ định một schema và kiểm tra lại.",
+      "empty": "Không có bảng nào để kiểm tra",
+      "colTable": "Bảng",
+      "colChg": "Cột thời gian thay đổi",
+      "colDel": "Cột xóa mềm",
+      "colAdapter": "Phương pháp đề xuất · lý do",
+      "toDraft": "Tạo bản nháp pipeline từ {n} đã chọn"
+    },
+    "ready": {
+      "ok": "Sao chép logic WAL đã sẵn sàng — các bảng có PK có thể sử dụng LOGICAL",
+      "no": "Sao chép logic WAL chưa sẵn sàng — thu thập qua thăm dò hoặc so sánh khóa",
+      "senders": "{n} kết nối sao chép"
+    },
+    "adapter": {
+      "LOGICAL": "Sao chép logic (WAL)",
+      "POLL": "Thăm dò thời gian thay đổi",
+      "KEY_DIFF": "So sánh ảnh chụp nhanh khóa",
+      "NONE": "Chỉ tải lại toàn bộ"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Có cột thời gian thay đổi",
+      "NO_CHG_COL": "Không có cột thời gian thay đổi",
+      "HAS_SOFT_DEL": "Có cột xóa mềm",
+      "NO_SOFT_DEL": "Không có cột xóa mềm",
+      "HAS_PK": "Có khóa chính",
+      "NO_PK": "Không có khóa chính — không thể xác định các hàng đã thay đổi",
+      "DELETE_UNSEEN": "Thăm dò không thể thu thập các bản DELETE vật lý (khuyến nghị cột xóa mềm)",
+      "LOGICAL_NOT_READY": "Có thể chuyển sang LOGICAL khi sao chép logic WAL đã sẵn sàng",
+      "FULL_RELOAD_ONLY": "Không có PK hoặc cột thời gian thay đổi, vì vậy không thể thu thập tăng dần — hãy thêm PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level không phải là logical (thay đổi nó cần khởi động lại DB)",
+      "NO_SLOTS": "max_replication_slots là 0",
+      "NO_SENDERS": "max_wal_senders là 0",
+      "IS_STANDBY": "Máy chủ dự phòng — lấy sao chép logic từ máy chủ chính",
+      "SETTINGS_UNKNOWN": "Không thể đọc cài đặt, trạng thái sẵn sàng không xác định"
+    },
+    "ed": {
+      "title": "Định nghĩa pipeline",
+      "draftOnly": "Chỉ thiết kế — lưu dưới dạng bản nháp (DRAFT)",
+      "new": "Pipeline mới",
+      "empty": "Không có pipeline nào được lưu",
+      "manual": "Thủ công",
+      "edit": "Chỉnh sửa",
+      "remove": "Xóa",
+      "removeConfirm": "Xóa pipeline '{name}'?",
+      "name": "Tên",
+      "adapter": "Phương pháp thu thập",
+      "srcConn": "Kết nối nguồn",
+      "useCurrentConn": "Sử dụng kết nối đã chọn ở trên",
+      "sched": "Lịch trình (cron 5 trường, để trống = thủ công)",
+      "target": "Đích",
+      "targetPh": "ví dụ: DB phân tích analytics.public / lake s3://…",
+      "tables": "Bảng nguồn (ngăn cách bằng dòng mới hoặc dấu phẩy)",
+      "steps": "Các bước (nguồn → chuyển đổi → đích)",
+      "op": "Thao tác",
+      "notePh": "Mô tả · điều kiện (tùy chọn)",
+      "addTransform": "Thêm bước chuyển đổi",
+      "save": "Lưu",
+      "saving": "Đang lưu…",
+      "saved": "Đã lưu",
+      "close": "Đóng"
+    },
+    "kind": {
+      "SOURCE": "Nguồn",
+      "TRANSFORM": "Chuyển đổi",
+      "TARGET": "Đích"
+    },
+    "sts": {
+      "DRAFT": "Bản nháp"
+    },
+    "check": {
+      "NAME_REQUIRED": "Nhập tên",
+      "CONN_REQUIRED": "Chọn kết nối nguồn",
+      "CRON_INVALID": "Nhập lịch trình dưới dạng cron 5 trường (phút giờ ngày tháng ngày trong tuần; chữ số, *, ',', -, /)",
+      "OP_REQUIRED": "Nhập một thao tác cho mỗi bước",
+      "STEPS_TOO_FEW": "Cần có các bước nguồn và đích",
+      "STEPS_TOO_MANY": "Tối đa 20 bước",
+      "STEP_FIRST_SOURCE": "Bước đầu tiên phải là nguồn",
+      "STEP_LAST_TARGET": "Bước cuối cùng phải là đích",
+      "STEP_MIDDLE_TRANSFORM": "Chỉ các bước chuyển đổi mới có thể nằm ở giữa"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Một pipeline có tên này đã tồn tại. Vui lòng sử dụng tên khác",
+      "CONN_UNSUPPORTED": "Kết nối này chưa thể kiểm tra (hiện chỉ hỗ trợ kết nối máy chủ PostgreSQL trực tiếp)"
+    }
+  },
+  "sqlLab": {
+    "title": "Phòng thí nghiệm điều chỉnh SQL",
+    "intro": "Chọn một kết nối và nhập SQL để xem kế hoạch thực thi dưới dạng cây, với các nguyên nhân gây chậm (quét toàn bộ, vòng lặp lồng nhau, sắp xếp lớn) và các mẫu chống SQL được kiểm tra với các miền tiêu chuẩn schema.pi. Các truy vấn không bao giờ thực sự được thực thi (không có ANALYZE).",
+    "needLink": "Chọn một liên kết và kết nối ở trên trước để xem các kế hoạch. Việc kiểm tra mẫu chống hoạt động mà không cần liên kết.",
+    "sqlLabel": "SQL (một câu lệnh SELECT hoặc WITH duy nhất)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Hiển thị kế hoạch",
+    "explaining": "Đang tải…",
+    "save": "Lưu kế hoạch",
+    "saving": "Đang lưu…",
+    "saveName": "Nhãn (ví dụ: trước khi thêm chỉ mục)",
+    "saveNote": "Các giá trị hằng số trong SQL và điều kiện kế hoạch được che bằng ? khi lưu.",
+    "plan": {
+      "title": "Kế hoạch thực thi",
+      "summary": "Tổng chi phí {cost} · {ms}ms",
+      "cost": "chi phí",
+      "rows": "hàng",
+      "width": "chiều rộng"
+    },
+    "warn": {
+      "none": "Không có cảnh báo đáng chú ý nào.",
+      "SEQ_SCAN_LARGE": "Quét toàn bộ trên {relation} (khoảng {rows} hàng) — hãy xem xét một chỉ mục trên các cột bộ lọc.",
+      "NESTED_LOOP_HIGH": "Vòng lặp lồng nhau tạo ra khoảng {rows} hàng — hãy xem xét một hash hoặc merge join, hoặc một chỉ mục trên điều kiện join.",
+      "SORT_SPILL": "Kích thước sắp xếp khoảng {kb}KB, vượt quá work_mem mặc định (4MB); nó có thể tràn ra đĩa."
+    },
+    "lint": {
+      "run": "Kiểm tra mẫu chống",
+      "title": "Kiểm tra mẫu chống SQL",
+      "none": "Không tìm thấy mẫu chống nào.",
+      "domainsOff": "Không thể tải các miền tiêu chuẩn; chỉ kiểm tra bằng các quy tắc hậu tố cột mặc định.",
+      "types": {
+        "num": "số",
+        "date": "ngày",
+        "char": "ký tự"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — chỉ chọn các cột bạn cần (I/O thừa, không có chỉ mục bao phủ).",
+        "FUNC_ON_COLUMN": "Cột bộ lọc {column} được bao bọc trong một hàm hoặc biểu thức, vì vậy chỉ mục của nó không thể được sử dụng — thay vào đó hãy chuyển đổi hằng số.",
+        "LEADING_WILDCARD": "LIKE với % đứng đầu không thể sử dụng chỉ mục B-tree — hãy xem xét chỉ mục GIN pg_trgm.",
+        "OR_DIFF_COLUMNS": "Các điều kiện trên các cột khác nhau được kết hợp với OR — hãy xem xét UNION ALL hoặc các chỉ mục trên mỗi cột.",
+        "IMPLICIT_CAST": "{column} được so sánh với một số được trích dẫn — khớp các kiểu cột và hằng số (chuyển đổi kiểu ngầm định).",
+        "NOT_IN_SUBQUERY": "NOT IN (truy vấn con) không trả về gì khi có giá trị NULL và chậm — hãy sử dụng NOT EXISTS.",
+        "NO_WHERE": "Không có mệnh đề WHERE — trên một bảng lớn, đây là một quét toàn bộ (thêm một điều kiện hoặc LIMIT).",
+        "DOMAIN_MISMATCH": "{column} là kiểu {expected} theo miền tiêu chuẩn nhưng được so sánh với một hằng số có kiểu khác — việc chuyển đổi kiểu ngầm định có thể ngăn việc sử dụng chỉ mục."
+      }
+    },
+    "saved": {
+      "title": "Các kế hoạch đã lưu · So sánh",
+      "empty": "Không có kế hoạch nào được lưu. Xem một kế hoạch, sau đó lưu nó.",
+      "pick": "Chọn kế hoạch để so sánh",
+      "pick2": "Chọn hai kế hoạch để so sánh.",
+      "compare": "So sánh hai kế hoạch",
+      "delete": "Xóa",
+      "cost": "chi phí",
+      "prev": "Trước",
+      "next": "Tiếp",
+      "page": "Trang {page}"
+    },
+    "diff": {
+      "cost": "Tổng chi phí {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Hai kế hoạch dành cho các SQL khác nhau (sau khi chuẩn hóa).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Không có thay đổi trong các nút kế hoạch.",
+      "before": "Trước",
+      "after": "Sau"
+    },
+    "ai": {
+      "title": "Lời khuyên điều chỉnh AI",
+      "badge": "Sắp ra mắt",
+      "body": "Sắp ra mắt (sau khi được phê duyệt và các thủ tục đo lường tác động) — lời khuyên sẽ được tạo từ SQL với các hằng số được che và chỉ được ghi nhận là đã áp dụng sau khi DA phê duyệt và tác động được đo lường."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Tính năng liên kết schema.pi đang được chuẩn bị. Vui lòng thử lại sau.",
+      "LINK_AUTH": "Token liên kết đã hết hạn hoặc bị thu hồi. Vui lòng cấp một token mới trong schema.pi và đăng ký lại.",
+      "LINK_SCOPE": "Liên kết này không thể sử dụng kết nối đó (sơ đồ phân loại khác).",
+      "CONN_UNSUPPORTED": "Loại kết nối này chưa được hỗ trợ (hiện chỉ hỗ trợ kết nối máy chủ PostgreSQL).",
+      "Q_UNKNOWN": "Truy vấn không được hỗ trợ.",
+      "SQL_NOT_SELECT": "Các kế hoạch chỉ có sẵn cho một câu lệnh duy nhất bắt đầu bằng SELECT hoặc WITH.",
+      "TIMEOUT": "Yêu cầu đã hết thời gian (5 giây). Vui lòng rút ngắn SQL hoặc thử lại sau.",
+      "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau một phút.",
+      "PAYLOAD_TOO_LARGE": "Kế hoạch quá lớn để lưu.",
+      "LINK_NOT_FOUND": "Không tìm thấy liên kết. Vui lòng chọn lại liên kết."
+    }
+  },
+  "nav": {
+    "label": "Tính năng",
+    "connect": "Kết nối",
+    "sqlLab": "Điều chỉnh SQL",
+    "perf": "Hiệu suất",
+    "monitor": "Giám sát",
+    "drift": "Độ lệch",
+    "migration": "Di chuyển",
+    "pipeline": "Pipeline",
+    "analytics": "Phân tích",
+    "ops": "An toàn vận hành",
+    "learn": "Học hỏi"
   }
 }

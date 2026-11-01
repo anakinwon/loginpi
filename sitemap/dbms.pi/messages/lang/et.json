@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "DBA ja SQLP töölaud DB-mootorite kiireks ja ohutuks käitamiseks"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Pange oma DB-mootor andmeid kiiresti ja ohutult käitama",
+    "description": "DBA ja SQLP töölaud täitmisplaanide, statistika ja jõudluse jaoks. schema.pi tegeleb disaini ja standarditega; dbms.pi on selle partner mootori poolel.",
+    "welcome": "Tere tulemast, {name}.",
+    "featTitle": "Funktsioonid",
+    "featDesc": {
+      "connect": "Registreerige schema.pi lingitoken ja kontrollige ühenduse olekut",
+      "sqlLab": "Plaanipuu, hoiatused, võrdlus ja antipatternite kontroll standarddomeenide vastu",
+      "perf": "Aeglaste päringute Top-N, tabeli/indeksi seisund, võimsuse prognoos, tegevus ja lukud",
+      "monitor": "Rakenduse, DB ja URL-i mõõdikute kokkuvõte lävehoiatused",
+      "drift": "Võrrelge schema.pi mudelit ja DDL-i ajalugu tegeliku kataloogiga, mõõtke indeksi efekti",
+      "migration": "Topoloogiline laadimisjärjekord, tükid, kontrollnimekiri ja verifitseerimise SQL",
+      "pipeline": "Muutuste jäädvustamise eelkontroll ja allika→teisenduse→sihtmärgi torujuhtme definitsioonid",
+      "analytics": "KPI armatuurlaud, 3-kihiline järve kaardistamine ja andmestiku kataloog",
+      "ops": "Parameetrite, rollide, varunduse ja replikatsiooni DR-i ainult lugemiseks diagnostika",
+      "learn": "SQLP/DAP praktikaülesanded, häälestusjuhtumid ja DBMS-i võrdlussõnastik"
+    }
+  },
   "auth": {
     "checking": "Sisselogimise kontrollimine…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "Linkimiskoodi loomine ebaõnnestus. Palun proovi hiljem uuesti.",
     "AUTH_DB_UNAVAILABLE": "Sinu kontot ei saanud salvestada, seega sisselogimine ebaõnnestus. Palun proovi hiljem uuesti.",
     "LINK_TRY_LIMIT": "Liiga palju valesid linkimiskoode. Proovi uuesti 15 minuti pärast."
+  },
+  "analytics": {
+    "title": "Analüütika ja järv",
+    "intro": "dbms-i tegevuse KPI-d, kolmekihiline järve disain ja andmestiku kataloog ühes kohas.",
+    "storageNotice": "Järve salvestusruum (kliendipoolne või pilv) ei ole veel otsustatud (PRD jaotis 10 #7). Praegu salvestatakse ainult disainid ja nimede vastendused – ridade andmeid ei salvestata.",
+    "noLink": "Valige või registreerige esmalt schema.pi link.",
+    "goConnect": "Registreeri link",
+    "loading": "Laadimine…",
+    "refresh": "Värskenda",
+    "kpi": {
+      "title": "KPI armatuurlaud",
+      "updatedAt": "{area} · seisuga {time}",
+      "notBuilt": "Ehitatud pole",
+      "keys": {
+        "links": "Minu lingid",
+        "perf": "Jõudluse hetktõmmised",
+        "drift": "Drifti käivitused",
+        "mig": "Migratsiooniplaanid",
+        "pipe": "Torujuhtmed",
+        "lake": "Järve andmestikud"
+      },
+      "countsChart": "Kogusumma funktsioonide kaupa",
+      "trendTitle": "Jõudluse hetktõmmised viimase 14 päeva jooksul",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Viimase 14 päeva jooksul jõudluse hetktõmmiseid pole.",
+      "monTitle": "schema.pi monitori kokkuvõte (viimane tund)",
+      "monTps": "Päringuid/s",
+      "monErr": "Veamäär",
+      "monAvg": "Keskmine vastus (ms)",
+      "monDb": "DB ühendused",
+      "monFail": "Monitori kokkuvõtet ei õnnestunud laadida: {msg}"
+    },
+    "lake": {
+      "title": "Kolmekihiline järve disain",
+      "raw": "Toores",
+      "rawDesc": "Laadib allika DB veerunimed ja tüübid sellistena, nagu need on.",
+      "std": "Standardiseeritud",
+      "stdDesc": "Nimetab veerud ümber schema.pi heakskiidetud standardterminiteks.",
+      "cur": "Kureeritud",
+      "curDesc": "Analüüsi andmestikud grupeeritud olemi järgi.",
+      "loadProjects": "Laadi projektid",
+      "project": "Projekt",
+      "pickProject": "Vali projekt",
+      "noProjects": "Selles piirkonnas projekte pole.",
+      "noTables": "Selle projekti mudelis pole tabeleid.",
+      "conform": "Standardile vastavus {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} veergu · {pct}% vastavuses",
+      "colSrc": "Allika veerg",
+      "colStd": "Standardiseeritud veerg",
+      "colType": "Tüüp",
+      "colOk": "Formaat",
+      "ok": "OK",
+      "ng": "Kontrolli",
+      "pk": "PK",
+      "selectAll": "Vali kõik",
+      "selected": "{cnt} valitud",
+      "save": "Lisa järve disaini",
+      "saved": "Lisatud {cnt} kataloogi."
+    },
+    "catalog": {
+      "title": "Andmestiku kataloog",
+      "schemaCard": "schema.pi on analüüsi andmestiku definitsioonide, metaandmete otsingu ja sõnastiku allikas. Siin näete ainult järve laadimise olekut ja värskust.",
+      "openSchema": "Vaata definitsioone schema.pi-s",
+      "empty": "Järve disaini pole veel tabeleid lisatud.",
+      "status": {
+        "DSGN": "Ainult disain",
+        "LOADED": "Laaditud",
+        "FAIL": "Laadimine ebaõnnestus"
+      },
+      "lastLoad": "Viimane laadimine {time}",
+      "neverLoaded": "Pole kunagi laaditud",
+      "remove": "Eemalda",
+      "removeConfirm": "Eemalda {tbl} kataloogist?",
+      "prev": "Eelmine",
+      "next": "Järgmine",
+      "page": "Leht {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Valige esmalt link.",
+      "NOT_FOUND": "Ei leitud. Kontrollige, kas mudel on muutunud."
+    }
+  },
+  "drift": {
+    "title": "Mudeli ↔ DB drift",
+    "intro": "Võrrelge schema.pi disainimudelit ja DDL-i rakendamise ajalugu reaalajas DB kataloogiga, et leida drifti, ja mõõtke, kas disainitud indekseid tegelikult kasutatakse. Kliendi ridade andmeid ei loeta ega salvestata kunagi.",
+    "needLink": "Valige esmalt schema.pi link. Kui teil pole ühtegi, registreerige token menüüs 'Link'.",
+    "needConn": "Valige ülal võrdlemiseks DB ühendus.",
+    "project": "Projekt",
+    "projectPick": "Vali projekt",
+    "loading": "Laadimine…",
+    "run": "Käivita drifti tuvastamine",
+    "running": "Võrdlemine…",
+    "readOnly": "Käivitatakse ainult lugemiseks kataloogi ja statistika päringud.",
+    "applyInSchema": "Rakendage parandused (mudeli muudatused, DDL-i genereerimine ja täitmine) schema.pi-s, mis on tõe allikas.",
+    "history": "Tuvastamise ajalugu",
+    "prev": "Eelmine",
+    "next": "Järgmine",
+    "none": "Puudub",
+    "model": "Mudel",
+    "reqNo": "Päring {id}",
+    "notSaved": "Seda käivitust ei õnnestunud ajalukku salvestada (tulemused kuvatakse tavapäraselt).",
+    "capped": "Liiga palju objekte – kuvatakse iga jaotise esimesed {cap} (kogused on täielikud).",
+    "statsMissing": "Indeksi kasutamise statistika ei olnud saadaval, seega ei saanud kasutust hinnata.",
+    "sum": {
+      "missingTables": "Tabelid puuduvad DB-s",
+      "extraTables": "Tabelid, mida mudelis pole",
+      "colMismatches": "Veergude mittevastavused",
+      "missingIndexes": "Disainitud indeksid puuduvad DB-s",
+      "extraIndexes": "Indeksid, mida mudelis pole",
+      "ddlMissing": "Objektid kadunud pärast rakendamist",
+      "unusedIndexes": "Kasutamata disainitud indeksid"
+    },
+    "sec": {
+      "ddlMissing": "DDL rakendatud, kuid puudub DB-s",
+      "missingTables": "Tabelid mudelis, kuid puuduvad DB-s",
+      "extraTables": "Tabelid DB-s, kuid mitte mudelis",
+      "colMismatches": "Veeru tüübi / NULL-i mittevastavused",
+      "missingIndexes": "Disainitud indeksid puuduvad DB-s",
+      "extraIndexes": "Indeksid ainult DB-s (v.a PK)",
+      "idxUsage": "Disainitud indeksi efektiivsus"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi salvestas need objektid rakendatutena, kuid need on kadunud – kahtlustage käsitsi kustutamist või tagasipööramist.",
+      "extraTables": "Need võivad kuuluda teistele projektidele või süsteemitabelitele sellel ühendusel.",
+      "idxUsage": "Null skaneerimist alates viimasest statistika lähtestamisest tähendab kasutamata. Kontrollige statistikaakent enne kustutamist."
+    },
+    "kind": {
+      "MISSING": "puudub DB-s",
+      "EXTRA": "pole mudelis",
+      "TYPE": "tüüp erineb",
+      "NULL": "NULL-i lubamine erineb"
+    },
+    "col": {
+      "idx": "Indeks",
+      "scans": "Skaneeringud",
+      "size": "Suurus",
+      "status": "Otsus"
+    },
+    "usage": {
+      "USED": "Kasutusel",
+      "UNUSED": "Kasutamata disainitud indeks",
+      "NO_STATS": "Statistika puudub"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi ühenduse funktsioon on veel ettevalmistamisel. Palun proovige varsti uuesti.",
+      "LINK_DOWN": "schema.pi-ga ei saa ühendust. Palun proovige varsti uuesti.",
+      "LINK_AUTH": "Ühenduse token on aegunud või tühistatud. Väljastage schema.pi-s uus token ja registreerige see uuesti.",
+      "LINK_NOT_FOUND": "Link ei leitud. Palun valige link uuesti.",
+      "LINK_SCOPE": "See ühendus ei kuulu lingi taksonoomiasse.",
+      "CONN_UNSUPPORTED": "Toetamata ühendus (praegu ainult PostgreSQL-i serveri ühendused).",
+      "TIMEOUT": "Päringu aegumine. Palun proovige varsti uuesti.",
+      "RATE": "Liiga palju päringuid. Palun proovige minuti pärast uuesti."
+    }
+  },
+  "learn": {
+    "title": "DBA õpe",
+    "intro": "SQLP/DAP praktikaülesanded, häälestusjuhtumite kogumik ja Oracle/Tibero/PostgreSQL võrdlussõnastik. Töötab ilma lingita; lingi valimisel näete ka oma schema.pi standardtüübi vastendust.",
+    "loading": "Laadimine…",
+    "tabs": {
+      "quiz": "Praktika",
+      "cases": "Häälestusjuhtumid",
+      "dict": "DBMS sõnastik"
+    },
+    "topics": {
+      "INDEX": "Indeksi skaneerimine",
+      "JOIN": "Liitmismeetodid",
+      "PARTITION": "Partitsiooni kärpimine",
+      "NORMAL": "Normaliseerimine",
+      "NAMING": "Standardne nimetamine",
+      "ISOLATION": "Isolatsioonitasemed",
+      "LOCK": "Lukud"
+    },
+    "levels": {
+      "1": "Algaja",
+      "2": "Kesktase",
+      "3": "Edasijõudnud"
+    },
+    "quiz": {
+      "score": "Minu edenemine",
+      "scoreLine": "Lahendatud {solved} {total}-st · {correct} õiget",
+      "right": "Õige",
+      "wrong": "Vale",
+      "retry": "Proovi uuesti",
+      "prevRight": "Eelmine õige",
+      "prevWrong": "Eelmine vale"
+    },
+    "cases": {
+      "notice": "Kõik juhtumid on ise kirjutatud õppematerjalid; numbrid on illustreerivad (pole kliendiandmed).",
+      "problem": "Probleemne SQL",
+      "plan": "Plaani kokkuvõte",
+      "cause": "Põhjus",
+      "fix": "Parandatud SQL",
+      "effect": "Mõju"
+    },
+    "cats": {
+      "ALL": "Kõik",
+      "TYPE": "Andmetüübid",
+      "FUNC": "Funktsioonid",
+      "PAGING": "Leheküljendus",
+      "SEQ": "Järjestused",
+      "DATE": "Kuupäevad",
+      "SYNTAX": "Süntaks"
+    },
+    "dict": {
+      "search": "Otsi (nt NVL, LIMIT)",
+      "item": "Kirje",
+      "note": "Märkus",
+      "empty": "Vastavaid kirjeid pole",
+      "loading": "Laadimine…",
+      "liveTitle": "Minu teemaala standardtüübi vastendus",
+      "liveIntro": "Valige link, et laadida schema.pi DBMS-i profiil (loogiline → füüsiline tüüp). Ülaltoodud sõnastik töötab ka ilma lingita.",
+      "liveLoad": "Laadi tüübi vastendus",
+      "lgcType": "Loogiline tüüp"
+    }
+  },
+  "link2": {
+    "title": "schema.pi ühendus",
+    "intro": "Registreerige ühenduse token, et kasutada schema.pi teemaala DB-ühendusi dbms.pi-s. Tokenid salvestatakse krüpteeritult ja teie andmebaasidest ei salvestata ridade andmeid.",
+    "howTitle": "Kuidas väljastada ühenduse tokenit",
+    "how1": "Logige sisse schema.pi-sse ja avage ühendatav teemaala",
+    "how2": "Minge Teemaala → Seaded → Ühenduse token ja vajutage 'Väljasta token' (ala administraatori või DA roll)",
+    "how3": "Kopeerige slk_ algav token – seda näidatakse ainult üks kord väljastamisel",
+    "how4": "Kleepige see allpool ja registreerige",
+    "openSchema": "Ava schema.pi",
+    "registerTitle": "Registreeri ühendus",
+    "tokenLabel": "Ühenduse token",
+    "tokenPlaceholder": "slk_…",
+    "register": "Registreeri",
+    "registering": "Kontrollimine…",
+    "registered": "Teemaala '{area}' on nüüd ühendatud",
+    "replaced": "Asendati teemaala '{area}' token",
+    "myLinks": "Minu ühendused",
+    "empty": "Ühendusi pole registreeritud",
+    "loading": "Laadimine…",
+    "regDtm": "Registreeritud {dtm}",
+    "remove": "Katkesta ühendus",
+    "removeConfirm": "Katkesta ühendus '{area}'? Seda ühendust kasutavad ekraanid ei saa sellele enam ligi.",
+    "prev": "Eelmine",
+    "next": "Järgmine",
+    "statusTitle": "Ühenduse olek",
+    "noConns": "Selles teemaalas pole DB-ühendusi (lisage üks schema.pi-s)",
+    "colConn": "Ühendus",
+    "colDbms": "DBMS",
+    "colMthd": "Meetod",
+    "colHost": "Host",
+    "colTest": "Viimane test",
+    "colAgent": "Agent viimati nähtud",
+    "never": "Puudub",
+    "retry": "Proovi uuesti",
+    "pickerLink": "Link",
+    "pickerConn": "Ühendus",
+    "pickerEmpty": "Ühendusi pole —",
+    "pickerGo": "registreeri üks aadressil /connect",
+    "errors": {
+      "LINK_AUTH": "Ühenduse token on aegunud või tühistatud. Väljastage schema.pi-s uus token ja registreerige uuesti",
+      "LINK_SCOPE": "See ühendus ei kuulu lingitud teemaalasse",
+      "LINK_DOWN": "schema.pi-ga ei saa ühendust. Palun proovige varsti uuesti",
+      "LINK_NOT_FOUND": "Link ei leitud",
+      "LINK_DUP": "Registreerimine on juba pooleli. Palun proovige uuesti",
+      "CONN_UNSUPPORTED": "Toetamata ühendus (praegu ainult PostgreSQL-i serveri ühendused)",
+      "Q_UNKNOWN": "Tundmatu päring",
+      "SQL_NOT_SELECT": "Käivitada saab ainult ühe SELECT (või WITH) lause",
+      "PGSS_MISSING": "Siht-DB-s pole pg_stat_statements laiendust installitud",
+      "TIMEOUT": "Päringu aegumine",
+      "RATE": "Liiga palju päringuid. Palun proovige minuti pärast uuesti",
+      "INVALID_INPUT": "Kleepige täielik ühenduse token, mis algab slk_"
+    }
+  },
+  "migration": {
+    "title": "Andmete migratsioon (PiMig)",
+    "intro": "Arvutab tabeli laadimisjärjekorra teie schema.pi disainimudeli suhetest, korraldab tükkide suuruse, paralleelsuse ja ülemineku kontrollnimekirja ning genereerib verifitseerimise SQL-i, mida te ise allikal ja sihtkohas käivitate. See ekraan ainult planeerib ja kontrollib – see ei liiguta andmeid ega loe kliendi DB-ridu.",
+    "needLink": "Valige esmalt schema.pi link. Kui teil pole ühtegi, registreerige token menüüs 'Ühenda'.",
+    "loading": "Laadimine…",
+    "newPlan": "Uus migratsiooniplaan",
+    "project": "Projekt",
+    "projectPick": "Vali projekt",
+    "planNm": "Plaani nimi",
+    "planNmHint": "Vaikimisi projekti nimi",
+    "create": "Loo plaan",
+    "creating": "Loomine…",
+    "snapHint": "Disain sel hetkel (tabeli, veeru ja suhete nimed) on fikseeritud hetktõmmisena. Looge uus plaan, kui mudel muutub.",
+    "plans": "Migratsiooniplaanid",
+    "prev": "Eelmine",
+    "next": "Järgmine",
+    "sts": {
+      "DRAFT": "Mustand",
+      "READY": "Valmis"
+    },
+    "del": "Kustuta",
+    "delConfirm": "Kas kustutada see plaan?",
+    "snapInfo": "Hetktõmmis: {tables} tabelit · {rels} seost",
+    "dropped": "({n} seost ilma füüsiliste tabeliteta on järjestusest välja jäetud)",
+    "chunkSize": "Tüki suurus (read/commit)",
+    "parallel": "Paralleelsus (tabelid korraga)",
+    "saveOpts": "Salvesta valikud",
+    "optsHint": "Paralleelsus on sama taseme piires korraga laaditavate tabelite arv. Tüki suurus on täitmismootori kasutatav commit-ühik (read).",
+    "order": "Laadimise järjekord",
+    "orderHint": "Topoloogiliselt sorteeritud disainisuhete (mitte füüsiliste FK-de) järgi, nii et vanemtabelid tulevad esimesena. Sama taseme tabelid ei sõltu üksteisest ja neid saab laadida paralleelselt.",
+    "cycles": "{n} tsükliline rühm — paigutatud samale tasemele. Määrake nende järjekord käsitsi ja lükake viidete kontrollimine edasi pärast laadimist.",
+    "selfRefs": "Iseviitavad (hierarhilised) tabelid — laadige vanemread esmalt tabeli sees",
+    "level": "Tase {n}",
+    "checklist": "Ülemineku kontrollnimekiri",
+    "toReady": "Märgi valmisolekuks",
+    "toDraft": "Tagasi mustandisse",
+    "readyNeedAll": "Kontrollige iga üksust enne plaani valmisolekuks märkimist.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC üleandmispunkt",
+        "desc": "Salvestage järjepidev allikapunkt enne esialgset laadimist (PG LSN · Oracle/Tibero SCN · küsitlemiseks, algusaeg miinus kattuvusaken), alustage CDC-d sellest ja neelake duplikaadid üleandmisaknas upsertidega."
+      },
+      "valueConv": {
+        "title": "Väärtuse teisendamine",
+        "desc": "Reeglid on seatud tühjale stringile = NULL, CHAR tühjade täidistele, NUMBER ilma täpsuseta → NUMERIC, DATE ajaga → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR pikkus ja LONG·RAW."
+      },
+      "charset": {
+        "title": "Märgistik",
+        "desc": "Allika märgistik (KO16MSWIN949, UTF8, …) on kinnitatud, veerud, mis ületavad mitmebaidilise kasvu tõttu, ja teisendamatute märkide isoleerimine on otsustatud."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB voogesitatakse tükkidena (suurus ja mälupiirangud) ning kontrollitakse pikkuse + räsi abil."
+      },
+      "seqResync": {
+        "title": "Järjestuse uuesti sünkroonimine",
+        "desc": "Pärast laadimist seatakse sihtjärjestused·identiteedid väärtusele max(võti)+1."
+      },
+      "timezone": {
+        "title": "Ajavöönd · süsteemiveerud",
+        "desc": "Määramata ajavööndiga väärtuste tõlgendamise ajavöönd (nt Asia/Seoul) on määratud, muudetud aja käivitajad ei kirjuta laadimise ajal allika ajatempleid üle ja looja/muutja asendusreeglid on seatud."
+      },
+      "backpressure": {
+        "title": "Vasturõhk · sihtlaadimine",
+        "desc": "Vähendage tüki suurust ja paralleelsust sihtviivituse, WAL-i kasvu või lukuootuste korral; ehitage mitte-PK indeksid pärast laadimist ja käivitage seejärel ANALYZE·VACUUM."
+      }
+    },
+    "verify": "Kontrolli SQL",
+    "verifyHint": "Genereerib loenduse, numbrilise veeru summa, duplikaatvõtme ja võtme räsi päringud tabeli kohta laadimisjärjekorras. Käivitage need ise allikal ja sihtkohas ning võrrelge (see ekraan neid ei käivita).",
+    "noHashOracle": "Oracle·Tibero räsi funktsioonid ja teksti renderdamine erinevad PostgreSQL-ist, seega räsi päringud jäetakse välja — võrrelge loendusi, summasid ja duplikaatvõtmeid.",
+    "copy": "Kopeeri",
+    "copied": "Kopeeritud",
+    "copyFail": "Ei saanud kopeerida. Valige tekst ja kopeerige see käsitsi.",
+    "engine": {
+      "title": "Täitmine·taaskäivitamine · proov·tagasipööramine",
+      "body": "Tegelik migratsiooni täitmine (kontrollpunktid, vasturõhk, vearidade isoleerimine) ja proov, tagasipööramine ning CDC alguspunkti salvestamine tulevad pärast tööagendi turvamudeli (A10) lõplikku valmimist. Praegu hõlmab see planeerimist, kontrolle ja kontrolli SQL-i."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi linki valmistatakse ette. Palun proovige varsti uuesti.",
+      "LINK_DOWN": "schema.pi-le ei saa ühendust. Palun proovige varsti uuesti.",
+      "LINK_AUTH": "Lingi token on aegunud või tühistatud. Väljastage schema.pi-s uus token ja registreerige see uuesti.",
+      "LINK_NOT_FOUND": "Link ei leitud. Palun valige link uuesti.",
+      "LINK_SCOPE": "See projekt ei kuulu lingi taksonoomiasse.",
+      "TIMEOUT": "Päringu aegumine. Palun proovige varsti uuesti.",
+      "RATE": "Liiga palju päringuid. Proovige uuesti minuti pärast.",
+      "MIG_NO_TABLES": "Sellel projektil pole füüsilisi tabeleid migreerimiseks. Teisendage esmalt schema.pi-s füüsiliseks.",
+      "MIG_CHECK_INCOMPLETE": "Kontrollige iga ülemineku kontrollnimekirja üksust enne plaani valmisolekuks märkimist.",
+      "NOT_FOUND": "Plaani ei leitud."
+    }
+  },
+  "monitor": {
+    "title": "Monitooringukeskus",
+    "collectNote": "Kogumine toimub schema.pi-s — migratsioon planeeritud (D7). See leht loeb schema.pi monitori kokkuvõtet.",
+    "noLink": "Valige või registreerige esmalt schema.pi link.",
+    "goConnect": "Registreeri link",
+    "period": "Periood",
+    "periods": {
+      "30": "30 min",
+      "60": "1 tund",
+      "360": "6 tundi",
+      "1440": "24 tundi"
+    },
+    "refresh": "Värskenda",
+    "loading": "Laadimine…",
+    "updatedAt": "{area} · seisuga {time} (automaatne värskendamine iga 30s järel)",
+    "appTitle": "Rakenduse jõudlus",
+    "dbTitle": "DB olek ühenduse järgi",
+    "urlTitle": "URL-i kontrollid",
+    "empty": "Andmeid pole kuvamiseks.",
+    "breachTitle": "{n} läve ületamist",
+    "rulesTitle": "Läve reeglid",
+    "rulesNote": "Reeglid salvestatakse selle lingi jaoks ja hinnatakse saadud kokkuvõtte alusel; rikkumised saavad punase piiri (teavitused tulevad hiljem).",
+    "metric": "Mõõdik",
+    "conn": "Ühendus",
+    "allConns": "Kõik ühendused",
+    "op": "Võrdle",
+    "threshold": "Lävi",
+    "thrInvalid": "Sisestage läve jaoks number.",
+    "addRule": "Lisa reegel",
+    "noRules": "Reegleid pole veel.",
+    "enable": "Luba",
+    "disable": "Keela",
+    "delete": "Kustuta",
+    "delConfirm": "Kas kustutada see reegel?",
+    "aiNote": "AI intsidentide analüüs ja paranduste kinnitamine toimuvad endiselt schema.pi monitoris.",
+    "aiLink": "Ava schema.pi monitor",
+    "metrics": {
+      "APP_TPS": "TPS (päringud/s)",
+      "APP_ERR_PCT": "Veamäär (%)",
+      "APP_SLOW_CNT": "Aeglased päringud",
+      "APP_AVG_MS": "Keskmine vastus (ms)",
+      "DB_SESS_CNT": "Sessioonid",
+      "DB_LOCK_WAIT_CNT": "Lukuootused",
+      "DB_CACHE_HIT_PCT": "Vahemälu tabavus (%)",
+      "DB_SIZE_MB": "DB suurus (MB)",
+      "URL_RSP_MS": "URL-i vastus (ms)",
+      "URL_FAIL_CNT": "URL-i vead"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Valige esmalt link.",
+      "NOT_IMPLEMENTED": "schema.pi lingi funktsiooni valmistatakse ette. Palun proovige hiljem uuesti.",
+      "LINK_AUTH": "Lingi token on kehtetu või aegunud. Väljastage schema.pi-s uus token ja registreerige see.",
+      "LINK_SCOPE": "See link ei pääse sellele taksonoomiale ligi.",
+      "RATE": "Liiga palju päringuid. Palun proovige varsti uuesti.",
+      "TIMEOUT": "schema.pi vastab aeglaselt. Palun proovige varsti uuesti.",
+      "RULE_LIMIT": "Kuni 50 reeglit lingi kohta.",
+      "NOT_FOUND": "Reeglit ei leitud."
+    }
+  },
+  "ops": {
+    "title": "DB toimingute ohutus",
+    "loading": "Laadimine…",
+    "pickFirst": "Valige esmalt ühendus ja link ülevalt",
+    "run": "Käivita diagnoos",
+    "running": "Diagnoosimine…",
+    "noRun": "Diagnoosi pole veel. Vajutage \"Käivita diagnoos\"",
+    "lastRun": "Viimane diagnoos {dtm}",
+    "readOnly": "Diagnoos loeb ainult (SELECT). Nõuanne on juhend ja sõltub serveri mälust, koormusest ja töökoormusest",
+    "truncated": "Liiga palju objekte — kontrolliti ainult esimesed 500",
+    "paramsNote": "Serveri kogu mälu on teadmata, seega hinnatakse seda shared_buffers ≈ 25% RAM-ist. random_page_cost eeldab SSD-d",
+    "auditNote": "Tabelid, millel on RLS välja lülitatud, ja kasutamata kontod kontrollitakse, kui lingipäring neid toetab",
+    "replNote": "Baasjoon on Active-Standby (A-S) — üks primaarne + ooterežiim. Replay viivitus ≥ 5s = hoiatus, ≥ 60s = risk (mõõdetud RPO viide)",
+    "lagIdle": "Muudatusi pole",
+    "pager": "Lehekülgede nummerdamine",
+    "prev": "Eelmine",
+    "next": "Järgmine",
+    "tabs": {
+      "params": "Parameetrid",
+      "audit": "Kontod ja õigused",
+      "backup": "Varundamine ja taastamine",
+      "repl": "Replikatsioon ja DR",
+      "history": "Ajalugu"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Hoiatus",
+      "RISK": "Risk"
+    },
+    "role": {
+      "primary": "See ühendus = Primaarne",
+      "standby": "See ühendus = Ooterežiim",
+      "unknown": "Roll teadmata"
+    },
+    "col": {
+      "level": "Otsus",
+      "item": "Üksus",
+      "value": "Väärtus",
+      "reason": "Üksikasjad",
+      "standby": "Ooterežiim",
+      "state": "Olek",
+      "sync": "Sünkroonimine",
+      "lag": "Replay viivitus"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLS rollid",
+      "bypass_ok": "BYPASSRLS rollid",
+      "no_expiry": "Parooli aegumine",
+      "expiry_ok": "Parooli aegumine",
+      "public_grant": "PUBLIC õigused",
+      "public_ok": "PUBLIC õigused",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Viimati arhiveeritud WAL",
+      "arc_stale": "Viimati arhiveeritud WAL",
+      "arc_recent": "Viimati arhiveeritud WAL",
+      "arc_failing": "WAL-i arhiveerimise viga"
+    },
+    "rules": {
+      "sb_default": "Vaikimisi (128MB). Spetsiaalses serveris on soovitatav umbes 25% RAM-ist",
+      "sb_ok": "Määratud vaikimisi väärtusest kõrgemaks",
+      "wm_over": "max_connections × work_mem ületab hinnangulist mälu. Samaaegsed sorteerimised riskivad mälupuudusega",
+      "wm_default": "Vaikimisi (4MB). Suured sorteerimised ja räsimised võivad kettale lekkida",
+      "wm_ok": "Mõistlikus vahemikus",
+      "mwm_default": "Vaikimisi (64MB). VACUUM ja indeksite loomine võivad olla aeglased; kaaluge 256MB või rohkem",
+      "mwm_ok": "Määratud vaikimisi väärtusest kõrgemaks",
+      "av_on": "autovacuum on sisse lülitatud",
+      "av_off": "autovacuum on välja lülitatud. Suur risk tabeli paisumisele ja tehingu ID ümberpööramisele",
+      "conn_high": "max_connections on kõrge. Iga ühendus kasutab mälu; soovitatav on ühenduste kogum (PgBouncer jne)",
+      "conn_ok": "Mõistlikus vahemikus",
+      "lmd_off": "Aeglaste päringute logimine on välja lülitatud (-1). Soovitatav on umbes 1000ms",
+      "lmd_all": "Iga lause logitakse (0). Suur logimise üldkulu",
+      "lmd_ok": "Aeglaste päringute logimine on sisse lülitatud",
+      "st_off": "Serveriülest lause aegumist pole (0). Määrake piirangud rolli või rakenduse kohta",
+      "st_ok": "Lause aegumine on määratud",
+      "iit_off": "Tehingus ooterežiimis aegumist pole (0). Võib põhjustada lukkude hoidmist ja paisumist",
+      "iit_ok": "Tehingus ooterežiimis aegumine on määratud",
+      "ckpt_short": "Kontrollpunkti intervall on 5 minutit või vähem. Kaaluge 10–15 minutit kirjutamismahukate koormuste korral",
+      "ckpt_ok": "Mõistlikus vahemikus",
+      "wal_minimal": "wal_level=minimal muudab PITR-i ja replikatsiooni võimatuks. Kasutage replica või kõrgemat",
+      "wal_ok": "WAL-i tase toetab PITR-i ja replikatsiooni",
+      "rpc_hdd": "HDD vaikimisi (4). SSD puhul on soovitatav 1.1–2",
+      "rpc_ok": "Sobib SSD-le",
+      "super_many": "Kaks või enam superkasutajat. Hoidke üks halduseks ja andke teistele ainult vajalikud õigused",
+      "super_ok": "Kõige rohkem üks superkasutaja",
+      "bypass_rls": "On olemas mitte-superkasutaja rollid, mis mööduvad reataseme turvalisusest",
+      "bypass_ok": "RLS-i möödaviivaid rolle pole",
+      "no_expiry": "Sisselogimisrollid ilma parooli aegumiseta. Määrake isiklikele kontodele VALID UNTIL",
+      "expiry_ok": "Kõigil sisselogimisrollidel on aegumiskuupäev",
+      "public_grant": "PUBLIC-il (igal rollil) on tabeliõigused. Kirjutamisõigused on riskantsed",
+      "public_ok": "PUBLIC-ile pole antud tabeliõigusi",
+      "arc_on": "WAL-i arhiveerimine (archive_mode) on sisse lülitatud",
+      "arc_off": "WAL-i arhiveerimine on välja lülitatud, seega punktisisese taastamise (PITR) võimalus puudub",
+      "arc_cmd_empty": "archive_mode on sisse lülitatud, kuid archive_command ja archive_library on tühjad",
+      "arc_never": "WAL-i pole veel arhiveeritud",
+      "arc_stale": "Viimane WAL-i arhiiv on vanem kui 24 tundi",
+      "arc_recent": "WAL arhiveeriti viimase 24 tunni jooksul",
+      "arc_failing": "WAL-i arhiveerimine ebaõnnestub praegu. Kontrollige ketast, õigusi ja sihtkataloogi",
+      "repl_is_standby": "See ühendus on ooterežiimis (taastamisrežiim). Kontrollige viivitust primaarsest ühendusest",
+      "repl_none": "Ühendatud ooterežiimi pole. Katastroofi taastamise (DR) seadistust pole",
+      "repl_ok": "Ooterežiimid voogesitavad normaalselt",
+      "repl_lag": "Ooterežiim viibib või ei voogesita"
+    },
+    "manual": {
+      "title": "Käsitsi kontrollnimekiri",
+      "intro": "Varundamise ja taastamise praktikad, mida ei saa automaatselt kontrollida. Märkige linnukesega, kui kinnitatud, ja märkige tõendid",
+      "memo": "Memo (nt tööriist, ajakava, viimati kontrollitud)",
+      "save": "Salvesta",
+      "updated": "Uuendatud {dtm}",
+      "items": {
+        "base_backup": "Täielik varundamine (pg_basebackup jne) õnnestus viimase 7 päeva jooksul",
+        "offsite_copy": "Varukoopia hoitakse väljaspool asukohta (teises piirkonnas või salvestusruumis)",
+        "restore_rehearsal": "Taastamise proov tehti sel veerandil ja selle kestus salvestati",
+        "pitr_target": "PITR-i protseduur ja siht-RPO/RTO on dokumenteeritud",
+        "backup_encrypt": "Varundusfailid on krüpteeritud ja juurdepääs on piiratud",
+        "retention": "Varunduse säilitusaeg ja kustutamispoliitika on määratletud"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi lingi funktsiooni valmistatakse ette. Palun proovige varsti uuesti",
+      "CONN_UNSUPPORTED": "Seda ühendust ei toetata veel (ainult otsene PostgreSQL)",
+      "TIMEOUT": "Siht-DB vastas liiga aeglaselt. Palun proovige varsti uuesti",
+      "RATE": "Liiga palju kõnesid. Proovige uuesti minuti pärast",
+      "Q_UNKNOWN": "Toetamata päring. Kontrollige schema.pi lingi API versiooni",
+      "INVALID_INPUT": "Kehtetu lingi või ühenduse valik"
+    }
+  },
+  "perf": {
+    "title": "Jõudlus",
+    "loading": "Laadimine…",
+    "pickFirst": "Valige esmalt ühendus ja link ülevalt",
+    "pager": "Lehekülgede nummerdamine",
+    "tabs": {
+      "collect": "Kogu",
+      "top": "Aeglased päringud",
+      "health": "Tabeli ja indeksi seisund",
+      "trend": "Suuruse trend",
+      "activity": "Tegevus ja lukud"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi lingi funktsiooni valmistatakse ette. Palun proovige hiljem uuesti",
+      "CONN_UNSUPPORTED": "Seda ühendust ei toetata veel (ainult otsesed PostgreSQL-i ühendused)",
+      "RATE": "Liiga palju päringuid. Proovige uuesti minuti pärast",
+      "LINK_AUTH": "Lingi token on aegunud või tühistatud. Registreerige token uuesti ühenduse lehel",
+      "LINK_SCOPE": "See ühendus ei kuulu lingi teemavaldkonda",
+      "Q_UNKNOWN": "Toetamata päring. Kontrollige schema.pi lingi API versiooni",
+      "INVALID_INPUT": "Lingi või ühenduse väärtus on kehtetu"
+    },
+    "pgss": {
+      "title": "Kuidas lubada pg_stat_statements",
+      "note": "Isemajandav PostgreSQL vajab ka pg_stat_statements-i shared_preload_libraries-is (postgresql.conf) ja taaskäivitust. Tabeli, indeksi ja suuruse statistika töötab ilma selleta"
+    },
+    "collect": {
+      "intro": "Nüüd kogub see parima päringu statistika, tabelid, indeksid ja suurused korra ja salvestab need hetktõmmisena. Koguge vähemalt kaks korda, et näha muutusi ja suuruse trende",
+      "run": "Kogu kohe",
+      "running": "Kogumine…",
+      "done": "Kogutud {dtm} — {qry} päringut · {tbl} tabelit · {idx} indeksit"
+    },
+    "top": {
+      "sort": "Sorteeri",
+      "sortTotal": "Koguaeg",
+      "sortMean": "Keskmine aeg",
+      "sortCalls": "Kõned",
+      "empty": "Hetktõmmiseid pole veel. Vajutage kogumise vahekaardil „Kogu kohe“",
+      "range": "Muutus vahemikus {from} → {to}",
+      "first": "Esimene hetktõmmis {dtm} — kumulatiivsed väärtused (muutused järgmisest hetktõmmisest)",
+      "query": "Päring (literaalid maskeeritud)",
+      "calls": "Kõned",
+      "totalMs": "Kogumillisekundid",
+      "meanMs": "Keskmine ms",
+      "rows": "Read",
+      "reset": " Statistika lähtestamine tuvastatud – kuvatakse kumulatiivsena"
+    },
+    "health": {
+      "empty": "Ühtegi hetktõmmist veel pole. Vajutage kogumise vahekaardil „Kogu kohe“",
+      "basis": "Põhineb hetktõmmisel {dtm}",
+      "unusedIdx": "Kasutamata indeksid",
+      "unusedIdxHint": "Indeksid, mida pole pärast viimast statistika lähtestamist kunagi kasutatud (suuruse järgi). Ärge kustutage PK- või unikaalse piirangu indekseid",
+      "fullScan": "Liigne täielik skaneerimine",
+      "fullScanHint": "Tabelid, millel on 1000+ aktiivset rida ja kus täielik skaneerimine moodustab vähemalt poole – vaadake üle filtrite veergude indeksid",
+      "dead": "Liigsed surnud tuplid",
+      "deadHint": "Surnud tuplite suhe 20% või rohkem – kontrollige VACUUM ja autovacuum seadeid",
+      "none": "Puudub",
+      "scans": "skaneeringud"
+    },
+    "trend": {
+      "limit": "Suuruse lävi",
+      "empty": "Viimase 30 päeva kohta pole hetktõmmiseid",
+      "now": "Praegune suurus",
+      "perDay": "Kasv päevas",
+      "needMore": "Vajab 2+ hetktõmmist",
+      "daysLeft": "Jõuab {gb} GB-ni",
+      "noGrowth": "Kasvutrend puudub",
+      "days": "umbes {n} päeva pärast"
+    },
+    "activity": {
+      "refresh": "Värskenda",
+      "live": "Reaalajas päring – ei salvestata",
+      "sessions": "Sessiooni tegevus",
+      "locks": "Lukud",
+      "none": "Puudub"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Torujuhtmed",
+    "intro": "Kontrollige, kas allika DB on valmis andmete muutuste jäädvustamiseks (CDC) ja kujundage allika → teisenduse → sihtkoha torujuhtmed. See etapp ainult kontrollib ja kujundab; kliendi reaarvude andmeid ei loeta ega salvestata.",
+    "needLink": "Valige esmalt schema.pi link. Kui teil seda pole, registreerige token menüüs „Link“.",
+    "needConn": "Valige ülaltoodud DB ühendus, mida kontrollida.",
+    "loading": "Laadimine…",
+    "pager": "Leheküljed",
+    "prev": "Eelmine",
+    "next": "Järgmine",
+    "runTitle": "Käivita ja jälgi (7-3 · 7-4)",
+    "runBody": "Torujuhtme käivitamine, viivituse jälgimine ja uuesti töötlemine saabuvad pärast tööagendi ja turvamudeli lõplikku valmimist. Praegu salvestage definitsioonid mustanditena (DRAFT).",
+    "pre": {
+      "title": "Allika eelkontroll",
+      "intro": "Iga tabeli puhul kontrollitakse muutumise aja veerge, pehme kustutamise veerge ja primaarvõtit, et soovitada jäädvustamismeetodit (adapterit), ning kontrollitakse WAL-i loogilise replikatsiooni valmisolekut. Teostatakse ainult lugemisõigusega kataloogi ja seadete päringuid.",
+      "schema": "Skeem (valikuline)",
+      "schemaPh": "Kõik",
+      "run": "Käivita eelkontroll",
+      "running": "Kontrollimine…",
+      "sum": "{tables} tabelit · {noPk} ilma PK-ta · {deleteUnseen} ei saa kustutamisi jäädvustada",
+      "truncated": "Kataloogipäring ületas 500 rea piirangu, seega võivad mõned tabelid puududa. Määrake skeem ja kontrollige uuesti.",
+      "empty": "Kontrollitavaid tabeleid pole",
+      "colTable": "Tabel",
+      "colChg": "Muutmise aja veerg",
+      "colDel": "Pehme kustutamise veerg",
+      "colAdapter": "Soovitatav meetod · põhjused",
+      "toDraft": "Loo torujuhtme mustand {n} valitud elemendist"
+    },
+    "ready": {
+      "ok": "WAL-i loogiline replikatsioon valmis – PK-ga tabelid saavad kasutada LOGICAL-i",
+      "no": "WAL-i loogiline replikatsioon pole valmis – jäädvustamine toimub küsitluse või võtme võrdluse kaudu",
+      "senders": "{n} replikatsiooniühendust"
+    },
+    "adapter": {
+      "LOGICAL": "Loogiline replikatsioon (WAL)",
+      "POLL": "Muutmise aja küsitlus",
+      "KEY_DIFF": "Võtme hetktõmmise erinevus",
+      "NONE": "Ainult täielik uuesti laadimine"
+    },
+    "reason": {
+      "HAS_CHG_COL": "On muutumise aja veerg",
+      "NO_CHG_COL": "Puudub muutumise aja veerg",
+      "HAS_SOFT_DEL": "On pehme kustutamise veerg",
+      "NO_SOFT_DEL": "Puudub pehme kustutamise veerg",
+      "HAS_PK": "On primaarvõti",
+      "NO_PK": "Puudub primaarvõti – muudetud ridu ei saa tuvastada",
+      "DELETE_UNSEEN": "Küsitlus ei saa jäädvustada füüsilisi DELETE-sid (soovitatav on pehme kustutamise veerg)",
+      "LOGICAL_NOT_READY": "Saab lülituda LOGICAL-ile, kui WAL-i loogiline replikatsioon on valmis",
+      "FULL_RELOAD_ONLY": "Puudub PK või muutumise aja veerg, seega puudub inkrementaalne jäädvustamine – lisage PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level ei ole logical (selle muutmine vajab DB taaskäivitust)",
+      "NO_SLOTS": "max_replication_slots on 0",
+      "NO_SENDERS": "max_wal_senders on 0",
+      "IS_STANDBY": "Ooterežiimi server – võtke loogiline replikatsioon primaarsest",
+      "SETTINGS_UNKNOWN": "Seadeid ei õnnestunud lugeda, valmisolek teadmata"
+    },
+    "ed": {
+      "title": "Torujuhtme definitsioonid",
+      "draftOnly": "Ainult disain – salvestatud mustanditena (DRAFT)",
+      "new": "Uus torujuhe",
+      "empty": "Salvestatud torujuhtmeid pole",
+      "manual": "Käsitsi",
+      "edit": "Muuda",
+      "remove": "Kustuta",
+      "removeConfirm": "Kustutada torujuhe '{name}'?",
+      "name": "Nimi",
+      "adapter": "Jäädvustamismeetod",
+      "srcConn": "Allikaühendus",
+      "useCurrentConn": "Kasuta ülal valitud ühendust",
+      "sched": "Ajakava (5-välja cron, tühi = käsitsi)",
+      "target": "Sihtkoht",
+      "targetPh": "nt analüüsi DB analytics.public / järv s3://…",
+      "tables": "Allika tabelid (eraldatud reavahetuse või komaga)",
+      "steps": "Sammud (allikas → teisendus → sihtkoht)",
+      "op": "Operatsioon",
+      "notePh": "Kirjeldus · tingimus (valikuline)",
+      "addTransform": "Lisa teisendusetapp",
+      "save": "Salvesta",
+      "saving": "Salvestamine…",
+      "saved": "Salvestatud",
+      "close": "Sulge"
+    },
+    "kind": {
+      "SOURCE": "Allikas",
+      "TRANSFORM": "Teisendus",
+      "TARGET": "Sihtkoht"
+    },
+    "sts": {
+      "DRAFT": "Mustand"
+    },
+    "check": {
+      "NAME_REQUIRED": "Sisestage nimi",
+      "CONN_REQUIRED": "Valige allikaühendus",
+      "CRON_INVALID": "Sisestage ajakava 5-välja cron-vormingus (minut tund päev kuu nädalapäev; numbrid, *, ',', -, /)",
+      "OP_REQUIRED": "Sisestage iga sammu jaoks operatsioon",
+      "STEPS_TOO_FEW": "Allika- ja sihtkoha sammud on kohustuslikud",
+      "STEPS_TOO_MANY": "Kuni 20 sammu",
+      "STEP_FIRST_SOURCE": "Esimene samm peab olema allikas",
+      "STEP_LAST_TARGET": "Viimane samm peab olema sihtkoht",
+      "STEP_MIDDLE_TRANSFORM": "Vahepealsed sammud võivad olla ainult teisendused"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Selle nimega torujuhe on juba olemas. Kasutage teist nime",
+      "CONN_UNSUPPORTED": "Seda ühendust ei saa veel kontrollida (praegu ainult PostgreSQL-i otseühendused)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL-i häälestamise labor",
+    "intro": "Valige ühendus ja sisestage SQL, et näha täitmise plaani puuna, koos aeglustumise põhjustega (täielikud skaneeringud, pesastatud tsüklid, suured sorteerimised) ja SQL-i antipatternite kontrollimisega schema.pi standarddomeenide vastu. Päringuid tegelikult ei täideta (ei ANALYZE).",
+    "needLink": "Plaanide vaatamiseks valige ülal link ja ühendus. Antipatternite kontroll töötab ilma lingita.",
+    "sqlLabel": "SQL (üks SELECT või WITH lause)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Näita plaani",
+    "explaining": "Laadimine…",
+    "save": "Salvesta plaan",
+    "saving": "Salvestamine…",
+    "saveName": "Silt (nt enne indeksi lisamist)",
+    "saveNote": "Salvestamisel maskeeritakse SQL-i ja plaani tingimuste konstantsed väärtused kui ?.",
+    "plan": {
+      "title": "Täitmise plaan",
+      "summary": "Kogukulu {cost} · {ms}ms",
+      "cost": "kulu",
+      "rows": "read",
+      "width": "laius"
+    },
+    "warn": {
+      "none": "Märkimisväärseid hoiatusi pole.",
+      "SEQ_SCAN_LARGE": "Täielik skaneerimine tabelis {relation} (umbes {rows} rida) – kaaluge indeksi lisamist filtri veergudele.",
+      "NESTED_LOOP_HIGH": "Pesastatud tsükkel toodab umbes {rows} rida – kaaluge räsi- või ühendamisliitmist või indeksi lisamist liitmise tingimusele.",
+      "SORT_SPILL": "Sorteerimise suurus on umbes {kb}KB, mis ületab vaikimisi work_mem (4MB); see võib kirjutada kettale."
+    },
+    "lint": {
+      "run": "Kontrolli antipatterneid",
+      "title": "SQL-i antipatternite kontroll",
+      "none": "Antipatterneid ei leitud.",
+      "domainsOff": "Standarddomeene ei õnnestunud laadida; kontrollitud ainult vaikimisi veeru-sufiksi reeglitega.",
+      "types": {
+        "num": "numbriline",
+        "date": "kuupäev",
+        "char": "märk"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * – valige ainult vajalikud veerud (lisanduv I/O, puudub kattev indeks).",
+        "FUNC_ON_COLUMN": "Filtri veerg {column} on ümbritsetud funktsiooni või avaldisega, seega ei saa selle indeksit kasutada – teisendage selle asemel konstant.",
+        "LEADING_WILDCARD": "LIKE algava %-ga ei saa kasutada B-puu indeksit – kaaluge pg_trgm GIN indeksit.",
+        "OR_DIFF_COLUMNS": "Erinevate veergude tingimused on kombineeritud OR-iga – kaaluge UNION ALL-i või veergude kaupa indekseid.",
+        "IMPLICIT_CAST": "{column} võrreldakse jutumärkides oleva numbriga – sobitage veeru ja konstandi tüübid (kaudne tüübimuutus).",
+        "NOT_IN_SUBQUERY": "NOT IN (alamküsimus) ei tagasta midagi, kui NULL-id on olemas ja on aeglane – kasutage NOT EXISTS.",
+        "NO_WHERE": "Puudub WHERE klausel – suure tabeli puhul on see täielik skaneerimine (lisage tingimus või LIMIT).",
+        "DOMAIN_MISMATCH": "{column} on standarddomeeni järgi {expected} tüüpi, kuid seda võrreldakse teist tüüpi konstandiga – kaudne tüübimuutus võib takistada indeksi kasutamist."
+      }
+    },
+    "saved": {
+      "title": "Salvestatud plaanid · Võrdle",
+      "empty": "Salvestatud plaane pole. Vaadake plaani, seejärel salvestage see.",
+      "pick": "Vali võrdlemiseks plaan",
+      "pick2": "Vali kaks plaani võrdlemiseks.",
+      "compare": "Võrdle kahte plaani",
+      "delete": "Kustuta",
+      "cost": "kulu",
+      "prev": "Eelmine",
+      "next": "Järgmine",
+      "page": "Lehekülg {page}"
+    },
+    "diff": {
+      "cost": "Kogukulu {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Kaks plaani on erinevate SQL-ide jaoks (pärast normaliseerimist).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Plaani sõlmede muutusi pole.",
+      "before": "Enne",
+      "after": "Pärast"
+    },
+    "ai": {
+      "title": "AI häälestamise nõuanne",
+      "badge": "Varsti saadaval",
+      "body": "Varsti saadaval (pärast heakskiidu ja mõju mõõtmise protseduure) – nõuanded genereeritakse SQL-ist maskeeritud konstantidega ja registreeritakse rakendatuks alles pärast DA heakskiitu ja mõõdetud mõju."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi lingi funktsiooni valmistatakse ette. Palun proovige varsti uuesti.",
+      "LINK_AUTH": "Lingi token on aegunud või tühistatud. Väljastage schema.pi-s uus token ja registreerige see uuesti.",
+      "LINK_SCOPE": "See link ei saa seda ühendust kasutada (erinev klassifitseerimisskeem).",
+      "CONN_UNSUPPORTED": "Seda ühenduse tüüpi ei toetata veel (praegu ainult PostgreSQL-i serveriühendused).",
+      "Q_UNKNOWN": "Toetamata päring.",
+      "SQL_NOT_SELECT": "Plaanid on saadaval ainult ühe SELECT-i või WITH-iga algava lause jaoks.",
+      "TIMEOUT": "Päringu aegumine (5 sekundit). Lühendage SQL-i või proovige hiljem uuesti.",
+      "RATE": "Liiga palju päringuid. Proovige uuesti minuti pärast.",
+      "PAYLOAD_TOO_LARGE": "Plaan on salvestamiseks liiga suur.",
+      "LINK_NOT_FOUND": "Link ei leitud. Palun valige link uuesti."
+    }
+  },
+  "nav": {
+    "label": "Funktsioonid",
+    "connect": "Ühenda",
+    "sqlLab": "SQL-i häälestamine",
+    "perf": "Jõudlus",
+    "monitor": "Jälgimine",
+    "drift": "Triiv",
+    "migration": "Migratsioon",
+    "pipeline": "Torujuhe",
+    "analytics": "Analüütika",
+    "ops": "Operatsioonide ohutus",
+    "learn": "Õpi"
   }
 }

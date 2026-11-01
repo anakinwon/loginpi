@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Aplikasi kerja DBA·SQLP untuk mengendalikan enjin DB dengan pantas dan selamat"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Jadikan enjin DB anda mengendalikan data anda dengan pantas dan selamat",
+    "description": "Aplikasi kerja DBA·SQLP untuk pelan pelaksanaan, statistik dan prestasi. schema.pi mengendalikan reka bentuk dan piawaian; dbms.pi adalah rakan kongsinya di bahagian enjin.",
+    "welcome": "Selamat datang, {name}.",
+    "featTitle": "Ciri-ciri",
+    "featDesc": {
+      "connect": "Daftar token pautan schema.pi dan semak status sambungan",
+      "sqlLab": "Pokok pelan, amaran, perbandingan dan semakan anti-corak terhadap domain standard",
+      "perf": "Pertanyaan perlahan Top-N, kesihatan jadual/indeks, ramalan kapasiti, aktiviti dan kunci",
+      "monitor": "Ringkasan metrik Aplikasi, DB dan URL dengan amaran ambang",
+      "drift": "Bandingkan model schema.pi dan sejarah DDL dengan katalog sebenar, ukur kesan indeks",
+      "migration": "Susunan muatan topologi, cebisan, senarai semak dan SQL pengesahan",
+      "pipeline": "Prapemeriksaan tangkapan perubahan dan definisi saluran paip sumber→transformasi→sasaran",
+      "analytics": "Papan pemuka KPI, pemetaan tasik 3 lapisan dan katalog set data",
+      "ops": "Diagnosis baca sahaja parameter, peranan, sandaran dan DR replikasi",
+      "learn": "Soalan latihan SQLP·DAP, kes penalaan dan kamus perbandingan DBMS"
+    }
+  },
   "auth": {
     "checking": "Menyemak log masuk…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "Tidak dapat membuat kod pautan. Sila cuba lagi nanti.",
     "AUTH_DB_UNAVAILABLE": "Tidak dapat menyimpan akaun anda, jadi log masuk gagal. Sila cuba lagi nanti.",
     "LINK_TRY_LIMIT": "Terlalu banyak kod pautan yang salah. Cuba lagi dalam 15 minit."
+  },
+  "analytics": {
+    "title": "Analitik & Tasik",
+    "intro": "KPI aktiviti dbms, reka bentuk tasik tiga lapisan dan katalog set data di satu tempat.",
+    "storageNotice": "Storan tasik (pihak pelanggan atau awan) belum diputuskan (PRD seksyen 10 #7). Hanya reka bentuk dan pemetaan nama disimpan buat masa ini — tiada data baris.",
+    "noLink": "Pilih atau daftar pautan schema.pi terlebih dahulu.",
+    "goConnect": "Daftar pautan",
+    "loading": "Memuatkan…",
+    "refresh": "Muat semula",
+    "kpi": {
+      "title": "Papan pemuka KPI",
+      "updatedAt": "{area} · setakat {time}",
+      "notBuilt": "Tidak dibina",
+      "keys": {
+        "links": "Pautan saya",
+        "perf": "Gambar prestasi",
+        "drift": "Larian drift",
+        "mig": "Pelan migrasi",
+        "pipe": "Saluran paip",
+        "lake": "Set data tasik"
+      },
+      "countsChart": "Jumlah mengikut ciri",
+      "trendTitle": "Gambar prestasi dalam 14 hari terakhir",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Tiada gambar prestasi dalam 14 hari terakhir.",
+      "monTitle": "Ringkasan monitor schema.pi (jam terakhir)",
+      "monTps": "Permintaan/s",
+      "monErr": "Kadar ralat",
+      "monAvg": "Purata respons (ms)",
+      "monDb": "Sambungan DB",
+      "monFail": "Gagal memuatkan ringkasan monitor: {msg}"
+    },
+    "lake": {
+      "title": "Reka bentuk tasik tiga lapisan",
+      "raw": "Mentah",
+      "rawDesc": "Memuatkan nama dan jenis lajur DB sumber seperti sedia ada.",
+      "std": "Piawaian",
+      "stdDesc": "Menamakan semula lajur kepada istilah standard yang diluluskan oleh schema.pi.",
+      "cur": "Tersusun",
+      "curDesc": "Set data analisis dikumpulkan mengikut entiti.",
+      "loadProjects": "Muatkan projek",
+      "project": "Projek",
+      "pickProject": "Pilih projek",
+      "noProjects": "Tiada projek dalam bidang ini.",
+      "noTables": "Model projek ini tiada jadual.",
+      "conform": "Pematuhan standard {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} lajur · {pct}% patuh",
+      "colSrc": "Lajur sumber",
+      "colStd": "Lajur piawaian",
+      "colType": "Jenis",
+      "colOk": "Format",
+      "ok": "OK",
+      "ng": "Semak",
+      "pk": "PK",
+      "selectAll": "Pilih semua",
+      "selected": "{cnt} dipilih",
+      "save": "Tambah ke reka bentuk tasik",
+      "saved": "Menambah {cnt} ke katalog."
+    },
+    "catalog": {
+      "title": "Katalog set data",
+      "schemaCard": "schema.pi adalah sumber kebenaran untuk definisi set data analisis, carian metadata dan glosari. Di sini anda hanya melihat status muatan tasik dan kesegaran.",
+      "openSchema": "Lihat definisi dalam schema.pi",
+      "empty": "Tiada jadual ditambahkan ke reka bentuk tasik lagi.",
+      "status": {
+        "DSGN": "Reka bentuk sahaja",
+        "LOADED": "Dimuatkan",
+        "FAIL": "Muatan gagal"
+      },
+      "lastLoad": "Muatan terakhir {time}",
+      "neverLoaded": "Tidak pernah dimuatkan",
+      "remove": "Alih keluar",
+      "removeConfirm": "Alih keluar {tbl} dari katalog?",
+      "prev": "Sebelum",
+      "next": "Seterusnya",
+      "page": "Halaman {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Pilih pautan terlebih dahulu.",
+      "NOT_FOUND": "Tidak ditemui. Semak sama ada model telah berubah."
+    }
+  },
+  "drift": {
+    "title": "Drift Model ↔ DB",
+    "intro": "Bandingkan model reka bentuk schema.pi dan sejarah aplikasi DDL dengan katalog DB langsung untuk mencari drift, dan ukur sama ada indeks yang direka bentuk sebenarnya digunakan. Data baris pelanggan tidak pernah dibaca atau disimpan.",
+    "needLink": "Pilih pautan schema.pi di atas terlebih dahulu. Jika anda tiada, daftar token dalam menu 'Pautan'.",
+    "needConn": "Pilih sambungan DB untuk dibandingkan di atas.",
+    "project": "Projek",
+    "projectPick": "Pilih projek",
+    "loading": "Memuatkan…",
+    "run": "Jalankan pengesanan drift",
+    "running": "Membandingkan…",
+    "readOnly": "Hanya katalog baca sahaja dan pertanyaan statistik dijalankan.",
+    "applyInSchema": "Gunakan pembetulan (suntingan model, penjanaan dan pelaksanaan DDL) dalam schema.pi, sumber kebenaran.",
+    "history": "Sejarah pengesanan",
+    "prev": "Sebelum",
+    "next": "Seterusnya",
+    "none": "Tiada",
+    "model": "Model",
+    "reqNo": "Permintaan {id}",
+    "notSaved": "Gagal menyimpan larian ini ke sejarah (hasil ditunjukkan seperti biasa).",
+    "capped": "Terlalu banyak item — menunjukkan {cap} yang pertama setiap bahagian (kiraan adalah lengkap).",
+    "statsMissing": "Statistik penggunaan indeks tidak tersedia, jadi penggunaan tidak dapat dinilai.",
+    "sum": {
+      "missingTables": "Jadual tiada dalam DB",
+      "extraTables": "Jadual tiada dalam model",
+      "colMismatches": "Ketidakpadanan lajur",
+      "missingIndexes": "Indeks yang direka bentuk tiada dalam DB",
+      "extraIndexes": "Indeks tiada dalam model",
+      "ddlMissing": "Objek hilang selepas aplikasi",
+      "unusedIndexes": "Indeks yang direka bentuk tidak digunakan"
+    },
+    "sec": {
+      "ddlMissing": "DDL digunakan tetapi tiada dalam DB",
+      "missingTables": "Jadual dalam model tetapi tiada dalam DB",
+      "extraTables": "Jadual dalam DB tetapi tiada dalam model",
+      "colMismatches": "Ketidakpadanan jenis lajur / NULL",
+      "missingIndexes": "Indeks yang direka bentuk tiada dalam DB",
+      "extraIndexes": "Indeks hanya dalam DB (tidak termasuk PK)",
+      "idxUsage": "Keberkesanan indeks yang direka bentuk"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi merekodkan objek ini sebagai telah digunakan, tetapi ia telah hilang — syak pengguguran atau penggulungan semula secara manual.",
+      "extraTables": "Ini mungkin milik projek lain atau jadual sistem pada sambungan ini.",
+      "idxUsage": "Sifar imbasan sejak penetapan semula statistik terakhir bermakna tidak digunakan. Semak tetingkap statistik sebelum menggugurkan."
+    },
+    "kind": {
+      "MISSING": "tiada dalam DB",
+      "EXTRA": "tiada dalam model",
+      "TYPE": "jenis berbeza",
+      "NULL": "kebolehnul berbeza"
+    },
+    "col": {
+      "idx": "Indeks",
+      "scans": "Imbasan",
+      "size": "Saiz",
+      "status": "Keputusan"
+    },
+    "usage": {
+      "USED": "Digunakan",
+      "UNUSED": "Indeks yang direka bentuk tidak digunakan",
+      "NO_STATS": "Tiada statistik"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Fungsi pautan schema.pi sedang disediakan. Sila cuba sebentar lagi.",
+      "LINK_DOWN": "Tidak dapat mencapai schema.pi. Sila cuba sebentar lagi.",
+      "LINK_AUTH": "Token pautan telah tamat tempoh atau dibatalkan. Keluarkan token baharu dalam schema.pi dan daftar semula.",
+      "LINK_NOT_FOUND": "Pautan tidak ditemui. Sila pilih pautan sekali lagi.",
+      "LINK_SCOPE": "Sambungan ini bukan milik taksonomi pautan.",
+      "CONN_UNSUPPORTED": "Sambungan tidak disokong (sambungan pelayan PostgreSQL sahaja buat masa ini).",
+      "TIMEOUT": "Permintaan tamat masa. Sila cuba sebentar lagi.",
+      "RATE": "Terlalu banyak permintaan. Sila cuba lagi dalam seminit."
+    }
+  },
+  "learn": {
+    "title": "Pembelajaran DBA",
+    "intro": "Soalan latihan SQLP·DAP, buku kes penalaan, dan kamus perbandingan Oracle/Tibero/PostgreSQL. Berfungsi tanpa pautan; pilih pautan untuk melihat pemetaan jenis standard schema.pi anda juga.",
+    "loading": "Memuatkan…",
+    "tabs": {
+      "quiz": "Latihan",
+      "cases": "Kes penalaan",
+      "dict": "Kamus DBMS"
+    },
+    "topics": {
+      "INDEX": "Imbasan indeks",
+      "JOIN": "Kaedah gabungan",
+      "PARTITION": "Pemangkasan partisi",
+      "NORMAL": "Normalisasi",
+      "NAMING": "Penamaan standard",
+      "ISOLATION": "Tahap pengasingan",
+      "LOCK": "Kunci"
+    },
+    "levels": {
+      "1": "Asas",
+      "2": "Pertengahan",
+      "3": "Lanjutan"
+    },
+    "quiz": {
+      "score": "Kemajuan saya",
+      "scoreLine": "{solved} daripada {total} diselesaikan · {correct} betul",
+      "right": "Betul",
+      "wrong": "Salah",
+      "retry": "Cuba lagi",
+      "prevRight": "Sebelum ini betul",
+      "prevWrong": "Sebelum ini salah"
+    },
+    "cases": {
+      "notice": "Semua kes adalah contoh pembelajaran yang ditulis sendiri; nombor adalah ilustrasi (bukan data pelanggan).",
+      "problem": "SQL masalah",
+      "plan": "Ringkasan pelan",
+      "cause": "Punca",
+      "fix": "SQL yang dibetulkan",
+      "effect": "Kesan"
+    },
+    "cats": {
+      "ALL": "Semua",
+      "TYPE": "Jenis data",
+      "FUNC": "Fungsi",
+      "PAGING": "Paging",
+      "SEQ": "Jujukan",
+      "DATE": "Tarikh",
+      "SYNTAX": "Sintaks"
+    },
+    "dict": {
+      "search": "Cari (cth. NVL, LIMIT)",
+      "item": "Item",
+      "note": "Nota",
+      "empty": "Tiada item yang sepadan",
+      "loading": "Memuatkan…",
+      "liveTitle": "Pemetaan jenis standard bidang subjek saya",
+      "liveIntro": "Pilih pautan untuk memuatkan profil DBMS schema.pi (jenis logik → fizikal). Kamus di atas berfungsi tanpa pautan.",
+      "liveLoad": "Muatkan pemetaan jenis",
+      "lgcType": "Jenis logik"
+    }
+  },
+  "link2": {
+    "title": "Sambungan schema.pi",
+    "intro": "Daftar token sambungan untuk menggunakan sambungan DB bagi bidang subjek schema.pi dalam dbms.pi. Token disimpan secara disulitkan, dan tiada data baris dari pangkalan data anda disimpan.",
+    "howTitle": "Cara mengeluarkan token sambungan",
+    "how1": "Log masuk ke schema.pi dan buka bidang subjek untuk disambungkan",
+    "how2": "Pergi ke Bidang subjek → Tetapan → Token sambungan dan tekan 'Keluarkan token' (pentadbir kawasan atau peranan DA)",
+    "how3": "Salin token yang bermula dengan slk_ — ia hanya ditunjukkan sekali apabila dikeluarkan",
+    "how4": "Tampal di bawah dan daftar",
+    "openSchema": "Buka schema.pi",
+    "registerTitle": "Daftar sambungan",
+    "tokenLabel": "Token sambungan",
+    "tokenPlaceholder": "slk_…",
+    "register": "Daftar",
+    "registering": "Menyemak…",
+    "registered": "Bidang subjek '{area}' kini disambungkan",
+    "replaced": "Menggantikan token bidang subjek '{area}'",
+    "myLinks": "Sambungan saya",
+    "empty": "Tiada sambungan didaftarkan",
+    "loading": "Memuatkan…",
+    "regDtm": "Didaftarkan {dtm}",
+    "remove": "Putuskan sambungan",
+    "removeConfirm": "Putuskan sambungan '{area}'? Skrin yang menggunakan sambungan ini tidak lagi dapat mengaksesnya.",
+    "prev": "Sebelum",
+    "next": "Seterusnya",
+    "statusTitle": "Status sambungan",
+    "noConns": "Tiada sambungan DB dalam bidang subjek ini (tambah satu dalam schema.pi)",
+    "colConn": "Sambungan",
+    "colDbms": "DBMS",
+    "colMthd": "Kaedah",
+    "colHost": "Hos",
+    "colTest": "Ujian terakhir",
+    "colAgent": "Ejen terakhir dilihat",
+    "never": "Tiada",
+    "retry": "Cuba lagi",
+    "pickerLink": "Pautan",
+    "pickerConn": "Sambungan",
+    "pickerEmpty": "Tiada sambungan —",
+    "pickerGo": "daftar satu di /connect",
+    "errors": {
+      "LINK_AUTH": "Token sambungan telah tamat tempoh atau dibatalkan. Keluarkan token baharu dalam schema.pi dan daftar semula",
+      "LINK_SCOPE": "Sambungan ini bukan milik bidang subjek yang dipautkan",
+      "LINK_DOWN": "Tidak dapat mencapai schema.pi. Sila cuba sebentar lagi",
+      "LINK_NOT_FOUND": "Sambungan tidak ditemui",
+      "LINK_DUP": "Pendaftaran sedang berjalan. Sila cuba lagi",
+      "CONN_UNSUPPORTED": "Sambungan tidak disokong (sambungan pelayan PostgreSQL sahaja buat masa ini)",
+      "Q_UNKNOWN": "Pertanyaan tidak diketahui",
+      "SQL_NOT_SELECT": "Hanya satu pernyataan SELECT (atau WITH) boleh dijalankan",
+      "PGSS_MISSING": "Sambungan pg_stat_statements tidak dipasang pada DB sasaran",
+      "TIMEOUT": "Permintaan tamat masa",
+      "RATE": "Terlalu banyak permintaan. Sila cuba lagi dalam seminit",
+      "INVALID_INPUT": "Tampal token sambungan penuh yang bermula dengan slk_"
+    }
+  },
+  "migration": {
+    "title": "Migrasi Data (PiMig)",
+    "intro": "Mengira susunan muatan jadual dari hubungan dalam model reka bentuk schema.pi anda, menyusun saiz cebisan, paralelisme dan senarai semak cutover, dan menjana SQL pengesahan yang anda jalankan sendiri pada sumber dan sasaran. Skrin ini hanya merancang dan menyemak — ia tidak memindahkan data atau membaca baris DB pelanggan.",
+    "needLink": "Pilih pautan schema.pi di atas terlebih dahulu. Jika anda tiada, daftar token di bawah 'Sambung'.",
+    "loading": "Memuatkan…",
+    "newPlan": "Pelan migrasi baharu",
+    "project": "Projek",
+    "projectPick": "Pilih projek",
+    "planNm": "Nama pelan",
+    "planNmHint": "Lalai kepada nama projek",
+    "create": "Buat pelan",
+    "creating": "Mencipta…",
+    "snapHint": "Reka bentuk pada masa ini (nama jadual, lajur dan hubungan) dibekukan sebagai gambar. Buat pelan baharu apabila model berubah.",
+    "plans": "Pelan migrasi",
+    "prev": "Sebelum",
+    "next": "Seterusnya",
+    "sts": {
+      "DRAFT": "Draf",
+      "READY": "Sedia"
+    },
+    "del": "Padam",
+    "delConfirm": "Padam pelan ini?",
+    "snapInfo": "Capaian pantas: {tables} jadual · {rels} hubungan",
+    "dropped": "({n} hubungan tanpa jadual fizikal dikecualikan daripada susunan)",
+    "chunkSize": "Saiz ketulan (baris/komit)",
+    "parallel": "Paralelisme (jadual serentak)",
+    "saveOpts": "Simpan pilihan",
+    "optsHint": "Paralelisme ialah bilangan jadual yang dimuatkan pada masa yang sama dalam satu tahap. Saiz ketulan ialah unit komit (baris) yang akan digunakan oleh enjin pelaksanaan.",
+    "order": "Susunan muatan",
+    "orderHint": "Disusun secara topologi mengikut hubungan reka bentuk (bukan FK fizikal) supaya jadual induk didahulukan. Jadual dalam tahap yang sama tidak bergantung antara satu sama lain dan boleh dimuatkan secara selari.",
+    "cycles": "{n} kumpulan kitaran — diletakkan pada tahap yang sama. Tetapkan susunan secara manual dan tangguhkan semakan rujukan sehingga selepas pemuatan.",
+    "selfRefs": "Jadual rujukan sendiri (hierarki) — muatkan baris induk dahulu dalam jadual",
+    "level": "Tahap {n}",
+    "checklist": "Senarai semak cutover",
+    "toReady": "Tandakan sebagai sedia",
+    "toDraft": "Kembali ke draf",
+    "readyNeedAll": "Semak setiap item sebelum menandakan pelan sedia.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "Titik serah CDC",
+        "desc": "Rekod titik sumber yang konsisten sebelum muatan awal (PG LSN · Oracle/Tibero SCN · untuk pengundian, masa mula tolak tetingkap pertindihan), mulakan CDC daripadanya, dan serap pendua dalam tetingkap serah dengan upsert."
+      },
+      "valueConv": {
+        "title": "Penukaran nilai",
+        "desc": "Peraturan ditetapkan untuk rentetan kosong = NULL, padding kosong CHAR, NUMBER tanpa ketepatan → NUMERIC, DATE dengan masa → TIMESTAMP, VARCHAR2 BYTE ↔ panjang CHAR, dan LONG·RAW."
+      },
+      "charset": {
+        "title": "Set aksara",
+        "desc": "Set aksara sumber (KO16MSWIN949, UTF8, …) disahkan, dengan lajur yang melimpah akibat pertumbuhan multibyte dan pengasingan aksara yang tidak boleh ditukar diputuskan."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB distrim dalam ketulan (had saiz dan memori) dan disahkan mengikut panjang + hash."
+      },
+      "seqResync": {
+        "title": "Penyegerakan semula jujukan",
+        "desc": "Selepas memuatkan, jujukan sasaran·identiti ditetapkan kepada max(key)+1."
+      },
+      "timezone": {
+        "title": "Zon waktu · lajur sistem",
+        "desc": "Zon waktu tafsiran untuk nilai tanpa satu (cth. Asia/Seoul) ditetapkan, pencetus masa diubah suai tidak akan menimpa cap masa sumber semasa muatan, dan peraturan penggantian pencipta/pengubah suai ditetapkan."
+      },
+      "backpressure": {
+        "title": "Tekanan belakang · muatan sasaran",
+        "desc": "Kurangkan saiz ketulan dan paralelisme pada lag sasaran, pertumbuhan WAL atau tunggu kunci; bina indeks bukan PK selepas memuatkan dan jalankan ANALYZE·VACUUM selepas itu."
+      }
+    },
+    "verify": "SQL Pengesahan",
+    "verifyHint": "Menjana kiraan, jumlah lajur berangka, kunci pendua dan pertanyaan hash kunci bagi setiap jadual mengikut susunan muatan. Jalankan sendiri pada sumber dan sasaran dan bandingkan (skrin ini tidak melaksanakannya).",
+    "noHashOracle": "Fungsi hash Oracle·Tibero dan pemaparan teks berbeza daripada PostgreSQL, jadi pertanyaan hash diabaikan — bandingkan kiraan, jumlah dan kunci pendua.",
+    "copy": "Salin",
+    "copied": "Disalin",
+    "copyFail": "Tidak dapat menyalin. Pilih teks dan salin secara manual.",
+    "engine": {
+      "title": "Pelaksanaan·mulakan semula · latihan·gulung balik",
+      "body": "Pelaksanaan migrasi sebenar (titik semak, tekanan belakang, pengasingan baris ralat) dan latihan, gulung balik dan rakaman titik mula CDC akan datang selepas model keselamatan ejen pekerja (A10) dimuktamadkan. Buat masa ini ini meliputi perancangan, semakan dan SQL pengesahan."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Pautan schema.pi sedang disediakan. Sila cuba sebentar lagi.",
+      "LINK_DOWN": "Tidak dapat mencapai schema.pi. Sila cuba sebentar lagi.",
+      "LINK_AUTH": "Token pautan telah tamat tempoh atau dibatalkan. Keluarkan token baharu dalam schema.pi dan daftarkannya semula.",
+      "LINK_NOT_FOUND": "Pautan tidak ditemui. Sila pilih pautan itu semula.",
+      "LINK_SCOPE": "Projek ini bukan milik taksonomi pautan.",
+      "TIMEOUT": "Permintaan tamat masa. Sila cuba sebentar lagi.",
+      "RATE": "Terlalu banyak permintaan. Cuba lagi dalam seminit.",
+      "MIG_NO_TABLES": "Projek ini tiada jadual fizikal untuk dimigrasikan. Tukar kepada fizikal dalam schema.pi dahulu.",
+      "MIG_CHECK_INCOMPLETE": "Semak setiap item senarai semak cutover sebelum menandakan pelan sedia.",
+      "NOT_FOUND": "Pelan tidak ditemui."
+    }
+  },
+  "monitor": {
+    "title": "Pusat Pemantauan",
+    "collectNote": "Pengumpulan berjalan dalam schema.pi — migrasi dirancang (D7). Halaman ini membaca ringkasan monitor schema.pi.",
+    "noLink": "Pilih atau daftar pautan schema.pi dahulu.",
+    "goConnect": "Daftar pautan",
+    "period": "Tempoh",
+    "periods": {
+      "30": "30 min",
+      "60": "1 jam",
+      "360": "6 jam",
+      "1440": "24 jam"
+    },
+    "refresh": "Segar semula",
+    "loading": "Memuatkan…",
+    "updatedAt": "{area} · setakat {time} (segarkan semula automatik setiap 30s)",
+    "appTitle": "Prestasi aplikasi",
+    "dbTitle": "Status DB mengikut sambungan",
+    "urlTitle": "Semakan URL",
+    "empty": "Tiada data untuk dipaparkan.",
+    "breachTitle": "{n} pelanggaran ambang",
+    "rulesTitle": "Peraturan ambang",
+    "rulesNote": "Peraturan disimpan untuk pautan ini dan dinilai terhadap ringkasan yang diterima; pelanggaran mendapat sempadan merah (pemberitahuan datang kemudian).",
+    "metric": "Metrik",
+    "conn": "Sambungan",
+    "allConns": "Semua sambungan",
+    "op": "Bandingkan",
+    "threshold": "Ambang",
+    "thrInvalid": "Masukkan nombor untuk ambang.",
+    "addRule": "Tambah peraturan",
+    "noRules": "Tiada peraturan lagi.",
+    "enable": "Dayakan",
+    "disable": "Lumpuhkan",
+    "delete": "Padam",
+    "delConfirm": "Padam peraturan ini?",
+    "aiNote": "Analisis insiden AI dan kelulusan pembetulan masih berlaku dalam monitor schema.pi.",
+    "aiLink": "Buka monitor schema.pi",
+    "metrics": {
+      "APP_TPS": "TPS (permintaan/s)",
+      "APP_ERR_PCT": "Kadar ralat (%)",
+      "APP_SLOW_CNT": "Permintaan perlahan",
+      "APP_AVG_MS": "Purata respons (ms)",
+      "DB_SESS_CNT": "Sesi",
+      "DB_LOCK_WAIT_CNT": "Tunggu kunci",
+      "DB_CACHE_HIT_PCT": "Kadar capaian cache (%)",
+      "DB_SIZE_MB": "Saiz DB (MB)",
+      "URL_RSP_MS": "Respons URL (ms)",
+      "URL_FAIL_CNT": "Kegagalan URL"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Pilih pautan dahulu.",
+      "NOT_IMPLEMENTED": "Pautan schema.pi sedang disediakan. Sila cuba sebentar lagi.",
+      "LINK_AUTH": "Token pautan tidak sah atau tamat tempoh. Keluarkan token baharu dalam schema.pi dan daftarkannya.",
+      "LINK_SCOPE": "Pautan ini tidak dapat mengakses taksonomi itu.",
+      "RATE": "Terlalu banyak permintaan. Sila cuba sebentar lagi.",
+      "TIMEOUT": "schema.pi bertindak balas dengan perlahan. Sila cuba sebentar lagi.",
+      "RULE_LIMIT": "Sehingga 50 peraturan setiap pautan.",
+      "NOT_FOUND": "Peraturan tidak ditemui."
+    }
+  },
+  "ops": {
+    "title": "Keselamatan Operasi DB",
+    "loading": "Memuatkan…",
+    "pickFirst": "Pilih pautan dan sambungan di atas dahulu",
+    "run": "Jalankan diagnosis",
+    "running": "Mendiagnosis…",
+    "noRun": "Tiada diagnosis lagi. Tekan \"Jalankan diagnosis\"",
+    "lastRun": "Diagnosis terakhir {dtm}",
+    "readOnly": "Diagnosis hanya membaca (SELECT). Nasihat adalah panduan dan bergantung pada memori pelayan, beban dan beban kerja",
+    "truncated": "Terlalu banyak objek — hanya 500 yang pertama disemak",
+    "paramsNote": "Jumlah memori pelayan tidak diketahui, jadi ia dianggarkan daripada shared_buffers ≈ 25% RAM. random_page_cost menganggap SSD",
+    "auditNote": "Jadual dengan RLS dimatikan dan akaun yang tidak digunakan akan disemak setelah pertanyaan pautan menyokongnya",
+    "replNote": "Garis dasar ialah Active-Standby (A-S) — satu primary + standby. Lag main semula ≥ 5s = amaran, ≥ 60s = risiko (rujukan RPO yang diukur)",
+    "lagIdle": "Tiada perubahan",
+    "pager": "Penomboran",
+    "prev": "Sebelum",
+    "next": "Seterusnya",
+    "tabs": {
+      "params": "Parameter",
+      "audit": "Akaun & keistimewaan",
+      "backup": "Sandaran & pemulihan",
+      "repl": "Replikasi & DR",
+      "history": "Sejarah"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Amaran",
+      "RISK": "Risiko"
+    },
+    "role": {
+      "primary": "Sambungan ini = Primary",
+      "standby": "Sambungan ini = Standby",
+      "unknown": "Peranan tidak diketahui"
+    },
+    "col": {
+      "level": "Keputusan",
+      "item": "Item",
+      "value": "Nilai",
+      "reason": "Butiran",
+      "standby": "Standby",
+      "state": "Negeri",
+      "sync": "Segerak",
+      "lag": "Lag main semula"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "Peranan BYPASSRLS",
+      "bypass_ok": "Peranan BYPASSRLS",
+      "no_expiry": "Tamat tempoh kata laluan",
+      "expiry_ok": "Tamat tempoh kata laluan",
+      "public_grant": "Geran PUBLIC",
+      "public_ok": "Geran PUBLIC",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "WAL terakhir diarkibkan",
+      "arc_stale": "WAL terakhir diarkibkan",
+      "arc_recent": "WAL terakhir diarkibkan",
+      "arc_failing": "Kegagalan arkib WAL"
+    },
+    "rules": {
+      "sb_default": "Pada lalai (128MB). Pada pelayan khusus kira-kira 25% RAM disyorkan",
+      "sb_ok": "Ditetapkan di atas lalai",
+      "wm_over": "max_connections × work_mem melebihi memori anggaran. Pengisihan serentak berisiko kehabisan memori",
+      "wm_default": "Pada lalai (4MB). Pengisihan dan hash besar mungkin melimpah ke cakera",
+      "wm_ok": "Dalam julat yang munasabah",
+      "mwm_default": "Pada lalai (64MB). VACUUM dan binaan indeks mungkin perlahan; pertimbangkan 256MB atau lebih",
+      "mwm_ok": "Ditetapkan di atas lalai",
+      "av_on": "autovacuum dihidupkan",
+      "av_off": "autovacuum dimatikan. Risiko tinggi pembengkakan jadual dan pembalutan ID transaksi",
+      "conn_high": "max_connections tinggi. Setiap sambungan menggunakan memori; pooler (PgBouncer dll.) disyorkan",
+      "conn_ok": "Dalam julat yang munasabah",
+      "lmd_off": "Pengelogan pertanyaan perlahan dimatikan (-1). Sekitar 1000ms disyorkan",
+      "lmd_all": "Setiap pernyataan dilog (0). Overhead pengelogan yang berat",
+      "lmd_ok": "Pengelogan pertanyaan perlahan dihidupkan",
+      "st_off": "Tiada tamat masa pernyataan seluruh pelayan (0). Tetapkan had setiap peranan atau aplikasi",
+      "st_ok": "Tamat masa pernyataan ditetapkan",
+      "iit_off": "Tiada tamat masa melahu dalam transaksi (0). Boleh menyebabkan pegangan kunci dan pembengkakan",
+      "iit_ok": "Tamat masa melahu dalam transaksi ditetapkan",
+      "ckpt_short": "Selang titik semak adalah 5 minit atau kurang. Pertimbangkan 10–15 minit untuk beban tulis yang berat",
+      "ckpt_ok": "Dalam julat yang munasabah",
+      "wal_minimal": "wal_level=minimal menjadikan PITR dan replikasi mustahil. Gunakan replika atau lebih tinggi",
+      "wal_ok": "Tahap WAL menyokong PITR dan replikasi",
+      "rpc_hdd": "Lalai HDD (4). Untuk SSD, 1.1–2 disyorkan",
+      "rpc_ok": "Sesuai untuk SSD",
+      "super_many": "Dua atau lebih superuser. Simpan satu untuk pentadbiran dan berikan hanya keistimewaan yang diperlukan kepada yang lain",
+      "super_ok": "Paling banyak satu superuser",
+      "bypass_rls": "Peranan bukan superuser yang memintas keselamatan peringkat baris wujud",
+      "bypass_ok": "Tiada peranan memintas RLS",
+      "no_expiry": "Peranan log masuk tanpa tamat tempoh kata laluan. Tetapkan VALID UNTIL untuk akaun peribadi",
+      "expiry_ok": "Semua peranan log masuk mempunyai tamat tempoh",
+      "public_grant": "PUBLIC (setiap peranan) mempunyai keistimewaan jadual. Keistimewaan tulis berisiko",
+      "public_ok": "Tiada keistimewaan jadual diberikan kepada PUBLIC",
+      "arc_on": "Pengarkiban WAL (archive_mode) dihidupkan",
+      "arc_off": "Pengarkiban WAL dimatikan, jadi pemulihan titik masa (PITR) mustahil",
+      "arc_cmd_empty": "archive_mode dihidupkan tetapi archive_command dan archive_library kosong",
+      "arc_never": "Tiada WAL yang diarkibkan lagi",
+      "arc_stale": "Arkib WAL terakhir lebih lama daripada 24 jam",
+      "arc_recent": "WAL diarkibkan dalam tempoh 24 jam terakhir",
+      "arc_failing": "Pengarkiban WAL sedang gagal. Semak cakera, kebenaran dan laluan sasaran",
+      "repl_is_standby": "Sambungan ini adalah standby (mod pemulihan). Semak lag daripada sambungan primary",
+      "repl_none": "Tiada standby disambungkan. Tiada persediaan pemulihan bencana (DR)",
+      "repl_ok": "Standby sedang menstrim secara normal",
+      "repl_lag": "Standby ketinggalan atau tidak menstrim"
+    },
+    "manual": {
+      "title": "Senarai semak manual",
+      "intro": "Amalan sandaran dan pemulihan yang tidak dapat disemak secara automatik. Tandakan apabila disahkan dan catatkan bukti",
+      "memo": "Memo (cth. alat, jadual, terakhir disemak)",
+      "save": "Simpan",
+      "updated": "Dikemas kini {dtm}",
+      "items": {
+        "base_backup": "Sandaran penuh (pg_basebackup dll.) berjaya dalam tempoh 7 hari terakhir",
+        "offsite_copy": "Salinan sandaran disimpan di luar tapak (rantau atau storan lain)",
+        "restore_rehearsal": "Latihan pemulihan telah dilakukan suku ini dan tempohnya direkodkan",
+        "pitr_target": "Prosedur PITR dan sasaran RPO/RTO didokumenkan",
+        "backup_encrypt": "Fail sandaran disulitkan dan akses dihadkan",
+        "retention": "Tempoh pengekalan sandaran dan dasar penghapusan ditakrifkan"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Pautan schema.pi sedang disediakan. Sila cuba sebentar lagi",
+      "CONN_UNSUPPORTED": "Sambungan ini belum disokong (PostgreSQL langsung sahaja)",
+      "TIMEOUT": "DB sasaran bertindak balas terlalu perlahan. Sila cuba sebentar lagi",
+      "RATE": "Terlalu banyak panggilan. Cuba lagi dalam seminit",
+      "Q_UNKNOWN": "Pertanyaan tidak disokong. Semak versi API pautan schema.pi",
+      "INVALID_INPUT": "Pilihan pautan atau sambungan tidak sah"
+    }
+  },
+  "perf": {
+    "title": "Prestasi",
+    "loading": "Memuatkan…",
+    "pickFirst": "Pilih pautan dan sambungan di atas dahulu",
+    "pager": "Penomboran",
+    "tabs": {
+      "collect": "Kumpul",
+      "top": "Pertanyaan perlahan",
+      "health": "Kesihatan jadual & indeks",
+      "trend": "Trend saiz",
+      "activity": "Aktiviti & kunci"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Pautan schema.pi sedang disediakan. Sila cuba sebentar lagi",
+      "CONN_UNSUPPORTED": "Sambungan ini belum disokong (sambungan PostgreSQL langsung sahaja)",
+      "RATE": "Terlalu banyak permintaan. Cuba lagi dalam seminit",
+      "LINK_AUTH": "Token pautan telah tamat tempoh atau dibatalkan. Daftar semula token pada halaman Sambung",
+      "LINK_SCOPE": "Sambungan ini bukan milik kawasan subjek pautan",
+      "Q_UNKNOWN": "Pertanyaan tidak disokong. Semak versi API pautan schema.pi",
+      "INVALID_INPUT": "Nilai pautan atau sambungan tidak sah"
+    },
+    "pgss": {
+      "title": "Cara mendayakan pg_stat_statements",
+      "note": "PostgreSQL yang dihoskan sendiri juga memerlukan pg_stat_statements dalam shared_preload_libraries (postgresql.conf) dan mulakan semula. Statistik jadual, indeks dan saiz berfungsi tanpanya"
+    },
+    "collect": {
+      "intro": "Kumpul sekarang membaca statistik pertanyaan teratas, jadual, indeks dan saiz sekali dan menyimpannya sebagai capaian pantas. Kumpul sekurang-kurangnya dua kali untuk melihat perubahan dan trend saiz",
+      "run": "Kumpul sekarang",
+      "running": "Mengumpul…",
+      "done": "Dikumpul pada {dtm} — {qry} pertanyaan · {tbl} jadual · {idx} indeks"
+    },
+    "top": {
+      "sort": "Isih",
+      "sortTotal": "Jumlah masa",
+      "sortMean": "Purata masa",
+      "sortCalls": "Panggilan",
+      "empty": "Tiada capaian pantas lagi. Tekan Kumpul sekarang pada tab Kumpul",
+      "range": "Perubahan antara {from} → {to}",
+      "first": "Capaian pantas pertama pada {dtm} — nilai kumulatif (perubahan daripada capaian pantas seterusnya)",
+      "query": "Pertanyaan (literal ditopeng)",
+      "calls": "Panggilan",
+      "totalMs": "Jumlah ms",
+      "meanMs": "Purata ms",
+      "rows": "Baris",
+      "reset": "Tetapan semula statistik dikesan — ditunjukkan sebagai kumulatif"
+    },
+    "health": {
+      "empty": "Tiada syot kilat lagi. Tekan Kumpul sekarang pada tab Kumpul",
+      "basis": "Berdasarkan syot kilat pada {dtm}",
+      "unusedIdx": "Indeks tidak digunakan",
+      "unusedIdxHint": "Indeks tidak pernah digunakan sejak tetapan semula statistik terakhir (mengikut saiz). Jangan gugurkan PK atau indeks kekangan unik",
+      "fullScan": "Imbasan penuh berlebihan",
+      "fullScanHint": "Jadual dengan 1,000+ baris langsung di mana imbasan penuh sekurang-kurangnya separuh — semak indeks pada lajur penapis",
+      "dead": "Tuple mati berlebihan",
+      "deadHint": "Nisbah tuple mati 20% atau lebih — semak tetapan VACUUM dan autovacuum",
+      "none": "Tiada",
+      "scans": "imbasan"
+    },
+    "trend": {
+      "limit": "Ambang saiz",
+      "empty": "Tiada syot kilat dalam 30 hari terakhir",
+      "now": "Saiz semasa",
+      "perDay": "Pertumbuhan setiap hari",
+      "needMore": "Memerlukan 2+ syot kilat",
+      "daysLeft": "Mencapai {gb} GB",
+      "noGrowth": "Tiada trend pertumbuhan",
+      "days": "dalam kira-kira {n} hari"
+    },
+    "activity": {
+      "refresh": "Muat semula",
+      "live": "Pertanyaan langsung — tidak disimpan",
+      "sessions": "Aktiviti sesi",
+      "locks": "Kunci",
+      "none": "Tiada"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Saluran Paip",
+    "intro": "Semak sama ada DB sumber sedia untuk penangkapan data perubahan (CDC) dan reka bentuk saluran paip sumber → transformasi → sasaran. Peringkat ini hanya menyemak dan mereka bentuk; tiada data baris pelanggan dibaca atau disimpan.",
+    "needLink": "Pilih pautan schema.pi di atas dahulu. Jika anda tiada, daftar token dalam menu 'Pautan'.",
+    "needConn": "Pilih sambungan DB untuk disemak di atas.",
+    "loading": "Memuatkan…",
+    "pager": "Halaman",
+    "prev": "Sebelum",
+    "next": "Seterusnya",
+    "runTitle": "Jalankan & pantau (7-3 · 7-4)",
+    "runBody": "Pelaksanaan saluran paip, pemantauan lag dan pemprosesan semula tiba setelah ejen pekerja dan model keselamatan dimuktamadkan. Buat masa ini, simpan definisi sebagai draf (DRAFT).",
+    "pre": {
+      "title": "Pra-semak sumber",
+      "intro": "Untuk setiap jadual, semak lajur masa perubahan, lajur padam lembut dan kunci primer untuk mengesyorkan kaedah penangkapan (penyesuai), dan semak kesediaan replikasi logik WAL. Pertanyaan katalog dan tetapan baca sahaja.",
+      "schema": "Skema (pilihan)",
+      "schemaPh": "Semua",
+      "run": "Jalankan pra-semak",
+      "running": "Menyemak…",
+      "sum": "{tables} jadual · {noPk} tanpa PK · {deleteUnseen} tidak dapat menangkap padam",
+      "truncated": "Pertanyaan katalog mencapai had 500 baris, jadi beberapa jadual mungkin tiada. Nyatakan skema dan semak semula.",
+      "empty": "Tiada jadual untuk disemak",
+      "colTable": "Jadual",
+      "colChg": "Lajur masa perubahan",
+      "colDel": "Lajur padam lembut",
+      "colAdapter": "Kaedah disyorkan · sebab",
+      "toDraft": "Cipta draf saluran paip daripada {n} yang dipilih"
+    },
+    "ready": {
+      "ok": "Replikasi logik WAL sedia — jadual dengan PK boleh menggunakan LOGICAL",
+      "no": "Replikasi logik WAL tidak sedia — tangkap melalui pengundian atau perbandingan kunci",
+      "senders": "{n} sambungan replikasi"
+    },
+    "adapter": {
+      "LOGICAL": "Replikasi logik (WAL)",
+      "POLL": "Pengundian masa perubahan",
+      "KEY_DIFF": "Perbezaan syot kilat kunci",
+      "NONE": "Muat semula penuh sahaja"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Mempunyai lajur masa perubahan",
+      "NO_CHG_COL": "Tiada lajur masa perubahan",
+      "HAS_SOFT_DEL": "Mempunyai lajur padam lembut",
+      "NO_SOFT_DEL": "Tiada lajur padam lembut",
+      "HAS_PK": "Mempunyai kunci primer",
+      "NO_PK": "Tiada kunci primer — baris yang diubah tidak dapat dikenal pasti",
+      "DELETE_UNSEEN": "Pengundian tidak dapat menangkap DELETE fizikal (lajur padam lembut disyorkan)",
+      "LOGICAL_NOT_READY": "Boleh bertukar kepada LOGICAL setelah replikasi logik WAL sedia",
+      "FULL_RELOAD_ONLY": "Tiada PK atau lajur masa perubahan, jadi tiada penangkapan tambahan — tambah PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level bukan logik (menukarnya memerlukan mulakan semula DB)",
+      "NO_SLOTS": "max_replication_slots ialah 0",
+      "NO_SENDERS": "max_wal_senders ialah 0",
+      "IS_STANDBY": "Pelayan siap sedia — ambil replikasi logik daripada primer",
+      "SETTINGS_UNKNOWN": "Tidak dapat membaca tetapan, kesediaan tidak diketahui"
+    },
+    "ed": {
+      "title": "Definisi saluran paip",
+      "draftOnly": "Reka bentuk sahaja — disimpan sebagai draf (DRAFT)",
+      "new": "Saluran paip baharu",
+      "empty": "Tiada saluran paip yang disimpan",
+      "manual": "Manual",
+      "edit": "Edit",
+      "remove": "Padam",
+      "removeConfirm": "Padam saluran paip '{name}'?",
+      "name": "Nama",
+      "adapter": "Kaedah penangkapan",
+      "srcConn": "Sambungan sumber",
+      "useCurrentConn": "Gunakan sambungan yang dipilih di atas",
+      "sched": "Jadual (cron 5 medan, kosong = manual)",
+      "target": "Sasaran",
+      "targetPh": "cth. DB analitik analytics.public / tasik s3://…",
+      "tables": "Jadual sumber (dipisahkan baris baharu atau koma)",
+      "steps": "Langkah (sumber → transformasi → sasaran)",
+      "op": "Operasi",
+      "notePh": "Penerangan · syarat (pilihan)",
+      "addTransform": "Tambah langkah transformasi",
+      "save": "Simpan",
+      "saving": "Menyimpan…",
+      "saved": "Disimpan",
+      "close": "Tutup"
+    },
+    "kind": {
+      "SOURCE": "Sumber",
+      "TRANSFORM": "Transformasi",
+      "TARGET": "Sasaran"
+    },
+    "sts": {
+      "DRAFT": "Draf"
+    },
+    "check": {
+      "NAME_REQUIRED": "Masukkan nama",
+      "CONN_REQUIRED": "Pilih sambungan sumber",
+      "CRON_INVALID": "Masukkan jadual sebagai cron 5 medan (minit jam hari bulan hari_minggu; digit, *, ',', -, /)",
+      "OP_REQUIRED": "Masukkan operasi untuk setiap langkah",
+      "STEPS_TOO_FEW": "Langkah sumber dan sasaran diperlukan",
+      "STEPS_TOO_MANY": "Sehingga 20 langkah",
+      "STEP_FIRST_SOURCE": "Langkah pertama mestilah sumber",
+      "STEP_LAST_TARGET": "Langkah terakhir mestilah sasaran",
+      "STEP_MIDDLE_TRANSFORM": "Hanya langkah transformasi boleh berada di antara"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Saluran paip dengan nama ini sudah wujud. Gunakan nama lain",
+      "CONN_UNSUPPORTED": "Sambungan ini belum boleh disemak (sambungan pelayan langsung PostgreSQL sahaja buat masa ini)"
+    }
+  },
+  "sqlLab": {
+    "title": "Makmal Penalaan SQL",
+    "intro": "Pilih sambungan dan masukkan SQL untuk melihat pelan pelaksanaan sebagai pokok, dengan punca kelambatan (imbasan penuh, gelung bersarang, isihan besar) dan anti-corak SQL disemak terhadap domain standard schema.pi. Pertanyaan tidak pernah benar-benar dilaksanakan (tiada ANALYZE).",
+    "needLink": "Pilih pautan dan sambungan di atas untuk melihat pelan. Semakan anti-corak berfungsi tanpa pautan.",
+    "sqlLabel": "SQL (satu pernyataan SELECT atau WITH)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Tunjukkan pelan",
+    "explaining": "Memuatkan…",
+    "save": "Simpan pelan",
+    "saving": "Menyimpan…",
+    "saveName": "Label (cth. sebelum menambah indeks)",
+    "saveNote": "Nilai malar dalam SQL dan syarat pelan ditutup sebagai ? apabila disimpan.",
+    "plan": {
+      "title": "Pelan pelaksanaan",
+      "summary": "Jumlah kos {cost} · {ms}ms",
+      "cost": "kos",
+      "rows": "baris",
+      "width": "lebar"
+    },
+    "warn": {
+      "none": "Tiada amaran yang ketara.",
+      "SEQ_SCAN_LARGE": "Imbasan penuh pada {relation} (kira-kira {rows} baris) — pertimbangkan indeks pada lajur penapis.",
+      "NESTED_LOOP_HIGH": "Gelung bersarang menghasilkan kira-kira {rows} baris — pertimbangkan hash atau gabungan gabungan, atau indeks pada syarat gabungan.",
+      "SORT_SPILL": "Saiz isihan adalah kira-kira {kb}KB, melebihi work_mem lalai (4MB); ia mungkin tumpah ke cakera."
+    },
+    "lint": {
+      "run": "Semak anti-corak",
+      "title": "Semakan anti-corak SQL",
+      "none": "Tiada anti-corak ditemui.",
+      "domainsOff": "Domain standard tidak dapat dimuatkan; disemak dengan peraturan akhiran lajur lalai sahaja.",
+      "types": {
+        "num": "numerik",
+        "date": "tarikh",
+        "char": "aksara"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — pilih hanya lajur yang anda perlukan (I/O tambahan, tiada indeks penutup).",
+        "FUNC_ON_COLUMN": "Lajur penapis {column} dibalut dalam fungsi atau ungkapan, jadi indeksnya tidak boleh digunakan — ubah malar sebaliknya.",
+        "LEADING_WILDCARD": "LIKE dengan % pendahulu tidak boleh menggunakan indeks B-tree — pertimbangkan indeks GIN pg_trgm.",
+        "OR_DIFF_COLUMNS": "Syarat pada lajur yang berbeza digabungkan dengan OR — pertimbangkan UNION ALL atau indeks setiap lajur.",
+        "IMPLICIT_CAST": "{column} dibandingkan dengan nombor yang dipetik — padankan jenis lajur dan malar (pemutus tersirat).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) tidak mengembalikan apa-apa apabila NULL hadir dan perlahan — gunakan NOT EXISTS.",
+        "NO_WHERE": "Tiada klausa WHERE — pada jadual besar ini adalah imbasan penuh (tambah syarat atau LIMIT).",
+        "DOMAIN_MISMATCH": "{column} ialah jenis {expected} mengikut domain standard tetapi dibandingkan dengan malar jenis lain — pemutus tersirat mungkin menghalang penggunaan indeks."
+      }
+    },
+    "saved": {
+      "title": "Pelan yang disimpan · Bandingkan",
+      "empty": "Tiada pelan yang disimpan. Lihat pelan, kemudian simpan.",
+      "pick": "Pilih pelan untuk dibandingkan",
+      "pick2": "Pilih dua pelan untuk dibandingkan.",
+      "compare": "Bandingkan dua pelan",
+      "delete": "Padam",
+      "cost": "kos",
+      "prev": "Sebelum",
+      "next": "Seterusnya",
+      "page": "Halaman {page}"
+    },
+    "diff": {
+      "cost": "Jumlah kos {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Kedua-dua pelan adalah untuk SQL yang berbeza (selepas normalisasi).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Tiada perubahan dalam nod pelan.",
+      "before": "Sebelum",
+      "after": "Selepas"
+    },
+    "ai": {
+      "title": "Nasihat penalaan AI",
+      "badge": "Akan datang",
+      "body": "Akan datang (selepas prosedur kelulusan dan pengukuran impak) — nasihat akan dijana daripada SQL dengan malar bertopeng dan direkodkan sebagai diterapkan hanya selepas kelulusan DA dan impak yang diukur."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Ciri pautan schema.pi sedang disediakan. Sila cuba lagi sebentar lagi.",
+      "LINK_AUTH": "Token pautan telah tamat tempoh atau dibatalkan. Keluarkan token baharu dalam schema.pi dan daftarkannya semula.",
+      "LINK_SCOPE": "Pautan ini tidak boleh menggunakan sambungan itu (skema klasifikasi yang berbeza).",
+      "CONN_UNSUPPORTED": "Jenis sambungan ini belum disokong (sambungan pelayan PostgreSQL sahaja).",
+      "Q_UNKNOWN": "Pertanyaan tidak disokong.",
+      "SQL_NOT_SELECT": "Pelan hanya tersedia untuk satu pernyataan yang bermula dengan SELECT atau WITH.",
+      "TIMEOUT": "Permintaan tamat masa (5 saat). Pendekkan SQL atau cuba lagi kemudian.",
+      "RATE": "Terlalu banyak permintaan. Cuba lagi dalam seminit.",
+      "PAYLOAD_TOO_LARGE": "Pelan terlalu besar untuk disimpan.",
+      "LINK_NOT_FOUND": "Pautan tidak ditemui. Sila pilih pautan sekali lagi."
+    }
+  },
+  "nav": {
+    "label": "Ciri-ciri",
+    "connect": "Sambung",
+    "sqlLab": "Penalaan SQL",
+    "perf": "Prestasi",
+    "monitor": "Pemantauan",
+    "drift": "Hanyutan",
+    "migration": "Migrasi",
+    "pipeline": "Saluran Paip",
+    "analytics": "Analitik",
+    "ops": "Keselamatan Operasi",
+    "learn": "Belajar"
   }
 }

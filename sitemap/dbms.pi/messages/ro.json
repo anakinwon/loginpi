@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Un mediu de lucru DBA și SQLP pentru rularea rapidă și sigură a motoarelor DB"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Asigură rularea rapidă și sigură a datelor tale de către motorul DB",
+    "description": "Un mediu de lucru DBA și SQLP pentru planuri de execuție, statistici și performanță. schema.pi se ocupă de design și standarde; dbms.pi este partenerul său pe partea de motor.",
+    "welcome": "Bun venit, {name}.",
+    "featTitle": "Funcționalități",
+    "featDesc": {
+      "connect": "Înregistrează un token de legătură schema.pi și verifică starea conexiunii",
+      "sqlLab": "Arborele planului, avertismente, comparații și verificări anti-tipar împotriva domeniilor standard",
+      "perf": "Top-N interogări lente, starea tabelelor/indexurilor, prognoza capacității, activitate și blocări",
+      "monitor": "Sumar metrici aplicație, DB și URL cu alerte de prag",
+      "drift": "Compară modelul schema.pi și istoricul DDL cu catalogul real, măsoară efectul indexului",
+      "migration": "Ordine de încărcare topologică, segmente, listă de verificare și SQL de verificare",
+      "pipeline": "Pre-verificare captură de modificări și definiții de pipeline sursă→transformare→țintă",
+      "analytics": "Tablou de bord KPI, mapare lac cu 3 straturi și catalog de seturi de date",
+      "ops": "Diagnosticare doar în citire a parametrilor, rolurilor, backup-ului și DR de replicare",
+      "learn": "Întrebări practice SQLP/DAP, cazuri de optimizare și dicționar de comparație DBMS"
+    }
+  },
   "auth": {
     "checking": "Se verifică autentificarea…",
     "signedIn": "{name}",
@@ -64,5 +87,828 @@
     "LINK_CODE_GEN_FAILED": "Nu s-a putut crea un cod de conectare. Te rugăm să încerci din nou mai târziu.",
     "AUTH_DB_UNAVAILABLE": "Nu s-a putut salva contul tău, deci autentificarea a eșuat. Te rugăm să încerci din nou mai târziu.",
     "LINK_TRY_LIMIT": "Prea multe coduri de conectare incorecte. Încearcă din nou în 15 minute."
+  },
+  "analytics": {
+    "title": "Analiză și Lac",
+    "intro": "KPI-uri de activitate dbms, design de lac cu trei straturi și catalog de seturi de date într-un singur loc.",
+    "storageNotice": "Stocarea lacului (la client sau în cloud) nu este încă decisă (secțiunea 10 #7 din PRD). Deocamdată sunt stocate doar designurile și mapările de nume — fără date pe rânduri.",
+    "noLink": "Selectează sau înregistrează mai întâi o legătură schema.pi.",
+    "goConnect": "Înregistrează o legătură",
+    "loading": "Se încarcă…",
+    "refresh": "Reîmprospătare",
+    "kpi": {
+      "title": "Tablou de bord KPI",
+      "updatedAt": "{area} · la {time}",
+      "notBuilt": "Neconstruit",
+      "keys": {
+        "links": "Legăturile mele",
+        "perf": "Instantanee de performanță",
+        "drift": "Rulări de drift",
+        "mig": "Planuri de migrare",
+        "pipe": "Pipeline-uri",
+        "lake": "Seturi de date Lac"
+      },
+      "countsChart": "Totaluri pe funcționalitate",
+      "trendTitle": "Instantanee de performanță în ultimele 14 zile",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Nu există instantanee de performanță în ultimele 14 zile.",
+      "monTitle": "Sumar monitor schema.pi (ultima oră)",
+      "monTps": "Cereri/s",
+      "monErr": "Rata de eroare",
+      "monAvg": "Răspuns mediu (ms)",
+      "monDb": "Conexiuni DB",
+      "monFail": "Nu s-a putut încărca sumarul monitorului: {msg}"
+    },
+    "lake": {
+      "title": "Design de lac cu trei straturi",
+      "raw": "Brut",
+      "rawDesc": "Încarcă numele și tipurile coloanelor DB sursă așa cum sunt.",
+      "std": "Standardizat",
+      "stdDesc": "Redenumește coloanele conform termenilor standard aprobați de schema.pi.",
+      "cur": "Curat",
+      "curDesc": "Seturi de date de analiză grupate pe entitate.",
+      "loadProjects": "Încarcă proiecte",
+      "project": "Proiect",
+      "pickProject": "Alege un proiect",
+      "noProjects": "Nu există proiecte în această zonă.",
+      "noTables": "Modelul acestui proiect nu are tabele.",
+      "conform": "Conformitate standard {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} coloane · {pct}% conforme",
+      "colSrc": "Coloană sursă",
+      "colStd": "Coloană standardizată",
+      "colType": "Tip",
+      "colOk": "Format",
+      "ok": "OK",
+      "ng": "Verifică",
+      "pk": "PK",
+      "selectAll": "Selectează tot",
+      "selected": "{cnt} selectate",
+      "save": "Adaugă la designul lacului",
+      "saved": "S-au adăugat {cnt} la catalog."
+    },
+    "catalog": {
+      "title": "Catalog de seturi de date",
+      "schemaCard": "schema.pi este sursa de adevăr pentru definițiile seturilor de date de analiză, căutarea metadatelor și glosar. Aici vezi doar starea de încărcare a lacului și prospețimea.",
+      "openSchema": "Vezi definițiile în schema.pi",
+      "empty": "Nu s-au adăugat încă tabele la designul lacului.",
+      "status": {
+        "DSGN": "Doar design",
+        "LOADED": "Încărcat",
+        "FAIL": "Încărcare eșuată"
+      },
+      "lastLoad": "Ultima încărcare {time}",
+      "neverLoaded": "Niciodată încărcat",
+      "remove": "Elimină",
+      "removeConfirm": "Elimini {tbl} din catalog?",
+      "prev": "Anterior",
+      "next": "Următor",
+      "page": "Pagina {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Selectează mai întâi o legătură.",
+      "NOT_FOUND": "Nu a fost găsit. Verifică dacă modelul s-a schimbat."
+    }
+  },
+  "drift": {
+    "title": "Model ↔ DB Drift",
+    "intro": "Compară modelul de design schema.pi și istoricul aplicării DDL cu catalogul DB live pentru a găsi drift-ul și măsoară dacă indexurile proiectate sunt utilizate efectiv. Datele pe rânduri ale clienților nu sunt niciodată citite sau stocate.",
+    "needLink": "Alege mai întâi o legătură schema.pi de mai sus. Dacă nu ai niciuna, înregistrează un token în meniul 'Legătură'.",
+    "needConn": "Alege conexiunea DB de comparat de mai sus.",
+    "project": "Proiect",
+    "projectPick": "Selectează un proiect",
+    "loading": "Se încarcă…",
+    "run": "Rulează detectarea drift-ului",
+    "running": "Se compară…",
+    "readOnly": "Se execută doar interogări de catalog și statistici în modul citire.",
+    "applyInSchema": "Aplică remedierile (editări de model, generare și execuție DDL) în schema.pi, sursa de adevăr.",
+    "history": "Istoric detectare",
+    "prev": "Anterior",
+    "next": "Următor",
+    "none": "Niciunul",
+    "model": "Model",
+    "reqNo": "Cerere {id}",
+    "notSaved": "Nu s-a putut salva această rulare în istoric (rezultatele sunt afișate normal).",
+    "capped": "Prea multe elemente — se afișează primele {cap} pe secțiune (numărul total este complet).",
+    "statsMissing": "Statisticile de utilizare a indexului nu au fost disponibile, deci utilizarea nu a putut fi judecată.",
+    "sum": {
+      "missingTables": "Tabele lipsă în DB",
+      "extraTables": "Tabele care nu sunt în model",
+      "colMismatches": "Nepotriviri de coloane",
+      "missingIndexes": "Indexuri proiectate lipsă în DB",
+      "extraIndexes": "Indexuri care nu sunt în model",
+      "ddlMissing": "Obiecte dispărute după aplicare",
+      "unusedIndexes": "Indexuri proiectate neutilizate"
+    },
+    "sec": {
+      "ddlMissing": "DDL aplicat, dar lipsește în DB",
+      "missingTables": "Tabele în model, dar lipsă în DB",
+      "extraTables": "Tabele în DB, dar nu în model",
+      "colMismatches": "Nepotriviri de tip coloană / NULL",
+      "missingIndexes": "Indexuri proiectate lipsă în DB",
+      "extraIndexes": "Indexuri doar în DB (excluzând PK)",
+      "idxUsage": "Eficacitatea indexului proiectat"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi a înregistrat aceste obiecte ca aplicate, dar au dispărut — suspectează o ștergere manuală sau o revenire.",
+      "extraTables": "Acestea pot aparține altor proiecte sau tabele de sistem pe această conexiune.",
+      "idxUsage": "Zero scanări de la ultima resetare a statisticilor înseamnă neutilizat. Verifică fereastra de statistici înainte de a șterge."
+    },
+    "kind": {
+      "MISSING": "lipsește în DB",
+      "EXTRA": "nu în model",
+      "TYPE": "tipul diferă",
+      "NULL": "nulabilitatea diferă"
+    },
+    "col": {
+      "idx": "Index",
+      "scans": "Scanări",
+      "size": "Dimensiune",
+      "status": "Verdict"
+    },
+    "usage": {
+      "USED": "În uz",
+      "UNUSED": "Index proiectat neutilizat",
+      "NO_STATS": "Fără statistici"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Funcționalitatea de conectare schema.pi este în curs de pregătire. Te rugăm să încerci din nou în scurt timp.",
+      "LINK_DOWN": "Nu se poate ajunge la schema.pi. Te rugăm să încerci din nou în scurt timp.",
+      "LINK_AUTH": "Tokenul de legătură a expirat sau a fost revocat. Emite un nou token în schema.pi și înregistrează-l din nou.",
+      "LINK_NOT_FOUND": "Legătura nu a fost găsită. Te rugăm să alegi din nou legătura.",
+      "LINK_SCOPE": "Această conexiune nu aparține taxonomiei legăturii.",
+      "CONN_UNSUPPORTED": "Conexiune neacceptată (doar conexiuni la server PostgreSQL deocamdată).",
+      "TIMEOUT": "Cererea a expirat. Te rugăm să încerci din nou în scurt timp.",
+      "RATE": "Prea multe cereri. Te rugăm să încerci din nou într-un minut."
+    }
+  },
+  "learn": {
+    "title": "Învățare DBA",
+    "intro": "Întrebări practice SQLP/DAP, un manual de cazuri de optimizare și un dicționar de comparație Oracle/Tibero/PostgreSQL. Funcționează fără o legătură; alege o legătură pentru a vedea și maparea tipurilor standard schema.pi.",
+    "loading": "Se încarcă…",
+    "tabs": {
+      "quiz": "Practică",
+      "cases": "Cazuri de optimizare",
+      "dict": "Dicționar DBMS"
+    },
+    "topics": {
+      "INDEX": "Scanări index",
+      "JOIN": "Metode de join",
+      "PARTITION": "Pruning partiții",
+      "NORMAL": "Normalizare",
+      "NAMING": "Denumire standard",
+      "ISOLATION": "Niveluri de izolare",
+      "LOCK": "Blocări"
+    },
+    "levels": {
+      "1": "De bază",
+      "2": "Intermediar",
+      "3": "Avansat"
+    },
+    "quiz": {
+      "score": "Progresul meu",
+      "scoreLine": "{solved} din {total} rezolvate · {correct} corecte",
+      "right": "Corect",
+      "wrong": "Incorect",
+      "retry": "Încearcă din nou",
+      "prevRight": "Anterior corect",
+      "prevWrong": "Anterior incorect"
+    },
+    "cases": {
+      "notice": "Toate cazurile sunt exemple de învățare auto-scrise; numerele sunt ilustrative (fără date de la clienți).",
+      "problem": "SQL problemă",
+      "plan": "Sumar plan",
+      "cause": "Cauză",
+      "fix": "SQL corectat",
+      "effect": "Efect"
+    },
+    "cats": {
+      "ALL": "Toate",
+      "TYPE": "Tipuri de date",
+      "FUNC": "Funcții",
+      "PAGING": "Paginare",
+      "SEQ": "Secvențe",
+      "DATE": "Date",
+      "SYNTAX": "Sintaxă"
+    },
+    "dict": {
+      "search": "Căutare (ex. NVL, LIMIT)",
+      "item": "Element",
+      "note": "Notă",
+      "empty": "Niciun element corespunzător",
+      "loading": "Se încarcă…",
+      "liveTitle": "Maparea tipurilor standard din aria mea de subiect",
+      "liveIntro": "Alege o legătură pentru a încărca profilul DBMS schema.pi (tip logic → tip fizic). Dicționarul de mai sus funcționează fără o legătură.",
+      "liveLoad": "Încarcă maparea tipurilor",
+      "lgcType": "Tip logic"
+    }
+  },
+  "link2": {
+    "title": "Conexiune schema.pi",
+    "intro": "Înregistrează un token de conexiune pentru a utiliza conexiunile DB dintr-o arie de subiect schema.pi în dbms.pi. Tokenurile sunt stocate criptat, iar datele pe rânduri din bazele tale de date nu sunt stocate.",
+    "howTitle": "Cum să emiți un token de conexiune",
+    "how1": "Conectează-te la schema.pi și deschide aria de subiect la care vrei să te conectezi",
+    "how2": "Mergi la Aria de subiect → Setări → Token de conexiune și apasă 'Emite token' (rol de administrator de arie sau DA)",
+    "how3": "Copiază tokenul care începe cu slk_ — este afișat o singură dată la emitere",
+    "how4": "Lipește-l mai jos și înregistrează-l",
+    "openSchema": "Deschide schema.pi",
+    "registerTitle": "Înregistrează conexiunea",
+    "tokenLabel": "Token de conexiune",
+    "tokenPlaceholder": "slk_…",
+    "register": "Înregistrează",
+    "registering": "Se verifică…",
+    "registered": "Aria de subiect '{area}' este acum conectată",
+    "replaced": "Tokenul ariei de subiect '{area}' a fost înlocuit",
+    "myLinks": "Conexiunile mele",
+    "empty": "Nicio conexiune înregistrată",
+    "loading": "Se încarcă…",
+    "regDtm": "Înregistrat la {dtm}",
+    "remove": "Deconectează",
+    "removeConfirm": "Deconectezi '{area}'? Ecranele care utilizează această conexiune nu o vor mai putea accesa.",
+    "prev": "Anterior",
+    "next": "Următor",
+    "statusTitle": "Stare conexiune",
+    "noConns": "Nicio conexiune DB în această arie de subiect (adaugă una în schema.pi)",
+    "colConn": "Conexiune",
+    "colDbms": "DBMS",
+    "colMthd": "Metodă",
+    "colHost": "Gazdă",
+    "colTest": "Ultimul test",
+    "colAgent": "Agent văzut ultima dată",
+    "never": "Niciodată",
+    "retry": "Reîncearcă",
+    "pickerLink": "Legătură",
+    "pickerConn": "Conexiune",
+    "pickerEmpty": "Nicio conexiune —",
+    "pickerGo": "înregistrează una la /connect",
+    "errors": {
+      "LINK_AUTH": "Tokenul de conexiune a expirat sau a fost revocat. Emite un nou token în schema.pi și înregistrează-l din nou",
+      "LINK_SCOPE": "Această conexiune nu aparține ariei de subiect legate",
+      "LINK_DOWN": "Nu se poate ajunge la schema.pi. Te rugăm să încerci din nou în scurt timp",
+      "LINK_NOT_FOUND": "Conexiunea nu a fost găsită",
+      "LINK_DUP": "Înregistrarea este deja în curs. Te rugăm să încerci din nou",
+      "CONN_UNSUPPORTED": "Conexiune neacceptată (doar conexiuni la server PostgreSQL deocamdată)",
+      "Q_UNKNOWN": "Interogare necunoscută",
+      "SQL_NOT_SELECT": "Poate fi executată doar o singură instrucțiune SELECT (sau WITH)",
+      "PGSS_MISSING": "Extensia pg_stat_statements nu este instalată pe DB țintă",
+      "TIMEOUT": "Cererea a expirat",
+      "RATE": "Prea multe cereri. Te rugăm să încerci din nou într-un minut",
+      "INVALID_INPUT": "Lipește tokenul complet de conexiune care începe cu slk_"
+    }
+  },
+  "migration": {
+    "title": "Migrare date (PiMig)",
+    "intro": "Calculează ordinea de încărcare a tabelelor din relațiile din modelul tău de design schema.pi, organizează dimensiunea segmentului, paralelismul și lista de verificare a transferului, și generează SQL de verificare pe care îl rulezi singur pe sursă și țintă. Acest ecran doar planifică și verifică — nu mută date sau citește rânduri din DB-ul clientului.",
+    "needLink": "Alege mai întâi o legătură schema.pi de mai sus. Dacă nu ai niciuna, înregistrează un token în meniul 'Conectare'.",
+    "loading": "Se încarcă…",
+    "newPlan": "Plan nou de migrare",
+    "project": "Proiect",
+    "projectPick": "Selectează un proiect",
+    "planNm": "Nume plan",
+    "planNmHint": "Implicit numele proiectului",
+    "create": "Creează plan",
+    "creating": "Se creează…",
+    "snapHint": "Designul din acest moment (numele tabelelor, coloanelor și relațiilor) este înghețat ca un instantaneu. Creează un plan nou când modelul se schimbă.",
+    "plans": "Planuri de migrare",
+    "prev": "Anterior",
+    "next": "Următor",
+    "sts": {
+      "DRAFT": "Ciornă",
+      "READY": "Gata"
+    },
+    "del": "Șterge",
+    "delConfirm": "Ștergeți acest plan?",
+    "snapInfo": "Instantaneu: {tables} tabele · {rels} relații",
+    "dropped": "({n} relații fără tabele fizice sunt excluse din ordonare)",
+    "chunkSize": "Dimensiune bloc (rânduri/commit)",
+    "parallel": "Paralelism (tabele simultan)",
+    "saveOpts": "Salvează opțiuni",
+    "optsHint": "Paralelismul este numărul de tabele încărcate simultan într-un nivel. Dimensiunea blocului este unitatea de commit (rânduri) pe care o va utiliza motorul de execuție.",
+    "order": "Ordine de încărcare",
+    "orderHint": "Sortate topologic după relațiile de design (nu FK-uri fizice), astfel încât tabelele părinte să vină primele. Tabelele de același nivel nu depind una de alta și pot fi încărcate în paralel.",
+    "cycles": "{n} grup(uri) circular(e) — plasate la același nivel. Setați manual ordinea lor și amânați verificările de referință până după încărcare.",
+    "selfRefs": "Tabele cu auto-referință (ierarhice) — încarcă rândurile părinte mai întâi în cadrul tabelului",
+    "level": "Nivel {n}",
+    "checklist": "Listă de verificare pentru tranziție",
+    "toReady": "Marchează ca gata",
+    "toDraft": "Înapoi la ciornă",
+    "readyNeedAll": "Verificați fiecare element înainte de a marca planul ca gata.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "Punct de transfer CDC",
+        "desc": "Înregistrați un punct sursă consistent înainte de încărcarea inițială (PG LSN · Oracle/Tibero SCN · pentru interogare, ora de începere minus o fereastră de suprapunere), începeți CDC de la acesta și absorbiți duplicatele în fereastra de transfer cu upsert-uri."
+      },
+      "valueConv": {
+        "title": "Conversie valori",
+        "desc": "Sunt stabilite reguli pentru șir vid = NULL, umplere cu spații CHAR, NUMBER fără precizie → NUMERIC, DATE cu oră → TIMESTAMP, VARCHAR2 BYTE ↔ lungime CHAR și LONG·RAW."
+      },
+      "charset": {
+        "title": "Set de caractere",
+        "desc": "Setul de caractere sursă (KO16MSWIN949, UTF8, …) este confirmat, cu coloane care depășesc din cauza creșterii multibyte și izolarea caracterelor neconvertibile decise."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB sunt transmise în blocuri (limite de dimensiune și memorie) și verificate prin lungime + hash."
+      },
+      "seqResync": {
+        "title": "Resincronizare secvență",
+        "desc": "După încărcare, secvențele·identitățile țintă sunt setate la max(cheie)+1."
+      },
+      "timezone": {
+        "title": "Fus orar · coloane de sistem",
+        "desc": "Fusul orar de interpretare pentru valorile fără unul (ex. Asia/Seoul) este setat, declanșatoarele de timp modificat nu vor suprascrie timestamp-urile sursă în timpul încărcării și sunt stabilite reguli de substituție pentru creator/modificator."
+      },
+      "backpressure": {
+        "title": "Contrapresiune · încărcare țintă",
+        "desc": "Reduceți dimensiunea blocului și paralelismul la întârzierea țintă, creșterea WAL sau așteptările de blocare; construiți indecși non-PK după încărcare și rulați ANALYZE·VACUUM ulterior."
+      }
+    },
+    "verify": "SQL de verificare",
+    "verifyHint": "Generează interogări de număr, sumă coloană numerică, cheie duplicat și hash cheie per tabel în ordinea de încărcare. Rulați-le singur pe sursă și țintă și comparați (acest ecran nu le execută).",
+    "noHashOracle": "Funcțiile hash și redarea textului Oracle·Tibero diferă de PostgreSQL, astfel încât interogările hash sunt omise — comparați numerele, sumele și cheile duplicate.",
+    "copy": "Copiază",
+    "copied": "Copiat",
+    "copyFail": "Nu s-a putut copia. Selectați textul și copiați-l manual.",
+    "engine": {
+      "title": "Execuție·restart · repetiție·rollback",
+      "body": "Execuția reală a migrației (puncte de control, contrapresiune, izolare rânduri eronate) și repetiția, rollback-ul și înregistrarea punctului de pornire CDC vor fi disponibile după finalizarea modelului de securitate al agentului worker (A10). Deocamdată, aceasta acoperă planificarea, verificările și SQL-ul de verificare."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Link-ul schema.pi este în pregătire. Vă rugăm să încercați din nou în scurt timp.",
+      "LINK_DOWN": "Nu se poate ajunge la schema.pi. Vă rugăm să încercați din nou în scurt timp.",
+      "LINK_AUTH": "Token-ul de link a expirat sau a fost revocat. Emiteți un nou token în schema.pi și înregistrați-l din nou.",
+      "LINK_NOT_FOUND": "Link-ul nu a fost găsit. Vă rugăm să alegeți din nou link-ul.",
+      "LINK_SCOPE": "Acest proiect nu aparține taxonomiei link-ului.",
+      "TIMEOUT": "Cererea a expirat. Vă rugăm să încercați din nou în scurt timp.",
+      "RATE": "Prea multe cereri. Încercați din nou într-un minut.",
+      "MIG_NO_TABLES": "Acest proiect nu are tabele fizice de migrat. Convertiți mai întâi la fizic în schema.pi.",
+      "MIG_CHECK_INCOMPLETE": "Verificați fiecare element din lista de verificare a tranziției înainte de a marca planul ca gata.",
+      "NOT_FOUND": "Planul nu a fost găsit."
+    }
+  },
+  "monitor": {
+    "title": "Centrul de monitorizare",
+    "collectNote": "Colectarea rulează în schema.pi — migrare planificată (D7). Această pagină citește sumarul monitorului schema.pi.",
+    "noLink": "Selectați sau înregistrați mai întâi un link schema.pi.",
+    "goConnect": "Înregistrează un link",
+    "period": "Perioadă",
+    "periods": {
+      "30": "30 min",
+      "60": "1 oră",
+      "360": "6 ore",
+      "1440": "24 ore"
+    },
+    "refresh": "Reîmprospătează",
+    "loading": "Se încarcă…",
+    "updatedAt": "{area} · la {time} (reîmprospătare automată la fiecare 30s)",
+    "appTitle": "Performanța aplicației",
+    "dbTitle": "Stare DB pe conexiune",
+    "urlTitle": "Verificări URL",
+    "empty": "Nu există date de afișat.",
+    "breachTitle": "{n} depășiri de prag",
+    "rulesTitle": "Reguli de prag",
+    "rulesNote": "Regulile sunt salvate pentru acest link și evaluate în raport cu sumarul primit; depășirile primesc o bordură roșie (notificările vor veni mai târziu).",
+    "metric": "Metrică",
+    "conn": "Conexiune",
+    "allConns": "Toate conexiunile",
+    "op": "Compară",
+    "threshold": "Prag",
+    "thrInvalid": "Introduceți un număr pentru prag.",
+    "addRule": "Adaugă regulă",
+    "noRules": "Încă nu există reguli.",
+    "enable": "Activează",
+    "disable": "Dezactivează",
+    "delete": "Șterge",
+    "delConfirm": "Ștergeți această regulă?",
+    "aiNote": "Analiza incidentelor AI și aprobarea remedierilor se fac încă în monitorul schema.pi.",
+    "aiLink": "Deschide monitorul schema.pi",
+    "metrics": {
+      "APP_TPS": "TPS (cereri/s)",
+      "APP_ERR_PCT": "Rata de erori (%)",
+      "APP_SLOW_CNT": "Cereri lente",
+      "APP_AVG_MS": "Răspuns mediu (ms)",
+      "DB_SESS_CNT": "Sesiuni",
+      "DB_LOCK_WAIT_CNT": "Așteptări blocare",
+      "DB_CACHE_HIT_PCT": "Rata de hit cache (%)",
+      "DB_SIZE_MB": "Dimensiune DB (MB)",
+      "URL_RSP_MS": "Răspuns URL (ms)",
+      "URL_FAIL_CNT": "Eșecuri URL"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Selectați mai întâi un link.",
+      "NOT_IMPLEMENTED": "Funcționalitatea de conectare schema.pi este în pregătire. Vă rugăm să încercați din nou mai târziu.",
+      "LINK_AUTH": "Token-ul de link este invalid sau a expirat. Emiteți un nou token în schema.pi și înregistrați-l.",
+      "LINK_SCOPE": "Acest link nu poate accesa acea taxonomie.",
+      "RATE": "Prea multe cereri. Vă rugăm să încercați din nou în scurt timp.",
+      "TIMEOUT": "schema.pi răspunde lent. Vă rugăm să încercați din nou în scurt timp.",
+      "RULE_LIMIT": "Maxim 50 de reguli per link.",
+      "NOT_FOUND": "Regula nu a fost găsită."
+    }
+  },
+  "ops": {
+    "title": "Siguranța operațiunilor DB",
+    "loading": "Se încarcă…",
+    "pickFirst": "Selectați mai întâi un link și o conexiune de mai sus",
+    "run": "Execută diagnosticare",
+    "running": "Se diagnostichează…",
+    "noRun": "Încă nu există diagnosticări. Apăsați „Execută diagnosticare”",
+    "lastRun": "Ultima diagnosticare {dtm}",
+    "readOnly": "Diagnosticarea citește doar (SELECT). Sfaturile sunt un ghid și depind de memoria serverului, încărcare și volumul de lucru.",
+    "truncated": "Prea multe obiecte — au fost verificate doar primele 500",
+    "paramsNote": "Memoria totală a serverului este necunoscută, deci este estimată din shared_buffers ≈ 25% din RAM. random_page_cost presupune SSD.",
+    "auditNote": "Tabelele cu RLS dezactivat și conturile neutilizate vor fi verificate odată ce interogarea link-ului le va suporta.",
+    "replNote": "Linia de bază este Active-Standby (A-S) — un primar + standby. Lag de redare ≥ 5s = avertisment, ≥ 60s = risc (referință RPO măsurată).",
+    "lagIdle": "Nicio modificare",
+    "pager": "Paginație",
+    "prev": "Anterior",
+    "next": "Următor",
+    "tabs": {
+      "params": "Parametri",
+      "audit": "Conturi și privilegii",
+      "backup": "Backup și recuperare",
+      "repl": "Replicare și DR",
+      "history": "Istoric"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Avertisment",
+      "RISK": "Risc"
+    },
+    "role": {
+      "primary": "Această conexiune = Primar",
+      "standby": "Această conexiune = Standby",
+      "unknown": "Rol necunoscut"
+    },
+    "col": {
+      "level": "Verdict",
+      "item": "Element",
+      "value": "Valoare",
+      "reason": "Detalii",
+      "standby": "Standby",
+      "state": "Stare",
+      "sync": "Sincronizare",
+      "lag": "Lag de redare"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "Roluri BYPASSRLS",
+      "bypass_ok": "Roluri BYPASSRLS",
+      "no_expiry": "Expirare parolă",
+      "expiry_ok": "Expirare parolă",
+      "public_grant": "Granturi PUBLIC",
+      "public_ok": "Granturi PUBLIC",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Ultimul WAL arhivat",
+      "arc_stale": "Ultimul WAL arhivat",
+      "arc_recent": "Ultimul WAL arhivat",
+      "arc_failing": "Eșec arhivare WAL"
+    },
+    "rules": {
+      "sb_default": "La valoarea implicită (128MB). Pe un server dedicat se recomandă aproximativ 25% din RAM.",
+      "sb_ok": "Setat peste valoarea implicită",
+      "wm_over": "max_connections × work_mem depășește memoria estimată. Sortările concurente riscă lipsa de memorie.",
+      "wm_default": "La valoarea implicită (4MB). Sortările și hash-urile mari pot fi scrise pe disc.",
+      "wm_ok": "Într-un interval rezonabil",
+      "mwm_default": "La valoarea implicită (64MB). VACUUM și construcția de indecși pot fi lente; luați în considerare 256MB sau mai mult.",
+      "mwm_ok": "Setat peste valoarea implicită",
+      "av_on": "autovacuum este activat",
+      "av_off": "autovacuum este dezactivat. Risc ridicat de umflare a tabelelor și de wraparound al ID-ului tranzacției.",
+      "conn_high": "max_connections este mare. Fiecare conexiune utilizează memorie; se recomandă un pooler (PgBouncer etc.).",
+      "conn_ok": "Într-un interval rezonabil",
+      "lmd_off": "Logarea interogărilor lente este dezactivată (-1). Se recomandă în jur de 1000ms.",
+      "lmd_all": "Fiecare instrucțiune este logată (0). Overhead mare de logare.",
+      "lmd_ok": "Logarea interogărilor lente este activată.",
+      "st_off": "Nu există un timeout global pentru instrucțiuni (0). Setați limite per rol sau aplicație.",
+      "st_ok": "Un timeout pentru instrucțiuni este setat.",
+      "iit_off": "Nu există un timeout pentru idle-in-transaction (0). Poate cauza blocări și umflare.",
+      "iit_ok": "Un timeout pentru idle-in-transaction este setat.",
+      "ckpt_short": "Intervalul de checkpoint este de 5 minute sau mai puțin. Luați în considerare 10-15 minute pentru sarcini cu scriere intensivă.",
+      "ckpt_ok": "Într-un interval rezonabil",
+      "wal_minimal": "wal_level=minimal face imposibile PITR și replicarea. Utilizați replica sau o valoare mai mare.",
+      "wal_ok": "Nivelul WAL suportă PITR și replicarea.",
+      "rpc_hdd": "Valoarea implicită pentru HDD (4). Pentru SSD, se recomandă 1.1–2.",
+      "rpc_ok": "Potrivit pentru SSD.",
+      "super_many": "Doi sau mai mulți superuseri. Păstrați unul pentru administrare și acordați doar privilegiile necesare celorlalți.",
+      "super_ok": "Cel mult un superuser.",
+      "bypass_rls": "Există roluri non-superuser care ocolesc securitatea la nivel de rând.",
+      "bypass_ok": "Nu există roluri care ocolesc RLS.",
+      "no_expiry": "Roluri de login fără o dată de expirare a parolei. Setați VALID UNTIL pentru conturile personale.",
+      "expiry_ok": "Toate rolurile de login au o dată de expirare.",
+      "public_grant": "PUBLIC (fiecare rol) are privilegii de tabel. Privilegiile de scriere sunt riscante.",
+      "public_ok": "Nu există privilegii de tabel acordate lui PUBLIC.",
+      "arc_on": "Arhivarea WAL (archive_mode) este activată.",
+      "arc_off": "Arhivarea WAL este dezactivată, deci recuperarea la un moment dat (PITR) este imposibilă.",
+      "arc_cmd_empty": "archive_mode este activat, dar archive_command și archive_library sunt goale.",
+      "arc_never": "Niciun WAL nu a fost arhivat încă.",
+      "arc_stale": "Ultima arhivă WAL este mai veche de 24 de ore.",
+      "arc_recent": "WAL arhivat în ultimele 24 de ore.",
+      "arc_failing": "Arhivarea WAL eșuează în prezent. Verificați discul, permisiunile și calea țintă.",
+      "repl_is_standby": "Această conexiune este un standby (mod de recuperare). Verificați lag-ul de la conexiunea primară.",
+      "repl_none": "Niciun standby conectat. Nu există o configurație de recuperare în caz de dezastru (DR).",
+      "repl_ok": "Standby-urile transmit normal.",
+      "repl_lag": "Un standby este în întârziere sau nu transmite."
+    },
+    "manual": {
+      "title": "Listă de verificare manuală",
+      "intro": "Practici de backup și recuperare care nu pot fi verificate automat. Bifați când sunt confirmate și notați dovezile.",
+      "memo": "Memo (ex. instrument, program, ultima verificare)",
+      "save": "Salvează",
+      "updated": "Actualizat {dtm}",
+      "items": {
+        "base_backup": "Un backup complet (pg_basebackup etc.) a reușit în ultimele 7 zile.",
+        "offsite_copy": "O copie de rezervă este păstrată în afara locației (altă regiune sau stocare).",
+        "restore_rehearsal": "O repetiție de restaurare a fost efectuată în acest trimestru și durata sa a fost înregistrată.",
+        "pitr_target": "Procedura PITR și RPO/RTO țintă sunt documentate.",
+        "backup_encrypt": "Fișierele de backup sunt criptate și accesul este restricționat.",
+        "retention": "Perioada de retenție a backup-ului și politica de ștergere sunt definite."
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Funcționalitatea de conectare schema.pi este în pregătire. Vă rugăm să încercați din nou în scurt timp.",
+      "CONN_UNSUPPORTED": "Această conexiune nu este încă suportată (doar PostgreSQL direct).",
+      "RATE": "Prea multe apeluri. Încercați din nou într-un minut.",
+      "Q_UNKNOWN": "Interogare nesuportată. Verificați versiunea API a link-ului schema.pi.",
+      "INVALID_INPUT": "Selecție invalidă de link sau conexiune."
+    }
+  },
+  "perf": {
+    "title": "Performanță",
+    "loading": "Se încarcă…",
+    "pickFirst": "Selectați mai întâi un link și o conexiune de mai sus",
+    "pager": "Paginație",
+    "tabs": {
+      "collect": "Colectează",
+      "top": "Interogări lente",
+      "health": "Starea tabelelor și indexurilor",
+      "trend": "Tendința dimensiunii",
+      "activity": "Activitate și blocări"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Funcționalitatea de conectare schema.pi este în pregătire. Vă rugăm să încercați din nou mai târziu.",
+      "CONN_UNSUPPORTED": "Această conexiune nu este încă suportată (doar conexiuni PostgreSQL directe).",
+      "RATE": "Prea multe cereri. Încercați din nou într-un minut.",
+      "LINK_AUTH": "Token-ul de link a expirat sau a fost revocat. Înregistrați din nou token-ul pe pagina Conectare.",
+      "LINK_SCOPE": "Această conexiune nu aparține ariei subiectului link-ului.",
+      "Q_UNKNOWN": "Interogare nesuportată. Verificați versiunea API a link-ului schema.pi.",
+      "INVALID_INPUT": "Valoarea link-ului sau a conexiunii este invalidă."
+    },
+    "pgss": {
+      "title": "Cum se activează pg_stat_statements",
+      "note": "PostgreSQL auto-găzduit necesită, de asemenea, pg_stat_statements în shared_preload_libraries (postgresql.conf) și o repornire. Statisticile tabelelor, indexurilor și dimensiunilor funcționează fără aceasta."
+    },
+    "collect": {
+      "intro": "Colectează acum citește statisticile de top ale interogărilor, tabelele, indecșii și dimensiunile o singură dată și le stochează ca un instantaneu. Colectați de cel puțin două ori pentru a vedea modificările și tendințele de dimensiune.",
+      "run": "Colectează acum",
+      "running": "Se colectează…",
+      "done": "Colectat la {dtm} — {qry} interogări · {tbl} tabele · {idx} indecși"
+    },
+    "top": {
+      "sort": "Sortează",
+      "sortTotal": "Timp total",
+      "sortMean": "Timp mediu",
+      "sortCalls": "Apeluri",
+      "empty": "Încă nu există instantanee. Apăsați Colectează acum pe fila Colectează.",
+      "range": "Modificare între {from} → {to}",
+      "first": "Primul instantaneu la {dtm} — valori cumulative (modificări de la următorul instantaneu)",
+      "query": "Interogare (literali mascați)",
+      "calls": "Apeluri",
+      "totalMs": "Total ms",
+      "meanMs": "Medie ms",
+      "rows": "Rânduri",
+      "reset": "Resetare statistici detectată — afișat ca cumulativ"
+    },
+    "health": {
+      "empty": "Nu există încă instantanee. Apăsați Colectează acum pe fila Colectează",
+      "basis": "Bazat pe instantaneul de la {dtm}",
+      "unusedIdx": "Indexuri neutilizate",
+      "unusedIdxHint": "Indexuri neutilizate niciodată de la ultima resetare a statisticilor (după dimensiune). Nu ștergeți indexurile PK sau cu constrângere unică",
+      "fullScan": "Scanări complete excesive",
+      "fullScanHint": "Tabele cu peste 1.000 de rânduri active unde scanările complete reprezintă cel puțin jumătate — revizuiți indexurile pe coloanele de filtrare",
+      "dead": "Tupluri moarte excesive",
+      "deadHint": "Raportul tuplurilor moarte de 20% sau mai mult — verificați setările VACUUM și autovacuum",
+      "none": "Niciunul",
+      "scans": "scanări"
+    },
+    "trend": {
+      "limit": "Prag de dimensiune",
+      "empty": "Nu există instantanee în ultimele 30 de zile",
+      "now": "Dimensiune curentă",
+      "perDay": "Creștere pe zi",
+      "needMore": "Necesită 2+ instantanee",
+      "daysLeft": "Atinge {gb} GB",
+      "noGrowth": "Fără tendință de creștere",
+      "days": "în aproximativ {n} zile"
+    },
+    "activity": {
+      "refresh": "Reîmprospătare",
+      "live": "Interogare live — nu este stocată",
+      "sessions": "Activitatea sesiunii",
+      "locks": "Blocări",
+      "none": "Niciunul"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pipeline-uri",
+    "needLink": "Alegeți mai întâi un link schema.pi de mai sus. Dacă nu aveți niciunul, înregistrați un token în meniul „Link”.",
+    "loading": "Se încarcă…",
+    "pager": "Pagini",
+    "prev": "Anterior",
+    "next": "Următor",
+    "runTitle": "Executare și monitorizare (7-3 · 7-4)",
+    "runBody": "Execuția pipeline-ului, monitorizarea întârzierilor și reprocesarea vor fi disponibile odată ce agentul worker și modelul de securitate sunt finalizate. Deocamdată, salvați definițiile ca schițe (DRAFT).",
+    "pre": {
+      "title": "Pre-verificare sursă",
+      "intro": "Pentru fiecare tabel, verifică coloanele de timp de modificare, coloanele de ștergere soft și cheia primară pentru a recomanda o metodă de captură (adaptor) și verifică pregătirea pentru replicarea logică WAL. Se execută doar interogări de catalog și setări în modul citire.",
+      "schema": "Schemă (opțional)",
+      "schemaPh": "Toate",
+      "run": "Execută pre-verificarea",
+      "running": "Se verifică…",
+      "sum": "{tables} tabele · {noPk} fără PK · {deleteUnseen} nu pot captura ștergeri",
+      "truncated": "O interogare de catalog a atins limita de 500 de rânduri, așa că unele tabele ar putea lipsi. Specificați o schemă și verificați din nou.",
+      "empty": "Nu există tabele de verificat",
+      "colTable": "Tabel",
+      "colChg": "Coloană timp de modificare",
+      "colDel": "Coloană ștergere soft",
+      "colAdapter": "Metodă recomandată · motive",
+      "toDraft": "Creează schiță de pipeline din {n} selectate"
+    },
+    "ready": {
+      "ok": "Replicare logică WAL pregătită — tabelele cu PK pot utiliza LOGICAL",
+      "no": "Replicare logică WAL nu este pregătită — captură prin interogare sau comparație de chei",
+      "senders": "{n} conexiuni de replicare"
+    },
+    "adapter": {
+      "LOGICAL": "Replicare logică (WAL)",
+      "POLL": "Interogare timp de modificare",
+      "KEY_DIFF": "Diferență instantaneu cheie",
+      "NONE": "Doar reîncărcare completă"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Are coloană timp de modificare",
+      "NO_CHG_COL": "Nu are coloană timp de modificare",
+      "HAS_SOFT_DEL": "Are coloană ștergere soft",
+      "NO_SOFT_DEL": "Nu are coloană ștergere soft",
+      "HAS_PK": "Are cheie primară",
+      "NO_PK": "Nu are cheie primară — rândurile modificate nu pot fi identificate",
+      "DELETE_UNSEEN": "Interogarea nu poate captura ștergeri fizice (se recomandă coloana de ștergere soft)",
+      "LOGICAL_NOT_READY": "Poate trece la LOGICAL odată ce replicarea logică WAL este pregătită",
+      "FULL_RELOAD_ONLY": "Fără PK sau coloană timp de modificare, deci fără captură incrementală — adăugați un PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "NO_SLOTS": "max_replication_slots este 0",
+      "NO_SENDERS": "max_wal_senders este 0",
+      "IS_STANDBY": "Server standby — preluați replicarea logică de la serverul primar",
+      "SETTINGS_UNKNOWN": "Nu s-au putut citi setările, starea de pregătire este necunoscută"
+    },
+    "ed": {
+      "title": "Definiții pipeline",
+      "draftOnly": "Doar proiectare — salvat ca schițe (DRAFT)",
+      "new": "Pipeline nou",
+      "empty": "Nu există pipeline-uri salvate",
+      "manual": "Manual",
+      "edit": "Editare",
+      "remove": "Ștergere",
+      "removeConfirm": "Ștergeți pipeline-ul '{name}'?",
+      "name": "Nume",
+      "adapter": "Metodă de captură",
+      "srcConn": "Conexiune sursă",
+      "useCurrentConn": "Utilizați conexiunea aleasă mai sus",
+      "sched": "Program (cron 5 câmpuri, gol = manual)",
+      "target": "Țintă",
+      "targetPh": "ex: DB de analiză analytics.public / lac s3://…",
+      "tables": "Tabele sursă (separate prin linie nouă sau virgulă)",
+      "steps": "Pași (sursă → transformare → țintă)",
+      "op": "Operație",
+      "notePh": "Descriere · condiție (opțional)",
+      "addTransform": "Adaugă pas de transformare",
+      "save": "Salvare",
+      "saving": "Se salvează…",
+      "saved": "Salvat",
+      "close": "Închidere"
+    },
+    "kind": {
+      "SOURCE": "Sursă",
+      "TRANSFORM": "Transformare",
+      "TARGET": "Țintă"
+    },
+    "sts": {
+      "DRAFT": "Schiță"
+    },
+    "check": {
+      "NAME_REQUIRED": "Introduceți un nume",
+      "CONN_REQUIRED": "Alegeți o conexiune sursă",
+      "CRON_INVALID": "Introduceți programul ca cron cu 5 câmpuri (minut oră zi lună zi_săptămână; cifre, *, ',', -, /)",
+      "OP_REQUIRED": "Introduceți o operație pentru fiecare pas",
+      "STEPS_TOO_FEW": "Sunt necesari pași sursă și țintă",
+      "STEPS_TOO_MANY": "Până la 20 de pași",
+      "STEP_FIRST_SOURCE": "Primul pas trebuie să fie sursa",
+      "STEP_LAST_TARGET": "Ultimul pas trebuie să fie ținta",
+      "STEP_MIDDLE_TRANSFORM": "Doar pașii de transformare pot fi între"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Un pipeline cu acest nume există deja. Utilizați un alt nume",
+      "CONN_UNSUPPORTED": "Această conexiune nu poate fi verificată încă (doar conexiuni directe la server PostgreSQL deocamdată)"
+    }
+  },
+  "sqlLab": {
+    "title": "Laborator de optimizare SQL",
+    "intro": "Alegeți o conexiune și introduceți SQL pentru a vedea planul de execuție ca un arbore, cu cauzele încetinirilor (scanări complete, bucle imbricate, sortări mari) și anti-modele SQL verificate în raport cu domeniile standard schema.pi. Interogările nu sunt executate efectiv (fără ANALYZE).",
+    "needLink": "Selectați mai întâi un link și o conexiune de mai sus pentru a vizualiza planurile. Verificarea anti-model funcționează fără un link.",
+    "sqlLabel": "SQL (o singură instrucțiune SELECT sau WITH)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Afișează planul",
+    "explaining": "Se încarcă…",
+    "save": "Salvează planul",
+    "saving": "Se salvează…",
+    "saveName": "Etichetă (ex: înainte de adăugarea indexului)",
+    "saveNote": "Valorile constante din SQL și condițiile planului sunt mascate ca ? la salvare.",
+    "plan": {
+      "title": "Plan de execuție",
+      "summary": "Cost total {cost} · {ms}ms",
+      "cost": "cost",
+      "rows": "rânduri",
+      "width": "lățime"
+    },
+    "warn": {
+      "none": "Fără avertismente notabile.",
+      "SEQ_SCAN_LARGE": "Scanare completă pe {relation} (aproximativ {rows} rânduri) — luați în considerare un index pe coloanele de filtrare.",
+      "NESTED_LOOP_HIGH": "Bucla imbricată produce aproximativ {rows} rânduri — luați în considerare o joncțiune hash sau merge, sau un index pe condiția de joncțiune.",
+      "SORT_SPILL": "Dimensiunea sortării este de aproximativ {kb}KB, peste work_mem implicit (4MB); ar putea scrie pe disc."
+    },
+    "lint": {
+      "run": "Verifică anti-modelele",
+      "title": "Verificare anti-model SQL",
+      "none": "Nu s-au găsit anti-modele.",
+      "domainsOff": "Domeniile standard nu au putut fi încărcate; verificate doar cu regulile implicite de sufix de coloană.",
+      "types": {
+        "num": "numeric",
+        "date": "dată",
+        "char": "caracter"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — selectați doar coloanele de care aveți nevoie (I/O suplimentar, fără index de acoperire).",
+        "FUNC_ON_COLUMN": "Coloana de filtrare {column} este încapsulată într-o funcție sau expresie, deci indexul său nu poate fi utilizat — transformați constanta în schimb.",
+        "LEADING_WILDCARD": "LIKE cu un % inițial nu poate utiliza un index B-tree — luați în considerare un index GIN pg_trgm.",
+        "OR_DIFF_COLUMNS": "Condițiile pe coloane diferite sunt combinate cu OR — luați în considerare UNION ALL sau indexuri pe coloană.",
+        "IMPLICIT_CAST": "{column} este comparată cu un număr între ghilimele — potriviți tipurile coloanei și constantei (conversie implicită).",
+        "NOT_IN_SUBQUERY": "NOT IN (subinterogare) nu returnează nimic când sunt prezente valori NULL și este lent — utilizați NOT EXISTS.",
+        "NO_WHERE": "Fără clauză WHERE — pe un tabel mare aceasta este o scanare completă (adăugați o condiție sau LIMIT).",
+        "DOMAIN_MISMATCH": "{column} este de tip {expected} conform domeniului standard, dar este comparată cu o constantă de alt tip — conversia implicită poate împiedica utilizarea indexului."
+      }
+    },
+    "saved": {
+      "title": "Planuri salvate · Compară",
+      "empty": "Nu există planuri salvate. Vizualizați un plan, apoi salvați-l.",
+      "pick": "Selectează planul de comparat",
+      "pick2": "Selectați două planuri de comparat.",
+      "compare": "Compară două planuri",
+      "delete": "Șterge",
+      "cost": "cost",
+      "prev": "Anterior",
+      "next": "Următor",
+      "page": "Pagina {page}"
+    },
+    "diff": {
+      "cost": "Cost total {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Cele două planuri sunt pentru SQL diferite (după normalizare).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Nicio modificare în nodurile planului.",
+      "before": "Înainte",
+      "after": "După"
+    },
+    "ai": {
+      "title": "Sfaturi de optimizare AI",
+      "badge": "În curând",
+      "body": "În curând (după aprobare și proceduri de măsurare a impactului) — sfaturile vor fi generate din SQL cu constante mascate și înregistrate ca aplicate doar după aprobarea DA și impactul măsurat."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Funcționalitatea de legătură schema.pi este în curs de pregătire. Vă rugăm să încercați din nou în scurt timp.",
+      "LINK_AUTH": "Tokenul de legătură a expirat sau a fost revocat. Emiteți un nou token în schema.pi și înregistrați-l din nou.",
+      "LINK_SCOPE": "Această legătură nu poate utiliza acea conexiune (schemă de clasificare diferită).",
+      "CONN_UNSUPPORTED": "Acest tip de conexiune nu este încă acceptat (doar conexiuni la server PostgreSQL).",
+      "Q_UNKNOWN": "Interogare neacceptată.",
+      "SQL_NOT_SELECT": "Planurile sunt disponibile doar pentru o singură instrucțiune care începe cu SELECT sau WITH.",
+      "TIMEOUT": "Cererea a expirat (5 secunde). Scurtați SQL-ul sau încercați din nou mai târziu.",
+      "RATE": "Prea multe cereri. Încercați din nou într-un minut.",
+      "PAYLOAD_TOO_LARGE": "Planul este prea mare pentru a fi salvat.",
+      "LINK_NOT_FOUND": "Legătura nu a fost găsită. Vă rugăm să selectați din nou legătura."
+    }
+  },
+  "nav": {
+    "label": "Funcționalități",
+    "connect": "Conectare",
+    "sqlLab": "Optimizare SQL",
+    "perf": "Performanță",
+    "monitor": "Monitorizare",
+    "drift": "Derivă",
+    "migration": "Migrare",
+    "pipeline": "Pipeline",
+    "analytics": "Analiză",
+    "ops": "Siguranță operațională",
+    "learn": "Învățare"
   }
 }

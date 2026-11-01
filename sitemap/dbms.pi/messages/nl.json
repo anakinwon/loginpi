@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Een DBA- en SQLP-werkbank voor het snel en veilig uitvoeren van DB-engines"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Laat uw DB-engine uw gegevens snel en veilig verwerken",
+    "description": "Een DBA- en SQLP-werkbank voor uitvoeringsplannen, statistieken en prestaties. schema.pi behandelt ontwerp en standaarden; dbms.pi is de partner aan de engine-zijde.",
+    "welcome": "Welkom, {name}.",
+    "featTitle": "Functies",
+    "featDesc": {
+      "connect": "Registreer een schema.pi-koppelingstoken en controleer de verbindingsstatus",
+      "sqlLab": "Planboom, waarschuwingen, vergelijking en anti-patrooncontroles tegen standaarddomeinen",
+      "perf": "Trage query Top-N, tabel-/indexstatus, capaciteitsvoorspelling, activiteit en vergrendelingen",
+      "monitor": "App-, DB- en URL-metriekoverzicht met drempelwaarschuwingen",
+      "drift": "Vergelijk schema.pi-model en DDL-geschiedenis met de echte catalogus, meet indexeffect",
+      "migration": "Topologische laadvolgorde, chunks, checklist en verificatie-SQL",
+      "pipeline": "Precheck voor wijzigingsvastlegging en pijplijndefinities voor bron→transformatie→doel",
+      "analytics": "KPI-dashboard, 3-laags lake-mapping en datasetcatalogus",
+      "ops": "Alleen-lezen diagnose van parameters, rollen, back-up en replicatie DR",
+      "learn": "SQLP/DAP-oefenvragen, tuningcases en DBMS-vergelijkingswoordenboek"
+    }
+  },
   "auth": {
     "checking": "Aanmelding controleren…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "Kon geen koppelcode aanmaken. Probeer het later opnieuw.",
     "AUTH_DB_UNAVAILABLE": "Kon uw account niet opslaan, dus aanmelding mislukt. Probeer het later opnieuw.",
     "LINK_TRY_LIMIT": "Te veel onjuiste koppelcodes. Probeer het over 15 minuten opnieuw."
+  },
+  "analytics": {
+    "title": "Analyse & Lake",
+    "intro": "dbms-activiteit-KPI's, drielaags lake-ontwerp en datasetcatalogus op één plek.",
+    "storageNotice": "Lake-opslag (klantzijde of cloud) is nog niet besloten (PRD sectie 10 #7). Alleen ontwerpen en naamtoewijzingen worden voorlopig opgeslagen — geen rijgegevens.",
+    "noLink": "Selecteer of registreer eerst een schema.pi-koppeling.",
+    "goConnect": "Koppeling registreren",
+    "loading": "Laden…",
+    "refresh": "Vernieuwen",
+    "kpi": {
+      "title": "KPI-dashboard",
+      "updatedAt": "{area} · per {time}",
+      "notBuilt": "Niet gebouwd",
+      "keys": {
+        "links": "Mijn koppelingen",
+        "perf": "Perf-momentopnamen",
+        "drift": "Drift-runs",
+        "mig": "Migratieplannen",
+        "pipe": "Pijplijnen",
+        "lake": "Lake-datasets"
+      },
+      "countsChart": "Totalen per functie",
+      "trendTitle": "Perf-momentopnamen in de laatste 14 dagen",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Geen perf-momentopnamen in de laatste 14 dagen.",
+      "monTitle": "schema.pi monitoroverzicht (laatste uur)",
+      "monTps": "Verzoeken/s",
+      "monErr": "Foutpercentage",
+      "monAvg": "Gem. respons (ms)",
+      "monDb": "DB-verbindingen",
+      "monFail": "Kon het monitoroverzicht niet laden: {msg}"
+    },
+    "lake": {
+      "title": "Drielaags lake-ontwerp",
+      "raw": "Raw",
+      "rawDesc": "Laadt kolomnamen en -typen van de bron-DB zoals ze zijn.",
+      "std": "Gestandaardiseerd",
+      "stdDesc": "Hernoemt kolommen naar schema.pi-goedgekeurde standaardtermen.",
+      "cur": "Gecureerd",
+      "curDesc": "Analysedatasets gegroepeerd per entiteit.",
+      "loadProjects": "Projecten laden",
+      "project": "Project",
+      "pickProject": "Kies een project",
+      "noProjects": "Geen projecten in dit gebied.",
+      "noTables": "Het model van dit project heeft geen tabellen.",
+      "conform": "Standaardconformiteit {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} kolommen · {pct}% conform",
+      "colSrc": "Bronkolom",
+      "colStd": "Gestandaardiseerde kolom",
+      "colType": "Type",
+      "colOk": "Formaat",
+      "ok": "OK",
+      "ng": "Controleren",
+      "pk": "PK",
+      "selectAll": "Alles selecteren",
+      "selected": "{cnt} geselecteerd",
+      "save": "Toevoegen aan lake-ontwerp",
+      "saved": "{cnt} toegevoegd aan de catalogus."
+    },
+    "catalog": {
+      "title": "Datasetcatalogus",
+      "schemaCard": "schema.pi is de bron van waarheid voor analysedefinities van datasets, metadatasearch en woordenlijst. Hier ziet u alleen de laadstatus en versheid van de lake.",
+      "openSchema": "Definities bekijken in schema.pi",
+      "empty": "Nog geen tabellen toegevoegd aan het lake-ontwerp.",
+      "status": {
+        "DSGN": "Alleen ontwerp",
+        "LOADED": "Geladen",
+        "FAIL": "Laden mislukt"
+      },
+      "lastLoad": "Laatste laad {time}",
+      "neverLoaded": "Nooit geladen",
+      "remove": "Verwijderen",
+      "removeConfirm": "{tbl} verwijderen uit de catalogus?",
+      "prev": "Vorige",
+      "next": "Volgende",
+      "page": "Pagina {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Selecteer eerst een koppeling.",
+      "NOT_FOUND": "Niet gevonden. Controleer of het model is gewijzigd."
+    }
+  },
+  "drift": {
+    "title": "Model ↔ DB Drift",
+    "intro": "Vergelijk het schema.pi-ontwerpmodel en de DDL-toepassingsgeschiedenis met de live DB-catalogus om drift te vinden, en meet of ontworpen indexen daadwerkelijk worden gebruikt. Klantrijgegevens worden nooit gelezen of opgeslagen.",
+    "needLink": "Kies eerst een schema.pi-koppeling hierboven. Als u er geen heeft, registreer dan een token in het menu 'Koppeling'.",
+    "needConn": "Kies de DB-verbinding om hierboven te vergelijken.",
+    "project": "Project",
+    "projectPick": "Selecteer een project",
+    "loading": "Laden…",
+    "run": "Driftdetectie uitvoeren",
+    "running": "Vergelijken…",
+    "readOnly": "Alleen alleen-lezen catalogus- en statistiekquery's worden uitgevoerd.",
+    "applyInSchema": "Pas fixes toe (modelbewerkingen, DDL-generatie en -uitvoering) in schema.pi, de bron van waarheid.",
+    "history": "Detectiegeschiedenis",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "none": "Geen",
+    "model": "Model",
+    "reqNo": "Verzoek {id}",
+    "notSaved": "Kon deze run niet opslaan in de geschiedenis (resultaten worden normaal weergegeven).",
+    "capped": "Te veel items — toont de eerste {cap} per sectie (aantallen zijn compleet).",
+    "statsMissing": "Indexgebruiksstatistieken waren niet beschikbaar, dus het gebruik kon niet worden beoordeeld.",
+    "sum": {
+      "missingTables": "Tabellen ontbreken in DB",
+      "extraTables": "Tabellen niet in model",
+      "colMismatches": "Kolomverschillen",
+      "missingIndexes": "Ontworpen indexen ontbreken in DB",
+      "extraIndexes": "Indexen niet in model",
+      "ddlMissing": "Objecten verdwenen na toepassing",
+      "unusedIndexes": "Ongebruikte ontworpen indexen"
+    },
+    "sec": {
+      "ddlMissing": "DDL toegepast maar ontbreekt in DB",
+      "missingTables": "Tabellen in model maar ontbreken in DB",
+      "extraTables": "Tabellen in DB maar niet in model",
+      "colMismatches": "Kolomtype / NULL-verschillen",
+      "missingIndexes": "Ontworpen indexen ontbreken in DB",
+      "extraIndexes": "Indexen alleen in DB (exclusief PK)",
+      "idxUsage": "Effectiviteit van ontworpen indexen"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi heeft deze objecten als toegepast geregistreerd, maar ze zijn verdwenen — vermoed een handmatige verwijdering of rollback.",
+      "extraTables": "Deze kunnen behoren tot andere projecten of systeemtabellen op deze verbinding.",
+      "idxUsage": "Nul scans sinds de laatste statistiekenreset betekent ongebruikt. Controleer het statistiekenvenster voordat u verwijdert."
+    },
+    "kind": {
+      "MISSING": "ontbreekt in DB",
+      "EXTRA": "niet in model",
+      "TYPE": "type verschilt",
+      "NULL": "nullability verschilt"
+    },
+    "col": {
+      "idx": "Index",
+      "scans": "Scans",
+      "size": "Grootte",
+      "status": "Oordeel"
+    },
+    "usage": {
+      "USED": "In gebruik",
+      "UNUSED": "Ongebruikte ontworpen index",
+      "NO_STATS": "Geen statistieken"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "De schema.pi-koppeling is nog niet klaar. Probeer het over een korte tijd opnieuw.",
+      "LINK_DOWN": "Kan schema.pi niet bereiken. Probeer het over een korte tijd opnieuw.",
+      "LINK_AUTH": "Het koppelingstoken is verlopen of ingetrokken. Geef een nieuw token uit in schema.pi en registreer het opnieuw.",
+      "LINK_NOT_FOUND": "Koppeling niet gevonden. Kies de koppeling opnieuw.",
+      "LINK_SCOPE": "Deze verbinding behoort niet tot de taxonomie van de koppeling.",
+      "CONN_UNSUPPORTED": "Niet-ondersteunde verbinding (voorlopig alleen PostgreSQL-serververbindingen).",
+      "TIMEOUT": "De aanvraag is verlopen. Probeer het over een korte tijd opnieuw.",
+      "RATE": "Te veel aanvragen. Probeer het over een minuut opnieuw."
+    }
+  },
+  "learn": {
+    "title": "DBA-leren",
+    "intro": "SQLP/DAP-oefenvragen, een tuning-casebook en een Oracle/Tibero/PostgreSQL-vergelijkingswoordenboek. Werkt zonder koppeling; kies een koppeling om ook uw schema.pi-standaardtype-mapping te zien.",
+    "loading": "Laden…",
+    "tabs": {
+      "quiz": "Oefenen",
+      "cases": "Tuningcases",
+      "dict": "DBMS-woordenboek"
+    },
+    "topics": {
+      "INDEX": "Indexscans",
+      "JOIN": "Join-methoden",
+      "PARTITION": "Partitie-pruning",
+      "NORMAL": "Normalisatie",
+      "NAMING": "Standaardnaamgeving",
+      "ISOLATION": "Isolatieniveaus",
+      "LOCK": "Vergrendelingen"
+    },
+    "levels": {
+      "1": "Basis",
+      "2": "Gemiddeld",
+      "3": "Gevorderd"
+    },
+    "quiz": {
+      "score": "Mijn voortgang",
+      "scoreLine": "{solved} van {total} opgelost · {correct} correct",
+      "right": "Correct",
+      "wrong": "Onjuist",
+      "retry": "Opnieuw proberen",
+      "prevRight": "Eerder correct",
+      "prevWrong": "Eerder onjuist"
+    },
+    "cases": {
+      "notice": "Alle cases zijn zelfgeschreven leervoorbeelden; getallen zijn illustratief (geen klantgegevens).",
+      "problem": "Probleem-SQL",
+      "plan": "Planoverzicht",
+      "cause": "Oorzaak",
+      "fix": "Gefixte SQL",
+      "effect": "Effect"
+    },
+    "cats": {
+      "ALL": "Alles",
+      "TYPE": "Gegevenstypen",
+      "FUNC": "Functies",
+      "PAGING": "Paginering",
+      "SEQ": "Sequenties",
+      "DATE": "Datums",
+      "SYNTAX": "Syntaxis"
+    },
+    "dict": {
+      "search": "Zoeken (bijv. NVL, LIMIT)",
+      "item": "Item",
+      "note": "Opmerking",
+      "empty": "Geen overeenkomende items",
+      "loading": "Laden…",
+      "liveTitle": "Standaardtype-mapping van mijn onderwerpgebied",
+      "liveIntro": "Kies een koppeling om het schema.pi DBMS-profiel (logisch → fysiek type) te laden. Het woordenboek hierboven werkt zonder koppeling.",
+      "liveLoad": "Typemapping laden",
+      "lgcType": "Logisch type"
+    }
+  },
+  "link2": {
+    "title": "schema.pi-verbinding",
+    "intro": "Registreer een verbindingstoken om de DB-verbindingen van een schema.pi-onderwerpgebied in dbms.pi te gebruiken. Tokens worden versleuteld opgeslagen en er worden geen rijgegevens van uw databases opgeslagen.",
+    "howTitle": "Hoe een verbindingstoken uit te geven",
+    "how1": "Meld u aan bij schema.pi en open het onderwerpgebied om verbinding te maken",
+    "how2": "Ga naar Onderwerpgebied → Instellingen → Verbindingstoken en druk op 'Token uitgeven' (gebiedsbeheerder of DA-rol)",
+    "how3": "Kopieer het token dat begint met slk_ — het wordt slechts één keer getoond bij uitgifte",
+    "how4": "Plak het hieronder en registreer",
+    "openSchema": "Open schema.pi",
+    "registerTitle": "Verbinding registreren",
+    "tokenLabel": "Verbindingstoken",
+    "tokenPlaceholder": "slk_…",
+    "register": "Registreren",
+    "registering": "Controleren…",
+    "registered": "Onderwerpgebied '{area}' is nu verbonden",
+    "replaced": "Het token van onderwerpgebied '{area}' is vervangen",
+    "myLinks": "Mijn verbindingen",
+    "empty": "Geen verbindingen geregistreerd",
+    "loading": "Laden…",
+    "regDtm": "Geregistreerd {dtm}",
+    "remove": "Verbinding verbreken",
+    "removeConfirm": "Verbinding met '{area}' verbreken? Schermen die deze verbinding gebruiken, hebben er geen toegang meer toe.",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "statusTitle": "Verbindingsstatus",
+    "noConns": "Geen DB-verbindingen in dit onderwerpgebied (voeg er een toe in schema.pi)",
+    "colConn": "Verbinding",
+    "colDbms": "DBMS",
+    "colMthd": "Methode",
+    "colHost": "Host",
+    "colTest": "Laatste test",
+    "colAgent": "Agent laatst gezien",
+    "never": "Geen",
+    "retry": "Opnieuw proberen",
+    "pickerLink": "Koppeling",
+    "pickerConn": "Verbinding",
+    "pickerEmpty": "Geen verbindingen —",
+    "pickerGo": "registreer er een op /connect",
+    "errors": {
+      "LINK_AUTH": "Het verbindingstoken is verlopen of ingetrokken. Geef een nieuw token uit in schema.pi en registreer opnieuw",
+      "LINK_SCOPE": "Deze verbinding behoort niet tot het gekoppelde onderwerpgebied",
+      "LINK_DOWN": "Kan schema.pi niet bereiken. Probeer het over een korte tijd opnieuw",
+      "LINK_NOT_FOUND": "Verbinding niet gevonden",
+      "LINK_DUP": "Registratie is al bezig. Probeer het opnieuw",
+      "CONN_UNSUPPORTED": "Niet-ondersteunde verbinding (voorlopig alleen PostgreSQL-serververbindingen)",
+      "Q_UNKNOWN": "Onbekende query",
+      "SQL_NOT_SELECT": "Alleen een enkele SELECT (of WITH) verklaring kan worden uitgevoerd",
+      "PGSS_MISSING": "De pg_stat_statements-extensie is niet geïnstalleerd op de doel-DB",
+      "TIMEOUT": "De aanvraag is verlopen",
+      "RATE": "Te veel aanvragen. Probeer het over een minuut opnieuw",
+      "INVALID_INPUT": "Plak het volledige verbindingstoken dat begint met slk_"
+    }
+  },
+  "migration": {
+    "title": "Gegevensmigratie (PiMig)",
+    "intro": "Berekent de laadvolgorde van tabellen op basis van de relaties in uw schema.pi-ontwerpmodel, organiseert de chunkgrootte, parallellisme en de cutover-checklist, en genereert verificatie-SQL die u zelf uitvoert op bron en doel. Dit scherm plant en controleert alleen — het verplaatst geen gegevens of leest geen klant-DB-rijen.",
+    "needLink": "Kies eerst een schema.pi-koppeling hierboven. Als u er geen heeft, registreer dan een token onder 'Verbinden'.",
+    "loading": "Laden…",
+    "newPlan": "Nieuw migratieplan",
+    "project": "Project",
+    "projectPick": "Selecteer een project",
+    "planNm": "Plannaam",
+    "planNmHint": "Standaard is de projectnaam",
+    "create": "Plan maken",
+    "creating": "Maken…",
+    "snapHint": "Het ontwerp op dit moment (tabel-, kolom- en relatienamen) wordt vastgelegd als een momentopname. Maak een nieuw plan wanneer het model verandert.",
+    "plans": "Migratieplannen",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "sts": {
+      "DRAFT": "Concept",
+      "READY": "Gereed"
+    },
+    "del": "Verwijderen",
+    "delConfirm": "Dit plan verwijderen?",
+    "snapInfo": "Snapshot: {tables} tabellen · {rels} relaties",
+    "dropped": "({n} relaties zonder fysieke tabellen zijn uitgesloten van de volgorde)",
+    "chunkSize": "Chunkgrootte (rijen/commit)",
+    "parallel": "Parallellisme (tabellen tegelijk)",
+    "saveOpts": "Opties opslaan",
+    "optsHint": "Parallellisme is het aantal tabellen dat tegelijkertijd binnen een niveau wordt geladen. Chunkgrootte is de commit-eenheid (rijen) die de uitvoeringsengine zal gebruiken.",
+    "order": "Laadvolgorde",
+    "orderHint": "Topologisch gesorteerd op ontwerp-relaties (niet fysieke FK's), zodat oudertabellen eerst komen. Tabellen op hetzelfde niveau zijn niet afhankelijk van elkaar en kunnen parallel worden geladen.",
+    "cycles": "{n} circulaire groep(en) — op hetzelfde niveau geplaatst. Stel hun volgorde handmatig in en stel referentiecontroles uit tot na het laden.",
+    "selfRefs": "Zelfrefererende (hiërarchische) tabellen — laad eerst oudertabellen binnen de tabel",
+    "level": "Niveau {n}",
+    "checklist": "Cutover checklist",
+    "toReady": "Markeren als gereed",
+    "toDraft": "Terug naar concept",
+    "readyNeedAll": "Controleer elk item voordat u het plan als gereed markeert.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC overdrachtspunt",
+        "desc": "Leg een consistent bronpunt vast vóór de initiële lading (PG LSN · Oracle/Tibero SCN · voor polling, starttijd minus een overlapvenster), start CDC vanaf dat punt en absorbeer duplicaten in het overdrachtsvenster met upserts."
+      },
+      "valueConv": {
+        "title": "Waardeconversie",
+        "desc": "Regels zijn ingesteld voor lege string = NULL, CHAR blanco opvulling, NUMBER zonder precisie → NUMERIC, DATE met tijd → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR lengte, en LONG·RAW."
+      },
+      "charset": {
+        "title": "Tekenset",
+        "desc": "Brontekenset (KO16MSWIN949, UTF8, …) is bevestigd, met kolommen die overlopen door multibyte-groei en isolatie van onconverteerbare tekens vastgesteld."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB worden in chunks gestreamd (grootte- en geheugenlimieten) en geverifieerd op lengte + hash."
+      },
+      "seqResync": {
+        "title": "Sequentie resync",
+        "desc": "Na het laden worden doelsequenties·identiteiten ingesteld op max(key)+1."
+      },
+      "timezone": {
+        "title": "Tijdzone · systeemkolommen",
+        "desc": "De interpretatietijdzone voor waarden zonder tijdzone (bijv. Asia/Seoul) is ingesteld, triggers voor wijzigingstijd zullen bron-tijdstempels niet overschrijven tijdens het laden, en substitutieregels voor maker/wijziger zijn ingesteld."
+      },
+      "backpressure": {
+        "title": "Tegendruk · doellading",
+        "desc": "Verminder chunkgrootte en parallellisme bij doellag, WAL-groei of lock-wachten; bouw niet-PK-indexen na het laden en voer daarna ANALYZE·VACUUM uit."
+      }
+    },
+    "verify": "Verificatie SQL",
+    "verifyHint": "Genereert telling, numerieke kolom som, dubbele sleutel en sleutel hash queries per tabel in laadvolgorde. Voer ze zelf uit op bron en doel en vergelijk (dit scherm voert ze niet uit).",
+    "noHashOracle": "Oracle·Tibero hashfuncties en tekstweergave verschillen van PostgreSQL, dus hash-queries worden weggelaten — vergelijk tellingen, sommen en dubbele sleutels.",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd",
+    "copyFail": "Kopiëren mislukt. Selecteer de tekst en kopieer deze handmatig.",
+    "engine": {
+      "title": "Uitvoering·herstart · repetitie·terugdraaien",
+      "body": "De feitelijke migratie-uitvoering (checkpoints, tegendruk, isolatie van foutrijen) en repetitie, terugdraaien en het vastleggen van het CDC-startpunt zullen beschikbaar komen nadat het beveiligingsmodel van de worker-agent (A10) is afgerond. Voor nu omvat dit planning, controles en verificatie-SQL."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "De schema.pi-koppeling wordt voorbereid. Probeer het over een ogenblik opnieuw.",
+      "LINK_DOWN": "Kan schema.pi niet bereiken. Probeer het over een ogenblik opnieuw.",
+      "LINK_AUTH": "Het koppelingstoken is verlopen of ingetrokken. Geef een nieuw token uit in schema.pi en registreer het opnieuw.",
+      "LINK_NOT_FOUND": "Koppeling niet gevonden. Kies de koppeling opnieuw.",
+      "LINK_SCOPE": "Dit project behoort niet tot de taxonomie van de koppeling.",
+      "TIMEOUT": "De aanvraag is verlopen. Probeer het over een ogenblik opnieuw.",
+      "RATE": "Te veel aanvragen. Probeer het over een minuut opnieuw.",
+      "MIG_NO_TABLES": "Dit project heeft geen fysieke tabellen om te migreren. Converteer eerst naar fysiek in schema.pi.",
+      "MIG_CHECK_INCOMPLETE": "Controleer elk item van de cutover-checklist voordat u het plan als gereed markeert.",
+      "NOT_FOUND": "Plan niet gevonden."
+    }
+  },
+  "monitor": {
+    "title": "Monitoringcentrum",
+    "collectNote": "Verzameling wordt uitgevoerd in schema.pi — migratie gepland (D7). Deze pagina leest de schema.pi monitor samenvatting.",
+    "noLink": "Selecteer of registreer eerst een schema.pi-koppeling.",
+    "goConnect": "Koppeling registreren",
+    "period": "Periode",
+    "periods": {
+      "30": "30 min",
+      "60": "1 uur",
+      "360": "6 uur",
+      "1440": "24 uur"
+    },
+    "refresh": "Vernieuwen",
+    "loading": "Laden…",
+    "updatedAt": "{area} · per {time} (automatisch vernieuwen elke 30s)",
+    "appTitle": "App-prestaties",
+    "dbTitle": "DB-status per verbinding",
+    "urlTitle": "URL-controles",
+    "empty": "Geen gegevens om weer te geven.",
+    "breachTitle": "{n} drempelwaardeoverschrijdingen",
+    "rulesTitle": "Drempelregels",
+    "rulesNote": "Regels worden opgeslagen voor deze koppeling en geëvalueerd tegen de ontvangen samenvatting; overtredingen krijgen een rode rand (meldingen komen later).",
+    "metric": "Metriek",
+    "conn": "Verbinding",
+    "allConns": "Alle verbindingen",
+    "op": "Vergelijken",
+    "threshold": "Drempelwaarde",
+    "thrInvalid": "Voer een getal in voor de drempelwaarde.",
+    "addRule": "Regel toevoegen",
+    "noRules": "Nog geen regels.",
+    "enable": "Inschakelen",
+    "disable": "Uitschakelen",
+    "delete": "Verwijderen",
+    "delConfirm": "Deze regel verwijderen?",
+    "aiNote": "AI-incidentanalyse en goedkeuring van fixes vinden nog steeds plaats in de schema.pi-monitor.",
+    "aiLink": "Open schema.pi-monitor",
+    "metrics": {
+      "APP_TPS": "TPS (verzoeken/s)",
+      "APP_ERR_PCT": "Foutpercentage (%)",
+      "APP_SLOW_CNT": "Trage verzoeken",
+      "APP_AVG_MS": "Gem. respons (ms)",
+      "DB_SESS_CNT": "Sessies",
+      "DB_LOCK_WAIT_CNT": "Wachtende vergrendelingen",
+      "DB_CACHE_HIT_PCT": "Cache hit (%)",
+      "DB_SIZE_MB": "DB-grootte (MB)",
+      "URL_RSP_MS": "URL-respons (ms)",
+      "URL_FAIL_CNT": "URL-fouten"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Selecteer eerst een koppeling.",
+      "NOT_IMPLEMENTED": "De schema.pi-koppeling wordt voorbereid. Probeer het later opnieuw.",
+      "LINK_AUTH": "Het koppelingstoken is ongeldig of verlopen. Geef een nieuw token uit in schema.pi en registreer het.",
+      "LINK_SCOPE": "Deze koppeling heeft geen toegang tot die taxonomie.",
+      "RATE": "Te veel aanvragen. Probeer het over een ogenblik opnieuw.",
+      "TIMEOUT": "schema.pi reageert traag. Probeer het over een ogenblik opnieuw.",
+      "RULE_LIMIT": "Maximaal 50 regels per koppeling.",
+      "NOT_FOUND": "Regel niet gevonden."
+    }
+  },
+  "ops": {
+    "title": "DB-operaties veiligheid",
+    "loading": "Laden…",
+    "pickFirst": "Selecteer eerst een koppeling en verbinding hierboven",
+    "run": "Diagnose uitvoeren",
+    "running": "Diagnose uitvoeren…",
+    "noRun": "Nog geen diagnose. Druk op \"Diagnose uitvoeren\"",
+    "lastRun": "Laatste diagnose {dtm}",
+    "readOnly": "Diagnose leest alleen (SELECT). Advies is een leidraad en hangt af van servergeheugen, belasting en workload",
+    "truncated": "Te veel objecten — alleen de eerste 500 zijn gecontroleerd",
+    "paramsNote": "Totaal servergeheugen is onbekend, dus het wordt geschat op basis van shared_buffers ≈ 25% van RAM. random_page_cost gaat uit van SSD",
+    "auditNote": "Tabellen met RLS uitgeschakeld en ongebruikte accounts worden gecontroleerd zodra de linkquery deze ondersteunt",
+    "replNote": "Baseline is Active-Standby (A-S) — één primaire + standby. Replay lag ≥ 5s = waarschuwing, ≥ 60s = risico (gemeten RPO-referentie)",
+    "lagIdle": "Geen wijzigingen",
+    "pager": "Paginering",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "tabs": {
+      "params": "Parameters",
+      "audit": "Accounts & rechten",
+      "backup": "Back-up & herstel",
+      "repl": "Replicatie & DR",
+      "history": "Geschiedenis"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Waarschuwing",
+      "RISK": "Risico"
+    },
+    "role": {
+      "primary": "Deze verbinding = Primair",
+      "standby": "Deze verbinding = Standby",
+      "unknown": "Rol onbekend"
+    },
+    "col": {
+      "level": "Oordeel",
+      "item": "Item",
+      "value": "Waarde",
+      "reason": "Details",
+      "standby": "Standby",
+      "state": "Status",
+      "sync": "Synchronisatie",
+      "lag": "Replay lag"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLS rollen",
+      "bypass_ok": "BYPASSRLS rollen",
+      "no_expiry": "Wachtwoordverloop",
+      "expiry_ok": "Wachtwoordverloop",
+      "public_grant": "PUBLIC rechten",
+      "public_ok": "PUBLIC rechten",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Laatst gearchiveerde WAL",
+      "arc_stale": "Laatst gearchiveerde WAL",
+      "arc_recent": "Laatst gearchiveerde WAL",
+      "arc_failing": "WAL-archivering mislukt"
+    },
+    "rules": {
+      "sb_default": "Op de standaardwaarde (128MB). Op een dedicated server wordt ongeveer 25% van het RAM aanbevolen",
+      "sb_ok": "Ingesteld boven de standaardwaarde",
+      "wm_over": "max_connections × work_mem overschrijdt het geschatte geheugen. Gelijktijdige sorteringen riskeren onvoldoende geheugen",
+      "wm_default": "Op de standaardwaarde (4MB). Grote sorteringen en hashes kunnen naar schijf overlopen",
+      "wm_ok": "Binnen een redelijk bereik",
+      "mwm_default": "Op de standaardwaarde (64MB). VACUUM en indexbouw kunnen traag zijn; overweeg 256MB of meer",
+      "mwm_ok": "Ingesteld boven de standaardwaarde",
+      "av_on": "autovacuum is ingeschakeld",
+      "av_off": "autovacuum is uitgeschakeld. Hoog risico op tabelbloat en transactie-ID wraparound",
+      "conn_high": "max_connections is hoog. Elke verbinding gebruikt geheugen; een pooler (PgBouncer etc.) wordt aanbevolen",
+      "conn_ok": "Binnen een redelijk bereik",
+      "lmd_off": "Trage query logging is uitgeschakeld (-1). Rond de 1000ms wordt aanbevolen",
+      "lmd_all": "Elke statement wordt gelogd (0). Zware logging overhead",
+      "lmd_ok": "Trage query logging is ingeschakeld",
+      "st_off": "Geen serverbrede statement timeout (0). Stel limieten in per rol of applicatie",
+      "st_ok": "Een statement timeout is ingesteld",
+      "iit_off": "Geen idle-in-transaction timeout (0). Kan leiden tot lock holding en bloat",
+      "iit_ok": "Een idle-in-transaction timeout is ingesteld",
+      "ckpt_short": "Checkpoint interval is 5 minuten of minder. Overweeg 10-15 minuten voor write-heavy loads",
+      "ckpt_ok": "Binnen een redelijk bereik",
+      "wal_minimal": "wal_level=minimal maakt PITR en replicatie onmogelijk. Gebruik replica of hoger",
+      "wal_ok": "WAL-niveau ondersteunt PITR en replicatie",
+      "rpc_hdd": "HDD standaard (4). Voor SSD wordt 1.1-2 aanbevolen",
+      "rpc_ok": "Geschikt voor SSD",
+      "super_many": "Twee of meer superusers. Houd er één voor administratie en verleen alleen de benodigde privileges aan anderen",
+      "super_ok": "Maximaal één superuser",
+      "bypass_rls": "Niet-superuser rollen die row-level security omzeilen bestaan",
+      "bypass_ok": "Geen RLS-omzeilende rollen",
+      "no_expiry": "Login rollen zonder wachtwoordverloop. Stel VALID UNTIL in voor persoonlijke accounts",
+      "expiry_ok": "Alle login rollen hebben een verloopdatum",
+      "public_grant": "PUBLIC (elke rol) heeft tabelrechten. Schrijfrechten zijn riskant",
+      "public_ok": "Geen tabelrechten verleend aan PUBLIC",
+      "arc_on": "WAL-archivering (archive_mode) is ingeschakeld",
+      "arc_off": "WAL-archivering is uitgeschakeld, dus point-in-time recovery (PITR) is onmogelijk",
+      "arc_cmd_empty": "archive_mode is ingeschakeld, maar archive_command en archive_library zijn leeg",
+      "arc_never": "Nog geen WAL gearchiveerd",
+      "arc_stale": "Het laatste WAL-archief is ouder dan 24 uur",
+      "arc_recent": "WAL gearchiveerd binnen de laatste 24 uur",
+      "arc_failing": "WAL-archivering mislukt momenteel. Controleer schijf, machtigingen en doelpad",
+      "repl_is_standby": "Deze verbinding is een standby (herstelmodus). Controleer de lag vanaf de primaire verbinding",
+      "repl_none": "Geen standby verbonden. Er is geen disaster recovery (DR) setup",
+      "repl_ok": "Standbys streamen normaal",
+      "repl_lag": "Een standby loopt achter of streamt niet"
+    },
+    "manual": {
+      "title": "Handmatige checklist",
+      "intro": "Back-up- en herstelpraktijken die niet automatisch kunnen worden gecontroleerd. Vink aan wanneer bevestigd en noteer het bewijs",
+      "memo": "Memo (bijv. tool, schema, laatst gecontroleerd)",
+      "save": "Opslaan",
+      "updated": "Bijgewerkt {dtm}",
+      "items": {
+        "base_backup": "Een volledige back-up (pg_basebackup etc.) is binnen de laatste 7 dagen gelukt",
+        "offsite_copy": "Een back-upkopie wordt off-site bewaard (een andere regio of opslag)",
+        "restore_rehearsal": "Een herstelrepetitie is dit kwartaal uitgevoerd en de duur ervan is vastgelegd",
+        "pitr_target": "PITR-procedure en doel-RPO/RTO zijn gedocumenteerd",
+        "backup_encrypt": "Back-upbestanden zijn versleuteld en toegang is beperkt",
+        "retention": "Bewaartermijn van back-ups en verwijderingsbeleid zijn gedefinieerd"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "De schema.pi-koppeling wordt voorbereid. Probeer het over een ogenblik opnieuw",
+      "CONN_UNSUPPORTED": "Deze verbinding wordt nog niet ondersteund (alleen directe PostgreSQL)",
+      "TIMEOUT": "De doel-DB reageerde te traag. Probeer het over een ogenblik opnieuw",
+      "RATE": "Te veel oproepen. Probeer het over een minuut opnieuw",
+      "Q_UNKNOWN": "Niet-ondersteunde query. Controleer de schema.pi-koppeling API-versie",
+      "INVALID_INPUT": "Ongeldige koppeling of verbinding selectie"
+    }
+  },
+  "perf": {
+    "title": "Prestaties",
+    "loading": "Laden…",
+    "pickFirst": "Selecteer eerst een koppeling en verbinding hierboven",
+    "pager": "Paginering",
+    "tabs": {
+      "collect": "Verzamelen",
+      "top": "Trage queries",
+      "health": "Tabel- & indexstatus",
+      "trend": "Groottetrend",
+      "activity": "Activiteit & vergrendelingen"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "De schema.pi-koppeling wordt voorbereid. Probeer het later opnieuw",
+      "CONN_UNSUPPORTED": "Deze verbinding wordt nog niet ondersteund (alleen directe PostgreSQL-verbindingen)",
+      "RATE": "Te veel aanvragen. Probeer het over een minuut opnieuw",
+      "LINK_AUTH": "Het koppelingstoken is verlopen of ingetrokken. Registreer het token opnieuw op de pagina Verbinden",
+      "LINK_SCOPE": "Deze verbinding behoort niet tot het onderwerpgebied van de koppeling",
+      "Q_UNKNOWN": "Niet-ondersteunde query. Controleer de schema.pi-koppeling API-versie",
+      "INVALID_INPUT": "De koppeling of verbindingswaarde is ongeldig"
+    },
+    "pgss": {
+      "title": "Hoe pg_stat_statements in te schakelen",
+      "note": "Zelf gehoste PostgreSQL vereist ook pg_stat_statements in shared_preload_libraries (postgresql.conf) en een herstart. Tabel-, index- en groottestatistieken werken zonder"
+    },
+    "collect": {
+      "intro": "Nu verzamelen leest de top query statistieken, tabellen, indexen en groottes één keer en slaat deze op als een snapshot. Verzamel minstens twee keer om wijzigingen en groottetrends te zien",
+      "run": "Nu verzamelen",
+      "running": "Verzamelen…",
+      "done": "Verzameld op {dtm} — {qry} queries · {tbl} tabellen · {idx} indexen"
+    },
+    "top": {
+      "sort": "Sorteren",
+      "sortTotal": "Totale tijd",
+      "sortMean": "Gemiddelde tijd",
+      "sortCalls": "Oproepen",
+      "empty": "Nog geen snapshots. Druk op Nu verzamelen op het tabblad Verzamelen",
+      "range": "Wijziging tussen {from} → {to}",
+      "first": "Eerste snapshot op {dtm} — cumulatieve waarden (wijzigingen vanaf het volgende snapshot)",
+      "query": "Query (literalen gemaskeerd)",
+      "calls": "Oproepen",
+      "totalMs": "Totaal ms",
+      "meanMs": "Gemiddelde ms",
+      "rows": "Rijen",
+      "reset": "Statistieken reset gedetecteerd — weergegeven als cumulatief"
+    },
+    "health": {
+      "empty": "Nog geen snapshots. Druk nu op Verzamelen op het tabblad Verzamelen",
+      "basis": "Gebaseerd op snapshot van {dtm}",
+      "unusedIdx": "Ongebruikte indexen",
+      "unusedIdxHint": "Indexen die sinds de laatste statistiekenreset (op grootte) nooit zijn gebruikt. Verwijder geen PK- of unieke-constraint-indexen",
+      "fullScan": "Overmatige volledige scans",
+      "fullScanHint": "Tabellen met 1.000+ live rijen waarbij volledige scans minstens de helft zijn — controleer indexen op filterkolommen",
+      "dead": "Overmatige dode tuples",
+      "deadHint": "Dode tuple-ratio 20% of meer — controleer VACUUM- en autovacuum-instellingen",
+      "none": "Geen",
+      "scans": "scans"
+    },
+    "trend": {
+      "limit": "Grootte drempel",
+      "empty": "Geen snapshots in de laatste 30 dagen",
+      "now": "Huidige grootte",
+      "perDay": "Groei per dag",
+      "needMore": "2+ snapshots nodig",
+      "daysLeft": "Bereikt {gb} GB",
+      "noGrowth": "Geen groeitrend",
+      "days": "over ongeveer {n} dagen"
+    },
+    "activity": {
+      "refresh": "Vernieuwen",
+      "live": "Live query — niet opgeslagen",
+      "sessions": "Sessieactiviteit",
+      "locks": "Vergrendelingen",
+      "none": "Geen"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pipelines",
+    "intro": "Controleer of een bron-DB klaar is voor change data capture (CDC) en ontwerp bron → transformatie → doel-pipelines. Deze fase controleert en ontwerpt alleen; er worden geen klantrijgegevens gelezen of opgeslagen.",
+    "needLink": "Kies eerst een schema.pi-link hierboven. Als u er geen heeft, registreer dan een token in het menu 'Link'.",
+    "needConn": "Kies de DB-verbinding die hierboven moet worden gecontroleerd.",
+    "loading": "Laden…",
+    "pager": "Pagina's",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "runTitle": "Uitvoeren & monitoren (7-3 · 7-4)",
+    "runBody": "Pipeline-uitvoering, lag-monitoring en herverwerking zijn beschikbaar zodra de worker-agent en het beveiligingsmodel zijn afgerond. Sla voor nu definities op als concepten (DRAFT).",
+    "pre": {
+      "title": "Bron pre-check",
+      "intro": "Voor elke tabel worden wijzigingstijdskolommen, soft-delete-kolommen en de primaire sleutel gecontroleerd om een opnamemethode (adapter) aan te bevelen, en wordt de WAL logische replicatiegereedheid gecontroleerd. Alleen read-only catalogus- en instellingenquery's.",
+      "schema": "Schema (optioneel)",
+      "schemaPh": "Alles",
+      "run": "Pre-check uitvoeren",
+      "running": "Controleren…",
+      "sum": "{tables} tabellen · {noPk} zonder PK · {deleteUnseen} kan verwijderingen niet vastleggen",
+      "truncated": "Een catalogusquery heeft de limiet van 500 rijen bereikt, dus sommige tabellen kunnen ontbreken. Specificeer een schema en controleer opnieuw.",
+      "empty": "Geen tabellen om te controleren",
+      "colTable": "Tabel",
+      "colChg": "Wijzigingstijdskolom",
+      "colDel": "Soft-delete kolom",
+      "colAdapter": "Aanbevolen methode · redenen",
+      "toDraft": "Pipeline-concept maken van {n} geselecteerde"
+    },
+    "ready": {
+      "ok": "WAL logische replicatie gereed — tabellen met een PK kunnen LOGICAL gebruiken",
+      "no": "WAL logische replicatie niet gereed — vastleggen via polling of sleutelvergelijking",
+      "senders": "{n} replicatieverbindingen"
+    },
+    "adapter": {
+      "LOGICAL": "Logische replicatie (WAL)",
+      "POLL": "Polling wijzigingstijd",
+      "KEY_DIFF": "Sleutel snapshot diff",
+      "NONE": "Alleen volledige herlading"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Heeft wijzigingstijdskolom",
+      "NO_CHG_COL": "Geen wijzigingstijdskolom",
+      "HAS_SOFT_DEL": "Heeft soft-delete kolom",
+      "NO_SOFT_DEL": "Geen soft-delete kolom",
+      "HAS_PK": "Heeft primaire sleutel",
+      "NO_PK": "Geen primaire sleutel — gewijzigde rijen kunnen niet worden geïdentificeerd",
+      "DELETE_UNSEEN": "Polling kan fysieke DELETEs niet vastleggen (soft-delete kolom aanbevolen)",
+      "LOGICAL_NOT_READY": "Kan overschakelen naar LOGICAL zodra WAL logische replicatie gereed is",
+      "FULL_RELOAD_ONLY": "Geen PK of wijzigingstijdskolom, dus geen incrementele vastlegging — voeg een PK toe",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level is niet logical (wijzigen vereist een DB-herstart)",
+      "NO_SLOTS": "max_replication_slots is 0",
+      "NO_SENDERS": "max_wal_senders is 0",
+      "IS_STANDBY": "Standby-server — neem logische replicatie van de primaire",
+      "SETTINGS_UNKNOWN": "Kon instellingen niet lezen, gereedheid onbekend"
+    },
+    "ed": {
+      "title": "Pipeline-definities",
+      "draftOnly": "Alleen ontwerp — opgeslagen als concepten (DRAFT)",
+      "new": "Nieuwe pipeline",
+      "empty": "Geen opgeslagen pipelines",
+      "manual": "Handmatig",
+      "edit": "Bewerken",
+      "remove": "Verwijderen",
+      "removeConfirm": "Pipeline '{name}' verwijderen?",
+      "name": "Naam",
+      "adapter": "Opnamemethode",
+      "srcConn": "Bronverbinding",
+      "useCurrentConn": "Gebruik de hierboven gekozen verbinding",
+      "sched": "Schema (5-veld cron, leeg = handmatig)",
+      "target": "Doel",
+      "targetPh": "bijv. analyse-DB analytics.public / lake s3://…",
+      "tables": "Brontabellen (gescheiden door nieuwe regel of komma)",
+      "steps": "Stappen (bron → transformatie → doel)",
+      "op": "Bewerking",
+      "notePh": "Beschrijving · voorwaarde (optioneel)",
+      "addTransform": "Transformatie stap toevoegen",
+      "save": "Opslaan",
+      "saving": "Opslaan…",
+      "saved": "Opgeslagen",
+      "close": "Sluiten"
+    },
+    "kind": {
+      "SOURCE": "Bron",
+      "TRANSFORM": "Transformatie",
+      "TARGET": "Doel"
+    },
+    "sts": {
+      "DRAFT": "Concept"
+    },
+    "check": {
+      "NAME_REQUIRED": "Voer een naam in",
+      "CONN_REQUIRED": "Kies een bronverbinding",
+      "CRON_INVALID": "Voer het schema in als 5-veld cron (min uur dag maand weekdag; cijfers, *, ',', -, /)",
+      "OP_REQUIRED": "Voer een bewerking in voor elke stap",
+      "STEPS_TOO_FEW": "Bron- en doelstappen zijn vereist",
+      "STEPS_TOO_MANY": "Maximaal 20 stappen",
+      "STEP_FIRST_SOURCE": "De eerste stap moet de bron zijn",
+      "STEP_LAST_TARGET": "De laatste stap moet het doel zijn",
+      "STEP_MIDDLE_TRANSFORM": "Alleen transformatiestappen kunnen ertussenin zitten"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Een pipeline met deze naam bestaat al. Gebruik een andere naam",
+      "CONN_UNSUPPORTED": "Deze verbinding kan nog niet worden gecontroleerd (voorlopig alleen PostgreSQL directe serververbindingen)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL Tuning Lab",
+    "intro": "Kies een verbinding en voer SQL in om het uitvoeringsplan als een boom te zien, met oorzaken van vertraging (volledige scans, geneste lussen, grote sorteringen) en SQL anti-patronen gecontroleerd tegen schema.pi standaard domeinen. Query's worden nooit daadwerkelijk uitgevoerd (geen ANALYZE).",
+    "needLink": "Selecteer eerst een link en verbinding hierboven om plannen te bekijken. De anti-patrooncontrole werkt zonder link.",
+    "sqlLabel": "SQL (één SELECT- of WITH-statement)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Toon plan",
+    "explaining": "Laden…",
+    "save": "Plan opslaan",
+    "saving": "Opslaan…",
+    "saveName": "Label (bijv. vóór het toevoegen van index)",
+    "saveNote": "Constante waarden in de SQL en plancondities worden gemaskeerd als ? wanneer opgeslagen.",
+    "plan": {
+      "title": "Uitvoeringsplan",
+      "summary": "Totale kosten {cost} · {ms}ms",
+      "cost": "kosten",
+      "rows": "rijen",
+      "width": "breedte"
+    },
+    "warn": {
+      "none": "Geen opmerkelijke waarschuwingen.",
+      "SEQ_SCAN_LARGE": "Volledige scan op {relation} (ongeveer {rows} rijen) — overweeg een index op de filterkolommen.",
+      "NESTED_LOOP_HIGH": "Geneste lus produceert ongeveer {rows} rijen — overweeg een hash- of merge-join, of een index op de join-conditie.",
+      "SORT_SPILL": "Sorteergrootte is ongeveer {kb}KB, boven de standaard work_mem (4MB); het kan naar schijf morsen."
+    },
+    "lint": {
+      "run": "Controleer anti-patronen",
+      "title": "SQL anti-patrooncontrole",
+      "none": "Geen anti-patronen gevonden.",
+      "domainsOff": "Standaard domeinen konden niet worden geladen; alleen gecontroleerd met standaard kolom-suffixregels.",
+      "types": {
+        "num": "numeriek",
+        "date": "datum",
+        "char": "teken"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — selecteer alleen de kolommen die u nodig heeft (extra I/O, geen covering index).",
+        "FUNC_ON_COLUMN": "De filterkolom {column} is verpakt in een functie of expressie, dus de index kan niet worden gebruikt — transformeer in plaats daarvan de constante.",
+        "LEADING_WILDCARD": "LIKE met een voorloop % kan geen B-tree index gebruiken — overweeg een pg_trgm GIN index.",
+        "OR_DIFF_COLUMNS": "Condities op verschillende kolommen worden gecombineerd met OR — overweeg UNION ALL of per-kolom indexen.",
+        "IMPLICIT_CAST": "{column} wordt vergeleken met een geciteerd nummer — match de kolom- en constantetypen (impliciete cast).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) retourneert niets wanneer NULLs aanwezig zijn en is traag — gebruik NOT EXISTS.",
+        "NO_WHERE": "Geen WHERE-clausule — op een grote tabel is dit een volledige scan (voeg een conditie of LIMIT toe).",
+        "DOMAIN_MISMATCH": "{column} is een {expected} type volgens standaard domein, maar wordt vergeleken met een constante van een ander type — de impliciete cast kan indexgebruik voorkomen."
+      }
+    },
+    "saved": {
+      "title": "Opgeslagen plannen · Vergelijken",
+      "empty": "Geen opgeslagen plannen. Bekijk een plan en sla het vervolgens op.",
+      "pick": "Selecteer plan om te vergelijken",
+      "pick2": "Selecteer twee plannen om te vergelijken.",
+      "compare": "Vergelijk twee plannen",
+      "delete": "Verwijderen",
+      "cost": "kosten",
+      "prev": "Vorige",
+      "next": "Volgende",
+      "page": "Pagina {page}"
+    },
+    "diff": {
+      "cost": "Totale kosten {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "De twee plannen zijn voor verschillende SQL (na normalisatie).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Geen wijziging in plannodes.",
+      "before": "Voor",
+      "after": "Na"
+    },
+    "ai": {
+      "title": "AI tuning advies",
+      "badge": "Binnenkort beschikbaar",
+      "body": "Binnenkort beschikbaar (na goedkeuring en impactmeting) — advies wordt gegenereerd uit SQL met gemaskeerde constanten en wordt pas als toegepast geregistreerd na DA-goedkeuring en gemeten impact."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "De schema.pi linkfunctie wordt voorbereid. Probeer het over korte tijd opnieuw.",
+      "LINK_AUTH": "Het linktoken is verlopen of ingetrokken. Geef een nieuw token uit in schema.pi en registreer het opnieuw.",
+      "LINK_SCOPE": "Deze link kan die verbinding niet gebruiken (ander classificatieschema).",
+      "CONN_UNSUPPORTED": "Dit verbindingstype wordt nog niet ondersteund (alleen PostgreSQL serververbindingen).",
+      "Q_UNKNOWN": "Niet-ondersteunde query.",
+      "SQL_NOT_SELECT": "Plannen zijn alleen beschikbaar voor een enkele instructie die begint met SELECT of WITH.",
+      "TIMEOUT": "De aanvraag is verlopen (5 seconden). Verkort de SQL of probeer het later opnieuw.",
+      "RATE": "Te veel aanvragen. Probeer het over een minuut opnieuw.",
+      "PAYLOAD_TOO_LARGE": "Het plan is te groot om op te slaan.",
+      "LINK_NOT_FOUND": "Link niet gevonden. Selecteer de link opnieuw."
+    }
+  },
+  "nav": {
+    "label": "Functies",
+    "connect": "Verbinden",
+    "sqlLab": "SQL Tuning",
+    "perf": "Prestaties",
+    "monitor": "Monitoring",
+    "drift": "Drift",
+    "migration": "Migratie",
+    "pipeline": "Pipeline",
+    "analytics": "Analyse",
+    "ops": "Ops Veiligheid",
+    "learn": "Leren"
   }
 }

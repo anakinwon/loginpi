@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Aplikasi kerja DBA·SQLP untuk menjalankan mesin DB dengan cepat dan aman"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Jadikan mesin DB Anda menjalankan data dengan cepat dan aman",
+    "description": "Aplikasi kerja DBA·SQLP untuk rencana eksekusi, statistik, dan kinerja. schema.pi menangani desain dan standar; dbms.pi adalah mitranya di sisi mesin.",
+    "welcome": "Selamat datang, {name}.",
+    "featTitle": "Fitur",
+    "featDesc": {
+      "connect": "Daftarkan token tautan schema.pi dan periksa status koneksi",
+      "sqlLab": "Pohon rencana, peringatan, perbandingan, dan pemeriksaan anti-pola terhadap domain standar",
+      "perf": "Kueri lambat Top-N, kesehatan tabel/indeks, perkiraan kapasitas, aktivitas, dan kunci",
+      "monitor": "Ringkasan metrik Aplikasi, DB, dan URL dengan peringatan ambang batas",
+      "drift": "Bandingkan model schema.pi dan riwayat DDL dengan katalog sebenarnya, ukur efek indeks",
+      "migration": "Urutan pemuatan topologi, potongan, daftar periksa, dan SQL verifikasi",
+      "pipeline": "Pemeriksaan awal tangkapan perubahan dan definisi pipeline sumber→transformasi→target",
+      "analytics": "Dasbor KPI, pemetaan lake 3 lapis, dan katalog dataset",
+      "ops": "Diagnosis hanya-baca parameter, peran, pencadangan, dan DR replikasi",
+      "learn": "Soal latihan SQLP·DAP, kasus penyetelan, dan kamus perbandingan DBMS"
+    }
+  },
   "auth": {
     "checking": "Memeriksa masuk…",
     "signedIn": "{name}",
@@ -64,5 +87,836 @@
     "LINK_CODE_GEN_FAILED": "Tidak dapat membuat kode tautan. Silakan coba lagi nanti.",
     "AUTH_DB_UNAVAILABLE": "Tidak dapat menyimpan akun Anda, jadi masuk gagal. Silakan coba lagi nanti.",
     "LINK_TRY_LIMIT": "Terlalu banyak kode tautan yang salah. Coba lagi dalam 15 menit."
+  },
+  "analytics": {
+    "title": "Analitik & Lake",
+    "intro": "KPI aktivitas dbms, desain lake tiga lapis, dan katalog dataset dalam satu tempat.",
+    "storageNotice": "Penyimpanan lake (sisi pelanggan atau cloud) belum diputuskan (PRD bagian 10 #7). Saat ini hanya desain dan pemetaan nama yang disimpan — tidak ada data baris.",
+    "noLink": "Pilih atau daftarkan tautan schema.pi terlebih dahulu.",
+    "goConnect": "Daftarkan tautan",
+    "loading": "Memuat…",
+    "refresh": "Segarkan",
+    "kpi": {
+      "title": "Dasbor KPI",
+      "updatedAt": "{area} · per {time}",
+      "notBuilt": "Belum dibangun",
+      "keys": {
+        "links": "Tautan saya",
+        "perf": "Snapshot kinerja",
+        "drift": "Jalankan drift",
+        "mig": "Rencana migrasi",
+        "pipe": "Pipeline",
+        "lake": "Dataset Lake"
+      },
+      "countsChart": "Total berdasarkan fitur",
+      "trendTitle": "Snapshot kinerja dalam 14 hari terakhir",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Tidak ada snapshot kinerja dalam 14 hari terakhir.",
+      "monTitle": "Ringkasan monitor schema.pi (jam terakhir)",
+      "monTps": "Permintaan/dtk",
+      "monErr": "Tingkat kesalahan",
+      "monAvg": "Rata-rata respons (ms)",
+      "monDb": "Koneksi DB",
+      "monFail": "Tidak dapat memuat ringkasan monitor: {msg}"
+    },
+    "lake": {
+      "title": "Desain lake tiga lapis",
+      "raw": "Mentah",
+      "rawDesc": "Memuat nama dan tipe kolom DB sumber apa adanya.",
+      "std": "Terstandardisasi",
+      "stdDesc": "Mengganti nama kolom menjadi istilah standar yang disetujui schema.pi.",
+      "cur": "Terpilih",
+      "curDesc": "Dataset analisis dikelompokkan berdasarkan entitas.",
+      "loadProjects": "Muat proyek",
+      "project": "Proyek",
+      "pickProject": "Pilih proyek",
+      "noProjects": "Tidak ada proyek di area ini.",
+      "noTables": "Model proyek ini tidak memiliki tabel.",
+      "conform": "Kesesuaian standar {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} kolom · {pct}% sesuai",
+      "colSrc": "Kolom sumber",
+      "colStd": "Kolom terstandardisasi",
+      "colType": "Tipe",
+      "colOk": "Format",
+      "ok": "OK",
+      "ng": "Periksa",
+      "pk": "PK",
+      "selectAll": "Pilih semua",
+      "selected": "{cnt} dipilih",
+      "save": "Tambahkan ke desain lake",
+      "saved": "Menambahkan {cnt} ke katalog."
+    },
+    "catalog": {
+      "title": "Katalog dataset",
+      "schemaCard": "schema.pi adalah sumber kebenaran untuk definisi dataset analisis, pencarian metadata, dan glosarium. Di sini Anda hanya melihat status pemuatan lake dan kesegaran.",
+      "openSchema": "Lihat definisi di schema.pi",
+      "empty": "Belum ada tabel yang ditambahkan ke desain lake.",
+      "status": {
+        "DSGN": "Hanya desain",
+        "LOADED": "Dimuat",
+        "FAIL": "Gagal memuat"
+      },
+      "lastLoad": "Pemuatan terakhir {time}",
+      "neverLoaded": "Belum pernah dimuat",
+      "remove": "Hapus",
+      "removeConfirm": "Hapus {tbl} dari katalog?",
+      "prev": "Sebelumnya",
+      "next": "Berikutnya",
+      "page": "Halaman {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Pilih tautan terlebih dahulu.",
+      "NOT_FOUND": "Tidak ditemukan. Periksa apakah model telah berubah."
+    }
+  },
+  "drift": {
+    "title": "Drift Model ↔ DB",
+    "intro": "Bandingkan model desain schema.pi dan riwayat penerapan DDL dengan katalog DB langsung untuk menemukan drift, dan ukur apakah indeks yang dirancang benar-benar digunakan. Data baris pelanggan tidak pernah dibaca atau disimpan.",
+    "needLink": "Pilih tautan schema.pi di atas terlebih dahulu. Jika Anda tidak memilikinya, daftarkan token di menu 'Tautan'.",
+    "needConn": "Pilih koneksi DB untuk dibandingkan di atas.",
+    "project": "Proyek",
+    "projectPick": "Pilih proyek",
+    "loading": "Memuat…",
+    "run": "Jalankan deteksi drift",
+    "running": "Membandingkan…",
+    "readOnly": "Hanya kueri katalog dan statistik hanya-baca yang dijalankan.",
+    "applyInSchema": "Terapkan perbaikan (edit model, pembuatan dan eksekusi DDL) di schema.pi, sumber kebenaran.",
+    "history": "Riwayat deteksi",
+    "prev": "Sebelumnya",
+    "next": "Berikutnya",
+    "none": "Tidak ada",
+    "model": "Model",
+    "reqNo": "Permintaan {id}",
+    "notSaved": "Tidak dapat menyimpan jalankan ini ke riwayat (hasil ditampilkan secara normal).",
+    "capped": "Terlalu banyak item — menampilkan {cap} pertama per bagian (jumlah lengkap).",
+    "statsMissing": "Statistik penggunaan indeks tidak tersedia, sehingga penggunaan tidak dapat dinilai.",
+    "sum": {
+      "missingTables": "Tabel hilang di DB",
+      "extraTables": "Tabel tidak ada dalam model",
+      "colMismatches": "Ketidakcocokan kolom",
+      "missingIndexes": "Indeks yang dirancang hilang di DB",
+      "extraIndexes": "Indeks tidak ada dalam model",
+      "ddlMissing": "Objek hilang setelah diterapkan",
+      "unusedIndexes": "Indeks yang dirancang tidak digunakan"
+    },
+    "sec": {
+      "ddlMissing": "DDL diterapkan tetapi hilang di DB",
+      "missingTables": "Tabel dalam model tetapi hilang di DB",
+      "extraTables": "Tabel di DB tetapi tidak ada dalam model",
+      "colMismatches": "Ketidakcocokan tipe kolom / NULL",
+      "missingIndexes": "Indeks yang dirancang hilang di DB",
+      "extraIndexes": "Indeks hanya di DB (tidak termasuk PK)",
+      "idxUsage": "Efektivitas indeks yang dirancang"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi mencatat objek-objek ini sebagai diterapkan, tetapi hilang — duga penghapusan manual atau rollback.",
+      "extraTables": "Ini mungkin milik proyek lain atau tabel sistem pada koneksi ini.",
+      "idxUsage": "Nol pemindaian sejak reset statistik terakhir berarti tidak digunakan. Periksa jendela statistik sebelum menghapus."
+    },
+    "kind": {
+      "MISSING": "hilang di DB",
+      "EXTRA": "tidak ada dalam model",
+      "TYPE": "tipe berbeda",
+      "NULL": "nullability berbeda"
+    },
+    "col": {
+      "idx": "Indeks",
+      "scans": "Pemindaian",
+      "size": "Ukuran",
+      "status": "Putusan"
+    },
+    "usage": {
+      "USED": "Digunakan",
+      "UNUSED": "Indeks yang dirancang tidak digunakan",
+      "NO_STATS": "Tidak ada statistik"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Tautan schema.pi belum siap. Silakan coba lagi sebentar lagi.",
+      "LINK_DOWN": "Tidak dapat menjangkau schema.pi. Silakan coba lagi sebentar lagi.",
+      "LINK_AUTH": "Token tautan telah kedaluwarsa atau dicabut. Keluarkan token baru di schema.pi dan daftarkan lagi.",
+      "LINK_NOT_FOUND": "Tautan tidak ditemukan. Silakan pilih tautan lagi.",
+      "LINK_SCOPE": "Koneksi ini bukan milik taksonomi tautan.",
+      "CONN_UNSUPPORTED": "Koneksi tidak didukung (hanya koneksi server PostgreSQL untuk saat ini).",
+      "TIMEOUT": "Permintaan habis waktu. Silakan coba lagi sebentar lagi.",
+      "RATE": "Terlalu banyak permintaan. Silakan coba lagi dalam satu menit."
+    }
+  },
+  "learn": {
+    "title": "Pembelajaran DBA",
+    "intro": "Soal latihan SQLP/DAP, buku kasus penyetelan, dan kamus perbandingan Oracle/Tibero/PostgreSQL. Berfungsi tanpa tautan; pilih tautan untuk juga melihat pemetaan tipe standar schema.pi Anda.",
+    "loading": "Memuat…",
+    "tabs": {
+      "quiz": "Latihan",
+      "cases": "Kasus penyetelan",
+      "dict": "Kamus DBMS"
+    },
+    "topics": {
+      "INDEX": "Pemindaian indeks",
+      "JOIN": "Metode gabungan",
+      "PARTITION": "Pemangkasan partisi",
+      "NORMAL": "Normalisasi",
+      "NAMING": "Penamaan standar",
+      "ISOLATION": "Tingkat isolasi",
+      "LOCK": "Kunci"
+    },
+    "levels": {
+      "1": "Dasar",
+      "2": "Menengah",
+      "3": "Lanjutan"
+    },
+    "quiz": {
+      "score": "Kemajuan saya",
+      "scoreLine": "{solved} dari {total} diselesaikan · {correct} benar",
+      "right": "Benar",
+      "wrong": "Salah",
+      "retry": "Coba lagi",
+      "prevRight": "Sebelumnya benar",
+      "prevWrong": "Sebelumnya salah"
+    },
+    "cases": {
+      "notice": "Semua kasus adalah contoh pembelajaran yang ditulis sendiri; angka-angka bersifat ilustratif (bukan data pelanggan).",
+      "problem": "SQL masalah",
+      "plan": "Ringkasan rencana",
+      "cause": "Penyebab",
+      "fix": "SQL yang diperbaiki",
+      "effect": "Efek"
+    },
+    "cats": {
+      "ALL": "Semua",
+      "TYPE": "Tipe data",
+      "FUNC": "Fungsi",
+      "PAGING": "Paging",
+      "SEQ": "Urutan",
+      "DATE": "Tanggal",
+      "SYNTAX": "Sintaks"
+    },
+    "dict": {
+      "search": "Cari (mis. NVL, LIMIT)",
+      "item": "Item",
+      "note": "Catatan",
+      "empty": "Tidak ada item yang cocok",
+      "loading": "Memuat…",
+      "liveTitle": "Pemetaan tipe standar area subjek saya",
+      "liveIntro": "Pilih tautan untuk memuat profil DBMS schema.pi (tipe logis → fisik). Kamus di atas berfungsi tanpa tautan.",
+      "liveLoad": "Muat pemetaan tipe",
+      "lgcType": "Tipe logis"
+    }
+  },
+  "link2": {
+    "title": "Koneksi schema.pi",
+    "intro": "Daftarkan token koneksi untuk menggunakan koneksi DB dari area subjek schema.pi di dbms.pi. Token disimpan terenkripsi, dan tidak ada data baris dari database Anda yang disimpan.",
+    "howTitle": "Cara mengeluarkan token koneksi",
+    "how1": "Masuk ke schema.pi dan buka area subjek untuk dihubungkan",
+    "how2": "Buka Area subjek → Pengaturan → Token koneksi dan tekan 'Keluarkan token' (admin area atau peran DA)",
+    "how3": "Salin token yang dimulai dengan slk_ — hanya ditampilkan sekali saat dikeluarkan",
+    "how4": "Tempel di bawah dan daftarkan",
+    "openSchema": "Buka schema.pi",
+    "registerTitle": "Daftarkan koneksi",
+    "tokenLabel": "Token koneksi",
+    "tokenPlaceholder": "slk_…",
+    "register": "Daftar",
+    "registering": "Memeriksa…",
+    "registered": "Area subjek '{area}' sekarang terhubung",
+    "replaced": "Mengganti token area subjek '{area}'",
+    "myLinks": "Koneksi saya",
+    "empty": "Tidak ada koneksi yang terdaftar",
+    "loading": "Memuat…",
+    "regDtm": "Terdaftar {dtm}",
+    "remove": "Putuskan koneksi",
+    "removeConfirm": "Putuskan koneksi '{area}'? Layar yang menggunakan koneksi ini tidak akan dapat mengaksesnya lagi.",
+    "prev": "Sebelumnya",
+    "next": "Berikutnya",
+    "statusTitle": "Status koneksi",
+    "noConns": "Tidak ada koneksi DB di area subjek ini (tambahkan satu di schema.pi)",
+    "colConn": "Koneksi",
+    "colDbms": "DBMS",
+    "colMthd": "Metode",
+    "colHost": "Host",
+    "colTest": "Tes terakhir",
+    "colAgent": "Agen terakhir terlihat",
+    "never": "Tidak ada",
+    "retry": "Coba lagi",
+    "pickerLink": "Tautan",
+    "pickerConn": "Koneksi",
+    "pickerEmpty": "Tidak ada koneksi —",
+    "pickerGo": "daftarkan satu di /connect",
+    "errors": {
+      "LINK_AUTH": "Token koneksi telah kedaluwarsa atau dicabut. Keluarkan token baru di schema.pi dan daftarkan lagi",
+      "LINK_SCOPE": "Koneksi ini bukan milik area subjek yang ditautkan",
+      "LINK_DOWN": "Tidak dapat menjangkau schema.pi. Silakan coba lagi sebentar lagi",
+      "LINK_NOT_FOUND": "Koneksi tidak ditemukan",
+      "LINK_DUP": "Pendaftaran sudah berlangsung. Silakan coba lagi",
+      "CONN_UNSUPPORTED": "Koneksi tidak didukung (hanya koneksi server PostgreSQL untuk saat ini)",
+      "Q_UNKNOWN": "Kueri tidak dikenal",
+      "SQL_NOT_SELECT": "Hanya satu pernyataan SELECT (atau WITH) yang dapat dijalankan",
+      "PGSS_MISSING": "Ekstensi pg_stat_statements tidak diinstal pada DB target",
+      "TIMEOUT": "Permintaan habis waktu",
+      "RATE": "Terlalu banyak permintaan. Silakan coba lagi dalam satu menit",
+      "INVALID_INPUT": "Tempel token koneksi lengkap yang dimulai dengan slk_"
+    }
+  },
+  "migration": {
+    "title": "Migrasi Data (PiMig)",
+    "intro": "Menghitung urutan pemuatan tabel dari hubungan dalam model desain schema.pi Anda, mengatur ukuran chunk, paralelisme, dan daftar periksa cutover, serta menghasilkan SQL verifikasi yang Anda jalankan sendiri di sumber dan target. Layar ini hanya merencanakan dan memeriksa — tidak memindahkan data atau membaca baris DB pelanggan.",
+    "needLink": "Pilih tautan schema.pi di atas terlebih dahulu. Jika Anda tidak memilikinya, daftarkan token di bawah 'Hubungkan'.",
+    "loading": "Memuat…",
+    "newPlan": "Rencana migrasi baru",
+    "project": "Proyek",
+    "projectPick": "Pilih proyek",
+    "planNm": "Nama rencana",
+    "planNmHint": "Default ke nama proyek",
+    "create": "Buat rencana",
+    "creating": "Membuat…",
+    "snapHint": "Desain pada saat ini (nama tabel, kolom, dan hubungan) dibekukan sebagai snapshot. Buat rencana baru saat model berubah.",
+    "plans": "Rencana migrasi",
+    "prev": "Sebelumnya",
+    "next": "Berikutnya",
+    "sts": {
+      "DRAFT": "Draf",
+      "READY": "Siap"
+    },
+    "del": "Hapus",
+    "delConfirm": "Hapus rencana ini?",
+    "snapInfo": "Snapshot: {tables} tabel · {rels} relasi",
+    "dropped": "({n} relasi tanpa tabel fisik dikecualikan dari pengurutan)",
+    "chunkSize": "Ukuran bongkahan (baris/commit)",
+    "parallel": "Paralelisme (tabel sekaligus)",
+    "saveOpts": "Simpan opsi",
+    "optsHint": "Paralelisme adalah jumlah tabel yang dimuat secara bersamaan dalam satu level. Ukuran bongkahan adalah unit commit (baris) yang akan digunakan oleh mesin eksekusi.",
+    "order": "Urutan muat",
+    "orderHint": "Diurutkan secara topologi berdasarkan relasi desain (bukan FK fisik) sehingga tabel induk didahulukan. Tabel dalam level yang sama tidak saling bergantung dan dapat dimuat secara paralel.",
+    "cycles": "{n} grup sirkular — ditempatkan di level yang sama. Atur urutannya secara manual dan tunda pemeriksaan referensi hingga setelah pemuatan.",
+    "selfRefs": "Tabel yang mereferensikan diri sendiri (hierarkis) — muat baris induk terlebih dahulu dalam tabel",
+    "level": "Level {n}",
+    "checklist": "Daftar periksa cutover",
+    "toReady": "Tandai sebagai siap",
+    "toDraft": "Kembali ke draf",
+    "readyNeedAll": "Periksa setiap item sebelum menandai rencana siap.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "Titik serah CDC",
+        "desc": "Catat titik sumber yang konsisten sebelum pemuatan awal (PG LSN · Oracle/Tibero SCN · untuk polling, waktu mulai dikurangi jendela tumpang tindih), mulai CDC dari sana, dan serap duplikat dalam jendela serah dengan upsert."
+      },
+      "valueConv": {
+        "title": "Konversi nilai",
+        "desc": "Aturan ditetapkan untuk string kosong = NULL, padding kosong CHAR, NUMBER tanpa presisi → NUMERIC, DATE dengan waktu → TIMESTAMP, VARCHAR2 BYTE ↔ panjang CHAR, dan LONG·RAW."
+      },
+      "charset": {
+        "title": "Set karakter",
+        "desc": "Set karakter sumber (KO16MSWIN949, UTF8, …) dikonfirmasi, dengan kolom yang meluap karena pertumbuhan multibyte dan isolasi karakter yang tidak dapat dikonversi diputuskan."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB dialirkan dalam bongkahan (ukuran dan batas memori) dan diverifikasi berdasarkan panjang + hash."
+      },
+      "seqResync": {
+        "title": "Sinkronisasi ulang urutan",
+        "desc": "Setelah pemuatan, urutan·identitas target diatur ke max(key)+1."
+      },
+      "timezone": {
+        "title": "Zona waktu · kolom sistem",
+        "desc": "Zona waktu interpretasi untuk nilai tanpa zona waktu (misalnya Asia/Seoul) diatur, pemicu waktu modifikasi tidak akan menimpa stempel waktu sumber selama pemuatan, dan aturan substitusi pembuat/pengubah diatur."
+      },
+      "backpressure": {
+        "title": "Backpressure · beban target",
+        "desc": "Kurangi ukuran bongkahan dan paralelisme pada lag target, pertumbuhan WAL, atau penantian kunci; buat indeks non-PK setelah pemuatan dan jalankan ANALYZE·VACUUM setelahnya."
+      }
+    },
+    "verify": "SQL Verifikasi",
+    "verifyHint": "Menghasilkan kueri hitungan, jumlah kolom numerik, kunci duplikat, dan hash kunci per tabel dalam urutan muat. Jalankan sendiri pada sumber dan target dan bandingkan (layar ini tidak menjalankannya).",
+    "noHashOracle": "Fungsi hash dan rendering teks Oracle·Tibero berbeda dari PostgreSQL, jadi kueri hash dihilangkan — bandingkan hitungan, jumlah, dan kunci duplikat.",
+    "copy": "Salin",
+    "copied": "Disalin",
+    "copyFail": "Tidak dapat menyalin. Pilih teks dan salin secara manual.",
+    "engine": {
+      "title": "Eksekusi·restart · latihan·rollback",
+      "body": "Eksekusi migrasi aktual (checkpoint, backpressure, isolasi baris kesalahan) dan latihan, rollback, serta pencatatan titik awal CDC akan tersedia setelah model keamanan agen pekerja (A10) diselesaikan. Untuk saat ini, ini mencakup perencanaan, pemeriksaan, dan SQL verifikasi."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Tautan schema.pi sedang disiapkan. Silakan coba lagi sebentar lagi.",
+      "LINK_DOWN": "Tidak dapat menjangkau schema.pi. Silakan coba lagi sebentar lagi.",
+      "LINK_AUTH": "Token tautan telah kedaluwarsa atau dicabut. Keluarkan token baru di schema.pi dan daftarkan lagi.",
+      "LINK_NOT_FOUND": "Tautan tidak ditemukan. Silakan pilih tautan lagi.",
+      "LINK_SCOPE": "Proyek ini bukan milik taksonomi tautan.",
+      "TIMEOUT": "Permintaan habis waktu. Silakan coba lagi sebentar lagi.",
+      "RATE": "Terlalu banyak permintaan. Coba lagi dalam satu menit.",
+      "MIG_NO_TABLES": "Proyek ini tidak memiliki tabel fisik untuk dimigrasikan. Konversi ke fisik di schema.pi terlebih dahulu.",
+      "MIG_CHECK_INCOMPLETE": "Periksa setiap item daftar periksa cutover sebelum menandai rencana siap.",
+      "NOT_FOUND": "Rencana tidak ditemukan."
+    }
+  },
+  "monitor": {
+    "title": "Pusat Pemantauan",
+    "collectNote": "Pengumpulan berjalan di schema.pi — migrasi direncanakan (D7). Halaman ini membaca ringkasan monitor schema.pi.",
+    "noLink": "Pilih atau daftarkan tautan schema.pi terlebih dahulu.",
+    "goConnect": "Daftarkan tautan",
+    "period": "Periode",
+    "periods": {
+      "30": "30 menit",
+      "60": "1 jam",
+      "360": "6 jam",
+      "1440": "24 jam"
+    },
+    "refresh": "Segarkan",
+    "loading": "Memuat…",
+    "updatedAt": "{area} · per {time} (refresh otomatis setiap 30 detik)",
+    "appTitle": "Performa aplikasi",
+    "dbTitle": "Status DB berdasarkan koneksi",
+    "urlTitle": "Pemeriksaan URL",
+    "empty": "Tidak ada data untuk ditampilkan.",
+    "breachTitle": "{n} pelanggaran ambang batas",
+    "rulesTitle": "Aturan ambang batas",
+    "rulesNote": "Aturan disimpan untuk tautan ini dan dievaluasi terhadap ringkasan yang diterima; pelanggaran akan mendapatkan batas merah (notifikasi akan datang nanti).",
+    "metric": "Metrik",
+    "conn": "Koneksi",
+    "allConns": "Semua koneksi",
+    "op": "Bandingkan",
+    "threshold": "Ambang batas",
+    "thrInvalid": "Masukkan angka untuk ambang batas.",
+    "addRule": "Tambah aturan",
+    "noRules": "Belum ada aturan.",
+    "enable": "Aktifkan",
+    "disable": "Nonaktifkan",
+    "delete": "Hapus",
+    "delConfirm": "Hapus aturan ini?",
+    "aiNote": "Analisis insiden AI dan persetujuan perbaikan masih dilakukan di monitor schema.pi.",
+    "aiLink": "Buka monitor schema.pi",
+    "metrics": {
+      "APP_TPS": "TPS (permintaan/dtk)",
+      "APP_ERR_PCT": "Tingkat kesalahan (%)",
+      "APP_SLOW_CNT": "Permintaan lambat",
+      "APP_AVG_MS": "Rata-rata respons (ms)",
+      "DB_SESS_CNT": "Sesi",
+      "DB_LOCK_WAIT_CNT": "Penantian kunci",
+      "DB_CACHE_HIT_PCT": "Cache hit (%)",
+      "DB_SIZE_MB": "Ukuran DB (MB)",
+      "URL_RSP_MS": "Respons URL (ms)",
+      "URL_FAIL_CNT": "Kegagalan URL"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Pilih tautan terlebih dahulu.",
+      "NOT_IMPLEMENTED": "Tautan schema.pi sedang disiapkan. Silakan coba lagi nanti.",
+      "LINK_AUTH": "Token tautan tidak valid atau kedaluwarsa. Keluarkan token baru di schema.pi dan daftarkan.",
+      "LINK_SCOPE": "Tautan ini tidak dapat mengakses taksonomi tersebut.",
+      "RATE": "Terlalu banyak permintaan. Silakan coba lagi sebentar lagi.",
+      "TIMEOUT": "schema.pi merespons dengan lambat. Silakan coba lagi sebentar lagi.",
+      "RULE_LIMIT": "Maksimal 50 aturan per tautan.",
+      "NOT_FOUND": "Aturan tidak ditemukan."
+    }
+  },
+  "ops": {
+    "title": "Keamanan Operasi DB",
+    "loading": "Memuat…",
+    "pickFirst": "Pilih tautan dan koneksi di atas terlebih dahulu",
+    "run": "Jalankan diagnosis",
+    "running": "Mendiagnosis…",
+    "noRun": "Belum ada diagnosis. Tekan \"Jalankan diagnosis\"",
+    "lastRun": "Diagnosis terakhir {dtm}",
+    "readOnly": "Diagnosis hanya membaca (SELECT). Saran adalah panduan dan bergantung pada memori server, beban, dan beban kerja",
+    "truncated": "Terlalu banyak objek — hanya 500 pertama yang diperiksa",
+    "paramsNote": "Total memori server tidak diketahui, jadi diperkirakan dari shared_buffers ≈ 25% RAM. random_page_cost mengasumsikan SSD",
+    "auditNote": "Tabel dengan RLS mati dan akun yang tidak digunakan akan diperiksa setelah kueri tautan mendukungnya",
+    "replNote": "Dasar adalah Active-Standby (A-S) — satu primary + standby. Lag replay ≥ 5 detik = peringatan, ≥ 60 detik = risiko (referensi RPO terukur)",
+    "lagIdle": "Tidak ada perubahan",
+    "pager": "Penomoran halaman",
+    "prev": "Sebelumnya",
+    "next": "Berikutnya",
+    "tabs": {
+      "params": "Parameter",
+      "audit": "Akun & hak istimewa",
+      "backup": "Pencadangan & pemulihan",
+      "repl": "Replikasi & DR",
+      "history": "Riwayat"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Peringatan",
+      "RISK": "Risiko"
+    },
+    "role": {
+      "primary": "Koneksi ini = Primary",
+      "standby": "Koneksi ini = Standby",
+      "unknown": "Peran tidak diketahui"
+    },
+    "col": {
+      "level": "Putusan",
+      "item": "Item",
+      "value": "Nilai",
+      "reason": "Detail",
+      "standby": "Standby",
+      "state": "Status",
+      "sync": "Sinkronisasi",
+      "lag": "Lag replay"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "Peran BYPASSRLS",
+      "bypass_ok": "Peran BYPASSRLS",
+      "no_expiry": "Kedaluwarsa kata sandi",
+      "expiry_ok": "Kedaluwarsa kata sandi",
+      "public_grant": "Hibah PUBLIC",
+      "public_ok": "Hibah PUBLIC",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "WAL terakhir diarsipkan",
+      "arc_stale": "WAL terakhir diarsipkan",
+      "arc_recent": "WAL terakhir diarsipkan",
+      "arc_failing": "Kegagalan arsip WAL"
+    },
+    "rules": {
+      "sb_default": "Pada default (128MB). Pada server khusus sekitar 25% RAM direkomendasikan",
+      "sb_ok": "Ditetapkan di atas default",
+      "wm_over": "max_connections × work_mem melebihi perkiraan memori. Pengurutan bersamaan berisiko kehabisan memori",
+      "wm_default": "Pada default (4MB). Pengurutan dan hash besar dapat meluap ke disk",
+      "wm_ok": "Dalam rentang yang wajar",
+      "mwm_default": "Pada default (64MB). VACUUM dan pembuatan indeks mungkin lambat; pertimbangkan 256MB atau lebih",
+      "mwm_ok": "Ditetapkan di atas default",
+      "av_on": "autovacuum aktif",
+      "av_off": "autovacuum mati. Risiko tinggi pembengkakan tabel dan wraparound ID transaksi",
+      "conn_high": "max_connections tinggi. Setiap koneksi menggunakan memori; pooler (PgBouncer dll.) direkomendasikan",
+      "conn_ok": "Dalam rentang yang wajar",
+      "lmd_off": "Pencatatan kueri lambat mati (-1). Sekitar 1000ms direkomendasikan",
+      "lmd_all": "Setiap pernyataan dicatat (0). Overhead pencatatan yang berat",
+      "lmd_ok": "Pencatatan kueri lambat aktif",
+      "st_off": "Tidak ada batas waktu pernyataan di seluruh server (0). Atur batas per peran atau aplikasi",
+      "st_ok": "Batas waktu pernyataan diatur",
+      "iit_off": "Tidak ada batas waktu idle-in-transaction (0). Dapat menyebabkan penahanan kunci dan pembengkakan",
+      "iit_ok": "Batas waktu idle-in-transaction diatur",
+      "ckpt_short": "Interval checkpoint 5 menit atau kurang. Pertimbangkan 10–15 menit untuk beban tulis yang berat",
+      "ckpt_ok": "Dalam rentang yang wajar",
+      "wal_minimal": "wal_level=minimal membuat PITR dan replikasi tidak mungkin. Gunakan replika atau lebih tinggi",
+      "wal_ok": "Level WAL mendukung PITR dan replikasi",
+      "rpc_hdd": "Default HDD (4). Untuk SSD, 1.1–2 direkomendasikan",
+      "rpc_ok": "Cocok untuk SSD",
+      "super_many": "Dua atau lebih superuser. Pertahankan satu untuk administrasi dan berikan hanya hak istimewa yang dibutuhkan kepada yang lain",
+      "super_ok": "Paling banyak satu superuser",
+      "bypass_rls": "Peran non-superuser yang melewati keamanan tingkat baris ada",
+      "bypass_ok": "Tidak ada peran yang melewati RLS",
+      "no_expiry": "Peran login tanpa kedaluwarsa kata sandi. Atur VALID UNTIL untuk akun pribadi",
+      "expiry_ok": "Semua peran login memiliki kedaluwarsa",
+      "public_grant": "PUBLIC (setiap peran) memiliki hak istimewa tabel. Hak istimewa tulis berisiko",
+      "public_ok": "Tidak ada hak istimewa tabel yang diberikan kepada PUBLIC",
+      "arc_on": "Pengarsipan WAL (archive_mode) aktif",
+      "arc_off": "Pengarsipan WAL mati, sehingga pemulihan point-in-time (PITR) tidak mungkin",
+      "arc_cmd_empty": "archive_mode aktif tetapi archive_command dan archive_library kosong",
+      "arc_never": "Belum ada WAL yang diarsipkan",
+      "arc_stale": "Arsip WAL terakhir lebih dari 24 jam yang lalu",
+      "arc_recent": "WAL diarsipkan dalam 24 jam terakhir",
+      "arc_failing": "Pengarsipan WAL saat ini gagal. Periksa disk, izin, dan jalur target",
+      "repl_is_standby": "Koneksi ini adalah standby (mode pemulihan). Periksa lag dari koneksi primary",
+      "repl_none": "Tidak ada standby yang terhubung. Tidak ada pengaturan pemulihan bencana (DR)",
+      "repl_ok": "Standby mengalirkan secara normal",
+      "repl_lag": "Standby tertinggal atau tidak mengalirkan"
+    },
+    "manual": {
+      "title": "Daftar periksa manual",
+      "intro": "Praktik pencadangan dan pemulihan yang tidak dapat diperiksa secara otomatis. Centang saat dikonfirmasi dan catat buktinya",
+      "memo": "Memo (misalnya alat, jadwal, terakhir diperiksa)",
+      "save": "Simpan",
+      "updated": "Diperbarui {dtm}",
+      "items": {
+        "base_backup": "Pencadangan penuh (pg_basebackup dll.) berhasil dalam 7 hari terakhir",
+        "offsite_copy": "Salinan cadangan disimpan di luar lokasi (wilayah atau penyimpanan lain)",
+        "restore_rehearsal": "Latihan pemulihan dilakukan kuartal ini dan durasinya dicatat",
+        "pitr_target": "Prosedur PITR dan target RPO/RTO didokumentasikan",
+        "backup_encrypt": "File cadangan dienkripsi dan akses dibatasi",
+        "retention": "Periode retensi cadangan dan kebijakan penghapusan ditentukan"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Tautan schema.pi sedang disiapkan. Silakan coba lagi sebentar lagi",
+      "CONN_UNSUPPORTED": "Koneksi ini belum didukung (hanya PostgreSQL langsung)",
+      "TIMEOUT": "DB target merespons terlalu lambat. Silakan coba lagi sebentar lagi",
+      "RATE": "Terlalu banyak panggilan. Coba lagi dalam satu menit",
+      "Q_UNKNOWN": "Kueri tidak didukung. Periksa versi API tautan schema.pi",
+      "INVALID_INPUT": "Pilihan tautan atau koneksi tidak valid"
+    }
+  },
+  "perf": {
+    "title": "Performa",
+    "loading": "Memuat…",
+    "pickFirst": "Pilih tautan dan koneksi di atas terlebih dahulu",
+    "pager": "Penomoran halaman",
+    "tabs": {
+      "collect": "Kumpulkan",
+      "top": "Kueri lambat",
+      "health": "Kesehatan tabel & indeks",
+      "trend": "Tren ukuran",
+      "activity": "Aktivitas & kunci"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Tautan schema.pi sedang disiapkan. Silakan coba lagi nanti",
+      "PGSS_MISSING": "Ekstensi pg_stat_statements tidak terinstal di DB ini, sehingga statistik kueri tidak dapat dilihat",
+      "CONN_UNSUPPORTED": "Koneksi ini belum didukung (hanya koneksi PostgreSQL langsung)",
+      "TIMEOUT": "Respons DB target lambat dan telah dihentikan. Silakan coba lagi nanti",
+      "RATE": "Terlalu banyak permintaan. Coba lagi dalam satu menit",
+      "LINK_AUTH": "Token tautan telah kedaluwarsa atau dicabut. Daftarkan kembali token di halaman Koneksi",
+      "LINK_SCOPE": "Koneksi ini bukan milik area subjek tautan",
+      "Q_UNKNOWN": "Kueri tidak didukung. Periksa versi API tautan schema.pi",
+      "INVALID_INPUT": "Nilai tautan atau koneksi tidak valid"
+    },
+    "pgss": {
+      "title": "Cara mengaktifkan pg_stat_statements",
+      "body": "Kueri Lambat Top-N memerlukan ekstensi pg_stat_statements. Jalankan pernyataan di bawah ini dengan akun administrator DB. Di Supabase, Anda dapat mengaktifkannya di Dasbor Database → Extensions",
+      "note": "PostgreSQL yang dihosting sendiri juga membutuhkan pg_stat_statements di shared_preload_libraries (postgresql.conf) dan restart. Statistik tabel, indeks, dan ukuran berfungsi tanpanya"
+    },
+    "collect": {
+      "intro": "Kumpulkan sekarang membaca statistik kueri teratas, tabel, indeks, dan ukuran sekali dan menyimpannya sebagai snapshot. Kumpulkan setidaknya dua kali untuk melihat perubahan dan tren ukuran",
+      "run": "Kumpulkan sekarang",
+      "running": "Mengumpulkan…",
+      "done": "Dikumpulkan pada {dtm} — {qry} kueri · {tbl} tabel · {idx} indeks"
+    },
+    "top": {
+      "sort": "Urutkan",
+      "sortTotal": "Total waktu",
+      "sortMean": "Waktu rata-rata",
+      "sortCalls": "Panggilan",
+      "empty": "Belum ada snapshot. Tekan Kumpulkan sekarang di tab Kumpulkan",
+      "range": "Perubahan antara {from} → {to}",
+      "first": "Snapshot pertama pada {dtm} — nilai kumulatif (perubahan dari snapshot berikutnya)",
+      "query": "Kueri (literal disamarkan)",
+      "calls": "Panggilan",
+      "totalMs": "Total ms",
+      "meanMs": "Rata-rata ms",
+      "rows": "Baris",
+      "reset": "Deteksi reset statistik — ditampilkan sebagai kumulatif"
+    },
+    "health": {
+      "empty": "Belum ada snapshot. Tekan Kumpulkan sekarang di tab Kumpulkan",
+      "basis": "Berdasarkan snapshot pada {dtm}",
+      "unusedIdx": "Indeks tidak terpakai",
+      "unusedIdxHint": "Indeks tidak pernah digunakan sejak reset statistik terakhir (berdasarkan ukuran). Jangan hapus PK atau indeks batasan unik",
+      "fullScan": "Pemindaian penuh berlebihan",
+      "fullScanHint": "Tabel dengan 1.000+ baris aktif di mana pemindaian penuh setidaknya setengah — tinjau indeks pada kolom filter",
+      "dead": "Tuple mati berlebihan",
+      "deadHint": "Rasio tuple mati 20% atau lebih — periksa pengaturan VACUUM dan autovacuum",
+      "none": "Tidak ada",
+      "scans": "pemindaian"
+    },
+    "trend": {
+      "limit": "Ambang batas ukuran",
+      "empty": "Tidak ada snapshot dalam 30 hari terakhir",
+      "chart": "Tren ukuran DB selama 30 hari terakhir",
+      "now": "Ukuran saat ini",
+      "perDay": "Pertumbuhan per hari",
+      "needMore": "Membutuhkan 2+ snapshot",
+      "daysLeft": "Mencapai {gb} GB",
+      "noGrowth": "Tidak ada tren pertumbuhan",
+      "days": "dalam sekitar {n} hari"
+    },
+    "activity": {
+      "refresh": "Segarkan",
+      "live": "Kueri langsung — tidak disimpan",
+      "sessions": "Aktivitas sesi",
+      "locks": "Kunci",
+      "none": "Tidak ada"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pipeline",
+    "intro": "Periksa apakah DB sumber siap untuk perubahan pengambilan data (CDC) dan rancang pipeline sumber → transformasi → target. Tahap ini hanya memeriksa dan merancang; tidak ada data baris pelanggan yang dibaca atau disimpan.",
+    "needLink": "Pilih tautan schema.pi di atas terlebih dahulu. Jika Anda tidak memilikinya, daftarkan token di menu 'Tautan'.",
+    "needConn": "Pilih koneksi DB untuk diperiksa di atas.",
+    "loading": "Memuat…",
+    "pager": "Halaman",
+    "prev": "Sebelumnya",
+    "next": "Berikutnya",
+    "runTitle": "Jalankan & pantau (7-3 · 7-4)",
+    "runBody": "Eksekusi pipeline, pemantauan lag, dan pemrosesan ulang akan tersedia setelah agen pekerja dan model keamanan diselesaikan. Untuk saat ini, simpan definisi sebagai draf (DRAFT).",
+    "pre": {
+      "title": "Pra-pemeriksaan sumber",
+      "intro": "Untuk setiap tabel, periksa kolom waktu perubahan, kolom penghapusan lunak, dan kunci utama untuk merekomendasikan metode pengambilan (adapter), dan periksa kesiapan replikasi logis WAL. Hanya kueri katalog dan pengaturan baca-saja.",
+      "schema": "Skema (opsional)",
+      "schemaPh": "Semua",
+      "run": "Jalankan pra-pemeriksaan",
+      "running": "Memeriksa…",
+      "sum": "{tables} tabel · {noPk} tanpa PK · {deleteUnseen} tidak dapat menangkap penghapusan",
+      "truncated": "Kueri katalog mencapai batas 500 baris, jadi beberapa tabel mungkin hilang. Tentukan skema dan periksa lagi.",
+      "empty": "Tidak ada tabel untuk diperiksa",
+      "colTable": "Tabel",
+      "colChg": "Kolom waktu perubahan",
+      "colDel": "Kolom penghapusan lunak",
+      "colAdapter": "Metode yang direkomendasikan · alasan",
+      "toDraft": "Buat draf pipeline dari {n} yang dipilih"
+    },
+    "ready": {
+      "ok": "Replikasi logis WAL siap — tabel dengan PK dapat menggunakan LOGICAL",
+      "no": "Replikasi logis WAL tidak siap — ambil melalui polling atau perbandingan kunci",
+      "senders": "{n} koneksi replikasi"
+    },
+    "adapter": {
+      "LOGICAL": "Replikasi logis (WAL)",
+      "POLL": "Polling waktu perubahan",
+      "KEY_DIFF": "Perbedaan snapshot kunci",
+      "NONE": "Hanya muat ulang penuh"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Memiliki kolom waktu perubahan",
+      "NO_CHG_COL": "Tidak ada kolom waktu perubahan",
+      "HAS_SOFT_DEL": "Memiliki kolom penghapusan lunak",
+      "NO_SOFT_DEL": "Tidak ada kolom penghapusan lunak",
+      "HAS_PK": "Memiliki kunci utama",
+      "NO_PK": "Tidak ada kunci utama — baris yang diubah tidak dapat diidentifikasi",
+      "DELETE_UNSEEN": "Polling tidak dapat menangkap DELETE fisik (kolom penghapusan lunak direkomendasikan)",
+      "LOGICAL_NOT_READY": "Dapat beralih ke LOGICAL setelah replikasi logis WAL siap",
+      "FULL_RELOAD_ONLY": "Tidak ada PK atau kolom waktu perubahan, jadi tidak ada pengambilan inkremental — tambahkan PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level bukan logical (mengubahnya membutuhkan restart DB)",
+      "NO_SLOTS": "max_replication_slots adalah 0",
+      "NO_SENDERS": "max_wal_senders adalah 0",
+      "IS_STANDBY": "Server standby — ambil replikasi logis dari primary",
+      "SETTINGS_UNKNOWN": "Tidak dapat membaca pengaturan, kesiapan tidak diketahui"
+    },
+    "ed": {
+      "title": "Definisi pipeline",
+      "draftOnly": "Hanya desain — disimpan sebagai draf (DRAFT)",
+      "new": "Pipeline baru",
+      "empty": "Tidak ada pipeline yang disimpan",
+      "manual": "Manual",
+      "edit": "Edit",
+      "remove": "Hapus",
+      "removeConfirm": "Hapus pipeline '{name}'?",
+      "name": "Nama",
+      "adapter": "Metode pengambilan",
+      "srcConn": "Koneksi sumber",
+      "useCurrentConn": "Gunakan koneksi yang dipilih di atas",
+      "sched": "Jadwal (cron 5-kolom, kosong = manual)",
+      "target": "Target",
+      "targetPh": "misalnya DB analitik analytics.public / lake s3://…",
+      "tables": "Tabel sumber (dipisahkan baris baru atau koma)",
+      "steps": "Langkah-langkah (sumber → transformasi → target)",
+      "op": "Operasi",
+      "notePh": "Deskripsi · kondisi (opsional)",
+      "addTransform": "Tambahkan langkah transformasi",
+      "save": "Simpan",
+      "saving": "Menyimpan…",
+      "saved": "Tersimpan",
+      "close": "Tutup"
+    },
+    "kind": {
+      "SOURCE": "Sumber",
+      "TRANSFORM": "Transformasi",
+      "TARGET": "Target"
+    },
+    "sts": {
+      "DRAFT": "Draf"
+    },
+    "check": {
+      "NAME_REQUIRED": "Masukkan nama",
+      "CONN_REQUIRED": "Pilih koneksi sumber",
+      "CRON_INVALID": "Masukkan jadwal sebagai cron 5-kolom (menit jam hari bulan hari_kerja; digit, *, ',', -, /)",
+      "OP_REQUIRED": "Masukkan operasi untuk setiap langkah",
+      "STEPS_TOO_FEW": "Langkah sumber dan target diperlukan",
+      "STEPS_TOO_MANY": "Hingga 20 langkah",
+      "STEP_FIRST_SOURCE": "Langkah pertama harus sumber",
+      "STEP_LAST_TARGET": "Langkah terakhir harus target",
+      "STEP_MIDDLE_TRANSFORM": "Hanya langkah transformasi yang dapat berada di antaranya"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Pipeline dengan nama ini sudah ada. Gunakan nama lain",
+      "CONN_UNSUPPORTED": "Koneksi ini belum dapat diperiksa (hanya koneksi server langsung PostgreSQL untuk saat ini)"
+    }
+  },
+  "sqlLab": {
+    "title": "Lab Penyetelan SQL",
+    "intro": "Pilih koneksi dan masukkan SQL untuk melihat rencana eksekusi sebagai pohon, dengan penyebab perlambatan (pemindaian penuh, loop bersarang, pengurutan besar) dan anti-pola SQL diperiksa terhadap domain standar schema.pi. Kueri tidak pernah benar-benar dieksekusi (tanpa ANALYZE).",
+    "needLink": "Pilih tautan dan koneksi di atas terlebih dahulu untuk melihat rencana. Pemeriksaan anti-pola berfungsi tanpa tautan.",
+    "sqlLabel": "SQL (satu pernyataan SELECT atau WITH)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Tampilkan rencana",
+    "explaining": "Memuat…",
+    "save": "Simpan rencana",
+    "saving": "Menyimpan…",
+    "saveName": "Label (misalnya sebelum menambahkan indeks)",
+    "saveNote": "Nilai konstanta dalam SQL dan kondisi rencana disamarkan sebagai ? saat disimpan.",
+    "plan": {
+      "title": "Rencana eksekusi",
+      "summary": "Total biaya {cost} · {ms}ms",
+      "cost": "biaya",
+      "rows": "baris",
+      "width": "lebar"
+    },
+    "warn": {
+      "none": "Tidak ada peringatan yang mencolok.",
+      "SEQ_SCAN_LARGE": "Pemindaian penuh pada {relation} (sekitar {rows} baris) — pertimbangkan indeks pada kolom filter.",
+      "NESTED_LOOP_HIGH": "Loop bersarang menghasilkan sekitar {rows} baris — pertimbangkan hash atau merge join, atau indeks pada kondisi join.",
+      "SORT_SPILL": "Ukuran pengurutan sekitar {kb}KB, di atas work_mem default (4MB); mungkin tumpah ke disk."
+    },
+    "lint": {
+      "run": "Periksa anti-pola",
+      "title": "Pemeriksaan anti-pola SQL",
+      "none": "Tidak ada anti-pola yang ditemukan.",
+      "domainsOff": "Domain standar tidak dapat dimuat; diperiksa hanya dengan aturan sufiks kolom default.",
+      "types": {
+        "num": "numerik",
+        "date": "tanggal",
+        "char": "karakter"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — pilih hanya kolom yang Anda butuhkan (I/O ekstra, tidak ada indeks penutup).",
+        "FUNC_ON_COLUMN": "Kolom filter {column} dibungkus dalam fungsi atau ekspresi, sehingga indeksnya tidak dapat digunakan — ubah konstanta sebagai gantinya.",
+        "LEADING_WILDCARD": "LIKE dengan % di depan tidak dapat menggunakan indeks B-tree — pertimbangkan indeks GIN pg_trgm.",
+        "OR_DIFF_COLUMNS": "Kondisi pada kolom yang berbeda digabungkan dengan OR — pertimbangkan UNION ALL atau indeks per kolom.",
+        "IMPLICIT_CAST": "{column} dibandingkan dengan angka yang dikutip — cocokkan jenis kolom dan konstanta (implicit cast).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) tidak mengembalikan apa pun ketika NULL ada dan lambat — gunakan NOT EXISTS.",
+        "NO_WHERE": "Tidak ada klausa WHERE — pada tabel besar ini adalah pemindaian penuh (tambahkan kondisi atau LIMIT).",
+        "DOMAIN_MISMATCH": "{column} adalah tipe {expected} berdasarkan domain standar tetapi dibandingkan dengan konstanta tipe lain — implicit cast dapat mencegah penggunaan indeks."
+      }
+    },
+    "saved": {
+      "title": "Rencana tersimpan · Bandingkan",
+      "empty": "Tidak ada rencana yang disimpan. Lihat rencana, lalu simpan.",
+      "pick": "Pilih rencana untuk dibandingkan",
+      "pick2": "Pilih dua rencana untuk dibandingkan.",
+      "compare": "Bandingkan dua rencana",
+      "delete": "Hapus",
+      "cost": "biaya",
+      "prev": "Sebelumnya",
+      "next": "Berikutnya",
+      "page": "Halaman {page}"
+    },
+    "diff": {
+      "cost": "Total biaya {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Kedua rencana adalah untuk SQL yang berbeda (setelah normalisasi).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Tidak ada perubahan pada node rencana.",
+      "before": "Sebelum",
+      "after": "Setelah"
+    },
+    "ai": {
+      "title": "Saran penyetelan AI",
+      "badge": "Segera hadir",
+      "body": "Segera hadir (setelah prosedur persetujuan dan pengukuran dampak) — saran akan dihasilkan dari SQL dengan konstanta yang disamarkan dan dicatat sebagai diterapkan hanya setelah persetujuan DA dan dampak terukur."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Fitur tautan schema.pi sedang disiapkan. Silakan coba lagi sebentar lagi.",
+      "LINK_AUTH": "Token tautan telah kedaluwarsa atau dicabut. Keluarkan token baru di schema.pi dan daftarkan lagi.",
+      "LINK_SCOPE": "Tautan ini tidak dapat menggunakan koneksi itu (skema klasifikasi yang berbeda).",
+      "CONN_UNSUPPORTED": "Jenis koneksi ini belum didukung (hanya koneksi server PostgreSQL).",
+      "Q_UNKNOWN": "Kueri tidak didukung.",
+      "SQL_NOT_SELECT": "Rencana hanya tersedia untuk satu pernyataan yang dimulai dengan SELECT atau WITH.",
+      "TIMEOUT": "Permintaan waktu habis (5 detik). Persingkat SQL atau coba lagi nanti.",
+      "RATE": "Terlalu banyak permintaan. Coba lagi dalam satu menit.",
+      "PAYLOAD_TOO_LARGE": "Rencana terlalu besar untuk disimpan.",
+      "LINK_NOT_FOUND": "Tautan tidak ditemukan. Silakan pilih tautan lagi."
+    }
+  },
+  "nav": {
+    "label": "Fitur",
+    "connect": "Hubungkan",
+    "sqlLab": "Penyetelan SQL",
+    "perf": "Performa",
+    "monitor": "Pemantauan",
+    "drift": "Penyimpangan",
+    "migration": "Migrasi",
+    "pipeline": "Pipeline",
+    "analytics": "Analitik",
+    "ops": "Keamanan Operasi",
+    "learn": "Pelajari"
   }
 }

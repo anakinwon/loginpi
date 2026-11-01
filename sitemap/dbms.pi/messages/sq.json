@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Një punishte DBA dhe SQLP për ekzekutimin e motorëve të DB shpejt dhe sigurt"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Bëni që motori juaj i DB të ekzekutojë të dhënat tuaja shpejt dhe sigurt",
+    "description": "Një punishte DBA dhe SQLP për planet e ekzekutimit, statistikat dhe performancën. schema.pi merret me dizajnin dhe standardet; dbms.pi është partneri i saj në anën e motorit.",
+    "welcome": "Mirë se vini, {name}.",
+    "featTitle": "Veçoritë",
+    "featDesc": {
+      "connect": "Regjistroni një token lidhjeje schema.pi dhe kontrolloni statusin e lidhjes",
+      "sqlLab": "Pema e planit, paralajmërimet, krahasimi dhe kontrollet kundër-model kundër fushave standarde",
+      "perf": "Top-N i pyetjeve të ngadalta, shëndeti i tabelës/indeksit, parashikimi i kapacitetit, aktiviteti dhe bllokimet",
+      "monitor": "Përmbledhje e metrikave të aplikacionit, DB dhe URL me alarme të pragut",
+      "drift": "Krahasoni modelin schema.pi dhe historikun DDL me katalogun real, matni efektin e indeksit",
+      "migration": "Renditja topologjike e ngarkimit, copat, lista e kontrollit dhe SQL-i i verifikimit",
+      "pipeline": "Parakontrolli i kapjes së ndryshimeve dhe përkufizimet e pipeline-it burim→transformim→target",
+      "analytics": "Paneli i KPI-ve, hartëzimi i liqenit me 3 shtresa dhe katalogu i grupeve të të dhënave",
+      "ops": "Diagnoza vetëm për lexim e parametrave, roleve, rezervës dhe replikimit DR",
+      "learn": "Pyetje praktike SQLP/DAP, raste akordimi dhe fjalor krahasimi i DBMS"
+    }
+  },
   "auth": {
     "checking": "Duke kontrolluar hyrjen…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "Nuk mund të krijohej një kod lidhjeje. Ju lutemi provoni përsëri më vonë.",
     "AUTH_DB_UNAVAILABLE": "Nuk mund të ruhej llogaria juaj, kështu që identifikimi dështoi. Ju lutemi provoni përsëri më vonë.",
     "LINK_TRY_LIMIT": "Shumë kode lidhjeje të pasakta. Provoni përsëri pas 15 minutash."
+  },
+  "analytics": {
+    "title": "Analitika dhe Liqeni",
+    "intro": "KPI-të e aktivitetit të dbms, dizajni i liqenit me tre shtresa dhe katalogu i grupeve të të dhënave në një vend.",
+    "storageNotice": "Ruajtja e liqenit (në anën e klientit ose në cloud) nuk është vendosur ende (PRD seksioni 10 #7). Për momentin ruhen vetëm dizajnet dhe hartëzimet e emrave — asnjë rresht të dhënash.",
+    "noLink": "Zgjidhni ose regjistroni një lidhje schema.pi së pari.",
+    "goConnect": "Regjistro një lidhje",
+    "loading": "Duke u ngarkuar…",
+    "refresh": "Rifresko",
+    "kpi": {
+      "title": "Paneli i KPI-ve",
+      "updatedAt": "{area} · që nga {time}",
+      "notBuilt": "Pa ndërtuar",
+      "keys": {
+        "links": "Lidhjet e mia",
+        "perf": "Fotografi të performancës",
+        "drift": "Ekzekutime të driftit",
+        "mig": "Plane migrimi",
+        "pipe": "Pipelines",
+        "lake": "Grupe të dhënash të liqenit"
+      },
+      "countsChart": "Totalet sipas veçorisë",
+      "trendTitle": "Fotografi të performancës në 14 ditët e fundit",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Nuk ka fotografi të performancës në 14 ditët e fundit.",
+      "monTitle": "Përmbledhja e monitorit schema.pi (ora e fundit)",
+      "monTps": "Kërkesa/s",
+      "monErr": "Shkalla e gabimeve",
+      "monAvg": "Përgjigje mesatare (ms)",
+      "monDb": "Lidhje DB",
+      "monFail": "Nuk mund të ngarkohej përmbledhja e monitorit: {msg}"
+    },
+    "lake": {
+      "title": "Dizajni i liqenit me tre shtresa",
+      "raw": "E papërpunuar",
+      "rawDesc": "Ngarkon emrat dhe llojet e kolonave të DB burim siç janë.",
+      "std": "E standardizuar",
+      "stdDesc": "Riemërton kolonat në terma standardë të aprovuar nga schema.pi.",
+      "cur": "E kuruar",
+      "curDesc": "Grupe të dhënash analize të grupuara sipas entitetit.",
+      "loadProjects": "Ngarko projekte",
+      "project": "Projekti",
+      "pickProject": "Zgjidh një projekt",
+      "noProjects": "Nuk ka projekte në këtë zonë.",
+      "noTables": "Modeli i këtij projekti nuk ka tabela.",
+      "conform": "Përputhshmëria standarde {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} kolona · {pct}% përputhshmëri",
+      "colSrc": "Kolona burim",
+      "colStd": "Kolona e standardizuar",
+      "colType": "Lloji",
+      "colOk": "Formati",
+      "ok": "OK",
+      "ng": "Kontrollo",
+      "pk": "PK",
+      "selectAll": "Zgjidh të gjitha",
+      "selected": "{cnt} të zgjedhura",
+      "save": "Shto në dizajnin e liqenit",
+      "saved": "Shtoi {cnt} në katalog."
+    },
+    "catalog": {
+      "title": "Katalogu i grupeve të të dhënave",
+      "schemaCard": "schema.pi është burimi i së vërtetës për përkufizimet e grupeve të të dhënave të analizës, kërkimin e metadatave dhe fjalorin. Këtu shihni vetëm statusin e ngarkimit të liqenit dhe freskinë.",
+      "openSchema": "Shiko përkufizimet në schema.pi",
+      "empty": "Nuk ka tabela të shtuara në dizajnin e liqenit ende.",
+      "status": {
+        "DSGN": "Vetëm dizajn",
+        "LOADED": "Ngarkuar",
+        "FAIL": "Ngarkimi dështoi"
+      },
+      "lastLoad": "Ngarkimi i fundit {time}",
+      "neverLoaded": "Asnjëherë i ngarkuar",
+      "remove": "Hiq",
+      "removeConfirm": "Të hiqet {tbl} nga katalogu?",
+      "prev": "Paraardhës",
+      "next": "Tjetër",
+      "page": "Faqja {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Zgjidhni një lidhje së pari.",
+      "NOT_FOUND": "Nuk u gjet. Kontrolloni nëse modeli ka ndryshuar."
+    }
+  },
+  "drift": {
+    "title": "Modeli ↔ DB Drift",
+    "intro": "Krahasoni modelin e dizajnit schema.pi dhe historikun e aplikimit DDL me katalogun e drejtpërdrejtë të DB për të gjetur driftin, dhe matni nëse indekset e dizajnuara përdoren në të vërtetë. Të dhënat e rreshtave të klientit nuk lexohen ose ruhen kurrë.",
+    "needLink": "Zgjidhni një lidhje schema.pi më lart së pari. Nëse nuk keni asnjë, regjistroni një token në menunë 'Lidhje'.",
+    "needConn": "Zgjidhni lidhjen e DB për të krahasuar më lart.",
+    "project": "Projekti",
+    "projectPick": "Zgjidh një projekt",
+    "loading": "Duke u ngarkuar…",
+    "run": "Ekzekuto zbulimin e driftit",
+    "running": "Duke krahasuar…",
+    "readOnly": "Ekzekutohen vetëm katalogu vetëm për lexim dhe pyetjet e statistikave.",
+    "applyInSchema": "Aplikoni rregullimet (redaktimet e modelit, gjenerimin dhe ekzekutimin e DDL) në schema.pi, burimin e së vërtetës.",
+    "history": "Historia e zbulimit",
+    "prev": "Paraardhës",
+    "next": "Tjetër",
+    "none": "Asnjë",
+    "model": "Modeli",
+    "reqNo": "Kërkesa {id}",
+    "notSaved": "Nuk mund të ruhej ky ekzekutim në histori (rezultatet shfaqen normalisht).",
+    "capped": "Shumë artikuj — po shfaqen {cap} të parat për seksion (numrat janë të plotë).",
+    "statsMissing": "Statistikat e përdorimit të indeksit nuk ishin të disponueshme, kështu që përdorimi nuk mund të gjykohej.",
+    "sum": {
+      "missingTables": "Tabela që mungojnë në DB",
+      "extraTables": "Tabela që nuk janë në model",
+      "colMismatches": "Moskorrespondime të kolonave",
+      "missingIndexes": "Indekset e dizajnuara që mungojnë në DB",
+      "extraIndexes": "Indekset që nuk janë në model",
+      "ddlMissing": "Objekte të zhdukura pas aplikimit",
+      "unusedIndexes": "Indekset e dizajnuara të papërdorura"
+    },
+    "sec": {
+      "ddlMissing": "DDL i aplikuar por mungon në DB",
+      "missingTables": "Tabela në model por mungojnë në DB",
+      "extraTables": "Tabela në DB por jo në model",
+      "colMismatches": "Moskorrespondime të tipit të kolonës / NULL",
+      "missingIndexes": "Indekset e dizajnuara që mungojnë në DB",
+      "extraIndexes": "Indekset vetëm në DB (duke përjashtuar PK)",
+      "idxUsage": "Efektiviteti i indeksit të dizajnuar"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi i regjistroi këto objekte si të aplikuara, por ato janë zhdukur — dyshoni për një fshirje manuale ose kthim prapa.",
+      "extraTables": "Këto mund t'u përkasin projekteve të tjera ose tabelave të sistemit në këtë lidhje.",
+      "idxUsage": "Zero skanime që nga rivendosja e fundit e statistikave do të thotë e papërdorur. Kontrolloni dritaren e statistikave para se të fshini."
+    },
+    "kind": {
+      "MISSING": "mungon në DB",
+      "EXTRA": "nuk është në model",
+      "TYPE": "lloji ndryshon",
+      "NULL": "ndryshon mundësia e NULL"
+    },
+    "col": {
+      "idx": "Indeksi",
+      "scans": "Skanime",
+      "size": "Madhësia",
+      "status": "Vendimi"
+    },
+    "usage": {
+      "USED": "Në përdorim",
+      "UNUSED": "Indeks i dizajnuar i papërdorur",
+      "NO_STATS": "Pa statistika"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Lidhja schema.pi nuk është gati ende. Ju lutemi provoni përsëri së shpejti.",
+      "LINK_DOWN": "Nuk mund të arrihet schema.pi. Ju lutemi provoni përsëri së shpejti.",
+      "LINK_AUTH": "Tokeni i lidhjes ka skaduar ose është revokuar. Lëshoni një token të ri në schema.pi dhe regjistrojeni përsëri.",
+      "LINK_NOT_FOUND": "Lidhja nuk u gjet. Ju lutemi zgjidhni lidhjen përsëri.",
+      "LINK_SCOPE": "Kjo lidhje nuk i përket taksonomisë së lidhjes.",
+      "CONN_UNSUPPORTED": "Lidhje e papërkrahur (vetëm lidhje serveri PostgreSQL për momentin).",
+      "TIMEOUT": "Kërkesa skadoi. Ju lutemi provoni përsëri së shpejti.",
+      "RATE": "Shumë kërkesa. Ju lutemi provoni përsëri pas një minute."
+    }
+  },
+  "learn": {
+    "title": "Mësimi i DBA",
+    "intro": "Pyetje praktike SQLP/DAP, një libër rastesh akordimi dhe një fjalor krahasimi Oracle/Tibero/PostgreSQL. Funksionon pa lidhje; zgjidhni një lidhje për të parë gjithashtu hartëzimin e tipit standard të schema.pi.",
+    "loading": "Duke u ngarkuar…",
+    "tabs": {
+      "quiz": "Praktikë",
+      "cases": "Raste akordimi",
+      "dict": "Fjalori i DBMS"
+    },
+    "topics": {
+      "INDEX": "Skanime indeksi",
+      "JOIN": "Metodat e bashkimit",
+      "PARTITION": "Prerja e ndarjes",
+      "NORMAL": "Normalizimi",
+      "NAMING": "Emërtimi standard",
+      "ISOLATION": "Nivelet e izolimit",
+      "LOCK": "Bllokimet"
+    },
+    "levels": {
+      "1": "Bazë",
+      "2": "E ndërmjetme",
+      "3": "E avancuar"
+    },
+    "quiz": {
+      "score": "Progresi im",
+      "scoreLine": "{solved} nga {total} të zgjidhura · {correct} të sakta",
+      "right": "E saktë",
+      "wrong": "E pasaktë",
+      "retry": "Provo përsëri",
+      "prevRight": "Më parë e saktë",
+      "prevWrong": "Më parë e pasaktë"
+    },
+    "cases": {
+      "notice": "Të gjitha rastet janë shembuj mësimorë të shkruar vetë; numrat janë ilustrues (jo të dhëna të klientit).",
+      "problem": "SQL problematik",
+      "plan": "Përmbledhja e planit",
+      "cause": "Shkaku",
+      "fix": "SQL i rregulluar",
+      "effect": "Efekti"
+    },
+    "cats": {
+      "ALL": "Të gjitha",
+      "TYPE": "Llojet e të dhënave",
+      "FUNC": "Funksionet",
+      "PAGING": "Faqosja",
+      "SEQ": "Sekuencat",
+      "DATE": "Datat",
+      "SYNTAX": "Sintaksa"
+    },
+    "dict": {
+      "search": "Kërko (p.sh. NVL, LIMIT)",
+      "item": "Artikull",
+      "note": "Shënim",
+      "empty": "Nuk ka artikuj që përputhen",
+      "loading": "Duke u ngarkuar…",
+      "liveTitle": "Hartëzimi i tipit standard të fushës sime të subjektit",
+      "liveIntro": "Zgjidhni një lidhje për të ngarkuar profilin e DBMS të schema.pi (lloji logjik → lloji fizik). Fjalori më lart funksionon pa lidhje.",
+      "liveLoad": "Ngarko hartëzimin e tipit",
+      "lgcType": "Lloji logjik"
+    }
+  },
+  "link2": {
+    "title": "Lidhja schema.pi",
+    "intro": "Regjistroni një token lidhjeje për të përdorur lidhjet e DB të një fushe subjekti schema.pi në dbms.pi. Tokenat ruhen të enkriptuar, dhe asnjë rresht të dhënash nga bazat tuaja të të dhënave nuk ruhet.",
+    "howTitle": "Si të lëshoni një token lidhjeje",
+    "how1": "Hyni në schema.pi dhe hapni fushën e subjektit për t'u lidhur",
+    "how2": "Shkoni te Fusha e subjektit → Cilësimet → Tokeni i lidhjes dhe shtypni 'Lësho token' (administrator i fushës ose roli DA)",
+    "how3": "Kopjoni tokenin që fillon me slk_ — ai shfaqet vetëm një herë kur lëshohet",
+    "how4": "Ngjiteni më poshtë dhe regjistrojeni",
+    "openSchema": "Hap schema.pi",
+    "registerTitle": "Regjistro lidhjen",
+    "tokenLabel": "Tokeni i lidhjes",
+    "tokenPlaceholder": "slk_…",
+    "register": "Regjistro",
+    "registering": "Duke kontrolluar…",
+    "registered": "Fusha e subjektit '{area}' është lidhur tani",
+    "replaced": "Zëvendësoi tokenin e fushës së subjektit '{area}'",
+    "myLinks": "Lidhjet e mia",
+    "empty": "Nuk ka lidhje të regjistruara",
+    "loading": "Duke u ngarkuar…",
+    "regDtm": "Regjistruar {dtm}",
+    "remove": "Shkëput",
+    "removeConfirm": "Të shkëputet '{area}'? Ekranet që përdorin këtë lidhje nuk do të mund ta aksesojnë më.",
+    "prev": "Paraardhës",
+    "next": "Tjetër",
+    "statusTitle": "Statusi i lidhjes",
+    "noConns": "Nuk ka lidhje DB në këtë fushë subjekti (shtoni një në schema.pi)",
+    "colConn": "Lidhja",
+    "colDbms": "DBMS",
+    "colMthd": "Metoda",
+    "colHost": "Hosti",
+    "colTest": "Testi i fundit",
+    "colAgent": "Agjenti i parë së fundmi",
+    "never": "Asnjë",
+    "retry": "Provo përsëri",
+    "pickerLink": "Lidhja",
+    "pickerConn": "Lidhja",
+    "pickerEmpty": "Nuk ka lidhje —",
+    "pickerGo": "regjistro një në /connect",
+    "errors": {
+      "LINK_AUTH": "Tokeni i lidhjes ka skaduar ose është revokuar. Lëshoni një token të ri në schema.pi dhe regjistrojeni përsëri",
+      "LINK_SCOPE": "Kjo lidhje nuk i përket fushës së subjektit të lidhur",
+      "LINK_DOWN": "Nuk mund të arrihet schema.pi. Ju lutemi provoni përsëri së shpejti",
+      "LINK_NOT_FOUND": "Lidhja nuk u gjet",
+      "LINK_DUP": "Regjistrimi tashmë në progres. Ju lutemi provoni përsëri",
+      "CONN_UNSUPPORTED": "Lidhje e papërkrahur (vetëm lidhje serveri PostgreSQL për momentin)",
+      "Q_UNKNOWN": "Pyetje e panjohur",
+      "SQL_NOT_SELECT": "Mund të ekzekutohet vetëm një deklaratë SELECT (ose WITH)",
+      "PGSS_MISSING": "Shtesa pg_stat_statements nuk është instaluar në DB target",
+      "TIMEOUT": "Kërkesa skadoi",
+      "RATE": "Shumë kërkesa. Ju lutemi provoni përsëri pas një minute",
+      "INVALID_INPUT": "Ngjiteni tokenin e plotë të lidhjes që fillon me slk_"
+    }
+  },
+  "migration": {
+    "title": "Migrimi i të Dhënave (PiMig)",
+    "intro": "Llogarit rendin e ngarkimit të tabelave nga marrëdhëniet në modelin tuaj të dizajnit schema.pi, organizon madhësinë e copave, paralelizmin dhe listën e kontrollit të kalimit, dhe gjeneron SQL-in e verifikimit që e ekzekutoni vetë në burim dhe target. Ky ekran vetëm planifikon dhe kontrollon — nuk lëviz të dhëna ose nuk lexon rreshtat e DB të klientit.",
+    "needLink": "Zgjidhni një lidhje schema.pi më lart së pari. Nëse nuk keni asnjë, regjistroni një token në menunë 'Lidhje'.",
+    "loading": "Duke u ngarkuar…",
+    "newPlan": "Plan i ri migrimi",
+    "project": "Projekti",
+    "projectPick": "Zgjidh një projekt",
+    "planNm": "Emri i planit",
+    "planNmHint": "Parazgjedhja është emri i projektit",
+    "create": "Krijo plan",
+    "creating": "Duke krijuar…",
+    "snapHint": "Dizajni në këtë moment (emrat e tabelave, kolonave dhe marrëdhënieve) është ngrirë si një fotografi. Krijoni një plan të ri kur modeli ndryshon.",
+    "plans": "Planet e migrimit",
+    "prev": "Paraardhës",
+    "next": "Tjetër",
+    "sts": {
+      "DRAFT": "Draft",
+      "READY": "Gati"
+    },
+    "del": "Fshij",
+    "delConfirm": "Ta fshij këtë plan?",
+    "snapInfo": "Pamje: {tables} tabela · {rels} marrëdhënie",
+    "dropped": "({n} marrëdhënie pa tabela fizike janë përjashtuar nga renditja)",
+    "chunkSize": "Madhësia e copës (rreshta/commit)",
+    "parallel": "Paralelizmi (tabela njëherësh)",
+    "saveOpts": "Ruaj opsionet",
+    "optsHint": "Paralelizmi është numri i tabelave të ngarkuara njëkohësisht brenda një niveli. Madhësia e copës është njësia e commit-it (rreshtat) që do të përdorë motori i ekzekutimit.",
+    "order": "Renditja e ngarkimit",
+    "orderHint": "Renditur topologjikisht sipas marrëdhënieve të projektimit (jo FK fizike) në mënyrë që tabelat prind të vijnë të parat. Tabelat në të njëjtin nivel nuk varen nga njëra-tjetra dhe mund të ngarkohen paralelisht.",
+    "cycles": "{n} grup(e) qarkore — vendosur në të njëjtin nivel. Vendosni rendin e tyre manualisht dhe shtyjini kontrollet e referencave deri pas ngarkimit.",
+    "selfRefs": "Tabela vetë-referuese (hierarkike) — ngarkoni rreshtat prindër së pari brenda tabelës",
+    "level": "Niveli {n}",
+    "checklist": "Lista e kontrollit të kalimit",
+    "toReady": "Shëno si gati",
+    "toDraft": "Kthehu te drafti",
+    "readyNeedAll": "Kontrolloni çdo artikull para se të shënoni planin gati.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "Pika e dorëzimit CDC",
+        "desc": "Regjistroni një pikë burimi konsistente para ngarkimit fillestar (PG LSN · Oracle/Tibero SCN · për polling, koha e fillimit minus një dritare mbivendosjeje), filloni CDC nga ajo, dhe thithni dublikatat në dritaren e dorëzimit me upserts."
+      },
+      "valueConv": {
+        "title": "Konvertimi i vlerës",
+        "desc": "Rregullat janë vendosur për string bosh = NULL, mbushje me hapësira CHAR, NUMBER pa precizion → NUMERIC, DATE me kohë → TIMESTAMP, VARCHAR2 BYTE ↔ gjatësi CHAR, dhe LONG·RAW."
+      },
+      "charset": {
+        "title": "Set i karaktereve",
+        "desc": "Seti i karaktereve burimor (KO16MSWIN949, UTF8, …) është konfirmuar, me kolona që tejkalojnë për shkak të rritjes së shumëbajtit dhe izolimit të karaktereve të pakonvertueshme të vendosura."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB transmetohen në copa (madhësia dhe kufizimet e memories) dhe verifikohen nga gjatësia + hash."
+      },
+      "seqResync": {
+        "title": "Rifreskimi i sekuencës",
+        "desc": "Pas ngarkimit, sekuencat·identitetet e objektivit vendosen në max(çelës)+1."
+      },
+      "timezone": {
+        "title": "Zona kohore · kolona të sistemit",
+        "desc": "Zona kohore e interpretimit për vlerat pa një të tillë (p.sh. Asia/Seoul) është vendosur, shkaktarët e kohës së modifikuar nuk do të mbishkruajnë kohëmatësit burimorë gjatë ngarkimit, dhe rregullat e zëvendësimit të krijuesit/modifikuesit janë vendosur."
+      },
+      "backpressure": {
+        "title": "Kundërpresioni · ngarkesa e objektivit",
+        "desc": "Reduktoni madhësinë e copës dhe paralelizmin në vonesën e objektivit, rritjen e WAL ose pritjet e bllokimit; ndërtoni indekset jo-PK pas ngarkimit dhe ekzekutoni ANALYZE·VACUUM më pas."
+      }
+    },
+    "verify": "SQL i verifikimit",
+    "verifyHint": "Gjeneron pyetje për numërimin, shumën e kolonave numerike, çelësat e dyfishtë dhe hash-in e çelësit për çdo tabelë në rendin e ngarkimit. Ekzekutojini vetë në burim dhe objektiv dhe krahasoni (ky ekran nuk i ekzekuton ato).",
+    "noHashOracle": "Funksionet hash dhe paraqitja e tekstit të Oracle·Tibero ndryshojnë nga PostgreSQL, kështu që pyetjet hash janë lënë jashtë — krahasoni numrat, shumat dhe çelësat e dyfishtë.",
+    "copy": "Kopjo",
+    "copied": "U kopjua",
+    "copyFail": "Nuk mund të kopjohej. Zgjidhni tekstin dhe kopjojeni manualisht.",
+    "engine": {
+      "title": "Ekzekutimi·rifillimi · provë·rikthim",
+      "body": "Ekzekutimi aktual i migrimit (pikat e kontrollit, kundërpresioni, izolimi i rreshtave të gabuar) dhe prova, rikthimi dhe regjistrimi i pikës fillestare të CDC do të vijnë pasi të finalizohet modeli i sigurisë së agjentit punëtor (A10). Për momentin kjo mbulon planifikimin, kontrollet dhe SQL-in e verifikimit."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Lidhja schema.pi po përgatitet. Ju lutemi provoni përsëri së shpejti.",
+      "LINK_DOWN": "Nuk mund të arrihet schema.pi. Ju lutemi provoni përsëri së shpejti.",
+      "LINK_AUTH": "Tokeni i lidhjes ka skaduar ose është revokuar. Lëshoni një token të ri në schema.pi dhe regjistrojeni përsëri.",
+      "LINK_NOT_FOUND": "Lidhja nuk u gjet. Ju lutemi zgjidhni lidhjen përsëri.",
+      "LINK_SCOPE": "Ky projekt nuk i përket taksonomisë së lidhjes.",
+      "TIMEOUT": "Kërkesa skadoi. Ju lutemi provoni përsëri së shpejti.",
+      "RATE": "Shumë kërkesa. Provoni përsëri pas një minute.",
+      "MIG_NO_TABLES": "Ky projekt nuk ka tabela fizike për të migruar. Konvertojini në fizike në schema.pi së pari.",
+      "MIG_CHECK_INCOMPLETE": "Kontrolloni çdo artikull të listës së kontrollit të kalimit para se të shënoni planin gati.",
+      "NOT_FOUND": "Plani nuk u gjet."
+    }
+  },
+  "monitor": {
+    "title": "Qendra e Monitorimit",
+    "collectNote": "Mbledhja ekzekutohet në schema.pi — migrimi i planifikuar (D7). Kjo faqe lexon përmbledhjen e monitorit schema.pi.",
+    "noLink": "Zgjidhni ose regjistroni një lidhje schema.pi së pari.",
+    "goConnect": "Regjistro një lidhje",
+    "period": "Periudha",
+    "periods": {
+      "30": "30 min",
+      "60": "1 orë",
+      "360": "6 orë",
+      "1440": "24 orë"
+    },
+    "refresh": "Rifresko",
+    "loading": "Po ngarkohet…",
+    "updatedAt": "{area} · që nga {time} (rifreskim automatik çdo 30s)",
+    "appTitle": "Performanca e aplikacionit",
+    "dbTitle": "Statusi i DB sipas lidhjes",
+    "urlTitle": "Kontrollet e URL-së",
+    "empty": "Nuk ka të dhëna për t'u shfaqur.",
+    "breachTitle": "{n} tejkalime të pragut",
+    "rulesTitle": "Rregullat e pragut",
+    "rulesNote": "Rregullat ruhen për këtë lidhje dhe vlerësohen kundër përmbledhjes së marrë; tejkalimet marrin një kufi të kuq (njoftimet vijnë më vonë).",
+    "metric": "Metrika",
+    "conn": "Lidhja",
+    "allConns": "Të gjitha lidhjet",
+    "op": "Krahaso",
+    "threshold": "Pragu",
+    "thrInvalid": "Vendosni një numër për pragun.",
+    "addRule": "Shto rregull",
+    "noRules": "Ende nuk ka rregulla.",
+    "enable": "Aktivizo",
+    "disable": "Çaktivizo",
+    "delete": "Fshij",
+    "delConfirm": "Ta fshij këtë rregull?",
+    "aiNote": "Analiza e incidenteve AI dhe miratimi i rregullimit ende ndodhin në monitorin schema.pi.",
+    "aiLink": "Hap monitorin schema.pi",
+    "metrics": {
+      "APP_TPS": "TPS (kërkesa/s)",
+      "APP_ERR_PCT": "Shkalla e gabimeve (%)",
+      "APP_SLOW_CNT": "Kërkesa të ngadalta",
+      "APP_AVG_MS": "Përgjigje mesatare (ms)",
+      "DB_SESS_CNT": "Sesione",
+      "DB_LOCK_WAIT_CNT": "Pritje bllokimi",
+      "DB_CACHE_HIT_PCT": "Përqindja e goditjes së cache (%)",
+      "DB_SIZE_MB": "Madhësia e DB (MB)",
+      "URL_RSP_MS": "Përgjigje URL (ms)",
+      "URL_FAIL_CNT": "Dështime URL"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Zgjidhni një lidhje së pari.",
+      "NOT_IMPLEMENTED": "Lidhja schema.pi po përgatitet. Ju lutemi provoni përsëri më vonë.",
+      "LINK_AUTH": "Tokeni i lidhjes është i pavlefshëm ose ka skaduar. Lëshoni një token të ri në schema.pi dhe regjistrojeni.",
+      "LINK_SCOPE": "Kjo lidhje nuk mund të aksesojë atë taksonomi.",
+      "RATE": "Shumë kërkesa. Ju lutemi provoni përsëri së shpejti.",
+      "TIMEOUT": "schema.pi po përgjigjet ngadalë. Ju lutemi provoni përsëri së shpejti.",
+      "RULE_LIMIT": "Deri në 50 rregulla për lidhje.",
+      "NOT_FOUND": "Rregulli nuk u gjet."
+    }
+  },
+  "ops": {
+    "title": "Siguria e Operacioneve të DB",
+    "loading": "Po ngarkohet…",
+    "pickFirst": "Zgjidhni një lidhje dhe lidhje më lart së pari",
+    "run": "Ekzekuto diagnozën",
+    "running": "Po diagnostikohet…",
+    "noRun": "Ende nuk ka diagnozë. Shtypni \"Ekzekuto diagnozën\"",
+    "lastRun": "Diagnoza e fundit {dtm}",
+    "readOnly": "Diagnoza lexon vetëm (SELECT). Këshilla është një udhëzues dhe varet nga memoria e serverit, ngarkesa dhe ngarkesa e punës",
+    "truncated": "Shumë objekte — u kontrolluan vetëm 500 të parat",
+    "paramsNote": "Memoria totale e serverit është e panjohur, kështu që vlerësohet nga shared_buffers ≈ 25% e RAM-it. random_page_cost supozon SSD",
+    "auditNote": "Tabelat me RLS të fikur dhe llogaritë e papërdorura do të kontrollohen pasi pyetja e lidhjes t'i mbështesë ato",
+    "replNote": "Baza është Active-Standby (A-S) — një primar + standby. Vonesa e riprodhimit ≥ 5s = paralajmërim, ≥ 60s = rrezik (referencë RPO e matur)",
+    "lagIdle": "Pa ndryshime",
+    "pager": "Faqosja",
+    "prev": "Para",
+    "next": "Tjetra",
+    "tabs": {
+      "params": "Parametrat",
+      "audit": "Llogaritë dhe privilegjet",
+      "backup": "Rezervimi dhe rikuperimi",
+      "repl": "Replikimi dhe DR",
+      "history": "Historia"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Paralajmërim",
+      "RISK": "Rrezik"
+    },
+    "role": {
+      "primary": "Kjo lidhje = Primare",
+      "standby": "Kjo lidhje = Standby",
+      "unknown": "Roli i panjohur"
+    },
+    "col": {
+      "level": "Vendimi",
+      "item": "Artikulli",
+      "value": "Vlera",
+      "reason": "Detajet",
+      "standby": "Standby",
+      "state": "Gjendja",
+      "sync": "Sinkronizimi",
+      "lag": "Vonesa e riprodhimit"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "Rolet BYPASSRLS",
+      "bypass_ok": "Rolet BYPASSRLS",
+      "no_expiry": "Skadimi i fjalëkalimit",
+      "expiry_ok": "Skadimi i fjalëkalimit",
+      "public_grant": "Grantet PUBLIC",
+      "public_ok": "Grantet PUBLIC",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "WAL i fundit i arkivuar",
+      "arc_stale": "WAL i fundit i arkivuar",
+      "arc_recent": "WAL i fundit i arkivuar",
+      "arc_failing": "Dështimi i arkivimit të WAL"
+    },
+    "rules": {
+      "sb_default": "Në vlerën e paracaktuar (128MB). Në një server të dedikuar rekomandohet rreth 25% e RAM-it",
+      "sb_ok": "Vendosur mbi vlerën e paracaktuar",
+      "wm_over": "max_connections × work_mem tejkalon memorien e vlerësuar. Renditjet e njëkohshme rrezikojnë mungesën e memories",
+      "wm_default": "Në vlerën e paracaktuar (4MB). Renditjet dhe hash-et e mëdha mund të derdhen në disk",
+      "wm_ok": "Brenda një diapazoni të arsyeshëm",
+      "mwm_default": "Në vlerën e paracaktuar (64MB). VACUUM dhe ndërtimet e indeksit mund të jenë të ngadalta; merrni parasysh 256MB ose më shumë",
+      "mwm_ok": "Vendosur mbi vlerën e paracaktuar",
+      "av_on": "autovacuum është i ndezur",
+      "av_off": "autovacuum është i fikur. Rrezik i lartë i fryrjes së tabelës dhe mbështjelljes së ID-së së transaksionit",
+      "conn_high": "max_connections është i lartë. Çdo lidhje përdor memorie; rekomandohet një pooler (PgBouncer etj.)",
+      "conn_ok": "Brenda një diapazoni të arsyeshëm",
+      "lmd_off": "Regjistrimi i pyetjeve të ngadalta është i fikur (-1). Rekomandohet rreth 1000ms",
+      "lmd_all": "Çdo deklaratë regjistrohet (0). Mbikëqyrje e rëndë e regjistrimit",
+      "lmd_ok": "Regjistrimi i pyetjeve të ngadalta është i ndezur",
+      "st_off": "Nuk ka kohëzgjatje të deklaratës në nivel serveri (0). Vendosni kufizime për rol ose aplikacion",
+      "st_ok": "Një kohëzgjatje e deklaratës është vendosur",
+      "iit_off": "Nuk ka kohëzgjatje të papunësisë në transaksion (0). Mund të shkaktojë mbajtje bllokimi dhe fryrje",
+      "iit_ok": "Një kohëzgjatje e papunësisë në transaksion është vendosur",
+      "ckpt_short": "Intervali i pikës së kontrollit është 5 minuta ose më pak. Merrni parasysh 10-15 minuta për ngarkesa me shkrim të rëndë",
+      "ckpt_ok": "Brenda një diapazoni të arsyeshëm",
+      "wal_minimal": "wal_level=minimal e bën PITR dhe replikimin të pamundur. Përdorni replica ose më lart",
+      "wal_ok": "Niveli WAL mbështet PITR dhe replikimin",
+      "rpc_hdd": "Paracaktimi i HDD (4). Për SSD, rekomandohet 1.1–2",
+      "rpc_ok": "I përshtatshëm për SSD",
+      "super_many": "Dy ose më shumë superpërdorues. Mbani një për administrim dhe jepni vetëm privilegjet e nevojshme të tjerëve",
+      "super_ok": "Më së shumti një superpërdorues",
+      "bypass_rls": "Ekzistojnë role jo-superpërdoruesish që anashkalojnë sigurinë në nivel rreshti",
+      "bypass_ok": "Nuk ka role që anashkalojnë RLS",
+      "no_expiry": "Rolet e hyrjes pa skadimin e fjalëkalimit. Vendosni VALID UNTIL për llogaritë personale",
+      "expiry_ok": "Të gjitha rolet e hyrjes kanë një skadim",
+      "public_grant": "PUBLIC (çdo rol) ka privilegje tabele. Privilegjet e shkrimit janë të rrezikshme",
+      "public_ok": "Nuk ka privilegje tabele të dhëna për PUBLIC",
+      "arc_on": "Arkivimi i WAL (archive_mode) është i ndezur",
+      "arc_off": "Arkivimi i WAL është i fikur, kështu që rikuperimi në kohë (PITR) është i pamundur",
+      "arc_cmd_empty": "archive_mode është i ndezur por archive_command dhe archive_library janë bosh",
+      "arc_never": "Asnjë WAL nuk është arkivuar ende",
+      "arc_stale": "Arkivi i fundit WAL është më i vjetër se 24 orë",
+      "arc_recent": "WAL i arkivuar brenda 24 orëve të fundit",
+      "arc_failing": "Arkivimi i WAL aktualisht po dështon. Kontrolloni diskun, lejet dhe rrugën e objektivit",
+      "repl_is_standby": "Kjo lidhje është një standby (modaliteti i rikuperimit). Kontrolloni vonesën nga lidhja primare",
+      "repl_none": "Nuk ka standby të lidhur. Nuk ka konfigurim të rikuperimit nga fatkeqësitë (DR)",
+      "repl_ok": "Standby-t po transmetojnë normalisht",
+      "repl_lag": "Një standby po vonohet ose nuk po transmeton"
+    },
+    "manual": {
+      "title": "Lista e kontrollit manual",
+      "intro": "Praktikat e rezervimit dhe rikuperimit që nuk mund të kontrollohen automatikisht. Shënoni kur të konfirmohet dhe shënoni provat",
+      "memo": "Memo (p.sh. mjet, orar, kontrolluar së fundmi)",
+      "save": "Ruaj",
+      "updated": "Përditësuar {dtm}",
+      "items": {
+        "base_backup": "Një rezervim i plotë (pg_basebackup etj.) ka qenë i suksesshëm brenda 7 ditëve të fundit",
+        "offsite_copy": "Një kopje rezervë mbahet jashtë vendit (një rajon ose ruajtje tjetër)",
+        "restore_rehearsal": "Një provë rikuperimi u bë këtë tremujor dhe kohëzgjatja e saj u regjistrua",
+        "pitr_target": "Procedura PITR dhe RPO/RTO e synuar janë dokumentuar",
+        "backup_encrypt": "Skedarët e rezervimit janë të kriptuar dhe aksesi është i kufizuar",
+        "retention": "Periudha e ruajtjes së rezervimit dhe politika e fshirjes janë përcaktuar"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Lidhja schema.pi po përgatitet. Ju lutemi provoni përsëri së shpejti",
+      "CONN_UNSUPPORTED": "Kjo lidhje nuk mbështetet ende (vetëm PostgreSQL i drejtpërdrejtë)",
+      "TIMEOUT": "DB e objektivit u përgjigj shumë ngadalë. Ju lutemi provoni përsëri së shpejti",
+      "RATE": "Shumë thirrje. Provoni përsëri pas një minute",
+      "Q_UNKNOWN": "Pyetje e pambështetur. Kontrolloni versionin e API-së së lidhjes schema.pi",
+      "INVALID_INPUT": "Zgjedhja e lidhjes ose lidhjes është e pavlefshme"
+    }
+  },
+  "perf": {
+    "title": "Performanca",
+    "loading": "Po ngarkohet…",
+    "pickFirst": "Zgjidhni një lidhje dhe lidhje më lart së pari",
+    "pager": "Faqosja",
+    "tabs": {
+      "collect": "Mbledh",
+      "top": "Pyetje të ngadalta",
+      "health": "Shëndeti i tabelave dhe indekseve",
+      "trend": "Tendenca e madhësisë",
+      "activity": "Aktiviteti dhe bllokimet"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Lidhja schema.pi po përgatitet. Ju lutemi provoni përsëri më vonë",
+      "CONN_UNSUPPORTED": "Kjo lidhje nuk mbështetet ende (vetëm lidhjet e drejtpërdrejta PostgreSQL)",
+      "RATE": "Shumë kërkesa. Provoni përsëri pas një minute",
+      "LINK_AUTH": "Tokeni i lidhjes ka skaduar ose është revokuar. Regjistrojeni tokenin përsëri në faqen Lidhje",
+      "LINK_SCOPE": "Kjo lidhje nuk i përket zonës së subjektit të lidhjes",
+      "Q_UNKNOWN": "Pyetje e pambështetur. Kontrolloni versionin e API-së së lidhjes schema.pi",
+      "INVALID_INPUT": "Vlera e lidhjes ose lidhjes është e pavlefshme"
+    },
+    "pgss": {
+      "title": "Si të aktivizoni pg_stat_statements",
+      "note": "PostgreSQL i vetë-hostuar gjithashtu kërkon pg_stat_statements në shared_preload_libraries (postgresql.conf) dhe një rifillim. Statistikat e tabelave, indekseve dhe madhësisë funksionojnë pa të"
+    },
+    "collect": {
+      "intro": "Mbledhja tani lexon statistikat kryesore të pyetjeve, tabelat, indekset dhe madhësitë një herë dhe i ruan ato si një pamje. Mblidhni të paktën dy herë për të parë ndryshimet dhe tendencat e madhësisë",
+      "run": "Mblidh tani",
+      "running": "Po mblidhet…",
+      "done": "Mbledhur në {dtm} — {qry} pyetje · {tbl} tabela · {idx} indekse"
+    },
+    "top": {
+      "sort": "Rendit",
+      "sortTotal": "Koha totale",
+      "sortMean": "Koha mesatare",
+      "sortCalls": "Thirrjet",
+      "empty": "Ende nuk ka pamje. Shtypni Mblidh tani në skedën Mblidh",
+      "range": "Ndryshimi midis {from} → {to}",
+      "first": "Pamja e parë në {dtm} — vlera kumulative (ndryshimet nga pamja tjetër)",
+      "query": "Pyetje (literale të maskuara)",
+      "calls": "Thirrjet",
+      "totalMs": "Total ms",
+      "meanMs": "Mesatarja ms",
+      "rows": "Rreshta",
+      "reset": "Rivendosja e statistikave u zbulua — shfaqet si kumulative"
+    },
+    "health": {
+      "empty": "Nuk ka ende pamje. Shtypni Mblidh tani në skedën Mblidh",
+      "basis": "Bazuar në pamjen në {dtm}",
+      "unusedIdx": "Indekse të papërdorura",
+      "unusedIdxHint": "Indekse të papërdorura që nga rivendosja e fundit e statistikave (sipas madhësisë). Mos hiqni indekset PK ose ato me kufizim unik",
+      "fullScan": "Skanime të tepërta të plota",
+      "fullScanHint": "Tabelat me 1,000+ rreshta aktivë ku skanimet e plota janë të paktën gjysma — rishikoni indekset në kolonat e filtrit",
+      "dead": "Tuple të tepërta të vdekura",
+      "deadHint": "Raporti i tupleve të vdekura 20% ose më shumë — kontrolloni cilësimet VACUUM dhe autovacuum",
+      "none": "Asnjë",
+      "scans": "skanime"
+    },
+    "trend": {
+      "limit": "Pragu i madhësisë",
+      "empty": "Nuk ka pamje në 30 ditët e fundit",
+      "now": "Madhësia aktuale",
+      "perDay": "Rritja për ditë",
+      "needMore": "Nevojiten 2+ pamje",
+      "daysLeft": "Arrin {gb} GB",
+      "noGrowth": "Nuk ka trend rritjeje",
+      "days": "në rreth {n} ditë"
+    },
+    "activity": {
+      "refresh": "Rifresko",
+      "live": "Kërkesë e drejtpërdrejtë — nuk ruhet",
+      "sessions": "Aktiviteti i sesionit",
+      "locks": "Bllokime",
+      "none": "Asnjë"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pipelines",
+    "intro": "Kontrolloni nëse një DB burimor është gati për kapjen e të dhënave të ndryshimit (CDC) dhe dizajnoni pipeline burim → transformim → objektiv. Kjo fazë vetëm kontrollon dhe dizajnon; asnjë të dhënë rreshti e klientit nuk lexohet ose ruhet.",
+    "needLink": "Zgjidhni një lidhje schema.pi më lart së pari. Nëse nuk keni asnjë, regjistroni një token në menunë 'Lidhje'.",
+    "needConn": "Zgjidhni lidhjen e DB-së për të kontrolluar më lart.",
+    "loading": "Duke u ngarkuar…",
+    "pager": "Faqe",
+    "prev": "Para",
+    "next": "Tjetra",
+    "runTitle": "Ekzekuto & monitoro (7-3 · 7-4)",
+    "runBody": "Ekzekutimi i pipeline-it, monitorimi i vonesës dhe ripërpunimi vijnë pasi të finalizohet agjenti i punës dhe modeli i sigurisë. Për momentin, ruani përkufizimet si drafte (DRAFT).",
+    "pre": {
+      "title": "Parakontrolli i burimit",
+      "intro": "Për çdo tabelë, kontrollon kolonat e kohës së ndryshimit, kolonat e fshirjes së butë dhe çelësin primar për të rekomanduar një metodë kapjeje (adapter), dhe kontrollon gatishmërinë e replikimit logjik WAL. Ekzekuton vetëm pyetje të katalogut dhe cilësimeve vetëm për lexim.",
+      "schema": "Skema (opsionale)",
+      "schemaPh": "Të gjitha",
+      "run": "Ekzekuto parakontrollin",
+      "running": "Duke kontrolluar…",
+      "sum": "{tables} tabela · {noPk} pa PK · {deleteUnseen} nuk mund të kapë fshirjet",
+      "truncated": "Një pyetje katalogu arriti kufirin prej 500 rreshtash, kështu që disa tabela mund të mungojnë. Specifikoni një skemë dhe kontrolloni përsëri.",
+      "empty": "Nuk ka tabela për të kontrolluar",
+      "colTable": "Tabela",
+      "colChg": "Kolona e kohës së ndryshimit",
+      "colDel": "Kolona e fshirjes së butë",
+      "colAdapter": "Metoda e rekomanduar · arsyet",
+      "toDraft": "Krijo draft pipeline nga {n} të zgjedhura"
+    },
+    "ready": {
+      "ok": "Replikimi logjik WAL gati — tabelat me një PK mund të përdorin LOGICAL",
+      "no": "Replikimi logjik WAL nuk është gati — kapni përmes polling-ut ose krahasimit të çelësave",
+      "senders": "{n} lidhje replikimi"
+    },
+    "adapter": {
+      "LOGICAL": "Replikim logjik (WAL)",
+      "POLL": "Polling i kohës së ndryshimit",
+      "KEY_DIFF": "Diferenca e snapshot-it të çelësit",
+      "NONE": "Vetëm ringarkim i plotë"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Ka kolonë të kohës së ndryshimit",
+      "NO_CHG_COL": "Nuk ka kolonë të kohës së ndryshimit",
+      "HAS_SOFT_DEL": "Ka kolonë të fshirjes së butë",
+      "NO_SOFT_DEL": "Nuk ka kolonë të fshirjes së butë",
+      "HAS_PK": "Ka çelës primar",
+      "NO_PK": "Nuk ka çelës primar — rreshtat e ndryshuar nuk mund të identifikohen",
+      "DELETE_UNSEEN": "Polling-u nuk mund të kapë DELETE-t fizike (rekomandohet kolona e fshirjes së butë)",
+      "LOGICAL_NOT_READY": "Mund të kalojë në LOGICAL pasi të jetë gati replikimi logjik WAL",
+      "FULL_RELOAD_ONLY": "Nuk ka PK ose kolonë të kohës së ndryshimit, kështu që nuk ka kapje inkrementale — shtoni një PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level nuk është logjik (ndryshimi i tij kërkon një rinisje të DB-së)",
+      "NO_SLOTS": "max_replication_slots është 0",
+      "NO_SENDERS": "max_wal_senders është 0",
+      "IS_STANDBY": "Server standby — merrni replikimin logjik nga primari",
+      "SETTINGS_UNKNOWN": "Nuk mund të lexoheshin cilësimet, gatishmëria e panjohur"
+    },
+    "ed": {
+      "title": "Përkufizimet e pipeline-it",
+      "draftOnly": "Vetëm dizajn — ruhet si drafte (DRAFT)",
+      "new": "Pipeline i ri",
+      "empty": "Nuk ka pipeline të ruajtura",
+      "manual": "Manual",
+      "edit": "Redakto",
+      "remove": "Fshij",
+      "removeConfirm": "Fshij pipeline-in '{name}'?",
+      "name": "Emri",
+      "adapter": "Metoda e kapjes",
+      "srcConn": "Lidhja burimore",
+      "useCurrentConn": "Përdor lidhjen e zgjedhur më lart",
+      "sched": "Orari (cron me 5 fusha, bosh = manual)",
+      "target": "Objektivi",
+      "targetPh": "p.sh. DB analitike analytics.public / lake s3://…",
+      "tables": "Tabelat burimore (të ndara me rresht të ri ose presje)",
+      "steps": "Hapat (burim → transformim → objektiv)",
+      "op": "Operacioni",
+      "notePh": "Përshkrimi · kushti (opsional)",
+      "addTransform": "Shto hap transformimi",
+      "save": "Ruaj",
+      "saving": "Duke ruajtur…",
+      "saved": "U ruajt",
+      "close": "Mbyll"
+    },
+    "kind": {
+      "SOURCE": "Burim",
+      "TRANSFORM": "Transformim",
+      "TARGET": "Objektiv"
+    },
+    "sts": {
+      "DRAFT": "Draft"
+    },
+    "check": {
+      "NAME_REQUIRED": "Vendosni një emër",
+      "CONN_REQUIRED": "Zgjidhni një lidhje burimore",
+      "CRON_INVALID": "Vendosni orarin si cron me 5 fusha (min orë ditë muaj ditë jave; shifra, *, ',', -, /)",
+      "OP_REQUIRED": "Vendosni një operacion për çdo hap",
+      "STEPS_TOO_FEW": "Kërkohen hapat burim dhe objektiv",
+      "STEPS_TOO_MANY": "Deri në 20 hapa",
+      "STEP_FIRST_SOURCE": "Hapi i parë duhet të jetë burimi",
+      "STEP_LAST_TARGET": "Hapi i fundit duhet të jetë objektivi",
+      "STEP_MIDDLE_TRANSFORM": "Vetëm hapat e transformimit mund të jenë në mes"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Një pipeline me këtë emër ekziston tashmë. Përdorni një emër tjetër",
+      "CONN_UNSUPPORTED": "Kjo lidhje nuk mund të kontrollohet ende (vetëm lidhjet direkte të serverit PostgreSQL për momentin)"
+    }
+  },
+  "sqlLab": {
+    "title": "Laboratori i Optimizimit të SQL",
+    "intro": "Zgjidhni një lidhje dhe vendosni SQL për të parë planin e ekzekutimit si një pemë, me shkaqet e ngadalësimit (skanime të plota, cikle të ndërthurura, renditje të mëdha) dhe anti-modelet e SQL të kontrolluara kundër domenave standarde schema.pi. Kërkesat nuk ekzekutohen kurrë (pa ANALYZE).",
+    "needLink": "Zgjidhni një lidhje dhe lidhje më lart për të parë planet. Kontrolli i anti-modelit funksionon pa një lidhje.",
+    "sqlLabel": "SQL (një deklaratë e vetme SELECT ose WITH)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Shfaq planin",
+    "explaining": "Duke u ngarkuar…",
+    "save": "Ruaj planin",
+    "saving": "Duke ruajtur…",
+    "saveName": "Etiketa (p.sh. para shtimit të indeksit)",
+    "saveNote": "Vlerat konstante në SQL dhe kushtet e planit maskohen si ? kur ruhen.",
+    "plan": {
+      "title": "Plani i ekzekutimit",
+      "summary": "Kosto totale {cost} · {ms}ms",
+      "cost": "kosto",
+      "rows": "rreshta",
+      "width": "gjerësia"
+    },
+    "warn": {
+      "none": "Nuk ka paralajmërime të rëndësishme.",
+      "SEQ_SCAN_LARGE": "Skanim i plotë në {relation} (rreth {rows} rreshta) — merrni parasysh një indeks në kolonat e filtrit.",
+      "NESTED_LOOP_HIGH": "Cikli i ndërthurur prodhon rreth {rows} rreshta — merrni parasysh një bashkim hash ose merge, ose një indeks në kushtin e bashkimit.",
+      "SORT_SPILL": "Madhësia e renditjes është rreth {kb}KB, mbi work_mem-in e paracaktuar (4MB); mund të derdhet në disk."
+    },
+    "lint": {
+      "run": "Kontrollo anti-modelet",
+      "title": "Kontrolli i anti-modeleve të SQL",
+      "none": "Nuk u gjetën anti-modele.",
+      "domainsOff": "Domenat standarde nuk mund të ngarkoheshin; u kontrolluan vetëm me rregullat e paracaktuar të prapashtesës së kolonës.",
+      "types": {
+        "num": "numerike",
+        "date": "datë",
+        "char": "karakter"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — zgjidhni vetëm kolonat që ju nevojiten (I/O shtesë, pa indeks mbulues).",
+        "FUNC_ON_COLUMN": "Kolona e filtrit {column} është e mbështjellë në një funksion ose shprehje, kështu që indeksi i saj nuk mund të përdoret — transformoni konstanten në vend të kësaj.",
+        "LEADING_WILDCARD": "LIKE me një % kryesor nuk mund të përdorë një indeks B-tree — merrni parasysh një indeks pg_trgm GIN.",
+        "OR_DIFF_COLUMNS": "Kushtet në kolona të ndryshme kombinohen me OR — merrni parasysh UNION ALL ose indekse për kolonë.",
+        "IMPLICIT_CAST": "{column} krahasohet me një numër të cituar — përputhni llojet e kolonës dhe konstantes (konvertim i nënkuptuar).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) nuk kthen asgjë kur ka NULL dhe është i ngadalshëm — përdorni NOT EXISTS.",
+        "NO_WHERE": "Nuk ka klauzolë WHERE — në një tabelë të madhe ky është një skanim i plotë (shtoni një kusht ose LIMIT).",
+        "DOMAIN_MISMATCH": "{column} është një tip {expected} sipas domenit standard, por krahasohet me një konstante të një tipi tjetër — konvertimi i nënkuptuar mund të parandalojë përdorimin e indeksit."
+      }
+    },
+    "saved": {
+      "title": "Planet e ruajtura · Krahaso",
+      "empty": "Nuk ka plane të ruajtura. Shikoni një plan, pastaj ruajeni.",
+      "pick": "Zgjidhni planin për të krahasuar",
+      "pick2": "Zgjidhni dy plane për të krahasuar.",
+      "compare": "Krahaso dy plane",
+      "delete": "Fshij",
+      "cost": "kosto",
+      "prev": "Paraardhës",
+      "next": "Tjetra",
+      "page": "Faqja {page}"
+    },
+    "diff": {
+      "cost": "Kosto totale {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Dy planet janë për SQL të ndryshme (pas normalizimit).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Nuk ka ndryshim në nyjet e planit.",
+      "before": "Para",
+      "after": "Pas"
+    },
+    "ai": {
+      "title": "Këshilla për optimizim me AI",
+      "badge": "Së shpejti",
+      "body": "Së shpejti (pas procedurave të miratimit dhe matjes së ndikimit) — këshillat do të gjenerohen nga SQL me konstante të maskuara dhe do të regjistrohen si të aplikuara vetëm pas miratimit të DA dhe ndikimit të matur."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Funksioni i lidhjes schema.pi po përgatitet. Ju lutemi provoni përsëri së shpejti.",
+      "LINK_AUTH": "Tokeni i lidhjes ka skaduar ose është revokuar. Lëshoni një token të ri në schema.pi dhe regjistrojeni përsëri.",
+      "LINK_SCOPE": "Kjo lidhje nuk mund të përdorë atë lidhje (skemë klasifikimi e ndryshme).",
+      "CONN_UNSUPPORTED": "Ky lloj lidhjeje nuk mbështetet ende (vetëm lidhjet e serverit PostgreSQL).",
+      "Q_UNKNOWN": "Kërkesë e pambështetur.",
+      "SQL_NOT_SELECT": "Planet janë të disponueshme vetëm për një deklaratë të vetme që fillon me SELECT ose WITH.",
+      "TIMEOUT": "Kërkesa skadoi (5 sekonda). Shkurtoni SQL-në ose provoni përsëri më vonë.",
+      "RATE": "Shumë kërkesa. Provoni përsëri pas një minute.",
+      "PAYLOAD_TOO_LARGE": "Plani është shumë i madh për t'u ruajtur.",
+      "LINK_NOT_FOUND": "Lidhja nuk u gjet. Ju lutemi zgjidhni lidhjen përsëri."
+    }
+  },
+  "nav": {
+    "label": "Funksionet",
+    "connect": "Lidh",
+    "sqlLab": "Optimizim SQL",
+    "perf": "Performanca",
+    "monitor": "Monitorimi",
+    "drift": "Divergjenca",
+    "migration": "Migrimi",
+    "pipeline": "Pipeline",
+    "analytics": "Analiza",
+    "ops": "Siguria e Operacioneve",
+    "learn": "Mëso"
   }
 }

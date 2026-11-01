@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Goob shaqo oo DBA iyo SQLP ah oo lagu socodsiiyo matoorada DB si degdeg ah oo ammaan ah"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Ka dhig matoorkaaga DB inuu xogtaada u socodsiiyo si degdeg ah oo ammaan ah",
+    "description": "Waa goob shaqo oo DBA iyo SQLP ah oo loogu talagalay qorshayaasha fulinta, tirakoobyada, iyo waxqabadka. schema.pi waxay gacanta ku haysaa naqshadaynta iyo heerarka; dbms.pi waa lammaanaheeda dhinaca matoorka.",
+    "welcome": "Soo dhawoow, {name}.",
+    "featTitle": "Astaamaha",
+    "featDesc": {
+      "connect": "Diiwaangeli calaamadda isku xirka schema.pi oo hubi heerka isku xirka",
+      "sqlLab": "Geedka qorshaha, digniinaha, isbarbardhigga iyo hubinta qaababka ka hortagga ee ka dhanka ah domainyada heerka",
+      "perf": "Weydiinta gaabiska ah Top-N, caafimaadka miiska/index, saadaasha awoodda, dhaqdhaqaaqa iyo qufulada",
+      "monitor": "Soo koobidda cabbirka App, DB iyo URL oo leh digniino xaddidan",
+      "drift": "Isbarbardhig schema.pi model iyo taariikhda DDL oo leh buugga dhabta ah, cabbir saamaynta index",
+      "migration": "Amarka rarista topological, qaybaha, liiska hubinta iyo SQL xaqiijinta",
+      "pipeline": "Hubinta hore ee qabashada isbeddelka iyo qeexitaannada dhuumaha isha→beddel→bartilmaameedka",
+      "analytics": "Dashboard KPI, khariidadda harada 3-lakab iyo buugga xogta",
+      "ops": "Baadhitaan akhris-kaliya ah oo ku saabsan cabbirrada, doorarka, kaydinta iyo soo celinta DR",
+      "learn": "Su'aalaha tababarka SQLP/DAP, kiisaska hagaajinta iyo qaamuuska isbarbardhigga DBMS"
+    }
+  },
   "auth": {
     "checking": "Hubinaya galitaanka…",
     "signedIn": "{name}",
@@ -64,5 +87,836 @@
     "LINK_CODE_GEN_FAILED": "Lama abuuri karin kood xiriiriye. Fadlan isku day mar dambe.",
     "AUTH_DB_UNAVAILABLE": "Lama kaydin karin akoonkaaga, sidaa darteed galitaanka wuu fashilmay. Fadlan isku day mar dambe.",
     "LINK_TRY_LIMIT": "Koodadka xiriirinta ee khaldan ayaa aad u badan. Isku day mar kale 15 daqiiqo gudahood."
+  },
+  "analytics": {
+    "title": "Falanqaynta & Harada",
+    "intro": "KPI-yada dhaqdhaqaaqa dbms, naqshadaynta harada saddex-lakab iyo buugga xogta oo hal meel ah.",
+    "storageNotice": "Kaydinta harada (dhinaca macmiilka ama daruurta) wali lama go'aamin (Qaybta PRD 10 #7). Hadda, kaliya naqshadaynta iyo khariidadaha magacyada ayaa la kaydiyaa — ma jiraan xog saf ah.",
+    "noLink": "Marka hore dooro ama diiwaangeli isku xirka schema.pi.",
+    "goConnect": "Diiwaangeli isku xirka",
+    "loading": "Waa la soo shubayaa…",
+    "refresh": "Dib u cusboonaysii",
+    "kpi": {
+      "title": "Dashboard KPI",
+      "updatedAt": "{area} · laga bilaabo {time}",
+      "notBuilt": "Lama dhisin",
+      "keys": {
+        "links": "Isku xirkayga",
+        "perf": "Sawirrada waxqabadka",
+        "drift": "Orodka isbeddelka",
+        "mig": "Qorshayaasha socdaalka",
+        "pipe": "Dhuumaha",
+        "lake": "Xogta harada"
+      },
+      "countsChart": "Wadaraha astaamaha",
+      "trendTitle": "Sawirrada waxqabadka 14-kii maalmood ee la soo dhaafay",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Ma jiraan sawirro waxqabad 14-kii maalmood ee la soo dhaafay.",
+      "monTitle": "schema.pi soo koobidda kormeeraha (saacaddii u dambaysay)",
+      "monTps": "Codsiyada/s",
+      "monErr": "Heerka khaladka",
+      "monAvg": "Celceliska jawaabta (ms)",
+      "monDb": "Isku xirka DB",
+      "monFail": "Lama soo shubi karin soo koobidda kormeeraha: {msg}"
+    },
+    "lake": {
+      "title": "Naqshadaynta harada saddex-lakab",
+      "raw": "Cayriin",
+      "rawDesc": "Waxay soo shubtaa magacyada iyo noocyada tiirarka DB ee isha sida ay yihiin.",
+      "std": "Heeraysan",
+      "stdDesc": "Waxay u beddeshaa magacyada tiirarka ereyada heerka ah ee schema.pi ansixisay.",
+      "cur": "La xushay",
+      "curDesc": "Xogta falanqaynta oo lagu kooxeeyay unug.",
+      "loadProjects": "Soo shub mashaariicda",
+      "project": "Mashruuc",
+      "pickProject": "Dooro mashruuc",
+      "noProjects": "Ma jiraan mashaariic aaggan.",
+      "noTables": "Qaabka mashruucani ma laha miisas.",
+      "conform": "U hoggaansanaanta heerka {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} tiirar · {pct}% u hoggaansan",
+      "colSrc": "Tiirka isha",
+      "colStd": "Tiirka heeraysan",
+      "colType": "Nooca",
+      "colOk": "Qaabka",
+      "ok": "WAXA LA OGYAHAY",
+      "ng": "Hubi",
+      "pk": "PK",
+      "selectAll": "Dooro dhammaan",
+      "selected": "{cnt} la doortay",
+      "save": "Ku dar naqshadaynta harada",
+      "saved": "Waxaa lagu daray {cnt} buugga."
+    },
+    "catalog": {
+      "title": "Buugga xogta",
+      "schemaCard": "schema.pi waa isha runta ee qeexitaannada xogta falanqaynta, raadinta metadata iyo qaamuuska. Halkan waxaad ku aragtaa oo kaliya heerka rarista harada iyo cusboonaanta.",
+      "openSchema": "Fiiri qeexitaannada schema.pi",
+      "empty": "Wali lama gelin miisas naqshadaynta harada.",
+      "status": {
+        "DSGN": "Naqshadayn kaliya",
+        "LOADED": "La raray",
+        "FAIL": "Rarisku wuu fashilmay"
+      },
+      "lastLoad": "Rarista u dambaysay {time}",
+      "neverLoaded": "Marnaba lama rarin",
+      "remove": "Ka saar",
+      "removeConfirm": "Ka saar {tbl} buugga?",
+      "prev": "Hore",
+      "next": "Xiga",
+      "page": "Bogga {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Marka hore dooro isku xirka.",
+      "NOT_FOUND": "Lama helin. Hubi in qaabka uu isbeddelay."
+    }
+  },
+  "drift": {
+    "title": "Model ↔ DB Isbeddel",
+    "intro": "Isbarbardhig schema.pi model naqshadaynta iyo taariikhda DDL ee la adeegsaday oo leh buugga DB ee tooska ah si aad u hesho isbeddel, oo cabbir in indexyada la naqshadeeyay dhab ahaantii la isticmaalo. Xogta safka macmiilka marnaba lama akhriyo ama lama kaydiyo.",
+    "needLink": "Marka hore dooro isku xirka schema.pi ee kor ku xusan. Haddii aadan midna haysan, diiwaangeli calaamad ku jirta menu-ka 'Isku xirka'.",
+    "needConn": "Dooro isku xirka DB ee la isbarbardhigi doono ee kor ku xusan.",
+    "project": "Mashruuc",
+    "projectPick": "Dooro mashruuc",
+    "loading": "Waa la soo shubayaa…",
+    "run": "Orodka ogaanshaha isbeddelka",
+    "running": "Isbarbardhigayaa…",
+    "readOnly": "Kaliya buugga akhris-kaliya iyo weydiimaha tirakoobyada ayaa la socodsiiyaa.",
+    "applyInSchema": "Ku dabaq hagaajinta (wax ka beddelka model, abuurista DDL iyo fulinta) schema.pi, isha runta.",
+    "history": "Taariikhda ogaanshaha",
+    "prev": "Hore",
+    "next": "Xiga",
+    "none": "Midna",
+    "model": "Model",
+    "reqNo": "Codsiga {id}",
+    "notSaved": "Lama kaydin karin orodkan taariikhda (natiijooyinka waxaa loo soo bandhigay si caadi ah).",
+    "capped": "Waxyaabo badan — waxaan soo bandhigaynaa {cap} kii ugu horreeyay qayb kasta (tiradu waa dhammaystiran tahay).",
+    "statsMissing": "Tirakoobyada isticmaalka index lama heli karin, sidaa darteed isticmaalka lama xukumi karin.",
+    "sum": {
+      "missingTables": "Miisas ka maqan DB",
+      "extraTables": "Miisas aan ku jirin model",
+      "colMismatches": "Isku dhacyada tiirarka",
+      "missingIndexes": "Indexyada la naqshadeeyay oo ka maqan DB",
+      "extraIndexes": "Indexyada aan ku jirin model",
+      "ddlMissing": "Walxaha ka lumay ka dib markii la adeegsaday",
+      "unusedIndexes": "Indexyada la naqshadeeyay ee aan la isticmaalin"
+    },
+    "sec": {
+      "ddlMissing": "DDL waa la adeegsaday laakiin ka maqan DB",
+      "missingTables": "Miisas ku jira model laakiin ka maqan DB",
+      "extraTables": "Miisas ku jira DB laakiin aan ku jirin model",
+      "colMismatches": "Nooca tiirka / isku dhacyada NULL",
+      "missingIndexes": "Indexyada la naqshadeeyay oo ka maqan DB",
+      "extraIndexes": "Indexyada kaliya ku jira DB (marka laga reebo PK)",
+      "idxUsage": "Waxtarka index-ka la naqshadeeyay"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi waxay diiwaangelisay walxahan sidii la adeegsaday, laakiin way lumeen — ka shakiso hoos u dhac gacmeed ama dib u celin.",
+      "extraTables": "Kuwan waxaa laga yaabaa inay ka tirsan yihiin mashaariic kale ama miisas nidaam oo ku saabsan isku xirkan.",
+      "idxUsage": "Eber baadhitaan tan iyo dib u dejintii tirakoobyada ee u dambaysay waxay la macno tahay in aan la isticmaalin. Hubi daaqadda tirakoobyada ka hor inta aadan tuurin."
+    },
+    "kind": {
+      "MISSING": "ka maqan DB",
+      "EXTRA": "kuma jiraan model",
+      "TYPE": "nooca wuu ka duwan yahay",
+      "NULL": "NULL-ka wuu ka duwan yahay"
+    },
+    "col": {
+      "idx": "Index",
+      "scans": "Baadhitaanada",
+      "size": "Cabbirka",
+      "status": "Xukun"
+    },
+    "usage": {
+      "USED": "La isticmaalayo",
+      "UNUSED": "Index la naqshadeeyay oo aan la isticmaalin",
+      "NO_STATS": "Ma jiraan tirakoobyo"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Isku xirka schema.pi wali diyaar ma aha. Fadlan isku day mar kale dhawaan.",
+      "LINK_DOWN": "Lama gaari karo schema.pi. Fadlan isku day mar kale dhawaan.",
+      "LINK_AUTH": "Calaamadda isku xirka way dhacday ama waa la buriyay. Soo saar calaamad cusub schema.pi oo mar kale diiwaangeli.",
+      "LINK_NOT_FOUND": "Isku xirka lama helin. Fadlan mar kale dooro isku xirka.",
+      "LINK_SCOPE": "Isku xirkan kuma jiraan taxonomy-ga isku xirka.",
+      "CONN_UNSUPPORTED": "Isku xirka aan la taageerin (isku xirka server-ka PostgreSQL kaliya hadda).",
+      "TIMEOUT": "Codsiga wuu dhacay. Fadlan isku day mar kale dhawaan.",
+      "RATE": "Codsiyo badan. Fadlan isku day mar kale daqiiqad gudaheed."
+    }
+  },
+  "learn": {
+    "title": "Barashada DBA",
+    "intro": "Su'aalaha tababarka SQLP/DAP, buugga kiisaska hagaajinta, iyo qaamuuska isbarbardhigga Oracle/Tibero/PostgreSQL. Waxay shaqeysaa iyada oo aan lahayn isku xir; dooro isku xir si aad sidoo kale u aragto khariidadda nooca heerka schema.pi.",
+    "loading": "Waa la soo shubayaa…",
+    "tabs": {
+      "quiz": "Tababar",
+      "cases": "Kiisaska hagaajinta",
+      "dict": "Qaamuuska DBMS"
+    },
+    "topics": {
+      "INDEX": "Baadhitaanada Index",
+      "JOIN": "Hababka isku xirka",
+      "PARTITION": "Jarista qaybta",
+      "NORMAL": "Caadiyeynta",
+      "NAMING": "Magacaabista heerka",
+      "ISOLATION": "Heerarka go'doominta",
+      "LOCK": "Qufulada"
+    },
+    "levels": {
+      "1": "Aasaasi",
+      "2": "Dhexdhexaad",
+      "3": "Horumarsan"
+    },
+    "quiz": {
+      "score": "Horumarkayga",
+      "scoreLine": "{solved} oo ka mid ah {total} ayaa la xalliyay · {correct} sax ah",
+      "right": "Sax",
+      "wrong": "Khalad",
+      "retry": "Isku day mar kale",
+      "prevRight": "Horey sax ah",
+      "prevWrong": "Horey khalad ah"
+    },
+    "cases": {
+      "notice": "Dhammaan kiisaska waa tusaalooyin waxbarasho oo iskeed loo qoray; tirooyinku waa tusaale (ma jiraan xog macmiil).",
+      "problem": "SQL dhibaatada",
+      "plan": "Soo koobidda qorshaha",
+      "cause": "Sababta",
+      "fix": "SQL la hagaajiyay",
+      "effect": "Saamaynta"
+    },
+    "cats": {
+      "ALL": "Dhammaan",
+      "TYPE": "Noocyada xogta",
+      "FUNC": "Hawlaha",
+      "PAGING": "Bogagga",
+      "SEQ": "Taxanaha",
+      "DATE": "Taariikhaha",
+      "SYNTAX": "Naxwaha"
+    },
+    "dict": {
+      "search": "Raadi (tusaale: NVL, LIMIT)",
+      "item": "Shey",
+      "note": "Fiiro gaar ah",
+      "empty": "Ma jiraan waxyaabo u dhigma",
+      "loading": "Waa la soo shubayaa…",
+      "liveTitle": "Khariidadda nooca heerka ee aagga mawduucayga",
+      "liveIntro": "Dooro isku xir si aad u soo shubto profile-ka DBMS ee schema.pi (nooca macquulka ah → nooca jirka). Qaamuuska kor ku xusan wuxuu shaqeeyaa iyada oo aan lahayn isku xir.",
+      "liveLoad": "Soo shub khariidadda nooca",
+      "lgcType": "Nooca macquulka ah"
+    }
+  },
+  "link2": {
+    "title": "schema.pi isku xirka",
+    "intro": "Diiwaangeli calaamad isku xirka si aad u isticmaasho isku xirka DB ee aagga mawduuca schema.pi ee dbms.pi. Calaamadaha waxaa lagu kaydiyaa si qarsoodi ah, mana jiraan xog saf ah oo ka timid xogtaada oo la kaydiyo.",
+    "howTitle": "Sida loo soo saaro calaamad isku xirka",
+    "how1": "Ku gal schema.pi oo fur aagga mawduuca si aad isugu xirto",
+    "how2": "Tag Aagga mawduuca → Dejinta → Calaamadda isku xirka oo riix 'Soo saar calaamad' (maamulaha aagga ama doorka DA)",
+    "how3": "Koobiyeey calaamadda ku bilaabata slk_ — waxaa la soo bandhigaa hal mar oo kaliya marka la soo saaro",
+    "how4": "Ku dheji hoos oo diiwaangeli",
+    "openSchema": "Fur schema.pi",
+    "registerTitle": "Diiwaangeli isku xirka",
+    "tokenLabel": "Calaamadda isku xirka",
+    "tokenPlaceholder": "slk_…",
+    "register": "Diiwaangeli",
+    "registering": "Hubinayaa…",
+    "registered": "Aagga mawduuca '{area}' hadda waa la isku xiray",
+    "replaced": "Waxaa la beddelay calaamadda aagga mawduuca '{area}'",
+    "myLinks": "Isku xirkayga",
+    "empty": "Ma jiraan isku xirro la diiwaangeliyay",
+    "loading": "Waa la soo shubayaa…",
+    "regDtm": "La diiwaangeliyay {dtm}",
+    "remove": "Ka gooyay",
+    "removeConfirm": "Ka gooyay '{area}'? Shaashadaha isticmaalaya isku xirkan ma awoodi doonaan inay mar dambe galaan.",
+    "prev": "Hore",
+    "next": "Xiga",
+    "statusTitle": "Heerka isku xirka",
+    "noConns": "Ma jiraan isku xirro DB ah aaggan mawduuca (ku dar mid schema.pi)",
+    "colConn": "Isku xirka",
+    "colDbms": "DBMS",
+    "colMthd": "Habka",
+    "colHost": "Marti-geliyaha",
+    "colTest": "Tijaabadii u dambaysay",
+    "colAgent": "Wakiilka ugu dambeeyay ee la arkay",
+    "never": "Midna",
+    "retry": "Isku day mar kale",
+    "pickerLink": "Isku xirka",
+    "pickerConn": "Isku xirka",
+    "pickerEmpty": "Ma jiraan isku xirro —",
+    "pickerGo": "diiwaangeli mid /connect",
+    "errors": {
+      "LINK_AUTH": "Calaamadda isku xirka way dhacday ama waa la buriyay. Soo saar calaamad cusub schema.pi oo mar kale diiwaangeli",
+      "LINK_SCOPE": "Isku xirkan kuma jiraan aagga mawduuca ee isku xiran",
+      "LINK_DOWN": "Lama gaari karo schema.pi. Fadlan isku day mar kale dhawaan",
+      "LINK_NOT_FOUND": "Isku xirka lama helin",
+      "LINK_DUP": "Diiwaangelintu horey ayay u socotaa. Fadlan isku day mar kale",
+      "CONN_UNSUPPORTED": "Isku xirka aan la taageerin (isku xirka server-ka PostgreSQL kaliya hadda)",
+      "Q_UNKNOWN": "Weydiin aan la garanayn",
+      "SQL_NOT_SELECT": "Kaliya hal bayaan SELECT (ama WITH) ayaa la socodsiin karaa",
+      "PGSS_MISSING": "Kordhinta pg_stat_statements kuma rakiban tahay DB-ga bartilmaameedka",
+      "TIMEOUT": "Codsiga wuu dhacay",
+      "RATE": "Codsiyo badan. Fadlan isku day mar kale daqiiqad gudaheed",
+      "INVALID_INPUT": "Ku dheji calaamadda isku xirka oo dhan oo ku bilaabata slk_"
+    }
+  },
+  "migration": {
+    "title": "Socdaalka Xogta (PiMig)",
+    "intro": "Waxay xisaabisaa amarka rarista miiska ee ka yimid xiriirka ku jira schema.pi model naqshadayntaada, waxay abaabushaa cabbirka qaybta, isbarbardhigga iyo liiska hubinta goynta, waxayna abuurtaa SQL xaqiijinta oo aad adigu ku socodsiiso isha iyo bartilmaameedka. Shaashaddan waxay qorsheysaa oo kaliya hubisaa — ma dhaqaajiso xogta ama ma akhrido safafka DB ee macmiilka.",
+    "needLink": "Marka hore dooro isku xirka schema.pi ee kor ku xusan. Haddii aadan midna haysan, diiwaangeli calaamad ku jirta menu-ka 'Isku xirka'.",
+    "loading": "Waa la soo shubayaa…",
+    "newPlan": "Qorshe socdaal cusub",
+    "project": "Mashruuc",
+    "projectPick": "Dooro mashruuc",
+    "planNm": "Magaca qorshaha",
+    "planNmHint": "Waxay ku dhacdaa magaca mashruuca",
+    "create": "Abuur qorshe",
+    "creating": "Abuurayaa…",
+    "snapHint": "Naqshadaynta wakhtigan (magacyada miiska, tiirarka iyo xiriirka) waxaa loo qaboojiyaa sidii sawir. Abuur qorshe cusub marka model-ka isbeddelo.",
+    "plans": "Qorshayaasha socdaalka",
+    "prev": "Hore",
+    "next": "Xiga",
+    "sts": {
+      "DRAFT": "Qabyo",
+      "READY": "Diyaar"
+    },
+    "del": "Tirtir",
+    "delConfirm": "Ma tirtirtaa qorshahan?",
+    "snapInfo": "Sawir-qaadis: {tables} miisas · {rels} xiriirro",
+    "dropped": "({n} xiriirro aan lahayn miisas jireed ayaa laga saaray kala-soocidda)",
+    "chunkSize": "Cabbirka qaybta (safaf/commit)",
+    "parallel": "Isbarbardhigga (miisas isku mar)",
+    "saveOpts": "Keydi xulashooyinka",
+    "optsHint": "Isbarbardhiggu waa tirada miisaska la soo shubay isku mar gudaha heer. Cabbirka qaybta waa cutubka commit (safaf) ee matoorka fulintu isticmaali doono.",
+    "order": "Amarka raridda",
+    "orderHint": "Si topoloji ahaan ayaa loo kala soocay xiriirrada naqshadeynta (ma aha FKs jireed) si miisaska waalidku u horreeyaan. Miisaska isku heerka ah isku tiirsanaan ma leh waxaana lagu rari karaa si isku mid ah.",
+    "cycles": "{n} koox(o) wareeg ah — oo la dhigay isku heer. Gacanta ku hagaaji amarkooda oo dib u dhig hubinta tixraaca ilaa inta la rarayo ka dib.",
+    "selfRefs": "Miisaska isku tixraacaya (heerarka) — marka hore rar safafka waalidka gudaha miiska",
+    "level": "Heerka {n}",
+    "checklist": "Liiska hubinta goynta",
+    "toReady": "U calaamadee diyaar",
+    "toDraft": "Ku noqo qabyo",
+    "readyNeedAll": "Hubi shay kasta ka hor intaadan u calaamadin qorshaha diyaar.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "Barta wareejinta CDC",
+        "desc": "Diiwaangeli barta isha joogtada ah ka hor inta aan la rarin (PG LSN · Oracle/Tibero SCN · si loo codeeyo, wakhtiga bilowga oo laga jaray daaqad isku-dhafan), ka bilow CDC halkaas, oo nuug nuqullada daaqadda wareejinta oo leh upserts."
+      },
+      "valueConv": {
+        "title": "Beddelidda qiimaha",
+        "desc": "Xeerarka ayaa loo dejiyay xarig madhan = NULL, CHAR buuxinta bannaan, NUMBER aan lahayn saxnaan → NUMERIC, DATE oo leh wakhti → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR dhererka, iyo LONG·RAW."
+      },
+      "charset": {
+        "title": "Xarfo-ururin",
+        "desc": "Xarfo-ururinta isha (KO16MSWIN949, UTF8, …) waa la xaqiijiyay, iyadoo la go'aamiyay tiirarka ka buuxsamay koritaanka multibyte iyo go'doominta xarfaha aan la beddeli karin."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB waxaa lagu shubaa qaybo (cabbirka iyo xaddidaadaha xusuusta) waxaana lagu xaqiijiyaa dhererka + hash."
+      },
+      "seqResync": {
+        "title": "Dib-u-habaynta isku-xigxiga",
+        "desc": "Ka dib marka la raro, isku-xigxiga bartilmaameedka·aqoonsiyada waxaa loo dejiyay max(furaha)+1."
+      },
+      "timezone": {
+        "title": "Aagga wakhtiga · tiirarka nidaamka",
+        "desc": "Aagga wakhtiga fasiraadda ee qiimayaasha aan lahayn mid (tusaale Asia/Seoul) waa la dejiyay, kiciyeyaasha wakhtiga la beddelay ma dul-saari doonaan wakhtiyada isha inta lagu jiro raridda, waxaana la dejiyay xeerarka beddelidda abuuraha/wax-ka-beddelaha."
+      },
+      "backpressure": {
+        "title": "Cadaadis dhabar · raridda bartilmaameedka",
+        "desc": "Yaree cabbirka qaybta iyo isbarbardhigga dib-u-dhaca bartilmaameedka, koritaanka WAL ama sugitaanka qufulka; dhis tusmooyinka aan-PK ahayn ka dib marka la raro oo ku socodsii ANALYZE·VACUUM ka dib."
+      }
+    },
+    "verify": "Xaqiijinta SQL",
+    "verifyHint": "Wuxuu soo saaraa tirada, wadarta tiirka nambarada, furaha nuqulka ah iyo furaha hash ee miiska kasta oo ku jira amarka raridda. Adigu ku socodsii isha iyo bartilmaameedka oo isbarbardhig (shaashaddani ma fuliso).",
+    "noHashOracle": "Oracle·Tibero hawlaha hash iyo soo-bandhigidda qoraalka way ka duwan yihiin PostgreSQL, sidaa darteed su'aalaha hash waa laga tagay — isbarbardhig tirada, wadarta iyo furayaasha nuqulka ah.",
+    "copy": "Koobiyeey",
+    "copied": "La koobiyeeyay",
+    "copyFail": "Lama koobiyeen karin. Dooro qoraalka oo gacanta ku koobiyeey.",
+    "engine": {
+      "title": "Fulinta·dib-u-bilowga · tijaabada·dib-u-celinta",
+      "body": "Fulinta dhabta ah ee guuritaanka (goobaha hubinta, cadaadiska dhabarka, go'doominta safka qaladka) iyo tijaabada, dib-u-celinta iyo diiwaangelinta barta bilowga CDC waxay imaan doonaan ka dib marka la dhammeeyo qaabka amniga wakiilka shaqaalaha (A10). Hadda tan waxaa ku jira qorsheynta, hubinta iyo xaqiijinta SQL."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi isku xirka waa la diyaarinayaa. Fadlan isku day mar dhow.",
+      "LINK_DOWN": "Lama gaari karo schema.pi. Fadlan isku day mar dhow.",
+      "LINK_AUTH": "Calaamadda isku xirka ayaa dhacday ama waa la buriyay. Soo saar calaamad cusub schema.pi oo mar kale diiwaangeli.",
+      "LINK_NOT_FOUND": "Isku xirka lama helin. Fadlan mar kale dooro isku xirka.",
+      "LINK_SCOPE": "Mashruucani ma aha mid ka tirsan taxonomy-ga isku xirka.",
+      "TIMEOUT": "Codsigii wuu dhacay. Fadlan isku day mar dhow.",
+      "RATE": "Codsiyo badan. Isku day mar kale daqiiqad gudaheed.",
+      "MIG_NO_TABLES": "Mashruucani ma laha miisas jireed oo la guuriyo. Marka hore u beddel jireed schema.pi.",
+      "MIG_CHECK_INCOMPLETE": "Hubi shay kasta oo ku jira liiska hubinta goynta ka hor intaadan u calaamadin qorshaha diyaar.",
+      "NOT_FOUND": "Qorshaha lama helin."
+    }
+  },
+  "monitor": {
+    "title": "Xarunta Kormeerka",
+    "collectNote": "Ururinta waxay ka socotaa schema.pi — guuritaanka la qorsheeyay (D7). Boggani wuxuu akhriyaa schema.pi soo koobidda kormeerka.",
+    "noLink": "Marka hore dooro ama diiwaangeli isku xirka schema.pi.",
+    "goConnect": "Diiwaangeli isku xir",
+    "period": "Muddada",
+    "periods": {
+      "30": "30 daqiiqo",
+      "60": "1 saac",
+      "360": "6 saacadood",
+      "1440": "24 saacadood"
+    },
+    "refresh": "Dib u cusboonaysii",
+    "loading": "Waa la soo shubayaa…",
+    "updatedAt": "{area} · laga bilaabo {time} (dib u cusboonaysiin otomaatig ah 30s kasta)",
+    "appTitle": "Waxqabadka app-ka",
+    "dbTitle": "Xaaladda DB ee isku xirka",
+    "urlTitle": "Hubinta URL",
+    "empty": "Ma jiraan xog la soo bandhigo.",
+    "breachTitle": "{n} xad-gudubyo xaddidan",
+    "rulesTitle": "Xeerarka xaddidan",
+    "rulesNote": "Xeerarka waxaa loo keydiyay isku xirkan waxaana lagu qiimeeyaa soo koobidda la helay; xad-gudubyada waxay helaan xuduud cas (ogeysiisyada waxay imaan doonaan mar dambe).",
+    "metric": "Cabbir",
+    "conn": "Isku xirka",
+    "allConns": "Dhammaan isku xirka",
+    "op": "Isbarbardhig",
+    "threshold": "Xaddiga",
+    "thrInvalid": "Geli nambar xaddiga.",
+    "addRule": "Ku dar sharci",
+    "noRules": "Wali ma jiraan sharciyo.",
+    "enable": "Daar",
+    "disable": "Demi",
+    "delete": "Tirtir",
+    "delConfirm": "Ma tirtirtaa sharcigan?",
+    "aiNote": "Falanqaynta dhacdada AI iyo ansixinta hagaajinta ayaa wali ka dhacda schema.pi kormeerka.",
+    "aiLink": "Fur schema.pi kormeerka",
+    "metrics": {
+      "APP_TPS": "TPS (codsiyo/s)",
+      "APP_ERR_PCT": "Heerka qaladka (%)",
+      "APP_SLOW_CNT": "Codsiyo gaabis ah",
+      "APP_AVG_MS": "Celceliska jawaabta (ms)",
+      "DB_SESS_CNT": "Fadhiyada",
+      "DB_LOCK_WAIT_CNT": "Sugitaanka qufulka",
+      "DB_CACHE_HIT_PCT": "Cache hit (%)",
+      "DB_SIZE_MB": "Cabbirka DB (MB)",
+      "URL_RSP_MS": "Jawaabta URL (ms)",
+      "URL_FAIL_CNT": "Guuldarrooyinka URL"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Marka hore dooro isku xir.",
+      "NOT_IMPLEMENTED": "schema.pi isku xirka waa la diyaarinayaa. Fadlan isku day mar dhow.",
+      "LINK_AUTH": "Calaamadda isku xirka waa mid aan sax ahayn ama waa dhacday. Soo saar calaamad cusub schema.pi oo diiwaangeli.",
+      "LINK_SCOPE": "Isku xirkan ma geli karo taxonomy-gaas.",
+      "RATE": "Codsiyo badan. Fadlan isku day mar dhow.",
+      "TIMEOUT": "schema.pi si tartiib ah ayuu u jawaabayaa. Fadlan isku day mar dhow.",
+      "RULE_LIMIT": "Ilaa 50 sharci isku xir kasta.",
+      "NOT_FOUND": "Sharciga lama helin."
+    }
+  },
+  "ops": {
+    "title": "Badbaadada Hawlgallada DB",
+    "loading": "Waa la soo shubayaa…",
+    "pickFirst": "Marka hore dooro isku xir iyo isku xirka sare",
+    "run": "Samee baaritaan",
+    "running": "Waa la baaraa…",
+    "noRun": "Wali ma jiraan baaritaan. Riix \"Samee baaritaan\"",
+    "lastRun": "Baaritaankii ugu dambeeyay {dtm}",
+    "readOnly": "Baaritaanku wuxuu akhriyaa kaliya (SELECT). Talooyinku waa hage waxayna ku xiran yihiin xusuusta server-ka, culeyska iyo shaqada",
+    "truncated": "Waxyaabo badan — kaliya 500-kii ugu horreeyay ayaa la hubiyay",
+    "paramsNote": "Wadarta xusuusta server-ka lama garanayo, sidaa darteed waxaa lagu qiyaasaa shared_buffers ≈ 25% ee RAM. random_page_cost wuxuu u malaynayaa SSD",
+    "auditNote": "Miisaska RLS-ka ka maqan iyo akoonnada aan la isticmaalin waa la hubin doonaa marka isku xirka su'aashu uu taageero",
+    "replNote": "Aasaasku waa Active-Standby (A-S) — hal primary + standby. Dib-u-ciyaarista dib-u-dhaca ≥ 5s = digniin, ≥ 60s = khatar (tixraaca RPO ee la cabbiray)",
+    "lagIdle": "Ma jiraan isbeddello",
+    "pager": "Bog-socodka",
+    "prev": "Hore",
+    "next": "Xiga",
+    "tabs": {
+      "params": "Cabbirrada",
+      "audit": "Akoonnada & mudnaanta",
+      "backup": "Kaydinta & soo kabashada",
+      "repl": "Koobiyeynta & DR",
+      "history": "Taariikhda"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Digniin",
+      "RISK": "Khatar"
+    },
+    "role": {
+      "primary": "Isku xirkan = Primary",
+      "standby": "Isku xirkan = Standby",
+      "unknown": "Doorka lama garanayo"
+    },
+    "col": {
+      "level": "Xukun",
+      "item": "Shay",
+      "value": "Qiimaha",
+      "reason": "Faahfaahin",
+      "standby": "Standby",
+      "state": "Xaaladda",
+      "sync": "Isku-dubarid",
+      "lag": "Dib-u-ciyaarista dib-u-dhaca"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "Doorka BYPASSRLS",
+      "bypass_ok": "Doorka BYPASSRLS",
+      "no_expiry": "Dhicitaanka erayga sirta ah",
+      "expiry_ok": "Dhicitaanka erayga sirta ah",
+      "public_grant": "Deegaanka PUBLIC",
+      "public_ok": "Deegaanka PUBLIC",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "WAL-kii ugu dambeeyay ee la kaydiyay",
+      "arc_stale": "WAL-kii ugu dambeeyay ee la kaydiyay",
+      "arc_recent": "WAL-kii ugu dambeeyay ee la kaydiyay",
+      "arc_failing": "WAL kaydinta oo fashilantay"
+    },
+    "rules": {
+      "sb_default": "Heerka caadiga ah (128MB). Server gaar ah waxaa lagu talinayaa qiyaastii 25% RAM",
+      "sb_ok": "Waxaa loo dejiyay ka sarreeya heerka caadiga ah",
+      "wm_over": "max_connections × work_mem wuxuu ka badan yahay xusuusta la qiyaasay. Kala-soocidda isku mar waxay halis u tahay xusuus la'aan",
+      "wm_default": "Heerka caadiga ah (4MB). Kala-soocidda waaweyn iyo hashes-ku waxay ku daadan karaan diskiga",
+      "wm_ok": "Gudaha xadka macquulka ah",
+      "mwm_default": "Heerka caadiga ah (64MB). VACUUM iyo dhismaha tusmooyinka ayaa laga yaabaa inay gaabis noqdaan; tixgeli 256MB ama ka badan",
+      "mwm_ok": "Waxaa loo dejiyay ka sarreeya heerka caadiga ah",
+      "av_on": "autovacuum waa daaran yahay",
+      "av_off": "autovacuum waa dansan yahay. Khatar sare oo ah bararka miiska iyo wareegga aqoonsiga macaamilka",
+      "conn_high": "max_connections waa sare. Isku xir kasta wuxuu isticmaalaa xusuus; pooler (PgBouncer iwm.) ayaa lagu talinayaa",
+      "conn_ok": "Gudaha xadka macquulka ah",
+      "lmd_off": "Log-ga su'aalaha gaabiska ah waa dansan yahay (-1). Qiyaastii 1000ms ayaa lagu talinayaa",
+      "lmd_all": "Qoraal kasta waa la diiwaangeliyaa (0). Culeys badan oo log-ga ah",
+      "lmd_ok": "Log-ga su'aalaha gaabiska ah waa daaran yahay",
+      "st_off": "Ma jiro wakhti-xaddidid qoraal oo server-ka oo dhan ah (0). Deji xaddidaadyo door kasta ama codsi kasta",
+      "st_ok": "Wakhti-xaddidid qoraal waa la dejiyay",
+      "iit_off": "Ma jiro wakhti-xaddidid aan shaqaynayn-gudaha-macaamilka (0). Waxay sababi kartaa quful hayn iyo barar",
+      "iit_ok": "Wakhti-xaddidid aan shaqaynayn-gudaha-macaamilka waa la dejiyay",
+      "ckpt_short": "Wakhtiga hubinta waa 5 daqiiqo ama ka yar. Tixgeli 10–15 daqiiqo culeysyada qorista ee badan",
+      "ckpt_ok": "Gudaha xadka macquulka ah",
+      "wal_minimal": "wal_level=minimal wuxuu ka dhigayaa PITR iyo koobiyeynta mid aan suurtagal ahayn. Isticmaal replica ama ka sareeya",
+      "wal_ok": "Heerka WAL wuxuu taageeraa PITR iyo koobiyeynta",
+      "rpc_hdd": "HDD default (4). SSD, 1.1–2 ayaa lagu talinayaa",
+      "rpc_ok": "Ku habboon SSD",
+      "super_many": "Laba ama ka badan superusers. Mid u hayso maamulka oo kuwa kale si kaliya mudnaanta loo baahan yahay",
+      "super_ok": "Ugu badnaan hal superuser",
+      "bypass_rls": "Doorka aan superuser ahayn ee ka gudba amniga safka (RLS) ayaa jira",
+      "bypass_ok": "Ma jiraan doorar RLS-ka ka gudba",
+      "no_expiry": "Doorka gelitaanka ee aan lahayn dhicitaanka erayga sirta ah. Deji VALID UNTIL akoonnada shakhsi ahaaneed",
+      "expiry_ok": "Dhammaan doorarka gelitaanka waxay leeyihiin dhicitaan",
+      "public_grant": "PUBLIC (door kasta) wuxuu leeyahay mudnaanta miiska. Mudnaanta qorista waa khatar",
+      "public_ok": "Ma jiraan mudnaanta miiska oo loo siiyay PUBLIC",
+      "arc_on": "Kaydinta WAL (archive_mode) waa daaran tahay",
+      "arc_off": "Kaydinta WAL waa dansan tahay, sidaa darteed soo kabashada wakhtiga (PITR) waa mid aan suurtagal ahayn",
+      "arc_cmd_empty": "archive_mode waa daaran yahay laakiin archive_command iyo archive_library waa madhan yihiin",
+      "arc_never": "Wali ma jiro WAL la kaydiyay",
+      "arc_stale": "WAL-kii ugu dambeeyay ee la kaydiyay wuxuu ka weyn yahay 24 saacadood",
+      "arc_recent": "WAL waxaa la kaydiyay 24 saacadood gudahood",
+      "arc_failing": "Kaydinta WAL hadda waa fashilantay. Hubi diskiga, ogolaanshaha iyo jidka bartilmaameedka",
+      "repl_is_standby": "Isku xirkan waa standby (qaabka soo kabashada). Hubi dib-u-dhaca isku xirka primary",
+      "repl_none": "Ma jiro standby ku xiran. Ma jiro habayn soo kabashada musiibada (DR)",
+      "repl_ok": "Standbys-ku si caadi ah ayay u shubayaan",
+      "repl_lag": "Standby wuu dib-u-dhacayaa ama ma shubayo"
+    },
+    "manual": {
+      "title": "Liiska hubinta gacanta",
+      "intro": "Hababka kaydinta iyo soo kabashada ee aan si otomaatig ah loo hubin karin. Calaamadee marka la xaqiijiyo oo qor caddaynta",
+      "memo": "Xusuus-qor (tusaale qalab, jadwal, markii ugu dambeysay ee la hubiyay)",
+      "save": "Keydi",
+      "updated": "La cusboonaysiiyay {dtm}",
+      "items": {
+        "base_backup": "Kayd buuxa (pg_basebackup iwm.) wuxuu ku guuleystay 7-dii maalmood ee ugu dambeysay",
+        "offsite_copy": "Nuqul kayd ah ayaa lagu hayaa meel ka baxsan goobta (gobol kale ama kayd)",
+        "restore_rehearsal": "Tijaabo soo kabasho ayaa la sameeyay rubucan waxaana la diiwaangeliyay muddadeeda",
+        "pitr_target": "Nidaamka PITR iyo bartilmaameedka RPO/RTO waa la diiwaangeliyay",
+        "backup_encrypt": "Faylasha kaydka waa la siriyay waxaana la xaddiday gelitaanka",
+        "retention": "Muddada kaydinta kaydka iyo siyaasadda tirtiridda waa la qeexay"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi isku xirka waa la diyaarinayaa. Fadlan isku day mar dhow",
+      "CONN_UNSUPPORTED": "Isku xirkan wali lama taageero (kaliya PostgreSQL toos ah)",
+      "TIMEOUT": "DB-ga bartilmaameedka wuxuu u jawaabay si tartiib ah. Fadlan isku day mar dhow",
+      "RATE": "Codsiyo badan. Isku day mar kale daqiiqad gudaheed",
+      "Q_UNKNOWN": "Su'aal aan la taageerin. Hubi schema.pi nooca API ee isku xirka",
+      "INVALID_INPUT": "Xulashada isku xirka ama isku xirka waa mid aan sax ahayn"
+    }
+  },
+  "perf": {
+    "title": "Waxqabadka",
+    "loading": "Waa la soo shubayaa…",
+    "pickFirst": "Marka hore dooro isku xir iyo isku xirka sare",
+    "pager": "Bog-socodka",
+    "tabs": {
+      "collect": "Ururi",
+      "top": "Su'aalo gaabis ah",
+      "health": "Caafimaadka miiska & tusmooyinka",
+      "trend": "Isbeddelka cabbirka",
+      "activity": "Hawlaha & qufulka"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi isku xirka waa la diyaarinayaa. Fadlan isku day mar dhow",
+      "PGSS_MISSING": "Kordhinta pg_stat_statements kuma rakibna DB-gan, sidaa darteed tirakoobyada su'aalaha lama heli karo.",
+      "CONN_UNSUPPORTED": "Isku xirkan wali lama taageero (kaliya isku xirka PostgreSQL toos ah)",
+      "TIMEOUT": "DB-ga bartilmaameedka ah wuxuu si gaabis ah uga jawaabay. Fadlan mar kale isku day hadhow.",
+      "RATE": "Codsiyo badan. Isku day mar kale daqiiqad gudaheed",
+      "LINK_AUTH": "Calaamadda isku xirka ayaa dhacday ama waa la buriyay. Mar kale diiwaangeli calaamadda bogga Isku xirka",
+      "LINK_SCOPE": "Isku xirkan ma aha mid ka tirsan aagga mawduuca isku xirka",
+      "Q_UNKNOWN": "Su'aal aan la taageerin. Hubi schema.pi nooca API ee isku xirka",
+      "INVALID_INPUT": "Qiimaha isku xirka ama isku xirka waa mid aan sax ahayn"
+    },
+    "pgss": {
+      "title": "Sida loo daaro pg_stat_statements",
+      "body": "Su'aalaha gaabiska ah ee Top-N waxay u baahan yihiin kordhinta pg_stat_statements. Ku socodsii bayaanka hoose adigoo ah maamulaha DB. Supabase, ka shid Dashboard Database → Extensions.",
+      "note": "PostgreSQL-ka isku-martigeliyay wuxuu sidoo kale u baahan yahay pg_stat_statements gudaha shared_preload_libraries (postgresql.conf) iyo dib-u-bilow. Miiska, tusmooyinka iyo tirakoobyada cabbirka waxay shaqeeyaan iyada oo aan lahayn"
+    },
+    "collect": {
+      "intro": "Hadda ururi wuxuu akhriyaa tirakoobyada su'aalaha sare, miisaska, tusmooyinka iyo cabbirrada hal mar wuxuuna u keydiyaa sida sawir-qaadis. Ururi ugu yaraan laba jeer si aad u aragto isbeddellada iyo isbeddellada cabbirka",
+      "run": "Hadda ururi",
+      "running": "Waa la ururiyaa…",
+      "done": "La ururiyay {dtm} — {qry} su'aalo · {tbl} miisas · {idx} tusmooyin"
+    },
+    "top": {
+      "sort": "Kala sooc",
+      "sortTotal": "Wadarta wakhtiga",
+      "sortMean": "Celceliska wakhtiga",
+      "sortCalls": "Wicitaannada",
+      "empty": "Wali ma jiraan sawir-qaadis. Riix Hadda ururi tabka Ururinta",
+      "range": "Isbeddelka u dhexeeya {from} → {to}",
+      "first": "Sawir-qaadistii ugu horreysay {dtm} — qiimayaasha isku-darka ah (isbeddellada sawir-qaadista xigta)",
+      "query": "Su'aal (xarfaha la qariyay)",
+      "calls": "Wicitaannada",
+      "totalMs": "Wadarta ms",
+      "meanMs": "Celcelis ms",
+      "rows": "Safaf",
+      "reset": "Dib-u-dejinta tirakoobyada waa la ogaaday — waxaa lagu muujiyay isku-darka"
+    },
+    "health": {
+      "empty": "Wali ma jiraan sawirro. Riix Ururi hadda tabka Ururi",
+      "basis": "Ku saleysan sawirka {dtm}",
+      "unusedIdx": "Tusmooyinka aan la isticmaalin",
+      "unusedIdxHint": "Tusmooyinka aan waligood la isticmaalin tan iyo dib-u-dejinta tirakoobyada ugu dambeysay (cabbir ahaan). Ha tuurin PK ama tusmooyinka xaddidaadda gaarka ah",
+      "fullScan": "Baadhitaan buuxa oo xad dhaaf ah",
+      "fullScanHint": "Shaxadaha leh 1,000+ saf oo nool oo baadhitaanada buuxa ay yihiin ugu yaraan kala badh — dib u eeg tusmooyinka tiirarka shaandhada",
+      "dead": "Tuubbooyinka dhintay ee xad dhaafka ah",
+      "deadHint": "Saamiga tuubbooyinka dhintay 20% ama ka badan — hubi goobaha VACUUM iyo autovacuum",
+      "none": "Midna",
+      "scans": "baadhitaanada"
+    },
+    "trend": {
+      "limit": "Xadka cabbirka",
+      "empty": "Ma jiraan sawirro 30-kii maalmood ee la soo dhaafay",
+      "chart": "Isbeddelka cabbirka DB ee 30-kii maalmood ee la soo dhaafay",
+      "now": "Cabbirka hadda",
+      "perDay": "Korodhka maalintii",
+      "needMore": "Wuxuu u baahan yahay 2+ sawirro",
+      "daysLeft": "Wuxuu gaarayaa {gb} GB",
+      "noGrowth": "Ma jiro isbeddel koritaan",
+      "days": "qiyaastii {n} maalmood"
+    },
+    "activity": {
+      "refresh": "Dib u cusboonaysii",
+      "live": "Weydiin toos ah — lama kaydin",
+      "sessions": "Hawsha fadhiga",
+      "locks": "Qufullo",
+      "none": "Midna"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Dhuumaha",
+    "intro": "Hubi in DB-ga isha uu diyaar u yahay qabashada xogta isbeddelka (CDC) oo naqshadee isha → beddel → dhuumaha bartilmaameedka. Marxaladdan waxay kaliya hubisaa oo naqshadeysaa; ma jiraan xog saf ah oo macmiil ah oo la akhriyo ama la kaydiyo.",
+    "needLink": "Marka hore dooro xiriirka schema.pi ee kor ku xusan. Haddii aadan midna lahayn, iska diiwaan geli calaamad ku taal menu-ka 'Xiriir'.",
+    "needConn": "Dooro xiriirka DB ee la hubinayo ee kor ku xusan.",
+    "loading": "Waa la soo shubayaa…",
+    "pager": "Bogag",
+    "prev": "Hore",
+    "next": "Xiga",
+    "runTitle": "Orod & la soco (7-3 · 7-4)",
+    "runBody": "Fulinta dhuumaha, la socodka dib u dhaca iyo dib u habaynta waxay yimaadaan marka wakiilka shaqaalaha iyo qaabka amniga la dhammaystiro. Hadda, ku kaydi qeexitaannada sidii qabyo qoraal (DRAFT).",
+    "pre": {
+      "title": "Hubinta hore ee isha",
+      "intro": "Shaxad kasta, waxay hubisaa tiirarka wakhtiga isbeddelka, tiirarka tirtirka jilicsan iyo furaha aasaasiga ah si ay u soo jeediso habka qabashada (adapter), waxayna hubisaa diyaar garowga WAL logical replication. Kaliya akhriska buug-gacmeedka iyo weydiimaha goobaha.",
+      "schema": "Schema (ikhtiyaari)",
+      "schemaPh": "Dhammaan",
+      "run": "Samee hubinta hore",
+      "running": "Waa la hubinayaa…",
+      "sum": "{tables} shaxadood · {noPk} PK la'aan · {deleteUnseen} ma qaban karaan tirtirka",
+      "truncated": "Weydiin buug-gacmeedka ayaa gaartay xadka 500-saf, sidaa darteed shaxadaha qaarkood ayaa laga yaabaa inay maqan yihiin. Qeex schema oo mar kale hubi.",
+      "empty": "Ma jiraan shaxado la hubiyo",
+      "colTable": "Shaxad",
+      "colChg": "Tiirka wakhtiga isbeddelka",
+      "colDel": "Tiirka tirtirka jilicsan",
+      "colAdapter": "Habka lagu taliyay · sababaha",
+      "toDraft": "Samee qabyo qoraal dhuumo ah oo laga soo xushay {n}"
+    },
+    "ready": {
+      "ok": "WAL logical replication waa diyaar — shaxadaha leh PK waxay isticmaali karaan LOGICAL",
+      "no": "WAL logical replication ma diyaar — ku qabso polling ama isbarbardhigga furaha",
+      "senders": "{n} xiriirada replication"
+    },
+    "adapter": {
+      "LOGICAL": "Logical replication (WAL)",
+      "POLL": "Polling wakhtiga isbeddelka",
+      "KEY_DIFF": "Farqiga sawirka furaha",
+      "NONE": "Dib u shubid buuxda oo kaliya"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Wuxuu leeyahay tiirka wakhtiga isbeddelka",
+      "NO_CHG_COL": "Ma jiro tiirka wakhtiga isbeddelka",
+      "HAS_SOFT_DEL": "Wuxuu leeyahay tiirka tirtirka jilicsan",
+      "NO_SOFT_DEL": "Ma jiro tiirka tirtirka jilicsan",
+      "HAS_PK": "Wuxuu leeyahay furaha aasaasiga ah",
+      "NO_PK": "Ma jiro furaha aasaasiga ah — safafka isbeddelay lama aqoonsan karo",
+      "DELETE_UNSEEN": "Polling ma qaban karo DELETE-yada jireed (waxaa lagu taliyay tiirka tirtirka jilicsan)",
+      "LOGICAL_NOT_READY": "Wuxuu u beddeli karaa LOGICAL marka WAL logical replication uu diyaar noqdo",
+      "FULL_RELOAD_ONLY": "Ma jiro PK ama tiirka wakhtiga isbeddelka, sidaa darteed ma jiro qabasho kordhin ah — ku dar PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level ma aha logical (beddelidda waxay u baahan tahay dib u bilawga DB)",
+      "NO_SLOTS": "max_replication_slots waa 0",
+      "NO_SENDERS": "max_wal_senders waa 0",
+      "IS_STANDBY": "Server-ka standby — ka qaado logical replication server-ka aasaasiga ah",
+      "SETTINGS_UNKNOWN": "Ma akhrin karin goobaha, diyaar garowga lama garanayo"
+    },
+    "ed": {
+      "title": "Qeexitaannada dhuumaha",
+      "draftOnly": "Naqshad kaliya — waxaa lagu kaydiyaa sidii qabyo qoraal (DRAFT)",
+      "new": "Dhuumo cusub",
+      "empty": "Ma jiraan dhuumo la kaydiyay",
+      "manual": "Gacanta",
+      "edit": "Wax ka beddel",
+      "remove": "Tirtir",
+      "removeConfirm": "Ma tirtirtaa dhuumaha '{name}'?",
+      "name": "Magac",
+      "adapter": "Habka qabashada",
+      "srcConn": "Xiriirka isha",
+      "useCurrentConn": "Isticmaal xiriirka kor ku xusan",
+      "sched": "Jadwalka (cron 5-field, bannaan = gacanta)",
+      "target": "Bartilmaameed",
+      "targetPh": "tusaale: analytics DB analytics.public / lake s3://…",
+      "tables": "Shaxadaha isha (xariiq cusub ama comma lagu kala saaray)",
+      "steps": "Tallaabooyinka (isha → beddel → bartilmaameed)",
+      "op": "Hawlgal",
+      "notePh": "Sharaxaad · xaalad (ikhtiyaari)",
+      "addTransform": "Ku dar tallaabada beddelka",
+      "save": "Kaydi",
+      "saving": "Waa la kaydinayaa…",
+      "saved": "Waa la kaydiyay",
+      "close": "Xidh"
+    },
+    "kind": {
+      "SOURCE": "Isha",
+      "TRANSFORM": "Beddel",
+      "TARGET": "Bartilmaameed"
+    },
+    "sts": {
+      "DRAFT": "Qabyo qoraal"
+    },
+    "check": {
+      "NAME_REQUIRED": "Geli magac",
+      "CONN_REQUIRED": "Dooro xiriirka isha",
+      "CRON_INVALID": "Geli jadwalka sidii cron 5-field (daqiiqad saacad maalin bil toddobaad; tirooyin, *, ',', -, /)",
+      "OP_REQUIRED": "Geli hawlgal tallaabo kasta",
+      "STEPS_TOO_FEW": "Tallaabooyinka isha iyo bartilmaameedka waa loo baahan yahay",
+      "STEPS_TOO_MANY": "Ilaa 20 tallaabo",
+      "STEP_FIRST_SOURCE": "Tallaabada ugu horreysa waa inay noqotaa isha",
+      "STEP_LAST_TARGET": "Tallaabada ugu dambeysa waa inay noqotaa bartilmaameedka",
+      "STEP_MIDDLE_TRANSFORM": "Kaliya tallaabooyinka beddelka ayaa dhex fadhiisan kara"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Dhuumo magacan leh ayaa hore u jirta. Isticmaal magac kale",
+      "CONN_UNSUPPORTED": "Xiriirkan lama hubin karo weli (kaliya xiriirada server-ka tooska ah ee PostgreSQL hadda)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL Tuning Lab",
+    "intro": "Dooro xiriir oo geli SQL si aad u aragto qorshaha fulinta sidii geed, oo leh sababaha gaabiska (baadhitaanada buuxa, wareegyada isku xidhan, kala soocidda waaweyn) iyo SQL anti-patterns oo lagu hubiyay schema.pi domain-yada caadiga ah. Weydiimaha dhab ahaantii lama fuliyo (ma jiro ANALYZE).",
+    "needLink": "Dooro xiriir iyo xiriir kor ku xusan si aad u aragto qorshayaasha. Hubinta anti-pattern waxay shaqeysaa iyada oo aan xiriir lahayn.",
+    "sqlLabel": "SQL (hal SELECT ama WITH statement)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Muuji qorshaha",
+    "explaining": "Waa la soo shubayaa…",
+    "save": "Kaydi qorshaha",
+    "saving": "Waa la kaydinayaa…",
+    "saveName": "Summad (tusaale: ka hor inta aan la gelin tusmo)",
+    "saveNote": "Qiimaha joogtada ah ee SQL iyo shuruudaha qorshaha waxaa lagu qariyaa ? marka la kaydiyo.",
+    "plan": {
+      "title": "Qorshaha fulinta",
+      "summary": "Qiimaha guud {cost} · {ms}ms",
+      "cost": "qiimaha",
+      "rows": "safaf",
+      "width": "ballac"
+    },
+    "warn": {
+      "none": "Ma jiraan digniino la xuso.",
+      "SEQ_SCAN_LARGE": "Baadhitaan buuxa oo ku saabsan {relation} (qiyaastii {rows} saf) — tixgeli tusmo ku saabsan tiirarka shaandhada.",
+      "NESTED_LOOP_HIGH": "Wareegga isku xidhan wuxuu soo saaraa qiyaastii {rows} saf — tixgeli hash ama merge join, ama tusmo ku saabsan shuruudaha join.",
+      "SORT_SPILL": "Cabbirka kala soocidda waa qiyaastii {kb}KB, oo ka sarreeya work_mem-ka asalka ah (4MB); waxaa laga yaabaa inay ku daadato diskiga."
+    },
+    "lint": {
+      "run": "Hubi anti-patterns",
+      "title": "Hubinta SQL anti-pattern",
+      "none": "Ma jiraan anti-patterns la helay.",
+      "domainsOff": "Domain-yada caadiga ah lama soo shubi karin; waxaa lagu hubiyay kaliya xeerarka suffix-ka tiirka asalka ah.",
+      "types": {
+        "num": "tiro",
+        "date": "taariikh",
+        "char": "xaraf"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — dooro kaliya tiirarka aad u baahan tahay (I/O dheeraad ah, ma jiro tusmo daboolaya).",
+        "FUNC_ON_COLUMN": "Tiirka shaandhada {column} waxaa lagu duubay hawlgal ama muujin, sidaa darteed tusmaheeda lama isticmaali karo — beddel joogtada ah.",
+        "LEADING_WILDCARD": "LIKE oo leh % hormood ah ma isticmaali karo tusmo B-tree ah — tixgeli tusmo pg_trgm GIN ah.",
+        "OR_DIFF_COLUMNS": "Shuruudaha tiirarka kala duwan waxaa lagu daray OR — tixgeli UNION ALL ama tusmooyinka tiir kasta.",
+        "IMPLICIT_CAST": "{column} waxaa lagu barbardhigayaa tiro la soo xigtay — isku dheji tiirka iyo noocyada joogtada ah (implicit cast).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) waxba ma soo celiso marka NULLs ay jiraan waana gaabis — isticmaal NOT EXISTS.",
+        "NO_WHERE": "Ma jiro WHERE clause — shaxad weyn tani waa baadhitaan buuxa (ku dar shuruud ama LIMIT).",
+        "DOMAIN_MISMATCH": "{column} waa nooc {expected} ah oo ku salaysan domain-ka caadiga ah laakiin waxaa lagu barbardhigayaa joogto nooc kale ah — implicit cast-ka ayaa laga yaabaa inuu ka hortago isticmaalka tusmada."
+      }
+    },
+    "saved": {
+      "title": "Qorshayaasha la kaydiyay · Isbarbardhig",
+      "empty": "Ma jiraan qorshayaal la kaydiyay. Eeg qorshe, ka dibna kaydi.",
+      "pick": "Dooro qorshe la isbarbardhigo",
+      "pick2": "Dooro laba qorshe oo la isbarbardhigo.",
+      "compare": "Isbarbardhig laba qorshe",
+      "delete": "Tirtir",
+      "cost": "qiimaha",
+      "prev": "Hore",
+      "next": "Xiga",
+      "page": "Bogga {page}"
+    },
+    "diff": {
+      "cost": "Qiimaha guud {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Laba qorshe ayaa loogu talagalay SQL kala duwan (ka dib marka la caadiyeeyo).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Ma jiro isbeddel ku yimid nodes-ka qorshaha.",
+      "before": "Kahor",
+      "after": "Kadib"
+    },
+    "ai": {
+      "title": "Talooyinka AI tuning",
+      "badge": "Waa soo socotaa",
+      "body": "Waa soo socotaa (ka dib marka la ansixiyo iyo habraacyada cabbirka saamaynta) — talooyinka waxaa laga soo saari doonaa SQL oo leh joogtooyin la qariyay waxaana loo diiwaan gelin doonaa sidii la codsaday kaliya ka dib marka la ansixiyo DA iyo saamaynta la cabbiray."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi muuqaalka xiriirka waa la diyaarinayaa. Fadlan isku day mar kale dhawaan.",
+      "LINK_AUTH": "Calaamadda xiriirka ayaa dhacday ama waa la buriyay. Soo saar calaamad cusub schema.pi oo mar kale iska diiwaan geli.",
+      "LINK_SCOPE": "Xiriirkan ma isticmaali karo xiriirkaas (nidaamka kala soocidda oo kala duwan).",
+      "CONN_UNSUPPORTED": "Nooca xiriirkan lama taageero weli (kaliya xiriirada server-ka PostgreSQL).",
+      "Q_UNKNOWN": "Weydiin aan la taageerin.",
+      "SQL_NOT_SELECT": "Qorshayaasha waxaa laga heli karaa kaliya hal statement oo ka bilaabmaya SELECT ama WITH.",
+      "TIMEOUT": "Codsigii wuu dhacay (5 ilbidhiqsi). Soo gaabi SQL ama isku day mar kale gadaal.",
+      "RATE": "Codsi badan. Isku day mar kale daqiiqad gudaheed.",
+      "PAYLOAD_TOO_LARGE": "Qorshuhu wuu ka weyn yahay in la kaydiyo.",
+      "LINK_NOT_FOUND": "Xiriirka lama helin. Fadlan mar kale dooro xiriirka."
+    }
+  },
+  "nav": {
+    "label": "Astaamaha",
+    "connect": "Ku xidh",
+    "sqlLab": "SQL Tuning",
+    "perf": "Waxqabadka",
+    "monitor": "La socodka",
+    "drift": "Leexasho",
+    "migration": "Hijra",
+    "pipeline": "Dhuumo",
+    "analytics": "Falanqaynta",
+    "ops": "Badbaadada Hawlgalka",
+    "learn": "Baro"
   }
 }

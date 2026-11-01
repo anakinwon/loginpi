@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "En DBA- og SQLP-arbeidsbenk for å kjøre DB-motorer raskt og sikkert"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Få DB-motoren til å kjøre dataene dine raskt og sikkert",
+    "description": "En DBA- og SQLP-arbeidsbenk for utførelsesplaner, statistikk og ytelse. schema.pi håndterer design og standarder; dbms.pi er partneren på motorsiden.",
+    "welcome": "Velkommen, {name}.",
+    "featTitle": "Funksjoner",
+    "featDesc": {
+      "connect": "Registrer et schema.pi-koblingstoken og sjekk tilkoblingsstatus",
+      "sqlLab": "Plantre, advarsler, sammenligning og anti-mønsterkontroller mot standarddomener",
+      "perf": "Sakte spørring Top-N, tabell-/indekshelse, kapasitetsprognose, aktivitet og låser",
+      "monitor": "App-, DB- og URL-metrikksammendrag med terskelvarsler",
+      "drift": "Sammenlign schema.pi-modell og DDL-historikk med den virkelige katalogen, mål indekseffekt",
+      "migration": "Topologisk lastrekkefølge, biter, sjekkliste og verifiserings-SQL",
+      "pipeline": "Forhåndskontroll av endringsfangst og kilde→transformasjon→mål-pipeline-definisjoner",
+      "analytics": "KPI-dashbord, 3-lags lake-mapping og datasettkatalog",
+      "ops": "Skrivebeskyttet diagnose av parametere, roller, sikkerhetskopiering og replikering DR",
+      "learn": "SQLP/DAP-øvelsesspørsmål, justeringssaker og DBMS-sammenligningsordbok"
+    }
+  },
   "auth": {
     "checking": "Sjekker pålogging…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "Kunne ikke opprette en koblingskode. Vennligst prøv igjen senere.",
     "AUTH_DB_UNAVAILABLE": "Kunne ikke lagre kontoen din, så pålogging mislyktes. Vennligst prøv igjen senere.",
     "LINK_TRY_LIMIT": "For mange feil koblingskoder. Prøv igjen om 15 minutter."
+  },
+  "analytics": {
+    "title": "Analyse og Lake",
+    "intro": "dbms-aktivitets-KPI-er, tre-lags lake-design og datasettkatalog på ett sted.",
+    "storageNotice": "Lake-lagring (kundeside eller sky) er ikke bestemt ennå (PRD seksjon 10 #7). Foreløpig lagres kun design og navnemapping – ingen raddata.",
+    "noLink": "Velg eller registrer en schema.pi-kobling først.",
+    "goConnect": "Registrer en kobling",
+    "loading": "Laster inn …",
+    "refresh": "Oppdater",
+    "kpi": {
+      "title": "KPI-dashbord",
+      "updatedAt": "{area} · per {time}",
+      "notBuilt": "Ikke bygget",
+      "keys": {
+        "links": "Mine koblinger",
+        "perf": "Ytelsesøyeblikksbilder",
+        "drift": "Driftkjøringer",
+        "mig": "Migreringsplaner",
+        "pipe": "Pipelines",
+        "lake": "Lake-datasett"
+      },
+      "countsChart": "Totalt per funksjon",
+      "trendTitle": "Ytelsesøyeblikksbilder de siste 14 dagene",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Ingen ytelsesøyeblikksbilder de siste 14 dagene.",
+      "monTitle": "schema.pi-monitoroversikt (siste time)",
+      "monTps": "Forespørsler/s",
+      "monErr": "Feilrate",
+      "monAvg": "Gj.snittlig respons (ms)",
+      "monDb": "DB-tilkoblinger",
+      "monFail": "Kunne ikke laste monitoroversikten: {msg}"
+    },
+    "lake": {
+      "title": "Tre-lags lake-design",
+      "raw": "Rå",
+      "rawDesc": "Laster kilde-DB-kolonnenavn og -typer som de er.",
+      "std": "Standardisert",
+      "stdDesc": "Endrer navn på kolonner til schema.pi-godkjente standardtermer.",
+      "cur": "Kurert",
+      "curDesc": "Analyse-datasett gruppert etter entitet.",
+      "loadProjects": "Last inn prosjekter",
+      "project": "Prosjekt",
+      "pickProject": "Velg et prosjekt",
+      "noProjects": "Ingen prosjekter i dette området.",
+      "noTables": "Dette prosjektets modell har ingen tabeller.",
+      "conform": "Standardoverensstemmelse {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} kolonner · {pct}% overensstemmende",
+      "colSrc": "Kildekolonne",
+      "colStd": "Standardisert kolonne",
+      "colType": "Type",
+      "colOk": "Format",
+      "ok": "OK",
+      "ng": "Sjekk",
+      "pk": "PK",
+      "selectAll": "Velg alle",
+      "selected": "{cnt} valgt",
+      "save": "Legg til i lake-design",
+      "saved": "La til {cnt} i katalogen."
+    },
+    "catalog": {
+      "title": "Datasettkatalog",
+      "schemaCard": "schema.pi er sannhetskilden for analyse-datasettdefinisjoner, metasøk og ordliste. Her ser du kun lake-lastestatus og friskhet.",
+      "openSchema": "Vis definisjoner i schema.pi",
+      "empty": "Ingen tabeller lagt til lake-designet ennå.",
+      "status": {
+        "DSGN": "Kun design",
+        "LOADED": "Lastet",
+        "FAIL": "Lasting mislyktes"
+      },
+      "lastLoad": "Siste lasting {time}",
+      "neverLoaded": "Aldri lastet",
+      "remove": "Fjern",
+      "removeConfirm": "Fjerne {tbl} fra katalogen?",
+      "prev": "Forrige",
+      "next": "Neste",
+      "page": "Side {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Velg en kobling først.",
+      "NOT_FOUND": "Ikke funnet. Sjekk om modellen er endret."
+    }
+  },
+  "drift": {
+    "title": "Modell ↔ DB-drift",
+    "intro": "Sammenlign schema.pi-designmodellen og DDL-historikken med den levende DB-katalogen for å finne avvik, og mål om designede indekser faktisk brukes. Kundens raddata leses eller lagres aldri.",
+    "needLink": "Velg en schema.pi-kobling ovenfor først. Hvis du ikke har noen, registrer et token i 'Kobling'-menyen.",
+    "needConn": "Velg DB-tilkoblingen som skal sammenlignes ovenfor.",
+    "project": "Prosjekt",
+    "projectPick": "Velg et prosjekt",
+    "loading": "Laster inn …",
+    "run": "Kjør drift-deteksjon",
+    "running": "Sammenligner …",
+    "readOnly": "Kun skrivebeskyttede katalog- og statistikkspørringer kjøres.",
+    "applyInSchema": "Anvend rettelser (modellredigeringer, DDL-generering og utførelse) i schema.pi, sannhetskilden.",
+    "history": "Deteksjonshistorikk",
+    "prev": "Forrige",
+    "next": "Neste",
+    "none": "Ingen",
+    "model": "Modell",
+    "reqNo": "Forespørsel {id}",
+    "notSaved": "Kunne ikke lagre denne kjøringen i historikken (resultatene vises normalt).",
+    "capped": "For mange elementer – viser de første {cap} per seksjon (antall er komplett).",
+    "statsMissing": "Indeksbruksstatistikk var utilgjengelig, så bruken kunne ikke bedømmes.",
+    "sum": {
+      "missingTables": "Tabeller mangler i DB",
+      "extraTables": "Tabeller ikke i modell",
+      "colMismatches": "Kolonnemismatch",
+      "missingIndexes": "Designede indekser mangler i DB",
+      "extraIndexes": "Indekser ikke i modell",
+      "ddlMissing": "Objekter borte etter anvendelse",
+      "unusedIndexes": "Ubrukte designede indekser"
+    },
+    "sec": {
+      "ddlMissing": "DDL anvendt, men mangler i DB",
+      "missingTables": "Tabeller i modell, men mangler i DB",
+      "extraTables": "Tabeller i DB, men ikke i modell",
+      "colMismatches": "Kolonnetype / NULL-mismatch",
+      "missingIndexes": "Designede indekser mangler i DB",
+      "extraIndexes": "Indekser kun i DB (ekskl. PK)",
+      "idxUsage": "Effektivitet av designede indekser"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi registrerte disse objektene som anvendt, men de er borte – mistenker en manuell sletting eller tilbakeføring.",
+      "extraTables": "Disse kan tilhøre andre prosjekter eller systemtabeller på denne tilkoblingen.",
+      "idxUsage": "Null skanninger siden siste statistikk-tilbakestilling betyr ubrukt. Sjekk statistikkvinduet før du sletter."
+    },
+    "kind": {
+      "MISSING": "mangler i DB",
+      "EXTRA": "ikke i modell",
+      "TYPE": "type avviker",
+      "NULL": "nullbarhet avviker"
+    },
+    "col": {
+      "idx": "Indeks",
+      "scans": "Skanninger",
+      "size": "Størrelse",
+      "status": "Dom"
+    },
+    "usage": {
+      "USED": "I bruk",
+      "UNUSED": "Ubrukt designet indeks",
+      "NO_STATS": "Ingen statistikk"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi-koblingen er ikke klar ennå. Vennligst prøv igjen om kort tid.",
+      "LINK_DOWN": "Kan ikke nå schema.pi. Vennligst prøv igjen om kort tid.",
+      "LINK_AUTH": "Koblingstokenet har utløpt eller er tilbakekalt. Utsted et nytt token i schema.pi og registrer det på nytt.",
+      "LINK_NOT_FOUND": "Kobling ikke funnet. Vennligst velg koblingen på nytt.",
+      "LINK_SCOPE": "Denne tilkoblingen tilhører ikke koblingens taksonomi.",
+      "CONN_UNSUPPORTED": "Ikke-støttet tilkobling (kun PostgreSQL-servertilkoblinger foreløpig).",
+      "TIMEOUT": "Forespørselen tidsavbrutt. Vennligst prøv igjen om kort tid.",
+      "RATE": "For mange forespørsler. Vennligst prøv igjen om et minutt."
+    }
+  },
+  "learn": {
+    "title": "DBA-læring",
+    "intro": "SQLP/DAP-øvelsesspørsmål, en justeringssakbok og en Oracle/Tibero/PostgreSQL-sammenligningsordbok. Fungerer uten kobling; velg en kobling for også å se din schema.pi standardtype-mapping.",
+    "loading": "Laster inn …",
+    "tabs": {
+      "quiz": "Øvelser",
+      "cases": "Justeringssaker",
+      "dict": "DBMS-ordbok"
+    },
+    "topics": {
+      "INDEX": "Indeksskanninger",
+      "JOIN": "Join-metoder",
+      "PARTITION": "Partisjonsbeskjæring",
+      "NORMAL": "Normalisering",
+      "NAMING": "Standard navngivning",
+      "ISOLATION": "Isolasjonsnivåer",
+      "LOCK": "Låser"
+    },
+    "levels": {
+      "1": "Grunnleggende",
+      "2": "Middels",
+      "3": "Avansert"
+    },
+    "quiz": {
+      "score": "Min fremgang",
+      "scoreLine": "{solved} av {total} løst · {correct} riktige",
+      "right": "Riktig",
+      "wrong": "Feil",
+      "retry": "Prøv igjen",
+      "prevRight": "Tidligere riktig",
+      "prevWrong": "Tidligere feil"
+    },
+    "cases": {
+      "notice": "Alle saker er selvskrevne læringseksempler; tall er illustrative (ingen kundedata).",
+      "problem": "Problem-SQL",
+      "plan": "Plan-sammendrag",
+      "cause": "Årsak",
+      "fix": "Fikset SQL",
+      "effect": "Effekt"
+    },
+    "cats": {
+      "ALL": "Alle",
+      "TYPE": "Datatyper",
+      "FUNC": "Funksjoner",
+      "PAGING": "Paginering",
+      "SEQ": "Sekvenser",
+      "DATE": "Datoer",
+      "SYNTAX": "Syntaks"
+    },
+    "dict": {
+      "search": "Søk (f.eks. NVL, LIMIT)",
+      "item": "Element",
+      "note": "Merknad",
+      "empty": "Ingen samsvarende elementer",
+      "loading": "Laster inn …",
+      "liveTitle": "Standard type-mapping av mitt fagområde",
+      "liveIntro": "Velg en kobling for å laste schema.pi DBMS-profilen (logisk → fysisk type). Ordboken ovenfor fungerer uten kobling.",
+      "liveLoad": "Last inn type-mapping",
+      "lgcType": "Logisk type"
+    }
+  },
+  "link2": {
+    "title": "schema.pi-tilkobling",
+    "intro": "Registrer et tilkoblingstoken for å bruke DB-tilkoblingene til et schema.pi-fagområde i dbms.pi. Tokener lagres kryptert, og ingen raddata fra databasene dine lagres.",
+    "howTitle": "Slik utsteder du et tilkoblingstoken",
+    "how1": "Logg inn på schema.pi og åpne fagområdet du vil koble til",
+    "how2": "Gå til Fagområde → Innstillinger → Tilkoblingstoken og trykk 'Utsted token' (områdeadministrator eller DA-rolle)",
+    "how3": "Kopier tokenet som starter med slk_ — det vises bare én gang når det utstedes",
+    "how4": "Lim det inn nedenfor og registrer",
+    "openSchema": "Åpne schema.pi",
+    "registerTitle": "Registrer tilkobling",
+    "tokenLabel": "Tilkoblingstoken",
+    "tokenPlaceholder": "slk_…",
+    "register": "Registrer",
+    "registering": "Sjekker …",
+    "registered": "Fagområdet '{area}' er nå tilkoblet",
+    "replaced": "Erstattet tokenet for fagområdet '{area}'",
+    "myLinks": "Mine tilkoblinger",
+    "empty": "Ingen tilkoblinger registrert",
+    "loading": "Laster inn …",
+    "regDtm": "Registrert {dtm}",
+    "remove": "Koble fra",
+    "removeConfirm": "Koble fra '{area}'? Skjermer som bruker denne tilkoblingen vil ikke lenger kunne få tilgang til den.",
+    "prev": "Forrige",
+    "next": "Neste",
+    "statusTitle": "Tilkoblingsstatus",
+    "noConns": "Ingen DB-tilkoblinger i dette fagområdet (legg til en i schema.pi)",
+    "colConn": "Tilkobling",
+    "colDbms": "DBMS",
+    "colMthd": "Metode",
+    "colHost": "Vert",
+    "colTest": "Siste test",
+    "colAgent": "Agent sist sett",
+    "never": "Ingen",
+    "retry": "Prøv igjen",
+    "pickerLink": "Kobling",
+    "pickerConn": "Tilkobling",
+    "pickerEmpty": "Ingen tilkoblinger —",
+    "pickerGo": "registrer en på /connect",
+    "errors": {
+      "LINK_AUTH": "Tilkoblingstokenet har utløpt eller er tilbakekalt. Utsted et nytt token i schema.pi og registrer på nytt",
+      "LINK_SCOPE": "Denne tilkoblingen tilhører ikke det koblede fagområdet",
+      "LINK_DOWN": "Kan ikke nå schema.pi. Vennligst prøv igjen om kort tid",
+      "LINK_NOT_FOUND": "Kobling ikke funnet",
+      "LINK_DUP": "Registrering pågår allerede. Vennligst prøv igjen",
+      "CONN_UNSUPPORTED": "Ikke-støttet tilkobling (kun PostgreSQL-servertilkoblinger foreløpig)",
+      "Q_UNKNOWN": "Ukjent spørring",
+      "SQL_NOT_SELECT": "Kun en enkelt SELECT (eller WITH) setning kan kjøres",
+      "PGSS_MISSING": "Utvidelsen pg_stat_statements er ikke installert på mål-DB",
+      "TIMEOUT": "Forespørselen tidsavbrutt",
+      "RATE": "For mange forespørsler. Vennligst prøv igjen om et minutt",
+      "INVALID_INPUT": "Lim inn hele tilkoblingstokenet som starter med slk_"
+    }
+  },
+  "migration": {
+    "title": "Datamigrering (PiMig)",
+    "intro": "Beregner tabelllastrekkefølgen fra relasjonene i schema.pi-designmodellen din, organiserer blokkstørrelse, parallellitet og sjekklisten for overgang, og genererer verifiserings-SQL du kjører selv på kilde og mål. Denne skjermen planlegger og sjekker kun – den flytter ikke data eller leser kundens DB-rader.",
+    "needLink": "Velg en schema.pi-kobling ovenfor først. Hvis du ikke har noen, registrer et token under 'Koble til'.",
+    "loading": "Laster inn …",
+    "newPlan": "Ny migreringsplan",
+    "project": "Prosjekt",
+    "projectPick": "Velg et prosjekt",
+    "planNm": "Plannavn",
+    "planNmHint": "Standard er prosjektnavnet",
+    "create": "Opprett plan",
+    "creating": "Oppretter …",
+    "snapHint": "Designet på dette tidspunktet (tabell-, kolonne- og relasjonsnavn) fryses som et øyeblikksbilde. Opprett en ny plan når modellen endres.",
+    "plans": "Migreringsplaner",
+    "prev": "Forrige",
+    "next": "Neste",
+    "sts": {
+      "DRAFT": "Utkast",
+      "READY": "Klar"
+    },
+    "del": "Slett",
+    "delConfirm": "Vil du slette denne planen?",
+    "snapInfo": "Øyeblikksbilde: {tables} tabeller · {rels} relasjoner",
+    "dropped": "({n} relasjoner uten fysiske tabeller er ekskludert fra rekkefølgen)",
+    "chunkSize": "Blokkstørrelse (rader/commit)",
+    "parallel": "Parallellitet (tabeller samtidig)",
+    "saveOpts": "Lagre alternativer",
+    "optsHint": "Parallellitet er antall tabeller som lastes samtidig innenfor et nivå. Blokkstørrelse er commit-enheten (rader) som utførelsesmotoren vil bruke.",
+    "order": "Lastingsrekkefølge",
+    "orderHint": "Topologisk sortert etter designrelasjoner (ikke fysiske FK-er) slik at foreldretabeller kommer først. Tabeller på samme nivå er ikke avhengige av hverandre og kan lastes parallelt.",
+    "cycles": "{n} sirkulær(e) gruppe(r) – plassert på samme nivå. Angi rekkefølgen manuelt og utsett referansesjekker til etter lasting.",
+    "selfRefs": "Selvrefererende (hierarkiske) tabeller – last foreldrerekker først innenfor tabellen",
+    "level": "Nivå {n}",
+    "checklist": "Sjekkliste for overgang",
+    "toReady": "Merk som klar",
+    "toDraft": "Tilbake til utkast",
+    "readyNeedAll": "Sjekk hvert element før du merker planen som klar.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC overleveringspunkt",
+        "desc": "Registrer et konsistent kildepunkt før den første lasten (PG LSN · Oracle/Tibero SCN · for polling, starttid minus et overlappingsvindu), start CDC fra det, og absorber duplikater i overleveringsvinduet med upserts."
+      },
+      "valueConv": {
+        "title": "Verdikonvertering",
+        "desc": "Regler er satt for tom streng = NULL, CHAR blank utfylling, NUMBER uten presisjon → NUMERIC, DATE med tid → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR lengde, og LONG·RAW."
+      },
+      "charset": {
+        "title": "Tegnsett",
+        "desc": "Kildetegnsett (KO16MSWIN949, UTF8, …) er bekreftet, med kolonner som overløper på grunn av multibyte-vekst og isolering av ikke-konvertible tegn bestemt."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB strømmes i blokker (størrelse og minnegrenser) og verifiseres av lengde + hash."
+      },
+      "seqResync": {
+        "title": "Sekvensresynkronisering",
+        "desc": "Etter lasting settes målsekvenser·identiteter til maks(nøkkel)+1."
+      },
+      "timezone": {
+        "title": "Tidssone · systemkolonner",
+        "desc": "Tolkningstidssonen for verdier uten en (f.eks. Asia/Seoul) er satt, endringstidstriggere vil ikke overskrive kildetidsstempler under lasting, og regler for erstatning av oppretter/endrer er satt."
+      },
+      "backpressure": {
+        "title": "Motstand · mållast",
+        "desc": "Reduser blokkstørrelse og parallellitet ved målforsinkelse, WAL-vekst eller låseventer; bygg ikke-PK-indekser etter lasting og kjør ANALYZE·VACUUM etterpå."
+      }
+    },
+    "verify": "Verifiserings-SQL",
+    "verifyHint": "Genererer antall, numerisk kolonne-sum, duplikatnøkkel og nøkkel-hash-spørringer per tabell i lastingsrekkefølge. Kjør dem selv på kilde og mål og sammenlign (denne skjermen utfører dem ikke).",
+    "noHashOracle": "Oracle·Tibero hash-funksjoner og tekstgjengivelse er forskjellige fra PostgreSQL, så hash-spørringer utelates – sammenlign antall, summer og duplikatnøkler.",
+    "copy": "Kopier",
+    "copied": "Kopiert",
+    "copyFail": "Kunne ikke kopiere. Velg teksten og kopier den manuelt.",
+    "engine": {
+      "title": "Utførelse·omstart · prøvekjøring·tilbakerulling",
+      "body": "Faktisk migreringsutførelse (sjekkpunkter, motstand, isolering av feilrader) og prøvekjøring, tilbakerulling og registrering av CDC-startpunkt vil komme etter at sikkerhetsmodellen for worker-agenten (A10) er ferdigstilt. Foreløpig dekker dette planlegging, kontroller og verifiserings-SQL."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi-koblingen er under forberedelse. Vennligst prøv igjen om kort tid.",
+      "LINK_DOWN": "Kan ikke nå schema.pi. Vennligst prøv igjen om kort tid.",
+      "LINK_AUTH": "Koblingstokenet er utløpt eller tilbakekalt. Utsted et nytt token i schema.pi og registrer det på nytt.",
+      "LINK_NOT_FOUND": "Kobling ikke funnet. Velg koblingen på nytt.",
+      "LINK_SCOPE": "Dette prosjektet tilhører ikke koblingens taksonomi.",
+      "TIMEOUT": "Forespørselen ble tidsavbrutt. Vennligst prøv igjen om kort tid.",
+      "RATE": "For mange forespørsler. Prøv igjen om et minutt.",
+      "MIG_NO_TABLES": "Dette prosjektet har ingen fysiske tabeller å migrere. Konverter til fysisk i schema.pi først.",
+      "MIG_CHECK_INCOMPLETE": "Sjekk hvert element i overgangs-sjekklisten før du merker planen som klar.",
+      "NOT_FOUND": "Plan ikke funnet."
+    }
+  },
+  "monitor": {
+    "title": "Overvåkingssenter",
+    "collectNote": "Innsamling kjører i schema.pi – migrering planlagt (D7). Denne siden leser schema.pi-overvåkingssammendraget.",
+    "noLink": "Velg eller registrer en schema.pi-kobling først.",
+    "goConnect": "Registrer en kobling",
+    "period": "Periode",
+    "periods": {
+      "30": "30 min",
+      "60": "1 time",
+      "360": "6 timer",
+      "1440": "24 timer"
+    },
+    "refresh": "Oppdater",
+    "loading": "Laster inn…",
+    "updatedAt": "{area} · per {time} (automatisk oppdatering hvert 30. sekund)",
+    "appTitle": "Appytelse",
+    "dbTitle": "DB-status etter tilkobling",
+    "urlTitle": "URL-sjekker",
+    "empty": "Ingen data å vise.",
+    "breachTitle": "{n} terskelbrudd",
+    "rulesTitle": "Terskelregler",
+    "rulesNote": "Regler lagres for denne koblingen og evalueres mot det mottatte sammendraget; brudd får en rød kant (varsler kommer senere).",
+    "metric": "Målemetrikk",
+    "conn": "Tilkobling",
+    "allConns": "Alle tilkoblinger",
+    "op": "Sammenlign",
+    "threshold": "Terskel",
+    "thrInvalid": "Skriv inn et tall for terskelen.",
+    "addRule": "Legg til regel",
+    "noRules": "Ingen regler ennå.",
+    "enable": "Aktiver",
+    "disable": "Deaktiver",
+    "delete": "Slett",
+    "delConfirm": "Slette denne regelen?",
+    "aiNote": "AI-hendelsesanalyse og godkjenning av feilretting skjer fortsatt i schema.pi-monitoren.",
+    "aiLink": "Åpne schema.pi-monitor",
+    "metrics": {
+      "APP_TPS": "TPS (forespørsler/s)",
+      "APP_ERR_PCT": "Feilrate (%)",
+      "APP_SLOW_CNT": "Langsomme forespørsler",
+      "APP_AVG_MS": "Gj.snitt. respons (ms)",
+      "DB_SESS_CNT": "Sesjoner",
+      "DB_LOCK_WAIT_CNT": "Låseventer",
+      "DB_CACHE_HIT_PCT": "Cache-treff (%)",
+      "DB_SIZE_MB": "DB-størrelse (MB)",
+      "URL_RSP_MS": "URL-respons (ms)",
+      "URL_FAIL_CNT": "URL-feil"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Velg en kobling først.",
+      "NOT_IMPLEMENTED": "schema.pi-koblingen er under forberedelse. Vennligst prøv igjen senere.",
+      "LINK_AUTH": "Koblingstokenet er ugyldig eller utløpt. Utsted et nytt token i schema.pi og registrer det.",
+      "LINK_SCOPE": "Denne koblingen har ikke tilgang til den taksonomien.",
+      "RATE": "For mange forespørsler. Vennligst prøv igjen om kort tid.",
+      "TIMEOUT": "schema.pi svarer sakte. Vennligst prøv igjen om kort tid.",
+      "RULE_LIMIT": "Maksimalt 50 regler per kobling.",
+      "NOT_FOUND": "Regel ikke funnet."
+    }
+  },
+  "ops": {
+    "title": "DB-driftsikkerhet",
+    "loading": "Laster inn…",
+    "pickFirst": "Velg en kobling og tilkobling ovenfor først",
+    "run": "Kjør diagnose",
+    "running": "Diagnostiserer…",
+    "noRun": "Ingen diagnose ennå. Trykk «Kjør diagnose»",
+    "lastRun": "Siste diagnose {dtm}",
+    "readOnly": "Diagnosen leser kun (SELECT). Råd er en veiledning og avhenger av serverminne, belastning og arbeidsmengde.",
+    "truncated": "For mange objekter – kun de første 500 ble sjekket",
+    "paramsNote": "Totalt serverminne er ukjent, så det er estimert fra shared_buffers ≈ 25 % av RAM. random_page_cost antar SSD.",
+    "auditNote": "Tabeller med RLS av og ubrukte kontoer vil bli sjekket når koblingsspørringen støtter dem.",
+    "replNote": "Grunnlinjen er Active-Standby (A-S) – én primær + standby. Replay-forsinkelse ≥ 5s = advarsel, ≥ 60s = risiko (målt RPO-referanse).",
+    "lagIdle": "Ingen endringer",
+    "pager": "Paginering",
+    "prev": "Forrige",
+    "next": "Neste",
+    "tabs": {
+      "params": "Parametere",
+      "audit": "Kontoer og privilegier",
+      "backup": "Sikkerhetskopiering og gjenoppretting",
+      "repl": "Replikering og DR",
+      "history": "Historikk"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Advarsel",
+      "RISK": "Risiko"
+    },
+    "role": {
+      "primary": "Denne tilkoblingen = Primær",
+      "standby": "Denne tilkoblingen = Standby",
+      "unknown": "Rolle ukjent"
+    },
+    "col": {
+      "level": "Dom",
+      "item": "Element",
+      "value": "Verdi",
+      "reason": "Detaljer",
+      "standby": "Standby",
+      "state": "Tilstand",
+      "sync": "Synkronisering",
+      "lag": "Replay-forsinkelse"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLS-roller",
+      "bypass_ok": "BYPASSRLS-roller",
+      "no_expiry": "Passordutløp",
+      "expiry_ok": "Passordutløp",
+      "public_grant": "PUBLIC-rettigheter",
+      "public_ok": "PUBLIC-rettigheter",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Siste arkiverte WAL",
+      "arc_stale": "Siste arkiverte WAL",
+      "arc_recent": "Siste arkiverte WAL",
+      "arc_failing": "WAL-arkivering feiler"
+    },
+    "rules": {
+      "sb_default": "På standard (128 MB). På en dedikert server anbefales ca. 25 % av RAM.",
+      "sb_ok": "Angitt over standard",
+      "wm_over": "max_connections × work_mem overskrider estimert minne. Samtidige sorteringer risikerer minnebrist.",
+      "wm_default": "På standard (4 MB). Store sorteringer og hashes kan spilles til disk.",
+      "wm_ok": "Innenfor et rimelig område",
+      "mwm_default": "På standard (64 MB). VACUUM og indeksbygging kan være sakte; vurder 256 MB eller mer.",
+      "mwm_ok": "Angitt over standard",
+      "av_on": "autovacuum er på",
+      "av_off": "autovacuum er av. Høy risiko for tabellbloat og transaksjons-ID-wraparound.",
+      "conn_high": "max_connections er høy. Hver tilkobling bruker minne; en pooler (PgBouncer osv.) anbefales.",
+      "conn_ok": "Innenfor et rimelig område",
+      "lmd_off": "Langsom spørringslogging er av (-1). Rundt 1000 ms anbefales.",
+      "lmd_all": "Hver setning logges (0). Tung logging-overhead.",
+      "lmd_ok": "Langsom spørringslogging er på.",
+      "st_off": "Ingen serveromfattende setningstidsavbrudd (0). Angi grenser per rolle eller applikasjon.",
+      "st_ok": "Et setningstidsavbrudd er angitt.",
+      "iit_off": "Ingen inaktiv-i-transaksjon-tidsavbrudd (0). Kan forårsake låseholding og bloat.",
+      "iit_ok": "Et inaktiv-i-transaksjon-tidsavbrudd er angitt.",
+      "ckpt_short": "Sjekkpunktintervall er 5 minutter eller mindre. Vurder 10–15 minutter for skriveintensive belastninger.",
+      "ckpt_ok": "Innenfor et rimelig område",
+      "wal_minimal": "wal_level=minimal gjør PITR og replikering umulig. Bruk replica eller høyere.",
+      "wal_ok": "WAL-nivå støtter PITR og replikering.",
+      "rpc_hdd": "HDD-standard (4). For SSD anbefales 1.1–2.",
+      "rpc_ok": "Egnet for SSD.",
+      "super_many": "To eller flere superusers. Behold én for administrasjon og gi kun nødvendige privilegier til andre.",
+      "super_ok": "Maksimalt én superuser.",
+      "bypass_rls": "Ikke-superuser-roller som omgår radnivåsikkerhet eksisterer.",
+      "bypass_ok": "Ingen RLS-omgående roller.",
+      "no_expiry": "Påloggingsroller uten passordutløp. Angi VALID UNTIL for personlige kontoer.",
+      "expiry_ok": "Alle påloggingsroller har et utløp.",
+      "public_grant": "PUBLIC (hver rolle) har tabellprivilegier. Skriveprivilegier er risikable.",
+      "public_ok": "Ingen tabellprivilegier gitt til PUBLIC.",
+      "arc_on": "WAL-arkivering (archive_mode) er på.",
+      "arc_off": "WAL-arkivering er av, så point-in-time recovery (PITR) er umulig.",
+      "arc_cmd_empty": "archive_mode er på, men archive_command og archive_library er tomme.",
+      "arc_never": "Ingen WAL er arkivert ennå.",
+      "arc_stale": "Siste WAL-arkiv er eldre enn 24 timer.",
+      "arc_recent": "WAL arkivert innen de siste 24 timene.",
+      "arc_failing": "WAL-arkivering feiler for øyeblikket. Sjekk disk, tillatelser og målbane.",
+      "repl_is_standby": "Denne tilkoblingen er en standby (gjenopprettingsmodus). Sjekk forsinkelse fra primærtilkoblingen.",
+      "repl_none": "Ingen standby tilkoblet. Det er ingen katastrofegjenoppretting (DR) oppsett.",
+      "repl_ok": "Standbys strømmer normalt.",
+      "repl_lag": "En standby henger etter eller strømmer ikke."
+    },
+    "manual": {
+      "title": "Manuell sjekkliste",
+      "intro": "Sikkerhetskopierings- og gjenopprettingspraksis som ikke kan sjekkes automatisk. Kryss av når bekreftet og noter beviset.",
+      "memo": "Notat (f.eks. verktøy, tidsplan, sist sjekket)",
+      "save": "Lagre",
+      "updated": "Oppdatert {dtm}",
+      "items": {
+        "base_backup": "En full sikkerhetskopi (pg_basebackup osv.) lyktes innen de siste 7 dagene.",
+        "offsite_copy": "En sikkerhetskopikopi oppbevares utenfor stedet (en annen region eller lagring).",
+        "restore_rehearsal": "En gjenopprettingsprøve ble utført dette kvartalet og varigheten ble registrert.",
+        "pitr_target": "PITR-prosedyre og mål-RPO/RTO er dokumentert.",
+        "backup_encrypt": "Sikkerhetskopifiler er kryptert og tilgang er begrenset.",
+        "retention": "Sikkerhetskopieringsperiode og slettepolicy er definert."
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi-koblingen er under forberedelse. Vennligst prøv igjen om kort tid.",
+      "CONN_UNSUPPORTED": "Denne tilkoblingen støttes ikke ennå (kun direkte PostgreSQL).",
+      "TIMEOUT": "Mål-DB svarte for sakte. Vennligst prøv igjen om kort tid.",
+      "RATE": "For mange kall. Prøv igjen om et minutt.",
+      "Q_UNKNOWN": "Ikke-støttet spørring. Sjekk schema.pi-koblingens API-versjon.",
+      "INVALID_INPUT": "Ugyldig kobling eller tilkoblingsvalg."
+    }
+  },
+  "perf": {
+    "title": "Ytelse",
+    "loading": "Laster inn…",
+    "pickFirst": "Velg en kobling og tilkobling ovenfor først",
+    "pager": "Paginering",
+    "tabs": {
+      "collect": "Samle inn",
+      "top": "Trege spørringer",
+      "health": "Tabell- og indekshelse",
+      "trend": "Størrelsestrend",
+      "activity": "Aktivitet og låser"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi-koblingen er under forberedelse. Vennligst prøv igjen senere.",
+      "CONN_UNSUPPORTED": "Denne tilkoblingen støttes ikke ennå (kun direkte PostgreSQL-tilkoblinger).",
+      "RATE": "For mange forespørsler. Prøv igjen om et minutt.",
+      "LINK_AUTH": "Koblingstokenet er utløpt eller tilbakekalt. Registrer tokenet på nytt på Koble til-siden.",
+      "LINK_SCOPE": "Denne tilkoblingen tilhører ikke koblingens fagområde.",
+      "Q_UNKNOWN": "Ikke-støttet spørring. Sjekk schema.pi-koblingens API-versjon.",
+      "INVALID_INPUT": "Koblings- eller tilkoblingsverdien er ugyldig."
+    },
+    "pgss": {
+      "title": "Slik aktiverer du pg_stat_statements",
+      "note": "Selvhostet PostgreSQL krever også pg_stat_statements i shared_preload_libraries (postgresql.conf) og en omstart. Tabell-, indeks- og størrelsesstatistikk fungerer uten den."
+    },
+    "collect": {
+      "intro": "Samle inn nå leser topp spørringsstatistikk, tabeller, indekser og størrelser én gang og lagrer dem som et øyeblikksbilde. Samle inn minst to ganger for å se endringer og størrelsestrender.",
+      "run": "Samle inn nå",
+      "running": "Samler inn…",
+      "done": "Samlet inn {dtm} – {qry} spørringer · {tbl} tabeller · {idx} indekser"
+    },
+    "top": {
+      "sort": "Sorter",
+      "sortTotal": "Total tid",
+      "sortMean": "Gjennomsnittlig tid",
+      "sortCalls": "Kall",
+      "empty": "Ingen øyeblikksbilder ennå. Trykk «Samle inn nå» på Samle inn-fanen.",
+      "range": "Endring mellom {from} → {to}",
+      "first": "Første øyeblikksbilde kl. {dtm} – kumulative verdier (endringer fra neste øyeblikksbilde)",
+      "query": "Spørring (literaler maskert)",
+      "calls": "Kall",
+      "totalMs": "Totalt ms",
+      "meanMs": "Gjennomsnittlig ms",
+      "rows": "Rader",
+      "reset": " Statistikk tilbakestilt – vises som kumulativ"
+    },
+    "health": {
+      "empty": "Ingen øyeblikksbilder ennå. Trykk «Samle nå» på «Samle»-fanen",
+      "basis": "Basert på øyeblikksbilde fra {dtm}",
+      "unusedIdx": "Ubrukte indekser",
+      "unusedIdxHint": "Indekser som aldri er brukt siden siste tilbakestilling av statistikk (etter størrelse). Ikke slipp PK- eller unike-begrensningsindekser",
+      "fullScan": "Overdreven full skanning",
+      "fullScanHint": "Tabeller med 1000+ aktive rader der full skanning utgjør minst halvparten – gjennomgå indekser på filterkolonner",
+      "dead": "Overdreven døde tupler",
+      "deadHint": "Forholdet mellom døde tupler er 20 % eller mer – sjekk VACUUM- og autovacuum-innstillinger",
+      "none": "Ingen",
+      "scans": "skanninger"
+    },
+    "trend": {
+      "limit": "Størrelsesterskel",
+      "empty": "Ingen øyeblikksbilder de siste 30 dagene",
+      "now": "Nåværende størrelse",
+      "perDay": "Vekst per dag",
+      "needMore": "Trenger 2+ øyeblikksbilder",
+      "daysLeft": "Når {gb} GB",
+      "noGrowth": "Ingen veksttrend",
+      "days": "om ca. {n} dager"
+    },
+    "activity": {
+      "refresh": "Oppdater",
+      "live": "Live-spørring – ikke lagret",
+      "sessions": "Sesjonsaktivitet",
+      "locks": "Låser",
+      "none": "Ingen"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pipelines",
+    "intro": "Sjekk om en kilde-DB er klar for endringsdatafangst (CDC) og design kilde → transformasjon → mål-pipelines. Dette trinnet sjekker og designer kun; ingen kunderadedata leses eller lagres.",
+    "needLink": "Velg en schema.pi-lenke ovenfor først. Hvis du ikke har noen, registrer et token i «Lenke»-menyen.",
+    "needConn": "Velg DB-tilkoblingen som skal sjekkes ovenfor.",
+    "loading": "Laster inn …",
+    "pager": "Sider",
+    "prev": "Forrige",
+    "next": "Neste",
+    "runTitle": "Kjør og overvåk (7-3 · 7-4)",
+    "runBody": "Pipeline-utførelse, forsinkelsesovervåking og reprosessering kommer når worker-agenten og sikkerhetsmodellen er ferdigstilt. Foreløpig lagrer du definisjoner som utkast (DRAFT).",
+    "pre": {
+      "title": "Forhåndskontroll av kilde",
+      "intro": "For hver tabell sjekkes endringstidskolonner, soft-delete-kolonner og primærnøkkelen for å anbefale en fangstmetode (adapter), og WAL logisk replikeringsberedskap sjekkes. Kun skrivebeskyttet katalog og innstillingsspørringer.",
+      "schema": "Skjema (valgfritt)",
+      "schemaPh": "Alle",
+      "run": "Kjør forhåndskontroll",
+      "running": "Sjekker …",
+      "sum": "{tables} tabeller · {noPk} uten PK · {deleteUnseen} kan ikke fange opp slettinger",
+      "truncated": "En katalogspørring nådde grensen på 500 rader, så noen tabeller kan mangle. Spesifiser et skjema og sjekk igjen.",
+      "empty": "Ingen tabeller å sjekke",
+      "colTable": "Tabell",
+      "colChg": "Endringstidskolonne",
+      "colDel": "Soft-delete-kolonne",
+      "colAdapter": "Anbefalt metode · årsaker",
+      "toDraft": "Opprett pipeline-utkast fra {n} valgte"
+    },
+    "ready": {
+      "ok": "WAL logisk replikering klar – tabeller med en PK kan bruke LOGICAL",
+      "no": "WAL logisk replikering ikke klar – fangst via polling eller nøkkelsammenligning",
+      "senders": "{n} replikeringsforbindelser"
+    },
+    "adapter": {
+      "LOGICAL": "Logisk replikering (WAL)",
+      "POLL": "Polling av endringstid",
+      "KEY_DIFF": "Nøkkeløyeblikksbilde-diff",
+      "NONE": "Kun full omlasting"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Har endringstidskolonne",
+      "NO_CHG_COL": "Ingen endringstidskolonne",
+      "HAS_SOFT_DEL": "Har soft-delete-kolonne",
+      "NO_SOFT_DEL": "Ingen soft-delete-kolonne",
+      "HAS_PK": "Har primærnøkkel",
+      "NO_PK": "Ingen primærnøkkel – endrede rader kan ikke identifiseres",
+      "DELETE_UNSEEN": "Polling kan ikke fange opp fysiske DELETE-er (soft-delete-kolonne anbefales)",
+      "LOGICAL_NOT_READY": "Kan bytte til LOGICAL når WAL logisk replikering er klar",
+      "FULL_RELOAD_ONLY": "Ingen PK eller endringstidskolonne, så ingen inkrementell fangst – legg til en PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level er ikke logical (endring krever DB-omstart)",
+      "NO_SLOTS": "max_replication_slots er 0",
+      "NO_SENDERS": "max_wal_senders er 0",
+      "IS_STANDBY": "Standby-server – ta logisk replikering fra primærserveren",
+      "SETTINGS_UNKNOWN": "Kunne ikke lese innstillinger, beredskap ukjent"
+    },
+    "ed": {
+      "title": "Pipeline-definisjoner",
+      "draftOnly": "Kun design – lagret som utkast (DRAFT)",
+      "new": "Ny pipeline",
+      "empty": "Ingen lagrede pipelines",
+      "manual": "Manuell",
+      "edit": "Rediger",
+      "remove": "Slett",
+      "removeConfirm": "Slette pipeline '{name}'?",
+      "name": "Navn",
+      "adapter": "Fangstmetode",
+      "srcConn": "Kildetilkobling",
+      "useCurrentConn": "Bruk tilkoblingen valgt ovenfor",
+      "sched": "Tidsplan (5-felts cron, tom = manuell)",
+      "target": "Mål",
+      "targetPh": "f.eks. analyse-DB analytics.public / lake s3://…",
+      "tables": "Kildetabeller (linjeskift eller komma-separert)",
+      "steps": "Trinn (kilde → transformasjon → mål)",
+      "op": "Operasjon",
+      "notePh": "Beskrivelse · betingelse (valgfritt)",
+      "addTransform": "Legg til transformasjonstrinn",
+      "save": "Lagre",
+      "saving": "Lagrer …",
+      "saved": "Lagret",
+      "close": "Lukk"
+    },
+    "kind": {
+      "SOURCE": "Kilde",
+      "TRANSFORM": "Transformasjon",
+      "TARGET": "Mål"
+    },
+    "sts": {
+      "DRAFT": "Utkast"
+    },
+    "check": {
+      "NAME_REQUIRED": "Skriv inn et navn",
+      "CONN_REQUIRED": "Velg en kildetilkobling",
+      "CRON_INVALID": "Skriv inn tidsplanen som 5-felts cron (minutt time dag måned ukedag; sifre, *, ',', -, /)",
+      "OP_REQUIRED": "Skriv inn en operasjon for hvert trinn",
+      "STEPS_TOO_FEW": "Kilde- og måltrinn er påkrevd",
+      "STEPS_TOO_MANY": "Opptil 20 trinn",
+      "STEP_FIRST_SOURCE": "Det første trinnet må være kilden",
+      "STEP_LAST_TARGET": "Det siste trinnet må være målet",
+      "STEP_MIDDLE_TRANSFORM": "Kun transformasjonstrinn kan være imellom"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "En pipeline med dette navnet finnes allerede. Bruk et annet navn",
+      "CONN_UNSUPPORTED": "Denne tilkoblingen kan ikke sjekkes ennå (kun PostgreSQL direkte servertilkoblinger foreløpig)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL-justeringslab",
+    "intro": "Velg en tilkobling og skriv inn SQL for å se utførelsesplanen som et tre, med årsaker til nedbremsing (fulle skanninger, nestede løkker, store sorteringer) og SQL-antimønstre sjekket mot schema.pi standarddomener. Spørringer blir aldri faktisk utført (ingen ANALYZE).",
+    "needLink": "Velg en lenke og tilkobling ovenfor for å se planer. Antimønsterkontrollen fungerer uten en lenke.",
+    "sqlLabel": "SQL (en enkelt SELECT- eller WITH-setning)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Vis plan",
+    "explaining": "Laster inn …",
+    "save": "Lagre plan",
+    "saving": "Lagrer …",
+    "saveName": "Etikett (f.eks. før du legger til indeks)",
+    "saveNote": "Konstante verdier i SQL og planbetingelser maskeres som ? når de lagres.",
+    "plan": {
+      "title": "Utførelsesplan",
+      "summary": "Total kostnad {cost} · {ms}ms",
+      "cost": "kostnad",
+      "rows": "rader",
+      "width": "bredde"
+    },
+    "warn": {
+      "none": "Ingen bemerkelsesverdige advarsler.",
+      "SEQ_SCAN_LARGE": "Full skanning på {relation} (ca. {rows} rader) – vurder en indeks på filterkolonnene.",
+      "NESTED_LOOP_HIGH": "Nestet løkke produserer ca. {rows} rader – vurder en hash- eller flettesammenføyning, eller en indeks på sammenføyningsbetingelsen.",
+      "SORT_SPILL": "Sorteringsstørrelsen er ca. {kb}KB, over standard work_mem (4MB); den kan spilles til disk."
+    },
+    "lint": {
+      "run": "Sjekk antimønstre",
+      "title": "SQL-antimønsterkontroll",
+      "none": "Ingen antimønstre funnet.",
+      "domainsOff": "Standarddomener kunne ikke lastes inn; sjekket kun med standard kolonne-suffiksregler.",
+      "types": {
+        "num": "numerisk",
+        "date": "dato",
+        "char": "tegn"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * – velg kun kolonnene du trenger (ekstra I/O, ingen dekkende indeks).",
+        "FUNC_ON_COLUMN": "Filterkolonnen {column} er pakket inn i en funksjon eller et uttrykk, så indeksen kan ikke brukes – transformer konstanten i stedet.",
+        "LEADING_WILDCARD": "LIKE med en ledende % kan ikke bruke en B-tre-indeks – vurder en pg_trgm GIN-indeks.",
+        "OR_DIFF_COLUMNS": "Betingelser på forskjellige kolonner er kombinert med OR – vurder UNION ALL eller indekser per kolonne.",
+        "IMPLICIT_CAST": "{column} sammenlignes med et sitert tall – match kolonne- og konstanttypene (implisitt cast).",
+        "NOT_IN_SUBQUERY": "NOT IN (underforespørsel) returnerer ingenting når NULL-verdier er til stede og er treg – bruk NOT EXISTS.",
+        "NO_WHERE": "Ingen WHERE-klausul – på en stor tabell er dette en full skanning (legg til en betingelse eller LIMIT).",
+        "DOMAIN_MISMATCH": "{column} er en {expected}-type ifølge standarddomenet, men sammenlignes med en konstant av en annen type – den implisitte casten kan forhindre indeksbruk."
+      }
+    },
+    "saved": {
+      "title": "Lagrede planer · Sammenlign",
+      "empty": "Ingen lagrede planer. Vis en plan, og lagre den deretter.",
+      "pick": "Velg plan å sammenligne",
+      "pick2": "Velg to planer å sammenligne.",
+      "compare": "Sammenlign to planer",
+      "delete": "Slett",
+      "cost": "kostnad",
+      "prev": "Forrige",
+      "next": "Neste",
+      "page": "Side {page}"
+    },
+    "diff": {
+      "cost": "Total kostnad {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "De to planene er for forskjellige SQL (etter normalisering).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Ingen endring i plannoder.",
+      "before": "Før",
+      "after": "Etter"
+    },
+    "ai": {
+      "title": "AI-justeringsråd",
+      "badge": "Kommer snart",
+      "body": "Kommer snart (etter godkjenning og prosedyrer for måling av effekt) – råd vil bli generert fra SQL med maskerte konstanter og registrert som anvendt først etter DA-godkjenning og målt effekt."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi-lenkefunksjonen forberedes. Prøv igjen om kort tid.",
+      "LINK_AUTH": "Lenketokenet er utløpt eller tilbakekalt. Utsted et nytt token i schema.pi og registrer det på nytt.",
+      "LINK_SCOPE": "Denne lenken kan ikke bruke den tilkoblingen (annet klassifiseringsskjema).",
+      "CONN_UNSUPPORTED": "Denne tilkoblingstypen støttes ikke ennå (kun PostgreSQL servertilkoblinger).",
+      "Q_UNKNOWN": "Ikke-støttet spørring.",
+      "SQL_NOT_SELECT": "Planer er kun tilgjengelige for en enkelt setning som starter med SELECT eller WITH.",
+      "TIMEOUT": "Forespørselen tidsavbrutt (5 sekunder). Forkort SQL-en eller prøv igjen senere.",
+      "RATE": "For mange forespørsler. Prøv igjen om et minutt.",
+      "PAYLOAD_TOO_LARGE": "Planen er for stor til å lagres.",
+      "LINK_NOT_FOUND": "Lenke ikke funnet. Velg lenken igjen."
+    }
+  },
+  "nav": {
+    "label": "Funksjoner",
+    "connect": "Koble til",
+    "sqlLab": "SQL-justering",
+    "perf": "Ytelse",
+    "monitor": "Overvåking",
+    "drift": "Drift",
+    "migration": "Migrering",
+    "pipeline": "Pipeline",
+    "analytics": "Analyse",
+    "ops": "Driftssikkerhet",
+    "learn": "Lær"
   }
 }

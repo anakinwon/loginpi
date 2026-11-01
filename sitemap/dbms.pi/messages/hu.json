@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "DBA és SQLP munkaállomás a DB motorok gyors és biztonságos futtatásához"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Tegye gyorssá és biztonságossá DB motorját az adatok futtatásában",
+    "description": "DBA és SQLP munkaállomás végrehajtási tervekhez, statisztikákhoz és teljesítményhez. A schema.pi kezeli a tervezést és a szabványokat; a dbms.pi a partnere a motor oldalon.",
+    "welcome": "Üdvözöljük, {name}!",
+    "featTitle": "Funkciók",
+    "featDesc": {
+      "connect": "Regisztráljon egy schema.pi link tokent, és ellenőrizze a kapcsolat állapotát",
+      "sqlLab": "Tervfa, figyelmeztetések, összehasonlítás és anti-minta ellenőrzések a szabványos tartományok ellen",
+      "perf": "Lassú lekérdezés Top-N, tábla/index állapot, kapacitás előrejelzés, aktivitás és zárolások",
+      "monitor": "Alkalmazás, DB és URL metrika összefoglaló küszöbérték riasztásokkal",
+      "drift": "Hasonlítsa össze a schema.pi modellt és a DDL előzményeket a valós katalógussal, mérje az index hatását",
+      "migration": "Topológiai betöltési sorrend, darabok, ellenőrzőlista és ellenőrző SQL",
+      "pipeline": "Változásrögzítési előellenőrzés és forrás→átalakítás→cél pipeline definíciók",
+      "analytics": "KPI irányítópult, 3 rétegű tó leképezés és adatkészlet katalógus",
+      "ops": "Paraméterek, szerepkörök, biztonsági mentés és replikáció DR csak olvasható diagnózisa",
+      "learn": "SQLP/DAP gyakorló kérdések, hangolási esetek és DBMS összehasonlító szótár"
+    }
+  },
   "auth": {
     "checking": "Bejelentkezés ellenőrzése…",
     "signedIn": "{name}",
@@ -64,5 +87,831 @@
     "LINK_CODE_GEN_FAILED": "Nem sikerült összekapcsolási kódot létrehozni. Kérjük, próbáld újra később.",
     "AUTH_DB_UNAVAILABLE": "Nem sikerült menteni a fiókodat, ezért a bejelentkezés sikertelen. Kérjük, próbáld újra később.",
     "LINK_TRY_LIMIT": "Túl sok helytelen összekapcsolási kód. Próbáld újra 15 perc múlva."
+  },
+  "analytics": {
+    "title": "Analitika és tó",
+    "intro": "dbms aktivitási KPI-k, háromrétegű tó tervezés és adatkészlet katalógus egy helyen.",
+    "storageNotice": "A tó tárolása (ügyféloldali vagy felhő) még nem dőlt el (PRD 10. szakasz #7). Egyelőre csak tervek és névleképezések tárolódnak – soradatok nem.",
+    "noLink": "Először válasszon vagy regisztráljon egy schema.pi linket.",
+    "goConnect": "Link regisztrálása",
+    "loading": "Betöltés…",
+    "refresh": "Frissítés",
+    "kpi": {
+      "title": "KPI irányítópult",
+      "updatedAt": "{area} · {time} állapot szerint",
+      "notBuilt": "Nincs felépítve",
+      "keys": {
+        "links": "Saját linkek",
+        "perf": "Teljesítmény pillanatképek",
+        "drift": "Eltérés futtatások",
+        "mig": "Migrációs tervek",
+        "pipe": "Pipeline-ok",
+        "lake": "Tó adatkészletek"
+      },
+      "countsChart": "Összesen funkciók szerint",
+      "trendTitle": "Teljesítmény pillanatképek az elmúlt 14 napban",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Nincs teljesítmény pillanatkép az elmúlt 14 napban.",
+      "monTitle": "schema.pi monitor összefoglaló (utolsó óra)",
+      "monTps": "Kérések/s",
+      "monErr": "Hibaarány",
+      "monAvg": "Átlagos válasz (ms)",
+      "monDb": "DB kapcsolatok",
+      "monFail": "Nem sikerült betölteni a monitor összefoglalót: {msg}"
+    },
+    "lake": {
+      "title": "Háromrétegű tó tervezés",
+      "raw": "Nyers",
+      "rawDesc": "Betölti a forrás DB oszlopneveit és típusait, ahogy vannak.",
+      "std": "Szabványosított",
+      "stdDesc": "Átnevezi az oszlopokat a schema.pi által jóváhagyott szabványos kifejezésekre.",
+      "cur": "Kurált",
+      "curDesc": "Entitás szerint csoportosított elemzési adatkészletek.",
+      "loadProjects": "Projektek betöltése",
+      "project": "Projekt",
+      "pickProject": "Válasszon egy projektet",
+      "noProjects": "Nincsenek projektek ezen a területen.",
+      "noTables": "Ennek a projektnek a modellje nem tartalmaz táblákat.",
+      "conform": "Szabvány megfelelőség {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} oszlop · {pct}% megfelelő",
+      "colSrc": "Forrás oszlop",
+      "colStd": "Szabványosított oszlop",
+      "colType": "Típus",
+      "colOk": "Formátum",
+      "ok": "OK",
+      "ng": "Ellenőrzés",
+      "pk": "PK",
+      "selectAll": "Összes kiválasztása",
+      "selected": "{cnt} kiválasztva",
+      "save": "Hozzáadás a tó tervezéséhez",
+      "saved": "{cnt} elem hozzáadva a katalógushoz."
+    },
+    "catalog": {
+      "title": "Adatkészlet katalógus",
+      "schemaCard": "A schema.pi az elemzési adatkészlet definíciók, metaadat keresés és szószedet forrása. Itt csak a tó betöltési állapotát és frissességét látja.",
+      "openSchema": "Definíciók megtekintése a schema.pi-ben",
+      "empty": "Még nincsenek táblák hozzáadva a tó tervezéséhez.",
+      "status": {
+        "DSGN": "Csak tervezés",
+        "LOADED": "Betöltve",
+        "FAIL": "Betöltés sikertelen"
+      },
+      "lastLoad": "Utolsó betöltés {time}",
+      "neverLoaded": "Soha nem volt betöltve",
+      "remove": "Eltávolítás",
+      "removeConfirm": "Eltávolítja a(z) {tbl} elemet a katalógusból?",
+      "prev": "Előző",
+      "next": "Következő",
+      "page": "{page}. oldal"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Először válasszon egy linket.",
+      "NOT_FOUND": "Nem található. Ellenőrizze, hogy a modell megváltozott-e."
+    }
+  },
+  "drift": {
+    "title": "Modell ↔ DB eltérés",
+    "intro": "Hasonlítsa össze a schema.pi tervezési modelljét és a DDL alkalmazási előzményeit az élő DB katalógussal az eltérések felderítéséhez, és mérje meg, hogy a tervezett indexek ténylegesen használatban vannak-e. Az ügyfél soradatait soha nem olvassuk vagy tároljuk.",
+    "needLink": "Először válasszon egy schema.pi linket fent. Ha nincs, regisztráljon egy tokent a 'Link' menüben.",
+    "needConn": "Válassza ki a fent összehasonlítandó DB kapcsolatot.",
+    "project": "Projekt",
+    "projectPick": "Válasszon egy projektet",
+    "loading": "Betöltés…",
+    "run": "Eltérés észlelés futtatása",
+    "running": "Összehasonlítás…",
+    "readOnly": "Csak olvasható katalógus és statisztikai lekérdezések futnak.",
+    "applyInSchema": "Alkalmazza a javításokat (modell szerkesztések, DDL generálás és végrehajtás) a schema.pi-ben, az igazság forrásában.",
+    "history": "Észlelési előzmények",
+    "prev": "Előző",
+    "next": "Következő",
+    "none": "Nincs",
+    "model": "Modell",
+    "reqNo": "Kérés {id}",
+    "notSaved": "Nem sikerült menteni ezt a futtatást az előzményekbe (az eredmények normálisan megjelennek).",
+    "capped": "Túl sok elem – szakaszonként az első {cap} elem látható (a számlálások teljesek).",
+    "statsMissing": "Az indexhasználati statisztikák nem voltak elérhetők, így a használat nem ítélhető meg.",
+    "sum": {
+      "missingTables": "Hiányzó táblák a DB-ben",
+      "extraTables": "Táblák, amelyek nincsenek a modellben",
+      "colMismatches": "Oszlop eltérések",
+      "missingIndexes": "Hiányzó tervezett indexek a DB-ben",
+      "extraIndexes": "Indexek, amelyek nincsenek a modellben",
+      "ddlMissing": "Objektumok eltűntek az alkalmazás után",
+      "unusedIndexes": "Nem használt tervezett indexek"
+    },
+    "sec": {
+      "ddlMissing": "DDL alkalmazva, de hiányzik a DB-ből",
+      "missingTables": "Táblák a modellben, de hiányoznak a DB-ből",
+      "extraTables": "Táblák a DB-ben, de nincsenek a modellben",
+      "colMismatches": "Oszlop típus / NULL eltérések",
+      "missingIndexes": "Tervezett indexek hiányoznak a DB-ből",
+      "extraIndexes": "Csak a DB-ben lévő indexek (PK kivételével)",
+      "idxUsage": "Tervezett index hatékonysága"
+    },
+    "hint": {
+      "ddlMissing": "A schema.pi ezeket az objektumokat alkalmazottként rögzítette, de eltűntek – gyanakodjon kézi törlésre vagy visszaállításra.",
+      "extraTables": "Ezek más projektekhez vagy rendszer táblákhoz tartozhatnak ezen a kapcsolaton.",
+      "idxUsage": "A statisztikák utolsó visszaállítása óta nulla beolvasás azt jelenti, hogy nem használt. Törlés előtt ellenőrizze a statisztikai ablakot."
+    },
+    "kind": {
+      "MISSING": "hiányzik a DB-ből",
+      "EXTRA": "nincs a modellben",
+      "TYPE": "típus eltér",
+      "NULL": "null érték eltér"
+    },
+    "col": {
+      "idx": "Index",
+      "scans": "Beolvasások",
+      "size": "Méret",
+      "status": "Ítélet"
+    },
+    "usage": {
+      "USED": "Használatban",
+      "UNUSED": "Nem használt tervezett index",
+      "NO_STATS": "Nincs statisztika"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "A schema.pi link még nem áll készen. Kérjük, próbálja újra hamarosan.",
+      "LINK_DOWN": "Nem érhető el a schema.pi. Kérjük, próbálja újra hamarosan.",
+      "LINK_AUTH": "A link token lejárt vagy visszavonásra került. Adjon ki új tokent a schema.pi-ben, és regisztrálja újra.",
+      "LINK_NOT_FOUND": "A link nem található. Kérjük, válassza ki újra a linket.",
+      "LINK_SCOPE": "Ez a kapcsolat nem tartozik a link taxonómiájához.",
+      "CONN_UNSUPPORTED": "Nem támogatott kapcsolat (egyelőre csak PostgreSQL szerver kapcsolatok).",
+      "TIMEOUT": "A kérés időtúllépés miatt megszakadt. Kérjük, próbálja újra hamarosan.",
+      "RATE": "Túl sok kérés. Kérjük, próbálja újra egy perc múlva."
+    }
+  },
+  "learn": {
+    "title": "DBA tanulás",
+    "intro": "SQLP/DAP gyakorló kérdések, hangolási esettanulmányok és Oracle/Tibero/PostgreSQL összehasonlító szótár. Link nélkül is működik; válasszon egy linket, hogy láthassa a schema.pi szabványos típusleképezését is.",
+    "loading": "Betöltés…",
+    "tabs": {
+      "quiz": "Gyakorlat",
+      "cases": "Hangolási esetek",
+      "dict": "DBMS szótár"
+    },
+    "topics": {
+      "INDEX": "Index beolvasások",
+      "JOIN": "Összekapcsolási módszerek",
+      "PARTITION": "Partíció metszés",
+      "NORMAL": "Normalizálás",
+      "NAMING": "Szabványos elnevezés",
+      "ISOLATION": "Izolációs szintek",
+      "LOCK": "Zárolások"
+    },
+    "levels": {
+      "1": "Alap",
+      "2": "Közép",
+      "3": "Haladó"
+    },
+    "quiz": {
+      "score": "Haladásom",
+      "scoreLine": "{total} kérdésből {solved} megoldva · {correct} helyes",
+      "right": "Helyes",
+      "wrong": "Helytelen",
+      "retry": "Újrapróbálkozás",
+      "prevRight": "Előzőleg helyes",
+      "prevWrong": "Előzőleg helytelen"
+    },
+    "cases": {
+      "notice": "Minden eset saját írású tanulási példa; a számok illusztratívak (nem ügyféladatok).",
+      "problem": "Problémás SQL",
+      "plan": "Terv összefoglaló",
+      "cause": "Ok",
+      "fix": "Javított SQL",
+      "effect": "Hatás"
+    },
+    "cats": {
+      "ALL": "Összes",
+      "TYPE": "Adattípusok",
+      "FUNC": "Függvények",
+      "PAGING": "Lapozás",
+      "SEQ": "Szekvenciák",
+      "DATE": "Dátumok",
+      "SYNTAX": "Szintaxis"
+    },
+    "dict": {
+      "search": "Keresés (pl. NVL, LIMIT)",
+      "item": "Elem",
+      "note": "Megjegyzés",
+      "empty": "Nincs egyező elem",
+      "loading": "Betöltés…",
+      "liveTitle": "Tárgyterületem szabványos típusleképezése",
+      "liveIntro": "Válasszon egy linket a schema.pi DBMS profiljának (logikai → fizikai típus) betöltéséhez. A fenti szótár link nélkül is működik.",
+      "liveLoad": "Típusleképezés betöltése",
+      "lgcType": "Logikai típus"
+    }
+  },
+  "link2": {
+    "title": "schema.pi kapcsolat",
+    "intro": "Regisztráljon egy kapcsolati tokent, hogy használhassa egy schema.pi tárgyterület DB kapcsolatait a dbms.pi-ben. A tokenek titkosítva tárolódnak, és az adatbázisaiból származó soradatok nem tárolódnak.",
+    "howTitle": "Kapcsolati token kiadásának módja",
+    "how1": "Jelentkezzen be a schema.pi-be, és nyissa meg a csatlakoztatni kívánt tárgyterületet",
+    "how2": "Lépjen a Tárgyterület → Beállítások → Kapcsolati token menüpontra, és nyomja meg a 'Token kiadása' gombot (terület adminisztrátor vagy DA szerepkör)",
+    "how3": "Másolja ki az slk_ -val kezdődő tokent – ez csak egyszer jelenik meg a kiadáskor",
+    "how4": "Illessze be alább, és regisztrálja",
+    "openSchema": "schema.pi megnyitása",
+    "registerTitle": "Kapcsolat regisztrálása",
+    "tokenLabel": "Kapcsolati token",
+    "tokenPlaceholder": "slk_…",
+    "register": "Regisztrálás",
+    "registering": "Ellenőrzés…",
+    "registered": "A(z) '{area}' tárgyterület most csatlakoztatva van",
+    "replaced": "A(z) '{area}' tárgyterület tokenje lecserélve",
+    "myLinks": "Saját kapcsolatok",
+    "empty": "Nincs regisztrált kapcsolat",
+    "loading": "Betöltés…",
+    "regDtm": "Regisztrálva {dtm}",
+    "remove": "Kapcsolat bontása",
+    "removeConfirm": "Bontja a(z) '{area}' kapcsolatot? Az ezt a kapcsolatot használó képernyők többé nem férhetnek hozzá.",
+    "prev": "Előző",
+    "next": "Következő",
+    "statusTitle": "Kapcsolat állapota",
+    "noConns": "Nincsenek DB kapcsolatok ebben a tárgyterületben (adjon hozzá egyet a schema.pi-ben)",
+    "colConn": "Kapcsolat",
+    "colDbms": "DBMS",
+    "colMthd": "Módszer",
+    "colHost": "Gazdagép",
+    "colTest": "Utolsó teszt",
+    "colAgent": "Ügynök utoljára látta",
+    "never": "Nincs",
+    "retry": "Újrapróbálkozás",
+    "pickerLink": "Link",
+    "pickerConn": "Kapcsolat",
+    "pickerEmpty": "Nincsenek kapcsolatok —",
+    "pickerGo": "regisztráljon egyet a /connect címen",
+    "errors": {
+      "LINK_AUTH": "A kapcsolati token lejárt vagy visszavonásra került. Adjon ki új tokent a schema.pi-ben, és regisztrálja újra",
+      "LINK_SCOPE": "Ez a kapcsolat nem tartozik a linkelt tárgyterülethez",
+      "LINK_DOWN": "Nem érhető el a schema.pi. Kérjük, próbálja újra hamarosan",
+      "LINK_NOT_FOUND": "A kapcsolat nem található",
+      "LINK_DUP": "A regisztráció már folyamatban van. Kérjük, próbálja újra",
+      "CONN_UNSUPPORTED": "Nem támogatott kapcsolat (egyelőre csak PostgreSQL szerver kapcsolatok)",
+      "Q_UNKNOWN": "Ismeretlen lekérdezés",
+      "SQL_NOT_SELECT": "Csak egyetlen SELECT (vagy WITH) utasítás futtatható",
+      "PGSS_MISSING": "A pg_stat_statements kiterjesztés nincs telepítve a cél DB-n",
+      "TIMEOUT": "A kérés időtúllépés miatt megszakadt",
+      "RATE": "Túl sok kérés. Kérjük, próbálja újra egy perc múlva",
+      "INVALID_INPUT": "Illessze be a teljes, slk_ -val kezdődő kapcsolati tokent"
+    }
+  },
+  "migration": {
+    "title": "Adatmigráció (PiMig)",
+    "intro": "Kiszámítja a tábla betöltési sorrendjét a schema.pi tervezési modelljében lévő kapcsolatokból, rendezi a darabméretet, a párhuzamosságot és az átállási ellenőrzőlistát, és generálja az ellenőrző SQL-t, amelyet Ön futtat a forráson és a célon. Ez a képernyő csak tervezi és ellenőrzi – nem mozgat adatokat, és nem olvas ügyfél DB sorokat.",
+    "needLink": "Először válasszon egy schema.pi linket fent. Ha nincs, regisztráljon egy tokent a 'Kapcsolat' menüben.",
+    "loading": "Betöltés…",
+    "newPlan": "Új migrációs terv",
+    "project": "Projekt",
+    "projectPick": "Válasszon egy projektet",
+    "planNm": "Terv neve",
+    "planNmHint": "Alapértelmezés szerint a projekt neve",
+    "create": "Terv létrehozása",
+    "creating": "Létrehozás…",
+    "snapHint": "A tervezés ebben a pillanatban (tábla, oszlop és kapcsolatnevek) pillanatfelvételként rögzül. Hozzon létre új tervet, ha a modell megváltozik.",
+    "plans": "Migrációs tervek",
+    "prev": "Előző",
+    "next": "Következő",
+    "sts": {
+      "DRAFT": "Piszkozat",
+      "READY": "Kész"
+    },
+    "del": "Törlés",
+    "delConfirm": "Törli ezt a tervet?",
+    "snapInfo": "Pillanatkép: {tables} tábla · {rels} kapcsolat",
+    "dropped": "({n} fizikai tábla nélküli kapcsolat kizárva a rendezésből)",
+    "chunkSize": "Blokkméret (sor/commit)",
+    "parallel": "Párhuzamosság (táblák egyszerre)",
+    "saveOpts": "Beállítások mentése",
+    "optsHint": "A párhuzamosság az egy szinten egyszerre betöltött táblák száma. A blokkméret a végrehajtó motor által használt commit egység (sorok).",
+    "order": "Betöltési sorrend",
+    "orderHint": "Topológiailag rendezve a tervezési kapcsolatok (nem fizikai FK-k) alapján, így a szülő táblák kerülnek előre. Az azonos szinten lévő táblák nem függenek egymástól, és párhuzamosan betölthetők.",
+    "cycles": "{n} körkörös csoport(ok) — azonos szinten elhelyezve. Állítsa be a sorrendjüket manuálisan, és halassza a hivatkozásellenőrzéseket a betöltés utánra.",
+    "selfRefs": "Önhivatkozó (hierarchikus) táblák — először a szülő sorokat töltse be a táblán belül",
+    "level": "{n}. szint",
+    "checklist": "Átállási ellenőrzőlista",
+    "toReady": "Készre jelölés",
+    "toDraft": "Vissza piszkozatba",
+    "readyNeedAll": "Jelöljön be minden elemet, mielőtt a tervet készre jelöli.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC átadási pont",
+        "desc": "Rögzítsen egy konzisztens forráspontot a kezdeti betöltés előtt (PG LSN · Oracle/Tibero SCN · lekérdezéshez, kezdési idő mínusz átfedési ablak), indítsa el a CDC-t onnan, és nyelje el az átadási ablakban lévő duplikátumokat upsert-ekkel."
+      },
+      "valueConv": {
+        "title": "Érték konverzió",
+        "desc": "A szabályok beállítása üres string = NULL, CHAR üres kitöltés, NUMBER precízió nélkül → NUMERIC, DATE idővel → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR hossz, és LONG·RAW."
+      },
+      "charset": {
+        "title": "Karakterkészlet",
+        "desc": "A forrás karakterkészlet (KO16MSWIN949, UTF8, …) megerősítve, a többbájtos növekedés miatt túlcsorduló oszlopok és az átalakíthatatlan karakterek elkülönítése eldöntve."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "A CLOB·BLOB darabokban (méret és memóriakorlátok) kerül streamelésre, és hossz + hash alapján ellenőrizve."
+      },
+      "seqResync": {
+        "title": "Szekvencia újraszinkronizálás",
+        "desc": "Betöltés után a cél szekvenciák·identitások max(kulcs)+1 értékre kerülnek beállításra."
+      },
+      "timezone": {
+        "title": "Időzóna · rendszer oszlopok",
+        "desc": "Az időzóna nélküli értékek értelmezési időzónája (pl. Asia/Seoul) beállítva, a módosított idő triggerek nem írják felül a forrás időbélyegeket a betöltés során, és a létrehozó/módosító helyettesítési szabályok beállítva."
+      },
+      "backpressure": {
+        "title": "Visszanyomás · célterhelés",
+        "desc": "Csökkentse a blokkméretet és a párhuzamosságot a cél késés, WAL növekedés vagy zárolási várakozások esetén; építsen nem-PK indexeket a betöltés után, és futtasson ANALYZE·VACUUM-ot utána."
+      }
+    },
+    "verify": "Ellenőrző SQL",
+    "verifyHint": "Táblánként generálja a darabszámot, numerikus oszlopösszeget, duplikált kulcsot és kulcs hash lekérdezéseket betöltési sorrendben. Futtassa őket Ön a forráson és a célon, és hasonlítsa össze (ez a képernyő nem hajtja végre őket).",
+    "noHashOracle": "Az Oracle·Tibero hash függvényei és szövegmegjelenítése eltér a PostgreSQL-től, ezért a hash lekérdezések kimaradnak — hasonlítsa össze a darabszámokat, összegeket és duplikált kulcsokat.",
+    "copy": "Másolás",
+    "copied": "Másolva",
+    "copyFail": "Nem sikerült másolni. Jelölje ki a szöveget és másolja manuálisan.",
+    "engine": {
+      "title": "Végrehajtás·újraindítás · próba·visszaállítás",
+      "body": "A tényleges migrációs végrehajtás (ellenőrzőpontok, visszanyomás, hibás sorok elkülönítése) és a próba, visszaállítás és CDC kezdőpont rögzítése a worker agent biztonsági modell (A10) véglegesítése után kerül bevezetésre. Jelenleg ez a tervezést, ellenőrzéseket és ellenőrző SQL-t fedi le."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "A schema.pi link előkészítés alatt áll. Kérjük, próbálja újra később.",
+      "LINK_DOWN": "Nem érhető el a schema.pi. Kérjük, próbálja újra később.",
+      "LINK_AUTH": "A link token lejárt vagy visszavonásra került. Adjon ki egy új tokent a schema.pi-ben, és regisztrálja újra.",
+      "LINK_NOT_FOUND": "A link nem található. Kérjük, válassza ki újra a linket.",
+      "LINK_SCOPE": "Ez a projekt nem tartozik a link taxonómiájába.",
+      "TIMEOUT": "A kérés időtúllépést szenvedett. Kérjük, próbálja újra később.",
+      "RATE": "Túl sok kérés. Próbálja újra egy perc múlva.",
+      "MIG_NO_TABLES": "Ennek a projektnek nincsenek fizikai táblái a migrációhoz. Először konvertálja fizikaivá a schema.pi-ben.",
+      "MIG_CHECK_INCOMPLETE": "Ellenőrizze az átállási ellenőrzőlista minden elemét, mielőtt a tervet készre jelöli.",
+      "NOT_FOUND": "A terv nem található."
+    }
+  },
+  "monitor": {
+    "title": "Felügyeleti Központ",
+    "collectNote": "A gyűjtés a schema.pi-ben fut — migráció tervezett (D7). Ez az oldal a schema.pi monitor összefoglalóját olvassa.",
+    "noLink": "Először válasszon ki vagy regisztráljon egy schema.pi linket.",
+    "goConnect": "Link regisztrálása",
+    "period": "Időszak",
+    "periods": {
+      "30": "30 perc",
+      "60": "1 óra",
+      "360": "6 óra",
+      "1440": "24 óra"
+    },
+    "refresh": "Frissítés",
+    "loading": "Betöltés…",
+    "updatedAt": "{area} · {time} állapot (automatikus frissítés 30 mp-enként)",
+    "appTitle": "Alkalmazás teljesítménye",
+    "dbTitle": "DB állapot kapcsolat szerint",
+    "urlTitle": "URL ellenőrzések",
+    "empty": "Nincs megjeleníthető adat.",
+    "breachTitle": "{n} küszöbérték túllépés",
+    "rulesTitle": "Küszöbérték szabályok",
+    "rulesNote": "A szabályok ehhez a linkhez vannak mentve, és az érkezett összefoglaló alapján kerülnek kiértékelésre; a túllépések piros keretet kapnak (az értesítések később érkeznek).",
+    "metric": "Metrika",
+    "conn": "Kapcsolat",
+    "allConns": "Összes kapcsolat",
+    "op": "Összehasonlítás",
+    "threshold": "Küszöbérték",
+    "thrInvalid": "Adjon meg egy számot a küszöbértékhez.",
+    "addRule": "Szabály hozzáadása",
+    "noRules": "Még nincsenek szabályok.",
+    "enable": "Engedélyezés",
+    "disable": "Kikapcsolás",
+    "delete": "Törlés",
+    "delConfirm": "Törli ezt a szabályt?",
+    "aiNote": "Az AI incidenselemzés és a javítás jóváhagyása továbbra is a schema.pi monitorban történik.",
+    "aiLink": "schema.pi monitor megnyitása",
+    "metrics": {
+      "APP_TPS": "TPS (kérés/mp)",
+      "APP_ERR_PCT": "Hibaarány (%)",
+      "APP_SLOW_CNT": "Lassú kérések",
+      "APP_AVG_MS": "Átlagos válasz (ms)",
+      "DB_SESS_CNT": "Munkamenetek",
+      "DB_LOCK_WAIT_CNT": "Zárolási várakozások",
+      "DB_CACHE_HIT_PCT": "Cache találati arány (%)",
+      "DB_SIZE_MB": "DB méret (MB)",
+      "URL_RSP_MS": "URL válasz (ms)",
+      "URL_FAIL_CNT": "URL hibák"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Először válasszon ki egy linket.",
+      "NOT_IMPLEMENTED": "A schema.pi link előkészítés alatt áll. Kérjük, próbálja újra később.",
+      "LINK_AUTH": "A link token érvénytelen vagy lejárt. Adjon ki egy új tokent a schema.pi-ben, és regisztrálja.",
+      "LINK_SCOPE": "Ez a link nem fér hozzá ehhez a taxonómiához.",
+      "RATE": "Túl sok kérés. Kérjük, próbálja újra később.",
+      "TIMEOUT": "A schema.pi lassan válaszol. Kérjük, próbálja újra később.",
+      "RULE_LIMIT": "Legfeljebb 50 szabály linkenként.",
+      "NOT_FOUND": "A szabály nem található."
+    }
+  },
+  "ops": {
+    "title": "DB Műveletek Biztonsága",
+    "loading": "Betöltés…",
+    "pickFirst": "Először válasszon ki egy linket és kapcsolatot fent",
+    "run": "Diagnosztika futtatása",
+    "running": "Diagnosztizálás…",
+    "noRun": "Még nincs diagnosztika. Nyomja meg a „Diagnosztika futtatása” gombot",
+    "lastRun": "Utolsó diagnosztika {dtm}",
+    "readOnly": "A diagnosztika csak olvas (SELECT). A tanács útmutató, és függ a szerver memóriájától, terhelésétől és munkaterhelésétől.",
+    "truncated": "Túl sok objektum — csak az első 500 lett ellenőrizve",
+    "paramsNote": "A szerver teljes memóriája ismeretlen, ezért a shared_buffers ≈ RAM 25%-ából becsüljük. A random_page_cost SSD-t feltételez.",
+    "auditNote": "Az RLS nélküli táblák és a nem használt fiókok ellenőrzése akkor kerül bevezetésre, ha a link lekérdezés támogatja őket.",
+    "replNote": "Az alapértelmezett az Active-Standby (A-S) — egy elsődleges + készenléti. A visszajátszási késés ≥ 5 mp = figyelmeztetés, ≥ 60 mp = kockázat (mért RPO referencia)",
+    "lagIdle": "Nincs változás",
+    "pager": "Lapozás",
+    "prev": "Előző",
+    "next": "Következő",
+    "tabs": {
+      "params": "Paraméterek",
+      "audit": "Fiókok és jogosultságok",
+      "backup": "Biztonsági mentés és helyreállítás",
+      "repl": "Replikáció és DR",
+      "history": "Előzmények"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Figyelmeztetés",
+      "RISK": "Kockázat"
+    },
+    "role": {
+      "primary": "Ez a kapcsolat = Elsődleges",
+      "standby": "Ez a kapcsolat = Készenléti",
+      "unknown": "Ismeretlen szerep"
+    },
+    "col": {
+      "level": "Ítélet",
+      "item": "Elem",
+      "value": "Érték",
+      "reason": "Részletek",
+      "standby": "Készenléti",
+      "state": "Állapot",
+      "sync": "Szinkronizálás",
+      "lag": "Visszajátszási késés"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLS szerepek",
+      "bypass_ok": "BYPASSRLS szerepek",
+      "no_expiry": "Jelszó lejárat",
+      "expiry_ok": "Jelszó lejárat",
+      "public_grant": "PUBLIC jogosultságok",
+      "public_ok": "PUBLIC jogosultságok",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Utolsó archivált WAL",
+      "arc_stale": "Utolsó archivált WAL",
+      "arc_recent": "Utolsó archivált WAL",
+      "arc_failing": "WAL archiválási hiba"
+    },
+    "rules": {
+      "sb_default": "Az alapértelmezett (128MB) értéken. Dedikált szerveren a RAM körülbelül 25%-a ajánlott.",
+      "sb_ok": "Az alapértelmezett felett beállítva.",
+      "wm_over": "max_connections × work_mem meghaladja a becsült memóriát. A párhuzamos rendezések memóriakimerülést kockáztatnak.",
+      "wm_default": "Az alapértelmezett (4MB) értéken. A nagy rendezések és hash-ek lemezre kerülhetnek.",
+      "wm_ok": "Ésszerű tartományon belül.",
+      "mwm_default": "Az alapértelmezett (64MB) értéken. A VACUUM és az indexépítések lassúak lehetnek; fontolja meg a 256MB-ot vagy többet.",
+      "mwm_ok": "Az alapértelmezett felett beállítva.",
+      "av_on": "Az autovacuum be van kapcsolva.",
+      "av_off": "Az autovacuum ki van kapcsolva. Magas a táblázat felduzzadásának és a tranzakcióazonosító körbefordulásának kockázata.",
+      "conn_high": "A max_connections magas. Minden kapcsolat memóriát használ; egy pooler (PgBouncer stb.) ajánlott.",
+      "conn_ok": "Ésszerű tartományon belül.",
+      "lmd_off": "A lassú lekérdezés naplózása ki van kapcsolva (-1). Körülbelül 1000ms ajánlott.",
+      "lmd_all": "Minden utasítás naplózva van (0). Nagy naplózási terhelés.",
+      "lmd_ok": "A lassú lekérdezés naplózása be van kapcsolva.",
+      "st_off": "Nincs szerver szintű utasítás időtúllépés (0). Állítson be korlátokat szerepenként vagy alkalmazásonként.",
+      "st_ok": "Be van állítva egy utasítás időtúllépés.",
+      "iit_off": "Nincs tétlen tranzakcióban időtúllépés (0). Zárolásokat és felduzzadást okozhat.",
+      "iit_ok": "Be van állítva egy tétlen tranzakcióban időtúllépés.",
+      "ckpt_short": "Az ellenőrzőpont intervallum 5 perc vagy kevesebb. Fontolja meg a 10–15 percet írásigényes terhelések esetén.",
+      "ckpt_ok": "Ésszerű tartományon belül.",
+      "wal_minimal": "A wal_level=minimal lehetetlenné teszi a PITR-t és a replikációt. Használjon replica vagy magasabb szintet.",
+      "wal_ok": "A WAL szint támogatja a PITR-t és a replikációt.",
+      "rpc_hdd": "HDD alapértelmezett (4). SSD esetén 1.1–2 ajánlott.",
+      "rpc_ok": "SSD-hez megfelelő.",
+      "super_many": "Két vagy több superuser. Tartson egyet az adminisztrációhoz, és csak a szükséges jogosultságokat adja meg a többieknek.",
+      "super_ok": "Legfeljebb egy superuser.",
+      "bypass_rls": "Nem superuser szerepek léteznek, amelyek megkerülik a sor szintű biztonságot.",
+      "bypass_ok": "Nincsenek RLS-t megkerülő szerepek.",
+      "no_expiry": "Jelszó lejárat nélküli bejelentkezési szerepek. Állítsa be a VALID UNTIL-t személyes fiókokhoz.",
+      "expiry_ok": "Minden bejelentkezési szerepnek van lejárata.",
+      "public_grant": "A PUBLIC (minden szerep) rendelkezik táblajogosultságokkal. Az írási jogosultságok kockázatosak.",
+      "public_ok": "Nincsenek táblajogosultságok megadva a PUBLIC-nak.",
+      "arc_on": "A WAL archiválás (archive_mode) be van kapcsolva.",
+      "arc_off": "A WAL archiválás ki van kapcsolva, így a pont-időben történő helyreállítás (PITR) lehetetlen.",
+      "arc_cmd_empty": "Az archive_mode be van kapcsolva, de az archive_command és az archive_library üres.",
+      "arc_never": "Még nem archiváltak WAL-t.",
+      "arc_stale": "Az utolsó WAL archívum 24 óránál régebbi.",
+      "arc_recent": "A WAL archiválva lett az elmúlt 24 órában.",
+      "arc_failing": "A WAL archiválás jelenleg hibás. Ellenőrizze a lemezt, az engedélyeket és a cél elérési utat.",
+      "repl_is_standby": "Ez a kapcsolat készenléti (helyreállítási mód). Ellenőrizze a késést az elsődleges kapcsolatról.",
+      "repl_none": "Nincs csatlakoztatott készenléti. Nincs katasztrófa-helyreállítási (DR) beállítás.",
+      "repl_ok": "A készenléti rendszerek normálisan streamelnek.",
+      "repl_lag": "Egy készenléti rendszer késik vagy nem streamel."
+    },
+    "manual": {
+      "title": "Kézi ellenőrzőlista",
+      "intro": "Biztonsági mentési és helyreállítási gyakorlatok, amelyek nem ellenőrizhetők automatikusan. Jelölje be, ha megerősítette, és jegyezze fel a bizonyítékot.",
+      "memo": "Emlékeztető (pl. eszköz, ütemezés, utolsó ellenőrzés)",
+      "save": "Mentés",
+      "updated": "Frissítve: {dtm}",
+      "items": {
+        "base_backup": "Teljes biztonsági mentés (pg_basebackup stb.) sikeresen megtörtént az elmúlt 7 napban.",
+        "offsite_copy": "A biztonsági mentés másolata külső helyen (más régióban vagy tárolóban) van tárolva.",
+        "restore_rehearsal": "Helyreállítási próba történt ebben a negyedévben, és annak időtartama rögzítésre került.",
+        "pitr_target": "A PITR eljárás és a cél RPO/RTO dokumentálva van.",
+        "backup_encrypt": "A biztonsági mentési fájlok titkosítva vannak, és a hozzáférés korlátozott.",
+        "retention": "A biztonsági mentés megőrzési ideje és törlési szabályzata meghatározott."
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "A schema.pi link előkészítés alatt áll. Kérjük, próbálja újra később.",
+      "CONN_UNSUPPORTED": "Ez a kapcsolat még nem támogatott (csak közvetlen PostgreSQL).",
+      "TIMEOUT": "A cél DB túl lassan válaszolt. Kérjük, próbálja újra később.",
+      "RATE": "Túl sok hívás. Próbálja újra egy perc múlva.",
+      "Q_UNKNOWN": "Nem támogatott lekérdezés. Ellenőrizze a schema.pi link API verzióját.",
+      "INVALID_INPUT": "Érvénytelen link vagy kapcsolat kiválasztása."
+    }
+  },
+  "perf": {
+    "title": "Teljesítmény",
+    "loading": "Betöltés…",
+    "pickFirst": "Először válasszon ki egy linket és kapcsolatot fent",
+    "pager": "Lapozás",
+    "tabs": {
+      "collect": "Gyűjtés",
+      "top": "Lassú lekérdezések",
+      "health": "Tábla és index állapot",
+      "trend": "Méret trend",
+      "activity": "Tevékenység és zárolások"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "A schema.pi link előkészítés alatt áll. Kérjük, próbálja újra később.",
+      "CONN_UNSUPPORTED": "Ez a kapcsolat még nem támogatott (csak közvetlen PostgreSQL kapcsolatok).",
+      "RATE": "Túl sok kérés. Próbálja újra egy perc múlva.",
+      "LINK_AUTH": "A link token lejárt vagy visszavonásra került. Regisztrálja újra a tokent a Csatlakozás oldalon.",
+      "LINK_SCOPE": "Ez a kapcsolat nem tartozik a link tárgykörébe.",
+      "Q_UNKNOWN": "Nem támogatott lekérdezés. Ellenőrizze a schema.pi link API verzióját.",
+      "INVALID_INPUT": "A link vagy a kapcsolat értéke érvénytelen."
+    },
+    "pgss": {
+      "title": "A pg_stat_statements engedélyezése",
+      "note": "Az önállóan hosztolt PostgreSQL-hez is szükséges a pg_stat_statements a shared_preload_libraries-ben (postgresql.conf) és újraindítás. A tábla-, index- és méretstatisztikák nélküle is működnek."
+    },
+    "collect": {
+      "intro": "A „Gyűjtés most” gomb megnyomásával egyszerre gyűjti a legfontosabb lekérdezési statisztikákat, táblákat, indexeket és méreteket, és pillanatfelvételként tárolja őket. Legalább kétszer gyűjtsön adatokat a változások és a méret trendek megtekintéséhez.",
+      "run": "Gyűjtés most",
+      "running": "Gyűjtés…",
+      "done": "Gyűjtve: {dtm} — {qry} lekérdezés · {tbl} tábla · {idx} index"
+    },
+    "top": {
+      "sort": "Rendezés",
+      "sortTotal": "Teljes idő",
+      "sortMean": "Átlagos idő",
+      "sortCalls": "Hívások",
+      "empty": "Még nincsenek pillanatfelvételek. Nyomja meg a „Gyűjtés most” gombot a Gyűjtés lapon.",
+      "range": "Változás {from} → {to} között",
+      "first": "Első pillanatfelvétel: {dtm} — kumulatív értékek (változások a következő pillanatfelvételtől)",
+      "query": "Lekérdezés (literálok maszkolva)",
+      "calls": "Hívások",
+      "totalMs": "Összes ms",
+      "meanMs": "Átlagos ms",
+      "rows": "Sorok",
+      "reset": "Statisztika visszaállítása észlelve – kumulatívként jelenik meg"
+    },
+    "health": {
+      "empty": "Még nincsenek pillanatképek. Nyomja meg a „Gyűjtés most” gombot a Gyűjtés lapon",
+      "basis": "Pillanatkép alapján: {dtm}",
+      "unusedIdx": "Nem használt indexek",
+      "unusedIdxHint": "Az utolsó statisztika visszaállítása óta soha nem használt indexek (méret szerint). Ne ejtse el a PK vagy egyedi-korlátozó indexeket",
+      "fullScan": "Túlzott teljes szkennelés",
+      "fullScanHint": "1000+ élő sorral rendelkező táblák, ahol a teljes szkennelés legalább a fele – ellenőrizze a szűrőoszlopok indexeit",
+      "dead": "Túlzottan sok halott rekord",
+      "deadHint": "Halott rekord arány 20% vagy több – ellenőrizze a VACUUM és autovacuum beállításokat",
+      "none": "Nincs",
+      "scans": "szkennelés"
+    },
+    "trend": {
+      "limit": "Méretküszöb",
+      "empty": "Nincsenek pillanatképek az elmúlt 30 napban",
+      "now": "Jelenlegi méret",
+      "perDay": "Napi növekedés",
+      "needMore": "2+ pillanatkép szükséges",
+      "daysLeft": "Eléri a {gb} GB-ot",
+      "noGrowth": "Nincs növekedési tendencia",
+      "days": "körülbelül {n} nap múlva"
+    },
+    "activity": {
+      "refresh": "Frissítés",
+      "live": "Élő lekérdezés – nincs tárolva",
+      "sessions": "Munkamenet tevékenység",
+      "locks": "Zárolások",
+      "none": "Nincs"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Adatcsatornák",
+    "intro": "Ellenőrizze, hogy egy forrás DB készen áll-e a változásadat-rögzítésre (CDC), és tervezzen forrás → átalakítás → cél adatcsatornákat. Ez a szakasz csak ellenőriz és tervez; ügyfél soradatai nem kerülnek olvasásra vagy tárolásra.",
+    "needLink": "Először válasszon ki egy schema.pi linket fent. Ha nincs, regisztráljon egy tokent a „Link” menüben.",
+    "needConn": "Válassza ki a fent ellenőrizendő DB kapcsolatot.",
+    "loading": "Betöltés…",
+    "pager": "Oldalak",
+    "prev": "Előző",
+    "next": "Következő",
+    "runTitle": "Futtatás és felügyelet (7-3 · 7-4)",
+    "runBody": "Az adatcsatorna végrehajtása, késleltetés figyelése és újrafeldolgozása akkor érkezik, amikor a munkavégző ügynök és a biztonsági modell véglegesítésre kerül. Egyelőre mentse a definíciókat vázlatként (DRAFT).",
+    "pre": {
+      "title": "Forrás előellenőrzés",
+      "intro": "Minden táblához ellenőrzi a változási idő oszlopokat, a soft-delete oszlopokat és az elsődleges kulcsot, hogy javasoljon egy rögzítési módszert (adaptert), és ellenőrzi a WAL logikai replikáció készenlétét. Csak olvasható katalógus és beállítások lekérdezések.",
+      "schema": "Séma (opcionális)",
+      "schemaPh": "Összes",
+      "run": "Előellenőrzés futtatása",
+      "running": "Ellenőrzés…",
+      "sum": "{tables} tábla · {noPk} PK nélkül · {deleteUnseen} nem tudja rögzíteni a törléseket",
+      "truncated": "Egy katalógus lekérdezés elérte az 500 soros korlátot, így néhány tábla hiányozhat. Adjon meg egy sémát, és ellenőrizze újra.",
+      "empty": "Nincsenek ellenőrizendő táblák",
+      "colTable": "Tábla",
+      "colChg": "Változási idő oszlop",
+      "colDel": "Soft-delete oszlop",
+      "colAdapter": "Ajánlott módszer · okok",
+      "toDraft": "Adatcsatorna vázlat létrehozása {n} kiválasztottból"
+    },
+    "ready": {
+      "ok": "WAL logikai replikáció készen áll – a PK-val rendelkező táblák használhatják a LOGICAL módszert",
+      "no": "WAL logikai replikáció nem áll készen – rögzítés lekérdezéssel vagy kulcs összehasonlítással",
+      "senders": "{n} replikációs kapcsolat"
+    },
+    "adapter": {
+      "LOGICAL": "Logikai replikáció (WAL)",
+      "POLL": "Változási idő lekérdezés",
+      "KEY_DIFF": "Kulcs pillanatkép különbség",
+      "NONE": "Csak teljes újratöltés"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Van változási idő oszlop",
+      "NO_CHG_COL": "Nincs változási idő oszlop",
+      "HAS_SOFT_DEL": "Van soft-delete oszlop",
+      "NO_SOFT_DEL": "Nincs soft-delete oszlop",
+      "HAS_PK": "Van elsődleges kulcs",
+      "NO_PK": "Nincs elsődleges kulcs – a megváltozott sorok nem azonosíthatók",
+      "DELETE_UNSEEN": "A lekérdezés nem tudja rögzíteni a fizikai DELETE-eket (soft-delete oszlop ajánlott)",
+      "LOGICAL_NOT_READY": "Átválthat LOGICAL-ra, amint a WAL logikai replikáció készen áll",
+      "FULL_RELOAD_ONLY": "Nincs PK vagy változási idő oszlop, így nincs inkrementális rögzítés – adjon hozzá egy PK-t",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level nem logical (a módosításhoz DB újraindítás szükséges)",
+      "NO_SLOTS": "max_replication_slots = 0",
+      "NO_SENDERS": "max_wal_senders = 0",
+      "IS_STANDBY": "Standby szerver – a logikai replikációt a primer szerverről vegye",
+      "SETTINGS_UNKNOWN": "Nem sikerült beolvasni a beállításokat, a készenlét ismeretlen"
+    },
+    "ed": {
+      "title": "Adatcsatorna definíciók",
+      "draftOnly": "Csak tervezés – vázlatként (DRAFT) mentve",
+      "new": "Új adatcsatorna",
+      "empty": "Nincsenek mentett adatcsatornák",
+      "manual": "Kézi",
+      "edit": "Szerkesztés",
+      "remove": "Törlés",
+      "name": "Név",
+      "adapter": "Rögzítési módszer",
+      "srcConn": "Forráskapcsolat",
+      "useCurrentConn": "A fent kiválasztott kapcsolat használata",
+      "sched": "Ütemezés (5 mezős cron, üres = kézi)",
+      "target": "Cél",
+      "targetPh": "pl. analitikai DB analytics.public / lake s3://…",
+      "tables": "Forrástáblák (új sorral vagy vesszővel elválasztva)",
+      "steps": "Lépések (forrás → átalakítás → cél)",
+      "op": "Művelet",
+      "notePh": "Leírás · feltétel (opcionális)",
+      "addTransform": "Átalakítási lépés hozzáadása",
+      "save": "Mentés",
+      "saving": "Mentés…",
+      "saved": "Mentve",
+      "close": "Bezárás"
+    },
+    "kind": {
+      "SOURCE": "Forrás",
+      "TRANSFORM": "Átalakítás",
+      "TARGET": "Cél"
+    },
+    "sts": {
+      "DRAFT": "Vázlat"
+    },
+    "check": {
+      "NAME_REQUIRED": "Adjon meg egy nevet",
+      "CONN_REQUIRED": "Válasszon egy forráskapcsolatot",
+      "CRON_INVALID": "Adja meg az ütemezést 5 mezős cron formátumban (perc óra nap hónap hétköznap; számjegyek, *, ',', -, /)",
+      "OP_REQUIRED": "Adjon meg egy műveletet minden lépéshez",
+      "STEPS_TOO_FEW": "Forrás és cél lépések szükségesek",
+      "STEPS_TOO_MANY": "Legfeljebb 20 lépés",
+      "STEP_FIRST_SOURCE": "Az első lépésnek a forrásnak kell lennie",
+      "STEP_LAST_TARGET": "Az utolsó lépésnek a célnak kell lennie",
+      "STEP_MIDDLE_TRANSFORM": "Csak átalakítási lépések lehetnek a kettő között"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Már létezik adatcsatorna ezzel a névvel. Használjon másik nevet",
+      "CONN_UNSUPPORTED": "Ez a kapcsolat még nem ellenőrizhető (egyelőre csak PostgreSQL közvetlen szerverkapcsolatok)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL Tuning Labor",
+    "intro": "Válasszon egy kapcsolatot, és írjon be SQL-t az végrehajtási terv fa nézetének megtekintéséhez, a lassulás okainak (teljes szkennelés, beágyazott ciklusok, nagy rendezések) és az SQL anti-minták schema.pi szabványos tartományok szerinti ellenőrzésével. A lekérdezések soha nem kerülnek ténylegesen végrehajtásra (nincs ANALYZE).",
+    "needLink": "A tervek megtekintéséhez először válasszon ki egy linket és kapcsolatot fent. Az anti-minta ellenőrzés link nélkül is működik.",
+    "sqlLabel": "SQL (egyetlen SELECT vagy WITH utasítás)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Terv megjelenítése",
+    "explaining": "Betöltés…",
+    "save": "Terv mentése",
+    "saving": "Mentés…",
+    "saveName": "Címke (pl. index hozzáadása előtt)",
+    "saveNote": "Az SQL-ben és a tervfeltételekben szereplő állandó értékek ? jelként vannak maszkolva mentéskor.",
+    "plan": {
+      "title": "Végrehajtási terv",
+      "summary": "Teljes költség {cost} · {ms}ms",
+      "cost": "költség",
+      "rows": "sorok",
+      "width": "szélesség"
+    },
+    "warn": {
+      "none": "Nincsenek figyelemre méltó figyelmeztetések.",
+      "SEQ_SCAN_LARGE": "Teljes szkennelés a(z) {relation} táblán (körülbelül {rows} sor) – fontolja meg egy indexet a szűrőoszlopokon.",
+      "NESTED_LOOP_HIGH": "A beágyazott ciklus körülbelül {rows} sort eredményez – fontolja meg a hash vagy merge join-t, vagy egy indexet a join feltételen.",
+      "SORT_SPILL": "A rendezés mérete körülbelül {kb}KB, ami meghaladja az alapértelmezett work_mem (4MB) értéket; lemezre kerülhet."
+    },
+    "lint": {
+      "run": "Anti-minták ellenőrzése",
+      "title": "SQL anti-minta ellenőrzés",
+      "none": "Nincsenek anti-minták.",
+      "domainsOff": "A szabványos tartományokat nem sikerült betölteni; csak az alapértelmezett oszlop-utótag szabályokkal ellenőrizve.",
+      "types": {
+        "num": "numerikus",
+        "date": "dátum",
+        "char": "karakter"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * – csak a szükséges oszlopokat válassza ki (extra I/O, nincs fedő index).",
+        "FUNC_ON_COLUMN": "A szűrőoszlop {column} egy függvénybe vagy kifejezésbe van csomagolva, így az indexe nem használható – ehelyett alakítsa át az állandót.",
+        "LEADING_WILDCARD": "A vezető %-ot tartalmazó LIKE nem használhat B-fa indexet – fontolja meg egy pg_trgm GIN indexet.",
+        "OR_DIFF_COLUMNS": "Különböző oszlopokon lévő feltételek OR-ral vannak kombinálva – fontolja meg a UNION ALL-t vagy az oszloponkénti indexeket.",
+        "IMPLICIT_CAST": "A(z) {column} egy idézőjeles számmal van összehasonlítva – egyeztesse az oszlop és az állandó típusait (implicit típuskonverzió).",
+        "NOT_IN_SUBQUERY": "A NOT IN (al-lekérdezés) semmit sem ad vissza, ha NULL értékek vannak jelen, és lassú – használja a NOT EXISTS-t.",
+        "NO_WHERE": "Nincs WHERE záradék – egy nagy táblán ez teljes szkennelés (adjon hozzá egy feltételt vagy LIMIT-et).",
+        "DOMAIN_MISMATCH": "A(z) {column} egy {expected} típus a szabványos tartomány szerint, de egy másik típusú állandóval van összehasonlítva – az implicit típuskonverzió megakadályozhatja az index használatát."
+      }
+    },
+    "saved": {
+      "title": "Mentett tervek · Összehasonlítás",
+      "empty": "Nincsenek mentett tervek. Tekintsen meg egy tervet, majd mentse el.",
+      "pick": "Válassza ki az összehasonlítandó tervet",
+      "pick2": "Válasszon ki két tervet az összehasonlításhoz.",
+      "compare": "Két terv összehasonlítása",
+      "delete": "Törlés",
+      "cost": "költség",
+      "prev": "Előző",
+      "next": "Következő",
+      "page": "{page} oldal"
+    },
+    "diff": {
+      "cost": "Teljes költség {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "A két terv különböző SQL-hez tartozik (normalizálás után).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Nincs változás a tervcsomópontokban.",
+      "before": "Előtte",
+      "after": "Utána"
+    },
+    "ai": {
+      "title": "AI tuning tanácsok",
+      "badge": "Hamarosan",
+      "body": "Hamarosan (jóváhagyási és hatásmérési eljárások után) – a tanácsok maszkolt állandókat tartalmazó SQL-ből generálódnak, és csak DA jóváhagyás és mért hatás után kerülnek alkalmazottként rögzítésre."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "A schema.pi link funkció előkészítés alatt áll. Kérjük, próbálja meg újra rövidesen.",
+      "LINK_AUTH": "A link token lejárt vagy visszavonásra került. Adjon ki egy új tokent a schema.pi-ben, és regisztrálja újra.",
+      "LINK_SCOPE": "Ez a link nem használhatja azt a kapcsolatot (eltérő osztályozási séma).",
+      "CONN_UNSUPPORTED": "Ez a kapcsolattípus még nem támogatott (egyelőre csak PostgreSQL szerverkapcsolatok).",
+      "Q_UNKNOWN": "Nem támogatott lekérdezés.",
+      "SQL_NOT_SELECT": "A tervek csak egyetlen, SELECT vagy WITH kezdetű utasításhoz érhetők el.",
+      "TIMEOUT": "A kérés időtúllépést szenvedett (5 másodperc). Rövidítse le az SQL-t, vagy próbálja meg újra később.",
+      "RATE": "Túl sok kérés. Próbálja meg újra egy perc múlva.",
+      "PAYLOAD_TOO_LARGE": "A terv túl nagy a mentéshez.",
+      "LINK_NOT_FOUND": "A link nem található. Kérjük, válassza ki újra a linket."
+    }
+  },
+  "nav": {
+    "label": "Funkciók",
+    "connect": "Csatlakozás",
+    "sqlLab": "SQL Tuning",
+    "perf": "Teljesítmény",
+    "monitor": "Felügyelet",
+    "drift": "Eltérés",
+    "migration": "Migráció",
+    "pipeline": "Adatcsatorna",
+    "analytics": "Analitika",
+    "ops": "Működési biztonság",
+    "learn": "Tanulás"
   }
 }

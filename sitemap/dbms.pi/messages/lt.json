@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "DBA ir SQLP darbo vieta, skirta greitai ir saugiai valdyti DB variklius"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Užtikrinkite, kad jūsų DB variklis greitai ir saugiai apdorotų duomenis",
+    "description": "DBA ir SQLP darbo vieta, skirta vykdymo planams, statistikai ir našumui. schema.pi tvarko dizainą ir standartus; dbms.pi yra jos partneris variklio pusėje.",
+    "welcome": "Sveiki, {name}.",
+    "featTitle": "Funkcijos",
+    "featDesc": {
+      "connect": "Užregistruokite schema.pi nuorodos žetoną ir patikrinkite ryšio būseną",
+      "sqlLab": "Plano medis, įspėjimai, palyginimas ir anti-modelių patikrinimai pagal standartinius domenus",
+      "perf": "Lėtos užklausos Top-N, lentelių/indeksų būklė, talpos prognozė, veikla ir užraktai",
+      "monitor": "Programos, DB ir URL metrikos suvestinė su slenksčio įspėjimais",
+      "drift": "Palyginkite schema.pi modelį ir DDL istoriją su realiu katalogu, įvertinkite indekso efektą",
+      "migration": "Topologinė įkėlimo tvarka, dalys, kontrolinis sąrašas ir patvirtinimo SQL",
+      "pipeline": "Pakeitimų fiksavimo išankstinis patikrinimas ir šaltinio→transformavimo→tikslo konvejerio apibrėžimai",
+      "analytics": "KPI prietaisų skydelis, 3 sluoksnių ežero žemėlapis ir duomenų rinkinių katalogas",
+      "ops": "Tik skaitymo parametrų, vaidmenų, atsarginių kopijų ir replikacijos DR diagnostika",
+      "learn": "SQLP/DAP praktikos klausimai, derinimo atvejai ir DBMS palyginimo žodynas"
+    }
+  },
   "auth": {
     "checking": "Tikrinamas prisijungimas…",
     "signedIn": "{name}",
@@ -64,5 +87,828 @@
     "LINK_CODE_GEN_FAILED": "Nepavyko sukurti susiejimo kodo. Prašome bandyti dar kartą vėliau.",
     "AUTH_DB_UNAVAILABLE": "Nepavyko išsaugoti jūsų paskyros, todėl prisijungimas nepavyko. Prašome bandyti dar kartą vėliau.",
     "LINK_TRY_LIMIT": "Per daug neteisingų susiejimo kodų. Bandykite dar kartą po 15 minučių."
+  },
+  "analytics": {
+    "title": "Analizė ir ežeras",
+    "intro": "dbms veiklos KPI, trijų sluoksnių ežero dizainas ir duomenų rinkinių katalogas vienoje vietoje.",
+    "storageNotice": "Ežero saugykla (kliento pusės arba debesies) dar nenuspręsta (PRD 10 skyrius #7). Kol kas saugomi tik dizainai ir pavadinimų atitikmenys – jokių eilučių duomenų.",
+    "noLink": "Pirmiausia pasirinkite arba užregistruokite schema.pi nuorodą.",
+    "goConnect": "Registruoti nuorodą",
+    "loading": "Įkeliama…",
+    "refresh": "Atnaujinti",
+    "kpi": {
+      "title": "KPI prietaisų skydelis",
+      "updatedAt": "{area} · {time} duomenimis",
+      "notBuilt": "Nesukurta",
+      "keys": {
+        "links": "Mano nuorodos",
+        "perf": "Našumo momentinės nuotraukos",
+        "drift": "Poslinkio vykdymas",
+        "mig": "Migracijos planai",
+        "pipe": "Konvejeriai",
+        "lake": "Ežero duomenų rinkiniai"
+      },
+      "countsChart": "Viso pagal funkciją",
+      "trendTitle": "Našumo momentinės nuotraukos per pastarąsias 14 dienų",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Per pastarąsias 14 dienų nėra našumo momentinių nuotraukų.",
+      "monTitle": "schema.pi monitoriaus suvestinė (paskutinė valanda)",
+      "monTps": "Užklausų/s",
+      "monErr": "Klaidų dažnis",
+      "monAvg": "Vid. atsakas (ms)",
+      "monDb": "DB prisijungimai",
+      "monFail": "Nepavyko įkelti monitoriaus suvestinės: {msg}"
+    },
+    "lake": {
+      "title": "Trijų sluoksnių ežero dizainas",
+      "raw": "Neapdorotas",
+      "rawDesc": "Įkelia šaltinio DB stulpelių pavadinimus ir tipus tokius, kokie jie yra.",
+      "std": "Standartizuotas",
+      "stdDesc": "Pervadina stulpelius į schema.pi patvirtintus standartinius terminus.",
+      "cur": "Sutvarkytas",
+      "curDesc": "Analizės duomenų rinkiniai, sugrupuoti pagal subjektą.",
+      "loadProjects": "Įkelti projektus",
+      "project": "Projektas",
+      "pickProject": "Pasirinkite projektą",
+      "noProjects": "Šioje srityje nėra projektų.",
+      "noTables": "Šio projekto modelyje nėra lentelių.",
+      "conform": "Standarto atitiktis {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} stulpeliai · {pct}% atitinka",
+      "colSrc": "Šaltinio stulpelis",
+      "colStd": "Standartizuotas stulpelis",
+      "colType": "Tipas",
+      "colOk": "Formatas",
+      "ok": "Gerai",
+      "ng": "Patikrinti",
+      "pk": "PK",
+      "selectAll": "Pasirinkti visus",
+      "selected": "Pasirinkta {cnt}",
+      "save": "Pridėti prie ežero dizaino",
+      "saved": "Pridėta {cnt} į katalogą."
+    },
+    "catalog": {
+      "title": "Duomenų rinkinių katalogas",
+      "schemaCard": "schema.pi yra analizės duomenų rinkinių apibrėžimų, metaduomenų paieškos ir žodyno šaltinis. Čia matote tik ežero įkėlimo būseną ir naujumą.",
+      "openSchema": "Peržiūrėti apibrėžimus schema.pi",
+      "empty": "Dar nepridėta jokių lentelių prie ežero dizaino.",
+      "status": {
+        "DSGN": "Tik dizainas",
+        "LOADED": "Įkelta",
+        "FAIL": "Įkėlimas nepavyko"
+      },
+      "lastLoad": "Paskutinis įkėlimas {time}",
+      "neverLoaded": "Niekada neįkelta",
+      "remove": "Pašalinti",
+      "removeConfirm": "Pašalinti {tbl} iš katalogo?",
+      "prev": "Ankstesnis",
+      "next": "Kitas",
+      "page": "Puslapis {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Pirmiausia pasirinkite nuorodą.",
+      "NOT_FOUND": "Nerasta. Patikrinkite, ar modelis pasikeitė."
+    }
+  },
+  "drift": {
+    "title": "Modelio ↔ DB poslinkis",
+    "intro": "Palyginkite schema.pi dizaino modelį ir DDL taikymo istoriją su gyvu DB katalogu, kad rastumėte poslinkį, ir įvertinkite, ar suprojektuoti indeksai iš tikrųjų naudojami. Kliento eilučių duomenys niekada neskaitomi ir nesaugomi.",
+    "needLink": "Pirmiausia pasirinkite schema.pi nuorodą aukščiau. Jei neturite, užregistruokite žetoną meniu „Nuoroda“.",
+    "needConn": "Pasirinkite DB ryšį, kurį norite palyginti aukščiau.",
+    "project": "Projektas",
+    "projectPick": "Pasirinkite projektą",
+    "loading": "Įkeliama…",
+    "run": "Vykdyti poslinkio aptikimą",
+    "running": "Lyginama…",
+    "readOnly": "Vykdomos tik skaitymo katalogo ir statistikos užklausos.",
+    "applyInSchema": "Taikykite pataisymus (modelio redagavimus, DDL generavimą ir vykdymą) schema.pi, tiesos šaltinyje.",
+    "history": "Aptikimo istorija",
+    "prev": "Ankstesnis",
+    "next": "Kitas",
+    "none": "Nėra",
+    "model": "Modelis",
+    "reqNo": "Užklausa {id}",
+    "notSaved": "Nepavyko išsaugoti šio vykdymo istorijoje (rezultatai rodomi normaliai).",
+    "capped": "Per daug elementų – rodomi pirmieji {cap} kiekviename skyriuje (skaičiai yra išsamūs).",
+    "statsMissing": "Indekso naudojimo statistika nebuvo prieinama, todėl naudojimo negalima įvertinti.",
+    "sum": {
+      "missingTables": "Lentelės, kurių trūksta DB",
+      "extraTables": "Lentelės, kurių nėra modelyje",
+      "colMismatches": "Stulpelių neatitikimai",
+      "missingIndexes": "Suprojektuoti indeksai, kurių trūksta DB",
+      "extraIndexes": "Indeksai, kurių nėra modelyje",
+      "ddlMissing": "Objektai, dingę po taikymo",
+      "unusedIndexes": "Nenaudojami suprojektuoti indeksai"
+    },
+    "sec": {
+      "ddlMissing": "DDL pritaikytas, bet trūksta DB",
+      "missingTables": "Lentelės modelyje, bet trūksta DB",
+      "extraTables": "Lentelės DB, bet ne modelyje",
+      "colMismatches": "Stulpelių tipo / NULL neatitikimai",
+      "missingIndexes": "Suprojektuoti indeksai, kurių trūksta DB",
+      "extraIndexes": "Indeksai tik DB (išskyrus PK)",
+      "idxUsage": "Suprojektuoto indekso efektyvumas"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi užfiksavo šiuos objektus kaip pritaikytus, bet jų nebėra – įtarkite rankinį pašalinimą arba atšaukimą.",
+      "extraTables": "Tai gali būti kiti projektai arba sistemos lentelės šiame ryšyje.",
+      "idxUsage": "Nulis nuskaitymų nuo paskutinio statistikos atstatymo reiškia nenaudojimą. Prieš ištrindami patikrinkite statistikos langą."
+    },
+    "kind": {
+      "MISSING": "trūksta DB",
+      "EXTRA": "nėra modelyje",
+      "TYPE": "tipas skiriasi",
+      "NULL": "NULL leidimas skiriasi"
+    },
+    "col": {
+      "idx": "Indeksas",
+      "scans": "Nuskaitymai",
+      "size": "Dydis",
+      "status": "Verdiktas"
+    },
+    "usage": {
+      "USED": "Naudojama",
+      "UNUSED": "Nenaudojamas suprojektuotas indeksas",
+      "NO_STATS": "Nėra statistikos"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi ryšio funkcija dar neparuošta. Bandykite dar kartą netrukus.",
+      "LINK_DOWN": "Nepavyksta pasiekti schema.pi. Bandykite dar kartą netrukus.",
+      "LINK_AUTH": "Ryšio žetonas baigėsi arba buvo atšauktas. Išduokite naują žetoną schema.pi ir užregistruokite jį iš naujo.",
+      "LINK_NOT_FOUND": "Nuoroda nerasta. Pasirinkite nuorodą dar kartą.",
+      "LINK_SCOPE": "Šis ryšys nepriklauso nuorodos taksonomijai.",
+      "CONN_UNSUPPORTED": "Nepalaikomas ryšys (kol kas tik PostgreSQL serverio ryšiai).",
+      "TIMEOUT": "Užklausos laikas baigėsi. Bandykite dar kartą netrukus.",
+      "RATE": "Per daug užklausų. Bandykite dar kartą po minutės."
+    }
+  },
+  "learn": {
+    "title": "DBA mokymasis",
+    "intro": "SQLP/DAP praktikos klausimai, derinimo atvejų knyga ir Oracle/Tibero/PostgreSQL palyginimo žodynas. Veikia be nuorodos; pasirinkite nuorodą, kad pamatytumėte ir savo schema.pi standartinio tipo atitikmenis.",
+    "loading": "Įkeliama…",
+    "tabs": {
+      "quiz": "Praktika",
+      "cases": "Derinimo atvejai",
+      "dict": "DBMS žodynas"
+    },
+    "topics": {
+      "INDEX": "Indekso nuskaitymai",
+      "JOIN": "Sujungimo metodai",
+      "PARTITION": "Particijos apipjaustymas",
+      "NORMAL": "Normalizavimas",
+      "NAMING": "Standartinis pavadinimas",
+      "ISOLATION": "Izoliacijos lygiai",
+      "LOCK": "Užraktai"
+    },
+    "levels": {
+      "1": "Pagrindinis",
+      "2": "Tarpinis",
+      "3": "Pažengęs"
+    },
+    "quiz": {
+      "score": "Mano pažanga",
+      "scoreLine": "Išspręsta {solved} iš {total} · {correct} teisingų",
+      "right": "Teisingai",
+      "wrong": "Neteisingai",
+      "retry": "Bandyti dar kartą",
+      "prevRight": "Ankstesnis teisingas",
+      "prevWrong": "Ankstesnis neteisingas"
+    },
+    "cases": {
+      "notice": "Visi atvejai yra savarankiškai parašyti mokymosi pavyzdžiai; skaičiai yra iliustraciniai (ne kliento duomenys).",
+      "problem": "Probleminis SQL",
+      "plan": "Plano santrauka",
+      "cause": "Priežastis",
+      "fix": "Pataisytas SQL",
+      "effect": "Efektas"
+    },
+    "cats": {
+      "ALL": "Visi",
+      "TYPE": "Duomenų tipai",
+      "FUNC": "Funkcijos",
+      "PAGING": "Puslapiavimas",
+      "SEQ": "Sekos",
+      "DATE": "Datos",
+      "SYNTAX": "Sintaksė"
+    },
+    "dict": {
+      "search": "Ieškoti (pvz., NVL, LIMIT)",
+      "item": "Elementas",
+      "note": "Pastaba",
+      "empty": "Nėra atitinkančių elementų",
+      "loading": "Įkeliama…",
+      "liveTitle": "Mano dalykinės srities standartinio tipo atitikmenys",
+      "liveIntro": "Pasirinkite nuorodą, kad įkeltumėte schema.pi DBMS profilį (loginis → fizinis tipas). Aukščiau esantis žodynas veikia be nuorodos.",
+      "liveLoad": "Įkelti tipo atitikmenis",
+      "lgcType": "Loginis tipas"
+    }
+  },
+  "link2": {
+    "title": "schema.pi ryšys",
+    "intro": "Užregistruokite ryšio žetoną, kad galėtumėte naudoti schema.pi dalykinės srities DB ryšius dbms.pi. Žetonai saugomi užšifruoti, ir jokie eilučių duomenys iš jūsų duomenų bazių nesaugomi.",
+    "howTitle": "Kaip išduoti ryšio žetoną",
+    "how1": "Prisijunkite prie schema.pi ir atidarykite dalykinę sritį, prie kurios norite prisijungti",
+    "how2": "Eikite į Dalykinė sritis → Nustatymai → Ryšio žetonas ir paspauskite „Išduoti žetoną“ (srities administratoriaus arba DA vaidmuo)",
+    "how3": "Nukopijuokite žetoną, prasidedantį slk_ – jis rodomas tik vieną kartą, kai išduodamas",
+    "how4": "Įklijuokite jį žemiau ir užregistruokite",
+    "openSchema": "Atidaryti schema.pi",
+    "registerTitle": "Registruoti ryšį",
+    "tokenLabel": "Ryšio žetonas",
+    "tokenPlaceholder": "slk_…",
+    "register": "Registruoti",
+    "registering": "Tikrinama…",
+    "myLinks": "Mano ryšiai",
+    "empty": "Nėra registruotų ryšių",
+    "loading": "Įkeliama…",
+    "regDtm": "Užregistruota {dtm}",
+    "remove": "Atjungti",
+    "prev": "Ankstesnis",
+    "next": "Kitas",
+    "statusTitle": "Ryšio būsena",
+    "noConns": "Šioje dalykinėje srityje nėra DB ryšių (pridėkite vieną schema.pi)",
+    "colConn": "Ryšys",
+    "colDbms": "DBMS",
+    "colMthd": "Metodas",
+    "colHost": "Serveris",
+    "colTest": "Paskutinis testas",
+    "colAgent": "Agentas paskutinį kartą matytas",
+    "never": "Nėra",
+    "retry": "Bandyti dar kartą",
+    "pickerLink": "Nuoroda",
+    "pickerConn": "Ryšys",
+    "pickerEmpty": "Nėra ryšių –",
+    "pickerGo": "užregistruokite vieną adresu /connect",
+    "errors": {
+      "LINK_AUTH": "Ryšio žetonas baigėsi arba buvo atšauktas. Išduokite naują žetoną schema.pi ir užregistruokite iš naujo",
+      "LINK_SCOPE": "Šis ryšys nepriklauso susietos dalykinės srities taksonomijai",
+      "LINK_DOWN": "Nepavyksta pasiekti schema.pi. Bandykite dar kartą netrukus",
+      "LINK_NOT_FOUND": "Ryšys nerastas",
+      "LINK_DUP": "Registracija jau vykdoma. Bandykite dar kartą",
+      "CONN_UNSUPPORTED": "Nepalaikomas ryšys (kol kas tik PostgreSQL serverio ryšiai)",
+      "Q_UNKNOWN": "Nežinoma užklausa",
+      "SQL_NOT_SELECT": "Gali būti vykdoma tik viena SELECT (arba WITH) instrukcija",
+      "PGSS_MISSING": "Tikslinėje DB nėra įdiegto pg_stat_statements plėtinio",
+      "TIMEOUT": "Užklausos laikas baigėsi",
+      "RATE": "Per daug užklausų. Bandykite dar kartą po minutės",
+      "INVALID_INPUT": "Įklijuokite visą ryšio žetoną, prasidedantį slk_"
+    }
+  },
+  "migration": {
+    "title": "Duomenų migracija (PiMig)",
+    "intro": "Apskaičiuoja lentelių įkėlimo tvarką iš schema.pi dizaino modelio ryšių, organizuoja dalių dydį, lygiagretumą ir perjungimo kontrolinį sąrašą, bei generuoja patvirtinimo SQL, kurį patys vykdote šaltinyje ir tiksle. Šis ekranas tik planuoja ir tikrina – jis neperkelia duomenų ir neskaito kliento DB eilučių.",
+    "needLink": "Pirmiausia pasirinkite schema.pi nuorodą aukščiau. Jei neturite, užregistruokite žetoną meniu „Prisijungti“.",
+    "loading": "Įkeliama…",
+    "newPlan": "Naujas migracijos planas",
+    "project": "Projektas",
+    "projectPick": "Pasirinkite projektą",
+    "planNm": "Plano pavadinimas",
+    "planNmHint": "Numatytasis – projekto pavadinimas",
+    "create": "Sukurti planą",
+    "creating": "Kuriama…",
+    "snapHint": "Šio momento dizainas (lentelės, stulpelių ir ryšių pavadinimai) yra užfiksuotas kaip momentinė nuotrauka. Kai modelis pasikeičia, sukurkite naują planą.",
+    "plans": "Migracijos planai",
+    "prev": "Ankstesnis",
+    "next": "Kitas",
+    "sts": {
+      "DRAFT": "Juodraštis",
+      "READY": "Paruošta"
+    },
+    "del": "Ištrinti",
+    "delConfirm": "Ištrinti šį planą?",
+    "snapInfo": "Momentinė kopija: {tables} lentelės · {rels} ryšiai",
+    "dropped": "({n} ryšiai be fizinių lentelių neįtraukti į tvarką)",
+    "chunkSize": "Bloko dydis (eilutės/įrašas)",
+    "parallel": "Lygiagretumas (lentelės vienu metu)",
+    "saveOpts": "Išsaugoti parinktis",
+    "optsHint": "Lygiagretumas yra vienu metu įkeliamų lentelių skaičius tame pačiame lygyje. Bloko dydis yra įrašymo vienetas (eilutės), kurį naudos vykdymo variklis.",
+    "order": "Įkėlimo tvarka",
+    "orderHint": "Topologiškai surūšiuota pagal projektavimo ryšius (ne fizinius FK), kad tėvinės lentelės būtų pirmos. To paties lygio lentelės nepriklauso viena nuo kitos ir gali būti įkeliamos lygiagrečiai.",
+    "cycles": "{n} ciklinė (-ės) grupė (-ės) – patalpinta (-os) tame pačiame lygyje. Nustatykite jų tvarką rankiniu būdu ir atidėkite nuorodų patikrinimus iki įkėlimo pabaigos.",
+    "selfRefs": "Savaime besireferuojančios (hierarchinės) lentelės – pirmiausia įkelkite tėvines eilutes lentelėje",
+    "level": "Lygis {n}",
+    "checklist": "Perėjimo kontrolinis sąrašas",
+    "toReady": "Pažymėti kaip paruoštą",
+    "toDraft": "Grįžti į juodraštį",
+    "readyNeedAll": "Prieš pažymėdami planą kaip paruoštą, patikrinkite kiekvieną elementą.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC perdavimo taškas",
+        "desc": "Įrašykite nuoseklų šaltinio tašką prieš pradinį įkėlimą (PG LSN · Oracle/Tibero SCN · apklausai, pradžios laikas minus persidengimo langas), pradėkite CDC nuo jo ir absorbuokite dublikatus perdavimo lange su upsert operacijomis."
+      },
+      "valueConv": {
+        "title": "Reikšmių konvertavimas",
+        "desc": "Nustatytos taisyklės tuščiai eilutei = NULL, CHAR tarpų užpildymui, NUMBER be tikslumo → NUMERIC, DATE su laiku → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR ilgiui ir LONG·RAW."
+      },
+      "charset": {
+        "title": "Simbolių rinkinys",
+        "desc": "Patvirtintas šaltinio simbolių rinkinys (KO16MSWIN949, UTF8, …), nustatytos stulpelių, kurie perpildomi dėl daugiabaičių augimo, ir nekonvertuojamų simbolių izoliavimo taisyklės."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB transliuojami blokais (dydžio ir atminties apribojimai) ir tikrinami pagal ilgį + maišą."
+      },
+      "seqResync": {
+        "title": "Sekos sinchronizavimas",
+        "desc": "Po įkėlimo, tikslinės sekos·identifikatoriai nustatomi į max(raktas)+1."
+      },
+      "timezone": {
+        "title": "Laiko juosta · sistemos stulpeliai",
+        "desc": "Nustatyta interpretavimo laiko juosta reikšmėms be jos (pvz., Asia/Seoul), modifikavimo laiko trigeriai neperrašys šaltinio laiko žymų įkėlimo metu, ir nustatytos kūrėjo/modifikatoriaus pakeitimo taisyklės."
+      },
+      "backpressure": {
+        "title": "Atgalinis slėgis · tikslinis įkėlimas",
+        "desc": "Sumažinkite bloko dydį ir lygiagretumą esant tiksliniam vėlavimui, WAL augimui ar užrakto laukimui; sukurkite ne PK indeksus po įkėlimo ir po to paleiskite ANALYZE·VACUUM."
+      }
+    },
+    "verify": "Patvirtinimo SQL",
+    "verifyHint": "Generuoja skaičiavimo, skaitmeninių stulpelių sumos, pasikartojančių raktų ir raktų maišos užklausas kiekvienai lentelei įkėlimo tvarka. Paleiskite jas patys šaltinyje ir tikslinėje sistemoje ir palyginkite (šiame ekrane jos nevykdomos).",
+    "noHashOracle": "Oracle·Tibero maišos funkcijos ir teksto atvaizdavimas skiriasi nuo PostgreSQL, todėl maišos užklausos praleidžiamos – palyginkite skaičius, sumas ir pasikartojančius raktus.",
+    "copy": "Kopijuoti",
+    "copied": "Nukopijuota",
+    "copyFail": "Nepavyko nukopijuoti. Pasirinkite tekstą ir nukopijuokite jį rankiniu būdu.",
+    "engine": {
+      "title": "Vykdymas·paleidimas iš naujo · repeticija·grąžinimas",
+      "body": "Faktinis migracijos vykdymas (kontroliniai taškai, atgalinis slėgis, klaidų eilučių izoliavimas) ir repeticija, grąžinimas bei CDC pradžios taško įrašymas bus prieinami po to, kai bus baigtas darbuotojo agento saugumo modelis (A10). Kol kas tai apima planavimą, patikrinimus ir patvirtinimo SQL."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi nuoroda ruošiama. Bandykite dar kartą netrukus.",
+      "LINK_DOWN": "Nepavyksta pasiekti schema.pi. Bandykite dar kartą netrukus.",
+      "LINK_AUTH": "Nuorodos prieigos raktas pasibaigęs arba atšauktas. Išduokite naują prieigos raktą schema.pi ir užregistruokite jį iš naujo.",
+      "LINK_NOT_FOUND": "Nuoroda nerasta. Pasirinkite nuorodą dar kartą.",
+      "LINK_SCOPE": "Šis projektas nepriklauso nuorodos taksonomijai.",
+      "TIMEOUT": "Užklausos laikas baigėsi. Bandykite dar kartą netrukus.",
+      "RATE": "Per daug užklausų. Bandykite dar kartą po minutės.",
+      "MIG_NO_TABLES": "Šis projektas neturi fizinių lentelių migracijai. Pirmiausia konvertuokite į fizines schema.pi.",
+      "MIG_CHECK_INCOMPLETE": "Patikrinkite kiekvieną perėjimo kontrolinio sąrašo elementą prieš pažymėdami planą kaip paruoštą.",
+      "NOT_FOUND": "Planas nerastas."
+    }
+  },
+  "monitor": {
+    "title": "Stebėjimo centras",
+    "collectNote": "Duomenų rinkimas vykdomas schema.pi – migracija suplanuota (D7). Šis puslapis nuskaito schema.pi stebėjimo suvestinę.",
+    "noLink": "Pirmiausia pasirinkite arba užregistruokite schema.pi nuorodą.",
+    "goConnect": "Registruoti nuorodą",
+    "period": "Laikotarpis",
+    "periods": {
+      "30": "30 min",
+      "60": "1 valanda",
+      "360": "6 valandos",
+      "1440": "24 valandos"
+    },
+    "refresh": "Atnaujinti",
+    "loading": "Įkeliama…",
+    "updatedAt": "{area} · nuo {time} (automatinis atnaujinimas kas 30s)",
+    "appTitle": "Programos našumas",
+    "dbTitle": "DB būsena pagal prisijungimą",
+    "urlTitle": "URL patikrinimai",
+    "empty": "Nėra duomenų rodymui.",
+    "breachTitle": "{n} viršytos ribos",
+    "rulesTitle": "Ribinių verčių taisyklės",
+    "rulesNote": "Taisyklės išsaugotos šiai nuorodai ir vertinamos pagal gautą suvestinę; viršijimai pažymimi raudonu rėmeliu (pranešimai bus vėliau).",
+    "metric": "Metrika",
+    "conn": "Prisijungimas",
+    "allConns": "Visi prisijungimai",
+    "op": "Palyginti",
+    "threshold": "Riba",
+    "thrInvalid": "Įveskite skaičių ribai.",
+    "addRule": "Pridėti taisyklę",
+    "noRules": "Kol kas nėra taisyklių.",
+    "enable": "Įjungti",
+    "disable": "Išjungti",
+    "delete": "Ištrinti",
+    "delConfirm": "Ištrinti šią taisyklę?",
+    "aiNote": "AI incidentų analizė ir pataisymų patvirtinimas vis dar vyksta schema.pi monitoriuje.",
+    "aiLink": "Atidaryti schema.pi monitorių",
+    "metrics": {
+      "APP_TPS": "TPS (užklausos/s)",
+      "APP_ERR_PCT": "Klaidų dažnis (%)",
+      "APP_SLOW_CNT": "Lėtos užklausos",
+      "APP_AVG_MS": "Vid. atsakas (ms)",
+      "DB_SESS_CNT": "Sesijos",
+      "DB_LOCK_WAIT_CNT": "Užrakto laukimai",
+      "DB_CACHE_HIT_PCT": "Talpyklos pataikymas (%)",
+      "DB_SIZE_MB": "DB dydis (MB)",
+      "URL_RSP_MS": "URL atsakas (ms)",
+      "URL_FAIL_CNT": "URL gedimai"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Pirmiausia pasirinkite nuorodą.",
+      "NOT_IMPLEMENTED": "schema.pi nuorodos funkcija ruošiama. Bandykite dar kartą vėliau.",
+      "LINK_AUTH": "Nuorodos prieigos raktas neteisingas arba pasibaigęs. Išduokite naują prieigos raktą schema.pi ir užregistruokite jį.",
+      "LINK_SCOPE": "Ši nuoroda negali pasiekti tos taksonomijos.",
+      "RATE": "Per daug užklausų. Bandykite dar kartą netrukus.",
+      "TIMEOUT": "schema.pi reaguoja lėtai. Bandykite dar kartą netrukus.",
+      "RULE_LIMIT": "Iki 50 taisyklių vienai nuorodai.",
+      "NOT_FOUND": "Taisyklė nerasta."
+    }
+  },
+  "ops": {
+    "title": "DB operacijų saugumas",
+    "loading": "Įkeliama…",
+    "pickFirst": "Pirmiausia pasirinkite nuorodą ir ryšį aukščiau",
+    "run": "Vykdyti diagnostiką",
+    "running": "Diagnozuojama…",
+    "noRun": "Dar nėra diagnostikos. Paspauskite „Vykdyti diagnostiką“",
+    "lastRun": "Paskutinė diagnostika {dtm}",
+    "readOnly": "Diagnostika tik skaito (SELECT). Patarimai yra gairės ir priklauso nuo serverio atminties, apkrovos ir darbo krūvio",
+    "truncated": "Per daug objektų – patikrinti tik pirmieji 500",
+    "paramsNote": "Bendra serverio atmintis nežinoma, todėl ji apskaičiuojama iš shared_buffers ≈ 25% RAM. random_page_cost daroma prielaida, kad naudojamas SSD",
+    "auditNote": "Lentelės su išjungtu RLS ir nenaudojamos paskyros bus patikrintos, kai nuorodos užklausa jas palaikys",
+    "replNote": "Bazinė linija yra Active-Standby (A-S) – vienas pirminis + atsarginis. Atkūrimo vėlavimas ≥ 5s = įspėjimas, ≥ 60s = rizika (išmatuota RPO nuoroda)",
+    "lagIdle": "Jokių pakeitimų",
+    "pager": "Puslapiavimas",
+    "prev": "Ankstesnis",
+    "next": "Kitas",
+    "tabs": {
+      "params": "Parametrai",
+      "audit": "Paskyros ir privilegijos",
+      "backup": "Atsarginė kopija ir atkūrimas",
+      "repl": "Replikacija ir DR",
+      "history": "Istorija"
+    },
+    "level": {
+      "OK": "GERAI",
+      "WARN": "Įspėjimas",
+      "RISK": "Rizika"
+    },
+    "role": {
+      "primary": "Šis ryšys = pirminis",
+      "standby": "Šis ryšys = atsarginis",
+      "unknown": "Vaidmuo nežinomas"
+    },
+    "col": {
+      "level": "Verdiktas",
+      "item": "Elementas",
+      "value": "Reikšmė",
+      "reason": "Išsami informacija",
+      "standby": "Atsarginis",
+      "state": "Būsena",
+      "sync": "Sinchronizavimas",
+      "lag": "Atkūrimo vėlavimas"
+    },
+    "item": {
+      "super_many": "supervartotojas",
+      "super_ok": "supervartotojas",
+      "bypass_rls": "BYPASSRLS vaidmenys",
+      "bypass_ok": "BYPASSRLS vaidmenys",
+      "no_expiry": "Slaptažodžio galiojimas",
+      "expiry_ok": "Slaptažodžio galiojimas",
+      "public_grant": "PUBLIC suteikimai",
+      "public_ok": "PUBLIC suteikimai",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Paskutinis archyvuotas WAL",
+      "arc_stale": "Paskutinis archyvuotas WAL",
+      "arc_recent": "Paskutinis archyvuotas WAL",
+      "arc_failing": "WAL archyvavimo klaida"
+    },
+    "rules": {
+      "sb_default": "Numatytasis (128 MB). Dedikuotame serveryje rekomenduojama apie 25% RAM",
+      "sb_ok": "Nustatyta virš numatytosios reikšmės",
+      "wm_over": "max_connections × work_mem viršija numatomą atmintį. Lygiagretūs rūšiavimai kelia atminties trūkumo riziką",
+      "wm_default": "Numatytasis (4 MB). Dideli rūšiavimai ir maišos gali persipildyti į diską",
+      "wm_ok": "Protingame diapazone",
+      "mwm_default": "Numatytasis (64 MB). VACUUM ir indeksų kūrimas gali būti lėtas; apsvarstykite 256 MB ar daugiau",
+      "mwm_ok": "Nustatyta virš numatytosios reikšmės",
+      "av_on": "autovacuum įjungtas",
+      "av_off": "autovacuum išjungtas. Didelė lentelės išsipūtimo ir transakcijos ID apsisukimo rizika",
+      "conn_high": "max_connections yra didelis. Kiekvienas ryšys naudoja atmintį; rekomenduojamas ryšių telkinys (PgBouncer ir kt.)",
+      "conn_ok": "Protingame diapazone",
+      "lmd_off": "Lėtų užklausų registravimas išjungtas (-1). Rekomenduojama apie 1000 ms",
+      "lmd_all": "Kiekvienas sakinys registruojamas (0). Didelė registravimo našta",
+      "lmd_ok": "Lėtų užklausų registravimas įjungtas",
+      "st_off": "Nėra serverio masto sakinio laiko limito (0). Nustatykite limitus pagal vaidmenį ar programą",
+      "st_ok": "Sakinio laiko limitas nustatytas",
+      "iit_off": "Nėra neaktyvaus transakcijos laiko limito (0). Gali sukelti užrakto laikymą ir išsipūtimą",
+      "iit_ok": "Nustatytas neaktyvaus transakcijos laiko limitas",
+      "ckpt_short": "Kontrolinio taško intervalas yra 5 minutės ar mažiau. Apsvarstykite 10–15 minučių esant dideliam rašymo krūviui",
+      "ckpt_ok": "Protingame diapazone",
+      "wal_minimal": "wal_level=minimal neleidžia PITR ir replikacijos. Naudokite replica arba aukštesnį lygį",
+      "wal_ok": "WAL lygis palaiko PITR ir replikaciją",
+      "rpc_hdd": "HDD numatytasis (4). SSD atveju rekomenduojama 1.1–2",
+      "rpc_ok": "Tinka SSD",
+      "super_many": "Du ar daugiau supervartotojų. Palikite vieną administravimui ir suteikite tik reikalingas privilegijas kitiems",
+      "super_ok": "Daugiausia vienas supervartotojas",
+      "bypass_rls": "Egzistuoja ne supervartotojų vaidmenys, kurie apeina eilučių lygio saugumą",
+      "bypass_ok": "Nėra RLS apeinančių vaidmenų",
+      "no_expiry": "Prisijungimo vaidmenys be slaptažodžio galiojimo. Nustatykite VALID UNTIL asmeninėms paskyroms",
+      "expiry_ok": "Visi prisijungimo vaidmenys turi galiojimo datą",
+      "public_grant": "PUBLIC (visi vaidmenys) turi lentelių privilegijas. Rašymo privilegijos yra rizikingos",
+      "public_ok": "PUBLIC nesuteiktos jokios lentelių privilegijos",
+      "arc_on": "WAL archyvavimas (archive_mode) įjungtas",
+      "arc_off": "WAL archyvavimas išjungtas, todėl atkūrimas iki tam tikro laiko (PITR) neįmanomas",
+      "arc_cmd_empty": "archive_mode įjungtas, bet archive_command ir archive_library yra tušti",
+      "arc_never": "Dar nebuvo archyvuotas joks WAL",
+      "arc_stale": "Paskutinis WAL archyvas yra senesnis nei 24 valandos",
+      "arc_recent": "WAL archyvuotas per paskutines 24 valandas",
+      "arc_failing": "WAL archyvavimas šiuo metu nepavyksta. Patikrinkite diską, leidimus ir tikslinį kelią",
+      "repl_is_standby": "Šis ryšys yra atsarginis (atkūrimo režimas). Patikrinkite vėlavimą iš pirminio ryšio",
+      "repl_none": "Neprijungtas joks atsarginis. Nėra nelaimės atkūrimo (DR) nustatymo",
+      "repl_ok": "Atsarginiai srautai veikia normaliai",
+      "repl_lag": "Atsarginis vėluoja arba nestreamina"
+    },
+    "manual": {
+      "title": "Rankinis kontrolinis sąrašas",
+      "intro": "Atsarginių kopijų kūrimo ir atkūrimo praktikos, kurių negalima patikrinti automatiškai. Pažymėkite, kai patvirtinta, ir užsirašykite įrodymus",
+      "memo": "Pastaba (pvz., įrankis, tvarkaraštis, paskutinis patikrinimas)",
+      "save": "Išsaugoti",
+      "updated": "Atnaujinta {dtm}",
+      "items": {
+        "base_backup": "Pilna atsarginė kopija (pg_basebackup ir kt.) sėkmingai atlikta per paskutines 7 dienas",
+        "offsite_copy": "Atsarginė kopija laikoma ne vietoje (kitame regione ar saugykloje)",
+        "restore_rehearsal": "Šį ketvirtį buvo atlikta atkūrimo repeticija ir užfiksuota jos trukmė",
+        "pitr_target": "PITR procedūra ir tikslinis RPO/RTO yra dokumentuoti",
+        "backup_encrypt": "Atsarginių kopijų failai yra užšifruoti ir prieiga prie jų yra apribota",
+        "retention": "Nustatytas atsarginių kopijų saugojimo laikotarpis ir ištrynimo politika"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi nuorodos funkcija ruošiama. Bandykite dar kartą netrukus",
+      "CONN_UNSUPPORTED": "Šis ryšys dar nepalaikomas (tik tiesioginis PostgreSQL)",
+      "TIMEOUT": "Tikslinė DB reagavo per lėtai. Bandykite dar kartą netrukus",
+      "RATE": "Per daug iškvietimų. Bandykite dar kartą po minutės",
+      "Q_UNKNOWN": "Nepalaikoma užklausa. Patikrinkite schema.pi nuorodos API versiją",
+      "INVALID_INPUT": "Neteisingas nuorodos arba ryšio pasirinkimas"
+    }
+  },
+  "perf": {
+    "title": "Našumas",
+    "loading": "Įkeliama…",
+    "pickFirst": "Pirmiausia pasirinkite nuorodą ir ryšį aukščiau",
+    "pager": "Puslapiavimas",
+    "tabs": {
+      "collect": "Rinkti",
+      "top": "Lėtos užklausos",
+      "health": "Lentelių ir indeksų būklė",
+      "trend": "Dydžio tendencija",
+      "activity": "Veikla ir užraktai"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "schema.pi nuorodos funkcija ruošiama. Bandykite dar kartą vėliau",
+      "CONN_UNSUPPORTED": "Šis ryšys dar nepalaikomas (tik tiesioginiai PostgreSQL ryšiai)",
+      "RATE": "Per daug užklausų. Bandykite dar kartą po minutės",
+      "LINK_AUTH": "Nuorodos prieigos raktas pasibaigęs arba atšauktas. Iš naujo užregistruokite prieigos raktą prisijungimo puslapyje",
+      "LINK_SCOPE": "Šis ryšys nepriklauso nuorodos teminei sričiai",
+      "Q_UNKNOWN": "Nepalaikoma užklausa. Patikrinkite schema.pi nuorodos API versiją",
+      "INVALID_INPUT": "Nuorodos arba ryšio reikšmė neteisinga"
+    },
+    "pgss": {
+      "title": "Kaip įjungti pg_stat_statements",
+      "note": "Savarankiškai hostuojamam PostgreSQL taip pat reikia pg_stat_statements shared_preload_libraries (postgresql.conf) ir perkrovimo. Lentelių, indeksų ir dydžio statistika veikia be jo"
+    },
+    "collect": {
+      "intro": "Dabar surinkimas vieną kartą nuskaito populiariausių užklausų statistiką, lenteles, indeksus ir dydžius ir išsaugo juos kaip momentinę kopiją. Surinkite bent du kartus, kad pamatytumėte pokyčius ir dydžio tendencijas",
+      "run": "Surinkti dabar",
+      "running": "Renkama…",
+      "done": "Surinkta {dtm} – {qry} užklausų · {tbl} lentelių · {idx} indeksų"
+    },
+    "top": {
+      "sort": "Rūšiuoti",
+      "sortTotal": "Bendras laikas",
+      "sortMean": "Vidutinis laikas",
+      "sortCalls": "Iškvietimai",
+      "empty": "Dar nėra momentinių kopijų. Paspauskite „Surinkti dabar“ skirtuke „Surinkti“",
+      "range": "Pokytis tarp {from} → {to}",
+      "first": "Pirma momentinė kopija {dtm} – kaupiamosios reikšmės (pokyčiai nuo kitos momentinės kopijos)",
+      "query": "Užklausa (literalai užmaskuoti)",
+      "calls": "Iškvietimai",
+      "totalMs": "Bendra ms",
+      "meanMs": "Vid. ms",
+      "rows": "Eilutės",
+      "reset": "Aptiktas statistikos nustatymas iš naujo – rodoma kaip kaupiamoji"
+    },
+    "health": {
+      "empty": "Dar nėra momentinių nuotraukų. Skirtuke „Rinkti“ paspauskite „Rinkti dabar“",
+      "basis": "Remiantis momentine nuotrauka {dtm}",
+      "unusedIdx": "Nenaudojami indeksai",
+      "unusedIdxHint": "Indeksai, kurie niekada nebuvo naudojami nuo paskutinio statistikos nustatymo iš naujo (pagal dydį). Nemeskite PK ar unikalių apribojimų indeksų",
+      "fullScan": "Per didelis pilnas nuskaitymas",
+      "fullScanHint": "Lentelės su 1 000+ aktyvių eilučių, kuriose pilnas nuskaitymas sudaro bent pusę – peržiūrėkite indeksus filtravimo stulpeliuose",
+      "dead": "Per daug negyvų kortelių",
+      "deadHint": "Negyvų kortelių santykis 20% ar daugiau – patikrinkite VACUUM ir autovacuum nustatymus",
+      "none": "Nėra",
+      "scans": "nuskaitymai"
+    },
+    "trend": {
+      "limit": "Dydžio slenkstis",
+      "empty": "Nėra momentinių nuotraukų per paskutines 30 dienų",
+      "now": "Dabartinis dydis",
+      "perDay": "Augimas per dieną",
+      "needMore": "Reikia 2+ momentinių nuotraukų",
+      "daysLeft": "Pasieks {gb} GB",
+      "noGrowth": "Nėra augimo tendencijos",
+      "days": "maždaug po {n} dienų"
+    },
+    "activity": {
+      "refresh": "Atnaujinti",
+      "live": "Tiesioginė užklausa – nesaugoma",
+      "sessions": "Seanso veikla",
+      "locks": "Užraktai",
+      "none": "Nėra"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Duomenų srautai",
+    "intro": "Patikrinkite, ar šaltinio DB yra paruošta duomenų pokyčių fiksavimui (CDC), ir sukurkite šaltinio → transformavimo → tikslinius duomenų srautus. Šiame etape tik tikrinama ir projektuojama; klientų eilučių duomenys neskaitomi ir nesaugomi.",
+    "needLink": "Pirmiausia pasirinkite schema.pi nuorodą aukščiau. Jei neturite, užregistruokite prieigos raktą meniu „Nuoroda“.",
+    "needConn": "Pasirinkite DB ryšį, kurį norite patikrinti aukščiau.",
+    "loading": "Įkeliama…",
+    "pager": "Puslapiai",
+    "prev": "Ankstesnis",
+    "next": "Kitas",
+    "runTitle": "Vykdyti ir stebėti (7-3 · 7-4)",
+    "runBody": "Duomenų srauto vykdymas, vėlavimo stebėjimas ir pakartotinis apdorojimas bus prieinami, kai bus baigtas darbuotojo agento ir saugumo modelio kūrimas. Kol kas išsaugokite apibrėžimus kaip juodraščius (DRAFT).",
+    "pre": {
+      "title": "Šaltinio išankstinis patikrinimas",
+      "intro": "Kiekvienai lentelei patikrinami pakeitimo laiko stulpeliai, minkštojo ištrynimo stulpeliai ir pirminis raktas, kad būtų rekomenduojamas fiksavimo metodas (adapteris), ir patikrinamas WAL loginio replikavimo parengtumas. Vykdomos tik skaitymo režimo katalogo ir nustatymų užklausos.",
+      "schema": "Schema (pasirinktinai)",
+      "schemaPh": "Visi",
+      "run": "Vykdyti išankstinį patikrinimą",
+      "running": "Tikrinama…",
+      "sum": "{tables} lentelės · {noPk} be PK · {deleteUnseen} negali fiksuoti ištrynimų",
+      "truncated": "Katalogo užklausa pasiekė 500 eilučių limitą, todėl kai kurios lentelės gali trūkti. Nurodykite schemą ir patikrinkite dar kartą.",
+      "empty": "Nėra lentelių patikrinti",
+      "colTable": "Lentelė",
+      "colChg": "Pakeitimo laiko stulpelis",
+      "colDel": "Minkštojo ištrynimo stulpelis",
+      "colAdapter": "Rekomenduojamas metodas · priežastys",
+      "toDraft": "Sukurti duomenų srauto juodraštį iš {n} pasirinktų"
+    },
+    "ready": {
+      "ok": "WAL loginis replikavimas paruoštas – lentelės su PK gali naudoti LOGICAL",
+      "no": "WAL loginis replikavimas neparuoštas – fiksavimas apklausos ar raktų palyginimo būdu",
+      "senders": "{n} replikavimo ryšiai"
+    },
+    "adapter": {
+      "LOGICAL": "Loginis replikavimas (WAL)",
+      "POLL": "Pakeitimo laiko apklausa",
+      "KEY_DIFF": "Raktų momentinės nuotraukos skirtumas",
+      "NONE": "Tik pilnas perkrovimas"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Turi pakeitimo laiko stulpelį",
+      "NO_CHG_COL": "Neturi pakeitimo laiko stulpelio",
+      "HAS_SOFT_DEL": "Turi minkštojo ištrynimo stulpelį",
+      "NO_SOFT_DEL": "Neturi minkštojo ištrynimo stulpelio",
+      "HAS_PK": "Turi pirminį raktą",
+      "NO_PK": "Neturi pirminio rakto – pakeistos eilutės negali būti identifikuotos",
+      "DELETE_UNSEEN": "Apklausa negali fiksuoti fizinių DELETE (rekomenduojamas minkštojo ištrynimo stulpelis)",
+      "LOGICAL_NOT_READY": "Gali persijungti į LOGICAL, kai WAL loginis replikavimas bus paruoštas",
+      "FULL_RELOAD_ONLY": "Nėra PK ar pakeitimo laiko stulpelio, todėl negalimas inkrementinis fiksavimas – pridėkite PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level nėra logical (pakeitimui reikia DB perkrovimo)",
+      "NO_SLOTS": "max_replication_slots yra 0",
+      "NO_SENDERS": "max_wal_senders yra 0",
+      "IS_STANDBY": "Budėjimo serveris – paimkite loginį replikavimą iš pirminio",
+      "SETTINGS_UNKNOWN": "Nepavyko nuskaityti nustatymų, parengtumas nežinomas"
+    },
+    "ed": {
+      "title": "Duomenų srauto apibrėžimai",
+      "draftOnly": "Tik projektavimas – išsaugoma kaip juodraščiai (DRAFT)",
+      "new": "Naujas duomenų srautas",
+      "empty": "Nėra išsaugotų duomenų srautų",
+      "manual": "Rankinis",
+      "edit": "Redaguoti",
+      "remove": "Ištrinti",
+      "name": "Pavadinimas",
+      "adapter": "Fiksavimo metodas",
+      "srcConn": "Šaltinio ryšys",
+      "useCurrentConn": "Naudoti aukščiau pasirinktą ryšį",
+      "sched": "Tvarkaraštis (5 laukų cron, tuščia = rankinis)",
+      "target": "Tikslas",
+      "targetPh": "pvz., analizės DB analytics.public / ežeras s3://…",
+      "tables": "Šaltinio lentelės (atskirtos nauja eilute arba kableliu)",
+      "steps": "Žingsniai (šaltinis → transformavimas → tikslas)",
+      "op": "Operacija",
+      "notePh": "Aprašymas · sąlyga (pasirinktinai)",
+      "addTransform": "Pridėti transformavimo žingsnį",
+      "save": "Išsaugoti",
+      "saving": "Saugoma…",
+      "saved": "Išsaugota",
+      "close": "Uždaryti"
+    },
+    "kind": {
+      "SOURCE": "Šaltinis",
+      "TRANSFORM": "Transformavimas",
+      "TARGET": "Tikslas"
+    },
+    "sts": {
+      "DRAFT": "Juodraštis"
+    },
+    "check": {
+      "NAME_REQUIRED": "Įveskite pavadinimą",
+      "CONN_REQUIRED": "Pasirinkite šaltinio ryšį",
+      "CRON_INVALID": "Įveskite tvarkaraštį kaip 5 laukų cron (min val diena mėnuo savaitės diena; skaitmenys, *, ',', -, /)",
+      "OP_REQUIRED": "Įveskite operaciją kiekvienam žingsniui",
+      "STEPS_TOO_FEW": "Reikalingi šaltinio ir tiksliniai žingsniai",
+      "STEPS_TOO_MANY": "Iki 20 žingsnių",
+      "STEP_FIRST_SOURCE": "Pirmasis žingsnis turi būti šaltinis",
+      "STEP_LAST_TARGET": "Paskutinis žingsnis turi būti tikslas",
+      "STEP_MIDDLE_TRANSFORM": "Tarp jų gali būti tik transformavimo žingsniai"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Duomenų srautas su tokiu pavadinimu jau egzistuoja. Naudokite kitą pavadinimą",
+      "CONN_UNSUPPORTED": "Šio ryšio dar negalima patikrinti (kol kas tik PostgreSQL tiesioginiai serverio ryšiai)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL derinimo laboratorija",
+    "intro": "Pasirinkite ryšį ir įveskite SQL, kad pamatytumėte vykdymo planą kaip medį, su lėtėjimo priežastimis (pilnas nuskaitymas, įdėtosios kilpos, dideli rūšiavimai) ir SQL anti-modeliais, patikrintais pagal schema.pi standartinius domenus. Užklausos niekada nėra iš tikrųjų vykdomos (be ANALYZE).",
+    "needLink": "Norėdami peržiūrėti planus, pirmiausia pasirinkite nuorodą ir ryšį aukščiau. Anti-modelio patikrinimas veikia be nuorodos.",
+    "sqlLabel": "SQL (viena SELECT arba WITH instrukcija)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Rodyti planą",
+    "explaining": "Įkeliama…",
+    "save": "Išsaugoti planą",
+    "saving": "Saugoma…",
+    "saveName": "Etiketė (pvz., prieš pridedant indeksą)",
+    "saveNote": "Konstantos reikšmės SQL ir plano sąlygose išsaugant užmaskuojamos kaip ?.",
+    "plan": {
+      "title": "Vykdymo planas",
+      "summary": "Bendra kaina {cost} · {ms}ms",
+      "cost": "kaina",
+      "rows": "eilutės",
+      "width": "plotis"
+    },
+    "warn": {
+      "none": "Nėra jokių pastebimų įspėjimų.",
+      "SEQ_SCAN_LARGE": "Pilnas nuskaitymas {relation} (apie {rows} eilučių) – apsvarstykite indeksą filtravimo stulpeliuose.",
+      "NESTED_LOOP_HIGH": "Įdėtoji kilpa sukuria apie {rows} eilučių – apsvarstykite maišos arba sujungimo prisijungimą, arba indeksą prisijungimo sąlygoje.",
+      "SORT_SPILL": "Rūšiavimo dydis yra apie {kb}KB, viršijantis numatytąjį work_mem (4MB); jis gali išsilieti į diską."
+    },
+    "lint": {
+      "run": "Patikrinti anti-modelius",
+      "title": "SQL anti-modelio patikrinimas",
+      "none": "Anti-modelių nerasta.",
+      "domainsOff": "Standartiniai domenai negalėjo būti įkelti; patikrinta tik pagal numatytąsias stulpelių priesagų taisykles.",
+      "types": {
+        "num": "skaitmeninis",
+        "date": "data",
+        "char": "simbolis"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * – pasirinkite tik reikalingus stulpelius (papildomas I/O, nėra dengiančio indekso).",
+        "FUNC_ON_COLUMN": "Filtravimo stulpelis {column} yra apgaubtas funkcija ar išraiška, todėl jo indekso negalima naudoti – vietoj to transformuokite konstantą.",
+        "LEADING_WILDCARD": "LIKE su pradiniu % negali naudoti B-medžio indekso – apsvarstykite pg_trgm GIN indeksą.",
+        "OR_DIFF_COLUMNS": "Sąlygos skirtinguose stulpeliuose yra sujungtos su OR – apsvarstykite UNION ALL arba indeksus kiekvienam stulpeliui.",
+        "IMPLICIT_CAST": "{column} lyginamas su skaičiumi kabutėse – suderinkite stulpelio ir konstantos tipus (numanomas tipų keitimas).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) nieko negrąžina, kai yra NULL reikšmių, ir yra lėtas – naudokite NOT EXISTS.",
+        "NO_WHERE": "Nėra WHERE sąlygos – didelėje lentelėje tai yra pilnas nuskaitymas (pridėkite sąlygą arba LIMIT).",
+        "DOMAIN_MISMATCH": "{column} yra {expected} tipo pagal standartinį domeną, bet lyginamas su kitokio tipo konstanta – numanomas tipų keitimas gali užkirsti kelią indekso naudojimui."
+      }
+    },
+    "saved": {
+      "title": "Išsaugoti planai · Palyginti",
+      "empty": "Nėra išsaugotų planų. Peržiūrėkite planą, tada jį išsaugokite.",
+      "pick": "Pasirinkite planą palyginimui",
+      "pick2": "Pasirinkite du planus palyginimui.",
+      "compare": "Palyginti du planus",
+      "delete": "Ištrinti",
+      "cost": "kaina",
+      "prev": "Ankstesnis",
+      "next": "Kitas",
+      "page": "{page} puslapis"
+    },
+    "diff": {
+      "cost": "Bendra kaina {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Du planai skirti skirtingam SQL (po normalizavimo).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Nėra pakeitimų plano mazguose.",
+      "before": "Prieš",
+      "after": "Po"
+    },
+    "ai": {
+      "title": "AI derinimo patarimai",
+      "badge": "Netrukus",
+      "body": "Netrukus (po patvirtinimo ir poveikio vertinimo procedūrų) – patarimai bus generuojami iš SQL su užmaskuotomis konstantomis ir įrašomi kaip pritaikyti tik po DA patvirtinimo ir išmatuoto poveikio."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "schema.pi nuorodos funkcija ruošiama. Bandykite dar kartą netrukus.",
+      "LINK_AUTH": "Nuorodos prieigos raktas pasibaigė arba buvo atšauktas. Išduokite naują prieigos raktą schema.pi ir užregistruokite jį dar kartą.",
+      "LINK_SCOPE": "Ši nuoroda negali naudoti to ryšio (skirtinga klasifikavimo schema).",
+      "CONN_UNSUPPORTED": "Šis ryšio tipas dar nepalaikomas (kol kas tik PostgreSQL serverio ryšiai).",
+      "Q_UNKNOWN": "Nepalaikoma užklausa.",
+      "SQL_NOT_SELECT": "Planai galimi tik vienai instrukcijai, prasidedančiai SELECT arba WITH.",
+      "TIMEOUT": "Užklausos laikas baigėsi (5 sekundės). Sutrumpinkite SQL arba bandykite dar kartą vėliau.",
+      "RATE": "Per daug užklausų. Bandykite dar kartą po minutės.",
+      "PAYLOAD_TOO_LARGE": "Planas per didelis, kad būtų galima išsaugoti.",
+      "LINK_NOT_FOUND": "Nuoroda nerasta. Pasirinkite nuorodą dar kartą."
+    }
+  },
+  "nav": {
+    "label": "Funkcijos",
+    "connect": "Prisijungti",
+    "sqlLab": "SQL derinimas",
+    "perf": "Našumas",
+    "monitor": "Stebėjimas",
+    "drift": "Poslinkis",
+    "migration": "Migracija",
+    "pipeline": "Duomenų srautas",
+    "analytics": "Analitika",
+    "ops": "Operacijų sauga",
+    "learn": "Mokytis"
   }
 }

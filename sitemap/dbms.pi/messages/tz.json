@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Programu ya kufanyia kazi ya DBA·SQLP ya kuendesha injini za DB haraka na kwa usalama"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Fanya injini yako ya DB iendeshe data yako haraka na kwa usalama",
+    "description": "Programu ya kufanyia kazi ya DBA·SQLP ya mipango ya utekelezaji, takwimu, na utendaji. schema.pi inashughulikia usanifu na viwango; dbms.pi ni mshirika wake upande wa injini.",
+    "welcome": "Karibu, {name}.",
+    "featTitle": "Vipengele",
+    "featDesc": {
+      "connect": "Sajili tokeni ya kiungo cha schema.pi na uangalie hali ya muunganisho",
+      "sqlLab": "Mti wa mpango, maonyo, ulinganisho na ukaguzi wa mifumo isiyo sahihi dhidi ya vikoa vya kawaida",
+      "perf": "Hoja polepole Top-N, afya ya jedwali/faharisi, utabiri wa uwezo, shughuli na kufuli",
+      "monitor": "Muhtasari wa metriki za Programu, DB na URL na arifa za kizingiti",
+      "drift": "Linganisha modeli ya schema.pi na historia ya DDL na katalogi halisi, pima athari ya faharisi",
+      "migration": "Mpangilio wa upakiaji wa topolojia, vipande, orodha ya ukaguzi na SQL ya uthibitishaji",
+      "pipeline": "Ukaguzi wa awali wa kunasa mabadiliko na ufafanuzi wa bomba la chanzo→badilisha→lengo",
+      "analytics": "Dashibodi ya KPI, ramani ya ziwa ya tabaka 3 na katalogi ya hifadhidata",
+      "ops": "Uchunguzi wa kusoma tu wa vigezo, majukumu, chelezo na urudufishaji wa DR",
+      "learn": "Maswali ya mazoezi ya SQLP/DAP, kesi za kurekebisha na kamusi ya kulinganisha ya DBMS"
+    }
+  },
   "auth": {
     "checking": "Inakagua kuingia…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "Imeshindwa kuunda msimbo wa kuunganisha. Tafadhali jaribu tena baadaye.",
     "AUTH_DB_UNAVAILABLE": "Imeshindwa kuhifadhi akaunti yako, kwa hivyo kuingia kumeshindwa. Tafadhali jaribu tena baadaye.",
     "LINK_TRY_LIMIT": "Misimbo mingi isiyo sahihi ya kuunganisha. Jaribu tena baada ya dakika 15."
+  },
+  "analytics": {
+    "title": "Uchambuzi & Ziwa",
+    "intro": "KPI za shughuli za dbms, usanifu wa ziwa wa tabaka tatu na katalogi ya hifadhidata katika sehemu moja.",
+    "storageNotice": "Hifadhi ya ziwa (upande wa mteja au wingu) bado haijaamuliwa (PRD sehemu ya 10 #7). Kwa sasa, miundo na ramani za majina pekee ndizo zinazohifadhiwa — hakuna data ya safu.",
+    "noLink": "Chagua au sajili kiungo cha schema.pi kwanza.",
+    "goConnect": "Sajili kiungo",
+    "loading": "Inapakia…",
+    "refresh": "Onyesha upya",
+    "kpi": {
+      "title": "Dashibodi ya KPI",
+      "updatedAt": "{area} · kufikia {time}",
+      "notBuilt": "Haijajengwa",
+      "keys": {
+        "links": "Viungo vyangu",
+        "perf": "Picha za utendaji",
+        "drift": "Mbio za kuteleza",
+        "mig": "Mipango ya uhamiaji",
+        "pipe": "Mabomba",
+        "lake": "Hifadhidata za ziwa"
+      },
+      "countsChart": "Jumla kwa kipengele",
+      "trendTitle": "Picha za utendaji katika siku 14 zilizopita",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Hakuna picha za utendaji katika siku 14 zilizopita.",
+      "monTitle": "Muhtasari wa kifuatiliaji cha schema.pi (saa iliyopita)",
+      "monTps": "Maombi/s",
+      "monErr": "Kiwango cha hitilafu",
+      "monAvg": "Majibu ya wastani (ms)",
+      "monDb": "Viunganisho vya DB",
+      "monFail": "Imeshindwa kupakia muhtasari wa kifuatiliaji: {msg}"
+    },
+    "lake": {
+      "title": "Usanifu wa ziwa wa tabaka tatu",
+      "raw": "Mbichi",
+      "rawDesc": "Inapakia majina na aina za safu wima za DB chanzo kama zilivyo.",
+      "std": "Sanifu",
+      "stdDesc": "Inabadilisha majina ya safu wima kuwa maneno ya kawaida yaliyoidhinishwa na schema.pi.",
+      "cur": "Iliyopangwa",
+      "curDesc": "Hifadhidata za uchambuzi zilizopangwa kwa huluki.",
+      "loadProjects": "Pakia miradi",
+      "project": "Mradi",
+      "pickProject": "Chagua mradi",
+      "noProjects": "Hakuna miradi katika eneo hili.",
+      "noTables": "Mfumo wa mradi huu hauna majedwali.",
+      "conform": "Ulinganifu wa kawaida {pct}%",
+      "tableSummary": "{tbl} → {std} · safu wima {cnt} · {pct}% inalingana",
+      "colSrc": "Safu wima chanzo",
+      "colStd": "Safu wima sanifu",
+      "colType": "Aina",
+      "colOk": "Umbizo",
+      "ok": "Sawa",
+      "ng": "Angalia",
+      "pk": "PK",
+      "selectAll": "Chagua zote",
+      "selected": "{cnt} zimechaguliwa",
+      "save": "Ongeza kwenye usanifu wa ziwa",
+      "saved": "Imeongeza {cnt} kwenye katalogi."
+    },
+    "catalog": {
+      "title": "Katalogi ya hifadhidata",
+      "schemaCard": "schema.pi ndiyo chanzo cha ukweli kwa ufafanuzi wa hifadhidata ya uchambuzi, utafutaji wa metadata na faharasa. Hapa unaona tu hali ya upakiaji wa ziwa na usafi.",
+      "openSchema": "Tazama ufafanuzi katika schema.pi",
+      "empty": "Hakuna majedwali yaliyoongezwa kwenye usanifu wa ziwa bado.",
+      "status": {
+        "DSGN": "Usanifu pekee",
+        "LOADED": "Imepakiwa",
+        "FAIL": "Imeshindwa kupakia"
+      },
+      "lastLoad": "Upakiaji wa mwisho {time}",
+      "neverLoaded": "Haijawahi kupakiwa",
+      "remove": "Ondoa",
+      "removeConfirm": "Ondoa {tbl} kutoka kwenye katalogi?",
+      "prev": "Iliyotangulia",
+      "next": "Inayofuata",
+      "page": "Ukurasa {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Chagua kiungo kwanza.",
+      "NOT_FOUND": "Haipatikani. Angalia kama modeli imebadilika."
+    }
+  },
+  "drift": {
+    "title": "Modeli ↔ DB Drift",
+    "intro": "Linganisha modeli ya usanifu ya schema.pi na historia ya utumiaji wa DDL na katalogi ya DB hai ili kupata mkengeuko, na pima kama faharisi zilizoundwa zinatumika kweli. Data ya safu wima ya mteja haisomwi au kuhifadhiwa kamwe.",
+    "needLink": "Chagua kiungo cha schema.pi hapo juu kwanza. Ikiwa huna, sajili tokeni kwenye menyu ya 'Kiungo'.",
+    "needConn": "Chagua muunganisho wa DB wa kulinganisha hapo juu.",
+    "project": "Mradi",
+    "projectPick": "Chagua mradi",
+    "loading": "Inapakia…",
+    "run": "Endesha ugunduzi wa mkengeuko",
+    "running": "Inalinganisha…",
+    "readOnly": "Hoja za katalogi na takwimu za kusoma tu ndizo zinazoendeshwa.",
+    "applyInSchema": "Tekeleza marekebisho (hariri za modeli, uzalishaji wa DDL na utekelezaji) katika schema.pi, chanzo cha ukweli.",
+    "history": "Historia ya ugunduzi",
+    "prev": "Iliyotangulia",
+    "next": "Inayofuata",
+    "none": "Hakuna",
+    "model": "Modeli",
+    "reqNo": "Ombi {id}",
+    "notSaved": "Imeshindwa kuhifadhi utekelezaji huu kwenye historia (matokeo yanaonyeshwa kawaida).",
+    "capped": "Vipengee vingi sana — vinaonyesha {cap} vya kwanza kwa kila sehemu (hesabu zimekamilika).",
+    "statsMissing": "Takwimu za matumizi ya faharisi hazikupatikana, kwa hivyo matumizi hayakuweza kuhukumiwa.",
+    "sum": {
+      "missingTables": "Majedwali yanayokosekana kwenye DB",
+      "extraTables": "Majedwali yasiyo kwenye modeli",
+      "colMismatches": "Kutolingana kwa safu wima",
+      "missingIndexes": "Faharisi zilizoundwa zinazokosekana kwenye DB",
+      "extraIndexes": "Faharisi zisizo kwenye modeli",
+      "ddlMissing": "Vitu vilivyopotea baada ya kutumia",
+      "unusedIndexes": "Faharisi zilizoundwa zisizotumika"
+    },
+    "sec": {
+      "ddlMissing": "DDL imetumika lakini inakosekana kwenye DB",
+      "missingTables": "Majedwali kwenye modeli lakini yanayokosekana kwenye DB",
+      "extraTables": "Majedwali kwenye DB lakini hayako kwenye modeli",
+      "colMismatches": "Aina ya safu wima / kutolingana kwa NULL",
+      "missingIndexes": "Faharisi zilizoundwa zinazokosekana kwenye DB",
+      "extraIndexes": "Faharisi kwenye DB pekee (ukiondoa PK)",
+      "idxUsage": "Ufanisi wa faharisi iliyoundwa"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi ilirekodi vitu hivi kama vilivyotumika, lakini vimepotea — shuku kufutwa kwa mkono au kurudisha nyuma.",
+      "extraTables": "Hizi zinaweza kuwa za miradi mingine au majedwali ya mfumo kwenye muunganisho huu.",
+      "idxUsage": "Sifuri za skani tangu kuweka upya takwimu za mwisho inamaanisha hazitumiki. Angalia dirisha la takwimu kabla ya kufuta."
+    },
+    "kind": {
+      "MISSING": "inakosekana kwenye DB",
+      "EXTRA": "haiko kwenye modeli",
+      "TYPE": "aina tofauti",
+      "NULL": "utupu tofauti"
+    },
+    "col": {
+      "idx": "Faharisi",
+      "scans": "Skani",
+      "size": "Ukubwa",
+      "status": "Uamuzi"
+    },
+    "usage": {
+      "USED": "Inatumika",
+      "UNUSED": "Faharisi iliyoundwa isiyotumika",
+      "NO_STATS": "Hakuna takwimu"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Kiungo cha schema.pi bado hakijawa tayari. Tafadhali jaribu tena baada ya muda mfupi.",
+      "LINK_DOWN": "Haiwezi kufikia schema.pi. Tafadhali jaribu tena baada ya muda mfupi.",
+      "LINK_AUTH": "Tokeni ya kiungo imeisha muda wake au imefutwa. Toa tokeni mpya katika schema.pi na uisajili tena.",
+      "LINK_NOT_FOUND": "Kiungo hakipatikani. Tafadhali chagua kiungo tena.",
+      "LINK_SCOPE": "Muunganisho huu hautokani na taksonomia ya kiungo.",
+      "CONN_UNSUPPORTED": "Muunganisho usiotumika (viunganisho vya seva ya PostgreSQL pekee kwa sasa).",
+      "TIMEOUT": "Ombi limeisha muda wake. Tafadhali jaribu tena baada ya muda mfupi.",
+      "RATE": "Maombi mengi sana. Tafadhali jaribu tena baada ya dakika moja."
+    }
+  },
+  "learn": {
+    "title": "Kujifunza DBA",
+    "intro": "Maswali ya mazoezi ya SQLP/DAP, kitabu cha kesi za kurekebisha, na kamusi ya kulinganisha ya Oracle/Tibero/PostgreSQL. Inafanya kazi bila kiungo; chagua kiungo ili pia uone ramani yako ya aina ya kawaida ya schema.pi.",
+    "loading": "Inapakia…",
+    "tabs": {
+      "quiz": "Mazoezi",
+      "cases": "Kesi za kurekebisha",
+      "dict": "Kamusi ya DBMS"
+    },
+    "topics": {
+      "INDEX": "Skani za faharisi",
+      "JOIN": "Njia za kuunganisha",
+      "PARTITION": "Kupunguza sehemu",
+      "NORMAL": "Kusanifisha",
+      "NAMING": "Kutaja kwa kawaida",
+      "ISOLATION": "Viwango vya kutengwa",
+      "LOCK": "Kufuli"
+    },
+    "levels": {
+      "1": "Msingi",
+      "2": "Kati",
+      "3": "Ya Juu"
+    },
+    "quiz": {
+      "score": "Maendeleo yangu",
+      "scoreLine": "{solved} kati ya {total} yametatuliwa · {correct} sahihi",
+      "right": "Sahihi",
+      "wrong": "Si sahihi",
+      "retry": "Jaribu tena",
+      "prevRight": "Sahihi hapo awali",
+      "prevWrong": "Si sahihi hapo awali"
+    },
+    "cases": {
+      "notice": "Kesi zote ni mifano ya kujifunza iliyoandikwa mwenyewe; nambari ni za kuonyesha (hakuna data ya mteja).",
+      "problem": "SQL ya tatizo",
+      "plan": "Muhtasari wa mpango",
+      "cause": "Sababu",
+      "fix": "SQL iliyorekebishwa",
+      "effect": "Athari"
+    },
+    "cats": {
+      "ALL": "Zote",
+      "TYPE": "Aina za data",
+      "FUNC": "Kazi",
+      "PAGING": "Kupanga kurasa",
+      "SEQ": "Mfuatano",
+      "DATE": "Tarehe",
+      "SYNTAX": "Sintaksia"
+    },
+    "dict": {
+      "search": "Tafuta (k.m. NVL, LIMIT)",
+      "item": "Kipengee",
+      "note": "Kumbuka",
+      "empty": "Hakuna vipengee vinavyolingana",
+      "loading": "Inapakia…",
+      "liveTitle": "Ramani ya aina ya kawaida ya eneo langu la somo",
+      "liveIntro": "Chagua kiungo ili kupakia wasifu wa DBMS wa schema.pi (aina ya kimantiki → aina halisi). Kamusi iliyo hapo juu inafanya kazi bila kiungo.",
+      "liveLoad": "Pakia ramani ya aina",
+      "lgcType": "Aina ya kimantiki"
+    }
+  },
+  "link2": {
+    "title": "Muunganisho wa schema.pi",
+    "intro": "Sajili tokeni ya muunganisho ili kutumia viunganisho vya DB vya eneo la somo la schema.pi katika dbms.pi. Tokeni huhifadhiwa zikiwa zimesimbwa, na hakuna data ya safu wima kutoka kwenye hifadhidata zako inayohifadhiwa.",
+    "howTitle": "Jinsi ya kutoa tokeni ya muunganisho",
+    "how1": "Ingia kwenye schema.pi na ufungue eneo la somo la kuunganisha",
+    "how2": "Nenda kwenye Eneo la somo → Mipangilio → Tokeni ya muunganisho na ubonyeze 'Toa tokeni' (msimamizi wa eneo au jukumu la DA)",
+    "how3": "Nakili tokeni inayoanza na slk_ — inaonyeshwa mara moja tu inapotolewa",
+    "how4": "Bandika hapa chini na usajili",
+    "openSchema": "Fungua schema.pi",
+    "registerTitle": "Sajili muunganisho",
+    "tokenLabel": "Tokeni ya muunganisho",
+    "tokenPlaceholder": "slk_…",
+    "register": "Sajili",
+    "registering": "Inakagua…",
+    "registered": "Eneo la somo '{area}' sasa limeunganishwa",
+    "replaced": "Imefuta tokeni ya eneo la somo '{area}'",
+    "myLinks": "Viunganisho vyangu",
+    "empty": "Hakuna viunganisho vilivyosajiliwa",
+    "loading": "Inapakia…",
+    "regDtm": "Imesajiliwa {dtm}",
+    "remove": "Tenganisha",
+    "removeConfirm": "Tenganisha '{area}'? Skrini zinazotumia muunganisho huu hazitaweza kuufikia tena.",
+    "prev": "Iliyotangulia",
+    "next": "Inayofuata",
+    "statusTitle": "Hali ya muunganisho",
+    "noConns": "Hakuna viunganisho vya DB katika eneo hili la somo (ongeza kimoja katika schema.pi)",
+    "colConn": "Muunganisho",
+    "colDbms": "DBMS",
+    "colMthd": "Njia",
+    "colHost": "Mwenyeji",
+    "colTest": "Jaribio la mwisho",
+    "colAgent": "Wakala alionekana mara ya mwisho",
+    "never": "Hakuna",
+    "retry": "Jaribu tena",
+    "pickerLink": "Kiungo",
+    "pickerConn": "Muunganisho",
+    "pickerEmpty": "Hakuna viunganisho —",
+    "pickerGo": "sajili kimoja kwenye /connect",
+    "errors": {
+      "LINK_AUTH": "Tokeni ya muunganisho imeisha muda wake au imefutwa. Toa tokeni mpya katika schema.pi na uisajili tena",
+      "LINK_SCOPE": "Muunganisho huu hautokani na eneo la somo lililounganishwa",
+      "LINK_DOWN": "Haiwezi kufikia schema.pi. Tafadhali jaribu tena baada ya muda mfupi",
+      "LINK_NOT_FOUND": "Kiungo hakipatikani",
+      "LINK_DUP": "Usajili tayari unaendelea. Tafadhali jaribu tena",
+      "CONN_UNSUPPORTED": "Muunganisho usiotumika (viunganisho vya seva ya PostgreSQL pekee kwa sasa)",
+      "Q_UNKNOWN": "Hoja isiyojulikana",
+      "SQL_NOT_SELECT": "Taarifa moja tu ya SELECT (au WITH) inaweza kuendeshwa",
+      "PGSS_MISSING": "Kiendelezi cha pg_stat_statements hakijasakinishwa kwenye DB lengwa",
+      "TIMEOUT": "Ombi limeisha muda wake",
+      "RATE": "Maombi mengi sana. Tafadhali jaribu tena baada ya dakika moja",
+      "INVALID_INPUT": "Bandika tokeni kamili ya muunganisho inayoanza na slk_"
+    }
+  },
+  "migration": {
+    "title": "Uhamiaji wa Data (PiMig)",
+    "intro": "Inakokotoa mpangilio wa upakiaji wa jedwali kutoka kwenye mahusiano katika modeli yako ya usanifu ya schema.pi, inapanga ukubwa wa vipande, usawa na orodha ya ukaguzi wa kukatisha, na inazalisha SQL ya uthibitishaji unayoendesha mwenyewe kwenye chanzo na lengo. Skrini hii inapanga na kukagua tu — haihamishi data au kusoma safu wima za DB za mteja.",
+    "needLink": "Chagua kiungo cha schema.pi hapo juu kwanza. Ikiwa huna, sajili tokeni chini ya 'Unganisha'.",
+    "loading": "Inapakia…",
+    "newPlan": "Mpango mpya wa uhamiaji",
+    "project": "Mradi",
+    "projectPick": "Chagua mradi",
+    "planNm": "Jina la mpango",
+    "planNmHint": "Chaguo-msingi kwa jina la mradi",
+    "create": "Unda mpango",
+    "creating": "Inaunda…",
+    "snapHint": "Usanifu wa wakati huu (majina ya jedwali, safu wima na mahusiano) umegandishwa kama picha. Unda mpango mpya wakati modeli inabadilika.",
+    "plans": "Mipango ya uhamiaji",
+    "prev": "Iliyotangulia",
+    "next": "Inayofuata",
+    "sts": {
+      "DRAFT": "Rasimu",
+      "READY": "Tayari"
+    },
+    "del": "Futa",
+    "delConfirm": "Futa mpango huu?",
+    "snapInfo": "Picha: {tables} jedwali · {rels} uhusiano",
+    "dropped": "(Mahusiano {n} bila majedwali halisi hayajajumuishwa kwenye mpangilio)",
+    "chunkSize": "Ukubwa wa chunk (safu/commit)",
+    "parallel": "Usawa (majadiwali kwa wakati mmoja)",
+    "saveOpts": "Hifadhi chaguo",
+    "optsHint": "Usawa ni idadi ya majedwali yaliyopakiwa kwa wakati mmoja ndani ya kiwango. Ukubwa wa chunk ni kitengo cha commit (safu) ambacho injini ya utekelezaji itatumia.",
+    "order": "Agizo la kupakia",
+    "orderHint": "Yamepangwa kwa topolojia kwa mahusiano ya muundo (sio FKs halisi) ili majedwali ya mzazi yaje kwanza. Majedwali katika kiwango kimoja hayategemeani na yanaweza kupakia sambamba.",
+    "cycles": "Kundi/makundi {n} ya mzunguko — yamewekwa katika kiwango kimoja. Weka mpangilio wao mwenyewe na uahirishe ukaguzi wa marejeleo hadi baada ya kupakia.",
+    "selfRefs": "Majedwali yanayojirejelea (ya kihierarkia) — pakia safu za mzazi kwanza ndani ya jedwali",
+    "level": "Kiwango {n}",
+    "checklist": "Orodha ya kukagua ya kukatisha",
+    "toReady": "Weka kama tayari",
+    "toDraft": "Rudi kwenye rasimu",
+    "readyNeedAll": "Angalia kila kipengee kabla ya kuweka mpango tayari.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "Sehemu ya kukabidhi ya CDC",
+        "desc": "Rekodi sehemu thabiti ya chanzo kabla ya upakiaji wa awali (PG LSN · Oracle/Tibero SCN · kwa upigaji kura, muda wa kuanza ukiondoa dirisha la mwingiliano), anza CDC kutoka hapo, na ufyonze nakala katika dirisha la kukabidhi kwa upserts."
+      },
+      "valueConv": {
+        "title": "Ubadilishaji wa thamani",
+        "desc": "Sheria zimewekwa kwa kamba tupu = NULL, CHAR blank padding, NUMBER bila usahihi → NUMERIC, DATE na muda → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR urefu, na LONG·RAW."
+      },
+      "charset": {
+        "title": "Seti ya herufi",
+        "desc": "Seti ya herufi chanzo (KO16MSWIN949, UTF8, …) imethibitishwa, na safu ambazo zinafurika kutokana na ukuaji wa multibyte na kutengwa kwa herufi zisizoweza kubadilishwa kumeamuliwa."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB hutiririshwa katika chunks (ukubwa na mipaka ya kumbukumbu) na kuthibitishwa kwa urefu + heshi."
+      },
+      "seqResync": {
+        "title": "Usawazishaji upya wa mfuatano",
+        "desc": "Baada ya kupakia, mfuatano lengwa·vitambulisho huwekwa kuwa max(key)+1."
+      },
+      "timezone": {
+        "title": "Eneo la saa · safu za mfumo",
+        "desc": "Eneo la saa la tafsiri kwa thamani zisizo na moja (k.m. Asia/Seoul) limewekwa, vianzishi vya muda uliorekebishwa havitafuta mihuri ya muda ya chanzo wakati wa upakiaji, na sheria za ubadilishaji wa muundaji/mrekebishaji zimewekwa."
+      },
+      "backpressure": {
+        "title": "Shinikizo la nyuma · upakiaji lengwa",
+        "desc": "Punguza ukubwa wa chunk na usawa kwenye ucheleweshaji lengwa, ukuaji wa WAL au kusubiri kwa kufuli; jenga faharisi zisizo za PK baada ya kupakia na uendeshe ANALYZE·VACUUM baadaye."
+      }
+    },
+    "verify": "SQL ya Uthibitishaji",
+    "verifyHint": "Huzalisha hesabu, jumla ya safu ya nambari, funguo rudufu na maswali ya heshi ya funguo kwa kila jedwali kwa mpangilio wa upakiaji. Yaendeshe mwenyewe kwenye chanzo na lengo na ulinganishe (skrini hii haiyatekelezi).",
+    "noHashOracle": "Vitendaji vya heshi vya Oracle·Tibero na uwasilishaji wa maandishi hutofautiana na PostgreSQL, kwa hivyo maswali ya heshi yameachwa — linganisha hesabu, jumla na funguo rudufu.",
+    "copy": "Nakili",
+    "copied": "Imenakiliwa",
+    "copyFail": "Imeshindwa kunakili. Chagua maandishi na unakili mwenyewe.",
+    "engine": {
+      "title": "Utekelezaji·kuanzisha upya · mazoezi·kurudisha nyuma",
+      "body": "Utekelezaji halisi wa uhamiaji (vituo vya ukaguzi, shinikizo la nyuma, kutengwa kwa safu za makosa) na mazoezi, kurudisha nyuma na kurekodi sehemu ya kuanzia ya CDC itakuja baada ya mfumo wa usalama wa wakala wa mfanyakazi (A10) kukamilika. Kwa sasa hii inashughulikia upangaji, ukaguzi na SQL ya uthibitishaji."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Kiungo cha schema.pi kinaandaliwa. Tafadhali jaribu tena baada ya muda mfupi.",
+      "LINK_DOWN": "Haiwezi kufikia schema.pi. Tafadhali jaribu tena baada ya muda mfupi.",
+      "LINK_AUTH": "Tokeni ya kiungo imeisha muda wake au imefutwa. Toa tokeni mpya katika schema.pi na uisajili tena.",
+      "LINK_NOT_FOUND": "Kiungo hakikupatikana. Tafadhali chagua kiungo tena.",
+      "LINK_SCOPE": "Mradi huu hautokani na taksonomia ya kiungo.",
+      "TIMEOUT": "Ombi limeisha muda. Tafadhali jaribu tena baada ya muda mfupi.",
+      "RATE": "Maombi mengi sana. Jaribu tena baada ya dakika moja.",
+      "MIG_NO_TABLES": "Mradi huu hauna majedwali halisi ya kuhamisha. Badilisha kuwa halisi katika schema.pi kwanza.",
+      "MIG_CHECK_INCOMPLETE": "Angalia kila kipengee cha orodha ya kukagua kabla ya kuweka mpango tayari.",
+      "NOT_FOUND": "Mpango haukupatikana."
+    }
+  },
+  "monitor": {
+    "title": "Kituo cha Ufuatiliaji",
+    "collectNote": "Mkusanyiko unaendeshwa katika schema.pi — uhamiaji umepangwa (D7). Ukurasa huu unasoma muhtasari wa ufuatiliaji wa schema.pi.",
+    "noLink": "Chagua au sajili kiungo cha schema.pi kwanza.",
+    "goConnect": "Sajili kiungo",
+    "period": "Kipindi",
+    "periods": {
+      "30": "Dakika 30",
+      "60": "Saa 1",
+      "360": "Saa 6",
+      "1440": "Saa 24"
+    },
+    "refresh": "Onyesha upya",
+    "loading": "Inapakia…",
+    "updatedAt": "{area} · kufikia {time} (onyesha upya kiotomatiki kila sekunde 30)",
+    "appTitle": "Utendaji wa programu",
+    "dbTitle": "Hali ya DB kwa muunganisho",
+    "urlTitle": "Ukaguzi wa URL",
+    "empty": "Hakuna data ya kuonyesha.",
+    "breachTitle": "Ukiukaji wa kizingiti {n}",
+    "rulesTitle": "Sheria za kizingiti",
+    "rulesNote": "Sheria zimehifadhiwa kwa kiungo hiki na kutathminiwa dhidi ya muhtasari uliopokelewa; ukiukaji hupata mpaka mwekundu (arifa zitakuja baadaye).",
+    "metric": "Kipimo",
+    "conn": "Muunganisho",
+    "allConns": "Miunganisho yote",
+    "op": "Linganisha",
+    "threshold": "Kizingiti",
+    "thrInvalid": "Weka nambari kwa kizingiti.",
+    "addRule": "Ongeza sheria",
+    "noRules": "Hakuna sheria bado.",
+    "enable": "Washa",
+    "disable": "Zima",
+    "delete": "Futa",
+    "delConfirm": "Futa sheria hii?",
+    "aiNote": "Uchambuzi wa tukio la AI na idhini ya kurekebisha bado hufanyika katika kifuatiliaji cha schema.pi.",
+    "aiLink": "Fungua kifuatiliaji cha schema.pi",
+    "metrics": {
+      "APP_TPS": "TPS (maombi/s)",
+      "APP_ERR_PCT": "Kiwango cha makosa (%)",
+      "APP_SLOW_CNT": "Maombi ya polepole",
+      "APP_AVG_MS": "Majibu ya wastani (ms)",
+      "DB_SESS_CNT": "Vikao",
+      "DB_LOCK_WAIT_CNT": "Kusubiri kwa kufuli",
+      "DB_CACHE_HIT_PCT": "Kiwango cha hit ya kache (%)",
+      "DB_SIZE_MB": "Ukubwa wa DB (MB)",
+      "URL_RSP_MS": "Majibu ya URL (ms)",
+      "URL_FAIL_CNT": "Kushindwa kwa URL"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Chagua kiungo kwanza.",
+      "NOT_IMPLEMENTED": "Kiungo cha schema.pi kinaandaliwa. Tafadhali jaribu tena baadaye.",
+      "LINK_AUTH": "Tokeni ya kiungo si sahihi au imeisha muda wake. Toa tokeni mpya katika schema.pi na uisajili.",
+      "LINK_SCOPE": "Kiungo hiki hakiwezi kufikia taksonomia hiyo.",
+      "RATE": "Maombi mengi sana. Tafadhali jaribu tena baada ya muda mfupi.",
+      "TIMEOUT": "schema.pi inajibu polepole. Tafadhali jaribu tena baada ya muda mfupi.",
+      "RULE_LIMIT": "Hadi sheria 50 kwa kila kiungo.",
+      "NOT_FOUND": "Sheria haikupatikana."
+    }
+  },
+  "ops": {
+    "title": "Usalama wa Uendeshaji wa DB",
+    "loading": "Inapakia…",
+    "pickFirst": "Chagua kiungo na muunganisho hapo juu kwanza",
+    "run": "Endesha utambuzi",
+    "running": "Inatambua…",
+    "noRun": "Hakuna utambuzi bado. Bonyeza \"Endesha utambuzi\"",
+    "lastRun": "Utambuzi wa mwisho {dtm}",
+    "readOnly": "Utambuzi husoma tu (SELECT). Ushauri ni mwongozo na unategemea kumbukumbu ya seva, mzigo na mzigo wa kazi",
+    "truncated": "Vitu vingi sana — 500 vya kwanza tu vilikaguliwa",
+    "paramsNote": "Jumla ya kumbukumbu ya seva haijulikani, kwa hivyo inakadiriwa kutoka shared_buffers ≈ 25% ya RAM. random_page_cost inachukulia SSD",
+    "auditNote": "Majedwali yenye RLS imezimwa na akaunti zisizotumika zitakaguliwa mara tu swali la kiungo litakapozisaidia",
+    "replNote": "Msingi ni Active-Standby (A-S) — primary moja + standby. Ucheleweshaji wa kucheza tena ≥ 5s = onyo, ≥ 60s = hatari (rejeleo la RPO lililopimwa)",
+    "lagIdle": "Hakuna mabadiliko",
+    "pager": "Ukurasa",
+    "prev": "Iliyotangulia",
+    "next": "Inayofuata",
+    "tabs": {
+      "params": "Vigezo",
+      "audit": "Akaunti na marupurupu",
+      "backup": "Chelezo na urejeshaji",
+      "repl": "Urudufishaji na DR",
+      "history": "Historia"
+    },
+    "level": {
+      "OK": "Sawa",
+      "WARN": "Onyo",
+      "RISK": "Hatari"
+    },
+    "role": {
+      "primary": "Muunganisho huu = Primary",
+      "standby": "Muunganisho huu = Standby",
+      "unknown": "Jukumu halijulikani"
+    },
+    "col": {
+      "level": "Hukumu",
+      "item": "Kipengee",
+      "value": "Thamani",
+      "reason": "Maelezo",
+      "standby": "Standby",
+      "state": "Hali",
+      "sync": "Sawazisha",
+      "lag": "Ucheleweshaji wa kucheza tena"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "Majukumu ya BYPASSRLS",
+      "bypass_ok": "Majukumu ya BYPASSRLS",
+      "no_expiry": "Muda wa kuisha wa nenosiri",
+      "expiry_ok": "Muda wa kuisha wa nenosiri",
+      "public_grant": "Ruzuku za PUBLIC",
+      "public_ok": "Ruzuku za PUBLIC",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "WAL ya mwisho iliyohifadhiwa",
+      "arc_stale": "WAL ya mwisho iliyohifadhiwa",
+      "arc_recent": "WAL ya mwisho iliyohifadhiwa",
+      "arc_failing": "Kushindwa kuhifadhi WAL"
+    },
+    "rules": {
+      "sb_default": "Katika chaguo-msingi (128MB). Kwenye seva maalum takriban 25% ya RAM inapendekezwa",
+      "sb_ok": "Imewekwa juu ya chaguo-msingi",
+      "wm_over": "max_connections × work_mem inazidi kumbukumbu iliyokadiriwa. Aina za wakati mmoja huhatarisha kukosa kumbukumbu",
+      "wm_default": "Katika chaguo-msingi (4MB). Aina kubwa na heshi zinaweza kumwagika kwenye diski",
+      "wm_ok": "Ndani ya safu inayofaa",
+      "mwm_default": "Katika chaguo-msingi (64MB). VACUUM na ujenzi wa faharisi zinaweza kuwa polepole; fikiria 256MB au zaidi",
+      "mwm_ok": "Imewekwa juu ya chaguo-msingi",
+      "av_on": "autovacuum imewashwa",
+      "av_off": "autovacuum imezimwa. Hatari kubwa ya uvimbe wa jedwali na mzunguko wa kitambulisho cha muamala",
+      "conn_high": "max_connections iko juu. Kila muunganisho hutumia kumbukumbu; pooler (PgBouncer n.k.) inapendekezwa",
+      "conn_ok": "Ndani ya safu inayofaa",
+      "lmd_off": "Uwekaji kumbukumbu wa swali polepole umezimwa (-1). Takriban 1000ms inapendekezwa",
+      "lmd_all": "Kila taarifa imewekwa kumbukumbu (0). Mzigo mkubwa wa uwekaji kumbukumbu",
+      "lmd_ok": "Uwekaji kumbukumbu wa swali polepole umewashwa",
+      "st_off": "Hakuna muda wa kuisha wa taarifa ya seva nzima (0). Weka mipaka kwa kila jukumu au programu",
+      "st_ok": "Muda wa kuisha wa taarifa umewekwa",
+      "iit_off": "Hakuna muda wa kuisha wa kutofanya kazi katika muamala (0). Inaweza kusababisha kushikilia kufuli na uvimbe",
+      "iit_ok": "Muda wa kuisha wa kutofanya kazi katika muamala umewekwa",
+      "ckpt_short": "Muda wa kituo cha ukaguzi ni dakika 5 au chini. Fikiria dakika 10–15 kwa mizigo mizito ya kuandika",
+      "ckpt_ok": "Ndani ya safu inayofaa",
+      "wal_minimal": "wal_level=minimal inafanya PITR na urudufishaji usiwezekane. Tumia replica au zaidi",
+      "wal_ok": "Kiwango cha WAL kinaunga mkono PITR na urudufishaji",
+      "rpc_hdd": "Chaguo-msingi cha HDD (4). Kwa SSD, 1.1–2 inapendekezwa",
+      "rpc_ok": "Inafaa kwa SSD",
+      "super_many": "Superuser mbili au zaidi. Weka moja kwa usimamizi na upe marupurupu yanayohitajika tu kwa wengine",
+      "super_ok": "Superuser mmoja au chini",
+      "bypass_rls": "Majukumu yasiyo ya superuser yanayopita usalama wa kiwango cha safu yapo",
+      "bypass_ok": "Hakuna majukumu yanayopita RLS",
+      "no_expiry": "Majukumu ya kuingia bila muda wa kuisha wa nenosiri. Weka VALID UNTIL kwa akaunti za kibinafsi",
+      "expiry_ok": "Majukumu yote ya kuingia yana muda wa kuisha",
+      "public_grant": "PUBLIC (kila jukumu) ina marupurupu ya jedwali. Marupurupu ya kuandika ni hatari",
+      "public_ok": "Hakuna marupurupu ya jedwali yaliyopewa PUBLIC",
+      "arc_on": "Uhifadhi wa WAL (archive_mode) umewashwa",
+      "arc_off": "Uhifadhi wa WAL umezimwa, kwa hivyo urejeshaji wa wakati fulani (PITR) hauwezekani",
+      "arc_cmd_empty": "archive_mode imewashwa lakini archive_command na archive_library ni tupu",
+      "arc_never": "Hakuna WAL iliyohifadhiwa bado",
+      "arc_stale": "Hifadhi ya mwisho ya WAL ni ya zamani zaidi ya masaa 24",
+      "arc_recent": "WAL imehifadhiwa ndani ya masaa 24 yaliyopita",
+      "arc_failing": "Uhifadhi wa WAL unashindwa kwa sasa. Angalia diski, ruhusa na njia lengwa",
+      "repl_is_standby": "Muunganisho huu ni standby (hali ya urejeshaji). Angalia ucheleweshaji kutoka kwa muunganisho wa primary",
+      "repl_none": "Hakuna standby iliyounganishwa. Hakuna usanidi wa urejeshaji wa maafa (DR)",
+      "repl_ok": "Standbys zinatiririsha kawaida",
+      "repl_lag": "Standby inachelewa au haitiririshi"
+    },
+    "manual": {
+      "title": "Orodha ya kukagua ya mwongozo",
+      "intro": "Mazoea ya chelezo na urejeshaji ambayo hayawezi kukaguliwa kiotomatiki. Tia alama inapothibitishwa na uandike ushahidi",
+      "memo": "Memo (k.m. zana, ratiba, ilikaguliwa mara ya mwisho)",
+      "save": "Hifadhi",
+      "updated": "Imesasishwa {dtm}",
+      "items": {
+        "base_backup": "Chelezo kamili (pg_basebackup n.k.) ilifanikiwa ndani ya siku 7 zilizopita",
+        "offsite_copy": "Nakala ya chelezo inahifadhiwa nje ya tovuti (eneo lingine au hifadhi)",
+        "restore_rehearsal": "Mazoezi ya kurejesha yalifanywa robo hii na muda wake kurekodiwa",
+        "pitr_target": "Utaratibu wa PITR na RPO/RTO lengwa zimeandikwa",
+        "backup_encrypt": "Faili za chelezo zimesimbwa kwa njia fiche na ufikiaji umewekewa vikwazo",
+        "retention": "Kipindi cha uhifadhi wa chelezo na sera ya kufuta imefafanuliwa"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Kiungo cha schema.pi kinaandaliwa. Tafadhali jaribu tena baada ya muda mfupi",
+      "CONN_UNSUPPORTED": "Muunganisho huu haujaungwa mkono bado (PostgreSQL ya moja kwa moja tu)",
+      "TIMEOUT": "DB lengwa ilijibu polepole sana. Tafadhali jaribu tena baada ya muda mfupi",
+      "RATE": "Simu nyingi sana. Jaribu tena baada ya dakika moja",
+      "Q_UNKNOWN": "Swali lisiloungwa mkono. Angalia toleo la API la kiungo cha schema.pi",
+      "INVALID_INPUT": "Uteuzi wa kiungo au muunganisho si sahihi"
+    }
+  },
+  "perf": {
+    "title": "Utendaji",
+    "loading": "Inapakia…",
+    "pickFirst": "Chagua kiungo na muunganisho hapo juu kwanza",
+    "pager": "Ukurasa",
+    "tabs": {
+      "collect": "Kusanya",
+      "top": "Maswali polepole",
+      "health": "Afya ya jedwali na faharisi",
+      "trend": "Mwenendo wa ukubwa",
+      "activity": "Shughuli na kufuli"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Kiungo cha schema.pi kinaandaliwa. Tafadhali jaribu tena baadaye",
+      "CONN_UNSUPPORTED": "Muunganisho huu haujaungwa mkono bado (miunganisho ya moja kwa moja ya PostgreSQL tu)",
+      "RATE": "Maombi mengi sana. Jaribu tena baada ya dakika moja",
+      "LINK_AUTH": "Tokeni ya kiungo imeisha muda wake au imefutwa. Sajili tokeni tena kwenye ukurasa wa Unganisha",
+      "LINK_SCOPE": "Muunganisho huu hautokani na eneo la somo la kiungo",
+      "Q_UNKNOWN": "Swali lisiloungwa mkono. Angalia toleo la API la kiungo cha schema.pi",
+      "INVALID_INPUT": "Thamani ya kiungo au muunganisho si sahihi"
+    },
+    "pgss": {
+      "title": "Jinsi ya kuwezesha pg_stat_statements",
+      "note": "PostgreSQL iliyojihifadhi pia inahitaji pg_stat_statements katika shared_preload_libraries (postgresql.conf) na kuanzisha upya. Takwimu za jedwali, faharisi na ukubwa hufanya kazi bila hiyo"
+    },
+    "collect": {
+      "intro": "Kusanya sasa inasoma takwimu za juu za swali, majedwali, faharisi na ukubwa mara moja na kuzihifadhi kama picha. Kusanya angalau mara mbili ili kuona mabadiliko na mienendo ya ukubwa",
+      "run": "Kusanya sasa",
+      "running": "Inakusanya…",
+      "done": "Imekusanywa saa {dtm} — maswali {qry} · majedwali {tbl} · faharisi {idx}"
+    },
+    "top": {
+      "sort": "Panga",
+      "sortTotal": "Jumla ya muda",
+      "sortMean": "Muda wa wastani",
+      "sortCalls": "Simu",
+      "empty": "Hakuna picha bado. Bonyeza Kusanya sasa kwenye kichupo cha Kusanya",
+      "range": "Badilisha kati ya {from} → {to}",
+      "first": "Picha ya kwanza saa {dtm} — thamani za jumla (mabadiliko kutoka picha inayofuata)",
+      "query": "Swali (literals zimefichwa)",
+      "calls": "Simu",
+      "totalMs": "Jumla ya ms",
+      "meanMs": "Wastani wa ms",
+      "rows": "Safu",
+      "reset": "Kuweka upya takwimu kumegunduliwa — imeonyeshwa kama jumla"
+    },
+    "health": {
+      "empty": "Hakuna picha bado. Bonyeza Kusanya sasa kwenye kichupo cha Kusanya",
+      "basis": "Kulingana na picha kwenye {dtm}",
+      "unusedIdx": "Faharisi zisizotumika",
+      "unusedIdxHint": "Faharisi ambazo hazijawahi kutumika tangu kuweka upya takwimu za mwisho (kwa ukubwa). Usidondoshe PK au faharisi za kizuizi cha kipekee",
+      "fullScan": "Uchanganuzi kamili kupita kiasi",
+      "fullScanHint": "Majedwali yenye safu 1,000+ hai ambapo uchanganuzi kamili ni angalau nusu — kagua faharisi kwenye safu za vichungi",
+      "dead": "Tuple nyingi zilizokufa",
+      "deadHint": "Uwiano wa tuple zilizokufa 20% au zaidi — angalia mipangilio ya VACUUM na autovacuum",
+      "none": "Hakuna",
+      "scans": "uchanganuzi"
+    },
+    "trend": {
+      "limit": "Kizingiti cha ukubwa",
+      "empty": "Hakuna picha katika siku 30 zilizopita",
+      "now": "Ukubwa wa sasa",
+      "perDay": "Ukuaji kwa siku",
+      "needMore": "Inahitaji picha 2+",
+      "daysLeft": "Inafikia {gb} GB",
+      "noGrowth": "Hakuna mwelekeo wa ukuaji",
+      "days": "katika takriban siku {n}"
+    },
+    "activity": {
+      "refresh": "Onyesha upya",
+      "live": "Hoja ya moja kwa moja — haijahifadhiwa",
+      "sessions": "Shughuli ya kipindi",
+      "locks": "Vifunguo",
+      "none": "Hakuna"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Mabomba",
+    "intro": "Angalia kama DB chanzo iko tayari kwa kunasa data ya mabadiliko (CDC) na kubuni mabomba ya chanzo → badilisha → lengwa. Hatua hii huangalia na kubuni tu; hakuna data ya safu ya mteja inayosomwa au kuhifadhiwa.",
+    "needLink": "Chagua kiungo cha schema.pi hapo juu kwanza. Ikiwa huna, sajili tokeni kwenye menyu ya 'Kiungo'.",
+    "needConn": "Chagua muunganisho wa DB wa kuangalia hapo juu.",
+    "loading": "Inapakia…",
+    "pager": "Kurasa",
+    "prev": "Iliyotangulia",
+    "next": "Inayofuata",
+    "runTitle": "Endesha & fuatilia (7-3 · 7-4)",
+    "runBody": "Utekelezaji wa bomba, ufuatiliaji wa kuchelewa na usindikaji upya hufika mara tu wakala wa mfanyakazi na mfumo wa usalama utakapokamilika. Kwa sasa, hifadhi ufafanuzi kama rasimu (DRAFT).",
+    "pre": {
+      "title": "Ukaguzi wa awali wa chanzo",
+      "intro": "Kwa kila jedwali, huangalia safu za muda wa mabadiliko, safu za kufuta laini na ufunguo mkuu ili kupendekeza njia ya kunasa (adapta), na huangalia utayari wa urudufishaji wa kimantiki wa WAL. Huendesha tu maswali ya katalogi na mipangilio ya kusoma tu.",
+      "schema": "Schema (si lazima)",
+      "schemaPh": "Zote",
+      "run": "Endesha ukaguzi wa awali",
+      "running": "Inakagua…",
+      "sum": "Majedwali {tables} · {noPk} bila PK · {deleteUnseen} hayawezi kunasa ufutaji",
+      "truncated": "Hoja ya katalogi ilifikia kikomo cha safu 500, kwa hivyo baadhi ya majedwali yanaweza kukosekana. Bainisha schema na uangalie tena.",
+      "empty": "Hakuna majedwali ya kuangalia",
+      "colTable": "Jedwali",
+      "colChg": "Safu ya muda wa mabadiliko",
+      "colDel": "Safu ya kufuta laini",
+      "colAdapter": "Njia iliyopendekezwa · sababu",
+      "toDraft": "Unda rasimu ya bomba kutoka kwa {n} zilizochaguliwa"
+    },
+    "ready": {
+      "ok": "Urudufishaji wa kimantiki wa WAL uko tayari — majedwali yenye PK yanaweza kutumia LOGICAL",
+      "no": "Urudufishaji wa kimantiki wa WAL hauko tayari — nasa kupitia upigaji kura au ulinganisho wa funguo",
+      "senders": "Viunganisho {n} vya urudufishaji"
+    },
+    "adapter": {
+      "LOGICAL": "Urudufishaji wa kimantiki (WAL)",
+      "POLL": "Upigaji kura wa muda wa mabadiliko",
+      "KEY_DIFF": "Tofauti ya picha ya funguo",
+      "NONE": "Pakia upya kamili tu"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Ina safu ya muda wa mabadiliko",
+      "NO_CHG_COL": "Haina safu ya muda wa mabadiliko",
+      "HAS_SOFT_DEL": "Ina safu ya kufuta laini",
+      "NO_SOFT_DEL": "Haina safu ya kufuta laini",
+      "HAS_PK": "Ina ufunguo mkuu",
+      "NO_PK": "Haina ufunguo mkuu — safu zilizobadilishwa haziwezi kutambuliwa",
+      "DELETE_UNSEEN": "Upigaji kura hauwezi kunasa ufutaji halisi (safu ya kufuta laini inapendekezwa)",
+      "LOGICAL_NOT_READY": "Inaweza kubadilisha hadi LOGICAL mara tu urudufishaji wa kimantiki wa WAL utakapokuwa tayari",
+      "FULL_RELOAD_ONLY": "Hakuna PK au safu ya muda wa mabadiliko, kwa hivyo hakuna unasi wa nyongeza — ongeza PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level si logical (kuibadilisha inahitaji kuanzisha upya DB)",
+      "NO_SLOTS": "max_replication_slots ni 0",
+      "NO_SENDERS": "max_wal_senders ni 0",
+      "IS_STANDBY": "Seva ya kusubiri — chukua urudufishaji wa kimantiki kutoka kwa msingi",
+      "SETTINGS_UNKNOWN": "Haikuweza kusoma mipangilio, utayari haujulikani"
+    },
+    "ed": {
+      "title": "Ufafanuzi wa bomba",
+      "draftOnly": "Ubunifu tu — umehifadhiwa kama rasimu (DRAFT)",
+      "new": "Bomba jipya",
+      "empty": "Hakuna mabomba yaliyohifadhiwa",
+      "manual": "Mwongozo",
+      "edit": "Hariri",
+      "remove": "Futa",
+      "removeConfirm": "Futa bomba '{name}'?",
+      "name": "Jina",
+      "adapter": "Njia ya kunasa",
+      "srcConn": "Muunganisho wa chanzo",
+      "useCurrentConn": "Tumia muunganisho uliochaguliwa hapo juu",
+      "sched": "Ratiba (cron ya sehemu 5, tupu = mwongozo)",
+      "target": "Lengo",
+      "targetPh": "k.m. DB ya uchanganuzi analytics.public / ziwa s3://…",
+      "tables": "Majedwali ya chanzo (yaliyotenganishwa na mstari mpya au koma)",
+      "steps": "Hatua (chanzo → badilisha → lengwa)",
+      "op": "Operesheni",
+      "notePh": "Maelezo · sharti (si lazima)",
+      "addTransform": "Ongeza hatua ya kubadilisha",
+      "save": "Hifadhi",
+      "saving": "Inahifadhi…",
+      "saved": "Imehifadhiwa",
+      "close": "Funga"
+    },
+    "kind": {
+      "SOURCE": "Chanzo",
+      "TRANSFORM": "Badilisha",
+      "TARGET": "Lengo"
+    },
+    "sts": {
+      "DRAFT": "Rasimu"
+    },
+    "check": {
+      "NAME_REQUIRED": "Weka jina",
+      "CONN_REQUIRED": "Chagua muunganisho wa chanzo",
+      "CRON_INVALID": "Weka ratiba kama cron ya sehemu 5 (dakika saa siku mwezi siku ya wiki; tarakimu, *, ',', -, /)",
+      "OP_REQUIRED": "Weka operesheni kwa kila hatua",
+      "STEPS_TOO_FEW": "Hatua za chanzo na lengwa zinahitajika",
+      "STEPS_TOO_MANY": "Hadi hatua 20",
+      "STEP_FIRST_SOURCE": "Hatua ya kwanza lazima iwe chanzo",
+      "STEP_LAST_TARGET": "Hatua ya mwisho lazima iwe lengwa",
+      "STEP_MIDDLE_TRANSFORM": "Hatua za kubadilisha tu zinaweza kukaa katikati"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Bomba lenye jina hili tayari lipo. Tumia jina lingine",
+      "CONN_UNSUPPORTED": "Muunganisho huu hauwezi kuangaliwa bado (miunganisho ya moja kwa moja ya seva ya PostgreSQL tu kwa sasa)"
+    }
+  },
+  "sqlLab": {
+    "title": "Maabara ya Kurekebisha SQL",
+    "intro": "Chagua muunganisho na uweke SQL ili kuona mpango wa utekelezaji kama mti, na sababu za kupungua (uchanganuzi kamili, vitanzi vilivyowekwa, upangaji mkubwa) na mifumo ya kupinga SQL iliyokaguliwa dhidi ya vikoa vya kawaida vya schema.pi. Hoja hazitekelezwi kamwe (hakuna ANALYZE).",
+    "needLink": "Chagua kiungo na muunganisho hapo juu ili kuona mipango. Ukaguzi wa mfumo wa kupinga hufanya kazi bila kiungo.",
+    "sqlLabel": "SQL (taarifa moja ya SELECT au WITH)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Onyesha mpango",
+    "explaining": "Inapakia…",
+    "save": "Hifadhi mpango",
+    "saving": "Inahifadhi…",
+    "saveName": "Lebo (k.m. kabla ya kuongeza faharisi)",
+    "saveNote": "Thamani za mara kwa mara katika SQL na masharti ya mpango hufichwa kama ? zinapohifadhiwa.",
+    "plan": {
+      "title": "Mpango wa utekelezaji",
+      "summary": "Jumla ya gharama {cost} · {ms}ms",
+      "cost": "gharama",
+      "rows": "safu",
+      "width": "upana"
+    },
+    "warn": {
+      "none": "Hakuna maonyo mashuhuri.",
+      "SEQ_SCAN_LARGE": "Uchanganuzi kamili kwenye {relation} (takriban safu {rows}) — zingatia faharisi kwenye safu za vichungi.",
+      "NESTED_LOOP_HIGH": "Kitanzi kilichowekwa hutoa takriban safu {rows} — zingatia kuunganisha kwa heshi au kuunganisha, au faharisi kwenye sharti la kuunganisha.",
+      "SORT_SPILL": "Ukubwa wa upangaji ni takriban {kb}KB, juu ya work_mem chaguo-msingi (4MB); inaweza kumwagika kwenye diski."
+    },
+    "lint": {
+      "run": "Angalia mifumo ya kupinga",
+      "title": "Ukaguzi wa mfumo wa kupinga SQL",
+      "none": "Hakuna mifumo ya kupinga iliyopatikana.",
+      "domainsOff": "Vikoa vya kawaida havikupakiwa; viliangaliwa na sheria za kiambishi tamati cha safu chaguo-msingi tu.",
+      "types": {
+        "num": "nambari",
+        "date": "tarehe",
+        "char": "herufi"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — chagua tu safu unazohitaji (I/O ya ziada, hakuna faharisi inayofunika).",
+        "FUNC_ON_COLUMN": "Safu ya kichungi {column} imefungwa katika kazi au usemi, kwa hivyo faharisi yake haiwezi kutumika — badilisha mara kwa mara badala yake.",
+        "LEADING_WILDCARD": "LIKE yenye % inayoongoza haiwezi kutumia faharisi ya B-tree — zingatia faharisi ya pg_trgm GIN.",
+        "OR_DIFF_COLUMNS": "Masharti kwenye safu tofauti yameunganishwa na OR — zingatia UNION ALL au faharisi za safu-kwa-safu.",
+        "IMPLICIT_CAST": "{column} inalinganishwa na nambari iliyonukuliwa — linganisha safu na aina za mara kwa mara (utupaji usio wazi).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) hairudishi chochote wakati NULL zipo na ni polepole — tumia NOT EXISTS.",
+        "NO_WHERE": "Hakuna kifungu cha WHERE — kwenye jedwali kubwa huu ni uchanganuzi kamili (ongeza sharti au LIMIT).",
+        "DOMAIN_MISMATCH": "{column} ni aina ya {expected} kwa kikoa cha kawaida lakini inalinganishwa na mara kwa mara ya aina nyingine — utupaji usio wazi unaweza kuzuia matumizi ya faharisi."
+      }
+    },
+    "saved": {
+      "title": "Mipango iliyohifadhiwa · Linganisha",
+      "empty": "Hakuna mipango iliyohifadhiwa. Tazama mpango, kisha uuhifadhi.",
+      "pick": "Chagua mpango wa kulinganisha",
+      "pick2": "Chagua mipango miwili ya kulinganisha.",
+      "compare": "Linganisha mipango miwili",
+      "delete": "Futa",
+      "cost": "gharama",
+      "prev": "Iliyotangulia",
+      "next": "Inayofuata",
+      "page": "Ukurasa {page}"
+    },
+    "diff": {
+      "cost": "Jumla ya gharama {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Mipango miwili ni ya SQL tofauti (baada ya kurekebisha).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Hakuna mabadiliko katika nodi za mpango.",
+      "before": "Kabla",
+      "after": "Baada"
+    },
+    "ai": {
+      "title": "Ushauri wa kurekebisha AI",
+      "badge": "Inakuja hivi karibuni",
+      "body": "Inakuja hivi karibuni (baada ya idhini na taratibu za kupima athari) — ushauri utatolewa kutoka SQL na vigezo vilivyofichwa na kurekodiwa kama ilivyotumika tu baada ya idhini ya DA na athari iliyopimwa."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Kipengele cha kiungo cha schema.pi kinaandaliwa. Tafadhali jaribu tena baada ya muda mfupi.",
+      "LINK_AUTH": "Tokeni ya kiungo imeisha muda au imefutwa. Toa tokeni mpya katika schema.pi na uisajili tena.",
+      "LINK_SCOPE": "Kiungo hiki hakiwezi kutumia muunganisho huo (mpango tofauti wa uainishaji).",
+      "CONN_UNSUPPORTED": "Aina hii ya muunganisho haitumiki bado (miunganisho ya seva ya PostgreSQL tu).",
+      "Q_UNKNOWN": "Hoja isiyotumika.",
+      "SQL_NOT_SELECT": "Mipango inapatikana tu kwa taarifa moja inayoanza na SELECT au WITH.",
+      "TIMEOUT": "Ombi limeisha muda (sekunde 5). Fupisha SQL au jaribu tena baadaye.",
+      "RATE": "Maombi mengi sana. Jaribu tena baada ya dakika moja.",
+      "PAYLOAD_TOO_LARGE": "Mpango ni mkubwa sana kuhifadhi.",
+      "LINK_NOT_FOUND": "Kiungo hakipatikani. Tafadhali chagua kiungo tena."
+    }
+  },
+  "nav": {
+    "label": "Vipengele",
+    "connect": "Unganisha",
+    "sqlLab": "Kurekebisha SQL",
+    "perf": "Utendaji",
+    "monitor": "Ufuatiliaji",
+    "drift": "Mkengeuko",
+    "migration": "Uhamiaji",
+    "pipeline": "Bomba",
+    "analytics": "Uchanganuzi",
+    "ops": "Usalama wa Uendeshaji",
+    "learn": "Jifunze"
   }
 }

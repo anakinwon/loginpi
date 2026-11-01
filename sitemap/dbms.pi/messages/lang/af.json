@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "'n DBA- en SQLP-werkbank om DB-enjins vinnig en veilig te laat loop"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Laat jou DB-enjin jou data vinnig en veilig laat loop",
+    "description": "'n DBA- en SQLP-werkbank vir uitvoeringsplanne, statistieke en werkverrigting. schema.pi hanteer ontwerp en standaarde; dbms.pi is sy vennoot aan die enjinkant.",
+    "welcome": "Welkom, {name}.",
+    "featTitle": "Kenmerke",
+    "featDesc": {
+      "connect": "Registreer 'n schema.pi-skakeltoken en kontroleer verbindingstatus",
+      "sqlLab": "Planboom, waarskuwings, vergelyking en anti-patroonkontroles teen standaarddomeine",
+      "perf": "Stadige navraag Top-N, tabel-/indeksgesondheid, kapasiteitsvoorspelling, aktiwiteit en slotte",
+      "monitor": "App-, DB- en URL-metriekopsomming met drempelwaarskuwings",
+      "drift": "Vergelyk schema.pi-model en DDL-geskiedenis met die regte katalogus, meet indekseffek",
+      "migration": "Topologiese laaivolgorde, brokke, kontrolelys en verifikasie SQL",
+      "pipeline": "Verander-vaslegging voorkontrole en bron→transformeer→teiken pyplyndefinisies",
+      "analytics": "KPI-kontroleskerm, 3-laag meer-kartering en datastel-katalogus",
+      "ops": "Leesalleen-diagnose van parameters, rolle, rugsteun en replikasie DR",
+      "learn": "SQLP/DAP-oefenvrae, instellingsgevalle en DBMS-vergelykingswoordeboek"
+    }
+  },
   "auth": {
     "checking": "Meld aan…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "Kon nie 'n skakelkode skep nie. Probeer asseblief later weer.",
     "AUTH_DB_UNAVAILABLE": "Kon nie jou rekening stoor nie, so aanmelding het misluk. Probeer asseblief later weer.",
     "LINK_TRY_LIMIT": "Te veel verkeerde skakelkodes. Probeer weer oor 15 minute."
+  },
+  "analytics": {
+    "title": "Analise en Meer",
+    "intro": "dbms-aktiwiteit KPI's, drielaag-meerontwerp en datastel-katalogus op een plek.",
+    "storageNotice": "Meerberging (kliënt-kant of wolk) is nog nie besluit nie (PRD afdeling 10 #7). Slegs ontwerpe en naamkarterings word tans gestoor — geen rydata nie.",
+    "noLink": "Kies of registreer eers 'n schema.pi-skakel.",
+    "goConnect": "Registreer 'n skakel",
+    "loading": "Laai tans…",
+    "refresh": "Verfris",
+    "kpi": {
+      "title": "KPI-kontroleskerm",
+      "updatedAt": "{area} · soos op {time}",
+      "notBuilt": "Nie gebou nie",
+      "keys": {
+        "links": "My skakels",
+        "perf": "Prestasie-momentopnames",
+        "drift": "Drift-lopies",
+        "mig": "Migrasieplanne",
+        "pipe": "Pyplyne",
+        "lake": "Meer-datastelle"
+      },
+      "countsChart": "Totale per kenmerk",
+      "trendTitle": "Prestasie-momentopnames in die laaste 14 dae",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Geen prestasie-momentopnames in die laaste 14 dae nie.",
+      "monTitle": "schema.pi-monitoropsomming (laaste uur)",
+      "monTps": "Versoeke/s",
+      "monErr": "Foutkoers",
+      "monAvg": "Gemiddelde reaksie (ms)",
+      "monDb": "DB-verbindings",
+      "monFail": "Kon nie die monitoropsomming laai nie: {msg}"
+    },
+    "lake": {
+      "title": "Drielaag-meerontwerp",
+      "raw": "Rou",
+      "rawDesc": "Laai bron-DB-kolomname en -tipes soos dit is.",
+      "std": "Gestandaardiseer",
+      "stdDesc": "Hernoem kolomme na schema.pi-goedgekeurde standaardterme.",
+      "cur": "Gekureer",
+      "curDesc": "Analise-datastelle gegroepeer volgens entiteit.",
+      "loadProjects": "Laai projekte",
+      "project": "Projek",
+      "pickProject": "Kies 'n projek",
+      "noProjects": "Geen projekte in hierdie area nie.",
+      "noTables": "Hierdie projek se model het geen tabelle nie.",
+      "conform": "Standaardkonformiteit {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} kolomme · {pct}% konform",
+      "colSrc": "Bronkolom",
+      "colStd": "Gestandaardiseerde kolom",
+      "colType": "Tipe",
+      "colOk": "Formaat",
+      "ok": "OK",
+      "ng": "Kontroleer",
+      "pk": "PK",
+      "selectAll": "Kies alles",
+      "selected": "{cnt} gekies",
+      "save": "Voeg by meerontwerp",
+      "saved": "{cnt} by die katalogus gevoeg."
+    },
+    "catalog": {
+      "title": "Datastel-katalogus",
+      "schemaCard": "schema.pi is die bron van waarheid vir analise-datasteldefinisies, metadata-soektog en woordelys. Hier sien jy slegs meerlaaistatus en varsheid.",
+      "openSchema": "Bekyk definisies in schema.pi",
+      "empty": "Geen tabelle is nog by die meerontwerp gevoeg nie.",
+      "status": {
+        "DSGN": "Slegs ontwerp",
+        "LOADED": "Gelaai",
+        "FAIL": "Laai het misluk"
+      },
+      "lastLoad": "Laaste laai {time}",
+      "neverLoaded": "Nooit gelaai nie",
+      "remove": "Verwyder",
+      "removeConfirm": "Verwyder {tbl} uit die katalogus?",
+      "prev": "Vorige",
+      "next": "Volgende",
+      "page": "Bladsy {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Kies eers 'n skakel.",
+      "NOT_FOUND": "Nie gevind nie. Kontroleer of die model verander het."
+    }
+  },
+  "drift": {
+    "title": "Model ↔ DB-afwyking",
+    "intro": "Vergelyk die schema.pi-ontwerpmodel en DDL-toepassingsgeskiedenis met die lewendige DB-katalogus om afwykings te vind, en meet of ontwerpte indekse werklik gebruik word. Kliëntrydata word nooit gelees of gestoor nie.",
+    "needLink": "Kies eers 'n schema.pi-skakel hierbo. As jy geen het nie, registreer 'n token in die 'Skakel'-kieslys.",
+    "needConn": "Kies die DB-verbinding om hierbo te vergelyk.",
+    "project": "Projek",
+    "projectPick": "Kies 'n projek",
+    "loading": "Laai tans…",
+    "run": "Voer afwykingsopsporing uit",
+    "running": "Vergelyk tans…",
+    "readOnly": "Slegs leesalleen-katalogus- en statistieknavrae word uitgevoer.",
+    "applyInSchema": "Pas regstellings toe (modelredigering, DDL-generering en -uitvoering) in schema.pi, die bron van waarheid.",
+    "history": "Opsporingsgeskiedenis",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "none": "Geen",
+    "model": "Model",
+    "reqNo": "Versoek {id}",
+    "notSaved": "Kon nie hierdie lopie na geskiedenis stoor nie (resultate word normaalweg gewys).",
+    "capped": "Te veel items — wys die eerste {cap} per afdeling (tellings is volledig).",
+    "statsMissing": "Indeksgebruikstatistieke was onbeskikbaar, dus kon gebruik nie beoordeel word nie.",
+    "sum": {
+      "missingTables": "Tabelle ontbreek in DB",
+      "extraTables": "Tabelle nie in model nie",
+      "colMismatches": "Kolomwanverhoudings",
+      "missingIndexes": "Ontwerpte indekse ontbreek in DB",
+      "extraIndexes": "Indekse nie in model nie",
+      "ddlMissing": "Objekte weg na toepassing",
+      "unusedIndexes": "Ongebruikte ontwerpte indekse"
+    },
+    "sec": {
+      "ddlMissing": "DDL toegepas maar ontbreek in DB",
+      "missingTables": "Tabelle in model maar ontbreek in DB",
+      "extraTables": "Tabelle in DB maar nie in model nie",
+      "colMismatches": "Kolomtipe / NULL-wanverhoudings",
+      "missingIndexes": "Ontwerpte indekse ontbreek in DB",
+      "extraIndexes": "Indekse slegs in DB (PK uitgesluit)",
+      "idxUsage": "Ontwerpte indekseffektiwiteit"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi het hierdie objekte as toegepas aangeteken, maar hulle is weg — vermoed 'n handmatige verwydering of terugrol.",
+      "extraTables": "Dit kan aan ander projekte of stelseltabelle op hierdie verbinding behoort.",
+      "idxUsage": "Nul skanderings sedert die laaste statistiekterugstelling beteken ongebruik. Kontroleer die statistiekvenster voordat u dit verwyder."
+    },
+    "kind": {
+      "MISSING": "ontbreek in DB",
+      "EXTRA": "nie in model nie",
+      "TYPE": "tipe verskil",
+      "NULL": "nullability verskil"
+    },
+    "col": {
+      "idx": "Indeks",
+      "scans": "Skanderings",
+      "size": "Grootte",
+      "status": "Uitspraak"
+    },
+    "usage": {
+      "USED": "In gebruik",
+      "UNUSED": "Ongebruikte ontwerpte indeks",
+      "NO_STATS": "Geen statistieke"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Die schema.pi-skakel is nog nie gereed nie. Probeer asseblief binnekort weer.",
+      "LINK_DOWN": "Kan nie schema.pi bereik nie. Probeer asseblief binnekort weer.",
+      "LINK_AUTH": "Die skakeltoken het verval of is herroep. Reik 'n nuwe token in schema.pi uit en registreer dit weer.",
+      "LINK_NOT_FOUND": "Skakel nie gevind nie. Kies asseblief die skakel weer.",
+      "LINK_SCOPE": "Hierdie verbinding behoort nie aan die skakel se taksonomie nie.",
+      "CONN_UNSUPPORTED": "Nie-ondersteunde verbinding (slegs PostgreSQL-bedienerverbindings vir nou).",
+      "TIMEOUT": "Die versoek het uitgetel. Probeer asseblief binnekort weer.",
+      "RATE": "Te veel versoeke. Probeer asseblief oor 'n minuut weer."
+    }
+  },
+  "learn": {
+    "title": "DBA-leer",
+    "intro": "SQLP/DAP-oefenvrae, 'n instellingsgevalleboek, en 'n Oracle/Tibero/PostgreSQL-vergelykingswoordeboek. Werk sonder 'n skakel; kies 'n skakel om ook jou schema.pi-standaardtipekartering te sien.",
+    "loading": "Laai tans…",
+    "tabs": {
+      "quiz": "Oefening",
+      "cases": "Instellingsgevalle",
+      "dict": "DBMS-woordeboek"
+    },
+    "topics": {
+      "INDEX": "Indeks-skanderings",
+      "JOIN": "Voegmetodes",
+      "PARTITION": "Partisie-snoei",
+      "NORMAL": "Normalisering",
+      "NAMING": "Standaardbenaming",
+      "ISOLATION": "Isolasievlakke",
+      "LOCK": "Slotte"
+    },
+    "levels": {
+      "1": "Basies",
+      "2": "Intermediêr",
+      "3": "Gevorderd"
+    },
+    "quiz": {
+      "score": "My vordering",
+      "scoreLine": "{solved} van {total} opgelos · {correct} korrek",
+      "right": "Korrek",
+      "wrong": "Verkeerd",
+      "retry": "Probeer weer",
+      "prevRight": "Voorheen korrek",
+      "prevWrong": "Voorheen verkeerd"
+    },
+    "cases": {
+      "notice": "Alle gevalle is selfgeskrewe leer-voorbeelde; getalle is illustratief (geen kliëntdata nie).",
+      "problem": "Probleem SQL",
+      "plan": "Planopsomming",
+      "cause": "Oorsaak",
+      "fix": "Vaste SQL",
+      "effect": "Effek"
+    },
+    "cats": {
+      "ALL": "Alles",
+      "TYPE": "Datatipes",
+      "FUNC": "Funksies",
+      "PAGING": "Paginering",
+      "SEQ": "Volgordes",
+      "DATE": "Datums",
+      "SYNTAX": "Sintaksis"
+    },
+    "dict": {
+      "search": "Soek (bv. NVL, LIMIT)",
+      "item": "Item",
+      "note": "Nota",
+      "empty": "Geen ooreenstemmende items nie",
+      "loading": "Laai tans…",
+      "liveTitle": "Standaardtipekartering van my onderwerparea",
+      "liveIntro": "Kies 'n skakel om die schema.pi DBMS-profiel (logies → fisiese tipe) te laai. Die woordeboek hierbo werk sonder 'n skakel.",
+      "liveLoad": "Laai tipekartering",
+      "lgcType": "Logiese tipe"
+    }
+  },
+  "link2": {
+    "title": "schema.pi-verbinding",
+    "intro": "Registreer 'n verbindingstoken om die DB-verbindings van 'n schema.pi-onderwerparea in dbms.pi te gebruik. Tokens word geënkripteer gestoor, en geen rydata van jou databasisse word gestoor nie.",
+    "howTitle": "Hoe om 'n verbindingstoken uit te reik",
+    "how1": "Meld aan by schema.pi en maak die onderwerparea oop om te verbind",
+    "how2": "Gaan na Onderwerparea → Instellings → Verbindingstoken en druk 'Reik token uit' (area-administrateur of DA-rol)",
+    "how3": "Kopieer die token wat met slk_ begin — dit word slegs een keer gewys wanneer dit uitgereik word",
+    "how4": "Plak dit hieronder en registreer",
+    "openSchema": "Maak schema.pi oop",
+    "registerTitle": "Registreer verbinding",
+    "tokenLabel": "Verbindingstoken",
+    "tokenPlaceholder": "slk_…",
+    "register": "Registreer",
+    "registering": "Kontroleer tans…",
+    "registered": "Onderwerparea '{area}' is nou gekoppel",
+    "replaced": "Het die token van onderwerparea '{area}' vervang",
+    "myLinks": "My verbindings",
+    "empty": "Geen verbindings geregistreer nie",
+    "loading": "Laai tans…",
+    "regDtm": "Geregistreer {dtm}",
+    "remove": "Ontkoppel",
+    "removeConfirm": "Ontkoppel '{area}'? Skerms wat hierdie verbinding gebruik, sal dit nie meer kan toegang nie.",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "statusTitle": "Verbindingstatus",
+    "noConns": "Geen DB-verbindings in hierdie onderwerparea nie (voeg een by in schema.pi)",
+    "colConn": "Verbinding",
+    "colDbms": "DBMS",
+    "colMthd": "Metode",
+    "colHost": "Gasheer",
+    "colTest": "Laaste toets",
+    "colAgent": "Agent laas gesien",
+    "never": "Geen",
+    "retry": "Probeer weer",
+    "pickerLink": "Skakel",
+    "pickerConn": "Verbinding",
+    "pickerEmpty": "Geen verbindings —",
+    "pickerGo": "registreer een by /connect",
+    "errors": {
+      "LINK_AUTH": "Die verbindingstoken het verval of is herroep. Reik 'n nuwe token in schema.pi uit en registreer weer",
+      "LINK_SCOPE": "Hierdie verbinding behoort nie aan die gekoppelde onderwerparea nie",
+      "LINK_DOWN": "Kan nie schema.pi bereik nie. Probeer asseblief binnekort weer",
+      "LINK_NOT_FOUND": "Verbinding nie gevind nie",
+      "LINK_DUP": "Registrasie is reeds aan die gang. Probeer asseblief weer",
+      "CONN_UNSUPPORTED": "Nie-ondersteunde verbinding (slegs PostgreSQL-bedienerverbindings vir nou)",
+      "Q_UNKNOWN": "Onbekende navraag",
+      "SQL_NOT_SELECT": "Slegs 'n enkele SELECT (of WITH) stelling kan uitgevoer word",
+      "PGSS_MISSING": "Die pg_stat_statements-uitbreiding is nie op die teiken-DB geïnstalleer nie",
+      "TIMEOUT": "Die versoek het uitgetel",
+      "RATE": "Te veel versoeke. Probeer asseblief oor 'n minuut weer",
+      "INVALID_INPUT": "Plak die volledige verbindingstoken wat met slk_ begin"
+    }
+  },
+  "migration": {
+    "title": "Datamigrasie (PiMig)",
+    "intro": "Bereken die tabel-laaivolgorde uit die verhoudings in jou schema.pi-ontwerpmodel, organiseer brokgrootte, parallelisme en die oorskakel-kontrolelys, en genereer verifikasie-SQL wat jy self op bron en teiken uitvoer. Hierdie skerm beplan en kontroleer slegs — dit skuif nie data of lees kliënt-DB-rye nie.",
+    "needLink": "Kies eers 'n schema.pi-skakel hierbo. As jy geen het nie, registreer 'n token onder 'Koppel'.",
+    "loading": "Laai tans…",
+    "newPlan": "Nuwe migrasieplan",
+    "project": "Projek",
+    "projectPick": "Kies 'n projek",
+    "planNm": "Plannaam",
+    "planNmHint": "Verstek na die projeknaam",
+    "create": "Skep plan",
+    "creating": "Skep tans…",
+    "snapHint": "Die ontwerp op hierdie oomblik (tabel-, kolom- en verhoudingname) word as 'n momentopname gevries. Skep 'n nuwe plan wanneer die model verander.",
+    "plans": "Migrasieplanne",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "sts": {
+      "DRAFT": "Konsep",
+      "READY": "Gereed"
+    },
+    "del": "Vee uit",
+    "delConfirm": "Vee hierdie plan uit?",
+    "snapInfo": "Momentopname: {tables} tabelle · {rels} verhoudings",
+    "dropped": "({n} verhoudings sonder fisiese tabelle is uitgesluit van sortering)",
+    "chunkSize": "Brokkiegrootte (rye/toewysing)",
+    "parallel": "Parallelisme (tabelle tegelyk)",
+    "saveOpts": "Stoor opsies",
+    "optsHint": "Parallelisme is die aantal tabelle wat gelyktydig binne 'n vlak gelaai word. Brokkiegrootte is die toewysingseenheid (rye) wat die uitvoerenjin sal gebruik.",
+    "order": "Laaivolgorde",
+    "orderHint": "Topologies gesorteer volgens ontwerprelasies (nie fisiese FK's nie) sodat ouertabelle eerste kom. Tabelle in dieselfde vlak is nie van mekaar afhanklik nie en kan parallel laai.",
+    "cycles": "{n} sirkelgroep(e) — in dieselfde vlak geplaas. Stel hul volgorde handmatig en stel verwysingskontroles uit tot na laai.",
+    "selfRefs": "Selfverwysende (hiërargiese) tabelle — laai ouerrye eers binne die tabel",
+    "level": "Vlak {n}",
+    "checklist": "Oorskakeling kontrolelys",
+    "toReady": "Merk as gereed",
+    "toDraft": "Terug na konsep",
+    "readyNeedAll": "Kontroleer elke item voordat die plan as gereed gemerk word.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC-oorhandigingspunt",
+        "desc": "Teken 'n konsekwente bronpunt op voor die aanvanklike laai (PG LSN · Oracle/Tibero SCN · vir peiling, begintyd minus 'n oorvleuelvenster), begin CDC daarvandaan, en absorbeer duplikate in die oorhandigingsvenster met upserts."
+      },
+      "valueConv": {
+        "title": "Waarde-omskakeling",
+        "desc": "Reëls is ingestel vir leë string = NULL, CHAR leë opvulling, NUMBER sonder presisie → NUMERIC, DATE met tyd → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR lengte, en LONG·RAW."
+      },
+      "charset": {
+        "title": "Karakterstel",
+        "desc": "Bronkarakterstel (KO16MSWIN949, UTF8, …) is bevestig, met kolomme wat oorloop as gevolg van multibyte-groei en isolasie van onomskakelbare karakters wat besluit is."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB word in brokkies gestroom (grootte en geheuebeperkings) en geverifieer deur lengte + hash."
+      },
+      "seqResync": {
+        "title": "Volgorde-hersinkronisering",
+        "desc": "Na laai word teikenvolgordes·identiteite ingestel op maks(sleutel)+1."
+      },
+      "timezone": {
+        "title": "Tydsone · stelselkolomme",
+        "desc": "Die interpretasie-tydsone vir waardes sonder een (bv. Asia/Seoul) is ingestel, gewysigde-tyd-snellers sal nie brontydstempels tydens laai oorskryf nie, en skepper/wysiger-vervangingsreëls is ingestel."
+      },
+      "backpressure": {
+        "title": "Terugdruk · teikenlaai",
+        "desc": "Verminder brokkiegrootte en parallelisme op teikenagterstand, WAL-groei of slotwagte; bou nie-PK-indekse na laai en voer ANALYZE·VACUUM daarna uit."
+      }
+    },
+    "verify": "Verifikasie SQL",
+    "verifyHint": "Genereer telling, numeriese kolom som, duplikaat sleutel en sleutel hash navrae per tabel in laaivolgorde. Voer dit self op bron en teiken uit en vergelyk (hierdie skerm voer dit nie uit nie).",
+    "noHashOracle": "Oracle·Tibero hash-funksies en teksweergawe verskil van PostgreSQL, so hash-navrae word weggelaat — vergelyk tellings, somme en duplikaat sleutels.",
+    "copy": "Kopieer",
+    "copied": "Gekopieer",
+    "copyFail": "Kon nie kopieer nie. Kies die teks en kopieer dit handmatig.",
+    "engine": {
+      "title": "Uitvoering·herbegin · repetisie·terugrol",
+      "body": "Werklike migrasie-uitvoering (kontrolepunte, terugdruk, foutry-isolasie) en repetisie, terugrol en CDC-beginpuntopname sal kom nadat die werkeragent-sekuriteitsmodel (A10) gefinaliseer is. Vir nou dek dit beplanning, kontroles en verifikasie SQL."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Die schema.pi-skakel word voorberei. Probeer asseblief binnekort weer.",
+      "LINK_DOWN": "Kan nie schema.pi bereik nie. Probeer asseblief binnekort weer.",
+      "LINK_AUTH": "Die skakeltoken het verval of is herroep. Reik 'n nuwe token in schema.pi uit en registreer dit weer.",
+      "LINK_NOT_FOUND": "Skakel nie gevind nie. Kies asseblief die skakel weer.",
+      "LINK_SCOPE": "Hierdie projek behoort nie aan die skakel se taksonomie nie.",
+      "TIMEOUT": "Die versoek het 'n tydsbeperking oorskry. Probeer asseblief binnekort weer.",
+      "RATE": "Te veel versoeke. Probeer weer oor 'n minuut.",
+      "MIG_NO_TABLES": "Hierdie projek het geen fisiese tabelle om te migreer nie. Skakel eers om na fisies in schema.pi.",
+      "MIG_CHECK_INCOMPLETE": "Kontroleer elke item op die oorskakeling-kontrolelys voordat die plan as gereed gemerk word.",
+      "NOT_FOUND": "Plan nie gevind nie."
+    }
+  },
+  "monitor": {
+    "title": "Moniteringsentrum",
+    "collectNote": "Versameling loop in schema.pi — migrasie beplan (D7). Hierdie bladsy lees die schema.pi monitor opsomming.",
+    "noLink": "Kies of registreer eers 'n schema.pi-skakel.",
+    "goConnect": "Registreer 'n skakel",
+    "period": "Tydperk",
+    "periods": {
+      "30": "30 min",
+      "60": "1 uur",
+      "360": "6 uur",
+      "1440": "24 uur"
+    },
+    "refresh": "Verfris",
+    "loading": "Laai tans…",
+    "updatedAt": "{area} · vanaf {time} (outo-verfris elke 30s)",
+    "appTitle": "Toepassingprestasie",
+    "dbTitle": "DB-status per verbinding",
+    "urlTitle": "URL-kontroles",
+    "empty": "Geen data om te wys nie.",
+    "breachTitle": "{n} drempelbreuke",
+    "rulesTitle": "Drempelreëls",
+    "rulesNote": "Reëls word vir hierdie skakel gestoor en teen die ontvangde opsomming geëvalueer; oortredings kry 'n rooi rand (kennisgewings kom later).",
+    "metric": "Metriek",
+    "conn": "Verbinding",
+    "allConns": "Alle verbindings",
+    "op": "Vergelyk",
+    "threshold": "Drempel",
+    "thrInvalid": "Voer 'n nommer vir die drempel in.",
+    "addRule": "Voeg reël by",
+    "noRules": "Nog geen reëls nie.",
+    "enable": "Aktiveer",
+    "disable": "Deaktiveer",
+    "delete": "Vee uit",
+    "delConfirm": "Vee hierdie reël uit?",
+    "aiNote": "AI-insidentanalise en goedkeuring van oplossings vind steeds in die schema.pi-monitor plaas.",
+    "aiLink": "Maak schema.pi-monitor oop",
+    "metrics": {
+      "APP_TPS": "TPS (versoeke/s)",
+      "APP_ERR_PCT": "Foutkoers (%)",
+      "APP_SLOW_CNT": "Stadige versoeke",
+      "APP_AVG_MS": "Gemiddelde reaksie (ms)",
+      "DB_SESS_CNT": "Sessies",
+      "DB_LOCK_WAIT_CNT": "Slotwagte",
+      "DB_CACHE_HIT_PCT": "Kas-treffers (%)",
+      "DB_SIZE_MB": "DB-grootte (MB)",
+      "URL_RSP_MS": "URL-reaksie (ms)",
+      "URL_FAIL_CNT": "URL-mislukkings"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Kies eers 'n skakel.",
+      "NOT_IMPLEMENTED": "Die schema.pi-skakel word voorberei. Probeer asseblief later weer.",
+      "LINK_AUTH": "Die skakeltoken is ongeldig of het verval. Reik 'n nuwe token in schema.pi uit en registreer dit.",
+      "LINK_SCOPE": "Hierdie skakel kan nie toegang tot daardie taksonomie kry nie.",
+      "RATE": "Te veel versoeke. Probeer asseblief binnekort weer.",
+      "TIMEOUT": "schema.pi reageer stadig. Probeer asseblief binnekort weer.",
+      "RULE_LIMIT": "Tot 50 reëls per skakel.",
+      "NOT_FOUND": "Reël nie gevind nie."
+    }
+  },
+  "ops": {
+    "title": "DB-bedryfsveiligheid",
+    "loading": "Laai tans…",
+    "pickFirst": "Kies eers 'n skakel en verbinding hierbo",
+    "run": "Voer diagnose uit",
+    "running": "Diagnoseer tans…",
+    "noRun": "Nog geen diagnose nie. Druk \"Voer diagnose uit\"",
+    "lastRun": "Laaste diagnose {dtm}",
+    "readOnly": "Diagnose lees slegs (SELECT). Advies is 'n gids en hang af van bedienergeheue, laai en werklading",
+    "truncated": "Te veel objekte — slegs die eerste 500 is nagegaan",
+    "paramsNote": "Totale bedienergeheue is onbekend, dus word dit geskat uit shared_buffers ≈ 25% van RAM. random_page_cost aanvaar SSD",
+    "auditNote": "Tabelle met RLS af en ongebruikte rekeninge sal nagegaan word sodra die skakelnavraag dit ondersteun",
+    "replNote": "Basislyn is Aktief-Standby (A-S) — een primêre + standby. Herlaagvertraging ≥ 5s = waarskuwing, ≥ 60s = risiko (gemeet RPO-verwysing)",
+    "lagIdle": "Geen veranderinge",
+    "pager": "Paginering",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "tabs": {
+      "params": "Parameters",
+      "audit": "Rekeninge & voorregte",
+      "backup": "Rugsteun & herstel",
+      "repl": "Replikasie & DR",
+      "history": "Geskiedenis"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Waarskuwing",
+      "RISK": "Risiko"
+    },
+    "role": {
+      "primary": "Hierdie verbinding = Primêr",
+      "standby": "Hierdie verbinding = Standby",
+      "unknown": "Rol onbekend"
+    },
+    "col": {
+      "level": "Uitspraak",
+      "item": "Item",
+      "value": "Waarde",
+      "reason": "Besonderhede",
+      "standby": "Standby",
+      "state": "Toestand",
+      "sync": "Sinkroniseer",
+      "lag": "Herlaagvertraging"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLS rolle",
+      "bypass_ok": "BYPASSRLS rolle",
+      "no_expiry": "Wagwoordverval",
+      "expiry_ok": "Wagwoordverval",
+      "public_grant": "PUBLIC toekennings",
+      "public_ok": "PUBLIC toekennings",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Laaste geargiveerde WAL",
+      "arc_stale": "Laaste geargiveerde WAL",
+      "arc_recent": "Laaste geargiveerde WAL",
+      "arc_failing": "WAL-argivering misluk"
+    },
+    "rules": {
+      "sb_default": "Op die verstek (128MB). Op 'n toegewyde bediener word ongeveer 25% van RAM aanbeveel",
+      "sb_ok": "Bo die verstek gestel",
+      "wm_over": "max_connections × work_mem oorskry geskatte geheue. Gelyktydige sorteerwerk loop die risiko van buite-geheue",
+      "wm_default": "Op die verstek (4MB). Groot sorteerwerk en hashes kan na skyf oorloop",
+      "wm_ok": "Binne 'n redelike reeks",
+      "mwm_default": "Op die verstek (64MB). VACUUM en indeksbou kan stadig wees; oorweeg 256MB of meer",
+      "mwm_ok": "Bo die verstek gestel",
+      "av_on": "autovacuum is aan",
+      "av_off": "autovacuum is af. Hoë risiko van tabelopblaas en transaksie-ID-omwenteling",
+      "conn_high": "max_connections is hoog. Elke verbinding gebruik geheue; 'n poeler (PgBouncer ens.) word aanbeveel",
+      "conn_ok": "Binne 'n redelike reeks",
+      "lmd_off": "Stadige navraaglogboek is af (-1). Ongeveer 1000ms word aanbeveel",
+      "lmd_all": "Elke stelling word gelog (0). Swaar logboekoorhoofse koste",
+      "lmd_ok": "Stadige navraaglogboek is aan",
+      "st_off": "Geen bedienerwye stellingtydperk (0). Stel per rol of toepassing beperkings",
+      "st_ok": "'n Stellingtydperk is ingestel",
+      "iit_off": "Geen ledig-in-transaksie tydperk (0). Kan slotvasthouding en opblaas veroorsaak",
+      "iit_ok": "'n Ledig-in-transaksie tydperk is ingestel",
+      "ckpt_short": "Kontrolepuntinterval is 5 minute of minder. Oorweeg 10–15 minute vir skryf-swaar ladings",
+      "ckpt_ok": "Binne 'n redelike reeks",
+      "wal_minimal": "wal_level=minimal maak PITR en replikasie onmoontlik. Gebruik replika of hoër",
+      "wal_ok": "WAL-vlak ondersteun PITR en replikasie",
+      "rpc_hdd": "HDD-verstek (4). Vir SSD word 1.1–2 aanbeveel",
+      "rpc_ok": "Geskik vir SSD",
+      "super_many": "Twee of meer supergebruikers. Hou een vir administrasie en ken slegs nodige voorregte aan ander toe",
+      "super_ok": "Hoogstens een supergebruiker",
+      "bypass_rls": "Nie-supergebruikerrolle wat ryvlaksekuriteit omseil, bestaan",
+      "bypass_ok": "Geen RLS-omseilrolle nie",
+      "no_expiry": "Aanmeldrolle sonder 'n wagwoordverval. Stel VALID UNTIL vir persoonlike rekeninge",
+      "expiry_ok": "Alle aanmeldrolle het 'n vervaldatum",
+      "public_grant": "PUBLIC (elke rol) het tabelvoorregte. Skryfvoorregte is riskant",
+      "public_ok": "Geen tabelvoorregte aan PUBLIC toegestaan nie",
+      "arc_on": "WAL-argivering (archive_mode) is aan",
+      "arc_off": "WAL-argivering is af, dus is punt-in-tyd-herstel (PITR) onmoontlik",
+      "arc_cmd_empty": "archive_mode is aan, maar archive_command en archive_library is leeg",
+      "arc_never": "Geen WAL is nog geargiveer nie",
+      "arc_stale": "Die laaste WAL-argief is ouer as 24 uur",
+      "arc_recent": "WAL binne die laaste 24 uur geargiveer",
+      "arc_failing": "WAL-argivering misluk tans. Kontroleer skyf, toestemmings en teikenpad",
+      "repl_is_standby": "Hierdie verbinding is 'n standby (herstelmodus). Kontroleer vertraging vanaf die primêre verbinding",
+      "repl_none": "Geen standby gekoppel nie. Daar is geen rampherstel (DR) opstelling nie",
+      "repl_ok": "Standbys stroom normaalweg",
+      "repl_lag": "'n Standby is agter of stroom nie"
+    },
+    "manual": {
+      "title": "Handmatige kontrolelys",
+      "intro": "Rugsteun- en herstelpraktyke wat nie outomaties nagegaan kan word nie. Merk wanneer bevestig en let op die bewyse",
+      "memo": "Memo (bv. hulpmiddel, skedule, laaste nagegaan)",
+      "save": "Stoor",
+      "updated": "Opgedateer {dtm}",
+      "items": {
+        "base_backup": "'n Volledige rugsteun (pg_basebackup ens.) het binne die laaste 7 dae geslaag",
+        "offsite_copy": "'n Rugsteunkopie word buite die terrein gehou (ander streek of stoorplek)",
+        "restore_rehearsal": "'n Herstelrepetisie is hierdie kwartaal gedoen en die duur daarvan is aangeteken",
+        "pitr_target": "PITR-prosedure en teiken RPO/RTO is gedokumenteer",
+        "backup_encrypt": "Rugsteunlêers is geënkripteer en toegang is beperk",
+        "retention": "Rugsteunbewaringstydperk en skrapbeleid is gedefinieer"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Die schema.pi-skakel word voorberei. Probeer asseblief binnekort weer",
+      "CONN_UNSUPPORTED": "Hierdie verbinding word nog nie ondersteun nie (slegs direkte PostgreSQL)",
+      "TIMEOUT": "Die teiken-DB het te stadig gereageer. Probeer asseblief binnekort weer",
+      "RATE": "Te veel oproepe. Probeer weer oor 'n minuut",
+      "Q_UNKNOWN": "Onondersteunde navraag. Kontroleer die schema.pi-skakel API-weergawe",
+      "INVALID_INPUT": "Ongeldige skakel- of verbindingkeuse"
+    }
+  },
+  "perf": {
+    "title": "Prestasie",
+    "loading": "Laai tans…",
+    "pickFirst": "Kies eers 'n skakel en verbinding hierbo",
+    "pager": "Paginering",
+    "tabs": {
+      "collect": "Versamel",
+      "top": "Stadige navrae",
+      "health": "Tabel- en indeksgesondheid",
+      "trend": "Groottetendens",
+      "activity": "Aktiwiteit & slotte"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Die schema.pi-skakel word voorberei. Probeer asseblief later weer",
+      "CONN_UNSUPPORTED": "Hierdie verbinding word nog nie ondersteun nie (slegs direkte PostgreSQL-verbindings)",
+      "RATE": "Te veel versoeke. Probeer weer oor 'n minuut",
+      "LINK_AUTH": "Die skakeltoken het verval of is herroep. Registreer die token weer op die Koppel-bladsy",
+      "LINK_SCOPE": "Hierdie verbinding behoort nie aan die skakel se onderwerpgebied nie",
+      "Q_UNKNOWN": "Onondersteunde navraag. Kontroleer die schema.pi-skakel API-weergawe",
+      "INVALID_INPUT": "Die skakel- of verbindingswaarde is ongeldig"
+    },
+    "pgss": {
+      "title": "Hoe om pg_stat_statements te aktiveer",
+      "note": "Self-gehuisvesde PostgreSQL benodig ook pg_stat_statements in shared_preload_libraries (postgresql.conf) en 'n herbegin. Tabel-, indeks- en groottestatistieke werk daarsonder"
+    },
+    "collect": {
+      "intro": "Versamel lees nou top-navraagstatistieke, tabelle, indekse en groottes een keer en stoor dit as 'n momentopname. Versamel ten minste twee keer om veranderinge en groottetendense te sien",
+      "run": "Versamel nou",
+      "running": "Versamel tans…",
+      "done": "Versamel op {dtm} — {qry} navrae · {tbl} tabelle · {idx} indekse"
+    },
+    "top": {
+      "sort": "Sorteer",
+      "sortTotal": "Totale tyd",
+      "sortMean": "Gemiddelde tyd",
+      "sortCalls": "Oproepe",
+      "empty": "Nog geen momentopnames nie. Druk Versamel nou op die Versamel-oortjie",
+      "range": "Verandering tussen {from} → {to}",
+      "first": "Eerste momentopname op {dtm} — kumulatiewe waardes (veranderinge vanaf die volgende momentopname)",
+      "query": "Navraag (literale gemasker)",
+      "calls": "Oproepe",
+      "totalMs": "Totale ms",
+      "meanMs": "Gemiddelde ms",
+      "rows": "Rye",
+      "reset": " Statistiekterugstelling bespeur — getoon as kumulatief"
+    },
+    "health": {
+      "empty": "Nog geen momentopnames nie. Druk Versamel nou op die Versamel-oortjie",
+      "basis": "Gebaseer op momentopname by {dtm}",
+      "unusedIdx": "Ongebruikte indekse",
+      "unusedIdxHint": "Indekse wat nooit gebruik is sedert die laaste statistiekterugstelling nie (volgens grootte). Moenie PK- of unieke-beperking-indekse laat val nie",
+      "fullScan": "Oormatige volle skanderings",
+      "fullScanHint": "Tabelle met 1 000+ lewendige rye waar volle skanderings ten minste die helfte is — hersien indekse op filterkolomme",
+      "dead": "Oormatige dooie tuples",
+      "deadHint": "Dooie tuple-verhouding 20% of meer — kontroleer VACUUM- en outovacuum-instellings",
+      "none": "Geen",
+      "scans": "skanderings"
+    },
+    "trend": {
+      "limit": "Grootte drempel",
+      "empty": "Geen momentopnames in die laaste 30 dae nie",
+      "now": "Huidige grootte",
+      "perDay": "Groei per dag",
+      "needMore": "Benodig 2+ momentopnames",
+      "daysLeft": "Bereik {gb} GB",
+      "noGrowth": "Geen groeitendens",
+      "days": "oor ongeveer {n} dae"
+    },
+    "activity": {
+      "refresh": "Verfris",
+      "live": "Regstreekse navraag — nie gestoor nie",
+      "sessions": "Sessie-aktiwiteit",
+      "locks": "Slotte",
+      "none": "Geen"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pyplyne",
+    "intro": "Kontroleer of 'n bron-DB gereed is vir veranderingsdata-vaslegging (CDC) en ontwerp bron → transformeer → teikenpyplyne. Hierdie stadium kontroleer en ontwerp slegs; geen klantrydata word gelees of gestoor nie.",
+    "needLink": "Kies eers 'n schema.pi-skakel hierbo. As jy geen het nie, registreer 'n token in die 'Skakel'-kieslys.",
+    "needConn": "Kies die DB-verbinding om hierbo te kontroleer.",
+    "loading": "Laai tans…",
+    "pager": "Bladsye",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "runTitle": "Loop en monitor (7-3 · 7-4)",
+    "runBody": "Pyplynuitvoering, vertragingsmonitering en herverwerking sal beskikbaar wees sodra die werkeragent en sekuriteitsmodel gefinaliseer is. Vir nou, stoor definisies as konsepte (DRAFT).",
+    "pre": {
+      "title": "Bron-voorkontrole",
+      "intro": "Vir elke tabel word veranderingstydkolomme, sagte-verwyder-kolomme en die primêre sleutel gekontroleer om 'n vasleggingsmetode (adapter) aan te beveel, en WAL logiese replikasie-gereedheid word gekontroleer. Slegs leesalleen katalogus- en instellingsnavrae word uitgevoer.",
+      "schema": "Skema (opsioneel)",
+      "schemaPh": "Alles",
+      "run": "Voer voorkontrole uit",
+      "running": "Kontroleer tans…",
+      "sum": "{tables} tabelle · {noPk} sonder PK · {deleteUnseen} kan nie skrappings vaslê nie",
+      "truncated": "'n Katalogusnavraag het die 500-ry-limiet bereik, so sommige tabelle mag ontbreek. Spesifiseer 'n skema en kontroleer weer.",
+      "empty": "Geen tabelle om te kontroleer nie",
+      "colTable": "Tabel",
+      "colChg": "Veranderingstydkolom",
+      "colDel": "Sagte-verwyder-kolom",
+      "colAdapter": "Aanbevole metode · redes",
+      "toDraft": "Skep pyplynkonsep uit {n} geselekteerde"
+    },
+    "ready": {
+      "ok": "WAL logiese replikasie gereed — tabelle met 'n PK kan LOGICAL gebruik",
+      "no": "WAL logiese replikasie nie gereed nie — vaslegging via polling of sleutelvergelyking",
+      "senders": "{n} replikasieverbinding(s)"
+    },
+    "adapter": {
+      "LOGICAL": "Logiese replikasie (WAL)",
+      "POLL": "Veranderingstyd-polling",
+      "KEY_DIFF": "Sleutel-momentopname-verskil",
+      "NONE": "Slegs volle herlaai"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Het veranderingstydkolom",
+      "NO_CHG_COL": "Geen veranderingstydkolom",
+      "HAS_SOFT_DEL": "Het sagte-verwyder-kolom",
+      "NO_SOFT_DEL": "Geen sagte-verwyder-kolom",
+      "HAS_PK": "Het primêre sleutel",
+      "NO_PK": "Geen primêre sleutel nie — veranderde rye kan nie geïdentifiseer word nie",
+      "DELETE_UNSEEN": "Polling kan nie fisiese DELETEs vaslê nie (sagte-verwyder-kolom aanbeveel)",
+      "LOGICAL_NOT_READY": "Kan na LOGICAL oorskakel sodra WAL logiese replikasie gereed is",
+      "FULL_RELOAD_ONLY": "Geen PK of veranderingstydkolom nie, dus geen inkrementele vaslegging nie — voeg 'n PK by",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level is nie logical nie (verandering vereis 'n DB-herbegin)",
+      "NO_SLOTS": "max_replication_slots is 0",
+      "NO_SENDERS": "max_wal_senders is 0",
+      "IS_STANDBY": "Standby-bediener — neem logiese replikasie van die primêre",
+      "SETTINGS_UNKNOWN": "Kon nie instellings lees nie, gereedheid onbekend"
+    },
+    "ed": {
+      "title": "Pyplyn definisies",
+      "draftOnly": "Slegs ontwerp — gestoor as konsepte (DRAFT)",
+      "new": "Nuwe pyplyn",
+      "empty": "Geen gestoorde pyplyne nie",
+      "manual": "Handmatig",
+      "edit": "Wysig",
+      "remove": "Verwyder",
+      "removeConfirm": "Verwyder pyplyn '{name}'?",
+      "name": "Naam",
+      "adapter": "Vasleggingsmetode",
+      "srcConn": "Bronverbinding",
+      "useCurrentConn": "Gebruik die verbinding wat hierbo gekies is",
+      "sched": "Skedule (5-veld cron, leeg = handmatig)",
+      "target": "Teiken",
+      "targetPh": "bv. analise DB analytics.public / meer s3://…",
+      "tables": "Bron-tabelle (nuwe lyn of komma geskei)",
+      "steps": "Stappe (bron → transformeer → teiken)",
+      "op": "Operasie",
+      "notePh": "Beskrywing · toestand (opsioneel)",
+      "addTransform": "Voeg transformasie-stap by",
+      "save": "Stoor",
+      "saving": "Stoor tans…",
+      "saved": "Gestoor",
+      "close": "Sluit"
+    },
+    "kind": {
+      "SOURCE": "Bron",
+      "TRANSFORM": "Transformeer",
+      "TARGET": "Teiken"
+    },
+    "sts": {
+      "DRAFT": "Konsep"
+    },
+    "check": {
+      "NAME_REQUIRED": "Voer 'n naam in",
+      "CONN_REQUIRED": "Kies 'n bronverbinding",
+      "CRON_INVALID": "Voer die skedule in as 5-veld cron (min uur dag maand weekdag; syfers, *, ',', -, /)",
+      "OP_REQUIRED": "Voer 'n operasie vir elke stap in",
+      "STEPS_TOO_FEW": "Bron- en teikenstappe word vereis",
+      "STEPS_TOO_MANY": "Tot 20 stappe",
+      "STEP_FIRST_SOURCE": "Die eerste stap moet die bron wees",
+      "STEP_LAST_TARGET": "Die laaste stap moet die teiken wees",
+      "STEP_MIDDLE_TRANSFORM": "Slegs transformasie-stappe kan tussenin wees"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "'n Pyplyn met hierdie naam bestaan reeds. Gebruik 'n ander naam",
+      "CONN_UNSUPPORTED": "Hierdie verbinding kan nog nie gekontroleer word nie (slegs PostgreSQL direkte bedienerverbindings vir nou)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL-instellinglaboratorium",
+    "intro": "Kies 'n verbinding en voer SQL in om die uitvoeringsplan as 'n boom te sien, met vertragingsoorsake (volle skanderings, geneste lusse, groot sorteer) en SQL-anti-patrone wat teen schema.pi standaarddomeine gekontroleer word. Navrae word nooit werklik uitgevoer nie (geen ANALYZE).",
+    "needLink": "Kies eers 'n skakel en verbinding hierbo om planne te sien. Die anti-patroonkontrole werk sonder 'n skakel.",
+    "sqlLabel": "SQL ('n enkele SELECT- of WITH-stelling)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Wys plan",
+    "explaining": "Laai tans…",
+    "save": "Stoor plan",
+    "saving": "Stoor tans…",
+    "saveName": "Etiket (bv. voor die byvoeging van indeks)",
+    "saveNote": "Konstante waardes in die SQL- en planvoorwaardes word as ? gemasker wanneer dit gestoor word.",
+    "plan": {
+      "title": "Uitvoeringsplan",
+      "summary": "Totale koste {cost} · {ms}ms",
+      "cost": "koste",
+      "rows": "rye",
+      "width": "breedte"
+    },
+    "warn": {
+      "none": "Geen noemenswaardige waarskuwings nie.",
+      "SEQ_SCAN_LARGE": "Volle skandering op {relation} (ongeveer {rows} rye) — oorweeg 'n indeks op die filterkolomme.",
+      "NESTED_LOOP_HIGH": "Geneste lus produseer ongeveer {rows} rye — oorweeg 'n hash- of merge-join, of 'n indeks op die join-voorwaarde.",
+      "SORT_SPILL": "Sorteergrootte is ongeveer {kb}KB, bo die verstek work_mem (4MB); dit kan na skyf mors."
+    },
+    "lint": {
+      "run": "Kontroleer anti-patrone",
+      "title": "SQL anti-patroonkontrole",
+      "none": "Geen anti-patrone gevind nie.",
+      "domainsOff": "Standaarddomeine kon nie gelaai word nie; slegs met verstek kolom-agtervoegselreëls gekontroleer.",
+      "types": {
+        "num": "numeries",
+        "date": "datum",
+        "char": "karakter"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — kies slegs die kolomme wat jy benodig (ekstra I/O, geen bedekkende indeks).",
+        "FUNC_ON_COLUMN": "Die filterkolom {column} is in 'n funksie of uitdrukking toegedraai, so sy indeks kan nie gebruik word nie — transformeer eerder die konstante.",
+        "LEADING_WILDCARD": "LIKE met 'n leidende % kan nie 'n B-boomindeks gebruik nie — oorweeg 'n pg_trgm GIN-indeks.",
+        "OR_DIFF_COLUMNS": "Voorwaardes op verskillende kolomme word met OR gekombineer — oorweeg UNION ALL of per-kolom-indekse.",
+        "IMPLICIT_CAST": "{column} word vergelyk met 'n aangehaalde nommer — pas die kolom- en konstante tipes aan (implisiete omskakeling).",
+        "NOT_IN_SUBQUERY": "NOT IN (subnavraag) gee niks terug wanneer NULLs teenwoordig is en is stadig — gebruik NOT EXISTS.",
+        "NO_WHERE": "Geen WHERE-klousule nie — op 'n groot tabel is dit 'n volle skandering (voeg 'n voorwaarde of LIMIT by).",
+        "DOMAIN_MISMATCH": "{column} is 'n {expected} tipe volgens standaarddomein, maar word vergelyk met 'n konstante van 'n ander tipe — die implisiete omskakeling kan indeksgebruik voorkom."
+      }
+    },
+    "saved": {
+      "title": "Gestoorde planne · Vergelyk",
+      "empty": "Geen gestoorde planne nie. Bekyk 'n plan, stoor dit dan.",
+      "pick": "Kies plan om te vergelyk",
+      "pick2": "Kies twee planne om te vergelyk.",
+      "compare": "Vergelyk twee planne",
+      "delete": "Verwyder",
+      "cost": "koste",
+      "prev": "Vorige",
+      "next": "Volgende",
+      "page": "Bladsy {page}"
+    },
+    "diff": {
+      "cost": "Totale koste {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Die twee planne is vir verskillende SQL (na normalisering).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Geen verandering in plan-nodes nie.",
+      "before": "Voor",
+      "after": "Na"
+    },
+    "ai": {
+      "title": "AI-instellingadvies",
+      "badge": "Kom binnekort",
+      "body": "Kom binnekort (na goedkeuring en impakmetingsprosedures) — advies sal gegenereer word uit SQL met gemaskerde konstantes en slegs as toegepas aangeteken word na DA-goedkeuring en gemete impak."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Die schema.pi-skakelfunksie word voorberei. Probeer asseblief binnekort weer.",
+      "LINK_AUTH": "Die skakeltoken het verval of is herroep. Reik 'n nuwe token in schema.pi uit en registreer dit weer.",
+      "LINK_SCOPE": "Hierdie skakel kan nie daardie verbinding gebruik nie (verskillende klassifikasieskema).",
+      "CONN_UNSUPPORTED": "Hierdie verbindingstipe word nog nie ondersteun nie (slegs PostgreSQL-bedienerverbindings).",
+      "Q_UNKNOWN": "Onondersteunde navraag.",
+      "SQL_NOT_SELECT": "Planne is slegs beskikbaar vir 'n enkele stelling wat met SELECT of WITH begin.",
+      "TIMEOUT": "Die versoek het tyd uitgeloop (5 sekondes). Verkort die SQL of probeer later weer.",
+      "RATE": "Te veel versoeke. Probeer oor 'n minuut weer.",
+      "PAYLOAD_TOO_LARGE": "Die plan is te groot om te stoor.",
+      "LINK_NOT_FOUND": "Skakel nie gevind nie. Kies asseblief die skakel weer."
+    }
+  },
+  "nav": {
+    "label": "Funksies",
+    "connect": "Koppel",
+    "sqlLab": "SQL-instelling",
+    "perf": "Prestasie",
+    "monitor": "Monitering",
+    "drift": "Afwyking",
+    "migration": "Migrasie",
+    "pipeline": "Pyplyn",
+    "analytics": "Analise",
+    "ops": "Bedryfsveiligheid",
+    "learn": "Leer"
   }
 }

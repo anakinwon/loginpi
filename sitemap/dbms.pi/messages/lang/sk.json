@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Pracovná aplikácia DBA a SQLP na rýchle a bezpečné spúšťanie DB enginov"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Zabezpečte, aby váš DB engine spracovával dáta rýchlo a bezpečne",
+    "description": "Pracovná aplikácia DBA a SQLP pre plány vykonávania, štatistiky a výkon. schema.pi sa stará o dizajn a štandardy; dbms.pi je jej partnerom na strane enginu.",
+    "welcome": "Vitajte, {name}.",
+    "featTitle": "Funkcie",
+    "featDesc": {
+      "connect": "Zaregistrujte token prepojenia schema.pi a skontrolujte stav pripojenia",
+      "sqlLab": "Strom plánu, varovania, porovnanie a kontroly anti-vzoru voči štandardným doménam",
+      "perf": "Pomalé dotazy Top-N, stav tabuliek/indexov, predpoveď kapacity, aktivita a zámky",
+      "monitor": "Súhrn metrík aplikácie, DB a URL s upozorneniami na prahové hodnoty",
+      "drift": "Porovnajte model schema.pi a históriu DDL so skutočným katalógom, zmerajte efekt indexu",
+      "migration": "Topologické poradie načítania, bloky, kontrolný zoznam a overovací SQL",
+      "pipeline": "Predbežná kontrola zachytávania zmien a definície pipeline zdroj→transformácia→cieľ",
+      "analytics": "KPI dashboard, 3-vrstvové mapovanie jazera a katalóg datasetov",
+      "ops": "Diagnostika parametrov, rolí, zálohovania a replikácie DR len na čítanie",
+      "learn": "Cvičné otázky SQLP/DAP, prípady ladenia a porovnávací slovník DBMS"
+    }
+  },
   "auth": {
     "checking": "Kontrolujem prihlásenie…",
     "signedIn": "{name}",
@@ -64,5 +87,831 @@
     "LINK_CODE_GEN_FAILED": "Nepodarilo sa vytvoriť prepojovací kód. Skúste to znova neskôr.",
     "AUTH_DB_UNAVAILABLE": "Nepodarilo sa uložiť váš účet, takže prihlásenie zlyhalo. Skúste to znova neskôr.",
     "LINK_TRY_LIMIT": "Príliš veľa nesprávnych prepojovacích kódov. Skúste to znova o 15 minút."
+  },
+  "analytics": {
+    "title": "Analytika a jazero",
+    "intro": "KPI aktivity dbms, trojvrstvový dizajn jazera a katalóg datasetov na jednom mieste.",
+    "storageNotice": "Úložisko jazera (na strane zákazníka alebo v cloude) ešte nie je rozhodnuté (PRD sekcia 10 #7). Zatiaľ sa ukladajú len návrhy a mapovania názvov – žiadne riadkové dáta.",
+    "noLink": "Najprv vyberte alebo zaregistrujte prepojenie schema.pi.",
+    "goConnect": "Zaregistrovať prepojenie",
+    "loading": "Načítava sa…",
+    "refresh": "Obnoviť",
+    "kpi": {
+      "title": "KPI dashboard",
+      "updatedAt": "{area} · k {time}",
+      "notBuilt": "Nevytvorené",
+      "keys": {
+        "links": "Moje prepojenia",
+        "perf": "Snímky výkonu",
+        "drift": "Spustenia driftu",
+        "mig": "Plány migrácie",
+        "pipe": "Pipeline",
+        "lake": "Datasety jazera"
+      },
+      "countsChart": "Celkové počty podľa funkcie",
+      "trendTitle": "Snímky výkonu za posledných 14 dní",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "Žiadne snímky výkonu za posledných 14 dní.",
+      "monTitle": "Súhrn monitora schema.pi (posledná hodina)",
+      "monTps": "Požiadavky/s",
+      "monErr": "Chybovosť",
+      "monAvg": "Priemerná odozva (ms)",
+      "monDb": "DB pripojenia",
+      "monFail": "Nepodarilo sa načítať súhrn monitora: {msg}"
+    },
+    "lake": {
+      "title": "Trojvrstvový dizajn jazera",
+      "raw": "Raw",
+      "rawDesc": "Načíta názvy a typy stĺpcov zdrojovej DB tak, ako sú.",
+      "std": "Štandardizované",
+      "stdDesc": "Premenuje stĺpce na štandardné termíny schválené schema.pi.",
+      "cur": "Kurátorované",
+      "curDesc": "Analytické datasety zoskupené podľa entity.",
+      "loadProjects": "Načítať projekty",
+      "project": "Projekt",
+      "pickProject": "Vyberte projekt",
+      "noProjects": "V tejto oblasti nie sú žiadne projekty.",
+      "noTables": "Model tohto projektu nemá žiadne tabuľky.",
+      "conform": "Štandardná zhoda {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} stĺpcov · {pct}% zhodných",
+      "colSrc": "Zdrojový stĺpec",
+      "colStd": "Štandardizovaný stĺpec",
+      "colType": "Typ",
+      "colOk": "Formát",
+      "ok": "OK",
+      "ng": "Skontrolovať",
+      "pk": "PK",
+      "selectAll": "Vybrať všetko",
+      "selected": "Vybraných {cnt}",
+      "save": "Pridať do návrhu jazera",
+      "saved": "Pridaných {cnt} do katalógu."
+    },
+    "catalog": {
+      "title": "Katalóg datasetov",
+      "schemaCard": "schema.pi je zdrojom pravdy pre definície analytických datasetov, vyhľadávanie metadát a glosár. Tu vidíte len stav načítania jazera a aktuálnosť.",
+      "openSchema": "Zobraziť definície v schema.pi",
+      "empty": "Do návrhu jazera zatiaľ neboli pridané žiadne tabuľky.",
+      "status": {
+        "DSGN": "Len návrh",
+        "LOADED": "Načítané",
+        "FAIL": "Načítanie zlyhalo"
+      },
+      "lastLoad": "Posledné načítanie {time}",
+      "neverLoaded": "Nikdy nenačítané",
+      "remove": "Odstrániť",
+      "removeConfirm": "Odstrániť {tbl} z katalógu?",
+      "prev": "Predchádzajúce",
+      "next": "Ďalšie",
+      "page": "Strana {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Najprv vyberte prepojenie.",
+      "NOT_FOUND": "Nenájdené. Skontrolujte, či sa model nezmenil."
+    }
+  },
+  "drift": {
+    "title": "Model ↔ DB Drift",
+    "intro": "Porovnajte návrhový model schema.pi a históriu aplikácie DDL so živým katalógom DB, aby ste našli odchýlky a zmerali, či sa navrhnuté indexy skutočne používajú. Riadkové dáta zákazníka sa nikdy nečítajú ani neukladajú.",
+    "needLink": "Najprv si vyberte prepojenie schema.pi vyššie. Ak žiadne nemáte, zaregistrujte token v menu 'Prepojenie'.",
+    "needConn": "Vyberte DB pripojenie na porovnanie vyššie.",
+    "project": "Projekt",
+    "projectPick": "Vybrať projekt",
+    "loading": "Načítava sa…",
+    "run": "Spustiť detekciu driftu",
+    "running": "Porovnáva sa…",
+    "readOnly": "Spúšťajú sa len dotazy na katalóg a štatistiky len na čítanie.",
+    "applyInSchema": "Aplikujte opravy (úpravy modelu, generovanie a vykonávanie DDL) v schema.pi, zdroji pravdy.",
+    "history": "História detekcie",
+    "prev": "Predchádzajúce",
+    "next": "Ďalšie",
+    "none": "Žiadne",
+    "model": "Model",
+    "reqNo": "Požiadavka {id}",
+    "notSaved": "Nepodarilo sa uložiť toto spustenie do histórie (výsledky sa zobrazujú normálne).",
+    "capped": "Príliš veľa položiek – zobrazuje sa prvých {cap} pre každú sekciu (počty sú kompletné).",
+    "statsMissing": "Štatistiky používania indexu neboli k dispozícii, takže použitie nebolo možné posúdiť.",
+    "sum": {
+      "missingTables": "Tabuľky chýbajúce v DB",
+      "extraTables": "Tabuľky, ktoré nie sú v modeli",
+      "colMismatches": "Nezhody stĺpcov",
+      "missingIndexes": "Navrhnuté indexy chýbajúce v DB",
+      "extraIndexes": "Indexy, ktoré nie sú v modeli",
+      "ddlMissing": "Objekty zmizli po aplikácii",
+      "unusedIndexes": "Nepoužité navrhnuté indexy"
+    },
+    "sec": {
+      "ddlMissing": "DDL aplikované, ale chýbajúce v DB",
+      "missingTables": "Tabuľky v modeli, ale chýbajúce v DB",
+      "extraTables": "Tabuľky v DB, ale nie v modeli",
+      "colMismatches": "Nezhody typu stĺpca / NULL",
+      "missingIndexes": "Navrhnuté indexy chýbajúce v DB",
+      "extraIndexes": "Indexy len v DB (okrem PK)",
+      "idxUsage": "Efektívnosť navrhnutého indexu"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi zaznamenal tieto objekty ako aplikované, ale zmizli – podozrenie na manuálne odstránenie alebo vrátenie.",
+      "extraTables": "Môžu patriť k iným projektom alebo systémovým tabuľkám na tomto pripojení.",
+      "idxUsage": "Nulové skenovanie od posledného resetu štatistík znamená nepoužité. Pred odstránením skontrolujte okno štatistík."
+    },
+    "kind": {
+      "MISSING": "chýba v DB",
+      "EXTRA": "nie je v modeli",
+      "TYPE": "typ sa líši",
+      "NULL": "nullabilita sa líši"
+    },
+    "col": {
+      "idx": "Index",
+      "scans": "Skenovania",
+      "size": "Veľkosť",
+      "status": "Rozsudok"
+    },
+    "usage": {
+      "USED": "Používané",
+      "UNUSED": "Nepoužitý navrhnutý index",
+      "NO_STATS": "Žiadne štatistiky"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Prepojenie schema.pi ešte nie je pripravené. Skúste to znova o chvíľu.",
+      "LINK_DOWN": "Nedá sa dosiahnuť schema.pi. Skúste to znova o chvíľu.",
+      "LINK_AUTH": "Token prepojenia vypršal alebo bol zrušený. Vydajte nový token v schema.pi a zaregistrujte ho znova.",
+      "LINK_NOT_FOUND": "Prepojenie nenájdené. Vyberte prepojenie znova.",
+      "LINK_SCOPE": "Toto pripojenie nepatrí do taxonómie prepojenia.",
+      "CONN_UNSUPPORTED": "Nepodporované pripojenie (zatiaľ len pripojenia k serveru PostgreSQL).",
+      "TIMEOUT": "Požiadavka vypršala. Skúste to znova o chvíľu.",
+      "RATE": "Príliš veľa požiadaviek. Skúste to znova o minútu."
+    }
+  },
+  "learn": {
+    "title": "Učenie DBA",
+    "intro": "Cvičné otázky SQLP/DAP, príručka prípadov ladenia a porovnávací slovník Oracle/Tibero/PostgreSQL. Funguje bez prepojenia; vyberte prepojenie, aby ste videli aj mapovanie štandardných typov schema.pi.",
+    "loading": "Načítava sa…",
+    "tabs": {
+      "quiz": "Cvičenie",
+      "cases": "Prípady ladenia",
+      "dict": "Slovník DBMS"
+    },
+    "topics": {
+      "INDEX": "Skenovanie indexov",
+      "JOIN": "Metódy spojenia",
+      "PARTITION": "Prerezávanie partícií",
+      "NORMAL": "Normalizácia",
+      "NAMING": "Štandardné pomenovanie",
+      "ISOLATION": "Úrovne izolácie",
+      "LOCK": "Zámky"
+    },
+    "levels": {
+      "1": "Základné",
+      "2": "Stredne pokročilé",
+      "3": "Pokročilé"
+    },
+    "quiz": {
+      "score": "Môj pokrok",
+      "scoreLine": "{solved} z {total} vyriešených · {correct} správnych",
+      "right": "Správne",
+      "wrong": "Nesprávne",
+      "retry": "Skúsiť znova",
+      "prevRight": "Predtým správne",
+      "prevWrong": "Predtým nesprávne"
+    },
+    "cases": {
+      "notice": "Všetky prípady sú vlastnoručne napísané príklady učenia; čísla sú ilustratívne (žiadne zákaznícke dáta).",
+      "problem": "Problémový SQL",
+      "plan": "Súhrn plánu",
+      "cause": "Príčina",
+      "fix": "Opravený SQL",
+      "effect": "Efekt"
+    },
+    "cats": {
+      "ALL": "Všetky",
+      "TYPE": "Dátové typy",
+      "FUNC": "Funkcie",
+      "PAGING": "Stránkovanie",
+      "SEQ": "Sekvencie",
+      "DATE": "Dátumy",
+      "SYNTAX": "Syntax"
+    },
+    "dict": {
+      "search": "Hľadať (napr. NVL, LIMIT)",
+      "item": "Položka",
+      "note": "Poznámka",
+      "empty": "Žiadne zodpovedajúce položky",
+      "loading": "Načítava sa…",
+      "liveTitle": "Štandardné mapovanie typov mojej predmetnej oblasti",
+      "liveIntro": "Vyberte prepojenie na načítanie profilu DBMS schema.pi (logický → fyzický typ). Slovník vyššie funguje aj bez prepojenia.",
+      "liveLoad": "Načítať mapovanie typov",
+      "lgcType": "Logický typ"
+    }
+  },
+  "link2": {
+    "title": "schema.pi pripojenie",
+    "intro": "Zaregistrujte token pripojenia, aby ste mohli používať DB pripojenia predmetnej oblasti schema.pi v dbms.pi. Tokeny sú uložené šifrovane a žiadne riadkové dáta z vašich databáz sa neukladajú.",
+    "howTitle": "Ako vydať token pripojenia",
+    "how1": "Prihláste sa do schema.pi a otvorte predmetnú oblasť, ktorú chcete pripojiť",
+    "how2": "Prejdite na Predmetná oblasť → Nastavenia → Token pripojenia a stlačte 'Vydať token' (rola správcu oblasti alebo DA)",
+    "how3": "Skopírujte token začínajúci na slk_ — zobrazí sa len raz pri vydaní",
+    "how4": "Vložte ho nižšie a zaregistrujte",
+    "openSchema": "Otvoriť schema.pi",
+    "registerTitle": "Zaregistrovať pripojenie",
+    "tokenLabel": "Token pripojenia",
+    "tokenPlaceholder": "slk_…",
+    "register": "Zaregistrovať",
+    "registering": "Kontroluje sa…",
+    "registered": "Predmetná oblasť '{area}' je teraz pripojená",
+    "replaced": "Nahradený token predmetnej oblasti '{area}'",
+    "myLinks": "Moje pripojenia",
+    "empty": "Žiadne zaregistrované pripojenia",
+    "loading": "Načítava sa…",
+    "regDtm": "Zaregistrované {dtm}",
+    "remove": "Odpojiť",
+    "removeConfirm": "Odpojiť '{area}'? Obrazovky používajúce toto pripojenie k nemu už nebudú mať prístup.",
+    "prev": "Predchádzajúce",
+    "next": "Ďalšie",
+    "statusTitle": "Stav pripojenia",
+    "noConns": "V tejto predmetnej oblasti nie sú žiadne DB pripojenia (pridajte jedno v schema.pi)",
+    "colConn": "Pripojenie",
+    "colDbms": "DBMS",
+    "colMthd": "Metóda",
+    "colHost": "Hostiteľ",
+    "colTest": "Posledný test",
+    "colAgent": "Agent naposledy videný",
+    "never": "Žiadne",
+    "retry": "Skúsiť znova",
+    "pickerLink": "Prepojenie",
+    "pickerConn": "Pripojenie",
+    "pickerEmpty": "Žiadne pripojenia —",
+    "pickerGo": "zaregistrujte jedno na /connect",
+    "errors": {
+      "LINK_AUTH": "Token pripojenia vypršal alebo bol zrušený. Vydajte nový token v schema.pi a zaregistrujte ho znova",
+      "LINK_SCOPE": "Toto pripojenie nepatrí do prepojenej predmetnej oblasti",
+      "LINK_DOWN": "Nedá sa dosiahnuť schema.pi. Skúste to znova o chvíľu",
+      "LINK_NOT_FOUND": "Pripojenie nenájdené",
+      "LINK_DUP": "Registrácia už prebieha. Skúste to znova",
+      "CONN_UNSUPPORTED": "Nepodporované pripojenie (zatiaľ len pripojenia k serveru PostgreSQL)",
+      "Q_UNKNOWN": "Neznámy dotaz",
+      "SQL_NOT_SELECT": "Môže byť spustený len jeden príkaz SELECT (alebo WITH)",
+      "PGSS_MISSING": "Rozšírenie pg_stat_statements nie je nainštalované na cieľovej DB",
+      "TIMEOUT": "Požiadavka vypršala",
+      "RATE": "Príliš veľa požiadaviek. Skúste to znova o minútu",
+      "INVALID_INPUT": "Vložte celý token pripojenia začínajúci na slk_"
+    }
+  },
+  "migration": {
+    "title": "Migrácia dát (PiMig)",
+    "intro": "Vypočíta poradie načítania tabuliek z vzťahov vo vašom návrhovom modeli schema.pi, organizuje veľkosť blokov, paralelizmus a kontrolný zoznam prechodu, a generuje overovací SQL, ktorý sami spustíte na zdroji a cieli. Táto obrazovka len plánuje a kontroluje – nepresúva dáta ani nečíta riadky DB zákazníka.",
+    "needLink": "Najprv si vyberte prepojenie schema.pi vyššie. Ak žiadne nemáte, zaregistrujte token v menu 'Pripojiť'.",
+    "loading": "Načítava sa…",
+    "newPlan": "Nový plán migrácie",
+    "project": "Projekt",
+    "projectPick": "Vybrať projekt",
+    "planNm": "Názov plánu",
+    "planNmHint": "Predvolene názov projektu",
+    "create": "Vytvoriť plán",
+    "creating": "Vytvára sa…",
+    "snapHint": "Návrh v tomto momente (názvy tabuliek, stĺpcov a vzťahov) je zmrazený ako snímka. Vytvorte nový plán, keď sa model zmení.",
+    "plans": "Plány migrácie",
+    "prev": "Predchádzajúce",
+    "next": "Ďalšie",
+    "sts": {
+      "DRAFT": "Návrh",
+      "READY": "Pripravené"
+    },
+    "del": "Odstrániť",
+    "delConfirm": "Odstrániť tento plán?",
+    "snapInfo": "Snímka: {tables} tabuliek · {rels} vzťahov",
+    "dropped": "({n} vzťahov bez fyzických tabuliek je vylúčených z usporiadania)",
+    "chunkSize": "Veľkosť bloku (riadky/commit)",
+    "parallel": "Paralelizmus (tabuľky naraz)",
+    "saveOpts": "Uložiť možnosti",
+    "optsHint": "Paralelizmus je počet tabuliek načítaných súčasne v rámci úrovne. Veľkosť bloku je jednotka commitu (riadky), ktorú použije vykonávací engine.",
+    "order": "Poradie načítania",
+    "orderHint": "Topologicky zoradené podľa návrhových vzťahov (nie fyzických FK), takže rodičovské tabuľky sú prvé. Tabuľky na rovnakej úrovni od seba nezávisia a môžu sa načítavať paralelne.",
+    "cycles": "{n} cyklická skupina(y) — umiestnené na rovnakej úrovni. Nastavte ich poradie manuálne a odložte kontroly referencií až po načítaní.",
+    "selfRefs": "Samo-referenčné (hierarchické) tabuľky — najprv načítajte rodičovské riadky v rámci tabuľky",
+    "level": "Úroveň {n}",
+    "checklist": "Kontrolný zoznam pre prechod",
+    "toReady": "Označiť ako pripravené",
+    "toDraft": "Späť na návrh",
+    "readyNeedAll": "Pred označením plánu ako pripraveného skontrolujte každú položku.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "Bod odovzdania CDC",
+        "desc": "Zaznamenajte konzistentný zdrojový bod pred počiatočným načítaním (PG LSN · Oracle/Tibero SCN · pre polling, čas začiatku mínus prekrývajúce sa okno), spustite z neho CDC a absorbujte duplikáty v okne odovzdania pomocou upsertov."
+      },
+      "valueConv": {
+        "title": "Konverzia hodnôt",
+        "desc": "Pravidlá sú nastavené pre prázdny reťazec = NULL, dopĺňanie medzier CHAR, NUMBER bez presnosti → NUMERIC, DATE s časom → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR dĺžka a LONG·RAW."
+      },
+      "charset": {
+        "title": "Znaková sada",
+        "desc": "Potvrdená je zdrojová znaková sada (KO16MSWIN949, UTF8, …), s rozhodnutím o stĺpcoch, ktoré pretekajú v dôsledku nárastu viacerých bajtov a izolácie nekonvertovateľných znakov."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB sú streamované v blokoch (limity veľkosti a pamäte) a overené dĺžkou + hash."
+      },
+      "seqResync": {
+        "title": "Resynchronizácia sekvencie",
+        "desc": "Po načítaní sú cieľové sekvencie·identity nastavené na max(kľúč)+1."
+      },
+      "timezone": {
+        "title": "Časové pásmo · systémové stĺpce",
+        "desc": "Nastaví sa interpretačné časové pásmo pre hodnoty bez neho (napr. Asia/Soul), spúšťače času úpravy neprepíšu zdrojové časové pečiatky počas načítania a nastavia sa pravidlá nahradenia tvorcu/modifikátora."
+      },
+      "backpressure": {
+        "title": "Spätný tlak · cieľové zaťaženie",
+        "desc": "Znížte veľkosť bloku a paralelizmus pri oneskorení cieľa, raste WAL alebo čakaní na zámok; po načítaní vytvorte ne-PK indexy a potom spustite ANALYZE·VACUUM."
+      }
+    },
+    "verify": "Overovací SQL",
+    "verifyHint": "Generuje dotazy na počet, súčet numerických stĺpcov, duplicitné kľúče a hash kľúčov pre každú tabuľku v poradí načítania. Spustite ich sami na zdroji a cieli a porovnajte (táto obrazovka ich nespúšťa).",
+    "noHashOracle": "Hashovacie funkcie a vykresľovanie textu Oracle·Tibero sa líšia od PostgreSQL, takže hashovacie dotazy sú vynechané — porovnajte počty, súčty a duplicitné kľúče.",
+    "copy": "Kopírovať",
+    "copied": "Skopírované",
+    "copyFail": "Nepodarilo sa skopírovať. Vyberte text a skopírujte ho manuálne.",
+    "engine": {
+      "title": "Vykonanie·reštart · skúška·vrátenie",
+      "body": "Skutočné vykonanie migrácie (kontrolné body, spätný tlak, izolácia chybových riadkov) a skúška, vrátenie a zaznamenávanie počiatočného bodu CDC budú k dispozícii po dokončení bezpečnostného modelu agenta pracovníka (A10). Zatiaľ to pokrýva plánovanie, kontroly a overovací SQL."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Odkaz schema.pi sa pripravuje. Skúste to znova o chvíľu.",
+      "LINK_DOWN": "Nedá sa dosiahnuť schema.pi. Skúste to znova o chvíľu.",
+      "LINK_AUTH": "Token odkazu vypršal alebo bol zrušený. Vydajte nový token v schema.pi a znova ho zaregistrujte.",
+      "LINK_NOT_FOUND": "Odkaz sa nenašiel. Vyberte odkaz znova.",
+      "LINK_SCOPE": "Tento projekt nepatrí do taxonómie odkazu.",
+      "TIMEOUT": "Požiadavka vypršala. Skúste to znova o chvíľu.",
+      "RATE": "Príliš veľa požiadaviek. Skúste to znova o minútu.",
+      "MIG_NO_TABLES": "Tento projekt nemá žiadne fyzické tabuľky na migráciu. Najprv ich konvertujte na fyzické v schema.pi.",
+      "MIG_CHECK_INCOMPLETE": "Pred označením plánu ako pripraveného skontrolujte každú položku kontrolného zoznamu pre prechod.",
+      "NOT_FOUND": "Plán sa nenašiel."
+    }
+  },
+  "monitor": {
+    "title": "Monitorovacie centrum",
+    "collectNote": "Zber prebieha v schema.pi — migrácia je naplánovaná (D7). Táto stránka číta súhrn monitora schema.pi.",
+    "noLink": "Najprv vyberte alebo zaregistrujte odkaz schema.pi.",
+    "goConnect": "Zaregistrovať odkaz",
+    "period": "Obdobie",
+    "periods": {
+      "30": "30 min",
+      "60": "1 hodina",
+      "360": "6 hodín",
+      "1440": "24 hodín"
+    },
+    "refresh": "Obnoviť",
+    "loading": "Načítava sa…",
+    "updatedAt": "{area} · k {time} (automatické obnovenie každých 30s)",
+    "appTitle": "Výkon aplikácie",
+    "dbTitle": "Stav DB podľa pripojenia",
+    "urlTitle": "Kontroly URL",
+    "empty": "Žiadne údaje na zobrazenie.",
+    "breachTitle": "{n} prekročení prahu",
+    "rulesTitle": "Prahové pravidlá",
+    "rulesNote": "Pravidlá sú uložené pre tento odkaz a vyhodnocujú sa oproti prijatému súhrnu; prekročenia dostanú červený okraj (oznámenia prídu neskôr).",
+    "metric": "Metrika",
+    "conn": "Pripojenie",
+    "allConns": "Všetky pripojenia",
+    "op": "Porovnať",
+    "threshold": "Prahová hodnota",
+    "thrInvalid": "Zadajte číslo pre prahovú hodnotu.",
+    "addRule": "Pridať pravidlo",
+    "noRules": "Zatiaľ žiadne pravidlá.",
+    "enable": "Povoliť",
+    "disable": "Zakázať",
+    "delete": "Odstrániť",
+    "delConfirm": "Odstrániť toto pravidlo?",
+    "aiNote": "Analýza incidentov AI a schvaľovanie opráv sa stále vykonávajú v monitore schema.pi.",
+    "aiLink": "Otvoriť monitor schema.pi",
+    "metrics": {
+      "APP_TPS": "TPS (požiadavky/s)",
+      "APP_ERR_PCT": "Chybovosť (%)",
+      "APP_SLOW_CNT": "Pomalé požiadavky",
+      "APP_AVG_MS": "Priemerná odozva (ms)",
+      "DB_SESS_CNT": "Relácie",
+      "DB_LOCK_WAIT_CNT": "Čakania na zámok",
+      "DB_CACHE_HIT_PCT": "Úspešnosť vyrovnávacej pamäte (%)",
+      "DB_SIZE_MB": "Veľkosť DB (MB)",
+      "URL_RSP_MS": "Odozva URL (ms)",
+      "URL_FAIL_CNT": "Zlyhania URL"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Najprv vyberte odkaz.",
+      "NOT_IMPLEMENTED": "Odkaz schema.pi sa pripravuje. Skúste to znova neskôr.",
+      "LINK_AUTH": "Token odkazu je neplatný alebo vypršal. Vydajte nový token v schema.pi a zaregistrujte ho.",
+      "LINK_SCOPE": "Tento odkaz nemá prístup k danej taxonómii.",
+      "RATE": "Príliš veľa požiadaviek. Skúste to znova o chvíľu.",
+      "TIMEOUT": "schema.pi reaguje pomaly. Skúste to znova o chvíľu.",
+      "RULE_LIMIT": "Maximálne 50 pravidiel na odkaz.",
+      "NOT_FOUND": "Pravidlo sa nenašlo."
+    }
+  },
+  "ops": {
+    "title": "Bezpečnosť DB operácií",
+    "loading": "Načítava sa…",
+    "pickFirst": "Najprv vyberte odkaz a pripojenie vyššie",
+    "run": "Spustiť diagnostiku",
+    "running": "Diagnostikuje sa…",
+    "noRun": "Zatiaľ žiadna diagnostika. Stlačte „Spustiť diagnostiku“",
+    "lastRun": "Posledná diagnostika {dtm}",
+    "readOnly": "Diagnostika len číta (SELECT). Rada je len usmernením a závisí od pamäte servera, zaťaženia a pracovného zaťaženia",
+    "truncated": "Príliš veľa objektov — skontrolovaných bolo len prvých 500",
+    "paramsNote": "Celková pamäť servera je neznáma, takže sa odhaduje z shared_buffers ≈ 25% RAM. random_page_cost predpokladá SSD",
+    "auditNote": "Tabuľky s vypnutým RLS a nepoužívané účty budú skontrolované, keď ich podpora dotazov odkazu bude podporovať",
+    "replNote": "Základom je Active-Standby (A-S) — jeden primárny + pohotovostný. Oneskorenie prehrávania ≥ 5s = varovanie, ≥ 60s = riziko (meraná referencia RPO)",
+    "lagIdle": "Žiadne zmeny",
+    "pager": "Stránkovanie",
+    "prev": "Predchádzajúce",
+    "next": "Ďalšie",
+    "tabs": {
+      "params": "Parametre",
+      "audit": "Účty a oprávnenia",
+      "backup": "Zálohovanie a obnova",
+      "repl": "Replikácia a DR",
+      "history": "História"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Upozornenie",
+      "RISK": "Riziko"
+    },
+    "role": {
+      "primary": "Toto pripojenie = Primárne",
+      "standby": "Toto pripojenie = Pohotovostné",
+      "unknown": "Rola neznáma"
+    },
+    "col": {
+      "level": "Verdikt",
+      "item": "Položka",
+      "value": "Hodnota",
+      "reason": "Podrobnosti",
+      "standby": "Pohotovostné",
+      "state": "Stav",
+      "sync": "Synchronizácia",
+      "lag": "Oneskorenie prehrávania"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "Roly BYPASSRLS",
+      "bypass_ok": "Roly BYPASSRLS",
+      "no_expiry": "Platnosť hesla",
+      "expiry_ok": "Platnosť hesla",
+      "public_grant": "PUBLIC oprávnenia",
+      "public_ok": "PUBLIC oprávnenia",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Posledný archivovaný WAL",
+      "arc_stale": "Posledný archivovaný WAL",
+      "arc_recent": "Posledný archivovaný WAL",
+      "arc_failing": "Zlyhanie archivácie WAL"
+    },
+    "rules": {
+      "sb_default": "Na predvolenej hodnote (128 MB). Na vyhradenom serveri sa odporúča približne 25 % RAM",
+      "sb_ok": "Nastavené nad predvolenou hodnotou",
+      "wm_over": "max_connections × work_mem prekračuje odhadovanú pamäť. Súbežné triedenia riskujú nedostatok pamäte",
+      "wm_default": "Na predvolenej hodnote (4 MB). Veľké triedenia a hashovania sa môžu preliať na disk",
+      "wm_ok": "V rozumnom rozsahu",
+      "mwm_default": "Na predvolenej hodnote (64 MB). VACUUM a vytváranie indexov môžu byť pomalé; zvážte 256 MB alebo viac",
+      "mwm_ok": "Nastavené nad predvolenou hodnotou",
+      "av_on": "autovacuum je zapnuté",
+      "av_off": "autovacuum je vypnuté. Vysoké riziko nafúknutia tabuliek a pretečenia ID transakcií",
+      "conn_high": "max_connections je vysoké. Každé pripojenie používa pamäť; odporúča sa pooler (PgBouncer atď.)",
+      "conn_ok": "V rozumnom rozsahu",
+      "lmd_off": "Pomalé zaznamenávanie dotazov je vypnuté (-1). Odporúča sa približne 1000 ms",
+      "lmd_all": "Každý príkaz je zaznamenaný (0). Vysoká réžia zaznamenávania",
+      "lmd_ok": "Pomalé zaznamenávanie dotazov je zapnuté",
+      "st_off": "Žiadny celosystémový časový limit príkazu (0). Nastavte limity pre rolu alebo aplikáciu",
+      "st_ok": "Je nastavený časový limit príkazu",
+      "iit_off": "Žiadny časový limit pre nečinnosť v transakcii (0). Môže spôsobiť držanie zámkov a nafúknutie",
+      "iit_ok": "Je nastavený časový limit pre nečinnosť v transakcii",
+      "ckpt_short": "Interval kontrolného bodu je 5 minút alebo menej. Zvážte 10 – 15 minút pre zaťaženia s vysokým počtom zápisov",
+      "ckpt_ok": "V rozumnom rozsahu",
+      "wal_minimal": "wal_level=minimal znemožňuje PITR a replikáciu. Použite replica alebo vyššie",
+      "wal_ok": "Úroveň WAL podporuje PITR a replikáciu",
+      "rpc_hdd": "Predvolená hodnota HDD (4). Pre SSD sa odporúča 1,1 – 2",
+      "rpc_ok": "Vhodné pre SSD",
+      "super_many": "Dvaja alebo viacerí superužívatelia. Ponechajte jedného pre správu a ostatným udeľte len potrebné oprávnenia",
+      "super_ok": "Najviac jeden superužívateľ",
+      "bypass_rls": "Existujú roly, ktoré nie sú superužívateľmi a obchádzajú zabezpečenie na úrovni riadkov",
+      "bypass_ok": "Žiadne roly obchádzajúce RLS",
+      "no_expiry": "Prihlasovacie roly bez platnosti hesla. Nastavte VALID UNTIL pre osobné účty",
+      "expiry_ok": "Všetky prihlasovacie roly majú platnosť",
+      "public_grant": "PUBLIC (každá rola) má oprávnenia k tabuľkám. Oprávnenia na zápis sú rizikové",
+      "public_ok": "Žiadne oprávnenia k tabuľkám udelené PUBLIC",
+      "arc_on": "Archivácia WAL (archive_mode) je zapnutá",
+      "arc_off": "Archivácia WAL je vypnutá, takže obnova k určitému bodu (PITR) je nemožná",
+      "arc_cmd_empty": "archive_mode je zapnutý, ale archive_command a archive_library sú prázdne",
+      "arc_never": "Zatiaľ nebol archivovaný žiadny WAL",
+      "arc_stale": "Posledná archivácia WAL je staršia ako 24 hodín",
+      "arc_recent": "WAL archivovaný za posledných 24 hodín",
+      "arc_failing": "Archivácia WAL momentálne zlyháva. Skontrolujte disk, oprávnenia a cieľovú cestu",
+      "repl_is_standby": "Toto pripojenie je pohotovostné (režim obnovy). Skontrolujte oneskorenie z primárneho pripojenia",
+      "repl_none": "Žiadne pohotovostné pripojenie. Neexistuje žiadne nastavenie obnovy po havárii (DR)",
+      "repl_ok": "Pohotovostné pripojenia streamujú normálne",
+      "repl_lag": "Pohotovostné pripojenie zaostáva alebo nestreamuje"
+    },
+    "manual": {
+      "title": "Manuálny kontrolný zoznam",
+      "intro": "Postupy zálohovania a obnovy, ktoré nemožno automaticky skontrolovať. Začiarknite po potvrdení a poznamenajte si dôkazy",
+      "memo": "Poznámka (napr. nástroj, plán, naposledy skontrolované)",
+      "save": "Uložiť",
+      "updated": "Aktualizované {dtm}",
+      "items": {
+        "base_backup": "Úplná záloha (pg_basebackup atď.) bola úspešná za posledných 7 dní",
+        "offsite_copy": "Kópia zálohy je uložená mimo pracoviska (iná oblasť alebo úložisko)",
+        "restore_rehearsal": "Skúška obnovy bola vykonaná v tomto štvrťroku a jej trvanie bolo zaznamenané",
+        "pitr_target": "Postup PITR a cieľové RPO/RTO sú zdokumentované",
+        "backup_encrypt": "Záložné súbory sú šifrované a prístup je obmedzený",
+        "retention": "Definované je obdobie uchovávania záloh a politika mazania"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Odkaz schema.pi sa pripravuje. Skúste to znova o chvíľu",
+      "CONN_UNSUPPORTED": "Toto pripojenie zatiaľ nie je podporované (iba priame PostgreSQL)",
+      "TIMEOUT": "Cieľová DB reagovala príliš pomaly. Skúste to znova o chvíľu",
+      "RATE": "Príliš veľa volaní. Skúste to znova o minútu",
+      "Q_UNKNOWN": "Nepodporovaný dotaz. Skontrolujte verziu API odkazu schema.pi",
+      "INVALID_INPUT": "Neplatný výber odkazu alebo pripojenia"
+    }
+  },
+  "perf": {
+    "title": "Výkon",
+    "loading": "Načítava sa…",
+    "pickFirst": "Najprv vyberte odkaz a pripojenie vyššie",
+    "pager": "Stránkovanie",
+    "tabs": {
+      "collect": "Zbierať",
+      "top": "Pomalé dotazy",
+      "health": "Stav tabuliek a indexov",
+      "trend": "Trend veľkosti",
+      "activity": "Aktivita a zámky"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "Odkaz schema.pi sa pripravuje. Skúste to znova neskôr",
+      "CONN_UNSUPPORTED": "Toto pripojenie zatiaľ nie je podporované (iba priame pripojenia PostgreSQL)",
+      "RATE": "Príliš veľa požiadaviek. Skúste to znova o minútu",
+      "LINK_AUTH": "Token odkazu vypršal alebo bol zrušený. Zaregistrujte token znova na stránke Pripojiť",
+      "LINK_SCOPE": "Toto pripojenie nepatrí do predmetnej oblasti odkazu",
+      "Q_UNKNOWN": "Nepodporovaný dotaz. Skontrolujte verziu API odkazu schema.pi",
+      "INVALID_INPUT": "Hodnota odkazu alebo pripojenia je neplatná"
+    },
+    "pgss": {
+      "title": "Ako povoliť pg_stat_statements",
+      "note": "Samostatne hostovaný PostgreSQL tiež potrebuje pg_stat_statements v shared_preload_libraries (postgresql.conf) a reštart. Štatistiky tabuliek, indexov a veľkosti fungujú aj bez neho"
+    },
+    "collect": {
+      "intro": "Teraz zbiera štatistiky najlepších dotazov, tabuliek, indexov a veľkostí raz a ukladá ich ako snímku. Zbierajte aspoň dvakrát, aby ste videli zmeny a trendy veľkosti",
+      "run": "Zbierať teraz",
+      "running": "Zbiera sa…",
+      "done": "Zozbierané {dtm} — {qry} dotazov · {tbl} tabuliek · {idx} indexov"
+    },
+    "top": {
+      "sort": "Zoradiť",
+      "sortTotal": "Celkový čas",
+      "sortMean": "Priemerný čas",
+      "sortCalls": "Volania",
+      "empty": "Zatiaľ žiadne snímky. Stlačte „Zbierať teraz“ na karte „Zbierať“",
+      "range": "Zmena medzi {from} → {to}",
+      "first": "Prvá snímka o {dtm} — kumulatívne hodnoty (zmeny od ďalšej snímky)",
+      "query": "Dotaz (literály maskované)",
+      "calls": "Volania",
+      "totalMs": "Celkový čas v ms",
+      "meanMs": "Priemer ms",
+      "rows": "Riadky",
+      "reset": "Zistený reset štatistík – zobrazené ako kumulatívne"
+    },
+    "health": {
+      "empty": "Zatiaľ žiadne snímky. Stlačte „Zbierať teraz“ na karte „Zbierať“",
+      "basis": "Na základe snímky z {dtm}",
+      "unusedIdx": "Nepoužité indexy",
+      "unusedIdxHint": "Indexy, ktoré neboli nikdy použité od posledného resetu štatistík (podľa veľkosti). Nevyhadzujte indexy PK alebo indexy s jedinečným obmedzením",
+      "fullScan": "Nadmerné úplné skenovanie",
+      "fullScanHint": "Tabuľky s 1 000+ živými riadkami, kde úplné skenovanie predstavuje aspoň polovicu – skontrolujte indexy na stĺpcoch filtra",
+      "dead": "Nadmerné mŕtve n-tice",
+      "deadHint": "Pomer mŕtvych n-tíc 20% alebo viac – skontrolujte nastavenia VACUUM a autovacuum",
+      "none": "Žiadne",
+      "scans": "skenovania"
+    },
+    "trend": {
+      "limit": "Prahová hodnota veľkosti",
+      "empty": "Žiadne snímky za posledných 30 dní",
+      "now": "Aktuálna veľkosť",
+      "perDay": "Denný rast",
+      "needMore": "Potrebné 2+ snímky",
+      "daysLeft": "Dosiahne {gb} GB",
+      "noGrowth": "Žiadny trend rastu",
+      "days": "približne za {n} dní"
+    },
+    "activity": {
+      "refresh": "Obnoviť",
+      "live": "Živý dotaz – neuložený",
+      "sessions": "Aktivita relácie",
+      "locks": "Zámky",
+      "none": "Žiadne"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pipelines",
+    "intro": "Skontrolujte, či je zdrojová DB pripravená na zachytávanie zmien dát (CDC) a navrhnite pipelines zdroj → transformácia → cieľ. Táto fáza len kontroluje a navrhuje; žiadne zákaznícke riadkové dáta sa nečítajú ani neukladajú.",
+    "needLink": "Najprv vyberte odkaz schema.pi vyššie. Ak žiadny nemáte, zaregistrujte token v menu „Odkaz“.",
+    "needConn": "Vyberte pripojenie k DB, ktoré chcete skontrolovať, vyššie.",
+    "loading": "Načítava sa…",
+    "pager": "Stránky",
+    "prev": "Predchádzajúce",
+    "next": "Ďalšie",
+    "runTitle": "Spustiť a monitorovať (7-3 · 7-4)",
+    "runBody": "Spustenie pipeline, monitorovanie oneskorenia a prepracovanie budú k dispozícii po dokončení agenta pracovníka a bezpečnostného modelu. Zatiaľ uložte definície ako návrhy (DRAFT).",
+    "pre": {
+      "title": "Predbežná kontrola zdroja",
+      "intro": "Pre každú tabuľku kontroluje stĺpce času zmeny, stĺpce mäkkého vymazania a primárny kľúč, aby odporučil metódu zachytávania (adaptér), a kontroluje pripravenosť WAL logickej replikácie. Vykonávajú sa len dotazy na katalóg a nastavenia len na čítanie.",
+      "schema": "Schéma (voliteľné)",
+      "schemaPh": "Všetky",
+      "run": "Spustiť predbežnú kontrolu",
+      "running": "Kontroluje sa…",
+      "sum": "{tables} tabuliek · {noPk} bez PK · {deleteUnseen} nemôže zachytiť vymazania",
+      "truncated": "Dotaz na katalóg dosiahol limit 500 riadkov, takže niektoré tabuľky môžu chýbať. Zadajte schému a skontrolujte znova.",
+      "empty": "Žiadne tabuľky na kontrolu",
+      "colTable": "Tabuľka",
+      "colChg": "Stĺpec času zmeny",
+      "colDel": "Stĺpec mäkkého vymazania",
+      "colAdapter": "Odporúčaná metóda · dôvody",
+      "toDraft": "Vytvoriť návrh pipeline z {n} vybraných"
+    },
+    "ready": {
+      "ok": "WAL logická replikácia pripravená – tabuľky s PK môžu použiť LOGICAL",
+      "no": "WAL logická replikácia nie je pripravená – zachytávanie pomocou pollingu alebo porovnávania kľúčov",
+      "senders": "{n} replikačných pripojení"
+    },
+    "adapter": {
+      "LOGICAL": "Logická replikácia (WAL)",
+      "POLL": "Polling času zmeny",
+      "KEY_DIFF": "Rozdiel snímok kľúčov",
+      "NONE": "Len úplné opätovné načítanie"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Má stĺpec času zmeny",
+      "NO_CHG_COL": "Nemá stĺpec času zmeny",
+      "HAS_SOFT_DEL": "Má stĺpec mäkkého vymazania",
+      "NO_SOFT_DEL": "Nemá stĺpec mäkkého vymazania",
+      "HAS_PK": "Má primárny kľúč",
+      "NO_PK": "Nemá primárny kľúč – zmenené riadky nemožno identifikovať",
+      "DELETE_UNSEEN": "Polling nemôže zachytiť fyzické DELETE (odporúča sa stĺpec mäkkého vymazania)",
+      "LOGICAL_NOT_READY": "Môže prejsť na LOGICAL, keď bude WAL logická replikácia pripravená",
+      "FULL_RELOAD_ONLY": "Žiadny PK alebo stĺpec času zmeny, takže žiadne inkrementálne zachytávanie – pridajte PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level nie je logical (zmena vyžaduje reštart DB)",
+      "NO_SLOTS": "max_replication_slots je 0",
+      "NO_SENDERS": "max_wal_senders je 0",
+      "IS_STANDBY": "Standby server – logickú replikáciu získajte z primárneho servera",
+      "SETTINGS_UNKNOWN": "Nepodarilo sa prečítať nastavenia, pripravenosť neznáma"
+    },
+    "ed": {
+      "title": "Definície pipeline",
+      "draftOnly": "Len návrh – uložené ako návrhy (DRAFT)",
+      "new": "Nová pipeline",
+      "empty": "Žiadne uložené pipelines",
+      "manual": "Manuálne",
+      "edit": "Upraviť",
+      "remove": "Odstrániť",
+      "name": "Názov",
+      "adapter": "Metóda zachytávania",
+      "srcConn": "Zdrojové pripojenie",
+      "useCurrentConn": "Použiť pripojenie vybrané vyššie",
+      "sched": "Plán (cron 5 polí, prázdne = manuálne)",
+      "target": "Cieľ",
+      "targetPh": "napr. analytická DB analytics.public / lake s3://…",
+      "tables": "Zdrojové tabuľky (oddelené novým riadkom alebo čiarkou)",
+      "steps": "Kroky (zdroj → transformácia → cieľ)",
+      "op": "Operácia",
+      "notePh": "Popis · podmienka (voliteľné)",
+      "addTransform": "Pridať krok transformácie",
+      "save": "Uložiť",
+      "saving": "Ukladá sa…",
+      "saved": "Uložené",
+      "close": "Zavrieť"
+    },
+    "kind": {
+      "SOURCE": "Zdroj",
+      "TRANSFORM": "Transformácia",
+      "TARGET": "Cieľ"
+    },
+    "sts": {
+      "DRAFT": "Návrh"
+    },
+    "check": {
+      "NAME_REQUIRED": "Zadajte názov",
+      "CONN_REQUIRED": "Vyberte zdrojové pripojenie",
+      "CRON_INVALID": "Zadajte plán ako 5-poľný cron (minúta hodina deň mesiac deň_v_týždni; číslice, *, ',', -, /)",
+      "OP_REQUIRED": "Zadajte operáciu pre každý krok",
+      "STEPS_TOO_FEW": "Vyžadujú sa kroky zdroja a cieľa",
+      "STEPS_TOO_MANY": "Maximálne 20 krokov",
+      "STEP_FIRST_SOURCE": "Prvý krok musí byť zdroj",
+      "STEP_LAST_TARGET": "Posledný krok musí byť cieľ",
+      "STEP_MIDDLE_TRANSFORM": "Medzi nimi môžu byť len transformačné kroky"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Pipeline s týmto názvom už existuje. Použite iný názov",
+      "CONN_UNSUPPORTED": "Toto pripojenie zatiaľ nemožno skontrolovať (zatiaľ len priame pripojenia k serveru PostgreSQL)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL Tuning Lab",
+    "intro": "Vyberte pripojenie a zadajte SQL, aby ste videli plán vykonávania ako strom, s príčinami spomalenia (úplné skenovanie, vnorené slučky, veľké triedenia) a SQL anti-vzormi skontrolovanými oproti štandardným doménam schema.pi. Dotazy sa nikdy skutočne nevykonávajú (žiadne ANALYZE).",
+    "needLink": "Ak chcete zobraziť plány, najprv vyberte odkaz a pripojenie vyššie. Kontrola anti-vzoru funguje aj bez odkazu.",
+    "sqlLabel": "SQL (jediný príkaz SELECT alebo WITH)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Zobraziť plán",
+    "explaining": "Načítava sa…",
+    "save": "Uložiť plán",
+    "saving": "Ukladá sa…",
+    "saveName": "Popis (napr. pred pridaním indexu)",
+    "saveNote": "Konštantné hodnoty v SQL a podmienkach plánu sú pri uložení maskované ako ?.",
+    "plan": {
+      "title": "Plán vykonávania",
+      "summary": "Celkové náklady {cost} · {ms}ms",
+      "cost": "náklady",
+      "rows": "riadky",
+      "width": "šírka"
+    },
+    "warn": {
+      "none": "Žiadne významné upozornenia.",
+      "SEQ_SCAN_LARGE": "Úplné skenovanie na {relation} (približne {rows} riadkov) – zvážte index na stĺpcoch filtra.",
+      "NESTED_LOOP_HIGH": "Vnorené slučky produkujú približne {rows} riadkov – zvážte hash alebo merge join, alebo index na podmienke spojenia.",
+      "SORT_SPILL": "Veľkosť triedenia je približne {kb}KB, nad predvolenou hodnotou work_mem (4MB); môže sa preliať na disk."
+    },
+    "lint": {
+      "run": "Skontrolovať anti-vzory",
+      "title": "Kontrola SQL anti-vzoru",
+      "none": "Nenašli sa žiadne anti-vzory.",
+      "domainsOff": "Štandardné domény sa nepodarilo načítať; skontrolované len s predvolenými pravidlami prípon stĺpcov.",
+      "types": {
+        "num": "číselné",
+        "date": "dátum",
+        "char": "znakové"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * – vyberte len stĺpce, ktoré potrebujete (extra I/O, žiadny pokrývajúci index).",
+        "FUNC_ON_COLUMN": "Stĺpec filtra {column} je zabalený vo funkcii alebo výraze, takže jeho index nemožno použiť – namiesto toho transformujte konštantu.",
+        "LEADING_WILDCARD": "LIKE s úvodným % nemôže použiť B-stromový index – zvážte pg_trgm GIN index.",
+        "OR_DIFF_COLUMNS": "Podmienky na rôznych stĺpcoch sú kombinované s OR – zvážte UNION ALL alebo indexy pre jednotlivé stĺpce.",
+        "IMPLICIT_CAST": "{column} sa porovnáva s číslom v úvodzovkách – prispôsobte typy stĺpcov a konštánt (implicitné pretypovanie).",
+        "NOT_IN_SUBQUERY": "NOT IN (poddotaz) nevracia nič, keď sú prítomné NULL hodnoty a je pomalý – použite NOT EXISTS.",
+        "NO_WHERE": "Žiadna klauzula WHERE – na veľkej tabuľke je to úplné skenovanie (pridajte podmienku alebo LIMIT).",
+        "DOMAIN_MISMATCH": "{column} je typu {expected} podľa štandardnej domény, ale porovnáva sa s konštantou iného typu – implicitné pretypovanie môže zabrániť použitiu indexu."
+      }
+    },
+    "saved": {
+      "title": "Uložené plány · Porovnať",
+      "empty": "Žiadne uložené plány. Zobrazte plán a potom ho uložte.",
+      "pick": "Vyberte plán na porovnanie",
+      "pick2": "Vyberte dva plány na porovnanie.",
+      "compare": "Porovnať dva plány",
+      "delete": "Odstrániť",
+      "cost": "náklady",
+      "prev": "Predchádzajúce",
+      "next": "Ďalšie",
+      "page": "Strana {page}"
+    },
+    "diff": {
+      "cost": "Celkové náklady {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Dva plány sú pre rôzne SQL (po normalizácii).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "Žiadna zmena v uzloch plánu.",
+      "before": "Pred",
+      "after": "Po"
+    },
+    "ai": {
+      "title": "AI tuningové rady",
+      "badge": "Už čoskoro",
+      "body": "Už čoskoro (po schválení a procedúrach merania dopadu) – rady budú generované z SQL s maskovanými konštantami a zaznamenané ako aplikované až po schválení DA a meranom dopade."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "Funkcia prepojenia schema.pi sa pripravuje. Skúste to znova o chvíľu.",
+      "LINK_AUTH": "Token prepojenia vypršal alebo bol zrušený. Vydajte nový token v schema.pi a znova ho zaregistrujte.",
+      "LINK_SCOPE": "Toto prepojenie nemôže použiť toto pripojenie (iná klasifikačná schéma).",
+      "CONN_UNSUPPORTED": "Tento typ pripojenia zatiaľ nie je podporovaný (len pripojenia k serveru PostgreSQL).",
+      "Q_UNKNOWN": "Nepodporovaný dotaz.",
+      "SQL_NOT_SELECT": "Plány sú k dispozícii len pre jeden príkaz začínajúci SELECT alebo WITH.",
+      "TIMEOUT": "Požiadavka vypršala (5 sekúnd). Skráťte SQL alebo skúste znova neskôr.",
+      "RATE": "Príliš veľa požiadaviek. Skúste to znova o minútu.",
+      "PAYLOAD_TOO_LARGE": "Plán je príliš veľký na uloženie.",
+      "LINK_NOT_FOUND": "Odkaz sa nenašiel. Vyberte odkaz znova."
+    }
+  },
+  "nav": {
+    "label": "Funkcie",
+    "connect": "Pripojiť",
+    "sqlLab": "SQL Tuning",
+    "perf": "Výkon",
+    "monitor": "Monitorovanie",
+    "drift": "Drift",
+    "migration": "Migrácia",
+    "pipeline": "Pipeline",
+    "analytics": "Analytika",
+    "ops": "Prevádzková bezpečnosť",
+    "learn": "Učiť sa"
   }
 }

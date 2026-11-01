@@ -1,4 +1,27 @@
 {
+  "meta": {
+    "title": "dbms.pi",
+    "description": "Un entorno de trabajo DBA y SQLP para ejecutar motores de DB de forma rápida y segura"
+  },
+  "home": {
+    "badge": "DBA · SQLP",
+    "headline": "Haga que su motor de DB ejecute sus datos de forma rápida y segura",
+    "description": "Un entorno de trabajo DBA y SQLP para planes de ejecución, estadísticas y rendimiento. schema.pi se encarga del diseño y los estándares; dbms.pi es su socio en el lado del motor.",
+    "welcome": "Bienvenido, {name}.",
+    "featTitle": "Características",
+    "featDesc": {
+      "connect": "Registre un token de enlace de schema.pi y verifique el estado de la conexión",
+      "sqlLab": "Árbol de plan, advertencias, comparación y comprobaciones de antipatrones contra dominios estándar",
+      "perf": "Top-N de consultas lentas, estado de tablas/índices, previsión de capacidad, actividad y bloqueos",
+      "monitor": "Resumen de métricas de aplicación, DB y URL con alertas de umbral",
+      "drift": "Compare el modelo schema.pi y el historial DDL con el catálogo real, mida el efecto del índice",
+      "migration": "Orden de carga topológico, fragmentos, lista de verificación y SQL de verificación",
+      "pipeline": "Verificación previa de captura de cambios y definiciones de pipeline origen→transformación→destino",
+      "analytics": "Panel de KPI, mapeo de lago de 3 capas y catálogo de conjuntos de datos",
+      "ops": "Diagnóstico de solo lectura de parámetros, roles, copia de seguridad y DR de replicación",
+      "learn": "Preguntas de práctica SQLP/DAP, casos de ajuste y diccionario de comparación de DBMS"
+    }
+  },
   "auth": {
     "checking": "Comprobando inicio de sesión…",
     "signedIn": "{name}",
@@ -64,5 +87,832 @@
     "LINK_CODE_GEN_FAILED": "No se pudo crear un código de enlace. Inténtalo de nuevo más tarde.",
     "AUTH_DB_UNAVAILABLE": "No se pudo guardar tu cuenta, por lo que el inicio de sesión falló. Inténtalo de nuevo más tarde.",
     "LINK_TRY_LIMIT": "Demasiados códigos de enlace incorrectos. Inténtalo de nuevo en 15 minutos."
+  },
+  "analytics": {
+    "title": "Análisis y Lago",
+    "intro": "KPI de actividad de dbms, diseño de lago de tres capas y catálogo de conjuntos de datos en un solo lugar.",
+    "storageNotice": "El almacenamiento del lago (del cliente o en la nube) aún no se ha decidido (sección 10 #7 del PRD). Por ahora solo se almacenan diseños y mapeos de nombres, no datos de filas.",
+    "noLink": "Seleccione o registre un enlace de schema.pi primero.",
+    "goConnect": "Registrar un enlace",
+    "loading": "Cargando…",
+    "refresh": "Actualizar",
+    "kpi": {
+      "title": "Panel de KPI",
+      "updatedAt": "{area} · a partir de {time}",
+      "notBuilt": "No construido",
+      "keys": {
+        "links": "Mis enlaces",
+        "perf": "Instantáneas de rendimiento",
+        "drift": "Ejecuciones de deriva",
+        "mig": "Planes de migración",
+        "pipe": "Pipelines",
+        "lake": "Conjuntos de datos del lago"
+      },
+      "countsChart": "Totales por característica",
+      "trendTitle": "Instantáneas de rendimiento en los últimos 14 días",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "No hay instantáneas de rendimiento en los últimos 14 días.",
+      "monTitle": "Resumen del monitor de schema.pi (última hora)",
+      "monTps": "Solicitudes/s",
+      "monErr": "Tasa de error",
+      "monAvg": "Respuesta promedio (ms)",
+      "monDb": "Conexiones DB",
+      "monFail": "No se pudo cargar el resumen del monitor: {msg}"
+    },
+    "lake": {
+      "title": "Diseño de lago de tres capas",
+      "raw": "Crudo",
+      "rawDesc": "Carga los nombres y tipos de columnas de la DB de origen tal como están.",
+      "std": "Estandarizado",
+      "stdDesc": "Renombra las columnas a los términos estándar aprobados por schema.pi.",
+      "cur": "Curado",
+      "curDesc": "Conjuntos de datos de análisis agrupados por entidad.",
+      "loadProjects": "Cargar proyectos",
+      "project": "Proyecto",
+      "pickProject": "Elija un proyecto",
+      "noProjects": "No hay proyectos en esta área.",
+      "noTables": "El modelo de este proyecto no tiene tablas.",
+      "conform": "Conformidad estándar {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} columnas · {pct}% conforme",
+      "colSrc": "Columna de origen",
+      "colStd": "Columna estandarizada",
+      "colType": "Tipo",
+      "colOk": "Formato",
+      "ok": "OK",
+      "ng": "Verificar",
+      "pk": "PK",
+      "selectAll": "Seleccionar todo",
+      "selected": "{cnt} seleccionados",
+      "save": "Añadir al diseño del lago",
+      "saved": "Se añadieron {cnt} al catálogo."
+    },
+    "catalog": {
+      "title": "Catálogo de conjuntos de datos",
+      "schemaCard": "schema.pi es la fuente de verdad para las definiciones de conjuntos de datos de análisis, la búsqueda de metadatos y el glosario. Aquí solo ve el estado de carga y la frescura del lago.",
+      "openSchema": "Ver definiciones en schema.pi",
+      "empty": "Aún no se han añadido tablas al diseño del lago.",
+      "status": {
+        "DSGN": "Solo diseño",
+        "LOADED": "Cargado",
+        "FAIL": "Fallo de carga"
+      },
+      "lastLoad": "Última carga {time}",
+      "neverLoaded": "Nunca cargado",
+      "remove": "Eliminar",
+      "removeConfirm": "¿Eliminar {tbl} del catálogo?",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "page": "Página {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Seleccione un enlace primero.",
+      "NOT_FOUND": "No encontrado. Compruebe si el modelo ha cambiado."
+    }
+  },
+  "drift": {
+    "title": "Deriva Modelo ↔ DB",
+    "intro": "Compare el modelo de diseño de schema.pi y el historial de aplicación de DDL con el catálogo de DB en vivo para encontrar la deriva y medir si los índices diseñados se utilizan realmente. Los datos de filas del cliente nunca se leen ni se almacenan.",
+    "needLink": "Primero elija un enlace de schema.pi arriba. Si no tiene ninguno, registre un token en el menú 'Enlace'.",
+    "needConn": "Elija la conexión DB a comparar arriba.",
+    "project": "Proyecto",
+    "projectPick": "Seleccionar un proyecto",
+    "loading": "Cargando…",
+    "run": "Ejecutar detección de deriva",
+    "running": "Comparando…",
+    "readOnly": "Solo se ejecutan consultas de catálogo y estadísticas de solo lectura.",
+    "applyInSchema": "Aplique las correcciones (ediciones de modelo, generación y ejecución de DDL) en schema.pi, la fuente de verdad.",
+    "history": "Historial de detección",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "none": "Ninguno",
+    "model": "Modelo",
+    "reqNo": "Solicitud {id}",
+    "notSaved": "No se pudo guardar esta ejecución en el historial (los resultados se muestran normalmente).",
+    "capped": "Demasiados elementos: se muestran los primeros {cap} por sección (los recuentos están completos).",
+    "statsMissing": "Las estadísticas de uso del índice no estaban disponibles, por lo que no se pudo juzgar el uso.",
+    "sum": {
+      "missingTables": "Tablas faltantes en DB",
+      "extraTables": "Tablas no en el modelo",
+      "colMismatches": "Discrepancias de columnas",
+      "missingIndexes": "Índices diseñados faltantes en DB",
+      "extraIndexes": "Índices no en el modelo",
+      "ddlMissing": "Objetos desaparecidos después de la aplicación",
+      "unusedIndexes": "Índices diseñados no utilizados"
+    },
+    "sec": {
+      "ddlMissing": "DDL aplicado pero faltante en DB",
+      "missingTables": "Tablas en el modelo pero faltantes en DB",
+      "extraTables": "Tablas en DB pero no en el modelo",
+      "colMismatches": "Discrepancias de tipo de columna / NULO",
+      "missingIndexes": "Índices diseñados faltantes en DB",
+      "extraIndexes": "Índices solo en DB (excluyendo PK)",
+      "idxUsage": "Efectividad del índice diseñado"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi registró estos objetos como aplicados, pero han desaparecido; sospeche de una eliminación manual o un rollback.",
+      "extraTables": "Estos pueden pertenecer a otros proyectos o tablas del sistema en esta conexión.",
+      "idxUsage": "Cero escaneos desde el último restablecimiento de estadísticas significa no utilizado. Verifique la ventana de estadísticas antes de eliminar."
+    },
+    "kind": {
+      "MISSING": "faltante en DB",
+      "EXTRA": "no en el modelo",
+      "TYPE": "el tipo difiere",
+      "NULL": "la nulabilidad difiere"
+    },
+    "col": {
+      "idx": "Índice",
+      "scans": "Escaneos",
+      "size": "Tamaño",
+      "status": "Veredicto"
+    },
+    "usage": {
+      "USED": "En uso",
+      "UNUSED": "Índice diseñado no utilizado",
+      "NO_STATS": "Sin estadísticas"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "La función de enlace de schema.pi aún no está lista. Inténtelo de nuevo en breve.",
+      "LINK_DOWN": "No se puede acceder a schema.pi. Inténtelo de nuevo en breve.",
+      "LINK_AUTH": "El token de enlace ha caducado o ha sido revocado. Emita un nuevo token en schema.pi y regístrelo de nuevo.",
+      "LINK_NOT_FOUND": "Enlace no encontrado. Vuelva a elegir el enlace.",
+      "LINK_SCOPE": "Esta conexión no pertenece a la taxonomía del enlace.",
+      "CONN_UNSUPPORTED": "Conexión no compatible (solo conexiones de servidor PostgreSQL por ahora).",
+      "TIMEOUT": "La solicitud ha caducado. Inténtelo de nuevo en breve.",
+      "RATE": "Demasiadas solicitudes. Inténtelo de nuevo en un minuto."
+    }
+  },
+  "learn": {
+    "title": "Aprendizaje DBA",
+    "intro": "Preguntas de práctica SQLP/DAP, un libro de casos de ajuste y un diccionario de comparación Oracle/Tibero/PostgreSQL. Funciona sin un enlace; elija un enlace para ver también su mapeo de tipos estándar de schema.pi.",
+    "loading": "Cargando…",
+    "tabs": {
+      "quiz": "Práctica",
+      "cases": "Casos de ajuste",
+      "dict": "Diccionario DBMS"
+    },
+    "topics": {
+      "INDEX": "Escaneos de índice",
+      "JOIN": "Métodos de unión",
+      "PARTITION": "Poda de particiones",
+      "NORMAL": "Normalización",
+      "NAMING": "Nomenclatura estándar",
+      "ISOLATION": "Niveles de aislamiento",
+      "LOCK": "Bloqueos"
+    },
+    "levels": {
+      "1": "Básico",
+      "2": "Intermedio",
+      "3": "Avanzado"
+    },
+    "quiz": {
+      "score": "Mi progreso",
+      "scoreLine": "{solved} de {total} resueltos · {correct} correctos",
+      "right": "Correcto",
+      "wrong": "Incorrecto",
+      "retry": "Intentar de nuevo",
+      "prevRight": "Anteriormente correcto",
+      "prevWrong": "Anteriormente incorrecto"
+    },
+    "cases": {
+      "notice": "Todos los casos son ejemplos de aprendizaje escritos por uno mismo; los números son ilustrativos (sin datos de clientes).",
+      "problem": "SQL del problema",
+      "plan": "Resumen del plan",
+      "cause": "Causa",
+      "fix": "SQL corregido",
+      "effect": "Efecto"
+    },
+    "cats": {
+      "ALL": "Todo",
+      "TYPE": "Tipos de datos",
+      "FUNC": "Funciones",
+      "PAGING": "Paginación",
+      "SEQ": "Secuencias",
+      "DATE": "Fechas",
+      "SYNTAX": "Sintaxis"
+    },
+    "dict": {
+      "search": "Buscar (ej. NVL, LIMIT)",
+      "item": "Elemento",
+      "note": "Nota",
+      "empty": "No hay elementos coincidentes",
+      "loading": "Cargando…",
+      "liveTitle": "Mapeo de tipos estándar de mi área temática",
+      "liveIntro": "Elija un enlace para cargar el perfil DBMS de schema.pi (tipo lógico → físico). El diccionario anterior funciona sin un enlace.",
+      "liveLoad": "Cargar mapeo de tipos",
+      "lgcType": "Tipo lógico"
+    }
+  },
+  "link2": {
+    "title": "Conexión schema.pi",
+    "intro": "Registre un token de conexión para usar las conexiones DB de un área temática de schema.pi en dbms.pi. Los tokens se almacenan cifrados y no se almacenan datos de filas de sus bases de datos.",
+    "howTitle": "Cómo emitir un token de conexión",
+    "how1": "Inicie sesión en schema.pi y abra el área temática a conectar",
+    "how2": "Vaya a Área temática → Configuración → Token de conexión y presione 'Emitir token' (administrador de área o rol DA)",
+    "how3": "Copie el token que comienza con slk_ — se muestra solo una vez cuando se emite",
+    "how4": "Péguelo a continuación y regístrelo",
+    "openSchema": "Abrir schema.pi",
+    "registerTitle": "Registrar conexión",
+    "tokenLabel": "Token de conexión",
+    "tokenPlaceholder": "slk_…",
+    "register": "Registrar",
+    "registering": "Comprobando…",
+    "registered": "El área temática '{area}' está ahora conectada",
+    "replaced": "Se reemplazó el token del área temática '{area}'",
+    "myLinks": "Mis conexiones",
+    "empty": "No hay conexiones registradas",
+    "loading": "Cargando…",
+    "regDtm": "Registrado {dtm}",
+    "remove": "Desconectar",
+    "removeConfirm": "¿Desconectar '{area}'? Las pantallas que usan esta conexión ya no podrán acceder a ella.",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "statusTitle": "Estado de la conexión",
+    "noConns": "No hay conexiones DB en esta área temática (añada una en schema.pi)",
+    "colConn": "Conexión",
+    "colDbms": "DBMS",
+    "colMthd": "Método",
+    "colHost": "Host",
+    "colTest": "Última prueba",
+    "colAgent": "Agente visto por última vez",
+    "never": "Ninguno",
+    "retry": "Reintentar",
+    "pickerLink": "Enlace",
+    "pickerConn": "Conexión",
+    "pickerEmpty": "No hay conexiones —",
+    "pickerGo": "registre una en /connect",
+    "errors": {
+      "LINK_AUTH": "El token de conexión ha caducado o ha sido revocado. Emita un nuevo token en schema.pi y regístrelo de nuevo",
+      "LINK_SCOPE": "Esta conexión no pertenece al área temática vinculada",
+      "LINK_DOWN": "No se puede acceder a schema.pi. Inténtelo de nuevo en breve",
+      "LINK_NOT_FOUND": "Conexión no encontrada",
+      "LINK_DUP": "El registro ya está en curso. Inténtelo de nuevo",
+      "CONN_UNSUPPORTED": "Conexión no compatible (solo conexiones de servidor PostgreSQL por ahora)",
+      "Q_UNKNOWN": "Consulta desconocida",
+      "SQL_NOT_SELECT": "Solo se puede ejecutar una única instrucción SELECT (o WITH)",
+      "PGSS_MISSING": "La extensión pg_stat_statements no está instalada en la DB de destino",
+      "TIMEOUT": "La solicitud ha caducado",
+      "RATE": "Demasiadas solicitudes. Inténtelo de nuevo en un minuto",
+      "INVALID_INPUT": "Pegue el token de conexión completo que comienza con slk_"
+    }
+  },
+  "migration": {
+    "title": "Migración de datos (PiMig)",
+    "intro": "Calcula el orden de carga de la tabla a partir de las relaciones en su modelo de diseño schema.pi, organiza el tamaño del fragmento, el paralelismo y la lista de verificación de corte, y genera SQL de verificación que usted mismo ejecuta en el origen y el destino. Esta pantalla solo planifica y verifica, no mueve datos ni lee filas de DB de clientes.",
+    "needLink": "Primero elija un enlace de schema.pi arriba. Si no tiene ninguno, registre un token en el menú 'Conectar'.",
+    "loading": "Cargando…",
+    "newPlan": "Nuevo plan de migración",
+    "project": "Proyecto",
+    "projectPick": "Seleccionar un proyecto",
+    "planNm": "Nombre del plan",
+    "planNmHint": "Por defecto, el nombre del proyecto",
+    "create": "Crear plan",
+    "creating": "Creando…",
+    "snapHint": "El diseño en este momento (nombres de tablas, columnas y relaciones) se congela como una instantánea. Cree un nuevo plan cuando el modelo cambie.",
+    "plans": "Planes de migración",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "sts": {
+      "DRAFT": "Borrador",
+      "READY": "Listo"
+    },
+    "del": "Eliminar",
+    "delConfirm": "¿Eliminar este plan?",
+    "snapInfo": "Instantánea: {tables} tablas · {rels} relaciones",
+    "dropped": "({n} relaciones sin tablas físicas se excluyen del orden)",
+    "chunkSize": "Tamaño de fragmento (filas/commit)",
+    "parallel": "Paralelismo (tablas a la vez)",
+    "saveOpts": "Guardar opciones",
+    "optsHint": "El paralelismo es el número de tablas que se cargan al mismo tiempo dentro de un nivel. El tamaño del fragmento es la unidad de commit (filas) que utilizará el motor de ejecución.",
+    "order": "Orden de carga",
+    "orderHint": "Ordenado topológicamente por relaciones de diseño (no FK físicas) para que las tablas padre aparezcan primero. Las tablas del mismo nivel no dependen entre sí y pueden cargarse en paralelo.",
+    "cycles": "{n} grupo(s) circular(es) — colocados en el mismo nivel. Establezca su orden manualmente y posponga las comprobaciones de referencia hasta después de la carga.",
+    "selfRefs": "Tablas autorreferenciadas (jerárquicas) — cargar primero las filas padre dentro de la tabla",
+    "level": "Nivel {n}",
+    "checklist": "Lista de verificación de transición",
+    "toReady": "Marcar como listo",
+    "toDraft": "Volver a borrador",
+    "readyNeedAll": "Verifique cada elemento antes de marcar el plan como listo.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "Punto de entrega de CDC",
+        "desc": "Registre un punto de origen consistente antes de la carga inicial (PG LSN · Oracle/Tibero SCN · para sondeo, hora de inicio menos una ventana de superposición), inicie CDC desde él y absorba los duplicados en la ventana de entrega con upserts."
+      },
+      "valueConv": {
+        "title": "Conversión de valores",
+        "desc": "Se establecen reglas para cadena vacía = NULL, relleno de espacios CHAR, NUMBER sin precisión → NUMERIC, DATE con hora → TIMESTAMP, VARCHAR2 BYTE ↔ longitud CHAR y LONG·RAW."
+      },
+      "charset": {
+        "title": "Conjunto de caracteres",
+        "desc": "Se confirma el conjunto de caracteres de origen (KO16MSWIN949, UTF8, …), con columnas que desbordan debido al crecimiento de multibyte y se decide el aislamiento de caracteres inconvertibles."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB se transmiten en fragmentos (límites de tamaño y memoria) y se verifican por longitud + hash."
+      },
+      "seqResync": {
+        "title": "Resincronización de secuencia",
+        "desc": "Después de la carga, las secuencias·identidades de destino se establecen en max(clave)+1."
+      },
+      "timezone": {
+        "title": "Zona horaria · columnas del sistema",
+        "desc": "Se establece la zona horaria de interpretación para valores sin una (por ejemplo, Asia/Seoul), los disparadores de tiempo de modificación no sobrescribirán las marcas de tiempo de origen durante la carga, y se establecen las reglas de sustitución de creador/modificador."
+      },
+      "backpressure": {
+        "title": "Contrapresión · carga de destino",
+        "desc": "Reduzca el tamaño del fragmento y el paralelismo en el retraso del destino, el crecimiento de WAL o las esperas de bloqueo; cree índices no PK después de la carga y ejecute ANALYZE·VACUUM después."
+      }
+    },
+    "verify": "SQL de verificación",
+    "verifyHint": "Genera consultas de recuento, suma de columnas numéricas, clave duplicada y hash de clave por tabla en orden de carga. Ejecútelas usted mismo en el origen y el destino y compare (esta pantalla no las ejecuta).",
+    "noHashOracle": "Las funciones hash y la representación de texto de Oracle·Tibero difieren de PostgreSQL, por lo que se omiten las consultas hash; compare recuentos, sumas y claves duplicadas.",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyFail": "No se pudo copiar. Seleccione el texto y cópielo manualmente.",
+    "engine": {
+      "title": "Ejecución·reinicio · ensayo·reversión",
+      "body": "La ejecución real de la migración (puntos de control, contrapresión, aislamiento de filas de error) y el ensayo, la reversión y el registro del punto de inicio de CDC estarán disponibles una vez que se finalice el modelo de seguridad del agente de trabajo (A10). Por ahora, esto cubre la planificación, las comprobaciones y el SQL de verificación."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "El enlace schema.pi se está preparando. Inténtelo de nuevo en breve.",
+      "LINK_DOWN": "No se puede acceder a schema.pi. Inténtelo de nuevo en breve.",
+      "LINK_AUTH": "El token de enlace ha caducado o ha sido revocado. Emita un nuevo token en schema.pi y regístrelo de nuevo.",
+      "LINK_NOT_FOUND": "Enlace no encontrado. Seleccione el enlace de nuevo.",
+      "LINK_SCOPE": "Este proyecto no pertenece a la taxonomía del enlace.",
+      "TIMEOUT": "La solicitud ha agotado el tiempo de espera. Inténtelo de nuevo en breve.",
+      "RATE": "Demasiadas solicitudes. Inténtelo de nuevo en un minuto.",
+      "MIG_NO_TABLES": "Este proyecto no tiene tablas físicas para migrar. Convierta a físico en schema.pi primero.",
+      "MIG_CHECK_INCOMPLETE": "Verifique cada elemento de la lista de verificación de transición antes de marcar el plan como listo.",
+      "NOT_FOUND": "Plan no encontrado."
+    }
+  },
+  "monitor": {
+    "title": "Centro de monitoreo",
+    "collectNote": "La recopilación se ejecuta en schema.pi — migración planificada (D7). Esta página lee el resumen del monitor de schema.pi.",
+    "noLink": "Seleccione o registre un enlace schema.pi primero.",
+    "goConnect": "Registrar un enlace",
+    "period": "Período",
+    "periods": {
+      "30": "30 min",
+      "60": "1 hora",
+      "360": "6 horas",
+      "1440": "24 horas"
+    },
+    "refresh": "Actualizar",
+    "loading": "Cargando…",
+    "updatedAt": "{area} · a partir de {time} (actualización automática cada 30s)",
+    "appTitle": "Rendimiento de la aplicación",
+    "dbTitle": "Estado de la DB por conexión",
+    "urlTitle": "Comprobaciones de URL",
+    "empty": "No hay datos para mostrar.",
+    "breachTitle": "{n} infracciones de umbral",
+    "rulesTitle": "Reglas de umbral",
+    "rulesNote": "Las reglas se guardan para este enlace y se evalúan contra el resumen recibido; las infracciones obtienen un borde rojo (las notificaciones llegarán más tarde).",
+    "metric": "Métrica",
+    "conn": "Conexión",
+    "allConns": "Todas las conexiones",
+    "op": "Comparar",
+    "threshold": "Umbral",
+    "thrInvalid": "Introduzca un número para el umbral.",
+    "addRule": "Añadir regla",
+    "noRules": "Aún no hay reglas.",
+    "enable": "Habilitar",
+    "disable": "Deshabilitar",
+    "delete": "Eliminar",
+    "delConfirm": "¿Eliminar esta regla?",
+    "aiNote": "El análisis de incidentes de IA y la aprobación de correcciones aún se realizan en el monitor de schema.pi.",
+    "aiLink": "Abrir monitor de schema.pi",
+    "metrics": {
+      "APP_TPS": "TPS (solicitudes/s)",
+      "APP_ERR_PCT": "Tasa de error (%)",
+      "APP_SLOW_CNT": "Solicitudes lentas",
+      "APP_AVG_MS": "Respuesta promedio (ms)",
+      "DB_SESS_CNT": "Sesiones",
+      "DB_LOCK_WAIT_CNT": "Esperas de bloqueo",
+      "DB_CACHE_HIT_PCT": "Acierto de caché (%)",
+      "DB_SIZE_MB": "Tamaño de DB (MB)",
+      "URL_RSP_MS": "Respuesta de URL (ms)",
+      "URL_FAIL_CNT": "Fallos de URL"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Seleccione un enlace primero.",
+      "NOT_IMPLEMENTED": "El enlace schema.pi se está preparando. Inténtelo de nuevo más tarde.",
+      "LINK_AUTH": "El token de enlace no es válido o ha caducado. Emita un nuevo token en schema.pi y regístrelo.",
+      "LINK_SCOPE": "Este enlace no puede acceder a esa taxonomía.",
+      "RATE": "Demasiadas solicitudes. Inténtelo de nuevo en breve.",
+      "TIMEOUT": "schema.pi está respondiendo lentamente. Inténtelo de nuevo en breve.",
+      "RULE_LIMIT": "Hasta 50 reglas por enlace.",
+      "NOT_FOUND": "Regla no encontrada."
+    }
+  },
+  "ops": {
+    "title": "Seguridad de operaciones de DB",
+    "loading": "Cargando…",
+    "pickFirst": "Seleccione un enlace y una conexión arriba primero",
+    "run": "Ejecutar diagnóstico",
+    "running": "Diagnosticando…",
+    "noRun": "Aún no hay diagnóstico. Pulse \"Ejecutar diagnóstico\"",
+    "lastRun": "Último diagnóstico {dtm}",
+    "readOnly": "El diagnóstico solo lee (SELECT). El consejo es una guía y depende de la memoria del servidor, la carga y la carga de trabajo",
+    "truncated": "Demasiados objetos — solo se verificaron los primeros 500",
+    "paramsNote": "La memoria total del servidor es desconocida, por lo que se estima a partir de shared_buffers ≈ 25% de RAM. random_page_cost asume SSD",
+    "auditNote": "Las tablas con RLS desactivado y las cuentas no utilizadas se verificarán una vez que la consulta de enlace las admita",
+    "replNote": "La línea base es Active-Standby (A-S) — un primario + en espera. Retraso de reproducción ≥ 5s = advertencia, ≥ 60s = riesgo (referencia RPO medida)",
+    "lagIdle": "Sin cambios",
+    "pager": "Paginación",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "tabs": {
+      "params": "Parámetros",
+      "audit": "Cuentas y privilegios",
+      "backup": "Copia de seguridad y recuperación",
+      "repl": "Replicación y DR",
+      "history": "Historial"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Advertencia",
+      "RISK": "Riesgo"
+    },
+    "role": {
+      "primary": "Esta conexión = Primaria",
+      "standby": "Esta conexión = En espera",
+      "unknown": "Rol desconocido"
+    },
+    "col": {
+      "level": "Veredicto",
+      "item": "Elemento",
+      "value": "Valor",
+      "reason": "Detalles",
+      "standby": "En espera",
+      "state": "Estado",
+      "sync": "Sincronización",
+      "lag": "Retraso de reproducción"
+    },
+    "item": {
+      "super_many": "superusuario",
+      "super_ok": "superusuario",
+      "bypass_rls": "Roles BYPASSRLS",
+      "bypass_ok": "Roles BYPASSRLS",
+      "no_expiry": "Caducidad de contraseña",
+      "expiry_ok": "Caducidad de contraseña",
+      "public_grant": "Permisos PUBLIC",
+      "public_ok": "Permisos PUBLIC",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Último WAL archivado",
+      "arc_stale": "Último WAL archivado",
+      "arc_recent": "Último WAL archivado",
+      "arc_failing": "Fallo de archivo WAL"
+    },
+    "rules": {
+      "sb_default": "En el valor predeterminado (128MB). En un servidor dedicado se recomienda alrededor del 25% de la RAM",
+      "sb_ok": "Configurado por encima del valor predeterminado",
+      "wm_over": "max_connections × work_mem excede la memoria estimada. Las ordenaciones concurrentes corren el riesgo de quedarse sin memoria",
+      "wm_default": "En el valor predeterminado (4MB). Las ordenaciones y hashes grandes pueden desbordarse al disco",
+      "wm_ok": "Dentro de un rango razonable",
+      "mwm_default": "En el valor predeterminado (64MB). VACUUM y las construcciones de índices pueden ser lentas; considere 256MB o más",
+      "mwm_ok": "Configurado por encima del valor predeterminado",
+      "av_on": "autovacuum está activado",
+      "av_off": "autovacuum está desactivado. Alto riesgo de hinchazón de tablas y desbordamiento de ID de transacción",
+      "conn_high": "max_connections es alto. Cada conexión usa memoria; se recomienda un pooler (PgBouncer, etc.)",
+      "conn_ok": "Dentro de un rango razonable",
+      "lmd_off": "El registro de consultas lentas está desactivado (-1). Se recomienda alrededor de 1000ms",
+      "lmd_all": "Cada instrucción se registra (0). Gran sobrecarga de registro",
+      "lmd_ok": "El registro de consultas lentas está activado",
+      "st_off": "No hay tiempo de espera de instrucción a nivel de servidor (0). Establezca límites por rol o aplicación",
+      "st_ok": "Se ha establecido un tiempo de espera de instrucción",
+      "iit_off": "No hay tiempo de espera de inactividad en transacción (0). Puede causar retención de bloqueos e hinchazón",
+      "iit_ok": "Se ha establecido un tiempo de espera de inactividad en transacción",
+      "ckpt_short": "El intervalo de punto de control es de 5 minutos o menos. Considere 10-15 minutos para cargas con muchas escrituras",
+      "ckpt_ok": "Dentro de un rango razonable",
+      "wal_minimal": "wal_level=minimal imposibilita PITR y la replicación. Use replica o superior",
+      "wal_ok": "El nivel WAL admite PITR y replicación",
+      "rpc_hdd": "Valor predeterminado de HDD (4). Para SSD, se recomienda 1.1-2",
+      "rpc_ok": "Adecuado para SSD",
+      "super_many": "Dos o más superusuarios. Mantenga uno para administración y otorgue solo los privilegios necesarios a los demás",
+      "super_ok": "Como máximo un superusuario",
+      "bypass_rls": "Existen roles no superusuario que omiten la seguridad a nivel de fila",
+      "bypass_ok": "No hay roles que omitan RLS",
+      "no_expiry": "Roles de inicio de sesión sin caducidad de contraseña. Establezca VALID UNTIL para cuentas personales",
+      "expiry_ok": "Todos los roles de inicio de sesión tienen una caducidad",
+      "public_grant": "PUBLIC (todos los roles) tiene privilegios de tabla. Los privilegios de escritura son riesgosos",
+      "public_ok": "No se otorgan privilegios de tabla a PUBLIC",
+      "arc_on": "El archivado WAL (archive_mode) está activado",
+      "arc_off": "El archivado WAL está desactivado, por lo que la recuperación a un punto en el tiempo (PITR) es imposible",
+      "arc_cmd_empty": "archive_mode está activado pero archive_command y archive_library están vacíos",
+      "arc_never": "Aún no se ha archivado ningún WAL",
+      "arc_stale": "El último archivo WAL tiene más de 24 horas",
+      "arc_recent": "WAL archivado en las últimas 24 horas",
+      "arc_failing": "El archivado WAL está fallando actualmente. Verifique el disco, los permisos y la ruta de destino",
+      "repl_is_standby": "Esta conexión es una en espera (modo de recuperación). Verifique el retraso desde la conexión primaria",
+      "repl_none": "No hay en espera conectada. No hay configuración de recuperación ante desastres (DR)",
+      "repl_ok": "Las en espera están transmitiendo normalmente",
+      "repl_lag": "Una en espera está retrasada o no está transmitiendo"
+    },
+    "manual": {
+      "title": "Lista de verificación manual",
+      "intro": "Prácticas de copia de seguridad y recuperación que no se pueden verificar automáticamente. Marque cuando se confirme y anote la evidencia",
+      "memo": "Nota (por ejemplo, herramienta, horario, última verificación)",
+      "save": "Guardar",
+      "updated": "Actualizado {dtm}",
+      "items": {
+        "base_backup": "Una copia de seguridad completa (pg_basebackup, etc.) se realizó con éxito en los últimos 7 días",
+        "offsite_copy": "Se mantiene una copia de seguridad fuera del sitio (otra región o almacenamiento)",
+        "restore_rehearsal": "Se realizó un ensayo de restauración este trimestre y se registró su duración",
+        "pitr_target": "El procedimiento PITR y el RPO/RTO objetivo están documentados",
+        "backup_encrypt": "Los archivos de copia de seguridad están cifrados y el acceso está restringido",
+        "retention": "Se define el período de retención de la copia de seguridad y la política de eliminación"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "El enlace schema.pi se está preparando. Inténtelo de nuevo en breve",
+      "CONN_UNSUPPORTED": "Esta conexión aún no es compatible (solo PostgreSQL directo)",
+      "TIMEOUT": "La DB de destino respondió demasiado lento. Inténtelo de nuevo en breve",
+      "RATE": "Demasiadas llamadas. Inténtelo de nuevo en un minuto",
+      "Q_UNKNOWN": "Consulta no compatible. Verifique la versión de la API del enlace schema.pi",
+      "INVALID_INPUT": "Selección de enlace o conexión no válida"
+    }
+  },
+  "perf": {
+    "title": "Rendimiento",
+    "loading": "Cargando…",
+    "pickFirst": "Seleccione un enlace y una conexión arriba primero",
+    "pager": "Paginación",
+    "tabs": {
+      "collect": "Recopilar",
+      "top": "Consultas lentas",
+      "health": "Estado de tablas e índices",
+      "trend": "Tendencia de tamaño",
+      "activity": "Actividad y bloqueos"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "El enlace schema.pi se está preparando. Inténtelo de nuevo más tarde",
+      "CONN_UNSUPPORTED": "Esta conexión aún no es compatible (solo conexiones directas de PostgreSQL)",
+      "RATE": "Demasiadas solicitudes. Inténtelo de nuevo en un minuto",
+      "LINK_AUTH": "El token de enlace ha caducado o ha sido revocado. Registre el token de nuevo en la página Conectar",
+      "LINK_SCOPE": "Esta conexión no pertenece al área temática del enlace",
+      "Q_UNKNOWN": "Consulta no compatible. Verifique la versión de la API del enlace schema.pi",
+      "INVALID_INPUT": "El valor del enlace o la conexión no es válido"
+    },
+    "pgss": {
+      "title": "Cómo habilitar pg_stat_statements",
+      "note": "PostgreSQL autoalojado también necesita pg_stat_statements en shared_preload_libraries (postgresql.conf) y un reinicio. Las estadísticas de tablas, índices y tamaño funcionan sin él"
+    },
+    "collect": {
+      "intro": "Recopilar ahora lee las principales estadísticas de consultas, tablas, índices y tamaños una vez y las almacena como una instantánea. Recopile al menos dos veces para ver los cambios y las tendencias de tamaño",
+      "run": "Recopilar ahora",
+      "running": "Recopilando…",
+      "done": "Recopilado el {dtm} — {qry} consultas · {tbl} tablas · {idx} índices"
+    },
+    "top": {
+      "sort": "Ordenar",
+      "sortTotal": "Tiempo total",
+      "sortMean": "Tiempo medio",
+      "sortCalls": "Llamadas",
+      "empty": "Aún no hay instantáneas. Pulse Recopilar ahora en la pestaña Recopilar",
+      "range": "Cambio entre {from} → {to}",
+      "first": "Primera instantánea el {dtm} — valores acumulativos (cambios desde la siguiente instantánea)",
+      "query": "Consulta (literales enmascarados)",
+      "calls": "Llamadas",
+      "totalMs": "Total ms",
+      "meanMs": "Media ms",
+      "rows": "Filas",
+      "reset": "Reinicio de estadísticas detectado — se muestra como acumulativo"
+    },
+    "health": {
+      "empty": "Aún no hay instantáneas. Presione Recopilar ahora en la pestaña Recopilar",
+      "basis": "Basado en la instantánea de {dtm}",
+      "unusedIdx": "Índices no utilizados",
+      "unusedIdxHint": "Índices nunca utilizados desde el último reinicio de estadísticas (por tamaño). No elimine los índices PK o de restricción única",
+      "fullScan": "Escaneos completos excesivos",
+      "fullScanHint": "Tablas con más de 1000 filas activas donde los escaneos completos son al menos la mitad — revise los índices en las columnas de filtro",
+      "dead": "Tuplas muertas excesivas",
+      "deadHint": "Relación de tuplas muertas del 20% o más — verifique la configuración de VACUUM y autovacuum",
+      "none": "Ninguno",
+      "scans": "escaneos"
+    },
+    "trend": {
+      "limit": "Umbral de tamaño",
+      "empty": "No hay instantáneas en los últimos 30 días",
+      "now": "Tamaño actual",
+      "perDay": "Crecimiento por día",
+      "needMore": "Necesita 2 o más instantáneas",
+      "daysLeft": "Alcanza {gb} GB",
+      "noGrowth": "Sin tendencia de crecimiento",
+      "days": "en aproximadamente {n} días"
+    },
+    "activity": {
+      "refresh": "Actualizar",
+      "live": "Consulta en vivo — no almacenada",
+      "sessions": "Actividad de la sesión",
+      "locks": "Bloqueos",
+      "none": "Ninguno"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pipelines",
+    "intro": "Comprueba si una DB de origen está lista para la captura de datos modificados (CDC) y diseña canalizaciones de origen → transformación → destino. Esta etapa solo comprueba y diseña; no se leen ni almacenan datos de fila del cliente.",
+    "needLink": "Primero, elija un enlace schema.pi arriba. Si no tiene ninguno, registre un token en el menú 'Enlace'.",
+    "needConn": "Elija la conexión de DB que desea comprobar arriba.",
+    "loading": "Cargando…",
+    "pager": "Páginas",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "runTitle": "Ejecutar y monitorear (7-3 · 7-4)",
+    "runBody": "La ejecución de pipelines, el monitoreo de retrasos y el reprocesamiento llegarán una vez que el agente de trabajo y el modelo de seguridad estén finalizados. Por ahora, guarde las definiciones como borradores (DRAFT).",
+    "pre": {
+      "title": "Verificación previa del origen",
+      "intro": "Para cada tabla, verifica las columnas de tiempo de cambio, las columnas de eliminación suave y la clave principal para recomendar un método de captura (adaptador), y verifica la preparación para la replicación lógica WAL. Solo se ejecutan consultas de catálogo y configuración de solo lectura.",
+      "schema": "Esquema (opcional)",
+      "schemaPh": "Todo",
+      "run": "Ejecutar verificación previa",
+      "running": "Verificando…",
+      "sum": "{tables} tablas · {noPk} sin PK · {deleteUnseen} no puede capturar eliminaciones",
+      "truncated": "Una consulta de catálogo alcanzó el límite de 500 filas, por lo que algunas tablas pueden faltar. Especifique un esquema y verifique de nuevo.",
+      "empty": "No hay tablas para verificar",
+      "colTable": "Tabla",
+      "colChg": "Columna de tiempo de cambio",
+      "colDel": "Columna de eliminación suave",
+      "colAdapter": "Método recomendado · razones",
+      "toDraft": "Crear borrador de pipeline a partir de {n} seleccionados"
+    },
+    "ready": {
+      "ok": "Replicación lógica WAL lista — las tablas con PK pueden usar LOGICAL",
+      "no": "Replicación lógica WAL no lista — captura mediante sondeo o comparación de claves",
+      "senders": "{n} conexiones de replicación"
+    },
+    "adapter": {
+      "LOGICAL": "Replicación lógica (WAL)",
+      "POLL": "Sondeo de tiempo de cambio",
+      "KEY_DIFF": "Diferencia de instantánea de clave",
+      "NONE": "Solo recarga completa"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Tiene columna de tiempo de cambio",
+      "NO_CHG_COL": "No tiene columna de tiempo de cambio",
+      "HAS_SOFT_DEL": "Tiene columna de eliminación suave",
+      "NO_SOFT_DEL": "No tiene columna de eliminación suave",
+      "HAS_PK": "Tiene clave principal",
+      "NO_PK": "No tiene clave principal — no se pueden identificar las filas cambiadas",
+      "DELETE_UNSEEN": "El sondeo no puede capturar eliminaciones físicas (se recomienda la columna de eliminación suave)",
+      "LOGICAL_NOT_READY": "Puede cambiar a LOGICAL una vez que la replicación lógica WAL esté lista",
+      "FULL_RELOAD_ONLY": "No hay PK o columna de tiempo de cambio, por lo que no hay captura incremental — agregue una PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level no es lógico (cambiarlo requiere un reinicio de la DB)",
+      "NO_SLOTS": "max_replication_slots es 0",
+      "NO_SENDERS": "max_wal_senders es 0",
+      "IS_STANDBY": "Servidor en espera — tome la replicación lógica del primario",
+      "SETTINGS_UNKNOWN": "No se pudieron leer las configuraciones, estado de preparación desconocido"
+    },
+    "ed": {
+      "title": "Definiciones de pipeline",
+      "draftOnly": "Solo diseño — guardado como borradores (DRAFT)",
+      "new": "Nuevo pipeline",
+      "empty": "No hay pipelines guardados",
+      "manual": "Manual",
+      "edit": "Editar",
+      "remove": "Eliminar",
+      "removeConfirm": "¿Eliminar pipeline '{name}'?",
+      "name": "Nombre",
+      "adapter": "Método de captura",
+      "srcConn": "Conexión de origen",
+      "useCurrentConn": "Usar la conexión seleccionada arriba",
+      "sched": "Programación (cron de 5 campos, en blanco = manual)",
+      "target": "Destino",
+      "targetPh": "ej. DB de análisis analytics.public / lake s3://…",
+      "tables": "Tablas de origen (separadas por nueva línea o coma)",
+      "steps": "Pasos (origen → transformación → destino)",
+      "op": "Operación",
+      "notePh": "Descripción · condición (opcional)",
+      "addTransform": "Agregar paso de transformación",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "saved": "Guardado",
+      "close": "Cerrar"
+    },
+    "kind": {
+      "SOURCE": "Origen",
+      "TRANSFORM": "Transformar",
+      "TARGET": "Destino"
+    },
+    "sts": {
+      "DRAFT": "Borrador"
+    },
+    "check": {
+      "NAME_REQUIRED": "Ingrese un nombre",
+      "CONN_REQUIRED": "Elija una conexión de origen",
+      "CRON_INVALID": "Ingrese la programación como cron de 5 campos (minuto hora día mes día_semana; dígitos, *, ',', -, /)",
+      "OP_REQUIRED": "Ingrese una operación para cada paso",
+      "STEPS_TOO_FEW": "Se requieren pasos de origen y destino",
+      "STEPS_TOO_MANY": "Hasta 20 pasos",
+      "STEP_FIRST_SOURCE": "El primer paso debe ser el origen",
+      "STEP_LAST_TARGET": "El último paso debe ser el destino",
+      "STEP_MIDDLE_TRANSFORM": "Solo los pasos de transformación pueden ir en medio"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "Ya existe un pipeline con este nombre. Use otro nombre",
+      "CONN_UNSUPPORTED": "Esta conexión aún no se puede verificar (solo conexiones directas a servidores PostgreSQL por ahora)"
+    }
+  },
+  "sqlLab": {
+    "title": "Laboratorio de optimización de SQL",
+    "intro": "Elija una conexión e ingrese SQL para ver el plan de ejecución como un árbol, con las causas de ralentización (escaneos completos, bucles anidados, grandes ordenaciones) y los anti-patrones de SQL verificados contra los dominios estándar de schema.pi. Las consultas nunca se ejecutan realmente (sin ANALYZE).",
+    "needLink": "Seleccione un enlace y una conexión arriba para ver los planes. La verificación de anti-patrones funciona sin un enlace.",
+    "sqlLabel": "SQL (una única instrucción SELECT o WITH)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Mostrar plan",
+    "explaining": "Cargando…",
+    "save": "Guardar plan",
+    "saving": "Guardando…",
+    "saveName": "Etiqueta (ej. antes de agregar índice)",
+    "saveNote": "Los valores constantes en las condiciones SQL y del plan se enmascaran como ? cuando se guardan.",
+    "plan": {
+      "title": "Plan de ejecución",
+      "summary": "Costo total {cost} · {ms}ms",
+      "cost": "costo",
+      "rows": "filas",
+      "width": "ancho"
+    },
+    "warn": {
+      "none": "No hay advertencias notables.",
+      "SEQ_SCAN_LARGE": "Escaneo completo en {relation} (aproximadamente {rows} filas) — considere un índice en las columnas de filtro.",
+      "NESTED_LOOP_HIGH": "El bucle anidado produce aproximadamente {rows} filas — considere un hash o merge join, o un índice en la condición de unión.",
+      "SORT_SPILL": "El tamaño de la ordenación es de aproximadamente {kb}KB, por encima del work_mem predeterminado (4MB); puede desbordarse al disco."
+    },
+    "lint": {
+      "run": "Verificar anti-patrones",
+      "title": "Verificación de anti-patrones SQL",
+      "none": "No se encontraron anti-patrones.",
+      "domainsOff": "No se pudieron cargar los dominios estándar; se verificó solo con las reglas predeterminadas de sufijo de columna.",
+      "types": {
+        "num": "numérico",
+        "date": "fecha",
+        "char": "carácter"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — seleccione solo las columnas que necesita (E/S extra, sin índice de cobertura).",
+        "FUNC_ON_COLUMN": "La columna de filtro {column} está envuelta en una función o expresión, por lo que su índice no se puede usar — transforme la constante en su lugar.",
+        "LEADING_WILDCARD": "LIKE con un % inicial no puede usar un índice B-tree — considere un índice GIN de pg_trgm.",
+        "OR_DIFF_COLUMNS": "Las condiciones en diferentes columnas se combinan con OR — considere UNION ALL o índices por columna.",
+        "IMPLICIT_CAST": "{column} se compara con un número entre comillas — haga coincidir los tipos de columna y constante (conversión implícita).",
+        "NOT_IN_SUBQUERY": "NOT IN (subconsulta) no devuelve nada cuando hay NULL y es lento — use NOT EXISTS.",
+        "NO_WHERE": "Sin cláusula WHERE — en una tabla grande esto es un escaneo completo (agregue una condición o LIMIT).",
+        "DOMAIN_MISMATCH": "{column} es de tipo {expected} según el dominio estándar, pero se compara con una constante de otro tipo — la conversión implícita puede impedir el uso del índice."
+      }
+    },
+    "saved": {
+      "title": "Planes guardados · Comparar",
+      "empty": "No hay planes guardados. Vea un plan y luego guárdelo.",
+      "pick": "Seleccionar plan para comparar",
+      "pick2": "Seleccione dos planes para comparar.",
+      "compare": "Comparar dos planes",
+      "delete": "Eliminar",
+      "cost": "costo",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "page": "Página {page}"
+    },
+    "diff": {
+      "cost": "Costo total {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "Los dos planes son para SQL diferentes (después de la normalización).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "No hay cambios en los nodos del plan.",
+      "before": "Antes",
+      "after": "Después"
+    },
+    "ai": {
+      "title": "Consejos de optimización de IA",
+      "badge": "Próximamente",
+      "body": "Próximamente (después de los procedimientos de aprobación y medición de impacto) — se generarán consejos a partir de SQL con constantes enmascaradas y se registrarán como aplicados solo después de la aprobación de DA y el impacto medido."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "La función de enlace schema.pi se está preparando. Inténtelo de nuevo en breve.",
+      "LINK_AUTH": "El token de enlace ha caducado o ha sido revocado. Emita un nuevo token en schema.pi y regístrelo de nuevo.",
+      "LINK_SCOPE": "Este enlace no puede usar esa conexión (esquema de clasificación diferente).",
+      "CONN_UNSUPPORTED": "Este tipo de conexión aún no es compatible (solo conexiones de servidor PostgreSQL).",
+      "Q_UNKNOWN": "Consulta no compatible.",
+      "SQL_NOT_SELECT": "Los planes solo están disponibles para una única instrucción que comience con SELECT o WITH.",
+      "TIMEOUT": "La solicitud ha agotado el tiempo de espera (5 segundos). Acorte el SQL o inténtelo de nuevo más tarde.",
+      "RATE": "Demasiadas solicitudes. Inténtelo de nuevo en un minuto.",
+      "PAYLOAD_TOO_LARGE": "El plan es demasiado grande para guardar.",
+      "LINK_NOT_FOUND": "Enlace no encontrado. Seleccione el enlace de nuevo."
+    }
+  },
+  "nav": {
+    "label": "Características",
+    "connect": "Conectar",
+    "sqlLab": "Optimización de SQL",
+    "perf": "Rendimiento",
+    "monitor": "Monitoreo",
+    "drift": "Deriva",
+    "migration": "Migración",
+    "pipeline": "Pipeline",
+    "analytics": "Análisis",
+    "ops": "Seguridad de operaciones",
+    "learn": "Aprender"
   }
 }
