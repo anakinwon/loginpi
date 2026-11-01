@@ -4,23 +4,7 @@
     "description": "Eine DBA- und SQLP-Workbench für den schnellen und sicheren Betrieb von DB-Engines"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Sorgen Sie dafür, dass Ihre DB-Engine Ihre Daten schnell und sicher verarbeitet",
-    "description": "Eine DBA- und SQLP-Workbench für Ausführungspläne, Statistiken und Performance. schema.pi kümmert sich um Design und Standards; dbms.pi ist der Partner auf der Engine-Seite.",
-    "welcome": "Willkommen, {name}.",
-    "featTitle": "Funktionen",
-    "featDesc": {
-      "connect": "schema.pi-Verbindungstoken registrieren und Verbindungsstatus prüfen",
-      "sqlLab": "Planbaum, Warnungen, Vergleich und Anti-Pattern-Prüfungen gegen Standarddomänen",
-      "perf": "Langsame Abfrage Top-N, Tabellen-/Index-Zustand, Kapazitätsprognose, Aktivität und Sperren",
-      "monitor": "Normal, Warnung und Gefahr für 14 Signale, plus was zu tun und wie es auf einen Blick zu lösen ist",
-      "drift": "schema.pi-Modell und DDL-Historie mit dem realen Katalog vergleichen, Indexeffekt messen",
-      "migration": "Topologische Lade-Reihenfolge, Chunks, Checkliste und Verifizierungs-SQL",
-      "pipeline": "Vorprüfung der Änderungsaufnahme und Definitionen der Quell-→Transformations-→Ziel-Pipeline",
-      "analytics": "KPI-Dashboard, 3-Schichten-Lake-Mapping und Dataset-Katalog",
-      "ops": "Nur-Lese-Diagnose von Parametern, Rollen, Backup und Replikations-DR",
-      "learn": "SQLP/DAP-Übungsfragen, Tuning-Fälle und DBMS-Vergleichswörterbuch"
-    }
+    "welcome": "Willkommen, {name}."
   },
   "auth": {
     "checking": "Anmeldung wird überprüft…",

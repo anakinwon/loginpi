@@ -4,23 +4,7 @@
     "description": "Un mediu de lucru DBA și SQLP pentru rularea rapidă și sigură a motoarelor DB"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Asigură rularea rapidă și sigură a datelor tale de către motorul DB",
-    "description": "Un mediu de lucru DBA și SQLP pentru planuri de execuție, statistici și performanță. schema.pi se ocupă de design și standarde; dbms.pi este partenerul său pe partea de motor.",
-    "welcome": "Bun venit, {name}.",
-    "featTitle": "Funcționalități",
-    "featDesc": {
-      "connect": "Înregistrează un token de legătură schema.pi și verifică starea conexiunii",
-      "sqlLab": "Arborele planului, avertismente, comparații și verificări anti-tipar împotriva domeniilor standard",
-      "perf": "Top-N interogări lente, starea tabelelor/indexurilor, prognoza capacității, activitate și blocări",
-      "monitor": "Stare normală, avertisment și pericol pentru 14 semnale, plus ce trebuie făcut și cum se rezolvă dintr-o privire",
-      "drift": "Compară modelul schema.pi și istoricul DDL cu catalogul real, măsoară efectul indexului",
-      "migration": "Ordine de încărcare topologică, segmente, listă de verificare și SQL de verificare",
-      "pipeline": "Pre-verificare captură de modificări și definiții de pipeline sursă→transformare→țintă",
-      "analytics": "Tablou de bord KPI, mapare lac cu 3 straturi și catalog de seturi de date",
-      "ops": "Diagnosticare doar în citire a parametrilor, rolurilor, backup-ului și DR de replicare",
-      "learn": "Întrebări practice SQLP/DAP, cazuri de optimizare și dicționar de comparație DBMS"
-    }
+    "welcome": "Bun venit, {name}."
   },
   "auth": {
     "checking": "Se verifică autentificarea…",

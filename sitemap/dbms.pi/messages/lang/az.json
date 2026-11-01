@@ -4,23 +4,7 @@
     "description": "DB mühərriklərini sürətli və təhlükəsiz idarə etmək üçün DBA·SQLP iş proqramı"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Məlumatlarınızı DB mühərriki ilə sürətli və təhlükəsiz idarə edin",
-    "description": "İcra planları, statistika və performansı idarə edən DBA·SQLP iş proqramıdır. Dizayn və standartlar schema.pi-yə, dbms.pi isə onun tərəfdaşı olaraq mühərrik tərəfinə cavabdehdir.",
-    "welcome": "Xoş gəlmisiniz, {name}.",
-    "featTitle": "Xüsusiyyətlər",
-    "featDesc": {
-      "connect": "schema.pi bağlantı tokenini qeyd edin və əlaqə vəziyyətini yoxlayın",
-      "sqlLab": "İcra planı ağacı, xəbərdarlıqlar, müqayisə və standart domenlərə qarşı anti-nümunə yoxlamaları",
-      "perf": "Yavaş sorğu Top-N, cədvəl/indeks sağlamlığı, tutum proqnozu, fəaliyyət və kilidlər",
-      "monitor": "14 siqnal üçün normal, xəbərdarlıq və təhlükə, üstəgəl nə etməli və necə həll etməli olduğunuz bir baxışda",
-      "drift": "schema.pi modeli və DDL tarixçəsini real kataloqla müqayisə edin, indeks effektini ölçün",
-      "migration": "Topoloji yükləmə ardıcıllığı, hissələr, yoxlama siyahısı və doğrulama SQL",
-      "pipeline": "Dəyişiklikləri ələ keçirmə ön yoxlaması və mənbə→çevirmə→hədəf boru kəməri tərifləri",
-      "analytics": "KPI paneli, 3 qatlı göl xəritəsi və məlumat dəsti kataloqu",
-      "ops": "Parametrlərin, rolların, ehtiyat nüsxəsinin və replikasiya DR-nin yalnız oxuma diaqnozu",
-      "learn": "SQLP·DAP təcrübə sualları, tənzimləmə halları və DBMS müqayisə lüğəti"
-    }
+    "welcome": "Xoş gəlmisiniz, {name}."
   },
   "auth": {
     "checking": "Daxil olma yoxlanılır…",

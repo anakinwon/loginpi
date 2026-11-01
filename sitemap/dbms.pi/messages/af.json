@@ -4,23 +4,7 @@
     "description": "'n DBA- en SQLP-werkbank om DB-enjins vinnig en veilig te laat loop"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Laat jou DB-enjin jou data vinnig en veilig laat loop",
-    "description": "'n DBA- en SQLP-werkbank vir uitvoeringsplanne, statistieke en werkverrigting. schema.pi hanteer ontwerp en standaarde; dbms.pi is sy vennoot aan die enjinkant.",
-    "welcome": "Welkom, {name}.",
-    "featTitle": "Kenmerke",
-    "featDesc": {
-      "connect": "Registreer 'n schema.pi-skakeltoken en kontroleer verbindingstatus",
-      "sqlLab": "Planboom, waarskuwings, vergelyking en anti-patroonkontroles teen standaarddomeine",
-      "perf": "Stadige navraag Top-N, tabel-/indeksgesondheid, kapasiteitsvoorspelling, aktiwiteit en slotte",
-      "monitor": "Normaal, waarskuwing en gevaar vir 14 seine, plus wat om te doen en hoe om dit in 'n oogopslag op te los",
-      "drift": "Vergelyk schema.pi-model en DDL-geskiedenis met die regte katalogus, meet indekseffek",
-      "migration": "Topologiese laaivolgorde, brokke, kontrolelys en verifikasie SQL",
-      "pipeline": "Verander-vaslegging voorkontrole en bron→transformeer→teiken pyplyndefinisies",
-      "analytics": "KPI-kontroleskerm, 3-laag meer-kartering en datastel-katalogus",
-      "ops": "Leesalleen-diagnose van parameters, rolle, rugsteun en replikasie DR",
-      "learn": "SQLP/DAP-oefenvrae, instellingsgevalle en DBMS-vergelykingswoordeboek"
-    }
+    "welcome": "Welkom, {name}."
   },
   "auth": {
     "checking": "Meld aan…",

@@ -4,22 +4,7 @@
     "description": "Un atelier DBA et SQLP pour exécuter les moteurs de base de données rapidement et en toute sécurité"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "description": "Un atelier DBA et SQLP pour les plans d'exécution, les statistiques et les performances. schema.pi gère la conception et les standards ; dbms.pi est son partenaire côté moteur.",
-    "welcome": "Bienvenue, {name}.",
-    "featTitle": "Fonctionnalités",
-    "featDesc": {
-      "connect": "Enregistrer un jeton de lien schema.pi et vérifier l'état de la connexion",
-      "sqlLab": "Arbre de plan, avertissements, comparaison et vérification des anti-modèles par rapport aux domaines standard",
-      "perf": "Top-N des requêtes lentes, santé des tables/index, prévision de capacité, activité et verrous",
-      "monitor": "Normal, avertissement et danger pour 14 signaux, plus ce qu'il faut faire et comment le résoudre en un coup d'œil",
-      "drift": "Comparer le modèle schema.pi et l'historique DDL avec le catalogue réel, mesurer l'effet de l'index",
-      "migration": "Ordre de chargement topologique, blocs, liste de contrôle et SQL de vérification",
-      "pipeline": "Pré-vérification de la capture des changements et définitions de pipeline source→transformation→cible",
-      "analytics": "Tableau de bord KPI, mappage de lac à 3 couches et catalogue de jeux de données",
-      "ops": "Diagnostic en lecture seule des paramètres, rôles, sauvegarde et DR de réplication",
-      "learn": "Questions pratiques SQLP/DAP, cas de réglage et dictionnaire de comparaison de SGBD"
-    }
+    "welcome": "Bienvenue, {name}."
   },
   "auth": {
     "checking": "Vérification de la connexion…",

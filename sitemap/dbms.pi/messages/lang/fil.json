@@ -4,23 +4,7 @@
     "description": "Isang DBA at SQLP workbench para sa mabilis at ligtas na pagpapatakbo ng mga DB engine"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Paganahin ang iyong DB engine nang mabilis at ligtas ang iyong data",
-    "description": "Isang DBA at SQLP workbench para sa mga execution plan, istatistika, at performance. Ang schema.pi ang humahawak sa disenyo at mga pamantayan; ang dbms.pi ang partner nito sa panig ng engine.",
-    "welcome": "Maligayang pagdating, {name}.",
-    "featTitle": "Mga Tampok",
-    "featDesc": {
-      "connect": "Magrehistro ng schema.pi link token at suriin ang status ng koneksyon",
-      "sqlLab": "Plan tree, mga babala, paghahambing at anti-pattern checks laban sa mga standard domain",
-      "perf": "Mabagal na query Top-N, kalusugan ng table/index, forecast ng kapasidad, aktibidad at mga lock",
-      "monitor": "Normal, babala, at panganib para sa 14 na signal, kasama ang kung ano ang gagawin at kung paano ito lutasin sa isang sulyap",
-      "drift": "Paghambingin ang schema.pi model at DDL history sa totoong catalog, sukatin ang epekto ng index",
-      "migration": "Topological load order, chunks, checklist at verification SQL",
-      "pipeline": "Precheck ng change-capture at mga definisyon ng pipeline ng source→transform→target",
-      "analytics": "KPI dashboard, 3-layer lake mapping at dataset catalog",
-      "ops": "Read-only diagnosis ng mga parameter, roles, backup at replication DR",
-      "learn": "Mga tanong sa pagsasanay ng SQLP/DAP, mga kaso ng pag-tune at diksyunaryo ng paghahambing ng DBMS"
-    }
+    "welcome": "Maligayang pagdating, {name}."
   },
   "auth": {
     "checking": "Sinusuri ang pag-sign in…",

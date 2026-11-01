@@ -1,25 +1,17 @@
 'use client'
 
-// dbms.pi 홈 로그인 게이트 — 미로그인이면 공용 LoginGate(Pi 로그인 + Google 버튼), 로그인이면 연동 안내(redirect 금지 — Pi Browser 무한 루프).
-//  Pi 세션이고 Google 연동 전이면 환영 문구 + 6자리 코드 발급(PiLinkCodeIssuer). 연동 완료(/api/auth/me linked)·Google 세션(연동돼야 생김)이면 둘 다 숨김(2026-11-01 마스터)
+// dbms.pi 첫 화면 연동 안내 — Pi 세션이고 Google 연동 전이면 환영 문구 + 6자리 코드 발급(PiLinkCodeIssuer)
+//  로그인 전(로그인은 아래 MonitorView 게이트가 맡음)·연동 완료(/api/auth/me linked)·Google 세션(연동돼야 생김)이면 아무것도 안 그림(2026-11-01·11-02 마스터)
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { readApi } from '@/lib/client-api'
 import { PiLinkCodeIssuer, useAppUser } from './google-auth'
-import { LoginGate } from './login-gate'
 
-export function HomeGate() {
-  return (
-    <LoginGate>
-      {(user) => <LinkPrompt name={user.displayName || user.username || ''} />}
-    </LoginGate>
-  )
-}
-
-function LinkPrompt({ name }: { name: string }) {
+export function HomeLinkPrompt() {
   const t = useTranslations('home')
-  const { source } = useAppUser()
+  const { source, user } = useAppUser()
+  const name = user?.displayName || user?.username || ''
   // null = 판정 전(깜빡임 방지로 아무것도 안 그림). 조회 실패는 미연동으로(코드 발급이 보일 뿐)
   const [linked, setLinked] = useState<boolean | null>(null)
   useEffect(() => {

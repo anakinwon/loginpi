@@ -4,23 +4,7 @@
     "description": "A DBA and SQLP workbench for running DB engines fast and safely"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Make your DB engine run your data fast and safely",
-    "description": "A DBA and SQLP workbench for execution plans, statistics, and performance. schema.pi handles design and standards; dbms.pi is its partner on the engine side.",
-    "welcome": "Welcome, {name}.",
-    "featTitle": "Features",
-    "featDesc": {
-      "connect": "Register a schema.pi link token and check connection status",
-      "sqlLab": "Plan tree, warnings, comparison and anti-pattern checks against standard domains",
-      "perf": "Slow query Top-N, table/index health, capacity forecast, activity and locks",
-      "monitor": "Normal, warning, and danger for 14 signals, plus what to do and how to solve it at a glance",
-      "drift": "Compare schema.pi model and DDL history with the real catalog, measure index effect",
-      "migration": "Topological load order, chunks, checklist and verification SQL",
-      "pipeline": "Change-capture precheck and source→transform→target pipeline definitions",
-      "analytics": "KPI dashboard, 3-layer lake mapping and dataset catalog",
-      "ops": "Read-only diagnosis of parameters, roles, backup and replication DR",
-      "learn": "SQLP/DAP practice questions, tuning cases and DBMS comparison dictionary"
-    }
+    "welcome": "Welcome, {name}."
   },
   "auth": {
     "checking": "Checking sign-in…",

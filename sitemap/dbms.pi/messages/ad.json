@@ -4,23 +4,7 @@
     "description": "Un entorn de treball de DBA i SQLP per executar motors de DB de manera ràpida i segura"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Fes que el teu motor de DB executi les teves dades de manera ràpida i segura",
-    "description": "Un entorn de treball de DBA i SQLP per a plans d'execució, estadístiques i rendiment. schema.pi s'encarrega del disseny i els estàndards; dbms.pi és el seu soci en el costat del motor.",
-    "welcome": "Benvingut/da, {name}.",
-    "featTitle": "Funcions",
-    "featDesc": {
-      "connect": "Registra un testimoni d'enllaç de schema.pi i comprova l'estat de la connexió",
-      "sqlLab": "Arbre de planificació, advertiments, comparació i comprovacions anti-patró contra dominis estàndard",
-      "perf": "Consultes lentes Top-N, salut de taules/índexs, previsió de capacitat, activitat i bloquejos",
-      "monitor": "Normal, avís i perill per a 14 senyals, a més de què fer i com resoldre-ho d'un cop d'ull",
-      "drift": "Compara el model de schema.pi i l'historial de DDL amb el catàleg real, mesura l'efecte de l'índex",
-      "migration": "Ordre de càrrega topològica, fragments, llista de comprovació i SQL de verificació",
-      "pipeline": "Comprovació prèvia de captura de canvis i definicions de pipeline origen→transformació→destí",
-      "analytics": "Tauler de KPI, mapeig de llac de 3 capes i catàleg de conjunts de dades",
-      "ops": "Diagnòstic de només lectura de paràmetres, rols, còpies de seguretat i DR de replicació",
-      "learn": "Preguntes de pràctica de SQLP/DAP, casos d'ajust i diccionari de comparació de DBMS"
-    }
+    "welcome": "Benvingut/da, {name}."
   },
   "auth": {
     "checking": "Comprovant l'inici de sessió…",

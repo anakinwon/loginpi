@@ -4,23 +4,7 @@
     "description": "Pracovná aplikácia DBA a SQLP na rýchle a bezpečné spúšťanie DB enginov"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Zabezpečte, aby váš DB engine spracovával dáta rýchlo a bezpečne",
-    "description": "Pracovná aplikácia DBA a SQLP pre plány vykonávania, štatistiky a výkon. schema.pi sa stará o dizajn a štandardy; dbms.pi je jej partnerom na strane enginu.",
-    "welcome": "Vitajte, {name}.",
-    "featTitle": "Funkcie",
-    "featDesc": {
-      "connect": "Zaregistrujte token prepojenia schema.pi a skontrolujte stav pripojenia",
-      "sqlLab": "Strom plánu, varovania, porovnanie a kontroly anti-vzoru voči štandardným doménam",
-      "perf": "Pomalé dotazy Top-N, stav tabuliek/indexov, predpoveď kapacity, aktivita a zámky",
-      "monitor": "Normálny stav, varovanie a riziko pre 14 signálov, plus čo robiť a ako to vyriešiť na prvý pohľad",
-      "drift": "Porovnajte model schema.pi a históriu DDL so skutočným katalógom, zmerajte efekt indexu",
-      "migration": "Topologické poradie načítania, bloky, kontrolný zoznam a overovací SQL",
-      "pipeline": "Predbežná kontrola zachytávania zmien a definície pipeline zdroj→transformácia→cieľ",
-      "analytics": "KPI dashboard, 3-vrstvové mapovanie jazera a katalóg datasetov",
-      "ops": "Diagnostika parametrov, rolí, zálohovania a replikácie DR len na čítanie",
-      "learn": "Cvičné otázky SQLP/DAP, prípady ladenia a porovnávací slovník DBMS"
-    }
+    "welcome": "Vitajte, {name}."
   },
   "auth": {
     "checking": "Kontrolujem prihlásenie…",

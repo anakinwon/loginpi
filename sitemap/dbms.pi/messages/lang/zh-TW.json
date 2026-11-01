@@ -4,23 +4,7 @@
     "description": "DBA 和 SQLP 的工作平台，用於快速安全地運行 DB 引擎"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "讓您的 DB 引擎快速安全地運行您的資料",
-    "description": "一個用於執行計畫、統計和效能的 DBA 和 SQLP 工作平台。schema.pi 負責設計和標準；dbms.pi 則是其在引擎端的合作夥伴。",
-    "welcome": "歡迎，{name}。",
-    "featTitle": "功能",
-    "featDesc": {
-      "connect": "註冊 schema.pi 連結權杖並檢查連線狀態",
-      "sqlLab": "計畫樹、警告、比較和針對標準領域的反模式檢查",
-      "perf": "慢速查詢 Top-N、資料表/索引健康狀況、容量預測、活動和鎖定",
-      "monitor": "14 個訊號的正常、警告、危險狀態，以及應對措施和解決方法一目了然",
-      "drift": "比較 schema.pi 模型和 DDL 歷史記錄與實際目錄，測量索引效果",
-      "migration": "拓撲載入順序、區塊、檢查清單和驗證 SQL",
-      "pipeline": "變更捕獲預檢和來源→轉換→目標管道定義",
-      "analytics": "KPI 儀表板、三層資料湖映射和資料集目錄",
-      "ops": "參數、角色、備份和複製 DR 的唯讀診斷",
-      "learn": "SQLP/DAP 練習題、調優案例和 DBMS 比較字典"
-    }
+    "welcome": "歡迎，{name}。"
   },
   "auth": {
     "checking": "正在檢查登入…",

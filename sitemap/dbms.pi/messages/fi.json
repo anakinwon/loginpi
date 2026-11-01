@@ -4,23 +4,7 @@
     "description": "DBA- ja SQLP-työpöytä DB-moottoreiden nopeaan ja turvalliseen käyttöön"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Anna DB-moottorisi käsitellä tietojasi nopeasti ja turvallisesti",
-    "description": "DBA- ja SQLP-työpöytä suoritussuunnitelmille, tilastoille ja suorituskyvylle. schema.pi hoitaa suunnittelun ja standardit; dbms.pi on sen kumppani moottoripuolella.",
-    "welcome": "Tervetuloa, {name}.",
-    "featTitle": "Ominaisuudet",
-    "featDesc": {
-      "connect": "Rekisteröi schema.pi-linkkitunnus ja tarkista yhteystila",
-      "sqlLab": "Suunnitelmapuu, varoitukset, vertailu ja anti-pattern-tarkistukset standardidomainien suhteen",
-      "perf": "Hitaat kyselyt Top-N, taulukon/indeksin kunto, kapasiteetin ennuste, aktiivisuus ja lukitukset",
-      "monitor": "14 signaalin normaali, varoitus ja vaara sekä mitä tehdä ja miten ratkaista yhdellä silmäyksellä",
-      "drift": "Vertaa schema.pi-mallia ja DDL-historiaa todelliseen luetteloon, mittaa indeksin vaikutusta",
-      "migration": "Topologinen latausjärjestys, palat, tarkistuslista ja varmennus-SQL",
-      "pipeline": "Muutosten sieppauksen esitarkistus ja lähde→muunnos→kohde-putkilinjojen määritykset",
-      "analytics": "KPI-hallintapaneeli, 3-kerroksinen järvikartoitus ja tietojoukkoluettelo",
-      "ops": "Parametrien, roolien, varmuuskopioinnin ja replikoinnin DR:n vain luku -diagnoosi",
-      "learn": "SQLP/DAP-harjoituskysymykset, viritystapaukset ja DBMS-vertailusanakirja"
-    }
+    "welcome": "Tervetuloa, {name}."
   },
   "auth": {
     "checking": "Kirjautumista tarkistetaan…",

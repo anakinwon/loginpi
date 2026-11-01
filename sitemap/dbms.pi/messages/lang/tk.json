@@ -4,23 +4,7 @@
     "description": "DBA we SQLP iş programmasy, DB hereketlendirijilerini çalt we ygtybarly dolandyrmak üçin"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "DB hereketlendirijisi maglumatlaryňyzy çalt we ygtybarly işledýär",
-    "description": "DBA we SQLP iş programmasy, ýerine ýetiriş meýilnamalary, statistika we öndürijilik üçin. schema.pi dizaýn we standartlar bilen meşgullanýar, dbms.pi bolsa hereketlendiriji tarapynda onuň hyzmatdaşy.",
-    "welcome": "Hoş geldiňiz, {name}.",
-    "featTitle": "Aýratynlyklar",
-    "featDesc": {
-      "connect": "schema.pi baglanyşyk tokenini hasaba alyň we baglanyşyk ýagdaýyny barlaň",
-      "sqlLab": "Meýilnama agajy, duýduryşlar, deňeşdirmek we standart domenlere garşy anti-nusga barlaglary",
-      "perf": "Haýal sorag Top-N, tablisanyň/indeksiň saglygy, kuwwatlylyk çaklamasy, işjeňlik we gulplar",
-      "monitor": "14 signalyň kadaly, duýduryş we howp ýagdaýlary, şeýle hem näme etmelidigini we ony nädip çözmelidigini bir seretmekde",
-      "drift": "schema.pi modelini we DDL taryhyny hakyky katalog bilen deňeşdiriň, indeks effektini ölçäň",
-      "migration": "Topologiki ýükleme tertibi, bölekler, barlag sanawy we tassyklama SQL",
-      "pipeline": "Üýtgeşmeleri ýazga almak üçin deslapky barlag we çeşme→öwrülişik→nyşana turba geçirijisiniň kesgitlemeleri",
-      "analytics": "KPI paneli, 3 gatlakly köl kartasy we maglumatlar toplumynyň katalogy",
-      "ops": "Parametrleriň, rollaryň, ätiýaçlyk nusgasynyň we replikasiýa DR-iň diňe okamak üçin diagnostikasy",
-      "learn": "SQLP/DAP tejribe soraglary, sazlama ýagdaýlary we DBMS deňeşdirme sözlügi"
-    }
+    "welcome": "Hoş geldiňiz, {name}."
   },
   "auth": {
     "checking": "Giriş barlanylýar…",

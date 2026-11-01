@@ -4,23 +4,7 @@
     "description": "DB motorlarını hızlı ve güvenli bir şekilde çalıştırmak için bir DBA ve SQLP çalışma alanı"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "DB motorunuzun verilerinizi hızlı ve güvenli bir şekilde çalıştırmasını sağlayın",
-    "description": "Yürütme planları, istatistikler ve performans için bir DBA ve SQLP çalışma alanıdır. schema.pi tasarım ve standartları yönetirken, dbms.pi motor tarafındaki ortağıdır.",
-    "welcome": "Hoş geldiniz, {name}.",
-    "featTitle": "Özellikler",
-    "featDesc": {
-      "connect": "Bir schema.pi bağlantı belirteci kaydedin ve bağlantı durumunu kontrol edin",
-      "sqlLab": "Plan ağacı, uyarılar, karşılaştırma ve standart alanlara karşı anti-kalıp kontrolleri",
-      "perf": "Yavaş sorgu Top-N, tablo/dizin sağlığı, kapasite tahmini, etkinlik ve kilitler",
-      "monitor": "14 sinyal için normal, uyarı ve tehlike durumları ile yapılması gerekenler ve çözüm yolları bir bakışta",
-      "drift": "schema.pi modelini ve DDL geçmişini gerçek katalogla karşılaştırın, dizin etkisini ölçün",
-      "migration": "Topolojik yükleme sırası, parçalar, kontrol listesi ve doğrulama SQL'i",
-      "pipeline": "Değişiklik yakalama ön kontrolü ve kaynak→dönüştürme→hedef işlem hattı tanımları",
-      "analytics": "KPI panosu, 3 katmanlı göl eşlemesi ve veri kümesi kataloğu",
-      "ops": "Parametrelerin, rollerin, yedeklemenin ve çoğaltma DR'nin salt okunur tanısı",
-      "learn": "SQLP/DAP pratik soruları, ayarlama vakaları ve DBMS karşılaştırma sözlüğü"
-    }
+    "welcome": "Hoş geldiniz, {name}."
   },
   "auth": {
     "checking": "Oturum açılıyor kontrol ediliyor…",

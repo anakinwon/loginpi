@@ -4,23 +4,7 @@
     "description": "DB 엔진을 빠르고 안전하게 운영하는 DBA·SQLP 작업 앱"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "담은 데이터를 DB 엔진이 빠르고 안전하게 돌리도록",
-    "description": "실행계획·통계·성능을 다루는 DBA·SQLP 작업 앱입니다. 설계·표준은 schema.pi 가 맡고, dbms.pi 는 그 짝으로 엔진 쪽을 맡습니다.",
-    "welcome": "{name} 님, 환영합니다.",
-    "featTitle": "기능",
-    "featDesc": {
-      "connect": "schema.pi 연결 토큰을 등록하고 접속 상태를 확인합니다",
-      "sqlLab": "실행계획 트리·경고·비교와 표준 도메인 대조 안티패턴 점검",
-      "perf": "느린 쿼리 Top-N·테이블/인덱스 건강·용량 추이 예측·활동/락",
-      "monitor": "14개 신호의 정상·주의·위험과 지금 할 일·해결 방법을 한눈에",
-      "drift": "schema.pi 모델·DDL 이력과 실제 카탈로그 대조, 인덱스 효과 측정",
-      "migration": "관계 위상 정렬 적재 순서·청크·체크리스트·검증 SQL",
-      "pipeline": "변경 캡처 사전 점검과 원천→변환→대상 파이프라인 정의",
-      "analytics": "KPI 대시보드·레이크 3층 매핑·데이터셋 카탈로그",
-      "ops": "파라미터·계정 권한·백업·복제 DR 읽기 전용 진단",
-      "learn": "SQLP·DAP 실습 문제·튜닝 사례집·DBMS 비교 사전"
-    }
+    "welcome": "{name} 님, 환영합니다."
   },
   "auth": {
     "checking": "로그인 확인 중…",

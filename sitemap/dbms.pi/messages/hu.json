@@ -4,23 +4,7 @@
     "description": "DBA és SQLP munkaállomás a DB motorok gyors és biztonságos futtatásához"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Tegye gyorssá és biztonságossá DB motorját az adatok futtatásában",
-    "description": "DBA és SQLP munkaállomás végrehajtási tervekhez, statisztikákhoz és teljesítményhez. A schema.pi kezeli a tervezést és a szabványokat; a dbms.pi a partnere a motor oldalon.",
-    "welcome": "Üdvözöljük, {name}!",
-    "featTitle": "Funkciók",
-    "featDesc": {
-      "connect": "Regisztráljon egy schema.pi link tokent, és ellenőrizze a kapcsolat állapotát",
-      "sqlLab": "Tervfa, figyelmeztetések, összehasonlítás és anti-minta ellenőrzések a szabványos tartományok ellen",
-      "perf": "Lassú lekérdezés Top-N, tábla/index állapot, kapacitás előrejelzés, aktivitás és zárolások",
-      "monitor": "14 jel normál, figyelmeztető és veszélyes állapota, valamint a teendők és megoldások egy pillantásra",
-      "drift": "Hasonlítsa össze a schema.pi modellt és a DDL előzményeket a valós katalógussal, mérje az index hatását",
-      "migration": "Topológiai betöltési sorrend, darabok, ellenőrzőlista és ellenőrző SQL",
-      "pipeline": "Változásrögzítési előellenőrzés és forrás→átalakítás→cél pipeline definíciók",
-      "analytics": "KPI irányítópult, 3 rétegű tó leképezés és adatkészlet katalógus",
-      "ops": "Paraméterek, szerepkörök, biztonsági mentés és replikáció DR csak olvasható diagnózisa",
-      "learn": "SQLP/DAP gyakorló kérdések, hangolási esetek és DBMS összehasonlító szótár"
-    }
+    "welcome": "Üdvözöljük, {name}!"
   },
   "auth": {
     "checking": "Bejelentkezés ellenőrzése…",

@@ -4,23 +4,7 @@
     "description": "Goob shaqo oo DBA iyo SQLP ah oo lagu socodsiiyo matoorada DB si degdeg ah oo ammaan ah"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Ka dhig matoorkaaga DB inuu xogtaada u socodsiiyo si degdeg ah oo ammaan ah",
-    "description": "Waa goob shaqo oo DBA iyo SQLP ah oo loogu talagalay qorshayaasha fulinta, tirakoobyada, iyo waxqabadka. schema.pi waxay gacanta ku haysaa naqshadaynta iyo heerarka; dbms.pi waa lammaanaheeda dhinaca matoorka.",
-    "welcome": "Soo dhawoow, {name}.",
-    "featTitle": "Astaamaha",
-    "featDesc": {
-      "connect": "Diiwaangeli calaamadda isku xirka schema.pi oo hubi heerka isku xirka",
-      "sqlLab": "Geedka qorshaha, digniinaha, isbarbardhigga iyo hubinta qaababka ka hortagga ee ka dhanka ah domainyada heerka",
-      "perf": "Weydiinta gaabiska ah Top-N, caafimaadka miiska/index, saadaasha awoodda, dhaqdhaqaaqa iyo qufulada",
-      "monitor": "Calaamadaha caadiga ah, digniinta, iyo khatarta 14 calaamadood, oo lagu daray waxa la sameeyo iyo sida loo xalliyo jaleeco",
-      "drift": "Isbarbardhig schema.pi model iyo taariikhda DDL oo leh buugga dhabta ah, cabbir saamaynta index",
-      "migration": "Amarka rarista topological, qaybaha, liiska hubinta iyo SQL xaqiijinta",
-      "pipeline": "Hubinta hore ee qabashada isbeddelka iyo qeexitaannada dhuumaha isha→beddel→bartilmaameedka",
-      "analytics": "Dashboard KPI, khariidadda harada 3-lakab iyo buugga xogta",
-      "ops": "Baadhitaan akhris-kaliya ah oo ku saabsan cabbirrada, doorarka, kaydinta iyo soo celinta DR",
-      "learn": "Su'aalaha tababarka SQLP/DAP, kiisaska hagaajinta iyo qaamuuska isbarbardhigga DBMS"
-    }
+    "welcome": "Soo dhawoow, {name}."
   },
   "auth": {
     "checking": "Hubinaya galitaanka…",

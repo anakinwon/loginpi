@@ -4,23 +4,7 @@
     "description": "DBA va SQLP ish stoli DB dvigatellarini tez va xavfsiz ishlatish uchun"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "DB dvigatelingiz maʼlumotlaringizni tez va xavfsiz ishlatsin",
-    "description": "Ijro rejalari, statistikalar va ishlash uchun DBA va SQLP ish stoli. schema.pi dizayn va standartlarni boshqaradi; dbms.pi uning dvigatel tomonidagi hamkoridir.",
-    "welcome": "Xush kelibsiz, {name}.",
-    "featTitle": "Xususiyatlar",
-    "featDesc": {
-      "connect": "schema.pi havola tokenini roʻyxatdan oʻtkazing va ulanish holatini tekshiring",
-      "sqlLab": "Reja daraxti, ogohlantirishlar, taqqoslash va standart domenlarga qarshi anti-naqsh tekshiruvlari",
-      "perf": "Sekin soʻrov Top-N, jadval/indeks holati, sigʻim prognozi, faoliyat va blokirovkalar",
-      "monitor": "14 ta signal uchun normal, ogohlantirish va xavf, shuningdek, nima qilish kerakligi va uni qanday hal qilish kerakligi bir qarashda",
-      "drift": "schema.pi modeli va DDL tarixini haqiqiy katalog bilan solishtiring, indeks effektini oʻlchang",
-      "migration": "Topologik yuklash tartibi, boʻlaklar, nazorat roʻyxati va tekshirish SQL",
-      "pipeline": "Oʻzgarishlarni qamrab olishni oldindan tekshirish va manba→transformatsiya→maqsad quvur liniyasi taʼriflari",
-      "analytics": "KPI boshqaruv paneli, 3 qatlamli koʻl xaritasi va maʼlumotlar toʻplami katalogi",
-      "ops": "Parametrlar, rollar, zaxira nusxalash va replikatsiya DR ning faqat oʻqish uchun diagnostikasi",
-      "learn": "SQLP/DAP amaliy savollari, sozlash holatlari va DBMS taqqoslash lugʻati"
-    }
+    "welcome": "Xush kelibsiz, {name}."
   },
   "auth": {
     "checking": "Kirish tekshirilmoqda…",

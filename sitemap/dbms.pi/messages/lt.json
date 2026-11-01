@@ -4,23 +4,7 @@
     "description": "DBA ir SQLP darbo vieta, skirta greitai ir saugiai valdyti DB variklius"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Užtikrinkite, kad jūsų DB variklis greitai ir saugiai apdorotų duomenis",
-    "description": "DBA ir SQLP darbo vieta, skirta vykdymo planams, statistikai ir našumui. schema.pi tvarko dizainą ir standartus; dbms.pi yra jos partneris variklio pusėje.",
-    "welcome": "Sveiki, {name}.",
-    "featTitle": "Funkcijos",
-    "featDesc": {
-      "connect": "Užregistruokite schema.pi nuorodos žetoną ir patikrinkite ryšio būseną",
-      "sqlLab": "Plano medis, įspėjimai, palyginimas ir anti-modelių patikrinimai pagal standartinius domenus",
-      "perf": "Lėtos užklausos Top-N, lentelių/indeksų būklė, talpos prognozė, veikla ir užraktai",
-      "monitor": "14 signalų būsenos (normalu, įspėjimas, pavojus), ką daryti ir kaip išspręsti – viskas vienu žvilgsniu",
-      "drift": "Palyginkite schema.pi modelį ir DDL istoriją su realiu katalogu, įvertinkite indekso efektą",
-      "migration": "Topologinė įkėlimo tvarka, dalys, kontrolinis sąrašas ir patvirtinimo SQL",
-      "pipeline": "Pakeitimų fiksavimo išankstinis patikrinimas ir šaltinio→transformavimo→tikslo konvejerio apibrėžimai",
-      "analytics": "KPI prietaisų skydelis, 3 sluoksnių ežero žemėlapis ir duomenų rinkinių katalogas",
-      "ops": "Tik skaitymo parametrų, vaidmenų, atsarginių kopijų ir replikacijos DR diagnostika",
-      "learn": "SQLP/DAP praktikos klausimai, derinimo atvejai ir DBMS palyginimo žodynas"
-    }
+    "welcome": "Sveiki, {name}."
   },
   "auth": {
     "checking": "Tikrinamas prisijungimas…",

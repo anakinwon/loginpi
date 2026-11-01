@@ -4,23 +4,7 @@
     "description": "Un workbench DBA e SQLP per eseguire i motori DB in modo rapido e sicuro"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Fai in modo che il tuo motore DB esegua i tuoi dati in modo rapido e sicuro",
-    "description": "Un workbench DBA e SQLP per piani di esecuzione, statistiche e prestazioni. schema.pi gestisce la progettazione e gli standard; dbms.pi è il suo partner lato motore.",
-    "welcome": "Benvenuto, {name}.",
-    "featTitle": "Funzionalità",
-    "featDesc": {
-      "connect": "Registra un token di collegamento schema.pi e controlla lo stato della connessione",
-      "sqlLab": "Albero del piano, avvisi, confronto e controlli anti-pattern rispetto ai domini standard",
-      "perf": "Query lente Top-N, stato di tabelle/indici, previsione della capacità, attività e blocchi",
-      "monitor": "Stato normale, di avviso e di pericolo per 14 segnali, oltre a cosa fare e come risolvere a colpo d'occhio",
-      "drift": "Confronta il modello schema.pi e la cronologia DDL con il catalogo reale, misura l'effetto dell'indice",
-      "migration": "Ordine di caricamento topologico, chunk, checklist e SQL di verifica",
-      "pipeline": "Pre-controllo della cattura delle modifiche e definizioni della pipeline source→transform→target",
-      "analytics": "Dashboard KPI, mappatura del lake a 3 strati e catalogo dei dataset",
-      "ops": "Diagnosi di sola lettura di parametri, ruoli, backup e DR di replica",
-      "learn": "Domande pratiche SQLP/DAP, casi di tuning e dizionario di confronto DBMS"
-    }
+    "welcome": "Benvenuto, {name}."
   },
   "auth": {
     "checking": "Verifica accesso…",

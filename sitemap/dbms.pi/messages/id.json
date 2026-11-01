@@ -4,23 +4,7 @@
     "description": "Aplikasi kerja DBA·SQLP untuk menjalankan mesin DB dengan cepat dan aman"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Jadikan mesin DB Anda menjalankan data dengan cepat dan aman",
-    "description": "Aplikasi kerja DBA·SQLP untuk rencana eksekusi, statistik, dan kinerja. schema.pi menangani desain dan standar; dbms.pi adalah mitranya di sisi mesin.",
-    "welcome": "Selamat datang, {name}.",
-    "featTitle": "Fitur",
-    "featDesc": {
-      "connect": "Daftarkan token tautan schema.pi dan periksa status koneksi",
-      "sqlLab": "Pohon rencana, peringatan, perbandingan, dan pemeriksaan anti-pola terhadap domain standar",
-      "perf": "Kueri lambat Top-N, kesehatan tabel/indeks, perkiraan kapasitas, aktivitas, dan kunci",
-      "monitor": "Status normal, peringatan, dan risiko dari 14 sinyal, serta hal yang harus dilakukan dan cara memperbaikinya secara sekilas",
-      "drift": "Bandingkan model schema.pi dan riwayat DDL dengan katalog sebenarnya, ukur efek indeks",
-      "migration": "Urutan pemuatan topologi, potongan, daftar periksa, dan SQL verifikasi",
-      "pipeline": "Pemeriksaan awal tangkapan perubahan dan definisi pipeline sumber→transformasi→target",
-      "analytics": "Dasbor KPI, pemetaan lake 3 lapis, dan katalog dataset",
-      "ops": "Diagnosis hanya-baca parameter, peran, pencadangan, dan DR replikasi",
-      "learn": "Soal latihan SQLP·DAP, kasus penyetelan, dan kamus perbandingan DBMS"
-    }
+    "welcome": "Selamat datang, {name}."
   },
   "auth": {
     "checking": "Memeriksa masuk…",

@@ -4,23 +4,7 @@
     "description": "DBA ja SQLP töölaud DB-mootorite kiireks ja ohutuks käitamiseks"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Pange oma DB-mootor andmeid kiiresti ja ohutult käitama",
-    "description": "DBA ja SQLP töölaud täitmisplaanide, statistika ja jõudluse jaoks. schema.pi tegeleb disaini ja standarditega; dbms.pi on selle partner mootori poolel.",
-    "welcome": "Tere tulemast, {name}.",
-    "featTitle": "Funktsioonid",
-    "featDesc": {
-      "connect": "Registreerige schema.pi lingitoken ja kontrollige ühenduse olekut",
-      "sqlLab": "Plaanipuu, hoiatused, võrdlus ja antipatternite kontroll standarddomeenide vastu",
-      "perf": "Aeglaste päringute Top-N, tabeli/indeksi seisund, võimsuse prognoos, tegevus ja lukud",
-      "monitor": "14 signaali (normaalne, hoiatus, oht) ning mida teha ja kuidas lahendada – kõik ühe pilguga",
-      "drift": "Võrrelge schema.pi mudelit ja DDL-i ajalugu tegeliku kataloogiga, mõõtke indeksi efekti",
-      "migration": "Topoloogiline laadimisjärjekord, tükid, kontrollnimekiri ja verifitseerimise SQL",
-      "pipeline": "Muutuste jäädvustamise eelkontroll ja allika→teisenduse→sihtmärgi torujuhtme definitsioonid",
-      "analytics": "KPI armatuurlaud, 3-kihiline järve kaardistamine ja andmestiku kataloog",
-      "ops": "Parameetrite, rollide, varunduse ja replikatsiooni DR-i ainult lugemiseks diagnostika",
-      "learn": "SQLP/DAP praktikaülesanded, häälestusjuhtumid ja DBMS-i võrdlussõnastik"
-    }
+    "welcome": "Tere tulemast, {name}."
   },
   "auth": {
     "checking": "Sisselogimise kontrollimine…",

@@ -4,23 +4,7 @@
     "description": "DBA un SQLP darbstacija DB dzinēju ātrai un drošai darbībai"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Panāciet, lai jūsu DB dzinējs ātri un droši apstrādātu jūsu datus",
-    "description": "DBA un SQLP darbstacija izpildes plāniem, statistikai un veiktspējai. schema.pi apstrādā dizainu un standartus; dbms.pi ir tā partneris dzinēja pusē.",
-    "welcome": "Sveicināti, {name}.",
-    "featTitle": "Funkcijas",
-    "featDesc": {
-      "connect": "Reģistrējiet schema.pi saites marķieri un pārbaudiet savienojuma statusu",
-      "sqlLab": "Plāna koks, brīdinājumi, salīdzinājumi un pret-modeļu pārbaudes pret standarta domēniem",
-      "perf": "Lēnu vaicājumu Top-N, tabulas/indeksa veselība, kapacitātes prognoze, aktivitāte un bloķēšana",
-      "monitor": "14 signālu statuss (normāls, brīdinājums, risks), kā arī risinājumi un rīcības plāns vienā acu uzmetienā",
-      "drift": "Salīdziniet schema.pi modeli un DDL vēsturi ar reālo katalogu, novērtējiet indeksa efektu",
-      "migration": "Topoloģiskā ielādes secība, bloki, kontrolsaraksts un verifikācijas SQL",
-      "pipeline": "Izmaiņu uztveršanas priekšpārbaude un avota→transformācijas→mērķa cauruļvadu definīcijas",
-      "analytics": "KPI informācijas panelis, 3 slāņu ezera kartēšana un datu kopu katalogs",
-      "ops": "Tikai lasāma parametru, lomu, dublējumu un replikācijas DR diagnostika",
-      "learn": "SQLP/DAP prakses jautājumi, pielāgošanas gadījumi un DBMS salīdzināšanas vārdnīca"
-    }
+    "welcome": "Sveicināti, {name}."
   },
   "auth": {
     "checking": "Pārbauda pierakstīšanos…",

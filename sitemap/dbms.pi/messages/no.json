@@ -4,23 +4,7 @@
     "description": "En DBA- og SQLP-arbeidsbenk for å kjøre DB-motorer raskt og sikkert"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Få DB-motoren til å kjøre dataene dine raskt og sikkert",
-    "description": "En DBA- og SQLP-arbeidsbenk for utførelsesplaner, statistikk og ytelse. schema.pi håndterer design og standarder; dbms.pi er partneren på motorsiden.",
-    "welcome": "Velkommen, {name}.",
-    "featTitle": "Funksjoner",
-    "featDesc": {
-      "connect": "Registrer et schema.pi-koblingstoken og sjekk tilkoblingsstatus",
-      "sqlLab": "Plantre, advarsler, sammenligning og anti-mønsterkontroller mot standarddomener",
-      "perf": "Sakte spørring Top-N, tabell-/indekshelse, kapasitetsprognose, aktivitet og låser",
-      "monitor": "Normal, advarsel og fare for 14 signaler, pluss hva du skal gjøre og hvordan du løser det med et øyekast",
-      "drift": "Sammenlign schema.pi-modell og DDL-historikk med den virkelige katalogen, mål indekseffekt",
-      "migration": "Topologisk lastrekkefølge, biter, sjekkliste og verifiserings-SQL",
-      "pipeline": "Forhåndskontroll av endringsfangst og kilde→transformasjon→mål-pipeline-definisjoner",
-      "analytics": "KPI-dashbord, 3-lags lake-mapping og datasettkatalog",
-      "ops": "Skrivebeskyttet diagnose av parametere, roller, sikkerhetskopiering og replikering DR",
-      "learn": "SQLP/DAP-øvelsesspørsmål, justeringssaker og DBMS-sammenligningsordbok"
-    }
+    "welcome": "Velkommen, {name}."
   },
   "auth": {
     "checking": "Sjekker pålogging…",

@@ -4,23 +4,7 @@
     "description": "DBA og SQLP vinnustöð til að keyra DB vélar hratt og örugglega"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Láttu DB vélina keyra gögnin þín hratt og örugglega",
-    "description": "DBA og SQLP vinnustöð fyrir framkvæmdaáætlanir, tölfræði og afköst. schema.pi sér um hönnun og staðla; dbms.pi er samstarfsaðili þess á vélarhliðinni.",
-    "welcome": "Velkomin, {name}.",
-    "featTitle": "Eiginleikar",
-    "featDesc": {
-      "connect": "Skráðu schema.pi tengitákn og athugaðu tengistöðu",
-      "sqlLab": "Áætlunartré, viðvaranir, samanburður og athuganir á andstæðum mynstrum gegn stöðluðum lénum",
-      "perf": "Hæg fyrirspurn Top-N, heilsa töflu/vísitölu, afkastagetuspá, virkni og læsingar",
-      "monitor": "Staða, viðvörun og hætta fyrir 14 merki, auk þess hvað á að gera og hvernig á að leysa það í fljótu bragði",
-      "drift": "Berðu saman schema.pi líkan og DDL sögu við raunverulega skrána, mældu áhrif vísitölu",
-      "migration": "Röðun hleðsluröð, hlutar, gátlisti og staðfestingar SQL",
-      "pipeline": "Forathugun á breytingafangi og skilgreiningar á uppruna→umbreytingu→markpípu",
-      "analytics": "KPI mælaborð, 3-laga vatnaskilgreining og gagnasafnaskrá",
-      "ops": "Aðeins lesanleg greining á breytum, hlutverkum, öryggisafritun og afritun DR",
-      "learn": "SQLP/DAP æfingarspurningar, stillingartilvik og DBMS samanburðarorðabók"
-    }
+    "welcome": "Velkomin, {name}."
   },
   "auth": {
     "checking": "Athuga innskráningu…",

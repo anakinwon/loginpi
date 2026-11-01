@@ -4,23 +4,7 @@
     "description": "Ứng dụng làm việc DBA·SQLP để vận hành DB engine nhanh chóng và an toàn"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Giúp DB engine vận hành dữ liệu của bạn nhanh chóng và an toàn",
-    "description": "Đây là ứng dụng làm việc DBA·SQLP để xử lý kế hoạch thực thi, thống kê và hiệu suất. schema.pi đảm nhiệm thiết kế và tiêu chuẩn, dbms.pi là đối tác phụ trách phía engine.",
-    "welcome": "Chào mừng, {name}.",
-    "featTitle": "Tính năng",
-    "featDesc": {
-      "connect": "Đăng ký token liên kết schema.pi và kiểm tra trạng thái kết nối",
-      "sqlLab": "Cây kế hoạch thực thi, cảnh báo, so sánh và kiểm tra anti-pattern đối với các miền tiêu chuẩn",
-      "perf": "Top-N truy vấn chậm, tình trạng bảng/chỉ mục, dự báo dung lượng, hoạt động và khóa",
-      "monitor": "14 tín hiệu OK, cảnh báo, rủi ro và các việc cần làm, cách khắc phục trong nháy mắt",
-      "drift": "So sánh mô hình schema.pi và lịch sử áp dụng DDL với danh mục thực tế, đo lường hiệu quả chỉ mục",
-      "migration": "Thứ tự tải theo cấu trúc liên kết, khối, danh sách kiểm tra và SQL xác minh",
-      "pipeline": "Kiểm tra trước thay đổi và định nghĩa pipeline nguồn→chuyển đổi→đích",
-      "analytics": "Bảng điều khiển KPI, ánh xạ hồ dữ liệu 3 lớp và danh mục tập dữ liệu",
-      "ops": "Chẩn đoán chỉ đọc các tham số, vai trò, sao lưu và DR sao chép",
-      "learn": "Câu hỏi thực hành SQLP·DAP, các trường hợp điều chỉnh và từ điển so sánh DBMS"
-    }
+    "welcome": "Chào mừng, {name}."
   },
   "auth": {
     "checking": "Đang kiểm tra đăng nhập…",

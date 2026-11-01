@@ -4,23 +4,7 @@
     "description": "DBA i SQLP radna aplikacija za brzo i sigurno pokretanje DB pogona"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Neka vaš DB pogon brzo i sigurno obrađuje vaše podatke",
-    "description": "DBA i SQLP radna aplikacija za planove izvršenja, statistiku i performanse. schema.pi se bavi dizajnom i standardima; dbms.pi je njegov partner na strani pogona.",
-    "welcome": "Dobrodošli, {name}.",
-    "featTitle": "Značajke",
-    "featDesc": {
-      "connect": "Registrirajte schema.pi vezni token i provjerite status veze",
-      "sqlLab": "Stablo plana, upozorenja, usporedba i provjere anti-uzoraka prema standardnim domenama",
-      "perf": "Spori upiti Top-N, stanje tablica/indeksa, predviđanje kapaciteta, aktivnost i zaključavanja",
-      "monitor": "Normalno, upozorenje i opasnost za 14 signala, plus što učiniti i kako to riješiti na prvi pogled",
-      "drift": "Usporedite schema.pi model i povijest DDL-a sa stvarnim katalogom, izmjerite učinak indeksa",
-      "migration": "Topološki redoslijed učitavanja, dijelovi, kontrolna lista i SQL za provjeru",
-      "pipeline": "Prethodna provjera snimanja promjena i definicije cjevovoda izvor→transformacija→cilj",
-      "analytics": "KPI nadzorna ploča, trostruko mapiranje jezera i katalog skupova podataka",
-      "ops": "Dijagnostika parametara, uloga, sigurnosne kopije i replikacije DR samo za čitanje",
-      "learn": "SQLP/DAP pitanja za vježbu, slučajevi ugađanja i rječnik usporedbe DBMS-a"
-    }
+    "welcome": "Dobrodošli, {name}."
   },
   "auth": {
     "checking": "Provjera prijave…",

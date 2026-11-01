@@ -66,7 +66,9 @@ const ICON: Record<GroupKey, ReactNode> = {
 
 export function FeatureNav() {
   const t = useTranslations('nav')
-  const path = usePathname()
+  // 첫 화면(/) = 모니터링 보드(마스터 2026-11-02) — 메뉴에서는 /monitor 로 본다
+  const raw = usePathname()
+  const path = raw === '/' ? '/monitor' : raw
   const cur = FEATURE_GROUPS.find((g) =>
     g.items.some((i) => isActive(path, i.href)),
   )

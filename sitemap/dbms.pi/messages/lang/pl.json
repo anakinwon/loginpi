@@ -4,23 +4,7 @@
     "description": "Środowisko pracy DBA i SQLP do szybkiego i bezpiecznego uruchamiania silników DB"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Spraw, aby Twój silnik DB szybko i bezpiecznie przetwarzał dane",
-    "description": "Środowisko pracy DBA i SQLP do planów wykonania, statystyk i wydajności. schema.pi zajmuje się projektowaniem i standardami; dbms.pi jest jego partnerem po stronie silnika.",
-    "welcome": "Witaj, {name}.",
-    "featTitle": "Funkcje",
-    "featDesc": {
-      "connect": "Zarejestruj token połączenia schema.pi i sprawdź status połączenia",
-      "sqlLab": "Drzewo planu, ostrzeżenia, porównanie i sprawdzanie antywzorców względem standardowych domen",
-      "perf": "Wolne zapytania Top-N, kondycja tabel/indeksów, prognoza pojemności, aktywność i blokady",
-      "monitor": "Normalny, ostrzegawczy i niebezpieczny dla 14 sygnałów, a także co robić i jak rozwiązać problem na pierwszy rzut oka",
-      "drift": "Porównaj model schema.pi i historię DDL z rzeczywistym katalogiem, zmierz efekt indeksu",
-      "migration": "Topologiczna kolejność ładowania, fragmenty, lista kontrolna i SQL weryfikacyjny",
-      "pipeline": "Wstępne sprawdzenie przechwytywania zmian i definicje potoków źródło→transformacja→cel",
-      "analytics": "Panel KPI, trójwarstwowe mapowanie jeziora danych i katalog zbiorów danych",
-      "ops": "Diagnostyka tylko do odczytu parametrów, ról, kopii zapasowych i replikacji DR",
-      "learn": "Pytania praktyczne SQLP/DAP, przypadki strojenia i słownik porównawczy DBMS"
-    }
+    "welcome": "Witaj, {name}."
   },
   "auth": {
     "checking": "Sprawdzanie logowania…",

@@ -4,23 +4,7 @@
     "description": "Um ambiente de trabalho DBA e SQLP para executar motores de DB de forma rápida e segura"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Faça seu motor de DB executar seus dados de forma rápida e segura",
-    "description": "Um ambiente de trabalho DBA e SQLP para planos de execução, estatísticas e desempenho. schema.pi lida com design e padrões; dbms.pi é seu parceiro no lado do motor.",
-    "welcome": "Bem-vindo(a), {name}.",
-    "featTitle": "Funcionalidades",
-    "featDesc": {
-      "connect": "Registre um token de link schema.pi e verifique o status da conexão",
-      "sqlLab": "Árvore de plano, avisos, comparação e verificações de anti-padrões contra domínios padrão",
-      "perf": "Top-N de consultas lentas, saúde de tabelas/índices, previsão de capacidade, atividade e bloqueios",
-      "monitor": "Normal, aviso e perigo para 14 sinais, além do que fazer e como resolver rapidamente",
-      "drift": "Compare o modelo schema.pi e o histórico DDL com o catálogo real, meça o efeito do índice",
-      "migration": "Ordem de carregamento topológica, blocos, lista de verificação e SQL de verificação",
-      "pipeline": "Pré-verificação de captura de alterações e definições de pipeline fonte→transformação→destino",
-      "analytics": "Painel de KPI, mapeamento de lago de 3 camadas e catálogo de conjuntos de dados",
-      "ops": "Diagnóstico somente leitura de parâmetros, funções, backup e DR de replicação",
-      "learn": "Questões práticas SQLP/DAP, casos de ajuste e dicionário de comparação de DBMS"
-    }
+    "welcome": "Bem-vindo(a), {name}."
   },
   "auth": {
     "checking": "Verificando login…",

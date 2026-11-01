@@ -4,23 +4,7 @@
     "description": "Një punishte DBA dhe SQLP për ekzekutimin e motorëve të DB shpejt dhe sigurt"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Bëni që motori juaj i DB të ekzekutojë të dhënat tuaja shpejt dhe sigurt",
-    "description": "Një punishte DBA dhe SQLP për planet e ekzekutimit, statistikat dhe performancën. schema.pi merret me dizajnin dhe standardet; dbms.pi është partneri i saj në anën e motorit.",
-    "welcome": "Mirë se vini, {name}.",
-    "featTitle": "Veçoritë",
-    "featDesc": {
-      "connect": "Regjistroni një token lidhjeje schema.pi dhe kontrolloni statusin e lidhjes",
-      "sqlLab": "Pema e planit, paralajmërimet, krahasimi dhe kontrollet kundër-model kundër fushave standarde",
-      "perf": "Top-N i pyetjeve të ngadalta, shëndeti i tabelës/indeksit, parashikimi i kapacitetit, aktiviteti dhe bllokimet",
-      "monitor": "Normal, paralajmërim dhe rrezik për 14 sinjale, plus çfarë të bëni dhe si ta zgjidhni me një shikim",
-      "drift": "Krahasoni modelin schema.pi dhe historikun DDL me katalogun real, matni efektin e indeksit",
-      "migration": "Renditja topologjike e ngarkimit, copat, lista e kontrollit dhe SQL-i i verifikimit",
-      "pipeline": "Parakontrolli i kapjes së ndryshimeve dhe përkufizimet e pipeline-it burim→transformim→target",
-      "analytics": "Paneli i KPI-ve, hartëzimi i liqenit me 3 shtresa dhe katalogu i grupeve të të dhënave",
-      "ops": "Diagnoza vetëm për lexim e parametrave, roleve, rezervës dhe replikimit DR",
-      "learn": "Pyetje praktike SQLP/DAP, raste akordimi dhe fjalor krahasimi i DBMS"
-    }
+    "welcome": "Mirë se vini, {name}."
   },
   "auth": {
     "checking": "Duke kontrolluar hyrjen…",

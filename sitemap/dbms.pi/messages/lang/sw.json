@@ -4,23 +4,7 @@
     "description": "Programu ya kufanyia kazi ya DBA·SQLP ya kuendesha injini za DB haraka na kwa usalama"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Fanya injini yako ya DB iendeshe data yako haraka na kwa usalama",
-    "description": "Programu ya kufanyia kazi ya DBA·SQLP ya mipango ya utekelezaji, takwimu, na utendaji. schema.pi inashughulikia usanifu na viwango; dbms.pi ni mshirika wake upande wa injini.",
-    "welcome": "Karibu, {name}.",
-    "featTitle": "Vipengele",
-    "featDesc": {
-      "connect": "Sajili tokeni ya kiungo cha schema.pi na uangalie hali ya muunganisho",
-      "sqlLab": "Mti wa mpango, maonyo, ulinganisho na ukaguzi wa mifumo isiyo sahihi dhidi ya vikoa vya kawaida",
-      "perf": "Hoja polepole Top-N, afya ya jedwali/faharisi, utabiri wa uwezo, shughuli na kufuli",
-      "monitor": "Kawaida, onyo, na hatari kwa ishara 14, pamoja na nini cha kufanya na jinsi ya kutatua kwa haraka",
-      "drift": "Linganisha modeli ya schema.pi na historia ya DDL na katalogi halisi, pima athari ya faharisi",
-      "migration": "Mpangilio wa upakiaji wa topolojia, vipande, orodha ya ukaguzi na SQL ya uthibitishaji",
-      "pipeline": "Ukaguzi wa awali wa kunasa mabadiliko na ufafanuzi wa bomba la chanzo→badilisha→lengo",
-      "analytics": "Dashibodi ya KPI, ramani ya ziwa ya tabaka 3 na katalogi ya hifadhidata",
-      "ops": "Uchunguzi wa kusoma tu wa vigezo, majukumu, chelezo na urudufishaji wa DR",
-      "learn": "Maswali ya mazoezi ya SQLP/DAP, kesi za kurekebisha na kamusi ya kulinganisha ya DBMS"
-    }
+    "welcome": "Karibu, {name}."
   },
   "auth": {
     "checking": "Inakagua kuingia…",

@@ -4,23 +4,7 @@
     "description": "Aplikasi kerja DBA·SQLP untuk mengendalikan enjin DB dengan pantas dan selamat"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Jadikan enjin DB anda mengendalikan data anda dengan pantas dan selamat",
-    "description": "Aplikasi kerja DBA·SQLP untuk pelan pelaksanaan, statistik dan prestasi. schema.pi mengendalikan reka bentuk dan piawaian; dbms.pi adalah rakan kongsinya di bahagian enjin.",
-    "welcome": "Selamat datang, {name}.",
-    "featTitle": "Ciri-ciri",
-    "featDesc": {
-      "connect": "Daftar token pautan schema.pi dan semak status sambungan",
-      "sqlLab": "Pokok pelan, amaran, perbandingan dan semakan anti-corak terhadap domain standard",
-      "perf": "Pertanyaan perlahan Top-N, kesihatan jadual/indeks, ramalan kapasiti, aktiviti dan kunci",
-      "monitor": "Normal, amaran, dan bahaya untuk 14 isyarat, serta perkara yang perlu dilakukan dan cara menyelesaikannya sepintas lalu",
-      "drift": "Bandingkan model schema.pi dan sejarah DDL dengan katalog sebenar, ukur kesan indeks",
-      "migration": "Susunan muatan topologi, cebisan, senarai semak dan SQL pengesahan",
-      "pipeline": "Prapemeriksaan tangkapan perubahan dan definisi saluran paip sumber→transformasi→sasaran",
-      "analytics": "Papan pemuka KPI, pemetaan tasik 3 lapisan dan katalog set data",
-      "ops": "Diagnosis baca sahaja parameter, peranan, sandaran dan DR replikasi",
-      "learn": "Soalan latihan SQLP·DAP, kes penalaan dan kamus perbandingan DBMS"
-    }
+    "welcome": "Selamat datang, {name}."
   },
   "auth": {
     "checking": "Menyemak log masuk…",

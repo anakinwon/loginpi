@@ -4,23 +4,7 @@
     "description": "Delovno okolje DBA in SQLP za hitro in varno delovanje DB pogonov"
   },
   "home": {
-    "badge": "DBA · SQLP",
-    "headline": "Poskrbite, da bo vaš DB pogon hitro in varno obdeloval vaše podatke",
-    "description": "Delovno okolje DBA in SQLP za načrte izvajanja, statistiko in zmogljivost. schema.pi skrbi za načrtovanje in standarde; dbms.pi je njegov partner na strani pogona.",
-    "welcome": "Dobrodošli, {name}.",
-    "featTitle": "Funkcije",
-    "featDesc": {
-      "connect": "Registrirajte žeton povezave schema.pi in preverite stanje povezave",
-      "sqlLab": "Drevo načrta, opozorila, primerjava in preverjanje protipredlog proti standardnim domenam",
-      "perf": "Počasne poizvedbe Top-N, stanje tabel/indeksov, napoved zmogljivosti, aktivnost in zaklepanja",
-      "monitor": "Normalno, opozorilo in tveganje za 14 signalov, plus kaj storiti in kako rešiti na prvi pogled",
-      "drift": "Primerjajte model schema.pi in zgodovino DDL z dejanskim katalogom, izmerite učinek indeksa",
-      "migration": "Topološki vrstni red nalaganja, kosi, kontrolni seznam in SQL za preverjanje",
-      "pipeline": "Predhodno preverjanje zajemanja sprememb in definicije cevovodov vir→transformacija→cilj",
-      "analytics": "Nadzorna plošča KPI, 3-slojna preslikava jezera in katalog podatkovnih nizov",
-      "ops": "Diagnostika parametrov, vlog, varnostnega kopiranja in replikacije DR samo za branje",
-      "learn": "Vprašanja za vajo SQLP/DAP, primeri uglaševanja in slovar primerjav DBMS"
-    }
+    "welcome": "Dobrodošli, {name}."
   },
   "auth": {
     "checking": "Preverjanje prijave…",
