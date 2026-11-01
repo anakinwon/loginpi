@@ -1251,7 +1251,7 @@
         "SELECT_STAR": "SELECT * – valige ainult vajalikud veerud (lisanduv I/O, puudub kattev indeks).",
         "FUNC_ON_COLUMN": "Filtri veerg {column} on ümbritsetud funktsiooni või avaldisega, seega ei saa selle indeksit kasutada – teisendage selle asemel konstant.",
         "LEADING_WILDCARD": "LIKE algava %-ga ei saa kasutada B-puu indeksit – kaaluge pg_trgm GIN indeksit.",
-        "OR_DIFF_COLUMNS": "Erinevate veergude tingimused on kombineeritud OR-iga – kaaluge UNION ALL-i või veergude kaupa indekseid.",
+        "OR_DIFF_COLUMNS": "OR-iga ühendatud tingimused erinevatel veergudel – kaaluge jagamist UNION-iga (lisage duplikaatide välistamise tingimus, kui UNION ALL) või veergude kaupa indeksite ülevaatamist.",
         "IMPLICIT_CAST": "{column} võrreldakse jutumärkides oleva numbriga – sobitage veeru ja konstandi tüübid (kaudne tüübimuutus).",
         "NOT_IN_SUBQUERY": "NOT IN (alamküsimus) ei tagasta midagi, kui NULL-id on olemas ja on aeglane – kasutage NOT EXISTS.",
         "NO_WHERE": "Puudub WHERE klausel – suure tabeli puhul on see täielik skaneerimine (lisage tingimus või LIMIT).",
@@ -1281,8 +1281,63 @@
     },
     "ai": {
       "title": "AI häälestamise nõuanne",
-      "badge": "Varsti saadaval",
-      "body": "Varsti saadaval (pärast heakskiidu ja mõju mõõtmise protseduure) – nõuanded genereeritakse SQL-ist maskeeritud konstantidega ja registreeritakse rakendatuks alles pärast DA heakskiitu ja mõõdetud mõju."
+      "intro": "Valige üks salvestatud plaan, et genereerida nõuandeid. Saadetakse ainult SQL ja plaanid, kus konstandid on maskeeritud kui ? (reeglipõhised nõuanded, kui võtit pole või ebaõnnestumise korral). Pärast lingi omaniku heakskiitu käivitage sama SQL-i jaoks uuesti EXPLAIN, salvestage see ja mõõtke mõju selle hilisema plaaniga – alles siis registreeritakse see rakendatuna.",
+      "pickPlan": "Valige nõuannete jaoks salvestatud plaan",
+      "create": "Genereeri nõuanded",
+      "creating": "Genereerimine… (kuni 30 s)",
+      "noPlans": "Salvestatud plaane pole. Vaadake ülal EXPLAIN-plaani ja salvestage see.",
+      "note": "Üks nõuanne plaani kohta. Olemasoleva nõuande uuesti genereerimiseks kustutage see. DDL on ainult soovituslik – rakendage see schema.pi-s.",
+      "empty": "Nõuandeid pole veel.",
+      "noItems": "Selle plaani jaoks ei leitud parandusi.",
+      "cost": "Eelnev kulu",
+      "delete": "Kustuta",
+      "prev": "Eelmine",
+      "next": "Järgmine",
+      "page": "Lehekülg {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Reegel"
+      },
+      "sts": {
+        "RCMD": "Soovitatud",
+        "APRV": "Heaks kiidetud",
+        "RJCT": "Tagasi lükatud",
+        "APLD": "Rakendatud"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "SQL-i ümberkirjutamine",
+        "STATS": "Statistika",
+        "CONFIG": "Konfiguratsioon"
+      },
+      "approve": "Kiida heaks",
+      "reject": "Lükka tagasi",
+      "measureHint": "Pärast heakskiidetud nõuande rakendamist vaadake ja salvestage sama SQL-i jaoks uuesti EXPLAIN-plaan. Seejärel valige see hilisem plaan ja mõõtke, et see registreeritaks rakendatuna.",
+      "findAfter": "Leia hilisemad plaanid",
+      "noAfter": "Pärast heakskiitu pole sama SQL-i jaoks salvestatud plaani.",
+      "reload": "Otsi uuesti",
+      "pickAfter": "Valige hilisem plaan",
+      "measure": "Mõõda mõju",
+      "effect": "Kulu {bfr} → {aft} ({pct}%)",
+      "better": "Parem",
+      "worse": "Halvem",
+      "same": "Muutus puudub",
+      "ddl": "Soovitatud DDL",
+      "rewrite": "Ümberkirjutatud SQL",
+      "runDdl": "Käivita DDL schema.pi-s",
+      "copy": "Kopeeri",
+      "copied": "Kopeeritud",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Täielik skaneerimine {relation} – looge indeks filtri veerule {column} (asendage NN indeksi nimes järjekorranumbriga).",
+        "SEQ_SCAN_STATS": "Täielik skaneerimine {relation} – kontrollige filtri veerge ja veenduge, et statistika (ANALYZE) on ajakohane.",
+        "NESTED_LOOP": "Pesastatud tsükkel ootab {rows} rida – värskendage statistikat ja kaaluge liitumisvõtme indekseid või räsiühendust.",
+        "SORT_SPILL": "Sorteerimine umbes {kb} KB võib lekkida kettale – kaaluge seansi work_mem suurendamist või sorteerimisveergude indekseerimist.",
+        "SELECT_STAR": "Valige ainult vajalikud veerud SELECT * asemel (vähem I/O-d, võimalikud katvad indeksid).",
+        "FUNC_ON_COLUMN": "Liigutage funktsioon/avaldis filtri veerul {column} konstandi poolele (võimaldab indeksi kasutamist).",
+        "IMPLICIT_CAST": "Sobitage {column} ja konstandi tüübid (eemaldage kaudne teisendus).",
+        "NOT_IN_SUBQUERY": "Kirjutage NOT IN (alamküsimus) ümber NOT EXISTS-iks.",
+        "OR_DIFF_COLUMNS": "Erinevate veergude OR-tingimused tuleks jagada UNION-iga (lisage duplikaatide välistamise tingimus viimasele, kui UNION ALL) või neil peaksid olema veergude kaupa indeksid (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi lingi funktsiooni valmistatakse ette. Palun proovige varsti uuesti.",
@@ -1294,7 +1349,11 @@
       "TIMEOUT": "Päringu aegumine (5 sekundit). Lühendage SQL-i või proovige hiljem uuesti.",
       "RATE": "Liiga palju päringuid. Proovige uuesti minuti pärast.",
       "PAYLOAD_TOO_LARGE": "Plaan on salvestamiseks liiga suur.",
-      "LINK_NOT_FOUND": "Link ei leitud. Palun valige link uuesti."
+      "LINK_NOT_FOUND": "Link ei leitud. Palun valige link uuesti.",
+      "TUN_EXISTS": "Sellel plaanil on juba nõuanne. Kontrollige loendit (kustutage see uuesti genereerimiseks).",
+      "TUN_BAD_STATE": "See toiming pole praeguses olekus lubatud (see võis mujal muutuda). Värskendage loendit.",
+      "TUN_PLAN_MISMATCH": "Hilisem plaan peab olema sama SQL-i jaoks erinev salvestatud plaan.",
+      "TUN_PLAN_STALE": "Hilisem plaan peab olema salvestatud pärast heakskiitu. Käivitage EXPLAIN uuesti pärast rakendamist ja salvestage see."
     }
   },
   "nav": {

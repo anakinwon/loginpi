@@ -1250,7 +1250,7 @@
         "SELECT_STAR": "SELECT * — odaberite samo stupce koje trebate (dodatni I/O, nema pokrivajućeg indeksa).",
         "FUNC_ON_COLUMN": "Stupac filtra {column} je omotan funkcijom ili izrazom, pa se njegov indeks ne može koristiti — umjesto toga transformirajte konstantu.",
         "LEADING_WILDCARD": "LIKE s vodećim % ne može koristiti B-stablo indeks — razmislite o pg_trgm GIN indeksu.",
-        "OR_DIFF_COLUMNS": "Uvjeti na različitim stupcima kombinirani su s OR — razmislite o UNION ALL ili indeksima po stupcima.",
+        "OR_DIFF_COLUMNS": "OR-uvjetovani uvjeti na različitim stupcima — razmislite o razdvajanju s UNION (dodajte uvjet isključenja duplikata ako je UNION ALL) ili pregledu indeksa po stupcima.",
         "IMPLICIT_CAST": "{column} se uspoređuje s brojem pod navodnicima — uskladite tipove stupca i konstante (implicitna pretvorba).",
         "NOT_IN_SUBQUERY": "NOT IN (podupit) ne vraća ništa kada su prisutni NULL-ovi i spor je — koristite NOT EXISTS.",
         "NO_WHERE": "Nema WHERE klauzule — na velikoj tablici ovo je potpuno skeniranje (dodajte uvjet ili LIMIT).",
@@ -1280,8 +1280,63 @@
     },
     "ai": {
       "title": "AI savjeti za ugađanje",
-      "badge": "Uskoro",
-      "body": "Uskoro (nakon odobrenja i procedura mjerenja utjecaja) — savjeti će se generirati iz SQL-a s maskiranim konstantama i bilježiti kao primijenjeni tek nakon odobrenja DA i izmjerenog utjecaja."
+      "intro": "Odaberite jedan spremljeni plan za generiranje savjeta. Šalju se samo SQL i planovi s konstantama maskiranim kao ? (savjet temeljen na pravilima ako nema ključa ili u slučaju neuspjeha). Nakon što vlasnik veze odobri, ponovno pokrenite objašnjenje za isti SQL, spremite ga i izmjerite utjecaj s tim kasnijim planom — tek tada se bilježi kao primijenjeno.",
+      "pickPlan": "Odaberite spremljeni plan za savjet",
+      "create": "Generiraj savjet",
+      "creating": "Generiranje… (do 30 s)",
+      "noPlans": "Nema spremljenih planova. Pogledajte plan objašnjenja iznad i spremite ga.",
+      "note": "Jedan savjet po planu. Izbrišite postojeći savjet za ponovno generiranje. DDL je samo prijedlog — primijenite ga u schema.pi.",
+      "empty": "Još nema savjeta.",
+      "noItems": "Nisu pronađena poboljšanja za ovaj plan.",
+      "cost": "Prethodni trošak",
+      "delete": "Izbriši",
+      "prev": "Prethodno",
+      "next": "Sljedeće",
+      "page": "Stranica {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Pravilo"
+      },
+      "sts": {
+        "RCMD": "Preporučeno",
+        "APRV": "Odobreno",
+        "RJCT": "Odbijeno",
+        "APLD": "Primijenjeno"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "Prepisivanje SQL-a",
+        "STATS": "Statistika",
+        "CONFIG": "Konfiguracija"
+      },
+      "approve": "Odobri",
+      "reject": "Odbij",
+      "measureHint": "Nakon primjene odobrenog savjeta, ponovno pogledajte i spremite plan objašnjenja za isti SQL. Zatim odaberite taj kasniji plan i izmjerite ga kako biste ga zabilježili kao primijenjenog.",
+      "findAfter": "Pronađi kasnije planove",
+      "noAfter": "Nema spremljenog plana za isti SQL nakon odobrenja.",
+      "reload": "Pretraži ponovno",
+      "pickAfter": "Odaberite kasniji plan",
+      "measure": "Izmjeri utjecaj",
+      "effect": "Trošak {bfr} → {aft} ({pct}%)",
+      "better": "Poboljšano",
+      "worse": "Lošije",
+      "same": "Nema promjene",
+      "ddl": "Predloženi DDL",
+      "rewrite": "Prepisani SQL",
+      "runDdl": "Pokreni DDL u schema.pi",
+      "copy": "Kopiraj",
+      "copied": "Kopirano",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Potpuno skeniranje {relation} — stvorite indeks na stupcu filtra {column} (zamijenite NN u nazivu indeksa rednim brojem).",
+        "SEQ_SCAN_STATS": "Potpuno skeniranje {relation} — provjerite stupce filtra i provjerite jesu li statistike (ANALYZE) ažurne.",
+        "NESTED_LOOP": "Ugniježđena petlja očekuje {rows} redaka — osvježite statistike i razmislite o indeksima ključa spajanja ili hash spajanju.",
+        "SORT_SPILL": "Sortiranje od oko {kb} KB može se preliti na disk — razmislite o povećanju work_mem sesije ili indeksiranju stupaca za sortiranje.",
+        "SELECT_STAR": "Odaberite samo stupce koji su vam potrebni umjesto SELECT * (manji I/O, mogući pokrivajući indeksi).",
+        "FUNC_ON_COLUMN": "Premjestite funkciju/izraz na stupcu filtra {column} na stranu konstante (omogućuje korištenje indeksa).",
+        "IMPLICIT_CAST": "Uskladite tipove {column} i konstante (uklonite implicitno pretvaranje).",
+        "NOT_IN_SUBQUERY": "Prepišite NOT IN (podupit) kao NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "OR uvjeti na različitim stupcima trebali bi se podijeliti s UNION (dodajte uvjet isključenja duplikata potonjem ako je UNION ALL) ili imati indekse po stupcima (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Značajka veze schema.pi se priprema. Pokušajte ponovno uskoro.",
@@ -1293,7 +1348,11 @@
       "TIMEOUT": "Zahtjev je istekao (5 sekundi). Skratite SQL ili pokušajte ponovno kasnije.",
       "RATE": "Previše zahtjeva. Pokušajte ponovno za minutu.",
       "PAYLOAD_TOO_LARGE": "Plan je prevelik za spremanje.",
-      "LINK_NOT_FOUND": "Veza nije pronađena. Ponovno odaberite vezu."
+      "LINK_NOT_FOUND": "Veza nije pronađena. Ponovno odaberite vezu.",
+      "TUN_EXISTS": "Ovaj plan već ima savjet. Provjerite popis (izbrišite ga za ponovno generiranje).",
+      "TUN_BAD_STATE": "Ova radnja nije dopuštena u trenutnom stanju (možda je promijenjena negdje drugdje). Osvježite popis.",
+      "TUN_PLAN_MISMATCH": "Kasniji plan mora biti drugačiji spremljeni plan za isti SQL.",
+      "TUN_PLAN_STALE": "Kasniji plan mora biti spremljen nakon odobrenja. Ponovno pokrenite objašnjenje nakon primjene i spremite ga."
     }
   },
   "nav": {

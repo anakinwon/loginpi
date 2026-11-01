@@ -1256,7 +1256,7 @@
         "SELECT_STAR": "SELECT * — selecione apenas as colunas que você precisa (I/O extra, sem índice de cobertura).",
         "FUNC_ON_COLUMN": "A coluna de filtro {column} está envolvida em uma função ou expressão, então seu índice não pode ser usado — transforme a constante em vez disso.",
         "LEADING_WILDCARD": "LIKE com um % inicial não pode usar um índice B-tree — considere um índice GIN pg_trgm.",
-        "OR_DIFF_COLUMNS": "Condições em colunas diferentes são combinadas com OR — considere UNION ALL ou índices por coluna.",
+        "OR_DIFF_COLUMNS": "Condições OR em colunas diferentes — considere dividir com UNION (adicione uma condição de exclusão de duplicatas se UNION ALL) ou revisar índices por coluna.",
         "IMPLICIT_CAST": "{column} é comparado a um número entre aspas — combine os tipos de coluna e constante (conversão implícita).",
         "NOT_IN_SUBQUERY": "NOT IN (subconsulta) não retorna nada quando há NULLs e é lento — use NOT EXISTS.",
         "NO_WHERE": "Nenhuma cláusula WHERE — em uma tabela grande, isso é um scan completo (adicione uma condição ou LIMIT).",
@@ -1286,8 +1286,63 @@
     },
     "ai": {
       "title": "Conselhos de otimização de IA",
-      "badge": "Em breve",
-      "body": "Em breve (após aprovação e procedimentos de medição de impacto) — os conselhos serão gerados a partir de SQL com constantes mascaradas e registrados como aplicados somente após a aprovação do DA e o impacto medido."
+      "intro": "Escolha um plano salvo para gerar conselhos. Apenas SQL e planos com constantes mascaradas como ? são enviados (conselhos baseados em regras se não houver chave ou em caso de falha). Depois que o proprietário do link aprovar, execute novamente o explain para o mesmo SQL, salve-o e meça o impacto com esse plano posterior — só então ele é registrado como aplicado.",
+      "pickPlan": "Selecionar um plano salvo para conselhos",
+      "create": "Gerar conselhos",
+      "creating": "Gerando… (até 30 s)",
+      "noPlans": "Nenhum plano salvo. Visualize um plano de execução acima e salve-o.",
+      "note": "Um conselho por plano. Exclua o conselho existente para regenerar. DDL é apenas sugerido — aplique-o em schema.pi.",
+      "empty": "Nenhum conselho ainda.",
+      "noItems": "Nenhuma melhoria encontrada para este plano.",
+      "cost": "Custo anterior",
+      "delete": "Excluir",
+      "prev": "Anterior",
+      "next": "Próximo",
+      "page": "Página {page}",
+      "engn": {
+        "AI": "IA",
+        "RULE": "Regra"
+      },
+      "sts": {
+        "RCMD": "Aconselhado",
+        "APRV": "Aprovado",
+        "RJCT": "Rejeitado",
+        "APLD": "Aplicado"
+      },
+      "kind": {
+        "INDEX": "Índice",
+        "REWRITE": "Reescrita de SQL",
+        "STATS": "Estatísticas",
+        "CONFIG": "Configuração"
+      },
+      "approve": "Aprovar",
+      "reject": "Rejeitar",
+      "measureHint": "Após aplicar o conselho aprovado, visualize e salve o plano de execução para o mesmo SQL novamente. Em seguida, escolha esse plano posterior e meça para registrá-lo como aplicado.",
+      "findAfter": "Encontrar planos posteriores",
+      "noAfter": "Nenhum plano para o mesmo SQL salvo após a aprovação.",
+      "reload": "Pesquisar novamente",
+      "pickAfter": "Selecionar o plano posterior",
+      "measure": "Medir impacto",
+      "effect": "Custo {bfr} → {aft} ({pct}%)",
+      "better": "Melhorado",
+      "worse": "Pior",
+      "same": "Sem alteração",
+      "ddl": "DDL sugerido",
+      "rewrite": "SQL reescrito",
+      "runDdl": "Executar DDL em schema.pi",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Varredura completa de {relation} — crie um índice na coluna de filtro {column} (substitua NN no nome do índice por um número de sequência).",
+        "SEQ_SCAN_STATS": "Varredura completa de {relation} — verifique as colunas de filtro e certifique-se de que as estatísticas (ANALYZE) estejam atualizadas.",
+        "NESTED_LOOP": "Loop aninhado espera {rows} linhas — atualize as estatísticas e considere índices de chave de junção ou uma junção hash.",
+        "SORT_SPILL": "A ordenação de cerca de {kb} KB pode transbordar para o disco — considere aumentar o work_mem da sessão ou indexar as colunas de ordenação.",
+        "SELECT_STAR": "Selecione apenas as colunas de que você precisa em vez de SELECT * (menos E/S, índices de cobertura possíveis).",
+        "FUNC_ON_COLUMN": "Mova a função/expressão na coluna de filtro {column} para o lado constante (permite o uso de índice).",
+        "IMPLICIT_CAST": "Corresponda os tipos de {column} e a constante (remova a conversão implícita).",
+        "NOT_IN_SUBQUERY": "Reescreva NOT IN (subconsulta) como NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Condições OR em colunas diferentes devem ser divididas com UNION (adicione uma condição de exclusão de duplicatas à última se UNION ALL) ou ter índices por coluna (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "O recurso de link schema.pi está sendo preparado. Por favor, tente novamente em breve.",
@@ -1299,7 +1354,11 @@
       "TIMEOUT": "A solicitação expirou (5 segundos). Encurte o SQL ou tente novamente mais tarde.",
       "RATE": "Muitas solicitações. Tente novamente em um minuto.",
       "PAYLOAD_TOO_LARGE": "O plano é muito grande para salvar.",
-      "LINK_NOT_FOUND": "Link não encontrado. Por favor, selecione o link novamente."
+      "LINK_NOT_FOUND": "Link não encontrado. Por favor, selecione o link novamente.",
+      "TUN_EXISTS": "Este plano já tem conselhos. Verifique a lista (exclua-o para regenerar).",
+      "TUN_BAD_STATE": "Esta ação não é permitida no estado atual (pode ter sido alterada em outro lugar). Atualize a lista.",
+      "TUN_PLAN_MISMATCH": "O plano posterior deve ser um plano salvo diferente para o mesmo SQL.",
+      "TUN_PLAN_STALE": "O plano posterior deve ser salvo após a aprovação. Execute novamente o explain após aplicar e salve-o."
     }
   },
   "nav": {

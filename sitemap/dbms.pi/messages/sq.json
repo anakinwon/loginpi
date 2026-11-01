@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — zgjidhni vetëm kolonat që ju nevojiten (I/O shtesë, pa indeks mbulues).",
         "FUNC_ON_COLUMN": "Kolona e filtrit {column} është e mbështjellë në një funksion ose shprehje, kështu që indeksi i saj nuk mund të përdoret — transformoni konstanten në vend të kësaj.",
         "LEADING_WILDCARD": "LIKE me një % kryesor nuk mund të përdorë një indeks B-tree — merrni parasysh një indeks pg_trgm GIN.",
-        "OR_DIFF_COLUMNS": "Kushtet në kolona të ndryshme kombinohen me OR — merrni parasysh UNION ALL ose indekse për kolonë.",
+        "OR_DIFF_COLUMNS": "Kushtet OR në kolona të ndryshme — merrni parasysh ndarjen me UNION (shtoni një kusht përjashtimi të dublikatës nëse UNION ALL) ose rishikoni indekset për kolonë.",
         "IMPLICIT_CAST": "{column} krahasohet me një numër të cituar — përputhni llojet e kolonës dhe konstantes (konvertim i nënkuptuar).",
         "NOT_IN_SUBQUERY": "NOT IN (subquery) nuk kthen asgjë kur ka NULL dhe është i ngadalshëm — përdorni NOT EXISTS.",
         "NO_WHERE": "Nuk ka klauzolë WHERE — në një tabelë të madhe ky është një skanim i plotë (shtoni një kusht ose LIMIT).",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "Këshilla për optimizim me AI",
-      "badge": "Së shpejti",
-      "body": "Së shpejti (pas procedurave të miratimit dhe matjes së ndikimit) — këshillat do të gjenerohen nga SQL me konstante të maskuara dhe do të regjistrohen si të aplikuara vetëm pas miratimit të DA dhe ndikimit të matur."
+      "intro": "Zgjidhni një plan të ruajtur për të gjeneruar këshilla. Dërgohen vetëm SQL dhe planet me konstante të maskuara si ? (këshilla të bazuara në rregulla nëse nuk ka çelës ose në rast dështimi). Pasi pronari i lidhjes të miratojë, ri-ekzekutoni shpjegimin për të njëjtin SQL, ruajeni atë dhe matni ndikimin me atë plan të mëvonshëm — vetëm atëherë regjistrohet si i aplikuar.",
+      "pickPlan": "Zgjidhni një plan të ruajtur për këshilla",
+      "create": "Gjenero këshilla",
+      "creating": "Po gjenerohet… (deri në 30 s)",
+      "noPlans": "Nuk ka plane të ruajtura. Shikoni një plan shpjegimi më lart dhe ruajeni atë.",
+      "note": "Një këshillë për plan. Fshini këshillën ekzistuese për të rigjeneruar. DDL vetëm sugjerohet — aplikojeni në schema.pi.",
+      "empty": "Ende nuk ka këshilla.",
+      "noItems": "Nuk u gjetën përmirësime për këtë plan.",
+      "cost": "Kostoja e mëparshme",
+      "delete": "Fshij",
+      "prev": "I mëparshëm",
+      "next": "Tjetri",
+      "page": "Faqja {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Rregull"
+      },
+      "sts": {
+        "RCMD": "Këshilluar",
+        "APRV": "Miratuar",
+        "RJCT": "Refuzuar",
+        "APLD": "Aplikuar"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "Rishkrim SQL",
+        "STATS": "Statistika",
+        "CONFIG": "Konfigurim"
+      },
+      "approve": "Mirato",
+      "reject": "Refuzo",
+      "measureHint": "Pasi të aplikoni këshillën e miratuar, shikoni dhe ruani përsëri planin e shpjegimit për të njëjtin SQL. Pastaj zgjidhni atë plan të mëvonshëm dhe matni për ta regjistruar si të aplikuar.",
+      "findAfter": "Gjej plane të mëvonshme",
+      "noAfter": "Nuk ka plan për të njëjtin SQL të ruajtur pas miratimit.",
+      "reload": "Kërko përsëri",
+      "pickAfter": "Zgjidhni planin e mëvonshëm",
+      "measure": "Mato ndikimin",
+      "effect": "Kosto {bfr} → {aft} ({pct}%)",
+      "better": "Përmirësuar",
+      "worse": "Më keq",
+      "same": "Pa ndryshim",
+      "ddl": "DDL i sugjeruar",
+      "rewrite": "SQL i rishkruar",
+      "runDdl": "Ekzekuto DDL në schema.pi",
+      "copy": "Kopjo",
+      "copied": "Kopjuar",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Skanim i plotë i {relation} — krijoni një indeks në kolonën e filtrit {column} (zëvendësoni NN në emrin e indeksit me një numër rendor).",
+        "SEQ_SCAN_STATS": "Skanim i plotë i {relation} — kontrolloni kolonat e filtrit dhe sigurohuni që statistikat (ANALYZE) janë aktuale.",
+        "NESTED_LOOP": "Cikli i folezuar pret {rows} rreshta — rifreskoni statistikat dhe merrni parasysh indekset e çelësave të bashkimit ose një bashkim hash.",
+        "SORT_SPILL": "Renditja prej rreth {kb} KB mund të derdhet në disk — merrni parasysh rritjen e work_mem të sesionit ose indeksimin e kolonave të renditjes.",
+        "SELECT_STAR": "Zgjidhni vetëm kolonat që ju nevojiten në vend të SELECT * (më pak I/O, indekse mbuluese të mundshme).",
+        "FUNC_ON_COLUMN": "Zhvendosni funksionin/shprehjen në kolonën e filtrit {column} në anën konstante (mundëson përdorimin e indeksit).",
+        "IMPLICIT_CAST": "Përputhni tipet e {column} dhe konstantes (hiqni konvertimin implicit).",
+        "NOT_IN_SUBQUERY": "Rishkruani NOT IN (nënpyetje) si NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Kushtet OR në kolona të ndryshme duhet të ndahen me UNION (shtoni një kusht përjashtimi të dublikatës në këtë të fundit nëse UNION ALL) ose të kenë indekse për kolonë (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Funksioni i lidhjes schema.pi po përgatitet. Ju lutemi provoni përsëri së shpejti.",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "Kërkesa skadoi (5 sekonda). Shkurtoni SQL-në ose provoni përsëri më vonë.",
       "RATE": "Shumë kërkesa. Provoni përsëri pas një minute.",
       "PAYLOAD_TOO_LARGE": "Plani është shumë i madh për t'u ruajtur.",
-      "LINK_NOT_FOUND": "Lidhja nuk u gjet. Ju lutemi zgjidhni lidhjen përsëri."
+      "LINK_NOT_FOUND": "Lidhja nuk u gjet. Ju lutemi zgjidhni lidhjen përsëri.",
+      "TUN_EXISTS": "Ky plan tashmë ka këshilla. Kontrolloni listën (fshijeni për të rigjeneruar).",
+      "TUN_BAD_STATE": "Ky veprim nuk lejohet në gjendjen aktuale (mund të jetë ndryshuar diku tjetër). Rifreskoni listën.",
+      "TUN_PLAN_MISMATCH": "Plani i mëvonshëm duhet të jetë një plan i ndryshëm i ruajtur për të njëjtin SQL.",
+      "TUN_PLAN_STALE": "Plani i mëvonshëm duhet të ruhet pas miratimit. Ri-ekzekutoni shpjegimin pas aplikimit dhe ruajeni atë."
     }
   },
   "nav": {

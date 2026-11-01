@@ -1256,7 +1256,7 @@
         "SELECT_STAR": "SELECT * – vyberte len stĺpce, ktoré potrebujete (extra I/O, žiadny pokrývajúci index).",
         "FUNC_ON_COLUMN": "Stĺpec filtra {column} je zabalený vo funkcii alebo výraze, takže jeho index nemožno použiť – namiesto toho transformujte konštantu.",
         "LEADING_WILDCARD": "LIKE s úvodným % nemôže použiť B-stromový index – zvážte pg_trgm GIN index.",
-        "OR_DIFF_COLUMNS": "Podmienky na rôznych stĺpcoch sú kombinované s OR – zvážte UNION ALL alebo indexy pre jednotlivé stĺpce.",
+        "OR_DIFF_COLUMNS": "Podmienky OR sú spojené na rôznych stĺpcoch — zvážte rozdelenie pomocou UNION (ak je UNION ALL, pridajte podmienku vylúčenia duplikátov) alebo skontrolujte indexy pre jednotlivé stĺpce.",
         "IMPLICIT_CAST": "{column} sa porovnáva s číslom v úvodzovkách – prispôsobte typy stĺpcov a konštánt (implicitné pretypovanie).",
         "NOT_IN_SUBQUERY": "NOT IN (poddotaz) nevracia nič, keď sú prítomné NULL hodnoty a je pomalý – použite NOT EXISTS.",
         "NO_WHERE": "Žiadna klauzula WHERE – na veľkej tabuľke je to úplné skenovanie (pridajte podmienku alebo LIMIT).",
@@ -1286,8 +1286,63 @@
     },
     "ai": {
       "title": "AI tuningové rady",
-      "badge": "Už čoskoro",
-      "body": "Už čoskoro (po schválení a procedúrach merania dopadu) – rady budú generované z SQL s maskovanými konštantami a zaznamenané ako aplikované až po schválení DA a meranom dopade."
+      "intro": "Vyberte jeden uložený plán na generovanie odporúčaní. Odosielajú sa len SQL a plány s konštantami maskovanými ako ? (odporúčania založené na pravidlách, ak chýba kľúč alebo pri zlyhaní). Po schválení vlastníkom odkazu znova spustite EXPLAIN pre rovnaký SQL, uložte ho a zmerajte vplyv s týmto neskorším plánom – až potom sa zaznamená ako aplikovaný.",
+      "pickPlan": "Vyberte uložený plán pre odporúčanie",
+      "create": "Generovať odporúčanie",
+      "creating": "Generuje sa… (až 30 s)",
+      "noPlans": "Žiadne uložené plány. Zobrazte plán EXPLAIN vyššie a uložte ho.",
+      "note": "Jeden plán, jedno odporúčanie. Ak chcete znova vygenerovať, odstráňte existujúce odporúčanie. DDL je len navrhované – aplikujte ho v schema.pi.",
+      "empty": "Zatiaľ žiadne odporúčanie.",
+      "noItems": "Pre tento plán sa nenašli žiadne zlepšenia.",
+      "cost": "Predchádzajúce náklady",
+      "delete": "Odstrániť",
+      "prev": "Predchádzajúce",
+      "next": "Ďalšie",
+      "page": "Strana {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Pravidlo"
+      },
+      "sts": {
+        "RCMD": "Odporúčané",
+        "APRV": "Schválené",
+        "RJCT": "Zamietnuté",
+        "APLD": "Aplikované"
+      },
+      "kind": {
+        "INDEX": "Index",
+        "REWRITE": "Prepísanie SQL",
+        "STATS": "Štatistiky",
+        "CONFIG": "Konfigurácia"
+      },
+      "approve": "Schváliť",
+      "reject": "Zamietnuť",
+      "measureHint": "Po aplikovaní schváleného odporúčania si znova pozrite a uložte plán EXPLAIN pre rovnaký SQL. Potom vyberte tento neskorší plán a zmerajte ho, aby sa zaznamenal ako aplikovaný.",
+      "findAfter": "Nájsť neskoršie plány",
+      "noAfter": "Žiadny plán pre rovnaký SQL uložený po schválení.",
+      "reload": "Hľadať znova",
+      "pickAfter": "Vyberte neskorší plán",
+      "measure": "Zmerať vplyv",
+      "effect": "Náklady {bfr} → {aft} ({pct}%)",
+      "better": "Zlepšené",
+      "worse": "Horšie",
+      "same": "Žiadna zmena",
+      "ddl": "Navrhované DDL",
+      "rewrite": "Prepísané SQL",
+      "runDdl": "Spustiť DDL v schema.pi",
+      "copy": "Kopírovať",
+      "copied": "Skopírované",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Úplné skenovanie {relation} – vytvorte index na stĺpci filtra {column} (nahraďte NN v názve indexu poradovým číslom).",
+        "SEQ_SCAN_STATS": "Úplné skenovanie {relation} – skontrolujte stĺpce filtra a uistite sa, že štatistiky (ANALYZE) sú aktuálne.",
+        "NESTED_LOOP": "Vnorené slučky očakávajú {rows} riadkov – obnovte štatistiky a zvážte indexy spojovacích kľúčov alebo hash join.",
+        "SORT_SPILL": "Triedenie približne {kb} KB sa môže preliať na disk – zvážte zvýšenie session work_mem alebo indexovanie stĺpcov triedenia.",
+        "SELECT_STAR": "Vyberte len stĺpce, ktoré potrebujete, namiesto SELECT * (menej I/O, možné pokrytie indexmi).",
+        "FUNC_ON_COLUMN": "Presuňte funkciu/výraz na stĺpci filtra {column} na stranu konštanty (umožňuje použitie indexu).",
+        "IMPLICIT_CAST": "Priraďte typy {column} a konštanty (odstráňte implicitné pretypovanie).",
+        "NOT_IN_SUBQUERY": "Prepíšte NOT IN (poddotaz) ako NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Podmienky OR na rôznych stĺpcoch by sa mali rozdeliť pomocou UNION (ak je UNION ALL, pridajte k druhej podmienke vylúčenie prvej, aby sa zabránilo duplikátom) alebo by mali mať indexy pre jednotlivé stĺpce (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Funkcia prepojenia schema.pi sa pripravuje. Skúste to znova o chvíľu.",
@@ -1299,7 +1354,11 @@
       "TIMEOUT": "Požiadavka vypršala (5 sekúnd). Skráťte SQL alebo skúste znova neskôr.",
       "RATE": "Príliš veľa požiadaviek. Skúste to znova o minútu.",
       "PAYLOAD_TOO_LARGE": "Plán je príliš veľký na uloženie.",
-      "LINK_NOT_FOUND": "Odkaz sa nenašiel. Vyberte odkaz znova."
+      "LINK_NOT_FOUND": "Odkaz sa nenašiel. Vyberte odkaz znova.",
+      "TUN_EXISTS": "Tento plán už má odporúčanie. Skontrolujte zoznam (ak chcete znova vygenerovať, odstráňte ho).",
+      "TUN_BAD_STATE": "Táto akcia nie je povolená v aktuálnom stave (mohla sa zmeniť inde). Obnovte zoznam.",
+      "TUN_PLAN_MISMATCH": "Neskorší plán musí byť iný uložený plán pre rovnaký SQL.",
+      "TUN_PLAN_STALE": "Neskorší plán musí byť uložený po schválení. Znova spustite EXPLAIN po aplikovaní a uložte ho."
     }
   },
   "nav": {

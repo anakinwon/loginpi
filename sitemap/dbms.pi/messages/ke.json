@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — select only the columns you need (extra I/O, no covering index).",
         "FUNC_ON_COLUMN": "The filter column {column} is wrapped in a function or expression, so its index cannot be used — transform the constant instead.",
         "LEADING_WILDCARD": "LIKE with a leading % cannot use a B-tree index — consider a pg_trgm GIN index.",
-        "OR_DIFF_COLUMNS": "Conditions on different columns are combined with OR — consider UNION ALL or per-column indexes.",
+        "OR_DIFF_COLUMNS": "OR-ed conditions on different columns — consider splitting with UNION (add a duplicate exclusion condition if UNION ALL) or reviewing per-column indexes.",
         "IMPLICIT_CAST": "{column} is compared to a quoted number — match the column and constant types (implicit cast).",
         "NOT_IN_SUBQUERY": "NOT IN (subquery) returns nothing when NULLs are present and is slow — use NOT EXISTS.",
         "NO_WHERE": "No WHERE clause — on a large table this is a full scan (add a condition or LIMIT).",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "AI tuning advice",
-      "badge": "Coming soon",
-      "body": "Coming soon (after approval and impact-measurement procedures) — advice will be generated from SQL with masked constants and recorded as applied only after DA approval and measured impact."
+      "intro": "Pick one saved plan to generate advice. Only SQL and plans with constants masked as ? are sent (rule-based advice if no key or on failure). After the link owner approves, re-run the explain for the same SQL, save it, and measure the impact with that later plan — only then is it recorded as applied.",
+      "pickPlan": "Select a saved plan for advice",
+      "create": "Generate advice",
+      "creating": "Generating… (up to 30 s)",
+      "noPlans": "No saved plans. View an explain plan above and save it.",
+      "note": "One advice per plan. Delete the existing advice to regenerate. DDL is only suggested — apply it in schema.pi.",
+      "empty": "No advice yet.",
+      "noItems": "No improvements found for this plan.",
+      "cost": "Before cost",
+      "delete": "Delete",
+      "prev": "Previous",
+      "next": "Next",
+      "page": "Page {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Rule"
+      },
+      "sts": {
+        "RCMD": "Advised",
+        "APRV": "Approved",
+        "RJCT": "Rejected",
+        "APLD": "Applied"
+      },
+      "kind": {
+        "INDEX": "Index",
+        "REWRITE": "SQL rewrite",
+        "STATS": "Statistics",
+        "CONFIG": "Config"
+      },
+      "approve": "Approve",
+      "reject": "Reject",
+      "measureHint": "After applying the approved advice, view and save the explain plan for the same SQL again. Then pick that later plan and measure to record it as applied.",
+      "findAfter": "Find later plans",
+      "noAfter": "No plan for the same SQL saved after approval.",
+      "reload": "Search again",
+      "pickAfter": "Select the later plan",
+      "measure": "Measure impact",
+      "effect": "Cost {bfr} → {aft} ({pct}%)",
+      "better": "Improved",
+      "worse": "Worse",
+      "same": "No change",
+      "ddl": "Suggested DDL",
+      "rewrite": "Rewritten SQL",
+      "runDdl": "Run DDL in schema.pi",
+      "copy": "Copy",
+      "copied": "Copied",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Full scan of {relation} — create an index on filter column {column} (replace NN in the index name with a sequence number).",
+        "SEQ_SCAN_STATS": "Full scan of {relation} — check the filter columns and make sure statistics (ANALYZE) are current.",
+        "NESTED_LOOP": "Nested loop expects {rows} rows — refresh statistics and consider join-key indexes or a hash join.",
+        "SORT_SPILL": "Sort of about {kb} KB may spill to disk — consider raising session work_mem or indexing the sort columns.",
+        "SELECT_STAR": "Select only the columns you need instead of SELECT * (less I/O, covering indexes possible).",
+        "FUNC_ON_COLUMN": "Move the function/expression on filter column {column} to the constant side (enables index use).",
+        "IMPLICIT_CAST": "Match the types of {column} and the constant (remove the implicit cast).",
+        "NOT_IN_SUBQUERY": "Rewrite NOT IN (subquery) as NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "OR conditions on different columns should be split with UNION (add a duplicate exclusion condition to the latter if UNION ALL) or have per-column indexes (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "The schema.pi link feature is being prepared. Please try again shortly.",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "The request timed out (5 seconds). Shorten the SQL or try again later.",
       "RATE": "Too many requests. Try again in a minute.",
       "PAYLOAD_TOO_LARGE": "The plan is too large to save.",
-      "LINK_NOT_FOUND": "Link not found. Please select the link again."
+      "LINK_NOT_FOUND": "Link not found. Please select the link again.",
+      "TUN_EXISTS": "This plan already has advice. Check the list (delete it to regenerate).",
+      "TUN_BAD_STATE": "This action is not allowed in the current state (it may have changed elsewhere). Refresh the list.",
+      "TUN_PLAN_MISMATCH": "The later plan must be a different saved plan for the same SQL.",
+      "TUN_PLAN_STALE": "The later plan must be saved after approval. Re-run the explain after applying and save it."
     }
   },
   "nav": {

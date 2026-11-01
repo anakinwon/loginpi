@@ -1235,7 +1235,7 @@
         "SELECT_STAR": "SELECT * — sélectionnez uniquement les colonnes dont vous avez besoin (E/S supplémentaires, pas d'index couvrant).",
         "FUNC_ON_COLUMN": "La colonne de filtre {column} est encapsulée dans une fonction ou une expression, son index ne peut donc pas être utilisé — transformez plutôt la constante.",
         "LEADING_WILDCARD": "LIKE avec un % initial ne peut pas utiliser un index B-tree — envisagez un index GIN pg_trgm.",
-        "OR_DIFF_COLUMNS": "Les conditions sur différentes colonnes sont combinées avec OR — envisagez UNION ALL ou des index par colonne.",
+        "OR_DIFF_COLUMNS": "Conditions OR sur des colonnes différentes — envisagez de les séparer avec UNION (ajoutez une condition d'exclusion des doublons si UNION ALL) ou de revoir les index par colonne.",
         "IMPLICIT_CAST": "{column} est comparé à un nombre entre guillemets — faites correspondre les types de colonne et de constante (cast implicite).",
         "NOT_IN_SUBQUERY": "NOT IN (sous-requête) ne renvoie rien lorsque des NULL sont présents et est lent — utilisez NOT EXISTS.",
         "NO_WHERE": "Pas de clause WHERE — sur une grande table, il s'agit d'un scan complet (ajoutez une condition ou LIMIT).",
@@ -1265,8 +1265,63 @@
     },
     "ai": {
       "title": "Conseils de réglage par IA",
-      "badge": "Bientôt disponible",
-      "body": "Bientôt disponible (après approbation et procédures de mesure d'impact) — les conseils seront générés à partir de SQL avec des constantes masquées et enregistrés comme appliqués uniquement après l'approbation de la DA et l'impact mesuré."
+      "intro": "Choisissez un plan enregistré pour générer des conseils. Seuls le SQL et les plans avec des constantes masquées en tant que ? sont envoyés (conseils basés sur des règles si aucune clé ou en cas d'échec). Après approbation par le propriétaire du lien, réexécutez l'explication pour le même SQL, enregistrez-le et mesurez l'impact avec ce plan ultérieur — ce n'est qu'alors qu'il est enregistré comme appliqué.",
+      "pickPlan": "Sélectionnez un plan enregistré pour obtenir des conseils",
+      "create": "Générer des conseils",
+      "creating": "Génération… (jusqu'à 30 s)",
+      "noPlans": "Aucun plan enregistré. Affichez un plan d'exécution ci-dessus et enregistrez-le.",
+      "note": "Un conseil par plan. Supprimez le conseil existant pour le régénérer. Le DDL n'est que suggéré — appliquez-le dans schema.pi.",
+      "empty": "Aucun conseil pour l'instant.",
+      "noItems": "Aucune amélioration trouvée pour ce plan.",
+      "cost": "Coût avant",
+      "delete": "Supprimer",
+      "prev": "Précédent",
+      "next": "Suivant",
+      "page": "Page {page}",
+      "engn": {
+        "AI": "IA",
+        "RULE": "Règle"
+      },
+      "sts": {
+        "RCMD": "Conseillé",
+        "APRV": "Approuvé",
+        "RJCT": "Rejeté",
+        "APLD": "Appliqué"
+      },
+      "kind": {
+        "INDEX": "Index",
+        "REWRITE": "Réécriture SQL",
+        "STATS": "Statistiques",
+        "CONFIG": "Configuration"
+      },
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "measureHint": "Après avoir appliqué le conseil approuvé, affichez et enregistrez à nouveau le plan d'exécution pour le même SQL. Ensuite, choisissez ce plan ultérieur et mesurez-le pour l'enregistrer comme appliqué.",
+      "findAfter": "Trouver les plans ultérieurs",
+      "noAfter": "Aucun plan pour le même SQL enregistré après approbation.",
+      "reload": "Rechercher à nouveau",
+      "pickAfter": "Sélectionner le plan ultérieur",
+      "measure": "Mesurer l'impact",
+      "effect": "Coût {bfr} → {aft} ({pct}%)",
+      "better": "Amélioré",
+      "worse": "Pire",
+      "same": "Aucun changement",
+      "ddl": "DDL suggéré",
+      "rewrite": "SQL réécrit",
+      "runDdl": "Exécuter DDL dans schema.pi",
+      "copy": "Copier",
+      "copied": "Copié",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Scan complet de {relation} — créez un index sur la colonne de filtre {column} (remplacez NN dans le nom de l'index par un numéro de séquence).",
+        "SEQ_SCAN_STATS": "Scan complet de {relation} — vérifiez les colonnes de filtre et assurez-vous que les statistiques (ANALYZE) sont à jour.",
+        "NESTED_LOOP": "La boucle imbriquée attend {rows} lignes — actualisez les statistiques et envisagez des index de clé de jointure ou une jointure de hachage.",
+        "SORT_SPILL": "Le tri d'environ {kb} Ko peut déborder sur le disque — envisagez d'augmenter la work_mem de session ou d'indexer les colonnes de tri.",
+        "SELECT_STAR": "Sélectionnez uniquement les colonnes dont vous avez besoin au lieu de SELECT * (moins d'E/S, index de couverture possibles).",
+        "FUNC_ON_COLUMN": "Déplacez la fonction/expression sur la colonne de filtre {column} vers le côté constant (permet l'utilisation d'index).",
+        "IMPLICIT_CAST": "Faites correspondre les types de {column} et de la constante (supprimez le cast implicite).",
+        "NOT_IN_SUBQUERY": "Réécrivez NOT IN (sous-requête) en NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Les conditions OR sur des colonnes différentes doivent être séparées avec UNION (ajoutez une condition d'exclusion des doublons à la dernière si UNION ALL) ou avoir des index par colonne (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "La fonctionnalité de lien schema.pi est en cours de préparation. Veuillez réessayer sous peu.",
@@ -1278,7 +1333,11 @@
       "TIMEOUT": "La requête a expiré (5 secondes). Raccourcissez le SQL ou réessayez plus tard.",
       "RATE": "Trop de requêtes. Réessayez dans une minute.",
       "PAYLOAD_TOO_LARGE": "Le plan est trop volumineux pour être enregistré.",
-      "LINK_NOT_FOUND": "Lien introuvable. Veuillez sélectionner à nouveau le lien."
+      "LINK_NOT_FOUND": "Lien introuvable. Veuillez sélectionner à nouveau le lien.",
+      "TUN_EXISTS": "Ce plan a déjà des conseils. Vérifiez la liste (supprimez-le pour régénérer).",
+      "TUN_BAD_STATE": "Cette action n'est pas autorisée dans l'état actuel (elle a peut-être été modifiée ailleurs). Actualisez la liste.",
+      "TUN_PLAN_MISMATCH": "Le plan ultérieur doit être un plan enregistré différent pour le même SQL.",
+      "TUN_PLAN_STALE": "Le plan ultérieur doit être enregistré après approbation. Réexécutez l'explication après l'application et enregistrez-la."
     }
   },
   "nav": {

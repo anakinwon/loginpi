@@ -234,6 +234,9 @@ importers:
 
   sitemap/dbms.pi:
     dependencies:
+      '@anthropic-ai/sdk':
+        specifier: 0.101.0
+        version: 0.101.0(zod@4.4.3)
       '@pi/auth':
         specifier: workspace:*
         version: link:../../packages/pi-auth

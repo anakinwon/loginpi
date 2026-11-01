@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — pilih hanya lajur yang anda perlukan (I/O tambahan, tiada indeks penutup).",
         "FUNC_ON_COLUMN": "Lajur penapis {column} dibalut dalam fungsi atau ungkapan, jadi indeksnya tidak boleh digunakan — ubah malar sebaliknya.",
         "LEADING_WILDCARD": "LIKE dengan % pendahulu tidak boleh menggunakan indeks B-tree — pertimbangkan indeks GIN pg_trgm.",
-        "OR_DIFF_COLUMNS": "Syarat pada lajur yang berbeza digabungkan dengan OR — pertimbangkan UNION ALL atau indeks setiap lajur.",
+        "OR_DIFF_COLUMNS": "Syarat OR pada lajur berbeza — pertimbangkan untuk memisahkan dengan UNION (tambah syarat pengecualian duplikat jika UNION ALL) atau menyemak indeks setiap lajur.",
         "IMPLICIT_CAST": "{column} dibandingkan dengan nombor yang dipetik — padankan jenis lajur dan malar (pemutus tersirat).",
         "NOT_IN_SUBQUERY": "NOT IN (subquery) tidak mengembalikan apa-apa apabila NULL hadir dan perlahan — gunakan NOT EXISTS.",
         "NO_WHERE": "Tiada klausa WHERE — pada jadual besar ini adalah imbasan penuh (tambah syarat atau LIMIT).",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "Nasihat penalaan AI",
-      "badge": "Akan datang",
-      "body": "Akan datang (selepas prosedur kelulusan dan pengukuran impak) — nasihat akan dijana daripada SQL dengan malar bertopeng dan direkodkan sebagai diterapkan hanya selepas kelulusan DA dan impak yang diukur."
+      "intro": "Pilih satu pelan yang disimpan untuk menjana nasihat. Hanya SQL dan pelan dengan pemalar yang ditopengkan sebagai ? dihantar (nasihat berasaskan peraturan jika tiada kunci atau gagal). Selepas pemilik pautan meluluskan, jalankan semula penjelasan untuk SQL yang sama, simpan, dan ukur impak dengan pelan kemudian itu — hanya kemudian ia direkodkan sebagai telah digunakan.",
+      "pickPlan": "Pilih pelan yang disimpan untuk nasihat",
+      "create": "Jana nasihat",
+      "creating": "Menjana… (sehingga 30 s)",
+      "noPlans": "Tiada pelan yang disimpan. Lihat pelan penjelasan di atas dan simpannya.",
+      "note": "Satu nasihat bagi setiap pelan. Padam nasihat sedia ada untuk menjana semula. DDL hanya dicadangkan — gunakannya dalam schema.pi.",
+      "empty": "Tiada nasihat lagi.",
+      "noItems": "Tiada penambahbaikan ditemui untuk pelan ini.",
+      "cost": "Kos sebelum",
+      "delete": "Padam",
+      "prev": "Sebelum",
+      "next": "Seterusnya",
+      "page": "Halaman {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Peraturan"
+      },
+      "sts": {
+        "RCMD": "Dinasihatkan",
+        "APRV": "Diluluskan",
+        "RJCT": "Ditolak",
+        "APLD": "Telah digunakan"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "Penulisan semula SQL",
+        "STATS": "Statistik",
+        "CONFIG": "Konfigurasi"
+      },
+      "approve": "Luluskan",
+      "reject": "Tolak",
+      "measureHint": "Selepas menggunakan nasihat yang diluluskan, lihat dan simpan pelan penjelasan untuk SQL yang sama sekali lagi. Kemudian pilih pelan kemudian itu dan ukur untuk merekodkannya sebagai telah digunakan.",
+      "findAfter": "Cari pelan kemudian",
+      "noAfter": "Tiada pelan untuk SQL yang sama disimpan selepas kelulusan.",
+      "reload": "Cari semula",
+      "pickAfter": "Pilih pelan kemudian",
+      "measure": "Ukur impak",
+      "effect": "Kos {bfr} → {aft} ({pct}%)",
+      "better": "Bertambah baik",
+      "worse": "Bertambah buruk",
+      "same": "Tiada perubahan",
+      "ddl": "DDL yang dicadangkan",
+      "rewrite": "SQL yang ditulis semula",
+      "runDdl": "Jalankan DDL dalam schema.pi",
+      "copy": "Salin",
+      "copied": "Disalin",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Imbasan penuh {relation} — buat indeks pada lajur penapis {column} (gantikan NN dalam nama indeks dengan nombor urutan).",
+        "SEQ_SCAN_STATS": "Imbasan penuh {relation} — semak lajur penapis dan pastikan statistik (ANALYZE) adalah terkini.",
+        "NESTED_LOOP": "Gelung bersarang menjangkakan {rows} baris — segarkan statistik dan pertimbangkan indeks kunci gabungan atau gabungan cincang.",
+        "SORT_SPILL": "Isihan sekitar {kb} KB mungkin melimpah ke cakera — pertimbangkan untuk menaikkan work_mem sesi atau mengindeks lajur isihan.",
+        "SELECT_STAR": "Pilih hanya lajur yang anda perlukan dan bukannya SELECT * (kurang I/O, indeks meliputi mungkin).",
+        "FUNC_ON_COLUMN": "Alihkan fungsi/ungkapan pada lajur penapis {column} ke sisi pemalar (membolehkan penggunaan indeks).",
+        "IMPLICIT_CAST": "Padankan jenis {column} dan pemalar (buang pemutus tersirat).",
+        "NOT_IN_SUBQUERY": "Tulis semula NOT IN (subkueri) sebagai NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Syarat OR pada lajur berbeza harus dipisahkan dengan UNION (tambah syarat pengecualian duplikat pada yang terakhir jika UNION ALL) atau mempunyai indeks setiap lajur (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Ciri pautan schema.pi sedang disediakan. Sila cuba lagi sebentar lagi.",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "Permintaan tamat masa (5 saat). Pendekkan SQL atau cuba lagi kemudian.",
       "RATE": "Terlalu banyak permintaan. Cuba lagi dalam seminit.",
       "PAYLOAD_TOO_LARGE": "Pelan terlalu besar untuk disimpan.",
-      "LINK_NOT_FOUND": "Pautan tidak ditemui. Sila pilih pautan sekali lagi."
+      "LINK_NOT_FOUND": "Pautan tidak ditemui. Sila pilih pautan sekali lagi.",
+      "TUN_EXISTS": "Pelan ini sudah mempunyai nasihat. Semak senarai (padam untuk menjana semula).",
+      "TUN_BAD_STATE": "Tindakan ini tidak dibenarkan dalam keadaan semasa (ia mungkin telah berubah di tempat lain). Segarkan senarai.",
+      "TUN_PLAN_MISMATCH": "Pelan kemudian mestilah pelan yang disimpan berbeza untuk SQL yang sama.",
+      "TUN_PLAN_STALE": "Pelan kemudian mestilah pelan yang disimpan selepas kelulusan. Jalankan semula penjelasan selepas menggunakan dan simpannya."
     }
   },
   "nav": {

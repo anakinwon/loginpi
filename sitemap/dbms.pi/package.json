@@ -13,6 +13,7 @@
     "test": "node --test \"src/**/*.test.mjs\""
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "0.101.0",
     "@pi/auth": "workspace:*",
     "@pi/db": "workspace:*",
     "@pi/guard": "workspace:*",

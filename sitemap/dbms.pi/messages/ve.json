@@ -1256,7 +1256,7 @@
         "SELECT_STAR": "SELECT * — seleccione solo las columnas que necesita (E/S extra, sin índice de cobertura).",
         "FUNC_ON_COLUMN": "La columna de filtro {column} está envuelta en una función o expresión, por lo que su índice no se puede usar — transforme la constante en su lugar.",
         "LEADING_WILDCARD": "LIKE con un % inicial no puede usar un índice B-tree — considere un índice GIN de pg_trgm.",
-        "OR_DIFF_COLUMNS": "Las condiciones en diferentes columnas se combinan con OR — considere UNION ALL o índices por columna.",
+        "OR_DIFF_COLUMNS": "Condiciones OR en columnas diferentes: considere dividirlas con UNION (agregue una condición de exclusión de duplicados si es UNION ALL) o revise los índices por columna.",
         "IMPLICIT_CAST": "{column} se compara con un número entre comillas — haga coincidir los tipos de columna y constante (conversión implícita).",
         "NOT_IN_SUBQUERY": "NOT IN (subconsulta) no devuelve nada cuando hay NULL y es lento — use NOT EXISTS.",
         "NO_WHERE": "Sin cláusula WHERE — en una tabla grande esto es un escaneo completo (agregue una condición o LIMIT).",
@@ -1286,8 +1286,63 @@
     },
     "ai": {
       "title": "Consejos de optimización de IA",
-      "badge": "Próximamente",
-      "body": "Próximamente (después de los procedimientos de aprobación y medición de impacto) — se generarán consejos a partir de SQL con constantes enmascaradas y se registrarán como aplicados solo después de la aprobación de DA y el impacto medido."
+      "intro": "Seleccione un plan guardado para generar una recomendación. Solo se envían SQL y planes con constantes enmascaradas como ? (recomendación basada en reglas si no hay clave o en caso de fallo). Después de que el propietario del enlace apruebe, vuelva a ejecutar el plan de explicación para el mismo SQL, guárdelo y mida el impacto con ese plan posterior; solo entonces se registrará como aplicado.",
+      "pickPlan": "Seleccionar un plan guardado para la recomendación",
+      "create": "Generar recomendación",
+      "creating": "Generando… (hasta 30 s)",
+      "noPlans": "No hay planes guardados. Vea un plan de explicación arriba y guárdelo.",
+      "note": "Una recomendación por plan. Elimine la recomendación existente para regenerar. DDL solo se sugiere; aplíquelo en schema.pi.",
+      "empty": "Aún no hay recomendaciones.",
+      "noItems": "No se encontraron mejoras para este plan.",
+      "cost": "Costo anterior",
+      "delete": "Eliminar",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "page": "Página {page}",
+      "engn": {
+        "AI": "IA",
+        "RULE": "Regla"
+      },
+      "sts": {
+        "RCMD": "Recomendado",
+        "APRV": "Aprobado",
+        "RJCT": "Rechazado",
+        "APLD": "Aplicado"
+      },
+      "kind": {
+        "INDEX": "Índice",
+        "REWRITE": "Reescritura de SQL",
+        "STATS": "Estadísticas",
+        "CONFIG": "Configuración"
+      },
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "measureHint": "Después de aplicar la recomendación aprobada, vea y guarde el plan de explicación para el mismo SQL nuevamente. Luego, seleccione ese plan posterior y mida para registrarlo como aplicado.",
+      "findAfter": "Buscar planes posteriores",
+      "noAfter": "No hay un plan para el mismo SQL guardado después de la aprobación.",
+      "reload": "Buscar de nuevo",
+      "pickAfter": "Seleccionar el plan posterior",
+      "measure": "Medir impacto",
+      "effect": "Costo {bfr} → {aft} ({pct}%)",
+      "better": "Mejorado",
+      "worse": "Peor",
+      "same": "Sin cambios",
+      "ddl": "DDL sugerido",
+      "rewrite": "SQL reescrito",
+      "runDdl": "Ejecutar DDL en schema.pi",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Escaneo completo de {relation} — cree un índice en la columna de filtro {column} (reemplace NN en el nombre del índice con un número de secuencia).",
+        "SEQ_SCAN_STATS": "Escaneo completo de {relation} — verifique las columnas de filtro y asegúrese de que las estadísticas (ANALYZE) estén actualizadas.",
+        "NESTED_LOOP": "El bucle anidado espera {rows} filas — actualice las estadísticas y considere índices de clave de unión o una unión hash.",
+        "SORT_SPILL": "La ordenación de aproximadamente {kb} KB puede desbordarse al disco — considere aumentar work_mem de la sesión o indexar las columnas de ordenación.",
+        "SELECT_STAR": "Seleccione solo las columnas que necesita en lugar de SELECT * (menos E/S, índices de cobertura posibles).",
+        "FUNC_ON_COLUMN": "Mueva la función/expresión en la columna de filtro {column} al lado constante (permite el uso de índices).",
+        "IMPLICIT_CAST": "Haga coincidir los tipos de {column} y la constante (elimine la conversión implícita).",
+        "NOT_IN_SUBQUERY": "Reescriba NOT IN (subconsulta) como NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Las condiciones OR en columnas diferentes deben dividirse con UNION (agregue una condición de exclusión de duplicados a la última si es UNION ALL) o tener índices por columna (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "La función de enlace schema.pi se está preparando. Inténtelo de nuevo en breve.",
@@ -1299,7 +1354,11 @@
       "TIMEOUT": "La solicitud ha agotado el tiempo de espera (5 segundos). Acorte el SQL o inténtelo de nuevo más tarde.",
       "RATE": "Demasiadas solicitudes. Inténtelo de nuevo en un minuto.",
       "PAYLOAD_TOO_LARGE": "El plan es demasiado grande para guardar.",
-      "LINK_NOT_FOUND": "Enlace no encontrado. Seleccione el enlace de nuevo."
+      "LINK_NOT_FOUND": "Enlace no encontrado. Seleccione el enlace de nuevo.",
+      "TUN_EXISTS": "Este plan ya tiene una recomendación. Revise la lista (elimínela para regenerar).",
+      "TUN_BAD_STATE": "Esta acción no está permitida en el estado actual (puede haber cambiado en otro lugar). Actualice la lista.",
+      "TUN_PLAN_MISMATCH": "El plan posterior debe ser un plan guardado diferente para el mismo SQL.",
+      "TUN_PLAN_STALE": "El plan posterior debe guardarse después de la aprobación. Vuelva a ejecutar la explicación después de aplicar y guárdela."
     }
   },
   "nav": {

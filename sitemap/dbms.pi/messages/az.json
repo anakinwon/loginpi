@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — yalnız ehtiyac duyduğunuz sütunları seçin (əlavə I/O, əhatə edən indeks yoxdur).",
         "FUNC_ON_COLUMN": "Filtr sütunu {column} bir funksiya və ya ifadəyə bükülmüşdür, buna görə indeksi istifadə edilə bilməz — əvəzinə sabiti çevirin.",
         "LEADING_WILDCARD": "Önündə % olan LIKE B-tree indeksini istifadə edə bilməz — pg_trgm GIN indeksini nəzərdən keçirin.",
-        "OR_DIFF_COLUMNS": "Fərqli sütunlardakı şərtlər OR ilə birləşdirilmişdir — UNION ALL və ya sütun başına indeksləri nəzərdən keçirin.",
+        "OR_DIFF_COLUMNS": "Fərqli sütun şərtləri OR ilə birləşdirilib — UNION ilə ayırmağı (UNION ALL olarsa, dublikat istisna şərti əlavə etməyi) və ya sütun üzrə indeksləri nəzərdən keçirməyi düşünün.",
         "IMPLICIT_CAST": "{column} dırnaq içindəki bir rəqəmlə müqayisə edilir — sütun və sabit tiplərini uyğunlaşdırın (örtülü çevrilmə).",
         "NOT_IN_SUBQUERY": "NOT IN (alt sorğu) NULL-lar mövcud olduqda heç nə qaytarmır və yavaşdır — NOT EXISTS istifadə edin.",
         "NO_WHERE": "WHERE bəndi yoxdur — böyük bir cədvəldə bu tam skandır (bir şərt və ya LIMIT əlavə edin).",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "AI tənzimləmə məsləhəti",
-      "badge": "Tezliklə",
-      "body": "Tezliklə (təsdiq və təsir ölçmə prosedurlarından sonra) — məsləhətlər maskalanmış sabitlərlə SQL-dən yaradılacaq və yalnız DA təsdiqindən və ölçülmüş təsirdən sonra tətbiq edilmiş kimi qeyd ediləcək."
+      "intro": "Məsləhət yaratmaq üçün yadda saxlanmış planlardan birini seçin. Yalnız SQL və sabitləri ? kimi maskalanmış planlar göndərilir (əgər açar yoxdursa və ya uğursuz olarsa, qayda əsaslı məsləhət). Link sahibi təsdiq etdikdən sonra, eyni SQL üçün izahı yenidən işə salın, onu yadda saxlayın və daha sonra həmin planla təsirini ölçün — yalnız bundan sonra tətbiq edilmiş kimi qeydə alınır.",
+      "pickPlan": "Məsləhət üçün yadda saxlanmış planı seçin",
+      "create": "Məsləhət yarat",
+      "creating": "Yaradılır… (30 saniyəyə qədər)",
+      "noPlans": "Yadda saxlanmış plan yoxdur. Yuxarıda izah planına baxın və onu yadda saxlayın.",
+      "note": "Hər plana bir məsləhət. Yenidən yaratmaq üçün mövcud məsləhəti silin. DDL yalnız təklif olunur — onu schema.pi-də tətbiq edin.",
+      "empty": "Hələ məsləhət yoxdur.",
+      "noItems": "Bu plan üçün heç bir təkmilləşdirmə tapılmadı.",
+      "cost": "Əvvəlki xərc",
+      "delete": "Sil",
+      "prev": "Əvvəlki",
+      "next": "Növbəti",
+      "page": "Səhifə {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Qayda"
+      },
+      "sts": {
+        "RCMD": "Məsləhət verildi",
+        "APRV": "Təsdiqləndi",
+        "RJCT": "Rədd edildi",
+        "APLD": "Tətbiq edildi"
+      },
+      "kind": {
+        "INDEX": "İndeks",
+        "REWRITE": "SQL yenidən yazılması",
+        "STATS": "Statistika",
+        "CONFIG": "Konfiqurasiya"
+      },
+      "approve": "Təsdiqlə",
+      "reject": "Rədd et",
+      "measureHint": "Təsdiqlənmiş məsləhəti tətbiq etdikdən sonra, eyni SQL üçün izah planına yenidən baxın və yadda saxlayın. Sonra həmin sonrakı planı seçin və tətbiq edilmiş kimi qeyd etmək üçün ölçün.",
+      "findAfter": "Sonrakı planları tapın",
+      "noAfter": "Təsdiqdən sonra eyni SQL üçün yadda saxlanmış plan yoxdur.",
+      "reload": "Yenidən axtar",
+      "pickAfter": "Sonrakı planı seçin",
+      "measure": "Təsiri ölçün",
+      "effect": "Xərc {bfr} → {aft} ({pct}%)",
+      "better": "Təkmilləşdirildi",
+      "worse": "Pisləşdi",
+      "same": "Dəyişiklik yoxdur",
+      "ddl": "Təklif olunan DDL",
+      "rewrite": "Yenidən yazılmış SQL",
+      "runDdl": "DDL-i schema.pi-də işə salın",
+      "copy": "Kopyala",
+      "copied": "Kopyalandı",
+      "rule": {
+        "SEQ_SCAN_INDEX": "{relation} tam skanı — filtr sütunu {column} üzərində indeks yaradın (indeks adındakı NN-i ardıcıllıq nömrəsi ilə əvəz edin).",
+        "SEQ_SCAN_STATS": "{relation} tam skanı — filtr sütunlarını yoxlayın və statistikaların (ANALYZE) aktual olduğundan əmin olun.",
+        "NESTED_LOOP": "Daxili dövrə {rows} sətir gözləyir — statistikaları yeniləyin və birləşmə açarı indekslərini və ya heş birləşməsini nəzərdən keçirin.",
+        "SORT_SPILL": "Təxminən {kb} KB ölçüsündə çeşidləmə diskə yayıla bilər — sessiya work_mem-i artırmağı və ya çeşidləmə sütunlarını indeksləməyi nəzərdən keçirin.",
+        "SELECT_STAR": "SELECT * əvəzinə yalnız ehtiyacınız olan sütunları seçin (daha az I/O, əhatə edən indekslər mümkündür).",
+        "FUNC_ON_COLUMN": "Filtr sütunu {column} üzərindəki funksiyanı/ifadəni sabit tərəfə keçirin (indeks istifadəsini təmin edir).",
+        "IMPLICIT_CAST": "{column} və sabitin tiplərini uyğunlaşdırın (gizli tip çevrilməsini aradan qaldırın).",
+        "NOT_IN_SUBQUERY": "NOT IN (alt sorğu) ifadəsini NOT EXISTS kimi yenidən yazın.",
+        "OR_DIFF_COLUMNS": "Fərqli sütun OR şərtləri UNION ilə ayrılmalı (UNION ALL olarsa, dublikatların qarşısını almaq üçün sonrakı şərtə əvvəlki şərtin istisnasını əlavə edin) və ya sütun üzrə indekslərə malik olmalıdır (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi bağlantı funksiyası hazırlanır. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "Sorğu vaxtı bitdi (5 saniyə). SQL-i qısaldın və ya sonra yenidən cəhd edin.",
       "RATE": "Çox sayda sorğu. Bir dəqiqə sonra yenidən cəhd edin.",
       "PAYLOAD_TOO_LARGE": "Plan saxlamaq üçün çox böyükdür.",
-      "LINK_NOT_FOUND": "Bağlantı tapılmadı. Zəhmət olmasa bağlantını yenidən seçin."
+      "LINK_NOT_FOUND": "Bağlantı tapılmadı. Zəhmət olmasa bağlantını yenidən seçin.",
+      "TUN_EXISTS": "Bu planda artıq məsləhət var. Siyahını yoxlayın (yenidən yaratmaq üçün silin).",
+      "TUN_BAD_STATE": "Bu əməliyyata cari vəziyyətdə icazə verilmir (başqa yerdə dəyişmiş ola bilər). Siyahını yeniləyin.",
+      "TUN_PLAN_MISMATCH": "Sonrakı plan eyni SQL üçün fərqli yadda saxlanmış plan olmalıdır.",
+      "TUN_PLAN_STALE": "Sonrakı plan təsdiqdən sonra yadda saxlanmış plan olmalıdır. Tətbiq etdikdən sonra izahı yenidən işə salın və yadda saxlayın."
     }
   },
   "nav": {

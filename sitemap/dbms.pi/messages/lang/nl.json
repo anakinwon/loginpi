@@ -1254,7 +1254,7 @@
         "SELECT_STAR": "SELECT * — selecteer alleen de kolommen die u nodig heeft (extra I/O, geen covering index).",
         "FUNC_ON_COLUMN": "De filterkolom {column} is verpakt in een functie of expressie, dus de index kan niet worden gebruikt — transformeer in plaats daarvan de constante.",
         "LEADING_WILDCARD": "LIKE met een voorloop % kan geen B-tree index gebruiken — overweeg een pg_trgm GIN index.",
-        "OR_DIFF_COLUMNS": "Condities op verschillende kolommen worden gecombineerd met OR — overweeg UNION ALL of per-kolom indexen.",
+        "OR_DIFF_COLUMNS": "OR-condities op verschillende kolommen — overweeg splitsing met UNION (voeg een dubbele uitsluitingsconditie toe indien UNION ALL) of controleer indexen per kolom.",
         "IMPLICIT_CAST": "{column} wordt vergeleken met een geciteerd nummer — match de kolom- en constantetypen (impliciete cast).",
         "NOT_IN_SUBQUERY": "NOT IN (subquery) retourneert niets wanneer NULLs aanwezig zijn en is traag — gebruik NOT EXISTS.",
         "NO_WHERE": "Geen WHERE-clausule — op een grote tabel is dit een volledige scan (voeg een conditie of LIMIT toe).",
@@ -1284,8 +1284,63 @@
     },
     "ai": {
       "title": "AI tuning advies",
-      "badge": "Binnenkort beschikbaar",
-      "body": "Binnenkort beschikbaar (na goedkeuring en impactmeting) — advies wordt gegenereerd uit SQL met gemaskeerde constanten en wordt pas als toegepast geregistreerd na DA-goedkeuring en gemeten impact."
+      "intro": "Kies één opgeslagen plan om advies te genereren. Alleen SQL en plannen met constanten gemaskeerd als ? worden verzonden (regelgebaseerd advies indien geen sleutel of bij fout). Nadat de linkeigenaar heeft goedgekeurd, voert u de explain opnieuw uit voor dezelfde SQL, slaat u deze op en meet u de impact met dat latere plan — pas dan wordt het geregistreerd als toegepast.",
+      "pickPlan": "Selecteer een opgeslagen plan voor advies",
+      "create": "Advies genereren",
+      "creating": "Genereren… (maximaal 30 s)",
+      "noPlans": "Geen opgeslagen plannen. Bekijk een explain plan hierboven en sla het op.",
+      "note": "Eén advies per plan. Verwijder het bestaande advies om opnieuw te genereren. DDL wordt alleen voorgesteld — pas het toe in schema.pi.",
+      "empty": "Nog geen advies.",
+      "noItems": "Geen verbeteringen gevonden voor dit plan.",
+      "cost": "Kosten vooraf",
+      "delete": "Verwijderen",
+      "prev": "Vorige",
+      "next": "Volgende",
+      "page": "Pagina {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Regel"
+      },
+      "sts": {
+        "RCMD": "Aanbevolen",
+        "APRV": "Goedgekeurd",
+        "RJCT": "Afgewezen",
+        "APLD": "Toegepast"
+      },
+      "kind": {
+        "INDEX": "Index",
+        "REWRITE": "SQL herschrijven",
+        "STATS": "Statistieken",
+        "CONFIG": "Configuratie"
+      },
+      "approve": "Goedkeuren",
+      "reject": "Afwijzen",
+      "measureHint": "Nadat u het goedgekeurde advies hebt toegepast, bekijkt en slaat u het explain plan voor dezelfde SQL opnieuw op. Kies vervolgens dat latere plan en meet om het als toegepast te registreren.",
+      "findAfter": "Latere plannen zoeken",
+      "noAfter": "Geen plan voor dezelfde SQL opgeslagen na goedkeuring.",
+      "reload": "Opnieuw zoeken",
+      "pickAfter": "Selecteer het latere plan",
+      "measure": "Impact meten",
+      "effect": "Kosten {bfr} → {aft} ({pct}%)",
+      "better": "Verbeterd",
+      "worse": "Verslechterd",
+      "same": "Geen verandering",
+      "ddl": "Voorgestelde DDL",
+      "rewrite": "Herschreven SQL",
+      "runDdl": "DDL uitvoeren in schema.pi",
+      "copy": "Kopiëren",
+      "copied": "Gekopieerd",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Volledige scan van {relation} — maak een index op filterkolom {column} (vervang NN in de indexnaam door een volgnummer).",
+        "SEQ_SCAN_STATS": "Volledige scan van {relation} — controleer de filterkolommen en zorg ervoor dat de statistieken (ANALYZE) actueel zijn.",
+        "NESTED_LOOP": "Geneste lus verwacht {rows} rijen — vernieuw statistieken en overweeg join-key-indexen of een hash join.",
+        "SORT_SPILL": "Sortering van ongeveer {kb} KB kan naar schijf overlopen — overweeg om de sessie work_mem te verhogen of de sorteerkolommen te indexeren.",
+        "SELECT_STAR": "Selecteer alleen de kolommen die u nodig hebt in plaats van SELECT * (minder I/O, covering indexes mogelijk).",
+        "FUNC_ON_COLUMN": "Verplaats de functie/expressie op filterkolom {column} naar de constante zijde (maakt indexgebruik mogelijk).",
+        "IMPLICIT_CAST": "Match de typen van {column} en de constante (verwijder de impliciete cast).",
+        "NOT_IN_SUBQUERY": "Herschrijf NOT IN (subquery) als NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "OR-condities op verschillende kolommen moeten worden gesplitst met UNION (voeg een dubbele uitsluitingsconditie toe aan de laatste indien UNION ALL) of indexen per kolom hebben (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "De schema.pi linkfunctie wordt voorbereid. Probeer het over korte tijd opnieuw.",
@@ -1297,7 +1352,11 @@
       "TIMEOUT": "De aanvraag is verlopen (5 seconden). Verkort de SQL of probeer het later opnieuw.",
       "RATE": "Te veel aanvragen. Probeer het over een minuut opnieuw.",
       "PAYLOAD_TOO_LARGE": "Het plan is te groot om op te slaan.",
-      "LINK_NOT_FOUND": "Link niet gevonden. Selecteer de link opnieuw."
+      "LINK_NOT_FOUND": "Link niet gevonden. Selecteer de link opnieuw.",
+      "TUN_EXISTS": "Dit plan heeft al advies. Controleer de lijst (verwijder het om opnieuw te genereren).",
+      "TUN_BAD_STATE": "Deze actie is niet toegestaan in de huidige staat (deze kan elders zijn gewijzigd). Ververs de lijst.",
+      "TUN_PLAN_MISMATCH": "Het latere plan moet een ander opgeslagen plan zijn voor dezelfde SQL.",
+      "TUN_PLAN_STALE": "Het latere plan moet na goedkeuring zijn opgeslagen. Voer de explain opnieuw uit na toepassing en sla deze op."
     }
   },
   "nav": {

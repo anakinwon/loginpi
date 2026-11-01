@@ -1247,7 +1247,7 @@
         "SELECT_STAR": "SELECT * — selectați doar coloanele de care aveți nevoie (I/O suplimentar, fără index de acoperire).",
         "FUNC_ON_COLUMN": "Coloana de filtrare {column} este încapsulată într-o funcție sau expresie, deci indexul său nu poate fi utilizat — transformați constanta în schimb.",
         "LEADING_WILDCARD": "LIKE cu un % inițial nu poate utiliza un index B-tree — luați în considerare un index GIN pg_trgm.",
-        "OR_DIFF_COLUMNS": "Condițiile pe coloane diferite sunt combinate cu OR — luați în considerare UNION ALL sau indexuri pe coloană.",
+        "OR_DIFF_COLUMNS": "Condiții OR pe coloane diferite — luați în considerare împărțirea cu UNION (adăugați o condiție de excludere a duplicatelor dacă UNION ALL) sau revizuirea indexurilor pe coloană.",
         "IMPLICIT_CAST": "{column} este comparată cu un număr între ghilimele — potriviți tipurile coloanei și constantei (conversie implicită).",
         "NOT_IN_SUBQUERY": "NOT IN (subinterogare) nu returnează nimic când sunt prezente valori NULL și este lent — utilizați NOT EXISTS.",
         "NO_WHERE": "Fără clauză WHERE — pe un tabel mare aceasta este o scanare completă (adăugați o condiție sau LIMIT).",
@@ -1277,8 +1277,63 @@
     },
     "ai": {
       "title": "Sfaturi de optimizare AI",
-      "badge": "În curând",
-      "body": "În curând (după aprobare și proceduri de măsurare a impactului) — sfaturile vor fi generate din SQL cu constante mascate și înregistrate ca aplicate doar după aprobarea DA și impactul măsurat."
+      "intro": "Alegeți un plan salvat pentru a genera sfaturi. Sunt trimise doar SQL și planuri cu constante mascate ca ? (sfaturi bazate pe reguli dacă nu există cheie sau în caz de eșec). După ce proprietarul linkului aprobă, rulați din nou explicația pentru același SQL, salvați-o și măsurați impactul cu acel plan ulterior — abia atunci este înregistrat ca aplicat.",
+      "pickPlan": "Selectați un plan salvat pentru sfaturi",
+      "create": "Generați sfaturi",
+      "creating": "Se generează… (până la 30 s)",
+      "noPlans": "Nu există planuri salvate. Vizualizați un plan de explicație mai sus și salvați-l.",
+      "note": "Un singur sfat per plan. Ștergeți sfatul existent pentru a regenera. DDL este doar sugerat — aplicați-l în schema.pi.",
+      "empty": "Nu există încă sfaturi.",
+      "noItems": "Nu s-au găsit îmbunătățiri pentru acest plan.",
+      "cost": "Cost anterior",
+      "delete": "Ștergeți",
+      "prev": "Anterior",
+      "next": "Următorul",
+      "page": "Pagina {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Regulă"
+      },
+      "sts": {
+        "RCMD": "Recomandat",
+        "APRV": "Aprobat",
+        "RJCT": "Respins",
+        "APLD": "Aplicat"
+      },
+      "kind": {
+        "INDEX": "Index",
+        "REWRITE": "Rescriere SQL",
+        "STATS": "Statistici",
+        "CONFIG": "Configurare"
+      },
+      "approve": "Aprobă",
+      "reject": "Respinge",
+      "measureHint": "După aplicarea sfatului aprobat, vizualizați și salvați din nou planul de explicație pentru același SQL. Apoi alegeți acel plan ulterior și măsurați pentru a-l înregistra ca aplicat.",
+      "findAfter": "Găsiți planuri ulterioare",
+      "noAfter": "Nu există plan salvat pentru același SQL după aprobare.",
+      "reload": "Căutați din nou",
+      "pickAfter": "Selectați planul ulterior",
+      "measure": "Măsurați impactul",
+      "effect": "Cost {bfr} → {aft} ({pct}%)",
+      "better": "Îmbunătățit",
+      "worse": "Mai rău",
+      "same": "Fără schimbare",
+      "ddl": "DDL sugerat",
+      "rewrite": "SQL rescris",
+      "runDdl": "Rulați DDL în schema.pi",
+      "copy": "Copiați",
+      "copied": "Copiat",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Scanare completă a {relation} — creați un index pe coloana de filtrare {column} (înlocuiți NN din numele indexului cu un număr de secvență).",
+        "SEQ_SCAN_STATS": "Scanare completă a {relation} — verificați coloanele de filtrare și asigurați-vă că statisticile (ANALYZE) sunt actuale.",
+        "NESTED_LOOP": "Bucla imbricată așteaptă {rows} rânduri — reîmprospătați statisticile și luați în considerare indexuri pentru cheia de join sau un hash join.",
+        "SORT_SPILL": "Sortarea de aproximativ {kb} KB poate fi transferată pe disc — luați în considerare creșterea work_mem a sesiunii sau indexarea coloanelor de sortare.",
+        "SELECT_STAR": "Selectați doar coloanele de care aveți nevoie în loc de SELECT * (mai puțin I/O, indexuri de acoperire posibile).",
+        "FUNC_ON_COLUMN": "Mutați funcția/expresia pe coloana de filtrare {column} pe partea constantă (permite utilizarea indexului).",
+        "IMPLICIT_CAST": "Potriviți tipurile lui {column} și ale constantei (eliminați conversia implicită).",
+        "NOT_IN_SUBQUERY": "Rescrieți NOT IN (subinterogare) ca NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Condițiile OR pe coloane diferite ar trebui împărțite cu UNION (adăugați o condiție de excludere a duplicatelor la cea din urmă dacă UNION ALL) sau să aibă indexuri pe coloană (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Funcționalitatea de legătură schema.pi este în curs de pregătire. Vă rugăm să încercați din nou în scurt timp.",
@@ -1290,7 +1345,11 @@
       "TIMEOUT": "Cererea a expirat (5 secunde). Scurtați SQL-ul sau încercați din nou mai târziu.",
       "RATE": "Prea multe cereri. Încercați din nou într-un minut.",
       "PAYLOAD_TOO_LARGE": "Planul este prea mare pentru a fi salvat.",
-      "LINK_NOT_FOUND": "Legătura nu a fost găsită. Vă rugăm să selectați din nou legătura."
+      "LINK_NOT_FOUND": "Legătura nu a fost găsită. Vă rugăm să selectați din nou legătura.",
+      "TUN_EXISTS": "Acest plan are deja sfaturi. Verificați lista (ștergeți-l pentru a regenera).",
+      "TUN_BAD_STATE": "Această acțiune nu este permisă în starea curentă (poate s-a schimbat în altă parte). Reîmprospătați lista.",
+      "TUN_PLAN_MISMATCH": "Planul ulterior trebuie să fie un plan salvat diferit pentru același SQL.",
+      "TUN_PLAN_STALE": "Planul ulterior trebuie salvat după aprobare. Rulați din nou explicația după aplicare și salvați-o."
     }
   },
   "nav": {

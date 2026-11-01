@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — 仅选择您需要的列（额外的 I/O，无覆盖索引）。",
         "FUNC_ON_COLUMN": "过滤列 {column} 被函数或表达式包裹，因此无法使用其索引 — 请转换常量。",
         "LEADING_WILDCARD": "以 % 开头的 LIKE 无法使用 B-tree 索引 — 考虑 pg_trgm GIN 索引。",
-        "OR_DIFF_COLUMNS": "不同列上的条件用 OR 组合 — 考虑 UNION ALL 或按列索引。",
+        "OR_DIFF_COLUMNS": "不同的列条件通过 OR 组合在一起 — 请考虑使用 UNION 分离（如果是 UNION ALL，则添加去重条件）或检查每列的索引。",
         "IMPLICIT_CAST": "{column} 与带引号的数字进行比较 — 匹配列和常量类型（隐式转换）。",
         "NOT_IN_SUBQUERY": "NOT IN (子查询) 在存在 NULL 时返回空且速度慢 — 请使用 NOT EXISTS。",
         "NO_WHERE": "无 WHERE 子句 — 在大型表上这将是全表扫描（添加条件或 LIMIT）。",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "AI 调优建议",
-      "badge": "即将推出",
-      "body": "即将推出（经批准和影响衡量程序后）— 建议将从带有掩码常量的 SQL 生成，并且仅在 DA 批准和衡量影响后才记录为已应用。"
+      "intro": "选择一个已保存的计划以生成建议。仅发送SQL和将常量屏蔽为?的计划（如果没有密钥或失败，则基于规则的建议）。在链接所有者批准后，重新运行相同SQL的解释，保存它，然后使用该后续计划测量影响——只有这样才会被记录为已应用。",
+      "pickPlan": "选择一个已保存的计划以获取建议",
+      "create": "生成建议",
+      "creating": "正在生成…（最多30秒）",
+      "noPlans": "没有已保存的计划。在上方查看执行计划并保存。",
+      "note": "每个计划只有一个建议。删除现有建议以重新生成。DDL仅为建议——请在schema.pi中应用。",
+      "empty": "暂无建议。",
+      "noItems": "未找到此计划的改进。",
+      "cost": "之前成本",
+      "delete": "删除",
+      "prev": "上一页",
+      "next": "下一页",
+      "page": "第 {page} 页",
+      "engn": {
+        "AI": "AI",
+        "RULE": "规则"
+      },
+      "sts": {
+        "RCMD": "已建议",
+        "APRV": "已批准",
+        "RJCT": "已拒绝",
+        "APLD": "已应用"
+      },
+      "kind": {
+        "INDEX": "索引",
+        "REWRITE": "SQL重写",
+        "STATS": "统计",
+        "CONFIG": "配置"
+      },
+      "approve": "批准",
+      "reject": "拒绝",
+      "measureHint": "应用已批准的建议后，再次查看并保存相同SQL的执行计划。然后选择该后续计划并测量，将其记录为已应用。",
+      "findAfter": "查找后续计划",
+      "noAfter": "批准后未保存相同SQL的计划。",
+      "reload": "再次搜索",
+      "pickAfter": "选择后续计划",
+      "measure": "测量影响",
+      "effect": "成本 {bfr} → {aft} ({pct}%)",
+      "better": "已改进",
+      "worse": "更差",
+      "same": "无变化",
+      "ddl": "建议的DDL",
+      "rewrite": "重写SQL",
+      "runDdl": "在schema.pi中运行DDL",
+      "copy": "复制",
+      "copied": "已复制",
+      "rule": {
+        "SEQ_SCAN_INDEX": "{relation} 的全表扫描 — 在过滤列 {column} 上创建索引（将索引名称中的NN替换为序列号）。",
+        "SEQ_SCAN_STATS": "{relation} 的全表扫描 — 检查过滤列并确保统计信息（ANALYZE）是最新的。",
+        "NESTED_LOOP": "嵌套循环预计 {rows} 行 — 刷新统计信息并考虑连接键索引或哈希连接。",
+        "SORT_SPILL": "约 {kb} KB 的排序可能会溢出到磁盘 — 考虑提高会话 work_mem 或为排序列创建索引。",
+        "SELECT_STAR": "只选择您需要的列，而不是 SELECT *（减少I/O，可能实现覆盖索引）。",
+        "FUNC_ON_COLUMN": "将过滤列 {column} 上的函数/表达式移到常量侧（启用索引使用）。",
+        "IMPLICIT_CAST": "匹配 {column} 和常量的类型（移除隐式类型转换）。",
+        "NOT_IN_SUBQUERY": "将 NOT IN (子查询) 重写为 NOT EXISTS。",
+        "OR_DIFF_COLUMNS": "不同的列 OR 条件应使用 UNION 分离（如果是 UNION ALL，则在后一个条件中添加排除前一个条件的条件以防止重复），或为每列设置索引（BitmapOr）。"
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi 链接功能正在准备中。请稍后重试。",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "请求超时（5 秒）。请缩短 SQL 或稍后重试。",
       "RATE": "请求过多。请在一分钟后重试。",
       "PAYLOAD_TOO_LARGE": "计划太大，无法保存。",
-      "LINK_NOT_FOUND": "未找到链接。请重新选择链接。"
+      "LINK_NOT_FOUND": "未找到链接。请重新选择链接。",
+      "TUN_EXISTS": "此计划已有建议。请查看列表（如需重新生成，请删除）。",
+      "TUN_BAD_STATE": "当前状态不允许此操作（可能已在其他地方更改）。请刷新列表。",
+      "TUN_PLAN_MISMATCH": "后续计划必须是相同SQL的不同已保存计划。",
+      "TUN_PLAN_STALE": "后续计划必须在批准后保存。应用后重新运行解释并保存。"
     }
   },
   "nav": {

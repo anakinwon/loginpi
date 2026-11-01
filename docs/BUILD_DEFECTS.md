@@ -6,11 +6,11 @@
 
 ## 0. 장치와 한계
 
-| 장치 | 잡는 것 | 못 잡는 것 |
-|---|---|---|
+| 장치                                            | 잡는 것                                                                                                                                                     | 못 잡는 것                                                                                            |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | `build-defect-guard` 훅(PostToolUse Write·Edit) | 방금 쓴 코드 조각의 R-P1(연달아 있는 독립 await 원격 호출)·R-P3(`select('*')`·`count:'exact'`)·R-P4(외부 fetch 타임아웃 없음)·R-P6(dev 코드 운영 가드 없음) | 떨어진 위치의 직렬 조회, N+1 루프(R-P2), 전량 로드 후 메모리 집계, 경합(R-P5) — 사람·검토 에이전트 몫 |
-| `--scan` 전수 검사 | 위와 같은 패턴을 디렉터리 전체에서 | 2026-10-24 기준 schema.pi 에서 에이전트 확신 높음 P1 19건 중 2건만 잡음 → 보조 수단 |
-| 서브에이전트 전수 점검(이 원장 2절) | 코드를 읽어 P1~P6 판정 | 실측 지연(ms) — 모니터링으로 확인 |
+| `--scan` 전수 검사                              | 위와 같은 패턴을 디렉터리 전체에서                                                                                                                          | 2026-10-24 기준 schema.pi 에서 에이전트 확신 높음 P1 19건 중 2건만 잡음 → 보조 수단                   |
+| 서브에이전트 전수 점검(이 원장 2절)             | 코드를 읽어 P1~P6 판정                                                                                                                                      | 실측 지연(ms) — 모니터링으로 확인                                                                     |
 
 ## 1. 신규 시스템 체크리스트 (15개+ 구축 시 매번)
 
@@ -26,148 +26,149 @@
 
 ### 2.1 schema.pi (29행 — P1 20 · P2 7 · P5 2, P3·P4·P6 위반 없음)
 
-| P | 위치(`sitemap/schema.pi/src/`) | 내용 | 등급 | 상태 |
-|---|---|---|---|---|
-| P1 | `lib/api.ts:258` | `currentUser()` 뒤 `areaPlan` 직렬(공용·모든 API) | B | ✅ 수정 |
-| P1 | `lib/model-phy.ts:64` `loadPhy` | 모델 확인 뒤 테이블·칼럼 조회 | A | ✅ 수정 |
-| P1 | `lib/model-phy.ts:149` `syncPlan` | `entInfoOf`→`phyPlan`, 청크 루프 직렬 | A | ✅ 수정 |
-| P1 | `lib/model-dgm.ts:48` `loadDgm` | `phy_tbl` 뒤 `dgm_rel`·`dgm_ent` | A | ✅ 수정 |
-| P1 | `api/…/physical/route.ts:58` | `loadPhy` 뒤 `phyPlan` | A | ✅ 수정 |
-| P1 | `api/…/attributes/route.ts:42` | `getEnt`→`std_term`→`nextSeq` | A | ✅ 수정 |
-| P1 | `lib/model.ts:96` `prepareEnt` | `mdl_subj`→`entWords` | A | ✅ 수정 |
-| P1 | `api/…/entities/route.ts:47` | `std_dic`→`withActors` | A | ✅ 수정 |
-| P1 | `api/…/terms·domains·key-domains·entity-classes/route.ts` | 권한 뒤 `pendingChg` 직렬(words #24 의 형제 4곳) | A | ✅ 수정 |
-| P1 | `api/…/key-domains/route.ts:49` | 건수→`withActors` | A | ✅ 수정 |
-| P1 | `api/…/approvals/route.ts:46` | 이름 조회 4회 직렬 | A | ✅ 수정 |
-| P1 | `lib/home.ts:25` | 멤버→`lst_area_id` | A | ✅ 수정 |
-| P1 | `api/mon/app/route.ts:26` | `addApp`→`addAppEvt`(모니터링 수집) | A | ✅ 수정 |
-| P1 | `api/…/subjects/suggest/route.ts:47` | `ex`·`eq` 가 첫 `Promise.all` 밖 | A | ✅ 수정 |
-| P1 | `api/…/versions/route.ts:36` | 스냅샷 a→b→현재, POST 현재→mx | A | ✅ 수정 |
-| P1 | `lib/model-ddl.ts:24` | `ddlTargets`·`buildDdl` 직렬 | A | ✅ 수정 |
-| P1 | `lib/change.ts:70` | `inUse`·`wordNameError` 3조회씩 | A | ✅ 수정 |
-| P1 | `api/…/domains/route.ts:57` | 검증 4단계 직렬 | A | ✅ 수정 |
-| P1 | `lib/bulk-check.ts:39…` | 100개 청크 for+await(`inChunks` 있음) | A | ✅ 수정 |
-| P1 | `api/payments/approve/route.ts:40` | 결제 승인 3조회 직렬 | B | ✅ 수정 |
-| P2 | `lib/model-stage.ts:96` `setPhy` | 테이블마다 같은 `phyPlan` N회 | A | ✅ 수정 |
-| P2 | `lib/model-stage.ts:156` `setDgm` | `loadDgm` 결과 두고 `findDgm` 재조회 | A | ✅ 수정 |
-| P2 | `lib/model-fk.ts:29`·`fk-plan/route.ts:58` | 단계마다 `nextSeq`·`std_term` 재조회 | A | ✅ 수정 |
-| P2 | `lib/home.ts:44` | 가진 `user` 를 `requireAreaRole` 이 재조회 | B | ✅ 수정 |
-| P2 | `api/…/relations/[relId]/route.ts:44` | 권한 2회·감사 insert 루프 | A | ✅ 수정 |
-| P2 | `api/…/plan/route.ts:134`·`lib/plan.ts` | `areaPlan`·`feePlans` 재조회 | B | ✅ 수정 |
-| P2 | `lib/sql-run.ts:315` | `getConn` 2회 | A | ✅ 수정 |
-| P5 | `attributes/[attrId]/route.ts:76`·`model-fk.ts:29`·`fk-plan/route.ts:65` | `nextSeq` 충돌 재시도 없음(#29 형제), 23505 를 ATTR_DUP 로 오표시 | A | ✅ 수정 |
-| P5 | `model/relations.tsx:52` + 호출처 3곳 | **#31 의 `locked` prop 을 아무도 안 넘김 — 화면 가드가 실제로 꺼져 있음**, `attrs.tsx` 잠금 가드 없음 | A | ✅ 수정 |
+| P   | 위치(`sitemap/schema.pi/src/`)                                           | 내용                                                                                                  | 등급 | 상태    |
+| --- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- | ---- | ------- |
+| P1  | `lib/api.ts:258`                                                         | `currentUser()` 뒤 `areaPlan` 직렬(공용·모든 API)                                                     | B    | ✅ 수정 |
+| P1  | `lib/model-phy.ts:64` `loadPhy`                                          | 모델 확인 뒤 테이블·칼럼 조회                                                                         | A    | ✅ 수정 |
+| P1  | `lib/model-phy.ts:149` `syncPlan`                                        | `entInfoOf`→`phyPlan`, 청크 루프 직렬                                                                 | A    | ✅ 수정 |
+| P1  | `lib/model-dgm.ts:48` `loadDgm`                                          | `phy_tbl` 뒤 `dgm_rel`·`dgm_ent`                                                                      | A    | ✅ 수정 |
+| P1  | `api/…/physical/route.ts:58`                                             | `loadPhy` 뒤 `phyPlan`                                                                                | A    | ✅ 수정 |
+| P1  | `api/…/attributes/route.ts:42`                                           | `getEnt`→`std_term`→`nextSeq`                                                                         | A    | ✅ 수정 |
+| P1  | `lib/model.ts:96` `prepareEnt`                                           | `mdl_subj`→`entWords`                                                                                 | A    | ✅ 수정 |
+| P1  | `api/…/entities/route.ts:47`                                             | `std_dic`→`withActors`                                                                                | A    | ✅ 수정 |
+| P1  | `api/…/terms·domains·key-domains·entity-classes/route.ts`                | 권한 뒤 `pendingChg` 직렬(words #24 의 형제 4곳)                                                      | A    | ✅ 수정 |
+| P1  | `api/…/key-domains/route.ts:49`                                          | 건수→`withActors`                                                                                     | A    | ✅ 수정 |
+| P1  | `api/…/approvals/route.ts:46`                                            | 이름 조회 4회 직렬                                                                                    | A    | ✅ 수정 |
+| P1  | `lib/home.ts:25`                                                         | 멤버→`lst_area_id`                                                                                    | A    | ✅ 수정 |
+| P1  | `api/mon/app/route.ts:26`                                                | `addApp`→`addAppEvt`(모니터링 수집)                                                                   | A    | ✅ 수정 |
+| P1  | `api/…/subjects/suggest/route.ts:47`                                     | `ex`·`eq` 가 첫 `Promise.all` 밖                                                                      | A    | ✅ 수정 |
+| P1  | `api/…/versions/route.ts:36`                                             | 스냅샷 a→b→현재, POST 현재→mx                                                                         | A    | ✅ 수정 |
+| P1  | `lib/model-ddl.ts:24`                                                    | `ddlTargets`·`buildDdl` 직렬                                                                          | A    | ✅ 수정 |
+| P1  | `lib/change.ts:70`                                                       | `inUse`·`wordNameError` 3조회씩                                                                       | A    | ✅ 수정 |
+| P1  | `api/…/domains/route.ts:57`                                              | 검증 4단계 직렬                                                                                       | A    | ✅ 수정 |
+| P1  | `lib/bulk-check.ts:39…`                                                  | 100개 청크 for+await(`inChunks` 있음)                                                                 | A    | ✅ 수정 |
+| P1  | `api/payments/approve/route.ts:40`                                       | 결제 승인 3조회 직렬                                                                                  | B    | ✅ 수정 |
+| P2  | `lib/model-stage.ts:96` `setPhy`                                         | 테이블마다 같은 `phyPlan` N회                                                                         | A    | ✅ 수정 |
+| P2  | `lib/model-stage.ts:156` `setDgm`                                        | `loadDgm` 결과 두고 `findDgm` 재조회                                                                  | A    | ✅ 수정 |
+| P2  | `lib/model-fk.ts:29`·`fk-plan/route.ts:58`                               | 단계마다 `nextSeq`·`std_term` 재조회                                                                  | A    | ✅ 수정 |
+| P2  | `lib/home.ts:44`                                                         | 가진 `user` 를 `requireAreaRole` 이 재조회                                                            | B    | ✅ 수정 |
+| P2  | `api/…/relations/[relId]/route.ts:44`                                    | 권한 2회·감사 insert 루프                                                                             | A    | ✅ 수정 |
+| P2  | `api/…/plan/route.ts:134`·`lib/plan.ts`                                  | `areaPlan`·`feePlans` 재조회                                                                          | B    | ✅ 수정 |
+| P2  | `lib/sql-run.ts:315`                                                     | `getConn` 2회                                                                                         | A    | ✅ 수정 |
+| P5  | `attributes/[attrId]/route.ts:76`·`model-fk.ts:29`·`fk-plan/route.ts:65` | `nextSeq` 충돌 재시도 없음(#29 형제), 23505 를 ATTR_DUP 로 오표시                                     | A    | ✅ 수정 |
+| P5  | `model/relations.tsx:52` + 호출처 3곳                                    | **#31 의 `locked` prop 을 아무도 안 넘김 — 화면 가드가 실제로 꺼져 있음**, `attrs.tsx` 잠금 가드 없음 | A    | ✅ 수정 |
 
 ### 2.2 sitemap.pi + 공용 패키지 (9건 — P1 3 · P2 3 · P3 2 · P4 1)
 
-| P | 위치 | 내용 | 등급 | 상태 |
-|---|---|---|---|---|
-| P4 | `packages/pi-auth/src/route.ts:117` | **Pi `/v2/me` 타임아웃 없음 — 공용, 3시스템 로그인 영향** | B | ✅ 수정 |
-| P1 | `sitemap.pi/src/app/api/payments/approve/route.ts:112` | 요금 조회 직렬 | B | ✅ 수정 |
-| P1 | `…/payments/prepare/route.ts:122` | 요금 3조회 직렬 | B | ✅ 수정 |
-| P1 | `sitemap.pi/src/lib/api.ts:193` `checkSiteWrite` | 독립 count 4개 직렬 | A | ✅ 수정 |
-| P2 | `components/google-auth.tsx:35` | 화면마다 `/api/auth/me` 3회 | B | ✅ 수정 |
-| P2 | `api/cron/site-sts-sweep/route.ts:129` | 루프 안 `pi_pymnt` 조회(N+1) | B | ✅ 수정 |
-| P2 | `api/cron/site-sts-sweep/route.ts:92` | RPC 최대 50건 직렬 | C | ✅ 수정 |
-| P3 | `api/sites/[domain]/route.ts:37` | 일별 조회수 전 행 받아 JS 합산(1000행 상한 시 과소) | C | ✅ 수정(sql/018 DB 적용 대기 — 미적용이면 기존 합산 폴백) |
-| P3 | `lib/payments.ts:92` `getPlanRemaining` | 전 행 받아 메모리 집계 | B | ✅ 수정 |
+| P   | 위치                                                   | 내용                                                      | 등급 | 상태                                                      |
+| --- | ------------------------------------------------------ | --------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| P4  | `packages/pi-auth/src/route.ts:117`                    | **Pi `/v2/me` 타임아웃 없음 — 공용, 3시스템 로그인 영향** | B    | ✅ 수정                                                   |
+| P1  | `sitemap.pi/src/app/api/payments/approve/route.ts:112` | 요금 조회 직렬                                            | B    | ✅ 수정                                                   |
+| P1  | `…/payments/prepare/route.ts:122`                      | 요금 3조회 직렬                                           | B    | ✅ 수정                                                   |
+| P1  | `sitemap.pi/src/lib/api.ts:193` `checkSiteWrite`       | 독립 count 4개 직렬                                       | A    | ✅ 수정                                                   |
+| P2  | `components/google-auth.tsx:35`                        | 화면마다 `/api/auth/me` 3회                               | B    | ✅ 수정                                                   |
+| P2  | `api/cron/site-sts-sweep/route.ts:129`                 | 루프 안 `pi_pymnt` 조회(N+1)                              | B    | ✅ 수정                                                   |
+| P2  | `api/cron/site-sts-sweep/route.ts:92`                  | RPC 최대 50건 직렬                                        | C    | ✅ 수정                                                   |
+| P3  | `api/sites/[domain]/route.ts:37`                       | 일별 조회수 전 행 받아 JS 합산(1000행 상한 시 과소)       | C    | ✅ 수정(sql/018 DB 적용 대기 — 미적용이면 기존 합산 폴백) |
+| P3  | `lib/payments.ts:92` `getPlanRemaining`                | 전 행 받아 메모리 집계                                    | B    | ✅ 수정                                                   |
 
 ### 2.3 cafe.pi 사용자 경로 (25 지점 — P1 6 · P2 2 · P3 2 · P4 15 — Telegram 행은 위치 2곳이 결함 1건)
 
-| P | 위치(`src/`) | 내용 | 등급 | 상태 |
-|---|---|---|---|---|
-| P1 | `app/[locale]/layout.tsx:75` | **루트 레이아웃 DB 3회 직렬 — 모든 페이지** | A | ✅ 수정 |
-| P1 | `app/api/chat/rooms/[roomId]/messages/route.ts:125` | 메시지 전송마다 멤버·최근 수 직렬 | A | ✅ 수정 |
-| P1 | `app/[locale]/chat/[roomId]/page.tsx:155` | 테마 이모지 조회가 `Promise.all` 밖 | A | ✅ 수정 |
-| P1 | `app/api/feedback/route.ts:78` | 이미지·사용자 조회 직렬 | A | ✅ 수정 |
-| P1 | `lib/chat-room-list.ts:71` | 부스트 방→일반 방 직렬 | A | ✅ 수정 |
-| P1 | `lib/mps-item.ts:320` | 상품 상세 매장 조회 직렬 | A | ✅ 수정 |
-| P2 | `lib/chat.ts:201` | 방마다 멤버 조회(N+1) | A | ✅ 수정 |
-| P2 | `lib/event.ts:259` | 행위마다 이벤트×미션 N+1(after) | C | ✅ 수정 |
-| P3 | `app/api/feedback/route.ts:137` | 별점 전량 메모리 집계 | C | ✅ 수정 |
-| P3 | `app/api/location/nearby/shops/route.ts:32` | 좌표 매장 전량 후 메모리 거리 필터 | C | ✅ 수정 |
-| P4 | `app/api/auth/pi/route.ts:106` 외 4곳(pi-redirect·pi-code·link-start·link-status) | Pi `/v2/me` 타임아웃 없음 | B | ✅ 수정 |
-| P4 | `app/api/payments/approve·complete·cancel` | Pi 결제 API 타임아웃 없음 | B | ✅ 수정 |
-| P4 | `payments/complete/route.ts:135`·`lib/telegram.ts:74` | 결제 완료 응답 안에서 Telegram 대기 → `after()` | B | ✅ 수정 |
-| P4 | `lib/realtime-broadcast.ts:17` | 채팅 전송마다 Realtime fetch 타임아웃 없음 | A | ✅ 수정 |
-| P4 | `lib/google-maps.ts:86` | Geocode 타임아웃 없음 | A | ✅ 수정 |
-| P4 | `lib/tip-pi-reward.ts`·`campaign-`·`fbck-`·`pi-reward.ts` | A2U 타임아웃 없음 | B | ✅ 수정 |
+| P   | 위치(`src/`)                                                                      | 내용                                            | 등급 | 상태    |
+| --- | --------------------------------------------------------------------------------- | ----------------------------------------------- | ---- | ------- |
+| P1  | `app/[locale]/layout.tsx:75`                                                      | **루트 레이아웃 DB 3회 직렬 — 모든 페이지**     | A    | ✅ 수정 |
+| P1  | `app/api/chat/rooms/[roomId]/messages/route.ts:125`                               | 메시지 전송마다 멤버·최근 수 직렬               | A    | ✅ 수정 |
+| P1  | `app/[locale]/chat/[roomId]/page.tsx:155`                                         | 테마 이모지 조회가 `Promise.all` 밖             | A    | ✅ 수정 |
+| P1  | `app/api/feedback/route.ts:78`                                                    | 이미지·사용자 조회 직렬                         | A    | ✅ 수정 |
+| P1  | `lib/chat-room-list.ts:71`                                                        | 부스트 방→일반 방 직렬                          | A    | ✅ 수정 |
+| P1  | `lib/mps-item.ts:320`                                                             | 상품 상세 매장 조회 직렬                        | A    | ✅ 수정 |
+| P2  | `lib/chat.ts:201`                                                                 | 방마다 멤버 조회(N+1)                           | A    | ✅ 수정 |
+| P2  | `lib/event.ts:259`                                                                | 행위마다 이벤트×미션 N+1(after)                 | C    | ✅ 수정 |
+| P3  | `app/api/feedback/route.ts:137`                                                   | 별점 전량 메모리 집계                           | C    | ✅ 수정 |
+| P3  | `app/api/location/nearby/shops/route.ts:32`                                       | 좌표 매장 전량 후 메모리 거리 필터              | C    | ✅ 수정 |
+| P4  | `app/api/auth/pi/route.ts:106` 외 4곳(pi-redirect·pi-code·link-start·link-status) | Pi `/v2/me` 타임아웃 없음                       | B    | ✅ 수정 |
+| P4  | `app/api/payments/approve·complete·cancel`                                        | Pi 결제 API 타임아웃 없음                       | B    | ✅ 수정 |
+| P4  | `payments/complete/route.ts:135`·`lib/telegram.ts:74`                             | 결제 완료 응답 안에서 Telegram 대기 → `after()` | B    | ✅ 수정 |
+| P4  | `lib/realtime-broadcast.ts:17`                                                    | 채팅 전송마다 Realtime fetch 타임아웃 없음      | A    | ✅ 수정 |
+| P4  | `lib/google-maps.ts:86`                                                           | Geocode 타임아웃 없음                           | A    | ✅ 수정 |
+| P4  | `lib/tip-pi-reward.ts`·`campaign-`·`fbck-`·`pi-reward.ts`                         | A2U 타임아웃 없음                               | B    | ✅ 수정 |
 
 ### 2.4 cafe.pi 관리자·크론 (19건 — P1 3 · P2 1 · P3 6 · P4 4 · 일반 fetch 5)
 
-| P | 위치(`src/app/`) | 내용 | 등급 | 상태 |
-|---|---|---|---|---|
-| P1 | `api/admin/open-promo/route.ts:23`·`fee-mode/route.ts:20` | 현재·이력 조회 직렬 | A | ✅ 수정 |
-| P1 | `api/admin/stickers/[packId]/items/route.ts:85` | 파일 20개 업로드 직렬 | A | ✅ 수정 |
-| P2 | `api/admin/event/exclude/route.ts:92` | 이름마다 3왕복, 상한 없음 | A | ✅ 수정 |
-| P3 | `api/admin/links/route.ts:17`·`subscriptions/route.ts:40` | 페이지네이션 없는 전량(데이터 패칭 표준 ① 위반) | A | links ✅ 수정 / subscriptions 보류(아래 2.7) |
-| P3 | `api/admin/event/completions`·`stickers/route.ts:32` | 전량 메모리 집계 | C | stickers ✅ 수정 / completions 보류(아래 2.7) |
-| P3 | `api/admin/analytics/usage:42`·`orders:66` | 기간 전량 메모리 집계 | C | 보류(아래 2.7) |
-| P4 | `api/cron/a2u-probe:78`·`admin/payments/a2u-status:46` | Pi·Horizon 타임아웃 없음 | B | ✅ 수정 |
-| P4 | `api/admin/i18n/translate:62`·`translate-all:47` | Gemini·자기 호출 타임아웃 없음 | A | ✅ 수정 |
-| 기타 | `[locale]/(admin)/admin/campaign·std/domains·std/terms·std/words·store/categories` 페이지 | **일반 `fetch` — Pi Browser 401**(piFetch 교체) | A | ✅ 수정 |
+| P    | 위치(`src/app/`)                                                                          | 내용                                            | 등급 | 상태                                          |
+| ---- | ----------------------------------------------------------------------------------------- | ----------------------------------------------- | ---- | --------------------------------------------- |
+| P1   | `api/admin/open-promo/route.ts:23`·`fee-mode/route.ts:20`                                 | 현재·이력 조회 직렬                             | A    | ✅ 수정                                       |
+| P1   | `api/admin/stickers/[packId]/items/route.ts:85`                                           | 파일 20개 업로드 직렬                           | A    | ✅ 수정                                       |
+| P2   | `api/admin/event/exclude/route.ts:92`                                                     | 이름마다 3왕복, 상한 없음                       | A    | ✅ 수정                                       |
+| P3   | `api/admin/links/route.ts:17`·`subscriptions/route.ts:40`                                 | 페이지네이션 없는 전량(데이터 패칭 표준 ① 위반) | A    | links ✅ 수정 / subscriptions 보류(아래 2.7)  |
+| P3   | `api/admin/event/completions`·`stickers/route.ts:32`                                      | 전량 메모리 집계                                | C    | stickers ✅ 수정 / completions 보류(아래 2.7) |
+| P3   | `api/admin/analytics/usage:42`·`orders:66`                                                | 기간 전량 메모리 집계                           | C    | 보류(아래 2.7)                                |
+| P4   | `api/cron/a2u-probe:78`·`admin/payments/a2u-status:46`                                    | Pi·Horizon 타임아웃 없음                        | B    | ✅ 수정                                       |
+| P4   | `api/admin/i18n/translate:62`·`translate-all:47`                                          | Gemini·자기 호출 타임아웃 없음                  | A    | ✅ 수정                                       |
+| 기타 | `[locale]/(admin)/admin/campaign·std/domains·std/terms·std/words·store/categories` 페이지 | **일반 `fetch` — Pi Browser 401**(piFetch 교체) | A    | ✅ 수정                                       |
 
 ### 2.5 합계
 
-| 시스템 | 확신 높음 | A | B | C | 확신 중간(별도) |
-|---|---|---|---|---|---|
-| schema.pi | 29행(에이전트 집계 28) | 25 | 4 | 0 | 19 |
-| sitemap.pi·공용 | 9 | 1 | 6 | 2 | 16 |
-| cafe.pi 사용자 | 16행(25 지점) | 9 | 4 | 3 | 9 |
-| cafe.pi 관리자·크론 | 9행(19건) | 6 | 1 | 2 | 7 |
+| 시스템              | 확신 높음              | A   | B   | C   | 확신 중간(별도) |
+| ------------------- | ---------------------- | --- | --- | --- | --------------- |
+| schema.pi           | 29행(에이전트 집계 28) | 25  | 4   | 0   | 19              |
+| sitemap.pi·공용     | 9                      | 1   | 6   | 2   | 16              |
+| cafe.pi 사용자      | 16행(25 지점)          | 9   | 4   | 3   | 9               |
+| cafe.pi 관리자·크론 | 9행(19건)              | 6   | 1   | 2   | 7               |
 
 ## 2.6 확신 중간(51건) — 남은 기록
 
 점검 에이전트가 위치째 넘긴 대표 항목만 남는다(나머지는 건수만 — 세션 밖 원문 없음, 수정 전 재점검 `[TBD]`).
 
-| 시스템 | 건수 | 대표 항목 |
-|---|---|---|
-| schema.pi | 19 | 쓰기 루프 9건(`syncPhy`·`setLgc`·physical PATCH:254·`attributes/order`:35·propagate:99·`applyCodes`·`approvals/batch`·`resolve-nm`·`delPhy` — `ver_no`·유일 인덱스 순서 의도 가능), `lib/auth.ts:100` 요청마다 비-await `lst_lgn_dtm` UPDATE(인증), `lib/change.ts:150`·`entities/[entId]/route.ts:12`·`attributes/[attrId]/route.ts:52` `select('*')`(감사 전체 행 필요 가능), `physical/idx` POST 전체 `loadPhy`, `words/route.ts:61` 진단 `console.log` 상시 출력 |
-| sitemap.pi·공용 | 16 | `packages/pi-db/src/users.ts:119`(로그인 직렬)·`:248,259`(인증 전체 칼럼), `lib/auth.ts:31`, `src/auth.ts:72`, `api/fee-plans/route.ts:13`, `components/my-sites.tsx:91`, `lib/payments.ts:139`·`:166`(결제 타임아웃 8초), `components/bubble-home.tsx`, `api/sites/route.ts:40`, P5 4건(`payments/approve:112` 비원자 확인·`me/sites:55` 상한 경합·`auth/link-complete:40`), P6 `api/bubbles/route.ts:73` 운영에서 demo 노출 |
-| cafe.pi 사용자 | 9 | `lib/users.ts:255` 모든 요청 `sys_user` 전체 칼럼(인증)·`:83` 로그인 2왕복, `lib/chat.ts:182` 직거래 방 중복 생성 경합, `chat/[roomId]/page.tsx:73`, `store/items/route.ts:33`, `lib/board.ts:45`, `exchange-rates`·`pi-price` 타임아웃(캐시 있음), P6 `[locale]/voice-test/page.tsx` 운영 가드 없음 |
-| cafe.pi 관리자·크론 | 7 | `api/cron/campaign-grant-all:105`(선착순 순서 의존 가능), `api/admin/stats/aggregate:45`, `api/cron/event-bean-reward:96`·`admin/event/bond-reward:102`, `admin/campaign/grant-all:109`, `cron/chat-noti:24`, `admin/std/approvals:19`·`i18n/stats:43` `select('*')` |
+| 시스템              | 건수 | 대표 항목                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| schema.pi           | 19   | 쓰기 루프 9건(`syncPhy`·`setLgc`·physical PATCH:254·`attributes/order`:35·propagate:99·`applyCodes`·`approvals/batch`·`resolve-nm`·`delPhy` — `ver_no`·유일 인덱스 순서 의도 가능), `lib/auth.ts:100` 요청마다 비-await `lst_lgn_dtm` UPDATE(인증), `lib/change.ts:150`·`entities/[entId]/route.ts:12`·`attributes/[attrId]/route.ts:52` `select('*')`(감사 전체 행 필요 가능), `physical/idx` POST 전체 `loadPhy`, `words/route.ts:61` 진단 `console.log` 상시 출력 |
+| sitemap.pi·공용     | 16   | `packages/pi-db/src/users.ts:119`(로그인 직렬)·`:248,259`(인증 전체 칼럼), `lib/auth.ts:31`, `src/auth.ts:72`, `api/fee-plans/route.ts:13`, `components/my-sites.tsx:91`, `lib/payments.ts:139`·`:166`(결제 타임아웃 8초), `components/bubble-home.tsx`, `api/sites/route.ts:40`, P5 4건(`payments/approve:112` 비원자 확인·`me/sites:55` 상한 경합·`auth/link-complete:40`), P6 `api/bubbles/route.ts:73` 운영에서 demo 노출                                        |
+| cafe.pi 사용자      | 9    | `lib/users.ts:255` 모든 요청 `sys_user` 전체 칼럼(인증)·`:83` 로그인 2왕복, `lib/chat.ts:182` 직거래 방 중복 생성 경합, `chat/[roomId]/page.tsx:73`, `store/items/route.ts:33`, `lib/board.ts:45`, `exchange-rates`·`pi-price` 타임아웃(캐시 있음), P6 `[locale]/voice-test/page.tsx` 운영 가드 없음                                                                                                                                                                 |
+| cafe.pi 관리자·크론 | 7    | `api/cron/campaign-grant-all:105`(선착순 순서 의존 가능), `api/admin/stats/aggregate:45`, `api/cron/event-bean-reward:96`·`admin/event/bond-reward:102`, `admin/campaign/grant-all:109`, `cron/chat-noti:24`, `admin/std/approvals:19`·`i18n/stats:43` `select('*')`                                                                                                                                                                                                 |
 
 ## 2.7 보류(설계 변경 — 상향 조건 명시, 2026-10-24)
 
 실측 행 수가 작고 정확도 문제가 없어 지금은 고치지 않는다. **상향 조건에 닿으면 R-P0 로 즉시 처리**(고객 결재 아님). 감지 = 4개 API 가 500행 초과 시 `console.warn('[BUILD_DEFECTS 2.7] …')`(Vercel 로그). `admin/subscriptions` 목록은 데이터 패칭 표준 ①(예외 없음)의 **임시 예외** — 마스터 확인 대상.
 
-| 위치 | 보류 이유(실측 2026-10-24) | 상향 조건 · 방법 |
-|---|---|---|
-| `api/admin/subscriptions` | 통계 차트(`SubscrStatsCharts`)가 전체 행 필요, 활성 구독은 사용자×상품으로 상한(3행) | 500행 초과 → 서버 집계 API + 목록 서버 페이지네이션(links 방식) |
-| `api/admin/event/completions` | 종료 이벤트(`evt-20260614-001`) 완료 기록 59행, 직렬 2조회만 병렬화 | 새 이벤트에 재사용 시 → 사용자별 count RPC |
-| `api/admin/analytics/usage`·`orders` | 활동 로그 90일 42행·주문 0행, cafe.pi 루트에 DB 마이그레이션 도구 없음 | 기간 행 수 500 초과(PostgREST 1000행 상한 전) → 집계 RPC + 적용 도구 |
+| 위치                                 | 보류 이유(실측 2026-10-24)                                                           | 상향 조건 · 방법                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| `api/admin/subscriptions`            | 통계 차트(`SubscrStatsCharts`)가 전체 행 필요, 활성 구독은 사용자×상품으로 상한(3행) | 500행 초과 → 서버 집계 API + 목록 서버 페이지네이션(links 방식)      |
+| `api/admin/event/completions`        | 종료 이벤트(`evt-20260614-001`) 완료 기록 59행, 직렬 2조회만 병렬화                  | 새 이벤트에 재사용 시 → 사용자별 count RPC                           |
+| `api/admin/analytics/usage`·`orders` | 활동 로그 90일 42행·주문 0행, cafe.pi 루트에 DB 마이그레이션 도구 없음               | 기간 행 수 500 초과(PostgREST 1000행 상한 전) → 집계 RPC + 적용 도구 |
 
 **R-P4 타임아웃 예외 값(2026-10-24 결정)** — 기본 2초 대신 : Pi `/v2/me` 5초 · Pi 결제·A2U 10초 · Telegram·Horizon 5초 · Gemini 번역 30초(전체 일괄 240초, 동기화 60초). 실패해도 각 호출부의 기존 실패 경로(try/catch)로 간다.
 
-| 예외(추가) | 값 | 결정 · 이유 | 실패 경로 |
-|---|---|---|---|
-| seminar.pi Gemini 호출(`sitemap/seminar.pi/src/lib/gemini.ts` — 음성→글·번역·합성 음성) | **10초** | 2026-10-27 아소카 결정(마스터 위임, 계획 A-4). 5초 음성 조각을 실시간 자막으로 돌려야 해 2초로는 모델 응답이 안 들어오고, 10초를 넘기면 다음 조각과 겹쳐 자막 의미가 없다. 캐시 = 번역·합성 음성은 문장 해시×언어(A-3, SA8·SA9) | `null` 반환 → 그 조각 자막 건너뜀(라우트 502, 화면은 다음 조각 계속) |
-| seminar.pi Gemini 회의록 요약(같은 파일 `summarize`) | **30초** | 같은 결정. 종료 시 1회·사람이 기다리는 화면(요약 중)이라 실시간 경로가 아니고, 2시간 회의 조각 전체를 한 번에 보내므로 10초로는 끊긴다(기존 예외 'Gemini 번역 30초'와 같은 값) | `null` → 회의록 상태 FAILED, 조각 원문은 남고 다시 요약 가능(SA7) |
-| seminar.pi Gemini 대면 노트 정밀 전사(같은 파일 `transcribeMeeting`) | **150초**(창 1개) | 2026-10-29 마스터 결정(STT PoC 1단계, 모델 3.5-flash). 종료 뒤 1회·5분 녹음 창 1개 전사에 PoC 40초, 여유 포함. 첫 창(화자 기준) 뒤 나머지 창 6개 동시, 전체 예산 240초 — 창마다 남은 예산으로 호출 시간을 줄이고 30초도 안 남으면 그 창은 건너뛰어 함수 상한(300초) 안에 요약까지 끝낸다 | `null` → 그 창은 실시간 초안을 그대로 둔다(기록 유실 0) |
-| dbms.pi → schema.pi `/api/link/v1` 대리 조회(`sitemap/dbms.pi/src/lib/link/client.ts` `schemaFetch`) | **4초** | 2026-11-01 아소카 결정(마스터 위임 NonStop). schema.pi 가 고객 DB 이름 붙인 조회를 `statement_timeout 5초` 안에서 대리 실행하므로 2초로는 일반 통계·EXPLAIN 이 끊긴다. 5초 안쪽 4초로 schema.pi 쪽 시간 초과(504)보다 먼저 끊어 함수가 매달리지 않게 함 | `LinkError('TIMEOUT', 504)`·연결 불가 `LINK_DOWN 502` → 화면 오류 문구, 다른 섹션은 계속 |
+| 예외(추가)                                                                                           | 값                | 결정 · 이유                                                                                                                                                                                                                                                                              | 실패 경로                                                                                |
+| ---------------------------------------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| seminar.pi Gemini 호출(`sitemap/seminar.pi/src/lib/gemini.ts` — 음성→글·번역·합성 음성)              | **10초**          | 2026-10-27 아소카 결정(마스터 위임, 계획 A-4). 5초 음성 조각을 실시간 자막으로 돌려야 해 2초로는 모델 응답이 안 들어오고, 10초를 넘기면 다음 조각과 겹쳐 자막 의미가 없다. 캐시 = 번역·합성 음성은 문장 해시×언어(A-3, SA8·SA9)                                                          | `null` 반환 → 그 조각 자막 건너뜀(라우트 502, 화면은 다음 조각 계속)                     |
+| seminar.pi Gemini 회의록 요약(같은 파일 `summarize`)                                                 | **30초**          | 같은 결정. 종료 시 1회·사람이 기다리는 화면(요약 중)이라 실시간 경로가 아니고, 2시간 회의 조각 전체를 한 번에 보내므로 10초로는 끊긴다(기존 예외 'Gemini 번역 30초'와 같은 값)                                                                                                           | `null` → 회의록 상태 FAILED, 조각 원문은 남고 다시 요약 가능(SA7)                        |
+| seminar.pi Gemini 대면 노트 정밀 전사(같은 파일 `transcribeMeeting`)                                 | **150초**(창 1개) | 2026-10-29 마스터 결정(STT PoC 1단계, 모델 3.5-flash). 종료 뒤 1회·5분 녹음 창 1개 전사에 PoC 40초, 여유 포함. 첫 창(화자 기준) 뒤 나머지 창 6개 동시, 전체 예산 240초 — 창마다 남은 예산으로 호출 시간을 줄이고 30초도 안 남으면 그 창은 건너뛰어 함수 상한(300초) 안에 요약까지 끝낸다 | `null` → 그 창은 실시간 초안을 그대로 둔다(기록 유실 0)                                  |
+| dbms.pi → schema.pi `/api/link/v1` 대리 조회(`sitemap/dbms.pi/src/lib/link/client.ts` `schemaFetch`) | **4초**           | 2026-11-01 아소카 결정(마스터 위임 NonStop). schema.pi 가 고객 DB 이름 붙인 조회를 `statement_timeout 5초` 안에서 대리 실행하므로 2초로는 일반 통계·EXPLAIN 이 끊긴다. 5초 안쪽 4초로 schema.pi 쪽 시간 초과(504)보다 먼저 끊어 함수가 매달리지 않게 함                                  | `LinkError('TIMEOUT', 504)`·연결 불가 `LINK_DOWN 502` → 화면 오류 문구, 다른 섹션은 계속 |
+| dbms.pi Claude 튜닝 권고(`sitemap/dbms.pi/src/lib/sql-lab/tune-ai.ts` `aiRecommend`)                 | **30초**          | 2026-11-01 아소카 결정(마스터 위임 NonStop, PRD 12 §2-4). 사람이 [권고 만들기] 버튼을 누르고 기다리는 1회 호출(실시간·목록 경로 아님), 계획 1건당 활성 권고 1건 유일 인덱스(x_dbm_sql_tun_02)로 재호출 차단 = 캐시. 기존 예외 'Gemini 번역 30초'와 같은 값, 재시도 0                     | `null` → 규칙 권고(`engn_cd RULE`)로 저장, 화면은 규칙 배지로 표시                       |
 
 ## 2.8 seminar.pi 첫 운영 체크리스트(1절, 2026-10-31 — 운영 중 소급 등재)
 
 1절 3항 `--scan sitemap/seminar.pi/src` = **R-P3 12건, 전부 의도** — `count:'exact'` 는 목록 페이지네이션 총건수(표준 ①: seminars 3·notes·qna·polls·attendance) 또는 `head:true` 건수만(연동 실패 횟수 제한·사진 상한·답변 수·참가자 수). 서브에이전트 P1~P6 점검 1회(route 24개 + `src/lib`) = **확신 높음 결함 0**, 경미·수용 5건 :
 
-| P | 위치 | 내용 | 등급 | 상태 |
-|---|---|---|---|---|
-| P4 | `packages/pi-mon/src/index.ts` `monForward` | 수집 전달을 await(최대 2초) — 브라우저 keepalive 비콘 응답이라 화면을 막지 않음, cafe·sitemap 공용 동작 | A | 수용(3시스템 공통, 바꾸면 `after()`로 일괄) |
-| P5 | `seminar.pi/src/app/api/seminars/[id]/ncknm/route.ts:50` | 별명 사칭 확인 ↔ upsert 경합(표시용 이름, 인증 무관) | C | 수용 |
-| P5 | `…/api/notes/route.ts:88` | 회의록 동시 시작 시 RECORDING 2건 가능(코드 `ponytail:` 수용 사유 있음) | C | 수용 — 실사용 중복 발견 시 부분 유일 인덱스 |
-| P2 | `…/seminars/[id]/ncknm/route.ts:22` | gate 와 별도로 `smn_mst` 1회 더(개최자 이름 조인) | C | 수용(저빈도) |
-| P3 | `…/api/media/ticket/route.ts:348` | 발표 권한 ADMIN 에게도 `hostPlan` RPC 후 폐기(입장 1회 1건) | A | 수용 |
+| P   | 위치                                                     | 내용                                                                                                    | 등급 | 상태                                        |
+| --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| P4  | `packages/pi-mon/src/index.ts` `monForward`              | 수집 전달을 await(최대 2초) — 브라우저 keepalive 비콘 응답이라 화면을 막지 않음, cafe·sitemap 공용 동작 | A    | 수용(3시스템 공통, 바꾸면 `after()`로 일괄) |
+| P5  | `seminar.pi/src/app/api/seminars/[id]/ncknm/route.ts:50` | 별명 사칭 확인 ↔ upsert 경합(표시용 이름, 인증 무관)                                                    | C    | 수용                                        |
+| P5  | `…/api/notes/route.ts:88`                                | 회의록 동시 시작 시 RECORDING 2건 가능(코드 `ponytail:` 수용 사유 있음)                                 | C    | 수용 — 실사용 중복 발견 시 부분 유일 인덱스 |
+| P2  | `…/seminars/[id]/ncknm/route.ts:22`                      | gate 와 별도로 `smn_mst` 1회 더(개최자 이름 조인)                                                       | C    | 수용(저빈도)                                |
+| P3  | `…/api/media/ticket/route.ts:348`                        | 발표 권한 ADMIN 에게도 `hostPlan` RPC 후 폐기(입장 1회 1건)                                             | A    | 수용                                        |
 
 [확인중 : 부하] 출석 하트비트(60초) = 참가자당 DB 3~4왕복(병렬화 완료) — 100명이면 분당 300~400, Supabase 풀러 한도와 실측으로 판단. 1절 5항 모니터링 = 2026-10-31 연결(`@pi/mon` SEMINAR · schema.pi `sql/076`), 운영 env·schema.pi 승격 뒤 첫 주 느림·오류를 3절에 기록.
 
 ## 3. 수정 이력
 
-| 날짜 | 시스템 | 등급 | 처리(패턴 · 매치 N · 처리 N) | 커밋 |
-|---|---|---|---|---|
-| 2026-10-24 | schema.pi | A | P1 직렬 조회 · 매치 18행(공용 함수·라우트·bulk-check 묶음 7곳) · 처리 18 — 커밋 메시지의 '19'는 syncPlan 보조 함수를 따로 센 것 | `87c1141d` |
-| 2026-10-24 | schema.pi | A | P2 반복 조회 · 매치 5 · 처리 5 / P5 순번 충돌·잠금 가드 · 매치 2 · 처리 2(#31 가드가 실제로 꺼져 있던 것 포함) | `4aa5fe32` |
-| 2026-10-24 | cafe.pi | A | P1 직렬 · 매치 6 · 처리 6 / P2 N+1 · 매치 1 · 처리 1 / P4 Realtime·Geocode · 매치 2 · 처리 2 | `f6b505a2` |
-| 2026-10-24 | cafe.pi | A | 일반 fetch(인증 필요) · 매치 61 중 대상 12 · 처리 12(부트스트랩·공개 호출 49 는 의도) / 관리자 P1·P2·P4 · 매치 6 · 처리 6 / links 서버 페이지네이션 · 처리 1 | `ebe81731` |
-| 2026-10-24 | cafe.pi·sitemap.pi·schema.pi·공용 | B | P4 외부 호출 타임아웃 · 매치 cafe 11파일·pi-auth 1·sitemap 1 · 처리 전부 / P1·P2 결제·권한 · 매치 schema 4·sitemap 5 · 처리 전부 — Pi Browser 실기기 검증 대기 | `ca73b24f`·`5cd4da85`·`9cd43d63` |
-| 2026-10-24 | cafe.pi·sitemap.pi | C | event N+1·feedback·nearby·stickers 집계 · 처리 4 / sitemap 조회수 SUM RPC·sweep 동시 5 · 처리 2 / 보류 3(2.7) | `0d915dc7`·`5cd4da85` |
-| 2026-10-29 | seminar.pi·공용(`@pi/db`) | A | **R-P5 위반으로 운영 장애 약 2시간** — 비운영 tier 운영 DB 오염 차단 가드가 운영 env 실값(운영이 `staging` tier 로 판정 [확인중 : 마스터]) 확인 없이 배포돼 운영 DB API 전부 503 · 매치 1(가드 `8ab7e634`) · 처리 1(되돌림 `603a9abb`, 복구 확인). 재도입 조건 = 운영 env 판정 결과 사전 확인 + 경고 로그 단계 선행 [확인중 : 마스터 — Production `APP_TIER` 정리]. 상세 seminar.pi TROUBLESHOOT 2026-10-29 | `8ab7e634` → `603a9abb` |
+| 날짜       | 시스템                            | 등급 | 처리(패턴 · 매치 N · 처리 N)                                                                                                                                                                                                                                                                                                                                                                                | 커밋                             |
+| ---------- | --------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| 2026-10-24 | schema.pi                         | A    | P1 직렬 조회 · 매치 18행(공용 함수·라우트·bulk-check 묶음 7곳) · 처리 18 — 커밋 메시지의 '19'는 syncPlan 보조 함수를 따로 센 것                                                                                                                                                                                                                                                                             | `87c1141d`                       |
+| 2026-10-24 | schema.pi                         | A    | P2 반복 조회 · 매치 5 · 처리 5 / P5 순번 충돌·잠금 가드 · 매치 2 · 처리 2(#31 가드가 실제로 꺼져 있던 것 포함)                                                                                                                                                                                                                                                                                              | `4aa5fe32`                       |
+| 2026-10-24 | cafe.pi                           | A    | P1 직렬 · 매치 6 · 처리 6 / P2 N+1 · 매치 1 · 처리 1 / P4 Realtime·Geocode · 매치 2 · 처리 2                                                                                                                                                                                                                                                                                                                | `f6b505a2`                       |
+| 2026-10-24 | cafe.pi                           | A    | 일반 fetch(인증 필요) · 매치 61 중 대상 12 · 처리 12(부트스트랩·공개 호출 49 는 의도) / 관리자 P1·P2·P4 · 매치 6 · 처리 6 / links 서버 페이지네이션 · 처리 1                                                                                                                                                                                                                                                | `ebe81731`                       |
+| 2026-10-24 | cafe.pi·sitemap.pi·schema.pi·공용 | B    | P4 외부 호출 타임아웃 · 매치 cafe 11파일·pi-auth 1·sitemap 1 · 처리 전부 / P1·P2 결제·권한 · 매치 schema 4·sitemap 5 · 처리 전부 — Pi Browser 실기기 검증 대기                                                                                                                                                                                                                                              | `ca73b24f`·`5cd4da85`·`9cd43d63` |
+| 2026-10-24 | cafe.pi·sitemap.pi                | C    | event N+1·feedback·nearby·stickers 집계 · 처리 4 / sitemap 조회수 SUM RPC·sweep 동시 5 · 처리 2 / 보류 3(2.7)                                                                                                                                                                                                                                                                                               | `0d915dc7`·`5cd4da85`            |
+| 2026-10-29 | seminar.pi·공용(`@pi/db`)         | A    | **R-P5 위반으로 운영 장애 약 2시간** — 비운영 tier 운영 DB 오염 차단 가드가 운영 env 실값(운영이 `staging` tier 로 판정 [확인중 : 마스터]) 확인 없이 배포돼 운영 DB API 전부 503 · 매치 1(가드 `8ab7e634`) · 처리 1(되돌림 `603a9abb`, 복구 확인). 재도입 조건 = 운영 env 판정 결과 사전 확인 + 경고 로그 단계 선행 [확인중 : 마스터 — Production `APP_TIER` 정리]. 상세 seminar.pi TROUBLESHOOT 2026-10-29 | `8ab7e634` → `603a9abb`          |

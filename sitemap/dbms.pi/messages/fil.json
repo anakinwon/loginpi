@@ -1257,7 +1257,7 @@
         "SELECT_STAR": "SELECT * — piliin lang ang mga column na kailangan mo (dagdag na I/O, walang covering index).",
         "FUNC_ON_COLUMN": "Ang filter column na {column} ay nakabalot sa isang function o expression, kaya hindi magagamit ang index nito — i-transform ang constant sa halip.",
         "LEADING_WILDCARD": "Ang LIKE na may leading % ay hindi makagamit ng B-tree index — isaalang-alang ang isang pg_trgm GIN index.",
-        "OR_DIFF_COLUMNS": "Ang mga kondisyon sa iba't ibang column ay pinagsama sa OR — isaalang-alang ang UNION ALL o per-column indexes.",
+        "OR_DIFF_COLUMNS": "Pinagsama ang magkaibang kundisyon ng column gamit ang OR — isaalang-alang ang paghihiwalay ng UNION (magdagdag ng kundisyon para sa pag-alis ng duplicate kung UNION ALL) o mga index sa bawat column.",
         "IMPLICIT_CAST": "Ang {column} ay inihambing sa isang quoted number — itugma ang mga uri ng column at constant (implicit cast).",
         "NOT_IN_SUBQUERY": "Ang NOT IN (subquery) ay walang ibinabalik kapag may mga NULL at mabagal — gamitin ang NOT EXISTS.",
         "NO_WHERE": "Walang WHERE clause — sa isang malaking table ito ay isang full scan (magdagdag ng kondisyon o LIMIT).",
@@ -1287,8 +1287,63 @@
     },
     "ai": {
       "title": "Payo sa AI tuning",
-      "badge": "Malapit na",
-      "body": "Malapit na (pagkatapos ng pag-apruba at mga pamamaraan ng pagsukat ng epekto) — ang payo ay bubuo mula sa SQL na may masked constants at itatala bilang inilapat lamang pagkatapos ng pag-apruba ng DA at nasukat na epekto."
+      "intro": "Pumili ng isang naka-save na plano upang makabuo ng payo. Tanging SQL at mga plano na may mga constant na nakamaskara bilang ? ang ipinapadala (payo na batay sa panuntunan kung walang key o sa pagkabigo). Pagkatapos aprubahan ng may-ari ng link, muling patakbuhin ang explain para sa parehong SQL, i-save ito, at sukatin ang epekto sa kalaunang planong iyon — pagkatapos lamang nito ay maitatala ito bilang inilapat.",
+      "pickPlan": "Pumili ng naka-save na plano para sa payo",
+      "create": "Bumuo ng payo",
+      "creating": "Bumubuo… (hanggang 30 s)",
+      "noPlans": "Walang naka-save na plano. Tingnan ang isang explain plan sa itaas at i-save ito.",
+      "note": "Isang payo bawat plano. Tanggalin ang kasalukuyang payo upang muling buuin. Ang DDL ay iminungkahi lamang — ilapat ito sa schema.pi.",
+      "empty": "Wala pang payo.",
+      "noItems": "Walang nakitang pagpapabuti para sa planong ito.",
+      "cost": "Bago ang gastos",
+      "delete": "Tanggalin",
+      "prev": "Nakaraan",
+      "next": "Susunod",
+      "page": "Pahina {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Panuntunan"
+      },
+      "sts": {
+        "RCMD": "Pinayuhan",
+        "APRV": "Naaprubahan",
+        "RJCT": "Tinanggihan",
+        "APLD": "Inilapat"
+      },
+      "kind": {
+        "INDEX": "Index",
+        "REWRITE": "SQL rewrite",
+        "STATS": "Statistics",
+        "CONFIG": "Config"
+      },
+      "approve": "Aprubahan",
+      "reject": "Tanggihan",
+      "measureHint": "Pagkatapos ilapat ang naaprubahang payo, tingnan at i-save muli ang explain plan para sa parehong SQL. Pagkatapos ay piliin ang kalaunang planong iyon at sukatin upang maitatala ito bilang inilapat.",
+      "findAfter": "Maghanap ng mga kalaunang plano",
+      "noAfter": "Walang plano para sa parehong SQL na na-save pagkatapos ng pag-apruba.",
+      "reload": "Maghanap muli",
+      "pickAfter": "Piliin ang kalaunang plano",
+      "measure": "Sukatin ang epekto",
+      "effect": "Gastos {bfr} → {aft} ({pct}%)",
+      "better": "Pinabuti",
+      "worse": "Lumala",
+      "same": "Walang pagbabago",
+      "ddl": "Iminungkahing DDL",
+      "rewrite": "Muling isinulat na SQL",
+      "runDdl": "Patakbuhin ang DDL sa schema.pi",
+      "copy": "Kopyahin",
+      "copied": "Nakopya",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Buong scan ng {relation} — gumawa ng index sa filter column {column} (palitan ang NN sa pangalan ng index ng isang sequence number).",
+        "SEQ_SCAN_STATS": "Buong scan ng {relation} — suriin ang mga filter column at tiyakin na ang statistics (ANALYZE) ay kasalukuyan.",
+        "NESTED_LOOP": "Ang nested loop ay umaasa ng {rows} na row — i-refresh ang statistics at isaalang-alang ang join-key indexes o isang hash join.",
+        "SORT_SPILL": "Ang pag-sort ng humigit-kumulang {kb} KB ay maaaring kumalat sa disk — isaalang-alang ang pagtaas ng session work_mem o pag-index ng mga sort column.",
+        "SELECT_STAR": "Piliin lamang ang mga column na kailangan mo sa halip na SELECT * (mas kaunting I/O, posibleng covering indexes).",
+        "FUNC_ON_COLUMN": "Ilipat ang function/expression sa filter column {column} sa constant side (nagbibigay-daan sa paggamit ng index).",
+        "IMPLICIT_CAST": "Itugma ang mga uri ng {column} at ang constant (tanggalin ang implicit cast).",
+        "NOT_IN_SUBQUERY": "Muling isulat ang NOT IN (subquery) bilang NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Para sa magkaibang kundisyon ng column na may OR, hatiin ito sa UNION (kung UNION ALL, magdagdag ng kundisyon upang ibukod ang naunang kundisyon upang maiwasan ang mga duplicate) o maglagay ng mga index sa bawat column (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Inihahanda ang feature ng schema.pi link. Pakisubukang muli sa ilang sandali.",
@@ -1300,7 +1355,11 @@
       "TIMEOUT": "Nag-timeout ang kahilingan (5 segundo). Paikliin ang SQL o subukang muli sa ibang pagkakataon.",
       "RATE": "Masyadong maraming kahilingan. Subukang muli sa isang minuto.",
       "PAYLOAD_TOO_LARGE": "Masyadong malaki ang plano para i-save.",
-      "LINK_NOT_FOUND": "Hindi nakita ang link. Piliin muli ang link."
+      "LINK_NOT_FOUND": "Hindi nakita ang link. Piliin muli ang link.",
+      "TUN_EXISTS": "Ang planong ito ay mayroon nang payo. Suriin ang listahan (tanggalin ito upang muling buuin).",
+      "TUN_BAD_STATE": "Hindi pinapayagan ang aksyon na ito sa kasalukuyang estado (maaaring nagbago na ito sa ibang lugar). I-refresh ang listahan.",
+      "TUN_PLAN_MISMATCH": "Ang kalaunang plano ay dapat na ibang naka-save na plano para sa parehong SQL.",
+      "TUN_PLAN_STALE": "Ang kalaunang plano ay dapat na na-save pagkatapos ng pag-apruba. Muling patakbuhin ang explain pagkatapos ilapat at i-save ito."
     }
   },
   "nav": {

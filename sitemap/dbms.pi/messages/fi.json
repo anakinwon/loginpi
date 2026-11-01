@@ -1250,7 +1250,7 @@
         "SELECT_STAR": "SELECT * – valitse vain tarvitsemasi sarakkeet (ylimääräinen I/O, ei kattavaa indeksiä).",
         "FUNC_ON_COLUMN": "Suodatuskolumni {column} on kääritty funktioon tai lausekkeeseen, joten sen indeksiä ei voi käyttää – muunna sen sijaan vakio.",
         "LEADING_WILDCARD": "LIKE, jossa on edessä %, ei voi käyttää B-puuindeksiä – harkitse pg_trgm GIN-indeksiä.",
-        "OR_DIFF_COLUMNS": "Eri sarakkeiden ehdot yhdistetään OR-operaattorilla – harkitse UNION ALL -operaattoria tai sarakekohtaisia indeksejä.",
+        "OR_DIFF_COLUMNS": "OR-ehdot eri sarakkeissa – harkitse jakamista UNIONilla (lisää kaksoiskappaleen poissulkemisehto, jos UNION ALL) tai sarakekohtaisten indeksien tarkistamista.",
         "IMPLICIT_CAST": "{column} verrataan lainattuun numeroon – vastaa sarakkeen ja vakion tyyppejä (implisiittinen tyyppimuunnos).",
         "NOT_IN_SUBQUERY": "NOT IN (aläkysely) ei palauta mitään, kun NULL-arvoja on läsnä, ja on hidas – käytä NOT EXISTS -operaattoria.",
         "NO_WHERE": "Ei WHERE-lausetta – suuressa taulukossa tämä on täysi skannaus (lisää ehto tai LIMIT).",
@@ -1280,8 +1280,63 @@
     },
     "ai": {
       "title": "AI-viritysneuvoja",
-      "badge": "Tulossa pian",
-      "body": "Tulossa pian (hyväksyntä- ja vaikutustenmittausmenettelyjen jälkeen) – neuvoja luodaan SQL:stä peitetyillä vakioilla ja kirjataan sovelletuksi vasta DA:n hyväksynnän ja mitatun vaikutuksen jälkeen."
+      "intro": "Valitse yksi tallennettu suunnitelma neuvojen luomiseksi. Vain SQL ja suunnitelmat, joissa vakiot on peitetty ?-merkillä, lähetetään (sääntöihin perustuva neuvonta, jos avainta ei ole tai epäonnistuu). Kun linkin omistaja hyväksyy, suorita explain uudelleen samalle SQL:lle, tallenna se ja mittaa vaikutus myöhemmällä suunnitelmalla – vasta sitten se kirjataan sovelletuksi.",
+      "pickPlan": "Valitse tallennettu suunnitelma neuvoja varten",
+      "create": "Luo neuvoja",
+      "creating": "Luodaan… (enintään 30 s)",
+      "noPlans": "Ei tallennettuja suunnitelmia. Tarkastele explain-suunnitelmaa yllä ja tallenna se.",
+      "note": "Yksi neuvo per suunnitelma. Poista olemassa olevat neuvot luodaksesi uudelleen. DDL on vain ehdotus – sovelta se schema.pi:ssä.",
+      "empty": "Ei vielä neuvoja.",
+      "noItems": "Tälle suunnitelmalle ei löytynyt parannuksia.",
+      "cost": "Ennen kustannus",
+      "delete": "Poista",
+      "prev": "Edellinen",
+      "next": "Seuraava",
+      "page": "Sivu {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Sääntö"
+      },
+      "sts": {
+        "RCMD": "Suositeltu",
+        "APRV": "Hyväksytty",
+        "RJCT": "Hylätty",
+        "APLD": "Sovellettu"
+      },
+      "kind": {
+        "INDEX": "Indeksi",
+        "REWRITE": "SQL:n uudelleenkirjoitus",
+        "STATS": "Tilastot",
+        "CONFIG": "Konfiguraatio"
+      },
+      "approve": "Hyväksy",
+      "reject": "Hylkää",
+      "measureHint": "Kun olet soveltanut hyväksytyn neuvon, tarkastele ja tallenna explain-suunnitelma samalle SQL:lle uudelleen. Valitse sitten myöhempi suunnitelma ja mittaa se kirjataksesi sen sovelletuksi.",
+      "findAfter": "Etsi myöhempiä suunnitelmia",
+      "noAfter": "Ei samaa SQL-suunnitelmaa tallennettuna hyväksynnän jälkeen.",
+      "reload": "Hae uudelleen",
+      "pickAfter": "Valitse myöhempi suunnitelma",
+      "measure": "Mittaa vaikutus",
+      "effect": "Kustannus {bfr} → {aft} ({pct}%)",
+      "better": "Parantunut",
+      "worse": "Huonontunut",
+      "same": "Ei muutosta",
+      "ddl": "Ehdotettu DDL",
+      "rewrite": "Uudelleenkirjoitettu SQL",
+      "runDdl": "Suorita DDL schema.pi:ssä",
+      "copy": "Kopioi",
+      "copied": "Kopioitu",
+      "rule": {
+        "SEQ_SCAN_INDEX": "{relation}-taulun täysi skannaus – luo indeksi suodatussarakkeeseen {column} (korvaa NN indeksin nimessä järjestysnumerolla).",
+        "SEQ_SCAN_STATS": "{relation}-taulun täysi skannaus – tarkista suodatussarakkeet ja varmista, että tilastot (ANALYZE) ovat ajantasaisia.",
+        "NESTED_LOOP": "Sisäkkäinen silmukka odottaa {rows} riviä – päivitä tilastot ja harkitse liitosavaimen indeksejä tai hajautusliitosta.",
+        "SORT_SPILL": "Noin {kb} KB:n lajittelu voi vuotaa levylle – harkitse session work_mem-arvon nostamista tai lajittelusarakkeiden indeksointia.",
+        "SELECT_STAR": "Valitse vain tarvitsemasi sarakkeet SELECT * -komennon sijaan (vähemmän I/O:ta, kattavat indeksit mahdollisia).",
+        "FUNC_ON_COLUMN": "Siirrä funktio/lauseke suodatussarakkeessa {column} vakion puolelle (mahdollistaa indeksin käytön).",
+        "IMPLICIT_CAST": "Yhdistä sarakkeen {column} ja vakion tyypit (poista implisiittinen tyyppimuunnos).",
+        "NOT_IN_SUBQUERY": "Kirjoita NOT IN (aläkysely) uudelleen NOT EXISTS -muotoon.",
+        "OR_DIFF_COLUMNS": "Eri sarakkeiden OR-ehdot tulisi jakaa UNIONilla (lisää jälkimmäiseen kaksoiskappaleen poissulkemisehto, jos UNION ALL) tai niillä tulisi olla sarakekohtaiset indeksit (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi-linkkiominaisuutta valmistellaan. Yritä uudelleen hetken kuluttua.",
@@ -1293,7 +1348,11 @@
       "TIMEOUT": "Pyynnön aikakatkaisu (5 sekuntia). Lyhennä SQL:ää tai yritä uudelleen myöhemmin.",
       "RATE": "Liian monta pyyntöä. Yritä uudelleen minuutin kuluttua.",
       "PAYLOAD_TOO_LARGE": "Suunnitelma on liian suuri tallennettavaksi.",
-      "LINK_NOT_FOUND": "Linkkiä ei löytynyt. Valitse linkki uudelleen."
+      "LINK_NOT_FOUND": "Linkkiä ei löytynyt. Valitse linkki uudelleen.",
+      "TUN_EXISTS": "Tällä suunnitelmalla on jo neuvoja. Tarkista lista (poista luodaksesi uudelleen).",
+      "TUN_BAD_STATE": "Tämä toiminto ei ole sallittu nykyisessä tilassa (se on saattanut muuttua muualla). Päivitä lista.",
+      "TUN_PLAN_MISMATCH": "Myöhemmän suunnitelman on oltava eri tallennettu suunnitelma samalle SQL:lle.",
+      "TUN_PLAN_STALE": "Myöhemmän suunnitelman on oltava tallennettu hyväksynnän jälkeen. Suorita explain uudelleen soveltamisen jälkeen ja tallenna se."
     }
   },
   "nav": {

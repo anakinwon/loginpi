@@ -1250,7 +1250,7 @@
         "SELECT_STAR": "SELECT * — seleccioneu només les columnes que necessiteu (E/S extra, sense índex de cobertura).",
         "FUNC_ON_COLUMN": "La columna de filtre {column} està encapsulada en una funció o expressió, de manera que el seu índex no es pot utilitzar — transformeu la constant en el seu lloc.",
         "LEADING_WILDCARD": "LIKE amb un % inicial no pot utilitzar un índex B-tree — considereu un índex GIN de pg_trgm.",
-        "OR_DIFF_COLUMNS": "Les condicions en columnes diferents es combinen amb OR — considereu UNION ALL o índexs per columna.",
+        "OR_DIFF_COLUMNS": "Condicions OR en columnes diferents — considereu dividir amb UNION (afegiu una condició d'exclusió de duplicats si és UNION ALL) o revisar els índexs per columna.",
         "IMPLICIT_CAST": "{column} es compara amb un número entre cometes — feu coincidir els tipus de columna i constant (conversió implícita).",
         "NOT_IN_SUBQUERY": "NOT IN (subconsulta) no retorna res quan hi ha NULLs i és lent — utilitzeu NOT EXISTS.",
         "NO_WHERE": "Sense clàusula WHERE — en una taula gran això és un escaneig complet (afegiu una condició o LIMIT).",
@@ -1280,8 +1280,63 @@
     },
     "ai": {
       "title": "Consells de tuning amb IA",
-      "badge": "Properament",
-      "body": "Properament (després dels procediments d'aprovació i mesura d'impacte) — els consells es generaran a partir de SQL amb constants emmascarades i es registraran com a aplicats només després de l'aprovació de DA i l'impacte mesurat."
+      "intro": "Trieu un pla desat per generar consells. Només s'envien SQL i plans amb constants emmascarades com a ? (consells basats en regles si no hi ha clau o en cas de fallada). Després que el propietari de l'enllaç aprovi, torneu a executar l'explicació per al mateix SQL, deseu-lo i mesureu l'impacte amb aquest pla posterior; només llavors es registra com a aplicat.",
+      "pickPlan": "Seleccioneu un pla desat per obtenir consells",
+      "create": "Genera consells",
+      "creating": "Generant... (fins a 30 s)",
+      "noPlans": "No hi ha plans desats. Vegeu un pla d'explicació a dalt i deseu-lo.",
+      "note": "Un consell per pla. Suprimiu el consell existent per tornar-lo a generar. El DDL només es suggereix; apliqueu-lo a schema.pi.",
+      "empty": "Encara no hi ha consells.",
+      "noItems": "No s'han trobat millores per a aquest pla.",
+      "cost": "Cost anterior",
+      "delete": "Suprimeix",
+      "prev": "Anterior",
+      "next": "Següent",
+      "page": "Pàgina {page}",
+      "engn": {
+        "AI": "IA",
+        "RULE": "Regla"
+      },
+      "sts": {
+        "RCMD": "Recomanat",
+        "APRV": "Aprovat",
+        "RJCT": "Rebutjat",
+        "APLD": "Aplicat"
+      },
+      "kind": {
+        "INDEX": "Índex",
+        "REWRITE": "Reescriptura de SQL",
+        "STATS": "Estadístiques",
+        "CONFIG": "Configuració"
+      },
+      "approve": "Aprova",
+      "reject": "Rebutja",
+      "measureHint": "Després d'aplicar el consell aprovat, torneu a veure i desar el pla d'explicació per al mateix SQL. A continuació, trieu aquest pla posterior i mesureu-lo per registrar-lo com a aplicat.",
+      "findAfter": "Cerca plans posteriors",
+      "noAfter": "No s'ha desat cap pla per al mateix SQL després de l'aprovació.",
+      "reload": "Cerca de nou",
+      "pickAfter": "Seleccioneu el pla posterior",
+      "measure": "Mesura l'impacte",
+      "effect": "Cost {bfr} → {aft} ({pct}%)",
+      "better": "Millorat",
+      "worse": "Pitjor",
+      "same": "Sense canvis",
+      "ddl": "DDL suggerit",
+      "rewrite": "SQL reescrit",
+      "runDdl": "Executa DDL a schema.pi",
+      "copy": "Copia",
+      "copied": "Copiat",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Escaneig complet de {relation}: creeu un índex a la columna de filtre {column} (substituïu NN al nom de l'índex per un número de seqüència).",
+        "SEQ_SCAN_STATS": "Escaneig complet de {relation}: comproveu les columnes de filtre i assegureu-vos que les estadístiques (ANALYZE) estiguin actualitzades.",
+        "NESTED_LOOP": "El bucle niuat espera {rows} files: actualitzeu les estadístiques i considereu els índexs de clau d'unió o una unió hash.",
+        "SORT_SPILL": "L'ordenació d'uns {kb} KB pot desbordar-se al disc: considereu augmentar la work_mem de la sessió o indexar les columnes d'ordenació.",
+        "SELECT_STAR": "Seleccioneu només les columnes que necessiteu en lloc de SELECT * (menys E/S, possibles índexs de cobertura).",
+        "FUNC_ON_COLUMN": "Moveu la funció/expressió a la columna de filtre {column} al costat constant (permet l'ús d'índexs).",
+        "IMPLICIT_CAST": "Feu coincidir els tipus de {column} i la constant (elimineu la conversió implícita).",
+        "NOT_IN_SUBQUERY": "Reescriviu NOT IN (subconsulta) com a NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Les condicions OR en columnes diferents s'han de dividir amb UNION (afegiu una condició d'exclusió de duplicats a la segona si és UNION ALL) o tenir índexs per columna (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "La funció d'enllaç schema.pi s'està preparant. Torneu-ho a provar en breu.",
@@ -1293,7 +1348,11 @@
       "TIMEOUT": "La sol·licitud ha caducat (5 segons). Escurceu el SQL o torneu-ho a provar més tard.",
       "RATE": "Massa sol·licituds. Torneu-ho a provar en un minut.",
       "PAYLOAD_TOO_LARGE": "El pla és massa gran per desar-lo.",
-      "LINK_NOT_FOUND": "Enllaç no trobat. Torneu a seleccionar l'enllaç."
+      "LINK_NOT_FOUND": "Enllaç no trobat. Torneu a seleccionar l'enllaç.",
+      "TUN_EXISTS": "Aquest pla ja té consells. Comproveu la llista (suprimiu-lo per tornar-lo a generar).",
+      "TUN_BAD_STATE": "Aquesta acció no està permesa en l'estat actual (pot haver canviat en un altre lloc). Actualitzeu la llista.",
+      "TUN_PLAN_MISMATCH": "El pla posterior ha de ser un pla desat diferent per al mateix SQL.",
+      "TUN_PLAN_STALE": "El pla posterior s'ha de desar després de l'aprovació. Torneu a executar l'explicació després d'aplicar-la i deseu-la."
     }
   },
   "nav": {

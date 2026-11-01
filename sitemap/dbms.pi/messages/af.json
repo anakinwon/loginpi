@@ -548,6 +548,7 @@
       "INVALID_INPUT": "Die versoek is ongeldig."
     },
     "board": {
+      "subtitle": "Wat om nou op hierdie DB te doen — 14 seine van OK, waarskuwing of risiko, met oplossings, in 'n oogopslag.",
       "refresh": {
         "updated": "Vanaf {time} · verfris elke minuut",
         "now": "Verfris nou",
@@ -1255,7 +1256,7 @@
         "SELECT_STAR": "SELECT * — kies slegs die kolomme wat jy benodig (ekstra I/O, geen bedekkende indeks).",
         "FUNC_ON_COLUMN": "Die filterkolom {column} is in 'n funksie of uitdrukking toegedraai, so sy indeks kan nie gebruik word nie — transformeer eerder die konstante.",
         "LEADING_WILDCARD": "LIKE met 'n leidende % kan nie 'n B-boomindeks gebruik nie — oorweeg 'n pg_trgm GIN-indeks.",
-        "OR_DIFF_COLUMNS": "Voorwaardes op verskillende kolomme word met OR gekombineer — oorweeg UNION ALL of per-kolom-indekse.",
+        "OR_DIFF_COLUMNS": "OR-voorwaardes op verskillende kolomme — oorweeg om met UNION te skei (voeg 'n duplikaat-uitsluitingsvoorwaarde by indien UNION ALL) of hersien kolom-spesifieke indekse.",
         "IMPLICIT_CAST": "{column} word vergelyk met 'n aangehaalde nommer — pas die kolom- en konstante tipes aan (implisiete omskakeling).",
         "NOT_IN_SUBQUERY": "NOT IN (subnavraag) gee niks terug wanneer NULLs teenwoordig is en is stadig — gebruik NOT EXISTS.",
         "NO_WHERE": "Geen WHERE-klousule nie — op 'n groot tabel is dit 'n volle skandering (voeg 'n voorwaarde of LIMIT by).",
@@ -1285,8 +1286,63 @@
     },
     "ai": {
       "title": "AI-instellingadvies",
-      "badge": "Kom binnekort",
-      "body": "Kom binnekort (na goedkeuring en impakmetingsprosedures) — advies sal gegenereer word uit SQL met gemaskerde konstantes en slegs as toegepas aangeteken word na DA-goedkeuring en gemete impak."
+      "intro": "Kies een gestoorde plan om advies te genereer. Slegs SQL en planne met konstantes gemasker as ? word gestuur (reëlgebaseerde advies indien geen sleutel of by mislukking). Nadat die skakel-eienaar goedkeur, herhaal die verduideliking vir dieselfde SQL, stoor dit, en meet die impak met daardie latere plan — slegs dan word dit as toegepas aangeteken.",
+      "pickPlan": "Kies 'n gestoorde plan vir advies",
+      "create": "Genereer advies",
+      "creating": "Genereer tans... (tot 30 s)",
+      "noPlans": "Geen gestoorde planne nie. Bekyk 'n verduidelikingsplan hierbo en stoor dit.",
+      "note": "Een advies per plan. Vee die bestaande advies uit om te hergenereer. DDL word slegs voorgestel — pas dit toe in schema.pi.",
+      "empty": "Nog geen advies nie.",
+      "noItems": "Geen verbeteringe vir hierdie plan gevind nie.",
+      "cost": "Voor koste",
+      "delete": "Vee uit",
+      "prev": "Vorige",
+      "next": "Volgende",
+      "page": "Bladsy {page}",
+      "engn": {
+        "AI": "KI",
+        "RULE": "Reël"
+      },
+      "sts": {
+        "RCMD": "Aanbeveel",
+        "APRV": "Goedgekeur",
+        "RJCT": "Verwerp",
+        "APLD": "Toegepas"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "SQL herskryf",
+        "STATS": "Statistieke",
+        "CONFIG": "Konfigurasie"
+      },
+      "approve": "Keur goed",
+      "reject": "Verwerp",
+      "measureHint": "Nadat die goedgekeurde advies toegepas is, bekyk en stoor die verduidelikingsplan vir dieselfde SQL weer. Kies dan daardie latere plan en meet om dit as toegepas aan te teken.",
+      "findAfter": "Vind latere planne",
+      "noAfter": "Geen plan vir dieselfde SQL gestoor na goedkeuring nie.",
+      "reload": "Soek weer",
+      "pickAfter": "Kies die latere plan",
+      "measure": "Meet impak",
+      "effect": "Koste {bfr} → {aft} ({pct}%)",
+      "better": "Verbeter",
+      "worse": "Slegter",
+      "same": "Geen verandering",
+      "ddl": "Voorgestelde DDL",
+      "rewrite": "Herskryf SQL",
+      "runDdl": "Voer DDL uit in schema.pi",
+      "copy": "Kopieer",
+      "copied": "Gekopieer",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Volle skandering van {relation} — skep 'n indeks op filterkolom {column} (vervang NN in die indeksnaam met 'n volgordenummer).",
+        "SEQ_SCAN_STATS": "Volle skandering van {relation} — kontroleer die filterkolomme en maak seker statistieke (ANALYZE) is op datum.",
+        "NESTED_LOOP": "Geneste lus verwag {rows} rye — verfris statistieke en oorweeg aansluitingsleutelindekse of 'n hash-aansluiting.",
+        "SORT_SPILL": "Sorteer van ongeveer {kb} KB kan na skyf mors — oorweeg om sessie work_mem te verhoog of die sorteerkolomme te indekseer.",
+        "SELECT_STAR": "Kies slegs die kolomme wat jy benodig in plaas van SELECT * (minder I/O, bedekkende indekse moontlik).",
+        "FUNC_ON_COLUMN": "Skuif die funksie/uitdrukking op filterkolom {column} na die konstante kant (maak indeksgebruik moontlik).",
+        "IMPLICIT_CAST": "Pas die tipes van {column} en die konstante aan (verwyder die implisiete omskakeling).",
+        "NOT_IN_SUBQUERY": "Herskryf NOT IN (subnavraag) as NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "OR-voorwaardes op verskillende kolomme moet met UNION geskei word (voeg 'n duplikaat-uitsluitingsvoorwaarde by laasgenoemde indien UNION ALL) of kolom-spesifieke indekse hê (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Die schema.pi-skakelfunksie word voorberei. Probeer asseblief binnekort weer.",
@@ -1298,7 +1354,11 @@
       "TIMEOUT": "Die versoek het tyd uitgeloop (5 sekondes). Verkort die SQL of probeer later weer.",
       "RATE": "Te veel versoeke. Probeer oor 'n minuut weer.",
       "PAYLOAD_TOO_LARGE": "Die plan is te groot om te stoor.",
-      "LINK_NOT_FOUND": "Skakel nie gevind nie. Kies asseblief die skakel weer."
+      "LINK_NOT_FOUND": "Skakel nie gevind nie. Kies asseblief die skakel weer.",
+      "TUN_EXISTS": "Hierdie plan het reeds advies. Kontroleer die lys (vee dit uit om te hergenereer).",
+      "TUN_BAD_STATE": "Hierdie aksie word nie in die huidige toestand toegelaat nie (dit mag elders verander het). Verfris die lys.",
+      "TUN_PLAN_MISMATCH": "Die latere plan moet 'n ander gestoorde plan vir dieselfde SQL wees.",
+      "TUN_PLAN_STALE": "Die latere plan moet na goedkeuring gestoor word. Herhaal die verduideliking nadat dit toegepas is en stoor dit."
     }
   },
   "nav": {

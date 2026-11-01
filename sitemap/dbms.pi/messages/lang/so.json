@@ -1256,7 +1256,7 @@
         "SELECT_STAR": "SELECT * — dooro kaliya tiirarka aad u baahan tahay (I/O dheeraad ah, ma jiro tusmo daboolaya).",
         "FUNC_ON_COLUMN": "Tiirka shaandhada {column} waxaa lagu duubay hawlgal ama muujin, sidaa darteed tusmaheeda lama isticmaali karo — beddel joogtada ah.",
         "LEADING_WILDCARD": "LIKE oo leh % hormood ah ma isticmaali karo tusmo B-tree ah — tixgeli tusmo pg_trgm GIN ah.",
-        "OR_DIFF_COLUMNS": "Shuruudaha tiirarka kala duwan waxaa lagu daray OR — tixgeli UNION ALL ama tusmooyinka tiir kasta.",
+        "OR_DIFF_COLUMNS": "Shuruudaha OR ee ku saabsan tiirar kala duwan — tixgeli in lagu kala qaybiyo UNION (ku dar shuruud ka saarista nuqul haddii UNION ALL) ama dib u eeg tusmooyinka tiir kasta.",
         "IMPLICIT_CAST": "{column} waxaa lagu barbardhigayaa tiro la soo xigtay — isku dheji tiirka iyo noocyada joogtada ah (implicit cast).",
         "NOT_IN_SUBQUERY": "NOT IN (subquery) waxba ma soo celiso marka NULLs ay jiraan waana gaabis — isticmaal NOT EXISTS.",
         "NO_WHERE": "Ma jiro WHERE clause — shaxad weyn tani waa baadhitaan buuxa (ku dar shuruud ama LIMIT).",
@@ -1286,8 +1286,63 @@
     },
     "ai": {
       "title": "Talooyinka AI tuning",
-      "badge": "Waa soo socotaa",
-      "body": "Waa soo socotaa (ka dib marka la ansixiyo iyo habraacyada cabbirka saamaynta) — talooyinka waxaa laga soo saari doonaa SQL oo leh joogtooyin la qariyay waxaana loo diiwaan gelin doonaa sidii la codsaday kaliya ka dib marka la ansixiyo DA iyo saamaynta la cabbiray."
+      "intro": "Dooro hal qorshe oo la kaydiyay si aad talo u abuurto. Kaliya SQL iyo qorshayaasha leh constants oo lagu qariyay ? ayaa la diraa (talo ku saleysan sharci haddii aan fure lahayn ama haddii ay dhacdo guuldarro). Ka dib marka milkiilaha xiriirku ansixiyo, dib u socodsii sharaxaadda SQL isku mid ah, kaydi, oo cabbir saameynta qorshahaas dambe — kaliya markaas ayaa loo diiwaan gelinayaa in la hirgeliyay.",
+      "pickPlan": "Dooro qorshe la kaydiyay oo talo ah",
+      "create": "Abuur talo",
+      "creating": "Abuurista… (ilaa 30 s)",
+      "noPlans": "Ma jiraan qorshayaal la kaydiyay. Fiiri qorshe sharaxaad ah oo kor ku xusan ka dibna kaydi.",
+      "note": "Hal talo qorshe kasta. Tirtir talada jira si aad dib ugu abuurto. DDL kaliya waa la soo jeediyaa — ku dabaq schema.pi.",
+      "empty": "Wali ma jirto talo.",
+      "noItems": "Ma jiraan wax horumar ah oo laga helay qorshahan.",
+      "cost": "Qiimaha hore",
+      "delete": "Tirtir",
+      "prev": "Hore",
+      "next": "Xiga",
+      "page": "Bogga {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Xeer"
+      },
+      "sts": {
+        "RCMD": "Lagula taliyay",
+        "APRV": "La ansixiyay",
+        "RJCT": "La diiday",
+        "APLD": "La hirgeliyay"
+      },
+      "kind": {
+        "INDEX": "Tusmo",
+        "REWRITE": "Dib u qorista SQL",
+        "STATS": "Tirakoob",
+        "CONFIG": "Habayn"
+      },
+      "approve": "Ansixi",
+      "reject": "Diid",
+      "measureHint": "Ka dib marka aad hirgeliso talada la ansixiyay, dib u fiiri oo kaydi qorshaha sharaxaadda ee SQL isku mid ah. Kadibna dooro qorshahaas dambe oo cabbir si aad u diiwaan geliso in la hirgeliyay.",
+      "findAfter": "Raadi qorshayaasha dambe",
+      "noAfter": "Ma jiro qorshe SQL isku mid ah oo la kaydiyay ka dib ansixinta.",
+      "reload": "Mar kale raadi",
+      "pickAfter": "Dooro qorshaha dambe",
+      "measure": "Cabbir saameynta",
+      "effect": "Qiimaha {bfr} → {aft} ({pct}%)",
+      "better": "Waa la hagaajiyay",
+      "worse": "Ka sii daray",
+      "same": "Ma jirto isbeddel",
+      "ddl": "DDL la soo jeediyay",
+      "rewrite": "SQL dib loo qoray",
+      "runDdl": "Ku socodsii DDL schema.pi",
+      "copy": "Koobiyeey",
+      "copied": "La koobiyeeyay",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Baaritaan buuxa oo {relation} ah — ku samee tusmo tiirka shaandhada {column} (ku beddel NN magaca tusmada lambar isku xigxiga).",
+        "SEQ_SCAN_STATS": "Baaritaan buuxa oo {relation} ah — hubi tiirarka shaandhada oo hubi in tirakoobyada (ANALYZE) ay yihiin kuwo cusub.",
+        "NESTED_LOOP": "Wareegga isku xiran wuxuu filayaa {rows} saf — cusboonaysii tirakoobyada oo tixgeli tusmooyinka furaha isku xirka ama isku xirka hash.",
+        "SORT_SPILL": "Kala soocida qiyaastii {kb} KB ayaa laga yaabaa inay ku daadato diskiga — tixgeli inaad kor u qaaddo work_mem fadhiga ama aad tusmeyso tiirarka kala soocida.",
+        "SELECT_STAR": "Dooro kaliya tiirarka aad u baahan tahay halkii aad ka dooran lahayd SELECT * (I/O yar, tusmooyinka daboolaya waa suurtagal).",
+        "FUNC_ON_COLUMN": "U rari shaqada/muujinta tiirka shaandhada {column} dhinaca joogtada ah (waxay awood u siinaysaa isticmaalka tusmada).",
+        "IMPLICIT_CAST": "Isbarbar dhig noocyada {column} iyo joogtada ah (ka saar tuurista qarsoon).",
+        "NOT_IN_SUBQUERY": "Dib u qor NOT IN (subquery) sida NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Shuruudaha OR ee tiirarka kala duwan waa in lagu kala qaybiyo UNION (ku dar shuruud ka saarista nuqul kan dambe haddii UNION ALL) ama ay yeeshaan tusmooyin tiir kasta (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi muuqaalka xiriirka waa la diyaarinayaa. Fadlan isku day mar kale dhawaan.",
@@ -1299,7 +1354,11 @@
       "TIMEOUT": "Codsigii wuu dhacay (5 ilbidhiqsi). Soo gaabi SQL ama isku day mar kale gadaal.",
       "RATE": "Codsi badan. Isku day mar kale daqiiqad gudaheed.",
       "PAYLOAD_TOO_LARGE": "Qorshuhu wuu ka weyn yahay in la kaydiyo.",
-      "LINK_NOT_FOUND": "Xiriirka lama helin. Fadlan mar kale dooro xiriirka."
+      "LINK_NOT_FOUND": "Xiriirka lama helin. Fadlan mar kale dooro xiriirka.",
+      "TUN_EXISTS": "Qorshahan horeyba wuxuu leeyahay talo. Hubi liiska (tirtir si aad dib ugu abuurto).",
+      "TUN_BAD_STATE": "Falkan lama oggola xaaladda hadda jirta (waxaa laga yaabaa in meel kale laga beddelay). Dib u cusboonaysii liiska.",
+      "TUN_PLAN_MISMATCH": "Qorshaha dambe waa inuu noqdaa qorshe la kaydiyay oo ka duwan SQL isku mid ah.",
+      "TUN_PLAN_STALE": "Qorshaha dambe waa in la kaydiyaa ka dib ansixinta. Dib u socodsii sharaxaadda ka dib marka aad hirgeliso oo kaydi."
     }
   },
   "nav": {

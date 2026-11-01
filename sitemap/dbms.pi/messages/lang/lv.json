@@ -1256,7 +1256,7 @@
         "SELECT_STAR": "SELECT * — atlasiet tikai nepieciešamās kolonnas (papildu I/O, nav aptveroša indeksa).",
         "FUNC_ON_COLUMN": "Filtra kolonna {column} ir iekļauta funkcijā vai izteiksmē, tāpēc tās indeksu nevar izmantot — tā vietā transformējiet konstanti.",
         "LEADING_WILDCARD": "LIKE ar sākuma % nevar izmantot B-tree indeksu — apsveriet pg_trgm GIN indeksu.",
-        "OR_DIFF_COLUMNS": "Nosacījumi dažādās kolonnās ir apvienoti ar OR — apsveriet UNION ALL vai indeksus katrai kolonnai.",
+        "OR_DIFF_COLUMNS": "OR nosacījumi dažādās kolonnās — apsveriet sadalīšanu ar UNION (pievienojiet dublikātu izslēgšanas nosacījumu, ja UNION ALL) vai pārskatiet indeksus katrai kolonnai.",
         "IMPLICIT_CAST": "{column} tiek salīdzināts ar citētu skaitli — saskaņojiet kolonnas un konstantes tipus (netieša tipa pārveidošana).",
         "NOT_IN_SUBQUERY": "NOT IN (apakšvaicājums) neatgriež neko, ja ir NULL vērtības, un ir lēns — izmantojiet NOT EXISTS.",
         "NO_WHERE": "Nav WHERE klauzulas — lielā tabulā tas ir pilna skenēšana (pievienojiet nosacījumu vai LIMIT).",
@@ -1286,8 +1286,63 @@
     },
     "ai": {
       "title": "AI pielāgošanas padomi",
-      "badge": "Drīzumā",
-      "body": "Drīzumā (pēc apstiprināšanas un ietekmes mērīšanas procedūrām) — padomi tiks ģenerēti no SQL ar maskētām konstantēm un reģistrēti kā piemēroti tikai pēc DA apstiprināšanas un izmērītas ietekmes."
+      "intro": "Izvēlieties vienu saglabātu plānu, lai ģenerētu padomu. Tiek nosūtīti tikai SQL un plāni ar konstantēm, kas maskētas kā ? (uz noteikumiem balstīts padoms, ja nav atslēgas vai kļūmes gadījumā). Pēc tam, kad saites īpašnieks apstiprina, atkārtoti palaidiet skaidrojumu tam pašam SQL, saglabājiet to un izmēriet ietekmi ar šo vēlāko plānu — tikai tad tas tiek ierakstīts kā piemērots.",
+      "pickPlan": "Izvēlieties saglabātu plānu padomam",
+      "create": "Ģenerēt padomu",
+      "creating": "Ģenerē… (līdz 30 s)",
+      "noPlans": "Nav saglabātu plānu. Skatiet skaidrojuma plānu iepriekš un saglabājiet to.",
+      "note": "Viens padoms vienam plānam. Dzēsiet esošo padomu, lai ģenerētu no jauna. DDL tiek tikai ieteikts — lietojiet to schema.pi.",
+      "empty": "Vēl nav padomu.",
+      "noItems": "Šim plānam nav atrasti uzlabojumi.",
+      "cost": "Pirms izmaksām",
+      "delete": "Dzēst",
+      "prev": "Iepriekšējais",
+      "next": "Nākamais",
+      "page": "{page}. lapa",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Noteikums"
+      },
+      "sts": {
+        "RCMD": "Ieteikts",
+        "APRV": "Apstiprināts",
+        "RJCT": "Noraidīts",
+        "APLD": "Piemērots"
+      },
+      "kind": {
+        "INDEX": "Indekss",
+        "REWRITE": "SQL pārrakstīšana",
+        "STATS": "Statistika",
+        "CONFIG": "Konfigurācija"
+      },
+      "approve": "Apstiprināt",
+      "reject": "Noraidīt",
+      "measureHint": "Pēc apstiprinātā padoma piemērošanas vēlreiz skatiet un saglabājiet skaidrojuma plānu tam pašam SQL. Pēc tam izvēlieties šo vēlāko plānu un izmēriet, lai to ierakstītu kā piemērotu.",
+      "findAfter": "Atrast vēlākos plānus",
+      "noAfter": "Nav saglabāts plāns tam pašam SQL pēc apstiprināšanas.",
+      "reload": "Meklēt vēlreiz",
+      "pickAfter": "Izvēlieties vēlāko plānu",
+      "measure": "Izmērīt ietekmi",
+      "effect": "Izmaksas {bfr} → {aft} ({pct}%)",
+      "better": "Uzlabots",
+      "worse": "Sliktāk",
+      "same": "Bez izmaiņām",
+      "ddl": "Ieteiktais DDL",
+      "rewrite": "Pārrakstīts SQL",
+      "runDdl": "Palaist DDL schema.pi",
+      "copy": "Kopēt",
+      "copied": "Nokopēts",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Pilna {relation} skenēšana — izveidojiet indeksu filtra kolonnā {column} (aizstājiet NN indeksa nosaukumā ar secības numuru).",
+        "SEQ_SCAN_STATS": "Pilna {relation} skenēšana — pārbaudiet filtra kolonnas un pārliecinieties, ka statistika (ANALYZE) ir aktuāla.",
+        "NESTED_LOOP": "Ligzdotā cilpa sagaida {rows} rindas — atsvaidziniet statistiku un apsveriet savienojuma atslēgu indeksus vai jaukšanas savienojumu.",
+        "SORT_SPILL": "Kārtošana aptuveni {kb} KB var pārpildīties uz disku — apsveriet sesijas work_mem palielināšanu vai kārtošanas kolonnu indeksēšanu.",
+        "SELECT_STAR": "Izvēlieties tikai nepieciešamās kolonnas, nevis SELECT * (mazāka I/O, iespējami aptverošie indeksi).",
+        "FUNC_ON_COLUMN": "Pārvietojiet funkciju/izteiksmi filtra kolonnā {column} uz konstantes pusi (iespējo indeksa izmantošanu).",
+        "IMPLICIT_CAST": "Saskaņojiet {column} un konstantes tipus (noņemiet netiešo pārveidošanu).",
+        "NOT_IN_SUBQUERY": "Pārrakstiet NOT IN (apakšvaicājums) kā NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "OR nosacījumi dažādās kolonnās jāsadala ar UNION (pievienojiet dublikātu izslēgšanas nosacījumu pēdējam, ja UNION ALL) vai jābūt indeksiem katrai kolonnai (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi saites funkcija tiek sagatavota. Lūdzu, mēģiniet vēlreiz pēc brīža.",
@@ -1299,7 +1354,11 @@
       "TIMEOUT": "Pieprasījuma laiks ir beidzies (5 sekundes). Saīsiniet SQL vai mēģiniet vēlreiz vēlāk.",
       "RATE": "Pārāk daudz pieprasījumu. Mēģiniet vēlreiz pēc minūtes.",
       "PAYLOAD_TOO_LARGE": "Plāns ir pārāk liels, lai to saglabātu.",
-      "LINK_NOT_FOUND": "Saite nav atrasta. Lūdzu, atlasiet saiti vēlreiz."
+      "LINK_NOT_FOUND": "Saite nav atrasta. Lūdzu, atlasiet saiti vēlreiz.",
+      "TUN_EXISTS": "Šim plānam jau ir padoms. Pārbaudiet sarakstu (dzēsiet to, lai ģenerētu no jauna).",
+      "TUN_BAD_STATE": "Šī darbība nav atļauta pašreizējā stāvoklī (tā var būt mainīta citur). Atsvaidziniet sarakstu.",
+      "TUN_PLAN_MISMATCH": "Vēlākajam plānam jābūt citam saglabātam plānam tam pašam SQL.",
+      "TUN_PLAN_STALE": "Vēlākais plāns jāglabā pēc apstiprināšanas. Pēc piemērošanas atkārtoti palaidiet skaidrojumu un saglabājiet to."
     }
   },
   "nav": {

@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — diňe zerur sütünleri saýlaň (goşmaça I/O, örtüji indeks ýok).",
         "FUNC_ON_COLUMN": "Süzgüç sütüni {column} funksiýa ýa-da aňlatma bilen örtülendir, şonuň üçin onuň indeksi ulanylyp bilinmeýär — munuň ýerine hemişelik üýtgediň.",
         "LEADING_WILDCARD": "Öňünde % bolan LIKE B-agajy indeksini ulanyp bilmeýär — pg_trgm GIN indeksini göz öňünde tutuň.",
-        "OR_DIFF_COLUMNS": "Dürli sütünlerdäki şertler OR bilen birleşdirilýär — UNION ALL ýa-da sütün boýunça indeksleri göz öňünde tutuň.",
+        "OR_DIFF_COLUMNS": "Tapawutly sütün şertleri OR bilen birleşdirildi — UNION bilen bölmegi (UNION ALL bolsa, gaýtalanma şertini goşmak) ýa-da sütün boýunça indeksleri gözden geçirmegi göz öňünde tutuň.",
         "IMPLICIT_CAST": "{column} sitata alnan san bilen deňeşdirilýär — sütün we hemişelik tipleri deňeşdiriň (gizlin görnüş çalşygy).",
         "NOT_IN_SUBQUERY": "NOT IN (içki sorag) NULL-lar bar bolanda hiç zady gaýtaryp bermeýär we haýal işleýär — NOT EXISTS ulanyň.",
         "NO_WHERE": "WHERE bendi ýok — uly tablisada bu doly skanirleme (şert ýa-da LIMIT goşuň).",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "AI sazlama maslahaty",
-      "badge": "Ýakyn wagtda",
-      "body": "Ýakyn wagtda (tassyklama we täsir ölçeg proseduralaryndan soň) — maslahat gizlenen hemişelikler bilen SQL-dan dörediler we diňe DA tassyklamasyny we ölçenen täsirini geçireninden soň ulanylan hökmünde ýazga alnar."
+      "intro": "Maslahat döretmek üçin saklanan meýilnamalaryň birini saýlaň. Diňe SQL we hemişelikleri ? hökmünde maskalanan meýilnamalar iberilýär (açary ýok bolsa ýa-da şowsuzlyk ýüze çykan halatynda düzgün esasly maslahat). Baglanyşyk eýesi tassyklanyndan soň, şol bir SQL üçin düşündirişi gaýtadan işläň, ony saklaň we şol soňky meýilnama bilen täsirini ölçäň — diňe şonda ol ulanylan hökmünde ýazga alynýar.",
+      "pickPlan": "Maslahat üçin saklanan meýilnamany saýlaň",
+      "create": "Maslahat döretmek",
+      "creating": "Döredilýär… (30 sekunda çenli)",
+      "noPlans": "Saklanan meýilnamalar ýok. Ýokardaky düşündiriş meýilnamasyna serediň we ony saklaň.",
+      "note": "Her meýilnama üçin bir maslahat. Gaýtadan döretmek üçin bar bolan maslahaty pozmak. DDL diňe teklip edilýär — ony schema.pi-de ulanyň.",
+      "empty": "Entek maslahat ýok.",
+      "noItems": "Bu meýilnama üçin hiç hili gowulaşma tapylmady.",
+      "cost": "Öňki çykdajy",
+      "delete": "Pozmak",
+      "prev": "Öňki",
+      "next": "Indiki",
+      "page": "Sahypa {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Düzgün"
+      },
+      "sts": {
+        "RCMD": "Maslahat berildi",
+        "APRV": "Tassyklanan",
+        "RJCT": "Ret edildi",
+        "APLD": "Ulanyldy"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "SQL gaýtadan ýazmak",
+        "STATS": "Statistika",
+        "CONFIG": "Sazlama"
+      },
+      "approve": "Tassykla",
+      "reject": "Ret et",
+      "measureHint": "Tassyklanan maslahaty ulanylandan soň, şol bir SQL üçin düşündiriş meýilnamasyna gaýtadan serediň we ony saklaň. Soňra şol soňky meýilnamany saýlaň we ony ulanylan hökmünde ýazga almak üçin ölçäň.",
+      "findAfter": "Soňky meýilnamalary tapyň",
+      "noAfter": "Tassyklanylandan soň şol bir SQL üçin saklanan meýilnama ýok.",
+      "reload": "Täzeden gözle",
+      "pickAfter": "Soňky meýilnamany saýlaň",
+      "measure": "Täsirini ölçemek",
+      "effect": "Çykdajy {bfr} → {aft} ({pct}%)",
+      "better": "Gowulaşdy",
+      "worse": "Erbetleşdi",
+      "same": "Üýtgeşiklik ýok",
+      "ddl": "Teklip edilen DDL",
+      "rewrite": "Gaýtadan ýazylan SQL",
+      "runDdl": "DDL-i schema.pi-de işlediň",
+      "copy": "Göçür",
+      "copied": "Göçürildi",
+      "rule": {
+        "SEQ_SCAN_INDEX": "{relation} doly skanirleme — süzgüç sütünine {column} indeks dörediň (indeks adyndaky NN-i yzygiderlilik belgisi bilen çalşyryň).",
+        "SEQ_SCAN_STATS": "{relation} doly skanirleme — süzgüç sütünlerini barlaň we statistikanyň (ANALYZE) häzirki zaman bolmagyny üpjün ediň.",
+        "NESTED_LOOP": "Içki aýlaw {rows} setir garaşýar — statistikany täzeläň we birikdirme açar indekslerini ýa-da heş birikmesini göz öňünde tutuň.",
+        "SORT_SPILL": "Takmynan {kb} KB tertipleşdirmesi diske ýaýrap biler — sessiýa work_mem-i ýokarlandyrmagy ýa-da tertipleşdirme sütünlerini indekslemegi göz öňünde tutuň.",
+        "SELECT_STAR": "SELECT * ýerine diňe zerur sütünleri saýlaň (az I/O, örtüji indeksler mümkin).",
+        "FUNC_ON_COLUMN": "Süzgüç sütünindäki {column} funksiýany/aňlatmany hemişelik tarapa geçiriň (indeks ulanylyşyny üpjün edýär).",
+        "IMPLICIT_CAST": "{column} we hemişelik görnüşlerini gabat getiriň (gizlin görnüş çalşyrmasyny aýyryň).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) NOT EXISTS hökmünde gaýtadan ýazyň.",
+        "OR_DIFF_COLUMNS": "Tapawutly sütün OR şertleri UNION bilen bölünmeli (UNION ALL bolsa, gaýtalanmagyň öňüni almak üçin soňky şerte öňki şerti aýyrmak goşulmaly) ýa-da sütün boýunça indeksler bolmaly (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi baglanyşyk funksiýasy taýýarlanýar. Biraz wagtdan soň täzeden synanyşyň.",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "Sorag wagt çäginden geçdi (5 sekunt). SQL-i gysgaldyň ýa-da soňrak täzeden synanyşyň.",
       "RATE": "Aşa köp sorag. Bir minutdan soň täzeden synanyşyň.",
       "PAYLOAD_TOO_LARGE": "Meýilnama saklamak üçin gaty uly.",
-      "LINK_NOT_FOUND": "Baglanyşyk tapylmady. Baglanyşygy täzeden saýlaň."
+      "LINK_NOT_FOUND": "Baglanyşyk tapylmady. Baglanyşygy täzeden saýlaň.",
+      "TUN_EXISTS": "Bu meýilnamada eýýäm maslahat bar. Sanawa serediň (gaýtadan döretmek üçin ony pozmak).",
+      "TUN_BAD_STATE": "Bu hereket häzirki ýagdaýda rugsat berilmeýär (başga ýerde üýtgän bolmagy mümkin). Sanawy täzeläň.",
+      "TUN_PLAN_MISMATCH": "Soňky meýilnama şol bir SQL üçin başga bir saklanan meýilnama bolmaly.",
+      "TUN_PLAN_STALE": "Soňky meýilnama tassyklanylandan soň saklanan bolmaly. Ulanylandan soň düşündirişi gaýtadan işläň we ony saklaň."
     }
   },
   "nav": {

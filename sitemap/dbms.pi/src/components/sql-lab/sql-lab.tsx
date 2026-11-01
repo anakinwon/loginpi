@@ -1,7 +1,7 @@
 'use client'
 
 // SQL 튜닝 랩 화면(PRD 12 §2) — 로그인 게이트 → 연결·접속 선택(LinkPicker, URL ?link=&conn=) → SQL 입력
-//  [실행계획] POST /api/sql-lab/explain → 트리·경고 / [점검] lint.ts(브라우저) + 표준 도메인 GET /api/sql-lab/domains / [저장] → 저장 계획 비교 / AI 권고 = 준비 중
+//  [실행계획] POST /api/sql-lab/explain → 트리·경고 / [점검] lint.ts(브라우저) + 표준 도메인 GET /api/sql-lab/domains / [저장] → 저장 계획 비교 / AI 튜닝 권고 → tune-panel(승인·효과 측정)
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -15,6 +15,7 @@ import { lintSql, type Domain, type LintIssue } from '@/lib/sql-lab/lint'
 import type { PlanNode, PlanWarning } from '@/lib/sql-lab/plan'
 import { CARD, PlanTree, useLabErrorText, Warnings } from './plan-tree'
 import { SavedPlans } from './saved-plans'
+import { TunePanel } from './tune-panel'
 
 export function SqlLab() {
   return <LoginGate>{() => <Lab />}</LoginGate>
@@ -195,17 +196,9 @@ function Lab() {
 
       {linkId && <SavedPlans key={`${linkId}:${savedTick}`} linkId={linkId} />}
 
-      <section className={`${CARD} border border-dashed border-white/15`}>
-        <h2 className="flex items-center gap-2 font-bold">
-          {t('ai.title')}
-          <span className="bg-surface-raised text-muted-foreground rounded-full px-2 py-0.5 text-xs font-medium">
-            {t('ai.badge')}
-          </span>
-        </h2>
-        <p className="text-muted-foreground mt-2 text-sm break-keep">
-          {t('ai.body')}
-        </p>
-      </section>
+      {linkId && (
+        <TunePanel key={linkId} linkId={linkId} savedTick={savedTick} />
+      )}
     </div>
   )
 }

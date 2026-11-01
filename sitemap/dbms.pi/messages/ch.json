@@ -1256,7 +1256,7 @@
         "SELECT_STAR": "SELECT * – wählen Sie nur die benötigten Spalten aus (zusätzliche E/A, kein Covering Index).",
         "FUNC_ON_COLUMN": "Die Filterspalte {column} ist in eine Funktion oder einen Ausdruck eingeschlossen, sodass ihr Index nicht verwendet werden kann – stattdessen die Konstante transformieren.",
         "LEADING_WILDCARD": "LIKE mit einem führenden % kann keinen B-Baum-Index verwenden – erwägen Sie einen pg_trgm GIN-Index.",
-        "OR_DIFF_COLUMNS": "Bedingungen auf verschiedenen Spalten werden mit OR kombiniert – erwägen Sie UNION ALL oder Indizes pro Spalte.",
+        "OR_DIFF_COLUMNS": "OR-verknüpfte Bedingungen auf verschiedenen Spalten – erwägen Sie eine Aufteilung mit UNION (fügen Sie eine Bedingung zum Ausschluss von Duplikaten hinzu, wenn UNION ALL) oder überprüfen Sie die spaltenweisen Indizes.",
         "IMPLICIT_CAST": "{column} wird mit einer in Anführungszeichen gesetzten Zahl verglichen – passen Sie die Spalten- und Konstantentypen an (implizite Umwandlung).",
         "NOT_IN_SUBQUERY": "NOT IN (Unterabfrage) gibt nichts zurück, wenn NULL-Werte vorhanden sind, und ist langsam – verwenden Sie NOT EXISTS.",
         "NO_WHERE": "Keine WHERE-Klausel – bei einer großen Tabelle ist dies ein vollständiger Scan (Bedingung oder LIMIT hinzufügen).",
@@ -1286,8 +1286,63 @@
     },
     "ai": {
       "title": "KI-Tuning-Empfehlung",
-      "badge": "Demnächst verfügbar",
-      "body": "Demnächst verfügbar (nach Genehmigung und Verfahren zur Wirkungsmessung) – Empfehlungen werden aus SQL mit maskierten Konstanten generiert und erst nach DA-Genehmigung und gemessener Wirkung als angewendet erfasst."
+      "intro": "Wählen Sie einen gespeicherten Plan aus, um Empfehlungen zu generieren. Es werden nur SQL und Pläne mit als ? maskierten Konstanten gesendet (regelbasierte Empfehlung, wenn kein Schlüssel vorhanden oder bei Fehler). Nachdem der Link-Eigentümer zugestimmt hat, führen Sie den Explain für dieselbe SQL erneut aus, speichern Sie ihn und messen Sie die Auswirkung mit diesem späteren Plan – erst dann wird er als angewendet aufgezeichnet.",
+      "pickPlan": "Gespeicherten Plan für Empfehlung auswählen",
+      "create": "Empfehlung generieren",
+      "creating": "Wird generiert… (bis zu 30 s)",
+      "noPlans": "Keine gespeicherten Pläne. Zeigen Sie oben einen Explain-Plan an und speichern Sie ihn.",
+      "note": "Eine Empfehlung pro Plan. Löschen Sie die vorhandene Empfehlung, um sie neu zu generieren. DDL wird nur vorgeschlagen – wenden Sie es in schema.pi an.",
+      "empty": "Noch keine Empfehlung.",
+      "noItems": "Keine Verbesserungen für diesen Plan gefunden.",
+      "cost": "Kosten vorher",
+      "delete": "Löschen",
+      "prev": "Zurück",
+      "next": "Weiter",
+      "page": "Seite {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Regel"
+      },
+      "sts": {
+        "RCMD": "Empfohlen",
+        "APRV": "Genehmigt",
+        "RJCT": "Abgelehnt",
+        "APLD": "Angewendet"
+      },
+      "kind": {
+        "INDEX": "Index",
+        "REWRITE": "SQL umschreiben",
+        "STATS": "Statistiken",
+        "CONFIG": "Konfiguration"
+      },
+      "approve": "Genehmigen",
+      "reject": "Ablehnen",
+      "measureHint": "Nachdem Sie die genehmigte Empfehlung angewendet haben, zeigen und speichern Sie den Explain-Plan für dieselbe SQL erneut. Wählen Sie dann diesen späteren Plan aus und messen Sie, um ihn als angewendet aufzuzeichnen.",
+      "findAfter": "Spätere Pläne finden",
+      "noAfter": "Kein Plan für dieselbe SQL nach Genehmigung gespeichert.",
+      "reload": "Erneut suchen",
+      "pickAfter": "Späteren Plan auswählen",
+      "measure": "Auswirkung messen",
+      "effect": "Kosten {bfr} → {aft} ({pct}%)",
+      "better": "Verbessert",
+      "worse": "Verschlechtert",
+      "same": "Keine Änderung",
+      "ddl": "Vorgeschlagene DDL",
+      "rewrite": "Umgeschriebene SQL",
+      "runDdl": "DDL in schema.pi ausführen",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Vollständiger Scan von {relation} – erstellen Sie einen Index auf der Filterspalte {column} (ersetzen Sie NN im Indexnamen durch eine Sequenznummer).",
+        "SEQ_SCAN_STATS": "Vollständiger Scan von {relation} – überprüfen Sie die Filterspalten und stellen Sie sicher, dass die Statistiken (ANALYZE) aktuell sind.",
+        "NESTED_LOOP": "Geschachtelte Schleife erwartet {rows} Zeilen – aktualisieren Sie die Statistiken und ziehen Sie Join-Key-Indizes oder einen Hash-Join in Betracht.",
+        "SORT_SPILL": "Sortierung von etwa {kb} KB kann auf die Festplatte ausgelagert werden – erwägen Sie, session work_mem zu erhöhen oder die Sortierspalten zu indizieren.",
+        "SELECT_STAR": "Wählen Sie nur die benötigten Spalten anstelle von SELECT * (weniger I/O, abdeckende Indizes möglich).",
+        "FUNC_ON_COLUMN": "Verschieben Sie die Funktion/den Ausdruck auf der Filterspalte {column} auf die konstante Seite (ermöglicht die Indexnutzung).",
+        "IMPLICIT_CAST": "Passen Sie die Typen von {column} und der Konstante an (entfernen Sie die implizite Typumwandlung).",
+        "NOT_IN_SUBQUERY": "Schreiben Sie NOT IN (Unterabfrage) als NOT EXISTS um.",
+        "OR_DIFF_COLUMNS": "OR-Bedingungen auf verschiedenen Spalten sollten mit UNION aufgeteilt werden (fügen Sie eine Bedingung zum Ausschluss von Duplikaten zur letzteren hinzu, wenn UNION ALL) oder spaltenweise Indizes haben (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Die schema.pi-Link-Funktion wird vorbereitet. Bitte versuchen Sie es in Kürze erneut.",
@@ -1299,7 +1354,11 @@
       "TIMEOUT": "Die Anfrage hat ein Timeout (5 Sekunden). Kürzen Sie die SQL oder versuchen Sie es später erneut.",
       "RATE": "Zu viele Anfragen. Versuchen Sie es in einer Minute erneut.",
       "PAYLOAD_TOO_LARGE": "Der Plan ist zu groß zum Speichern.",
-      "LINK_NOT_FOUND": "Link nicht gefunden. Bitte wählen Sie den Link erneut aus."
+      "LINK_NOT_FOUND": "Link nicht gefunden. Bitte wählen Sie den Link erneut aus.",
+      "TUN_EXISTS": "Dieser Plan hat bereits eine Empfehlung. Überprüfen Sie die Liste (löschen Sie sie, um sie neu zu generieren).",
+      "TUN_BAD_STATE": "Diese Aktion ist im aktuellen Zustand nicht zulässig (sie könnte an anderer Stelle geändert worden sein). Aktualisieren Sie die Liste.",
+      "TUN_PLAN_MISMATCH": "Der spätere Plan muss ein anderer gespeicherter Plan für dieselbe SQL sein.",
+      "TUN_PLAN_STALE": "Der spätere Plan muss nach der Genehmigung gespeichert werden. Führen Sie den Explain nach der Anwendung erneut aus und speichern Sie ihn."
     }
   },
   "nav": {

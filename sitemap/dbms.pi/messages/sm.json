@@ -1255,7 +1255,7 @@
         "SELECT_STAR": "SELECT * — seleziona solo le colonne di cui hai bisogno (I/O extra, nessun indice di copertura).",
         "FUNC_ON_COLUMN": "La colonna filtro {column} è racchiusa in una funzione o espressione, quindi il suo indice non può essere utilizzato — trasforma invece la costante.",
         "LEADING_WILDCARD": "LIKE con un % iniziale non può usare un indice B-tree — considera un indice GIN pg_trgm.",
-        "OR_DIFF_COLUMNS": "Le condizioni su colonne diverse sono combinate con OR — considera UNION ALL o indici per colonna.",
+        "OR_DIFF_COLUMNS": "Condizioni OR su colonne diverse — considera di dividerle con UNION (aggiungi una condizione di esclusione dei duplicati se UNION ALL) o di rivedere gli indici per colonna.",
         "IMPLICIT_CAST": "{column} è confrontato con un numero tra virgolette — abbina i tipi di colonna e costante (cast implicito).",
         "NOT_IN_SUBQUERY": "NOT IN (sottoconsulta) non restituisce nulla quando sono presenti NULL ed è lento — usa NOT EXISTS.",
         "NO_WHERE": "Nessuna clausola WHERE — su una tabella grande questa è una scansione completa (aggiungi una condizione o LIMIT).",
@@ -1285,8 +1285,63 @@
     },
     "ai": {
       "title": "Consigli di ottimizzazione AI",
-      "badge": "Prossimamente",
-      "body": "Prossimamente (dopo le procedure di approvazione e misurazione dell'impatto) — i consigli saranno generati da SQL con costanti mascherate e registrati come applicati solo dopo l'approvazione DA e l'impatto misurato."
+      "intro": "Scegli un piano salvato per generare consigli. Vengono inviati solo SQL e piani con costanti mascherate come ? (consigli basati su regole se non c'è chiave o in caso di errore). Dopo l'approvazione del proprietario del link, riesegui l'explain per lo stesso SQL, salvalo e misura l'impatto con quel piano successivo — solo allora viene registrato come applicato.",
+      "pickPlan": "Seleziona un piano salvato per i consigli",
+      "create": "Genera consigli",
+      "creating": "Generazione in corso… (fino a 30 s)",
+      "noPlans": "Nessun piano salvato. Visualizza un piano di explain sopra e salvalo.",
+      "note": "Un consiglio per piano. Elimina il consiglio esistente per rigenerarlo. Il DDL è solo suggerito — applicalo in schema.pi.",
+      "empty": "Nessun consiglio ancora.",
+      "noItems": "Nessun miglioramento trovato per questo piano.",
+      "cost": "Costo precedente",
+      "delete": "Elimina",
+      "prev": "Precedente",
+      "next": "Successivo",
+      "page": "Pagina {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Regola"
+      },
+      "sts": {
+        "RCMD": "Consigliato",
+        "APRV": "Approvato",
+        "RJCT": "Rifiutato",
+        "APLD": "Applicato"
+      },
+      "kind": {
+        "INDEX": "Indice",
+        "REWRITE": "Riscrivi SQL",
+        "STATS": "Statistiche",
+        "CONFIG": "Configurazione"
+      },
+      "approve": "Approva",
+      "reject": "Rifiuta",
+      "measureHint": "Dopo aver applicato il consiglio approvato, visualizza e salva nuovamente il piano di explain per lo stesso SQL. Quindi scegli quel piano successivo e misura per registrarlo come applicato.",
+      "findAfter": "Trova piani successivi",
+      "noAfter": "Nessun piano per lo stesso SQL salvato dopo l'approvazione.",
+      "reload": "Cerca di nuovo",
+      "pickAfter": "Seleziona il piano successivo",
+      "measure": "Misura l'impatto",
+      "effect": "Costo {bfr} → {aft} ({pct}%)",
+      "better": "Migliorato",
+      "worse": "Peggiorato",
+      "same": "Nessun cambiamento",
+      "ddl": "DDL suggerito",
+      "rewrite": "SQL riscritto",
+      "runDdl": "Esegui DDL in schema.pi",
+      "copy": "Copia",
+      "copied": "Copiato",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Scansione completa di {relation} — crea un indice sulla colonna filtro {column} (sostituisci NN nel nome dell'indice con un numero di sequenza).",
+        "SEQ_SCAN_STATS": "Scansione completa di {relation} — controlla le colonne filtro e assicurati che le statistiche (ANALYZE) siano aggiornate.",
+        "NESTED_LOOP": "Il nested loop si aspetta {rows} righe — aggiorna le statistiche e considera indici sulla chiave di join o un hash join.",
+        "SORT_SPILL": "L'ordinamento di circa {kb} KB potrebbe riversarsi su disco — considera di aumentare work_mem della sessione o di indicizzare le colonne di ordinamento.",
+        "SELECT_STAR": "Seleziona solo le colonne di cui hai bisogno invece di SELECT * (meno I/O, possibili indici di copertura).",
+        "FUNC_ON_COLUMN": "Sposta la funzione/espressione sulla colonna filtro {column} sul lato costante (abilita l'uso dell'indice).",
+        "IMPLICIT_CAST": "Fai corrispondere i tipi di {column} e della costante (rimuovi il cast implicito).",
+        "NOT_IN_SUBQUERY": "Riscrivi NOT IN (sottoquery) come NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Le condizioni OR su colonne diverse dovrebbero essere divise con UNION (aggiungi una condizione di esclusione dei duplicati a quest'ultima se UNION ALL) o avere indici per colonna (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "La funzione di collegamento schema.pi è in preparazione. Riprova a breve.",
@@ -1298,7 +1353,11 @@
       "TIMEOUT": "La richiesta è scaduta (5 secondi). Accorcia l'SQL o riprova più tardi.",
       "RATE": "Troppe richieste. Riprova tra un minuto.",
       "PAYLOAD_TOO_LARGE": "Il piano è troppo grande per essere salvato.",
-      "LINK_NOT_FOUND": "Collegamento non trovato. Seleziona di nuovo il collegamento."
+      "LINK_NOT_FOUND": "Collegamento non trovato. Seleziona di nuovo il collegamento.",
+      "TUN_EXISTS": "Questo piano ha già dei consigli. Controlla l'elenco (eliminalo per rigenerare).",
+      "TUN_BAD_STATE": "Questa azione non è consentita nello stato attuale (potrebbe essere cambiata altrove). Aggiorna l'elenco.",
+      "TUN_PLAN_MISMATCH": "Il piano successivo deve essere un piano salvato diverso per lo stesso SQL.",
+      "TUN_PLAN_STALE": "Il piano successivo deve essere salvato dopo l'approvazione. Riesegui l'explain dopo aver applicato e salvalo."
     }
   },
   "nav": {

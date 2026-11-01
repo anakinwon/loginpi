@@ -1253,7 +1253,7 @@
         "SELECT_STAR": "SELECT * – velg kun kolonnene du trenger (ekstra I/O, ingen dekkende indeks).",
         "FUNC_ON_COLUMN": "Filterkolonnen {column} er pakket inn i en funksjon eller et uttrykk, så indeksen kan ikke brukes – transformer konstanten i stedet.",
         "LEADING_WILDCARD": "LIKE med en ledende % kan ikke bruke en B-tre-indeks – vurder en pg_trgm GIN-indeks.",
-        "OR_DIFF_COLUMNS": "Betingelser på forskjellige kolonner er kombinert med OR – vurder UNION ALL eller indekser per kolonne.",
+        "OR_DIFF_COLUMNS": "OR-betingelser på forskjellige kolonner – vurder å dele med UNION (legg til en duplikat ekskluderingsbetingelse hvis UNION ALL) eller se over indekser per kolonne.",
         "IMPLICIT_CAST": "{column} sammenlignes med et sitert tall – match kolonne- og konstanttypene (implisitt cast).",
         "NOT_IN_SUBQUERY": "NOT IN (underforespørsel) returnerer ingenting når NULL-verdier er til stede og er treg – bruk NOT EXISTS.",
         "NO_WHERE": "Ingen WHERE-klausul – på en stor tabell er dette en full skanning (legg til en betingelse eller LIMIT).",
@@ -1283,8 +1283,63 @@
     },
     "ai": {
       "title": "AI-justeringsråd",
-      "badge": "Kommer snart",
-      "body": "Kommer snart (etter godkjenning og prosedyrer for måling av effekt) – råd vil bli generert fra SQL med maskerte konstanter og registrert som anvendt først etter DA-godkjenning og målt effekt."
+      "intro": "Velg én lagret plan for å generere råd. Kun SQL og planer med konstanter maskert som ? sendes (regelbasert råd hvis ingen nøkkel eller ved feil). Etter at lenkeeieren godkjenner, kjør forklaringen for samme SQL på nytt, lagre den, og mål effekten med den senere planen – først da blir den registrert som anvendt.",
+      "pickPlan": "Velg en lagret plan for råd",
+      "create": "Generer råd",
+      "creating": "Genererer… (opptil 30 s)",
+      "noPlans": "Ingen lagrede planer. Vis en forklaring ovenfor og lagre den.",
+      "note": "Ett råd per plan. Slett eksisterende råd for å generere på nytt. DDL er kun foreslått – bruk det i schema.pi.",
+      "empty": "Ingen råd ennå.",
+      "noItems": "Ingen forbedringer funnet for denne planen.",
+      "cost": "Før kostnad",
+      "delete": "Slett",
+      "prev": "Forrige",
+      "next": "Neste",
+      "page": "Side {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Regel"
+      },
+      "sts": {
+        "RCMD": "Anbefalt",
+        "APRV": "Godkjent",
+        "RJCT": "Avvist",
+        "APLD": "Anvendt"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "SQL-omskriving",
+        "STATS": "Statistikk",
+        "CONFIG": "Konfigurasjon"
+      },
+      "approve": "Godkjenn",
+      "reject": "Avvis",
+      "measureHint": "Etter å ha anvendt det godkjente rådet, vis og lagre forklaringen for samme SQL igjen. Velg deretter den senere planen og mål for å registrere den som anvendt.",
+      "findAfter": "Finn senere planer",
+      "noAfter": "Ingen plan for samme SQL lagret etter godkjenning.",
+      "reload": "Søk igjen",
+      "pickAfter": "Velg den senere planen",
+      "measure": "Mål effekt",
+      "effect": "Kostnad {bfr} → {aft} ({pct}%)",
+      "better": "Forbedret",
+      "worse": "Forverret",
+      "same": "Ingen endring",
+      "ddl": "Foreslått DDL",
+      "rewrite": "Omskrevet SQL",
+      "runDdl": "Kjør DDL i schema.pi",
+      "copy": "Kopier",
+      "copied": "Kopiert",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Full skanning av {relation} – opprett en indeks på filterkolonnen {column} (erstatt NN i indeksnavnet med et sekvensnummer).",
+        "SEQ_SCAN_STATS": "Full skanning av {relation} – sjekk filterkolonnene og sørg for at statistikken (ANALYZE) er oppdatert.",
+        "NESTED_LOOP": "Nested loop forventer {rows} rader – oppdater statistikk og vurder join-key indekser eller en hash join.",
+        "SORT_SPILL": "Sortering av ca. {kb} KB kan spilles til disk – vurder å øke session work_mem eller indeksere sorteringskolonnene.",
+        "SELECT_STAR": "Velg kun kolonnene du trenger i stedet for SELECT * (mindre I/O, dekkende indekser mulig).",
+        "FUNC_ON_COLUMN": "Flytt funksjonen/uttrykket på filterkolonnen {column} til konstantsiden (muliggjør indeksbruk).",
+        "IMPLICIT_CAST": "Match typene til {column} og konstanten (fjern den implisitte casten).",
+        "NOT_IN_SUBQUERY": "Skriv om NOT IN (subquery) som NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "OR-betingelser på forskjellige kolonner bør deles med UNION (legg til en duplikat ekskluderingsbetingelse til den siste hvis UNION ALL) eller ha indekser per kolonne (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi-lenkefunksjonen forberedes. Prøv igjen om kort tid.",
@@ -1296,7 +1351,11 @@
       "TIMEOUT": "Forespørselen tidsavbrutt (5 sekunder). Forkort SQL-en eller prøv igjen senere.",
       "RATE": "For mange forespørsler. Prøv igjen om et minutt.",
       "PAYLOAD_TOO_LARGE": "Planen er for stor til å lagres.",
-      "LINK_NOT_FOUND": "Lenke ikke funnet. Velg lenken igjen."
+      "LINK_NOT_FOUND": "Lenke ikke funnet. Velg lenken igjen.",
+      "TUN_EXISTS": "Denne planen har allerede råd. Sjekk listen (slett den for å generere på nytt).",
+      "TUN_BAD_STATE": "Denne handlingen er ikke tillatt i gjeldende tilstand (den kan ha endret seg andre steder). Oppdater listen.",
+      "TUN_PLAN_MISMATCH": "Den senere planen må være en annen lagret plan for samme SQL.",
+      "TUN_PLAN_STALE": "Den senere planen må være lagret etter godkjenning. Kjør forklaringen på nytt etter å ha anvendt og lagre den."
     }
   },
   "nav": {

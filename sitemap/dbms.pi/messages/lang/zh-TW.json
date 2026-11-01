@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — 僅選擇您需要的欄位（額外 I/O，無覆蓋索引）。",
         "FUNC_ON_COLUMN": "篩選欄 {column} 被函數或表達式包裝，因此無法使用其索引 — 請改為轉換常數。",
         "LEADING_WILDCARD": "帶有前導 % 的 LIKE 無法使用 B-tree 索引 — 請考慮 pg_trgm GIN 索引。",
-        "OR_DIFF_COLUMNS": "不同欄位上的條件與 OR 結合 — 請考慮 UNION ALL 或按欄位建立索引。",
+        "OR_DIFF_COLUMNS": "不同欄位條件以 OR 連結 — 請考慮使用 UNION 分割（如果是 UNION ALL，請新增重複排除條件）或檢閱各欄位索引。",
         "IMPLICIT_CAST": "{column} 與帶引號的數字進行比較 — 請匹配欄位和常數類型（隱式轉換）。",
         "NOT_IN_SUBQUERY": "NOT IN (子查詢) 在存在 NULL 時不返回任何內容且速度慢 — 請使用 NOT EXISTS。",
         "NO_WHERE": "無 WHERE 子句 — 在大型資料表上這是全表掃描（新增條件或 LIMIT）。",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "AI 調整建議",
-      "badge": "即將推出",
-      "body": "即將推出（經批准和影響衡量程序後）— 建議將從帶有遮罩常數的 SQL 生成，並僅在 DA 批准和衡量影響後記錄為已應用。"
+      "intro": "選擇一個已儲存的計畫來產生建議。只會傳送 SQL 和常數以「?」遮罩的計畫（如果沒有金鑰或失敗，則為基於規則的建議）。在連結擁有者核准後，重新執行相同 SQL 的解釋，儲存它，然後使用該後續計畫測量影響 — 只有這樣才會記錄為已應用。",
+      "pickPlan": "選擇一個已儲存的計畫以取得建議",
+      "create": "產生建議",
+      "creating": "正在產生中… (最多 30 秒)",
+      "noPlans": "沒有已儲存的計畫。請在上方檢視解釋計畫並儲存。",
+      "note": "每個計畫只有一個建議。若要重新產生，請刪除現有建議。DDL 僅為建議 — 請在 schema.pi 中應用。",
+      "empty": "尚無建議。",
+      "noItems": "此計畫未發現任何改進。",
+      "cost": "之前成本",
+      "delete": "刪除",
+      "prev": "上一個",
+      "next": "下一個",
+      "page": "第 {page} 頁",
+      "engn": {
+        "AI": "AI",
+        "RULE": "規則"
+      },
+      "sts": {
+        "RCMD": "建議",
+        "APRV": "已核准",
+        "RJCT": "已拒絕",
+        "APLD": "已應用"
+      },
+      "kind": {
+        "INDEX": "索引",
+        "REWRITE": "SQL 重寫",
+        "STATS": "統計",
+        "CONFIG": "設定"
+      },
+      "approve": "核准",
+      "reject": "拒絕",
+      "measureHint": "應用已核准的建議後，再次檢視並儲存相同 SQL 的解釋計畫。然後選擇該後續計畫並測量，以將其記錄為已應用。",
+      "findAfter": "尋找後續計畫",
+      "noAfter": "核准後沒有儲存相同 SQL 的計畫。",
+      "reload": "再次搜尋",
+      "pickAfter": "選擇後續計畫",
+      "measure": "測量影響",
+      "effect": "成本 {bfr} → {aft} ({pct}%)",
+      "better": "已改進",
+      "worse": "惡化",
+      "same": "無變化",
+      "ddl": "建議的 DDL",
+      "rewrite": "重寫的 SQL",
+      "runDdl": "在 schema.pi 中執行 DDL",
+      "copy": "複製",
+      "copied": "已複製",
+      "rule": {
+        "SEQ_SCAN_INDEX": "{relation} 的完整掃描 — 在篩選欄位 {column} 上建立索引（將索引名稱中的 NN 替換為序號）。",
+        "SEQ_SCAN_STATS": "{relation} 的完整掃描 — 檢查篩選欄位並確保統計資料 (ANALYZE) 是最新的。",
+        "NESTED_LOOP": "巢狀迴圈預期 {rows} 列 — 重新整理統計資料並考慮連接鍵索引或雜湊連接。",
+        "SORT_SPILL": "約 {kb} KB 的排序可能會溢出到磁碟 — 考慮提高會話 work_mem 或為排序欄位建立索引。",
+        "SELECT_STAR": "只選擇您需要的欄位，而不是 SELECT *（減少 I/O，可能涵蓋索引）。",
+        "FUNC_ON_COLUMN": "將篩選欄位 {column} 上的函數/表達式移到常數側（啟用索引使用）。",
+        "IMPLICIT_CAST": "匹配 {column} 和常數的類型（移除隱式轉換）。",
+        "NOT_IN_SUBQUERY": "將 NOT IN (子查詢) 重寫為 NOT EXISTS。",
+        "OR_DIFF_COLUMNS": "不同欄位的 OR 條件應使用 UNION 分割（如果是 UNION ALL，請在後者新增排除前者條件以避免重複）或為各欄位建立索引（BitmapOr）。"
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi 連結功能正在準備中。請稍後再試。",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "請求逾時（5 秒）。請縮短 SQL 或稍後再試。",
       "RATE": "請求過多。請在一分鐘後再試。",
       "PAYLOAD_TOO_LARGE": "計畫太大，無法儲存。",
-      "LINK_NOT_FOUND": "找不到連結。請重新選擇連結。"
+      "LINK_NOT_FOUND": "找不到連結。請重新選擇連結。",
+      "TUN_EXISTS": "此計畫已有建議。請檢查清單（若要重新產生，請刪除後再試）。",
+      "TUN_BAD_STATE": "目前狀態不允許此操作（可能已在其他地方更改）。請重新整理清單。",
+      "TUN_PLAN_MISMATCH": "後續計畫必須是相同 SQL 的不同已儲存計畫。",
+      "TUN_PLAN_STALE": "後續計畫必須在核准後儲存。請在應用後重新執行解釋並儲存。"
     }
   },
   "nav": {

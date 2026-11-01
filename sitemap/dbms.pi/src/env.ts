@@ -40,6 +40,8 @@ export const env = createEnv({
     // dbms.pi 애플리케이션 모니터링 → schema.pi 수집 API — 전달 라우트 미구현(TODO 7단계, Phase 1 미사용)
     MON_INGEST_URL: z.string().url().optional(),
     MON_INGEST_KEY: z.string().min(32).optional(),
+    // dbms.pi SQL 튜닝 랩 AI 튜닝 권고(Claude) — 미설정이면 규칙 권고로 대체(engn_cd RULE). 공유 가능 키(docs/ENV_GUIDE.md)
+    ANTHROPIC_API_KEY: z.string().optional(),
   },
   client: {
     // dbms.pi 공개 URL — Origin 검사·메타. 미설정이면 src/lib/site-url.ts 가 http://localhost:3004 로 폴백
@@ -79,6 +81,7 @@ export const env = createEnv({
     CRON_SECRET: process.env.CRON_SECRET,
     MON_INGEST_URL: process.env.MON_INGEST_URL,
     MON_INGEST_KEY: process.env.MON_INGEST_KEY,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
     NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_PI_OAUTH_CLIENT_ID,

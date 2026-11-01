@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — faqat kerakli ustunlarni tanlang (qoʻshimcha I/O, qoplovchi indeks yoʻq).",
         "FUNC_ON_COLUMN": "Filtr ustuni {column} funksiya yoki ifodaga oʻralgan, shuning uchun uning indeksi ishlatilmaydi — buning oʻrniga konstantani oʻzgartiring.",
         "LEADING_WILDCARD": "Oldida % boʻlgan LIKE B-tree indeksidan foydalana olmaydi — pg_trgm GIN indeksini koʻrib chiqing.",
-        "OR_DIFF_COLUMNS": "Turli ustunlardagi shartlar OR bilan birlashtirilgan — UNION ALL yoki ustun boʻyicha indekslarni koʻrib chiqing.",
+        "OR_DIFF_COLUMNS": "Turli ustun shartlari OR bilan bogʻlangan — UNION bilan ajratishni (agar UNION ALL boʻlsa, takrorlanishni istisno qilish shartini qoʻshish) yoki ustun boʻyicha indekslarni koʻrib chiqing.",
         "IMPLICIT_CAST": "{column} tirnoqli raqam bilan taqqoslanadi — ustun va doimiy turlarni moslang (yashirin tur oʻzgartirish).",
         "NOT_IN_SUBQUERY": "NOT IN (kichik soʻrov) NULLlar mavjud boʻlganda hech narsa qaytarmaydi va sekin ishlaydi — NOT EXISTS dan foydalaning.",
         "NO_WHERE": "WHERE bandi yoʻq — katta jadvalda bu toʻliq skanerlash (shart yoki LIMIT qoʻshing).",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "AI sozlash boʻyicha maslahat",
-      "badge": "Tez orada",
-      "body": "Tez orada (tasdiqlash va taʼsirni oʻlchash tartib-qoidalari tugagandan soʻng) — maslahatlar niqoblangan konstantalar bilan SQL dan yaratiladi va faqat DA tasdiqlash va oʻlchangan taʼsirdan keyin qoʻllanilgan deb qayd etiladi."
+      "intro": "Maslahat yaratish uchun saqlangan rejalardan birini tanlang. Faqat SQL va konstantalari ? bilan niqoblangan rejalar yuboriladi (agar kalit boʻlmasa yoki muvaffaqiyatsizlikka uchrasa, qoidaga asoslangan maslahat). Havola egasi tasdiqlaganidan soʻng, xuddi shu SQL uchun tushuntirishni qayta ishga tushiring, uni saqlang va keyingi reja bilan taʼsirini oʻlchang — shundan keyingina u qoʻllanilgan deb qayd etiladi.",
+      "pickPlan": "Maslahat uchun saqlangan rejani tanlang",
+      "create": "Maslahat yaratish",
+      "creating": "Yaratilmoqda… (30 soniyagacha)",
+      "noPlans": "Saqlangan rejalar yoʻq. Yuqoridagi tushuntirish rejasini koʻring va saqlang.",
+      "note": "Har bir reja uchun bitta maslahat. Qayta yaratish uchun mavjud maslahatni oʻchiring. DDL faqat taklif qilinadi — uni schema.pi da qoʻllang.",
+      "empty": "Hali maslahat yoʻq.",
+      "noItems": "Ushbu reja uchun hech qanday yaxshilanish topilmadi.",
+      "cost": "Avvalgi xarajat",
+      "delete": "Oʻchirish",
+      "prev": "Oldingi",
+      "next": "Keyingi",
+      "page": "{page}-sahifa",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Qoida"
+      },
+      "sts": {
+        "RCMD": "Maslahat berilgan",
+        "APRV": "Tasdiqlangan",
+        "RJCT": "Rad etilgan",
+        "APLD": "Qoʻllanilgan"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "SQL qayta yozish",
+        "STATS": "Statistika",
+        "CONFIG": "Konfiguratsiya"
+      },
+      "approve": "Tasdiqlash",
+      "reject": "Rad etish",
+      "measureHint": "Tasdiqlangan maslahatni qoʻllaganingizdan soʻng, xuddi shu SQL uchun tushuntirish rejasini qayta koʻring va saqlang. Keyin oʻsha keyingi rejani tanlang va uni qoʻllanilgan deb qayd etish uchun oʻlchang.",
+      "findAfter": "Keyingi rejalarni topish",
+      "noAfter": "Tasdiqlashdan keyin xuddi shu SQL uchun saqlangan reja yoʻq.",
+      "reload": "Qayta qidirish",
+      "pickAfter": "Keyingi rejani tanlang",
+      "measure": "Taʼsirni oʻlchash",
+      "effect": "Xarajat {bfr} → {aft} ({pct}%)",
+      "better": "Yaxshilangan",
+      "worse": "Yomonlashgan",
+      "same": "Oʻzgarish yoʻq",
+      "ddl": "Taklif qilingan DDL",
+      "rewrite": "Qayta yozilgan SQL",
+      "runDdl": "schema.pi da DDL ni ishga tushirish",
+      "copy": "Nusxalash",
+      "copied": "Nusxalandi",
+      "rule": {
+        "SEQ_SCAN_INDEX": "{relation} ning toʻliq skaneri — filtr ustuni {column} da indeks yarating (indeks nomidagi NN ni ketma-ketlik raqami bilan almashtiring).",
+        "SEQ_SCAN_STATS": "{relation} ning toʻliq skaneri — filtr ustunlarini tekshiring va statistika (ANALYZE) ning joriy ekanligiga ishonch hosil qiling.",
+        "NESTED_LOOP": "Ichki tsikl {rows} qatorni kutadi — statistikani yangilang va birlashma kalit indekslarini yoki xesh birlashmasini koʻrib chiqing.",
+        "SORT_SPILL": "Taxminan {kb} KB hajmdagi saralash diskka toʻkilishi mumkin — sessiya work_mem ni oshirishni yoki saralash ustunlarini indekslashni koʻrib chiqing.",
+        "SELECT_STAR": "SELECT * oʻrniga faqat kerakli ustunlarni tanlang (kamroq I/O, qoplovchi indekslar mumkin).",
+        "FUNC_ON_COLUMN": "Filtr ustuni {column} dagi funksiya/ifodani konstanta tomoniga oʻtkazing (indeksdan foydalanishni yoqadi).",
+        "IMPLICIT_CAST": "{column} va konstantaning turlarini moslang (yashirin tur oʻzgartirishni olib tashlang).",
+        "NOT_IN_SUBQUERY": "NOT IN (kichik soʻrov) ni NOT EXISTS ga qayta yozing.",
+        "OR_DIFF_COLUMNS": "Turli ustunlardagi OR shartlari UNION bilan ajratilishi (agar UNION ALL boʻlsa, keyingi shartga oldingi shartni istisno qilishni qoʻshib, takrorlanishning oldini olish) yoki ustun boʻyicha indekslarga ega boʻlishi kerak (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi havola funksiyasi tayyorlanmoqda. Iltimos, birozdan keyin qayta urinib koʻring.",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "Soʻrov vaqti tugadi (5 soniya). SQLni qisqartiring yoki keyinroq qayta urinib koʻring.",
       "RATE": "Juda koʻp soʻrovlar. Bir daqiqadan keyin qayta urinib koʻring.",
       "PAYLOAD_TOO_LARGE": "Reja juda katta, saqlab boʻlmaydi.",
-      "LINK_NOT_FOUND": "Havola topilmadi. Iltimos, havolani qayta tanlang."
+      "LINK_NOT_FOUND": "Havola topilmadi. Iltimos, havolani qayta tanlang.",
+      "TUN_EXISTS": "Bu rejada allaqachon maslahat mavjud. Roʻyxatni tekshiring (qayta yaratish uchun uni oʻchiring).",
+      "TUN_BAD_STATE": "Ushbu harakat joriy holatda ruxsat etilmaydi (u boshqa joyda oʻzgargan boʻlishi mumkin). Roʻyxatni yangilang.",
+      "TUN_PLAN_MISMATCH": "Keyingi reja xuddi shu SQL uchun boshqa saqlangan reja boʻlishi kerak.",
+      "TUN_PLAN_STALE": "Keyingi reja tasdiqlashdan keyin saqlangan boʻlishi kerak. Qoʻllaganingizdan soʻng tushuntirishni qayta ishga tushiring va saqlang."
     }
   },
   "nav": {

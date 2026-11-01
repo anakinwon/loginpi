@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — 필요한 칼럼만 고르세요(불필요한 I/O·커버링 인덱스 불가).",
         "FUNC_ON_COLUMN": "조건 칼럼 {column} 을 함수·연산으로 가공해 인덱스를 쓸 수 없습니다 — 상수 쪽을 가공하세요.",
         "LEADING_WILDCARD": "앞에 % 가 붙은 LIKE 는 B-tree 인덱스를 못 탑니다 — pg_trgm GIN 인덱스를 검토하세요.",
-        "OR_DIFF_COLUMNS": "서로 다른 칼럼 조건을 OR 로 묶었습니다 — UNION ALL 분리나 칼럼별 인덱스를 검토하세요.",
+        "OR_DIFF_COLUMNS": "서로 다른 칼럼 조건을 OR 로 묶었습니다 — UNION 분리(UNION ALL 이면 중복 제외 조건 추가)나 칼럼별 인덱스를 검토하세요.",
         "IMPLICIT_CAST": "{column} 을 따옴표 숫자와 비교합니다 — 칼럼 타입과 상수 타입을 맞추세요(암시적 형변환).",
         "NOT_IN_SUBQUERY": "NOT IN (부질의) 는 NULL 이 섞이면 결과가 비고 느립니다 — NOT EXISTS 로 바꾸세요.",
         "NO_WHERE": "WHERE 조건이 없습니다 — 큰 테이블이면 전체 스캔입니다(LIMIT 또는 조건 추가).",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "AI 튜닝 권고",
-      "badge": "준비 중",
-      "body": "준비 중 (승인·효과 측정 절차 후) — 상수를 가린 SQL 로 권고를 만들고, DA 승인과 효과 측정을 거친 뒤에만 적용 완료로 기록합니다."
+      "intro": "저장한 실행계획 1건을 골라 권고를 만듭니다. 상수를 ? 로 가린 SQL·계획만 보내고(키가 없거나 실패하면 규칙 권고), 연결 소유자가 승인한 뒤 같은 SQL 을 다시 실행계획 보기·저장한 후 계획으로 효과를 측정해야 적용 완료가 됩니다.",
+      "pickPlan": "권고를 만들 저장 계획 선택",
+      "create": "권고 만들기",
+      "creating": "권고 만드는 중… (최대 30초)",
+      "noPlans": "저장한 계획이 없습니다. 위에서 실행계획을 본 뒤 저장하세요.",
+      "note": "계획 1건에는 권고 1건만 둡니다. 다시 만들려면 기존 권고를 삭제하세요. DDL 은 제안만 하며 실제 적용은 schema.pi 에서 합니다.",
+      "empty": "아직 만든 권고가 없습니다.",
+      "noItems": "이 계획에서 찾은 개선점이 없습니다.",
+      "cost": "전 비용",
+      "delete": "삭제",
+      "prev": "이전",
+      "next": "다음",
+      "page": "{page}쪽",
+      "engn": {
+        "AI": "AI",
+        "RULE": "규칙"
+      },
+      "sts": {
+        "RCMD": "권고",
+        "APRV": "승인",
+        "RJCT": "반려",
+        "APLD": "적용 완료"
+      },
+      "kind": {
+        "INDEX": "인덱스",
+        "REWRITE": "SQL 재작성",
+        "STATS": "통계",
+        "CONFIG": "설정"
+      },
+      "approve": "승인",
+      "reject": "반려",
+      "measureHint": "승인한 권고를 적용한 뒤 같은 SQL 로 실행계획을 다시 보고 저장하세요. 그 후 계획을 골라 측정하면 적용 완료로 기록됩니다.",
+      "findAfter": "후 계획 찾기",
+      "noAfter": "승인 이후 저장한 같은 SQL 계획이 없습니다.",
+      "reload": "다시 찾기",
+      "pickAfter": "후 계획 선택",
+      "measure": "효과 측정",
+      "effect": "비용 {bfr} → {aft} ({pct}%)",
+      "better": "개선",
+      "worse": "악화",
+      "same": "변화 없음",
+      "ddl": "제안 DDL",
+      "rewrite": "재작성 SQL",
+      "runDdl": "schema.pi 에서 DDL 실행",
+      "copy": "복사",
+      "copied": "복사됨",
+      "rule": {
+        "SEQ_SCAN_INDEX": "{relation} 전체 스캔 — 조건 칼럼 {column} 에 인덱스를 만드세요(인덱스명 NN 은 순번으로 바꿈).",
+        "SEQ_SCAN_STATS": "{relation} 전체 스캔 — 조건 칼럼을 확인하고 통계(ANALYZE)가 최신인지 점검하세요.",
+        "NESTED_LOOP": "중첩 루프 결과가 예상 {rows}행 — 통계를 갱신하고 조인 조건 인덱스나 해시 조인을 검토하세요.",
+        "SORT_SPILL": "정렬이 약 {kb}KB 로 디스크로 넘칠 수 있습니다 — 세션 work_mem 상향이나 정렬 칼럼 인덱스를 검토하세요.",
+        "SELECT_STAR": "SELECT * 대신 필요한 칼럼만 고르세요(I/O 감소·커버링 인덱스 가능).",
+        "FUNC_ON_COLUMN": "조건 칼럼 {column} 의 함수·연산 가공을 상수 쪽으로 옮기세요(인덱스 사용).",
+        "IMPLICIT_CAST": "{column} 과 상수의 타입을 맞추세요(암시적 형변환 제거).",
+        "NOT_IN_SUBQUERY": "NOT IN (부질의) 를 NOT EXISTS 로 바꾸세요.",
+        "OR_DIFF_COLUMNS": "서로 다른 칼럼 OR 조건은 UNION 으로 나누거나(UNION ALL 이면 뒤 조건에 앞 조건 제외를 붙여 중복 방지) 칼럼별 인덱스를 두세요(BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi 연결 기능을 준비 중입니다. 잠시 후 다시 시도하세요.",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "응답 시간이 초과되었습니다(5초). SQL 을 줄이거나 잠시 후 다시 시도하세요.",
       "RATE": "요청이 너무 많습니다. 1분 뒤에 다시 시도하세요.",
       "PAYLOAD_TOO_LARGE": "계획이 너무 커서 저장할 수 없습니다.",
-      "LINK_NOT_FOUND": "연결을 찾을 수 없습니다. 연결을 다시 고르세요."
+      "LINK_NOT_FOUND": "연결을 찾을 수 없습니다. 연결을 다시 고르세요.",
+      "TUN_EXISTS": "이 계획에는 이미 권고가 있습니다. 목록에서 확인하세요(다시 만들려면 삭제 후).",
+      "TUN_BAD_STATE": "지금 상태에서는 할 수 없는 처리입니다(다른 곳에서 이미 바뀌었을 수 있음). 목록을 새로 보세요.",
+      "TUN_PLAN_MISMATCH": "후 계획은 같은 SQL 의, 전 계획이 아닌 저장 계획이어야 합니다.",
+      "TUN_PLAN_STALE": "후 계획은 승인 이후에 저장한 계획이어야 합니다. 적용 뒤 실행계획을 다시 보고 저장하세요."
     }
   },
   "nav": {

@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — pilih hanya kolom yang Anda butuhkan (I/O ekstra, tidak ada indeks penutup).",
         "FUNC_ON_COLUMN": "Kolom filter {column} dibungkus dalam fungsi atau ekspresi, sehingga indeksnya tidak dapat digunakan — ubah konstanta sebagai gantinya.",
         "LEADING_WILDCARD": "LIKE dengan % di depan tidak dapat menggunakan indeks B-tree — pertimbangkan indeks GIN pg_trgm.",
-        "OR_DIFF_COLUMNS": "Kondisi pada kolom yang berbeda digabungkan dengan OR — pertimbangkan UNION ALL atau indeks per kolom.",
+        "OR_DIFF_COLUMNS": "Kondisi kolom berbeda digabungkan dengan OR — pertimbangkan untuk memisahkan dengan UNION (jika UNION ALL, tambahkan kondisi untuk mengecualikan duplikat) atau tinjau indeks per kolom.",
         "IMPLICIT_CAST": "{column} dibandingkan dengan angka yang dikutip — cocokkan jenis kolom dan konstanta (implicit cast).",
         "NOT_IN_SUBQUERY": "NOT IN (subquery) tidak mengembalikan apa pun ketika NULL ada dan lambat — gunakan NOT EXISTS.",
         "NO_WHERE": "Tidak ada klausa WHERE — pada tabel besar ini adalah pemindaian penuh (tambahkan kondisi atau LIMIT).",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "Saran penyetelan AI",
-      "badge": "Segera hadir",
-      "body": "Segera hadir (setelah prosedur persetujuan dan pengukuran dampak) — saran akan dihasilkan dari SQL dengan konstanta yang disamarkan dan dicatat sebagai diterapkan hanya setelah persetujuan DA dan dampak terukur."
+      "intro": "Pilih satu rencana tersimpan untuk membuat saran. Hanya SQL dan rencana dengan konstanta yang ditutupi sebagai ? yang dikirim (saran berbasis aturan jika tidak ada kunci atau gagal). Setelah pemilik tautan menyetujui, jalankan ulang explain untuk SQL yang sama, simpan, dan ukur dampaknya dengan rencana selanjutnya — baru kemudian dicatat sebagai diterapkan.",
+      "pickPlan": "Pilih rencana tersimpan untuk saran",
+      "create": "Buat saran",
+      "creating": "Membuat… (hingga 30 dtk)",
+      "noPlans": "Tidak ada rencana tersimpan. Lihat rencana explain di atas dan simpan.",
+      "note": "Satu saran per rencana. Hapus saran yang ada untuk membuat ulang. DDL hanya disarankan — terapkan di schema.pi.",
+      "empty": "Belum ada saran.",
+      "noItems": "Tidak ditemukan peningkatan untuk rencana ini.",
+      "cost": "Biaya sebelumnya",
+      "delete": "Hapus",
+      "prev": "Sebelumnya",
+      "next": "Berikutnya",
+      "page": "Halaman {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Aturan"
+      },
+      "sts": {
+        "RCMD": "Disarankan",
+        "APRV": "Disetujui",
+        "RJCT": "Ditolak",
+        "APLD": "Diterapkan"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "Penulisan ulang SQL",
+        "STATS": "Statistik",
+        "CONFIG": "Konfigurasi"
+      },
+      "approve": "Setujui",
+      "reject": "Tolak",
+      "measureHint": "Setelah menerapkan saran yang disetujui, lihat dan simpan kembali rencana explain untuk SQL yang sama. Kemudian pilih rencana selanjutnya dan ukur untuk mencatatnya sebagai diterapkan.",
+      "findAfter": "Temukan rencana selanjutnya",
+      "noAfter": "Tidak ada rencana untuk SQL yang sama yang disimpan setelah persetujuan.",
+      "reload": "Cari lagi",
+      "pickAfter": "Pilih rencana selanjutnya",
+      "measure": "Ukur dampak",
+      "effect": "Biaya {bfr} → {aft} ({pct}%)",
+      "better": "Meningkat",
+      "worse": "Memburuk",
+      "same": "Tidak ada perubahan",
+      "ddl": "DDL yang disarankan",
+      "rewrite": "SQL yang ditulis ulang",
+      "runDdl": "Jalankan DDL di schema.pi",
+      "copy": "Salin",
+      "copied": "Disalin",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Pindai penuh {relation} — buat indeks pada kolom filter {column} (ganti NN dalam nama indeks dengan nomor urut).",
+        "SEQ_SCAN_STATS": "Pindai penuh {relation} — periksa kolom filter dan pastikan statistik (ANALYZE) terbaru.",
+        "NESTED_LOOP": "Nested loop mengharapkan {rows} baris — perbarui statistik dan pertimbangkan indeks kunci gabungan atau hash join.",
+        "SORT_SPILL": "Pengurutan sekitar {kb} KB mungkin meluap ke disk — pertimbangkan untuk menaikkan work_mem sesi atau mengindeks kolom pengurutan.",
+        "SELECT_STAR": "Pilih hanya kolom yang Anda butuhkan alih-alih SELECT * (I/O lebih sedikit, indeks penutup mungkin).",
+        "FUNC_ON_COLUMN": "Pindahkan fungsi/ekspresi pada kolom filter {column} ke sisi konstanta (memungkinkan penggunaan indeks).",
+        "IMPLICIT_CAST": "Cocokkan tipe {column} dan konstanta (hapus cast implisit).",
+        "NOT_IN_SUBQUERY": "Tulis ulang NOT IN (subquery) sebagai NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Kondisi OR kolom yang berbeda harus dipisahkan dengan UNION (jika UNION ALL, tambahkan pengecualian kondisi sebelumnya ke kondisi berikutnya untuk mencegah duplikasi) atau gunakan indeks per kolom (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Fitur tautan schema.pi sedang disiapkan. Silakan coba lagi sebentar lagi.",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "Permintaan waktu habis (5 detik). Persingkat SQL atau coba lagi nanti.",
       "RATE": "Terlalu banyak permintaan. Coba lagi dalam satu menit.",
       "PAYLOAD_TOO_LARGE": "Rencana terlalu besar untuk disimpan.",
-      "LINK_NOT_FOUND": "Tautan tidak ditemukan. Silakan pilih tautan lagi."
+      "LINK_NOT_FOUND": "Tautan tidak ditemukan. Silakan pilih tautan lagi.",
+      "TUN_EXISTS": "Rencana ini sudah memiliki saran. Periksa daftar (hapus untuk membuat ulang).",
+      "TUN_BAD_STATE": "Tindakan ini tidak diizinkan dalam keadaan saat ini (mungkin telah berubah di tempat lain). Segarkan daftar.",
+      "TUN_PLAN_MISMATCH": "Rencana selanjutnya harus merupakan rencana tersimpan yang berbeda untuk SQL yang sama.",
+      "TUN_PLAN_STALE": "Rencana selanjutnya harus disimpan setelah persetujuan. Jalankan ulang explain setelah menerapkan dan simpan."
     }
   },
   "nav": {

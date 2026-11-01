@@ -1246,7 +1246,7 @@
         "SELECT_STAR": "SELECT * — wybierz tylko potrzebne kolumny (dodatkowe I/O, brak indeksu pokrywającego).",
         "FUNC_ON_COLUMN": "Kolumna filtrująca {column} jest opakowana w funkcję lub wyrażenie, więc jej indeks nie może być użyty — zamiast tego przekształć stałą.",
         "LEADING_WILDCARD": "LIKE z wiodącym % nie może używać indeksu B-tree — rozważ indeks pg_trgm GIN.",
-        "OR_DIFF_COLUMNS": "Warunki na różnych kolumnach są połączone operatorem OR — rozważ UNION ALL lub indeksy dla poszczególnych kolumn.",
+        "OR_DIFF_COLUMNS": "Warunki OR na różnych kolumnach — rozważ podział za pomocą UNION (dodaj warunek wykluczenia duplikatów, jeśli UNION ALL) lub przeglądanie indeksów dla poszczególnych kolumn.",
         "IMPLICIT_CAST": "{column} jest porównywane z liczbą w cudzysłowie — dopasuj typy kolumny i stałej (niejawne rzutowanie).",
         "NOT_IN_SUBQUERY": "NOT IN (podzapytanie) zwraca nic, gdy występują wartości NULL i jest wolne — użyj NOT EXISTS.",
         "NO_WHERE": "Brak klauzuli WHERE — na dużej tabeli jest to pełne skanowanie (dodaj warunek lub LIMIT).",
@@ -1276,8 +1276,63 @@
     },
     "ai": {
       "title": "Porady AI dotyczące strojenia",
-      "badge": "Wkrótce",
-      "body": "Wkrótce (po zatwierdzeniu i procedurach pomiaru wpływu) — porady będą generowane z SQL z zamaskowanymi stałymi i rejestrowane jako zastosowane dopiero po zatwierdzeniu DA i zmierzonym wpływie."
+      "intro": "Wybierz jeden zapisany plan, aby wygenerować poradę. Wysyłane są tylko SQL i plany ze stałymi zamaskowanymi jako ? (porada oparta na regułach, jeśli brak klucza lub w przypadku błędu). Po zatwierdzeniu przez właściciela linku, ponownie uruchom EXPLAIN dla tego samego SQL, zapisz go i zmierz wpływ z tym późniejszym planem — dopiero wtedy zostanie to zarejestrowane jako zastosowane.",
+      "pickPlan": "Wybierz zapisany plan dla porady",
+      "create": "Generuj poradę",
+      "creating": "Generowanie… (do 30 s)",
+      "noPlans": "Brak zapisanych planów. Wyświetl plan EXPLAIN powyżej i zapisz go.",
+      "note": "Jedna porada na plan. Usuń istniejącą poradę, aby wygenerować ponownie. DDL jest tylko sugerowane — zastosuj je w schema.pi.",
+      "empty": "Brak porad.",
+      "noItems": "Nie znaleziono ulepszeń dla tego planu.",
+      "cost": "Koszt przed",
+      "delete": "Usuń",
+      "prev": "Poprzedni",
+      "next": "Następny",
+      "page": "Strona {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Reguła"
+      },
+      "sts": {
+        "RCMD": "Zalecane",
+        "APRV": "Zatwierdzone",
+        "RJCT": "Odrzucone",
+        "APLD": "Zastosowane"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "Przepisanie SQL",
+        "STATS": "Statystyki",
+        "CONFIG": "Konfiguracja"
+      },
+      "approve": "Zatwierdź",
+      "reject": "Odrzuć",
+      "measureHint": "Po zastosowaniu zatwierdzonej porady, ponownie wyświetl i zapisz plan EXPLAIN dla tego samego SQL. Następnie wybierz ten późniejszy plan i zmierz, aby zarejestrować go jako zastosowany.",
+      "findAfter": "Znajdź późniejsze plany",
+      "noAfter": "Brak planu dla tego samego SQL zapisanego po zatwierdzeniu.",
+      "reload": "Szukaj ponownie",
+      "pickAfter": "Wybierz późniejszy plan",
+      "measure": "Zmierz wpływ",
+      "effect": "Koszt {bfr} → {aft} ({pct}%)",
+      "better": "Poprawiono",
+      "worse": "Pogorszono",
+      "same": "Bez zmian",
+      "ddl": "Sugerowane DDL",
+      "rewrite": "Przepisany SQL",
+      "runDdl": "Uruchom DDL w schema.pi",
+      "copy": "Kopiuj",
+      "copied": "Skopiowano",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Pełne skanowanie {relation} — utwórz indeks na kolumnie filtrującej {column} (zastąp NN w nazwie indeksu numerem sekwencyjnym).",
+        "SEQ_SCAN_STATS": "Pełne skanowanie {relation} — sprawdź kolumny filtrujące i upewnij się, że statystyki (ANALYZE) są aktualne.",
+        "NESTED_LOOP": "Pętla zagnieżdżona oczekuje {rows} wierszy — odśwież statystyki i rozważ indeksy kluczy łączenia lub hash join.",
+        "SORT_SPILL": "Sortowanie około {kb} KB może wylać się na dysk — rozważ zwiększenie work_mem sesji lub indeksowanie kolumn sortowania.",
+        "SELECT_STAR": "Wybierz tylko potrzebne kolumny zamiast SELECT * (mniej I/O, możliwe indeksy pokrywające).",
+        "FUNC_ON_COLUMN": "Przenieś funkcję/wyrażenie na kolumnie filtrującej {column} na stronę stałej (umożliwia użycie indeksu).",
+        "IMPLICIT_CAST": "Dopasuj typy {column} i stałej (usuń niejawne rzutowanie).",
+        "NOT_IN_SUBQUERY": "Przepisz NOT IN (podzapytanie) jako NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Warunki OR na różnych kolumnach powinny być rozdzielone za pomocą UNION (dodaj warunek wykluczenia duplikatów do tego drugiego, jeśli UNION ALL) lub mieć indeksy dla poszczególnych kolumn (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Funkcja linkowania schema.pi jest w przygotowaniu. Spróbuj ponownie wkrótce.",
@@ -1289,7 +1344,11 @@
       "TIMEOUT": "Żądanie przekroczyło limit czasu (5 sekund). Skróć SQL lub spróbuj ponownie później.",
       "RATE": "Zbyt wiele żądań. Spróbuj ponownie za minutę.",
       "PAYLOAD_TOO_LARGE": "Plan jest zbyt duży, aby go zapisać.",
-      "LINK_NOT_FOUND": "Link nie znaleziony. Wybierz link ponownie."
+      "LINK_NOT_FOUND": "Link nie znaleziony. Wybierz link ponownie.",
+      "TUN_EXISTS": "Ten plan ma już poradę. Sprawdź listę (usuń ją, aby wygenerować ponownie).",
+      "TUN_BAD_STATE": "Ta akcja jest niedozwolona w bieżącym stanie (mogła zostać zmieniona gdzie indziej). Odśwież listę.",
+      "TUN_PLAN_MISMATCH": "Późniejszy plan musi być innym zapisanym planem dla tego samego SQL.",
+      "TUN_PLAN_STALE": "Późniejszy plan musi być zapisany po zatwierdzeniu. Ponownie uruchom EXPLAIN po zastosowaniu i zapisz go."
     }
   },
   "nav": {

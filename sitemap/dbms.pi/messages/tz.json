@@ -1256,7 +1256,7 @@
         "SELECT_STAR": "SELECT * — chagua tu safu unazohitaji (I/O ya ziada, hakuna faharisi inayofunika).",
         "FUNC_ON_COLUMN": "Safu ya kichungi {column} imefungwa katika kazi au usemi, kwa hivyo faharisi yake haiwezi kutumika — badilisha mara kwa mara badala yake.",
         "LEADING_WILDCARD": "LIKE yenye % inayoongoza haiwezi kutumia faharisi ya B-tree — zingatia faharisi ya pg_trgm GIN.",
-        "OR_DIFF_COLUMNS": "Masharti kwenye safu tofauti yameunganishwa na OR — zingatia UNION ALL au faharisi za safu-kwa-safu.",
+        "OR_DIFF_COLUMNS": "Masharti ya OR kwenye safu tofauti — zingatia kugawanya na UNION (ongeza sharti la kutengwa kwa nakala ikiwa UNION ALL) au kukagua faharisi za kila safu.",
         "IMPLICIT_CAST": "{column} inalinganishwa na nambari iliyonukuliwa — linganisha safu na aina za mara kwa mara (utupaji usio wazi).",
         "NOT_IN_SUBQUERY": "NOT IN (subquery) hairudishi chochote wakati NULL zipo na ni polepole — tumia NOT EXISTS.",
         "NO_WHERE": "Hakuna kifungu cha WHERE — kwenye jedwali kubwa huu ni uchanganuzi kamili (ongeza sharti au LIMIT).",
@@ -1286,8 +1286,63 @@
     },
     "ai": {
       "title": "Ushauri wa kurekebisha AI",
-      "badge": "Inakuja hivi karibuni",
-      "body": "Inakuja hivi karibuni (baada ya idhini na taratibu za kupima athari) — ushauri utatolewa kutoka SQL na vigezo vilivyofichwa na kurekodiwa kama ilivyotumika tu baada ya idhini ya DA na athari iliyopimwa."
+      "intro": "Chagua mpango mmoja uliookolewa ili kutoa ushauri. SQL na mipango pekee iliyo na vigezo vilivyofichwa kama ? hutumwa (ushauri unaotegemea sheria ikiwa hakuna ufunguo au ikishindwa). Baada ya mmiliki wa kiungo kuidhinisha, endesha tena maelezo kwa SQL hiyo hiyo, ihifadhi, na pima athari na mpango huo wa baadaye — ndipo tu inaporekodiwa kama imetumika.",
+      "pickPlan": "Chagua mpango uliookolewa kwa ushauri",
+      "create": "Tengeneza ushauri",
+      "creating": "Inatengeneza… (hadi sekunde 30)",
+      "noPlans": "Hakuna mipango iliyookolewa. Tazama mpango wa maelezo hapo juu na uuhifadhi.",
+      "note": "Ushauri mmoja kwa kila mpango. Futa ushauri uliopo ili kutengeneza upya. DDL inapendekezwa tu — itumie katika schema.pi.",
+      "empty": "Bado hakuna ushauri.",
+      "noItems": "Hakuna maboresho yaliyopatikana kwa mpango huu.",
+      "cost": "Gharama ya awali",
+      "delete": "Futa",
+      "prev": "Iliyotangulia",
+      "next": "Inayofuata",
+      "page": "Ukurasa {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Sheria"
+      },
+      "sts": {
+        "RCMD": "Imeshauriwa",
+        "APRV": "Imeidhinishwa",
+        "RJCT": "Imekataliwa",
+        "APLD": "Imetumika"
+      },
+      "kind": {
+        "INDEX": "Faharisi",
+        "REWRITE": "Uandishi upya wa SQL",
+        "STATS": "Takwimu",
+        "CONFIG": "Usanidi"
+      },
+      "approve": "Idhinisha",
+      "reject": "Kataa",
+      "measureHint": "Baada ya kutumia ushauri ulioidhinishwa, tazama na uhifadhi mpango wa maelezo kwa SQL hiyo hiyo tena. Kisha chagua mpango huo wa baadaye na upime ili kuurekodi kama umetumika.",
+      "findAfter": "Tafuta mipango ya baadaye",
+      "noAfter": "Hakuna mpango wa SQL hiyo hiyo uliookolewa baada ya kuidhinishwa.",
+      "reload": "Tafuta tena",
+      "pickAfter": "Chagua mpango wa baadaye",
+      "measure": "Pima athari",
+      "effect": "Gharama {bfr} → {aft} ({pct}%)",
+      "better": "Imeboreshwa",
+      "worse": "Mbaya zaidi",
+      "same": "Hakuna mabadiliko",
+      "ddl": "DDL iliyopendekezwa",
+      "rewrite": "SQL iliyoandikwa upya",
+      "runDdl": "Endesha DDL katika schema.pi",
+      "copy": "Nakili",
+      "copied": "Imenakiliwa",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Uchanganuzi kamili wa {relation} — unda faharisi kwenye safu wima ya kichujio {column} (badilisha NN katika jina la faharisi na nambari ya mfuatano).",
+        "SEQ_SCAN_STATS": "Uchanganuzi kamili wa {relation} — angalia safu wima za kichujio na uhakikishe takwimu (ANALYZE) ni za sasa.",
+        "NESTED_LOOP": "Kitanzi kilichowekwa ndani kinatarajia safu {rows} — onyesha upya takwimu na uzingatie faharisi za ufunguo wa kuunganisha au kuunganisha kwa heshi.",
+        "SORT_SPILL": "Upangaji wa takriban {kb} KB unaweza kumwagika kwenye diski — zingatia kuongeza work_mem ya kikao au kuweka faharisi kwenye safu wima za upangaji.",
+        "SELECT_STAR": "Chagua safu wima unazohitaji tu badala ya SELECT * (I/O kidogo, faharisi za kufunika zinawezekana).",
+        "FUNC_ON_COLUMN": "Sogeza kitendakazi/kielelezo kwenye safu wima ya kichujio {column} hadi upande wa kudumu (huwezesha matumizi ya faharisi).",
+        "IMPLICIT_CAST": "Linganisha aina za {column} na kigezo (ondoa ubadilishaji usio wazi).",
+        "NOT_IN_SUBQUERY": "Andika upya NOT IN (subquery) kama NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Masharti ya OR kwenye safu tofauti yanapaswa kugawanywa na UNION (ongeza sharti la kutengwa kwa nakala kwa la mwisho ikiwa UNION ALL) au kuwa na faharisi za kila safu (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Kipengele cha kiungo cha schema.pi kinaandaliwa. Tafadhali jaribu tena baada ya muda mfupi.",
@@ -1299,7 +1354,11 @@
       "TIMEOUT": "Ombi limeisha muda (sekunde 5). Fupisha SQL au jaribu tena baadaye.",
       "RATE": "Maombi mengi sana. Jaribu tena baada ya dakika moja.",
       "PAYLOAD_TOO_LARGE": "Mpango ni mkubwa sana kuhifadhi.",
-      "LINK_NOT_FOUND": "Kiungo hakipatikani. Tafadhali chagua kiungo tena."
+      "LINK_NOT_FOUND": "Kiungo hakipatikani. Tafadhali chagua kiungo tena.",
+      "TUN_EXISTS": "Mpango huu tayari una ushauri. Angalia orodha (ifute ili kutengeneza upya).",
+      "TUN_BAD_STATE": "Kitendo hiki hakiruhusiwi katika hali ya sasa (kinaweza kuwa kimebadilika mahali pengine). Onyesha upya orodha.",
+      "TUN_PLAN_MISMATCH": "Mpango wa baadaye lazima uwe mpango tofauti uliookolewa kwa SQL hiyo hiyo.",
+      "TUN_PLAN_STALE": "Mpango wa baadaye lazima uhifadhiwe baada ya kuidhinishwa. Endesha tena maelezo baada ya kutumia na uihifadhi."
     }
   },
   "nav": {

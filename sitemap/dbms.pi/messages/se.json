@@ -1250,7 +1250,7 @@
         "SELECT_STAR": "SELECT * – välj endast de kolumner du behöver (extra I/O, inget täckande index).",
         "FUNC_ON_COLUMN": "Filterkolumnen {column} är insvept i en funktion eller ett uttryck, så dess index kan inte användas – transformera konstanten istället.",
         "LEADING_WILDCARD": "LIKE med ett inledande % kan inte använda ett B-trädindex – överväg ett pg_trgm GIN-index.",
-        "OR_DIFF_COLUMNS": "Villkor på olika kolumner kombineras med OR – överväg UNION ALL eller per-kolumnindex.",
+        "OR_DIFF_COLUMNS": "OR-villkor på olika kolumner — överväg att dela med UNION (lägg till ett villkor för att exkludera dubbletter om UNION ALL) eller granska index per kolumn.",
         "IMPLICIT_CAST": "{column} jämförs med ett citerat nummer – matcha kolumn- och konstanttyperna (implicit cast).",
         "NOT_IN_SUBQUERY": "NOT IN (subquery) returnerar ingenting när NULL finns och är långsamt – använd NOT EXISTS.",
         "NO_WHERE": "Ingen WHERE-klausul – på en stor tabell är detta en fullständig skanning (lägg till ett villkor eller LIMIT).",
@@ -1280,8 +1280,63 @@
     },
     "ai": {
       "title": "AI-justeringsråd",
-      "badge": "Kommer snart",
-      "body": "Kommer snart (efter godkännande och procedurer för effektmätning) – råd kommer att genereras från SQL med maskerade konstanter och registreras som tillämpade först efter DA-godkännande och mätt effekt."
+      "intro": "Välj en sparad plan för att generera råd. Endast SQL och planer med konstanter maskerade som ? skickas (regelbaserade råd om ingen nyckel eller vid fel). Efter att länkägaren godkänt, kör explain igen för samma SQL, spara den och mät effekten med den senare planen – först då registreras den som tillämpad.",
+      "pickPlan": "Välj en sparad plan för råd",
+      "create": "Generera råd",
+      "creating": "Genererar… (upp till 30 s)",
+      "noPlans": "Inga sparade planer. Visa en explain-plan ovan och spara den.",
+      "note": "Ett råd per plan. Radera befintliga råd för att återskapa. DDL föreslås endast – tillämpa det i schema.pi.",
+      "empty": "Inga råd ännu.",
+      "noItems": "Inga förbättringar hittades för denna plan.",
+      "cost": "Före kostnad",
+      "delete": "Radera",
+      "prev": "Föregående",
+      "next": "Nästa",
+      "page": "Sida {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Regel"
+      },
+      "sts": {
+        "RCMD": "Rekommenderad",
+        "APRV": "Godkänd",
+        "RJCT": "Avvisad",
+        "APLD": "Tillämpad"
+      },
+      "kind": {
+        "INDEX": "Index",
+        "REWRITE": "SQL-omskrivning",
+        "STATS": "Statistik",
+        "CONFIG": "Konfiguration"
+      },
+      "approve": "Godkänn",
+      "reject": "Avvisa",
+      "measureHint": "Efter att ha tillämpat de godkända råden, visa och spara explain-planen för samma SQL igen. Välj sedan den senare planen och mät för att registrera den som tillämpad.",
+      "findAfter": "Hitta senare planer",
+      "noAfter": "Ingen plan för samma SQL sparad efter godkännande.",
+      "reload": "Sök igen",
+      "pickAfter": "Välj den senare planen",
+      "measure": "Mät påverkan",
+      "effect": "Kostnad {bfr} → {aft} ({pct}%)",
+      "better": "Förbättrad",
+      "worse": "Sämre",
+      "same": "Ingen förändring",
+      "ddl": "Föreslagen DDL",
+      "rewrite": "Omskriven SQL",
+      "runDdl": "Kör DDL i schema.pi",
+      "copy": "Kopiera",
+      "copied": "Kopierad",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Fullständig skanning av {relation} – skapa ett index på filterkolumnen {column} (ersätt NN i indexnamnet med ett sekvensnummer).",
+        "SEQ_SCAN_STATS": "Fullständig skanning av {relation} – kontrollera filterkolumnerna och se till att statistiken (ANALYZE) är aktuell.",
+        "NESTED_LOOP": "Kapslad loop förväntar sig {rows} rader – uppdatera statistik och överväg join-nyckelindex eller en hash-join.",
+        "SORT_SPILL": "Sortering av cirka {kb} KB kan spillas till disk – överväg att höja session work_mem eller indexera sorteringskolumnerna.",
+        "SELECT_STAR": "Välj endast de kolumner du behöver istället för SELECT * (mindre I/O, täckande index möjliga).",
+        "FUNC_ON_COLUMN": "Flytta funktionen/uttrycket på filterkolumnen {column} till konstantsidan (möjliggör indexanvändning).",
+        "IMPLICIT_CAST": "Matcha typerna för {column} och konstanten (ta bort den implicita typomvandlingen).",
+        "NOT_IN_SUBQUERY": "Skriv om NOT IN (underfråga) som NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "OR-villkor på olika kolumner bör delas med UNION (lägg till ett villkor för att exkludera dubbletter till det senare om UNION ALL) eller ha index per kolumn (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi-länkfunktionen förbereds. Försök igen snart.",
@@ -1293,7 +1348,11 @@
       "TIMEOUT": "Begäran tog för lång tid (5 sekunder). Förkorta SQL eller försök igen senare.",
       "RATE": "För många förfrågningar. Försök igen om en minut.",
       "PAYLOAD_TOO_LARGE": "Planen är för stor för att spara.",
-      "LINK_NOT_FOUND": "Länk hittades inte. Välj länken igen."
+      "LINK_NOT_FOUND": "Länk hittades inte. Välj länken igen.",
+      "TUN_EXISTS": "Denna plan har redan råd. Kontrollera listan (radera den för att återskapa).",
+      "TUN_BAD_STATE": "Denna åtgärd är inte tillåten i det aktuella tillståndet (det kan ha ändrats någon annanstans). Uppdatera listan.",
+      "TUN_PLAN_MISMATCH": "Den senare planen måste vara en annan sparad plan för samma SQL.",
+      "TUN_PLAN_STALE": "Den senare planen måste sparas efter godkännande. Kör explain igen efter tillämpning och spara den."
     }
   },
   "nav": {

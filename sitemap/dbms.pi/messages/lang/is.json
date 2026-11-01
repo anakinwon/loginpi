@@ -1247,7 +1247,7 @@
         "SELECT_STAR": "SELECT * — veldu aðeins dálkana sem þú þarft (auka I/O, engin yfirgripsmikil vísitala).",
         "FUNC_ON_COLUMN": "Síunardálkurinn {column} er vafinn í fall eða tjáningu, svo vísitala hans er ekki hægt að nota — umbreyttu fastanum í staðinn.",
         "LEADING_WILDCARD": "LIKE með leiðandi % getur ekki notað B-tré vísitölu — íhugaðu pg_trgm GIN vísitölu.",
-        "OR_DIFF_COLUMNS": "Skilyrði á mismunandi dálkum eru sameinuð með OR — íhugaðu UNION ALL eða vísitölur á hverjum dálki.",
+        "OR_DIFF_COLUMNS": "OR-skilyrði á mismunandi dálkum — íhugaðu að skipta með UNION (bættu við skilyrði um útilokun tvítekninga ef UNION ALL) eða fara yfir vísitölur fyrir hvern dálk.",
         "IMPLICIT_CAST": "{column} er borið saman við tölustaf í gæsalöppum — samsvaraðu dálka- og fastagildistegundum (óbein steypa).",
         "NOT_IN_SUBQUERY": "NOT IN (undirfyrirspurn) skilar engu þegar NULLs eru til staðar og er hægt — notaðu NOT EXISTS.",
         "NO_WHERE": "Engin WHERE ákvæði — á stórri töflu er þetta full skönnun (bættu við skilyrði eða LIMIT).",
@@ -1277,8 +1277,63 @@
     },
     "ai": {
       "title": "AI ráðleggingar um stillingar",
-      "badge": "Kemur bráðum",
-      "body": "Kemur bráðum (eftir samþykki og verklagsreglur um mælingu á áhrifum) — ráðleggingar verða búnar til úr SQL með dulbúnum föstum og skráðar sem beittar aðeins eftir samþykki DA og mæld áhrif."
+      "intro": "Veldu eina vistaða áætlun til að búa til ráðgjöf. Aðeins SQL og áætlanir með föstum gildum dulbúnum sem ? eru sendar (reglubundin ráðgjöf ef enginn lykill eða við bilun). Eftir að eigandi tengilsins samþykkir, keyrðu explain aftur fyrir sama SQL, vistaðu það og mældu áhrifin með þeirri síðari áætlun — aðeins þá er það skráð sem beitt.",
+      "pickPlan": "Veldu vistaða áætlun fyrir ráðgjöf",
+      "create": "Búa til ráðgjöf",
+      "creating": "Bý til… (allt að 30 sek.)",
+      "noPlans": "Engar vistaðar áætlanir. Skoðaðu explain áætlun hér að ofan og vistaðu hana.",
+      "note": "Ein ráðgjöf á hverja áætlun. Eyða núverandi ráðgjöf til að endurnýja. DDL er aðeins lagt til — beittu því í schema.pi.",
+      "empty": "Engin ráðgjöf ennþá.",
+      "noItems": "Engar endurbætur fundust fyrir þessa áætlun.",
+      "cost": "Fyrri kostnaður",
+      "delete": "Eyða",
+      "prev": "Fyrri",
+      "next": "Næsta",
+      "page": "Síða {page}",
+      "engn": {
+        "AI": "Gervigreind",
+        "RULE": "Regla"
+      },
+      "sts": {
+        "RCMD": "Ráðlagt",
+        "APRV": "Samþykkt",
+        "RJCT": "Hafnað",
+        "APLD": "Beitt"
+      },
+      "kind": {
+        "INDEX": "Vísitala",
+        "REWRITE": "SQL endurskrifa",
+        "STATS": "Tölfræði",
+        "CONFIG": "Stillingar"
+      },
+      "approve": "Samþykkja",
+      "reject": "Hafna",
+      "measureHint": "Eftir að hafa beitt samþykktri ráðgjöf, skoðaðu og vistaðu explain áætlunina fyrir sama SQL aftur. Veldu síðan þá síðari áætlun og mældu til að skrá hana sem beitta.",
+      "findAfter": "Finna síðari áætlanir",
+      "noAfter": "Engin áætlun fyrir sama SQL vistuð eftir samþykkt.",
+      "reload": "Leita aftur",
+      "pickAfter": "Veldu síðari áætlunina",
+      "measure": "Mæla áhrif",
+      "effect": "Kostnaður {bfr} → {aft} ({pct}%)",
+      "better": "Bætt",
+      "worse": "Verra",
+      "same": "Engin breyting",
+      "ddl": "Tillaga DDL",
+      "rewrite": "Endurskrifað SQL",
+      "runDdl": "Keyra DDL í schema.pi",
+      "copy": "Afrita",
+      "copied": "Afritað",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Full skönnun á {relation} — búðu til vísitölu á síunarsúlu {column} (skiptu NN í vísitöluheiti út fyrir raðnúmer).",
+        "SEQ_SCAN_STATS": "Full skönnun á {relation} — athugaðu síunarsúlurnar og vertu viss um að tölfræði (ANALYZE) sé uppfærð.",
+        "NESTED_LOOP": "Innbyggð lykkja býst við {rows} röðum — endurnýjaðu tölfræði og íhugaðu join-key vísitölur eða hash join.",
+        "SORT_SPILL": "Röðun um {kb} KB gæti farið yfir á disk — íhugaðu að hækka session work_mem eða vísitölu á röðunarsúlunum.",
+        "SELECT_STAR": "Veldu aðeins þær súlur sem þú þarft í stað SELECT * (minna I/O, mögulegar covering vísitölur).",
+        "FUNC_ON_COLUMN": "Færðu fallið/segðina á síunarsúlu {column} yfir á fasta hliðina (gerir vísitölu notkun kleift).",
+        "IMPLICIT_CAST": "Passaðu saman tegundir {column} og fasta gildisins (fjarlægðu óbeina gerðarbreytingu).",
+        "NOT_IN_SUBQUERY": "Endurskrifaðu NOT IN (undirfyrirspurn) sem NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "OR skilyrði á mismunandi dálkum ættu að vera skipt með UNION (bættu við skilyrði um útilokun tvítekninga við hið síðara ef UNION ALL) eða hafa vísitölur fyrir hvern dálk (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi tengingaraðgerðin er í undirbúningi. Vinsamlegast reyndu aftur eftir smá stund.",
@@ -1290,7 +1345,11 @@
       "TIMEOUT": "Beiðnin rann út á tíma (5 sekúndur). Styttu SQL eða reyndu aftur síðar.",
       "RATE": "Of margar beiðnir. Reyndu aftur eftir eina mínútu.",
       "PAYLOAD_TOO_LARGE": "Áætlunin er of stór til að vista.",
-      "LINK_NOT_FOUND": "Tengill fannst ekki. Vinsamlegast veldu tengilinn aftur."
+      "LINK_NOT_FOUND": "Tengill fannst ekki. Vinsamlegast veldu tengilinn aftur.",
+      "TUN_EXISTS": "Þessi áætlun hefur þegar ráðgjöf. Athugaðu listann (eyddu henni til að endurnýja).",
+      "TUN_BAD_STATE": "Þessi aðgerð er ekki leyfð í núverandi ástandi (hún gæti hafa breyst annars staðar). Endurnýjaðu listann.",
+      "TUN_PLAN_MISMATCH": "Síðari áætlunin verður að vera önnur vistuð áætlun fyrir sama SQL.",
+      "TUN_PLAN_STALE": "Síðari áætlunin verður að vera vistuð eftir samþykkt. Keyrðu explain aftur eftir að hafa beitt og vistaðu hana."
     }
   },
   "nav": {

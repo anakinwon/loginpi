@@ -1256,7 +1256,7 @@
         "SELECT_STAR": "SELECT * — izberite samo stolpce, ki jih potrebujete (dodatni I/O, brez pokrivnega indeksa).",
         "FUNC_ON_COLUMN": "Filtrirni stolpec {column} je ovit v funkcijo ali izraz, zato njegovega indeksa ni mogoče uporabiti — namesto tega transformirajte konstanto.",
         "LEADING_WILDCARD": "LIKE z vodilnim % ne more uporabiti B-drevesnega indeksa — razmislite o pg_trgm GIN indeksu.",
-        "OR_DIFF_COLUMNS": "Pogoji na različnih stolpcih so združeni z OR — razmislite o UNION ALL ali indeksih za posamezne stolpce.",
+        "OR_DIFF_COLUMNS": "Pogoji OR na različnih stolpcih — razmislite o razdelitvi z UNION (dodajte pogoj izključitve podvojitev, če je UNION ALL) ali pregledu indeksov za posamezne stolpce.",
         "IMPLICIT_CAST": "{column} se primerja z navedenim številom — uskladite tipe stolpca in konstante (implicitna pretvorba).",
         "NOT_IN_SUBQUERY": "NOT IN (podpoizvedba) ne vrne ničesar, ko so prisotni NULL-i, in je počasen — uporabite NOT EXISTS.",
         "NO_WHERE": "Ni klavzule WHERE — na veliki tabeli je to polno skeniranje (dodajte pogoj ali LIMIT).",
@@ -1286,8 +1286,63 @@
     },
     "ai": {
       "title": "AI nasveti za optimizacijo",
-      "badge": "Kmalu na voljo",
-      "body": "Kmalu na voljo (po postopkih odobritve in merjenja vpliva) — nasveti bodo generirani iz SQL z maskiranimi konstantami in zabeleženi kot uporabljeni šele po odobritvi DA in izmerjenem vplivu."
+      "intro": "Izberite en shranjen načrt za generiranje nasvetov. Poslani so samo SQL in načrti s konstantami, maskiranimi kot ? (nasveti na podlagi pravil, če ni ključa ali ob napaki). Ko lastnik povezave odobri, znova zaženite razlago za isti SQL, jo shranite in izmerite vpliv s tem kasnejšim načrtom – šele takrat se zabeleži kot uporabljeno.",
+      "pickPlan": "Izberite shranjen načrt za nasvet",
+      "create": "Ustvari nasvet",
+      "creating": "Ustvarjanje… (do 30 s)",
+      "noPlans": "Ni shranjenih načrtov. Oglejte si načrt razlage zgoraj in ga shranite.",
+      "note": "En nasvet na načrt. Izbrišite obstoječi nasvet za ponovno generiranje. DDL je samo predlagan – uporabite ga v schema.pi.",
+      "empty": "Še ni nasvetov.",
+      "noItems": "Za ta načrt niso bile najdene izboljšave.",
+      "cost": "Pred stroški",
+      "delete": "Izbriši",
+      "prev": "Prejšnja",
+      "next": "Naslednja",
+      "page": "Stran {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Pravilo"
+      },
+      "sts": {
+        "RCMD": "Svetovano",
+        "APRV": "Odobreno",
+        "RJCT": "Zavrnjeno",
+        "APLD": "Uporabljeno"
+      },
+      "kind": {
+        "INDEX": "Indeks",
+        "REWRITE": "Prepis SQL",
+        "STATS": "Statistika",
+        "CONFIG": "Konfiguracija"
+      },
+      "approve": "Odobri",
+      "reject": "Zavrni",
+      "measureHint": "Po uporabi odobrenega nasveta si znova oglejte in shranite načrt razlage za isti SQL. Nato izberite ta kasnejši načrt in izmerite, da ga zabeležite kot uporabljeno.",
+      "findAfter": "Poišči kasnejše načrte",
+      "noAfter": "Po odobritvi ni shranjenega načrta za isti SQL.",
+      "reload": "Znova išči",
+      "pickAfter": "Izberite kasnejši načrt",
+      "measure": "Izmeri vpliv",
+      "effect": "Stroški {bfr} → {aft} ({pct}%)",
+      "better": "Izboljšano",
+      "worse": "Slabše",
+      "same": "Brez sprememb",
+      "ddl": "Predlagan DDL",
+      "rewrite": "Prepisan SQL",
+      "runDdl": "Zaženi DDL v schema.pi",
+      "copy": "Kopiraj",
+      "copied": "Kopirano",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Popolno skeniranje {relation} — ustvarite indeks na filtrirnem stolpcu {column} (NN v imenu indeksa zamenjajte z zaporedno številko).",
+        "SEQ_SCAN_STATS": "Popolno skeniranje {relation} — preverite filtrirne stolpce in se prepričajte, da so statistike (ANALYZE) posodobljene.",
+        "NESTED_LOOP": "Ugnezdena zanka pričakuje {rows} vrstic — osvežite statistiko in razmislite o indeksih združitvenih ključev ali zgoščenem združevanju.",
+        "SORT_SPILL": "Razvrščanje približno {kb} KB se lahko prelije na disk — razmislite o povečanju work_mem seje ali indeksiranju stolpcev za razvrščanje.",
+        "SELECT_STAR": "Izberite samo stolpce, ki jih potrebujete, namesto SELECT * (manj V/I, možni pokrivni indeksi).",
+        "FUNC_ON_COLUMN": "Premaknite funkcijo/izraz na filtrirnem stolpcu {column} na konstantno stran (omogoča uporabo indeksa).",
+        "IMPLICIT_CAST": "Ujemite tipe {column} in konstante (odstranite implicitno pretvorbo).",
+        "NOT_IN_SUBQUERY": "Prepišite NOT IN (podpoizvedba) kot NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Pogoje OR na različnih stolpcih je treba razdeliti z UNION (dodajte pogoj izključitve podvojitev k slednjemu, če je UNION ALL) ali imeti indekse za posamezne stolpce (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Funkcija povezave schema.pi se pripravlja. Poskusite znova čez nekaj časa.",
@@ -1299,7 +1354,11 @@
       "TIMEOUT": "Zahteva je potekla (5 sekund). Skrajšajte SQL ali poskusite znova pozneje.",
       "RATE": "Preveč zahtev. Poskusite znova čez minuto.",
       "PAYLOAD_TOO_LARGE": "Načrt je prevelik za shranjevanje.",
-      "LINK_NOT_FOUND": "Povezave ni mogoče najti. Ponovno izberite povezavo."
+      "LINK_NOT_FOUND": "Povezave ni mogoče najti. Ponovno izberite povezavo.",
+      "TUN_EXISTS": "Ta načrt že ima nasvet. Preverite seznam (izbrišite ga za ponovno generiranje).",
+      "TUN_BAD_STATE": "To dejanje ni dovoljeno v trenutnem stanju (morda se je spremenilo drugje). Osvežite seznam.",
+      "TUN_PLAN_MISMATCH": "Kasnejši načrt mora biti drugačen shranjen načrt za isti SQL.",
+      "TUN_PLAN_STALE": "Kasnejši načrt mora biti shranjen po odobritvi. Znova zaženite razlago po uporabi in jo shranite."
     }
   },
   "nav": {

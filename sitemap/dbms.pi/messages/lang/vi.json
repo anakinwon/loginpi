@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — chỉ chọn các cột bạn cần (I/O thừa, không có chỉ mục bao phủ).",
         "FUNC_ON_COLUMN": "Cột bộ lọc {column} được bao bọc trong một hàm hoặc biểu thức, vì vậy chỉ mục của nó không thể được sử dụng — thay vào đó hãy chuyển đổi hằng số.",
         "LEADING_WILDCARD": "LIKE với % đứng đầu không thể sử dụng chỉ mục B-tree — hãy xem xét chỉ mục GIN pg_trgm.",
-        "OR_DIFF_COLUMNS": "Các điều kiện trên các cột khác nhau được kết hợp với OR — hãy xem xét UNION ALL hoặc các chỉ mục trên mỗi cột.",
+        "OR_DIFF_COLUMNS": "Các điều kiện cột khác nhau được nhóm bằng OR — hãy xem xét tách UNION (thêm điều kiện loại trừ trùng lặp nếu là UNION ALL) hoặc các chỉ mục theo cột.",
         "IMPLICIT_CAST": "{column} được so sánh với một số được trích dẫn — khớp các kiểu cột và hằng số (chuyển đổi kiểu ngầm định).",
         "NOT_IN_SUBQUERY": "NOT IN (truy vấn con) không trả về gì khi có giá trị NULL và chậm — hãy sử dụng NOT EXISTS.",
         "NO_WHERE": "Không có mệnh đề WHERE — trên một bảng lớn, đây là một quét toàn bộ (thêm một điều kiện hoặc LIMIT).",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "Lời khuyên điều chỉnh AI",
-      "badge": "Sắp ra mắt",
-      "body": "Sắp ra mắt (sau khi được phê duyệt và các thủ tục đo lường tác động) — lời khuyên sẽ được tạo từ SQL với các hằng số được che và chỉ được ghi nhận là đã áp dụng sau khi DA phê duyệt và tác động được đo lường."
+      "intro": "Chọn một kế hoạch đã lưu để tạo đề xuất. Chỉ SQL và các kế hoạch có hằng số được che bằng dấu ? mới được gửi (đề xuất dựa trên quy tắc nếu không có khóa hoặc khi thất bại). Sau khi chủ sở hữu liên kết chấp thuận, hãy chạy lại giải thích cho cùng một SQL, lưu nó và đo lường tác động với kế hoạch sau đó — chỉ khi đó nó mới được ghi nhận là đã áp dụng.",
+      "pickPlan": "Chọn một kế hoạch đã lưu để đề xuất",
+      "create": "Tạo đề xuất",
+      "creating": "Đang tạo… (tối đa 30 giây)",
+      "noPlans": "Không có kế hoạch nào được lưu. Xem một kế hoạch giải thích ở trên và lưu nó.",
+      "note": "Mỗi kế hoạch chỉ có một đề xuất. Xóa đề xuất hiện có để tạo lại. DDL chỉ được đề xuất — áp dụng nó trong schema.pi.",
+      "empty": "Chưa có đề xuất nào.",
+      "noItems": "Không tìm thấy cải tiến nào cho kế hoạch này.",
+      "cost": "Chi phí trước",
+      "delete": "Xóa",
+      "prev": "Trước",
+      "next": "Tiếp",
+      "page": "Trang {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Quy tắc"
+      },
+      "sts": {
+        "RCMD": "Đã đề xuất",
+        "APRV": "Đã chấp thuận",
+        "RJCT": "Đã từ chối",
+        "APLD": "Đã áp dụng"
+      },
+      "kind": {
+        "INDEX": "Chỉ mục",
+        "REWRITE": "Viết lại SQL",
+        "STATS": "Thống kê",
+        "CONFIG": "Cấu hình"
+      },
+      "approve": "Chấp thuận",
+      "reject": "Từ chối",
+      "measureHint": "Sau khi áp dụng đề xuất đã được chấp thuận, hãy xem và lưu lại kế hoạch giải thích cho cùng một SQL. Sau đó chọn kế hoạch sau đó và đo lường để ghi nhận là đã áp dụng.",
+      "findAfter": "Tìm kế hoạch sau",
+      "noAfter": "Không có kế hoạch nào cho cùng một SQL được lưu sau khi chấp thuận.",
+      "reload": "Tìm lại",
+      "pickAfter": "Chọn kế hoạch sau",
+      "measure": "Đo lường tác động",
+      "effect": "Chi phí {bfr} → {aft} ({pct}%)",
+      "better": "Cải thiện",
+      "worse": "Tệ hơn",
+      "same": "Không thay đổi",
+      "ddl": "DDL được đề xuất",
+      "rewrite": "SQL đã viết lại",
+      "runDdl": "Chạy DDL trong schema.pi",
+      "copy": "Sao chép",
+      "copied": "Đã sao chép",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Quét toàn bộ {relation} — tạo chỉ mục trên cột bộ lọc {column} (thay thế NN trong tên chỉ mục bằng số thứ tự).",
+        "SEQ_SCAN_STATS": "Quét toàn bộ {relation} — kiểm tra các cột bộ lọc và đảm bảo thống kê (ANALYZE) là mới nhất.",
+        "NESTED_LOOP": "Vòng lặp lồng nhau dự kiến {rows} hàng — làm mới thống kê và xem xét các chỉ mục khóa nối hoặc nối băm.",
+        "SORT_SPILL": "Sắp xếp khoảng {kb} KB có thể tràn ra đĩa — xem xét tăng work_mem của phiên hoặc lập chỉ mục các cột sắp xếp.",
+        "SELECT_STAR": "Chỉ chọn các cột bạn cần thay vì SELECT * (giảm I/O, có thể có chỉ mục bao phủ).",
+        "FUNC_ON_COLUMN": "Di chuyển hàm/biểu thức trên cột bộ lọc {column} sang phía hằng số (cho phép sử dụng chỉ mục).",
+        "IMPLICIT_CAST": "Khớp các kiểu của {column} và hằng số (loại bỏ ép kiểu ngầm định).",
+        "NOT_IN_SUBQUERY": "Viết lại NOT IN (truy vấn con) thành NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "Các điều kiện OR của các cột khác nhau nên được chia thành UNION (để tránh trùng lặp, hãy thêm điều kiện loại trừ điều kiện trước vào điều kiện sau nếu là UNION ALL) hoặc đặt chỉ mục theo cột (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "Tính năng liên kết schema.pi đang được chuẩn bị. Vui lòng thử lại sau.",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "Yêu cầu đã hết thời gian (5 giây). Vui lòng rút ngắn SQL hoặc thử lại sau.",
       "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau một phút.",
       "PAYLOAD_TOO_LARGE": "Kế hoạch quá lớn để lưu.",
-      "LINK_NOT_FOUND": "Không tìm thấy liên kết. Vui lòng chọn lại liên kết."
+      "LINK_NOT_FOUND": "Không tìm thấy liên kết. Vui lòng chọn lại liên kết.",
+      "TUN_EXISTS": "Kế hoạch này đã có đề xuất. Kiểm tra danh sách (xóa nó để tạo lại).",
+      "TUN_BAD_STATE": "Hành động này không được phép trong trạng thái hiện tại (nó có thể đã thay đổi ở nơi khác). Làm mới danh sách.",
+      "TUN_PLAN_MISMATCH": "Kế hoạch sau phải là một kế hoạch đã lưu khác cho cùng một SQL.",
+      "TUN_PLAN_STALE": "Kế hoạch sau phải được lưu sau khi chấp thuận. Chạy lại giải thích sau khi áp dụng và lưu nó."
     }
   },
   "nav": {

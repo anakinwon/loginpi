@@ -1258,7 +1258,7 @@
         "SELECT_STAR": "SELECT * — yalnızca ihtiyacınız olan sütunları seçin (ekstra I/O, kapsayan dizin yok).",
         "FUNC_ON_COLUMN": "Filtre sütunu {column} bir fonksiyon veya ifade içine sarılmış, bu nedenle dizini kullanılamaz — bunun yerine sabiti dönüştürün.",
         "LEADING_WILDCARD": "Önde % olan LIKE bir B-ağacı dizini kullanamaz — bir pg_trgm GIN dizini düşünün.",
-        "OR_DIFF_COLUMNS": "Farklı sütunlardaki koşullar OR ile birleştirilmiştir — UNION ALL veya sütun başına dizinleri düşünün.",
+        "OR_DIFF_COLUMNS": "Farklı sütunlardaki koşullar OR ile birleştirildi — UNION ile ayırmayı (UNION ALL ise yinelenen dışlama koşulu ekleyin) veya sütun bazında dizinleri gözden geçirmeyi düşünün.",
         "IMPLICIT_CAST": "{column} tırnak içine alınmış bir sayıyla karşılaştırılıyor — sütun ve sabit türlerini eşleştirin (örtük dönüştürme).",
         "NOT_IN_SUBQUERY": "NOT IN (alt sorgu) NULL'lar mevcut olduğunda hiçbir şey döndürmez ve yavaştır — NOT EXISTS kullanın.",
         "NO_WHERE": "WHERE yan tümcesi yok — büyük bir tabloda bu tam bir taramadır (bir koşul veya LIMIT ekleyin).",
@@ -1288,8 +1288,63 @@
     },
     "ai": {
       "title": "AI ayarlama tavsiyesi",
-      "badge": "Çok yakında",
-      "body": "Çok yakında (onay ve etki ölçüm prosedürlerinden sonra) — tavsiye, maskelenmiş sabitlerle SQL'den oluşturulacak ve yalnızca DA onayı ve ölçülen etki sonrasında uygulandı olarak kaydedilecektir."
+      "intro": "Tavsiye oluşturmak için kaydedilmiş bir plan seçin. Yalnızca sabitleri ? olarak maskelenmiş SQL ve planlar gönderilir (anahtar yoksa veya başarısız olursa kural tabanlı tavsiye). Bağlantı sahibi onayladıktan sonra, aynı SQL için açıklama tekrar çalıştırılmalı, kaydedilmeli ve daha sonraki planla etkisi ölçülmelidir; ancak o zaman uygulandı olarak kaydedilir.",
+      "pickPlan": "Tavsiye için kaydedilmiş bir plan seçin",
+      "create": "Tavsiye oluştur",
+      "creating": "Oluşturuluyor… (en fazla 30 sn)",
+      "noPlans": "Kaydedilmiş plan yok. Yukarıdaki açıklama planını görüntüleyin ve kaydedin.",
+      "note": "Plan başına bir tavsiye. Yeniden oluşturmak için mevcut tavsiyeyi silin. DDL yalnızca önerilir; schema.pi'de uygulayın.",
+      "empty": "Henüz tavsiye yok.",
+      "noItems": "Bu plan için iyileştirme bulunamadı.",
+      "cost": "Önceki maliyet",
+      "delete": "Sil",
+      "prev": "Önceki",
+      "next": "Sonraki",
+      "page": "Sayfa {page}",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Kural"
+      },
+      "sts": {
+        "RCMD": "Tavsiye edildi",
+        "APRV": "Onaylandı",
+        "RJCT": "Reddedildi",
+        "APLD": "Uygulandı"
+      },
+      "kind": {
+        "INDEX": "Dizin",
+        "REWRITE": "SQL yeniden yazma",
+        "STATS": "İstatistikler",
+        "CONFIG": "Yapılandırma"
+      },
+      "approve": "Onayla",
+      "reject": "Reddet",
+      "measureHint": "Onaylanan tavsiyeyi uyguladıktan sonra, aynı SQL için açıklama planını tekrar görüntüleyin ve kaydedin. Ardından, o sonraki planı seçin ve uygulandı olarak kaydetmek için ölçün.",
+      "findAfter": "Sonraki planları bul",
+      "noAfter": "Onaydan sonra aynı SQL için kaydedilmiş plan yok.",
+      "reload": "Tekrar ara",
+      "pickAfter": "Sonraki planı seç",
+      "measure": "Etkiyi ölç",
+      "effect": "Maliyet {bfr} → {aft} ({pct}%)",
+      "better": "İyileştirildi",
+      "worse": "Kötüleşti",
+      "same": "Değişiklik yok",
+      "ddl": "Önerilen DDL",
+      "rewrite": "Yeniden yazılan SQL",
+      "runDdl": "schema.pi'de DDL çalıştır",
+      "copy": "Kopyala",
+      "copied": "Kopyalandı",
+      "rule": {
+        "SEQ_SCAN_INDEX": "{relation} tam taraması — filtre sütunu {column} üzerinde bir dizin oluşturun (dizin adındaki NN'yi bir sıra numarasıyla değiştirin).",
+        "SEQ_SCAN_STATS": "{relation} tam taraması — filtre sütunlarını kontrol edin ve istatistiklerin (ANALYZE) güncel olduğundan emin olun.",
+        "NESTED_LOOP": "İç içe döngü {rows} satır bekliyor — istatistikleri yenileyin ve birleştirme anahtarı dizinlerini veya bir hash birleştirmeyi düşünün.",
+        "SORT_SPILL": "Yaklaşık {kb} KB'lik sıralama diske taşabilir — oturum work_mem'ini artırmayı veya sıralama sütunlarını dizinlemeyi düşünün.",
+        "SELECT_STAR": "SELECT * yerine yalnızca ihtiyacınız olan sütunları seçin (daha az I/O, kapsayan dizinler mümkün).",
+        "FUNC_ON_COLUMN": "Filtre sütunu {column} üzerindeki işlevi/ifadeyi sabit tarafa taşıyın (dizin kullanımını etkinleştirir).",
+        "IMPLICIT_CAST": "{column} ve sabitin türlerini eşleştirin (örtük dönüştürmeyi kaldırın).",
+        "NOT_IN_SUBQUERY": "NOT IN (alt sorgu) ifadesini NOT EXISTS olarak yeniden yazın.",
+        "OR_DIFF_COLUMNS": "Farklı sütunlardaki OR koşulları UNION ile ayrılmalı (UNION ALL ise ikincisine önceki koşulu hariç tutarak yinelenmeyi önleyin) veya sütun bazında dizinler olmalıdır (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi bağlantı özelliği hazırlanıyor. Lütfen kısa süre sonra tekrar deneyin.",
@@ -1301,7 +1356,11 @@
       "TIMEOUT": "İstek zaman aşımına uğradı (5 saniye). SQL'i kısaltın veya daha sonra tekrar deneyin.",
       "RATE": "Çok fazla istek. Bir dakika sonra tekrar deneyin.",
       "PAYLOAD_TOO_LARGE": "Plan kaydedilemeyecek kadar büyük.",
-      "LINK_NOT_FOUND": "Bağlantı bulunamadı. Lütfen bağlantıyı tekrar seçin."
+      "LINK_NOT_FOUND": "Bağlantı bulunamadı. Lütfen bağlantıyı tekrar seçin.",
+      "TUN_EXISTS": "Bu planda zaten tavsiye var. Listeyi kontrol edin (yeniden oluşturmak için silin).",
+      "TUN_BAD_STATE": "Bu eylem mevcut durumda izin verilmiyor (başka bir yerde değişmiş olabilir). Listeyi yenileyin.",
+      "TUN_PLAN_MISMATCH": "Sonraki plan, aynı SQL için farklı bir kaydedilmiş plan olmalıdır.",
+      "TUN_PLAN_STALE": "Sonraki plan, onaydan sonra kaydedilmiş olmalıdır. Uyguladıktan sonra açıklamayı tekrar çalıştırın ve kaydedin."
     }
   },
   "nav": {

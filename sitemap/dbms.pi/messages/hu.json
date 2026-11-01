@@ -1097,6 +1097,7 @@
         "none": "(üres)"
       },
       "noSample": "Még nincsenek minták — a futó munkamenetek mintavételezése akkor történik, amikor megtekinti a felügyeleti panelt vagy az Aktivitás és zárolások lapot. Egyelőre csak a fióknév alapján van osztályozva.",
+      "privOff": "A csatlakozó fiók nem láthatja más fiókok munkamenet-adatait, így nem gyűjt mintákat. Kérjen meg egy DB adminisztrátort, hogy futtassa a GRANT pg_read_all_stats TO {user}; parancsot.",
       "linkUsr": "link fiók",
       "qidOff": "A munkamenet részletei láthatók, de a lekérdezési azonosító üres (a compute_query_id ki van kapcsolva). Ellenőrizze a SHOW compute_query_id; paranccsal, majd futtassa az ALTER SYSTEM SET compute_query_id = 'auto'; parancsot, és töltse újra (SELECT pg_reload_conf();).",
       "openHint": "Megnyitja az SQL Tuningot a kitöltött lekérdezéssel. Cserélje ki a helyőrzőket, mint például a $1, valós értékekre a terv megtekintése előtt."
@@ -1245,7 +1246,7 @@
         "SELECT_STAR": "SELECT * – csak a szükséges oszlopokat válassza ki (extra I/O, nincs fedő index).",
         "FUNC_ON_COLUMN": "A szűrőoszlop {column} egy függvénybe vagy kifejezésbe van csomagolva, így az indexe nem használható – ehelyett alakítsa át az állandót.",
         "LEADING_WILDCARD": "A vezető %-ot tartalmazó LIKE nem használhat B-fa indexet – fontolja meg egy pg_trgm GIN indexet.",
-        "OR_DIFF_COLUMNS": "Különböző oszlopokon lévő feltételek OR-ral vannak kombinálva – fontolja meg a UNION ALL-t vagy az oszloponkénti indexeket.",
+        "OR_DIFF_COLUMNS": "Különböző oszlopokon lévő OR-feltételek – fontolja meg a UNION-nal való felosztást (ha UNION ALL, adjon hozzá egy duplikált kizárási feltételt) vagy az oszloponkénti indexek áttekintését.",
         "IMPLICIT_CAST": "A(z) {column} egy idézőjeles számmal van összehasonlítva – egyeztesse az oszlop és az állandó típusait (implicit típuskonverzió).",
         "NOT_IN_SUBQUERY": "A NOT IN (al-lekérdezés) semmit sem ad vissza, ha NULL értékek vannak jelen, és lassú – használja a NOT EXISTS-t.",
         "NO_WHERE": "Nincs WHERE záradék – egy nagy táblán ez teljes szkennelés (adjon hozzá egy feltételt vagy LIMIT-et).",
@@ -1275,8 +1276,63 @@
     },
     "ai": {
       "title": "AI tuning tanácsok",
-      "badge": "Hamarosan",
-      "body": "Hamarosan (jóváhagyási és hatásmérési eljárások után) – a tanácsok maszkolt állandókat tartalmazó SQL-ből generálódnak, és csak DA jóváhagyás és mért hatás után kerülnek alkalmazottként rögzítésre."
+      "intro": "Válasszon ki egy mentett tervet a tanács generálásához. Csak az SQL és a ? jellel maszkolt állandókat tartalmazó tervek kerülnek elküldésre (szabályalapú tanács, ha nincs kulcs vagy hiba esetén). Miután a link tulajdonosa jóváhagyta, futtassa újra az EXPLAIN-t ugyanahhoz az SQL-hez, mentse el, és mérje meg a hatást azzal a későbbi tervvel – csak ekkor kerül rögzítésre alkalmazottként.",
+      "pickPlan": "Válasszon egy mentett tervet a tanácshoz",
+      "create": "Tanács generálása",
+      "creating": "Generálás… (akár 30 mp)",
+      "noPlans": "Nincsenek mentett tervek. Tekintse meg az EXPLAIN tervet fent, majd mentse el.",
+      "note": "Egy tervhez egy tanács tartozik. A meglévő tanács törlésével újra generálhatja. A DDL csak javaslat – alkalmazza a schema.pi-ben.",
+      "empty": "Még nincs tanács.",
+      "noItems": "Nem található javítás ehhez a tervhez.",
+      "cost": "Előző költség",
+      "delete": "Törlés",
+      "prev": "Előző",
+      "next": "Következő",
+      "page": "{page}. oldal",
+      "engn": {
+        "AI": "AI",
+        "RULE": "Szabály"
+      },
+      "sts": {
+        "RCMD": "Javasolt",
+        "APRV": "Jóváhagyva",
+        "RJCT": "Elutasítva",
+        "APLD": "Alkalmazva"
+      },
+      "kind": {
+        "INDEX": "Index",
+        "REWRITE": "SQL átírás",
+        "STATS": "Statisztika",
+        "CONFIG": "Konfiguráció"
+      },
+      "approve": "Jóváhagyás",
+      "reject": "Elutasítás",
+      "measureHint": "A jóváhagyott tanács alkalmazása után tekintse meg és mentse el újra ugyanahhoz az SQL-hez az EXPLAIN tervet. Ezután válassza ki azt a későbbi tervet, és mérje meg, hogy alkalmazottként rögzítse.",
+      "findAfter": "Későbbi tervek keresése",
+      "noAfter": "Nincs mentett terv ugyanahhoz az SQL-hez a jóváhagyás után.",
+      "reload": "Újra keresés",
+      "pickAfter": "Válassza ki a későbbi tervet",
+      "measure": "Hatás mérése",
+      "effect": "Költség {bfr} → {aft} ({pct}%)",
+      "better": "Javult",
+      "worse": "Rosszabb",
+      "same": "Nincs változás",
+      "ddl": "Javasolt DDL",
+      "rewrite": "Átírt SQL",
+      "runDdl": "DDL futtatása a schema.pi-ben",
+      "copy": "Másolás",
+      "copied": "Másolva",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Teljes szkennelés a(z) {relation} táblán – hozzon létre indexet a szűrőoszlopon {column} (az index nevében az NN-t cserélje sorszámra).",
+        "SEQ_SCAN_STATS": "Teljes szkennelés a(z) {relation} táblán – ellenőrizze a szűrőoszlopokat, és győződjön meg arról, hogy a statisztikák (ANALYZE) naprakészek.",
+        "NESTED_LOOP": "A beágyazott ciklus {rows} sort vár – frissítse a statisztikákat, és fontolja meg a join-kulcs indexeket vagy a hash join-t.",
+        "SORT_SPILL": "A(z) {kb} KB körüli rendezés lemezre kerülhet – fontolja meg a session work_mem növelését vagy a rendezési oszlopok indexelését.",
+        "SELECT_STAR": "Csak a szükséges oszlopokat válassza ki a SELECT * helyett (kevesebb I/O, lefedő indexek lehetségesek).",
+        "FUNC_ON_COLUMN": "Helyezze át a függvényt/kifejezést a szűrőoszlopon {column} az állandó oldalra (lehetővé teszi az index használatát).",
+        "IMPLICIT_CAST": "Illessze össze a(z) {column} és az állandó típusait (távolítsa el az implicit típuskonverziót).",
+        "NOT_IN_SUBQUERY": "Írja át a NOT IN (al-lekérdezés) kifejezést NOT EXISTS-re.",
+        "OR_DIFF_COLUMNS": "A különböző oszlopokon lévő OR feltételeket UNION-nal kell felosztani (ha UNION ALL, akkor az utóbbihoz adjon hozzá egy duplikált kizárási feltételt), vagy oszloponkénti indexekkel kell rendelkezniük (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "A schema.pi link funkció előkészítés alatt áll. Kérjük, próbálja meg újra rövidesen.",
@@ -1288,7 +1344,11 @@
       "TIMEOUT": "A kérés időtúllépést szenvedett (5 másodperc). Rövidítse le az SQL-t, vagy próbálja meg újra később.",
       "RATE": "Túl sok kérés. Próbálja meg újra egy perc múlva.",
       "PAYLOAD_TOO_LARGE": "A terv túl nagy a mentéshez.",
-      "LINK_NOT_FOUND": "A link nem található. Kérjük, válassza ki újra a linket."
+      "LINK_NOT_FOUND": "A link nem található. Kérjük, válassza ki újra a linket.",
+      "TUN_EXISTS": "Ehhez a tervhez már van tanács. Ellenőrizze a listát (törölje az újrageneráláshoz).",
+      "TUN_BAD_STATE": "Ez a művelet nem engedélyezett az aktuális állapotban (máshol már megváltozhatott). Frissítse a listát.",
+      "TUN_PLAN_MISMATCH": "A későbbi tervnek egy másik mentett tervnek kell lennie ugyanahhoz az SQL-hez.",
+      "TUN_PLAN_STALE": "A későbbi tervet a jóváhagyás után kell menteni. Alkalmazás után futtassa újra az EXPLAIN-t, és mentse el."
     }
   },
   "nav": {

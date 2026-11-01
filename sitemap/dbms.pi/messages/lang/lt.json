@@ -1246,7 +1246,7 @@
         "SELECT_STAR": "SELECT * – pasirinkite tik reikalingus stulpelius (papildomas I/O, nėra dengiančio indekso).",
         "FUNC_ON_COLUMN": "Filtravimo stulpelis {column} yra apgaubtas funkcija ar išraiška, todėl jo indekso negalima naudoti – vietoj to transformuokite konstantą.",
         "LEADING_WILDCARD": "LIKE su pradiniu % negali naudoti B-medžio indekso – apsvarstykite pg_trgm GIN indeksą.",
-        "OR_DIFF_COLUMNS": "Sąlygos skirtinguose stulpeliuose yra sujungtos su OR – apsvarstykite UNION ALL arba indeksus kiekvienam stulpeliui.",
+        "OR_DIFF_COLUMNS": "OR sąlygos skirtingiems stulpeliams – apsvarstykite galimybę atskirti su UNION (pridėkite pasikartojimo išskyrimo sąlygą, jei UNION ALL) arba peržiūrėkite kiekvieno stulpelio indeksus.",
         "IMPLICIT_CAST": "{column} lyginamas su skaičiumi kabutėse – suderinkite stulpelio ir konstantos tipus (numanomas tipų keitimas).",
         "NOT_IN_SUBQUERY": "NOT IN (subquery) nieko negrąžina, kai yra NULL reikšmių, ir yra lėtas – naudokite NOT EXISTS.",
         "NO_WHERE": "Nėra WHERE sąlygos – didelėje lentelėje tai yra pilnas nuskaitymas (pridėkite sąlygą arba LIMIT).",
@@ -1276,8 +1276,63 @@
     },
     "ai": {
       "title": "AI derinimo patarimai",
-      "badge": "Netrukus",
-      "body": "Netrukus (po patvirtinimo ir poveikio vertinimo procedūrų) – patarimai bus generuojami iš SQL su užmaskuotomis konstantomis ir įrašomi kaip pritaikyti tik po DA patvirtinimo ir išmatuoto poveikio."
+      "intro": "Pasirinkite vieną išsaugotą planą, kad sugeneruotumėte patarimą. Siunčiami tik SQL ir planai, kuriuose konstantos užmaskuotos kaip „?“ (taisyklėmis pagrįstas patarimas, jei nėra rakto arba nepavyksta). Kai ryšio savininkas patvirtina, pakartotinai paleiskite to paties SQL paaiškinimą, išsaugokite jį ir išmatuokite poveikį su vėlesniu planu – tik tada jis įrašomas kaip pritaikytas.",
+      "pickPlan": "Pasirinkite išsaugotą planą patarimui",
+      "create": "Generuoti patarimą",
+      "creating": "Generuojama... (iki 30 s)",
+      "noPlans": "Nėra išsaugotų planų. Peržiūrėkite paaiškinimo planą aukščiau ir išsaugokite jį.",
+      "note": "Vienam planui skiriamas vienas patarimas. Norėdami sugeneruoti iš naujo, ištrinkite esamą patarimą. DDL tik siūlomas – pritaikykite jį schema.pi.",
+      "empty": "Dar nėra patarimų.",
+      "noItems": "Šiam planui patobulinimų nerasta.",
+      "cost": "Ankstesnė kaina",
+      "delete": "Ištrinti",
+      "prev": "Ankstesnis",
+      "next": "Kitas",
+      "page": "Puslapis {page}",
+      "engn": {
+        "AI": "DI",
+        "RULE": "Taisyklė"
+      },
+      "sts": {
+        "RCMD": "Rekomenduojama",
+        "APRV": "Patvirtinta",
+        "RJCT": "Atmesta",
+        "APLD": "Pritaityta"
+      },
+      "kind": {
+        "INDEX": "Indeksas",
+        "REWRITE": "SQL perrašymas",
+        "STATS": "Statistika",
+        "CONFIG": "Konfigūracija"
+      },
+      "approve": "Patvirtinti",
+      "reject": "Atmesti",
+      "measureHint": "Pritaikius patvirtintą patarimą, dar kartą peržiūrėkite ir išsaugokite to paties SQL paaiškinimo planą. Tada pasirinkite tą vėlesnį planą ir išmatuokite, kad jis būtų įrašytas kaip pritaikytas.",
+      "findAfter": "Rasti vėlesnius planus",
+      "noAfter": "Nėra to paties SQL plano, išsaugoto po patvirtinimo.",
+      "reload": "Ieškoti iš naujo",
+      "pickAfter": "Pasirinkite vėlesnį planą",
+      "measure": "Įvertinti poveikį",
+      "effect": "Kaina {bfr} → {aft} ({pct}%)",
+      "better": "Patobulinta",
+      "worse": "Pablogėjo",
+      "same": "Jokių pokyčių",
+      "ddl": "Siūlomas DDL",
+      "rewrite": "Perrašytas SQL",
+      "runDdl": "Vykdyti DDL schema.pi",
+      "copy": "Kopijuoti",
+      "copied": "Nukopijuota",
+      "rule": {
+        "SEQ_SCAN_INDEX": "Visas {relation} nuskaitymas – sukurkite indeksą filtro stulpelyje {column} (indekso pavadinime NN pakeiskite eilės numeriu).",
+        "SEQ_SCAN_STATS": "Visas {relation} nuskaitymas – patikrinkite filtro stulpelius ir įsitikinkite, kad statistika (ANALYZE) yra naujausia.",
+        "NESTED_LOOP": "Įdėtasis ciklas tikisi {rows} eilučių – atnaujinkite statistiką ir apsvarstykite jungties rakto indeksus arba maišos jungtį.",
+        "SORT_SPILL": "Rūšiavimas apie {kb} KB gali persipildyti į diską – apsvarstykite galimybę padidinti sesijos work_mem arba indeksuoti rūšiavimo stulpelius.",
+        "SELECT_STAR": "Pasirinkite tik reikalingus stulpelius, o ne SELECT * (mažiau I/O, galimi dengiantys indeksai).",
+        "FUNC_ON_COLUMN": "Perkelkite funkciją/išraišką filtro stulpelyje {column} į konstantos pusę (įgalina indekso naudojimą).",
+        "IMPLICIT_CAST": "Suderinkite {column} ir konstantos tipus (pašalinkite numanomą tipo konvertavimą).",
+        "NOT_IN_SUBQUERY": "Perrašykite NOT IN (subquery) kaip NOT EXISTS.",
+        "OR_DIFF_COLUMNS": "OR sąlygos skirtingiems stulpeliams turėtų būti atskirtos su UNION (pridėkite pasikartojimo išskyrimo sąlygą pastarajai, jei UNION ALL) arba turėti kiekvieno stulpelio indeksus (BitmapOr)."
+      }
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi nuorodos funkcija ruošiama. Bandykite dar kartą netrukus.",
@@ -1289,7 +1344,11 @@
       "TIMEOUT": "Užklausos laikas baigėsi (5 sekundės). Sutrumpinkite SQL arba bandykite dar kartą vėliau.",
       "RATE": "Per daug užklausų. Bandykite dar kartą po minutės.",
       "PAYLOAD_TOO_LARGE": "Planas per didelis, kad būtų galima išsaugoti.",
-      "LINK_NOT_FOUND": "Nuoroda nerasta. Pasirinkite nuorodą dar kartą."
+      "LINK_NOT_FOUND": "Nuoroda nerasta. Pasirinkite nuorodą dar kartą.",
+      "TUN_EXISTS": "Šis planas jau turi patarimą. Patikrinkite sąrašą (ištrinkite jį, kad sugeneruotumėte iš naujo).",
+      "TUN_BAD_STATE": "Šis veiksmas neleidžiamas dabartinėje būsenoje (galėjo pasikeisti kitur). Atnaujinkite sąrašą.",
+      "TUN_PLAN_MISMATCH": "Vėlesnis planas turi būti kitas išsaugotas to paties SQL planas.",
+      "TUN_PLAN_STALE": "Vėlesnis planas turi būti išsaugotas po patvirtinimo. Pakartotinai paleiskite paaiškinimą po pritaikymo ir išsaugokite jį."
     }
   },
   "nav": {
