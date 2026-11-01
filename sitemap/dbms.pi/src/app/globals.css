@@ -1,0 +1,67 @@
+/* dbms.pi 전역 스타일 — Tailwind v4 CSS-first 진입점(config 파일 없음) */
+@import 'tailwindcss';
+/* 공용 패키지 컴포넌트(@pi/i18n 언어 콤보·π 시세칩)는 앱 밖이라 자동 탐지가 안 됨 — 명시 */
+@source '../../../../packages/pi-i18n/src';
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  /* @pi/i18n 언어 콤보·π 시세칩(loginpi shadcn 토큰) 이 쓰는 색 */
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-danger: var(--danger);
+  --color-accent: var(--accent);
+}
+
+/* 단일 어두운 테마 — 라이트 테마는 화면 확정 후 */
+:root {
+  color-scheme: dark;
+  --background: #0b0d14;
+  --foreground: oklch(0.985 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --muted: #222838;
+  --border: rgb(255 255 255 / 0.1);
+  --primary: #2f7fd6;
+  --surface: #161a24;
+  --surface-raised: #222838;
+  --danger: #e5484d;
+  --accent: #2f7fd6;
+}
+
+/* 색 없는 border = --border(loginpi shadcn 기본과 같은 방식 — 언어 콤보 구분선) */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border);
+  }
+}
+
+/* 연동 코드 입력칸 */
+@layer components {
+  .input {
+    @apply bg-surface-raised h-11 rounded-lg px-3 text-lg;
+  }
+}
+
+/* 키보드 포커스 표시(Tab 이동에만 보이고 마우스·터치 클릭엔 안 보임) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 움직임 줄이기 — 모든 애니메이션·전환을 끈다 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
