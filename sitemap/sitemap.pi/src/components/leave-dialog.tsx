@@ -2,7 +2,7 @@
 
 // "외부 사이트로 이동" 안내 레이어 — 워프 점프 연출(마스터 지시 2026-10-14, 구 아이보리 3D 카드 대체) :
 //  뒤에는 <canvas> 스타필드(warp-field), 앞에는 우주선 실루엣 카드(.ship-* : 뾰족한 선수 목적지 · 본체 좌표·항해 로그 · 워프 나셀).
-//  "점프" 클릭 → 우주선이 진동하며 음속 돌파(소닉붐 링 + 플래시) → 화면 정중앙에 블랙홀(.ship-hole)이 열리고 그 점을 향해 작아지며 음속으로 날아가 소멸(회전 없음)(FLY_MS, 흡입 지점은 --jx/--jy) → 블랙홀이 화면 전체로 줌인(2026-11-01) → 그 뒤에 window.open(마스터 지시 "실제 이동 전에 사라지는 효과").
+//  "점프" 클릭 → 우주선이 진동하며 음속 돌파(플래시) → 화면 정중앙에 블랙홀(.ship-hole)이 열리고 그 점을 향해 작아지며 음속으로 날아가 소멸(회전 없음)(FLY_MS, 흡입 지점은 --jx/--jy) → 블랙홀이 화면 전체로 줌인(2026-11-01) → 그 뒤에 window.open(마스터 지시 "실제 이동 전에 사라지는 효과").
 //  외부 이동은 사용자 클릭 + 안내 후에만(MAINNET A-6) — 점프 버튼이 유일한 이동 경로. 열기는 클릭 뒤 ~1.7s(일시적 사용자 활성화 5s 안)지만
 //  구형 WebKit 처럼 비동기 open 을 막는 환경은 null 을 돌려주므로 "차단됨" 안내 + 직접 링크로 폴백(링크 클릭도 사용자 클릭).
 //  floating 이면 화면 하단 고정 + 뷰포트 전체 별(메인 버블), 아니면 인라인 + 카드 안 별(상세)
@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl'
 import { markWarp } from '@pi/warp'
 import { WarpField } from './warp-field'
 
-// 점프 연출 길이(ms) — 래퍼 인라인 --fly 로 CSS(.ship-jump / .ship-boom / .ship-hole / .hud-flash)에 전달하는 단일 소스. 1.0s → 1.4s(마스터 2026-10-16 "조금 늦춰")
+// 점프 연출 길이(ms) — 래퍼 인라인 --fly 로 CSS(.ship-jump / .ship-hole / .hud-flash)에 전달하는 단일 소스. 1.0s → 1.4s(마스터 2026-10-16 "조금 늦춰")
 const FLY_MS = 1400
 // 소멸 뒤 정지 시간(ms) — 우주선이 블랙홀에 완전히 사라진 다음에 창을 연다(마스터 2026-10-16). 합계 1.7s 는 사용자 활성화 5s 안
 const HOLD_MS = 300
@@ -84,7 +84,7 @@ export function LeaveDialog({
       {jumping && (
         <div className="hud-flash pointer-events-none fixed inset-0 z-30" />
       )}
-      {/* 블랙홀 — 흡입 지점(floating = 뷰포트 정중앙, 인라인 = 카드 중심)에 소닉붐 직후 열림. 우주선(z-20) 아래 */}
+      {/* 블랙홀 — 흡입 지점(floating = 뷰포트 정중앙, 인라인 = 카드 중심)에 음속 돌파 직후 열림 → 우주선을 삼킨 뒤 화면 전체로 줌인. 우주선(z-20) 아래 */}
       {jumping && (
         <div
           className={`ship-hole pointer-events-none top-1/2 left-1/2 ${floating ? 'fixed z-[15]' : 'absolute'}`}
@@ -107,8 +107,6 @@ export function LeaveDialog({
         <div className="ship-nacelle ship-nacelle-r" aria-hidden />
         <div className="ship-pylon ship-pylon-l" aria-hidden />
         <div className="ship-pylon ship-pylon-r" aria-hidden />
-        {/* 소닉붐 — 음속 돌파 순간 선수 뒤(카드 40% 높이)에서 퍼지는 링 */}
-        {jumping && <div className="ship-boom" aria-hidden />}
         {/* 선수(prow) — 뾰족한 화살촉 윤곽(clip-path) + 조종석 창. 제목 문구는 aria-label 로만(마스터 지시 2026-10-14 "코멘트 제거") */}
         <div className="ship-head">
           <div className="ship-prow">

@@ -201,7 +201,7 @@
       box-shadow: 0 0 22px rgba(147, 197, 253, 0.95);
     }
   }
-  /* 점프 시퀀스(--fly = leave-dialog FLY_MS) — 0~35% 진동(음속 접근) → 40% 소닉붐(.ship-boom 링 + .hud-flash) → 화면 정중앙 블랙홀(.ship-hole)을 향해 선수 방향 그대로 작아지며 음속으로 날아가 점으로 소멸(회전 없음)(마스터 지시 2026-10-14, 구 상승 소멸 대체).
+  /* 점프 시퀀스(--fly = leave-dialog FLY_MS) — 0~35% 진동(음속 접근) → 40% 음속 돌파 플래시(.hud-flash, 우주선 링 없음 — 커지는 동그라미는 가운데 블랙홀 하나, 마스터 2026-11-01) → 화면 정중앙 블랙홀(.ship-hole)을 향해 선수 방향 그대로 작아지며 음속으로 날아가 점으로 소멸(회전 없음)(마스터 지시 2026-10-14, 구 상승 소멸 대체).
      --jx/--jy = 카드 중심에서 소멸 지점까지 거리(leave-dialog 가 점프 때 뷰포트 중심으로 계산, 인라인은 0 = 카드 중심) */
   .ship {
     /* --fly 는 leave-dialog 래퍼 인라인 스타일(FLY_MS)에서 상속 — 여기·.ship-hole·.hud-flash 에 값을 두지 않는다(단일 소스) */
@@ -233,18 +233,18 @@
       opacity: 1;
       filter: blur(0);
     }
-    70% {
+    58% {
       opacity: 1;
     }
-    /* 76% 에 블랙홀 속으로 완전히 들어가 사라짐 — 그 뒤(78%~) 블랙홀이 화면 전체로 줌인할 때 카드가 검은 화면 위에 남지 않게(2026-11-01) */
-    76%,
+    /* 64% 에 가운데 블랙홀 속으로 완전히 들어가 사라짐 — 그 뒤(66%~) 블랙홀이 화면 전체로 줌인할 때 카드가 검은 화면 위에 남지 않게(2026-11-01) */
+    64%,
     100% {
       transform: translate(var(--jx), var(--jy)) scale(0.02);
       opacity: 0;
       filter: blur(2px);
     }
   }
-  /* 블랙홀(워프 포인트) — 작은 검은 코어 + 얇게 도는 시안 고리(conic). 우주선은 회전 없이 선수 방향 그대로 이 점으로. HTML div 라 transform 애니메이션 허용(SVG 아님). 소닉붐(36%) 직후 열려 끝까지 유지, 닫힘은 dialog 언마운트 */
+  /* 블랙홀(워프 포인트) — 작은 검은 코어 + 얇게 도는 시안 고리(conic). 우주선은 회전 없이 선수 방향 그대로 이 점으로. HTML div 라 transform 애니메이션 허용(SVG 아님). 음속 돌파(36%) 직후 열려 우주선을 삼킨 뒤 화면 전체로 줌인, 닫힘은 dialog 언마운트 */
   .ship-hole {
     width: 96px; /* 작게 — 워프 포인트 느낌(마스터 지시 2026-10-14 "너무 크지 않게") */
     height: 96px;
@@ -286,7 +286,7 @@
     );
     animation: ship-hole-spin 0.5s linear infinite;
   }
-  /* 블랙홀 — 열리고(48%) 우주선을 삼킨 뒤(78%) 가운데에서 화면 전체로 줌인(100%, 96px × 30 ≈ 2,900px 로 대각선까지 덮음)해 그 속으로 들어가는 느낌(마스터 2026-11-01 "가운데 동그라미가 zoom in"). 이 검은 화면 뒤에 window.open */
+  /* 블랙홀 — 열리고(48%) 우주선을 삼킨 뒤(66%) 가운데에서 화면 전체로 줌인(100%, 96px × 30 ≈ 2,900px 로 대각선까지 덮음)해 그 속으로 들어가는 느낌(마스터 2026-11-01 "가운데 동그라미가 zoom in"). 이 검은 화면 뒤에 window.open */
   @keyframes ship-hole {
     0%,
     34% {
@@ -297,9 +297,10 @@
       transform: scale(1.1);
       opacity: 1;
     }
-    78% {
+    66% {
       transform: scale(1);
       opacity: 1;
+      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); /* 줌인은 천천히 시작해 가속 — 블랙홀 속으로 빨려 들어가는 느낌 */
     }
     100% {
       transform: scale(30);
@@ -309,37 +310,6 @@
   @keyframes ship-hole-spin {
     to {
       transform: rotate(360deg);
-    }
-  }
-  .ship-boom {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow:
-      0 0 20px #bae6fd,
-      inset 0 0 20px #bae6fd;
-    opacity: 0;
-    pointer-events: none;
-    animation: ship-boom var(--fly) ease-out forwards;
-  }
-  /* 소닉붐 링 — 작은 링이 크게 퍼지며 출발(음속 돌파로 이동을 시작하는 느낌, 마스터 2026-11-01 "작은 동그라미가 커져서 이동을 시작"). 도착 연출(@pi/warp)은 반대로 모이며 작아짐 */
-  @keyframes ship-boom {
-    0%,
-    36% {
-      transform: translate(-50%, -50%) scale(0.2);
-      opacity: 0;
-    }
-    42% {
-      transform: translate(-50%, -50%) scale(0.8);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(-50%, -50%) scale(14);
-      opacity: 0;
     }
   }
   /* 점프 — 나셀 백열·본체 글로우 강화 */
@@ -389,7 +359,7 @@
     @apply border-violet-400 bg-violet-600 hover:bg-violet-500;
     box-shadow: 0 0 16px rgba(127, 34, 254, 0.6);
   }
-  /* 점프 플래시 — 소닉붐 시점(--fly 의 38%)에 흰색 0 → 0.9 → 0 (HTML div, opacity 만). --fly 는 leave-dialog 래퍼에서 상속 */
+  /* 점프 플래시 — 음속 돌파 시점(--fly 의 38%)에 흰색 0 → 0.9 → 0 (HTML div, opacity 만). --fly 는 leave-dialog 래퍼에서 상속 */
   .hud-flash {
     background: #fff;
     opacity: 0;
