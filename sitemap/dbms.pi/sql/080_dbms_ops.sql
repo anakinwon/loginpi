@@ -56,12 +56,12 @@ SELECT fn_grant_svc_only('TABLE', 'dbm_ops_chk');
 CREATE OR REPLACE FUNCTION fn_upd_dbm_ops_run_mod_dtm()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $
+AS $$
 BEGIN
   NEW.mod_dtm = CURRENT_TIMESTAMP;
   RETURN NEW;
 END;
-$;
+$$;
 DROP TRIGGER IF EXISTS trg_dbm_ops_run_mod_dtm ON dbm_ops_run;
 CREATE TRIGGER trg_dbm_ops_run_mod_dtm
   BEFORE UPDATE ON dbm_ops_run
@@ -71,12 +71,12 @@ CREATE TRIGGER trg_dbm_ops_run_mod_dtm
 CREATE OR REPLACE FUNCTION fn_upd_dbm_ops_chk_mod_dtm()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $
+AS $$
 BEGIN
   NEW.mod_dtm = CURRENT_TIMESTAMP;
   RETURN NEW;
 END;
-$;
+$$;
 DROP TRIGGER IF EXISTS trg_dbm_ops_chk_mod_dtm ON dbm_ops_chk;
 CREATE TRIGGER trg_dbm_ops_chk_mod_dtm
   BEFORE UPDATE ON dbm_ops_chk

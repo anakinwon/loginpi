@@ -44,12 +44,12 @@ SELECT fn_grant_svc_only('TABLE', 'dbm_mig_plan');
 CREATE OR REPLACE FUNCTION fn_upd_dbm_mig_plan_mod_dtm()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $
+AS $$
 BEGIN
   NEW.mod_dtm = CURRENT_TIMESTAMP;
   RETURN NEW;
 END;
-$;
+$$;
 DROP TRIGGER IF EXISTS trg_dbm_mig_plan_mod_dtm ON dbm_mig_plan;
 CREATE TRIGGER trg_dbm_mig_plan_mod_dtm
   BEFORE UPDATE ON dbm_mig_plan

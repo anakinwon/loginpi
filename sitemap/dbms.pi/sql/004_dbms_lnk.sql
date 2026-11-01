@@ -35,12 +35,12 @@ SELECT fn_grant_svc_only('TABLE', 'dbm_lnk');
 CREATE OR REPLACE FUNCTION fn_upd_dbm_lnk_mod_dtm()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $
+AS $$
 BEGIN
   NEW.mod_dtm = CURRENT_TIMESTAMP;
   RETURN NEW;
 END;
-$;
+$$;
 DROP TRIGGER IF EXISTS trg_dbm_lnk_mod_dtm ON dbm_lnk;
 CREATE TRIGGER trg_dbm_lnk_mod_dtm
   BEFORE UPDATE ON dbm_lnk
