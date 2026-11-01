@@ -78,7 +78,9 @@ Phase 0 ─▶ 1 MVP ─▶ 2 등재
 
 진행 기록 :
 - [x] 앱 골격 1차(2026-11-01, `0a1c87a0`) — seminar.pi 기준(TODO §3 의 sitemap.pi 는 @pi/i18n 표준 이전 문서라 대체), 로그인 3경로·@pi/i18n·워프·프록시·홈. 로컬 build(Google 끔)·tsc·HTTP·360/1440 화면 통과
-- [ ] 미결 : `.env.local` Google 키(채움 vs 끔) · sql/001~003 DA 리뷰 후 적용 · 신규 문구 9키 번역 · Google 끈 상태 SessionProvider 콘솔 오류 4건 판정 · Pi Browser 실기기
+- [x] 운영 배포·로그인(2026-11-01) — Pi Browser·Google 로그인 성공(마스터 확인), sql/001~003 적용, 6자리 연동 코드 발급 홈 노출
+- [x] 12절 기능 트리 1차 NonStop 구축(2026-11-01, 계약 `docs/BUILD_CONTRACT.md`, 결정 D1~D9) — schema.pi 연결 API `/api/link/v1/*` + 토큰 발급(`2c8cdbc0`, sql/077 운영 적용), SQL 우회 차단(`2ddeb841`), dbms 10대분류 화면·API(`da658285`, sql/004~090 운영 적용·DA 검토 m1·m2·m6 반영), `prod/schema`·`prod/dbms` 승격 Vercel success, 운영 11화면 200·연결 API 무인증 401 확인
+- [ ] 미결 : 연결 토큰 실흐름(schema.pi 설정 '사이트 연결' 발급 → dbms `/connect` 등록 → SQL 튜닝 랩 EXPLAIN) Pi Browser·PC 실기기 · 신규 문구 번역(현재 en 폴백) · DA 후속 m3~m5·m7(CHAR(64) 사유 주석·도메인 통일·표준단어 등재·트리거 함수 권한) · 결제(F-05, 결정 D3 로 제외)
 
 ## Phase 2 — 등재 (추정 2 작업일 + 심사 대기)
 
