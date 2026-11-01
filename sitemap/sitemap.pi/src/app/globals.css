@@ -233,9 +233,11 @@
       opacity: 1;
       filter: blur(0);
     }
-    80% {
+    70% {
       opacity: 1;
     }
+    /* 76% 에 블랙홀 속으로 완전히 들어가 사라짐 — 그 뒤(78%~) 블랙홀이 화면 전체로 줌인할 때 카드가 검은 화면 위에 남지 않게(2026-11-01) */
+    76%,
     100% {
       transform: translate(var(--jx), var(--jy)) scale(0.02);
       opacity: 0;
