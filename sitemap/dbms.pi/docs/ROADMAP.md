@@ -60,6 +60,10 @@ Phase 0 ─▶ 1 MVP ─▶ 2 등재
 
 **완료 기준** : 스테이징에서 schema.pi 접속 1개를 골라 EXPLAIN 결과 표시 + Pi Browser 실기기 로그인·결제 성공
 
+진행 기록 :
+- [x] 앱 골격 1차(2026-11-01, `0a1c87a0`) — seminar.pi 기준(TODO §3 의 sitemap.pi 는 @pi/i18n 표준 이전 문서라 대체), 로그인 3경로·@pi/i18n·워프·프록시·홈. 로컬 build(Google 끔)·tsc·HTTP·360/1440 화면 통과
+- [ ] 미결 : `.env.local` Google 키(채움 vs 끔) · sql/001~003 DA 리뷰 후 적용 · 신규 문구 9키 번역 · Google 끈 상태 SessionProvider 콘솔 오류 4건 판정 · Pi Browser 실기기
+
 ## Phase 2 — 등재 (추정 2 작업일 + 심사 대기)
 
 - [ ] pi-mainnet-listing-auditor A-1~A-7(Google 연동 예외라 A-4 재점검), 상표 점검(PRD 10절 #5)
