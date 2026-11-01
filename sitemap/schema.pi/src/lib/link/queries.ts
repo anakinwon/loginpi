@@ -18,7 +18,7 @@ const Q = {
   round(100.0 * d.blks_hit / nullif(d.blks_hit + d.blks_read, 0), 2) AS cache_hit_pct, d.tup_returned, d.tup_fetched, d.tup_inserted, d.tup_updated, d.tup_deleted,
   d.conflicts, d.temp_files, d.temp_bytes, d.deadlocks, pg_database_size(d.datname) AS db_sz, d.stats_reset
 FROM pg_stat_database d WHERE d.datname = current_database()`,
-  top_sql: `SELECT s.queryid::text AS queryid, left(regexp_replace(s.query, '\\s+', ' ', 'g'), 1000) AS query, s.calls, round(s.total_exec_time::numeric, 2) AS total_ms, round(s.mean_exec_time::numeric, 3) AS mean_ms,
+  top_sql: `SELECT s.queryid::text AS queryid, pg_get_userbyid(s.userid) AS usr_nm, left(regexp_replace(s.query, '\\s+', ' ', 'g'), 1000) AS query, s.calls, round(s.total_exec_time::numeric, 2) AS total_ms, round(s.mean_exec_time::numeric, 3) AS mean_ms,
   round(s.max_exec_time::numeric, 2) AS max_ms, s.rows, s.shared_blks_hit, s.shared_blks_read, s.temp_blks_written
 FROM pg_stat_statements s WHERE s.dbid = (SELECT oid FROM pg_database WHERE datname = current_database()) ORDER BY s.total_exec_time DESC LIMIT $1`,
   tbl_stats: `SELECT schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_live_tup, n_dead_tup, n_mod_since_analyze, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze, vacuum_count, autovacuum_count
@@ -29,9 +29,11 @@ FROM pg_stat_user_indexes s JOIN pg_index i ON i.indexrelid = s.indexrelid WHERE
   coalesce(pg_total_relation_size(c.reltoastrelid), 0) AS toast_sz, c.reltuples::bigint AS est_rows
 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind IN ('r', 'm', 'p') AND ${SYS_NS} AND ($1::text IS NULL OR n.nspname = $1)
 ORDER BY pg_total_relation_size(c.oid) DESC LIMIT ${MAX_ROWS} OFFSET $2`,
-  activity: `SELECT pid, usename, application_name, client_addr::text AS client_addr, backend_type, state, wait_event_type, wait_event, xact_start, query_start,
-  round(extract(epoch FROM now() - query_start) * 1000)::bigint AS run_ms, left(regexp_replace(query, '\\s+', ' ', 'g'), 1000) AS query
-FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid() ORDER BY (state = 'idle'), query_start NULLS LAST LIMIT ${MAX_ROWS}`,
+  // query_id = PG14+ 칼럼(to_jsonb 로 읽어 PG13 이하·compute_query_id=off 면 오류 없이 NULL)
+  activity: `SELECT a.pid, a.usename, a.application_name, a.client_addr::text AS client_addr, a.backend_type, a.state, a.wait_event_type, a.wait_event, a.xact_start, a.query_start,
+  round(extract(epoch FROM now() - a.query_start) * 1000)::bigint AS run_ms, left(regexp_replace(a.query, '\\s+', ' ', 'g'), 1000) AS query,
+  (to_jsonb(a) ->> 'query_id') AS query_id, current_user AS link_usr
+FROM pg_stat_activity a WHERE a.datname = current_database() AND a.pid <> pg_backend_pid() ORDER BY (a.state = 'idle'), a.query_start NULLS LAST LIMIT ${MAX_ROWS}`,
   locks: `SELECT l.pid, l.locktype, l.mode, l.granted, l.relation::regclass::text AS rel_nm, pg_blocking_pids(l.pid) AS blocked_by, a.usename, a.state,
   round(extract(epoch FROM now() - a.query_start) * 1000)::bigint AS run_ms, left(regexp_replace(a.query, '\\s+', ' ', 'g'), 500) AS query
 FROM pg_locks l LEFT JOIN pg_stat_activity a ON a.pid = l.pid WHERE (l.database IS NULL OR l.database = (SELECT oid FROM pg_database WHERE datname = current_database())) AND l.pid <> pg_backend_pid()
@@ -61,18 +63,39 @@ WHERE ${SYS_NS} AND ($1::text IS NULL OR n.nspname = $1) AND ($2::text IS NULL O
 } as const
 export type QueryName = keyof typeof Q
 export const QUERY_NAMES = Object.keys(Q) as QueryName[]
-export const isQueryName = (v: unknown): v is QueryName => typeof v === 'string' && Object.hasOwn(Q, v)
+export const isQueryName = (v: unknown): v is QueryName =>
+  typeof v === 'string' && Object.hasOwn(Q, v)
 
-const ident = z.string().trim().min(1).max(128).nullish().transform((v) => v ?? null)
+const ident = z
+  .string()
+  .trim()
+  .min(1)
+  .max(128)
+  .nullish()
+  .transform((v) => v ?? null)
 export const paramsSchema = z
-  .object({ sql: z.string().max(20_000).optional(), schema: ident, table: ident, offset: z.number().int().min(0).max(1_000_000).default(0), limit: z.number().int().min(1).max(100).default(50) })
+  .object({
+    sql: z.string().max(20_000).optional(),
+    schema: ident,
+    table: ident,
+    offset: z.number().int().min(0).max(1_000_000).default(0),
+    limit: z.number().int().min(1).max(100).default(50),
+  })
   .default({ schema: null, table: null, offset: 0, limit: 50 })
 type Params = z.infer<typeof paramsSchema>
 
 function argsOf(q: QueryName, p: Params): unknown[] {
   if (q === 'top_sql') return [p.limit]
-  if (q === 'tbl_stats' || q === 'idx_stats' || q === 'sizes' || q === 'table_privs' || q === 'catalog_tables') return [p.schema, p.offset]
-  if (q === 'catalog_columns' || q === 'catalog_indexes') return [p.schema, p.table, p.offset]
+  if (
+    q === 'tbl_stats' ||
+    q === 'idx_stats' ||
+    q === 'sizes' ||
+    q === 'table_privs' ||
+    q === 'catalog_tables'
+  )
+    return [p.schema, p.offset]
+  if (q === 'catalog_columns' || q === 'catalog_indexes')
+    return [p.schema, p.table, p.offset]
   if (q === 'settings' || q === 'roles') return [p.offset]
   return []
 }
@@ -81,7 +104,12 @@ export type QueryRes = { cols: string[]; rows: Cell[][]; ms: number }
 export type QueryFail = { fail: LinkCode; status: number; message?: string }
 
 // 실행 — 이 분류체계 접속만(다른 분류체계 = LINK_SCOPE), SRV PostgreSQL 만
-export async function runNamed(areaId: string, connId: string, q: QueryName, p: Params): Promise<QueryRes | QueryFail> {
+export async function runNamed(
+  areaId: string,
+  connId: string,
+  q: QueryName,
+  p: Params,
+): Promise<QueryRes | QueryFail> {
   let text: string = Q[q]
   if (q === 'explain') {
     const s = p.sql ? explainTarget(p.sql) : null
@@ -90,12 +118,27 @@ export async function runNamed(areaId: string, connId: string, q: QueryName, p: 
   }
   const c = await getConn(areaId, connId)
   if (!c) return { fail: 'LINK_SCOPE', status: 403 }
-  if (c.exec_mthd_cd !== 'SRV' || c.dbms_cd !== '0014') return { fail: 'CONN_UNSUPPORTED', status: 400 }
+  if (c.exec_mthd_cd !== 'SRV' || c.dbms_cd !== '0014')
+    return { fail: 'CONN_UNSUPPORTED', status: 400 }
   if (connBlock()) return { fail: 'CONN_DISABLED', status: 503 }
   const pwd = c.pwd_enc_txt ? openPwd(areaId, c.conn_id, c.pwd_enc_txt) : null
-  if (pwd == null) return { fail: 'CONN_FAIL', status: 400, message: '저장된 비밀번호를 열 수 없습니다 — schema.pi 접속 관리에서 비밀번호를 다시 입력하십시오' }
+  if (pwd == null)
+    return {
+      fail: 'CONN_FAIL',
+      status: 400,
+      message:
+        '저장된 비밀번호를 열 수 없습니다 — schema.pi 접속 관리에서 비밀번호를 다시 입력하십시오',
+    }
   const t = await resolveTarget(c)
-  if (t === 'BLOCKED' || t === 'DNS') return { fail: 'CONN_FAIL', status: 400, message: t === 'DNS' ? '호스트 이름을 찾을 수 없습니다' : '허용되지 않은 접속 주소입니다' }
+  if (t === 'BLOCKED' || t === 'DNS')
+    return {
+      fail: 'CONN_FAIL',
+      status: 400,
+      message:
+        t === 'DNS'
+          ? '호스트 이름을 찾을 수 없습니다'
+          : '허용되지 않은 접속 주소입니다',
+    }
   const sql = pgClient(t, pwd)
   const t0 = Date.now()
   try {
@@ -104,21 +147,36 @@ export async function runNamed(areaId: string, connId: string, q: QueryName, p: 
       await tx.unsafe("SET LOCAL lock_timeout = '1s'")
       await tx.unsafe('SET LOCAL standard_conforming_strings = on') // explainTarget 의 문자열 가림과 같은 해석
       if (q === 'top_sql') {
-        const ok = await tx.unsafe("SELECT to_regclass('pg_stat_statements') IS NOT NULL AS ok")
+        const ok = await tx.unsafe(
+          "SELECT to_regclass('pg_stat_statements') IS NOT NULL AS ok",
+        )
         if (!(ok[0] as unknown as { ok: boolean }).ok) return 'PGSS' as const
       }
       // 확장 프로토콜 고정(인자 0개면 postgres.js 가 simple 로 보내 여러 문장 실행) — Parse 가 다중 문장을 거부해 마스킹 해석 차이와 무관하게 차단
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return tx.unsafe(text, argsOf(q, p) as any[], { simple: false } as any).values()
+      return tx
+        .unsafe(text, argsOf(q, p) as any[], { simple: false } as any)
+        .values()
     })
     if (r === 'PGSS') return { fail: 'PGSS_MISSING', status: 400 }
-    const rows = (r as unknown as unknown[][]).slice(0, MAX_ROWS).map((x) => x.map(cell))
-    return { cols: (r.columns ?? []).map((x: { name: string }) => x.name), rows, ms: Date.now() - t0 }
+    const rows = (r as unknown as unknown[][])
+      .slice(0, MAX_ROWS)
+      .map((x) => x.map(cell))
+    return {
+      cols: (r.columns ?? []).map((x: { name: string }) => x.name),
+      rows,
+      ms: Date.now() - t0,
+    }
   } catch (e) {
     const x = e as { code?: string; message?: string }
     if (x.code === '57014') return { fail: 'TIMEOUT', status: 504 }
-    if (q === 'top_sql' && (x.code === '42P01' || x.code === '55000')) return { fail: 'PGSS_MISSING', status: 400 } // 확장은 있으나 preload 안 됨
-    return { fail: 'CONN_FAIL', status: 400, message: maskErr(x.message ?? e, [t.host, t.ip, t.usr, t.db, pwd]) }
+    if (q === 'top_sql' && (x.code === '42P01' || x.code === '55000'))
+      return { fail: 'PGSS_MISSING', status: 400 } // 확장은 있으나 preload 안 됨
+    return {
+      fail: 'CONN_FAIL',
+      status: 400,
+      message: maskErr(x.message ?? e, [t.host, t.ip, t.usr, t.db, pwd]),
+    }
   } finally {
     await sql.end({ timeout: 2 }).catch(() => {})
   }
