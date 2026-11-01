@@ -37,7 +37,6 @@ export async function linkAuth(req: Request): Promise<LinkAuth | NextResponse> {
   const raw = bearerOf(req.headers.get('authorization'))
   if (!raw) return linkFail('LINK_AUTH', 401)
   const h = tokenHash(raw)
-  if (!rateOk(hits, h)) return linkFail('RATE', 429)
   const r = await db().from('sys_lnk_tkn').select('tkn_id, area_id, lst_use_dtm').eq('tkn_hash', h).eq('del_yn', 'N').gt('exp_dtm', new Date().toISOString()).maybeSingle()
   if (r.error) {
     console.error('[link] auth', r.error.code, r.error.message)
@@ -45,6 +44,8 @@ export async function linkAuth(req: Request): Promise<LinkAuth | NextResponse> {
   }
   const t = r.data as { tkn_id: string; area_id: string; lst_use_dtm: string | null } | null
   if (!t) return linkFail('LINK_AUTH', 401)
+  // 상한 기록은 유효 토큰만(무작위 Bearer 로 메모리 버킷이 불어나지 않게 — 팀장 검토 m-b)
+  if (!rateOk(hits, h)) return linkFail('RATE', 429)
   if (!t.lst_use_dtm || Date.now() - new Date(t.lst_use_dtm).getTime() >= USE_MS)
     after(async () => {
       const u = await db().from('sys_lnk_tkn').update({ lst_use_dtm: new Date().toISOString() }).eq('tkn_id', t.tkn_id)

@@ -8,7 +8,7 @@ const COLS = 'tkn_id, tkn_nm, tkn_pfx, exp_dtm, lst_use_dtm, reg_dtm'
 export const TKN_MAX = 20 // 분류체계별 활성 토큰 상한
 
 export async function listTkns(areaId: string) {
-  const r = await db().from('sys_lnk_tkn').select(COLS).eq('area_id', areaId).eq('del_yn', 'N').order('reg_dtm', { ascending: false }).limit(TKN_MAX)
+  const r = await db().from('sys_lnk_tkn').select(COLS).eq('area_id', areaId).eq('del_yn', 'N').gt('exp_dtm', new Date().toISOString()).order('reg_dtm', { ascending: false }).limit(TKN_MAX)
   if (r.error) throw r.error
   return r.data as TknRow[]
 }
