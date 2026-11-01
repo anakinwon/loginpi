@@ -50,7 +50,7 @@
 | F-01 | Pi 로그인(@pi/auth) + Google 연동 코드 | P0 | 공용 패키지 배선만 |
 | F-02 | schema.pi 연결 API — 분류체계·DBMS 프로파일·접속 목록 읽기 | P0 | schema.pi 쪽 API 추가 포함 |
 | F-03 | 실행계획·성능 분석 — SQL 의 EXPLAIN(ANALYZE 선택)·느린 쿼리·테이블/인덱스 통계(PiAnal P35~P39 일부) | P1 | 대상 DB 실행은 schema.pi 대리 실행(5절). 현재 schema.pi SQL 편집기에는 실행계획 기능이 없다 |
-| F-04 | 모니터링 이전 — schema.pi 임시 배치(`/areas/[id]/monitor`, sql/068~070·072~076, 약 3,500행)를 dbms.pi 로 | P2 | 수집 주소(`MON_INGEST_URL`, 현재 schem.vercel.app)를 보내는 모든 앱(cafe·sitemap·seminar·schema)에서 함께 변경(R-P0), 이력 데이터 이전 방식 [TBD] |
+| F-04 | 모니터링 이전 — schema.pi 임시 배치(`/areas/[id]/monitor`, sql/068~070·072~076, 약 3,500행)를 dbms.pi 로 | P2 | 수집 주소(`MON_INGEST_URL`, 현재 schem.vercel.app)를 보내는 모든 앱에서 함께 변경(R-P0) — 2026-11-01 확인 : 전달 코드 = cafe(`src/app/api/mon/app/route.ts`)·sitemap·seminar 의 `api/mon/app` + `src/env.ts`, 기본값 = `scripts/tenant-env.mjs`·`packages/pi-mon`. schema.pi 는 수신처(ingest)라 이전 시 수신 쪽이 바뀜, 이력 데이터 이전 방식 [TBD] |
 | F-05 | 결제(Pi U2A, @pi/payments) — 이용권 | P1 | 8절 |
 | F-06 | 5~7단계 실행 엔진 — PiMig 실행·모니터, PiCDC·PipeLine, 레이크 저장·성능 | P3 | **요구사항 상세 = 11절**(MASTER_ROADMAP §4.5~4.7 · 제안서 P14·P32·P35~P45), 일정 = `ROADMAP.md` Phase 3~6 |
 
