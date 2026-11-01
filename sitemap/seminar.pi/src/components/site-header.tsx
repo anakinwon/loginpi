@@ -221,7 +221,7 @@ export function SiteHeader() {
       <header className="border-b border-white/10">
         {/* 모바일 = 1줄 로고 + 언어 콤보·시세칩(최우상단 고정), 2줄 로그인 상태(오른쪽 정렬) — 한 줄에 다 넣으면 360px 에서 화면이 좌우로 밀려 가로 스크롤이 생김(2026-11-01).
             sm 이상 = 한 줄 : 로고 … 로그인 상태 · 언어 콤보 · 시세칩(loginpi 순서) */}
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 lg:max-w-none lg:px-8">
+        <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:px-6 lg:px-8">
           {/* 로고 — 화상 말풍선 아이콘(src/images/seminar_logo.png 439×282, 마스터 2026-11-01). 높이 32px, 이름은 alt·aria-label 로 */}
           <Link href="/" aria-label="seminar.pi" className="flex shrink-0 items-center">
             <Image src={logo} alt="seminar.pi" priority className="h-8 w-auto" />

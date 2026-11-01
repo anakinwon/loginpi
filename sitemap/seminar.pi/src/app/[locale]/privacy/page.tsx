@@ -34,7 +34,7 @@ export default async function PrivacyPage({
   const keep = t.raw('keep') as string[]
   const h2 = 'mt-6 text-lg font-semibold'
   return (
-    <article className="mx-auto flex max-w-2xl flex-col gap-2 text-sm leading-relaxed">
+    <article className="flex w-full flex-col gap-2 text-sm leading-relaxed">
       <h1 className="text-2xl font-bold">{t('title')}</h1>
       <p className="text-muted-foreground">
         {t('effective', { date: PRIVACY_VER })}
