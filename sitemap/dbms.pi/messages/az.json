@@ -13,7 +13,7 @@
       "connect": "schema.pi bağlantı tokenini qeyd edin və əlaqə vəziyyətini yoxlayın",
       "sqlLab": "İcra planı ağacı, xəbərdarlıqlar, müqayisə və standart domenlərə qarşı anti-nümunə yoxlamaları",
       "perf": "Yavaş sorğu Top-N, cədvəl/indeks sağlamlığı, tutum proqnozu, fəaliyyət və kilidlər",
-      "monitor": "Tətbiq, DB və URL metrik xülasəsi hədd siqnalları ilə",
+      "monitor": "14 siqnal üçün normal, xəbərdarlıq və təhlükə, üstəgəl nə etməli və necə həll etməli olduğunuz bir baxışda",
       "drift": "schema.pi modeli və DDL tarixçəsini real kataloqla müqayisə edin, indeks effektini ölçün",
       "migration": "Topoloji yükləmə ardıcıllığı, hissələr, yoxlama siyahısı və doğrulama SQL",
       "pipeline": "Dəyişiklikləri ələ keçirmə ön yoxlaması və mənbə→çevirmə→hədəf boru kəməri tərifləri",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Monitorinq Mərkəzi",
-    "collectNote": "Toplama schema.pi-də işləyir — miqrasiya planlaşdırılıb (D7). Bu səhifə schema.pi monitorunun xülasəsini oxuyur.",
+    "title": "Monitorinq",
     "noLink": "Əvvəlcə schema.pi bağlantısını seçin və ya qeydiyyatdan keçirin.",
     "goConnect": "Bağlantı qeydiyyatdan keçir",
     "period": "Dövr",
@@ -457,16 +456,9 @@
       "360": "6 saat",
       "1440": "24 saat"
     },
-    "refresh": "Yenilə",
     "loading": "Yüklənir…",
-    "updatedAt": "{area} · {time} tarixinə (hər 30 saniyədən bir avtomatik yenilənmə)",
-    "appTitle": "Tətbiq performansı",
-    "dbTitle": "Bağlantıya görə DB statusu",
-    "urlTitle": "URL yoxlamaları",
-    "empty": "Göstəriləcək məlumat yoxdur.",
-    "breachTitle": "{n} həddin aşılması",
-    "rulesTitle": "Hədd qaydaları",
-    "rulesNote": "Qaydalar bu bağlantı üçün saxlanılır və alınan xülasəyə qarşı qiymətləndirilir; həddi aşanlar qırmızı haşiyə ilə göstərilir (bildirişlər daha sonra gələcək).",
+    "rulesNote": "Qaydalar bu bağlantıya saxlanılır və lövhə hər dəfə yeniləndikdə qiymətləndirilir (DB sessiyası/kilid gözləməsi/keş hit dərəcəsi hər 1 dəqiqədən bir, DB ölçüsü/URL cavab müddəti/uğursuzluq hər 5 dəqiqədən bir). Pozulmuş siqnallar təhlükəyə çevriləcək və 'Mənim Qaydam' olaraq işarələnəcək (bildiriş göndərmə növbəti addımdır). Xidmət (APP) metrik qaydaları qiymətləndirilmir. DB ölçüsü (MB) qaydaları (>) həm də tutum limitləri kimi istifadə olunur.",
+    "notEvaluated": "Qiymətləndirilməyib",
     "metric": "Metrik",
     "conn": "Bağlantı",
     "allConns": "Bütün bağlantılar",
@@ -501,7 +493,278 @@
       "RATE": "Çox sayda sorğu. Zəhmət olmasa, qısa müddət sonra yenidən cəhd edin.",
       "TIMEOUT": "schema.pi yavaş cavab verir. Zəhmət olmasa, qısa müddət sonra yenidən cəhd edin.",
       "RULE_LIMIT": "Hər bağlantı üçün 50 qaydaya qədər.",
-      "NOT_FOUND": "Qayda tapılmadı."
+      "NOT_FOUND": "Qayda tapılmadı.",
+      "CONN_FAIL": "Verilənlər bazasına qoşulmaq mümkün olmadı. Qoşulma parametrlərini və DB statusunu yoxlayın.",
+      "LINK_DOWN": "schema.pi-yə çatmaq mümkün olmadı. Bir azdan yenidən cəhd edin.",
+      "PGSS_MISSING": "pg_stat_statements quraşdırılmayıb, buna görə də yavaş SQL mövcud deyil.",
+      "CONN_UNSUPPORTED": "Bu qoşulma monitorinqi dəstəkləmir (yalnız PostgreSQL server qoşulmaları).",
+      "CONN_DISABLED": "Bu qoşulma deaktiv edilib. schema.pi-də aktivləşdirin.",
+      "INVALID_INPUT": "Sorğu etibarsızdır."
+    },
+    "board": {
+      "subtitle": "Bu DB-də hazırda nə etməli olduğunuzu — 14 siqnalın normal, xəbərdarlıq və risk və həll yollarını bir baxışda görün.",
+      "refresh": {
+        "updated": "{time} tarixinə · hər dəqiqə yenilənir",
+        "now": "İndi yenilə",
+        "busy": "Yüklənir…",
+        "stale": "Köhnəlmiş · {min} dəqiqə əvvəl"
+      },
+      "level": {
+        "RISK": "Risk",
+        "WARN": "Xəbərdarlıq",
+        "OK": "OK",
+        "UNKNOWN": "Naməlum",
+        "NA": "Tətbiq edilmir"
+      },
+      "overall": {
+        "RISK": "Risk — indi tədbir görülməlidir",
+        "WARN": "Xəbərdarlıq — bəzi elementlərə baxmaq lazımdır",
+        "UNKNOWN": "Naməlum — qoşulmanı yoxlayın",
+        "OK": "OK — hər bir siqnal limitlər daxilindədir",
+        "CONN_DOWN": "DB-yə qoşulmaq mümkün deyil — əvvəlcə bağlantını yoxlayın",
+        "NA": "Tətbiq edilmir"
+      },
+      "kpi": {
+        "sess": "Sessiyalar / maks",
+        "tps": "Saniyədə əməliyyatlar",
+        "cache": "Keş hit dərəcəsi",
+        "size": "DB ölçüsü"
+      },
+      "todo": {
+        "title": "İndi ediləcək",
+        "more": "Daha {n} göstər",
+        "less": "Daha az göstər",
+        "setup": "Daha çox görmək üçün bunları quraşdırın",
+        "none": "Hazırda heç bir risk və ya xəbərdarlıq elementi tədbir tələb etmir.",
+        "unknown": "{n} siqnal yoxlanıla bilmədi — səbəbi kartlarda görün.",
+        "myRule": "Mənim qaydam pozuldu: {rule}",
+        "copySql": "SQL-i kopyala",
+        "copied": "Kopyalandı"
+      },
+      "cat": {
+        "avail": "Əlçatanlıq",
+        "load": "Yük və gözləmələr",
+        "eff": "Effektivlik",
+        "store": "Saxlama və təmir",
+        "protect": "Mühafizə (ehtiyat nüsxəsi, replikasiya)"
+      },
+      "card": {
+        "thr": "Limitlər: xəbərdarlıq {warn} · risk {risk}",
+        "thrDown": "Limitlər: {warn} altı xəbərdarlıq · {risk} altı risk",
+        "more": "Necə düzəltməli",
+        "addRule": "Bu metrik üçün qayda əlavə et",
+        "basisLive": "Son dəqiqə",
+        "basisStored": "Yığılmış",
+        "since": "statistikalar sıfırlandı {at}",
+        "partial": "Qismən görünüş (500 sətir limiti və ya çatışmayan imtiyazlar)."
+      },
+      "sig": {
+        "AVAIL": "DB cavabı",
+        "CONN_USE": "Qoşulma istifadəsi (bu DB)",
+        "URL": "Xidmət URL-ləri",
+        "LONG_QRY": "Uzunmüddətli sorğular",
+        "IDLE_TX": "Boş əməliyyatlar",
+        "LOCK_WAIT": "Kilid gözləmələri",
+        "CACHE_HIT": "Keş hit dərəcəsi",
+        "XACT_ERR": "Geri qaytarmalar və ölü kilidlər",
+        "SLOW_SQL": "Yavaş SQL",
+        "STORAGE": "Saxlama",
+        "VACUUM": "Vakuum",
+        "INDEX": "İndeks sağlamlığı",
+        "BACKUP": "Ehtiyat nüsxəsi (WAL arxivi)",
+        "REPL": "Replikasiya gecikməsi"
+      },
+      "fix": {
+        "AVAIL": "Yavaş cavab və ya son yenidən başlatma — qoşulma parametrlərini və DB server statusunu yoxlayın.",
+        "AVAIL_DOWN": "DB-yə qoşulmaq mümkün olmadı — qoşulma parametrlərini və DB serverinin işlək olduğunu yoxlayın.",
+        "CONN_USE": "Bu DB-də {sess}/{max} sessiya (klaster miqyasında deyil — digər verilənlər bazaları istisna edilir) — boş qoşulmaları bağlayın və ya qoşulma hovuzu (pgbouncer) əlavə edin.",
+        "URL": "{n} yoxlanmış URL uğursuz oldu · maksimum cavab {ms}ms — səbəbi schema.pi monitorunda görün.",
+        "LONG_QRY": "Bir sorğu {sec} saniyədir işləyir — planını nəzərdən keçirin və tənzimləyin, ya da bir DBA-ya ləğv etdirin.",
+        "IDLE_TX": "Bir əməliyyat {sec} saniyədir boş vəziyyətdədir — tətbiqdə çatışmayan commit-i tapın və vaxt aşımı təyin edin.",
+        "LOCK_WAIT": "{n} sessiya kilidləri gözləyir — bloklayan sessiyanı tapın və əməliyyatını bitirin.",
+        "CACHE_HIT": "Keş hit dərəcəsi {pct}% — böyük cədvəllərin tam skanlarını axtarın və ya shared_buffers-i nəzərdən keçirin.",
+        "XACT_ERR": "Geri qaytarma dərəcəsi {pct}%, {dlck} ölü kilid — uğursuz əməliyyatları və tətbiq xəta loglarını yoxlayın.",
+        "SLOW_SQL": "Bir sorğu orta hesabla {ms} ms-dir — planlarından istifadə edərək ümumi vaxta görə ən yaxşı sorğuları tənzimləyin.",
+        "STORAGE": "DB ({gb} GB) limitinə yaxındır (qalan günlər {days}) — böyük cədvəlləri təmizləyin və ya tutum əlavə edin.",
+        "VACUUM": "{tbl} çoxlu ölü sətirlərə və ya köhnəlmiş statistikalara malikdir — VACUUM (ANALYZE) və autovacuum parametrlərini nəzərdən keçirin.",
+        "INDEX": "{n} indeks tapıntısı (etibarsız, istifadəsiz, tam skanlar) — hədəflər üçün cədvəl və indeks sağlamlığı tabına baxın.",
+        "BACKUP": "WAL arxivləməsi bağlıdır və ya dayanıb — archive_mode, archive_command və ehtiyat nüsxəsi statusunu yoxlayın.",
+        "REPL": "Replikasiya gecikməsi {sec}s — gözləmə statusunu və şəbəkəni yoxlayın.",
+        "PGSS": "pg_stat_statements quraşdırılmayıb, buna görə də yavaş SQL mövcud deyil — aşağıdakı SQL ilə aktivləşdirin (serverin yenidən başladılması tələb olunur)."
+      },
+      "reason": {
+        "CONN_DOWN": "DB qoşulması kəsildiyi üçün qiymətləndirilmədi.",
+        "PGSS": "pg_stat_statements quraşdırılmayıb.",
+        "VER": "Yalnız PostgreSQL 13 və ya daha yeni versiyalarda mövcuddur.",
+        "SAMPLE": "Hələ kifayət qədər nümunə yoxdur.",
+        "NO_LIMIT": "Ölçü limiti yoxdur, buna görə də istifadə qiymətləndirilmir — limit kimi istifadə etmək üçün DB ölçüsü (MB) qaydası (>) əlavə edin.",
+        "RESET": "Statistikalar 7 gündən az əvvəl sıfırlandığı üçün istifadəsiz indekslər qiymətləndirilmir.",
+        "STALE": "Son yoxlama qeydləri yoxdur.",
+        "STANDBY": "Gözləmə serverində tətbiq edilmir.",
+        "NONE": "Yoxlanılacaq heç nə yoxdur.",
+        "GRANT": "Çatışmayan imtiyazlar — qoşulma hesabına pg_monitor rolunu verin.",
+        "LINK": "schema.pi sorğusu uğursuz oldu ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Qoşulmalar bölməsində qoşulma statusunu yoxlayın və schema.pi-də qoşulma parametrlərini (host, port, hesab) düzəldin.",
+          "2": "DB serverinin işlək olduğunu və son vaxtlar yenidən başladılıb-başladılmadığını yoxlayın.",
+          "3": "Əgər yavaş qalırsa, server yükünü (CPU, disk) və şəbəkəni yoxlayın."
+        },
+        "CONN_USE": {
+          "1": "Fəaliyyət və kilidlər tabında istifadəçi və vəziyyətə görə sessiya saylarını görün.",
+          "2": "Əgər çoxu boşdursa, tətbiq hovuzunu kiçildin və ya qoşulma hovuzu əlavə edin.",
+          "3": "max_connections-u yaddaşı nəzərə alaraq diqqətlə artırın."
+        },
+        "URL": {
+          "1": "schema.pi monitorunda uğursuz URL-ləri və status kodlarını görün.",
+          "2": "Tətbiqin yerləşdirilməsini və xarici asılılıqları yoxlayın.",
+          "3": "Əgər təkrarlanırsa, URL uğursuzluq sayı (URL_FAIL_CNT) qaydası əlavə edin."
+        },
+        "LONG_QRY": {
+          "1": "Fəaliyyət və kilidlər tabında uzunmüddətli sorğuları və onların istifadəçilərini tapın.",
+          "2": "SQL tənzimləməsində planı nəzərdən keçirin və indeksləri və ya şərtləri düzəldin.",
+          "3": "Təcili olarsa, bir DBA onu pg_cancel_backend ilə ləğv edir."
+        },
+        "IDLE_TX": {
+          "1": "Fəaliyyət və kilidlər tabında idle-in-transaction sessiyalarının son sorğusunu görün.",
+          "2": "Tətbiq kodunda çatışmayan commit və ya rollback-i tapın.",
+          "3": "idle_in_transaction_session_timeout ilə limit qoyun."
+        },
+        "LOCK_WAIT": {
+          "1": "Fəaliyyət və kilidlər tabında bloklayan sessiyanı (blocked_by) tapın.",
+          "2": "Onun əməliyyatını bitirin və ya bir DBA-ya ləğv etdirin.",
+          "3": "Eyni sətirləri uzun müddət saxlayan partiyaları və ya əməliyyat sırasını düzəldin."
+        },
+        "CACHE_HIT": {
+          "1": "Yavaş sorğu tabında böyük cədvəllərin tam skanlarını tapın.",
+          "2": "Daha az blok oxumaq üçün lazım olan indeksləri əlavə edin.",
+          "3": "Əgər yaddaş imkan verirsə, shared_buffers-i nəzərdən keçirin."
+        },
+        "XACT_ERR": {
+          "1": "Tətbiq xəta loglarında rollback səbəblərini (məhdudiyyət pozuntuları, vaxt aşımı) tapın.",
+          "2": "Əgər ölü kilidlər varsa, cədvəlləri ardıcıl bir qaydada kilidləyin.",
+          "3": "Yenidən cəhd məntiqinin rollback-ləri şişirtmədiyini yoxlayın."
+        },
+        "SLOW_SQL": {
+          "1": "Yavaş sorğu tabında ümumi vaxta görə ən yaxşı sorğuları seçin.",
+          "2": "SQL tənzimləməsində planları nəzərdən keçirin və indeksləri və ya birləşmələri düzəldin.",
+          "3": "Düzəltdikdən sonra orta vaxtın azaldığını yoxlayın."
+        },
+        "STORAGE": {
+          "1": "Ölçü trendi tabında böyümə trendini və təxmini dolma tarixini görün.",
+          "2": "Böyük cədvəlləri, indeksləri və köhnə məlumatları təmizləyin.",
+          "3": "Lazım gələrsə, disk əlavə edin və limit qaydasını yeniləyin."
+        },
+        "VACUUM": {
+          "1": "Cədvəl və indeks sağlamlığı tabında çoxlu ölü sətirləri olan cədvəlləri görün.",
+          "2": "Bir DBA VACUUM (ANALYZE) işlədir.",
+          "3": "Əgər təkrarlanırsa, həmin cədvəl üçün autovacuum həddlərini aşağı salın."
+        },
+        "INDEX": {
+          "1": "Cədvəl və indeks sağlamlığı tabında etibarsız və ya istifadəsiz indeksləri və tam skan cədvəllərini görün.",
+          "2": "Etibarsız indeksləri yenidən qurun; bir DBA istifadəsiz olanları nəzərdən keçirir və silir.",
+          "3": "Çoxlu tam skanları olan cədvəllər üçün SQL tənzimləməsində indeksləri dizayn edin."
+        },
+        "BACKUP": {
+          "1": "Ehtiyat nüsxəsi və bərpa tabında archive_mode və son arxiv vaxtını görün.",
+          "2": "Əgər arxivləmə uğursuz olarsa, archive_command və təyinat yerindəki boş yeri yoxlayın.",
+          "3": "İdarə olunan DB-də provayderin ehtiyat nüsxəsi parametrlərini yoxlayın."
+        },
+        "REPL": {
+          "1": "Replikasiya və DR tabında hər bir gözləmənin vəziyyətini və gecikməsini görün.",
+          "2": "Gözləmə serverində diski, CPU-nu və şəbəkəni yoxlayın.",
+          "3": "Əgər axın etmirsə, gözləmə serverinin loglarını yoxlayın."
+        }
+      },
+      "sqlNote": "Aşağıdakı SQL yalnız oxumaq üçündür, yoxlamaq üçündür — düzəlişlər (VACUUM, DROP INDEX, pg_terminate_backend) bir DBA tərəfindən icra edilir.",
+      "go": {
+        "activity": "Fəaliyyət və kilidlər",
+        "top": "Yavaş sorğular",
+        "health": "Cədvəl və indeks sağlamlığı",
+        "trend": "Tutum trendi",
+        "params": "Parametr yoxlaması",
+        "repl": "Replikasiya yoxlaması",
+        "backup": "Ehtiyat nüsxəsi yoxlaması",
+        "sqlLab": "SQL tənzimləməsi",
+        "drift": "Sürüşmə müqayisəsi",
+        "connect": "Qoşulmalar",
+        "schema": "schema.pi monitoru"
+      },
+      "chart": {
+        "title": "Trendlər və reytinqlər",
+        "note": "Trendlər bu ekran açıq olduğu müddətdə hər dəqiqə qeyd olunur (fon kolleksiyası yoxdur).",
+        "gauges": "Qoşulma və keş göstəriciləri",
+        "sessState": "Hazırda sessiyalar",
+        "sessTrend": "Sessiya trendi və kilid gözləmələri",
+        "tpsCombo": "Məhsuldarlıq və geri qaytarma dərəcəsi",
+        "cacheTrend": "Keş hit dərəcəsi trendi",
+        "capacity": "DB ölçüsü və proqnozu",
+        "slowTop": "Yavaş SQL ilk 10",
+        "slowLegend": "Çubuğun uzunluğu = ümumi vaxt · rəng = orta vaxt (▲ {warn}ms-dən xəbərdarlıq · ✕ {risk}ms-dən risk)",
+        "sizeTop": "Boş yer ilk 10",
+        "heat": "Zamanla siqnala görə risk",
+        "q": {
+          "gauges": "Qoşulmalar dolurmu? Oxumalar yaddaşdan verilirmi?",
+          "sessState": "Sessiyalar indi nə edir?",
+          "sessTrend": "Sessiyalar yığıldıqda kilid gözləmələri artırmı?",
+          "tpsCombo": "Məhsuldarlıq və uğursuzluq dərəcəsi birlikdə hərəkət edirmi?",
+          "cacheTrend": "Keş hit dərəcəsi nə vaxt düşdü?",
+          "capacity": "DB nə vaxt dolacaq?",
+          "slowTop": "Əvvəlcə nəyi tənzimləməli? (ümumi vaxta görə)",
+          "sizeTop": "Boş yeri nə tutur?",
+          "heat": "Risk birdəfəlikdir, yoxsa təkrarlanan?"
+        },
+        "asTable": "Cədvəl kimi bax",
+        "needHistory": "Hələ trend yoxdur — bu ekranı bir neçə dəqiqə açıq saxlayın.",
+        "needPerf": "Ölçü tarixi yoxdur — performans tabında toplayın və ya bu ekranı açıq saxlayın.",
+        "noSess": "Sessiya yoxdur.",
+        "noWait": "Gözləmələr yoxdur",
+        "noData": "Göstəriləcək heç nə yoxdur.",
+        "loading": "Yüklənir…",
+        "waitTop": "Gözləmə hadisələri",
+        "lockWait": "Kilid gözləmələri",
+        "tps": "Saniyədə əməliyyatlar",
+        "rlbk": "Geri qaytarma dərəcəsi (%)",
+        "cacheHit": "Keş hit dərəcəsi",
+        "size": "DB ölçüsü",
+        "limit": "Limit",
+        "forecast": "Proqnoz",
+        "daysLeft": "Qalan günlər",
+        "capNote": "Gündəlik artım {perDay} · limitə qədər {days} gün",
+        "tbl": "Cədvəl",
+        "idxToast": "İndeks + TOAST",
+        "mix": {
+          "active": "Aktiv",
+          "idleTx": "Əməliyyatda boş",
+          "idle": "Boş",
+          "total": "sessiyalar"
+        },
+        "col": {
+          "item": "Element",
+          "value": "Dəyər",
+          "time": "Vaxt",
+          "calls": "Zənglər",
+          "total": "Ümumi (ms)",
+          "mean": "Orta (ms)",
+          "share": "Pay"
+        }
+      },
+      "empty": {
+        "noConn": "Bu taksonomiyada monitorinq üçün PostgreSQL server qoşulması yoxdur — yalnız URL-lər və xidmət statusu göstərilir.",
+        "unsupported": "Bu qoşulma monitorinqi dəstəkləmir (yalnız PostgreSQL server qoşulmaları).",
+        "connFail": "Verilənlər bazasına qoşulmaq mümkün olmadı — qoşulma parametrlərini və DB statusunu yoxlayın.",
+        "linkDown": "schema.pi-yə çatmaq mümkün olmadı — avtomatik olaraq yenidən cəhd edilir.",
+        "linkAuth": "Qoşulma tokeninin müddəti bitib — schema.pi-də yeni token verin və qeydiyyatdan keçirin.",
+        "timeout": "Cavablar yavaşdır — avtomatik olaraq yenidən cəhd edilir.",
+        "rate": "Çoxlu sorğular var, buna görə də yeniləmə intervalı artırıldı."
+      },
+      "aux": {
+        "rules": "Mənim xəbərdarlıq qaydalarım ({n} aktiv)",
+        "schemaSvc": "Xidmət statusu — schema.pi cavabları",
+        "schemaSvcNote": "schema.pi tərəfindən saxlanılan son 60 dəqiqəlik tətbiq metrikaları.",
+        "source": "Məlumat mənbəyi: hədəf DB yalnız schema.pi adlı sorğular vasitəsilə oxunur (yalnız oxumaq); trendlər yalnız dbms.pi-də statistika saxlayır (sətir məlumatı yoxdur)."
+      }
     }
   },
   "ops": {
@@ -663,6 +926,7 @@
     },
     "pgss": {
       "title": "pg_stat_statements necə aktivləşdirilir",
+      "body": "Yavaş sorğu Top-N üçün pg_stat_statements uzantısı tələb olunur. Aşağıdakı ifadəni DB administrator hesabı ilə icra edin. Supabase-də bunu İdarə Paneli Database → Extensions bölməsində aktivləşdirə bilərsiniz",
       "note": "Öz-özünə host edilmiş PostgreSQL üçün də shared_preload_libraries (postgresql.conf) daxilində pg_stat_statements və yenidən başlama lazımdır. Cədvəl, indeks və ölçü statistikası onsuz da işləyir"
     },
     "collect": {
@@ -909,6 +1173,12 @@
   },
   "nav": {
     "label": "Xüsusiyyətlər",
+    "groups": {
+      "monitor": "Monitorinq",
+      "drift": "Uyğunluq",
+      "lake": "Göl",
+      "admin": "İdarəetmə"
+    },
     "connect": "Bağlan",
     "sqlLab": "SQL Tuning",
     "perf": "Performans",

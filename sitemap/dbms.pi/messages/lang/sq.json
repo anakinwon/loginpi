@@ -13,7 +13,7 @@
       "connect": "Regjistroni një token lidhjeje schema.pi dhe kontrolloni statusin e lidhjes",
       "sqlLab": "Pema e planit, paralajmërimet, krahasimi dhe kontrollet kundër-model kundër fushave standarde",
       "perf": "Top-N i pyetjeve të ngadalta, shëndeti i tabelës/indeksit, parashikimi i kapacitetit, aktiviteti dhe bllokimet",
-      "monitor": "Përmbledhje e metrikave të aplikacionit, DB dhe URL me alarme të pragut",
+      "monitor": "Normal, paralajmërim dhe rrezik për 14 sinjale, plus çfarë të bëni dhe si ta zgjidhni me një shikim",
       "drift": "Krahasoni modelin schema.pi dhe historikun DDL me katalogun real, matni efektin e indeksit",
       "migration": "Renditja topologjike e ngarkimit, copat, lista e kontrollit dhe SQL-i i verifikimit",
       "pipeline": "Parakontrolli i kapjes së ndryshimeve dhe përkufizimet e pipeline-it burim→transformim→target",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Qendra e Monitorimit",
-    "collectNote": "Mbledhja ekzekutohet në schema.pi — migrimi i planifikuar (D7). Kjo faqe lexon përmbledhjen e monitorit schema.pi.",
+    "title": "Monitorimi",
     "noLink": "Zgjidhni ose regjistroni një lidhje schema.pi së pari.",
     "goConnect": "Regjistro një lidhje",
     "period": "Periudha",
@@ -457,16 +456,9 @@
       "360": "6 orë",
       "1440": "24 orë"
     },
-    "refresh": "Rifresko",
     "loading": "Po ngarkohet…",
-    "updatedAt": "{area} · që nga {time} (rifreskim automatik çdo 30s)",
-    "appTitle": "Performanca e aplikacionit",
-    "dbTitle": "Statusi i DB sipas lidhjes",
-    "urlTitle": "Kontrollet e URL-së",
-    "empty": "Nuk ka të dhëna për t'u shfaqur.",
-    "breachTitle": "{n} tejkalime të pragut",
-    "rulesTitle": "Rregullat e pragut",
-    "rulesNote": "Rregullat ruhen për këtë lidhje dhe vlerësohen kundër përmbledhjes së marrë; tejkalimet marrin një kufi të kuq (njoftimet vijnë më vonë).",
+    "rulesNote": "Rregullat ruhen në këtë lidhje dhe vlerësohen sa herë që rifreskohet tabela (sesioni i DB-së/pritja e bllokimit/shkalla e goditjes së cache-it çdo 1 minutë, madhësia e DB-së/koha e përgjigjes së URL-së/dështimi çdo 5 minuta). Sinjalet e shkelura do të shkallëzohen në rrezik dhe do të shënohen 'Rregulli im' (dërgimi i njoftimeve është hapi tjetër). Rregullat e metrikave të shërbimit (APP) nuk vlerësohen. Rregullat e madhësisë së DB-së (MB) (>) përdoren gjithashtu si kufizime kapaciteti.",
+    "notEvaluated": "Nuk u vlerësua",
     "metric": "Metrika",
     "conn": "Lidhja",
     "allConns": "Të gjitha lidhjet",
@@ -501,7 +493,278 @@
       "RATE": "Shumë kërkesa. Ju lutemi provoni përsëri së shpejti.",
       "TIMEOUT": "schema.pi po përgjigjet ngadalë. Ju lutemi provoni përsëri së shpejti.",
       "RULE_LIMIT": "Deri në 50 rregulla për lidhje.",
-      "NOT_FOUND": "Rregulli nuk u gjet."
+      "NOT_FOUND": "Rregulli nuk u gjet.",
+      "CONN_FAIL": "Nuk mund të lidhej me bazën e të dhënave. Kontrolloni cilësimet e lidhjes dhe statusin e DB-së.",
+      "LINK_DOWN": "Nuk mund të arrihej schema.pi. Provoni përsëri së shpejti.",
+      "PGSS_MISSING": "pg_stat_statements nuk është instaluar, kështu që SQL i ngadaltë nuk është i disponueshëm.",
+      "CONN_UNSUPPORTED": "Kjo lidhje nuk mbështet monitorimin (vetëm lidhjet e serverit PostgreSQL).",
+      "CONN_DISABLED": "Kjo lidhje është çaktivizuar. Aktivizojeni në schema.pi.",
+      "INVALID_INPUT": "Kërkesa është e pavlefshme."
+    },
+    "board": {
+      "subtitle": "Çfarë duhet bërë në këtë DB tani – 14 sinjale OK, paralajmërim ose rrezik, me zgjidhje, me një shikim.",
+      "refresh": {
+        "updated": "Që nga {time} · rifreskohet çdo minutë",
+        "now": "Rifresko tani",
+        "busy": "Po ngarkohet…",
+        "stale": "E vjetër · {min} min më parë"
+      },
+      "level": {
+        "RISK": "Rrezik",
+        "WARN": "Paralajmërim",
+        "OK": "OK",
+        "UNKNOWN": "E panjohur",
+        "NA": "N/A"
+      },
+      "overall": {
+        "RISK": "Rrezik — nevojitet veprim tani",
+        "WARN": "Paralajmërim — disa artikuj duhet të shikohen",
+        "UNKNOWN": "E panjohur — kontrolloni lidhjen",
+        "OK": "OK — çdo sinjal është brenda kufijve",
+        "CONN_DOWN": "Nuk mund të arrihet DB – kontrolloni së pari lidhjen",
+        "NA": "N/A"
+      },
+      "kpi": {
+        "sess": "Sesione / maks",
+        "tps": "Transaksione/s",
+        "cache": "Shkalla e goditjes së cache-it",
+        "size": "Madhësia e DB-së"
+      },
+      "todo": {
+        "title": "Për të bërë tani",
+        "more": "Shfaq {n} më shumë",
+        "less": "Shfaq më pak",
+        "setup": "Konfigurojini këto për të parë më shumë",
+        "none": "Asnjë artikull rreziku ose paralajmërimi nuk kërkon veprim tani.",
+        "unknown": "Nuk mund të kontrollohej {n} sinjal(e) — shihni kartat për arsyen.",
+        "myRule": "Rregulli im u shkel: {rule}",
+        "copySql": "Kopjo SQL",
+        "copied": "U kopjua"
+      },
+      "cat": {
+        "avail": "Disponueshmëria",
+        "load": "Ngarkesa dhe pritjet",
+        "eff": "Efikasiteti",
+        "store": "Ruajtja dhe mirëmbajtja",
+        "protect": "Mbrojtja (backup, replikimi)"
+      },
+      "card": {
+        "thr": "Kufijtë: paralajmërim {warn} · rrezik {risk}",
+        "thrDown": "Kufijtë: paralajmërim nën {warn} · rrezik nën {risk}",
+        "more": "Si të rregullohet",
+        "addRule": "Shto një rregull për këtë metrikë",
+        "basisLive": "Minuta e fundit",
+        "basisStored": "Kumulative",
+        "since": "rivendosja e statistikave {at}",
+        "partial": "Pamje e pjesshme (kapacitet 500 rreshta ose privilegje të mungueshme)."
+      },
+      "sig": {
+        "AVAIL": "Përgjigja e DB-së",
+        "CONN_USE": "Përdorimi i lidhjes (kjo DB)",
+        "URL": "URL-të e shërbimit",
+        "LONG_QRY": "Pyetje me kohëzgjatje të gjatë",
+        "IDLE_TX": "Transaksione të papërdorura",
+        "LOCK_WAIT": "Pritjet e bllokimit",
+        "CACHE_HIT": "Shkalla e goditjes së cache-it",
+        "XACT_ERR": "Rikthimet dhe bllokimet",
+        "SLOW_SQL": "SQL i ngadaltë",
+        "STORAGE": "Ruajtja",
+        "VACUUM": "Vacuum",
+        "INDEX": "Gjendja e indeksit",
+        "BACKUP": "Backup (arkivi WAL)",
+        "REPL": "Vonesa e replikimit"
+      },
+      "fix": {
+        "AVAIL": "Përgjigje e ngadaltë ose një rindezje e fundit — kontrolloni cilësimet e lidhjes dhe statusin e serverit të DB-së.",
+        "AVAIL_DOWN": "Nuk mund të lidhej me DB-në — kontrolloni cilësimet e lidhjes dhe nëse serveri i DB-së është aktiv.",
+        "CONN_USE": "{sess}/{max} sesione në këtë DB (jo në të gjithë grupin — bazat e të dhënave të tjera janë të përjashtuara) — mbyllni lidhjet e papërdorura ose shtoni një pooler lidhjesh (pgbouncer).",
+        "URL": "{n} URL të kontrolluara dështojnë · përgjigje maksimale {ms}ms — shihni monitorin schema.pi për shkakun.",
+        "LONG_QRY": "Një pyetje ka qenë duke u ekzekutuar për {sec}s — rishikoni planin e saj dhe rregullojeni, ose kërkoni nga një DBA ta anulojë.",
+        "IDLE_TX": "Një transaksion ka qenë i papërdorur për {sec}s — gjeni commit-in e munguar në aplikacion dhe vendosni një timeout.",
+        "LOCK_WAIT": "{n} sesione po presin bllokime — gjeni sesionin bllokues dhe përfundoni transaksionin e tij.",
+        "CACHE_HIT": "Shkalla e goditjes së cache-it {pct}% — kërkoni skanime të plota të tabelave të mëdha ose rishikoni shared_buffers.",
+        "XACT_ERR": "Shkalla e rikthimit {pct}%, {dlck} bllokime — kontrolloni transaksionet e dështuara dhe logjet e gabimeve të aplikacionit.",
+        "SLOW_SQL": "Një pyetje mesatarisht {ms} ms — rregulloni pyetjet kryesore sipas kohës totale duke përdorur planet e tyre.",
+        "STORAGE": "DB ({gb} GB) është afër kufirit të saj (ditë të mbetura {days}) — pastroni tabelat e mëdha ose shtoni kapacitet.",
+        "VACUUM": "{tbl} ka shumë rreshta të vdekur ose statistika të vjetruara — rishikoni cilësimet VACUUM (ANALYZE) dhe autovacuum.",
+        "INDEX": "{n} gjetje indeksi (të pavlefshme, të papërdorura, skanime të plota) — shihni skedën e shëndetit të tabelës dhe indeksit për objektivat.",
+        "BACKUP": "Arkivimi WAL është i fikur ose i bllokuar — kontrolloni archive_mode, archive_command dhe statusin e backup-it.",
+        "REPL": "Vonesa e replikimit {sec}s — kontrolloni statusin e standby-t dhe rrjetin.",
+        "PGSS": "pg_stat_statements nuk është instaluar, kështu që SQL i ngadaltë nuk është i disponueshëm — aktivizojeni me SQL-në më poshtë (kërkohet rindezje e serverit)."
+      },
+      "reason": {
+        "CONN_DOWN": "Nuk u gjykua sepse lidhja e DB-së është e fikur.",
+        "PGSS": "pg_stat_statements nuk është instaluar.",
+        "VER": "E disponueshme në PostgreSQL 13 ose më vonë.",
+        "SAMPLE": "Nuk ka ende mostra të mjaftueshme.",
+        "NO_LIMIT": "Nuk ka kufi madhësie, kështu që përdorimi nuk gjykohet — shtoni një rregull të madhësisë së DB-së (MB) (>) për ta përdorur si kufi.",
+        "RESET": "Statistikat u rivendosën më pak se 7 ditë më parë, kështu që indekset e papërdorura nuk gjykohen.",
+        "STALE": "Nuk ka regjistrime të fundit kontrolli.",
+        "STANDBY": "Nuk aplikohet në një server standby.",
+        "NONE": "Asgjë për të kontrolluar.",
+        "GRANT": "Privilegje të mungueshme — jepni rolin pg_monitor llogarisë së lidhjes.",
+        "LINK": "Pyetja schema.pi dështoi ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Kontrolloni statusin e lidhjes në Lidhjet, dhe rregulloni cilësimet e lidhjes (host, port, llogari) në schema.pi.",
+          "2": "Kontrolloni nëse serveri i DB-së është aktiv dhe nëse është rindezur së fundmi.",
+          "3": "Nëse vazhdon të jetë i ngadaltë, kontrolloni ngarkesën e serverit (CPU, disk) dhe rrjetin."
+        },
+        "CONN_USE": {
+          "1": "Shihni numrin e sesioneve sipas përdoruesit dhe gjendjes në skedën e aktivitetit dhe bllokimeve.",
+          "2": "Nëse shumë janë të papërdorura, zvogëloni pool-in e aplikacionit ose shtoni një pooler lidhjesh.",
+          "3": "Rritni max_connections me kujdes, duke marrë parasysh memorien."
+        },
+        "URL": {
+          "1": "Shihni URL-të e dështuara dhe kodet e statusit në monitorin schema.pi.",
+          "2": "Kontrolloni vendosjen e aplikacionit dhe varësitë e jashtme.",
+          "3": "Nëse përsëritet, shtoni një rregull të numrit të dështimeve të URL-së (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Gjeni pyetjet me kohëzgjatje të gjatë dhe përdoruesit e tyre në skedën e aktivitetit dhe bllokimeve.",
+          "2": "Rishikoni planin në SQL tuning dhe rregulloni indekset ose kushtet.",
+          "3": "Nëse është urgjente, një DBA e anulon me pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Shihni pyetjen e fundit të sesioneve idle-in-transaction në skedën e aktivitetit dhe bllokimeve.",
+          "2": "Gjeni commit-in ose rollback-un e munguar në kodin e aplikacionit.",
+          "3": "Kufizojeni me idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Gjeni sesionin bllokues (blocked_by) në skedën e aktivitetit dhe bllokimeve.",
+          "2": "Përfundoni transaksionin e tij ose kërkoni nga një DBA ta anulojë.",
+          "3": "Rregulloni grupet ose rendin e transaksioneve që mbajnë të njëjtat rreshta për një kohë të gjatë."
+        },
+        "CACHE_HIT": {
+          "1": "Gjeni skanime të plota të tabelave të mëdha në skedën e pyetjeve të ngadalta.",
+          "2": "Shtoni indekset e nevojshme për të lexuar më pak blloqe.",
+          "3": "Nëse memoria lejon, rishikoni shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Gjeni shkaqet e rikthimit (shkeljet e kufizimeve, timeout-et) në logjet e gabimeve të aplikacionit.",
+          "2": "Nëse ka bllokime, bllokoni tabelat në një rend konsistent.",
+          "3": "Kontrolloni që logjika e ritentimit nuk po fryn rikthimet."
+        },
+        "SLOW_SQL": {
+          "1": "Zgjidhni pyetjet kryesore sipas kohës totale në skedën e pyetjeve të ngadalta.",
+          "2": "Rishikoni planet në SQL tuning dhe rregulloni indekset ose bashkimet.",
+          "3": "Pas rregullimit, kontrolloni që koha mesatare ka rënë."
+        },
+        "STORAGE": {
+          "1": "Shihni trendin e rritjes dhe datën e vlerësuar të plotësimit në skedën e trendit të madhësisë.",
+          "2": "Pastroni tabelat e mëdha, indekset dhe të dhënat e vjetra.",
+          "3": "Nëse është e nevojshme, shtoni disk dhe përditësoni rregullin e kufirit."
+        },
+        "VACUUM": {
+          "1": "Shihni tabelat me shumë rreshta të vdekur në skedën e shëndetit të tabelës dhe indeksit.",
+          "2": "Një DBA ekzekuton VACUUM (ANALYZE).",
+          "3": "Nëse përsëritet, ulni pragjet e autovacuum për atë tabelë."
+        },
+        "INDEX": {
+          "1": "Shihni indekset e pavlefshme ose të papërdorura dhe tabelat me skanim të plotë në skedën e shëndetit të tabelës dhe indeksit.",
+          "2": "Rindërtoni indekset e pavlefshme; një DBA rishikon dhe heq ato të papërdorura.",
+          "3": "Dizajnoni indekset në SQL tuning për tabelat me shumë skanime të plota."
+        },
+        "BACKUP": {
+          "1": "Shihni archive_mode dhe kohën e fundit të arkivimit në skedën e backup-it dhe rikuperimit.",
+          "2": "Nëse arkivimi dështon, kontrolloni archive_command dhe hapësirën e lirë në destinacion.",
+          "3": "Në një DB të menaxhuar, kontrolloni cilësimet e backup-it të ofruesit."
+        },
+        "REPL": {
+          "1": "Shihni gjendjen dhe vonesën e çdo standby-i në skedën e replikimit dhe DR.",
+          "2": "Kontrolloni diskun, CPU-në dhe rrjetin në standby.",
+          "3": "Nëse nuk po transmeton, kontrolloni logjet e standby-t."
+        }
+      },
+      "sqlNote": "SQL-ja më poshtë është vetëm për lexim, për kontroll — rregullimet (VACUUM, DROP INDEX, pg_terminate_backend) ekzekutohen nga një DBA.",
+      "go": {
+        "activity": "Aktiviteti dhe bllokimet",
+        "top": "Pyetjet e ngadalta",
+        "health": "Gjendja e tabelës dhe indeksit",
+        "trend": "Trendi i kapacitetit",
+        "params": "Kontrolli i parametrave",
+        "repl": "Kontrolli i replikimit",
+        "backup": "Kontrolli i backup-it",
+        "sqlLab": "SQL tuning",
+        "drift": "Krahasimi i drift-it",
+        "connect": "Lidhjet",
+        "schema": "schema.pi monitor"
+      },
+      "chart": {
+        "title": "Trendet dhe renditjet",
+        "note": "Trendet regjistrohen çdo minutë ndërsa ky ekran është i hapur (nuk ka mbledhje në sfond).",
+        "gauges": "Matësit e lidhjes dhe cache-it",
+        "sessState": "Sesionet tani",
+        "sessTrend": "Trendi i sesioneve dhe pritjet e bllokimit",
+        "tpsCombo": "Shkalla e përpunimit dhe rikthimit",
+        "cacheTrend": "Trendi i shkallës së goditjes së cache-it",
+        "capacity": "Madhësia e DB-së dhe parashikimi",
+        "slowTop": "SQL i ngadaltë top 10",
+        "slowLegend": "Gjatësia e shiritit = koha totale · ngjyra = koha mesatare (▲ paralajmërim nga {warn}ms · ✕ rrezik nga {risk}ms)",
+        "sizeTop": "Hapësira top 10",
+        "heat": "Rreziku sipas sinjalit me kalimin e kohës",
+        "q": {
+          "gauges": "A po mbushen lidhjet? A po shërbehen leximet nga memoria?",
+          "sessState": "Çfarë po bëjnë sesionet tani?",
+          "sessTrend": "A rriten pritjet e bllokimit kur grumbullohen sesionet?",
+          "tpsCombo": "A lëvizin së bashku shkalla e përpunimit dhe shkalla e dështimit?",
+          "cacheTrend": "Kur ra shkalla e goditjes së cache-it?",
+          "capacity": "Kur do të mbushet DB-ja?",
+          "slowTop": "Çfarë të rregullohet së pari? (sipas kohës totale)",
+          "sizeTop": "Çfarë po zë hapësirën?",
+          "heat": "A është rreziku një rast i vetëm apo i përsëritur?"
+        },
+        "asTable": "Shiko si tabelë",
+        "needHistory": "Nuk ka ende trend — mbajeni këtë ekran të hapur për disa minuta.",
+        "needPerf": "Nuk ka histori madhësie — mblidhni në skedën e performancës ose mbajeni këtë ekran të hapur.",
+        "noSess": "Nuk ka sesione.",
+        "noWait": "Nuk ka pritje",
+        "noData": "Asgjë për të shfaqur.",
+        "loading": "Po ngarkohet…",
+        "waitTop": "Ngjarjet e pritjes",
+        "lockWait": "Pritjet e bllokimit",
+        "tps": "Transaksione/s",
+        "rlbk": "Shkalla e rikthimit (%)",
+        "cacheHit": "Shkalla e goditjes së cache-it",
+        "size": "Madhësia e DB-së",
+        "limit": "Kufiri",
+        "forecast": "Parashikimi",
+        "daysLeft": "Ditë të mbetura",
+        "capNote": "Rritja për ditë {perDay} · {days} ditë deri në kufi",
+        "tbl": "Tabela",
+        "idxToast": "Indeksi + TOAST",
+        "mix": {
+          "active": "Aktiv",
+          "idleTx": "I papërdorur në transaksion",
+          "idle": "I papërdorur",
+          "total": "sesione"
+        },
+        "col": {
+          "item": "Artikulli",
+          "value": "Vlera",
+          "time": "Koha",
+          "calls": "Thirrjet",
+          "total": "Totali (ms)",
+          "mean": "Mesatarja (ms)",
+          "share": "Pjesa"
+        }
+      },
+      "empty": {
+        "noConn": "Kjo taksonomi nuk ka lidhje serveri PostgreSQL për të monitoruar — shfaqen vetëm URL-të dhe statusi i shërbimit.",
+        "unsupported": "Kjo lidhje nuk mbështet monitorimin (vetëm lidhjet e serverit PostgreSQL).",
+        "connFail": "Nuk mund të lidhej me bazën e të dhënave — kontrolloni cilësimet e lidhjes dhe statusin e DB-së.",
+        "linkDown": "Nuk mund të arrihej schema.pi — po ritentohet automatikisht.",
+        "linkAuth": "Tokeni i lidhjes ka skaduar — lëshoni një token të ri në schema.pi dhe regjistrojeni atë.",
+        "timeout": "Përgjigjet janë të ngadalta — po ritentohet automatikisht.",
+        "rate": "Shumë kërkesa, kështu që intervali i rifreskimit u rrit."
+      },
+      "aux": {
+        "rules": "Rregullat e mia të alarmit ({n} aktive)",
+        "schemaSvc": "Statusi i shërbimit — përgjigjet e schema.pi",
+        "schemaSvcNote": "Metrikat e aplikacionit për 60 minutat e fundit të ruajtura nga schema.pi.",
+        "source": "Burimi i të dhënave: DB e synuar lexohet vetëm përmes pyetjeve të emërtuara të schema.pi (vetëm për lexim); trendet ruajnë statistika vetëm në dbms.pi (nuk ka të dhëna rreshtash)."
+      }
     }
   },
   "ops": {
@@ -650,7 +913,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "Lidhja schema.pi po përgatitet. Ju lutemi provoni përsëri më vonë",
+      "PGSS_MISSING": "Zgjerimi pg_stat_statements nuk është instaluar në këtë DB, kështu që statistikat e pyetjeve nuk janë të disponueshme",
       "CONN_UNSUPPORTED": "Kjo lidhje nuk mbështetet ende (vetëm lidhjet e drejtpërdrejta PostgreSQL)",
+      "TIMEOUT": "DB e synuar u përgjigj shumë ngadalë. Ju lutemi provoni përsëri më vonë",
       "RATE": "Shumë kërkesa. Provoni përsëri pas një minute",
       "LINK_AUTH": "Tokeni i lidhjes ka skaduar ose është revokuar. Regjistrojeni tokenin përsëri në faqen Lidhje",
       "LINK_SCOPE": "Kjo lidhje nuk i përket zonës së subjektit të lidhjes",
@@ -659,6 +924,7 @@
     },
     "pgss": {
       "title": "Si të aktivizoni pg_stat_statements",
+      "body": "Top-N i pyetjeve të ngadalta kërkon zgjerimin pg_stat_statements. Ekzekutoni deklaratën e mëposhtme si administrator i DB. Në Supabase, mund ta aktivizoni në Dashboard Database → Extensions",
       "note": "PostgreSQL i vetë-hostuar gjithashtu kërkon pg_stat_statements në shared_preload_libraries (postgresql.conf) dhe një rifillim. Statistikat e tabelave, indekseve dhe madhësisë funksionojnë pa të"
     },
     "collect": {
@@ -697,6 +963,7 @@
     "trend": {
       "limit": "Pragu i madhësisë",
       "empty": "Nuk ka pamje në 30 ditët e fundit",
+      "chart": "Tendenca e madhësisë së DB gjatë 30 ditëve të fundit",
       "now": "Madhësia aktuale",
       "perDay": "Rritja për ditë",
       "needMore": "Nevojiten 2+ pamje",
@@ -904,6 +1171,12 @@
   },
   "nav": {
     "label": "Funksionet",
+    "groups": {
+      "monitor": "Monitorimi",
+      "drift": "Konsistenca",
+      "lake": "Liqeni",
+      "admin": "Admin"
+    },
     "connect": "Lidh",
     "sqlLab": "Optimizim SQL",
     "perf": "Performanca",

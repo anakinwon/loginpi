@@ -13,7 +13,7 @@
       "connect": "Registrirajte žeton povezave schema.pi in preverite stanje povezave",
       "sqlLab": "Drevo načrta, opozorila, primerjava in preverjanje protipredlog proti standardnim domenam",
       "perf": "Počasne poizvedbe Top-N, stanje tabel/indeksov, napoved zmogljivosti, aktivnost in zaklepanja",
-      "monitor": "Povzetek metrik aplikacije, DB in URL z opozorili o pragih",
+      "monitor": "Normalno, opozorilo in tveganje za 14 signalov, plus kaj storiti in kako rešiti na prvi pogled",
       "drift": "Primerjajte model schema.pi in zgodovino DDL z dejanskim katalogom, izmerite učinek indeksa",
       "migration": "Topološki vrstni red nalaganja, kosi, kontrolni seznam in SQL za preverjanje",
       "pipeline": "Predhodno preverjanje zajemanja sprememb in definicije cevovodov vir→transformacija→cilj",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Nadzorni center",
-    "collectNote": "Zbiranje poteka v schema.pi — migracija načrtovana (D7). Ta stran bere povzetek monitorja schema.pi.",
+    "title": "Spremljanje",
     "noLink": "Najprej izberite ali registrirajte povezavo schema.pi.",
     "goConnect": "Registriraj povezavo",
     "period": "Obdobje",
@@ -457,16 +456,9 @@
       "360": "6 ur",
       "1440": "24 ur"
     },
-    "refresh": "Osveži",
     "loading": "Nalaganje…",
-    "updatedAt": "{area} · od {time} (samodejno osveževanje vsakih 30s)",
-    "appTitle": "Učinkovitost aplikacije",
-    "dbTitle": "Stanje DB po povezavi",
-    "urlTitle": "Preverjanje URL-jev",
-    "empty": "Ni podatkov za prikaz.",
-    "breachTitle": "{n} prekoračitev praga",
-    "rulesTitle": "Pravila praga",
-    "rulesNote": "Pravila so shranjena za to povezavo in se ocenjujejo glede na prejeti povzetek; prekoračitve dobijo rdeč rob (obvestila pridejo kasneje).",
+    "rulesNote": "Pravila so shranjena v tej povezavi in se ovrednotijo vsakič, ko se plošča osveži (seja DB/čakanje na zaklepanje/stopnja zadetkov predpomnilnika vsako 1 minuto, velikost DB/odzivni čas URL-ja/napaka vsakih 5 minut). Kršeni signali bodo eskalirali v nevarnost in bodo označeni kot 'Moje pravilo' (pošiljanje obvestil je naslednji korak). Pravila metrik storitev (APP) se ne ovrednotijo. Pravila velikosti DB (MB) (>) se uporabljajo tudi kot omejitve zmogljivosti.",
+    "notEvaluated": "Ni ovrednoteno",
     "metric": "Metrika",
     "conn": "Povezava",
     "allConns": "Vse povezave",
@@ -501,7 +493,278 @@
       "RATE": "Preveč zahtev. Poskusite znova čez nekaj časa.",
       "TIMEOUT": "schema.pi se odziva počasi. Poskusite znova čez nekaj časa.",
       "RULE_LIMIT": "Do 50 pravil na povezavo.",
-      "NOT_FOUND": "Pravilo ni najdeno."
+      "NOT_FOUND": "Pravilo ni najdeno.",
+      "CONN_FAIL": "Povezava z zbirko podatkov ni uspela. Preverite nastavitve povezave in stanje DB.",
+      "LINK_DOWN": "schema.pi ni dosegljiv. Poskusite znova čez nekaj časa.",
+      "PGSS_MISSING": "pg_stat_statements ni nameščen, zato počasen SQL ni na voljo.",
+      "CONN_UNSUPPORTED": "Ta povezava ne podpira spremljanja (samo povezave s strežnikom PostgreSQL).",
+      "CONN_DISABLED": "Ta povezava je onemogočena. Omogočite jo v schema.pi.",
+      "INVALID_INPUT": "Zahteva je neveljavna."
+    },
+    "board": {
+      "subtitle": "Kaj storiti s to DB takoj zdaj — 14 signalov OK, opozoril ali tveganj z rešitvami, na hitro.",
+      "refresh": {
+        "updated": "Od {time} · osveži se vsako minuto",
+        "now": "Osveži zdaj",
+        "busy": "Nalaganje ...",
+        "stale": "Zastarelo · pred {min} min"
+      },
+      "level": {
+        "RISK": "Tveganje",
+        "WARN": "Opozorilo",
+        "OK": "V redu",
+        "UNKNOWN": "Neznano",
+        "NA": "Ni na voljo"
+      },
+      "overall": {
+        "RISK": "Tveganje — potrebna je takojšnja akcija",
+        "WARN": "Opozorilo — nekatere postavke je treba pregledati",
+        "UNKNOWN": "Neznano — preverite povezavo",
+        "OK": "V redu — vsak signal je znotraj omejitev",
+        "CONN_DOWN": "Ne morem doseči DB — najprej preverite povezavo",
+        "NA": "Ni na voljo"
+      },
+      "kpi": {
+        "sess": "Seje / maks.",
+        "tps": "Transakcije/s",
+        "cache": "Stopnja zadetkov predpomnilnika",
+        "size": "Velikost DB"
+      },
+      "todo": {
+        "title": "Kaj storiti zdaj",
+        "more": "Prikaži še {n}",
+        "less": "Prikaži manj",
+        "setup": "Nastavite to, da boste videli več",
+        "none": "Trenutno ni tveganih ali opozorilnih elementov, ki bi zahtevali ukrepanje.",
+        "unknown": "Ni bilo mogoče preveriti {n} signala(ov) — razlog si oglejte na karticah.",
+        "myRule": "Moje pravilo kršeno: {rule}",
+        "copySql": "Kopiraj SQL",
+        "copied": "Kopirano"
+      },
+      "cat": {
+        "avail": "Razpoložljivost",
+        "load": "Obremenitev in čakanja",
+        "eff": "Učinkovitost",
+        "store": "Shranjevanje in vzdrževanje",
+        "protect": "Zaščita (varnostno kopiranje, replikacija)"
+      },
+      "card": {
+        "thr": "Omejitve: opozorilo {warn} · tveganje {risk}",
+        "thrDown": "Omejitve: opozorilo pod {warn} · tveganje pod {risk}",
+        "more": "Kako popraviti",
+        "addRule": "Dodaj pravilo za to metriko",
+        "basisLive": "Zadnja minuta",
+        "basisStored": "Kumulativno",
+        "since": "ponastavitev statistike {at}",
+        "partial": "Delni pogled (omejitev 500 vrstic ali manjkajoče pravice)."
+      },
+      "sig": {
+        "AVAIL": "Odziv DB",
+        "CONN_USE": "Uporaba povezave (ta DB)",
+        "URL": "URL-ji storitev",
+        "LONG_QRY": "Dolgotrajne poizvedbe",
+        "IDLE_TX": "Nedejavne transakcije",
+        "LOCK_WAIT": "Čakanja na zaklepanje",
+        "CACHE_HIT": "Stopnja zadetkov predpomnilnika",
+        "XACT_ERR": "Povratne transakcije in mrtvi zaklepi",
+        "SLOW_SQL": "Počasen SQL",
+        "STORAGE": "Shranjevanje",
+        "VACUUM": "Vacuum",
+        "INDEX": "Stanje indeksa",
+        "BACKUP": "Varnostno kopiranje (arhiv WAL)",
+        "REPL": "Zakasnitev replikacije"
+      },
+      "fix": {
+        "AVAIL": "Počasen odziv ali nedavni ponovni zagon — preverite nastavitve povezave in stanje strežnika DB.",
+        "AVAIL_DOWN": "Povezava z DB ni uspela — preverite nastavitve povezave in ali je strežnik DB vklopljen.",
+        "CONN_USE": "{sess}/{max} sej na tej DB (ne za celoten klaster — druge zbirke podatkov so izključene) — zaprite nedejavne povezave ali dodajte povezovalni bazen (pgbouncer).",
+        "URL": "{n} preverjenih URL-jev ne deluje · največji odziv {ms}ms — vzrok si oglejte v monitorju schema.pi.",
+        "LONG_QRY": "Poizvedba se izvaja že {sec}s — preglejte njen načrt in jo optimizirajte, ali pa naj jo DBA prekliče.",
+        "IDLE_TX": "Transakcija je bila nedejavna {sec}s — poiščite manjkajočo potrditev v aplikaciji in nastavite časovno omejitev.",
+        "LOCK_WAIT": "{n} sej čaka na zaklepanje — poiščite blokirajočo sejo in končajte njeno transakcijo.",
+        "CACHE_HIT": "Stopnja zadetkov predpomnilnika {pct}% — poiščite popolne preglede velikih tabel ali preglejte shared_buffers.",
+        "XACT_ERR": "Stopnja povratnih transakcij {pct}%, {dlck} mrtvih zaklepov — preverite neuspešne transakcije in dnevnike napak aplikacije.",
+        "SLOW_SQL": "Poizvedba v povprečju traja {ms} ms — optimizirajte najboljše poizvedbe po skupnem času z uporabo njihovih načrtov.",
+        "STORAGE": "DB ({gb} GB) je blizu svoje omejitve (preostali dnevi {days}) — počistite velike tabele ali dodajte zmogljivost.",
+        "VACUUM": "{tbl} ima veliko mrtvih vrstic ali zastarele statistike — preglejte nastavitve VACUUM (ANALYZE) in autovacuum.",
+        "INDEX": "{n} ugotovitev indeksa (neveljavni, neuporabljeni, popolni pregledi) — cilje si oglejte na zavihku zdravja tabel in indeksov.",
+        "BACKUP": "Arhiviranje WAL je izklopljeno ali zastalo — preverite archive_mode, archive_command in stanje varnostnega kopiranja.",
+        "REPL": "Zakasnitev replikacije {sec}s — preverite stanje pripravljenosti in omrežje.",
+        "PGSS": "pg_stat_statements ni nameščen, zato počasen SQL ni na voljo — omogočite ga s spodnjim SQL-jem (potreben je ponovni zagon strežnika)."
+      },
+      "reason": {
+        "CONN_DOWN": "Ni ocenjeno, ker je povezava z DB prekinjena.",
+        "PGSS": "pg_stat_statements ni nameščen.",
+        "VER": "Na voljo na PostgreSQL 13 ali novejšem.",
+        "SAMPLE": "Še ni dovolj vzorcev.",
+        "NO_LIMIT": "Ni omejitve velikosti, zato uporaba ni ocenjena — dodajte pravilo velikosti DB (MB) (>) za uporabo kot omejitev.",
+        "RESET": "Statistika je bila ponastavljena pred manj kot 7 dnevi, zato neuporabljeni indeksi niso ocenjeni.",
+        "STALE": "Ni nedavnih zapisov preverjanja.",
+        "STANDBY": "Ni primerno za strežnik v pripravljenosti.",
+        "NONE": "Nič za preveriti.",
+        "GRANT": "Manjkajoče pravice — dodelite vlogo pg_monitor računu povezave.",
+        "LINK": "Poizvedba schema.pi ni uspela ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Preverite stanje povezave v Povezavah in popravite nastavitve povezave (gostitelj, vrata, račun) v schema.pi.",
+          "2": "Preverite, ali je strežnik DB vklopljen in ali se je nedavno ponovno zagnal.",
+          "3": "Če ostane počasen, preverite obremenitev strežnika (CPU, disk) in omrežje."
+        },
+        "CONN_USE": {
+          "1": "Oglejte si število sej po uporabniku in stanju na zavihku dejavnosti in zaklepanja.",
+          "2": "Če je veliko nedejavnih, zmanjšajte bazen aplikacij ali dodajte povezovalni bazen.",
+          "3": "Previdno povečajte max_connections, upoštevajoč pomnilnik."
+        },
+        "URL": {
+          "1": "Oglejte si neuspešne URL-je in kode stanja v monitorju schema.pi.",
+          "2": "Preverite namestitev aplikacije in zunanje odvisnosti.",
+          "3": "Če se ponavlja, dodajte pravilo za število napak URL-ja (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Poiščite dolgotrajne poizvedbe in njihove uporabnike na zavihku dejavnosti in zaklepanja.",
+          "2": "Preglejte načrt v SQL tuning in popravite indekse ali pogoje.",
+          "3": "Če je nujno, ga DBA prekliče z pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Oglejte si zadnjo poizvedbo sej idle-in-transaction na zavihku dejavnosti in zaklepanja.",
+          "2": "Poiščite manjkajočo potrditev ali povratno transakcijo v kodi aplikacije.",
+          "3": "Omejite jo z idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Poiščite blokirajočo sejo (blocked_by) na zavihku dejavnosti in zaklepanja.",
+          "2": "Končajte njeno transakcijo ali pa naj jo DBA prekliče.",
+          "3": "Popravite pakete ali vrstni red transakcij, ki dolgo držijo iste vrstice."
+        },
+        "CACHE_HIT": {
+          "1": "Poiščite popolne preglede velikih tabel na zavihku počasnih poizvedb.",
+          "2": "Dodajte potrebne indekse za branje manj blokov.",
+          "3": "Če pomnilnik dopušča, preglejte shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Poiščite vzroke povratnih transakcij (kršitve omejitev, časovne omejitve) v dnevnikih napak aplikacije.",
+          "2": "Če so mrtvi zaklepi, zaklenite tabele v doslednem vrstnem redu.",
+          "3": "Preverite, ali logika ponovnega poskusa ne napihuje povratnih transakcij."
+        },
+        "SLOW_SQL": {
+          "1": "Izberite najboljše poizvedbe po skupnem času na zavihku počasnih poizvedb.",
+          "2": "Preglejte načrte v SQL tuning in popravite indekse ali združitve.",
+          "3": "Po popravku preverite, ali se je povprečni čas zmanjšal."
+        },
+        "STORAGE": {
+          "1": "Oglejte si trend rasti in predvideni datum polnosti na zavihku trenda velikosti.",
+          "2": "Počistite velike tabele, indekse in stare podatke.",
+          "3": "Po potrebi dodajte disk in posodobite pravilo omejitve."
+        },
+        "VACUUM": {
+          "1": "Oglejte si tabele z veliko mrtvimi vrsticami na zavihku zdravja tabel in indeksov.",
+          "2": "DBA izvede VACUUM (ANALYZE).",
+          "3": "Če se ponavlja, znižajte pragove autovacuum za to tabelo."
+        },
+        "INDEX": {
+          "1": "Oglejte si neveljavne ali neuporabljene indekse in tabele s popolnim pregledom na zavihku zdravja tabel in indeksov.",
+          "2": "Ponovno zgradite neveljavne indekse; DBA pregleda in izbriše neuporabljene.",
+          "3": "Oblikujte indekse v SQL tuning za tabele z veliko popolnimi pregledi."
+        },
+        "BACKUP": {
+          "1": "Oglejte si archive_mode in zadnji čas arhiviranja na zavihku varnostnega kopiranja in obnovitve.",
+          "2": "Če arhiviranje ne uspe, preverite archive_command in prosti prostor na cilju.",
+          "3": "Na upravljani DB preverite nastavitve varnostnega kopiranja ponudnika."
+        },
+        "REPL": {
+          "1": "Oglejte si stanje in zakasnitev vsakega pripravljenega strežnika na zavihku replikacije in DR.",
+          "2": "Preverite disk, CPU in omrežje na pripravljenem strežniku.",
+          "3": "Če ne pretaka, preverite dnevnike pripravljenega strežnika."
+        }
+      },
+      "sqlNote": "Spodnji SQL je samo za branje, za preverjanje — popravke (VACUUM, DROP INDEX, pg_terminate_backend) izvede DBA.",
+      "go": {
+        "activity": "Dejavnost in zaklepanja",
+        "top": "Počasne poizvedbe",
+        "health": "Stanje tabel in indeksov",
+        "trend": "Trend zmogljivosti",
+        "params": "Preverjanje parametrov",
+        "repl": "Preverjanje replikacije",
+        "backup": "Preverjanje varnostnega kopiranja",
+        "sqlLab": "SQL tuning",
+        "drift": "Primerjava odstopanj",
+        "connect": "Povezave",
+        "schema": "schema.pi monitor"
+      },
+      "chart": {
+        "title": "Trendi in uvrstitve",
+        "note": "Trendi se beležijo vsako minuto, medtem ko je ta zaslon odprt (brez zbiranja v ozadju).",
+        "gauges": "Merilniki povezave in predpomnilnika",
+        "sessState": "Seje trenutno",
+        "sessTrend": "Trend sej in čakanja na zaklepanje",
+        "tpsCombo": "Pretok in stopnja povratnih transakcij",
+        "cacheTrend": "Trend stopnje zadetkov predpomnilnika",
+        "capacity": "Velikost in napoved DB",
+        "slowTop": "Počasen SQL top 10",
+        "slowLegend": "Dolžina stolpca = skupni čas · barva = povprečni čas (▲ opozorilo od {warn}ms · ✕ tveganje od {risk}ms)",
+        "sizeTop": "Prostor top 10",
+        "heat": "Tveganje po signalu skozi čas",
+        "q": {
+          "gauges": "Ali se povezave polnijo? Ali se branja strežejo iz pomnilnika?",
+          "sessState": "Kaj počnejo seje zdaj?",
+          "sessTrend": "Ali se čakanja na zaklepanje povečajo, ko se seje kopičijo?",
+          "tpsCombo": "Ali se pretok in stopnja napak premikata skupaj?",
+          "cacheTrend": "Kdaj je padla stopnja zadetkov predpomnilnika?",
+          "capacity": "Kdaj se bo DB napolnila?",
+          "slowTop": "Kaj najprej optimizirati? (po skupnem času)",
+          "sizeTop": "Kaj zavzema prostor?",
+          "heat": "Ali je tveganje enkratno ali ponavljajoče se?"
+        },
+        "asTable": "Prikaži kot tabelo",
+        "needHistory": "Še ni trenda — pustite ta zaslon odprt nekaj minut.",
+        "needPerf": "Ni zgodovine velikosti — zbirajte na zavihku zmogljivosti ali pustite ta zaslon odprt.",
+        "noSess": "Ni sej.",
+        "noWait": "Ni čakanj",
+        "noData": "Ni podatkov za prikaz.",
+        "loading": "Nalaganje ...",
+        "waitTop": "Čakalni dogodki",
+        "lockWait": "Čakanja na zaklepanje",
+        "tps": "Transakcije/s",
+        "rlbk": "Stopnja povratnih transakcij (%)",
+        "cacheHit": "Stopnja zadetkov predpomnilnika",
+        "size": "Velikost DB",
+        "limit": "Omejitev",
+        "forecast": "Napoved",
+        "daysLeft": "Preostali dnevi",
+        "capNote": "Rast na dan {perDay} · {days} dni do omejitve",
+        "tbl": "Tabela",
+        "idxToast": "Indeks + TOAST",
+        "mix": {
+          "active": "Aktivno",
+          "idleTx": "Nedejavno v transakciji",
+          "idle": "Nedejavno",
+          "total": "seje"
+        },
+        "col": {
+          "item": "Postavka",
+          "value": "Vrednost",
+          "time": "Čas",
+          "calls": "Klici",
+          "total": "Skupaj (ms)",
+          "mean": "Povprečje (ms)",
+          "share": "Delež"
+        }
+      },
+      "empty": {
+        "noConn": "Ta taksonomija nima povezave s strežnikom PostgreSQL za spremljanje — prikazani so samo URL-ji in stanje storitev.",
+        "unsupported": "Ta povezava ne podpira spremljanja (samo povezave s strežnikom PostgreSQL).",
+        "connFail": "Povezava z zbirko podatkov ni uspela — preverite nastavitve povezave in stanje DB.",
+        "linkDown": "schema.pi ni dosegljiv — samodejno ponovno poskušam.",
+        "linkAuth": "Žeton povezave je potekel — izdajte nov žeton v schema.pi in ga registrirajte.",
+        "timeout": "Odzivi so počasni — samodejno ponovno poskušam.",
+        "rate": "Preveč zahtev, zato je bil interval osveževanja povečan."
+      },
+      "aux": {
+        "rules": "Moja opozorilna pravila ({n} aktivnih)",
+        "schemaSvc": "Stanje storitve — odzivi schema.pi",
+        "schemaSvcNote": "Metrike aplikacije za zadnjih 60 minut, shranjene s strani schema.pi.",
+        "source": "Vir podatkov: ciljna DB je samo za branje prek poimenovanih poizvedb schema.pi (samo za branje); trendi shranjujejo statistiko samo v dbms.pi (brez podatkov o vrsticah)."
+      }
     }
   },
   "ops": {
@@ -650,7 +913,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "Povezava schema.pi se pripravlja. Poskusite znova kasneje.",
+      "PGSS_MISSING": "Razširitev pg_stat_statements ni nameščena na tej DB, zato statistika poizvedb ni na voljo.",
       "CONN_UNSUPPORTED": "Ta povezava še ni podprta (samo neposredne PostgreSQL povezave).",
+      "TIMEOUT": "Ciljna DB se je odzvala prepočasi. Poskusite znova pozneje.",
       "RATE": "Preveč zahtev. Poskusite znova čez minuto.",
       "LINK_AUTH": "Žeton povezave je potekel ali bil preklican. Ponovno registrirajte žeton na strani Povezava.",
       "LINK_SCOPE": "Ta povezava ne spada v predmetno področje povezave.",
@@ -659,6 +924,7 @@
     },
     "pgss": {
       "title": "Kako omogočiti pg_stat_statements",
+      "body": "Top-N počasnih poizvedb potrebuje razširitev pg_stat_statements. Spodnjo izjavo zaženite kot skrbnik DB. Na Supabase jo lahko omogočite pod Database → Extensions.",
       "note": "Samostojno gostujoči PostgreSQL potrebuje tudi pg_stat_statements v shared_preload_libraries (postgresql.conf) in ponovni zagon. Statistika tabel, indeksov in velikosti deluje brez nje."
     },
     "collect": {
@@ -697,6 +963,7 @@
     "trend": {
       "limit": "Prag velikosti",
       "empty": "Ni posnetkov v zadnjih 30 dneh",
+      "chart": "Velikost DB v zadnjih 30 dneh",
       "now": "Trenutna velikost",
       "perDay": "Dnevna rast",
       "needMore": "Potrebna sta 2+ posnetka",
@@ -904,6 +1171,12 @@
   },
   "nav": {
     "label": "Funkcije",
+    "groups": {
+      "monitor": "Spremljanje",
+      "drift": "Doslednost",
+      "lake": "Jezero",
+      "admin": "Skrbnik"
+    },
     "connect": "Poveži",
     "sqlLab": "SQL uglaševanje",
     "perf": "Zmogljivost",

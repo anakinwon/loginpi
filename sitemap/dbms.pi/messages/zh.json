@@ -13,7 +13,7 @@
       "connect": "注册 schema.pi 链接令牌并检查连接状态",
       "sqlLab": "计划树、警告、比较和针对标准域的反模式检查",
       "perf": "慢查询 Top-N、表/索引健康状况、容量预测、活动和锁",
-      "monitor": "应用程序、DB 和 URL 指标摘要以及阈值警报",
+      "monitor": "14 个信号的正常、警告、风险以及当前操作和解决方案一览",
       "drift": "将 schema.pi 模型和 DDL 历史与实际目录进行比较，测量索引效果",
       "migration": "拓扑加载顺序、分块、清单和验证 SQL",
       "pipeline": "变更捕获预检查和源→转换→目标管道定义",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "监控中心",
-    "collectNote": "收集在schema.pi中运行 — 迁移已计划（D7）。此页面读取schema.pi监控摘要。",
+    "title": "监控",
     "noLink": "请先选择或注册一个schema.pi连接。",
     "goConnect": "注册连接",
     "period": "期间",
@@ -457,16 +456,9 @@
       "360": "6小时",
       "1440": "24小时"
     },
-    "refresh": "刷新",
     "loading": "正在加载…",
-    "updatedAt": "{area} · 截至 {time}（每30秒自动刷新）",
-    "appTitle": "应用性能",
-    "dbTitle": "按连接查看 DB 状态",
-    "urlTitle": "URL检查",
-    "empty": "无数据显示。",
-    "breachTitle": "{n}个阈值违规",
-    "rulesTitle": "阈值规则",
-    "rulesNote": "规则为此连接保存，并根据收到的摘要进行评估；违规项将显示红色边框（通知稍后提供）。",
+    "rulesNote": "规则存储在此连接中，并在每次刷新面板时进行评估（DB 会话、锁等待、缓存命中率每分钟评估一次；DB 大小、URL 响应时间、失败每 5 分钟评估一次）。违反的信号将升级为风险，并带有“我的规则”标记（警报发送是下一步）。不评估服务 (APP) 指标规则。DB 大小 (MB) 规则 (>) 也用作容量限制。",
+    "notEvaluated": "未评估",
     "metric": "指标",
     "conn": "连接",
     "allConns": "所有连接",
@@ -501,7 +493,259 @@
       "RATE": "请求过多。请稍后重试。",
       "TIMEOUT": "schema.pi 响应缓慢。请稍后重试。",
       "RULE_LIMIT": "每个连接最多50条规则。",
-      "NOT_FOUND": "未找到规则。"
+      "NOT_FOUND": "未找到规则。",
+      "LINK_DOWN": "无法连接到 schema.pi。请稍后重试。",
+      "PGSS_MISSING": "未安装 pg_stat_statements 扩展，因此无法查看慢速 SQL。",
+      "CONN_UNSUPPORTED": "此连接不支持监控（仅限 PostgreSQL 服务器连接）。",
+      "CONN_DISABLED": "此连接已禁用。请在 schema.pi 中启用连接。",
+      "INVALID_INPUT": "请求无效。"
+    },
+    "board": {
+      "refresh": {
+        "updated": "截至 {time} · 每分钟刷新",
+        "now": "立即刷新",
+        "busy": "正在加载…",
+        "stale": "过时 · {min} 分钟前"
+      },
+      "level": {
+        "RISK": "风险",
+        "WARN": "警告",
+        "OK": "正常",
+        "UNKNOWN": "未知",
+        "NA": "不适用"
+      },
+      "overall": {
+        "RISK": "风险 — 需立即采取行动",
+        "WARN": "警告 — 某些项目需要关注",
+        "UNKNOWN": "未知 — 检查连接",
+        "OK": "正常 — 所有信号都在限制范围内",
+        "NA": "不适用"
+      },
+      "kpi": {
+        "sess": "会话 / 最大值",
+        "tps": "每秒事务数",
+        "cache": "缓存命中率"
+      },
+      "todo": {
+        "title": "立即执行",
+        "more": "显示更多 {n} 项",
+        "less": "显示更少",
+        "setup": "设置这些以查看更多",
+        "none": "目前没有需要处理的风险或警告项。",
+        "unknown": "无法检查 {n} 个信号 — 请查看卡片了解原因。",
+        "myRule": "我的规则违规：{rule}",
+        "copySql": "复制 SQL",
+        "copied": "已复制"
+      },
+      "cat": {
+        "avail": "可用性",
+        "load": "负载与等待",
+        "eff": "效率",
+        "store": "存储与维护",
+        "protect": "保护（备份、复制）"
+      },
+      "card": {
+        "thr": "限制：警告 {warn} · 风险 {risk}",
+        "thrDown": "限制：低于 {warn} 警告 · 低于 {risk} 风险",
+        "more": "如何修复",
+        "addRule": "为此指标添加规则",
+        "basisLive": "最近一分钟",
+        "basisStored": "累计",
+        "since": "统计信息重置 {at}",
+        "partial": "部分视图（500 行上限或缺少权限）。"
+      },
+      "sig": {
+        "URL": "服务 URL",
+        "LONG_QRY": "长时间运行的查询",
+        "IDLE_TX": "空闲事务",
+        "LOCK_WAIT": "锁等待",
+        "CACHE_HIT": "缓存命中率",
+        "XACT_ERR": "回滚与死锁",
+        "SLOW_SQL": "慢速 SQL",
+        "STORAGE": "存储",
+        "VACUUM": "清理",
+        "INDEX": "索引健康状况",
+        "BACKUP": "备份 (WAL 归档)",
+        "REPL": "复制延迟"
+      },
+      "fix": {
+        "URL": "{n} 个已检查的 URL 失败 · 最大响应 {ms}ms — 请查看 schema.pi 监控以了解原因。",
+        "LONG_QRY": "一个查询已运行 {sec} 秒 — 请查看其计划并进行优化，或让 DBA 取消它。",
+        "IDLE_TX": "一个事务已空闲 {sec} 秒 — 请在应用程序中查找缺失的提交并设置超时。",
+        "LOCK_WAIT": "{n} 个会话正在等待锁 — 请查找阻塞会话并结束其事务。",
+        "CACHE_HIT": "缓存命中率 {pct}% — 请查找大型表的完全扫描或检查 shared_buffers。",
+        "XACT_ERR": "回滚率 {pct}%，{dlck} 个死锁 — 请检查失败的事务和应用程序错误日志。",
+        "SLOW_SQL": "一个查询平均 {ms} 毫秒 — 请根据总时间使用其计划优化顶部查询。",
+        "VACUUM": "{tbl} 有许多死行或过时的统计信息 — 请检查 VACUUM (ANALYZE) 和 autovacuum 设置。",
+        "INDEX": "{n} 个索引发现（无效、未使用、完全扫描）— 请查看表和索引健康状况选项卡以了解目标。",
+        "BACKUP": "WAL 归档已关闭或停滞 — 请检查 archive_mode、archive_command 和备份状态。",
+        "REPL": "复制延迟 {sec} 秒 — 请检查备用服务器状态和网络。",
+        "PGSS": "未安装 pg_stat_statements 扩展，因此无法查看慢速 SQL — 请使用以下 SQL 启用它（需要重启服务器）。"
+      },
+      "reason": {
+        "PGSS": "未安装 pg_stat_statements。",
+        "VER": "仅适用于 PostgreSQL 13 或更高版本。",
+        "SAMPLE": "样本不足，暂不判断。",
+        "RESET": "统计信息重置不足 7 天，因此不判断未使用的索引。",
+        "STALE": "没有最近的检查记录。",
+        "STANDBY": "不适用于备用服务器。",
+        "NONE": "没有可检查的对象。",
+        "GRANT": "缺少权限 — 请授予连接帐户 pg_monitor 角色。",
+        "LINK": "schema.pi 查询失败 ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "在“连接管理”中检查连接状态，并在 schema.pi 中修复连接设置（主机、端口、帐户）。",
+          "3": "如果仍然缓慢，请检查服务器负载（CPU、磁盘）和网络。"
+        },
+        "CONN_USE": {
+          "1": "在“活动与锁”选项卡中按用户和状态查看会话计数。",
+          "2": "如果空闲连接过多，请缩小应用程序连接池或添加连接池。",
+          "3": "谨慎提高 max_connections，考虑内存。"
+        },
+        "URL": {
+          "1": "在 schema.pi 监控中查看失败的 URL 和状态码。",
+          "2": "检查应用程序部署和外部依赖项。",
+          "3": "如果重复发生，请添加 URL 失败计数 (URL_FAIL_CNT) 规则。"
+        },
+        "LONG_QRY": {
+          "1": "在“活动与锁”选项卡中查找长时间运行的查询及其用户。",
+          "2": "在“SQL 调优”中查看计划并修复索引或条件。",
+          "3": "如果紧急，DBA 会使用 pg_cancel_backend 取消它。"
+        },
+        "IDLE_TX": {
+          "1": "在“活动与锁”选项卡中查看处于 idle in transaction 状态的会话的最后查询。",
+          "2": "在应用程序代码中查找缺失的提交或回滚。",
+          "3": "使用 idle_in_transaction_session_timeout 设置上限。"
+        },
+        "LOCK_WAIT": {
+          "1": "在“活动与锁”选项卡中查找阻塞会话 (blocked_by)。",
+          "2": "结束其事务或让 DBA 取消它。",
+          "3": "修复长时间占用相同行的批处理或事务顺序。"
+        },
+        "CACHE_HIT": {
+          "1": "在“慢速查询”选项卡中查找大型表的完全扫描。",
+          "2": "添加所需的索引以减少读取的块数。",
+          "3": "如果内存允许，请检查 shared_buffers。"
+        },
+        "XACT_ERR": {
+          "1": "在应用程序错误日志中查找回滚原因（约束违规、超时）。",
+          "2": "如果存在死锁，请以一致的顺序锁定表。",
+          "3": "检查重试逻辑是否导致回滚膨胀。"
+        },
+        "SLOW_SQL": {
+          "1": "在“慢速查询”选项卡中选择按总时间排名的顶部查询。",
+          "2": "在“SQL 调优”中查看计划并修复索引或连接。",
+          "3": "修复后，检查平均时间是否下降。"
+        },
+        "STORAGE": {
+          "1": "在“容量趋势”选项卡中查看增长趋势和预计耗尽日期。",
+          "2": "清理大型表、索引和旧数据。",
+          "3": "如果需要，增加磁盘并更新限制规则。"
+        },
+        "VACUUM": {
+          "1": "在“表与索引健康状况”选项卡中查看具有许多死行的表。",
+          "2": "DBA 运行 VACUUM (ANALYZE)。",
+          "3": "如果重复发生，请降低该表的 autovacuum 阈值。"
+        },
+        "INDEX": {
+          "1": "在“表与索引健康状况”选项卡中查看无效或未使用的索引以及完全扫描的表。",
+          "2": "重建无效索引；DBA 审查并删除未使用的索引。",
+          "3": "在“SQL 调优”中为具有许多完全扫描的表设计索引。"
+        },
+        "BACKUP": {
+          "1": "在“备份与恢复”选项卡中查看 archive_mode 和最后归档时间。",
+          "2": "如果归档失败，请检查 archive_command 和目标位置的可用空间。"
+        },
+        "REPL": {
+          "1": "在“复制与灾难恢复”选项卡中查看每个备用服务器的状态和延迟。",
+          "2": "检查备用服务器上的磁盘、CPU 和网络。",
+          "3": "如果未进行流式传输，请检查备用服务器日志。"
+        }
+      },
+      "sqlNote": "以下 SQL 仅用于只读检查 — 修复（VACUUM、DROP INDEX、pg_terminate_backend）由 DBA 执行。",
+      "go": {
+        "activity": "活动与锁",
+        "top": "慢速查询",
+        "health": "表与索引健康状况",
+        "trend": "容量趋势",
+        "params": "参数检查",
+        "repl": "复制检查",
+        "backup": "备份检查",
+        "sqlLab": "SQL 调优",
+        "drift": "漂移比较",
+        "connect": "连接管理",
+        "schema": "schema.pi 监控"
+      },
+      "chart": {
+        "title": "趋势与排名",
+        "note": "趋势在此屏幕打开时每分钟记录一次（无后台收集）。",
+        "gauges": "连接与缓存仪表",
+        "sessState": "当前会话状态",
+        "sessTrend": "会话趋势与锁等待",
+        "tpsCombo": "吞吐量与回滚率",
+        "cacheTrend": "缓存命中率趋势",
+        "slowTop": "慢速 SQL 前 10 名",
+        "slowLegend": "条形长度 = 总时间 · 颜色 = 平均时间（▲ 警告从 {warn}ms · ✕ 风险从 {risk}ms）",
+        "sizeTop": "空间前 10 名",
+        "heat": "按信号随时间变化的风险",
+        "q": {
+          "gauges": "连接是否已满？读取是否从内存中提供？",
+          "sessState": "会话现在正在做什么？",
+          "sessTrend": "会话堆积时锁等待是否增加？",
+          "tpsCombo": "吞吐量和失败率是否同步变化？",
+          "cacheTrend": "缓存命中率何时下降？",
+          "slowTop": "首先优化什么？（按总时间）",
+          "sizeTop": "什么占用了空间？",
+          "heat": "风险是一次性的还是重复发生的？"
+        },
+        "asTable": "以表格形式查看",
+        "needHistory": "尚无趋势 — 请保持此屏幕打开几分钟。",
+        "needPerf": "无大小历史记录 — 请在性能选项卡中收集或保持此屏幕打开。",
+        "noSess": "无会话。",
+        "noWait": "无等待",
+        "noData": "无数据显示。",
+        "loading": "正在加载…",
+        "waitTop": "等待事件",
+        "lockWait": "锁等待",
+        "tps": "每秒事务数",
+        "rlbk": "回滚率 (%)",
+        "cacheHit": "缓存命中率",
+        "limit": "限制",
+        "forecast": "预测",
+        "daysLeft": "剩余天数",
+        "capNote": "每日增长 {perDay} · 距离限制 {days} 天",
+        "tbl": "表",
+        "idxToast": "索引 + TOAST",
+        "mix": {
+          "active": "活动",
+          "idleTx": "事务中空闲",
+          "idle": "空闲",
+          "total": "会话"
+        },
+        "col": {
+          "item": "项目",
+          "value": "值",
+          "time": "时间",
+          "calls": "调用次数",
+          "total": "总时间 (ms)",
+          "mean": "平均 (ms)",
+          "share": "份额"
+        }
+      },
+      "empty": {
+        "noConn": "此分类法没有要监控的 PostgreSQL 服务器连接 — 仅显示 URL 和服务状态。",
+        "unsupported": "此连接不支持监控（仅限 PostgreSQL 服务器连接）。",
+        "linkDown": "无法连接到 schema.pi — 正在自动重试。",
+        "linkAuth": "连接令牌已过期 — 请在 schema.pi 中重新颁发令牌并注册。",
+        "timeout": "响应缓慢 — 正在自动重试。",
+        "rate": "请求过多，因此刷新间隔已增加。"
+      },
+      "aux": {
+        "rules": "我的警报规则（{n} 个活动）",
+        "schemaSvc": "服务状态 — schema.pi 响应",
+        "schemaSvcNote": "schema.pi 存储的最近 60 分钟应用程序指标。"
+      }
     }
   },
   "ops": {
@@ -904,6 +1148,12 @@
   },
   "nav": {
     "label": "功能",
+    "groups": {
+      "monitor": "监控",
+      "drift": "一致性",
+      "lake": "数据湖",
+      "admin": "管理"
+    },
     "connect": "连接",
     "sqlLab": "SQL 调优",
     "perf": "性能",

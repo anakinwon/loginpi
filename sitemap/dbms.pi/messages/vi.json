@@ -13,7 +13,7 @@
       "connect": "Đăng ký token liên kết schema.pi và kiểm tra trạng thái kết nối",
       "sqlLab": "Cây kế hoạch thực thi, cảnh báo, so sánh và kiểm tra anti-pattern đối với các miền tiêu chuẩn",
       "perf": "Top-N truy vấn chậm, tình trạng bảng/chỉ mục, dự báo dung lượng, hoạt động và khóa",
-      "monitor": "Tóm tắt chỉ số ứng dụng, DB và URL với cảnh báo ngưỡng",
+      "monitor": "14 tín hiệu OK, cảnh báo, rủi ro và các việc cần làm, cách khắc phục trong nháy mắt",
       "drift": "So sánh mô hình schema.pi và lịch sử áp dụng DDL với danh mục thực tế, đo lường hiệu quả chỉ mục",
       "migration": "Thứ tự tải theo cấu trúc liên kết, khối, danh sách kiểm tra và SQL xác minh",
       "pipeline": "Kiểm tra trước thay đổi và định nghĩa pipeline nguồn→chuyển đổi→đích",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Trung tâm giám sát",
-    "collectNote": "Thu thập chạy trong schema.pi — di chuyển đã lên kế hoạch (D7). Trang này đọc tóm tắt giám sát schema.pi.",
+    "title": "Giám sát",
     "noLink": "Vui lòng chọn hoặc đăng ký liên kết schema.pi trước.",
     "goConnect": "Đăng ký liên kết",
     "period": "Thời gian",
@@ -457,16 +456,9 @@
       "360": "6 giờ",
       "1440": "24 giờ"
     },
-    "refresh": "Làm mới",
     "loading": "Đang tải…",
-    "updatedAt": "{area} · tính đến {time} (tự động làm mới mỗi 30 giây)",
-    "appTitle": "Hiệu suất ứng dụng",
-    "dbTitle": "Trạng thái DB theo kết nối",
-    "urlTitle": "Kiểm tra URL",
-    "empty": "Không có dữ liệu để hiển thị.",
-    "breachTitle": "{n} vi phạm ngưỡng",
-    "rulesTitle": "Quy tắc ngưỡng",
-    "rulesNote": "Các quy tắc được lưu cho liên kết này và được đánh giá dựa trên tóm tắt đã nhận; các vi phạm sẽ có viền đỏ (thông báo sẽ đến sau).",
+    "rulesNote": "Các quy tắc được lưu trữ cho kết nối này và được đánh giá mỗi khi bảng được làm mới (phiên DB, chờ khóa, tỷ lệ truy cập bộ nhớ cache là 1 phút; kích thước DB, thời gian phản hồi URL, lỗi là 5 phút). Các tín hiệu vi phạm sẽ được nâng lên mức rủi ro và được gắn nhãn 'Quy tắc của tôi' (gửi thông báo là bước tiếp theo). Các quy tắc chỉ số dịch vụ (APP) không được đánh giá. Quy tắc kích thước DB (MB) (>) cũng được sử dụng làm giới hạn dung lượng.",
+    "notEvaluated": "Chưa được đánh giá",
     "metric": "Chỉ số",
     "conn": "Kết nối",
     "allConns": "Tất cả kết nối",
@@ -501,7 +493,278 @@
       "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
       "TIMEOUT": "schema.pi đang phản hồi chậm. Vui lòng thử lại sau.",
       "RULE_LIMIT": "Tối đa 50 quy tắc cho mỗi liên kết.",
-      "NOT_FOUND": "Không tìm thấy quy tắc."
+      "NOT_FOUND": "Không tìm thấy quy tắc.",
+      "CONN_FAIL": "Không thể kết nối với DB. Kiểm tra cài đặt kết nối và trạng thái DB.",
+      "LINK_DOWN": "Không thể kết nối với schema.pi. Vui lòng thử lại sau.",
+      "PGSS_MISSING": "Không cài đặt pg_stat_statements nên không thể xem SQL chậm.",
+      "CONN_UNSUPPORTED": "Kết nối này không hỗ trợ giám sát (chỉ kết nối máy chủ PostgreSQL).",
+      "CONN_DISABLED": "Kết nối này bị vô hiệu hóa. Bật nó trong schema.pi.",
+      "INVALID_INPUT": "Giá trị yêu cầu không hợp lệ."
+    },
+    "board": {
+      "subtitle": "Những việc cần làm trên DB này ngay bây giờ — 14 tín hiệu OK, cảnh báo hoặc rủi ro, cùng với các bản sửa lỗi, trong nháy mắt.",
+      "refresh": {
+        "updated": "Tính đến {time} · làm mới mỗi phút",
+        "now": "Làm mới ngay",
+        "busy": "Đang tải…",
+        "stale": "Cũ · {min} phút trước"
+      },
+      "level": {
+        "RISK": "Rủi ro",
+        "WARN": "Cảnh báo",
+        "OK": "OK",
+        "UNKNOWN": "Không xác định",
+        "NA": "Không áp dụng"
+      },
+      "overall": {
+        "RISK": "Rủi ro — cần hành động ngay",
+        "WARN": "Cảnh báo — một số mục cần xem xét",
+        "UNKNOWN": "Không xác định — kiểm tra kết nối",
+        "OK": "OK — mọi tín hiệu đều nằm trong giới hạn",
+        "CONN_DOWN": "Không thể kết nối với DB — kiểm tra kết nối trước",
+        "NA": "Không áp dụng"
+      },
+      "kpi": {
+        "sess": "Phiên / tối đa",
+        "tps": "Giao dịch/giây",
+        "cache": "Tỷ lệ truy cập bộ nhớ cache",
+        "size": "Kích thước DB"
+      },
+      "todo": {
+        "title": "Việc cần làm ngay",
+        "more": "Hiển thị thêm {n}",
+        "less": "Thu gọn",
+        "setup": "Thiết lập các mục này để xem thêm",
+        "none": "Không có mục rủi ro hoặc cảnh báo nào cần hành động ngay bây giờ.",
+        "unknown": "Không thể kiểm tra {n} tín hiệu — xem thẻ để biết lý do.",
+        "myRule": "Quy tắc của tôi bị vi phạm: {rule}",
+        "copySql": "Sao chép SQL",
+        "copied": "Đã sao chép"
+      },
+      "cat": {
+        "avail": "Khả dụng",
+        "load": "Tải & chờ",
+        "eff": "Hiệu quả",
+        "store": "Lưu trữ & bảo trì",
+        "protect": "Bảo vệ (sao lưu, sao chép)"
+      },
+      "card": {
+        "thr": "Giới hạn: cảnh báo {warn} · rủi ro {risk}",
+        "thrDown": "Giới hạn: cảnh báo dưới {warn} · rủi ro dưới {risk}",
+        "more": "Cách khắc phục",
+        "addRule": "Thêm quy tắc cho chỉ số này",
+        "basisLive": "Phút cuối",
+        "basisStored": "Tích lũy",
+        "since": "thống kê được đặt lại {at}",
+        "partial": "Chế độ xem một phần (giới hạn 500 hàng hoặc thiếu đặc quyền)."
+      },
+      "sig": {
+        "AVAIL": "Phản hồi DB",
+        "CONN_USE": "Sử dụng kết nối (DB này)",
+        "URL": "URL dịch vụ",
+        "LONG_QRY": "Truy vấn chạy dài",
+        "IDLE_TX": "Giao dịch nhàn rỗi",
+        "LOCK_WAIT": "Chờ khóa",
+        "CACHE_HIT": "Tỷ lệ truy cập bộ nhớ cache",
+        "XACT_ERR": "Rollback & deadlock",
+        "SLOW_SQL": "SQL chậm",
+        "STORAGE": "Dung lượng lưu trữ",
+        "VACUUM": "Vacuum",
+        "INDEX": "Tình trạng chỉ mục",
+        "BACKUP": "Sao lưu (lưu trữ WAL)",
+        "REPL": "Độ trễ sao chép"
+      },
+      "fix": {
+        "AVAIL": "Phản hồi chậm hoặc vừa khởi động lại — kiểm tra cài đặt kết nối và trạng thái máy chủ DB.",
+        "AVAIL_DOWN": "Không thể kết nối với DB — kiểm tra cài đặt kết nối và đảm bảo máy chủ DB đang hoạt động.",
+        "CONN_USE": "{sess}/{max} phiên trên DB này (không phải toàn bộ cụm — các cơ sở dữ liệu khác bị loại trừ) — đóng các kết nối nhàn rỗi hoặc thêm bộ quản lý kết nối (pgbouncer).",
+        "URL": "{n} URL được kiểm tra bị lỗi · phản hồi tối đa {ms}ms — xem màn hình schema.pi để biết nguyên nhân.",
+        "LONG_QRY": "Một truy vấn đã chạy được {sec} giây — xem lại kế hoạch của nó và điều chỉnh, hoặc nhờ DBA hủy bỏ.",
+        "IDLE_TX": "Một giao dịch đã nhàn rỗi {sec} giây — tìm cam kết bị thiếu trong ứng dụng và đặt thời gian chờ.",
+        "LOCK_WAIT": "{n} phiên đang chờ khóa — tìm phiên chặn và kết thúc giao dịch của nó.",
+        "CACHE_HIT": "Tỷ lệ truy cập bộ nhớ cache {pct}% — tìm các lần quét toàn bộ bảng lớn hoặc xem lại shared_buffers.",
+        "XACT_ERR": "Tỷ lệ rollback {pct}%, {dlck} deadlock — kiểm tra các giao dịch lỗi và nhật ký lỗi ứng dụng.",
+        "SLOW_SQL": "Một truy vấn trung bình {ms} ms — điều chỉnh các truy vấn hàng đầu theo tổng thời gian bằng cách sử dụng kế hoạch của chúng.",
+        "STORAGE": "DB ({gb} GB) gần hết giới hạn (còn lại {days} ngày) — dọn dẹp các bảng lớn hoặc thêm dung lượng.",
+        "VACUUM": "{tbl} có nhiều hàng chết hoặc thống kê cũ — xem lại cài đặt VACUUM (ANALYZE) và autovacuum.",
+        "INDEX": "{n} phát hiện chỉ mục (không hợp lệ, không sử dụng, quét toàn bộ) — xem tab tình trạng bảng & chỉ mục để biết các mục tiêu.",
+        "BACKUP": "Lưu trữ WAL bị tắt hoặc bị kẹt — kiểm tra archive_mode, archive_command và trạng thái sao lưu.",
+        "REPL": "Độ trễ sao chép {sec} giây — kiểm tra trạng thái dự phòng và mạng.",
+        "PGSS": "pg_stat_statements không được cài đặt, vì vậy SQL chậm không khả dụng — bật nó bằng SQL bên dưới (yêu cầu khởi động lại máy chủ)."
+      },
+      "reason": {
+        "CONN_DOWN": "Không được đánh giá vì kết nối DB bị ngắt.",
+        "PGSS": "pg_stat_statements không được cài đặt.",
+        "VER": "Chỉ khả dụng trên PostgreSQL 13 trở lên.",
+        "SAMPLE": "Chưa đủ mẫu.",
+        "NO_LIMIT": "Không có giới hạn kích thước, vì vậy việc sử dụng không được đánh giá — thêm quy tắc kích thước DB (MB) (>) để sử dụng nó làm giới hạn.",
+        "RESET": "Thống kê được đặt lại chưa đầy 7 ngày trước, vì vậy các chỉ mục không sử dụng không được đánh giá.",
+        "STALE": "Không có bản ghi kiểm tra gần đây.",
+        "STANDBY": "Không áp dụng trên máy chủ dự phòng.",
+        "NONE": "Không có gì để kiểm tra.",
+        "GRANT": "Thiếu đặc quyền — cấp vai trò pg_monitor cho tài khoản kết nối.",
+        "LINK": "Truy vấn schema.pi thất bại ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Kiểm tra trạng thái kết nối trong Kết nối và sửa cài đặt kết nối (máy chủ, cổng, tài khoản) trong schema.pi.",
+          "2": "Kiểm tra xem máy chủ DB có đang hoạt động không và liệu nó có khởi động lại gần đây không.",
+          "3": "Nếu nó vẫn chậm, hãy kiểm tra tải máy chủ (CPU, đĩa) và mạng."
+        },
+        "CONN_USE": {
+          "1": "Xem số lượng phiên theo người dùng và trạng thái trong tab hoạt động & khóa.",
+          "2": "Nếu có nhiều phiên nhàn rỗi, hãy thu nhỏ nhóm ứng dụng hoặc thêm bộ quản lý kết nối.",
+          "3": "Tăng max_connections cẩn thận, xem xét bộ nhớ."
+        },
+        "URL": {
+          "1": "Xem các URL bị lỗi và mã trạng thái trong màn hình schema.pi.",
+          "2": "Kiểm tra triển khai ứng dụng và các phụ thuộc bên ngoài.",
+          "3": "Nếu nó lặp lại, hãy thêm quy tắc số lượng lỗi URL (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Tìm các truy vấn chạy dài và người dùng của chúng trong tab hoạt động & khóa.",
+          "2": "Xem lại kế hoạch trong điều chỉnh SQL và sửa các chỉ mục hoặc điều kiện.",
+          "3": "Nếu khẩn cấp, DBA sẽ hủy bỏ nó bằng pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Xem truy vấn cuối cùng của các phiên nhàn rỗi trong giao dịch trong tab hoạt động & khóa.",
+          "2": "Tìm cam kết hoặc rollback bị thiếu trong mã ứng dụng.",
+          "3": "Giới hạn nó bằng idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Tìm phiên chặn (blocked_by) trong tab hoạt động & khóa.",
+          "2": "Kết thúc giao dịch của nó hoặc nhờ DBA hủy bỏ.",
+          "3": "Sửa các lô hoặc thứ tự giao dịch giữ cùng một hàng trong thời gian dài."
+        },
+        "CACHE_HIT": {
+          "1": "Tìm các lần quét toàn bộ bảng lớn trong tab truy vấn chậm.",
+          "2": "Thêm các chỉ mục cần thiết để đọc ít khối hơn.",
+          "3": "Nếu bộ nhớ cho phép, hãy xem lại shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Tìm nguyên nhân rollback (vi phạm ràng buộc, thời gian chờ) trong nhật ký lỗi ứng dụng.",
+          "2": "Nếu có deadlock, hãy khóa các bảng theo thứ tự nhất quán.",
+          "3": "Kiểm tra xem logic thử lại có làm tăng rollback không."
+        },
+        "SLOW_SQL": {
+          "1": "Chọn các truy vấn hàng đầu theo tổng thời gian trong tab truy vấn chậm.",
+          "2": "Xem lại kế hoạch trong điều chỉnh SQL và sửa các chỉ mục hoặc join.",
+          "3": "Sau khi sửa, kiểm tra xem thời gian trung bình có giảm xuống không."
+        },
+        "STORAGE": {
+          "1": "Xem xu hướng tăng trưởng và ngày đầy đủ ước tính trong tab xu hướng kích thước.",
+          "2": "Dọn dẹp các bảng lớn, chỉ mục và dữ liệu cũ.",
+          "3": "Nếu cần, hãy thêm đĩa và cập nhật quy tắc giới hạn."
+        },
+        "VACUUM": {
+          "1": "Xem các bảng có nhiều hàng chết trong tab tình trạng bảng & chỉ mục.",
+          "2": "DBA chạy VACUUM (ANALYZE).",
+          "3": "Nếu nó lặp lại, hãy giảm ngưỡng autovacuum cho bảng đó."
+        },
+        "INDEX": {
+          "1": "Xem các chỉ mục không hợp lệ hoặc không sử dụng và các bảng quét toàn bộ trong tab tình trạng bảng & chỉ mục.",
+          "2": "Xây dựng lại các chỉ mục không hợp lệ; DBA xem xét và loại bỏ các chỉ mục không sử dụng.",
+          "3": "Thiết kế các chỉ mục trong điều chỉnh SQL cho các bảng có nhiều lần quét toàn bộ."
+        },
+        "BACKUP": {
+          "1": "Xem archive_mode và thời gian lưu trữ cuối cùng trong tab sao lưu & phục hồi.",
+          "2": "Nếu lưu trữ thất bại, hãy kiểm tra archive_command và dung lượng trống tại đích.",
+          "3": "Trên DB được quản lý, kiểm tra cài đặt sao lưu của nhà cung cấp."
+        },
+        "REPL": {
+          "1": "Xem trạng thái và độ trễ của từng máy chủ dự phòng trong tab sao chép & DR.",
+          "2": "Kiểm tra đĩa, CPU và mạng trên máy chủ dự phòng.",
+          "3": "Nếu nó không phát trực tuyến, hãy kiểm tra nhật ký máy chủ dự phòng."
+        }
+      },
+      "sqlNote": "SQL bên dưới chỉ đọc, để kiểm tra — các bản sửa lỗi (VACUUM, DROP INDEX, pg_terminate_backend) được DBA chạy.",
+      "go": {
+        "activity": "Hoạt động & khóa",
+        "top": "Truy vấn chậm",
+        "health": "Tình trạng bảng & chỉ mục",
+        "trend": "Xu hướng dung lượng",
+        "params": "Kiểm tra tham số",
+        "repl": "Kiểm tra sao chép",
+        "backup": "Kiểm tra sao lưu",
+        "sqlLab": "Điều chỉnh SQL",
+        "drift": "So sánh độ lệch",
+        "connect": "Kết nối",
+        "schema": "Màn hình schema.pi"
+      },
+      "chart": {
+        "title": "Xu hướng & xếp hạng",
+        "note": "Xu hướng được ghi lại mỗi phút khi màn hình này đang mở (không có thu thập nền).",
+        "gauges": "Đồng hồ kết nối & bộ nhớ cache",
+        "sessState": "Trạng thái phiên hiện tại",
+        "sessTrend": "Xu hướng phiên & chờ khóa",
+        "tpsCombo": "Thông lượng & tỷ lệ rollback",
+        "cacheTrend": "Xu hướng tỷ lệ truy cập bộ nhớ cache",
+        "capacity": "Kích thước & dự báo DB",
+        "slowTop": "SQL chậm top 10",
+        "slowLegend": "Độ dài thanh = tổng thời gian · màu = thời gian trung bình (▲ cảnh báo từ {warn}ms · ✕ rủi ro từ {risk}ms)",
+        "sizeTop": "Không gian top 10",
+        "heat": "Rủi ro theo tín hiệu theo thời gian",
+        "q": {
+          "gauges": "Các kết nối có đầy không? Các lượt đọc có được phục vụ từ bộ nhớ không?",
+          "sessState": "Các phiên đang làm gì bây giờ?",
+          "sessTrend": "Chờ khóa có tăng khi các phiên chồng chất không?",
+          "tpsCombo": "Thông lượng và tỷ lệ lỗi có di chuyển cùng nhau không?",
+          "cacheTrend": "Tỷ lệ truy cập bộ nhớ cache giảm khi nào?",
+          "capacity": "DB sẽ đầy khi nào?",
+          "slowTop": "Điều chỉnh gì trước? (theo tổng thời gian)",
+          "sizeTop": "Cái gì đang chiếm không gian?",
+          "heat": "Rủi ro là một lần hay lặp lại?"
+        },
+        "asTable": "Xem dưới dạng bảng",
+        "needHistory": "Chưa có xu hướng — giữ màn hình này mở trong vài phút.",
+        "needPerf": "Không có lịch sử kích thước — thu thập trong tab hiệu suất hoặc giữ màn hình này mở.",
+        "noSess": "Không có phiên.",
+        "noWait": "Không chờ",
+        "noData": "Không có gì để hiển thị.",
+        "loading": "Đang tải…",
+        "waitTop": "Sự kiện chờ",
+        "lockWait": "Chờ khóa",
+        "tps": "Giao dịch/giây",
+        "rlbk": "Tỷ lệ rollback (%)",
+        "cacheHit": "Tỷ lệ truy cập bộ nhớ cache",
+        "size": "Kích thước DB",
+        "limit": "Giới hạn",
+        "forecast": "Dự báo",
+        "daysLeft": "Số ngày còn lại",
+        "capNote": "Tăng trưởng mỗi ngày {perDay} · {days} ngày đến giới hạn",
+        "tbl": "Bảng",
+        "idxToast": "Chỉ mục + TOAST",
+        "mix": {
+          "active": "Đang hoạt động",
+          "idleTx": "Nhàn rỗi trong giao dịch",
+          "idle": "Nhàn rỗi",
+          "total": "phiên"
+        },
+        "col": {
+          "item": "Mục",
+          "value": "Giá trị",
+          "time": "Thời gian",
+          "calls": "Số lượt gọi",
+          "total": "Tổng (ms)",
+          "mean": "Trung bình (ms)",
+          "share": "Chia sẻ"
+        }
+      },
+      "empty": {
+        "noConn": "Phân loại này không có kết nối máy chủ PostgreSQL để giám sát — chỉ hiển thị URL và trạng thái dịch vụ.",
+        "unsupported": "Kết nối này không hỗ trợ giám sát (chỉ kết nối máy chủ PostgreSQL).",
+        "connFail": "Không thể kết nối với cơ sở dữ liệu — kiểm tra cài đặt kết nối và trạng thái DB.",
+        "linkDown": "Không thể kết nối với schema.pi — đang tự động thử lại.",
+        "linkAuth": "Mã thông báo kết nối đã hết hạn — phát hành mã thông báo mới trong schema.pi và đăng ký nó.",
+        "timeout": "Phản hồi chậm — đang tự động thử lại.",
+        "rate": "Quá nhiều yêu cầu, vì vậy khoảng thời gian làm mới đã được tăng lên."
+      },
+      "aux": {
+        "rules": "Quy tắc cảnh báo của tôi ({n} đang hoạt động)",
+        "schemaSvc": "Trạng thái dịch vụ — phản hồi schema.pi",
+        "schemaSvcNote": "Các chỉ số ứng dụng trong 60 phút gần nhất được schema.pi lưu trữ.",
+        "source": "Nguồn dữ liệu: DB đích chỉ đọc thông qua các truy vấn được đặt tên của schema.pi (chỉ đọc); xu hướng chỉ lưu trữ thống kê trong dbms.pi (không có dữ liệu hàng)."
+      }
     }
   },
   "ops": {
@@ -908,6 +1171,12 @@
   },
   "nav": {
     "label": "Tính năng",
+    "groups": {
+      "monitor": "Giám sát",
+      "drift": "Tính nhất quán",
+      "lake": "Hồ dữ liệu",
+      "admin": "Quản trị"
+    },
     "connect": "Kết nối",
     "sqlLab": "Điều chỉnh SQL",
     "perf": "Hiệu suất",

@@ -13,7 +13,7 @@
       "connect": "schema.pi havola tokenini roʻyxatdan oʻtkazing va ulanish holatini tekshiring",
       "sqlLab": "Reja daraxti, ogohlantirishlar, taqqoslash va standart domenlarga qarshi anti-naqsh tekshiruvlari",
       "perf": "Sekin soʻrov Top-N, jadval/indeks holati, sigʻim prognozi, faoliyat va blokirovkalar",
-      "monitor": "Ilova, DB va URL metrikalarining chegaraviy ogohlantirishlar bilan qisqacha mazmuni",
+      "monitor": "14 ta signal uchun normal, ogohlantirish va xavf, shuningdek, nima qilish kerakligi va uni qanday hal qilish kerakligi bir qarashda",
       "drift": "schema.pi modeli va DDL tarixini haqiqiy katalog bilan solishtiring, indeks effektini oʻlchang",
       "migration": "Topologik yuklash tartibi, boʻlaklar, nazorat roʻyxati va tekshirish SQL",
       "pipeline": "Oʻzgarishlarni qamrab olishni oldindan tekshirish va manba→transformatsiya→maqsad quvur liniyasi taʼriflari",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Monitoring markazi",
-    "collectNote": "Yigʻish schema.pi da ishlaydi — migratsiya rejalashtirilgan (D7). Bu sahifa schema.pi monitor xulosasini oʻqiydi.",
+    "title": "Monitoring",
     "noLink": "Avval schema.pi havolasini tanlang yoki roʻyxatdan oʻtkazing.",
     "goConnect": "Havolani roʻyxatdan oʻtkazish",
     "period": "Davr",
@@ -457,16 +456,9 @@
       "360": "6 soat",
       "1440": "24 soat"
     },
-    "refresh": "Yangilash",
     "loading": "Yuklanmoqda…",
-    "updatedAt": "{area} · {time} holatiga koʻra (har 30 soniyada avtomatik yangilash)",
-    "appTitle": "Ilova ishlashi",
-    "dbTitle": "Ulanish boʻyicha DB holati",
-    "urlTitle": "URL tekshiruvlari",
-    "empty": "Koʻrsatish uchun maʼlumot yoʻq.",
-    "breachTitle": "{n} ta chegara buzilishi",
-    "rulesTitle": "Chegara qoidalari",
-    "rulesNote": "Qoidalar ushbu havola uchun saqlanadi va qabul qilingan xulosaga nisbatan baholanadi; buzilishlar qizil chegara bilan belgilanadi (bildirishnomalar keyinroq keladi).",
+    "rulesNote": "Qoidalar ushbu ulanishga saqlanadi va doska har yangilanganda baholanadi (DB sessiyasi/bloklash kutish/keshga kirish darajasi har 1 daqiqada, DB hajmi/URL javob vaqti/xato har 5 daqiqada). Buzilgan signallar xavf darajasiga koʻtariladi va 'Mening qoidam' deb belgilanadi (bildirishnoma yuborish keyingi qadam). Xizmat (APP) metrik qoidalari baholanmaydi. DB hajmi (MB) qoidalari (>) sigʻim chegaralari sifatida ham ishlatiladi.",
+    "notEvaluated": "Baholanmagan",
     "metric": "Metrika",
     "conn": "Ulanish",
     "allConns": "Barcha ulanishlar",
@@ -501,11 +493,283 @@
       "RATE": "Juda koʻp soʻrovlar. Iltimos, birozdan keyin qayta urinib koʻring.",
       "TIMEOUT": "schema.pi sekin javob bermoqda. Iltimos, birozdan keyin qayta urinib koʻring.",
       "RULE_LIMIT": "Har bir havola uchun 50 tagacha qoida.",
-      "NOT_FOUND": "Qoida topilmadi."
+      "NOT_FOUND": "Qoida topilmadi.",
+      "CONN_FAIL": "Maʼlumotlar bazasiga ulanib boʻlmadi. Ulanish sozlamalarini va DB holatini tekshiring.",
+      "LINK_DOWN": "schema.pi ga ulanib boʻlmadi. Birozdan keyin qayta urinib koʻring.",
+      "PGSS_MISSING": "pg_stat_statements oʻrnatilmagan, shuning uchun sekin SQL mavjud emas.",
+      "CONN_UNSUPPORTED": "Ushbu ulanish monitoringni qoʻllab-quvvatlamaydi (faqat PostgreSQL server ulanishlari).",
+      "CONN_DISABLED": "Ushbu ulanish oʻchirilgan. Uni schema.pi da yoqing.",
+      "INVALID_INPUT": "Soʻrov notoʻgʻri."
+    },
+    "board": {
+      "subtitle": "Ushbu DB da hozir nima qilish kerak — 14 ta signal OK, ogohlantirish yoki xavf sifatida, tuzatishlar bilan, bir qarashda.",
+      "refresh": {
+        "updated": "{time} holatiga koʻra · har daqiqada yangilanadi",
+        "now": "Hozir yangilash",
+        "busy": "Yuklanmoqda…",
+        "stale": "Eskirgan · {min} daqiqa oldin"
+      },
+      "level": {
+        "RISK": "Xavf",
+        "WARN": "Ogohlantirish",
+        "OK": "OK",
+        "UNKNOWN": "Nomaʼlum",
+        "NA": "Mavjud emas"
+      },
+      "overall": {
+        "RISK": "Xavf — hozir harakat qilish kerak",
+        "WARN": "Ogohlantirish — baʼzi elementlarni koʻrib chiqish kerak",
+        "UNKNOWN": "Nomaʼlum — ulanishni tekshiring",
+        "OK": "OK — har bir signal chegaralar ichida",
+        "CONN_DOWN": "DB ga ulanib boʻlmadi — avval ulanishni tekshiring",
+        "NA": "Mavjud emas"
+      },
+      "kpi": {
+        "sess": "Sessiyalar / maksimal",
+        "tps": "Tranzaksiyalar/s",
+        "cache": "Keshga kirish darajasi",
+        "size": "DB hajmi"
+      },
+      "todo": {
+        "title": "Hozir bajariladigan ishlar",
+        "more": "Yana {n} tasini koʻrsatish",
+        "less": "Kamroq koʻrsatish",
+        "setup": "Koʻproq koʻrish uchun bularni sozlang",
+        "none": "Hozirda hech qanday xavf yoki ogohlantirish elementlari harakatni talab qilmaydi.",
+        "unknown": "{n} ta signalni tekshirib boʻlmadi — sababini kartalarda koʻring.",
+        "myRule": "Mening qoidam buzildi: {rule}",
+        "copySql": "SQL nusxalash",
+        "copied": "Nusxalandi"
+      },
+      "cat": {
+        "avail": "Mavjudlik",
+        "load": "Yuklash va kutishlar",
+        "eff": "Samaradorlik",
+        "store": "Saqlash va texnik xizmat koʻrsatish",
+        "protect": "Himoya (zaxira, replikatsiya)"
+      },
+      "card": {
+        "thr": "Chegaralar: ogohlantirish {warn} · xavf {risk}",
+        "thrDown": "Chegaralar: {warn} dan past ogohlantirish · {risk} dan past xavf",
+        "more": "Qanday tuzatish kerak",
+        "addRule": "Ushbu metrika uchun qoida qoʻshish",
+        "basisLive": "Oxirgi daqiqa",
+        "basisStored": "Kümülatif",
+        "since": "statistikalar {at} da tiklandi",
+        "partial": "Qisman koʻrinish (500 qator chegarasi yoki yetishmayotgan imtiyozlar)."
+      },
+      "sig": {
+        "AVAIL": "DB javobi",
+        "CONN_USE": "Ulanishdan foydalanish (ushbu DB)",
+        "URL": "Xizmat URL manzillari",
+        "LONG_QRY": "Uzoq davom etadigan soʻrovlar",
+        "IDLE_TX": "Boʻsh tranzaksiyalar",
+        "LOCK_WAIT": "Bloklash kutishlari",
+        "CACHE_HIT": "Keshga kirish darajasi",
+        "XACT_ERR": "Qaytarishlar va oʻlik blokirovkalar",
+        "SLOW_SQL": "Sekin SQL",
+        "STORAGE": "Saqlash",
+        "VACUUM": "Vakuum",
+        "INDEX": "Indeks holati",
+        "BACKUP": "Zaxira (WAL arxivi)",
+        "REPL": "Replikatsiya kechikishi"
+      },
+      "fix": {
+        "AVAIL": "Sekin javob yoki yaqinda qayta ishga tushirish — ulanish sozlamalarini va DB server holatini tekshiring.",
+        "AVAIL_DOWN": "DB ga ulanib boʻlmadi — ulanish sozlamalarini va DB serveri ishlayotganligini tekshiring.",
+        "CONN_USE": "Ushbu DB da {sess}/{max} sessiya (klaster boʻyicha emas — boshqa maʼlumotlar bazalari chiqarib tashlangan) — boʻsh ulanishlarni yoping yoki ulanish poolerini (pgbouncer) qoʻshing.",
+        "URL": "{n} ta tekshirilgan URL ishlamayapti · maksimal javob {ms}ms — sababini schema.pi monitorida koʻring.",
+        "LONG_QRY": "Soʻrov {sec} soniyadan beri ishlamoqda — uning rejasini koʻrib chiqing va sozlang, yoki DBA ga uni bekor qildiring.",
+        "IDLE_TX": "Tranzaksiya {sec} soniyadan beri boʻsh turibdi — ilovada yoʻqolgan commitni toping va vaqt chegarasini oʻrnating.",
+        "LOCK_WAIT": "{n} ta sessiya bloklashlarni kutmoqda — bloklovchi sessiyani toping va uning tranzaksiyasini yakunlang.",
+        "CACHE_HIT": "Keshga kirish darajasi {pct}% — katta jadvallarni toʻliq skanerlashni qidiring yoki shared_buffers ni koʻrib chiqing.",
+        "XACT_ERR": "Qaytarish darajasi {pct}%, {dlck} ta oʻlik blokirovkalar — ishlamayotgan tranzaksiyalarni va ilova xato loglarini tekshiring.",
+        "SLOW_SQL": "Soʻrov oʻrtacha {ms} ms — umumiy vaqt boʻyicha eng yaxshi soʻrovlarni ularning rejalari yordamida sozlang.",
+        "STORAGE": "DB ({gb} GB) oʻz chegarasiga yaqin ({days} kun qoldi) — katta jadvallarni tozalang yoki sigʻimni oshiring.",
+        "VACUUM": "{tbl} da koʻplab oʻlik qatorlar yoki eskirgan statistikalar mavjud — VACUUM (ANALYZE) va autovacuum sozlamalarini koʻrib chiqing.",
+        "INDEX": "{n} ta indeks topilmalari (yaroqsiz, ishlatilmagan, toʻliq skanerlash) — jadvallar va indekslar holati yorligʻida maqsadlarni koʻring.",
+        "BACKUP": "WAL arxivlash oʻchirilgan yoki toʻxtatilgan — archive_mode, archive_command va zaxira holatini tekshiring.",
+        "REPL": "Replikatsiya kechikishi {sec} soniya — kutish holatini va tarmoqni tekshiring.",
+        "PGSS": "pg_stat_statements oʻrnatilmagan, shuning uchun sekin SQL mavjud emas — uni quyidagi SQL bilan yoqing (serverni qayta ishga tushirish talab qilinadi)."
+      },
+      "reason": {
+        "CONN_DOWN": "DB ulanishi uzilganligi sababli baholanmadi.",
+        "PGSS": "pg_stat_statements oʻrnatilmagan.",
+        "VER": "PostgreSQL 13 yoki undan keyingi versiyalarda mavjud.",
+        "SAMPLE": "Hali yetarli namunalar yoʻq.",
+        "NO_LIMIT": "Hajm chegarasi yoʻq, shuning uchun foydalanish baholanmaydi — uni chegara sifatida ishlatish uchun DB hajmi (MB) qoidasini (>) qoʻshing.",
+        "RESET": "Statistikalar 7 kundan kamroq vaqt oldin tiklangan, shuning uchun ishlatilmagan indekslar baholanmaydi.",
+        "STALE": "Yaqinda tekshirish yozuvlari yoʻq.",
+        "STANDBY": "Kutish serverida qoʻllanilmaydi.",
+        "NONE": "Tekshirish uchun hech narsa yoʻq.",
+        "GRANT": "Yetishmayotgan imtiyozlar — ulanish hisobiga pg_monitor rolini bering.",
+        "LINK": "schema.pi soʻrovi bajarilmadi ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Ulanishlar boʻlimida ulanish holatini tekshiring va ulanish sozlamalarini (host, port, hisob) schema.pi da tuzating.",
+          "2": "DB serveri ishlayotganligini va yaqinda qayta ishga tushirilganligini tekshiring.",
+          "3": "Agar u sekin ishlayotgan boʻlsa, server yukini (CPU, disk) va tarmoqni tekshiring."
+        },
+        "CONN_USE": {
+          "1": "Faoliyat va bloklashlar yorligʻida foydalanuvchi va holat boʻyicha sessiya sonini koʻring.",
+          "2": "Agar koʻp boʻsh ulanishlar boʻlsa, ilova poolini kichraytiring yoki ulanish poolerini qoʻshing.",
+          "3": "max_connections ni ehtiyotkorlik bilan, xotirani hisobga olgan holda oshiring."
+        },
+        "URL": {
+          "1": "schema.pi monitorida ishlamayotgan URL manzillarni va holat kodlarini koʻring.",
+          "2": "Ilova joylashtirilishini va tashqi bogʻliqliklarni tekshiring.",
+          "3": "Agar u takrorlansa, URL xato soni (URL_FAIL_CNT) qoidasini qoʻshing."
+        },
+        "LONG_QRY": {
+          "1": "Faoliyat va bloklashlar yorligʻida uzoq davom etadigan soʻrovlarni va ularning foydalanuvchilarini toping.",
+          "2": "SQL tuningda rejasini koʻrib chiqing va indekslarni yoki shartlarni tuzating.",
+          "3": "Agar shoshilinch boʻlsa, DBA uni pg_cancel_backend bilan bekor qiladi."
+        },
+        "IDLE_TX": {
+          "1": "Faoliyat va bloklashlar yorligʻida idle-in-transaction sessiyalarining oxirgi soʻrovini koʻring.",
+          "2": "Ilova kodida yoʻqolgan commit yoki rollbackni toping.",
+          "3": "Uni idle_in_transaction_session_timeout bilan cheklang."
+        },
+        "LOCK_WAIT": {
+          "1": "Faoliyat va bloklashlar yorligʻida bloklovchi sessiyani (blocked_by) toping.",
+          "2": "Uning tranzaksiyasini yakunlang yoki DBA ga uni bekor qildiring.",
+          "3": "Bir xil qatorlarni uzoq vaqt ushlab turadigan partiyalarni yoki tranzaksiya tartibini tuzating."
+        },
+        "CACHE_HIT": {
+          "1": "Sekin soʻrov yorligʻida katta jadvallarni toʻliq skanerlashni toping.",
+          "2": "Kamroq bloklarni oʻqish uchun kerakli indekslarni qoʻshing.",
+          "3": "Agar xotira imkon bersa, shared_buffers ni koʻrib chiqing."
+        },
+        "XACT_ERR": {
+          "1": "Ilova xato loglarida rollback sabablarini (cheklash buzilishlari, vaqt tugashlari) toping.",
+          "2": "Agar oʻlik blokirovkalar boʻlsa, jadvallarni izchil tartibda bloklang.",
+          "3": "Qayta urinish mantiqi rollbacklarni oshirib yubormayotganligini tekshiring."
+        },
+        "SLOW_SQL": {
+          "1": "Sekin soʻrov yorligʻida umumiy vaqt boʻyicha eng yaxshi soʻrovlarni tanlang.",
+          "2": "SQL tuningda rejalarni koʻrib chiqing va indekslarni yoki qoʻshilishlarni tuzating.",
+          "3": "Tuzatgandan soʻng, oʻrtacha vaqt kamayganligini tekshiring."
+        },
+        "STORAGE": {
+          "1": "Hajm tendensiyasi yorligʻida oʻsish tendensiyasini va taxminiy toʻlish sanasini koʻring.",
+          "2": "Katta jadvallarni, indekslarni va eski maʼlumotlarni tozalang.",
+          "3": "Agar kerak boʻlsa, diskni qoʻshing va chegara qoidasini yangilang."
+        },
+        "VACUUM": {
+          "1": "Jadvallar va indekslar holati yorligʻida koʻplab oʻlik qatorlarga ega jadvallarni koʻring.",
+          "2": "DBA VACUUM (ANALYZE) ni ishga tushiradi.",
+          "3": "Agar u takrorlansa, ushbu jadval uchun autovacuum chegaralarini pasaytiring."
+        },
+        "INDEX": {
+          "1": "Jadvallar va indekslar holati yorligʻida yaroqsiz yoki ishlatilmagan indekslarni va toʻliq skanerlash jadvallarini koʻring.",
+          "2": "Yaroqsiz indekslarni qayta quring; DBA ishlatilmaganlarini koʻrib chiqadi va oʻchiradi.",
+          "3": "Koʻplab toʻliq skanerlashlarga ega jadvallar uchun SQL tuningda indekslarni loyihalashtiring."
+        },
+        "BACKUP": {
+          "1": "Zaxira va tiklash yorligʻida archive_mode va oxirgi arxivlash vaqtini koʻring.",
+          "2": "Agar arxivlash muvaffaqiyatsiz boʻlsa, archive_command va manzil joyidagi boʻsh joyni tekshiring.",
+          "3": "Boshqariladigan DB da provayderning zaxira sozlamalarini tekshiring."
+        },
+        "REPL": {
+          "1": "Replikatsiya va DR yorligʻida har bir kutish serverining holatini va kechikishini koʻring.",
+          "2": "Kutish serverida disk, CPU va tarmoqni tekshiring.",
+          "3": "Agar u oqimlamayotgan boʻlsa, kutish serveri loglarini tekshiring."
+        }
+      },
+      "sqlNote": "Quyidagi SQL faqat oʻqish uchun, tekshirish uchun — tuzatishlar (VACUUM, DROP INDEX, pg_terminate_backend) DBA tomonidan bajariladi.",
+      "go": {
+        "activity": "Faoliyat va bloklashlar",
+        "top": "Sekin soʻrovlar",
+        "health": "Jadval va indeks holati",
+        "trend": "Sigʻim tendensiyasi",
+        "params": "Parametr tekshiruvi",
+        "repl": "Replikatsiya tekshiruvi",
+        "backup": "Zaxira tekshiruvi",
+        "sqlLab": "SQL tuning",
+        "drift": "Drift taqqoslash",
+        "connect": "Ulanishlar",
+        "schema": "schema.pi monitor"
+      },
+      "chart": {
+        "title": "Tendensiyalar va reytinglar",
+        "note": "Tendensiyalar ushbu ekran ochiq boʻlganda har daqiqada yozib olinadi (fon yigʻish yoʻq).",
+        "gauges": "Ulanish va kesh oʻlchagichlari",
+        "sessState": "Hozirgi sessiyalar",
+        "sessTrend": "Sessiya tendensiyasi va bloklash kutishlari",
+        "tpsCombo": "Oʻtkazuvchanlik va qaytarish darajasi",
+        "cacheTrend": "Keshga kirish darajasi tendensiyasi",
+        "capacity": "DB hajmi va prognozi",
+        "slowTop": "Sekin SQL TOP 10",
+        "slowLegend": "Ustun uzunligi = umumiy vaqt · rang = oʻrtacha vaqt (▲ {warn}ms dan ogohlantirish · ✕ {risk}ms dan xavf)",
+        "sizeTop": "Boʻsh joy TOP 10",
+        "heat": "Vaqt boʻyicha signal boʻyicha xavf",
+        "q": {
+          "gauges": "Ulanishlar toʻlib bormoqdami? Oʻqishlar xotiradan amalga oshirilmoqdami?",
+          "sessState": "Sessiyalar hozir nima qilmoqda?",
+          "sessTrend": "Sessiyalar toʻplanganda bloklash kutishlari ortadimi?",
+          "tpsCombo": "Oʻtkazuvchanlik va xato darajasi birga harakat qiladimi?",
+          "cacheTrend": "Keshga kirish darajasi qachon tushib ketdi?",
+          "capacity": "DB qachon toʻladi?",
+          "slowTop": "Avval nimani sozlash kerak? (umumiy vaqt boʻyicha)",
+          "sizeTop": "Boʻsh joyni nima egallamoqda?",
+          "heat": "Xavf bir martalikmi yoki takrorlanuvchimi?"
+        },
+        "asTable": "Jadval sifatida koʻrish",
+        "needHistory": "Hali tendensiya yoʻq — ushbu ekranni bir necha daqiqa ochiq qoldiring.",
+        "needPerf": "Hajm tarixi yoʻq — ishlash yorligʻida yigʻing yoki ushbu ekranni ochiq qoldiring.",
+        "noSess": "Sessiyalar yoʻq.",
+        "noWait": "Kutishlar yoʻq",
+        "noData": "Koʻrsatish uchun maʼlumot yoʻq.",
+        "loading": "Yuklanmoqda…",
+        "waitTop": "Kutish hodisalari",
+        "lockWait": "Bloklash kutishlari",
+        "tps": "Tranzaksiyalar/s",
+        "rlbk": "Qaytarish darajasi (%)",
+        "cacheHit": "Keshga kirish darajasi",
+        "size": "DB hajmi",
+        "limit": "Chegara",
+        "forecast": "Prognoz",
+        "daysLeft": "Qolgan kunlar",
+        "capNote": "Kuniga oʻsish {perDay} · chegaragacha {days} kun",
+        "tbl": "Jadval",
+        "idxToast": "Indeks + TOAST",
+        "mix": {
+          "active": "Faol",
+          "idleTx": "Tranzaksiyada boʻsh",
+          "idle": "Boʻsh",
+          "total": "sessiyalar"
+        },
+        "col": {
+          "item": "Element",
+          "value": "Qiymat",
+          "time": "Vaqt",
+          "calls": "Chaqiruvlar",
+          "total": "Jami (ms)",
+          "mean": "Oʻrtacha (ms)",
+          "share": "Ulush"
+        }
+      },
+      "empty": {
+        "noConn": "Ushbu taksonomiyada monitoring qilish uchun PostgreSQL server ulanishi yoʻq — faqat URL manzillar va xizmat holati koʻrsatiladi.",
+        "unsupported": "Ushbu ulanish monitoringni qoʻllab-quvvatlamaydi (faqat PostgreSQL server ulanishlari).",
+        "connFail": "Maʼlumotlar bazasiga ulanib boʻlmadi — ulanish sozlamalarini va DB holatini tekshiring.",
+        "linkDown": "schema.pi ga ulanib boʻlmadi — avtomatik ravishda qayta urinilmoqda.",
+        "linkAuth": "Ulanish tokenining muddati tugadi — schema.pi da yangi token yarating va uni roʻyxatdan oʻtkazing.",
+        "timeout": "Javoblar sekin — avtomatik ravishda qayta urinilmoqda.",
+        "rate": "Juda koʻp soʻrovlar, shuning uchun yangilash oraligʻi oshirildi."
+      },
+      "aux": {
+        "rules": "Mening ogohlantirish qoidalarim ({n} faol)",
+        "schemaSvc": "Xizmat holati — schema.pi javoblari",
+        "schemaSvcNote": "schema.pi tomonidan saqlangan oxirgi 60 daqiqalik ilova metrikalari.",
+        "source": "Maʼlumot manbai: maqsadli DB faqat schema.pi nomli soʻrovlar (faqat oʻqish uchun) orqali oʻqiladi; tendensiyalar faqat dbms.pi da statistikani saqlaydi (qator maʼlumotlari saqlanmaydi)."
+      }
     }
   },
   "ops": {
     "title": "DB operatsiyalari xavfsizligi",
+    "intro": "Ulanilgan PostgreSQL ulanishining parametrlarini, hisob imtiyozlarini, zaxira nusxalash va replikatsiya holatini faqat oʻqish rejimida diagnostika qiladi. Hech qanday sozlamalar oʻzgartirilmaydi; faqat xulosa natijalari saqlanadi, mijoz DB qator maʼlumotlari hech qachon saqlanmaydi",
     "loading": "Yuklanmoqda…",
     "pickFirst": "Avval yuqoridan havolani va ulanishni tanlang",
     "run": "Diagnostikani ishga tushirish",
@@ -638,6 +902,7 @@
   },
   "perf": {
     "title": "Ishlash",
+    "intro": "Ulanilgan PostgreSQL ulanishidan soʻrov, jadval va indeks statistikalarini toʻplaydi, sekin soʻrovlarni, jadval/indeks holatini va hajm tendensiyalarini koʻrsatadi. Faqat statistika saqlanadi — mijoz DB qator maʼlumotlari hech qachon saqlanmaydi",
     "loading": "Yuklanmoqda…",
     "pickFirst": "Avval yuqoridan havolani va ulanishni tanlang.",
     "pager": "Sahifalash",
@@ -650,7 +915,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "schema.pi havolasi tayyorlanmoqda. Iltimos, birozdan keyin qayta urinib koʻring.",
+      "PGSS_MISSING": "Bu DB da pg_stat_statements kengaytmasi oʻrnatilmagan, shuning uchun soʻrov statistikasi mavjud emas",
       "CONN_UNSUPPORTED": "Bu ulanish hali qoʻllab-quvvatlanmaydi (faqat toʻgʻridan-toʻgʻri PostgreSQL ulanishlari).",
+      "TIMEOUT": "Maqsadli DB juda sekin javob berdi. Iltimos, keyinroq qayta urinib koʻring",
       "RATE": "Juda koʻp soʻrovlar. Bir daqiqadan keyin qayta urinib koʻring.",
       "LINK_AUTH": "Havola tokenining muddati tugagan yoki u bekor qilingan. Ulanish sahifasida tokenni qayta roʻyxatdan oʻtkazing.",
       "LINK_SCOPE": "Bu ulanish havolaning mavzu sohasiga tegishli emas.",
@@ -659,6 +926,7 @@
     },
     "pgss": {
       "title": "pg_stat_statementsni qanday yoqish kerak",
+      "body": "Sekin soʻrovlar Top-N uchun pg_stat_statements kengaytmasi kerak. Quyidagi bayonotni DB administratori sifatida bajaring. Supabase da uni Database → Extensions ostida yoqing",
       "note": "Oʻz-oʻzidan joylashtirilgan PostgreSQL ham shared_preload_libraries (postgresql.conf) da pg_stat_statementsni talab qiladi va qayta ishga tushirish kerak. Jadval, indeks va hajmi statistikasi usiz ham ishlaydi."
     },
     "collect": {
@@ -697,6 +965,7 @@
     "trend": {
       "limit": "Hajm chegarasi",
       "empty": "Oxirgi 30 kunda suratlar yoʻq",
+      "chart": "Soʻnggi 30 kundagi DB hajmi tendensiyasi",
       "now": "Joriy hajm",
       "perDay": "Kunlik oʻsish",
       "needMore": "2+ surat kerak",
@@ -904,6 +1173,12 @@
   },
   "nav": {
     "label": "Xususiyatlar",
+    "groups": {
+      "monitor": "Monitoring",
+      "drift": "Muvofiqlik",
+      "lake": "Koʻl",
+      "admin": "Admin"
+    },
     "connect": "Ulanish",
     "sqlLab": "SQL sozlash",
     "perf": "Ishlash",

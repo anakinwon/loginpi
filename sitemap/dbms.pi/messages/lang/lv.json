@@ -13,7 +13,7 @@
       "connect": "Reģistrējiet schema.pi saites marķieri un pārbaudiet savienojuma statusu",
       "sqlLab": "Plāna koks, brīdinājumi, salīdzinājumi un pret-modeļu pārbaudes pret standarta domēniem",
       "perf": "Lēnu vaicājumu Top-N, tabulas/indeksa veselība, kapacitātes prognoze, aktivitāte un bloķēšana",
-      "monitor": "Lietotnes, DB un URL metrikas kopsavilkums ar sliekšņa brīdinājumiem",
+      "monitor": "14 signālu statuss (normāls, brīdinājums, risks), kā arī risinājumi un rīcības plāns vienā acu uzmetienā",
       "drift": "Salīdziniet schema.pi modeli un DDL vēsturi ar reālo katalogu, novērtējiet indeksa efektu",
       "migration": "Topoloģiskā ielādes secība, bloki, kontrolsaraksts un verifikācijas SQL",
       "pipeline": "Izmaiņu uztveršanas priekšpārbaude un avota→transformācijas→mērķa cauruļvadu definīcijas",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Uzraudzības centrs",
-    "collectNote": "Datu vākšana notiek schema.pi — migrācija plānota (D7). Šī lapa nolasa schema.pi monitora kopsavilkumu.",
+    "title": "Uzraudzība",
     "noLink": "Vispirms atlasiet vai reģistrējiet schema.pi saiti.",
     "goConnect": "Reģistrēt saiti",
     "period": "Periods",
@@ -457,16 +456,9 @@
       "360": "6 stundas",
       "1440": "24 stundas"
     },
-    "refresh": "Atsvaidzināt",
     "loading": "Ielādē…",
-    "updatedAt": "{area} · no {time} (automātiska atsvaidzināšana ik pēc 30s)",
-    "appTitle": "Lietotnes veiktspēja",
-    "dbTitle": "DB statuss pēc savienojuma",
-    "urlTitle": "URL pārbaudes",
-    "empty": "Nav datu, ko parādīt.",
-    "breachTitle": "{n} sliekšņa pārkāpumi",
-    "rulesTitle": "Sliekšņa noteikumi",
-    "rulesNote": "Noteikumi tiek saglabāti šai saitei un tiek novērtēti pret saņemto kopsavilkumu; pārkāpumi tiek apzīmēti ar sarkanu apmali (paziņojumi tiks saņemti vēlāk).",
+    "rulesNote": "Noteikumi tiek saglabāti šim savienojumam un tiek novērtēti katru reizi, kad tiek atsvaidzināts panelis (DB sesijas, bloķēšanas gaidīšana, kešatmiņas trāpījumu biežums ik pēc 1 minūtes; DB izmērs, URL atbildes laiks, kļūmes ik pēc 5 minūtēm). Pārkāptie signāli tiks eskalēti līdz riska līmenim un atzīmēti kā “Mans noteikums” (paziņojumu sūtīšana ir nākamais solis). Pakalpojumu (APP) metrikas noteikumi netiek novērtēti. DB izmēra (MB) noteikumi (>) tiek izmantoti arī kā kapacitātes ierobežojumi.",
+    "notEvaluated": "Nav novērtēts",
     "metric": "Metrika",
     "conn": "Savienojums",
     "allConns": "Visi savienojumi",
@@ -501,7 +493,278 @@
       "RATE": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc brīža.",
       "TIMEOUT": "schema.pi atbild lēni. Lūdzu, mēģiniet vēlreiz pēc brīža.",
       "RULE_LIMIT": "Līdz 50 noteikumiem katrai saitei.",
-      "NOT_FOUND": "Noteikums nav atrasts."
+      "NOT_FOUND": "Noteikums nav atrasts.",
+      "CONN_FAIL": "Neizdevās izveidot savienojumu ar DB. Pārbaudiet savienojuma iestatījumus un DB statusu.",
+      "LINK_DOWN": "Neizdevās sasniegt schema.pi. Mēģiniet vēlreiz pēc brīža.",
+      "PGSS_MISSING": "pg_stat_statements nav instalēts, tāpēc lēni SQL vaicājumi nav pieejami.",
+      "CONN_UNSUPPORTED": "Šis savienojums neatbalsta uzraudzību (tikai PostgreSQL servera savienojumi).",
+      "CONN_DISABLED": "Šis savienojums ir atspējots. Iespējojiet to schema.pi.",
+      "INVALID_INPUT": "Pieprasījums nav derīgs."
+    },
+    "board": {
+      "subtitle": "Ko darīt ar šo DB tieši tagad — 14 signāli kā OK, brīdinājums vai risks, ar labojumiem, vienā acu uzmetienā.",
+      "refresh": {
+        "updated": "Uz {time} · atsvaidzinās katru minūti",
+        "now": "Atsvaidzināt tūlīt",
+        "busy": "Ielādē…",
+        "stale": "Novecojis · pirms {min} min"
+      },
+      "level": {
+        "RISK": "Risks",
+        "WARN": "Brīdinājums",
+        "OK": "Labi",
+        "UNKNOWN": "Nezināms",
+        "NA": "Nav piemērojams"
+      },
+      "overall": {
+        "RISK": "Risks — nepieciešama tūlītēja rīcība",
+        "WARN": "Brīdinājums — dažiem elementiem jāpievērš uzmanība",
+        "UNKNOWN": "Nezināms — pārbaudiet savienojumu",
+        "OK": "Labi — visi signāli ir robežās",
+        "CONN_DOWN": "Nevar izveidot savienojumu ar DB — vispirms pārbaudiet savienojumu",
+        "NA": "Nav piemērojams"
+      },
+      "kpi": {
+        "sess": "Sesijas / maks.",
+        "tps": "Transakcijas/s",
+        "cache": "Kešatmiņas trāpījumu biežums",
+        "size": "DB izmērs"
+      },
+      "todo": {
+        "title": "Darāmais tagad",
+        "more": "Rādīt vēl {n}",
+        "less": "Rādīt mazāk",
+        "setup": "Iestatiet šos, lai redzētu vairāk",
+        "none": "Pašlaik nav riska vai brīdinājuma elementu, kuriem būtu nepieciešama rīcība.",
+        "unknown": "Neizdevās pārbaudīt {n} signālu(s) — skatiet kartītēs iemeslu.",
+        "myRule": "Mans noteikums pārkāpts: {rule}",
+        "copySql": "Kopēt SQL",
+        "copied": "Nokopēts"
+      },
+      "cat": {
+        "avail": "Pieejamība",
+        "load": "Slodze un gaidīšana",
+        "eff": "Efektivitāte",
+        "store": "Glabāšana un uzturēšana",
+        "protect": "Aizsardzība (dublēšana, replikācija)"
+      },
+      "card": {
+        "thr": "Ierobežojumi: brīdinājums {warn} · risks {risk}",
+        "thrDown": "Ierobežojumi: brīdinājums zem {warn} · risks zem {risk}",
+        "more": "Kā labot",
+        "addRule": "Pievienot noteikumu šai metrikai",
+        "basisLive": "Pēdējā minūte",
+        "basisStored": "Kumulatīvs",
+        "since": "statistika atiestatīta {at}",
+        "partial": "Daļējs skats (500 rindu ierobežojums vai trūkstošas privilēģijas)."
+      },
+      "sig": {
+        "AVAIL": "DB atbilde",
+        "CONN_USE": "Savienojuma izmantošana (šī DB)",
+        "URL": "Pakalpojumu URL",
+        "LONG_QRY": "Ilgstoši vaicājumi",
+        "IDLE_TX": "Dīkstāves transakcijas",
+        "LOCK_WAIT": "Bloķēšanas gaidīšana",
+        "CACHE_HIT": "Kešatmiņas trāpījumu biežums",
+        "XACT_ERR": "Atcelšanas un strupceļi",
+        "SLOW_SQL": "Lēns SQL",
+        "STORAGE": "Krātuve",
+        "VACUUM": "Vakuums",
+        "INDEX": "Indeksa veselība",
+        "BACKUP": "Dublēšana (WAL arhīvs)",
+        "REPL": "Replikācijas aizkave"
+      },
+      "fix": {
+        "AVAIL": "Lēna atbilde vai nesena restartēšana — pārbaudiet savienojuma iestatījumus un DB servera statusu.",
+        "AVAIL_DOWN": "Neizdevās izveidot savienojumu ar DB — pārbaudiet savienojuma iestatījumus un to, vai DB serveris darbojas.",
+        "CONN_USE": "{sess}/{max} sesijas šajā DB (nevis visā klasterī — citas datu bāzes ir izslēgtas) — aizveriet dīkstāves savienojumus vai pievienojiet savienojumu pūleru (pgbouncer).",
+        "URL": "{n} pārbaudītie URL neizdodas · maksimālā atbilde {ms}ms — skatiet schema.pi monitorā iemeslu.",
+        "LONG_QRY": "Vaicājums darbojas jau {sec}s — pārskatiet tā plānu un noregulējiet to, vai lūdziet DBA to atcelt.",
+        "IDLE_TX": "Transakcija ir dīkstāvē jau {sec}s — atrodiet trūkstošo apstiprinājumu lietotnē un iestatiet taimautu.",
+        "LOCK_WAIT": "{n} sesijas gaida bloķēšanu — atrodiet bloķējošo sesiju un pārtrauciet tās transakciju.",
+        "CACHE_HIT": "Kešatmiņas trāpījumu biežums {pct}% — meklējiet lielu tabulu pilnas skenēšanas vai pārskatiet shared_buffers.",
+        "XACT_ERR": "Atcelšanas biežums {pct}%, {dlck} strupceļi — pārbaudiet neizdevušās transakcijas un lietotnes kļūdu žurnālus.",
+        "SLOW_SQL": "Vaicājuma vidējais laiks ir {ms} ms — noregulējiet populārākos vaicājumus pēc kopējā laika, izmantojot to plānus.",
+        "STORAGE": "DB ({gb} GB) ir tuvu savam limitam (atlikušās dienas {days}) — iztīriet lielas tabulas vai palieliniet kapacitāti.",
+        "VACUUM": "{tbl} ir daudz mirušu rindu vai novecojusi statistika — pārskatiet VACUUM (ANALYZE) un autovacuum iestatījumus.",
+        "INDEX": "{n} indeksa atklājumi (nederīgi, neizmantoti, pilnas skenēšanas) — skatiet tabulas un indeksa veselības cilnē mērķus.",
+        "BACKUP": "WAL arhivēšana ir izslēgta vai apstājusies — pārbaudiet archive_mode, archive_command un dublēšanas statusu.",
+        "REPL": "Replikācijas aizkave {sec}s — pārbaudiet gaidstāves statusu un tīklu.",
+        "PGSS": "pg_stat_statements nav instalēts, tāpēc lēns SQL nav pieejams — iespējojiet to ar zemāk redzamo SQL (nepieciešama servera restartēšana)."
+      },
+      "reason": {
+        "CONN_DOWN": "Nav novērtēts, jo DB savienojums ir pārtraukts.",
+        "PGSS": "pg_stat_statements paplašinājums nav instalēts.",
+        "VER": "Pieejams PostgreSQL 13 vai jaunākā versijā.",
+        "SAMPLE": "Vēl nav pietiekami daudz paraugu.",
+        "NO_LIMIT": "Nav izmēra ierobežojuma, tāpēc lietojums netiek novērtēts — pievienojiet DB izmēra (MB) noteikumu (>) , lai to izmantotu kā ierobežojumu.",
+        "RESET": "Statistika tika atiestatīta mazāk nekā pirms 7 dienām, tāpēc neizmantotie indeksi netiek novērtēti.",
+        "STALE": "Nav nesenu pārbaudes ierakstu.",
+        "STANDBY": "Nav piemērojams gaidstāves serverī.",
+        "NONE": "Nav ko pārbaudīt.",
+        "GRANT": "Trūkst privilēģiju — piešķiriet pg_monitor lomu savienojuma kontam.",
+        "LINK": "schema.pi vaicājums neizdevās ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Pārbaudiet savienojuma statusu sadaļā Savienojumi un labojiet savienojuma iestatījumus (resursdators, ports, konts) schema.pi.",
+          "2": "Pārbaudiet, vai DB serveris darbojas un vai tas nesen tika restartēts.",
+          "3": "Ja tas joprojām ir lēns, pārbaudiet servera slodzi (CPU, disks) un tīklu."
+        },
+        "CONN_USE": {
+          "1": "Skatiet sesiju skaitu pēc lietotāja un statusa cilnē Aktivitāte un bloķēšana.",
+          "2": "Ja daudzi ir dīkstāvē, samaziniet lietotnes pūla izmēru vai pievienojiet savienojumu pūleru.",
+          "3": "Uzmanīgi palieliniet max_connections, ņemot vērā atmiņu."
+        },
+        "URL": {
+          "1": "Skatiet neizdevušos URL un statusa kodus schema.pi monitorā.",
+          "2": "Pārbaudiet lietotnes izvietošanu un ārējās atkarības.",
+          "3": "Ja tas atkārtojas, pievienojiet URL kļūmju skaita (URL_FAIL_CNT) noteikumu."
+        },
+        "LONG_QRY": {
+          "1": "Atrodiet ilgstošus vaicājumus un to lietotājus cilnē Aktivitāte un bloķēšana.",
+          "2": "Pārskatiet plānu SQL regulēšanā un labojiet indeksus vai nosacījumus.",
+          "3": "Ja steidzami, DBA to atceļ ar pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Skatiet pēdējo vaicājumu dīkstāves transakciju sesijās cilnē Aktivitāte un bloķēšana.",
+          "2": "Atrodiet trūkstošo apstiprinājumu vai atcelšanu lietotnes kodā.",
+          "3": "Ierobežojiet to ar idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Atrodiet bloķējošo sesiju (blocked_by) cilnē Aktivitāte un bloķēšana.",
+          "2": "Pārtrauciet tās transakciju vai lūdziet DBA to atcelt.",
+          "3": "Labojiet partijas vai transakciju secību, kas ilgi tur tās pašas rindas."
+        },
+        "CACHE_HIT": {
+          "1": "Atrodiet lielu tabulu pilnas skenēšanas cilnē Lēni vaicājumi.",
+          "2": "Pievienojiet nepieciešamos indeksus, lai lasītu mazāk bloku.",
+          "3": "Ja atmiņa atļauj, pārskatiet shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Atrodiet atcelšanas cēloņus (ierobežojumu pārkāpumi, taimauti) lietotnes kļūdu žurnālos.",
+          "2": "Ja ir strupceļi, bloķējiet tabulas konsekventā secībā.",
+          "3": "Pārbaudiet, vai atkārtotas mēģināšanas loģika nepalielina atcelšanas."
+        },
+        "SLOW_SQL": {
+          "1": "Izvēlieties populārākos vaicājumus pēc kopējā laika cilnē Lēni vaicājumi.",
+          "2": "Pārskatiet plānus SQL regulēšanā un labojiet indeksus vai savienojumus.",
+          "3": "Pēc labošanas pārbaudiet, vai vidējais laiks samazinājās."
+        },
+        "STORAGE": {
+          "1": "Skatiet izaugsmes tendenci un paredzamo pilnās dienas datumu cilnē Izmēra tendence.",
+          "2": "Iztīriet lielas tabulas, indeksus un vecus datus.",
+          "3": "Ja nepieciešams, pievienojiet disku un atjauniniet ierobežojuma noteikumu."
+        },
+        "VACUUM": {
+          "1": "Skatiet tabulas ar daudz mirušām rindām cilnē Tabulas un indeksa veselība.",
+          "2": "DBA palaiž VACUUM (ANALYZE).",
+          "3": "Ja tas atkārtojas, samaziniet autovacuum sliekšņus šai tabulai."
+        },
+        "INDEX": {
+          "1": "Skatiet nederīgus vai neizmantotus indeksus un pilnas skenēšanas tabulas cilnē Tabulas un indeksa veselība.",
+          "2": "Pārbūvējiet nederīgus indeksus; DBA pārskata un dzēš neizmantotos.",
+          "3": "Izstrādājiet indeksus SQL regulēšanā tabulām ar daudzām pilnām skenēšanām."
+        },
+        "BACKUP": {
+          "1": "Skatiet archive_mode un pēdējo arhivēšanas laiku cilnē Dublēšana un atjaunošana.",
+          "2": "Ja arhivēšana neizdodas, pārbaudiet archive_command un brīvo vietu galamērķī.",
+          "3": "Pārvaldītā DB pārbaudiet pakalpojumu sniedzēja dublēšanas iestatījumus."
+        },
+        "REPL": {
+          "1": "Skatiet katras gaidstāves statusu un aizkavi cilnē Replikācija un DR.",
+          "2": "Pārbaudiet disku, CPU un tīklu gaidstāvē.",
+          "3": "Ja tas nestrādā, pārbaudiet gaidstāves žurnālus."
+        }
+      },
+      "sqlNote": "Zemāk redzamais SQL ir tikai lasīšanai, pārbaudei — labojumus (VACUUM, DROP INDEX, pg_terminate_backend) veic DBA.",
+      "go": {
+        "activity": "Aktivitāte un bloķēšana",
+        "top": "Lēni vaicājumi",
+        "health": "Tabulas un indeksa veselība",
+        "trend": "Kapacitātes tendence",
+        "params": "Parametru pārbaude",
+        "repl": "Replikācijas pārbaude",
+        "backup": "Dublēšanas pārbaude",
+        "sqlLab": "SQL regulēšana",
+        "drift": "Novirzes salīdzināšana",
+        "connect": "Savienojumi",
+        "schema": "schema.pi monitors"
+      },
+      "chart": {
+        "title": "Tendences un reitingi",
+        "note": "Tendences tiek ierakstītas katru minūti, kamēr šis ekrāns ir atvērts (nav fona vākšanas).",
+        "gauges": "Savienojuma un kešatmiņas mērītāji",
+        "sessState": "Sesijas tieši tagad",
+        "sessTrend": "Sesiju tendence un bloķēšanas gaidīšana",
+        "tpsCombo": "Caurlaides spēja un atcelšanas biežums",
+        "cacheTrend": "Kešatmiņas trāpījumu biežuma tendence",
+        "capacity": "DB izmērs un prognoze",
+        "slowTop": "Lēns SQL TOP 10",
+        "slowLegend": "Stabiņa garums = kopējais laiks · krāsa = vidējais laiks (▲ brīdinājums no {warn}ms · ✕ risks no {risk}ms)",
+        "sizeTop": "Vietas TOP 10",
+        "heat": "Risks pēc signāla laika gaitā",
+        "q": {
+          "gauges": "Vai savienojumi piepildās? Vai lasīšana tiek veikta no atmiņas?",
+          "sessState": "Ko sesijas dara tagad?",
+          "sessTrend": "Vai bloķēšanas gaidīšana palielinās, kad sesijas uzkrājas?",
+          "tpsCombo": "Vai caurlaides spēja un kļūmju biežums kustas kopā?",
+          "cacheTrend": "Kad kešatmiņas trāpījumu biežums samazinājās?",
+          "capacity": "Kad DB piepildīsies?",
+          "slowTop": "Ko vispirms noregulēt? (pēc kopējā laika)",
+          "sizeTop": "Kas aizņem vietu?",
+          "heat": "Vai risks ir vienreizējs vai atkārtojas?"
+        },
+        "asTable": "Skatīt kā tabulu",
+        "needHistory": "Vēl nav tendences — turiet šo ekrānu atvērtu dažas minūtes.",
+        "needPerf": "Nav izmēra vēstures — vāciet veiktspējas cilnē vai turiet šo ekrānu atvērtu.",
+        "noSess": "Nav sesiju.",
+        "noWait": "Nav gaidīšanas",
+        "noData": "Nav ko rādīt.",
+        "loading": "Ielādē…",
+        "waitTop": "Gaidīšanas notikumi",
+        "lockWait": "Bloķēšanas gaidīšana",
+        "tps": "Transakcijas/s",
+        "rlbk": "Atcelšanas biežums (%)",
+        "cacheHit": "Kešatmiņas trāpījumu biežums",
+        "size": "DB izmērs",
+        "limit": "Ierobežojums",
+        "forecast": "Prognoze",
+        "daysLeft": "Atlikušās dienas",
+        "capNote": "Izaugsme dienā {perDay} · {days} dienas līdz limitam",
+        "tbl": "Tabula",
+        "idxToast": "Indekss + TOAST",
+        "mix": {
+          "active": "Aktīvs",
+          "idleTx": "Dīkstāvē transakcijā",
+          "idle": "Dīkstāvē",
+          "total": "sesijas"
+        },
+        "col": {
+          "item": "Elements",
+          "value": "Vērtība",
+          "time": "Laiks",
+          "calls": "Izsaukumi",
+          "total": "Kopā (ms)",
+          "mean": "Vidēji (ms)",
+          "share": "Daļa"
+        }
+      },
+      "empty": {
+        "noConn": "Šai taksonomijai nav PostgreSQL servera savienojuma, ko uzraudzīt — tiek rādīti tikai URL un pakalpojumu statuss.",
+        "unsupported": "Šis savienojums neatbalsta uzraudzību (tikai PostgreSQL servera savienojumi).",
+        "connFail": "Neizdevās izveidot savienojumu ar datu bāzi — pārbaudiet savienojuma iestatījumus un DB statusu.",
+        "linkDown": "Neizdevās sasniegt schema.pi — automātiski mēģina vēlreiz.",
+        "linkAuth": "Savienojuma marķieris ir beidzies — izsniedziet jaunu marķieri schema.pi un reģistrējiet to.",
+        "timeout": "Atbildes ir lēnas — automātiski mēģina vēlreiz.",
+        "rate": "Pārāk daudz pieprasījumu, tāpēc atsvaidzināšanas intervāls tika palielināts."
+      },
+      "aux": {
+        "rules": "Mani brīdinājuma noteikumi ({n} aktīvi)",
+        "schemaSvc": "Pakalpojuma statuss — schema.pi atbildes",
+        "schemaSvcNote": "Lietotnes metrikas par pēdējām 60 minūtēm, ko saglabājis schema.pi.",
+        "source": "Datu avots: mērķa DB ir tikai lasāma, izmantojot schema.pi nosauktos vaicājumus (tikai lasāmi); tendences saglabā statistiku tikai dbms.pi (nav rindu datu)."
+      }
     }
   },
   "ops": {
@@ -650,7 +913,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "schema.pi saite tiek sagatavota. Lūdzu, mēģiniet vēlreiz vēlāk",
+      "PGSS_MISSING": "Šajā DB nav instalēts pg_stat_statements paplašinājums, tāpēc vaicājumu statistika nav pieejama",
       "CONN_UNSUPPORTED": "Šis savienojums vēl netiek atbalstīts (tikai tiešie PostgreSQL savienojumi)",
+      "TIMEOUT": "Mērķa DB atbildēja pārāk lēni. Lūdzu, mēģiniet vēlreiz vēlāk",
       "RATE": "Pārāk daudz pieprasījumu. Mēģiniet vēlreiz pēc minūtes",
       "LINK_AUTH": "Saites pilnvaras derīguma termiņš ir beidzies vai tā ir atsaukta. Reģistrējiet pilnvaru vēlreiz savienojuma lapā",
       "LINK_SCOPE": "Šis savienojums nepieder saites tēmai",
@@ -659,6 +924,7 @@
     },
     "pgss": {
       "title": "Kā iespējot pg_stat_statements",
+      "body": "Lēnu vaicājumu Top-N ir nepieciešams pg_stat_statements paplašinājums. Palaidiet tālāk redzamo paziņojumu kā DB administratora kontu. Supabase to var iespējot sadaļā Database → Extensions",
       "note": "Pašmitinātam PostgreSQL ir nepieciešams arī pg_stat_statements shared_preload_libraries (postgresql.conf) un restartēšana. Tabulu, indeksu un izmēru statistika darbojas bez tā"
     },
     "collect": {
@@ -697,6 +963,7 @@
     "trend": {
       "limit": "Lieluma slieksnis",
       "empty": "Nav momentuzņēmumu pēdējās 30 dienās",
+      "chart": "DB lieluma tendence pēdējās 30 dienās",
       "now": "Pašreizējais lielums",
       "perDay": "Pieaugums dienā",
       "needMore": "Nepieciešami 2+ momentuzņēmumi",
@@ -904,6 +1171,12 @@
   },
   "nav": {
     "label": "Funkcijas",
+    "groups": {
+      "monitor": "Uzraudzība",
+      "drift": "Konsekvence",
+      "lake": "Datu ezers",
+      "admin": "Administrēšana"
+    },
     "connect": "Savienot",
     "sqlLab": "SQL pielāgošana",
     "perf": "Veiktspēja",

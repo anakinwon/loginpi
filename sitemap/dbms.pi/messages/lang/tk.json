@@ -13,7 +13,7 @@
       "connect": "schema.pi baglanyşyk tokenini hasaba alyň we baglanyşyk ýagdaýyny barlaň",
       "sqlLab": "Meýilnama agajy, duýduryşlar, deňeşdirmek we standart domenlere garşy anti-nusga barlaglary",
       "perf": "Haýal sorag Top-N, tablisanyň/indeksiň saglygy, kuwwatlylyk çaklamasy, işjeňlik we gulplar",
-      "monitor": "App, DB we URL metrikasynyň gysgaça beýany, çäk duýduryşlary bilen",
+      "monitor": "14 signalyň kadaly, duýduryş we howp ýagdaýlary, şeýle hem näme etmelidigini we ony nädip çözmelidigini bir seretmekde",
       "drift": "schema.pi modelini we DDL taryhyny hakyky katalog bilen deňeşdiriň, indeks effektini ölçäň",
       "migration": "Topologiki ýükleme tertibi, bölekler, barlag sanawy we tassyklama SQL",
       "pipeline": "Üýtgeşmeleri ýazga almak üçin deslapky barlag we çeşme→öwrülişik→nyşana turba geçirijisiniň kesgitlemeleri",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Gözegçilik merkezi",
-    "collectNote": "Ýygnamak schema.pi-de işleýär — migrasiýa meýilleşdirildi (D7). Bu sahypa schema.pi gözegçilik jemlemesini okaýar.",
+    "title": "Gözegçilik",
     "noLink": "Ilki schema.pi baglanyşygyny saýlaň ýa-da hasaba alyň.",
     "goConnect": "Baglanyşyk hasaba al",
     "period": "Döwür",
@@ -457,16 +456,9 @@
       "360": "6 sagat",
       "1440": "24 sagat"
     },
-    "refresh": "Täzele",
     "loading": "Ýüklenýär…",
-    "updatedAt": "{area} · {time} ýagdaýy (her 30s awtomatiki täzelenme)",
-    "appTitle": "Programmanyň öndürijiligi",
-    "dbTitle": "Birikme boýunça DB ýagdaýy",
-    "urlTitle": "URL barlaglary",
-    "empty": "Görkezmäge maglumat ýok.",
-    "breachTitle": "{n} çäkden geçmeler",
-    "rulesTitle": "Çäk düzgünleri",
-    "rulesNote": "Düzgünler bu baglanyşyk üçin ýatda saklanýar we alnan jemleme boýunça bahalandyrylýar; çäkden geçmeler gyzyl çäk alýar (bildirişler soň geler).",
+    "rulesNote": "Düzgünler bu birikmä saklanýar we tagta täzelenende (DB sessiýasy/gulplama garaşmak/keş urgy tizligi her 1 minutda, DB ululygy/URL jogap wagty/şowsuzlyk her 5 minutda) baha berilýär. Bozulan signallar howp derejesine ýeter we 'Meniň düzgünim' diýlip belleniler (bildiriş ibermek indiki ädimdir). Hyzmat (APP) metrik düzgünlerine baha berilmeýär. DB ululygy (MB) düzgünleri (>) hem kuwwatlylyk çäkleri hökmünde ulanylýar.",
+    "notEvaluated": "Baha berilmedi",
     "metric": "Metrika",
     "conn": "Birikme",
     "allConns": "Ähli birikmeler",
@@ -501,7 +493,278 @@
       "RATE": "Gaty köp sorag. Biraz wagtdan soň gaýtadan synanyşyň.",
       "TIMEOUT": "schema.pi haýal jogap berýär. Biraz wagtdan soň gaýtadan synanyşyň.",
       "RULE_LIMIT": "Her baglanyşyk üçin 50-e çenli düzgün.",
-      "NOT_FOUND": "Düzgün tapylmady."
+      "NOT_FOUND": "Düzgün tapylmady.",
+      "CONN_FAIL": "DB-e birikmek başarmady. Birikme sazlamalaryny we DB ýagdaýyny barlaň.",
+      "LINK_DOWN": "schema.pi-e ýetip bolmady. Biraz wagtdan soň gaýtadan synanyşyň.",
+      "PGSS_MISSING": "pg_stat_statements gurulmady, şonuň üçin haýal SQL elýeterli däl.",
+      "CONN_UNSUPPORTED": "Bu birikme gözegçiligi goldamaýar (diňe PostgreSQL serwer birikmeleri).",
+      "CONN_DISABLED": "Bu birikme öçürildi. Ony schema.pi-de açyň.",
+      "INVALID_INPUT": "Talap nädogry."
+    },
+    "board": {
+      "subtitle": "Bu DB-de häzir näme etmelidigini — 14 signalyň kadaly, duýduryş ýa-da howp ýagdaýlaryny, düzedişleri bilen bir seretmekde.",
+      "refresh": {
+        "updated": "{time} ýagdaýy boýunça · her minutda täzelenýär",
+        "now": "Häzir täzele",
+        "busy": "Ýüklenýär…",
+        "stale": "Köne maglumat · {min} min öň"
+      },
+      "level": {
+        "RISK": "Howp",
+        "WARN": "Duýduryş",
+        "OK": "OK",
+        "UNKNOWN": "Näbelli",
+        "NA": "Degişli däl"
+      },
+      "overall": {
+        "RISK": "Howp — häzir çäre görmek gerek",
+        "WARN": "Duýduryş — käbir zatlara seretmek gerek",
+        "UNKNOWN": "Näbelli — birikmäni barlaň",
+        "OK": "OK — ähli signallar çäklerde",
+        "CONN_DOWN": "DB-e birikip bolmaýar — ilki birikmäni barlaň",
+        "NA": "Degişli däl"
+      },
+      "kpi": {
+        "sess": "Sessiýalar / iň köp",
+        "tps": "Tranzaksiýalar/s",
+        "cache": "Keş urgy tizligi",
+        "size": "DB ululygy"
+      },
+      "todo": {
+        "title": "Häzir etmeli işler",
+        "more": "Ýene {n} görkez",
+        "less": "Az görkez",
+        "setup": "Has köp görmek üçin bulary sazlaň",
+        "none": "Häzir çäre görmegi talap edýän howp ýa-da duýduryş elementleri ýok.",
+        "unknown": "{n} signal barlaýyp bolmady — sebäbini kartoçkalarda görüň.",
+        "myRule": "Meniň düzgünim bozuldy: {rule}",
+        "copySql": "SQL göçür",
+        "copied": "Göçürildi"
+      },
+      "cat": {
+        "avail": "Elýeterlilik",
+        "load": "Ýük we garaşmalar",
+        "eff": "Netijelilik",
+        "store": "Saklama we hyzmat",
+        "protect": "Gorag (ätiýaçlyk, replikasiýa)"
+      },
+      "card": {
+        "thr": "Çäkler: duýduryş {warn} · howp {risk}",
+        "thrDown": "Çäkler: {warn} aşagynda duýduryş · {risk} aşagynda howp",
+        "more": "Nädip düzedmeli",
+        "addRule": "Bu metrika üçin düzgün goş",
+        "basisLive": "Soňky minut",
+        "basisStored": "Jemi",
+        "since": "statistika täzeden guruldy {at}",
+        "partial": "Bölekleýin görnüş (500 setir çägi ýa-da ýetmezçilikli hukuklar)."
+      },
+      "sig": {
+        "AVAIL": "DB jogaby",
+        "CONN_USE": "Birikme ulanylyşy (bu DB)",
+        "URL": "Hyzmat URL-leri",
+        "LONG_QRY": "Uzak dowam edýän soraglar",
+        "IDLE_TX": "Boş tranzaksiýalar",
+        "LOCK_WAIT": "Gulplama garaşmalar",
+        "CACHE_HIT": "Keş urgy tizligi",
+        "XACT_ERR": "Yza gaýtarmalar we öli gulplamalar",
+        "SLOW_SQL": "Haýal SQL",
+        "STORAGE": "Saklama",
+        "VACUUM": "WAKUUM",
+        "INDEX": "Indeks saglygy",
+        "BACKUP": "Ätiýaçlyk (WAL arhiwi)",
+        "REPL": "Replikasiýa yza galmagy"
+      },
+      "fix": {
+        "AVAIL": "Haýal jogap ýa-da ýaňy-ýakynda täzeden işe girizildi — birikme sazlamalaryny we DB serwer ýagdaýyny barlaň.",
+        "AVAIL_DOWN": "DB-e birikip bolmady — birikme sazlamalaryny we DB serweriniň işjeňdigini barlaň.",
+        "CONN_USE": "Bu DB-de {sess}/{max} sessiýa (klaster boýunça däl — beýleki maglumat bazalary çykarylýar) — boş birikmeleri ýapyň ýa-da birikme pooler (pgbouncer) goşuň.",
+        "URL": "{n} barlanan URL şowsuz · iň ýokary jogap {ms}ms — sebäbini schema.pi monitorda görüň.",
+        "LONG_QRY": "Bir sorag {sec}s bäri işleýär — onuň meýilnamasyny gözden geçiriň we sazlaň, ýa-da DBA-dan ony ýatyrmagyny haýyş ediň.",
+        "IDLE_TX": "Bir tranzaksiýa {sec}s bäri boş dur — programmadaky ýitirilen kommiti tapyň we wagt çägini sazlaň.",
+        "LOCK_WAIT": "{n} sessiýa gulplamalara garaşýar — blokirleýji sessiýany tapyň we onuň tranzaksiýasyny tamamlaň.",
+        "CACHE_HIT": "Keş urgy tizligi {pct}% — uly tablisalaryň doly skanirlenmegini gözläň ýa-da shared_buffers-i gözden geçiriň.",
+        "XACT_ERR": "Yza gaýtarmak tizligi {pct}%, {dlck} öli gulplamalar — şowsuz tranzaksiýalary we programma ýalňyş loglaryny barlaň.",
+        "SLOW_SQL": "Bir soragyň ortaça {ms} ms — umumy wagt boýunça iň ýokary soraglary meýilnamalaryny ulanyp sazlaň.",
+        "STORAGE": "DB ({gb} GB) öz çägine ýakyn (galan günler {days}) — uly tablisalary arassalaň ýa-da kuwwatlylyk goşuň.",
+        "VACUUM": "{tbl} köp öli setirleri ýa-da köne statistikasy bar — VACUUM (ANALYZE) we autovacuum sazlamalaryny gözden geçiriň.",
+        "INDEX": "{n} indeks tapyndylary (nädogry, ulanylmadyk, doly skanirlenmeler) — maksatlary üçin tablisanyň we indeksiň saglyk tabyny görüň.",
+        "BACKUP": "WAL arhiwlemek öçürilen ýa-da durdy — archive_mode, archive_command we ätiýaçlyk ýagdaýyny barlaň.",
+        "REPL": "Replikasiýa yza galmagy {sec}s — garaşma ýagdaýyny we toruňy barlaň.",
+        "PGSS": "pg_stat_statements gurulmady, şonuň üçin haýal SQL elýeterli däl — aşakdaky SQL bilen açyň (serweri täzeden işe girizmek talap edilýär)."
+      },
+      "reason": {
+        "CONN_DOWN": "DB birikmesi kesilendigi sebäpli baha berilmedi.",
+        "PGSS": "pg_stat_statements giňeltmesi ýok.",
+        "VER": "Diňe PostgreSQL 13 ýa-da ondan soňky wersiýalarda elýeterli.",
+        "SAMPLE": "Heniz ýeterlik nusgalar ýok.",
+        "NO_LIMIT": "Ululyk çägi ýok, şonuň üçin ulanylyşyna baha berilmeýär — çäk hökmünde ulanmak üçin DB ululygy (MB) düzgünini (>) goşuň.",
+        "RESET": "Statistika 7 günden az wagt öň täzeden guruldy, şonuň üçin ulanylmadyk indekslere baha berilmeýär.",
+        "STALE": "Soňky barlag ýazgylary ýok.",
+        "STANDBY": "Garaşma serwerinde degişli däl.",
+        "NONE": "Barlamak üçin hiç zat ýok.",
+        "GRANT": "Hukuklar ýok — birikme hasabyna pg_monitor roluny beriň.",
+        "LINK": "schema.pi soragy şowsuz boldy ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Birikmelerde birikme ýagdaýyny barlaň we schema.pi-de birikme sazlamalaryny (host, port, hasap) düzediň.",
+          "2": "DB serweriniň işjeňdigini we ýaňy-ýakynda täzeden işe girizilendigini barlaň.",
+          "3": "Eger haýal bolsa, serwer ýüküni (CPU, disk) we toruňy barlaň."
+        },
+        "CONN_USE": {
+          "1": "Işjeňlik we gulplamalar tabynynda ulanyjy we ýagdaý boýunça sessiýa sanyny görüň.",
+          "2": "Eger köpüsi boş bolsa, programma pooluny kiçeldiň ýa-da birikme pooler goşuň.",
+          "3": "max_connections-i ýady göz öňünde tutup seresaplylyk bilen ýokarlandyryň."
+        },
+        "URL": {
+          "1": "schema.pi monitorda şowsuz URL-leri we ýagdaý kodlaryny görüň.",
+          "2": "Programma ýaýradylmagyny we daşarky baglylyklary barlaň.",
+          "3": "Eger gaýtalansa, URL şowsuzlyk sany (URL_FAIL_CNT) düzgünini goşuň."
+        },
+        "LONG_QRY": {
+          "1": "Işjeňlik we gulplamalar tabynynda uzak dowam edýän soraglary we olaryň ulanyjylaryny tapyň.",
+          "2": "SQL sazlamasynda meýilnamany gözden geçiriň we indeksleri ýa-da şertleri düzediň.",
+          "3": "Eger gyssagly bolsa, DBA ony pg_cancel_backend bilen ýatyrýar."
+        },
+        "IDLE_TX": {
+          "1": "Işjeňlik we gulplamalar tabynynda idle-in-transaction sessiýalarynyň soňky soragyny görüň.",
+          "2": "Programma kodynda ýitirilen kommit ýa-da yza gaýtarmany tapyň.",
+          "3": "Ony idle_in_transaction_session_timeout bilen çäklendiriň."
+        },
+        "LOCK_WAIT": {
+          "1": "Işjeňlik we gulplamalar tabynynda blokirleýji sessiýany (blocked_by) tapyň.",
+          "2": "Onuň tranzaksiýasyny tamamlaň ýa-da DBA-dan ony ýatyrmagyny haýyş ediň.",
+          "3": "Şol bir setirleri uzak wagtlap saklaýan partiýalary ýa-da tranzaksiýa tertibini düzediň."
+        },
+        "CACHE_HIT": {
+          "1": "Haýal sorag tabynynda uly tablisalaryň doly skanirlenmegini tapyň.",
+          "2": "Az blok okamak üçin zerur indeksleri goşuň.",
+          "3": "Eger ýatda ýer bar bolsa, shared_buffers-i gözden geçiriň."
+        },
+        "XACT_ERR": {
+          "1": "Programma ýalňyş loglarynda yza gaýtarmak sebäplerini (çäklendirme bozulmalary, wagt çäkleri) tapyň.",
+          "2": "Eger öli gulplamalar bar bolsa, tablisalary yzygiderli tertipde gulplaň.",
+          "3": "Gaýtadan synanyşyk logikasynyň yza gaýtarmalary köpeltmeýändigini barlaň."
+        },
+        "SLOW_SQL": {
+          "1": "Haýal sorag tabynynda umumy wagt boýunça iň ýokary soraglary saýlaň.",
+          "2": "SQL sazlamasynda meýilnamalary gözden geçiriň we indeksleri ýa-da birikmeleri düzediň.",
+          "3": "Düzedişden soň, ortaça wagtyň aşak düşendigini barlaň."
+        },
+        "STORAGE": {
+          "1": "Ululyk tendensiýasy tabynynda ösüş tendensiýasyny we çak edilýän doly senäni görüň.",
+          "2": "Uly tablisalary, indeksleri we köne maglumatlary arassalaň.",
+          "3": "Eger gerek bolsa, disk goşuň we çäk düzgünini täzeläň."
+        },
+        "VACUUM": {
+          "1": "Tablisa we indeks saglyk tabynynda köp öli setirleri bolan tablisalary görüň.",
+          "2": "DBA VACUUM (ANALYZE) işleýär.",
+          "3": "Eger gaýtalansa, şol tablisanyň autovacuum çäklerini peseldiň."
+        },
+        "INDEX": {
+          "1": "Tablisa we indeks saglyk tabynynda nädogry ýa-da ulanylmadyk indeksleri we doly skanirlenen tablisalary görüň.",
+          "2": "Nädogry indeksleri täzeden gurmak; DBA ulanylmadyklaryny gözden geçirýär we aýyrýar.",
+          "3": "Köp doly skanirlenen tablisalar üçin SQL sazlamasynda indeksleri dizaýn ediň."
+        },
+        "BACKUP": {
+          "1": "Ätiýaçlyk we dikeldiş tabynynda archive_mode we soňky arhiw wagtyny görüň.",
+          "2": "Eger arhiwlemek şowsuz bolsa, archive_command we barmaly ýerde boş ýeri barlaň.",
+          "3": "Dolandyrylýan DB-de, üpjün edijiniň ätiýaçlyk sazlamalaryny barlaň."
+        },
+        "REPL": {
+          "1": "Replikasiýa we DR tabynynda her bir garaşma serweriniň ýagdaýyny we yza galmagyny görüň.",
+          "2": "Garaşma serwerinde diski, CPU-ny we toruňy barlaň.",
+          "3": "Eger akym etmeýän bolsa, garaşma serwer loglaryny barlaň."
+        }
+      },
+      "sqlNote": "Aşakdaky SQL diňe okamak üçin, barlamak üçin — düzedişler (VACUUM, DROP INDEX, pg_terminate_backend) DBA tarapyndan ýerine ýetirilýär.",
+      "go": {
+        "activity": "Işjeňlik we gulplamalar",
+        "top": "Haýal soraglar",
+        "health": "Tablisa we indeks saglygy",
+        "trend": "Kuwwatlylyk tendensiýasy",
+        "params": "Parametr barlagy",
+        "repl": "Replikasiýa barlagy",
+        "backup": "Ätiýaçlyk barlagy",
+        "sqlLab": "SQL sazlamasy",
+        "drift": "Sazlaşyk deňeşdirmesi",
+        "connect": "Birikmeler",
+        "schema": "schema.pi monitor"
+      },
+      "chart": {
+        "title": "Tendensiýalar we reýtingler",
+        "note": "Tendensiýalar bu ekran açyk wagtynda her minutda ýazga alynýar (fon ýygnamak ýok).",
+        "gauges": "Birikme we keş ölçegleri",
+        "sessState": "Häzirki sessiýalar",
+        "sessTrend": "Sessiýa tendensiýasy we gulplama garaşmalar",
+        "tpsCombo": "Öndürijilik we yza gaýtarmak tizligi",
+        "cacheTrend": "Keş urgy tizligi tendensiýasy",
+        "capacity": "DB ululygy we çaklama",
+        "slowTop": "Haýal SQL iň gowy 10",
+        "slowLegend": "Zolak uzynlygy = umumy wagt · reňk = ortaça wagt (▲ {warn}ms-den duýduryş · ✕ {risk}ms-den howp)",
+        "sizeTop": "Ýer iň gowy 10",
+        "heat": "Wagt boýunça signal boýunça howp",
+        "q": {
+          "gauges": "Birikmeler dolýarmy? Okamalar ýatdan hyzmat edilýärmi?",
+          "sessState": "Sessiýalar häzir näme edýär?",
+          "sessTrend": "Sessiýalar köpelende gulplama garaşmalar artýarmy?",
+          "tpsCombo": "Öndürijilik we şowsuzlyk tizligi bile hereket edýärmi?",
+          "cacheTrend": "Keş urgy tizligi haçan aşak düşdi?",
+          "capacity": "DB haçan dolar?",
+          "slowTop": "Ilki nämäni sazlamaly? (umumy wagt boýunça)",
+          "sizeTop": "Ýeri näme eýeleýär?",
+          "heat": "Howp bir gezeklikmi ýa-da gaýtalanýarmy?"
+        },
+        "asTable": "Tablisa hökmünde görkez",
+        "needHistory": "Heniz tendensiýa ýok — bu ekrany birnäçe minut açyk saklaň.",
+        "needPerf": "Ululyk taryhy ýok — öndürijilik tabynynda ýygnamak ýa-da bu ekrany açyk saklamak.",
+        "noSess": "Sessiýalar ýok.",
+        "noWait": "Garaşmalar ýok",
+        "noData": "Görkezmek üçin maglumat ýok.",
+        "loading": "Ýüklenýär…",
+        "waitTop": "Garaşma wakalary",
+        "lockWait": "Gulplama garaşmalar",
+        "tps": "Tranzaksiýalar/s",
+        "rlbk": "Yza gaýtarmak tizligi (%)",
+        "cacheHit": "Keş urgy tizligi",
+        "size": "DB ululygy",
+        "limit": "Çäk",
+        "forecast": "Çaklama",
+        "daysLeft": "Galan günler",
+        "capNote": "Günde ösüş {perDay} · çäge çenli {days} gün",
+        "tbl": "Tablisa",
+        "idxToast": "Indeks + TOAST",
+        "mix": {
+          "active": "Işjeň",
+          "idleTx": "Tranzaksiýada boş",
+          "idle": "Boş",
+          "total": "sessiýalar"
+        },
+        "col": {
+          "item": "Element",
+          "value": "Baha",
+          "time": "Wagt",
+          "calls": "Jaňlar",
+          "total": "Jemi (ms)",
+          "mean": "Ortaça (ms)",
+          "share": "Paý"
+        }
+      },
+      "empty": {
+        "noConn": "Bu taksonomiýada gözegçilik etmek üçin PostgreSQL serwer birikmesi ýok — diňe URL-ler we hyzmat ýagdaýy görkezilýär.",
+        "unsupported": "Bu birikme gözegçiligi goldamaýar (diňe PostgreSQL serwer birikmeleri).",
+        "connFail": "DB-e birikmek başarmady — birikme sazlamalaryny we DB ýagdaýyny barlaň.",
+        "linkDown": "schema.pi-e ýetip bolmady — awtomatiki gaýtadan synanyşylýar.",
+        "linkAuth": "Birikme tokeni möhleti gutardy — schema.pi-de täze token çykaryň we ony hasaba alyň.",
+        "timeout": "Jogaplar haýal — awtomatiki gaýtadan synanyşylýar.",
+        "rate": "Talaplar gaty köp, şonuň üçin täzeleme aralygy artdyryldy."
+      },
+      "aux": {
+        "rules": "Meniň duýduryş düzgünlerim ({n} işjeň)",
+        "schemaSvc": "Hyzmat ýagdaýy — schema.pi jogaplary",
+        "schemaSvcNote": "schema.pi tarapyndan saklanan soňky 60 minutyň programma metrikleri.",
+        "source": "Maglumat çeşmesi: maksat DB diňe schema.pi-niň atlandyrylan soraglary (diňe okamak) arkaly okalýar; tendensiýalar diňe dbms.pi-de statistika saklaýar (setir maglumatlary saklanmaýar)."
+      }
     }
   },
   "ops": {
@@ -910,6 +1173,12 @@
   },
   "nav": {
     "label": "Aýratynlyklar",
+    "groups": {
+      "monitor": "Gözegçilik",
+      "drift": "Sazlaşyk",
+      "lake": "Köl",
+      "admin": "Dolandyryş"
+    },
     "connect": "Birikmek",
     "sqlLab": "SQL Sazlama",
     "perf": "Öndürijilik",

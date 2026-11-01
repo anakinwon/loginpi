@@ -13,7 +13,7 @@
       "connect": "Sajili tokeni ya kiungo cha schema.pi na uangalie hali ya muunganisho",
       "sqlLab": "Mti wa mpango, maonyo, ulinganisho na ukaguzi wa mifumo isiyo sahihi dhidi ya vikoa vya kawaida",
       "perf": "Hoja polepole Top-N, afya ya jedwali/faharisi, utabiri wa uwezo, shughuli na kufuli",
-      "monitor": "Muhtasari wa metriki za Programu, DB na URL na arifa za kizingiti",
+      "monitor": "Kawaida, onyo, na hatari kwa ishara 14, pamoja na nini cha kufanya na jinsi ya kutatua kwa haraka",
       "drift": "Linganisha modeli ya schema.pi na historia ya DDL na katalogi halisi, pima athari ya faharisi",
       "migration": "Mpangilio wa upakiaji wa topolojia, vipande, orodha ya ukaguzi na SQL ya uthibitishaji",
       "pipeline": "Ukaguzi wa awali wa kunasa mabadiliko na ufafanuzi wa bomba la chanzo→badilisha→lengo",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Kituo cha Ufuatiliaji",
-    "collectNote": "Mkusanyiko unaendeshwa katika schema.pi — uhamiaji umepangwa (D7). Ukurasa huu unasoma muhtasari wa ufuatiliaji wa schema.pi.",
+    "title": "Ufuatiliaji",
     "noLink": "Chagua au sajili kiungo cha schema.pi kwanza.",
     "goConnect": "Sajili kiungo",
     "period": "Kipindi",
@@ -457,16 +456,9 @@
       "360": "Saa 6",
       "1440": "Saa 24"
     },
-    "refresh": "Onyesha upya",
     "loading": "Inapakia…",
-    "updatedAt": "{area} · kufikia {time} (onyesha upya kiotomatiki kila sekunde 30)",
-    "appTitle": "Utendaji wa programu",
-    "dbTitle": "Hali ya DB kwa muunganisho",
-    "urlTitle": "Ukaguzi wa URL",
-    "empty": "Hakuna data ya kuonyesha.",
-    "breachTitle": "Ukiukaji wa kizingiti {n}",
-    "rulesTitle": "Sheria za kizingiti",
-    "rulesNote": "Sheria zimehifadhiwa kwa kiungo hiki na kutathminiwa dhidi ya muhtasari uliopokelewa; ukiukaji hupata mpaka mwekundu (arifa zitakuja baadaye).",
+    "rulesNote": "Sheria huhifadhiwa kwenye muunganisho huu na kutathminiwa kila wakati ubao unapoburudishwa (kikao cha DB/kusubiri kufungwa/kiwango cha hit cha akiba kila dakika 1, ukubwa wa DB/muda wa kujibu wa URL/kushindwa kila dakika 5). Ishara zilizokiukwa zitaongezeka hadi hatari na kuwekwa alama 'Sheria Yangu' (kutuma arifa ni hatua inayofuata). Sheria za metriki za Huduma (APP) hazitathminiwi. Sheria za ukubwa wa DB (MB) (>) pia hutumika kama mipaka ya uwezo.",
+    "notEvaluated": "Haijatathminiwa",
     "metric": "Kipimo",
     "conn": "Muunganisho",
     "allConns": "Miunganisho yote",
@@ -501,7 +493,278 @@
       "RATE": "Maombi mengi sana. Tafadhali jaribu tena baada ya muda mfupi.",
       "TIMEOUT": "schema.pi inajibu polepole. Tafadhali jaribu tena baada ya muda mfupi.",
       "RULE_LIMIT": "Hadi sheria 50 kwa kila kiungo.",
-      "NOT_FOUND": "Sheria haikupatikana."
+      "NOT_FOUND": "Sheria haikupatikana.",
+      "CONN_FAIL": "Imeshindwa kuunganisha kwenye hifadhidata. Angalia mipangilio ya muunganisho na hali ya DB.",
+      "LINK_DOWN": "Imeshindwa kufikia schema.pi. Jaribu tena baada ya muda mfupi.",
+      "PGSS_MISSING": "pg_stat_statements haijasakinishwa, kwa hivyo SQL polepole haipatikani.",
+      "CONN_UNSUPPORTED": "Muunganisho huu hautumii ufuatiliaji (miunganisho ya seva ya PostgreSQL pekee).",
+      "CONN_DISABLED": "Muunganisho huu umezimwa. Washa katika schema.pi.",
+      "INVALID_INPUT": "Ombi si sahihi."
+    },
+    "board": {
+      "subtitle": "Nini cha kufanya kwenye DB hii sasa hivi — ishara 14 za OK, onyo au hatari, pamoja na masuluhisho, kwa mtazamo mmoja.",
+      "refresh": {
+        "updated": "Kuanzia {time} · huburudisha kila dakika",
+        "now": "Burudisha sasa",
+        "busy": "Inapakia…",
+        "stale": "Imepitwa na wakati · {min} min iliyopita"
+      },
+      "level": {
+        "RISK": "Hatari",
+        "WARN": "Onyo",
+        "OK": "SAWA",
+        "UNKNOWN": "Haijulikani",
+        "NA": "Haitumiki"
+      },
+      "overall": {
+        "RISK": "Hatari — hatua inahitajika sasa",
+        "WARN": "Onyo — baadhi ya vitu vinahitaji kuangaliwa",
+        "UNKNOWN": "Haijulikani — angalia muunganisho",
+        "OK": "SAWA — kila ishara iko ndani ya mipaka",
+        "CONN_DOWN": "Haiwezi kufikia DB — angalia muunganisho kwanza",
+        "NA": "Haitumiki"
+      },
+      "kpi": {
+        "sess": "Vikao / max",
+        "tps": "Miamala/s",
+        "cache": "Kiwango cha hit cha akiba",
+        "size": "Ukubwa wa DB"
+      },
+      "todo": {
+        "title": "Cha kufanya sasa",
+        "more": "Onyesha {n} zaidi",
+        "less": "Onyesha kidogo",
+        "setup": "Weka hizi ili kuona zaidi",
+        "none": "Hakuna hatari au vitu vya onyo vinavyohitaji hatua sasa hivi.",
+        "unknown": "Imeshindwa kuangalia ishara {n} — angalia kadi kwa sababu.",
+        "myRule": "Sheria yangu imekiukwa: {rule}",
+        "copySql": "Nakili SQL",
+        "copied": "Imenakiliwa"
+      },
+      "cat": {
+        "avail": "Upatikanaji",
+        "load": "Mzigo & kusubiri",
+        "eff": "Ufanisi",
+        "store": "Hifadhi & matengenezo",
+        "protect": "Ulinzi (chelezo, urudufishaji)"
+      },
+      "card": {
+        "thr": "Mipaka: onyo {warn} · hatari {risk}",
+        "thrDown": "Mipaka: onyo chini ya {warn} · hatari chini ya {risk}",
+        "more": "Jinsi ya kurekebisha",
+        "addRule": "Ongeza sheria kwa metriki hii",
+        "basisLive": "Dakika iliyopita",
+        "basisStored": "Jumla",
+        "since": "takwimu zimewekwa upya {at}",
+        "partial": "Mwonekano wa sehemu (kikomo cha safu 500 au mapendeleo yanayokosekana)."
+      },
+      "sig": {
+        "AVAIL": "Majibu ya DB",
+        "CONN_USE": "Matumizi ya muunganisho (DB hii)",
+        "URL": "URL za huduma",
+        "LONG_QRY": "Hoja zinazoendeshwa kwa muda mrefu",
+        "IDLE_TX": "Miamala isiyotumika",
+        "LOCK_WAIT": "Kusubiri kufungwa",
+        "CACHE_HIT": "Kiwango cha hit cha akiba",
+        "XACT_ERR": "Kurejesha & kufungwa",
+        "SLOW_SQL": "SQL polepole",
+        "STORAGE": "Hifadhi",
+        "VACUUM": "Vacuum",
+        "INDEX": "Afya ya faharisi",
+        "BACKUP": "Hifadhi rudufu (jalada la WAL)",
+        "REPL": "Ucheleweshaji wa urudufishaji"
+      },
+      "fix": {
+        "AVAIL": "Majibu polepole au kuanzisha upya hivi karibuni — angalia mipangilio ya muunganisho na hali ya seva ya DB.",
+        "AVAIL_DOWN": "Imeshindwa kuunganisha kwenye DB — angalia mipangilio ya muunganisho na kwamba seva ya DB iko juu.",
+        "CONN_USE": "{sess}/{max} vikao kwenye DB hii (sio klasta nzima — hifadhidata zingine hazijumuishwi) — funga miunganisho isiyotumika au ongeza kikusanya muunganisho (pgbouncer).",
+        "URL": "URL {n} zilizochunguzwa zikishindwa · majibu max {ms}ms — angalia schema.pi monitor kwa sababu.",
+        "LONG_QRY": "Hoja imeendeshwa kwa {sec}s — kagua mpango wake na urekebishe, au DBA aighairi.",
+        "IDLE_TX": "Muamala umekuwa haufanyi kazi kwa {sec}s — pata ahadi inayokosekana kwenye programu na uweke muda wa kuisha.",
+        "LOCK_WAIT": "Vikao {n} vinasubiri kufungwa — pata kikao kinachozuia na umalize muamala wake.",
+        "CACHE_HIT": "Kiwango cha hit cha akiba {pct}% — tafuta skani kamili za jedwali kubwa au kagua shared_buffers.",
+        "XACT_ERR": "Kiwango cha kurejesha {pct}%, {dlck} kufungwa — angalia miamala inayoshindwa na kumbukumbu za makosa ya programu.",
+        "SLOW_SQL": "Hoja ina wastani wa {ms} ms — rekebisha hoja za juu kwa jumla ya muda kwa kutumia mipango yao.",
+        "STORAGE": "DB ({gb} GB) iko karibu na kikomo chake (siku zilizobaki {days}) — safisha jedwali kubwa au ongeza uwezo.",
+        "VACUUM": "{tbl} ina safu nyingi zilizokufa au takwimu zilizopitwa na wakati — kagua mipangilio ya VACUUM (ANALYZE) na autovacuum.",
+        "INDEX": "Matokeo ya faharisi {n} (batili, isiyotumika, skani kamili) — angalia kichupo cha afya ya jedwali & faharisi kwa malengo.",
+        "BACKUP": "Uhifadhi wa WAL umezimwa au umekwama — angalia archive_mode, archive_command na hali ya chelezo.",
+        "REPL": "Ucheleweshaji wa urudufishaji {sec}s — angalia hali ya kusubiri na mtandao.",
+        "PGSS": "pg_stat_statements haijasakinishwa, kwa hivyo SQL polepole haipatikani — iwashe kwa SQL iliyo hapa chini (kuanzisha upya seva kunahitajika)."
+      },
+      "reason": {
+        "CONN_DOWN": "Haijahukumiwa kwa sababu muunganisho wa DB umeshuka.",
+        "PGSS": "pg_stat_statements haijasakinishwa.",
+        "VER": "Inapatikana kwenye PostgreSQL 13 au baadaye.",
+        "SAMPLE": "Sampuli hazitoshi bado.",
+        "NO_LIMIT": "Hakuna kikomo cha ukubwa, kwa hivyo matumizi hayajahukumiwa — ongeza sheria ya ukubwa wa DB (MB) (>) ili kuitumia kama kikomo.",
+        "RESET": "Takwimu zimewekwa upya chini ya siku 7 zilizopita, kwa hivyo faharisi zisizotumika hazijahukumiwa.",
+        "STALE": "Hakuna rekodi za ukaguzi za hivi karibuni.",
+        "STANDBY": "Haitumiki kwenye seva ya kusubiri.",
+        "NONE": "Hakuna cha kuangalia.",
+        "GRANT": "Mapendeleo yanayokosekana — toa jukumu la pg_monitor kwa akaunti ya muunganisho.",
+        "LINK": "schema.pi hoja imeshindwa ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Angalia hali ya muunganisho katika Miunganisho, na urekebishe mipangilio ya muunganisho (host, port, account) katika schema.pi.",
+          "2": "Angalia kwamba seva ya DB iko juu na kama ilianzishwa upya hivi karibuni.",
+          "3": "Ikiwa inaendelea polepole, angalia mzigo wa seva (CPU, diski) na mtandao."
+        },
+        "CONN_USE": {
+          "1": "Angalia idadi ya vikao kwa mtumiaji na hali katika kichupo cha shughuli & kufungwa.",
+          "2": "Ikiwa vingi havifanyi kazi, punguza bwawa la programu au ongeza kikusanya muunganisho.",
+          "3": "Ongeza max_connections kwa uangalifu, ukizingatia kumbukumbu."
+        },
+        "URL": {
+          "1": "Angalia URL zinazoshindwa na misimbo ya hali katika schema.pi monitor.",
+          "2": "Angalia usambazaji wa programu na utegemezi wa nje.",
+          "3": "Ikiwa inarudia, ongeza sheria ya idadi ya kushindwa kwa URL (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Pata hoja zinazoendeshwa kwa muda mrefu na watumiaji wao katika kichupo cha shughuli & kufungwa.",
+          "2": "Kagua mpango katika urekebishaji wa SQL na urekebishe faharisi au masharti.",
+          "3": "Ikiwa ni haraka, DBA anaighairi kwa pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Angalia hoja ya mwisho ya vikao visivyotumika-katika-muamala katika kichupo cha shughuli & kufungwa.",
+          "2": "Pata ahadi inayokosekana au kurejesha katika msimbo wa programu.",
+          "3": "Iweke kikomo kwa idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Pata kikao kinachozuia (blocked_by) katika kichupo cha shughuli & kufungwa.",
+          "2": "Maliza muamala wake au DBA aighairi.",
+          "3": "Rekebisha bechi au mpangilio wa muamala unaoshikilia safu sawa kwa muda mrefu."
+        },
+        "CACHE_HIT": {
+          "1": "Pata skani kamili za jedwali kubwa katika kichupo cha hoja polepole.",
+          "2": "Ongeza faharisi zinazohitajika ili kusoma vizuizi vichache.",
+          "3": "Ikiwa kumbukumbu inaruhusu, kagua shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Pata sababu za kurejesha (ukiukaji wa vikwazo, muda wa kuisha) katika kumbukumbu za makosa ya programu.",
+          "2": "Ikiwa kuna kufungwa, funga jedwali kwa mpangilio thabiti.",
+          "3": "Angalia kwamba mantiki ya kujaribu tena haiongezi kurejesha."
+        },
+        "SLOW_SQL": {
+          "1": "Chagua hoja za juu kwa jumla ya muda katika kichupo cha hoja polepole.",
+          "2": "Kagua mipango katika urekebishaji wa SQL na urekebishe faharisi au viunganishi.",
+          "3": "Baada ya kurekebisha, angalia kwamba muda wa wastani umeshuka."
+        },
+        "STORAGE": {
+          "1": "Angalia mwenendo wa ukuaji na tarehe kamili iliyokadiriwa katika kichupo cha mwenendo wa ukubwa.",
+          "2": "Safisha jedwali kubwa, faharisi na data ya zamani.",
+          "3": "Ikiwa inahitajika, ongeza diski na usasishe sheria ya kikomo."
+        },
+        "VACUUM": {
+          "1": "Angalia jedwali zilizo na safu nyingi zilizokufa katika kichupo cha afya ya jedwali & faharisi.",
+          "2": "DBA anaendesha VACUUM (ANALYZE).",
+          "3": "Ikiwa inarudia, punguza vizingiti vya autovacuum kwa jedwali hilo."
+        },
+        "INDEX": {
+          "1": "Angalia faharisi batili au zisizotumika na jedwali za skani kamili katika kichupo cha afya ya jedwali & faharisi.",
+          "2": "Jenga upya faharisi batili; DBA anakagua na kuondoa zisizotumika.",
+          "3": "Buni faharisi katika urekebishaji wa SQL kwa jedwali zilizo na skani nyingi kamili."
+        },
+        "BACKUP": {
+          "1": "Angalia archive_mode na muda wa mwisho wa kuhifadhi katika kichupo cha chelezo & urejeshaji.",
+          "2": "Ikiwa uhifadhi unashindwa, angalia archive_command na nafasi ya bure kwenye marudio.",
+          "3": "Kwenye DB inayosimamiwa, angalia mipangilio ya chelezo ya mtoa huduma."
+        },
+        "REPL": {
+          "1": "Angalia hali na ucheleweshaji wa kila kusubiri katika kichupo cha urudufishaji & DR.",
+          "2": "Angalia diski, CPU na mtandao kwenye kusubiri.",
+          "3": "Ikiwa haitiririshi, angalia kumbukumbu za kusubiri."
+        }
+      },
+      "sqlNote": "SQL iliyo hapa chini ni ya kusoma tu, kwa kuangalia — marekebisho (VACUUM, DROP INDEX, pg_terminate_backend) yanaendeshwa na DBA.",
+      "go": {
+        "activity": "Shughuli & kufungwa",
+        "top": "Hoja polepole",
+        "health": "Afya ya jedwali & faharisi",
+        "trend": "Mwenendo wa uwezo",
+        "params": "Ukaguzi wa vigezo",
+        "repl": "Ukaguzi wa urudufishaji",
+        "backup": "Ukaguzi wa chelezo",
+        "sqlLab": "Urekebishaji wa SQL",
+        "drift": "Linganisha mkengeuko",
+        "connect": "Miunganisho",
+        "schema": "schema.pi monitor"
+      },
+      "chart": {
+        "title": "Mwenendo & viwango",
+        "note": "Mwenendo hurekodiwa kila dakika wakati skrini hii imefunguliwa (hakuna ukusanyaji wa mandharinyuma).",
+        "gauges": "Viashiria vya muunganisho & akiba",
+        "sessState": "Vikao sasa hivi",
+        "sessTrend": "Mwenendo wa kikao & kusubiri kufungwa",
+        "tpsCombo": "Kiwango cha upitishaji & kurejesha",
+        "cacheTrend": "Mwenendo wa kiwango cha hit cha akiba",
+        "capacity": "Ukubwa wa DB & utabiri",
+        "slowTop": "SQL polepole 10 bora",
+        "slowLegend": "Urefu wa pau = jumla ya muda · rangi = muda wa wastani (▲ onyo kutoka {warn}ms · ✕ hatari kutoka {risk}ms)",
+        "sizeTop": "Nafasi 10 bora",
+        "heat": "Hatari kwa ishara kwa muda",
+        "q": {
+          "gauges": "Je, miunganisho inajaa? Je, usomaji unatolewa kutoka kwenye kumbukumbu?",
+          "sessState": "Vikao vinafanya nini sasa?",
+          "sessTrend": "Je, kusubiri kufungwa huongezeka wakati vikao vinapojikusanya?",
+          "tpsCombo": "Je, kiwango cha upitishaji na kiwango cha kushindwa huenda pamoja?",
+          "cacheTrend": "Kiwango cha hit cha akiba kilishuka lini?",
+          "capacity": "DB itajaa lini?",
+          "slowTop": "Nini cha kurekebisha kwanza? (kwa jumla ya muda)",
+          "sizeTop": "Nini kinachukua nafasi?",
+          "heat": "Je, hatari ni ya mara moja au inarudia?"
+        },
+        "asTable": "Tazama kama jedwali",
+        "needHistory": "Hakuna mwenendo bado — weka skrini hii wazi kwa dakika chache.",
+        "needPerf": "Hakuna historia ya ukubwa — kusanya katika kichupo cha utendaji au weka skrini hii wazi.",
+        "noSess": "Hakuna vikao.",
+        "noWait": "Hakuna kusubiri",
+        "noData": "Hakuna data ya kuonyesha.",
+        "loading": "Inapakia…",
+        "waitTop": "Matukio ya kusubiri",
+        "lockWait": "Kusubiri kufungwa",
+        "tps": "Miamala/s",
+        "rlbk": "Kiwango cha kurejesha (%)",
+        "cacheHit": "Kiwango cha hit cha akiba",
+        "size": "Ukubwa wa DB",
+        "limit": "Kikomo",
+        "forecast": "Utabiri",
+        "daysLeft": "Siku zilizobaki",
+        "capNote": "Ukuaji kwa siku {perDay} · siku {days} hadi kikomo",
+        "tbl": "Jedwali",
+        "idxToast": "Faharisi + TOAST",
+        "mix": {
+          "active": "Inatumika",
+          "idleTx": "Haitumiki katika muamala",
+          "idle": "Haitumiki",
+          "total": "vikao"
+        },
+        "col": {
+          "item": "Kipengee",
+          "value": "Thamani",
+          "time": "Muda",
+          "calls": "Simu",
+          "total": "Jumla (ms)",
+          "mean": "Wastani (ms)",
+          "share": "Shiriki"
+        }
+      },
+      "empty": {
+        "noConn": "Uainishaji huu hauna muunganisho wa seva ya PostgreSQL wa kufuatilia — unaonyesha URL na hali ya huduma pekee.",
+        "unsupported": "Muunganisho huu hautumii ufuatiliaji (miunganisho ya seva ya PostgreSQL pekee).",
+        "connFail": "Imeshindwa kuunganisha kwenye hifadhidata — angalia mipangilio ya muunganisho na hali ya DB.",
+        "linkDown": "Imeshindwa kufikia schema.pi — inajaribu tena kiotomatiki.",
+        "linkAuth": "Tokeni ya muunganisho imeisha muda wake — toa tokeni mpya katika schema.pi na uisajili.",
+        "timeout": "Majibu ni polepole — inajaribu tena kiotomatiki.",
+        "rate": "Maombi mengi sana, kwa hivyo muda wa kuburudisha uliongezeka."
+      },
+      "aux": {
+        "rules": "Sheria zangu za arifa ({n} zinazotumika)",
+        "schemaSvc": "Hali ya huduma — majibu ya schema.pi",
+        "schemaSvcNote": "Metriki za programu kwa dakika 60 zilizopita zilizohifadhiwa na schema.pi.",
+        "source": "Chanzo cha data: DB lengwa inasomwa tu kupitia hoja zenye jina za schema.pi (kusoma tu); mwenendo huhifadhi takwimu tu katika dbms.pi (hakuna data ya safu)."
+      }
     }
   },
   "ops": {
@@ -650,7 +913,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "Kiungo cha schema.pi kinaandaliwa. Tafadhali jaribu tena baadaye",
+      "PGSS_MISSING": "pg_stat_statements haijasakinishwa kwenye DB hii, kwa hivyo takwimu za hoja hazipatikani",
       "CONN_UNSUPPORTED": "Muunganisho huu haujaungwa mkono bado (miunganisho ya moja kwa moja ya PostgreSQL tu)",
+      "TIMEOUT": "DB lengwa ilijibu polepole sana. Tafadhali jaribu tena baadaye",
       "RATE": "Maombi mengi sana. Jaribu tena baada ya dakika moja",
       "LINK_AUTH": "Tokeni ya kiungo imeisha muda wake au imefutwa. Sajili tokeni tena kwenye ukurasa wa Unganisha",
       "LINK_SCOPE": "Muunganisho huu hautokani na eneo la somo la kiungo",
@@ -659,6 +924,7 @@
     },
     "pgss": {
       "title": "Jinsi ya kuwezesha pg_stat_statements",
+      "body": "Hoja polepole Top-N inahitaji kiendelezi cha pg_stat_statements. Endesha taarifa iliyo hapa chini kama msimamizi wa DB. Kwenye Supabase, iwashe chini ya Database → Extensions",
       "note": "PostgreSQL iliyojihifadhi pia inahitaji pg_stat_statements katika shared_preload_libraries (postgresql.conf) na kuanzisha upya. Takwimu za jedwali, faharisi na ukubwa hufanya kazi bila hiyo"
     },
     "collect": {
@@ -697,6 +963,7 @@
     "trend": {
       "limit": "Kizingiti cha ukubwa",
       "empty": "Hakuna picha katika siku 30 zilizopita",
+      "chart": "Ukubwa wa DB katika siku 30 zilizopita",
       "now": "Ukubwa wa sasa",
       "perDay": "Ukuaji kwa siku",
       "needMore": "Inahitaji picha 2+",
@@ -904,6 +1171,12 @@
   },
   "nav": {
     "label": "Vipengele",
+    "groups": {
+      "monitor": "Ufuatiliaji",
+      "drift": "Uthabiti",
+      "lake": "Ziwa",
+      "admin": "Msimamizi"
+    },
     "connect": "Unganisha",
     "sqlLab": "Kurekebisha SQL",
     "perf": "Utendaji",

@@ -13,7 +13,7 @@
       "connect": "Rekisteröi schema.pi-linkkitunnus ja tarkista yhteystila",
       "sqlLab": "Suunnitelmapuu, varoitukset, vertailu ja anti-pattern-tarkistukset standardidomainien suhteen",
       "perf": "Hitaat kyselyt Top-N, taulukon/indeksin kunto, kapasiteetin ennuste, aktiivisuus ja lukitukset",
-      "monitor": "Sovelluksen, DB:n ja URL-mittareiden yhteenveto kynnyshälytyksillä",
+      "monitor": "14 signaalin normaali, varoitus ja vaara sekä mitä tehdä ja miten ratkaista yhdellä silmäyksellä",
       "drift": "Vertaa schema.pi-mallia ja DDL-historiaa todelliseen luetteloon, mittaa indeksin vaikutusta",
       "migration": "Topologinen latausjärjestys, palat, tarkistuslista ja varmennus-SQL",
       "pipeline": "Muutosten sieppauksen esitarkistus ja lähde→muunnos→kohde-putkilinjojen määritykset",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Valvontakeskus",
-    "collectNote": "Keräys suoritetaan schema.pi:ssä — siirto suunniteltu (D7). Tämä sivu lukee schema.pi-valvonnan yhteenvedon.",
+    "title": "Valvonta",
     "noLink": "Valitse tai rekisteröi ensin schema.pi-linkki.",
     "goConnect": "Rekisteröi linkki",
     "period": "Jakso",
@@ -457,15 +456,9 @@
       "360": "6 tuntia",
       "1440": "24 tuntia"
     },
-    "refresh": "Päivitä",
     "loading": "Ladataan…",
-    "updatedAt": "{area} · {time} (automaattinen päivitys 30s välein)",
-    "appTitle": "Sovelluksen suorituskyky",
-    "urlTitle": "URL-tarkistukset",
-    "empty": "Ei näytettäviä tietoja.",
-    "breachTitle": "{n} kynnysarvon ylitystä",
-    "rulesTitle": "Kynnyssäännöt",
-    "rulesNote": "Säännöt tallennetaan tälle linkille ja arvioidaan vastaanotettua yhteenvetoa vasten; ylitykset saavat punaisen reunuksen (ilmoitukset tulevat myöhemmin).",
+    "rulesNote": "Säännöt tallennetaan tähän yhteyteen ja arvioidaan aina, kun taulu päivitetään (DB-istunto/lukitus odotus/välimuistin osumaprosentti joka 1. minuutti, DB-koko/URL-vastausaika/virhe joka 5. minuutti). Rikkoutuneet signaalit eskaloituvat vaaraan ja merkitään 'Oma sääntö' (ilmoitusten lähettäminen on seuraava vaihe). Palvelun (APP) mittarisääntöjä ei arvioida. DB-koko (MB) sääntöjä (>) käytetään myös kapasiteettirajoina.",
+    "notEvaluated": "Ei arvioitu",
     "metric": "Mittari",
     "conn": "Yhteys",
     "allConns": "Kaikki yhteydet",
@@ -488,6 +481,7 @@
       "DB_SESS_CNT": "Istunnot",
       "DB_LOCK_WAIT_CNT": "Lukitusodotukset",
       "DB_CACHE_HIT_PCT": "Välimuistin osumaprosentti (%)",
+      "DB_SIZE_MB": "DB-koko (MB)",
       "URL_RSP_MS": "URL-vastaus (ms)",
       "URL_FAIL_CNT": "URL-virheet"
     },
@@ -499,10 +493,280 @@
       "RATE": "Liian monta pyyntöä. Yritä uudelleen hetken kuluttua.",
       "TIMEOUT": "schema.pi vastaa hitaasti. Yritä uudelleen hetken kuluttua.",
       "RULE_LIMIT": "Enintään 50 sääntöä linkkiä kohden.",
-      "NOT_FOUND": "Sääntöä ei löytynyt."
+      "NOT_FOUND": "Sääntöä ei löytynyt.",
+      "CONN_FAIL": "Tietokantaan ei saatu yhteyttä. Tarkista yhteysasetukset ja DB-tila.",
+      "LINK_DOWN": "schema.pi-yhteyttä ei saatu. Yritä uudelleen hetken kuluttua.",
+      "PGSS_MISSING": "pg_stat_statements ei ole asennettu, joten hidas SQL ei ole käytettävissä.",
+      "CONN_UNSUPPORTED": "Tämä yhteys ei tue valvontaa (vain PostgreSQL-palvelinyhteydet).",
+      "CONN_DISABLED": "Tämä yhteys on poistettu käytöstä. Ota se käyttöön schema.pi:ssä.",
+      "INVALID_INPUT": "Pyynnön arvo on virheellinen."
+    },
+    "board": {
+      "refresh": {
+        "updated": "Tilanne {time} · päivittyy minuutin välein",
+        "now": "Päivitä nyt",
+        "busy": "Ladataan…",
+        "stale": "Vanhentunut · {min} min sitten"
+      },
+      "level": {
+        "RISK": "Riski",
+        "WARN": "Varoitus",
+        "OK": "OK",
+        "UNKNOWN": "Tuntematon",
+        "NA": "Ei sovellettavissa"
+      },
+      "overall": {
+        "RISK": "Riski – toimenpiteitä tarvitaan nyt",
+        "WARN": "Varoitus – joitakin kohteita on tarkasteltava",
+        "UNKNOWN": "Tuntematon – tarkista yhteys",
+        "OK": "OK – kaikki signaalit ovat rajojen sisällä",
+        "NA": "Ei sovellettavissa"
+      },
+      "kpi": {
+        "sess": "Istunnot / maks.",
+        "tps": "Transaktiot/s",
+        "cache": "Välimuistin osumaprosentti",
+        "size": "DB-koko"
+      },
+      "todo": {
+        "title": "Tehtävät nyt",
+        "more": "Näytä {n} lisää",
+        "less": "Näytä vähemmän",
+        "setup": "Määritä nämä nähdäksesi lisää",
+        "none": "Ei riski- tai varoituskohteita, jotka vaatisivat toimenpiteitä juuri nyt.",
+        "unknown": "Ei voitu tarkistaa {n} signaalia – katso syy korteista.",
+        "myRule": "Oma sääntö rikottu: {rule}",
+        "copySql": "Kopioi SQL",
+        "copied": "Kopioitu"
+      },
+      "cat": {
+        "avail": "Saatavuus",
+        "load": "Kuormitus ja odotukset",
+        "eff": "Tehokkuus",
+        "store": "Tallennus ja ylläpito",
+        "protect": "Suojaus (varmuuskopiointi, replikointi)"
+      },
+      "card": {
+        "thr": "Rajat: varoitus {warn} · riski {risk}",
+        "thrDown": "Rajat: varoitus alle {warn} · riski alle {risk}",
+        "more": "Miten korjata",
+        "addRule": "Lisää sääntö tälle mittarille",
+        "basisLive": "Viime minuutti",
+        "basisStored": "Kumulatiivinen",
+        "since": "tilastot nollattu {at}",
+        "partial": "Osittainen näkymä (500 rivin raja tai puuttuvat oikeudet)."
+      },
+      "sig": {
+        "AVAIL": "DB-vastaus",
+        "CONN_USE": "Yhteyden käyttö (tämä DB)",
+        "URL": "Palvelun URL-osoitteet",
+        "LONG_QRY": "Pitkään käynnissä olevat kyselyt",
+        "IDLE_TX": "Tyhjäkäynnillä olevat transaktiot",
+        "LOCK_WAIT": "Lukituksen odotukset",
+        "CACHE_HIT": "Välimuistin osumaprosentti",
+        "XACT_ERR": "Palautukset ja lukkiutumiset",
+        "SLOW_SQL": "Hidas SQL",
+        "STORAGE": "Tallennustila",
+        "VACUUM": "Vacuum",
+        "INDEX": "Indeksin tila",
+        "BACKUP": "Varmuuskopiointi (WAL-arkisto)",
+        "REPL": "Replikointiviive"
+      },
+      "fix": {
+        "AVAIL": "Hidas vastaus tai äskettäinen uudelleenkäynnistys – tarkista yhteysasetukset ja DB-palvelimen tila.",
+        "AVAIL_DOWN": "Tietokantaan ei saatu yhteyttä – tarkista yhteysasetukset ja että DB-palvelin on käynnissä.",
+        "CONN_USE": "{sess}/{max} istuntoa tässä DB:ssä (ei klusterinlaajuinen – muut tietokannat on suljettu pois) – sulje tyhjäkäynnillä olevat yhteydet tai lisää yhteyspooleri (pgbouncer).",
+        "URL": "{n} tarkistettua URL-osoitetta epäonnistuu · maksimivastaus {ms}ms – katso syy schema.pi-monitorista.",
+        "LONG_QRY": "Kysely on ollut käynnissä {sec}s – tarkista sen suunnitelma ja viritä se, tai pyydä DBA:ta peruuttamaan se.",
+        "IDLE_TX": "Transaktio on ollut tyhjäkäynnillä {sec}s – etsi puuttuva commit sovelluksesta ja aseta aikakatkaisu.",
+        "LOCK_WAIT": "{n} istuntoa odottaa lukituksia – etsi estävä istunto ja lopeta sen transaktio.",
+        "CACHE_HIT": "Välimuistin osumaprosentti {pct}% – etsi suurten taulukoiden täysiä skannauksia tai tarkista shared_buffers.",
+        "XACT_ERR": "Palautusprosentti {pct}%, {dlck} lukkiutumista – tarkista epäonnistuneet transaktiot ja sovelluksen virhelokit.",
+        "SLOW_SQL": "Kyselyn keskiarvo on {ms} ms – viritä eniten aikaa vievät kyselyt niiden suunnitelmien avulla.",
+        "STORAGE": "DB ({gb} GB) on lähellä rajaansa (päiviä jäljellä {days}) – siivoa suuria taulukoita tai lisää kapasiteettia.",
+        "VACUUM": "{tbl}:ssä on paljon kuolleita rivejä tai vanhentuneita tilastoja – tarkista VACUUM (ANALYZE) ja autovacuum-asetukset.",
+        "INDEX": "{n} indeksilöydöstä (virheellinen, käyttämätön, täydet skannaukset) – katso taulukon ja indeksin kunto -välilehdeltä kohteet.",
+        "BACKUP": "WAL-arkistointi on pois päältä tai pysähtynyt – tarkista archive_mode, archive_command ja varmuuskopioinnin tila.",
+        "REPL": "Replikointiviive {sec}s – tarkista valmiustilan tila ja verkko.",
+        "PGSS": "pg_stat_statements ei ole asennettu, joten hidas SQL ei ole käytettävissä – ota se käyttöön alla olevalla SQL:llä (palvelimen uudelleenkäynnistys vaaditaan)."
+      },
+      "reason": {
+        "CONN_DOWN": "Ei arvioitu, koska DB-yhteys on poikki.",
+        "PGSS": "pg_stat_statements-laajennusta ei ole.",
+        "VER": "Saatavilla PostgreSQL 13 tai uudemmassa.",
+        "SAMPLE": "Näytteitä ei ole vielä tarpeeksi.",
+        "NO_LIMIT": "Ei kokorajaa, joten käyttöä ei arvioida – lisää DB-koko (MB) -sääntö (>) käyttääksesi sitä rajana.",
+        "RESET": "Tilastoja ei ole nollattu alle 7 päivää sitten, joten käyttämättömiä indeksejä ei arvioida.",
+        "STALE": "Ei viimeaikaisia tarkistustietoja.",
+        "STANDBY": "Ei sovellettavissa valmiustilapalvelimella.",
+        "NONE": "Ei tarkistettavaa.",
+        "GRANT": "Puuttuvat oikeudet – myönnä pg_monitor-rooli yhteystilille.",
+        "LINK": "schema.pi-kysely epäonnistui ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Tarkista yhteyden tila Yhteydet-kohdasta ja korjaa yhteysasetukset (isäntä, portti, tili) schema.pi:ssä.",
+          "2": "Tarkista, että DB-palvelin on käynnissä ja onko se käynnistetty uudelleen äskettäin.",
+          "3": "Jos se pysyy hitaana, tarkista palvelimen kuormitus (CPU, levy) ja verkko."
+        },
+        "CONN_USE": {
+          "1": "Katso istuntojen määrät käyttäjän ja tilan mukaan toiminta- ja lukitukset-välilehdeltä.",
+          "2": "Jos moni on tyhjäkäynnillä, pienennä sovelluksen poolia tai lisää yhteyspooleri.",
+          "3": "Nosta max_connections-arvoa varovasti, ottaen huomioon muistin."
+        },
+        "URL": {
+          "1": "Katso epäonnistuneet URL-osoitteet ja tilakoodit schema.pi-monitorista.",
+          "2": "Tarkista sovelluksen käyttöönotto ja ulkoiset riippuvuudet.",
+          "3": "Jos se toistuu, lisää URL-epäonnistumisten määrä (URL_FAIL_CNT) -sääntö."
+        },
+        "LONG_QRY": {
+          "1": "Etsi pitkään käynnissä olevat kyselyt ja niiden käyttäjät toiminta- ja lukitukset-välilehdeltä.",
+          "2": "Tarkista suunnitelma SQL-virityksessä ja korjaa indeksit tai ehdot.",
+          "3": "Jos kiireellistä, DBA peruuttaa sen pg_cancel_backend-komennolla."
+        },
+        "IDLE_TX": {
+          "1": "Katso idle-in-transaction-istuntojen viimeinen kysely toiminta- ja lukitukset-välilehdeltä.",
+          "2": "Etsi puuttuva commit tai rollback sovelluskoodista.",
+          "3": "Rajoita se idle_in_transaction_session_timeout-asetuksella."
+        },
+        "LOCK_WAIT": {
+          "1": "Etsi estävä istunto (blocked_by) toiminta- ja lukitukset-välilehdeltä.",
+          "2": "Lopeta sen transaktio tai pyydä DBA:ta peruuttamaan se.",
+          "3": "Korjaa erät tai transaktiojärjestys, jotka pitävät samoja rivejä pitkään."
+        },
+        "CACHE_HIT": {
+          "1": "Etsi suurten taulukoiden täysiä skannauksia hitaiden kyselyjen välilehdeltä.",
+          "2": "Lisää tarvittavat indeksit lukemaan vähemmän lohkoja.",
+          "3": "Jos muisti sallii, tarkista shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Etsi palautusten syyt (rajoitusrikkomukset, aikakatkaisut) sovelluksen virhelokeista.",
+          "2": "Jos on lukkiutumisia, lukitse taulukot johdonmukaisessa järjestyksessä.",
+          "3": "Tarkista, ettei uudelleenyrityslogiikka lisää palautuksia."
+        },
+        "SLOW_SQL": {
+          "1": "Valitse hitaiden kyselyjen välilehdeltä eniten aikaa vievät kyselyt.",
+          "2": "Tarkista suunnitelmat SQL-virityksessä ja korjaa indeksit tai liitokset.",
+          "3": "Korjauksen jälkeen tarkista, että keskimääräinen aika laski."
+        },
+        "STORAGE": {
+          "1": "Katso kasvutrendi ja arvioitu täyttymispäivä koon trendi -välilehdeltä.",
+          "2": "Siivoa suuria taulukoita, indeksejä ja vanhoja tietoja.",
+          "3": "Tarvittaessa lisää levyä ja päivitä rajasääntö."
+        },
+        "VACUUM": {
+          "1": "Katso taulukot, joissa on paljon kuolleita rivejä taulukon ja indeksin kunto -välilehdeltä.",
+          "2": "DBA suorittaa VACUUM (ANALYZE) -komennon.",
+          "3": "Jos se toistuu, alenna kyseisen taulukon autovacuum-kynnysarvoja."
+        },
+        "INDEX": {
+          "1": "Katso virheelliset tai käyttämättömät indeksit ja täyden skannauksen taulukot taulukon ja indeksin kunto -välilehdeltä.",
+          "2": "Rakenna virheelliset indeksit uudelleen; DBA tarkistaa ja poistaa käyttämättömät.",
+          "3": "Suunnittele indeksit SQL-virityksessä taulukoille, joissa on paljon täysiä skannauksia."
+        },
+        "BACKUP": {
+          "1": "Katso archive_mode ja viimeinen arkistointiaika varmuuskopiointi- ja palautus-välilehdeltä.",
+          "2": "Jos arkistointi epäonnistuu, tarkista archive_command ja vapaa tila kohteessa.",
+          "3": "Hallitussa DB:ssä tarkista palveluntarjoajan varmuuskopiointiasetukset."
+        },
+        "REPL": {
+          "1": "Katso kunkin valmiustilan tila ja viive replikointi- ja DR-välilehdeltä.",
+          "2": "Tarkista valmiustilan levy, CPU ja verkko.",
+          "3": "Jos se ei suoratoista, tarkista valmiustilan lokit."
+        }
+      },
+      "sqlNote": "Alla oleva SQL on vain luku -tarkistusta varten – korjaukset (VACUUM, DROP INDEX, pg_terminate_backend) suorittaa DBA.",
+      "go": {
+        "activity": "Toiminta ja lukitukset",
+        "top": "Hitaat kyselyt",
+        "health": "Taulukon ja indeksin kunto",
+        "trend": "Kapasiteettitrendi",
+        "params": "Parametrien tarkistus",
+        "repl": "Replikoinnin tarkistus",
+        "backup": "Varmuuskopioinnin tarkistus",
+        "sqlLab": "SQL-viritys",
+        "drift": "Poikkeaman vertailu",
+        "connect": "Yhteydet",
+        "schema": "schema.pi-monitori"
+      },
+      "chart": {
+        "title": "Trendit ja sijoitukset",
+        "note": "Trendit tallennetaan minuutin välein tämän näytön ollessa auki (ei taustakeräystä).",
+        "gauges": "Yhteys- ja välimuistimittarit",
+        "sessState": "Istuntojen tila nyt",
+        "sessTrend": "Istuntotrendi ja lukituksen odotukset",
+        "tpsCombo": "Suorituskyky ja palautusaste",
+        "cacheTrend": "Välimuistin osumaprosentin trendi",
+        "capacity": "DB-koko ja ennuste",
+        "slowTop": "Hidas SQL TOP 10",
+        "slowLegend": "Palkin pituus = kokonaisaika · väri = keskimääräinen aika (▲ varoitus alkaen {warn}ms · ✕ riski alkaen {risk}ms)",
+        "sizeTop": "Tilan TOP 10",
+        "heat": "Riski signaalin mukaan ajan mittaan",
+        "q": {
+          "gauges": "Ovatko yhteydet täyttymässä? Luetaanko muistista?",
+          "sessState": "Mitä istunnot tekevät nyt?",
+          "sessTrend": "Kasvoivatko lukituksen odotukset, kun istuntoja kertyi?",
+          "tpsCombo": "Liikkuvatko suorituskyky ja virheprosentti yhdessä?",
+          "cacheTrend": "Milloin välimuistin osumaprosentti laski?",
+          "capacity": "Milloin DB täyttyy?",
+          "slowTop": "Mitä virittää ensin? (kokonaisajan mukaan)",
+          "sizeTop": "Mikä vie tilaa?",
+          "heat": "Onko riski kertaluonteinen vai toistuva?"
+        },
+        "asTable": "Näytä taulukkona",
+        "needHistory": "Ei trendiä vielä – pidä tämä näyttö auki muutaman minuutin ajan.",
+        "needPerf": "Ei kokohistoriaa – kerää suorituskyky-välilehdeltä tai pidä tämä näyttö auki.",
+        "noSess": "Ei istuntoja.",
+        "noWait": "Ei odotuksia",
+        "noData": "Ei näytettävää dataa.",
+        "loading": "Ladataan…",
+        "waitTop": "Odotustapahtumat",
+        "lockWait": "Lukituksen odotukset",
+        "tps": "Transaktiot/s",
+        "rlbk": "Palautusaste (%)",
+        "cacheHit": "Välimuistin osumaprosentti",
+        "size": "DB-koko",
+        "limit": "Raja",
+        "forecast": "Ennuste",
+        "daysLeft": "Päiviä jäljellä",
+        "capNote": "Kasvu päivässä {perDay} · {days} päivää rajaan",
+        "tbl": "Taulukko",
+        "idxToast": "Indeksi + TOAST",
+        "mix": {
+          "active": "Aktiivinen",
+          "idleTx": "Tyhjäkäynnillä transaktiossa",
+          "idle": "Tyhjäkäynnillä",
+          "total": "istuntoa"
+        },
+        "col": {
+          "item": "Kohde",
+          "value": "Arvo",
+          "time": "Aika",
+          "calls": "Kutsut",
+          "total": "Yhteensä (ms)",
+          "mean": "Keskimääräinen (ms)",
+          "share": "Osuus"
+        }
+      },
+      "empty": {
+        "noConn": "Tässä taksonomiassa ei ole PostgreSQL-palvelinyhteyttä valvottavaksi – näytetään vain URL-osoitteet ja palvelun tila.",
+        "unsupported": "Tämä yhteys ei tue valvontaa (vain PostgreSQL-palvelinyhteydet).",
+        "connFail": "Tietokantaan ei saatu yhteyttä – tarkista yhteysasetukset ja DB-tila.",
+        "linkDown": "schema.pi-yhteyttä ei saatu – yritetään automaattisesti uudelleen.",
+        "linkAuth": "Yhteystunnus on vanhentunut – myönnä uusi tunnus schema.pi:ssä ja rekisteröi se.",
+        "timeout": "Vastaukset ovat hitaita – yritetään automaattisesti uudelleen.",
+        "rate": "Liian monta pyyntöä, joten päivitysväliä pidennettiin."
+      },
+      "aux": {
+        "rules": "Omat hälytyssäännöt ({n} aktiivista)",
+        "schemaSvc": "Palvelun tila – schema.pi-vastaukset",
+        "schemaSvcNote": "schema.pi:n tallentamat sovellusmittarit viimeiseltä 60 minuutin ajalta.",
+        "source": "Tietolähde: kohde-DB on vain luku schema.pi:n nimettyjen kyselyjen kautta (vain luku); trendit tallentavat tilastoja vain dbms.pi:hin (ei rividataa)."
+      }
     }
   },
   "ops": {
+    "title": "DB-toimintojen turvallisuus",
     "loading": "Ladataan…",
     "pickFirst": "Valitse ensin linkki ja yhteys ylhäältä",
     "run": "Suorita diagnoosi",
@@ -627,6 +891,7 @@
     "err": {
       "NOT_IMPLEMENTED": "schema.pi-yhteys on valmisteilla. Yritä uudelleen hetken kuluttua.",
       "CONN_UNSUPPORTED": "Tätä yhteyttä ei vielä tueta (vain suora PostgreSQL).",
+      "TIMEOUT": "Kohde-DB vastasi liian hitaasti. Yritä uudelleen hetken kuluttua.",
       "RATE": "Liian monta kutsua. Yritä uudelleen minuutin kuluttua.",
       "Q_UNKNOWN": "Tuntematon kysely. Tarkista schema.pi-linkin API-versio.",
       "INVALID_INPUT": "Virheellinen linkin tai yhteyden valinta."
@@ -710,7 +975,9 @@
   },
   "pipeline": {
     "title": "PiCDC · Putket",
+    "intro": "Tarkista, onko lähde-DB valmis muutostietojen kaappaukseen (CDC) ja suunnittele lähde → muunnos → kohde-putkilinjat. Tämä vaihe vain tarkistaa ja suunnittelee; asiakkaan rividataa ei lueta tai tallenneta.",
     "needLink": "Valitse ensin schema.pi-linkki yllä. Jos sinulla ei ole linkkiä, rekisteröi tunnus 'Linkki'-valikossa.",
+    "needConn": "Valitse tarkistettava DB-yhteys yllä.",
     "loading": "Ladataan…",
     "pager": "Sivut",
     "prev": "Edellinen",
@@ -755,6 +1022,7 @@
       "LOGICAL_NOT_READY": "Voidaan vaihtaa LOGICAL-tilaan, kun WAL-looginen replikointi on valmis",
       "FULL_RELOAD_ONLY": "Ei PK:ta tai muutosajankohdan saraketta, joten ei inkrementaalista kaappausta – lisää PK",
       "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level ei ole logical (sen muuttaminen vaatii DB:n uudelleenkäynnistyksen)",
       "NO_SLOTS": "max_replication_slots on 0",
       "NO_SENDERS": "max_wal_senders on 0",
       "IS_STANDBY": "Valmiustilapalvelin – ota looginen replikointi ensisijaisesta",
@@ -775,6 +1043,7 @@
       "useCurrentConn": "Käytä yllä valittua yhteyttä",
       "sched": "Aikataulu (cron 5-kenttä, tyhjä = manuaalinen)",
       "target": "Kohde",
+      "targetPh": "esim. analytiikka-DB analytics.public / järvi s3://…",
       "tables": "Lähdetaulukot (rivinvaihdolla tai pilkulla eroteltuna)",
       "steps": "Vaiheet (lähde → muunnos → kohde)",
       "op": "Toiminto",
@@ -896,6 +1165,12 @@
   },
   "nav": {
     "label": "Ominaisuudet",
+    "groups": {
+      "monitor": "Valvonta",
+      "drift": "Johdonmukaisuus",
+      "lake": "Järvi",
+      "admin": "Hallinta"
+    },
     "connect": "Yhdistä",
     "sqlLab": "SQL-viritys",
     "perf": "Suorituskyky",

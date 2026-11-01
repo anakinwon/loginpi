@@ -13,7 +13,7 @@
       "connect": "Magrehistro ng schema.pi link token at suriin ang status ng koneksyon",
       "sqlLab": "Plan tree, mga babala, paghahambing at anti-pattern checks laban sa mga standard domain",
       "perf": "Mabagal na query Top-N, kalusugan ng table/index, forecast ng kapasidad, aktibidad at mga lock",
-      "monitor": "Buod ng metric ng App, DB at URL na may mga alerto sa threshold",
+      "monitor": "Normal, babala, at panganib para sa 14 na signal, kasama ang kung ano ang gagawin at kung paano ito lutasin sa isang sulyap",
       "drift": "Paghambingin ang schema.pi model at DDL history sa totoong catalog, sukatin ang epekto ng index",
       "migration": "Topological load order, chunks, checklist at verification SQL",
       "pipeline": "Precheck ng change-capture at mga definisyon ng pipeline ng source→transform→target",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Monitoring Center",
-    "collectNote": "Ang koleksyon ay tumatakbo sa schema.pi — nakaplanong migration (D7). Binabasa ng pahinang ito ang buod ng monitor ng schema.pi.",
+    "title": "Pagsubaybay",
     "noLink": "Piliin o irehistro muna ang isang schema.pi link.",
     "goConnect": "Magrehistro ng link",
     "period": "Panahon",
@@ -457,16 +456,9 @@
       "360": "6 na oras",
       "1440": "24 na oras"
     },
-    "refresh": "I-refresh",
     "loading": "Naglo-load…",
-    "updatedAt": "{area} · hanggang {time} (auto refresh bawat 30s)",
-    "appTitle": "Pagganap ng app",
-    "dbTitle": "Status ng DB ayon sa koneksyon",
-    "urlTitle": "Mga pagsusuri sa URL",
-    "empty": "Walang data na ipapakita.",
-    "breachTitle": "{n} paglabag sa threshold",
-    "rulesTitle": "Mga panuntunan sa threshold",
-    "rulesNote": "Ang mga panuntunan ay nai-save para sa link na ito at sinusuri laban sa natanggap na buod; ang mga paglabag ay nagkakaroon ng pulang border (ang mga notification ay darating sa ibang pagkakataon).",
+    "rulesNote": "Ang mga panuntunan ay nai-save sa koneksyon na ito at sinusuri sa tuwing nire-refresh ang board (DB session/lock wait/cache hit rate bawat 1 minuto, DB size/URL response time/failure bawat 5 minuto). Ang mga nilabag na signal ay magiging panganib at mamarkahan ng 'Aking Panuntunan' (ang pagpapadala ng abiso ay ang susunod na hakbang). Hindi sinusuri ang mga panuntunan sa sukatan ng Serbisyo (APP). Ang mga panuntunan sa laki ng DB (MB) (>) ay ginagamit din bilang mga limitasyon sa kapasidad.",
+    "notEvaluated": "Hindi nasuri",
     "metric": "Metric",
     "conn": "Koneksyon",
     "allConns": "Lahat ng koneksyon",
@@ -501,7 +493,277 @@
       "RATE": "Masyadong maraming kahilingan. Pakisubukang muli sa ilang sandali.",
       "TIMEOUT": "Mabagal ang pagtugon ng schema.pi. Pakisubukang muli sa ilang sandali.",
       "RULE_LIMIT": "Hanggang 50 panuntunan bawat link.",
-      "NOT_FOUND": "Hindi nakita ang panuntunan."
+      "NOT_FOUND": "Hindi nakita ang panuntunan.",
+      "CONN_FAIL": "Hindi makakonekta sa database. Suriin ang mga setting ng koneksyon at status ng DB.",
+      "LINK_DOWN": "Hindi maabot ang schema.pi. Subukang muli sa ilang sandali.",
+      "PGSS_MISSING": "Hindi naka-install ang pg_stat_statements, kaya hindi available ang mabagal na SQL.",
+      "CONN_UNSUPPORTED": "Hindi sinusuportahan ng koneksyon na ito ang pagsubaybay (mga koneksyon sa PostgreSQL server lang).",
+      "CONN_DISABLED": "Hindi pinagana ang koneksyon na ito. Paganahin ito sa schema.pi.",
+      "INVALID_INPUT": "Hindi valid ang kahilingan."
+    },
+    "board": {
+      "refresh": {
+        "updated": "Hanggang {time} · nagre-refresh bawat minuto",
+        "now": "I-refresh ngayon",
+        "busy": "Naglo-load…",
+        "stale": "Luma · {min} min nakalipas"
+      },
+      "level": {
+        "RISK": "Panganib",
+        "WARN": "Babala",
+        "OK": "OK",
+        "UNKNOWN": "Hindi alam",
+        "NA": "Hindi Naaangkop"
+      },
+      "overall": {
+        "RISK": "Panganib — kailangan ng agarang aksyon",
+        "WARN": "Babala — kailangan tingnan ang ilang item",
+        "UNKNOWN": "Hindi alam — suriin ang koneksyon",
+        "OK": "OK — ang bawat signal ay nasa loob ng mga limitasyon",
+        "CONN_DOWN": "Hindi maabot ang DB — suriin muna ang koneksyon",
+        "NA": "Hindi Naaangkop"
+      },
+      "kpi": {
+        "sess": "Mga session / max",
+        "tps": "Mga transaksyon/s",
+        "cache": "Rate ng pagtama ng cache",
+        "size": "Laki ng DB"
+      },
+      "todo": {
+        "title": "Gawin ngayon",
+        "more": "Ipakita ang {n} pa",
+        "less": "Ipakita nang mas kaunti",
+        "setup": "I-set up ang mga ito para makakita pa",
+        "none": "Walang panganib o babala na item na nangangailangan ng aksyon ngayon.",
+        "unknown": "Hindi masuri ang {n} signal(s) — tingnan ang mga card para sa dahilan.",
+        "myRule": "Nilabag ang aking panuntunan: {rule}",
+        "copySql": "Kopyahin ang SQL",
+        "copied": "Nakopya"
+      },
+      "cat": {
+        "avail": "Availability",
+        "load": "Load at paghihintay",
+        "eff": "Efficiency",
+        "store": "Storage at pagpapanatili",
+        "protect": "Proteksyon (backup, replication)"
+      },
+      "card": {
+        "thr": "Mga limitasyon: babala {warn} · panganib {risk}",
+        "thrDown": "Mga limitasyon: babala sa ibaba {warn} · panganib sa ibaba {risk}",
+        "more": "Paano ayusin",
+        "addRule": "Magdagdag ng panuntunan para sa metric na ito",
+        "basisLive": "Huling minuto",
+        "basisStored": "Pinagsama-sama",
+        "since": "na-reset ang mga istatistika {at}",
+        "partial": "Bahagyang view (500-row cap o nawawalang pribilehiyo)."
+      },
+      "sig": {
+        "AVAIL": "Tugon ng DB",
+        "CONN_USE": "Paggamit ng koneksyon (itong DB)",
+        "URL": "Mga URL ng serbisyo",
+        "LONG_QRY": "Mga query na matagal nang tumatakbo",
+        "IDLE_TX": "Mga transaksyon na idle",
+        "LOCK_WAIT": "Mga paghihintay sa lock",
+        "CACHE_HIT": "Rate ng pagtama ng cache",
+        "XACT_ERR": "Mga rollback at deadlock",
+        "SLOW_SQL": "Mabagal na SQL",
+        "STORAGE": "Storage",
+        "VACUUM": "Vacuum",
+        "INDEX": "Kalusugan ng index",
+        "BACKUP": "Backup (WAL archive)",
+        "REPL": "Pagkaantala ng replication"
+      },
+      "fix": {
+        "AVAIL": "Mabagal na tugon o kamakailang pag-restart — suriin ang mga setting ng koneksyon at status ng DB server.",
+        "AVAIL_DOWN": "Hindi makakonekta sa DB — suriin ang mga setting ng koneksyon at kung naka-up ang DB server.",
+        "CONN_USE": "{sess}/{max} na session sa DB na ito (hindi cluster-wide — hindi kasama ang ibang database) — isara ang mga idle na koneksyon o magdagdag ng connection pooler (pgbouncer).",
+        "URL": "{n} na sinuring URL ang nabigo · max response {ms}ms — tingnan ang schema.pi monitor para sa dahilan.",
+        "LONG_QRY": "May query na tumatakbo nang {sec}s — suriin ang plano nito at i-tune ito, o ipa-cancel ito sa isang DBA.",
+        "IDLE_TX": "May transaksyon na idle nang {sec}s — hanapin ang nawawalang commit sa app at magtakda ng timeout.",
+        "LOCK_WAIT": "{n} na session ang naghihintay sa mga lock — hanapin ang blocking session at tapusin ang transaksyon nito.",
+        "CACHE_HIT": "Rate ng pagtama ng cache {pct}% — hanapin ang buong pag-scan ng malalaking talahanayan o suriin ang shared_buffers.",
+        "XACT_ERR": "Rollback rate {pct}%, {dlck} deadlock — suriin ang mga nabigong transaksyon at mga log ng error ng app.",
+        "SLOW_SQL": "Ang isang query ay may average na {ms} ms — i-tune ang mga nangungunang query sa pamamagitan ng kabuuang oras gamit ang kanilang mga plano.",
+        "STORAGE": "Ang DB ({gb} GB) ay malapit na sa limitasyon nito (natitirang araw {days}) — linisin ang malalaking talahanayan o magdagdag ng kapasidad.",
+        "VACUUM": "Ang {tbl} ay may maraming patay na row o luma na istatistika — suriin ang mga setting ng VACUUM (ANALYZE) at autovacuum.",
+        "INDEX": "{n} na natuklasan sa index (invalid, hindi ginagamit, buong pag-scan) — tingnan ang tab ng kalusugan ng talahanayan at index para sa mga target.",
+        "BACKUP": "Naka-off o stalled ang WAL archiving — suriin ang archive_mode, archive_command at status ng backup.",
+        "REPL": "Pagkaantala ng replication {sec}s — suriin ang standby status at ang network.",
+        "PGSS": "Hindi naka-install ang pg_stat_statements, kaya hindi available ang mabagal na SQL — paganahin ito gamit ang SQL sa ibaba (kinakailangan ang pag-restart ng server)."
+      },
+      "reason": {
+        "CONN_DOWN": "Hindi hinusgahan dahil down ang koneksyon ng DB.",
+        "PGSS": "Hindi naka-install ang pg_stat_statements.",
+        "VER": "Available sa PostgreSQL 13 o mas bago.",
+        "SAMPLE": "Hindi pa sapat ang mga sample.",
+        "NO_LIMIT": "Walang limitasyon sa laki, kaya hindi hinuhusgahan ang paggamit — magdagdag ng panuntunan sa laki ng DB (MB) (>) para gamitin ito bilang limitasyon.",
+        "RESET": "Ang mga istatistika ay na-reset nang mas mababa sa 7 araw na nakalipas, kaya hindi hinuhusgahan ang mga hindi nagamit na index.",
+        "STALE": "Walang kamakailang tala ng pagsusuri.",
+        "STANDBY": "Hindi naaangkop sa isang standby server.",
+        "NONE": "Walang dapat suriin.",
+        "GRANT": "Nawawalang mga pribilehiyo — ibigay ang pg_monitor role sa connection account.",
+        "LINK": "Nabigo ang query ng schema.pi ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Suriin ang status ng koneksyon sa Mga Koneksyon, at ayusin ang mga setting ng koneksyon (host, port, account) sa schema.pi.",
+          "2": "Suriin kung naka-up ang DB server at kung kamakailan lang ito nag-restart.",
+          "3": "Kung mananatili itong mabagal, suriin ang load ng server (CPU, disk) at ang network."
+        },
+        "CONN_USE": {
+          "1": "Tingnan ang mga bilang ng session ayon sa user at estado sa tab ng aktibidad at mga lock.",
+          "2": "Kung marami ang idle, paliitin ang app pool o magdagdag ng connection pooler.",
+          "3": "Taasan ang max_connections nang maingat, isinasaalang-alang ang memory."
+        },
+        "URL": {
+          "1": "Tingnan ang mga nabigong URL at status code sa schema.pi monitor.",
+          "2": "Suriin ang deployment ng app at mga panlabas na dependency.",
+          "3": "Kung umuulit ito, magdagdag ng panuntunan sa bilang ng pagkabigo ng URL (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Hanapin ang mga query na matagal nang tumatakbo at ang kanilang mga user sa tab ng aktibidad at mga lock.",
+          "2": "Suriin ang plano sa SQL tuning at ayusin ang mga index o kondisyon.",
+          "3": "Kung apurahan, kinakansela ito ng isang DBA gamit ang pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Tingnan ang huling query ng mga idle-in-transaction session sa tab ng aktibidad at mga lock.",
+          "2": "Hanapin ang nawawalang commit o rollback sa code ng app.",
+          "3": "Limitahan ito gamit ang idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Hanapin ang blocking session (blocked_by) sa tab ng aktibidad at mga lock.",
+          "2": "Tapusin ang transaksyon nito o ipa-cancel ito sa isang DBA.",
+          "3": "Ayusin ang mga batch o order ng transaksyon na matagal nang humahawak ng parehong mga row."
+        },
+        "CACHE_HIT": {
+          "1": "Hanapin ang buong pag-scan ng malalaking talahanayan sa tab ng mabagal na query.",
+          "2": "Idagdag ang mga kinakailangang index para makabasa ng mas kaunting block.",
+          "3": "Kung pinapayagan ng memory, suriin ang shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Hanapin ang mga sanhi ng rollback (mga paglabag sa constraint, timeout) sa mga log ng error ng app.",
+          "2": "Kung may mga deadlock, i-lock ang mga talahanayan sa isang pare-parehong order.",
+          "3": "Suriin na ang retry logic ay hindi nagpapalaki ng mga rollback."
+        },
+        "SLOW_SQL": {
+          "1": "Piliin ang mga nangungunang query sa pamamagitan ng kabuuang oras sa tab ng mabagal na query.",
+          "2": "Suriin ang mga plano sa SQL tuning at ayusin ang mga index o join.",
+          "3": "Pagkatapos ayusin, suriin na bumaba ang average na oras."
+        },
+        "STORAGE": {
+          "1": "Tingnan ang trend ng paglago at tinantyang petsa ng pagpuno sa tab ng trend ng laki.",
+          "2": "Linisin ang malalaking talahanayan, index at lumang data.",
+          "3": "Kung kinakailangan, magdagdag ng disk at i-update ang panuntunan sa limitasyon."
+        },
+        "VACUUM": {
+          "1": "Tingnan ang mga talahanayan na may maraming patay na row sa tab ng kalusugan ng talahanayan at index.",
+          "2": "Ang isang DBA ay nagpapatakbo ng VACUUM (ANALYZE).",
+          "3": "Kung umuulit ito, babaan ang mga threshold ng autovacuum para sa talahanayang iyon."
+        },
+        "INDEX": {
+          "1": "Tingnan ang mga invalid o hindi nagamit na index at mga talahanayan ng buong pag-scan sa tab ng kalusugan ng talahanayan at index.",
+          "2": "Muling buuin ang mga invalid na index; sinusuri ng isang DBA at binababa ang mga hindi nagamit.",
+          "3": "Magdisenyo ng mga index sa SQL tuning para sa mga talahanayan na may maraming buong pag-scan."
+        },
+        "BACKUP": {
+          "1": "Tingnan ang archive_mode at ang huling oras ng archive sa tab ng backup at recovery.",
+          "2": "Kung nabigo ang archiving, suriin ang archive_command at libreng espasyo sa destinasyon.",
+          "3": "Sa isang pinamamahalaang DB, suriin ang mga setting ng backup ng provider."
+        },
+        "REPL": {
+          "1": "Tingnan ang estado at lag ng bawat standby sa tab ng replication at DR.",
+          "2": "Suriin ang disk, CPU at network sa standby.",
+          "3": "Kung hindi ito nag-stream, suriin ang mga log ng standby."
+        }
+      },
+      "sqlNote": "Ang SQL sa ibaba ay read-only, para sa pagsusuri — ang mga pag-aayos (VACUUM, DROP INDEX, pg_terminate_backend) ay pinapatakbo ng isang DBA.",
+      "go": {
+        "activity": "Aktibidad at mga lock",
+        "top": "Mabagal na mga query",
+        "health": "Kalusugan ng talahanayan at index",
+        "trend": "Trend ng kapasidad",
+        "params": "Pagsusuri ng parameter",
+        "repl": "Pagsusuri ng replication",
+        "backup": "Pagsusuri ng backup",
+        "sqlLab": "SQL tuning",
+        "drift": "Paghambing ng drift",
+        "connect": "Mga koneksyon",
+        "schema": "schema.pi monitor"
+      },
+      "chart": {
+        "title": "Mga trend at ranggo",
+        "note": "Ang mga trend ay nire-record bawat minuto habang bukas ang screen na ito (walang background collection).",
+        "gauges": "Mga gauge ng koneksyon at cache",
+        "sessState": "Mga session ngayon",
+        "sessTrend": "Trend ng session at mga paghihintay sa lock",
+        "tpsCombo": "Throughput at rollback rate",
+        "cacheTrend": "Trend ng rate ng pagtama ng cache",
+        "capacity": "Laki at forecast ng DB",
+        "slowTop": "Mabagal na SQL top 10",
+        "slowLegend": "Haba ng bar = kabuuang oras · kulay = average na oras (▲ babala mula {warn}ms · ✕ panganib mula {risk}ms)",
+        "sizeTop": "Laki top 10",
+        "heat": "Panganib ayon sa signal sa paglipas ng panahon",
+        "q": {
+          "gauges": "Napupuno ba ang mga koneksyon? Nagsisilbi ba ang mga pagbasa mula sa memorya?",
+          "sessState": "Ano ang ginagawa ng mga session ngayon?",
+          "sessTrend": "Tumaas ba ang mga paghihintay sa lock kapag dumami ang mga session?",
+          "tpsCombo": "Sabay bang gumagalaw ang throughput at failure rate?",
+          "cacheTrend": "Kailan bumaba ang rate ng pagtama ng cache?",
+          "capacity": "Kailan mapupuno ang DB?",
+          "slowTop": "Ano ang unang i-tune? (ayon sa kabuuang oras)",
+          "sizeTop": "Ano ang kumukuha ng espasyo?",
+          "heat": "Ang panganib ba ay isang beses lang o umuulit?"
+        },
+        "asTable": "Tingnan bilang talahanayan",
+        "needHistory": "Wala pang trend — panatilihing bukas ang screen na ito sa loob ng ilang minuto.",
+        "needPerf": "Walang history ng laki — kolektahin sa tab ng performance o panatilihing bukas ang screen na ito.",
+        "noSess": "Walang session.",
+        "noWait": "Walang paghihintay",
+        "noData": "Walang maipakita.",
+        "loading": "Naglo-load…",
+        "waitTop": "Mga kaganapan sa paghihintay",
+        "lockWait": "Mga paghihintay sa lock",
+        "tps": "Mga transaksyon/s",
+        "rlbk": "Rate ng rollback (%)",
+        "cacheHit": "Rate ng pagtama ng cache",
+        "size": "Laki ng DB",
+        "limit": "Limitasyon",
+        "forecast": "Pagtataya",
+        "daysLeft": "Natitirang araw",
+        "capNote": "Paglago bawat araw {perDay} · {days} araw hanggang sa limitasyon",
+        "tbl": "Talahanayan",
+        "idxToast": "Index + TOAST",
+        "mix": {
+          "active": "Aktibo",
+          "idleTx": "Idle sa transaksyon",
+          "idle": "Idle",
+          "total": "mga session"
+        },
+        "col": {
+          "item": "Item",
+          "value": "Halaga",
+          "time": "Oras",
+          "calls": "Mga tawag",
+          "total": "Kabuuan (ms)",
+          "mean": "Average (ms)",
+          "share": "Bahagi"
+        }
+      },
+      "empty": {
+        "noConn": "Walang koneksyon sa PostgreSQL server ang taxonomy na ito para subaybayan — ipinapakita lang ang mga URL at status ng serbisyo.",
+        "unsupported": "Hindi sinusuportahan ng koneksyon na ito ang pagsubaybay (mga koneksyon sa PostgreSQL server lang).",
+        "connFail": "Hindi makakonekta sa database — suriin ang mga setting ng koneksyon at status ng DB.",
+        "linkDown": "Hindi maabot ang schema.pi — awtomatikong sinusubukang muli.",
+        "linkAuth": "Nag-expire na ang token ng koneksyon — mag-isyu ng bagong token sa schema.pi at irehistro ito.",
+        "timeout": "Mabagal ang mga tugon — awtomatikong sinusubukang muli.",
+        "rate": "Masyadong maraming kahilingan, kaya tumaas ang interval ng pag-refresh."
+      },
+      "aux": {
+        "rules": "Aking mga panuntunan sa alerto ({n} aktibo)",
+        "schemaSvc": "Status ng serbisyo — mga tugon ng schema.pi",
+        "schemaSvcNote": "Mga metric ng app para sa huling 60 minuto na naka-store sa schema.pi.",
+        "source": "Pinagmulan ng data: ang target na DB ay read-only sa pamamagitan ng mga pinangalanang query ng schema.pi (read-only); ang mga trend ay nag-iimbak lang ng mga istatistika sa dbms.pi (walang data ng row)."
+      }
     }
   },
   "ops": {
@@ -910,6 +1172,12 @@
   },
   "nav": {
     "label": "Mga Feature",
+    "groups": {
+      "monitor": "Pagsubaybay",
+      "drift": "Pagkakapare-pareho",
+      "lake": "Lake",
+      "admin": "Admin"
+    },
     "connect": "Kumonekta",
     "sqlLab": "SQL Tuning",
     "perf": "Performance",

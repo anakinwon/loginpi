@@ -13,7 +13,7 @@
       "connect": "Diiwaangeli calaamadda isku xirka schema.pi oo hubi heerka isku xirka",
       "sqlLab": "Geedka qorshaha, digniinaha, isbarbardhigga iyo hubinta qaababka ka hortagga ee ka dhanka ah domainyada heerka",
       "perf": "Weydiinta gaabiska ah Top-N, caafimaadka miiska/index, saadaasha awoodda, dhaqdhaqaaqa iyo qufulada",
-      "monitor": "Soo koobidda cabbirka App, DB iyo URL oo leh digniino xaddidan",
+      "monitor": "Calaamadaha caadiga ah, digniinta, iyo khatarta 14 calaamadood, oo lagu daray waxa la sameeyo iyo sida loo xalliyo jaleeco",
       "drift": "Isbarbardhig schema.pi model iyo taariikhda DDL oo leh buugga dhabta ah, cabbir saamaynta index",
       "migration": "Amarka rarista topological, qaybaha, liiska hubinta iyo SQL xaqiijinta",
       "pipeline": "Hubinta hore ee qabashada isbeddelka iyo qeexitaannada dhuumaha isha→beddel→bartilmaameedka",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Xarunta Kormeerka",
-    "collectNote": "Ururinta waxay ka socotaa schema.pi — guuritaanka la qorsheeyay (D7). Boggani wuxuu akhriyaa schema.pi soo koobidda kormeerka.",
+    "title": "Kormeerid",
     "noLink": "Marka hore dooro ama diiwaangeli isku xirka schema.pi.",
     "goConnect": "Diiwaangeli isku xir",
     "period": "Muddada",
@@ -457,16 +456,9 @@
       "360": "6 saacadood",
       "1440": "24 saacadood"
     },
-    "refresh": "Dib u cusboonaysii",
     "loading": "Waa la soo shubayaa…",
-    "updatedAt": "{area} · laga bilaabo {time} (dib u cusboonaysiin otomaatig ah 30s kasta)",
-    "appTitle": "Waxqabadka app-ka",
-    "dbTitle": "Xaaladda DB ee isku xirka",
-    "urlTitle": "Hubinta URL",
-    "empty": "Ma jiraan xog la soo bandhigo.",
-    "breachTitle": "{n} xad-gudubyo xaddidan",
-    "rulesTitle": "Xeerarka xaddidan",
-    "rulesNote": "Xeerarka waxaa loo keydiyay isku xirkan waxaana lagu qiimeeyaa soo koobidda la helay; xad-gudubyada waxay helaan xuduud cas (ogeysiisyada waxay imaan doonaan mar dambe).",
+    "rulesNote": "Xeerarka waxa lagu kaydiyaa xidhiidhkan waxaana la qiimeeyaa mar kasta oo la cusboonaysiiyo guddiga (fadhiga DB/sugitaanka qufulka/heerka garaaca kaydka 1 daqiiqo kasta, cabbirka DB/wakhtiga jawaabta URL/guuldarada 5 daqiiqo kasta). Calaamadaha la jabiyay waxay u kici doonaan khatar waxaana lagu calaamadin doonaa 'Xeerkayga' (dirista ogeysiiska waa tallaabada xigta). Xeerarka cabbirka adeegga (APP) lama qiimeeyo. Xeerarka cabbirka DB (MB) (>) waxa kale oo loo isticmaalaa xaddidaadaha awoodda.",
+    "notEvaluated": "Lama qiimeyn",
     "metric": "Cabbir",
     "conn": "Isku xirka",
     "allConns": "Dhammaan isku xirka",
@@ -501,7 +493,278 @@
       "RATE": "Codsiyo badan. Fadlan isku day mar dhow.",
       "TIMEOUT": "schema.pi si tartiib ah ayuu u jawaabayaa. Fadlan isku day mar dhow.",
       "RULE_LIMIT": "Ilaa 50 sharci isku xir kasta.",
-      "NOT_FOUND": "Sharciga lama helin."
+      "NOT_FOUND": "Sharciga lama helin.",
+      "CONN_FAIL": "Kuma xidhnaan karo xogta. Hubi goobaha xidhiidhka iyo heerka DB.",
+      "LINK_DOWN": "Kuma gaadhi karo schema.pi. Isku day mar kale dhawaan.",
+      "PGSS_MISSING": "pg_stat_statements lama rakibin, sidaa darteed SQL gaabiska ah lama heli karo.",
+      "CONN_UNSUPPORTED": "Xidhiidhkan ma taageero kormeeridda (kaliya xidhiidhada server-ka PostgreSQL).",
+      "CONN_DISABLED": "Xidhiidhkan waa la joojiyay. Ku shaqeysii schema.pi.",
+      "INVALID_INPUT": "Codsiga ma ansaxsan."
+    },
+    "board": {
+      "subtitle": "Waxa laga qabanayo DB-gan hadda — 14 calaamadood oo ah OK, digniin ama khatar, oo leh hagaajin, hal mar.",
+      "refresh": {
+        "updated": "Laga bilaabo {time} · wuxuu cusboonaysiiyaa daqiiqad kasta",
+        "now": "Cusboonaysii hadda",
+        "busy": "Waa la soo shubayaa…",
+        "stale": "Duugoobay · {min} daqiiqo ka hor"
+      },
+      "level": {
+        "RISK": "Khatar",
+        "WARN": "Digniin",
+        "OK": "OK",
+        "UNKNOWN": "Lama garanayo",
+        "NA": "Ma khusayso"
+      },
+      "overall": {
+        "RISK": "Khatar — tallaabo ayaa loo baahan yahay hadda",
+        "WARN": "Digniin — qaar ka mid ah alaabta ayaa u baahan in la eego",
+        "UNKNOWN": "Lama garanayo — hubi xidhiidhka",
+        "OK": "OK — calaamad kasta waxay ku jirtaa xaddidaadaha",
+        "CONN_DOWN": "Lama gaari karo DB — marka hore hubi isku xirka",
+        "NA": "Ma khusayso"
+      },
+      "kpi": {
+        "sess": "Fadhiyada / ugu badnaan",
+        "tps": "Wax kala iibsiga/s",
+        "cache": "Heerka garaaca kaydka",
+        "size": "Cabbirka DB"
+      },
+      "todo": {
+        "title": "Waxa la qabanayo hadda",
+        "more": "Tus {n} dheeraad ah",
+        "less": "Tus wax yar",
+        "setup": "Kuwan u deji si aad wax badan u aragto",
+        "none": "Ma jiraan wax khatar ah ama digniin ah oo u baahan tallaabo hadda.",
+        "unknown": "Kuma hubin karo {n} calaamad(o) — eeg kaararka sababta.",
+        "myRule": "Xeerkayga waa la jabiyay: {rule}",
+        "copySql": "Nuqul SQL",
+        "copied": "La nuqulay"
+      },
+      "cat": {
+        "avail": "Helitaan",
+        "load": "Culays & sugitaan",
+        "eff": "Waxtarka",
+        "store": "Kaydinta & dayactirka",
+        "protect": "Ilaalinta (kaydinta, koobiyeynta)"
+      },
+      "card": {
+        "thr": "Xaddidaadaha: digniin {warn} · khatar {risk}",
+        "thrDown": "Xaddidaadaha: digniin ka hooseeya {warn} · khatar ka hooseeya {risk}",
+        "more": "Sida loo hagaajiyo",
+        "addRule": "Ku dar xeer cabbirkan",
+        "basisLive": "Daqiiqadii u dambaysay",
+        "basisStored": "Isku-darka",
+        "since": "dib u dajinta tirakoobka {at}",
+        "partial": "Muuqaal qayb ah (500-saf cap ama mudnaanta maqan)."
+      },
+      "sig": {
+        "AVAIL": "Jawaabta DB",
+        "CONN_USE": "Isticmaalka xidhiidhka (DB-gan)",
+        "URL": "URL-yada Adeegga",
+        "LONG_QRY": "Weydiimaha socda muddo dheer",
+        "IDLE_TX": "Wax kala iibsiga aan shaqaynayn",
+        "LOCK_WAIT": "Sugitaanka qufulka",
+        "CACHE_HIT": "Heerka garaaca kaydka",
+        "XACT_ERR": "Dib u celinta & isku-xidhka",
+        "SLOW_SQL": "SQL gaabis ah",
+        "STORAGE": "Kaydinta",
+        "VACUUM": "Vacuum",
+        "INDEX": "Caafimaadka tusmada",
+        "BACKUP": "Kaydinta (kaydka WAL)",
+        "REPL": "Dib u celinta dib u dhaca"
+      },
+      "fix": {
+        "AVAIL": "Jawaab gaabis ah ama dib u bilow dhowaan ah — hubi goobaha xidhiidhka iyo heerka server-ka DB.",
+        "AVAIL_DOWN": "Kuma xidhnaan karo DB — hubi goobaha xidhiidhka iyo in server-ka DB uu shaqaynayo.",
+        "CONN_USE": "{sess}/{max} fadhiyada DB-gan (ma aha guud ahaan kooxda — xogaha kale waa laga saaray) — xidh xidhiidhada aan shaqaynayn ama ku dar barkad xidhiidh (pgbouncer).",
+        "URL": "{n} URL-yada la hubiyay oo fashilmay · jawaabta ugu badan {ms}ms — eeg kormeeraha schema.pi sababta.",
+        "LONG_QRY": "Weydiin ayaa socotay {sec}s — dib u eeg qorshaheeda oo hagaaji, ama DBA ha joojiyo.",
+        "IDLE_TX": "Wax kala iibsi ayaa aan shaqaynayn {sec}s — ka hel ballanqaadka maqan ee abka oo deji wakhti xaddidan.",
+        "LOCK_WAIT": "{n} fadhi ayaa sugaya qufullo — hel fadhiga xannibaya oo soo afjar wax kala iibsigiisa.",
+        "CACHE_HIT": "Heerka garaaca kaydka {pct}% — raadi baadhitaanno buuxa oo miisaska waaweyn ah ama dib u eeg shared_buffers.",
+        "XACT_ERR": "Heerka dib u celinta {pct}%, {dlck} isku-xidhka — hubi wax kala iibsiga fashilmay iyo diiwaannada qaladka abka.",
+        "SLOW_SQL": "Weydiin celcelis ahaan {ms} ms — hagaaji weydiimaha ugu sarreeya wakhtiga guud adoo isticmaalaya qorshayaashooda.",
+        "STORAGE": "DB ({gb} GB) wuxuu ku dhow yahay xaddidkiisa (maalmaha ka hadhay {days}) — nadiifi miisaska waaweyn ama ku dar awood.",
+        "VACUUM": "{tbl} wuxuu leeyahay safaf badan oo dhintay ama tirakoob duugoobay — dib u eeg goobaha VACUUM (ANALYZE) iyo autovacuum.",
+        "INDEX": "{n} natiijooyinka tusmada (ansax la'aan, aan la isticmaalin, baadhitaanno buuxa) — eeg tabka caafimaadka miiska & tusmada ee bartilmaameedyada.",
+        "BACKUP": "Kaydinta WAL waa dansan tahay ama way istaagtay — hubi archive_mode, archive_command iyo heerka kaydinta.",
+        "REPL": "Dib u dhaca koobiyeynta {sec}s — hubi heerka heeganka iyo shabakadda.",
+        "PGSS": "pg_stat_statements lama rakibin, sidaa darteed SQL gaabiska ah lama heli karo — ku shaqeysii SQL-ka hoose (dib u bilowga server-ka ayaa loo baahan yahay)."
+      },
+      "reason": {
+        "CONN_DOWN": "Lama xukumin sababtoo ah xidhiidhka DB waa dansan yahay.",
+        "PGSS": "pg_stat_statements lama rakibin.",
+        "VER": "Waxa laga heli karaa PostgreSQL 13 ama ka dib.",
+        "SAMPLE": "Weli ma jiraan muunado ku filan.",
+        "NO_LIMIT": "Ma jiro xaddidaad cabbir ah, sidaa darteed isticmaalka lama xukumin — ku dar xeer cabbirka DB (MB) (>) si aad ugu isticmaasho xaddidaad ahaan.",
+        "RESET": "Tirakoobka dib looma dajin wax ka yar 7 maalmood ka hor, sidaa darteed tusmooyinka aan la isticmaalin lama xukumin.",
+        "STALE": "Ma jiraan diiwaanno hubin dhowaan ah.",
+        "STANDBY": "Kuma khusayso server-ka heeganka ah.",
+        "NONE": "Ma jiraan wax la hubiyo.",
+        "GRANT": "Mudnaanta maqan — ku dar doorka pg_monitor akoonka xidhiidhka.",
+        "LINK": "Weydiinta schema.pi way fashilantay ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Hubi heerka xidhiidhka ee Xidhiidhada, oo hagaaji goobaha xidhiidhka (martigeliyaha, dekedda, akoonka) ee schema.pi.",
+          "2": "Hubi in server-ka DB uu shaqaynayo iyo inuu dib u bilowday dhowaan.",
+          "3": "Haddii ay sii gaabis tahay, hubi culayska server-ka (CPU, disk) iyo shabakadda."
+        },
+        "CONN_USE": {
+          "1": "Eeg tirada fadhiyada ee isticmaale iyo heerka tabka hawsha & qufulka.",
+          "2": "Haddii ay badan yihiin kuwa aan shaqaynayn, yaree barkadda abka ama ku dar barkad xidhiidh.",
+          "3": "Si taxaddar leh u kordhi max_connections, adoo tixgelinaya xusuusta."
+        },
+        "URL": {
+          "1": "Eeg URL-yada fashilmay iyo koodhadhka heerka ee kormeeraha schema.pi.",
+          "2": "Hubi geynta abka iyo ku tiirsanaanta dibadda.",
+          "3": "Haddii ay ku celceliso, ku dar xeer tirada fashilka URL (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Ka hel weydiimaha socda muddo dheer iyo isticmaalayaashooda tabka hawsha & qufulka.",
+          "2": "Dib u eeg qorshaha hagaajinta SQL oo hagaaji tusmooyinka ama shuruudaha.",
+          "3": "Haddii ay degdeg tahay, DBA wuxuu ku joojinayaa pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Eeg weydiinta u dambaysay ee fadhiyada aan shaqaynayn ee wax kala iibsiga tabka hawsha & qufulka.",
+          "2": "Ka hel ballanqaadka maqan ama dib u celinta koodhka abka.",
+          "3": "Ku xaddid idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Ka hel fadhiga xannibaya (blocked_by) tabka hawsha & qufulka.",
+          "2": "Soo afjar wax kala iibsigiisa ama DBA ha joojiyo.",
+          "3": "Hagaaji dufcadaha ama nidaamka wax kala iibsiga ee haya safaf isku mid ah muddo dheer."
+        },
+        "CACHE_HIT": {
+          "1": "Ka hel baadhitaanno buuxa oo miisaska waaweyn ah tabka weydiinta gaabiska ah.",
+          "2": "Ku dar tusmooyinka loo baahan yahay si aad u akhrido baloogyo yar.",
+          "3": "Haddii xusuusta ay ogolaato, dib u eeg shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Ka hel sababaha dib u celinta (jabin xaddidaad, wakhti xaddidan) diiwaannada qaladka abka.",
+          "2": "Haddii ay jiraan isku-xidhka, quful miisaska si isku mid ah.",
+          "3": "Hubi in macquulka dib u celinta uusan kor u qaadin dib u celinta."
+        },
+        "SLOW_SQL": {
+          "1": "Dooro weydiimaha ugu sarreeya wakhtiga guud ee tabka weydiinta gaabiska ah.",
+          "2": "Dib u eeg qorshayaasha hagaajinta SQL oo hagaaji tusmooyinka ama isku-xidhka.",
+          "3": "Ka dib hagaajinta, hubi in wakhtiga celceliska uu hoos u dhacay."
+        },
+        "STORAGE": {
+          "1": "Eeg isbeddelka koritaanka iyo taariikhda buuxda ee la qiyaasay tabka isbeddelka cabbirka.",
+          "2": "Nadiifi miisaska waaweyn, tusmooyinka iyo xogta duugowday.",
+          "3": "Haddii loo baahdo, ku dar disk oo cusboonaysii xeerka xaddidaadda."
+        },
+        "VACUUM": {
+          "1": "Eeg miisaska leh safaf badan oo dhintay tabka caafimaadka miiska & tusmada.",
+          "2": "DBA wuxuu socodsiiyaa VACUUM (ANALYZE).",
+          "3": "Haddii ay ku celceliso, hoos u dhig xaddidaadaha autovacuum ee miiskaas."
+        },
+        "INDEX": {
+          "1": "Eeg tusmooyinka ansax la'aanta ah ama aan la isticmaalin iyo miisaska baadhitaanka buuxa ee tabka caafimaadka miiska & tusmada.",
+          "2": "Dib u dhis tusmooyinka ansax la'aanta ah; DBA wuxuu dib u eegaa oo tirtiraa kuwa aan la isticmaalin.",
+          "3": "Naqshadee tusmooyinka hagaajinta SQL ee miisaska leh baadhitaanno buuxa oo badan."
+        },
+        "BACKUP": {
+          "1": "Eeg archive_mode iyo wakhtiga kaydinta u dambaysay tabka kaydinta & soo kabashada.",
+          "2": "Haddii kaydinta ay fashilanto, hubi archive_command iyo meesha bannaan ee meesha loo socdo.",
+          "3": "DB la maamulo, hubi goobaha kaydinta ee bixiyaha."
+        },
+        "REPL": {
+          "1": "Eeg heerka iyo dib u dhaca heegan kasta tabka koobiyeynta & DR.",
+          "2": "Hubi disk, CPU iyo shabakadda heeganka.",
+          "3": "Haddii aysan socon, hubi diiwaannada heeganka."
+        }
+      },
+      "sqlNote": "SQL-ka hoose waa akhris-kaliya, si loo hubiyo — hagaajinta (VACUUM, DROP INDEX, pg_terminate_backend) waxaa socodsiiya DBA.",
+      "go": {
+        "activity": "Hawsha & qufulka",
+        "top": "Weydiimaha gaabiska ah",
+        "health": "Caafimaadka miiska & tusmada",
+        "trend": "Isbeddelka awoodda",
+        "params": "Hubinta cabbirka",
+        "repl": "Hubinta koobiyeynta",
+        "backup": "Hubinta kaydinta",
+        "sqlLab": "Hagaajinta SQL",
+        "drift": "Isbarbardhigga isbeddelka",
+        "connect": "Xidhiidhada",
+        "schema": "schema.pi kormeeraha"
+      },
+      "chart": {
+        "title": "Isbeddellada & darajooyinka",
+        "note": "Isbeddellada waxa la diiwaangeliyaa daqiiqad kasta inta shaashaddan ay furan tahay (ma jirto ururin gadaal ah).",
+        "gauges": "Xidhiidhka & cabbirrada kaydka",
+        "sessState": "Fadhiyada hadda",
+        "sessTrend": "Isbeddelka fadhiga & sugitaanka qufulka",
+        "tpsCombo": "Wax soo saarka & heerka dib u celinta",
+        "cacheTrend": "Isbeddelka heerka garaaca kaydka",
+        "capacity": "Cabbirka DB & saadaasha",
+        "slowTop": "SQL gaabis ah TOP 10",
+        "slowLegend": "Dhererka baar = wakhtiga guud · midab = wakhtiga celceliska (▲ digniin laga bilaabo {warn}ms · ✕ khatar laga bilaabo {risk}ms)",
+        "sizeTop": "Booska TOP 10",
+        "heat": "Khatarta calaamad kasta wakhti ka dib",
+        "q": {
+          "gauges": "Ma buuxsamayaan xidhiidhada? Akhriska ma laga bixiyaa xusuusta?",
+          "sessState": "Maxay fadhiyada samaynayaan hadda?",
+          "sessTrend": "Ma kordheen sugitaanka qufulka marka fadhiyada ay isku urursadaan?",
+          "tpsCombo": "Ma wada socdaan wax soo saarka iyo heerka fashilka?",
+          "cacheTrend": "Goorma ayuu hoos u dhacay heerka garaaca kaydka?",
+          "capacity": "Goorma ayuu DB buuxsami doonaa?",
+          "slowTop": "Maxaa marka hore la hagaajinayaa? (wakhtiga guud)",
+          "sizeTop": "Maxaa qaadanaya booska?",
+          "heat": "Khatarta ma mid mar ah baa mise waa soo noqnoqotaa?"
+        },
+        "asTable": "U eeg sidii miis",
+        "needHistory": "Weli ma jiro isbeddel — shaashaddan ha furnaato dhowr daqiiqo.",
+        "needPerf": "Ma jiro taariikh cabbir ah — ku ururi tabka waxqabadka ama shaashaddan ha furnaato.",
+        "noSess": "Ma jiraan fadhiyo.",
+        "noWait": "Ma jiraan sugitaan",
+        "noData": "Ma jiraan wax la tuso.",
+        "loading": "Waa la soo shubayaa…",
+        "waitTop": "Dhacdooyinka sugitaanka",
+        "lockWait": "Sugitaanka qufulka",
+        "tps": "Wax kala iibsiga/s",
+        "rlbk": "Heerka dib u celinta (%)",
+        "cacheHit": "Heerka garaaca kaydka",
+        "size": "Cabbirka DB",
+        "limit": "Xaddidaad",
+        "forecast": "Saadaasha",
+        "daysLeft": "Maalmaha ka hadhay",
+        "capNote": "Koritaanka maalintii {perDay} · {days} maalmood ilaa xaddidaadda",
+        "tbl": "Miiska",
+        "idxToast": "Tusmada + TOAST",
+        "mix": {
+          "active": "Firfircoon",
+          "idleTx": "Aan shaqaynayn wax kala iibsiga",
+          "idle": "Aan shaqaynayn",
+          "total": "fadhiyada"
+        },
+        "col": {
+          "item": "Alaabta",
+          "value": "Qiimaha",
+          "time": "Wakhtiga",
+          "calls": "Wicitaanada",
+          "total": "Wadarta (ms)",
+          "mean": "Celceliska (ms)",
+          "share": "Saamiga"
+        }
+      },
+      "empty": {
+        "noConn": "Taxanahan ma laha xidhiidh server-ka PostgreSQL oo la kormeerayo — kaliya waxa la tusayaa URL-yada iyo heerka adeegga.",
+        "unsupported": "Xidhiidhkan ma taageero kormeeridda (kaliya xidhiidhada server-ka PostgreSQL).",
+        "connFail": "Kuma xidhnaan karo xogta — hubi goobaha xidhiidhka iyo heerka DB.",
+        "linkDown": "Kuma gaadhi karo schema.pi — si toos ah ayuu dib isugu dayayaa.",
+        "linkAuth": "Calaamadda xidhiidhka way dhacday — soo saar calaamad cusub schema.pi oo diiwaangeli.",
+        "timeout": "Jawaabaha waa gaabis — si toos ah ayuu dib isugu dayayaa.",
+        "rate": "Codsiyo badan, sidaa darteed wakhtiga cusboonaysiinta waa la kordhiyay."
+      },
+      "aux": {
+        "rules": "Xeerarkayga digniinta ({n} firfircoon)",
+        "schemaSvc": "Heerka adeegga — jawaabaha schema.pi",
+        "schemaSvcNote": "Cabbirrada abka ee 60-kii daqiiqo ee u dambeeyay oo ay kaydisay schema.pi.",
+        "source": "Isha xogta: DB-ga bartilmaameedka waa akhris-kaliya iyada oo loo marayo weydiimaha magacaaban ee schema.pi (akhris-kaliya); isbeddellada waxay kaydiyaan tirakoobka kaliya dbms.pi (ma jirto xog saf ah)."
+      }
     }
   },
   "ops": {
@@ -908,6 +1171,12 @@
   },
   "nav": {
     "label": "Astaamaha",
+    "groups": {
+      "monitor": "Kormeerid",
+      "drift": "Joogtaynta",
+      "lake": "Harada",
+      "admin": "Maamulka"
+    },
     "connect": "Ku xidh",
     "sqlLab": "SQL Tuning",
     "perf": "Waxqabadka",

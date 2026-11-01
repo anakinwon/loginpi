@@ -13,7 +13,7 @@
       "connect": "Skráðu schema.pi tengitákn og athugaðu tengistöðu",
       "sqlLab": "Áætlunartré, viðvaranir, samanburður og athuganir á andstæðum mynstrum gegn stöðluðum lénum",
       "perf": "Hæg fyrirspurn Top-N, heilsa töflu/vísitölu, afkastagetuspá, virkni og læsingar",
-      "monitor": "Samantekt á mælingum forrita, DB og URL með viðvörunum um þröskuld",
+      "monitor": "Staða, viðvörun og hætta fyrir 14 merki, auk þess hvað á að gera og hvernig á að leysa það í fljótu bragði",
       "drift": "Berðu saman schema.pi líkan og DDL sögu við raunverulega skrána, mældu áhrif vísitölu",
       "migration": "Röðun hleðsluröð, hlutar, gátlisti og staðfestingar SQL",
       "pipeline": "Forathugun á breytingafangi og skilgreiningar á uppruna→umbreytingu→markpípu",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Vöktunarmiðstöð",
-    "collectNote": "Söfnun fer fram í schema.pi — flutningur áætlaður (D7). Þessi síða les schema.pi vöktunaryfirlitið.",
+    "title": "Vöktun",
     "noLink": "Veldu eða skráðu schema.pi tengil fyrst.",
     "goConnect": "Skrá tengil",
     "period": "Tímabil",
@@ -457,16 +456,9 @@
       "360": "6 klst",
       "1440": "24 klst"
     },
-    "refresh": "Endurnýja",
     "loading": "Hleður…",
-    "updatedAt": "{area} · frá {time} (sjálfvirk endurnýjun á 30s fresti)",
-    "appTitle": "Afköst forrits",
-    "dbTitle": "DB staða eftir tengingu",
-    "urlTitle": "URL athuganir",
-    "empty": "Engin gögn til að sýna.",
-    "breachTitle": "{n} brot á þröskuldi",
-    "rulesTitle": "Þröskuldareglur",
     "rulesNote": "Reglur eru vistaðar fyrir þennan tengil og metnar gegn mótteknu yfirliti; brot fá rauðan ramma (tilkynningar koma síðar).",
+    "notEvaluated": "Ekki metið",
     "metric": "Mælikvarði",
     "conn": "Tenging",
     "allConns": "Allar tengingar",
@@ -501,7 +493,273 @@
       "RATE": "Of margar beiðnir. Vinsamlegast reyndu aftur eftir smá stund.",
       "TIMEOUT": "schema.pi svarar hægt. Vinsamlegast reyndu aftur eftir smá stund.",
       "RULE_LIMIT": "Allt að 50 reglur á tengil.",
-      "NOT_FOUND": "Regla fannst ekki."
+      "NOT_FOUND": "Regla fannst ekki.",
+      "CONN_FAIL": "Gat ekki tengst gagnagrunninum. Athugaðu tengistillingar og DB-stöðu.",
+      "LINK_DOWN": "Gat ekki náð í schema.pi. Reyndu aftur eftir smá stund.",
+      "PGSS_MISSING": "pg_stat_statements er ekki uppsett, svo hægur SQL er ekki í boði.",
+      "CONN_UNSUPPORTED": "Þessi tenging styður ekki vöktun (aðeins PostgreSQL netþjónatengingar).",
+      "CONN_DISABLED": "Þessi tenging er óvirk. Virkjaðu hana í schema.pi.",
+      "INVALID_INPUT": "Beiðnin er ógild."
+    },
+    "board": {
+      "refresh": {
+        "updated": "Frá {time} · endurnýjast á mínútu fresti",
+        "now": "Endurnýja núna",
+        "busy": "Hleðst…",
+        "stale": "Úrelt · fyrir {min} mín."
+      },
+      "level": {
+        "RISK": "Hætta",
+        "WARN": "Viðvörun",
+        "OK": "Í lagi",
+        "UNKNOWN": "Óþekkt",
+        "NA": "Á ekki við"
+      },
+      "overall": {
+        "RISK": "Hætta — þörf á aðgerð núna",
+        "WARN": "Viðvörun — sumir hlutir þarfnast skoðunar",
+        "UNKNOWN": "Óþekkt — athugaðu tenginguna",
+        "OK": "Í lagi — öll merki eru innan marka",
+        "NA": "Á ekki við"
+      },
+      "kpi": {
+        "sess": "Lotur / hámark",
+        "tps": "Færslur/s",
+        "cache": "Skyndiminni-hlutfall",
+        "size": "DB-stærð"
+      },
+      "todo": {
+        "title": "Að gera núna",
+        "more": "Sýna {n} fleiri",
+        "less": "Sýna færri",
+        "setup": "Settu þetta upp til að sjá meira",
+        "none": "Engin áhættu- eða viðvörunaratriði þarfnast aðgerða núna.",
+        "unknown": "Gat ekki athugað {n} merki — sjáðu spjöldin fyrir ástæðuna.",
+        "myRule": "Mín regla brotin: {rule}",
+        "copySql": "Afrita SQL",
+        "copied": "Afritað"
+      },
+      "cat": {
+        "avail": "Framboð",
+        "load": "Álag og bið",
+        "eff": "Skilvirkni",
+        "store": "Geymsla og viðhald",
+        "protect": "Vernd (afritun, afritun)"
+      },
+      "card": {
+        "thr": "Mörk: viðvörun {warn} · hætta {risk}",
+        "thrDown": "Mörk: viðvörun undir {warn} · hætta undir {risk}",
+        "more": "Hvernig á að laga",
+        "addRule": "Bæta við reglu fyrir þennan mælikvarða",
+        "basisLive": "Síðasta mínúta",
+        "basisStored": "Uppsafnað",
+        "since": "tölfræði endurstillt {at}",
+        "partial": "Hlutaútsýni (500 raða takmörk eða vantar forréttindi)."
+      },
+      "sig": {
+        "AVAIL": "DB-svörun",
+        "CONN_USE": "Tengingarnotkun (þessi DB)",
+        "URL": "Þjónustu-URL",
+        "LONG_QRY": "Langvarandi fyrirspurnir",
+        "IDLE_TX": "Óvirk viðskipti",
+        "LOCK_WAIT": "Læsingarbið",
+        "CACHE_HIT": "Skyndiminni-hlutfall",
+        "XACT_ERR": "Afturköllun og dauðalæsingar",
+        "SLOW_SQL": "Hægur SQL",
+        "STORAGE": "Geymsla",
+        "VACUUM": "Ryksuga",
+        "INDEX": "Vísitölustaða",
+        "BACKUP": "Afritun (WAL-skjalasafn)",
+        "REPL": "Afritunartöf"
+      },
+      "fix": {
+        "AVAIL": "Hæg svörun eða nýleg endurræsing — athugaðu tengistillingar og DB-netþjónastöðu.",
+        "AVAIL_DOWN": "Gat ekki tengst DB — athugaðu tengistillingar og að DB-netþjónninn sé í gangi.",
+        "CONN_USE": "{sess}/{max} lotur á þessum DB (ekki á klasa — aðrir gagnagrunnar eru undanskildir) — lokaðu óvirkum tengingum eða bættu við tengingarsafni (pgbouncer).",
+        "LONG_QRY": "Fyrirspurn hefur verið í gangi í {sec}s — farðu yfir áætlun hennar og stilltu hana, eða láttu DBA hætta við hana.",
+        "IDLE_TX": "Viðskipti hafa verið óvirk í {sec}s — finndu vantar skuldbindingu í forritinu og stilltu tímamörk.",
+        "LOCK_WAIT": "{n} lotur bíða eftir læsingum — finndu læsandi lotuna og ljúktu viðskiptum hennar.",
+        "CACHE_HIT": "Skyndiminni-hlutfall {pct}% — leitaðu að fullum skönnunum á stórum töflum eða farðu yfir shared_buffers.",
+        "XACT_ERR": "Afturköllunarhlutfall {pct}%, {dlck} dauðalæsingar — athugaðu bilandi viðskipti og villuskrá forritsins.",
+        "SLOW_SQL": "Fyrirspurn er að meðaltali {ms} ms — stilltu efstu fyrirspurnirnar eftir heildartíma með því að nota áætlanir þeirra.",
+        "STORAGE": "DB ({gb} GB) er nálægt mörkum sínum (dagar eftir {days}) — hreinsaðu stórar töflur eða bættu við afkastagetu.",
+        "VACUUM": "{tbl} hefur margar dauðar raðir eða úreltar tölfræði — farðu yfir VACUUM (ANALYZE) og autovacuum stillingar.",
+        "INDEX": "{n} vísitölufundir (ógildir, ónotaðir, fullar skannanir) — sjáðu flipann um töflu- og vísitölustöðu fyrir markmiðin.",
+        "BACKUP": "WAL-skjalasafn er slökkt eða stöðvað — athugaðu archive_mode, archive_command og afritunarstöðu.",
+        "REPL": "Afritunartöf {sec}s — athugaðu biðstöðu og netið.",
+        "PGSS": "pg_stat_statements er ekki uppsett, svo hægur SQL er ekki í boði — virkjaðu það með SQL hér að neðan (þarf að endurræsa netþjóninn)."
+      },
+      "reason": {
+        "CONN_DOWN": "Ekki dæmt vegna þess að DB-tengingin er niðri.",
+        "PGSS": "pg_stat_statements er ekki uppsett.",
+        "VER": "Fáanlegt á PostgreSQL 13 eða nýrri.",
+        "SAMPLE": "Ekki nógu mörg sýni ennþá.",
+        "NO_LIMIT": "Engin stærðartakmörk, svo notkun er ekki dæmd — bættu við DB-stærð (MB) reglu (>) til að nota hana sem takmörk.",
+        "RESET": "Tölfræði var endurstillt fyrir minna en 7 dögum, svo ónotaðar vísitölur eru ekki dæmdar.",
+        "STALE": "Engar nýlegar athugunarskrár.",
+        "STANDBY": "Á ekki við á biðnetþjóni.",
+        "NONE": "Ekkert til að athuga.",
+        "GRANT": "Vantar forréttindi — veittu pg_monitor hlutverkið tengingarreikningnum.",
+        "LINK": "schema.pi fyrirspurn mistókst ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Athugaðu tengistöðu í Tengingum og lagaðu tengistillingar (gestgjafi, tengi, reikningur) í schema.pi.",
+          "2": "Athugaðu hvort DB-netþjónninn sé í gangi og hvort hann hafi verið endurræstur nýlega.",
+          "3": "Ef hann er enn hægur, athugaðu álag á netþjóni (CPU, diskur) og netið."
+        },
+        "CONN_USE": {
+          "1": "Sjáðu fjölda lota eftir notanda og stöðu í flipanum um virkni og læsingar.",
+          "2": "Ef margir eru óvirkir, minnkaðu forritapottinn eða bættu við tengingarsafni.",
+          "3": "Hækkaðu max_connections varlega, með hliðsjón af minni."
+        },
+        "URL": {
+          "2": "Athugaðu uppsetningu forritsins og ytri háðir.",
+          "3": "Ef það endurtekur sig, bættu við reglu um fjölda vefslóðabilana (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Finndu langvarandi fyrirspurnir og notendur þeirra í flipanum um virkni og læsingar.",
+          "2": "Farðu yfir áætlunina í SQL-stillingu og lagaðu vísitölur eða skilyrði.",
+          "3": "Ef brýnt er, hættir DBA við hana með pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Sjáðu síðustu fyrirspurn óvirkra í viðskiptalotum í flipanum um virkni og læsingar.",
+          "2": "Finndu vantar skuldbindingu eða afturköllun í forritakóðanum.",
+          "3": "Takmarkaðu það með idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Finndu læsandi lotuna (blocked_by) í flipanum um virkni og læsingar.",
+          "2": "Ljúktu viðskiptum hennar eða láttu DBA hætta við hana.",
+          "3": "Lagaðu lotur eða viðskiptaröð sem halda sömu röðum lengi."
+        },
+        "CACHE_HIT": {
+          "1": "Finndu fullar skannanir á stórum töflum í flipanum um hægar fyrirspurnir.",
+          "2": "Bættu við nauðsynlegum vísitölum til að lesa færri blokkir.",
+          "3": "Ef minni leyfir, farðu yfir shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Finndu afturköllunarorsakir (takmarkanir brotnar, tímamörk) í villuskrá forritsins.",
+          "2": "Ef dauðalæsingar eru til staðar, læstu töflum í samræmdri röð.",
+          "3": "Athugaðu að endurtekningarrökfræði sé ekki að blása upp afturköllun."
+        },
+        "SLOW_SQL": {
+          "1": "Veldu efstu fyrirspurnirnar eftir heildartíma í flipanum um hægar fyrirspurnir.",
+          "2": "Farðu yfir áætlanir í SQL-stillingu og lagaðu vísitölur eða samsetningar.",
+          "3": "Eftir lagfæringu, athugaðu að meðaltíminn hafi lækkað."
+        },
+        "STORAGE": {
+          "1": "Sjáðu vaxtarþróun og áætlaðan fullan dag í flipanum um stærðarþróun.",
+          "2": "Hreinsaðu stórar töflur, vísitölur og gömul gögn.",
+          "3": "Ef þörf krefur, bættu við diski og uppfærðu takmörkunarregluna."
+        },
+        "VACUUM": {
+          "1": "Sjáðu töflur með mörgum dauðum röðum í flipanum um töflu- og vísitölustöðu.",
+          "2": "DBA keyrir VACUUM (ANALYZE).",
+          "3": "Ef það endurtekur sig, lækkaðu autovacuum þröskuldana fyrir þá töflu."
+        },
+        "INDEX": {
+          "1": "Sjáðu ógildar eða ónotaðar vísitölur og fullskannaðar töflur í flipanum um töflu- og vísitölustöðu.",
+          "2": "Endurbyggðu ógildar vísitölur; DBA fer yfir og eyðir ónotuðum.",
+          "3": "Hannaðu vísitölur í SQL-stillingu fyrir töflur með mörgum fullum skönnunum."
+        },
+        "BACKUP": {
+          "1": "Sjáðu archive_mode og síðasta skjalasafnstíma í flipanum um afritun og endurheimt.",
+          "2": "Ef skjalasafn mistekst, athugaðu archive_command og laust pláss á áfangastað.",
+          "3": "Á stýrðum DB, athugaðu afritunarstillingar veitunnar."
+        },
+        "REPL": {
+          "1": "Sjáðu stöðu og töf hvers biðstöðu í flipanum um afritun og DR.",
+          "2": "Athugaðu disk, CPU og net á biðstöðu.",
+          "3": "Ef það er ekki að streyma, athugaðu biðstöðuskrána."
+        }
+      },
+      "sqlNote": "SQL hér að neðan er aðeins til skoðunar — lagfæringar (VACUUM, DROP INDEX, pg_terminate_backend) eru keyrðar af DBA.",
+      "go": {
+        "activity": "Virkni og læsingar",
+        "top": "Hægar fyrirspurnir",
+        "health": "Tafla- og vísitölustaða",
+        "trend": "Afkastagetaþróun",
+        "params": "Færibreytueftirlit",
+        "repl": "Afritunareftirlit",
+        "backup": "Afritunareftirlit",
+        "sqlLab": "SQL-stilling",
+        "drift": "Drift samanburður",
+        "connect": "Tengingar",
+        "schema": "schema.pi skjár"
+      },
+      "chart": {
+        "title": "Þróun og röðun",
+        "note": "Þróun er skráð á mínútu fresti á meðan þessi skjár er opinn (engin bakgrunnssöfnun).",
+        "gauges": "Tengingar- og skyndiminni-mælar",
+        "sessState": "Lotur núna",
+        "sessTrend": "Lotuþróun og læsingarbið",
+        "tpsCombo": "Gegnumstreymi og afturköllunarhlutfall",
+        "cacheTrend": "Þróun skyndiminni-hlutfalls",
+        "capacity": "DB-stærð og spá",
+        "slowTop": "Hægur SQL topp 10",
+        "slowLegend": "Stikullengd = heildartími · litur = meðaltími (▲ viðvörun frá {warn}ms · ✕ hætta frá {risk}ms)",
+        "sizeTop": "Pláss topp 10",
+        "heat": "Áhætta eftir merki yfir tíma",
+        "q": {
+          "gauges": "Eru tengingar að fyllast? Eru lestrar þjónaðir úr minni?",
+          "sessState": "Hvað eru lotur að gera núna?",
+          "sessTrend": "Hækkar læsingarbið þegar lotur safnast upp?",
+          "tpsCombo": "Hreyfast gegnumstreymi og bilunarhlutfall saman?",
+          "cacheTrend": "Hvenær lækkaði skyndiminni-hlutfallið?",
+          "capacity": "Hvenær fyllist DB?",
+          "slowTop": "Hvað á að stilla fyrst? (eftir heildartíma)",
+          "sizeTop": "Hvað tekur plássið?",
+          "heat": "Er áhættan einstök eða endurtekin?"
+        },
+        "asTable": "Skoða sem töflu",
+        "needHistory": "Engin þróun ennþá — haltu þessum skjá opnum í nokkrar mínútur.",
+        "needPerf": "Engin stærðarsaga — safnaðu í frammistöðuflipanum eða haltu þessum skjá opnum.",
+        "noSess": "Engar lotur.",
+        "noWait": "Engin bið",
+        "noData": "Engin gögn til að sýna.",
+        "loading": "Hleðst…",
+        "waitTop": "Biðviðburðir",
+        "lockWait": "Læsingarbið",
+        "tps": "Færslur/s",
+        "rlbk": "Afturköllunarhlutfall (%)",
+        "cacheHit": "Skyndiminni-hlutfall",
+        "size": "DB-stærð",
+        "limit": "Takmörk",
+        "forecast": "Spá",
+        "daysLeft": "Dagar eftir",
+        "capNote": "Vöxtur á dag {perDay} · {days} dagar að mörkum",
+        "tbl": "Tafla",
+        "idxToast": "Vísitala + TOAST",
+        "mix": {
+          "active": "Virkur",
+          "idleTx": "Óvirkur í viðskiptum",
+          "idle": "Óvirkur",
+          "total": "lotur"
+        },
+        "col": {
+          "item": "Atriði",
+          "value": "Gildi",
+          "time": "Tími",
+          "calls": "Símtöl",
+          "total": "Samtals (ms)",
+          "mean": "Meðaltal (ms)",
+          "share": "Hlutdeild"
+        }
+      },
+      "empty": {
+        "unsupported": "Þessi tenging styður ekki vöktun (aðeins PostgreSQL netþjónatengingar).",
+        "connFail": "Gat ekki tengst gagnagrunninum — athugaðu tengistillingar og DB-stöðu.",
+        "linkDown": "Gat ekki náð í schema.pi — reyni aftur sjálfkrafa.",
+        "linkAuth": "Tengingartákn hefur runnið út — gefðu út nýtt tákn í schema.pi og skráðu það.",
+        "timeout": "Svörun er hæg — reyni aftur sjálfkrafa.",
+        "rate": "Of margar beiðnir, svo endurnýjunartímabilið var aukið."
+      },
+      "aux": {
+        "rules": "Mínar viðvörunarreglur ({n} virkar)",
+        "schemaSvc": "Þjónustustaða — schema.pi svörun",
+        "schemaSvcNote": "Forritsmælingar síðustu 60 mínútna vistaðar af schema.pi.",
+        "source": "Gagnagjafi: mark DB er aðeins lesið í gegnum schema.pi nefndar fyrirspurnir (aðeins lestur); þróun vistar aðeins tölfræði í dbms.pi (engin raðgögn)."
+      }
     }
   },
   "ops": {
@@ -904,6 +1162,12 @@
   },
   "nav": {
     "label": "Eiginleikar",
+    "groups": {
+      "monitor": "Vöktun",
+      "drift": "Samræmi",
+      "lake": "Vatn",
+      "admin": "Stjórnun"
+    },
     "connect": "Tengjast",
     "sqlLab": "SQL stillingar",
     "perf": "Afköst",

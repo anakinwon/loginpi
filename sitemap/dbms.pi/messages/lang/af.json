@@ -13,7 +13,7 @@
       "connect": "Registreer 'n schema.pi-skakeltoken en kontroleer verbindingstatus",
       "sqlLab": "Planboom, waarskuwings, vergelyking en anti-patroonkontroles teen standaarddomeine",
       "perf": "Stadige navraag Top-N, tabel-/indeksgesondheid, kapasiteitsvoorspelling, aktiwiteit en slotte",
-      "monitor": "App-, DB- en URL-metriekopsomming met drempelwaarskuwings",
+      "monitor": "Normaal, waarskuwing en gevaar vir 14 seine, plus wat om te doen en hoe om dit in 'n oogopslag op te los",
       "drift": "Vergelyk schema.pi-model en DDL-geskiedenis met die regte katalogus, meet indekseffek",
       "migration": "Topologiese laaivolgorde, brokke, kontrolelys en verifikasie SQL",
       "pipeline": "Verander-vaslegging voorkontrole en bron→transformeer→teiken pyplyndefinisies",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Moniteringsentrum",
-    "collectNote": "Versameling loop in schema.pi — migrasie beplan (D7). Hierdie bladsy lees die schema.pi monitor opsomming.",
+    "title": "Monitering",
     "noLink": "Kies of registreer eers 'n schema.pi-skakel.",
     "goConnect": "Registreer 'n skakel",
     "period": "Tydperk",
@@ -457,16 +456,9 @@
       "360": "6 uur",
       "1440": "24 uur"
     },
-    "refresh": "Verfris",
     "loading": "Laai tans…",
-    "updatedAt": "{area} · vanaf {time} (outo-verfris elke 30s)",
-    "appTitle": "Toepassingprestasie",
-    "dbTitle": "DB-status per verbinding",
-    "urlTitle": "URL-kontroles",
-    "empty": "Geen data om te wys nie.",
-    "breachTitle": "{n} drempelbreuke",
-    "rulesTitle": "Drempelreëls",
-    "rulesNote": "Reëls word vir hierdie skakel gestoor en teen die ontvangde opsomming geëvalueer; oortredings kry 'n rooi rand (kennisgewings kom later).",
+    "rulesNote": "Reëls word aan hierdie verbinding gestoor en geëvalueer elke keer as die bord verfris word (DB-sessie/slotwag/kas-treffersyfer elke 1 minuut, DB-grootte/URL-responstyd/fout elke 5 minute). Oortrede seine sal eskaleer na gevaar en gemerk word 'My Reël' (kennisgewingversending is die volgende stap). Diens (APP) metrieke reëls word nie geëvalueer nie. DB-grootte (MB) reëls (>) word ook as kapasiteitslimiete gebruik.",
+    "notEvaluated": "Nie geëvalueer nie",
     "metric": "Metriek",
     "conn": "Verbinding",
     "allConns": "Alle verbindings",
@@ -501,7 +493,276 @@
       "RATE": "Te veel versoeke. Probeer asseblief binnekort weer.",
       "TIMEOUT": "schema.pi reageer stadig. Probeer asseblief binnekort weer.",
       "RULE_LIMIT": "Tot 50 reëls per skakel.",
-      "NOT_FOUND": "Reël nie gevind nie."
+      "NOT_FOUND": "Reël nie gevind nie.",
+      "CONN_FAIL": "Kon nie aan die databasis koppel nie. Kontroleer die verbindinginstellings en DB-status.",
+      "LINK_DOWN": "Kon nie schema.pi bereik nie. Probeer asseblief binnekort weer.",
+      "PGSS_MISSING": "pg_stat_statements is nie geïnstalleer nie, so stadige SQL is nie beskikbaar nie.",
+      "CONN_UNSUPPORTED": "Hierdie verbinding ondersteun nie monitering nie (slegs PostgreSQL-bedienerverbindings).",
+      "CONN_DISABLED": "Hierdie verbinding is gedeaktiveer. Aktiveer dit in schema.pi.",
+      "INVALID_INPUT": "Die versoek is ongeldig."
+    },
+    "board": {
+      "refresh": {
+        "updated": "Vanaf {time} · verfris elke minuut",
+        "now": "Verfris nou",
+        "busy": "Laai tans…",
+        "stale": "Verouderd · {min} min gelede"
+      },
+      "level": {
+        "RISK": "Risiko",
+        "WARN": "Waarskuwing",
+        "OK": "OK",
+        "UNKNOWN": "Onbekend",
+        "NA": "N.v.t."
+      },
+      "overall": {
+        "RISK": "Risiko — aksie is nou nodig",
+        "WARN": "Waarskuwing — sommige items moet nagegaan word",
+        "UNKNOWN": "Onbekend — kontroleer die verbinding",
+        "OK": "OK — elke sein is binne perke",
+        "NA": "N.v.t."
+      },
+      "kpi": {
+        "sess": "Sessies / maks",
+        "tps": "Transaksies/s",
+        "cache": "Kas-treffersyfer",
+        "size": "DB-grootte"
+      },
+      "todo": {
+        "title": "Om nou te doen",
+        "more": "Wys {n} meer",
+        "less": "Wys minder",
+        "setup": "Stel dit op om meer te sien",
+        "none": "Geen risiko- of waarskuwingsitems benodig nou aksie nie.",
+        "unknown": "Kon nie {n} sein(e) kontroleer nie — sien die kaarte vir die rede.",
+        "myRule": "My reël oortree: {rule}",
+        "copySql": "Kopieer SQL",
+        "copied": "Gekopieer"
+      },
+      "cat": {
+        "avail": "Beskikbaarheid",
+        "load": "Lading & wagte",
+        "eff": "Doeltreffendheid",
+        "store": "Berging & onderhoud",
+        "protect": "Beskerming (rugsteun, replikasie)"
+      },
+      "card": {
+        "thr": "Perke: waarskuwing {warn} · risiko {risk}",
+        "thrDown": "Perke: waarskuwing onder {warn} · risiko onder {risk}",
+        "more": "Hoe om reg te maak",
+        "addRule": "Voeg 'n reël by vir hierdie metriek",
+        "basisLive": "Laaste minuut",
+        "basisStored": "Kumulatief",
+        "since": "statistieke teruggestel {at}",
+        "partial": "Gedeeltelike aansig (500-ry-limiet of ontbrekende voorregte)."
+      },
+      "sig": {
+        "AVAIL": "DB-reaksie",
+        "CONN_USE": "Verbindingsgebruik (hierdie DB)",
+        "URL": "Diens-URL's",
+        "LONG_QRY": "Langlopende navrae",
+        "IDLE_TX": "Ledige transaksies",
+        "LOCK_WAIT": "Slotwagte",
+        "CACHE_HIT": "Kas-treffersyfer",
+        "XACT_ERR": "Terugrolle & dooiepunte",
+        "SLOW_SQL": "Stadige SQL",
+        "STORAGE": "Berging",
+        "VACUUM": "Vakuum",
+        "INDEX": "Indeksgesondheid",
+        "BACKUP": "Rugsteun (WAL-argief)",
+        "REPL": "Replikasie-agterstand"
+      },
+      "fix": {
+        "AVAIL": "Stadige reaksie of 'n onlangse herbegin — kontroleer die verbindinginstellings en DB-bedienerstatus.",
+        "AVAIL_DOWN": "Kon nie aan die DB koppel nie — kontroleer die verbindinginstellings en dat die DB-bediener aan is.",
+        "CONN_USE": "{sess}/{max} sessies op hierdie DB (nie klusterwyd nie — ander databasisse is uitgesluit) — sluit ledige verbindings of voeg 'n verbindingpoeler (pgbouncer) by.",
+        "URL": "{n} gekontroleerde URL's misluk · maksimum reaksie {ms}ms — sien die schema.pi-monitor vir die oorsaak.",
+        "LONG_QRY": "'n Navraag loop al {sec}s — hersien die plan en stem dit af, of laat 'n DBA dit kanselleer.",
+        "IDLE_TX": "'n Transaksie is al {sec}s ledig — vind die ontbrekende commit in die toepassing en stel 'n tydsbeperking in.",
+        "LOCK_WAIT": "{n} sessies wag op slotte — vind die blokkerende sessie en beëindig die transaksie.",
+        "CACHE_HIT": "Kas-treffersyfer {pct}% — soek vir volle skanderings van groot tabelle of hersien shared_buffers.",
+        "XACT_ERR": "Terugrolkoers {pct}%, {dlck} dooiepunte — kontroleer die mislukte transaksies en toepassingsfoutlogboeke.",
+        "SLOW_SQL": "'n Navraag is gemiddeld {ms} ms — stem die topnavrae volgens totale tyd af deur hul planne te gebruik.",
+        "STORAGE": "Die DB ({gb} GB) is naby sy limiet (dae oor {days}) — maak groot tabelle skoon of voeg kapasiteit by.",
+        "VACUUM": "{tbl} het baie dooie rye of verouderde statistieke — hersien VACUUM (ANALYZE) en autovacuum-instellings.",
+        "INDEX": "{n} indeksbevindinge (ongeldig, ongebruik, volle skanderings) — sien die tabel- en indeksgesondheid-oortjie vir die teikens.",
+        "BACKUP": "WAL-argivering is af of vasgeloop — kontroleer archive_mode, archive_command en rugsteunstatus.",
+        "REPL": "Replikasie-agterstand {sec}s — kontroleer die bystandstatus en die netwerk.",
+        "PGSS": "pg_stat_statements is nie geïnstalleer nie, so stadige SQL is nie beskikbaar nie — aktiveer dit met die SQL hieronder (bedienerherbegin benodig)."
+      },
+      "reason": {
+        "CONN_DOWN": "Nie beoordeel nie omdat die DB-verbinding af is.",
+        "PGSS": "pg_stat_statements is nie geïnstalleer nie.",
+        "VER": "Beskikbaar op PostgreSQL 13 of later.",
+        "SAMPLE": "Nog nie genoeg monsters nie.",
+        "NO_LIMIT": "Geen groottelimiet nie, so gebruik word nie beoordeel nie — voeg 'n DB-grootte (MB) reël (>) by om dit as die limiet te gebruik.",
+        "RESET": "Statistieke is minder as 7 dae gelede teruggestel, so ongebruikte indekse word nie beoordeel nie.",
+        "STALE": "Geen onlangse kontrole rekords nie.",
+        "STANDBY": "Nie van toepassing op 'n bystandbediener nie.",
+        "NONE": "Niks om te kontroleer nie.",
+        "GRANT": "Ontbrekende voorregte — gee die pg_monitor-rol aan die verbindingrekening.",
+        "LINK": "schema.pi navraag het misluk ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Kontroleer die verbindingstatus in Verbindings, en herstel die verbindinginstellings (gasheer, poort, rekening) in schema.pi.",
+          "2": "Kontroleer dat die DB-bediener aan is en of dit onlangs herbegin het.",
+          "3": "As dit stadig bly, kontroleer bedienerlading (CPU, skyf) en die netwerk."
+        },
+        "CONN_USE": {
+          "1": "Sien sessietellings volgens gebruiker en status in die aktiwiteit- en slotte-oortjie.",
+          "2": "As baie ledig is, krimp die toepassingspoel of voeg 'n verbindingpoeler by.",
+          "3": "Verhoog max_connections versigtig, met inagneming van geheue."
+        },
+        "URL": {
+          "1": "Sien die mislukte URL's en statuskodes in die schema.pi-monitor.",
+          "2": "Kontroleer die toepassingsontplooiing en eksterne afhanklikhede.",
+          "3": "As dit herhaal, voeg 'n URL-fouttelling (URL_FAIL_CNT) reël by."
+        },
+        "LONG_QRY": {
+          "1": "Vind langlopende navrae en hul gebruikers in die aktiwiteit- en slotte-oortjie.",
+          "2": "Hersien die plan in SQL-afstemming en herstel indekse of voorwaardes.",
+          "3": "As dit dringend is, kanselleer 'n DBA dit met pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Sien die laaste navraag van ledig-in-transaksie-sessies in die aktiwiteit- en slotte-oortjie.",
+          "2": "Vind die ontbrekende commit of rollback in die toepassingskode.",
+          "3": "Beperk dit met idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Vind die blokkerende sessie (blocked_by) in die aktiwiteit- en slotte-oortjie.",
+          "2": "Beëindig die transaksie of laat 'n DBA dit kanselleer.",
+          "3": "Herstel bondels of transaksievolgorde wat dieselfde rye lank vashou."
+        },
+        "CACHE_HIT": {
+          "1": "Vind volle skanderings van groot tabelle in die stadige navraag-oortjie.",
+          "2": "Voeg die nodige indekse by om minder blokke te lees.",
+          "3": "As geheue dit toelaat, hersien shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Vind terugrol-oorsake (beperkingsoortredings, tydsbeperkings) in toepassingsfoutlogboeke.",
+          "2": "As daar dooiepunte is, sluit tabelle in 'n konsekwente volgorde.",
+          "3": "Kontroleer dat herprobeerlogika nie terugrolle opblaas nie."
+        },
+        "SLOW_SQL": {
+          "1": "Kies die topnavrae volgens totale tyd in die stadige navraag-oortjie.",
+          "2": "Hersien planne in SQL-afstemming en herstel indekse of joins.",
+          "3": "Na herstel, kontroleer dat die gemiddelde tyd afgeneem het."
+        },
+        "STORAGE": {
+          "1": "Sien die groeineiging en geskatte volle datum in die grootte-neiging-oortjie.",
+          "2": "Maak groot tabelle, indekse en ou data skoon.",
+          "3": "Indien nodig, voeg skyf by en werk die limietreël op."
+        },
+        "VACUUM": {
+          "1": "Sien tabelle met baie dooie rye in die tabel- en indeksgesondheid-oortjie.",
+          "2": "'n DBA voer VACUUM (ANALYZE) uit.",
+          "3": "As dit herhaal, verlaag die autovacuum-drempels vir daardie tabel."
+        },
+        "INDEX": {
+          "1": "Sien ongeldige of ongebruikte indekse en volle-skandering-tabelle in die tabel- en indeksgesondheid-oortjie.",
+          "2": "Herbou ongeldige indekse; 'n DBA hersien en verwyder ongebruikte indekse.",
+          "3": "Ontwerp indekse in SQL-afstemming vir tabelle met baie volle skanderings."
+        },
+        "BACKUP": {
+          "1": "Sien archive_mode en die laaste argieftyd in die rugsteun- en herstel-oortjie.",
+          "2": "As argivering misluk, kontroleer archive_command en vrye spasie by die bestemming.",
+          "3": "Op 'n bestuurde DB, kontroleer die rugsteuninstellings van die verskaffer."
+        },
+        "REPL": {
+          "1": "Sien die status en agterstand van elke bystand in die replikasie- en DR-oortjie.",
+          "2": "Kontroleer skyf, SVE en netwerk op die bystand.",
+          "3": "As dit nie stroom nie, kontroleer die bystandlogboeke."
+        }
+      },
+      "sqlNote": "Die SQL hieronder is slegs-lees, vir kontrole — regstellings (VACUUM, DROP INDEX, pg_terminate_backend) word deur 'n DBA uitgevoer.",
+      "go": {
+        "activity": "Aktiwiteit & slotte",
+        "top": "Stadige navrae",
+        "health": "Tabel- & indeksgesondheid",
+        "trend": "Kapasiteitstendens",
+        "params": "Parameterkontrole",
+        "repl": "Replikasiekontrole",
+        "backup": "Rugsteunkontrole",
+        "sqlLab": "SQL-afstemming",
+        "drift": "Dryfvergelyking",
+        "connect": "Verbindings",
+        "schema": "schema.pi-monitor"
+      },
+      "chart": {
+        "title": "Tendense & ranglys",
+        "note": "Tendense word elke minuut aangeteken terwyl hierdie skerm oop is (geen agtergrondversameling nie).",
+        "gauges": "Verbindings- & kasmeters",
+        "sessState": "Sessies nou",
+        "sessTrend": "Sessietendens & slotwagte",
+        "tpsCombo": "Deurset & terugrolkoers",
+        "cacheTrend": "Kas-treffersyfer-tendens",
+        "capacity": "DB-grootte & voorspelling",
+        "slowTop": "Stadige SQL top 10",
+        "slowLegend": "Balklengte = totale tyd · kleur = gemiddelde tyd (▲ waarskuwing vanaf {warn}ms · ✕ risiko vanaf {risk}ms)",
+        "sizeTop": "Spasie top 10",
+        "heat": "Risiko volgens sein oor tyd",
+        "q": {
+          "gauges": "Raak verbindings vol? Word lesings uit geheue bedien?",
+          "sessState": "Wat doen sessies nou?",
+          "sessTrend": "Styg slotwagte wanneer sessies ophoop?",
+          "tpsCombo": "Beweeg deurset en foutkoers saam?",
+          "cacheTrend": "Wanneer het die kas-treffersyfer gedaal?",
+          "capacity": "Wanneer sal die DB vol raak?",
+          "slowTop": "Wat om eerste af te stem? (volgens totale tyd)",
+          "sizeTop": "Wat neem die spasie op?",
+          "heat": "Is die risiko 'n eenmalige of herhalende een?"
+        },
+        "asTable": "Bekyk as tabel",
+        "needHistory": "Nog geen tendens nie — hou hierdie skerm vir 'n paar minute oop.",
+        "needPerf": "Geen groottegeskiedenis nie — versamel in die prestasie-oortjie of hou hierdie skerm oop.",
+        "noSess": "Geen sessies nie.",
+        "noWait": "Geen wagte nie",
+        "noData": "Niks om te wys nie.",
+        "loading": "Laai tans…",
+        "waitTop": "Wag gebeurtenisse",
+        "lockWait": "Slotwagte",
+        "tps": "Transaksies/s",
+        "rlbk": "Terugrolkoers (%)",
+        "cacheHit": "Kas-treffersyfer",
+        "size": "DB-grootte",
+        "limit": "Limiet",
+        "forecast": "Voorspelling",
+        "daysLeft": "Dae oor",
+        "capNote": "Groei per dag {perDay} · {days} dae tot die limiet",
+        "tbl": "Tabel",
+        "idxToast": "Indeks + TOAST",
+        "mix": {
+          "active": "Aktief",
+          "idleTx": "Ledig in transaksie",
+          "idle": "Ledig",
+          "total": "sessies"
+        },
+        "col": {
+          "item": "Item",
+          "value": "Waarde",
+          "time": "Tyd",
+          "calls": "Oproepe",
+          "total": "Totaal (ms)",
+          "mean": "Gemiddeld (ms)",
+          "share": "Aandeel"
+        }
+      },
+      "empty": {
+        "noConn": "Hierdie taksonomie het geen PostgreSQL-bedienerverbinding om te monitor nie — wys slegs URL's en diensstatus.",
+        "unsupported": "Hierdie verbinding ondersteun nie monitering nie (slegs PostgreSQL-bedienerverbindings).",
+        "connFail": "Kon nie aan die databasis koppel nie — kontroleer die verbindinginstellings en DB-status.",
+        "linkDown": "Kon nie schema.pi bereik nie — probeer outomaties weer.",
+        "linkAuth": "Die verbindingstoken het verval — reik 'n nuwe token uit in schema.pi en registreer dit.",
+        "timeout": "Antwoorde is stadig — probeer outomaties weer.",
+        "rate": "Te veel versoeke, so die verfrisinterval is verhoog."
+      },
+      "aux": {
+        "rules": "My waarskuwingsreëls ({n} aktief)",
+        "schemaSvc": "Diensstatus — schema.pi-antwoorde",
+        "schemaSvcNote": "Toepassingsmetrieke vir die laaste 60 minute gestoor deur schema.pi.",
+        "source": "Databron: die teiken-DB is slegs-lees deur schema.pi-benoemde navrae (slegs-lees); tendense stoor slegs statistieke in dbms.pi (geen rydata nie)."
+      }
     }
   },
   "ops": {
@@ -904,6 +1165,12 @@
   },
   "nav": {
     "label": "Funksies",
+    "groups": {
+      "monitor": "Monitering",
+      "drift": "Konsekwentheid",
+      "lake": "Meer",
+      "admin": "Admin"
+    },
     "connect": "Koppel",
     "sqlLab": "SQL-instelling",
     "perf": "Prestasie",

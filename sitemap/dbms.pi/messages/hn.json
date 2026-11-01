@@ -13,7 +13,7 @@
       "connect": "Registre un token de enlace de schema.pi y verifique el estado de la conexión",
       "sqlLab": "Árbol de plan, advertencias, comparación y comprobaciones de antipatrones contra dominios estándar",
       "perf": "Top-N de consultas lentas, estado de tablas/índices, previsión de capacidad, actividad y bloqueos",
-      "monitor": "Resumen de métricas de aplicación, DB y URL con alertas de umbral",
+      "monitor": "Normal, advertencia y peligro para 14 señales, además de qué hacer y cómo resolverlo de un vistazo",
       "drift": "Compare el modelo schema.pi y el historial DDL con el catálogo real, mida el efecto del índice",
       "migration": "Orden de carga topológico, fragmentos, lista de verificación y SQL de verificación",
       "pipeline": "Verificación previa de captura de cambios y definiciones de pipeline origen→transformación→destino",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Centro de monitoreo",
-    "collectNote": "La recopilación se ejecuta en schema.pi — migración planificada (D7). Esta página lee el resumen del monitor de schema.pi.",
+    "title": "Monitorización",
     "noLink": "Seleccione o registre un enlace schema.pi primero.",
     "goConnect": "Registrar un enlace",
     "period": "Período",
@@ -457,16 +456,9 @@
       "360": "6 horas",
       "1440": "24 horas"
     },
-    "refresh": "Actualizar",
     "loading": "Cargando…",
-    "updatedAt": "{area} · a partir de {time} (actualización automática cada 30s)",
-    "appTitle": "Rendimiento de la aplicación",
-    "dbTitle": "Estado de la DB por conexión",
-    "urlTitle": "Comprobaciones de URL",
-    "empty": "No hay datos para mostrar.",
-    "breachTitle": "{n} infracciones de umbral",
-    "rulesTitle": "Reglas de umbral",
-    "rulesNote": "Las reglas se guardan para este enlace y se evalúan contra el resumen recibido; las infracciones obtienen un borde rojo (las notificaciones llegarán más tarde).",
+    "rulesNote": "Las reglas se guardan en esta conexión y se evalúan cada vez que se actualiza el panel (sesión de DB/espera de bloqueo/tasa de aciertos de caché cada 1 minuto; tamaño de DB/tiempo de respuesta de URL/fallo cada 5 minutos). Las señales violadas escalarán a peligro y se marcarán como 'Mi regla' (el envío de notificaciones es el siguiente paso). Las reglas de métricas de servicio (APP) no se evalúan. Las reglas de tamaño de DB (MB) (>) también se utilizan como límites de capacidad.",
+    "notEvaluated": "No evaluado",
     "metric": "Métrica",
     "conn": "Conexión",
     "allConns": "Todas las conexiones",
@@ -501,7 +493,276 @@
       "RATE": "Demasiadas solicitudes. Inténtelo de nuevo en breve.",
       "TIMEOUT": "schema.pi está respondiendo lentamente. Inténtelo de nuevo en breve.",
       "RULE_LIMIT": "Hasta 50 reglas por enlace.",
-      "NOT_FOUND": "Regla no encontrada."
+      "NOT_FOUND": "Regla no encontrada.",
+      "CONN_FAIL": "No se pudo conectar a la base de datos. Compruebe la configuración de la conexión y el estado de la DB.",
+      "LINK_DOWN": "No se pudo acceder a schema.pi. Inténtelo de nuevo en breve.",
+      "PGSS_MISSING": "pg_stat_statements no está instalado, por lo que el SQL lento no está disponible.",
+      "CONN_UNSUPPORTED": "Esta conexión no admite la monitorización (solo conexiones de servidor PostgreSQL).",
+      "CONN_DISABLED": "Esta conexión está deshabilitada. Habilítela en schema.pi.",
+      "INVALID_INPUT": "La solicitud no es válida."
+    },
+    "board": {
+      "refresh": {
+        "updated": "A partir de las {time} · se actualiza cada minuto",
+        "now": "Actualizar ahora",
+        "busy": "Cargando…",
+        "stale": "Obsoleto · hace {min} min"
+      },
+      "level": {
+        "RISK": "Riesgo",
+        "WARN": "Advertencia",
+        "OK": "OK",
+        "UNKNOWN": "Desconocido",
+        "NA": "N/A"
+      },
+      "overall": {
+        "RISK": "Riesgo: se necesita acción ahora",
+        "WARN": "Advertencia: algunos elementos necesitan revisión",
+        "UNKNOWN": "Desconocido: compruebe la conexión",
+        "OK": "OK: todas las señales están dentro de los límites",
+        "NA": "N/A"
+      },
+      "kpi": {
+        "sess": "Sesiones / máx.",
+        "tps": "Transacciones/s",
+        "cache": "Tasa de aciertos de caché",
+        "size": "Tamaño de la DB"
+      },
+      "todo": {
+        "title": "Tareas pendientes ahora",
+        "more": "Mostrar {n} más",
+        "less": "Mostrar menos",
+        "setup": "Configure esto para ver más",
+        "none": "No hay elementos de riesgo o advertencia que requieran acción ahora mismo.",
+        "unknown": "No se pudieron comprobar {n} señal(es); consulte las tarjetas para ver el motivo.",
+        "myRule": "Mi regla incumplida: {rule}",
+        "copySql": "Copiar SQL",
+        "copied": "Copiado"
+      },
+      "cat": {
+        "avail": "Disponibilidad",
+        "load": "Carga y esperas",
+        "eff": "Eficiencia",
+        "store": "Almacenamiento y mantenimiento",
+        "protect": "Protección (copia de seguridad, replicación)"
+      },
+      "card": {
+        "thr": "Límites: advertencia {warn} · riesgo {risk}",
+        "thrDown": "Límites: advertencia por debajo de {warn} · riesgo por debajo de {risk}",
+        "more": "Cómo solucionar",
+        "addRule": "Añadir una regla para esta métrica",
+        "basisLive": "Último minuto",
+        "basisStored": "Acumulativo",
+        "since": "restablecimiento de estadísticas {at}",
+        "partial": "Vista parcial (límite de 500 filas o privilegios insuficientes)."
+      },
+      "sig": {
+        "AVAIL": "Respuesta de la DB",
+        "CONN_USE": "Uso de la conexión (esta DB)",
+        "URL": "URL de servicio",
+        "LONG_QRY": "Consultas de larga duración",
+        "IDLE_TX": "Transacciones inactivas",
+        "LOCK_WAIT": "Esperas de bloqueo",
+        "CACHE_HIT": "Tasa de aciertos de caché",
+        "XACT_ERR": "Rollbacks y deadlocks",
+        "SLOW_SQL": "SQL lento",
+        "STORAGE": "Almacenamiento",
+        "VACUUM": "Vacuum",
+        "INDEX": "Estado del índice",
+        "BACKUP": "Copia de seguridad (archivo WAL)",
+        "REPL": "Retraso de replicación"
+      },
+      "fix": {
+        "AVAIL": "Respuesta lenta o un reinicio reciente: compruebe la configuración de la conexión y el estado del servidor de la DB.",
+        "AVAIL_DOWN": "No se pudo conectar a la DB: compruebe la configuración de la conexión y que el servidor de la DB esté activo.",
+        "CONN_USE": "{sess}/{max} sesiones en esta DB (no en todo el clúster; otras bases de datos están excluidas): cierre las conexiones inactivas o añada un agrupador de conexiones (pgbouncer).",
+        "URL": "{n} URL comprobadas fallando · respuesta máxima {ms}ms: consulte el monitor de schema.pi para ver la causa.",
+        "LONG_QRY": "Una consulta lleva {sec}s ejecutándose: revise su plan y ajústela, o pida a un DBA que la cancele.",
+        "IDLE_TX": "Una transacción ha estado inactiva durante {sec}s: encuentre el commit que falta en la aplicación y establezca un tiempo de espera.",
+        "LOCK_WAIT": "{n} sesiones están esperando bloqueos: encuentre la sesión que bloquea y finalice su transacción.",
+        "CACHE_HIT": "Tasa de aciertos de caché {pct}%: busque escaneos completos de tablas grandes o revise shared_buffers.",
+        "XACT_ERR": "Tasa de rollback {pct}%, {dlck} deadlocks: compruebe las transacciones fallidas y los registros de errores de la aplicación.",
+        "SLOW_SQL": "Una consulta promedia {ms} ms: ajuste las consultas principales por tiempo total utilizando sus planes.",
+        "STORAGE": "La DB ({gb} GB) está cerca de su límite (días restantes {days}): limpie tablas grandes o añada capacidad.",
+        "VACUUM": "{tbl} tiene muchas filas muertas o estadísticas obsoletas: revise la configuración de VACUUM (ANALYZE) y autovacuum.",
+        "INDEX": "{n} hallazgos de índices (inválidos, no utilizados, escaneos completos): consulte la pestaña de estado de tablas e índices para ver los objetivos.",
+        "BACKUP": "El archivado de WAL está desactivado o atascado: compruebe archive_mode, archive_command y el estado de la copia de seguridad.",
+        "REPL": "Retraso de replicación {sec}s: compruebe el estado del standby y la red.",
+        "PGSS": "pg_stat_statements no está instalado, por lo que el SQL lento no está disponible; habilítelo con el SQL siguiente (se requiere reiniciar el servidor)."
+      },
+      "reason": {
+        "CONN_DOWN": "No juzgado porque la conexión a la DB está caída.",
+        "PGSS": "pg_stat_statements no está instalado.",
+        "VER": "Disponible en PostgreSQL 13 o posterior.",
+        "SAMPLE": "Todavía no hay suficientes muestras.",
+        "NO_LIMIT": "No hay límite de tamaño, por lo que el uso no se juzga; añada una regla de tamaño de DB (MB) (>) para usarla como límite.",
+        "RESET": "Las estadísticas se restablecieron hace menos de 7 días, por lo que los índices no utilizados no se juzgan.",
+        "STALE": "No hay registros de verificación recientes.",
+        "STANDBY": "No aplicable en un servidor en espera.",
+        "NONE": "Nada que comprobar.",
+        "GRANT": "Faltan privilegios: conceda el rol pg_monitor a la cuenta de conexión.",
+        "LINK": "La consulta de schema.pi falló ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Compruebe el estado de la conexión en Conexiones y corrija la configuración de la conexión (host, puerto, cuenta) en schema.pi.",
+          "2": "Compruebe que el servidor de la DB esté activo y si se reinició recientemente.",
+          "3": "Si sigue siendo lento, compruebe la carga del servidor (CPU, disco) y la red."
+        },
+        "CONN_USE": {
+          "1": "Consulte los recuentos de sesiones por usuario y estado en la pestaña de actividad y bloqueos.",
+          "2": "Si hay muchas inactivas, reduzca el grupo de aplicaciones o añada un agrupador de conexiones.",
+          "3": "Aumente max_connections con cuidado, considerando la memoria."
+        },
+        "URL": {
+          "1": "Consulte las URL fallidas y los códigos de estado en el monitor de schema.pi.",
+          "2": "Compruebe la implementación de la aplicación y las dependencias externas.",
+          "3": "Si se repite, añada una regla de recuento de fallos de URL (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Encuentre las consultas de larga duración y sus usuarios en la pestaña de actividad y bloqueos.",
+          "2": "Revise el plan en la optimización de SQL y corrija los índices o las condiciones.",
+          "3": "Si es urgente, un DBA la cancela con pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Consulte la última consulta de las sesiones inactivas en transacción en la pestaña de actividad y bloqueos.",
+          "2": "Encuentre el commit o rollback que falta en el código de la aplicación.",
+          "3": "Limítelo con idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Encuentre la sesión que bloquea (blocked_by) en la pestaña de actividad y bloqueos.",
+          "2": "Finalice su transacción o pida a un DBA que la cancele.",
+          "3": "Corrija los lotes o el orden de las transacciones que mantienen las mismas filas durante mucho tiempo."
+        },
+        "CACHE_HIT": {
+          "1": "Encuentre escaneos completos de tablas grandes en la pestaña de consultas lentas.",
+          "2": "Añada los índices necesarios para leer menos bloques.",
+          "3": "Si la memoria lo permite, revise shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Encuentre las causas de los rollbacks (violaciones de restricciones, tiempos de espera) en los registros de errores de la aplicación.",
+          "2": "Si hay deadlocks, bloquee las tablas en un orden consistente.",
+          "3": "Compruebe que la lógica de reintento no esté inflando los rollbacks."
+        },
+        "SLOW_SQL": {
+          "1": "Elija las consultas principales por tiempo total en la pestaña de consultas lentas.",
+          "2": "Revise los planes en la optimización de SQL y corrija los índices o las uniones.",
+          "3": "Después de corregir, compruebe que el tiempo medio disminuyó."
+        },
+        "STORAGE": {
+          "1": "Consulte la tendencia de crecimiento y la fecha de llenado estimada en la pestaña de tendencia de tamaño.",
+          "2": "Limpie tablas grandes, índices y datos antiguos.",
+          "3": "Si es necesario, añada disco y actualice la regla de límite."
+        },
+        "VACUUM": {
+          "1": "Consulte las tablas con muchas filas muertas en la pestaña de estado de tablas e índices.",
+          "2": "Un DBA ejecuta VACUUM (ANALYZE).",
+          "3": "Si se repite, reduzca los umbrales de autovacuum para esa tabla."
+        },
+        "INDEX": {
+          "1": "Consulte los índices inválidos o no utilizados y las tablas de escaneo completo en la pestaña de estado de tablas e índices.",
+          "2": "Reconstruya los índices inválidos; un DBA revisa y elimina los no utilizados.",
+          "3": "Diseñe índices en la optimización de SQL para tablas con muchos escaneos completos."
+        },
+        "BACKUP": {
+          "1": "Consulte archive_mode y la última hora de archivo en la pestaña de copia de seguridad y recuperación.",
+          "2": "Si el archivado falla, compruebe archive_command y el espacio libre en el destino.",
+          "3": "En una DB gestionada, compruebe la configuración de copia de seguridad del proveedor."
+        },
+        "REPL": {
+          "1": "Consulte el estado y el retraso de cada standby en la pestaña de replicación y DR.",
+          "2": "Compruebe el disco, la CPU y la red en el standby.",
+          "3": "Si no está transmitiendo, compruebe los registros del standby."
+        }
+      },
+      "sqlNote": "El SQL siguiente es de solo lectura, para comprobación; las correcciones (VACUUM, DROP INDEX, pg_terminate_backend) las ejecuta un DBA.",
+      "go": {
+        "activity": "Actividad y bloqueos",
+        "top": "Consultas lentas",
+        "health": "Estado de tablas e índices",
+        "trend": "Tendencia de capacidad",
+        "params": "Comprobación de parámetros",
+        "repl": "Comprobación de replicación",
+        "backup": "Comprobación de copia de seguridad",
+        "sqlLab": "Optimización de SQL",
+        "drift": "Comparación de deriva",
+        "connect": "Conexiones",
+        "schema": "Monitor de schema.pi"
+      },
+      "chart": {
+        "title": "Tendencias y clasificaciones",
+        "note": "Las tendencias se registran cada minuto mientras esta pantalla está abierta (no hay recopilación en segundo plano).",
+        "gauges": "Medidores de conexión y caché",
+        "sessState": "Sesiones ahora mismo",
+        "sessTrend": "Tendencia de sesiones y esperas de bloqueo",
+        "tpsCombo": "Rendimiento y tasa de rollback",
+        "cacheTrend": "Tendencia de tasa de aciertos de caché",
+        "capacity": "Tamaño y previsión de la DB",
+        "slowTop": "Top 10 de SQL lento",
+        "slowLegend": "Longitud de la barra = tiempo total · color = tiempo medio (▲ advertencia desde {warn}ms · ✕ riesgo desde {risk}ms)",
+        "sizeTop": "Top 10 de espacio",
+        "heat": "Riesgo por señal a lo largo del tiempo",
+        "q": {
+          "gauges": "¿Se están llenando las conexiones? ¿Las lecturas se sirven desde la memoria?",
+          "sessState": "¿Qué están haciendo las sesiones ahora?",
+          "sessTrend": "¿Aumentan las esperas de bloqueo cuando se acumulan las sesiones?",
+          "tpsCombo": "¿El rendimiento y la tasa de fallos se mueven juntos?",
+          "cacheTrend": "¿Cuándo bajó la tasa de aciertos de caché?",
+          "capacity": "¿Cuándo se llenará la DB?",
+          "slowTop": "¿Qué optimizar primero? (por tiempo total)",
+          "sizeTop": "¿Qué está ocupando el espacio?",
+          "heat": "¿El riesgo es puntual o recurrente?"
+        },
+        "asTable": "Ver como tabla",
+        "needHistory": "Todavía no hay tendencia; mantenga esta pantalla abierta durante unos minutos.",
+        "needPerf": "No hay historial de tamaño; recopile en la pestaña de rendimiento o mantenga esta pantalla abierta.",
+        "noSess": "No hay sesiones.",
+        "noWait": "Sin esperas",
+        "noData": "No hay datos para mostrar.",
+        "loading": "Cargando…",
+        "waitTop": "Eventos de espera",
+        "lockWait": "Esperas de bloqueo",
+        "tps": "Transacciones/s",
+        "rlbk": "Tasa de rollback (%)",
+        "cacheHit": "Tasa de aciertos de caché",
+        "size": "Tamaño de la DB",
+        "limit": "Límite",
+        "forecast": "Previsión",
+        "daysLeft": "Días restantes",
+        "capNote": "Crecimiento por día {perDay} · {days} días hasta el límite",
+        "tbl": "Tabla",
+        "idxToast": "Índice + TOAST",
+        "mix": {
+          "active": "Activo",
+          "idleTx": "Inactivo en transacción",
+          "idle": "Inactivo",
+          "total": "sesiones"
+        },
+        "col": {
+          "item": "Elemento",
+          "value": "Valor",
+          "time": "Hora",
+          "calls": "Llamadas",
+          "total": "Total (ms)",
+          "mean": "Media (ms)",
+          "share": "Cuota"
+        }
+      },
+      "empty": {
+        "noConn": "Esta taxonomía no tiene una conexión de servidor PostgreSQL para monitorizar; solo se muestran las URL y el estado del servicio.",
+        "unsupported": "Esta conexión no admite la monitorización (solo conexiones de servidor PostgreSQL).",
+        "connFail": "No se pudo conectar a la base de datos; compruebe la configuración de la conexión y el estado de la DB.",
+        "linkDown": "No se pudo acceder a schema.pi; reintentando automáticamente.",
+        "linkAuth": "El token de conexión ha caducado; emita un nuevo token en schema.pi y regístrelo.",
+        "timeout": "Las respuestas son lentas; reintentando automáticamente.",
+        "rate": "Demasiadas solicitudes, por lo que se aumentó el intervalo de actualización."
+      },
+      "aux": {
+        "rules": "Mis reglas de alerta ({n} activas)",
+        "schemaSvc": "Estado del servicio: respuestas de schema.pi",
+        "schemaSvcNote": "Métricas de la aplicación de los últimos 60 minutos almacenadas por schema.pi.",
+        "source": "Fuente de datos: la DB de destino es de solo lectura a través de consultas con nombre de schema.pi (solo lectura); las tendencias almacenan estadísticas solo en dbms.pi (sin datos de fila)."
+      }
     }
   },
   "ops": {
@@ -904,6 +1165,12 @@
   },
   "nav": {
     "label": "Características",
+    "groups": {
+      "monitor": "Monitorización",
+      "drift": "Consistencia",
+      "lake": "Lago",
+      "admin": "Administración"
+    },
     "connect": "Conectar",
     "sqlLab": "Optimización de SQL",
     "perf": "Rendimiento",

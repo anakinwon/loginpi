@@ -13,7 +13,7 @@
       "connect": "Înregistrează un token de legătură schema.pi și verifică starea conexiunii",
       "sqlLab": "Arborele planului, avertismente, comparații și verificări anti-tipar împotriva domeniilor standard",
       "perf": "Top-N interogări lente, starea tabelelor/indexurilor, prognoza capacității, activitate și blocări",
-      "monitor": "Sumar metrici aplicație, DB și URL cu alerte de prag",
+      "monitor": "Stare normală, avertisment și pericol pentru 14 semnale, plus ce trebuie făcut și cum se rezolvă dintr-o privire",
       "drift": "Compară modelul schema.pi și istoricul DDL cu catalogul real, măsoară efectul indexului",
       "migration": "Ordine de încărcare topologică, segmente, listă de verificare și SQL de verificare",
       "pipeline": "Pre-verificare captură de modificări și definiții de pipeline sursă→transformare→țintă",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Centrul de monitorizare",
-    "collectNote": "Colectarea rulează în schema.pi — migrare planificată (D7). Această pagină citește sumarul monitorului schema.pi.",
+    "title": "Monitorizare",
     "noLink": "Selectați sau înregistrați mai întâi un link schema.pi.",
     "goConnect": "Înregistrează un link",
     "period": "Perioadă",
@@ -457,16 +456,9 @@
       "360": "6 ore",
       "1440": "24 ore"
     },
-    "refresh": "Reîmprospătează",
     "loading": "Se încarcă…",
-    "updatedAt": "{area} · la {time} (reîmprospătare automată la fiecare 30s)",
-    "appTitle": "Performanța aplicației",
-    "dbTitle": "Stare DB pe conexiune",
-    "urlTitle": "Verificări URL",
-    "empty": "Nu există date de afișat.",
-    "breachTitle": "{n} depășiri de prag",
-    "rulesTitle": "Reguli de prag",
-    "rulesNote": "Regulile sunt salvate pentru acest link și evaluate în raport cu sumarul primit; depășirile primesc o bordură roșie (notificările vor veni mai târziu).",
+    "rulesNote": "Regulile sunt salvate la această conexiune și evaluate ori de câte ori panoul este reîmprospătat (sesiunea DB/așteptarea blocării/rata de succes a cache-ului la fiecare 1 minut, dimensiunea DB/timpul de răspuns URL/eșecul la fiecare 5 minute). Semnalele încălcate vor escalada la pericol și vor fi marcate „Regula mea” (trimiterea notificărilor este următorul pas). Regulile pentru metricile serviciului (APP) nu sunt evaluate. Regulile pentru dimensiunea DB (MB) (>) sunt, de asemenea, utilizate ca limite de capacitate.",
+    "notEvaluated": "Nu este evaluat",
     "metric": "Metrică",
     "conn": "Conexiune",
     "allConns": "Toate conexiunile",
@@ -501,7 +493,275 @@
       "RATE": "Prea multe cereri. Vă rugăm să încercați din nou în scurt timp.",
       "TIMEOUT": "schema.pi răspunde lent. Vă rugăm să încercați din nou în scurt timp.",
       "RULE_LIMIT": "Maxim 50 de reguli per link.",
-      "NOT_FOUND": "Regula nu a fost găsită."
+      "NOT_FOUND": "Regula nu a fost găsită.",
+      "CONN_FAIL": "Nu s-a putut conecta la baza de date. Verificați setările conexiunii și starea DB.",
+      "LINK_DOWN": "Nu s-a putut accesa schema.pi. Încercați din nou în scurt timp.",
+      "PGSS_MISSING": "pg_stat_statements nu este instalat, deci SQL lent nu este disponibil.",
+      "CONN_UNSUPPORTED": "Această conexiune nu acceptă monitorizarea (doar conexiuni la serverul PostgreSQL).",
+      "CONN_DISABLED": "Această conexiune este dezactivată. Activați-o în schema.pi.",
+      "INVALID_INPUT": "Cererea este invalidă."
+    },
+    "board": {
+      "refresh": {
+        "updated": "La {time} · se reîmprospătează în fiecare minut",
+        "now": "Reîmprospătați acum",
+        "busy": "Se încarcă…",
+        "stale": "Învechit · acum {min} min"
+      },
+      "level": {
+        "RISK": "Risc",
+        "WARN": "Avertisment",
+        "OK": "OK",
+        "UNKNOWN": "Necunoscut",
+        "NA": "N/A"
+      },
+      "overall": {
+        "RISK": "Risc — este necesară acțiune acum",
+        "WARN": "Avertisment — unele elemente necesită atenție",
+        "UNKNOWN": "Necunoscut — verificați conexiunea",
+        "OK": "OK — fiecare semnal este în limite",
+        "NA": "N/A"
+      },
+      "kpi": {
+        "sess": "Sesiuni / maxim",
+        "tps": "Tranzacții/s",
+        "cache": "Rata de succes a cache-ului",
+        "size": "Dimensiune DB"
+      },
+      "todo": {
+        "title": "De făcut acum",
+        "more": "Afișați încă {n}",
+        "less": "Afișați mai puțin",
+        "setup": "Configurați acestea pentru a vedea mai multe",
+        "none": "Niciun element de risc sau avertisment nu necesită acțiune chiar acum.",
+        "unknown": "Nu s-a putut verifica {n} semnal(e) — vedeți cardurile pentru motiv.",
+        "myRule": "Regula mea a fost încălcată: {rule}",
+        "copySql": "Copiați SQL",
+        "copied": "Copiat"
+      },
+      "cat": {
+        "avail": "Disponibilitate",
+        "load": "Încărcare și așteptări",
+        "eff": "Eficiență",
+        "store": "Stocare și întreținere",
+        "protect": "Protecție (backup, replicare)"
+      },
+      "card": {
+        "thr": "Limite: avertisment {warn} · risc {risk}",
+        "thrDown": "Limite: avertisment sub {warn} · risc sub {risk}",
+        "more": "Cum se remediază",
+        "addRule": "Adăugați o regulă pentru această metrică",
+        "basisLive": "Ultimul minut",
+        "basisStored": "Cumulativ",
+        "since": "statistici resetate {at}",
+        "partial": "Vizualizare parțială (limită de 500 de rânduri sau privilegii lipsă)."
+      },
+      "sig": {
+        "AVAIL": "Răspuns DB",
+        "CONN_USE": "Utilizare conexiune (acest DB)",
+        "URL": "URL-uri serviciu",
+        "LONG_QRY": "Interogări de lungă durată",
+        "IDLE_TX": "Tranzacții inactive",
+        "LOCK_WAIT": "Așteptări blocare",
+        "CACHE_HIT": "Rata de succes a cache-ului",
+        "XACT_ERR": "Rollback-uri și blocaje",
+        "SLOW_SQL": "SQL lent",
+        "STORAGE": "Stocare",
+        "VACUUM": "Vacuum",
+        "INDEX": "Starea indexului",
+        "BACKUP": "Backup (arhivă WAL)",
+        "REPL": "Întârziere replicare"
+      },
+      "fix": {
+        "AVAIL": "Răspuns lent sau o repornire recentă — verificați setările conexiunii și starea serverului DB.",
+        "AVAIL_DOWN": "Nu s-a putut conecta la DB — verificați setările conexiunii și dacă serverul DB este activ.",
+        "CONN_USE": "{sess}/{max} sesiuni pe acest DB (nu la nivel de cluster — alte baze de date sunt excluse) — închideți conexiunile inactive sau adăugați un pooler de conexiuni (pgbouncer).",
+        "URL": "{n} URL-uri verificate eșuează · răspuns maxim {ms}ms — vedeți monitorul schema.pi pentru cauză.",
+        "LONG_QRY": "O interogare rulează de {sec}s — revizuiți planul și optimizați-o, sau cereți unui DBA să o anuleze.",
+        "IDLE_TX": "O tranzacție a fost inactivă timp de {sec}s — găsiți commit-ul lipsă în aplicație și setați un timeout.",
+        "LOCK_WAIT": "{n} sesiuni așteaptă blocări — găsiți sesiunea de blocare și încheiați tranzacția acesteia.",
+        "CACHE_HIT": "Rata de succes a cache-ului {pct}% — căutați scanări complete ale tabelelor mari sau revizuiți shared_buffers.",
+        "XACT_ERR": "Rata de rollback {pct}%, {dlck} blocaje — verificați tranzacțiile eșuate și jurnalele de erori ale aplicației.",
+        "SLOW_SQL": "O interogare are o medie de {ms} ms — optimizați interogările de top după timpul total folosind planurile lor.",
+        "STORAGE": "DB-ul ({gb} GB) este aproape de limită (zile rămase {days}) — curățați tabelele mari sau adăugați capacitate.",
+        "VACUUM": "{tbl} are multe rânduri moarte sau statistici învechite — revizuiți setările VACUUM (ANALYZE) și autovacuum.",
+        "INDEX": "{n} constatări de index (invalid, neutilizat, scanări complete) — vedeți fila de stare a tabelelor și indexurilor pentru ținte.",
+        "BACKUP": "Arhivarea WAL este oprită sau blocată — verificați archive_mode, archive_command și starea backup-ului.",
+        "REPL": "Întârziere replicare {sec}s — verificați starea standby-ului și rețeaua.",
+        "PGSS": "pg_stat_statements nu este instalat, deci SQL lent nu este disponibil — activați-l cu SQL-ul de mai jos (este necesară repornirea serverului)."
+      },
+      "reason": {
+        "CONN_DOWN": "Nu a fost judecat deoarece conexiunea DB este întreruptă.",
+        "PGSS": "pg_stat_statements nu este instalat.",
+        "VER": "Disponibil pe PostgreSQL 13 sau o versiune ulterioară.",
+        "SAMPLE": "Nu sunt suficiente eșantioane încă.",
+        "NO_LIMIT": "Fără limită de dimensiune, deci utilizarea nu este judecată — adăugați o regulă de dimensiune DB (MB) (>) pentru a o utiliza ca limită.",
+        "RESET": "Statisticile au fost resetate cu mai puțin de 7 zile în urmă, deci indexurile neutilizate nu sunt judecate.",
+        "STALE": "Nu există înregistrări recente de verificare.",
+        "STANDBY": "Nu se aplică pe un server standby.",
+        "NONE": "Nimic de verificat.",
+        "GRANT": "Privilegii lipsă — acordați rolul pg_monitor contului de conexiune.",
+        "LINK": "Interogarea schema.pi a eșuat ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Verificați starea conexiunii în Conexiuni și remediați setările conexiunii (gazdă, port, cont) în schema.pi.",
+          "2": "Verificați dacă serverul DB este activ și dacă a fost repornit recent.",
+          "3": "Dacă rămâne lent, verificați încărcarea serverului (CPU, disc) și rețeaua."
+        },
+        "CONN_USE": {
+          "1": "Vedeți numărul de sesiuni pe utilizator și stare în fila activitate și blocări.",
+          "2": "Dacă multe sunt inactive, micșorați pool-ul aplicației sau adăugați un pooler de conexiuni.",
+          "3": "Măriți max_connections cu atenție, luând în considerare memoria."
+        },
+        "URL": {
+          "1": "Vedeți URL-urile eșuate și codurile de stare în monitorul schema.pi.",
+          "2": "Verificați implementarea aplicației și dependențele externe.",
+          "3": "Dacă se repetă, adăugați o regulă de număr de eșecuri URL (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Găsiți interogările de lungă durată și utilizatorii acestora în fila activitate și blocări.",
+          "2": "Revizuiți planul în SQL tuning și remediați indexurile sau condițiile.",
+          "3": "Dacă este urgent, un DBA o anulează cu pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Vedeți ultima interogare a sesiunilor idle-in-transaction în fila activitate și blocări.",
+          "2": "Găsiți commit-ul lipsă sau rollback-ul în codul aplicației.",
+          "3": "Limitați-o cu idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Găsiți sesiunea de blocare (blocked_by) în fila activitate și blocări.",
+          "2": "Încheiați tranzacția acesteia sau cereți unui DBA să o anuleze.",
+          "3": "Remediați loturile sau ordinea tranzacțiilor care rețin aceleași rânduri pentru o perioadă lungă."
+        },
+        "CACHE_HIT": {
+          "1": "Găsiți scanări complete ale tabelelor mari în fila de interogări lente.",
+          "2": "Adăugați indexurile necesare pentru a citi mai puține blocuri.",
+          "3": "Dacă memoria permite, revizuiți shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Găsiți cauzele rollback-ului (încălcări de constrângeri, timeout-uri) în jurnalele de erori ale aplicației.",
+          "2": "Dacă există blocaje, blocați tabelele într-o ordine consistentă.",
+          "3": "Verificați dacă logica de reîncercare nu umflă rollback-urile."
+        },
+        "SLOW_SQL": {
+          "1": "Alegeți interogările de top după timpul total în fila de interogări lente.",
+          "2": "Revizuiți planurile în SQL tuning și remediați indexurile sau join-urile.",
+          "3": "După remediere, verificați dacă timpul mediu a scăzut."
+        },
+        "STORAGE": {
+          "1": "Vedeți tendința de creștere și data estimată de umplere în fila de tendințe de dimensiune.",
+          "2": "Curățați tabelele mari, indexurile și datele vechi.",
+          "3": "Dacă este necesar, adăugați disc și actualizați regula de limită."
+        },
+        "VACUUM": {
+          "1": "Vedeți tabelele cu multe rânduri moarte în fila de stare a tabelelor și indexurilor.",
+          "2": "Un DBA rulează VACUUM (ANALYZE).",
+          "3": "Dacă se repetă, reduceți pragurile autovacuum pentru acea tabelă."
+        },
+        "INDEX": {
+          "1": "Vedeți indexurile invalide sau neutilizate și tabelele cu scanări complete în fila de stare a tabelelor și indexurilor.",
+          "2": "Reconstruiți indexurile invalide; un DBA revizuiește și șterge cele neutilizate.",
+          "3": "Proiectați indexuri în SQL tuning pentru tabelele cu multe scanări complete."
+        },
+        "BACKUP": {
+          "1": "Vedeți archive_mode și ultimul timp de arhivare în fila de backup și recuperare.",
+          "2": "Dacă arhivarea eșuează, verificați archive_command și spațiul liber la destinație."
+        },
+        "REPL": {
+          "1": "Vedeți starea și întârzierea fiecărui standby în fila de replicare și DR.",
+          "2": "Verificați discul, CPU-ul și rețeaua pe standby.",
+          "3": "Dacă nu este streaming, verificați jurnalele standby-ului."
+        }
+      },
+      "sqlNote": "SQL-ul de mai jos este doar pentru verificare, în modul citire — remediile (VACUUM, DROP INDEX, pg_terminate_backend) sunt rulate de un DBA.",
+      "go": {
+        "activity": "Activitate și blocări",
+        "top": "Interogări lente",
+        "health": "Starea tabelelor și indexurilor",
+        "trend": "Tendința capacității",
+        "params": "Verificare parametri",
+        "repl": "Verificare replicare",
+        "backup": "Verificare backup",
+        "sqlLab": "Optimizare SQL",
+        "drift": "Comparare drift",
+        "connect": "Conexiuni",
+        "schema": "Monitor schema.pi"
+      },
+      "chart": {
+        "title": "Tendințe și clasamente",
+        "note": "Tendințele sunt înregistrate în fiecare minut cât timp acest ecran este deschis (fără colectare în fundal).",
+        "gauges": "Indicatoare conexiune și cache",
+        "sessState": "Sesiuni chiar acum",
+        "sessTrend": "Tendința sesiunilor și așteptări de blocare",
+        "tpsCombo": "Debit și rata de rollback",
+        "cacheTrend": "Tendința ratei de succes a cache-ului",
+        "capacity": "Dimensiune DB și prognoză",
+        "slowTop": "Top 10 SQL lent",
+        "slowLegend": "Lungimea barei = timp total · culoare = timp mediu (▲ avertisment de la {warn}ms · ✕ risc de la {risk}ms)",
+        "sizeTop": "Top 10 spațiu",
+        "heat": "Risc pe semnal în timp",
+        "q": {
+          "gauges": "Se umplu conexiunile? Se citesc datele din memorie?",
+          "sessState": "Ce fac sesiunile acum?",
+          "sessTrend": "Crește numărul de așteptări de blocare când se acumulează sesiunile?",
+          "tpsCombo": "Debit și rata de eșec se mișcă împreună?",
+          "cacheTrend": "Când a scăzut rata de succes a cache-ului?",
+          "capacity": "Când se va umple DB-ul?",
+          "slowTop": "Ce să optimizez mai întâi? (după timpul total)",
+          "sizeTop": "Ce ocupă spațiul?",
+          "heat": "Riscul este o întâmplare sau se repetă?"
+        },
+        "asTable": "Vizualizați ca tabel",
+        "needHistory": "Încă nu există o tendință — mențineți acest ecran deschis câteva minute.",
+        "needPerf": "Nu există istoric de dimensiune — colectați în fila de performanță sau mențineți acest ecran deschis.",
+        "noSess": "Nicio sesiune.",
+        "noWait": "Fără așteptări",
+        "noData": "Nimic de afișat.",
+        "loading": "Se încarcă…",
+        "waitTop": "Evenimente de așteptare",
+        "lockWait": "Așteptări blocare",
+        "tps": "Tranzacții/s",
+        "rlbk": "Rata de rollback (%)",
+        "cacheHit": "Rata de succes a cache-ului",
+        "size": "Dimensiune DB",
+        "limit": "Limită",
+        "forecast": "Prognoză",
+        "daysLeft": "Zile rămase",
+        "capNote": "Creștere pe zi {perDay} · {days} zile până la limită",
+        "tbl": "Tabel",
+        "idxToast": "Index + TOAST",
+        "mix": {
+          "active": "Activ",
+          "idleTx": "Inactiv în tranzacție",
+          "idle": "Inactiv",
+          "total": "sesiuni"
+        },
+        "col": {
+          "item": "Element",
+          "value": "Valoare",
+          "time": "Timp",
+          "calls": "Apeluri",
+          "total": "Total (ms)",
+          "mean": "Medie (ms)",
+          "share": "Cotă"
+        }
+      },
+      "empty": {
+        "noConn": "Această taxonomie nu are o conexiune la serverul PostgreSQL de monitorizat — se afișează doar URL-uri și starea serviciului.",
+        "unsupported": "Această conexiune nu acceptă monitorizarea (doar conexiuni la serverul PostgreSQL).",
+        "connFail": "Nu s-a putut conecta la baza de date — verificați setările conexiunii și starea DB.",
+        "linkDown": "Nu s-a putut accesa schema.pi — se reîncearcă automat.",
+        "linkAuth": "Tokenul de conexiune a expirat — emiteți un nou token în schema.pi și înregistrați-l.",
+        "timeout": "Răspunsurile sunt lente — se reîncearcă automat.",
+        "rate": "Prea multe cereri, așa că intervalul de reîmprospătare a fost mărit."
+      },
+      "aux": {
+        "rules": "Regulile mele de alertă ({n} active)",
+        "schemaSvc": "Starea serviciului — răspunsuri schema.pi",
+        "schemaSvcNote": "Metricile aplicației pentru ultimele 60 de minute stocate de schema.pi.",
+        "source": "Sursă de date: DB-ul țintă este citit doar prin interogări numite schema.pi (doar citire); tendințele stochează statistici doar în dbms.pi (fără date de rând)."
+      }
     }
   },
   "ops": {
@@ -630,6 +890,7 @@
     "err": {
       "NOT_IMPLEMENTED": "Funcționalitatea de conectare schema.pi este în pregătire. Vă rugăm să încercați din nou în scurt timp.",
       "CONN_UNSUPPORTED": "Această conexiune nu este încă suportată (doar PostgreSQL direct).",
+      "TIMEOUT": "DB-ul țintă a răspuns prea lent. Vă rugăm să încercați din nou în scurt timp",
       "RATE": "Prea multe apeluri. Încercați din nou într-un minut.",
       "Q_UNKNOWN": "Interogare nesuportată. Verificați versiunea API a link-ului schema.pi.",
       "INVALID_INPUT": "Selecție invalidă de link sau conexiune."
@@ -714,6 +975,7 @@
   "pipeline": {
     "title": "PiCDC · Pipeline-uri",
     "needLink": "Alegeți mai întâi un link schema.pi de mai sus. Dacă nu aveți niciunul, înregistrați un token în meniul „Link”.",
+    "needConn": "Alegeți conexiunea DB de verificat de mai sus.",
     "loading": "Se încarcă…",
     "pager": "Pagini",
     "prev": "Anterior",
@@ -758,6 +1020,7 @@
       "LOGICAL_NOT_READY": "Poate trece la LOGICAL odată ce replicarea logică WAL este pregătită",
       "FULL_RELOAD_ONLY": "Fără PK sau coloană timp de modificare, deci fără captură incrementală — adăugați un PK",
       "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level nu este logical (modificarea necesită o repornire a DB)",
       "NO_SLOTS": "max_replication_slots este 0",
       "NO_SENDERS": "max_wal_senders este 0",
       "IS_STANDBY": "Server standby — preluați replicarea logică de la serverul primar",
@@ -900,6 +1163,12 @@
   },
   "nav": {
     "label": "Funcționalități",
+    "groups": {
+      "monitor": "Monitorizare",
+      "drift": "Consistență",
+      "lake": "Lac",
+      "admin": "Administrare"
+    },
     "connect": "Conectare",
     "sqlLab": "Optimizare SQL",
     "perf": "Performanță",

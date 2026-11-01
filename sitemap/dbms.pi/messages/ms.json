@@ -13,7 +13,7 @@
       "connect": "Daftar token pautan schema.pi dan semak status sambungan",
       "sqlLab": "Pokok pelan, amaran, perbandingan dan semakan anti-corak terhadap domain standard",
       "perf": "Pertanyaan perlahan Top-N, kesihatan jadual/indeks, ramalan kapasiti, aktiviti dan kunci",
-      "monitor": "Ringkasan metrik Aplikasi, DB dan URL dengan amaran ambang",
+      "monitor": "Normal, amaran, dan bahaya untuk 14 isyarat, serta perkara yang perlu dilakukan dan cara menyelesaikannya sepintas lalu",
       "drift": "Bandingkan model schema.pi dan sejarah DDL dengan katalog sebenar, ukur kesan indeks",
       "migration": "Susunan muatan topologi, cebisan, senarai semak dan SQL pengesahan",
       "pipeline": "Prapemeriksaan tangkapan perubahan dan definisi saluran paip sumber→transformasi→sasaran",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Pusat Pemantauan",
-    "collectNote": "Pengumpulan berjalan dalam schema.pi — migrasi dirancang (D7). Halaman ini membaca ringkasan monitor schema.pi.",
+    "title": "Pemantauan",
     "noLink": "Pilih atau daftar pautan schema.pi dahulu.",
     "goConnect": "Daftar pautan",
     "period": "Tempoh",
@@ -457,16 +456,9 @@
       "360": "6 jam",
       "1440": "24 jam"
     },
-    "refresh": "Segar semula",
     "loading": "Memuatkan…",
-    "updatedAt": "{area} · setakat {time} (segarkan semula automatik setiap 30s)",
-    "appTitle": "Prestasi aplikasi",
-    "dbTitle": "Status DB mengikut sambungan",
-    "urlTitle": "Semakan URL",
-    "empty": "Tiada data untuk dipaparkan.",
-    "breachTitle": "{n} pelanggaran ambang",
-    "rulesTitle": "Peraturan ambang",
-    "rulesNote": "Peraturan disimpan untuk pautan ini dan dinilai terhadap ringkasan yang diterima; pelanggaran mendapat sempadan merah (pemberitahuan datang kemudian).",
+    "rulesNote": "Peraturan disimpan ke sambungan ini dan dinilai setiap kali papan disegarkan (sesi DB/tunggu kunci/kadar capaian cache setiap 1 minit, saiz DB/masa respons URL/kegagalan setiap 5 minit). Isyarat yang dilanggar akan meningkat kepada bahaya dan ditandakan 'Peraturan Saya' (penghantaran pemberitahuan adalah langkah seterusnya). Peraturan metrik perkhidmatan (APP) tidak dinilai. Peraturan saiz DB (MB) (>) juga digunakan sebagai had kapasiti.",
+    "notEvaluated": "Tidak dinilai",
     "metric": "Metrik",
     "conn": "Sambungan",
     "allConns": "Semua sambungan",
@@ -501,7 +493,278 @@
       "RATE": "Terlalu banyak permintaan. Sila cuba sebentar lagi.",
       "TIMEOUT": "schema.pi bertindak balas dengan perlahan. Sila cuba sebentar lagi.",
       "RULE_LIMIT": "Sehingga 50 peraturan setiap pautan.",
-      "NOT_FOUND": "Peraturan tidak ditemui."
+      "NOT_FOUND": "Peraturan tidak ditemui.",
+      "CONN_FAIL": "Tidak dapat menyambung ke pangkalan data. Semak tetapan sambungan dan status DB.",
+      "LINK_DOWN": "Tidak dapat mencapai schema.pi. Cuba lagi sebentar lagi.",
+      "PGSS_MISSING": "pg_stat_statements tidak dipasang, jadi SQL perlahan tidak tersedia.",
+      "CONN_UNSUPPORTED": "Sambungan ini tidak menyokong pemantauan (sambungan pelayan PostgreSQL sahaja).",
+      "CONN_DISABLED": "Sambungan ini dilumpuhkan. Dayakannya dalam schema.pi.",
+      "INVALID_INPUT": "Permintaan tidak sah."
+    },
+    "board": {
+      "subtitle": "Apa yang perlu dilakukan pada DB ini sekarang — 14 isyarat OK, amaran atau risiko, dengan pembetulan, sepintas lalu.",
+      "refresh": {
+        "updated": "Sehingga {time} · disegarkan setiap minit",
+        "now": "Segarkan sekarang",
+        "busy": "Memuatkan…",
+        "stale": "Lapuk · {min} minit lalu"
+      },
+      "level": {
+        "RISK": "Risiko",
+        "WARN": "Amaran",
+        "OK": "OK",
+        "UNKNOWN": "Tidak diketahui",
+        "NA": "T/A"
+      },
+      "overall": {
+        "RISK": "Risiko — tindakan diperlukan sekarang",
+        "WARN": "Amaran — beberapa item perlu dilihat",
+        "UNKNOWN": "Tidak diketahui — semak sambungan",
+        "OK": "OK — setiap isyarat berada dalam had",
+        "CONN_DOWN": "Tidak dapat mencapai DB — semak sambungan dahulu",
+        "NA": "T/A"
+      },
+      "kpi": {
+        "sess": "Sesi / maks",
+        "tps": "Transaksi/s",
+        "cache": "Kadar capaian cache",
+        "size": "Saiz DB"
+      },
+      "todo": {
+        "title": "Perkara yang perlu dilakukan sekarang",
+        "more": "Tunjukkan {n} lagi",
+        "less": "Tunjukkan kurang",
+        "setup": "Sediakan ini untuk melihat lebih banyak",
+        "none": "Tiada item risiko atau amaran yang memerlukan tindakan sekarang.",
+        "unknown": "Tidak dapat menyemak {n} isyarat — lihat kad untuk sebabnya.",
+        "myRule": "Peraturan saya dilanggar: {rule}",
+        "copySql": "Salin SQL",
+        "copied": "Disalin"
+      },
+      "cat": {
+        "avail": "Ketersediaan",
+        "load": "Muatan & tunggu",
+        "eff": "Kecekapan",
+        "store": "Storan & penyelenggaraan",
+        "protect": "Perlindungan (sandaran, replikasi)"
+      },
+      "card": {
+        "thr": "Had: amaran {warn} · risiko {risk}",
+        "thrDown": "Had: amaran di bawah {warn} · risiko di bawah {risk}",
+        "more": "Cara membetulkan",
+        "addRule": "Tambah peraturan untuk metrik ini",
+        "basisLive": "Minit terakhir",
+        "basisStored": "Kumulatif",
+        "since": "statistik ditetapkan semula {at}",
+        "partial": "Paparan separa (had 500 baris atau keistimewaan hilang)."
+      },
+      "sig": {
+        "AVAIL": "Respons DB",
+        "CONN_USE": "Penggunaan sambungan (DB ini)",
+        "URL": "URL Perkhidmatan",
+        "LONG_QRY": "Pertanyaan berjalan lama",
+        "IDLE_TX": "Transaksi terbiar",
+        "LOCK_WAIT": "Tunggu kunci",
+        "CACHE_HIT": "Kadar capaian cache",
+        "XACT_ERR": "Rollback & deadlock",
+        "SLOW_SQL": "SQL perlahan",
+        "STORAGE": "Storan",
+        "VACUUM": "Vacuum",
+        "INDEX": "Kesihatan indeks",
+        "BACKUP": "Sandaran (arkib WAL)",
+        "REPL": "Kelewatan replikasi"
+      },
+      "fix": {
+        "AVAIL": "Respons perlahan atau permulaan semula baru-baru ini — semak tetapan sambungan dan status pelayan DB.",
+        "AVAIL_DOWN": "Tidak dapat menyambung ke DB — semak tetapan sambungan dan pastikan pelayan DB berfungsi.",
+        "CONN_USE": "{sess}/{max} sesi pada DB ini (bukan seluruh kluster — pangkalan data lain dikecualikan) — tutup sambungan terbiar atau tambah pengumpul sambungan (pgbouncer).",
+        "URL": "{n} URL yang disemak gagal · respons maks {ms}ms — lihat monitor schema.pi untuk puncanya.",
+        "LONG_QRY": "Pertanyaan telah berjalan selama {sec}s — semak rancangannya dan sesuaikannya, atau minta DBA membatalkannya.",
+        "IDLE_TX": "Transaksi telah terbiar selama {sec}s — cari komit yang hilang dalam aplikasi dan tetapkan had masa.",
+        "LOCK_WAIT": "{n} sesi sedang menunggu kunci — cari sesi yang menyekat dan tamatkan transaksinya.",
+        "CACHE_HIT": "Kadar capaian cache {pct}% — cari imbasan penuh jadual besar atau semak shared_buffers.",
+        "XACT_ERR": "Kadar rollback {pct}%, {dlck} deadlock — semak transaksi yang gagal dan log ralat aplikasi.",
+        "SLOW_SQL": "Pertanyaan purata {ms} ms — sesuaikan pertanyaan teratas mengikut jumlah masa menggunakan rancangan mereka.",
+        "STORAGE": "DB ({gb} GB) hampir mencapai hadnya (hari tinggal {days}) — bersihkan jadual besar atau tambah kapasiti.",
+        "VACUUM": "{tbl} mempunyai banyak baris mati atau statistik lapuk — semak tetapan VACUUM (ANALYZE) dan autovacuum.",
+        "INDEX": "{n} penemuan indeks (tidak sah, tidak digunakan, imbasan penuh) — lihat tab kesihatan jadual & indeks untuk sasaran.",
+        "BACKUP": "Pengarkiban WAL dimatikan atau terhenti — semak archive_mode, archive_command dan status sandaran.",
+        "REPL": "Kelewatan replikasi {sec}s — semak status siap sedia dan rangkaian.",
+        "PGSS": "pg_stat_statements tidak dipasang, jadi SQL perlahan tidak tersedia — dayakannya dengan SQL di bawah (memerlukan permulaan semula pelayan)."
+      },
+      "reason": {
+        "CONN_DOWN": "Tidak dinilai kerana sambungan DB terputus.",
+        "PGSS": "pg_stat_statements tidak dipasang.",
+        "VER": "Tersedia pada PostgreSQL 13 atau lebih baru.",
+        "SAMPLE": "Sampel belum mencukupi.",
+        "NO_LIMIT": "Tiada had saiz, jadi penggunaan tidak dinilai — tambah peraturan saiz DB (MB) (>) untuk menggunakannya sebagai had.",
+        "RESET": "Statistik ditetapkan semula kurang daripada 7 hari yang lalu, jadi indeks yang tidak digunakan tidak dinilai.",
+        "STALE": "Tiada rekod semakan baru-baru ini.",
+        "STANDBY": "Tidak berkenaan pada pelayan siap sedia.",
+        "NONE": "Tiada apa-apa untuk disemak.",
+        "GRANT": "Keistimewaan hilang — berikan peranan pg_monitor kepada akaun sambungan.",
+        "LINK": "Pertanyaan schema.pi gagal ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Semak status sambungan dalam Sambungan, dan betulkan tetapan sambungan (hos, port, akaun) dalam schema.pi.",
+          "2": "Semak sama ada pelayan DB berfungsi dan sama ada ia dimulakan semula baru-baru ini.",
+          "3": "Jika ia kekal perlahan, semak beban pelayan (CPU, cakera) dan rangkaian."
+        },
+        "CONN_USE": {
+          "1": "Lihat kiraan sesi mengikut pengguna dan keadaan dalam tab aktiviti & kunci.",
+          "2": "Jika banyak yang terbiar, kecilkan kumpulan aplikasi atau tambah pengumpul sambungan.",
+          "3": "Tingkatkan max_connections dengan berhati-hati, mengambil kira memori."
+        },
+        "URL": {
+          "1": "Lihat URL yang gagal dan kod status dalam monitor schema.pi.",
+          "2": "Semak penempatan aplikasi dan kebergantungan luaran.",
+          "3": "Jika ia berulang, tambah peraturan kiraan kegagalan URL (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Cari pertanyaan berjalan lama dan penggunanya dalam tab aktiviti & kunci.",
+          "2": "Semak rancangan dalam penalaan SQL dan betulkan indeks atau syarat.",
+          "3": "Jika mendesak, DBA membatalkannya dengan pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Lihat pertanyaan terakhir sesi terbiar dalam transaksi dalam tab aktiviti & kunci.",
+          "2": "Cari komit atau rollback yang hilang dalam kod aplikasi.",
+          "3": "Hadkannya dengan idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Cari sesi yang menyekat (blocked_by) dalam tab aktiviti & kunci.",
+          "2": "Tamatkan transaksinya atau minta DBA membatalkannya.",
+          "3": "Betulkan kelompok atau urutan transaksi yang memegang baris yang sama untuk masa yang lama."
+        },
+        "CACHE_HIT": {
+          "1": "Cari imbasan penuh jadual besar dalam tab pertanyaan perlahan.",
+          "2": "Tambah indeks yang diperlukan untuk membaca blok yang lebih sedikit.",
+          "3": "Jika memori membenarkan, semak shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Cari punca rollback (pelanggaran kekangan, had masa) dalam log ralat aplikasi.",
+          "2": "Jika terdapat deadlock, kunci jadual dalam urutan yang konsisten.",
+          "3": "Semak bahawa logik cuba semula tidak meningkatkan rollback."
+        },
+        "SLOW_SQL": {
+          "1": "Pilih pertanyaan teratas mengikut jumlah masa dalam tab pertanyaan perlahan.",
+          "2": "Semak rancangan dalam penalaan SQL dan betulkan indeks atau gabungan.",
+          "3": "Selepas membetulkan, semak bahawa masa purata menurun."
+        },
+        "STORAGE": {
+          "1": "Lihat trend pertumbuhan dan anggaran tarikh penuh dalam tab trend saiz.",
+          "2": "Bersihkan jadual besar, indeks dan data lama.",
+          "3": "Jika diperlukan, tambah cakera dan kemas kini peraturan had."
+        },
+        "VACUUM": {
+          "1": "Lihat jadual dengan banyak baris mati dalam tab kesihatan jadual & indeks.",
+          "2": "DBA menjalankan VACUUM (ANALYZE).",
+          "3": "Jika ia berulang, turunkan ambang autovacuum untuk jadual tersebut."
+        },
+        "INDEX": {
+          "1": "Lihat indeks tidak sah atau tidak digunakan dan jadual imbasan penuh dalam tab kesihatan jadual & indeks.",
+          "2": "Bina semula indeks tidak sah; DBA menyemak dan menggugurkan yang tidak digunakan.",
+          "3": "Reka indeks dalam penalaan SQL untuk jadual dengan banyak imbasan penuh."
+        },
+        "BACKUP": {
+          "1": "Lihat archive_mode dan masa arkib terakhir dalam tab sandaran & pemulihan.",
+          "2": "Jika pengarkiban gagal, semak archive_command dan ruang kosong di destinasi.",
+          "3": "Pada DB terurus, semak tetapan sandaran pembekal."
+        },
+        "REPL": {
+          "1": "Lihat keadaan dan kelewatan setiap siap sedia dalam tab replikasi & DR.",
+          "2": "Semak cakera, CPU dan rangkaian pada siap sedia.",
+          "3": "Jika ia tidak menstrim, semak log siap sedia."
+        }
+      },
+      "sqlNote": "SQL di bawah adalah baca sahaja, untuk semakan — pembetulan (VACUUM, DROP INDEX, pg_terminate_backend) dijalankan oleh DBA.",
+      "go": {
+        "activity": "Aktiviti & kunci",
+        "top": "Pertanyaan perlahan",
+        "health": "Kesihatan jadual & indeks",
+        "trend": "Trend kapasiti",
+        "params": "Semakan parameter",
+        "repl": "Semakan replikasi",
+        "backup": "Semakan sandaran",
+        "sqlLab": "Penalaan SQL",
+        "drift": "Bandingkan hanyutan",
+        "connect": "Sambungan",
+        "schema": "monitor schema.pi"
+      },
+      "chart": {
+        "title": "Trend & kedudukan",
+        "note": "Trend direkodkan setiap minit semasa skrin ini dibuka (tiada pengumpulan latar belakang).",
+        "gauges": "Tolok sambungan & cache",
+        "sessState": "Sesi sekarang",
+        "sessTrend": "Trend sesi & tunggu kunci",
+        "tpsCombo": "Kadar daya pemprosesan & rollback",
+        "cacheTrend": "Trend kadar capaian cache",
+        "capacity": "Saiz DB & ramalan",
+        "slowTop": "SQL perlahan top 10",
+        "slowLegend": "Panjang bar = jumlah masa · warna = masa purata (▲ amaran dari {warn}ms · ✕ risiko dari {risk}ms)",
+        "sizeTop": "Ruang top 10",
+        "heat": "Risiko mengikut isyarat dari semasa ke semasa",
+        "q": {
+          "gauges": "Adakah sambungan semakin penuh? Adakah bacaan disajikan dari memori?",
+          "sessState": "Apa yang sedang dilakukan oleh sesi sekarang?",
+          "sessTrend": "Adakah tunggu kunci meningkat apabila sesi bertimbun?",
+          "tpsCombo": "Adakah kadar daya pemprosesan dan kegagalan bergerak bersama?",
+          "cacheTrend": "Bilakah kadar capaian cache menurun?",
+          "capacity": "Bilakah DB akan penuh?",
+          "slowTop": "Apa yang perlu ditala dahulu? (mengikut jumlah masa)",
+          "sizeTop": "Apa yang mengambil ruang?",
+          "heat": "Adakah risiko itu sekali sahaja atau berulang?"
+        },
+        "asTable": "Lihat sebagai jadual",
+        "needHistory": "Tiada trend lagi — biarkan skrin ini terbuka selama beberapa minit.",
+        "needPerf": "Tiada sejarah saiz — kumpul dalam tab prestasi atau biarkan skrin ini terbuka.",
+        "noSess": "Tiada sesi.",
+        "noWait": "Tiada tunggu",
+        "noData": "Tiada apa-apa untuk ditunjukkan.",
+        "loading": "Memuatkan…",
+        "waitTop": "Peristiwa tunggu",
+        "lockWait": "Tunggu kunci",
+        "tps": "Transaksi/s",
+        "rlbk": "Kadar rollback (%)",
+        "cacheHit": "Kadar capaian cache",
+        "size": "Saiz DB",
+        "limit": "Had",
+        "forecast": "Ramalan",
+        "daysLeft": "Hari tinggal",
+        "capNote": "Pertumbuhan setiap hari {perDay} · {days} hari ke had",
+        "tbl": "Jadual",
+        "idxToast": "Indeks + TOAST",
+        "mix": {
+          "active": "Aktif",
+          "idleTx": "Terbiar dalam transaksi",
+          "idle": "Terbiar",
+          "total": "sesi"
+        },
+        "col": {
+          "item": "Item",
+          "value": "Nilai",
+          "time": "Masa",
+          "calls": "Panggilan",
+          "total": "Jumlah (ms)",
+          "mean": "Purata (ms)",
+          "share": "Kongsi"
+        }
+      },
+      "empty": {
+        "noConn": "Taksonomi ini tiada sambungan pelayan PostgreSQL untuk dipantau — hanya menunjukkan URL dan status perkhidmatan.",
+        "unsupported": "Sambungan ini tidak menyokong pemantauan (sambungan pelayan PostgreSQL sahaja).",
+        "connFail": "Tidak dapat menyambung ke pangkalan data — semak tetapan sambungan dan status DB.",
+        "linkDown": "Tidak dapat mencapai schema.pi — mencuba semula secara automatik.",
+        "linkAuth": "Token sambungan telah tamat tempoh — keluarkan token baharu dalam schema.pi dan daftarkannya.",
+        "timeout": "Respons perlahan — mencuba semula secara automatik.",
+        "rate": "Terlalu banyak permintaan, jadi selang penyegaran telah ditingkatkan."
+      },
+      "aux": {
+        "rules": "Peraturan amaran saya ({n} aktif)",
+        "schemaSvc": "Status perkhidmatan — respons schema.pi",
+        "schemaSvcNote": "Metrik aplikasi untuk 60 minit terakhir yang disimpan oleh schema.pi.",
+        "source": "Sumber data: DB sasaran adalah baca sahaja melalui pertanyaan bernama schema.pi (baca sahaja); trend menyimpan statistik hanya dalam dbms.pi (tiada data baris)."
+      }
     }
   },
   "ops": {
@@ -650,7 +913,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "Pautan schema.pi sedang disediakan. Sila cuba sebentar lagi",
+      "PGSS_MISSING": "pg_stat_statements tidak dipasang pada DB ini, jadi statistik pertanyaan tidak tersedia",
       "CONN_UNSUPPORTED": "Sambungan ini belum disokong (sambungan PostgreSQL langsung sahaja)",
+      "TIMEOUT": "DB sasaran bertindak balas terlalu perlahan. Sila cuba lagi nanti",
       "RATE": "Terlalu banyak permintaan. Cuba lagi dalam seminit",
       "LINK_AUTH": "Token pautan telah tamat tempoh atau dibatalkan. Daftar semula token pada halaman Sambung",
       "LINK_SCOPE": "Sambungan ini bukan milik kawasan subjek pautan",
@@ -659,6 +924,7 @@
     },
     "pgss": {
       "title": "Cara mendayakan pg_stat_statements",
+      "body": "Pertanyaan perlahan Top-N memerlukan sambungan pg_stat_statements. Jalankan pernyataan di bawah sebagai pentadbir DB. Pada Supabase, dayakannya di bawah Database → Extensions",
       "note": "PostgreSQL yang dihoskan sendiri juga memerlukan pg_stat_statements dalam shared_preload_libraries (postgresql.conf) dan mulakan semula. Statistik jadual, indeks dan saiz berfungsi tanpanya"
     },
     "collect": {
@@ -697,6 +963,7 @@
     "trend": {
       "limit": "Ambang saiz",
       "empty": "Tiada syot kilat dalam 30 hari terakhir",
+      "chart": "Saiz DB sepanjang 30 hari yang lalu",
       "now": "Saiz semasa",
       "perDay": "Pertumbuhan setiap hari",
       "needMore": "Memerlukan 2+ syot kilat",
@@ -904,6 +1171,12 @@
   },
   "nav": {
     "label": "Ciri-ciri",
+    "groups": {
+      "monitor": "Pemantauan",
+      "drift": "Konsistensi",
+      "lake": "Tasik",
+      "admin": "Pentadbir"
+    },
     "connect": "Sambung",
     "sqlLab": "Penalaan SQL",
     "perf": "Prestasi",

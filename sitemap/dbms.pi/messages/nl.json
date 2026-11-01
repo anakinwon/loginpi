@@ -13,7 +13,7 @@
       "connect": "Registreer een schema.pi-koppelingstoken en controleer de verbindingsstatus",
       "sqlLab": "Planboom, waarschuwingen, vergelijking en anti-patrooncontroles tegen standaarddomeinen",
       "perf": "Trage query Top-N, tabel-/indexstatus, capaciteitsvoorspelling, activiteit en vergrendelingen",
-      "monitor": "App-, DB- en URL-metriekoverzicht met drempelwaarschuwingen",
+      "monitor": "Normaal, waarschuwing en gevaar voor 14 signalen, plus wat te doen en hoe het op te lossen in één oogopslag",
       "drift": "Vergelijk schema.pi-model en DDL-geschiedenis met de echte catalogus, meet indexeffect",
       "migration": "Topologische laadvolgorde, chunks, checklist en verificatie-SQL",
       "pipeline": "Precheck voor wijzigingsvastlegging en pijplijndefinities voor bron→transformatie→doel",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Monitoringcentrum",
-    "collectNote": "Verzameling wordt uitgevoerd in schema.pi — migratie gepland (D7). Deze pagina leest de schema.pi monitor samenvatting.",
+    "title": "Monitoring",
     "noLink": "Selecteer of registreer eerst een schema.pi-koppeling.",
     "goConnect": "Koppeling registreren",
     "period": "Periode",
@@ -457,16 +456,9 @@
       "360": "6 uur",
       "1440": "24 uur"
     },
-    "refresh": "Vernieuwen",
     "loading": "Laden…",
-    "updatedAt": "{area} · per {time} (automatisch vernieuwen elke 30s)",
-    "appTitle": "App-prestaties",
-    "dbTitle": "DB-status per verbinding",
-    "urlTitle": "URL-controles",
-    "empty": "Geen gegevens om weer te geven.",
-    "breachTitle": "{n} drempelwaardeoverschrijdingen",
-    "rulesTitle": "Drempelregels",
-    "rulesNote": "Regels worden opgeslagen voor deze koppeling en geëvalueerd tegen de ontvangen samenvatting; overtredingen krijgen een rode rand (meldingen komen later).",
+    "rulesNote": "Regels worden opgeslagen in deze verbinding en geëvalueerd telkens wanneer het bord wordt vernieuwd (DB-sessie/lock-wacht/cache-hitrate elke 1 minuut, DB-grootte/URL-responstijd/fout elke 5 minuten). Geschonden signalen escaleren naar gevaar en worden gemarkeerd als 'Mijn Regel' (meldingen verzenden is de volgende stap). Serviceregels (APP) worden niet geëvalueerd. DB-grootte (MB) regels (>) worden ook gebruikt als capaciteitslimieten.",
+    "notEvaluated": "Niet geëvalueerd",
     "metric": "Metriek",
     "conn": "Verbinding",
     "allConns": "Alle verbindingen",
@@ -501,7 +493,276 @@
       "RATE": "Te veel aanvragen. Probeer het over een ogenblik opnieuw.",
       "TIMEOUT": "schema.pi reageert traag. Probeer het over een ogenblik opnieuw.",
       "RULE_LIMIT": "Maximaal 50 regels per koppeling.",
-      "NOT_FOUND": "Regel niet gevonden."
+      "NOT_FOUND": "Regel niet gevonden.",
+      "CONN_FAIL": "Kon geen verbinding maken met de database. Controleer de verbindingsinstellingen en de DB-status.",
+      "LINK_DOWN": "Kon schema.pi niet bereiken. Probeer het over een korte tijd opnieuw.",
+      "PGSS_MISSING": "pg_stat_statements is niet geïnstalleerd, dus trage SQL is niet beschikbaar.",
+      "CONN_UNSUPPORTED": "Deze verbinding ondersteunt geen monitoring (alleen PostgreSQL-serververbindingen).",
+      "CONN_DISABLED": "Deze verbinding is uitgeschakeld. Schakel deze in schema.pi in.",
+      "INVALID_INPUT": "Het verzoek is ongeldig."
+    },
+    "board": {
+      "refresh": {
+        "updated": "Per {time} · vernieuwt elke minuut",
+        "now": "Nu vernieuwen",
+        "busy": "Laden…",
+        "stale": "Verouderd · {min} min geleden"
+      },
+      "level": {
+        "RISK": "Risico",
+        "WARN": "Waarschuwing",
+        "OK": "OK",
+        "UNKNOWN": "Onbekend",
+        "NA": "N.v.t."
+      },
+      "overall": {
+        "RISK": "Risico — actie nu nodig",
+        "WARN": "Waarschuwing — sommige items moeten worden bekeken",
+        "UNKNOWN": "Onbekend — controleer de verbinding",
+        "OK": "OK — elk signaal is binnen de limieten",
+        "NA": "N.v.t."
+      },
+      "kpi": {
+        "sess": "Sessies / max",
+        "tps": "Transacties/s",
+        "cache": "Cache-hitrate",
+        "size": "DB-grootte"
+      },
+      "todo": {
+        "title": "Nu doen",
+        "more": "Toon {n} meer",
+        "less": "Minder tonen",
+        "setup": "Stel deze in om meer te zien",
+        "none": "Geen risico- of waarschuwingsitems vereisen nu actie.",
+        "unknown": "Kon {n} signaal/signalen niet controleren — zie de kaarten voor de reden.",
+        "myRule": "Mijn regel overtreden: {rule}",
+        "copySql": "SQL kopiëren",
+        "copied": "Gekopieerd"
+      },
+      "cat": {
+        "avail": "Beschikbaarheid",
+        "load": "Belasting & wachttijden",
+        "eff": "Efficiëntie",
+        "store": "Opslag & onderhoud",
+        "protect": "Bescherming (backup, replicatie)"
+      },
+      "card": {
+        "thr": "Limieten: waarschuwing {warn} · risico {risk}",
+        "thrDown": "Limieten: waarschuwing onder {warn} · risico onder {risk}",
+        "more": "Hoe op te lossen",
+        "addRule": "Regel toevoegen voor deze metriek",
+        "basisLive": "Laatste minuut",
+        "basisStored": "Cumulatief",
+        "since": "statistieken gereset {at}",
+        "partial": "Gedeeltelijke weergave (limiet van 500 rijen of ontbrekende privileges)."
+      },
+      "sig": {
+        "AVAIL": "DB-respons",
+        "CONN_USE": "Verbindingsgebruik (deze DB)",
+        "URL": "Service-URL's",
+        "LONG_QRY": "Langlopende queries",
+        "IDLE_TX": "Inactieve transacties",
+        "LOCK_WAIT": "Lock-wachttijden",
+        "CACHE_HIT": "Cache-hitrate",
+        "XACT_ERR": "Rollbacks & deadlocks",
+        "SLOW_SQL": "Trage SQL",
+        "STORAGE": "Opslag",
+        "VACUUM": "Vacuum",
+        "INDEX": "Indexstatus",
+        "BACKUP": "Backup (WAL-archief)",
+        "REPL": "Replicatievertraging"
+      },
+      "fix": {
+        "AVAIL": "Trage respons of een recente herstart — controleer de verbindingsinstellingen en de DB-serverstatus.",
+        "AVAIL_DOWN": "Kon geen verbinding maken met de DB — controleer de verbindingsinstellingen en of de DB-server actief is.",
+        "CONN_USE": "{sess}/{max} sessies op deze DB (niet clusterbreed — andere databases zijn uitgesloten) — sluit inactieve verbindingen of voeg een connection pooler (pgbouncer) toe.",
+        "URL": "{n} gecontroleerde URL's falen · maximale respons {ms}ms — zie de schema.pi-monitor voor de oorzaak.",
+        "LONG_QRY": "Een query draait al {sec}s — bekijk het plan en optimaliseer het, of laat een DBA het annuleren.",
+        "IDLE_TX": "Een transactie is al {sec}s inactief — zoek de ontbrekende commit in de app en stel een timeout in.",
+        "LOCK_WAIT": "{n} sessies wachten op locks — zoek de blokkerende sessie en beëindig de transactie.",
+        "CACHE_HIT": "Cache-hitrate {pct}% — zoek naar volledige scans van grote tabellen of controleer shared_buffers.",
+        "XACT_ERR": "Rollback-percentage {pct}%, {dlck} deadlocks — controleer de falende transacties en app-foutenlogboeken.",
+        "SLOW_SQL": "Een query duurt gemiddeld {ms} ms — optimaliseer de topqueries op totale tijd met behulp van hun plannen.",
+        "STORAGE": "De DB ({gb} GB) nadert zijn limiet (dagen over {days}) — ruim grote tabellen op of voeg capaciteit toe.",
+        "VACUUM": "{tbl} heeft veel dode rijen of verouderde statistieken — controleer VACUUM (ANALYZE) en autovacuum-instellingen.",
+        "INDEX": "{n} indexbevindingen (ongeldig, ongebruikt, volledige scans) — zie het tabblad tabel- & indexstatus voor de doelen.",
+        "BACKUP": "WAL-archivering is uitgeschakeld of vastgelopen — controleer archive_mode, archive_command en de back-upstatus.",
+        "REPL": "Replicatievertraging {sec}s — controleer de standby-status en het netwerk.",
+        "PGSS": "pg_stat_statements is niet geïnstalleerd, dus trage SQL is niet beschikbaar — schakel het in met de onderstaande SQL (serverherstart vereist)."
+      },
+      "reason": {
+        "CONN_DOWN": "Niet beoordeeld omdat de DB-verbinding verbroken is.",
+        "PGSS": "pg_stat_statements is niet geïnstalleerd.",
+        "VER": "Alleen beschikbaar op PostgreSQL 13 of hoger.",
+        "SAMPLE": "Nog niet genoeg samples.",
+        "NO_LIMIT": "Geen groottelimiet, dus gebruik wordt niet beoordeeld — voeg een DB-grootte (MB) regel (>) toe om het als limiet te gebruiken.",
+        "RESET": "Statistieken zijn minder dan 7 dagen geleden gereset, dus ongebruikte indexen worden niet beoordeeld.",
+        "STALE": "Geen recente controleverslagen.",
+        "STANDBY": "Niet van toepassing op een standby-server.",
+        "NONE": "Niets te controleren.",
+        "GRANT": "Ontbrekende privileges — verleen de pg_monitor-rol aan het verbindingsaccount.",
+        "LINK": "schema.pi-query mislukt ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Controleer de verbindingsstatus in Verbindingen en corrigeer de verbindingsinstellingen (host, poort, account) in schema.pi.",
+          "2": "Controleer of de DB-server actief is en of deze recentelijk opnieuw is opgestart.",
+          "3": "Als het traag blijft, controleer dan de serverbelasting (CPU, schijf) en het netwerk."
+        },
+        "CONN_USE": {
+          "1": "Bekijk het aantal sessies per gebruiker en status op het tabblad activiteit & locks.",
+          "2": "Als er veel inactief zijn, verklein dan de app-pool of voeg een connection pooler toe.",
+          "3": "Verhoog max_connections voorzichtig, rekening houdend met geheugen."
+        },
+        "URL": {
+          "1": "Bekijk de falende URL's en statuscodes in de schema.pi-monitor.",
+          "2": "Controleer de app-implementatie en externe afhankelijkheden.",
+          "3": "Als het zich herhaalt, voeg dan een URL-foutenteller (URL_FAIL_CNT) regel toe."
+        },
+        "LONG_QRY": {
+          "1": "Zoek langlopende queries en hun gebruikers op het tabblad activiteit & locks.",
+          "2": "Bekijk het plan in SQL-tuning en corrigeer indexen of voorwaarden.",
+          "3": "Indien urgent, annuleert een DBA het met pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Bekijk de laatste query van idle-in-transaction-sessies op het tabblad activiteit & locks.",
+          "2": "Zoek de ontbrekende commit of rollback in de app-code.",
+          "3": "Beperk het met idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Zoek de blokkerende sessie (blocked_by) op het tabblad activiteit & locks.",
+          "2": "Beëindig de transactie of laat een DBA deze annuleren.",
+          "3": "Corrigeer batches of transactievolgorde die dezelfde rijen lang vasthouden."
+        },
+        "CACHE_HIT": {
+          "1": "Zoek volledige scans van grote tabellen op het tabblad trage queries.",
+          "2": "Voeg de benodigde indexen toe om minder blokken te lezen.",
+          "3": "Als geheugen het toelaat, controleer shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Zoek rollback-oorzaken (beperkingsschendingen, timeouts) in app-foutenlogboeken.",
+          "2": "Als er deadlocks zijn, vergrendel tabellen dan in een consistente volgorde.",
+          "3": "Controleer of de retry-logica rollbacks niet opblaast."
+        },
+        "SLOW_SQL": {
+          "1": "Kies de topqueries op totale tijd op het tabblad trage queries.",
+          "2": "Bekijk plannen in SQL-tuning en corrigeer indexen of joins.",
+          "3": "Controleer na de fix of de gemiddelde tijd is gedaald."
+        },
+        "STORAGE": {
+          "1": "Bekijk de groeitrend en geschatte volledige datum op het tabblad groottetrend.",
+          "2": "Ruim grote tabellen, indexen en oude gegevens op.",
+          "3": "Voeg indien nodig schijfruimte toe en werk de limietregel bij."
+        },
+        "VACUUM": {
+          "1": "Bekijk tabellen met veel dode rijen op het tabblad tabel- & indexstatus.",
+          "2": "Een DBA voert VACUUM (ANALYZE) uit.",
+          "3": "Als het zich herhaalt, verlaag dan de autovacuum-drempels voor die tabel."
+        },
+        "INDEX": {
+          "1": "Bekijk ongeldige of ongebruikte indexen en full-scan tabellen op het tabblad tabel- & indexstatus.",
+          "2": "Herbouw ongeldige indexen; een DBA controleert en verwijdert ongebruikte.",
+          "3": "Ontwerp indexen in SQL-tuning voor tabellen met veel full scans."
+        },
+        "BACKUP": {
+          "1": "Bekijk archive_mode en de laatste archiveringstijd op het tabblad backup & herstel.",
+          "2": "Als archivering mislukt, controleer dan archive_command en de vrije ruimte op de bestemming.",
+          "3": "Controleer bij een beheerde DB de back-upinstellingen van de provider."
+        },
+        "REPL": {
+          "1": "Bekijk de status en vertraging van elke standby op het tabblad replicatie & DR.",
+          "2": "Controleer schijf, CPU en netwerk op de standby.",
+          "3": "Als het niet streamt, controleer dan de standby-logboeken."
+        }
+      },
+      "sqlNote": "De onderstaande SQL is alleen-lezen, ter controle — fixes (VACUUM, DROP INDEX, pg_terminate_backend) worden uitgevoerd door een DBA.",
+      "go": {
+        "activity": "Activiteit & locks",
+        "top": "Trage queries",
+        "health": "Tabel- & indexstatus",
+        "trend": "Capaciteitstrend",
+        "params": "Parametercontrole",
+        "repl": "Replicatiecontrole",
+        "backup": "Backupcontrole",
+        "sqlLab": "SQL-tuning",
+        "drift": "Drift vergelijken",
+        "connect": "Verbindingen",
+        "schema": "schema.pi-monitor"
+      },
+      "chart": {
+        "title": "Trends & ranglijsten",
+        "note": "Trends worden elke minuut vastgelegd zolang dit scherm open is (geen achtergrondverzameling).",
+        "gauges": "Verbindings- & cachemeters",
+        "sessState": "Sessies nu",
+        "sessTrend": "Sessietrend & lock-wachttijden",
+        "tpsCombo": "Doorvoer & rollback-percentage",
+        "cacheTrend": "Cache-hitrate trend",
+        "capacity": "DB-grootte & prognose",
+        "slowTop": "Trage SQL top 10",
+        "slowLegend": "Balklengte = totale tijd · kleur = gemiddelde tijd (▲ waarschuwing vanaf {warn}ms · ✕ risico vanaf {risk}ms)",
+        "sizeTop": "Ruimte top 10",
+        "heat": "Risico per signaal over tijd",
+        "q": {
+          "gauges": "Lopen de verbindingen vol? Worden reads uit geheugen geserveerd?",
+          "sessState": "Wat doen sessies nu?",
+          "sessTrend": "Nemen lock-wachttijden toe wanneer sessies zich opstapelen?",
+          "tpsCombo": "Bewegen doorvoer en faalpercentage samen?",
+          "cacheTrend": "Wanneer daalde de cache-hitrate?",
+          "capacity": "Wanneer raakt de DB vol?",
+          "slowTop": "Wat eerst tunen? (op totale tijd)",
+          "sizeTop": "Wat neemt de ruimte in beslag?",
+          "heat": "Is het risico eenmalig of terugkerend?"
+        },
+        "asTable": "Bekijken als tabel",
+        "needHistory": "Nog geen trend — houd dit scherm een paar minuten open.",
+        "needPerf": "Geen grootteschiedenis — verzamel op het tabblad prestaties of houd dit scherm open.",
+        "noSess": "Geen sessies.",
+        "noWait": "Geen wachttijden",
+        "noData": "Niets om te tonen.",
+        "loading": "Laden…",
+        "waitTop": "Wachtgebeurtenissen",
+        "lockWait": "Lock-wachttijden",
+        "tps": "Transacties/s",
+        "rlbk": "Rollback-percentage (%)",
+        "cacheHit": "Cache-hitrate",
+        "size": "DB-grootte",
+        "limit": "Limiet",
+        "forecast": "Prognose",
+        "daysLeft": "Dagen over",
+        "capNote": "Groei per dag {perDay} · {days} dagen tot de limiet",
+        "tbl": "Tabel",
+        "idxToast": "Index + TOAST",
+        "mix": {
+          "active": "Actief",
+          "idleTx": "Inactief in transactie",
+          "idle": "Inactief",
+          "total": "sessies"
+        },
+        "col": {
+          "item": "Item",
+          "value": "Waarde",
+          "time": "Tijd",
+          "calls": "Oproepen",
+          "total": "Totaal (ms)",
+          "mean": "Gemiddelde (ms)",
+          "share": "Aandeel"
+        }
+      },
+      "empty": {
+        "noConn": "Deze taxonomie heeft geen PostgreSQL-serververbinding om te monitoren — toont alleen URL's en servicestatus.",
+        "unsupported": "Deze verbinding ondersteunt geen monitoring (alleen PostgreSQL-serververbindingen).",
+        "connFail": "Kon geen verbinding maken met de database — controleer de verbindingsinstellingen en DB-status.",
+        "linkDown": "Kon schema.pi niet bereiken — probeert automatisch opnieuw.",
+        "linkAuth": "Het verbindingstoken is verlopen — geef een nieuw token uit in schema.pi en registreer het.",
+        "timeout": "Reacties zijn traag — probeert automatisch opnieuw.",
+        "rate": "Te veel verzoeken, dus het vernieuwingsinterval is verhoogd."
+      },
+      "aux": {
+        "rules": "Mijn waarschuwingsregels ({n} actief)",
+        "schemaSvc": "Servicestatus — schema.pi-reacties",
+        "schemaSvcNote": "App-metrieken van de laatste 60 minuten opgeslagen door schema.pi.",
+        "source": "Gegevensbron: de doel-DB is alleen-lezen via benoemde queries van schema.pi (alleen-lezen); trends slaan alleen statistieken op in dbms.pi (geen rijgegevens)."
+      }
     }
   },
   "ops": {
@@ -904,6 +1165,12 @@
   },
   "nav": {
     "label": "Functies",
+    "groups": {
+      "monitor": "Monitoring",
+      "drift": "Consistentie",
+      "lake": "Lake",
+      "admin": "Beheer"
+    },
     "connect": "Verbinden",
     "sqlLab": "SQL Tuning",
     "perf": "Prestaties",

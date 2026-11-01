@@ -13,7 +13,7 @@
       "connect": "Registrer et schema.pi-koblingstoken og sjekk tilkoblingsstatus",
       "sqlLab": "Plantre, advarsler, sammenligning og anti-mønsterkontroller mot standarddomener",
       "perf": "Sakte spørring Top-N, tabell-/indekshelse, kapasitetsprognose, aktivitet og låser",
-      "monitor": "App-, DB- og URL-metrikksammendrag med terskelvarsler",
+      "monitor": "Normal, advarsel og fare for 14 signaler, pluss hva du skal gjøre og hvordan du løser det med et øyekast",
       "drift": "Sammenlign schema.pi-modell og DDL-historikk med den virkelige katalogen, mål indekseffekt",
       "migration": "Topologisk lastrekkefølge, biter, sjekkliste og verifiserings-SQL",
       "pipeline": "Forhåndskontroll av endringsfangst og kilde→transformasjon→mål-pipeline-definisjoner",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Overvåkingssenter",
-    "collectNote": "Innsamling kjører i schema.pi – migrering planlagt (D7). Denne siden leser schema.pi-overvåkingssammendraget.",
+    "title": "Overvåking",
     "noLink": "Velg eller registrer en schema.pi-kobling først.",
     "goConnect": "Registrer en kobling",
     "period": "Periode",
@@ -457,16 +456,9 @@
       "360": "6 timer",
       "1440": "24 timer"
     },
-    "refresh": "Oppdater",
     "loading": "Laster inn…",
-    "updatedAt": "{area} · per {time} (automatisk oppdatering hvert 30. sekund)",
-    "appTitle": "Appytelse",
-    "dbTitle": "DB-status etter tilkobling",
-    "urlTitle": "URL-sjekker",
-    "empty": "Ingen data å vise.",
-    "breachTitle": "{n} terskelbrudd",
-    "rulesTitle": "Terskelregler",
-    "rulesNote": "Regler lagres for denne koblingen og evalueres mot det mottatte sammendraget; brudd får en rød kant (varsler kommer senere).",
+    "rulesNote": "Regler lagres i denne tilkoblingen og evalueres hver gang tavlen oppdateres (DB-sesjon/låsevent/cache-treffrate hvert 1. minutt, DB-størrelse/URL-responstid/feil hvert 5. minutt). Brutte signaler vil eskalere til fare og merkes «Min regel» (varsling er neste trinn). Regler for tjeneste (APP)-målinger evalueres ikke. Regler for DB-størrelse (MB) (>) brukes også som kapasitetsgrenser.",
+    "notEvaluated": "Ikke evaluert",
     "metric": "Målemetrikk",
     "conn": "Tilkobling",
     "allConns": "Alle tilkoblinger",
@@ -501,7 +493,278 @@
       "RATE": "For mange forespørsler. Vennligst prøv igjen om kort tid.",
       "TIMEOUT": "schema.pi svarer sakte. Vennligst prøv igjen om kort tid.",
       "RULE_LIMIT": "Maksimalt 50 regler per kobling.",
-      "NOT_FOUND": "Regel ikke funnet."
+      "NOT_FOUND": "Regel ikke funnet.",
+      "CONN_FAIL": "Kunne ikke koble til databasen. Sjekk tilkoblingsinnstillingene og DB-statusen.",
+      "LINK_DOWN": "Kunne ikke nå schema.pi. Prøv igjen om kort tid.",
+      "PGSS_MISSING": "pg_stat_statements er ikke installert, så treg SQL er utilgjengelig.",
+      "CONN_UNSUPPORTED": "Denne tilkoblingen støtter ikke overvåking (kun PostgreSQL-servertilkoblinger).",
+      "CONN_DISABLED": "Denne tilkoblingen er deaktivert. Aktiver den i schema.pi.",
+      "INVALID_INPUT": "Forespørselen er ugyldig."
+    },
+    "board": {
+      "subtitle": "Hva du skal gjøre med denne DB-en akkurat nå – 14 signaler om OK, advarsel eller risiko, med løsninger, på et øyeblikk.",
+      "refresh": {
+        "updated": "Per {time} · oppdateres hvert minutt",
+        "now": "Oppdater nå",
+        "busy": "Laster inn…",
+        "stale": "Foreldet · {min} min siden"
+      },
+      "level": {
+        "RISK": "Risiko",
+        "WARN": "Advarsel",
+        "OK": "OK",
+        "UNKNOWN": "Ukjent",
+        "NA": "Ikke relevant"
+      },
+      "overall": {
+        "RISK": "Risiko – handling er nødvendig nå",
+        "WARN": "Advarsel – noen elementer trenger en sjekk",
+        "UNKNOWN": "Ukjent – sjekk tilkoblingen",
+        "OK": "OK – alle signaler er innenfor grensene",
+        "CONN_DOWN": "Kan ikke koble til DB-en – sjekk tilkoblingen først",
+        "NA": "Ikke relevant"
+      },
+      "kpi": {
+        "sess": "Sesjoner / maks",
+        "tps": "Transaksjoner/s",
+        "cache": "Cache-treffrate",
+        "size": "DB-størrelse"
+      },
+      "todo": {
+        "title": "Å gjøre nå",
+        "more": "Vis {n} mer",
+        "less": "Vis mindre",
+        "setup": "Sett opp disse for å se mer",
+        "none": "Ingen risiko- eller advarselselementer krever handling akkurat nå.",
+        "unknown": "Kunne ikke sjekke {n} signal(er) – se kortene for årsaken.",
+        "myRule": "Min regel brutt: {rule}",
+        "copySql": "Kopier SQL",
+        "copied": "Kopiert"
+      },
+      "cat": {
+        "avail": "Tilgjengelighet",
+        "load": "Belastning og ventetider",
+        "eff": "Effektivitet",
+        "store": "Lagring og vedlikehold",
+        "protect": "Beskyttelse (sikkerhetskopi, replikering)"
+      },
+      "card": {
+        "thr": "Grenser: advarsel {warn} · risiko {risk}",
+        "thrDown": "Grenser: advarsel under {warn} · risiko under {risk}",
+        "more": "Slik løser du det",
+        "addRule": "Legg til en regel for denne målingen",
+        "basisLive": "Siste minutt",
+        "basisStored": "Kumulativ",
+        "since": "statistikk tilbakestilt {at}",
+        "partial": "Delvis visning (500-raders grense eller manglende privilegier)."
+      },
+      "sig": {
+        "AVAIL": "DB-respons",
+        "CONN_USE": "Tilkoblingsbruk (denne DB)",
+        "URL": "Tjeneste-URL-er",
+        "LONG_QRY": "Langvarige spørringer",
+        "IDLE_TX": "Inaktive transaksjoner",
+        "LOCK_WAIT": "Låseventer",
+        "CACHE_HIT": "Cache-treffrate",
+        "XACT_ERR": "Tilbakerullinger og dødlåser",
+        "SLOW_SQL": "Treg SQL",
+        "STORAGE": "Lagring",
+        "VACUUM": "Vacuum",
+        "INDEX": "Indekshelse",
+        "BACKUP": "Sikkerhetskopi (WAL-arkiv)",
+        "REPL": "Replikeringforsinkelse"
+      },
+      "fix": {
+        "AVAIL": "Treg respons eller en nylig omstart – sjekk tilkoblingsinnstillingene og DB-serverstatusen.",
+        "AVAIL_DOWN": "Kunne ikke koble til DB – sjekk tilkoblingsinnstillingene og at DB-serveren er oppe.",
+        "CONN_USE": "{sess}/{max} sesjoner på denne DB (ikke klyngedekkende – andre databaser er ekskludert) – lukk inaktive tilkoblinger eller legg til en tilkoblingspooler (pgbouncer).",
+        "URL": "{n} sjekkede URL-er feiler · maks respons {ms}ms – se schema.pi-monitoren for årsaken.",
+        "LONG_QRY": "En spørring har kjørt i {sec}s – gjennomgå planen og juster den, eller la en DBA avbryte den.",
+        "IDLE_TX": "En transaksjon har vært inaktiv i {sec}s – finn den manglende commit i appen og sett en tidsavbrudd.",
+        "LOCK_WAIT": "{n} sesjoner venter på låser – finn den blokkerende sesjonen og avslutt transaksjonen.",
+        "CACHE_HIT": "Cache-treffrate {pct}% – se etter fullstendige skanninger av store tabeller eller gjennomgå shared_buffers.",
+        "XACT_ERR": "Tilbakerullingsrate {pct}%, {dlck} dødlåser – sjekk de feilende transaksjonene og appens feillogger.",
+        "SLOW_SQL": "En spørring har et gjennomsnitt på {ms} ms – juster de øverste spørringene etter total tid ved hjelp av planene deres.",
+        "STORAGE": "DB ({gb} GB) er nær grensen (dager igjen {days}) – rydd opp i store tabeller eller legg til kapasitet.",
+        "VACUUM": "{tbl} har mange døde rader eller foreldet statistikk – gjennomgå VACUUM (ANALYZE) og autovacuum-innstillingene.",
+        "INDEX": "{n} indeksfunn (ugyldige, ubrukte, fullstendige skanninger) – se fanen for tabell- og indekshelse for målene.",
+        "BACKUP": "WAL-arkivering er av eller stoppet – sjekk archive_mode, archive_command og sikkerhetskopistatus.",
+        "REPL": "Replikeringforsinkelse {sec}s – sjekk standby-statusen og nettverket.",
+        "PGSS": "pg_stat_statements er ikke installert, så treg SQL er utilgjengelig – aktiver den med SQL-en nedenfor (serveromstart kreves)."
+      },
+      "reason": {
+        "CONN_DOWN": "Ikke vurdert fordi DB-tilkoblingen er nede.",
+        "PGSS": "pg_stat_statements er ikke installert.",
+        "VER": "Tilgjengelig på PostgreSQL 13 eller nyere.",
+        "SAMPLE": "Ikke nok prøver ennå.",
+        "NO_LIMIT": "Ingen størrelsesgrense, så bruken er ikke vurdert – legg til en DB-størrelse (MB)-regel (>) for å bruke den som grense.",
+        "RESET": "Statistikken ble tilbakestilt for mindre enn 7 dager siden, så ubrukte indekser er ikke vurdert.",
+        "STALE": "Ingen nylige sjekkposter.",
+        "STANDBY": "Ikke aktuelt på en standby-server.",
+        "NONE": "Ingenting å sjekke.",
+        "GRANT": "Manglende privilegier – gi pg_monitor-rollen til tilkoblingskontoen.",
+        "LINK": "schema.pi-spørring mislyktes ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Sjekk tilkoblingsstatusen i Tilkoblinger, og korriger tilkoblingsinnstillingene (vert, port, konto) i schema.pi.",
+          "2": "Sjekk at DB-serveren er oppe og om den nylig ble startet på nytt.",
+          "3": "Hvis den fortsatt er treg, sjekk serverbelastning (CPU, disk) og nettverket."
+        },
+        "CONN_USE": {
+          "1": "Se sesjonstall etter bruker og tilstand i fanen for aktivitet og låser.",
+          "2": "Hvis mange er inaktive, reduser app-poolen eller legg til en tilkoblingspooler.",
+          "3": "Øk max_connections forsiktig, med tanke på minne."
+        },
+        "URL": {
+          "1": "Se de feilende URL-ene og statuskodene i schema.pi-monitoren.",
+          "2": "Sjekk app-distribusjonen og eksterne avhengigheter.",
+          "3": "Hvis det gjentar seg, legg til en regel for URL-feiltelling (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Finn langvarige spørringer og deres brukere i fanen for aktivitet og låser.",
+          "2": "Gjennomgå planen i SQL-justering og korriger indekser eller betingelser.",
+          "3": "Hvis det haster, avbryter en DBA den med pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Se den siste spørringen for inaktive transaksjonssesjoner i fanen for aktivitet og låser.",
+          "2": "Finn den manglende commit eller rollback i app-koden.",
+          "3": "Begrens den med idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Finn den blokkerende sesjonen (blocked_by) i fanen for aktivitet og låser.",
+          "2": "Avslutt transaksjonen eller la en DBA avbryte den.",
+          "3": "Korriger batcher eller transaksjonsrekkefølge som holder de samme radene lenge."
+        },
+        "CACHE_HIT": {
+          "1": "Finn fullstendige skanninger av store tabeller i fanen for trege spørringer.",
+          "2": "Legg til de nødvendige indeksene for å lese færre blokker.",
+          "3": "Hvis minnet tillater det, gjennomgå shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Finn årsaker til tilbakerulling (begrensningsbrudd, tidsavbrudd) i appens feillogger.",
+          "2": "Hvis det er dødlåser, lås tabeller i en konsistent rekkefølge.",
+          "3": "Sjekk at gjenforsøkslogikken ikke øker tilbakerullingene."
+        },
+        "SLOW_SQL": {
+          "1": "Velg de øverste spørringene etter total tid i fanen for trege spørringer.",
+          "2": "Gjennomgå planer i SQL-justering og korriger indekser eller joins.",
+          "3": "Etter korrigering, sjekk at gjennomsnittstiden gikk ned."
+        },
+        "STORAGE": {
+          "1": "Se veksttrenden og estimert full dato i fanen for størrelsestrend.",
+          "2": "Rydd opp i store tabeller, indekser og gamle data.",
+          "3": "Om nødvendig, legg til disk og oppdater grenseverdien."
+        },
+        "VACUUM": {
+          "1": "Se tabeller med mange døde rader i fanen for tabell- og indekshelse.",
+          "2": "En DBA kjører VACUUM (ANALYZE).",
+          "3": "Hvis det gjentar seg, senk autovacuum-terskelen for den tabellen."
+        },
+        "INDEX": {
+          "1": "Se ugyldige eller ubrukte indekser og fullskanningstabeller i fanen for tabell- og indekshelse.",
+          "2": "Gjenoppbygg ugyldige indekser; en DBA gjennomgår og sletter ubrukte.",
+          "3": "Design indekser i SQL-justering for tabeller med mange fullstendige skanninger."
+        },
+        "BACKUP": {
+          "1": "Se archive_mode og siste arkiveringstid i fanen for sikkerhetskopi og gjenoppretting.",
+          "2": "Hvis arkivering mislykkes, sjekk archive_command og ledig plass på destinasjonen.",
+          "3": "På en administrert DB, sjekk sikkerhetskopieringsinnstillingene til leverandøren."
+        },
+        "REPL": {
+          "1": "Se tilstanden og forsinkelsen for hver standby i fanen for replikering og DR.",
+          "2": "Sjekk disk, CPU og nettverk på standby-serveren.",
+          "3": "Hvis den ikke strømmer, sjekk standby-loggene."
+        }
+      },
+      "sqlNote": "SQL-en nedenfor er skrivebeskyttet, for kontroll – rettelser (VACUUM, DROP INDEX, pg_terminate_backend) utføres av en DBA.",
+      "go": {
+        "activity": "Aktivitet og låser",
+        "top": "Trege spørringer",
+        "health": "Tabell- og indekshelse",
+        "trend": "Kapasitetstrend",
+        "params": "Parameterkontroll",
+        "repl": "Replikeringkontroll",
+        "backup": "Sikkerhetskopikontroll",
+        "sqlLab": "SQL-justering",
+        "drift": "Driftssammenligning",
+        "connect": "Tilkoblinger",
+        "schema": "schema.pi-monitor"
+      },
+      "chart": {
+        "title": "Trender og rangeringer",
+        "note": "Trender registreres hvert minutt mens denne skjermen er åpen (ingen bakgrunnssamling).",
+        "gauges": "Tilkoblings- og cache-målere",
+        "sessState": "Sesjoner akkurat nå",
+        "sessTrend": "Sesjonstrend og låseventer",
+        "tpsCombo": "Gjennomstrømning og tilbakerullingsrate",
+        "cacheTrend": "Cache-treffratetrend",
+        "capacity": "DB-størrelse og prognose",
+        "slowTop": "Treg SQL topp 10",
+        "slowLegend": "Stolpelengde = total tid · farge = gjennomsnittlig tid (▲ advarsel fra {warn}ms · ✕ risiko fra {risk}ms)",
+        "sizeTop": "Plass topp 10",
+        "heat": "Risiko etter signal over tid",
+        "q": {
+          "gauges": "Fylles tilkoblingene opp? Serveres lesninger fra minnet?",
+          "sessState": "Hva gjør sesjonene nå?",
+          "sessTrend": "Øker låseventene når sesjonene hoper seg opp?",
+          "tpsCombo": "Beveger gjennomstrømning og feilrate seg sammen?",
+          "cacheTrend": "Når falt cache-treffraten?",
+          "capacity": "Når blir DB full?",
+          "slowTop": "Hva skal justeres først? (etter total tid)",
+          "sizeTop": "Hva tar plassen?",
+          "heat": "Er risikoen en engangshendelse eller gjentakende?"
+        },
+        "asTable": "Vis som tabell",
+        "needHistory": "Ingen trend ennå – hold denne skjermen åpen i noen minutter.",
+        "needPerf": "Ingen størrelseshistorikk – samle inn i ytelsesfanen eller hold denne skjermen åpen.",
+        "noSess": "Ingen sesjoner.",
+        "noWait": "Ingen ventetider",
+        "noData": "Ingen data å vise.",
+        "loading": "Laster inn…",
+        "waitTop": "Ventearrangementer",
+        "lockWait": "Låseventer",
+        "tps": "Transaksjoner/s",
+        "rlbk": "Tilbakerullingsrate (%)",
+        "cacheHit": "Cache-treffrate",
+        "size": "DB-størrelse",
+        "limit": "Grense",
+        "forecast": "Prognose",
+        "daysLeft": "Dager igjen",
+        "capNote": "Vekst per dag {perDay} · {days} dager til grensen",
+        "tbl": "Tabell",
+        "idxToast": "Indeks + TOAST",
+        "mix": {
+          "active": "Aktiv",
+          "idleTx": "Inaktiv i transaksjon",
+          "idle": "Inaktiv",
+          "total": "sesjoner"
+        },
+        "col": {
+          "item": "Element",
+          "value": "Verdi",
+          "time": "Tid",
+          "calls": "Kall",
+          "total": "Totalt (ms)",
+          "mean": "Gjennomsnitt (ms)",
+          "share": "Andel"
+        }
+      },
+      "empty": {
+        "noConn": "Denne taksonomien har ingen PostgreSQL-servertilkobling å overvåke – viser kun URL-er og tjenestestatus.",
+        "unsupported": "Denne tilkoblingen støtter ikke overvåking (kun PostgreSQL-servertilkoblinger).",
+        "connFail": "Kunne ikke koble til databasen – sjekk tilkoblingsinnstillingene og DB-statusen.",
+        "linkDown": "Kunne ikke nå schema.pi – prøver automatisk på nytt.",
+        "linkAuth": "Tilkoblingstokenet er utløpt – utsted et nytt token i schema.pi og registrer det.",
+        "timeout": "Svarene er trege – prøver automatisk på nytt.",
+        "rate": "For mange forespørsler, så oppdateringsintervallet ble økt."
+      },
+      "aux": {
+        "rules": "Mine varslingsregler ({n} aktive)",
+        "schemaSvc": "Tjenestestatus – schema.pi-svar",
+        "schemaSvcNote": "App-målinger for de siste 60 minuttene lagret av schema.pi.",
+        "source": "Datakilde: Mål-DB leses kun via schema.pi navngitte spørringer (skrivebeskyttet); trender lagrer statistikk kun i dbms.pi (ingen raddata)."
+      }
     }
   },
   "ops": {
@@ -697,6 +960,7 @@
     "trend": {
       "limit": "Størrelsesterskel",
       "empty": "Ingen øyeblikksbilder de siste 30 dagene",
+      "chart": "DB-størrelse de siste 30 dagene",
       "now": "Nåværende størrelse",
       "perDay": "Vekst per dag",
       "needMore": "Trenger 2+ øyeblikksbilder",
@@ -904,6 +1168,12 @@
   },
   "nav": {
     "label": "Funksjoner",
+    "groups": {
+      "monitor": "Overvåking",
+      "drift": "Konsistens",
+      "lake": "Lake",
+      "admin": "Admin"
+    },
     "connect": "Koble til",
     "sqlLab": "SQL-justering",
     "perf": "Ytelse",

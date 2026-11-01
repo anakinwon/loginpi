@@ -13,7 +13,7 @@
       "connect": "Registreerige schema.pi lingitoken ja kontrollige ühenduse olekut",
       "sqlLab": "Plaanipuu, hoiatused, võrdlus ja antipatternite kontroll standarddomeenide vastu",
       "perf": "Aeglaste päringute Top-N, tabeli/indeksi seisund, võimsuse prognoos, tegevus ja lukud",
-      "monitor": "Rakenduse, DB ja URL-i mõõdikute kokkuvõte lävehoiatused",
+      "monitor": "14 signaali (normaalne, hoiatus, oht) ning mida teha ja kuidas lahendada – kõik ühe pilguga",
       "drift": "Võrrelge schema.pi mudelit ja DDL-i ajalugu tegeliku kataloogiga, mõõtke indeksi efekti",
       "migration": "Topoloogiline laadimisjärjekord, tükid, kontrollnimekiri ja verifitseerimise SQL",
       "pipeline": "Muutuste jäädvustamise eelkontroll ja allika→teisenduse→sihtmärgi torujuhtme definitsioonid",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Monitooringukeskus",
-    "collectNote": "Kogumine toimub schema.pi-s — migratsioon planeeritud (D7). See leht loeb schema.pi monitori kokkuvõtet.",
+    "title": "Monitooring",
     "noLink": "Valige või registreerige esmalt schema.pi link.",
     "goConnect": "Registreeri link",
     "period": "Periood",
@@ -457,16 +456,9 @@
       "360": "6 tundi",
       "1440": "24 tundi"
     },
-    "refresh": "Värskenda",
     "loading": "Laadimine…",
-    "updatedAt": "{area} · seisuga {time} (automaatne värskendamine iga 30s järel)",
-    "appTitle": "Rakenduse jõudlus",
-    "dbTitle": "DB olek ühenduse järgi",
-    "urlTitle": "URL-i kontrollid",
-    "empty": "Andmeid pole kuvamiseks.",
-    "breachTitle": "{n} läve ületamist",
-    "rulesTitle": "Läve reeglid",
-    "rulesNote": "Reeglid salvestatakse selle lingi jaoks ja hinnatakse saadud kokkuvõtte alusel; rikkumised saavad punase piiri (teavitused tulevad hiljem).",
+    "rulesNote": "Reeglid salvestatakse sellele ühendusele ja neid hinnatakse iga kord, kui tahvlit värskendatakse (DB seanss/luku ooteaeg/vahemälu tabamuste määr iga 1 minuti järel, DB suurus/URL-i vastamisaeg/tõrge iga 5 minuti järel). Rikutud signaalid eskaleeruvad ohuks ja märgitakse „Minu reegel“ (teavituste saatmine on järgmine samm). Teenuse (APP) mõõdikute reegleid ei hinnata. DB suuruse (MB) reegleid (>) kasutatakse ka mahupiirangutena.",
+    "notEvaluated": "Hindamata",
     "metric": "Mõõdik",
     "conn": "Ühendus",
     "allConns": "Kõik ühendused",
@@ -501,7 +493,278 @@
       "RATE": "Liiga palju päringuid. Palun proovige varsti uuesti.",
       "TIMEOUT": "schema.pi vastab aeglaselt. Palun proovige varsti uuesti.",
       "RULE_LIMIT": "Kuni 50 reeglit lingi kohta.",
-      "NOT_FOUND": "Reeglit ei leitud."
+      "NOT_FOUND": "Reeglit ei leitud.",
+      "CONN_FAIL": "Andmebaasiga ei õnnestunud ühendust luua. Kontrollige ühenduse seadeid ja DB olekut.",
+      "LINK_DOWN": "schema.pi-ga ei õnnestunud ühendust luua. Proovige mõne aja pärast uuesti.",
+      "PGSS_MISSING": "pg_stat_statements pole installitud, seega aeglased SQL-päringud pole saadaval.",
+      "CONN_UNSUPPORTED": "See ühendus ei toeta monitooringut (ainult PostgreSQL-i serveri ühendused).",
+      "CONN_DISABLED": "See ühendus on keelatud. Lubage see schema.pi-s.",
+      "INVALID_INPUT": "Päring on kehtetu."
+    },
+    "board": {
+      "subtitle": "Mida selle DB-ga praegu teha – 14 signaali OK, hoiatuse või riski tasemel, koos lahendustega, ühe pilguga.",
+      "refresh": {
+        "updated": "Seisuga {time} · värskendatakse iga minut",
+        "now": "Värskenda kohe",
+        "busy": "Laadimine…",
+        "stale": "Aegunud · {min} min tagasi"
+      },
+      "level": {
+        "RISK": "Risk",
+        "WARN": "Hoiatus",
+        "OK": "OK",
+        "UNKNOWN": "Teadmata",
+        "NA": "Pole saadaval"
+      },
+      "overall": {
+        "RISK": "Risk – kohene tegutsemine vajalik",
+        "WARN": "Hoiatus – mõned elemendid vajavad ülevaatamist",
+        "UNKNOWN": "Teadmata – kontrollige ühendust",
+        "OK": "OK – kõik signaalid on piirides",
+        "CONN_DOWN": "DB-ga ei saa ühendust – kontrollige esmalt ühendust",
+        "NA": "Pole saadaval"
+      },
+      "kpi": {
+        "sess": "Seansid / maks",
+        "tps": "Tehingud/s",
+        "cache": "Vahemälu tabamuste määr",
+        "size": "DB suurus"
+      },
+      "todo": {
+        "title": "Mida kohe teha",
+        "more": "Näita {n} rohkem",
+        "less": "Näita vähem",
+        "setup": "Seadistage need, et näha rohkem",
+        "none": "Praegu pole ühtegi riski- või hoiatusüksust, mis vajaks tegutsemist.",
+        "unknown": "Ei saanud kontrollida {n} signaali – vaadake põhjust kaartidelt.",
+        "myRule": "Minu reeglit rikuti: {rule}",
+        "copySql": "Kopeeri SQL",
+        "copied": "Kopeeritud"
+      },
+      "cat": {
+        "avail": "Saadavus",
+        "load": "Koormus ja ooteajad",
+        "eff": "Tõhusus",
+        "store": "Salvestusruum ja hooldus",
+        "protect": "Kaitse (varundamine, replikatsioon)"
+      },
+      "card": {
+        "thr": "Piirid: hoiatus {warn} · risk {risk}",
+        "thrDown": "Piirid: hoiatus alla {warn} · risk alla {risk}",
+        "more": "Kuidas parandada",
+        "addRule": "Lisa sellele mõõdikule reegel",
+        "basisLive": "Viimane minut",
+        "basisStored": "Kumulatiivne",
+        "since": "statistika lähtestati {at}",
+        "partial": "Osaline vaade (500 rea piirang või puuduvad õigused)."
+      },
+      "sig": {
+        "AVAIL": "DB vastus",
+        "CONN_USE": "Ühenduse kasutus (see DB)",
+        "URL": "Teenuse URL-id",
+        "LONG_QRY": "Pikalt kestvad päringud",
+        "IDLE_TX": "Tühikäigul olevad tehingud",
+        "LOCK_WAIT": "Luku ooteajad",
+        "CACHE_HIT": "Vahemälu tabamuste määr",
+        "XACT_ERR": "Tagasipöörded ja ummikseisud",
+        "SLOW_SQL": "Aeglane SQL",
+        "STORAGE": "Salvestusruum",
+        "VACUUM": "Vacuum",
+        "INDEX": "Indeksi seisund",
+        "BACKUP": "Varundamine (WAL-arhiiv)",
+        "REPL": "Replikatsiooni viivitus"
+      },
+      "fix": {
+        "AVAIL": "Aeglane vastus või hiljutine taaskäivitus – kontrollige ühenduse seadeid ja DB serveri olekut.",
+        "AVAIL_DOWN": "DB-ga ei õnnestunud ühendust luua – kontrollige ühenduse seadeid ja DB serveri käivitamist.",
+        "CONN_USE": "{sess}/{max} seanssi selles DB-s (mitte klastriüleselt – teised andmebaasid on välja jäetud) – sulgege tühikäigul olevad ühendused või lisage ühenduste haldur (pgbouncer).",
+        "URL": "{n} kontrollitud URL-i ebaõnnestus · maksimaalne vastus {ms}ms – vaadake põhjust schema.pi monitorist.",
+        "LONG_QRY": "Päring on kestnud {sec}s – vaadake selle plaani üle ja häälestage seda või laske DBA-l see tühistada.",
+        "IDLE_TX": "Tehing on olnud tühikäigul {sec}s – leidke rakendusest puuduv commit ja määrake ajapiirang.",
+        "LOCK_WAIT": "{n} seanssi ootavad lukke – leidke blokeeriv seanss ja lõpetage selle tehing.",
+        "CACHE_HIT": "Vahemälu tabamuste määr {pct}% – otsige suurte tabelite täielikke skaneeringuid või vaadake üle shared_buffers.",
+        "XACT_ERR": "Tagasipöörde määr {pct}%, {dlck} ummikseisu – kontrollige ebaõnnestuvaid tehinguid ja rakenduse vealogisid.",
+        "SLOW_SQL": "Päringu keskmine aeg on {ms} ms – häälestage kõige aeganõudvamaid päringuid nende plaanide abil.",
+        "STORAGE": "DB ({gb} GB) on oma piiri lähedal (päevi jäänud {days}) – puhastage suuri tabeleid või lisage mahtu.",
+        "VACUUM": "{tbl}-l on palju surnud ridu või aegunud statistikat – vaadake üle VACUUM (ANALYZE) ja autovacuum seaded.",
+        "INDEX": "{n} indeksi leid (kehtetu, kasutamata, täielikud skaneeringud) – vaadake sihtmärke tabeli ja indeksi seisundi vahekaardilt.",
+        "BACKUP": "WAL-arhiveerimine on välja lülitatud või seiskunud – kontrollige archive_mode, archive_command ja varunduse olekut.",
+        "REPL": "Replikatsiooni viivitus {sec}s – kontrollige ooterežiimi olekut ja võrku.",
+        "PGSS": "pg_stat_statements pole installitud, seega aeglased SQL-päringud pole saadaval – lubage see alloleva SQL-iga (vajalik serveri taaskäivitus)."
+      },
+      "reason": {
+        "CONN_DOWN": "Ei hinnatud, kuna DB ühendus on katkenud.",
+        "PGSS": "pg_stat_statements pole installitud.",
+        "VER": "Saadaval PostgreSQL 13 või uuemas versioonis.",
+        "SAMPLE": "Proove pole veel piisavalt.",
+        "NO_LIMIT": "Suuruspiirang puudub, seega kasutust ei hinnata – lisage DB suuruse (MB) reegel (>) selle kasutamiseks piiranguna.",
+        "RESET": "Statistika lähtestati vähem kui 7 päeva tagasi, seega kasutamata indekseid ei hinnata.",
+        "STALE": "Hiljutisi kontrollkirjeid pole.",
+        "STANDBY": "Ei kehti ooterežiimi serveris.",
+        "NONE": "Midagi kontrollida pole.",
+        "GRANT": "Puuduvad õigused – andke ühenduse kontole pg_monitor roll.",
+        "LINK": "schema.pi päring ebaõnnestus ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Kontrollige ühenduse olekut Ühenduste halduses ja parandage ühenduse seaded (host, port, konto) schema.pi-s.",
+          "2": "Kontrollige, kas DB server on käivitatud ja kas see hiljuti taaskäivitati.",
+          "3": "Kui see jääb aeglaseks, kontrollige serveri koormust (CPU, ketas) ja võrku."
+        },
+        "CONN_USE": {
+          "1": "Vaadake seansside arvu kasutaja ja oleku järgi tegevuse ja lukkude vahekaardil.",
+          "2": "Kui paljud on tühikäigul, vähendage rakenduse ühenduste hulka või lisage ühenduste haldur.",
+          "3": "Suurendage max_connections ettevaatlikult, arvestades mälu."
+        },
+        "URL": {
+          "1": "Vaadake ebaõnnestunud URL-e ja olekukoode schema.pi monitorist.",
+          "2": "Kontrollige rakenduse juurutamist ja väliseid sõltuvusi.",
+          "3": "Kui see kordub, lisage URL-i ebaõnnestumiste arvu (URL_FAIL_CNT) reegel."
+        },
+        "LONG_QRY": {
+          "1": "Leidke pikalt kestvad päringud ja nende kasutajad tegevuse ja lukkude vahekaardilt.",
+          "2": "Vaadake plaani üle SQL-i häälestuses ja parandage indekseid või tingimusi.",
+          "3": "Kui kiireloomuline, tühistab DBA selle pg_cancel_backend-iga."
+        },
+        "IDLE_TX": {
+          "1": "Vaadake tühikäigul olevate tehingute seansside viimast päringut tegevuse ja lukkude vahekaardil.",
+          "2": "Leidke rakenduse koodist puuduv commit või rollback.",
+          "3": "Piirake seda idle_in_transaction_session_timeout-iga."
+        },
+        "LOCK_WAIT": {
+          "1": "Leidke blokeeriv seanss (blocked_by) tegevuse ja lukkude vahekaardilt.",
+          "2": "Lõpetage selle tehing või laske DBA-l see tühistada.",
+          "3": "Parandage partiid või tehingute järjekord, mis hoiavad samu ridu pikalt kinni."
+        },
+        "CACHE_HIT": {
+          "1": "Leidke suurte tabelite täielikud skaneeringud aeglaste päringute vahekaardilt.",
+          "2": "Lisage vajalikud indeksid, et lugeda vähem plokke.",
+          "3": "Kui mälu lubab, vaadake üle shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Leidke tagasipöörde põhjused (piirangute rikkumised, ajapiirangud) rakenduse vealogidest.",
+          "2": "Kui on ummikseisud, lukustage tabelid järjepidevas järjekorras.",
+          "3": "Kontrollige, et kordusloogika ei suurendaks tagasipöördeid."
+        },
+        "SLOW_SQL": {
+          "1": "Valige aeglaste päringute vahekaardilt kõige aeganõudvamad päringud.",
+          "2": "Vaadake plaanid üle SQL-i häälestuses ja parandage indekseid või ühendusi.",
+          "3": "Pärast parandamist kontrollige, et keskmine aeg langes."
+        },
+        "STORAGE": {
+          "1": "Vaadake kasvu trendi ja hinnangulist täitumise kuupäeva suuruse trendi vahekaardilt.",
+          "2": "Puhastage suuri tabeleid, indekseid ja vanu andmeid.",
+          "3": "Vajadusel lisage ketast ja värskendage piirangu reeglit."
+        },
+        "VACUUM": {
+          "1": "Vaadake tabeleid, millel on palju surnud ridu tabeli ja indeksi seisundi vahekaardilt.",
+          "2": "DBA käivitab VACUUM (ANALYZE).",
+          "3": "Kui see kordub, vähendage selle tabeli autovacuum lävesid."
+        },
+        "INDEX": {
+          "1": "Vaadake kehtetuid või kasutamata indekseid ja täielikult skaneeritud tabeleid tabeli ja indeksi seisundi vahekaardilt.",
+          "2": "Ehitage kehtetud indeksid uuesti üles; DBA vaatab üle ja kustutab kasutamata indeksid.",
+          "3": "Kujundage indeksid SQL-i häälestuses tabelitele, millel on palju täielikke skaneeringuid."
+        },
+        "BACKUP": {
+          "1": "Vaadake archive_mode ja viimast arhiveerimise aega varundamise ja taastamise vahekaardilt.",
+          "2": "Kui arhiveerimine ebaõnnestub, kontrollige archive_command ja vaba ruumi sihtkohas.",
+          "3": "Hallatud DB-s kontrollige teenusepakkuja varunduse seadeid."
+        },
+        "REPL": {
+          "1": "Vaadake iga ooterežiimi olekut ja viivitust replikatsiooni ja DR vahekaardilt.",
+          "2": "Kontrollige ooterežiimi ketast, CPU-d ja võrku.",
+          "3": "Kui see ei voogesita, kontrollige ooterežiimi logisid."
+        }
+      },
+      "sqlNote": "Allolev SQL on ainult lugemiseks, kontrollimiseks – parandused (VACUUM, DROP INDEX, pg_terminate_backend) käivitab DBA.",
+      "go": {
+        "activity": "Tegevus ja lukud",
+        "top": "Aeglased päringud",
+        "health": "Tabeli ja indeksi seisund",
+        "trend": "Mahutrend",
+        "params": "Parameetrite kontroll",
+        "repl": "Replikatsiooni kontroll",
+        "backup": "Varunduse kontroll",
+        "sqlLab": "SQL-i häälestamine",
+        "drift": "Triivi võrdlus",
+        "connect": "Ühendused",
+        "schema": "schema.pi monitor"
+      },
+      "chart": {
+        "title": "Trendid ja edetabelid",
+        "note": "Trendid salvestatakse iga minuti järel, kui see ekraan on avatud (taustakogumist pole).",
+        "gauges": "Ühenduse ja vahemälu näidikud",
+        "sessState": "Seansid praegu",
+        "sessTrend": "Seansside trend ja luku ooteajad",
+        "tpsCombo": "Läbilaskevõime ja tagasipöörde määr",
+        "cacheTrend": "Vahemälu tabamuste määra trend",
+        "capacity": "DB suurus ja prognoos",
+        "slowTop": "Aeglane SQL TOP 10",
+        "slowLegend": "Riba pikkus = koguaeg · värv = keskmine aeg (▲ hoiatus alates {warn}ms · ✕ risk alates {risk}ms)",
+        "sizeTop": "Ruum TOP 10",
+        "heat": "Risk signaali järgi aja jooksul",
+        "q": {
+          "gauges": "Kas ühendused täituvad? Kas lugemised serveeritakse mälust?",
+          "sessState": "Mida seansid praegu teevad?",
+          "sessTrend": "Kas luku ooteajad suurenevad, kui seansid kuhjuvad?",
+          "tpsCombo": "Kas läbilaskevõime ja ebaõnnestumiste määr liiguvad koos?",
+          "cacheTrend": "Millal vahemälu tabamuste määr langes?",
+          "capacity": "Millal DB täitub?",
+          "slowTop": "Mida esimesena häälestada? (koguaega järgi)",
+          "sizeTop": "Mis võtab ruumi?",
+          "heat": "Kas risk on ühekordne või korduv?"
+        },
+        "asTable": "Vaata tabelina",
+        "needHistory": "Trendi pole veel – hoidke seda ekraani mõni minut avatuna.",
+        "needPerf": "Suuruse ajalugu puudub – koguge jõudluse vahekaardilt või hoidke see ekraan avatuna.",
+        "noSess": "Seansse pole.",
+        "noWait": "Ooteid pole",
+        "noData": "Andmeid pole kuvamiseks.",
+        "loading": "Laadimine…",
+        "waitTop": "Ooteüritused",
+        "lockWait": "Luku ooteajad",
+        "tps": "Tehingud/s",
+        "rlbk": "Tagasipöörde määr (%)",
+        "cacheHit": "Vahemälu tabamuste määr",
+        "size": "DB suurus",
+        "limit": "Piirang",
+        "forecast": "Prognoos",
+        "daysLeft": "Päevi jäänud",
+        "capNote": "Kasv päevas {perDay} · {days} päeva piirini",
+        "tbl": "Tabel",
+        "idxToast": "Indeks + TOAST",
+        "mix": {
+          "active": "Aktiivne",
+          "idleTx": "Tühikäigul tehingus",
+          "idle": "Tühikäigul",
+          "total": "seansid"
+        },
+        "col": {
+          "item": "Üksus",
+          "value": "Väärtus",
+          "time": "Aeg",
+          "calls": "Kutsed",
+          "total": "Kokku (ms)",
+          "mean": "Keskmine (ms)",
+          "share": "Osa"
+        }
+      },
+      "empty": {
+        "noConn": "Selles taksonoomias pole PostgreSQL-i serveri ühendust, mida monitoorida – kuvatakse ainult URL-id ja teenuse olek.",
+        "unsupported": "See ühendus ei toeta monitooringut (ainult PostgreSQL-i serveri ühendused).",
+        "connFail": "Andmebaasiga ei õnnestunud ühendust luua – kontrollige ühenduse seadeid ja DB olekut.",
+        "linkDown": "schema.pi-ga ei õnnestunud ühendust luua – proovitakse automaatselt uuesti.",
+        "linkAuth": "Ühenduse token on aegunud – väljastage schema.pi-s uus token ja registreerige see.",
+        "timeout": "Vastused on aeglased – proovitakse automaatselt uuesti.",
+        "rate": "Liiga palju päringuid, seega värskendamise intervalli suurendati."
+      },
+      "aux": {
+        "rules": "Minu hoiatuste reeglid ({n} aktiivset)",
+        "schemaSvc": "Teenuse olek – schema.pi vastused",
+        "schemaSvcNote": "schema.pi salvestatud rakenduse mõõdikud viimase 60 minuti kohta.",
+        "source": "Andmeallikas: siht-DB-d loetakse ainult schema.pi nimetatud päringute kaudu (ainult lugemiseks); trendid salvestavad statistikat ainult dbms.pi-sse (ridade andmeid ei salvestata)."
+      }
     }
   },
   "ops": {
@@ -904,6 +1167,12 @@
   },
   "nav": {
     "label": "Funktsioonid",
+    "groups": {
+      "monitor": "Monitooring",
+      "drift": "Järjepidevus",
+      "lake": "Andmeladu",
+      "admin": "Administraator"
+    },
     "connect": "Ühenda",
     "sqlLab": "SQL-i häälestamine",
     "perf": "Jõudlus",

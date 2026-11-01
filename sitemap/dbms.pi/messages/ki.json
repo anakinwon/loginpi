@@ -13,7 +13,7 @@
       "connect": "Register a schema.pi link token and check connection status",
       "sqlLab": "Plan tree, warnings, comparison and anti-pattern checks against standard domains",
       "perf": "Slow query Top-N, table/index health, capacity forecast, activity and locks",
-      "monitor": "App, DB and URL metric summary with threshold alerts",
+      "monitor": "Normal, warning, and danger for 14 signals, plus what to do and how to solve it at a glance",
       "drift": "Compare schema.pi model and DDL history with the real catalog, measure index effect",
       "migration": "Topological load order, chunks, checklist and verification SQL",
       "pipeline": "Change-capture precheck and source→transform→target pipeline definitions",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Monitoring Center",
-    "collectNote": "Collection runs in schema.pi — migration planned (D7). This page reads the schema.pi monitor summary.",
+    "title": "Monitoring",
     "noLink": "Select or register a schema.pi link first.",
     "goConnect": "Register a link",
     "period": "Period",
@@ -457,16 +456,9 @@
       "360": "6 hours",
       "1440": "24 hours"
     },
-    "refresh": "Refresh",
     "loading": "Loading…",
-    "updatedAt": "{area} · as of {time} (auto refresh every 30s)",
-    "appTitle": "App performance",
-    "dbTitle": "DB status by connection",
-    "urlTitle": "URL checks",
-    "empty": "No data to show.",
-    "breachTitle": "{n} threshold breaches",
-    "rulesTitle": "Threshold rules",
-    "rulesNote": "Rules are saved for this link and evaluated against the received summary; breaches get a red border (notifications come later).",
+    "rulesNote": "Rules are saved to this connection and evaluated whenever the board is refreshed (DB session/lock wait/cache hit rate every 1 minute, DB size/URL response time/failure every 5 minutes). Violated signals will escalate to danger and be marked 'My Rule' (notification sending is the next step). Service (APP) metric rules are not evaluated. DB size (MB) rules (>) are also used as capacity limits.",
+    "notEvaluated": "Not evaluated",
     "metric": "Metric",
     "conn": "Connection",
     "allConns": "All connections",
@@ -501,7 +493,278 @@
       "RATE": "Too many requests. Please try again shortly.",
       "TIMEOUT": "schema.pi is responding slowly. Please try again shortly.",
       "RULE_LIMIT": "Up to 50 rules per link.",
-      "NOT_FOUND": "Rule not found."
+      "NOT_FOUND": "Rule not found.",
+      "CONN_FAIL": "Could not connect to the database. Check the connection settings and DB status.",
+      "LINK_DOWN": "Could not reach schema.pi. Try again shortly.",
+      "PGSS_MISSING": "pg_stat_statements is not installed, so slow SQL is unavailable.",
+      "CONN_UNSUPPORTED": "This connection does not support monitoring (PostgreSQL server connections only).",
+      "CONN_DISABLED": "This connection is disabled. Enable it in schema.pi.",
+      "INVALID_INPUT": "The request is invalid."
+    },
+    "board": {
+      "subtitle": "What to do on this database right now — 14 signals as OK, warning or risk, with fixes, at a glance.",
+      "refresh": {
+        "updated": "As of {time} · refreshes every minute",
+        "now": "Refresh now",
+        "busy": "Loading…",
+        "stale": "Stale · {min} min ago"
+      },
+      "level": {
+        "RISK": "Risk",
+        "WARN": "Warning",
+        "OK": "OK",
+        "UNKNOWN": "Unknown",
+        "NA": "N/A"
+      },
+      "overall": {
+        "RISK": "Risk — action needed now",
+        "WARN": "Warning — some items need a look",
+        "UNKNOWN": "Unknown — check the connection",
+        "OK": "OK — every signal is within limits",
+        "CONN_DOWN": "Cannot reach the database — check the connection first",
+        "NA": "N/A"
+      },
+      "kpi": {
+        "sess": "Sessions / max",
+        "tps": "Transactions/s",
+        "cache": "Cache hit rate",
+        "size": "DB size"
+      },
+      "todo": {
+        "title": "To do now",
+        "more": "Show {n} more",
+        "less": "Show less",
+        "setup": "Set these up to see more",
+        "none": "No risk or warning items need action right now.",
+        "unknown": "Could not check {n} signal(s) — see the cards for the reason.",
+        "myRule": "My rule breached: {rule}",
+        "copySql": "Copy SQL",
+        "copied": "Copied"
+      },
+      "cat": {
+        "avail": "Availability",
+        "load": "Load & waits",
+        "eff": "Efficiency",
+        "store": "Storage & upkeep",
+        "protect": "Protection (backup, replication)"
+      },
+      "card": {
+        "thr": "Limits: warning {warn} · risk {risk}",
+        "thrDown": "Limits: warning below {warn} · risk below {risk}",
+        "more": "How to fix",
+        "addRule": "Add a rule for this metric",
+        "basisLive": "Last minute",
+        "basisStored": "Cumulative",
+        "since": "stats reset {at}",
+        "partial": "Partial view (500-row cap or missing privileges)."
+      },
+      "sig": {
+        "AVAIL": "DB response",
+        "CONN_USE": "Connection usage (this DB)",
+        "URL": "Service URLs",
+        "LONG_QRY": "Long-running queries",
+        "IDLE_TX": "Idle transactions",
+        "LOCK_WAIT": "Lock waits",
+        "CACHE_HIT": "Cache hit rate",
+        "XACT_ERR": "Rollbacks & deadlocks",
+        "SLOW_SQL": "Slow SQL",
+        "STORAGE": "Storage",
+        "VACUUM": "Vacuum",
+        "INDEX": "Index health",
+        "BACKUP": "Backup (WAL archive)",
+        "REPL": "Replication lag"
+      },
+      "fix": {
+        "AVAIL": "Slow response or a recent restart — check the connection settings and DB server status.",
+        "AVAIL_DOWN": "Could not connect to the DB — check the connection settings and that the DB server is up.",
+        "CONN_USE": "{sess}/{max} sessions on this DB (not cluster-wide — other databases are excluded) — close idle connections or add a connection pooler (pgbouncer).",
+        "URL": "{n} checked URLs failing · max response {ms}ms — see the schema.pi monitor for the cause.",
+        "LONG_QRY": "A query has been running for {sec}s — review its plan and tune it, or have a DBA cancel it.",
+        "IDLE_TX": "A transaction has been idle for {sec}s — find the missing commit in the app and set a timeout.",
+        "LOCK_WAIT": "{n} sessions are waiting on locks — find the blocking session and end its transaction.",
+        "CACHE_HIT": "Cache hit rate {pct}% — look for full scans of large tables or review shared_buffers.",
+        "XACT_ERR": "Rollback rate {pct}%, {dlck} deadlocks — check the failing transactions and app error logs.",
+        "SLOW_SQL": "A query averages {ms} ms — tune the top queries by total time using their plans.",
+        "STORAGE": "The DB ({gb} GB) is near its limit (days left {days}) — clean up large tables or add capacity.",
+        "VACUUM": "{tbl} has many dead rows or stale statistics — review VACUUM (ANALYZE) and autovacuum settings.",
+        "INDEX": "{n} index findings (invalid, unused, full scans) — see the table & index health tab for the targets.",
+        "BACKUP": "WAL archiving is off or stalled — check archive_mode, archive_command and backup status.",
+        "REPL": "Replication lag {sec}s — check the standby status and the network.",
+        "PGSS": "pg_stat_statements is not installed, so slow SQL is unavailable — enable it with the SQL below (server restart required)."
+      },
+      "reason": {
+        "CONN_DOWN": "Not judged because the DB connection is down.",
+        "PGSS": "pg_stat_statements is not installed.",
+        "VER": "Available on PostgreSQL 13 or later.",
+        "SAMPLE": "Not enough samples yet.",
+        "NO_LIMIT": "No size limit, so usage is not judged — add a DB size (MB) rule (>) to use it as the limit.",
+        "RESET": "Statistics were reset less than 7 days ago, so unused indexes are not judged.",
+        "STALE": "No recent check records.",
+        "STANDBY": "Not applicable on a standby server.",
+        "NONE": "Nothing to check.",
+        "GRANT": "Missing privileges — grant the pg_monitor role to the connection account.",
+        "LINK": "schema.pi query failed ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Check the connection status in Connections, and fix the connection settings (host, port, account) in schema.pi.",
+          "2": "Check that the DB server is up and whether it restarted recently.",
+          "3": "If it stays slow, check server load (CPU, disk) and the network."
+        },
+        "CONN_USE": {
+          "1": "See session counts by user and state in the activity & locks tab.",
+          "2": "If many are idle, shrink the app pool or add a connection pooler.",
+          "3": "Raise max_connections carefully, considering memory."
+        },
+        "URL": {
+          "1": "See the failing URLs and status codes in the schema.pi monitor.",
+          "2": "Check the app deployment and external dependencies.",
+          "3": "If it repeats, add a URL failure count (URL_FAIL_CNT) rule."
+        },
+        "LONG_QRY": {
+          "1": "Find long-running queries and their users in the activity & locks tab.",
+          "2": "Review the plan in SQL tuning and fix indexes or conditions.",
+          "3": "If urgent, a DBA cancels it with pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "See the last query of idle-in-transaction sessions in the activity & locks tab.",
+          "2": "Find the missing commit or rollback in the app code.",
+          "3": "Cap it with idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Find the blocking session (blocked_by) in the activity & locks tab.",
+          "2": "End its transaction or have a DBA cancel it.",
+          "3": "Fix batches or transaction order that hold the same rows for long."
+        },
+        "CACHE_HIT": {
+          "1": "Find full scans of large tables in the slow query tab.",
+          "2": "Add the needed indexes to read fewer blocks.",
+          "3": "If memory allows, review shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Find rollback causes (constraint violations, timeouts) in app error logs.",
+          "2": "If there are deadlocks, lock tables in a consistent order.",
+          "3": "Check that retry logic is not inflating rollbacks."
+        },
+        "SLOW_SQL": {
+          "1": "Pick the top queries by total time in the slow query tab.",
+          "2": "Review plans in SQL tuning and fix indexes or joins.",
+          "3": "After fixing, check that the mean time went down."
+        },
+        "STORAGE": {
+          "1": "See the growth trend and estimated full date in the size trend tab.",
+          "2": "Clean up large tables, indexes and old data.",
+          "3": "If needed, add disk and update the limit rule."
+        },
+        "VACUUM": {
+          "1": "See tables with many dead rows in the table & index health tab.",
+          "2": "A DBA runs VACUUM (ANALYZE).",
+          "3": "If it repeats, lower the autovacuum thresholds for that table."
+        },
+        "INDEX": {
+          "1": "See invalid or unused indexes and full-scan tables in the table & index health tab.",
+          "2": "Rebuild invalid indexes; a DBA reviews and drops unused ones.",
+          "3": "Design indexes in SQL tuning for tables with many full scans."
+        },
+        "BACKUP": {
+          "1": "See archive_mode and the last archive time in the backup & recovery tab.",
+          "2": "If archiving fails, check archive_command and free space at the destination.",
+          "3": "On a managed DB, check the backup settings of the provider."
+        },
+        "REPL": {
+          "1": "See the state and lag of each standby in the replication & DR tab.",
+          "2": "Check disk, CPU and network on the standby.",
+          "3": "If it is not streaming, check the standby logs."
+        }
+      },
+      "sqlNote": "The SQL below is read-only, for checking — fixes (VACUUM, DROP INDEX, pg_terminate_backend) are run by a DBA.",
+      "go": {
+        "activity": "Activity & locks",
+        "top": "Slow queries",
+        "health": "Table & index health",
+        "trend": "Capacity trend",
+        "params": "Parameter check",
+        "repl": "Replication check",
+        "backup": "Backup check",
+        "sqlLab": "SQL tuning",
+        "drift": "Drift compare",
+        "connect": "Connections",
+        "schema": "schema.pi monitor"
+      },
+      "chart": {
+        "title": "Trends & rankings",
+        "note": "Trends are recorded every minute while this screen is open (no background collection).",
+        "gauges": "Connection & cache gauges",
+        "sessState": "Sessions right now",
+        "sessTrend": "Session trend & lock waits",
+        "tpsCombo": "Throughput & rollback rate",
+        "cacheTrend": "Cache hit rate trend",
+        "capacity": "DB size & forecast",
+        "slowTop": "Slow SQL top 10",
+        "slowLegend": "Bar length = total time · color = mean time (▲ warning from {warn}ms · ✕ risk from {risk}ms)",
+        "sizeTop": "Space top 10",
+        "heat": "Risk by signal over time",
+        "q": {
+          "gauges": "Are connections filling up? Are reads served from memory?",
+          "sessState": "What are sessions doing now?",
+          "sessTrend": "Do lock waits rise when sessions pile up?",
+          "tpsCombo": "Do throughput and failure rate move together?",
+          "cacheTrend": "When did the cache hit rate drop?",
+          "capacity": "When will the DB fill up?",
+          "slowTop": "What to tune first? (by total time)",
+          "sizeTop": "What is taking the space?",
+          "heat": "Is the risk a one-off or recurring?"
+        },
+        "asTable": "View as table",
+        "needHistory": "No trend yet — keep this screen open for a few minutes.",
+        "needPerf": "No size history — collect in the performance tab or keep this screen open.",
+        "noSess": "No sessions.",
+        "noWait": "No waits",
+        "noData": "Nothing to show.",
+        "loading": "Loading…",
+        "waitTop": "Wait events",
+        "lockWait": "Lock waits",
+        "tps": "Transactions/s",
+        "rlbk": "Rollback rate (%)",
+        "cacheHit": "Cache hit rate",
+        "size": "DB size",
+        "limit": "Limit",
+        "forecast": "Forecast",
+        "daysLeft": "Days left",
+        "capNote": "Growth per day {perDay} · {days} days to the limit",
+        "tbl": "Table",
+        "idxToast": "Index + TOAST",
+        "mix": {
+          "active": "Active",
+          "idleTx": "Idle in transaction",
+          "idle": "Idle",
+          "total": "sessions"
+        },
+        "col": {
+          "item": "Item",
+          "value": "Value",
+          "time": "Time",
+          "calls": "Calls",
+          "total": "Total (ms)",
+          "mean": "Mean (ms)",
+          "share": "Share"
+        }
+      },
+      "empty": {
+        "noConn": "This taxonomy has no PostgreSQL server connection to monitor — showing URLs and service status only.",
+        "unsupported": "This connection does not support monitoring (PostgreSQL server connections only).",
+        "connFail": "Could not connect to the database — check the connection settings and DB status.",
+        "linkDown": "Could not reach schema.pi — retrying automatically.",
+        "linkAuth": "The connection token has expired — issue a new token in schema.pi and register it.",
+        "timeout": "Responses are slow — retrying automatically.",
+        "rate": "Too many requests, so the refresh interval was increased."
+      },
+      "aux": {
+        "rules": "My alert rules ({n} active)",
+        "schemaSvc": "Service status — schema.pi responses",
+        "schemaSvcNote": "App metrics for the last 60 minutes stored by schema.pi.",
+        "source": "Data source: the target DB is read only through schema.pi named queries (read-only); trends store statistics only in dbms.pi (no row data)."
+      }
     }
   },
   "ops": {
@@ -910,6 +1173,12 @@
   },
   "nav": {
     "label": "Features",
+    "groups": {
+      "monitor": "Monitoring",
+      "drift": "Consistency",
+      "lake": "Lake",
+      "admin": "Admin"
+    },
     "connect": "Connect",
     "sqlLab": "SQL Tuning",
     "perf": "Performance",

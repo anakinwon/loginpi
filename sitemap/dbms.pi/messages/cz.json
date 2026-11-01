@@ -13,7 +13,7 @@
       "connect": "Zaregistrujte token propojení schema.pi a zkontrolujte stav připojení",
       "sqlLab": "Strom plánu, varování, porovnání a kontroly anti-vzorů proti standardním doménám",
       "perf": "Pomalé dotazy Top-N, stav tabulek/indexů, předpověď kapacity, aktivita a zámky",
-      "monitor": "Souhrn metrik aplikace, DB a URL s upozorněními na prahové hodnoty",
+      "monitor": "Normální stav, varování a riziko pro 14 signálů, plus co dělat a jak to vyřešit na první pohled",
       "drift": "Porovnejte model schema.pi a historii DDL se skutečným katalogem, změřte efekt indexu",
       "migration": "Topologické pořadí načítání, bloky, kontrolní seznam a ověřovací SQL",
       "pipeline": "Předběžná kontrola zachycení změn a definice pipeline zdroj→transformace→cíl",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Monitorovací centrum",
-    "collectNote": "Sběr probíhá v schema.pi — migrace je naplánována (D7). Tato stránka čte souhrn monitoru schema.pi.",
+    "title": "Monitorování",
     "noLink": "Nejprve vyberte nebo zaregistrujte odkaz schema.pi.",
     "goConnect": "Zaregistrovat odkaz",
     "period": "Období",
@@ -457,16 +456,9 @@
       "360": "6 hodin",
       "1440": "24 hodin"
     },
-    "refresh": "Obnovit",
     "loading": "Načítání…",
-    "updatedAt": "{area} · k {time} (automatická aktualizace každých 30s)",
-    "appTitle": "Výkon aplikace",
-    "dbTitle": "Stav DB podle připojení",
-    "urlTitle": "Kontroly URL",
-    "empty": "Žádná data k zobrazení.",
-    "breachTitle": "{n} překročení prahové hodnoty",
-    "rulesTitle": "Prahová pravidla",
-    "rulesNote": "Pravidla jsou uložena pro tento odkaz a vyhodnocována proti přijatému souhrnu; překročení se označí červeným okrajem (oznámení přijdou později).",
+    "rulesNote": "Pravidla se ukládají k tomuto připojení a vyhodnocují se při každém obnovení panelu (DB relace/čekání na zámek/míra zásahů do mezipaměti každou 1 minutu, velikost DB/doba odezvy URL/selhání každých 5 minut). Porušené signály eskalují na riziko a budou označeny jako „Moje pravidlo“ (odesílání oznámení je dalším krokem). Pravidla metrik služby (APP) se nevyhodnocují. Pravidla velikosti DB (MB) (>) se také používají jako limity kapacity.",
+    "notEvaluated": "Nevyhodnoceno",
     "metric": "Metrika",
     "conn": "Připojení",
     "allConns": "Všechna připojení",
@@ -501,7 +493,277 @@
       "RATE": "Příliš mnoho požadavků. Zkuste to prosím znovu za chvíli.",
       "TIMEOUT": "schema.pi reaguje pomalu. Zkuste to prosím znovu za chvíli.",
       "RULE_LIMIT": "Maximálně 50 pravidel na odkaz.",
-      "NOT_FOUND": "Pravidlo nebylo nalezeno."
+      "NOT_FOUND": "Pravidlo nebylo nalezeno.",
+      "CONN_FAIL": "Nepodařilo se připojit k databázi. Zkontrolujte nastavení připojení a stav DB.",
+      "LINK_DOWN": "Nepodařilo se dosáhnout schema.pi. Zkuste to prosím znovu za chvíli.",
+      "PGSS_MISSING": "pg_stat_statements není nainstalováno, takže pomalé SQL není k dispozici.",
+      "CONN_UNSUPPORTED": "Toto připojení nepodporuje monitorování (pouze připojení k serveru PostgreSQL).",
+      "CONN_DISABLED": "Toto připojení je zakázáno. Povolte jej v schema.pi.",
+      "INVALID_INPUT": "Požadavek je neplatný."
+    },
+    "board": {
+      "refresh": {
+        "updated": "Aktuální k {time} · obnovuje se každou minutu",
+        "now": "Obnovit nyní",
+        "busy": "Načítání…",
+        "stale": "Zastaralé · před {min} min"
+      },
+      "level": {
+        "RISK": "Riziko",
+        "WARN": "Varování",
+        "OK": "OK",
+        "UNKNOWN": "Neznámé",
+        "NA": "N/A"
+      },
+      "overall": {
+        "RISK": "Riziko – je třeba okamžitá akce",
+        "WARN": "Varování – některé položky vyžadují kontrolu",
+        "UNKNOWN": "Neznámé – zkontrolujte připojení",
+        "OK": "OK – každý signál je v mezích",
+        "CONN_DOWN": "Nelze se připojit k DB — nejprve zkontrolujte připojení",
+        "NA": "N/A"
+      },
+      "kpi": {
+        "sess": "Relace / max",
+        "tps": "Transakce/s",
+        "cache": "Míra zásahů do mezipaměti",
+        "size": "Velikost DB"
+      },
+      "todo": {
+        "title": "Co dělat nyní",
+        "more": "Zobrazit {n} {n, plural, one {další} few {další} many {dalších} other {dalších}}",
+        "less": "Zobrazit méně",
+        "setup": "Nastavte tyto položky, abyste viděli více",
+        "none": "Žádné rizikové nebo varovné položky nevyžadují okamžitou akci.",
+        "unknown": "Nelze zkontrolovat {n} {n, plural, one {signál} few {signály} many {signálů} other {signálů}} – důvod naleznete v kartách.",
+        "myRule": "Moje pravidlo porušeno: {rule}",
+        "copySql": "Kopírovat SQL",
+        "copied": "Zkopírováno"
+      },
+      "cat": {
+        "avail": "Dostupnost",
+        "load": "Zatížení a čekání",
+        "eff": "Efektivita",
+        "store": "Úložiště a údržba",
+        "protect": "Ochrana (zálohování, replikace)"
+      },
+      "card": {
+        "thr": "Limity: varování {warn} · riziko {risk}",
+        "thrDown": "Limity: varování pod {warn} · riziko pod {risk}",
+        "more": "Jak opravit",
+        "addRule": "Přidat pravidlo pro tuto metriku",
+        "basisLive": "Poslední minuta",
+        "basisStored": "Kumulativní",
+        "since": "reset statistik {at}",
+        "partial": "Částečný pohled (limit 500 řádků nebo chybějící oprávnění)."
+      },
+      "sig": {
+        "AVAIL": "Odezva DB",
+        "CONN_USE": "Využití připojení (tato DB)",
+        "URL": "URL služeb",
+        "LONG_QRY": "Dlouho běžící dotazy",
+        "IDLE_TX": "Nečinné transakce",
+        "LOCK_WAIT": "Čekání na zámek",
+        "CACHE_HIT": "Míra zásahů do mezipaměti",
+        "XACT_ERR": "Rollbacky a deadlocky",
+        "SLOW_SQL": "Pomalé SQL",
+        "STORAGE": "Úložiště",
+        "VACUUM": "Vacuum",
+        "INDEX": "Stav indexu",
+        "BACKUP": "Záloha (archiv WAL)",
+        "REPL": "Zpoždění replikace"
+      },
+      "fix": {
+        "AVAIL": "Pomalá odezva nebo nedávný restart – zkontrolujte nastavení připojení a stav DB serveru.",
+        "AVAIL_DOWN": "Nepodařilo se připojit k DB – zkontrolujte nastavení připojení a zda je DB server spuštěn.",
+        "CONN_USE": "{sess}/{max} relací na této DB (ne v celém clusteru – ostatní databáze jsou vyloučeny) – zavřete nečinná připojení nebo přidejte pooler připojení (pgbouncer).",
+        "URL": "{n} {n, plural, one {zkontrolovaná URL selhává} few {zkontrolované URL selhávají} many {zkontrolovaných URL selhává} other {zkontrolovaných URL selhává}} · maximální odezva {ms}ms – příčinu naleznete v monitoru schema.pi.",
+        "LONG_QRY": "Dotaz běží {sec}s – zkontrolujte jeho plán a optimalizujte ho, nebo ho nechte zrušit DBA.",
+        "IDLE_TX": "Transakce je nečinná {sec}s – najděte chybějící commit v aplikaci a nastavte časový limit.",
+        "LOCK_WAIT": "{n} {n, plural, one {relace čeká} few {relace čekají} many {relací čeká} other {relací čeká}} na zámky – najděte blokující relaci a ukončete její transakci.",
+        "CACHE_HIT": "Míra zásahů do mezipaměti {pct}% – hledejte plné skenování velkých tabulek nebo zkontrolujte shared_buffers.",
+        "XACT_ERR": "Míra vrácení {pct}%, {dlck} uváznutí — zkontrolujte selhávající transakce a protokoly chyb aplikace.",
+        "SLOW_SQL": "Dotaz má průměr {ms} ms – optimalizujte nejčastější dotazy podle celkového času pomocí jejich plánů.",
+        "STORAGE": "DB ({gb} GB) se blíží limitu (zbývá {days} dní) — vyčistěte velké tabulky nebo zvyšte kapacitu.",
+        "VACUUM": "{tbl} má mnoho mrtvých řádků nebo zastaralé statistiky – zkontrolujte nastavení VACUUM (ANALYZE) a autovacuum.",
+        "INDEX": "{n} {n, plural, one {nález indexu} few {nálezy indexů} many {nálezů indexů} other {nálezů indexů}} (neplatné, nepoužívané, plné skenování) – cíle naleznete na kartě stavu tabulek a indexů.",
+        "BACKUP": "Archivace WAL je vypnutá nebo zastavená – zkontrolujte archive_mode, archive_command a stav zálohy.",
+        "REPL": "Zpoždění replikace {sec}s – zkontrolujte stav standby a síť.",
+        "PGSS": "pg_stat_statements není nainstalováno, takže pomalé SQL není k dispozici – povolte jej pomocí níže uvedeného SQL (vyžaduje restart serveru)."
+      },
+      "reason": {
+        "CONN_DOWN": "Nebylo posouzeno, protože připojení k DB je nefunkční.",
+        "PGSS": "Rozšíření pg_stat_statements chybí.",
+        "VER": "K dispozici na PostgreSQL 13 nebo novějším.",
+        "SAMPLE": "Zatím není dostatek vzorků.",
+        "NO_LIMIT": "Žádný limit velikosti, takže využití není posuzováno – přidejte pravidlo velikosti DB (MB) (>) pro použití jako limit.",
+        "RESET": "Statistiky byly resetovány před méně než 7 dny, takže nepoužívané indexy nejsou posuzovány.",
+        "STALE": "Žádné nedávné záznamy kontroly.",
+        "STANDBY": "Není použitelné na standby serveru.",
+        "NONE": "Nic ke kontrole.",
+        "GRANT": "Chybějící oprávnění – udělte roli pg_monitor účtu připojení.",
+        "LINK": "Dotaz schema.pi selhal ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Zkontrolujte stav připojení v Připojeních a opravte nastavení připojení (hostitel, port, účet) v schema.pi.",
+          "2": "Zkontrolujte, zda je DB server spuštěn a zda byl nedávno restartován.",
+          "3": "Pokud zůstává pomalý, zkontrolujte zatížení serveru (CPU, disk) a síť."
+        },
+        "CONN_USE": {
+          "1": "Zobrazte počty relací podle uživatele a stavu na kartě aktivity a zámků.",
+          "2": "Pokud je mnoho nečinných, zmenšete fond aplikací nebo přidejte pooler připojení.",
+          "3": "Zvyšujte max_connections opatrně, s ohledem na paměť."
+        },
+        "URL": {
+          "1": "Zobrazte selhávající URL a stavové kódy v monitoru schema.pi.",
+          "2": "Zkontrolujte nasazení aplikace a externí závislosti.",
+          "3": "Pokud se to opakuje, přidejte pravidlo pro počet selhání URL (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Najděte dlouho běžící dotazy a jejich uživatele na kartě aktivity a zámků.",
+          "2": "Zkontrolujte plán v ladění SQL a opravte indexy nebo podmínky.",
+          "3": "Pokud je to naléhavé, DBA to zruší pomocí pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Zobrazte poslední dotaz nečinných relací v transakci na kartě aktivity a zámků.",
+          "2": "Najděte chybějící commit nebo rollback v kódu aplikace.",
+          "3": "Omezte to pomocí idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Najděte blokující relaci (blocked_by) na kartě aktivity a zámků.",
+          "2": "Ukončete její transakci nebo ji nechte zrušit DBA.",
+          "3": "Opravte dávky nebo pořadí transakcí, které drží stejné řádky po dlouhou dobu."
+        },
+        "CACHE_HIT": {
+          "1": "Najděte plné skenování velkých tabulek na kartě pomalých dotazů.",
+          "2": "Přidejte potřebné indexy pro čtení menšího počtu bloků.",
+          "3": "Pokud to paměť dovoluje, zkontrolujte shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Najděte příčiny rollbacků (porušení omezení, časové limity) v protokolech chyb aplikace.",
+          "2": "Pokud existují deadlocky, zamkněte tabulky v konzistentním pořadí.",
+          "3": "Zkontrolujte, zda logika opakování nenafukuje rollbacky."
+        },
+        "SLOW_SQL": {
+          "1": "Vyberte nejčastější dotazy podle celkového času na kartě pomalých dotazů.",
+          "2": "Zkontrolujte plány v ladění SQL a opravte indexy nebo spojení.",
+          "3": "Po opravě zkontrolujte, zda se průměrný čas snížil."
+        },
+        "STORAGE": {
+          "1": "Zobrazte trend růstu a odhadované datum zaplnění na kartě trendu velikosti.",
+          "2": "Vyčistěte velké tabulky, indexy a stará data.",
+          "3": "V případě potřeby přidejte disk a aktualizujte pravidlo limitu."
+        },
+        "VACUUM": {
+          "1": "Zobrazte tabulky s mnoha mrtvými řádky na kartě stavu tabulek a indexů.",
+          "2": "DBA spustí VACUUM (ANALYZE).",
+          "3": "Pokud se to opakuje, snižte prahové hodnoty autovacuum pro tuto tabulku."
+        },
+        "INDEX": {
+          "1": "Zobrazte neplatné nebo nepoužívané indexy a tabulky s plným skenováním na kartě stavu tabulek a indexů.",
+          "2": "Přestavte neplatné indexy; DBA zkontroluje a odstraní nepoužívané.",
+          "3": "Navrhněte indexy v ladění SQL pro tabulky s mnoha plnými skenováními."
+        },
+        "BACKUP": {
+          "1": "Zobrazte archive_mode a čas posledního archivu na kartě zálohování a obnovy.",
+          "2": "Pokud archivace selže, zkontrolujte archive_command a volné místo v cíli.",
+          "3": "U spravované DB zkontrolujte nastavení zálohování poskytovatele."
+        },
+        "REPL": {
+          "1": "Zobrazte stav a zpoždění každého standby na kartě replikace a DR.",
+          "2": "Zkontrolujte disk, CPU a síť na standby.",
+          "3": "Pokud nestreamuje, zkontrolujte protokoly standby."
+        }
+      },
+      "sqlNote": "Níže uvedené SQL je pouze pro čtení, pro kontrolu – opravy (VACUUM, DROP INDEX, pg_terminate_backend) provádí DBA.",
+      "go": {
+        "activity": "Aktivita a zámky",
+        "top": "Pomalé dotazy",
+        "health": "Stav tabulek a indexů",
+        "trend": "Trend kapacity",
+        "params": "Kontrola parametrů",
+        "repl": "Kontrola replikace",
+        "backup": "Kontrola zálohy",
+        "sqlLab": "Ladění SQL",
+        "drift": "Porovnání driftu",
+        "connect": "Připojení",
+        "schema": "Monitor schema.pi"
+      },
+      "chart": {
+        "title": "Trendy a žebříčky",
+        "note": "Trendy se zaznamenávají každou minutu, dokud je tato obrazovka otevřená (žádné shromažďování na pozadí).",
+        "gauges": "Měřidla připojení a mezipaměti",
+        "sessState": "Relace právě teď",
+        "sessTrend": "Trend relací a čekání na zámky",
+        "tpsCombo": "Propustnost a míra rollbacků",
+        "cacheTrend": "Trend míry zásahů do mezipaměti",
+        "capacity": "Velikost DB a předpověď",
+        "slowTop": "Pomalé SQL top 10",
+        "slowLegend": "Délka pruhu = celkový čas · barva = průměrný čas (▲ varování od {warn}ms · ✕ riziko od {risk}ms)",
+        "sizeTop": "Místo top 10",
+        "heat": "Riziko podle signálu v čase",
+        "q": {
+          "gauges": "Zaplňují se připojení? Jsou čtení obsluhována z paměti?",
+          "sessState": "Co dělají relace teď?",
+          "sessTrend": "Zvyšuje se čekání na zámky, když se hromadí relace?",
+          "tpsCombo": "Pohybují se propustnost a míra selhání společně?",
+          "cacheTrend": "Kdy klesla míra zásahů do mezipaměti?",
+          "capacity": "Kdy se DB zaplní?",
+          "slowTop": "Co ladit jako první? (podle celkového času)",
+          "sizeTop": "Co zabírá místo?",
+          "heat": "Je riziko jednorázové nebo opakující se?"
+        },
+        "asTable": "Zobrazit jako tabulku",
+        "needHistory": "Zatím žádný trend – nechte tuto obrazovku otevřenou několik minut.",
+        "needPerf": "Žádná historie velikosti – shromažďujte na kartě výkonu nebo nechte tuto obrazovku otevřenou.",
+        "noSess": "Žádné relace.",
+        "noWait": "Žádné čekání",
+        "noData": "Žádná data k zobrazení.",
+        "loading": "Načítání…",
+        "waitTop": "Události čekání",
+        "lockWait": "Čekání na zámky",
+        "tps": "Transakce/s",
+        "rlbk": "Míra rollbacků (%)",
+        "cacheHit": "Míra zásahů do mezipaměti",
+        "size": "Velikost DB",
+        "limit": "Limit",
+        "forecast": "Předpověď",
+        "daysLeft": "Zbývající dny",
+        "capNote": "Denní růst {perDay} · {days} dní do limitu",
+        "tbl": "Tabulka",
+        "idxToast": "Index + TOAST",
+        "mix": {
+          "active": "Aktivní",
+          "idleTx": "Nečinné v transakci",
+          "idle": "Nečinné",
+          "total": "relace"
+        },
+        "col": {
+          "item": "Položka",
+          "value": "Hodnota",
+          "time": "Čas",
+          "calls": "Volání",
+          "total": "Celkem (ms)",
+          "mean": "Průměr (ms)",
+          "share": "Podíl"
+        }
+      },
+      "empty": {
+        "noConn": "Tato taxonomie nemá připojení k serveru PostgreSQL k monitorování – zobrazují se pouze URL a stav služby.",
+        "unsupported": "Toto připojení nepodporuje monitorování (pouze připojení k serveru PostgreSQL).",
+        "connFail": "Nepodařilo se připojit k databázi – zkontrolujte nastavení připojení a stav DB.",
+        "linkDown": "Nepodařilo se dosáhnout schema.pi – automaticky se opakuje.",
+        "linkAuth": "Token připojení vypršel – vydejte nový token v schema.pi a zaregistrujte jej.",
+        "timeout": "Odezvy jsou pomalé – automaticky se opakuje.",
+        "rate": "Příliš mnoho požadavků, takže interval obnovení byl zvýšen."
+      },
+      "aux": {
+        "rules": "Moje pravidla upozornění ({n} {n, plural, one {aktivní} few {aktivní} many {aktivních} other {aktivních}})",
+        "schemaSvc": "Stav služby – odezvy schema.pi",
+        "schemaSvcNote": "Metriky aplikace za posledních 60 minut uložené schema.pi.",
+        "source": "Zdroj dat: cílová DB je pouze pro čtení prostřednictvím pojmenovaných dotazů schema.pi (pouze pro čtení); trendy ukládají statistiky pouze do dbms.pi (žádná data řádků)."
+      }
     }
   },
   "ops": {
@@ -904,6 +1166,12 @@
   },
   "nav": {
     "label": "Funkce",
+    "groups": {
+      "monitor": "Monitorování",
+      "drift": "Konzistence",
+      "lake": "Lake",
+      "admin": "Správa"
+    },
     "connect": "Připojit",
     "sqlLab": "SQL ladění",
     "perf": "Výkon",

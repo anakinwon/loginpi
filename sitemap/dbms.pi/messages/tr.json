@@ -13,7 +13,7 @@
       "connect": "Bir schema.pi bağlantı belirteci kaydedin ve bağlantı durumunu kontrol edin",
       "sqlLab": "Plan ağacı, uyarılar, karşılaştırma ve standart alanlara karşı anti-kalıp kontrolleri",
       "perf": "Yavaş sorgu Top-N, tablo/dizin sağlığı, kapasite tahmini, etkinlik ve kilitler",
-      "monitor": "Uygulama, DB ve URL metrik özeti ile eşik uyarıları",
+      "monitor": "14 sinyal için normal, uyarı ve tehlike durumları ile yapılması gerekenler ve çözüm yolları bir bakışta",
       "drift": "schema.pi modelini ve DDL geçmişini gerçek katalogla karşılaştırın, dizin etkisini ölçün",
       "migration": "Topolojik yükleme sırası, parçalar, kontrol listesi ve doğrulama SQL'i",
       "pipeline": "Değişiklik yakalama ön kontrolü ve kaynak→dönüştürme→hedef işlem hattı tanımları",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "İzleme Merkezi",
-    "collectNote": "schema.pi'de toplama çalışır — geçiş planlandı (D7). Bu sayfa schema.pi izleme özetini okur.",
+    "title": "İzleme",
     "noLink": "Önce bir schema.pi bağlantısı seçin veya kaydedin.",
     "goConnect": "Bağlantı kaydet",
     "period": "Dönem",
@@ -457,16 +456,9 @@
       "360": "6 saat",
       "1440": "24 saat"
     },
-    "refresh": "Yenile",
     "loading": "Yükleniyor…",
-    "updatedAt": "{area} · {time} itibarıyla (her 30 saniyede bir otomatik yenileme)",
-    "appTitle": "Uygulama performansı",
-    "dbTitle": "Bağlantıya göre DB durumu",
-    "urlTitle": "URL kontrolleri",
-    "empty": "Gösterilecek veri yok.",
-    "breachTitle": "{n} eşik ihlali",
-    "rulesTitle": "Eşik kuralları",
-    "rulesNote": "Kurallar bu bağlantı için kaydedilir ve alınan özete göre değerlendirilir; ihlaller kırmızı bir kenarlık alır (bildirimler daha sonra gelir).",
+    "rulesNote": "Kurallar bu bağlantıya kaydedilir ve pano her yenilendiğinde değerlendirilir (DB oturumu/kilit bekleme/önbellek isabet oranı her 1 dakikada bir, DB boyutu/URL yanıt süresi/başarısızlık her 5 dakikada bir). İhlal edilen sinyaller tehlikeye dönüşür ve 'Kuralım' olarak işaretlenir (bildirim gönderme bir sonraki adımdır). Hizmet (APP) metrik kuralları değerlendirilmez. DB boyutu (MB) kuralları (>) aynı zamanda kapasite limitleri olarak da kullanılır.",
+    "notEvaluated": "Değerlendirilmedi",
     "metric": "Metrik",
     "conn": "Bağlantı",
     "allConns": "Tüm bağlantılar",
@@ -501,11 +493,283 @@
       "RATE": "Çok fazla istek. Lütfen kısa süre sonra tekrar deneyin.",
       "TIMEOUT": "schema.pi yavaş yanıt veriyor. Lütfen kısa süre sonra tekrar deneyin.",
       "RULE_LIMIT": "Bağlantı başına en fazla 50 kural.",
-      "NOT_FOUND": "Kural bulunamadı."
+      "NOT_FOUND": "Kural bulunamadı.",
+      "CONN_FAIL": "Veritabanına bağlanılamadı. Bağlantı ayarlarını ve DB durumunu kontrol edin.",
+      "LINK_DOWN": "schema.pi adresine ulaşılamadı. Lütfen kısa süre sonra tekrar deneyin.",
+      "PGSS_MISSING": "pg_stat_statements yüklü değil, bu nedenle yavaş SQL kullanılamıyor.",
+      "CONN_UNSUPPORTED": "Bu bağlantı izlemeyi desteklemiyor (yalnızca PostgreSQL sunucu bağlantıları).",
+      "CONN_DISABLED": "Bu bağlantı devre dışı. schema.pi içinde etkinleştirin.",
+      "INVALID_INPUT": "İstek geçersiz."
+    },
+    "board": {
+      "subtitle": "Bu DB'de şu anda ne yapılması gerektiği — 14 sinyalin normal, uyarı veya risk durumu ve çözümleri bir bakışta.",
+      "refresh": {
+        "updated": "{time} itibarıyla · her dakika yenilenir",
+        "now": "Şimdi yenile",
+        "busy": "Yükleniyor…",
+        "stale": "Eski · {min} dk önce"
+      },
+      "level": {
+        "RISK": "Risk",
+        "WARN": "Uyarı",
+        "OK": "Tamam",
+        "UNKNOWN": "Bilinmiyor",
+        "NA": "Yok"
+      },
+      "overall": {
+        "RISK": "Risk — şimdi işlem gerekiyor",
+        "WARN": "Uyarı — bazı öğelere bakılması gerekiyor",
+        "UNKNOWN": "Bilinmiyor — bağlantıyı kontrol edin",
+        "OK": "Tamam — her sinyal limitler içinde",
+        "CONN_DOWN": "DB'ye bağlanılamıyor — önce bağlantıyı kontrol edin",
+        "NA": "Yok"
+      },
+      "kpi": {
+        "sess": "Oturumlar / maks",
+        "tps": "İşlemler/sn",
+        "cache": "Önbellek isabet oranı",
+        "size": "DB boyutu"
+      },
+      "todo": {
+        "title": "Şimdi yapılacaklar",
+        "more": "{n} tane daha göster",
+        "less": "Daha az göster",
+        "setup": "Daha fazlasını görmek için bunları ayarlayın",
+        "none": "Şu anda işlem gerektiren risk veya uyarı öğesi yok.",
+        "unknown": "{n} sinyal kontrol edilemedi — nedeni için kartlara bakın.",
+        "myRule": "Kuralım ihlal edildi: {rule}",
+        "copySql": "SQL Kopyala",
+        "copied": "Kopyalandı"
+      },
+      "cat": {
+        "avail": "Kullanılabilirlik",
+        "load": "Yük ve beklemeler",
+        "eff": "Verimlilik",
+        "store": "Depolama ve bakım",
+        "protect": "Koruma (yedekleme, replikasyon)"
+      },
+      "card": {
+        "thr": "Limitler: uyarı {warn} · risk {risk}",
+        "thrDown": "Limitler: {warn} altı uyarı · {risk} altı risk",
+        "more": "Nasıl düzeltilir",
+        "addRule": "Bu metrik için kural ekle",
+        "basisLive": "Son dakika",
+        "basisStored": "Kümülatif",
+        "since": "istatistikler sıfırlandı {at}",
+        "partial": "Kısmi görünüm (500 satır sınırı veya eksik ayrıcalıklar)."
+      },
+      "sig": {
+        "AVAIL": "DB yanıtı",
+        "CONN_USE": "Bağlantı kullanımı (bu DB)",
+        "URL": "Hizmet URL'leri",
+        "LONG_QRY": "Uzun süreli sorgular",
+        "IDLE_TX": "Boşta bekleyen işlemler",
+        "LOCK_WAIT": "Kilit beklemeleri",
+        "CACHE_HIT": "Önbellek isabet oranı",
+        "XACT_ERR": "Geri almalar ve kilitlenmeler",
+        "SLOW_SQL": "Yavaş SQL",
+        "STORAGE": "Depolama",
+        "VACUUM": "Vacuum",
+        "INDEX": "Dizin sağlığı",
+        "BACKUP": "Yedekleme (WAL arşivi)",
+        "REPL": "Replikasyon gecikmesi"
+      },
+      "fix": {
+        "AVAIL": "Yavaş yanıt veya yakın zamanda yeniden başlatma — bağlantı ayarlarını ve DB sunucu durumunu kontrol edin.",
+        "AVAIL_DOWN": "DB'ye bağlanılamadı — bağlantı ayarlarını ve DB sunucusunun çalışır durumda olduğunu kontrol edin.",
+        "CONN_USE": "Bu DB'de {sess}/{max} oturum (küme genelinde değil — diğer veritabanları hariç) — boşta bekleyen bağlantıları kapatın veya bir bağlantı havuzu (pgbouncer) ekleyin.",
+        "URL": "{n} kontrol edilen URL başarısız · maks yanıt {ms}ms — nedeni için schema.pi monitörüne bakın.",
+        "LONG_QRY": "Bir sorgu {sec} saniyedir çalışıyor — planını gözden geçirin ve ayarlayın veya bir DBA'nın iptal etmesini sağlayın.",
+        "IDLE_TX": "Bir işlem {sec} saniyedir boşta bekliyor — uygulamadaki eksik commit'i bulun ve bir zaman aşımı ayarlayın.",
+        "LOCK_WAIT": "{n} oturum kilitleri bekliyor — engelleyen oturumu bulun ve işlemini sonlandırın.",
+        "CACHE_HIT": "Önbellek isabet oranı %{pct} — büyük tabloların tam taramalarını arayın veya shared_buffers'ı gözden geçirin.",
+        "XACT_ERR": "Geri alma oranı %{pct}, {dlck} kilitlenme — başarısız olan işlemleri ve uygulama hata günlüklerini kontrol edin.",
+        "SLOW_SQL": "Bir sorgu ortalama {ms} ms — toplam süreye göre en iyi sorguları planlarını kullanarak ayarlayın.",
+        "STORAGE": "DB ({gb} GB) limitine yaklaşıyor (kalan gün {days}) — büyük tabloları temizleyin veya kapasite ekleyin.",
+        "VACUUM": "{tbl} çok sayıda ölü satıra veya eski istatistiklere sahip — VACUUM (ANALYZE) ve autovacuum ayarlarını gözden geçirin.",
+        "INDEX": "{n} dizin bulgusu (geçersiz, kullanılmayan, tam taramalar) — hedefler için tablo ve dizin sağlığı sekmesine bakın.",
+        "BACKUP": "WAL arşivleme kapalı veya durdu — archive_mode, archive_command ve yedekleme durumunu kontrol edin.",
+        "REPL": "Replikasyon gecikmesi {sec} saniye — bekleme sunucusu durumunu ve ağı kontrol edin.",
+        "PGSS": "pg_stat_statements yüklü değil, bu nedenle yavaş SQL kullanılamıyor — aşağıdaki SQL ile etkinleştirin (sunucu yeniden başlatma gereklidir)."
+      },
+      "reason": {
+        "CONN_DOWN": "DB bağlantısı kesik olduğu için değerlendirilmedi.",
+        "PGSS": "pg_stat_statements yüklü değil.",
+        "VER": "Yalnızca PostgreSQL 13 veya sonraki sürümlerde kullanılabilir.",
+        "SAMPLE": "Henüz yeterli örnek yok.",
+        "NO_LIMIT": "Boyut limiti yok, bu nedenle kullanım değerlendirilmiyor — limit olarak kullanmak için bir DB boyutu (MB) kuralı (>) ekleyin.",
+        "RESET": "İstatistikler 7 günden daha kısa süre önce sıfırlandığı için kullanılmayan dizinler değerlendirilmiyor.",
+        "STALE": "Yakın zamanda kontrol kaydı yok.",
+        "STANDBY": "Bekleme sunucusunda geçerli değil.",
+        "NONE": "Kontrol edilecek bir şey yok.",
+        "GRANT": "Eksik ayrıcalıklar — bağlantı hesabına pg_monitor rolünü verin.",
+        "LINK": "schema.pi sorgusu başarısız oldu ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Bağlantılar'da bağlantı durumunu kontrol edin ve schema.pi'de bağlantı ayarlarını (ana bilgisayar, bağlantı noktası, hesap) düzeltin.",
+          "2": "DB sunucusunun çalışır durumda olduğunu ve yakın zamanda yeniden başlatılıp başlatılmadığını kontrol edin.",
+          "3": "Hala yavaşsa, sunucu yükünü (CPU, disk) ve ağı kontrol edin."
+        },
+        "CONN_USE": {
+          "1": "Etkinlik ve kilitler sekmesinde kullanıcıya ve duruma göre oturum sayılarını görün.",
+          "2": "Çok sayıda boşta bekleyen varsa, uygulama havuzunu küçültün veya bir bağlantı havuzu ekleyin.",
+          "3": "max_connections'ı belleği göz önünde bulundurarak dikkatlice artırın."
+        },
+        "URL": {
+          "1": "schema.pi monitöründe başarısız olan URL'leri ve durum kodlarını görün.",
+          "2": "Uygulama dağıtımını ve harici bağımlılıkları kontrol edin.",
+          "3": "Tekrarlanırsa, bir URL hata sayısı (URL_FAIL_CNT) kuralı ekleyin."
+        },
+        "LONG_QRY": {
+          "1": "Etkinlik ve kilitler sekmesinde uzun süreli sorguları ve kullanıcılarını bulun.",
+          "2": "SQL ayarlamasında planı gözden geçirin ve dizinleri veya koşulları düzeltin.",
+          "3": "Acilse, bir DBA pg_cancel_backend ile iptal eder."
+        },
+        "IDLE_TX": {
+          "1": "Etkinlik ve kilitler sekmesinde işlemde boşta bekleyen oturumların son sorgusunu görün.",
+          "2": "Uygulama kodunda eksik commit veya rollback'i bulun.",
+          "3": "idle_in_transaction_session_timeout ile sınırlayın."
+        },
+        "LOCK_WAIT": {
+          "1": "Etkinlik ve kilitler sekmesinde engelleyen oturumu (blocked_by) bulun.",
+          "2": "İşlemini sonlandırın veya bir DBA'nın iptal etmesini sağlayın.",
+          "3": "Aynı satırları uzun süre tutan toplu işlemleri veya işlem sırasını düzeltin."
+        },
+        "CACHE_HIT": {
+          "1": "Yavaş sorgu sekmesinde büyük tabloların tam taramalarını bulun.",
+          "2": "Daha az blok okumak için gerekli dizinleri ekleyin.",
+          "3": "Bellek izin veriyorsa, shared_buffers'ı gözden geçirin."
+        },
+        "XACT_ERR": {
+          "1": "Uygulama hata günlüklerinde geri alma nedenlerini (kısıtlama ihlalleri, zaman aşımları) bulun.",
+          "2": "Kilitlenmeler varsa, tabloları tutarlı bir sırada kilitleyin.",
+          "3": "Yeniden deneme mantığının geri almaları şişirmediğini kontrol edin."
+        },
+        "SLOW_SQL": {
+          "1": "Yavaş sorgu sekmesinde toplam süreye göre en iyi sorguları seçin.",
+          "2": "SQL ayarlamasında planları gözden geçirin ve dizinleri veya birleştirmeleri düzeltin.",
+          "3": "Düzeltme sonrası, ortalama sürenin azaldığını kontrol edin."
+        },
+        "STORAGE": {
+          "1": "Boyut eğilimi sekmesinde büyüme eğilimini ve tahmini dolum tarihini görün.",
+          "2": "Büyük tabloları, dizinleri ve eski verileri temizleyin.",
+          "3": "Gerekirse disk ekleyin ve limit kuralını güncelleyin."
+        },
+        "VACUUM": {
+          "1": "Tablo ve dizin sağlığı sekmesinde çok sayıda ölü satıra sahip tabloları görün.",
+          "2": "Bir DBA VACUUM (ANALYZE) çalıştırır.",
+          "3": "Tekrarlanırsa, o tablo için autovacuum eşiklerini düşürün."
+        },
+        "INDEX": {
+          "1": "Tablo ve dizin sağlığı sekmesinde geçersiz veya kullanılmayan dizinleri ve tam tarama tablolarını görün.",
+          "2": "Geçersiz dizinleri yeniden oluşturun; bir DBA kullanılmayanları gözden geçirir ve düşürür.",
+          "3": "Çok sayıda tam tarama içeren tablolar için SQL ayarlamasında dizinleri tasarlayın."
+        },
+        "BACKUP": {
+          "1": "Yedekleme ve kurtarma sekmesinde archive_mode ve son arşivleme zamanını görün.",
+          "2": "Arşivleme başarısız olursa, archive_command'ı ve hedeften boş alanı kontrol edin.",
+          "3": "Yönetilen bir DB'de, sağlayıcının yedekleme ayarlarını kontrol edin."
+        },
+        "REPL": {
+          "1": "Replikasyon ve DR sekmesinde her bekleme sunucusunun durumunu ve gecikmesini görün.",
+          "2": "Bekleme sunucusunda diski, CPU'yu ve ağı kontrol edin.",
+          "3": "Akış yapmıyorsa, bekleme sunucusu günlüklerini kontrol edin."
+        }
+      },
+      "sqlNote": "Aşağıdaki SQL yalnızca kontrol amaçlıdır — düzeltmeler (VACUUM, DROP INDEX, pg_terminate_backend) bir DBA tarafından çalıştırılır.",
+      "go": {
+        "activity": "Etkinlik ve kilitler",
+        "top": "Yavaş sorgular",
+        "health": "Tablo ve dizin sağlığı",
+        "trend": "Kapasite eğilimi",
+        "params": "Parametre kontrolü",
+        "repl": "Replikasyon kontrolü",
+        "backup": "Yedekleme kontrolü",
+        "sqlLab": "SQL ayarlaması",
+        "drift": "Kayma karşılaştırması",
+        "connect": "Bağlantılar",
+        "schema": "schema.pi monitör"
+      },
+      "chart": {
+        "title": "Eğilimler ve sıralamalar",
+        "note": "Eğilimler, bu ekran açıkken her dakika kaydedilir (arka plan toplama yok).",
+        "gauges": "Bağlantı ve önbellek göstergeleri",
+        "sessState": "Şu anki oturumlar",
+        "sessTrend": "Oturum eğilimi ve kilit beklemeleri",
+        "tpsCombo": "İşlem hacmi ve geri alma oranı",
+        "cacheTrend": "Önbellek isabet oranı eğilimi",
+        "capacity": "DB boyutu ve tahmini",
+        "slowTop": "Yavaş SQL ilk 10",
+        "slowLegend": "Çubuk uzunluğu = toplam süre · renk = ortalama süre (▲ {warn}ms'den uyarı · ✕ {risk}ms'den risk)",
+        "sizeTop": "Alan ilk 10",
+        "heat": "Zamanla sinyale göre risk",
+        "q": {
+          "gauges": "Bağlantılar doluyor mu? Okumalar bellekten mi servis ediliyor?",
+          "sessState": "Oturumlar şimdi ne yapıyor?",
+          "sessTrend": "Oturumlar biriktiğinde kilit beklemeleri artıyor mu?",
+          "tpsCombo": "İşlem hacmi ve hata oranı birlikte mi hareket ediyor?",
+          "cacheTrend": "Önbellek isabet oranı ne zaman düştü?",
+          "capacity": "DB ne zaman dolacak?",
+          "slowTop": "Önce neyi ayarlamalı? (toplam süreye göre)",
+          "sizeTop": "Alan neyi kaplıyor?",
+          "heat": "Risk tek seferlik mi yoksa tekrarlayan mı?"
+        },
+        "asTable": "Tablo olarak görüntüle",
+        "needHistory": "Henüz eğilim yok — bu ekranı birkaç dakika açık tutun.",
+        "needPerf": "Boyut geçmişi yok — performans sekmesinde toplayın veya bu ekranı açık tutun.",
+        "noSess": "Oturum yok.",
+        "noWait": "Bekleme yok",
+        "noData": "Gösterilecek veri yok.",
+        "loading": "Yükleniyor…",
+        "waitTop": "Bekleme olayları",
+        "lockWait": "Kilit beklemeleri",
+        "tps": "İşlemler/sn",
+        "rlbk": "Geri alma oranı (%)",
+        "cacheHit": "Önbellek isabet oranı",
+        "size": "DB boyutu",
+        "limit": "Limit",
+        "forecast": "Tahmin",
+        "daysLeft": "Kalan gün",
+        "capNote": "Günlük büyüme {perDay} · limite {days} gün kaldı",
+        "tbl": "Tablo",
+        "idxToast": "Dizin + TOAST",
+        "mix": {
+          "active": "Aktif",
+          "idleTx": "İşlemde boşta",
+          "idle": "Boşta",
+          "total": "oturumlar"
+        },
+        "col": {
+          "item": "Öğe",
+          "value": "Değer",
+          "time": "Zaman",
+          "calls": "Çağrılar",
+          "total": "Toplam (ms)",
+          "mean": "Ortalama (ms)",
+          "share": "Pay"
+        }
+      },
+      "empty": {
+        "noConn": "Bu taksonomide izlenecek bir PostgreSQL sunucu bağlantısı yok — yalnızca URL'ler ve hizmet durumu gösteriliyor.",
+        "unsupported": "Bu bağlantı izlemeyi desteklemiyor (yalnızca PostgreSQL sunucu bağlantıları).",
+        "connFail": "Veritabanına bağlanılamadı — bağlantı ayarlarını ve DB durumunu kontrol edin.",
+        "linkDown": "schema.pi adresine ulaşılamadı — otomatik olarak yeniden deneniyor.",
+        "linkAuth": "Bağlantı belirtecinin süresi doldu — schema.pi'de yeni bir belirteç oluşturun ve kaydedin.",
+        "timeout": "Yanıtlar yavaş — otomatik olarak yeniden deneniyor.",
+        "rate": "Çok fazla istek var, bu nedenle yenileme aralığı artırıldı."
+      },
+      "aux": {
+        "rules": "Uyarı kurallarım ({n} aktif)",
+        "schemaSvc": "Hizmet durumu — schema.pi yanıtları",
+        "schemaSvcNote": "schema.pi tarafından depolanan son 60 dakikalık uygulama metrikleri.",
+        "source": "Veri kaynağı: hedef DB, yalnızca schema.pi adlı sorgular (salt okunur) aracılığıyla okunur; eğilimler yalnızca dbms.pi'de istatistikleri depolar (satır verisi depolanmaz)."
+      }
     }
   },
   "ops": {
     "title": "DB Operasyon Güvenliği",
+    "intro": "Bağlı PostgreSQL bağlantısının parametrelerini, hesap ayrıcalıklarını, yedekleme ve replikasyon durumunu salt okunur olarak teşhis eder. Ayarlar değiştirilmez; yalnızca karar özetleri saklanır ve müşteri DB satır verileri asla saklanmaz",
     "loading": "Yükleniyor…",
     "pickFirst": "Önce yukarıdan bir bağlantı ve bağlantı seçin",
     "run": "Tanıyı çalıştır",
@@ -638,6 +902,7 @@
   },
   "perf": {
     "title": "Performans",
+    "intro": "Bağlı PostgreSQL bağlantısından sorgu, tablo ve dizin istatistiklerini toplayarak yavaş sorguları, tablo/dizin sağlığını ve boyut eğilimlerini gösterir. Yalnızca istatistikler saklanır — müşteri DB satır verileri asla saklanmaz",
     "loading": "Yükleniyor…",
     "pickFirst": "Önce yukarıdan bir bağlantı ve bağlantı seçin",
     "pager": "Sayfalama",
@@ -650,7 +915,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "schema.pi bağlantısı hazırlanıyor. Lütfen daha sonra tekrar deneyin",
+      "PGSS_MISSING": "Bu DB'de pg_stat_statements uzantısı yüklü değil, bu nedenle sorgu istatistikleri kullanılamıyor",
       "CONN_UNSUPPORTED": "Bu bağlantı henüz desteklenmiyor (yalnızca doğrudan PostgreSQL bağlantıları)",
+      "TIMEOUT": "Hedef DB çok yavaş yanıt verdi. Lütfen daha sonra tekrar deneyin",
       "RATE": "Çok fazla istek. Bir dakika sonra tekrar deneyin",
       "LINK_AUTH": "Bağlantı belirtecinin süresi doldu veya iptal edildi. Belirteci Bağlan sayfasında tekrar kaydedin",
       "LINK_SCOPE": "Bu bağlantı, bağlantının konu alanına ait değil",
@@ -659,6 +926,7 @@
     },
     "pgss": {
       "title": "pg_stat_statements nasıl etkinleştirilir",
+      "body": "Yavaş sorgu Top-N için pg_stat_statements uzantısı gereklidir. Aşağıdaki ifadeyi bir DB yöneticisi olarak çalıştırın. Supabase'de, Database → Extensions altında etkinleştirebilirsiniz",
       "note": "Kendi kendine barındırılan PostgreSQL ayrıca shared_preload_libraries (postgresql.conf) içinde pg_stat_statements'a ve yeniden başlatmaya ihtiyaç duyar. Tablo, indeks ve boyut istatistikleri onsuz çalışır"
     },
     "collect": {
@@ -697,6 +965,7 @@
     "trend": {
       "limit": "Boyut eşiği",
       "empty": "Son 30 günde anlık görüntü yok",
+      "chart": "Son 30 gündeki DB boyutu eğilimi",
       "now": "Mevcut boyut",
       "perDay": "Günlük büyüme",
       "needMore": "2+ anlık görüntü gerekiyor",
@@ -904,6 +1173,12 @@
   },
   "nav": {
     "label": "Özellikler",
+    "groups": {
+      "monitor": "İzleme",
+      "drift": "Tutarlılık",
+      "lake": "Göl",
+      "admin": "Yönetim"
+    },
     "connect": "Bağlan",
     "sqlLab": "SQL Ayarlama",
     "perf": "Performans",

@@ -13,7 +13,7 @@
       "connect": "Registra un testimoni d'enllaç de schema.pi i comprova l'estat de la connexió",
       "sqlLab": "Arbre de planificació, advertiments, comparació i comprovacions anti-patró contra dominis estàndard",
       "perf": "Consultes lentes Top-N, salut de taules/índexs, previsió de capacitat, activitat i bloquejos",
-      "monitor": "Resum de mètriques d'aplicacions, DB i URL amb alertes de llindar",
+      "monitor": "Normal, avís i perill per a 14 senyals, a més de què fer i com resoldre-ho d'un cop d'ull",
       "drift": "Compara el model de schema.pi i l'historial de DDL amb el catàleg real, mesura l'efecte de l'índex",
       "migration": "Ordre de càrrega topològica, fragments, llista de comprovació i SQL de verificació",
       "pipeline": "Comprovació prèvia de captura de canvis i definicions de pipeline origen→transformació→destí",
@@ -446,8 +446,7 @@
     }
   },
   "monitor": {
-    "title": "Centre de monitorització",
-    "collectNote": "La recollida s'executa a schema.pi — migració planificada (D7). Aquesta pàgina llegeix el resum del monitor de schema.pi.",
+    "title": "Monitorització",
     "noLink": "Selecciona o registra primer un vincle schema.pi.",
     "goConnect": "Registra un vincle",
     "period": "Període",
@@ -457,16 +456,9 @@
       "360": "6 hores",
       "1440": "24 hores"
     },
-    "refresh": "Actualitza",
     "loading": "Carregant…",
-    "updatedAt": "{area} · a partir de {time} (actualització automàtica cada 30s)",
-    "appTitle": "Rendiment de l'aplicació",
-    "dbTitle": "Estat de la DB per connexió",
-    "urlTitle": "Comprovacions d'URL",
-    "empty": "No hi ha dades per mostrar.",
-    "breachTitle": "{n} infraccions de llindar",
-    "rulesTitle": "Regles de llindar",
-    "rulesNote": "Les regles es guarden per a aquest vincle i s'avaluen respecte al resum rebut; les infraccions reben una vora vermella (les notificacions arribaran més tard).",
+    "rulesNote": "Les regles es guarden en aquesta connexió i s'avaluen cada vegada que s'actualitza el tauler (sessió de DB/espera de bloqueig/taxa d'èxit de la memòria cau cada 1 minut, mida de la DB/temps de resposta d'URL/error cada 5 minuts). Els senyals violats s'escalaran a perill i es marcaran com a 'La meva regla' (l'enviament de notificacions és el següent pas). Les regles de mètriques de servei (APP) no s'avaluen. Les regles de mida de DB (MB) (>) també s'utilitzen com a límits de capacitat.",
+    "notEvaluated": "No avaluat",
     "metric": "Mètrica",
     "conn": "Connexió",
     "allConns": "Totes les connexions",
@@ -501,7 +493,276 @@
       "RATE": "Massa sol·licituds. Torna-ho a provar en breu.",
       "TIMEOUT": "schema.pi respon lentament. Torna-ho a provar en breu.",
       "RULE_LIMIT": "Fins a 50 regles per vincle.",
-      "NOT_FOUND": "Regla no trobada."
+      "NOT_FOUND": "Regla no trobada.",
+      "CONN_FAIL": "No s'ha pogut connectar a la base de dades. Comproveu la configuració de la connexió i l'estat de la DB.",
+      "LINK_DOWN": "No s'ha pogut accedir a schema.pi. Torneu-ho a provar d'aquí a poc.",
+      "PGSS_MISSING": "pg_stat_statements no està instal·lat, per tant, el SQL lent no està disponible.",
+      "CONN_UNSUPPORTED": "Aquesta connexió no admet la monitorització (només connexions de servidor PostgreSQL).",
+      "CONN_DISABLED": "Aquesta connexió està desactivada. Activeu-la a schema.pi.",
+      "INVALID_INPUT": "La sol·licitud no és vàlida."
+    },
+    "board": {
+      "refresh": {
+        "updated": "A partir de les {time} · s'actualitza cada minut",
+        "now": "Actualitza ara",
+        "busy": "Carregant…",
+        "stale": "Antic · fa {min} min"
+      },
+      "level": {
+        "RISK": "Risc",
+        "WARN": "Avís",
+        "OK": "Correcte",
+        "UNKNOWN": "Desconegut",
+        "NA": "N/A"
+      },
+      "overall": {
+        "RISK": "Risc — cal actuar ara",
+        "WARN": "Avís — alguns elements necessiten una revisió",
+        "UNKNOWN": "Desconegut — comproveu la connexió",
+        "OK": "Correcte — tots els senyals estan dins dels límits",
+        "NA": "N/A"
+      },
+      "kpi": {
+        "sess": "Sessions / màx",
+        "tps": "Transaccions/s",
+        "cache": "Taxa d'èxit de la memòria cau",
+        "size": "Mida de la DB"
+      },
+      "todo": {
+        "title": "Per fer ara",
+        "more": "Mostra {n} més",
+        "less": "Mostra menys",
+        "setup": "Configureu-ho per veure'n més",
+        "none": "No hi ha elements de risc o avís que requereixin acció ara mateix.",
+        "unknown": "No s'han pogut comprovar {n} senyal(s) — vegeu les targetes per saber el motiu.",
+        "myRule": "La meva regla s'ha incomplert: {rule}",
+        "copySql": "Copia SQL",
+        "copied": "Copiat"
+      },
+      "cat": {
+        "avail": "Disponibilitat",
+        "load": "Càrrega i esperes",
+        "eff": "Eficiència",
+        "store": "Emmagatzematge i manteniment",
+        "protect": "Protecció (còpia de seguretat, replicació)"
+      },
+      "card": {
+        "thr": "Límits: avís {warn} · risc {risk}",
+        "thrDown": "Límits: avís per sota de {warn} · risc per sota de {risk}",
+        "more": "Com solucionar-ho",
+        "addRule": "Afegeix una regla per a aquesta mètrica",
+        "basisLive": "Últim minut",
+        "basisStored": "Acumulat",
+        "since": "estadístiques restablertes {at}",
+        "partial": "Vista parcial (límit de 500 files o privilegis insuficients)."
+      },
+      "sig": {
+        "AVAIL": "Resposta de la DB",
+        "CONN_USE": "Ús de la connexió (aquesta DB)",
+        "URL": "URL de servei",
+        "LONG_QRY": "Consultes de llarga durada",
+        "IDLE_TX": "Transaccions inactives",
+        "LOCK_WAIT": "Esperes de bloqueig",
+        "CACHE_HIT": "Taxa d'èxit de la memòria cau",
+        "XACT_ERR": "Rollbacks i interbloquejos",
+        "SLOW_SQL": "SQL lent",
+        "STORAGE": "Emmagatzematge",
+        "VACUUM": "Vacuum",
+        "INDEX": "Estat de l'índex",
+        "BACKUP": "Còpia de seguretat (arxiu WAL)",
+        "REPL": "Retard de replicació"
+      },
+      "fix": {
+        "AVAIL": "Resposta lenta o un reinici recent — comproveu la configuració de la connexió i l'estat del servidor de la DB.",
+        "AVAIL_DOWN": "No s'ha pogut connectar a la DB — comproveu la configuració de la connexió i que el servidor de la DB estigui actiu.",
+        "CONN_USE": "{sess}/{max} sessions en aquesta DB (no a tot el clúster — s'exclouen altres bases de dades) — tanqueu les connexions inactives o afegiu un agrupador de connexions (pgbouncer).",
+        "URL": "{n} URL comprovades fallen · resposta màxima {ms}ms — vegeu el monitor de schema.pi per saber la causa.",
+        "LONG_QRY": "Una consulta s'ha estat executant durant {sec}s — reviseu el seu pla i ajusteu-la, o feu que un DBA la cancel·li.",
+        "IDLE_TX": "Una transacció ha estat inactiva durant {sec}s — trobeu el commit que falta a l'aplicació i establiu un temps d'espera.",
+        "LOCK_WAIT": "{n} sessions estan esperant bloquejos — trobeu la sessió que bloqueja i finalitzeu la seva transacció.",
+        "CACHE_HIT": "Taxa d'èxit de la memòria cau {pct}% — busqueu exploracions completes de taules grans o reviseu shared_buffers.",
+        "XACT_ERR": "Taxa de rollback {pct}%, {dlck} interbloquejos — comproveu les transaccions fallides i els registres d'errors de l'aplicació.",
+        "SLOW_SQL": "Una consulta té una mitjana de {ms} ms — ajusteu les consultes principals per temps total utilitzant els seus plans.",
+        "STORAGE": "La DB ({gb} GB) està a prop del seu límit (dies restants {days}) — netegeu taules grans o afegiu capacitat.",
+        "VACUUM": "{tbl} té moltes files mortes o estadístiques obsoletes — reviseu la configuració de VACUUM (ANALYZE) i autovacuum.",
+        "INDEX": "{n} troballes d'índex (invàlid, no utilitzat, exploracions completes) — vegeu la pestanya d'estat de la taula i l'índex per als objectius.",
+        "BACKUP": "L'arxivament de WAL està desactivat o aturat — comproveu archive_mode, archive_command i l'estat de la còpia de seguretat.",
+        "REPL": "Retard de replicació {sec}s — comproveu l'estat de l'espera i la xarxa.",
+        "PGSS": "pg_stat_statements no està instal·lat, per tant, el SQL lent no està disponible — activeu-lo amb el SQL següent (es requereix reiniciar el servidor)."
+      },
+      "reason": {
+        "CONN_DOWN": "No s'ha jutjat perquè la connexió a la DB està caiguda.",
+        "PGSS": "pg_stat_statements no està instal·lat.",
+        "VER": "Disponible a PostgreSQL 13 o posterior.",
+        "SAMPLE": "Encara no hi ha prou mostres.",
+        "NO_LIMIT": "No hi ha límit de mida, per tant, l'ús no es jutja — afegiu una regla de mida de DB (MB) (>) per utilitzar-la com a límit.",
+        "RESET": "Les estadístiques es van restablir fa menys de 7 dies, per tant, els índexs no utilitzats no es jutgen.",
+        "STALE": "No hi ha registres de comprovació recents.",
+        "STANDBY": "No aplicable en un servidor en espera.",
+        "NONE": "Res a comprovar.",
+        "GRANT": "Falten privilegis — concediu el rol pg_monitor al compte de connexió.",
+        "LINK": "La consulta de schema.pi ha fallat ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Comproveu l'estat de la connexió a Connexions i corregiu la configuració de la connexió (host, port, compte) a schema.pi.",
+          "2": "Comproveu que el servidor de la DB estigui actiu i si s'ha reiniciat recentment.",
+          "3": "Si continua lent, comproveu la càrrega del servidor (CPU, disc) i la xarxa."
+        },
+        "CONN_USE": {
+          "1": "Vegeu el recompte de sessions per usuari i estat a la pestanya d'activitat i bloquejos.",
+          "2": "Si moltes estan inactives, reduïu el grup d'aplicacions o afegiu un agrupador de connexions.",
+          "3": "Augmenteu max_connections amb cura, tenint en compte la memòria."
+        },
+        "URL": {
+          "1": "Vegeu les URL fallides i els codis d'estat al monitor de schema.pi.",
+          "2": "Comproveu el desplegament de l'aplicació i les dependències externes.",
+          "3": "Si es repeteix, afegiu una regla de recompte d'errors d'URL (URL_FAIL_CNT)."
+        },
+        "LONG_QRY": {
+          "1": "Trobeu les consultes de llarga durada i els seus usuaris a la pestanya d'activitat i bloquejos.",
+          "2": "Reviseu el pla a l'ajust de SQL i corregiu els índexs o les condicions.",
+          "3": "Si és urgent, un DBA la cancel·la amb pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Vegeu l'última consulta de les sessions inactives en transacció a la pestanya d'activitat i bloquejos.",
+          "2": "Trobeu el commit que falta al codi de l'aplicació.",
+          "3": "Limita-ho amb idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Trobeu la sessió que bloqueja (blocked_by) a la pestanya d'activitat i bloquejos.",
+          "2": "Finalitzeu la seva transacció o feu que un DBA la cancel·li.",
+          "3": "Corregiu els lots o l'ordre de les transaccions que mantenen les mateixes files durant molt de temps."
+        },
+        "CACHE_HIT": {
+          "1": "Trobeu exploracions completes de taules grans a la pestanya de consultes lentes.",
+          "2": "Afegiu els índexs necessaris per llegir menys blocs.",
+          "3": "Si la memòria ho permet, reviseu shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Trobeu les causes del rollback (violacions de restriccions, temps d'espera) als registres d'errors de l'aplicació.",
+          "2": "Si hi ha interbloquejos, bloquegeu les taules en un ordre coherent.",
+          "3": "Comproveu que la lògica de reintent no estigui inflant els rollbacks."
+        },
+        "SLOW_SQL": {
+          "1": "Trieu les consultes principals per temps total a la pestanya de consultes lentes.",
+          "2": "Reviseu els plans a l'ajust de SQL i corregiu els índexs o les unions.",
+          "3": "Després de corregir, comproveu que el temps mitjà ha disminuït."
+        },
+        "STORAGE": {
+          "1": "Vegeu la tendència de creixement i la data de finalització estimada a la pestanya de tendència de mida.",
+          "2": "Netegeu taules grans, índexs i dades antigues.",
+          "3": "Si cal, afegiu disc i actualitzeu la regla de límit."
+        },
+        "VACUUM": {
+          "1": "Vegeu les taules amb moltes files mortes a la pestanya d'estat de la taula i l'índex.",
+          "2": "Un DBA executa VACUUM (ANALYZE).",
+          "3": "Si es repeteix, reduïu els llindars d'autovacuum per a aquesta taula."
+        },
+        "INDEX": {
+          "1": "Vegeu els índexs invàlids o no utilitzats i les taules d'exploració completa a la pestanya d'estat de la taula i l'índex.",
+          "2": "Reconstruïu els índexs invàlids; un DBA revisa i elimina els no utilitzats.",
+          "3": "Dissenyeu índexs a l'ajust de SQL per a taules amb moltes exploracions completes."
+        },
+        "BACKUP": {
+          "1": "Vegeu archive_mode i l'última hora d'arxiu a la pestanya de còpia de seguretat i recuperació.",
+          "2": "Si l'arxivament falla, comproveu archive_command i l'espai lliure a la destinació.",
+          "3": "En una DB gestionada, comproveu la configuració de la còpia de seguretat del proveïdor."
+        },
+        "REPL": {
+          "1": "Vegeu l'estat i el retard de cada espera a la pestanya de replicació i DR.",
+          "2": "Comproveu el disc, la CPU i la xarxa a l'espera.",
+          "3": "Si no està en streaming, comproveu els registres de l'espera."
+        }
+      },
+      "sqlNote": "El SQL següent és de només lectura, per a la comprovació — les correccions (VACUUM, DROP INDEX, pg_terminate_backend) les executa un DBA.",
+      "go": {
+        "activity": "Activitat i bloquejos",
+        "top": "Consultes lentes",
+        "health": "Estat de la taula i l'índex",
+        "trend": "Tendència de capacitat",
+        "params": "Comprovació de paràmetres",
+        "repl": "Comprovació de replicació",
+        "backup": "Comprovació de còpia de seguretat",
+        "sqlLab": "Ajust de SQL",
+        "drift": "Comparació de deriva",
+        "connect": "Connexions",
+        "schema": "monitor de schema.pi"
+      },
+      "chart": {
+        "title": "Tendències i classificacions",
+        "note": "Les tendències es registren cada minut mentre aquesta pantalla està oberta (sense recollida en segon pla).",
+        "gauges": "Indicadors de connexió i memòria cau",
+        "sessState": "Sessions ara mateix",
+        "sessTrend": "Tendència de sessions i esperes de bloqueig",
+        "tpsCombo": "Rendiment i taxa de rollback",
+        "cacheTrend": "Tendència de la taxa d'èxit de la memòria cau",
+        "capacity": "Mida i previsió de la DB",
+        "slowTop": "Top 10 de SQL lent",
+        "slowLegend": "Longitud de la barra = temps total · color = temps mitjà (▲ avís a partir de {warn}ms · ✕ risc a partir de {risk}ms)",
+        "sizeTop": "Top 10 d'espai",
+        "heat": "Risc per senyal al llarg del temps",
+        "q": {
+          "gauges": "Les connexions s'estan omplint? Les lectures es serveixen des de la memòria?",
+          "sessState": "Què estan fent les sessions ara?",
+          "sessTrend": "Augmenten les esperes de bloqueig quan s'acumulen les sessions?",
+          "tpsCombo": "El rendiment i la taxa d'errors es mouen junts?",
+          "cacheTrend": "Quan va caure la taxa d'èxit de la memòria cau?",
+          "capacity": "Quan s'omplirà la DB?",
+          "slowTop": "Què cal ajustar primer? (per temps total)",
+          "sizeTop": "Què ocupa l'espai?",
+          "heat": "El risc és puntual o recurrent?"
+        },
+        "asTable": "Mostra com a taula",
+        "needHistory": "Encara no hi ha tendència — mantingueu aquesta pantalla oberta uns minuts.",
+        "needPerf": "No hi ha historial de mida — recopileu-lo a la pestanya de rendiment o mantingueu aquesta pantalla oberta.",
+        "noSess": "No hi ha sessions.",
+        "noWait": "Sense esperes",
+        "noData": "No hi ha dades per mostrar.",
+        "loading": "Carregant…",
+        "waitTop": "Esdeveniments d'espera",
+        "lockWait": "Esperes de bloqueig",
+        "tps": "Transaccions/s",
+        "rlbk": "Taxa de rollback (%)",
+        "cacheHit": "Taxa d'èxit de la memòria cau",
+        "size": "Mida de la DB",
+        "limit": "Límit",
+        "forecast": "Previsió",
+        "daysLeft": "Dies restants",
+        "capNote": "Creixement per dia {perDay} · {days} dies fins al límit",
+        "tbl": "Taula",
+        "idxToast": "Índex + TOAST",
+        "mix": {
+          "active": "Actiu",
+          "idleTx": "Inactiu en transacció",
+          "idle": "Inactiu",
+          "total": "sessions"
+        },
+        "col": {
+          "item": "Element",
+          "value": "Valor",
+          "time": "Hora",
+          "calls": "Crides",
+          "total": "Total (ms)",
+          "mean": "Mitjana (ms)",
+          "share": "Quota"
+        }
+      },
+      "empty": {
+        "noConn": "Aquesta taxonomia no té cap connexió de servidor PostgreSQL per monitoritzar — només es mostren les URL i l'estat del servei.",
+        "unsupported": "Aquesta connexió no admet la monitorització (només connexions de servidor PostgreSQL).",
+        "connFail": "No s'ha pogut connectar a la base de dades — comproveu la configuració de la connexió i l'estat de la DB.",
+        "linkDown": "No s'ha pogut accedir a schema.pi — es torna a intentar automàticament.",
+        "linkAuth": "El testimoni de connexió ha caducat — emeteu un nou testimoni a schema.pi i registreu-lo.",
+        "timeout": "Les respostes són lentes — es torna a intentar automàticament.",
+        "rate": "Massa sol·licituds, per tant, l'interval d'actualització s'ha augmentat."
+      },
+      "aux": {
+        "rules": "Les meves regles d'alerta ({n} actives)",
+        "schemaSvc": "Estat del servei — respostes de schema.pi",
+        "schemaSvcNote": "Mètriques de l'aplicació dels últims 60 minuts emmagatzemades per schema.pi.",
+        "source": "Font de dades: la DB de destinació és de només lectura mitjançant consultes amb nom de schema.pi (només lectura); les tendències emmagatzemen estadístiques només a dbms.pi (sense dades de fila)."
+      }
     }
   },
   "ops": {
@@ -904,6 +1165,12 @@
   },
   "nav": {
     "label": "Funcions",
+    "groups": {
+      "monitor": "Monitorització",
+      "drift": "Consistència",
+      "lake": "Lake",
+      "admin": "Administració"
+    },
     "connect": "Connecta",
     "sqlLab": "Tuning SQL",
     "perf": "Rendiment",

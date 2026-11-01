@@ -13,7 +13,7 @@
       "connect": "Užregistruokite schema.pi nuorodos žetoną ir patikrinkite ryšio būseną",
       "sqlLab": "Plano medis, įspėjimai, palyginimas ir anti-modelių patikrinimai pagal standartinius domenus",
       "perf": "Lėtos užklausos Top-N, lentelių/indeksų būklė, talpos prognozė, veikla ir užraktai",
-      "monitor": "Programos, DB ir URL metrikos suvestinė su slenksčio įspėjimais",
+      "monitor": "14 signalų būsenos (normalu, įspėjimas, pavojus), ką daryti ir kaip išspręsti – viskas vienu žvilgsniu",
       "drift": "Palyginkite schema.pi modelį ir DDL istoriją su realiu katalogu, įvertinkite indekso efektą",
       "migration": "Topologinė įkėlimo tvarka, dalys, kontrolinis sąrašas ir patvirtinimo SQL",
       "pipeline": "Pakeitimų fiksavimo išankstinis patikrinimas ir šaltinio→transformavimo→tikslo konvejerio apibrėžimai",
@@ -443,8 +443,7 @@
     }
   },
   "monitor": {
-    "title": "Stebėjimo centras",
-    "collectNote": "Duomenų rinkimas vykdomas schema.pi – migracija suplanuota (D7). Šis puslapis nuskaito schema.pi stebėjimo suvestinę.",
+    "title": "Stebėjimas",
     "noLink": "Pirmiausia pasirinkite arba užregistruokite schema.pi nuorodą.",
     "goConnect": "Registruoti nuorodą",
     "period": "Laikotarpis",
@@ -454,16 +453,9 @@
       "360": "6 valandos",
       "1440": "24 valandos"
     },
-    "refresh": "Atnaujinti",
     "loading": "Įkeliama…",
-    "updatedAt": "{area} · nuo {time} (automatinis atnaujinimas kas 30s)",
-    "appTitle": "Programos našumas",
-    "dbTitle": "DB būsena pagal prisijungimą",
-    "urlTitle": "URL patikrinimai",
-    "empty": "Nėra duomenų rodymui.",
-    "breachTitle": "{n} viršytos ribos",
-    "rulesTitle": "Ribinių verčių taisyklės",
-    "rulesNote": "Taisyklės išsaugotos šiai nuorodai ir vertinamos pagal gautą suvestinę; viršijimai pažymimi raudonu rėmeliu (pranešimai bus vėliau).",
+    "rulesNote": "Taisyklės išsaugomos šiam ryšiui ir įvertinamos kiekvieną kartą atnaujinus lentą (DB sesija, užrakto laukimas, talpyklos pataikymo dažnis – kas 1 minutę; DB dydis, URL atsako laikas, gedimas – kas 5 minutes). Pažeisti signalai eskaluojami iki pavojaus ir pažymimi „Mano taisyklė“ (pranešimų siuntimas yra kitas žingsnis). Paslaugos (APP) metrikos taisyklės nevertinamos. DB dydžio (MB) taisyklės (>) taip pat naudojamos kaip talpos limitai.",
+    "notEvaluated": "Neįvertinta",
     "metric": "Metrika",
     "conn": "Prisijungimas",
     "allConns": "Visi prisijungimai",
@@ -498,7 +490,276 @@
       "RATE": "Per daug užklausų. Bandykite dar kartą netrukus.",
       "TIMEOUT": "schema.pi reaguoja lėtai. Bandykite dar kartą netrukus.",
       "RULE_LIMIT": "Iki 50 taisyklių vienai nuorodai.",
-      "NOT_FOUND": "Taisyklė nerasta."
+      "NOT_FOUND": "Taisyklė nerasta.",
+      "CONN_FAIL": "Nepavyko prisijungti prie duomenų bazės. Patikrinkite prisijungimo nustatymus ir DB būseną.",
+      "LINK_DOWN": "Nepavyko pasiekti schema.pi. Bandykite dar kartą po kurio laiko.",
+      "PGSS_MISSING": "pg_stat_statements neįdiegta, todėl lėtas SQL nepasiekiamas.",
+      "CONN_UNSUPPORTED": "Šis ryšys nepalaiko stebėjimo (tik PostgreSQL serverio ryšiai).",
+      "CONN_DISABLED": "Šis ryšys išjungtas. Įjunkite jį schema.pi.",
+      "INVALID_INPUT": "Užklausos reikšmė neteisinga."
+    },
+    "board": {
+      "refresh": {
+        "updated": "Atnaujinta {time} · atnaujinama kas minutę",
+        "now": "Atnaujinti dabar",
+        "busy": "Įkeliama…",
+        "stale": "Pasenę · prieš {min} min."
+      },
+      "level": {
+        "RISK": "Rizika",
+        "WARN": "Įspėjimas",
+        "OK": "Gerai",
+        "UNKNOWN": "Nežinoma",
+        "NA": "Netaikoma"
+      },
+      "overall": {
+        "RISK": "Rizika – reikia imtis veiksmų dabar",
+        "WARN": "Įspėjimas – kai kuriuos elementus reikia peržiūrėti",
+        "UNKNOWN": "Nežinoma – patikrinkite ryšį",
+        "OK": "Gerai – visi signalai yra ribose",
+        "NA": "Netaikoma"
+      },
+      "kpi": {
+        "sess": "Sesijos / maks.",
+        "tps": "Operacijos/s",
+        "cache": "Talpyklos pataikymo dažnis",
+        "size": "DB dydis"
+      },
+      "todo": {
+        "title": "Ką daryti dabar",
+        "more": "Rodyti dar {n}",
+        "less": "Rodyti mažiau",
+        "setup": "Nustatykite tai, kad matytumėte daugiau",
+        "none": "Šiuo metu nėra rizikos ar įspėjimo elementų, kuriems reikėtų veiksmų.",
+        "unknown": "Nepavyko patikrinti {n} signalo (-ų) – priežastį žr. kortelėse.",
+        "myRule": "Mano taisyklė pažeista: {rule}",
+        "copySql": "Kopijuoti SQL",
+        "copied": "Nukopijuota"
+      },
+      "cat": {
+        "avail": "Prieinamumas",
+        "load": "Apkrova ir laukimai",
+        "eff": "Efektyvumas",
+        "store": "Saugykla ir priežiūra",
+        "protect": "Apsauga (atsarginė kopija, replikacija)"
+      },
+      "card": {
+        "thr": "Ribos: įspėjimas {warn} · rizika {risk}",
+        "thrDown": "Ribos: įspėjimas žemiau {warn} · rizika žemiau {risk}",
+        "more": "Kaip pataisyti",
+        "addRule": "Pridėti taisyklę šiai metrikai",
+        "basisLive": "Paskutinė minutė",
+        "basisStored": "Kaupiamasis",
+        "since": "Statistika atnaujinta {at}",
+        "partial": "Dalinis vaizdas (500 eilučių riba arba trūksta privilegijų)."
+      },
+      "sig": {
+        "AVAIL": "DB atsakas",
+        "CONN_USE": "Ryšio naudojimas (ši DB)",
+        "URL": "Paslaugos URL",
+        "LONG_QRY": "Ilgai vykdomos užklausos",
+        "IDLE_TX": "Nenaudojamos transakcijos",
+        "LOCK_WAIT": "Užrakto laukimai",
+        "CACHE_HIT": "Talpyklos pataikymo dažnis",
+        "XACT_ERR": "Atšaukimai ir aklavietės",
+        "SLOW_SQL": "Lėtas SQL",
+        "STORAGE": "Saugykla",
+        "VACUUM": "Valymas (VACUUM)",
+        "INDEX": "Indekso būklė",
+        "BACKUP": "Atsarginė kopija (WAL archyvas)",
+        "REPL": "Replikacijos vėlavimas"
+      },
+      "fix": {
+        "AVAIL": "Lėtas atsakas arba neseniai įvykęs perkrovimas – patikrinkite prisijungimo nustatymus ir DB serverio būseną.",
+        "AVAIL_DOWN": "Nepavyko prisijungti prie DB – patikrinkite prisijungimo nustatymus ir ar DB serveris veikia.",
+        "CONN_USE": "{sess}/{max} sesijų šioje DB (ne visame klasteryje – kitos duomenų bazės neįtrauktos) – uždarykite nenaudojamus ryšius arba pridėkite ryšių telkinį (pgbouncer).",
+        "URL": "{n} patikrintų URL nepavyko · maksimalus atsakas {ms}ms – priežastį žr. schema.pi monitoriuje.",
+        "LONG_QRY": "Užklausa vykdoma {sec}s – peržiūrėkite jos planą ir sureguliuokite, arba paprašykite DBA ją atšaukti.",
+        "IDLE_TX": "Transakcija nenaudojama {sec}s – raskite trūkstamą patvirtinimą programoje ir nustatykite laiko limitą.",
+        "LOCK_WAIT": "{n} sesijų laukia užraktų – raskite blokuojančią sesiją ir užbaikite jos transakciją.",
+        "CACHE_HIT": "Talpyklos pataikymo dažnis {pct}% – ieškokite didelių lentelių visų nuskaitymų arba peržiūrėkite shared_buffers.",
+        "XACT_ERR": "Atšaukimo dažnis {pct}%, {dlck} aklavietės – patikrinkite nepavykusias transakcijas ir programos klaidų žurnalus.",
+        "SLOW_SQL": "Užklausos vidurkis {ms} ms – sureguliuokite populiariausias užklausas pagal bendrą laiką, naudodami jų planus.",
+        "STORAGE": "DB ({gb} GB) artėja prie savo limito (liko dienų {days}) – išvalykite dideles lenteles arba padidinkite talpą.",
+        "VACUUM": "{tbl} turi daug negyvų eilučių arba pasenusių statistikų – peržiūrėkite VACUUM (ANALYZE) ir autovacuum nustatymus.",
+        "INDEX": "{n} indekso radinių (neteisingi, nenaudojami, visi nuskaitymai) – tikslus žr. lentelės ir indekso būklės skirtuke.",
+        "BACKUP": "WAL archyvavimas išjungtas arba sustabdytas – patikrinkite archive_mode, archive_command ir atsarginės kopijos būseną.",
+        "REPL": "Replikacijos vėlavimas {sec}s – patikrinkite budėjimo režimo būseną ir tinklą.",
+        "PGSS": "pg_stat_statements neįdiegta, todėl lėtas SQL nepasiekiamas – įjunkite jį naudodami žemiau esantį SQL (reikalingas serverio perkrovimas)."
+      },
+      "reason": {
+        "CONN_DOWN": "Neįvertinta, nes DB ryšys neveikia.",
+        "PGSS": "pg_stat_statements plėtinio nėra.",
+        "VER": "Galima naudoti tik su PostgreSQL 13 ar naujesne versija.",
+        "SAMPLE": "Dar nepakanka pavyzdžių.",
+        "NO_LIMIT": "Nėra dydžio limito, todėl naudojimas nevertinamas – pridėkite DB dydžio (MB) taisyklę (>) norėdami ją naudoti kaip limitą.",
+        "RESET": "Statistika atnaujinta mažiau nei prieš 7 dienas, todėl nenaudojami indeksai nevertinami.",
+        "STALE": "Nėra naujausių patikrinimo įrašų.",
+        "STANDBY": "Netaikoma budėjimo režimo serveryje.",
+        "NONE": "Nėra ko tikrinti.",
+        "GRANT": "Trūksta privilegijų – suteikite pg_monitor rolę prisijungimo paskyrai.",
+        "LINK": "schema.pi užklausa nepavyko ({code})"
+      },
+      "steps": {
+        "AVAIL": {
+          "1": "Patikrinkite ryšio būseną skiltyje „Ryšiai“ ir pataisykite ryšio nustatymus (host, port, account) schema.pi.",
+          "2": "Patikrinkite, ar DB serveris veikia ir ar jis neseniai buvo perkrautas.",
+          "3": "Jei vis dar lėtai veikia, patikrinkite serverio apkrovą (CPU, diską) ir tinklą."
+        },
+        "CONN_USE": {
+          "1": "Žr. sesijų skaičių pagal vartotoją ir būseną skirtuke „Veikla ir užraktai“.",
+          "2": "Jei daug yra nenaudojamų, sumažinkite programos telkinio dydį arba pridėkite ryšių telkinį.",
+          "3": "Atsargiai padidinkite max_connections, atsižvelgdami į atmintį."
+        },
+        "URL": {
+          "1": "Žr. nepavykusius URL ir būsenos kodus schema.pi monitoriuje.",
+          "2": "Patikrinkite programos diegimą ir išorines priklausomybes.",
+          "3": "Jei tai kartojasi, pridėkite URL gedimų skaičiaus (URL_FAIL_CNT) taisyklę."
+        },
+        "LONG_QRY": {
+          "1": "Raskite ilgai vykdomas užklausas ir jų vartotojus skirtuke „Veikla ir užraktai“.",
+          "2": "Peržiūrėkite planą SQL derinime ir pataisykite indeksus ar sąlygas.",
+          "3": "Jei skubu, DBA atšaukia ją su pg_cancel_backend."
+        },
+        "IDLE_TX": {
+          "1": "Žr. paskutinę nenaudojamų transakcijų sesijų užklausą skirtuke „Veikla ir užraktai“.",
+          "2": "Raskite trūkstamą patvirtinimą arba atšaukimą programos kode.",
+          "3": "Apribokite ją su idle_in_transaction_session_timeout."
+        },
+        "LOCK_WAIT": {
+          "1": "Raskite blokuojančią sesiją (blocked_by) skirtuke „Veikla ir užraktai“.",
+          "2": "Užbaikite jos transakciją arba paprašykite DBA ją atšaukti.",
+          "3": "Pataisykite paketus ar transakcijų tvarką, kurie ilgai laiko tas pačias eilutes."
+        },
+        "CACHE_HIT": {
+          "1": "Raskite didelių lentelių visus nuskaitymus lėtų užklausų skirtuke.",
+          "2": "Pridėkite reikalingus indeksus, kad būtų skaitoma mažiau blokų.",
+          "3": "Jei atmintis leidžia, peržiūrėkite shared_buffers."
+        },
+        "XACT_ERR": {
+          "1": "Raskite atšaukimo priežastis (apribojimų pažeidimai, laiko limitai) programos klaidų žurnaluose.",
+          "2": "Jei yra aklavietės, užrakinkite lenteles nuoseklia tvarka.",
+          "3": "Patikrinkite, ar pakartotinio bandymo logika nedidina atšaukimų."
+        },
+        "SLOW_SQL": {
+          "1": "Pasirinkite populiariausias užklausas pagal bendrą laiką lėtų užklausų skirtuke.",
+          "2": "Peržiūrėkite planus SQL derinime ir pataisykite indeksus ar sujungimus.",
+          "3": "Po pataisymo patikrinkite, ar vidutinis laikas sumažėjo."
+        },
+        "STORAGE": {
+          "1": "Žr. augimo tendenciją ir numatomą užpildymo datą talpos tendencijų skirtuke.",
+          "2": "Išvalykite dideles lenteles, indeksus ir senus duomenis.",
+          "3": "Jei reikia, pridėkite disko ir atnaujinkite limito taisyklę."
+        },
+        "VACUUM": {
+          "1": "Žr. lenteles su daug negyvų eilučių lentelės ir indekso būklės skirtuke.",
+          "2": "DBA paleidžia VACUUM (ANALYZE).",
+          "3": "Jei tai kartojasi, sumažinkite autovacuum slenksčius tai lentelei."
+        },
+        "INDEX": {
+          "1": "Žr. neteisingus ar nenaudojamus indeksus ir visų nuskaitymų lenteles lentelės ir indekso būklės skirtuke.",
+          "2": "Atkurkite neteisingus indeksus; DBA peržiūri ir pašalina nenaudojamus.",
+          "3": "SQL derinime suprojektuokite indeksus lentelėms su daug visų nuskaitymų."
+        },
+        "BACKUP": {
+          "1": "Žr. archive_mode ir paskutinį archyvavimo laiką atsarginių kopijų ir atkūrimo skirtuke.",
+          "2": "Jei archyvavimas nepavyksta, patikrinkite archive_command ir laisvą vietą paskirties vietoje.",
+          "3": "Valdomoje DB patikrinkite teikėjo atsarginių kopijų nustatymus."
+        },
+        "REPL": {
+          "1": "Žr. kiekvieno budėjimo režimo serverio būseną ir vėlavimą replikacijos ir DR skirtuke.",
+          "2": "Patikrinkite disko, CPU ir tinklo būseną budėjimo režimo serveryje.",
+          "3": "Jei srautas nevyksta, patikrinkite budėjimo režimo serverio žurnalus."
+        }
+      },
+      "sqlNote": "Žemiau pateiktas SQL yra skirtas tik skaitymui ir tikrinimui – pataisymus (VACUUM, DROP INDEX, pg_terminate_backend) atlieka DBA.",
+      "go": {
+        "activity": "Veikla ir užraktai",
+        "top": "Lėtos užklausos",
+        "health": "Lentelės ir indekso būklė",
+        "trend": "Talpos tendencija",
+        "params": "Parametrų patikra",
+        "repl": "Replikacijos patikra",
+        "backup": "Atsarginės kopijos patikra",
+        "sqlLab": "SQL derinimas",
+        "drift": "Nuokrypio palyginimas",
+        "connect": "Ryšiai",
+        "schema": "schema.pi monitorius"
+      },
+      "chart": {
+        "title": "Tendencijos ir reitingai",
+        "note": "Tendencijos įrašomos kas minutę, kol šis ekranas yra atidarytas (nėra fono rinkimo).",
+        "gauges": "Ryšio ir talpyklos matuokliai",
+        "sessState": "Sesijos dabar",
+        "sessTrend": "Sesijų tendencija ir užrakto laukimai",
+        "tpsCombo": "Pralaidumas ir atšaukimo dažnis",
+        "cacheTrend": "Talpyklos pataikymo dažnio tendencija",
+        "capacity": "DB dydis ir prognozė",
+        "slowTop": "Lėtas SQL TOP 10",
+        "slowLegend": "Juostos ilgis = bendras laikas · spalva = vidutinis laikas (▲ įspėjimas nuo {warn}ms · ✕ rizika nuo {risk}ms)",
+        "sizeTop": "Vietos TOP 10",
+        "heat": "Rizika pagal signalą laikui bėgant",
+        "q": {
+          "gauges": "Ar ryšiai pildosi? Ar skaitymai atliekami iš atminties?",
+          "sessState": "Ką sesijos veikia dabar?",
+          "sessTrend": "Ar užrakto laukimai didėja, kai sesijos kaupiasi?",
+          "tpsCombo": "Ar pralaidumas ir gedimų dažnis juda kartu?",
+          "cacheTrend": "Kada sumažėjo talpyklos pataikymo dažnis?",
+          "capacity": "Kada DB užsipildys?",
+          "slowTop": "Ką derinti pirmiausia? (pagal bendrą laiką)",
+          "sizeTop": "Kas užima vietą?",
+          "heat": "Ar rizika yra vienkartinė, ar pasikartojanti?"
+        },
+        "asTable": "Rodyti kaip lentelę",
+        "needHistory": "Dar nėra tendencijos – palikite šį ekraną atidarytą kelias minutes.",
+        "needPerf": "Nėra dydžio istorijos – rinkite našumo skirtuke arba palikite šį ekraną atidarytą.",
+        "noSess": "Nėra sesijų.",
+        "noWait": "Nėra laukimų",
+        "noData": "Nėra duomenų rodymui.",
+        "loading": "Įkeliama…",
+        "waitTop": "Laukimo įvykiai",
+        "lockWait": "Užrakto laukimai",
+        "tps": "Operacijos/s",
+        "rlbk": "Atšaukimo dažnis (%)",
+        "cacheHit": "Talpyklos pataikymo dažnis",
+        "size": "DB dydis",
+        "limit": "Limitas",
+        "forecast": "Prognozė",
+        "daysLeft": "Likę dienų",
+        "capNote": "Augimas per dieną {perDay} · {days} dienos iki limito",
+        "tbl": "Lentelė",
+        "idxToast": "Indeksas + TOAST",
+        "mix": {
+          "active": "Aktyvus",
+          "idleTx": "Nenaudojamas transakcijoje",
+          "idle": "Nenaudojamas",
+          "total": "sesijos"
+        },
+        "col": {
+          "item": "Elementas",
+          "value": "Reikšmė",
+          "time": "Laikas",
+          "calls": "Iškvietimai",
+          "total": "Bendra (ms)",
+          "mean": "Vidutinė (ms)",
+          "share": "Dalis"
+        }
+      },
+      "empty": {
+        "noConn": "Ši taksonomija neturi PostgreSQL serverio ryšio stebėjimui – rodomi tik URL ir paslaugos būsena.",
+        "unsupported": "Šis ryšys nepalaiko stebėjimo (tik PostgreSQL serverio ryšiai).",
+        "connFail": "Nepavyko prisijungti prie duomenų bazės – patikrinkite prisijungimo nustatymus ir DB būseną.",
+        "linkDown": "Nepavyko pasiekti schema.pi – automatiškai bandoma dar kartą.",
+        "linkAuth": "Ryšio prieigos raktas pasibaigė – išduokite naują prieigos raktą schema.pi ir užregistruokite jį.",
+        "timeout": "Atsakymai lėti – automatiškai bandoma dar kartą.",
+        "rate": "Per daug užklausų, todėl atnaujinimo intervalas buvo padidintas."
+      },
+      "aux": {
+        "rules": "Mano įspėjimo taisyklės ({n} aktyvios)",
+        "schemaSvc": "Paslaugos būsena – schema.pi atsakymai",
+        "schemaSvcNote": "Programos metrikos už paskutines 60 minučių, saugomos schema.pi.",
+        "source": "Duomenų šaltinis: tikslinė DB skaitoma tik per schema.pi pavadintas užklausas (tik skaitymui); tendencijos saugo statistiką tik dbms.pi (nėra eilučių duomenų)."
+      }
     }
   },
   "ops": {
@@ -900,6 +1161,12 @@
   },
   "nav": {
     "label": "Funkcijos",
+    "groups": {
+      "monitor": "Stebėjimas",
+      "drift": "Nuoseklumas",
+      "lake": "Ežeras",
+      "admin": "Administravimas"
+    },
     "connect": "Prisijungti",
     "sqlLab": "SQL derinimas",
     "perf": "Našumas",
