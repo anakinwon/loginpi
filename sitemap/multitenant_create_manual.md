@@ -17,14 +17,14 @@
 
 ## ★ 반드시 접속해서 값을 만들고 가져오는 외부 사이트 4곳
 
-> **접속 순서 : ① Supabase → ② Vercel → ③ Google → ④ Pi**
-> ③·④ 는 ② 에서 정한 운영 주소 `<URL>` 이 있어야 등록할 수 있고, ④ 도메인 검증은 검증 키 파일을 **커밋·배포한 뒤**에 한다. 이 순서를 지키면 같은 콘솔을 두 번 열 일이 없다.
+> **①~④ 는 분류 번호(마스터 지정)이고, 실제 진행 순서는 3절대로 ② Vercel(S6) → ③ Google(S9) → ① Supabase(S10) → ④ Pi(S12)**
+> ③·④ 는 ② 에서 정한 운영 주소 `<URL>` 이 있어야 등록할 수 있고, ④ 도메인 검증은 검증 키 파일을 **커밋·배포한 뒤**에 한다. Vercel 은 다른 사이트에서 값을 받을 때마다 환경변수 등록·재배포로 다시 연다.
 > 값은 **마스터가 콘솔에서 직접 복사해** `.env.local`·Vercel 에 넣는다. 아래 표의 단계 번호(S6 등)는 3절 절차와 같다.
 
 | # | 사이트 | 접속 링크 | 언제(3절) |
 |---|---|---|---|
 | 1 | **Database — Supabase** | https://supabase.com/dashboard | S10 · S11 |
-| 2 | **WAS — Vercel** | https://vercel.com/dashboard | S6 · S7 · S8 · S13 |
+| 2 | **WAS — Vercel** | https://vercel.com/dashboard | S6 · S7 · S8 · S13 + 환경변수 등록 S9 · S11 · S12 · S16 |
 | 3 | **Google — OAuth** | https://console.cloud.google.com/apis/credentials | S9 (Pi + Google 사이트만) |
 | 4 | **Pi — Developer Portal** | Pi Browser 앱 주소창 `develop.pi` → **Develop** (PC 웹으로는 열 수 없다) | S12 · S16 |
 
@@ -36,13 +36,13 @@
 
 ### ① Database — Supabase · https://supabase.com/dashboard
 
-- **만드는 것** : New project — 이름 `<app>`, 리전 Seoul(ap-northeast-2), DB 비밀번호는 비밀번호 관리자에 보관. 스키마는 **전 환경 `public`**(seminar.pi 2026-10-29 결정)
+- **만드는 것** : New project — 이름 `<app>`, 리전 Seoul(ap-northeast-2) 권장 [확인중 : 마스터 — dbms 실제 리전], DB 비밀번호는 비밀번호 관리자에 보관. 스키마는 **전 환경 `public`**(seminar.pi 2026-10-29 결정)
 
 | 콘솔 위치 | 넣는 키 | 넣는 곳 |
 |---|---|---|
 | Project Settings → **Data API** → Project URL | `NEXT_PUBLIC_SUPABASE_URL` | 로컬 + Vercel |
 | Project Settings → **API Keys** → secret(`sb_secret_…`) | `SUPABASE_SERVICE_ROLE_KEY` | 로컬 + Vercel (서버 전용) |
-| 상단 **Connect → Session pooler(5432)** — `postgresql://postgres.<ref>:…@aws-0-…pooler.supabase.com:5432/postgres` | `<APP>_PROD_DATABASE_URL` | **로컬만** — 마이그레이션 전용, **Vercel 금지** |
+| 상단 **Connect → Session pooler(5432)** — `postgresql://postgres.<ref>:…@aws-N-<리전>.pooler.supabase.com:5432/postgres`(`aws-N` 은 프로젝트마다 다름 — Connect 화면 값을 그대로 복사) | `<APP>_PROD_DATABASE_URL` | **로컬만** — 마이그레이션 전용, **Vercel 금지** |
 
 - **흔한 실수** : REST 주소(`https://<ref>.supabase.co`)를 `*_DATABASE_URL` 에 넣음 → 마이그레이션 불가. `--tier dev|stg` 로 적용 → `<app>_dev` 스키마가 따로 생김(**`--tier prod` 만**)
 - **확인** : `node scripts/db-migrate.mjs --app <app> --tier prod --dry-run` → '적용 예정' 목록(5.4)
@@ -80,9 +80,9 @@
 |---|---|---|---|
 | 1 | 체크리스트 → **Verify domain** 의 키 | `sitemap/<domain>/validation-key.txt` 로 저장 → 커밋·push·승격 → 운영 `<URL>/validation-key.txt` 내용 일치 확인 → 포털 Verify | 저장소(공개값 — 커밋 OK) |
 | 2 | **API Key** → Generate(한 번만 표시, 바로 복사) | `PI_API_KEY` | 로컬 + Vercel |
-| 3 | 앱 화면 맨 위 **Open app** 주소(`<앱>.pinet.com`) | `NEXT_PUBLIC_PI_APP_DOMAIN` | Vercel — **없으면 Pi 로그인 403 `cross_origin_auth`** |
-| 4 | **Pi Sign-In** → Client ID (선택) | `NEXT_PUBLIC_PI_OAUTH_CLIENT_ID`, 콜백 `<URL>/auth/pi/callback` 정확히 등록 | 로컬 + Vercel |
-| 5 | (포털 값 아님) | `NEXT_PUBLIC_PI_SANDBOX=true` (메인넷 운영만 false) | Vercel |
+| 3 | 앱 화면 맨 위 **Open app** 주소(`<앱>.pinet.com`) | `NEXT_PUBLIC_PI_APP_DOMAIN` | 로컬 + Vercel — **없으면 Pi 로그인 403 `cross_origin_auth`** |
+| 4 | **Pi Sign-In** → Client ID (선택) | `NEXT_PUBLIC_PI_OAUTH_CLIENT_ID`, 콜백 `<URL>/auth/pi/callback` · `http://localhost:<port>/auth/pi/callback` 정확히 등록(LOGIN_PLAYBOOK) | 로컬 + Vercel |
+| 5 | (포털 값 아님) | `NEXT_PUBLIC_PI_SANDBOX=true` (메인넷 운영만 false) | 로컬 + Vercel |
 | 6 | 첫 Pi 로그인 뒤 Supabase `sys_user.pi_uid` (S16) | `ADMIN_PI_UIDS` + `ADMIN_PI_USERNAMES` — **둘을 함께** | Vercel |
 
 - `pi_uid` 는 앱 × Testnet/Mainnet 마다 다르다 — 다른 앱 값 재사용 금지
@@ -519,7 +519,7 @@ cd ../..
      | `NEXT_PUBLIC_PI_APP_DOMAIN` | 앱 화면 맨 위 **Open app** 주소 | `<app>NNNN.pinet.com` — **없으면 Pi 로그인 POST 403 `cross_origin_auth`** |
      | `NEXT_PUBLIC_PI_SANDBOX` | 포털 값 아님 | testnet = `true`(S7 에서 이미 넣었으면 그대로) |
      | `PI_API_KEY` | 앱 화면 → API Key → Generate(한 번만 표시) | 결제(나중)용이지만 포털에서 받은 김에 등록 |
-     | `NEXT_PUBLIC_PI_OAUTH_CLIENT_ID`(선택) | 앱 화면 → Pi Sign-In → Client ID, 콜백 `<URL>/auth/pi/callback` 정확히 등록 | 없으면 SDK 로그인만 |
+     | `NEXT_PUBLIC_PI_OAUTH_CLIENT_ID`(선택) | 앱 화면 → Pi Sign-In → Client ID, 콜백 `<URL>/auth/pi/callback` · `http://localhost:<port>/auth/pi/callback` 정확히 등록 | 없으면 SDK 로그인만 |
 
 - **완료 확인** : `<URL>/validation-key.txt` 내용 = 파일 내용(5.2), 포털 도메인 검증 통과.
 - **흔한 실수** : T08 · T09. 다른 앱 `validation-key.txt` 를 복사해 둠.
@@ -866,3 +866,4 @@ cd sitemap/<domain> && pnpm build && pnpm tsc --noEmit
 |---|---|---|---|
 | 2026-11-01 | v1.0 | 최초 작성 — dbms.pi 구축(착수 → 운영 Pi Browser 로그인·Google 연동) 절차·명령·검증·트러블슈팅 19건·개선 과제 10건 | 마스터 지시 "다음 멀티테넌트 사이트 추가 시 참고할 매뉴얼" |
 | 2026-11-01 | v1.1 | 검수 결함 반영 — 로컬 첫 빌드 AUTH_SECRET 단독(S4) · `.env.vercel-prod` 통째 붙여넣기 금지(S7) · 빈 커밋 Skipped(S8·S13·T04) · 5.1 판정(description·target_url) · `<URL>` 확정(S6) · Pi 전용 분기(S3) · App URL(S12) · 로컬 APP_TIER(S10-5) · 결함 스캔 기대값 합계 1 · 이름 바꾸기 명령(3-3) · SQL 머리 주석 재작성(S10-2) · S5 커밋 3개 · Google 동의 화면(S9) · Supabase 리전·비밀번호(S10-1) · 기준선 커밋 정정(8절) · 개선 과제 12건 | 검수(통과 12 / 결함 11) + 후속 결함 16건 |
+| 2026-11-01 | v1.2 | 맨 앞 '★ 외부 사이트 4곳'(Supabase·Vercel·Google·Pi Portal — 접속 링크·만드는 것·가져오는 값·넣는 곳·흔한 실수·확인, 함께 넣는 키 묶음·보안 경고) 추가 + 팀장 사후 검토 7건(번호 ≠ 진행 순서 명시, Vercel 재방문 단계, 리전 권장 표기, `aws-N` 접속 문자열, Pi 키 넣는 곳 로컬 + Vercel, Pi Sign-In 로컬 콜백) | 마스터 지시 "반드시 접속해야 하는 사이트 4곳 핵심 강조" |
