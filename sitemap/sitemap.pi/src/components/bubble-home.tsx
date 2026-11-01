@@ -394,7 +394,7 @@ function BubbleTable({
   )
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-3 py-4">
+    <div className="w-full px-3 py-4">
       <CtgrLinks />
       <table className="w-full text-left text-sm">
         <thead className="text-xs text-white/60">

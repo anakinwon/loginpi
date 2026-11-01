@@ -14,7 +14,7 @@ export default async function PayPage({
   setRequestLocale(locale)
   const t = await getTranslations('pay')
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <h1 className="text-2xl font-bold">{t('title')}</h1>
       <PayPanel
         siteId={siteId}

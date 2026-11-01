@@ -21,7 +21,7 @@ export function SiteHeader() {
   return (
     <header className="bg-background border-b border-white/10">
       {/* loginpi header.tsx 처럼 한 줄 고정(h-14, 줄바꿈 없음) — 폭이 모자라면 가운데 메뉴만 가로 스크롤, 오른쪽 끝 콤보·시세칩은 줄지 않음 */}
-      <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
+      <div className="flex h-14 w-full items-center gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="shrink-0 text-lg font-bold">
           sitemap.pi
         </Link>

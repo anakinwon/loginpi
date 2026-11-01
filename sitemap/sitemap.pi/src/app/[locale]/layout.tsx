@@ -58,7 +58,7 @@ export default async function LocaleLayout({
               <PiAuthRoot>
                 <SiteHeader />
                 {/* 홈 버블처럼 data-fullbleed 자식이 있으면 폭 제한·여백 해제(:has 미지원 브라우저는 기존 폭으로 표시) */}
-                <main className="mx-auto max-w-5xl px-4 py-6 has-[[data-fullbleed]]:max-w-none has-[[data-fullbleed]]:p-0">
+                <main className="w-full px-4 py-6 has-[[data-fullbleed]]:p-0! sm:px-6 lg:px-8">
                   {children}
                 </main>
                 {/* 애플리케이션 모니터링 계측 → schema.pi 모니터링(운영만, 2026-10-24) */}
