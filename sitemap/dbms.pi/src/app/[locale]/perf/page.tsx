@@ -7,7 +7,7 @@ export default async function PerfPage({ params }: { params: Promise<{ locale: s
   setRequestLocale(locale)
   const t = await getTranslations('perf')
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <h1 className="text-2xl font-bold">{t('title')}</h1>
       <p className="text-muted-foreground text-sm break-keep">{t('intro')}</p>
       <PerfView />

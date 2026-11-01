@@ -11,7 +11,7 @@ export function FeatureNav() {
   const path = usePathname()
   return (
     <nav aria-label={t('label')} className="border-t border-white/5">
-      <ul className="mx-auto flex max-w-3xl gap-1.5 overflow-x-auto px-4 py-2 [scrollbar-width:none] lg:max-w-none lg:flex-wrap lg:px-8">
+      <ul className="flex w-full gap-1.5 overflow-x-auto px-4 py-2 [scrollbar-width:none] sm:px-6 lg:flex-wrap lg:px-8">
         {FEATURES.map((f) => {
           const on = path === f.href || path.startsWith(`${f.href}/`)
           return (

@@ -11,7 +11,7 @@ export default function Home({ params }: { params: Promise<{ locale: string }> }
   const t = useTranslations('home')
   const tn = useTranslations('nav')
   return (
-    <div className="mx-auto max-w-3xl space-y-6 py-2">
+    <div className="w-full space-y-6 py-2">
       <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#0f1a2e] via-[#111827] to-[#0b1a24] px-5 py-10 sm:px-10 sm:py-14">
         <p className="text-accent mb-3 font-mono text-xs font-semibold tracking-widest">{t('badge')}</p>
         <h1 className="max-w-2xl text-3xl leading-tight font-extrabold break-keep sm:text-4xl">{t('headline')}</h1>
@@ -20,7 +20,7 @@ export default function Home({ params }: { params: Promise<{ locale: string }> }
       <HomeGate />
       <section aria-labelledby="home-feat-title">
         <h2 id="home-feat-title" className="mb-3 font-bold">{t('featTitle')}</h2>
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
           {FEATURES.map((f) => (
             <li key={f.key}>
               <Link href={f.href} className="bg-surface hover:border-accent/60 block h-full rounded-2xl border border-white/10 p-4">

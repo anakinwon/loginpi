@@ -18,7 +18,7 @@ export function SiteHeader() {
     <header className="border-b border-white/10">
       {/* 모바일 = 1줄 로고 + 언어 콤보·시세칩(최우상단 고정), 2줄 로그인 상태(오른쪽 정렬) — 360px 가로 스크롤 방지.
           sm 이상 = 한 줄 : 로고 … 로그인 상태 · 언어 콤보 · 시세칩 */}
-      <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 lg:max-w-none lg:px-8">
+      <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="shrink-0 font-mono text-lg font-bold tracking-tight">
           dbms<span className="text-accent">.pi</span>
         </Link>

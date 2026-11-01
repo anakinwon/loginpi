@@ -8,7 +8,7 @@ export default async function LearnPage({ params }: { params: Promise<{ locale: 
   setRequestLocale(locale)
   const t = await getTranslations('learn')
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <h1 className="text-2xl font-bold">{t('title')}</h1>
       <p className="text-muted-foreground text-sm break-keep">{t('intro')}</p>
       {/* LinkPicker(useSearchParams) — 정적 렌더 경계 */}

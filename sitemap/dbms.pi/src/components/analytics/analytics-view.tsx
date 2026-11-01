@@ -32,7 +32,7 @@ type DsRes = { items: Dataset[]; page: number; hasMore: boolean }
 export function AnalyticsView() {
   const t = useTranslations('analytics')
   return (
-    <div className="mx-auto max-w-5xl space-y-4 py-2">
+    <div className="w-full space-y-4 py-2">
       <header className="space-y-1">
         <h1 className="text-2xl font-extrabold">{t('title')}</h1>
         <p className="text-muted-foreground text-sm break-keep">{t('intro')}</p>
