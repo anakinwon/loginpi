@@ -1376,6 +1376,8 @@
     "pipeline": "Pipeline",
     "analytics": "Analyse",
     "ops": "Ops Veiligheid",
-    "learn": "Leren"
+    "learn": "Leren",
+    "fold": "Menu inklappen",
+    "unfold": "Menu uitklappen"
   }
 }

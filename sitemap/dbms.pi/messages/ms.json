@@ -1380,6 +1380,8 @@
     "pipeline": "Saluran Paip",
     "analytics": "Analitik",
     "ops": "Keselamatan Operasi",
-    "learn": "Belajar"
+    "learn": "Belajar",
+    "fold": "Lipat menu",
+    "unfold": "Buka menu"
   }
 }

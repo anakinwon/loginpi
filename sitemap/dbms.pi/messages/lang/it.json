@@ -1377,6 +1377,8 @@
     "pipeline": "Pipeline",
     "analytics": "Analisi",
     "ops": "Sicurezza Operativa",
-    "learn": "Impara"
+    "learn": "Impara",
+    "fold": "Comprimi menu",
+    "unfold": "Espandi menu"
   }
 }

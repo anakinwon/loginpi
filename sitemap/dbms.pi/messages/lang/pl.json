@@ -1368,6 +1368,8 @@
     "pipeline": "Potok",
     "analytics": "Analityka",
     "ops": "Bezpieczeństwo operacji",
-    "learn": "Ucz się"
+    "learn": "Ucz się",
+    "fold": "Zwiń menu",
+    "unfold": "Rozwiń menu"
   }
 }

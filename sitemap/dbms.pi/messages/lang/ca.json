@@ -548,6 +548,7 @@
       "INVALID_INPUT": "La sol·licitud no és vàlida."
     },
     "board": {
+      "subtitle": "Què fer en aquesta DB ara mateix — 14 senyals d'estat OK, advertència o risc, amb solucions, d'un cop d'ull.",
       "refresh": {
         "updated": "A partir de les {time} · s'actualitza cada minut",
         "now": "Actualitza ara",
@@ -566,6 +567,7 @@
         "WARN": "Avís — alguns elements necessiten una revisió",
         "UNKNOWN": "Desconegut — comproveu la connexió",
         "OK": "Correcte — tots els senyals estan dins dels límits",
+        "CONN_DOWN": "No es pot accedir a la DB — comproveu primer la connexió",
         "NA": "N/A"
       },
       "kpi": {
@@ -1000,7 +1002,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "El vincle schema.pi s'està preparant. Torna-ho a provar més tard.",
+      "PGSS_MISSING": "L'extensió pg_stat_statements no està instal·lada en aquesta DB, per la qual cosa les estadístiques de consultes no estan disponibles",
       "CONN_UNSUPPORTED": "Aquesta connexió encara no és compatible (només connexions PostgreSQL directes).",
+      "TIMEOUT": "La DB de destinació ha respost massa lentament. Torneu-ho a provar més tard",
       "RATE": "Massa sol·licituds. Torna-ho a provar en un minut.",
       "LINK_AUTH": "El testimoni del vincle ha caducat o ha estat revocat. Registra el testimoni de nou a la pàgina de connexió.",
       "LINK_SCOPE": "Aquesta connexió no pertany a l'àrea temàtica del vincle.",
@@ -1051,6 +1055,7 @@
     "trend": {
       "limit": "Llindar de mida",
       "empty": "No hi ha instantànies en els últims 30 dies",
+      "chart": "Tendència de la mida de la DB durant els últims 30 dies",
       "now": "Mida actual",
       "perDay": "Creixement per dia",
       "needMore": "Necessita 2 o més instantànies",
@@ -1372,6 +1377,8 @@
     "pipeline": "Pipeline",
     "analytics": "Analítica",
     "ops": "Seguretat d'operacions",
-    "learn": "Aprèn"
+    "learn": "Aprèn",
+    "fold": "Redueix el menú",
+    "unfold": "Expandeix el menú"
   }
 }

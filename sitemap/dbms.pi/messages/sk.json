@@ -1378,6 +1378,8 @@
     "pipeline": "Pipeline",
     "analytics": "Analytika",
     "ops": "Prevádzková bezpečnosť",
-    "learn": "Učiť sa"
+    "learn": "Učiť sa",
+    "fold": "Zbaliť menu",
+    "unfold": "Rozbaliť menu"
   }
 }

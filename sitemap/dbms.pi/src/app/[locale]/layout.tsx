@@ -57,7 +57,8 @@ export default async function LocaleLayout({
             {/* 결제 기능이 없어 미완료 결제 복구(onIncompletePayment)는 붙이지 않는다 — 결제(Phase 2) 때 추가 */}
             <PiAuthProvider>
               <SiteHeader />
-              <main className="w-full px-4 py-6 sm:px-6 lg:px-8">
+              {/* 아래 여백 = 하단 고정 메뉴 높이(feature-nav 가 :root --dbms-nav-h 갱신) + 24px */}
+              <main className="w-full px-4 pt-6 pb-[calc(var(--dbms-nav-h,6rem)+1.5rem)] sm:px-6 lg:px-8">
                 {children}
               </main>
             </PiAuthProvider>

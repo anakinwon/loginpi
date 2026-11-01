@@ -1379,6 +1379,8 @@
     "pipeline": "Pipeline",
     "analytics": "Analytics",
     "ops": "Kaligtasan ng Ops",
-    "learn": "Matuto"
+    "learn": "Matuto",
+    "fold": "I-collapse ang menu",
+    "unfold": "Palawakin ang menu"
   }
 }

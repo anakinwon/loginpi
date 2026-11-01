@@ -1378,6 +1378,8 @@
     "pipeline": "Cjevovod",
     "analytics": "Analitika",
     "ops": "Sigurnost operacija",
-    "learn": "Učenje"
+    "learn": "Učenje",
+    "fold": "Skupi meni",
+    "unfold": "Proširi meni"
   }
 }

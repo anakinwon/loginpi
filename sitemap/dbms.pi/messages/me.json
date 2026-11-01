@@ -1373,6 +1373,8 @@
     "pipeline": "Pajplajn",
     "analytics": "Analitika",
     "ops": "Sigurnost operacija",
-    "learn": "Uči"
+    "learn": "Uči",
+    "fold": "Skupi meni",
+    "unfold": "Proširi meni"
   }
 }

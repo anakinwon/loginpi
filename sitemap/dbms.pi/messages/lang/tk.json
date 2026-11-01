@@ -1380,6 +1380,8 @@
     "pipeline": "Turba",
     "analytics": "Analitika",
     "ops": "Operasiýa Howpsuzlygy",
-    "learn": "Öwrenmek"
+    "learn": "Öwrenmek",
+    "fold": "Menýuny ýygnamak",
+    "unfold": "Menýuny açmak"
   }
 }

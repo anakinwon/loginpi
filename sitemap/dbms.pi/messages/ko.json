@@ -1380,6 +1380,8 @@
     "pipeline": "파이프라인",
     "analytics": "분석",
     "ops": "운영 안전",
-    "learn": "학습"
+    "learn": "학습",
+    "fold": "메뉴 접기",
+    "unfold": "메뉴 펼치기"
   }
 }

@@ -548,6 +548,7 @@
       "INVALID_INPUT": "Požadavek je neplatný."
     },
     "board": {
+      "subtitle": "Co dělat s touto DB právě teď — 14 signálů OK, varování nebo rizika s řešeními, na první pohled.",
       "refresh": {
         "updated": "Aktuální k {time} · obnovuje se každou minutu",
         "now": "Obnovit nyní",
@@ -1001,7 +1002,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "Odkaz schema.pi se připravuje. Zkuste to prosím znovu později.",
+      "PGSS_MISSING": "Rozšíření pg_stat_statements není na této DB nainstalováno, takže statistiky dotazů nejsou k dispozici.",
       "CONN_UNSUPPORTED": "Toto připojení zatím není podporováno (pouze přímá připojení PostgreSQL).",
+      "TIMEOUT": "Cílová DB reagovala příliš pomalu. Zkuste to prosím později.",
       "RATE": "Příliš mnoho požadavků. Zkuste to znovu za minutu.",
       "LINK_AUTH": "Token odkazu vypršel nebo byl zrušen. Zaregistrujte token znovu na stránce Připojení.",
       "LINK_SCOPE": "Toto připojení nepatří do předmětné oblasti odkazu.",
@@ -1010,6 +1013,7 @@
     },
     "pgss": {
       "title": "Jak povolit pg_stat_statements",
+      "body": "Top-N pomalých dotazů vyžaduje rozšíření pg_stat_statements. Spusťte níže uvedený příkaz jako správce DB. Na Supabase jej povolte v části Database → Extensions.",
       "note": "Samostatně hostované PostgreSQL také potřebuje pg_stat_statements v shared_preload_libraries (postgresql.conf) a restart. Statistiky tabulek, indexů a velikostí fungují i bez něj."
     },
     "collect": {
@@ -1052,6 +1056,7 @@
     "trend": {
       "limit": "Prahová velikost",
       "empty": "Žádné snímky za posledních 30 dní",
+      "chart": "Trend velikosti DB za posledních 30 dní",
       "now": "Aktuální velikost",
       "perDay": "Denní růst",
       "needMore": "Potřebuje 2+ snímky",
@@ -1373,6 +1378,8 @@
     "pipeline": "Pipeline",
     "analytics": "Analýza",
     "ops": "Bezpečnost operací",
-    "learn": "Učit se"
+    "learn": "Učit se",
+    "fold": "Sbalit menu",
+    "unfold": "Rozbalit menu"
   }
 }

@@ -1368,6 +1368,8 @@
     "pipeline": "Duomenų srautas",
     "analytics": "Analitika",
     "ops": "Operacijų sauga",
-    "learn": "Mokytis"
+    "learn": "Mokytis",
+    "fold": "Suskleisti meniu",
+    "unfold": "Išskleisti meniu"
   }
 }

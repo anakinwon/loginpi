@@ -1372,6 +1372,8 @@
     "pipeline": "Putki",
     "analytics": "Analytiikka",
     "ops": "Toimintojen turvallisuus",
-    "learn": "Opi"
+    "learn": "Opi",
+    "fold": "Kutista valikko",
+    "unfold": "Laajenna valikko"
   }
 }

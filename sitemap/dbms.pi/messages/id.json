@@ -1380,6 +1380,8 @@
     "pipeline": "Pipeline",
     "analytics": "Analitik",
     "ops": "Keamanan Operasi",
-    "learn": "Pelajari"
+    "learn": "Pelajari",
+    "fold": "Ciutkan menu",
+    "unfold": "Bentangkan menu"
   }
 }

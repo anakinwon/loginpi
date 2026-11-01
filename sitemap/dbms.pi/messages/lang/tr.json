@@ -1380,6 +1380,8 @@
     "pipeline": "İşlem Hattı",
     "analytics": "Analiz",
     "ops": "Operasyon Güvenliği",
-    "learn": "Öğren"
+    "learn": "Öğren",
+    "fold": "Menüyü daralt",
+    "unfold": "Menüyü genişlet"
   }
 }

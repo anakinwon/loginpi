@@ -1372,6 +1372,8 @@
     "pipeline": "Pipeline",
     "analytics": "Analys",
     "ops": "Driftsäkerhet",
-    "learn": "Lär dig"
+    "learn": "Lär dig",
+    "fold": "Fäll ihop meny",
+    "unfold": "Fäll ut meny"
   }
 }

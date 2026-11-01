@@ -1378,6 +1378,8 @@
     "pipeline": "Pyplyn",
     "analytics": "Analise",
     "ops": "Bedryfsveiligheid",
-    "learn": "Leer"
+    "learn": "Leer",
+    "fold": "Vou kieslys toe",
+    "unfold": "Vou kieslys oop"
   }
 }

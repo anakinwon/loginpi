@@ -1380,6 +1380,8 @@
     "pipeline": "管道",
     "analytics": "分析",
     "ops": "运维安全",
-    "learn": "学习"
+    "learn": "学习",
+    "fold": "收起菜单",
+    "unfold": "展开菜单"
   }
 }

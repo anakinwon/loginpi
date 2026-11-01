@@ -1380,6 +1380,8 @@
     "pipeline": "Pipeline",
     "analytics": "Phân tích",
     "ops": "An toàn vận hành",
-    "learn": "Học hỏi"
+    "learn": "Học hỏi",
+    "fold": "Thu gọn menu",
+    "unfold": "Mở rộng menu"
   }
 }

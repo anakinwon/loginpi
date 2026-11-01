@@ -1380,6 +1380,8 @@
     "pipeline": "Quvur liniyasi",
     "analytics": "Analitika",
     "ops": "Operatsiyalar xavfsizligi",
-    "learn": "Oʻrganish"
+    "learn": "Oʻrganish",
+    "fold": "Menyuni yigʻish",
+    "unfold": "Menyuni ochish"
   }
 }

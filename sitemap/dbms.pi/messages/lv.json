@@ -1378,6 +1378,8 @@
     "pipeline": "Cauruļvads",
     "analytics": "Analītika",
     "ops": "Darbības drošība",
-    "learn": "Mācīties"
+    "learn": "Mācīties",
+    "fold": "Sakļaut izvēlni",
+    "unfold": "Izvērst izvēlni"
   }
 }

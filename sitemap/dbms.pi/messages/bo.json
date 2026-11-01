@@ -1378,6 +1378,8 @@
     "pipeline": "Pipeline",
     "analytics": "Análisis",
     "ops": "Seguridad de operaciones",
-    "learn": "Aprender"
+    "learn": "Aprender",
+    "fold": "Contraer menú",
+    "unfold": "Expandir menú"
   }
 }

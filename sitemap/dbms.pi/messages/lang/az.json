@@ -1380,6 +1380,8 @@
     "pipeline": "Boru kəməri",
     "analytics": "Analitika",
     "ops": "Əməliyyat Təhlükəsizliyi",
-    "learn": "Öyrən"
+    "learn": "Öyrən",
+    "fold": "Menyunu yığcamlaşdırın",
+    "unfold": "Menyunu genişləndirin"
   }
 }

@@ -1380,6 +1380,8 @@
     "pipeline": "Pipeline",
     "analytics": "Analiza",
     "ops": "Siguria e Operacioneve",
-    "learn": "Mëso"
+    "learn": "Mëso",
+    "fold": "Palos menunë",
+    "unfold": "Zgjero menunë"
   }
 }

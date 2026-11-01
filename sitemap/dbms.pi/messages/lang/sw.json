@@ -1378,6 +1378,8 @@
     "pipeline": "Bomba",
     "analytics": "Uchanganuzi",
     "ops": "Usalama wa Uendeshaji",
-    "learn": "Jifunze"
+    "learn": "Jifunze",
+    "fold": "Kunja menyu",
+    "unfold": "Panua menyu"
   }
 }

@@ -1373,6 +1373,8 @@
     "pipeline": "Torujuhe",
     "analytics": "Analüütika",
     "ops": "Operatsioonide ohutus",
-    "learn": "Õpi"
+    "learn": "Õpi",
+    "fold": "Ahenda menüü",
+    "unfold": "Laienda menüü"
   }
 }
