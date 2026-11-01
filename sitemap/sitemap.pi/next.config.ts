@@ -48,6 +48,13 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  // Google 버튼 플래그 = 서버 3종(src/auth.ts googleEnabled)에서 빌드 때 파생 — Vercel 에 NEXT_PUBLIC_GOOGLE_LOGIN 을 빠뜨리면
+  // 서버는 활성인데 버튼이 숨던 운영 사고(2026-10-18 schem.vercel.app · 2026-11-01 dbmspi.vercel.app) 방지. 직접 설정한 값('1')이 있으면 그 값, 빈 값은 미설정과 같게 파생
+  env: {
+    NEXT_PUBLIC_GOOGLE_LOGIN:
+      process.env.NEXT_PUBLIC_GOOGLE_LOGIN ||
+      (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.AUTH_SECRET ? '1' : ''),
+  },
 }
 
 export default withNextIntl(nextConfig)
