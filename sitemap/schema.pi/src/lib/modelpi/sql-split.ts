@@ -10,6 +10,8 @@ export type Danger = 'NO_WHERE' | 'DROP' | 'TRUNCATE' | 'ALTER'
 // 문자열·주석 → 공백(글자 수 그대로 — 위치 유지, 문자열·블록 주석 안 줄바꿈도 가려 빈 줄 구분에 안 걸림)
 // keepIdent : 따옴표 식별자 안 글자는 남기고 따옴표만 지움(code — 부작용 함수 판정용, "pg_terminate_backend"(…) 우회 차단)
 // cmt : 주석을 채울 글자(기본 공백) — 들여쓰기 정렬이 주석 유무를 가릴 때 다른 글자로
+// PG 식별자 글자(ident_cont = 글자·숫자·_·$·비 ASCII) — $tag$·E'…' 앞이 이 글자면 식별자의 일부(a$$$·한$a$ 우회 차단, 2026-11-01)
+const IDENT = /[\w$]|[^\x00-\x7f]/
 export function maskSql(text: string, d: Dialect, keepIdent = false, cmt = ' '): string {
   const out = text.split('')
   const blank = (a: number, b: number, ch = ' ') => { for (let k = a; k < b; k++) out[k] = ch }
@@ -32,7 +34,7 @@ export function maskSql(text: string, d: Dialect, keepIdent = false, cmt = ' '):
       blank(i + 2, end - 1); i = end; continue
     }
     if (c === "'") {
-      const esc = d === 'PG' && /[eE]/.test(text[i - 1] ?? '') && !/\w/.test(text[i - 2] ?? '')
+      const esc = d === 'PG' && /[eE]/.test(text[i - 1] ?? '') && !IDENT.test(text[i - 2] ?? '')
       let j = i + 1
       while (j < n) {
         if (esc && text[j] === '\\') { j += 2; continue }
@@ -44,7 +46,7 @@ export function maskSql(text: string, d: Dialect, keepIdent = false, cmt = ' '):
     if (c === '"') { const e = text.indexOf('"', i + 1); const end = e < 0 ? n : e; if (keepIdent) blank(i, i + 1), blank(end, end + 1); else blank(i + 1, end); i = end + 1; continue }
     if (d === 'PG' && c === '$') {
       const m = /^\$([A-Za-z_][A-Za-z0-9_]*)?\$/.exec(text.slice(i))
-      if (m && !/\w/.test(text[i - 1] ?? '')) {
+      if (m && !IDENT.test(text[i - 1] ?? '')) {
         const e = text.indexOf(m[0], i + m[0].length); const end = e < 0 ? n : e + m[0].length
         blank(i + m[0].length, end - m[0].length); i = end; continue
       }

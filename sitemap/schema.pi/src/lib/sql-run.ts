@@ -121,7 +121,7 @@ async function pgOne(q: Q, s: Stmt, limit: number, budget: { left: number }, typ
     if (!cols) cols = (await q.unsafe(s.txt).describe().catch(() => null))?.columns ?? [] // 0행 — 칼럼만
   } else {
     if (s.mask.includes(';')) throw Object.assign(new Error('한 번에 한 문장만 실행합니다'), { code: 'MULTI' }) // 분리기와 다른 해석 방지
-    const r = await q.unsafe(s.txt).values()
+    const r = await q.unsafe(s.txt, [], { simple: false }).values() // 확장 프로토콜 — 서버 Parse 가 다중 문장 거부(분리기 우회 이중 차단)
     cols = r.columns ?? null
     for (const x of r as unknown[][]) if (!c.take(x)) break
     affected = typeof r.count === 'number' ? r.count : null
