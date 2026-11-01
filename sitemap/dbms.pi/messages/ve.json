@@ -692,7 +692,7 @@
       "chart": {
         "title": "Tendencias y clasificaciones",
         "note": "Las tendencias se registran cada minuto mientras esta pantalla está abierta (no hay recopilación en segundo plano).",
-        "gauges": "Medidores de conexión y caché",
+        "gauges": "Medidores de límite",
         "sessState": "Sesiones ahora mismo",
         "sessTrend": "Tendencia de sesiones y esperas de bloqueo",
         "tpsCombo": "Rendimiento y tasa de rollback",
@@ -703,7 +703,7 @@
         "sizeTop": "Top 10 de espacio",
         "heat": "Riesgo por señal a lo largo del tiempo",
         "q": {
-          "gauges": "¿Se están llenando las conexiones? ¿Las lecturas se sirven desde la memoria?",
+          "gauges": "¿Qué tan cerca están las conexiones, la caché, las respuestas y el almacenamiento de sus límites?",
           "sessState": "¿Qué están haciendo las sesiones ahora?",
           "sessTrend": "¿Aumentan las esperas de bloqueo cuando se acumulan las sesiones?",
           "tpsCombo": "¿El rendimiento y la tasa de fallos se mueven juntos?",
@@ -711,7 +711,10 @@
           "capacity": "¿Cuándo se llenará la DB?",
           "slowTop": "¿Qué optimizar primero? (por tiempo total)",
           "sizeTop": "¿Qué está ocupando el espacio?",
-          "heat": "¿El riesgo es puntual o recurrente?"
+          "heat": "¿El riesgo es puntual o recurrente?",
+          "radar": "¿Qué área es débil?",
+          "flow": "¿Qué aplicaciones y cuentas crean sesiones problemáticas?",
+          "tree": "¿Qué ocupa espacio y qué necesita limpieza?"
         },
         "asTable": "Ver como tabla",
         "needHistory": "Todavía no hay tendencia; mantenga esta pantalla abierta durante unos minutos.",
@@ -745,8 +748,48 @@
           "calls": "Llamadas",
           "total": "Total (ms)",
           "mean": "Media (ms)",
-          "share": "Cuota"
-        }
+          "share": "Cuota",
+          "score": "Puntuación",
+          "level": "Nivel",
+          "ago": "Hace 1 hora",
+          "from": "Desde",
+          "to": "Hasta",
+          "sessions": "Sesiones",
+          "schema": "Esquema",
+          "size": "Tamaño",
+          "thr": "Umbral (advertencia·riesgo)"
+        },
+        "radar": "Puntuación de salud por área",
+        "radarCur": "Ahora",
+        "radarSafe": "Línea base segura",
+        "radarAgo": "Hace 1 hora",
+        "radarOut": "No medible: {list}",
+        "axis": {
+          "avail": "Disponibilidad",
+          "sess": "Sesiones",
+          "lock": "Bloqueos",
+          "perf": "Rendimiento de consulta",
+          "store": "Almacenamiento",
+          "maint": "Mantenimiento",
+          "idx": "Índices",
+          "protect": "Replicación/copia de seguridad"
+        },
+        "flow": "Aplicación → cuenta → estado de sesión",
+        "flowState": {
+          "lockWait": "Espera de bloqueo",
+          "active": "Activo",
+          "idleTx": "Inactivo en transacción",
+          "idle": "Inactivo"
+        },
+        "noApp": "(sin nombre de aplicación)",
+        "otherN": "{n} otros",
+        "otherSchema": "{n} otros esquemas",
+        "tree": "Mapa de tamaño de esquema y tabla",
+        "deadPct": "Proporción de filas muertas",
+        "partial": "Agregado hasta 500 filas solamente.",
+        "gaugeNoLimit": "Sin regla de límite de almacenamiento",
+        "rsp": "Tiempo de respuesta",
+        "noStat": "Sin estadísticas"
       },
       "empty": {
         "noConn": "Esta taxonomía no tiene una conexión de servidor PostgreSQL para monitorizar; solo se muestran las URL y el estado del servicio.",

@@ -694,7 +694,7 @@
       "chart": {
         "title": "Trends & rankings",
         "note": "Trends are recorded every minute while this screen is open (no background collection).",
-        "gauges": "Connection & cache gauges",
+        "gauges": "Limit Gauges",
         "sessState": "Sessions right now",
         "sessTrend": "Session trend & lock waits",
         "tpsCombo": "Throughput & rollback rate",
@@ -705,7 +705,7 @@
         "sizeTop": "Space top 10",
         "heat": "Risk by signal over time",
         "q": {
-          "gauges": "Are connections filling up? Are reads served from memory?",
+          "gauges": "How close are connections, cache, responses, and storage to their limits?",
           "sessState": "What are sessions doing now?",
           "sessTrend": "Do lock waits rise when sessions pile up?",
           "tpsCombo": "Do throughput and failure rate move together?",
@@ -713,7 +713,10 @@
           "capacity": "When will the DB fill up?",
           "slowTop": "What to tune first? (by total time)",
           "sizeTop": "What is taking the space?",
-          "heat": "Is the risk a one-off or recurring?"
+          "heat": "Is the risk a one-off or recurring?",
+          "radar": "Which area is weak?",
+          "flow": "Which apps and accounts create problem sessions?",
+          "tree": "What eats space, and what needs cleanup?"
         },
         "asTable": "View as table",
         "needHistory": "No trend yet — keep this screen open for a few minutes.",
@@ -747,8 +750,48 @@
           "calls": "Calls",
           "total": "Total (ms)",
           "mean": "Mean (ms)",
-          "share": "Share"
-        }
+          "share": "Share",
+          "score": "Score",
+          "level": "Level",
+          "ago": "1 hour ago",
+          "from": "From",
+          "to": "To",
+          "sessions": "Sessions",
+          "schema": "Schema",
+          "size": "Size",
+          "thr": "Threshold (warn·risk)"
+        },
+        "radar": "Health score by area",
+        "radarCur": "Now",
+        "radarSafe": "Safe baseline",
+        "radarAgo": "1 hour ago",
+        "radarOut": "Not measurable : {list}",
+        "axis": {
+          "avail": "Availability",
+          "sess": "Sessions",
+          "lock": "Locks",
+          "perf": "Query performance",
+          "store": "Storage",
+          "maint": "Maintenance",
+          "idx": "Indexes",
+          "protect": "Replication/backup"
+        },
+        "flow": "App → account → session state",
+        "flowState": {
+          "lockWait": "Lock wait",
+          "active": "Active",
+          "idleTx": "Idle in transaction",
+          "idle": "Idle"
+        },
+        "noApp": "(no app name)",
+        "otherN": "{n} others",
+        "otherSchema": "{n} other schemas",
+        "tree": "Schema and table size map",
+        "deadPct": "Dead row ratio",
+        "partial": "Aggregated up to 500 rows only.",
+        "gaugeNoLimit": "No storage limit rule",
+        "rsp": "Response time",
+        "noStat": "No statistics"
       },
       "empty": {
         "noConn": "This taxonomy has no PostgreSQL server connection to monitor — showing URLs and service status only.",

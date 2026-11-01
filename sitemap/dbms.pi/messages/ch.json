@@ -692,7 +692,7 @@
       "chart": {
         "title": "Trends & Rankings",
         "note": "Trends werden jede Minute aufgezeichnet, während dieser Bildschirm geöffnet ist (keine Hintergrundsammlung).",
-        "gauges": "Verbindungs- & Cache-Anzeigen",
+        "gauges": "Grenzwert-Anzeigen",
         "sessState": "Sitzungen aktuell",
         "sessTrend": "Sitzungstrend & Sperrwartezeiten",
         "tpsCombo": "Durchsatz & Rollback-Rate",
@@ -703,7 +703,7 @@
         "sizeTop": "Speicher Top 10",
         "heat": "Risiko nach Signal im Zeitverlauf",
         "q": {
-          "gauges": "Füllen sich die Verbindungen? Werden Lesevorgänge aus dem Speicher bedient?",
+          "gauges": "Wie nah sind Verbindungen, Cache, Antworten und Speicher an ihren Grenzen?",
           "sessState": "Was machen die Sitzungen gerade?",
           "sessTrend": "Steigen die Sperrwartezeiten, wenn sich Sitzungen ansammeln?",
           "tpsCombo": "Bewegen sich Durchsatz und Fehlerrate zusammen?",
@@ -711,7 +711,10 @@
           "capacity": "Wann wird die DB voll sein?",
           "slowTop": "Was zuerst optimieren? (nach Gesamtzeit)",
           "sizeTop": "Was belegt den Speicherplatz?",
-          "heat": "Ist das Risiko einmalig oder wiederkehrend?"
+          "heat": "Ist das Risiko einmalig oder wiederkehrend?",
+          "radar": "Welcher Bereich ist schwach?",
+          "flow": "Welche Apps und Konten erzeugen Problemsitzungen?",
+          "tree": "Was verbraucht Speicherplatz und was muss bereinigt werden?"
         },
         "asTable": "Als Tabelle anzeigen",
         "needHistory": "Noch kein Trend — lassen Sie diesen Bildschirm einige Minuten geöffnet.",
@@ -745,8 +748,48 @@
           "calls": "Aufrufe",
           "total": "Gesamt (ms)",
           "mean": "Mittelwert (ms)",
-          "share": "Anteil"
-        }
+          "share": "Anteil",
+          "score": "Score",
+          "level": "Level",
+          "ago": "Vor 1 Stunde",
+          "from": "Von",
+          "to": "Nach",
+          "sessions": "Sitzungen",
+          "schema": "Schema",
+          "size": "Größe",
+          "thr": "Schwellenwert (Warnung·Risiko)"
+        },
+        "radar": "Gesundheits-Score nach Bereich",
+        "radarCur": "Jetzt",
+        "radarSafe": "Sichere Basislinie",
+        "radarAgo": "Vor 1 Stunde",
+        "radarOut": "Nicht messbar: {list}",
+        "axis": {
+          "avail": "Verfügbarkeit",
+          "sess": "Sitzungen",
+          "lock": "Sperren",
+          "perf": "Abfrageleistung",
+          "store": "Speicher",
+          "maint": "Wartung",
+          "idx": "Indizes",
+          "protect": "Replikation/Backup"
+        },
+        "flow": "App → Konto → Sitzungsstatus",
+        "flowState": {
+          "lockWait": "Sperrwartezeit",
+          "active": "Aktiv",
+          "idleTx": "In Transaktion inaktiv",
+          "idle": "Inaktiv"
+        },
+        "noApp": "(kein App-Name)",
+        "otherN": "{n} weitere",
+        "otherSchema": "{n} weitere Schemas",
+        "tree": "Schema- und Tabellengrößenkarte",
+        "deadPct": "Anteil toter Zeilen",
+        "partial": "Nur bis zu 500 Zeilen aggregiert.",
+        "gaugeNoLimit": "Keine Speicherbegrenzungsregel",
+        "rsp": "Antwortzeit",
+        "noStat": "Keine Statistiken"
       },
       "empty": {
         "noConn": "Diese Taxonomie hat keine PostgreSQL-Serververbindung zur Überwachung — es werden nur URLs und der Dienststatus angezeigt.",

@@ -10,12 +10,16 @@ import {
   HeatmapChart,
   LineChart,
   PieChart,
+  RadarChart,
+  SankeyChart,
+  TreemapChart,
 } from 'echarts/charts'
 import {
   AriaComponent,
   GridComponent,
   LegendComponent,
   MarkLineComponent,
+  RadarComponent,
   TitleComponent,
   TooltipComponent,
   VisualMapPiecewiseComponent,
@@ -29,10 +33,14 @@ echarts.use([
   HeatmapChart,
   LineChart,
   PieChart,
+  RadarChart,
+  SankeyChart,
+  TreemapChart,
   AriaComponent,
   GridComponent,
   LegendComponent,
   MarkLineComponent,
+  RadarComponent,
   TitleComponent,
   TooltipComponent,
   VisualMapPiecewiseComponent,
@@ -43,7 +51,8 @@ export type ChartOption = echarts.EChartsCoreOption
 export type EChartProps = {
   option: (narrow: boolean) => ChartOption
   ariaLabel: string
-  height?: number
+  // 높이도 narrow 에 따라 바꿀 수 있다(게이지 2×2·트리맵)
+  height?: number | ((narrow: boolean) => number)
   className?: string
 }
 
@@ -81,7 +90,13 @@ export function EChart({
   // aria-label 은 바깥 div — ECharts aria 가 안쪽 div 에 자동 설명을 단다
   return (
     <div role="img" aria-label={ariaLabel} className={className}>
-      <div ref={el} className="w-full" style={{ height }} />
+      <div
+        ref={el}
+        className="w-full"
+        style={{
+          height: typeof height === 'function' ? height(narrow) : height,
+        }}
+      />
     </div>
   )
 }

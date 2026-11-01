@@ -680,7 +680,7 @@
       "chart": {
         "title": "趋势与排名",
         "note": "趋势在此屏幕打开时每分钟记录一次（无后台收集）。",
-        "gauges": "连接与缓存仪表",
+        "gauges": "限制仪表",
         "sessState": "当前会话状态",
         "sessTrend": "会话趋势与锁等待",
         "tpsCombo": "吞吐量与回滚率",
@@ -690,14 +690,17 @@
         "sizeTop": "空间前 10 名",
         "heat": "按信号随时间变化的风险",
         "q": {
-          "gauges": "连接是否已满？读取是否从内存中提供？",
+          "gauges": "连接、缓存、响应、存储离限制有多近？",
           "sessState": "会话现在正在做什么？",
           "sessTrend": "会话堆积时锁等待是否增加？",
           "tpsCombo": "吞吐量和失败率是否同步变化？",
           "cacheTrend": "缓存命中率何时下降？",
           "slowTop": "首先优化什么？（按总时间）",
           "sizeTop": "什么占用了空间？",
-          "heat": "风险是一次性的还是重复发生的？"
+          "heat": "风险是一次性的还是重复发生的？",
+          "radar": "哪个区域较弱？",
+          "flow": "哪个应用和账户创建了问题会话？",
+          "tree": "什么占用了空间，什么需要清理？"
         },
         "asTable": "以表格形式查看",
         "needHistory": "尚无趋势 — 请保持此屏幕打开几分钟。",
@@ -730,8 +733,48 @@
           "calls": "调用次数",
           "total": "总时间 (ms)",
           "mean": "平均 (ms)",
-          "share": "份额"
-        }
+          "share": "份额",
+          "score": "分数",
+          "level": "判断",
+          "ago": "1 小时前",
+          "from": "来源",
+          "to": "目标",
+          "sessions": "会话数",
+          "schema": "模式",
+          "size": "大小",
+          "thr": "阈值（警告·风险）"
+        },
+        "radar": "按区域划分的健康分数",
+        "radarCur": "当前",
+        "radarSafe": "安全基线",
+        "radarAgo": "1 小时前",
+        "radarOut": "无法测量区域：{list}",
+        "axis": {
+          "avail": "可用性",
+          "sess": "会话",
+          "lock": "锁",
+          "perf": "查询性能",
+          "store": "存储",
+          "maint": "维护",
+          "idx": "索引",
+          "protect": "复制/备份"
+        },
+        "flow": "应用 → 账户 → 会话状态",
+        "flowState": {
+          "lockWait": "锁等待",
+          "active": "运行中",
+          "idleTx": "空闲（事务开启）",
+          "idle": "空闲"
+        },
+        "noApp": "(无应用名称)",
+        "otherN": "其他 {n} 个",
+        "otherSchema": "其他 {n} 个模式",
+        "tree": "模式·表容量图",
+        "deadPct": "死行比例",
+        "partial": "仅聚合了最多 500 行。",
+        "gaugeNoLimit": "无存储限制规则",
+        "rsp": "响应时间",
+        "noStat": "无统计数据"
       },
       "empty": {
         "noConn": "此分类法没有要监控的 PostgreSQL 服务器连接 — 仅显示 URL 和服务状态。",

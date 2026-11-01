@@ -73,6 +73,7 @@ export type BoardFast = {
   kpi: Kpi
   sessMix: SessMix
   waitTop: { type: string; cnt: number }[]
+  flow: SessFlow
   errors: Partial<Record<FastErrKey, string>>
 }
 export type AppSum = {
@@ -103,6 +104,7 @@ export type BoardSlow = {
   }[] // ≤10
   sizeTop: { label: string; tblByte: number; otherByte: number }[] // ≤10
   capacity: Capacity
+  tree: SizeTree
   app: AppSum | null // 보조 '연계 상태'(schema.pi 서비스 응답) — /api/monitor/summary 를 따로 부르지 않게
   errors: Partial<Record<SlowErrKey, string>>
 }
@@ -160,6 +162,7 @@ export type DbStats = {
 export type ActRow = {
   pid: number
   usename: string | null
+  appNm: string | null // application_name
   backendType: string | null
   state: string | null
   waitType: string | null
@@ -215,6 +218,7 @@ export type SizeRow = {
   tblSz: number
   idxSz: number
   toastSz: number
+  totalSz: number // pg_total_relation_size(없으면 tbl+idx+toast)
 }
 export type ArcRow = {
   archivedCount: number
@@ -667,10 +671,161 @@ export function evalFast(i: {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
       .map(([type, cnt]) => ({ type, cnt })),
+    flow: dn || !act ? EMPTY_FLOW : sessFlow(cb, act.length >= MAX_ROWS),
     snap,
     vals,
   }
 }
+
+// ── 산키(앱 → 계정 → 상태) — 클라이언트 세션만(합계 = sessMix.total). 쿼리문·pid·주소 미포함(A3) ──
+export const FLOW_TOP = 6
+export type FlowState = 'lockWait' | 'active' | 'idleTx' | 'idle'
+export type FlowNode = {
+  id: string // 'a:<app>' · 'u:<user>' · 's:<state>' — 접두사로 열 구분(순환 없음)
+  kind: 'app' | 'user' | 'state'
+  label: string // '' = 앱 이름 없음, 또는(fold 있으면) 기타
+  value: number
+  fold?: number // 'a:*'·'u:*' 에 접힌 개체 수
+}
+export type SessFlow = {
+  nodes: FlowNode[]
+  links: { source: string; target: string; value: number }[]
+  partial: boolean
+}
+const EMPTY_FLOW: SessFlow = { nodes: [], links: [], partial: false }
+const FLOW_STATES: FlowState[] = ['lockWait', 'active', 'idleTx', 'idle']
+const flowState = (r: ActRow): FlowState =>
+  isLockWaiter(r)
+    ? 'lockWait'
+    : isActive(r.state)
+      ? 'active'
+      : isIdleTx(r.state)
+        ? 'idleTx'
+        : 'idle'
+// 세션 수 상위 FLOW_TOP 이름만 두고 나머지는 '<p>:*' 로 접는다
+function foldTop(names: string[], p: 'a' | 'u') {
+  const cnt = new Map<string, number>()
+  for (const n of names) cnt.set(n, (cnt.get(n) ?? 0) + 1)
+  const sorted = [...cnt].sort(
+    (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+  )
+  const keep = new Set(sorted.slice(0, FLOW_TOP).map(([n]) => n))
+  return {
+    id: (n: string) => (keep.has(n) ? `${p}:${n}` : `${p}:*`),
+    fold: sorted.length - keep.size,
+  }
+}
+export function sessFlow(cb: ActRow[], partial: boolean): SessFlow {
+  if (!cb.length) return { ...EMPTY_FLOW, partial }
+  const app = (r: ActRow) => r.appNm ?? ''
+  const usr = (r: ActRow) => r.usename ?? '-'
+  const fa = foldTop(cb.map(app), 'a')
+  const fu = foldTop(cb.map(usr), 'u')
+  const nv = new Map<string, number>()
+  const lk = new Map<string, Map<string, number>>()
+  const add = (s: string, t: string) => {
+    const m = lk.get(s) ?? new Map<string, number>()
+    m.set(t, (m.get(t) ?? 0) + 1)
+    lk.set(s, m)
+  }
+  for (const r of cb) {
+    const a = fa.id(app(r)),
+      u = fu.id(usr(r)),
+      st = `s:${flowState(r)}`
+    for (const n of [a, u, st]) nv.set(n, (nv.get(n) ?? 0) + 1)
+    add(a, u)
+    add(u, st)
+  }
+  const col = (id: string) => 'aus'.indexOf(id[0])
+  const stOrder = (id: string) =>
+    id[0] === 's' ? FLOW_STATES.indexOf(id.slice(2) as FlowState) : 0
+  const KIND = { a: 'app', u: 'user', s: 'state' } as const
+  const nodes: FlowNode[] = [...nv]
+    .sort(
+      ([x, xv], [y, yv]) =>
+        col(x) - col(y) || stOrder(x) - stOrder(y) || yv - xv,
+    )
+    .map(([id, value]) => {
+      const star = id[0] !== 's' && id.slice(2) === '*'
+      return {
+        id,
+        kind: KIND[id[0] as keyof typeof KIND],
+        label: star ? '' : id.slice(2),
+        value,
+        ...(star ? { fold: id[0] === 'a' ? fa.fold : fu.fold } : {}),
+      }
+    })
+  const links = [...lk].flatMap(([source, m]) =>
+    [...m].map(([target, value]) => ({ source, target, value })),
+  )
+  return { nodes, links, partial }
+}
+
+// ── 게이지 구간 — Signal.thr(THR 파생) 그대로, stops = ECharts axisLine.color 비율(0~1). 바늘은 [min,max] clamp ──
+export type GaugeScale = { min: number; max: number; stops: [number, Lvl][] }
+export function gaugeScale(
+  thr: NonNullable<Signal['thr']>,
+  unit: Signal['unit'],
+): GaugeScale {
+  const max = thr.down || unit === 'pct' ? 100 : thr.risk * 1.5
+  const min = thr.down ? Math.max(0, 2 * thr.risk - thr.warn) : 0
+  const f = (v: number) =>
+    max > min ? Math.min(1, Math.max(0, (v - min) / (max - min))) : 1
+  return {
+    min,
+    max,
+    stops: thr.down
+      ? [
+          [f(thr.risk), 'RISK'],
+          [f(thr.warn), 'WARN'],
+          [1, 'OK'],
+        ]
+      : [
+          [f(thr.warn), 'OK'],
+          [f(thr.risk), 'WARN'],
+          [1, 'RISK'],
+        ],
+  }
+}
+
+// ── 레이더(범주 8축) — 축 점수 = 축 안 평가된 신호(OK·WARN·RISK) 중 최악의 SCORE, 평가 없음 = null·NA ──
+export type RadarAxis =
+  | 'avail'
+  | 'sess'
+  | 'lock'
+  | 'perf'
+  | 'store'
+  | 'maint'
+  | 'idx'
+  | 'protect'
+export const RADAR_AXES: Record<RadarAxis, SigId[]> = {
+  avail: ['AVAIL', 'CONN_USE', 'URL'],
+  sess: ['LONG_QRY', 'IDLE_TX'],
+  lock: ['LOCK_WAIT'],
+  perf: ['CACHE_HIT', 'XACT_ERR', 'SLOW_SQL'],
+  store: ['STORAGE'],
+  maint: ['VACUUM'],
+  idx: ['INDEX'],
+  protect: ['BACKUP', 'REPL'],
+}
+export const SCORE = { OK: 100, WARN: 60, RISK: 20 } as const
+export const RADAR_SAFE = (SCORE.OK + SCORE.WARN) / 2 // 안전 기준선(점선) — 안쪽이면 주의 이상
+export type RadarPt = { axis: RadarAxis; score: number | null; lvl: Lvl }
+export function radarScores(lv: Partial<Record<SigId, Lvl>>): RadarPt[] {
+  return (Object.keys(RADAR_AXES) as RadarAxis[]).map((axis) => {
+    const ls = RADAR_AXES[axis]
+      .map((id) => lv[id])
+      .filter((l): l is keyof typeof SCORE => !!l && l in SCORE)
+    if (!ls.length) return { axis, score: null, lvl: 'NA' as Lvl }
+    const w = worst(ls) as keyof typeof SCORE
+    return { axis, score: SCORE[w], lvl: w }
+  })
+}
+// 현재 신호 → radarScores 입력. 설정성 사유(NO_LIMIT 등)는 summarize 처럼 판정에서 뺀다
+export const sigLevels = (signals: Iterable<Signal>) =>
+  Object.fromEntries(
+    [...signals].filter((s) => !isSetup(s)).map((s) => [s.id, s.lvl]),
+  ) as Partial<Record<SigId, Lvl>>
 
 // ── URL(schema.pi 저장 이력, 접속 없이 연결만으로 판정) ──
 export function evalUrl(urls: In<UrlCheck[]>, now: number) {
@@ -764,6 +919,101 @@ export function storageLimit(rules: Rule[], connId: string): number | null {
 
 const UTIL_SQL =
   /^\s*(VACUUM|ANALYZE|COPY|CREATE|ALTER|REINDEX|BEGIN|COMMIT|ROLLBACK|SET|EXPLAIN|SHOW|DISCARD|RESET)\b/i
+
+// 테이블 1개의 죽은 행·분석 지연 판정 — VACUUM 카드와 트리맵 색이 같은 함수를 쓴다(판정 갈라짐 방지)
+export function rateDead(t: TblRow, now: number) {
+  const deadPct =
+    t.deadTup >= THR.deadMin
+      ? r2((t.deadTup / Math.max(1, t.liveTup + t.deadTup)) * 100)
+      : 0
+  const anaAge = now - ts(t.lastAnalyze)
+  const stale =
+    t.modSinceAnalyze >= Math.max(1000, 0.5 * t.liveTup) && !(anaAge <= DAY)
+  const vacOld = !(now - ts(t.lastVacuum) <= 7 * DAY)
+  const lvl: Lvl =
+    (deadPct >= THR.deadPct[1] && t.deadTup >= THR.deadRiskMin) ||
+    (t.deadTup >= THR.deadHuge && vacOld)
+      ? 'RISK'
+      : deadPct >= THR.deadPct[0] || stale
+        ? 'WARN'
+        : 'OK'
+  return { deadPct, stale, lvl }
+}
+
+// ── 트리맵(스키마 → 테이블) — sizes 면적 + tbl_stats 죽은 행 판정 색. 새 조회 없음 ──
+export const TREE_SCHEMA_TOP = 6
+export const TREE_TBL_TOP = 10
+export type TreeNode = {
+  id: string // 스키마 = schema, 테이블 = schema.rel, 접은 것 = '__other' · '<schema>.__other'
+  name: string // 스키마명 / 테이블명(스키마 접두 없음) / '__other'
+  value: number // 바이트
+  deadPct: number | null // 실제 죽은 행 비율(툴팁·표용), 스키마·접은 것·통계 없음 = null
+  lvl: Lvl
+  fold?: number // 접힌 개체 수
+  children?: TreeNode[]
+}
+export type SizeTree = { nodes: TreeNode[]; partial: boolean }
+const sumV = (ns: TreeNode[]) => ns.reduce((a, n) => a + n.value, 0)
+const byValue = (a: TreeNode, b: TreeNode) =>
+  b.value - a.value || a.id.localeCompare(b.id)
+// 상위 n 개 + 나머지 1개(접은 노드)
+function foldNodes(ns: TreeNode[], n: number, id: string): TreeNode[] {
+  const sorted = [...ns].sort(byValue)
+  const rest = sorted.slice(n)
+  if (!rest.length) return sorted
+  return [
+    ...sorted.slice(0, n),
+    {
+      id,
+      name: '__other',
+      value: sumV(rest),
+      deadPct: null,
+      lvl: worst(rest.map((x) => x.lvl)),
+      fold: rest.length,
+    },
+  ]
+}
+export function sizeTree(
+  sizes: In<SizeRow[]>,
+  tbl: In<TblRow[]>,
+  now: number,
+): SizeTree {
+  if (typeof sizes === 'string') return { nodes: [], partial: false }
+  const tb = typeof tbl === 'string' ? [] : tbl
+  const byRel = new Map(tb.map((t) => [`${t.schema}.${t.rel}`, t]))
+  const bySch = new Map<string, TreeNode[]>()
+  for (const s of sizes) {
+    const id = `${s.schema}.${s.rel}`
+    const t = byRel.get(id)
+    const leaf: TreeNode = {
+      id,
+      name: s.rel,
+      value: s.totalSz,
+      deadPct: t
+        ? r2((t.deadTup / Math.max(1, t.liveTup + t.deadTup)) * 100)
+        : null,
+      lvl: t ? rateDead(t, now).lvl : 'NA',
+    }
+    const ls = bySch.get(s.schema)
+    if (ls) ls.push(leaf)
+    else bySch.set(s.schema, [leaf])
+  }
+  const schemas = [...bySch].map(([sch, ls]): TreeNode => {
+    const kids = foldNodes(ls, TREE_TBL_TOP, `${sch}.__other`)
+    return {
+      id: sch,
+      name: sch,
+      value: sumV(kids),
+      deadPct: null,
+      lvl: worst(kids.map((x) => x.lvl)),
+      children: kids,
+    }
+  })
+  return {
+    nodes: foldNodes(schemas, TREE_SCHEMA_TOP, '__other'),
+    partial: sizes.length >= MAX_ROWS || tb.length >= MAX_ROWS,
+  }
+}
 
 // ── 느린 층(top_sql·tbl_stats·idx_stats·sizes·archiver·replication + schema.pi 요약·성능 수집 용량) ──
 export function evalSlow(i: {
@@ -885,25 +1135,7 @@ export function evalSlow(i: {
   else if (!i.tbl.length) out.push(sig('VACUUM', 'NA', at, { reason: 'NONE' }))
   else {
     const rated = i.tbl
-      .map((t) => {
-        const deadPct =
-          t.deadTup >= THR.deadMin
-            ? r2((t.deadTup / Math.max(1, t.liveTup + t.deadTup)) * 100)
-            : 0
-        const anaAge = i.now - ts(t.lastAnalyze)
-        const stale =
-          t.modSinceAnalyze >= Math.max(1000, 0.5 * t.liveTup) &&
-          !(anaAge <= DAY)
-        const vacOld = !(i.now - ts(t.lastVacuum) <= 7 * DAY)
-        const lvl: Lvl =
-          (deadPct >= THR.deadPct[1] && t.deadTup >= THR.deadRiskMin) ||
-          (t.deadTup >= THR.deadHuge && vacOld)
-            ? 'RISK'
-            : deadPct >= THR.deadPct[0] || stale
-              ? 'WARN'
-              : 'OK'
-        return { t, deadPct, stale, lvl }
-      })
+      .map((t) => ({ t, ...rateDead(t, i.now) }))
       .filter((x) => x.lvl !== 'OK')
       .sort(
         (a, b) =>
@@ -1109,7 +1341,13 @@ export function evalSlow(i: {
     ...u.vals,
     DB_SIZE_MB: typeof i.dbSzByte === 'number' ? r2(i.dbSzByte / MIB) : null,
   }
-  return { signals: out, slowTop, sizeTop, vals }
+  return {
+    signals: out,
+    slowTop,
+    sizeTop,
+    tree: sizeTree(i.sizes, i.tbl, i.now),
+    vals,
+  }
 }
 
 // ── 요약·할 일 ──
@@ -1263,6 +1501,35 @@ export const HEAT_BKT_MIN: Record<Range, number> = {
   1440: 60,
 }
 
+// 스냅샷 1행의 축약 판정(히트맵 칸·레이더 '1시간 전' 공용) — prev = 바로 앞 행(Δ 용)
+export function rowLevels(
+  prev: SnapRow | undefined,
+  r: SnapRow,
+): Record<(typeof HEAT_ROWS)[number], Lvl> {
+  const d = pair(prev, r)
+  const hr = d && d.hit !== null && d.read !== null ? d.hit + d.read : 0
+  const x = d && d.cmt !== null && d.rlbk !== null ? d.cmt + d.rlbk : 0
+  return {
+    CONN_USE: r.max_conn_cnt
+      ? up((r.sess_cnt / r.max_conn_cnt) * 100, THR.connPct)
+      : 'NA',
+    CACHE_HIT:
+      hr >= SAMPLE.blks ? down((d!.hit! / hr) * 100, THR.cachePct) : 'NA',
+    LOCK_WAIT:
+      r.lock_wait_cnt >= THR.lockWaiters
+        ? 'RISK'
+        : r.lock_wait_cnt >= 1
+          ? 'WARN'
+          : 'OK',
+    LONG_QRY: up(r.max_run_ms, THR.longMs),
+    IDLE_TX: up(r.max_idle_tx_ms, THR.idleMs),
+    XACT_ERR: worst([
+      x >= SAMPLE.xact ? up((d!.rlbk! / x) * 100, THR.rlbkPct) : 'NA',
+      d && d.dlck !== null ? up(d.dlck, THR.dlck) : 'NA',
+    ]),
+  }
+}
+
 // 히트맵(신호 × 시간 구간) — 저장 칼럼만 쓰는 축약 규칙(카드 판정과 다름 : 락은 대기 수만, Δ 는 표본 충분할 때만), 구간 대표값 = 최악, 빈 구간 = NA
 export function levelsByBucket(
   rows: SnapRow[],
@@ -1279,28 +1546,7 @@ export function levelsByBucket(
   rows.forEach((r, k) => {
     const c = Math.floor((ts(r.bkt_dtm) - first) / bkt)
     if (c < 0 || c >= n) return
-    const d = pair(rows[k - 1], r)
-    const hr = d && d.hit !== null && d.read !== null ? d.hit + d.read : 0
-    const x = d && d.cmt !== null && d.rlbk !== null ? d.cmt + d.rlbk : 0
-    const lv: Record<(typeof HEAT_ROWS)[number], Lvl> = {
-      CONN_USE: r.max_conn_cnt
-        ? up((r.sess_cnt / r.max_conn_cnt) * 100, THR.connPct)
-        : 'NA',
-      CACHE_HIT:
-        hr >= SAMPLE.blks ? down((d!.hit! / hr) * 100, THR.cachePct) : 'NA',
-      LOCK_WAIT:
-        r.lock_wait_cnt >= THR.lockWaiters
-          ? 'RISK'
-          : r.lock_wait_cnt >= 1
-            ? 'WARN'
-            : 'OK',
-      LONG_QRY: up(r.max_run_ms, THR.longMs),
-      IDLE_TX: up(r.max_idle_tx_ms, THR.idleMs),
-      XACT_ERR: worst([
-        x >= SAMPLE.xact ? up((d!.rlbk! / x) * 100, THR.rlbkPct) : 'NA',
-        d && d.dlck !== null ? up(d.dlck, THR.dlck) : 'NA',
-      ]),
-    }
+    const lv = rowLevels(rows[k - 1], r)
     HEAT_ROWS.forEach((id, ri) => {
       cells[ri][c] = worst([cells[ri][c], lv[id]])
     })

@@ -692,7 +692,7 @@
       "chart": {
         "title": "Trender & rankningar",
         "note": "Trender registreras varje minut medan denna skärm är öppen (ingen bakgrundsinsamling).",
-        "gauges": "Anslutnings- & cachemätare",
+        "gauges": "Gränsvärdesmätare",
         "sessState": "Sessioner just nu",
         "sessTrend": "Sessionstrend & låsväntetider",
         "tpsCombo": "Genomströmning & återställningsfrekvens",
@@ -703,7 +703,7 @@
         "sizeTop": "Utrymme topp 10",
         "heat": "Risk per signal över tid",
         "q": {
-          "gauges": "Fylls anslutningarna? Serveras läsningar från minnet?",
+          "gauges": "Hur nära sina gränser är anslutningar, cache, svar och lagring?",
           "sessState": "Vad gör sessionerna nu?",
           "sessTrend": "Ökar låsväntetiderna när sessioner hopar sig?",
           "tpsCombo": "Rör sig genomströmning och felfrekvens tillsammans?",
@@ -711,7 +711,10 @@
           "capacity": "När fylls DB:n?",
           "slowTop": "Vad ska justeras först? (efter total tid)",
           "sizeTop": "Vad tar upp utrymmet?",
-          "heat": "Är risken engångsföreteelse eller återkommande?"
+          "heat": "Är risken engångsföreteelse eller återkommande?",
+          "radar": "Vilket område är svagt?",
+          "flow": "Vilka appar och konton skapar problemsessioner?",
+          "tree": "Vad tar upp utrymme, och vad behöver rensas?"
         },
         "asTable": "Visa som tabell",
         "needHistory": "Ingen trend ännu – håll denna skärm öppen i några minuter.",
@@ -745,8 +748,48 @@
           "calls": "Anrop",
           "total": "Totalt (ms)",
           "mean": "Medel (ms)",
-          "share": "Andel"
-        }
+          "share": "Andel",
+          "score": "Poäng",
+          "level": "Nivå",
+          "ago": "1 timme sedan",
+          "from": "Från",
+          "to": "Till",
+          "sessions": "Sessioner",
+          "schema": "Schema",
+          "size": "Storlek",
+          "thr": "Tröskel (varning·risk)"
+        },
+        "radar": "Hälsopoäng per område",
+        "radarCur": "Nu",
+        "radarSafe": "Säker baslinje",
+        "radarAgo": "1 timme sedan",
+        "radarOut": "Ej mätbart: {list}",
+        "axis": {
+          "avail": "Tillgänglighet",
+          "sess": "Sessioner",
+          "lock": "Lås",
+          "perf": "Frågeprestanda",
+          "store": "Lagring",
+          "maint": "Underhåll",
+          "idx": "Index",
+          "protect": "Replikering/säkerhetskopiering"
+        },
+        "flow": "App → konto → sessionsstatus",
+        "flowState": {
+          "lockWait": "Låsväntan",
+          "active": "Aktiv",
+          "idleTx": "Inaktiv i transaktion",
+          "idle": "Inaktiv"
+        },
+        "noApp": "(inget appnamn)",
+        "otherN": "{n} andra",
+        "otherSchema": "{n} andra scheman",
+        "tree": "Karta över schema- och tabellstorlek",
+        "deadPct": "Andel döda rader",
+        "partial": "Endast upp till 500 rader aggregerade.",
+        "gaugeNoLimit": "Ingen regel för lagringsgräns",
+        "rsp": "Svarstid",
+        "noStat": "Ingen statistik"
       },
       "empty": {
         "noConn": "Denna taxonomi har ingen PostgreSQL-serveranslutning att övervaka – visar endast URL:er och tjänststatus.",

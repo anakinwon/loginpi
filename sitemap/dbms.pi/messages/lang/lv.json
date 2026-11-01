@@ -694,7 +694,7 @@
       "chart": {
         "title": "Tendences un reitingi",
         "note": "Tendences tiek ierakstītas katru minūti, kamēr šis ekrāns ir atvērts (nav fona vākšanas).",
-        "gauges": "Savienojuma un kešatmiņas mērītāji",
+        "gauges": "Ierobežojumu mērierīces",
         "sessState": "Sesijas tieši tagad",
         "sessTrend": "Sesiju tendence un bloķēšanas gaidīšana",
         "tpsCombo": "Caurlaides spēja un atcelšanas biežums",
@@ -705,7 +705,7 @@
         "sizeTop": "Vietas TOP 10",
         "heat": "Risks pēc signāla laika gaitā",
         "q": {
-          "gauges": "Vai savienojumi piepildās? Vai lasīšana tiek veikta no atmiņas?",
+          "gauges": "Cik tuvu saviem ierobežojumiem ir savienojumi, kešatmiņa, atbildes un krātuve?",
           "sessState": "Ko sesijas dara tagad?",
           "sessTrend": "Vai bloķēšanas gaidīšana palielinās, kad sesijas uzkrājas?",
           "tpsCombo": "Vai caurlaides spēja un kļūmju biežums kustas kopā?",
@@ -713,7 +713,10 @@
           "capacity": "Kad DB piepildīsies?",
           "slowTop": "Ko vispirms noregulēt? (pēc kopējā laika)",
           "sizeTop": "Kas aizņem vietu?",
-          "heat": "Vai risks ir vienreizējs vai atkārtojas?"
+          "heat": "Vai risks ir vienreizējs vai atkārtojas?",
+          "radar": "Kura joma ir vāja?",
+          "flow": "Kuras lietotnes un konti rada problemātiskas sesijas?",
+          "tree": "Kas aizņem vietu un kas jātīra?"
         },
         "asTable": "Skatīt kā tabulu",
         "needHistory": "Vēl nav tendences — turiet šo ekrānu atvērtu dažas minūtes.",
@@ -747,8 +750,48 @@
           "calls": "Izsaukumi",
           "total": "Kopā (ms)",
           "mean": "Vidēji (ms)",
-          "share": "Daļa"
-        }
+          "share": "Daļa",
+          "score": "Rādītājs",
+          "level": "Līmenis",
+          "ago": "Pirms 1 stundas",
+          "from": "No",
+          "to": "Līdz",
+          "sessions": "Sesijas",
+          "schema": "Shēma",
+          "size": "Lielums",
+          "thr": "Slieksnis (brīdinājums·risks)"
+        },
+        "radar": "Veselības rādītājs pa jomām",
+        "radarCur": "Tagad",
+        "radarSafe": "Droša bāzes līnija",
+        "radarAgo": "Pirms 1 stundas",
+        "radarOut": "Nav mērāms: {list}",
+        "axis": {
+          "avail": "Pieejamība",
+          "sess": "Sesijas",
+          "lock": "Bloķēšana",
+          "perf": "Vaicājumu veiktspēja",
+          "store": "Krātuve",
+          "maint": "Apkope",
+          "idx": "Indeksi",
+          "protect": "Replikācija/dublēšana"
+        },
+        "flow": "Lietotne → konts → sesijas statuss",
+        "flowState": {
+          "lockWait": "Bloķēšanas gaidīšana",
+          "active": "Aktīvs",
+          "idleTx": "Dīkstāve transakcijā",
+          "idle": "Dīkstāve"
+        },
+        "noApp": "(nav lietotnes nosaukuma)",
+        "otherN": "{n} citi",
+        "otherSchema": "{n} citas shēmas",
+        "tree": "Shēmas un tabulas lieluma karte",
+        "deadPct": "Mirušo rindu attiecība",
+        "partial": "Apkopotas tikai līdz 500 rindām.",
+        "gaugeNoLimit": "Nav krātuves ierobežojuma noteikumu",
+        "rsp": "Atbildes laiks",
+        "noStat": "Nav statistikas"
       },
       "empty": {
         "noConn": "Šai taksonomijai nav PostgreSQL servera savienojuma, ko uzraudzīt — tiek rādīti tikai URL un pakalpojumu statuss.",

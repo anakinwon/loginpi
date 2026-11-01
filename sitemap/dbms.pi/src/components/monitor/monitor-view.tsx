@@ -296,7 +296,14 @@ function MonitorBody() {
             }}
             onAddRule={addRule}
           />
-          {sel.connId && <ChartPanels sel={sel} fast={b.fast} slow={b.slow} />}
+          {sel.connId && (
+            <ChartPanels
+              sel={sel}
+              fast={b.fast}
+              slow={b.slow}
+              signals={signals}
+            />
+          )}
           <div className="space-y-3">
             <RulesPanel
               linkId={sel.linkId}

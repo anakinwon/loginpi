@@ -520,6 +520,7 @@
         "WARN": "Waarschuwing — sommige items moeten worden bekeken",
         "UNKNOWN": "Onbekend — controleer de verbinding",
         "OK": "OK — elk signaal is binnen de limieten",
+        "CONN_DOWN": "Kan geen verbinding maken met de DB — controleer eerst de verbinding",
         "NA": "N.v.t."
       },
       "kpi": {
@@ -692,7 +693,7 @@
       "chart": {
         "title": "Trends & ranglijsten",
         "note": "Trends worden elke minuut vastgelegd zolang dit scherm open is (geen achtergrondverzameling).",
-        "gauges": "Verbindings- & cachemeters",
+        "gauges": "Limietmeters",
         "sessState": "Sessies nu",
         "sessTrend": "Sessietrend & lock-wachttijden",
         "tpsCombo": "Doorvoer & rollback-percentage",
@@ -703,7 +704,7 @@
         "sizeTop": "Ruimte top 10",
         "heat": "Risico per signaal over tijd",
         "q": {
-          "gauges": "Lopen de verbindingen vol? Worden reads uit geheugen geserveerd?",
+          "gauges": "Hoe dicht zijn verbindingen, cache, reacties en opslag bij hun limieten?",
           "sessState": "Wat doen sessies nu?",
           "sessTrend": "Nemen lock-wachttijden toe wanneer sessies zich opstapelen?",
           "tpsCombo": "Bewegen doorvoer en faalpercentage samen?",
@@ -711,7 +712,10 @@
           "capacity": "Wanneer raakt de DB vol?",
           "slowTop": "Wat eerst tunen? (op totale tijd)",
           "sizeTop": "Wat neemt de ruimte in beslag?",
-          "heat": "Is het risico eenmalig of terugkerend?"
+          "heat": "Is het risico eenmalig of terugkerend?",
+          "radar": "Welk gebied is zwak?",
+          "flow": "Welke apps en accounts creëren probleem-sessies?",
+          "tree": "Wat neemt ruimte in beslag en wat moet worden opgeruimd?"
         },
         "asTable": "Bekijken als tabel",
         "needHistory": "Nog geen trend — houd dit scherm een paar minuten open.",
@@ -745,8 +749,48 @@
           "calls": "Oproepen",
           "total": "Totaal (ms)",
           "mean": "Gemiddelde (ms)",
-          "share": "Aandeel"
-        }
+          "share": "Aandeel",
+          "score": "Score",
+          "level": "Niveau",
+          "ago": "1 uur geleden",
+          "from": "Van",
+          "to": "Naar",
+          "sessions": "Sessies",
+          "schema": "Schema",
+          "size": "Grootte",
+          "thr": "Drempel (waarschuwing·risico)"
+        },
+        "radar": "Gezondheidsscore per gebied",
+        "radarCur": "Nu",
+        "radarSafe": "Veilige basislijn",
+        "radarAgo": "1 uur geleden",
+        "radarOut": "Niet meetbaar: {list}",
+        "axis": {
+          "avail": "Beschikbaarheid",
+          "sess": "Sessies",
+          "lock": "Vergrendelingen",
+          "perf": "Queryprestaties",
+          "store": "Opslag",
+          "maint": "Onderhoud",
+          "idx": "Indexen",
+          "protect": "Replicatie/back-up"
+        },
+        "flow": "App → account → sessiestatus",
+        "flowState": {
+          "lockWait": "Wachten op vergrendeling",
+          "active": "Actief",
+          "idleTx": "Inactief (transactie open)",
+          "idle": "Inactief"
+        },
+        "noApp": "(geen app-naam)",
+        "otherN": "{n} andere",
+        "otherSchema": "{n} andere schema's",
+        "tree": "Schema- en tabelgroottekaart",
+        "deadPct": "Verhouding dode rijen",
+        "partial": "Slechts tot 500 rijen geaggregeerd.",
+        "gaugeNoLimit": "Geen opslaglimietregel",
+        "rsp": "Responstijd",
+        "noStat": "Geen statistieken"
       },
       "empty": {
         "noConn": "Deze taxonomie heeft geen PostgreSQL-serververbinding om te monitoren — toont alleen URL's en servicestatus.",

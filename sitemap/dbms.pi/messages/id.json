@@ -694,7 +694,7 @@
       "chart": {
         "title": "Tren & peringkat",
         "note": "Tren dicatat setiap menit saat layar ini terbuka (tidak ada pengumpulan latar belakang).",
-        "gauges": "Pengukur koneksi & cache",
+        "gauges": "Batas Pengukur",
         "sessState": "Sesi saat ini",
         "sessTrend": "Tren sesi & tunggu kunci",
         "tpsCombo": "Throughput & tingkat rollback",
@@ -705,7 +705,7 @@
         "sizeTop": "10 ruang teratas",
         "heat": "Risiko berdasarkan sinyal seiring waktu",
         "q": {
-          "gauges": "Apakah koneksi penuh? Apakah pembacaan dilayani dari memori?",
+          "gauges": "Seberapa dekat koneksi, cache, respons, dan penyimpanan dengan batas?",
           "sessState": "Apa yang sedang dilakukan sesi sekarang?",
           "sessTrend": "Apakah tunggu kunci meningkat saat sesi menumpuk?",
           "tpsCombo": "Apakah throughput dan tingkat kegagalan bergerak bersama?",
@@ -713,7 +713,10 @@
           "capacity": "Kapan DB akan penuh?",
           "slowTop": "Apa yang harus disetel terlebih dahulu? (berdasarkan total waktu)",
           "sizeTop": "Apa yang menghabiskan ruang?",
-          "heat": "Apakah risiko ini sekali saja atau berulang?"
+          "heat": "Apakah risiko ini sekali saja atau berulang?",
+          "radar": "Area mana yang lemah?",
+          "flow": "Aplikasi dan akun mana yang membuat sesi bermasalah?",
+          "tree": "Apa yang menghabiskan ruang, dan apa yang perlu dibersihkan?"
         },
         "asTable": "Lihat sebagai tabel",
         "needHistory": "Belum ada tren — biarkan layar ini terbuka selama beberapa menit.",
@@ -747,8 +750,48 @@
           "calls": "Panggilan",
           "total": "Total (ms)",
           "mean": "Rata-rata (ms)",
-          "share": "Bagian"
-        }
+          "share": "Bagian",
+          "score": "Skor",
+          "level": "Level",
+          "ago": "1 jam lalu",
+          "from": "Dari",
+          "to": "Ke",
+          "sessions": "Sesi",
+          "schema": "Skema",
+          "size": "Ukuran",
+          "thr": "Ambang Batas (peringatan·risiko)"
+        },
+        "radar": "Skor kesehatan berdasarkan area",
+        "radarCur": "Sekarang",
+        "radarSafe": "Garis dasar aman",
+        "radarAgo": "1 jam lalu",
+        "radarOut": "Tidak dapat diukur: {list}",
+        "axis": {
+          "avail": "Ketersediaan",
+          "sess": "Sesi",
+          "lock": "Kunci",
+          "perf": "Performa kueri",
+          "store": "Penyimpanan",
+          "maint": "Pemeliharaan",
+          "idx": "Indeks",
+          "protect": "Replikasi/cadangan"
+        },
+        "flow": "Aplikasi → akun → status sesi",
+        "flowState": {
+          "lockWait": "Menunggu kunci",
+          "active": "Aktif",
+          "idleTx": "Menganggur dalam transaksi",
+          "idle": "Menganggur"
+        },
+        "noApp": "(tanpa nama aplikasi)",
+        "otherN": "{n} lainnya",
+        "otherSchema": "{n} skema lainnya",
+        "tree": "Peta ukuran skema dan tabel",
+        "deadPct": "Rasio baris mati",
+        "partial": "Hanya diagregasi hingga 500 baris.",
+        "gaugeNoLimit": "Tidak ada aturan batas penyimpanan",
+        "rsp": "Waktu respons",
+        "noStat": "Tidak ada statistik"
       },
       "empty": {
         "noConn": "Taksonomi ini tidak memiliki koneksi server PostgreSQL untuk dipantau — hanya menampilkan URL dan status layanan.",

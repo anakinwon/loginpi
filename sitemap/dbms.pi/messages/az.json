@@ -694,7 +694,7 @@
       "chart": {
         "title": "Trendlər və reytinqlər",
         "note": "Trendlər bu ekran açıq olduğu müddətdə hər dəqiqə qeyd olunur (fon kolleksiyası yoxdur).",
-        "gauges": "Qoşulma və keş göstəriciləri",
+        "gauges": "Limit göstəriciləri",
         "sessState": "Hazırda sessiyalar",
         "sessTrend": "Sessiya trendi və kilid gözləmələri",
         "tpsCombo": "Məhsuldarlıq və geri qaytarma dərəcəsi",
@@ -705,7 +705,7 @@
         "sizeTop": "Boş yer ilk 10",
         "heat": "Zamanla siqnala görə risk",
         "q": {
-          "gauges": "Qoşulmalar dolurmu? Oxumalar yaddaşdan verilirmi?",
+          "gauges": "Bağlantılar, keş, cavablar və yaddaş öz limitlərinə nə qədər yaxındır?",
           "sessState": "Sessiyalar indi nə edir?",
           "sessTrend": "Sessiyalar yığıldıqda kilid gözləmələri artırmı?",
           "tpsCombo": "Məhsuldarlıq və uğursuzluq dərəcəsi birlikdə hərəkət edirmi?",
@@ -713,7 +713,10 @@
           "capacity": "DB nə vaxt dolacaq?",
           "slowTop": "Əvvəlcə nəyi tənzimləməli? (ümumi vaxta görə)",
           "sizeTop": "Boş yeri nə tutur?",
-          "heat": "Risk birdəfəlikdir, yoxsa təkrarlanan?"
+          "heat": "Risk birdəfəlikdir, yoxsa təkrarlanan?",
+          "radar": "Hansı sahə zəifdir?",
+          "flow": "Hansı tətbiqlər və hesablar problem sessiyaları yaradır?",
+          "tree": "Nə yer tutur və nə təmizlənməlidir?"
         },
         "asTable": "Cədvəl kimi bax",
         "needHistory": "Hələ trend yoxdur — bu ekranı bir neçə dəqiqə açıq saxlayın.",
@@ -747,8 +750,48 @@
           "calls": "Zənglər",
           "total": "Ümumi (ms)",
           "mean": "Orta (ms)",
-          "share": "Pay"
-        }
+          "share": "Pay",
+          "score": "Xal",
+          "level": "Səviyyə",
+          "ago": "1 saat əvvəl",
+          "from": "Kimdən",
+          "to": "Kimə",
+          "sessions": "Sessiyalar",
+          "schema": "Sxem",
+          "size": "Ölçü",
+          "thr": "Hədd (xəbərdarlıq·risk)"
+        },
+        "radar": "Sahə üzrə sağlamlıq balı",
+        "radarCur": "İndi",
+        "radarSafe": "Təhlükəsiz baza xətti",
+        "radarAgo": "1 saat əvvəl",
+        "radarOut": "Ölçülə bilməyən sahə: {list}",
+        "axis": {
+          "avail": "Əlçatanlıq",
+          "sess": "Sessiyalar",
+          "lock": "Kilidlər",
+          "perf": "Sorğu performansı",
+          "store": "Yaddaş",
+          "maint": "Baxım",
+          "idx": "İndekslər",
+          "protect": "Replikasiya/ehtiyat nüsxə"
+        },
+        "flow": "Tətbiq → hesab → sessiya vəziyyəti",
+        "flowState": {
+          "lockWait": "Kilid gözləməsi",
+          "active": "Aktiv",
+          "idleTx": "Əməliyyatda boş",
+          "idle": "Boş"
+        },
+        "noApp": "(tətbiq adı yoxdur)",
+        "otherN": "{n} digər",
+        "otherSchema": "{n} digər sxem",
+        "tree": "Sxem və cədvəl ölçüsü xəritəsi",
+        "deadPct": "Ölü sətir nisbəti",
+        "partial": "Yalnız 500 sətrə qədər cəmlənmişdir.",
+        "gaugeNoLimit": "Yaddaş limiti qaydası yoxdur",
+        "rsp": "Cavab müddəti",
+        "noStat": "Statistika yoxdur"
       },
       "empty": {
         "noConn": "Bu taksonomiyada monitorinq üçün PostgreSQL server qoşulması yoxdur — yalnız URL-lər və xidmət statusu göstərilir.",

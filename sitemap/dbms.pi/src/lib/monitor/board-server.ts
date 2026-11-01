@@ -110,6 +110,7 @@ export const parseActivity = (r: QueryResult): ActRow[] =>
   toObjs(r).map((o) => ({
     pid: num(o.pid),
     usename: str(o.usename),
+    appNm: str(o.application_name),
     backendType: str(o.backend_type),
     state: str(o.state),
     waitType: str(o.wait_event_type),
@@ -173,6 +174,8 @@ export const parseSizes = (r: QueryResult): SizeRow[] =>
     tblSz: num(o.tbl_sz),
     idxSz: num(o.idx_sz),
     toastSz: num(o.toast_sz),
+    totalSz:
+      numOrNull(o.total_sz) ?? num(o.tbl_sz) + num(o.idx_sz) + num(o.toast_sz),
   }))
 export function parseArc(r: QueryResult): ArcRow | null {
   const o = toObjs(r)[0]
@@ -383,6 +386,7 @@ export async function buildFast(
     kpi: e.kpi,
     sessMix: e.sessMix,
     waitTop: e.waitTop,
+    flow: e.flow,
     errors,
   }
   return {
@@ -446,6 +450,7 @@ export async function buildSlow(
       slowTop: [],
       sizeTop: [],
       capacity: { points: [], limitByte: null, perDay: null, daysLeft: null },
+      tree: { nodes: [], partial: false },
       app: sum instanceof LinkError ? null : sum.app,
       errors: sum instanceof LinkError ? { summary: sum.code } : {},
     }
@@ -529,6 +534,7 @@ export async function buildSlow(
     slowTop: e.slowTop,
     sizeTop: e.sizeTop,
     capacity,
+    tree: e.tree,
     app: sum instanceof LinkError ? null : sum.app,
     errors,
   }

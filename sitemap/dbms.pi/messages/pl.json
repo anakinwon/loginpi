@@ -689,7 +689,7 @@
       "chart": {
         "title": "Trendy i rankingi",
         "note": "Trendy są rejestrowane co minutę, gdy ten ekran jest otwarty (brak zbierania w tle).",
-        "gauges": "Wskaźniki połączeń i pamięci podręcznej",
+        "gauges": "Wskaźniki limitów",
         "sessState": "Sesje w tej chwili",
         "sessTrend": "Trend sesji i oczekiwanie na blokady",
         "tpsCombo": "Przepustowość i współczynnik wycofań",
@@ -700,7 +700,7 @@
         "sizeTop": "Top 10 zajętości miejsca",
         "heat": "Ryzyko według sygnału w czasie",
         "q": {
-          "gauges": "Czy połączenia się zapełniają? Czy odczyty są obsługiwane z pamięci?",
+          "gauges": "Jak blisko limitów są połączenia, pamięć podręczna, odpowiedzi i pamięć masowa?",
           "sessState": "Co robią sesje teraz?",
           "sessTrend": "Czy oczekiwanie na blokady rośnie, gdy sesje się kumulują?",
           "tpsCombo": "Czy przepustowość i wskaźnik awarii poruszają się razem?",
@@ -708,7 +708,10 @@
           "capacity": "Kiedy DB się zapełni?",
           "slowTop": "Co najpierw dostroić? (według całkowitego czasu)",
           "sizeTop": "Co zajmuje miejsce?",
-          "heat": "Czy ryzyko jest jednorazowe czy powtarzające się?"
+          "heat": "Czy ryzyko jest jednorazowe czy powtarzające się?",
+          "radar": "Który obszar jest słaby?",
+          "flow": "Które aplikacje i konta tworzą problematyczne sesje?",
+          "tree": "Co zajmuje miejsce i co wymaga czyszczenia?"
         },
         "asTable": "Wyświetl jako tabelę",
         "needHistory": "Brak trendu — pozostaw ten ekran otwarty na kilka minut.",
@@ -742,8 +745,48 @@
           "calls": "Wywołania",
           "total": "Całkowity (ms)",
           "mean": "Średnia (ms)",
-          "share": "Udział"
-        }
+          "share": "Udział",
+          "score": "Wynik",
+          "level": "Poziom",
+          "ago": "1 godzinę temu",
+          "from": "Od",
+          "to": "Do",
+          "sessions": "Sesje",
+          "schema": "Schemat",
+          "size": "Rozmiar",
+          "thr": "Próg (ostrzeżenie·ryzyko)"
+        },
+        "radar": "Ocena stanu zdrowia według obszaru",
+        "radarCur": "Teraz",
+        "radarSafe": "Bezpieczna linia bazowa",
+        "radarAgo": "1 godzinę temu",
+        "radarOut": "Niemierzalne: {list}",
+        "axis": {
+          "avail": "Dostępność",
+          "sess": "Sesje",
+          "lock": "Blokady",
+          "perf": "Wydajność zapytań",
+          "store": "Pamięć masowa",
+          "maint": "Konserwacja",
+          "idx": "Indeksy",
+          "protect": "Replikacja/kopia zapasowa"
+        },
+        "flow": "Aplikacja → konto → stan sesji",
+        "flowState": {
+          "lockWait": "Oczekiwanie na blokadę",
+          "active": "Aktywny",
+          "idleTx": "Bezczynny w transakcji",
+          "idle": "Bezczynny"
+        },
+        "noApp": "(brak nazwy aplikacji)",
+        "otherN": "{n} innych",
+        "otherSchema": "{n} innych schematów",
+        "tree": "Mapa rozmiarów schematów i tabel",
+        "deadPct": "Współczynnik martwych wierszy",
+        "partial": "Agregowano tylko do 500 wierszy.",
+        "gaugeNoLimit": "Brak reguły limitu pamięci masowej",
+        "rsp": "Czas odpowiedzi",
+        "noStat": "Brak statystyk"
       },
       "empty": {
         "noConn": "Ta taksonomia nie ma połączenia z serwerem PostgreSQL do monitorowania — wyświetlane są tylko adresy URL i status usługi.",

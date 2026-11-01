@@ -694,7 +694,7 @@
       "chart": {
         "title": "Eğilimler ve sıralamalar",
         "note": "Eğilimler, bu ekran açıkken her dakika kaydedilir (arka plan toplama yok).",
-        "gauges": "Bağlantı ve önbellek göstergeleri",
+        "gauges": "Limit Göstergeleri",
         "sessState": "Şu anki oturumlar",
         "sessTrend": "Oturum eğilimi ve kilit beklemeleri",
         "tpsCombo": "İşlem hacmi ve geri alma oranı",
@@ -705,7 +705,7 @@
         "sizeTop": "Alan ilk 10",
         "heat": "Zamanla sinyale göre risk",
         "q": {
-          "gauges": "Bağlantılar doluyor mu? Okumalar bellekten mi servis ediliyor?",
+          "gauges": "Bağlantılar, önbellek, yanıtlar ve depolama limitlerine ne kadar yakın?",
           "sessState": "Oturumlar şimdi ne yapıyor?",
           "sessTrend": "Oturumlar biriktiğinde kilit beklemeleri artıyor mu?",
           "tpsCombo": "İşlem hacmi ve hata oranı birlikte mi hareket ediyor?",
@@ -713,7 +713,10 @@
           "capacity": "DB ne zaman dolacak?",
           "slowTop": "Önce neyi ayarlamalı? (toplam süreye göre)",
           "sizeTop": "Alan neyi kaplıyor?",
-          "heat": "Risk tek seferlik mi yoksa tekrarlayan mı?"
+          "heat": "Risk tek seferlik mi yoksa tekrarlayan mı?",
+          "radar": "Hangi alan zayıf?",
+          "flow": "Hangi uygulamalar ve hesaplar sorunlu oturumlar oluşturuyor?",
+          "tree": "Neresi yer kaplıyor ve neresi temizlenmeli?"
         },
         "asTable": "Tablo olarak görüntüle",
         "needHistory": "Henüz eğilim yok — bu ekranı birkaç dakika açık tutun.",
@@ -747,8 +750,48 @@
           "calls": "Çağrılar",
           "total": "Toplam (ms)",
           "mean": "Ortalama (ms)",
-          "share": "Pay"
-        }
+          "share": "Pay",
+          "score": "Puan",
+          "level": "Seviye",
+          "ago": "1 saat önce",
+          "from": "Kimden",
+          "to": "Kime",
+          "sessions": "Oturumlar",
+          "schema": "Şema",
+          "size": "Boyut",
+          "thr": "Eşik (uyarı·risk)"
+        },
+        "radar": "Alana göre sağlık puanı",
+        "radarCur": "Şimdi",
+        "radarSafe": "Güvenli temel çizgi",
+        "radarAgo": "1 saat önce",
+        "radarOut": "Ölçülemeyen alanlar: {list}",
+        "axis": {
+          "avail": "Kullanılabilirlik",
+          "sess": "Oturumlar",
+          "lock": "Kilitler",
+          "perf": "Sorgu performansı",
+          "store": "Depolama",
+          "maint": "Bakım",
+          "idx": "Dizinler",
+          "protect": "Çoğaltma/yedekleme"
+        },
+        "flow": "Uygulama → hesap → oturum durumu",
+        "flowState": {
+          "lockWait": "Kilit beklemesi",
+          "active": "Aktif",
+          "idleTx": "İşlemde boşta",
+          "idle": "Boşta"
+        },
+        "noApp": "(uygulama adı yok)",
+        "otherN": "Diğer {n}",
+        "otherSchema": "Diğer {n} şema",
+        "tree": "Şema ve tablo boyutu haritası",
+        "deadPct": "Ölü satır oranı",
+        "partial": "Yalnızca 500 satıra kadar toplandı.",
+        "gaugeNoLimit": "Depolama limiti kuralı yok",
+        "rsp": "Yanıt süresi",
+        "noStat": "İstatistik yok"
       },
       "empty": {
         "noConn": "Bu taksonomide izlenecek bir PostgreSQL sunucu bağlantısı yok — yalnızca URL'ler ve hizmet durumu gösteriliyor.",

@@ -692,7 +692,7 @@
       "chart": {
         "title": "Trendovi i rangiranja",
         "note": "Trendovi se bilježe svake minute dok je ovaj zaslon otvoren (nema pozadinskog prikupljanja).",
-        "gauges": "Mjerači veze i predmemorije",
+        "gauges": "Mjerači ograničenja",
         "sessState": "Sesije upravo sada",
         "sessTrend": "Trend sesija i čekanja zaključavanja",
         "tpsCombo": "Propusnost i stopa poništavanja",
@@ -703,7 +703,7 @@
         "sizeTop": "Prostor top 10",
         "heat": "Rizik po signalu tijekom vremena",
         "q": {
-          "gauges": "Popunjavaju li se veze? Poslužuju li se čitanja iz memorije?",
+          "gauges": "Koliko su veze, predmemorija, odgovori i pohrana blizu svojim ograničenjima?",
           "sessState": "Što sesije rade sada?",
           "sessTrend": "Rastu li čekanja zaključavanja kada se sesije nagomilavaju?",
           "tpsCombo": "Kreću li se propusnost i stopa neuspjeha zajedno?",
@@ -711,7 +711,10 @@
           "capacity": "Kada će se DB popuniti?",
           "slowTop": "Što prvo podesiti? (po ukupnom vremenu)",
           "sizeTop": "Što zauzima prostor?",
-          "heat": "Je li rizik jednokratan ili se ponavlja?"
+          "heat": "Je li rizik jednokratan ili se ponavlja?",
+          "radar": "Koje je područje slabo?",
+          "flow": "Koje aplikacije i računi stvaraju problematične sesije?",
+          "tree": "Što zauzima prostor i što treba očistiti?"
         },
         "asTable": "Prikaži kao tablicu",
         "needHistory": "Nema trenda još — držite ovaj zaslon otvorenim nekoliko minuta.",
@@ -745,8 +748,48 @@
           "calls": "Pozivi",
           "total": "Ukupno (ms)",
           "mean": "Prosjek (ms)",
-          "share": "Udio"
-        }
+          "share": "Udio",
+          "score": "Ocjena",
+          "level": "Razina",
+          "ago": "Prije 1 sat",
+          "from": "Od",
+          "to": "Do",
+          "sessions": "Sesije",
+          "schema": "Shema",
+          "size": "Veličina",
+          "thr": "Prag (upozorenje·rizik)"
+        },
+        "radar": "Ocjena zdravlja po područjima",
+        "radarCur": "Sada",
+        "radarSafe": "Sigurna osnovna linija",
+        "radarAgo": "Prije 1 sat",
+        "radarOut": "Nije mjerljivo: {list}",
+        "axis": {
+          "avail": "Dostupnost",
+          "sess": "Sesije",
+          "lock": "Zaključavanja",
+          "perf": "Izvedba upita",
+          "store": "Pohrana",
+          "maint": "Održavanje",
+          "idx": "Indeksi",
+          "protect": "Replikacija/sigurnosna kopija"
+        },
+        "flow": "Aplikacija → račun → stanje sesije",
+        "flowState": {
+          "lockWait": "Čekanje zaključavanja",
+          "active": "Aktivno",
+          "idleTx": "Neaktivno u transakciji",
+          "idle": "Neaktivno"
+        },
+        "noApp": "(nema naziva aplikacije)",
+        "otherN": "{n} ostalih",
+        "otherSchema": "{n} ostalih shema",
+        "tree": "Karta veličine sheme i tablice",
+        "deadPct": "Omjer mrtvih redaka",
+        "partial": "Agregirano do samo 500 redaka.",
+        "gaugeNoLimit": "Nema pravila ograničenja pohrane",
+        "rsp": "Vrijeme odgovora",
+        "noStat": "Nema statistike"
       },
       "empty": {
         "noConn": "Ova taksonomija nema PostgreSQL poslužiteljsku vezu za nadzor — prikazuju se samo URL-ovi i status usluge.",

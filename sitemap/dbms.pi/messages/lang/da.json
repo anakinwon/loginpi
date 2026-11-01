@@ -693,7 +693,7 @@
       "chart": {
         "title": "Tendenser & rangeringer",
         "note": "Tendenser registreres hvert minut, mens denne skærm er åben (ingen baggrundsindsamling).",
-        "gauges": "Forbindelses- & cachemålere",
+        "gauges": "Grænsemålere",
         "sessState": "Sessioner lige nu",
         "sessTrend": "Sessionstrend & låseventer",
         "tpsCombo": "Gennemløb & rollback-rate",
@@ -704,7 +704,7 @@
         "sizeTop": "Plads top 10",
         "heat": "Risiko efter signal over tid",
         "q": {
-          "gauges": "Er forbindelserne ved at fyldes op? Serveres læsninger fra hukommelsen?",
+          "gauges": "Hvor tæt er forbindelser, cache, svar og lagring på deres grænser?",
           "sessState": "Hvad laver sessionerne nu?",
           "sessTrend": "Stiger låseventer, når sessioner hober sig op?",
           "tpsCombo": "Bevæger gennemløb og fejlrate sig sammen?",
@@ -712,7 +712,10 @@
           "capacity": "Hvornår fyldes DB'en op?",
           "slowTop": "Hvad skal justeres først? (efter samlet tid)",
           "sizeTop": "Hvad optager pladsen?",
-          "heat": "Er risikoen en engangsforeteelse eller tilbagevendende?"
+          "heat": "Er risikoen en engangsforeteelse eller tilbagevendende?",
+          "radar": "Hvilket område er svagt?",
+          "flow": "Hvilke apps og konti skaber problematiske sessioner?",
+          "tree": "Hvad optager plads, og hvad skal ryddes op?"
         },
         "asTable": "Vis som tabel",
         "needHistory": "Ingen trend endnu — hold denne skærm åben i et par minutter.",
@@ -746,8 +749,48 @@
           "calls": "Kald",
           "total": "Total (ms)",
           "mean": "Gennemsnit (ms)",
-          "share": "Andel"
-        }
+          "share": "Andel",
+          "score": "Score",
+          "level": "Niveau",
+          "ago": "1 time siden",
+          "from": "Fra",
+          "to": "Til",
+          "sessions": "Sessioner",
+          "schema": "Skema",
+          "size": "Størrelse",
+          "thr": "Tærskel (advarsel·risiko)"
+        },
+        "radar": "Sundhedsscore efter område",
+        "radarCur": "Nu",
+        "radarSafe": "Sikker basislinje",
+        "radarAgo": "1 time siden",
+        "radarOut": "Ikke målbart : {list}",
+        "axis": {
+          "avail": "Tilgængelighed",
+          "sess": "Sessioner",
+          "lock": "Låse",
+          "perf": "Forespørgselsydelse",
+          "store": "Lagring",
+          "maint": "Vedligeholdelse",
+          "idx": "Indekser",
+          "protect": "Replikering/backup"
+        },
+        "flow": "App → konto → sessionstilstand",
+        "flowState": {
+          "lockWait": "Låsevent",
+          "active": "Aktiv",
+          "idleTx": "Inaktiv i transaktion",
+          "idle": "Inaktiv"
+        },
+        "noApp": "(intet appnavn)",
+        "otherN": "{n} andre",
+        "otherSchema": "{n} andre skemaer",
+        "tree": "Skema- og tabelstørrelseskort",
+        "deadPct": "Forhold for døde rækker",
+        "partial": "Kun aggregeret op til 500 rækker.",
+        "gaugeNoLimit": "Ingen regel for lagringsgrænse",
+        "rsp": "Svartid",
+        "noStat": "Ingen statistik"
       },
       "empty": {
         "noConn": "Denne taksonomi har ingen PostgreSQL-serverforbindelse at overvåge — viser kun URL'er og servicestatus.",

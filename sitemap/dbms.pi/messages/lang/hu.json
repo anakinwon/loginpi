@@ -691,7 +691,7 @@
       "chart": {
         "title": "Trendek és rangsorok",
         "note": "A trendek percenként rögzítésre kerülnek, amíg ez a képernyő nyitva van (nincs háttérgyűjtés).",
-        "gauges": "Kapcsolat és gyorsítótár mérők",
+        "gauges": "Határérték mérők",
         "sessState": "Munkamenetek most",
         "sessTrend": "Munkamenet trend és zárolási várakozások",
         "tpsCombo": "Áteresztőképesség és rollback arány",
@@ -702,7 +702,7 @@
         "sizeTop": "Helyfoglalás top 10",
         "heat": "Kockázat jel szerint idővel",
         "q": {
-          "gauges": "Telnek a kapcsolatok? Memóriából történik az olvasás?",
+          "gauges": "Mennyire közelítik meg a kapcsolatok, a gyorsítótár, a válaszok és a tárolás a határaikat?",
           "sessState": "Mit csinálnak most a munkamenetek?",
           "sessTrend": "Nőnek a zárolási várakozások, amikor felhalmozódnak a munkamenetek?",
           "tpsCombo": "Együtt mozog az áteresztőképesség és a hibaarány?",
@@ -710,7 +710,10 @@
           "capacity": "Mikor telik meg a DB?",
           "slowTop": "Mit hangoljunk először? (teljes idő szerint)",
           "sizeTop": "Mi foglalja a helyet?",
-          "heat": "A kockázat egyszeri vagy ismétlődő?"
+          "heat": "A kockázat egyszeri vagy ismétlődő?",
+          "radar": "Melyik terület gyenge?",
+          "flow": "Mely alkalmazások és fiókok hoznak létre problémás munkameneteket?",
+          "tree": "Mi foglalja a helyet, és mit kell megtisztítani?"
         },
         "asTable": "Megtekintés táblázatként",
         "needHistory": "Még nincs trend – tartsa nyitva ezt a képernyőt néhány percig.",
@@ -744,8 +747,48 @@
           "calls": "Hívások",
           "total": "Összes (ms)",
           "mean": "Átlag (ms)",
-          "share": "Arány"
-        }
+          "share": "Arány",
+          "score": "Pontszám",
+          "level": "Szint",
+          "ago": "1 órája",
+          "from": "Feladó",
+          "to": "Címzett",
+          "sessions": "Munkamenetek",
+          "schema": "Séma",
+          "size": "Méret",
+          "thr": "Küszöb (figyelmeztetés·kockázat)"
+        },
+        "radar": "Egészségügyi pontszám területenként",
+        "radarCur": "Most",
+        "radarSafe": "Biztonságos alapvonal",
+        "radarAgo": "1 órája",
+        "radarOut": "Nem mérhető: {list}",
+        "axis": {
+          "avail": "Elérhetőség",
+          "sess": "Munkamenetek",
+          "lock": "Zárolások",
+          "perf": "Lekérdezési teljesítmény",
+          "store": "Tárolás",
+          "maint": "Karbantartás",
+          "idx": "Indexek",
+          "protect": "Replikáció/mentés"
+        },
+        "flow": "Alkalmazás → fiók → munkamenet állapota",
+        "flowState": {
+          "lockWait": "Zárolásra vár",
+          "active": "Aktív",
+          "idleTx": "Inaktív (tranzakcióban)",
+          "idle": "Inaktív"
+        },
+        "noApp": "(nincs alkalmazásnév)",
+        "otherN": "{n} egyéb",
+        "otherSchema": "{n} egyéb séma",
+        "tree": "Séma és táblaméret térkép",
+        "deadPct": "Halott sorok aránya",
+        "partial": "Csak 500 sorig összesítve.",
+        "gaugeNoLimit": "Nincs tárolási korlát szabály",
+        "rsp": "Válaszidő",
+        "noStat": "Nincs statisztika"
       },
       "empty": {
         "noConn": "Ez a taxonómia nem rendelkezik PostgreSQL szerverkapcsolattal a felügyelethez – csak URL-eket és szolgáltatásállapotot mutat.",

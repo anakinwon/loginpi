@@ -692,7 +692,7 @@
       "chart": {
         "title": "Andamenti e classifiche",
         "note": "Gli andamenti vengono registrati ogni minuto mentre questa schermata è aperta (nessuna raccolta in background).",
-        "gauges": "Indicatori connessione e cache",
+        "gauges": "Indicatori limite",
         "sessState": "Sessioni attuali",
         "sessTrend": "Andamento sessioni e attese blocco",
         "tpsCombo": "Throughput e tasso di rollback",
@@ -703,7 +703,7 @@
         "sizeTop": "Top 10 spazio",
         "heat": "Rischio per segnale nel tempo",
         "q": {
-          "gauges": "Le connessioni si stanno riempiendo? Le letture sono servite dalla memoria?",
+          "gauges": "Quanto sono vicine ai loro limiti connessioni, cache, risposte e archiviazione?",
           "sessState": "Cosa stanno facendo le sessioni ora?",
           "sessTrend": "Le attese di blocco aumentano quando le sessioni si accumulano?",
           "tpsCombo": "Throughput e tasso di errore si muovono insieme?",
@@ -711,7 +711,10 @@
           "capacity": "Quando si riempirà il DB?",
           "slowTop": "Cosa ottimizzare per primo? (per tempo totale)",
           "sizeTop": "Cosa occupa lo spazio?",
-          "heat": "Il rischio è occasionale o ricorrente?"
+          "heat": "Il rischio è occasionale o ricorrente?",
+          "radar": "Quale area è debole?",
+          "flow": "Quali app e account creano sessioni problematiche?",
+          "tree": "Cosa occupa spazio e cosa deve essere pulito?"
         },
         "asTable": "Visualizza come tabella",
         "needHistory": "Nessun andamento ancora — tenere questa schermata aperta per alcuni minuti.",
@@ -745,8 +748,48 @@
           "calls": "Chiamate",
           "total": "Totale (ms)",
           "mean": "Media (ms)",
-          "share": "Quota"
-        }
+          "share": "Quota",
+          "score": "Punteggio",
+          "level": "Livello",
+          "ago": "1 ora fa",
+          "from": "Da",
+          "to": "A",
+          "sessions": "Sessioni",
+          "schema": "Schema",
+          "size": "Dimensione",
+          "thr": "Soglia (avviso·rischio)"
+        },
+        "radar": "Punteggio di salute per area",
+        "radarCur": "Ora",
+        "radarSafe": "Base sicura",
+        "radarAgo": "1 ora fa",
+        "radarOut": "Non misurabile: {list}",
+        "axis": {
+          "avail": "Disponibilità",
+          "sess": "Sessioni",
+          "lock": "Blocchi",
+          "perf": "Prestazioni query",
+          "store": "Archiviazione",
+          "maint": "Manutenzione",
+          "idx": "Indici",
+          "protect": "Replica/backup"
+        },
+        "flow": "App → account → stato sessione",
+        "flowState": {
+          "lockWait": "Attesa blocco",
+          "active": "Attivo",
+          "idleTx": "Inattivo in transazione",
+          "idle": "Inattivo"
+        },
+        "noApp": "(nessun nome app)",
+        "otherN": "{n} altri",
+        "otherSchema": "{n} altri schemi",
+        "tree": "Mappa dimensioni schema e tabella",
+        "deadPct": "Percentuale righe morte",
+        "partial": "Aggregato fino a 500 righe.",
+        "gaugeNoLimit": "Nessuna regola limite di archiviazione",
+        "rsp": "Tempo di risposta",
+        "noStat": "Nessuna statistica"
       },
       "empty": {
         "noConn": "Questa tassonomia non ha una connessione server PostgreSQL da monitorare — mostra solo URL e stato del servizio.",

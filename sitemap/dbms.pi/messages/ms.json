@@ -694,7 +694,7 @@
       "chart": {
         "title": "Trend & kedudukan",
         "note": "Trend direkodkan setiap minit semasa skrin ini dibuka (tiada pengumpulan latar belakang).",
-        "gauges": "Tolok sambungan & cache",
+        "gauges": "Tolok Had",
         "sessState": "Sesi sekarang",
         "sessTrend": "Trend sesi & tunggu kunci",
         "tpsCombo": "Kadar daya pemprosesan & rollback",
@@ -705,7 +705,7 @@
         "sizeTop": "Ruang top 10",
         "heat": "Risiko mengikut isyarat dari semasa ke semasa",
         "q": {
-          "gauges": "Adakah sambungan semakin penuh? Adakah bacaan disajikan dari memori?",
+          "gauges": "Sejauh mana sambungan, cache, respons dan storan menghampiri hadnya?",
           "sessState": "Apa yang sedang dilakukan oleh sesi sekarang?",
           "sessTrend": "Adakah tunggu kunci meningkat apabila sesi bertimbun?",
           "tpsCombo": "Adakah kadar daya pemprosesan dan kegagalan bergerak bersama?",
@@ -713,7 +713,10 @@
           "capacity": "Bilakah DB akan penuh?",
           "slowTop": "Apa yang perlu ditala dahulu? (mengikut jumlah masa)",
           "sizeTop": "Apa yang mengambil ruang?",
-          "heat": "Adakah risiko itu sekali sahaja atau berulang?"
+          "heat": "Adakah risiko itu sekali sahaja atau berulang?",
+          "radar": "Kawasan manakah yang lemah?",
+          "flow": "Apl dan akaun manakah yang mencipta sesi masalah?",
+          "tree": "Apakah yang menggunakan ruang, dan apakah yang perlu dibersihkan?"
         },
         "asTable": "Lihat sebagai jadual",
         "needHistory": "Tiada trend lagi — biarkan skrin ini terbuka selama beberapa minit.",
@@ -747,8 +750,48 @@
           "calls": "Panggilan",
           "total": "Jumlah (ms)",
           "mean": "Purata (ms)",
-          "share": "Kongsi"
-        }
+          "share": "Kongsi",
+          "score": "Skor",
+          "level": "Tahap",
+          "ago": "1 jam lalu",
+          "from": "Daripada",
+          "to": "Kepada",
+          "sessions": "Sesi",
+          "schema": "Skema",
+          "size": "Saiz",
+          "thr": "Ambang (amaran·risiko)"
+        },
+        "radar": "Skor kesihatan mengikut kawasan",
+        "radarCur": "Sekarang",
+        "radarSafe": "Garis dasar selamat",
+        "radarAgo": "1 jam lalu",
+        "radarOut": "Tidak boleh diukur : {list}",
+        "axis": {
+          "avail": "Ketersediaan",
+          "sess": "Sesi",
+          "lock": "Kunci",
+          "perf": "Prestasi pertanyaan",
+          "store": "Storan",
+          "maint": "Penyelenggaraan",
+          "idx": "Indeks",
+          "protect": "Replikasi/sandaran"
+        },
+        "flow": "Apl → akaun → status sesi",
+        "flowState": {
+          "lockWait": "Menunggu kunci",
+          "active": "Aktif",
+          "idleTx": "Terbiar dalam transaksi",
+          "idle": "Terbiar"
+        },
+        "noApp": "(tiada nama apl)",
+        "otherN": "{n} lain",
+        "otherSchema": "{n} skema lain",
+        "tree": "Peta saiz skema dan jadual",
+        "deadPct": "Nisbah baris mati",
+        "partial": "Agregat sehingga 500 baris sahaja.",
+        "gaugeNoLimit": "Tiada peraturan had storan",
+        "rsp": "Masa respons",
+        "noStat": "Tiada statistik"
       },
       "empty": {
         "noConn": "Taksonomi ini tiada sambungan pelayan PostgreSQL untuk dipantau — hanya menunjukkan URL dan status perkhidmatan.",

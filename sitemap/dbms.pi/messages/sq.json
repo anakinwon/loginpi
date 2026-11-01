@@ -694,7 +694,7 @@
       "chart": {
         "title": "Trendet dhe renditjet",
         "note": "Trendet regjistrohen çdo minutë ndërsa ky ekran është i hapur (nuk ka mbledhje në sfond).",
-        "gauges": "Matësit e lidhjes dhe cache-it",
+        "gauges": "Matës Kufiri",
         "sessState": "Sesionet tani",
         "sessTrend": "Trendi i sesioneve dhe pritjet e bllokimit",
         "tpsCombo": "Shkalla e përpunimit dhe rikthimit",
@@ -705,7 +705,7 @@
         "sizeTop": "Hapësira top 10",
         "heat": "Rreziku sipas sinjalit me kalimin e kohës",
         "q": {
-          "gauges": "A po mbushen lidhjet? A po shërbehen leximet nga memoria?",
+          "gauges": "Sa afër janë lidhjet, cache, përgjigjet dhe ruajtja me kufijtë e tyre?",
           "sessState": "Çfarë po bëjnë sesionet tani?",
           "sessTrend": "A rriten pritjet e bllokimit kur grumbullohen sesionet?",
           "tpsCombo": "A lëvizin së bashku shkalla e përpunimit dhe shkalla e dështimit?",
@@ -713,7 +713,10 @@
           "capacity": "Kur do të mbushet DB-ja?",
           "slowTop": "Çfarë të rregullohet së pari? (sipas kohës totale)",
           "sizeTop": "Çfarë po zë hapësirën?",
-          "heat": "A është rreziku një rast i vetëm apo i përsëritur?"
+          "heat": "A është rreziku një rast i vetëm apo i përsëritur?",
+          "radar": "Cila zonë është e dobët?",
+          "flow": "Cilat aplikacione dhe llogari krijojnë sesione problematike?",
+          "tree": "Çfarë zë hapësirë dhe çfarë duhet pastruar?"
         },
         "asTable": "Shiko si tabelë",
         "needHistory": "Nuk ka ende trend — mbajeni këtë ekran të hapur për disa minuta.",
@@ -747,8 +750,48 @@
           "calls": "Thirrjet",
           "total": "Totali (ms)",
           "mean": "Mesatarja (ms)",
-          "share": "Pjesa"
-        }
+          "share": "Pjesa",
+          "score": "Pikë",
+          "level": "Nivel",
+          "ago": "1 orë më parë",
+          "from": "Nga",
+          "to": "Te",
+          "sessions": "Sesione",
+          "schema": "Skema",
+          "size": "Madhësia",
+          "thr": "Pragu (kujdes·rrezik)"
+        },
+        "radar": "Pikët e shëndetit sipas zonës",
+        "radarCur": "Tani",
+        "radarSafe": "Baza e sigurt",
+        "radarAgo": "1 orë më parë",
+        "radarOut": "E pamatur: {list}",
+        "axis": {
+          "avail": "Disponueshmëria",
+          "sess": "Sesione",
+          "lock": "Bllokime",
+          "perf": "Performanca e pyetjeve",
+          "store": "Ruajtja",
+          "maint": "Mirëmbajtja",
+          "idx": "Indekset",
+          "protect": "Replikimi/kopja rezervë"
+        },
+        "flow": "Aplikacioni → llogaria → gjendja e sesionit",
+        "flowState": {
+          "lockWait": "Pritje bllokimi",
+          "active": "Aktive",
+          "idleTx": "Pasive në transaksion",
+          "idle": "Pasive"
+        },
+        "noApp": "(pa emër aplikacioni)",
+        "otherN": "{n} të tjera",
+        "otherSchema": "{n} skema të tjera",
+        "tree": "Harta e madhësisë së skemës dhe tabelës",
+        "deadPct": "Raporti i rreshtave të vdekur",
+        "partial": "Agreguar deri në 500 rreshta.",
+        "gaugeNoLimit": "Pa rregull kufiri ruajtjeje",
+        "rsp": "Koha e përgjigjes",
+        "noStat": "Pa statistika"
       },
       "empty": {
         "noConn": "Kjo taksonomi nuk ka lidhje serveri PostgreSQL për të monitoruar — shfaqen vetëm URL-të dhe statusi i shërbimit.",

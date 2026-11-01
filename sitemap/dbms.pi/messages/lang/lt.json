@@ -689,7 +689,7 @@
       "chart": {
         "title": "Tendencijos ir reitingai",
         "note": "Tendencijos įrašomos kas minutę, kol šis ekranas yra atidarytas (nėra fono rinkimo).",
-        "gauges": "Ryšio ir talpyklos matuokliai",
+        "gauges": "Ribiniai matuokliai",
         "sessState": "Sesijos dabar",
         "sessTrend": "Sesijų tendencija ir užrakto laukimai",
         "tpsCombo": "Pralaidumas ir atšaukimo dažnis",
@@ -700,7 +700,7 @@
         "sizeTop": "Vietos TOP 10",
         "heat": "Rizika pagal signalą laikui bėgant",
         "q": {
-          "gauges": "Ar ryšiai pildosi? Ar skaitymai atliekami iš atminties?",
+          "gauges": "Kiek arti ribos yra ryšiai, talpykla, atsakymai ir saugykla?",
           "sessState": "Ką sesijos veikia dabar?",
           "sessTrend": "Ar užrakto laukimai didėja, kai sesijos kaupiasi?",
           "tpsCombo": "Ar pralaidumas ir gedimų dažnis juda kartu?",
@@ -708,7 +708,10 @@
           "capacity": "Kada DB užsipildys?",
           "slowTop": "Ką derinti pirmiausia? (pagal bendrą laiką)",
           "sizeTop": "Kas užima vietą?",
-          "heat": "Ar rizika yra vienkartinė, ar pasikartojanti?"
+          "heat": "Ar rizika yra vienkartinė, ar pasikartojanti?",
+          "radar": "Kuri sritis yra silpna?",
+          "flow": "Kurios programos ir paskyros sukuria problemines sesijas?",
+          "tree": "Kas užima vietą ir ką reikia išvalyti?"
         },
         "asTable": "Rodyti kaip lentelę",
         "needHistory": "Dar nėra tendencijos – palikite šį ekraną atidarytą kelias minutes.",
@@ -742,8 +745,48 @@
           "calls": "Iškvietimai",
           "total": "Bendra (ms)",
           "mean": "Vidutinė (ms)",
-          "share": "Dalis"
-        }
+          "share": "Dalis",
+          "score": "Įvertinimas",
+          "level": "Lygis",
+          "ago": "Prieš 1 valandą",
+          "from": "Nuo",
+          "to": "Iki",
+          "sessions": "Sesijos",
+          "schema": "Schema",
+          "size": "Dydis",
+          "thr": "Riba (įspėjimas·rizika)"
+        },
+        "radar": "Sveikatos balas pagal sritį",
+        "radarCur": "Dabar",
+        "radarSafe": "Saugi bazinė linija",
+        "radarAgo": "Prieš 1 valandą",
+        "radarOut": "Nematoma sritis: {list}",
+        "axis": {
+          "avail": "Prieinamumas",
+          "sess": "Sesijos",
+          "lock": "Užraktai",
+          "perf": "Užklausų našumas",
+          "store": "Saugykla",
+          "maint": "Priežiūra",
+          "idx": "Indeksai",
+          "protect": "Replikacija / atsarginė kopija"
+        },
+        "flow": "Programa → paskyra → sesijos būsena",
+        "flowState": {
+          "lockWait": "Laukia užrakto",
+          "active": "Aktyvus",
+          "idleTx": "Nenaudojama (atidaryta transakcija)",
+          "idle": "Nenaudojama"
+        },
+        "noApp": "(nėra programos pavadinimo)",
+        "otherN": "{n} kiti",
+        "otherSchema": "{n} kitos schemos",
+        "tree": "Schemos ir lentelės dydžio žemėlapis",
+        "deadPct": "Negyvų eilučių santykis",
+        "partial": "Apibendrinta tik iki 500 eilučių.",
+        "gaugeNoLimit": "Nėra saugyklos limito taisyklės",
+        "rsp": "Atsakymo laikas",
+        "noStat": "Nėra statistikos"
       },
       "empty": {
         "noConn": "Ši taksonomija neturi PostgreSQL serverio ryšio stebėjimui – rodomi tik URL ir paslaugos būsena.",

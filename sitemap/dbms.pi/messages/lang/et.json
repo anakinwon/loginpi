@@ -694,7 +694,7 @@
       "chart": {
         "title": "Trendid ja edetabelid",
         "note": "Trendid salvestatakse iga minuti järel, kui see ekraan on avatud (taustakogumist pole).",
-        "gauges": "Ühenduse ja vahemälu näidikud",
+        "gauges": "Piirnäidikud",
         "sessState": "Seansid praegu",
         "sessTrend": "Seansside trend ja luku ooteajad",
         "tpsCombo": "Läbilaskevõime ja tagasipöörde määr",
@@ -705,7 +705,7 @@
         "sizeTop": "Ruum TOP 10",
         "heat": "Risk signaali järgi aja jooksul",
         "q": {
-          "gauges": "Kas ühendused täituvad? Kas lugemised serveeritakse mälust?",
+          "gauges": "Kui lähedal on ühendused, vahemälu, vastused ja salvestusruum oma piiridele?",
           "sessState": "Mida seansid praegu teevad?",
           "sessTrend": "Kas luku ooteajad suurenevad, kui seansid kuhjuvad?",
           "tpsCombo": "Kas läbilaskevõime ja ebaõnnestumiste määr liiguvad koos?",
@@ -713,7 +713,10 @@
           "capacity": "Millal DB täitub?",
           "slowTop": "Mida esimesena häälestada? (koguaega järgi)",
           "sizeTop": "Mis võtab ruumi?",
-          "heat": "Kas risk on ühekordne või korduv?"
+          "heat": "Kas risk on ühekordne või korduv?",
+          "radar": "Milline valdkond on nõrk?",
+          "flow": "Millised rakendused ja kontod loovad probleemseid seansse?",
+          "tree": "Mis võtab ruumi ja mida on vaja puhastada?"
         },
         "asTable": "Vaata tabelina",
         "needHistory": "Trendi pole veel – hoidke seda ekraani mõni minut avatuna.",
@@ -747,8 +750,48 @@
           "calls": "Kutsed",
           "total": "Kokku (ms)",
           "mean": "Keskmine (ms)",
-          "share": "Osa"
-        }
+          "share": "Osa",
+          "score": "Skoor",
+          "level": "Tase",
+          "ago": "1 tund tagasi",
+          "from": "Alates",
+          "to": "Kuni",
+          "sessions": "Seansid",
+          "schema": "Skeem",
+          "size": "Suurus",
+          "thr": "Lävi (hoiatus·risk)"
+        },
+        "radar": "Terviseskoor valdkonniti",
+        "radarCur": "Praegu",
+        "radarSafe": "Ohutu algtase",
+        "radarAgo": "1 tund tagasi",
+        "radarOut": "Mõõtmatu: {list}",
+        "axis": {
+          "avail": "Saadavus",
+          "sess": "Seansid",
+          "lock": "Lukud",
+          "perf": "Päringu jõudlus",
+          "store": "Salvestusruum",
+          "maint": "Hooldus",
+          "idx": "Indeksid",
+          "protect": "Replikatsioon/varundus"
+        },
+        "flow": "Rakendus → konto → seansi olek",
+        "flowState": {
+          "lockWait": "Luku ootamine",
+          "active": "Aktiivne",
+          "idleTx": "Tühikäigul tehingus",
+          "idle": "Tühikäigul"
+        },
+        "noApp": "(rakenduse nime pole)",
+        "otherN": "{n} muud",
+        "otherSchema": "{n} muud skeemi",
+        "tree": "Skeemi ja tabeli suuruse kaart",
+        "deadPct": "Surnud ridade suhe",
+        "partial": "Koondatud ainult kuni 500 rida.",
+        "gaugeNoLimit": "Salvestusruumi piirangu reeglit pole",
+        "rsp": "Vastamisaeg",
+        "noStat": "Statistika puudub"
       },
       "empty": {
         "noConn": "Selles taksonoomias pole PostgreSQL-i serveri ühendust, mida monitoorida – kuvatakse ainult URL-id ja teenuse olek.",

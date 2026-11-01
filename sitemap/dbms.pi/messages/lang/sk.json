@@ -694,7 +694,7 @@
       "chart": {
         "title": "Trendy a rebríčky",
         "note": "Trendy sa zaznamenávajú každú minútu, kým je táto obrazovka otvorená (žiadne zhromažďovanie na pozadí).",
-        "gauges": "Merače pripojenia a vyrovnávacej pamäte",
+        "gauges": "Limitné ukazovatele",
         "sessState": "Relácie práve teraz",
         "sessTrend": "Trend relácií a čakania na zámok",
         "tpsCombo": "Priepustnosť a miera vrátenia",
@@ -705,7 +705,7 @@
         "sizeTop": "Priestor top 10",
         "heat": "Riziko podľa signálu v čase",
         "q": {
-          "gauges": "Zapĺňajú sa pripojenia? Sú čítania obsluhované z pamäte?",
+          "gauges": "Ako blízko sú pripojenia, vyrovnávacia pamäť, odpovede a úložisko k svojim limitom?",
           "sessState": "Čo robia relácie teraz?",
           "sessTrend": "Zvyšuje sa čakanie na zámok, keď sa hromadia relácie?",
           "tpsCombo": "Pohybujú sa priepustnosť a miera zlyhania spolu?",
@@ -713,7 +713,10 @@
           "capacity": "Kedy sa DB zaplní?",
           "slowTop": "Čo najprv optimalizovať? (podľa celkového času)",
           "sizeTop": "Čo zaberá miesto?",
-          "heat": "Je riziko jednorazové alebo opakujúce sa?"
+          "heat": "Je riziko jednorazové alebo opakujúce sa?",
+          "radar": "Ktorá oblasť je slabá?",
+          "flow": "Ktoré aplikácie a účty vytvárajú problémové relácie?",
+          "tree": "Čo zaberá miesto a čo treba vyčistiť?"
         },
         "asTable": "Zobraziť ako tabuľku",
         "needHistory": "Zatiaľ žiadny trend — nechajte túto obrazovku otvorenú niekoľko minút.",
@@ -747,8 +750,48 @@
           "calls": "Volania",
           "total": "Celkom (ms)",
           "mean": "Priemer (ms)",
-          "share": "Podiel"
-        }
+          "share": "Podiel",
+          "score": "Skóre",
+          "level": "Úroveň",
+          "ago": "Pred 1 hodinou",
+          "from": "Od",
+          "to": "Do",
+          "sessions": "Relácie",
+          "schema": "Schéma",
+          "size": "Veľkosť",
+          "thr": "Prah (varovanie·riziko)"
+        },
+        "radar": "Skóre zdravia podľa oblasti",
+        "radarCur": "Teraz",
+        "radarSafe": "Bezpečná základná línia",
+        "radarAgo": "Pred 1 hodinou",
+        "radarOut": "Nemerateľné: {list}",
+        "axis": {
+          "avail": "Dostupnosť",
+          "sess": "Relácie",
+          "lock": "Zámky",
+          "perf": "Výkon dotazov",
+          "store": "Úložisko",
+          "maint": "Údržba",
+          "idx": "Indexy",
+          "protect": "Replikácia/zálohovanie"
+        },
+        "flow": "Aplikácia → účet → stav relácie",
+        "flowState": {
+          "lockWait": "Čakanie na zámok",
+          "active": "Aktívne",
+          "idleTx": "Nečinné v transakcii",
+          "idle": "Nečinné"
+        },
+        "noApp": "(bez názvu aplikácie)",
+        "otherN": "{n} ďalších",
+        "otherSchema": "{n} ďalších schém",
+        "tree": "Mapa veľkosti schémy a tabuľky",
+        "deadPct": "Pomer mŕtvych riadkov",
+        "partial": "Agregované len do 500 riadkov.",
+        "gaugeNoLimit": "Žiadne pravidlo limitu úložiska",
+        "rsp": "Čas odozvy",
+        "noStat": "Žiadne štatistiky"
       },
       "empty": {
         "noConn": "Táto taxonómia nemá pripojenie k serveru PostgreSQL na monitorovanie — zobrazujú sa iba URL a stav služby.",

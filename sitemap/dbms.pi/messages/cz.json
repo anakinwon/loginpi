@@ -693,7 +693,7 @@
       "chart": {
         "title": "Trendy a žebříčky",
         "note": "Trendy se zaznamenávají každou minutu, dokud je tato obrazovka otevřená (žádné shromažďování na pozadí).",
-        "gauges": "Měřidla připojení a mezipaměti",
+        "gauges": "Limitní měřidla",
         "sessState": "Relace právě teď",
         "sessTrend": "Trend relací a čekání na zámky",
         "tpsCombo": "Propustnost a míra rollbacků",
@@ -704,7 +704,7 @@
         "sizeTop": "Místo top 10",
         "heat": "Riziko podle signálu v čase",
         "q": {
-          "gauges": "Zaplňují se připojení? Jsou čtení obsluhována z paměti?",
+          "gauges": "Jak blízko jsou připojení, mezipaměť, odezvy a úložiště svým limitům?",
           "sessState": "Co dělají relace teď?",
           "sessTrend": "Zvyšuje se čekání na zámky, když se hromadí relace?",
           "tpsCombo": "Pohybují se propustnost a míra selhání společně?",
@@ -712,7 +712,10 @@
           "capacity": "Kdy se DB zaplní?",
           "slowTop": "Co ladit jako první? (podle celkového času)",
           "sizeTop": "Co zabírá místo?",
-          "heat": "Je riziko jednorázové nebo opakující se?"
+          "heat": "Je riziko jednorázové nebo opakující se?",
+          "radar": "Která oblast je slabá?",
+          "flow": "Které aplikace a účty vytvářejí problémové relace?",
+          "tree": "Co zabírá místo a co je třeba vyčistit?"
         },
         "asTable": "Zobrazit jako tabulku",
         "needHistory": "Zatím žádný trend – nechte tuto obrazovku otevřenou několik minut.",
@@ -746,8 +749,48 @@
           "calls": "Volání",
           "total": "Celkem (ms)",
           "mean": "Průměr (ms)",
-          "share": "Podíl"
-        }
+          "share": "Podíl",
+          "score": "Skóre",
+          "level": "Úroveň",
+          "ago": "Před 1 hodinou",
+          "from": "Odesílatel",
+          "to": "Příjemce",
+          "sessions": "Relace",
+          "schema": "Schéma",
+          "size": "Velikost",
+          "thr": "Prahová hodnota (varování·riziko)"
+        },
+        "radar": "Skóre stavu podle oblasti",
+        "radarCur": "Nyní",
+        "radarSafe": "Bezpečná základní úroveň",
+        "radarAgo": "Před 1 hodinou",
+        "radarOut": "Neměřitelné: {list}",
+        "axis": {
+          "avail": "Dostupnost",
+          "sess": "Relace",
+          "lock": "Zámky",
+          "perf": "Výkon dotazů",
+          "store": "Úložiště",
+          "maint": "Údržba",
+          "idx": "Indexy",
+          "protect": "Replikace/zálohování"
+        },
+        "flow": "Aplikace → účet → stav relace",
+        "flowState": {
+          "lockWait": "Čekání na zámek",
+          "active": "Aktivní",
+          "idleTx": "Nečinný v transakci",
+          "idle": "Nečinný"
+        },
+        "noApp": "(bez názvu aplikace)",
+        "otherN": "{n} dalších",
+        "otherSchema": "{n} dalších schémat",
+        "tree": "Mapa velikosti schématu a tabulky",
+        "deadPct": "Poměr mrtvých řádků",
+        "partial": "Agregováno pouze do 500 řádků.",
+        "gaugeNoLimit": "Žádné pravidlo pro limit úložiště",
+        "rsp": "Doba odezvy",
+        "noStat": "Žádné statistiky"
       },
       "empty": {
         "noConn": "Tato taxonomie nemá připojení k serveru PostgreSQL k monitorování – zobrazují se pouze URL a stav služby.",

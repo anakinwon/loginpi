@@ -694,7 +694,7 @@
       "chart": {
         "title": "Tendensiyalar va reytinglar",
         "note": "Tendensiyalar ushbu ekran ochiq boʻlganda har daqiqada yozib olinadi (fon yigʻish yoʻq).",
-        "gauges": "Ulanish va kesh oʻlchagichlari",
+        "gauges": "Chegara oʻlchagichlari",
         "sessState": "Hozirgi sessiyalar",
         "sessTrend": "Sessiya tendensiyasi va bloklash kutishlari",
         "tpsCombo": "Oʻtkazuvchanlik va qaytarish darajasi",
@@ -705,7 +705,7 @@
         "sizeTop": "Boʻsh joy TOP 10",
         "heat": "Vaqt boʻyicha signal boʻyicha xavf",
         "q": {
-          "gauges": "Ulanishlar toʻlib bormoqdami? Oʻqishlar xotiradan amalga oshirilmoqdami?",
+          "gauges": "Ulanishlar, kesh, javoblar va xotira oʻz chegaralariga qanchalik yaqin?",
           "sessState": "Sessiyalar hozir nima qilmoqda?",
           "sessTrend": "Sessiyalar toʻplanganda bloklash kutishlari ortadimi?",
           "tpsCombo": "Oʻtkazuvchanlik va xato darajasi birga harakat qiladimi?",
@@ -713,7 +713,10 @@
           "capacity": "DB qachon toʻladi?",
           "slowTop": "Avval nimani sozlash kerak? (umumiy vaqt boʻyicha)",
           "sizeTop": "Boʻsh joyni nima egallamoqda?",
-          "heat": "Xavf bir martalikmi yoki takrorlanuvchimi?"
+          "heat": "Xavf bir martalikmi yoki takrorlanuvchimi?",
+          "radar": "Qaysi soha zaif?",
+          "flow": "Qaysi ilovalar va hisoblar muammoli seanslarni yaratadi?",
+          "tree": "Nima joy egallaydi va nimani tozalash kerak?"
         },
         "asTable": "Jadval sifatida koʻrish",
         "needHistory": "Hali tendensiya yoʻq — ushbu ekranni bir necha daqiqa ochiq qoldiring.",
@@ -747,8 +750,48 @@
           "calls": "Chaqiruvlar",
           "total": "Jami (ms)",
           "mean": "Oʻrtacha (ms)",
-          "share": "Ulush"
-        }
+          "share": "Ulush",
+          "score": "Ball",
+          "level": "Daraja",
+          "ago": "1 soat oldin",
+          "from": "Kimdan",
+          "to": "Kimga",
+          "sessions": "Seanslar",
+          "schema": "Sxema",
+          "size": "Hajmi",
+          "thr": "Chegara (ogohlantirish·xavf)"
+        },
+        "radar": "Soha boʻyicha salomatlik koʻrsatkichi",
+        "radarCur": "Hozir",
+        "radarSafe": "Xavfsiz tayanch chizigʻi",
+        "radarAgo": "1 soat oldin",
+        "radarOut": "Oʻlchab boʻlmaydigan hudud: {list}",
+        "axis": {
+          "avail": "Mavjudlik",
+          "sess": "Seanslar",
+          "lock": "Qulflar",
+          "perf": "Soʻrov samaradorligi",
+          "store": "Xotira",
+          "maint": "Xizmat koʻrsatish",
+          "idx": "Indekslar",
+          "protect": "Replikatsiya/zaxira"
+        },
+        "flow": "Ilova → hisob → seans holati",
+        "flowState": {
+          "lockWait": "Qulfni kutish",
+          "active": "Faol",
+          "idleTx": "Tranzaksiyada boʻsh",
+          "idle": "Boʻsh"
+        },
+        "noApp": "(ilova nomi yoʻq)",
+        "otherN": "Boshqa {n} ta",
+        "otherSchema": "Boshqa {n} ta sxema",
+        "tree": "Sxema va jadval hajmi xaritasi",
+        "deadPct": "Oʻlik qatorlar nisbati",
+        "partial": "Faqat 500 qatorgacha yigʻilgan.",
+        "gaugeNoLimit": "Xotira chegarasi qoidasi yoʻq",
+        "rsp": "Javob vaqti",
+        "noStat": "Statistika yoʻq"
       },
       "empty": {
         "noConn": "Ushbu taksonomiyada monitoring qilish uchun PostgreSQL server ulanishi yoʻq — faqat URL manzillar va xizmat holati koʻrsatiladi.",

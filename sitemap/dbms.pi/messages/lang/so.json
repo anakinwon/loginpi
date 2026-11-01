@@ -694,7 +694,7 @@
       "chart": {
         "title": "Isbeddellada & darajooyinka",
         "note": "Isbeddellada waxa la diiwaangeliyaa daqiiqad kasta inta shaashaddan ay furan tahay (ma jirto ururin gadaal ah).",
-        "gauges": "Xidhiidhka & cabbirrada kaydka",
+        "gauges": "Cabiraha Xadka",
         "sessState": "Fadhiyada hadda",
         "sessTrend": "Isbeddelka fadhiga & sugitaanka qufulka",
         "tpsCombo": "Wax soo saarka & heerka dib u celinta",
@@ -705,7 +705,7 @@
         "sizeTop": "Booska TOP 10",
         "heat": "Khatarta calaamad kasta wakhti ka dib",
         "q": {
-          "gauges": "Ma buuxsamayaan xidhiidhada? Akhriska ma laga bixiyaa xusuusta?",
+          "gauges": "Sidee ayay isku xirnaanta, kaydka, jawaabaha, iyo kaydinta ugu dhow yihiin xadkooda?",
           "sessState": "Maxay fadhiyada samaynayaan hadda?",
           "sessTrend": "Ma kordheen sugitaanka qufulka marka fadhiyada ay isku urursadaan?",
           "tpsCombo": "Ma wada socdaan wax soo saarka iyo heerka fashilka?",
@@ -713,7 +713,10 @@
           "capacity": "Goorma ayuu DB buuxsami doonaa?",
           "slowTop": "Maxaa marka hore la hagaajinayaa? (wakhtiga guud)",
           "sizeTop": "Maxaa qaadanaya booska?",
-          "heat": "Khatarta ma mid mar ah baa mise waa soo noqnoqotaa?"
+          "heat": "Khatarta ma mid mar ah baa mise waa soo noqnoqotaa?",
+          "radar": "Aaggee daciif ah?",
+          "flow": "Waa kuwee abka iyo akoonnada abuuraya fadhiyo dhibaato leh?",
+          "tree": "Maxaa cuna meel, maxaase u baahan nadiifin?"
         },
         "asTable": "U eeg sidii miis",
         "needHistory": "Weli ma jiro isbeddel — shaashaddan ha furnaato dhowr daqiiqo.",
@@ -747,8 +750,48 @@
           "calls": "Wicitaanada",
           "total": "Wadarta (ms)",
           "mean": "Celceliska (ms)",
-          "share": "Saamiga"
-        }
+          "share": "Saamiga",
+          "score": "Dhibco",
+          "level": "Heer",
+          "ago": "1 saac ka hor",
+          "from": "Ka yimid",
+          "to": "Ku socota",
+          "sessions": "Fadhiyada",
+          "schema": "Schema",
+          "size": "Cabbir",
+          "thr": "Xadka (digniin·khatar)"
+        },
+        "radar": "Dhibcaha caafimaadka ee aagga",
+        "radarCur": "Hadda",
+        "radarSafe": "Xariiqda aasaasiga ah ee badbaadada",
+        "radarAgo": "1 saac ka hor",
+        "radarOut": "Lama cabbiri karo: {list}",
+        "axis": {
+          "avail": "Helitaan",
+          "sess": "Fadhiyada",
+          "lock": "Qufulada",
+          "perf": "Waxqabadka weydiinta",
+          "store": "Kaydinta",
+          "maint": "Dayactir",
+          "idx": "Tusmooyinka",
+          "protect": "Ku celcelin/kaydin"
+        },
+        "flow": "App → akoon → xaaladda fadhiga",
+        "flowState": {
+          "lockWait": "Sugitaanka qufulka",
+          "active": "Firfircoon",
+          "idleTx": "Shaqo la'aan (wax kala iibsi furan)",
+          "idle": "Shaqo la'aan"
+        },
+        "noApp": "(magaca abka ma jiro)",
+        "otherN": "{n} kale",
+        "otherSchema": "{n} schemas kale",
+        "tree": "Khariidadda cabbirka Schema iyo miiska",
+        "deadPct": "Saamiga safka dhintay",
+        "partial": "Waxa la isku daray ilaa 500 saf oo keliya.",
+        "gaugeNoLimit": "Ma jiro sharci xaddidaad kaydin",
+        "rsp": "Waqtiga jawaabta",
+        "noStat": "Ma jiro tirokoob"
       },
       "empty": {
         "noConn": "Taxanahan ma laha xidhiidh server-ka PostgreSQL oo la kormeerayo — kaliya waxa la tusayaa URL-yada iyo heerka adeegga.",

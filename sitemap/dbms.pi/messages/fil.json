@@ -693,7 +693,7 @@
       "chart": {
         "title": "Mga trend at ranggo",
         "note": "Ang mga trend ay nire-record bawat minuto habang bukas ang screen na ito (walang background collection).",
-        "gauges": "Mga gauge ng koneksyon at cache",
+        "gauges": "Mga Limitasyon ng Gauge",
         "sessState": "Mga session ngayon",
         "sessTrend": "Trend ng session at mga paghihintay sa lock",
         "tpsCombo": "Throughput at rollback rate",
@@ -704,7 +704,7 @@
         "sizeTop": "Laki top 10",
         "heat": "Panganib ayon sa signal sa paglipas ng panahon",
         "q": {
-          "gauges": "Napupuno ba ang mga koneksyon? Nagsisilbi ba ang mga pagbasa mula sa memorya?",
+          "gauges": "Gaano kalapit ang mga koneksyon, cache, tugon, at storage sa kanilang mga limitasyon?",
           "sessState": "Ano ang ginagawa ng mga session ngayon?",
           "sessTrend": "Tumaas ba ang mga paghihintay sa lock kapag dumami ang mga session?",
           "tpsCombo": "Sabay bang gumagalaw ang throughput at failure rate?",
@@ -712,7 +712,10 @@
           "capacity": "Kailan mapupuno ang DB?",
           "slowTop": "Ano ang unang i-tune? (ayon sa kabuuang oras)",
           "sizeTop": "Ano ang kumukuha ng espasyo?",
-          "heat": "Ang panganib ba ay isang beses lang o umuulit?"
+          "heat": "Ang panganib ba ay isang beses lang o umuulit?",
+          "radar": "Aling lugar ang mahina?",
+          "flow": "Aling mga app at account ang lumilikha ng mga problemang session?",
+          "tree": "Ano ang kumakain ng espasyo, at ano ang kailangang linisin?"
         },
         "asTable": "Tingnan bilang talahanayan",
         "needHistory": "Wala pang trend — panatilihing bukas ang screen na ito sa loob ng ilang minuto.",
@@ -746,8 +749,48 @@
           "calls": "Mga tawag",
           "total": "Kabuuan (ms)",
           "mean": "Average (ms)",
-          "share": "Bahagi"
-        }
+          "share": "Bahagi",
+          "score": "Score",
+          "level": "Antas",
+          "ago": "1 oras na ang nakalipas",
+          "from": "Mula",
+          "to": "Patungo",
+          "sessions": "Mga Session",
+          "schema": "Schema",
+          "size": "Sukat",
+          "thr": "Threshold (babala·panganib)"
+        },
+        "radar": "Health score ayon sa lugar",
+        "radarCur": "Ngayon",
+        "radarSafe": "Ligtas na baseline",
+        "radarAgo": "1 oras na ang nakalipas",
+        "radarOut": "Hindi masusukat : {list}",
+        "axis": {
+          "avail": "Availability",
+          "sess": "Mga Session",
+          "lock": "Mga Lock",
+          "perf": "Pagganap ng Query",
+          "store": "Storage",
+          "maint": "Maintenance",
+          "idx": "Mga Index",
+          "protect": "Replication/backup"
+        },
+        "flow": "App → account → estado ng session",
+        "flowState": {
+          "lockWait": "Paghihintay sa lock",
+          "active": "Aktibo",
+          "idleTx": "Idle sa transaksyon",
+          "idle": "Idle"
+        },
+        "noApp": "(walang pangalan ng app)",
+        "otherN": "{n} iba pa",
+        "otherSchema": "{n} iba pang schema",
+        "tree": "Mapa ng laki ng schema at table",
+        "deadPct": "Ratio ng patay na row",
+        "partial": "Pinagsama-sama hanggang 500 row lang.",
+        "gaugeNoLimit": "Walang panuntunan sa limitasyon ng storage",
+        "rsp": "Oras ng pagtugon",
+        "noStat": "Walang istatistika"
       },
       "empty": {
         "noConn": "Walang koneksyon sa PostgreSQL server ang taxonomy na ito para subaybayan — ipinapakita lang ang mga URL at status ng serbisyo.",

@@ -694,7 +694,7 @@
       "chart": {
         "title": "Tendensiýalar we reýtingler",
         "note": "Tendensiýalar bu ekran açyk wagtynda her minutda ýazga alynýar (fon ýygnamak ýok).",
-        "gauges": "Birikme we keş ölçegleri",
+        "gauges": "Çäk ölçegleri",
         "sessState": "Häzirki sessiýalar",
         "sessTrend": "Sessiýa tendensiýasy we gulplama garaşmalar",
         "tpsCombo": "Öndürijilik we yza gaýtarmak tizligi",
@@ -705,7 +705,7 @@
         "sizeTop": "Ýer iň gowy 10",
         "heat": "Wagt boýunça signal boýunça howp",
         "q": {
-          "gauges": "Birikmeler dolýarmy? Okamalar ýatdan hyzmat edilýärmi?",
+          "gauges": "Baglanyşyklar, keş, jogaplar we saklama çäklerine näderejede ýakyn?",
           "sessState": "Sessiýalar häzir näme edýär?",
           "sessTrend": "Sessiýalar köpelende gulplama garaşmalar artýarmy?",
           "tpsCombo": "Öndürijilik we şowsuzlyk tizligi bile hereket edýärmi?",
@@ -713,7 +713,10 @@
           "capacity": "DB haçan dolar?",
           "slowTop": "Ilki nämäni sazlamaly? (umumy wagt boýunça)",
           "sizeTop": "Ýeri näme eýeleýär?",
-          "heat": "Howp bir gezeklikmi ýa-da gaýtalanýarmy?"
+          "heat": "Howp bir gezeklikmi ýa-da gaýtalanýarmy?",
+          "radar": "Haýsy ýer gowşak?",
+          "flow": "Haýsy programmalarda we hasaplarda meseleli sessiýalar döreýär?",
+          "tree": "Näme ýer eýeleýär we nämäni arassalamaly?"
         },
         "asTable": "Tablisa hökmünde görkez",
         "needHistory": "Heniz tendensiýa ýok — bu ekrany birnäçe minut açyk saklaň.",
@@ -747,8 +750,48 @@
           "calls": "Jaňlar",
           "total": "Jemi (ms)",
           "mean": "Ortaça (ms)",
-          "share": "Paý"
-        }
+          "share": "Paý",
+          "score": "Baha",
+          "level": "Dereje",
+          "ago": "1 sagat öň",
+          "from": "Nireden",
+          "to": "Nirede",
+          "sessions": "Sessiýalar",
+          "schema": "Shema",
+          "size": "Ölçeg",
+          "thr": "Çäk (duýduryş·howp)"
+        },
+        "radar": "Meýdan boýunça saglyk baly",
+        "radarCur": "Häzir",
+        "radarSafe": "Howpsuz başlangyç çäk",
+        "radarAgo": "1 sagat öň",
+        "radarOut": "Ölçelmeýän ýer: {list}",
+        "axis": {
+          "avail": "Elýeterlilik",
+          "sess": "Sessiýalar",
+          "lock": "Gulplar",
+          "perf": "Sorag öndürijiligi",
+          "store": "Saklama",
+          "maint": "Hyzmat",
+          "idx": "Indeksler",
+          "protect": "Replikasiýa/ätiýaçlyk nusgasy"
+        },
+        "flow": "Programma → hasap → sessiýa ýagdaýy",
+        "flowState": {
+          "lockWait": "Gulplama garaşýar",
+          "active": "Işjeň",
+          "idleTx": "Gatnaşykda boş",
+          "idle": "Boş"
+        },
+        "noApp": "(programmanyň ady ýok)",
+        "otherN": "Beýleki {n}",
+        "otherSchema": "Beýleki {n} shemalar",
+        "tree": "Shema we tablisanyň ölçeg kartasy",
+        "deadPct": "Öli hatar gatnaşygy",
+        "partial": "Diňe 500 hatara çenli jemlenen.",
+        "gaugeNoLimit": "Saklama çäklendirme düzgüni ýok",
+        "rsp": "Jogap wagty",
+        "noStat": "Statistika ýok"
       },
       "empty": {
         "noConn": "Bu taksonomiýada gözegçilik etmek üçin PostgreSQL serwer birikmesi ýok — diňe URL-ler we hyzmat ýagdaýy görkezilýär.",

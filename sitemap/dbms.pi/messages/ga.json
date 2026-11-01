@@ -688,7 +688,7 @@
       "chart": {
         "title": "Tendances et classements",
         "note": "Les tendances sont enregistrées toutes les minutes tant que cet écran est ouvert (pas de collecte en arrière-plan).",
-        "gauges": "Jauges de connexion et de cache",
+        "gauges": "Jauges de limite",
         "sessState": "Sessions actuelles",
         "sessTrend": "Tendance des sessions et attentes de verrouillage",
         "tpsCombo": "Débit et taux de rollback",
@@ -699,7 +699,7 @@
         "sizeTop": "Top 10 de l'espace",
         "heat": "Risque par signal au fil du temps",
         "q": {
-          "gauges": "Les connexions se remplissent-elles ? Les lectures sont-elles servies depuis la mémoire ?",
+          "gauges": "Dans quelle mesure les connexions, le cache, les réponses et le stockage sont-ils proches de leurs limites ?",
           "sessState": "Que font les sessions actuellement ?",
           "sessTrend": "Les attentes de verrouillage augmentent-elles lorsque les sessions s'accumulent ?",
           "tpsCombo": "Le débit et le taux d'échec évoluent-ils ensemble ?",
@@ -707,7 +707,10 @@
           "capacity": "Quand la DB sera-t-elle pleine ?",
           "slowTop": "Quoi optimiser en premier ? (par temps total)",
           "sizeTop": "Qu'est-ce qui prend de l'espace ?",
-          "heat": "Le risque est-il ponctuel ou récurrent ?"
+          "heat": "Le risque est-il ponctuel ou récurrent ?",
+          "radar": "Quelle zone est faible ?",
+          "flow": "Quelles applications et quels comptes créent des sessions problématiques ?",
+          "tree": "Qu'est-ce qui prend de l'espace et qu'est-ce qui doit être nettoyé ?"
         },
         "asTable": "Afficher sous forme de tableau",
         "needHistory": "Pas encore de tendance — gardez cet écran ouvert pendant quelques minutes.",
@@ -741,8 +744,48 @@
           "calls": "Appels",
           "total": "Total (ms)",
           "mean": "Moyenne (ms)",
-          "share": "Part"
-        }
+          "share": "Part",
+          "score": "Score",
+          "level": "Niveau",
+          "ago": "Il y a 1 heure",
+          "from": "De",
+          "to": "À",
+          "sessions": "Sessions",
+          "schema": "Schéma",
+          "size": "Taille",
+          "thr": "Seuil (avertissement·risque)"
+        },
+        "radar": "Score de santé par zone",
+        "radarCur": "Maintenant",
+        "radarSafe": "Ligne de base de sécurité",
+        "radarAgo": "Il y a 1 heure",
+        "radarOut": "Non mesurable : {list}",
+        "axis": {
+          "avail": "Disponibilité",
+          "sess": "Sessions",
+          "lock": "Verrous",
+          "perf": "Performance des requêtes",
+          "store": "Stockage",
+          "maint": "Maintenance",
+          "idx": "Index",
+          "protect": "Réplication/sauvegarde"
+        },
+        "flow": "Application → compte → état de la session",
+        "flowState": {
+          "lockWait": "Attente de verrouillage",
+          "active": "Actif",
+          "idleTx": "Inactif en transaction",
+          "idle": "Inactif"
+        },
+        "noApp": "(pas de nom d'application)",
+        "otherN": "{n} autres",
+        "otherSchema": "{n} autres schémas",
+        "tree": "Carte de la taille des schémas et des tables",
+        "deadPct": "Ratio de lignes mortes",
+        "partial": "Agrégé jusqu'à 500 lignes seulement.",
+        "gaugeNoLimit": "Aucune règle de limite de stockage",
+        "rsp": "Temps de réponse",
+        "noStat": "Aucune statistique"
       },
       "empty": {
         "noConn": "Cette taxonomie n'a aucune connexion de serveur PostgreSQL à surveiller — affichage des URL et de l'état du service uniquement.",

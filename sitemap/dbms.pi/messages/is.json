@@ -457,7 +457,7 @@
       "1440": "24 klst"
     },
     "loading": "Hleður…",
-    "rulesNote": "Reglur eru vistaðar fyrir þennan tengil og metnar gegn mótteknu yfirliti; brot fá rauðan ramma (tilkynningar koma síðar).",
+    "rulesNote": "Reglur eru vistaðar í þessari tengingu og metnar í hvert skipti sem taflan er endurnýjuð (DB lota/bið eftir læsingu/skyndiminni hittahlutfall á 1 mínútu, DB stærð/URL viðbragðstími/bilun á 5 mínútum). Brotin merki munu stigmagnast í hættu og verða merkt „Mín regla“ (tilkynningasending er næsta skref). Reglur um þjónustu (APP) mælingar eru ekki metnar. Reglur um DB stærð (MB) (>) eru einnig notaðar sem takmörk á getu.",
     "notEvaluated": "Ekki metið",
     "metric": "Mælikvarði",
     "conn": "Tenging",
@@ -690,7 +690,7 @@
       "chart": {
         "title": "Þróun og röðun",
         "note": "Þróun er skráð á mínútu fresti á meðan þessi skjár er opinn (engin bakgrunnssöfnun).",
-        "gauges": "Tengingar- og skyndiminni-mælar",
+        "gauges": "Takmörkunarmælar",
         "sessState": "Lotur núna",
         "sessTrend": "Lotuþróun og læsingarbið",
         "tpsCombo": "Gegnumstreymi og afturköllunarhlutfall",
@@ -701,7 +701,7 @@
         "sizeTop": "Pláss topp 10",
         "heat": "Áhætta eftir merki yfir tíma",
         "q": {
-          "gauges": "Eru tengingar að fyllast? Eru lestrar þjónaðir úr minni?",
+          "gauges": "Hversu nálægt takmörkunum eru tengingar, skyndiminni, svörun og geymsla?",
           "sessState": "Hvað eru lotur að gera núna?",
           "sessTrend": "Hækkar læsingarbið þegar lotur safnast upp?",
           "tpsCombo": "Hreyfast gegnumstreymi og bilunarhlutfall saman?",
@@ -709,7 +709,10 @@
           "capacity": "Hvenær fyllist DB?",
           "slowTop": "Hvað á að stilla fyrst? (eftir heildartíma)",
           "sizeTop": "Hvað tekur plássið?",
-          "heat": "Er áhættan einstök eða endurtekin?"
+          "heat": "Er áhættan einstök eða endurtekin?",
+          "radar": "Hvaða svæði er veikt?",
+          "flow": "Hvaða forrit og reikningar skapa vandamálalotur?",
+          "tree": "Hvað tekur pláss og hvað þarf að hreinsa?"
         },
         "asTable": "Skoða sem töflu",
         "needHistory": "Engin þróun ennþá — haltu þessum skjá opnum í nokkrar mínútur.",
@@ -743,8 +746,48 @@
           "calls": "Símtöl",
           "total": "Samtals (ms)",
           "mean": "Meðaltal (ms)",
-          "share": "Hlutdeild"
-        }
+          "share": "Hlutdeild",
+          "score": "Stig",
+          "level": "Stig",
+          "ago": "Fyrir 1 klukkustund",
+          "from": "Frá",
+          "to": "Til",
+          "sessions": "Lotur",
+          "schema": "Skema",
+          "size": "Stærð",
+          "thr": "Þröskuldur (viðvörun·áhætta)"
+        },
+        "radar": "Heilsustig eftir svæðum",
+        "radarCur": "Núna",
+        "radarSafe": "Örugg grunnlína",
+        "radarAgo": "Fyrir 1 klukkustund",
+        "radarOut": "Ekki mælanlegt : {list}",
+        "axis": {
+          "avail": "Framboð",
+          "sess": "Lotur",
+          "lock": "Læsingar",
+          "perf": "Fyrirspurnarárangur",
+          "store": "Geymsla",
+          "maint": "Viðhald",
+          "idx": "Vísitölur",
+          "protect": "Afritun/öryggisafritun"
+        },
+        "flow": "Forrit → reikningur → lotustaða",
+        "flowState": {
+          "lockWait": "Bið eftir læsingu",
+          "active": "Virk",
+          "idleTx": "Óvirk í færslu",
+          "idle": "Óvirk"
+        },
+        "noApp": "(ekkert forritsheiti)",
+        "otherN": "{n} aðrir",
+        "otherSchema": "{n} önnur skema",
+        "tree": "Kort yfir stærð skema og töflu",
+        "deadPct": "Hlutfall dauðra raða",
+        "partial": "Aðeins samanlagt allt að 500 raðir.",
+        "gaugeNoLimit": "Engin takmörkunarregla fyrir geymslu",
+        "rsp": "Viðbragðstími",
+        "noStat": "Engar tölfræði"
       },
       "empty": {
         "unsupported": "Þessi tenging styður ekki vöktun (aðeins PostgreSQL netþjónatengingar).",

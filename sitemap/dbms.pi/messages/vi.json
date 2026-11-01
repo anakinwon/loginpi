@@ -694,7 +694,7 @@
       "chart": {
         "title": "Xu hướng & xếp hạng",
         "note": "Xu hướng được ghi lại mỗi phút khi màn hình này đang mở (không có thu thập nền).",
-        "gauges": "Đồng hồ kết nối & bộ nhớ cache",
+        "gauges": "Đồng hồ đo giới hạn",
         "sessState": "Trạng thái phiên hiện tại",
         "sessTrend": "Xu hướng phiên & chờ khóa",
         "tpsCombo": "Thông lượng & tỷ lệ rollback",
@@ -705,7 +705,7 @@
         "sizeTop": "Không gian top 10",
         "heat": "Rủi ro theo tín hiệu theo thời gian",
         "q": {
-          "gauges": "Các kết nối có đầy không? Các lượt đọc có được phục vụ từ bộ nhớ không?",
+          "gauges": "Kết nối, bộ nhớ đệm, phản hồi, lưu trữ gần giới hạn đến mức nào?",
           "sessState": "Các phiên đang làm gì bây giờ?",
           "sessTrend": "Chờ khóa có tăng khi các phiên chồng chất không?",
           "tpsCombo": "Thông lượng và tỷ lệ lỗi có di chuyển cùng nhau không?",
@@ -713,7 +713,10 @@
           "capacity": "DB sẽ đầy khi nào?",
           "slowTop": "Điều chỉnh gì trước? (theo tổng thời gian)",
           "sizeTop": "Cái gì đang chiếm không gian?",
-          "heat": "Rủi ro là một lần hay lặp lại?"
+          "heat": "Rủi ro là một lần hay lặp lại?",
+          "radar": "Khu vực nào yếu?",
+          "flow": "Ứng dụng và tài khoản nào tạo phiên có vấn đề?",
+          "tree": "Cái gì chiếm không gian và cái gì cần dọn dẹp?"
         },
         "asTable": "Xem dưới dạng bảng",
         "needHistory": "Chưa có xu hướng — giữ màn hình này mở trong vài phút.",
@@ -747,8 +750,48 @@
           "calls": "Số lượt gọi",
           "total": "Tổng (ms)",
           "mean": "Trung bình (ms)",
-          "share": "Chia sẻ"
-        }
+          "share": "Chia sẻ",
+          "score": "Điểm",
+          "level": "Mức",
+          "ago": "1 giờ trước",
+          "from": "Từ",
+          "to": "Đến",
+          "sessions": "Phiên",
+          "schema": "Schema",
+          "size": "Kích thước",
+          "thr": "Ngưỡng (cảnh báo·rủi ro)"
+        },
+        "radar": "Điểm sức khỏe theo khu vực",
+        "radarCur": "Hiện tại",
+        "radarSafe": "Đường cơ sở an toàn",
+        "radarAgo": "1 giờ trước",
+        "radarOut": "Không thể đo lường: {list}",
+        "axis": {
+          "avail": "Khả dụng",
+          "sess": "Phiên",
+          "lock": "Khóa",
+          "perf": "Hiệu suất truy vấn",
+          "store": "Lưu trữ",
+          "maint": "Bảo trì",
+          "idx": "Chỉ mục",
+          "protect": "Sao chép/Sao lưu"
+        },
+        "flow": "Ứng dụng → tài khoản → trạng thái phiên",
+        "flowState": {
+          "lockWait": "Chờ khóa",
+          "active": "Đang hoạt động",
+          "idleTx": "Không hoạt động (giao dịch đang mở)",
+          "idle": "Không hoạt động"
+        },
+        "noApp": "(không có tên ứng dụng)",
+        "otherN": "{n} khác",
+        "otherSchema": "{n} schema khác",
+        "tree": "Bản đồ kích thước schema và bảng",
+        "deadPct": "Tỷ lệ hàng chết",
+        "partial": "Chỉ tổng hợp tối đa 500 hàng.",
+        "gaugeNoLimit": "Không có quy tắc giới hạn lưu trữ",
+        "rsp": "Thời gian phản hồi",
+        "noStat": "Không có thống kê"
       },
       "empty": {
         "noConn": "Phân loại này không có kết nối máy chủ PostgreSQL để giám sát — chỉ hiển thị URL và trạng thái dịch vụ.",

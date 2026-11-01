@@ -694,7 +694,7 @@
       "chart": {
         "title": "Trender og rangeringer",
         "note": "Trender registreres hvert minutt mens denne skjermen er åpen (ingen bakgrunnssamling).",
-        "gauges": "Tilkoblings- og cache-målere",
+        "gauges": "Grensemålere",
         "sessState": "Sesjoner akkurat nå",
         "sessTrend": "Sesjonstrend og låseventer",
         "tpsCombo": "Gjennomstrømning og tilbakerullingsrate",
@@ -705,7 +705,7 @@
         "sizeTop": "Plass topp 10",
         "heat": "Risiko etter signal over tid",
         "q": {
-          "gauges": "Fylles tilkoblingene opp? Serveres lesninger fra minnet?",
+          "gauges": "Hvor nær er tilkoblinger, hurtigbuffer, svar og lagring sine grenser?",
           "sessState": "Hva gjør sesjonene nå?",
           "sessTrend": "Øker låseventene når sesjonene hoper seg opp?",
           "tpsCombo": "Beveger gjennomstrømning og feilrate seg sammen?",
@@ -713,7 +713,10 @@
           "capacity": "Når blir DB full?",
           "slowTop": "Hva skal justeres først? (etter total tid)",
           "sizeTop": "Hva tar plassen?",
-          "heat": "Er risikoen en engangshendelse eller gjentakende?"
+          "heat": "Er risikoen en engangshendelse eller gjentakende?",
+          "radar": "Hvilket område er svakt?",
+          "flow": "Hvilke apper og kontoer skaper problemøkter?",
+          "tree": "Hva tar opp plass, og hva trenger opprydding?"
         },
         "asTable": "Vis som tabell",
         "needHistory": "Ingen trend ennå – hold denne skjermen åpen i noen minutter.",
@@ -747,8 +750,48 @@
           "calls": "Kall",
           "total": "Totalt (ms)",
           "mean": "Gjennomsnitt (ms)",
-          "share": "Andel"
-        }
+          "share": "Andel",
+          "score": "Poengsum",
+          "level": "Nivå",
+          "ago": "1 time siden",
+          "from": "Fra",
+          "to": "Til",
+          "sessions": "Økter",
+          "schema": "Skjema",
+          "size": "Størrelse",
+          "thr": "Terskel (advarsel·risiko)"
+        },
+        "radar": "Helsetilstand etter område",
+        "radarCur": "Nå",
+        "radarSafe": "Sikker grunnlinje",
+        "radarAgo": "1 time siden",
+        "radarOut": "Ikke målbart: {list}",
+        "axis": {
+          "avail": "Tilgjengelighet",
+          "sess": "Økter",
+          "lock": "Låser",
+          "perf": "Spørringsytelse",
+          "store": "Lagring",
+          "maint": "Vedlikehold",
+          "idx": "Indekser",
+          "protect": "Replikering/sikkerhetskopi"
+        },
+        "flow": "App → konto → øktstatus",
+        "flowState": {
+          "lockWait": "Lås venter",
+          "active": "Aktiv",
+          "idleTx": "Inaktiv i transaksjon",
+          "idle": "Inaktiv"
+        },
+        "noApp": "(ingen appnavn)",
+        "otherN": "{n} andre",
+        "otherSchema": "{n} andre skjemaer",
+        "tree": "Kart over skjema- og tabellstørrelse",
+        "deadPct": "Forhold mellom døde rader",
+        "partial": "Aggregert opp til 500 rader.",
+        "gaugeNoLimit": "Ingen regel for lagringsgrense",
+        "rsp": "Responstid",
+        "noStat": "Ingen statistikk"
       },
       "empty": {
         "noConn": "Denne taksonomien har ingen PostgreSQL-servertilkobling å overvåke – viser kun URL-er og tjenestestatus.",

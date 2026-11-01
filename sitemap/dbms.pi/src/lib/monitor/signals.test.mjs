@@ -7,9 +7,22 @@ import {
   evalFast,
   evalSlow,
   evalUrl,
+  FLOW_TOP,
+  gaugeScale,
   levelsByBucket,
   lsnDiff,
+  RADAR_AXES,
+  RADAR_SAFE,
+  radarScores,
+  rateDead,
+  rowLevels,
+  SCORE,
+  SIG_IDS,
+  sigLevels,
   storageLimit,
+  THR,
+  TREE_SCHEMA_TOP,
+  TREE_TBL_TOP,
   summarize,
   todo,
   worst,
@@ -40,6 +53,7 @@ const cb = (n, o = {}) =>
   Array.from({ length: n }, (_, k) => ({
     pid: k + 1,
     usename: 'app',
+    appNm: 'app1',
     backendType: 'client backend',
     state: 'idle',
     waitType: null,
@@ -493,4 +507,189 @@ test('LOCK_WAIT·IDLE_TX·스냅샷 값', () => {
   assert.equal(e.snap.rsp_ms, 100)
   assert.equal(e.snap.tmp_sz_byte, 0)
   assert.equal(fast({ activity: 'TIMEOUT' }).snap, null)
+})
+
+test('RADAR_AXES : 14개 신호가 정확히 한 축씩', () => {
+  const all = Object.values(RADAR_AXES).flat()
+  assert.equal(all.length, SIG_IDS.length)
+  assert.deepEqual([...new Set(all)].sort(), [...SIG_IDS].sort())
+})
+
+test('radarScores : 최악 점수·평가 없음 null·안전선', () => {
+  const by = (lv) => Object.fromEntries(radarScores(lv).map((p) => [p.axis, p]))
+  const allOk = Object.fromEntries(SIG_IDS.map((id) => [id, 'OK']))
+  assert.ok(radarScores(allOk).every((p) => p.score === SCORE.OK))
+  const r = by({
+    ...allOk,
+    AVAIL: 'RISK',
+    LONG_QRY: 'WARN',
+    IDLE_TX: 'WARN',
+    LOCK_WAIT: 'UNKNOWN',
+    STORAGE: 'NA',
+    BACKUP: 'UNKNOWN',
+    REPL: 'WARN',
+  })
+  assert.equal(r.avail.score, SCORE.RISK) // OK + RISK
+  assert.equal(r.sess.score, SCORE.WARN) // WARN 만
+  assert.equal(r.lock.score, null)
+  assert.equal(r.lock.lvl, 'NA')
+  assert.equal(r.store.score, null)
+  assert.equal(r.protect.score, SCORE.WARN) // UNKNOWN + WARN
+  assert.equal(RADAR_SAFE, (SCORE.OK + SCORE.WARN) / 2)
+  // 설정성 사유(STORAGE NO_LIMIT) 는 현재 레이더에서 빠짐
+  const lv = sigLevels([...fast().signals, ...slow({})])
+  assert.equal(lv.STORAGE, undefined)
+  assert.equal(by(lv).store.score, null)
+})
+
+test('gaugeScale : THR 파생 구간', () => {
+  const c = gaugeScale(get(fast().signals, 'CONN_USE').thr, 'pct')
+  assert.equal(c.min, 0)
+  assert.equal(c.max, 100)
+  assert.equal(c.stops[0][0], THR.connPct[0] / 100)
+  assert.deepEqual(
+    c.stops.map((x) => x[1]),
+    ['OK', 'WARN', 'RISK'],
+  )
+  const h = gaugeScale(get(fast().signals, 'CACHE_HIT').thr, 'pct')
+  assert.equal(h.min, 2 * THR.cachePct[1] - THR.cachePct[0])
+  assert.equal(h.max, 100)
+  assert.deepEqual(
+    h.stops.map((x) => x[1]),
+    ['RISK', 'WARN', 'OK'],
+  )
+  assert.equal(h.stops[0][0], (THR.cachePct[1] - h.min) / (h.max - h.min))
+  const a = gaugeScale(get(fast().signals, 'AVAIL').thr, 'ms')
+  assert.equal(a.max, THR.rspMs[1] * 1.5)
+  for (const g of [c, h, a]) assert.equal(g.stops.at(-1)[0], 1)
+})
+
+test('flow : 상위 접기·합계 보존·앱명 없음·락 대기·방향', () => {
+  const act = Array.from({ length: 20 }, (_, k) =>
+    cb(k + 1, {
+      appNm: `app${String(k).padStart(2, '0')}`,
+      usename: `u${k % 9}`,
+    }),
+  ).flat()
+  const e = fast({ activity: act, version: ver({ maxConn: 1000 }) })
+  const apps = e.flow.nodes.filter((n) => n.kind === 'app')
+  assert.ok(apps.length <= FLOW_TOP + 1)
+  assert.equal(apps.find((n) => n.id === 'a:*').fold, 20 - FLOW_TOP)
+  assert.ok(
+    e.flow.nodes.filter((n) => n.kind === 'user').length <= FLOW_TOP + 1,
+  )
+  const sum = (f) => e.flow.links.filter(f).reduce((s, l) => s + l.value, 0)
+  assert.equal(
+    sum((l) => l.source.startsWith('a:')),
+    e.sessMix.total,
+  )
+  assert.equal(
+    sum((l) => l.source.startsWith('u:')),
+    e.sessMix.total,
+  )
+  assert.equal(e.sessMix.total, act.length)
+  assert.ok(
+    e.flow.links.every(
+      (l) =>
+        (l.source.startsWith('a:') && l.target.startsWith('u:')) ||
+        (l.source.startsWith('u:') && l.target.startsWith('s:')),
+    ),
+  )
+  const f2 = fast({
+    activity: [
+      ...cb(2, { appNm: '' }),
+      ...cb(3, { appNm: null }),
+      ...cb(2, { state: 'active', waitType: 'Lock' }),
+      ...cb(1, { state: 'active' }),
+      { ...cb(1)[0], backendType: 'autovacuum worker', appNm: 'bg' },
+    ],
+  }).flow
+  const n = (id) => f2.nodes.find((x) => x.id === id)
+  assert.equal(n('a:').value, 5)
+  assert.equal(n('a:').label, '')
+  assert.equal(n('s:lockWait').value, 2)
+  assert.equal(n('s:active').value, 1)
+  assert.equal(n('a:bg'), undefined) // 클라이언트 세션만
+  assert.equal(n('s:idleTx'), undefined) // 값 0 상태 없음
+  for (const a of [[], 'TIMEOUT']) {
+    const f = fast({ activity: a }).flow
+    assert.deepEqual([f.nodes, f.links], [[], []])
+  }
+})
+
+test('tree : 접기·총량 보존·짝 없음 NA·VACUUM 과 같은 판정', () => {
+  const sizes = []
+  const tbl = []
+  for (let s = 0; s < 10; s++)
+    for (let k = 0; k < 15; k++) {
+      sizes.push({
+        schema: `s${s}`,
+        rel: `t${k}`,
+        tblSz: 1,
+        idxSz: 1,
+        toastSz: 0,
+        totalSz: (s + 1) * 1000 + k,
+      })
+      if (k !== 12)
+        tbl.push({
+          schema: `s${s}`,
+          rel: `t${k}`,
+          seqScan: 0,
+          seqTupRead: 0,
+          idxScan: 0,
+          liveTup: 1000,
+          deadTup: k * 1000,
+          modSinceAnalyze: 0,
+          lastVacuum: '2026-11-01T00:00:00Z',
+          lastAnalyze: '2026-11-01T00:00:00Z',
+        })
+    }
+  const e = evalSlow(slowIn({ sizes, tbl }))
+  const ns = e.tree.nodes
+  assert.ok(ns.length <= TREE_SCHEMA_TOP + 1)
+  assert.equal(ns.at(-1).fold, 10 - TREE_SCHEMA_TOP)
+  for (const s of ns.filter((x) => x.children))
+    assert.ok(s.children.length <= TREE_TBL_TOP + 1)
+  const leaves = ns.flatMap((x) => x.children ?? [x])
+  assert.equal(
+    leaves.reduce((a, x) => a + x.value, 0),
+    sizes.reduce((a, x) => a + x.totalSz, 0),
+  )
+  const top = ns[0] // 가장 큰 스키마 s9
+  assert.equal(top.id, 's9')
+  const t3 = top.children.find((x) => x.id === 's9.t12')
+  assert.equal(t3.lvl, 'NA')
+  assert.equal(t3.deadPct, null)
+  const vac = get(e.signals, 'VACUUM').top
+  let seen = 0
+  for (const leaf of top.children.filter((x) => !x.fold && x.lvl !== 'NA')) {
+    const row = tbl.find((t) => `${t.schema}.${t.rel}` === leaf.id)
+    assert.equal(leaf.lvl, rateDead(row, NOW).lvl)
+    const v = vac.find((x) => x.key === leaf.id)
+    if (v) {
+      assert.equal(v.lvl, leaf.lvl)
+      seen++
+    }
+  }
+  assert.ok(seen > 0)
+  assert.ok(top.children.some((x) => x.lvl === 'RISK'))
+  assert.deepEqual(evalSlow(slowIn({ sizes: 'TIMEOUT' })).tree.nodes, [])
+})
+
+test('rowLevels = levelsByBucket 칸(추출 동작 동일)', () => {
+  const now = Date.parse('2026-11-01T12:30:00Z')
+  const rows = [
+    snap('2026-11-01T12:20:00Z', { blks_hit_cnt: 0, blks_read_cnt: 0 }),
+    snap('2026-11-01T12:21:00Z', {
+      sess_cnt: 90,
+      blks_hit_cnt: 9000,
+      blks_read_cnt: 1000,
+    }),
+  ]
+  const lv = rowLevels(rows[0], rows[1])
+  assert.equal(lv.CONN_USE, 'RISK')
+  assert.equal(lv.CACHE_HIT, 'RISK')
+  const h = levelsByBucket(rows, 30, now)
+  assert.equal(h.cells[h.rows.indexOf('CONN_USE')][3], 'RISK') // 12:20·12:21 = 4번째 5분 칸
+  assert.equal(h.cells[h.rows.indexOf('CACHE_HIT')][3], 'RISK')
 })

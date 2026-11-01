@@ -692,7 +692,7 @@
       "chart": {
         "title": "Tendense & ranglys",
         "note": "Tendense word elke minuut aangeteken terwyl hierdie skerm oop is (geen agtergrondversameling nie).",
-        "gauges": "Verbindings- & kasmeters",
+        "gauges": "Beperk meters",
         "sessState": "Sessies nou",
         "sessTrend": "Sessietendens & slotwagte",
         "tpsCombo": "Deurset & terugrolkoers",
@@ -703,7 +703,7 @@
         "sizeTop": "Spasie top 10",
         "heat": "Risiko volgens sein oor tyd",
         "q": {
-          "gauges": "Raak verbindings vol? Word lesings uit geheue bedien?",
+          "gauges": "Hoe naby is verbindings, kas, antwoorde en berging aan hul perke?",
           "sessState": "Wat doen sessies nou?",
           "sessTrend": "Styg slotwagte wanneer sessies ophoop?",
           "tpsCombo": "Beweeg deurset en foutkoers saam?",
@@ -711,7 +711,10 @@
           "capacity": "Wanneer sal die DB vol raak?",
           "slowTop": "Wat om eerste af te stem? (volgens totale tyd)",
           "sizeTop": "Wat neem die spasie op?",
-          "heat": "Is die risiko 'n eenmalige of herhalende een?"
+          "heat": "Is die risiko 'n eenmalige of herhalende een?",
+          "radar": "Watter area is swak?",
+          "flow": "Watter programme en rekeninge skep probleem sessies?",
+          "tree": "Wat eet spasie, en wat moet skoongemaak word?"
         },
         "asTable": "Bekyk as tabel",
         "needHistory": "Nog geen tendens nie — hou hierdie skerm vir 'n paar minute oop.",
@@ -745,8 +748,48 @@
           "calls": "Oproepe",
           "total": "Totaal (ms)",
           "mean": "Gemiddeld (ms)",
-          "share": "Aandeel"
-        }
+          "share": "Aandeel",
+          "score": "Telling",
+          "level": "Vlak",
+          "ago": "1 uur gelede",
+          "from": "Van",
+          "to": "Na",
+          "sessions": "Sessies",
+          "schema": "Skema",
+          "size": "Grootte",
+          "thr": "Drempel (waarskuwing·risiko)"
+        },
+        "radar": "Gesondheidstelling per area",
+        "radarCur": "Nou",
+        "radarSafe": "Veilige basislyn",
+        "radarAgo": "1 uur gelede",
+        "radarOut": "Nie meetbaar nie: {list}",
+        "axis": {
+          "avail": "Beskikbaarheid",
+          "sess": "Sessies",
+          "lock": "Slotte",
+          "perf": "Navraagprestasie",
+          "store": "Berging",
+          "maint": "Onderhoud",
+          "idx": "Indekse",
+          "protect": "Replikasie/rugsteun"
+        },
+        "flow": "App → rekening → sessiestatus",
+        "flowState": {
+          "lockWait": "Slotwag",
+          "active": "Aktief",
+          "idleTx": "Ledig in transaksie",
+          "idle": "Ledig"
+        },
+        "noApp": "(geen appnaam)",
+        "otherN": "{n} ander",
+        "otherSchema": "{n} ander skemas",
+        "tree": "Skema- en tabelgroottekaart",
+        "deadPct": "Dooie ry-verhouding",
+        "partial": "Slegs tot 500 rye geaggregeer.",
+        "gaugeNoLimit": "Geen bergingsbeperkingsreël nie",
+        "rsp": "Reaksietyd",
+        "noStat": "Geen statistieke"
       },
       "empty": {
         "noConn": "Hierdie taksonomie het geen PostgreSQL-bedienerverbinding om te monitor nie — wys slegs URL's en diensstatus.",

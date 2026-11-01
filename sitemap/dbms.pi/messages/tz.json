@@ -694,7 +694,7 @@
       "chart": {
         "title": "Mwenendo & viwango",
         "note": "Mwenendo hurekodiwa kila dakika wakati skrini hii imefunguliwa (hakuna ukusanyaji wa mandharinyuma).",
-        "gauges": "Viashiria vya muunganisho & akiba",
+        "gauges": "Geji za Kikomo",
         "sessState": "Vikao sasa hivi",
         "sessTrend": "Mwenendo wa kikao & kusubiri kufungwa",
         "tpsCombo": "Kiwango cha upitishaji & kurejesha",
@@ -705,7 +705,7 @@
         "sizeTop": "Nafasi 10 bora",
         "heat": "Hatari kwa ishara kwa muda",
         "q": {
-          "gauges": "Je, miunganisho inajaa? Je, usomaji unatolewa kutoka kwenye kumbukumbu?",
+          "gauges": "Je, miunganisho, akiba, majibu, na hifadhi ziko karibu kiasi gani na vikomo vyao?",
           "sessState": "Vikao vinafanya nini sasa?",
           "sessTrend": "Je, kusubiri kufungwa huongezeka wakati vikao vinapojikusanya?",
           "tpsCombo": "Je, kiwango cha upitishaji na kiwango cha kushindwa huenda pamoja?",
@@ -713,7 +713,10 @@
           "capacity": "DB itajaa lini?",
           "slowTop": "Nini cha kurekebisha kwanza? (kwa jumla ya muda)",
           "sizeTop": "Nini kinachukua nafasi?",
-          "heat": "Je, hatari ni ya mara moja au inarudia?"
+          "heat": "Je, hatari ni ya mara moja au inarudia?",
+          "radar": "Ni eneo gani dhaifu?",
+          "flow": "Ni programu na akaunti zipi zinazounda vipindi vya matatizo?",
+          "tree": "Ni nini kinachotumia nafasi, na nini kinahitaji kusafishwa?"
         },
         "asTable": "Tazama kama jedwali",
         "needHistory": "Hakuna mwenendo bado — weka skrini hii wazi kwa dakika chache.",
@@ -747,8 +750,48 @@
           "calls": "Simu",
           "total": "Jumla (ms)",
           "mean": "Wastani (ms)",
-          "share": "Shiriki"
-        }
+          "share": "Shiriki",
+          "score": "Alama",
+          "level": "Kiwango",
+          "ago": "Saa 1 iliyopita",
+          "from": "Kutoka",
+          "to": "Kwa",
+          "sessions": "Vipindi",
+          "schema": "Schema",
+          "size": "Ukubwa",
+          "thr": "Kizingiti (onyo·hatari)"
+        },
+        "radar": "Alama ya afya kwa eneo",
+        "radarCur": "Sasa",
+        "radarSafe": "Msingi salama",
+        "radarAgo": "Saa 1 iliyopita",
+        "radarOut": "Haiwezi kupimwa : {list}",
+        "axis": {
+          "avail": "Upatikanaji",
+          "sess": "Vipindi",
+          "lock": "Kufuli",
+          "perf": "Utendaji wa hoja",
+          "store": "Hifadhi",
+          "maint": "Matengenezo",
+          "idx": "Faharisi",
+          "protect": "Utoaji/chelezo"
+        },
+        "flow": "Programu → akaunti → hali ya kipindi",
+        "flowState": {
+          "lockWait": "Kusubiri kufuli",
+          "active": "Inatumika",
+          "idleTx": "Haina shughuli katika muamala",
+          "idle": "Haina shughuli"
+        },
+        "noApp": "(hakuna jina la programu)",
+        "otherN": "{n} zingine",
+        "otherSchema": "{n} schema zingine",
+        "tree": "Ramani ya ukubwa wa Schema na jedwali",
+        "deadPct": "Uwiano wa safu zilizokufa",
+        "partial": "Imejumlishwa hadi safu 500 pekee.",
+        "gaugeNoLimit": "Hakuna sheria ya kikomo cha hifadhi",
+        "rsp": "Muda wa kujibu",
+        "noStat": "Hakuna takwimu"
       },
       "empty": {
         "noConn": "Uainishaji huu hauna muunganisho wa seva ya PostgreSQL wa kufuatilia — unaonyesha URL na hali ya huduma pekee.",

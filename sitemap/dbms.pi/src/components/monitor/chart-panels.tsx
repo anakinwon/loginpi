@@ -2,7 +2,7 @@
 
 // 모니터링 보드 차트 영역(ECharts) — 모니터 화면이 next/dynamic(ssr:false)로만 불러와 첫 화면 번들에서 빠진다. 화면에 들어오기 직전(rootMargin 200px)에만 이력 조회
 //  P1 게이지(연결·캐시) · P2 도넛(세션 상태) · P3 누적 막대+선(세션 추이·락 대기, 한 축) · P4 처리량/롤백 위아래 2단(이중 축 대신) · P5 캐시 적중률 선 · P6 용량 영역+예측 점선
-//  · P7 느린 SQL TOP10 · P8 공간 TOP10 누적 막대 · P9 신호×시간 히트맵. 퍼널은 전환 데이터가 없어 쓰지 않는다. 모든 패널은 질문 한 줄 + '표로 보기' 동반
+//  · P7 느린 SQL TOP10 · P8 공간 TOP10 누적 막대 · P9 신호×시간 히트맵 · R 영역별 건강 레이더 · F 앱→계정→상태 산키 · T 스키마·테이블 트리맵. 퍼널은 전환 데이터가 없어 쓰지 않는다. 모든 패널은 질문 한 줄 + '표로 보기' 동반
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
@@ -22,13 +22,22 @@ import { readApi } from '@/lib/client-api'
 import { PERIODS, type PeriodMin } from '@/lib/monitor/rules'
 import {
   deltas,
+  gaugeScale,
   levelsByBucket,
+  RADAR_SAFE,
+  radarScores,
+  rowLevels,
+  sigLevels,
   THR,
   type BoardFast,
   type BoardSlow,
+  type FlowNode,
   type HistoryRes,
   type Lvl,
+  type SigId,
+  type Signal,
   type SnapRow,
+  type TreeNode,
 } from '@/lib/monitor/signals'
 import {
   CopyBtn,
@@ -58,6 +67,14 @@ const LVL_IDX: Record<Lvl, number> = {
 }
 const LVL_MARK = ['–', '✓', '?', '▲', '✕']
 const LVL_COLOR = [C.na, C.ok, C.unknown, C.warn, C.risk]
+const mark = (l: Lvl) => LVL_MARK[LVL_IDX[l]]
+const lvlColor = (l: Lvl) => LVL_COLOR[LVL_IDX[l]]
+// 툴팁은 HTML — 앱·계정·테이블 이름(사용자 입력)을 그대로 넣지 않는다
+const esc = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+// '#rrggbb' → rgba (그라데이션 면)
+const rgba = (hex: string, a: number) =>
+  `rgba(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(',')},${a})`
 
 // 시계열 공백 구간에 null 점을 끼워 선·영역이 빈 시간을 잇지 않게 한다
 const withGaps = (arr: [number, number][]): [number, number | null][] =>
@@ -83,9 +100,15 @@ function useOnVisible<T extends Element>() {
   return { ref, seen }
 }
 
-type Props = { sel: Sel; fast: BoardFast | null; slow: BoardSlow | null }
+type Props = {
+  sel: Sel
+  fast: BoardFast | null
+  slow: BoardSlow | null
+  // 카드와 같은 판정(AVAIL TIMEOUT 승격 반영) — monitor-view 가 합친 Map
+  signals: Map<SigId, Signal>
+}
 
-export default function ChartPanels({ sel, fast, slow }: Props) {
+export default function ChartPanels({ sel, fast, slow, signals }: Props) {
   const t = useTranslations('monitor')
   const { ref, seen } = useOnVisible<HTMLElement>()
   const [range, setRange] = useState<PeriodMin>(60)
@@ -144,14 +167,19 @@ export default function ChartPanels({ sel, fast, slow }: Props) {
       </p>
       {seen && (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {fast && <Gauges fast={fast} />}
+          {signals.size > 0 && (
+            <Radar signals={signals} rows={rows} range={range} />
+          )}
+          {signals.size > 0 && <Gauges signals={signals} />}
           {fast && <SessDonut fast={fast} />}
+          {fast && <Flow fast={fast} />}
           <SessTrend rows={rows} />
           <TpsCombo rows={rows} />
           <CacheTrend rows={rows} />
           <Capacity slow={slow} rows={rows} />
           <SlowTop slow={slow} />
           <SizeTop slow={slow} />
+          <SizeTreemap slow={slow} />
           <Heat rows={rows} range={range} />
         </div>
       )}
@@ -237,101 +265,565 @@ function Table({
 const dash = (v: number | null | undefined) =>
   v === null || v === undefined ? '—' : v
 
-// P1 — 연결 사용률·캐시 적중률 게이지(상태 띠)
-function Gauges({ fast }: { fast: BoardFast }) {
+// 게이지 눈금 칸 수 — 범위가 10 이하 정수면 1단위 칸(정수 눈금), 아니면 5칸
+function gaugeSplit(sc: { min: number; max: number } | null): number {
+  const span = sc ? sc.max - sc.min : 100
+  return span > 0 && span <= 10 && Number.isInteger(span) ? span : 5
+}
+
+// P1 — 한계 게이지(속도계 2×2) : 연결·캐시·응답·저장. 색 띠 = gaugeScale(Signal.thr) = 카드 판정과 같은 THR 구간
+const GAUGE_IDS = ['CONN_USE', 'CACHE_HIT', 'AVAIL', 'STORAGE'] as const
+const GAUGE_POS = [
+  ['25%', '28%'],
+  ['75%', '28%'],
+  ['25%', '76%'],
+  ['75%', '76%'],
+]
+const unitTxt = (u: Signal['unit']) =>
+  u === 'pct' ? '%' : u === 'ms' ? ' ms' : ''
+
+function Gauges({ signals }: { signals: Map<SigId, Signal> }) {
   const t = useTranslations('monitor.board')
-  const conn =
-    fast.kpi.sess !== null && fast.kpi.maxConn
-      ? r1((fast.kpi.sess / fast.kpi.maxConn) * 100)
-      : null
-  const cache = fast.kpi.cachePct
+  const items = useMemo(
+    () =>
+      GAUGE_IDS.map((id) => {
+        const s = signals.get(id)
+        // 저장은 한도 규칙이 있을 때(unit pct)만 바늘 — 없으면 회색 띠·'—'·한도 없음 안내
+        const sc =
+          s?.thr &&
+          s.value !== null &&
+          s.lvl !== 'UNKNOWN' &&
+          (id !== 'STORAGE' || s.unit === 'pct')
+            ? gaugeScale(s.thr, s.unit)
+            : null
+        return {
+          id,
+          s,
+          sc,
+          lvl: s?.lvl ?? ('UNKNOWN' as Lvl),
+          name: id === 'AVAIL' ? t('chart.rsp') : t(`sig.${id}`),
+          noLimit: id === 'STORAGE' && s?.reason === 'NO_LIMIT',
+          txt:
+            sc && s ? `${s.value}${unitTxt(s.unit)}` : ('—' as string | number),
+        }
+      }),
+    [signals, t],
+  )
   const opt = useCallback(
-    (narrow: boolean): ChartOption => {
-      const g = (
-        center: string,
-        v: number | null,
-        min: number,
-        bands: [number, string][],
-        name: string,
-      ) => ({
+    (narrow: boolean): ChartOption => ({
+      ...base(narrow),
+      tooltip: { show: false },
+      series: items.map((g, i) => ({
         type: 'gauge',
-        center: [center, '62%'],
-        // 두 게이지가 반쪽 폭씩 나눠 쓰므로 narrow 면 반지름을 줄여 겹침·잘림을 막는다
-        radius: narrow ? '58%' : '90%',
-        startAngle: 200,
-        endAngle: -20,
-        min,
-        max: 100,
-        splitNumber: 2,
-        axisLine: { lineStyle: { width: 10, color: bands } },
-        pointer: { width: 4, itemStyle: { color: C.ink } },
-        axisTick: { show: false },
-        splitLine: { show: false },
-        axisLabel: { color: C.text, fontSize: 10, distance: 14 },
+        center: GAUGE_POS[i],
+        radius: narrow ? '36%' : '40%',
+        startAngle: 225,
+        endAngle: -45,
+        min: g.sc?.min ?? 0,
+        max: g.sc?.max ?? 100,
+        // 눈금 간격을 정수로 — 폭 10 이하(캐시 91~100)는 1포인트 간격이라 판정 경계(95)와 눈금 글자가 같은 자리
+        splitNumber: gaugeSplit(g.sc),
+        axisLine: {
+          lineStyle: {
+            width: 12,
+            color: g.sc
+              ? g.sc.stops.map(([p, l]) => [p, lvlColor(l)])
+              : [[1, C.unknown]],
+          },
+        },
+        axisTick: { length: 4, lineStyle: { color: C.text } }, // 어두운 면 위 눈금 대비(C.grid 는 1.2:1)
+        splitLine: { length: 10, lineStyle: { color: C.ink, width: 2 } },
+        axisLabel: {
+          show: !narrow,
+          color: C.text,
+          fontSize: 9,
+          distance: 16,
+          // 정수 간격이면 정수 그대로, 아니면 소수 1자리(반올림으로 위치와 글자가 어긋나지 않게)
+          formatter: (v: number) =>
+            Number.isInteger(v) ? String(v) : v.toFixed(1),
+        },
+        pointer: { show: !!g.sc, width: 4, itemStyle: { color: C.ink } },
+        anchor: {
+          show: !!g.sc,
+          size: 8,
+          itemStyle: { color: C.ink },
+        },
         title: {
           color: C.text,
-          fontSize: narrow ? 11 : 12,
-          offsetCenter: [0, '70%'],
+          fontSize: narrow ? 10 : 11,
+          offsetCenter: [0, '78%'],
         },
         detail: {
           color: C.ink,
-          fontSize: narrow ? 16 : 20,
+          fontSize: narrow ? 13 : 16,
           fontWeight: 700,
-          offsetCenter: [0, '35%'],
-          formatter: v === null ? '—' : '{value}%',
+          offsetCenter: [0, '42%'],
+          formatter: () => String(g.txt),
         },
-        data: [{ value: v ?? min, name }],
-      })
-      return {
-        ...base(narrow),
-        tooltip: { show: false },
-        series: [
-          g(
-            '25%',
-            conn,
-            0,
-            [
-              [THR.connPct[0] / 100, C.ok],
-              [THR.connPct[1] / 100, C.warn],
-              [1, C.risk],
-            ],
-            t('sig.CONN_USE'),
-          ),
-          // 캐시 80~100% 구간 — 95 미만 위험, 99 미만 주의
-          g(
-            '75%',
-            cache,
-            80,
-            [
-              [(THR.cachePct[1] - 80) / 20, C.risk],
-              [(THR.cachePct[0] - 80) / 20, C.warn],
-              [1, C.ok],
-            ],
-            t('sig.CACHE_HIT'),
-          ),
+        data: [
+          {
+            // 바늘은 [min,max] 로 자르고 글자는 실제 값
+            value: g.sc
+              ? Math.min(g.sc.max, Math.max(g.sc.min, g.s!.value!))
+              : 0,
+            name: `${g.name} ${mark(g.lvl)}${g.noLimit ? `\n${t('chart.gaugeNoLimit')}` : ''}`,
+          },
         ],
-      }
-    },
-    [conn, cache, t],
+      })),
+    }),
+    [items, t],
   )
   return (
     <Panel
       id="gauges"
       table={
         <Table
-          head={[t('chart.col.item'), t('chart.col.value')]}
-          rows={[
-            [t('sig.CONN_USE'), conn === null ? '—' : `${conn}%`],
-            [t('sig.CACHE_HIT'), cache === null ? '—' : `${cache}%`],
+          head={[
+            t('chart.col.item'),
+            t('chart.col.value'),
+            t('chart.col.level'),
+            t('chart.col.thr'),
           ]}
+          rows={items.map((g) => [
+            g.name,
+            g.txt,
+            `${mark(g.lvl)} ${t(`level.${g.lvl}`)}`,
+            g.s?.thr
+              ? `▲ ${g.s.thr.warn}${unitTxt(g.s.unit)} · ✕ ${g.s.thr.risk}${unitTxt(g.s.unit)}`
+              : '—',
+          ])}
         />
       }
     >
       <EChart
         option={opt}
-        height={200}
-        ariaLabel={`${t('chart.gauges')} : ${t('sig.CONN_USE')} ${dash(conn)}%, ${t('sig.CACHE_HIT')} ${dash(cache)}%`}
+        height={(narrow) => (narrow ? 320 : 360)}
+        ariaLabel={`${t('chart.gauges')} : ${items.map((g) => `${g.name} ${g.txt}`).join(', ')}`}
       />
+    </Panel>
+  )
+}
+
+// R — 영역별 건강 점수 레이더(8축) : 현재 vs 안전 기준선(점선·사각 마커). '1시간 전'은 스냅샷 4축뿐이라 표 열로만
+function Radar({
+  signals,
+  rows,
+  range,
+}: {
+  signals: Map<SigId, Signal>
+  rows: SnapRow[] | null
+  range: PeriodMin
+}) {
+  const t = useTranslations('monitor.board')
+  const cur = useMemo(() => radarScores(sigLevels(signals.values())), [signals])
+  const ago = useMemo(() => {
+    if (range < 60 || !rows || rows.length < 2) return null
+    // 기준 '지금' = 마지막 스냅샷 시각(렌더 중 Date.now 회피 — 이력은 5분마다 새로 받음)
+    const target = Date.parse(rows[rows.length - 1].bkt_dtm) - 3_600_000
+    let k = -1
+    let best = 5 * 60_000
+    rows.forEach((r, i) => {
+      const d = Math.abs(Date.parse(r.bkt_dtm) - target)
+      if (d <= best) {
+        best = d
+        k = i
+      }
+    })
+    return k < 0 ? null : radarScores(rowLevels(rows[k - 1], rows[k]))
+  }, [rows, range])
+  const axisNm = useCallback(
+    (a: string) => t(`chart.axis.${a}` as 'chart.axis.avail'),
+    [t],
+  )
+  // option 이 렌더마다 새로 만들어지지 않게(setOption 반복 방지) 메모
+  const shown = useMemo(() => cur.filter((p) => p.score !== null), [cur])
+  const out = useMemo(() => cur.filter((p) => p.score === null), [cur])
+  const opt = useCallback(
+    (narrow: boolean): ChartOption => {
+      const marks = new Map(shown.map((p) => [axisNm(p.axis), mark(p.lvl)]))
+      return {
+        ...base(narrow),
+        legend: {
+          ...base(narrow).legend,
+          data: [t('chart.radarCur'), t('chart.radarSafe')],
+        },
+        tooltip: { ...base(narrow).tooltip, trigger: 'item' },
+        radar: {
+          shape: 'polygon',
+          center: ['50%', '56%'],
+          radius: narrow ? '42%' : '65%',
+          splitNumber: 5,
+          splitLine: { lineStyle: { color: 'rgba(137,135,129,0.35)' } }, // 다각형 고리 보이게
+          splitArea: { show: false },
+          axisLine: { lineStyle: { color: 'rgba(137,135,129,0.35)' } },
+          // 축 이름 = 어두운 배지 + 판정 글자(색 외 구분)
+          axisName: {
+            color: C.ink,
+            backgroundColor: C.grid,
+            borderRadius: 3,
+            padding: [3, 5],
+            fontSize: narrow ? 10 : 11,
+            // 좁은 화면 : 긴 축 이름(en 등)은 2줄로 접어 배지가 잘리지 않게
+            ...(narrow ? { width: 70, overflow: 'break' as const } : {}),
+            formatter: (v: string) => `${v} ${marks.get(v) ?? ''}`,
+          },
+          indicator: shown.map((p) => ({ name: axisNm(p.axis), max: 100 })),
+        },
+        series: [
+          {
+            type: 'radar',
+            data: [
+              {
+                name: t('chart.radarCur'),
+                value: shown.map((p) => p.score),
+                symbol: 'circle',
+                symbolSize: 8,
+                lineStyle: { width: 2, color: SERIES[0] },
+                itemStyle: { color: SERIES[0] },
+                areaStyle: {
+                  color: {
+                    type: 'radial',
+                    x: 0.5,
+                    y: 0.5,
+                    r: 0.5,
+                    colorStops: [
+                      { offset: 0, color: rgba(SERIES[0], 0.45) },
+                      { offset: 1, color: rgba(SERIES[0], 0.05) },
+                    ],
+                  },
+                },
+              },
+              {
+                name: t('chart.radarSafe'),
+                value: shown.map(() => RADAR_SAFE),
+                symbol: 'rect',
+                symbolSize: 6,
+                lineStyle: { width: 1.5, type: 'dashed', color: C.gray },
+                itemStyle: { color: C.gray },
+              },
+            ],
+          },
+        ],
+      }
+    },
+    [shown, axisNm, t],
+  )
+  return (
+    <Panel
+      id="radar"
+      table={
+        <Table
+          head={[
+            t('chart.col.item'),
+            t('chart.col.score'),
+            t('chart.col.level'),
+            t('chart.col.ago'),
+          ]}
+          rows={cur.map((p, i) => [
+            axisNm(p.axis),
+            dash(p.score),
+            `${mark(p.lvl)} ${t(`level.${p.lvl}`)}`,
+            dash(ago?.[i].score),
+          ])}
+        />
+      }
+    >
+      {shown.length < 3 ? (
+        <Empty k="noData" />
+      ) : (
+        <EChart
+          option={opt}
+          height={300}
+          ariaLabel={`${t('chart.radar')} : ${shown.map((p) => `${axisNm(p.axis)} ${p.score}`).join(', ')}`}
+        />
+      )}
+      {out.length > 0 && (
+        <p className="text-muted-foreground text-xs break-keep">
+          {t('chart.radarOut', {
+            list: out.map((p) => axisNm(p.axis)).join(' · '),
+          })}
+        </p>
+      )}
+    </Panel>
+  )
+}
+
+// F — 앱 → 계정 → 세션 상태 산키(그라데이션 연결선, 마우스를 올리면 인접 강조). 쿼리문·pid·주소는 없음(A3)
+const FLOW_STATE_COLOR: Record<string, string> = {
+  lockWait: C.risk,
+  idleTx: C.warn,
+  active: C.blue,
+  idle: C.gray,
+}
+function Flow({ fast }: { fast: BoardFast }) {
+  const t = useTranslations('monitor.board.chart')
+  const f = fast.flow
+  const disp = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const n of f?.nodes ?? [])
+      m.set(
+        n.id,
+        n.fold !== undefined
+          ? t('otherN', { n: n.fold })
+          : n.kind === 'state'
+            ? t(`flowState.${n.label}` as 'flowState.idle')
+            : n.label === ''
+              ? t('noApp')
+              : n.label,
+      )
+    return m
+  }, [f, t])
+  const nm = useCallback((id: string) => disp.get(id) ?? id, [disp])
+  const color = (n: FlowNode) =>
+    n.kind === 'app'
+      ? SERIES[0]
+      : n.kind === 'user'
+        ? SERIES[2]
+        : FLOW_STATE_COLOR[n.label]
+  const height = useMemo(() => {
+    const per = { app: 0, user: 0, state: 0 }
+    for (const n of f?.nodes ?? []) per[n.kind]++
+    return Math.min(480, Math.max(240, Math.max(...Object.values(per)) * 24))
+  }, [f])
+  const opt = useCallback(
+    (narrow: boolean): ChartOption => ({
+      ...base(narrow),
+      tooltip: {
+        ...base(narrow).tooltip,
+        trigger: 'item',
+        formatter: (p: {
+          dataType: string
+          name: string
+          value: number
+          data: { source?: string; target?: string }
+        }) =>
+          p.dataType === 'edge'
+            ? `${esc(nm(p.data.source!))} → ${esc(nm(p.data.target!))} : ${p.value} ${t('col.sessions')}`
+            : `${esc(nm(p.name))} : ${p.value}`,
+      },
+      series: [
+        {
+          type: 'sankey',
+          left: 8,
+          top: 8,
+          bottom: 8,
+          right: narrow ? 64 : 110,
+          layoutIterations: 32,
+          nodeAlign: 'justify',
+          nodeWidth: narrow ? 8 : 12,
+          nodeGap: narrow ? 6 : 10,
+          data: (f?.nodes ?? []).map((n) => ({
+            name: n.id,
+            itemStyle: { color: color(n) },
+            // 상태(마지막 열) 이름은 노드 왼쪽 안쪽에 — 오른쪽 여백 밖으로 잘림 방지
+            ...(n.kind === 'state' ? { label: { position: 'left' } } : {}),
+          })),
+          links: f?.links ?? [],
+          lineStyle: { color: 'gradient', curveness: 0.5, opacity: 0.35 },
+          emphasis: { focus: 'adjacency', lineStyle: { opacity: 0.7 } },
+          itemStyle: { borderColor: C.surface, borderWidth: 2 },
+          label: {
+            color: C.ink,
+            fontSize: narrow ? 9 : 11,
+            formatter: (p: { name: string }) => short(nm(p.name), narrow),
+          },
+        },
+      ],
+    }),
+    [f, nm, t],
+  )
+  const links = useMemo(
+    () => [...(f?.links ?? [])].sort((a, b) => b.value - a.value),
+    [f],
+  )
+  return (
+    <Panel
+      id="flow"
+      wide
+      table={
+        links.length > 0 && (
+          <Table
+            head={[t('col.from'), t('col.to'), t('col.sessions')]}
+            rows={links.map((l) => [nm(l.source), nm(l.target), l.value])}
+          />
+        )
+      }
+    >
+      {!f || f.nodes.length === 0 ? (
+        <Empty k="noSess" />
+      ) : (
+        <EChart
+          option={opt}
+          height={height}
+          ariaLabel={`${t('flow')} : ${links
+            .slice(0, 5)
+            .map((l) => `${nm(l.source)} → ${nm(l.target)} ${l.value}`)
+            .join(', ')}`}
+        />
+      )}
+      {f?.partial && (
+        <p className="text-muted-foreground text-xs">{t('partial')}</p>
+      )}
+    </Panel>
+  )
+}
+
+// T — 스키마 → 테이블 용량 지도(면적 = 총 크기, 색 = 죽은 행 판정 = VACUUM 카드와 같은 rateDead). 스키마를 누르면 테이블로
+const TREE_LVLS: Lvl[] = ['OK', 'WARN', 'RISK', 'NA']
+function SizeTreemap({ slow }: { slow: BoardSlow | null }) {
+  const t = useTranslations('monitor.board')
+  const tree = slow?.tree
+  const label = useCallback(
+    (n: TreeNode, top: boolean) =>
+      n.name === '__other'
+        ? t(top ? 'chart.otherSchema' : 'chart.otherN', { n: n.fold ?? 0 })
+        : n.name,
+    [t],
+  )
+  const data = useMemo(() => {
+    const map = (n: TreeNode, top: boolean): Record<string, unknown> => ({
+      name: label(n, top),
+      value: n.value,
+      deadPct: n.deadPct,
+      lvl: n.lvl,
+      // 정상(초록)·주의(노랑) 칸은 흰 글자 대비가 4.5:1 미만이라 어두운 글자, 위험·해당 없음만 흰 글자
+      itemStyle: { color: lvlColor(n.lvl) },
+      label: { color: n.lvl === 'OK' || n.lvl === 'WARN' ? '#0b0d14' : '#fff' },
+      ...(n.children?.length
+        ? { children: n.children.map((c) => map(c, false)) }
+        : {}),
+    })
+    return (tree?.nodes ?? []).map((n) => map(n, true))
+  }, [tree, label])
+  const opt = useCallback(
+    (narrow: boolean): ChartOption => ({
+      ...base(narrow),
+      tooltip: {
+        ...base(narrow).tooltip,
+        trigger: 'item',
+        formatter: (p: {
+          value: number
+          data: { deadPct: number | null; lvl: Lvl }
+          treePathInfo: { name: string }[]
+        }) =>
+          `${esc(
+            p.treePathInfo
+              .map((x) => x.name)
+              .filter(Boolean)
+              .join(' / '),
+          )}<br/>${fmtBytes(p.value)} · ${t('chart.deadPct')} ${p.data.deadPct === null ? '—' : `${p.data.deadPct}%`}<br/>${mark(p.data.lvl)} ${t(`level.${p.data.lvl}`)}`,
+      },
+      series: [
+        {
+          type: 'treemap',
+          top: 8,
+          left: 0,
+          right: 0,
+          bottom: 28,
+          roam: false,
+          nodeClick: 'zoomToNode',
+          // 스키마가 1개(대부분 public)면 첫 화면부터 테이블까지 — 한 덩어리 단색 방지
+          leafDepth: data.length === 1 ? 2 : 1,
+          visibleMin: 300,
+          breadcrumb: {
+            show: true,
+            bottom: 0,
+            itemStyle: { color: C.grid, textStyle: { color: C.ink } },
+          },
+          levels: [
+            {
+              itemStyle: {
+                borderColor: C.surface,
+                borderWidth: 2,
+                gapWidth: 2,
+              },
+              upperLabel: { show: true, height: 18, color: C.ink },
+            },
+            { itemStyle: { gapWidth: 2, borderColor: C.surface } },
+          ],
+          label: {
+            fontSize: narrow ? 9 : 11,
+            // 판정 기호(✓▲✕–)를 칸에도 표시 — 색만으로 구분하지 않게(색각 이상·터치 사용자)
+            formatter: (p: {
+              name: string
+              value: number
+              data: { lvl: Lvl }
+            }) =>
+              `${mark(p.data.lvl)} ${short(p.name, narrow)}\n${fmtBytes(p.value)}`,
+          },
+          data,
+        },
+      ],
+    }),
+    [data, t],
+  )
+  const rowsT = useMemo(
+    () =>
+      (tree?.nodes ?? []).flatMap((s) =>
+        (s.children?.length ? s.children : [null]).map((c) => {
+          const n = c ?? s
+          return [
+            label(s, true),
+            c ? label(c, false) : '—',
+            fmtBytes(n.value),
+            n.deadPct === null ? '—' : `${n.deadPct}%`,
+            `${mark(n.lvl)} ${t(`level.${n.lvl}`)}`,
+          ]
+        }),
+      ),
+    [tree, label, t],
+  )
+  // SizeTop 과 같은 규칙 — 받은 뒤 비면(또는 구 응답이라 tree 없음) 숨김
+  if (slow && !tree?.nodes.length) return null
+  return (
+    <Panel
+      id="tree"
+      wide
+      table={
+        rowsT.length > 0 && (
+          <Table
+            head={[
+              t('chart.col.schema'),
+              t('chart.tbl'),
+              t('chart.col.size'),
+              t('chart.deadPct'),
+              t('chart.col.level'),
+            ]}
+            rows={rowsT}
+          />
+        )
+      }
+    >
+      {!slow ? (
+        <Empty k="loading" />
+      ) : (
+        <>
+          <ul className="text-muted-foreground flex flex-wrap gap-3 text-xs">
+            {TREE_LVLS.map((l) => (
+              <li key={l} className="flex items-center gap-1">
+                <span
+                  aria-hidden
+                  className="inline-block size-2.5 rounded-sm"
+                  style={{ background: lvlColor(l) }}
+                />
+                {mark(l)} {l === 'NA' ? t('chart.noStat') : t(`level.${l}`)}
+              </li>
+            ))}
+          </ul>
+          <EChart
+            option={opt}
+            height={(narrow) => (narrow ? 280 : 320)}
+            ariaLabel={`${t('chart.tree')} : ${(tree?.nodes ?? [])
+              .map((n) => `${label(n, true)} ${fmtBytes(n.value)}`)
+              .join(', ')}`}
+          />
+          {tree?.partial && (
+            <p className="text-muted-foreground text-xs">
+              {t('chart.partial')}
+            </p>
+          )}
+        </>
+      )}
     </Panel>
   )
 }

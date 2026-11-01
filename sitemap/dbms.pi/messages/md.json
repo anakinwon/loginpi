@@ -691,7 +691,7 @@
       "chart": {
         "title": "Tendințe și clasamente",
         "note": "Tendințele sunt înregistrate în fiecare minut cât timp acest ecran este deschis (fără colectare în fundal).",
-        "gauges": "Indicatoare conexiune și cache",
+        "gauges": "Indicatori limită",
         "sessState": "Sesiuni chiar acum",
         "sessTrend": "Tendința sesiunilor și așteptări de blocare",
         "tpsCombo": "Debit și rata de rollback",
@@ -702,7 +702,7 @@
         "sizeTop": "Top 10 spațiu",
         "heat": "Risc pe semnal în timp",
         "q": {
-          "gauges": "Se umplu conexiunile? Se citesc datele din memorie?",
+          "gauges": "Cât de aproape sunt conexiunile, memoria cache, răspunsurile și stocarea de limitele lor?",
           "sessState": "Ce fac sesiunile acum?",
           "sessTrend": "Crește numărul de așteptări de blocare când se acumulează sesiunile?",
           "tpsCombo": "Debit și rata de eșec se mișcă împreună?",
@@ -710,7 +710,10 @@
           "capacity": "Când se va umple DB-ul?",
           "slowTop": "Ce să optimizez mai întâi? (după timpul total)",
           "sizeTop": "Ce ocupă spațiul?",
-          "heat": "Riscul este o întâmplare sau se repetă?"
+          "heat": "Riscul este o întâmplare sau se repetă?",
+          "radar": "Ce zonă este slabă?",
+          "flow": "Ce aplicații și conturi creează sesiuni problematice?",
+          "tree": "Ce ocupă spațiu și ce necesită curățare?"
         },
         "asTable": "Vizualizați ca tabel",
         "needHistory": "Încă nu există o tendință — mențineți acest ecran deschis câteva minute.",
@@ -744,8 +747,48 @@
           "calls": "Apeluri",
           "total": "Total (ms)",
           "mean": "Medie (ms)",
-          "share": "Cotă"
-        }
+          "share": "Cotă",
+          "score": "Scor",
+          "level": "Nivel",
+          "ago": "Acum 1 oră",
+          "from": "De la",
+          "to": "Către",
+          "sessions": "Sesiuni",
+          "schema": "Schemă",
+          "size": "Dimensiune",
+          "thr": "Prag (avertisment·risc)"
+        },
+        "radar": "Scor de sănătate pe zonă",
+        "radarCur": "Acum",
+        "radarSafe": "Linie de bază sigură",
+        "radarAgo": "Acum 1 oră",
+        "radarOut": "Nu se poate măsura: {list}",
+        "axis": {
+          "avail": "Disponibilitate",
+          "sess": "Sesiuni",
+          "lock": "Blocări",
+          "perf": "Performanța interogărilor",
+          "store": "Stocare",
+          "maint": "Mentenanță",
+          "idx": "Indexuri",
+          "protect": "Replicare/backup"
+        },
+        "flow": "Aplicație → cont → stare sesiune",
+        "flowState": {
+          "lockWait": "Așteptare blocare",
+          "active": "Activ",
+          "idleTx": "Inactiv în tranzacție",
+          "idle": "Inactiv"
+        },
+        "noApp": "(fără nume aplicație)",
+        "otherN": "{n} altele",
+        "otherSchema": "{n} alte scheme",
+        "tree": "Hartă dimensiune schemă și tabel",
+        "deadPct": "Raport rânduri inactive",
+        "partial": "Agregat până la 500 de rânduri.",
+        "gaugeNoLimit": "Fără regulă de limită de stocare",
+        "rsp": "Timp de răspuns",
+        "noStat": "Fără statistici"
       },
       "empty": {
         "noConn": "Această taxonomie nu are o conexiune la serverul PostgreSQL de monitorizat — se afișează doar URL-uri și starea serviciului.",

@@ -692,7 +692,7 @@
       "chart": {
         "title": "Tendències i classificacions",
         "note": "Les tendències es registren cada minut mentre aquesta pantalla està oberta (sense recollida en segon pla).",
-        "gauges": "Indicadors de connexió i memòria cau",
+        "gauges": "Indicadors de límit",
         "sessState": "Sessions ara mateix",
         "sessTrend": "Tendència de sessions i esperes de bloqueig",
         "tpsCombo": "Rendiment i taxa de rollback",
@@ -703,7 +703,7 @@
         "sizeTop": "Top 10 d'espai",
         "heat": "Risc per senyal al llarg del temps",
         "q": {
-          "gauges": "Les connexions s'estan omplint? Les lectures es serveixen des de la memòria?",
+          "gauges": "Fins a quin punt s'acosten les connexions, la memòria cau, les respostes i l'emmagatzematge als seus límits?",
           "sessState": "Què estan fent les sessions ara?",
           "sessTrend": "Augmenten les esperes de bloqueig quan s'acumulen les sessions?",
           "tpsCombo": "El rendiment i la taxa d'errors es mouen junts?",
@@ -711,7 +711,10 @@
           "capacity": "Quan s'omplirà la DB?",
           "slowTop": "Què cal ajustar primer? (per temps total)",
           "sizeTop": "Què ocupa l'espai?",
-          "heat": "El risc és puntual o recurrent?"
+          "heat": "El risc és puntual o recurrent?",
+          "radar": "Quina àrea és feble?",
+          "flow": "Quines aplicacions i comptes creen sessions problemàtiques?",
+          "tree": "Què ocupa espai i què cal netejar?"
         },
         "asTable": "Mostra com a taula",
         "needHistory": "Encara no hi ha tendència — mantingueu aquesta pantalla oberta uns minuts.",
@@ -745,8 +748,48 @@
           "calls": "Crides",
           "total": "Total (ms)",
           "mean": "Mitjana (ms)",
-          "share": "Quota"
-        }
+          "share": "Quota",
+          "score": "Puntuació",
+          "level": "Nivell",
+          "ago": "Fa 1 hora",
+          "from": "Des de",
+          "to": "A",
+          "sessions": "Sessions",
+          "schema": "Esquema",
+          "size": "Mida",
+          "thr": "Llindar (advertència·risc)"
+        },
+        "radar": "Puntuació de salut per àrea",
+        "radarCur": "Ara",
+        "radarSafe": "Línia de base segura",
+        "radarAgo": "Fa 1 hora",
+        "radarOut": "No mesurable: {list}",
+        "axis": {
+          "avail": "Disponibilitat",
+          "sess": "Sessions",
+          "lock": "Bloquejos",
+          "perf": "Rendiment de la consulta",
+          "store": "Emmagatzematge",
+          "maint": "Manteniment",
+          "idx": "Índexs",
+          "protect": "Replicació/còpia de seguretat"
+        },
+        "flow": "Aplicació → compte → estat de la sessió",
+        "flowState": {
+          "lockWait": "Espera de bloqueig",
+          "active": "Actiu",
+          "idleTx": "Inactiu en transacció",
+          "idle": "Inactiu"
+        },
+        "noApp": "(sense nom d'aplicació)",
+        "otherN": "{n} altres",
+        "otherSchema": "{n} altres esquemes",
+        "tree": "Mapa de mida d'esquema i taula",
+        "deadPct": "Percentatge de files mortes",
+        "partial": "Agregat fins a 500 files només.",
+        "gaugeNoLimit": "Sense regla de límit d'emmagatzematge",
+        "rsp": "Temps de resposta",
+        "noStat": "Sense estadístiques"
       },
       "empty": {
         "noConn": "Aquesta taxonomia no té cap connexió de servidor PostgreSQL per monitoritzar — només es mostren les URL i l'estat del servei.",

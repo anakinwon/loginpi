@@ -692,7 +692,7 @@
       "chart": {
         "title": "Trendit ja sijoitukset",
         "note": "Trendit tallennetaan minuutin välein tämän näytön ollessa auki (ei taustakeräystä).",
-        "gauges": "Yhteys- ja välimuistimittarit",
+        "gauges": "Rajamittarit",
         "sessState": "Istuntojen tila nyt",
         "sessTrend": "Istuntotrendi ja lukituksen odotukset",
         "tpsCombo": "Suorituskyky ja palautusaste",
@@ -703,7 +703,7 @@
         "sizeTop": "Tilan TOP 10",
         "heat": "Riski signaalin mukaan ajan mittaan",
         "q": {
-          "gauges": "Ovatko yhteydet täyttymässä? Luetaanko muistista?",
+          "gauges": "Kuinka lähellä yhteydet, välimuisti, vastaukset ja tallennustila ovat rajojaan?",
           "sessState": "Mitä istunnot tekevät nyt?",
           "sessTrend": "Kasvoivatko lukituksen odotukset, kun istuntoja kertyi?",
           "tpsCombo": "Liikkuvatko suorituskyky ja virheprosentti yhdessä?",
@@ -711,7 +711,10 @@
           "capacity": "Milloin DB täyttyy?",
           "slowTop": "Mitä virittää ensin? (kokonaisajan mukaan)",
           "sizeTop": "Mikä vie tilaa?",
-          "heat": "Onko riski kertaluonteinen vai toistuva?"
+          "heat": "Onko riski kertaluonteinen vai toistuva?",
+          "radar": "Mikä alue on heikko?",
+          "flow": "Mitkä sovellukset ja tilit luovat ongelmallisia istuntoja?",
+          "tree": "Mikä vie tilaa ja mikä tarvitsee siivousta?"
         },
         "asTable": "Näytä taulukkona",
         "needHistory": "Ei trendiä vielä – pidä tämä näyttö auki muutaman minuutin ajan.",
@@ -745,8 +748,48 @@
           "calls": "Kutsut",
           "total": "Yhteensä (ms)",
           "mean": "Keskimääräinen (ms)",
-          "share": "Osuus"
-        }
+          "share": "Osuus",
+          "score": "Pisteet",
+          "level": "Taso",
+          "ago": "1 tunti sitten",
+          "from": "Lähtö",
+          "to": "Kohde",
+          "sessions": "Istuntoja",
+          "schema": "Skeema",
+          "size": "Koko",
+          "thr": "Kynnys (varoitus·riski)"
+        },
+        "radar": "Terveyspisteet alueittain",
+        "radarCur": "Nyt",
+        "radarSafe": "Turvallinen perustaso",
+        "radarAgo": "1 tunti sitten",
+        "radarOut": "Ei mitattavissa: {list}",
+        "axis": {
+          "avail": "Saatavuus",
+          "sess": "Istunnot",
+          "lock": "Lukitukset",
+          "perf": "Kyselyn suorituskyky",
+          "store": "Tallennustila",
+          "maint": "Ylläpito",
+          "idx": "Indeksit",
+          "protect": "Replikointi/varmuuskopiointi"
+        },
+        "flow": "Sovellus → tili → istunnon tila",
+        "flowState": {
+          "lockWait": "Lukituksen odotus",
+          "active": "Aktiivinen",
+          "idleTx": "Toimeton transaktiossa",
+          "idle": "Toimeton"
+        },
+        "noApp": "(ei sovelluksen nimeä)",
+        "otherN": "{n} muuta",
+        "otherSchema": "{n} muuta skeemaa",
+        "tree": "Skeeman ja taulukon kokokartta",
+        "deadPct": "Kuolleiden rivien suhde",
+        "partial": "Aggregoitu vain 500 riviin asti.",
+        "gaugeNoLimit": "Ei tallennustilan rajoitussääntöä",
+        "rsp": "Vasteaika",
+        "noStat": "Ei tilastoja"
       },
       "empty": {
         "noConn": "Tässä taksonomiassa ei ole PostgreSQL-palvelinyhteyttä valvottavaksi – näytetään vain URL-osoitteet ja palvelun tila.",
