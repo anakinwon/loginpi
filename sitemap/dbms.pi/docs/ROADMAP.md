@@ -44,7 +44,10 @@ Phase 0 ─▶ 1 MVP ─▶ 2 등재
 - [ ] 비운영 스키마(`dbms_dev`·`dbms_stg`) 유지 여부 — seminar.pi 406 폐지 결정 적용 확인(PRD §8 점검, TROUBLESHOOT L14)
 - [ ] (고객) Pi Developer Portal testnet 앱 등록 · API 키 · 도메인 검증 (ENV_GUIDE 3.2)
 - [ ] (고객) pi-nonprod Exposed schemas `dbms_dev`·`dbms_stg` → (서비스) `db-migrate.mjs --app dbms --tier dev`
-- [ ] (고객) Vercel 프로젝트(Root Directory `sitemap/dbms.pi`, 운영 브랜치 `prod/dbms`) · Google OAuth 클라이언트
+- [x] (고객) Vercel 프로젝트 `dbms` 생성(Root Directory `sitemap/dbms.pi`, 주소 https://dbmspi.vercel.app) · GitHub 연동(커밋 상태 `Vercel – dbms` 기록 확인) — 2026-11-01
+- [x] (서비스) 운영 브랜치 `prod/dbms` 생성(`promote-to-prod.mjs --app dbms`, 2026-11-01)
+- [ ] (고객) Vercel Production Branch = `prod/dbms` 설정 · 환경변수 Production·Preview 등록 · 첫 빌드 success 확인
+- [ ] (고객) Google OAuth 클라이언트
 - [ ] PRD_28 §1.1-2·LOGIN_PLAYBOOK Google 예외 등재(dbms.pi, schema.pi 함께)
 
 **완료 기준** : PRD v1.0 · Pi 앱 ID · 비운영 DB · 스테이징 URL
