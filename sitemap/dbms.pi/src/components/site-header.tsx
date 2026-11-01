@@ -1,11 +1,12 @@
 'use client'
 
 // dbms.pi 상단 헤더 — 로고 · 로그인 상태(Pi 세션 OR Google 연동 세션, useAppUser 통합) · 맨 오른쪽 끝 = 언어 콤보(국기·환율) → π 시세칩
-//  (loginpi header.tsx 와 같은 순서, 다국어 표준 4.6 — 언어 콤보는 하단 바·푸터 금지). 하단 메뉴는 화면이 늘면 추가
+//  (loginpi header.tsx 와 같은 순서, 다국어 표준 4.6 — 언어 콤보는 하단 바·푸터 금지). 그 아래 줄 = 기능 메뉴(FeatureNav)
 import { useLocale } from 'next-intl'
 import { PiPriceChip } from '@pi/i18n/client'
 import { Link } from '@/i18n/navigation'
 import { AuthStatus } from './auth-status'
+import { FeatureNav } from './feature-nav'
 import { LanguageSwitcher } from './language-switcher'
 
 // Pi 가치(언어 콤보 Pi 환산·π 시세칩) — 기본 표시, 'false' 면 숨김(loginpi override 와 같은 이름)
@@ -30,6 +31,7 @@ export function SiteHeader() {
           <AuthStatus />
         </nav>
       </div>
+      <FeatureNav />
     </header>
   )
 }

@@ -8,9 +8,19 @@
     "headline": "Make your DB engine run your data fast and safely",
     "description": "A DBA and SQLP workbench for execution plans, statistics, and performance. schema.pi handles design and standards; dbms.pi is its partner on the engine side.",
     "welcome": "Welcome, {name}.",
-    "connTitle": "schema.pi connection",
-    "connBadge": "Coming soon",
-    "connBody": "We are preparing a connection that reads taxonomies, DBMS profiles, and connection lists from schema.pi."
+    "featTitle": "Features",
+    "featDesc": {
+      "connect": "Register a schema.pi link token and check connection status",
+      "sqlLab": "Plan tree, warnings, comparison and anti-pattern checks against standard domains",
+      "perf": "Slow query Top-N, table/index health, capacity forecast, activity and locks",
+      "monitor": "App, DB and URL metric summary with threshold alerts",
+      "drift": "Compare schema.pi model and DDL history with the real catalog, measure index effect",
+      "migration": "Topological load order, chunks, checklist and verification SQL",
+      "pipeline": "Change-capture precheck and source→transform→target pipeline definitions",
+      "analytics": "KPI dashboard, 3-layer lake mapping and dataset catalog",
+      "ops": "Read-only diagnosis of parameters, roles, backup and replication DR",
+      "learn": "SQLP/DAP practice questions, tuning cases and DBMS comparison dictionary"
+    }
   },
   "auth": {
     "checking": "Checking sign-in…",
@@ -77,5 +87,838 @@
     "LINK_CODE_GEN_FAILED": "Could not create a link code. Please try again later.",
     "AUTH_DB_UNAVAILABLE": "Could not save your account, so sign-in failed. Please try again later.",
     "LINK_TRY_LIMIT": "Too many incorrect link codes. Try again in 15 minutes."
+  },
+  "analytics": {
+    "title": "Analytics & Lake",
+    "intro": "dbms activity KPIs, three-layer lake design and dataset catalog in one place.",
+    "storageNotice": "Lake storage (customer-side or cloud) is not decided yet (PRD section 10 #7). Only designs and name mappings are stored for now — no row data.",
+    "noLink": "Select or register a schema.pi link first.",
+    "goConnect": "Register a link",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "kpi": {
+      "title": "KPI dashboard",
+      "updatedAt": "{area} · as of {time}",
+      "notBuilt": "Not built",
+      "keys": {
+        "links": "My links",
+        "perf": "Perf snapshots",
+        "drift": "Drift runs",
+        "mig": "Migration plans",
+        "pipe": "Pipelines",
+        "lake": "Lake datasets"
+      },
+      "countsChart": "Totals by feature",
+      "trendTitle": "Perf snapshots in the last 14 days",
+      "trendItem": "{day}: {cnt}",
+      "trendEmpty": "No perf snapshots in the last 14 days.",
+      "monTitle": "schema.pi monitor summary (last hour)",
+      "monTps": "Requests/s",
+      "monErr": "Error rate",
+      "monAvg": "Avg response (ms)",
+      "monDb": "DB connections",
+      "monFail": "Could not load the monitor summary: {msg}"
+    },
+    "lake": {
+      "title": "Three-layer lake design",
+      "raw": "Raw",
+      "rawDesc": "Loads source DB column names and types as they are.",
+      "std": "Standardized",
+      "stdDesc": "Renames columns to schema.pi approved standard terms.",
+      "cur": "Curated",
+      "curDesc": "Analysis datasets grouped by entity.",
+      "loadProjects": "Load projects",
+      "project": "Project",
+      "pickProject": "Choose a project",
+      "noProjects": "No projects in this area.",
+      "noTables": "This project's model has no tables.",
+      "conform": "Standard conformance {pct}%",
+      "tableSummary": "{tbl} → {std} · {cnt} columns · {pct}% conformant",
+      "colSrc": "Source column",
+      "colStd": "Standardized column",
+      "colType": "Type",
+      "colOk": "Format",
+      "ok": "OK",
+      "ng": "Check",
+      "pk": "PK",
+      "selectAll": "Select all",
+      "selected": "{cnt} selected",
+      "save": "Add to lake design",
+      "saved": "Added {cnt} to the catalog."
+    },
+    "catalog": {
+      "title": "Dataset catalog",
+      "schemaCard": "schema.pi is the source of truth for analysis dataset definitions, metadata search and glossary. Here you only see lake load status and freshness.",
+      "openSchema": "View definitions in schema.pi",
+      "empty": "No tables added to the lake design yet.",
+      "status": {
+        "DSGN": "Design only",
+        "LOADED": "Loaded",
+        "FAIL": "Load failed"
+      },
+      "lastLoad": "Last load {time}",
+      "neverLoaded": "Never loaded",
+      "remove": "Remove",
+      "removeConfirm": "Remove {tbl} from the catalog?",
+      "prev": "Prev",
+      "next": "Next",
+      "page": "Page {page}"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Select a link first.",
+      "NOT_FOUND": "Not found. Check whether the model has changed."
+    }
+  },
+  "drift": {
+    "title": "Model ↔ DB Drift",
+    "intro": "Compare the schema.pi design model and DDL apply history with the live DB catalog to find drift, and measure whether designed indexes are actually used. Customer row data is never read or stored.",
+    "needLink": "Pick a schema.pi link above first. If you have none, register a token in the 'Link' menu.",
+    "needConn": "Pick the DB connection to compare above.",
+    "project": "Project",
+    "projectPick": "Select a project",
+    "loading": "Loading…",
+    "run": "Run drift detection",
+    "running": "Comparing…",
+    "readOnly": "Only read-only catalog and statistics queries are run.",
+    "applyInSchema": "Apply fixes (model edits, DDL generation and execution) in schema.pi, the source of truth.",
+    "history": "Detection history",
+    "prev": "Prev",
+    "next": "Next",
+    "none": "None",
+    "model": "Model",
+    "reqNo": "Request {id}",
+    "notSaved": "Could not save this run to history (results are shown normally).",
+    "capped": "Too many items — showing the first {cap} per section (counts are complete).",
+    "statsMissing": "Index usage statistics were unavailable, so usage could not be judged.",
+    "sum": {
+      "missingTables": "Tables missing in DB",
+      "extraTables": "Tables not in model",
+      "colMismatches": "Column mismatches",
+      "missingIndexes": "Designed indexes missing in DB",
+      "extraIndexes": "Indexes not in model",
+      "ddlMissing": "Objects gone after apply",
+      "unusedIndexes": "Unused designed indexes"
+    },
+    "sec": {
+      "ddlMissing": "DDL applied but missing in DB",
+      "missingTables": "Tables in model but missing in DB",
+      "extraTables": "Tables in DB but not in model",
+      "colMismatches": "Column type / NULL mismatches",
+      "missingIndexes": "Designed indexes missing in DB",
+      "extraIndexes": "Indexes only in DB (excluding PK)",
+      "idxUsage": "Designed index effectiveness"
+    },
+    "hint": {
+      "ddlMissing": "schema.pi recorded these objects as applied, but they are gone — suspect a manual drop or rollback.",
+      "extraTables": "These may belong to other projects or system tables on this connection.",
+      "idxUsage": "Zero scans since the last statistics reset means unused. Check the statistics window before dropping."
+    },
+    "kind": {
+      "MISSING": "missing in DB",
+      "EXTRA": "not in model",
+      "TYPE": "type differs",
+      "NULL": "nullability differs"
+    },
+    "col": {
+      "idx": "Index",
+      "scans": "Scans",
+      "size": "Size",
+      "status": "Verdict"
+    },
+    "usage": {
+      "USED": "In use",
+      "UNUSED": "Unused designed index",
+      "NO_STATS": "No statistics"
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "The schema.pi link is not ready yet. Please try again shortly.",
+      "LINK_DOWN": "Cannot reach schema.pi. Please try again shortly.",
+      "LINK_AUTH": "The link token has expired or been revoked. Issue a new token in schema.pi and register it again.",
+      "LINK_NOT_FOUND": "Link not found. Please pick the link again.",
+      "LINK_SCOPE": "This connection does not belong to the link's taxonomy.",
+      "CONN_UNSUPPORTED": "Unsupported connection (PostgreSQL server connections only for now).",
+      "TIMEOUT": "The request timed out. Please try again shortly.",
+      "RATE": "Too many requests. Please try again in a minute."
+    }
+  },
+  "learn": {
+    "title": "DBA Learning",
+    "intro": "SQLP/DAP practice questions, a tuning casebook, and an Oracle/Tibero/PostgreSQL comparison dictionary. Works without a link; pick a link to also see your schema.pi standard type mapping.",
+    "loading": "Loading…",
+    "tabs": {
+      "quiz": "Practice",
+      "cases": "Tuning cases",
+      "dict": "DBMS dictionary"
+    },
+    "topics": {
+      "INDEX": "Index scans",
+      "JOIN": "Join methods",
+      "PARTITION": "Partition pruning",
+      "NORMAL": "Normalization",
+      "NAMING": "Standard naming",
+      "ISOLATION": "Isolation levels",
+      "LOCK": "Locks"
+    },
+    "levels": {
+      "1": "Basic",
+      "2": "Intermediate",
+      "3": "Advanced"
+    },
+    "quiz": {
+      "score": "My progress",
+      "scoreLine": "{solved} of {total} solved · {correct} correct",
+      "right": "Correct",
+      "wrong": "Incorrect",
+      "retry": "Try again",
+      "prevRight": "Previously correct",
+      "prevWrong": "Previously incorrect"
+    },
+    "cases": {
+      "notice": "All cases are self-written learning examples; numbers are illustrative (no customer data).",
+      "problem": "Problem SQL",
+      "plan": "Plan summary",
+      "cause": "Cause",
+      "fix": "Fixed SQL",
+      "effect": "Effect"
+    },
+    "cats": {
+      "ALL": "All",
+      "TYPE": "Data types",
+      "FUNC": "Functions",
+      "PAGING": "Paging",
+      "SEQ": "Sequences",
+      "DATE": "Dates",
+      "SYNTAX": "Syntax"
+    },
+    "dict": {
+      "search": "Search (e.g. NVL, LIMIT)",
+      "item": "Item",
+      "note": "Note",
+      "empty": "No matching items",
+      "loading": "Loading…",
+      "liveTitle": "Standard type mapping of my subject area",
+      "liveIntro": "Pick a link to load the schema.pi DBMS profile (logical → physical type). The dictionary above works without a link.",
+      "liveLoad": "Load type mapping",
+      "lgcType": "Logical type"
+    }
+  },
+  "link2": {
+    "title": "schema.pi connection",
+    "intro": "Register a connection token to use the DB connections of a schema.pi subject area in dbms.pi. Tokens are stored encrypted, and no row data from your databases is stored.",
+    "howTitle": "How to issue a connection token",
+    "how1": "Sign in to schema.pi and open the subject area to connect",
+    "how2": "Go to Subject area → Settings → Connection token and press 'Issue token' (area admin or DA role)",
+    "how3": "Copy the token starting with slk_ — it is shown only once when issued",
+    "how4": "Paste it below and register",
+    "openSchema": "Open schema.pi",
+    "registerTitle": "Register connection",
+    "tokenLabel": "Connection token",
+    "tokenPlaceholder": "slk_…",
+    "register": "Register",
+    "registering": "Checking…",
+    "registered": "Subject area '{area}' is now connected",
+    "replaced": "Replaced the token of subject area '{area}'",
+    "myLinks": "My connections",
+    "empty": "No connections registered",
+    "loading": "Loading…",
+    "regDtm": "Registered {dtm}",
+    "remove": "Disconnect",
+    "removeConfirm": "Disconnect '{area}'? Screens using this connection will no longer be able to access it.",
+    "prev": "Previous",
+    "next": "Next",
+    "statusTitle": "Connection status",
+    "noConns": "No DB connections in this subject area (add one in schema.pi)",
+    "colConn": "Connection",
+    "colDbms": "DBMS",
+    "colMthd": "Method",
+    "colHost": "Host",
+    "colTest": "Last test",
+    "colAgent": "Agent last seen",
+    "never": "None",
+    "retry": "Retry",
+    "pickerLink": "Link",
+    "pickerConn": "Connection",
+    "pickerEmpty": "No connections —",
+    "pickerGo": "register one at /connect",
+    "errors": {
+      "LINK_AUTH": "The connection token has expired or been revoked. Issue a new token in schema.pi and register again",
+      "LINK_SCOPE": "This connection does not belong to the linked subject area",
+      "LINK_DOWN": "Cannot reach schema.pi. Please try again shortly",
+      "LINK_NOT_FOUND": "Connection not found",
+      "LINK_DUP": "Registration already in progress. Please try again",
+      "CONN_UNSUPPORTED": "Unsupported connection (PostgreSQL server connections only for now)",
+      "Q_UNKNOWN": "Unknown query",
+      "SQL_NOT_SELECT": "Only a single SELECT (or WITH) statement can be run",
+      "PGSS_MISSING": "The pg_stat_statements extension is not installed on the target DB",
+      "TIMEOUT": "The request timed out",
+      "RATE": "Too many requests. Please try again in a minute",
+      "INVALID_INPUT": "Paste the full connection token starting with slk_"
+    }
+  },
+  "migration": {
+    "title": "Data Migration (PiMig)",
+    "intro": "Computes the table load order from the relationships in your schema.pi design model, organizes chunk size, parallelism and the cutover checklist, and generates verification SQL you run yourself on source and target. This screen only plans and checks — it does not move data or read customer DB rows.",
+    "needLink": "Pick a schema.pi link above first. If you have none, register a token under 'Connect'.",
+    "loading": "Loading…",
+    "newPlan": "New migration plan",
+    "project": "Project",
+    "projectPick": "Select a project",
+    "planNm": "Plan name",
+    "planNmHint": "Defaults to the project name",
+    "create": "Create plan",
+    "creating": "Creating…",
+    "snapHint": "The design at this moment (table, column and relationship names) is frozen as a snapshot. Create a new plan when the model changes.",
+    "plans": "Migration plans",
+    "prev": "Prev",
+    "next": "Next",
+    "sts": {
+      "DRAFT": "Draft",
+      "READY": "Ready"
+    },
+    "del": "Delete",
+    "delConfirm": "Delete this plan?",
+    "snapInfo": "Snapshot: {tables} tables · {rels} relationships",
+    "dropped": "({n} relationships without physical tables are excluded from ordering)",
+    "chunkSize": "Chunk size (rows/commit)",
+    "parallel": "Parallelism (tables at once)",
+    "saveOpts": "Save options",
+    "optsHint": "Parallelism is the number of tables loaded at the same time within a level. Chunk size is the commit unit (rows) the execution engine will use.",
+    "order": "Load order",
+    "orderHint": "Topologically sorted by design relationships (not physical FKs) so parent tables come first. Tables in the same level do not depend on each other and can load in parallel.",
+    "cycles": "{n} circular group(s) — placed in the same level. Set their order manually and defer reference checks until after loading.",
+    "selfRefs": "Self-referencing (hierarchical) tables — load parent rows first within the table",
+    "level": "Level {n}",
+    "checklist": "Cutover checklist",
+    "toReady": "Mark as ready",
+    "toDraft": "Back to draft",
+    "readyNeedAll": "Check every item before marking the plan ready.",
+    "chk": {
+      "cdcHandoff": {
+        "title": "CDC handoff point",
+        "desc": "Record a consistent source point before the initial load (PG LSN · Oracle/Tibero SCN · for polling, start time minus an overlap window), start CDC from it, and absorb duplicates in the handoff window with upserts."
+      },
+      "valueConv": {
+        "title": "Value conversion",
+        "desc": "Rules are set for empty string = NULL, CHAR blank padding, NUMBER without precision → NUMERIC, DATE with time → TIMESTAMP, VARCHAR2 BYTE ↔ CHAR length, and LONG·RAW."
+      },
+      "charset": {
+        "title": "Character set",
+        "desc": "Source character set (KO16MSWIN949, UTF8, …) is confirmed, with columns that overflow due to multibyte growth and isolation of unconvertible characters decided."
+      },
+      "lob": {
+        "title": "LOB",
+        "desc": "CLOB·BLOB are streamed in chunks (size and memory limits) and verified by length + hash."
+      },
+      "seqResync": {
+        "title": "Sequence resync",
+        "desc": "After loading, target sequences·identities are set to max(key)+1."
+      },
+      "timezone": {
+        "title": "Time zone · system columns",
+        "desc": "The interpretation time zone for values without one (e.g. Asia/Seoul) is set, modified-time triggers will not overwrite source timestamps during load, and creator/modifier substitution rules are set."
+      },
+      "backpressure": {
+        "title": "Backpressure · target load",
+        "desc": "Reduce chunk size and parallelism on target lag, WAL growth or lock waits; build non-PK indexes after loading and run ANALYZE·VACUUM afterwards."
+      }
+    },
+    "verify": "Verification SQL",
+    "verifyHint": "Generates count, numeric column sum, duplicate key and key hash queries per table in load order. Run them yourself on source and target and compare (this screen does not execute them).",
+    "noHashOracle": "Oracle·Tibero hash functions and text rendering differ from PostgreSQL, so hash queries are omitted — compare counts, sums and duplicate keys.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyFail": "Could not copy. Select the text and copy it manually.",
+    "engine": {
+      "title": "Execution·restart · rehearsal·rollback",
+      "body": "Actual migration execution (checkpoints, backpressure, error row isolation) and rehearsal, rollback and CDC start point recording will come after the worker agent security model (A10) is finalized. For now this covers planning, checks and verification SQL."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "The schema.pi link is being prepared. Please try again shortly.",
+      "LINK_DOWN": "Cannot reach schema.pi. Please try again shortly.",
+      "LINK_AUTH": "The link token has expired or been revoked. Issue a new token in schema.pi and register it again.",
+      "LINK_NOT_FOUND": "Link not found. Please pick the link again.",
+      "LINK_SCOPE": "This project does not belong to the link's taxonomy.",
+      "TIMEOUT": "The request timed out. Please try again shortly.",
+      "RATE": "Too many requests. Try again in a minute.",
+      "MIG_NO_TABLES": "This project has no physical tables to migrate. Convert to physical in schema.pi first.",
+      "MIG_CHECK_INCOMPLETE": "Check every cutover checklist item before marking the plan ready.",
+      "NOT_FOUND": "Plan not found."
+    }
+  },
+  "monitor": {
+    "title": "Monitoring Center",
+    "collectNote": "Collection runs in schema.pi — migration planned (D7). This page reads the schema.pi monitor summary.",
+    "noLink": "Select or register a schema.pi link first.",
+    "goConnect": "Register a link",
+    "period": "Period",
+    "periods": {
+      "30": "30 min",
+      "60": "1 hour",
+      "360": "6 hours",
+      "1440": "24 hours"
+    },
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "updatedAt": "{area} · as of {time} (auto refresh every 30s)",
+    "appTitle": "App performance",
+    "dbTitle": "DB status by connection",
+    "urlTitle": "URL checks",
+    "empty": "No data to show.",
+    "breachTitle": "{n} threshold breaches",
+    "rulesTitle": "Threshold rules",
+    "rulesNote": "Rules are saved for this link and evaluated against the received summary; breaches get a red border (notifications come later).",
+    "metric": "Metric",
+    "conn": "Connection",
+    "allConns": "All connections",
+    "op": "Compare",
+    "threshold": "Threshold",
+    "thrInvalid": "Enter a number for the threshold.",
+    "addRule": "Add rule",
+    "noRules": "No rules yet.",
+    "enable": "Enable",
+    "disable": "Disable",
+    "delete": "Delete",
+    "delConfirm": "Delete this rule?",
+    "aiNote": "AI incident analysis and fix approval still happen in the schema.pi monitor.",
+    "aiLink": "Open schema.pi monitor",
+    "metrics": {
+      "APP_TPS": "TPS (requests/s)",
+      "APP_ERR_PCT": "Error rate (%)",
+      "APP_SLOW_CNT": "Slow requests",
+      "APP_AVG_MS": "Avg response (ms)",
+      "DB_SESS_CNT": "Sessions",
+      "DB_LOCK_WAIT_CNT": "Lock waits",
+      "DB_CACHE_HIT_PCT": "Cache hit (%)",
+      "DB_SIZE_MB": "DB size (MB)",
+      "URL_RSP_MS": "URL response (ms)",
+      "URL_FAIL_CNT": "URL failures"
+    },
+    "errors": {
+      "LINK_REQUIRED": "Select a link first.",
+      "NOT_IMPLEMENTED": "The schema.pi link is being prepared. Please try again later.",
+      "LINK_AUTH": "The link token is invalid or expired. Issue a new token in schema.pi and register it.",
+      "LINK_SCOPE": "This link cannot access that taxonomy.",
+      "RATE": "Too many requests. Please try again shortly.",
+      "TIMEOUT": "schema.pi is responding slowly. Please try again shortly.",
+      "RULE_LIMIT": "Up to 50 rules per link.",
+      "NOT_FOUND": "Rule not found."
+    }
+  },
+  "ops": {
+    "title": "DB Operations Safety",
+    "intro": "Read-only diagnosis of parameters, account privileges, backup and replication for the linked PostgreSQL connection. Nothing is changed; only verdict summaries are stored, never customer row data",
+    "loading": "Loading…",
+    "pickFirst": "Select a link and connection above first",
+    "run": "Run diagnosis",
+    "running": "Diagnosing…",
+    "noRun": "No diagnosis yet. Press \"Run diagnosis\"",
+    "lastRun": "Last diagnosis {dtm}",
+    "readOnly": "Diagnosis only reads (SELECT). Advice is a guide and depends on server memory, load and workload",
+    "truncated": "Too many objects — only the first 500 were checked",
+    "paramsNote": "Total server memory is unknown, so it is estimated from shared_buffers ≈ 25% of RAM. random_page_cost assumes SSD",
+    "auditNote": "Tables with RLS off and unused accounts will be checked once the link query supports them",
+    "replNote": "Baseline is Active-Standby (A-S) — one primary + standby. Replay lag ≥ 5s = warning, ≥ 60s = risk (measured RPO reference)",
+    "lagIdle": "No changes",
+    "pager": "Pagination",
+    "prev": "Prev",
+    "next": "Next",
+    "tabs": {
+      "params": "Parameters",
+      "audit": "Accounts & privileges",
+      "backup": "Backup & recovery",
+      "repl": "Replication & DR",
+      "history": "History"
+    },
+    "level": {
+      "OK": "OK",
+      "WARN": "Warning",
+      "RISK": "Risk"
+    },
+    "role": {
+      "primary": "This connection = Primary",
+      "standby": "This connection = Standby",
+      "unknown": "Role unknown"
+    },
+    "col": {
+      "level": "Verdict",
+      "item": "Item",
+      "value": "Value",
+      "reason": "Details",
+      "standby": "Standby",
+      "state": "State",
+      "sync": "Sync",
+      "lag": "Replay lag"
+    },
+    "item": {
+      "super_many": "superuser",
+      "super_ok": "superuser",
+      "bypass_rls": "BYPASSRLS roles",
+      "bypass_ok": "BYPASSRLS roles",
+      "no_expiry": "Password expiry",
+      "expiry_ok": "Password expiry",
+      "public_grant": "PUBLIC grants",
+      "public_ok": "PUBLIC grants",
+      "arc_on": "archive_mode",
+      "arc_off": "archive_mode",
+      "wal_minimal": "wal_level",
+      "wal_ok": "wal_level",
+      "arc_cmd_empty": "archive_command",
+      "arc_never": "Last archived WAL",
+      "arc_stale": "Last archived WAL",
+      "arc_recent": "Last archived WAL",
+      "arc_failing": "WAL archive failure"
+    },
+    "rules": {
+      "sb_default": "At the default (128MB). On a dedicated server about 25% of RAM is recommended",
+      "sb_ok": "Set above the default",
+      "wm_over": "max_connections × work_mem exceeds estimated memory. Concurrent sorts risk out-of-memory",
+      "wm_default": "At the default (4MB). Large sorts and hashes may spill to disk",
+      "wm_ok": "Within a reasonable range",
+      "mwm_default": "At the default (64MB). VACUUM and index builds may be slow; consider 256MB or more",
+      "mwm_ok": "Set above the default",
+      "av_on": "autovacuum is on",
+      "av_off": "autovacuum is off. High risk of table bloat and transaction ID wraparound",
+      "conn_high": "max_connections is high. Each connection uses memory; a pooler (PgBouncer etc.) is recommended",
+      "conn_ok": "Within a reasonable range",
+      "lmd_off": "Slow query logging is off (-1). Around 1000ms is recommended",
+      "lmd_all": "Every statement is logged (0). Heavy logging overhead",
+      "lmd_ok": "Slow query logging is on",
+      "st_off": "No server-wide statement timeout (0). Set limits per role or application",
+      "st_ok": "A statement timeout is set",
+      "iit_off": "No idle-in-transaction timeout (0). Can cause lock holding and bloat",
+      "iit_ok": "An idle-in-transaction timeout is set",
+      "ckpt_short": "Checkpoint interval is 5 minutes or less. Consider 10–15 minutes for write-heavy loads",
+      "ckpt_ok": "Within a reasonable range",
+      "wal_minimal": "wal_level=minimal makes PITR and replication impossible. Use replica or higher",
+      "wal_ok": "WAL level supports PITR and replication",
+      "rpc_hdd": "HDD default (4). For SSD, 1.1–2 is recommended",
+      "rpc_ok": "Suitable for SSD",
+      "super_many": "Two or more superusers. Keep one for administration and grant only needed privileges to others",
+      "super_ok": "At most one superuser",
+      "bypass_rls": "Non-superuser roles that bypass row-level security exist",
+      "bypass_ok": "No RLS-bypassing roles",
+      "no_expiry": "Login roles without a password expiry. Set VALID UNTIL for personal accounts",
+      "expiry_ok": "All login roles have an expiry",
+      "public_grant": "PUBLIC (every role) has table privileges. Write privileges are risky",
+      "public_ok": "No table privileges granted to PUBLIC",
+      "arc_on": "WAL archiving (archive_mode) is on",
+      "arc_off": "WAL archiving is off, so point-in-time recovery (PITR) is impossible",
+      "arc_cmd_empty": "archive_mode is on but archive_command and archive_library are empty",
+      "arc_never": "No WAL has been archived yet",
+      "arc_stale": "The last WAL archive is older than 24 hours",
+      "arc_recent": "WAL archived within the last 24 hours",
+      "arc_failing": "WAL archiving is currently failing. Check disk, permissions and target path",
+      "repl_is_standby": "This connection is a standby (recovery mode). Check lag from the primary connection",
+      "repl_none": "No standby connected. There is no disaster recovery (DR) setup",
+      "repl_ok": "Standbys are streaming normally",
+      "repl_lag": "A standby is lagging or not streaming"
+    },
+    "manual": {
+      "title": "Manual checklist",
+      "intro": "Backup and recovery practices that cannot be checked automatically. Tick when confirmed and note the evidence",
+      "memo": "Memo (e.g. tool, schedule, last checked)",
+      "save": "Save",
+      "updated": "Updated {dtm}",
+      "items": {
+        "base_backup": "A full backup (pg_basebackup etc.) succeeded within the last 7 days",
+        "offsite_copy": "A backup copy is kept off-site (another region or storage)",
+        "restore_rehearsal": "A restore rehearsal was done this quarter and its duration recorded",
+        "pitr_target": "PITR procedure and target RPO/RTO are documented",
+        "backup_encrypt": "Backup files are encrypted and access is restricted",
+        "retention": "Backup retention period and deletion policy are defined"
+      }
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "The schema.pi link is being prepared. Please try again shortly",
+      "CONN_UNSUPPORTED": "This connection is not supported yet (direct PostgreSQL only)",
+      "TIMEOUT": "The target DB responded too slowly. Please try again shortly",
+      "RATE": "Too many calls. Try again in a minute",
+      "Q_UNKNOWN": "Unsupported query. Check the schema.pi link API version",
+      "INVALID_INPUT": "Invalid link or connection selection"
+    }
+  },
+  "perf": {
+    "title": "Performance",
+    "intro": "Collects query, table and index statistics from a linked PostgreSQL connection to show slow queries, table/index health and size trends. Only statistics are stored — never customer row data",
+    "loading": "Loading…",
+    "pickFirst": "Select a link and connection above first",
+    "pager": "Pagination",
+    "tabs": {
+      "collect": "Collect",
+      "top": "Slow queries",
+      "health": "Table & index health",
+      "trend": "Size trend",
+      "activity": "Activity & locks"
+    },
+    "err": {
+      "NOT_IMPLEMENTED": "The schema.pi link is being prepared. Please try again later",
+      "PGSS_MISSING": "pg_stat_statements is not installed on this database, so query statistics are unavailable",
+      "CONN_UNSUPPORTED": "This connection is not supported yet (direct PostgreSQL connections only)",
+      "TIMEOUT": "The target database responded too slowly. Please try again later",
+      "RATE": "Too many requests. Try again in a minute",
+      "LINK_AUTH": "The link token has expired or been revoked. Register the token again on the Connect page",
+      "LINK_SCOPE": "This connection does not belong to the link's subject area",
+      "Q_UNKNOWN": "Unsupported query. Check the schema.pi link API version",
+      "INVALID_INPUT": "The link or connection value is invalid"
+    },
+    "pgss": {
+      "title": "How to enable pg_stat_statements",
+      "body": "Slow-query Top-N needs the pg_stat_statements extension. Run the statement below as a database admin. On Supabase, enable it under Database → Extensions",
+      "note": "Self-hosted PostgreSQL also needs pg_stat_statements in shared_preload_libraries (postgresql.conf) and a restart. Table, index and size statistics work without it"
+    },
+    "collect": {
+      "intro": "Collect now reads top query statistics, tables, indexes and sizes once and stores them as a snapshot. Collect at least twice to see changes and size trends",
+      "run": "Collect now",
+      "running": "Collecting…",
+      "done": "Collected at {dtm} — {qry} queries · {tbl} tables · {idx} indexes"
+    },
+    "top": {
+      "sort": "Sort",
+      "sortTotal": "Total time",
+      "sortMean": "Mean time",
+      "sortCalls": "Calls",
+      "empty": "No snapshots yet. Press Collect now on the Collect tab",
+      "range": "Change between {from} → {to}",
+      "first": "First snapshot at {dtm} — cumulative values (changes from the next snapshot)",
+      "query": "Query (literals masked)",
+      "calls": "Calls",
+      "totalMs": "Total ms",
+      "meanMs": "Mean ms",
+      "rows": "Rows",
+      "reset": " Stats reset detected — shown as cumulative"
+    },
+    "health": {
+      "empty": "No snapshots yet. Press Collect now on the Collect tab",
+      "basis": "Based on snapshot at {dtm}",
+      "unusedIdx": "Unused indexes",
+      "unusedIdxHint": "Indexes never used since the last stats reset (by size). Do not drop PK or unique-constraint indexes",
+      "fullScan": "Excessive full scans",
+      "fullScanHint": "Tables with 1,000+ live rows where full scans are at least half — review indexes on filter columns",
+      "dead": "Excessive dead tuples",
+      "deadHint": "Dead tuple ratio 20% or more — check VACUUM and autovacuum settings",
+      "none": "None",
+      "scans": "scans"
+    },
+    "trend": {
+      "limit": "Size threshold",
+      "empty": "No snapshots in the last 30 days",
+      "chart": "Database size over the last 30 days",
+      "now": "Current size",
+      "perDay": "Growth per day",
+      "needMore": "Needs 2+ snapshots",
+      "daysLeft": "Reaches {gb} GB",
+      "noGrowth": "No growth trend",
+      "days": "in about {n} days"
+    },
+    "activity": {
+      "refresh": "Refresh",
+      "live": "Live query — not stored",
+      "sessions": "Session activity",
+      "locks": "Locks",
+      "none": "None"
+    }
+  },
+  "pipeline": {
+    "title": "PiCDC · Pipelines",
+    "intro": "Check whether a source DB is ready for change data capture (CDC) and design source → transform → target pipelines. This stage only checks and designs; no customer row data is read or stored.",
+    "needLink": "Pick a schema.pi link above first. If you have none, register a token in the 'Link' menu.",
+    "needConn": "Pick the DB connection to check above.",
+    "loading": "Loading…",
+    "pager": "Pages",
+    "prev": "Prev",
+    "next": "Next",
+    "runTitle": "Run & monitor (7-3 · 7-4)",
+    "runBody": "Pipeline execution, lag monitoring and reprocessing arrive once the worker agent and security model are finalized. For now, save definitions as drafts (DRAFT).",
+    "pre": {
+      "title": "Source pre-check",
+      "intro": "For each table, checks change-time columns, soft-delete columns and the primary key to recommend a capture method (adapter), and checks WAL logical replication readiness. Read-only catalog and settings queries only.",
+      "schema": "Schema (optional)",
+      "schemaPh": "All",
+      "run": "Run pre-check",
+      "running": "Checking…",
+      "sum": "{tables} tables · {noPk} without PK · {deleteUnseen} cannot capture deletes",
+      "truncated": "A catalog query hit the 500-row limit, so some tables may be missing. Specify a schema and check again.",
+      "empty": "No tables to check",
+      "colTable": "Table",
+      "colChg": "Change-time column",
+      "colDel": "Soft-delete column",
+      "colAdapter": "Recommended method · reasons",
+      "toDraft": "Create pipeline draft from {n} selected"
+    },
+    "ready": {
+      "ok": "WAL logical replication ready — tables with a PK can use LOGICAL",
+      "no": "WAL logical replication not ready — capture via polling or key comparison",
+      "senders": "{n} replication connections"
+    },
+    "adapter": {
+      "LOGICAL": "Logical replication (WAL)",
+      "POLL": "Change-time polling",
+      "KEY_DIFF": "Key snapshot diff",
+      "NONE": "Full reload only"
+    },
+    "reason": {
+      "HAS_CHG_COL": "Has change-time column",
+      "NO_CHG_COL": "No change-time column",
+      "HAS_SOFT_DEL": "Has soft-delete column",
+      "NO_SOFT_DEL": "No soft-delete column",
+      "HAS_PK": "Has primary key",
+      "NO_PK": "No primary key — changed rows cannot be identified",
+      "DELETE_UNSEEN": "Polling cannot capture physical DELETEs (soft-delete column recommended)",
+      "LOGICAL_NOT_READY": "Can switch to LOGICAL once WAL logical replication is ready",
+      "FULL_RELOAD_ONLY": "No PK or change-time column, so no incremental capture — add a PK",
+      "WAL_LOGICAL": "wal_level = logical",
+      "WAL_NOT_LOGICAL": "wal_level is not logical (changing it needs a DB restart)",
+      "NO_SLOTS": "max_replication_slots is 0",
+      "NO_SENDERS": "max_wal_senders is 0",
+      "IS_STANDBY": "Standby server — take logical replication from the primary",
+      "SETTINGS_UNKNOWN": "Could not read settings, readiness unknown"
+    },
+    "ed": {
+      "title": "Pipeline definitions",
+      "draftOnly": "Design only — saved as drafts (DRAFT)",
+      "new": "New pipeline",
+      "empty": "No saved pipelines",
+      "manual": "Manual",
+      "edit": "Edit",
+      "remove": "Delete",
+      "removeConfirm": "Delete pipeline '{name}'?",
+      "name": "Name",
+      "adapter": "Capture method",
+      "srcConn": "Source connection",
+      "useCurrentConn": "Use the connection picked above",
+      "sched": "Schedule (5-field cron, blank = manual)",
+      "target": "Target",
+      "targetPh": "e.g. analytics DB analytics.public / lake s3://…",
+      "tables": "Source tables (newline or comma separated)",
+      "steps": "Steps (source → transform → target)",
+      "op": "Operation",
+      "notePh": "Description · condition (optional)",
+      "addTransform": "Add transform step",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "close": "Close"
+    },
+    "kind": {
+      "SOURCE": "Source",
+      "TRANSFORM": "Transform",
+      "TARGET": "Target"
+    },
+    "sts": {
+      "DRAFT": "Draft"
+    },
+    "check": {
+      "NAME_REQUIRED": "Enter a name",
+      "CONN_REQUIRED": "Pick a source connection",
+      "CRON_INVALID": "Enter the schedule as 5-field cron (min hour day month weekday; digits, *, ',', -, /)",
+      "OP_REQUIRED": "Enter an operation for every step",
+      "STEPS_TOO_FEW": "Source and target steps are required",
+      "STEPS_TOO_MANY": "Up to 20 steps",
+      "STEP_FIRST_SOURCE": "The first step must be the source",
+      "STEP_LAST_TARGET": "The last step must be the target",
+      "STEP_MIDDLE_TRANSFORM": "Only transform steps can sit in between"
+    },
+    "errors": {
+      "PPL_NAME_DUP": "A pipeline with this name already exists. Use another name",
+      "CONN_UNSUPPORTED": "This connection cannot be checked yet (PostgreSQL direct server connections only for now)"
+    }
+  },
+  "sqlLab": {
+    "title": "SQL Tuning Lab",
+    "intro": "Pick a connection and enter SQL to see the execution plan as a tree, with slowdown causes (full scans, nested loops, large sorts) and SQL anti-patterns checked against schema.pi standard domains. Queries are never actually executed (no ANALYZE).",
+    "needLink": "Select a link and connection above to view plans. The anti-pattern check works without a link.",
+    "sqlLabel": "SQL (a single SELECT or WITH statement)",
+    "sqlPlaceholder": "SELECT ord_id, ord_amt FROM ord WHERE cust_id = ...",
+    "explain": "Show plan",
+    "explaining": "Loading…",
+    "save": "Save plan",
+    "saving": "Saving…",
+    "saveName": "Label (e.g. before adding index)",
+    "saveNote": "Constant values in the SQL and plan conditions are masked as ? when saved.",
+    "plan": {
+      "title": "Execution plan",
+      "summary": "Total cost {cost} · {ms}ms",
+      "cost": "cost",
+      "rows": "rows",
+      "width": "width"
+    },
+    "warn": {
+      "none": "No notable warnings.",
+      "SEQ_SCAN_LARGE": "Full scan on {relation} (about {rows} rows) — consider an index on the filter columns.",
+      "NESTED_LOOP_HIGH": "Nested loop produces about {rows} rows — consider a hash or merge join, or an index on the join condition.",
+      "SORT_SPILL": "Sort size is about {kb}KB, above the default work_mem (4MB); it may spill to disk."
+    },
+    "lint": {
+      "run": "Check anti-patterns",
+      "title": "SQL anti-pattern check",
+      "none": "No anti-patterns found.",
+      "domainsOff": "Standard domains could not be loaded; checked with default column-suffix rules only.",
+      "types": {
+        "num": "numeric",
+        "date": "date",
+        "char": "character"
+      },
+      "codes": {
+        "SELECT_STAR": "SELECT * — select only the columns you need (extra I/O, no covering index).",
+        "FUNC_ON_COLUMN": "The filter column {column} is wrapped in a function or expression, so its index cannot be used — transform the constant instead.",
+        "LEADING_WILDCARD": "LIKE with a leading % cannot use a B-tree index — consider a pg_trgm GIN index.",
+        "OR_DIFF_COLUMNS": "Conditions on different columns are combined with OR — consider UNION ALL or per-column indexes.",
+        "IMPLICIT_CAST": "{column} is compared to a quoted number — match the column and constant types (implicit cast).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) returns nothing when NULLs are present and is slow — use NOT EXISTS.",
+        "NO_WHERE": "No WHERE clause — on a large table this is a full scan (add a condition or LIMIT).",
+        "DOMAIN_MISMATCH": "{column} is a {expected} type by standard domain but is compared to a constant of another type — the implicit cast may prevent index use."
+      }
+    },
+    "saved": {
+      "title": "Saved plans · Compare",
+      "empty": "No saved plans. View a plan, then save it.",
+      "pick": "Select plan to compare",
+      "pick2": "Select two plans to compare.",
+      "compare": "Compare two plans",
+      "delete": "Delete",
+      "cost": "cost",
+      "prev": "Previous",
+      "next": "Next",
+      "page": "Page {page}"
+    },
+    "diff": {
+      "cost": "Total cost {a} → {b} ({delta}, {pct}%)",
+      "diffSql": "The two plans are for different SQL (after normalization).",
+      "scan": "{relation}: {a} → {b}",
+      "type": "{nodeType}: {a} → {b}",
+      "none": "No change in plan nodes.",
+      "before": "Before",
+      "after": "After"
+    },
+    "ai": {
+      "title": "AI tuning advice",
+      "badge": "Coming soon",
+      "body": "Coming soon (after approval and impact-measurement procedures) — advice will be generated from SQL with masked constants and recorded as applied only after DA approval and measured impact."
+    },
+    "errors": {
+      "NOT_IMPLEMENTED": "The schema.pi link feature is being prepared. Please try again shortly.",
+      "LINK_AUTH": "The link token has expired or been revoked. Issue a new token in schema.pi and register it again.",
+      "LINK_SCOPE": "This link cannot use that connection (different classification scheme).",
+      "CONN_UNSUPPORTED": "This connection type is not supported yet (PostgreSQL server connections only).",
+      "Q_UNKNOWN": "Unsupported query.",
+      "SQL_NOT_SELECT": "Plans are available only for a single statement starting with SELECT or WITH.",
+      "TIMEOUT": "The request timed out (5 seconds). Shorten the SQL or try again later.",
+      "RATE": "Too many requests. Try again in a minute.",
+      "PAYLOAD_TOO_LARGE": "The plan is too large to save.",
+      "LINK_NOT_FOUND": "Link not found. Please select the link again."
+    }
+  },
+  "nav": {
+    "label": "Features",
+    "connect": "Connect",
+    "sqlLab": "SQL Tuning",
+    "perf": "Performance",
+    "monitor": "Monitoring",
+    "drift": "Drift",
+    "migration": "Migration",
+    "pipeline": "Pipeline",
+    "analytics": "Analytics",
+    "ops": "Ops Safety",
+    "learn": "Learn"
   }
 }

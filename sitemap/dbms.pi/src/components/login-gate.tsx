@@ -95,3 +95,8 @@ export function LoginGate({
     </div>
   )
 }
+
+// 서버 페이지용 게이트 — 서버 컴포넌트는 함수(render prop)를 클라이언트로 넘길 수 없어 요소(children)로 받는다
+export function LoginGated({ children }: { children: React.ReactNode }) {
+  return <LoginGate>{() => children}</LoginGate>
+}

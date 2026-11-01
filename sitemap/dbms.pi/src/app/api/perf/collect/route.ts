@@ -1,0 +1,131 @@
+// 성능 수집(PRD 12 §3-1, ANL-R02) — POST /api/perf/collect { linkId, connId }
+//  이름 붙인 조회 5종(top_sql·tbl_stats·idx_stats·sizes·db_stats) 병렬 → dbm_prf_clct 1행 + 쿼리·테이블·인덱스 자식 행. 통계 수치만(행 데이터 없음, 계약 A3)
+//  top_sql 만 PGSS_MISSING 허용(pgss_yn='N'로 저장), 나머지 실패는 오류. 자식 저장 실패 시 수집 행 논리삭제
+import { NextResponse } from 'next/server'
+import { z } from 'zod'
+import { withGuard } from '@pi/guard'
+import { db, dbFail, dbRoute, parseBody } from '@/lib/api'
+import { LinkError, linkQuery } from '@/lib/link/client'
+import { maskLiterals } from '@/lib/perf/calc'
+import { linkFail, linkParams, num, numOrNull, pick, str, toObjs, type Obj } from '@/lib/perf/server'
+
+const MAX_QRY = 100 // 저장할 쿼리 상위 건수(조회 상한 500행 안)
+const bodySchema = z.object({ linkId: z.string(), connId: z.string() })
+
+const toDtm = (v: unknown) => {
+  const d = v ? new Date(String(v)) : null
+  return d && !Number.isNaN(d.getTime()) ? d.toISOString() : null
+}
+
+export const POST = withGuard(
+  dbRoute(async (req) => {
+    const body = await parseBody(req, bodySchema)
+    if (body instanceof NextResponse) return body
+    const p = await linkParams(req, body.linkId, body.connId)
+    if (p instanceof NextResponse) return p
+    const { linkId, connId } = p
+
+    let res
+    try {
+      res = await Promise.all([
+        linkQuery(linkId, connId, 'top_sql').catch((e: unknown) => {
+          if (e instanceof LinkError && e.code === 'PGSS_MISSING') return null
+          throw e
+        }),
+        linkQuery(linkId, connId, 'tbl_stats'),
+        linkQuery(linkId, connId, 'idx_stats'),
+        linkQuery(linkId, connId, 'sizes'),
+        linkQuery(linkId, connId, 'db_stats'),
+      ])
+    } catch (e) {
+      return linkFail(e)
+    }
+    const [topR, tblR, idxR, szR, dbR] = res
+    const qrys = topR ? toObjs(topR) : []
+    const sizes = toObjs(szR)
+    const dbRow: Obj = toObjs(dbR)[0] ?? {}
+
+    // sizes : 테이블별 크기(relname·total_bytes) 또는 DB 전체 크기 행 — 둘 다 받는다
+    const tblSz = new Map<string, number>()
+    let dbSz = numOrNull(pick(dbRow, 'db_size', 'db_sz_byte', 'database_size', 'size_bytes'))
+    for (const s of sizes) {
+      const nm = str(pick(s, 'relname', 'tbl_nm', 'table_name'))
+      const b = numOrNull(pick(s, 'total_bytes', 'total_size', 'tot_sz_byte', 'size_bytes', 'bytes'))
+      if (nm && b !== null) tblSz.set(nm, b)
+      else if (dbSz === null) dbSz = numOrNull(pick(s, 'db_size', 'database_size', 'db_sz_byte'))
+    }
+    if (dbSz === null && tblSz.size) dbSz = [...tblSz.values()].reduce((a, b) => a + b, 0)
+
+    const ins = await db()
+      .from('dbm_prf_clct')
+      .insert({
+        lnk_id: linkId,
+        conn_id: connId,
+        stat_reset_dtm: toDtm(pick(qrys[0] ?? {}, 'stats_reset') ?? pick(dbRow, 'stats_reset', 'stat_reset_dtm')),
+        pgss_yn: topR ? 'Y' : 'N',
+        db_sz_byte: dbSz,
+      })
+      .select('clct_id, clct_dtm')
+      .single()
+    if (ins.error) return dbFail(ins.error)
+    const clctId = ins.data.clct_id as string
+
+    const qryRows = qrys.slice(0, MAX_QRY).map((o, i) => {
+      const calls = num(pick(o, 'calls', 'call_cnt'))
+      const totalMs = num(pick(o, 'total_exec_time', 'total_time', 'total_ms'))
+      const txt = str(pick(o, 'query', 'qry_txt'))
+      return {
+        clct_id: clctId,
+        qry_seq: i + 1,
+        qry_id: str(pick(o, 'queryid', 'qry_id')) ?? `#${i + 1}`,
+        qry_txt: txt ? maskLiterals(txt).slice(0, 4000) : null,
+        call_cnt: calls,
+        tot_ms: totalMs,
+        avg_ms: num(pick(o, 'mean_exec_time', 'mean_time', 'mean_ms')) || (calls ? totalMs / calls : 0),
+        row_cnt: num(pick(o, 'rows', 'row_cnt')),
+      }
+    })
+    const tblRows = toObjs(tblR).map((o, i) => {
+      const nm = str(pick(o, 'relname', 'tbl_nm', 'table_name')) ?? '?'
+      return {
+        clct_id: clctId,
+        tbl_seq: i + 1,
+        schm_nm: str(pick(o, 'schemaname', 'schm_nm')),
+        tbl_nm: nm,
+        full_scan_cnt: num(pick(o, 'seq_scan', 'full_scan_cnt')),
+        idx_scan_cnt: num(pick(o, 'idx_scan', 'idx_scan_cnt')),
+        live_tup_cnt: num(pick(o, 'n_live_tup', 'live_tup_cnt')),
+        dead_tup_cnt: num(pick(o, 'n_dead_tup', 'dead_tup_cnt')),
+        tot_sz_byte: numOrNull(pick(o, 'total_bytes', 'tot_sz_byte')) ?? tblSz.get(nm) ?? null,
+      }
+    })
+    const idxRows = toObjs(idxR).map((o, i) => ({
+      clct_id: clctId,
+      idx_seq: i + 1,
+      schm_nm: str(pick(o, 'schemaname', 'schm_nm')),
+      tbl_nm: str(pick(o, 'relname', 'tbl_nm', 'table_name')) ?? '?',
+      idx_nm: str(pick(o, 'indexrelname', 'idx_nm', 'index_name')) ?? '?',
+      idx_scan_cnt: num(pick(o, 'idx_scan', 'idx_scan_cnt')),
+      idx_sz_byte: numOrNull(pick(o, 'idx_size', 'index_bytes', 'idx_sz_byte', 'size_bytes')),
+    }))
+
+    const results = await Promise.all([
+      qryRows.length ? db().from('dbm_prf_qry').insert(qryRows) : null,
+      tblRows.length ? db().from('dbm_prf_tbl').insert(tblRows) : null,
+      idxRows.length ? db().from('dbm_prf_idx').insert(idxRows) : null,
+    ])
+    const failed = results.find((r) => r?.error)?.error
+    if (failed) {
+      await db().from('dbm_prf_clct').update({ del_yn: 'Y', del_dtm: new Date().toISOString() }).eq('clct_id', clctId)
+      return dbFail(failed)
+    }
+    return NextResponse.json({
+      clctId,
+      clctDtm: ins.data.clct_dtm,
+      pgss: !!topR,
+      qryCnt: qryRows.length,
+      tblCnt: tblRows.length,
+      idxCnt: idxRows.length,
+    })
+  }),
+)

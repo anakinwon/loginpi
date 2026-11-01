@@ -62,7 +62,7 @@
 
 ### 2.3 dbms 쪽 클라이언트 `src/lib/link/client.ts` (F1b 구현, 서버 전용)
 ```ts
-export type LinkCtx = { linkId: string; areaId: string; areaNm: string }
+export type LinkCtx = { linkId: string; areaId: string; areaNm: string; usrId: string } // usrId = 세션 사용자 ID(regr_id·modr_id 기록용, 2026-11-01 추가)
 export async function requireLink(req: Request, linkId: string): Promise<LinkCtx | Response> // 로그인 + 소유자(또는 ADMIN) 확인, 실패 시 Response
 export async function linkGet<T>(linkId: string, path: string): Promise<T>            // throws LinkError{code,status}
 export async function linkQuery(linkId: string, connId: string, q: QueryName, params?: Record<string, unknown>): Promise<{ cols: string[]; rows: unknown[][]; ms: number }>

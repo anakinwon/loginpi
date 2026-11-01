@@ -1,12 +1,15 @@
-// dbms.pi 홈 — 한 줄 소개(PRD §1) + 로그인 게이트 + schema.pi 연결 자리(준비 중, PRD §5). DB 조회 없음(서버 렌더 + 클라이언트 게이트)
+// dbms.pi 홈 — 한 줄 소개(PRD §1) + 로그인 게이트 + 기능 대분류 10종 카드(PRD 12절, 각 페이지가 자체 로그인 게이트). DB 조회 없음(서버 렌더 + 클라이언트 게이트)
 import { useTranslations } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { use } from 'react'
 import { HomeGate } from '@/components/home-gate'
+import { Link } from '@/i18n/navigation'
+import { FEATURES } from '@/lib/features'
 
 export default function Home({ params }: { params: Promise<{ locale: string }> }) {
   setRequestLocale(use(params).locale)
   const t = useTranslations('home')
+  const tn = useTranslations('nav')
   return (
     <div className="mx-auto max-w-3xl space-y-6 py-2">
       <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#0f1a2e] via-[#111827] to-[#0b1a24] px-5 py-10 sm:px-10 sm:py-14">
@@ -15,12 +18,18 @@ export default function Home({ params }: { params: Promise<{ locale: string }> }
         <p className="text-muted-foreground mt-4 max-w-xl text-sm break-keep sm:text-base">{t('description')}</p>
       </section>
       <HomeGate />
-      <section aria-labelledby="home-conn-title" className="bg-surface rounded-2xl border border-dashed border-white/15 p-5">
-        <h2 id="home-conn-title" className="flex items-center gap-2 font-bold">
-          {t('connTitle')}
-          <span className="bg-surface-raised text-muted-foreground rounded-full px-2 py-0.5 text-xs font-medium">{t('connBadge')}</span>
-        </h2>
-        <p className="text-muted-foreground mt-2 text-sm break-keep">{t('connBody')}</p>
+      <section aria-labelledby="home-feat-title">
+        <h2 id="home-feat-title" className="mb-3 font-bold">{t('featTitle')}</h2>
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {FEATURES.map((f) => (
+            <li key={f.key}>
+              <Link href={f.href} className="bg-surface hover:border-accent/60 block h-full rounded-2xl border border-white/10 p-4">
+                <span className="font-semibold">{tn(f.key)}</span>
+                <p className="text-muted-foreground mt-1 text-sm break-keep">{t(`featDesc.${f.key}`)}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   )
