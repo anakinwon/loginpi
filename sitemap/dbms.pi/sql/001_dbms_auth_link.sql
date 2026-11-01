@@ -1,6 +1,6 @@
 -- 001_dbms_auth_link.sql — 일반 브라우저 Google 로그인 ↔ Pi 계정 연동 (sitemap.pi sql/003 승계, dbms.pi Google 연동 예외 마스터 결정 2026-11-01 — PRD §4)
--- DA-APPROVED: 마스터 결정 2026-11-01 — dbms.pi Google 연동 허용(PRD §4, PRD_28 §1.1-2 예외 — LOGIN_PLAYBOOK 예외 목록 등재 [확인중 : 마스터]). 형제 앱 연동 DDL(2026-10-24 마스터 승인본, 원형 sitemap.pi sql/003)과 같은 구조·같은 객체 이름, DA 표준 §5 v2.5(pk_·x_NN). sys_user baseline 무변경. DA 사후 리뷰 대상
--- 선행 : packages/pi-db/sql/000_baseline.sql(sys_user · fn_grant_svc_only). 적용 : node scripts/db-migrate.mjs --app dbms --tier dev|stg|prod
+-- DA-APPROVED: 2026-11-01 da-governance-expert — seminar 001 동일 구조 dbms 적용 승인(본문 diff 0). 예외 : lnk_cd CHAR(6)(CHECK ^[0-9]{6}$ 로 패딩 불가, 형제 앱 정합 유지 — 3앱 VARCHAR(6) 일괄 정정은 §10 추적). Google 연동 예외는 마스터 2026-11-01(PRD §4), LOGIN_PLAYBOOK 예외 목록 등재 [확인중 : 마스터]
+-- 선행 : packages/pi-db/sql/000_baseline.sql(sys_user · fn_grant_svc_only). 적용 : node scripts/db-migrate.mjs --app dbms --tier prod (dbms.pi 전용 Supabase 프로젝트 public — 2026-10-29 전 환경 public 결정, --tier dev|stg 는 <app>_<tier> 스키마를 만들므로 쓰지 않음)
 -- 설계 :
 --  · sys_usr_auth_lnk — 사용자 외부인증 연동(현재 GOOGLE). 사용자당 제공자 1건, 제공자 식별자(sub) 활성 1건
 --  · sys_auth_lnk_cd  — 연동 코드. Pi Browser(Pi 세션)가 숫자 6자리 발급(10분) → 일반 브라우저(Google 세션)가 입력 → 성립 시 use_dtm 기록

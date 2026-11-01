@@ -1,6 +1,6 @@
 -- 003_dbms_auth_lnk_try_glob_idx.sql — 연동 코드 전체 실패 건수 조회 인덱스 (형제 앱 2026-10-25 보강 승계, 자동 보안 리뷰 HIGH : 계정 다수 동원 우회 차단)
--- DA-APPROVED: 마스터 결정 2026-11-01(dbms.pi 착수) — 형제 앱 연동 코드 보안 보강(2026-10-25)과 같은 인덱스 1개 추가, 테이블 무변경. DA 사후 리뷰 대상
--- 선행 : 002_dbms_auth_lnk_try.sql. 적용 : node scripts/db-migrate.mjs --app dbms --tier dev|stg|prod
+-- DA-APPROVED: 2026-11-01 da-governance-expert — seminar 003 동일 구조 dbms 적용 승인(본문 diff 0, 인덱스 1개)
+-- 선행 : 002_dbms_auth_lnk_try.sql. 적용 : node scripts/db-migrate.mjs --app dbms --tier prod (dbms.pi 전용 Supabase 프로젝트 public — 2026-10-29 전 환경 public 결정, --tier dev|stg 는 <app>_<tier> 스키마를 만들므로 쓰지 않음)
 -- 사용 : POST /api/auth/link-complete 가 모든 Google 계정 합계 최근 15분 실패 건수를 세어 30건을 넘으면 429(GLOBAL_MAX)
 BEGIN;
 

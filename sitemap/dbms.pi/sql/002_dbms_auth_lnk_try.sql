@@ -1,6 +1,6 @@
 -- 002_dbms_auth_lnk_try.sql — 연동 코드 입력 실패 이력 (무차별 대입 방어, 형제 앱 2026-10-25 보강 승계)
--- DA-APPROVED: 마스터 결정 2026-11-01(dbms.pi 착수) — 형제 앱 연동 코드 보안 보강(2026-10-25 마스터 지시 "1번부터 진행", 자동 보안 리뷰 HIGH)과 같은 이력 테이블 1개(sys_ 접두·_hist), sys_user 무변경. DA 사후 리뷰 대상
--- 선행 : 001_dbms_auth_link.sql. 적용 : node scripts/db-migrate.mjs --app dbms --tier dev|stg|prod
+-- DA-APPROVED: 2026-11-01 da-governance-expert — seminar 002 동일 구조 dbms 적용 승인(본문 diff 0, sys_ 접두·_hist 이력 1개, sys_user 무변경)
+-- 선행 : 001_dbms_auth_link.sql. 적용 : node scripts/db-migrate.mjs --app dbms --tier prod (dbms.pi 전용 Supabase 프로젝트 public — 2026-10-29 전 환경 public 결정, --tier dev|stg 는 <app>_<tier> 스키마를 만들므로 쓰지 않음)
 -- 설계 :
 --  · 사용 : POST /api/auth/link-complete 가 Google sub 별 최근 15분 실패 건수를 세어 5건을 넘으면 429(LINK_TRY_LIMIT) — 시도를 먼저 'N' 으로 기록한 뒤 센다(동시 요청 경합 차단)
 --  · 시도마다 1행 — 처음엔 succ_yn='N', 연동 성공 시 'Y' 로 갱신. 물리 삭제 없음, 오래된 행 정리는 논리삭제 배치(후속)
