@@ -1218,7 +1218,7 @@ function Erd({ areaId }: { areaId: string }) {
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact }
 }`}</style>
             {markers('p')}
-            <div className="no-print mx-auto mb-3 flex max-w-5xl flex-wrap items-center gap-2 rounded-xl bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-2 text-sm text-white shadow" aria-label="인쇄 설정">
+            <div className="no-print mb-3 flex w-full flex-wrap items-center gap-2 rounded-xl bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-2 text-sm text-white shadow" aria-label="인쇄 설정">
               <strong className="mr-1">인쇄 설정</strong>
               <select value={pr.paper} onChange={(e) => changePaper({ paper: e.target.value })} className={sel2} aria-label="용지">
                 {Object.keys(PAPER).map((k) => (
