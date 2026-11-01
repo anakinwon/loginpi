@@ -103,7 +103,7 @@
       "keys": {
         "links": "Mijn koppelingen",
         "perf": "Perf-momentopnamen",
-        "drift": "Drift-runs",
+        "drift": "GAP-analyse",
         "mig": "Migratieplannen",
         "pipe": "Pijplijnen",
         "lake": "Lake-datasets"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB Drift",
+    "title": "GAP-analyse — Model↔DB",
     "intro": "Vergelijk het schema.pi-ontwerpmodel en de DDL-toepassingsgeschiedenis met de live DB-catalogus om drift te vinden, en meet of ontworpen indexen daadwerkelijk worden gebruikt. Klantrijgegevens worden nooit gelezen of opgeslagen.",
     "needLink": "Kies eerst een schema.pi-koppeling hierboven. Als u er geen heeft, registreer dan een token in het menu 'Koppeling'.",
     "needConn": "Kies de DB-verbinding om hierboven te vergelijken.",
     "project": "Project",
     "projectPick": "Selecteer een project",
     "loading": "Laden…",
-    "run": "Driftdetectie uitvoeren",
+    "run": "GAP-analyse uitvoeren",
     "running": "Vergelijken…",
     "readOnly": "Alleen alleen-lezen catalogus- en statistiekquery's worden uitgevoerd.",
     "applyInSchema": "Pas fixes toe (modelbewerkingen, DDL-generatie en -uitvoering) in schema.pi, de bron van waarheid.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Ontworpen indexen ontbreken in DB",
       "extraIndexes": "Indexen niet in model",
       "ddlMissing": "Objecten verdwenen na toepassing",
-      "unusedIndexes": "Ongebruikte ontworpen indexen"
+      "unusedIndexes": "Kandidaat ongebruikte indexen"
     },
     "sec": {
       "ddlMissing": "DDL toegepast maar ontbreekt in DB",
       "missingTables": "Tabellen in model maar ontbreken in DB",
       "extraTables": "Tabellen in DB maar niet in model",
-      "colMismatches": "Kolomtype / NULL-verschillen",
+      "colMismatches": "Kolomverschillen (Ontbrekend·Type·NULL)",
       "missingIndexes": "Ontworpen indexen ontbreken in DB",
       "extraIndexes": "Indexen alleen in DB (exclusief PK)",
       "idxUsage": "Effectiviteit van ontworpen indexen"
     },
     "hint": {
-      "ddlMissing": "schema.pi heeft deze objecten als toegepast geregistreerd, maar ze zijn verdwenen — vermoed een handmatige verwijdering of rollback.",
-      "extraTables": "Deze kunnen behoren tot andere projecten of systeemtabellen op deze verbinding.",
-      "idxUsage": "Nul scans sinds de laatste statistiekenreset betekent ongebruikt. Controleer het statistiekenvenster voordat u verwijdert."
+      "ddlMissing": "Alleen objecten die ontbreken in de DB op basis van de laatst toegepaste standaard worden getoond. Eerdere verzoeken die later dezelfde tabel opnieuw hebben gemaakt en oude naamgevingsconventies (_PKEY) zijn normaal en hieronder samengevouwen.",
+      "extraTables": "Gebaseerd op schema {schema}. Gegroepeerd op voorvoegsel, zijn alleen de voorvoegselgroepen van dit project kandidaten voor modelweglating.",
+      "idxUsage": "Oordeel = In gebruik / Voor uniciteit / Geen gegevens / Onder observatie (Statistieken gestart·Minder dan 7 dagen geleden gemaakt) / Kandidaat voor ongebruikt. Alleen kandidaten voor ongebruikte indexen worden overwogen voor verwijdering."
     },
     "kind": {
       "MISSING": "ontbreekt in DB",
@@ -223,12 +223,16 @@
       "idx": "Index",
       "scans": "Scans",
       "size": "Grootte",
-      "status": "Oordeel"
+      "status": "Oordeel",
+      "basis": "Basis"
     },
     "usage": {
       "USED": "In gebruik",
-      "UNUSED": "Ongebruikte ontworpen index",
-      "NO_STATS": "Geen statistieken"
+      "NO_STATS": "Geen statistieken",
+      "CONSTRAINT": "Uniciteitsbeperking (behouden)",
+      "NO_DATA": "Geen gegevens of statistieken niet verzameld — kan niet beoordelen",
+      "OBSERVING": "Onder observatie (minder dan 7 dagen)",
+      "UNUSED_CAND": "Kandidaat ongebruikt"
     },
     "errors": {
       "NOT_IMPLEMENTED": "De schema.pi-koppeling is nog niet klaar. Probeer het over een korte tijd opnieuw.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Niet-ondersteunde verbinding (voorlopig alleen PostgreSQL-serververbindingen).",
       "TIMEOUT": "De aanvraag is verlopen. Probeer het over een korte tijd opnieuw.",
       "RATE": "Te veel aanvragen. Probeer het over een minuut opnieuw."
+    },
+    "schema": "Schema",
+    "schemaHint": "Alleen reguliere en gepartitioneerde tabellen in dit schema worden vergeleken (views uitgesloten). Standaard public — Supabase interne schema's (auth, storage, …) worden weggelaten.",
+    "truncated": "{names} heeft de limiet van {max} rijen bereikt en is afgekapt — sommige 'niet in DB' / 'niet in model' resultaten kunnen vals zijn. Verfijn het schema en voer opnieuw uit.",
+    "colUnchecked": "Omdat de kolomquery is afgekapt, worden {n} ontbrekende/extra kolomresultaten als onverifieerbaar behandeld en uitgesloten van het aantal kolomverschillen.",
+    "renamed": "{n} PK-index(en) toegepast onder de oude naamgevingsregel (_PKEY) bestaan in de DB onder de nieuwe naam (PK_) — normaal",
+    "superseded": "{n} oudere verzoek(en) zijn uitgesloten omdat een later verzoek dezelfde tabel opnieuw heeft gemaakt (DROP … CASCADE) — normaal",
+    "supersededItem": "Verzoek {id} → vervangen door verzoek {by}",
+    "sysCols": "{n} systeemkolom(men) die automatisch zijn toegevoegd bij DDL-generatie, zijn opzettelijk niet in het model en zijn uitgesloten van verschillen.",
+    "groupOwn": "Projectvoorvoegsel {pfx} — kandidaten die ontbreken in het model",
+    "groupOther": "Ander systeem {pfx}",
+    "basis": "Gesch. rijen {rows} · sinds {since}",
+    "guide": {
+      "title": "Volgende stappen",
+      "ddlMissing": {
+        "s1": "Pas in schema.pi → het project → fysiek model → DDL-generatie opnieuw toe op deze verbinding.",
+        "s2": "Als dit is voltooid, gebruik dan 'Opnieuw uitvoeren' hieronder en controleer of het aantal 0 is.",
+        "s3": "Als objecten na opnieuw toepassen nog steeds verdwijnen, vermoed dan een handmatige drop of rollback en controleer de activiteit van het verbindingsaccount met uw DBA."
+      },
+      "extraTables": {
+        "s1": "Dit projectvoorvoegselpakket = ontbrekende modelkandidaten — importeer ze in het model via schema.pi → Instellingen → Reverse, of besluit ze te verwijderen als het ongebruikte tabellen zijn.",
+        "s2": "Andere voorvoegselgroepen = andere systemen die deze DB delen — geen actiepunten voor dit project.",
+        "s3": "Als het doelschema niet public is, wijzig dan het veld 'Schema' hierboven en voer opnieuw uit."
+      },
+      "colMismatches": {
+        "s1": "Niet in DB = pas de modelkolom toe op de DB via schema.pi DDL-generatie.",
+        "s2": "Niet in model = importeer de DB-kolom in het model via schema.pi → Instellingen → Reverse, of besluit deze te verwijderen indien onnodig.",
+        "s3": "Type/NULL verschilt = stem af op het model (bron van waarheid); controleer voordat u de lengte verkleint of overschakelt naar NOT NULL of bestaande rijen eraan voldoen."
+      },
+      "idxUsage": {
+        "s1": "Controleer vóór verwijdering ① of het statistiekenvenster ten minste één bedrijfscyclus (bijv. batch einde maand) omvat — zie 'sinds'.",
+        "s2": "② Het is geen unieke/PK-index (deze worden afzonderlijk weergegeven als 'uniciteitsbeperking').",
+        "s3": "③ EXPLAIN de representatieve SQL van de tabel in SQL Tuning en bevestig dat deze index niet wordt gebruikt.",
+        "s4": "Zodra alle drie zijn bevestigd, verwijdert u de index uit het model in schema.pi en past u deze toe via DDL."
+      }
+    },
+    "act": {
+      "openSchema": "schema.pi openen",
+      "rerun": "Opnieuw uitvoeren",
+      "copy": "Lijst kopiëren",
+      "copied": "Gekopieerd",
+      "sqlLab": "EXPLAIN in SQL Tuning"
     }
   },
   "learn": {
@@ -502,6 +548,7 @@
       "INVALID_INPUT": "Het verzoek is ongeldig."
     },
     "board": {
+      "subtitle": "Wat te doen op deze DB nu — 14 signalen van OK, waarschuwing of risico met oplossingen, in één oogopslag.",
       "refresh": {
         "updated": "Per {time} · vernieuwt elke minuut",
         "now": "Nu vernieuwen",
@@ -686,7 +733,7 @@
         "repl": "Replicatiecontrole",
         "backup": "Backupcontrole",
         "sqlLab": "SQL-tuning",
-        "drift": "Drift vergelijken",
+        "drift": "GAP-analyse",
         "connect": "Verbindingen",
         "schema": "schema.pi-monitor"
       },
@@ -956,6 +1003,7 @@
     "err": {
       "NOT_IMPLEMENTED": "De schema.pi-koppeling wordt voorbereid. Probeer het later opnieuw",
       "CONN_UNSUPPORTED": "Deze verbinding wordt nog niet ondersteund (alleen directe PostgreSQL-verbindingen)",
+      "TIMEOUT": "De doel-DB reageerde te traag. Probeer het later opnieuw",
       "RATE": "Te veel aanvragen. Probeer het over een minuut opnieuw",
       "LINK_AUTH": "Het koppelingstoken is verlopen of ingetrokken. Registreer het token opnieuw op de pagina Verbinden",
       "LINK_SCOPE": "Deze verbinding behoort niet tot het onderwerpgebied van de koppeling",
@@ -985,7 +1033,11 @@
       "totalMs": "Totaal ms",
       "meanMs": "Gemiddelde ms",
       "rows": "Rijen",
-      "reset": "Statistieken reset gedetecteerd — weergegeven als cumulatief"
+      "reset": "Statistieken reset gedetecteerd — weergegeven als cumulatief",
+      "src": "Bron",
+      "srcToggle": "Brondetails tonen of verbergen",
+      "openSqlLab": "Openen in SQL Tuning",
+      "acct": "Account"
     },
     "health": {
       "empty": "Nog geen snapshots. Druk nu op Verzamelen op het tabblad Verzamelen",
@@ -1002,6 +1054,7 @@
     "trend": {
       "limit": "Grootte drempel",
       "empty": "Geen snapshots in de laatste 30 dagen",
+      "chart": "DB-grootte trend van de afgelopen 30 dagen",
       "now": "Huidige grootte",
       "perDay": "Groei per dag",
       "needMore": "2+ snapshots nodig",
@@ -1015,6 +1068,46 @@
       "sessions": "Sessieactiviteit",
       "locks": "Vergrendelingen",
       "none": "Geen"
+    },
+    "src": {
+      "root": "Om de bron precies te bepalen: (1) gebruik een apart DB-account voor elk programma, batch en persoon (tool), en (2) stel application_name in op elke verbinding. Het account komt van pg_stat_statements en is zeker; de app/tool-categorie wordt geschat op basis van activiteitsmonsters (application_name wordt door de client zelf gerapporteerd, dus het kan leeg zijn of gewijzigd, en korte queries die tussen monsters eindigen kunnen worden gemist).",
+      "cd": {
+        "PROGRAM": "Programma",
+        "BATCH": "Batch",
+        "TOOL": "Tool (persoon)",
+        "PLATFORM": "Platform intern",
+        "MONITOR": "Monitoring (wij)",
+        "UNKNOWN": "Onbekend"
+      },
+      "conf": {
+        "high": "Hoge zekerheid",
+        "mid": "Gemiddelde zekerheid",
+        "low": "Lage zekerheid",
+        "acct": "Alleen account",
+        "ver": "Versielimiet"
+      },
+      "fix": {
+        "TOOL": "Lijkt erop dat een persoon de productie-DB rechtstreeks bevraagt met een DB-tool (DBeaver etc.). Verwijs hen in plaats daarvan naar een alleen-lezen replica of analyse-DB, en beperk de looptijd op menselijke accounts, bijv. ALTER ROLE human_user SET statement_timeout = '30s'. Gebruik een aparte alleen-lezen rol en voer bulkextracties uit tijdens daluren.",
+        "BATCH": "Lijkt op een batch- of geplande taak. Spreid de looptijden buiten de piekuren en verklein het werk per commit. Controleer indexen en statistieken (ANALYZE) op de doeltabellen en splits lange transacties. Het opnemen van de taaknaam in application_name maakt de volgende classificatie preciezer.",
+        "PROGRAM": "Lijkt op een query die door een applicatie is uitgevoerd. Controleer het plan in SQL Tuning. Veel aanroepen met een korte gemiddelde wijzen op herhaalde aanroepen (N+1) of caching; een lange gemiddelde wijst eerst op indexen of joinvolgorde. Stel de servicenaam in de application_name van uw verbindingspool in.",
+        "PLATFORM": "Lijkt op DB- of platformintern werk zoals autovacuum of replicatie. Meestal is er geen actie nodig. Als het bovenaan blijft staan, controleer dan de autovacuum-drempels en maintenance_work_mem.",
+        "MONITOR": "Lijkt op de eigen statistiekqueries van deze service (schema.pi link). Geen actie nodig. Als het te vaak voorkomt, verlaag dan de pollingfrequentie.",
+        "UNKNOWN": "Er is geen aanwijzing voor de bron. Stel application_name in op elke verbinding en splits accounts per doel; het wordt geclassificeerd vanaf de volgende monsters."
+      },
+      "detail": {
+        "app": "Appnaam",
+        "addr": "Clientadres (gemaskeerd)",
+        "samples": "Monsters",
+        "active": "Actieve monsters",
+        "period": "Waargenomen",
+        "none": "(leeg)"
+      },
+      "noSample": "Nog geen monsters — actieve sessies worden bemonsterd wanneer u het monitoringbord of het tabblad Activiteit & vergrendelingen bekijkt. Voorlopig wordt het alleen geclassificeerd op basis van de accountnaam.",
+      "verOff": "Deze DB is ouder dan PostgreSQL 14, dus actieve sessies hebben geen query-ID. Alleen het account (zeker) wordt getoond.",
+      "privOff": "Het linkaccount kan de sessiedetails van andere accounts niet zien, dus er worden geen monsters verzameld. Vraag een DB-beheerder om GRANT pg_read_all_stats TO {user}; uit te voeren.",
+      "linkUsr": "linkaccount",
+      "qidOff": "Sessiedetails zijn zichtbaar, maar de query-ID is leeg (compute_query_id is uitgeschakeld). Controleer met SHOW compute_query_id; voer vervolgens ALTER SYSTEM SET compute_query_id = 'auto'; uit en herlaad (SELECT pg_reload_conf();).",
+      "openHint": "Opent SQL Tuning met de query ingevuld. Vervang plaatsaanduidingen zoals $1 door echte waarden voordat u het plan bekijkt."
     }
   },
   "pipeline": {
@@ -1211,7 +1304,7 @@
     "label": "Functies",
     "groups": {
       "monitor": "Monitoring",
-      "drift": "Consistentie",
+      "drift": "GAP-analyse",
       "lake": "Lake",
       "admin": "Beheer"
     },
@@ -1219,7 +1312,7 @@
     "sqlLab": "SQL Tuning",
     "perf": "Prestaties",
     "monitor": "Monitoring",
-    "drift": "Drift",
+    "drift": "GAP-analyse",
     "migration": "Migratie",
     "pipeline": "Pipeline",
     "analytics": "Analyse",

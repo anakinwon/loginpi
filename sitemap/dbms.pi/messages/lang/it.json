@@ -103,7 +103,7 @@
       "keys": {
         "links": "I miei collegamenti",
         "perf": "Snapshot delle prestazioni",
-        "drift": "Esecuzioni di drift",
+        "drift": "Analisi GAP",
         "mig": "Piani di migrazione",
         "pipe": "Pipeline",
         "lake": "Dataset del Lake"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Drift Modello ↔ DB",
+    "title": "Analisi GAP — Modello↔DB",
     "intro": "Confronta il modello di progettazione schema.pi e la cronologia di applicazione DDL con il catalogo DB live per trovare il drift e misurare se gli indici progettati sono effettivamente utilizzati. I dati delle righe del cliente non vengono mai letti o archiviati.",
     "needLink": "Scegli prima un collegamento schema.pi qui sopra. Se non ne hai, registra un token nel menu 'Collegamento'.",
     "needConn": "Scegli la connessione DB da confrontare qui sopra.",
     "project": "Progetto",
     "projectPick": "Seleziona un progetto",
     "loading": "Caricamento…",
-    "run": "Esegui rilevamento drift",
+    "run": "Esegui Analisi GAP",
     "running": "Confrontando…",
     "readOnly": "Vengono eseguite solo query di catalogo e statistiche di sola lettura.",
     "applyInSchema": "Applica le correzioni (modifiche al modello, generazione ed esecuzione DDL) in schema.pi, la fonte di verità.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Indici progettati mancanti nel DB",
       "extraIndexes": "Indici non nel modello",
       "ddlMissing": "Oggetti scomparsi dopo l'applicazione",
-      "unusedIndexes": "Indici progettati inutilizzati"
+      "unusedIndexes": "Indici candidati non utilizzati"
     },
     "sec": {
       "ddlMissing": "DDL applicato ma mancante nel DB",
       "missingTables": "Tabelle nel modello ma mancanti nel DB",
       "extraTables": "Tabelle nel DB ma non nel modello",
-      "colMismatches": "Mancate corrispondenze tipo colonna / NULL",
+      "colMismatches": "Mancanze colonne (Mancanti·Tipo·NULL)",
       "missingIndexes": "Indici progettati mancanti nel DB",
       "extraIndexes": "Indici solo nel DB (escluso PK)",
       "idxUsage": "Efficacia dell'indice progettato"
     },
     "hint": {
-      "ddlMissing": "schema.pi ha registrato questi oggetti come applicati, ma sono scomparsi — sospettare un'eliminazione manuale o un rollback.",
-      "extraTables": "Questi potrebbero appartenere ad altri progetti o tabelle di sistema su questa connessione.",
-      "idxUsage": "Zero scansioni dall'ultimo reset delle statistiche significa inutilizzato. Controlla la finestra delle statistiche prima di eliminare."
+      "ddlMissing": "Vengono mostrati solo gli oggetti mancanti dal DB in base all'ultimo standard applicato. Le richieste precedenti che hanno ricreato la stessa tabella in seguito e le vecchie convenzioni di denominazione (_PKEY) sono normali e ripiegate di seguito.",
+      "extraTables": "Basato sullo schema {schema}. Raggruppato per prefisso, solo il gruppo di prefissi di questo progetto è candidato all'omissione del modello.",
+      "idxUsage": "Giudizio = In uso / Per unicità / Nessun dato / Sotto osservazione (Statistiche avviate·Creato meno di 7 giorni) / Candidato per non utilizzato. Solo i candidati per indici non utilizzati vengono considerati per l'eliminazione."
     },
     "kind": {
       "MISSING": "mancante nel DB",
@@ -223,12 +223,16 @@
       "idx": "Indice",
       "scans": "Scansioni",
       "size": "Dimensione",
-      "status": "Verdetto"
+      "status": "Verdetto",
+      "basis": "Base"
     },
     "usage": {
       "USED": "In uso",
-      "UNUSED": "Indice progettato inutilizzato",
-      "NO_STATS": "Nessuna statistica"
+      "NO_STATS": "Nessuna statistica",
+      "CONSTRAINT": "Vincolo di unicità (mantieni)",
+      "NO_DATA": "Nessun dato o statistiche non raccolte — impossibile giudicare",
+      "OBSERVING": "In osservazione (meno di 7 giorni)",
+      "UNUSED_CAND": "Candidato non utilizzato"
     },
     "errors": {
       "NOT_IMPLEMENTED": "La funzione di collegamento schema.pi non è ancora pronta. Riprova a breve.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Connessione non supportata (solo connessioni server PostgreSQL per ora).",
       "TIMEOUT": "La richiesta è scaduta. Riprova a breve.",
       "RATE": "Troppe richieste. Riprova tra un minuto."
+    },
+    "schema": "Schema",
+    "schemaHint": "Vengono confrontate solo le tabelle regolari e partizionate in questo schema (viste escluse). Predefinito public — gli schemi interni di Supabase (auth, storage, …) sono esclusi.",
+    "truncated": "{names} ha raggiunto il limite di {max} righe ed è stato troncato — alcuni risultati \"non nel DB\" / \"non nel modello\" potrebbero essere falsi. Restringere lo schema ed eseguire di nuovo.",
+    "colUnchecked": "Poiché la query delle colonne è stata troncata, {n} risultati di colonne mancanti/extra sono trattati come non verificabili ed esclusi dal conteggio delle mancate corrispondenze delle colonne.",
+    "renamed": "{n} indice/i PK applicato/i con la vecchia regola di denominazione (_PKEY) esiste/ono nel DB con il nuovo nome (PK_) — normale",
+    "superseded": "{n} richiesta/e più vecchia/e è/sono stata/e esclusa/e perché una richiesta successiva ha ricreato la stessa tabella (DROP … CASCADE) — normale",
+    "supersededItem": "Richiesta {id} → sostituita dalla richiesta {by}",
+    "sysCols": "{n} colonna/e di sistema aggiunta/e automaticamente durante la generazione DDL non è/sono nel modello per progettazione ed è/sono esclusa/e dalle mancate corrispondenze",
+    "groupOwn": "Prefisso progetto {pfx} — candidati mancanti dal modello",
+    "groupOther": "Altro sistema {pfx}",
+    "basis": "Righe stimate {rows} · da {since}",
+    "guide": {
+      "title": "Passi successivi",
+      "ddlMissing": {
+        "s1": "In schema.pi → il progetto → modello fisico → generazione DDL, applica di nuovo a questa connessione.",
+        "s2": "Al termine, usa \"Esegui di nuovo\" qui sotto e conferma che il conteggio sia 0.",
+        "s3": "Se gli oggetti continuano a scomparire dopo aver riapplicato, sospetta un'eliminazione manuale o un rollback e controlla l'attività dell'account di connessione con il tuo DBA."
+      },
+      "extraTables": {
+        "s1": "Questo bundle di prefissi di progetto = candidati modello mancanti — importali nel modello tramite schema.pi → Impostazioni → Reverse, oppure decidi se eliminarli se sono tabelle inutilizzate.",
+        "s2": "Altri gruppi di prefissi = altri sistemi che condividono questo DB — non sono elementi di azione per questo progetto.",
+        "s3": "Se lo schema di destinazione non è public, cambia il campo \"Schema\" sopra ed esegui di nuovo."
+      },
+      "colMismatches": {
+        "s1": "Non nel DB = applica la colonna del modello al DB tramite la generazione DDL di schema.pi.",
+        "s2": "Non nel modello = importa la colonna DB nel modello tramite schema.pi → Impostazioni → Reverse, oppure decidi di eliminarla se non necessaria.",
+        "s3": "Tipo/NULL differisce = allinea al modello (fonte di verità); prima di ridurre la lunghezza o passare a NOT NULL, conferma che le righe esistenti lo soddisfino."
+      },
+      "idxUsage": {
+        "s1": "Prima di rimuovere, controlla ① che la finestra delle statistiche copra almeno un ciclo di business (es. batch di fine mese) — vedi \"da\".",
+        "s2": "② Non è un indice unico/PK (questi vengono mostrati separatamente come \"vincolo di unicità\").",
+        "s3": "③ EXPLAIN il SQL rappresentativo della tabella in SQL Tuning e conferma che questo indice non viene utilizzato.",
+        "s4": "Una volta confermati tutti e tre, rimuovi l'indice dal modello in schema.pi e applica tramite DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Apri schema.pi",
+      "rerun": "Esegui di nuovo",
+      "copy": "Copia elenco",
+      "copied": "Copiato",
+      "sqlLab": "EXPLAIN in SQL Tuning"
     }
   },
   "learn": {
@@ -502,6 +548,7 @@
       "INVALID_INPUT": "La richiesta non è valida."
     },
     "board": {
+      "subtitle": "Cosa fare su questo DB in questo momento — 14 segnali di stato (OK, avviso o rischio) e soluzioni, a colpo d'occhio.",
       "refresh": {
         "updated": "Aggiornato alle {time} · si aggiorna ogni minuto",
         "now": "Aggiorna ora",
@@ -520,6 +567,7 @@
         "WARN": "Avviso — alcuni elementi richiedono attenzione",
         "UNKNOWN": "Sconosciuto — controllare la connessione",
         "OK": "OK — ogni segnale è entro i limiti",
+        "CONN_DOWN": "Impossibile connettersi al DB — verificare prima la connessione",
         "NA": "N/D"
       },
       "kpi": {
@@ -685,7 +733,7 @@
         "repl": "Controllo replica",
         "backup": "Controllo backup",
         "sqlLab": "SQL tuning",
-        "drift": "Confronto drift",
+        "drift": "Analisi GAP",
         "connect": "Connessioni",
         "schema": "monitor schema.pi"
       },
@@ -954,7 +1002,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "Il collegamento schema.pi è in preparazione. Riprova più tardi",
+      "PGSS_MISSING": "L'estensione pg_stat_statements non è installata su questo DB, quindi le statistiche delle query non sono disponibili",
       "CONN_UNSUPPORTED": "Questa connessione non è ancora supportata (solo connessioni PostgreSQL dirette)",
+      "TIMEOUT": "Il DB di destinazione ha risposto troppo lentamente. Riprovare più tardi",
       "RATE": "Troppe richieste. Riprova tra un minuto",
       "LINK_AUTH": "Il token di collegamento è scaduto o è stato revocato. Registra di nuovo il token nella pagina Connetti",
       "LINK_SCOPE": "Questa connessione non appartiene all'area tematica del collegamento",
@@ -984,7 +1034,11 @@
       "totalMs": "Totale ms",
       "meanMs": "Media ms",
       "rows": "Righe",
-      "reset": "Rilevato ripristino statistiche — mostrato come cumulativo"
+      "reset": "Rilevato ripristino statistiche — mostrato come cumulativo",
+      "src": "Origine",
+      "srcToggle": "Mostra o nascondi i dettagli dell'origine",
+      "openSqlLab": "Apri in SQL Tuning",
+      "acct": "Account"
     },
     "health": {
       "empty": "Nessuna istantanea ancora. Premi Raccogli ora nella scheda Raccogli",
@@ -1001,6 +1055,7 @@
     "trend": {
       "limit": "Soglia dimensione",
       "empty": "Nessuna istantanea negli ultimi 30 giorni",
+      "chart": "Dimensioni del DB negli ultimi 30 giorni",
       "now": "Dimensione attuale",
       "perDay": "Crescita giornaliera",
       "needMore": "Richiede 2+ istantanee",
@@ -1014,6 +1069,46 @@
       "sessions": "Attività sessione",
       "locks": "Blocchi",
       "none": "Nessuno"
+    },
+    "src": {
+      "root": "Per individuare l'origine con precisione: (1) usa un account DB separato per ogni programma, batch e persona (strumento), e (2) imposta application_name su ogni connessione. L'account proviene da pg_stat_statements ed è certo; la categoria app/strumento è stimata da campioni di attività (application_name è auto-dichiarato dal client, quindi può essere vuoto o modificato, e le query brevi che terminano tra i campioni possono essere perse)",
+      "cd": {
+        "PROGRAM": "Programma",
+        "BATCH": "Batch",
+        "TOOL": "Strumento (persona)",
+        "PLATFORM": "Interno piattaforma",
+        "MONITOR": "Monitoraggio (noi)",
+        "UNKNOWN": "Sconosciuto"
+      },
+      "conf": {
+        "high": "Alta confidenza",
+        "mid": "Media confidenza",
+        "low": "Bassa confidenza",
+        "acct": "Solo account",
+        "ver": "Limite versione"
+      },
+      "fix": {
+        "TOOL": "Sembra che una persona stia interrogando direttamente il DB di produzione con uno strumento DB (DBeaver ecc.). Indirizzali invece a una replica di sola lettura o a un DB di analisi e limita il tempo di esecuzione sugli account umani, ad esempio ALTER ROLE human_user SET statement_timeout = '30s'. Usa un ruolo di sola lettura separato ed esegui estrazioni di massa in orari non di punta",
+        "BATCH": "Sembra un batch o un lavoro pianificato. Distribuisci i tempi di esecuzione lontano dai picchi di business e riduci il lavoro per commit. Controlla indici e statistiche (ANALYZE) sulle tabelle di destinazione e dividi le transazioni lunghe. Inserire il nome del lavoro in application_name rende la prossima classificazione più precisa",
+        "PROGRAM": "Sembra una query eseguita da un'applicazione. Controlla il piano in SQL Tuning. Molte chiamate con una media breve indicano chiamate ripetute (N+1) o caching; una media lunga indica prima indici o ordine di join. Imposta il nome del servizio in application_name del tuo pool di connessioni",
+        "PLATFORM": "Sembra un lavoro interno al DB o alla piattaforma come autovacuum o replica. Di solito non è necessaria alcuna azione. Se rimane in cima, rivedi le soglie di autovacuum e maintenance_work_mem",
+        "MONITOR": "Sembra che siano le query statistiche di questo servizio (collegamento schema.pi). Nessuna azione necessaria. Se appare troppo spesso, abbassa la frequenza di polling",
+        "UNKNOWN": "Non ci sono indizi sull'origine. Imposta application_name su ogni connessione e dividi gli account per scopo; verrà classificato dai prossimi campioni"
+      },
+      "detail": {
+        "app": "Nome app",
+        "addr": "Indirizzo client (mascherato)",
+        "samples": "Campioni",
+        "active": "Campioni attivi",
+        "period": "Osservato",
+        "none": "(vuoto)"
+      },
+      "noSample": "Ancora nessun campione — le sessioni in esecuzione vengono campionate quando visualizzi la bacheca di monitoraggio o la scheda Attività e blocchi. Per ora è classificato solo dal nome dell'account",
+      "verOff": "Questo DB è precedente a PostgreSQL 14, quindi le sessioni in esecuzione non hanno un ID query. Viene mostrato solo l'account (certo)",
+      "privOff": "L'account di collegamento non può vedere i dettagli delle sessioni di altri account, quindi non vengono raccolti campioni. Chiedi a un amministratore DB di eseguire GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "account di collegamento",
+      "qidOff": "I dettagli della sessione sono visibili ma l'ID query è vuoto (compute_query_id è disattivato). Controlla con SHOW compute_query_id; quindi esegui ALTER SYSTEM SET compute_query_id = 'auto'; e ricarica (SELECT pg_reload_conf();)",
+      "openHint": "Apre SQL Tuning con la query compilata. Sostituisci i segnaposto come $1 con valori reali prima di visualizzare il piano"
     }
   },
   "pipeline": {
@@ -1210,7 +1305,7 @@
     "label": "Funzionalità",
     "groups": {
       "monitor": "Monitoraggio",
-      "drift": "Coerenza",
+      "drift": "Analisi GAP",
       "lake": "Lake",
       "admin": "Amministrazione"
     },
@@ -1218,7 +1313,7 @@
     "sqlLab": "Tuning SQL",
     "perf": "Prestazioni",
     "monitor": "Monitoraggio",
-    "drift": "Deriva",
+    "drift": "Analisi GAP",
     "migration": "Migrazione",
     "pipeline": "Pipeline",
     "analytics": "Analisi",

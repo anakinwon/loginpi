@@ -103,7 +103,7 @@
       "keys": {
         "links": "Liên kết của tôi",
         "perf": "Ảnh chụp hiệu suất",
-        "drift": "Chạy kiểm tra độ lệch",
+        "drift": "Phân tích GAP",
         "mig": "Kế hoạch di chuyển",
         "pipe": "Pipeline",
         "lake": "Tập dữ liệu hồ dữ liệu"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Độ lệch Mô hình ↔ DB",
+    "title": "Phân tích GAP — Mô hình↔DB",
     "intro": "So sánh mô hình thiết kế schema.pi và lịch sử áp dụng DDL với danh mục DB trực tiếp để tìm độ lệch, và đo lường xem các chỉ mục đã thiết kế có thực sự được sử dụng hay không. Dữ liệu hàng của khách hàng không bao giờ được đọc hoặc lưu trữ.",
     "needLink": "Trước tiên, hãy chọn một liên kết schema.pi ở trên. Nếu bạn chưa có, hãy đăng ký một token trong menu 'Liên kết'.",
     "needConn": "Chọn kết nối DB để so sánh ở trên.",
     "project": "Dự án",
     "projectPick": "Chọn một dự án",
     "loading": "Đang tải…",
-    "run": "Chạy phát hiện độ lệch",
+    "run": "Chạy phân tích GAP",
     "running": "Đang so sánh…",
     "readOnly": "Chỉ chạy các truy vấn danh mục và thống kê chỉ đọc.",
     "applyInSchema": "Áp dụng các bản sửa lỗi (chỉnh sửa mô hình, tạo và thực thi DDL) trong schema.pi, nguồn đáng tin cậy.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Chỉ mục đã thiết kế thiếu trong DB",
       "extraIndexes": "Chỉ mục không có trong mô hình",
       "ddlMissing": "Đối tượng đã biến mất sau khi áp dụng",
-      "unusedIndexes": "Chỉ mục đã thiết kế không được sử dụng"
+      "unusedIndexes": "Chỉ mục ứng cử viên không sử dụng"
     },
     "sec": {
       "ddlMissing": "DDL đã áp dụng nhưng thiếu trong DB",
       "missingTables": "Bảng có trong mô hình nhưng thiếu trong DB",
       "extraTables": "Bảng có trong DB nhưng không có trong mô hình",
-      "colMismatches": "Không khớp kiểu cột / NULL",
+      "colMismatches": "Cột không khớp (thiếu·kiểu·NULL)",
       "missingIndexes": "Chỉ mục đã thiết kế thiếu trong DB",
       "extraIndexes": "Chỉ mục chỉ có trong DB (trừ PK)",
       "idxUsage": "Hiệu quả sử dụng chỉ mục đã thiết kế"
     },
     "hint": {
-      "ddlMissing": "schema.pi đã ghi nhận các đối tượng này đã được áp dụng, nhưng chúng đã biến mất — nghi ngờ bị xóa thủ công hoặc rollback.",
-      "extraTables": "Những bảng này có thể thuộc về các dự án khác hoặc bảng hệ thống trên kết nối này.",
-      "idxUsage": "Số lần quét bằng 0 kể từ lần đặt lại thống kê cuối cùng có nghĩa là không được sử dụng. Kiểm tra cửa sổ thống kê trước khi xóa."
+      "ddlMissing": "Chỉ hiển thị các đối tượng không có trong DB dựa trên ứng dụng mới nhất. Các yêu cầu trước đó đã tạo lại cùng một bảng sau này và các quy tắc đặt tên cũ (_PKEY) là bình thường và được thu gọn bên dưới.",
+      "extraTables": "Dựa trên schema {schema}. Được nhóm theo tiền tố và chỉ nhóm tiền tố dự án này là các ứng cử viên bị thiếu trong mô hình.",
+      "idxUsage": "Phán đoán = đang sử dụng / để đảm bảo tính duy nhất / không có dữ liệu / đang quan sát (thống kê bắt đầu·tạo dưới 7 ngày) / ứng cử viên không sử dụng. Chỉ xem xét xóa các ứng cử viên không sử dụng."
     },
     "kind": {
       "MISSING": "thiếu trong DB",
@@ -223,12 +223,16 @@
       "idx": "Chỉ mục",
       "scans": "Số lần quét",
       "size": "Kích thước",
-      "status": "Phán quyết"
+      "status": "Phán quyết",
+      "basis": "Cơ sở"
     },
     "usage": {
       "USED": "Đang sử dụng",
-      "UNUSED": "Chỉ mục đã thiết kế không được sử dụng",
-      "NO_STATS": "Không có thống kê"
+      "NO_STATS": "Không có thống kê",
+      "CONSTRAINT": "Để đảm bảo tính duy nhất (không phải đối tượng xóa)",
+      "NO_DATA": "Không có dữ liệu hoặc thống kê chưa được thu thập — không thể phán đoán",
+      "OBSERVING": "Đang quan sát (dưới 7 ngày)",
+      "UNUSED_CAND": "Ứng cử viên không sử dụng"
     },
     "errors": {
       "NOT_IMPLEMENTED": "Tính năng liên kết schema.pi đang được chuẩn bị. Vui lòng thử lại sau.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Kết nối không được hỗ trợ (hiện tại chỉ hỗ trợ kết nối máy chủ PostgreSQL).",
       "TIMEOUT": "Yêu cầu đã hết thời gian. Vui lòng thử lại sau.",
       "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau một phút."
+    },
+    "schema": "Schema",
+    "schemaHint": "Chỉ các bảng thông thường và bảng phân vùng trong schema này được so sánh (không bao gồm các view). Mặc định là public — các schema nội bộ của Supabase (auth, storage, …) bị bỏ qua.",
+    "truncated": "Truy vấn {names} đã đạt giới hạn {max} hàng và bị cắt bớt — một số kết quả \"không có trong DB\" / \"không có trong mô hình\" có thể sai. Thu hẹp schema và chạy lại.",
+    "colUnchecked": "Vì truy vấn cột bị cắt bớt, {n} kết quả cột bị thiếu/thêm được coi là không thể xác minh và bị loại khỏi số lượng cột không khớp.",
+    "renamed": "{n} chỉ mục PK được áp dụng theo quy tắc đặt tên cũ (_PKEY) tồn tại trong DB dưới tên mới (PK_) — bình thường",
+    "superseded": "{n} yêu cầu cũ hơn đã bị loại trừ vì một yêu cầu sau đó đã tạo lại cùng một bảng (DROP … CASCADE) — bình thường",
+    "supersededItem": "Yêu cầu {id} → bị thay thế bởi yêu cầu {by}",
+    "sysCols": "{n} cột hệ thống (được thêm tự động khi tạo DDL) không có trong mô hình theo thiết kế và bị loại khỏi các trường hợp không khớp",
+    "groupOwn": "Tiền tố dự án {pfx} — ứng cử viên bị thiếu trong mô hình",
+    "groupOther": "Hệ thống khác {pfx}",
+    "basis": "Ước tính hàng {rows} · từ {since}",
+    "guide": {
+      "title": "Các bước tiếp theo",
+      "ddlMissing": {
+        "s1": "Trong schema.pi → dự án → mô hình vật lý → tạo DDL, áp dụng lại cho kết nối này.",
+        "s2": "Khi hoàn tất, sử dụng \"Chạy lại\" bên dưới và xác nhận số lượng là 0.",
+        "s3": "Nếu các đối tượng vẫn biến mất sau khi áp dụng lại, hãy nghi ngờ việc xóa thủ công hoặc khôi phục và kiểm tra hoạt động của tài khoản kết nối với DBA của bạn."
+      },
+      "extraTables": {
+        "s1": "Các bảng có tiền tố dự án này = Các ứng viên thiếu mô hình — hãy nhập chúng vào mô hình thông qua schema.pi → Cài đặt → Đảo ngược, hoặc quyết định xóa nếu chúng không được sử dụng.",
+        "s2": "Các nhóm tiền tố khác = các hệ thống khác chia sẻ DB này — không phải là mục hành động cho dự án này.",
+        "s3": "Nếu schema đích không phải là public, hãy thay đổi trường \"Schema\" ở trên và chạy lại."
+      },
+      "colMismatches": {
+        "s1": "Không có trong DB = áp dụng cột mô hình vào DB thông qua tạo DDL của schema.pi.",
+        "s2": "Không có trong mô hình = Nhập cột DB vào mô hình thông qua schema.pi → Cài đặt → Đảo ngược, hoặc quyết định xóa nếu không cần thiết.",
+        "s3": "Kiểu/NULL khác nhau = căn chỉnh theo mô hình (nguồn đáng tin cậy); trước khi thu hẹp độ dài hoặc chuyển sang NOT NULL, hãy xác nhận các hàng hiện có đáp ứng điều đó."
+      },
+      "idxUsage": {
+        "s1": "Trước khi xóa, hãy kiểm tra ① cửa sổ thống kê bao gồm ít nhất một chu kỳ kinh doanh (ví dụ: lô cuối tháng) — xem \"từ\".",
+        "s2": "② Nó không phải là chỉ mục duy nhất/PK (những chỉ mục đó hiển thị riêng là \"ràng buộc duy nhất\").",
+        "s3": "③ EXPLAIN SQL đại diện của bảng trong SQL Tuning và xác nhận chỉ mục này không được sử dụng.",
+        "s4": "Sau khi xác nhận cả ba, hãy xóa chỉ mục khỏi mô hình trong schema.pi và áp dụng thông qua DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Mở schema.pi",
+      "rerun": "Chạy lại",
+      "copy": "Sao chép danh sách",
+      "copied": "Đã sao chép",
+      "sqlLab": "EXPLAIN trong SQL Tuning"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Kiểm tra sao chép",
         "backup": "Kiểm tra sao lưu",
         "sqlLab": "Điều chỉnh SQL",
-        "drift": "So sánh độ lệch",
+        "drift": "Phân tích GAP",
         "connect": "Kết nối",
         "schema": "Màn hình schema.pi"
       },
@@ -812,6 +858,7 @@
   },
   "ops": {
     "title": "An toàn hoạt động DB",
+    "intro": "Chẩn đoán chỉ đọc các tham số, quyền tài khoản, sao lưu và trạng thái sao chép của kết nối PostgreSQL đã liên kết. Không thay đổi cài đặt; chỉ lưu trữ tóm tắt phán quyết và không lưu trữ dữ liệu hàng DB của khách hàng",
     "loading": "Đang tải…",
     "pickFirst": "Vui lòng chọn một liên kết và kết nối ở trên trước",
     "run": "Chạy chẩn đoán",
@@ -944,6 +991,7 @@
   },
   "perf": {
     "title": "Hiệu suất",
+    "intro": "Thu thập số liệu thống kê truy vấn, bảng và chỉ mục từ kết nối PostgreSQL đã liên kết để hiển thị các truy vấn chậm, tình trạng bảng/chỉ mục và xu hướng kích thước. Chỉ lưu trữ số liệu thống kê — không bao giờ lưu trữ dữ liệu hàng DB của khách hàng",
     "loading": "Đang tải…",
     "pickFirst": "Vui lòng chọn một liên kết và kết nối ở trên trước",
     "pager": "Phân trang",
@@ -989,7 +1037,11 @@
       "totalMs": "Tổng ms",
       "meanMs": "Trung bình ms",
       "rows": "Hàng",
-      "reset": "Đã phát hiện đặt lại số liệu thống kê — hiển thị dưới dạng tích lũy"
+      "reset": "Đã phát hiện đặt lại số liệu thống kê — hiển thị dưới dạng tích lũy",
+      "src": "Nguồn",
+      "srcToggle": "Hiển thị hoặc ẩn chi tiết nguồn",
+      "openSqlLab": "Mở trong SQL Tuning",
+      "acct": "Tài khoản"
     },
     "health": {
       "empty": "Chưa có ảnh chụp nhanh nào. Nhấn Thu thập ngay trên tab Thu thập",
@@ -1020,6 +1072,46 @@
       "sessions": "Hoạt động phiên",
       "locks": "Khóa",
       "none": "Không có"
+    },
+    "src": {
+      "root": "Để xác định chính xác nguồn: (1) sử dụng một tài khoản DB riêng cho mỗi chương trình, lô và người (công cụ), và (2) đặt application_name trên mỗi kết nối. Tài khoản đến từ pg_stat_statements và là chắc chắn; danh mục ứng dụng/công cụ được ước tính từ các mẫu hoạt động (application_name được máy khách tự báo cáo, vì vậy nó có thể trống hoặc thay đổi, và các truy vấn ngắn kết thúc giữa các mẫu có thể bị bỏ lỡ)",
+      "cd": {
+        "PROGRAM": "Chương trình",
+        "BATCH": "Lô",
+        "TOOL": "Công cụ (người)",
+        "PLATFORM": "Nội bộ nền tảng",
+        "MONITOR": "Giám sát (chúng tôi)",
+        "UNKNOWN": "Không xác định"
+      },
+      "conf": {
+        "high": "Độ tin cậy cao",
+        "mid": "Độ tin cậy trung bình",
+        "low": "Độ tin cậy thấp",
+        "acct": "Chỉ tài khoản",
+        "ver": "Giới hạn phiên bản"
+      },
+      "fix": {
+        "TOOL": "Có vẻ như một người đang truy vấn trực tiếp DB sản xuất bằng một công cụ DB (DBeaver, v.v.). Thay vào đó, hãy hướng họ đến một bản sao chỉ đọc hoặc DB phân tích, và giới hạn thời gian chạy trên các tài khoản người dùng, ví dụ: ALTER ROLE human_user SET statement_timeout = '30s'. Sử dụng một vai trò chỉ đọc riêng, và thực hiện các trích xuất lớn vào giờ thấp điểm",
+        "BATCH": "Có vẻ như một lô hoặc công việc đã lên lịch. Phân tán thời gian chạy ra khỏi các đỉnh kinh doanh và thu nhỏ công việc trên mỗi commit. Kiểm tra các chỉ mục và thống kê (ANALYZE) trên các bảng đích, và chia nhỏ các giao dịch dài. Đặt tên công việc vào application_name sẽ làm cho phân loại tiếp theo chính xác hơn",
+        "PROGRAM": "Có vẻ như một truy vấn được chạy bởi một ứng dụng. Kiểm tra kế hoạch trong SQL Tuning. Nhiều cuộc gọi với thời gian trung bình ngắn chỉ ra các cuộc gọi lặp lại (N+1) hoặc bộ nhớ đệm; thời gian trung bình dài chỉ ra các chỉ mục hoặc thứ tự join trước tiên. Đặt tên dịch vụ trong application_name của nhóm kết nối của bạn",
+        "PLATFORM": "Có vẻ như công việc nội bộ của DB hoặc nền tảng như autovacuum hoặc sao chép. Thường không cần hành động. Nếu nó vẫn ở trên cùng, hãy xem xét ngưỡng autovacuum và maintenance_work_mem",
+        "MONITOR": "Có vẻ như các truy vấn thống kê của dịch vụ này (liên kết schema.pi). Không cần hành động. Nếu nó xuất hiện quá thường xuyên, hãy giảm tần suất thăm dò",
+        "UNKNOWN": "Không có manh mối nào về nguồn. Đặt application_name trên mỗi kết nối và chia tài khoản theo mục đích; nó sẽ được phân loại từ các mẫu tiếp theo"
+      },
+      "detail": {
+        "app": "Tên ứng dụng",
+        "addr": "Địa chỉ máy khách (đã che)",
+        "samples": "Mẫu",
+        "active": "Mẫu hoạt động",
+        "period": "Đã quan sát",
+        "none": "(trống)"
+      },
+      "noSample": "Chưa có mẫu nào — các phiên đang chạy được lấy mẫu khi bạn xem bảng giám sát hoặc tab Hoạt động & khóa. Hiện tại nó chỉ được phân loại từ tên tài khoản",
+      "verOff": "DB này cũ hơn PostgreSQL 14, vì vậy các phiên đang chạy không có ID truy vấn. Chỉ tài khoản (chắc chắn) được hiển thị",
+      "privOff": "Tài khoản liên kết không thể xem chi tiết phiên của các tài khoản khác, vì vậy không có mẫu nào được thu thập. Yêu cầu quản trị viên DB chạy GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "tài khoản liên kết",
+      "qidOff": "Chi tiết phiên hiển thị nhưng ID truy vấn trống (compute_query_id bị tắt). Kiểm tra với SHOW compute_query_id; sau đó chạy ALTER SYSTEM SET compute_query_id = 'auto'; và tải lại (SELECT pg_reload_conf();)",
+      "openHint": "Mở SQL Tuning với truy vấn đã được điền. Thay thế các chỗ giữ chỗ như $1 bằng các giá trị thực trước khi xem kế hoạch"
     }
   },
   "pipeline": {
@@ -1216,7 +1308,7 @@
     "label": "Tính năng",
     "groups": {
       "monitor": "Giám sát",
-      "drift": "Tính nhất quán",
+      "drift": "Phân tích GAP",
       "lake": "Hồ dữ liệu",
       "admin": "Quản trị"
     },
@@ -1224,7 +1316,7 @@
     "sqlLab": "Điều chỉnh SQL",
     "perf": "Hiệu suất",
     "monitor": "Giám sát",
-    "drift": "Độ lệch",
+    "drift": "Phân tích GAP",
     "migration": "Di chuyển",
     "pipeline": "Pipeline",
     "analytics": "Phân tích",

@@ -103,7 +103,7 @@
       "keys": {
         "links": "Mənim bağlantılarım",
         "perf": "Performans anlıq görüntüləri",
-        "drift": "Drift işləri",
+        "drift": "GAP Analizi",
         "mig": "Miqrasiya planları",
         "pipe": "Boru kəmərləri",
         "lake": "Göl məlumat dəstləri"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB Drift",
+    "title": "GAP Analizi — Model↔DB",
     "intro": "schema.pi dizayn modelini və DDL tətbiq tarixçəsini canlı DB kataloqu ilə müqayisə edərək drifti tapın və dizayn edilmiş indekslərin həqiqətən istifadə edilib-edilmədiyini ölçün. Müştəri sətir məlumatları heç vaxt oxunmur və ya saxlanılmır.",
     "needLink": "Əvvəlcə yuxarıdan bir schema.pi bağlantısı seçin. Əgər yoxdursa, 'Bağlantı' menyusunda bir token qeyd edin.",
     "needConn": "Yuxarıdan müqayisə etmək üçün DB bağlantısını seçin.",
     "project": "Layihə",
     "projectPick": "Layihə seçin",
     "loading": "Yüklənir…",
-    "run": "Drift aşkarlanmasını işə salın",
+    "run": "GAP Analizini Başlat",
     "running": "Müqayisə edilir…",
     "readOnly": "Yalnız oxuma kataloqu və statistika sorğuları işə salınır.",
     "applyInSchema": "Düzəlişləri (model redaktələri, DDL generasiyası və icrası) həqiqət mənbəyi olan schema.pi-də tətbiq edin.",
@@ -197,21 +197,21 @@
       "missingIndexes": "DB-də olmayan dizayn edilmiş indekslər",
       "extraIndexes": "Modeldə olmayan indekslər",
       "ddlMissing": "Tətbiqdən sonra itən obyektlər",
-      "unusedIndexes": "İstifadə olunmayan dizayn edilmiş indekslər"
+      "unusedIndexes": "İstifadə edilməmiş indeks namizədləri"
     },
     "sec": {
       "ddlMissing": "DDL tətbiq edildi, lakin DB-də yoxdur",
       "missingTables": "Modeldə olan, lakin DB-də olmayan cədvəllər",
       "extraTables": "DB-də olan, lakin modeldə olmayan cədvəllər",
-      "colMismatches": "Sütun tipi / NULL uyğunsuzluqları",
+      "colMismatches": "Sütun uyğunsuzluqları (Çatışmayan·Növ·NULL)",
       "missingIndexes": "DB-də olmayan dizayn edilmiş indekslər",
       "extraIndexes": "Yalnız DB-də olan indekslər (PK istisna olmaqla)",
       "idxUsage": "Dizayn edilmiş indeksin effektivliyi"
     },
     "hint": {
-      "ddlMissing": "schema.pi bu obyektləri tətbiq edilmiş kimi qeyd etdi, lakin onlar yoxdur — əl ilə silinmə və ya geri qaytarılmadan şübhələnin.",
-      "extraTables": "Bunlar bu bağlantıdakı digər layihələrə və ya sistem cədvəllərinə aid ola bilər.",
-      "idxUsage": "Son statistika sıfırlanmasından bəri sıfır skan istifadə olunmadığı deməkdir. Silməzdən əvvəl statistika pəncərəsini yoxlayın."
+      "ddlMissing": "Yalnız ən son tətbiq edilmiş standarta əsasən DB-də olmayan obyektlər göstərilir. Eyni cədvəli daha sonra yenidən yaradan əvvəlki sorğular və köhnə adlandırma qaydaları (_PKEY) normaldır və aşağıda qatlanmışdır.",
+      "extraTables": "{schema} sxeminə əsaslanır. Prefiksə görə qruplaşdırılıb, yalnız bu layihənin prefiks qrupu modeldən buraxılma namizədləridir.",
+      "idxUsage": "Mühakimə = İstifadə olunur / Unikallıq üçün / Məlumat yoxdur / Müşahidə altında (Statistika başladı·7 gündən az yaradılıb) / İstifadə edilməmiş namizəd. Yalnız istifadə edilməmiş indeks namizədləri silinmək üçün nəzərdən keçirilir."
     },
     "kind": {
       "MISSING": "DB-də yoxdur",
@@ -223,12 +223,16 @@
       "idx": "İndeks",
       "scans": "Skanlar",
       "size": "Ölçü",
-      "status": "Hökm"
+      "status": "Hökm",
+      "basis": "Əsas"
     },
     "usage": {
       "USED": "İstifadədədir",
-      "UNUSED": "İstifadə olunmayan dizayn edilmiş indeks",
-      "NO_STATS": "Statistika yoxdur"
+      "NO_STATS": "Statistika yoxdur",
+      "CONSTRAINT": "Unikallıq məhdudiyyəti (saxla)",
+      "NO_DATA": "Məlumat yoxdur və ya statistika toplanmayıb — mühakimə etmək mümkün deyil",
+      "OBSERVING": "Müşahidə altında (7 gündən az)",
+      "UNUSED_CAND": "İstifadə edilməmiş namizəd"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi bağlantı funksiyası hazırlanır. Zəhmət olmasa, qısa müddətdən sonra yenidən cəhd edin.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Dəstəklənməyən bağlantı (hələlik yalnız PostgreSQL server bağlantıları).",
       "TIMEOUT": "Sorğunun vaxtı bitdi. Zəhmət olmasa, qısa müddətdən sonra yenidən cəhd edin.",
       "RATE": "Çoxlu sorğu var. Zəhmət olmasa, bir dəqiqədən sonra yenidən cəhd edin."
+    },
+    "schema": "Sxem",
+    "schemaHint": "Yalnız bu sxemdəki adi və bölməli cədvəllər müqayisə edilir (görünüşlər istisna olmaqla). Varsayılan public — Supabase daxili sxemləri (auth, storage, …) kənarda qalır.",
+    "truncated": "{names} {max} sətir limitinə çatdı və kəsildi — bəzi \"DB-də yoxdur\" / \"modeldə yoxdur\" nəticələri yanlış ola bilər. Sxemi daraldın və yenidən işə salın.",
+    "colUnchecked": "Sütun sorğusu kəsildiyi üçün, {n} çatışmayan/əlavə sütun nəticəsi təsdiqlənməz hesab edilir və sütun uyğunsuzluğu sayından çıxarılır.",
+    "renamed": "Köhnə adlandırma qaydası (_PKEY) altında tətbiq edilmiş {n} PK indeksi yeni adla (PK_) DB-də mövcuddur — normaldır",
+    "superseded": "{n} köhnə sorğu daha sonra eyni cədvəli yenidən yaratdığı üçün (DROP … CASCADE) müqayisədən çıxarıldı — normaldır",
+    "supersededItem": "Sorğu {id} → sorğu {by} ilə əvəz edildi",
+    "sysCols": "DDL yaradılması zamanı avtomatik əlavə edilmiş {n} sistem sütunu dizaynla modeldə yoxdur və uyğunsuzluqlardan çıxarılır.",
+    "groupOwn": "Layihə prefiksi {pfx} — modeldən çatışmayan namizədlər",
+    "groupOther": "Digər sistem {pfx}",
+    "basis": "Təxmini sətirlər {rows} · {since} tarixindən",
+    "guide": {
+      "title": "Növbəti addımlar",
+      "ddlMissing": {
+        "s1": "schema.pi → layihə → fiziki model → DDL yaradılması bölməsində bu əlaqəyə yenidən tətbiq edin.",
+        "s2": "Bitirdikdən sonra aşağıdakı \"Yenidən işə sal\" düyməsini istifadə edin və sayın 0 olduğunu təsdiqləyin.",
+        "s3": "Yenidən tətbiq etdikdən sonra obyektlər hələ də yox olursa, əl ilə silinmə və ya geri qaytarılmadan şübhələnin və DBA-nızla əlaqə hesabının fəaliyyətini yoxlayın."
+      },
+      "extraTables": {
+        "s1": "Bu layihə prefiks paketi = modeldə çatışmayan namizədlər — onları schema.pi → Parametrlər → Reverse vasitəsilə modelə idxal edin və ya istifadə olunmayan cədvəllərdirsə, silmək qərarına gəlin.",
+        "s2": "Digər prefiks qrupları = bu DB-ni paylaşan digər sistemlər — bu layihə üçün fəaliyyət maddələri deyil.",
+        "s3": "Əgər hədəf sxem public deyilsə, yuxarıdakı \"Sxem\" sahəsini dəyişdirin və yenidən işə salın."
+      },
+      "colMismatches": {
+        "s1": "DB-də yoxdur = model sütununu schema.pi DDL yaradılması vasitəsilə DB-yə tətbiq edin.",
+        "s2": "Modeldə yoxdur = DB sütununu schema.pi → Parametrlər → Reverse vasitəsilə modelə idxal edin və ya lazımsızdırsa, silmək qərarına gəlin.",
+        "s3": "Növ/NULL fərqlidir = modelə uyğunlaşdırın (həqiqət mənbəyi); uzunluğu azaltmadan və ya NOT NULL-a keçməzdən əvvəl mövcud sətirlərin buna uyğun olduğunu təsdiqləyin."
+      },
+      "idxUsage": {
+        "s1": "Silməzdən əvvəl yoxlayın: ① statistika pəncərəsi ən azı bir iş dövrünü (məsələn, ay sonu partiyası) əhatə edir — \"tarixdən bəri\" hissəsinə baxın.",
+        "s2": "② Bu, unikal/PK indeksi deyil (bunlar ayrıca \"unikallıq məhdudiyyəti\" kimi göstərilir).",
+        "s3": "③ SQL Tuning-də cədvəlin təmsilçi SQL-ni EXPLAIN edin və bu indeksin istifadə edilmədiyini təsdiqləyin.",
+        "s4": "Hər üçü təsdiqləndikdən sonra, indeksi schema.pi-də modeldən silin və DDL vasitəsilə tətbiq edin."
+      }
+    },
+    "act": {
+      "openSchema": "schema.pi açın",
+      "rerun": "Yenidən işə salın",
+      "copy": "Siyahını kopyala",
+      "copied": "Kopyalandı",
+      "sqlLab": "SQL Tuning-də EXPLAIN"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Replikasiya yoxlaması",
         "backup": "Ehtiyat nüsxəsi yoxlaması",
         "sqlLab": "SQL tənzimləməsi",
-        "drift": "Sürüşmə müqayisəsi",
+        "drift": "GAP Analizi",
         "connect": "Qoşulmalar",
         "schema": "schema.pi monitoru"
       },
@@ -991,7 +1037,11 @@
       "totalMs": "Ümumi ms",
       "meanMs": "Orta ms",
       "rows": "Sətirlər",
-      "reset": "Statistika sıfırlanması aşkarlandı — kümülatif olaraq göstərilir"
+      "reset": "Statistika sıfırlanması aşkarlandı — kümülatif olaraq göstərilir",
+      "src": "Mənbə",
+      "srcToggle": "Mənbə detallarını göstər və ya gizlət",
+      "openSqlLab": "SQL Tuning-də açın",
+      "acct": "Hesab"
     },
     "health": {
       "empty": "Hələ heç bir anlıq görüntü yoxdur. Topla sekmesinde İndi topla düyməsini basın",
@@ -1022,6 +1072,46 @@
       "sessions": "Sessiya fəaliyyəti",
       "locks": "Kilidlər",
       "none": "Heç biri"
+    },
+    "src": {
+      "root": "Mənbəyi dəqiq müəyyən etmək üçün: (1) hər proqram, partiya və şəxs (alət) üçün ayrı bir DB hesabı istifadə edin və (2) hər əlaqədə application_name təyin edin. Hesab pg_stat_statements-dən gəlir və dəqiqdir; tətbiq/alət kateqoriyası fəaliyyət nümunələrindən təxmin edilir (application_name müştəri tərəfindən özü tərəfindən bildirilir, buna görə boş ola bilər və ya dəyişdirilə bilər, nümunələr arasında bitən qısa sorğular isə buraxıla bilər)",
+      "cd": {
+        "PROGRAM": "Proqram",
+        "BATCH": "Partiya",
+        "TOOL": "Alət (şəxs)",
+        "PLATFORM": "Platforma daxili",
+        "MONITOR": "Monitorinq (biz)",
+        "UNKNOWN": "Naməlum"
+      },
+      "conf": {
+        "high": "Yüksək etibarlılıq",
+        "mid": "Orta etibarlılıq",
+        "low": "Aşağı etibarlılıq",
+        "acct": "Yalnız hesab",
+        "ver": "Versiya limiti"
+      },
+      "fix": {
+        "TOOL": "Görünür ki, bir şəxs DB aləti (DBeaver və s.) ilə birbaşa istehsal DB-ni sorğulayır. Onları yalnız oxumaq üçün replikaya və ya analitika DB-yə yönəldin və insan hesablarında işləmə müddətini məhdudlaşdırın, məsələn, ALTER ROLE human_user SET statement_timeout = '30s'. Ayrı bir yalnız oxumaq üçün rol istifadə edin və kütləvi çıxarışları pik olmayan saatlarda edin.",
+        "BATCH": "Görünür ki, bir partiya və ya planlaşdırılmış işdir. İşləmə müddətlərini iş piklərindən uzaqlaşdırın və hər commit üçün işi azaldın. Hədəf cədvəllərdə indeksləri və statistikaları (ANALYZE) yoxlayın və uzun əməliyyatları bölün. İş adını application_name-ə daxil etmək növbəti təsnifatı daha dəqiq edir.",
+        "PROGRAM": "Görünür ki, bir tətbiq tərəfindən işlədilən bir sorğudur. SQL Tuning-də planı yoxlayın. Qısa ortalama ilə çoxlu zənglər təkrarlanan zənglərə (N+1) və ya keşləməyə işarə edir; uzun ortalama isə əvvəlcə indekslərə və ya birləşmə sırasına işarə edir. Bağlantı hovuzunuzun application_name-də xidmət adını təyin edin.",
+        "PLATFORM": "Görünür ki, autovacuum və ya replikasiya kimi DB və ya platforma daxili işdir. Adətən heç bir tədbirə ehtiyac yoxdur. Əgər yuxarıda qalırsa, autovacuum həddlərini və maintenance_work_mem-i nəzərdən keçirin.",
+        "MONITOR": "Görünür ki, bu xidmətin öz statistika sorğularıdır (schema.pi bağlantısı). Heç bir tədbirə ehtiyac yoxdur. Əgər çox tez-tez görünürsə, sorğu tezliyini azaldın.",
+        "UNKNOWN": "Mənbəyə dair heç bir ipucu yoxdur. Hər əlaqədə application_name təyin edin və hesabları məqsədə görə bölün; növbəti nümunələrdən təsnif ediləcək."
+      },
+      "detail": {
+        "app": "Tətbiq adı",
+        "addr": "Müştəri ünvanı (maskalanmış)",
+        "samples": "Nümunələr",
+        "active": "Aktiv nümunələr",
+        "period": "Müşahidə edildi",
+        "none": "(boş)"
+      },
+      "noSample": "Hələ nümunələr yoxdur — monitorinq lövhəsini və ya Fəaliyyət və kilidlər sekmesini görüntülədiyiniz zaman işləyən sessiyalar nümunə götürülür. Hələlik yalnız hesab adına görə təsnif edilir.",
+      "verOff": "Bu DB PostgreSQL 14-dən köhnədir, buna görə işləyən sessiyalarda sorğu ID-si yoxdur. Yalnız hesab (dəqiq) göstərilir.",
+      "privOff": "Bağlantı hesabı digər hesabların sessiya detallarını görə bilmir, buna görə nümunələr toplanmır. DB administratorundan GRANT pg_read_all_stats TO {user}; əmrini işə salmasını xahiş edin.",
+      "linkUsr": "bağlantı hesabı",
+      "qidOff": "Sessiya detalları görünür, lakin sorğu ID-si boşdur (compute_query_id söndürülüb). SHOW compute_query_id; ilə yoxlayın, sonra ALTER SYSTEM SET compute_query_id = 'auto'; əmrini işə salın və yenidən yükləyin (SELECT pg_reload_conf();).",
+      "openHint": "Sorğu doldurulmuş SQL Tuning-i açır. Planı görməzdən əvvəl $1 kimi yer tutucuları real dəyərlərlə əvəz edin."
     }
   },
   "pipeline": {
@@ -1218,7 +1308,7 @@
     "label": "Xüsusiyyətlər",
     "groups": {
       "monitor": "Monitorinq",
-      "drift": "Uyğunluq",
+      "drift": "GAP Analizi",
       "lake": "Göl",
       "admin": "İdarəetmə"
     },
@@ -1226,7 +1316,7 @@
     "sqlLab": "SQL Tuning",
     "perf": "Performans",
     "monitor": "Monitorinq",
-    "drift": "Sürüşmə",
+    "drift": "GAP Analizi",
     "migration": "Miqrasiya",
     "pipeline": "Boru kəməri",
     "analytics": "Analitika",

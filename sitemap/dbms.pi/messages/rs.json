@@ -103,7 +103,7 @@
       "keys": {
         "links": "Moje veze",
         "perf": "Snimci performansi",
-        "drift": "Pokretanja drifta",
+        "drift": "GAP analiza",
         "mig": "Planovi migracije",
         "pipe": "Tokovi",
         "lake": "Skupovi podataka jezera"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB drift",
+    "title": "GAP analiza — Model↔DB",
     "intro": "Uporedite schema.pi model dizajna i istoriju primene DDL-a sa katalogom DB-a uživo da biste pronašli drift i izmerili da li se dizajnirani indeksi zaista koriste. Podaci o redovima korisnika se nikada ne čitaju niti čuvaju.",
     "needLink": "Prvo izaberite schema.pi vezu iznad. Ako nemate nijednu, registrujte token u meniju 'Veza'.",
     "needConn": "Izaberite DB vezu za poređenje iznad.",
     "project": "Projekat",
     "projectPick": "Izaberite projekat",
     "loading": "Učitavanje…",
-    "run": "Pokreni detekciju drifta",
+    "run": "Pokreni GAP analizu",
     "running": "Poređenje…",
     "readOnly": "Pokreću se samo upiti kataloga i statistike samo za čitanje.",
     "applyInSchema": "Primena ispravki (izmena modela, generisanje i izvršavanje DDL-a) u schema.pi, izvoru istine.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Dizajnirani indeksi koji nedostaju u DB-u",
       "extraIndexes": "Indeksi koji nisu u modelu",
       "ddlMissing": "Objekti nestali nakon primene",
-      "unusedIndexes": "Nekorišćeni dizajnirani indeksi"
+      "unusedIndexes": "Kandidati za neiskorišćene indekse"
     },
     "sec": {
       "ddlMissing": "DDL primenjen, ali nedostaje u DB-u",
       "missingTables": "Tabele u modelu, ali nedostaju u DB-u",
       "extraTables": "Tabele u DB-u, ali ne u modelu",
-      "colMismatches": "Nepodudarnosti tipa kolone / NULL",
+      "colMismatches": "Nepodudarnosti kolona (Nedostaje·Tip·NULL)",
       "missingIndexes": "Dizajnirani indeksi koji nedostaju u DB-u",
       "extraIndexes": "Indeksi samo u DB-u (isključujući PK)",
       "idxUsage": "Efikasnost dizajniranog indeksa"
     },
     "hint": {
-      "ddlMissing": "schema.pi je zabeležio ove objekte kao primenjene, ali su nestali — sumnja se na ručno brisanje ili povratak.",
-      "extraTables": "Ovo može pripadati drugim projektima ili sistemskim tabelama na ovoj vezi.",
-      "idxUsage": "Nula skeniranja od poslednjeg resetovanja statistike znači neiskorišćeno. Proverite prozor statistike pre brisanja."
+      "ddlMissing": "Prikazani su samo objekti koji nedostaju u DB na osnovu najnovijeg primenjenog standarda. Prethodni zahtevi koji su kasnije ponovo kreirali istu tabelu i stare konvencije imenovanja (_PKEY) su normalni i preklopljeni ispod.",
+      "extraTables": "Na osnovu šeme {schema}. Grupisano po prefiksu, samo grupa prefiksa ovog projekta su kandidati za izostavljanje iz modela.",
+      "idxUsage": "Presuda = U upotrebi / Za jedinstvenost / Nema podataka / Pod nadzorom (Statistika počela·Kreirano pre manje od 7 dana) / Kandidat za neiskorišćeno. Samo kandidati za neiskorišćene indekse se razmatraju za brisanje."
     },
     "kind": {
       "MISSING": "nedostaje u DB-u",
@@ -223,12 +223,16 @@
       "idx": "Indeks",
       "scans": "Skeniranja",
       "size": "Veličina",
-      "status": "Presuda"
+      "status": "Presuda",
+      "basis": "Osnova"
     },
     "usage": {
       "USED": "U upotrebi",
-      "UNUSED": "Nekorišćeni dizajnirani indeks",
-      "NO_STATS": "Nema statistike"
+      "NO_STATS": "Nema statistike",
+      "CONSTRAINT": "Ograničenje jedinstvenosti (zadržati)",
+      "NO_DATA": "Nema podataka ili statistika nije prikupljena — ne može se proceniti",
+      "OBSERVING": "Posmatranje (manje od 7 dana)",
+      "UNUSED_CAND": "Kandidat za neiskorišćeno"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi veza još nije spremna. Pokušajte ponovo uskoro.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Nepodržana veza (za sada samo PostgreSQL serverske veze).",
       "TIMEOUT": "Zahtev je istekao. Pokušajte ponovo uskoro.",
       "RATE": "Previše zahteva. Pokušajte ponovo za minut."
+    },
+    "schema": "Šema",
+    "schemaHint": "Porede se samo regularne i particionisane tabele u ovoj šemi (pogledi su isključeni). Podrazumevano public — interne Supabase šeme (auth, storage, …) su izostavljene.",
+    "truncated": "{names} su dostigli ograničenje od {max} redova i skraćeni su — neki rezultati „nije u DB“ / „nije u modelu“ mogu biti lažni. Sužite šemu i pokrenite ponovo.",
+    "colUnchecked": "Pošto je upit za kolone skraćen, {n} rezultata nedostajućih/dodatnih kolona se tretiraju kao neproverljivi i isključeni su iz broja nepodudarnosti kolona.",
+    "renamed": "{n} PK indeks(a) primenjen(ih) po starom pravilu imenovanja (_PKEY) postoji u DB pod novim imenom (PK_) — normalno",
+    "superseded": "{n} stariji(h) zahtev(a) je isključen(o) jer je kasniji zahtev ponovo kreirao istu tabelu (DROP … CASCADE) — normalno",
+    "supersededItem": "Zahtev {id} → zamenjen zahtevom {by}",
+    "sysCols": "{n} sistemski(h) kolona(e) automatski dodatih prilikom generisanja DDL-a nisu u modelu po dizajnu i isključene su iz nepodudarnosti",
+    "groupOwn": "Prefiks projekta {pfx} — kandidati koji nedostaju u modelu",
+    "groupOther": "Drugi sistem {pfx}",
+    "basis": "Proc. redova {rows} · od {since}",
+    "guide": {
+      "title": "Sledeći koraci",
+      "ddlMissing": {
+        "s1": "U schema.pi → projekat → fizički model → DDL generisanje, ponovo primenite na ovu vezu.",
+        "s2": "Kada završite, koristite „Pokreni ponovo“ ispod i potvrdite da je broj 0.",
+        "s3": "Ako objekti i dalje nestaju nakon ponovne primene, sumnjajte na ručno brisanje ili vraćanje i proverite aktivnost naloga veze sa svojim DBA."
+      },
+      "extraTables": {
+        "s1": "Ovaj prefiks projekta = nedostajući kandidati modela — uvezite ih u model putem schema.pi → Podešavanja → Reverse, ili odlučite da ih obrišete ako su neiskorišćene tabele.",
+        "s2": "Druge grupe prefiksa = drugi sistemi koji dele ovu DB — nisu stavke za akciju za ovaj projekat.",
+        "s3": "Ako ciljna šema nije public, promenite polje „Šema“ iznad i pokrenite ponovo."
+      },
+      "colMismatches": {
+        "s1": "Nije u DB = primenite kolonu modela na DB putem schema.pi DDL generisanja.",
+        "s2": "Nije u modelu = uvezite DB kolonu u model putem schema.pi → Podešavanja → Reverse, ili odlučite da je obrišete ako je nepotrebna.",
+        "s3": "Tip/NULL se razlikuje = uskladite sa modelom (izvor istine); pre smanjenja dužine ili prelaska na NOT NULL, potvrdite da postojeći redovi to zadovoljavaju."
+      },
+      "idxUsage": {
+        "s1": "Pre uklanjanja, proverite ① da prozor statistike pokriva najmanje jedan poslovni ciklus (npr. mesečna serija) — pogledajte „od“.",
+        "s2": "② Nije jedinstveni/PK indeks (oni se posebno prikazuju kao „ograničenje jedinstvenosti“).",
+        "s3": "③ EXPLAIN reprezentativni SQL tabele u SQL Tuning-u i potvrdite da se ovaj indeks ne koristi.",
+        "s4": "Kada se sve tri stvari potvrde, uklonite indeks iz modela u schema.pi i primenite putem DDL-a."
+      }
+    },
+    "act": {
+      "openSchema": "Otvori schema.pi",
+      "rerun": "Pokreni ponovo",
+      "copy": "Kopiraj listu",
+      "copied": "Kopirano",
+      "sqlLab": "EXPLAIN u SQL Tuning-u"
     }
   },
   "learn": {
@@ -520,6 +566,7 @@
         "WARN": "Upozorenje — neke stavke treba proveriti",
         "UNKNOWN": "Nepoznato — proverite vezu",
         "OK": "OK — svaki signal je u granicama",
+        "CONN_DOWN": "Nije moguće pristupiti DB-u — prvo proverite vezu",
         "NA": "N/A"
       },
       "kpi": {
@@ -685,7 +732,7 @@
         "repl": "Provera replikacije",
         "backup": "Provera rezervne kopije",
         "sqlLab": "SQL podešavanje",
-        "drift": "Poređenje odstupanja",
+        "drift": "GAP analiza",
         "connect": "Veze",
         "schema": "schema.pi monitor"
       },
@@ -984,7 +1031,11 @@
       "totalMs": "Ukupno ms",
       "meanMs": "Prosečno ms",
       "rows": "Redovi",
-      "reset": "Otkriveno je resetovanje statistike — prikazano kao kumulativno"
+      "reset": "Otkriveno je resetovanje statistike — prikazano kao kumulativno",
+      "src": "Izvor",
+      "srcToggle": "Prikaži ili sakrij detalje izvora",
+      "openSqlLab": "Otvori u SQL Tuning-u",
+      "acct": "Nalog"
     },
     "health": {
       "empty": "Još nema snimaka. Pritisnite „Sakupi sada“ na kartici „Sakupi“",
@@ -1014,6 +1065,46 @@
       "sessions": "Aktivnost sesije",
       "locks": "Zaključavanja",
       "none": "Nijedno"
+    },
+    "src": {
+      "root": "Da biste precizno odredili izvor: (1) koristite poseban DB nalog za svaki program, seriju i osobu (alat), i (2) postavite application_name na svakoj vezi. Nalog dolazi iz pg_stat_statements i siguran je; kategorija aplikacije/alata je procenjena iz uzoraka aktivnosti (application_name je samoprijavljen od strane klijenta, tako da može biti prazan ili promenjen, a kratki upiti koji se završe između uzoraka mogu biti propušteni)",
+      "cd": {
+        "PROGRAM": "Program",
+        "BATCH": "Serija",
+        "TOOL": "Alat (osoba)",
+        "PLATFORM": "Interna platforma",
+        "MONITOR": "Praćenje (mi)",
+        "UNKNOWN": "Nepoznato"
+      },
+      "conf": {
+        "high": "Visoko poverenje",
+        "mid": "Srednje poverenje",
+        "low": "Nisko poverenje",
+        "acct": "Samo nalog",
+        "ver": "Ograničenje verzije"
+      },
+      "fix": {
+        "TOOL": "Izgleda da osoba direktno upita produkcionu DB pomoću DB alata (DBeaver itd.). Uputite ih na repliku samo za čitanje ili analitičku DB umesto toga, i ograničite vreme izvršavanja na ljudskim nalozima, npr. ALTER ROLE human_user SET statement_timeout = '30s'. Koristite posebnu ulogu samo za čitanje i pokrenite masovne ekstrakcije u vanšpicnim satima",
+        "BATCH": "Izgleda kao serija ili zakazani posao. Rasporedite vreme izvršavanja van poslovnih špica i smanjite rad po commit-u. Proverite indekse i statistike (ANALYZE) na ciljnim tabelama i podelite duge transakcije. Stavljanje imena posla u application_name čini sledeću klasifikaciju preciznijom",
+        "PROGRAM": "Izgleda kao upit koji je pokrenula aplikacija. Proverite plan u SQL Tuning-u. Mnogi pozivi sa kratkim prosekom ukazuju na ponovljene pozive (N+1) ili keširanje; dug prosek prvo ukazuje na indekse ili redosled spajanja. Postavite ime usluge u application_name vašeg connection pool-a",
+        "PLATFORM": "Izgleda kao interni rad DB-a ili platforme, kao što su autovacuum ili replikacija. Obično nije potrebna akcija. Ako ostane na vrhu, pregledajte autovacuum pragove i maintenance_work_mem",
+        "MONITOR": "Izgleda kao upiti za statistiku ove usluge (schema.pi veza). Nije potrebna akcija. Ako se prečesto pojavljuje, smanjite frekvenciju anketiranja",
+        "UNKNOWN": "Nema traga o izvoru. Postavite application_name na svakoj vezi i podelite naloge po nameni; biće klasifikovano iz sledećih uzoraka"
+      },
+      "detail": {
+        "app": "Ime aplikacije",
+        "addr": "Adresa klijenta (maskirana)",
+        "samples": "Uzorci",
+        "active": "Aktivni uzorci",
+        "period": "Posmatrano",
+        "none": "(prazno)"
+      },
+      "noSample": "Još nema uzoraka — sesije koje se pokreću se uzorkuju kada pregledate tablu za nadzor ili karticu Aktivnost i zaključavanja. Za sada se klasifikuje samo po imenu naloga",
+      "verOff": "Ova DB je starija od PostgreSQL 14, tako da sesije koje se pokreću nemaju ID upita. Prikazuje se samo nalog (sigurno)",
+      "privOff": "Nalog veze ne može videti detalje sesije drugih naloga, tako da se ne prikupljaju uzorci. Zamolite DB administratora da pokrene GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "nalog veze",
+      "qidOff": "Detalji sesije su vidljivi, ali je ID upita prazan (compute_query_id je isključen). Proverite sa SHOW compute_query_id; zatim pokrenite ALTER SYSTEM SET compute_query_id = 'auto'; i ponovo učitajte (SELECT pg_reload_conf();)",
+      "openHint": "Otvara SQL Tuning sa popunjenim upitom. Zamenite zamenske simbole kao što je $1 stvarnim vrednostima pre pregleda plana"
     }
   },
   "pipeline": {
@@ -1210,7 +1301,7 @@
     "label": "Funkcije",
     "groups": {
       "monitor": "Praćenje",
-      "drift": "Konzistentnost",
+      "drift": "GAP analiza",
       "lake": "Jezero",
       "admin": "Admin"
     },
@@ -1218,7 +1309,7 @@
     "sqlLab": "SQL podešavanje",
     "perf": "Performanse",
     "monitor": "Praćenje",
-    "drift": "Drift",
+    "drift": "GAP analiza",
     "migration": "Migracija",
     "pipeline": "Pajplajn",
     "analytics": "Analitika",

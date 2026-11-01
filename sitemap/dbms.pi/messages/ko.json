@@ -103,7 +103,7 @@
       "keys": {
         "links": "내 연결",
         "perf": "성능 수집",
-        "drift": "정합 탐지",
+        "drift": "GAP분석",
         "mig": "이행 계획",
         "pipe": "파이프라인",
         "lake": "레이크 데이터셋"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "모델↔DB 정합",
+    "title": "GAP분석 — 모델↔DB",
     "intro": "schema.pi 의 설계 모델·DDL 적용 이력과 실제 DB 카탈로그를 대조해 어긋난 곳을 찾고, 설계한 인덱스가 실제로 쓰이는지 측정합니다. 고객 DB 행 데이터는 읽거나 저장하지 않습니다.",
     "needLink": "먼저 위에서 schema.pi 연결을 고르세요. 연결이 없으면 '연결' 메뉴에서 토큰을 등록하세요.",
     "needConn": "대조할 DB 접속을 위에서 고르세요.",
     "project": "프로젝트",
     "projectPick": "프로젝트 선택",
     "loading": "불러오는 중…",
-    "run": "정합 탐지 실행",
+    "run": "GAP분석 실행",
     "running": "대조 중…",
     "readOnly": "읽기 전용 카탈로그·통계 조회만 실행합니다.",
     "applyInSchema": "어긋난 곳의 반영(모델 수정·DDL 생성·적용)은 정본인 schema.pi 에서 하세요.",
@@ -197,21 +197,21 @@
       "missingIndexes": "DB 에 없는 설계 인덱스",
       "extraIndexes": "모델에 없는 인덱스",
       "ddlMissing": "적용 후 사라진 객체",
-      "unusedIndexes": "미사용 설계 인덱스"
+      "unusedIndexes": "미사용 후보 인덱스"
     },
     "sec": {
       "ddlMissing": "DDL 적용 완료인데 DB 에 없음",
       "missingTables": "모델에는 있고 DB 에 없는 테이블",
       "extraTables": "DB 에는 있고 모델에 없는 테이블",
-      "colMismatches": "칼럼 타입·NULL 불일치",
+      "colMismatches": "칼럼 불일치(없음·타입·NULL)",
       "missingIndexes": "설계했지만 DB 에 없는 인덱스",
       "extraIndexes": "DB 에만 있는 인덱스(PK 제외)",
       "idxUsage": "설계 인덱스 사용 효과"
     },
     "hint": {
-      "ddlMissing": "schema.pi 에서 적용 완료로 기록된 객체가 없습니다 — 수동 삭제·롤백을 의심하세요.",
-      "extraTables": "이 접속의 다른 프로젝트·시스템 테이블일 수 있습니다.",
-      "idxUsage": "통계 초기화 이후 스캔 수가 0이면 미사용입니다. 삭제 전 통계 수집 기간을 확인하세요."
+      "ddlMissing": "최신 적용 기준으로 DB 에 없는 객체만 보입니다. 같은 테이블을 나중에 다시 만든 이전 요청과 구 이름 규칙(_PKEY)은 정상이라 아래에 접어 둡니다.",
+      "extraTables": "스키마 {schema} 기준입니다. 접두사로 묶었고, 이 프로젝트 접두사 묶음만 모델 누락 후보입니다.",
+      "idxUsage": "판정 = 사용 중 / 유일성 보장용 / 데이터 없음 / 관찰 중(통계 시작·생성 7일 미만) / 미사용 후보. 미사용 후보만 삭제를 검토합니다."
     },
     "kind": {
       "MISSING": "DB 에 없음",
@@ -223,12 +223,16 @@
       "idx": "인덱스",
       "scans": "스캔 수",
       "size": "크기",
-      "status": "판정"
+      "status": "판정",
+      "basis": "근거"
     },
     "usage": {
       "USED": "사용 중",
-      "UNUSED": "미사용 설계 인덱스",
-      "NO_STATS": "통계 없음"
+      "NO_STATS": "통계 없음",
+      "CONSTRAINT": "유일성 보장용(삭제 대상 아님)",
+      "NO_DATA": "데이터 없음 또는 통계 미수집 — 판정 불가",
+      "OBSERVING": "관찰 중(7일 미만)",
+      "UNUSED_CAND": "미사용 후보"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi 연결 기능을 준비 중입니다. 잠시 후 다시 시도하세요.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "지원하지 않는 접속입니다(현재 PostgreSQL 서버 접속만).",
       "TIMEOUT": "응답 시간이 초과되었습니다. 잠시 후 다시 시도하세요.",
       "RATE": "호출이 너무 많습니다. 1분 뒤에 다시 시도하세요."
+    },
+    "schema": "스키마",
+    "schemaHint": "이 스키마의 일반·파티션 테이블만 대조합니다(뷰 제외). 기본 public — Supabase 내부 스키마(auth·storage 등)는 빠집니다.",
+    "truncated": "{names} 조회가 {max}행 상한에 닿아 잘렸습니다 — 일부 'DB 에 없음'·'모델에 없음' 판정이 오탐일 수 있습니다. 스키마를 좁혀 다시 탐지하세요.",
+    "colUnchecked": "칼럼 조회가 잘려 칼럼 누락·추가 {n}건은 확인 불가로 보고 칼럼 불일치 건수에서 뺐습니다.",
+    "renamed": "구 이름 규칙(_PKEY)으로 적용된 PK 인덱스 {n}건이 새 이름(PK_)으로 DB 에 있습니다 — 정상",
+    "superseded": "이전 요청 {n}건은 같은 테이블을 나중 요청이 다시 만들어(DROP … CASCADE) 대조에서 뺐습니다 — 정상",
+    "supersededItem": "요청 {id} → 요청 {by} 로 대체",
+    "sysCols": "시스템 칼럼(DDL 생성 때 자동 추가) {n}건은 모델에 없는 것이 정상이라 불일치에서 뺐습니다",
+    "groupOwn": "이 프로젝트 접두사 {pfx} — 모델 누락 후보",
+    "groupOther": "다른 시스템 {pfx}",
+    "basis": "예상 행 {rows} · 기준일 {since}",
+    "guide": {
+      "title": "다음 할 일",
+      "ddlMissing": {
+        "s1": "schema.pi → 해당 프로젝트 → 물리 모델 → DDL 생성에서 이 접속에 다시 적용하세요.",
+        "s2": "적용이 끝나면 아래 '다시 탐지'로 0건인지 확인하세요.",
+        "s3": "다시 적용한 뒤에도 사라지면 수동 삭제·롤백을 의심하고 이 접속 계정의 작업 이력을 DBA 와 확인하세요."
+      },
+      "extraTables": {
+        "s1": "이 프로젝트 접두사 묶음 = 모델 누락 후보 — schema.pi → 설정 → 리버스로 모델에 가져오거나, 쓰지 않는 테이블이면 삭제 여부를 결정하세요.",
+        "s2": "다른 접두사 묶음 = 같은 DB 를 쓰는 다른 시스템 — 이 프로젝트의 조치 대상이 아닙니다.",
+        "s3": "대상 스키마가 public 이 아니면 위 '스키마' 칸을 바꿔 다시 탐지하세요."
+      },
+      "colMismatches": {
+        "s1": "DB 에 없음 = 모델 칼럼을 schema.pi DDL 생성으로 DB 에 반영하세요.",
+        "s2": "모델에 없음 = DB 칼럼을 schema.pi → 설정 → 리버스로 모델에 가져오거나, 불필요하면 삭제를 결정하세요.",
+        "s3": "타입·NULL 다름 = 모델(정본) 기준으로 맞추되, 길이 축소·NOT NULL 전환은 기존 행이 조건을 지키는지 먼저 확인한 뒤 적용하세요."
+      },
+      "idxUsage": {
+        "s1": "삭제 전 확인 ① 통계 수집 기간이 운영 주기(월말 배치 등) 1회 이상인지 — 기준일을 보세요.",
+        "s2": "② 유일성 보장·PK 인덱스가 아닌지(해당하면 판정이 '유일성 보장용'으로 따로 나옵니다).",
+        "s3": "③ 그 테이블의 대표 SQL 을 SQL 튜닝에서 EXPLAIN 해 이 인덱스를 쓰지 않는지 확인하세요.",
+        "s4": "세 가지를 모두 확인하면 삭제는 schema.pi 에서 모델 인덱스를 지우고 DDL 로 반영하세요."
+      }
+    },
+    "act": {
+      "openSchema": "schema.pi 열기",
+      "rerun": "다시 탐지",
+      "copy": "목록 복사",
+      "copied": "복사됨",
+      "sqlLab": "SQL 튜닝에서 EXPLAIN"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "복제 점검",
         "backup": "백업 점검",
         "sqlLab": "SQL 튜닝",
-        "drift": "정합 비교",
+        "drift": "GAP분석",
         "connect": "연결 관리",
         "schema": "schema.pi 모니터"
       },
@@ -991,7 +1037,11 @@
       "totalMs": "총 ms",
       "meanMs": "평균 ms",
       "rows": "행",
-      "reset": " 통계 초기화 감지 — 누적치로 표시"
+      "reset": " 통계 초기화 감지 — 누적치로 표시",
+      "src": "출처",
+      "srcToggle": "출처 상세 열기·닫기",
+      "openSqlLab": "SQL 튜닝에서 열기",
+      "acct": "계정"
     },
     "health": {
       "empty": "수집 기록이 없습니다. 수집 탭에서 지금 수집을 누르세요",
@@ -1022,6 +1072,46 @@
       "sessions": "세션 활동",
       "locks": "락",
       "none": "없음"
+    },
+    "src": {
+      "root": "출처를 정확히 가리는 근본 대책 : ① 프로그램·배치·사람(도구)마다 DB 계정을 따로 쓰고 ② 모든 접속에 application_name 을 설정하세요. 계정은 pg_stat_statements 기준 확정값이고, 앱·도구 분류는 활동 표본으로 추정한 값입니다(application_name 은 접속 프로그램이 스스로 신고하는 값이라 비어 있거나 바뀔 수 있고, 표본 사이에 끝난 짧은 쿼리는 놓칠 수 있습니다)",
+      "cd": {
+        "PROGRAM": "프로그램",
+        "BATCH": "배치",
+        "TOOL": "도구(사람)",
+        "PLATFORM": "플랫폼 내부",
+        "MONITOR": "모니터링(우리)",
+        "UNKNOWN": "알 수 없음"
+      },
+      "conf": {
+        "high": "확신 높음",
+        "mid": "확신 보통",
+        "low": "확신 낮음",
+        "acct": "계정만 확정",
+        "ver": "버전 한계"
+      },
+      "fix": {
+        "TOOL": "사람이 DB 도구(DBeaver 등)로 운영 DB 를 직접 조회한 것으로 보입니다. 운영 DB 직접 조회 대신 읽기 전용 복제본·분석 DB 를 쓰게 하고, 사람용 계정에 ALTER ROLE human_user SET statement_timeout = '30s' 처럼 실행 시간 상한을 거세요. 조회 전용 역할을 따로 두고, 대량 추출은 한가한 시간대에 하세요",
+        "BATCH": "배치·예약 작업으로 보입니다. 업무가 몰리는 시간을 피해 실행 시각을 나누고, 한 번에 처리하는 양(커밋 단위)을 줄이세요. 대상 테이블 인덱스와 통계(ANALYZE)를 점검하고, 긴 트랜잭션은 나누세요. application_name 에 작업 이름을 넣으면 다음부터 더 정확히 가려집니다",
+        "PROGRAM": "애플리케이션이 실행한 쿼리로 보입니다. SQL 튜닝에서 실행계획을 확인하세요. 호출 수가 많고 평균이 짧으면 반복 호출(N+1)·캐시를, 평균이 길면 인덱스·조인 순서를 먼저 보세요. 커넥션 풀의 application_name 에 서비스 이름을 넣어 두세요",
+        "PLATFORM": "autovacuum·복제 같은 DB·플랫폼 내부 작업으로 보입니다. 대개 조치가 필요 없습니다. 계속 상위에 있으면 autovacuum 임계값과 maintenance_work_mem 을 검토하세요",
+        "MONITOR": "이 서비스(schema.pi 연결)의 통계 조회로 보입니다. 조치가 필요 없습니다. 너무 자주 보인다면 조회 주기를 늘리세요",
+        "UNKNOWN": "출처를 가릴 단서가 없습니다. 모든 접속에 application_name 을 설정하고 용도별로 계정을 나누면 다음 표본부터 분류됩니다"
+      },
+      "detail": {
+        "app": "앱 이름",
+        "addr": "접속 주소(마스킹)",
+        "samples": "표본",
+        "active": "활성 표본",
+        "period": "관측 기간",
+        "none": "(빈 값)"
+      },
+      "noSample": "아직 표본이 없습니다 — 모니터링 보드나 활동·락 탭을 볼 때 실행 중인 세션이 표본으로 쌓입니다. 지금은 계정 이름으로만 참고 분류합니다",
+      "verOff": "이 DB 는 PostgreSQL 14 미만이라 실행 중 세션에 쿼리ID 가 없습니다. 계정(확정)까지만 보여 줍니다",
+      "privOff": "연결 계정이 다른 계정의 세션 내용을 볼 권한이 없어 표본이 쌓이지 않습니다. DB 관리자가 GRANT pg_read_all_stats TO {user}; 을 실행하세요",
+      "linkUsr": "연결 계정",
+      "qidOff": "세션 내용은 보이지만 쿼리ID 가 비어 있습니다(compute_query_id 가 꺼짐). SHOW compute_query_id; 로 확인하고 ALTER SYSTEM SET compute_query_id = 'auto'; 뒤 설정을 다시 읽으세요(SELECT pg_reload_conf();)",
+      "openHint": "SQL 튜닝 입력칸에 쿼리를 채워 엽니다. $1 같은 자리표시자는 실제 값으로 바꾼 뒤 실행계획을 보세요"
     }
   },
   "pipeline": {
@@ -1218,7 +1308,7 @@
     "label": "기능 메뉴",
     "groups": {
       "monitor": "모니터링",
-      "drift": "정합",
+      "drift": "GAP분석",
       "lake": "레이크",
       "admin": "관리"
     },
@@ -1226,7 +1316,7 @@
     "sqlLab": "SQL 튜닝",
     "perf": "성능",
     "monitor": "모니터링",
-    "drift": "정합",
+    "drift": "GAP분석",
     "migration": "이행",
     "pipeline": "파이프라인",
     "analytics": "분석",

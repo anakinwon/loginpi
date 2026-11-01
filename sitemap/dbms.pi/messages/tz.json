@@ -103,7 +103,7 @@
       "keys": {
         "links": "Viungo vyangu",
         "perf": "Picha za utendaji",
-        "drift": "Mbio za kuteleza",
+        "drift": "Uchambuzi wa GAP",
         "mig": "Mipango ya uhamiaji",
         "pipe": "Mabomba",
         "lake": "Hifadhidata za ziwa"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Modeli ↔ DB Drift",
+    "title": "Uchambuzi wa GAP — Model↔DB",
     "intro": "Linganisha modeli ya usanifu ya schema.pi na historia ya utumiaji wa DDL na katalogi ya DB hai ili kupata mkengeuko, na pima kama faharisi zilizoundwa zinatumika kweli. Data ya safu wima ya mteja haisomwi au kuhifadhiwa kamwe.",
     "needLink": "Chagua kiungo cha schema.pi hapo juu kwanza. Ikiwa huna, sajili tokeni kwenye menyu ya 'Kiungo'.",
     "needConn": "Chagua muunganisho wa DB wa kulinganisha hapo juu.",
     "project": "Mradi",
     "projectPick": "Chagua mradi",
     "loading": "Inapakia…",
-    "run": "Endesha ugunduzi wa mkengeuko",
+    "run": "Endesha Uchambuzi wa GAP",
     "running": "Inalinganisha…",
     "readOnly": "Hoja za katalogi na takwimu za kusoma tu ndizo zinazoendeshwa.",
     "applyInSchema": "Tekeleza marekebisho (hariri za modeli, uzalishaji wa DDL na utekelezaji) katika schema.pi, chanzo cha ukweli.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Faharisi zilizoundwa zinazokosekana kwenye DB",
       "extraIndexes": "Faharisi zisizo kwenye modeli",
       "ddlMissing": "Vitu vilivyopotea baada ya kutumia",
-      "unusedIndexes": "Faharisi zilizoundwa zisizotumika"
+      "unusedIndexes": "Faharisi Zisizotumika Zinazowezekana"
     },
     "sec": {
       "ddlMissing": "DDL imetumika lakini inakosekana kwenye DB",
       "missingTables": "Majedwali kwenye modeli lakini yanayokosekana kwenye DB",
       "extraTables": "Majedwali kwenye DB lakini hayako kwenye modeli",
-      "colMismatches": "Aina ya safu wima / kutolingana kwa NULL",
+      "colMismatches": "Hitilafu za Safu (Zinazokosekana·Aina·NULL)",
       "missingIndexes": "Faharisi zilizoundwa zinazokosekana kwenye DB",
       "extraIndexes": "Faharisi kwenye DB pekee (ukiondoa PK)",
       "idxUsage": "Ufanisi wa faharisi iliyoundwa"
     },
     "hint": {
-      "ddlMissing": "schema.pi ilirekodi vitu hivi kama vilivyotumika, lakini vimepotea — shuku kufutwa kwa mkono au kurudisha nyuma.",
-      "extraTables": "Hizi zinaweza kuwa za miradi mingine au majedwali ya mfumo kwenye muunganisho huu.",
-      "idxUsage": "Sifuri za skani tangu kuweka upya takwimu za mwisho inamaanisha hazitumiki. Angalia dirisha la takwimu kabla ya kufuta."
+      "ddlMissing": "Ni vitu tu vinavyokosekana kutoka kwa DB kulingana na kiwango cha hivi karibuni kilichotumika ndivyo vinavyoonyeshwa. Maombi ya awali yaliyounda upya jedwali lile lile baadaye na mikataba ya zamani ya kutaja (_PKEY) ni ya kawaida na yamefungwa hapa chini.",
+      "extraTables": "Kulingana na schema {schema}. Imepangwa kwa kiambishi awali, ni kikundi cha kiambishi awali cha mradi huu tu ndicho kinachoweza kukosekana kwenye modeli.",
+      "idxUsage": "Uamuzi = Inatumika / Kwa Upekee / Hakuna Data / Inachunguzwa (Takwimu zimeanza·Imeundwa chini ya siku 7) / Inayoweza Kutotumika. Ni faharisi zinazoweza kutotumika tu ndizo zinazozingatiwa kufutwa."
     },
     "kind": {
       "MISSING": "inakosekana kwenye DB",
@@ -223,12 +223,16 @@
       "idx": "Faharisi",
       "scans": "Skani",
       "size": "Ukubwa",
-      "status": "Uamuzi"
+      "status": "Uamuzi",
+      "basis": "Msingi"
     },
     "usage": {
       "USED": "Inatumika",
-      "UNUSED": "Faharisi iliyoundwa isiyotumika",
-      "NO_STATS": "Hakuna takwimu"
+      "NO_STATS": "Hakuna takwimu",
+      "CONSTRAINT": "Kizuizi cha upekee (weka)",
+      "NO_DATA": "Hakuna data au takwimu hazijakusanywa — haiwezi kuhukumiwa",
+      "OBSERVING": "Inachunguzwa (chini ya siku 7)",
+      "UNUSED_CAND": "Inayoweza kutotumika"
     },
     "errors": {
       "NOT_IMPLEMENTED": "Kiungo cha schema.pi bado hakijawa tayari. Tafadhali jaribu tena baada ya muda mfupi.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Muunganisho usiotumika (viunganisho vya seva ya PostgreSQL pekee kwa sasa).",
       "TIMEOUT": "Ombi limeisha muda wake. Tafadhali jaribu tena baada ya muda mfupi.",
       "RATE": "Maombi mengi sana. Tafadhali jaribu tena baada ya dakika moja."
+    },
+    "schema": "Schema",
+    "schemaHint": "Ni majedwali ya kawaida na yaliyogawanywa tu katika schema hii ndiyo yanalinganishwa (maoni hayajajumuishwa). Chaguomsingi ya umma — schema za ndani za Supabase (auth, storage, …) zimeachwa.",
+    "truncated": "{names} zimefikia kikomo cha safu {max} na zimekatwa — baadhi ya matokeo ya \"hayapo kwenye DB\" / \"hayapo kwenye modeli\" yanaweza kuwa ya uongo. Punguza schema na uendeshe tena.",
+    "colUnchecked": "Kwa sababu swala la safu lilikatwa, matokeo {n} ya safu zinazokosekana/za ziada yanachukuliwa kuwa hayawezi kuthibitishwa na yametengwa kutoka kwa hesabu ya hitilafu za safu.",
+    "renamed": "Faharisi {n} za PK zilizotumika chini ya sheria ya zamani ya kutaja (_PKEY) zipo kwenye DB chini ya jina jipya (PK_) — kawaida",
+    "superseded": "Maombi {n} ya zamani hayakujumuishwa kwa sababu ombi la baadaye liliunda upya jedwali lile lile (DROP … CASCADE) — kawaida",
+    "supersededItem": "Ombi {id} → limebadilishwa na ombi {by}",
+    "sysCols": "Safu {n} za mfumo zilizoongezwa kiotomatiki wakati wa uzalishaji wa DDL hazipo kwenye modeli kwa muundo na zimetengwa kutoka kwa hitilafu",
+    "groupOwn": "Kiambishi awali cha mradi {pfx} — zinazoweza kukosekana kwenye modeli",
+    "groupOther": "Mfumo mwingine {pfx}",
+    "basis": "Makadirio ya safu {rows} · tangu {since}",
+    "guide": {
+      "title": "Hatua zinazofuata",
+      "ddlMissing": {
+        "s1": "Katika schema.pi → mradi → modeli halisi → uzalishaji wa DDL, tumia tena kwenye muunganisho huu.",
+        "s2": "Ukimaliza, tumia \"Endesha tena\" hapa chini na uthibitishe kuwa hesabu ni 0.",
+        "s3": "Ikiwa vitu bado vinatoweka baada ya kutumia tena, shuku kufutwa kwa mikono au kurudisha nyuma na uangalie shughuli ya akaunti ya muunganisho na DBA wako."
+      },
+      "extraTables": {
+        "s1": "Kifurushi hiki cha kiambishi awali cha mradi = watahiniwa wa modeli waliokosekana — waingize kwenye modeli kupitia schema.pi → Mipangilio → Geuza, au amua kama utawafuta ikiwa ni jedwali zisizotumika.",
+        "s2": "Vikundi vingine vya kiambishi awali = mifumo mingine inayoshiriki DB hii — si vitu vya kuchukua hatua kwa mradi huu.",
+        "s3": "Ikiwa schema lengwa si ya umma, badilisha sehemu ya \"Schema\" hapo juu na uendeshe tena."
+      },
+      "colMismatches": {
+        "s1": "Hayapo kwenye DB = tumia safu ya modeli kwenye DB kupitia uzalishaji wa DDL wa schema.pi.",
+        "s2": "Haipo kwenye modeli = ingiza safu wima ya DB kwenye modeli kupitia schema.pi → Mipangilio → Geuza, au amua kuifuta ikiwa si lazima.",
+        "s3": "Aina/NULL inatofautiana = linganisha na modeli (chanzo cha ukweli); kabla ya kupunguza urefu au kubadili NOT NULL, thibitisha safu zilizopo zinakidhi."
+      },
+      "idxUsage": {
+        "s1": "Kabla ya kuondoa, angalia ① dirisha la takwimu linajumuisha angalau mzunguko mmoja wa biashara (k.m. kundi la mwisho wa mwezi) — angalia \"tangu\".",
+        "s2": "② Sio faharisi ya kipekee/PK (hizo zinaonyeshwa kando kama \"kizuizi cha upekee\").",
+        "s3": "③ EXPLAIN SQL ya uwakilishi wa jedwali katika SQL Tuning na uthibitishe faharisi hii haitumiki.",
+        "s4": "Mara tu zote tatu zimethibitishwa, ondoa faharisi kutoka kwa modeli katika schema.pi na utumie kupitia DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Fungua schema.pi",
+      "rerun": "Endesha tena",
+      "copy": "Nakili orodha",
+      "copied": "Imenakiliwa",
+      "sqlLab": "EXPLAIN katika SQL Tuning"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Ukaguzi wa urudufishaji",
         "backup": "Ukaguzi wa chelezo",
         "sqlLab": "Urekebishaji wa SQL",
-        "drift": "Linganisha mkengeuko",
+        "drift": "Uchambuzi wa GAP",
         "connect": "Miunganisho",
         "schema": "schema.pi monitor"
       },
@@ -989,7 +1035,11 @@
       "totalMs": "Jumla ya ms",
       "meanMs": "Wastani wa ms",
       "rows": "Safu",
-      "reset": "Kuweka upya takwimu kumegunduliwa — imeonyeshwa kama jumla"
+      "reset": "Kuweka upya takwimu kumegunduliwa — imeonyeshwa kama jumla",
+      "src": "Chanzo",
+      "srcToggle": "Onyesha au ficha maelezo ya chanzo",
+      "openSqlLab": "Fungua katika SQL Tuning",
+      "acct": "Akaunti"
     },
     "health": {
       "empty": "Hakuna picha bado. Bonyeza Kusanya sasa kwenye kichupo cha Kusanya",
@@ -1020,6 +1070,46 @@
       "sessions": "Shughuli ya kipindi",
       "locks": "Vifunguo",
       "none": "Hakuna"
+    },
+    "src": {
+      "root": "Ili kubainisha chanzo kwa usahihi: (1) tumia akaunti tofauti ya DB kwa kila programu, kundi na mtu (zana), na (2) weka application_name kwenye kila muunganisho. Akaunti inatoka pg_stat_statements na ni hakika; kitengo cha programu/zana kinakadiriwa kutoka kwa sampuli za shughuli (application_name inaripotiwa na mteja mwenyewe, kwa hivyo inaweza kuwa tupu au kubadilishwa, na maswali mafupi yanayomalizika kati ya sampuli yanaweza kukosekana)",
+      "cd": {
+        "PROGRAM": "Programu",
+        "BATCH": "Kundi",
+        "TOOL": "Zana (mtu)",
+        "PLATFORM": "Ndani ya Jukwaa",
+        "MONITOR": "Ufuatiliaji (sisi)",
+        "UNKNOWN": "Haijulikani"
+      },
+      "conf": {
+        "high": "Uhakika mkubwa",
+        "mid": "Uhakika wa kati",
+        "low": "Uhakika mdogo",
+        "acct": "Akaunti tu",
+        "ver": "Kikomo cha toleo"
+      },
+      "fix": {
+        "TOOL": "Inaonekana kama mtu anauliza DB ya uzalishaji moja kwa moja na zana ya DB (DBeaver n.k.). Waelekeze kwenye nakala ya kusoma tu au DB ya uchambuzi badala yake, na weka kikomo cha muda wa kukimbia kwenye akaunti za binadamu, k.m. ALTER ROLE human_user SET statement_timeout = '30s'. Tumia jukumu tofauti la kusoma tu, na fanya uchimbaji mwingi katika masaa ya chini ya kilele",
+        "BATCH": "Inaonekana kama kundi au kazi iliyopangwa. Sambaza nyakati za kukimbia mbali na vilele vya biashara na punguza kazi kwa kila ahadi. Angalia faharisi na takwimu (ANALYZE) kwenye majedwali lengwa, na ugawanye miamala mirefu. Kuweka jina la kazi katika application_name hufanya uainishaji unaofuata kuwa sahihi zaidi",
+        "PROGRAM": "Inaonekana kama swala lililoendeshwa na programu. Angalia mpango katika SQL Tuning. Simu nyingi zilizo na maana fupi zinaelekeza kwenye simu zinazorudiwa (N+1) au kache; maana ndefu inaelekeza kwenye faharisi au mpangilio wa kuunganisha kwanza. Weka jina la huduma katika application_name ya bwawa lako la muunganisho",
+        "PLATFORM": "Inaonekana kama kazi ya ndani ya DB au jukwaa kama vile autovacuum au urudufishaji. Kawaida hakuna hatua inayohitajika. Ikiwa inakaa juu, kagua vizingiti vya autovacuum na maintenance_work_mem",
+        "MONITOR": "Inaonekana kama maswali ya takwimu ya huduma hii (kiungo cha schema.pi). Hakuna hatua inayohitajika. Ikiwa inaonekana mara nyingi sana, punguza mzunguko wa upigaji kura",
+        "UNKNOWN": "Hakuna dalili ya chanzo. Weka application_name kwenye kila muunganisho na ugawanye akaunti kwa madhumuni; itaainishwa kutoka kwa sampuli zinazofuata"
+      },
+      "detail": {
+        "app": "Jina la programu",
+        "addr": "Anwani ya mteja (iliyofichwa)",
+        "samples": "Sampuli",
+        "active": "Sampuli zinazotumika",
+        "period": "Imechunguzwa",
+        "none": "(tupu)"
+      },
+      "noSample": "Hakuna sampuli bado — vikao vinavyoendesha vinachukuliwa sampuli unapotazama bodi ya ufuatiliaji au kichupo cha Shughuli na kufuli. Kwa sasa imeainishwa kutoka kwa jina la akaunti tu",
+      "verOff": "DB hii ni ya zamani kuliko PostgreSQL 14, kwa hivyo vikao vinavyoendesha havina kitambulisho cha swala. Akaunti tu (hakika) ndiyo inayoonyeshwa",
+      "privOff": "Akaunti ya kiungo haiwezi kuona maelezo ya kikao cha akaunti zingine, kwa hivyo hakuna sampuli zinazokusanywa. Muulize msimamizi wa DB kuendesha GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "akaunti ya kiungo",
+      "qidOff": "Maelezo ya kikao yanaonekana lakini kitambulisho cha swala ni tupu (compute_query_id imezimwa). Angalia na SHOW compute_query_id; kisha endesha ALTER SYSTEM SET compute_query_id = 'auto'; na upakie upya (SELECT pg_reload_conf();)",
+      "openHint": "Inafungua SQL Tuning na swala lililojazwa. Badilisha vishikilia nafasi kama $1 na maadili halisi kabla ya kutazama mpango"
     }
   },
   "pipeline": {
@@ -1216,7 +1306,7 @@
     "label": "Vipengele",
     "groups": {
       "monitor": "Ufuatiliaji",
-      "drift": "Uthabiti",
+      "drift": "Uchambuzi wa GAP",
       "lake": "Ziwa",
       "admin": "Msimamizi"
     },
@@ -1224,7 +1314,7 @@
     "sqlLab": "Kurekebisha SQL",
     "perf": "Utendaji",
     "monitor": "Ufuatiliaji",
-    "drift": "Mkengeuko",
+    "drift": "Uchambuzi wa GAP",
     "migration": "Uhamiaji",
     "pipeline": "Bomba",
     "analytics": "Uchanganuzi",

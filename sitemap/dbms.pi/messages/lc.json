@@ -103,7 +103,7 @@
       "keys": {
         "links": "My links",
         "perf": "Perf snapshots",
-        "drift": "Drift runs",
+        "drift": "GAP Analysis",
         "mig": "Migration plans",
         "pipe": "Pipelines",
         "lake": "Lake datasets"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB Drift",
+    "title": "GAP Analysis — Model↔DB",
     "intro": "Compare the schema.pi design model and DDL apply history with the live DB catalog to find drift, and measure whether designed indexes are actually used. Customer row data is never read or stored.",
     "needLink": "Pick a schema.pi link above first. If you have none, register a token in the 'Link' menu.",
     "needConn": "Pick the DB connection to compare above.",
     "project": "Project",
     "projectPick": "Select a project",
     "loading": "Loading…",
-    "run": "Run drift detection",
+    "run": "Run GAP Analysis",
     "running": "Comparing…",
     "readOnly": "Only read-only catalog and statistics queries are run.",
     "applyInSchema": "Apply fixes (model edits, DDL generation and execution) in schema.pi, the source of truth.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Designed indexes missing in DB",
       "extraIndexes": "Indexes not in model",
       "ddlMissing": "Objects gone after apply",
-      "unusedIndexes": "Unused designed indexes"
+      "unusedIndexes": "Unused index candidates"
     },
     "sec": {
       "ddlMissing": "DDL applied but missing in DB",
       "missingTables": "Tables in model but missing in DB",
       "extraTables": "Tables in DB but not in model",
-      "colMismatches": "Column type / NULL mismatches",
+      "colMismatches": "Column mismatches (missing·type·NULL)",
       "missingIndexes": "Designed indexes missing in DB",
       "extraIndexes": "Indexes only in DB (excluding PK)",
       "idxUsage": "Designed index effectiveness"
     },
     "hint": {
-      "ddlMissing": "schema.pi recorded these objects as applied, but they are gone — suspect a manual drop or rollback.",
-      "extraTables": "These may belong to other projects or system tables on this connection.",
-      "idxUsage": "Zero scans since the last statistics reset means unused. Check the statistics window before dropping."
+      "ddlMissing": "Only objects missing from the DB as of the most recent DDL request are shown. Older requests superseded by a later re-creation of the same table, and the old naming rule (_PKEY), are normal and folded below.",
+      "extraTables": "Based on schema {schema}, grouped by prefix. Only this project's prefix group is a candidate for missing-from-model.",
+      "idxUsage": "Verdict = In use / Uniqueness constraint / No data / Observing (stats or index under 7 days) / Unused candidate. Only unused candidates should be reviewed for removal."
     },
     "kind": {
       "MISSING": "missing in DB",
@@ -223,12 +223,16 @@
       "idx": "Index",
       "scans": "Scans",
       "size": "Size",
-      "status": "Verdict"
+      "status": "Verdict",
+      "basis": "Basis"
     },
     "usage": {
       "USED": "In use",
-      "UNUSED": "Unused designed index",
-      "NO_STATS": "No statistics"
+      "NO_STATS": "No statistics",
+      "CONSTRAINT": "Uniqueness constraint (keep)",
+      "NO_DATA": "No data or stats not collected — cannot judge",
+      "OBSERVING": "Observing (under 7 days)",
+      "UNUSED_CAND": "Unused candidate"
     },
     "errors": {
       "NOT_IMPLEMENTED": "The schema.pi link is not ready yet. Please try again shortly.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Unsupported connection (PostgreSQL server connections only for now).",
       "TIMEOUT": "The request timed out. Please try again shortly.",
       "RATE": "Too many requests. Please try again in a minute."
+    },
+    "schema": "Schema",
+    "schemaHint": "Only regular and partitioned tables in this schema are compared (views excluded). Default public — Supabase internal schemas (auth, storage, …) are left out.",
+    "truncated": "{names} hit the {max}-row limit and were truncated — some \"not in DB\" / \"not in model\" results may be false. Narrow the schema and run again.",
+    "colUnchecked": "Because the column query was truncated, {n} missing/extra column results are treated as unverifiable and excluded from the column mismatch count.",
+    "renamed": "{n} PK index(es) applied under the old naming rule (_PKEY) exist in the DB under the new name (PK_) — normal",
+    "superseded": "{n} older request(s) were excluded because a later request re-created the same table (DROP … CASCADE) — normal",
+    "supersededItem": "Request {id} → superseded by request {by}",
+    "sysCols": "{n} system column(s) added automatically at DDL generation are not in the model by design and are excluded from mismatches",
+    "groupOwn": "Project prefix {pfx} — missing-from-model candidates",
+    "groupOther": "Other system {pfx}",
+    "basis": "Est. rows {rows} · since {since}",
+    "guide": {
+      "title": "Next steps",
+      "ddlMissing": {
+        "s1": "In schema.pi → the project → physical model → DDL generation, apply again to this connection.",
+        "s2": "When done, use \"Run again\" below and confirm the count is 0.",
+        "s3": "If objects still disappear after re-applying, suspect a manual drop or rollback and check the connection account's activity with your DBA."
+      },
+      "extraTables": {
+        "s1": "This project prefix bundle = missing model candidates — import them into the model via schema.pi → Settings → Reverse, or decide whether to delete them if they are unused tables.",
+        "s2": "Other prefix groups = other systems sharing this DB — not action items for this project.",
+        "s3": "If the target schema is not public, change the \"Schema\" field above and run again."
+      },
+      "colMismatches": {
+        "s1": "Not in DB = apply the model column to the DB via schema.pi DDL generation.",
+        "s2": "Not in model = import the DB column into the model via schema.pi → Settings → Reverse, or decide to delete it if unnecessary.",
+        "s3": "Type/NULL differs = align to the model (source of truth); before shrinking length or switching to NOT NULL, confirm existing rows satisfy it."
+      },
+      "idxUsage": {
+        "s1": "Before removing, check ① the statistics window covers at least one business cycle (e.g. month-end batch) — see \"since\".",
+        "s2": "② It is not a unique/PK index (those show separately as \"uniqueness constraint\").",
+        "s3": "③ EXPLAIN the table's representative SQL in SQL Tuning and confirm this index is not used.",
+        "s4": "Once all three are confirmed, remove the index from the model in schema.pi and apply via DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Open schema.pi",
+      "rerun": "Run again",
+      "copy": "Copy list",
+      "copied": "Copied",
+      "sqlLab": "EXPLAIN in SQL Tuning"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Replication check",
         "backup": "Backup check",
         "sqlLab": "SQL tuning",
-        "drift": "Drift compare",
+        "drift": "GAP Analysis",
         "connect": "Connections",
         "schema": "schema.pi monitor"
       },
@@ -991,7 +1037,11 @@
       "totalMs": "Total ms",
       "meanMs": "Mean ms",
       "rows": "Rows",
-      "reset": " Stats reset detected — shown as cumulative"
+      "reset": " Stats reset detected — shown as cumulative",
+      "src": "Source",
+      "srcToggle": "Show or hide source details",
+      "openSqlLab": "Open in SQL Tuning",
+      "acct": "Account"
     },
     "health": {
       "empty": "No snapshots yet. Press Collect now on the Collect tab",
@@ -1022,6 +1072,46 @@
       "sessions": "Session activity",
       "locks": "Locks",
       "none": "None"
+    },
+    "src": {
+      "root": "To pin down the source precisely: (1) use a separate DB account for each program, batch and person (tool), and (2) set application_name on every connection. The account comes from pg_stat_statements and is certain; the app/tool category is estimated from activity samples (application_name is self-reported by the client, so it can be empty or changed, and short queries that finish between samples can be missed)",
+      "cd": {
+        "PROGRAM": "Program",
+        "BATCH": "Batch",
+        "TOOL": "Tool (person)",
+        "PLATFORM": "Platform internal",
+        "MONITOR": "Monitoring (us)",
+        "UNKNOWN": "Unknown"
+      },
+      "conf": {
+        "high": "High confidence",
+        "mid": "Medium confidence",
+        "low": "Low confidence",
+        "acct": "Account only",
+        "ver": "Version limit"
+      },
+      "fix": {
+        "TOOL": "Looks like a person querying the production DB directly with a DB tool (DBeaver etc.). Point them to a read-only replica or analytics DB instead, and cap run time on human accounts, e.g. ALTER ROLE human_user SET statement_timeout = '30s'. Use a separate read-only role, and run bulk extracts in off-peak hours",
+        "BATCH": "Looks like a batch or scheduled job. Spread run times away from business peaks and shrink the work per commit. Check indexes and statistics (ANALYZE) on the target tables, and split long transactions. Putting the job name in application_name makes the next classification more precise",
+        "PROGRAM": "Looks like a query run by an application. Check the plan in SQL Tuning. Many calls with a short mean point to repeated calls (N+1) or caching; a long mean points to indexes or join order first. Set the service name in your connection pool's application_name",
+        "PLATFORM": "Looks like DB or platform internal work such as autovacuum or replication. Usually no action is needed. If it stays at the top, review autovacuum thresholds and maintenance_work_mem",
+        "MONITOR": "Looks like this service's own statistics queries (schema.pi link). No action needed. If it shows up too often, lower the polling frequency",
+        "UNKNOWN": "There is no clue to the source. Set application_name on every connection and split accounts by purpose; it will be classified from the next samples"
+      },
+      "detail": {
+        "app": "App name",
+        "addr": "Client address (masked)",
+        "samples": "Samples",
+        "active": "Active samples",
+        "period": "Observed",
+        "none": "(empty)"
+      },
+      "noSample": "No samples yet — running sessions are sampled when you view the monitoring board or the Activity & locks tab. For now it is classified from the account name only",
+      "verOff": "This DB is older than PostgreSQL 14, so running sessions have no query ID. Only the account (certain) is shown",
+      "privOff": "The link account cannot see other accounts' session details, so no samples are collected. Ask a DB admin to run GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "link account",
+      "qidOff": "Session details are visible but the query ID is empty (compute_query_id is off). Check with SHOW compute_query_id; then run ALTER SYSTEM SET compute_query_id = 'auto'; and reload (SELECT pg_reload_conf();)",
+      "openHint": "Opens SQL Tuning with the query filled in. Replace placeholders like $1 with real values before viewing the plan"
     }
   },
   "pipeline": {
@@ -1218,7 +1308,7 @@
     "label": "Features",
     "groups": {
       "monitor": "Monitoring",
-      "drift": "Consistency",
+      "drift": "GAP Analysis",
       "lake": "Lake",
       "admin": "Admin"
     },
@@ -1226,7 +1316,7 @@
     "sqlLab": "SQL Tuning",
     "perf": "Performance",
     "monitor": "Monitoring",
-    "drift": "Drift",
+    "drift": "GAP Analysis",
     "migration": "Migration",
     "pipeline": "Pipeline",
     "analytics": "Analytics",

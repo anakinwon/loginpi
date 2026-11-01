@@ -103,7 +103,7 @@
       "keys": {
         "links": "Tenglar mínir",
         "perf": "Afkasta skyndimyndir",
-        "drift": "Rekstrarferlar",
+        "drift": "GAP greining",
         "mig": "Flutningsáætlanir",
         "pipe": "Pípur",
         "lake": "Vatnaskila gagnasöfn"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Líkan ↔ DB reki",
+    "title": "GAP greining — Líkan↔DB",
     "intro": "Berðu saman schema.pi hönnunarlíkan og DDL umsóknarsögu við lifandi DB skrána til að finna reki og mæla hvort hönnuð vísitölur séu í raun notaðar. Raðgögn viðskiptavina eru aldrei lesin eða geymd.",
     "needLink": "Veldu schema.pi tengil hér að ofan fyrst. Ef þú hefur engan, skráðu tákn í 'Tengill' valmyndinni.",
     "needConn": "Veldu DB tenginguna til að bera saman hér að ofan.",
     "project": "Verkefni",
     "projectPick": "Veldu verkefni",
     "loading": "Hleður…",
-    "run": "Keyra rekileit",
+    "run": "Keyra GAP greiningu",
     "running": "Ber saman…",
     "readOnly": "Aðeins lesanlegar skráar- og tölfræðifyrirspurnir eru keyrðar.",
     "applyInSchema": "Beittu lagfæringum (líkanabreytingum, DDL kynslóð og framkvæmd) í schema.pi, uppruna sannleikans.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Hönnuð vísitölur sem vantar í DB",
       "extraIndexes": "Vísitölur ekki í líkani",
       "ddlMissing": "Hlutir horfnir eftir umsókn",
-      "unusedIndexes": "Ónotaðar hönnuð vísitölur"
+      "unusedIndexes": "Ónotaðir vísitölur til skoðunar"
     },
     "sec": {
       "ddlMissing": "DDL beitt en vantar í DB",
       "missingTables": "Töflur í líkani en vantar í DB",
       "extraTables": "Töflur í DB en ekki í líkani",
-      "colMismatches": "Dálkagerð / NULL óreglur",
+      "colMismatches": "Misræmi í dálkum (Vantar·Tegund·NULL)",
       "missingIndexes": "Hönnuð vísitölur sem vantar í DB",
       "extraIndexes": "Vísitölur aðeins í DB (að undanskildum PK)",
       "idxUsage": "Árangur hönnuðrar vísitölu"
     },
     "hint": {
-      "ddlMissing": "schema.pi skráði þessa hluti sem beitta, en þeir eru horfnir — grunaðu handvirka eyðingu eða afturköllun.",
-      "extraTables": "Þetta gæti tilheyrt öðrum verkefnum eða kerfistöflum á þessari tengingu.",
-      "idxUsage": "Núll skannanir síðan síðasta endurstilling tölfræði þýðir ónotað. Athugaðu tölfræðigluggann áður en þú sleppir."
+      "ddlMissing": "Aðeins hlutir sem vantar í DB miðað við nýjustu staðla eru sýndir. Fyrri beiðnir sem endursköpuðu sömu töflu síðar og gamlar nafngiftarreglur (_PKEY) eru eðlilegar og felldar saman hér að neðan.",
+      "extraTables": "Miðað við schema {schema}. Flokkað eftir forskeyti, aðeins forskeytishópur þessa verkefnis er til skoðunar fyrir líkanútilokun.",
+      "idxUsage": "Dómur = Í notkun / Fyrir einstakleika / Engin gögn / Undir athugun (Tölfræði hafin·Búið til innan 7 daga) / Ónotað til skoðunar. Aðeins ónotaðir vísitölur til skoðunar eru teknar til greina fyrir eyðingu."
     },
     "kind": {
       "MISSING": "vantar í DB",
@@ -223,12 +223,16 @@
       "idx": "Vísitala",
       "scans": "Skannanir",
       "size": "Stærð",
-      "status": "Dómur"
+      "status": "Dómur",
+      "basis": "Grundvöllur"
     },
     "usage": {
       "USED": "Í notkun",
-      "UNUSED": "Ónotuð hönnuð vísitala",
-      "NO_STATS": "Engar tölfræði"
+      "NO_STATS": "Engar tölfræði",
+      "CONSTRAINT": "Einstakleikaþvingun (halda)",
+      "NO_DATA": "Engin gögn eða tölfræði ekki safnað — ekki hægt að dæma",
+      "OBSERVING": "Undir athugun (innan 7 daga)",
+      "UNUSED_CAND": "Ónotað til skoðunar"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi tengingin er ekki tilbúin ennþá. Vinsamlegast reyndu aftur eftir smá stund.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Óstudd tenging (aðeins PostgreSQL netþjónatengingar í bili).",
       "TIMEOUT": "Beiðnin rann út á tíma. Vinsamlegast reyndu aftur eftir smá stund.",
       "RATE": "Of margar beiðnir. Vinsamlegast reyndu aftur eftir eina mínútu."
+    },
+    "schema": "Schema",
+    "schemaHint": "Aðeins venjulegar og skiptar töflur í þessu schema eru bornar saman (útsýni undanskilið). Sjálfgefið public — innri schema Supabase (auth, storage, …) eru undanskilin.",
+    "truncated": "{names} náðu {max}-línu takmörkuninni og voru stytt — sumar „ekki í DB“ / „ekki í líkani“ niðurstöður geta verið rangar. Þrengdu schema og keyrðu aftur.",
+    "colUnchecked": "Vegna þess að dálka fyrirspurnin var stytt, eru {n} dálkar sem vantar/eru aukalega meðhöndlaðir sem óstaðfestanlegir og undanskildir úr fjölda dálkamisræma.",
+    "renamed": "{n} PK vísitölur sem voru notaðar samkvæmt gömlu nafngiftarreglunni (_PKEY) eru til í DB undir nýju nafni (PK_) — eðlilegt",
+    "superseded": "{n} eldri beiðnir voru undanskildar vegna þess að síðari beiðni endurskapaði sömu töflu (DROP … CASCADE) — eðlilegt",
+    "supersededItem": "Beiðni {id} → skipt út fyrir beiðni {by}",
+    "sysCols": "{n} kerfisdálkar (sjálfkrafa bætt við við DDL gerð) eru ekki í líkaninu samkvæmt hönnun og eru undanskildir úr misræmum.",
+    "groupOwn": "Verkefnisforskeyti {pfx} — til skoðunar fyrir líkanútilokun",
+    "groupOther": "Annað kerfi {pfx}",
+    "basis": "Áætlaðar raðir {rows} · síðan {since}",
+    "guide": {
+      "title": "Næstu skref",
+      "ddlMissing": {
+        "s1": "Í schema.pi → verkefnið → líkamlegt líkan → DDL gerð, beittu aftur á þessa tengingu.",
+        "s2": "Þegar því er lokið, notaðu „Keyra aftur“ hér að neðan og staðfestu að fjöldinn sé 0.",
+        "s3": "Ef hlutir hverfa enn eftir endurbeitingu, grunaðu handvirka eyðingu eða afturköllun og athugaðu virkni tengingarreikningsins með DBA þínum."
+      },
+      "extraTables": {
+        "s1": "Þessi verkefnaforgangsröðun = líkan sem vantar — flyttu þau inn í líkanið í gegnum schema.pi → Stillingar → Bakfæra, eða ákveðið hvort þau eigi að vera eydd ef þau eru ónotuð töflur.",
+        "s2": "Aðrir forskeytishópar = önnur kerfi sem deila þessari DB — ekki aðgerðaratriði fyrir þetta verkefni.",
+        "s3": "Ef markschema er ekki public, breyttu „Schema“ reitnum hér að ofan og keyrðu aftur."
+      },
+      "colMismatches": {
+        "s1": "Ekki í DB = beittu líkanadálknum á DB með schema.pi DDL gerð.",
+        "s2": "Ekki í líkani = flyttu DB dálkinn inn í líkanið í gegnum schema.pi → Stillingar → Bakfæra, eða ákveðið að eyða honum ef hann er óþarfur.",
+        "s3": "Tegund/NULL er mismunandi = samræmdu við líkanið (uppruna sannleikans); áður en lengd er minnkuð eða skipt yfir í NOT NULL, staðfestu að núverandi raðir uppfylli það."
+      },
+      "idxUsage": {
+        "s1": "Áður en fjarlægt er, athugaðu ① að tölfræðiglugginn nái yfir að minnsta kosti einn viðskiptalotu (t.d. mánaðarlokahóp) — sjá „síðan“.",
+        "s2": "② Það er ekki einstakur/PK vísitala (þeir sýna sig sérstaklega sem „einstakleikaþvingun“).",
+        "s3": "③ EXPLAIN dæmigerða SQL töflunnar í SQL Tuning og staðfestu að þessi vísitala sé ekki notuð.",
+        "s4": "Þegar allt þrennt hefur verið staðfest, fjarlægðu vísitöluna úr líkaninu í schema.pi og beittu með DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Opna schema.pi",
+      "rerun": "Keyra aftur",
+      "copy": "Afrita lista",
+      "copied": "Afritað",
+      "sqlLab": "EXPLAIN í SQL Tuning"
     }
   },
   "learn": {
@@ -683,7 +729,7 @@
         "repl": "Afritunareftirlit",
         "backup": "Afritunareftirlit",
         "sqlLab": "SQL-stilling",
-        "drift": "Drift samanburður",
+        "drift": "GAP greining",
         "connect": "Tengingar",
         "schema": "schema.pi skjár"
       },
@@ -981,7 +1027,11 @@
       "totalMs": "Heildar ms",
       "meanMs": "Meðaltal ms",
       "rows": "Raðir",
-      "reset": "Endurstilling tölfræði greind — sýnt sem uppsafnað"
+      "reset": "Endurstilling tölfræði greind — sýnt sem uppsafnað",
+      "src": "Uppruni",
+      "srcToggle": "Sýna eða fela upprunaupplýsingar",
+      "openSqlLab": "Opna í SQL Tuning",
+      "acct": "Reikningur"
     },
     "health": {
       "empty": "Engar skyndimyndir ennþá. Ýttu á Safna núna á Safna flipanum",
@@ -1011,6 +1061,46 @@
       "sessions": "Virkni lotu",
       "locks": "Læsingar",
       "none": "Engin"
+    },
+    "src": {
+      "root": "Til að ákvarða upprunann nákvæmlega: (1) notaðu sérstakan DB reikning fyrir hvert forrit, hóp og einstakling (verkfæri), og (2) stilltu application_name á hverri tengingu. Reikningurinn kemur frá pg_stat_statements og er öruggur; flokkur forrits/verkfæris er áætlaður út frá virknisýnum (application_name er sjálfskýrt af viðskiptavininum, svo það getur verið tómt eða breytt, og stuttar fyrirspurnir sem klárast á milli sýna geta verið misst).",
+      "cd": {
+        "PROGRAM": "Forrit",
+        "BATCH": "Hópur",
+        "TOOL": "Verkfæri (einstaklingur)",
+        "PLATFORM": "Innra kerfi",
+        "MONITOR": "Eftirlit (við)",
+        "UNKNOWN": "Óþekkt"
+      },
+      "conf": {
+        "high": "Mikil vissu",
+        "mid": "Meðal vissu",
+        "low": "Lítil vissu",
+        "acct": "Aðeins reikningur",
+        "ver": "Útgáfutakmörk"
+      },
+      "fix": {
+        "TOOL": "Líklega er einstaklingur að spyrja framleiðslu DB beint með DB verkfæri (DBeaver o.s.frv.). Vísaðu þeim í les-aðeins afrit eða greiningar DB í staðinn, og takmarkaðu keyrslutíma á mannlegum reikningum, t.d. ALTER ROLE human_user SET statement_timeout = '30s'. Notaðu sérstakt les-aðeins hlutverk, og keyrðu stórar útdrættir utan háannatíma.",
+        "BATCH": "Líklega hópur eða tímasett verk. Dreifðu keyrslutímum frá háannatímum og minnkaðu vinnu á hverja skuldbindingu. Athugaðu vísitölur og tölfræði (ANALYZE) á markatöflunum, og skiptu löngum færslum. Að setja nafn verksins í application_name gerir næstu flokkun nákvæmari.",
+        "PROGRAM": "Líklega fyrirspurn keyrð af forriti. Athugaðu áætlunina í SQL Tuning. Margar kallanir með stuttan meðaltal benda til endurtekinna kalla (N+1) eða skyndiminni; langur meðaltal bendir fyrst til vísitölu eða samsetningarröð. Stilltu þjónustunafnið í application_name tengingarsafnsins þíns.",
+        "PLATFORM": "Líklega DB eða innri kerfisvinna eins og autovacuum eða afritun. Venjulega er engin aðgerð nauðsynleg. Ef það heldur áfram að vera efst, skoðaðu autovacuum þröskulda og maintenance_work_mem.",
+        "MONITOR": "Líklega eigin tölfræðifyrirspurnir þessarar þjónustu (schema.pi tengill). Engin aðgerð nauðsynleg. Ef það birtist of oft, lækkaðu könnunartíðni.",
+        "UNKNOWN": "Engin vísbending er um upprunann. Stilltu application_name á hverri tengingu og skiptu reikningum eftir tilgangi; það verður flokkað út frá næstu sýnum."
+      },
+      "detail": {
+        "app": "Nafn forrits",
+        "addr": "Heimilisfang viðskiptavinar (grímað)",
+        "samples": "Sýni",
+        "active": "Virk sýni",
+        "period": "Athugað tímabil",
+        "none": "(tómt)"
+      },
+      "noSample": "Engin sýni enn — keyrandi lotur eru sýndar þegar þú skoðar eftirlitsborðið eða Virkni og læsingar flipann. Í bili er það flokkað út frá reikningsnafninu eingöngu.",
+      "verOff": "Þessi DB er eldri en PostgreSQL 14, svo keyrandi lotur hafa enga fyrirspurnarauðkenni. Aðeins reikningurinn (viss) er sýndur.",
+      "privOff": "Tengingarreikningurinn getur ekki séð upplýsingar um lotur annarra reikninga, svo engin sýni eru safnað. Biddu DB stjórnanda að keyra GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "tengingarreikningur",
+      "qidOff": "Upplýsingar um lotu eru sýnilegar en fyrirspurnarauðkenni er tómt (compute_query_id er slökkt). Athugaðu með SHOW compute_query_id; keyrðu síðan ALTER SYSTEM SET compute_query_id = 'auto'; og endurhlaðið (SELECT pg_reload_conf();).",
+      "openHint": "Opnar SQL Tuning með fyrirspurninni útfylltri. Skiptu út staðgildum eins og $1 með raunverulegum gildum áður en áætlunin er skoðuð."
     }
   },
   "pipeline": {
@@ -1207,7 +1297,7 @@
     "label": "Eiginleikar",
     "groups": {
       "monitor": "Vöktun",
-      "drift": "Samræmi",
+      "drift": "GAP greining",
       "lake": "Vatn",
       "admin": "Stjórnun"
     },
@@ -1215,7 +1305,7 @@
     "sqlLab": "SQL stillingar",
     "perf": "Afköst",
     "monitor": "Eftirlit",
-    "drift": "Frávik",
+    "drift": "GAP greining",
     "migration": "Flutningur",
     "pipeline": "Pípa",
     "analytics": "Greiningar",

@@ -1,6 +1,7 @@
 // GET /api/monitor/board?link=&conn=&tier=fast|slow&force=1 — 모니터링 관문 보드(감시 신호 14개). fast = db_stats·activity·version(50초 캐시),
 //  slow = top_sql·tbl·idx·sizes·archiver·replication + schema.pi 요약(270초 캐시, conn 없으면 URL·연계 상태만). 캐시는 소유 확인 뒤에만 읽는다
 //  fast 캐시 미스 + 세 조회 성공일 때만 after() 로 dbm_mon_snap 1행 upsert(분 절삭, 같은 분 중복 무시)
+//  fast 캐시 미스 + activity 성공이면 after() 로 느린 쿼리 출처 표본 병합(dbm_prf_qry_src, sql/032 — 같은 결과 재사용, 새 조회 없음)
 import { after, NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import { dbRoute } from '@/lib/api'
@@ -17,6 +18,7 @@ import {
 import { linkFail, linkGate } from '@/lib/monitor/server'
 import { hasTransient, type BoardSlow } from '@/lib/monitor/signals'
 import { LinkError } from '@/lib/link/client'
+import { writeQrySrc } from '@/lib/perf/source-store'
 
 const bad = () =>
   NextResponse.json(
@@ -47,8 +49,18 @@ export const GET = withGuard(
       const r = await buildFast(g.linkId, connId!)
       if (r instanceof LinkError) return linkFail(r)
       cacheSet(fastKey, TTL.fast, r.hit)
-      const snap = r.snap
+      const { snap, act } = r
       if (snap) after(() => writeSnap(g.linkId, connId!, g.usrId, snap))
+      if (act)
+        after(() =>
+          writeQrySrc(
+            g.linkId,
+            connId!,
+            g.usrId,
+            act,
+            r.hit.ver?.versionNum ?? null,
+          ),
+        )
       return NextResponse.json(r.hit.res, NO_STORE)
     }
 

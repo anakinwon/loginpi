@@ -103,7 +103,7 @@
       "keys": {
         "links": "Isku xirkayga",
         "perf": "Sawirrada waxqabadka",
-        "drift": "Orodka isbeddelka",
+        "drift": "Falanqaynta GAP",
         "mig": "Qorshayaasha socdaalka",
         "pipe": "Dhuumaha",
         "lake": "Xogta harada"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB Isbeddel",
+    "title": "Falanqaynta GAP — Model↔DB",
     "intro": "Isbarbardhig schema.pi model naqshadaynta iyo taariikhda DDL ee la adeegsaday oo leh buugga DB ee tooska ah si aad u hesho isbeddel, oo cabbir in indexyada la naqshadeeyay dhab ahaantii la isticmaalo. Xogta safka macmiilka marnaba lama akhriyo ama lama kaydiyo.",
     "needLink": "Marka hore dooro isku xirka schema.pi ee kor ku xusan. Haddii aadan midna haysan, diiwaangeli calaamad ku jirta menu-ka 'Isku xirka'.",
     "needConn": "Dooro isku xirka DB ee la isbarbardhigi doono ee kor ku xusan.",
     "project": "Mashruuc",
     "projectPick": "Dooro mashruuc",
     "loading": "Waa la soo shubayaa…",
-    "run": "Orodka ogaanshaha isbeddelka",
+    "run": "Samee Falanqaynta GAP",
     "running": "Isbarbardhigayaa…",
     "readOnly": "Kaliya buugga akhris-kaliya iyo weydiimaha tirakoobyada ayaa la socodsiiyaa.",
     "applyInSchema": "Ku dabaq hagaajinta (wax ka beddelka model, abuurista DDL iyo fulinta) schema.pi, isha runta.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Indexyada la naqshadeeyay oo ka maqan DB",
       "extraIndexes": "Indexyada aan ku jirin model",
       "ddlMissing": "Walxaha ka lumay ka dib markii la adeegsaday",
-      "unusedIndexes": "Indexyada la naqshadeeyay ee aan la isticmaalin"
+      "unusedIndexes": "Tusmooyinka aan la isticmaalin ee la filayo"
     },
     "sec": {
       "ddlMissing": "DDL waa la adeegsaday laakiin ka maqan DB",
       "missingTables": "Miisas ku jira model laakiin ka maqan DB",
       "extraTables": "Miisas ku jira DB laakiin aan ku jirin model",
-      "colMismatches": "Nooca tiirka / isku dhacyada NULL",
+      "colMismatches": "Khilaafaadka Tiirarka (Maqan·Nooc·NULL)",
       "missingIndexes": "Indexyada la naqshadeeyay oo ka maqan DB",
       "extraIndexes": "Indexyada kaliya ku jira DB (marka laga reebo PK)",
       "idxUsage": "Waxtarka index-ka la naqshadeeyay"
     },
     "hint": {
-      "ddlMissing": "schema.pi waxay diiwaangelisay walxahan sidii la adeegsaday, laakiin way lumeen — ka shakiso hoos u dhac gacmeed ama dib u celin.",
-      "extraTables": "Kuwan waxaa laga yaabaa inay ka tirsan yihiin mashaariic kale ama miisas nidaam oo ku saabsan isku xirkan.",
-      "idxUsage": "Eber baadhitaan tan iyo dib u dejintii tirakoobyada ee u dambaysay waxay la macno tahay in aan la isticmaalin. Hubi daaqadda tirakoobyada ka hor inta aadan tuurin."
+      "ddlMissing": "Kaliya walxaha ka maqan DB-da oo ku salaysan heerka ugu dambeeyay ee la dabaqay ayaa la soo bandhigay. Codsiyadii hore ee dib u abuuray isla shaxda ka dib iyo hababkii magac-bixinta ee hore (_PKEY) waa caadi waxaana hoos lagu soo koobay.",
+      "extraTables": "Waxay ku salaysan tahay schema {schema}. Waxaa lagu kooxeeyay horgale, kaliya kooxda horgalaha mashruucan ayaa ah musharaxiin loogu talagalay in laga tago modelka.",
+      "idxUsage": "Xukun = La Isticmaalayo / U Gaarnimo / Xog Maqan / La Ilaalinayo (Tirakoobyada la bilaabay·La abuuray wax ka yar 7 maalmood) / Musharax aan la isticmaalin. Kaliya tusmooyinka aan la isticmaalin ee la filayo ayaa loo tixgeliyaa in la tirtiro."
     },
     "kind": {
       "MISSING": "ka maqan DB",
@@ -223,12 +223,16 @@
       "idx": "Index",
       "scans": "Baadhitaanada",
       "size": "Cabbirka",
-      "status": "Xukun"
+      "status": "Xukun",
+      "basis": "Saldhig"
     },
     "usage": {
       "USED": "La isticmaalayo",
-      "UNUSED": "Index la naqshadeeyay oo aan la isticmaalin",
-      "NO_STATS": "Ma jiraan tirakoobyo"
+      "NO_STATS": "Ma jiraan tirakoobyo",
+      "CONSTRAINT": "Xaddidaadda gaarnimada (ilaali)",
+      "NO_DATA": "Xog ma jirto ama tirakoobyo lama soo ururin — lama xukumi karo",
+      "OBSERVING": "La ilaalinayo (wax ka yar 7 maalmood)",
+      "UNUSED_CAND": "Musharax aan la isticmaalin"
     },
     "errors": {
       "NOT_IMPLEMENTED": "Isku xirka schema.pi wali diyaar ma aha. Fadlan isku day mar kale dhawaan.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Isku xirka aan la taageerin (isku xirka server-ka PostgreSQL kaliya hadda).",
       "TIMEOUT": "Codsiga wuu dhacay. Fadlan isku day mar kale dhawaan.",
       "RATE": "Codsiyo badan. Fadlan isku day mar kale daqiiqad gudaheed."
+    },
+    "schema": "Schema",
+    "schemaHint": "Kaliya shaxda caadiga ah iyo kuwa la qaybiyay ee schema-kan ayaa la isbarbardhigayaa (aragtiyada waa laga reebay). Dadweynaha caadiga ah — schema-yada gudaha ee Supabase (auth, storage, …) waa laga tagay.",
+    "truncated": "{names} waxay gaareen xadka {max}-saf oo waa la gooyay — qaar ka mid ah natiijooyinka 'kuma jiraan DB' / 'kuma jiraan modelka' waxay noqon karaan kuwo been abuur ah. Cidhiidhi geli schema-da oo mar kale samee.",
+    "colUnchecked": "Sababtoo ah weydiinta tiirka waa la gooyay, {n} natiijooyinka tiirarka maqan/dheeraadka ah waxaa loo tixgeliyaa kuwo aan la xaqiijin karin waxaana laga reebay tirada khilaafaadka tiirarka.",
+    "renamed": "{n} tusmooyinka PK (kuwaas oo lagu dabaqay xeerka magac-bixinta ee hore (_PKEY)) ayaa ku jira DB-da magaca cusub (PK_) — caadi",
+    "superseded": "{n} codsiyadii hore waa laga reebay sababtoo ah codsi dambe ayaa dib u abuuray isla shaxda (DROP … CASCADE) — caadi",
+    "supersededItem": "Codsiga {id} → waxaa bedelay codsiga {by}",
+    "sysCols": "{n} tiirarka nidaamka (si toos ah loogu daray abuurista DDL) kuma jiraan modelka sida loogu talagalay waxaana laga reebay khilaafaadka",
+    "groupOwn": "Horgalaha mashruuca {pfx} — musharaxiin ka maqan modelka",
+    "groupOther": "Nidaam kale {pfx}",
+    "basis": "Safafka la qiyaasay {rows} · tan iyo {since}",
+    "guide": {
+      "title": "Tallaabooyinka xiga",
+      "ddlMissing": {
+        "s1": "schema.pi → mashruuca → modelka jireed → abuurista DDL, mar kale ku dabaq xiriirkan.",
+        "s2": "Marka la dhammeeyo, isticmaal \"Mar kale samee\" hoos oo xaqiiji in tiradu tahay 0.",
+        "s3": "Haddii walxaha ay weli maqan yihiin ka dib dib u dabaqidda, ka shakiso hoos u dhac gacmeed ama dib u celin oo la xiriir DBA-gaaga si aad u hubiso dhaqdhaqaaqa akoonka xiriirka."
+      },
+      "extraTables": {
+        "s1": "Xirmadan horgaleed ee mashruucan = musharrixiinta moodeelka ka maqan — ku soo deji moodeelka adoo isticmaalaya schema.pi → Settings → Reverse, ama go'aanso inaad tirtirto haddii ay yihiin miisas aan la isticmaalin.",
+        "s2": "Kooxaha horgalaha kale = nidaamyada kale ee wadaaga DB-gan — ma aha waxyaabo ficil ah oo loogu talagalay mashruucan.",
+        "s3": "Haddii schema-da bartilmaameedku aanu ahayn mid guud, beddel goobta \"Schema\" ee kor ku xusan oo mar kale samee."
+      },
+      "colMismatches": {
+        "s1": "Kuma jiraan DB = ku dabaq tiirka modelka DB-da adoo isticmaalaya schema.pi abuurista DDL.",
+        "s2": "Kuma jirto moodeelka = ku soo deji tiirka DB moodeelka adoo isticmaalaya schema.pi → Settings → Reverse, ama go'aanso inaad tirtirto haddii aan loo baahnayn.",
+        "s3": "Nooca/NULL way kala duwan yihiin = la jaanqaad modelka (isha runta); ka hor inta aanad gaabin dhererka ama aanad u beddelin NOT NULL, xaqiiji in safafka jira ay buuxiyaan shuruudaha."
+      },
+      "idxUsage": {
+        "s1": "Ka hor inta aanad saarin, hubi ① in daaqada tirakoobyada ay daboolayso ugu yaraan hal wareeg ganacsi (tusaale, bisha dhammaadkeeda) — eeg \"tan iyo\".",
+        "s2": "② Ma aha tusmo gaar ah/PK (kuwaas oo si gaar ah u muuqda sida \"xaddidaadda gaarnimada\").",
+        "s3": "③ EXPLAIN SQL-ka matalaya shaxda ee SQL Tuning oo xaqiiji in tusmadan aan la isticmaalin.",
+        "s4": "Marka saddexdaas la xaqiijiyo, ka saar tusmada modelka ee schema.pi oo ku dabaq DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Fur schema.pi",
+      "rerun": "Mar kale samee",
+      "copy": "Koobiyeey liiska",
+      "copied": "La koobiyeeyay",
+      "sqlLab": "EXPLAIN ee SQL Tuning"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Hubinta koobiyeynta",
         "backup": "Hubinta kaydinta",
         "sqlLab": "Hagaajinta SQL",
-        "drift": "Isbarbardhigga isbeddelka",
+        "drift": "Falanqaynta GAP",
         "connect": "Xidhiidhada",
         "schema": "schema.pi kormeeraha"
       },
@@ -989,7 +1035,11 @@
       "totalMs": "Wadarta ms",
       "meanMs": "Celcelis ms",
       "rows": "Safaf",
-      "reset": "Dib-u-dejinta tirakoobyada waa la ogaaday — waxaa lagu muujiyay isku-darka"
+      "reset": "Dib-u-dejinta tirakoobyada waa la ogaaday — waxaa lagu muujiyay isku-darka",
+      "src": "Isha",
+      "srcToggle": "Muuji ama qari faahfaahinta isha",
+      "openSqlLab": "Fur SQL Tuning",
+      "acct": "Akoon"
     },
     "health": {
       "empty": "Wali ma jiraan sawirro. Riix Ururi hadda tabka Ururi",
@@ -1020,6 +1070,46 @@
       "sessions": "Hawsha fadhiga",
       "locks": "Qufullo",
       "none": "Midna"
+    },
+    "src": {
+      "root": "Si si sax ah loo ogaado isha: (1) isticmaal akoon DB gaar ah barnaamij kasta, dufcad kasta iyo qof kasta (qalab), iyo (2) deji application_name xiriir kasta. Akoonka wuxuu ka yimaadaa pg_stat_statements waana hubaal; qaybta app/qalabka waxaa lagu qiyaasaa muunado dhaqdhaqaaq (application_name waxaa iska soo sheega macmiilka, sidaa darteed wuu madhnaan karaa ama isbeddeli karaa, iyo weydiimaha gaaban ee ku dhammaada inta u dhaxaysa muunado waa la seegi karaa)",
+      "cd": {
+        "PROGRAM": "Barnaamij",
+        "BATCH": "Dufcad",
+        "TOOL": "Qalab (qof)",
+        "PLATFORM": "Gudaha madal",
+        "MONITOR": "La socod (annaga)",
+        "UNKNOWN": "Lama garanayo"
+      },
+      "conf": {
+        "high": "Kalsooni sare",
+        "mid": "Kalsooni dhexdhexaad ah",
+        "low": "Kalsooni hoose",
+        "acct": "Kaliya akoon",
+        "ver": "Xadka nooca"
+      },
+      "fix": {
+        "TOOL": "Waxay u egtahay qof si toos ah u weydiinaya DB-da wax-soo-saarka isagoo isticmaalaya qalab DB (DBeaver iwm.). U tilmaan nuqul akhris-kaliya ah ama DB falanqayn ah, oo xaddid wakhtiga socodka akoonnada aadanaha, tusaale ahaan ALTER ROLE human_user SET statement_timeout = '30s'. Isticmaal door akhris-kaliya ah oo gaar ah, oo samee soo saaridda tiro badan saacadaha aan mashquulka ahayn",
+        "BATCH": "Waxay u egtahay dufcad ama shaqo la qorsheeyay. Faafi wakhtiyada socodka si ay uga fogaadaan meelaha ugu sarreeya ee ganacsiga oo yaree shaqada halkii ballanqaad. Hubi tusmooyinka iyo tirakoobyada (ANALYZE) ee shaxda bartilmaameedka, oo kala qaybi macaamilada dhaadheer. Ku darista magaca shaqada application_name waxay ka dhigaysaa kala-saaridda xigta mid sax ah",
+        "PROGRAM": "Waxay u egtahay weydiin uu sameeyay codsi. Hubi qorshaha SQL Tuning. Wicitaanno badan oo leh celcelis gaaban waxay tilmaamayaan wicitaanno soo noqnoqda (N+1) ama kaydinta; celcelis dheer waxay tilmaamaysaa tusmooyinka ama kala-sarraynta isku-darka marka hore. Deji magaca adeegga application_name ee barkadda xiriirkaaga",
+        "PLATFORM": "Waxay u egtahay shaqo gudaha ah oo DB ama madal ah sida autovacuum ama nuqul-samayn. Badanaa wax ficil ah looma baahna. Haddii ay ku sii jirto meesha ugu sarreysa, dib u eeg marinka autovacuum iyo maintenance_work_mem",
+        "MONITOR": "Waxay u egtahay weydiimaha tirakoobyada ee adeeggan (xiriirka schema.pi). Wax ficil ah looma baahna. Haddii ay soo muuqato marar badan, hoos u dhig inta jeer ee la hubinayo",
+        "UNKNOWN": "Ma jirto wax tilmaan ah oo ku saabsan isha. Deji application_name xiriir kasta oo kala qaybi akoonnada ujeeddooyin kala duwan; waxaa lagu kala saari doonaa muunadaha xiga"
+      },
+      "detail": {
+        "app": "Magaca app-ka",
+        "addr": "Cinwaanka macmiilka (la qariyay)",
+        "samples": "Muunado",
+        "active": "Muunado firfircoon",
+        "period": "La arkay",
+        "none": "(madhan)"
+      },
+      "noSample": "Weli ma jiraan muunado — fadhiyada socda waa la muunadeeyaa marka aad eegto guddiga la socodka ama tabka Dhaqdhaqaaqa & qufulada. Hadda waxaa lagu kala saaraa magaca akoonka oo kaliya",
+      "verOff": "DB-gan wuu ka duugsan yahay PostgreSQL 14, sidaa darteed fadhiyada socda ma laha aqoonsi weydiin. Kaliya akoonka (huban) ayaa la soo bandhigay",
+      "privOff": "Akoonka xiriirku ma arki karo faahfaahinta fadhiyada akoonnada kale, sidaa darteed ma jiraan muunado la soo ururiyay. Weydii maamulaha DB inuu sameeyo GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "akoonta xiriirka",
+      "qidOff": "Faahfaahinta fadhiga waa la arki karaa laakiin aqoonsiga weydiinta waa madhan yahay (compute_query_id waa dansan yahay). Hubi SHOW compute_query_id; ka dibna samee ALTER SYSTEM SET compute_query_id = 'auto'; oo dib u soo shub (SELECT pg_reload_conf();)",
+      "openHint": "Wuxuu furaa SQL Tuning iyadoo weydiinta la buuxiyay. Beddel meelaha bannaan sida $1 qiimayaal dhab ah ka hor inta aanad eegin qorshaha"
     }
   },
   "pipeline": {
@@ -1216,7 +1306,7 @@
     "label": "Astaamaha",
     "groups": {
       "monitor": "Kormeerid",
-      "drift": "Joogtaynta",
+      "drift": "Falanqaynta GAP",
       "lake": "Harada",
       "admin": "Maamulka"
     },
@@ -1224,7 +1314,7 @@
     "sqlLab": "SQL Tuning",
     "perf": "Waxqabadka",
     "monitor": "La socodka",
-    "drift": "Leexasho",
+    "drift": "Falanqaynta GAP",
     "migration": "Hijra",
     "pipeline": "Dhuumo",
     "analytics": "Falanqaynta",

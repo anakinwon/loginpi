@@ -103,7 +103,7 @@
       "keys": {
         "links": "Omat linkit",
         "perf": "Suorituskykykuvat",
-        "drift": "Drift-ajot",
+        "drift": "GAP-analyysi",
         "mig": "Siirtosuunnitelmat",
         "pipe": "Putkilinjat",
         "lake": "Järven tietojoukot"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Malli ↔ DB-drift",
+    "title": "GAP-analyysi — Malli↔DB",
     "intro": "Vertaa schema.pi-suunnittelumallia ja DDL-sovellushistoriaa live-DB-luetteloon löytääksesi driftin ja mittaa, käytetäänkö suunniteltuja indeksejä todella. Asiakkaan rivitietoja ei koskaan lueta tai tallenneta.",
     "needLink": "Valitse ensin schema.pi-linkki ylhäältä. Jos sinulla ei ole sellaista, rekisteröi tunnus 'Linkki'-valikossa.",
     "needConn": "Valitse ylhäältä vertailtava DB-yhteys.",
     "project": "Projekti",
     "projectPick": "Valitse projekti",
     "loading": "Ladataan…",
-    "run": "Suorita driftin tunnistus",
+    "run": "Suorita GAP-analyysi",
     "running": "Vertailu käynnissä…",
     "readOnly": "Vain vain luku -luettelo- ja tilastokyselyt suoritetaan.",
     "applyInSchema": "Tee korjaukset (mallin muokkaukset, DDL-generointi ja suoritus) schema.pi:ssä, joka on totuuden lähde.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Suunnitellut indeksit puuttuvat DB:stä",
       "extraIndexes": "Indeksit, jotka eivät ole mallissa",
       "ddlMissing": "Objektit kadonneet soveltamisen jälkeen",
-      "unusedIndexes": "Käyttämättömät suunnitellut indeksit"
+      "unusedIndexes": "Käyttämättömät indeksi-ehdokkaat"
     },
     "sec": {
       "ddlMissing": "DDL sovellettu, mutta puuttuu DB:stä",
       "missingTables": "Taulukot mallissa, mutta puuttuvat DB:stä",
       "extraTables": "Taulukot DB:ssä, mutta eivät mallissa",
-      "colMismatches": "Saraketyypin / NULL-yhteensopimattomuudet",
+      "colMismatches": "Sarakkeiden ristiriidat (puuttuu·tyyppi·NULL)",
       "missingIndexes": "Suunnitellut indeksit puuttuvat DB:stä",
       "extraIndexes": "Indeksit vain DB:ssä (pois lukien PK)",
       "idxUsage": "Suunnitellun indeksin tehokkuus"
     },
     "hint": {
-      "ddlMissing": "schema.pi kirjasi nämä objektit sovelletuiksi, mutta ne ovat kadonneet – epäile manuaalista poistoa tai palautusta.",
-      "extraTables": "Nämä voivat kuulua muihin projekteihin tai järjestelmätaulukoihin tällä yhteydellä.",
-      "idxUsage": "Nolla skannausta viimeisimmän tilastojen nollauksen jälkeen tarkoittaa käyttämätöntä. Tarkista tilastoikkuna ennen poistamista."
+      "ddlMissing": "Näytetään vain objektit, jotka puuttuvat DB:stä viimeisimmän sovelletun standardin perusteella. Aiemmat pyynnöt, jotka loivat saman taulukon myöhemmin, ja vanhat nimeämiskäytännöt (_PKEY) ovat normaaleja ja taitettu alle.",
+      "extraTables": "Perustuu skeemaan {schema}. Ryhmitelty etuliitteen mukaan, vain tämän projektin etuliite-ryhmä on ehdokas mallin puuttumiselle.",
+      "idxUsage": "Arvio = Käytössä / Yksilöllisyyden varmistamiseksi / Ei tietoja / Tarkkailussa (tilastot aloitettu·luotu alle 7 päivää sitten) / Käyttämätön ehdokas. Vain käyttämättömät indeksi-ehdokkaat otetaan huomioon poistossa."
     },
     "kind": {
       "MISSING": "puuttuu DB:stä",
@@ -223,12 +223,16 @@
       "idx": "Indeksi",
       "scans": "Skannaukset",
       "size": "Koko",
-      "status": "Tuomio"
+      "status": "Tuomio",
+      "basis": "Peruste"
     },
     "usage": {
       "USED": "Käytössä",
-      "UNUSED": "Käyttämätön suunniteltu indeksi",
-      "NO_STATS": "Ei tilastoja"
+      "NO_STATS": "Ei tilastoja",
+      "CONSTRAINT": "Yksilöllisyysrajoitus (säilytä)",
+      "NO_DATA": "Ei tietoja tai tilastoja ei kerätty — ei voida arvioida",
+      "OBSERVING": "Tarkkailussa (alle 7 päivää)",
+      "UNUSED_CAND": "Käyttämätön ehdokas"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi-yhteysominaisuutta valmistellaan. Yritä uudelleen hetken kuluttua.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Yhteyttä ei tueta (toistaiseksi vain PostgreSQL-palvelinyhteydet).",
       "TIMEOUT": "Pyynnön aikakatkaisu. Yritä uudelleen hetken kuluttua.",
       "RATE": "Liian monta pyyntöä. Yritä uudelleen minuutin kuluttua."
+    },
+    "schema": "Skeema",
+    "schemaHint": "Vain tämän skeeman tavalliset ja osioidut taulukot verrataan (näkymät pois lukien). Oletus public — Supabasen sisäiset skeemat (auth, storage, …) jätetään pois.",
+    "truncated": "{names} saavutti {max}-rivin rajan ja katkaistiin — jotkin \"ei DB:ssä\" / \"ei mallissa\" -tulokset voivat olla virheellisiä. Rajaa skeemaa ja suorita uudelleen.",
+    "colUnchecked": "Koska sarakekysely katkaistiin, {n} puuttuvaa/ylimääräistä saraketulosta käsitellään vahvistamattomina ja ne on suljettu pois sarakkeiden ristiriitojen määrästä.",
+    "renamed": "{n} PK-indeksiä, jotka on sovellettu vanhan nimeämissäännön (_PKEY) mukaisesti, ovat DB:ssä uudella nimellä (PK_) — normaali",
+    "superseded": "{n} vanhempaa pyyntöä suljettiin pois, koska myöhempi pyyntö loi saman taulukon uudelleen (DROP … CASCADE) — normaali",
+    "supersededItem": "Pyyntö {id} → korvattu pyynnöllä {by}",
+    "sysCols": "{n} järjestelmäsaraketta, jotka lisättiin automaattisesti DDL-generoinnin yhteydessä, eivät ole mallissa suunnittelun mukaan ja ne on suljettu pois ristiriidoista",
+    "groupOwn": "Projektin etuliite {pfx} — mallista puuttuvat ehdokkaat",
+    "groupOther": "Muut järjestelmät {pfx}",
+    "basis": "Arvioituja rivejä {rows} · alkaen {since}",
+    "guide": {
+      "title": "Seuraavat vaiheet",
+      "ddlMissing": {
+        "s1": "schema.pi → projekti → fyysinen malli → DDL-generointi, sovelleta uudelleen tähän yhteyteen.",
+        "s2": "Kun valmis, käytä alla olevaa \"Suorita uudelleen\" ja varmista, että määrä on 0.",
+        "s3": "Jos objektit katoavat edelleen uudelleen soveltamisen jälkeen, epäile manuaalista poistoa tai palautusta ja tarkista yhteyden tilin toimintahistoria DBA:n kanssa."
+      },
+      "extraTables": {
+        "s1": "Tämä projektin etuliitepaketti = puuttuvat malliehdokkaat – tuo ne malliin schema.pi → Asetukset → Käänteinen, tai päätä poistaa ne, jos ne ovat käyttämättömiä taulukoita.",
+        "s2": "Muut etuliite-ryhmät = muut järjestelmät, jotka jakavat tämän DB:n — eivät ole tämän projektin toimenpiteitä.",
+        "s3": "Jos kohdeskeema ei ole public, muuta yllä olevaa \"Skeema\"-kenttää ja suorita uudelleen."
+      },
+      "colMismatches": {
+        "s1": "Ei DB:ssä = sovelleta mallisaraketta DB:hen schema.pi DDL-generoinnin kautta.",
+        "s2": "Ei mallissa = tuo DB-sarake malliin schema.pi → Asetukset → Käänteinen, tai päätä poistaa se, jos se on tarpeeton.",
+        "s3": "Tyyppi/NULL eroaa = kohdista malliin (totuuden lähde); ennen pituuden pienentämistä tai NOT NULL -tilaan siirtymistä, varmista, että olemassa olevat rivit täyttävät sen."
+      },
+      "idxUsage": {
+        "s1": "Ennen poistamista, tarkista ① että tilastoikkuna kattaa vähintään yhden liiketoimintasyklin (esim. kuun lopun eräajo) — katso \"alkaen\".",
+        "s2": "② Se ei ole yksilöllinen/PK-indeksi (ne näkyvät erikseen \"yksilöllisyysrajoituksena\").",
+        "s3": "③ EXPLAIN taulukon edustava SQL SQL Tuningissa ja varmista, ettei tätä indeksiä käytetä.",
+        "s4": "Kun kaikki kolme on vahvistettu, poista indeksi mallista schema.pi:ssä ja sovelleta DDL:n kautta."
+      }
+    },
+    "act": {
+      "openSchema": "Avaa schema.pi",
+      "rerun": "Suorita uudelleen",
+      "copy": "Kopioi luettelo",
+      "copied": "Kopioitu",
+      "sqlLab": "EXPLAIN SQL Tuningissa"
     }
   },
   "learn": {
@@ -685,7 +731,7 @@
         "repl": "Replikoinnin tarkistus",
         "backup": "Varmuuskopioinnin tarkistus",
         "sqlLab": "SQL-viritys",
-        "drift": "Poikkeaman vertailu",
+        "drift": "GAP-analyysi",
         "connect": "Yhteydet",
         "schema": "schema.pi-monitori"
       },
@@ -984,7 +1030,11 @@
       "totalMs": "Kokonais-ms",
       "meanMs": "Keskim. ms",
       "rows": "Rivit",
-      "reset": " Tilastojen nollaus havaittu – näytetään kumulatiivisena"
+      "reset": " Tilastojen nollaus havaittu – näytetään kumulatiivisena",
+      "src": "Lähde",
+      "srcToggle": "Näytä tai piilota lähteen tiedot",
+      "openSqlLab": "Avaa SQL Tuningissa",
+      "acct": "Tili"
     },
     "health": {
       "empty": "Ei tilannekuvia vielä. Paina Kerää nyt Kerää-välilehdellä",
@@ -1014,6 +1064,46 @@
       "sessions": "Istunnon aktiviteetti",
       "locks": "Lukot",
       "none": "Ei mitään"
+    },
+    "src": {
+      "root": "Tarkka lähde: (1) käytä erillistä DB-tiliä jokaiselle ohjelmalle, eräajolle ja henkilölle (työkalulle), ja (2) aseta application_name jokaiselle yhteydelle. Tili tulee pg_stat_statementsista ja on varma; sovellus-/työkaluluokka arvioidaan aktiivisuusnäytteistä (application_name on asiakkaan itse ilmoittama, joten se voi olla tyhjä tai muuttunut, ja lyhyet kyselyt, jotka päättyvät näytteiden välillä, voivat jäädä huomaamatta)",
+      "cd": {
+        "PROGRAM": "Ohjelma",
+        "BATCH": "Eräajo",
+        "TOOL": "Työkalu (henkilö)",
+        "PLATFORM": "Alustan sisäinen",
+        "MONITOR": "Valvonta (me)",
+        "UNKNOWN": "Tuntematon"
+      },
+      "conf": {
+        "high": "Korkea varmuus",
+        "mid": "Keskiverto varmuus",
+        "low": "Matala varmuus",
+        "acct": "Vain tili",
+        "ver": "Version raja"
+      },
+      "fix": {
+        "TOOL": "Näyttää siltä, että henkilö kysyy tuotanto-DB:tä suoraan DB-työkalulla (DBeaver jne.). Ohjaa heidät sen sijaan vain luku -replikaan tai analytiikka-DB:hen ja rajoita ajoaikaa ihmisten tileillä, esim. ALTER ROLE human_user SET statement_timeout = '30s'. Käytä erillistä vain luku -roolia ja suorita massapoiminnat ruuhka-aikojen ulkopuolella",
+        "BATCH": "Näyttää eräajolta tai ajoitetulta työltä. Jaa ajoajat pois liiketoiminnan ruuhkahuipuista ja pienennä työtä per commit. Tarkista indeksit ja tilastot (ANALYZE) kohdetaulukoista ja jaa pitkät transaktiot. Työn nimen lisääminen application_nameen tekee seuraavasta luokittelusta tarkemman",
+        "PROGRAM": "Näyttää sovelluksen suorittamalta kyselyltä. Tarkista suunnitelma SQL Tuningissa. Monet lyhyen keskiarvon omaavat kutsut viittaavat toistuviin kutsuihin (N+1) tai välimuistiin; pitkä keskiarvo viittaa ensisijaisesti indekseihin tai liitosjärjestykseen. Aseta palvelun nimi yhteyspoolisi application_nameen",
+        "PLATFORM": "Näyttää DB:n tai alustan sisäiseltä työltä, kuten autovacuum tai replikointi. Yleensä toimenpiteitä ei tarvita. Jos se pysyy kärjessä, tarkista autovacuum-kynnysarvot ja maintenance_work_mem",
+        "MONITOR": "Näyttää tämän palvelun omilta tilastokyselyiltä (schema.pi-linkki). Toimenpiteitä ei tarvita. Jos se näkyy liian usein, alenna kyselytaajuutta",
+        "UNKNOWN": "Lähteestä ei ole vihjettä. Aseta application_name jokaiselle yhteydelle ja jaa tilit tarkoituksen mukaan; se luokitellaan seuraavista näytteistä"
+      },
+      "detail": {
+        "app": "Sovelluksen nimi",
+        "addr": "Asiakkaan osoite (maskattu)",
+        "samples": "Näytteet",
+        "active": "Aktiiviset näytteet",
+        "period": "Havainnoitu",
+        "none": "(tyhjä)"
+      },
+      "noSample": "Ei vielä näytteitä — käynnissä olevat istunnot näytteistetään, kun tarkastelet valvontataulua tai Activity & locks -välilehteä. Toistaiseksi se luokitellaan vain tilin nimen perusteella",
+      "verOff": "Tämä DB on vanhempi kuin PostgreSQL 14, joten käynnissä olevilla istunnoilla ei ole kysely-ID:tä. Vain tili (varma) näytetään",
+      "privOff": "Linkkitili ei voi nähdä muiden tilien istuntotietoja, joten näytteitä ei kerätä. Pyydä DB-järjestelmänvalvojaa suorittamaan GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "linkkitili",
+      "qidOff": "Istuntotiedot ovat näkyvissä, mutta kysely-ID on tyhjä (compute_query_id on pois päältä). Tarkista SHOW compute_query_id; -komennolla ja suorita sitten ALTER SYSTEM SET compute_query_id = 'auto'; ja lataa uudelleen (SELECT pg_reload_conf();)",
+      "openHint": "Avaa SQL Tuningin kysely täytettynä. Korvaa paikkamerkit, kuten $1, todellisilla arvoilla ennen suunnitelman tarkastelua"
     }
   },
   "pipeline": {
@@ -1210,7 +1300,7 @@
     "label": "Ominaisuudet",
     "groups": {
       "monitor": "Valvonta",
-      "drift": "Johdonmukaisuus",
+      "drift": "GAP-analyysi",
       "lake": "Järvi",
       "admin": "Hallinta"
     },
@@ -1218,7 +1308,7 @@
     "sqlLab": "SQL-viritys",
     "perf": "Suorituskyky",
     "monitor": "Valvonta",
-    "drift": "Poikkeama",
+    "drift": "GAP-analyysi",
     "migration": "Siirto",
     "pipeline": "Putki",
     "analytics": "Analytiikka",

@@ -103,7 +103,7 @@
       "keys": {
         "links": "Mening havolalarim",
         "perf": "Ishlash suratlari",
-        "drift": "Drift ishga tushirishlari",
+        "drift": "GAP tahlili",
         "mig": "Migratsiya rejalari",
         "pipe": "Quvur liniyalari",
         "lake": "Koʻl maʼlumotlar toʻplamlari"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB Drift",
+    "title": "GAP tahlili — Model↔DB",
     "intro": "schema.pi dizayn modeli va DDL qoʻllash tarixini jonli DB katalogi bilan solishtirib, driftni toping va moʻljallangan indekslar haqiqatda ishlatilayotganligini oʻlchang. Mijoz qator maʼlumotlari hech qachon oʻqilmaydi yoki saqlanmaydi.",
     "needLink": "Avval yuqoridan schema.pi havolasini tanlang. Agar sizda yoʻq boʻlsa, 'Ulanish' menyusida token roʻyxatdan oʻtkazing.",
     "needConn": "Yuqoridan solishtirish uchun DB ulanishini tanlang.",
     "project": "Loyiha",
     "projectPick": "Loyihani tanlang",
     "loading": "Yuklanmoqda…",
-    "run": "Driftni aniqlashni ishga tushirish",
+    "run": "GAP tahlilini ishga tushirish",
     "running": "Solishtirilmoqda…",
     "readOnly": "Faqat oʻqish uchun katalog va statistika soʻrovlari bajariladi.",
     "applyInSchema": "Tuzatishlarni (model tahrirlari, DDL yaratish va bajarish) haqiqat manbai boʻlgan schema.pi da qoʻllang.",
@@ -197,21 +197,21 @@
       "missingIndexes": "DB da yoʻq moʻljallangan indekslar",
       "extraIndexes": "Modelda yoʻq indekslar",
       "ddlMissing": "Qoʻllashdan keyin yoʻqolgan obʼektlar",
-      "unusedIndexes": "Ishlatilmagan moʻljallangan indekslar"
+      "unusedIndexes": "Ishlatilmagan indeks nomzodlari"
     },
     "sec": {
       "ddlMissing": "DDL qoʻllandi, lekin DB da yoʻq",
       "missingTables": "Modelda bor, lekin DB da yoʻq jadvallar",
       "extraTables": "DB da bor, lekin modelda yoʻq jadvallar",
-      "colMismatches": "Ustun turi / NULL nomuvofiqliklari",
+      "colMismatches": "Ustunlar nomuvofiqligi (yoʻq·turi·NULL)",
       "missingIndexes": "DB da yoʻq moʻljallangan indekslar",
       "extraIndexes": "Faqat DB da mavjud indekslar (PK dan tashqari)",
       "idxUsage": "Moʻljallangan indeks samaradorligi"
     },
     "hint": {
-      "ddlMissing": "schema.pi bu obʼektlarni qoʻllanilgan deb qayd etgan, ammo ular yoʻq — qoʻlda oʻchirish yoki qaytarishdan shubhalaning.",
-      "extraTables": "Bular boshqa loyihalarga yoki bu ulanishdagi tizim jadvallariga tegishli boʻlishi mumkin.",
-      "idxUsage": "Oxirgi statistika tiklashdan beri nol skanerlash ishlatilmaganligini bildiradi. Oʻchirishdan oldin statistika oynasini tekshiring."
+      "ddlMissing": "Faqat oxirgi qoʻllanilgan standartga asoslanib, DBda mavjud boʻlmagan obyektlar koʻrsatiladi. Xuddi shu jadvalni keyinroq qayta yaratgan oldingi soʻrovlar va eski nomlash qoidalari (_PKEY) normal hisoblanadi va quyida yigʻilgan.",
+      "extraTables": "{schema} sxemasi asosida. Prefiks boʻyicha guruhlangan, faqat ushbu loyiha prefiksi guruhi modeldan tashqarida qolgan nomzodlardir.",
+      "idxUsage": "Hukm = Foydalanishda / Noyoblik uchun / Maʼlumot yoʻq / Kuzatuv ostida (Statistika boshlangan·7 kundan kam yaratilgan) / Ishlatilmagan nomzod. Faqat ishlatilmagan indeks nomzodlari oʻchirish uchun koʻrib chiqiladi."
     },
     "kind": {
       "MISSING": "DB da yoʻq",
@@ -223,12 +223,16 @@
       "idx": "Indeks",
       "scans": "Skanerlashlar",
       "size": "Hajmi",
-      "status": "Hukm"
+      "status": "Hukm",
+      "basis": "Asos"
     },
     "usage": {
       "USED": "Foydalanilmoqda",
-      "UNUSED": "Ishlatilmagan moʻljallangan indeks",
-      "NO_STATS": "Statistika yoʻq"
+      "NO_STATS": "Statistika yoʻq",
+      "CONSTRAINT": "Noyoblik cheklovi (saqlash)",
+      "NO_DATA": "Maʼlumot yoʻq yoki statistika yigʻilmagan — hukm qilib boʻlmaydi",
+      "OBSERVING": "Kuzatuv ostida (7 kundan kam)",
+      "UNUSED_CAND": "Ishlatilmagan nomzod"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi havolasi hali tayyor emas. Iltimos, birozdan keyin qayta urinib koʻring.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Qoʻllab-quvvatlanmaydigan ulanish (hozircha faqat PostgreSQL server ulanishlari).",
       "TIMEOUT": "Soʻrov vaqti tugadi. Iltimos, birozdan keyin qayta urinib koʻring.",
       "RATE": "Juda koʻp soʻrovlar. Iltimos, bir daqiqadan keyin qayta urinib koʻring."
+    },
+    "schema": "Sxema",
+    "schemaHint": "Faqat ushbu sxemadagi oddiy va boʻlingan jadvallar solishtiriladi (koʻrinishlar bundan mustasno). Standart public — Supabase ichki sxemalari (auth, storage, …) chiqarib tashlanadi.",
+    "truncated": "{names} {max} qator chegarasiga yetdi va qisqartirildi — baʼzi \"DBda yoʻq\" / \"modelda yoʻq\" natijalari notoʻgʻri boʻlishi mumkin. Sxemani toraytiring va qayta ishga tushiring.",
+    "colUnchecked": "Ustun soʻrovi qisqartirilganligi sababli, {n} ta yetishmayotgan/qoʻshimcha ustun natijalari tekshirib boʻlmaydigan deb hisoblanadi va ustun nomuvofiqligi sonidan chiqarib tashlanadi.",
+    "renamed": "Eski nomlash qoidasi (_PKEY) boʻyicha qoʻllanilgan {n} ta PK indeksi DBda yangi nom (PK_) ostida mavjud — normal",
+    "superseded": "{n} ta eski soʻrov keyingi soʻrov xuddi shu jadvalni qayta yaratganligi sababli (DROP … CASCADE) chiqarib tashlandi — normal",
+    "supersededItem": "Soʻrov {id} → {by} soʻrovi bilan almashtirildi",
+    "sysCols": "DDL yaratishda avtomatik qoʻshilgan {n} ta tizim ustuni modelda boʻlmasligi normal holat va nomuvofiqliklardan chiqarib tashlanadi",
+    "groupOwn": "Loyiha prefiksi {pfx} — modeldan tashqarida qolgan nomzodlar",
+    "groupOther": "Boshqa tizim {pfx}",
+    "basis": "Taxminiy qatorlar {rows} · {since} dan beri",
+    "guide": {
+      "title": "Keyingi qadamlar",
+      "ddlMissing": {
+        "s1": "schema.pi → loyiha → fizik model → DDL yaratishda, ushbu ulanishga qayta qoʻllang.",
+        "s2": "Tugagandan soʻng, quyidagi \"Qayta ishga tushirish\" tugmasidan foydalaning va soni 0 ekanligini tasdiqlang.",
+        "s3": "Qayta qoʻllagandan keyin ham obyektlar yoʻqolsa, qoʻlda oʻchirish yoki qaytarishdan shubhalaning va ulanish hisobining faoliyatini DBA bilan tekshiring."
+      },
+      "extraTables": {
+        "s1": "Ushbu loyiha prefiksi toʻplami = modelda yoʻq nomzodlar — ularni schema.pi → Sozlamalar → Reverse orqali modelga import qiling yoki foydalanilmayotgan jadvallar boʻlsa, ularni oʻchirishni hal qiling.",
+        "s2": "Boshqa prefiks guruhlari = ushbu DBni baham koʻradigan boshqa tizimlar — ushbu loyiha uchun harakat elementlari emas.",
+        "s3": "Agar maqsadli sxema public boʻlmasa, yuqoridagi \"Sxema\" maydonini oʻzgartiring va qayta ishga tushiring."
+      },
+      "colMismatches": {
+        "s1": "DBda yoʻq = model ustunini schema.pi DDL yaratish orqali DBga qoʻllang.",
+        "s2": "Modelda yoʻq = DB ustunini schema.pi → Sozlamalar → Reverse orqali modelga import qiling yoki keraksiz boʻlsa, uni oʻchirishni hal qiling.",
+        "s3": "Turi/NULL farq qiladi = modelga (haqiqat manbai) moslashtiring; uzunlikni qisqartirish yoki NOT NULLga oʻtishdan oldin, mavjud qatorlar unga mos kelishini tasdiqlang."
+      },
+      "idxUsage": {
+        "s1": "Oʻchirishdan oldin, ① statistika oynasi kamida bitta biznes siklini (masalan, oy oxiridagi partiya) qamrab olganligini tekshiring — \"dan beri\" ga qarang.",
+        "s2": "② Bu noyob/PK indeks emasligini (ular alohida \"noyoblik cheklovi\" sifatida koʻrsatiladi).",
+        "s3": "③ SQL Tuningda jadvalning vakili SQLni EXPLAIN qiling va ushbu indeks ishlatilmaganligini tasdiqlang.",
+        "s4": "Uchta holat ham tasdiqlangandan soʻng, indeksni schema.pi dagi modeldan olib tashlang va DDL orqali qoʻllang."
+      }
+    },
+    "act": {
+      "openSchema": "schema.pi ni ochish",
+      "rerun": "Qayta ishga tushirish",
+      "copy": "Roʻyxatni nusxalash",
+      "copied": "Nusxalandi",
+      "sqlLab": "SQL Tuningda EXPLAIN"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Replikatsiya tekshiruvi",
         "backup": "Zaxira tekshiruvi",
         "sqlLab": "SQL tuning",
-        "drift": "Drift taqqoslash",
+        "drift": "GAP tahlili",
         "connect": "Ulanishlar",
         "schema": "schema.pi monitor"
       },
@@ -991,7 +1037,11 @@
       "totalMs": "Umumiy ms",
       "meanMs": "Oʻrtacha ms",
       "rows": "Qatorlar",
-      "reset": "Statistikalar qayta tiklangani aniqlandi — umumiy sifatida koʻrsatilgan"
+      "reset": "Statistikalar qayta tiklangani aniqlandi — umumiy sifatida koʻrsatilgan",
+      "src": "Manba",
+      "srcToggle": "Manba tafsilotlarini koʻrsatish yoki yashirish",
+      "openSqlLab": "SQL Tuningda ochish",
+      "acct": "Hisob"
     },
     "health": {
       "empty": "Hali suratlar yoʻq. Yigʻish yorligʻida hozir yigʻish tugmasini bosing",
@@ -1022,6 +1072,46 @@
       "sessions": "Sessiya faoliyati",
       "locks": "Qulflar",
       "none": "Hech biri"
+    },
+    "src": {
+      "root": "Manbani aniq aniqlash uchun: (1) har bir dastur, partiya va shaxs (vosita) uchun alohida DB hisobidan foydalaning va (2) har bir ulanishda application_name ni oʻrnating. Hisob pg_stat_statements dan keladi va aniq; ilova/vosita kategoriyasi faoliyat namunalari asosida baholanadi (application_name mijoz tomonidan oʻzi xabar qilinadi, shuning uchun u boʻsh yoki oʻzgartirilishi mumkin, va namunalar orasida tugaydigan qisqa soʻrovlar oʻtkazib yuborilishi mumkin)",
+      "cd": {
+        "PROGRAM": "Dastur",
+        "BATCH": "Partiya",
+        "TOOL": "Vosita (shaxs)",
+        "PLATFORM": "Platforma ichki",
+        "MONITOR": "Monitoring (biz)",
+        "UNKNOWN": "Nomaʼlum"
+      },
+      "conf": {
+        "high": "Yuqori ishonch",
+        "mid": "Oʻrta ishonch",
+        "low": "Past ishonch",
+        "acct": "Faqat hisob",
+        "ver": "Versiya chegarasi"
+      },
+      "fix": {
+        "TOOL": "Koʻrinishidan, shaxs DB vositasi (DBeaver va boshqalar) bilan ishlab chiqarish DBni toʻgʻridan-toʻgʻri soʻragan. Ularni oʻqish uchun moʻljallangan nusxaga yoki analitika DBga yoʻnaltiring va inson hisoblari uchun ish vaqtini cheklang, masalan, ALTER ROLE human_user SET statement_timeout = '30s'. Alohida oʻqish uchun moʻljallangan roldan foydalaning va katta hajmdagi maʼlumotlarni ishlamaydigan soatlarda chiqaring",
+        "BATCH": "Koʻrinishidan, partiya yoki rejalashtirilgan ish. Ish vaqtini biznes choʻqqilaridan uzoqlashtiring va har bir commit uchun ish hajmini kamaytiring. Maqsadli jadvallardagi indekslar va statistikalarni (ANALYZE) tekshiring va uzoq tranzaksiyalarni boʻling. Ish nomini application_name ga kiritish keyingi tasnifni aniqroq qiladi",
+        "PROGRAM": "Koʻrinishidan, ilova tomonidan bajarilgan soʻrov. SQL Tuningda reja tekshiring. Qisqa oʻrtacha bilan koʻp chaqiruvlar takroriy chaqiruvlarga (N+1) yoki keshga ishora qiladi; uzoq oʻrtacha birinchi navbatda indekslarga yoki birlashish tartibiga ishora qiladi. Ulanish havzangizning application_name ga xizmat nomini oʻrnating",
+        "PLATFORM": "Koʻrinishidan, DB yoki platformaning ichki ishi, masalan, autovacuum yoki replikatsiya. Odatda hech qanday harakat talab qilinmaydi. Agar u yuqorida qolsa, autovacuum chegaralari va maintenance_work_mem ni koʻrib chiqing",
+        "MONITOR": "Koʻrinishidan, ushbu xizmatning oʻz statistika soʻrovlari (schema.pi havolasi). Hech qanday harakat talab qilinmaydi. Agar u juda tez-tez koʻrinsa, soʻrov chastotasini kamaytiring",
+        "UNKNOWN": "Manbaga oid hech qanday maʼlumot yoʻq. Har bir ulanishda application_name ni oʻrnating va hisoblarni maqsad boʻyicha ajrating; u keyingi namunalardan tasniflanadi"
+      },
+      "detail": {
+        "app": "Ilova nomi",
+        "addr": "Mijoz manzili (maskalangan)",
+        "samples": "Namunalar",
+        "active": "Faol namunalar",
+        "period": "Kuzatilgan",
+        "none": "(boʻsh)"
+      },
+      "noSample": "Hali namunalar yoʻq — monitoring paneli yoki Faoliyat va blokirovkalar yorligʻini koʻrganingizda ishlayotgan sessiyalar namuna olinadi. Hozircha u faqat hisob nomi boʻyicha tasniflanadi",
+      "verOff": "Ushbu DB PostgreSQL 14 dan eski, shuning uchun ishlayotgan sessiyalarda soʻrov IDsi yoʻq. Faqat hisob (aniq) koʻrsatiladi",
+      "privOff": "Ulanish hisobi boshqa hisoblarning sessiya tafsilotlarini koʻra olmaydi, shuning uchun namunalar yigʻilmaydi. DB administratoridan GRANT pg_read_all_stats TO {user}; ni ishga tushirishni soʻrang",
+      "linkUsr": "ulanuvchi hisob",
+      "qidOff": "Sessiya tafsilotlari koʻrinadi, lekin soʻrov IDsi boʻsh (compute_query_id oʻchirilgan). SHOW compute_query_id; bilan tekshiring, soʻng ALTER SYSTEM SET compute_query_id = 'auto'; ni ishga tushiring va qayta yuklang (SELECT pg_reload_conf();)",
+      "openHint": "Soʻrov toʻldirilgan holda SQL Tuningni ochadi. Rejani koʻrishdan oldin $1 kabi joy egalarini haqiqiy qiymatlar bilan almashtiring"
     }
   },
   "pipeline": {
@@ -1218,7 +1308,7 @@
     "label": "Xususiyatlar",
     "groups": {
       "monitor": "Monitoring",
-      "drift": "Muvofiqlik",
+      "drift": "GAP tahlili",
       "lake": "Koʻl",
       "admin": "Admin"
     },
@@ -1226,7 +1316,7 @@
     "sqlLab": "SQL sozlash",
     "perf": "Ishlash",
     "monitor": "Kuzatish",
-    "drift": "Siljish",
+    "drift": "GAP tahlili",
     "migration": "Migratsiya",
     "pipeline": "Quvur liniyasi",
     "analytics": "Analitika",

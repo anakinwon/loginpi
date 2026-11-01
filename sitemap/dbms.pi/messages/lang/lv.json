@@ -103,7 +103,7 @@
       "keys": {
         "links": "Manas saites",
         "perf": "Veiktspējas momentuzņēmumi",
-        "drift": "Novirzes palaišanas reizes",
+        "drift": "GAP analīze",
         "mig": "Migrācijas plāni",
         "pipe": "Cauruļvadi",
         "lake": "Ezera datu kopas"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Modelis ↔ DB novirze",
+    "title": "GAP analīze — modelis↔DB",
     "intro": "Salīdziniet schema.pi dizaina modeli un DDL lietošanas vēsturi ar tiešraides DB katalogu, lai atrastu novirzes, un novērtējiet, vai izstrādātie indeksi tiek faktiski izmantoti. Klientu rindu dati nekad netiek lasīti vai glabāti.",
     "needLink": "Vispirms izvēlieties schema.pi saiti. Ja jums nav nevienas, reģistrējiet marķieri izvēlnē 'Saite'.",
     "needConn": "Izvēlieties DB savienojumu, ko salīdzināt.",
     "project": "Projekts",
     "projectPick": "Izvēlieties projektu",
     "loading": "Ielādē…",
-    "run": "Palaist novirzes noteikšanu",
+    "run": "Veikt GAP analīzi",
     "running": "Salīdzina…",
     "readOnly": "Tiek palaisti tikai lasāmi kataloga un statistikas vaicājumi.",
     "applyInSchema": "Lietojiet labojumus (modeļa rediģēšana, DDL ģenerēšana un izpilde) schema.pi, kas ir patiesības avots.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Izstrādātie indeksi trūkst DB",
       "extraIndexes": "Indeksi nav modelī",
       "ddlMissing": "Objekti pazuduši pēc lietošanas",
-      "unusedIndexes": "Neizmantoti izstrādātie indeksi"
+      "unusedIndexes": "Kandidāti neizmantotiem indeksiem"
     },
     "sec": {
       "ddlMissing": "DDL lietots, bet trūkst DB",
       "missingTables": "Tabulas modelī, bet trūkst DB",
       "extraTables": "Tabulas DB, bet nav modelī",
-      "colMismatches": "Kolonnu tipa / NULL neatbilstības",
+      "colMismatches": "Kolonnu neatbilstības (trūkst·tips·NULL)",
       "missingIndexes": "Izstrādātie indeksi trūkst DB",
       "extraIndexes": "Indeksi tikai DB (izņemot PK)",
       "idxUsage": "Izstrādātā indeksa efektivitāte"
     },
     "hint": {
-      "ddlMissing": "schema.pi reģistrēja šos objektus kā lietotus, bet tie ir pazuduši — aizdomas par manuālu dzēšanu vai atcelšanu.",
-      "extraTables": "Tie var piederēt citiem projektiem vai sistēmas tabulām šajā savienojumā.",
-      "idxUsage": "Nulle skenēšanas kopš pēdējās statistikas atiestatīšanas nozīmē neizmantots. Pirms dzēšanas pārbaudiet statistikas logu."
+      "ddlMissing": "Tiek rādīti tikai objekti, kas trūkst DB, pamatojoties uz jaunāko piemēroto standartu. Iepriekšējie pieprasījumi, kas vēlāk atkārtoti izveidoja to pašu tabulu, un vecas nosaukumu konvencijas (_PKEY) ir normālas un salocītas zemāk.",
+      "extraTables": "Pamatojoties uz shēmu {schema}. Sagrupēti pēc prefiksa, tikai šī projekta prefiksu grupa ir kandidāti modeļa izlaišanai.",
+      "idxUsage": "Spriedums = tiek izmantots / unikālumam / nav datu / tiek novērots (statistika sākta·izveidots mazāk nekā 7 dienas) / kandidāts neizmantotam. Tikai kandidāti neizmantotiem indeksiem tiek ņemti vērā dzēšanai."
     },
     "kind": {
       "MISSING": "trūkst DB",
@@ -223,12 +223,16 @@
       "idx": "Indekss",
       "scans": "Skenēšanas reizes",
       "size": "Izmērs",
-      "status": "Spriedums"
+      "status": "Spriedums",
+      "basis": "Pamats"
     },
     "usage": {
       "USED": "Tiek izmantots",
-      "UNUSED": "Neizmantots izstrādātais indekss",
-      "NO_STATS": "Nav statistikas"
+      "NO_STATS": "Nav statistikas",
+      "CONSTRAINT": "Unikalitātes ierobežojums (saglabāt)",
+      "NO_DATA": "Nav datu vai statistika nav savākta — nevar spriest",
+      "OBSERVING": "Tiek novērots (mazāk nekā 7 dienas)",
+      "UNUSED_CAND": "Neizmantots kandidāts"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi savienojums vēl nav gatavs. Lūdzu, mēģiniet vēlreiz pēc brīža.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Neatbalstīts savienojums (pagaidām tikai PostgreSQL servera savienojumi).",
       "TIMEOUT": "Pieprasījuma laiks ir beidzies. Lūdzu, mēģiniet vēlreiz pēc brīža.",
       "RATE": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc minūtes."
+    },
+    "schema": "Shēma",
+    "schemaHint": "Tiek salīdzinātas tikai parastās un sadalītās tabulas šajā shēmā (skati izslēgti). Noklusējuma public — Supabase iekšējās shēmas (auth, storage, …) tiek izlaistas.",
+    "truncated": "{names} sasniedza {max} rindu ierobežojumu un tika saīsināti — daži \"nav DB\" / \"nav modelī\" rezultāti var būt nepatiesi. Sašauriniet shēmu un palaidiet vēlreiz.",
+    "colUnchecked": "Tā kā kolonnu vaicājums tika saīsināts, {n} trūkstošo/papildu kolonnu rezultāti tiek uzskatīti par nepārbaudāmiem un izslēgti no kolonnu neatbilstību skaita.",
+    "renamed": "{n} PK indekss(-i), kas piemēroti saskaņā ar veco nosaukumu noteikumu (_PKEY), pastāv DB ar jauno nosaukumu (PK_) — normāli",
+    "superseded": "{n} vecāki pieprasījumi tika izslēgti, jo vēlāks pieprasījums atkārtoti izveidoja to pašu tabulu (DROP … CASCADE) — normāli",
+    "supersededItem": "Pieprasījums {id} → aizstāts ar pieprasījumu {by}",
+    "sysCols": "{n} sistēmas kolonna(-as), kas automātiski pievienotas DDL ģenerēšanas laikā, nav modelī pēc dizaina un tiek izslēgtas no neatbilstībām",
+    "groupOwn": "Projekta prefikss {pfx} — trūkstošo modeļa kandidāti",
+    "groupOther": "Cita sistēma {pfx}",
+    "basis": "Aptuvenais rindu skaits {rows} · kopš {since}",
+    "guide": {
+      "title": "Nākamie soļi",
+      "ddlMissing": {
+        "s1": "schema.pi → projekts → fiziskais modelis → DDL ģenerēšana, piemērojiet vēlreiz šim savienojumam.",
+        "s2": "Kad tas ir izdarīts, izmantojiet \"Palaist vēlreiz\" zemāk un pārliecinieties, ka skaits ir 0.",
+        "s3": "Ja objekti joprojām pazūd pēc atkārtotas piemērošanas, aizdomājieties par manuālu dzēšanu vai atcelšanu un pārbaudiet savienojuma konta aktivitāti ar savu DBA."
+      },
+      "extraTables": {
+        "s1": "Šis projekta prefiksu kopums = trūkstošie modeļa kandidāti — importējiet tos modelī, izmantojot schema.pi → Iestatījumi → Reversā inženierija, vai izlemiet, vai dzēst, ja tās ir neizmantotas tabulas.",
+        "s2": "Citas prefiksu grupas = citas sistēmas, kas izmanto šo DB — nav šī projekta darbības vienumi.",
+        "s3": "Ja mērķa shēma nav public, mainiet lauku \"Shēma\" augšpusē un palaidiet vēlreiz."
+      },
+      "colMismatches": {
+        "s1": "Nav DB = piemērojiet modeļa kolonnu DB, izmantojot schema.pi DDL ģenerēšanu.",
+        "s2": "Nav modelī = importējiet DB kolonnu modelī, izmantojot schema.pi → Iestatījumi → Reversā inženierija, vai izlemiet to dzēst, ja tā nav nepieciešama.",
+        "s3": "Tips/NULL atšķiras = saskaņojiet ar modeli (patiesības avots); pirms garuma samazināšanas vai pārslēgšanās uz NOT NULL, pārliecinieties, ka esošās rindas to apmierina."
+      },
+      "idxUsage": {
+        "s1": "Pirms noņemšanas pārbaudiet ①, vai statistikas logs aptver vismaz vienu biznesa ciklu (piemēram, mēneša beigu partiju) — skatiet \"kopš\".",
+        "s2": "② Tas nav unikāls/PK indekss (tie tiek rādīti atsevišķi kā \"unikalitātes ierobežojums\").",
+        "s3": "③ EXPLAIN tabulas reprezentatīvo SQL SQL Tuning un pārliecinieties, ka šis indekss netiek izmantots.",
+        "s4": "Kad visi trīs ir apstiprināti, noņemiet indeksu no modeļa schema.pi un piemērojiet, izmantojot DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Atvērt schema.pi",
+      "rerun": "Palaist vēlreiz",
+      "copy": "Kopēt sarakstu",
+      "copied": "Nokopēts",
+      "sqlLab": "EXPLAIN SQL Tuning"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Replikācijas pārbaude",
         "backup": "Dublēšanas pārbaude",
         "sqlLab": "SQL regulēšana",
-        "drift": "Novirzes salīdzināšana",
+        "drift": "GAP analīze",
         "connect": "Savienojumi",
         "schema": "schema.pi monitors"
       },
@@ -989,7 +1035,11 @@
       "totalMs": "Kopējais ms",
       "meanMs": "Vidējais ms",
       "rows": "Rindas",
-      "reset": "Konstatēta statistikas atiestatīšana — rādīts kā kumulatīvs"
+      "reset": "Konstatēta statistikas atiestatīšana — rādīts kā kumulatīvs",
+      "src": "Avots",
+      "srcToggle": "Rādīt vai paslēpt avota detaļas",
+      "openSqlLab": "Atvērt SQL Tuning",
+      "acct": "Konts"
     },
     "health": {
       "empty": "Vēl nav momentuzņēmumu. Cilnē Vākt nospiediet Vākt tūlīt",
@@ -1020,6 +1070,46 @@
       "sessions": "Sesijas aktivitāte",
       "locks": "Bloķēšanas",
       "none": "Nav"
+    },
+    "src": {
+      "root": "Lai precīzi noteiktu avotu: (1) katrai programmai, partijai un personai (rīkam) izmantojiet atsevišķu DB kontu un (2) katrā savienojumā iestatiet application_name. Konts nāk no pg_stat_statements un ir noteikts; lietotnes/rīka kategorija tiek novērtēta no aktivitātes paraugiem (application_name ir klienta pašziņots, tāpēc tas var būt tukšs vai mainīts, un īsi vaicājumi, kas beidzas starp paraugiem, var tikt palaisti garām)",
+      "cd": {
+        "PROGRAM": "Programma",
+        "BATCH": "Partija",
+        "TOOL": "Rīks (persona)",
+        "PLATFORM": "Platformas iekšējais",
+        "MONITOR": "Uzraudzība (mēs)",
+        "UNKNOWN": "Nezināms"
+      },
+      "conf": {
+        "high": "Augsta pārliecība",
+        "mid": "Vidēja pārliecība",
+        "low": "Zema pārliecība",
+        "acct": "Tikai konts",
+        "ver": "Versijas ierobežojums"
+      },
+      "fix": {
+        "TOOL": "Izskatās, ka persona tieši vaicā ražošanas DB ar DB rīku (DBeaver utt.). Norādiet viņiem izmantot tikai lasāmu repliku vai analīzes DB, un ierobežojiet cilvēku kontu izpildes laiku, piemēram, ALTER ROLE human_user SET statement_timeout = '30s'. Izmantojiet atsevišķu tikai lasāmu lomu un veiciet lielapjoma ekstrakcijas ārpus pīķa stundām",
+        "BATCH": "Izskatās pēc partijas vai plānota darba. Izplatiet izpildes laikus ārpus biznesa pīķiem un samaziniet darbu uz vienu apņemšanos. Pārbaudiet indeksus un statistiku (ANALYZE) mērķa tabulās un sadaliet garas transakcijas. Darba nosaukuma ievietošana application_name padara nākamo klasifikāciju precīzāku",
+        "PROGRAM": "Izskatās pēc vaicājuma, ko izpilda lietojumprogramma. Pārbaudiet plānu SQL Tuning. Daudzi izsaukumi ar īsu vidējo rāda uz atkārtotiem izsaukumiem (N+1) vai kešatmiņu; garš vidējais rāda uz indeksiem vai savienojuma secību vispirms. Iestatiet pakalpojuma nosaukumu savā savienojumu kopas application_name",
+        "PLATFORM": "Izskatās pēc DB vai platformas iekšējā darba, piemēram, autovacuum vai replikācijas. Parasti nav nepieciešama nekāda darbība. Ja tas paliek augšpusē, pārskatiet autovacuum sliekšņus un maintenance_work_mem",
+        "MONITOR": "Izskatās pēc šī pakalpojuma pašu statistikas vaicājumiem (schema.pi saite). Nav nepieciešama nekāda darbība. Ja tas parādās pārāk bieži, samaziniet aptaujas frekvenci",
+        "UNKNOWN": "Nav norādes uz avotu. Iestatiet application_name katrā savienojumā un sadaliet kontus pēc mērķa; tas tiks klasificēts no nākamajiem paraugiem"
+      },
+      "detail": {
+        "app": "Lietotnes nosaukums",
+        "addr": "Klienta adrese (maskēta)",
+        "samples": "Paraugi",
+        "active": "Aktīvie paraugi",
+        "period": "Novērots",
+        "none": "(tukšs)"
+      },
+      "noSample": "Vēl nav paraugu — darbojošās sesijas tiek paraugotas, kad skatāt uzraudzības paneli vai cilni Aktivitāte un bloķēšana. Pagaidām tas tiek klasificēts tikai pēc konta nosaukuma",
+      "verOff": "Šī DB ir vecāka par PostgreSQL 14, tāpēc darbojošajām sesijām nav vaicājuma ID. Tiek rādīts tikai konts (noteikts)",
+      "privOff": "Saistītais konts nevar redzēt citu kontu sesijas detaļas, tāpēc netiek vākti paraugi. Lūdziet DB administratoram palaist GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "saistītais konts",
+      "qidOff": "Sesijas detaļas ir redzamas, bet vaicājuma ID ir tukšs (compute_query_id ir izslēgts). Pārbaudiet ar SHOW compute_query_id; pēc tam palaidiet ALTER SYSTEM SET compute_query_id = 'auto'; un pārlādējiet (SELECT pg_reload_conf();)",
+      "openHint": "Atver SQL Tuning ar aizpildītu vaicājumu. Pirms plāna skatīšanas aizstājiet vietturus, piemēram, $1, ar reālām vērtībām"
     }
   },
   "pipeline": {
@@ -1216,7 +1306,7 @@
     "label": "Funkcijas",
     "groups": {
       "monitor": "Uzraudzība",
-      "drift": "Konsekvence",
+      "drift": "GAP analīze",
       "lake": "Datu ezers",
       "admin": "Administrēšana"
     },
@@ -1224,7 +1314,7 @@
     "sqlLab": "SQL pielāgošana",
     "perf": "Veiktspēja",
     "monitor": "Uzraudzība",
-    "drift": "Novirze",
+    "drift": "GAP analīze",
     "migration": "Migrācija",
     "pipeline": "Cauruļvads",
     "analytics": "Analītika",

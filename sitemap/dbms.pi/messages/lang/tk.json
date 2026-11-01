@@ -103,7 +103,7 @@
       "keys": {
         "links": "Meniň baglanyşyklarym",
         "perf": "Öndürijilik suratlary",
-        "drift": "Drift işleri",
+        "drift": "GAP derňewi",
         "mig": "Göçürme meýilnamalary",
         "pipe": "Turba geçirijileri",
         "lake": "Köl maglumatlar toplumy"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB Drift",
+    "title": "GAP derňewi — Model↔DB",
     "intro": "schema.pi dizaýn modelini we DDL ulanyş taryhyny janly DB katalogy bilen deňeşdirip, drifti tapyň we dizaýn edilen indeksleriň hakykatdanam ulanylýandygyny ölçäň. Müşderi setir maglumatlary hiç haçan okalmaz ýa-da saklanmaz.",
     "needLink": "Ilki bilen ýokardaky schema.pi baglanyşygyny saýlaň. Eger ýok bolsa, 'Baglanyşyk' menýusynda tokeni hasaba alyň.",
     "needConn": "Deňeşdirmek üçin ýokardaky DB baglanyşygyny saýlaň.",
     "project": "Taslama",
     "projectPick": "Taslama saýlaň",
     "loading": "Ýüklenýär…",
-    "run": "Drifti anyklamagy işe giriz",
+    "run": "GAP derňewini işe giriz",
     "running": "Deňeşdirilýär…",
     "readOnly": "Diňe okamak üçin katalog we statistika soraglary işledilýär.",
     "applyInSchema": "Düzedişleri (model redaktirlemeleri, DDL döretmek we ýerine ýetirmek) hakykatyň çeşmesi bolan schema.pi-de ulanyň.",
@@ -197,21 +197,21 @@
       "missingIndexes": "DB-de ýok dizaýn edilen indeksler",
       "extraIndexes": "Modelde ýok indeksler",
       "ddlMissing": "Ulanandan soň ýiten obýektler",
-      "unusedIndexes": "Ulanylmadyk dizaýn edilen indeksler"
+      "unusedIndexes": "Ulanylmadyk indeksler üçin dalaşgärler"
     },
     "sec": {
       "ddlMissing": "DDL ulanyldy, ýöne DB-de ýok",
       "missingTables": "Modelde bar, ýöne DB-de ýok tablisalar",
       "extraTables": "DB-de bar, ýöne modelde ýok tablisalar",
-      "colMismatches": "Sütün görnüşi / NULL gabat gelmezlikleri",
+      "colMismatches": "Sütün gabat gelmezlikleri (Ýok·Görnüş·NULL)",
       "missingIndexes": "Dizaýn edilen, ýöne DB-de ýok indeksler",
       "extraIndexes": "Diňe DB-de bar indeksler (PK-dan başga)",
       "idxUsage": "Dizaýn edilen indeksleriň netijeliligi"
     },
     "hint": {
-      "ddlMissing": "schema.pi bu obýektleri ulanylan hökmünde ýazga aldy, ýöne olar ýok — el bilen aýyrmak ýa-da yzyna gaýtarmak ähtimallygy bar.",
-      "extraTables": "Bular bu baglanyşykdaky beýleki taslamalara ýa-da ulgam tablisalaryna degişli bolup biler.",
-      "idxUsage": "Soňky statistika täzelenenden bäri nol skanirleme ulanylmadyk diýmekdir. Aýyrmazdan ozal statistika penjiresini barlaň."
+      "ddlMissing": "Diňe iň soňky ulanylan standarta esaslanyp, DB-de ýok obýektler görkezilýär. Şol bir tablisany soňra täzeden döreden öňki haýyşlar we köne atlandyryş düzgünleri (_PKEY) adaty bolup, aşakda ýygnalýar.",
+      "extraTables": "{schema} shemasyna esaslanýar. Prefiks boýunça toparlanan, diňe bu taslamanyň prefiks topary modelden aýrylmak üçin dalaşgärlerdir.",
+      "idxUsage": "Höküm = Ulanylýar / Ýeke-täk bolmak üçin / Maglumat ýok / Gözegçilikde (Statistika başlandy·7 günden az döredildi) / Ulanylmadyk üçin dalaşgär. Diňe ulanylmadyk indeksler üçin dalaşgärler pozulmak üçin seredilýär."
     },
     "kind": {
       "MISSING": "DB-de ýok",
@@ -223,12 +223,16 @@
       "idx": "Indeks",
       "scans": "Skanirlemeler",
       "size": "Ölçegi",
-      "status": "Karar"
+      "status": "Karar",
+      "basis": "Esas"
     },
     "usage": {
       "USED": "Ulanylýar",
-      "UNUSED": "Ulanylmadyk dizaýn edilen indeks",
-      "NO_STATS": "Statistika ýok"
+      "NO_STATS": "Statistika ýok",
+      "CONSTRAINT": "Ýeke-täk çäklendirme (sakla)",
+      "NO_DATA": "Maglumat ýok ýa-da statistika ýygnalmady — höküm çykaryp bolmaýar",
+      "OBSERVING": "Gözegçilikde (7 günden az)",
+      "UNUSED_CAND": "Ulanylmadyk dalaşgär"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi baglanyşyk funksiýasy entek taýýar däl. Biraz wagtdan soň gaýtadan synanyşyň.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Goldanylmaýan baglanyşyk (häzirki wagtda diňe PostgreSQL serwer baglanyşyklary üçin).",
       "TIMEOUT": "Soragyň wagty gutardy. Biraz wagtdan soň gaýtadan synanyşyň.",
       "RATE": "Örän köp sorag. Bir minutdan soň gaýtadan synanyşyň."
+    },
+    "schema": "Shema",
+    "schemaHint": "Diňe bu shemadaky adaty we bölünen tablisalar deňeşdirilýär (görnüşler hasaba alynmaýar). Deslapky public — Supabase içerki shemalary (auth, storage, ...) hasaba alynmaýar.",
+    "truncated": "{names} {max} setir çägine ýetdi we kesildi — käbir \"DB-de ýok\" / \"modelde ýok\" netijeler ýalňyş bolup biler. Shemany daraldyň we täzeden işe giriň.",
+    "colUnchecked": "Sütün soragy kesilendigi sebäpli, {n} ýok/goşmaça sütün netijesi tassyklanmaýan hasaplanyp, sütün gabat gelmezlik sanyndan aýryldy.",
+    "renamed": "Köne atlandyryş düzgüni (_PKEY) boýunça ulanylan {n} PK indeksi täze at (PK_) bilen DB-de bar — adaty",
+    "superseded": "{n} köne haýyş soňky haýyş şol bir tablisany täzeden döredendigi (DROP … CASCADE) sebäpli hasaba alynmady — adaty",
+    "supersededItem": "Haýyş {id} → {by} haýyşy bilen çalşyldy",
+    "sysCols": "DDL döredilende awtomatiki goşulan {n} sany ulgam sütüni dizaýn boýunça modelde ýok we gabat gelmezliklerden aýryldy.",
+    "groupOwn": "Taslama prefiksi {pfx} — modelden ýok dalaşgärler",
+    "groupOther": "Beýleki ulgam {pfx}",
+    "basis": "Takmynan setirler {rows} · {since} bäri",
+    "guide": {
+      "title": "Indiki ädimler",
+      "ddlMissing": {
+        "s1": "schema.pi → taslama → fiziki model → DDL döretmekde, bu birikmä täzeden ulanyň.",
+        "s2": "Tamamlanandan soň, aşakdaky \"Täzeden işe giriz\" düwmesini ulanyp, sanyň 0 bolandygyny tassyklap.",
+        "s3": "Täzeden ulanylandan soň hem obýektler ýitip gitse, el bilen pozulmagy ýa-da yzyna gaýtarylmagy güman ediň we birikme hasabynyň işjeňligini DBA bilen barlaň."
+      },
+      "extraTables": {
+        "s1": "Bu taslama prefiks toplumy = modelde ýok bolan kandidatlar — olary schema.pi → Sazlamalar → Tersine arkaly modele import ediň ýa-da ulanylmaýan tablisalar bolsa, olary pozmak kararyna geliň.",
+        "s2": "Beýleki prefiks toparlary = bu DB-ni ulanýan beýleki ulgamlar — bu taslama üçin hereket edip bolmaýan zatlar.",
+        "s3": "Eger maksat shemasy public däl bolsa, ýokardaky \"Shema\" meýdançasyny üýtgediň we täzeden işe giriň."
+      },
+      "colMismatches": {
+        "s1": "DB-de ýok = model sütüni schema.pi DDL döretmek arkaly DB-e ulanyň.",
+        "s2": "Modelde ýok = DB sütünini schema.pi → Sazlamalar → Tersine arkaly modele import ediň ýa-da zerur däl bolsa, pozmak kararyna geliň.",
+        "s3": "Görnüş/NULL tapawutlanýar = modele (hakykatyň çeşmesi) laýyklaşdyryň; uzynlygy gysaltmazdan ýa-da NOT NULL-a geçmezden ozal, bar bolan setirleriň ony kanagatlandyrýandygyny tassyklap."
+      },
+      "idxUsage": {
+        "s1": "Pozmazdan ozal, ① statistika penjiresiniň azyndan bir iş siklini (meselem, aýyň ahyryndaky partiýa) öz içine alýandygyny barlaň — \"bäri\" serediň.",
+        "s2": "② Bu ýeke-täk/PK indeks däl (olar aýratyn \"ýeke-täk çäklendirme\" hökmünde görkezilýär).",
+        "s3": "③ SQL Tuning-de tablisanyň wekilçilikli SQL-ini EXPLAIN ediň we bu indeksiň ulanylmaýandygyny tassyklap.",
+        "s4": "Üçüsi hem tassyklanandan soň, indeksi schema.pi-daky modelden aýryň we DDL arkaly ulanyň."
+      }
+    },
+    "act": {
+      "openSchema": "schema.pi aç",
+      "rerun": "Täzeden işe giriz",
+      "copy": "Sanawy göçür",
+      "copied": "Göçürildi",
+      "sqlLab": "SQL Tuning-de EXPLAIN"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Replikasiýa barlagy",
         "backup": "Ätiýaçlyk barlagy",
         "sqlLab": "SQL sazlamasy",
-        "drift": "Sazlaşyk deňeşdirmesi",
+        "drift": "GAP derňewi",
         "connect": "Birikmeler",
         "schema": "schema.pi monitor"
       },
@@ -991,7 +1037,11 @@
       "totalMs": "Jemi ms",
       "meanMs": "Ortaça ms",
       "rows": "Setirler",
-      "reset": "Statistika täzeden düzüldi — jemi görkezilýär"
+      "reset": "Statistika täzeden düzüldi — jemi görkezilýär",
+      "src": "Çeşme",
+      "srcToggle": "Çeşme jikme-jikliklerini görkez ýa-da gizle",
+      "openSqlLab": "SQL Tuning-de aç",
+      "acct": "Hasap"
     },
     "health": {
       "empty": "Heniz hiç hili surata düşürilen ýok. Ýygnamak bölüminde häzir ýygnamak düwmesini basyň",
@@ -1022,6 +1072,46 @@
       "sessions": "Sessiýa işjeňligi",
       "locks": "Gulplar",
       "none": "Ýok"
+    },
+    "src": {
+      "root": "Çeşmäni takyk kesgitlemek üçin: (1) her bir programma, partiýa we adam (gural) üçin aýratyn DB hasabyny ulanyň, we (2) her bir birikmede application_name-i sazlaň. Hasap pg_stat_statements-den gelýär we kesgitlidir; programma/gural kategoriýasy işjeňlik nusgalaryndan takmynan kesgitlenýär (application_name müşderi tarapyndan öz-özünden habar berilýär, şonuň üçin boş ýa-da üýtgedilip bilner, we nusgalaryň arasynda gutarýan gysga soraglar ýitip bilner)",
+      "cd": {
+        "PROGRAM": "Programma",
+        "BATCH": "Partiýa",
+        "TOOL": "Gural (adam)",
+        "PLATFORM": "Platforma içerki",
+        "MONITOR": "Gözegçilik (biziň)",
+        "UNKNOWN": "Näbelli"
+      },
+      "conf": {
+        "high": "Ýokary ynam",
+        "mid": "Orta ynam",
+        "low": "Pes ynam",
+        "acct": "Diňe hasap",
+        "ver": "Wersiýa çägi"
+      },
+      "fix": {
+        "TOOL": "Adam DB guraly (DBeaver we ş.m.) bilen önümçilik DB-ni göni sorag edýän ýaly. Olaryň ýerine diňe okamak üçin replika ýa-da analitika DB-ni ulanmagyny maslahat beriň we adam hasaplarynda iş wagtyny çäkläň, meselem, ALTER ROLE human_user SET statement_timeout = '30s'. Aýratyn diňe okamak üçin roly ulanyň we köp mukdardaky çykarmalary iň ýokary däl sagatlarda ýerine ýetiriň",
+        "BATCH": "Partiýa ýa-da meýilleşdirilen iş ýaly. Iş wagtlaryny iş ýokary nokatlaryndan daşlaşdyryň we her bir tabşyryk üçin işi kiçeldiň. Maksat tablisalarynda indeksleri we statistikany (ANALYZE) barlaň we uzyn tranzaksiýalary bölüň. application_name-e iş adyny goýmak indiki klassifikasiýany has takyk edýär",
+        "PROGRAM": "Programma tarapyndan ýerine ýetirilen sorag ýaly. SQL Tuning-de meýilnamany barlaň. Gysga ortaça bilen köp jaňlar gaýtalanýan jaňlara (N+1) ýa-da keşlemä, uzyn ortaça bolsa ilki indekslere ýa-da birikme tertibine degişlidir. Birikme howzyňyzyň application_name-ine hyzmat adyny sazlaň",
+        "PLATFORM": "autovacuum ýa-da replikasiýa ýaly DB ýa-da platforma içerki iş ýaly. Adatça hiç hili hereket talap edilmeýär. Eger ýokarda galýan bolsa, autovacuum çäklerini we maintenance_work_mem-i gözden geçiriň",
+        "MONITOR": "Bu hyzmatyň öz statistika soraglary (schema.pi baglanyşygy) ýaly. Hiç hili hereket talap edilmeýär. Eger gaty ýygy-ýygydan görkezilýän bolsa, sorag ýygylygyny peseldiň",
+        "UNKNOWN": "Çeşmä hiç hili delil ýok. Her bir birikmede application_name-i sazlaň we hasaplary maksat boýunça bölüň; indiki nusgalardan klassifikasiýa ediler"
+      },
+      "detail": {
+        "app": "Programma ady",
+        "addr": "Müşderi salgysy (maskalanan)",
+        "samples": "Nusgalar",
+        "active": "Işjeň nusgalar",
+        "period": "Gözegçilik edilen döwür",
+        "none": "(boş)"
+      },
+      "noSample": "Heniz nusgalar ýok — monitoring tagtasyny ýa-da Işjeňlik we gulplar tabyny görkezende işjeň sessiýalar nusga alynýar. Häzirki wagtda diňe hasap adyndan klassifikasiýa edilýär",
+      "verOff": "Bu DB PostgreSQL 14-den köne, şonuň üçin işjeň sessiýalarda sorag ID-si ýok. Diňe hasap (kesgitli) görkezilýär",
+      "privOff": "Baglanyşyk hasaby beýleki hasaplaryň sessiýa jikme-jikliklerini görüp bilmeýär, şonuň üçin nusgalar ýygnalmaýar. DB administratoryndan GRANT pg_read_all_stats TO {user}; işe girizmegi haýyş ediň",
+      "linkUsr": "baglanyşyk hasaby",
+      "qidOff": "Sessiýa jikme-jiklikleri görünýär, ýöne sorag ID-si boş (compute_query_id öçürilen). SHOW compute_query_id; bilen barlaň, soňra ALTER SYSTEM SET compute_query_id = 'auto'; işe giriziň we täzeden ýükläň (SELECT pg_reload_conf();)",
+      "openHint": "Soragy doldurylan SQL Tuning-i açýar. Meýilnamany görmezden ozal $1 ýaly ýer tutujylary hakyky gymmatlyklar bilen çalşyryň"
     }
   },
   "pipeline": {
@@ -1218,7 +1308,7 @@
     "label": "Aýratynlyklar",
     "groups": {
       "monitor": "Gözegçilik",
-      "drift": "Sazlaşyk",
+      "drift": "GAP derňewi",
       "lake": "Köl",
       "admin": "Dolandyryş"
     },
@@ -1226,7 +1316,7 @@
     "sqlLab": "SQL Sazlama",
     "perf": "Öndürijilik",
     "monitor": "Gözegçilik",
-    "drift": "Süýşme",
+    "drift": "GAP derňewi",
     "migration": "Göçürme",
     "pipeline": "Turba",
     "analytics": "Analitika",

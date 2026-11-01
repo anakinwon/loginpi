@@ -170,6 +170,9 @@ export type ActRow = {
   queryStart: string | null
   runMs: number | null
   query: string | null
+  queryId: string | null // query_id(PG14+·compute_query_id·pg_read_all_stats 조건 — 아니면 null)
+  clientAddr: string | null // 원주소 — 출처 표본 저장 전 maskAddr 필수(계약 A3)
+  linkUsr?: string | null // 연결 계정명(current_user — schema.pi 구버전이면 없음)
 }
 export type Version = {
   versionNum: number | null

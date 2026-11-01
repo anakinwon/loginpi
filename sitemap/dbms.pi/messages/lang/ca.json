@@ -103,7 +103,7 @@
       "keys": {
         "links": "Els meus enllaços",
         "perf": "Instantànies de rendiment",
-        "drift": "Execucions de deriva",
+        "drift": "Anàlisi de GAP",
         "mig": "Plans de migració",
         "pipe": "Pipelines",
         "lake": "Conjunts de dades del llac"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Deriva Model ↔ DB",
+    "title": "Anàlisi de GAP — Model↔DB",
     "intro": "Compara el model de disseny de schema.pi i l'historial d'aplicació de DDL amb el catàleg de DB en viu per trobar la deriva, i mesura si els índexs dissenyats s'utilitzen realment. Les dades de fila del client mai es llegeixen ni s'emmagatzemen.",
     "needLink": "Tria primer un enllaç de schema.pi a dalt. Si no en tens cap, registra un testimoni al menú 'Enllaç'.",
     "needConn": "Tria la connexió de DB per comparar a dalt.",
     "project": "Projecte",
     "projectPick": "Selecciona un projecte",
     "loading": "Carregant…",
-    "run": "Executa la detecció de deriva",
+    "run": "Executar anàlisi de GAP",
     "running": "Comparant…",
     "readOnly": "Només s'executen consultes de catàleg i estadístiques de només lectura.",
     "applyInSchema": "Aplica les correccions (edicions del model, generació i execució de DDL) a schema.pi, la font de veritat.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Índexs dissenyats que falten a la DB",
       "extraIndexes": "Índexs que no estan al model",
       "ddlMissing": "Objectes desapareguts després de l'aplicació",
-      "unusedIndexes": "Índexs dissenyats no utilitzats"
+      "unusedIndexes": "Índexs candidats no utilitzats"
     },
     "sec": {
       "ddlMissing": "DDL aplicat però que falta a la DB",
       "missingTables": "Taules al model però que falten a la DB",
       "extraTables": "Taules a la DB però que no estan al model",
-      "colMismatches": "Discrepàncies de tipus de columna / NULL",
+      "colMismatches": "Discrepàncies de columnes (Falten·Tipus·NULL)",
       "missingIndexes": "Índexs dissenyats que falten a la DB",
       "extraIndexes": "Índexs només a la DB (excloent PK)",
       "idxUsage": "Eficàcia de l'índex dissenyat"
     },
     "hint": {
-      "ddlMissing": "schema.pi va registrar aquests objectes com a aplicats, però han desaparegut; sospita d'una eliminació manual o una reversió.",
-      "extraTables": "Aquests poden pertànyer a altres projectes o taules del sistema en aquesta connexió.",
-      "idxUsage": "Zero escanejos des de l'últim restabliment d'estadístiques significa no utilitzat. Comprova la finestra d'estadístiques abans d'eliminar."
+      "ddlMissing": "Només es mostren els objectes que falten a la DB segons l'estàndard aplicat més recent. Les sol·licituds anteriors que van recrear la mateixa taula posteriorment i les antigues convencions de noms (_PKEY) són normals i es pleguen a continuació.",
+      "extraTables": "Basat en l'esquema {schema}. Agrupat per prefix, només el grup de prefix d'aquest projecte són candidats a l'omissió del model.",
+      "idxUsage": "Judici = En ús / Per a unicitat / Sense dades / En observació (Estadístiques iniciades·Creat fa menys de 7 dies) / Candidat a no utilitzat. Només els candidats a índexs no utilitzats es consideren per a l'eliminació."
     },
     "kind": {
       "MISSING": "falta a la DB",
@@ -223,12 +223,16 @@
       "idx": "Índex",
       "scans": "Escanejos",
       "size": "Mida",
-      "status": "Veredicte"
+      "status": "Veredicte",
+      "basis": "Base"
     },
     "usage": {
       "USED": "En ús",
-      "UNUSED": "Índex dissenyat no utilitzat",
-      "NO_STATS": "Sense estadístiques"
+      "NO_STATS": "Sense estadístiques",
+      "CONSTRAINT": "Restricció d'unicitat (conservar)",
+      "NO_DATA": "Sense dades o estadístiques no recollides — no es pot jutjar",
+      "OBSERVING": "En observació (menys de 7 dies)",
+      "UNUSED_CAND": "Candidat no utilitzat"
     },
     "errors": {
       "NOT_IMPLEMENTED": "La funció d'enllaç de schema.pi encara no està a punt. Torna-ho a provar d'aquí a poc.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Connexió no compatible (només connexions de servidor PostgreSQL per ara).",
       "TIMEOUT": "La sol·licitud ha caducat. Torna-ho a provar d'aquí a poc.",
       "RATE": "Massa sol·licituds. Torna-ho a provar d'aquí a un minut."
+    },
+    "schema": "Esquema",
+    "schemaHint": "Només es comparen les taules regulars i particionades d'aquest esquema (vistes excloses). Per defecte public — els esquemes interns de Supabase (auth, storage, …) s'ometen.",
+    "truncated": "{names} ha arribat al límit de {max} files i s'ha truncat — alguns resultats de \"no a la DB\" / \"no al model\" poden ser falsos. Reduïu l'esquema i torneu a executar.",
+    "colUnchecked": "Com que la consulta de columnes es va truncar, {n} resultats de columnes que falten/extra es tracten com a no verificables i s'exclouen del recompte de discrepàncies de columnes.",
+    "renamed": "{n} índex(s) PK aplicat(s) sota l'antiga regla de noms (_PKEY) existeixen a la DB amb el nou nom (PK_) — normal",
+    "superseded": "{n} sol·licitud(s) més antiga(s) es van excloure perquè una sol·licitud posterior va recrear la mateixa taula (DROP … CASCADE) — normal",
+    "supersededItem": "Sol·licitud {id} → substituïda per la sol·licitud {by}",
+    "sysCols": "{n} columna(s) del sistema afegida(s) automàticament en la generació de DDL no estan al model per disseny i s'exclouen de les discrepàncies",
+    "groupOwn": "Prefix del projecte {pfx} — candidats que falten al model",
+    "groupOther": "Altres sistemes {pfx}",
+    "basis": "Est. files {rows} · des de {since}",
+    "guide": {
+      "title": "Passos següents",
+      "ddlMissing": {
+        "s1": "A schema.pi → el projecte → model físic → generació de DDL, torneu a aplicar a aquesta connexió.",
+        "s2": "Quan hàgiu acabat, utilitzeu \"Torna a executar\" a continuació i confirmeu que el recompte és 0.",
+        "s3": "Si els objectes encara desapareixen després de tornar a aplicar, sospiteu d'una eliminació manual o una reversió i comproveu l'activitat del compte de connexió amb el vostre DBA."
+      },
+      "extraTables": {
+        "s1": "Aquest paquet de prefixos de projecte = candidats a models que falten — importeu-los al model mitjançant schema.pi → Configuració → Invers, o decidiu si els voleu suprimir si són taules no utilitzades.",
+        "s2": "Altres grups de prefix = altres sistemes que comparteixen aquesta DB — no són elements d'acció per a aquest projecte.",
+        "s3": "Si l'esquema de destinació no és public, canvieu el camp \"Esquema\" anterior i torneu a executar."
+      },
+      "colMismatches": {
+        "s1": "No a la DB = apliqueu la columna del model a la DB mitjançant la generació de DDL de schema.pi.",
+        "s2": "No al model = importeu la columna de la DB al model mitjançant schema.pi → Configuració → Invers, o decidiu suprimir-la si és innecessària.",
+        "s3": "El tipus/NULL difereix = alineeu-vos amb el model (font de veritat); abans de reduir la longitud o canviar a NOT NULL, confirmeu que les files existents ho satisfan."
+      },
+      "idxUsage": {
+        "s1": "Abans d'eliminar, comproveu ① que la finestra d'estadístiques cobreixi almenys un cicle de negoci (p. ex., lot de final de mes) — vegeu \"des de\".",
+        "s2": "② No és un índex únic/PK (aquests es mostren per separat com a \"restricció d'unicitat\").",
+        "s3": "③ EXPLAIN el SQL representatiu de la taula a SQL Tuning i confirmeu que aquest índex no s'utilitza.",
+        "s4": "Un cop confirmats els tres, elimineu l'índex del model a schema.pi i apliqueu-lo mitjançant DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Obrir schema.pi",
+      "rerun": "Torna a executar",
+      "copy": "Copiar llista",
+      "copied": "Copiat",
+      "sqlLab": "EXPLAIN a SQL Tuning"
     }
   },
   "learn": {
@@ -685,7 +731,7 @@
         "repl": "Comprovació de replicació",
         "backup": "Comprovació de còpia de seguretat",
         "sqlLab": "Ajust de SQL",
-        "drift": "Comparació de deriva",
+        "drift": "Anàlisi de GAP",
         "connect": "Connexions",
         "schema": "monitor de schema.pi"
       },
@@ -984,7 +1030,11 @@
       "totalMs": "Total ms",
       "meanMs": "Mitjana ms",
       "rows": "Files",
-      "reset": "Detecció de restabliment d'estadístiques — es mostra com a acumulatiu"
+      "reset": "Detecció de restabliment d'estadístiques — es mostra com a acumulatiu",
+      "src": "Origen",
+      "srcToggle": "Mostrar o amagar detalls de l'origen",
+      "openSqlLab": "Obrir a SQL Tuning",
+      "acct": "Compte"
     },
     "health": {
       "empty": "Encara no hi ha instantànies. Premeu Recull ara a la pestanya Recull",
@@ -1014,6 +1064,46 @@
       "sessions": "Activitat de la sessió",
       "locks": "Bloquejos",
       "none": "Cap"
+    },
+    "src": {
+      "root": "Per determinar l'origen amb precisió: (1) utilitzeu un compte de DB separat per a cada programa, lot i persona (eina), i (2) configureu application_name en cada connexió. El compte prové de pg_stat_statements i és segur; la categoria d'aplicació/eina s'estima a partir de mostres d'activitat (application_name és autoinformat pel client, de manera que pot estar buit o canviat, i les consultes curtes que finalitzen entre mostres es poden perdre)",
+      "cd": {
+        "PROGRAM": "Programa",
+        "BATCH": "Lot",
+        "TOOL": "Eina (persona)",
+        "PLATFORM": "Plataforma interna",
+        "MONITOR": "Monitorització (nosaltres)",
+        "UNKNOWN": "Desconegut"
+      },
+      "conf": {
+        "high": "Confiança alta",
+        "mid": "Confiança mitjana",
+        "low": "Confiança baixa",
+        "acct": "Només compte",
+        "ver": "Límit de versió"
+      },
+      "fix": {
+        "TOOL": "Sembla que una persona consulta la DB de producció directament amb una eina de DB (DBeaver, etc.). Dirigiu-los a una rèplica de només lectura o a una DB d'anàlisi en lloc d'això, i limiteu el temps d'execució als comptes humans, p. ex., ALTER ROLE human_user SET statement_timeout = '30s'. Utilitzeu un rol de només lectura separat i executeu extraccions massives en hores de poca activitat",
+        "BATCH": "Sembla un lot o una feina programada. Distribuïu els temps d'execució fora dels pics de negoci i reduïu la feina per commit. Comproveu els índexs i les estadístiques (ANALYZE) a les taules de destinació i dividiu les transaccions llargues. Posar el nom de la feina a application_name fa que la següent classificació sigui més precisa",
+        "PROGRAM": "Sembla una consulta executada per una aplicació. Comproveu el pla a SQL Tuning. Moltes trucades amb una mitjana curta apunten a trucades repetides (N+1) o a la memòria cau; una mitjana llarga apunta primer als índexs o a l'ordre de les unions. Definiu el nom del servei a application_name del vostre pool de connexions",
+        "PLATFORM": "Sembla una feina interna de la DB o de la plataforma, com ara autovacuum o replicació. Normalment no cal cap acció. Si es manté a la part superior, reviseu els llindars d'autovacuum i maintenance_work_mem",
+        "MONITOR": "Sembla que són les consultes d'estadístiques d'aquest servei (enllaç schema.pi). No cal cap acció. Si apareix massa sovint, reduïu la freqüència de sondeig",
+        "UNKNOWN": "No hi ha cap pista sobre l'origen. Definiu application_name en cada connexió i dividiu els comptes per propòsit; es classificarà a partir de les properes mostres"
+      },
+      "detail": {
+        "app": "Nom de l'aplicació",
+        "addr": "Adreça del client (emmascarada)",
+        "samples": "Mostres",
+        "active": "Mostres actives",
+        "period": "Observat",
+        "none": "(buit)"
+      },
+      "noSample": "Encara no hi ha mostres — les sessions en execució es mostren quan visualitzeu el tauler de monitorització o la pestanya Activitat i bloquejos. Per ara, es classifica només a partir del nom del compte",
+      "verOff": "Aquesta DB és anterior a PostgreSQL 14, per la qual cosa les sessions en execució no tenen ID de consulta. Només es mostra el compte (segur)",
+      "privOff": "El compte d'enllaç no pot veure els detalls de la sessió d'altres comptes, per la qual cosa no es recullen mostres. Demaneu a un administrador de DB que executi GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "compte d'enllaç",
+      "qidOff": "Els detalls de la sessió són visibles, però l'ID de consulta està buit (compute_query_id està desactivat). Comproveu amb SHOW compute_query_id; després executeu ALTER SYSTEM SET compute_query_id = 'auto'; i torneu a carregar (SELECT pg_reload_conf();)",
+      "openHint": "Obre SQL Tuning amb la consulta emplenada. Substituïu els marcadors de posició com $1 per valors reals abans de veure el pla"
     }
   },
   "pipeline": {
@@ -1210,7 +1300,7 @@
     "label": "Funcions",
     "groups": {
       "monitor": "Monitorització",
-      "drift": "Consistència",
+      "drift": "Anàlisi de GAP",
       "lake": "Lake",
       "admin": "Administració"
     },
@@ -1218,7 +1308,7 @@
     "sqlLab": "Tuning SQL",
     "perf": "Rendiment",
     "monitor": "Monitorització",
-    "drift": "Deriva",
+    "drift": "Anàlisi de GAP",
     "migration": "Migració",
     "pipeline": "Pipeline",
     "analytics": "Analítica",

@@ -103,7 +103,7 @@
       "keys": {
         "links": "我的链接",
         "perf": "性能快照",
-        "drift": "漂移运行",
+        "drift": "GAP分析",
         "mig": "迁移计划",
         "pipe": "管道",
         "lake": "数据湖数据集"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "模型 ↔ DB 漂移",
+    "title": "GAP分析 — 模型↔DB",
     "intro": "将 schema.pi 设计模型和 DDL 应用历史与实时 DB 目录进行比较，以查找漂移，并测量设计的索引是否实际使用。绝不读取或存储客户行数据。",
     "needLink": "请先在上方选择一个 schema.pi 链接。如果没有，请在“链接”菜单中注册一个令牌。",
     "needConn": "请在上方选择要比较的 DB 连接。",
     "project": "项目",
     "projectPick": "选择一个项目",
     "loading": "加载中…",
-    "run": "运行漂移检测",
+    "run": "运行GAP分析",
     "running": "正在比较…",
     "readOnly": "仅运行只读目录和统计查询。",
     "applyInSchema": "在 schema.pi（真实来源）中应用修复（模型编辑、DDL 生成和执行）。",
@@ -197,21 +197,21 @@
       "missingIndexes": "DB 中缺失的设计索引",
       "extraIndexes": "模型中没有的索引",
       "ddlMissing": "应用后消失的对象",
-      "unusedIndexes": "未使用的设计索引"
+      "unusedIndexes": "未使用的候选索引"
     },
     "sec": {
       "ddlMissing": "DDL 已应用但在 DB 中缺失",
       "missingTables": "模型中有但在 DB 中缺失的表",
       "extraTables": "DB 中有但在模型中没有的表",
-      "colMismatches": "列类型/NULL 不匹配",
+      "colMismatches": "列不匹配（缺失·类型·NULL）",
       "missingIndexes": "设计但在 DB 中缺失的索引",
       "extraIndexes": "仅在 DB 中的索引（不包括主键）",
       "idxUsage": "设计索引的有效性"
     },
     "hint": {
-      "ddlMissing": "schema.pi 记录这些对象已应用，但它们已消失 — 怀疑是手动删除或回滚。",
-      "extraTables": "这些可能属于此连接上的其他项目或系统表。",
-      "idxUsage": "自上次统计信息重置以来扫描次数为零表示未使用。在删除之前检查统计信息窗口。"
+      "ddlMissing": "仅显示DB中不存在的、基于最新应用的DDL对象。由于旧的请求（后来重新创建了相同的表）和旧的命名规则（_PKEY）是正常的，因此它们被折叠在下方。",
+      "extraTables": "基于模式 {schema}。按前缀分组，只有此项目前缀组是模型中缺失的候选对象。",
+      "idxUsage": "判断 = 使用中 / 保证唯一性 / 无数据 / 观察中（统计开始·创建不足7天） / 未使用的候选。仅考虑删除未使用的候选。"
     },
     "kind": {
       "MISSING": "DB 中缺失",
@@ -223,12 +223,16 @@
       "idx": "索引",
       "scans": "扫描次数",
       "size": "大小",
-      "status": "判断"
+      "status": "判断",
+      "basis": "依据"
     },
     "usage": {
       "USED": "使用中",
-      "UNUSED": "未使用的设计索引",
-      "NO_STATS": "无统计信息"
+      "NO_STATS": "无统计信息",
+      "CONSTRAINT": "用于保证唯一性（非删除对象）",
+      "NO_DATA": "无数据或未收集统计信息 — 无法判断",
+      "OBSERVING": "观察中（不足7天）",
+      "UNUSED_CAND": "未使用的候选"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi 链接尚未准备就绪。请稍后重试。",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "不支持的连接（目前仅支持 PostgreSQL 服务器连接）。",
       "TIMEOUT": "请求超时。请稍后重试。",
       "RATE": "请求过多。请在一分钟后重试。"
+    },
+    "schema": "模式",
+    "schemaHint": "仅比较此模式下的常规表和分区表（视图除外）。默认public — Supabase内部模式（auth、storage等）不包括在内。",
+    "truncated": "{names} 查询达到 {max} 行上限并被截断 — 部分“不在DB中”·“不在模型中”的判断可能是误报。请缩小模式范围并重新检测。",
+    "colUnchecked": "由于列查询被截断，缺失·额外列 {n} 项被视为无法验证，并从列不匹配计数中排除。",
+    "renamed": "旧命名规则（_PKEY）应用的PK索引 {n} 项在DB中以新名称（PK_）存在 — 正常",
+    "superseded": "旧请求 {n} 项被排除，因为后来的请求重新创建了相同的表（DROP … CASCADE） — 正常",
+    "supersededItem": "请求 {id} → 被请求 {by} 替代",
+    "sysCols": "系统列（DDL生成时自动添加） {n} 项在模型中不存在是正常的，因此从不匹配中排除",
+    "groupOwn": "此项目前缀 {pfx} — 模型中缺失的候选",
+    "groupOther": "其他系统 {pfx}",
+    "basis": "预计行数 {rows} · 截至 {since}",
+    "guide": {
+      "title": "下一步操作",
+      "ddlMissing": {
+        "s1": "在schema.pi → 对应项目 → 物理模型 → DDL生成中，重新应用于此连接。",
+        "s2": "应用完成后，使用下方的“重新检测”确认计数为0。",
+        "s3": "如果重新应用后仍然消失，请怀疑是手动删除或回滚，并与您的DBA确认此连接账户的操作历史。"
+      },
+      "extraTables": {
+        "s1": "此项目前缀包 = 缺失模型候选 — schema.pi → 设置 → 反向导入到模型中，如果是不使用的表，请决定是否删除。",
+        "s2": "其他前缀组 = 使用相同DB的其他系统 — 不属于此项目的操作项。",
+        "s3": "如果目标模式不是public，请更改上方“模式”字段并重新检测。"
+      },
+      "colMismatches": {
+        "s1": "不在DB中 = 通过schema.pi DDL生成将模型列反映到DB中。",
+        "s2": "模型中没有 = 将 DB 列通过 schema.pi → 设置 → 反向导入到模型中，如果不需要，请决定是否删除。",
+        "s3": "类型·NULL不同 = 以模型（真相来源）为准进行对齐，但在缩短长度或转换为NOT NULL之前，请先确认现有行满足条件。"
+      },
+      "idxUsage": {
+        "s1": "删除前确认 ① 统计收集期间是否覆盖至少一个业务周期（例如月末批处理） — 请查看“截至”。",
+        "s2": "② 是否不是唯一性保证·PK索引（如果是，则判断会单独显示为“用于保证唯一性”）。",
+        "s3": "③ 在SQL Tuning中EXPLAIN该表的代表性SQL，确认此索引未被使用。",
+        "s4": "确认以上三点后，在schema.pi中删除模型索引并通过DDL反映。"
+      }
+    },
+    "act": {
+      "openSchema": "打开schema.pi",
+      "rerun": "重新检测",
+      "copy": "复制列表",
+      "copied": "已复制",
+      "sqlLab": "在SQL Tuning中EXPLAIN"
     }
   },
   "learn": {
@@ -494,6 +540,7 @@
       "TIMEOUT": "schema.pi 响应缓慢。请稍后重试。",
       "RULE_LIMIT": "每个连接最多50条规则。",
       "NOT_FOUND": "未找到规则。",
+      "CONN_FAIL": "无法连接到 DB。请检查连接设置和 DB 状态。",
       "LINK_DOWN": "无法连接到 schema.pi。请稍后重试。",
       "PGSS_MISSING": "未安装 pg_stat_statements 扩展，因此无法查看慢速 SQL。",
       "CONN_UNSUPPORTED": "此连接不支持监控（仅限 PostgreSQL 服务器连接）。",
@@ -501,6 +548,7 @@
       "INVALID_INPUT": "请求无效。"
     },
     "board": {
+      "subtitle": "此 DB 当前需要做什么 — 14 个信号的正常、警告、风险和解决方案一目了然。",
       "refresh": {
         "updated": "截至 {time} · 每分钟刷新",
         "now": "立即刷新",
@@ -519,12 +567,14 @@
         "WARN": "警告 — 某些项目需要关注",
         "UNKNOWN": "未知 — 检查连接",
         "OK": "正常 — 所有信号都在限制范围内",
+        "CONN_DOWN": "无法连接到 DB — 请先检查连接",
         "NA": "不适用"
       },
       "kpi": {
         "sess": "会话 / 最大值",
         "tps": "每秒事务数",
-        "cache": "缓存命中率"
+        "cache": "缓存命中率",
+        "size": "DB大小"
       },
       "todo": {
         "title": "立即执行",
@@ -555,6 +605,8 @@
         "partial": "部分视图（500 行上限或缺少权限）。"
       },
       "sig": {
+        "AVAIL": "DB响应",
+        "CONN_USE": "连接使用率（此DB）",
         "URL": "服务 URL",
         "LONG_QRY": "长时间运行的查询",
         "IDLE_TX": "空闲事务",
@@ -569,6 +621,9 @@
         "REPL": "复制延迟"
       },
       "fix": {
+        "AVAIL": "响应缓慢或刚刚重启 — 请检查连接设置和DB服务器状态。",
+        "AVAIL_DOWN": "无法连接到DB — 请检查连接设置和DB服务器是否正常运行。",
+        "CONN_USE": "此DB会话 {sess}/{max} 个（非集群范围 — 其他DB连接已排除） — 请关闭空闲连接或添加连接池（pgbouncer）。",
         "URL": "{n} 个已检查的 URL 失败 · 最大响应 {ms}ms — 请查看 schema.pi 监控以了解原因。",
         "LONG_QRY": "一个查询已运行 {sec} 秒 — 请查看其计划并进行优化，或让 DBA 取消它。",
         "IDLE_TX": "一个事务已空闲 {sec} 秒 — 请在应用程序中查找缺失的提交并设置超时。",
@@ -576,6 +631,7 @@
         "CACHE_HIT": "缓存命中率 {pct}% — 请查找大型表的完全扫描或检查 shared_buffers。",
         "XACT_ERR": "回滚率 {pct}%，{dlck} 个死锁 — 请检查失败的事务和应用程序错误日志。",
         "SLOW_SQL": "一个查询平均 {ms} 毫秒 — 请根据总时间使用其计划优化顶部查询。",
+        "STORAGE": "DB {gb}GB 接近上限（剩余天数 {days}） — 请清理大表或增加容量。",
         "VACUUM": "{tbl} 有许多死行或过时的统计信息 — 请检查 VACUUM (ANALYZE) 和 autovacuum 设置。",
         "INDEX": "{n} 个索引发现（无效、未使用、完全扫描）— 请查看表和索引健康状况选项卡以了解目标。",
         "BACKUP": "WAL 归档已关闭或停滞 — 请检查 archive_mode、archive_command 和备份状态。",
@@ -583,9 +639,11 @@
         "PGSS": "未安装 pg_stat_statements 扩展，因此无法查看慢速 SQL — 请使用以下 SQL 启用它（需要重启服务器）。"
       },
       "reason": {
+        "CONN_DOWN": "由于DB连接中断，未进行判断。",
         "PGSS": "未安装 pg_stat_statements。",
         "VER": "仅适用于 PostgreSQL 13 或更高版本。",
         "SAMPLE": "样本不足，暂不判断。",
+        "NO_LIMIT": "无容量上限，因此不判断使用率 — 添加DB大小（MB）规则（>）即可用作上限。",
         "RESET": "统计信息重置不足 7 天，因此不判断未使用的索引。",
         "STALE": "没有最近的检查记录。",
         "STANDBY": "不适用于备用服务器。",
@@ -596,6 +654,7 @@
       "steps": {
         "AVAIL": {
           "1": "在“连接管理”中检查连接状态，并在 schema.pi 中修复连接设置（主机、端口、帐户）。",
+          "2": "检查DB服务器是否正常运行，以及最近是否重启过。",
           "3": "如果仍然缓慢，请检查服务器负载（CPU、磁盘）和网络。"
         },
         "CONN_USE": {
@@ -655,7 +714,8 @@
         },
         "BACKUP": {
           "1": "在“备份与恢复”选项卡中查看 archive_mode 和最后归档时间。",
-          "2": "如果归档失败，请检查 archive_command 和目标位置的可用空间。"
+          "2": "如果归档失败，请检查 archive_command 和目标位置的可用空间。",
+          "3": "如果是托管型DB，请检查提供商的备份设置。"
         },
         "REPL": {
           "1": "在“复制与灾难恢复”选项卡中查看每个备用服务器的状态和延迟。",
@@ -673,7 +733,7 @@
         "repl": "复制检查",
         "backup": "备份检查",
         "sqlLab": "SQL 调优",
-        "drift": "漂移比较",
+        "drift": "GAP分析",
         "connect": "连接管理",
         "schema": "schema.pi 监控"
       },
@@ -685,6 +745,7 @@
         "sessTrend": "会话趋势与锁等待",
         "tpsCombo": "吞吐量与回滚率",
         "cacheTrend": "缓存命中率趋势",
+        "capacity": "DB容量与预测",
         "slowTop": "慢速 SQL 前 10 名",
         "slowLegend": "条形长度 = 总时间 · 颜色 = 平均时间（▲ 警告从 {warn}ms · ✕ 风险从 {risk}ms）",
         "sizeTop": "空间前 10 名",
@@ -695,6 +756,7 @@
           "sessTrend": "会话堆积时锁等待是否增加？",
           "tpsCombo": "吞吐量和失败率是否同步变化？",
           "cacheTrend": "缓存命中率何时下降？",
+          "capacity": "DB何时会满？",
           "slowTop": "首先优化什么？（按总时间）",
           "sizeTop": "什么占用了空间？",
           "heat": "风险是一次性的还是重复发生的？",
@@ -714,6 +776,7 @@
         "tps": "每秒事务数",
         "rlbk": "回滚率 (%)",
         "cacheHit": "缓存命中率",
+        "size": "DB大小",
         "limit": "限制",
         "forecast": "预测",
         "daysLeft": "剩余天数",
@@ -779,6 +842,7 @@
       "empty": {
         "noConn": "此分类法没有要监控的 PostgreSQL 服务器连接 — 仅显示 URL 和服务状态。",
         "unsupported": "此连接不支持监控（仅限 PostgreSQL 服务器连接）。",
+        "connFail": "无法连接到 DB — 请检查连接信息和 DB 状态。",
         "linkDown": "无法连接到 schema.pi — 正在自动重试。",
         "linkAuth": "连接令牌已过期 — 请在 schema.pi 中重新颁发令牌并注册。",
         "timeout": "响应缓慢 — 正在自动重试。",
@@ -787,12 +851,14 @@
       "aux": {
         "rules": "我的警报规则（{n} 个活动）",
         "schemaSvc": "服务状态 — schema.pi 响应",
-        "schemaSvcNote": "schema.pi 存储的最近 60 分钟应用程序指标。"
+        "schemaSvcNote": "schema.pi 存储的最近 60 分钟应用程序指标。",
+        "source": "数据来源：目标DB仅通过schema.pi的命名查询（只读）读取，趋势仅在dbms.pi中存储统计数据（不存储行数据）。"
       }
     }
   },
   "ops": {
     "title": "DB 操作安全",
+    "intro": "对已连接的 PostgreSQL 连接的参数、账户权限、备份和复制状态进行只读诊断。不更改设置，仅存储判断摘要，不存储客户 DB 行数据",
     "loading": "正在加载…",
     "pickFirst": "请先在上方选择连接和数据库连接",
     "run": "运行诊断",
@@ -925,6 +991,7 @@
   },
   "perf": {
     "title": "性能",
+    "intro": "收集已连接的 PostgreSQL 连接的查询、表和索引统计信息，以显示慢查询、表/索引健康状况和容量趋势。仅存储统计数据，不存储客户 DB 行数据",
     "loading": "正在加载…",
     "pickFirst": "请先在上方选择连接和数据库连接",
     "pager": "分页",
@@ -937,7 +1004,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "schema.pi 连接功能正在准备中。请稍后重试",
+      "PGSS_MISSING": "此 DB 未安装 pg_stat_statements 扩展，因此无法查看查询统计信息",
       "CONN_UNSUPPORTED": "此连接尚不支持（仅支持直接PostgreSQL连接）",
+      "TIMEOUT": "目标 DB 响应过慢，已中断。请稍后重试",
       "RATE": "请求过多。请在一分钟后重试",
       "LINK_AUTH": "连接令牌已过期或被撤销。请在连接页面重新注册令牌",
       "LINK_SCOPE": "此连接不属于该连接的主题区域",
@@ -946,6 +1015,7 @@
     },
     "pgss": {
       "title": "如何启用pg_stat_statements",
+      "body": "慢查询 Top-N 需要 pg_stat_statements 扩展。请以 DB 管理员账户运行以下语句。Supabase 可以在仪表板的 Database → Extensions 中启用",
       "note": "自托管的PostgreSQL还需要在shared_preload_libraries (postgresql.conf)中添加pg_stat_statements并重新启动。表、索引和大小统计信息无需此扩展即可工作"
     },
     "collect": {
@@ -967,7 +1037,11 @@
       "totalMs": "总毫秒",
       "meanMs": "平均毫秒",
       "rows": "行",
-      "reset": "检测到统计信息重置 — 显示为累计值"
+      "reset": "检测到统计信息重置 — 显示为累计值",
+      "src": "来源",
+      "srcToggle": "显示·隐藏来源详情",
+      "openSqlLab": "在SQL Tuning中打开",
+      "acct": "账户"
     },
     "health": {
       "empty": "暂无快照。请在“收集”选项卡上点击“立即收集”",
@@ -984,6 +1058,7 @@
     "trend": {
       "limit": "大小阈值",
       "empty": "最近 30 天没有快照",
+      "chart": "最近30天DB大小趋势",
       "now": "当前大小",
       "perDay": "每日增长量",
       "needMore": "需要 2 个以上快照",
@@ -997,6 +1072,46 @@
       "sessions": "会话活动",
       "locks": "锁",
       "none": "无"
+    },
+    "src": {
+      "root": "准确识别来源的根本对策：① 为每个程序·批处理·人员（工具）单独使用DB账户，② 为所有连接设置application_name。账户是基于pg_stat_statements的确定值，应用·工具分类是根据活动样本估算的值（application_name是连接程序自行报告的值，因此可能为空或更改，并且在样本之间完成的短查询可能会被遗漏）",
+      "cd": {
+        "PROGRAM": "程序",
+        "BATCH": "批处理",
+        "TOOL": "工具（人员）",
+        "PLATFORM": "平台内部",
+        "MONITOR": "监控（我们）",
+        "UNKNOWN": "未知"
+      },
+      "conf": {
+        "high": "高度确信",
+        "mid": "中度确信",
+        "low": "低度确信",
+        "acct": "仅账户确定",
+        "ver": "版本限制"
+      },
+      "fix": {
+        "TOOL": "看起来是人员使用DB工具（DBeaver等）直接查询生产DB。请引导他们使用只读副本或分析DB，并对人员账户设置执行时间上限，例如 ALTER ROLE human_user SET statement_timeout = '30s'。使用单独的只读角色，并在非高峰时段进行批量提取。",
+        "BATCH": "看起来是批处理·计划任务。请避开业务高峰期分散执行时间，并减少每次提交的工作量。检查目标表的索引和统计信息（ANALYZE），并拆分长事务。在application_name中放入任务名称将使下次分类更精确。",
+        "PROGRAM": "看起来是应用程序执行的查询。请在SQL Tuning中检查执行计划。调用次数多且平均时间短指向重复调用（N+1）·缓存，平均时间长则首先查看索引·连接顺序。请在连接池的application_name中设置服务名称。",
+        "PLATFORM": "看起来是autovacuum·复制等DB·平台内部工作。通常无需采取措施。如果持续排在前面，请审查autovacuum阈值和maintenance_work_mem。",
+        "MONITOR": "看起来是此服务（schema.pi连接）自身的统计查询。无需采取措施。如果出现过于频繁，请降低查询频率。",
+        "UNKNOWN": "没有线索可以识别来源。请为所有连接设置application_name，并按用途划分账户，下次采样时将进行分类。"
+      },
+      "detail": {
+        "app": "应用名称",
+        "addr": "客户端地址（已屏蔽）",
+        "samples": "样本",
+        "active": "活跃样本",
+        "period": "观察期间",
+        "none": "(空值)"
+      },
+      "noSample": "暂无样本 — 在查看监控面板或活动·锁选项卡时，正在运行的会话会被采样。目前仅根据账户名称进行参考分类。",
+      "verOff": "此DB版本低于PostgreSQL 14，因此正在运行的会话没有查询ID。仅显示账户（确定）。",
+      "privOff": "连接账户无权查看其他账户的会话详情，因此未收集样本。请DB管理员执行 GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "连接账户",
+      "qidOff": "会话详情可见，但查询ID为空（compute_query_id已关闭）。请通过 SHOW compute_query_id; 确认，然后执行 ALTER SYSTEM SET compute_query_id = 'auto'; 并重新加载配置（SELECT pg_reload_conf();）。",
+      "openHint": "在SQL Tuning输入框中填充查询并打开。在查看执行计划之前，请将$1等占位符替换为实际值。"
     }
   },
   "pipeline": {
@@ -1193,7 +1308,7 @@
     "label": "功能",
     "groups": {
       "monitor": "监控",
-      "drift": "一致性",
+      "drift": "GAP分析",
       "lake": "数据湖",
       "admin": "管理"
     },
@@ -1201,7 +1316,7 @@
     "sqlLab": "SQL 调优",
     "perf": "性能",
     "monitor": "监控",
-    "drift": "漂移",
+    "drift": "GAP分析",
     "migration": "迁移",
     "pipeline": "管道",
     "analytics": "分析",

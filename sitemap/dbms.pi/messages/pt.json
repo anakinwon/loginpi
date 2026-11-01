@@ -103,7 +103,7 @@
       "keys": {
         "links": "Meus links",
         "perf": "Instantâneos de desempenho",
-        "drift": "Execuções de drift",
+        "drift": "Análise de GAP",
         "mig": "Planos de migração",
         "pipe": "Pipelines",
         "lake": "Conjuntos de dados do lago"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Drift Modelo ↔ DB",
+    "title": "Análise de GAP — Modelo↔DB",
     "intro": "Compare o modelo de design schema.pi e o histórico de aplicação DDL com o catálogo DB ativo para encontrar desvios e medir se os índices projetados são realmente usados. Dados de linha do cliente nunca são lidos ou armazenados.",
     "needLink": "Escolha um link schema.pi acima primeiro. Se não tiver nenhum, registre um token no menu 'Link'.",
     "needConn": "Escolha a conexão DB para comparar acima.",
     "project": "Projeto",
     "projectPick": "Selecionar um projeto",
     "loading": "Carregando…",
-    "run": "Executar detecção de drift",
+    "run": "Executar Análise de GAP",
     "running": "Comparando…",
     "readOnly": "Apenas consultas de catálogo e estatísticas somente leitura são executadas.",
     "applyInSchema": "Aplique as correções (edições de modelo, geração e execução de DDL) em schema.pi, a fonte da verdade.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Índices projetados ausentes no DB",
       "extraIndexes": "Índices não no modelo",
       "ddlMissing": "Objetos desaparecidos após a aplicação",
-      "unusedIndexes": "Índices projetados não utilizados"
+      "unusedIndexes": "Índices Candidatos Não Utilizados"
     },
     "sec": {
       "ddlMissing": "DDL aplicado, mas ausente no DB",
       "missingTables": "Tabelas no modelo, mas ausentes no DB",
       "extraTables": "Tabelas no DB, mas não no modelo",
-      "colMismatches": "Incompatibilidades de tipo de coluna / NULL",
+      "colMismatches": "Incompatibilidades de Colunas (Faltando·Tipo·NULL)",
       "missingIndexes": "Índices projetados ausentes no DB",
       "extraIndexes": "Índices apenas no DB (excluindo PK)",
       "idxUsage": "Eficácia do índice projetado"
     },
     "hint": {
-      "ddlMissing": "schema.pi registrou esses objetos como aplicados, mas eles desapareceram — suspeite de uma exclusão manual ou rollback.",
-      "extraTables": "Estes podem pertencer a outros projetos ou tabelas de sistema nesta conexão.",
-      "idxUsage": "Zero varreduras desde a última redefinição de estatísticas significa não utilizado. Verifique a janela de estatísticas antes de descartar."
+      "ddlMissing": "Apenas objetos ausentes do DB com base no padrão aplicado mais recente são mostrados. Solicitações anteriores que recriaram a mesma tabela mais tarde e convenções de nomenclatura antigas (_PKEY) são normais e estão ocultas abaixo.",
+      "extraTables": "Com base no esquema {schema}. Agrupados por prefixo, apenas o grupo de prefixos deste projeto são candidatos a omissão do modelo.",
+      "idxUsage": "Julgamento = Em Uso / Para Unicidade / Sem Dados / Em Observação (Estatísticas iniciadas·Criado há menos de 7 dias) / Candidato a Não Utilizado. Apenas candidatos a índices não utilizados são considerados para exclusão."
     },
     "kind": {
       "MISSING": "ausente no DB",
@@ -223,12 +223,16 @@
       "idx": "Índice",
       "scans": "Varreduras",
       "size": "Tamanho",
-      "status": "Veredito"
+      "status": "Veredito",
+      "basis": "Base"
     },
     "usage": {
       "USED": "Em uso",
-      "UNUSED": "Índice projetado não utilizado",
-      "NO_STATS": "Sem estatísticas"
+      "NO_STATS": "Sem estatísticas",
+      "CONSTRAINT": "Restrição de unicidade (manter)",
+      "NO_DATA": "Sem dados ou estatísticas não coletadas — não é possível julgar",
+      "OBSERVING": "Em observação (menos de 7 dias)",
+      "UNUSED_CAND": "Candidato não utilizado"
     },
     "errors": {
       "NOT_IMPLEMENTED": "A funcionalidade de conexão schema.pi está sendo preparada. Por favor, tente novamente em breve.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Conexão não suportada (apenas conexões de servidor PostgreSQL por enquanto).",
       "TIMEOUT": "A requisição expirou. Por favor, tente novamente em breve.",
       "RATE": "Muitas requisições. Por favor, tente novamente em um minuto."
+    },
+    "schema": "Esquema",
+    "schemaHint": "Apenas tabelas regulares e particionadas neste esquema são comparadas (visualizações excluídas). Padrão public — esquemas internos do Supabase (auth, storage, …) são omitidos.",
+    "truncated": "{names} atingiram o limite de {max} linhas e foram truncados — alguns resultados \"não no DB\" / \"não no modelo\" podem ser falsos. Reduza o esquema e execute novamente.",
+    "colUnchecked": "Como a consulta de coluna foi truncada, {n} resultados de colunas ausentes/extras são tratados como não verificáveis e excluídos da contagem de incompatibilidades de colunas.",
+    "renamed": "{n} índice(s) PK aplicado(s) sob a regra de nomenclatura antiga (_PKEY) existem no DB com o novo nome (PK_) — normal",
+    "superseded": "{n} solicitação(ões) mais antiga(s) foram excluídas porque uma solicitação posterior recriou a mesma tabela (DROP … CASCADE) — normal",
+    "supersededItem": "Solicitação {id} → substituída pela solicitação {by}",
+    "sysCols": "{n} coluna(s) do sistema adicionada(s) automaticamente na geração DDL não estão no modelo por design e são excluídas das incompatibilidades",
+    "groupOwn": "Prefixo do projeto {pfx} — candidatos ausentes do modelo",
+    "groupOther": "Outro sistema {pfx}",
+    "basis": "Est. linhas {rows} · desde {since}",
+    "guide": {
+      "title": "Próximos passos",
+      "ddlMissing": {
+        "s1": "Em schema.pi → o projeto → modelo físico → geração DDL, aplique novamente a esta conexão.",
+        "s2": "Quando terminar, use \"Executar novamente\" abaixo e confirme se a contagem é 0.",
+        "s3": "Se os objetos ainda desaparecerem após a reaplicação, suspeite de uma exclusão manual ou rollback e verifique a atividade da conta de conexão com seu DBA."
+      },
+      "extraTables": {
+        "s1": "Este pacote de prefixo de projeto = candidatos a modelo ausentes — importe-os para o modelo via schema.pi → Configurações → Reverter, ou decida se os exclui se forem tabelas não utilizadas.",
+        "s2": "Outros grupos de prefixo = outros sistemas compartilhando este DB — não são itens de ação para este projeto.",
+        "s3": "Se o esquema de destino não for public, altere o campo \"Esquema\" acima e execute novamente."
+      },
+      "colMismatches": {
+        "s1": "Não no DB = aplique a coluna do modelo ao DB via geração DDL do schema.pi.",
+        "s2": "Não está no modelo = importe a coluna do DB para o modelo via schema.pi → Configurações → Reverter, ou decida excluí-la se for desnecessária.",
+        "s3": "Tipo/NULL difere = alinhe ao modelo (fonte da verdade); antes de reduzir o comprimento ou mudar para NOT NULL, confirme se as linhas existentes o satisfazem."
+      },
+      "idxUsage": {
+        "s1": "Antes de remover, verifique ① se a janela de estatísticas cobre pelo menos um ciclo de negócios (por exemplo, lote de fim de mês) — veja \"desde\".",
+        "s2": "② Não é um índice único/PK (esses são mostrados separadamente como \"restrição de unicidade\").",
+        "s3": "③ EXPLAIN o SQL representativo da tabela em SQL Tuning e confirme se este índice não é usado.",
+        "s4": "Uma vez que todos os três forem confirmados, remova o índice do modelo em schema.pi e aplique via DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Abrir schema.pi",
+      "rerun": "Executar novamente",
+      "copy": "Copiar lista",
+      "copied": "Copiado",
+      "sqlLab": "EXPLAIN em SQL Tuning"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Verificação de replicação",
         "backup": "Verificação de backup",
         "sqlLab": "Ajuste de SQL",
-        "drift": "Comparar desvio",
+        "drift": "Análise de GAP",
         "connect": "Conexões",
         "schema": "monitor schema.pi"
       },
@@ -989,7 +1035,11 @@
       "totalMs": "Total ms",
       "meanMs": "Média ms",
       "rows": "Linhas",
-      "reset": "Redefinição de estatísticas detectada — exibido como cumulativo"
+      "reset": "Redefinição de estatísticas detectada — exibido como cumulativo",
+      "src": "Origem",
+      "srcToggle": "Mostrar ou ocultar detalhes da origem",
+      "openSqlLab": "Abrir em SQL Tuning",
+      "acct": "Conta"
     },
     "health": {
       "empty": "Nenhum instantâneo ainda. Pressione Coletar agora na aba Coletar",
@@ -1020,6 +1070,46 @@
       "sessions": "Atividade da sessão",
       "locks": "Bloqueios",
       "none": "Nenhum"
+    },
+    "src": {
+      "root": "Para identificar a origem com precisão: (1) use uma conta de DB separada para cada programa, lote e pessoa (ferramenta), e (2) defina application_name em cada conexão. A conta vem de pg_stat_statements e é certa; a categoria de aplicativo/ferramenta é estimada a partir de amostras de atividade (application_name é auto-relatado pelo cliente, então pode estar vazio ou ser alterado, e consultas curtas que terminam entre as amostras podem ser perdidas)",
+      "cd": {
+        "PROGRAM": "Programa",
+        "BATCH": "Lote",
+        "TOOL": "Ferramenta (pessoa)",
+        "PLATFORM": "Plataforma interna",
+        "MONITOR": "Monitoramento (nós)",
+        "UNKNOWN": "Desconhecido"
+      },
+      "conf": {
+        "high": "Alta confiança",
+        "mid": "Média confiança",
+        "low": "Baixa confiança",
+        "acct": "Apenas conta",
+        "ver": "Limite de versão"
+      },
+      "fix": {
+        "TOOL": "Parece que uma pessoa está consultando o DB de produção diretamente com uma ferramenta de DB (DBeaver etc.). Oriente-os a usar uma réplica somente leitura ou DB de análise, e limite o tempo de execução em contas humanas, por exemplo, ALTER ROLE human_user SET statement_timeout = '30s'. Use uma função somente leitura separada e execute extrações em massa fora dos horários de pico",
+        "BATCH": "Parece um lote ou trabalho agendado. Distribua os tempos de execução para longe dos picos de negócios e reduza o trabalho por commit. Verifique índices e estatísticas (ANALYZE) nas tabelas de destino e divida transações longas. Colocar o nome do trabalho em application_name torna a próxima classificação mais precisa",
+        "PROGRAM": "Parece uma consulta executada por um aplicativo. Verifique o plano em SQL Tuning. Muitas chamadas com uma média curta apontam para chamadas repetidas (N+1) ou cache; uma média longa aponta para índices ou ordem de junção primeiro. Defina o nome do serviço no application_name do seu pool de conexões",
+        "PLATFORM": "Parece trabalho interno do DB ou da plataforma, como autovacuum ou replicação. Geralmente, nenhuma ação é necessária. Se permanecer no topo, revise os limites de autovacuum e maintenance_work_mem",
+        "MONITOR": "Parece as próprias consultas de estatísticas deste serviço (link schema.pi). Nenhuma ação necessária. Se aparecer com muita frequência, diminua a frequência de sondagem",
+        "UNKNOWN": "Não há nenhuma pista sobre a origem. Defina application_name em cada conexão e divida as contas por finalidade; será classificado a partir das próximas amostras"
+      },
+      "detail": {
+        "app": "Nome do aplicativo",
+        "addr": "Endereço do cliente (mascarado)",
+        "samples": "Amostras",
+        "active": "Amostras ativas",
+        "period": "Observado",
+        "none": "(vazio)"
+      },
+      "noSample": "Nenhuma amostra ainda — as sessões em execução são amostradas quando você visualiza o painel de monitoramento ou a guia Atividade e bloqueios. Por enquanto, é classificado apenas pelo nome da conta",
+      "verOff": "Este DB é anterior ao PostgreSQL 14, então as sessões em execução não têm ID de consulta. Apenas a conta (certa) é mostrada",
+      "privOff": "A conta de link não pode ver os detalhes da sessão de outras contas, então nenhuma amostra é coletada. Peça a um administrador de DB para executar GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "conta de link",
+      "qidOff": "Os detalhes da sessão estão visíveis, mas o ID da consulta está vazio (compute_query_id está desativado). Verifique com SHOW compute_query_id; então execute ALTER SYSTEM SET compute_query_id = 'auto'; e recarregue (SELECT pg_reload_conf();)",
+      "openHint": "Abre o SQL Tuning com a consulta preenchida. Substitua os espaços reservados como $1 por valores reais antes de visualizar o plano"
     }
   },
   "pipeline": {
@@ -1216,7 +1306,7 @@
     "label": "Recursos",
     "groups": {
       "monitor": "Monitoramento",
-      "drift": "Consistência",
+      "drift": "Análise de GAP",
       "lake": "Lake",
       "admin": "Administrador"
     },
@@ -1224,7 +1314,7 @@
     "sqlLab": "Otimização SQL",
     "perf": "Desempenho",
     "monitor": "Monitoramento",
-    "drift": "Desvio",
+    "drift": "Análise de GAP",
     "migration": "Migração",
     "pipeline": "Pipeline",
     "analytics": "Análise",

@@ -103,7 +103,7 @@
       "keys": {
         "links": "Moje propojení",
         "perf": "Snímky výkonu",
-        "drift": "Spuštění detekce odchylek",
+        "drift": "Analýza GAP",
         "mig": "Plány migrace",
         "pipe": "Pipelines",
         "lake": "Datové sady jezera"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB odchylka",
+    "title": "Analýza GAP — Model↔DB",
     "intro": "Porovnejte návrhový model schema.pi a historii aplikací DDL s živým katalogem DB, abyste našli odchylky a změřili, zda jsou navržené indexy skutečně používány. Řádková data zákazníků nejsou nikdy čtena ani ukládána.",
     "needLink": "Nejprve si vyberte propojení schema.pi výše. Pokud žádné nemáte, zaregistrujte token v menu 'Propojení'.",
     "needConn": "Vyberte DB připojení pro porovnání výše.",
     "project": "Projekt",
     "projectPick": "Vyberte projekt",
     "loading": "Načítání…",
-    "run": "Spustit detekci odchylek",
+    "run": "Spustit analýzu GAP",
     "running": "Porovnávání…",
     "readOnly": "Spouštějí se pouze dotazy na katalog a statistiky pouze pro čtení.",
     "applyInSchema": "Aplikujte opravy (úpravy modelu, generování a provádění DDL) v schema.pi, zdroji pravdy.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Navržené indexy chybějící v DB",
       "extraIndexes": "Indexy, které nejsou v modelu",
       "ddlMissing": "Objekty zmizely po aplikaci",
-      "unusedIndexes": "Nepoužívané navržené indexy"
+      "unusedIndexes": "Kandidáti na nepoužívané indexy"
     },
     "sec": {
       "ddlMissing": "DDL aplikováno, ale chybí v DB",
       "missingTables": "Tabulky v modelu, ale chybí v DB",
       "extraTables": "Tabulky v DB, ale nejsou v modelu",
-      "colMismatches": "Neshody typu sloupce / NULL",
+      "colMismatches": "Neshody sloupců (chybějící·typ·NULL)",
       "missingIndexes": "Navržené indexy chybějící v DB",
       "extraIndexes": "Indexy pouze v DB (kromě PK)",
       "idxUsage": "Efektivita navrženého indexu"
     },
     "hint": {
-      "ddlMissing": "schema.pi zaznamenalo tyto objekty jako aplikované, ale zmizely – podezření na ruční smazání nebo rollback.",
-      "extraTables": "Tyto mohou patřit k jiným projektům nebo systémovým tabulkám na tomto připojení.",
-      "idxUsage": "Nulové skenování od posledního resetu statistik znamená nepoužívané. Před smazáním zkontrolujte okno statistik."
+      "ddlMissing": "Zobrazují se pouze objekty chybějící v DB na základě nejnovějšího aplikovaného standardu. Předchozí požadavky, které později znovu vytvořily stejnou tabulku, a staré konvence pojmenování (_PKEY) jsou normální a jsou sbaleny níže.",
+      "extraTables": "Na základě schématu {schema}. Seskupeno podle předpony, pouze skupina předpon tohoto projektu jsou kandidáti na opomenutí modelu.",
+      "idxUsage": "Posouzení = Používáno / Pro jedinečnost / Žádná data / Pod dohledem (statistiky spuštěny·vytvořeno před méně než 7 dny) / Kandidát na nepoužívané. K odstranění se zvažují pouze kandidáti na nepoužívané indexy."
     },
     "kind": {
       "MISSING": "chybí v DB",
@@ -223,12 +223,16 @@
       "idx": "Index",
       "scans": "Skenování",
       "size": "Velikost",
-      "status": "Verdikt"
+      "status": "Verdikt",
+      "basis": "Základ"
     },
     "usage": {
       "USED": "Používáno",
-      "UNUSED": "Nepoužívaný navržený index",
-      "NO_STATS": "Žádné statistiky"
+      "NO_STATS": "Žádné statistiky",
+      "CONSTRAINT": "Omezení jedinečnosti (ponechat)",
+      "NO_DATA": "Žádná data nebo neshromážděné statistiky — nelze posoudit",
+      "OBSERVING": "Sledování (méně než 7 dní)",
+      "UNUSED_CAND": "Kandidát na nepoužívané"
     },
     "errors": {
       "NOT_IMPLEMENTED": "Funkce propojení schema.pi se připravuje. Zkuste to prosím znovu za chvíli.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Nepodporované připojení (prozatím pouze připojení k serveru PostgreSQL).",
       "TIMEOUT": "Požadavek vypršel. Zkuste to prosím znovu za chvíli.",
       "RATE": "Příliš mnoho požadavků. Zkuste to prosím znovu za minutu."
+    },
+    "schema": "Schéma",
+    "schemaHint": "Porovnávají se pouze běžné a rozdělené tabulky v tomto schématu (pohledy jsou vyloučeny). Výchozí public — interní schémata Supabase (auth, storage, …) jsou vynechána.",
+    "truncated": "{names} dosáhly limitu {max} řádků a byly zkráceny — některé výsledky „není v DB“ / „není v modelu“ mohou být chybné. Zúžte schéma a spusťte znovu.",
+    "colUnchecked": "Protože dotaz na sloupce byl zkrácen, {n} výsledků chybějících/extra sloupců je považováno za neověřitelné a vyloučeno z počtu neshod sloupců.",
+    "renamed": "{n} PK index(y) aplikované podle starého pravidla pojmenování (_PKEY) existují v DB pod novým názvem (PK_) — normální",
+    "superseded": "{n} starších požadavků bylo vyloučeno, protože pozdější požadavek znovu vytvořil stejnou tabulku (DROP … CASCADE) — normální",
+    "supersededItem": "Požadavek {id} → nahrazen požadavkem {by}",
+    "sysCols": "{n} systémových sloupců přidaných automaticky při generování DDL není v modelu záměrně a jsou vyloučeny z neshod",
+    "groupOwn": "Předpona projektu {pfx} — kandidáti chybějící v modelu",
+    "groupOther": "Jiný systém {pfx}",
+    "basis": "Odhad. řádky {rows} · od {since}",
+    "guide": {
+      "title": "Další kroky",
+      "ddlMissing": {
+        "s1": "V schema.pi → projekt → fyzický model → generování DDL, aplikujte znovu na toto připojení.",
+        "s2": "Po dokončení použijte níže „Spustit znovu“ a ověřte, že počet je 0.",
+        "s3": "Pokud objekty po opětovné aplikaci stále mizí, podezřívejte ruční smazání nebo rollback a zkontrolujte aktivitu účtu připojení s vaším DBA."
+      },
+      "extraTables": {
+        "s1": "Tento balíček předpon projektu = chybějící kandidáti modelu — importujte je do modelu přes schema.pi → Nastavení → Reverzní, nebo se rozhodněte, zda je odstraníte, pokud se jedná o nepoužívané tabulky.",
+        "s2": "Jiné skupiny předpon = jiné systémy sdílející tuto DB — nejsou akčními položkami pro tento projekt.",
+        "s3": "Pokud cílové schéma není public, změňte pole „Schéma“ výše a spusťte znovu."
+      },
+      "colMismatches": {
+        "s1": "Není v DB = aplikujte sloupec modelu do DB pomocí generování DDL schema.pi.",
+        "s2": "Není v modelu = importujte sloupec DB do modelu přes schema.pi → Nastavení → Reverzní, nebo se rozhodněte jej odstranit, pokud je nepotřebný.",
+        "s3": "Typ/NULL se liší = zarovnejte s modelem (zdroj pravdy); před zkrácením délky nebo přepnutím na NOT NULL ověřte, zda stávající řádky splňují podmínku."
+      },
+      "idxUsage": {
+        "s1": "Před odstraněním zkontrolujte ①, zda okno statistik pokrývá alespoň jeden obchodní cyklus (např. dávka na konci měsíce) — viz „od“.",
+        "s2": "② Není to unikátní/PK index (ty se zobrazují samostatně jako „omezení jedinečnosti“).",
+        "s3": "③ EXPLAIN reprezentativní SQL tabulky v SQL Tuning a ověřte, že tento index není použit.",
+        "s4": "Jakmile jsou všechny tři potvrzeny, odstraňte index z modelu v schema.pi a aplikujte pomocí DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Otevřít schema.pi",
+      "rerun": "Spustit znovu",
+      "copy": "Kopírovat seznam",
+      "copied": "Zkopírováno",
+      "sqlLab": "EXPLAIN v SQL Tuning"
     }
   },
   "learn": {
@@ -686,7 +732,7 @@
         "repl": "Kontrola replikace",
         "backup": "Kontrola zálohy",
         "sqlLab": "Ladění SQL",
-        "drift": "Porovnání driftu",
+        "drift": "Analýza GAP",
         "connect": "Připojení",
         "schema": "Monitor schema.pi"
       },
@@ -985,7 +1031,11 @@
       "totalMs": "Celkem ms",
       "meanMs": "Průměr ms",
       "rows": "Řádky",
-      "reset": "Zjištěno resetování statistik – zobrazeno jako kumulativní"
+      "reset": "Zjištěno resetování statistik – zobrazeno jako kumulativní",
+      "src": "Zdroj",
+      "srcToggle": "Zobrazit nebo skrýt podrobnosti zdroje",
+      "openSqlLab": "Otevřít v SQL Tuning",
+      "acct": "Účet"
     },
     "health": {
       "empty": "Zatím žádné snímky. Stiskněte „Shromáždit nyní“ na kartě „Shromáždit“",
@@ -1015,6 +1065,46 @@
       "sessions": "Aktivita relací",
       "locks": "Zámky",
       "none": "Žádné"
+    },
+    "src": {
+      "root": "Pro přesné určení zdroje: (1) použijte samostatný DB účet pro každý program, dávku a osobu (nástroj) a (2) nastavte application_name na každém připojení. Účet pochází z pg_stat_statements a je jistý; kategorie aplikace/nástroje je odhadnuta ze vzorků aktivity (application_name je hlášeno klientem, takže může být prázdné nebo změněné, a krátké dotazy, které skončí mezi vzorky, mohou být vynechány).",
+      "cd": {
+        "PROGRAM": "Program",
+        "BATCH": "Dávka",
+        "TOOL": "Nástroj (osoba)",
+        "PLATFORM": "Interní platforma",
+        "MONITOR": "Monitorování (my)",
+        "UNKNOWN": "Neznámý"
+      },
+      "conf": {
+        "high": "Vysoká spolehlivost",
+        "mid": "Střední spolehlivost",
+        "low": "Nízká spolehlivost",
+        "acct": "Pouze účet",
+        "ver": "Limit verze"
+      },
+      "fix": {
+        "TOOL": "Vypadá to, že osoba dotazuje produkční DB přímo pomocí DB nástroje (DBeaver atd.). Místo toho je nasměrujte na repliku pouze pro čtení nebo analytickou DB a omezte dobu běhu na lidských účtech, např. ALTER ROLE human_user SET statement_timeout = '30s'. Použijte samostatnou roli pouze pro čtení a provádějte hromadné extrakce mimo špičku.",
+        "BATCH": "Vypadá to jako dávka nebo naplánovaná úloha. Rozložte doby běhu mimo obchodní špičky a zmenšete práci na jeden commit. Zkontrolujte indexy a statistiky (ANALYZE) na cílových tabulkách a rozdělte dlouhé transakce. Zadání názvu úlohy do application_name zpřesní další klasifikaci.",
+        "PROGRAM": "Vypadá to jako dotaz spuštěný aplikací. Zkontrolujte plán v SQL Tuning. Mnoho volání s krátkým průměrem ukazuje na opakovaná volání (N+1) nebo cachování; dlouhý průměr ukazuje nejprve na indexy nebo pořadí spojení. Nastavte název služby v application_name vašeho fondu připojení.",
+        "PLATFORM": "Vypadá to jako interní práce DB nebo platformy, jako je autovacuum nebo replikace. Obvykle není potřeba žádná akce. Pokud zůstává na vrcholu, zkontrolujte prahové hodnoty autovacuum a maintenance_work_mem.",
+        "MONITOR": "Vypadá to jako vlastní statistické dotazy této služby (odkaz schema.pi). Není potřeba žádná akce. Pokud se zobrazuje příliš často, snižte frekvenci dotazování.",
+        "UNKNOWN": "Není žádná stopa ke zdroji. Nastavte application_name na každém připojení a rozdělte účty podle účelu; bude klasifikováno z dalších vzorků."
+      },
+      "detail": {
+        "app": "Název aplikace",
+        "addr": "Adresa klienta (maskovaná)",
+        "samples": "Vzorky",
+        "active": "Aktivní vzorky",
+        "period": "Pozorováno",
+        "none": "(prázdné)"
+      },
+      "noSample": "Zatím žádné vzorky — běžící relace jsou vzorkovány, když si prohlížíte monitorovací panel nebo kartu Aktivita a zámky. Prozatím je klasifikováno pouze podle názvu účtu.",
+      "verOff": "Tato DB je starší než PostgreSQL 14, takže běžící relace nemají ID dotazu. Zobrazuje se pouze účet (jistý).",
+      "privOff": "Propojený účet nemůže vidět podrobnosti relací jiných účtů, takže se neshromažďují žádné vzorky. Požádejte správce DB, aby spustil GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "propojený účet",
+      "qidOff": "Podrobnosti relace jsou viditelné, ale ID dotazu je prázdné (compute_query_id je vypnuto). Zkontrolujte pomocí SHOW compute_query_id; poté spusťte ALTER SYSTEM SET compute_query_id = 'auto'; a znovu načtěte (SELECT pg_reload_conf();).",
+      "openHint": "Otevře SQL Tuning s vyplněným dotazem. Před zobrazením plánu nahraďte zástupné symboly jako $1 skutečnými hodnotami."
     }
   },
   "pipeline": {
@@ -1211,7 +1301,7 @@
     "label": "Funkce",
     "groups": {
       "monitor": "Monitorování",
-      "drift": "Konzistence",
+      "drift": "Analýza GAP",
       "lake": "Lake",
       "admin": "Správa"
     },
@@ -1219,7 +1309,7 @@
     "sqlLab": "SQL ladění",
     "perf": "Výkon",
     "monitor": "Monitorování",
-    "drift": "Drift",
+    "drift": "Analýza GAP",
     "migration": "Migrace",
     "pipeline": "Pipeline",
     "analytics": "Analýza",

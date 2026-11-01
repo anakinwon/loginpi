@@ -103,7 +103,7 @@
       "keys": {
         "links": "Mine koblinger",
         "perf": "Ytelsesøyeblikksbilder",
-        "drift": "Driftkjøringer",
+        "drift": "GAP-analyse",
         "mig": "Migreringsplaner",
         "pipe": "Pipelines",
         "lake": "Lake-datasett"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Modell ↔ DB-drift",
+    "title": "GAP-analyse — Modell↔DB",
     "intro": "Sammenlign schema.pi-designmodellen og DDL-historikken med den levende DB-katalogen for å finne avvik, og mål om designede indekser faktisk brukes. Kundens raddata leses eller lagres aldri.",
     "needLink": "Velg en schema.pi-kobling ovenfor først. Hvis du ikke har noen, registrer et token i 'Kobling'-menyen.",
     "needConn": "Velg DB-tilkoblingen som skal sammenlignes ovenfor.",
     "project": "Prosjekt",
     "projectPick": "Velg et prosjekt",
     "loading": "Laster inn …",
-    "run": "Kjør drift-deteksjon",
+    "run": "Kjør GAP-analyse",
     "running": "Sammenligner …",
     "readOnly": "Kun skrivebeskyttede katalog- og statistikkspørringer kjøres.",
     "applyInSchema": "Anvend rettelser (modellredigeringer, DDL-generering og utførelse) i schema.pi, sannhetskilden.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Designede indekser mangler i DB",
       "extraIndexes": "Indekser ikke i modell",
       "ddlMissing": "Objekter borte etter anvendelse",
-      "unusedIndexes": "Ubrukte designede indekser"
+      "unusedIndexes": "Kandidater for ubrukte indekser"
     },
     "sec": {
       "ddlMissing": "DDL anvendt, men mangler i DB",
       "missingTables": "Tabeller i modell, men mangler i DB",
       "extraTables": "Tabeller i DB, men ikke i modell",
-      "colMismatches": "Kolonnetype / NULL-mismatch",
+      "colMismatches": "Kolonnemismatch (mangler·type·NULL)",
       "missingIndexes": "Designede indekser mangler i DB",
       "extraIndexes": "Indekser kun i DB (ekskl. PK)",
       "idxUsage": "Effektivitet av designede indekser"
     },
     "hint": {
-      "ddlMissing": "schema.pi registrerte disse objektene som anvendt, men de er borte – mistenker en manuell sletting eller tilbakeføring.",
-      "extraTables": "Disse kan tilhøre andre prosjekter eller systemtabeller på denne tilkoblingen.",
-      "idxUsage": "Null skanninger siden siste statistikk-tilbakestilling betyr ubrukt. Sjekk statistikkvinduet før du sletter."
+      "ddlMissing": "Kun objekter som mangler fra DB basert på den sist anvendte standarden, vises. Tidligere forespørsler som gjenskapte den samme tabellen senere, og gamle navnekonvensjoner (_PKEY) er normale og er foldet inn nedenfor.",
+      "extraTables": "Basert på skjema {schema}. Gruppert etter prefiks, er kun denne gruppens prefiks kandidater for modellutelatelse.",
+      "idxUsage": "Vurdering = I bruk / For unikhet / Ingen data / Under observasjon (statistikk startet·opprettet mindre enn 7 dager) / Kandidat for ubrukt. Kun kandidater for ubrukte indekser vurderes for sletting."
     },
     "kind": {
       "MISSING": "mangler i DB",
@@ -223,12 +223,16 @@
       "idx": "Indeks",
       "scans": "Skanninger",
       "size": "Størrelse",
-      "status": "Dom"
+      "status": "Dom",
+      "basis": "Grunnlag"
     },
     "usage": {
       "USED": "I bruk",
-      "UNUSED": "Ubrukt designet indeks",
-      "NO_STATS": "Ingen statistikk"
+      "NO_STATS": "Ingen statistikk",
+      "CONSTRAINT": "Unikhetsbegrensning (behold)",
+      "NO_DATA": "Ingen data eller statistikk ikke samlet inn — kan ikke bedømmes",
+      "OBSERVING": "Observerer (under 7 dager)",
+      "UNUSED_CAND": "Ubrukt kandidat"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi-koblingen er ikke klar ennå. Vennligst prøv igjen om kort tid.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Ikke-støttet tilkobling (kun PostgreSQL-servertilkoblinger foreløpig).",
       "TIMEOUT": "Forespørselen tidsavbrutt. Vennligst prøv igjen om kort tid.",
       "RATE": "For mange forespørsler. Vennligst prøv igjen om et minutt."
+    },
+    "schema": "Skjema",
+    "schemaHint": "Kun vanlige og partisjonerte tabeller i dette skjemaet sammenlignes (visninger er ekskludert). Standard public — Supabase interne skjemaer (auth, storage, …) er utelatt.",
+    "truncated": "{names} nådde {max}-radersgrensen og ble avkortet — noen «ikke i DB» / «ikke i modell»-resultater kan være falske. Avgrens skjemaet og kjør igjen.",
+    "colUnchecked": "Fordi kolonneforespørselen ble avkortet, behandles {n} manglende/ekstra kolonner som ubekreftelige og er ekskludert fra antall kolonnemismatch.",
+    "renamed": "{n} PK-indeks(er) anvendt under den gamle navneregelen (_PKEY) eksisterer i DB under det nye navnet (PK_) — normalt",
+    "superseded": "{n} eldre forespørsel(er) ble ekskludert fordi en senere forespørsel gjenskapte den samme tabellen (DROP … CASCADE) — normalt",
+    "supersededItem": "Forespørsel {id} → erstattet av forespørsel {by}",
+    "sysCols": "{n} systemkolonne(r) lagt til automatisk ved DDL-generering er ikke i modellen per design og er ekskludert fra mismatch",
+    "groupOwn": "Prosjektprefiks {pfx} — kandidater som mangler fra modellen",
+    "groupOther": "Andre systemer {pfx}",
+    "basis": "Est. rader {rows} · siden {since}",
+    "guide": {
+      "title": "Neste trinn",
+      "ddlMissing": {
+        "s1": "I schema.pi → prosjektet → fysisk modell → DDL-generering, bruk igjen på denne tilkoblingen.",
+        "s2": "Når du er ferdig, bruk «Kjør igjen» nedenfor og bekreft at antallet er 0.",
+        "s3": "Hvis objekter fortsatt forsvinner etter gjenanvendelse, mistenk et manuelt slett eller tilbakerulling og sjekk tilkoblingskontoens aktivitet med din DBA."
+      },
+      "extraTables": {
+        "s1": "Dette prosjektprefiks-pakken = manglende modellkandidater – importer dem til modellen via schema.pi → Innstillinger → Reverse, eller bestem om de skal slettes hvis de er ubrukte tabeller.",
+        "s2": "Andre prefiks-grupper = andre systemer som deler denne DB — ikke handlingselementer for dette prosjektet.",
+        "s3": "Hvis målsjemaet ikke er public, endre «Skjema»-feltet ovenfor og kjør igjen."
+      },
+      "colMismatches": {
+        "s1": "Ikke i DB = bruk modellkolonnen på DB via schema.pi DDL-generering.",
+        "s2": "Ikke i modell = importer DB-kolonnen til modellen via schema.pi → Innstillinger → Reverse, eller bestem deg for å slette den hvis den er unødvendig.",
+        "s3": "Type/NULL avviker = juster til modellen (sannhetskilde); før du reduserer lengden eller bytter til NOT NULL, bekreft at eksisterende rader tilfredsstiller det."
+      },
+      "idxUsage": {
+        "s1": "Før fjerning, sjekk ① at statistikkvinduet dekker minst én forretningssyklus (f.eks. månedssluttbatch) — se «siden».",
+        "s2": "② Det er ikke en unik/PK-indeks (disse vises separat som «unikhetsbegrensning»).",
+        "s3": "③ EXPLAIN tabellens representative SQL i SQL Tuning og bekreft at denne indeksen ikke brukes.",
+        "s4": "Når alle tre er bekreftet, fjern indeksen fra modellen i schema.pi og bruk via DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Åpne schema.pi",
+      "rerun": "Kjør igjen",
+      "copy": "Kopier liste",
+      "copied": "Kopiert",
+      "sqlLab": "EXPLAIN i SQL Tuning"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Replikeringkontroll",
         "backup": "Sikkerhetskopikontroll",
         "sqlLab": "SQL-justering",
-        "drift": "Driftssammenligning",
+        "drift": "GAP-analyse",
         "connect": "Tilkoblinger",
         "schema": "schema.pi-monitor"
       },
@@ -986,7 +1032,11 @@
       "totalMs": "Totalt ms",
       "meanMs": "Gjennomsnittlig ms",
       "rows": "Rader",
-      "reset": " Statistikk tilbakestilt – vises som kumulativ"
+      "reset": " Statistikk tilbakestilt – vises som kumulativ",
+      "src": "Kilde",
+      "srcToggle": "Vis eller skjul kildedetaljer",
+      "openSqlLab": "Åpne i SQL Tuning",
+      "acct": "Konto"
     },
     "health": {
       "empty": "Ingen øyeblikksbilder ennå. Trykk «Samle nå» på «Samle»-fanen",
@@ -1017,6 +1067,46 @@
       "sessions": "Sesjonsaktivitet",
       "locks": "Låser",
       "none": "Ingen"
+    },
+    "src": {
+      "root": "For å finne kilden nøyaktig: (1) bruk en separat DB-konto for hvert program, batch og person (verktøy), og (2) sett application_name på hver tilkobling. Kontoen kommer fra pg_stat_statements og er sikker; app-/verktøykategorien er estimert fra aktivitetsprøver (application_name rapporteres av klienten selv, så den kan være tom eller endret, og korte spørringer som fullføres mellom prøver kan bli savnet)",
+      "cd": {
+        "PROGRAM": "Program",
+        "BATCH": "Batch",
+        "TOOL": "Verktøy (person)",
+        "PLATFORM": "Plattform intern",
+        "MONITOR": "Overvåking (oss)",
+        "UNKNOWN": "Ukjent"
+      },
+      "conf": {
+        "high": "Høy sikkerhet",
+        "mid": "Middels sikkerhet",
+        "low": "Lav sikkerhet",
+        "acct": "Kun konto",
+        "ver": "Versjonsgrense"
+      },
+      "fix": {
+        "TOOL": "Ser ut som en person som spør produksjons-DB direkte med et DB-verktøy (DBeaver osv.). Pek dem til en skrivebeskyttet replika eller analyse-DB i stedet, og begrens kjøretiden på menneskelige kontoer, f.eks. ALTER ROLE human_user SET statement_timeout = '30s'. Bruk en separat skrivebeskyttet rolle, og kjør masseekstraksjoner i lavtrafikkperioder",
+        "BATCH": "Ser ut som en batch eller planlagt jobb. Spre kjøretider vekk fra forretningstopper og reduser arbeidet per commit. Sjekk indekser og statistikk (ANALYZE) på måltabellene, og del lange transaksjoner. Å sette jobbnavnet i application_name gjør neste klassifisering mer presis",
+        "PROGRAM": "Ser ut som en spørring kjørt av en applikasjon. Sjekk planen i SQL Tuning. Mange kall med kort gjennomsnitt peker på gjentatte kall (N+1) eller caching; et langt gjennomsnitt peker først på indekser eller join-rekkefølge. Sett tjenestenavnet i tilkoblingspoolens application_name",
+        "PLATFORM": "Ser ut som DB- eller plattforminternt arbeid som autovacuum eller replikering. Vanligvis er ingen handling nødvendig. Hvis det forblir på toppen, gjennomgå autovacuum-terskler og maintenance_work_mem",
+        "MONITOR": "Ser ut som denne tjenestens egne statistikkspørringer (schema.pi-lenke). Ingen handling nødvendig. Hvis det vises for ofte, senk avstemningsfrekvensen",
+        "UNKNOWN": "Det er ingen anelse om kilden. Sett application_name på hver tilkobling og del kontoer etter formål; det vil bli klassifisert fra neste prøver"
+      },
+      "detail": {
+        "app": "Appnavn",
+        "addr": "Klientadresse (maskert)",
+        "samples": "Prøver",
+        "active": "Aktive prøver",
+        "period": "Observert",
+        "none": "(tom)"
+      },
+      "noSample": "Ingen prøver ennå — kjørende sesjoner samples når du ser på overvåkingspanelet eller fanen Aktivitet og låser. Foreløpig er det klassifisert kun fra kontonavnet",
+      "verOff": "Denne DB er eldre enn PostgreSQL 14, så kjørende sesjoner har ingen spørrings-ID. Kun kontoen (sikker) vises",
+      "privOff": "Lenkekontoen kan ikke se andre kontoers sesjonsdetaljer, så ingen prøver samles inn. Be en DB-administrator om å kjøre GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "lenkekonto",
+      "qidOff": "Sesjonsdetaljer er synlige, men spørrings-ID er tom (compute_query_id er av). Sjekk med SHOW compute_query_id; kjør deretter ALTER SYSTEM SET compute_query_id = 'auto'; og last inn på nytt (SELECT pg_reload_conf();)",
+      "openHint": "Åpner SQL Tuning med spørringen fylt inn. Erstatt plassholdere som $1 med reelle verdier før du ser planen"
     }
   },
   "pipeline": {
@@ -1213,7 +1303,7 @@
     "label": "Funksjoner",
     "groups": {
       "monitor": "Overvåking",
-      "drift": "Konsistens",
+      "drift": "GAP-analyse",
       "lake": "Lake",
       "admin": "Admin"
     },
@@ -1221,7 +1311,7 @@
     "sqlLab": "SQL-justering",
     "perf": "Ytelse",
     "monitor": "Overvåking",
-    "drift": "Drift",
+    "drift": "GAP-analyse",
     "migration": "Migrering",
     "pipeline": "Pipeline",
     "analytics": "Analyse",

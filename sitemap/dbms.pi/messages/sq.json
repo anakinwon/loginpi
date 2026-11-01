@@ -103,7 +103,7 @@
       "keys": {
         "links": "Lidhjet e mia",
         "perf": "Fotografi të performancës",
-        "drift": "Ekzekutime të driftit",
+        "drift": "Analiza GAP",
         "mig": "Plane migrimi",
         "pipe": "Pipelines",
         "lake": "Grupe të dhënash të liqenit"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Modeli ↔ DB Drift",
+    "title": "Analiza GAP — Modeli↔DB",
     "intro": "Krahasoni modelin e dizajnit schema.pi dhe historikun e aplikimit DDL me katalogun e drejtpërdrejtë të DB për të gjetur driftin, dhe matni nëse indekset e dizajnuara përdoren në të vërtetë. Të dhënat e rreshtave të klientit nuk lexohen ose ruhen kurrë.",
     "needLink": "Zgjidhni një lidhje schema.pi më lart së pari. Nëse nuk keni asnjë, regjistroni një token në menunë 'Lidhje'.",
     "needConn": "Zgjidhni lidhjen e DB për të krahasuar më lart.",
     "project": "Projekti",
     "projectPick": "Zgjidh një projekt",
     "loading": "Duke u ngarkuar…",
-    "run": "Ekzekuto zbulimin e driftit",
+    "run": "Ekzekuto Analizën GAP",
     "running": "Duke krahasuar…",
     "readOnly": "Ekzekutohen vetëm katalogu vetëm për lexim dhe pyetjet e statistikave.",
     "applyInSchema": "Aplikoni rregullimet (redaktimet e modelit, gjenerimin dhe ekzekutimin e DDL) në schema.pi, burimin e së vërtetës.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Indekset e dizajnuara që mungojnë në DB",
       "extraIndexes": "Indekset që nuk janë në model",
       "ddlMissing": "Objekte të zhdukura pas aplikimit",
-      "unusedIndexes": "Indekset e dizajnuara të papërdorura"
+      "unusedIndexes": "Indekset Kandidate të Papërdorura"
     },
     "sec": {
       "ddlMissing": "DDL i aplikuar por mungon në DB",
       "missingTables": "Tabela në model por mungojnë në DB",
       "extraTables": "Tabela në DB por jo në model",
-      "colMismatches": "Moskorrespondime të tipit të kolonës / NULL",
+      "colMismatches": "Moskorrespondime Kolonash (Mungesë·Tipi·NULL)",
       "missingIndexes": "Indekset e dizajnuara që mungojnë në DB",
       "extraIndexes": "Indekset vetëm në DB (duke përjashtuar PK)",
       "idxUsage": "Efektiviteti i indeksit të dizajnuar"
     },
     "hint": {
-      "ddlMissing": "schema.pi i regjistroi këto objekte si të aplikuara, por ato janë zhdukur — dyshoni për një fshirje manuale ose kthim prapa.",
-      "extraTables": "Këto mund t'u përkasin projekteve të tjera ose tabelave të sistemit në këtë lidhje.",
-      "idxUsage": "Zero skanime që nga rivendosja e fundit e statistikave do të thotë e papërdorur. Kontrolloni dritaren e statistikave para se të fshini."
+      "ddlMissing": "Shfaqen vetëm objektet që mungojnë nga DB bazuar në standardin më të fundit të aplikuar. Kërkesat e mëparshme që rikrijuan të njëjtën tabelë më vonë dhe konvencionet e vjetra të emërtimit (_PKEY) janë normale dhe palosen më poshtë.",
+      "extraTables": "Bazuar në skemën {schema}. Të grupuara sipas prefiksit, vetëm grupi i prefiksit të këtij projekti janë kandidatë për lëshim modeli.",
+      "idxUsage": "Gjykimi = Në Përdorim / Për Unicitet / Pa Të Dhëna / Nën Vëzhgim (Statistikat filluan·Krijuar më pak se 7 ditë) / Kandidat për Papërdorur. Vetëm kandidatët për indekse të papërdorura merren në konsideratë për fshirje."
     },
     "kind": {
       "MISSING": "mungon në DB",
@@ -223,12 +223,16 @@
       "idx": "Indeksi",
       "scans": "Skanime",
       "size": "Madhësia",
-      "status": "Vendimi"
+      "status": "Vendimi",
+      "basis": "Baza"
     },
     "usage": {
       "USED": "Në përdorim",
-      "UNUSED": "Indeks i dizajnuar i papërdorur",
-      "NO_STATS": "Pa statistika"
+      "NO_STATS": "Pa statistika",
+      "CONSTRAINT": "Kufizim uniciteti (mbajeni)",
+      "NO_DATA": "Pa të dhëna ose statistika të mbledhura — nuk mund të gjykohet",
+      "OBSERVING": "Nën vëzhgim (më pak se 7 ditë)",
+      "UNUSED_CAND": "Kandidat i papërdorur"
     },
     "errors": {
       "NOT_IMPLEMENTED": "Lidhja schema.pi nuk është gati ende. Ju lutemi provoni përsëri së shpejti.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Lidhje e papërkrahur (vetëm lidhje serveri PostgreSQL për momentin).",
       "TIMEOUT": "Kërkesa skadoi. Ju lutemi provoni përsëri së shpejti.",
       "RATE": "Shumë kërkesa. Ju lutemi provoni përsëri pas një minute."
+    },
+    "schema": "Skema",
+    "schemaHint": "Krahasohen vetëm tabelat e rregullta dhe të ndara në këtë skemë (pamjet përjashtohen). Publiku i paracaktuar — skemat e brendshme të Supabase (auth, storage, …) lihen jashtë.",
+    "truncated": "{names} arritën kufirin e {max} rreshtave dhe u shkurtuan — disa rezultate \"nuk janë në DB\" / \"nuk janë në model\" mund të jenë të rreme. Ngushtoni skemën dhe ekzekutoni përsëri.",
+    "colUnchecked": "Për shkak se kërkesa e kolonës u shkurtua, {n} rezultate të kolonave që mungojnë/shtesë trajtohen si të paverifikueshme dhe përjashtohen nga numri i moskorrespondimeve të kolonave.",
+    "renamed": "{n} indeks(e) PK të aplikuar sipas rregullit të vjetër të emërtimit (_PKEY) ekzistojnë në DB me emrin e ri (PK_) — normale",
+    "superseded": "{n} kërkesa më të vjetra u përjashtuan sepse një kërkesë e mëvonshme rikrijoi të njëjtën tabelë (DROP … CASCADE) — normale",
+    "supersededItem": "Kërkesa {id} → zëvendësuar nga kërkesa {by}",
+    "sysCols": "{n} kolonë(a) sistemi të shtuara automatikisht gjatë gjenerimit të DDL nuk janë në model sipas dizajnit dhe përjashtohen nga moskorrespondimet",
+    "groupOwn": "Prefiksi i projektit {pfx} — kandidatë që mungojnë nga modeli",
+    "groupOther": "Sistem tjetër {pfx}",
+    "basis": "Rreshta të vlerësuar {rows} · që nga {since}",
+    "guide": {
+      "title": "Hapat e ardhshëm",
+      "ddlMissing": {
+        "s1": "Në schema.pi → projekti → modeli fizik → gjenerimi i DDL, aplikoni përsëri në këtë lidhje.",
+        "s2": "Kur të keni mbaruar, përdorni \"Ekzekuto përsëri\" më poshtë dhe konfirmoni që numri është 0.",
+        "s3": "Nëse objektet ende zhduken pas riaplikimit, dyshoni për një fshirje manuale ose kthim prapa dhe kontrolloni aktivitetin e llogarisë së lidhjes me DBA-në tuaj."
+      },
+      "extraTables": {
+        "s1": "Ky grup prefiksesh projekti = kandidatë modelesh të munguar — importojini në model përmes schema.pi → Cilësimet → Reverse, ose vendosni nëse do t'i fshini nëse janë tabela të papërdorura.",
+        "s2": "Grupe të tjera prefiksash = sisteme të tjera që ndajnë këtë DB — nuk janë artikuj veprimi për këtë projekt.",
+        "s3": "Nëse skema e synuar nuk është publike, ndryshoni fushën \"Skema\" më lart dhe ekzekutoni përsëri."
+      },
+      "colMismatches": {
+        "s1": "Nuk është në DB = aplikoni kolonën e modelit në DB përmes gjenerimit të DDL të schema.pi.",
+        "s2": "Nuk është në model = importoni kolonën e DB-së në model përmes schema.pi → Cilësimet → Reverse, ose vendosni ta fshini nëse është e panevojshme.",
+        "s3": "Tipi/NULL ndryshon = rreshtojeni me modelin (burimi i së vërtetës); para se të zvogëloni gjatësinë ose të kaloni në NOT NULL, konfirmoni që rreshtat ekzistues e plotësojnë atë."
+      },
+      "idxUsage": {
+        "s1": "Para se të hiqni, kontrolloni ① që dritarja e statistikave mbulon të paktën një cikël biznesi (p.sh. grupi i fundit të muajit) — shihni \"që nga\".",
+        "s2": "② Nuk është një indeks unik/PK (ato shfaqen veçmas si \"kufizim uniciteti\").",
+        "s3": "③ EXPLAIN SQL-in përfaqësues të tabelës në SQL Tuning dhe konfirmoni që ky indeks nuk përdoret.",
+        "s4": "Pasi të konfirmohen të treja, hiqni indeksin nga modeli në schema.pi dhe aplikoni përmes DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Hap schema.pi",
+      "rerun": "Ekzekuto përsëri",
+      "copy": "Kopjo listën",
+      "copied": "Kopjuar",
+      "sqlLab": "EXPLAIN në SQL Tuning"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Kontrolli i replikimit",
         "backup": "Kontrolli i backup-it",
         "sqlLab": "SQL tuning",
-        "drift": "Krahasimi i drift-it",
+        "drift": "Analiza GAP",
         "connect": "Lidhjet",
         "schema": "schema.pi monitor"
       },
@@ -812,6 +858,7 @@
   },
   "ops": {
     "title": "Siguria e Operacioneve të DB",
+    "intro": "Diagnostikon vetëm në lexim parametrat, privilegjet e llogarisë, kopjimin rezervë dhe statusin e replikimit të lidhjes së lidhur PostgreSQL. Nuk ndryshon asnjë cilësim dhe ruan vetëm përmbledhjet e vendimeve, jo të dhënat e rreshtave të klientit DB",
     "loading": "Po ngarkohet…",
     "pickFirst": "Zgjidhni një lidhje dhe lidhje më lart së pari",
     "run": "Ekzekuto diagnozën",
@@ -944,6 +991,7 @@
   },
   "perf": {
     "title": "Performanca",
+    "intro": "Mbledh statistikat e pyetjeve, tabelave dhe indekseve nga një lidhje e lidhur PostgreSQL për të shfaqur pyetjet e ngadalta, gjendjen e tabelave/indekseve dhe tendencat e madhësisë. Ruhen vetëm shifrat statistikore dhe jo të dhënat e rreshtave të klientit DB",
     "loading": "Po ngarkohet…",
     "pickFirst": "Zgjidhni një lidhje dhe lidhje më lart së pari",
     "pager": "Faqosja",
@@ -989,7 +1037,11 @@
       "totalMs": "Total ms",
       "meanMs": "Mesatarja ms",
       "rows": "Rreshta",
-      "reset": "Rivendosja e statistikave u zbulua — shfaqet si kumulative"
+      "reset": "Rivendosja e statistikave u zbulua — shfaqet si kumulative",
+      "src": "Burimi",
+      "srcToggle": "Shfaq ose fsheh detajet e burimit",
+      "openSqlLab": "Hap në SQL Tuning",
+      "acct": "Llogaria"
     },
     "health": {
       "empty": "Nuk ka ende pamje. Shtypni Mblidh tani në skedën Mblidh",
@@ -1020,6 +1072,46 @@
       "sessions": "Aktiviteti i sesionit",
       "locks": "Bllokime",
       "none": "Asnjë"
+    },
+    "src": {
+      "root": "Për të përcaktuar burimin saktësisht: (1) përdorni një llogari të veçantë DB për çdo program, grup dhe person (mjet), dhe (2) vendosni application_name në çdo lidhje. Llogaria vjen nga pg_stat_statements dhe është e sigurt; kategoria e aplikacionit/mjetit vlerësohet nga mostrat e aktivitetit (application_name raportohet vetë nga klienti, kështu që mund të jetë bosh ose të ndryshohet, dhe kërkesat e shkurtra që përfundojnë midis mostrave mund të humbasin)",
+      "cd": {
+        "PROGRAM": "Programi",
+        "BATCH": "Grupi",
+        "TOOL": "Mjet (person)",
+        "PLATFORM": "Platformë e brendshme",
+        "MONITOR": "Monitorim (ne)",
+        "UNKNOWN": "E panjohur"
+      },
+      "conf": {
+        "high": "Besueshmëri e lartë",
+        "mid": "Besueshmëri mesatare",
+        "low": "Besueshmëri e ulët",
+        "acct": "Vetëm llogaria",
+        "ver": "Kufiri i versionit"
+      },
+      "fix": {
+        "TOOL": "Duket si një person që kërkon DB-në e prodhimit direkt me një mjet DB (DBeaver etj.). Drejtojini ata në një replikë vetëm për lexim ose DB analitike, dhe vendosni një kufi kohor për llogaritë njerëzore, p.sh. ALTER ROLE human_user SET statement_timeout = '30s'. Përdorni një rol të veçantë vetëm për lexim, dhe kryeni nxjerrje masive në orët jashtë pikut",
+        "BATCH": "Duket si një grup ose punë e planifikuar. Shpërndani kohët e ekzekutimit larg pikut të biznesit dhe zvogëloni punën për çdo angazhim. Kontrolloni indekset dhe statistikat (ANALYZE) në tabelat e synuara, dhe ndani transaksionet e gjata. Vendosja e emrit të punës në application_name e bën klasifikimin tjetër më të saktë",
+        "PROGRAM": "Duket si një kërkesë e ekzekutuar nga një aplikacion. Kontrolloni planin në SQL Tuning. Shumë thirrje me një mesatare të shkurtër tregojnë thirrje të përsëritura (N+1) ose caching; një mesatare e gjatë tregon indekse ose rendin e bashkimit së pari. Vendosni emrin e shërbimit në application_name të grupit tuaj të lidhjeve",
+        "PLATFORM": "Duket si punë e brendshme e DB ose platformës si autovacuum ose replikimi. Zakonisht nuk nevojitet asnjë veprim. Nëse qëndron në krye, rishikoni pragjet e autovacuum dhe maintenance_work_mem",
+        "MONITOR": "Duket si kërkesat e statistikave të këtij shërbimi (lidhja schema.pi). Nuk nevojitet asnjë veprim. Nëse shfaqet shumë shpesh, ulni frekuencën e votimit",
+        "UNKNOWN": "Nuk ka asnjë të dhënë për burimin. Vendosni application_name në çdo lidhje dhe ndani llogaritë sipas qëllimit; do të klasifikohet nga mostrat e ardhshme"
+      },
+      "detail": {
+        "app": "Emri i aplikacionit",
+        "addr": "Adresa e klientit (e maskuar)",
+        "samples": "Mostra",
+        "active": "Mostra aktive",
+        "period": "Vëzhguar",
+        "none": "(bosh)"
+      },
+      "noSample": "Ende nuk ka mostra — sesionet në ekzekutim merren mostra kur shikoni bordin e monitorimit ose skedën Aktivitet & bllokime. Për momentin klasifikohet vetëm nga emri i llogarisë",
+      "verOff": "Kjo DB është më e vjetër se PostgreSQL 14, kështu që sesionet në ekzekutim nuk kanë ID kërkese. Shfaqet vetëm llogaria (e sigurt)",
+      "privOff": "Llogaria e lidhjes nuk mund të shohë detajet e sesionit të llogarive të tjera, kështu që nuk mblidhen mostra. Kërkoni një administrator DB të ekzekutojë GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "llogaria e lidhjes",
+      "qidOff": "Detajet e sesionit janë të dukshme por ID e kërkesës është bosh (compute_query_id është i fikur). Kontrolloni me SHOW compute_query_id; pastaj ekzekutoni ALTER SYSTEM SET compute_query_id = 'auto'; dhe ringarkoni (SELECT pg_reload_conf();)",
+      "openHint": "Hap SQL Tuning me kërkesën e plotësuar. Zëvendësoni vendmbajtësit si $1 me vlera reale para se të shikoni planin"
     }
   },
   "pipeline": {
@@ -1216,7 +1308,7 @@
     "label": "Funksionet",
     "groups": {
       "monitor": "Monitorimi",
-      "drift": "Konsistenca",
+      "drift": "Analiza GAP",
       "lake": "Liqeni",
       "admin": "Admin"
     },
@@ -1224,7 +1316,7 @@
     "sqlLab": "Optimizim SQL",
     "perf": "Performanca",
     "monitor": "Monitorimi",
-    "drift": "Divergjenca",
+    "drift": "Analiza GAP",
     "migration": "Migrimi",
     "pipeline": "Pipeline",
     "analytics": "Analiza",

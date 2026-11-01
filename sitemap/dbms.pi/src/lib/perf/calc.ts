@@ -11,7 +11,15 @@ export const HEALTH = {
 }
 const DAY_MS = 86_400_000
 
-export type QryStat = { qryId: string; qryTxt: string | null; calls: number; totalMs: number; rows: number }
+// usrNm = pg_stat_statements 계정(sql/032 이전 수집 행은 null) — 같은 queryid 가 계정별로 갈라진다
+export type QryStat = {
+  qryId: string
+  usrNm?: string | null
+  qryTxt: string | null
+  calls: number
+  totalMs: number
+  rows: number
+}
 export type QryDelta = QryStat & { meanMs: number; reset: boolean }
 
 // 상수 마스킹(방어) — pg_stat_statements 는 이미 $1 로 정규화하지만, 문자열·숫자 상수가 남은 경우 대비
@@ -21,45 +29,98 @@ export function maskLiterals(sql: string): string {
     .replace(/(^|[^\w$."])-?\d+(?:\.\d+)?(?:e[+-]?\d+)?\b/gi, '$1?')
 }
 
+// 행 키 = 쿼리ID + 계정(화면 React key 도 이것)
+export const qryKey = (q: Pick<QryStat, 'qryId' | 'usrNm'>) =>
+  `${q.qryId}|${q.usrNm ?? ''}`
+
 // 이전 수집 대비 증감. 통계 리셋(reset 시각 변경) 또는 호출 수 감소 = 누적 역전 → 현재 누적치를 증감으로 본다
-export function qryDelta(cur: QryStat[], prev: QryStat[] | null, resetChanged: boolean): QryDelta[] {
-  const prevMap = new Map((prev ?? []).map((p) => [p.qryId, p]))
+//  짝 = (qryId, usrNm). 이전 행 계정이 null(sql/032 이전 수집)이면 qryId 만으로 짝짓는다(배포 직후 1회 이행 폴백)
+export function qryDelta(
+  cur: QryStat[],
+  prev: QryStat[] | null,
+  resetChanged: boolean,
+): QryDelta[] {
+  const prevMap = new Map<string, QryStat>()
+  const legacy = new Map<string, QryStat>()
+  for (const p of prev ?? [])
+    p.usrNm == null ? legacy.set(p.qryId, p) : prevMap.set(qryKey(p), p)
   return cur.map((c) => {
-    const p = prev && !resetChanged ? prevMap.get(c.qryId) : undefined
+    const p =
+      prev && !resetChanged
+        ? (prevMap.get(qryKey(c)) ?? legacy.get(c.qryId))
+        : undefined
     const reset = !!p && (c.calls < p.calls || c.totalMs < p.totalMs)
     const base = p && !reset ? p : null
     const calls = c.calls - (base?.calls ?? 0)
     const totalMs = c.totalMs - (base?.totalMs ?? 0)
     const rows = c.rows - (base?.rows ?? 0)
-    return { ...c, calls, totalMs, rows, meanMs: calls > 0 ? totalMs / calls : 0, reset: reset || resetChanged }
+    return {
+      ...c,
+      calls,
+      totalMs,
+      rows,
+      meanMs: calls > 0 ? totalMs / calls : 0,
+      reset: reset || resetChanged,
+    }
   })
 }
 
-export type TblStat = { tblNm: string; fullScan: number; idxScan: number; liveTup: number; deadTup: number; szByte: number | null }
-export type IdxStat = { idxNm: string; tblNm: string; idxScan: number; szByte: number | null }
+export type TblStat = {
+  tblNm: string
+  fullScan: number
+  idxScan: number
+  liveTup: number
+  deadTup: number
+  szByte: number | null
+}
+export type IdxStat = {
+  idxNm: string
+  tblNm: string
+  idxScan: number
+  szByte: number | null
+}
 
 export function health(tbls: TblStat[], idxs: IdxStat[]) {
-  const unusedIdx = idxs.filter((i) => i.idxScan === 0).sort((a, b) => (b.szByte ?? 0) - (a.szByte ?? 0))
+  const unusedIdx = idxs
+    .filter((i) => i.idxScan === 0)
+    .sort((a, b) => (b.szByte ?? 0) - (a.szByte ?? 0))
   const fullScan = tbls
-    .map((t) => ({ ...t, ratio: t.fullScan / Math.max(1, t.fullScan + t.idxScan) }))
-    .filter((t) => t.liveTup >= HEALTH.minLiveTup && t.fullScan >= HEALTH.minFullScan && t.ratio >= HEALTH.fullScanRatio)
+    .map((t) => ({
+      ...t,
+      ratio: t.fullScan / Math.max(1, t.fullScan + t.idxScan),
+    }))
+    .filter(
+      (t) =>
+        t.liveTup >= HEALTH.minLiveTup &&
+        t.fullScan >= HEALTH.minFullScan &&
+        t.ratio >= HEALTH.fullScanRatio,
+    )
     .sort((a, b) => b.fullScan - a.fullScan)
   const dead = tbls
-    .map((t) => ({ ...t, ratio: t.deadTup / Math.max(1, t.liveTup + t.deadTup) }))
-    .filter((t) => t.deadTup >= HEALTH.minDeadTup && t.ratio >= HEALTH.deadRatio)
+    .map((t) => ({
+      ...t,
+      ratio: t.deadTup / Math.max(1, t.liveTup + t.deadTup),
+    }))
+    .filter(
+      (t) => t.deadTup >= HEALTH.minDeadTup && t.ratio >= HEALTH.deadRatio,
+    )
     .sort((a, b) => b.ratio - a.ratio)
   return { unusedIdx, fullScan, dead }
 }
 
 // 최소제곱 직선 → 하루 증가 바이트·임계 도달 예상일(증가 없음·점 2개 미만 = null)
-export function forecast(points: { t: number; bytes: number }[], limitByte: number) {
+export function forecast(
+  points: { t: number; bytes: number }[],
+  limitByte: number,
+) {
   if (points.length < 2) return { perDay: null, daysLeft: null }
   const n = points.length
   const mx = points.reduce((s, p) => s + p.t, 0) / n
   const my = points.reduce((s, p) => s + p.bytes, 0) / n
   const den = points.reduce((s, p) => s + (p.t - mx) ** 2, 0)
   if (den === 0) return { perDay: null, daysLeft: null }
-  const slope = points.reduce((s, p) => s + (p.t - mx) * (p.bytes - my), 0) / den // 바이트/ms
+  const slope =
+    points.reduce((s, p) => s + (p.t - mx) * (p.bytes - my), 0) / den // 바이트/ms
   const perDay = slope * DAY_MS
   const last = points.reduce((a, b) => (b.t > a.t ? b : a))
   if (perDay <= 0) return { perDay, daysLeft: null }

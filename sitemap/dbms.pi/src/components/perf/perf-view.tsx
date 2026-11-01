@@ -2,10 +2,14 @@
 
 // 성능 관측 화면(PRD 12 §3) — 로그인 게이트 + 연결·접속 선택 + 탭 5개(수집·느린 쿼리·건강·용량·활동/락). 열린 탭만 조회(지연 조회), 목록은 페이지 단위
 //  모든 호출 piFetch(Pi Browser X-Pi-Token). 연결 클라이언트 오류는 code 로 번역(perf.err → link2.errors → apiErrors)
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
+import { Link } from '@/i18n/navigation'
+import { qryKey } from '@/lib/perf/calc'
+import { SQL_LAB_SEED } from '@/lib/sql-lab/seed'
+import type { QidCause, SrcJudge } from '@/lib/perf/source'
 import { readApi, type ApiErrorBody } from '@/lib/client-api'
 import { LoginGate } from '@/components/login-gate'
 import { LinkPicker, type LinkSelection } from '@/components/link/link-picker'
@@ -224,12 +228,14 @@ function CollectTab({ sel, onDone }: { sel: Sel; onDone: () => void }) {
 
 type TopRow = {
   qryId: string
+  usrNm?: string | null
   qryTxt: string | null
   calls: number
   totalMs: number
   meanMs: number
   rows: number
   reset: boolean
+  src?: SrcJudge
 }
 type TopRes = {
   clctDtm: string | null
@@ -239,6 +245,20 @@ type TopRes = {
   total: number
   page: number
   pageSize: number
+  qid?: {
+    cause: QidCause | null
+    verNum: number | null
+    linkUsr?: string | null
+  } | null
+}
+
+// 출처 배지 색 — 확신 높음만 진하게(추정 값을 확정처럼 보이지 않게)
+const SRC_CONF_CLS: Record<SrcJudge['conf'], string> = {
+  high: 'bg-primary/20 text-foreground',
+  mid: 'bg-surface-raised text-foreground',
+  low: 'bg-surface-raised text-muted-foreground',
+  acct: 'bg-surface-raised text-muted-foreground',
+  ver: 'bg-surface-raised text-muted-foreground',
 }
 
 // 3-2 느린 쿼리 Top-N — 최근 2회 수집 증감
@@ -246,6 +266,7 @@ function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
   const t = useTranslations('perf.top')
   const [page, setPage] = useState(1)
   const [sort, setSort] = useState<'total' | 'mean' | 'calls'>('total')
+  const [open, setOpen] = useState<string | null>(null) // 출처 상세를 펼친 행 키
   const s = useGet<TopRes>(
     `/api/perf/top?${qs(sel, `&page=${page}&sort=${sort}&r=${rev}`)}`,
   )
@@ -282,11 +303,16 @@ function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
               : t('first', { dtm: fmtDtm(d.clctDtm) })}
           </p>
           {!d.pgss && <PgssGuide />}
+          <SrcNotice
+            cause={d.qid?.cause ?? null}
+            linkUsr={d.qid?.linkUsr ?? null}
+          />
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr>
                   <th className={TH}>{t('query')}</th>
+                  <th className={TH}>{t('src')}</th>
                   <th className={`${TH} text-right`}>{t('calls')}</th>
                   <th className={`${TH} text-right`}>{t('totalMs')}</th>
                   <th className={`${TH} text-right`}>{t('meanMs')}</th>
@@ -295,22 +321,42 @@ function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
               </thead>
               <tbody>
                 {d.rows.map((r) => (
-                  <tr key={r.qryId} className="border-t border-white/5">
-                    <td className={`${TD} max-w-md`}>
-                      <code className="line-clamp-3 text-xs break-all">
-                        {r.qryTxt ?? r.qryId}
-                      </code>
-                      {r.reset && (
-                        <span className="text-muted-foreground text-xs">
-                          {t('reset')}
-                        </span>
-                      )}
-                    </td>
-                    <td className={`${TD} text-right`}>{fmtNum(r.calls)}</td>
-                    <td className={`${TD} text-right`}>{fmtNum(r.totalMs)}</td>
-                    <td className={`${TD} text-right`}>{fmtNum(r.meanMs)}</td>
-                    <td className={`${TD} text-right`}>{fmtNum(r.rows)}</td>
-                  </tr>
+                  <Fragment key={qryKey(r)}>
+                    <tr className="border-t border-white/5">
+                      <td className={`${TD} max-w-md`}>
+                        <code className="line-clamp-3 text-xs break-all">
+                          {r.qryTxt ?? r.qryId}
+                        </code>
+                        {r.reset && (
+                          <span className="text-muted-foreground text-xs">
+                            {t('reset')}
+                          </span>
+                        )}
+                      </td>
+                      <td className={TD}>
+                        <SrcBadge
+                          r={r}
+                          open={open === qryKey(r)}
+                          onToggle={() =>
+                            setOpen((o) => (o === qryKey(r) ? null : qryKey(r)))
+                          }
+                        />
+                      </td>
+                      <td className={`${TD} text-right`}>{fmtNum(r.calls)}</td>
+                      <td className={`${TD} text-right`}>
+                        {fmtNum(r.totalMs)}
+                      </td>
+                      <td className={`${TD} text-right`}>{fmtNum(r.meanMs)}</td>
+                      <td className={`${TD} text-right`}>{fmtNum(r.rows)}</td>
+                    </tr>
+                    {open === qryKey(r) && (
+                      <tr>
+                        <td colSpan={6} className="px-2 pb-3">
+                          <SrcDetail r={r} sel={sel} />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -323,6 +369,135 @@ function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
           />
         </>
       )}
+    </div>
+  )
+}
+
+// 화면 첫 줄 — 출처를 정확히 가리는 근본 대책 + 계정 확정·앱 추정 한계, 표본이 안 쌓이는 원인(버전·권한·설정) 안내
+const QID_MSG = { ver: 'verOff', priv: 'privOff', off: 'qidOff' } as const
+function SrcNotice({
+  cause,
+  linkUsr,
+}: {
+  cause: QidCause | null
+  linkUsr: string | null
+}) {
+  const t = useTranslations('perf.src')
+  const why = cause && cause !== 'ok' ? QID_MSG[cause] : null
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="bg-surface-raised rounded-xl p-3 text-xs break-keep">
+        {t('root')}
+      </p>
+      {why && (
+        <p
+          className="bg-surface-raised text-muted-foreground rounded-xl p-3 text-xs break-keep"
+          role="note"
+        >
+          {/* 계정명을 모르면(schema.pi 구버전) 바꿔 넣을 자리임을 <연결 계정> 꼴로 보인다 */}
+          {t(why, { user: linkUsr || `<${t('linkUsr')}>` })}
+        </p>
+      )}
+    </div>
+  )
+}
+
+// 출처 배지(분류 + 확신도) — 누르면 아래 행에 상세. 계정은 확정값이라 별도 줄
+function SrcBadge({
+  r,
+  open,
+  onToggle,
+}: {
+  r: TopRow
+  open: boolean
+  onToggle: () => void
+}) {
+  const t = useTranslations('perf')
+  const src = r.src
+  if (!src) return <span className="text-muted-foreground text-xs">-</span>
+  const label = `${t(`src.cd.${src.cd}`)} · ${t(`src.conf.${src.conf}`)}`
+  return (
+    <button
+      type="button"
+      className="flex min-h-9 flex-col items-start gap-0.5 text-left"
+      aria-expanded={open}
+      aria-label={`${t('top.srcToggle')} — ${label}`}
+      onClick={onToggle}
+    >
+      <span
+        className={`rounded-md px-1.5 py-0.5 text-xs font-medium whitespace-nowrap ${SRC_CONF_CLS[src.conf]}`}
+      >
+        {label}
+        <span aria-hidden="true"> {open ? '▴' : '▾'}</span>
+      </span>
+      {r.usrNm && (
+        <span className="text-muted-foreground text-xs break-all">
+          {t('top.acct')} {r.usrNm}
+        </span>
+      )}
+    </button>
+  )
+}
+
+// 출처 상세 — 표본 상위 3(앱·마스킹 주소·표본 수·기간) + 출처별 해결 방안 + SQL 튜닝 딥링크
+function SrcDetail({ r, sel }: { r: TopRow; sel: Sel }) {
+  const t = useTranslations('perf')
+  const src = r.src
+  if (!src) return null
+  const href = `/sql-lab?link=${encodeURIComponent(sel.linkId)}&conn=${encodeURIComponent(sel.connId)}`
+  return (
+    <div className="bg-surface-raised flex flex-col gap-2 rounded-xl p-3 text-xs">
+      {src.top.length ? (
+        <ul className="flex flex-col gap-1">
+          {src.top.map((x, i) => (
+            <li key={i} className="break-all">
+              <span className="text-muted-foreground">
+                {t('src.detail.app')}
+              </span>{' '}
+              {x.appNm || t('src.detail.none')} ·{' '}
+              <span className="text-muted-foreground">
+                {t('src.detail.addr')}
+              </span>{' '}
+              {x.addr || t('src.detail.none')} ·{' '}
+              <span className="text-muted-foreground">
+                {t('src.detail.samples')}
+              </span>{' '}
+              {fmtNum(x.smpCnt)} ·{' '}
+              <span className="text-muted-foreground">
+                {t('src.detail.active')}
+              </span>{' '}
+              {fmtNum(x.actvCnt ?? 0)}
+              {x.fstDtm && (
+                <>
+                  {' · '}
+                  <span className="text-muted-foreground">
+                    {t('src.detail.period')}
+                  </span>{' '}
+                  {fmtDtm(x.fstDtm)} ~ {fmtDtm(x.lstDtm ?? null)}
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-muted-foreground break-keep">{t('src.noSample')}</p>
+      )}
+      <p className="break-keep">{t(`src.fix.${src.cd}`)}</p>
+      <div className="flex flex-wrap items-center gap-2">
+        <Link
+          className={BTN}
+          href={href}
+          onClick={() => {
+            // 쿼리문은 URL(서버 로그)에 싣지 않고 sessionStorage 로 1회 전달 — sql-lab 이 읽고 지움
+            if (r.qryTxt) sessionStorage.setItem(SQL_LAB_SEED, r.qryTxt)
+          }}
+        >
+          {t('top.openSqlLab')}
+        </Link>
+        <span className="text-muted-foreground break-keep">
+          {t('src.openHint')}
+        </span>
+      </div>
     </div>
   )
 }

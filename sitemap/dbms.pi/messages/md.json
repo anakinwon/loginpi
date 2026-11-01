@@ -103,7 +103,7 @@
       "keys": {
         "links": "Legăturile mele",
         "perf": "Instantanee de performanță",
-        "drift": "Rulări de drift",
+        "drift": "Analiză GAP",
         "mig": "Planuri de migrare",
         "pipe": "Pipeline-uri",
         "lake": "Seturi de date Lac"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB Drift",
+    "title": "Analiză GAP — Model↔DB",
     "intro": "Compară modelul de design schema.pi și istoricul aplicării DDL cu catalogul DB live pentru a găsi drift-ul și măsoară dacă indexurile proiectate sunt utilizate efectiv. Datele pe rânduri ale clienților nu sunt niciodată citite sau stocate.",
     "needLink": "Alege mai întâi o legătură schema.pi de mai sus. Dacă nu ai niciuna, înregistrează un token în meniul 'Legătură'.",
     "needConn": "Alege conexiunea DB de comparat de mai sus.",
     "project": "Proiect",
     "projectPick": "Selectează un proiect",
     "loading": "Se încarcă…",
-    "run": "Rulează detectarea drift-ului",
+    "run": "Execută Analiza GAP",
     "running": "Se compară…",
     "readOnly": "Se execută doar interogări de catalog și statistici în modul citire.",
     "applyInSchema": "Aplică remedierile (editări de model, generare și execuție DDL) în schema.pi, sursa de adevăr.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Indexuri proiectate lipsă în DB",
       "extraIndexes": "Indexuri care nu sunt în model",
       "ddlMissing": "Obiecte dispărute după aplicare",
-      "unusedIndexes": "Indexuri proiectate neutilizate"
+      "unusedIndexes": "Indecși candidați neutilizați"
     },
     "sec": {
       "ddlMissing": "DDL aplicat, dar lipsește în DB",
       "missingTables": "Tabele în model, dar lipsă în DB",
       "extraTables": "Tabele în DB, dar nu în model",
-      "colMismatches": "Nepotriviri de tip coloană / NULL",
+      "colMismatches": "Incompatibilități coloane (Lipsă·Tip·NULL)",
       "missingIndexes": "Indexuri proiectate lipsă în DB",
       "extraIndexes": "Indexuri doar în DB (excluzând PK)",
       "idxUsage": "Eficacitatea indexului proiectat"
     },
     "hint": {
-      "ddlMissing": "schema.pi a înregistrat aceste obiecte ca aplicate, dar au dispărut — suspectează o ștergere manuală sau o revenire.",
-      "extraTables": "Acestea pot aparține altor proiecte sau tabele de sistem pe această conexiune.",
-      "idxUsage": "Zero scanări de la ultima resetare a statisticilor înseamnă neutilizat. Verifică fereastra de statistici înainte de a șterge."
+      "ddlMissing": "Se afișează doar obiectele lipsă din DB pe baza celui mai recent standard aplicat. Solicitările anterioare care au recreat aceeași tabelă ulterior și convențiile vechi de denumire (_PKEY) sunt normale și sunt pliate mai jos.",
+      "extraTables": "Pe baza schemei {schema}. Grupat după prefix, doar grupul de prefix al acestui proiect sunt candidați pentru omisiune din model.",
+      "idxUsage": "Verdict = În uz / Pentru unicitate / Fără date / Sub observație (Statistici începute·Creat în mai puțin de 7 zile) / Candidat pentru neutilizat. Doar candidații pentru indecși neutilizați sunt considerați pentru ștergere."
     },
     "kind": {
       "MISSING": "lipsește în DB",
@@ -223,12 +223,16 @@
       "idx": "Index",
       "scans": "Scanări",
       "size": "Dimensiune",
-      "status": "Verdict"
+      "status": "Verdict",
+      "basis": "Bază"
     },
     "usage": {
       "USED": "În uz",
-      "UNUSED": "Index proiectat neutilizat",
-      "NO_STATS": "Fără statistici"
+      "NO_STATS": "Fără statistici",
+      "CONSTRAINT": "Constraint de unicitate (păstrează)",
+      "NO_DATA": "Fără date sau statistici necolectate — nu se poate judeca",
+      "OBSERVING": "Sub observație (mai puțin de 7 zile)",
+      "UNUSED_CAND": "Candidat neutilizat"
     },
     "errors": {
       "NOT_IMPLEMENTED": "Funcționalitatea de conectare schema.pi este în curs de pregătire. Te rugăm să încerci din nou în scurt timp.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Conexiune neacceptată (doar conexiuni la server PostgreSQL deocamdată).",
       "TIMEOUT": "Cererea a expirat. Te rugăm să încerci din nou în scurt timp.",
       "RATE": "Prea multe cereri. Te rugăm să încerci din nou într-un minut."
+    },
+    "schema": "Schemă",
+    "schemaHint": "Doar tabelele regulate și partiționate din această schemă sunt comparate (vizualizările sunt excluse). Public implicit — schemele interne Supabase (auth, storage, …) sunt omise.",
+    "truncated": "{names} au atins limita de {max} rânduri și au fost trunchiate — unele rezultate „nu în DB” / „nu în model” pot fi false. Restrângeți schema și rulați din nou.",
+    "colUnchecked": "Deoarece interogarea coloanei a fost trunchiată, {n} rezultate de coloane lipsă/suplimentare sunt tratate ca neverificabile și excluse din numărul de nepotriviri de coloane.",
+    "renamed": "{n} indecși PK aplicați conform vechii reguli de denumire (_PKEY) există în DB sub noul nume (PK_) — normal",
+    "superseded": "{n} solicitări mai vechi au fost excluse deoarece o solicitare ulterioară a recreat aceeași tabelă (DROP … CASCADE) — normal",
+    "supersededItem": "Solicitare {id} → înlocuită de solicitarea {by}",
+    "sysCols": "{n} coloane de sistem (adăugate automat la generarea DDL) nu sunt în model prin design și sunt excluse din nepotriviri",
+    "groupOwn": "Prefix proiect {pfx} — candidați lipsă din model",
+    "groupOther": "Alt sistem {pfx}",
+    "basis": "Est. rânduri {rows} · de la {since}",
+    "guide": {
+      "title": "Pașii următori",
+      "ddlMissing": {
+        "s1": "În schema.pi → proiectul → modelul fizic → generarea DDL, aplicați din nou la această conexiune.",
+        "s2": "Când ați terminat, utilizați „Rulează din nou” de mai jos și confirmați că numărul este 0.",
+        "s3": "Dacă obiectele dispar în continuare după re-aplicare, suspectați o ștergere manuală sau o revenire și verificați activitatea contului de conexiune cu DBA-ul dumneavoastră."
+      },
+      "extraTables": {
+        "s1": "Acest pachet de prefixe de proiect = candidați de model lipsă — importați-i în model prin schema.pi → Setări → Inversare, sau decideți dacă să-i ștergeți dacă sunt tabele neutilizate.",
+        "s2": "Alte grupuri de prefix = alte sisteme care partajează această DB — nu sunt elemente de acțiune pentru acest proiect.",
+        "s3": "Dacă schema țintă nu este publică, schimbați câmpul „Schemă” de mai sus și rulați din nou."
+      },
+      "colMismatches": {
+        "s1": "Nu în DB = aplicați coloana modelului la DB prin generarea DDL schema.pi.",
+        "s2": "Nu este în model = importați coloana DB în model prin schema.pi → Setări → Inversare, sau decideți să o ștergeți dacă este inutilă.",
+        "s3": "Tip/NULL diferă = aliniați la model (sursa de adevăr); înainte de a reduce lungimea sau de a trece la NOT NULL, confirmați că rândurile existente satisfac acest lucru."
+      },
+      "idxUsage": {
+        "s1": "Înainte de a elimina, verificați ① dacă fereastra de statistici acoperă cel puțin un ciclu de afaceri (ex. lot de sfârșit de lună) — vezi „de la”.",
+        "s2": "② Nu este un index unic/PK (acestea apar separat ca „constraint de unicitate”).",
+        "s3": "③ EXPLAIN SQL-ul reprezentativ al tabelei în SQL Tuning și confirmați că acest index nu este utilizat.",
+        "s4": "Odată ce toate trei sunt confirmate, eliminați indexul din model în schema.pi și aplicați prin DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Deschide schema.pi",
+      "rerun": "Rulează din nou",
+      "copy": "Copiază lista",
+      "copied": "Copiat",
+      "sqlLab": "EXPLAIN în SQL Tuning"
     }
   },
   "learn": {
@@ -684,7 +730,7 @@
         "repl": "Verificare replicare",
         "backup": "Verificare backup",
         "sqlLab": "Optimizare SQL",
-        "drift": "Comparare drift",
+        "drift": "Analiză GAP",
         "connect": "Conexiuni",
         "schema": "Monitor schema.pi"
       },
@@ -983,7 +1029,11 @@
       "totalMs": "Total ms",
       "meanMs": "Medie ms",
       "rows": "Rânduri",
-      "reset": "Resetare statistici detectată — afișat ca cumulativ"
+      "reset": "Resetare statistici detectată — afișat ca cumulativ",
+      "src": "Sursă",
+      "srcToggle": "Afișează sau ascunde detaliile sursei",
+      "openSqlLab": "Deschide în SQL Tuning",
+      "acct": "Cont"
     },
     "health": {
       "empty": "Nu există încă instantanee. Apăsați Colectează acum pe fila Colectează",
@@ -1013,6 +1063,45 @@
       "sessions": "Activitatea sesiunii",
       "locks": "Blocări",
       "none": "Niciunul"
+    },
+    "src": {
+      "root": "Pentru a identifica sursa cu precizie: (1) utilizați un cont DB separat pentru fiecare program, lot și persoană (instrument), și (2) setați application_name la fiecare conexiune. Contul provine de la pg_stat_statements și este cert; categoria aplicației/instrumentului este estimată din eșantioane de activitate (application_name este auto-raportat de client, deci poate fi gol sau modificat, iar interogările scurte care se termină între eșantioane pot fi ratate)",
+      "cd": {
+        "PROGRAM": "Program",
+        "BATCH": "Lot",
+        "TOOL": "Instrument (persoană)",
+        "PLATFORM": "Intern platformă",
+        "MONITOR": "Monitorizare (noi)",
+        "UNKNOWN": "Necunoscut"
+      },
+      "conf": {
+        "high": "Încredere mare",
+        "mid": "Încredere medie",
+        "low": "Încredere scăzută",
+        "acct": "Doar cont",
+        "ver": "Limită versiune"
+      },
+      "fix": {
+        "TOOL": "Pare a fi o persoană care interoghează direct DB-ul de producție cu un instrument DB (DBeaver etc.). Îndrumați-o către o replică doar în citire sau o bază de date de analiză, și limitați timpul de execuție pentru conturile umane, de ex. ALTER ROLE human_user SET statement_timeout = '30s'. Utilizați un rol separat doar în citire și rulați extrageri în masă în orele de vârf.",
+        "BATCH": "Pare a fi un lot sau o lucrare programată. Distribuiți timpii de execuție în afara orelor de vârf ale afacerii și reduceți volumul de muncă per commit. Verificați indecșii și statisticile (ANALYZE) pe tabelele țintă și împărțiți tranzacțiile lungi. Includerea numelui lucrării în application_name face următoarea clasificare mai precisă.",
+        "PROGRAM": "Pare a fi o interogare rulată de o aplicație. Verificați planul în SQL Tuning. Multe apeluri cu o medie scurtă indică apeluri repetate (N+1) sau cache; o medie lungă indică indecși sau ordinea de join în primul rând. Setați numele serviciului în application_name al pool-ului de conexiuni.",
+        "PLATFORM": "Pare a fi o lucrare internă a DB-ului sau a platformei, cum ar fi autovacuum sau replicare. De obicei nu este necesară nicio acțiune. Dacă rămâne în top, revizuiți pragurile autovacuum și maintenance_work_mem.",
+        "MONITOR": "Pare a fi interogările de statistici ale acestui serviciu (link schema.pi). Nu este necesară nicio acțiune. Dacă apare prea des, reduceți frecvența de interogare.",
+        "UNKNOWN": "Nu există niciun indiciu despre sursă. Setați application_name la fiecare conexiune și împărțiți conturile după scop; va fi clasificat din următoarele eșantioane."
+      },
+      "detail": {
+        "app": "Nume aplicație",
+        "addr": "Adresă client (mascată)",
+        "samples": "Eșantioane",
+        "active": "Eșantioane active",
+        "period": "Observat",
+        "none": "(gol)"
+      },
+      "noSample": "Încă nu există eșantioane — sesiunile în curs sunt eșantionate când vizualizați panoul de monitorizare sau fila Activitate și blocări. Deocamdată este clasificat doar după numele contului.",
+      "privOff": "Contul de legătură nu poate vedea detaliile sesiunilor altor conturi, deci nu sunt colectate eșantioane. Rugați un administrator DB să ruleze GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "cont de legătură",
+      "qidOff": "Detaliile sesiunii sunt vizibile, dar ID-ul interogării este gol (compute_query_id este dezactivat). Verificați cu SHOW compute_query_id; apoi rulați ALTER SYSTEM SET compute_query_id = 'auto'; și reîncărcați (SELECT pg_reload_conf();)",
+      "openHint": "Deschide SQL Tuning cu interogarea completată. Înlocuiți placeholder-ele precum $1 cu valori reale înainte de a vizualiza planul."
     }
   },
   "pipeline": {
@@ -1208,7 +1297,7 @@
     "label": "Funcționalități",
     "groups": {
       "monitor": "Monitorizare",
-      "drift": "Consistență",
+      "drift": "Analiză GAP",
       "lake": "Lac",
       "admin": "Administrare"
     },
@@ -1216,7 +1305,7 @@
     "sqlLab": "Optimizare SQL",
     "perf": "Performanță",
     "monitor": "Monitorizare",
-    "drift": "Derivă",
+    "drift": "Analiză GAP",
     "migration": "Migrare",
     "pipeline": "Pipeline",
     "analytics": "Analiză",

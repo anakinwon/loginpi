@@ -103,7 +103,7 @@
       "keys": {
         "links": "Tautan saya",
         "perf": "Snapshot kinerja",
-        "drift": "Jalankan drift",
+        "drift": "Analisis GAP",
         "mig": "Rencana migrasi",
         "pipe": "Pipeline",
         "lake": "Dataset Lake"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Drift Model ↔ DB",
+    "title": "Analisis GAP — Model↔DB",
     "intro": "Bandingkan model desain schema.pi dan riwayat penerapan DDL dengan katalog DB langsung untuk menemukan drift, dan ukur apakah indeks yang dirancang benar-benar digunakan. Data baris pelanggan tidak pernah dibaca atau disimpan.",
     "needLink": "Pilih tautan schema.pi di atas terlebih dahulu. Jika Anda tidak memilikinya, daftarkan token di menu 'Tautan'.",
     "needConn": "Pilih koneksi DB untuk dibandingkan di atas.",
     "project": "Proyek",
     "projectPick": "Pilih proyek",
     "loading": "Memuat…",
-    "run": "Jalankan deteksi drift",
+    "run": "Jalankan Analisis GAP",
     "running": "Membandingkan…",
     "readOnly": "Hanya kueri katalog dan statistik hanya-baca yang dijalankan.",
     "applyInSchema": "Terapkan perbaikan (edit model, pembuatan dan eksekusi DDL) di schema.pi, sumber kebenaran.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Indeks yang dirancang hilang di DB",
       "extraIndexes": "Indeks tidak ada dalam model",
       "ddlMissing": "Objek hilang setelah diterapkan",
-      "unusedIndexes": "Indeks yang dirancang tidak digunakan"
+      "unusedIndexes": "Indeks Kandidat Tidak Terpakai"
     },
     "sec": {
       "ddlMissing": "DDL diterapkan tetapi hilang di DB",
       "missingTables": "Tabel dalam model tetapi hilang di DB",
       "extraTables": "Tabel di DB tetapi tidak ada dalam model",
-      "colMismatches": "Ketidakcocokan tipe kolom / NULL",
+      "colMismatches": "Ketidakcocokan Kolom (Tidak Ada·Tipe·NULL)",
       "missingIndexes": "Indeks yang dirancang hilang di DB",
       "extraIndexes": "Indeks hanya di DB (tidak termasuk PK)",
       "idxUsage": "Efektivitas indeks yang dirancang"
     },
     "hint": {
-      "ddlMissing": "schema.pi mencatat objek-objek ini sebagai diterapkan, tetapi hilang — duga penghapusan manual atau rollback.",
-      "extraTables": "Ini mungkin milik proyek lain atau tabel sistem pada koneksi ini.",
-      "idxUsage": "Nol pemindaian sejak reset statistik terakhir berarti tidak digunakan. Periksa jendela statistik sebelum menghapus."
+      "ddlMissing": "Hanya objek yang tidak ada di DB berdasarkan penerapan terbaru yang ditampilkan. Permintaan sebelumnya yang membuat ulang tabel yang sama nanti dan aturan penamaan lama (_PKEY) adalah normal, jadi disembunyikan di bawah.",
+      "extraTables": "Berdasarkan skema {schema}. Dikelompokkan berdasarkan awalan, dan hanya grup awalan proyek ini yang merupakan kandidat yang hilang dari model.",
+      "idxUsage": "Penilaian = Sedang Digunakan / Untuk Memastikan Keunikan / Tidak Ada Data / Sedang Diobservasi (Kurang dari 7 hari sejak statistik dimulai·dibuat) / Kandidat Tidak Terpakai. Hanya kandidat tidak terpakai yang dipertimbangkan untuk dihapus."
     },
     "kind": {
       "MISSING": "hilang di DB",
@@ -223,12 +223,16 @@
       "idx": "Indeks",
       "scans": "Pemindaian",
       "size": "Ukuran",
-      "status": "Putusan"
+      "status": "Putusan",
+      "basis": "Dasar"
     },
     "usage": {
       "USED": "Digunakan",
-      "UNUSED": "Indeks yang dirancang tidak digunakan",
-      "NO_STATS": "Tidak ada statistik"
+      "NO_STATS": "Tidak ada statistik",
+      "CONSTRAINT": "Untuk memastikan keunikan (bukan target penghapusan)",
+      "NO_DATA": "Tidak ada data atau statistik belum terkumpul — tidak dapat menilai",
+      "OBSERVING": "Sedang diobservasi (kurang dari 7 hari)",
+      "UNUSED_CAND": "Kandidat tidak terpakai"
     },
     "errors": {
       "NOT_IMPLEMENTED": "Tautan schema.pi belum siap. Silakan coba lagi sebentar lagi.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Koneksi tidak didukung (hanya koneksi server PostgreSQL untuk saat ini).",
       "TIMEOUT": "Permintaan habis waktu. Silakan coba lagi sebentar lagi.",
       "RATE": "Terlalu banyak permintaan. Silakan coba lagi dalam satu menit."
+    },
+    "schema": "Skema",
+    "schemaHint": "Hanya tabel reguler dan partisi dalam skema ini yang dibandingkan (tampilan dikecualikan). Default public — skema internal Supabase (auth, storage, dll.) dikecualikan.",
+    "truncated": "Pencarian {names} mencapai batas {max} baris dan terpotong — beberapa hasil 'tidak ada di DB'·'tidak ada di model' mungkin salah. Sempitkan skema dan deteksi lagi.",
+    "colUnchecked": "Karena pencarian kolom terpotong, {n} hasil kolom yang hilang·tambahan dianggap tidak dapat diverifikasi dan dikecualikan dari jumlah ketidakcocokan kolom.",
+    "renamed": "{n} indeks PK yang diterapkan dengan aturan penamaan lama (_PKEY) ada di DB dengan nama baru (PK_) — normal",
+    "superseded": "{n} permintaan sebelumnya dikecualikan karena permintaan selanjutnya membuat ulang tabel yang sama (DROP … CASCADE) — normal",
+    "supersededItem": "Permintaan {id} → digantikan oleh permintaan {by}",
+    "sysCols": "{n} kolom sistem (ditambahkan secara otomatis saat pembuatan DDL) normalnya tidak ada di model dan dikecualikan dari ketidakcocokan",
+    "groupOwn": "Awalan proyek ini {pfx} — kandidat yang hilang dari model",
+    "groupOther": "Sistem lain {pfx}",
+    "basis": "Estimasi baris {rows} · sejak {since}",
+    "guide": {
+      "title": "Langkah selanjutnya",
+      "ddlMissing": {
+        "s1": "Di schema.pi → proyek terkait → model fisik → pembuatan DDL, terapkan lagi ke koneksi ini.",
+        "s2": "Setelah selesai, gunakan 'Deteksi lagi' di bawah dan konfirmasi jumlahnya 0.",
+        "s3": "Jika objek masih hilang setelah diterapkan kembali, curigai penghapusan manual atau rollback dan periksa riwayat aktivitas akun koneksi dengan DBA Anda."
+      },
+      "extraTables": {
+        "s1": "Kumpulan prefiks proyek ini = kandidat model yang hilang — impor ke model dari schema.pi → Pengaturan → Reverse, atau putuskan apakah akan menghapus tabel jika tidak digunakan.",
+        "s2": "Grup awalan lain = sistem lain yang berbagi DB ini — bukan item tindakan untuk proyek ini.",
+        "s3": "Jika skema target bukan public, ubah kolom 'Skema' di atas dan deteksi lagi."
+      },
+      "colMismatches": {
+        "s1": "Tidak ada di DB = terapkan kolom model ke DB melalui pembuatan DDL schema.pi.",
+        "s2": "Tidak ada dalam model = Impor kolom DB ke model dari schema.pi → Pengaturan → Reverse, atau putuskan untuk menghapusnya jika tidak diperlukan.",
+        "s3": "Tipe·NULL berbeda = sesuaikan dengan model (sumber kebenaran); sebelum memperkecil panjang atau beralih ke NOT NULL, konfirmasi baris yang ada memenuhi kondisi tersebut."
+      },
+      "idxUsage": {
+        "s1": "Sebelum menghapus, periksa ① apakah periode pengumpulan statistik mencakup setidaknya satu siklus bisnis (misalnya, batch akhir bulan) — lihat 'sejak'.",
+        "s2": "② Apakah itu bukan indeks unik·PK (jika ya, penilaian akan muncul secara terpisah sebagai 'untuk memastikan keunikan').",
+        "s3": "③ EXPLAIN SQL representatif tabel tersebut di SQL Tuning dan konfirmasi indeks ini tidak digunakan.",
+        "s4": "Setelah ketiga hal dikonfirmasi, hapus indeks dari model di schema.pi dan terapkan melalui DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Buka schema.pi",
+      "rerun": "Deteksi lagi",
+      "copy": "Salin daftar",
+      "copied": "Disalin",
+      "sqlLab": "EXPLAIN di SQL Tuning"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Pemeriksaan replikasi",
         "backup": "Pemeriksaan cadangan",
         "sqlLab": "Penyetelan SQL",
-        "drift": "Bandingkan drift",
+        "drift": "Analisis GAP",
         "connect": "Koneksi",
         "schema": "schema.pi monitor"
       },
@@ -991,7 +1037,11 @@
       "totalMs": "Total ms",
       "meanMs": "Rata-rata ms",
       "rows": "Baris",
-      "reset": "Deteksi reset statistik — ditampilkan sebagai kumulatif"
+      "reset": "Deteksi reset statistik — ditampilkan sebagai kumulatif",
+      "src": "Sumber",
+      "srcToggle": "Tampilkan atau sembunyikan detail sumber",
+      "openSqlLab": "Buka di SQL Tuning",
+      "acct": "Akun"
     },
     "health": {
       "empty": "Belum ada snapshot. Tekan Kumpulkan sekarang di tab Kumpulkan",
@@ -1022,6 +1072,46 @@
       "sessions": "Aktivitas sesi",
       "locks": "Kunci",
       "none": "Tidak ada"
+    },
+    "src": {
+      "root": "Tindakan fundamental untuk menentukan sumber secara akurat: ① gunakan akun DB terpisah untuk setiap program, batch, dan orang (alat), dan ② atur application_name pada setiap koneksi. Akun berasal dari pg_stat_statements dan pasti; kategori aplikasi/alat diperkirakan dari sampel aktivitas (application_name dilaporkan sendiri oleh klien, sehingga bisa kosong atau berubah, dan kueri singkat yang selesai di antara sampel bisa terlewat)",
+      "cd": {
+        "PROGRAM": "Program",
+        "BATCH": "Batch",
+        "TOOL": "Alat (orang)",
+        "PLATFORM": "Internal platform",
+        "MONITOR": "Pemantauan (kami)",
+        "UNKNOWN": "Tidak diketahui"
+      },
+      "conf": {
+        "high": "Keyakinan tinggi",
+        "mid": "Keyakinan sedang",
+        "low": "Keyakinan rendah",
+        "acct": "Hanya akun yang pasti",
+        "ver": "Batas versi"
+      },
+      "fix": {
+        "TOOL": "Tampaknya seseorang mengkueri DB produksi secara langsung dengan alat DB (DBeaver, dll.). Arahkan mereka ke replika read-only atau DB analitik sebagai gantinya, dan batasi waktu eksekusi pada akun manusia, mis. ALTER ROLE human_user SET statement_timeout = '30s'. Gunakan peran read-only terpisah, dan lakukan ekstraksi massal di luar jam sibuk",
+        "BATCH": "Tampaknya ini adalah batch atau pekerjaan terjadwal. Sebarkan waktu eksekusi menjauh dari puncak bisnis dan kurangi pekerjaan per commit. Periksa indeks dan statistik (ANALYZE) pada tabel target, dan bagi transaksi yang panjang. Menempatkan nama pekerjaan di application_name akan membuat klasifikasi berikutnya lebih tepat",
+        "PROGRAM": "Tampaknya ini adalah kueri yang dijalankan oleh aplikasi. Periksa rencana di SQL Tuning. Banyak panggilan dengan rata-rata singkat menunjukkan panggilan berulang (N+1) atau caching; rata-rata panjang menunjukkan indeks atau urutan join terlebih dahulu. Atur nama layanan di application_name pool koneksi Anda",
+        "PLATFORM": "Tampaknya ini adalah pekerjaan internal DB atau platform seperti autovacuum atau replikasi. Biasanya tidak diperlukan tindakan. Jika tetap di atas, tinjau ambang batas autovacuum dan maintenance_work_mem",
+        "MONITOR": "Tampaknya ini adalah kueri statistik layanan ini sendiri (tautan schema.pi). Tidak diperlukan tindakan. Jika terlalu sering muncul, kurangi frekuensi polling",
+        "UNKNOWN": "Tidak ada petunjuk tentang sumbernya. Atur application_name pada setiap koneksi dan pisahkan akun berdasarkan tujuan; itu akan diklasifikasikan dari sampel berikutnya"
+      },
+      "detail": {
+        "app": "Nama aplikasi",
+        "addr": "Alamat klien (disamarkan)",
+        "samples": "Sampel",
+        "active": "Sampel aktif",
+        "period": "Diamati",
+        "none": "(kosong)"
+      },
+      "noSample": "Belum ada sampel — sesi yang berjalan diambil sampelnya saat Anda melihat papan pemantauan atau tab Aktivitas & Kunci. Untuk saat ini, diklasifikasikan hanya dari nama akun",
+      "verOff": "DB ini lebih lama dari PostgreSQL 14, jadi sesi yang berjalan tidak memiliki ID kueri. Hanya akun (pasti) yang ditampilkan",
+      "privOff": "Akun tautan tidak dapat melihat detail sesi akun lain, jadi tidak ada sampel yang dikumpulkan. Minta admin DB untuk menjalankan GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "akun tautan",
+      "qidOff": "Detail sesi terlihat tetapi ID kueri kosong (compute_query_id mati). Periksa dengan SHOW compute_query_id; lalu jalankan ALTER SYSTEM SET compute_query_id = 'auto'; dan muat ulang (SELECT pg_reload_conf();)",
+      "openHint": "Membuka SQL Tuning dengan kueri yang sudah terisi. Ganti placeholder seperti $1 dengan nilai sebenarnya sebelum melihat rencana"
     }
   },
   "pipeline": {
@@ -1218,7 +1308,7 @@
     "label": "Fitur",
     "groups": {
       "monitor": "Pemantauan",
-      "drift": "Konsistensi",
+      "drift": "Analisis GAP",
       "lake": "Lake",
       "admin": "Admin"
     },
@@ -1226,7 +1316,7 @@
     "sqlLab": "Penyetelan SQL",
     "perf": "Performa",
     "monitor": "Pemantauan",
-    "drift": "Penyimpangan",
+    "drift": "Analisis GAP",
     "migration": "Migrasi",
     "pipeline": "Pipeline",
     "analytics": "Analitik",

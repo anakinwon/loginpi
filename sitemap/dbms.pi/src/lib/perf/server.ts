@@ -3,12 +3,19 @@
 import 'server-only'
 import { NextResponse, type NextRequest } from 'next/server'
 import { db, dbFail } from '@/lib/api'
-import { LinkError, requireLink, type LinkCtx, type QueryResult } from '@/lib/link/client'
+import {
+  LinkError,
+  requireLink,
+  type LinkCtx,
+  type QueryResult,
+} from '@/lib/link/client'
 
 export type Obj = Record<string, unknown>
 
 export function toObjs(r: QueryResult): Obj[] {
-  return r.rows.map((row) => Object.fromEntries(r.cols.map((c, i) => [c.toLowerCase(), row[i]])))
+  return r.rows.map((row) =>
+    Object.fromEntries(r.cols.map((c, i) => [c.toLowerCase(), row[i]])),
+  )
 }
 
 // 별칭 중 처음 나온 값
@@ -20,8 +27,10 @@ export const num = (v: unknown): number => {
   const n = Number(v)
   return Number.isFinite(n) ? n : 0
 }
-export const numOrNull = (v: unknown): number | null => (v === null || v === undefined || v === '' ? null : num(v))
-export const str = (v: unknown): string | null => (v === null || v === undefined ? null : String(v))
+export const numOrNull = (v: unknown): number | null =>
+  v === null || v === undefined || v === '' ? null : num(v)
+export const str = (v: unknown): string | null =>
+  v === null || v === undefined ? null : String(v)
 
 // LinkError(연결 클라이언트) → { error, code } — 접속 정보 원문 노출 없음(code 만, 문구는 화면 perf.err.<code>)
 export function linkFail(e: unknown) {
@@ -33,9 +42,21 @@ export function linkFail(e: unknown) {
 }
 
 // ?link=&conn= 검증 + 소유자 확인. 실패면 Response
-export async function linkParams(req: NextRequest, linkId: string | null, connId: string | null): Promise<{ ctx: LinkCtx; linkId: string; connId: string } | NextResponse> {
-  if (!linkId || !connId || !/^[0-9a-f-]{36}$/i.test(linkId) || connId.length > 100)
-    return NextResponse.json({ error: 'INVALID_INPUT', code: 'INVALID_INPUT' }, { status: 400 })
+export async function linkParams(
+  req: NextRequest,
+  linkId: string | null,
+  connId: string | null,
+): Promise<{ ctx: LinkCtx; linkId: string; connId: string } | NextResponse> {
+  if (
+    !linkId ||
+    !connId ||
+    !/^[0-9a-f-]{36}$/i.test(linkId) ||
+    connId.length > 100
+  )
+    return NextResponse.json(
+      { error: 'INVALID_INPUT', code: 'INVALID_INPUT' },
+      { status: 400 },
+    )
   try {
     const ctx = await requireLink(req, linkId)
     if (!(ctx instanceof Response)) return { ctx, linkId, connId }
@@ -45,10 +66,20 @@ export async function linkParams(req: NextRequest, linkId: string | null, connId
   }
 }
 
-export type ClctRow = { clct_id: string; clct_dtm: string; stat_reset_dtm: string | null; pgss_yn: string; db_sz_byte: number | null }
+export type ClctRow = {
+  clct_id: string
+  clct_dtm: string
+  stat_reset_dtm: string | null
+  pgss_yn: string
+  db_sz_byte: number | null
+}
 
 // 최근 수집 n건(최신 먼저)
-export async function latestClct(linkId: string, connId: string, n: number): Promise<ClctRow[] | NextResponse> {
+export async function latestClct(
+  linkId: string,
+  connId: string,
+  n: number,
+): Promise<ClctRow[] | NextResponse> {
   const { data, error } = await db()
     .from('dbm_prf_clct')
     .select('clct_id, clct_dtm, stat_reset_dtm, pgss_yn, db_sz_byte')

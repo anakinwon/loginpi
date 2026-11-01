@@ -103,7 +103,7 @@
       "keys": {
         "links": "我的連結",
         "perf": "效能快照",
-        "drift": "漂移執行",
+        "drift": "GAP 分析",
         "mig": "遷移計畫",
         "pipe": "管道",
         "lake": "資料湖資料集"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "模型 ↔ DB 漂移",
+    "title": "GAP 分析 — 模型↔DB",
     "intro": "比較 schema.pi 設計模型和 DDL 應用歷史記錄與即時 DB 目錄，以找出漂移，並測量設計的索引是否實際使用。絕不讀取或儲存客戶列資料。",
     "needLink": "請先在上方選擇一個 schema.pi 連結。如果沒有，請在「連結」選單中註冊一個權杖。",
     "needConn": "請在上方選擇要比較的 DB 連線。",
     "project": "專案",
     "projectPick": "選擇一個專案",
     "loading": "載入中…",
-    "run": "執行漂移偵測",
+    "run": "執行 GAP 分析",
     "running": "正在比較…",
     "readOnly": "僅執行唯讀目錄和統計查詢。",
     "applyInSchema": "在 schema.pi（真實來源）中應用修復（模型編輯、DDL 生成和執行）。",
@@ -197,21 +197,21 @@
       "missingIndexes": "DB 中缺少的設計索引",
       "extraIndexes": "模型中沒有的索引",
       "ddlMissing": "應用後消失的物件",
-      "unusedIndexes": "未使用的設計索引"
+      "unusedIndexes": "候選未使用索引"
     },
     "sec": {
       "ddlMissing": "DDL 已應用但在 DB 中缺失",
       "missingTables": "模型中有但在 DB 中缺失的資料表",
       "extraTables": "DB 中有但在模型中沒有的資料表",
-      "colMismatches": "欄位類型 / NULL 不匹配",
+      "colMismatches": "欄位不符 (遺失·類型·NULL)",
       "missingIndexes": "DB 中缺少的設計索引",
       "extraIndexes": "僅在 DB 中的索引（不包括 PK）",
       "idxUsage": "設計索引的有效性"
     },
     "hint": {
-      "ddlMissing": "schema.pi 記錄這些物件已應用，但它們已消失 — 懷疑是手動刪除或回滾。",
-      "extraTables": "這些可能屬於此連線上的其他專案或系統資料表。",
-      "idxUsage": "自上次統計資料重設以來掃描次數為零表示未使用。在刪除之前檢查統計資料視窗。"
+      "ddlMissing": "僅顯示根據最新套用標準，DB 中遺失的物件。先前重新建立相同資料表的請求以及舊的命名慣例 (_PKEY) 屬於正常情況，已摺疊於下方。",
+      "extraTables": "以 {schema} 綱要為基準。依前綴分組，僅此專案前綴組為模型遺漏的候選項目。",
+      "idxUsage": "判斷 = 使用中 / 用於唯一性 / 無資料 / 觀察中 (統計開始·建立未滿 7 天) / 未使用候選。僅考慮刪除未使用候選索引。"
     },
     "kind": {
       "MISSING": "DB 中缺失",
@@ -223,12 +223,16 @@
       "idx": "索引",
       "scans": "掃描次數",
       "size": "大小",
-      "status": "判斷"
+      "status": "判斷",
+      "basis": "依據"
     },
     "usage": {
       "USED": "使用中",
-      "UNUSED": "未使用的設計索引",
-      "NO_STATS": "無統計資料"
+      "NO_STATS": "無統計資料",
+      "CONSTRAINT": "唯一性約束 (保留)",
+      "NO_DATA": "無資料或未收集統計資料 — 無法判斷",
+      "OBSERVING": "觀察中 (未滿 7 天)",
+      "UNUSED_CAND": "未使用候選"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi 連結尚未準備好。請稍後再試。",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "不支援的連線（目前僅支援 PostgreSQL 伺服器連線）。",
       "TIMEOUT": "請求逾時。請稍後再試。",
       "RATE": "請求過多。請在一分鐘後再試。"
+    },
+    "schema": "綱要",
+    "schemaHint": "僅比較此綱要中的一般表和分割表 (不含視圖)。預設 public — Supabase 內部綱要 (auth、storage 等) 已排除。",
+    "truncated": "{names} 達到 {max} 行限制並被截斷 — 部分「不在 DB 中」/「不在模型中」的結果可能是錯誤的。請縮小綱要範圍並重新執行。",
+    "colUnchecked": "由於欄位查詢被截斷，{n} 個遺失/額外欄位結果被視為無法驗證，並從欄位不符計數中排除。",
+    "renamed": "DB 中存在 {n} 個依舊命名規則 (_PKEY) 套用的 PK 索引，已更名為新名稱 (PK_) — 正常",
+    "superseded": "由於後續請求重新建立相同的資料表 (DROP … CASCADE)，{n} 個較舊的請求已被排除 — 正常",
+    "supersededItem": "請求 {id} → 被請求 {by} 取代",
+    "sysCols": "DDL 產生時自動新增的 {n} 個系統欄位，在模型中不存在是正常情況，已從不符項目中排除",
+    "groupOwn": "專案前綴 {pfx} — 模型遺漏候選項目",
+    "groupOther": "其他系統 {pfx}",
+    "basis": "預估行數 {rows} · 截至 {since}",
+    "guide": {
+      "title": "後續步驟",
+      "ddlMissing": {
+        "s1": "在 schema.pi → 專案 → 實體模型 → DDL 產生中，再次套用至此連線。",
+        "s2": "完成後，使用下方的「再次執行」並確認計數為 0。",
+        "s3": "如果重新套用後物件仍然消失，請懷疑是手動刪除或回溯，並與您的 DBA 確認連線帳戶的活動。"
+      },
+      "extraTables": {
+        "s1": "此專案前綴套件 = 遺失的模型候選項目 — 透過 schema.pi → 設定 → 反向將其匯入模型，或如果是不使用的資料表，則決定是否刪除。",
+        "s2": "其他前綴組 = 共用此 DB 的其他系統 — 非此專案的行動項目。",
+        "s3": "如果目標綱要不是 public，請變更上方「綱要」欄位並重新執行。"
+      },
+      "colMismatches": {
+        "s1": "不在 DB 中 = 透過 schema.pi DDL 產生將模型欄位反映到 DB 中。",
+        "s2": "模型中沒有 = 透過 schema.pi → 設定 → 反向將 DB 欄位匯入模型中，或在不必要時決定刪除。",
+        "s3": "類型/NULL 不同 = 與模型 (真實來源) 對齊；在縮短長度或切換為 NOT NULL 之前，請確認現有行符合條件。"
+      },
+      "idxUsage": {
+        "s1": "刪除前請檢查 ① 統計視窗是否涵蓋至少一個業務週期 (例如月底批次) — 請參閱「截至」。",
+        "s2": "② 它不是唯一/PK 索引 (這些會單獨顯示為「唯一性約束」)。",
+        "s3": "③ 在 SQL 調整中 EXPLAIN 該資料表的代表性 SQL，並確認此索引未使用。",
+        "s4": "一旦確認所有三點，請在 schema.pi 中從模型中移除索引，並透過 DDL 套用。"
+      }
+    },
+    "act": {
+      "openSchema": "開啟 schema.pi",
+      "rerun": "再次執行",
+      "copy": "複製清單",
+      "copied": "已複製",
+      "sqlLab": "在 SQL 調整中 EXPLAIN"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "複寫檢查",
         "backup": "備份檢查",
         "sqlLab": "SQL 調整",
-        "drift": "漂移比較",
+        "drift": "GAP 分析",
         "connect": "連線管理",
         "schema": "schema.pi 監控"
       },
@@ -991,7 +1037,11 @@
       "totalMs": "總毫秒",
       "meanMs": "平均毫秒",
       "rows": "列",
-      "reset": "偵測到統計資料重設 — 顯示為累計"
+      "reset": "偵測到統計資料重設 — 顯示為累計",
+      "src": "來源",
+      "srcToggle": "顯示或隱藏來源詳細資料",
+      "openSqlLab": "在 SQL 調整中開啟",
+      "acct": "帳戶"
     },
     "health": {
       "empty": "尚無快照。請在「收集」分頁上按一下「立即收集」",
@@ -1022,6 +1072,46 @@
       "sessions": "工作階段活動",
       "locks": "鎖定",
       "none": "無"
+    },
+    "src": {
+      "root": "要精確找出來源：(1) 為每個程式、批次和人員 (工具) 使用單獨的 DB 帳戶，以及 (2) 在每個連線設定 application_name。帳戶來自 pg_stat_statements 且確定；應用程式/工具類別是根據活動樣本估計的 (application_name 由客戶端自行報告，因此可能為空或更改，並且在樣本之間完成的短查詢可能會被遺漏)",
+      "cd": {
+        "PROGRAM": "程式",
+        "BATCH": "批次",
+        "TOOL": "工具 (人員)",
+        "PLATFORM": "平台內部",
+        "MONITOR": "監控 (我們)",
+        "UNKNOWN": "未知"
+      },
+      "conf": {
+        "high": "高度確定",
+        "mid": "中度確定",
+        "low": "低度確定",
+        "acct": "僅帳戶",
+        "ver": "版本限制"
+      },
+      "fix": {
+        "TOOL": "看起來是人員使用 DB 工具 (DBeaver 等) 直接查詢生產 DB。請引導他們使用唯讀副本或分析 DB，並限制人員帳戶的執行時間，例如 ALTER ROLE human_user SET statement_timeout = '30s'。使用單獨的唯讀角色，並在非高峰時段執行大量提取",
+        "BATCH": "看起來是批次或排程作業。將執行時間分散開，避開業務高峰，並縮小每次提交的工作量。檢查目標資料表的索引和統計資料 (ANALYZE)，並拆分長時間交易。將作業名稱放入 application_name 會使下次分類更精確",
+        "PROGRAM": "看起來是應用程式執行的查詢。在 SQL 調整中檢查計畫。許多呼叫且平均時間短表示重複呼叫 (N+1) 或快取；平均時間長則首先檢查索引或連接順序。在您的連線池的 application_name 中設定服務名稱",
+        "PLATFORM": "看起來是 DB 或平台內部工作，例如 autovacuum 或複製。通常不需要採取行動。如果它一直排在最前面，請審查 autovacuum 閾值和 maintenance_work_mem",
+        "MONITOR": "看起來是此服務自己的統計查詢 (schema.pi 連結)。無需採取行動。如果它出現得太頻繁，請降低輪詢頻率",
+        "UNKNOWN": "沒有線索可追溯來源。在每個連線設定 application_name 並按用途劃分帳戶；它將從下一個樣本開始分類"
+      },
+      "detail": {
+        "app": "應用程式名稱",
+        "addr": "客戶端位址 (已遮罩)",
+        "samples": "樣本",
+        "active": "活動樣本",
+        "period": "觀察期間",
+        "none": "(空白)"
+      },
+      "noSample": "尚未有樣本 — 當您查看監控面板或「活動與鎖定」分頁時，正在執行的會話會被取樣。目前僅根據帳戶名稱進行分類",
+      "verOff": "此 DB 早於 PostgreSQL 14，因此正在執行的會話沒有查詢 ID。僅顯示帳戶 (確定)",
+      "privOff": "連結帳戶無法查看其他帳戶的會話詳細資料，因此未收集樣本。請要求 DB 管理員執行 GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "連結帳戶",
+      "qidOff": "會話詳細資料可見，但查詢 ID 為空 (compute_query_id 已關閉)。請使用 SHOW compute_query_id; 檢查，然後執行 ALTER SYSTEM SET compute_query_id = 'auto'; 並重新載入 (SELECT pg_reload_conf();)",
+      "openHint": "在 SQL 調整中開啟並填入查詢。在查看計畫之前，請將 $1 等佔位符替換為實際值"
     }
   },
   "pipeline": {
@@ -1218,7 +1308,7 @@
     "label": "功能選單",
     "groups": {
       "monitor": "監控",
-      "drift": "一致性",
+      "drift": "GAP 分析",
       "lake": "資料湖",
       "admin": "管理"
     },
@@ -1226,7 +1316,7 @@
     "sqlLab": "SQL 調整",
     "perf": "效能",
     "monitor": "監控",
-    "drift": "漂移",
+    "drift": "GAP 分析",
     "migration": "遷移",
     "pipeline": "管道",
     "analytics": "分析",

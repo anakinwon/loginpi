@@ -103,7 +103,7 @@
       "keys": {
         "links": "Mano nuorodos",
         "perf": "Našumo momentinės nuotraukos",
-        "drift": "Poslinkio vykdymas",
+        "drift": "GAP analizė",
         "mig": "Migracijos planai",
         "pipe": "Konvejeriai",
         "lake": "Ežero duomenų rinkiniai"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Modelio ↔ DB poslinkis",
+    "title": "GAP analizė — Modelis↔DB",
     "intro": "Palyginkite schema.pi dizaino modelį ir DDL taikymo istoriją su gyvu DB katalogu, kad rastumėte poslinkį, ir įvertinkite, ar suprojektuoti indeksai iš tikrųjų naudojami. Kliento eilučių duomenys niekada neskaitomi ir nesaugomi.",
     "needLink": "Pirmiausia pasirinkite schema.pi nuorodą aukščiau. Jei neturite, užregistruokite žetoną meniu „Nuoroda“.",
     "needConn": "Pasirinkite DB ryšį, kurį norite palyginti aukščiau.",
     "project": "Projektas",
     "projectPick": "Pasirinkite projektą",
     "loading": "Įkeliama…",
-    "run": "Vykdyti poslinkio aptikimą",
+    "run": "Vykdyti GAP analizę",
     "running": "Lyginama…",
     "readOnly": "Vykdomos tik skaitymo katalogo ir statistikos užklausos.",
     "applyInSchema": "Taikykite pataisymus (modelio redagavimus, DDL generavimą ir vykdymą) schema.pi, tiesos šaltinyje.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Suprojektuoti indeksai, kurių trūksta DB",
       "extraIndexes": "Indeksai, kurių nėra modelyje",
       "ddlMissing": "Objektai, dingę po taikymo",
-      "unusedIndexes": "Nenaudojami suprojektuoti indeksai"
+      "unusedIndexes": "Galimi nenaudojami indeksai"
     },
     "sec": {
       "ddlMissing": "DDL pritaikytas, bet trūksta DB",
       "missingTables": "Lentelės modelyje, bet trūksta DB",
       "extraTables": "Lentelės DB, bet ne modelyje",
-      "colMismatches": "Stulpelių tipo / NULL neatitikimai",
+      "colMismatches": "Stulpelių neatitikimai (trūksta·tipas·NULL)",
       "missingIndexes": "Suprojektuoti indeksai, kurių trūksta DB",
       "extraIndexes": "Indeksai tik DB (išskyrus PK)",
       "idxUsage": "Suprojektuoto indekso efektyvumas"
     },
     "hint": {
-      "ddlMissing": "schema.pi užfiksavo šiuos objektus kaip pritaikytus, bet jų nebėra – įtarkite rankinį pašalinimą arba atšaukimą.",
-      "extraTables": "Tai gali būti kiti projektai arba sistemos lentelės šiame ryšyje.",
-      "idxUsage": "Nulis nuskaitymų nuo paskutinio statistikos atstatymo reiškia nenaudojimą. Prieš ištrindami patikrinkite statistikos langą."
+      "ddlMissing": "Rodomi tik objektai, kurių trūksta DB, remiantis naujausiu pritaikytu standartu. Ankstesni užklausos, kurios vėliau sukūrė tą pačią lentelę, ir senos pavadinimų konvencijos (_PKEY) yra normalios ir sulankstytos žemiau.",
+      "extraTables": "Remiantis schema {schema}. Sugrupuota pagal priešdėlį, tik šio projekto priešdėlių grupė yra kandidatai į modelio praleidimą.",
+      "idxUsage": "Vertinimas = Naudojamas / Unikalumui / Nėra duomenų / Stebimas (statistika pradėta·sukurta mažiau nei prieš 7 dienas) / Nenaudojamas kandidatas. Tik nenaudojami indeksai yra svarstomi ištrynimui."
     },
     "kind": {
       "MISSING": "trūksta DB",
@@ -223,12 +223,16 @@
       "idx": "Indeksas",
       "scans": "Nuskaitymai",
       "size": "Dydis",
-      "status": "Verdiktas"
+      "status": "Verdiktas",
+      "basis": "Pagrindas"
     },
     "usage": {
       "USED": "Naudojama",
-      "UNUSED": "Nenaudojamas suprojektuotas indeksas",
-      "NO_STATS": "Nėra statistikos"
+      "NO_STATS": "Nėra statistikos",
+      "CONSTRAINT": "Unikalumo apribojimas (palikti)",
+      "NO_DATA": "Nėra duomenų arba statistika nesurinkta — negalima įvertinti",
+      "OBSERVING": "Stebima (mažiau nei 7 dienos)",
+      "UNUSED_CAND": "Nenaudojamas kandidatas"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi ryšio funkcija dar neparuošta. Bandykite dar kartą netrukus.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Nepalaikomas ryšys (kol kas tik PostgreSQL serverio ryšiai).",
       "TIMEOUT": "Užklausos laikas baigėsi. Bandykite dar kartą netrukus.",
       "RATE": "Per daug užklausų. Bandykite dar kartą po minutės."
+    },
+    "schema": "Schema",
+    "schemaHint": "Palyginamos tik įprastos ir padalintos lentelės šioje schemoje (išskyrus rodinius). Numatytasis public — Supabase vidinės schemos (auth, storage ir kt.) yra praleidžiamos.",
+    "truncated": "{names} pasiekė {max} eilučių limitą ir buvo sutrumpinti — kai kurie „nėra DB“ / „nėra modelyje“ rezultatai gali būti klaidingi. Susiaurinkite schemą ir paleiskite iš naujo.",
+    "colUnchecked": "Kadangi stulpelių užklausa buvo sutrumpinta, {n} trūkstamų/papildomų stulpelių rezultatai laikomi nepatikrinamais ir neįtraukiami į stulpelių neatitikimų skaičių.",
+    "renamed": "{n} PK indeksas (-ai), pritaikytas (-i) pagal seną pavadinimo taisyklę (_PKEY), egzistuoja DB su nauju pavadinimu (PK_) — normalu",
+    "superseded": "{n} senesnė (-ės) užklausa (-os) buvo atmesta (-os), nes vėlesnė užklausa iš naujo sukūrė tą pačią lentelę (DROP … CASCADE) — normalu",
+    "supersededItem": "Užklausa {id} → pakeista užklausa {by}",
+    "sysCols": "{n} sistemos stulpelis (-iai), automatiškai pridėtas (-i) DDL generavimo metu, pagal numatytuosius nustatymus nėra modelyje ir yra neįtraukiami į neatitikimus",
+    "groupOwn": "Projekto priešdėlis {pfx} — kandidatai, kurių trūksta modelyje",
+    "groupOther": "Kita sistema {pfx}",
+    "basis": "Apskaičiuota eilučių {rows} · nuo {since}",
+    "guide": {
+      "title": "Kiti žingsniai",
+      "ddlMissing": {
+        "s1": "schema.pi → projektas → fizinis modelis → DDL generavimas, pritaikykite dar kartą šiam ryšiui.",
+        "s2": "Baigę naudokite „Paleisti iš naujo“ žemiau ir patvirtinkite, kad skaičius yra 0.",
+        "s3": "Jei objektai vis dar dingsta po pakartotinio pritaikymo, įtarkite rankinį ištrynimą arba atšaukimą ir patikrinkite ryšio paskyros veiklą su savo DBA."
+      },
+      "extraTables": {
+        "s1": "Šis projekto prefiksų paketas = trūkstami modelio kandidatai – importuokite juos į modelį per schema.pi → Nustatymai → Atvirkštinis, arba nuspręskite, ar juos ištrinti, jei tai nenaudojamos lentelės.",
+        "s2": "Kitos priešdėlių grupės = kitos sistemos, naudojančios tą pačią DB — nėra šio projekto veiksmų elementai.",
+        "s3": "Jei tikslinė schema nėra public, pakeiskite lauką „Schema“ aukščiau ir paleiskite iš naujo."
+      },
+      "colMismatches": {
+        "s1": "Nėra DB = pritaikykite modelio stulpelį DB per schema.pi DDL generavimą.",
+        "s2": "Nėra modelyje = importuokite DB stulpelį į modelį per schema.pi → Nustatymai → Atvirkštinis, arba nuspręskite jį ištrinti, jei nereikalingas.",
+        "s3": "Tipas/NULL skiriasi = suderinkite su modeliu (tiesos šaltiniu); prieš mažindami ilgį arba pereidami prie NOT NULL, patvirtinkite, kad esamos eilutės tai atitinka."
+      },
+      "idxUsage": {
+        "s1": "Prieš pašalindami, patikrinkite ①, ar statistikos langas apima bent vieną verslo ciklą (pvz., mėnesio pabaigos partiją) — žr. „nuo“.",
+        "s2": "② Tai nėra unikalus/PK indeksas (jie rodomi atskirai kaip „unikalumo apribojimas“).",
+        "s3": "③ EXPLAIN lentelės reprezentatyvų SQL SQL derinime ir patvirtinkite, kad šis indeksas nenaudojamas.",
+        "s4": "Patvirtinus visus tris, pašalinkite indeksą iš modelio schema.pi ir pritaikykite per DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Atidaryti schema.pi",
+      "rerun": "Paleisti iš naujo",
+      "copy": "Kopijuoti sąrašą",
+      "copied": "Nukopijuota",
+      "sqlLab": "EXPLAIN SQL derinime"
     }
   },
   "learn": {
@@ -682,7 +728,7 @@
         "repl": "Replikacijos patikra",
         "backup": "Atsarginės kopijos patikra",
         "sqlLab": "SQL derinimas",
-        "drift": "Nuokrypio palyginimas",
+        "drift": "GAP analizė",
         "connect": "Ryšiai",
         "schema": "schema.pi monitorius"
       },
@@ -981,7 +1027,11 @@
       "totalMs": "Bendra ms",
       "meanMs": "Vid. ms",
       "rows": "Eilutės",
-      "reset": "Aptiktas statistikos nustatymas iš naujo – rodoma kaip kaupiamoji"
+      "reset": "Aptiktas statistikos nustatymas iš naujo – rodoma kaip kaupiamoji",
+      "src": "Šaltinis",
+      "srcToggle": "Rodyti arba slėpti šaltinio detales",
+      "openSqlLab": "Atidaryti SQL derinime",
+      "acct": "Paskyra"
     },
     "health": {
       "empty": "Dar nėra momentinių nuotraukų. Skirtuke „Rinkti“ paspauskite „Rinkti dabar“",
@@ -1011,6 +1061,46 @@
       "sessions": "Seanso veikla",
       "locks": "Užraktai",
       "none": "Nėra"
+    },
+    "src": {
+      "root": "Norėdami tiksliai nustatyti šaltinį: (1) naudokite atskirą DB paskyrą kiekvienai programai, partijai ir asmeniui (įrankiui), ir (2) nustatykite application_name kiekvienam ryšiui. Paskyra gaunama iš pg_stat_statements ir yra tikra; programos/įrankio kategorija yra įvertinama iš veiklos pavyzdžių (application_name yra kliento savarankiškai pranešama, todėl ji gali būti tuščia arba pakeista, o trumpos užklausos, kurios baigiasi tarp pavyzdžių, gali būti praleistos)",
+      "cd": {
+        "PROGRAM": "Programa",
+        "BATCH": "Paketas",
+        "TOOL": "Įrankis (asmuo)",
+        "PLATFORM": "Platformos vidinis",
+        "MONITOR": "Stebėjimas (mes)",
+        "UNKNOWN": "Nežinoma"
+      },
+      "conf": {
+        "high": "Didelis pasitikėjimas",
+        "mid": "Vidutinis pasitikėjimas",
+        "low": "Mažas pasitikėjimas",
+        "acct": "Tik paskyra",
+        "ver": "Versijos limitas"
+      },
+      "fix": {
+        "TOOL": "Panašu, kad asmuo tiesiogiai užklausia gamybos DB naudodamas DB įrankį (DBeaver ir kt.). Nukreipkite juos į tik skaitomą kopiją arba analizės DB ir apribokite vykdymo laiką žmogiškosioms paskyroms, pvz., ALTER ROLE human_user SET statement_timeout = '30s'. Naudokite atskirą tik skaitomą rolę ir atlikite masinius ištraukimus ne piko valandomis.",
+        "BATCH": "Panašu, kad tai paketas arba suplanuotas darbas. Paskirstykite vykdymo laikus, kad išvengtumėte verslo piko, ir sumažinkite darbo apimtį vienam įsipareigojimui. Patikrinkite indeksus ir statistiką (ANALYZE) tikslinėse lentelėse ir padalinkite ilgas transakcijas. Įdėjus užduoties pavadinimą į application_name, kitas klasifikavimas bus tikslesnis.",
+        "PROGRAM": "Panašu, kad tai programos vykdoma užklausa. Patikrinkite planą SQL derinime. Daug iškvietimų su trumpu vidurkiu rodo pasikartojančius iškvietimus (N+1) arba talpyklą; ilgas vidurkis pirmiausia rodo indeksus arba sujungimo tvarką. Nustatykite paslaugos pavadinimą savo ryšio telkinio application_name.",
+        "PLATFORM": "Panašu, kad tai DB arba platformos vidinis darbas, pvz., autovacuum arba replikacija. Paprastai nereikia jokių veiksmų. Jei jis išlieka viršuje, peržiūrėkite autovacuum slenksčius ir maintenance_work_mem.",
+        "MONITOR": "Panašu, kad tai šios paslaugos statistikos užklausos (schema.pi nuoroda). Jokių veiksmų nereikia. Jei rodoma per dažnai, sumažinkite apklausos dažnumą.",
+        "UNKNOWN": "Nėra jokių užuominų apie šaltinį. Nustatykite application_name kiekvienam ryšiui ir padalinkite paskyras pagal paskirtį; ji bus klasifikuojama iš kitų pavyzdžių."
+      },
+      "detail": {
+        "app": "Programos pavadinimas",
+        "addr": "Kliento adresas (maskuotas)",
+        "samples": "Pavyzdžiai",
+        "active": "Aktyvūs pavyzdžiai",
+        "period": "Stebėta",
+        "none": "(tuščia)"
+      },
+      "noSample": "Kol kas nėra pavyzdžių – veikiančios sesijos imamos, kai peržiūrite stebėjimo lentą arba skirtuką „Veikla ir užraktai“. Kol kas ji klasifikuojama tik pagal paskyros pavadinimą.",
+      "verOff": "Ši DB yra senesnė nei PostgreSQL 14, todėl veikiančios sesijos neturi užklausos ID. Rodoma tik paskyra (tikra).",
+      "privOff": "Susiejimo paskyra negali matyti kitų paskyrų sesijos detalių, todėl pavyzdžiai nerenkami. Paprašykite DB administratoriaus paleisti GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "susiejimo paskyra",
+      "qidOff": "Sesijos detalės matomos, bet užklausos ID yra tuščias (compute_query_id išjungtas). Patikrinkite su SHOW compute_query_id; tada paleiskite ALTER SYSTEM SET compute_query_id = 'auto'; ir perkraukite (SELECT pg_reload_conf();)",
+      "openHint": "Atidaro SQL derinimo įrankį su užpildyta užklausa. Prieš peržiūrėdami planą, pakeiskite vietos žymeklius, pvz., $1, tikromis reikšmėmis."
     }
   },
   "pipeline": {
@@ -1206,7 +1296,7 @@
     "label": "Funkcijos",
     "groups": {
       "monitor": "Stebėjimas",
-      "drift": "Nuoseklumas",
+      "drift": "GAP analizė",
       "lake": "Ežeras",
       "admin": "Administravimas"
     },
@@ -1214,7 +1304,7 @@
     "sqlLab": "SQL derinimas",
     "perf": "Našumas",
     "monitor": "Stebėjimas",
-    "drift": "Poslinkis",
+    "drift": "GAP analizė",
     "migration": "Migracija",
     "pipeline": "Duomenų srautas",
     "analytics": "Analitika",

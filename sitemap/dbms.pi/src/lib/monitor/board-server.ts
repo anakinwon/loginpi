@@ -118,6 +118,9 @@ export const parseActivity = (r: QueryResult): ActRow[] =>
     queryStart: str(o.query_start),
     runMs: numOrNull(o.run_ms),
     query: str(o.query),
+    queryId: str(o.query_id),
+    clientAddr: str(o.client_addr),
+    linkUsr: str(o.link_usr),
   }))
 export function parseVersion(r: QueryResult): Version {
   const o = one(r)
@@ -344,7 +347,9 @@ export async function buildFast(
   linkId: string,
   connId: string,
   now = Date.now(),
-): Promise<{ hit: FastHit; snap: SnapVals | null } | LinkError> {
+): Promise<
+  { hit: FastHit; snap: SnapVals | null; act: ActRow[] | null } | LinkError
+> {
   // R-P1 — 세 조회·직전 스냅샷·규칙은 서로 독립
   const [dsR, actR, verR, prev, rules] = await Promise.all([
     run(linkId, connId, 'db_stats'),
@@ -397,6 +402,7 @@ export async function buildFast(
       statsReset: typeof ds === 'string' ? null : ds.statsReset,
     },
     snap: e.snap,
+    act: typeof act === 'string' ? null : act, // 출처 표본 쓰기용(after) — 캐시(hit)에 넣지 않음(메모리)
   }
 }
 

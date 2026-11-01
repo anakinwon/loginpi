@@ -103,7 +103,7 @@
       "keys": {
         "links": "Saját linkek",
         "perf": "Teljesítmény pillanatképek",
-        "drift": "Eltérés futtatások",
+        "drift": "GAP elemzés",
         "mig": "Migrációs tervek",
         "pipe": "Pipeline-ok",
         "lake": "Tó adatkészletek"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Modell ↔ DB eltérés",
+    "title": "GAP elemzés — Modell↔DB",
     "intro": "Hasonlítsa össze a schema.pi tervezési modelljét és a DDL alkalmazási előzményeit az élő DB katalógussal az eltérések felderítéséhez, és mérje meg, hogy a tervezett indexek ténylegesen használatban vannak-e. Az ügyfél soradatait soha nem olvassuk vagy tároljuk.",
     "needLink": "Először válasszon egy schema.pi linket fent. Ha nincs, regisztráljon egy tokent a 'Link' menüben.",
     "needConn": "Válassza ki a fent összehasonlítandó DB kapcsolatot.",
     "project": "Projekt",
     "projectPick": "Válasszon egy projektet",
     "loading": "Betöltés…",
-    "run": "Eltérés észlelés futtatása",
+    "run": "GAP elemzés futtatása",
     "running": "Összehasonlítás…",
     "readOnly": "Csak olvasható katalógus és statisztikai lekérdezések futnak.",
     "applyInSchema": "Alkalmazza a javításokat (modell szerkesztések, DDL generálás és végrehajtás) a schema.pi-ben, az igazság forrásában.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Hiányzó tervezett indexek a DB-ben",
       "extraIndexes": "Indexek, amelyek nincsenek a modellben",
       "ddlMissing": "Objektumok eltűntek az alkalmazás után",
-      "unusedIndexes": "Nem használt tervezett indexek"
+      "unusedIndexes": "Fel nem használt indexek jelöltjei"
     },
     "sec": {
       "ddlMissing": "DDL alkalmazva, de hiányzik a DB-ből",
       "missingTables": "Táblák a modellben, de hiányoznak a DB-ből",
       "extraTables": "Táblák a DB-ben, de nincsenek a modellben",
-      "colMismatches": "Oszlop típus / NULL eltérések",
+      "colMismatches": "Oszlopeltérések (hiányzó·típus·NULL)",
       "missingIndexes": "Tervezett indexek hiányoznak a DB-ből",
       "extraIndexes": "Csak a DB-ben lévő indexek (PK kivételével)",
       "idxUsage": "Tervezett index hatékonysága"
     },
     "hint": {
-      "ddlMissing": "A schema.pi ezeket az objektumokat alkalmazottként rögzítette, de eltűntek – gyanakodjon kézi törlésre vagy visszaállításra.",
-      "extraTables": "Ezek más projektekhez vagy rendszer táblákhoz tartozhatnak ezen a kapcsolaton.",
-      "idxUsage": "A statisztikák utolsó visszaállítása óta nulla beolvasás azt jelenti, hogy nem használt. Törlés előtt ellenőrizze a statisztikai ablakot."
+      "ddlMissing": "Csak a legutóbb alkalmazott szabvány alapján a DB-ből hiányzó objektumok láthatók. Az azonos táblát később újra létrehozó korábbi kérések és a régi elnevezési konvenciók (_PKEY) normálisak, és alább össze vannak csukva.",
+      "extraTables": "A {schema} séma alapján. Előtag szerint csoportosítva, csak ennek a projektnek az előtagcsoportja a modell kihagyásának jelöltje.",
+      "idxUsage": "Ítélet = Használatban / Egyediség biztosítására / Nincs adat / Megfigyelés alatt (Statisztika indult·7 napnál fiatalabb) / Fel nem használt jelölt. Csak a fel nem használt indexek jelöltjeit vesszük figyelembe törlésre."
     },
     "kind": {
       "MISSING": "hiányzik a DB-ből",
@@ -223,12 +223,16 @@
       "idx": "Index",
       "scans": "Beolvasások",
       "size": "Méret",
-      "status": "Ítélet"
+      "status": "Ítélet",
+      "basis": "Alap"
     },
     "usage": {
       "USED": "Használatban",
-      "UNUSED": "Nem használt tervezett index",
-      "NO_STATS": "Nincs statisztika"
+      "NO_STATS": "Nincs statisztika",
+      "CONSTRAINT": "Egyediségi megszorítás (megtartandó)",
+      "NO_DATA": "Nincs adat vagy nem gyűjtött statisztika — nem ítélhető meg",
+      "OBSERVING": "Megfigyelés alatt (7 napnál fiatalabb)",
+      "UNUSED_CAND": "Fel nem használt jelölt"
     },
     "errors": {
       "NOT_IMPLEMENTED": "A schema.pi link még nem áll készen. Kérjük, próbálja újra hamarosan.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Nem támogatott kapcsolat (egyelőre csak PostgreSQL szerver kapcsolatok).",
       "TIMEOUT": "A kérés időtúllépés miatt megszakadt. Kérjük, próbálja újra hamarosan.",
       "RATE": "Túl sok kérés. Kérjük, próbálja újra egy perc múlva."
+    },
+    "schema": "Séma",
+    "schemaHint": "Csak az ebben a sémában lévő rendes és particionált táblák kerülnek összehasonlításra (nézetek kizárva). Alapértelmezett public — a Supabase belső sémái (auth, storage, …) kimaradnak.",
+    "truncated": "A {names} elérte a {max} soros korlátot, és csonkolva lett — néhány „nincs a DB-ben” / „nincs a modellben” eredmény hamis lehet. Szűkítse a sémát, és futtassa újra.",
+    "colUnchecked": "Mivel az oszlop lekérdezés csonkolva lett, {n} hiányzó/extra oszlop eredmény ellenőrizhetetlennek minősül, és kizárásra került az oszlopeltérés számból.",
+    "renamed": "{n} PK index(ek) a régi elnevezési szabály (_PKEY) szerint alkalmazva léteznek a DB-ben az új név (PK_) alatt — normális",
+    "superseded": "{n} régebbi kérés(ek) kizárásra kerültek, mert egy későbbi kérés újra létrehozta ugyanazt a táblát (DROP … CASCADE) — normális",
+    "supersededItem": "Kérés {id} → felülírva a {by} kéréssel",
+    "sysCols": "{n} rendszer oszlop(ok), amelyek automatikusan hozzáadódtak a DDL generáláskor, tervezetten nincsenek a modellben, és kizárásra kerültek az eltérésekből",
+    "groupOwn": "Projekt előtag {pfx} — modellből hiányzó jelöltek",
+    "groupOther": "Egyéb rendszer {pfx}",
+    "basis": "Becsült sorok {rows} · {since} óta",
+    "guide": {
+      "title": "Következő lépések",
+      "ddlMissing": {
+        "s1": "A schema.pi → a projekt → fizikai modell → DDL generálásban alkalmazza újra erre a kapcsolatra.",
+        "s2": "Ha elkészült, használja az alábbi „Futtatás újra” gombot, és ellenőrizze, hogy a szám 0.",
+        "s3": "Ha az objektumok az újraalkalmazás után is eltűnnek, gyanakodjon manuális törlésre vagy visszaállításra, és ellenőrizze a kapcsolati fiók tevékenységét a DBA-jával."
+      },
+      "extraTables": {
+        "s1": "Ez a projekt előtag-csomag = hiányzó modelljelöltek – importálja őket a modellbe a schema.pi → Beállítások → Fordított menüpontban, vagy döntse el, hogy törli-e őket, ha nem használt táblákról van szó.",
+        "s2": "Egyéb előtag csoportok = más rendszerek, amelyek megosztják ezt a DB-t — nem jelentenek teendőt ehhez a projekthez.",
+        "s3": "Ha a cél séma nem public, módosítsa a fenti „Séma” mezőt, és futtassa újra."
+      },
+      "colMismatches": {
+        "s1": "Nincs a DB-ben = alkalmazza a modell oszlopot a DB-re a schema.pi DDL generálásával.",
+        "s2": "Nincs a modellben = importálja a DB oszlopot a modellbe a schema.pi → Beállítások → Fordított menüpontban, vagy döntse el, hogy törli, ha felesleges.",
+        "s3": "Típus/NULL eltér = igazítsa a modellhez (igazság forrása); mielőtt csökkentené a hosszt vagy NOT NULL-ra váltana, ellenőrizze, hogy a meglévő sorok megfelelnek-e."
+      },
+      "idxUsage": {
+        "s1": "Törlés előtt ellenőrizze, hogy ① a statisztikai ablak legalább egy üzleti ciklust (pl. hónap végi kötegelt feldolgozás) lefed-e — lásd „óta”.",
+        "s2": "② Nem egyedi/PK index (ezek külön „egyediségi megszorításként” jelennek meg).",
+        "s3": "③ Az SQL Tuningban EXPLAIN-elje a tábla reprezentatív SQL-jét, és ellenőrizze, hogy ez az index nem használatos.",
+        "s4": "Miután mindhárom megerősítést nyert, távolítsa el az indexet a modellből a schema.pi-ben, és alkalmazza DDL-en keresztül."
+      }
+    },
+    "act": {
+      "openSchema": "schema.pi megnyitása",
+      "rerun": "Futtatás újra",
+      "copy": "Lista másolása",
+      "copied": "Másolva",
+      "sqlLab": "EXPLAIN az SQL Tuningban"
     }
   },
   "learn": {
@@ -684,7 +730,7 @@
         "repl": "Replikáció ellenőrzés",
         "backup": "Mentés ellenőrzés",
         "sqlLab": "SQL tuning",
-        "drift": "Eltérés összehasonlítása",
+        "drift": "GAP elemzés",
         "connect": "Kapcsolatok",
         "schema": "schema.pi monitor"
       },
@@ -982,7 +1028,11 @@
       "totalMs": "Összes ms",
       "meanMs": "Átlagos ms",
       "rows": "Sorok",
-      "reset": "Statisztika visszaállítása észlelve – kumulatívként jelenik meg"
+      "reset": "Statisztika visszaállítása észlelve – kumulatívként jelenik meg",
+      "src": "Forrás",
+      "srcToggle": "Forrás részletek megjelenítése vagy elrejtése",
+      "openSqlLab": "Megnyitás az SQL Tuningban",
+      "acct": "Fiók"
     },
     "health": {
       "empty": "Még nincsenek pillanatképek. Nyomja meg a „Gyűjtés most” gombot a Gyűjtés lapon",
@@ -1012,6 +1062,44 @@
       "sessions": "Munkamenet tevékenység",
       "locks": "Zárolások",
       "none": "Nincs"
+    },
+    "src": {
+      "root": "A forrás pontos meghatározásához: (1) használjon külön DB fiókot minden programhoz, kötegelt feladathoz és személyhez (eszköz), és (2) állítsa be az application_name-et minden kapcsolaton. A fiók a pg_stat_statements-ből származik és biztos; az alkalmazás/eszköz kategória a tevékenységi mintákból becsült (az application_name-et a kliens jelenti be, így lehet üres vagy megváltozott, és a minták között befejeződő rövid lekérdezések kimaradhatnak).",
+      "cd": {
+        "PROGRAM": "Program",
+        "BATCH": "Kötegelt feladat",
+        "TOOL": "Eszköz (személy)",
+        "PLATFORM": "Platform belső",
+        "MONITOR": "Felügyelet (mi)",
+        "UNKNOWN": "Ismeretlen"
+      },
+      "conf": {
+        "high": "Magas megbízhatóság",
+        "mid": "Közepes megbízhatóság",
+        "low": "Alacsony megbízhatóság",
+        "acct": "Csak fiók",
+        "ver": "Verziókorlát"
+      },
+      "fix": {
+        "TOOL": "Úgy tűnik, egy személy közvetlenül lekérdezi a termelési DB-t egy DB eszközzel (DBeaver stb.). Irányítsa őket egy csak olvasható replikára vagy analitikai DB-re, és korlátozza a futási időt az emberi fiókokon, pl. ALTER ROLE human_user SET statement_timeout = '30s'. Használjon külön csak olvasható szerepkört, és futtassa a tömeges kivonásokat csúcsidőn kívül.",
+        "BATCH": "Úgy tűnik, kötegelt vagy ütemezett feladat. Ossza el a futási időket az üzleti csúcsoktól távol, és csökkentse a munkát commitenként. Ellenőrizze az indexeket és a statisztikákat (ANALYZE) a cél táblákon, és ossza fel a hosszú tranzakciókat. A feladat nevének beállítása az application_name-ben pontosabbá teszi a következő osztályozást.",
+        "PROGRAM": "Úgy tűnik, egy alkalmazás által futtatott lekérdezés. Ellenőrizze a tervet az SQL Tuningban. Sok hívás rövid átlaggal ismétlődő hívásokra (N+1) vagy gyorsítótárazásra utal; hosszú átlag esetén először az indexeket vagy a join sorrendet nézze meg. Állítsa be a szolgáltatás nevét a kapcsolatkészlet application_name-jében.",
+        "PLATFORM": "Úgy tűnik, DB vagy platform belső munka, például autovacuum vagy replikáció. Általában nincs szükség beavatkozásra. Ha a tetején marad, ellenőrizze az autovacuum küszöbértékeket és a maintenance_work_mem-et.",
+        "MONITOR": "Úgy tűnik, ez a szolgáltatás saját statisztikai lekérdezései (schema.pi link). Nincs szükség beavatkozásra. Ha túl gyakran jelenik meg, csökkentse a lekérdezési gyakoriságot.",
+        "UNKNOWN": "Nincs nyom a forrásra. Állítsa be az application_name-et minden kapcsolaton, és ossza fel a fiókokat cél szerint; a következő mintákból osztályozva lesz."
+      },
+      "detail": {
+        "app": "Alkalmazás neve",
+        "addr": "Kliens címe (maszkolt)",
+        "samples": "Minták",
+        "active": "Aktív minták",
+        "period": "Megfigyelt",
+        "none": "(üres)"
+      },
+      "noSample": "Még nincsenek minták — a futó munkamenetek mintavételezése akkor történik, amikor megtekinti a felügyeleti panelt vagy az Aktivitás és zárolások lapot. Egyelőre csak a fióknév alapján van osztályozva.",
+      "linkUsr": "link fiók",
+      "qidOff": "A munkamenet részletei láthatók, de a lekérdezési azonosító üres (a compute_query_id ki van kapcsolva). Ellenőrizze a SHOW compute_query_id; paranccsal, majd futtassa az ALTER SYSTEM SET compute_query_id = 'auto'; parancsot, és töltse újra (SELECT pg_reload_conf();).",
+      "openHint": "Megnyitja az SQL Tuningot a kitöltött lekérdezéssel. Cserélje ki a helyőrzőket, mint például a $1, valós értékekre a terv megtekintése előtt."
     }
   },
   "pipeline": {
@@ -1207,7 +1295,7 @@
     "label": "Funkciók",
     "groups": {
       "monitor": "Felügyelet",
-      "drift": "Konzisztencia",
+      "drift": "GAP elemzés",
       "lake": "Lake",
       "admin": "Admin"
     },
@@ -1215,7 +1303,7 @@
     "sqlLab": "SQL Tuning",
     "perf": "Teljesítmény",
     "monitor": "Felügyelet",
-    "drift": "Eltérés",
+    "drift": "GAP elemzés",
     "migration": "Migráció",
     "pipeline": "Adatcsatorna",
     "analytics": "Analitika",

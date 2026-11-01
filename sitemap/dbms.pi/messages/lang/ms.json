@@ -103,7 +103,7 @@
       "keys": {
         "links": "Pautan saya",
         "perf": "Gambar prestasi",
-        "drift": "Larian drift",
+        "drift": "Analisis GAP",
         "mig": "Pelan migrasi",
         "pipe": "Saluran paip",
         "lake": "Set data tasik"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Drift Model ↔ DB",
+    "title": "Analisis GAP — Model↔DB",
     "intro": "Bandingkan model reka bentuk schema.pi dan sejarah aplikasi DDL dengan katalog DB langsung untuk mencari drift, dan ukur sama ada indeks yang direka bentuk sebenarnya digunakan. Data baris pelanggan tidak pernah dibaca atau disimpan.",
     "needLink": "Pilih pautan schema.pi di atas terlebih dahulu. Jika anda tiada, daftar token dalam menu 'Pautan'.",
     "needConn": "Pilih sambungan DB untuk dibandingkan di atas.",
     "project": "Projek",
     "projectPick": "Pilih projek",
     "loading": "Memuatkan…",
-    "run": "Jalankan pengesanan drift",
+    "run": "Jalankan Analisis GAP",
     "running": "Membandingkan…",
     "readOnly": "Hanya katalog baca sahaja dan pertanyaan statistik dijalankan.",
     "applyInSchema": "Gunakan pembetulan (suntingan model, penjanaan dan pelaksanaan DDL) dalam schema.pi, sumber kebenaran.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Indeks yang direka bentuk tiada dalam DB",
       "extraIndexes": "Indeks tiada dalam model",
       "ddlMissing": "Objek hilang selepas aplikasi",
-      "unusedIndexes": "Indeks yang direka bentuk tidak digunakan"
+      "unusedIndexes": "Indeks Tidak Digunakan (Calon)"
     },
     "sec": {
       "ddlMissing": "DDL digunakan tetapi tiada dalam DB",
       "missingTables": "Jadual dalam model tetapi tiada dalam DB",
       "extraTables": "Jadual dalam DB tetapi tiada dalam model",
-      "colMismatches": "Ketidakpadanan jenis lajur / NULL",
+      "colMismatches": "Ketidakpadanan Lajur (Hilang·Jenis·NULL)",
       "missingIndexes": "Indeks yang direka bentuk tiada dalam DB",
       "extraIndexes": "Indeks hanya dalam DB (tidak termasuk PK)",
       "idxUsage": "Keberkesanan indeks yang direka bentuk"
     },
     "hint": {
-      "ddlMissing": "schema.pi merekodkan objek ini sebagai telah digunakan, tetapi ia telah hilang — syak pengguguran atau penggulungan semula secara manual.",
-      "extraTables": "Ini mungkin milik projek lain atau jadual sistem pada sambungan ini.",
-      "idxUsage": "Sifar imbasan sejak penetapan semula statistik terakhir bermakna tidak digunakan. Semak tetingkap statistik sebelum menggugurkan."
+      "ddlMissing": "Hanya objek yang tiada dalam DB berdasarkan piawaian terpakai terkini yang ditunjukkan. Permintaan sebelumnya yang mencipta semula jadual yang sama kemudian dan konvensyen penamaan lama (_PKEY) adalah normal dan dilipat di bawah.",
+      "extraTables": "Berdasarkan skema {schema}. Dikelompokkan mengikut awalan, hanya kumpulan awalan projek ini adalah calon untuk peninggalan model.",
+      "idxUsage": "Penghakiman = Sedang Digunakan / Untuk Keunikan / Tiada Data / Dalam Pemerhatian (Statistik bermula·Dicipta kurang daripada 7 hari) / Calon untuk Tidak Digunakan. Hanya calon untuk indeks tidak digunakan dipertimbangkan untuk penghapusan."
     },
     "kind": {
       "MISSING": "tiada dalam DB",
@@ -223,12 +223,16 @@
       "idx": "Indeks",
       "scans": "Imbasan",
       "size": "Saiz",
-      "status": "Keputusan"
+      "status": "Keputusan",
+      "basis": "Asas"
     },
     "usage": {
       "USED": "Digunakan",
-      "UNUSED": "Indeks yang direka bentuk tidak digunakan",
-      "NO_STATS": "Tiada statistik"
+      "NO_STATS": "Tiada statistik",
+      "CONSTRAINT": "Kekangan keunikan (kekalkan)",
+      "NO_DATA": "Tiada data atau statistik tidak dikumpul — tidak dapat menilai",
+      "OBSERVING": "Memerhati (kurang 7 hari)",
+      "UNUSED_CAND": "Calon tidak digunakan"
     },
     "errors": {
       "NOT_IMPLEMENTED": "Fungsi pautan schema.pi sedang disediakan. Sila cuba sebentar lagi.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Sambungan tidak disokong (sambungan pelayan PostgreSQL sahaja buat masa ini).",
       "TIMEOUT": "Permintaan tamat masa. Sila cuba sebentar lagi.",
       "RATE": "Terlalu banyak permintaan. Sila cuba lagi dalam seminit."
+    },
+    "schema": "Skema",
+    "schemaHint": "Hanya jadual biasa dan berpartisi dalam skema ini dibandingkan (paparan dikecualikan). Lalai public — skema dalaman Supabase (auth, storage, …) ditinggalkan.",
+    "truncated": "{names} mencapai had {max} baris dan dipotong — beberapa hasil \"tiada dalam DB\" / \"tiada dalam model\" mungkin palsu. Kecilkan skema dan jalankan semula.",
+    "colUnchecked": "Oleh kerana pertanyaan lajur dipotong, {n} hasil lajur hilang/tambahan dianggap tidak dapat disahkan dan dikecualikan daripada kiraan ketidakpadanan lajur.",
+    "renamed": "{n} indeks PK yang digunakan di bawah peraturan penamaan lama (_PKEY) wujud dalam DB di bawah nama baharu (PK_) — normal",
+    "superseded": "{n} permintaan lama dikecualikan kerana permintaan kemudian mencipta semula jadual yang sama (DROP … CASCADE) — normal",
+    "supersededItem": "Permintaan {id} → digantikan oleh permintaan {by}",
+    "sysCols": "{n} lajur sistem (ditambah secara automatik semasa penjanaan DDL) tiada dalam model mengikut reka bentuk dan dikecualikan daripada ketidakpadanan",
+    "groupOwn": "Awalan projek {pfx} — calon hilang daripada model",
+    "groupOther": "Sistem lain {pfx}",
+    "basis": "Anggaran baris {rows} · sejak {since}",
+    "guide": {
+      "title": "Langkah seterusnya",
+      "ddlMissing": {
+        "s1": "Dalam schema.pi → projek → model fizikal → penjanaan DDL, gunakan semula pada sambungan ini.",
+        "s2": "Apabila selesai, gunakan \"Jalankan semula\" di bawah dan sahkan kiraan adalah 0.",
+        "s3": "Jika objek masih hilang selepas penggunaan semula, syak penghapusan manual atau penggulungan semula dan semak aktiviti akaun sambungan dengan DBA anda."
+      },
+      "extraTables": {
+        "s1": "Gabungan awalan projek ini = calon model yang hilang — importnya ke dalam model melalui schema.pi → Tetapan → Songsang, atau putuskan sama ada untuk memadamkannya jika ia adalah jadual yang tidak digunakan.",
+        "s2": "Kumpulan awalan lain = sistem lain yang berkongsi DB ini — bukan item tindakan untuk projek ini.",
+        "s3": "Jika skema sasaran bukan public, tukar medan \"Skema\" di atas dan jalankan semula."
+      },
+      "colMismatches": {
+        "s1": "Tiada dalam DB = gunakan lajur model ke DB melalui penjanaan DDL schema.pi.",
+        "s2": "Tiada dalam model = import lajur DB ke dalam model melalui schema.pi → Tetapan → Songsang, atau putuskan untuk memadamkannya jika tidak perlu.",
+        "s3": "Jenis/NULL berbeza = selaraskan dengan model (sumber kebenaran); sebelum mengecilkan panjang atau beralih ke NOT NULL, sahkan baris sedia ada memenuhinya."
+      },
+      "idxUsage": {
+        "s1": "Sebelum mengalih keluar, semak ① tetingkap statistik meliputi sekurang-kurangnya satu kitaran perniagaan (cth. kelompok akhir bulan) — lihat \"sejak\".",
+        "s2": "② Ia bukan indeks unik/PK (yang menunjukkan secara berasingan sebagai \"kekangan keunikan\").",
+        "s3": "③ EXPLAIN SQL wakil jadual dalam SQL Tuning dan sahkan indeks ini tidak digunakan.",
+        "s4": "Setelah ketiga-tiganya disahkan, alih keluar indeks daripada model dalam schema.pi dan gunakan melalui DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Buka schema.pi",
+      "rerun": "Jalankan semula",
+      "copy": "Salin senarai",
+      "copied": "Disalin",
+      "sqlLab": "EXPLAIN dalam SQL Tuning"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Semakan replikasi",
         "backup": "Semakan sandaran",
         "sqlLab": "Penalaan SQL",
-        "drift": "Bandingkan hanyutan",
+        "drift": "Analisis GAP",
         "connect": "Sambungan",
         "schema": "monitor schema.pi"
       },
@@ -812,6 +858,7 @@
   },
   "ops": {
     "title": "Keselamatan Operasi DB",
+    "intro": "Mendiagnosis parameter, keistimewaan akaun, sandaran dan status replikasi sambungan PostgreSQL yang dipautkan dalam mod baca sahaja. Tetapan tidak diubah, hanya ringkasan keputusan disimpan dan data baris DB pelanggan tidak disimpan",
     "loading": "Memuatkan…",
     "pickFirst": "Pilih pautan dan sambungan di atas dahulu",
     "run": "Jalankan diagnosis",
@@ -944,6 +991,7 @@
   },
   "perf": {
     "title": "Prestasi",
+    "intro": "Mengumpul statistik pertanyaan, jadual dan indeks daripada sambungan PostgreSQL yang dipautkan untuk menunjukkan pertanyaan perlahan, kesihatan jadual/indeks dan trend kapasiti. Hanya nilai statistik disimpan dan data baris DB pelanggan tidak disimpan",
     "loading": "Memuatkan…",
     "pickFirst": "Pilih pautan dan sambungan di atas dahulu",
     "pager": "Penomboran",
@@ -989,7 +1037,11 @@
       "totalMs": "Jumlah ms",
       "meanMs": "Purata ms",
       "rows": "Baris",
-      "reset": "Tetapan semula statistik dikesan — ditunjukkan sebagai kumulatif"
+      "reset": "Tetapan semula statistik dikesan — ditunjukkan sebagai kumulatif",
+      "src": "Sumber",
+      "srcToggle": "Tunjukkan atau sembunyikan butiran sumber",
+      "openSqlLab": "Buka dalam SQL Tuning",
+      "acct": "Akaun"
     },
     "health": {
       "empty": "Tiada syot kilat lagi. Tekan Kumpul sekarang pada tab Kumpul",
@@ -1020,6 +1072,46 @@
       "sessions": "Aktiviti sesi",
       "locks": "Kunci",
       "none": "Tiada"
+    },
+    "src": {
+      "root": "Untuk menentukan sumber dengan tepat: (1) gunakan akaun DB yang berasingan untuk setiap program, kelompok dan orang (alat), dan (2) tetapkan application_name pada setiap sambungan. Akaun datang daripada pg_stat_statements dan adalah pasti; kategori aplikasi/alat dianggarkan daripada sampel aktiviti (application_name dilaporkan sendiri oleh klien, jadi ia boleh kosong atau diubah, dan pertanyaan pendek yang selesai antara sampel boleh terlepas)",
+      "cd": {
+        "PROGRAM": "Program",
+        "BATCH": "Kelompok",
+        "TOOL": "Alat (orang)",
+        "PLATFORM": "Dalaman platform",
+        "MONITOR": "Pemantauan (kami)",
+        "UNKNOWN": "Tidak diketahui"
+      },
+      "conf": {
+        "high": "Keyakinan tinggi",
+        "mid": "Keyakinan sederhana",
+        "low": "Keyakinan rendah",
+        "acct": "Akaun sahaja",
+        "ver": "Had versi"
+      },
+      "fix": {
+        "TOOL": "Kelihatan seperti seseorang menanyakan DB pengeluaran secara langsung dengan alat DB (DBeaver dll.). Arahkan mereka ke replika baca sahaja atau DB analitik sebaliknya, dan hadkan masa jalan pada akaun manusia, cth. ALTER ROLE human_user SET statement_timeout = '30s'. Gunakan peranan baca sahaja yang berasingan, dan jalankan ekstrak pukal pada waktu luar puncak",
+        "BATCH": "Kelihatan seperti kelompok atau kerja berjadual. Sebarkan masa jalan jauh dari puncak perniagaan dan kecilkan kerja setiap komit. Semak indeks dan statistik (ANALYZE) pada jadual sasaran, dan bahagikan transaksi panjang. Meletakkan nama kerja dalam application_name menjadikan klasifikasi seterusnya lebih tepat",
+        "PROGRAM": "Kelihatan seperti pertanyaan yang dijalankan oleh aplikasi. Semak rancangan dalam SQL Tuning. Banyak panggilan dengan purata pendek menunjukkan panggilan berulang (N+1) atau caching; purata panjang menunjukkan indeks atau susunan gabungan terlebih dahulu. Tetapkan nama perkhidmatan dalam application_name kumpulan sambungan anda",
+        "PLATFORM": "Kelihatan seperti kerja dalaman DB atau platform seperti autovacuum atau replikasi. Biasanya tiada tindakan diperlukan. Jika ia kekal di atas, semak ambang autovacuum dan maintenance_work_mem",
+        "MONITOR": "Kelihatan seperti pertanyaan statistik perkhidmatan ini sendiri (pautan schema.pi). Tiada tindakan diperlukan. Jika ia muncul terlalu kerap, kurangkan kekerapan pengundian",
+        "UNKNOWN": "Tiada petunjuk kepada sumber. Tetapkan application_name pada setiap sambungan dan bahagikan akaun mengikut tujuan; ia akan diklasifikasikan daripada sampel seterusnya"
+      },
+      "detail": {
+        "app": "Nama aplikasi",
+        "addr": "Alamat klien (ditopeng)",
+        "samples": "Sampel",
+        "active": "Sampel aktif",
+        "period": "Diperhatikan",
+        "none": "(kosong)"
+      },
+      "noSample": "Tiada sampel lagi — sesi berjalan disampel apabila anda melihat papan pemantauan atau tab Aktiviti & kunci. Buat masa ini ia diklasifikasikan daripada nama akaun sahaja",
+      "verOff": "DB ini lebih lama daripada PostgreSQL 14, jadi sesi berjalan tiada ID pertanyaan. Hanya akaun (pasti) ditunjukkan",
+      "privOff": "Akaun pautan tidak dapat melihat butiran sesi akaun lain, jadi tiada sampel dikumpul. Minta pentadbir DB untuk menjalankan GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "akaun pautan",
+      "qidOff": "Butiran sesi kelihatan tetapi ID pertanyaan kosong (compute_query_id dimatikan). Semak dengan SHOW compute_query_id; kemudian jalankan ALTER SYSTEM SET compute_query_id = 'auto'; dan muat semula (SELECT pg_reload_conf();)",
+      "openHint": "Membuka SQL Tuning dengan pertanyaan diisi. Gantikan pemegang tempat seperti $1 dengan nilai sebenar sebelum melihat rancangan"
     }
   },
   "pipeline": {
@@ -1216,7 +1308,7 @@
     "label": "Ciri-ciri",
     "groups": {
       "monitor": "Pemantauan",
-      "drift": "Konsistensi",
+      "drift": "Analisis GAP",
       "lake": "Tasik",
       "admin": "Pentadbir"
     },
@@ -1224,7 +1316,7 @@
     "sqlLab": "Penalaan SQL",
     "perf": "Prestasi",
     "monitor": "Pemantauan",
-    "drift": "Hanyutan",
+    "drift": "Analisis GAP",
     "migration": "Migrasi",
     "pipeline": "Saluran Paip",
     "analytics": "Analitik",

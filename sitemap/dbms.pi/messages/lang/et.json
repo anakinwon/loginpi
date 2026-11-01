@@ -103,7 +103,7 @@
       "keys": {
         "links": "Minu lingid",
         "perf": "Jõudluse hetktõmmised",
-        "drift": "Drifti käivitused",
+        "drift": "GAP-analüüs",
         "mig": "Migratsiooniplaanid",
         "pipe": "Torujuhtmed",
         "lake": "Järve andmestikud"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Mudeli ↔ DB drift",
+    "title": "GAP-analüüs — mudel↔DB",
     "intro": "Võrrelge schema.pi disainimudelit ja DDL-i rakendamise ajalugu reaalajas DB kataloogiga, et leida drifti, ja mõõtke, kas disainitud indekseid tegelikult kasutatakse. Kliendi ridade andmeid ei loeta ega salvestata kunagi.",
     "needLink": "Valige esmalt schema.pi link. Kui teil pole ühtegi, registreerige token menüüs 'Link'.",
     "needConn": "Valige ülal võrdlemiseks DB ühendus.",
     "project": "Projekt",
     "projectPick": "Vali projekt",
     "loading": "Laadimine…",
-    "run": "Käivita drifti tuvastamine",
+    "run": "Käivita GAP-analüüs",
     "running": "Võrdlemine…",
     "readOnly": "Käivitatakse ainult lugemiseks kataloogi ja statistika päringud.",
     "applyInSchema": "Rakendage parandused (mudeli muudatused, DDL-i genereerimine ja täitmine) schema.pi-s, mis on tõe allikas.",
@@ -197,21 +197,20 @@
       "missingIndexes": "Disainitud indeksid puuduvad DB-s",
       "extraIndexes": "Indeksid, mida mudelis pole",
       "ddlMissing": "Objektid kadunud pärast rakendamist",
-      "unusedIndexes": "Kasutamata disainitud indeksid"
+      "unusedIndexes": "Kandidaadid kasutamata indeksiteks"
     },
     "sec": {
       "ddlMissing": "DDL rakendatud, kuid puudub DB-s",
       "missingTables": "Tabelid mudelis, kuid puuduvad DB-s",
       "extraTables": "Tabelid DB-s, kuid mitte mudelis",
-      "colMismatches": "Veeru tüübi / NULL-i mittevastavused",
+      "colMismatches": "Veergude mittevastavused (puuduvad·tüüp·NULL)",
       "missingIndexes": "Disainitud indeksid puuduvad DB-s",
       "extraIndexes": "Indeksid ainult DB-s (v.a PK)",
       "idxUsage": "Disainitud indeksi efektiivsus"
     },
     "hint": {
-      "ddlMissing": "schema.pi salvestas need objektid rakendatutena, kuid need on kadunud – kahtlustage käsitsi kustutamist või tagasipööramist.",
-      "extraTables": "Need võivad kuuluda teistele projektidele või süsteemitabelitele sellel ühendusel.",
-      "idxUsage": "Null skaneerimist alates viimasest statistika lähtestamisest tähendab kasutamata. Kontrollige statistikaakent enne kustutamist."
+      "extraTables": "Põhineb skeemil {schema}. Rühmitatud prefiksi järgi, ainult selle projekti prefiksi rühm on mudeli väljajätmise kandidaadid.",
+      "idxUsage": "Otsus = Kasutuses / Unikaalsuse tagamiseks / Andmed puuduvad / Jälgimisel (statistika algas·loodud vähem kui 7 päeva tagasi) / Kasutamata kandidaat. Kustutamiseks kaalutakse ainult kasutamata indeksite kandidaate."
     },
     "kind": {
       "MISSING": "puudub DB-s",
@@ -223,12 +222,16 @@
       "idx": "Indeks",
       "scans": "Skaneeringud",
       "size": "Suurus",
-      "status": "Otsus"
+      "status": "Otsus",
+      "basis": "Alus"
     },
     "usage": {
       "USED": "Kasutusel",
-      "UNUSED": "Kasutamata disainitud indeks",
-      "NO_STATS": "Statistika puudub"
+      "NO_STATS": "Statistika puudub",
+      "CONSTRAINT": "Unikaalsuse piirang (säilitada)",
+      "NO_DATA": "Andmed puuduvad või statistikat pole kogutud — ei saa hinnata",
+      "OBSERVING": "Jälgimisel (alla 7 päeva)",
+      "UNUSED_CAND": "Kasutamata kandidaat"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi ühenduse funktsioon on veel ettevalmistamisel. Palun proovige varsti uuesti.",
@@ -239,6 +242,48 @@
       "CONN_UNSUPPORTED": "Toetamata ühendus (praegu ainult PostgreSQL-i serveri ühendused).",
       "TIMEOUT": "Päringu aegumine. Palun proovige varsti uuesti.",
       "RATE": "Liiga palju päringuid. Palun proovige minuti pärast uuesti."
+    },
+    "schema": "Skeem",
+    "schemaHint": "Võrreldakse ainult selle skeemi tavalisi ja partitsioonitud tabeleid (vaated on välja jäetud). Vaikimisi public — Supabase'i sisemised skeemid (auth, storage, …) on välja jäetud.",
+    "truncated": "{names} ületas {max}-rea piirangu ja kärbiti — mõned „pole DB-s“ / „pole mudelis“ tulemused võivad olla valed. Kitsenda skeemi ja käivita uuesti.",
+    "colUnchecked": "Kuna veergude päring kärbiti, käsitletakse {n} puuduvat/lisaveeru tulemust kontrollimatutena ja need on veergude mittevastavuste arvust välja jäetud.",
+    "renamed": "{n} PK indeks(id), mis rakendati vana nimekonventsiooni (_PKEY) alusel, eksisteerivad DB-s uue nimega (PK_) — normaalne",
+    "superseded": "{n} vanem(ad) päring(ud) jäeti välja, kuna hilisem päring lõi sama tabeli uuesti (DROP … CASCADE) — normaalne",
+    "supersededItem": "Päring {id} → asendatud päringuga {by}",
+    "sysCols": "{n} süsteemiveerg(u), mis lisati automaatselt DDL-i genereerimisel, ei ole mudelis disaini järgi ja on mittevastavustest välja jäetud.",
+    "groupOwn": "Projekti prefiks {pfx} — mudelist puuduvate kandidaadid",
+    "groupOther": "Muu süsteem {pfx}",
+    "basis": "Hinnanguline ridade arv {rows} · alates {since}",
+    "guide": {
+      "title": "Järgmised sammud",
+      "ddlMissing": {
+        "s1": "schema.pi → projekt → füüsiline mudel → DDL-i genereerimine, rakenda uuesti sellele ühendusele.",
+        "s2": "Kui valmis, kasuta allpool „Käivita uuesti“ ja veendu, et arv on 0.",
+        "s3": "Kui objektid kaovad pärast uuesti rakendamist endiselt, kahtlusta käsitsi kustutamist või tagasipööramist ja kontrolli ühenduse konto tegevust oma DBA-ga."
+      },
+      "extraTables": {
+        "s1": "See projekti prefiksi komplekt = puuduvad mudelikandidaadid – importige need mudelisse schema.pi → Seaded → Tagurpidi kaudu või otsustage, kas kustutada need, kui tegemist on kasutamata tabelitega.",
+        "s2": "Muud prefiksi rühmad = teised süsteemid, mis jagavad seda DB-d — ei ole selle projekti tegevusobjektid.",
+        "s3": "Kui sihtskeem ei ole public, muuda ülaltoodud „Skeem“ välja ja käivita uuesti."
+      },
+      "colMismatches": {
+        "s1": "Pole DB-s = rakenda mudeli veerg DB-le schema.pi DDL-i genereerimise kaudu.",
+        "s2": "Mudelis puudub = importige DB veerg mudelisse schema.pi → Seaded → Tagurpidi kaudu või otsustage see mittevajalikuna kustutada.",
+        "s3": "Tüüp/NULL erineb = viia vastavusse mudeliga (tõe allikas); enne pikkuse lühendamist või NOT NULL-iks muutmist veendu, et olemasolevad read seda rahuldavad."
+      },
+      "idxUsage": {
+        "s1": "Enne eemaldamist kontrolli ①, et statistikaaken hõlmaks vähemalt ühte äritüklit (nt kuu lõpu partii) — vaata „alates“.",
+        "s2": "② See ei ole unikaalne/PK indeks (need kuvatakse eraldi kui „unikaalsuse piirang“).",
+        "s3": "③ EXPLAIN tabeli esinduslikku SQL-i SQL Tuningus ja veendu, et seda indeksit ei kasutata.",
+        "s4": "Kui kõik kolm on kinnitatud, eemalda indeks mudelist schema.pi-s ja rakenda DDL-i kaudu."
+      }
+    },
+    "act": {
+      "openSchema": "Ava schema.pi",
+      "rerun": "Käivita uuesti",
+      "copy": "Kopeeri loend",
+      "copied": "Kopeeritud",
+      "sqlLab": "EXPLAIN SQL Tuningus"
     }
   },
   "learn": {
@@ -687,7 +732,7 @@
         "repl": "Replikatsiooni kontroll",
         "backup": "Varunduse kontroll",
         "sqlLab": "SQL-i häälestamine",
-        "drift": "Triivi võrdlus",
+        "drift": "GAP-analüüs",
         "connect": "Ühendused",
         "schema": "schema.pi monitor"
       },
@@ -986,7 +1031,11 @@
       "totalMs": "Kogumillisekundid",
       "meanMs": "Keskmine ms",
       "rows": "Read",
-      "reset": " Statistika lähtestamine tuvastatud – kuvatakse kumulatiivsena"
+      "reset": " Statistika lähtestamine tuvastatud – kuvatakse kumulatiivsena",
+      "src": "Allikas",
+      "srcToggle": "Näita või peida allika üksikasjad",
+      "openSqlLab": "Ava SQL Tuningus",
+      "acct": "Konto"
     },
     "health": {
       "empty": "Ühtegi hetktõmmist veel pole. Vajutage kogumise vahekaardil „Kogu kohe“",
@@ -1016,6 +1065,46 @@
       "sessions": "Sessiooni tegevus",
       "locks": "Lukud",
       "none": "Puudub"
+    },
+    "src": {
+      "root": "Allika täpseks määramiseks: (1) kasutage iga programmi, partii ja isiku (tööriista) jaoks eraldi DB kontot ning (2) seadistage igal ühendusel application_name. Konto pärineb pg_stat_statements'ist ja on kindel; rakenduse/tööriista kategooria on hinnatud tegevusproovide põhjal (application_name on kliendi poolt ise teatatud, seega võib see olla tühi või muutuda, ja lühikesed päringud, mis lõpevad proovide vahel, võivad jääda märkamatuks).",
+      "cd": {
+        "PROGRAM": "Programm",
+        "BATCH": "Partii",
+        "TOOL": "Tööriist (isik)",
+        "PLATFORM": "Platvormi sisemine",
+        "MONITOR": "Jälgimine (meie)",
+        "UNKNOWN": "Teadmata"
+      },
+      "conf": {
+        "high": "Kõrge usaldusväärsus",
+        "mid": "Keskmine usaldusväärsus",
+        "low": "Madal usaldusväärsus",
+        "acct": "Ainult konto",
+        "ver": "Versiooni piirang"
+      },
+      "fix": {
+        "TOOL": "Näib, et inimene pärib tootmis-DB-d otse DB-tööriistaga (DBeaver jne). Suunake nad hoopis lugemiseks mõeldud replikasse või analüütika-DB-sse ja piirake inimkontode käitusaega, nt ALTER ROLE human_user SET statement_timeout = '30s'. Kasutage eraldi lugemiseks mõeldud rolli ja tehke suuremahulisi väljavõtteid tipptundide välisel ajal.",
+        "BATCH": "Näib olevat partii- või ajastatud töö. Jaotage käitusajad äri tippudest eemale ja vähendage töö mahtu ühe commit'i kohta. Kontrollige sihttabelite indekseid ja statistikat (ANALYZE) ning jagage pikad tehingud. Töö nime lisamine application_name'i muudab järgmise klassifikatsiooni täpsemaks.",
+        "PROGRAM": "Näib olevat rakenduse käivitatud päring. Kontrollige plaani SQL Tuningus. Paljud lühikese keskmisega kõned viitavad korduvatele kõnedele (N+1) või vahemälu kasutamisele; pikk keskmine viitab esmalt indeksitele või liitumisjärjekorrale. Seadistage teenuse nimi oma ühenduste kogumi application_name'is.",
+        "PLATFORM": "Näib olevat DB või platvormi sisemine töö, nagu autovacuum või replikatsioon. Tavaliselt pole vaja midagi ette võtta. Kui see jääb tippu, vaadake üle autovacuum'i läved ja maintenance_work_mem.",
+        "MONITOR": "Näib olevat selle teenuse enda statistikapäringud (schema.pi link). Tegevust pole vaja. Kui see ilmub liiga sageli, vähendage küsitlussagedust.",
+        "UNKNOWN": "Allika kohta puudub vihje. Seadistage application_name igal ühendusel ja jagage kontod otstarbe järgi; see klassifitseeritakse järgmistest proovidest."
+      },
+      "detail": {
+        "app": "Rakenduse nimi",
+        "addr": "Kliendi aadress (maskeeritud)",
+        "samples": "Proovid",
+        "active": "Aktiivsed proovid",
+        "period": "Vaadeldud",
+        "none": "(tühi)"
+      },
+      "noSample": "Proove pole veel — jooksvad seansid võetakse prooviks, kui vaatate jälgimispaneeli või vahekaarti Tegevus ja lukud. Praegu klassifitseeritakse see ainult konto nime järgi.",
+      "verOff": "See DB on vanem kui PostgreSQL 14, seega jooksvatel seanssidel puudub päringu ID. Kuvatakse ainult konto (kindel).",
+      "privOff": "Lingi kontol puudub õigus näha teiste kontode seansi üksikasju, seega proove ei koguta. Paluge DB administraatoril käivitada GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "lingi konto",
+      "qidOff": "Seansi üksikasjad on nähtavad, kuid päringu ID on tühi (compute_query_id on välja lülitatud). Kontrollige käsuga SHOW compute_query_id; seejärel käivitage ALTER SYSTEM SET compute_query_id = 'auto'; ja laadige uuesti (SELECT pg_reload_conf();).",
+      "openHint": "Avab SQL Tuning'u, kus päring on täidetud. Asendage kohatäited nagu $1 tegelike väärtustega enne plaani vaatamist."
     }
   },
   "pipeline": {
@@ -1212,7 +1301,7 @@
     "label": "Funktsioonid",
     "groups": {
       "monitor": "Monitooring",
-      "drift": "Järjepidevus",
+      "drift": "GAP-analüüs",
       "lake": "Andmeladu",
       "admin": "Administraator"
     },
@@ -1220,7 +1309,7 @@
     "sqlLab": "SQL-i häälestamine",
     "perf": "Jõudlus",
     "monitor": "Jälgimine",
-    "drift": "Triiv",
+    "drift": "GAP-analüüs",
     "migration": "Migratsioon",
     "pipeline": "Torujuhe",
     "analytics": "Analüütika",

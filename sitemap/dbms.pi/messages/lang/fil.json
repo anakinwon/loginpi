@@ -103,7 +103,7 @@
       "keys": {
         "links": "Aking mga link",
         "perf": "Mga snapshot ng performance",
-        "drift": "Mga pagpapatakbo ng drift",
+        "drift": "GAP Analysis",
         "mig": "Mga plano sa migration",
         "pipe": "Mga pipeline",
         "lake": "Mga dataset ng Lake"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB Drift",
+    "title": "GAP Analysis — Model↔DB",
     "intro": "Paghambingin ang schema.pi design model at DDL apply history sa live DB catalog upang makahanap ng drift, at sukatin kung talagang ginagamit ang mga dinisenyong index. Hindi kailanman binabasa o iniimbak ang row data ng customer.",
     "needLink": "Pumili muna ng schema.pi link sa itaas. Kung wala kang anuman, magrehistro ng token sa menu ng 'Link'.",
     "needConn": "Pumili ng koneksyon sa DB na ihahambing sa itaas.",
     "project": "Proyekto",
     "projectPick": "Pumili ng proyekto",
     "loading": "Naglo-load…",
-    "run": "Patakbuhin ang drift detection",
+    "run": "Patakbuhin ang GAP Analysis",
     "running": "Naghahambing…",
     "readOnly": "Mga read-only na catalog at istatistika lang ang pinapatakbo.",
     "applyInSchema": "Ilapat ang mga pag-aayos (mga pag-edit ng modelo, pagbuo ng DDL at pagpapatupad) sa schema.pi, ang source of truth.",
@@ -197,21 +197,21 @@
       "missingIndexes": "Mga dinisenyong index na nawawala sa DB",
       "extraIndexes": "Mga index na wala sa modelo",
       "ddlMissing": "Mga object na nawala pagkatapos ilapat",
-      "unusedIndexes": "Mga hindi nagamit na dinisenyong index"
+      "unusedIndexes": "Mga Kandidatong Hindi Nagagamit na Index"
     },
     "sec": {
       "ddlMissing": "Na-apply ang DDL ngunit nawawala sa DB",
       "missingTables": "Mga table sa modelo ngunit nawawala sa DB",
       "extraTables": "Mga table sa DB ngunit wala sa modelo",
-      "colMismatches": "Mga hindi tugmang uri ng column / NULL",
+      "colMismatches": "Mga Hindi Pagkakatugma ng Column (Nawawala·Uri·NULL)",
       "missingIndexes": "Mga dinisenyong index na nawawala sa DB",
       "extraIndexes": "Mga index lang sa DB (hindi kasama ang PK)",
       "idxUsage": "Epektibo ng dinisenyong index"
     },
     "hint": {
-      "ddlMissing": "Naitala ng schema.pi ang mga object na ito bilang na-apply, ngunit nawala ang mga ito — hinala na manual na pag-drop o rollback.",
-      "extraTables": "Maaaring kabilang ang mga ito sa ibang proyekto o system table sa koneksyon na ito.",
-      "idxUsage": "Ang zero scans mula noong huling pag-reset ng istatistika ay nangangahulugang hindi nagamit. Suriin ang statistics window bago i-drop."
+      "ddlMissing": "Ang mga object lang na nawawala sa DB batay sa pinakabagong inilapat na pamantayan ang ipinapakita. Ang mga nakaraang kahilingan na muling gumawa ng parehong table sa ibang pagkakataon at lumang convention sa pagpapangalan (_PKEY) ay normal at nakatiklop sa ibaba.",
+      "extraTables": "Batay sa schema {schema}. Nakagrupo ayon sa prefix, ang prefix group lang ng proyektong ito ang mga kandidato para sa pagtanggal ng modelo.",
+      "idxUsage": "Paghuhusga = Ginagamit / Para sa Uniqueness / Walang Data / Sa Ilalim ng Pagmamasid (Nagsimula ang Stats·Nagawa nang wala pang 7 araw) / Kandidato para sa Hindi Nagagamit. Ang mga kandidato lang para sa hindi nagagamit na index ang isinasaalang-alang para sa pagtanggal."
     },
     "kind": {
       "MISSING": "nawawala sa DB",
@@ -223,12 +223,16 @@
       "idx": "Index",
       "scans": "Mga scan",
       "size": "Sukat",
-      "status": "Hatol"
+      "status": "Hatol",
+      "basis": "Batayan"
     },
     "usage": {
       "USED": "Ginagamit",
-      "UNUSED": "Hindi nagamit na dinisenyong index",
-      "NO_STATS": "Walang istatistika"
+      "NO_STATS": "Walang istatistika",
+      "CONSTRAINT": "Uniqueness constraint (panatilihin)",
+      "NO_DATA": "Walang data o hindi nakolekta ang stats — hindi mahuhusgahan",
+      "OBSERVING": "Nag-oobserba (wala pang 7 araw)",
+      "UNUSED_CAND": "Kandidato para sa hindi nagagamit"
     },
     "errors": {
       "NOT_IMPLEMENTED": "Hindi pa handa ang schema.pi link. Pakisubukang muli sa ilang sandali.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Hindi suportadong koneksyon (mga koneksyon lang ng PostgreSQL server sa ngayon).",
       "TIMEOUT": "Nag-timeout ang kahilingan. Pakisubukang muli sa ilang sandali.",
       "RATE": "Masyadong maraming kahilingan. Pakisubukang muli sa isang minuto."
+    },
+    "schema": "Schema",
+    "schemaHint": "Ang mga regular at partitioned table lang sa schema na ito ang inihahambing (hindi kasama ang mga view). Default public — ang mga internal schema ng Supabase (auth, storage, …) ay hindi kasama.",
+    "truncated": "Naabot ng {names} ang limitasyon ng {max}-row at na-truncate — maaaring mali ang ilang resulta ng \"wala sa DB\" / \"wala sa model\". Paliitin ang schema at patakbuhin muli.",
+    "colUnchecked": "Dahil na-truncate ang query ng column, ang {n} nawawala/dagdag na resulta ng column ay itinuturing na hindi mapapatunayan at hindi kasama sa bilang ng hindi pagkakatugma ng column.",
+    "renamed": "Ang {n} PK index(es) na inilapat sa ilalim ng lumang panuntunan sa pagpapangalan (_PKEY) ay umiiral sa DB sa ilalim ng bagong pangalan (PK_) — normal",
+    "superseded": "Ang {n} mas lumang kahilingan ay hindi kasama dahil muling ginawa ng isang mas huling kahilingan ang parehong table (DROP … CASCADE) — normal",
+    "supersededItem": "Kahilingan {id} → pinalitan ng kahilingan {by}",
+    "sysCols": "Ang {n} system column(s) na awtomatikong idinagdag sa pagbuo ng DDL ay wala sa modelo ayon sa disenyo at hindi kasama sa mga hindi pagkakatugma",
+    "groupOwn": "Prefix ng proyekto {pfx} — mga kandidato na nawawala sa modelo",
+    "groupOther": "Ibang system {pfx}",
+    "basis": "Tinantyang rows {rows} · mula {since}",
+    "guide": {
+      "title": "Mga susunod na hakbang",
+      "ddlMissing": {
+        "s1": "Sa schema.pi → ang proyekto → physical model → DDL generation, ilapat muli sa koneksyon na ito.",
+        "s2": "Kapag tapos na, gamitin ang \"Patakbuhin muli\" sa ibaba at kumpirmahing 0 ang bilang.",
+        "s3": "Kung nawawala pa rin ang mga object pagkatapos muling ilapat, maghinala ng manual na pagtanggal o rollback at suriin ang aktibidad ng account ng koneksyon sa iyong DBA."
+      },
+      "extraTables": {
+        "s1": "Ang bundle ng prefix ng proyektong ito = nawawalang mga kandidato ng modelo — i-import ang mga ito sa modelo sa pamamagitan ng schema.pi → Mga Setting → Reverse, o magpasya kung tatanggalin ang mga ito kung hindi nagagamit na mga talahanayan.",
+        "s2": "Ibang grupo ng prefix = ibang system na nagbabahagi ng DB na ito — hindi ito mga item ng aksyon para sa proyektong ito.",
+        "s3": "Kung ang target na schema ay hindi public, baguhin ang field na \"Schema\" sa itaas at patakbuhin muli."
+      },
+      "colMismatches": {
+        "s1": "Wala sa DB = ilapat ang column ng modelo sa DB sa pamamagitan ng schema.pi DDL generation.",
+        "s2": "Wala sa modelo = i-import ang column ng DB sa modelo sa pamamagitan ng schema.pi → Mga Setting → Reverse, o magpasya na tanggalin ito kung hindi kinakailangan.",
+        "s3": "Magkaiba ang Uri/NULL = ihanay sa modelo (source of truth); bago paliitin ang haba o lumipat sa NOT NULL, kumpirmahing natutugunan ito ng mga umiiral na row."
+      },
+      "idxUsage": {
+        "s1": "Bago tanggalin, suriin ① kung ang window ng istatistika ay sumasaklaw ng hindi bababa sa isang business cycle (hal. batch sa katapusan ng buwan) — tingnan ang \"mula\".",
+        "s2": "② Hindi ito unique/PK index (ang mga iyon ay hiwalay na ipinapakita bilang \"uniqueness constraint\").",
+        "s3": "③ I-EXPLAIN ang kinatawan ng SQL ng table sa SQL Tuning at kumpirmahing hindi ginagamit ang index na ito.",
+        "s4": "Kapag nakumpirma na ang lahat ng tatlo, tanggalin ang index mula sa modelo sa schema.pi at ilapat sa pamamagitan ng DDL."
+      }
+    },
+    "act": {
+      "openSchema": "Buksan ang schema.pi",
+      "rerun": "Patakbuhin muli",
+      "copy": "Kopyahin ang listahan",
+      "copied": "Nakopya",
+      "sqlLab": "EXPLAIN sa SQL Tuning"
     }
   },
   "learn": {
@@ -686,7 +732,7 @@
         "repl": "Pagsusuri ng replication",
         "backup": "Pagsusuri ng backup",
         "sqlLab": "SQL tuning",
-        "drift": "Paghambing ng drift",
+        "drift": "GAP Analysis",
         "connect": "Mga koneksyon",
         "schema": "schema.pi monitor"
       },
@@ -990,7 +1036,11 @@
       "totalMs": "Kabuuang ms",
       "meanMs": "Mean ms",
       "rows": "Mga Row",
-      "reset": "Nakita ang pag-reset ng stats — ipinapakita bilang cumulative"
+      "reset": "Nakita ang pag-reset ng stats — ipinapakita bilang cumulative",
+      "src": "Pinagmulan",
+      "srcToggle": "Ipakita o itago ang mga detalye ng pinagmulan",
+      "openSqlLab": "Buksan sa SQL Tuning",
+      "acct": "Account"
     },
     "health": {
       "empty": "Wala pang snapshot. Pindutin ang Kolektahin ngayon sa tab na Kolektahin",
@@ -1021,6 +1071,46 @@
       "sessions": "Aktibidad ng session",
       "locks": "Mga Lock",
       "none": "Wala"
+    },
+    "src": {
+      "root": "Upang matukoy nang tumpak ang pinagmulan: (1) gumamit ng hiwalay na DB account para sa bawat programa, batch at tao (tool), at (2) itakda ang application_name sa bawat koneksyon. Ang account ay nagmumula sa pg_stat_statements at tiyak; ang kategorya ng app/tool ay tinatantya mula sa mga sample ng aktibidad (ang application_name ay self-reported ng client, kaya maaari itong walang laman o mabago, at ang mga maikling query na natatapos sa pagitan ng mga sample ay maaaring makaligtaan)",
+      "cd": {
+        "PROGRAM": "Programa",
+        "BATCH": "Batch",
+        "TOOL": "Tool (tao)",
+        "PLATFORM": "Internal ng Platform",
+        "MONITOR": "Pagsubaybay (kami)",
+        "UNKNOWN": "Hindi alam"
+      },
+      "conf": {
+        "high": "Mataas na kumpiyansa",
+        "mid": "Katamtamang kumpiyansa",
+        "low": "Mababang kumpiyansa",
+        "acct": "Account lang",
+        "ver": "Limitasyon ng bersyon"
+      },
+      "fix": {
+        "TOOL": "Mukhang isang tao ang direktang nag-query sa production DB gamit ang isang DB tool (DBeaver atbp.). Ituro sila sa isang read-only replica o analytics DB sa halip, at limitahan ang run time sa mga human account, hal. ALTER ROLE human_user SET statement_timeout = '30s'. Gumamit ng hiwalay na read-only role, at patakbuhin ang bulk extracts sa mga oras na hindi peak",
+        "BATCH": "Mukhang isang batch o naka-iskedyul na trabaho. Ikalat ang run times palayo sa mga business peak at paliitin ang trabaho bawat commit. Suriin ang mga index at istatistika (ANALYZE) sa mga target na table, at hatiin ang mahabang transaksyon. Ang paglalagay ng pangalan ng trabaho sa application_name ay nagiging mas tumpak ang susunod na klasipikasyon",
+        "PROGRAM": "Mukhang isang query na pinatakbo ng isang application. Suriin ang plano sa SQL Tuning. Maraming tawag na may maikling mean ang tumuturo sa paulit-ulit na tawag (N+1) o caching; ang mahabang mean ay tumuturo sa mga index o join order muna. Itakda ang pangalan ng serbisyo sa application_name ng iyong connection pool",
+        "PLATFORM": "Mukhang DB o internal na trabaho ng platform tulad ng autovacuum o replication. Karaniwan ay walang aksyon na kailangan. Kung nananatili ito sa itaas, suriin ang mga threshold ng autovacuum at maintenance_work_mem",
+        "MONITOR": "Mukhang sariling mga query ng istatistika ng serbisyong ito (link ng schema.pi). Walang aksyon na kailangan. Kung masyadong madalas itong lumalabas, babaan ang polling frequency",
+        "UNKNOWN": "Walang pahiwatig sa pinagmulan. Itakda ang application_name sa bawat koneksyon at hatiin ang mga account ayon sa layunin; ito ay ikaklasipika mula sa mga susunod na sample"
+      },
+      "detail": {
+        "app": "Pangalan ng app",
+        "addr": "Address ng client (masked)",
+        "samples": "Mga sample",
+        "active": "Mga aktibong sample",
+        "period": "Naobserbahan",
+        "none": "(walang laman)"
+      },
+      "noSample": "Wala pang sample — ang mga tumatakbong session ay sinasample kapag tiningnan mo ang monitoring board o ang tab na Activity & locks. Sa ngayon, ito ay ikinaklasipika mula sa pangalan ng account lang",
+      "verOff": "Ang DB na ito ay mas luma kaysa sa PostgreSQL 14, kaya ang mga tumatakbong session ay walang query ID. Ang account lang (tiyak) ang ipinapakita",
+      "privOff": "Ang link account ay hindi makakita ng mga detalye ng session ng ibang account, kaya walang sample na nakolekta. Hilingin sa isang DB admin na patakbuhin ang GRANT pg_read_all_stats TO {user};",
+      "linkUsr": "link account",
+      "qidOff": "Nakikita ang mga detalye ng session ngunit walang laman ang query ID (naka-off ang compute_query_id). Suriin gamit ang SHOW compute_query_id; pagkatapos ay patakbuhin ang ALTER SYSTEM SET compute_query_id = 'auto'; at i-reload (SELECT pg_reload_conf();)",
+      "openHint": "Binubuksan ang SQL Tuning na may nakapuno na query. Palitan ang mga placeholder tulad ng $1 ng mga tunay na halaga bago tingnan ang plano"
     }
   },
   "pipeline": {
@@ -1217,7 +1307,7 @@
     "label": "Mga Feature",
     "groups": {
       "monitor": "Pagsubaybay",
-      "drift": "Pagkakapare-pareho",
+      "drift": "GAP Analysis",
       "lake": "Lake",
       "admin": "Admin"
     },
@@ -1225,7 +1315,7 @@
     "sqlLab": "SQL Tuning",
     "perf": "Performance",
     "monitor": "Pagsubaybay",
-    "drift": "Drift",
+    "drift": "GAP Analysis",
     "migration": "Migrasyon",
     "pipeline": "Pipeline",
     "analytics": "Analytics",

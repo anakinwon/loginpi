@@ -7,7 +7,16 @@ import { withGuard } from '@pi/guard'
 import { db, dbFail, dbRoute, parseBody } from '@/lib/api'
 import { LinkError, linkQuery } from '@/lib/link/client'
 import { maskLiterals } from '@/lib/perf/calc'
-import { linkFail, linkParams, num, numOrNull, pick, str, toObjs, type Obj } from '@/lib/perf/server'
+import {
+  linkFail,
+  linkParams,
+  num,
+  numOrNull,
+  pick,
+  str,
+  toObjs,
+  type Obj,
+} from '@/lib/perf/server'
 
 const MAX_QRY = 100 // 저장할 쿼리 상위 건수(조회 상한 500행 안)
 const bodySchema = z.object({ linkId: z.string(), connId: z.string() })
@@ -15,6 +24,15 @@ const bodySchema = z.object({ linkId: z.string(), connId: z.string() })
 const toDtm = (v: unknown) => {
   const d = v ? new Date(String(v)) : null
   return d && !Number.isNaN(d.getTime()) ? d.toISOString() : null
+}
+
+// sql/032(usr_nm) 미적용 DB 에 코드가 먼저 배포돼도 수집은 계속 — 칼럼 없음(42703)이면 usr_nm 빼고 재시도
+async function insQry(rows: Record<string, unknown>[]) {
+  const r = await db().from('dbm_prf_qry').insert(rows)
+  if (r.error?.code !== '42703') return r
+  return db()
+    .from('dbm_prf_qry')
+    .insert(rows.map(({ usr_nm: _u, ...o }) => o))
 }
 
 export const POST = withGuard(
@@ -47,21 +65,37 @@ export const POST = withGuard(
 
     // sizes : 테이블별 크기(relname·total_bytes) 또는 DB 전체 크기 행 — 둘 다 받는다
     const tblSz = new Map<string, number>()
-    let dbSz = numOrNull(pick(dbRow, 'db_size', 'db_sz_byte', 'database_size', 'size_bytes'))
+    let dbSz = numOrNull(
+      pick(dbRow, 'db_size', 'db_sz_byte', 'database_size', 'size_bytes'),
+    )
     for (const s of sizes) {
       const nm = str(pick(s, 'relname', 'tbl_nm', 'table_name'))
-      const b = numOrNull(pick(s, 'total_bytes', 'total_size', 'tot_sz_byte', 'size_bytes', 'bytes'))
+      const b = numOrNull(
+        pick(
+          s,
+          'total_bytes',
+          'total_size',
+          'tot_sz_byte',
+          'size_bytes',
+          'bytes',
+        ),
+      )
       if (nm && b !== null) tblSz.set(nm, b)
-      else if (dbSz === null) dbSz = numOrNull(pick(s, 'db_size', 'database_size', 'db_sz_byte'))
+      else if (dbSz === null)
+        dbSz = numOrNull(pick(s, 'db_size', 'database_size', 'db_sz_byte'))
     }
-    if (dbSz === null && tblSz.size) dbSz = [...tblSz.values()].reduce((a, b) => a + b, 0)
+    if (dbSz === null && tblSz.size)
+      dbSz = [...tblSz.values()].reduce((a, b) => a + b, 0)
 
     const ins = await db()
       .from('dbm_prf_clct')
       .insert({
         lnk_id: linkId,
         conn_id: connId,
-        stat_reset_dtm: toDtm(pick(qrys[0] ?? {}, 'stats_reset') ?? pick(dbRow, 'stats_reset', 'stat_reset_dtm')),
+        stat_reset_dtm: toDtm(
+          pick(qrys[0] ?? {}, 'stats_reset') ??
+            pick(dbRow, 'stats_reset', 'stat_reset_dtm'),
+        ),
         pgss_yn: topR ? 'Y' : 'N',
         db_sz_byte: dbSz,
       })
@@ -78,10 +112,13 @@ export const POST = withGuard(
         clct_id: clctId,
         qry_seq: i + 1,
         qry_id: str(pick(o, 'queryid', 'qry_id')) ?? `#${i + 1}`,
+        usr_nm: str(pick(o, 'usr_nm')), // 계정(schema.pi top_sql — 미승격이면 null, sql/032)
         qry_txt: txt ? maskLiterals(txt).slice(0, 4000) : null,
         call_cnt: calls,
         tot_ms: totalMs,
-        avg_ms: num(pick(o, 'mean_exec_time', 'mean_time', 'mean_ms')) || (calls ? totalMs / calls : 0),
+        avg_ms:
+          num(pick(o, 'mean_exec_time', 'mean_time', 'mean_ms')) ||
+          (calls ? totalMs / calls : 0),
         row_cnt: num(pick(o, 'rows', 'row_cnt')),
       }
     })
@@ -96,7 +133,10 @@ export const POST = withGuard(
         idx_scan_cnt: num(pick(o, 'idx_scan', 'idx_scan_cnt')),
         live_tup_cnt: num(pick(o, 'n_live_tup', 'live_tup_cnt')),
         dead_tup_cnt: num(pick(o, 'n_dead_tup', 'dead_tup_cnt')),
-        tot_sz_byte: numOrNull(pick(o, 'total_bytes', 'tot_sz_byte')) ?? tblSz.get(nm) ?? null,
+        tot_sz_byte:
+          numOrNull(pick(o, 'total_bytes', 'tot_sz_byte')) ??
+          tblSz.get(nm) ??
+          null,
       }
     })
     const idxRows = toObjs(idxR).map((o, i) => ({
@@ -106,17 +146,22 @@ export const POST = withGuard(
       tbl_nm: str(pick(o, 'relname', 'tbl_nm', 'table_name')) ?? '?',
       idx_nm: str(pick(o, 'indexrelname', 'idx_nm', 'index_name')) ?? '?',
       idx_scan_cnt: num(pick(o, 'idx_scan', 'idx_scan_cnt')),
-      idx_sz_byte: numOrNull(pick(o, 'idx_size', 'index_bytes', 'idx_sz_byte', 'size_bytes')),
+      idx_sz_byte: numOrNull(
+        pick(o, 'idx_size', 'index_bytes', 'idx_sz_byte', 'size_bytes'),
+      ),
     }))
 
     const results = await Promise.all([
-      qryRows.length ? db().from('dbm_prf_qry').insert(qryRows) : null,
+      qryRows.length ? insQry(qryRows) : null,
       tblRows.length ? db().from('dbm_prf_tbl').insert(tblRows) : null,
       idxRows.length ? db().from('dbm_prf_idx').insert(idxRows) : null,
     ])
     const failed = results.find((r) => r?.error)?.error
     if (failed) {
-      await db().from('dbm_prf_clct').update({ del_yn: 'Y', del_dtm: new Date().toISOString() }).eq('clct_id', clctId)
+      await db()
+        .from('dbm_prf_clct')
+        .update({ del_yn: 'Y', del_dtm: new Date().toISOString() })
+        .eq('clct_id', clctId)
       return dbFail(failed)
     }
     return NextResponse.json({

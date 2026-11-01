@@ -103,7 +103,7 @@
       "keys": {
         "links": "Bağlantılarım",
         "perf": "Performans anlık görüntüleri",
-        "drift": "Sapma çalıştırmaları",
+        "drift": "GAP Analizi",
         "mig": "Geçiş planları",
         "pipe": "İşlem hatları",
         "lake": "Göl veri kümeleri"
@@ -170,14 +170,14 @@
     }
   },
   "drift": {
-    "title": "Model ↔ DB Sapması",
+    "title": "GAP Analizi — Model↔DB",
     "intro": "schema.pi tasarım modelini ve DDL uygulama geçmişini canlı DB kataloğuyla karşılaştırarak sapmayı bulun ve tasarlanmış dizinlerin gerçekten kullanılıp kullanılmadığını ölçün. Müşteri satır verileri asla okunmaz veya depolanmaz.",
     "needLink": "Önce yukarıdan bir schema.pi bağlantısı seçin. Hiç yoksa, 'Bağlantı' menüsünden bir belirteç kaydedin.",
     "needConn": "Yukarıdan karşılaştırılacak DB bağlantısını seçin.",
     "project": "Proje",
     "projectPick": "Bir proje seçin",
     "loading": "Yükleniyor…",
-    "run": "Sapma algılamayı çalıştır",
+    "run": "GAP Analizi Çalıştır",
     "running": "Karşılaştırılıyor…",
     "readOnly": "Yalnızca salt okunur katalog ve istatistik sorguları çalıştırılır.",
     "applyInSchema": "Düzeltmeleri (model düzenlemeleri, DDL oluşturma ve yürütme) doğruluk kaynağı olan schema.pi'de uygulayın.",
@@ -197,21 +197,21 @@
       "missingIndexes": "DB'de eksik tasarlanmış dizinler",
       "extraIndexes": "Modelde olmayan dizinler",
       "ddlMissing": "Uygulandıktan sonra kaybolan nesneler",
-      "unusedIndexes": "Kullanılmayan tasarlanmış dizinler"
+      "unusedIndexes": "Kullanılmayan Aday İndeksler"
     },
     "sec": {
       "ddlMissing": "DDL uygulandı ancak DB'de eksik",
       "missingTables": "Modelde olan ancak DB'de eksik olan tablolar",
       "extraTables": "DB'de olan ancak modelde olmayan tablolar",
-      "colMismatches": "Sütun türü / NULL uyuşmazlıkları",
+      "colMismatches": "Sütun Uyuşmazlıkları (Eksik·Tip·NULL)",
       "missingIndexes": "DB'de eksik tasarlanmış dizinler",
       "extraIndexes": "Yalnızca DB'de olan dizinler (PK hariç)",
       "idxUsage": "Tasarlanmış dizin etkinliği"
     },
     "hint": {
-      "ddlMissing": "schema.pi bu nesneleri uygulandı olarak kaydetti, ancak kaybolmuşlar — manuel bir bırakma veya geri alma şüphesi var.",
-      "extraTables": "Bunlar, bu bağlantıdaki diğer projelere veya sistem tablolarına ait olabilir.",
-      "idxUsage": "Son istatistik sıfırlamasından bu yana sıfır tarama, kullanılmadığı anlamına gelir. Bırakmadan önce istatistik penceresini kontrol edin."
+      "ddlMissing": "Yalnızca en son uygulanan standarda göre DB'de eksik olan nesneler gösterilir. Aynı tabloyu daha sonra yeniden oluşturan önceki istekler ve eski adlandırma kuralları (_PKEY) normaldir ve aşağıda katlanmıştır.",
+      "extraTables": "Şema {schema} baz alınmıştır. Öneke göre gruplandırılmıştır, yalnızca bu projenin önek grubu modelden eksik adaylardır.",
+      "idxUsage": "Karar = Kullanımda / Benzersizlik İçin / Veri Yok / Gözlem Altında (İstatistikler başladı·7 günden az oluşturuldu) / Kullanılmayan Aday. Yalnızca kullanılmayan indeks adayları silme için değerlendirilir."
     },
     "kind": {
       "MISSING": "DB'de eksik",
@@ -223,12 +223,16 @@
       "idx": "Dizin",
       "scans": "Tarama sayısı",
       "size": "Boyut",
-      "status": "Karar"
+      "status": "Karar",
+      "basis": "Dayanak"
     },
     "usage": {
       "USED": "Kullanımda",
-      "UNUSED": "Kullanılmayan tasarlanmış dizin",
-      "NO_STATS": "İstatistik yok"
+      "NO_STATS": "İstatistik yok",
+      "CONSTRAINT": "Benzersizlik kısıtlaması (tutulacak)",
+      "NO_DATA": "Veri yok veya istatistikler toplanmadı — karar verilemez",
+      "OBSERVING": "Gözlem altında (7 günden az)",
+      "UNUSED_CAND": "Kullanılmayan aday"
     },
     "errors": {
       "NOT_IMPLEMENTED": "schema.pi bağlantı özelliği henüz hazır değil. Lütfen kısa süre sonra tekrar deneyin.",
@@ -239,6 +243,48 @@
       "CONN_UNSUPPORTED": "Desteklenmeyen bağlantı (şimdilik yalnızca PostgreSQL sunucu bağlantıları).",
       "TIMEOUT": "İstek zaman aşımına uğradı. Lütfen kısa süre sonra tekrar deneyin.",
       "RATE": "Çok fazla istek var. Lütfen bir dakika sonra tekrar deneyin."
+    },
+    "schema": "Şema",
+    "schemaHint": "Bu şemadaki yalnızca normal ve bölümlenmiş tablolar karşılaştırılır (görünümler hariç). Varsayılan public — Supabase dahili şemaları (auth, storage, vb.) dışarıda bırakılır.",
+    "truncated": "{names} {max} satır sınırına ulaştı ve kesildi — bazı \"DB'de yok\" / \"modelde yok\" sonuçları yanlış olabilir. Şemayı daraltın ve tekrar çalıştırın.",
+    "colUnchecked": "Sütun sorgusu kesildiği için, {n} eksik/ek sütun sonucu doğrulanamaz olarak kabul edildi ve sütun uyuşmazlığı sayısından çıkarıldı.",
+    "renamed": "Eski adlandırma kuralı (_PKEY) altında uygulanan {n} PK indeksi, DB'de yeni adla (PK_) mevcuttur — normal",
+    "superseded": "{n} eski istek, daha sonraki bir isteğin aynı tabloyu yeniden oluşturması (DROP … CASCADE) nedeniyle hariç tutuldu — normal",
+    "supersededItem": "İstek {id} → istek {by} tarafından geçersiz kılındı",
+    "sysCols": "DDL oluşturma sırasında otomatik olarak eklenen {n} sistem sütunu, tasarım gereği modelde değildir ve uyuşmazlıklardan hariç tutulmuştur.",
+    "groupOwn": "Proje öneki {pfx} — modelden eksik adaylar",
+    "groupOther": "Diğer sistem {pfx}",
+    "basis": "Tahmini satır {rows} · {since} tarihinden beri",
+    "guide": {
+      "title": "Sonraki adımlar",
+      "ddlMissing": {
+        "s1": "schema.pi → proje → fiziksel model → DDL oluşturma bölümünde, bu bağlantıya tekrar uygulayın.",
+        "s2": "Tamamlandığında, aşağıdaki \"Tekrar çalıştır\"ı kullanarak sayının 0 olduğunu onaylayın.",
+        "s3": "Yeniden uygulandıktan sonra nesneler hala kayboluyorsa, manuel bir düşürme veya geri alma şüphesiyle DBA'nızla bağlantı hesabının etkinliğini kontrol edin."
+      },
+      "extraTables": {
+        "s1": "Bu proje önek paketi = eksik model adayları — schema.pi → Ayarlar → Tersine Çevir yoluyla modele aktarın veya kullanılmayan tablolarsa silmeye karar verin.",
+        "s2": "Diğer önek grupları = bu DB'yi paylaşan diğer sistemler — bu proje için eylem öğeleri değildir.",
+        "s3": "Hedef şema public değilse, yukarıdaki \"Şema\" alanını değiştirin ve tekrar çalıştırın."
+      },
+      "colMismatches": {
+        "s1": "DB'de yok = model sütununu schema.pi DDL oluşturma yoluyla DB'ye uygulayın.",
+        "s2": "Modelde yok = DB sütununu schema.pi → Ayarlar → Tersine Çevir yoluyla modele aktarın veya gereksizse silmeye karar verin.",
+        "s3": "Tip/NULL farklı = modele hizalayın (doğruluk kaynağı); uzunluğu küçültmeden veya NOT NULL'a geçmeden önce, mevcut satırların bunu karşıladığını onaylayın."
+      },
+      "idxUsage": {
+        "s1": "Kaldırmadan önce, ① istatistik penceresinin en az bir iş döngüsünü (örn. ay sonu toplu işlemi) kapsadığını kontrol edin — \"itibaren\"e bakın.",
+        "s2": "② Benzersiz/PK indeksi olmadığını (bunlar ayrı olarak \"benzersizlik kısıtlaması\" olarak gösterilir).",
+        "s3": "③ SQL Tuning'de tablonun temsilci SQL'ini EXPLAIN edin ve bu indeksin kullanılmadığını onaylayın.",
+        "s4": "Üçü de onaylandıktan sonra, indeksi schema.pi'deki modelden kaldırın ve DDL aracılığıyla uygulayın."
+      }
+    },
+    "act": {
+      "openSchema": "schema.pi'yi aç",
+      "rerun": "Tekrar çalıştır",
+      "copy": "Listeyi kopyala",
+      "copied": "Kopyalandı",
+      "sqlLab": "SQL Tuning'de EXPLAIN"
     }
   },
   "learn": {
@@ -687,7 +733,7 @@
         "repl": "Replikasyon kontrolü",
         "backup": "Yedekleme kontrolü",
         "sqlLab": "SQL ayarlaması",
-        "drift": "Kayma karşılaştırması",
+        "drift": "GAP Analizi",
         "connect": "Bağlantılar",
         "schema": "schema.pi monitör"
       },
@@ -991,7 +1037,11 @@
       "totalMs": "Toplam ms",
       "meanMs": "Ortalama ms",
       "rows": "Satırlar",
-      "reset": " İstatistik sıfırlama algılandı — kümülatif olarak gösterilir"
+      "reset": " İstatistik sıfırlama algılandı — kümülatif olarak gösterilir",
+      "src": "Kaynak",
+      "srcToggle": "Kaynak detaylarını göster veya gizle",
+      "openSqlLab": "SQL Tuning'de aç",
+      "acct": "Hesap"
     },
     "health": {
       "empty": "Henüz anlık görüntü yok. Topla sekmesinde Şimdi Topla'ya basın",
@@ -1022,6 +1072,46 @@
       "sessions": "Oturum etkinliği",
       "locks": "Kilitler",
       "none": "Yok"
+    },
+    "src": {
+      "root": "Kaynağı kesin olarak belirlemek için: (1) her program, toplu işlem ve kişi (araç) için ayrı bir DB hesabı kullanın ve (2) her bağlantıda application_name'i ayarlayın. Hesap pg_stat_statements'tan gelir ve kesindir; uygulama/araç kategorisi etkinlik örneklerinden tahmin edilir (application_name istemci tarafından kendi kendine bildirilir, bu nedenle boş veya değiştirilebilir ve örnekler arasında biten kısa sorgular kaçırılabilir)",
+      "cd": {
+        "PROGRAM": "Program",
+        "BATCH": "Toplu İşlem",
+        "TOOL": "Araç (kişi)",
+        "PLATFORM": "Platform dahili",
+        "MONITOR": "İzleme (biz)",
+        "UNKNOWN": "Bilinmiyor"
+      },
+      "conf": {
+        "high": "Yüksek güven",
+        "mid": "Orta güven",
+        "low": "Düşük güven",
+        "acct": "Yalnızca hesap",
+        "ver": "Sürüm sınırı"
+      },
+      "fix": {
+        "TOOL": "Bir kişinin DB aracı (DBeaver vb.) ile doğrudan üretim DB'sini sorguladığı görülüyor. Bunun yerine onları salt okunur bir replikaya veya analiz DB'sine yönlendirin ve insan hesaplarında çalışma süresini sınırlayın, örn. ALTER ROLE human_user SET statement_timeout = '30s'. Ayrı bir salt okunur rol kullanın ve toplu çıkarmaları yoğun olmayan saatlerde çalıştırın.",
+        "BATCH": "Bir toplu işlem veya zamanlanmış iş gibi görünüyor. Çalışma sürelerini iş yoğunluğundan uzaklaştırın ve her taahhüt başına işi küçültün. Hedef tablolardaki indeksleri ve istatistikleri (ANALYZE) kontrol edin ve uzun işlemleri bölün. İş adını application_name'e koymak, bir sonraki sınıflandırmayı daha hassas hale getirir.",
+        "PROGRAM": "Bir uygulama tarafından çalıştırılan bir sorgu gibi görünüyor. SQL Tuning'de planı kontrol edin. Kısa bir ortalama ile birçok çağrı, tekrarlanan çağrılara (N+1) veya önbelleğe almaya işaret eder; uzun bir ortalama önce indekslere veya birleştirme sırasına işaret eder. Bağlantı havuzunuzun application_name'inde hizmet adını ayarlayın.",
+        "PLATFORM": "Autovacuum veya replikasyon gibi DB veya platform dahili bir iş gibi görünüyor. Genellikle herhangi bir işlem gerekmez. En üstte kalmaya devam ederse, autovacuum eşiklerini ve maintenance_work_mem'i gözden geçirin.",
+        "MONITOR": "Bu hizmetin kendi istatistik sorguları (schema.pi bağlantısı) gibi görünüyor. Herhangi bir işlem gerekmez. Çok sık görünüyorsa, yoklama sıklığını düşürün.",
+        "UNKNOWN": "Kaynağa dair hiçbir ipucu yok. Her bağlantıda application_name'i ayarlayın ve hesapları amaca göre ayırın; bir sonraki örneklerden itibaren sınıflandırılacaktır."
+      },
+      "detail": {
+        "app": "Uygulama adı",
+        "addr": "İstemci adresi (maskelenmiş)",
+        "samples": "Örnekler",
+        "active": "Aktif örnekler",
+        "period": "Gözlemlenen",
+        "none": "(boş)"
+      },
+      "noSample": "Henüz örnek yok — izleme panosunu veya Etkinlik ve kilitler sekmesini görüntülediğinizde çalışan oturumlar örneklenir. Şimdilik yalnızca hesap adına göre sınıflandırılır.",
+      "verOff": "Bu DB, PostgreSQL 14'ten daha eski, bu nedenle çalışan oturumların sorgu kimliği yok. Yalnızca hesap (kesin) gösterilir.",
+      "privOff": "Bağlantı hesabı diğer hesapların oturum detaylarını göremiyor, bu nedenle örnek toplanmıyor. Bir DB yöneticisinden GRANT pg_read_all_stats TO {user}; komutunu çalıştırmasını isteyin.",
+      "linkUsr": "bağlantı hesabı",
+      "qidOff": "Oturum detayları görünür ancak sorgu kimliği boş (compute_query_id kapalı). SHOW compute_query_id; ile kontrol edin, ardından ALTER SYSTEM SET compute_query_id = 'auto'; komutunu çalıştırın ve yeniden yükleyin (SELECT pg_reload_conf();).",
+      "openHint": "Sorgu doldurulmuş olarak SQL Tuning'i açar. Planı görüntülemeden önce $1 gibi yer tutucuları gerçek değerlerle değiştirin."
     }
   },
   "pipeline": {
@@ -1218,7 +1308,7 @@
     "label": "Özellikler",
     "groups": {
       "monitor": "İzleme",
-      "drift": "Tutarlılık",
+      "drift": "GAP Analizi",
       "lake": "Göl",
       "admin": "Yönetim"
     },
@@ -1226,7 +1316,7 @@
     "sqlLab": "SQL Ayarlama",
     "perf": "Performans",
     "monitor": "İzleme",
-    "drift": "Kayma",
+    "drift": "GAP Analizi",
     "migration": "Geçiş",
     "pipeline": "İşlem Hattı",
     "analytics": "Analiz",
