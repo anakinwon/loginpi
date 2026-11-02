@@ -3,7 +3,8 @@
 // dbms.pi 하단 고정 2단 폴더블 메뉴 — schema.pi area-nav 와 같은 구조(마스터 지시 2026-11-02)
 //  1단(아래) = 묶음 4개(모니터링·GAP분석·레이크·관리) 타일 — 아이콘 타일 위 + 작은 글씨 아래, 누르면 그 묶음의 첫 기능으로
 //  2단(위) = 현재 묶음의 하위 기능 서브 바 — 현재 묶음 타일 위에 맞춰 띄움 — 모니터링·GAP분석은 타일 시작 끝, 레이크·관리는 타일 끝 쪽 끝(ALIGN_END, RTL 반전), 화면 양끝 8px 안쪽, 묶음 색 연한 바탕
-//  접기·펼치기 = 위 경계선 가운데 손잡이(localStorage 기억), 메뉴 높이 → :root --dbms-nav-h(본문 아래 여백이 따라감)
+//  접기 = 위 경계선 가운데 손잡이 / 펼치기 = 접힘 바(전체 폭 44px, 현재 묶음·기능 이름) — localStorage 기억, 메뉴 높이 → :root --dbms-nav-h(본문 아래 여백이 따라감)
+//   접힘 바 사유 : 손잡이만 남으면 화면 맨 아래 16px 띠라 Pi Browser(Android WebView, safe-area 0)의 하단 제스처 바에 가려 펼칠 수 없었음(마스터 2026-11-02 Pi Browser 접힘 손잡이 가림)
 //  잠긴 기능 = 서브 탭에 'D2부터' 배지(지금 URL ?link= 연결의 요금제, 모르면 표시 안 함 — 서버 검사는 requireLink)
 //  페이지마다 로그인 게이트가 있어 로그인 여부와 무관하게 노출. 좁은 화면은 가로 스크롤(줄바꿈 없음)
 import {
@@ -80,6 +81,13 @@ export function FeatureNav() {
     g.items.some((i) => isActive(path, i.href)),
   )
   const curKey = grp?.key
+  // 접힘 바에 보일 이름 = 현재 묶음 · 현재 기능
+  const feat = grp?.items.find((i) => isActive(path, i.href))
+  const here = grp
+    ? [t(`groups.${grp.key}`), feat && t(feat.key)] // 묶음·기능 이름이 같으면(모니터링 · 모니터링) 한 번만
+        .filter((v, i, a) => v && a.indexOf(v) === i)
+        .join(' · ')
+    : ''
   const navRef = useRef<HTMLElement>(null)
   const rowRef = useRef<HTMLDivElement>(null)
   const subRef = useRef<HTMLUListElement>(null)
@@ -154,34 +162,47 @@ export function FeatureNav() {
       )
     set()
     const ro = new ResizeObserver(set)
-    ro.observe(nav)
+    ro.observe(nav, { box: 'border-box' }) // 아래 여백(safe-area) 만 바뀌어도 다시 잼
     return () => {
       ro.disconnect()
       document.documentElement.style.removeProperty('--dbms-nav-h')
     }
   }, [])
 
+  // 아래 여백 = 화면 맨 아래(하단 제스처 바·브라우저 UI)에서 띄움 — Pi Browser 는 safe-area 가 0 이라 max 로 최소값 보장
   return (
     <nav
       ref={navRef}
       aria-label={t('label')}
-      className="bg-background/95 fixed inset-x-0 bottom-0 z-40 border-t border-white/10 pb-[env(safe-area-inset-bottom)] backdrop-blur"
+      className={`bg-background/95 fixed inset-x-0 bottom-0 z-40 border-t border-white/10 backdrop-blur ${fold ? 'pb-[max(12px,env(safe-area-inset-bottom))]' : 'pb-[max(4px,env(safe-area-inset-bottom))]'}`}
     >
-      {/* 접기·펼치기 손잡이 — 위 경계선 가운데, 서브 바를 가리지 않게 선 위에 얹음 */}
-      <button
-        type="button"
-        onClick={toggle}
-        aria-expanded={!fold}
-        aria-label={fold ? t('unfold') : t('fold')}
-        title={fold ? t('unfold') : t('fold')}
-        className="bg-background text-muted-foreground hover:text-foreground absolute bottom-full left-1/2 flex h-4 w-12 -translate-x-1/2 items-center justify-center rounded-t-md border border-b-0 border-white/10"
-      >
-        {fold ? (
+      {fold ? (
+        // 접힘 바 — 전체 폭이 눌림 영역(높이 44px), 이미 접힌 채 저장된 사용자도 여기서 펼침
+        <button
+          type="button"
+          onClick={toggle}
+          aria-expanded={false}
+          aria-label={here ? `${t('unfold')} · ${here}` : t('unfold')}
+          title={t('unfold')}
+          className={`flex min-h-11 w-full touch-manipulation items-center justify-center gap-2 px-4 text-xs hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none focus-visible:ring-inset ${grp ? TONE[grp.key].text : 'text-muted-foreground'}`}
+        >
           <IconChevronUp width={14} height={14} />
-        ) : (
+          {grp && ICON[grp.key]}
+          <span className="truncate">{here || t('unfold')}</span>
+        </button>
+      ) : (
+        // 접기 손잡이 — 위 경계선 가운데, 서브 바를 가리지 않게 선 위에 얹음. 모양 16×48 그대로, 눌림 영역만 투명 의사요소로 32×64
+        <button
+          type="button"
+          onClick={toggle}
+          aria-expanded
+          aria-label={t('fold')}
+          title={t('fold')}
+          className="bg-background text-muted-foreground hover:text-foreground absolute bottom-full left-1/2 z-10 flex h-4 w-12 -translate-x-1/2 touch-manipulation items-center justify-center rounded-t-md border border-b-0 border-white/10 before:absolute before:-inset-x-2 before:-top-3 before:-bottom-1"
+        >
           <IconChevronDown width={14} height={14} />
-        )}
-      </button>
+        </button>
+      )}
       <Suspense fallback={null}>
         <LinkWatch onLink={setLinkId} />
       </Suspense>
