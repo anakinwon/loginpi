@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Ez a fiók már össze van kapcsolva.",
     "LINK_CODE_GEN_FAILED": "Nem sikerült összekapcsolási kódot létrehozni. Kérjük, próbáld újra később.",
     "AUTH_DB_UNAVAILABLE": "Nem sikerült menteni a fiókodat, ezért a bejelentkezés sikertelen. Kérjük, próbáld újra később.",
-    "LINK_TRY_LIMIT": "Túl sok helytelen összekapcsolási kód. Próbáld újra 15 perc múlva."
+    "LINK_TRY_LIMIT": "Túl sok helytelen összekapcsolási kód. Próbáld újra 15 perc múlva.",
+    "PLAN_REQUIRED": "Ez a funkció nem érhető el az aktuális csomaggal. Kérjük, frissítse csomagját.",
+    "PLAN_LIMIT": "Ebben az időszakban minden rendelkezésre álló próbálkozást felhasznált. Kérjük, frissítse csomagját, vagy próbálja újra a következő időszakban.",
+    "PLAN_EXPIRED": "A schema.pi csomagja lejárt. Kérjük, végezze el a fizetést a schema.pi csomag képernyőn.",
+    "PAY_PI_FAILED": "Nem sikerült kommunikálni a Pi fizetési szerverrel. Kérjük, próbálja újra rövidesen.",
+    "PAY_MISMATCH": "A fizetési információk nem egyeznek.",
+    "PAY_AMOUNT_MISMATCH": "A fizetési összeg eltér a becsült értéktől.",
+    "PAY_CANCELLED": "Fizetés törölve.",
+    "PAY_ALREADY_PAID": "Fizetés van folyamatban. Ha a pénztárcájába jelentkezett be, próbálja újra 3 perc múlva.",
+    "PAY_INVALID_STATE": "A fizetés aktuális állapotában nem dolgozható fel.",
+    "PAY_PI_CANCEL_REFUSED": "A fizetés már folyamatban van, és nem törölhető. Kérjük, ellenőrizze újra rövidesen.",
+    "PAY_PAYER": "Csak a kapcsolat tulajdonosa vagy rendszergazdája végezhet fizetéseket.",
+    "PAY_SUBSCRIBED": "Előfizetés esetén csak a jelenlegi csomag frissítését vagy meghosszabbítását fizetheti.",
+    "PAY_UPGRADE": "Ez a csomag nem frissíthető.",
+    "PAY_PRICE_CHANGED": "A csomag állapota megváltozott. Kérjük, végezze el újra a fizetést.",
+    "PRICE_UNAVAILABLE": "Nem sikerült ellenőrizni a Pi árfolyamát. Kérjük, próbálja újra rövidesen.",
+    "QUOTE_EXPIRED": "A fizetési árajánlat lejárt. Kérjük, végezze el újra a fizetést."
   },
   "analytics": {
     "title": "Analitika és tó",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "A pg_stat_statements kiterjesztés nincs telepítve a cél DB-n",
       "TIMEOUT": "A kérés időtúllépés miatt megszakadt",
       "RATE": "Túl sok kérés. Kérjük, próbálja újra egy perc múlva",
-      "INVALID_INPUT": "Illessze be a teljes, slk_ -val kezdődő kapcsolati tokent"
+      "INVALID_INPUT": "Illessze be a teljes, slk_ -val kezdődő kapcsolati tokent",
+      "PLAN_EXPIRED": "A schema.pi csomagja lejárt. Kérjük, végezze el a fizetést a schema.pi csomag képernyőn."
     }
   },
   "migration": {
@@ -1406,6 +1423,70 @@
     "ops": "Működési biztonság",
     "learn": "Tanulás",
     "fold": "Menü összecsukása",
-    "unfold": "Menü kibontása"
+    "unfold": "Menü kibontása",
+    "plan": "Csomag"
+  },
+  "plan": {
+    "title": "Csomag",
+    "intro": "A csomagok külön-külön vannak beállítva minden schema.pi kapcsolathoz (taxonómia). Az új kapcsolatok 7 napig kipróbálhatják a DBA csomagot.",
+    "loading": "Csomag betöltése…",
+    "loadFail": "Nem sikerült betölteni a csomagot. Kérjük, próbálja újra rövidesen.",
+    "names": {
+      "FREE": "Ingyenes",
+      "D1": "D1 Megfigyelés",
+      "D2": "D2 Hangolás",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Felfedezés és tanulás",
+      "D1": "Operátor – Ellenőrzi, hogy az adatbázis rendben van-e most.",
+      "D2": "Fejlesztő és hangoló – Javítja a lassú SQL-t",
+      "D3": "DBA és DA – Az operatív biztonságtól a megvalósításig és a tóig"
+    },
+    "feat": {
+      "FREE": "Monitoring tábla, végrehajtási terv nézet, alapvető tanulás",
+      "D1": "Ingyenes funkciók + korlátlan teljesítménygyűjtés, GAP elemzési lekérdezés, teljes tanulás",
+      "D2": "D1 funkciók + tervösszehasonlítás, AI hangolási javaslatok, GAP elemzés végrehajtása",
+      "D3": "D2 funkciók + megvalósítás, pipeline, elemzés, operatív biztonság"
+    },
+    "featAi": "AI hangolási javaslatok havonta {n} alkalommal",
+    "featClct": "Manuális teljesítménygyűjtés naponta {n} alkalommal",
+    "aiNone": "Nincs AI hangolási javaslat",
+    "cur": "Jelenlegi csomag: {plan}",
+    "grace": "Próba",
+    "until": "{date} dátumig ({days} nap maradt)",
+    "aiLeft": "{left}/{total} AI hangolási javaslat maradt ebben a hónapban",
+    "clctLeft": "{left}/{total} manuális teljesítménygyűjtés maradt mára",
+    "keep": "Korábbi értékek megőrzése {days} napig",
+    "bndlOn": "Ugyanazt a DA csomagot használja a schema.pi-vel azonos taxonómiához, így 20% kedvezményt kap a fizetésből.",
+    "bndlOff": "Ha DA csomagot (P4) használ a schema.pi-vel azonos taxonómiához, 20% kedvezményt kap a fizetésből.",
+    "monthly": "Havi",
+    "yearly": "Éves",
+    "freePrice": "Ingyenes",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Fizetés a(z) {prd} termékért",
+    "extend": "{prd} időszak meghosszabbítása",
+    "upgradeTitle": "Frissítés",
+    "upgradeNote": "A jelenlegi csomag hátralévő napjai levonásra kerülnek a fizetésből. Évesről havi csomagra nem válthat.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Frissítés",
+    "paying": "Fizetés folyamatban…",
+    "payStillWaiting": "Várja a pénztárca aláírását. Az aláírás után automatikusan érvényesül.",
+    "bought": "A fizetés rögzítve.",
+    "payCancelled": "Fizetés törölve.",
+    "payFailed": "A fizetés sikertelen. Kérjük, próbálja újra rövidesen.",
+    "piBrowserOnly": "A fizetés a Pi Browserbe való Pi-vel történő bejelentkezés után lehetséges.",
+    "payNote": "A fizetés csak Pi-vel történik. A KRW összeg tájékoztató jellegű, és a fizetés pillanatában érvényes Pi árfolyamon átszámított Pi összeget kapja meg.",
+    "from": "{plan} csomagtól",
+    "notice": {
+      "required": "Ez a funkció a(z) {plan} csomagtól érhető el.",
+      "limit": "Ebben az időszakban minden rendelkezésre álló próbálkozást felhasznált. A(z) {plan} csomagra való frissítéssel többet használhat.",
+      "limitTop": "Ebben az időszakban minden rendelkezésre álló próbálkozást felhasznált. A következő időszakban újra használhatja.",
+      "expired": "A schema.pi csomagja lejárt – kérjük, végezze el a fizetést a schema.pi csomag képernyőn.",
+      "go": "Csomag megtekintése",
+      "close": "Bezárás"
+    }
   }
 }

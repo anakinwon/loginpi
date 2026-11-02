@@ -31,7 +31,7 @@ const isErr = (v: number | null | DbErr): v is DbErr => v !== null && typeof v =
 
 export const GET = withGuard(
   dbRoute(async (req) => {
-    const g = await linkGate(req, req.nextUrl.searchParams.get('link'))
+    const g = await linkGate(req, req.nextUrl.searchParams.get('link'), 'LAKE')
     if (g instanceof NextResponse) return g
     const since = new Date(Date.now() - TREND_DAYS * 86_400_000).toISOString()
     // R-P1 — 서로 독립인 건수·추이·외부 요약을 한 번에. count:'exact' 는 KPI 화면이 건수를 그대로 표시하므로 의도(head:true 로 행 없음)

@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Esta conta já está vinculada.",
     "LINK_CODE_GEN_FAILED": "Não foi possível criar um código de link. Tente novamente mais tarde.",
     "AUTH_DB_UNAVAILABLE": "Não foi possível salvar sua conta, então o login falhou. Tente novamente mais tarde.",
-    "LINK_TRY_LIMIT": "Muitos códigos de link incorretos. Tente novamente em 15 minutos."
+    "LINK_TRY_LIMIT": "Muitos códigos de link incorretos. Tente novamente em 15 minutos.",
+    "PLAN_REQUIRED": "Este recurso não está disponível com o seu plano atual. Por favor, atualize o seu plano.",
+    "PLAN_LIMIT": "Você usou todas as tentativas disponíveis para este período. Por favor, atualize o seu plano ou tente novamente no próximo período.",
+    "PLAN_EXPIRED": "Seu plano schema.pi expirou. Por favor, faça um pagamento na tela do plano schema.pi.",
+    "PAY_PI_FAILED": "Falha na comunicação com o servidor de pagamento Pi. Por favor, tente novamente em breve.",
+    "PAY_MISMATCH": "As informações de pagamento não correspondem.",
+    "PAY_AMOUNT_MISMATCH": "O valor do pagamento difere da estimativa.",
+    "PAY_CANCELLED": "Pagamento cancelado.",
+    "PAY_ALREADY_PAID": "Há um pagamento em andamento. Se você estava assinando em sua carteira, tente novamente em 3 minutos.",
+    "PAY_INVALID_STATE": "O pagamento não pode ser processado no estado atual.",
+    "PAY_PI_CANCEL_REFUSED": "O pagamento já está em andamento e não pode ser cancelado. Por favor, verifique novamente em breve.",
+    "PAY_PAYER": "Apenas o proprietário da conexão ou o administrador podem fazer pagamentos.",
+    "PAY_SUBSCRIBED": "Enquanto estiver inscrito, você só pode pagar por atualizações ou extensões do seu período de plano atual.",
+    "PAY_UPGRADE": "Este plano não pode ser atualizado.",
+    "PAY_PRICE_CHANGED": "O status do plano foi alterado. Por favor, faça o pagamento novamente.",
+    "PRICE_UNAVAILABLE": "Falha ao verificar a taxa de câmbio do Pi. Por favor, tente novamente em breve.",
+    "QUOTE_EXPIRED": "A cotação do pagamento expirou. Por favor, faça o pagamento novamente."
   },
   "analytics": {
     "title": "Análise e Lago",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "A extensão pg_stat_statements não está instalada no DB de destino",
       "TIMEOUT": "A requisição expirou",
       "RATE": "Muitas requisições. Por favor, tente novamente em um minuto",
-      "INVALID_INPUT": "Cole o token de conexão completo começando com slk_"
+      "INVALID_INPUT": "Cole o token de conexão completo começando com slk_",
+      "PLAN_EXPIRED": "Seu plano schema.pi expirou. Por favor, faça um pagamento na tela do plano schema.pi."
     }
   },
   "migration": {
@@ -1411,6 +1428,70 @@
     "ops": "Segurança de Operações",
     "learn": "Aprender",
     "fold": "Recolher menu",
-    "unfold": "Expandir menu"
+    "unfold": "Expandir menu",
+    "plan": "Plano"
+  },
+  "plan": {
+    "title": "Plano",
+    "intro": "Os planos são definidos separadamente para cada conexão schema.pi (taxonomia). Novas conexões podem experimentar o plano DBA por 7 dias.",
+    "loading": "Carregando plano…",
+    "loadFail": "Falha ao carregar o plano. Por favor, tente novamente em breve.",
+    "names": {
+      "FREE": "Grátis",
+      "D1": "D1 Observação",
+      "D2": "D2 Ajuste",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Explorar e Aprender",
+      "D1": "Operador — Verifica se o banco de dados está ok agora",
+      "D2": "Desenvolvedor e Ajustador — Corrige SQL lento",
+      "D3": "DBA e DA — Da segurança operacional à implementação e lake"
+    },
+    "feat": {
+      "FREE": "Painel de monitoramento, visualização do plano de execução, aprendizado básico",
+      "D1": "Recursos gratuitos + coleta de desempenho ilimitada, consulta de análise GAP, aprendizado completo",
+      "D2": "Recursos D1 + comparação de planos, recomendações de ajuste de IA, execução de análise GAP",
+      "D3": "Recursos D2 + implementação, pipeline, análise, segurança operacional"
+    },
+    "featAi": "Recomendações de ajuste de IA {n} vezes/mês",
+    "featClct": "Coleta manual de desempenho {n} vezes/dia",
+    "aiNone": "Nenhuma recomendação de ajuste de IA",
+    "cur": "Plano atual: {plan}",
+    "grace": "Teste",
+    "until": "Até {date} ({days} dias restantes)",
+    "aiLeft": "{left}/{total} recomendações de ajuste de IA restantes este mês",
+    "clctLeft": "{left}/{total} coletas manuais de desempenho restantes hoje",
+    "keep": "Manter valores anteriores por {days} dias",
+    "bndlOn": "Você está usando um plano DA para a mesma taxonomia que schema.pi, então você recebe um desconto de 20% no seu pagamento.",
+    "bndlOff": "Se você usar um plano DA (P4) para a mesma taxonomia que schema.pi, você receberá um desconto de 20% no seu pagamento.",
+    "monthly": "Mensal",
+    "yearly": "Anual",
+    "freePrice": "Grátis",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Pagar por {prd}",
+    "extend": "Estender período de {prd}",
+    "upgradeTitle": "Atualizar",
+    "upgradeNote": "Os dias restantes do seu plano atual serão deduzidos do pagamento. Você não pode mudar de anual para mensal.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Atualizar",
+    "paying": "Pagando…",
+    "payStillWaiting": "Aguardando assinatura da carteira. Será aplicado automaticamente após a assinatura.",
+    "bought": "Pagamento refletido.",
+    "payCancelled": "Pagamento cancelado.",
+    "payFailed": "Pagamento falhou. Por favor, tente novamente em breve.",
+    "piBrowserOnly": "O pagamento pode ser feito após fazer login no Pi Browser com Pi.",
+    "payNote": "O pagamento é feito apenas com Pi. O valor em KRW é para referência, e o valor em Pi convertido na taxa de câmbio Pi em tempo real no momento do pagamento será recebido.",
+    "from": "De {plan}",
+    "notice": {
+      "required": "Este recurso está disponível a partir do plano {plan}.",
+      "limit": "Você usou todas as tentativas disponíveis para este período. Você pode usar mais atualizando para o plano {plan}.",
+      "limitTop": "Você usou todas as tentativas disponíveis para este período. Você pode usá-lo novamente no próximo período.",
+      "expired": "Seu plano schema.pi expirou — por favor, faça um pagamento na tela do plano schema.pi.",
+      "go": "Ver Plano",
+      "close": "Fechar"
+    }
   }
 }

@@ -42,7 +42,7 @@ export const POST = withGuard(
   dbRoute(async (req) => {
     const body = await parseBody(req, Body)
     if (body instanceof NextResponse) return body
-    const ctx = await requireLink(req, body.link)
+    const ctx = await requireLink(req, body.link, 'DRIFT_RUN')
     if (ctx instanceof Response) return ctx as NextResponse
 
     const prj = encodeURIComponent(body.prjId)

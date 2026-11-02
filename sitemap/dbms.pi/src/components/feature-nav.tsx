@@ -4,17 +4,22 @@
 //  1단(아래) = 묶음 4개(모니터링·GAP분석·레이크·관리) 타일 — 아이콘 타일 위 + 작은 글씨 아래, 누르면 그 묶음의 첫 기능으로
 //  2단(위) = 현재 묶음의 하위 기능 서브 바 — 현재 묶음 타일 위에 맞춰 띄움 — 모니터링·GAP분석은 타일 시작 끝, 레이크·관리는 타일 끝 쪽 끝(ALIGN_END, RTL 반전), 화면 양끝 8px 안쪽, 묶음 색 연한 바탕
 //  접기·펼치기 = 위 경계선 가운데 손잡이(localStorage 기억), 메뉴 높이 → :root --dbms-nav-h(본문 아래 여백이 따라감)
+//  잠긴 기능 = 서브 탭에 'D2부터' 배지(지금 URL ?link= 연결의 요금제, 모르면 표시 안 함 — 서버 검사는 requireLink)
 //  페이지마다 로그인 게이트가 있어 로그인 여부와 무관하게 노출. 좁은 화면은 가로 스크롤(줄바꿈 없음)
 import {
+  Suspense,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
   type ReactNode,
 } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link, usePathname } from '@/i18n/navigation'
 import { FEATURE_GROUPS, isActive } from '@/lib/features'
+import { planRank, type PlanCd } from '@/lib/plan-rules'
+import { usePlanInfo } from './plan/use-plan'
 import {
   IconChevronDown,
   IconChevronUp,
@@ -71,15 +76,20 @@ export function FeatureNav() {
   // 첫 화면(/) = 모니터링 보드(마스터 2026-11-02) — 메뉴에서는 /monitor 로 본다
   const raw = usePathname()
   const path = raw === '/' ? '/monitor' : raw
-  const cur = FEATURE_GROUPS.find((g) =>
+  const grp = FEATURE_GROUPS.find((g) =>
     g.items.some((i) => isActive(path, i.href)),
   )
-  const curKey = cur?.key
+  const curKey = grp?.key
   const navRef = useRef<HTMLElement>(null)
   const rowRef = useRef<HTMLDivElement>(null)
   const subRef = useRef<HTMLUListElement>(null)
   const [fold, setFold] = useState(false)
   const [subX, setSubX] = useState<number | null>(null)
+  const tp = useTranslations('plan')
+  // 지금 연결 = URL ?link=(LinkPicker 가 맞춤) — LinkWatch(Suspense 안 useSearchParams)가 알려 준다
+  const [linkId, setLinkId] = useState<string | null>(null)
+  const cur = usePlanInfo(linkId).info?.cur.plan ?? null
+  const locked = (min: PlanCd) => cur !== null && planRank(cur) < planRank(min)
 
   useEffect(() => {
     try {
@@ -172,27 +182,35 @@ export function FeatureNav() {
           <IconChevronDown width={14} height={14} />
         )}
       </button>
-      {!fold && cur && (
+      <Suspense fallback={null}>
+        <LinkWatch onLink={setLinkId} />
+      </Suspense>
+      {!fold && grp && (
         <div className="relative h-9">
           <ul
             ref={subRef}
-            aria-label={t(`groups.${cur.key}`)}
+            aria-label={t(`groups.${grp.key}`)}
             style={{
               left: subX ?? 0,
               visibility: subX == null ? 'hidden' : undefined,
             }}
-            className={`absolute bottom-0 flex max-w-[calc(100vw-16px)] [scrollbar-width:none] gap-1 overflow-x-auto rounded-t-lg border border-b-0 px-1.5 py-1 text-xs whitespace-nowrap ${TONE[cur.key].soft}`}
+            className={`absolute bottom-0 flex max-w-[calc(100vw-16px)] [scrollbar-width:none] gap-1 overflow-x-auto rounded-t-lg border border-b-0 px-1.5 py-1 text-xs whitespace-nowrap ${TONE[grp.key].soft}`}
           >
-            {cur.items.map((f) => {
+            {grp.items.map((f) => {
               const on = isActive(path, f.href)
               return (
                 <li key={f.key}>
                   <Link
                     href={f.href}
                     aria-current={on ? 'page' : undefined}
-                    className={`block rounded px-2.5 py-1 ${on ? `${TONE[cur.key].on} border font-semibold text-white` : `${TONE[cur.key].text} hover:bg-white/10`}`}
+                    className={`block rounded px-2.5 py-1 ${on ? `${TONE[grp.key].on} border font-semibold text-white` : `${TONE[grp.key].text} hover:bg-white/10`}`}
                   >
                     {t(f.key)}
+                    {locked(f.min) && (
+                      <span className="ms-1 rounded bg-amber-400/20 px-1 text-[10px] text-amber-200">
+                        {tp('from', { plan: f.min })}
+                      </span>
+                    )}
                   </Link>
                 </li>
               )
@@ -207,7 +225,7 @@ export function FeatureNav() {
         >
           <ul className="mx-auto flex w-max items-center gap-2 whitespace-nowrap">
             {FEATURE_GROUPS.map((g) => {
-              const on = g.key === cur?.key
+              const on = g.key === grp?.key
               const tone = TONE[g.key]
               return (
                 <li
@@ -238,4 +256,11 @@ export function FeatureNav() {
       )}
     </nav>
   )
+}
+
+// URL ?link= 감시 — useSearchParams 는 Suspense 경계 안에서만(정적 렌더 빌드 오류 방지)
+function LinkWatch({ onLink }: { onLink: (v: string | null) => void }) {
+  const v = useSearchParams().get('link')
+  useEffect(() => onLink(v), [v, onLink])
+  return null
 }

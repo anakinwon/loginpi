@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Šis konts jau ir saistīts.",
     "LINK_CODE_GEN_FAILED": "Nevarēja izveidot saites kodu. Lūdzu, mēģiniet vēlāk.",
     "AUTH_DB_UNAVAILABLE": "Nevarēja saglabāt jūsu kontu, tāpēc pierakstīšanās neizdevās. Lūdzu, mēģiniet vēlāk.",
-    "LINK_TRY_LIMIT": "Pārāk daudz nepareizu saites kodu. Mēģiniet vēlreiz pēc 15 minūtēm."
+    "LINK_TRY_LIMIT": "Pārāk daudz nepareizu saites kodu. Mēģiniet vēlreiz pēc 15 minūtēm.",
+    "PLAN_REQUIRED": "Šī funkcija nav pieejama ar jūsu pašreizējo plānu. Lūdzu, jauniniet savu plānu.",
+    "PLAN_LIMIT": "Jūs esat izmantojis visus pieejamos mēģinājumus šajā periodā. Lūdzu, jauniniet savu plānu vai mēģiniet vēlreiz nākamajā periodā.",
+    "PLAN_EXPIRED": "Jūsu schema.pi plāns ir beidzies. Lūdzu, veiciet maksājumu schema.pi plāna ekrānā.",
+    "PAY_PI_FAILED": "Neizdevās sazināties ar Pi maksājumu serveri. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+    "PAY_MISMATCH": "Maksājuma informācija nesakrīt.",
+    "PAY_AMOUNT_MISMATCH": "Maksājuma summa atšķiras no aprēķinātās.",
+    "PAY_CANCELLED": "Maksājums atcelts.",
+    "PAY_ALREADY_PAID": "Notiek maksājums. Ja parakstījāt savā makā, lūdzu, mēģiniet vēlreiz pēc 3 minūtēm.",
+    "PAY_INVALID_STATE": "Maksājumu nevar apstrādāt tā pašreizējā stāvoklī.",
+    "PAY_PI_CANCEL_REFUSED": "Maksājums jau notiek un to nevar atcelt. Lūdzu, pārbaudiet vēlreiz pēc brīža.",
+    "PAY_PAYER": "Maksājumus var veikt tikai savienojuma īpašnieks vai administrators.",
+    "PAY_SUBSCRIBED": "Kamēr esat abonējis, varat maksāt tikai par pašreizējā plāna perioda jauninājumiem vai pagarinājumiem.",
+    "PAY_UPGRADE": "Šo plānu nevar jaunināt.",
+    "PAY_PRICE_CHANGED": "Plāna statuss ir mainījies. Lūdzu, veiciet maksājumu vēlreiz.",
+    "PRICE_UNAVAILABLE": "Neizdevās pārbaudīt Pi valūtas kursu. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+    "QUOTE_EXPIRED": "Maksājuma piedāvājuma derīguma termiņš ir beidzies. Lūdzu, veiciet maksājumu vēlreiz."
   },
   "analytics": {
     "title": "Analītika un ezers",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Mērķa DB nav instalēts pg_stat_statements paplašinājums",
       "TIMEOUT": "Pieprasījuma laiks ir beidzies",
       "RATE": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc minūtes",
-      "INVALID_INPUT": "Ielīmējiet pilnu savienojuma marķieri, kas sākas ar slk_"
+      "INVALID_INPUT": "Ielīmējiet pilnu savienojuma marķieri, kas sākas ar slk_",
+      "PLAN_EXPIRED": "Jūsu schema.pi plāns ir beidzies. Lūdzu, veiciet maksājumu schema.pi plāna ekrānā."
     }
   },
   "migration": {
@@ -1411,6 +1428,70 @@
     "ops": "Darbības drošība",
     "learn": "Mācīties",
     "fold": "Sakļaut izvēlni",
-    "unfold": "Izvērst izvēlni"
+    "unfold": "Izvērst izvēlni",
+    "plan": "Plāns"
+  },
+  "plan": {
+    "title": "Plāns",
+    "intro": "Plāni tiek iestatīti atsevišķi katram schema.pi savienojumam (taksonomijai). Jauni savienojumi var izmēģināt DBA plānu 7 dienas.",
+    "loading": "Ielādē plānu…",
+    "loadFail": "Neizdevās ielādēt plānu. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+    "names": {
+      "FREE": "Bezmaksas",
+      "D1": "D1 Novērošana",
+      "D2": "D2 Tūnings",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Izpētīt un mācīties",
+      "D1": "Operators — pārbauda, vai datu bāze pašlaik ir kārtībā",
+      "D2": "Izstrādātājs un tūneris — labo lēnus SQL vaicājumus",
+      "D3": "DBA un DA — no darbības drošības līdz ieviešanai un datu ezeram"
+    },
+    "feat": {
+      "FREE": "Uzraudzības panelis, izpildes plāna skats, pamata apmācība",
+      "D1": "Bezmaksas funkcijas + neierobežota veiktspējas datu vākšana, GAP analīzes vaicājums, pilna apmācība",
+      "D2": "D1 funkcijas + plānu salīdzināšana, AI tūninga ieteikumi, GAP analīzes izpilde",
+      "D3": "D2 funkcijas + ieviešana, cauruļvads, analīze, darbības drošība"
+    },
+    "featAi": "AI tūninga ieteikumi {n} reizes/mēnesī",
+    "featClct": "Manuāla veiktspējas datu vākšana {n} reizes/dienā",
+    "aiNone": "Nav AI tūninga ieteikumu",
+    "cur": "Pašreizējais plāns: {plan}",
+    "grace": "Izmēģinājuma",
+    "until": "Līdz {date} (atlikušas {days} dienas)",
+    "aiLeft": "Šomēnes atlikušas {left}/{total} AI tūninga ieteikumu",
+    "clctLeft": "Šodien atlikušas {left}/{total} manuālas veiktspējas datu vākšanas",
+    "keep": "Saglabāt iepriekšējās vērtības {days} dienas",
+    "bndlOn": "Jūs izmantojat DA plānu tai pašai taksonomijai kā schema.pi, tāpēc saņemat 20% atlaidi maksājumam.",
+    "bndlOff": "Ja izmantojat DA plānu (P4) tai pašai taksonomijai kā schema.pi, saņemat 20% atlaidi maksājumam.",
+    "monthly": "Mēnesī",
+    "yearly": "Gadā",
+    "freePrice": "Bezmaksas",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Maksāt par {prd}",
+    "extend": "Pagarināt {prd} periodu",
+    "upgradeTitle": "Jaunināt",
+    "upgradeNote": "Atlikušās jūsu pašreizējā plāna dienas tiks atskaitītas no maksājuma. Jūs nevarat mainīt no gada uz mēneša.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Jaunināt",
+    "paying": "Maksā…",
+    "payStillWaiting": "Gaida maka parakstu. Pēc parakstīšanas tas tiks automātiski piemērots.",
+    "bought": "Maksājums atspoguļots.",
+    "payCancelled": "Maksājums atcelts.",
+    "payFailed": "Maksājums neizdevās. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+    "piBrowserOnly": "Maksājumu var veikt pēc pieteikšanās Pi Browser ar Pi.",
+    "payNote": "Maksājums tiek veikts tikai ar Pi. KRW summa ir informatīva, un tiks saņemta Pi summa, kas pārrēķināta pēc reālā laika Pi valūtas kursa maksājuma brīdī.",
+    "from": "No {plan}",
+    "notice": {
+      "required": "Šī funkcija ir pieejama no {plan} plāna.",
+      "limit": "Jūs esat izmantojis visus pieejamos mēģinājumus šajā periodā. Varat izmantot vairāk, jauninot uz {plan} plānu.",
+      "limitTop": "Jūs esat izmantojis visus pieejamos mēģinājumus šajā periodā. Varat to izmantot vēlreiz nākamajā periodā.",
+      "expired": "Jūsu schema.pi plāns ir beidzies — lūdzu, veiciet maksājumu schema.pi plāna ekrānā.",
+      "go": "Skatīt plānu",
+      "close": "Aizvērt"
+    }
   }
 }

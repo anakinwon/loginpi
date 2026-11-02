@@ -16,7 +16,7 @@ export const GET = withGuard(
   dbRoute(async (req, ctx) => {
     const a = await args(req, ctx)
     if (!a) return apiError('INVALID_INPUT', 400)
-    const link = await resolveLink(req, a.linkId)
+    const link = await resolveLink(req, a.linkId, 'ANY')
     if (link instanceof NextResponse) return link
     const { data, error } = await db()
       .from('dbm_sql_plan')
@@ -34,7 +34,7 @@ export const DELETE = withGuard(
   dbRoute(async (req, ctx) => {
     const a = await args(req, ctx)
     if (!a) return apiError('INVALID_INPUT', 400)
-    const ok = await requireUserLink(req, a.linkId)
+    const ok = await requireUserLink(req, a.linkId, 'ANY')
     if (ok instanceof NextResponse) return ok
     const { data, error } = await db()
       .from('dbm_sql_plan')

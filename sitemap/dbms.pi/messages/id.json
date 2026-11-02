@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Akun ini sudah tertaut.",
     "LINK_CODE_GEN_FAILED": "Tidak dapat membuat kode tautan. Silakan coba lagi nanti.",
     "AUTH_DB_UNAVAILABLE": "Tidak dapat menyimpan akun Anda, jadi masuk gagal. Silakan coba lagi nanti.",
-    "LINK_TRY_LIMIT": "Terlalu banyak kode tautan yang salah. Coba lagi dalam 15 menit."
+    "LINK_TRY_LIMIT": "Terlalu banyak kode tautan yang salah. Coba lagi dalam 15 menit.",
+    "PLAN_REQUIRED": "Fitur ini tidak tersedia di paket Anda saat ini. Harap tingkatkan paket Anda.",
+    "PLAN_LIMIT": "Anda telah menggunakan semua penggunaan untuk periode ini. Harap tingkatkan paket Anda atau coba lagi di periode berikutnya.",
+    "PLAN_EXPIRED": "Paket schema.pi Anda telah kedaluwarsa. Harap lakukan pembayaran di layar paket schema.pi.",
+    "PAY_PI_FAILED": "Gagal berkomunikasi dengan server pembayaran Pi. Harap coba lagi nanti.",
+    "PAY_MISMATCH": "Informasi pembayaran tidak cocok.",
+    "PAY_AMOUNT_MISMATCH": "Jumlah pembayaran berbeda dari perkiraan.",
+    "PAY_CANCELLED": "Pembayaran dibatalkan.",
+    "PAY_ALREADY_PAID": "Ada pembayaran yang sedang diproses. Jika Anda sedang menandatangani di dompet, coba lagi setelah 3 menit.",
+    "PAY_INVALID_STATE": "Pembayaran tidak dapat diproses dalam status ini.",
+    "PAY_PI_CANCEL_REFUSED": "Pembayaran tidak dapat dibatalkan karena sudah berlangsung. Harap periksa lagi nanti.",
+    "PAY_PAYER": "Hanya pemilik atau administrator koneksi yang dapat melakukan pembayaran.",
+    "PAY_SUBSCRIBED": "Saat berlangganan, Anda hanya dapat membayar untuk peningkatan atau perpanjangan periode paket saat ini.",
+    "PAY_UPGRADE": "Ini adalah paket yang tidak dapat ditingkatkan.",
+    "PAY_PRICE_CHANGED": "Status paket telah berubah. Harap lakukan pembayaran lagi.",
+    "PRICE_UNAVAILABLE": "Gagal memeriksa harga Pi. Harap coba lagi nanti.",
+    "QUOTE_EXPIRED": "Waktu penawaran pembayaran telah kedaluwarsa. Harap lakukan pembayaran lagi."
   },
   "analytics": {
     "title": "Analitik & Lake",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Ekstensi pg_stat_statements tidak diinstal pada DB target",
       "TIMEOUT": "Permintaan habis waktu",
       "RATE": "Terlalu banyak permintaan. Silakan coba lagi dalam satu menit",
-      "INVALID_INPUT": "Tempel token koneksi lengkap yang dimulai dengan slk_"
+      "INVALID_INPUT": "Tempel token koneksi lengkap yang dimulai dengan slk_",
+      "PLAN_EXPIRED": "Paket schema.pi Anda telah kedaluwarsa. Harap lakukan pembayaran di layar paket schema.pi."
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "Keamanan Operasi",
     "learn": "Pelajari",
     "fold": "Ciutkan menu",
-    "unfold": "Bentangkan menu"
+    "unfold": "Bentangkan menu",
+    "plan": "Paket"
+  },
+  "plan": {
+    "title": "Paket",
+    "intro": "Paket ditentukan secara terpisah untuk setiap koneksi (taksonomi) schema.pi. Koneksi baru dapat mencoba paket DBA selama 7 hari.",
+    "loading": "Memuat paket…",
+    "loadFail": "Gagal memuat paket. Harap coba lagi nanti.",
+    "names": {
+      "FREE": "Gratis",
+      "D1": "Observasi D1",
+      "D2": "Penyetelan D2",
+      "D3": "DBA D3"
+    },
+    "desc": {
+      "FREE": "Jelajahi·Pelajari",
+      "D1": "Operator — Memeriksa apakah basis data baik-baik saja sekarang",
+      "D2": "Pengembang·Penyetel — Memperbaiki SQL yang lambat",
+      "D3": "DBA·DA — Dari keamanan operasional hingga implementasi dan lake"
+    },
+    "feat": {
+      "FREE": "Papan pemantauan·Lihat rencana eksekusi·Pembelajaran dasar",
+      "D1": "Fitur gratis + Pengumpulan kinerja tanpa batas·Lihat analisis GAP·Pembelajaran lengkap",
+      "D2": "Fitur D1 + Perbandingan rencana·Rekomendasi penyetelan AI·Eksekusi analisis GAP",
+      "D3": "Fitur D2 + Implementasi·Pipeline·Analisis·Keamanan operasional"
+    },
+    "featAi": "Rekomendasi penyetelan AI {n} kali per bulan",
+    "featClct": "Pengumpulan kinerja manual {n} kali per hari",
+    "aiNone": "Tidak ada rekomendasi penyetelan AI",
+    "cur": "Paket saat ini: {plan}",
+    "grace": "Uji coba",
+    "until": "Hingga {date} (sisa {days} hari)",
+    "aiLeft": "Sisa rekomendasi penyetelan AI bulan ini {left}/{total} kali",
+    "clctLeft": "Sisa pengumpulan kinerja manual hari ini {left}/{total} kali",
+    "keep": "Simpan nilai sebelumnya selama {days} hari",
+    "bndlOn": "Anda menggunakan paket DA dari taksonomi yang sama dengan schema.pi, sehingga Anda mendapatkan diskon 20% untuk pembayaran.",
+    "bndlOff": "Jika Anda menggunakan paket DA (P4) dari taksonomi yang sama dengan schema.pi, Anda akan mendapatkan diskon 20% untuk pembayaran.",
+    "monthly": "Bulanan",
+    "yearly": "Tahunan",
+    "freePrice": "Gratis",
+    "won": "{won} Won",
+    "moneyKo": "{won} Won ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Bayar {prd}",
+    "extend": "Perpanjang periode {prd}",
+    "upgradeTitle": "Tingkatkan",
+    "upgradeNote": "Anda akan membayar setelah dikurangi sisa hari dari paket yang Anda gunakan saat ini. Anda tidak dapat beralih dari tahunan ke bulanan.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Tingkatkan",
+    "paying": "Membayar…",
+    "payStillWaiting": "Menunggu tanda tangan dompet. Ini akan diterapkan secara otomatis setelah tanda tangan selesai.",
+    "bought": "Pembayaran telah diterapkan.",
+    "payCancelled": "Pembayaran dibatalkan.",
+    "payFailed": "Pembayaran gagal diselesaikan. Harap coba lagi nanti.",
+    "piBrowserOnly": "Pembayaran dapat dilakukan setelah masuk ke Pi di Pi Browser.",
+    "payNote": "Pembayaran hanya dilakukan dengan Pi. Won Korea adalah jumlah referensi, dan Anda akan menerima jumlah Pi yang dikonversi pada nilai tukar Pi saat pembayaran.",
+    "from": "Dari {plan}",
+    "notice": {
+      "required": "Fitur ini tersedia mulai dari paket {plan}.",
+      "limit": "Anda telah menggunakan semua penggunaan untuk periode ini. Anda dapat menggunakan lebih banyak jika Anda meningkatkan ke paket {plan}.",
+      "limitTop": "Anda telah menggunakan semua penggunaan untuk periode ini. Anda dapat menggunakannya lagi di periode berikutnya.",
+      "expired": "Paket schema.pi telah kedaluwarsa — harap lakukan pembayaran di layar paket schema.pi.",
+      "go": "Lihat Paket",
+      "close": "Tutup"
+    }
   }
 }

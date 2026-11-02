@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Ši paskyra jau susieta.",
     "LINK_CODE_GEN_FAILED": "Nepavyko sukurti susiejimo kodo. Prašome bandyti dar kartą vėliau.",
     "AUTH_DB_UNAVAILABLE": "Nepavyko išsaugoti jūsų paskyros, todėl prisijungimas nepavyko. Prašome bandyti dar kartą vėliau.",
-    "LINK_TRY_LIMIT": "Per daug neteisingų susiejimo kodų. Bandykite dar kartą po 15 minučių."
+    "LINK_TRY_LIMIT": "Per daug neteisingų susiejimo kodų. Bandykite dar kartą po 15 minučių.",
+    "PLAN_REQUIRED": "Ši funkcija nepasiekiama su jūsų dabartiniu planu. Prašome atnaujinti planą.",
+    "PLAN_LIMIT": "Išnaudojote visus galimus bandymus šiam laikotarpiui. Prašome atnaujinti planą arba bandyti dar kartą kitą laikotarpį.",
+    "PLAN_EXPIRED": "Jūsų schema.pi planas baigėsi. Prašome atlikti mokėjimą schema.pi plano ekrane.",
+    "PAY_PI_FAILED": "Nepavyko susisiekti su Pi mokėjimo serveriu. Prašome bandyti dar kartą netrukus.",
+    "PAY_MISMATCH": "Mokėjimo informacija nesutampa.",
+    "PAY_AMOUNT_MISMATCH": "Mokėjimo suma skiriasi nuo sąmatos.",
+    "PAY_CANCELLED": "Mokėjimas atšauktas.",
+    "PAY_ALREADY_PAID": "Vyksta mokėjimas. Jei pasirašinėjote piniginėje, prašome bandyti dar kartą po 3 minučių.",
+    "PAY_INVALID_STATE": "Mokėjimas negali būti apdorotas dabartinėje būsenoje.",
+    "PAY_PI_CANCEL_REFUSED": "Mokėjimas jau vyksta ir negali būti atšauktas. Prašome patikrinti dar kartą netrukus.",
+    "PAY_PAYER": "Mokėjimus gali atlikti tik ryšio savininkas arba administratorius.",
+    "PAY_SUBSCRIBED": "Prenumeruojant, galite mokėti tik už dabartinio plano laikotarpio atnaujinimus ar pratęsimus.",
+    "PAY_UPGRADE": "Šio plano negalima atnaujinti.",
+    "PAY_PRICE_CHANGED": "Plano būsena pasikeitė. Prašome atlikti mokėjimą dar kartą.",
+    "PRICE_UNAVAILABLE": "Nepavyko patikrinti Pi keitimo kurso. Prašome bandyti dar kartą netrukus.",
+    "QUOTE_EXPIRED": "Mokėjimo pasiūlymo laikas baigėsi. Prašome atlikti mokėjimą dar kartą."
   },
   "analytics": {
     "title": "Analizė ir ežeras",
@@ -379,7 +395,8 @@
       "PGSS_MISSING": "Tikslinėje DB nėra įdiegto pg_stat_statements plėtinio",
       "TIMEOUT": "Užklausos laikas baigėsi",
       "RATE": "Per daug užklausų. Bandykite dar kartą po minutės",
-      "INVALID_INPUT": "Įklijuokite visą ryšio žetoną, prasidedantį slk_"
+      "INVALID_INPUT": "Įklijuokite visą ryšio žetoną, prasidedantį slk_",
+      "PLAN_EXPIRED": "Jūsų schema.pi planas baigėsi. Prašome atlikti mokėjimą schema.pi plano ekrane."
     }
   },
   "migration": {
@@ -1401,6 +1418,70 @@
     "ops": "Operacijų sauga",
     "learn": "Mokytis",
     "fold": "Suskleisti meniu",
-    "unfold": "Išskleisti meniu"
+    "unfold": "Išskleisti meniu",
+    "plan": "Planas"
+  },
+  "plan": {
+    "title": "Planas",
+    "intro": "Planai nustatomi atskirai kiekvienam schema.pi ryšiui (taksonomijai). Nauji ryšiai gali išbandyti DBA planą 7 dienas.",
+    "loading": "Įkeliamas planas…",
+    "loadFail": "Nepavyko įkelti plano. Prašome bandyti dar kartą netrukus.",
+    "names": {
+      "FREE": "Nemokamas",
+      "D1": "D1 Stebėjimas",
+      "D2": "D2 Derinimas",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Naršyti ir mokytis",
+      "D1": "Operatorius – tikrina, ar duomenų bazė dabar veikia tinkamai",
+      "D2": "Kūrėjas ir derintojas – taiso lėtas SQL užklausas",
+      "D3": "DBA ir DA – nuo veiklos saugumo iki įgyvendinimo ir duomenų ežero"
+    },
+    "feat": {
+      "FREE": "Stebėjimo lenta, vykdymo plano peržiūra, pagrindinis mokymasis",
+      "D1": "Nemokamos funkcijos + neribotas našumo rinkimas, GAP analizės užklausa, visas mokymasis",
+      "D2": "D1 funkcijos + plano palyginimas, AI derinimo rekomendacijos, GAP analizės vykdymas",
+      "D3": "D2 funkcijos + įgyvendinimas, duomenų srautas, analizė, veiklos saugumas"
+    },
+    "featAi": "AI derinimo rekomendacijos {n} kartų/mėn.",
+    "featClct": "Rankinis našumo rinkimas {n} kartų/dieną",
+    "aiNone": "Nėra AI derinimo rekomendacijų",
+    "cur": "Dabartinis planas: {plan}",
+    "grace": "Bandomasis",
+    "until": "Iki {date} (liko {days} dienos)",
+    "aiLeft": "Liko {left}/{total} AI derinimo rekomendacijų šį mėnesį",
+    "clctLeft": "Liko {left}/{total} rankinių našumo rinkimų šiandien",
+    "keep": "Saugoti ankstesnes vertes {days} dienas",
+    "bndlOn": "Naudojate DA planą tai pačiai taksonomijai kaip schema.pi, todėl gaunate 20% nuolaidą mokėjimui.",
+    "bndlOff": "Jei naudojate DA planą (P4) tai pačiai taksonomijai kaip schema.pi, gausite 20% nuolaidą mokėjimui.",
+    "monthly": "Mėnesinis",
+    "yearly": "Metinis",
+    "freePrice": "Nemokamai",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Mokėti už {prd}",
+    "extend": "Pratęsti {prd} laikotarpį",
+    "upgradeTitle": "Atnaujinti",
+    "upgradeNote": "Likusios dabartinio plano dienos bus išskaičiuotos iš mokėjimo. Negalite pakeisti iš metinio į mėnesinį.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Atnaujinti",
+    "paying": "Mokama…",
+    "payStillWaiting": "Laukiama piniginės parašo. Pasirašius, bus automatiškai pritaikyta.",
+    "bought": "Mokėjimas atspindėtas.",
+    "payCancelled": "Mokėjimas atšauktas.",
+    "payFailed": "Mokėjimas nepavyko. Prašome bandyti dar kartą netrukus.",
+    "piBrowserOnly": "Mokėjimą galima atlikti prisijungus prie Pi Browser su Pi.",
+    "payNote": "Mokėjimas atliekamas tik su Pi. KRW suma yra nuoroda, o Pi suma, perskaičiuota pagal realaus laiko Pi keitimo kursą mokėjimo metu, bus gauta.",
+    "from": "Nuo {plan}",
+    "notice": {
+      "required": "Ši funkcija pasiekiama nuo {plan} plano.",
+      "limit": "Išnaudojote visus galimus bandymus šiam laikotarpiui. Galite naudoti daugiau, atnaujinę į {plan} planą.",
+      "limitTop": "Išnaudojote visus galimus bandymus šiam laikotarpiui. Galėsite naudoti dar kartą kitą laikotarpį.",
+      "expired": "Jūsų schema.pi planas baigėsi – prašome atlikti mokėjimą schema.pi plano ekrane.",
+      "go": "Peržiūrėti planą",
+      "close": "Uždaryti"
+    }
   }
 }

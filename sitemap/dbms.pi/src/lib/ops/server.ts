@@ -23,7 +23,7 @@ export async function opsParams(req: NextRequest, linkId: unknown, connId: unkno
   if (typeof linkId !== 'string' || typeof connId !== 'string' || !UUID_RE.test(linkId) || !connId || connId.length > 100)
     return NextResponse.json({ error: 'INVALID_INPUT', code: 'INVALID_INPUT' }, { status: 400 })
   try {
-    const ctx = await requireLink(req, linkId)
+    const ctx = await requireLink(req, linkId, 'OPS') // 운영 안전 = D3
     if (!(ctx instanceof Response)) return { linkId, connId, usrId: ctx.usrId }
     return ctx instanceof NextResponse ? ctx : new NextResponse(ctx.body, ctx)
   } catch (e) {

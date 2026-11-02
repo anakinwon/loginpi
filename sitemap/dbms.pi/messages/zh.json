@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "此账户已关联。",
     "LINK_CODE_GEN_FAILED": "无法生成关联代码。请稍后重试。",
     "AUTH_DB_UNAVAILABLE": "无法保存您的账户，因此登录失败。请稍后重试。",
-    "LINK_TRY_LIMIT": "关联代码输入错误次数过多。请在 15 分钟后重试"
+    "LINK_TRY_LIMIT": "关联代码输入错误次数过多。请在 15 分钟后重试",
+    "PLAN_REQUIRED": "当前套餐无法使用此功能。请升级套餐",
+    "PLAN_LIMIT": "本期使用次数已用完。请升级套餐或在下期重试",
+    "PLAN_EXPIRED": "schema.pi 套餐已过期。请在 schema.pi 套餐页面支付",
+    "PAY_PI_FAILED": "无法与 Pi 支付服务器通信。请稍后重试",
+    "PAY_MISMATCH": "支付信息不匹配",
+    "PAY_AMOUNT_MISMATCH": "支付金额与报价不同",
+    "PAY_CANCELLED": "已取消的支付",
+    "PAY_ALREADY_PAID": "有正在处理的支付。如果在钱包中签名，请在3分钟后重试",
+    "PAY_INVALID_STATE": "支付无法处理",
+    "PAY_PI_CANCEL_REFUSED": "支付已在进行中，无法取消。请稍后再次确认",
+    "PAY_PAYER": "只有连接所有者或管理员才能支付",
+    "PAY_SUBSCRIBED": "订阅期间只能支付升级或延长当前套餐期限",
+    "PAY_UPGRADE": "无法升级的套餐",
+    "PAY_PRICE_CHANGED": "套餐状态已更改。请重新支付",
+    "PRICE_UNAVAILABLE": "无法确认 Pi 汇率。请稍后重试",
+    "QUOTE_EXPIRED": "支付报价已过期。请重新支付"
   },
   "analytics": {
     "title": "分析与数据湖",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "目标 DB 上未安装 pg_stat_statements 扩展",
       "TIMEOUT": "请求超时",
       "RATE": "请求过多。请在一分钟后重试",
-      "INVALID_INPUT": "请粘贴以 slk_ 开头的完整连接令牌"
+      "INVALID_INPUT": "请粘贴以 slk_ 开头的完整连接令牌",
+      "PLAN_EXPIRED": "schema.pi 套餐已过期。请在 schema.pi 套餐页面支付"
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "运维安全",
     "learn": "学习",
     "fold": "收起菜单",
-    "unfold": "展开菜单"
+    "unfold": "展开菜单",
+    "plan": "套餐"
+  },
+  "plan": {
+    "title": "套餐",
+    "intro": "每个 schema.pi 连接（分类体系）都有单独的套餐。新连接可免费试用 DBA 套餐7天。",
+    "loading": "正在加载套餐…",
+    "loadFail": "无法加载套餐。请稍后重试",
+    "names": {
+      "FREE": "免费",
+      "D1": "D1 观测",
+      "D2": "D2 调优",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "浏览·学习",
+      "D1": "操作员 — 检查数据库是否正常",
+      "D2": "开发者·调优师 — 修复慢速 SQL",
+      "D3": "DBA·DA — 运营安全·迁移·数据湖"
+    },
+    "feat": {
+      "FREE": "监控板·执行计划查看·基础学习",
+      "D1": "免费功能 + 性能收集无限制·GAP分析查询·全部学习",
+      "D2": "D1 功能 + 计划比较·AI 调优建议·GAP分析执行",
+      "D3": "D2 功能 + 迁移·管道·分析·运营安全"
+    },
+    "featAi": "AI 调优建议每月 {n} 次",
+    "featClct": "每日手动收集性能 {n} 次",
+    "aiNone": "无 AI 调优建议",
+    "cur": "当前套餐：{plan}",
+    "grace": "试用",
+    "until": "至 {date}（剩余 {days} 天）",
+    "aiLeft": "本月 AI 调优建议剩余 {left}/{total} 次",
+    "clctLeft": "今日手动收集性能剩余 {left}/{total} 次",
+    "keep": "保留历史值 {days} 天",
+    "bndlOn": "您正在使用与 schema.pi 相同的分类体系的 DA 套餐，因此支付金额可享受20%折扣",
+    "bndlOff": "如果您正在使用与 schema.pi 相同的分类体系的 DA 套餐（P4），支付金额可享受20%折扣",
+    "monthly": "每月",
+    "yearly": "每年",
+    "freePrice": "免费",
+    "won": "{won}韩元",
+    "moneyKo": "{won}韩元 ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "支付 {prd}",
+    "extend": "延长 {prd} 期限",
+    "upgradeTitle": "升级",
+    "upgradeNote": "将扣除当前套餐剩余天数的费用。无法从年度套餐更改为月度套餐。",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "升级",
+    "paying": "正在支付…",
+    "payStillWaiting": "正在等待钱包签名。签名完成后将自动生效",
+    "bought": "支付已生效",
+    "payCancelled": "已取消支付",
+    "payFailed": "支付未完成。请稍后重试",
+    "piBrowserOnly": "支付需在 Pi Browser 中登录 Pi 后进行",
+    "payNote": "仅支持 Pi 支付。韩元为参考金额，将根据支付时的 Pi 汇率换算成 Pi 金额。",
+    "from": "从 {plan} 开始",
+    "notice": {
+      "required": "此功能仅适用于 {plan} 套餐。",
+      "limit": "本期使用次数已用完。升级到 {plan} 套餐可获得更多使用次数。",
+      "limitTop": "本期使用次数已用完。下期可再次使用。",
+      "expired": "schema.pi 套餐已过期 — 请在 schema.pi 套餐页面支付。",
+      "go": "查看套餐",
+      "close": "关闭"
+    }
   }
 }

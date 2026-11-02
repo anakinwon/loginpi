@@ -6,6 +6,9 @@ import { withGuard } from '@pi/guard'
 import { getLanguage, getLocaleInfo } from '@pi/i18n'
 import { apiError, db, dbFail, dbRoute, parseBody } from '@/lib/api'
 import { parsePlan } from '@/lib/sql-lab/plan'
+import { planRequired } from '@/lib/link/client'
+import { aiUsedMonth } from '@/lib/plan'
+import { nextPlan } from '@/lib/plan-rules'
 import { requireUserLink, resolveLink } from '@/lib/sql-lab/server'
 import { ruleRecommend, TUN_COLS } from '@/lib/sql-lab/tune'
 import { aiRecommend } from '@/lib/sql-lab/tune-ai'
@@ -30,7 +33,7 @@ export const GET = withGuard(
     const linkId = sp.get('link')
     if (!linkId) return apiError('INVALID_INPUT', 400)
     const page = Math.max(1, Number(sp.get('page')) || 1)
-    const link = await resolveLink(req, linkId)
+    const link = await resolveLink(req, linkId, 'ANY')
     if (link instanceof NextResponse) return link
     // 다음 쪽 유무는 1건 더 읽어 판단(정확 건수 미사용 — R-P3)
     const { data, error } = await db()
@@ -54,8 +57,8 @@ export const POST = withGuard(
     const body = await parseBody(req, Body)
     if (body instanceof NextResponse) return body
     // R-P1 — 소유 확인·계획·기존 권고 조회는 서로 독립
-    const [ok, planR, dupR] = await Promise.all([
-      requireUserLink(req, body.linkId),
+    const [ok, planR, dupR, aiUsed] = await Promise.all([
+      requireUserLink(req, body.linkId, 'SQL_TUNE'),
       db()
         .from('dbm_sql_plan')
         .select('plan_id, conn_id, sql_hash, sql_txt, plan_json, total_cost')
@@ -69,8 +72,11 @@ export const POST = withGuard(
         .eq('plan_id', body.planId)
         .eq('del_yn', 'N')
         .maybeSingle(),
+      aiUsedMonth(body.linkId),
     ])
     if (ok instanceof NextResponse) return ok
+    // AI 튜닝 월 횟수(sql/035 ai_mon_cnt — D2 30·D3 100). 초과 = 다음 요금제 안내(최상위면 need null). ponytail: 동시 요청은 1회 넘칠 수 있음
+    if (aiUsed >= ok.link.plan.aiMon) return planRequired(nextPlan(ok.link.plan.plan), 'PLAN_LIMIT')
     if (planR.error) return dbFail(planR.error)
     if (dupR.error) return dbFail(dupR.error)
     if (!planR.data) return apiError('NOT_FOUND', 404)

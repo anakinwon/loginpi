@@ -62,7 +62,7 @@ export async function linkParams(
       { status: 400 },
     )
   try {
-    const ctx = await requireLink(req, linkId)
+    const ctx = await requireLink(req, linkId, 'PERF')
     if (!(ctx instanceof Response)) return { ctx, linkId, connId }
     return ctx instanceof NextResponse ? ctx : new NextResponse(ctx.body, ctx)
   } catch (e) {

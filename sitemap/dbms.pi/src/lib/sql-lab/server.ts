@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import type { UserRow } from '@pi/db'
 import { requireUser } from '@/lib/api'
 import { LinkError, requireLink, type LinkCtx } from '@/lib/link/client'
+import type { Perm } from '@/lib/plan-rules'
 
 // LinkError(LINK_AUTH·CONN_UNSUPPORTED·TIMEOUT …) → { error, code } — 접속 정보는 담지 않는다(클라이언트가 sqlLab.errors.<code> 번역)
 export function linkFail(e: unknown): NextResponse {
@@ -17,9 +18,10 @@ export function linkFail(e: unknown): NextResponse {
 export async function requireUserLink(
   req: NextRequest,
   linkId: string,
+  perm: Perm,
 ): Promise<{ user: UserRow; link: LinkCtx } | NextResponse> {
   try {
-    const [user, link] = await Promise.all([requireUser(req), requireLink(req, linkId)])
+    const [user, link] = await Promise.all([requireUser(req), requireLink(req, linkId, perm)])
     if (user instanceof NextResponse) return user
     if (link instanceof Response) return link as NextResponse
     return { user, link }
@@ -29,9 +31,9 @@ export async function requireUserLink(
 }
 
 // 연결만 확인(사용자 행이 필요 없는 조회)
-export async function resolveLink(req: NextRequest, linkId: string): Promise<LinkCtx | NextResponse> {
+export async function resolveLink(req: NextRequest, linkId: string, perm: Perm): Promise<LinkCtx | NextResponse> {
   try {
-    const link = await requireLink(req, linkId)
+    const link = await requireLink(req, linkId, perm)
     return link instanceof Response ? (link as NextResponse) : link
   } catch (e) {
     return linkFail(e)

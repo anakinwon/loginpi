@@ -10,7 +10,7 @@ export const GET = withGuard(
   dbRoute(async (req) => {
     const linkId = req.nextUrl.searchParams.get('link')
     if (!linkId) return apiError('INVALID_INPUT', 400)
-    const link = await resolveLink(req, linkId)
+    const link = await resolveLink(req, linkId, 'SQL_EXPLAIN')
     if (link instanceof NextResponse) return link
     try {
       const domains = await linkGet<Domain[]>(linkId, '/domains')

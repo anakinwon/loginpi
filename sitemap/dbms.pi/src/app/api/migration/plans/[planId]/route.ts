@@ -16,7 +16,7 @@ export const GET = withGuard(
     const { planId } = await (ctx as Ctx).params
     const linkId = req.nextUrl.searchParams.get('link') ?? ''
     if (!UUID.safeParse(planId).success || !linkId) return apiError('INVALID_INPUT', 400)
-    const link = await requireLink(req, linkId)
+    const link = await requireLink(req, linkId, 'LAKE')
     if (link instanceof Response) return link as NextResponse
     const { data, error } = await db()
       .from('dbm_mig_plan')
@@ -47,7 +47,7 @@ export const PATCH = withGuard(
     if (!UUID.safeParse(planId).success) return apiError('INVALID_INPUT', 400)
     const body = await parseBody(req, Body)
     if (body instanceof NextResponse) return body
-    const link = await requireLink(req, body.link)
+    const link = await requireLink(req, body.link, 'LAKE')
     if (link instanceof Response) return link as NextResponse
 
     // 체크리스트 병합·READY 판정에 현재 값이 필요(앞 결과를 쓰므로 직렬)

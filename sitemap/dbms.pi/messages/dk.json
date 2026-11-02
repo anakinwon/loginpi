@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Denne konto er allerede linket.",
     "LINK_CODE_GEN_FAILED": "Kunne ikke oprette en linkkode. Prøv igen senere.",
     "AUTH_DB_UNAVAILABLE": "Kunne ikke gemme din konto, så login mislykkedes. Prøv igen senere.",
-    "LINK_TRY_LIMIT": "For mange forkerte linkkoder. Prøv igen om 15 minutter."
+    "LINK_TRY_LIMIT": "For mange forkerte linkkoder. Prøv igen om 15 minutter.",
+    "PLAN_REQUIRED": "Denne funktion er ikke tilgængelig med din nuværende plan. Opgrader venligst din plan.",
+    "PLAN_LIMIT": "Du har brugt alle tilgængelige forsøg for denne periode. Opgrader venligst din plan eller prøv igen næste periode.",
+    "PLAN_EXPIRED": "Din schema.pi-plan er udløbet. Foretag venligst en betaling på schema.pi-planskærmen.",
+    "PAY_PI_FAILED": "Kunne ikke kommunikere med Pi-betalingsserveren. Prøv venligst igen om et øjeblik.",
+    "PAY_MISMATCH": "Betalingsoplysninger stemmer ikke overens.",
+    "PAY_AMOUNT_MISMATCH": "Betalingsbeløbet afviger fra estimatet.",
+    "PAY_CANCELLED": "Betaling annulleret.",
+    "PAY_ALREADY_PAID": "Der er en betaling i gang. Hvis du var ved at logge ind på din tegnebog, prøv venligst igen om 3 minutter.",
+    "PAY_INVALID_STATE": "Betalingen kan ikke behandles i dens nuværende tilstand.",
+    "PAY_PI_CANCEL_REFUSED": "Betalingen er allerede i gang og kan ikke annulleres. Tjek venligst igen om et øjeblik.",
+    "PAY_PAYER": "Kun forbindelsesejeren eller administratoren kan foretage betalinger.",
+    "PAY_SUBSCRIBED": "Mens du abonnerer, kan du kun betale for opgraderinger eller forlængelser af din nuværende planperiode.",
+    "PAY_UPGRADE": "Denne plan kan ikke opgraderes.",
+    "PAY_PRICE_CHANGED": "Planstatus er ændret. Foretag venligst betalingen igen.",
+    "PRICE_UNAVAILABLE": "Kunne ikke tjekke Pi-vekselkursen. Prøv venligst igen om et øjeblik.",
+    "QUOTE_EXPIRED": "Betalingskvoten er udløbet. Foretag venligst betalingen igen."
   },
   "analytics": {
     "title": "Analyse og Lake",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "pg_stat_statements-udvidelsen er ikke installeret på mål-DB'en",
       "TIMEOUT": "Anmodningen fik timeout",
       "RATE": "For mange anmodninger. Prøv igen om et minut",
-      "INVALID_INPUT": "Indsæt det fulde forbindelsestoken, der starter med slk_"
+      "INVALID_INPUT": "Indsæt det fulde forbindelsestoken, der starter med slk_",
+      "PLAN_EXPIRED": "Din schema.pi-plan er udløbet. Foretag venligst en betaling på schema.pi-planskærmen."
     }
   },
   "migration": {
@@ -1409,6 +1426,70 @@
     "ops": "Driftssikkerhed",
     "learn": "Lær",
     "fold": "Skjul menu",
-    "unfold": "Udvid menu"
+    "unfold": "Udvid menu",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Planer indstilles separat for hver schema.pi-forbindelse (taksonomi). Nye forbindelser kan opleve DBA-planen i 7 dage.",
+    "loading": "Indlæser plan…",
+    "loadFail": "Kunne ikke indlæse planen. Prøv venligst igen om et øjeblik.",
+    "names": {
+      "FREE": "Gratis",
+      "D1": "D1 Observation",
+      "D2": "D2 Tuning",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Udforsk & Lær",
+      "D1": "Operatør — Kontrollerer, om databasen er i orden nu",
+      "D2": "Udvikler & Tuner — Retter langsom SQL",
+      "D3": "DBA & DA — Fra driftssikkerhed til implementering og lake"
+    },
+    "feat": {
+      "FREE": "Overvågningspanel, visning af udførelsesplan, grundlæggende læring",
+      "D1": "Gratis funktioner + ubegrænset ydelsesindsamling, GAP-analyseforespørgsel, fuld læring",
+      "D2": "D1-funktioner + plan sammenligning, AI-tuninganbefalinger, GAP-analyseudførelse",
+      "D3": "D2-funktioner + implementering, pipeline, analyse, driftssikkerhed"
+    },
+    "featAi": "AI-tuninganbefalinger {n} gange/måned",
+    "featClct": "Manuel ydelsesindsamling {n} gange/dag",
+    "aiNone": "Ingen AI-tuninganbefalinger",
+    "cur": "Nuværende plan: {plan}",
+    "grace": "Prøveperiode",
+    "until": "Indtil {date} ({days} dage tilbage)",
+    "aiLeft": "{left}/{total} AI-tuninganbefalinger tilbage denne måned",
+    "clctLeft": "{left}/{total} manuelle ydelsesindsamlinger tilbage i dag",
+    "keep": "Behold tidligere værdier i {days} dage",
+    "bndlOn": "Du bruger en DA-plan for samme taksonomi som schema.pi, så du får 20% rabat på din betaling.",
+    "bndlOff": "Hvis du bruger en DA-plan (P4) for samme taksonomi som schema.pi, får du 20% rabat på din betaling.",
+    "monthly": "Månedlig",
+    "yearly": "Årlig",
+    "freePrice": "Gratis",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Betal for {prd}",
+    "extend": "Forlæng {prd}-periode",
+    "upgradeTitle": "Opgrader",
+    "upgradeNote": "De resterende dage af din nuværende plan vil blive trukket fra betalingen. Du kan ikke skifte fra årlig til månedlig.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Opgrader",
+    "paying": "Betaler…",
+    "payStillWaiting": "Venter på tegnebogssignatur. Den vil automatisk blive anvendt, når den er signeret.",
+    "bought": "Betaling afspejlet.",
+    "payCancelled": "Betaling annulleret.",
+    "payFailed": "Betaling mislykkedes. Prøv venligst igen om et øjeblik.",
+    "piBrowserOnly": "Betaling kan foretages efter login til Pi Browser med Pi.",
+    "payNote": "Betaling foretages kun med Pi. KRW-beløbet er til reference, og Pi-beløbet konverteret til den realtids Pi-vekselkurs på betalingstidspunktet vil blive modtaget.",
+    "from": "Fra {plan}",
+    "notice": {
+      "required": "Denne funktion er tilgængelig fra {plan}-planen.",
+      "limit": "Du har brugt alle tilgængelige forsøg for denne periode. Du kan bruge mere ved at opgradere til {plan}-planen.",
+      "limitTop": "Du har brugt alle tilgængelige forsøg for denne periode. Du kan bruge den igen næste periode.",
+      "expired": "Din schema.pi-plan er udløbet — foretag venligst en betaling på schema.pi-planskærmen.",
+      "go": "Se plan",
+      "close": "Luk"
+    }
   }
 }

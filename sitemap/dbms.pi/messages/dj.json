@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Ce compte est déjà lié.",
     "LINK_CODE_GEN_FAILED": "Impossible de créer un code de liaison. Veuillez réessayer plus tard.",
     "AUTH_DB_UNAVAILABLE": "Impossible d'enregistrer votre compte, la connexion a échoué. Veuillez réessayer plus tard.",
-    "LINK_TRY_LIMIT": "Trop de codes de liaison incorrects. Réessayez dans 15 minutes."
+    "LINK_TRY_LIMIT": "Trop de codes de liaison incorrects. Réessayez dans 15 minutes.",
+    "PLAN_REQUIRED": "Cette fonctionnalité n'est pas disponible avec votre forfait actuel. Veuillez mettre à niveau votre forfait.",
+    "PLAN_LIMIT": "Vous avez utilisé toutes les tentatives disponibles pour cette période. Veuillez mettre à niveau votre forfait ou réessayer la période suivante.",
+    "PLAN_EXPIRED": "Votre forfait schema.pi a expiré. Veuillez effectuer un paiement sur l'écran des forfaits schema.pi.",
+    "PAY_PI_FAILED": "Échec de la communication avec le serveur de paiement Pi. Veuillez réessayer sous peu.",
+    "PAY_MISMATCH": "Les informations de paiement ne correspondent pas.",
+    "PAY_AMOUNT_MISMATCH": "Le montant du paiement diffère de l'estimation.",
+    "PAY_CANCELLED": "Paiement annulé.",
+    "PAY_ALREADY_PAID": "Un paiement est en cours. Si vous étiez en train de vous connecter à votre portefeuille, veuillez réessayer dans 3 minutes.",
+    "PAY_INVALID_STATE": "Le paiement ne peut pas être traité dans son état actuel.",
+    "PAY_PI_CANCEL_REFUSED": "Le paiement est déjà en cours et ne peut pas être annulé. Veuillez vérifier à nouveau sous peu.",
+    "PAY_PAYER": "Seul le propriétaire de la connexion ou l'administrateur peut effectuer des paiements.",
+    "PAY_SUBSCRIBED": "Lorsque vous êtes abonné, vous ne pouvez payer que les mises à niveau ou les extensions de votre période de forfait actuelle.",
+    "PAY_UPGRADE": "Ce forfait ne peut pas être mis à niveau.",
+    "PAY_PRICE_CHANGED": "Le statut du forfait a changé. Veuillez effectuer le paiement à nouveau.",
+    "PRICE_UNAVAILABLE": "Échec de la vérification du taux de change Pi. Veuillez réessayer sous peu.",
+    "QUOTE_EXPIRED": "Le devis de paiement a expiré. Veuillez effectuer le paiement à nouveau."
   },
   "analytics": {
     "title": "Analyse et Lac",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "L'extension pg_stat_statements n'est pas installée sur la DB cible",
       "TIMEOUT": "La requête a expiré",
       "RATE": "Trop de requêtes. Veuillez réessayer dans une minute",
-      "INVALID_INPUT": "Collez le jeton de connexion complet commençant par slk_"
+      "INVALID_INPUT": "Collez le jeton de connexion complet commençant par slk_",
+      "PLAN_EXPIRED": "Votre forfait schema.pi a expiré. Veuillez effectuer un paiement sur l'écran des forfaits schema.pi."
     }
   },
   "migration": {
@@ -550,6 +567,7 @@
         "WARN": "Avertissement — certains éléments nécessitent un examen",
         "UNKNOWN": "Inconnu — vérifiez la connexion",
         "OK": "OK — chaque signal est dans les limites",
+        "CONN_DOWN": "Impossible d'accéder à la DB — vérifiez d'abord la connexion",
         "NA": "N/A"
       },
       "kpi": {
@@ -983,7 +1001,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "Le lien schema.pi est en préparation. Veuillez réessayer plus tard.",
+      "PGSS_MISSING": "L'extension pg_stat_statements n'est pas installée sur cette DB, les statistiques de requêtes ne sont donc pas disponibles.",
       "CONN_UNSUPPORTED": "Cette connexion n’est pas encore prise en charge (connexions PostgreSQL directes uniquement).",
+      "TIMEOUT": "La DB cible a répondu trop lentement. Veuillez réessayer plus tard.",
       "RATE": "Trop de requêtes. Réessayez dans une minute.",
       "LINK_AUTH": "Le jeton de lien a expiré ou a été révoqué. Enregistrez à nouveau le jeton sur la page de connexion.",
       "LINK_SCOPE": "Cette connexion n’appartient pas au domaine du lien.",
@@ -992,6 +1012,7 @@
     },
     "pgss": {
       "title": "Comment activer pg_stat_statements",
+      "body": "Le Top-N des requêtes lentes nécessite l'extension pg_stat_statements. Exécutez l'instruction ci-dessous en tant qu'administrateur de la DB. Sur Supabase, activez-la sous Database → Extensions.",
       "note": "PostgreSQL auto-hébergé nécessite également pg_stat_statements dans shared_preload_libraries (postgresql.conf) et un redémarrage. Les statistiques de tables, d’index et de taille fonctionnent sans cela."
     },
     "collect": {
@@ -1038,6 +1059,7 @@
     "trend": {
       "limit": "Seuil de taille",
       "empty": "Aucun instantané au cours des 30 derniers jours",
+      "chart": "Taille de la DB au cours des 30 derniers jours",
       "now": "Taille actuelle",
       "perDay": "Croissance par jour",
       "needMore": "Nécessite 2 instantanés ou plus",
@@ -1405,6 +1427,70 @@
     "ops": "Sécurité des opérations",
     "learn": "Apprendre",
     "fold": "Réduire le menu",
-    "unfold": "Développer le menu"
+    "unfold": "Développer le menu",
+    "plan": "Forfait"
+  },
+  "plan": {
+    "title": "Forfait",
+    "intro": "Les forfaits sont définis séparément pour chaque connexion schema.pi (taxonomie). Les nouvelles connexions peuvent bénéficier du forfait DBA pendant 7 jours.",
+    "loading": "Chargement du forfait…",
+    "loadFail": "Échec du chargement du forfait. Veuillez réessayer sous peu.",
+    "names": {
+      "FREE": "Gratuit",
+      "D1": "D1 Observation",
+      "D2": "D2 Optimisation",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Explorer et apprendre",
+      "D1": "Opérateur — Vérifie si la base de données est en bon état maintenant.",
+      "D2": "Développeur et optimiseur — Corrige les requêtes SQL lentes",
+      "D3": "DBA et DA — De la sécurité opérationnelle à l'implémentation et au lac de données"
+    },
+    "feat": {
+      "FREE": "Tableau de bord de surveillance, vue du plan d'exécution, apprentissage de base",
+      "D1": "Fonctionnalités gratuites + collecte de performances illimitée, requête d'analyse GAP, apprentissage complet",
+      "D2": "Fonctionnalités D1 + comparaison de plans, recommandations d'optimisation IA, exécution d'analyse GAP",
+      "D3": "Fonctionnalités D2 + implémentation, pipeline, analyse, sécurité opérationnelle"
+    },
+    "featAi": "Recommandations d'optimisation IA {n} fois/mois",
+    "featClct": "Collecte manuelle de performances {n} fois/jour",
+    "aiNone": "Aucune recommandation d'optimisation IA",
+    "cur": "Forfait actuel : {plan}",
+    "grace": "Essai",
+    "until": "Jusqu'au {date} ({days} jours restants)",
+    "aiLeft": "{left}/{total} recommandations d'optimisation IA restantes ce mois-ci",
+    "clctLeft": "{left}/{total} collectes manuelles de performances restantes aujourd'hui",
+    "keep": "Conserver les valeurs passées pendant {days} jours",
+    "bndlOn": "Vous utilisez un forfait DA pour la même taxonomie que schema.pi, vous bénéficiez donc d'une réduction de 20 % sur votre paiement.",
+    "bndlOff": "Si vous utilisez un forfait DA (P4) pour la même taxonomie que schema.pi, vous bénéficiez d'une réduction de 20 % sur votre paiement.",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "freePrice": "Gratuit",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Payer pour {prd}",
+    "extend": "Prolonger la période de {prd}",
+    "upgradeTitle": "Mettre à niveau",
+    "upgradeNote": "Les jours restants de votre forfait actuel seront déduits du paiement. Vous ne pouvez pas passer d'annuel à mensuel.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Mettre à niveau",
+    "paying": "Paiement en cours…",
+    "payStillWaiting": "En attente de la signature du portefeuille. Elle sera automatiquement appliquée une fois signée.",
+    "bought": "Paiement enregistré.",
+    "payCancelled": "Paiement annulé.",
+    "payFailed": "Échec du paiement. Veuillez réessayer sous peu.",
+    "piBrowserOnly": "Le paiement peut être effectué après s'être connecté à Pi Browser avec Pi.",
+    "payNote": "Le paiement est effectué uniquement avec Pi. Le montant en KRW est à titre indicatif, et le montant en Pi converti au taux de change Pi en temps réel au moment du paiement sera reçu.",
+    "from": "À partir de {plan}",
+    "notice": {
+      "required": "Cette fonctionnalité est disponible à partir du forfait {plan}.",
+      "limit": "Vous avez utilisé toutes les tentatives disponibles pour cette période. Vous pouvez en utiliser davantage en passant au forfait {plan}.",
+      "limitTop": "Vous avez utilisé toutes les tentatives disponibles pour cette période. Vous pourrez l'utiliser à nouveau la période suivante.",
+      "expired": "Votre forfait schema.pi a expiré — veuillez effectuer un paiement sur l'écran des forfaits schema.pi.",
+      "go": "Voir le forfait",
+      "close": "Fermer"
+    }
   }
 }

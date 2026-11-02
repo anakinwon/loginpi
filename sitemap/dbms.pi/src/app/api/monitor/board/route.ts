@@ -39,7 +39,7 @@ export const GET = withGuard(
       (tier === 'fast' && !connId)
     )
       return bad()
-    const g = await linkGate(req, sp.get('link'))
+    const g = await linkGate(req, sp.get('link'), 'MON')
     if (g instanceof NextResponse) return g
     const fastKey = cacheKey(g.linkId, connId, 'fast')
 

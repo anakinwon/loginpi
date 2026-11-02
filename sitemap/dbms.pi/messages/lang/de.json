@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Dieses Konto ist bereits verknüpft.",
     "LINK_CODE_GEN_FAILED": "Verknüpfungscode konnte nicht erstellt werden. Bitte versuchen Sie es später erneut.",
     "AUTH_DB_UNAVAILABLE": "Ihr Konto konnte nicht gespeichert werden, daher ist die Anmeldung fehlgeschlagen. Bitte versuchen Sie es später erneut.",
-    "LINK_TRY_LIMIT": "Zu viele falsche Verknüpfungscodes. Versuchen Sie es in 15 Minuten erneut."
+    "LINK_TRY_LIMIT": "Zu viele falsche Verknüpfungscodes. Versuchen Sie es in 15 Minuten erneut.",
+    "PLAN_REQUIRED": "Diese Funktion ist mit Ihrem aktuellen Plan nicht verfügbar. Bitte aktualisieren Sie Ihren Plan.",
+    "PLAN_LIMIT": "Sie haben alle verfügbaren Versuche für diesen Zeitraum aufgebraucht. Bitte aktualisieren Sie Ihren Plan oder versuchen Sie es im nächsten Zeitraum erneut.",
+    "PLAN_EXPIRED": "Ihr schema.pi-Plan ist abgelaufen. Bitte nehmen Sie eine Zahlung auf dem schema.pi-Planbildschirm vor.",
+    "PAY_PI_FAILED": "Die Kommunikation mit dem Pi-Zahlungsserver ist fehlgeschlagen. Bitte versuchen Sie es in Kürze erneut.",
+    "PAY_MISMATCH": "Die Zahlungsinformationen stimmen nicht überein.",
+    "PAY_AMOUNT_MISMATCH": "Der Zahlungsbetrag weicht vom Kostenvoranschlag ab.",
+    "PAY_CANCELLED": "Zahlung storniert.",
+    "PAY_ALREADY_PAID": "Es ist eine Zahlung im Gange. Wenn Sie sich in Ihrer Wallet angemeldet haben, versuchen Sie es bitte in 3 Minuten erneut.",
+    "PAY_INVALID_STATE": "Die Zahlung kann im aktuellen Zustand nicht verarbeitet werden.",
+    "PAY_PI_CANCEL_REFUSED": "Die Zahlung ist bereits im Gange und kann nicht storniert werden. Bitte überprüfen Sie dies in Kürze erneut.",
+    "PAY_PAYER": "Nur der Verbindungsinhaber oder Administrator kann Zahlungen vornehmen.",
+    "PAY_SUBSCRIBED": "Während des Abonnements können Sie nur Upgrades oder Verlängerungen Ihres aktuellen Planzeitraums bezahlen.",
+    "PAY_UPGRADE": "Dieser Plan kann nicht aktualisiert werden.",
+    "PAY_PRICE_CHANGED": "Der Planstatus hat sich geändert. Bitte nehmen Sie die Zahlung erneut vor.",
+    "PRICE_UNAVAILABLE": "Der Pi-Wechselkurs konnte nicht überprüft werden. Bitte versuchen Sie es in Kürze erneut.",
+    "QUOTE_EXPIRED": "Das Zahlungsangebot ist abgelaufen. Bitte nehmen Sie die Zahlung erneut vor."
   },
   "analytics": {
     "title": "Analyse & Lake",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Die Erweiterung pg_stat_statements ist auf der Ziel-DB nicht installiert",
       "TIMEOUT": "Die Anfrage hat ein Zeitlimit überschritten",
       "RATE": "Zu viele Anfragen. Bitte versuchen Sie es in einer Minute erneut",
-      "INVALID_INPUT": "Fügen Sie das vollständige Verbindungstoken ein, das mit slk_ beginnt"
+      "INVALID_INPUT": "Fügen Sie das vollständige Verbindungstoken ein, das mit slk_ beginnt",
+      "PLAN_EXPIRED": "Ihr schema.pi-Plan ist abgelaufen. Bitte nehmen Sie eine Zahlung auf dem schema.pi-Planbildschirm vor."
     }
   },
   "migration": {
@@ -1411,6 +1428,70 @@
     "ops": "Betriebssicherheit",
     "learn": "Lernen",
     "fold": "Menü einklappen",
-    "unfold": "Menü ausklappen"
+    "unfold": "Menü ausklappen",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Pläne werden für jede schema.pi-Verbindung (Taxonomie) separat festgelegt. Neue Verbindungen können den DBA-Plan 7 Tage lang testen.",
+    "loading": "Plan wird geladen…",
+    "loadFail": "Der Plan konnte nicht geladen werden. Bitte versuchen Sie es in Kürze erneut.",
+    "names": {
+      "FREE": "Kostenlos",
+      "D1": "D1 Beobachtung",
+      "D2": "D2 Tuning",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Erkunden & Lernen",
+      "D1": "Operator – Überprüft, ob die Datenbank in Ordnung ist.",
+      "D2": "Entwickler & Tuner – Behebt langsame SQL-Abfragen",
+      "D3": "DBA & DA – Von Betriebssicherheit bis Implementierung und Lake"
+    },
+    "feat": {
+      "FREE": "Monitoring-Board, Ausführungsplan-Ansicht, grundlegendes Lernen",
+      "D1": "Kostenlose Funktionen + unbegrenzte Performance-Sammlung, GAP-Analyse-Abfrage, vollständiges Lernen",
+      "D2": "D1-Funktionen + Planvergleich, KI-Tuning-Empfehlungen, GAP-Analyse-Ausführung",
+      "D3": "D2-Funktionen + Implementierung, Pipeline, Analyse, Betriebssicherheit"
+    },
+    "featAi": "KI-Tuning-Empfehlungen {n} Mal/Monat",
+    "featClct": "Manuelle Performance-Sammlung {n} Mal/Tag",
+    "aiNone": "Keine KI-Tuning-Empfehlungen",
+    "cur": "Aktueller Plan: {plan}",
+    "grace": "Testversion",
+    "until": "Bis {date} ({days} Tage verbleibend)",
+    "aiLeft": "{left}/{total} KI-Tuning-Empfehlungen diesen Monat verbleibend",
+    "clctLeft": "{left}/{total} manuelle Performance-Sammlungen heute verbleibend",
+    "keep": "Vergangene Werte {days} Tage aufbewahren",
+    "bndlOn": "Sie verwenden einen DA-Plan für dieselbe Taxonomie wie schema.pi, daher erhalten Sie 20 % Rabatt auf Ihre Zahlung.",
+    "bndlOff": "Wenn Sie einen DA-Plan (P4) für dieselbe Taxonomie wie schema.pi verwenden, erhalten Sie 20 % Rabatt auf Ihre Zahlung.",
+    "monthly": "Monatlich",
+    "yearly": "Jährlich",
+    "freePrice": "Kostenlos",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "{prd} bezahlen",
+    "extend": "{prd}-Zeitraum verlängern",
+    "upgradeTitle": "Upgrade",
+    "upgradeNote": "Die verbleibenden Tage Ihres aktuellen Plans werden von der Zahlung abgezogen. Sie können nicht von jährlich auf monatlich wechseln.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Upgrade",
+    "paying": "Zahlung läuft…",
+    "payStillWaiting": "Warten auf Wallet-Signatur. Nach der Signatur wird sie automatisch angewendet.",
+    "bought": "Zahlung wurde verbucht.",
+    "payCancelled": "Zahlung storniert.",
+    "payFailed": "Zahlung fehlgeschlagen. Bitte versuchen Sie es in Kürze erneut.",
+    "piBrowserOnly": "Die Zahlung kann nach dem Einloggen in den Pi Browser mit Pi erfolgen.",
+    "payNote": "Die Zahlung erfolgt nur mit Pi. Der KRW-Betrag dient als Referenz, und der zum Echtzeit-Pi-Wechselkurs zum Zeitpunkt der Zahlung umgerechnete Pi-Betrag wird empfangen.",
+    "from": "Ab {plan}",
+    "notice": {
+      "required": "Diese Funktion ist ab dem {plan}-Plan verfügbar.",
+      "limit": "Sie haben alle verfügbaren Versuche für diesen Zeitraum aufgebraucht. Sie können mehr nutzen, indem Sie auf den {plan}-Plan upgraden.",
+      "limitTop": "Sie haben alle verfügbaren Versuche für diesen Zeitraum aufgebraucht. Sie können es im nächsten Zeitraum erneut verwenden.",
+      "expired": "Ihr schema.pi-Plan ist abgelaufen – bitte nehmen Sie eine Zahlung auf dem schema.pi-Planbildschirm vor.",
+      "go": "Plan anzeigen",
+      "close": "Schließen"
+    }
   }
 }

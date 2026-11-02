@@ -20,7 +20,7 @@ export type LinkConn = {
 export const GET = withGuard(
   dbRoute(async (req, ctx) => {
     const { linkId } = await (ctx as Ctx).params
-    const link = await requireLink(req, linkId)
+    const link = await requireLink(req, linkId, 'ANY')
     if (link instanceof Response) return link as NextResponse
     try {
       const items = await linkGet<LinkConn[]>(link.linkId, '/conns')

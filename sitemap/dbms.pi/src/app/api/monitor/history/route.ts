@@ -22,7 +22,7 @@ export const GET = withGuard(
         { error: 'INVALID_INPUT', code: 'INVALID_INPUT' },
         { status: 400 },
       )
-    const g = await linkGate(req, sp.get('link'))
+    const g = await linkGate(req, sp.get('link'), 'MON')
     if (g instanceof NextResponse) return g
     const since = new Date(Date.now() - range * 60_000).toISOString()
     const page = (from: number) =>

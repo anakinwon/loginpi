@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Acest cont este deja conectat.",
     "LINK_CODE_GEN_FAILED": "Nu s-a putut crea un cod de conectare. Te rugăm să încerci din nou mai târziu.",
     "AUTH_DB_UNAVAILABLE": "Nu s-a putut salva contul tău, deci autentificarea a eșuat. Te rugăm să încerci din nou mai târziu.",
-    "LINK_TRY_LIMIT": "Prea multe coduri de conectare incorecte. Încearcă din nou în 15 minute."
+    "LINK_TRY_LIMIT": "Prea multe coduri de conectare incorecte. Încearcă din nou în 15 minute.",
+    "PLAN_REQUIRED": "Această funcționalitate nu este disponibilă cu planul dvs. actual. Vă rugăm să vă actualizați planul.",
+    "PLAN_LIMIT": "Ați folosit toate încercările disponibile pentru această perioadă. Vă rugăm să vă actualizați planul sau să încercați din nou în perioada următoare.",
+    "PLAN_EXPIRED": "Planul dvs. schema.pi a expirat. Vă rugăm să efectuați o plată pe ecranul planului schema.pi.",
+    "PAY_PI_FAILED": "Nu s-a putut comunica cu serverul de plată Pi. Vă rugăm să încercați din nou în scurt timp.",
+    "PAY_MISMATCH": "Informațiile de plată nu corespund.",
+    "PAY_AMOUNT_MISMATCH": "Suma plătită diferă de estimare.",
+    "PAY_CANCELLED": "Plată anulată.",
+    "PAY_ALREADY_PAID": "Există o plată în curs. Dacă ați semnat în portofel, vă rugăm să încercați din nou în 3 minute.",
+    "PAY_INVALID_STATE": "Plata nu poate fi procesată în starea sa actuală.",
+    "PAY_PI_CANCEL_REFUSED": "Plata este deja în curs și nu poate fi anulată. Vă rugăm să verificați din nou în scurt timp.",
+    "PAY_PAYER": "Doar proprietarul conexiunii sau administratorul poate efectua plăți.",
+    "PAY_SUBSCRIBED": "În timpul abonamentului, puteți plăti doar pentru upgrade-uri sau extinderi ale perioadei curente a planului.",
+    "PAY_UPGRADE": "Acest plan nu poate fi actualizat.",
+    "PAY_PRICE_CHANGED": "Starea planului s-a modificat. Vă rugăm să efectuați plata din nou.",
+    "PRICE_UNAVAILABLE": "Nu s-a putut verifica rata de schimb Pi. Vă rugăm să încercați din nou în scurt timp.",
+    "QUOTE_EXPIRED": "Cotația de plată a expirat. Vă rugăm să efectuați plata din nou."
   },
   "analytics": {
     "title": "Analiză și Lac",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Extensia pg_stat_statements nu este instalată pe DB țintă",
       "TIMEOUT": "Cererea a expirat",
       "RATE": "Prea multe cereri. Te rugăm să încerci din nou într-un minut",
-      "INVALID_INPUT": "Lipește tokenul complet de conexiune care începe cu slk_"
+      "INVALID_INPUT": "Lipește tokenul complet de conexiune care începe cu slk_",
+      "PLAN_EXPIRED": "Planul dvs. schema.pi a expirat. Vă rugăm să efectuați o plată pe ecranul planului schema.pi."
     }
   },
   "migration": {
@@ -1402,6 +1419,70 @@
     "ops": "Siguranță operațională",
     "learn": "Învățare",
     "fold": "Restrânge meniul",
-    "unfold": "Extinde meniul"
+    "unfold": "Extinde meniul",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Planurile sunt setate separat pentru fiecare conexiune schema.pi (taxonomie). Noile conexiuni pot experimenta planul DBA timp de 7 zile.",
+    "loading": "Se încarcă planul…",
+    "loadFail": "Nu s-a putut încărca planul. Vă rugăm să încercați din nou în scurt timp.",
+    "names": {
+      "FREE": "Gratuit",
+      "D1": "D1 Observare",
+      "D2": "D2 Optimizare",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Explorați și învățați",
+      "D1": "Operator — Verifică dacă baza de date este în regulă acum",
+      "D2": "Dezvoltator și Optimizator — Corectează SQL-ul lent",
+      "D3": "DBA și DA — De la siguranța operațională la implementare și lake"
+    },
+    "feat": {
+      "FREE": "Tablou de bord de monitorizare, vizualizare plan de execuție, învățare de bază",
+      "D1": "Funcții gratuite + colectare nelimitată de performanță, interogare analiză GAP, învățare completă",
+      "D2": "Funcții D1 + comparație planuri, recomandări de optimizare AI, execuție analiză GAP",
+      "D3": "Funcții D2 + implementare, conductă, analiză, siguranță operațională"
+    },
+    "featAi": "Recomandări de optimizare AI de {n} ori/lună",
+    "featClct": "Colectare manuală de performanță de {n} ori/zi",
+    "aiNone": "Fără recomandări de optimizare AI",
+    "cur": "Plan curent: {plan}",
+    "grace": "Probă",
+    "until": "Până la {date} (mai sunt {days} zile)",
+    "aiLeft": "Mai sunt {left}/{total} recomandări de optimizare AI luna aceasta",
+    "clctLeft": "Mai sunt {left}/{total} colectări manuale de performanță astăzi",
+    "keep": "Păstrați valorile anterioare timp de {days} zile",
+    "bndlOn": "Utilizați un plan DA pentru aceeași taxonomie ca schema.pi, deci beneficiați de o reducere de 20% la plată.",
+    "bndlOff": "Dacă utilizați un plan DA (P4) pentru aceeași taxonomie ca schema.pi, beneficiați de o reducere de 20% la plată.",
+    "monthly": "Lunar",
+    "yearly": "Anual",
+    "freePrice": "Gratuit",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Plătiți pentru {prd}",
+    "extend": "Extindeți perioada {prd}",
+    "upgradeTitle": "Upgrade",
+    "upgradeNote": "Zilele rămase din planul dvs. actual vor fi deduse din plată. Nu puteți schimba de la anual la lunar.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Upgrade",
+    "paying": "Se plătește…",
+    "payStillWaiting": "Se așteaptă semnătura portofelului. Se va aplica automat odată semnat.",
+    "bought": "Plata a fost reflectată.",
+    "payCancelled": "Plata a fost anulată.",
+    "payFailed": "Plata a eșuat. Vă rugăm să încercați din nou în scurt timp.",
+    "piBrowserOnly": "Plata poate fi efectuată după autentificarea în Pi Browser cu Pi.",
+    "payNote": "Plata se face doar cu Pi. Suma în KRW este pentru referință, iar suma Pi convertită la rata de schimb Pi în timp real la momentul plății va fi primită.",
+    "from": "De la {plan}",
+    "notice": {
+      "required": "Această funcționalitate este disponibilă începând cu planul {plan}.",
+      "limit": "Ați folosit toate încercările disponibile pentru această perioadă. Puteți utiliza mai mult prin upgrade la planul {plan}.",
+      "limitTop": "Ați folosit toate încercările disponibile pentru această perioadă. O puteți utiliza din nou în perioada următoare.",
+      "expired": "Planul dvs. schema.pi a expirat — vă rugăm să efectuați o plată pe ecranul planului schema.pi.",
+      "go": "Vizualizați planul",
+      "close": "Închideți"
+    }
   }
 }

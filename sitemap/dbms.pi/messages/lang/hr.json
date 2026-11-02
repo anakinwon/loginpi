@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Ovaj račun je već povezan.",
     "LINK_CODE_GEN_FAILED": "Nije moguće stvoriti kôd za povezivanje. Pokušajte ponovno kasnije.",
     "AUTH_DB_UNAVAILABLE": "Nije moguće spremiti vaš račun, pa prijava nije uspjela. Pokušajte ponovno kasnije.",
-    "LINK_TRY_LIMIT": "Previše netočnih kodova za povezivanje. Pokušajte ponovno za 15 minuta."
+    "LINK_TRY_LIMIT": "Previše netočnih kodova za povezivanje. Pokušajte ponovno za 15 minuta.",
+    "PLAN_REQUIRED": "Ova značajka nije dostupna s vašim trenutnim planom. Nadogradite svoj plan.",
+    "PLAN_LIMIT": "Iskoristili ste sve dostupne pokušaje za ovo razdoblje. Nadogradite svoj plan ili pokušajte ponovno u sljedećem razdoblju.",
+    "PLAN_EXPIRED": "Vaš schema.pi plan je istekao. Izvršite plaćanje na zaslonu plana schema.pi.",
+    "PAY_PI_FAILED": "Nije uspjela komunikacija s Pi poslužiteljem za plaćanje. Pokušajte ponovno uskoro.",
+    "PAY_MISMATCH": "Podaci o plaćanju se ne podudaraju.",
+    "PAY_AMOUNT_MISMATCH": "Iznos plaćanja razlikuje se od procjene.",
+    "PAY_CANCELLED": "Plaćanje otkazano.",
+    "PAY_ALREADY_PAID": "Plaćanje je u tijeku. Ako ste se prijavljivali u svoj novčanik, pokušajte ponovno za 3 minute.",
+    "PAY_INVALID_STATE": "Plaćanje se ne može obraditi u trenutnom stanju.",
+    "PAY_PI_CANCEL_REFUSED": "Plaćanje je već u tijeku i ne može se otkazati. Provjerite ponovno uskoro.",
+    "PAY_PAYER": "Samo vlasnik veze ili administrator može izvršiti plaćanja.",
+    "PAY_SUBSCRIBED": "Dok ste pretplaćeni, možete platiti samo nadogradnje ili produženja vašeg trenutnog razdoblja plana.",
+    "PAY_UPGRADE": "Ovaj plan se ne može nadograditi.",
+    "PAY_PRICE_CHANGED": "Status plana se promijenio. Ponovno izvršite plaćanje.",
+    "PRICE_UNAVAILABLE": "Nije uspjela provjera Pi tečaja. Pokušajte ponovno uskoro.",
+    "QUOTE_EXPIRED": "Ponuda za plaćanje je istekla. Ponovno izvršite plaćanje."
   },
   "analytics": {
     "title": "Analitika i jezero",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Proširenje pg_stat_statements nije instalirano na ciljnom DB-u",
       "TIMEOUT": "Zahtjev je istekao",
       "RATE": "Previše zahtjeva. Pokušajte ponovno za minutu",
-      "INVALID_INPUT": "Zalijepite cijeli token veze koji počinje s slk_"
+      "INVALID_INPUT": "Zalijepite cijeli token veze koji počinje s slk_",
+      "PLAN_EXPIRED": "Vaš schema.pi plan je istekao. Izvršite plaćanje na zaslonu plana schema.pi."
     }
   },
   "migration": {
@@ -550,6 +567,7 @@
         "WARN": "Upozorenje — neke stavke treba provjeriti",
         "UNKNOWN": "Nepoznato — provjerite vezu",
         "OK": "U redu — svaki signal je unutar granica",
+        "CONN_DOWN": "Nije moguće pristupiti DB-u — prvo provjerite vezu",
         "NA": "N/P"
       },
       "kpi": {
@@ -1405,6 +1423,70 @@
     "ops": "Sigurnost operacija",
     "learn": "Učenje",
     "fold": "Sažmi izbornik",
-    "unfold": "Proširi izbornik"
+    "unfold": "Proširi izbornik",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Planovi se postavljaju zasebno za svaku schema.pi vezu (taksonomiju). Nove veze mogu isprobati DBA plan 7 dana.",
+    "loading": "Učitavanje plana…",
+    "loadFail": "Nije uspjelo učitavanje plana. Pokušajte ponovno uskoro.",
+    "names": {
+      "FREE": "Besplatno",
+      "D1": "D1 Promatranje",
+      "D2": "D2 Podešavanje",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Istražite i učite",
+      "D1": "Operator — Provjerava je li baza podataka sada u redu",
+      "D2": "Programer i Tuner — Popravlja spore SQL upite",
+      "D3": "DBA i DA — Od operativne sigurnosti do implementacije i jezera"
+    },
+    "feat": {
+      "FREE": "Nadzorna ploča, prikaz plana izvršenja, osnovno učenje",
+      "D1": "Besplatne značajke + neograničeno prikupljanje performansi, upit za GAP analizu, potpuno učenje",
+      "D2": "Značajke D1 + usporedba planova, preporuke za AI podešavanje, izvršenje GAP analize",
+      "D3": "Značajke D2 + implementacija, cjevovod, analiza, operativna sigurnost"
+    },
+    "featAi": "AI preporuke za podešavanje {n} puta/mjesečno",
+    "featClct": "Ručno prikupljanje performansi {n} puta/dnevno",
+    "aiNone": "Nema AI preporuka za podešavanje",
+    "cur": "Trenutni plan: {plan}",
+    "grace": "Probno",
+    "until": "Do {date} (preostalo {days} dana)",
+    "aiLeft": "Preostalo {left}/{total} AI preporuka za podešavanje ovog mjeseca",
+    "clctLeft": "Preostalo {left}/{total} ručnih prikupljanja performansi danas",
+    "keep": "Zadrži prošle vrijednosti {days} dana",
+    "bndlOn": "Koristite DA plan za istu taksonomiju kao schema.pi, pa dobivate 20% popusta na plaćanje.",
+    "bndlOff": "Ako koristite DA plan (P4) za istu taksonomiju kao schema.pi, dobivate 20% popusta na plaćanje.",
+    "monthly": "Mjesečno",
+    "yearly": "Godišnje",
+    "freePrice": "Besplatno",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Plati za {prd}",
+    "extend": "Produži razdoblje {prd}",
+    "upgradeTitle": "Nadogradnja",
+    "upgradeNote": "Preostali dani vašeg trenutnog plana bit će odbijeni od plaćanja. Ne možete promijeniti s godišnjeg na mjesečni.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Nadogradi",
+    "paying": "Plaćanje u tijeku…",
+    "payStillWaiting": "Čeka se potpis novčanika. Automatski će se primijeniti nakon potpisivanja.",
+    "bought": "Plaćanje je evidentirano.",
+    "payCancelled": "Plaćanje otkazano.",
+    "payFailed": "Plaćanje nije uspjelo. Pokušajte ponovno uskoro.",
+    "piBrowserOnly": "Plaćanje se može izvršiti nakon prijave u Pi Browser s Pi.",
+    "payNote": "Plaćanje se vrši samo s Pi. Iznos u KRW je za referencu, a primit će se iznos Pi pretvoren po Pi tečaju u stvarnom vremenu u trenutku plaćanja.",
+    "from": "Od {plan}",
+    "notice": {
+      "required": "Ova značajka je dostupna od {plan} plana.",
+      "limit": "Iskoristili ste sve dostupne pokušaje za ovo razdoblje. Možete koristiti više nadogradnjom na {plan} plan.",
+      "limitTop": "Iskoristili ste sve dostupne pokušaje za ovo razdoblje. Možete ga ponovno koristiti u sljedećem razdoblju.",
+      "expired": "Vaš schema.pi plan je istekao — izvršite plaćanje na zaslonu plana schema.pi.",
+      "go": "Prikaži plan",
+      "close": "Zatvori"
+    }
   }
 }

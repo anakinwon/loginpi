@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Bu hasap eýýäm birikdirildi.",
     "LINK_CODE_GEN_FAILED": "Birikdirme koduny döredip bolmady. Biraz wagtdan täzeden synanyşyň.",
     "AUTH_DB_UNAVAILABLE": "Hasabyňyzy saklap bolmady, şonuň üçin giriş şowsuz boldy. Biraz wagtdan täzeden synanyşyň.",
-    "LINK_TRY_LIMIT": "Nädogry birikdirme kodlarynyň sany köp. 15 minudyň içinde täzeden synanyşyň."
+    "LINK_TRY_LIMIT": "Nädogry birikdirme kodlarynyň sany köp. 15 minudyň içinde täzeden synanyşyň.",
+    "PLAN_REQUIRED": "Bu aýratynlyk häzirki meýilnamaňyz bilen elýeterli däl. Meýilnamaňyzy täzeläň.",
+    "PLAN_LIMIT": "Bu döwür üçin ähli elýeterli synanyşyklary ulanypsyňyz. Meýilnamaňyzy täzeläň ýa-da indiki döwürde täzeden synanyşyň.",
+    "PLAN_EXPIRED": "schema.pi meýilnamaňyzyň möhleti gutardy. schema.pi meýilnama ekranynda töleg ediň.",
+    "PAY_PI_FAILED": "Pi töleg serweri bilen aragatnaşyk saklanyp bilmedi. Biraz wagtdan täzeden synanyşyň.",
+    "PAY_MISMATCH": "Töleg maglumatlary gabat gelmeýär.",
+    "PAY_AMOUNT_MISMATCH": "Töleg möçberi çaklamadan tapawutlanýar.",
+    "PAY_CANCELLED": "Töleg ýatyryldy.",
+    "PAY_ALREADY_PAID": "Töleg dowam edýär. Eger gapjygyňyza girýän bolsaňyz, 3 minudyň içinde täzeden synanyşyň.",
+    "PAY_INVALID_STATE": "Töleg häzirki ýagdaýynda gaýtadan işlenip bilinmez.",
+    "PAY_PI_CANCEL_REFUSED": "Töleg eýýäm dowam edýär we ýatyrylyp bilinmez. Biraz wagtdan täzeden barlaň.",
+    "PAY_PAYER": "Diňe birikmäniň eýesi ýa-da administratory tölegleri edip biler.",
+    "PAY_SUBSCRIBED": "Abunalykda bolanyňyzda, diňe häzirki meýilnama döwrüňiziň täzelenmeleri ýa-da uzaldylmalary üçin töleg edip bilersiňiz.",
+    "PAY_UPGRADE": "Bu meýilnama täzelenip bilinmez.",
+    "PAY_PRICE_CHANGED": "Meýilnamanyň ýagdaýy üýtgedi. Tölegi täzeden ediň.",
+    "PRICE_UNAVAILABLE": "Pi alyş-çalyş kursuny barlap bilmedi. Biraz wagtdan täzeden synanyşyň.",
+    "QUOTE_EXPIRED": "Töleg sitatasynyň möhleti gutardy. Tölegi täzeden ediň."
   },
   "analytics": {
     "title": "Analitika we Köl",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Nyşana DB-de pg_stat_statements giňeltmesi gurulmady",
       "TIMEOUT": "Soragyň wagty gutardy",
       "RATE": "Örän köp sorag. Bir minutdan soň gaýtadan synanyşyň",
-      "INVALID_INPUT": "slk_ bilen başlaýan doly baglanyşyk tokenini goýuň"
+      "INVALID_INPUT": "slk_ bilen başlaýan doly baglanyşyk tokenini goýuň",
+      "PLAN_EXPIRED": "schema.pi meýilnamaňyzyň möhleti gutardy. schema.pi meýilnama ekranynda töleg ediň."
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "Operasiýa Howpsuzlygy",
     "learn": "Öwrenmek",
     "fold": "Menýuny ýygnamak",
-    "unfold": "Menýuny açmak"
+    "unfold": "Menýuny açmak",
+    "plan": "Meýilnama"
+  },
+  "plan": {
+    "title": "Meýilnama",
+    "intro": "Meýilnamalar her bir schema.pi birikmesi (taksonomiýa) üçin aýratyn kesgitlenýär. Täze birikmeler 7 günläp DBA meýilnamasyny synap bilerler.",
+    "loading": "Meýilnama ýüklenýär…",
+    "loadFail": "Meýilnamany ýükläp bilmedi. Biraz wagtdan täzeden synanyşyň.",
+    "names": {
+      "FREE": "Mugt",
+      "D1": "D1 Gözegçilik",
+      "D2": "D2 Sazlama",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Öwren we gözden geçir",
+      "D1": "Operator — Häzir maglumat bazasynyň gowudygyny barlaýar",
+      "D2": "Öndüriji we sazlaýjy — Haýal SQL-i düzeldýär",
+      "D3": "DBA we DA — Operasion howpsuzlykdan ýerine ýetiriş we köle çenli"
+    },
+    "feat": {
+      "FREE": "Gözegçilik tagtasy, ýerine ýetiriş meýilnamasyny görmek, esasy öwrenmek",
+      "D1": "Mugt aýratynlyklar + çäksiz öndürijilik ýygyndysy, GAP derňew soragy, doly öwrenmek",
+      "D2": "D1 aýratynlyklary + meýilnamany deňeşdirmek, AI sazlama maslahatlary, GAP derňewini ýerine ýetirmek",
+      "D3": "D2 aýratynlyklary + ýerine ýetiriş, turba, derňew, operasion howpsuzlyk"
+    },
+    "featAi": "AI sazlama maslahatlary aýda {n} gezek",
+    "featClct": "El bilen öndürijilik ýygyndysy günde {n} gezek",
+    "aiNone": "AI sazlama maslahatlary ýok",
+    "cur": "Häzirki meýilnama: {plan}",
+    "grace": "Synag",
+    "until": "{date} çenli ({days} gün galdy)",
+    "aiLeft": "Bu aýda {left}/{total} AI sazlama maslahaty galdy",
+    "clctLeft": "Şu gün {left}/{total} el bilen öndürijilik ýygyndysy galdy",
+    "keep": "Geçen bahalary {days} gün sakla",
+    "bndlOn": "schema.pi bilen bir taksonomiýa üçin DA meýilnamasyny ulanýandygyňyz sebäpli, tölegiňize 20% arzanladyş alýarsyňyz.",
+    "bndlOff": "Eger schema.pi bilen bir taksonomiýa üçin DA meýilnamasyny (P4) ulanýan bolsaňyz, tölegiňize 20% arzanladyş alarsyňyz.",
+    "monthly": "Aýlyk",
+    "yearly": "Ýyllyk",
+    "freePrice": "Mugt",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "{prd} üçin töleg",
+    "extend": "{prd} möhletini uzaltmak",
+    "upgradeTitle": "Täzelemek",
+    "upgradeNote": "Häzirki meýilnamaňyzyň galan günleri tölegden aýrylar. Ýyllykdan aýlyga üýtgedip bilmersiňiz.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Täzelemek",
+    "paying": "Töleg edilýär…",
+    "payStillWaiting": "Gapjyk golunyň garaşylýar. Gol çekilenden soň awtomatiki ýagdaýda ulanylar.",
+    "bought": "Töleg hasaba alyndy.",
+    "payCancelled": "Töleg ýatyryldy.",
+    "payFailed": "Töleg şowsuz boldy. Biraz wagtdan täzeden synanyşyň.",
+    "piBrowserOnly": "Töleg Pi Browser-e Pi bilen girensoň edilip bilner.",
+    "payNote": "Töleg diňe Pi bilen edilýär. KRW möçberi salgylanma üçindir, töleg wagtyndaky hakyky Pi alyş-çalyş kursunda hasaplanan Pi möçberi kabul ediler.",
+    "from": "{plan} başlap",
+    "notice": {
+      "required": "Bu aýratynlyk {plan} meýilnamasyndan elýeterlidir.",
+      "limit": "Bu döwür üçin ähli elýeterli synanyşyklary ulanypsyňyz. {plan} meýilnamasyna täzeläp, has köp ulanyp bilersiňiz.",
+      "limitTop": "Bu döwür üçin ähli elýeterli synanyşyklary ulanypsyňyz. Indiki döwürde täzeden ulanyp bilersiňiz.",
+      "expired": "schema.pi meýilnamaňyzyň möhleti gutardy — schema.pi meýilnama ekranynda töleg ediň.",
+      "go": "Meýilnamany görkez",
+      "close": "Ýap"
+    }
   }
 }

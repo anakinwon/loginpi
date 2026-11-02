@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Þessi reikningur er þegar tengdur.",
     "LINK_CODE_GEN_FAILED": "Gat ekki búið til tengikóða. Vinsamlegast reyndu aftur síðar.",
     "AUTH_DB_UNAVAILABLE": "Gat ekki vistað reikninginn þinn, svo innskráning mistókst. Vinsamlegast reyndu aftur síðar.",
-    "LINK_TRY_LIMIT": "Of margir rangir tengikóðar. Reyndu aftur eftir 15 mínútur."
+    "LINK_TRY_LIMIT": "Of margir rangir tengikóðar. Reyndu aftur eftir 15 mínútur.",
+    "PLAN_REQUIRED": "Þessi eiginleiki er ekki í boði með núverandi áskrift. Vinsamlegast uppfærðu áskriftina þína.",
+    "PLAN_LIMIT": "Þú hefur notað allar tiltækar tilraunir fyrir þetta tímabil. Vinsamlegast uppfærðu áskriftina þína eða reyndu aftur á næsta tímabili.",
+    "PLAN_EXPIRED": "schema.pi áskriftin þín er útrunnin. Vinsamlegast framkvæmdu greiðslu á schema.pi áskriftarskjánum.",
+    "PAY_PI_FAILED": "Mistókst að hafa samband við Pi greiðsluþjóninn. Vinsamlegast reyndu aftur eftir stutta stund.",
+    "PAY_MISMATCH": "Greiðsluupplýsingar passa ekki.",
+    "PAY_AMOUNT_MISMATCH": "Greiðsluupphæðin er frábrugðin áætluninni.",
+    "PAY_CANCELLED": "Greiðslu var hætt við.",
+    "PAY_ALREADY_PAID": "Greiðsla er í vinnslu. Ef þú varst að skrá þig inn í veskið þitt, vinsamlegast reyndu aftur eftir 3 mínútur.",
+    "PAY_INVALID_STATE": "Ekki er hægt að vinna úr greiðslunni í núverandi ástandi.",
+    "PAY_PI_CANCEL_REFUSED": "Greiðsla er þegar í vinnslu og ekki er hægt að hætta við hana. Vinsamlegast athugaðu aftur eftir stutta stund.",
+    "PAY_PAYER": "Aðeins eigandi tengingar eða stjórnandi getur framkvæmt greiðslur.",
+    "PAY_SUBSCRIBED": "Meðan þú ert áskrifandi geturðu aðeins greitt fyrir uppfærslur eða framlengingar á núverandi áskriftartímabili þínu.",
+    "PAY_UPGRADE": "Ekki er hægt að uppfæra þessa áskrift.",
+    "PAY_PRICE_CHANGED": "Staða áskriftar hefur breyst. Vinsamlegast framkvæmdu greiðsluna aftur.",
+    "PRICE_UNAVAILABLE": "Mistókst að athuga Pi gengið. Vinsamlegast reyndu aftur eftir stutta stund.",
+    "QUOTE_EXPIRED": "Greiðslutilboðið er útrunnið. Vinsamlegast framkvæmdu greiðsluna aftur."
   },
   "analytics": {
     "title": "Greining og vatnaskil",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "pg_stat_statements viðbótin er ekki uppsett á mark DB",
       "TIMEOUT": "Beiðnin rann út á tíma",
       "RATE": "Of margar beiðnir. Vinsamlegast reyndu aftur eftir eina mínútu",
-      "INVALID_INPUT": "Límdu inn allt tengitáknið sem byrjar á slk_"
+      "INVALID_INPUT": "Límdu inn allt tengitáknið sem byrjar á slk_",
+      "PLAN_EXPIRED": "schema.pi áskriftin þín er útrunnin. Vinsamlegast framkvæmdu greiðslu á schema.pi áskriftarskjánum."
     }
   },
   "migration": {
@@ -1402,6 +1419,70 @@
     "ops": "Rekstraröryggi",
     "learn": "Læra",
     "fold": "Fella saman valmynd",
-    "unfold": "Stækka valmynd"
+    "unfold": "Stækka valmynd",
+    "plan": "Áskrift"
+  },
+  "plan": {
+    "title": "Áskrift",
+    "intro": "Áskriftir eru stilltar sérstaklega fyrir hverja schema.pi tengingu (flokkun). Nýjar tengingar geta prófað DBA áskriftina í 7 daga.",
+    "loading": "Hleð áskrift…",
+    "loadFail": "Mistókst að hlaða áskriftina. Vinsamlegast reyndu aftur eftir stutta stund.",
+    "names": {
+      "FREE": "Ókeypis",
+      "D1": "D1 Athugun",
+      "D2": "D2 Stilling",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Kanna og læra",
+      "D1": "Rekstraraðili — Athugar hvort gagnagrunnurinn sé í lagi núna",
+      "D2": "Hönnuður og stillir — Lagar hægar SQL fyrirspurnir",
+      "D3": "DBA og DA — Frá rekstraröryggi til innleiðingar og gagnasafns"
+    },
+    "feat": {
+      "FREE": "Vöktunarborð, skoðun á framkvæmdaráætlun, grunnþjálfun",
+      "D1": "Ókeypis eiginleikar + ótakmörkuð frammistöðusöfnun, GAP greiningarfyrirspurn, full þjálfun",
+      "D2": "D1 eiginleikar + áætlunarsamanburður, AI stillingarráðleggingar, GAP greiningarframkvæmd",
+      "D3": "D2 eiginleikar + innleiðing, pípa, greining, rekstraröryggi"
+    },
+    "featAi": "AI stillingarráðleggingar {n} sinnum/mánuði",
+    "featClct": "Handvirk frammistöðusöfnun {n} sinnum/dag",
+    "aiNone": "Engar AI stillingarráðleggingar",
+    "cur": "Núverandi áskrift: {plan}",
+    "grace": "Tilraun",
+    "until": "Til {date} ({days} dagar eftir)",
+    "aiLeft": "{left}/{total} AI stillingarráðleggingar eftir þennan mánuð",
+    "clctLeft": "{left}/{total} handvirk frammistöðusöfnun eftir í dag",
+    "keep": "Geyma fyrri gildi í {days} daga",
+    "bndlOn": "Þú ert að nota DA áskrift fyrir sömu flokkun og schema.pi, svo þú færð 20% afslátt af greiðslunni þinni.",
+    "bndlOff": "Ef þú notar DA áskrift (P4) fyrir sömu flokkun og schema.pi, færðu 20% afslátt af greiðslunni þinni.",
+    "monthly": "Mánaðarlega",
+    "yearly": "Árlega",
+    "freePrice": "Ókeypis",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Greiða fyrir {prd}",
+    "extend": "Lengja {prd} tímabil",
+    "upgradeTitle": "Uppfæra",
+    "upgradeNote": "Eftirstandandi dagar núverandi áskriftar þinnar verða dregnir frá greiðslunni. Þú getur ekki breytt úr árlegri í mánaðarlega.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Uppfæra",
+    "paying": "Greiði…",
+    "payStillWaiting": "Bíður eftir undirskrift veskis. Það verður sjálfkrafa virkt þegar búið er að undirrita.",
+    "bought": "Greiðsla hefur verið skráð.",
+    "payCancelled": "Greiðslu var hætt við.",
+    "payFailed": "Greiðsla mistókst. Vinsamlegast reyndu aftur eftir stutta stund.",
+    "piBrowserOnly": "Hægt er að greiða eftir að hafa skráð sig inn á Pi Browser með Pi.",
+    "payNote": "Greiðsla er aðeins gerð með Pi. KRW upphæðin er til viðmiðunar og Pi upphæðin, umreiknuð á rauntíma Pi gengi við greiðslu, verður móttekin.",
+    "from": "Frá {plan}",
+    "notice": {
+      "required": "Þessi eiginleiki er í boði frá {plan} áskriftinni.",
+      "limit": "Þú hefur notað allar tiltækar tilraunir fyrir þetta tímabil. Þú getur notað meira með því að uppfæra í {plan} áskriftina.",
+      "limitTop": "Þú hefur notað allar tiltækar tilraunir fyrir þetta tímabil. Þú getur notað það aftur á næsta tímabili.",
+      "expired": "schema.pi áskriftin þín er útrunnin — vinsamlegast framkvæmdu greiðslu á schema.pi áskriftarskjánum.",
+      "go": "Skoða áskrift",
+      "close": "Loka"
+    }
   }
 }

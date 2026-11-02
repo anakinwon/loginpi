@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Dit account is al gekoppeld.",
     "LINK_CODE_GEN_FAILED": "Kon geen koppelcode aanmaken. Probeer het later opnieuw.",
     "AUTH_DB_UNAVAILABLE": "Kon uw account niet opslaan, dus aanmelding mislukt. Probeer het later opnieuw.",
-    "LINK_TRY_LIMIT": "Te veel onjuiste koppelcodes. Probeer het over 15 minuten opnieuw."
+    "LINK_TRY_LIMIT": "Te veel onjuiste koppelcodes. Probeer het over 15 minuten opnieuw.",
+    "PLAN_REQUIRED": "Deze functie is niet beschikbaar met uw huidige abonnement. Waardeer uw abonnement op.",
+    "PLAN_LIMIT": "U heeft alle beschikbare pogingen voor deze periode gebruikt. Waardeer uw abonnement op of probeer het de volgende periode opnieuw.",
+    "PLAN_EXPIRED": "Uw schema.pi-abonnement is verlopen. Voer een betaling uit op het schema.pi-abonnementsscherm.",
+    "PAY_PI_FAILED": "Communicatie met de Pi-betalingsserver is mislukt. Probeer het over een ogenblik opnieuw.",
+    "PAY_MISMATCH": "Betalingsinformatie komt niet overeen.",
+    "PAY_AMOUNT_MISMATCH": "Het betalingsbedrag wijkt af van de schatting.",
+    "PAY_CANCELLED": "Betaling geannuleerd.",
+    "PAY_ALREADY_PAID": "Er is een betaling bezig. Als u in uw wallet aan het ondertekenen was, probeer het dan over 3 minuten opnieuw.",
+    "PAY_INVALID_STATE": "De betaling kan in de huidige staat niet worden verwerkt.",
+    "PAY_PI_CANCEL_REFUSED": "De betaling is al bezig en kan niet worden geannuleerd. Controleer het over een ogenblik opnieuw.",
+    "PAY_PAYER": "Alleen de verbindingseigenaar of beheerder kan betalingen doen.",
+    "PAY_SUBSCRIBED": "Tijdens een abonnement kunt u alleen betalen voor upgrades of verlengingen van uw huidige abonnementsperiode.",
+    "PAY_UPGRADE": "Dit abonnement kan niet worden geüpgraded.",
+    "PAY_PRICE_CHANGED": "De abonnementsstatus is gewijzigd. Voer de betaling opnieuw uit.",
+    "PRICE_UNAVAILABLE": "Controle van de Pi-wisselkoers is mislukt. Probeer het over een ogenblik opnieuw.",
+    "QUOTE_EXPIRED": "De betalingsopgave is verlopen. Voer de betaling opnieuw uit."
   },
   "analytics": {
     "title": "Analyse & Lake",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "De pg_stat_statements-extensie is niet geïnstalleerd op de doel-DB",
       "TIMEOUT": "De aanvraag is verlopen",
       "RATE": "Te veel aanvragen. Probeer het over een minuut opnieuw",
-      "INVALID_INPUT": "Plak het volledige verbindingstoken dat begint met slk_"
+      "INVALID_INPUT": "Plak het volledige verbindingstoken dat begint met slk_",
+      "PLAN_EXPIRED": "Uw schema.pi-abonnement is verlopen. Voer een betaling uit op het schema.pi-abonnementsscherm."
     }
   },
   "migration": {
@@ -1409,6 +1426,70 @@
     "ops": "Ops Veiligheid",
     "learn": "Leren",
     "fold": "Menu inklappen",
-    "unfold": "Menu uitklappen"
+    "unfold": "Menu uitklappen",
+    "plan": "Abonnement"
+  },
+  "plan": {
+    "title": "Abonnement",
+    "intro": "Abonnementen worden afzonderlijk ingesteld voor elke schema.pi-verbinding (taxonomie). Nieuwe verbindingen kunnen het DBA-abonnement 7 dagen uitproberen.",
+    "loading": "Abonnement laden…",
+    "loadFail": "Laden van abonnement mislukt. Probeer het over een ogenblik opnieuw.",
+    "names": {
+      "FREE": "Gratis",
+      "D1": "D1 Observatie",
+      "D2": "D2 Tuning",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Verkennen & Leren",
+      "D1": "Operator — Controleert of de database nu in orde is.",
+      "D2": "Ontwikkelaar & Tuner — Lost trage SQL op",
+      "D3": "DBA & DA — Van operationele veiligheid tot implementatie en lake"
+    },
+    "feat": {
+      "FREE": "Monitoringbord, uitvoeringsplanweergave, basisleren",
+      "D1": "Gratis functies + onbeperkte prestatieverzameling, GAP-analysequery, volledig leren",
+      "D2": "D1-functies + planvergelijking, AI-tuningaanbevelingen, GAP-analyseuitvoering",
+      "D3": "D2-functies + implementatie, pijplijn, analyse, operationele veiligheid"
+    },
+    "featAi": "AI-tuningaanbevelingen {n} keer/maand",
+    "featClct": "Handmatige prestatieverzameling {n} keer/dag",
+    "aiNone": "Geen AI-tuningaanbevelingen",
+    "cur": "Huidig abonnement: {plan}",
+    "grace": "Proef",
+    "until": "Tot {date} ({days} dagen resterend)",
+    "aiLeft": "{left}/{total} AI-tuningaanbevelingen resterend deze maand",
+    "clctLeft": "{left}/{total} handmatige prestatieverzamelingen resterend vandaag",
+    "keep": "Bewaar eerdere waarden voor {days} dagen",
+    "bndlOn": "U gebruikt een DA-abonnement voor dezelfde taxonomie als schema.pi, dus u krijgt 20% korting op uw betaling.",
+    "bndlOff": "Als u een DA-abonnement (P4) gebruikt voor dezelfde taxonomie als schema.pi, krijgt u 20% korting op uw betaling.",
+    "monthly": "Maandelijks",
+    "yearly": "Jaarlijks",
+    "freePrice": "Gratis",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Betaal voor {prd}",
+    "extend": "Verleng {prd}-periode",
+    "upgradeTitle": "Upgraden",
+    "upgradeNote": "De resterende dagen van uw huidige abonnement worden van de betaling afgetrokken. U kunt niet overstappen van jaarlijks naar maandelijks.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Upgraden",
+    "paying": "Betalen…",
+    "payStillWaiting": "Wachten op wallet-handtekening. Wordt automatisch toegepast zodra ondertekend.",
+    "bought": "Betaling verwerkt.",
+    "payCancelled": "Betaling geannuleerd.",
+    "payFailed": "Betaling mislukt. Probeer het over een ogenblik opnieuw.",
+    "piBrowserOnly": "Betaling kan worden gedaan na inloggen op Pi Browser met Pi.",
+    "payNote": "Betaling gebeurt alleen met Pi. Het KRW-bedrag is ter referentie, en het Pi-bedrag, omgerekend tegen de real-time Pi-wisselkoers op het moment van betaling, zal worden ontvangen.",
+    "from": "Vanaf {plan}",
+    "notice": {
+      "required": "Deze functie is beschikbaar vanaf het {plan}-abonnement.",
+      "limit": "U heeft alle beschikbare pogingen voor deze periode gebruikt. U kunt meer gebruiken door te upgraden naar het {plan}-abonnement.",
+      "limitTop": "U heeft alle beschikbare pogingen voor deze periode gebruikt. U kunt het de volgende periode opnieuw gebruiken.",
+      "expired": "Uw schema.pi-abonnement is verlopen — voer een betaling uit op het schema.pi-abonnementsscherm.",
+      "go": "Bekijk abonnement",
+      "close": "Sluiten"
+    }
   }
 }

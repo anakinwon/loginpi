@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "See konto on juba lingitud.",
     "LINK_CODE_GEN_FAILED": "Linkimiskoodi loomine ebaõnnestus. Palun proovi hiljem uuesti.",
     "AUTH_DB_UNAVAILABLE": "Sinu kontot ei saanud salvestada, seega sisselogimine ebaõnnestus. Palun proovi hiljem uuesti.",
-    "LINK_TRY_LIMIT": "Liiga palju valesid linkimiskoode. Proovi uuesti 15 minuti pärast."
+    "LINK_TRY_LIMIT": "Liiga palju valesid linkimiskoode. Proovi uuesti 15 minuti pärast.",
+    "PLAN_REQUIRED": "See funktsioon pole teie praeguse plaaniga saadaval. Palun uuendage oma plaani.",
+    "PLAN_LIMIT": "Olete kasutanud kõik selle perioodi katsed. Palun uuendage oma plaani või proovige uuesti järgmisel perioodil.",
+    "PLAN_EXPIRED": "Teie schema.pi plaan on aegunud. Palun tehke makse schema.pi plaani ekraanil.",
+    "PAY_PI_FAILED": "Pi makseserveriga ei õnnestunud ühendust luua. Palun proovige varsti uuesti.",
+    "PAY_MISMATCH": "Makseandmed ei ühti.",
+    "PAY_AMOUNT_MISMATCH": "Maksesumma erineb hinnangust.",
+    "PAY_CANCELLED": "Makse tühistatud.",
+    "PAY_ALREADY_PAID": "Makse on pooleli. Kui logisite oma rahakotti sisse, proovige 3 minuti pärast uuesti.",
+    "PAY_INVALID_STATE": "Makset ei saa praeguses olekus töödelda.",
+    "PAY_PI_CANCEL_REFUSED": "Makse on juba pooleli ja seda ei saa tühistada. Palun kontrollige varsti uuesti.",
+    "PAY_PAYER": "Makseid saab teha ainult ühenduse omanik või administraator.",
+    "PAY_SUBSCRIBED": "Tellimuse ajal saate maksta ainult uuenduste või praeguse plaani perioodi pikenduste eest.",
+    "PAY_UPGRADE": "Seda plaani ei saa uuendada.",
+    "PAY_PRICE_CHANGED": "Plaani olek on muutunud. Palun tehke makse uuesti.",
+    "PRICE_UNAVAILABLE": "Pi vahetuskurssi ei õnnestunud kontrollida. Palun proovige varsti uuesti.",
+    "QUOTE_EXPIRED": "Maksepakkumise aeg on möödas. Palun tehke makse uuesti."
   },
   "analytics": {
     "title": "Analüütika ja järv",
@@ -381,7 +397,8 @@
       "PGSS_MISSING": "Siht-DB-s pole pg_stat_statements laiendust installitud",
       "TIMEOUT": "Päringu aegumine",
       "RATE": "Liiga palju päringuid. Palun proovige minuti pärast uuesti",
-      "INVALID_INPUT": "Kleepige täielik ühenduse token, mis algab slk_"
+      "INVALID_INPUT": "Kleepige täielik ühenduse token, mis algab slk_",
+      "PLAN_EXPIRED": "Teie schema.pi plaan on aegunud. Palun tehke makse schema.pi plaani ekraanil."
     }
   },
   "migration": {
@@ -1406,6 +1423,70 @@
     "ops": "Operatsioonide ohutus",
     "learn": "Õpi",
     "fold": "Ahenda menüü",
-    "unfold": "Laienda menüü"
+    "unfold": "Laienda menüü",
+    "plan": "Plaan"
+  },
+  "plan": {
+    "title": "Plaan",
+    "intro": "Plaanid määratakse iga schema.pi ühenduse (taksonoomia) jaoks eraldi. Uued ühendused saavad DBA plaani proovida 7 päeva.",
+    "loading": "Plaani laadimine…",
+    "loadFail": "Plaani laadimine ebaõnnestus. Palun proovige varsti uuesti.",
+    "names": {
+      "FREE": "Tasuta",
+      "D1": "D1 Vaatlus",
+      "D2": "D2 Häälestus",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Avasta ja õpi",
+      "D1": "Operaator – kontrollib, kas andmebaas on praegu korras.",
+      "D2": "Arendaja ja häälestaja – parandab aeglase SQL-i",
+      "D3": "DBA ja DA – alates operatiivsest ohutusest kuni juurutamise ja järveni"
+    },
+    "feat": {
+      "FREE": "Monitooringu laud, täitmisplaani vaade, põhiõpe",
+      "D1": "Tasuta funktsioonid + piiramatu jõudluse kogumine, GAP-analüüsi päring, täielik õpe",
+      "D2": "D1 funktsioonid + plaani võrdlus, AI häälestussoovitused, GAP-analüüsi täitmine",
+      "D3": "D2 funktsioonid + juurutamine, torujuhe, analüüs, operatiivne ohutus"
+    },
+    "featAi": "AI häälestussoovitused {n} korda kuus",
+    "featClct": "Käsitsi jõudluse kogumine {n} korda päevas",
+    "aiNone": "AI häälestussoovitusi pole",
+    "cur": "Praegune plaan: {plan}",
+    "grace": "Prooviperiood",
+    "until": "Kuni {date} ({days} päeva jäänud)",
+    "aiLeft": "Sellel kuul on jäänud {left}/{total} AI häälestussoovitust",
+    "clctLeft": "Täna on jäänud {left}/{total} käsitsi jõudluse kogumist",
+    "keep": "Säilita varasemad väärtused {days} päeva",
+    "bndlOn": "Kasutate sama taksonoomia jaoks DA-plaani nagu schema.pi, seega saate oma makselt 20% allahindlust.",
+    "bndlOff": "Kui kasutate sama taksonoomia jaoks DA-plaani (P4) nagu schema.pi, saate oma makselt 20% allahindlust.",
+    "monthly": "Igakuine",
+    "yearly": "Aastane",
+    "freePrice": "Tasuta",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Maksa {prd} eest",
+    "extend": "Pikenda {prd} perioodi",
+    "upgradeTitle": "Uuenda",
+    "upgradeNote": "Teie praeguse plaani järelejäänud päevad arvatakse maksest maha. Aastaselt kuupõhisele plaanile üle minna ei saa.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Uuenda",
+    "paying": "Maksmine…",
+    "payStillWaiting": "Ootan rahakoti allkirja. See rakendub automaatselt pärast allkirjastamist.",
+    "bought": "Makse kajastatud.",
+    "payCancelled": "Makse tühistatud.",
+    "payFailed": "Makse ebaõnnestus. Palun proovige varsti uuesti.",
+    "piBrowserOnly": "Makse saab teha pärast Pi Browserisse sisselogimist Pi-ga.",
+    "payNote": "Makse tehakse ainult Pi-ga. KRW summa on viiteks ja makse hetkel reaalajas Pi vahetuskursiga konverteeritud Pi summa võetakse vastu.",
+    "from": "Alates {plan}",
+    "notice": {
+      "required": "See funktsioon on saadaval alates {plan} plaanist.",
+      "limit": "Olete kasutanud kõik selle perioodi katsed. Saate rohkem kasutada, uuendades {plan} plaanile.",
+      "limitTop": "Olete kasutanud kõik selle perioodi katsed. Saate seda uuesti kasutada järgmisel perioodil.",
+      "expired": "Teie schema.pi plaan on aegunud – palun tehke makse schema.pi plaani ekraanil.",
+      "go": "Vaata plaani",
+      "close": "Sulge"
+    }
   }
 }

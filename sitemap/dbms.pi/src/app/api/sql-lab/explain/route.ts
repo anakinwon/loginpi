@@ -20,7 +20,7 @@ export const POST = withGuard(
     if (body instanceof NextResponse) return body
     if (!isSingleSelect(body.sql))
       return NextResponse.json({ error: 'SQL_NOT_SELECT', code: 'SQL_NOT_SELECT' }, { status: 400 })
-    const link = await resolveLink(req, body.linkId)
+    const link = await resolveLink(req, body.linkId, 'SQL_EXPLAIN')
     if (link instanceof NextResponse) return link
     try {
       const r = await linkQuery(body.linkId, body.connId, 'explain', { sql: body.sql })

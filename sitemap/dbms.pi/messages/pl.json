@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "To konto jest już połączone.",
     "LINK_CODE_GEN_FAILED": "Nie udało się utworzyć kodu połączenia. Spróbuj ponownie później.",
     "AUTH_DB_UNAVAILABLE": "Nie udało się zapisać Twojego konta, więc logowanie nie powiodło się. Spróbuj ponownie później.",
-    "LINK_TRY_LIMIT": "Zbyt wiele nieprawidłowych kodów połączenia. Spróbuj ponownie za 15 minut."
+    "LINK_TRY_LIMIT": "Zbyt wiele nieprawidłowych kodów połączenia. Spróbuj ponownie za 15 minut.",
+    "PLAN_REQUIRED": "Ta funkcja nie jest dostępna w Twoim obecnym planie. Zmień plan na wyższy.",
+    "PLAN_LIMIT": "Wykorzystano wszystkie dostępne próby w tym okresie. Zmień plan na wyższy lub spróbuj ponownie w następnym okresie.",
+    "PLAN_EXPIRED": "Twój plan schema.pi wygasł. Dokonaj płatności na ekranie planu schema.pi.",
+    "PAY_PI_FAILED": "Nie udało się nawiązać komunikacji z serwerem płatności Pi. Spróbuj ponownie za chwilę.",
+    "PAY_MISMATCH": "Informacje o płatności nie zgadzają się.",
+    "PAY_AMOUNT_MISMATCH": "Kwota płatności różni się od szacowanej.",
+    "PAY_CANCELLED": "Płatność anulowana.",
+    "PAY_ALREADY_PAID": "Trwa przetwarzanie płatności. Jeśli podpisywałeś w portfelu, spróbuj ponownie za 3 minuty.",
+    "PAY_INVALID_STATE": "Płatność nie może być przetworzona w obecnym stanie.",
+    "PAY_PI_CANCEL_REFUSED": "Płatność jest już w toku i nie można jej anulować. Sprawdź ponownie za chwilę.",
+    "PAY_PAYER": "Tylko właściciel połączenia lub administrator może dokonywać płatności.",
+    "PAY_SUBSCRIBED": "W trakcie subskrypcji możesz płacić tylko za ulepszenia lub przedłużenia bieżącego okresu planu.",
+    "PAY_UPGRADE": "Tego planu nie można ulepszyć.",
+    "PAY_PRICE_CHANGED": "Status planu uległ zmianie. Dokonaj płatności ponownie.",
+    "PRICE_UNAVAILABLE": "Nie udało się sprawdzić kursu wymiany Pi. Spróbuj ponownie za chwilę.",
+    "QUOTE_EXPIRED": "Wycena płatności wygasła. Dokonaj płatności ponownie."
   },
   "analytics": {
     "title": "Analityka i Jezioro Danych",
@@ -379,7 +395,8 @@
       "PGSS_MISSING": "Rozszerzenie pg_stat_statements nie jest zainstalowane w docelowej DB",
       "TIMEOUT": "Żądanie przekroczyło limit czasu",
       "RATE": "Zbyt wiele żądań. Spróbuj ponownie za minutę",
-      "INVALID_INPUT": "Wklej pełny token połączenia zaczynający się od slk_"
+      "INVALID_INPUT": "Wklej pełny token połączenia zaczynający się od slk_",
+      "PLAN_EXPIRED": "Twój plan schema.pi wygasł. Dokonaj płatności na ekranie planu schema.pi."
     }
   },
   "migration": {
@@ -1401,6 +1418,70 @@
     "ops": "Bezpieczeństwo operacji",
     "learn": "Ucz się",
     "fold": "Zwiń menu",
-    "unfold": "Rozwiń menu"
+    "unfold": "Rozwiń menu",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Plany są ustalane oddzielnie dla każdego połączenia schema.pi (taksonomii). Nowe połączenia mogą korzystać z planu DBA przez 7 dni.",
+    "loading": "Ładowanie planu…",
+    "loadFail": "Nie udało się załadować planu. Spróbuj ponownie za chwilę.",
+    "names": {
+      "FREE": "Darmowy",
+      "D1": "D1 Obserwacja",
+      "D2": "D2 Strojenie",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Odkrywaj i ucz się",
+      "D1": "Operator — Sprawdza, czy baza danych jest teraz w porządku.",
+      "D2": "Deweloper i Tuner — Naprawia wolne zapytania SQL",
+      "D3": "DBA i DA — Od bezpieczeństwa operacyjnego po implementację i jezioro danych"
+    },
+    "feat": {
+      "FREE": "Panel monitorowania, widok planu wykonania, podstawowa nauka",
+      "D1": "Funkcje darmowe + nieograniczone zbieranie danych o wydajności, zapytania analizy GAP, pełna nauka",
+      "D2": "Funkcje D1 + porównanie planów, rekomendacje strojenia AI, wykonanie analizy GAP",
+      "D3": "Funkcje D2 + implementacja, potok, analiza, bezpieczeństwo operacyjne"
+    },
+    "featAi": "Rekomendacje strojenia AI {n} razy/miesiąc",
+    "featClct": "Ręczne zbieranie danych o wydajności {n} razy/dzień",
+    "aiNone": "Brak rekomendacji strojenia AI",
+    "cur": "Obecny plan: {plan}",
+    "grace": "Próbny",
+    "until": "Do {date} (pozostało {days} dni)",
+    "aiLeft": "Pozostało {left}/{total} rekomendacji strojenia AI w tym miesiącu",
+    "clctLeft": "Pozostało {left}/{total} ręcznych zbierań danych o wydajności dzisiaj",
+    "keep": "Zachowaj poprzednie wartości przez {days} dni",
+    "bndlOn": "Korzystasz z planu DA dla tej samej taksonomii co schema.pi, więc otrzymujesz 20% zniżki na płatność.",
+    "bndlOff": "Jeśli korzystasz z planu DA (P4) dla tej samej taksonomii co schema.pi, otrzymujesz 20% zniżki na płatność.",
+    "monthly": "Miesięcznie",
+    "yearly": "Rocznie",
+    "freePrice": "Darmowy",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Zapłać za {prd}",
+    "extend": "Przedłuż okres {prd}",
+    "upgradeTitle": "Ulepsz",
+    "upgradeNote": "Pozostałe dni Twojego obecnego planu zostaną odliczone od płatności. Nie możesz zmienić planu z rocznego na miesięczny.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Ulepsz",
+    "paying": "Płacenie…",
+    "payStillWaiting": "Oczekiwanie na podpis portfela. Zostanie automatycznie zastosowane po podpisaniu.",
+    "bought": "Płatność odzwierciedlona.",
+    "payCancelled": "Płatność anulowana.",
+    "payFailed": "Płatność nie powiodła się. Spróbuj ponownie za chwilę.",
+    "piBrowserOnly": "Płatność można dokonać po zalogowaniu się do Pi Browser za pomocą Pi.",
+    "payNote": "Płatność jest dokonywana tylko za pomocą Pi. Kwota w KRW jest orientacyjna, a kwota Pi przeliczona według kursu wymiany Pi w czasie rzeczywistym w momencie płatności zostanie otrzymana.",
+    "from": "Od {plan}",
+    "notice": {
+      "required": "Ta funkcja jest dostępna od planu {plan}.",
+      "limit": "Wykorzystano wszystkie dostępne próby w tym okresie. Możesz użyć więcej, ulepszając do planu {plan}.",
+      "limitTop": "Wykorzystano wszystkie dostępne próby w tym okresie. Możesz użyć ponownie w następnym okresie.",
+      "expired": "Twój plan schema.pi wygasł — dokonaj płatności na ekranie planu schema.pi.",
+      "go": "Wyświetl plan",
+      "close": "Zamknij"
+    }
   }
 }

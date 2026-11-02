@@ -16,7 +16,7 @@ export const GET = withGuard(
   dbRoute(async (req) => {
     const sp = req.nextUrl.searchParams
     const page = Math.max(1, Math.floor(Number(sp.get('page') ?? 1)) || 1)
-    const g = await linkGate(req, sp.get('link'))
+    const g = await linkGate(req, sp.get('link'), 'MON')
     if (g instanceof NextResponse) return g
     const from = (page - 1) * PAGE
     const r = await db()
@@ -43,7 +43,7 @@ export const POST = withGuard(
   dbRoute(async (req) => {
     const b = await parseBody(req, PostSchema)
     if (b instanceof NextResponse) return b
-    const g = await linkGate(req, b.link)
+    const g = await linkGate(req, b.link, 'MON')
     if (g instanceof NextResponse) return g
     const cnt = await db().from('dbm_mon_rule').select('rule_id', { count: 'exact', head: true }).eq('lnk_id', g.linkId).eq('del_yn', 'N')
     if (cnt.error) return dbFail(cnt.error)
@@ -72,7 +72,7 @@ export const PATCH = withGuard(
     const b = await parseBody(req, PatchSchema)
     if (b instanceof NextResponse) return b
     if (!b.useYn && !b.del) return bad()
-    const g = await linkGate(req, b.link)
+    const g = await linkGate(req, b.link, 'MON')
     if (g instanceof NextResponse) return g
     const now = new Date().toISOString()
     const who = { modr_id: g.usrId || 'ADMIN', mod_dtm: now }

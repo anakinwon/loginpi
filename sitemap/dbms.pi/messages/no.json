@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Denne kontoen er allerede koblet.",
     "LINK_CODE_GEN_FAILED": "Kunne ikke opprette en koblingskode. Vennligst prøv igjen senere.",
     "AUTH_DB_UNAVAILABLE": "Kunne ikke lagre kontoen din, så pålogging mislyktes. Vennligst prøv igjen senere.",
-    "LINK_TRY_LIMIT": "For mange feil koblingskoder. Prøv igjen om 15 minutter."
+    "LINK_TRY_LIMIT": "For mange feil koblingskoder. Prøv igjen om 15 minutter.",
+    "PLAN_REQUIRED": "Denne funksjonen er ikke tilgjengelig med din nåværende plan. Vennligst oppgrader planen din.",
+    "PLAN_LIMIT": "Du har brukt alle tilgjengelige forsøk for denne perioden. Vennligst oppgrader planen din eller prøv igjen neste periode.",
+    "PLAN_EXPIRED": "Din schema.pi-plan har utløpt. Vennligst foreta en betaling på schema.pi-planskjermen.",
+    "PAY_PI_FAILED": "Kunne ikke kommunisere med Pi-betalingsserveren. Vennligst prøv igjen om kort tid.",
+    "PAY_MISMATCH": "Betalingsinformasjonen stemmer ikke.",
+    "PAY_AMOUNT_MISMATCH": "Betalingsbeløpet avviker fra estimatet.",
+    "PAY_CANCELLED": "Betalingen ble kansellert.",
+    "PAY_ALREADY_PAID": "Det pågår en betaling. Hvis du signerte i lommeboken din, vennligst prøv igjen om 3 minutter.",
+    "PAY_INVALID_STATE": "Betalingen kan ikke behandles i sin nåværende tilstand.",
+    "PAY_PI_CANCEL_REFUSED": "Betalingen er allerede i gang og kan ikke kanselleres. Vennligst sjekk igjen om kort tid.",
+    "PAY_PAYER": "Kun tilkoblingseieren eller administratoren kan foreta betalinger.",
+    "PAY_SUBSCRIBED": "Mens du abonnerer, kan du kun betale for oppgraderinger eller forlengelser av din nåværende planperiode.",
+    "PAY_UPGRADE": "Denne planen kan ikke oppgraderes.",
+    "PAY_PRICE_CHANGED": "Planstatusen har endret seg. Vennligst foreta betalingen på nytt.",
+    "PRICE_UNAVAILABLE": "Kunne ikke sjekke Pi-vekslingskursen. Vennligst prøv igjen om kort tid.",
+    "QUOTE_EXPIRED": "Betalingstilbudet har utløpt. Vennligst foreta betalingen på nytt."
   },
   "analytics": {
     "title": "Analyse og Lake",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Utvidelsen pg_stat_statements er ikke installert på mål-DB",
       "TIMEOUT": "Forespørselen tidsavbrutt",
       "RATE": "For mange forespørsler. Vennligst prøv igjen om et minutt",
-      "INVALID_INPUT": "Lim inn hele tilkoblingstokenet som starter med slk_"
+      "INVALID_INPUT": "Lim inn hele tilkoblingstokenet som starter med slk_",
+      "PLAN_EXPIRED": "Din schema.pi-plan har utløpt. Vennligst foreta en betaling på schema.pi-planskjermen."
     }
   },
   "migration": {
@@ -1408,6 +1425,70 @@
     "ops": "Driftssikkerhet",
     "learn": "Lær",
     "fold": "Skjul meny",
-    "unfold": "Vis meny"
+    "unfold": "Vis meny",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Planer settes separat for hver schema.pi-tilkobling (taksonomi). Nye tilkoblinger kan oppleve DBA-planen i 7 dager.",
+    "loading": "Laster plan…",
+    "loadFail": "Kunne ikke laste planen. Vennligst prøv igjen om kort tid.",
+    "names": {
+      "FREE": "Gratis",
+      "D1": "D1 Observasjon",
+      "D2": "D2 Justering",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Utforsk og lær",
+      "D1": "Operatør – Sjekker om databasen er i orden nå.",
+      "D2": "Utvikler og justerer – Fikser trege SQL-spørringer",
+      "D3": "DBA og DA – Fra operasjonell sikkerhet til implementering og lake"
+    },
+    "feat": {
+      "FREE": "Overvåkingspanel, visning av utførelsesplan, grunnleggende læring",
+      "D1": "Gratis funksjoner + ubegrenset ytelsessamling, GAP-analyseforespørsel, full læring",
+      "D2": "D1-funksjoner + plan-sammenligning, AI-justeringsanbefalinger, GAP-analyseutførelse",
+      "D3": "D2-funksjoner + implementering, pipeline, analyse, operasjonell sikkerhet"
+    },
+    "featAi": "AI-justeringsanbefalinger {n} ganger/måned",
+    "featClct": "Manuell ytelsessamling {n} ganger/dag",
+    "aiNone": "Ingen AI-justeringsanbefalinger",
+    "cur": "Gjeldende plan: {plan}",
+    "grace": "Prøveperiode",
+    "until": "Til {date} ({days} dager igjen)",
+    "aiLeft": "{left}/{total} AI-justeringsanbefalinger igjen denne måneden",
+    "clctLeft": "{left}/{total} manuelle ytelsessamlinger igjen i dag",
+    "keep": "Behold tidligere verdier i {days} dager",
+    "bndlOn": "Du bruker en DA-plan for samme taksonomi som schema.pi, så du får 20 % rabatt på betalingen din.",
+    "bndlOff": "Hvis du bruker en DA-plan (P4) for samme taksonomi som schema.pi, får du 20 % rabatt på betalingen din.",
+    "monthly": "Månedlig",
+    "yearly": "Årlig",
+    "freePrice": "Gratis",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Betal for {prd}",
+    "extend": "Forleng {prd}-perioden",
+    "upgradeTitle": "Oppgrader",
+    "upgradeNote": "De resterende dagene av din nåværende plan vil bli trukket fra betalingen. Du kan ikke endre fra årlig til månedlig.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Oppgrader",
+    "paying": "Betaler…",
+    "payStillWaiting": "Venter på lommeboksignatur. Den vil automatisk bli brukt når den er signert.",
+    "bought": "Betalingen er registrert.",
+    "payCancelled": "Betalingen ble kansellert.",
+    "payFailed": "Betalingen mislyktes. Vennligst prøv igjen om kort tid.",
+    "piBrowserOnly": "Betaling kan gjøres etter å ha logget inn på Pi Browser med Pi.",
+    "payNote": "Betaling gjøres kun med Pi. KRW-beløpet er til referanse, og Pi-beløpet konvertert til sanntids Pi-vekslingskursen på betalingstidspunktet vil bli mottatt.",
+    "from": "Fra {plan}",
+    "notice": {
+      "required": "Denne funksjonen er tilgjengelig fra {plan}-planen.",
+      "limit": "Du har brukt alle tilgjengelige forsøk for denne perioden. Du kan bruke mer ved å oppgradere til {plan}-planen.",
+      "limitTop": "Du har brukt alle tilgjengelige forsøk for denne perioden. Du kan bruke den igjen neste periode.",
+      "expired": "Din schema.pi-plan har utløpt – vennligst foreta en betaling på schema.pi-planskjermen.",
+      "go": "Vis plan",
+      "close": "Lukk"
+    }
   }
 }

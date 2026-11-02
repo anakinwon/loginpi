@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Kjo llogari është lidhur tashmë.",
     "LINK_CODE_GEN_FAILED": "Nuk mund të krijohej një kod lidhjeje. Ju lutemi provoni përsëri më vonë.",
     "AUTH_DB_UNAVAILABLE": "Nuk mund të ruhej llogaria juaj, kështu që identifikimi dështoi. Ju lutemi provoni përsëri më vonë.",
-    "LINK_TRY_LIMIT": "Shumë kode lidhjeje të pasakta. Provoni përsëri pas 15 minutash."
+    "LINK_TRY_LIMIT": "Shumë kode lidhjeje të pasakta. Provoni përsëri pas 15 minutash.",
+    "PLAN_REQUIRED": "Ky funksion nuk është i disponueshëm me planin tuaj aktual. Ju lutemi përmirësoni planin tuaj.",
+    "PLAN_LIMIT": "Keni përdorur të gjitha tentativat e disponueshme për këtë periudhë. Ju lutemi përmirësoni planin tuaj ose provoni përsëri në periudhën tjetër.",
+    "PLAN_EXPIRED": "Plani juaj schema.pi ka skaduar. Ju lutemi bëni një pagesë në ekranin e planit schema.pi.",
+    "PAY_PI_FAILED": "Dështoi komunikimi me serverin e pagesave Pi. Ju lutemi provoni përsëri pas pak.",
+    "PAY_MISMATCH": "Informacioni i pagesës nuk përputhet.",
+    "PAY_AMOUNT_MISMATCH": "Shuma e pagesës ndryshon nga vlerësimi.",
+    "PAY_CANCELLED": "Pagesa u anulua.",
+    "PAY_ALREADY_PAID": "Ka një pagesë në proces. Nëse po nënshkruanit në portofolin tuaj, ju lutemi provoni përsëri pas 3 minutash.",
+    "PAY_INVALID_STATE": "Pagesa nuk mund të përpunohet në gjendjen aktuale.",
+    "PAY_PI_CANCEL_REFUSED": "Pagesa është tashmë në proces dhe nuk mund të anulohet. Ju lutemi kontrolloni përsëri pas pak.",
+    "PAY_PAYER": "Vetëm pronari i lidhjes ose administratori mund të bëjë pagesa.",
+    "PAY_SUBSCRIBED": "Gjatë abonimit, mund të paguani vetëm për përmirësime ose zgjatime të periudhës aktuale të planit tuaj.",
+    "PAY_UPGRADE": "Ky plan nuk mund të përmirësohet.",
+    "PAY_PRICE_CHANGED": "Statusi i planit ka ndryshuar. Ju lutemi bëni pagesën përsëri.",
+    "PRICE_UNAVAILABLE": "Dështoi kontrolli i kursit të këmbimit Pi. Ju lutemi provoni përsëri pas pak.",
+    "QUOTE_EXPIRED": "Kuotimi i pagesës ka skaduar. Ju lutemi bëni pagesën përsëri."
   },
   "analytics": {
     "title": "Analitika dhe Liqeni",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Shtesa pg_stat_statements nuk është instaluar në DB target",
       "TIMEOUT": "Kërkesa skadoi",
       "RATE": "Shumë kërkesa. Ju lutemi provoni përsëri pas një minute",
-      "INVALID_INPUT": "Ngjiteni tokenin e plotë të lidhjes që fillon me slk_"
+      "INVALID_INPUT": "Ngjiteni tokenin e plotë të lidhjes që fillon me slk_",
+      "PLAN_EXPIRED": "Plani juaj schema.pi ka skaduar. Ju lutemi bëni një pagesë në ekranin e planit schema.pi."
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "Siguria e Operacioneve",
     "learn": "Mëso",
     "fold": "Palos menunë",
-    "unfold": "Zgjero menunë"
+    "unfold": "Zgjero menunë",
+    "plan": "Plani"
+  },
+  "plan": {
+    "title": "Plani",
+    "intro": "Planet vendosen veçmas për çdo lidhje schema.pi (taksonomi). Lidhjet e reja mund të provojnë planin DBA për 7 ditë.",
+    "loading": "Po ngarkohet plani…",
+    "loadFail": "Dështoi ngarkimi i planit. Ju lutemi provoni përsëri pas pak.",
+    "names": {
+      "FREE": "Falas",
+      "D1": "D1 Vëzhgim",
+      "D2": "D2 Akordim",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Eksploro & Mëso",
+      "D1": "Operatori — Kontrollon nëse baza e të dhënave është në rregull tani",
+      "D2": "Zhvilluesi & Akorduesi — Rregullon SQL-in e ngadaltë",
+      "D3": "DBA & DA — Nga siguria operacionale te zbatimi dhe liqeni"
+    },
+    "feat": {
+      "FREE": "Paneli i monitorimit, pamja e planit të ekzekutimit, mësimi bazë",
+      "D1": "Funksione falas + mbledhje e pakufizuar e performancës, pyetje për analizën GAP, mësim i plotë",
+      "D2": "Funksione D1 + krahasimi i planit, rekomandime për akordim me AI, ekzekutim i analizës GAP",
+      "D3": "Funksione D2 + zbatim, tubacion, analizë, siguri operacionale"
+    },
+    "featAi": "Rekomandime për akordim me AI {n} herë/muaj",
+    "featClct": "Mbledhje manuale e performancës {n} herë/ditë",
+    "aiNone": "Pa rekomandime për akordim me AI",
+    "cur": "Plani aktual: {plan}",
+    "grace": "Provë",
+    "until": "Deri më {date} (kanë mbetur {days} ditë)",
+    "aiLeft": "{left}/{total} rekomandime për akordim me AI të mbetura këtë muaj",
+    "clctLeft": "{left}/{total} mbledhje manuale të performancës të mbetura sot",
+    "keep": "Mbani vlerat e kaluara për {days} ditë",
+    "bndlOn": "Po përdorni një plan DA për të njëjtën taksonomi si schema.pi, kështu që merrni një zbritje 20% në pagesën tuaj.",
+    "bndlOff": "Nëse përdorni një plan DA (P4) për të njëjtën taksonomi si schema.pi, merrni një zbritje 20% në pagesën tuaj.",
+    "monthly": "Mujor",
+    "yearly": "Vjetor",
+    "freePrice": "Falas",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Paguaj për {prd}",
+    "extend": "Zgjat periudhën {prd}",
+    "upgradeTitle": "Përmirëso",
+    "upgradeNote": "Ditët e mbetura të planit tuaj aktual do të zbriten nga pagesa. Nuk mund të ndryshoni nga vjetor në mujor.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Përmirëso",
+    "paying": "Po paguhet…",
+    "payStillWaiting": "Po pritet nënshkrimi i portofolit. Do të aplikohet automatikisht pasi të nënshkruhet.",
+    "bought": "Pagesa u reflektua.",
+    "payCancelled": "Pagesa u anulua.",
+    "payFailed": "Pagesa dështoi. Ju lutemi provoni përsëri pas pak.",
+    "piBrowserOnly": "Pagesa mund të bëhet pasi të keni hyrë në Pi Browser me Pi.",
+    "payNote": "Pagesa bëhet vetëm me Pi. Shuma në KRW është për referencë, dhe shuma në Pi e konvertuar me kursin e këmbimit Pi në kohë reale në momentin e pagesës do të pranohet.",
+    "from": "Nga {plan}",
+    "notice": {
+      "required": "Ky funksion është i disponueshëm nga plani {plan}.",
+      "limit": "Keni përdorur të gjitha tentativat e disponueshme për këtë periudhë. Mund të përdorni më shumë duke përmirësuar në planin {plan}.",
+      "limitTop": "Keni përdorur të gjitha tentativat e disponueshme për këtë periudhë. Mund ta përdorni përsëri në periudhën tjetër.",
+      "expired": "Plani juaj schema.pi ka skaduar — ju lutemi bëni një pagesë në ekranin e planit schema.pi.",
+      "go": "Shiko Planin",
+      "close": "Mbyll"
+    }
   }
 }

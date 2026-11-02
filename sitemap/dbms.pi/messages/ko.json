@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "이미 연동된 계정입니다.",
     "LINK_CODE_GEN_FAILED": "연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요.",
     "AUTH_DB_UNAVAILABLE": "사용자 정보를 저장하지 못해 로그인할 수 없습니다. 잠시 후 다시 시도하세요.",
-    "LINK_TRY_LIMIT": "연동 코드를 여러 번 틀렸습니다. 15분 뒤에 다시 시도하세요"
+    "LINK_TRY_LIMIT": "연동 코드를 여러 번 틀렸습니다. 15분 뒤에 다시 시도하세요",
+    "PLAN_REQUIRED": "현재 요금제에서 쓸 수 없는 기능입니다. 요금제를 올려 주세요",
+    "PLAN_LIMIT": "이번 기간 사용 횟수를 모두 썼습니다. 요금제를 올리거나 다음 기간에 다시 시도하세요",
+    "PLAN_EXPIRED": "schema.pi 요금제가 만료되었습니다. schema.pi 요금제 화면에서 결제하세요",
+    "PAY_PI_FAILED": "Pi 결제 서버와 통신하지 못했습니다. 잠시 후 다시 시도하세요",
+    "PAY_MISMATCH": "결제 정보가 일치하지 않습니다",
+    "PAY_AMOUNT_MISMATCH": "결제 금액이 견적과 다릅니다",
+    "PAY_CANCELLED": "취소된 결제입니다",
+    "PAY_ALREADY_PAID": "처리 중인 결제가 있습니다. 지갑에서 서명 중이었다면 3분 뒤 다시 시도하세요",
+    "PAY_INVALID_STATE": "결제를 처리할 수 없는 상태입니다",
+    "PAY_PI_CANCEL_REFUSED": "결제가 이미 진행 중이라 취소할 수 없습니다. 잠시 후 다시 확인하세요",
+    "PAY_PAYER": "연결 소유자 또는 관리자만 결제할 수 있습니다",
+    "PAY_SUBSCRIBED": "구독 중에는 업그레이드나 현재 요금제 기간 연장만 결제할 수 있습니다",
+    "PAY_UPGRADE": "업그레이드할 수 없는 요금제입니다",
+    "PAY_PRICE_CHANGED": "요금제 상태가 바뀌었습니다. 다시 결제하세요",
+    "PRICE_UNAVAILABLE": "Pi 시세를 확인하지 못했습니다. 잠시 후 다시 시도하세요",
+    "QUOTE_EXPIRED": "결제 견적 시간이 지났습니다. 다시 결제하세요"
   },
   "analytics": {
     "title": "분석·레이크",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "대상 DB 에 pg_stat_statements 확장이 없습니다",
       "TIMEOUT": "응답 시간이 초과되었습니다",
       "RATE": "호출이 너무 많습니다. 1분 뒤에 다시 시도하세요",
-      "INVALID_INPUT": "slk_ 로 시작하는 연결 토큰을 정확히 붙여 넣으세요"
+      "INVALID_INPUT": "slk_ 로 시작하는 연결 토큰을 정확히 붙여 넣으세요",
+      "PLAN_EXPIRED": "schema.pi 요금제가 만료되었습니다. schema.pi 요금제 화면에서 결제하세요"
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "운영 안전",
     "learn": "학습",
     "fold": "메뉴 접기",
-    "unfold": "메뉴 펼치기"
+    "unfold": "메뉴 펼치기",
+    "plan": "요금제"
+  },
+  "plan": {
+    "title": "요금제",
+    "intro": "요금제는 schema.pi 연결(분류체계) 1개마다 따로 정합니다. 새 연결은 7일 동안 DBA 요금제를 체험할 수 있습니다.",
+    "loading": "요금제를 불러오는 중…",
+    "loadFail": "요금제를 불러오지 못했습니다. 잠시 후 다시 시도하세요",
+    "names": {
+      "FREE": "무료",
+      "D1": "D1 관측",
+      "D2": "D2 튜닝",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "둘러보기·학습",
+      "D1": "운영자 — 지금 데이터베이스가 괜찮은지 살핍니다",
+      "D2": "개발자·튜너 — 느린 SQL 을 고칩니다",
+      "D3": "DBA·DA — 운영 안전·이행·레이크까지"
+    },
+    "feat": {
+      "FREE": "모니터링 보드·실행계획 보기·기초 학습",
+      "D1": "무료 기능 + 성능 수집 무제한·GAP분석 조회·학습 전체",
+      "D2": "D1 기능 + 계획 비교·AI 튜닝 권고·GAP분석 실행",
+      "D3": "D2 기능 + 이행·파이프라인·분석·운영 안전"
+    },
+    "featAi": "AI 튜닝 권고 월 {n}회",
+    "featClct": "성능 수동 수집 하루 {n}회",
+    "aiNone": "AI 튜닝 권고 없음",
+    "cur": "현재 요금제 : {plan}",
+    "grace": "체험",
+    "until": "{date}까지 ({days}일 남음)",
+    "aiLeft": "이번 달 AI 튜닝 권고 {left}/{total}회 남음",
+    "clctLeft": "오늘 성능 수동 수집 {left}/{total}회 남음",
+    "keep": "지난 값 {days}일 보관",
+    "bndlOn": "schema.pi 같은 분류체계의 DA 요금제를 쓰고 있어 결제 금액이 20% 할인됩니다",
+    "bndlOff": "schema.pi 같은 분류체계에서 DA 요금제(P4)를 쓰고 있으면 결제 금액이 20% 할인됩니다",
+    "monthly": "월간",
+    "yearly": "연간",
+    "freePrice": "무료",
+    "won": "{won}원",
+    "moneyKo": "{won}원 ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "{prd} 결제",
+    "extend": "{prd} 기간 연장",
+    "upgradeTitle": "업그레이드",
+    "upgradeNote": "지금 쓰는 요금제의 남은 날만큼 빼고 결제합니다. 연간에서 월간으로는 바꿀 수 없습니다.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "업그레이드",
+    "paying": "결제 중…",
+    "payStillWaiting": "지갑 서명을 기다리고 있습니다. 서명을 마치면 자동으로 반영됩니다",
+    "bought": "결제가 반영되었습니다",
+    "payCancelled": "결제를 취소했습니다",
+    "payFailed": "결제를 마치지 못했습니다. 잠시 후 다시 시도하세요",
+    "piBrowserOnly": "결제는 Pi Browser 에서 Pi 로그인 뒤 할 수 있습니다",
+    "payNote": "결제는 Pi 로만 합니다. 원화는 참고 금액이며, 결제 순간의 Pi 시세로 환산한 Pi 금액을 받습니다.",
+    "from": "{plan}부터",
+    "notice": {
+      "required": "{plan} 요금제부터 쓸 수 있는 기능입니다.",
+      "limit": "이번 기간 사용 횟수를 모두 썼습니다. {plan} 요금제로 올리면 더 쓸 수 있습니다.",
+      "limitTop": "이번 기간 사용 횟수를 모두 썼습니다. 다음 기간에 다시 쓸 수 있습니다.",
+      "expired": "schema.pi 요금제가 만료되었습니다 — schema.pi 요금제 화면에서 결제하세요.",
+      "go": "요금제 보기",
+      "close": "닫기"
+    }
   }
 }

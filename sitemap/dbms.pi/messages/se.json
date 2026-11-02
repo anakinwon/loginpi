@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Detta konto är redan länkat.",
     "LINK_CODE_GEN_FAILED": "Kunde inte skapa en länk-kod. Försök igen senare.",
     "AUTH_DB_UNAVAILABLE": "Kunde inte spara ditt konto, så inloggningen misslyckades. Försök igen senare.",
-    "LINK_TRY_LIMIT": "För många felaktiga länk-koder. Försök igen om 15 minuter."
+    "LINK_TRY_LIMIT": "För många felaktiga länk-koder. Försök igen om 15 minuter.",
+    "PLAN_REQUIRED": "Den här funktionen är inte tillgänglig med din nuvarande plan. Uppgradera din plan.",
+    "PLAN_LIMIT": "Du har använt alla tillgängliga försök för den här perioden. Uppgradera din plan eller försök igen nästa period.",
+    "PLAN_EXPIRED": "Din schema.pi-plan har löpt ut. Vänligen genomför en betalning på schema.pi-plansidan.",
+    "PAY_PI_FAILED": "Misslyckades med att kommunicera med Pi-betalningsservern. Försök igen om en liten stund.",
+    "PAY_MISMATCH": "Betalningsinformationen matchar inte.",
+    "PAY_AMOUNT_MISMATCH": "Betalningsbeloppet skiljer sig från uppskattningen.",
+    "PAY_CANCELLED": "Betalning avbruten.",
+    "PAY_ALREADY_PAID": "En betalning pågår. Om du signerade i din plånbok, försök igen om 3 minuter.",
+    "PAY_INVALID_STATE": "Betalningen kan inte behandlas i dess nuvarande tillstånd.",
+    "PAY_PI_CANCEL_REFUSED": "Betalningen pågår redan och kan inte avbrytas. Kontrollera igen om en liten stund.",
+    "PAY_PAYER": "Endast anslutningsägaren eller administratören kan göra betalningar.",
+    "PAY_SUBSCRIBED": "När du prenumererar kan du bara betala för uppgraderingar eller förlängningar av din nuvarande planperiod.",
+    "PAY_UPGRADE": "Denna plan kan inte uppgraderas.",
+    "PAY_PRICE_CHANGED": "Planstatusen har ändrats. Vänligen genomför betalningen igen.",
+    "PRICE_UNAVAILABLE": "Misslyckades med att kontrollera Pi-växelkursen. Försök igen om en liten stund.",
+    "QUOTE_EXPIRED": "Betalningskvoten har löpt ut. Vänligen genomför betalningen igen."
   },
   "analytics": {
     "title": "Analys & Lake",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Tillägget pg_stat_statements är inte installerat på mål-DB",
       "TIMEOUT": "Begäran tog för lång tid",
       "RATE": "För många förfrågningar. Försök igen om en minut",
-      "INVALID_INPUT": "Klistra in hela anslutningstoken som börjar med slk_"
+      "INVALID_INPUT": "Klistra in hela anslutningstoken som börjar med slk_",
+      "PLAN_EXPIRED": "Din schema.pi-plan har löpt ut. Vänligen genomför en betalning på schema.pi-plansidan."
     }
   },
   "migration": {
@@ -1406,6 +1423,70 @@
     "ops": "Driftsäkerhet",
     "learn": "Lär dig",
     "fold": "Fäll ihop meny",
-    "unfold": "Fäll ut meny"
+    "unfold": "Fäll ut meny",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Planer ställs in separat för varje schema.pi-anslutning (taxonomi). Nya anslutningar kan prova DBA-planen i 7 dagar.",
+    "loading": "Laddar plan…",
+    "loadFail": "Misslyckades med att ladda planen. Försök igen om en liten stund.",
+    "names": {
+      "FREE": "Gratis",
+      "D1": "D1 Observation",
+      "D2": "D2 Tuning",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Utforska & Lär",
+      "D1": "Operatör – Kontrollerar om databasen är okej just nu.",
+      "D2": "Utvecklare & Tuner – Fixar långsam SQL",
+      "D3": "DBA & DA – Från driftsäkerhet till implementering och lake"
+    },
+    "feat": {
+      "FREE": "Övervakningspanel, visning av exekveringsplan, grundläggande inlärning",
+      "D1": "Gratisfunktioner + obegränsad prestandainsamling, GAP-analysfråga, fullständig inlärning",
+      "D2": "D1-funktioner + planjämförelse, AI-justeringsrekommendationer, GAP-analysutförande",
+      "D3": "D2-funktioner + implementering, pipeline, analys, driftsäkerhet"
+    },
+    "featAi": "AI-justeringsrekommendationer {n} gånger/månad",
+    "featClct": "Manuell prestandainsamling {n} gånger/dag",
+    "aiNone": "Inga AI-justeringsrekommendationer",
+    "cur": "Nuvarande plan: {plan}",
+    "grace": "Provperiod",
+    "until": "Till {date} ({days} dagar kvar)",
+    "aiLeft": "{left}/{total} AI-justeringsrekommendationer kvar denna månad",
+    "clctLeft": "{left}/{total} manuella prestandainsamlingar kvar idag",
+    "keep": "Behåll tidigare värden i {days} dagar",
+    "bndlOn": "Du använder en DA-plan för samma taxonomi som schema.pi, så du får 20% rabatt på din betalning.",
+    "bndlOff": "Om du använder en DA-plan (P4) för samma taxonomi som schema.pi, får du 20% rabatt på din betalning.",
+    "monthly": "Månatlig",
+    "yearly": "Årlig",
+    "freePrice": "Gratis",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Betala för {prd}",
+    "extend": "Förläng {prd}-perioden",
+    "upgradeTitle": "Uppgradera",
+    "upgradeNote": "Återstående dagar av din nuvarande plan kommer att dras av från betalningen. Du kan inte ändra från årlig till månatlig.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Uppgradera",
+    "paying": "Betalar…",
+    "payStillWaiting": "Väntar på plånbokssignatur. Den kommer att tillämpas automatiskt när den är signerad.",
+    "bought": "Betalning registrerad.",
+    "payCancelled": "Betalning avbruten.",
+    "payFailed": "Betalning misslyckades. Försök igen om en liten stund.",
+    "piBrowserOnly": "Betalning kan göras efter att du loggat in på Pi Browser med Pi.",
+    "payNote": "Betalning sker endast med Pi. KRW-beloppet är för referens, och Pi-beloppet omvandlat till den realtids Pi-växelkursen vid betalningstillfället kommer att tas emot.",
+    "from": "Från {plan}",
+    "notice": {
+      "required": "Denna funktion är tillgänglig från {plan}-planen.",
+      "limit": "Du har använt alla tillgängliga försök för den här perioden. Du kan använda fler genom att uppgradera till {plan}-planen.",
+      "limitTop": "Du har använt alla tillgängliga försök för den här perioden. Du kan använda den igen nästa period.",
+      "expired": "Din schema.pi-plan har löpt ut – vänligen genomför en betalning på schema.pi-plansidan.",
+      "go": "Visa plan",
+      "close": "Stäng"
+    }
   }
 }

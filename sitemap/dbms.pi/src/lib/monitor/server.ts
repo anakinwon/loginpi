@@ -2,6 +2,7 @@
 import 'server-only'
 import { NextResponse, type NextRequest } from 'next/server'
 import { LinkError, requireLink, type LinkCtx } from '@/lib/link/client'
+import type { Perm } from '@/lib/plan-rules'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 export const isUuid = (v: unknown): v is string => typeof v === 'string' && UUID.test(v)
@@ -15,10 +16,11 @@ export function linkFail(e: unknown): NextResponse {
   throw e // dbRoute 가 500 처리
 }
 
-export async function linkGate(req: NextRequest, linkId: string | null): Promise<LinkCtx | NextResponse> {
+// perm = 요금제 기능 권한(모니터링 MON·분석 LAKE)
+export async function linkGate(req: NextRequest, linkId: string | null, perm: Perm): Promise<LinkCtx | NextResponse> {
   if (!isUuid(linkId)) return NextResponse.json({ error: 'LINK_REQUIRED', code: 'LINK_REQUIRED' }, { status: 400 })
   try {
-    const r = await requireLink(req, linkId)
+    const r = await requireLink(req, linkId, perm)
     if (r instanceof Response) {
       if (r instanceof NextResponse) return r
       return new NextResponse(r.body, { status: r.status, headers: r.headers })

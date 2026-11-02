@@ -173,7 +173,7 @@ test('지문 오탐 방지 : 사용자 테이블·함수를 하나라도 읽으�
     assert.equal(isSelfQry(q), false, String(q).slice(0, 60))
 })
 
-// 계약 — schema.pi 연결 API 이름 붙인 조회(version·explain 제외)는 모두 지문에 걸려야 보드·출처·진단이 자체 수집으로 거른다
+// 계약 — schema.pi 연결 API 이름 붙인 조회(version·explain·area_plan 제외)는 모두 지문에 걸려야 보드·출처·진단이 자체 수집으로 거른다
 test('계약 : schema.pi 이름 붙인 조회 전부 = 모니터링 수집 지문', () => {
   const src = readFileSync(
     new URL('../../../../schema.pi/src/lib/link/queries.ts', import.meta.url),
@@ -189,7 +189,7 @@ test('계약 : schema.pi 이름 붙인 조회 전부 = 모니터링 수집 지�
   )
   assert.ok(Object.keys(Q).length >= 16)
   for (const [k, v] of Object.entries(Q)) {
-    if (k === 'version' || k === 'explain') continue
+    if (k === 'version' || k === 'explain' || k === 'area_plan') continue // area_plan = schema.pi 자체 DB 조회(대상 DB 에서 안 돎)
     assert.equal(isSelfQry(v.replace(/\s+/g, ' ')), true, k)
   }
 })

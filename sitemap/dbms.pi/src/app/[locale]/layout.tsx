@@ -4,9 +4,11 @@ import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { SessionProvider } from 'next-auth/react'
-import { PiAuthProvider, PiSdkScript } from '@pi/auth/client'
+import { PiSdkScript } from '@pi/auth/client'
 import { getDir, PreferredLocaleScript } from '@pi/i18n'
 import { WarpArrival } from '@pi/warp/client'
+import { PiAuthRoot } from '@/components/pi-auth-root'
+import { PlanNotice } from '@/components/plan/plan-notice'
 import { SiteHeader } from '@/components/site-header'
 import { routing } from '@/i18n/routing'
 import { appUrl } from '@/lib/site-url'
@@ -54,14 +56,16 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           {/* Google(NextAuth) 세션 — Pi 세션(PiAuthProvider)과 useAppUser 가 통합. 미설정 환경은 /api/auth/* 가 404 라 세션 null */}
           <SessionProvider>
-            {/* 결제 기능이 없어 미완료 결제 복구(onIncompletePayment)는 붙이지 않는다 — 결제(Phase 2) 때 추가 */}
-            <PiAuthProvider>
+            {/* Pi 인증 + 미완료 요금제 결제 복구(onIncompletePayment → complete·cancel, sql/035) */}
+            <PiAuthRoot>
               <SiteHeader />
               {/* 아래 여백 = 하단 고정 메뉴 높이(feature-nav 가 :root --dbms-nav-h 갱신) + 24px */}
               <main className="w-full px-4 pt-6 pb-[calc(var(--dbms-nav-h,6rem)+1.5rem)] sm:px-6 lg:px-8">
                 {children}
               </main>
-            </PiAuthProvider>
+              {/* 요금제 잠김·한도·schema.pi 만료 공통 안내(readApi 이벤트) */}
+              <PlanNotice />
+            </PiAuthRoot>
           </SessionProvider>
         </NextIntlClientProvider>
       </body>

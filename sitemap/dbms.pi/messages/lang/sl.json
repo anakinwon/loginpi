@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Ta račun je že povezan.",
     "LINK_CODE_GEN_FAILED": "Povezovalne kode ni bilo mogoče ustvariti. Poskusite znova pozneje.",
     "AUTH_DB_UNAVAILABLE": "Vašega računa ni bilo mogoče shraniti, zato prijava ni uspela. Poskusite znova pozneje.",
-    "LINK_TRY_LIMIT": "Preveč napačnih povezovalnih kod. Poskusite znova čez 15 minut."
+    "LINK_TRY_LIMIT": "Preveč napačnih povezovalnih kod. Poskusite znova čez 15 minut.",
+    "PLAN_REQUIRED": "Ta funkcija ni na voljo z vašim trenutnim načrtom. Prosimo, nadgradite svoj načrt.",
+    "PLAN_LIMIT": "Porabili ste vse razpoložljive poskuse za to obdobje. Prosimo, nadgradite svoj načrt ali poskusite znova v naslednjem obdobju.",
+    "PLAN_EXPIRED": "Vaš schema.pi načrt je potekel. Prosimo, izvedite plačilo na zaslonu načrta schema.pi.",
+    "PAY_PI_FAILED": "Komunikacija s plačilnim strežnikom Pi ni uspela. Prosimo, poskusite znova čez nekaj časa.",
+    "PAY_MISMATCH": "Podatki o plačilu se ne ujemajo.",
+    "PAY_AMOUNT_MISMATCH": "Znesek plačila se razlikuje od ocene.",
+    "PAY_CANCELLED": "Plačilo preklicano.",
+    "PAY_ALREADY_PAID": "Plačilo je v teku. Če ste se prijavljali v svojo denarnico, poskusite znova čez 3 minute.",
+    "PAY_INVALID_STATE": "Plačila ni mogoče obdelati v trenutnem stanju.",
+    "PAY_PI_CANCEL_REFUSED": "Plačilo je že v teku in ga ni mogoče preklicati. Prosimo, preverite znova čez nekaj časa.",
+    "PAY_PAYER": "Plačila lahko izvede samo lastnik povezave ali skrbnik.",
+    "PAY_SUBSCRIBED": "Med naročnino lahko plačate samo nadgradnje ali podaljšanja trenutnega obdobja načrta.",
+    "PAY_UPGRADE": "Tega načrta ni mogoče nadgraditi.",
+    "PAY_PRICE_CHANGED": "Status načrta se je spremenil. Prosimo, ponovno izvedite plačilo.",
+    "PRICE_UNAVAILABLE": "Preverjanje tečaja Pi ni uspelo. Prosimo, poskusite znova čez nekaj časa.",
+    "QUOTE_EXPIRED": "Ponudba za plačilo je potekla. Prosimo, ponovno izvedite plačilo."
   },
   "analytics": {
     "title": "Analitika in jezero",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Razširitev pg_stat_statements ni nameščena na ciljni DB",
       "TIMEOUT": "Zahteva je potekla",
       "RATE": "Preveč zahtev. Poskusite znova čez minuto",
-      "INVALID_INPUT": "Prilepite celoten žeton povezave, ki se začne z slk_"
+      "INVALID_INPUT": "Prilepite celoten žeton povezave, ki se začne z slk_",
+      "PLAN_EXPIRED": "Vaš schema.pi načrt je potekel. Prosimo, izvedite plačilo na zaslonu načrta schema.pi."
     }
   },
   "migration": {
@@ -1411,6 +1428,70 @@
     "ops": "Varnost delovanja",
     "learn": "Učenje",
     "fold": "Strni meni",
-    "unfold": "Razširi meni"
+    "unfold": "Razširi meni",
+    "plan": "Načrt"
+  },
+  "plan": {
+    "title": "Načrt",
+    "intro": "Načrti so določeni ločeno za vsako schema.pi povezavo (taksonomijo). Nove povezave lahko 7 dni preizkušajo načrt DBA.",
+    "loading": "Nalaganje načrta…",
+    "loadFail": "Nalaganje načrta ni uspelo. Prosimo, poskusite znova čez nekaj časa.",
+    "names": {
+      "FREE": "Brezplačno",
+      "D1": "D1 Opazovanje",
+      "D2": "D2 Uglasitev",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Raziskovanje in učenje",
+      "D1": "Operater — Preveri, ali je zbirka podatkov zdaj v redu.",
+      "D2": "Razvijalec in uglaševalec — Popravlja počasen SQL",
+      "D3": "DBA in DA — Od operativne varnosti do implementacije in jezera"
+    },
+    "feat": {
+      "FREE": "Nadzorna plošča, pogled izvedbenega načrta, osnovno učenje",
+      "D1": "Brezplačne funkcije + neomejeno zbiranje zmogljivosti, poizvedba GAP analize, celotno učenje",
+      "D2": "Funkcije D1 + primerjava načrtov, priporočila za uglaševanje z umetno inteligenco, izvedba GAP analize",
+      "D3": "Funkcije D2 + implementacija, cevovod, analiza, operativna varnost"
+    },
+    "featAi": "Priporočila za uglaševanje z umetno inteligenco {n} krat/mesec",
+    "featClct": "Ročno zbiranje zmogljivosti {n} krat/dan",
+    "aiNone": "Ni priporočil za uglaševanje z umetno inteligenco",
+    "cur": "Trenutni načrt: {plan}",
+    "grace": "Preizkusno",
+    "until": "Do {date} (ostalo {days} dni)",
+    "aiLeft": "{left}/{total} priporočil za uglaševanje z umetno inteligenco ostaja ta mesec",
+    "clctLeft": "{left}/{total} ročnih zbirk zmogljivosti ostaja danes",
+    "keep": "Shrani pretekle vrednosti za {days} dni",
+    "bndlOn": "Uporabljate načrt DA za isto taksonomijo kot schema.pi, zato prejmete 20% popust na plačilo.",
+    "bndlOff": "Če uporabljate načrt DA (P4) za isto taksonomijo kot schema.pi, prejmete 20% popust na plačilo.",
+    "monthly": "Mesečno",
+    "yearly": "Letno",
+    "freePrice": "Brezplačno",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Plačaj za {prd}",
+    "extend": "Podaljšaj obdobje {prd}",
+    "upgradeTitle": "Nadgradnja",
+    "upgradeNote": "Preostali dnevi vašega trenutnega načrta bodo odšteti od plačila. Ne morete spremeniti iz letnega v mesečni.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Nadgradnja",
+    "paying": "Plačevanje…",
+    "payStillWaiting": "Čakam na podpis denarnice. Samodejno bo uporabljeno, ko bo podpisano.",
+    "bought": "Plačilo je bilo upoštevano.",
+    "payCancelled": "Plačilo preklicano.",
+    "payFailed": "Plačilo ni uspelo. Prosimo, poskusite znova čez nekaj časa.",
+    "piBrowserOnly": "Plačilo je mogoče izvesti po prijavi v Pi Browser s Pi.",
+    "payNote": "Plačilo se izvede samo s Pi. Znesek v KRW je za referenco, prejet pa bo znesek Pi, preračunan po realnem tečaju Pi v času plačila.",
+    "from": "Od {plan}",
+    "notice": {
+      "required": "Ta funkcija je na voljo od načrta {plan}.",
+      "limit": "Porabili ste vse razpoložljive poskuse za to obdobje. Več jih lahko uporabite z nadgradnjo na načrt {plan}.",
+      "limitTop": "Porabili ste vse razpoložljive poskuse za to obdobje. Ponovno ga lahko uporabite v naslednjem obdobju.",
+      "expired": "Vaš schema.pi načrt je potekel — prosimo, izvedite plačilo na zaslonu načrta schema.pi.",
+      "go": "Ogled načrta",
+      "close": "Zapri"
+    }
   }
 }

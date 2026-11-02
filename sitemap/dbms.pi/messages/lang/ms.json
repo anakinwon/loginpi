@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Akaun ini sudah dipautkan.",
     "LINK_CODE_GEN_FAILED": "Tidak dapat membuat kod pautan. Sila cuba lagi nanti.",
     "AUTH_DB_UNAVAILABLE": "Tidak dapat menyimpan akaun anda, jadi log masuk gagal. Sila cuba lagi nanti.",
-    "LINK_TRY_LIMIT": "Terlalu banyak kod pautan yang salah. Cuba lagi dalam 15 minit."
+    "LINK_TRY_LIMIT": "Terlalu banyak kod pautan yang salah. Cuba lagi dalam 15 minit.",
+    "PLAN_REQUIRED": "Ciri ini tidak tersedia dengan pelan semasa anda. Sila tingkatkan pelan anda.",
+    "PLAN_LIMIT": "Anda telah menggunakan semua percubaan yang tersedia untuk tempoh ini. Sila tingkatkan pelan anda atau cuba lagi pada tempoh seterusnya.",
+    "PLAN_EXPIRED": "Pelan schema.pi anda telah tamat tempoh. Sila buat pembayaran pada skrin pelan schema.pi.",
+    "PAY_PI_FAILED": "Gagal berkomunikasi dengan pelayan pembayaran Pi. Sila cuba lagi sebentar lagi.",
+    "PAY_MISMATCH": "Maklumat pembayaran tidak sepadan.",
+    "PAY_AMOUNT_MISMATCH": "Jumlah pembayaran berbeza daripada anggaran.",
+    "PAY_CANCELLED": "Pembayaran dibatalkan.",
+    "PAY_ALREADY_PAID": "Terdapat pembayaran yang sedang diproses. Jika anda sedang menandatangani dalam dompet anda, sila cuba lagi dalam 3 minit.",
+    "PAY_INVALID_STATE": "Pembayaran tidak dapat diproses dalam keadaan semasa.",
+    "PAY_PI_CANCEL_REFUSED": "Pembayaran sedang diproses dan tidak boleh dibatalkan. Sila semak semula sebentar lagi.",
+    "PAY_PAYER": "Hanya pemilik sambungan atau pentadbir boleh membuat pembayaran.",
+    "PAY_SUBSCRIBED": "Semasa melanggan, anda hanya boleh membayar untuk peningkatan atau lanjutan tempoh pelan semasa anda.",
+    "PAY_UPGRADE": "Pelan ini tidak boleh ditingkatkan.",
+    "PAY_PRICE_CHANGED": "Status pelan telah berubah. Sila buat pembayaran semula.",
+    "PRICE_UNAVAILABLE": "Gagal menyemak kadar pertukaran Pi. Sila cuba lagi sebentar lagi.",
+    "QUOTE_EXPIRED": "Sebut harga pembayaran telah tamat tempoh. Sila buat pembayaran semula."
   },
   "analytics": {
     "title": "Analitik & Tasik",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Sambungan pg_stat_statements tidak dipasang pada DB sasaran",
       "TIMEOUT": "Permintaan tamat masa",
       "RATE": "Terlalu banyak permintaan. Sila cuba lagi dalam seminit",
-      "INVALID_INPUT": "Tampal token sambungan penuh yang bermula dengan slk_"
+      "INVALID_INPUT": "Tampal token sambungan penuh yang bermula dengan slk_",
+      "PLAN_EXPIRED": "Pelan schema.pi anda telah tamat tempoh. Sila buat pembayaran pada skrin pelan schema.pi."
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "Keselamatan Operasi",
     "learn": "Belajar",
     "fold": "Lipat menu",
-    "unfold": "Buka menu"
+    "unfold": "Buka menu",
+    "plan": "Pelan"
+  },
+  "plan": {
+    "title": "Pelan",
+    "intro": "Pelan ditetapkan secara berasingan untuk setiap sambungan schema.pi (taksonomi). Sambungan baharu boleh mengalami pelan DBA selama 7 hari.",
+    "loading": "Memuatkan pelan…",
+    "loadFail": "Gagal memuatkan pelan. Sila cuba lagi sebentar lagi.",
+    "names": {
+      "FREE": "Percuma",
+      "D1": "D1 Pemerhatian",
+      "D2": "D2 Penalaan",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Teroka & Belajar",
+      "D1": "Operator — Menyemak sama ada pangkalan data baik-baik sahaja sekarang",
+      "D2": "Pembangun & Penala — Membaiki SQL yang perlahan",
+      "D3": "DBA & DA — Daripada keselamatan operasi hingga pelaksanaan dan tasik"
+    },
+    "feat": {
+      "FREE": "Papan pemantauan, paparan pelan pelaksanaan, pembelajaran asas",
+      "D1": "Ciri percuma + pengumpulan prestasi tanpa had, pertanyaan analisis GAP, pembelajaran penuh",
+      "D2": "Ciri D1 + perbandingan pelan, cadangan penalaan AI, pelaksanaan analisis GAP",
+      "D3": "Ciri D2 + pelaksanaan, saluran paip, analisis, keselamatan operasi"
+    },
+    "featAi": "Cadangan penalaan AI {n} kali/bulan",
+    "featClct": "Pengumpulan prestasi manual {n} kali/hari",
+    "aiNone": "Tiada cadangan penalaan AI",
+    "cur": "Pelan semasa: {plan}",
+    "grace": "Percubaan",
+    "until": "Sehingga {date} ({days} hari lagi)",
+    "aiLeft": "{left}/{total} cadangan penalaan AI tinggal bulan ini",
+    "clctLeft": "{left}/{total} pengumpulan prestasi manual tinggal hari ini",
+    "keep": "Simpan nilai lalu selama {days} hari",
+    "bndlOn": "Anda menggunakan pelan DA untuk taksonomi yang sama seperti schema.pi, jadi anda mendapat diskaun 20% untuk pembayaran anda.",
+    "bndlOff": "Jika anda menggunakan pelan DA (P4) untuk taksonomi yang sama seperti schema.pi, anda mendapat diskaun 20% untuk pembayaran anda.",
+    "monthly": "Bulanan",
+    "yearly": "Tahunan",
+    "freePrice": "Percuma",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Bayar untuk {prd}",
+    "extend": "Lanjutkan tempoh {prd}",
+    "upgradeTitle": "Naik taraf",
+    "upgradeNote": "Hari-hari yang tinggal dalam pelan semasa anda akan ditolak daripada pembayaran. Anda tidak boleh menukar daripada tahunan kepada bulanan.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Naik taraf",
+    "paying": "Membayar…",
+    "payStillWaiting": "Menunggu tandatangan dompet. Ia akan digunakan secara automatik setelah ditandatangani.",
+    "bought": "Pembayaran telah dipaparkan.",
+    "payCancelled": "Pembayaran dibatalkan.",
+    "payFailed": "Pembayaran gagal. Sila cuba lagi sebentar lagi.",
+    "piBrowserOnly": "Pembayaran boleh dibuat selepas log masuk ke Pi Browser dengan Pi.",
+    "payNote": "Pembayaran dibuat hanya dengan Pi. Jumlah KRW adalah untuk rujukan, dan jumlah Pi yang ditukar pada kadar pertukaran Pi masa nyata pada masa pembayaran akan diterima.",
+    "from": "Daripada {plan}",
+    "notice": {
+      "required": "Ciri ini tersedia daripada pelan {plan}.",
+      "limit": "Anda telah menggunakan semua percubaan yang tersedia untuk tempoh ini. Anda boleh menggunakan lebih banyak dengan menaik taraf kepada pelan {plan}.",
+      "limitTop": "Anda telah menggunakan semua percubaan yang tersedia untuk tempoh ini. Anda boleh menggunakannya lagi pada tempoh seterusnya.",
+      "expired": "Pelan schema.pi anda telah tamat tempoh — sila buat pembayaran pada skrin pelan schema.pi.",
+      "go": "Lihat Pelan",
+      "close": "Tutup"
+    }
   }
 }

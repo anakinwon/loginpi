@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Tài khoản này đã được liên kết.",
     "LINK_CODE_GEN_FAILED": "Không thể tạo mã liên kết. Vui lòng thử lại sau.",
     "AUTH_DB_UNAVAILABLE": "Không thể lưu tài khoản của bạn, vì vậy đăng nhập thất bại. Vui lòng thử lại sau.",
-    "LINK_TRY_LIMIT": "Quá nhiều mã liên kết không chính xác. Thử lại sau 15 phút."
+    "LINK_TRY_LIMIT": "Quá nhiều mã liên kết không chính xác. Thử lại sau 15 phút.",
+    "PLAN_REQUIRED": "Tính năng này không khả dụng với gói hiện tại của bạn. Vui lòng nâng cấp gói của bạn.",
+    "PLAN_LIMIT": "Bạn đã sử dụng hết số lần cho phép trong kỳ này. Vui lòng nâng cấp gói của bạn hoặc thử lại vào kỳ tiếp theo.",
+    "PLAN_EXPIRED": "Gói schema.pi của bạn đã hết hạn. Vui lòng thanh toán trên màn hình gói schema.pi.",
+    "PAY_PI_FAILED": "Không thể giao tiếp với máy chủ thanh toán Pi. Vui lòng thử lại sau.",
+    "PAY_MISMATCH": "Thông tin thanh toán không khớp.",
+    "PAY_AMOUNT_MISMATCH": "Số tiền thanh toán khác với ước tính.",
+    "PAY_CANCELLED": "Thanh toán đã bị hủy.",
+    "PAY_ALREADY_PAID": "Có một giao dịch thanh toán đang được xử lý. Nếu bạn đang ký trong ví, vui lòng thử lại sau 3 phút.",
+    "PAY_INVALID_STATE": "Không thể xử lý thanh toán ở trạng thái này.",
+    "PAY_PI_CANCEL_REFUSED": "Không thể hủy thanh toán vì nó đang được tiến hành. Vui lòng kiểm tra lại sau.",
+    "PAY_PAYER": "Chỉ chủ sở hữu hoặc quản trị viên kết nối mới có thể thanh toán.",
+    "PAY_SUBSCRIBED": "Khi đang đăng ký, bạn chỉ có thể thanh toán để nâng cấp hoặc gia hạn gói hiện tại.",
+    "PAY_UPGRADE": "Đây là gói không thể nâng cấp.",
+    "PAY_PRICE_CHANGED": "Trạng thái gói đã thay đổi. Vui lòng thanh toán lại.",
+    "PRICE_UNAVAILABLE": "Không thể kiểm tra tỷ giá Pi. Vui lòng thử lại sau.",
+    "QUOTE_EXPIRED": "Thời gian báo giá thanh toán đã hết. Vui lòng thanh toán lại."
   },
   "analytics": {
     "title": "Phân tích·Hồ dữ liệu",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Tiện ích mở rộng pg_stat_statements chưa được cài đặt trên DB đích",
       "TIMEOUT": "Yêu cầu đã hết thời gian",
       "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau một phút",
-      "INVALID_INPUT": "Dán toàn bộ token kết nối bắt đầu bằng slk_"
+      "INVALID_INPUT": "Dán toàn bộ token kết nối bắt đầu bằng slk_",
+      "PLAN_EXPIRED": "Gói schema.pi của bạn đã hết hạn. Vui lòng thanh toán trên màn hình gói schema.pi."
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "An toàn vận hành",
     "learn": "Học hỏi",
     "fold": "Thu gọn menu",
-    "unfold": "Mở rộng menu"
+    "unfold": "Mở rộng menu",
+    "plan": "Gói"
+  },
+  "plan": {
+    "title": "Gói",
+    "intro": "Các gói được đặt riêng cho mỗi kết nối (phân loại) schema.pi. Các kết nối mới có thể dùng thử gói DBA trong 7 ngày.",
+    "loading": "Đang tải gói…",
+    "loadFail": "Không thể tải gói. Vui lòng thử lại sau.",
+    "names": {
+      "FREE": "Miễn phí",
+      "D1": "Quan sát D1",
+      "D2": "Điều chỉnh D2",
+      "D3": "DBA D3"
+    },
+    "desc": {
+      "FREE": "Khám phá·Học hỏi",
+      "D1": "Người vận hành — kiểm tra xem cơ sở dữ liệu có ổn không",
+      "D2": "Nhà phát triển·Người điều chỉnh — Sửa SQL chậm",
+      "D3": "DBA·DA — Từ an toàn vận hành·triển khai·đến hồ dữ liệu"
+    },
+    "feat": {
+      "FREE": "Bảng điều khiển giám sát·Xem kế hoạch thực thi·Học cơ bản",
+      "D1": "Tính năng miễn phí + Thu thập hiệu suất không giới hạn·Truy vấn phân tích GAP·Học toàn bộ",
+      "D2": "Tính năng D1 + So sánh kế hoạch·Đề xuất điều chỉnh AI·Thực thi phân tích GAP",
+      "D3": "Tính năng D2 + Triển khai·Đường ống·Phân tích·An toàn vận hành"
+    },
+    "featAi": "Đề xuất điều chỉnh AI {n} lần/tháng",
+    "featClct": "Thu thập hiệu suất thủ công {n} lần/ngày",
+    "aiNone": "Không có đề xuất điều chỉnh AI",
+    "cur": "Gói hiện tại: {plan}",
+    "grace": "Dùng thử",
+    "until": "Đến {date} (còn {days} ngày)",
+    "aiLeft": "Còn {left}/{total} đề xuất điều chỉnh AI trong tháng này",
+    "clctLeft": "Còn {left}/{total} lần thu thập hiệu suất thủ công hôm nay",
+    "keep": "Giữ giá trị cũ {days} ngày",
+    "bndlOn": "Bạn đang sử dụng gói DA của cùng một phân loại schema.pi, nên bạn được giảm giá 20% trên số tiền thanh toán.",
+    "bndlOff": "Nếu bạn đang sử dụng gói DA (P4) trong cùng một phân loại schema.pi, bạn sẽ được giảm giá 20% trên số tiền thanh toán.",
+    "monthly": "Hàng tháng",
+    "yearly": "Hàng năm",
+    "freePrice": "Miễn phí",
+    "won": "{won} won",
+    "moneyKo": "{won} won ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Thanh toán {prd}",
+    "extend": "Gia hạn {prd}",
+    "upgradeTitle": "Nâng cấp",
+    "upgradeNote": "Bạn sẽ thanh toán sau khi trừ đi số ngày còn lại của gói hiện tại. Không thể chuyển từ gói hàng năm sang gói hàng tháng.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Nâng cấp",
+    "paying": "Đang thanh toán…",
+    "payStillWaiting": "Đang chờ ký ví. Sau khi ký xong, nó sẽ tự động được áp dụng.",
+    "bought": "Thanh toán đã được áp dụng.",
+    "payCancelled": "Đã hủy thanh toán.",
+    "payFailed": "Không thể hoàn tất thanh toán. Vui lòng thử lại sau.",
+    "piBrowserOnly": "Bạn có thể thanh toán sau khi đăng nhập Pi trong Pi Browser.",
+    "payNote": "Thanh toán chỉ bằng Pi. Won Hàn Quốc là số tiền tham khảo và bạn sẽ nhận được số tiền Pi được quy đổi theo tỷ giá Pi tại thời điểm thanh toán.",
+    "from": "Từ {plan}",
+    "notice": {
+      "required": "Tính năng này khả dụng từ gói {plan}.",
+      "limit": "Bạn đã sử dụng hết số lần cho phép trong kỳ này. Bạn có thể sử dụng thêm nếu nâng cấp lên gói {plan}.",
+      "limitTop": "Bạn đã sử dụng hết số lần cho phép trong kỳ này. Bạn có thể sử dụng lại vào kỳ tiếp theo.",
+      "expired": "Gói schema.pi đã hết hạn — vui lòng thanh toán trên màn hình gói schema.pi.",
+      "go": "Xem gói",
+      "close": "Đóng"
+    }
   }
 }

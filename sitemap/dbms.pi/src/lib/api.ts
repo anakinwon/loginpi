@@ -25,6 +25,24 @@ export const apiError = createApiError({
     '연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요',
   LINK_TRY_LIMIT:
     '연동 코드를 여러 번 틀렸습니다. 15분 뒤에 다시 시도하세요',
+  // 요금제(sql/035, src/lib/plan-rules.ts) — 화면 PlanNotice 가 요금제 링크와 함께 안내
+  PLAN_REQUIRED: '현재 요금제에서 쓸 수 없는 기능입니다. 요금제를 올려 주세요',
+  PLAN_LIMIT: '이번 기간 사용 횟수를 모두 썼습니다. 요금제를 올리거나 다음 기간에 다시 시도하세요',
+  PLAN_EXPIRED: 'schema.pi 요금제가 만료되었습니다. schema.pi 요금제 화면에서 결제하세요',
+  // 결제(@pi/payments PayFail·DBM_PLAN 검증기 매핑, plan-rules payErrorCode)
+  PAY_PI_FAILED: 'Pi 결제 서버와 통신하지 못했습니다. 잠시 후 다시 시도하세요',
+  PAY_MISMATCH: '결제 정보가 일치하지 않습니다',
+  PAY_AMOUNT_MISMATCH: '결제 금액이 견적과 다릅니다',
+  PAY_CANCELLED: '취소된 결제입니다',
+  PAY_ALREADY_PAID: '처리 중인 결제가 있습니다. 지갑에서 서명 중이었다면 3분 뒤 다시 시도하세요',
+  PAY_INVALID_STATE: '결제를 처리할 수 없는 상태입니다',
+  PAY_PI_CANCEL_REFUSED: '결제가 이미 진행 중이라 취소할 수 없습니다. 잠시 후 다시 확인하세요',
+  PAY_PAYER: '연결 소유자 또는 관리자만 결제할 수 있습니다',
+  PAY_SUBSCRIBED: '구독 중에는 업그레이드나 현재 요금제 기간 연장만 결제할 수 있습니다',
+  PAY_UPGRADE: '업그레이드할 수 없는 요금제입니다',
+  PAY_PRICE_CHANGED: '요금제 상태가 바뀌었습니다. 다시 결제하세요',
+  PRICE_UNAVAILABLE: 'Pi 시세를 확인하지 못했습니다. 잠시 후 다시 시도하세요',
+  QUOTE_EXPIRED: '결제 견적 시간이 지났습니다. 다시 결제하세요',
 })
 
 export const db = () => getSupabaseAdmin()

@@ -13,12 +13,20 @@ export type ApiResult<T> =
   | { ok: true; data: T }
   | { ok: false; status: number; body: ApiErrorBody }
 
+// 요금제 안내 이벤트 — readApi 가 403 PLAN_REQUIRED·PLAN_LIMIT·PLAN_EXPIRED 를 받으면 보낸다(src/components/plan/plan-notice.tsx 가 받음)
+export const PLAN_EVENT = 'dbms:plan'
+export type PlanEvent = { code: string; need: string | null }
+const PLAN_CODES = new Set(['PLAN_REQUIRED', 'PLAN_LIMIT', 'PLAN_EXPIRED'])
+
 export async function readApi<T>(
   res: Promise<Response>,
 ): Promise<ApiResult<T>> {
   try {
     const r = await res
     const body = (await r.json().catch(() => ({}))) as T & ApiErrorBody
+    // 요금제 잠김·한도·schema.pi 요금제 만료 — 화면 공통 안내(PlanNotice)로 알림. 각 화면의 오류 문구 처리는 그대로(redirect 없음)
+    if (!r.ok && body.code && PLAN_CODES.has(body.code))
+      window.dispatchEvent(new CustomEvent<PlanEvent>(PLAN_EVENT, { detail: { code: body.code, need: (body as { need?: string | null }).need ?? null } }))
     return r.ok
       ? { ok: true, data: body }
       : { ok: false, status: r.status, body }

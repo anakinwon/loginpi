@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Bu hesap zaten bağlı.",
     "LINK_CODE_GEN_FAILED": "Bağlantı kodu oluşturulamadı. Lütfen daha sonra tekrar deneyin.",
     "AUTH_DB_UNAVAILABLE": "Hesabınız kaydedilemedi, bu yüzden oturum açma başarısız oldu. Lütfen daha sonra tekrar deneyin.",
-    "LINK_TRY_LIMIT": "Çok fazla yanlış bağlantı kodu. 15 dakika sonra tekrar deneyin."
+    "LINK_TRY_LIMIT": "Çok fazla yanlış bağlantı kodu. 15 dakika sonra tekrar deneyin.",
+    "PLAN_REQUIRED": "Bu özellik mevcut planınızla kullanılamaz. Lütfen planınızı yükseltin.",
+    "PLAN_LIMIT": "Bu dönem için tüm kullanım haklarınızı kullandınız. Lütfen planınızı yükseltin veya bir sonraki dönemde tekrar deneyin.",
+    "PLAN_EXPIRED": "schema.pi planınızın süresi doldu. Lütfen schema.pi plan ekranından ödeme yapın.",
+    "PAY_PI_FAILED": "Pi ödeme sunucusuyla iletişim kurulamadı. Lütfen kısa süre sonra tekrar deneyin.",
+    "PAY_MISMATCH": "Ödeme bilgileri eşleşmiyor.",
+    "PAY_AMOUNT_MISMATCH": "Ödeme tutarı tahminden farklı.",
+    "PAY_CANCELLED": "Ödeme iptal edildi.",
+    "PAY_ALREADY_PAID": "Devam eden bir ödeme var. Cüzdanınızda imzalama yapıyorsanız, lütfen 3 dakika sonra tekrar deneyin.",
+    "PAY_INVALID_STATE": "Ödeme mevcut durumunda işlenemiyor.",
+    "PAY_PI_CANCEL_REFUSED": "Ödeme zaten devam ediyor ve iptal edilemez. Lütfen kısa süre sonra tekrar kontrol edin.",
+    "PAY_PAYER": "Yalnızca bağlantı sahibi veya yönetici ödeme yapabilir.",
+    "PAY_SUBSCRIBED": "Abone olduğunuzda, yalnızca mevcut plan sürenizin yükseltmeleri veya uzatmaları için ödeme yapabilirsiniz.",
+    "PAY_UPGRADE": "Bu plan yükseltilemez.",
+    "PAY_PRICE_CHANGED": "Plan durumu değişti. Lütfen ödemeyi tekrar yapın.",
+    "PRICE_UNAVAILABLE": "Pi döviz kurunu kontrol edemedi. Lütfen kısa süre sonra tekrar deneyin.",
+    "QUOTE_EXPIRED": "Ödeme teklifinin süresi doldu. Lütfen ödemeyi tekrar yapın."
   },
   "analytics": {
     "title": "Analiz ve Göl",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Hedef DB'de pg_stat_statements uzantısı yüklü değil",
       "TIMEOUT": "İstek zaman aşımına uğradı",
       "RATE": "Çok fazla istek var. Lütfen bir dakika sonra tekrar deneyin",
-      "INVALID_INPUT": "slk_ ile başlayan bağlantı belirtecinin tamamını yapıştırın"
+      "INVALID_INPUT": "slk_ ile başlayan bağlantı belirtecinin tamamını yapıştırın",
+      "PLAN_EXPIRED": "schema.pi planınızın süresi doldu. Lütfen schema.pi plan ekranından ödeme yapın."
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "Operasyon Güvenliği",
     "learn": "Öğren",
     "fold": "Menüyü daralt",
-    "unfold": "Menüyü genişlet"
+    "unfold": "Menüyü genişlet",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Planlar, her bir schema.pi bağlantısı (taksonomi) için ayrı ayrı belirlenir. Yeni bağlantılar 7 gün boyunca DBA planını deneyimleyebilir.",
+    "loading": "Plan yükleniyor…",
+    "loadFail": "Plan yüklenemedi. Lütfen kısa süre sonra tekrar deneyin.",
+    "names": {
+      "FREE": "Ücretsiz",
+      "D1": "D1 Gözlem",
+      "D2": "D2 Ayarlama",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Keşfet ve Öğren",
+      "D1": "Operatör — Veritabanının şu anda iyi durumda olup olmadığını kontrol eder",
+      "D2": "Geliştirici ve Ayarlayıcı — Yavaş SQL'i düzeltir",
+      "D3": "DBA ve DA — Operasyonel güvenlikten uygulamaya ve göle kadar"
+    },
+    "feat": {
+      "FREE": "İzleme panosu, yürütme planı görünümü, temel öğrenme",
+      "D1": "Ücretsiz özellikler + sınırsız performans toplama, GAP analizi sorgusu, tam öğrenme",
+      "D2": "D1 özellikleri + plan karşılaştırması, AI ayarlama önerileri, GAP analizi yürütme",
+      "D3": "D2 özellikleri + uygulama, boru hattı, analiz, operasyonel güvenlik"
+    },
+    "featAi": "AI ayarlama önerileri ayda {n} kez",
+    "featClct": "Manuel performans toplama günde {n} kez",
+    "aiNone": "AI ayarlama önerisi yok",
+    "cur": "Mevcut plan: {plan}",
+    "grace": "Deneme",
+    "until": "{date} tarihine kadar ({days} gün kaldı)",
+    "aiLeft": "Bu ay {left}/{total} AI ayarlama önerisi kaldı",
+    "clctLeft": "Bugün {left}/{total} manuel performans toplama kaldı",
+    "keep": "Geçmiş değerleri {days} gün sakla",
+    "bndlOn": "schema.pi ile aynı taksonomi için bir DA planı kullandığınızdan, ödemenizde %20 indirim alırsınız.",
+    "bndlOff": "schema.pi ile aynı taksonomi için bir DA planı (P4) kullanırsanız, ödemenizde %20 indirim alırsınız.",
+    "monthly": "Aylık",
+    "yearly": "Yıllık",
+    "freePrice": "Ücretsiz",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "{prd} için öde",
+    "extend": "{prd} süresini uzat",
+    "upgradeTitle": "Yükselt",
+    "upgradeNote": "Mevcut planınızın kalan günleri ödemeden düşülecektir. Yıllık plandan aylık plana geçiş yapamazsınız.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Yükselt",
+    "paying": "Ödeniyor…",
+    "payStillWaiting": "Cüzdan imzası bekleniyor. İmzalandıktan sonra otomatik olarak uygulanacaktır.",
+    "bought": "Ödeme yansıdı.",
+    "payCancelled": "Ödeme iptal edildi.",
+    "payFailed": "Ödeme başarısız oldu. Lütfen kısa süre sonra tekrar deneyin.",
+    "piBrowserOnly": "Ödeme, Pi Browser'da Pi ile giriş yaptıktan sonra yapılabilir.",
+    "payNote": "Ödeme yalnızca Pi ile yapılır. KRW tutarı referans içindir ve ödeme anındaki gerçek zamanlı Pi döviz kurundan dönüştürülen Pi tutarı alınacaktır.",
+    "from": "{plan} planından",
+    "notice": {
+      "required": "Bu özellik {plan} planından itibaren kullanılabilir.",
+      "limit": "Bu dönem için tüm kullanım haklarınızı kullandınız. {plan} planına yükselterek daha fazla kullanabilirsiniz.",
+      "limitTop": "Bu dönem için tüm kullanım haklarınızı kullandınız. Bir sonraki dönemde tekrar kullanabilirsiniz.",
+      "expired": "schema.pi planınızın süresi doldu — lütfen schema.pi plan ekranından ödeme yapın.",
+      "go": "Planı Görüntüle",
+      "close": "Kapat"
+    }
   }
 }

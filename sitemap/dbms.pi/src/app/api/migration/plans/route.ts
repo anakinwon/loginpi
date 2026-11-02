@@ -15,7 +15,7 @@ export const GET = withGuard(
     const linkId = sp.get('link') ?? ''
     if (!linkId) return apiError('INVALID_INPUT', 400)
     const page = Math.max(1, Math.min(1000, Number(sp.get('page')) || 1))
-    const ctx = await requireLink(req, linkId)
+    const ctx = await requireLink(req, linkId, 'LAKE')
     if (ctx instanceof Response) return ctx as NextResponse
 
     const from = (page - 1) * PAGE_SIZE
@@ -43,7 +43,7 @@ export const POST = withGuard(
   dbRoute(async (req) => {
     const body = await parseBody(req, Body)
     if (body instanceof NextResponse) return body
-    const ctx = await requireLink(req, body.link)
+    const ctx = await requireLink(req, body.link, 'LAKE')
     if (ctx instanceof Response) return ctx as NextResponse
 
     let model: ModelRes

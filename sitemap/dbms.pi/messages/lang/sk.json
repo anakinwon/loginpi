@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Tento účet je už prepojený.",
     "LINK_CODE_GEN_FAILED": "Nepodarilo sa vytvoriť prepojovací kód. Skúste to znova neskôr.",
     "AUTH_DB_UNAVAILABLE": "Nepodarilo sa uložiť váš účet, takže prihlásenie zlyhalo. Skúste to znova neskôr.",
-    "LINK_TRY_LIMIT": "Príliš veľa nesprávnych prepojovacích kódov. Skúste to znova o 15 minút."
+    "LINK_TRY_LIMIT": "Príliš veľa nesprávnych prepojovacích kódov. Skúste to znova o 15 minút.",
+    "PLAN_REQUIRED": "Táto funkcia nie je dostupná s vaším aktuálnym plánom. Inovujte svoj plán.",
+    "PLAN_LIMIT": "Využili ste všetky dostupné pokusy pre toto obdobie. Inovujte svoj plán alebo to skúste znova v ďalšom období.",
+    "PLAN_EXPIRED": "Váš plán schema.pi vypršal. Uskutočnite platbu na obrazovke plánu schema.pi.",
+    "PAY_PI_FAILED": "Nepodarilo sa komunikovať s platobným serverom Pi. Skúste to znova o chvíľu.",
+    "PAY_MISMATCH": "Informácie o platbe sa nezhodujú.",
+    "PAY_AMOUNT_MISMATCH": "Suma platby sa líši od odhadu.",
+    "PAY_CANCELLED": "Platba zrušená.",
+    "PAY_ALREADY_PAID": "Prebieha platba. Ak ste sa prihlasovali do svojej peňaženky, skúste to znova o 3 minúty.",
+    "PAY_INVALID_STATE": "Platbu nie je možné spracovať v jej aktuálnom stave.",
+    "PAY_PI_CANCEL_REFUSED": "Platba už prebieha a nedá sa zrušiť. Skontrolujte to znova o chvíľu.",
+    "PAY_PAYER": "Platby môže vykonávať iba vlastník pripojenia alebo administrátor.",
+    "PAY_SUBSCRIBED": "Počas predplatného môžete platiť iba za inovácie alebo predĺženie aktuálneho obdobia plánu.",
+    "PAY_UPGRADE": "Tento plán nie je možné inovovať.",
+    "PAY_PRICE_CHANGED": "Stav plánu sa zmenil. Uskutočnite platbu znova.",
+    "PRICE_UNAVAILABLE": "Nepodarilo sa skontrolovať výmenný kurz Pi. Skúste to znova o chvíľu.",
+    "QUOTE_EXPIRED": "Platobná ponuka vypršala. Uskutočnite platbu znova."
   },
   "analytics": {
     "title": "Analytika a jazero",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Rozšírenie pg_stat_statements nie je nainštalované na cieľovej DB",
       "TIMEOUT": "Požiadavka vypršala",
       "RATE": "Príliš veľa požiadaviek. Skúste to znova o minútu",
-      "INVALID_INPUT": "Vložte celý token pripojenia začínajúci na slk_"
+      "INVALID_INPUT": "Vložte celý token pripojenia začínajúci na slk_",
+      "PLAN_EXPIRED": "Váš plán schema.pi vypršal. Uskutočnite platbu na obrazovke plánu schema.pi."
     }
   },
   "migration": {
@@ -1411,6 +1428,70 @@
     "ops": "Prevádzková bezpečnosť",
     "learn": "Učiť sa",
     "fold": "Zbaliť menu",
-    "unfold": "Rozbaliť menu"
+    "unfold": "Rozbaliť menu",
+    "plan": "Plán"
+  },
+  "plan": {
+    "title": "Plán",
+    "intro": "Plány sa nastavujú samostatne pre každé pripojenie schema.pi (taxonómiu). Nové pripojenia môžu vyskúšať plán DBA na 7 dní.",
+    "loading": "Načítava sa plán…",
+    "loadFail": "Nepodarilo sa načítať plán. Skúste to znova o chvíľu.",
+    "names": {
+      "FREE": "Zadarmo",
+      "D1": "D1 Pozorovanie",
+      "D2": "D2 Ladenie",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Preskúmať a učiť sa",
+      "D1": "Operátor – Skontroluje, či je databáza v poriadku",
+      "D2": "Vývojár a ladič – Opravuje pomalé SQL",
+      "D3": "DBA a DA – Od prevádzkovej bezpečnosti po implementáciu a lake"
+    },
+    "feat": {
+      "FREE": "Monitorovací panel, zobrazenie plánu vykonávania, základné učenie",
+      "D1": "Bezplatné funkcie + neobmedzené zhromažďovanie výkonu, dotaz na analýzu GAP, úplné učenie",
+      "D2": "Funkcie D1 + porovnanie plánov, odporúčania AI ladenia, vykonanie analýzy GAP",
+      "D3": "Funkcie D2 + implementácia, pipeline, analýza, prevádzková bezpečnosť"
+    },
+    "featAi": "Odporúčania AI ladenia {n} krát/mesiac",
+    "featClct": "Manuálne zhromažďovanie výkonu {n} krát/deň",
+    "aiNone": "Žiadne odporúčania AI ladenia",
+    "cur": "Aktuálny plán: {plan}",
+    "grace": "Skúšobná verzia",
+    "until": "Do {date} (zostáva {days} dní)",
+    "aiLeft": "Zostáva {left}/{total} odporúčaní AI ladenia tento mesiac",
+    "clctLeft": "Zostáva {left}/{total} manuálnych zhromažďovaní výkonu dnes",
+    "keep": "Uchovať minulé hodnoty {days} dní",
+    "bndlOn": "Používate plán DA pre rovnakú taxonómiu ako schema.pi, takže získate 20% zľavu na platbu.",
+    "bndlOff": "Ak používate plán DA (P4) pre rovnakú taxonómiu ako schema.pi, získate 20% zľavu na platbu.",
+    "monthly": "Mesačne",
+    "yearly": "Ročne",
+    "freePrice": "Zadarmo",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Zaplaťte za {prd}",
+    "extend": "Predĺžiť obdobie {prd}",
+    "upgradeTitle": "Inovovať",
+    "upgradeNote": "Z platby sa odpočíta zostávajúci počet dní vášho aktuálneho plánu. Nemôžete prejsť z ročného na mesačný.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Inovovať",
+    "paying": "Platí sa…",
+    "payStillWaiting": "Čaká sa na podpis peňaženky. Po podpise sa automaticky uplatní.",
+    "bought": "Platba sa prejavila.",
+    "payCancelled": "Platba zrušená.",
+    "payFailed": "Platba zlyhala. Skúste to znova o chvíľu.",
+    "piBrowserOnly": "Platbu je možné uskutočniť po prihlásení do Pi Browser s Pi.",
+    "payNote": "Platba sa uskutočňuje iba pomocou Pi. Suma v KRW je referenčná a bude prijatá suma Pi prepočítaná aktuálnym výmenným kurzom Pi v čase platby.",
+    "from": "Od {plan}",
+    "notice": {
+      "required": "Táto funkcia je dostupná od plánu {plan}.",
+      "limit": "Využili ste všetky dostupné pokusy pre toto obdobie. Viac môžete použiť inováciou na plán {plan}.",
+      "limitTop": "Využili ste všetky dostupné pokusy pre toto obdobie. Môžete to použiť znova v ďalšom období.",
+      "expired": "Váš plán schema.pi vypršal – uskutočnite platbu na obrazovke plánu schema.pi.",
+      "go": "Zobraziť plán",
+      "close": "Zavrieť"
+    }
   }
 }

@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Aquest compte ja està enllaçat.",
     "LINK_CODE_GEN_FAILED": "No s'ha pogut crear un codi d'enllaç. Torna-ho a provar més tard.",
     "AUTH_DB_UNAVAILABLE": "No s'ha pogut desar el teu compte, per la qual cosa l'inici de sessió ha fallat. Torna-ho a provar més tard.",
-    "LINK_TRY_LIMIT": "Massa codis d'enllaç incorrectes. Torna-ho a provar d'aquí a 15 minuts."
+    "LINK_TRY_LIMIT": "Massa codis d'enllaç incorrectes. Torna-ho a provar d'aquí a 15 minuts.",
+    "PLAN_REQUIRED": "Aquesta funció no està disponible amb el vostre pla actual. Actualitzeu el vostre pla.",
+    "PLAN_LIMIT": "Heu utilitzat tots els intents disponibles per a aquest període. Actualitzeu el vostre pla o torneu-ho a provar el pròxim període.",
+    "PLAN_EXPIRED": "El vostre pla de schema.pi ha caducat. Feu un pagament a la pantalla del pla de schema.pi.",
+    "PAY_PI_FAILED": "No s'ha pogut comunicar amb el servidor de pagament de Pi. Torneu-ho a provar en breu.",
+    "PAY_MISMATCH": "La informació de pagament no coincideix.",
+    "PAY_AMOUNT_MISMATCH": "L'import del pagament difereix de l'estimació.",
+    "PAY_CANCELLED": "Pagament cancel·lat.",
+    "PAY_ALREADY_PAID": "Hi ha un pagament en curs. Si estaveu iniciant sessió a la vostra cartera, torneu-ho a provar en 3 minuts.",
+    "PAY_INVALID_STATE": "El pagament no es pot processar en el seu estat actual.",
+    "PAY_PI_CANCEL_REFUSED": "El pagament ja està en curs i no es pot cancel·lar. Torneu-ho a comprovar en breu.",
+    "PAY_PAYER": "Només el propietari de la connexió o l'administrador poden fer pagaments.",
+    "PAY_SUBSCRIBED": "Mentre estigueu subscrits, només podeu pagar per actualitzacions o extensions del vostre període de pla actual.",
+    "PAY_UPGRADE": "Aquest pla no es pot actualitzar.",
+    "PAY_PRICE_CHANGED": "L'estat del pla ha canviat. Torneu a fer el pagament.",
+    "PRICE_UNAVAILABLE": "No s'ha pogut comprovar el tipus de canvi de Pi. Torneu-ho a provar en breu.",
+    "QUOTE_EXPIRED": "La cotització del pagament ha caducat. Torneu a fer el pagament."
   },
   "analytics": {
     "title": "Analítiques i Llac",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "L'extensió pg_stat_statements no està instal·lada a la DB de destí",
       "TIMEOUT": "La sol·licitud ha caducat",
       "RATE": "Massa sol·licituds. Torna-ho a provar d'aquí a un minut",
-      "INVALID_INPUT": "Enganxa el testimoni de connexió complet que comença per slk_"
+      "INVALID_INPUT": "Enganxa el testimoni de connexió complet que comença per slk_",
+      "PLAN_EXPIRED": "El vostre pla de schema.pi ha caducat. Feu un pagament a la pantalla del pla de schema.pi."
     }
   },
   "migration": {
@@ -1410,6 +1427,70 @@
     "ops": "Seguretat d'operacions",
     "learn": "Aprèn",
     "fold": "Redueix el menú",
-    "unfold": "Expandeix el menú"
+    "unfold": "Expandeix el menú",
+    "plan": "Pla"
+  },
+  "plan": {
+    "title": "Pla",
+    "intro": "Els plans s'estableixen per separat per a cada connexió (taxonomia) de schema.pi. Les noves connexions poden experimentar el pla DBA durant 7 dies.",
+    "loading": "S'està carregant el pla…",
+    "loadFail": "No s'ha pogut carregar el pla. Torneu-ho a provar en breu.",
+    "names": {
+      "FREE": "Gratuït",
+      "D1": "D1 Observació",
+      "D2": "D2 Ajust",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Explorar i aprendre",
+      "D1": "Operador — Comprova si la base de dades està bé ara",
+      "D2": "Desenvolupador i ajustador — Corregeix SQL lent",
+      "D3": "DBA i DA — Des de la seguretat operativa fins a la implementació i el llac"
+    },
+    "feat": {
+      "FREE": "Tauler de monitorització, vista del pla d'execució, aprenentatge bàsic",
+      "D1": "Funcions gratuïtes + recollida de rendiment il·limitada, consulta d'anàlisi GAP, aprenentatge complet",
+      "D2": "Funcions D1 + comparació de plans, recomanacions d'ajust d'IA, execució d'anàlisi GAP",
+      "D3": "Funcions D2 + implementació, pipeline, anàlisi, seguretat operativa"
+    },
+    "featAi": "Recomanacions d'ajust d'IA {n} vegades/mes",
+    "featClct": "Recollida manual de rendiment {n} vegades/dia",
+    "aiNone": "Sense recomanacions d'ajust d'IA",
+    "cur": "Pla actual: {plan}",
+    "grace": "Prova",
+    "until": "Fins al {date} (queden {days} dies)",
+    "aiLeft": "Queden {left}/{total} recomanacions d'ajust d'IA aquest mes",
+    "clctLeft": "Queden {left}/{total} recollides manuals de rendiment avui",
+    "keep": "Conservar valors anteriors durant {days} dies",
+    "bndlOn": "Esteu utilitzant un pla DA per a la mateixa taxonomia que schema.pi, de manera que obteniu un 20% de descompte en el vostre pagament.",
+    "bndlOff": "Si utilitzeu un pla DA (P4) per a la mateixa taxonomia que schema.pi, obteniu un 20% de descompte en el vostre pagament.",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "freePrice": "Gratuït",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Pagar per {prd}",
+    "extend": "Ampliar el període de {prd}",
+    "upgradeTitle": "Actualitzar",
+    "upgradeNote": "Els dies restants del vostre pla actual es deduiran del pagament. No podeu canviar d'anual a mensual.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Actualitzar",
+    "paying": "Pagant…",
+    "payStillWaiting": "Esperant la signatura de la cartera. S'aplicarà automàticament un cop signat.",
+    "bought": "Pagament reflectit.",
+    "payCancelled": "Pagament cancel·lat.",
+    "payFailed": "El pagament ha fallat. Torneu-ho a provar en breu.",
+    "piBrowserOnly": "El pagament es pot fer després d'iniciar sessió a Pi Browser amb Pi.",
+    "payNote": "El pagament es fa només amb Pi. L'import en KRW és de referència, i es rebrà l'import en Pi convertit al tipus de canvi de Pi en temps real en el moment del pagament.",
+    "from": "Des de {plan}",
+    "notice": {
+      "required": "Aquesta funció està disponible a partir del pla {plan}.",
+      "limit": "Heu utilitzat tots els intents disponibles per a aquest període. Podeu utilitzar-ne més actualitzant al pla {plan}.",
+      "limitTop": "Heu utilitzat tots els intents disponibles per a aquest període. Podeu tornar a utilitzar-lo el pròxim període.",
+      "expired": "El vostre pla de schema.pi ha caducat — feu un pagament a la pantalla del pla de schema.pi.",
+      "go": "Veure pla",
+      "close": "Tancar"
+    }
   }
 }

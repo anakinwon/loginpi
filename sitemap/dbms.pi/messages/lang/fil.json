@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Naka-link na ang account na ito.",
     "LINK_CODE_GEN_FAILED": "Hindi makagawa ng link code. Pakisubukang muli mamaya.",
     "AUTH_DB_UNAVAILABLE": "Hindi ma-save ang iyong account, kaya nabigo ang pag-sign in. Pakisubukang muli mamaya.",
-    "LINK_TRY_LIMIT": "Masyadong maraming maling link code. Subukang muli sa loob ng 15 minuto."
+    "LINK_TRY_LIMIT": "Masyadong maraming maling link code. Subukang muli sa loob ng 15 minuto.",
+    "PLAN_REQUIRED": "Hindi magagamit ang feature na ito sa kasalukuyang plan. Mangyaring i-upgrade ang iyong plan.",
+    "PLAN_LIMIT": "Naubos mo na ang lahat ng paggamit para sa panahong ito. Mangyaring i-upgrade ang iyong plan o subukang muli sa susunod na panahon.",
+    "PLAN_EXPIRED": "Nag-expire ang iyong schema.pi plan. Mangyaring magbayad sa screen ng schema.pi plan.",
+    "PAY_PI_FAILED": "Hindi makakonekta sa Pi payment server. Mangyaring subukang muli pagkalipas ng ilang sandali.",
+    "PAY_MISMATCH": "Hindi tugma ang impormasyon sa pagbabayad.",
+    "PAY_AMOUNT_MISMATCH": "Iba ang halaga ng bayad sa quote.",
+    "PAY_CANCELLED": "Kinansela ang pagbabayad.",
+    "PAY_ALREADY_PAID": "May nakabinbing pagbabayad. Kung nag-sign ka sa wallet, subukang muli pagkalipas ng 3 minuto.",
+    "PAY_INVALID_STATE": "Hindi maproseso ang pagbabayad dahil sa hindi wastong estado.",
+    "PAY_PI_CANCEL_REFUSED": "Hindi makakansela ang pagbabayad dahil ito ay kasalukuyan nang pinoproseso. Mangyaring suriin muli pagkalipas ng ilang sandali.",
+    "PAY_PAYER": "Ang may-ari ng koneksyon o administrator lang ang makakapagbayad.",
+    "PAY_SUBSCRIBED": "Sa panahon ng subscription, maaari ka lang magbayad para sa pag-upgrade o pagpapalawig ng kasalukuyang panahon ng plan.",
+    "PAY_UPGRADE": "Hindi ito isang plan na maaaring i-upgrade.",
+    "PAY_PRICE_CHANGED": "Nagbago ang status ng plan. Mangyaring magbayad muli.",
+    "PRICE_UNAVAILABLE": "Hindi makumpirma ang presyo ng Pi. Mangyaring subukang muli pagkalipas ng ilang sandali.",
+    "QUOTE_EXPIRED": "Nag-expire ang quote ng pagbabayad. Mangyaring magbayad muli."
   },
   "analytics": {
     "title": "Analytics at Lake",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Hindi naka-install ang pg_stat_statements extension sa target na DB",
       "TIMEOUT": "Nag-timeout ang kahilingan",
       "RATE": "Masyadong maraming kahilingan. Pakisubukang muli sa isang minuto",
-      "INVALID_INPUT": "Idikit ang buong connection token na nagsisimula sa slk_"
+      "INVALID_INPUT": "Idikit ang buong connection token na nagsisimula sa slk_",
+      "PLAN_EXPIRED": "Nag-expire ang iyong schema.pi plan. Mangyaring magbayad sa screen ng schema.pi plan."
     }
   },
   "migration": {
@@ -1412,6 +1429,70 @@
     "ops": "Kaligtasan ng Ops",
     "learn": "Matuto",
     "fold": "I-collapse ang menu",
-    "unfold": "Palawakin ang menu"
+    "unfold": "Palawakin ang menu",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Ang plan ay itinakda nang hiwalay para sa bawat schema.pi na koneksyon (taxonomy). Ang mga bagong koneksyon ay maaaring makaranas ng DBA plan sa loob ng 7 araw.",
+    "loading": "Naglo-load ng plan…",
+    "loadFail": "Hindi ma-load ang plan. Mangyaring subukang muli pagkalipas ng ilang sandali.",
+    "names": {
+      "FREE": "Libre",
+      "D1": "D1 Pagmamasid",
+      "D2": "D2 Pag-tune",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Paggalugad·Pag-aaral",
+      "D1": "Operator — Sinusuri kung maayos ang database ngayon",
+      "D2": "Developer·Tuner — Inaayos ang mabagal na SQL",
+      "D3": "DBA·DA — Mula sa kaligtasan ng operasyon·pagpapatupad·lake"
+    },
+    "feat": {
+      "FREE": "Monitoring board·Tingnan ang execution plan·Pangunahing pag-aaral",
+      "D1": "Libreng feature + Walang limitasyong pagkolekta ng performance·Pagtatanong sa GAP analysis·Buong pag-aaral",
+      "D2": "D1 feature + Paghahambing ng plan·Rekomendasyon sa AI tuning·Pagsasagawa ng GAP analysis",
+      "D3": "D2 feature + Pagpapatupad·Pipeline·Pagsusuri·Kaligtasan ng operasyon"
+    },
+    "featAi": "Rekomendasyon sa AI tuning {n} beses bawat buwan",
+    "featClct": "Manu-manong pagkolekta ng performance {n} beses bawat araw",
+    "aiNone": "Walang rekomendasyon sa AI tuning",
+    "cur": "Kasalukuyang plan: {plan}",
+    "grace": "Trial",
+    "until": "Hanggang {date} ({days} araw na lang)",
+    "aiLeft": "{left}/{total} na rekomendasyon sa AI tuning ang natitira ngayong buwan",
+    "clctLeft": "{left}/{total} na manu-manong pagkolekta ng performance ang natitira ngayon",
+    "keep": "Panatilihin ang nakaraang halaga sa loob ng {days} araw",
+    "bndlOn": "Mayroon kang DA plan para sa parehong taxonomy tulad ng schema.pi, kaya 20% diskwento ang halaga ng pagbabayad.",
+    "bndlOff": "Kung gumagamit ka ng DA plan (P4) sa parehong taxonomy tulad ng schema.pi, makakakuha ka ng 20% diskwento sa halaga ng pagbabayad.",
+    "monthly": "Buwanan",
+    "yearly": "Taunan",
+    "freePrice": "Libre",
+    "won": "{won} won",
+    "moneyKo": "{won} won ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Pagbabayad para sa {prd}",
+    "extend": "Pagpapalawig ng panahon para sa {prd}",
+    "upgradeTitle": "I-upgrade",
+    "upgradeNote": "Ibawas ang natitirang araw ng kasalukuyang plan at magbayad. Hindi maaaring magpalit mula taunan patungong buwanan.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "I-upgrade",
+    "paying": "Nagbabayad…",
+    "payStillWaiting": "Naghihintay ng lagda sa wallet. Awtomatiko itong ipapakita kapag natapos ang lagda.",
+    "bought": "Naipakita na ang pagbabayad.",
+    "payCancelled": "Kinansela ang pagbabayad.",
+    "payFailed": "Hindi natapos ang pagbabayad. Mangyaring subukang muli pagkalipas ng ilang sandali.",
+    "piBrowserOnly": "Maaari kang magbayad pagkatapos mag-log in sa Pi Browser gamit ang Pi.",
+    "payNote": "Sa Pi lang ang pagbabayad. Ang Korean Won ay isang reference na halaga, at ang halaga ng Pi na na-convert sa kasalukuyang presyo ng Pi sa oras ng pagbabayad ay tatanggapin.",
+    "from": "Mula {plan}",
+    "notice": {
+      "required": "Ang feature na ito ay magagamit mula sa {plan} plan.",
+      "limit": "Naubos mo na ang lahat ng paggamit para sa panahong ito. Maaari kang gumamit ng higit pa kung mag-a-upgrade ka sa {plan} plan.",
+      "limitTop": "Naubos mo na ang lahat ng paggamit para sa panahong ito. Maaari mo itong gamitin muli sa susunod na panahon.",
+      "expired": "Nag-expire ang iyong schema.pi plan — mangyaring magbayad sa screen ng schema.pi plan.",
+      "go": "Tingnan ang Plan",
+      "close": "Isara"
+    }
   }
 }

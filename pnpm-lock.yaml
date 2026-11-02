@@ -249,6 +249,9 @@ importers:
       '@pi/i18n':
         specifier: workspace:*
         version: link:../../packages/pi-i18n
+      '@pi/payments':
+        specifier: workspace:*
+        version: link:../../packages/pi-payments
       '@pi/warp':
         specifier: workspace:*
         version: link:../../packages/pi-warp

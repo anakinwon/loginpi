@@ -10,7 +10,7 @@ export const GET = withGuard(
   dbRoute(async (req) => {
     const linkId = req.nextUrl.searchParams.get('link') ?? ''
     if (!linkId) return apiError('INVALID_INPUT', 400)
-    const ctx = await requireLink(req, linkId)
+    const ctx = await requireLink(req, linkId, 'LAKE')
     if (ctx instanceof Response) return ctx as NextResponse
     try {
       const projects = await linkGet<Project[]>(ctx.linkId, '/projects')

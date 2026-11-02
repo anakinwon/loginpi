@@ -26,7 +26,7 @@ export const GET = withGuard(
     if (!linkId) return apiError('INVALID_INPUT', 400)
     const page = Math.max(1, Number(sp.get('page')) || 1)
     const hash = sp.get('hash')
-    const link = await resolveLink(req, linkId)
+    const link = await resolveLink(req, linkId, 'ANY')
     if (link instanceof NextResponse) return link
     // 다음 쪽 유무는 1건 더 읽어 판단(정확 건수 미사용 — R-P3)
     let q = db()
@@ -51,7 +51,7 @@ export const POST = withGuard(
     if (!plan) return apiError('INVALID_INPUT', 400)
     const masked = maskPlan(plan)
     if (JSON.stringify(masked).length > MAX_PLAN_BYTES) return NextResponse.json({ error: 'PAYLOAD_TOO_LARGE', code: 'PAYLOAD_TOO_LARGE' }, { status: 413 })
-    const ok = await requireUserLink(req, body.linkId)
+    const ok = await requireUserLink(req, body.linkId, 'SQL_TUNE')
     if (ok instanceof NextResponse) return ok
     const { data, error } = await db()
       .from('dbm_sql_plan')

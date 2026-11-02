@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Akaunti hii tayari imeunganishwa.",
     "LINK_CODE_GEN_FAILED": "Imeshindwa kuunda msimbo wa kuunganisha. Tafadhali jaribu tena baadaye.",
     "AUTH_DB_UNAVAILABLE": "Imeshindwa kuhifadhi akaunti yako, kwa hivyo kuingia kumeshindwa. Tafadhali jaribu tena baadaye.",
-    "LINK_TRY_LIMIT": "Misimbo mingi isiyo sahihi ya kuunganisha. Jaribu tena baada ya dakika 15."
+    "LINK_TRY_LIMIT": "Misimbo mingi isiyo sahihi ya kuunganisha. Jaribu tena baada ya dakika 15.",
+    "PLAN_REQUIRED": "Kipengele hiki hakipatikani na mpango wako wa sasa. Tafadhali boresha mpango wako.",
+    "PLAN_LIMIT": "Umetumia majaribio yote yanayopatikana kwa kipindi hiki. Tafadhali boresha mpango wako au jaribu tena kipindi kijacho.",
+    "PLAN_EXPIRED": "Mpango wako wa schema.pi umeisha muda wake. Tafadhali fanya malipo kwenye skrini ya mpango wa schema.pi.",
+    "PAY_PI_FAILED": "Imeshindwa kuwasiliana na seva ya malipo ya Pi. Tafadhali jaribu tena baada ya muda mfupi.",
+    "PAY_MISMATCH": "Taarifa za malipo hazilingani.",
+    "PAY_AMOUNT_MISMATCH": "Kiasi cha malipo kinatofautiana na makadirio.",
+    "PAY_CANCELLED": "Malipo yameghairiwa.",
+    "PAY_ALREADY_PAID": "Kuna malipo yanaendelea. Ikiwa ulikuwa unaingia kwenye Pi Wallet yako, tafadhali jaribu tena baada ya dakika 3.",
+    "PAY_INVALID_STATE": "Malipo hayawezi kuchakatwa katika hali yake ya sasa.",
+    "PAY_PI_CANCEL_REFUSED": "Malipo tayari yanaendelea na hayawezi kughairiwa. Tafadhali angalia tena baada ya muda mfupi.",
+    "PAY_PAYER": "Mmiliki wa muunganisho au msimamizi pekee ndiye anayeweza kufanya malipo.",
+    "PAY_SUBSCRIBED": "Ukiwa umejiandikisha, unaweza tu kulipia uboreshaji au upanuzi wa kipindi chako cha sasa cha mpango.",
+    "PAY_UPGRADE": "Mpango huu hauwezi kuboreshwa.",
+    "PAY_PRICE_CHANGED": "Hali ya mpango imebadilika. Tafadhali fanya malipo tena.",
+    "PRICE_UNAVAILABLE": "Imeshindwa kuangalia kiwango cha ubadilishaji cha Pi. Tafadhali jaribu tena baada ya muda mfupi.",
+    "QUOTE_EXPIRED": "Nukuu ya malipo imeisha muda wake. Tafadhali fanya malipo tena."
   },
   "analytics": {
     "title": "Uchambuzi & Ziwa",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Kiendelezi cha pg_stat_statements hakijasakinishwa kwenye DB lengwa",
       "TIMEOUT": "Ombi limeisha muda wake",
       "RATE": "Maombi mengi sana. Tafadhali jaribu tena baada ya dakika moja",
-      "INVALID_INPUT": "Bandika tokeni kamili ya muunganisho inayoanza na slk_"
+      "INVALID_INPUT": "Bandika tokeni kamili ya muunganisho inayoanza na slk_",
+      "PLAN_EXPIRED": "Mpango wako wa schema.pi umeisha muda wake. Tafadhali fanya malipo kwenye skrini ya mpango wa schema.pi."
     }
   },
   "migration": {
@@ -1411,6 +1428,70 @@
     "ops": "Usalama wa Uendeshaji",
     "learn": "Jifunze",
     "fold": "Kunja menyu",
-    "unfold": "Panua menyu"
+    "unfold": "Panua menyu",
+    "plan": "Mpango"
+  },
+  "plan": {
+    "title": "Mpango",
+    "intro": "Mipango huwekwa kando kwa kila muunganisho wa schema.pi (taxonomy). Miunganisho mipya inaweza kutumia mpango wa DBA kwa siku 7.",
+    "loading": "Inapakia mpango…",
+    "loadFail": "Imeshindwa kupakia mpango. Tafadhali jaribu tena baada ya muda mfupi.",
+    "names": {
+      "FREE": "Bure",
+      "D1": "Uchunguzi wa D1",
+      "D2": "Urekebishaji wa D2",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Gundua & Jifunze",
+      "D1": "Opereta — Huangalia kama hifadhidata iko sawa sasa",
+      "D2": "Msanidi & Mrekebishaji — Hurekebisha SQL polepole",
+      "D3": "DBA & DA — Kutoka usalama wa uendeshaji hadi utekelezaji na ziwa"
+    },
+    "feat": {
+      "FREE": "Bodi ya ufuatiliaji, mwonekano wa mpango wa utekelezaji, mafunzo ya msingi",
+      "D1": "Vipengele vya bure + ukusanyaji wa utendaji usio na kikomo, hoja ya uchambuzi wa GAP, mafunzo kamili",
+      "D2": "Vipengele vya D1 + kulinganisha mpango, mapendekezo ya urekebishaji wa AI, utekelezaji wa uchambuzi wa GAP",
+      "D3": "Vipengele vya D2 + utekelezaji, bomba, uchambuzi, usalama wa uendeshaji"
+    },
+    "featAi": "Mapendekezo ya urekebishaji wa AI mara {n}/mwezi",
+    "featClct": "Ukusanyaji wa utendaji wa mikono mara {n}/siku",
+    "aiNone": "Hakuna mapendekezo ya urekebishaji wa AI",
+    "cur": "Mpango wa sasa: {plan}",
+    "grace": "Jaribio",
+    "until": "Hadi {date} (zimesalia siku {days})",
+    "aiLeft": "Zimesalia mapendekezo ya urekebishaji wa AI {left}/{total} mwezi huu",
+    "clctLeft": "Zimesalia kukusanya utendaji wa mikono {left}/{total} leo",
+    "keep": "Hifadhi thamani za zamani kwa siku {days}",
+    "bndlOn": "Unatumia mpango wa DA kwa taxonomy sawa na schema.pi, kwa hivyo unapata punguzo la 20% kwenye malipo yako.",
+    "bndlOff": "Ikiwa unatumia mpango wa DA (P4) kwa taxonomy sawa na schema.pi, unapata punguzo la 20% kwenye malipo yako.",
+    "monthly": "Kila mwezi",
+    "yearly": "Kila mwaka",
+    "freePrice": "Bure",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Lipa kwa {prd}",
+    "extend": "Panua kipindi cha {prd}",
+    "upgradeTitle": "Boresha",
+    "upgradeNote": "Siku zilizosalia za mpango wako wa sasa zitakatwa kutoka kwa malipo. Huwezi kubadilisha kutoka mwaka hadi mwezi.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Boresha",
+    "paying": "Inalipa…",
+    "payStillWaiting": "Inasubiri saini ya Pi Wallet. Itatumika kiotomatiki mara tu itakaposainiwa.",
+    "bought": "Malipo yamerekodiwa.",
+    "payCancelled": "Malipo yameghairiwa.",
+    "payFailed": "Malipo yameshindwa. Tafadhali jaribu tena baada ya muda mfupi.",
+    "piBrowserOnly": "Malipo yanaweza kufanywa baada ya kuingia kwenye Pi Browser na Pi.",
+    "payNote": "Malipo yanafanywa kwa Pi pekee. Kiasi cha KRW ni kwa ajili ya kumbukumbu, na kiasi cha Pi kilichobadilishwa kwa kiwango cha ubadilishaji cha Pi cha wakati halisi wakati wa malipo kitapokelewa.",
+    "from": "Kutoka {plan}",
+    "notice": {
+      "required": "Kipengele hiki kinapatikana kuanzia mpango wa {plan}.",
+      "limit": "Umetumia majaribio yote yanayopatikana kwa kipindi hiki. Unaweza kutumia zaidi kwa kuboresha hadi mpango wa {plan}.",
+      "limitTop": "Umetumia majaribio yote yanayopatikana kwa kipindi hiki. Unaweza kuitumia tena kipindi kijacho.",
+      "expired": "Mpango wako wa schema.pi umeisha muda wake — tafadhali fanya malipo kwenye skrini ya mpango wa schema.pi.",
+      "go": "Tazama Mpango",
+      "close": "Funga"
+    }
   }
 }

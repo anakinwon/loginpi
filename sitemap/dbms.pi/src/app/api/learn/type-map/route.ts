@@ -13,7 +13,7 @@ export const GET = withGuard(
   dbRoute(async (req) => {
     const linkId = req.nextUrl.searchParams.get('link')
     if (!linkId) return apiError('INVALID_INPUT', 400)
-    const link = await requireLink(req, linkId)
+    const link = await requireLink(req, linkId, 'LEARN')
     if (link instanceof Response) return link as NextResponse
     try {
       const p = await linkGet<Profiles>(linkId, '/dbms-profiles')

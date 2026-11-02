@@ -9,7 +9,7 @@
 |---|---|---|---|
 | D1 | #1 분류체계 접근 범위 | **연결 토큰** — schema.pi 에서 DA·SYS 가 분류체계 단위 토큰(`slk_…`)을 발급, dbms 사용자가 등록. 사용자 대조 없음 | PRD_28 §1.1-1(사이트 간 사용자 대조 금지)·5절 |
 | D2 | #2 대리 실행 | **schema.pi 이름 붙인 조회(named query)만** 실행 — 임의 SQL 금지(EXPLAIN 은 SELECT 1문장만, ANALYZE 없음), READ ONLY 트랜잭션·statement_timeout 5초·최대 500행, **PostgreSQL SRV 접속만**(Oracle·Tibero·AGT = 다음) | PRD §5·A1·A3 |
-| D3 | #3 수익·결제 | 이번 범위 **제외**(무료 표시) | 요금 미결 |
+| D3 | #3 수익·결제 | ~~이번 범위 제외(무료 표시)~~ **해제 2026-11-02** — 연결 단위 요금제 구현(PRD 9절, `sql/035`·`/plan`·`/api/payments/*`) | 마스터 확정 2026-11-02 |
 | D4 | #12 역할 | dbms 1차 = **연결 소유자**만 그 연결 기능 사용(관리자 ADMIN 은 전체) | 역할표 확정 전 최소 권한 |
 | D5 | #13 대분류 9·10 채택 | **채택**(9 = 진단 읽기 전용, 10 = 학습 콘텐츠·사전) | 차별화·EDU |
 | D6 | 1-3 워커 에이전트·실제 이행/CDC 실행 | 이번 범위 **제외** — 6·7 은 계획·점검·설계 화면까지(실행 엔진은 A10 보안 모델 확정 후) | A2·A10 |
@@ -58,6 +58,8 @@
 
 ### 2.2 이름 붙인 조회(`q`) — PostgreSQL 전용, schema.pi `src/lib/link/queries.ts` 정본
 `explain`(params.sql: SELECT/WITH 1문장, `EXPLAIN (FORMAT JSON, COSTS true)`), `db_stats`, `top_sql`(pg_stat_statements 없으면 `PGSS_MISSING`), `tbl_stats`, `idx_stats`, `sizes`, `activity`, `locks`, `settings`, `roles`, `table_privs`, `catalog_tables`, `catalog_columns`, `catalog_indexes`, `replication`, `archiver`, `version`.
+
+**추가(2026-11-02, 요금제)** : `area_plan` — 인자·접속 없음, 토큰의 분류체계 현재 요금제 1행 `{plan_cd, prd_cd, end_dtm, grnt_rsn_cd}`(schema.pi 자체 DB, FREE = `plan_cd 'FREE'`·`end_dtm null`). dbms 쪽 `linkAreaPlan()`(2초, 실패 = null) — 묶음 할인 판정만. schema.pi `linkAuth` 는 분류체계 요금제가 FREE 면 403 `{error:'PLAN_EXPIRED'}`(`area_plan`·토큰 상태 확인 경로 제외) → dbms `schemaFetch` 가 `LinkError('PLAN_EXPIRED', 403)` 로 넘기고 화면 PlanNotice 가 안내.
 오류 코드 : `LINK_AUTH`(401), `LINK_SCOPE`(403 — 다른 분류체계 접속), `CONN_UNSUPPORTED`(Oracle·AGT), `Q_UNKNOWN`, `SQL_NOT_SELECT`, `PGSS_MISSING`, `TIMEOUT`, `RATE`.
 
 ### 2.3 dbms 쪽 클라이언트 `src/lib/link/client.ts` (F1b 구현, 서버 전용)

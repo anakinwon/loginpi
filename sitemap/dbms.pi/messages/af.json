@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Hierdie rekening is reeds gekoppel.",
     "LINK_CODE_GEN_FAILED": "Kon nie 'n skakelkode skep nie. Probeer asseblief later weer.",
     "AUTH_DB_UNAVAILABLE": "Kon nie jou rekening stoor nie, so aanmelding het misluk. Probeer asseblief later weer.",
-    "LINK_TRY_LIMIT": "Te veel verkeerde skakelkodes. Probeer weer oor 15 minute."
+    "LINK_TRY_LIMIT": "Te veel verkeerde skakelkodes. Probeer weer oor 15 minute.",
+    "PLAN_REQUIRED": "Hierdie funksie is nie beskikbaar met jou huidige plan nie. Gradeer asseblief jou plan op.",
+    "PLAN_LIMIT": "Jy het al die beskikbare pogings vir hierdie tydperk gebruik. Gradeer asseblief jou plan op of probeer weer volgende tydperk.",
+    "PLAN_EXPIRED": "Jou schema.pi-plan het verval. Doen asseblief 'n betaling op die schema.pi-plan-skerm.",
+    "PAY_PI_FAILED": "Kon nie met die Pi-betalingsbediener kommunikeer nie. Probeer asseblief binnekort weer.",
+    "PAY_MISMATCH": "Betalingsinligting stem nie ooreen nie.",
+    "PAY_AMOUNT_MISMATCH": "Die betalingsbedrag verskil van die skatting.",
+    "PAY_CANCELLED": "Betaling gekanselleer.",
+    "PAY_ALREADY_PAID": "Daar is 'n betaling aan die gang. As jy in jou beursie aangemeld het, probeer asseblief oor 3 minute weer.",
+    "PAY_INVALID_STATE": "Die betaling kan nie in sy huidige toestand verwerk word nie.",
+    "PAY_PI_CANCEL_REFUSED": "Betaling is reeds aan die gang en kan nie gekanselleer word nie. Kontroleer asseblief binnekort weer.",
+    "PAY_PAYER": "Slegs die verbindingseienaar of administrateur kan betalings maak.",
+    "PAY_SUBSCRIBED": "Terwyl jy ingeteken is, kan jy slegs betaal vir opgraderings of verlengings van jou huidige planperiode.",
+    "PAY_UPGRADE": "Hierdie plan kan nie opgegradeer word nie.",
+    "PAY_PRICE_CHANGED": "Die planstatus het verander. Doen asseblief die betaling weer.",
+    "PRICE_UNAVAILABLE": "Kon nie die Pi-wisselkoers nagaan nie. Probeer asseblief binnekort weer.",
+    "QUOTE_EXPIRED": "Die betalingskwotasie het verval. Doen asseblief die betaling weer."
   },
   "analytics": {
     "title": "Analise en Meer",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Die pg_stat_statements-uitbreiding is nie op die teiken-DB geïnstalleer nie",
       "TIMEOUT": "Die versoek het uitgetel",
       "RATE": "Te veel versoeke. Probeer asseblief oor 'n minuut weer",
-      "INVALID_INPUT": "Plak die volledige verbindingstoken wat met slk_ begin"
+      "INVALID_INPUT": "Plak die volledige verbindingstoken wat met slk_ begin",
+      "PLAN_EXPIRED": "Jou schema.pi-plan het verval. Doen asseblief 'n betaling op die schema.pi-plan-skerm."
     }
   },
   "migration": {
@@ -1411,6 +1428,70 @@
     "ops": "Bedryfsveiligheid",
     "learn": "Leer",
     "fold": "Vou kieslys toe",
-    "unfold": "Vou kieslys oop"
+    "unfold": "Vou kieslys oop",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Planne word afsonderlik vir elke schema.pi-verbinding (taksonomie) gestel. Nuwe verbindings kan die DBA-plan vir 7 dae ervaar.",
+    "loading": "Laai plan…",
+    "loadFail": "Kon nie die plan laai nie. Probeer asseblief binnekort weer.",
+    "names": {
+      "FREE": "Gratis",
+      "D1": "D1 Waarneming",
+      "D2": "D2 Instelling",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Verken & Leer",
+      "D1": "Operateur — Kontroleer of die databasis nou in orde is",
+      "D2": "Ontwikkelaar & Insteller — Herstel stadige SQL",
+      "D3": "DBA & DA — Van operasionele veiligheid tot implementering en meer"
+    },
+    "feat": {
+      "FREE": "Moniteringsbord, uitvoeringsplan-aansig, basiese leer",
+      "D1": "Gratis kenmerke + onbeperkte prestasieversameling, GAP-analise-navraag, volle leer",
+      "D2": "D1-kenmerke + planvergelyking, KI-instellingsaanbevelings, GAP-analise-uitvoering",
+      "D3": "D2-kenmerke + implementering, pyplyn, analise, operasionele veiligheid"
+    },
+    "featAi": "KI-instellingsaanbevelings {n} keer/maand",
+    "featClct": "Handmatige prestasieversameling {n} keer/dag",
+    "aiNone": "Geen KI-instellingsaanbevelings nie",
+    "cur": "Huidige plan: {plan}",
+    "grace": "Proef",
+    "until": "Tot {date} ({days} dae oor)",
+    "aiLeft": "{left}/{total} KI-instellingsaanbevelings oor hierdie maand",
+    "clctLeft": "{left}/{total} handmatige prestasieversamelings oor vandag",
+    "keep": "Hou vorige waardes vir {days} dae",
+    "bndlOn": "Jy gebruik 'n DA-plan vir dieselfde taksonomie as schema.pi, so jy kry 'n 20% afslag op jou betaling.",
+    "bndlOff": "As jy 'n DA-plan (P4) vir dieselfde taksonomie as schema.pi gebruik, kry jy 'n 20% afslag op jou betaling.",
+    "monthly": "Maandeliks",
+    "yearly": "Jaarliks",
+    "freePrice": "Gratis",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Betaal vir {prd}",
+    "extend": "Verleng {prd}-periode",
+    "upgradeTitle": "Opgradeer",
+    "upgradeNote": "Die oorblywende dae van jou huidige plan sal van die betaling afgetrek word. Jy kan nie van jaarliks na maandeliks verander nie.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Opgradeer",
+    "paying": "Betaal tans…",
+    "payStillWaiting": "Wag vir beursie-handtekening. Dit sal outomaties toegepas word sodra dit onderteken is.",
+    "bought": "Betaling weerspieël.",
+    "payCancelled": "Betaling gekanselleer.",
+    "payFailed": "Betaling het misluk. Probeer asseblief binnekort weer.",
+    "piBrowserOnly": "Betaling kan gemaak word nadat jy by Pi Browser met Pi aangemeld het.",
+    "payNote": "Betaling word slegs met Pi gemaak. Die KRW-bedrag is vir verwysing, en die Pi-bedrag wat teen die intydse Pi-wisselkoers ten tyde van betaling omgeskakel is, sal ontvang word.",
+    "from": "Vanaf {plan}",
+    "notice": {
+      "required": "Hierdie funksie is beskikbaar vanaf die {plan}-plan.",
+      "limit": "Jy het al die beskikbare pogings vir hierdie tydperk gebruik. Jy kan meer gebruik deur op te gradeer na die {plan}-plan.",
+      "limitTop": "Jy het al die beskikbare pogings vir hierdie tydperk gebruik. Jy kan dit volgende tydperk weer gebruik.",
+      "expired": "Jou schema.pi-plan het verval — doen asseblief 'n betaling op die schema.pi-plan-skerm.",
+      "go": "Bekyk Plan",
+      "close": "Sluit"
+    }
   }
 }

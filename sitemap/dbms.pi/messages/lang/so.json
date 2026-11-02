@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Akoonkan wuu horey u xiran yahay.",
     "LINK_CODE_GEN_FAILED": "Lama abuuri karin kood xiriiriye. Fadlan isku day mar dambe.",
     "AUTH_DB_UNAVAILABLE": "Lama kaydin karin akoonkaaga, sidaa darteed galitaanka wuu fashilmay. Fadlan isku day mar dambe.",
-    "LINK_TRY_LIMIT": "Koodadka xiriirinta ee khaldan ayaa aad u badan. Isku day mar kale 15 daqiiqo gudahood."
+    "LINK_TRY_LIMIT": "Koodadka xiriirinta ee khaldan ayaa aad u badan. Isku day mar kale 15 daqiiqo gudahood.",
+    "PLAN_REQUIRED": "Muuqaalkan lagama heli karo qorshahaaga hadda. Fadlan kor u qaad qorshahaaga.",
+    "PLAN_LIMIT": "Waxaad isticmaashay dhammaan isku daygii la heli karo muddadan. Fadlan kor u qaad qorshahaaga ama isku day mar kale muddada xigta.",
+    "PLAN_EXPIRED": "Qorshahaaga schema.pi wuu dhacay. Fadlan bixi lacagta shaashadda qorshaha schema.pi.",
+    "PAY_PI_FAILED": "Wuu ku guuldareystay inuu la xiriiro server-ka lacag bixinta Pi. Fadlan isku day mar kale dhawaan.",
+    "PAY_MISMATCH": "Macluumaadka lacag bixinta isma waafaqsana.",
+    "PAY_AMOUNT_MISMATCH": "Lacagta la bixinayo way ka duwan tahay qiyaasta.",
+    "PAY_CANCELLED": "Lacag bixinta waa la joojiyay.",
+    "PAY_ALREADY_PAID": "Waxaa jira lacag bixin socota. Haddii aad ku saxiixanaysay boorsadaada, fadlan isku day mar kale 3 daqiiqo gudahood.",
+    "PAY_INVALID_STATE": "Lacag bixinta lama farsamayn karo xaaladdeeda hadda.",
+    "PAY_PI_CANCEL_REFUSED": "Lacag bixinta ayaa horey u socota lamana joojin karo. Fadlan mar kale hubi dhawaan.",
+    "PAY_PAYER": "Kaliya milkiilaha isku xirka ama maamulaha ayaa bixin kara lacagaha.",
+    "PAY_SUBSCRIBED": "Inta aad isdiiwaangashan tahay, waxaad kaliya bixin kartaa kor u qaadista ama kordhinta muddada qorshahaaga hadda.",
+    "PAY_UPGRADE": "Qorshahan lama kor u qaadi karo.",
+    "PAY_PRICE_CHANGED": "Xaaladda qorshaha ayaa isbedeshay. Fadlan mar kale bixi lacagta.",
+    "PRICE_UNAVAILABLE": "Wuu ku guuldareystay inuu hubiyo heerka sarrifka Pi. Fadlan isku day mar kale dhawaan.",
+    "QUOTE_EXPIRED": "Qiimaha lacag bixinta wuu dhacay. Fadlan mar kale bixi lacagta."
   },
   "analytics": {
     "title": "Falanqaynta & Harada",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Kordhinta pg_stat_statements kuma rakiban tahay DB-ga bartilmaameedka",
       "TIMEOUT": "Codsiga wuu dhacay",
       "RATE": "Codsiyo badan. Fadlan isku day mar kale daqiiqad gudaheed",
-      "INVALID_INPUT": "Ku dheji calaamadda isku xirka oo dhan oo ku bilaabata slk_"
+      "INVALID_INPUT": "Ku dheji calaamadda isku xirka oo dhan oo ku bilaabata slk_",
+      "PLAN_EXPIRED": "Qorshahaaga schema.pi wuu dhacay. Fadlan bixi lacagta shaashadda qorshaha schema.pi."
     }
   },
   "migration": {
@@ -1411,6 +1428,70 @@
     "ops": "Badbaadada Hawlgalka",
     "learn": "Baro",
     "fold": "Duub menu-ga",
-    "unfold": "Fidi menu-ga"
+    "unfold": "Fidi menu-ga",
+    "plan": "Qorshe"
+  },
+  "plan": {
+    "title": "Qorshe",
+    "intro": "Qorshayaasha waxaa si gaar ah loogu dejiyay isku xir kasta oo schema.pi ah (taxonomy). Isku xirrada cusub waxay la kulmi karaan qorshaha DBA 7 maalmood.",
+    "loading": "Wuxuu soo shubayaa qorshaha…",
+    "loadFail": "Wuu ku guuldareystay inuu soo shubo qorshaha. Fadlan isku day mar kale dhawaan.",
+    "names": {
+      "FREE": "Bilaash",
+      "D1": "D1 Kormeer",
+      "D2": "D2 Hagaajin",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Sahami & Baro",
+      "D1": "Hawl-wadeen — Waxay hubisaa in xogta hadda ay hagaagsan tahay.",
+      "D2": "Horumariye & Hagaajiye — Wuxuu hagaajiyaa SQL-ka gaabiska ah",
+      "D3": "DBA & DA — Laga bilaabo badbaadada hawlgalka ilaa hirgelinta iyo harada"
+    },
+    "feat": {
+      "FREE": "Guddiga kormeerka, aragtida qorshaha fulinta, barashada aasaasiga ah",
+      "D1": "Muuqaalada bilaashka ah + ururinta waxqabadka aan xadidnayn, su'aalaha falanqaynta GAP, barashada buuxda",
+      "D2": "Muuqaalada D1 + isbarbardhigga qorshaha, talooyinka hagaajinta AI, fulinta falanqaynta GAP",
+      "D3": "Muuqaalada D2 + hirgelinta, dhuumaha, falanqaynta, badbaadada hawlgalka"
+    },
+    "featAi": "Talooyinka hagaajinta AI {n} jeer/bishii",
+    "featClct": "Ururinta waxqabadka gacanta {n} jeer/maalintii",
+    "aiNone": "Ma jiraan talooyin hagaajinta AI ah",
+    "cur": "Qorshaha hadda: {plan}",
+    "grace": "Tijaabo",
+    "until": "Ilaa {date} ({days} maalmood ayaa harsan)",
+    "aiLeft": "{left}/{total} talooyinka hagaajinta AI ayaa harsan bishan",
+    "clctLeft": "{left}/{total} ururinta waxqabadka gacanta ayaa harsan maanta",
+    "keep": "Ku hayso qiimayaashii hore {days} maalmood",
+    "bndlOn": "Waxaad isticmaalaysaa qorshe DA ah oo loogu talagalay taxonomy-ga la midka ah schema.pi, sidaa darteed waxaad helaysaa 20% dhimis lacagtaada.",
+    "bndlOff": "Haddii aad isticmaasho qorshe DA ah (P4) oo loogu talagalay taxonomy-ga la midka ah schema.pi, waxaad helaysaa 20% dhimis lacagtaada.",
+    "monthly": "Bishii",
+    "yearly": "Sannadkii",
+    "freePrice": "Bilaash",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Bixi {prd}",
+    "extend": "Kordhi muddada {prd}",
+    "upgradeTitle": "Kor u qaad",
+    "upgradeNote": "Maalmaha harsan ee qorshahaaga hadda waxaa laga jari doonaa lacagta. Ma beddeli kartid sannadkii ilaa bishii.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Kor u qaad",
+    "paying": "Wuxuu bixinayaa…",
+    "payStillWaiting": "Wuxuu sugayaa saxiixa boorsada. Si toos ah ayaa loo dabaqi doonaa marka la saxiixo.",
+    "bought": "Lacag bixinta waa la muujiyay.",
+    "payCancelled": "Lacag bixinta waa la joojiyay.",
+    "payFailed": "Lacag bixinta way guuldareysatay. Fadlan isku day mar kale dhawaan.",
+    "piBrowserOnly": "Lacag bixinta waxaa la samayn karaa ka dib marka lagu galo Pi Browser Pi.",
+    "payNote": "Lacag bixinta waxaa lagu sameeyaa kaliya Pi. Qaddarka KRW waa tixraac, waxaana la heli doonaa qaddarka Pi ee lagu beddelay heerka sarrifka Pi ee waqtiga dhabta ah ee lacag bixinta.",
+    "from": "Laga bilaabo {plan}",
+    "notice": {
+      "required": "Muuqaalkan waxaa laga heli karaa qorshaha {plan}.",
+      "limit": "Waxaad isticmaashay dhammaan isku daygii la heli karo muddadan. Waxaad isticmaali kartaa wax badan adoo kor u qaadaya qorshaha {plan}.",
+      "limitTop": "Waxaad isticmaashay dhammaan isku daygii la heli karo muddadan. Waxaad mar kale isticmaali kartaa muddada xigta.",
+      "expired": "Qorshahaaga schema.pi wuu dhacay — fadlan bixi lacagta shaashadda qorshaha schema.pi.",
+      "go": "Eeg Qorshaha",
+      "close": "Xidh"
+    }
   }
 }

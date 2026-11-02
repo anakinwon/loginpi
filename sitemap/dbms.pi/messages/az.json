@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Bu hesab artıq əlaqələndirilib.",
     "LINK_CODE_GEN_FAILED": "Əlaqə kodu yaradıla bilmədi. Zəhmət olmasa, bir az sonra yenidən cəhd edin.",
     "AUTH_DB_UNAVAILABLE": "Hesabınız saxlanıla bilmədi, buna görə də daxil olma uğursuz oldu. Zəhmət olmasa, bir az sonra yenidən cəhd edin.",
-    "LINK_TRY_LIMIT": "Çox sayda yanlış əlaqə kodu. 15 dəqiqə sonra yenidən cəhd edin."
+    "LINK_TRY_LIMIT": "Çox sayda yanlış əlaqə kodu. 15 dəqiqə sonra yenidən cəhd edin.",
+    "PLAN_REQUIRED": "Bu funksiya cari planınızla mövcud deyil. Zəhmət olmasa, planınızı təkmilləşdirin.",
+    "PLAN_LIMIT": "Bu dövr üçün bütün mövcud cəhdlərdən istifadə etdiniz. Zəhmət olmasa, planınızı təkmilləşdirin və ya növbəti dövrdə yenidən cəhd edin.",
+    "PLAN_EXPIRED": "schema.pi planınızın müddəti bitmişdir. Zəhmət olmasa, schema.pi plan ekranında ödəniş edin.",
+    "PAY_PI_FAILED": "Pi ödəniş serveri ilə əlaqə qurulmadı. Zəhmət olmasa, bir azdan yenidən cəhd edin.",
+    "PAY_MISMATCH": "Ödəniş məlumatları uyğun gəlmir.",
+    "PAY_AMOUNT_MISMATCH": "Ödəniş məbləği təxmini məbləğdən fərqlənir.",
+    "PAY_CANCELLED": "Ödəniş ləğv edildi.",
+    "PAY_ALREADY_PAID": "Hazırda ödəniş prosesi davam edir. Əgər cüzdanınızda imzalayırdınızsa, zəhmət olmasa, 3 dəqiqə sonra yenidən cəhd edin.",
+    "PAY_INVALID_STATE": "Ödəniş hazırkı vəziyyətində emal edilə bilməz.",
+    "PAY_PI_CANCEL_REFUSED": "Ödəniş artıq davam etdiyindən ləğv edilə bilməz. Zəhmət olmasa, bir azdan yenidən yoxlayın.",
+    "PAY_PAYER": "Yalnız qoşulma sahibi və ya administrator ödəniş edə bilər.",
+    "PAY_SUBSCRIBED": "Abunə olduğunuz müddətdə yalnız cari planınızın təkmilləşdirilməsi və ya müddətinin uzadılması üçün ödəniş edə bilərsiniz.",
+    "PAY_UPGRADE": "Bu plan təkmilləşdirilə bilməz.",
+    "PAY_PRICE_CHANGED": "Planın statusu dəyişdi. Zəhmət olmasa, ödənişi yenidən edin.",
+    "PRICE_UNAVAILABLE": "Pi məzənnəsini yoxlamaq mümkün olmadı. Zəhmət olmasa, bir azdan yenidən cəhd edin.",
+    "QUOTE_EXPIRED": "Ödəniş təklifinin müddəti bitmişdir. Zəhmət olmasa, ödənişi yenidən edin."
   },
   "analytics": {
     "title": "Analitika və Göl",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Hədəf DB-də pg_stat_statements genişləndirməsi quraşdırılmayıb",
       "TIMEOUT": "Sorğunun vaxtı bitdi",
       "RATE": "Çoxlu sorğu var. Zəhmət olmasa, bir dəqiqədən sonra yenidən cəhd edin",
-      "INVALID_INPUT": "slk_ ilə başlayan tam bağlantı tokenini yapışdırın"
+      "INVALID_INPUT": "slk_ ilə başlayan tam bağlantı tokenini yapışdırın",
+      "PLAN_EXPIRED": "schema.pi planınızın müddəti bitmişdir. Zəhmət olmasa, schema.pi plan ekranında ödəniş edin."
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "Əməliyyat Təhlükəsizliyi",
     "learn": "Öyrən",
     "fold": "Menyunu yığcamlaşdırın",
-    "unfold": "Menyunu genişləndirin"
+    "unfold": "Menyunu genişləndirin",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Planlar hər schema.pi qoşulması (taksonomiya) üçün ayrıca təyin edilir. Yeni qoşulmalar 7 gün ərzində DBA planını sınaqdan keçirə bilər.",
+    "loading": "Plan yüklənir…",
+    "loadFail": "Plan yüklənmədi. Zəhmət olmasa, bir azdan yenidən cəhd edin.",
+    "names": {
+      "FREE": "Pulsuz",
+      "D1": "D1 Müşahidə",
+      "D2": "D2 Tənzimləmə",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Kəşf et və öyrən",
+      "D1": "Operator — Verilənlər bazasının indi yaxşı olub-olmadığını yoxlayır",
+      "D2": "Tərtibatçı və Tənzimləyici — Yavaş SQL-i düzəldir",
+      "D3": "DBA və DA — Əməliyyat təhlükəsizliyindən tətbiqə və gölə qədər"
+    },
+    "feat": {
+      "FREE": "Monitorinq lövhəsi, icra planı görünüşü, əsas öyrənmə",
+      "D1": "Pulsuz funksiyalar + limitsiz performans toplanması, GAP analizi sorğusu, tam öyrənmə",
+      "D2": "D1 funksiyaları + plan müqayisəsi, AI tənzimləmə tövsiyələri, GAP analizi icrası",
+      "D3": "D2 funksiyaları + tətbiq, boru kəməri, analiz, əməliyyat təhlükəsizliyi"
+    },
+    "featAi": "AI tənzimləmə tövsiyələri ayda {n} dəfə",
+    "featClct": "Əl ilə performans toplanması gündə {n} dəfə",
+    "aiNone": "AI tənzimləmə tövsiyələri yoxdur",
+    "cur": "Cari plan: {plan}",
+    "grace": "Sınaq",
+    "until": "{date} tarixinə qədər ({days} gün qalıb)",
+    "aiLeft": "Bu ay {left}/{total} AI tənzimləmə tövsiyəsi qalıb",
+    "clctLeft": "Bu gün {left}/{total} əl ilə performans toplanması qalıb",
+    "keep": "Keçmiş dəyərləri {days} gün saxla",
+    "bndlOn": "schema.pi ilə eyni taksonomiya üçün DA planından istifadə etdiyinizə görə, ödənişinizə 20% endirim edilir.",
+    "bndlOff": "Əgər schema.pi ilə eyni taksonomiya üçün DA planından (P4) istifadə etsəniz, ödənişinizə 20% endirim əldə edərsiniz.",
+    "monthly": "Aylıq",
+    "yearly": "İllik",
+    "freePrice": "Pulsuz",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "{prd} üçün ödəniş et",
+    "extend": "{prd} müddətini uzat",
+    "upgradeTitle": "Təkmilləşdir",
+    "upgradeNote": "Cari planınızın qalan günləri ödənişdən çıxılacaq. İllikdən aylığa keçə bilməzsiniz.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Təkmilləşdir",
+    "paying": "Ödəniş edilir…",
+    "payStillWaiting": "Cüzdan imzası gözlənilir. İmzalandıqdan sonra avtomatik tətbiq olunacaq.",
+    "bought": "Ödəniş əks olundu.",
+    "payCancelled": "Ödəniş ləğv edildi.",
+    "payFailed": "Ödəniş uğursuz oldu. Zəhmət olmasa, bir azdan yenidən cəhd edin.",
+    "piBrowserOnly": "Ödəniş Pi Browser-da Pi ilə daxil olduqdan sonra edilə bilər.",
+    "payNote": "Ödəniş yalnız Pi ilə edilir. KRW məbləği istinad üçündür və ödəniş anında real vaxt Pi məzənnəsi ilə çevrilmiş Pi məbləği qəbul ediləcək.",
+    "from": "{plan} -dən",
+    "notice": {
+      "required": "Bu funksiya {plan} planından etibarən mövcuddur.",
+      "limit": "Bu dövr üçün bütün mövcud cəhdlərdən istifadə etdiniz. {plan} planına yüksəltməklə daha çox istifadə edə bilərsiniz.",
+      "limitTop": "Bu dövr üçün bütün mövcud cəhdlərdən istifadə etdiniz. Növbəti dövrdə yenidən istifadə edə bilərsiniz.",
+      "expired": "schema.pi planınızın müddəti bitmişdir — zəhmət olmasa, schema.pi plan ekranında ödəniş edin.",
+      "go": "Plana bax",
+      "close": "Bağla"
+    }
   }
 }

@@ -13,7 +13,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 async function gate(req: NextRequest, ctx: unknown, linkId: string): Promise<{ link: LinkCtx; pplId: string } | NextResponse> {
   const { pplId } = await (ctx as Ctx).params
   if (!UUID_RE.test(pplId) || !linkId) return apiError('INVALID_INPUT', 400)
-  const link = await requireLink(req, linkId)
+  const link = await requireLink(req, linkId, 'LAKE')
   if (link instanceof Response) return link as NextResponse
   return { link, pplId }
 }

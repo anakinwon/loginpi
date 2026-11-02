@@ -45,7 +45,7 @@ export const GET = withGuard(
   dbRoute(async (req) => {
     const sp = req.nextUrl.searchParams
     const page = Math.max(1, Math.floor(Number(sp.get('page') ?? 1)) || 1)
-    const g = await linkGate(req, sp.get('link'))
+    const g = await linkGate(req, sp.get('link'), 'LAKE')
     if (g instanceof NextResponse) return g
     const from = (page - 1) * PAGE
     // 정확 건수 없이 1행 더 읽어 다음 쪽 여부만 판정(R-P3)
@@ -73,7 +73,7 @@ export const POST = withGuard(
   dbRoute(async (req) => {
     const b = await parseBody(req, PostSchema)
     if (b instanceof NextResponse) return b
-    const g = await linkGate(req, b.link)
+    const g = await linkGate(req, b.link, 'LAKE')
     if (g instanceof NextResponse) return g
     let model: ModelRes
     try {
@@ -120,7 +120,7 @@ export const PATCH = withGuard(
   dbRoute(async (req) => {
     const b = await parseBody(req, PatchSchema)
     if (b instanceof NextResponse) return b
-    const g = await linkGate(req, b.link)
+    const g = await linkGate(req, b.link, 'LAKE')
     if (g instanceof NextResponse) return g
     const now = new Date().toISOString()
     const r = await db()

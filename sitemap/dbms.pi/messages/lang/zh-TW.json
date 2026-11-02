@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "此帳戶已連結。",
     "LINK_CODE_GEN_FAILED": "無法建立連結代碼。請稍後再試。",
     "AUTH_DB_UNAVAILABLE": "無法儲存您的帳戶，因此登入失敗。請稍後再試。",
-    "LINK_TRY_LIMIT": "連結代碼錯誤次數過多。請在 15 分鐘後再試。"
+    "LINK_TRY_LIMIT": "連結代碼錯誤次數過多。請在 15 分鐘後再試。",
+    "PLAN_REQUIRED": "您的目前方案不支援此功能。請升級您的方案。",
+    "PLAN_LIMIT": "您已用完此期間所有可用次數。請升級您的方案或在下個期間再試。",
+    "PLAN_EXPIRED": "您的 schema.pi 方案已過期。請在 schema.pi 方案畫面付款。",
+    "PAY_PI_FAILED": "無法與 Pi 支付伺服器通訊。請稍後再試。",
+    "PAY_MISMATCH": "支付資訊不符。",
+    "PAY_AMOUNT_MISMATCH": "支付金額與估計金額不同。",
+    "PAY_CANCELLED": "支付已取消。",
+    "PAY_ALREADY_PAID": "有支付正在處理中。如果您正在錢包中簽名，請在 3 分鐘後再試。",
+    "PAY_INVALID_STATE": "支付無法在目前狀態下處理。",
+    "PAY_PI_CANCEL_REFUSED": "支付已在進行中，無法取消。請稍後再檢查。",
+    "PAY_PAYER": "只有連線擁有者或管理員可以進行支付。",
+    "PAY_SUBSCRIBED": "訂閱期間，您只能支付升級或延長目前方案期間的費用。",
+    "PAY_UPGRADE": "此方案無法升級。",
+    "PAY_PRICE_CHANGED": "方案狀態已變更。請重新支付。",
+    "PRICE_UNAVAILABLE": "無法檢查 Pi 匯率。請稍後再試。",
+    "QUOTE_EXPIRED": "支付報價已過期。請重新支付。"
   },
   "analytics": {
     "title": "分析與資料湖",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "目標 DB 上未安裝 pg_stat_statements 擴充功能",
       "TIMEOUT": "請求逾時",
       "RATE": "請求過多。請在一分鐘後再試",
-      "INVALID_INPUT": "請貼上以 slk_ 開頭的完整連線權杖"
+      "INVALID_INPUT": "請貼上以 slk_ 開頭的完整連線權杖",
+      "PLAN_EXPIRED": "您的 schema.pi 方案已過期。請在 schema.pi 方案畫面付款。"
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "營運安全",
     "learn": "學習",
     "fold": "收合選單",
-    "unfold": "展開選單"
+    "unfold": "展開選單",
+    "plan": "方案"
+  },
+  "plan": {
+    "title": "方案",
+    "intro": "每個 schema.pi 連線（分類法）的方案是分開設定的。新連線可以體驗 DBA 方案 7 天。",
+    "loading": "正在載入方案…",
+    "loadFail": "載入方案失敗。請稍後再試。",
+    "names": {
+      "FREE": "免費",
+      "D1": "D1 觀察",
+      "D2": "D2 調校",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "探索與學習",
+      "D1": "營運者 — 檢查資料庫目前是否正常",
+      "D2": "開發人員與調校師 — 修復緩慢的 SQL",
+      "D3": "DBA 與 DA — 從操作安全到實作與資料湖"
+    },
+    "feat": {
+      "FREE": "監控面板、執行計畫檢視、基礎學習",
+      "D1": "免費功能 + 無限效能收集、GAP 分析查詢、完整學習",
+      "D2": "D1 功能 + 方案比較、AI 調校建議、GAP 分析執行",
+      "D3": "D2 功能 + 實作、管道、分析、操作安全"
+    },
+    "featAi": "AI 調校建議每月 {n} 次",
+    "featClct": "手動效能收集每天 {n} 次",
+    "aiNone": "無 AI 調校建議",
+    "cur": "目前方案：{plan}",
+    "grace": "試用",
+    "until": "直到 {date}（剩餘 {days} 天）",
+    "aiLeft": "本月剩餘 {left}/{total} 次 AI 調校建議",
+    "clctLeft": "今天剩餘 {left}/{total} 次手動效能收集",
+    "keep": "保留過去值 {days} 天",
+    "bndlOn": "您正在使用與 schema.pi 相同分類法的 DA 方案，因此您的支付可享 20% 折扣。",
+    "bndlOff": "如果您使用與 schema.pi 相同分類法的 DA 方案 (P4)，您的支付可享 20% 折扣。",
+    "monthly": "每月",
+    "yearly": "每年",
+    "freePrice": "免費",
+    "won": "{won} 韓元",
+    "moneyKo": "{won} 韓元 ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "支付 {prd}",
+    "extend": "延長 {prd} 期間",
+    "upgradeTitle": "升級",
+    "upgradeNote": "您目前方案的剩餘天數將從支付中扣除。您無法從每年變更為每月。",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "升級",
+    "paying": "正在支付…",
+    "payStillWaiting": "正在等待錢包簽名。簽名後將自動套用。",
+    "bought": "支付已反映。",
+    "payCancelled": "支付已取消。",
+    "payFailed": "支付失敗。請稍後再試。",
+    "piBrowserOnly": "登入 Pi Browser 並使用 Pi 後才能進行支付。",
+    "payNote": "僅使用 Pi 進行支付。韓元金額僅供參考，將收取支付時以即時 Pi 匯率換算的 Pi 金額。",
+    "from": "從 {plan} 開始",
+    "notice": {
+      "required": "此功能從 {plan} 方案開始提供。",
+      "limit": "您已用完此期間所有可用次數。升級到 {plan} 方案即可使用更多次。",
+      "limitTop": "您已用完此期間所有可用次數。下個期間即可再次使用。",
+      "expired": "您的 schema.pi 方案已過期 — 請在 schema.pi 方案畫面付款。",
+      "go": "查看方案",
+      "close": "關閉"
+    }
   }
 }

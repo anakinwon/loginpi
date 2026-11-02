@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Bu hisob allaqachon bogʻlangan.",
     "LINK_CODE_GEN_FAILED": "Bogʻlash kodini yaratib boʻlmadi. Iltimos, keyinroq qayta urinib koʻring.",
     "AUTH_DB_UNAVAILABLE": "Hisobingizni saqlab boʻlmadi, shuning uchun kirish muvaffaqiyatsiz tugadi. Iltimos, keyinroq qayta urinib koʻring.",
-    "LINK_TRY_LIMIT": "Notoʻgʻri bogʻlash kodlari juda koʻp kiritildi. 15 daqiqadan keyin qayta urinib koʻring."
+    "LINK_TRY_LIMIT": "Notoʻgʻri bogʻlash kodlari juda koʻp kiritildi. 15 daqiqadan keyin qayta urinib koʻring.",
+    "PLAN_REQUIRED": "Bu funksiya joriy tarif rejangizda mavjud emas. Iltimos, tarif rejangizni yangilang.",
+    "PLAN_LIMIT": "Bu davr uchun barcha mavjud urinishlardan foydalanib boʻldingiz. Iltimos, tarif rejangizni yangilang yoki keyingi davrda qayta urinib koʻring.",
+    "PLAN_EXPIRED": "schema.pi tarif rejangiz muddati tugadi. Iltimos, schema.pi tarif rejalari ekranida toʻlovni amalga oshiring.",
+    "PAY_PI_FAILED": "Pi toʻlov serveri bilan aloqa oʻrnatilmadi. Iltimos, birozdan keyin qayta urinib koʻring.",
+    "PAY_MISMATCH": "Toʻlov maʼlumotlari mos kelmadi.",
+    "PAY_AMOUNT_MISMATCH": "Toʻlov miqdori hisoblanganidan farq qiladi.",
+    "PAY_CANCELLED": "Toʻlov bekor qilindi.",
+    "PAY_ALREADY_PAID": "Toʻlov jarayoni davom etmoqda. Agar hamyoningizda imzo chekayotgan boʻlsangiz, iltimos, 3 daqiqadan keyin qayta urinib koʻring.",
+    "PAY_INVALID_STATE": "Toʻlovni hozirgi holatida qayta ishlash mumkin emas.",
+    "PAY_PI_CANCEL_REFUSED": "Toʻlov allaqachon davom etmoqda va uni bekor qilib boʻlmaydi. Iltimos, birozdan keyin qayta tekshiring.",
+    "PAY_PAYER": "Faqat ulanish egasi yoki administrator toʻlovlarni amalga oshirishi mumkin.",
+    "PAY_SUBSCRIBED": "Obuna boʻlganingizda, faqat joriy tarif rejangizni yangilash yoki muddatini uzaytirish uchun toʻlov qilishingiz mumkin.",
+    "PAY_UPGRADE": "Bu tarif rejasini yangilab boʻlmaydi.",
+    "PAY_PRICE_CHANGED": "Tarif rejasi holati oʻzgardi. Iltimos, toʻlovni qayta amalga oshiring.",
+    "PRICE_UNAVAILABLE": "Pi kursini tekshirib boʻlmadi. Iltimos, birozdan keyin qayta urinib koʻring.",
+    "QUOTE_EXPIRED": "Toʻlov kotirovkasi muddati tugadi. Iltimos, toʻlovni qayta amalga oshiring."
   },
   "analytics": {
     "title": "Analitika va koʻl",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "Maqsadli DB da pg_stat_statements kengaytmasi oʻrnatilmagan",
       "TIMEOUT": "Soʻrov vaqti tugadi",
       "RATE": "Juda koʻp soʻrovlar. Iltimos, bir daqiqadan keyin qayta urinib koʻring",
-      "INVALID_INPUT": "slk_ bilan boshlanadigan toʻliq ulanish tokenini joylashtiring"
+      "INVALID_INPUT": "slk_ bilan boshlanadigan toʻliq ulanish tokenini joylashtiring",
+      "PLAN_EXPIRED": "schema.pi tarif rejangiz muddati tugadi. Iltimos, schema.pi tarif rejalari ekranida toʻlovni amalga oshiring."
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "Operatsiyalar xavfsizligi",
     "learn": "Oʻrganish",
     "fold": "Menyuni yigʻish",
-    "unfold": "Menyuni ochish"
+    "unfold": "Menyuni ochish",
+    "plan": "Tarif rejasi"
+  },
+  "plan": {
+    "title": "Tarif rejasi",
+    "intro": "Tarif rejalari har bir schema.pi ulanishi (taksonomiya) uchun alohida belgilanadi. Yangi ulanishlar 7 kun davomida DBA tarif rejasini sinab koʻrishlari mumkin.",
+    "loading": "Tarif rejasi yuklanmoqda…",
+    "loadFail": "Tarif rejasini yuklab boʻlmadi. Iltimos, birozdan keyin qayta urinib koʻring.",
+    "names": {
+      "FREE": "Bepul",
+      "D1": "D1 Kuzatuv",
+      "D2": "D2 Sozlash",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Oʻrganish va kashf qilish",
+      "D1": "Operator — Hozir maʼlumotlar bazasi yaxshi ishlayotganini tekshiradi",
+      "D2": "Dasturchi va sozlovchi — Sekin SQLni tuzatadi",
+      "D3": "DBA va DA — Operatsion xavfsizlikdan tortib amalga oshirish va koʻlga qadar"
+    },
+    "feat": {
+      "FREE": "Monitoring paneli, ijro rejasini koʻrish, asosiy oʻrganish",
+      "D1": "Bepul funksiyalar + cheksiz ishlashni yigʻish, GAP tahlil soʻrovi, toʻliq oʻrganish",
+      "D2": "D1 funksiyalari + rejalarni taqqoslash, AI sozlash tavsiyalari, GAP tahlilini bajarish",
+      "D3": "D2 funksiyalari + amalga oshirish, quvur liniyasi, tahlil, operatsion xavfsizlik"
+    },
+    "featAi": "AI sozlash tavsiyalari oyiga {n} marta",
+    "featClct": "Ishlashni qoʻlda yigʻish kuniga {n} marta",
+    "aiNone": "AI sozlash tavsiyalari yoʻq",
+    "cur": "Joriy tarif rejasi: {plan}",
+    "grace": "Sinov",
+    "until": "{date}gacha ({days} kun qoldi)",
+    "aiLeft": "Bu oyda {left}/{total} ta AI sozlash tavsiyalari qoldi",
+    "clctLeft": "Bugun {left}/{total} ta qoʻlda ishlashni yigʻish qoldi",
+    "keep": "Oʻtgan qiymatlarni {days} kun saqlash",
+    "bndlOn": "schema.pi bilan bir xil taksonomiya uchun DA tarif rejasidan foydalanayotganingiz sababli, toʻlovdan 20% chegirma olasiz.",
+    "bndlOff": "Agar schema.pi bilan bir xil taksonomiya uchun DA tarif rejasidan (P4) foydalansangiz, toʻlovdan 20% chegirma olasiz.",
+    "monthly": "Oylik",
+    "yearly": "Yillik",
+    "freePrice": "Bepul",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "{prd} uchun toʻlash",
+    "extend": "{prd} muddatini uzaytirish",
+    "upgradeTitle": "Yangilash",
+    "upgradeNote": "Joriy tarif rejangizning qolgan kunlari toʻlovdan chegiriladi. Yillikdan oylikka oʻzgartira olmaysiz.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Yangilash",
+    "paying": "Toʻlanmoqda…",
+    "payStillWaiting": "Hamyon imzosini kutmoqda. Imzolangandan soʻng avtomatik ravishda qoʻllaniladi.",
+    "bought": "Toʻlov aks ettirildi.",
+    "payCancelled": "Toʻlov bekor qilindi.",
+    "payFailed": "Toʻlov amalga oshmadi. Iltimos, birozdan keyin qayta urinib koʻring.",
+    "piBrowserOnly": "Toʻlovni Pi Browserga Pi bilan kirganingizdan soʻng amalga oshirish mumkin.",
+    "payNote": "Toʻlov faqat Pi bilan amalga oshiriladi. KRW miqdori maʼlumot uchun boʻlib, toʻlov vaqtida real vaqt rejimida Pi kursiga aylantirilgan Pi miqdori qabul qilinadi.",
+    "from": "{plan}dan boshlab",
+    "notice": {
+      "required": "Bu funksiya {plan} tarif rejasidan boshlab mavjud.",
+      "limit": "Bu davr uchun barcha mavjud urinishlardan foydalanib boʻldingiz. {plan} tarif rejasiga yangilash orqali koʻproq foydalanishingiz mumkin.",
+      "limitTop": "Bu davr uchun barcha mavjud urinishlardan foydalanib boʻldingiz. Keyingi davrda yana foydalanishingiz mumkin.",
+      "expired": "schema.pi tarif rejangiz muddati tugadi — iltimos, schema.pi tarif rejalari ekranida toʻlovni amalga oshiring.",
+      "go": "Tarif rejasini koʻrish",
+      "close": "Yopish"
+    }
   }
 }

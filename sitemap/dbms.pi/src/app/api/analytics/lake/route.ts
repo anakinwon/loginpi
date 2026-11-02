@@ -11,7 +11,7 @@ export const GET = withGuard(
     const sp = req.nextUrl.searchParams
     const prj = sp.get('prj')
     if (prj !== null && !PRJ_ID_RE.test(prj)) return NextResponse.json({ error: 'INVALID_INPUT', code: 'INVALID_INPUT' }, { status: 400 })
-    const g = await linkGate(req, sp.get('link'))
+    const g = await linkGate(req, sp.get('link'), 'LAKE')
     if (g instanceof NextResponse) return g
     try {
       if (!prj) return NextResponse.json({ projects: await linkGet<Project[]>(g.linkId, '/projects') })

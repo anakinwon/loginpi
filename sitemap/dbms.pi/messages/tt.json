@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "This account is already linked.",
     "LINK_CODE_GEN_FAILED": "Could not create a link code. Please try again later.",
     "AUTH_DB_UNAVAILABLE": "Could not save your account, so sign-in failed. Please try again later.",
-    "LINK_TRY_LIMIT": "Too many incorrect link codes. Try again in 15 minutes."
+    "LINK_TRY_LIMIT": "Too many incorrect link codes. Try again in 15 minutes.",
+    "PLAN_REQUIRED": "This feature is not available with your current plan. Please upgrade your plan.",
+    "PLAN_LIMIT": "You have used all available attempts for this period. Please upgrade your plan or try again next period.",
+    "PLAN_EXPIRED": "Your schema.pi plan has expired. Please make a payment on the schema.pi plan screen.",
+    "PAY_PI_FAILED": "Failed to communicate with the Pi payment server. Please try again shortly.",
+    "PAY_MISMATCH": "Payment information does not match.",
+    "PAY_AMOUNT_MISMATCH": "The payment amount differs from the estimate.",
+    "PAY_CANCELLED": "Payment cancelled.",
+    "PAY_ALREADY_PAID": "There is a payment in progress. If you were signing in your wallet, please try again in 3 minutes.",
+    "PAY_INVALID_STATE": "The payment cannot be processed in its current state.",
+    "PAY_PI_CANCEL_REFUSED": "Payment is already in progress and cannot be cancelled. Please check again shortly.",
+    "PAY_PAYER": "Only the connection owner or administrator can make payments.",
+    "PAY_SUBSCRIBED": "While subscribed, you can only pay for upgrades or extensions of your current plan period.",
+    "PAY_UPGRADE": "This plan cannot be upgraded.",
+    "PAY_PRICE_CHANGED": "The plan status has changed. Please make the payment again.",
+    "PRICE_UNAVAILABLE": "Failed to check the Pi exchange rate. Please try again shortly.",
+    "QUOTE_EXPIRED": "The payment quote has expired. Please make the payment again."
   },
   "analytics": {
     "title": "Analytics & Lake",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "The pg_stat_statements extension is not installed on the target DB",
       "TIMEOUT": "The request timed out",
       "RATE": "Too many requests. Please try again in a minute",
-      "INVALID_INPUT": "Paste the full connection token starting with slk_"
+      "INVALID_INPUT": "Paste the full connection token starting with slk_",
+      "PLAN_EXPIRED": "Your schema.pi plan has expired. Please make a payment on the schema.pi plan screen."
     }
   },
   "migration": {
@@ -1413,6 +1430,70 @@
     "ops": "Ops Safety",
     "learn": "Learn",
     "fold": "Collapse menu",
-    "unfold": "Expand menu"
+    "unfold": "Expand menu",
+    "plan": "Plan"
+  },
+  "plan": {
+    "title": "Plan",
+    "intro": "Plans are set separately for each schema.pi connection (taxonomy). New connections can experience the DBA plan for 7 days.",
+    "loading": "Loading plan…",
+    "loadFail": "Failed to load the plan. Please try again shortly.",
+    "names": {
+      "FREE": "Free",
+      "D1": "D1 Observation",
+      "D2": "D2 Tuning",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Explore & Learn",
+      "D1": "Operator — Checks if the database is okay now",
+      "D2": "Developer & Tuner — Fixes slow SQL",
+      "D3": "DBA & DA — From operational safety to implementation and lake"
+    },
+    "feat": {
+      "FREE": "Monitoring board, execution plan view, basic learning",
+      "D1": "Free features + unlimited performance collection, GAP analysis query, full learning",
+      "D2": "D1 features + plan comparison, AI tuning recommendations, GAP analysis execution",
+      "D3": "D2 features + implementation, pipeline, analysis, operational safety"
+    },
+    "featAi": "AI tuning recommendations {n} times/month",
+    "featClct": "Manual performance collection {n} times/day",
+    "aiNone": "No AI tuning recommendations",
+    "cur": "Current plan: {plan}",
+    "grace": "Trial",
+    "until": "Until {date} ({days} days left)",
+    "aiLeft": "{left}/{total} AI tuning recommendations remaining this month",
+    "clctLeft": "{left}/{total} manual performance collections remaining today",
+    "keep": "Keep past values for {days} days",
+    "bndlOn": "You are using a DA plan for the same taxonomy as schema.pi, so you get a 20% discount on your payment.",
+    "bndlOff": "If you use a DA plan (P4) for the same taxonomy as schema.pi, you get a 20% discount on your payment.",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "freePrice": "Free",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Pay for {prd}",
+    "extend": "Extend {prd} period",
+    "upgradeTitle": "Upgrade",
+    "upgradeNote": "The remaining days of your current plan will be deducted from the payment. You cannot change from yearly to monthly.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Upgrade",
+    "paying": "Paying…",
+    "payStillWaiting": "Waiting for wallet signature. It will be automatically applied once signed.",
+    "bought": "Payment reflected.",
+    "payCancelled": "Payment cancelled.",
+    "payFailed": "Payment failed. Please try again shortly.",
+    "piBrowserOnly": "Payment can be made after logging in to Pi Browser with Pi.",
+    "payNote": "Payment is made only with Pi. The KRW amount is for reference, and the Pi amount converted at the real-time Pi exchange rate at the time of payment will be received.",
+    "from": "From {plan}",
+    "notice": {
+      "required": "This feature is available from the {plan} plan.",
+      "limit": "You have used all available attempts for this period. You can use more by upgrading to the {plan} plan.",
+      "limitTop": "You have used all available attempts for this period. You can use it again next period.",
+      "expired": "Your schema.pi plan has expired — please make a payment on the schema.pi plan screen.",
+      "go": "View Plan",
+      "close": "Close"
+    }
   }
 }

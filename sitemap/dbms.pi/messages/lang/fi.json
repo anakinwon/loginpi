@@ -70,7 +70,23 @@
     "LINK_ALREADY_LINKED": "Tämä tili on jo linkitetty.",
     "LINK_CODE_GEN_FAILED": "Linkkikoodia ei voitu luoda. Yritä myöhemmin uudelleen.",
     "AUTH_DB_UNAVAILABLE": "Tiliäsi ei voitu tallentaa, joten kirjautuminen epäonnistui. Yritä myöhemmin uudelleen.",
-    "LINK_TRY_LIMIT": "Liian monta virheellistä linkkikoodia. Yritä uudelleen 15 minuutin kuluttua."
+    "LINK_TRY_LIMIT": "Liian monta virheellistä linkkikoodia. Yritä uudelleen 15 minuutin kuluttua.",
+    "PLAN_REQUIRED": "Tämä ominaisuus ei ole käytettävissä nykyisellä tilauksellasi. Päivitä tilauksesi.",
+    "PLAN_LIMIT": "Olet käyttänyt kaikki käytettävissä olevat yritykset tällä jaksolla. Päivitä tilauksesi tai yritä uudelleen seuraavalla jaksolla.",
+    "PLAN_EXPIRED": "schema.pi-tilauksesi on vanhentunut. Suorita maksu schema.pi-tilausnäytöllä.",
+    "PAY_PI_FAILED": "Yhteys Pi-maksupalvelimeen epäonnistui. Yritä pian uudelleen.",
+    "PAY_MISMATCH": "Maksutiedot eivät täsmää.",
+    "PAY_AMOUNT_MISMATCH": "Maksettava summa eroaa arviosta.",
+    "PAY_CANCELLED": "Maksu peruutettu.",
+    "PAY_ALREADY_PAID": "Maksu on jo käynnissä. Jos olit kirjautumassa lompakkoosi, yritä uudelleen 3 minuutin kuluttua.",
+    "PAY_INVALID_STATE": "Maksua ei voida käsitellä sen nykyisessä tilassa.",
+    "PAY_PI_CANCEL_REFUSED": "Maksu on jo käynnissä, eikä sitä voi peruuttaa. Tarkista pian uudelleen.",
+    "PAY_PAYER": "Vain yhteyden omistaja tai järjestelmänvalvoja voi suorittaa maksuja.",
+    "PAY_SUBSCRIBED": "Tilauksen ollessa voimassa voit maksaa vain nykyisen tilauksesi päivityksistä tai laajennuksista.",
+    "PAY_UPGRADE": "Tätä tilausta ei voi päivittää.",
+    "PAY_PRICE_CHANGED": "Tilauksen tila on muuttunut. Suorita maksu uudelleen.",
+    "PRICE_UNAVAILABLE": "Pi-valuuttakurssin tarkistaminen epäonnistui. Yritä pian uudelleen.",
+    "QUOTE_EXPIRED": "Maksutarjous on vanhentunut. Suorita maksu uudelleen."
   },
   "analytics": {
     "title": "Analytiikka ja järvi",
@@ -382,7 +398,8 @@
       "PGSS_MISSING": "pg_stat_statements-laajennusta ei ole asennettu kohde-DB:hen",
       "TIMEOUT": "Pyynnön aikakatkaisu",
       "RATE": "Liian monta pyyntöä. Yritä uudelleen minuutin kuluttua",
-      "INVALID_INPUT": "Liitä koko yhteystunnus, joka alkaa slk_"
+      "INVALID_INPUT": "Liitä koko yhteystunnus, joka alkaa slk_",
+      "PLAN_EXPIRED": "schema.pi-tilauksesi on vanhentunut. Suorita maksu schema.pi-tilausnäytöllä."
     }
   },
   "migration": {
@@ -1411,6 +1428,70 @@
     "ops": "Toimintojen turvallisuus",
     "learn": "Opi",
     "fold": "Kutista valikko",
-    "unfold": "Laajenna valikko"
+    "unfold": "Laajenna valikko",
+    "plan": "Tilaus"
+  },
+  "plan": {
+    "title": "Tilaus",
+    "intro": "Tilaukset asetetaan erikseen jokaiselle schema.pi-yhteydelle (taksonomia). Uudet yhteydet voivat kokeilla DBA-tilausta 7 päivän ajan.",
+    "loading": "Ladataan tilausta…",
+    "loadFail": "Tilauksen lataaminen epäonnistui. Yritä pian uudelleen.",
+    "names": {
+      "FREE": "Ilmainen",
+      "D1": "D1 Havainnointi",
+      "D2": "D2 Viritys",
+      "D3": "D3 DBA"
+    },
+    "desc": {
+      "FREE": "Tutustu ja opi",
+      "D1": "Operaattori – Tarkistaa, onko tietokanta kunnossa nyt",
+      "D2": "Kehittäjä ja virittäjä – Korjaa hitaat SQL-kyselyt",
+      "D3": "DBA ja DA – Käyttöturvallisuudesta toteutukseen ja datajärveen"
+    },
+    "feat": {
+      "FREE": "Valvontapaneeli, suorituskykysuunnitelman näkymä, perusoppiminen",
+      "D1": "Ilmaiset ominaisuudet + rajoittamaton suorituskyvyn keräys, GAP-analyysikysely, täysi oppiminen",
+      "D2": "D1-ominaisuudet + suunnitelmien vertailu, tekoälypohjaiset virityssuositukset, GAP-analyysin suoritus",
+      "D3": "D2-ominaisuudet + toteutus, putkisto, analyysi, käyttöturvallisuus"
+    },
+    "featAi": "Tekoälypohjaiset virityssuositukset {n} kertaa/kuukausi",
+    "featClct": "Manuaalinen suorituskyvyn keräys {n} kertaa/päivä",
+    "aiNone": "Ei tekoälypohjaisia virityssuosituksia",
+    "cur": "Nykyinen tilaus: {plan}",
+    "grace": "Kokeilu",
+    "until": "Astia {date} ({days} päivää jäljellä)",
+    "aiLeft": "{left}/{total} tekoälypohjaista virityssuositusta jäljellä tässä kuussa",
+    "clctLeft": "{left}/{total} manuaalista suorituskyvyn keräystä jäljellä tänään",
+    "keep": "Säilytä aiemmat arvot {days} päivää",
+    "bndlOn": "Käytät DA-tilausta samalle taksonomialle kuin schema.pi, joten saat 20 % alennuksen maksustasi.",
+    "bndlOff": "Jos käytät DA-tilausta (P4) samalle taksonomialle kuin schema.pi, saat 20 % alennuksen maksustasi.",
+    "monthly": "Kuukausittain",
+    "yearly": "Vuosittain",
+    "freePrice": "Ilmainen",
+    "won": "{won} KRW",
+    "moneyKo": "{won} KRW ({pi} Pi)",
+    "pi": "{pi} Pi",
+    "buy": "Maksa {prd}",
+    "extend": "Jatka {prd} kautta",
+    "upgradeTitle": "Päivitä",
+    "upgradeNote": "Nykyisen tilauksesi jäljellä olevat päivät vähennetään maksusta. Et voi vaihtaa vuosittaisesta kuukausittaiseen.",
+    "upgradeTo": "{plan} {prd}",
+    "upgradeBtn": "Päivitä",
+    "paying": "Maksetaan…",
+    "payStillWaiting": "Odotetaan lompakon allekirjoitusta. Se otetaan automaattisesti käyttöön, kun allekirjoitus on tehty.",
+    "bought": "Maksu kirjattu.",
+    "payCancelled": "Maksu peruutettu.",
+    "payFailed": "Maksu epäonnistui. Yritä pian uudelleen.",
+    "piBrowserOnly": "Maksu voidaan suorittaa kirjautumalla Pi Browseriin Pi:llä.",
+    "payNote": "Maksu suoritetaan vain Pi:llä. KRW-määrä on viitteellinen, ja maksuhetken reaaliaikaisella Pi-valuuttakurssilla muunnettu Pi-määrä vastaanotetaan.",
+    "from": "Alkaen {plan}",
+    "notice": {
+      "required": "Tämä ominaisuus on käytettävissä {plan}-tilauksesta alkaen.",
+      "limit": "Olet käyttänyt kaikki käytettävissä olevat yritykset tällä jaksolla. Voit käyttää enemmän päivittämällä {plan}-tilaukseen.",
+      "limitTop": "Olet käyttänyt kaikki käytettävissä olevat yritykset tällä jaksolla. Voit käyttää sitä uudelleen seuraavalla jaksolla.",
+      "expired": "schema.pi-tilauksesi on vanhentunut – suorita maksu schema.pi-tilausnäytöllä.",
+      "go": "Näytä tilaus",
+      "close": "Sulje"
+    }
   }
 }

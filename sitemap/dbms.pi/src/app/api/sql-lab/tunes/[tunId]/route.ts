@@ -36,7 +36,7 @@ export const PATCH = withGuard(
     if (body.act === 'measure' && !body.aftPlanId)
       return apiError('INVALID_INPUT', 400)
     const [ok, tunR, aftR] = await Promise.all([
-      requireUserLink(req, body.linkId),
+      requireUserLink(req, body.linkId, 'SQL_TUNE'),
       db()
         .from('dbm_sql_tun')
         .select('tun_sts_cd, conn_id, sql_hash, plan_id, aprv_dtm')
@@ -111,7 +111,7 @@ export const DELETE = withGuard(
     const linkId = req.nextUrl.searchParams.get('link')
     if (!tunId || !linkId || !UUID.test(linkId))
       return apiError('INVALID_INPUT', 400)
-    const ok = await requireUserLink(req, linkId)
+    const ok = await requireUserLink(req, linkId, 'ANY')
     if (ok instanceof NextResponse) return ok
     const now = new Date().toISOString()
     const { data, error } = await db()

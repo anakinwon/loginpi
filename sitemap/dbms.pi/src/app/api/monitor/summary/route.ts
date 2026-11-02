@@ -11,7 +11,7 @@ export const GET = withGuard(
     const sp = req.nextUrl.searchParams
     const min = Number(sp.get('min') ?? 60)
     if (!isPeriod(min)) return NextResponse.json({ error: 'INVALID_INPUT', code: 'INVALID_INPUT' }, { status: 400 })
-    const g = await linkGate(req, sp.get('link'))
+    const g = await linkGate(req, sp.get('link'), 'MON')
     if (g instanceof NextResponse) return g
     try {
       const raw = await linkGet<unknown>(g.linkId, `/mon/summary?min=${min}`)
