@@ -14,6 +14,7 @@
 //     서브 메뉴 = 메인 메뉴 바로 위, 묶음 기준 정렬(마스터 지시 2026-10-18) : 표준사전 = 묶음 왼쪽 끝에 맞춤, 모델·설정 = 묶음 오른쪽 끝에 맞춤(화면 끝 안쪽으로)
 //   · 요금제 = 설정 오른쪽 독립 메인 메뉴, 권한 무관(멤버면 항상 — 결제 전에도 들어가야 함, 마스터 지시 2026-10-19)
 //  좁은 화면은 가로 스크롤(줄바꿈 없이 한 줄 유지)
+//  접힘 = 전체 폭 44px 접힘 바(마스터 2026-11-02 Pi Browser 접힘 손잡이 가림 — 화면 맨 아래 16px 손잡이가 Android WebView 하단 제스처 바·브라우저 UI 에 덮임), 펼침 손잡이 눌림 영역 32×64px
 import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
 import { useParams, useSearchParams } from 'next/navigation'
@@ -153,9 +154,14 @@ const REST: Item[] = [
 const PLAN_ITEM: Item = { seg: 'plan', nm: 'plan', icon: I.plan }
 
 // 메뉴 묶음 박스 — 묶음별 무채색 계열 색감(마스터 지시 2026-10-21, src/lib/menu-icons TONE)
-const group = (t: Tone) => `flex shrink-0 gap-1 rounded-md border p-0.5 ${t.box}`
+const group = (t: Tone) =>
+  `flex shrink-0 gap-1 rounded-md border p-0.5 ${t.box}`
 // ?tab= 이 없을 때 화면별 기본 탭
-const DEF_TAB: Record<string, string> = { model: 'prj', bulk: 'words', monitor: 'app' }
+const DEF_TAB: Record<string, string> = {
+  model: 'prj',
+  bulk: 'words',
+  monitor: 'app',
+}
 // 아이콘 = 가장 일반적인 기호(설정 = 톱니바퀴 등, 2026-10-21 — 2026-10-20 의 가는 선 기하 기호 대체), 색 = 묶음 색
 //  평소 = 흰 바탕 + 묶음 색 테두리 타일, 현재 메뉴 = 묶음의 진한 색 타일 + 흰 아이콘, 서브 바 = 현재 묶음의 연한 바탕 · 현재 서브 탭 = 진한 색
 // 메인 메뉴 = 아이콘 타일 위 + 작은 글씨 아래, 현재 메뉴는 묶음 연한 바탕
@@ -201,7 +207,13 @@ export default function AreaNav() {
     (m) => m.subs && isOn(m),
   )
   // 서브 바 색 = 현재 메뉴가 속한 묶음 색
-  const subTone = SQLED.includes(active!) ? TONE.tech : CORE.includes(active!) ? TONE.std : MODEL.includes(active!) ? TONE.model : TONE.set
+  const subTone = SQLED.includes(active!)
+    ? TONE.tech
+    : CORE.includes(active!)
+      ? TONE.std
+      : MODEL.includes(active!)
+        ? TONE.model
+        : TONE.set
   // 지금 메뉴(서브 유무 무관 — 접은 줄 표시용)
   const cur = [...REST, ...CORE, ...MODEL, ...SQLED, PLAN_ITEM].find(isOn)
   // 서브 바를 현재 메인 메뉴 묶음 위에 — 묶음 data-sub-align(left·right) 끝에 맞추고 화면 양끝 8px 안쪽으로, 메인 줄 가로 스크롤·창 크기 바뀌면 다시 계산
@@ -267,7 +279,7 @@ export default function AreaNav() {
       )
     set()
     const ro = new ResizeObserver(set)
-    ro.observe(nav)
+    ro.observe(nav, { box: 'border-box' }) // 아래 여백(safe-area) 만 바뀌어도 다시 잼
     return () => {
       ro.disconnect()
       document.documentElement.style.removeProperty('--area-nav-h')
@@ -294,29 +306,34 @@ export default function AreaNav() {
     <nav
       ref={navRef}
       aria-label={t('label')}
-      className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 backdrop-blur"
+      className={`fixed inset-x-0 bottom-0 z-40 touch-manipulation border-t bg-white/95 backdrop-blur ${fold ? 'pb-[max(12px,env(safe-area-inset-bottom))]' : 'pb-[max(4px,env(safe-area-inset-bottom))]'}`}
     >
-      {/* 접기·펼치기 손잡이 — 본문과 하단 메뉴 사이 선 중앙에 화살표만(마스터 지시 2026-10-20), 서브 바를 가리지 않게 선 위에 얹음 */}
-      <button
-        type="button"
-        onClick={toggle}
-        aria-expanded={!fold}
-        aria-label={
-          fold
-            ? cur
-              ? t('expandWith', { menu: t(cur.nm) })
-              : t('expand')
-            : t('collapse')
-        }
-        title={fold ? t('expand') : t('collapse')}
-        className="absolute bottom-full left-1/2 flex h-4 w-12 -translate-x-1/2 items-center justify-center rounded-t-md border border-b-0 bg-white text-gray-500 shadow-[0_-1px_2px_rgba(15,23,42,0.06)] hover:bg-gray-100 hover:text-gray-800"
-      >
-        {fold ? (
-          <ChevronUp className="h-3.5 w-3.5" aria-hidden />
-        ) : (
+      {/* 접힘 = 전체 폭 접힘 바(44px, 바 전체가 눌림 영역) — 화면 맨 아래에서 띄워 Pi Browser 하단 제스처 바·브라우저 UI 에 가리지 않게(마스터 2026-11-02) */}
+      {fold ? (
+        <button
+          type="button"
+          onClick={toggle}
+          aria-expanded={false}
+          aria-label={cur ? t('expandWith', { menu: t(cur.nm) }) : t('expand')}
+          title={t('expand')}
+          className="flex min-h-11 w-full items-center justify-center gap-1.5 px-3 text-xs text-[#5b6578] hover:bg-gray-100 hover:text-[#2c3850] focus-visible:ring-2 focus-visible:ring-[#5b6578]/50 focus-visible:outline-none focus-visible:ring-inset"
+        >
+          <ChevronUp className="h-4 w-4 shrink-0" aria-hidden />
+          <span className="truncate">{cur ? t(cur.nm) : t('expand')}</span>
+        </button>
+      ) : (
+        // 접기 손잡이 — 본문과 하단 메뉴 사이 선 중앙에 화살표만(마스터 지시 2026-10-20), 서브 바를 가리지 않게 선 위에 얹음. 모양 16×48 그대로, 눌림 영역 = 투명 의사요소로 32×64(아래는 4px 만 — 메인 메뉴 줄 위 여백 안)
+        <button
+          type="button"
+          onClick={toggle}
+          aria-expanded
+          aria-label={t('collapse')}
+          title={t('collapse')}
+          className="absolute bottom-full left-1/2 z-10 flex h-4 w-12 -translate-x-1/2 items-center justify-center rounded-t-md border border-b-0 bg-white text-gray-500 shadow-[0_-1px_2px_rgba(15,23,42,0.06)] before:absolute before:-inset-x-2 before:-top-3 before:-bottom-1 hover:bg-gray-100 hover:text-gray-800"
+        >
           <ChevronDown className="h-3.5 w-3.5" aria-hidden />
-        )}
-      </button>
+        </button>
+      )}
       {!fold && active?.subs && (
         <div className="relative h-9">
           <ul
@@ -346,23 +363,39 @@ export default function AreaNav() {
         <div ref={rowRef} className="w-full overflow-x-auto px-2 py-1.5">
           <div className="mx-auto flex w-max items-center gap-2 whitespace-nowrap">
             {visible(SQLED).length > 0 && (
-              <ul aria-label={t('groupTech')} data-sub-align="item" className={group(TONE.tech)}>
+              <ul
+                aria-label={t('groupTech')}
+                data-sub-align="item"
+                className={group(TONE.tech)}
+              >
                 {visible(SQLED).map(item(TONE.tech))}
               </ul>
             )}
             {/* 메뉴 묶음 = 메뉴 권한(2 표준·3 모델링·4 설정)이 있을 때만 — 역할 ∩ 요금제 */}
             {allowed('STD_VIEW') && (
-              <ul aria-label={t('groupStd')} data-sub-align="left" className={group(TONE.std)}>
+              <ul
+                aria-label={t('groupStd')}
+                data-sub-align="left"
+                className={group(TONE.std)}
+              >
                 {visible(CORE).map(item(TONE.std))}
               </ul>
             )}
             {allowed('MODEL_VIEW') && (
-              <ul aria-label={t('groupModel')} data-sub-align="right" className={group(TONE.model)}>
+              <ul
+                aria-label={t('groupModel')}
+                data-sub-align="right"
+                className={group(TONE.model)}
+              >
                 {visible(MODEL).map(item(TONE.model))}
               </ul>
             )}
             {allowed('SET_VIEW') && (
-              <ul aria-label={t('groupSet')} data-sub-align="right" className={group(TONE.set)}>
+              <ul
+                aria-label={t('groupSet')}
+                data-sub-align="right"
+                className={group(TONE.set)}
+              >
                 {visible(REST).map(item(TONE.set))}
               </ul>
             )}
