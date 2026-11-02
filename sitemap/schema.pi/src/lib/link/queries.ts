@@ -20,7 +20,7 @@ const Q = {
 FROM pg_stat_database d WHERE d.datname = current_database()`,
   top_sql: `SELECT s.queryid::text AS queryid, pg_get_userbyid(s.userid) AS usr_nm, left(regexp_replace(s.query, '\\s+', ' ', 'g'), 1000) AS query, s.calls, round(s.total_exec_time::numeric, 2) AS total_ms, round(s.mean_exec_time::numeric, 3) AS mean_ms,
   round(s.max_exec_time::numeric, 2) AS max_ms, s.rows, s.shared_blks_hit, s.shared_blks_read, s.temp_blks_written
-FROM pg_stat_statements s WHERE s.dbid = (SELECT oid FROM pg_database WHERE datname = current_database()) ORDER BY s.total_exec_time DESC LIMIT $1`,
+FROM pg_stat_statements s WHERE s.dbid = (SELECT oid FROM pg_database WHERE datname = current_database()) ORDER BY s.max_exec_time DESC LIMIT $1`,
   tbl_stats: `SELECT schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_live_tup, n_dead_tup, n_mod_since_analyze, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze, vacuum_count, autovacuum_count
 FROM pg_stat_user_tables WHERE ($1::text IS NULL OR schemaname = $1) ORDER BY seq_tup_read DESC NULLS LAST, relname LIMIT ${MAX_ROWS} OFFSET $2`,
   idx_stats: `SELECT s.schemaname, s.relname, s.indexrelname, s.idx_scan, s.idx_tup_read, s.idx_tup_fetch, pg_relation_size(s.indexrelid) AS idx_sz, i.indisunique, i.indisprimary, i.indisvalid

@@ -41,6 +41,8 @@ test('QUERY_NAMES 17개 불변(이름·순서)', () => {
 test('top_sql — usr_nm(pg_get_userbyid) 추가, 기존 칼럼 유지', () => {
   const q = sqlOf('top_sql')
   assert.match(q, /pg_get_userbyid\(s\.userid\) AS usr_nm/)
+  // 느린 SQL 순위 = 1회 최고 시간(마스터 2026-11-02) — 총 시간·평균 순 금지
+  assert.match(q, /ORDER BY s\.max_exec_time DESC/)
   for (const c of [
     'AS queryid',
     'AS query,',
