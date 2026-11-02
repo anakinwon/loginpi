@@ -63,8 +63,9 @@ export async function resolveTarget(c: { host_nm: string | null; port_no: number
   return { ip: ips[0], host: c.host_nm, port: c.port_no, db: c.db_nm, usr: c.usr_nm, priv: bad.length > 0, ca: c.ca_cert_txt ?? null }
 }
 
-export const pgClient = (t: Target, pwd: string) =>
-  postgres({ host: t.ip, port: t.port, database: t.db, username: t.usr, password: pwd, max: 1, connect_timeout: 10, idle_timeout: 5, prepare: false, onnotice: () => {}, ssl: t.priv ? false : { rejectUnauthorized: true, servername: isIP(t.host) ? undefined : t.host, ...(t.ca ? { ca: t.ca } : {}) } }) // 사설 주소(개발 전용 허용)만 평문
+// app = application_name(pg_stat_activity 출처 판정용, 63자 이내 ASCII) — 없으면 postgres.js 기본 'postgres.js'. 연결 API 만 'dbms.pi-link'(SQL 편집기 등 사람 조회와 구분)
+export const pgClient = (t: Target, pwd: string, app?: string) =>
+  postgres({ host: t.ip, port: t.port, database: t.db, username: t.usr, password: pwd, max: 1, connect_timeout: 10, idle_timeout: 5, prepare: false, onnotice: () => {}, ...(app ? { connection: { application_name: app } } : {}), ssl: t.priv ? false : { rejectUnauthorized: true, servername: isIP(t.host) ? undefined : t.host, ...(t.ca ? { ca: t.ca } : {}) } }) // 사설 주소(개발 전용 허용)만 평문
 
 // 연결 시험(SELECT 1)
 export async function testConn(dbms: string, t: Target, pwd: string): Promise<{ ok: boolean; msg: string }> {

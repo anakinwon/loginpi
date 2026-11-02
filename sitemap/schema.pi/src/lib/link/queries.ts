@@ -11,6 +11,8 @@ import type { LinkCode } from './auth'
 import { explainTarget } from './rules'
 
 export const MAX_ROWS = 500
+// 대상 DB application_name — dbms.pi 출처 판정 MONITOR_APPS 와 같은 값(바꾸면 dbms.pi src/lib/perf/source.ts 도 함께)
+export const LINK_APP = 'dbms.pi-link'
 const SYS_NS = `n.nspname NOT IN ('pg_catalog', 'information_schema', 'pg_toast') AND n.nspname NOT LIKE 'pg_temp%' AND n.nspname NOT LIKE 'pg_toast_temp%'`
 // $1 = schema(선택) · $2 = table(선택) · $3 = offset — 인자가 없는 조회는 아래 ARGS 에서 빈 배열
 const Q = {
@@ -18,9 +20,12 @@ const Q = {
   round(100.0 * d.blks_hit / nullif(d.blks_hit + d.blks_read, 0), 2) AS cache_hit_pct, d.tup_returned, d.tup_fetched, d.tup_inserted, d.tup_updated, d.tup_deleted,
   d.conflicts, d.temp_files, d.temp_bytes, d.deadlocks, pg_database_size(d.datname) AS db_sz, d.stats_reset
 FROM pg_stat_database d WHERE d.datname = current_database()`,
-  top_sql: `SELECT s.queryid::text AS queryid, pg_get_userbyid(s.userid) AS usr_nm, left(regexp_replace(s.query, '\\s+', ' ', 'g'), 1000) AS query, s.calls, round(s.total_exec_time::numeric, 2) AS total_ms, round(s.mean_exec_time::numeric, 3) AS mean_ms,
+  // 안쪽에서 수치만 max 정렬·LIMIT, 정규식·계정명은 바깥 N행에만 — SELECT 목록에 두면 pgss 전체(수천 행·수 MB 문장)에 정규식을 돌린 뒤 버려 1회 ~200ms(실측 2026-11-02, 바꾼 뒤 13~16ms)
+  // 안쪽 left(query, 2000) = N행에 32KB 문장이 몰려도 정규식 비용 상한
+  top_sql: `SELECT s.queryid::text AS queryid, pg_get_userbyid(s.userid) AS usr_nm, left(regexp_replace(left(s.query, 2000), '\\s+', ' ', 'g'), 1000) AS query, s.calls, round(s.total_exec_time::numeric, 2) AS total_ms, round(s.mean_exec_time::numeric, 3) AS mean_ms,
   round(s.max_exec_time::numeric, 2) AS max_ms, s.rows, s.shared_blks_hit, s.shared_blks_read, s.temp_blks_written
-FROM pg_stat_statements s WHERE s.dbid = (SELECT oid FROM pg_database WHERE datname = current_database()) ORDER BY s.max_exec_time DESC LIMIT $1`,
+FROM (SELECT p.queryid, p.userid, p.query, p.calls, p.total_exec_time, p.mean_exec_time, p.max_exec_time, p.rows, p.shared_blks_hit, p.shared_blks_read, p.temp_blks_written
+  FROM pg_stat_statements p WHERE p.dbid = (SELECT oid FROM pg_database WHERE datname = current_database()) ORDER BY p.max_exec_time DESC LIMIT $1) s ORDER BY s.max_exec_time DESC`,
   tbl_stats: `SELECT schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_live_tup, n_dead_tup, n_mod_since_analyze, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze, vacuum_count, autovacuum_count
 FROM pg_stat_user_tables WHERE ($1::text IS NULL OR schemaname = $1) ORDER BY seq_tup_read DESC NULLS LAST, relname LIMIT ${MAX_ROWS} OFFSET $2`,
   idx_stats: `SELECT s.schemaname, s.relname, s.indexrelname, s.idx_scan, s.idx_tup_read, s.idx_tup_fetch, pg_relation_size(s.indexrelid) AS idx_sz, i.indisunique, i.indisprimary, i.indisvalid
@@ -139,7 +144,7 @@ export async function runNamed(
           ? '호스트 이름을 찾을 수 없습니다'
           : '허용되지 않은 접속 주소입니다',
     }
-  const sql = pgClient(t, pwd)
+  const sql = pgClient(t, pwd, LINK_APP)
   const t0 = Date.now()
   try {
     const r = await sql.begin('READ ONLY', async (tx) => {

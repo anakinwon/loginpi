@@ -56,6 +56,18 @@ test('top_sql — usr_nm(pg_get_userbyid) 추가, 기존 칼럼 유지', () => {
     assert.ok(q.includes(c), c)
 })
 
+test('top_sql — 정규식은 바깥 상위 N행에만(안쪽 = 수치 정렬·LIMIT), 연결 API application_name', () => {
+  const q = sqlOf('top_sql')
+  const inner = q.slice(q.indexOf('FROM (SELECT'))
+  assert.ok(q.indexOf('regexp_replace') < q.indexOf('FROM (SELECT'))
+  assert.ok(!inner.includes('regexp_replace'), '안쪽 서브쿼리에 정규식 금지')
+  assert.ok(!inner.includes('pg_get_userbyid'))
+  assert.match(inner, /FROM pg_stat_statements p .*ORDER BY p\.max_exec_time DESC LIMIT \$1\) s/s)
+  assert.match(q, /regexp_replace\(left\(s\.query, 2000\), '\\\\s\+'/) // TS 템플릿 안 '\\s+' = DB 로 '\s+'
+  assert.match(src, /export const LINK_APP = 'dbms\.pi-link'/)
+  assert.match(src, /pgClient\(t, pwd, LINK_APP\)/)
+})
+
 test('activity — query_id(to_jsonb, PG13 이하 NULL) 추가, 기존 칼럼 유지', () => {
   const q = sqlOf('activity')
   assert.match(q, /\(to_jsonb\(a\) ->> 'query_id'\) AS query_id/)
