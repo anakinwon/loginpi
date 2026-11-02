@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sessions are waiting on locks — find the blocking session and end its transaction.",
         "CACHE_HIT": "Cache hit rate {pct}% — look for full scans of large tables or review shared_buffers.",
         "XACT_ERR": "Rollback rate {pct}%, {dlck} deadlocks — check the failing transactions and app error logs.",
-        "SLOW_SQL": "A query averages {ms} ms — tune the top queries by total time using their plans.",
+        "SLOW_SQL": "There is a query that takes up to {ms}ms per execution — view the execution plan and tune it, starting from the highest single execution time.",
         "STORAGE": "The DB ({gb} GB) is near its limit (days left {days}) — clean up large tables or add capacity.",
         "VACUUM": "{tbl} has many dead rows or stale statistics — review VACUUM (ANALYZE) and autovacuum settings.",
         "INDEX": "{n} index findings (invalid, unused, full scans) — see the table & index health tab for the targets.",
@@ -677,9 +677,9 @@
           "3": "Check that retry logic is not inflating rollbacks."
         },
         "SLOW_SQL": {
-          "1": "Pick the top queries by total time in the slow query tab.",
+          "1": "From the slow queries tab, select the query with the highest single execution time.",
           "2": "Review plans in SQL tuning and fix indexes or joins.",
-          "3": "After fixing, check that the mean time went down."
+          "3": "After fixing, reset statistics (pg_stat_statements_reset) and check again if the highest single execution time has decreased."
         },
         "STORAGE": {
           "1": "See the growth trend and estimated full date in the size trend tab.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Cache hit rate trend",
         "capacity": "DB size & forecast",
         "slowTop": "Slow SQL top 10",
-        "slowLegend": "Bar length = total time · color = mean time (▲ warning from {warn}ms · ✕ risk from {risk}ms)",
+        "slowLegend": "Bar length/color = Max single execution time (▲ {warn}ms or more: warning · ✕ {risk}ms or more: risk)",
         "sizeTop": "Space top 10",
         "heat": "Risk by signal over time",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Do throughput and failure rate move together?",
           "cacheTrend": "When did the cache hit rate drop?",
           "capacity": "When will the DB fill up?",
-          "slowTop": "What to tune first? (by total time)",
+          "slowTop": "What to tune first? (By max single execution time)",
           "sizeTop": "What is taking the space?",
           "heat": "Is the risk a one-off or recurring?",
           "radar": "Which area is weak?",
@@ -778,9 +778,7 @@
           "value": "Value",
           "time": "Time",
           "calls": "Calls",
-          "total": "Total (ms)",
           "mean": "Mean (ms)",
-          "share": "Share",
           "score": "Score",
           "level": "Level",
           "ago": "1 hour ago",
@@ -789,7 +787,8 @@
           "sessions": "Sessions",
           "schema": "Schema",
           "size": "Size",
-          "thr": "Threshold (warn·risk)"
+          "thr": "Threshold (warn·risk)",
+          "max": "Max single (ms)"
         },
         "radar": "Health score by area",
         "radarCur": "Now",
@@ -1025,7 +1024,9 @@
       "src": "Source",
       "srcToggle": "Show or hide source details",
       "openSqlLab": "Open in SQL Tuning",
-      "acct": "Account"
+      "acct": "Account",
+      "sortMax": "Max single execution time",
+      "maxMs": "Max single ms"
     },
     "health": {
       "empty": "No snapshots yet. Press Collect now on the Collect tab",
@@ -1077,7 +1078,7 @@
       "fix": {
         "TOOL": "Looks like a person querying the production DB directly with a DB tool (DBeaver etc.). Point them to a read-only replica or analytics DB instead, and cap run time on human accounts, e.g. ALTER ROLE human_user SET statement_timeout = '30s'. Use a separate read-only role, and run bulk extracts in off-peak hours",
         "BATCH": "Looks like a batch or scheduled job. Spread run times away from business peaks and shrink the work per commit. Check indexes and statistics (ANALYZE) on the target tables, and split long transactions. Putting the job name in application_name makes the next classification more precise",
-        "PROGRAM": "Looks like a query run by an application. Check the plan in SQL Tuning. Many calls with a short mean point to repeated calls (N+1) or caching; a long mean points to indexes or join order first. Set the service name in your connection pool's application_name",
+        "PROGRAM": "This appears to be a query executed by the application. Check the execution plan in SQL tuning. If the max single execution time is long, first look at indexes and join order. If a single execution is short but the call count is high, look at repeated calls (N+1) and caching. Put the service name in the application_name of the connection pool.",
         "PLATFORM": "Looks like DB or platform internal work such as autovacuum or replication. Usually no action is needed. If it stays at the top, review autovacuum thresholds and maintenance_work_mem",
         "MONITOR": "Looks like this service's own statistics queries (schema.pi link). No action needed. If it shows up too often, lower the polling frequency",
         "UNKNOWN": "There is no clue to the source. Set application_name on every connection and split accounts by purpose; it will be classified from the next samples"

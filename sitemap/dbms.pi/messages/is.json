@@ -611,7 +611,7 @@
         "LOCK_WAIT": "{n} lotur bíða eftir læsingum — finndu læsandi lotuna og ljúktu viðskiptum hennar.",
         "CACHE_HIT": "Skyndiminni-hlutfall {pct}% — leitaðu að fullum skönnunum á stórum töflum eða farðu yfir shared_buffers.",
         "XACT_ERR": "Afturköllunarhlutfall {pct}%, {dlck} dauðalæsingar — athugaðu bilandi viðskipti og villuskrá forritsins.",
-        "SLOW_SQL": "Fyrirspurn er að meðaltali {ms} ms — stilltu efstu fyrirspurnirnar eftir heildartíma með því að nota áætlanir þeirra.",
+        "SLOW_SQL": "Það er fyrirspurn sem tekur allt að {ms}ms í hverri keyrslu — skoðaðu keyrsluáætlunina og stilltu hana, byrjaðu á hæsta einstaka keyrslutíma.",
         "STORAGE": "DB ({gb} GB) er nálægt mörkum sínum (dagar eftir {days}) — hreinsaðu stórar töflur eða bættu við afkastagetu.",
         "VACUUM": "{tbl} hefur margar dauðar raðir eða úreltar tölfræði — farðu yfir VACUUM (ANALYZE) og autovacuum stillingar.",
         "INDEX": "{n} vísitölufundir (ógildir, ónotaðir, fullar skannanir) — sjáðu flipann um töflu- og vísitölustöðu fyrir markmiðin.",
@@ -673,9 +673,9 @@
           "3": "Athugaðu að endurtekningarrökfræði sé ekki að blása upp afturköllun."
         },
         "SLOW_SQL": {
-          "1": "Veldu efstu fyrirspurnirnar eftir heildartíma í flipanum um hægar fyrirspurnir.",
+          "1": "Á flipanum fyrir hægar fyrirspurnir, veldu fyrirspurnina með hæsta einstaka keyrslutíma.",
           "2": "Farðu yfir áætlanir í SQL-stillingu og lagaðu vísitölur eða samsetningar.",
-          "3": "Eftir lagfæringu, athugaðu að meðaltíminn hafi lækkað."
+          "3": "Eftir lagfæringu, endurstilltu tölfræði (pg_stat_statements_reset) og athugaðu aftur hvort hæsti einstaki keyrslutíminn hafi minnkað."
         },
         "STORAGE": {
           "1": "Sjáðu vaxtarþróun og áætlaðan fullan dag í flipanum um stærðarþróun.",
@@ -727,7 +727,7 @@
         "cacheTrend": "Þróun skyndiminni-hlutfalls",
         "capacity": "DB-stærð og spá",
         "slowTop": "Hægur SQL topp 10",
-        "slowLegend": "Stikullengd = heildartími · litur = meðaltími (▲ viðvörun frá {warn}ms · ✕ hætta frá {risk}ms)",
+        "slowLegend": "Lengd/litur stiku = Hámark einstaks keyrslutíma (▲ {warn}ms eða meira: viðvörun · ✕ {risk}ms eða meira: áhætta)",
         "sizeTop": "Pláss topp 10",
         "heat": "Áhætta eftir merki yfir tíma",
         "q": {
@@ -737,7 +737,7 @@
           "tpsCombo": "Hreyfast gegnumstreymi og bilunarhlutfall saman?",
           "cacheTrend": "Hvenær lækkaði skyndiminni-hlutfallið?",
           "capacity": "Hvenær fyllist DB?",
-          "slowTop": "Hvað á að stilla fyrst? (eftir heildartíma)",
+          "slowTop": "Hvað á að stilla fyrst? (Eftir hámarki einstaks keyrslutíma)",
           "sizeTop": "Hvað tekur plássið?",
           "heat": "Er áhættan einstök eða endurtekin?",
           "radar": "Hvaða svæði er veikt?",
@@ -774,9 +774,7 @@
           "value": "Gildi",
           "time": "Tími",
           "calls": "Símtöl",
-          "total": "Samtals (ms)",
           "mean": "Meðaltal (ms)",
-          "share": "Hlutdeild",
           "score": "Stig",
           "level": "Stig",
           "ago": "Fyrir 1 klukkustund",
@@ -785,7 +783,8 @@
           "sessions": "Lotur",
           "schema": "Skema",
           "size": "Stærð",
-          "thr": "Þröskuldur (viðvörun·áhætta)"
+          "thr": "Þröskuldur (viðvörun·áhætta)",
+          "max": "Hámark einstaks (ms)"
         },
         "radar": "Heilsustig eftir svæðum",
         "radarCur": "Núna",
@@ -1015,7 +1014,9 @@
       "src": "Uppruni",
       "srcToggle": "Sýna eða fela upprunaupplýsingar",
       "openSqlLab": "Opna í SQL Tuning",
-      "acct": "Reikningur"
+      "acct": "Reikningur",
+      "sortMax": "Hámark einstaks keyrslutíma",
+      "maxMs": "Hámark einstaks ms"
     },
     "health": {
       "empty": "Engar skyndimyndir ennþá. Ýttu á Safna núna á Safna flipanum",
@@ -1066,7 +1067,7 @@
       "fix": {
         "TOOL": "Líklega er einstaklingur að spyrja framleiðslu DB beint með DB verkfæri (DBeaver o.s.frv.). Vísaðu þeim í les-aðeins afrit eða greiningar DB í staðinn, og takmarkaðu keyrslutíma á mannlegum reikningum, t.d. ALTER ROLE human_user SET statement_timeout = '30s'. Notaðu sérstakt les-aðeins hlutverk, og keyrðu stórar útdrættir utan háannatíma.",
         "BATCH": "Líklega hópur eða tímasett verk. Dreifðu keyrslutímum frá háannatímum og minnkaðu vinnu á hverja skuldbindingu. Athugaðu vísitölur og tölfræði (ANALYZE) á markatöflunum, og skiptu löngum færslum. Að setja nafn verksins í application_name gerir næstu flokkun nákvæmari.",
-        "PROGRAM": "Líklega fyrirspurn keyrð af forriti. Athugaðu áætlunina í SQL Tuning. Margar kallanir með stuttan meðaltal benda til endurtekinna kalla (N+1) eða skyndiminni; langur meðaltal bendir fyrst til vísitölu eða samsetningarröð. Stilltu þjónustunafnið í application_name tengingarsafnsins þíns.",
+        "PROGRAM": "Þetta virðist vera fyrirspurn sem forritið keyrði. Athugaðu keyrsluáætlunina í SQL stillingu. Ef hámark einstaks keyrslutíma er langur, skoðaðu fyrst vísitölur og samsetningarröð. Ef ein keyrsla er stutt en fjöldi kalla er mikill, skoðaðu endurtekin köll (N+1) og skyndiminni. Settu þjónustunafnið í application_name tengipottarins.",
         "PLATFORM": "Líklega DB eða innri kerfisvinna eins og autovacuum eða afritun. Venjulega er engin aðgerð nauðsynleg. Ef það heldur áfram að vera efst, skoðaðu autovacuum þröskulda og maintenance_work_mem.",
         "MONITOR": "Líklega eigin tölfræðifyrirspurnir þessarar þjónustu (schema.pi tengill). Engin aðgerð nauðsynleg. Ef það birtist of oft, lækkaðu könnunartíðni.",
         "UNKNOWN": "Engin vísbending er um upprunann. Stilltu application_name á hverri tengingu og skiptu reikningum eftir tilgangi; það verður flokkað út frá næstu sýnum."

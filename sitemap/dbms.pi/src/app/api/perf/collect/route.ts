@@ -26,13 +26,16 @@ const toDtm = (v: unknown) => {
   return d && !Number.isNaN(d.getTime()) ? d.toISOString() : null
 }
 
-// sql/032(usr_nm) 미적용 DB 에 코드가 먼저 배포돼도 수집은 계속 — 칼럼 없음(42703)이면 usr_nm 빼고 재시도
+// sql/033(max_ms)·032(usr_nm) 미적용 DB 에 코드가 먼저 배포돼도 수집은 계속 — 칼럼 없음(42703)이면 새 칼럼부터 빼고 재시도
 async function insQry(rows: Record<string, unknown>[]) {
-  const r = await db().from('dbm_prf_qry').insert(rows)
+  const ins = (rs: Record<string, unknown>[]) =>
+    db().from('dbm_prf_qry').insert(rs)
+  let r = await ins(rows)
   if (r.error?.code !== '42703') return r
-  return db()
-    .from('dbm_prf_qry')
-    .insert(rows.map(({ usr_nm: _u, ...o }) => o))
+  const noMax = rows.map(({ max_ms: _m, ...o }) => o)
+  r = await ins(noMax)
+  if (r.error?.code !== '42703') return r
+  return ins(noMax.map(({ usr_nm: _u, ...o }) => o))
 }
 
 export const POST = withGuard(
@@ -120,6 +123,8 @@ export const POST = withGuard(
           num(pick(o, 'mean_exec_time', 'mean_time', 'mean_ms')) ||
           (calls ? totalMs / calls : 0),
         row_cnt: num(pick(o, 'rows', 'row_cnt')),
+        // 1회 최고(리셋 이후 누적 최고치 그대로 — 증감 불가, sql/033). 값이 없으면 null
+        max_ms: numOrNull(pick(o, 'max_exec_time', 'max_time', 'max_ms')),
       }
     })
     const tblRows = toObjs(tblR).map((o, i) => {

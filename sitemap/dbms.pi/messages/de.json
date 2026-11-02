@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} Sitzungen warten auf Sperren — finden Sie die blockierende Sitzung und beenden Sie ihre Transaktion.",
         "CACHE_HIT": "Cache-Trefferrate {pct}% — suchen Sie nach vollständigen Scans großer Tabellen oder überprüfen Sie shared_buffers.",
         "XACT_ERR": "Rollback-Rate {pct}%, {dlck} Deadlocks — überprüfen Sie die fehlgeschlagenen Transaktionen und App-Fehlerprotokolle.",
-        "SLOW_SQL": "Eine Abfrage benötigt durchschnittlich {ms} ms — optimieren Sie die Top-Abfragen nach Gesamtzeit mithilfe ihrer Pläne.",
+        "SLOW_SQL": "Es gibt Abfragen mit einer maximalen Einzelzeit von {ms}ms – sehen Sie sich den Ausführungsplan an und optimieren Sie die Abfragen mit der höchsten Einzelzeit zuerst.",
         "STORAGE": "Die DB ({gb} GB) nähert sich ihrer Grenze (verbleibende Tage {days}) — bereinigen Sie große Tabellen oder erhöhen Sie die Kapazität.",
         "VACUUM": "{tbl} hat viele tote Zeilen oder veraltete Statistiken — überprüfen Sie die VACUUM (ANALYZE) und autovacuum-Einstellungen.",
         "INDEX": "{n} Index-Befunde (ungültig, unbenutzt, vollständige Scans) — siehe den Tab „Tabellen- & Indexzustand“ für die Ziele.",
@@ -677,9 +677,9 @@
           "3": "Überprüfen Sie, ob die Wiederholungslogik Rollbacks nicht aufbläht."
         },
         "SLOW_SQL": {
-          "1": "Wählen Sie die Top-Abfragen nach Gesamtzeit im Tab „Langsame Abfragen“.",
+          "1": "Wählen Sie im Tab „Langsame Abfragen“ die Abfragen mit der höchsten Einzelzeit aus.",
           "2": "Überprüfen Sie Pläne in der SQL-Optimierung und korrigieren Sie Indizes oder Joins.",
-          "3": "Überprüfen Sie nach der Korrektur, ob die mittlere Zeit gesunken ist."
+          "3": "Nach der Korrektur setzen Sie die Statistiken zurück (pg_stat_statements_reset) und prüfen erneut, ob die maximale Einzelzeit gesunken ist."
         },
         "STORAGE": {
           "1": "Sehen Sie den Wachstumstrend und das geschätzte Fülldatum im Tab „Größentrend“.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Cache-Trefferraten-Trend",
         "capacity": "DB-Größe & Prognose",
         "slowTop": "Langsame SQL Top 10",
-        "slowLegend": "Balkenlänge = Gesamtzeit · Farbe = mittlere Zeit (▲ Warnung ab {warn}ms · ✕ Risiko ab {risk}ms)",
+        "slowLegend": "Balkenlänge/-farbe = maximale Einzelzeit (▲ über {warn}ms Warnung · ✕ über {risk}ms Risiko)",
         "sizeTop": "Speicher Top 10",
         "heat": "Risiko nach Signal im Zeitverlauf",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Bewegen sich Durchsatz und Fehlerrate zusammen?",
           "cacheTrend": "Wann ist die Cache-Trefferrate gesunken?",
           "capacity": "Wann wird die DB voll sein?",
-          "slowTop": "Was zuerst optimieren? (nach Gesamtzeit)",
+          "slowTop": "Was zuerst optimieren? (nach maximaler Einzelzeit)",
           "sizeTop": "Was belegt den Speicherplatz?",
           "heat": "Ist das Risiko einmalig oder wiederkehrend?",
           "radar": "Welcher Bereich ist schwach?",
@@ -778,9 +778,7 @@
           "value": "Wert",
           "time": "Zeit",
           "calls": "Aufrufe",
-          "total": "Gesamt (ms)",
           "mean": "Mittelwert (ms)",
-          "share": "Anteil",
           "score": "Score",
           "level": "Level",
           "ago": "Vor 1 Stunde",
@@ -789,7 +787,8 @@
           "sessions": "Sitzungen",
           "schema": "Schema",
           "size": "Größe",
-          "thr": "Schwellenwert (Warnung·Risiko)"
+          "thr": "Schwellenwert (Warnung·Risiko)",
+          "max": "Max. Einzelzeit (ms)"
         },
         "radar": "Gesundheits-Score nach Bereich",
         "radarCur": "Jetzt",
@@ -1023,7 +1022,9 @@
       "src": "Quelle",
       "srcToggle": "Quelldetails anzeigen oder ausblenden",
       "openSqlLab": "Im SQL Tuning öffnen",
-      "acct": "Konto"
+      "acct": "Konto",
+      "sortMax": "Maximale Einzel-Ausführungszeit",
+      "maxMs": "Max. Einzelzeit ms"
     },
     "health": {
       "empty": "Noch keine Snapshots. Drücken Sie jetzt „Sammeln“ auf der Registerkarte „Sammeln“",
@@ -1075,7 +1076,7 @@
       "fix": {
         "TOOL": "Sieht aus, als würde eine Person die Produktions-DB direkt mit einem DB-Tool (DBeaver usw.) abfragen. Verweisen Sie sie stattdessen auf eine schreibgeschützte Replik oder Analyse-DB und begrenzen Sie die Laufzeit für menschliche Konten, z. B. ALTER ROLE human_user SET statement_timeout = '30s'. Verwenden Sie eine separate schreibgeschützte Rolle und führen Sie Massenextraktionen außerhalb der Spitzenzeiten durch.",
         "BATCH": "Sieht aus wie ein Batch oder ein geplanter Job. Verteilen Sie die Laufzeiten außerhalb der Geschäftsspitzen und reduzieren Sie die Arbeit pro Commit. Überprüfen Sie Indizes und Statistiken (ANALYZE) auf den Zieltabellen und teilen Sie lange Transaktionen auf. Das Einfügen des Jobnamens in application_name macht die nächste Klassifizierung präziser.",
-        "PROGRAM": "Sieht aus wie eine von einer Anwendung ausgeführte Abfrage. Überprüfen Sie den Plan im SQL Tuning. Viele Aufrufe mit einem kurzen Mittelwert deuten auf wiederholte Aufrufe (N+1) oder Caching hin; ein langer Mittelwert deutet zuerst auf Indizes oder Join-Reihenfolge hin. Legen Sie den Dienstnamen in application_name Ihres Verbindungspools fest.",
+        "PROGRAM": "Dies scheint eine von der Anwendung ausgeführte Abfrage zu sein. Überprüfen Sie den Ausführungsplan in der SQL-Optimierung. Wenn die maximale Einzelzeit lang ist, überprüfen Sie zuerst die Index- und Join-Reihenfolge. Wenn die Einzelzeit kurz ist, aber die Anzahl der Aufrufe hoch ist, überprüfen Sie wiederholte Aufrufe (N+1) und den Cache. Fügen Sie den Dienstnamen in application_name des Verbindungspools ein.",
         "PLATFORM": "Sieht aus wie DB- oder plattforminterne Arbeit wie Autovacuum oder Replikation. Normalerweise ist keine Aktion erforderlich. Wenn es oben bleibt, überprüfen Sie die Autovacuum-Schwellenwerte und maintenance_work_mem.",
         "MONITOR": "Sieht aus wie die eigenen Statistikabfragen dieses Dienstes (schema.pi-Link). Keine Aktion erforderlich. Wenn es zu oft angezeigt wird, reduzieren Sie die Abfragehäufigkeit.",
         "UNKNOWN": "Es gibt keinen Hinweis auf die Quelle. Legen Sie application_name bei jeder Verbindung fest und teilen Sie Konten nach Zweck auf; es wird ab den nächsten Stichproben klassifiziert."

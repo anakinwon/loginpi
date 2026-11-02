@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} ta sessiya bloklashlarni kutmoqda — bloklovchi sessiyani toping va uning tranzaksiyasini yakunlang.",
         "CACHE_HIT": "Keshga kirish darajasi {pct}% — katta jadvallarni toʻliq skanerlashni qidiring yoki shared_buffers ni koʻrib chiqing.",
         "XACT_ERR": "Qaytarish darajasi {pct}%, {dlck} ta oʻlik blokirovkalar — ishlamayotgan tranzaksiyalarni va ilova xato loglarini tekshiring.",
-        "SLOW_SQL": "Soʻrov oʻrtacha {ms} ms — umumiy vaqt boʻyicha eng yaxshi soʻrovlarni ularning rejalari yordamida sozlang.",
+        "SLOW_SQL": "Har bir ijroda {ms}ms gacha vaqt oladigan soʻrov mavjud — ijro rejasini koʻrib chiqing va eng yuqori bir martalik ijro vaqtidan boshlab sozlang.",
         "STORAGE": "DB ({gb} GB) oʻz chegarasiga yaqin ({days} kun qoldi) — katta jadvallarni tozalang yoki sigʻimni oshiring.",
         "VACUUM": "{tbl} da koʻplab oʻlik qatorlar yoki eskirgan statistikalar mavjud — VACUUM (ANALYZE) va autovacuum sozlamalarini koʻrib chiqing.",
         "INDEX": "{n} ta indeks topilmalari (yaroqsiz, ishlatilmagan, toʻliq skanerlash) — jadvallar va indekslar holati yorligʻida maqsadlarni koʻring.",
@@ -677,9 +677,9 @@
           "3": "Qayta urinish mantiqi rollbacklarni oshirib yubormayotganligini tekshiring."
         },
         "SLOW_SQL": {
-          "1": "Sekin soʻrov yorligʻida umumiy vaqt boʻyicha eng yaxshi soʻrovlarni tanlang.",
+          "1": "Sekin soʻrovlar yorligʻidan eng yuqori bir martalik ijro vaqtiga ega soʻrovni tanlang.",
           "2": "SQL tuningda rejalarni koʻrib chiqing va indekslarni yoki qoʻshilishlarni tuzating.",
-          "3": "Tuzatgandan soʻng, oʻrtacha vaqt kamayganligini tekshiring."
+          "3": "Tuzatgandan soʻng, statistikani tiklang (pg_stat_statements_reset) va eng yuqori bir martalik ijro vaqti kamayganligini qayta tekshiring."
         },
         "STORAGE": {
           "1": "Hajm tendensiyasi yorligʻida oʻsish tendensiyasini va taxminiy toʻlish sanasini koʻring.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Keshga kirish darajasi tendensiyasi",
         "capacity": "DB hajmi va prognozi",
         "slowTop": "Sekin SQL TOP 10",
-        "slowLegend": "Ustun uzunligi = umumiy vaqt · rang = oʻrtacha vaqt (▲ {warn}ms dan ogohlantirish · ✕ {risk}ms dan xavf)",
+        "slowLegend": "Ustun uzunligi/rangi = Maksimal bir martalik ijro vaqti (▲ {warn}ms yoki undan koʻp: ogohlantirish · ✕ {risk}ms yoki undan koʻp: xavf)",
         "sizeTop": "Boʻsh joy TOP 10",
         "heat": "Vaqt boʻyicha signal boʻyicha xavf",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Oʻtkazuvchanlik va xato darajasi birga harakat qiladimi?",
           "cacheTrend": "Keshga kirish darajasi qachon tushib ketdi?",
           "capacity": "DB qachon toʻladi?",
-          "slowTop": "Avval nimani sozlash kerak? (umumiy vaqt boʻyicha)",
+          "slowTop": "Birinchi nimani sozlash kerak? (Maksimal bir martalik ijro vaqti boʻyicha)",
           "sizeTop": "Boʻsh joyni nima egallamoqda?",
           "heat": "Xavf bir martalikmi yoki takrorlanuvchimi?",
           "radar": "Qaysi soha zaif?",
@@ -778,9 +778,7 @@
           "value": "Qiymat",
           "time": "Vaqt",
           "calls": "Chaqiruvlar",
-          "total": "Jami (ms)",
           "mean": "Oʻrtacha (ms)",
-          "share": "Ulush",
           "score": "Ball",
           "level": "Daraja",
           "ago": "1 soat oldin",
@@ -789,7 +787,8 @@
           "sessions": "Seanslar",
           "schema": "Sxema",
           "size": "Hajmi",
-          "thr": "Chegara (ogohlantirish·xavf)"
+          "thr": "Chegara (ogohlantirish·xavf)",
+          "max": "Maksimal bir martalik (ms)"
         },
         "radar": "Soha boʻyicha salomatlik koʻrsatkichi",
         "radarCur": "Hozir",
@@ -1025,7 +1024,9 @@
       "src": "Manba",
       "srcToggle": "Manba tafsilotlarini koʻrsatish yoki yashirish",
       "openSqlLab": "SQL Tuningda ochish",
-      "acct": "Hisob"
+      "acct": "Hisob",
+      "sortMax": "Maksimal bir martalik ijro vaqti",
+      "maxMs": "Maksimal bir martalik ms"
     },
     "health": {
       "empty": "Hali suratlar yoʻq. Yigʻish yorligʻida hozir yigʻish tugmasini bosing",
@@ -1077,7 +1078,7 @@
       "fix": {
         "TOOL": "Koʻrinishidan, shaxs DB vositasi (DBeaver va boshqalar) bilan ishlab chiqarish DBni toʻgʻridan-toʻgʻri soʻragan. Ularni oʻqish uchun moʻljallangan nusxaga yoki analitika DBga yoʻnaltiring va inson hisoblari uchun ish vaqtini cheklang, masalan, ALTER ROLE human_user SET statement_timeout = '30s'. Alohida oʻqish uchun moʻljallangan roldan foydalaning va katta hajmdagi maʼlumotlarni ishlamaydigan soatlarda chiqaring",
         "BATCH": "Koʻrinishidan, partiya yoki rejalashtirilgan ish. Ish vaqtini biznes choʻqqilaridan uzoqlashtiring va har bir commit uchun ish hajmini kamaytiring. Maqsadli jadvallardagi indekslar va statistikalarni (ANALYZE) tekshiring va uzoq tranzaksiyalarni boʻling. Ish nomini application_name ga kiritish keyingi tasnifni aniqroq qiladi",
-        "PROGRAM": "Koʻrinishidan, ilova tomonidan bajarilgan soʻrov. SQL Tuningda reja tekshiring. Qisqa oʻrtacha bilan koʻp chaqiruvlar takroriy chaqiruvlarga (N+1) yoki keshga ishora qiladi; uzoq oʻrtacha birinchi navbatda indekslarga yoki birlashish tartibiga ishora qiladi. Ulanish havzangizning application_name ga xizmat nomini oʻrnating",
+        "PROGRAM": "Bu ilova tomonidan bajarilgan soʻrovga oʻxshaydi. SQL sozlashda ijro rejasini tekshiring. Agar maksimal bir martalik ijro vaqti uzoq boʻlsa, avval indekslar va qoʻshilish tartibini koʻrib chiqing. Agar bir martalik ijro qisqa boʻlsa, lekin chaqiruvlar soni koʻp boʻlsa, takroriy chaqiruvlar (N+1) va keshni koʻrib chiqing. Ulanish pulining application_name ga xizmat nomini kiriting.",
         "PLATFORM": "Koʻrinishidan, DB yoki platformaning ichki ishi, masalan, autovacuum yoki replikatsiya. Odatda hech qanday harakat talab qilinmaydi. Agar u yuqorida qolsa, autovacuum chegaralari va maintenance_work_mem ni koʻrib chiqing",
         "MONITOR": "Koʻrinishidan, ushbu xizmatning oʻz statistika soʻrovlari (schema.pi havolasi). Hech qanday harakat talab qilinmaydi. Agar u juda tez-tez koʻrinsa, soʻrov chastotasini kamaytiring",
         "UNKNOWN": "Manbaga oid hech qanday maʼlumot yoʻq. Har bir ulanishda application_name ni oʻrnating va hisoblarni maqsad boʻyicha ajrating; u keyingi namunalardan tasniflanadi"

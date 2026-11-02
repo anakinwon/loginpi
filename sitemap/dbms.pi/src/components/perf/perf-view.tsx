@@ -233,6 +233,7 @@ type TopRow = {
   calls: number
   totalMs: number
   meanMs: number
+  maxMs: number | null // 1회 최고(리셋 이후) — sql/033 이전 수집은 null
   rows: number
   reset: boolean
   src?: SrcJudge
@@ -265,7 +266,8 @@ const SRC_CONF_CLS: Record<SrcJudge['conf'], string> = {
 function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
   const t = useTranslations('perf.top')
   const [page, setPage] = useState(1)
-  const [sort, setSort] = useState<'total' | 'mean' | 'calls'>('total')
+  // 기본 정렬 = 1회 최고(마스터 2026-11-02 — 느린 SQL 은 max 만)
+  const [sort, setSort] = useState<'max' | 'total' | 'mean' | 'calls'>('max')
   const [open, setOpen] = useState<string | null>(null) // 출처 상세를 펼친 행 키
   const s = useGet<TopRes>(
     `/api/perf/top?${qs(sel, `&page=${page}&sort=${sort}&r=${rev}`)}`,
@@ -286,6 +288,7 @@ function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
             setPage(1)
           }}
         >
+          <option value="max">{t('sortMax')}</option>
           <option value="total">{t('sortTotal')}</option>
           <option value="mean">{t('sortMean')}</option>
           <option value="calls">{t('sortCalls')}</option>
@@ -314,6 +317,7 @@ function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
                   <th className={TH}>{t('query')}</th>
                   <th className={TH}>{t('src')}</th>
                   <th className={`${TH} text-right`}>{t('calls')}</th>
+                  <th className={`${TH} text-right`}>{t('maxMs')}</th>
                   <th className={`${TH} text-right`}>{t('totalMs')}</th>
                   <th className={`${TH} text-right`}>{t('meanMs')}</th>
                   <th className={`${TH} text-right`}>{t('rows')}</th>
@@ -344,6 +348,9 @@ function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
                       </td>
                       <td className={`${TD} text-right`}>{fmtNum(r.calls)}</td>
                       <td className={`${TD} text-right`}>
+                        {r.maxMs == null ? '—' : fmtNum(r.maxMs)}
+                      </td>
+                      <td className={`${TD} text-right`}>
                         {fmtNum(r.totalMs)}
                       </td>
                       <td className={`${TD} text-right`}>{fmtNum(r.meanMs)}</td>
@@ -351,7 +358,7 @@ function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
                     </tr>
                     {open === qryKey(r) && (
                       <tr>
-                        <td colSpan={6} className="px-2 pb-3">
+                        <td colSpan={7} className="px-2 pb-3">
                           <SrcDetail r={r} sel={sel} />
                         </td>
                       </tr>

@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} oturum kilitleri bekliyor — engelleyen oturumu bulun ve işlemini sonlandırın.",
         "CACHE_HIT": "Önbellek isabet oranı %{pct} — büyük tabloların tam taramalarını arayın veya shared_buffers'ı gözden geçirin.",
         "XACT_ERR": "Geri alma oranı %{pct}, {dlck} kilitlenme — başarısız olan işlemleri ve uygulama hata günlüklerini kontrol edin.",
-        "SLOW_SQL": "Bir sorgu ortalama {ms} ms — toplam süreye göre en iyi sorguları planlarını kullanarak ayarlayın.",
+        "SLOW_SQL": "Tek çalıştırmada {ms}ms'ye kadar süren bir sorgu var — en yüksek tek çalıştırma süresinden başlayarak yürütme planını görüntüleyin ve ayarlayın.",
         "STORAGE": "DB ({gb} GB) limitine yaklaşıyor (kalan gün {days}) — büyük tabloları temizleyin veya kapasite ekleyin.",
         "VACUUM": "{tbl} çok sayıda ölü satıra veya eski istatistiklere sahip — VACUUM (ANALYZE) ve autovacuum ayarlarını gözden geçirin.",
         "INDEX": "{n} dizin bulgusu (geçersiz, kullanılmayan, tam taramalar) — hedefler için tablo ve dizin sağlığı sekmesine bakın.",
@@ -677,9 +677,9 @@
           "3": "Yeniden deneme mantığının geri almaları şişirmediğini kontrol edin."
         },
         "SLOW_SQL": {
-          "1": "Yavaş sorgu sekmesinde toplam süreye göre en iyi sorguları seçin.",
+          "1": "Yavaş sorgular sekmesinden, en yüksek tek çalıştırma süresine sahip sorguyu seçin.",
           "2": "SQL ayarlamasında planları gözden geçirin ve dizinleri veya birleştirmeleri düzeltin.",
-          "3": "Düzeltme sonrası, ortalama sürenin azaldığını kontrol edin."
+          "3": "Düzeltme sonrası istatistikleri sıfırlayın (pg_stat_statements_reset) ve en yüksek tek çalıştırma süresinin azalıp azalmadığını tekrar kontrol edin."
         },
         "STORAGE": {
           "1": "Boyut eğilimi sekmesinde büyüme eğilimini ve tahmini dolum tarihini görün.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Önbellek isabet oranı eğilimi",
         "capacity": "DB boyutu ve tahmini",
         "slowTop": "Yavaş SQL ilk 10",
-        "slowLegend": "Çubuk uzunluğu = toplam süre · renk = ortalama süre (▲ {warn}ms'den uyarı · ✕ {risk}ms'den risk)",
+        "slowLegend": "Çubuk uzunluğu/rengi = Maksimum tek çalıştırma süresi (▲ {warn}ms veya daha fazla: uyarı · ✕ {risk}ms veya daha fazla: risk)",
         "sizeTop": "Alan ilk 10",
         "heat": "Zamanla sinyale göre risk",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "İşlem hacmi ve hata oranı birlikte mi hareket ediyor?",
           "cacheTrend": "Önbellek isabet oranı ne zaman düştü?",
           "capacity": "DB ne zaman dolacak?",
-          "slowTop": "Önce neyi ayarlamalı? (toplam süreye göre)",
+          "slowTop": "Önce ne ayarlanmalı? (Maksimum tek çalıştırma süresine göre)",
           "sizeTop": "Alan neyi kaplıyor?",
           "heat": "Risk tek seferlik mi yoksa tekrarlayan mı?",
           "radar": "Hangi alan zayıf?",
@@ -778,9 +778,7 @@
           "value": "Değer",
           "time": "Zaman",
           "calls": "Çağrılar",
-          "total": "Toplam (ms)",
           "mean": "Ortalama (ms)",
-          "share": "Pay",
           "score": "Puan",
           "level": "Seviye",
           "ago": "1 saat önce",
@@ -789,7 +787,8 @@
           "sessions": "Oturumlar",
           "schema": "Şema",
           "size": "Boyut",
-          "thr": "Eşik (uyarı·risk)"
+          "thr": "Eşik (uyarı·risk)",
+          "max": "Maks tek (ms)"
         },
         "radar": "Alana göre sağlık puanı",
         "radarCur": "Şimdi",
@@ -1025,7 +1024,9 @@
       "src": "Kaynak",
       "srcToggle": "Kaynak detaylarını göster veya gizle",
       "openSqlLab": "SQL Tuning'de aç",
-      "acct": "Hesap"
+      "acct": "Hesap",
+      "sortMax": "Maksimum tek çalıştırma süresi",
+      "maxMs": "Maks tek ms"
     },
     "health": {
       "empty": "Henüz anlık görüntü yok. Topla sekmesinde Şimdi Topla'ya basın",
@@ -1077,7 +1078,7 @@
       "fix": {
         "TOOL": "Bir kişinin DB aracı (DBeaver vb.) ile doğrudan üretim DB'sini sorguladığı görülüyor. Bunun yerine onları salt okunur bir replikaya veya analiz DB'sine yönlendirin ve insan hesaplarında çalışma süresini sınırlayın, örn. ALTER ROLE human_user SET statement_timeout = '30s'. Ayrı bir salt okunur rol kullanın ve toplu çıkarmaları yoğun olmayan saatlerde çalıştırın.",
         "BATCH": "Bir toplu işlem veya zamanlanmış iş gibi görünüyor. Çalışma sürelerini iş yoğunluğundan uzaklaştırın ve her taahhüt başına işi küçültün. Hedef tablolardaki indeksleri ve istatistikleri (ANALYZE) kontrol edin ve uzun işlemleri bölün. İş adını application_name'e koymak, bir sonraki sınıflandırmayı daha hassas hale getirir.",
-        "PROGRAM": "Bir uygulama tarafından çalıştırılan bir sorgu gibi görünüyor. SQL Tuning'de planı kontrol edin. Kısa bir ortalama ile birçok çağrı, tekrarlanan çağrılara (N+1) veya önbelleğe almaya işaret eder; uzun bir ortalama önce indekslere veya birleştirme sırasına işaret eder. Bağlantı havuzunuzun application_name'inde hizmet adını ayarlayın.",
+        "PROGRAM": "Bu, uygulama tarafından yürütülen bir sorgu gibi görünüyor. SQL ayarlamasında yürütme planını kontrol edin. Maksimum tek çalıştırma süresi uzunsa, önce dizinlere ve birleştirme sırasına bakın. Tek çalıştırma kısa ancak çağrı sayısı yüksekse, tekrarlanan çağrılara (N+1) ve önbelleğe almaya bakın. Bağlantı havuzunun application_name alanına hizmet adını ekleyin.",
         "PLATFORM": "Autovacuum veya replikasyon gibi DB veya platform dahili bir iş gibi görünüyor. Genellikle herhangi bir işlem gerekmez. En üstte kalmaya devam ederse, autovacuum eşiklerini ve maintenance_work_mem'i gözden geçirin.",
         "MONITOR": "Bu hizmetin kendi istatistik sorguları (schema.pi bağlantısı) gibi görünüyor. Herhangi bir işlem gerekmez. Çok sık görünüyorsa, yoklama sıklığını düşürün.",
         "UNKNOWN": "Kaynağa dair hiçbir ipucu yok. Her bağlantıda application_name'i ayarlayın ve hesapları amaca göre ayırın; bir sonraki örneklerden itibaren sınıflandırılacaktır."

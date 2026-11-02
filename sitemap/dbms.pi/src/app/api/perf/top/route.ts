@@ -1,4 +1,4 @@
-// 느린 쿼리 Top-N(PRD 12 §3-2, ANL-R03) — GET /api/perf/top?link=&conn=&page=&sort=total|mean|calls
+// 느린 쿼리 Top-N(PRD 12 §3-2, ANL-R03) — GET /api/perf/top?link=&conn=&page=&sort=max|total|mean|calls
 //  최근 수집 2건의 쿼리 통계 → 증감(stat_reset 변경·호출 감소 = 리셋 보정, src/lib/perf/calc.ts) → 정렬·페이지(20건)
 //  → 페이지 20건의 출처 표본(dbm_prf_qry_src, sql/032) 1회 조회 → 행마다 src {cd, conf, smpCnt, top}(계정 = 확정, 앱 = 표본 추정)
 //  qid = query_id 미수집 원인(ok·ver·priv·off — 보드·활동 탭 표본에서, 인스턴스 캐시라 없으면 null)
@@ -18,6 +18,7 @@ type QryRow = {
   call_cnt: number
   tot_ms: number
   row_cnt: number
+  max_ms?: number | null
 }
 
 async function qryOf(
@@ -30,12 +31,11 @@ async function qryOf(
       .eq('clct_id', clctId)
       .eq('del_yn', 'N')
       .returns<QryRow[]>()
-  let { data, error } = await sel(
-    'qry_id, usr_nm, qry_txt, call_cnt, tot_ms, row_cnt',
-  )
-  // sql/032(usr_nm) 미적용 DB — 칼럼 없음(42703)이면 계정 없이 재조회(목록은 막지 않음, 출처는 표본 추정만)
-  if (error?.code === '42703')
-    ({ data, error } = await sel('qry_id, qry_txt, call_cnt, tot_ms, row_cnt'))
+  const base = 'qry_id, qry_txt, call_cnt, tot_ms, row_cnt'
+  let { data, error } = await sel(`${base}, usr_nm, max_ms`)
+  // sql/033(max_ms)·032(usr_nm) 미적용 DB — 칼럼 없음(42703)이면 새 칼럼부터 빼고 재조회(목록은 막지 않음)
+  if (error?.code === '42703') ({ data, error } = await sel(`${base}, usr_nm`))
+  if (error?.code === '42703') ({ data, error } = await sel(base))
   if (error || !data) return { error: error ?? {} }
   return data.map((r) => ({
     qryId: r.qry_id,
@@ -44,6 +44,7 @@ async function qryOf(
     calls: Number(r.call_cnt),
     totalMs: Number(r.tot_ms),
     rows: Number(r.row_cnt),
+    maxMs: r.max_ms == null ? null : Number(r.max_ms),
   }))
 }
 
@@ -77,11 +78,18 @@ export const GET = withGuard(
 
     const resetChanged =
       !!prev && (prev.stat_reset_dtm ?? '') !== (cur.stat_reset_dtm ?? '')
+    // 기본 정렬 = 1회 최고(max, 마스터 2026-11-02). max 없는 행(033 이전 수집)은 맨 뒤
     const sort = sp.get('sort')
     const key =
-      sort === 'mean' ? 'meanMs' : sort === 'calls' ? 'calls' : 'totalMs'
+      sort === 'mean'
+        ? 'meanMs'
+        : sort === 'calls'
+          ? 'calls'
+          : sort === 'total'
+            ? 'totalMs'
+            : 'maxMs'
     const all = qryDelta(curQ, prevQ, resetChanged).sort(
-      (a, b) => b[key] - a[key],
+      (a, b) => (b[key] ?? -1) - (a[key] ?? -1) || b.totalMs - a.totalMs, // 033 이전 수집(max 없음)끼리는 총 시간으로
     )
     const page = Math.max(1, Number(sp.get('page')) || 1)
     const pageRows = all.slice((page - 1) * PAGE, page * PAGE)

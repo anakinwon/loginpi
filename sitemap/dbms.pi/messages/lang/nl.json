@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sessies wachten op locks — zoek de blokkerende sessie en beëindig de transactie.",
         "CACHE_HIT": "Cache-hitrate {pct}% — zoek naar volledige scans van grote tabellen of controleer shared_buffers.",
         "XACT_ERR": "Rollback-percentage {pct}%, {dlck} deadlocks — controleer de falende transacties en app-foutenlogboeken.",
-        "SLOW_SQL": "Een query duurt gemiddeld {ms} ms — optimaliseer de topqueries op totale tijd met behulp van hun plannen.",
+        "SLOW_SQL": "Er is een query die tot {ms}ms per uitvoering duurt — bekijk het uitvoeringsplan en stem het af, beginnend bij de hoogste enkele uitvoeringstijd.",
         "STORAGE": "De DB ({gb} GB) nadert zijn limiet (dagen over {days}) — ruim grote tabellen op of voeg capaciteit toe.",
         "VACUUM": "{tbl} heeft veel dode rijen of verouderde statistieken — controleer VACUUM (ANALYZE) en autovacuum-instellingen.",
         "INDEX": "{n} indexbevindingen (ongeldig, ongebruikt, volledige scans) — zie het tabblad tabel- & indexstatus voor de doelen.",
@@ -677,9 +677,9 @@
           "3": "Controleer of de retry-logica rollbacks niet opblaast."
         },
         "SLOW_SQL": {
-          "1": "Kies de topqueries op totale tijd op het tabblad trage queries.",
+          "1": "Selecteer op het tabblad trage queries de query met de hoogste enkele uitvoeringstijd.",
           "2": "Bekijk plannen in SQL-tuning en corrigeer indexen of joins.",
-          "3": "Controleer na de fix of de gemiddelde tijd is gedaald."
+          "3": "Na de correctie, reset de statistieken (pg_stat_statements_reset) en controleer opnieuw of de hoogste enkele uitvoeringstijd is afgenomen."
         },
         "STORAGE": {
           "1": "Bekijk de groeitrend en geschatte volledige datum op het tabblad groottetrend.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Cache-hitrate trend",
         "capacity": "DB-grootte & prognose",
         "slowTop": "Trage SQL top 10",
-        "slowLegend": "Balklengte = totale tijd · kleur = gemiddelde tijd (▲ waarschuwing vanaf {warn}ms · ✕ risico vanaf {risk}ms)",
+        "slowLegend": "Balklengte/kleur = Max. enkele uitvoeringstijd (▲ {warn}ms of meer: waarschuwing · ✕ {risk}ms of meer: risico)",
         "sizeTop": "Ruimte top 10",
         "heat": "Risico per signaal over tijd",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Bewegen doorvoer en faalpercentage samen?",
           "cacheTrend": "Wanneer daalde de cache-hitrate?",
           "capacity": "Wanneer raakt de DB vol?",
-          "slowTop": "Wat eerst tunen? (op totale tijd)",
+          "slowTop": "Wat eerst afstemmen? (Op max. enkele uitvoeringstijd)",
           "sizeTop": "Wat neemt de ruimte in beslag?",
           "heat": "Is het risico eenmalig of terugkerend?",
           "radar": "Welk gebied is zwak?",
@@ -778,9 +778,7 @@
           "value": "Waarde",
           "time": "Tijd",
           "calls": "Oproepen",
-          "total": "Totaal (ms)",
           "mean": "Gemiddelde (ms)",
-          "share": "Aandeel",
           "score": "Score",
           "level": "Niveau",
           "ago": "1 uur geleden",
@@ -789,7 +787,8 @@
           "sessions": "Sessies",
           "schema": "Schema",
           "size": "Grootte",
-          "thr": "Drempel (waarschuwing·risico)"
+          "thr": "Drempel (waarschuwing·risico)",
+          "max": "Max. enkele (ms)"
         },
         "radar": "Gezondheidsscore per gebied",
         "radarCur": "Nu",
@@ -1021,7 +1020,9 @@
       "src": "Bron",
       "srcToggle": "Brondetails tonen of verbergen",
       "openSqlLab": "Openen in SQL Tuning",
-      "acct": "Account"
+      "acct": "Account",
+      "sortMax": "Max. enkele uitvoeringstijd",
+      "maxMs": "Max. enkele ms"
     },
     "health": {
       "empty": "Nog geen snapshots. Druk nu op Verzamelen op het tabblad Verzamelen",
@@ -1073,7 +1074,7 @@
       "fix": {
         "TOOL": "Lijkt erop dat een persoon de productie-DB rechtstreeks bevraagt met een DB-tool (DBeaver etc.). Verwijs hen in plaats daarvan naar een alleen-lezen replica of analyse-DB, en beperk de looptijd op menselijke accounts, bijv. ALTER ROLE human_user SET statement_timeout = '30s'. Gebruik een aparte alleen-lezen rol en voer bulkextracties uit tijdens daluren.",
         "BATCH": "Lijkt op een batch- of geplande taak. Spreid de looptijden buiten de piekuren en verklein het werk per commit. Controleer indexen en statistieken (ANALYZE) op de doeltabellen en splits lange transacties. Het opnemen van de taaknaam in application_name maakt de volgende classificatie preciezer.",
-        "PROGRAM": "Lijkt op een query die door een applicatie is uitgevoerd. Controleer het plan in SQL Tuning. Veel aanroepen met een korte gemiddelde wijzen op herhaalde aanroepen (N+1) of caching; een lange gemiddelde wijst eerst op indexen of joinvolgorde. Stel de servicenaam in de application_name van uw verbindingspool in.",
+        "PROGRAM": "Dit lijkt een query te zijn die door de applicatie is uitgevoerd. Controleer het uitvoeringsplan in SQL-tuning. Als de maximale enkele uitvoeringstijd lang is, kijk dan eerst naar indexen en de join-volgorde. Als een enkele uitvoering kort is maar het aantal aanroepen hoog, kijk dan naar herhaalde aanroepen (N+1) en caching. Plaats de servicenaam in de application_name van de connection pool.",
         "PLATFORM": "Lijkt op DB- of platformintern werk zoals autovacuum of replicatie. Meestal is er geen actie nodig. Als het bovenaan blijft staan, controleer dan de autovacuum-drempels en maintenance_work_mem.",
         "MONITOR": "Lijkt op de eigen statistiekqueries van deze service (schema.pi link). Geen actie nodig. Als het te vaak voorkomt, verlaag dan de pollingfrequentie.",
         "UNKNOWN": "Er is geen aanwijzing voor de bron. Stel application_name in op elke verbinding en splits accounts per doel; het wordt geclassificeerd vanaf de volgende monsters."

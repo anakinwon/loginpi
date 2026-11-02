@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sesi sedang menunggu kunci — cari sesi yang menyekat dan tamatkan transaksinya.",
         "CACHE_HIT": "Kadar capaian cache {pct}% — cari imbasan penuh jadual besar atau semak shared_buffers.",
         "XACT_ERR": "Kadar rollback {pct}%, {dlck} deadlock — semak transaksi yang gagal dan log ralat aplikasi.",
-        "SLOW_SQL": "Pertanyaan purata {ms} ms — sesuaikan pertanyaan teratas mengikut jumlah masa menggunakan rancangan mereka.",
+        "SLOW_SQL": "Terdapat pertanyaan yang mengambil masa sehingga {ms}ms setiap pelaksanaan — lihat pelan pelaksanaan dan tala, bermula dari masa pelaksanaan tunggal tertinggi.",
         "STORAGE": "DB ({gb} GB) hampir mencapai hadnya (hari tinggal {days}) — bersihkan jadual besar atau tambah kapasiti.",
         "VACUUM": "{tbl} mempunyai banyak baris mati atau statistik lapuk — semak tetapan VACUUM (ANALYZE) dan autovacuum.",
         "INDEX": "{n} penemuan indeks (tidak sah, tidak digunakan, imbasan penuh) — lihat tab kesihatan jadual & indeks untuk sasaran.",
@@ -677,9 +677,9 @@
           "3": "Semak bahawa logik cuba semula tidak meningkatkan rollback."
         },
         "SLOW_SQL": {
-          "1": "Pilih pertanyaan teratas mengikut jumlah masa dalam tab pertanyaan perlahan.",
+          "1": "Dari tab pertanyaan perlahan, pilih pertanyaan dengan masa pelaksanaan tunggal tertinggi.",
           "2": "Semak rancangan dalam penalaan SQL dan betulkan indeks atau gabungan.",
-          "3": "Selepas membetulkan, semak bahawa masa purata menurun."
+          "3": "Selepas membaiki, set semula statistik (pg_stat_statements_reset) dan semak semula jika masa pelaksanaan tunggal tertinggi telah berkurangan."
         },
         "STORAGE": {
           "1": "Lihat trend pertumbuhan dan anggaran tarikh penuh dalam tab trend saiz.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Trend kadar capaian cache",
         "capacity": "Saiz DB & ramalan",
         "slowTop": "SQL perlahan top 10",
-        "slowLegend": "Panjang bar = jumlah masa · warna = masa purata (▲ amaran dari {warn}ms · ✕ risiko dari {risk}ms)",
+        "slowLegend": "Panjang/warna bar = Masa pelaksanaan tunggal maksimum (▲ {warn}ms atau lebih: amaran · ✕ {risk}ms atau lebih: risiko)",
         "sizeTop": "Ruang top 10",
         "heat": "Risiko mengikut isyarat dari semasa ke semasa",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Adakah kadar daya pemprosesan dan kegagalan bergerak bersama?",
           "cacheTrend": "Bilakah kadar capaian cache menurun?",
           "capacity": "Bilakah DB akan penuh?",
-          "slowTop": "Apa yang perlu ditala dahulu? (mengikut jumlah masa)",
+          "slowTop": "Apa yang perlu ditala dahulu? (Mengikut masa pelaksanaan tunggal maksimum)",
           "sizeTop": "Apa yang mengambil ruang?",
           "heat": "Adakah risiko itu sekali sahaja atau berulang?",
           "radar": "Kawasan manakah yang lemah?",
@@ -778,9 +778,7 @@
           "value": "Nilai",
           "time": "Masa",
           "calls": "Panggilan",
-          "total": "Jumlah (ms)",
           "mean": "Purata (ms)",
-          "share": "Kongsi",
           "score": "Skor",
           "level": "Tahap",
           "ago": "1 jam lalu",
@@ -789,7 +787,8 @@
           "sessions": "Sesi",
           "schema": "Skema",
           "size": "Saiz",
-          "thr": "Ambang (amaran·risiko)"
+          "thr": "Ambang (amaran·risiko)",
+          "max": "Maks tunggal (ms)"
         },
         "radar": "Skor kesihatan mengikut kawasan",
         "radarCur": "Sekarang",
@@ -1025,7 +1024,9 @@
       "src": "Sumber",
       "srcToggle": "Tunjukkan atau sembunyikan butiran sumber",
       "openSqlLab": "Buka dalam SQL Tuning",
-      "acct": "Akaun"
+      "acct": "Akaun",
+      "sortMax": "Masa pelaksanaan tunggal maksimum",
+      "maxMs": "Maks tunggal ms"
     },
     "health": {
       "empty": "Tiada syot kilat lagi. Tekan Kumpul sekarang pada tab Kumpul",
@@ -1077,7 +1078,7 @@
       "fix": {
         "TOOL": "Kelihatan seperti seseorang menanyakan DB pengeluaran secara langsung dengan alat DB (DBeaver dll.). Arahkan mereka ke replika baca sahaja atau DB analitik sebaliknya, dan hadkan masa jalan pada akaun manusia, cth. ALTER ROLE human_user SET statement_timeout = '30s'. Gunakan peranan baca sahaja yang berasingan, dan jalankan ekstrak pukal pada waktu luar puncak",
         "BATCH": "Kelihatan seperti kelompok atau kerja berjadual. Sebarkan masa jalan jauh dari puncak perniagaan dan kecilkan kerja setiap komit. Semak indeks dan statistik (ANALYZE) pada jadual sasaran, dan bahagikan transaksi panjang. Meletakkan nama kerja dalam application_name menjadikan klasifikasi seterusnya lebih tepat",
-        "PROGRAM": "Kelihatan seperti pertanyaan yang dijalankan oleh aplikasi. Semak rancangan dalam SQL Tuning. Banyak panggilan dengan purata pendek menunjukkan panggilan berulang (N+1) atau caching; purata panjang menunjukkan indeks atau susunan gabungan terlebih dahulu. Tetapkan nama perkhidmatan dalam application_name kumpulan sambungan anda",
+        "PROGRAM": "Ini kelihatan seperti pertanyaan yang dilaksanakan oleh aplikasi. Semak pelan pelaksanaan dalam penalaan SQL. Jika masa pelaksanaan tunggal maksimum panjang, mula-mula lihat indeks dan susunan gabungan. Jika satu pelaksanaan pendek tetapi kiraan panggilan tinggi, lihat panggilan berulang (N+1) dan caching. Letakkan nama perkhidmatan dalam application_name bagi kumpulan sambungan.",
         "PLATFORM": "Kelihatan seperti kerja dalaman DB atau platform seperti autovacuum atau replikasi. Biasanya tiada tindakan diperlukan. Jika ia kekal di atas, semak ambang autovacuum dan maintenance_work_mem",
         "MONITOR": "Kelihatan seperti pertanyaan statistik perkhidmatan ini sendiri (pautan schema.pi). Tiada tindakan diperlukan. Jika ia muncul terlalu kerap, kurangkan kekerapan pengundian",
         "UNKNOWN": "Tiada petunjuk kepada sumber. Tetapkan application_name pada setiap sambungan dan bahagikan akaun mengikut tujuan; ia akan diklasifikasikan daripada sampel seterusnya"

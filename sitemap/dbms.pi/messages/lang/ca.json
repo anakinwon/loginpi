@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sessions estan esperant bloquejos — trobeu la sessió que bloqueja i finalitzeu la seva transacció.",
         "CACHE_HIT": "Taxa d'èxit de la memòria cau {pct}% — busqueu exploracions completes de taules grans o reviseu shared_buffers.",
         "XACT_ERR": "Taxa de rollback {pct}%, {dlck} interbloquejos — comproveu les transaccions fallides i els registres d'errors de l'aplicació.",
-        "SLOW_SQL": "Una consulta té una mitjana de {ms} ms — ajusteu les consultes principals per temps total utilitzant els seus plans.",
+        "SLOW_SQL": "Hi ha una consulta que triga fins a {ms}ms per execució — visualitzeu el pla d'execució i ajusteu-lo, començant pel temps d'execució individual més alt.",
         "STORAGE": "La DB ({gb} GB) està a prop del seu límit (dies restants {days}) — netegeu taules grans o afegiu capacitat.",
         "VACUUM": "{tbl} té moltes files mortes o estadístiques obsoletes — reviseu la configuració de VACUUM (ANALYZE) i autovacuum.",
         "INDEX": "{n} troballes d'índex (invàlid, no utilitzat, exploracions completes) — vegeu la pestanya d'estat de la taula i l'índex per als objectius.",
@@ -677,9 +677,9 @@
           "3": "Comproveu que la lògica de reintent no estigui inflant els rollbacks."
         },
         "SLOW_SQL": {
-          "1": "Trieu les consultes principals per temps total a la pestanya de consultes lentes.",
+          "1": "A la pestanya de consultes lentes, seleccioneu la consulta amb el temps d'execució individual més alt.",
           "2": "Reviseu els plans a l'ajust de SQL i corregiu els índexs o les unions.",
-          "3": "Després de corregir, comproveu que el temps mitjà ha disminuït."
+          "3": "Després de la correcció, reinicieu les estadístiques (pg_stat_statements_reset) i torneu a comprovar si el temps d'execució individual més alt ha disminuït."
         },
         "STORAGE": {
           "1": "Vegeu la tendència de creixement i la data de finalització estimada a la pestanya de tendència de mida.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Tendència de la taxa d'èxit de la memòria cau",
         "capacity": "Mida i previsió de la DB",
         "slowTop": "Top 10 de SQL lent",
-        "slowLegend": "Longitud de la barra = temps total · color = temps mitjà (▲ avís a partir de {warn}ms · ✕ risc a partir de {risk}ms)",
+        "slowLegend": "Longitud/color de la barra = Temps màxim d'execució individual (▲ {warn}ms o més: avís · ✕ {risk}ms o més: risc)",
         "sizeTop": "Top 10 d'espai",
         "heat": "Risc per senyal al llarg del temps",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "El rendiment i la taxa d'errors es mouen junts?",
           "cacheTrend": "Quan va caure la taxa d'èxit de la memòria cau?",
           "capacity": "Quan s'omplirà la DB?",
-          "slowTop": "Què cal ajustar primer? (per temps total)",
+          "slowTop": "Què cal ajustar primer? (Per temps màxim d'execució individual)",
           "sizeTop": "Què ocupa l'espai?",
           "heat": "El risc és puntual o recurrent?",
           "radar": "Quina àrea és feble?",
@@ -778,9 +778,7 @@
           "value": "Valor",
           "time": "Hora",
           "calls": "Crides",
-          "total": "Total (ms)",
           "mean": "Mitjana (ms)",
-          "share": "Quota",
           "score": "Puntuació",
           "level": "Nivell",
           "ago": "Fa 1 hora",
@@ -789,7 +787,8 @@
           "sessions": "Sessions",
           "schema": "Esquema",
           "size": "Mida",
-          "thr": "Llindar (advertència·risc)"
+          "thr": "Llindar (advertència·risc)",
+          "max": "Màx. individual (ms)"
         },
         "radar": "Puntuació de salut per àrea",
         "radarCur": "Ara",
@@ -1022,7 +1021,9 @@
       "src": "Origen",
       "srcToggle": "Mostrar o amagar detalls de l'origen",
       "openSqlLab": "Obrir a SQL Tuning",
-      "acct": "Compte"
+      "acct": "Compte",
+      "sortMax": "Temps màxim d'execució individual",
+      "maxMs": "Màx. individual ms"
     },
     "health": {
       "empty": "Encara no hi ha instantànies. Premeu Recull ara a la pestanya Recull",
@@ -1074,7 +1075,7 @@
       "fix": {
         "TOOL": "Sembla que una persona consulta la DB de producció directament amb una eina de DB (DBeaver, etc.). Dirigiu-los a una rèplica de només lectura o a una DB d'anàlisi en lloc d'això, i limiteu el temps d'execució als comptes humans, p. ex., ALTER ROLE human_user SET statement_timeout = '30s'. Utilitzeu un rol de només lectura separat i executeu extraccions massives en hores de poca activitat",
         "BATCH": "Sembla un lot o una feina programada. Distribuïu els temps d'execució fora dels pics de negoci i reduïu la feina per commit. Comproveu els índexs i les estadístiques (ANALYZE) a les taules de destinació i dividiu les transaccions llargues. Posar el nom de la feina a application_name fa que la següent classificació sigui més precisa",
-        "PROGRAM": "Sembla una consulta executada per una aplicació. Comproveu el pla a SQL Tuning. Moltes trucades amb una mitjana curta apunten a trucades repetides (N+1) o a la memòria cau; una mitjana llarga apunta primer als índexs o a l'ordre de les unions. Definiu el nom del servei a application_name del vostre pool de connexions",
+        "PROGRAM": "Sembla una consulta executada per l'aplicació. Comproveu el pla d'execució a l'ajust de SQL. Si el temps màxim d'execució individual és llarg, primer mireu els índexs i l'ordre de les unions. Si una sola execució és curta però el nombre de trucades és alt, mireu les trucades repetides (N+1) i la memòria cau. Poseu el nom del servei a l'application_name del pool de connexions.",
         "PLATFORM": "Sembla una feina interna de la DB o de la plataforma, com ara autovacuum o replicació. Normalment no cal cap acció. Si es manté a la part superior, reviseu els llindars d'autovacuum i maintenance_work_mem",
         "MONITOR": "Sembla que són les consultes d'estadístiques d'aquest servei (enllaç schema.pi). No cal cap acció. Si apareix massa sovint, reduïu la freqüència de sondeig",
         "UNKNOWN": "No hi ha cap pista sobre l'origen. Definiu application_name en cada connexió i dividiu els comptes per propòsit; es classificarà a partir de les properes mostres"

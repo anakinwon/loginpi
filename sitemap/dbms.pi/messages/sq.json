@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sesione po presin bllokime — gjeni sesionin bllokues dhe përfundoni transaksionin e tij.",
         "CACHE_HIT": "Shkalla e goditjes së cache-it {pct}% — kërkoni skanime të plota të tabelave të mëdha ose rishikoni shared_buffers.",
         "XACT_ERR": "Shkalla e rikthimit {pct}%, {dlck} bllokime — kontrolloni transaksionet e dështuara dhe logjet e gabimeve të aplikacionit.",
-        "SLOW_SQL": "Një pyetje mesatarisht {ms} ms — rregulloni pyetjet kryesore sipas kohës totale duke përdorur planet e tyre.",
+        "SLOW_SQL": "Ka një pyetje që zgjat deri në {ms}ms për ekzekutim — shikoni planin e ekzekutimit dhe akordojeni, duke filluar nga koha më e lartë e ekzekutimit të vetëm.",
         "STORAGE": "DB ({gb} GB) është afër kufirit të saj (ditë të mbetura {days}) — pastroni tabelat e mëdha ose shtoni kapacitet.",
         "VACUUM": "{tbl} ka shumë rreshta të vdekur ose statistika të vjetruara — rishikoni cilësimet VACUUM (ANALYZE) dhe autovacuum.",
         "INDEX": "{n} gjetje indeksi (të pavlefshme, të papërdorura, skanime të plota) — shihni skedën e shëndetit të tabelës dhe indeksit për objektivat.",
@@ -677,9 +677,9 @@
           "3": "Kontrolloni që logjika e ritentimit nuk po fryn rikthimet."
         },
         "SLOW_SQL": {
-          "1": "Zgjidhni pyetjet kryesore sipas kohës totale në skedën e pyetjeve të ngadalta.",
+          "1": "Nga skeda e pyetjeve të ngadalta, zgjidhni pyetjen me kohën më të lartë të ekzekutimit të vetëm.",
           "2": "Rishikoni planet në SQL tuning dhe rregulloni indekset ose bashkimet.",
-          "3": "Pas rregullimit, kontrolloni që koha mesatare ka rënë."
+          "3": "Pas rregullimit, rivendosni statistikat (pg_stat_statements_reset) dhe kontrolloni përsëri nëse koha më e lartë e ekzekutimit të vetëm është ulur."
         },
         "STORAGE": {
           "1": "Shihni trendin e rritjes dhe datën e vlerësuar të plotësimit në skedën e trendit të madhësisë.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Trendi i shkallës së goditjes së cache-it",
         "capacity": "Madhësia e DB-së dhe parashikimi",
         "slowTop": "SQL i ngadaltë top 10",
-        "slowLegend": "Gjatësia e shiritit = koha totale · ngjyra = koha mesatare (▲ paralajmërim nga {warn}ms · ✕ rrezik nga {risk}ms)",
+        "slowLegend": "Gjatësia/ngjyra e shiritit = Koha maksimale e ekzekutimit të vetëm (▲ {warn}ms ose më shumë: paralajmërim · ✕ {risk}ms ose më shumë: rrezik)",
         "sizeTop": "Hapësira top 10",
         "heat": "Rreziku sipas sinjalit me kalimin e kohës",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "A lëvizin së bashku shkalla e përpunimit dhe shkalla e dështimit?",
           "cacheTrend": "Kur ra shkalla e goditjes së cache-it?",
           "capacity": "Kur do të mbushet DB-ja?",
-          "slowTop": "Çfarë të rregullohet së pari? (sipas kohës totale)",
+          "slowTop": "Çfarë të akordoni së pari? (Sipas kohës maksimale të ekzekutimit të vetëm)",
           "sizeTop": "Çfarë po zë hapësirën?",
           "heat": "A është rreziku një rast i vetëm apo i përsëritur?",
           "radar": "Cila zonë është e dobët?",
@@ -778,9 +778,7 @@
           "value": "Vlera",
           "time": "Koha",
           "calls": "Thirrjet",
-          "total": "Totali (ms)",
           "mean": "Mesatarja (ms)",
-          "share": "Pjesa",
           "score": "Pikë",
           "level": "Nivel",
           "ago": "1 orë më parë",
@@ -789,7 +787,8 @@
           "sessions": "Sesione",
           "schema": "Skema",
           "size": "Madhësia",
-          "thr": "Pragu (kujdes·rrezik)"
+          "thr": "Pragu (kujdes·rrezik)",
+          "max": "Maksimumi i vetëm (ms)"
         },
         "radar": "Pikët e shëndetit sipas zonës",
         "radarCur": "Tani",
@@ -1025,7 +1024,9 @@
       "src": "Burimi",
       "srcToggle": "Shfaq ose fsheh detajet e burimit",
       "openSqlLab": "Hap në SQL Tuning",
-      "acct": "Llogaria"
+      "acct": "Llogaria",
+      "sortMax": "Koha maksimale e ekzekutimit të vetëm",
+      "maxMs": "Maksimumi i vetëm ms"
     },
     "health": {
       "empty": "Nuk ka ende pamje. Shtypni Mblidh tani në skedën Mblidh",
@@ -1077,7 +1078,7 @@
       "fix": {
         "TOOL": "Duket si një person që kërkon DB-në e prodhimit direkt me një mjet DB (DBeaver etj.). Drejtojini ata në një replikë vetëm për lexim ose DB analitike, dhe vendosni një kufi kohor për llogaritë njerëzore, p.sh. ALTER ROLE human_user SET statement_timeout = '30s'. Përdorni një rol të veçantë vetëm për lexim, dhe kryeni nxjerrje masive në orët jashtë pikut",
         "BATCH": "Duket si një grup ose punë e planifikuar. Shpërndani kohët e ekzekutimit larg pikut të biznesit dhe zvogëloni punën për çdo angazhim. Kontrolloni indekset dhe statistikat (ANALYZE) në tabelat e synuara, dhe ndani transaksionet e gjata. Vendosja e emrit të punës në application_name e bën klasifikimin tjetër më të saktë",
-        "PROGRAM": "Duket si një kërkesë e ekzekutuar nga një aplikacion. Kontrolloni planin në SQL Tuning. Shumë thirrje me një mesatare të shkurtër tregojnë thirrje të përsëritura (N+1) ose caching; një mesatare e gjatë tregon indekse ose rendin e bashkimit së pari. Vendosni emrin e shërbimit në application_name të grupit tuaj të lidhjeve",
+        "PROGRAM": "Kjo duket të jetë një pyetje e ekzekutuar nga aplikacioni. Kontrolloni planin e ekzekutimit në akordimin e SQL. Nëse koha maksimale e ekzekutimit të vetëm është e gjatë, shikoni së pari indekset dhe rendin e bashkimit. Nëse një ekzekutim i vetëm është i shkurtër por numri i thirrjeve është i lartë, shikoni thirrjet e përsëritura (N+1) dhe ruajtjen në cache. Vendosni emrin e shërbimit në application_name të grupit të lidhjeve.",
         "PLATFORM": "Duket si punë e brendshme e DB ose platformës si autovacuum ose replikimi. Zakonisht nuk nevojitet asnjë veprim. Nëse qëndron në krye, rishikoni pragjet e autovacuum dhe maintenance_work_mem",
         "MONITOR": "Duket si kërkesat e statistikave të këtij shërbimi (lidhja schema.pi). Nuk nevojitet asnjë veprim. Nëse shfaqet shumë shpesh, ulni frekuencën e votimit",
         "UNKNOWN": "Nuk ka asnjë të dhënë për burimin. Vendosni application_name në çdo lidhje dhe ndani llogaritë sipas qëllimit; do të klasifikohet nga mostrat e ardhshme"

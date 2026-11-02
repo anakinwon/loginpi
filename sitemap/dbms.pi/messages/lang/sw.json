@@ -614,7 +614,7 @@
         "LOCK_WAIT": "Vikao {n} vinasubiri kufungwa — pata kikao kinachozuia na umalize muamala wake.",
         "CACHE_HIT": "Kiwango cha hit cha akiba {pct}% — tafuta skani kamili za jedwali kubwa au kagua shared_buffers.",
         "XACT_ERR": "Kiwango cha kurejesha {pct}%, {dlck} kufungwa — angalia miamala inayoshindwa na kumbukumbu za makosa ya programu.",
-        "SLOW_SQL": "Hoja ina wastani wa {ms} ms — rekebisha hoja za juu kwa jumla ya muda kwa kutumia mipango yao.",
+        "SLOW_SQL": "Kuna hoja inayochukua hadi {ms}ms kwa kila utekelezaji — angalia mpango wa utekelezaji na urekebishe, kuanzia na muda mrefu zaidi wa utekelezaji mmoja.",
         "STORAGE": "DB ({gb} GB) iko karibu na kikomo chake (siku zilizobaki {days}) — safisha jedwali kubwa au ongeza uwezo.",
         "VACUUM": "{tbl} ina safu nyingi zilizokufa au takwimu zilizopitwa na wakati — kagua mipangilio ya VACUUM (ANALYZE) na autovacuum.",
         "INDEX": "Matokeo ya faharisi {n} (batili, isiyotumika, skani kamili) — angalia kichupo cha afya ya jedwali & faharisi kwa malengo.",
@@ -677,9 +677,9 @@
           "3": "Angalia kwamba mantiki ya kujaribu tena haiongezi kurejesha."
         },
         "SLOW_SQL": {
-          "1": "Chagua hoja za juu kwa jumla ya muda katika kichupo cha hoja polepole.",
+          "1": "Kutoka kwenye kichupo cha hoja polepole, chagua hoja yenye muda mrefu zaidi wa utekelezaji mmoja.",
           "2": "Kagua mipango katika urekebishaji wa SQL na urekebishe faharisi au viunganishi.",
-          "3": "Baada ya kurekebisha, angalia kwamba muda wa wastani umeshuka."
+          "3": "Baada ya kurekebisha, weka upya takwimu (pg_stat_statements_reset) na uangalie tena ikiwa muda mrefu zaidi wa utekelezaji mmoja umepungua."
         },
         "STORAGE": {
           "1": "Angalia mwenendo wa ukuaji na tarehe kamili iliyokadiriwa katika kichupo cha mwenendo wa ukubwa.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Mwenendo wa kiwango cha hit cha akiba",
         "capacity": "Ukubwa wa DB & utabiri",
         "slowTop": "SQL polepole 10 bora",
-        "slowLegend": "Urefu wa pau = jumla ya muda · rangi = muda wa wastani (▲ onyo kutoka {warn}ms · ✕ hatari kutoka {risk}ms)",
+        "slowLegend": "Urefu/rangi ya pau = Muda wa juu zaidi wa utekelezaji mmoja (▲ {warn}ms au zaidi: onyo · ✕ {risk}ms au zaidi: hatari)",
         "sizeTop": "Nafasi 10 bora",
         "heat": "Hatari kwa ishara kwa muda",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Je, kiwango cha upitishaji na kiwango cha kushindwa huenda pamoja?",
           "cacheTrend": "Kiwango cha hit cha akiba kilishuka lini?",
           "capacity": "DB itajaa lini?",
-          "slowTop": "Nini cha kurekebisha kwanza? (kwa jumla ya muda)",
+          "slowTop": "Nini cha kurekebisha kwanza? (Kwa muda wa juu zaidi wa utekelezaji mmoja)",
           "sizeTop": "Nini kinachukua nafasi?",
           "heat": "Je, hatari ni ya mara moja au inarudia?",
           "radar": "Ni eneo gani dhaifu?",
@@ -778,9 +778,7 @@
           "value": "Thamani",
           "time": "Muda",
           "calls": "Simu",
-          "total": "Jumla (ms)",
           "mean": "Wastani (ms)",
-          "share": "Shiriki",
           "score": "Alama",
           "level": "Kiwango",
           "ago": "Saa 1 iliyopita",
@@ -789,7 +787,8 @@
           "sessions": "Vipindi",
           "schema": "Schema",
           "size": "Ukubwa",
-          "thr": "Kizingiti (onyo·hatari)"
+          "thr": "Kizingiti (onyo·hatari)",
+          "max": "Juu zaidi moja (ms)"
         },
         "radar": "Alama ya afya kwa eneo",
         "radarCur": "Sasa",
@@ -1023,7 +1022,9 @@
       "src": "Chanzo",
       "srcToggle": "Onyesha au ficha maelezo ya chanzo",
       "openSqlLab": "Fungua katika SQL Tuning",
-      "acct": "Akaunti"
+      "acct": "Akaunti",
+      "sortMax": "Muda wa juu zaidi wa utekelezaji mmoja",
+      "maxMs": "Juu zaidi moja ms"
     },
     "health": {
       "empty": "Hakuna picha bado. Bonyeza Kusanya sasa kwenye kichupo cha Kusanya",
@@ -1075,7 +1076,7 @@
       "fix": {
         "TOOL": "Inaonekana kama mtu anauliza DB ya uzalishaji moja kwa moja na zana ya DB (DBeaver n.k.). Waelekeze kwenye nakala ya kusoma tu au DB ya uchambuzi badala yake, na weka kikomo cha muda wa kukimbia kwenye akaunti za binadamu, k.m. ALTER ROLE human_user SET statement_timeout = '30s'. Tumia jukumu tofauti la kusoma tu, na fanya uchimbaji mwingi katika masaa ya chini ya kilele",
         "BATCH": "Inaonekana kama kundi au kazi iliyopangwa. Sambaza nyakati za kukimbia mbali na vilele vya biashara na punguza kazi kwa kila ahadi. Angalia faharisi na takwimu (ANALYZE) kwenye majedwali lengwa, na ugawanye miamala mirefu. Kuweka jina la kazi katika application_name hufanya uainishaji unaofuata kuwa sahihi zaidi",
-        "PROGRAM": "Inaonekana kama swala lililoendeshwa na programu. Angalia mpango katika SQL Tuning. Simu nyingi zilizo na maana fupi zinaelekeza kwenye simu zinazorudiwa (N+1) au kache; maana ndefu inaelekeza kwenye faharisi au mpangilio wa kuunganisha kwanza. Weka jina la huduma katika application_name ya bwawa lako la muunganisho",
+        "PROGRAM": "Hii inaonekana kuwa hoja iliyotekelezwa na programu. Angalia mpango wa utekelezaji katika urekebishaji wa SQL. Ikiwa muda wa juu zaidi wa utekelezaji mmoja ni mrefu, kwanza angalia faharisi na mpangilio wa kuunganisha. Ikiwa utekelezaji mmoja ni mfupi lakini idadi ya simu ni kubwa, angalia simu zinazorudiwa (N+1) na kache. Weka jina la huduma katika application_name ya kundi la muunganisho.",
         "PLATFORM": "Inaonekana kama kazi ya ndani ya DB au jukwaa kama vile autovacuum au urudufishaji. Kawaida hakuna hatua inayohitajika. Ikiwa inakaa juu, kagua vizingiti vya autovacuum na maintenance_work_mem",
         "MONITOR": "Inaonekana kama maswali ya takwimu ya huduma hii (kiungo cha schema.pi). Hakuna hatua inayohitajika. Ikiwa inaonekana mara nyingi sana, punguza mzunguko wa upigaji kura",
         "UNKNOWN": "Hakuna dalili ya chanzo. Weka application_name kwenye kila muunganisho na ugawanye akaunti kwa madhumuni; itaainishwa kutoka kwa sampuli zinazofuata"

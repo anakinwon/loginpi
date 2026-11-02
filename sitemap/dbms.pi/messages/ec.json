@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sesiones están esperando bloqueos: encuentre la sesión que bloquea y finalice su transacción.",
         "CACHE_HIT": "Tasa de aciertos de caché {pct}%: busque escaneos completos de tablas grandes o revise shared_buffers.",
         "XACT_ERR": "Tasa de rollback {pct}%, {dlck} deadlocks: compruebe las transacciones fallidas y los registros de errores de la aplicación.",
-        "SLOW_SQL": "Una consulta promedia {ms} ms: ajuste las consultas principales por tiempo total utilizando sus planes.",
+        "SLOW_SQL": "Hay una consulta que tarda hasta {ms}ms por ejecución; vea el plan de ejecución y ajústela, empezando por el tiempo de ejecución individual más alto.",
         "STORAGE": "La DB ({gb} GB) está cerca de su límite (días restantes {days}): limpie tablas grandes o añada capacidad.",
         "VACUUM": "{tbl} tiene muchas filas muertas o estadísticas obsoletas: revise la configuración de VACUUM (ANALYZE) y autovacuum.",
         "INDEX": "{n} hallazgos de índices (inválidos, no utilizados, escaneos completos): consulte la pestaña de estado de tablas e índices para ver los objetivos.",
@@ -677,9 +677,9 @@
           "3": "Compruebe que la lógica de reintento no esté inflando los rollbacks."
         },
         "SLOW_SQL": {
-          "1": "Elija las consultas principales por tiempo total en la pestaña de consultas lentas.",
+          "1": "En la pestaña de consultas lentas, seleccione la consulta con el tiempo de ejecución individual más alto.",
           "2": "Revise los planes en la optimización de SQL y corrija los índices o las uniones.",
-          "3": "Después de corregir, compruebe que el tiempo medio disminuyó."
+          "3": "Después de corregir, restablezca las estadísticas (pg_stat_statements_reset) y verifique nuevamente si el tiempo de ejecución individual más alto ha disminuido."
         },
         "STORAGE": {
           "1": "Consulte la tendencia de crecimiento y la fecha de llenado estimada en la pestaña de tendencia de tamaño.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Tendencia de tasa de aciertos de caché",
         "capacity": "Tamaño y previsión de la DB",
         "slowTop": "Top 10 de SQL lento",
-        "slowLegend": "Longitud de la barra = tiempo total · color = tiempo medio (▲ advertencia desde {warn}ms · ✕ riesgo desde {risk}ms)",
+        "slowLegend": "Longitud/color de la barra = Tiempo máximo de ejecución individual (▲ {warn}ms o más: advertencia · ✕ {risk}ms o más: riesgo)",
         "sizeTop": "Top 10 de espacio",
         "heat": "Riesgo por señal a lo largo del tiempo",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "¿El rendimiento y la tasa de fallos se mueven juntos?",
           "cacheTrend": "¿Cuándo bajó la tasa de aciertos de caché?",
           "capacity": "¿Cuándo se llenará la DB?",
-          "slowTop": "¿Qué optimizar primero? (por tiempo total)",
+          "slowTop": "¿Qué ajustar primero? (Por tiempo máximo de ejecución individual)",
           "sizeTop": "¿Qué está ocupando el espacio?",
           "heat": "¿El riesgo es puntual o recurrente?",
           "radar": "¿Qué área es débil?",
@@ -778,9 +778,7 @@
           "value": "Valor",
           "time": "Hora",
           "calls": "Llamadas",
-          "total": "Total (ms)",
           "mean": "Media (ms)",
-          "share": "Cuota",
           "score": "Puntuación",
           "level": "Nivel",
           "ago": "Hace 1 hora",
@@ -789,7 +787,8 @@
           "sessions": "Sesiones",
           "schema": "Esquema",
           "size": "Tamaño",
-          "thr": "Umbral (advertencia·riesgo)"
+          "thr": "Umbral (advertencia·riesgo)",
+          "max": "Máx. individual (ms)"
         },
         "radar": "Puntuación de salud por área",
         "radarCur": "Ahora",
@@ -1023,7 +1022,9 @@
       "src": "Origen",
       "srcToggle": "Mostrar u ocultar detalles del origen",
       "openSqlLab": "Abrir en SQL Tuning",
-      "acct": "Cuenta"
+      "acct": "Cuenta",
+      "sortMax": "Tiempo máximo de ejecución individual",
+      "maxMs": "Máx. individual ms"
     },
     "health": {
       "empty": "Aún no hay instantáneas. Presione Recopilar ahora en la pestaña Recopilar",
@@ -1075,7 +1076,7 @@
       "fix": {
         "TOOL": "Parece que una persona está consultando la DB de producción directamente con una herramienta de DB (DBeaver, etc.). En su lugar, diríjalos a una réplica de solo lectura o a una DB de análisis, y limite el tiempo de ejecución en las cuentas humanas, por ejemplo, ALTER ROLE human_user SET statement_timeout = '30s'. Use un rol de solo lectura separado y ejecute extracciones masivas en horas de menor actividad.",
         "BATCH": "Parece un lote o un trabajo programado. Distribuya los tiempos de ejecución fuera de los picos de negocio y reduzca el trabajo por commit. Verifique los índices y las estadísticas (ANALYZE) en las tablas de destino, y divida las transacciones largas. Poner el nombre del trabajo en application_name hará que la próxima clasificación sea más precisa.",
-        "PROGRAM": "Parece una consulta ejecutada por una aplicación. Verifique el plan en SQL Tuning. Muchas llamadas con una media corta apuntan a llamadas repetidas (N+1) o almacenamiento en caché; una media larga apunta primero a índices o al orden de unión. Establezca el nombre del servicio en application_name de su pool de conexiones.",
+        "PROGRAM": "Parece ser una consulta ejecutada por la aplicación. Verifique el plan de ejecución en la optimización de SQL. Si el tiempo máximo de ejecución individual es largo, primero examine los índices y el orden de unión. Si una sola ejecución es corta pero el número de llamadas es alto, examine las llamadas repetidas (N+1) y el almacenamiento en caché. Inserte el nombre del servicio en el application_name del grupo de conexiones.",
         "PLATFORM": "Parece un trabajo interno de DB o plataforma, como autovacuum o replicación. Generalmente no se necesita ninguna acción. Si permanece en la parte superior, revise los umbrales de autovacuum y maintenance_work_mem.",
         "MONITOR": "Parece que son las propias consultas de estadísticas de este servicio (enlace schema.pi). No se necesita ninguna acción. Si aparece con demasiada frecuencia, reduzca la frecuencia de sondeo.",
         "UNKNOWN": "No hay ninguna pista sobre el origen. Configure application_name en cada conexión y divida las cuentas por propósito; se clasificará a partir de las próximas muestras."

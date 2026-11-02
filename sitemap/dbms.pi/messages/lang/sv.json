@@ -612,7 +612,7 @@
         "LOCK_WAIT": "{n} sessioner väntar på lås – hitta den blockerande sessionen och avsluta dess transaktion.",
         "CACHE_HIT": "Cache-träfffrekvens {pct}% – leta efter fullständiga skanningar av stora tabeller eller granska shared_buffers.",
         "XACT_ERR": "Återställningsfrekvens {pct}%, {dlck} dödlägen – kontrollera de misslyckade transaktionerna och appens felloggar.",
-        "SLOW_SQL": "En fråga tar i genomsnitt {ms} ms – justera de bästa frågorna efter total tid med hjälp av deras planer.",
+        "SLOW_SQL": "Det finns en fråga som tar upp till {ms}ms per körning – visa körningsplanen och justera den, med början från den högsta enskilda körningstiden.",
         "STORAGE": "DB ({gb} GB) är nära sin gräns (dagar kvar {days}) – rensa stora tabeller eller lägg till kapacitet.",
         "VACUUM": "{tbl} har många döda rader eller inaktuell statistik – granska VACUUM (ANALYZE) och autovacuum-inställningar.",
         "INDEX": "{n} indexfynd (ogiltiga, oanvända, fullständiga skanningar) – se fliken för tabell- och indexhälsa för målen.",
@@ -675,9 +675,9 @@
           "3": "Kontrollera att återförsökslogiken inte ökar återställningarna."
         },
         "SLOW_SQL": {
-          "1": "Välj de bästa frågorna efter total tid på fliken långsamma frågor.",
+          "1": "Från fliken för långsamma frågor, välj frågan med den högsta enskilda körningstiden.",
           "2": "Granska planer i SQL-justering och korrigera index eller joinar.",
-          "3": "Efter korrigering, kontrollera att medeltiden minskade."
+          "3": "Efter åtgärd, återställ statistik (pg_stat_statements_reset) och kontrollera igen om den högsta enskilda körningstiden har minskat."
         },
         "STORAGE": {
           "1": "Se tillväxttrenden och beräknat fullt datum på fliken storlekstrend.",
@@ -729,7 +729,7 @@
         "cacheTrend": "Cache-träfffrekvenstrend",
         "capacity": "DB-storlek & prognos",
         "slowTop": "Långsam SQL topp 10",
-        "slowLegend": "Stapelns längd = total tid · färg = medeltid (▲ varning från {warn}ms · ✕ risk från {risk}ms)",
+        "slowLegend": "Stapelns längd/färg = Max enskild körningstid (▲ {warn}ms eller mer: varning · ✕ {risk}ms eller mer: risk)",
         "sizeTop": "Utrymme topp 10",
         "heat": "Risk per signal över tid",
         "q": {
@@ -739,7 +739,7 @@
           "tpsCombo": "Rör sig genomströmning och felfrekvens tillsammans?",
           "cacheTrend": "När sjönk cache-träfffrekvensen?",
           "capacity": "När fylls DB:n?",
-          "slowTop": "Vad ska justeras först? (efter total tid)",
+          "slowTop": "Vad ska justeras först? (Efter max enskild körningstid)",
           "sizeTop": "Vad tar upp utrymmet?",
           "heat": "Är risken engångsföreteelse eller återkommande?",
           "radar": "Vilket område är svagt?",
@@ -776,9 +776,7 @@
           "value": "Värde",
           "time": "Tid",
           "calls": "Anrop",
-          "total": "Totalt (ms)",
           "mean": "Medel (ms)",
-          "share": "Andel",
           "score": "Poäng",
           "level": "Nivå",
           "ago": "1 timme sedan",
@@ -787,7 +785,8 @@
           "sessions": "Sessioner",
           "schema": "Schema",
           "size": "Storlek",
-          "thr": "Tröskel (varning·risk)"
+          "thr": "Tröskel (varning·risk)",
+          "max": "Max enskild (ms)"
         },
         "radar": "Hälsopoäng per område",
         "radarCur": "Nu",
@@ -1018,7 +1017,9 @@
       "src": "Källa",
       "srcToggle": "Visa eller dölj källdetaljer",
       "openSqlLab": "Öppna i SQL Tuning",
-      "acct": "Konto"
+      "acct": "Konto",
+      "sortMax": "Max enskild körningstid",
+      "maxMs": "Max enskild ms"
     },
     "health": {
       "empty": "Inga ögonblicksbilder än. Tryck på Samla nu på fliken Samla",
@@ -1069,7 +1070,7 @@
       "fix": {
         "TOOL": "Verkar som en person som direkt frågar produktions-DB med ett DB-verktyg (DBeaver etc.). Hänvisa dem istället till en skrivskyddad replik eller analys-DB, och begränsa körtiden på mänskliga konton, t.ex. ALTER ROLE human_user SET statement_timeout = '30s'. Använd en separat skrivskyddad roll och kör massutdrag under lågtrafik.",
         "BATCH": "Verkar som en batch eller ett schemalagt jobb. Sprid körtiderna bort från affärstoppar och minska arbetet per commit. Kontrollera index och statistik (ANALYZE) på måltabellerna och dela upp långa transaktioner. Att lägga jobbnamnet i application_name gör nästa klassificering mer exakt.",
-        "PROGRAM": "Verkar som en fråga som körs av en applikation. Kontrollera planen i SQL Tuning. Många anrop med ett kort medelvärde pekar på upprepade anrop (N+1) eller cachning; ett långt medelvärde pekar först på index eller join-ordning. Ställ in tjänstnamnet i din anslutningspools application_name.",
+        "PROGRAM": "Detta verkar vara en fråga som körs av applikationen. Kontrollera körningsplanen i SQL-justeringen. Om den maximala enskilda körningstiden är lång, titta först på index och kopplingsordning. Om en enskild körning är kort men anropsantalet är högt, titta på upprepade anrop (N+1) och cachning. Ange tjänstens namn i application_name för anslutningspoolen.",
         "PLATFORM": "Verkar som DB- eller plattformsinternt arbete som autovacuum eller replikering. Vanligtvis behövs ingen åtgärd. Om det stannar högst upp, granska autovacuum-trösklar och maintenance_work_mem.",
         "MONITOR": "Verkar som denna tjänsts egna statistikfrågor (schema.pi-länk). Ingen åtgärd behövs. Om det visas för ofta, sänk pollingfrekvensen.",
         "UNKNOWN": "Det finns ingen ledtråd till källan. Ställ in application_name på varje anslutning och dela upp konton efter syfte; det kommer att klassificeras från nästa urval."

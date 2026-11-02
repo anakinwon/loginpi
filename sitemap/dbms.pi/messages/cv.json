@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sessões estão esperando por bloqueios — encontre a sessão bloqueadora e finalize sua transação.",
         "CACHE_HIT": "Taxa de acerto de cache {pct}% — procure por varreduras completas de tabelas grandes ou revise shared_buffers.",
         "XACT_ERR": "Taxa de rollback {pct}%, {dlck} deadlocks — verifique as transações com falha e os logs de erro do aplicativo.",
-        "SLOW_SQL": "Uma consulta tem média de {ms} ms — ajuste as principais consultas por tempo total usando seus planos.",
+        "SLOW_SQL": "Há uma consulta que leva até {ms}ms por execução — visualize o plano de execução e ajuste-o, começando pelo maior tempo de execução único.",
         "STORAGE": "O DB ({gb} GB) está perto do seu limite (dias restantes {days}) — limpe tabelas grandes ou adicione capacidade.",
         "VACUUM": "{tbl} tem muitas linhas mortas ou estatísticas obsoletas — revise as configurações de VACUUM (ANALYZE) e autovacuum.",
         "INDEX": "{n} descobertas de índice (inválido, não utilizado, varreduras completas) — veja a guia de saúde de tabela e índice para os alvos.",
@@ -677,9 +677,9 @@
           "3": "Verifique se a lógica de repetição não está inflando os rollbacks."
         },
         "SLOW_SQL": {
-          "1": "Escolha as principais consultas por tempo total na guia de consultas lentas.",
+          "1": "Na aba de consultas lentas, selecione a consulta com o maior tempo de execução único.",
           "2": "Revise os planos em ajuste de SQL e corrija índices ou junções.",
-          "3": "Após a correção, verifique se o tempo médio diminuiu."
+          "3": "Após a correção, redefina as estatísticas (pg_stat_statements_reset) e verifique novamente se o tempo máximo de execução única diminuiu."
         },
         "STORAGE": {
           "1": "Veja a tendência de crescimento e a data de preenchimento estimada na guia de tendência de tamanho.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Tendência da taxa de acerto de cache",
         "capacity": "Tamanho e previsão do DB",
         "slowTop": "Top 10 SQL lento",
-        "slowLegend": "Comprimento da barra = tempo total · cor = tempo médio (▲ aviso de {warn}ms · ✕ risco de {risk}ms)",
+        "slowLegend": "Comprimento/cor da barra = Tempo máximo de execução única (▲ {warn}ms ou mais: aviso · ✕ {risk}ms ou mais: risco)",
         "sizeTop": "Top 10 de espaço",
         "heat": "Risco por sinal ao longo do tempo",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "A taxa de transferência e a taxa de falha se movem juntas?",
           "cacheTrend": "Quando a taxa de acerto de cache caiu?",
           "capacity": "Quando o DB vai encher?",
-          "slowTop": "O que ajustar primeiro? (por tempo total)",
+          "slowTop": "O que ajustar primeiro? (Pelo tempo máximo de execução única)",
           "sizeTop": "O que está ocupando o espaço?",
           "heat": "O risco é pontual ou recorrente?",
           "radar": "Qual área está fraca?",
@@ -778,9 +778,7 @@
           "value": "Valor",
           "time": "Hora",
           "calls": "Chamadas",
-          "total": "Total (ms)",
           "mean": "Média (ms)",
-          "share": "Compartilhar",
           "score": "Pontuação",
           "level": "Nível",
           "ago": "1 hora atrás",
@@ -789,7 +787,8 @@
           "sessions": "Sessões",
           "schema": "Esquema",
           "size": "Tamanho",
-          "thr": "Limite (aviso·risco)"
+          "thr": "Limite (aviso·risco)",
+          "max": "Máx. único (ms)"
         },
         "radar": "Pontuação de saúde por área",
         "radarCur": "Agora",
@@ -1023,7 +1022,9 @@
       "src": "Origem",
       "srcToggle": "Mostrar ou ocultar detalhes da origem",
       "openSqlLab": "Abrir em SQL Tuning",
-      "acct": "Conta"
+      "acct": "Conta",
+      "sortMax": "Tempo máximo de execução única",
+      "maxMs": "Máx. único ms"
     },
     "health": {
       "empty": "Nenhum instantâneo ainda. Pressione Coletar agora na aba Coletar",
@@ -1075,7 +1076,7 @@
       "fix": {
         "TOOL": "Parece que uma pessoa está consultando o DB de produção diretamente com uma ferramenta de DB (DBeaver etc.). Oriente-os a usar uma réplica somente leitura ou DB de análise, e limite o tempo de execução em contas humanas, por exemplo, ALTER ROLE human_user SET statement_timeout = '30s'. Use uma função somente leitura separada e execute extrações em massa fora dos horários de pico",
         "BATCH": "Parece um lote ou trabalho agendado. Distribua os tempos de execução para longe dos picos de negócios e reduza o trabalho por commit. Verifique índices e estatísticas (ANALYZE) nas tabelas de destino e divida transações longas. Colocar o nome do trabalho em application_name torna a próxima classificação mais precisa",
-        "PROGRAM": "Parece uma consulta executada por um aplicativo. Verifique o plano em SQL Tuning. Muitas chamadas com uma média curta apontam para chamadas repetidas (N+1) ou cache; uma média longa aponta para índices ou ordem de junção primeiro. Defina o nome do serviço no application_name do seu pool de conexões",
+        "PROGRAM": "Parece ser uma consulta executada pela aplicação. Verifique o plano de execução no ajuste de SQL. Se o tempo máximo de execução única for longo, primeiro observe os índices e a ordem de junção. Se uma única execução for curta, mas o número de chamadas for alto, observe as chamadas repetidas (N+1) e o cache. Coloque o nome do serviço no application_name do pool de conexões.",
         "PLATFORM": "Parece trabalho interno do DB ou da plataforma, como autovacuum ou replicação. Geralmente, nenhuma ação é necessária. Se permanecer no topo, revise os limites de autovacuum e maintenance_work_mem",
         "MONITOR": "Parece as próprias consultas de estatísticas deste serviço (link schema.pi). Nenhuma ação necessária. Se aparecer com muita frequência, diminua a frequência de sondagem",
         "UNKNOWN": "Não há nenhuma pista sobre a origem. Defina application_name em cada conexão e divida as contas por finalidade; será classificado a partir das próximas amostras"

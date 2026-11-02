@@ -612,7 +612,7 @@
         "LOCK_WAIT": "{n} sesiuni așteaptă blocări — găsiți sesiunea de blocare și încheiați tranzacția acesteia.",
         "CACHE_HIT": "Rata de succes a cache-ului {pct}% — căutați scanări complete ale tabelelor mari sau revizuiți shared_buffers.",
         "XACT_ERR": "Rata de rollback {pct}%, {dlck} blocaje — verificați tranzacțiile eșuate și jurnalele de erori ale aplicației.",
-        "SLOW_SQL": "O interogare are o medie de {ms} ms — optimizați interogările de top după timpul total folosind planurile lor.",
+        "SLOW_SQL": "Există o interogare care durează până la {ms}ms per execuție — vizualizați planul de execuție și optimizați-o, începând cu cel mai mare timp de execuție individual.",
         "STORAGE": "DB-ul ({gb} GB) este aproape de limită (zile rămase {days}) — curățați tabelele mari sau adăugați capacitate.",
         "VACUUM": "{tbl} are multe rânduri moarte sau statistici învechite — revizuiți setările VACUUM (ANALYZE) și autovacuum.",
         "INDEX": "{n} constatări de index (invalid, neutilizat, scanări complete) — vedeți fila de stare a tabelelor și indexurilor pentru ținte.",
@@ -675,9 +675,9 @@
           "3": "Verificați dacă logica de reîncercare nu umflă rollback-urile."
         },
         "SLOW_SQL": {
-          "1": "Alegeți interogările de top după timpul total în fila de interogări lente.",
+          "1": "Din fila interogări lente, selectați interogarea cu cel mai mare timp de execuție individual.",
           "2": "Revizuiți planurile în SQL tuning și remediați indexurile sau join-urile.",
-          "3": "După remediere, verificați dacă timpul mediu a scăzut."
+          "3": "După remediere, resetați statisticile (pg_stat_statements_reset) și verificați din nou dacă timpul maxim de execuție individual a scăzut."
         },
         "STORAGE": {
           "1": "Vedeți tendința de creștere și data estimată de umplere în fila de tendințe de dimensiune.",
@@ -728,7 +728,7 @@
         "cacheTrend": "Tendința ratei de succes a cache-ului",
         "capacity": "Dimensiune DB și prognoză",
         "slowTop": "Top 10 SQL lent",
-        "slowLegend": "Lungimea barei = timp total · culoare = timp mediu (▲ avertisment de la {warn}ms · ✕ risc de la {risk}ms)",
+        "slowLegend": "Lungime/culoare bară = Timp maxim de execuție individual (▲ {warn}ms sau mai mult: avertisment · ✕ {risk}ms sau mai mult: risc)",
         "sizeTop": "Top 10 spațiu",
         "heat": "Risc pe semnal în timp",
         "q": {
@@ -738,7 +738,7 @@
           "tpsCombo": "Debit și rata de eșec se mișcă împreună?",
           "cacheTrend": "Când a scăzut rata de succes a cache-ului?",
           "capacity": "Când se va umple DB-ul?",
-          "slowTop": "Ce să optimizez mai întâi? (după timpul total)",
+          "slowTop": "Ce să optimizați mai întâi? (După timpul maxim de execuție individual)",
           "sizeTop": "Ce ocupă spațiul?",
           "heat": "Riscul este o întâmplare sau se repetă?",
           "radar": "Ce zonă este slabă?",
@@ -775,9 +775,7 @@
           "value": "Valoare",
           "time": "Timp",
           "calls": "Apeluri",
-          "total": "Total (ms)",
           "mean": "Medie (ms)",
-          "share": "Cotă",
           "score": "Scor",
           "level": "Nivel",
           "ago": "Acum 1 oră",
@@ -786,7 +784,8 @@
           "sessions": "Sesiuni",
           "schema": "Schemă",
           "size": "Dimensiune",
-          "thr": "Prag (avertisment·risc)"
+          "thr": "Prag (avertisment·risc)",
+          "max": "Max individual (ms)"
         },
         "radar": "Scor de sănătate pe zonă",
         "radarCur": "Acum",
@@ -1017,7 +1016,9 @@
       "src": "Sursă",
       "srcToggle": "Afișează sau ascunde detaliile sursei",
       "openSqlLab": "Deschide în SQL Tuning",
-      "acct": "Cont"
+      "acct": "Cont",
+      "sortMax": "Timp maxim de execuție individual",
+      "maxMs": "Max individual ms"
     },
     "health": {
       "empty": "Nu există încă instantanee. Apăsați Colectează acum pe fila Colectează",
@@ -1068,7 +1069,7 @@
       "fix": {
         "TOOL": "Pare a fi o persoană care interoghează direct DB-ul de producție cu un instrument DB (DBeaver etc.). Îndrumați-o către o replică doar în citire sau o bază de date de analiză, și limitați timpul de execuție pentru conturile umane, de ex. ALTER ROLE human_user SET statement_timeout = '30s'. Utilizați un rol separat doar în citire și rulați extrageri în masă în orele de vârf.",
         "BATCH": "Pare a fi un lot sau o lucrare programată. Distribuiți timpii de execuție în afara orelor de vârf ale afacerii și reduceți volumul de muncă per commit. Verificați indecșii și statisticile (ANALYZE) pe tabelele țintă și împărțiți tranzacțiile lungi. Includerea numelui lucrării în application_name face următoarea clasificare mai precisă.",
-        "PROGRAM": "Pare a fi o interogare rulată de o aplicație. Verificați planul în SQL Tuning. Multe apeluri cu o medie scurtă indică apeluri repetate (N+1) sau cache; o medie lungă indică indecși sau ordinea de join în primul rând. Setați numele serviciului în application_name al pool-ului de conexiuni.",
+        "PROGRAM": "Aceasta pare a fi o interogare executată de aplicație. Verificați planul de execuție în optimizarea SQL. Dacă timpul maxim de execuție individual este lung, uitați-vă mai întâi la indecși și ordinea de join. Dacă o singură execuție este scurtă, dar numărul de apeluri este mare, uitați-vă la apelurile repetate (N+1) și la cache. Puneți numele serviciului în application_name al pool-ului de conexiuni.",
         "PLATFORM": "Pare a fi o lucrare internă a DB-ului sau a platformei, cum ar fi autovacuum sau replicare. De obicei nu este necesară nicio acțiune. Dacă rămâne în top, revizuiți pragurile autovacuum și maintenance_work_mem.",
         "MONITOR": "Pare a fi interogările de statistici ale acestui serviciu (link schema.pi). Nu este necesară nicio acțiune. Dacă apare prea des, reduceți frecvența de interogare.",
         "UNKNOWN": "Nu există niciun indiciu despre sursă. Setați application_name la fiecare conexiune și împărțiți conturile după scop; va fi clasificat din următoarele eșantioane."

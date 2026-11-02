@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sesija čeka na zaključavanja — pronađite sesiju koja blokira i završite njenu transakciju.",
         "CACHE_HIT": "Stopa pogodaka keša {pct}% — potražite potpuna skeniranja velikih tabela ili pregledajte shared_buffers.",
         "XACT_ERR": "Stopa poništavanja {pct}%, {dlck} mrtvih tačaka — provjerite neuspjele transakcije i logove grešaka aplikacije.",
-        "SLOW_SQL": "Upit u prosjeku traje {ms} ms — podesite najvažnije upite po ukupnom vremenu koristeći njihove planove.",
+        "SLOW_SQL": "Postoji upit koji traje do {ms}ms po izvršenju — pregledajte plan izvršenja i podesite ga, počevši od najvišeg vremena pojedinačnog izvršenja.",
         "STORAGE": "DB ({gb} GB) je blizu svog ograničenja (preostalo dana {days}) — očistite velike tabele ili dodajte kapacitet.",
         "VACUUM": "{tbl} ima mnogo mrtvih redova ili zastarjelih statistika — pregledajte postavke VACUUM (ANALYZE) i autovacuum.",
         "INDEX": "{n} nalaza indeksa (nevažeći, neiskorišteni, potpuna skeniranja) — pogledajte karticu zdravlja tabele i indeksa za ciljeve.",
@@ -677,9 +677,9 @@
           "3": "Provjerite da logika ponovnog pokušaja ne povećava rollbacke."
         },
         "SLOW_SQL": {
-          "1": "Odaberite najvažnije upite po ukupnom vremenu u kartici 'Spori upiti'.",
+          "1": "Na kartici sporih upita odaberite upit s najvišim vremenom pojedinačnog izvršenja.",
           "2": "Pregledajte planove u SQL podešavanju i popravite indekse ili spojeve.",
-          "3": "Nakon popravke, provjerite je li prosječno vrijeme smanjeno."
+          "3": "Nakon popravke, resetujte statistiku (pg_stat_statements_reset) i ponovo provjerite da li se najviše vrijeme pojedinačnog izvršenja smanjilo."
         },
         "STORAGE": {
           "1": "Pogledajte trend rasta i procijenjeni datum popunjenosti u kartici 'Trend veličine'.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Trend stope pogodaka keša",
         "capacity": "Veličina DB-a i prognoza",
         "slowTop": "Spori SQL top 10",
-        "slowLegend": "Dužina trake = ukupno vrijeme · boja = prosječno vrijeme (▲ upozorenje od {warn}ms · ✕ rizik od {risk}ms)",
+        "slowLegend": "Dužina/boja trake = Maksimalno vrijeme pojedinačnog izvršenja (▲ {warn}ms ili više: upozorenje · ✕ {risk}ms ili više: rizik)",
         "sizeTop": "Prostor top 10",
         "heat": "Rizik po signalu tokom vremena",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Da li se propusnost i stopa grešaka kreću zajedno?",
           "cacheTrend": "Kada je stopa pogodaka keša pala?",
           "capacity": "Kada će se DB popuniti?",
-          "slowTop": "Šta prvo podesiti? (po ukupnom vremenu)",
+          "slowTop": "Šta prvo podesiti? (Po maksimalnom vremenu pojedinačnog izvršenja)",
           "sizeTop": "Šta zauzima prostor?",
           "heat": "Je li rizik jednokratan ili se ponavlja?",
           "radar": "Koja je oblast slaba?",
@@ -778,9 +778,7 @@
           "value": "Vrijednost",
           "time": "Vrijeme",
           "calls": "Pozivi",
-          "total": "Ukupno (ms)",
           "mean": "Prosjek (ms)",
-          "share": "Udio",
           "score": "Ocjena",
           "level": "Nivo",
           "ago": "Prije 1 sat",
@@ -789,7 +787,8 @@
           "sessions": "Sesije",
           "schema": "Šema",
           "size": "Veličina",
-          "thr": "Prag (upozorenje·rizik)"
+          "thr": "Prag (upozorenje·rizik)",
+          "max": "Maks. pojedinačno (ms)"
         },
         "radar": "Ocjena zdravlja po područjima",
         "radarCur": "Sada",
@@ -1023,7 +1022,9 @@
       "src": "Izvor",
       "srcToggle": "Prikaži ili sakrij detalje izvora",
       "openSqlLab": "Otvori u SQL Tuning-u",
-      "acct": "Račun"
+      "acct": "Račun",
+      "sortMax": "Maksimalno vrijeme pojedinačnog izvršenja",
+      "maxMs": "Maks. pojedinačno ms"
     },
     "health": {
       "empty": "Još nema snimaka. Pritisnite „Prikupi sada“ na kartici „Prikupi“",
@@ -1075,7 +1076,7 @@
       "fix": {
         "TOOL": "Izgleda da osoba direktno upita produkcijsku DB pomoću DB alata (DBeaver itd.). Usmjerite ih na repliku samo za čitanje ili analitičku DB umjesto toga, i ograničite vrijeme izvršavanja na ljudskim računima, npr. ALTER ROLE human_user SET statement_timeout = '30s'. Koristite zasebnu ulogu samo za čitanje i pokrenite masovne ekstrakcije u vanšpicnim satima",
         "BATCH": "Izgleda kao batch ili zakazani posao. Rasporedite vrijeme izvršavanja izvan poslovnih špica i smanjite rad po commitu. Provjerite indekse i statistike (ANALYZE) na ciljnim tabelama i podijelite duge transakcije. Stavljanje imena posla u application_name čini sljedeću klasifikaciju preciznijom",
-        "PROGRAM": "Izgleda kao upit koji je pokrenula aplikacija. Provjerite plan u SQL Tuning-u. Mnogi pozivi sa kratkim prosjekom ukazuju na ponovljene pozive (N+1) ili keširanje; dug prosjek ukazuje prvo na indekse ili redoslijed spajanja. Postavite naziv usluge u application_name vašeg connection pool-a",
+        "PROGRAM": "Čini se da je ovo upit koji je izvršila aplikacija. Provjerite plan izvršenja u SQL podešavanju. Ako je maksimalno vrijeme pojedinačnog izvršenja dugo, prvo pogledajte indekse i redoslijed spajanja. Ako je pojedinačno izvršenje kratko, ali je broj poziva visok, pogledajte ponovljene pozive (N+1) i keširanje. Stavite naziv usluge u application_name skupa veza.",
         "PLATFORM": "Izgleda kao interni rad DB-a ili platforme, kao što je autovacuum ili replikacija. Obično nije potrebna nikakva akcija. Ako ostane na vrhu, pregledajte autovacuum pragove i maintenance_work_mem",
         "MONITOR": "Izgleda kao vlastiti statistički upiti ove usluge (schema.pi veza). Nije potrebna nikakva akcija. Ako se prečesto pojavljuje, smanjite frekvenciju anketiranja",
         "UNKNOWN": "Nema traga o izvoru. Postavite application_name na svakoj vezi i podijelite račune po namjeni; bit će klasificirano iz sljedećih uzoraka"

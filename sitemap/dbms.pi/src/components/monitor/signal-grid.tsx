@@ -103,7 +103,7 @@ export const SQL_CHECK: Partial<Record<SigId | 'PGSS', string>> = {
   XACT_ERR:
     'SELECT xact_commit, xact_rollback, deadlocks, stats_reset FROM pg_stat_database WHERE datname = current_database();',
   SLOW_SQL:
-    'SELECT calls, round(mean_exec_time) AS mean_ms, round(total_exec_time) AS total_ms, left(query, 200) AS query FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 10;',
+    'SELECT calls, round(max_exec_time) AS max_ms, round(mean_exec_time) AS mean_ms, left(query, 200) AS query FROM pg_stat_statements ORDER BY max_exec_time DESC LIMIT 10;',
   STORAGE:
     'SELECT pg_size_pretty(pg_database_size(current_database())) AS db_size;',
   VACUUM:

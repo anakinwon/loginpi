@@ -1322,7 +1322,7 @@ function Capacity({
   )
 }
 
-// P7 — 느린 SQL TOP10(총 시간 순) : 평균이 기준을 넘는 막대만 상태색 + 막대 끝 글자(색 외 구분)
+// P7 — 느린 SQL TOP10(1회 최고 시간 순, 마스터 2026-11-02) : 최고 시간이 기준을 넘는 막대만 상태색 + 막대 끝 글자(색 외 구분)
 function SlowTop({ slow }: { slow: BoardSlow | null }) {
   const t = useTranslations('monitor.board')
   const sig = slow?.signals.find((s) => s.id === 'SLOW_SQL')
@@ -1336,7 +1336,7 @@ function SlowTop({ slow }: { slow: BoardSlow | null }) {
         trigger: 'item',
         formatter: (p: { dataIndex: number }) => {
           const r = top[p.dataIndex]
-          return `#${top.length - p.dataIndex} ${r.label.replace(/</g, '&lt;')}<br/>${t('chart.col.calls')} ${r.calls} · ${t('chart.col.mean')} ${Math.round(r.meanMs)} ms · ${t('chart.col.share')} ${Math.round(r.share * 100)}%`
+          return `#${top.length - p.dataIndex} ${r.label.replace(/</g, '&lt;')}<br/>${t('chart.col.max')} ${Math.round(r.maxMs)} · ${t('chart.col.mean')} ${Math.round(r.meanMs)} · ${t('chart.col.calls')} ${r.calls}`
         },
       },
       grid: {
@@ -1362,12 +1362,12 @@ function SlowTop({ slow }: { slow: BoardSlow | null }) {
           type: 'bar',
           barMaxWidth: 14,
           data: top.map((r) => ({
-            value: Math.round(r.totalMs),
+            value: Math.round(r.maxMs),
             itemStyle: {
               color:
-                r.meanMs >= THR.slowMs[1]
+                r.maxMs >= THR.slowMs[1]
                   ? C.risk
-                  : r.meanMs >= THR.slowMs[0]
+                  : r.maxMs >= THR.slowMs[0]
                     ? C.warn
                     : SERIES[0],
               borderRadius: [0, 4, 4, 0],
@@ -1380,7 +1380,7 @@ function SlowTop({ slow }: { slow: BoardSlow | null }) {
             color: C.text,
             fontSize: 10,
             formatter: (p: { dataIndex: number }) => {
-              const m = top[p.dataIndex].meanMs
+              const m = top[p.dataIndex].maxMs
               return m >= THR.slowMs[1] ? '✕' : m >= THR.slowMs[0] ? '▲' : ''
             },
           },
@@ -1398,19 +1398,17 @@ function SlowTop({ slow }: { slow: BoardSlow | null }) {
           <Table
             head={[
               'SQL',
-              t('chart.col.calls'),
-              t('chart.col.total'),
+              t('chart.col.max'),
               t('chart.col.mean'),
-              t('chart.col.share'),
+              t('chart.col.calls'),
             ]}
             rows={[...top]
               .reverse()
               .map((r, k) => [
                 `#${k + 1} ${r.label}`,
-                r.calls,
-                Math.round(r.totalMs),
+                Math.round(r.maxMs),
                 Math.round(r.meanMs),
-                `${Math.round(r.share * 100)}%`,
+                r.calls,
               ])}
           />
         )

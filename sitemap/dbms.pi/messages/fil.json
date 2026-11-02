@@ -613,7 +613,7 @@
         "LOCK_WAIT": "{n} na session ang naghihintay sa mga lock — hanapin ang blocking session at tapusin ang transaksyon nito.",
         "CACHE_HIT": "Rate ng pagtama ng cache {pct}% — hanapin ang buong pag-scan ng malalaking talahanayan o suriin ang shared_buffers.",
         "XACT_ERR": "Rollback rate {pct}%, {dlck} deadlock — suriin ang mga nabigong transaksyon at mga log ng error ng app.",
-        "SLOW_SQL": "Ang isang query ay may average na {ms} ms — i-tune ang mga nangungunang query sa pamamagitan ng kabuuang oras gamit ang kanilang mga plano.",
+        "SLOW_SQL": "Mayroong query na may pinakamataas na {ms}ms sa isang pagkakataon — tingnan ang execution plan mula sa pinakamataas na single-execution time at i-tune.",
         "STORAGE": "Ang DB ({gb} GB) ay malapit na sa limitasyon nito (natitirang araw {days}) — linisin ang malalaking talahanayan o magdagdag ng kapasidad.",
         "VACUUM": "Ang {tbl} ay may maraming patay na row o luma na istatistika — suriin ang mga setting ng VACUUM (ANALYZE) at autovacuum.",
         "INDEX": "{n} na natuklasan sa index (invalid, hindi ginagamit, buong pag-scan) — tingnan ang tab ng kalusugan ng talahanayan at index para sa mga target.",
@@ -676,9 +676,9 @@
           "3": "Suriin na ang retry logic ay hindi nagpapalaki ng mga rollback."
         },
         "SLOW_SQL": {
-          "1": "Piliin ang mga nangungunang query sa pamamagitan ng kabuuang oras sa tab ng mabagal na query.",
+          "1": "Sa tab ng mabagal na query, piliin ang mga query na may pinakamataas na single-execution time.",
           "2": "Suriin ang mga plano sa SQL tuning at ayusin ang mga index o join.",
-          "3": "Pagkatapos ayusin, suriin na bumaba ang average na oras."
+          "3": "Pagkatapos ng pag-aayos, i-reset ang mga istatistika (pg_stat_statements_reset) at tingnan muli kung bumaba ang pinakamataas na single-execution time."
         },
         "STORAGE": {
           "1": "Tingnan ang trend ng paglago at tinantyang petsa ng pagpuno sa tab ng trend ng laki.",
@@ -730,7 +730,7 @@
         "cacheTrend": "Trend ng rate ng pagtama ng cache",
         "capacity": "Laki at forecast ng DB",
         "slowTop": "Mabagal na SQL top 10",
-        "slowLegend": "Haba ng bar = kabuuang oras · kulay = average na oras (▲ babala mula {warn}ms · ✕ panganib mula {risk}ms)",
+        "slowLegend": "Haba/kulay ng bar = pinakamataas na single-execution time (▲ {warn}ms o higit pa ay babala · ✕ {risk}ms o higit pa ay panganib)",
         "sizeTop": "Laki top 10",
         "heat": "Panganib ayon sa signal sa paglipas ng panahon",
         "q": {
@@ -740,7 +740,7 @@
           "tpsCombo": "Sabay bang gumagalaw ang throughput at failure rate?",
           "cacheTrend": "Kailan bumaba ang rate ng pagtama ng cache?",
           "capacity": "Kailan mapupuno ang DB?",
-          "slowTop": "Ano ang unang i-tune? (ayon sa kabuuang oras)",
+          "slowTop": "Ano ang dapat i-tune muna? (ayon sa pinakamataas na single-execution time)",
           "sizeTop": "Ano ang kumukuha ng espasyo?",
           "heat": "Ang panganib ba ay isang beses lang o umuulit?",
           "radar": "Aling lugar ang mahina?",
@@ -777,9 +777,7 @@
           "value": "Halaga",
           "time": "Oras",
           "calls": "Mga tawag",
-          "total": "Kabuuan (ms)",
           "mean": "Average (ms)",
-          "share": "Bahagi",
           "score": "Score",
           "level": "Antas",
           "ago": "1 oras na ang nakalipas",
@@ -788,7 +786,8 @@
           "sessions": "Mga Session",
           "schema": "Schema",
           "size": "Sukat",
-          "thr": "Threshold (babala·panganib)"
+          "thr": "Threshold (babala·panganib)",
+          "max": "Pinakamataas na 1 beses (ms)"
         },
         "radar": "Health score ayon sa lugar",
         "radarCur": "Ngayon",
@@ -1024,7 +1023,9 @@
       "src": "Pinagmulan",
       "srcToggle": "Ipakita o itago ang mga detalye ng pinagmulan",
       "openSqlLab": "Buksan sa SQL Tuning",
-      "acct": "Account"
+      "acct": "Account",
+      "sortMax": "Pinakamataas na single-execution time",
+      "maxMs": "Pinakamataas na 1 beses ms"
     },
     "health": {
       "empty": "Wala pang snapshot. Pindutin ang Kolektahin ngayon sa tab na Kolektahin",
@@ -1076,7 +1077,7 @@
       "fix": {
         "TOOL": "Mukhang isang tao ang direktang nag-query sa production DB gamit ang isang DB tool (DBeaver atbp.). Ituro sila sa isang read-only replica o analytics DB sa halip, at limitahan ang run time sa mga human account, hal. ALTER ROLE human_user SET statement_timeout = '30s'. Gumamit ng hiwalay na read-only role, at patakbuhin ang bulk extracts sa mga oras na hindi peak",
         "BATCH": "Mukhang isang batch o naka-iskedyul na trabaho. Ikalat ang run times palayo sa mga business peak at paliitin ang trabaho bawat commit. Suriin ang mga index at istatistika (ANALYZE) sa mga target na table, at hatiin ang mahabang transaksyon. Ang paglalagay ng pangalan ng trabaho sa application_name ay nagiging mas tumpak ang susunod na klasipikasyon",
-        "PROGRAM": "Mukhang isang query na pinatakbo ng isang application. Suriin ang plano sa SQL Tuning. Maraming tawag na may maikling mean ang tumuturo sa paulit-ulit na tawag (N+1) o caching; ang mahabang mean ay tumuturo sa mga index o join order muna. Itakda ang pangalan ng serbisyo sa application_name ng iyong connection pool",
+        "PROGRAM": "Mukhang ito ay isang query na isinagawa ng application. Tingnan ang execution plan sa SQL tuning. Kung mahaba ang pinakamataas na single-execution time, tingnan muna ang index/join order, at kung maikli ang single-execution time ngunit mataas ang bilang ng tawag, tingnan ang paulit-ulit na tawag (N+1)/cache. Ilagay ang pangalan ng serbisyo sa application_name ng connection pool.",
         "PLATFORM": "Mukhang DB o internal na trabaho ng platform tulad ng autovacuum o replication. Karaniwan ay walang aksyon na kailangan. Kung nananatili ito sa itaas, suriin ang mga threshold ng autovacuum at maintenance_work_mem",
         "MONITOR": "Mukhang sariling mga query ng istatistika ng serbisyong ito (link ng schema.pi). Walang aksyon na kailangan. Kung masyadong madalas itong lumalabas, babaan ang polling frequency",
         "UNKNOWN": "Walang pahiwatig sa pinagmulan. Itakda ang application_name sa bawat koneksyon at hatiin ang mga account ayon sa layunin; ito ay ikaklasipika mula sa mga susunod na sample"

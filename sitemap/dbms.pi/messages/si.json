@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sej čaka na zaklepanje — poiščite blokirajočo sejo in končajte njeno transakcijo.",
         "CACHE_HIT": "Stopnja zadetkov predpomnilnika {pct}% — poiščite popolne preglede velikih tabel ali preglejte shared_buffers.",
         "XACT_ERR": "Stopnja povratnih transakcij {pct}%, {dlck} mrtvih zaklepov — preverite neuspešne transakcije in dnevnike napak aplikacije.",
-        "SLOW_SQL": "Poizvedba v povprečju traja {ms} ms — optimizirajte najboljše poizvedbe po skupnem času z uporabo njihovih načrtov.",
+        "SLOW_SQL": "Obstaja poizvedba, ki traja do {ms}ms na izvedbo — oglejte si načrt izvedbe in jo prilagodite, začenši z najvišjim časom posamezne izvedbe.",
         "STORAGE": "DB ({gb} GB) je blizu svoje omejitve (preostali dnevi {days}) — počistite velike tabele ali dodajte zmogljivost.",
         "VACUUM": "{tbl} ima veliko mrtvih vrstic ali zastarele statistike — preglejte nastavitve VACUUM (ANALYZE) in autovacuum.",
         "INDEX": "{n} ugotovitev indeksa (neveljavni, neuporabljeni, popolni pregledi) — cilje si oglejte na zavihku zdravja tabel in indeksov.",
@@ -677,9 +677,9 @@
           "3": "Preverite, ali logika ponovnega poskusa ne napihuje povratnih transakcij."
         },
         "SLOW_SQL": {
-          "1": "Izberite najboljše poizvedbe po skupnem času na zavihku počasnih poizvedb.",
+          "1": "Na zavihku počasnih poizvedb izberite poizvedbo z najvišjim časom posamezne izvedbe.",
           "2": "Preglejte načrte v SQL tuning in popravite indekse ali združitve.",
-          "3": "Po popravku preverite, ali se je povprečni čas zmanjšal."
+          "3": "Po popravku ponastavite statistiko (pg_stat_statements_reset) in ponovno preverite, ali se je najvišji čas posamezne izvedbe zmanjšal."
         },
         "STORAGE": {
           "1": "Oglejte si trend rasti in predvideni datum polnosti na zavihku trenda velikosti.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Trend stopnje zadetkov predpomnilnika",
         "capacity": "Velikost in napoved DB",
         "slowTop": "Počasen SQL top 10",
-        "slowLegend": "Dolžina stolpca = skupni čas · barva = povprečni čas (▲ opozorilo od {warn}ms · ✕ tveganje od {risk}ms)",
+        "slowLegend": "Dolžina/barva stolpca = Najdaljši čas posamezne izvedbe (▲ {warn}ms ali več: opozorilo · ✕ {risk}ms ali več: tveganje)",
         "sizeTop": "Prostor top 10",
         "heat": "Tveganje po signalu skozi čas",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Ali se pretok in stopnja napak premikata skupaj?",
           "cacheTrend": "Kdaj je padla stopnja zadetkov predpomnilnika?",
           "capacity": "Kdaj se bo DB napolnila?",
-          "slowTop": "Kaj najprej optimizirati? (po skupnem času)",
+          "slowTop": "Kaj najprej prilagoditi? (Po najdaljšem času posamezne izvedbe)",
           "sizeTop": "Kaj zavzema prostor?",
           "heat": "Ali je tveganje enkratno ali ponavljajoče se?",
           "radar": "Katero področje je šibko?",
@@ -778,9 +778,7 @@
           "value": "Vrednost",
           "time": "Čas",
           "calls": "Klici",
-          "total": "Skupaj (ms)",
           "mean": "Povprečje (ms)",
-          "share": "Delež",
           "score": "Ocena",
           "level": "Raven",
           "ago": "Pred 1 uro",
@@ -789,7 +787,8 @@
           "sessions": "Seje",
           "schema": "Shema",
           "size": "Velikost",
-          "thr": "Prag (opozorilo·tveganje)"
+          "thr": "Prag (opozorilo·tveganje)",
+          "max": "Največja posamezna (ms)"
         },
         "radar": "Ocena zdravja po področjih",
         "radarCur": "Trenutno",
@@ -1023,7 +1022,9 @@
       "src": "Vir",
       "srcToggle": "Pokaži ali skrij podrobnosti vira",
       "openSqlLab": "Odpri v SQL Tuning",
-      "acct": "Račun"
+      "acct": "Račun",
+      "sortMax": "Najdaljši čas posamezne izvedbe",
+      "maxMs": "Najdaljši posamezni ms"
     },
     "health": {
       "empty": "Ni posnetkov. Pritisnite Zberi zdaj na zavihku Zbiranje",
@@ -1075,7 +1076,7 @@
       "fix": {
         "TOOL": "Videti je, da oseba neposredno poizveduje po produkcijski DB z orodjem DB (DBeaver itd.). Namesto tega jih usmerite na repliko samo za branje ali analitično DB in omejite čas izvajanja na človeških računih, npr. ALTER ROLE human_user SET statement_timeout = '30s'. Uporabite ločeno vlogo samo za branje in izvajajte množične ekstrakcije v urah izven konic.",
         "BATCH": "Videti je kot paketno ali načrtovano opravilo. Razporedite čase izvajanja stran od poslovnih konic in zmanjšajte delo na potrditev. Preverite indekse in statistike (ANALYZE) na ciljnih tabelah in razdelite dolge transakcije. Če v application_name vnesete ime opravila, bo naslednja klasifikacija natančnejša.",
-        "PROGRAM": "Videti je kot poizvedba, ki jo izvaja aplikacija. Preverite načrt v SQL Tuning. Veliko klicev s kratkim povprečjem kaže na ponavljajoče se klice (N+1) ali predpomnjenje; dolgo povprečje najprej kaže na indekse ali vrstni red združevanja. Nastavite ime storitve v application_name vašega bazena povezav.",
+        "PROGRAM": "Zdi se, da je to poizvedba, ki jo je izvedla aplikacija. Preverite načrt izvedbe v SQL uglaševanju. Če je najdaljši čas posamezne izvedbe dolg, najprej preglejte indekse in vrstni red združevanja. Če je posamezna izvedba kratka, vendar je število klicev visoko, preglejte ponavljajoče se klice (N+1) in predpomnjenje. V application_name povezovalnega bazena vnesite ime storitve.",
         "PLATFORM": "Videti je kot notranje delo DB ali platforme, kot je autovacuum ali replikacija. Običajno ni potrebno nobeno dejanje. Če ostane na vrhu, preglejte pragove autovacuum in maintenance_work_mem.",
         "MONITOR": "Videti je kot lastne statistične poizvedbe te storitve (povezava schema.pi). Ni potrebno nobeno dejanje. Če se pojavlja prepogosto, zmanjšajte pogostost anketiranja.",
         "UNKNOWN": "Ni namigov o viru. Nastavite application_name na vsaki povezavi in razdelite račune po namenu; klasificirano bo iz naslednjih vzorcev."

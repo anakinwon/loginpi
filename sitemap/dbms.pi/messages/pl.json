@@ -609,7 +609,7 @@
         "LOCK_WAIT": "{n} sesji oczekuje na blokady — znajdź blokującą sesję i zakończ jej transakcję.",
         "CACHE_HIT": "Współczynnik trafień pamięci podręcznej {pct}% — poszukaj pełnych skanów dużych tabel lub przejrzyj shared_buffers.",
         "XACT_ERR": "Współczynnik wycofań {pct}%, {dlck} zakleszczeń — sprawdź nieudane transakcje i logi błędów aplikacji.",
-        "SLOW_SQL": "Zapytanie średnio {ms} ms — dostrój najważniejsze zapytania według całkowitego czasu, używając ich planów.",
+        "SLOW_SQL": "Istnieje zapytanie, które zajmuje do {ms}ms na wykonanie — wyświetl plan wykonania i dostrój je, zaczynając od najwyższego czasu pojedynczego wykonania.",
         "STORAGE": "DB ({gb} GB) zbliża się do limitu (pozostało {days} dni) — wyczyść duże tabele lub zwiększ pojemność.",
         "VACUUM": "{tbl} ma wiele martwych wierszy lub nieaktualne statystyki — przejrzyj ustawienia VACUUM (ANALYZE) i autovacuum.",
         "INDEX": "{n} znalezionych problemów z indeksem (nieprawidłowe, nieużywane, pełne skanowanie) — sprawdź kartę stanu tabel i indeksów, aby zobaczyć cele.",
@@ -672,9 +672,9 @@
           "3": "Sprawdź, czy logika ponawiania nie zwiększa liczby wycofań."
         },
         "SLOW_SQL": {
-          "1": "Wybierz najważniejsze zapytania według całkowitego czasu w zakładce wolnych zapytań.",
+          "1": "Z zakładki wolnych zapytań wybierz zapytanie z najwyższym czasem pojedynczego wykonania.",
           "2": "Przejrzyj plany w strojeniu SQL i popraw indeksy lub połączenia.",
-          "3": "Po naprawie sprawdź, czy średni czas spadł."
+          "3": "Po naprawieniu zresetuj statystyki (pg_stat_statements_reset) i ponownie sprawdź, czy najwyższy czas pojedynczego wykonania zmniejszył się."
         },
         "STORAGE": {
           "1": "Zobacz trend wzrostu i szacowaną datę zapełnienia w zakładce trendu rozmiaru.",
@@ -726,7 +726,7 @@
         "cacheTrend": "Trend współczynnika trafień pamięci podręcznej",
         "capacity": "Rozmiar DB i prognoza",
         "slowTop": "Wolne zapytania SQL Top 10",
-        "slowLegend": "Długość słupka = całkowity czas · kolor = średni czas (▲ ostrzeżenie od {warn}ms · ✕ ryzyko od {risk}ms)",
+        "slowLegend": "Długość/kolor słupka = Maksymalny czas pojedynczego wykonania (▲ {warn}ms lub więcej: ostrzeżenie · ✕ {risk}ms lub więcej: ryzyko)",
         "sizeTop": "Top 10 zajętości miejsca",
         "heat": "Ryzyko według sygnału w czasie",
         "q": {
@@ -736,7 +736,7 @@
           "tpsCombo": "Czy przepustowość i wskaźnik awarii poruszają się razem?",
           "cacheTrend": "Kiedy spadł współczynnik trafień pamięci podręcznej?",
           "capacity": "Kiedy DB się zapełni?",
-          "slowTop": "Co najpierw dostroić? (według całkowitego czasu)",
+          "slowTop": "Co najpierw dostroić? (Według maksymalnego czasu pojedynczego wykonania)",
           "sizeTop": "Co zajmuje miejsce?",
           "heat": "Czy ryzyko jest jednorazowe czy powtarzające się?",
           "radar": "Który obszar jest słaby?",
@@ -773,9 +773,7 @@
           "value": "Wartość",
           "time": "Czas",
           "calls": "Wywołania",
-          "total": "Całkowity (ms)",
           "mean": "Średnia (ms)",
-          "share": "Udział",
           "score": "Wynik",
           "level": "Poziom",
           "ago": "1 godzinę temu",
@@ -784,7 +782,8 @@
           "sessions": "Sesje",
           "schema": "Schemat",
           "size": "Rozmiar",
-          "thr": "Próg (ostrzeżenie·ryzyko)"
+          "thr": "Próg (ostrzeżenie·ryzyko)",
+          "max": "Maks. pojedyncze (ms)"
         },
         "radar": "Ocena stanu zdrowia według obszaru",
         "radarCur": "Teraz",
@@ -1015,7 +1014,9 @@
       "src": "Źródło",
       "srcToggle": "Pokaż lub ukryj szczegóły źródła",
       "openSqlLab": "Otwórz w SQL Tuning",
-      "acct": "Konto"
+      "acct": "Konto",
+      "sortMax": "Maksymalny czas pojedynczego wykonania",
+      "maxMs": "Maks. pojedyncze ms"
     },
     "health": {
       "empty": "Brak migawek. Naciśnij „Zbierz teraz” na karcie „Zbieranie”",
@@ -1066,7 +1067,7 @@
       "fix": {
         "TOOL": "Wygląda na to, że osoba bezpośrednio wysyła zapytania do produkcyjnej DB za pomocą narzędzia DB (DBeaver itp.). Zamiast tego skieruj ją do repliki tylko do odczytu lub DB analitycznej i ogranicz czas działania na kontach ludzkich, np. ALTER ROLE human_user SET statement_timeout = '30s'. Użyj oddzielnej roli tylko do odczytu i wykonuj masowe ekstrakcje poza godzinami szczytu",
         "BATCH": "Wygląda na partię lub zaplanowane zadanie. Rozłóż czasy działania poza szczytami biznesowymi i zmniejsz pracę na zatwierdzenie. Sprawdź indeksy i statystyki (ANALYZE) w tabelach docelowych i podziel długie transakcje. Umieszczenie nazwy zadania w application_name sprawi, że następna klasyfikacja będzie bardziej precyzyjna",
-        "PROGRAM": "Wygląda na zapytanie uruchomione przez aplikację. Sprawdź plan w SQL Tuning. Wiele wywołań z krótką średnią wskazuje na powtarzające się wywołania (N+1) lub buforowanie; długa średnia wskazuje najpierw na indeksy lub kolejność łączenia. Ustaw nazwę usługi w application_name puli połączeń",
+        "PROGRAM": "Wygląda na to, że jest to zapytanie wykonane przez aplikację. Sprawdź plan wykonania w strojeniu SQL. Jeśli maksymalny czas pojedynczego wykonania jest długi, najpierw sprawdź indeksy i kolejność łączenia. Jeśli pojedyncze wykonanie jest krótkie, ale liczba wywołań jest wysoka, sprawdź powtarzające się wywołania (N+1) i buforowanie. Umieść nazwę usługi w application_name puli połączeń.",
         "PLATFORM": "Wygląda na wewnętrzną pracę DB lub platformy, taką jak autovacuum lub replikacja. Zazwyczaj nie są wymagane żadne działania. Jeśli pozostaje na szczycie, przejrzyj progi autovacuum i maintenance_work_mem",
         "MONITOR": "Wygląda na własne zapytania statystyczne tej usługi (połączenie schema.pi). Nie są wymagane żadne działania. Jeśli pojawia się zbyt często, zmniejsz częstotliwość odpytywania",
         "UNKNOWN": "Brak wskazówek co do źródła. Ustaw application_name dla każdego połączenia i podziel konta według celu; zostanie sklasyfikowane na podstawie następnych próbek"

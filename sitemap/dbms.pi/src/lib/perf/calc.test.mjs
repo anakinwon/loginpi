@@ -37,6 +37,18 @@ test('증감 : 이전 수집 없음 = 누적치 그대로, 호출 0 이면 평�
   assert.equal(qryDelta([q('a', 0, 0)], null, false)[0].meanMs, 0)
 })
 
+test('최고(maxMs) : 증감 아님 — 현재 수집 값 그대로 통과, 033 이전 null 유지', () => {
+  const d = qryDelta(
+    [{ ...q('a', 15, 300), maxMs: 900 }, { ...q('b', 3, 30), maxMs: null }],
+    [{ ...q('a', 10, 100), maxMs: 500 }],
+    false,
+  )
+  assert.deepEqual(
+    d.map((x) => x.maxMs),
+    [900, null],
+  )
+})
+
 const qu = (qryId, usrNm, calls, totalMs) => ({
   qryId,
   usrNm,

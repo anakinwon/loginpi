@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sessioni sono in attesa di blocchi — trovare la sessione bloccante e terminare la sua transazione.",
         "CACHE_HIT": "Tasso di successo cache {pct}% — cercare scansioni complete di tabelle grandi o rivedere shared_buffers.",
         "XACT_ERR": "Tasso di rollback {pct}%, {dlck} deadlock — controllare le transazioni fallite e i log degli errori dell'app.",
-        "SLOW_SQL": "Una query ha una media di {ms} ms — ottimizzare le query principali per tempo totale utilizzando i loro piani.",
+        "SLOW_SQL": "C'è una query che impiega fino a {ms}ms per esecuzione — visualizza il piano di esecuzione e ottimizzala, partendo dal tempo di esecuzione singolo più alto.",
         "STORAGE": "Il DB ({gb} GB) è vicino al suo limite (giorni rimanenti {days}) — pulire tabelle grandi o aggiungere capacità.",
         "VACUUM": "{tbl} ha molte righe morte o statistiche obsolete — rivedere le impostazioni di VACUUM (ANALYZE) e autovacuum.",
         "INDEX": "{n} risultati indice (non valido, non utilizzato, scansioni complete) — vedere la scheda stato tabella e indice per gli obiettivi.",
@@ -677,9 +677,9 @@
           "3": "Controllare che la logica di retry non stia gonfiando i rollback."
         },
         "SLOW_SQL": {
-          "1": "Selezionare le query principali per tempo totale nella scheda query lente.",
+          "1": "Dalla scheda delle query lente, seleziona la query con il tempo di esecuzione singolo più alto.",
           "2": "Rivedere i piani in SQL tuning e correggere indici o join.",
-          "3": "Dopo la correzione, controllare che il tempo medio sia diminuito."
+          "3": "Dopo aver corretto, reimposta le statistiche (pg_stat_statements_reset) e controlla di nuovo se il tempo di esecuzione singolo più alto è diminuito."
         },
         "STORAGE": {
           "1": "Vedere l'andamento della crescita e la data di riempimento stimata nella scheda andamento dimensioni.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Andamento tasso di successo cache",
         "capacity": "Dimensione DB e previsione",
         "slowTop": "Top 10 SQL lente",
-        "slowLegend": "Lunghezza barra = tempo totale · colore = tempo medio (▲ avviso da {warn}ms · ✕ rischio da {risk}ms)",
+        "slowLegend": "Lunghezza/colore barra = Tempo massimo di esecuzione singolo (▲ {warn}ms o più: avviso · ✕ {risk}ms o più: rischio)",
         "sizeTop": "Top 10 spazio",
         "heat": "Rischio per segnale nel tempo",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Throughput e tasso di errore si muovono insieme?",
           "cacheTrend": "Quando è sceso il tasso di successo cache?",
           "capacity": "Quando si riempirà il DB?",
-          "slowTop": "Cosa ottimizzare per primo? (per tempo totale)",
+          "slowTop": "Cosa ottimizzare per primo? (Per tempo massimo di esecuzione singolo)",
           "sizeTop": "Cosa occupa lo spazio?",
           "heat": "Il rischio è occasionale o ricorrente?",
           "radar": "Quale area è debole?",
@@ -778,9 +778,7 @@
           "value": "Valore",
           "time": "Ora",
           "calls": "Chiamate",
-          "total": "Totale (ms)",
           "mean": "Media (ms)",
-          "share": "Quota",
           "score": "Punteggio",
           "level": "Livello",
           "ago": "1 ora fa",
@@ -789,7 +787,8 @@
           "sessions": "Sessioni",
           "schema": "Schema",
           "size": "Dimensione",
-          "thr": "Soglia (avviso·rischio)"
+          "thr": "Soglia (avviso·rischio)",
+          "max": "Max singolo (ms)"
         },
         "radar": "Punteggio di salute per area",
         "radarCur": "Ora",
@@ -1022,7 +1021,9 @@
       "src": "Origine",
       "srcToggle": "Mostra o nascondi i dettagli dell'origine",
       "openSqlLab": "Apri in SQL Tuning",
-      "acct": "Account"
+      "acct": "Account",
+      "sortMax": "Tempo massimo di esecuzione singolo",
+      "maxMs": "Max singolo ms"
     },
     "health": {
       "empty": "Nessuna istantanea ancora. Premi Raccogli ora nella scheda Raccogli",
@@ -1074,7 +1075,7 @@
       "fix": {
         "TOOL": "Sembra che una persona stia interrogando direttamente il DB di produzione con uno strumento DB (DBeaver ecc.). Indirizzali invece a una replica di sola lettura o a un DB di analisi e limita il tempo di esecuzione sugli account umani, ad esempio ALTER ROLE human_user SET statement_timeout = '30s'. Usa un ruolo di sola lettura separato ed esegui estrazioni di massa in orari non di punta",
         "BATCH": "Sembra un batch o un lavoro pianificato. Distribuisci i tempi di esecuzione lontano dai picchi di business e riduci il lavoro per commit. Controlla indici e statistiche (ANALYZE) sulle tabelle di destinazione e dividi le transazioni lunghe. Inserire il nome del lavoro in application_name rende la prossima classificazione più precisa",
-        "PROGRAM": "Sembra una query eseguita da un'applicazione. Controlla il piano in SQL Tuning. Molte chiamate con una media breve indicano chiamate ripetute (N+1) o caching; una media lunga indica prima indici o ordine di join. Imposta il nome del servizio in application_name del tuo pool di connessioni",
+        "PROGRAM": "Sembra essere una query eseguita dall'applicazione. Controlla il piano di esecuzione nell'ottimizzazione SQL. Se il tempo massimo di esecuzione singolo è lungo, guarda prima gli indici e l'ordine di join. Se una singola esecuzione è breve ma il numero di chiamate è alto, guarda le chiamate ripetute (N+1) e la cache. Inserisci il nome del servizio in application_name del pool di connessioni.",
         "PLATFORM": "Sembra un lavoro interno al DB o alla piattaforma come autovacuum o replica. Di solito non è necessaria alcuna azione. Se rimane in cima, rivedi le soglie di autovacuum e maintenance_work_mem",
         "MONITOR": "Sembra che siano le query statistiche di questo servizio (collegamento schema.pi). Nessuna azione necessaria. Se appare troppo spesso, abbassa la frequenza di polling",
         "UNKNOWN": "Non ci sono indizi sull'origine. Imposta application_name su ogni connessione e dividi gli account per scopo; verrà classificato dai prossimi campioni"

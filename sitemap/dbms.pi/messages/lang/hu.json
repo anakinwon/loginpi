@@ -611,7 +611,7 @@
         "LOCK_WAIT": "{n} munkamenet vár zárolásokra – keresse meg a blokkoló munkamenetet, és fejezze be a tranzakcióját.",
         "CACHE_HIT": "Gyorsítótár találati arány {pct}% – keressen nagy táblák teljes vizsgálatát, vagy tekintse át a shared_buffers-t.",
         "XACT_ERR": "Visszagörgetési arány {pct}%, {dlck} holtpont – ellenőrizze a sikertelen tranzakciókat és az alkalmazás hibanaplóit.",
-        "SLOW_SQL": "Egy lekérdezés átlagosan {ms} ms – hangolja a leggyakoribb lekérdezéseket a teljes idő alapján a terveik segítségével.",
+        "SLOW_SQL": "Van egy lekérdezés, amely végrehajtásonként akár {ms}ms-ig is eltart – tekintse meg a végrehajtási tervet, és hangolja azt, a legmagasabb egyszeri végrehajtási időtől kezdve.",
         "STORAGE": "A DB ({gb} GB) közel van a limitjéhez (hátralévő napok {days}) – tisztítsa meg a nagy táblákat, vagy növelje a kapacitást.",
         "VACUUM": "A {tbl} sok halott sort vagy elavult statisztikát tartalmaz – tekintse át a VACUUM (ANALYZE) és autovacuum beállításokat.",
         "INDEX": "{n} indexhiba (érvénytelen, nem használt, teljes vizsgálat) – lásd a tábla és index állapot fület a célokért.",
@@ -674,9 +674,9 @@
           "3": "Ellenőrizze, hogy az újrapróbálkozási logika nem növeli-e a rollbackeket."
         },
         "SLOW_SQL": {
-          "1": "Válassza ki a lassú lekérdezés lapon a teljes idő alapján a leggyakoribb lekérdezéseket.",
+          "1": "A lassú lekérdezések lapon válassza ki a legmagasabb egyszeri végrehajtási idejű lekérdezést.",
           "2": "Tekintse át a terveket az SQL tuningban, és javítsa ki az indexeket vagy illesztéseket.",
-          "3": "Javítás után ellenőrizze, hogy az átlagos idő csökkent-e."
+          "3": "Javítás után állítsa vissza a statisztikákat (pg_stat_statements_reset), és ellenőrizze újra, hogy a legmagasabb egyszeri végrehajtási idő csökkent-e."
         },
         "STORAGE": {
           "1": "Tekintse meg a növekedési trendet és a becsült telítettségi dátumot a méret trend lapon.",
@@ -728,7 +728,7 @@
         "cacheTrend": "Gyorsítótár találati arány trend",
         "capacity": "DB méret és előrejelzés",
         "slowTop": "Lassú SQL top 10",
-        "slowLegend": "Sáv hossza = teljes idő · szín = átlagos idő (▲ figyelmeztetés {warn}ms-től · ✕ kockázat {risk}ms-től)",
+        "slowLegend": "Sáv hossza/színe = Max. egyszeri végrehajtási idő (▲ {warn}ms vagy több: figyelmeztetés · ✕ {risk}ms vagy több: kockázat)",
         "sizeTop": "Helyfoglalás top 10",
         "heat": "Kockázat jel szerint idővel",
         "q": {
@@ -738,7 +738,7 @@
           "tpsCombo": "Együtt mozog az áteresztőképesség és a hibaarány?",
           "cacheTrend": "Mikor esett a gyorsítótár találati arány?",
           "capacity": "Mikor telik meg a DB?",
-          "slowTop": "Mit hangoljunk először? (teljes idő szerint)",
+          "slowTop": "Mit hangoljunk először? (Max. egyszeri végrehajtási idő szerint)",
           "sizeTop": "Mi foglalja a helyet?",
           "heat": "A kockázat egyszeri vagy ismétlődő?",
           "radar": "Melyik terület gyenge?",
@@ -775,9 +775,7 @@
           "value": "Érték",
           "time": "Idő",
           "calls": "Hívások",
-          "total": "Összes (ms)",
           "mean": "Átlag (ms)",
-          "share": "Arány",
           "score": "Pontszám",
           "level": "Szint",
           "ago": "1 órája",
@@ -786,7 +784,8 @@
           "sessions": "Munkamenetek",
           "schema": "Séma",
           "size": "Méret",
-          "thr": "Küszöb (figyelmeztetés·kockázat)"
+          "thr": "Küszöb (figyelmeztetés·kockázat)",
+          "max": "Max. egyszeri (ms)"
         },
         "radar": "Egészségügyi pontszám területenként",
         "radarCur": "Most",
@@ -1016,7 +1015,9 @@
       "src": "Forrás",
       "srcToggle": "Forrás részletek megjelenítése vagy elrejtése",
       "openSqlLab": "Megnyitás az SQL Tuningban",
-      "acct": "Fiók"
+      "acct": "Fiók",
+      "sortMax": "Max. egyszeri végrehajtási idő",
+      "maxMs": "Max. egyszeri ms"
     },
     "health": {
       "empty": "Még nincsenek pillanatképek. Nyomja meg a „Gyűjtés most” gombot a Gyűjtés lapon",
@@ -1067,7 +1068,7 @@
       "fix": {
         "TOOL": "Úgy tűnik, egy személy közvetlenül lekérdezi a termelési DB-t egy DB eszközzel (DBeaver stb.). Irányítsa őket egy csak olvasható replikára vagy analitikai DB-re, és korlátozza a futási időt az emberi fiókokon, pl. ALTER ROLE human_user SET statement_timeout = '30s'. Használjon külön csak olvasható szerepkört, és futtassa a tömeges kivonásokat csúcsidőn kívül.",
         "BATCH": "Úgy tűnik, kötegelt vagy ütemezett feladat. Ossza el a futási időket az üzleti csúcsoktól távol, és csökkentse a munkát commitenként. Ellenőrizze az indexeket és a statisztikákat (ANALYZE) a cél táblákon, és ossza fel a hosszú tranzakciókat. A feladat nevének beállítása az application_name-ben pontosabbá teszi a következő osztályozást.",
-        "PROGRAM": "Úgy tűnik, egy alkalmazás által futtatott lekérdezés. Ellenőrizze a tervet az SQL Tuningban. Sok hívás rövid átlaggal ismétlődő hívásokra (N+1) vagy gyorsítótárazásra utal; hosszú átlag esetén először az indexeket vagy a join sorrendet nézze meg. Állítsa be a szolgáltatás nevét a kapcsolatkészlet application_name-jében.",
+        "PROGRAM": "Ez egy olyan lekérdezésnek tűnik, amelyet az alkalmazás hajtott végre. Ellenőrizze a végrehajtási tervet az SQL hangolásban. Ha a maximális egyszeri végrehajtási idő hosszú, először nézze meg az indexeket és a JOIN sorrendet. Ha egyetlen végrehajtás rövid, de a hívásszám magas, nézze meg az ismétlődő hívásokat (N+1) és a gyorsítótárazást. Tegye a szolgáltatás nevét a kapcsolatkészlet application_name mezőjébe.",
         "PLATFORM": "Úgy tűnik, DB vagy platform belső munka, például autovacuum vagy replikáció. Általában nincs szükség beavatkozásra. Ha a tetején marad, ellenőrizze az autovacuum küszöbértékeket és a maintenance_work_mem-et.",
         "MONITOR": "Úgy tűnik, ez a szolgáltatás saját statisztikai lekérdezései (schema.pi link). Nincs szükség beavatkozásra. Ha túl gyakran jelenik meg, csökkentse a lekérdezési gyakoriságot.",
         "UNKNOWN": "Nincs nyom a forrásra. Állítsa be az application_name-et minden kapcsolaton, és ossza fel a fiókokat cél szerint; a következő mintákból osztályozva lesz."

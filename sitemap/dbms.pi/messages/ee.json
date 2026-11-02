@@ -613,7 +613,7 @@
         "LOCK_WAIT": "{n} seanssi ootavad lukke – leidke blokeeriv seanss ja lõpetage selle tehing.",
         "CACHE_HIT": "Vahemälu tabamuste määr {pct}% – otsige suurte tabelite täielikke skaneeringuid või vaadake üle shared_buffers.",
         "XACT_ERR": "Tagasipöörde määr {pct}%, {dlck} ummikseisu – kontrollige ebaõnnestuvaid tehinguid ja rakenduse vealogisid.",
-        "SLOW_SQL": "Päringu keskmine aeg on {ms} ms – häälestage kõige aeganõudvamaid päringuid nende plaanide abil.",
+        "SLOW_SQL": "On päring, mis võtab ühe käivituse kohta kuni {ms}ms — vaadake täitmisplaani ja häälestage seda, alustades kõrgeimast üksikust täitmisajast.",
         "STORAGE": "DB ({gb} GB) on oma piiri lähedal (päevi jäänud {days}) – puhastage suuri tabeleid või lisage mahtu.",
         "VACUUM": "{tbl}-l on palju surnud ridu või aegunud statistikat – vaadake üle VACUUM (ANALYZE) ja autovacuum seaded.",
         "INDEX": "{n} indeksi leid (kehtetu, kasutamata, täielikud skaneeringud) – vaadake sihtmärke tabeli ja indeksi seisundi vahekaardilt.",
@@ -676,9 +676,9 @@
           "3": "Kontrollige, et kordusloogika ei suurendaks tagasipöördeid."
         },
         "SLOW_SQL": {
-          "1": "Valige aeglaste päringute vahekaardilt kõige aeganõudvamad päringud.",
+          "1": "Valige aeglaste päringute vahelehelt päring, millel on kõrgeim üksik täitmisaja.",
           "2": "Vaadake plaanid üle SQL-i häälestuses ja parandage indekseid või ühendusi.",
-          "3": "Pärast parandamist kontrollige, et keskmine aeg langes."
+          "3": "Pärast parandamist lähtestage statistika (pg_stat_statements_reset) ja kontrollige uuesti, kas kõrgeim üksik täitmisaja on vähenenud."
         },
         "STORAGE": {
           "1": "Vaadake kasvu trendi ja hinnangulist täitumise kuupäeva suuruse trendi vahekaardilt.",
@@ -730,7 +730,7 @@
         "cacheTrend": "Vahemälu tabamuste määra trend",
         "capacity": "DB suurus ja prognoos",
         "slowTop": "Aeglane SQL TOP 10",
-        "slowLegend": "Riba pikkus = koguaeg · värv = keskmine aeg (▲ hoiatus alates {warn}ms · ✕ risk alates {risk}ms)",
+        "slowLegend": "Riba pikkus/värv = Maksimaalne üksik täitmisaja (▲ {warn}ms või rohkem: hoiatus · ✕ {risk}ms või rohkem: risk)",
         "sizeTop": "Ruum TOP 10",
         "heat": "Risk signaali järgi aja jooksul",
         "q": {
@@ -740,7 +740,7 @@
           "tpsCombo": "Kas läbilaskevõime ja ebaõnnestumiste määr liiguvad koos?",
           "cacheTrend": "Millal vahemälu tabamuste määr langes?",
           "capacity": "Millal DB täitub?",
-          "slowTop": "Mida esimesena häälestada? (koguaega järgi)",
+          "slowTop": "Mida esimesena häälestada? (Maksimaalse üksiku täitmisaja järgi)",
           "sizeTop": "Mis võtab ruumi?",
           "heat": "Kas risk on ühekordne või korduv?",
           "radar": "Milline valdkond on nõrk?",
@@ -777,9 +777,7 @@
           "value": "Väärtus",
           "time": "Aeg",
           "calls": "Kutsed",
-          "total": "Kokku (ms)",
           "mean": "Keskmine (ms)",
-          "share": "Osa",
           "score": "Skoor",
           "level": "Tase",
           "ago": "1 tund tagasi",
@@ -788,7 +786,8 @@
           "sessions": "Seansid",
           "schema": "Skeem",
           "size": "Suurus",
-          "thr": "Lävi (hoiatus·risk)"
+          "thr": "Lävi (hoiatus·risk)",
+          "max": "Maksimaalne üksik (ms)"
         },
         "radar": "Terviseskoor valdkonniti",
         "radarCur": "Praegu",
@@ -1019,7 +1018,9 @@
       "src": "Allikas",
       "srcToggle": "Näita või peida allika üksikasjad",
       "openSqlLab": "Ava SQL Tuningus",
-      "acct": "Konto"
+      "acct": "Konto",
+      "sortMax": "Maksimaalne üksik täitmisaja",
+      "maxMs": "Maksimaalne üksik ms"
     },
     "health": {
       "empty": "Ühtegi hetktõmmist veel pole. Vajutage kogumise vahekaardil „Kogu kohe“",
@@ -1070,7 +1071,7 @@
       "fix": {
         "TOOL": "Näib, et inimene pärib tootmis-DB-d otse DB-tööriistaga (DBeaver jne). Suunake nad hoopis lugemiseks mõeldud replikasse või analüütika-DB-sse ja piirake inimkontode käitusaega, nt ALTER ROLE human_user SET statement_timeout = '30s'. Kasutage eraldi lugemiseks mõeldud rolli ja tehke suuremahulisi väljavõtteid tipptundide välisel ajal.",
         "BATCH": "Näib olevat partii- või ajastatud töö. Jaotage käitusajad äri tippudest eemale ja vähendage töö mahtu ühe commit'i kohta. Kontrollige sihttabelite indekseid ja statistikat (ANALYZE) ning jagage pikad tehingud. Töö nime lisamine application_name'i muudab järgmise klassifikatsiooni täpsemaks.",
-        "PROGRAM": "Näib olevat rakenduse käivitatud päring. Kontrollige plaani SQL Tuningus. Paljud lühikese keskmisega kõned viitavad korduvatele kõnedele (N+1) või vahemälu kasutamisele; pikk keskmine viitab esmalt indeksitele või liitumisjärjekorrale. Seadistage teenuse nimi oma ühenduste kogumi application_name'is.",
+        "PROGRAM": "See näib olevat rakenduse käivitatud päring. Kontrollige täitmisplaani SQL-häälestuses. Kui maksimaalne üksik täitmisaja on pikk, vaadake esmalt indekseid ja liitumisjärjekorda. Kui üksik täitmine on lühike, kuid kutsete arv on suur, vaadake korduvaid kutseid (N+1) ja vahemälu. Pange teenuse nimi ühendusepargi application_name'i.",
         "PLATFORM": "Näib olevat DB või platvormi sisemine töö, nagu autovacuum või replikatsioon. Tavaliselt pole vaja midagi ette võtta. Kui see jääb tippu, vaadake üle autovacuum'i läved ja maintenance_work_mem.",
         "MONITOR": "Näib olevat selle teenuse enda statistikapäringud (schema.pi link). Tegevust pole vaja. Kui see ilmub liiga sageli, vähendage küsitlussagedust.",
         "UNKNOWN": "Allika kohta puudub vihje. Seadistage application_name igal ühendusel ja jagage kontod otstarbe järgi; see klassifitseeritakse järgmistest proovidest."

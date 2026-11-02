@@ -247,38 +247,43 @@ test('⑤ BACKUP : off → RISK, 실패가 성공보다 뒤 → RISK, standby �
   )
 })
 
-test('⑥ SLOW_SQL : PGSS·VER, calls<20·유틸 제외, share 합 1', () => {
+test('⑥ SLOW_SQL : PGSS·VER, 유틸 제외, 1회 최고(maxMs) 순·판정, 호출 수 하한 없음', () => {
   assert.equal(get(slow({ topSql: 'PGSS_MISSING' }), 'SLOW_SQL').reason, 'PGSS')
   assert.equal(
     get(slow({ topSql: [], version: ver({ versionNum: 120000 }) }), 'SLOW_SQL')
       .reason,
     'VER',
   )
-  const q = (id, query, calls, totalMs) => ({
+  const q = (id, query, calls, maxMs, meanMs = maxMs / 2) => ({
     queryid: id,
     query,
     calls,
-    totalMs,
-    meanMs: totalMs / calls,
+    maxMs,
+    meanMs,
   })
   const e = evalSlow(
     slowIn({
       topSql: [
-        q('1', 'select a', 100, 100000),
-        q('2', 'select b', 50, 5000),
-        q('3', 'select c', 5, 99999),
+        q('1', 'select a', 3001, 7, 6.6), // 총 19.8초지만 1회 7ms — 하위
+        q('2', 'select b', 50, 800),
+        q('3', 'select c', 1, 40000), // DBeaver 1회성 40초 — 1등
         q('4', 'VACUUM t', 100, 999999),
       ],
     }),
   )
   assert.deepEqual(
     e.slowTop.map((r) => r.key),
-    ['1', '2'],
+    ['3', '2', '1'],
   )
-  assert.ok(Math.abs(e.slowTop.reduce((s, r) => s + r.share, 0) - 1) < 1e-9)
-  assert.equal(get(e.signals, 'SLOW_SQL').lvl, 'WARN') // 평균 1000ms
+  const s = get(e.signals, 'SLOW_SQL')
+  assert.equal(s.lvl, 'RISK') // 최고 40000ms ≥ 3000
+  assert.equal(s.params.ms, 40000)
   assert.equal(
-    get(slow({ topSql: [q('3', 'select c', 5, 99999)] }), 'SLOW_SQL').lvl,
+    get(slow({ topSql: [q('2', 'select b', 50, 800)] }), 'SLOW_SQL').lvl,
+    'WARN',
+  )
+  assert.equal(
+    get(slow({ topSql: [q('4', 'VACUUM t', 1, 9)] }), 'SLOW_SQL').lvl,
     'NA',
   )
 })

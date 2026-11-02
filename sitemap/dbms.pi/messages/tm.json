@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sessiýa gulplamalara garaşýar — blokirleýji sessiýany tapyň we onuň tranzaksiýasyny tamamlaň.",
         "CACHE_HIT": "Keş urgy tizligi {pct}% — uly tablisalaryň doly skanirlenmegini gözläň ýa-da shared_buffers-i gözden geçiriň.",
         "XACT_ERR": "Yza gaýtarmak tizligi {pct}%, {dlck} öli gulplamalar — şowsuz tranzaksiýalary we programma ýalňyş loglaryny barlaň.",
-        "SLOW_SQL": "Bir soragyň ortaça {ms} ms — umumy wagt boýunça iň ýokary soraglary meýilnamalaryny ulanyp sazlaň.",
+        "SLOW_SQL": "Her gezekde {ms}ms çenli wagt alýan sorag bar — ýerine ýetiriş meýilnamasyna serediň we iň ýokary ýeke ýerine ýetiriş wagtyndan başlap sazlaň.",
         "STORAGE": "DB ({gb} GB) öz çägine ýakyn (galan günler {days}) — uly tablisalary arassalaň ýa-da kuwwatlylyk goşuň.",
         "VACUUM": "{tbl} köp öli setirleri ýa-da köne statistikasy bar — VACUUM (ANALYZE) we autovacuum sazlamalaryny gözden geçiriň.",
         "INDEX": "{n} indeks tapyndylary (nädogry, ulanylmadyk, doly skanirlenmeler) — maksatlary üçin tablisanyň we indeksiň saglyk tabyny görüň.",
@@ -677,9 +677,9 @@
           "3": "Gaýtadan synanyşyk logikasynyň yza gaýtarmalary köpeltmeýändigini barlaň."
         },
         "SLOW_SQL": {
-          "1": "Haýal sorag tabynynda umumy wagt boýunça iň ýokary soraglary saýlaň.",
+          "1": "Haýal soraglar bölüminden iň ýokary ýeke ýerine ýetiriş wagty bolan soragy saýlaň.",
           "2": "SQL sazlamasynda meýilnamalary gözden geçiriň we indeksleri ýa-da birikmeleri düzediň.",
-          "3": "Düzedişden soň, ortaça wagtyň aşak düşendigini barlaň."
+          "3": "Düzedişden soň, statistikany täzeden düzüň (pg_stat_statements_reset) we iň ýokary ýeke ýerine ýetiriş wagtynyň azalandygyny ýa-da azalmandygyny ýene bir gezek barlaň."
         },
         "STORAGE": {
           "1": "Ululyk tendensiýasy tabynynda ösüş tendensiýasyny we çak edilýän doly senäni görüň.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Keş urgy tizligi tendensiýasy",
         "capacity": "DB ululygy we çaklama",
         "slowTop": "Haýal SQL iň gowy 10",
-        "slowLegend": "Zolak uzynlygy = umumy wagt · reňk = ortaça wagt (▲ {warn}ms-den duýduryş · ✕ {risk}ms-den howp)",
+        "slowLegend": "Zolagyň uzynlygy/reňki = Iň ýokary ýeke ýerine ýetiriş wagty (▲ {warn}ms ýa-da ondan köp: duýduryş · ✕ {risk}ms ýa-da ondan köp: töwekgelçilik)",
         "sizeTop": "Ýer iň gowy 10",
         "heat": "Wagt boýunça signal boýunça howp",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Öndürijilik we şowsuzlyk tizligi bile hereket edýärmi?",
           "cacheTrend": "Keş urgy tizligi haçan aşak düşdi?",
           "capacity": "DB haçan dolar?",
-          "slowTop": "Ilki nämäni sazlamaly? (umumy wagt boýunça)",
+          "slowTop": "Ilki nämäni sazlamaly? (Iň ýokary ýeke ýerine ýetiriş wagty boýunça)",
           "sizeTop": "Ýeri näme eýeleýär?",
           "heat": "Howp bir gezeklikmi ýa-da gaýtalanýarmy?",
           "radar": "Haýsy ýer gowşak?",
@@ -778,9 +778,7 @@
           "value": "Baha",
           "time": "Wagt",
           "calls": "Jaňlar",
-          "total": "Jemi (ms)",
           "mean": "Ortaça (ms)",
-          "share": "Paý",
           "score": "Baha",
           "level": "Dereje",
           "ago": "1 sagat öň",
@@ -789,7 +787,8 @@
           "sessions": "Sessiýalar",
           "schema": "Shema",
           "size": "Ölçeg",
-          "thr": "Çäk (duýduryş·howp)"
+          "thr": "Çäk (duýduryş·howp)",
+          "max": "Iň ýokary ýeke (ms)"
         },
         "radar": "Meýdan boýunça saglyk baly",
         "radarCur": "Häzir",
@@ -1025,7 +1024,9 @@
       "src": "Çeşme",
       "srcToggle": "Çeşme jikme-jikliklerini görkez ýa-da gizle",
       "openSqlLab": "SQL Tuning-de aç",
-      "acct": "Hasap"
+      "acct": "Hasap",
+      "sortMax": "Iň ýokary ýeke ýerine ýetiriş wagty",
+      "maxMs": "Iň ýokary ýeke ms"
     },
     "health": {
       "empty": "Heniz hiç hili surata düşürilen ýok. Ýygnamak bölüminde häzir ýygnamak düwmesini basyň",
@@ -1077,7 +1078,7 @@
       "fix": {
         "TOOL": "Adam DB guraly (DBeaver we ş.m.) bilen önümçilik DB-ni göni sorag edýän ýaly. Olaryň ýerine diňe okamak üçin replika ýa-da analitika DB-ni ulanmagyny maslahat beriň we adam hasaplarynda iş wagtyny çäkläň, meselem, ALTER ROLE human_user SET statement_timeout = '30s'. Aýratyn diňe okamak üçin roly ulanyň we köp mukdardaky çykarmalary iň ýokary däl sagatlarda ýerine ýetiriň",
         "BATCH": "Partiýa ýa-da meýilleşdirilen iş ýaly. Iş wagtlaryny iş ýokary nokatlaryndan daşlaşdyryň we her bir tabşyryk üçin işi kiçeldiň. Maksat tablisalarynda indeksleri we statistikany (ANALYZE) barlaň we uzyn tranzaksiýalary bölüň. application_name-e iş adyny goýmak indiki klassifikasiýany has takyk edýär",
-        "PROGRAM": "Programma tarapyndan ýerine ýetirilen sorag ýaly. SQL Tuning-de meýilnamany barlaň. Gysga ortaça bilen köp jaňlar gaýtalanýan jaňlara (N+1) ýa-da keşlemä, uzyn ortaça bolsa ilki indekslere ýa-da birikme tertibine degişlidir. Birikme howzyňyzyň application_name-ine hyzmat adyny sazlaň",
+        "PROGRAM": "Bu programma tarapyndan ýerine ýetirilen sorag ýaly görünýär. SQL sazlamasynda ýerine ýetiriş meýilnamasyny barlaň. Eger iň ýokary ýeke ýerine ýetiriş wagty uzyn bolsa, ilki indekslere we birikme tertibine serediň. Eger ýeke ýerine ýetiriş gysga bolsa, ýöne çagyryş sany ýokary bolsa, gaýtalanýan çagyryşlara (N+1) we keşlemä serediň. Birikme howuzynyň application_name-ine hyzmat adyny goýuň.",
         "PLATFORM": "autovacuum ýa-da replikasiýa ýaly DB ýa-da platforma içerki iş ýaly. Adatça hiç hili hereket talap edilmeýär. Eger ýokarda galýan bolsa, autovacuum çäklerini we maintenance_work_mem-i gözden geçiriň",
         "MONITOR": "Bu hyzmatyň öz statistika soraglary (schema.pi baglanyşygy) ýaly. Hiç hili hereket talap edilmeýär. Eger gaty ýygy-ýygydan görkezilýän bolsa, sorag ýygylygyny peseldiň",
         "UNKNOWN": "Çeşmä hiç hili delil ýok. Her bir birikmede application_name-i sazlaň we hasaplary maksat boýunça bölüň; indiki nusgalardan klassifikasiýa ediler"

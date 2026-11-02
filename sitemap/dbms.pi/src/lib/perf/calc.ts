@@ -19,6 +19,7 @@ export type QryStat = {
   calls: number
   totalMs: number
   rows: number
+  maxMs: number | null // 1회 최고(리셋 이후 누적 최고치) — 증감이 아니라 현재 값 그대로 통과, sql/033 이전 수집은 null
 }
 export type QryDelta = QryStat & { meanMs: number; reset: boolean }
 

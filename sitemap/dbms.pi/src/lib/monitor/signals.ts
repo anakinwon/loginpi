@@ -98,9 +98,8 @@ export type BoardSlow = {
     key: string
     label: string
     calls: number
-    totalMs: number
-    meanMs: number
-    share: number
+    maxMs: number // 1회 최고 시간 — 순위·색·경보 기준(마스터 2026-11-02)
+    meanMs: number // 보조 표시
   }[] // ≤10
   sizeTop: { label: string; tblByte: number; otherByte: number }[] // ≤10
   capacity: Capacity
@@ -190,7 +189,7 @@ export type TopRow = {
   queryid: string
   query: string
   calls: number
-  totalMs: number
+  maxMs: number
   meanMs: number
 }
 export type TblRow = {
@@ -252,7 +251,6 @@ export const THR = {
   cachePct: [99, 95],
   rlbkPct: [5, 20],
   slowMs: [500, 3000],
-  slowMinCalls: 20,
   storePct: [70, 85],
   storeDays: [30, 7],
   deadPct: [20, 50],
@@ -1038,7 +1036,8 @@ export function evalSlow(i: {
   const u = evalUrl(i.summaryUrl, i.now)
   out.push(u.signal)
 
-  // SLOW_SQL — calls≥20·유틸 문장 제외, 평균 최악으로 판정, 순위는 총 시간
+  // SLOW_SQL — 유틸 문장 제외, 순위·경보 = 1회 최고 시간(max_exec_time) 만(총 시간·평균 순 금지, 마스터 2026-11-02)
+  // 호출 수 하한 없음 — DBeaver 1회성 수십 초 쿼리도 바로 악성
   let slowTop: BoardSlow['slowTop'] = []
   if (i.topSql === 'PGSS_MISSING')
     out.push(sig('SLOW_SQL', 'UNKNOWN', at, { reason: 'PGSS' }))
@@ -1048,36 +1047,34 @@ export function evalSlow(i: {
     out.push(sig('SLOW_SQL', 'UNKNOWN', at, { reason: `LINK_${i.topSql}` }))
   else {
     const rows = i.topSql
-      .filter((r) => r.calls >= THR.slowMinCalls && !UTIL_SQL.test(r.query))
-      .sort((a, b) => b.totalMs - a.totalMs)
-    const sum = rows.reduce((s, r) => s + r.totalMs, 0)
+      .filter((r) => !UTIL_SQL.test(r.query))
+      .sort((a, b) => b.maxMs - a.maxMs)
     slowTop = rows.slice(0, 10).map((r) => ({
       key: r.queryid,
       label: cut(r.query),
       calls: r.calls,
-      totalMs: r.totalMs,
+      maxMs: r.maxMs,
       meanMs: r.meanMs,
-      share: sum > 0 ? r.totalMs / sum : 0,
     }))
     if (!rows.length) out.push(sig('SLOW_SQL', 'NA', at, { reason: 'NONE' }))
     else {
-      const w = rows.reduce((a, b) => (b.meanMs > a.meanMs ? b : a))
+      const w = rows[0]
       out.push(
-        sig('SLOW_SQL', up(w.meanMs, THR.slowMs), at, {
-          value: r2(w.meanMs),
+        sig('SLOW_SQL', up(w.maxMs, THR.slowMs), at, {
+          value: r2(w.maxMs),
           unit: 'ms',
           thr: { warn: THR.slowMs[0], risk: THR.slowMs[1] },
           params: {
-            ms: Math.round(w.meanMs),
+            ms: Math.round(w.maxMs),
             ...(i.statsReset ? { since: i.statsReset } : {}),
             basis: 'stored',
           },
           top: slowTop.slice(0, 5).map((r) => ({
             key: r.key,
             label: r.label,
-            value: r.totalMs,
-            sub: `${r.calls}·${r2(r.meanMs)}ms·${Math.round(r.share * 100)}%`,
-            lvl: up(r.meanMs, THR.slowMs),
+            value: r.maxMs,
+            sub: `calls ${r.calls} · max ${r2(r.maxMs)}ms`, // 언어 중립(pg_stat_statements 칼럼명)
+            lvl: up(r.maxMs, THR.slowMs),
           })),
         }),
       )

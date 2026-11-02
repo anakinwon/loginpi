@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sesijas gaida bloķēšanu — atrodiet bloķējošo sesiju un pārtrauciet tās transakciju.",
         "CACHE_HIT": "Kešatmiņas trāpījumu biežums {pct}% — meklējiet lielu tabulu pilnas skenēšanas vai pārskatiet shared_buffers.",
         "XACT_ERR": "Atcelšanas biežums {pct}%, {dlck} strupceļi — pārbaudiet neizdevušās transakcijas un lietotnes kļūdu žurnālus.",
-        "SLOW_SQL": "Vaicājuma vidējais laiks ir {ms} ms — noregulējiet populārākos vaicājumus pēc kopējā laika, izmantojot to plānus.",
+        "SLOW_SQL": "Ir vaicājums, kas aizņem līdz {ms} ms vienā izpildē — skatiet izpildes plānu un veiciet regulēšanu, sākot ar augstāko viena izpildes laiku.",
         "STORAGE": "DB ({gb} GB) ir tuvu savam limitam (atlikušās dienas {days}) — iztīriet lielas tabulas vai palieliniet kapacitāti.",
         "VACUUM": "{tbl} ir daudz mirušu rindu vai novecojusi statistika — pārskatiet VACUUM (ANALYZE) un autovacuum iestatījumus.",
         "INDEX": "{n} indeksa atklājumi (nederīgi, neizmantoti, pilnas skenēšanas) — skatiet tabulas un indeksa veselības cilnē mērķus.",
@@ -677,9 +677,9 @@
           "3": "Pārbaudiet, vai atkārtotas mēģināšanas loģika nepalielina atcelšanas."
         },
         "SLOW_SQL": {
-          "1": "Izvēlieties populārākos vaicājumus pēc kopējā laika cilnē Lēni vaicājumi.",
+          "1": "Lēno vaicājumu cilnē atlasiet vaicājumu ar augstāko viena izpildes laiku.",
           "2": "Pārskatiet plānus SQL regulēšanā un labojiet indeksus vai savienojumus.",
-          "3": "Pēc labošanas pārbaudiet, vai vidējais laiks samazinājās."
+          "3": "Pēc labošanas atiestatiet statistiku (pg_stat_statements_reset) un vēlreiz pārbaudiet, vai augstākais viena izpildes laiks ir samazinājies."
         },
         "STORAGE": {
           "1": "Skatiet izaugsmes tendenci un paredzamo pilnās dienas datumu cilnē Izmēra tendence.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Kešatmiņas trāpījumu biežuma tendence",
         "capacity": "DB izmērs un prognoze",
         "slowTop": "Lēns SQL TOP 10",
-        "slowLegend": "Stabiņa garums = kopējais laiks · krāsa = vidējais laiks (▲ brīdinājums no {warn}ms · ✕ risks no {risk}ms)",
+        "slowLegend": "Joslas garums/krāsa = Maksimālais viena izpildes laiks (▲ {warn} ms vai vairāk: brīdinājums · ✕ {risk} ms vai vairāk: risks)",
         "sizeTop": "Vietas TOP 10",
         "heat": "Risks pēc signāla laika gaitā",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Vai caurlaides spēja un kļūmju biežums kustas kopā?",
           "cacheTrend": "Kad kešatmiņas trāpījumu biežums samazinājās?",
           "capacity": "Kad DB piepildīsies?",
-          "slowTop": "Ko vispirms noregulēt? (pēc kopējā laika)",
+          "slowTop": "Ko regulēt vispirms? (Pēc maksimālā viena izpildes laika)",
           "sizeTop": "Kas aizņem vietu?",
           "heat": "Vai risks ir vienreizējs vai atkārtojas?",
           "radar": "Kura joma ir vāja?",
@@ -778,9 +778,7 @@
           "value": "Vērtība",
           "time": "Laiks",
           "calls": "Izsaukumi",
-          "total": "Kopā (ms)",
           "mean": "Vidēji (ms)",
-          "share": "Daļa",
           "score": "Rādītājs",
           "level": "Līmenis",
           "ago": "Pirms 1 stundas",
@@ -789,7 +787,8 @@
           "sessions": "Sesijas",
           "schema": "Shēma",
           "size": "Lielums",
-          "thr": "Slieksnis (brīdinājums·risks)"
+          "thr": "Slieksnis (brīdinājums·risks)",
+          "max": "Maks. viena (ms)"
         },
         "radar": "Veselības rādītājs pa jomām",
         "radarCur": "Tagad",
@@ -1023,7 +1022,9 @@
       "src": "Avots",
       "srcToggle": "Rādīt vai paslēpt avota detaļas",
       "openSqlLab": "Atvērt SQL Tuning",
-      "acct": "Konts"
+      "acct": "Konts",
+      "sortMax": "Maksimālais viena izpildes laiks",
+      "maxMs": "Maks. viena ms"
     },
     "health": {
       "empty": "Vēl nav momentuzņēmumu. Cilnē Vākt nospiediet Vākt tūlīt",
@@ -1075,7 +1076,7 @@
       "fix": {
         "TOOL": "Izskatās, ka persona tieši vaicā ražošanas DB ar DB rīku (DBeaver utt.). Norādiet viņiem izmantot tikai lasāmu repliku vai analīzes DB, un ierobežojiet cilvēku kontu izpildes laiku, piemēram, ALTER ROLE human_user SET statement_timeout = '30s'. Izmantojiet atsevišķu tikai lasāmu lomu un veiciet lielapjoma ekstrakcijas ārpus pīķa stundām",
         "BATCH": "Izskatās pēc partijas vai plānota darba. Izplatiet izpildes laikus ārpus biznesa pīķiem un samaziniet darbu uz vienu apņemšanos. Pārbaudiet indeksus un statistiku (ANALYZE) mērķa tabulās un sadaliet garas transakcijas. Darba nosaukuma ievietošana application_name padara nākamo klasifikāciju precīzāku",
-        "PROGRAM": "Izskatās pēc vaicājuma, ko izpilda lietojumprogramma. Pārbaudiet plānu SQL Tuning. Daudzi izsaukumi ar īsu vidējo rāda uz atkārtotiem izsaukumiem (N+1) vai kešatmiņu; garš vidējais rāda uz indeksiem vai savienojuma secību vispirms. Iestatiet pakalpojuma nosaukumu savā savienojumu kopas application_name",
+        "PROGRAM": "Šķiet, ka šo vaicājumu izpildīja lietojumprogramma. Pārbaudiet izpildes plānu SQL regulēšanā. Ja maksimālais viena izpildes laiks ir ilgs, vispirms apskatiet indeksus un savienojuma secību. Ja viena izpilde ir īsa, bet izsaukumu skaits ir liels, apskatiet atkārtotus izsaukumus (N+1) un kešatmiņu. Ievietojiet pakalpojuma nosaukumu savienojumu kopas application_name.",
         "PLATFORM": "Izskatās pēc DB vai platformas iekšējā darba, piemēram, autovacuum vai replikācijas. Parasti nav nepieciešama nekāda darbība. Ja tas paliek augšpusē, pārskatiet autovacuum sliekšņus un maintenance_work_mem",
         "MONITOR": "Izskatās pēc šī pakalpojuma pašu statistikas vaicājumiem (schema.pi saite). Nav nepieciešama nekāda darbība. Ja tas parādās pārāk bieži, samaziniet aptaujas frekvenci",
         "UNKNOWN": "Nav norādes uz avotu. Iestatiet application_name katrā savienojumā un sadaliet kontus pēc mērķa; tas tiks klasificēts no nākamajiem paraugiem"

@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sesi menunggu kunci — temukan sesi yang memblokir dan akhiri transaksinya.",
         "CACHE_HIT": "Rasio hit cache {pct}% — cari pemindaian penuh tabel besar atau tinjau shared_buffers.",
         "XACT_ERR": "Tingkat rollback {pct}%, {dlck} deadlock — periksa transaksi yang gagal dan log kesalahan aplikasi.",
-        "SLOW_SQL": "Kueri rata-rata {ms} ms — sesuaikan kueri teratas berdasarkan total waktu menggunakan rencananya.",
+        "SLOW_SQL": "Ada kueri yang membutuhkan waktu hingga {ms}ms per eksekusi — lihat rencana eksekusi dan lakukan tuning, dimulai dari kueri dengan waktu eksekusi tunggal terlama.",
         "STORAGE": "DB {gb} GB mendekati batasnya (sisa hari {days}) — bersihkan tabel besar atau tambahkan kapasitas.",
         "VACUUM": "{tbl} memiliki banyak baris mati atau statistik usang — tinjau pengaturan VACUUM (ANALYZE) dan autovacuum.",
         "INDEX": "{n} temuan indeks (tidak valid, tidak digunakan, pemindaian penuh) — lihat tab kesehatan tabel & indeks untuk targetnya.",
@@ -677,9 +677,9 @@
           "3": "Periksa apakah logika coba lagi tidak meningkatkan rollback."
         },
         "SLOW_SQL": {
-          "1": "Pilih kueri teratas berdasarkan total waktu di tab kueri lambat.",
+          "1": "Pilih kueri dengan waktu eksekusi tunggal terlama dari tab Kueri Lambat.",
           "2": "Tinjau rencana di penyetelan SQL dan perbaiki indeks atau join.",
-          "3": "Setelah diperbaiki, periksa apakah waktu rata-rata menurun."
+          "3": "Setelah perbaikan, reset statistik (pg_stat_statements_reset) dan periksa lagi apakah waktu eksekusi tunggal telah berkurang."
         },
         "STORAGE": {
           "1": "Lihat tren pertumbuhan dan perkiraan tanggal penuh di tab tren ukuran.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Tren rasio hit cache",
         "capacity": "Ukuran & perkiraan DB",
         "slowTop": "10 SQL lambat teratas",
-        "slowLegend": "Panjang batang = total waktu · warna = waktu rata-rata (▲ peringatan dari {warn}ms · ✕ risiko dari {risk}ms)",
+        "slowLegend": "Panjang/warna batang = waktu eksekusi tunggal terlama (▲ perhatian jika lebih dari {warn}ms · ✕ risiko jika lebih dari {risk}ms)",
         "sizeTop": "10 ruang teratas",
         "heat": "Risiko berdasarkan sinyal seiring waktu",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Apakah throughput dan tingkat kegagalan bergerak bersama?",
           "cacheTrend": "Kapan rasio hit cache turun?",
           "capacity": "Kapan DB akan penuh?",
-          "slowTop": "Apa yang harus disetel terlebih dahulu? (berdasarkan total waktu)",
+          "slowTop": "Apa yang harus di-tuning terlebih dahulu? (berdasarkan waktu eksekusi tunggal terlama)",
           "sizeTop": "Apa yang menghabiskan ruang?",
           "heat": "Apakah risiko ini sekali saja atau berulang?",
           "radar": "Area mana yang lemah?",
@@ -778,9 +778,7 @@
           "value": "Nilai",
           "time": "Waktu",
           "calls": "Panggilan",
-          "total": "Total (ms)",
           "mean": "Rata-rata (ms)",
-          "share": "Bagian",
           "score": "Skor",
           "level": "Level",
           "ago": "1 jam lalu",
@@ -789,7 +787,8 @@
           "sessions": "Sesi",
           "schema": "Skema",
           "size": "Ukuran",
-          "thr": "Ambang Batas (peringatan·risiko)"
+          "thr": "Ambang Batas (peringatan·risiko)",
+          "max": "Maks. 1x (ms)"
         },
         "radar": "Skor kesehatan berdasarkan area",
         "radarCur": "Sekarang",
@@ -1025,7 +1024,9 @@
       "src": "Sumber",
       "srcToggle": "Tampilkan atau sembunyikan detail sumber",
       "openSqlLab": "Buka di SQL Tuning",
-      "acct": "Akun"
+      "acct": "Akun",
+      "sortMax": "Waktu Eksekusi Tunggal Terlama",
+      "maxMs": "Maks. 1x ms"
     },
     "health": {
       "empty": "Belum ada snapshot. Tekan Kumpulkan sekarang di tab Kumpulkan",
@@ -1077,7 +1078,7 @@
       "fix": {
         "TOOL": "Tampaknya seseorang mengkueri DB produksi secara langsung dengan alat DB (DBeaver, dll.). Arahkan mereka ke replika read-only atau DB analitik sebagai gantinya, dan batasi waktu eksekusi pada akun manusia, mis. ALTER ROLE human_user SET statement_timeout = '30s'. Gunakan peran read-only terpisah, dan lakukan ekstraksi massal di luar jam sibuk",
         "BATCH": "Tampaknya ini adalah batch atau pekerjaan terjadwal. Sebarkan waktu eksekusi menjauh dari puncak bisnis dan kurangi pekerjaan per commit. Periksa indeks dan statistik (ANALYZE) pada tabel target, dan bagi transaksi yang panjang. Menempatkan nama pekerjaan di application_name akan membuat klasifikasi berikutnya lebih tepat",
-        "PROGRAM": "Tampaknya ini adalah kueri yang dijalankan oleh aplikasi. Periksa rencana di SQL Tuning. Banyak panggilan dengan rata-rata singkat menunjukkan panggilan berulang (N+1) atau caching; rata-rata panjang menunjukkan indeks atau urutan join terlebih dahulu. Atur nama layanan di application_name pool koneksi Anda",
+        "PROGRAM": "Ini tampaknya adalah kueri yang dijalankan oleh aplikasi. Periksa rencana eksekusi dalam tuning SQL. Jika waktu eksekusi tunggal terlama panjang, periksa indeks dan urutan join terlebih dahulu; jika waktu eksekusi tunggal pendek tetapi jumlah panggilan tinggi, periksa panggilan berulang (N+1) dan cache. Masukkan nama layanan di application_name dari connection pool.",
         "PLATFORM": "Tampaknya ini adalah pekerjaan internal DB atau platform seperti autovacuum atau replikasi. Biasanya tidak diperlukan tindakan. Jika tetap di atas, tinjau ambang batas autovacuum dan maintenance_work_mem",
         "MONITOR": "Tampaknya ini adalah kueri statistik layanan ini sendiri (tautan schema.pi). Tidak diperlukan tindakan. Jika terlalu sering muncul, kurangi frekuensi polling",
         "UNKNOWN": "Tidak ada petunjuk tentang sumbernya. Atur application_name pada setiap koneksi dan pisahkan akun berdasarkan tujuan; itu akan diklasifikasikan dari sampel berikutnya"

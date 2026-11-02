@@ -613,7 +613,7 @@
         "LOCK_WAIT": "{n} sessioner venter på låse — find den blokerende session og afslut dens transaktion.",
         "CACHE_HIT": "Cache-hitrate {pct}% — se efter fulde scanninger af store tabeller eller gennemgå shared_buffers.",
         "XACT_ERR": "Rollback-rate {pct}%, {dlck} deadlocks — kontroller de fejlede transaktioner og app-fejllogger.",
-        "SLOW_SQL": "En forespørgsel er i gennemsnit {ms} ms — juster de øverste forespørgsler efter samlet tid ved hjælp af deres planer.",
+        "SLOW_SQL": "Der er en forespørgsel, der tager op til {ms}ms pr. udførelse — se udførelsesplanen og juster den, startende fra den højeste enkelte udførelsestid.",
         "STORAGE": "DB ({gb} GB) er tæt på sin grænse (dage tilbage {days}) — ryd op i store tabeller eller tilføj kapacitet.",
         "VACUUM": "{tbl} har mange døde rækker eller forældet statistik — gennemgå VACUUM (ANALYZE) og autovacuum-indstillinger.",
         "INDEX": "{n} indeksfund (ugyldige, ubrugte, fulde scanninger) — se fanen for tabel- og indekstilstand for målene.",
@@ -676,9 +676,9 @@
           "3": "Kontroller, at genforsøgslogikken ikke oppuster rollbacks."
         },
         "SLOW_SQL": {
-          "1": "Vælg de øverste forespørgsler efter samlet tid i fanen langsomme forespørgsler.",
+          "1": "Fra fanen for langsomme forespørgsler skal du vælge den forespørgsel med den højeste enkelte udførelsestid.",
           "2": "Gennemgå planer i SQL-tuning og ret indekser eller joins.",
-          "3": "Efter rettelse, kontroller at gennemsnitstiden faldt."
+          "3": "Efter rettelse skal du nulstille statistikken (pg_stat_statements_reset) og igen kontrollere, om den højeste enkelte udførelsestid er faldet."
         },
         "STORAGE": {
           "1": "Se væksttendensen og den estimerede fulde dato i fanen størrelsestrend.",
@@ -730,7 +730,7 @@
         "cacheTrend": "Cache-hitrate-trend",
         "capacity": "DB-størrelse & prognose",
         "slowTop": "Langsom SQL top 10",
-        "slowLegend": "Søjlelængde = samlet tid · farve = gennemsnitstid (▲ advarsel fra {warn}ms · ✕ risiko fra {risk}ms)",
+        "slowLegend": "Søjlelængde/farve = Maks. enkelt udførelsestid (▲ {warn}ms eller mere: advarsel · ✕ {risk}ms eller mere: risiko)",
         "sizeTop": "Plads top 10",
         "heat": "Risiko efter signal over tid",
         "q": {
@@ -740,7 +740,7 @@
           "tpsCombo": "Bevæger gennemløb og fejlrate sig sammen?",
           "cacheTrend": "Hvornår faldt cache-hitraten?",
           "capacity": "Hvornår fyldes DB'en op?",
-          "slowTop": "Hvad skal justeres først? (efter samlet tid)",
+          "slowTop": "Hvad skal justeres først? (Efter maks. enkelt udførelsestid)",
           "sizeTop": "Hvad optager pladsen?",
           "heat": "Er risikoen en engangsforeteelse eller tilbagevendende?",
           "radar": "Hvilket område er svagt?",
@@ -777,9 +777,7 @@
           "value": "Værdi",
           "time": "Tid",
           "calls": "Kald",
-          "total": "Total (ms)",
           "mean": "Gennemsnit (ms)",
-          "share": "Andel",
           "score": "Score",
           "level": "Niveau",
           "ago": "1 time siden",
@@ -788,7 +786,8 @@
           "sessions": "Sessioner",
           "schema": "Skema",
           "size": "Størrelse",
-          "thr": "Tærskel (advarsel·risiko)"
+          "thr": "Tærskel (advarsel·risiko)",
+          "max": "Maks. enkelt (ms)"
         },
         "radar": "Sundhedsscore efter område",
         "radarCur": "Nu",
@@ -1020,7 +1019,9 @@
       "src": "Kilde",
       "srcToggle": "Vis eller skjul kildedetaljer",
       "openSqlLab": "Åbn i SQL Tuning",
-      "acct": "Konto"
+      "acct": "Konto",
+      "sortMax": "Maks. enkelt udførelsestid",
+      "maxMs": "Maks. enkelt ms"
     },
     "health": {
       "empty": "Ingen snapshots endnu. Tryk på 'Saml nu' under fanen 'Saml'",
@@ -1072,7 +1073,7 @@
       "fix": {
         "TOOL": "Ser ud til, at en person forespørger produktions-DB direkte med et DB-værktøj (DBeaver osv.). Henvis dem i stedet til en skrivebeskyttet replika eller analyse-DB, og sæt en tidsgrænse for menneskelige konti, f.eks. ALTER ROLE human_user SET statement_timeout = '30s'. Brug en separat skrivebeskyttet rolle, og kør masseudtræk i lavtrafikperioder.",
         "BATCH": "Ser ud til at være en batch- eller planlagt job. Spred køretider væk fra forretningsspidser og reducer arbejdet pr. commit. Kontroller indekser og statistikker (ANALYZE) på måltabellerne, og opdel lange transaktioner. At sætte jobnavnet i application_name gør den næste klassificering mere præcis.",
-        "PROGRAM": "Ser ud til at være en forespørgsel kørt af en applikation. Kontroller planen i SQL Tuning. Mange kald med en kort gennemsnitlig tid peger på gentagne kald (N+1) eller caching; en lang gennemsnitlig tid peger først på indekser eller join-rækkefølge. Indstil servicenavnet i din forbindelsespols application_name.",
+        "PROGRAM": "Dette ser ud til at være en forespørgsel udført af applikationen. Kontroller udførelsesplanen i SQL-justering. Hvis den maksimale enkelte udførelsestid er lang, skal du først se på indekser og join-rækkefølge. Hvis en enkelt udførelse er kort, men antallet af kald er højt, skal du se på gentagne kald (N+1) og caching. Indsæt servicenavnet i connection poolens application_name.",
         "PLATFORM": "Ser ud til at være DB- eller platforminternt arbejde som autovacuum eller replikering. Normalt er der ikke behov for handling. Hvis det forbliver øverst, gennemgå autovacuum-tærskler og maintenance_work_mem.",
         "MONITOR": "Ser ud til at være denne services egne statistikforespørgsler (schema.pi-link). Ingen handling nødvendig. Hvis det vises for ofte, sænk pollingfrekvensen.",
         "UNKNOWN": "Der er ingen spor til kilden. Indstil application_name på hver forbindelse og opdel konti efter formål; det vil blive klassificeret fra de næste prøver."

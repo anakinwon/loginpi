@@ -612,7 +612,7 @@
         "LOCK_WAIT": "{n} {n, plural, one {sesija čeka} few {sesije čekaju} other {sesija čeka}} na zaključavanja — pronađite blokirajuću sesiju i završite njezinu transakciju.",
         "CACHE_HIT": "Stopa pogodaka predmemorije {pct}% — potražite potpuna skeniranja velikih tablica ili pregledajte shared_buffers.",
         "XACT_ERR": "Stopa povrata {pct}%, {dlck} zastoja — provjerite neuspjele transakcije i zapisnike pogrešaka aplikacije.",
-        "SLOW_SQL": "Upit u prosjeku traje {ms} ms — podesite najvažnije upite po ukupnom vremenu koristeći njihove planove.",
+        "SLOW_SQL": "Postoji upit koji traje do {ms}ms po izvršenju — pogledajte plan izvršenja i podesite ga, počevši od najvišeg vremena pojedinačnog izvršenja.",
         "STORAGE": "DB ({gb} GB) je blizu svog ograničenja (preostalo dana {days}) — očistite velike tablice ili dodajte kapacitet.",
         "VACUUM": "{tbl} ima mnogo mrtvih redaka ili zastarjelih statistika — pregledajte postavke VACUUM (ANALYZE) i autovacuum.",
         "INDEX": "{n} {n, plural, one {nalaz indeksa} few {nalaza indeksa} other {nalaza indeksa}} (nevažeći, neiskorišteni, potpuna skeniranja) — pogledajte karticu zdravlja tablice i indeksa za ciljeve.",
@@ -675,9 +675,9 @@
           "3": "Provjerite da logika ponovnog pokušaja ne povećava poništavanja."
         },
         "SLOW_SQL": {
-          "1": "Odaberite najvažnije upite po ukupnom vremenu na kartici sporih upita.",
+          "1": "Na kartici sporih upita odaberite upit s najvišim vremenom pojedinačnog izvršenja.",
           "2": "Pregledajte planove u SQL tuningu i popravite indekse ili spojeve.",
-          "3": "Nakon popravka, provjerite je li prosječno vrijeme smanjeno."
+          "3": "Nakon popravka, resetirajte statistiku (pg_stat_statements_reset) i ponovno provjerite je li se najviše vrijeme pojedinačnog izvršenja smanjilo."
         },
         "STORAGE": {
           "1": "Pogledajte trend rasta i procijenjeni datum popunjenosti na kartici trenda veličine.",
@@ -729,7 +729,7 @@
         "cacheTrend": "Trend stope pogodaka predmemorije",
         "capacity": "Veličina DB-a i prognoza",
         "slowTop": "Spori SQL top 10",
-        "slowLegend": "Duljina trake = ukupno vrijeme · boja = prosječno vrijeme (▲ upozorenje od {warn}ms · ✕ rizik od {risk}ms)",
+        "slowLegend": "Duljina/boja trake = Maksimalno vrijeme pojedinačnog izvršenja (▲ {warn}ms ili više: upozorenje · ✕ {risk}ms ili više: rizik)",
         "sizeTop": "Prostor top 10",
         "heat": "Rizik po signalu tijekom vremena",
         "q": {
@@ -739,7 +739,7 @@
           "tpsCombo": "Kreću li se propusnost i stopa neuspjeha zajedno?",
           "cacheTrend": "Kada je stopa pogodaka predmemorije pala?",
           "capacity": "Kada će se DB popuniti?",
-          "slowTop": "Što prvo podesiti? (po ukupnom vremenu)",
+          "slowTop": "Što prvo podesiti? (Po maksimalnom vremenu pojedinačnog izvršenja)",
           "sizeTop": "Što zauzima prostor?",
           "heat": "Je li rizik jednokratan ili se ponavlja?",
           "radar": "Koje je područje slabo?",
@@ -776,9 +776,7 @@
           "value": "Vrijednost",
           "time": "Vrijeme",
           "calls": "Pozivi",
-          "total": "Ukupno (ms)",
           "mean": "Prosjek (ms)",
-          "share": "Udio",
           "score": "Ocjena",
           "level": "Razina",
           "ago": "Prije 1 sat",
@@ -787,7 +785,8 @@
           "sessions": "Sesije",
           "schema": "Shema",
           "size": "Veličina",
-          "thr": "Prag (upozorenje·rizik)"
+          "thr": "Prag (upozorenje·rizik)",
+          "max": "Maks. pojedinačno (ms)"
         },
         "radar": "Ocjena zdravlja po područjima",
         "radarCur": "Sada",
@@ -1018,7 +1017,9 @@
       "src": "Izvor",
       "srcToggle": "Prikaži ili sakrij detalje izvora",
       "openSqlLab": "Otvori u SQL Tuning-u",
-      "acct": "Račun"
+      "acct": "Račun",
+      "sortMax": "Maksimalno vrijeme pojedinačnog izvršenja",
+      "maxMs": "Maks. pojedinačno ms"
     },
     "health": {
       "empty": "Još nema snimaka. Pritisnite Prikupljanje sada na kartici Prikupljanje",
@@ -1069,7 +1070,7 @@
       "fix": {
         "TOOL": "Izgleda da osoba izravno upita produkcijsku DB pomoću DB alata (DBeaver itd.). Usmjerite ih na repliku samo za čitanje ili analitičku DB umjesto toga, i ograničite vrijeme izvođenja na ljudskim računima, npr. ALTER ROLE human_user SET statement_timeout = '30s'. Koristite zasebnu ulogu samo za čitanje i pokrenite masovne ekstrakcije izvan vršnih sati.",
         "BATCH": "Izgleda kao batch ili zakazani posao. Rasporedite vrijeme izvođenja izvan poslovnih vrhunaca i smanjite rad po commitu. Provjerite indekse i statistike (ANALYZE) na ciljnim tablicama i podijelite duge transakcije. Stavljanje naziva posla u application_name čini sljedeću klasifikaciju preciznijom.",
-        "PROGRAM": "Izgleda kao upit koji je pokrenula aplikacija. Provjerite plan u SQL Tuning-u. Mnogi pozivi s kratkim prosjekom ukazuju na ponovljene pozive (N+1) ili keširanje; dugi prosjek ukazuje na indekse ili redoslijed spajanja. Postavite naziv usluge u application_name vašeg connection pool-a.",
+        "PROGRAM": "Čini se da je ovo upit koji je izvršila aplikacija. Provjerite plan izvršenja u SQL podešavanju. Ako je maksimalno vrijeme pojedinačnog izvršenja dugo, prvo pogledajte indekse i redoslijed spajanja. Ako je pojedinačno izvršenje kratko, ali je broj poziva visok, pogledajte ponovljene pozive (N+1) i predmemoriranje. Stavite naziv usluge u application_name skupa veza.",
         "PLATFORM": "Izgleda kao interni rad DB-a ili platforme, kao što su autovacuum ili replikacija. Obično nije potrebna nikakva akcija. Ako ostane na vrhu, pregledajte pragove autovacuum-a i maintenance_work_mem.",
         "MONITOR": "Izgleda kao vlastiti statistički upiti ove usluge (schema.pi veza). Nije potrebna nikakva akcija. Ako se prečesto pojavljuje, smanjite frekvenciju anketiranja.",
         "UNKNOWN": "Nema traga izvoru. Postavite application_name na svakoj vezi i podijelite račune po namjeni; bit će klasificirano iz sljedećih uzoraka."

@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} relácií čaká na zámky — nájdite blokujúcu reláciu a ukončite jej transakciu.",
         "CACHE_HIT": "Miera zásahov do vyrovnávacej pamäte {pct}% — hľadajte úplné skenovanie veľkých tabuliek alebo skontrolujte shared_buffers.",
         "XACT_ERR": "Miera vrátenia {pct}%, {dlck} zablokovaní — skontrolujte zlyhávajúce transakcie a protokoly chýb aplikácie.",
-        "SLOW_SQL": "Dotaz má priemer {ms} ms — optimalizujte najčastejšie dotazy podľa celkového času pomocou ich plánov.",
+        "SLOW_SQL": "Existuje dotaz, ktorého vykonanie trvá až {ms}ms – pozrite si plán vykonania a dolaďte ho, začínajúc od najvyššieho času jedného vykonania.",
         "STORAGE": "DB ({gb} GB) sa blíži k limitu (zostáva {days} dní) — vyčistite veľké tabuľky alebo pridajte kapacitu.",
         "VACUUM": "{tbl} má veľa mŕtvych riadkov alebo zastaraných štatistík — skontrolujte nastavenia VACUUM (ANALYZE) a autovacuum.",
         "INDEX": "{n} nálezov indexov (neplatné, nepoužívané, úplné skenovanie) — ciele nájdete na karte stavu tabuľky a indexu.",
@@ -677,9 +677,9 @@
           "3": "Skontrolujte, či logika opakovania nenafukuje vrátenia."
         },
         "SLOW_SQL": {
-          "1": "Vyberte najčastejšie dotazy podľa celkového času na karte pomalých dotazov.",
+          "1": "Na karte pomalých dotazov vyberte dotaz s najvyšším časom jedného vykonania.",
           "2": "Skontrolujte plány v ladení SQL a opravte indexy alebo spojenia.",
-          "3": "Po oprave skontrolujte, či sa priemerný čas znížil."
+          "3": "Po oprave resetujte štatistiky (pg_stat_statements_reset) a znova skontrolujte, či sa najvyšší čas jedného vykonania znížil."
         },
         "STORAGE": {
           "1": "Pozrite si trend rastu a odhadovaný dátum naplnenia na karte trendu veľkosti.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Trend miery zásahov do vyrovnávacej pamäte",
         "capacity": "Veľkosť DB a prognóza",
         "slowTop": "Pomalé SQL top 10",
-        "slowLegend": "Dĺžka stĺpca = celkový čas · farba = priemerný čas (▲ varovanie od {warn}ms · ✕ riziko od {risk}ms)",
+        "slowLegend": "Dĺžka/farba stĺpca = Max. čas jedného vykonania (▲ {warn}ms alebo viac: upozornenie · ✕ {risk}ms alebo viac: riziko)",
         "sizeTop": "Priestor top 10",
         "heat": "Riziko podľa signálu v čase",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Pohybujú sa priepustnosť a miera zlyhania spolu?",
           "cacheTrend": "Kedy klesla miera zásahov do vyrovnávacej pamäte?",
           "capacity": "Kedy sa DB zaplní?",
-          "slowTop": "Čo najprv optimalizovať? (podľa celkového času)",
+          "slowTop": "Čo ladiť ako prvé? (Podľa max. času jedného vykonania)",
           "sizeTop": "Čo zaberá miesto?",
           "heat": "Je riziko jednorazové alebo opakujúce sa?",
           "radar": "Ktorá oblasť je slabá?",
@@ -778,9 +778,7 @@
           "value": "Hodnota",
           "time": "Čas",
           "calls": "Volania",
-          "total": "Celkom (ms)",
           "mean": "Priemer (ms)",
-          "share": "Podiel",
           "score": "Skóre",
           "level": "Úroveň",
           "ago": "Pred 1 hodinou",
@@ -789,7 +787,8 @@
           "sessions": "Relácie",
           "schema": "Schéma",
           "size": "Veľkosť",
-          "thr": "Prah (varovanie·riziko)"
+          "thr": "Prah (varovanie·riziko)",
+          "max": "Max. jedno (ms)"
         },
         "radar": "Skóre zdravia podľa oblasti",
         "radarCur": "Teraz",
@@ -1023,7 +1022,9 @@
       "src": "Zdroj",
       "srcToggle": "Zobraziť alebo skryť podrobnosti zdroja",
       "openSqlLab": "Otvoriť v SQL Tuning",
-      "acct": "Účet"
+      "acct": "Účet",
+      "sortMax": "Max. čas jedného vykonania",
+      "maxMs": "Max. jedno ms"
     },
     "health": {
       "empty": "Zatiaľ žiadne snímky. Stlačte „Zbierať teraz“ na karte „Zbierať“",
@@ -1075,7 +1076,7 @@
       "fix": {
         "TOOL": "Vyzerá to, že osoba priamo dotazuje produkčnú DB pomocou DB nástroja (DBeaver atď.). Namiesto toho ich nasmerujte na repliku len na čítanie alebo analytickú DB a obmedzte čas spustenia na ľudských účtoch, napr. ALTER ROLE human_user SET statement_timeout = '30s'. Použite samostatnú rolu len na čítanie a hromadné extrakcie spúšťajte mimo špičky.",
         "BATCH": "Vyzerá to ako dávka alebo plánovaná úloha. Rozložte časy spustenia mimo obchodných špičiek a zmenšite prácu na jeden commit. Skontrolujte indexy a štatistiky (ANALYZE) na cieľových tabuľkách a rozdeľte dlhé transakcie. Uvedenie názvu úlohy do application_name spresní ďalšiu klasifikáciu.",
-        "PROGRAM": "Vyzerá to ako dotaz spustený aplikáciou. Skontrolujte plán v SQL Tuning. Mnoho volaní s krátkym priemerom poukazuje na opakované volania (N+1) alebo cachovanie; dlhý priemer poukazuje najprv na indexy alebo poradie spojenia. Nastavte názov služby v application_name vášho pripojenia.",
+        "PROGRAM": "Zdá sa, že ide o dotaz vykonaný aplikáciou. Skontrolujte plán vykonania v ladení SQL. Ak je max. čas jedného vykonania dlhý, najprv sa pozrite na indexy a poradie spojenia. Ak je jedno vykonanie krátke, ale počet volaní je vysoký, pozrite sa na opakované volania (N+1) a ukladanie do vyrovnávacej pamäte. Názov služby uveďte do application_name fondu pripojení.",
         "PLATFORM": "Vyzerá to ako interná práca DB alebo platformy, ako je autovacuum alebo replikácia. Zvyčajne nie je potrebná žiadna akcia. Ak zostáva na vrchole, skontrolujte prahové hodnoty autovacuum a maintenance_work_mem.",
         "MONITOR": "Vyzerá to ako vlastné štatistické dotazy tejto služby (odkaz schema.pi). Nie je potrebná žiadna akcia. Ak sa zobrazuje príliš často, znížte frekvenciu dotazovania.",
         "UNKNOWN": "Nie je žiadna stopa k zdroju. Nastavte application_name na každom pripojení a rozdeľte účty podľa účelu; bude klasifikované z ďalších vzoriek."

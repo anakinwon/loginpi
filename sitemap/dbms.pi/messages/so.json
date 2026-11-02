@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} fadhi ayaa sugaya qufullo — hel fadhiga xannibaya oo soo afjar wax kala iibsigiisa.",
         "CACHE_HIT": "Heerka garaaca kaydka {pct}% — raadi baadhitaanno buuxa oo miisaska waaweyn ah ama dib u eeg shared_buffers.",
         "XACT_ERR": "Heerka dib u celinta {pct}%, {dlck} isku-xidhka — hubi wax kala iibsiga fashilmay iyo diiwaannada qaladka abka.",
-        "SLOW_SQL": "Weydiin celcelis ahaan {ms} ms — hagaaji weydiimaha ugu sarreeya wakhtiga guud adoo isticmaalaya qorshayaashooda.",
+        "SLOW_SQL": "Waxaa jira su'aal qaadata ilaa {ms}ms hal mar – eeg qorshaha fulinta oo hagaaji, adigoo ka bilaabaya wakhtiga ugu sarreeya ee hal fulin.",
         "STORAGE": "DB ({gb} GB) wuxuu ku dhow yahay xaddidkiisa (maalmaha ka hadhay {days}) — nadiifi miisaska waaweyn ama ku dar awood.",
         "VACUUM": "{tbl} wuxuu leeyahay safaf badan oo dhintay ama tirakoob duugoobay — dib u eeg goobaha VACUUM (ANALYZE) iyo autovacuum.",
         "INDEX": "{n} natiijooyinka tusmada (ansax la'aan, aan la isticmaalin, baadhitaanno buuxa) — eeg tabka caafimaadka miiska & tusmada ee bartilmaameedyada.",
@@ -677,9 +677,9 @@
           "3": "Hubi in macquulka dib u celinta uusan kor u qaadin dib u celinta."
         },
         "SLOW_SQL": {
-          "1": "Dooro weydiimaha ugu sarreeya wakhtiga guud ee tabka weydiinta gaabiska ah.",
+          "1": "Tabka su'aalaha gaabiska ah, ka dooro su'aasha leh wakhtiga ugu sarreeya ee hal fulin.",
           "2": "Dib u eeg qorshayaasha hagaajinta SQL oo hagaaji tusmooyinka ama isku-xidhka.",
-          "3": "Ka dib hagaajinta, hubi in wakhtiga celceliska uu hoos u dhacay."
+          "3": "Kadib hagaajinta, dib u deji tirakoobyada (pg_stat_statements_reset) oo mar kale hubi in wakhtiga ugu sarreeya ee hal fulin uu hoos u dhacay."
         },
         "STORAGE": {
           "1": "Eeg isbeddelka koritaanka iyo taariikhda buuxda ee la qiyaasay tabka isbeddelka cabbirka.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Isbeddelka heerka garaaca kaydka",
         "capacity": "Cabbirka DB & saadaasha",
         "slowTop": "SQL gaabis ah TOP 10",
-        "slowLegend": "Dhererka baar = wakhtiga guud · midab = wakhtiga celceliska (▲ digniin laga bilaabo {warn}ms · ✕ khatar laga bilaabo {risk}ms)",
+        "slowLegend": "Dhererka/midabka baararka = Wakhtiga ugu sarreeya ee hal mar (▲ {warn}ms ama ka badan: digniin · ✕ {risk}ms ama ka badan: khatar)",
         "sizeTop": "Booska TOP 10",
         "heat": "Khatarta calaamad kasta wakhti ka dib",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Ma wada socdaan wax soo saarka iyo heerka fashilka?",
           "cacheTrend": "Goorma ayuu hoos u dhacay heerka garaaca kaydka?",
           "capacity": "Goorma ayuu DB buuxsami doonaa?",
-          "slowTop": "Maxaa marka hore la hagaajinayaa? (wakhtiga guud)",
+          "slowTop": "Maxaa marka hore la hagaajinayaa? (Marka loo eego wakhtiga ugu sarreeya ee hal fulin)",
           "sizeTop": "Maxaa qaadanaya booska?",
           "heat": "Khatarta ma mid mar ah baa mise waa soo noqnoqotaa?",
           "radar": "Aaggee daciif ah?",
@@ -778,9 +778,7 @@
           "value": "Qiimaha",
           "time": "Wakhtiga",
           "calls": "Wicitaanada",
-          "total": "Wadarta (ms)",
           "mean": "Celceliska (ms)",
-          "share": "Saamiga",
           "score": "Dhibco",
           "level": "Heer",
           "ago": "1 saac ka hor",
@@ -789,7 +787,8 @@
           "sessions": "Fadhiyada",
           "schema": "Schema",
           "size": "Cabbir",
-          "thr": "Xadka (digniin·khatar)"
+          "thr": "Xadka (digniin·khatar)",
+          "max": "Ugu sarreeya hal mar (ms)"
         },
         "radar": "Dhibcaha caafimaadka ee aagga",
         "radarCur": "Hadda",
@@ -1023,7 +1022,9 @@
       "src": "Isha",
       "srcToggle": "Muuji ama qari faahfaahinta isha",
       "openSqlLab": "Fur SQL Tuning",
-      "acct": "Akoon"
+      "acct": "Akoon",
+      "sortMax": "Wakhtiga ugu sarreeya ee hal fulin",
+      "maxMs": "Ugu sarreeya hal ms"
     },
     "health": {
       "empty": "Wali ma jiraan sawirro. Riix Ururi hadda tabka Ururi",
@@ -1075,7 +1076,7 @@
       "fix": {
         "TOOL": "Waxay u egtahay qof si toos ah u weydiinaya DB-da wax-soo-saarka isagoo isticmaalaya qalab DB (DBeaver iwm.). U tilmaan nuqul akhris-kaliya ah ama DB falanqayn ah, oo xaddid wakhtiga socodka akoonnada aadanaha, tusaale ahaan ALTER ROLE human_user SET statement_timeout = '30s'. Isticmaal door akhris-kaliya ah oo gaar ah, oo samee soo saaridda tiro badan saacadaha aan mashquulka ahayn",
         "BATCH": "Waxay u egtahay dufcad ama shaqo la qorsheeyay. Faafi wakhtiyada socodka si ay uga fogaadaan meelaha ugu sarreeya ee ganacsiga oo yaree shaqada halkii ballanqaad. Hubi tusmooyinka iyo tirakoobyada (ANALYZE) ee shaxda bartilmaameedka, oo kala qaybi macaamilada dhaadheer. Ku darista magaca shaqada application_name waxay ka dhigaysaa kala-saaridda xigta mid sax ah",
-        "PROGRAM": "Waxay u egtahay weydiin uu sameeyay codsi. Hubi qorshaha SQL Tuning. Wicitaanno badan oo leh celcelis gaaban waxay tilmaamayaan wicitaanno soo noqnoqda (N+1) ama kaydinta; celcelis dheer waxay tilmaamaysaa tusmooyinka ama kala-sarraynta isku-darka marka hore. Deji magaca adeegga application_name ee barkadda xiriirkaaga",
+        "PROGRAM": "Tani waxay u muuqataa inay tahay su'aal ay fulisay codsiga. Hubi qorshaha fulinta ee hagaajinta SQL. Haddii wakhtiga ugu sarreeya ee hal fulin uu dheer yahay, marka hore eeg tusmooyinka iyo nidaamka isku xirka. Haddii hal fulin ay gaaban tahay laakiin tirada wicitaanada ay badan tahay, eeg wicitaanada soo noqnoqda (N+1) iyo kaydinta. Ku rid magaca adeegga application_name ee barkadda isku xirka.",
         "PLATFORM": "Waxay u egtahay shaqo gudaha ah oo DB ama madal ah sida autovacuum ama nuqul-samayn. Badanaa wax ficil ah looma baahna. Haddii ay ku sii jirto meesha ugu sarreysa, dib u eeg marinka autovacuum iyo maintenance_work_mem",
         "MONITOR": "Waxay u egtahay weydiimaha tirakoobyada ee adeeggan (xiriirka schema.pi). Wax ficil ah looma baahna. Haddii ay soo muuqato marar badan, hoos u dhig inta jeer ee la hubinayo",
         "UNKNOWN": "Ma jirto wax tilmaan ah oo ku saabsan isha. Deji application_name xiriir kasta oo kala qaybi akoonnada ujeeddooyin kala duwan; waxaa lagu kala saari doonaa muunadaha xiga"

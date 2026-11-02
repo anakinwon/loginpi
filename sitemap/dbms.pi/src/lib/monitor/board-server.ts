@@ -143,7 +143,7 @@ export const parseTopSql = (r: QueryResult): TopRow[] =>
     queryid: s(o.queryid),
     query: s(o.query),
     calls: num(o.calls),
-    totalMs: num(o.total_ms),
+    maxMs: num(o.max_ms),
     meanMs: num(o.mean_ms),
   }))
 export const parseTbl = (r: QueryResult): TblRow[] =>
@@ -462,7 +462,7 @@ export async function buildSlow(
     }
   }
   const names: [QueryName, Record<string, unknown>?][] = [
-    ['top_sql', { limit: 10 }],
+    ['top_sql', { limit: 30 }], // 1회 최고 순 상위엔 VACUUM·CREATE INDEX 등 유틸 문장이 몰림 — 넉넉히 받아 거른 뒤 10개
     ['tbl_stats'],
     ['idx_stats'],
     ['sizes'],

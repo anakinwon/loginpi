@@ -612,7 +612,7 @@
         "LOCK_WAIT": "{n} istuntoa odottaa lukituksia – etsi estävä istunto ja lopeta sen transaktio.",
         "CACHE_HIT": "Välimuistin osumaprosentti {pct}% – etsi suurten taulukoiden täysiä skannauksia tai tarkista shared_buffers.",
         "XACT_ERR": "Palautusprosentti {pct}%, {dlck} lukkiutumista – tarkista epäonnistuneet transaktiot ja sovelluksen virhelokit.",
-        "SLOW_SQL": "Kyselyn keskiarvo on {ms} ms – viritä eniten aikaa vievät kyselyt niiden suunnitelmien avulla.",
+        "SLOW_SQL": "On olemassa kysely, joka kestää jopa {ms}ms per suoritus – tarkastele suoritussuunnitelmaa ja viritä sitä, aloittaen korkeimmasta yksittäisestä suoritusajasta.",
         "STORAGE": "DB ({gb} GB) on lähellä rajaansa (päiviä jäljellä {days}) – siivoa suuria taulukoita tai lisää kapasiteettia.",
         "VACUUM": "{tbl}:ssä on paljon kuolleita rivejä tai vanhentuneita tilastoja – tarkista VACUUM (ANALYZE) ja autovacuum-asetukset.",
         "INDEX": "{n} indeksilöydöstä (virheellinen, käyttämätön, täydet skannaukset) – katso taulukon ja indeksin kunto -välilehdeltä kohteet.",
@@ -675,9 +675,9 @@
           "3": "Tarkista, ettei uudelleenyrityslogiikka lisää palautuksia."
         },
         "SLOW_SQL": {
-          "1": "Valitse hitaiden kyselyjen välilehdeltä eniten aikaa vievät kyselyt.",
+          "1": "Valitse hitaiden kyselyjen välilehdeltä kysely, jolla on korkein yksittäinen suoritusaika.",
           "2": "Tarkista suunnitelmat SQL-virityksessä ja korjaa indeksit tai liitokset.",
-          "3": "Korjauksen jälkeen tarkista, että keskimääräinen aika laski."
+          "3": "Korjauksen jälkeen nollaa tilastot (pg_stat_statements_reset) ja tarkista uudelleen, onko korkein yksittäinen suoritusaika pienentynyt."
         },
         "STORAGE": {
           "1": "Katso kasvutrendi ja arvioitu täyttymispäivä koon trendi -välilehdeltä.",
@@ -729,7 +729,7 @@
         "cacheTrend": "Välimuistin osumaprosentin trendi",
         "capacity": "DB-koko ja ennuste",
         "slowTop": "Hidas SQL TOP 10",
-        "slowLegend": "Palkin pituus = kokonaisaika · väri = keskimääräinen aika (▲ varoitus alkaen {warn}ms · ✕ riski alkaen {risk}ms)",
+        "slowLegend": "Palkin pituus/väri = Maksimi yksittäinen suoritusaika (▲ {warn}ms tai enemmän: varoitus · ✕ {risk}ms tai enemmän: riski)",
         "sizeTop": "Tilan TOP 10",
         "heat": "Riski signaalin mukaan ajan mittaan",
         "q": {
@@ -739,7 +739,7 @@
           "tpsCombo": "Liikkuvatko suorituskyky ja virheprosentti yhdessä?",
           "cacheTrend": "Milloin välimuistin osumaprosentti laski?",
           "capacity": "Milloin DB täyttyy?",
-          "slowTop": "Mitä virittää ensin? (kokonaisajan mukaan)",
+          "slowTop": "Mitä virittää ensin? (Maksimi yksittäisen suoritusajan mukaan)",
           "sizeTop": "Mikä vie tilaa?",
           "heat": "Onko riski kertaluonteinen vai toistuva?",
           "radar": "Mikä alue on heikko?",
@@ -776,9 +776,7 @@
           "value": "Arvo",
           "time": "Aika",
           "calls": "Kutsut",
-          "total": "Yhteensä (ms)",
           "mean": "Keskimääräinen (ms)",
-          "share": "Osuus",
           "score": "Pisteet",
           "level": "Taso",
           "ago": "1 tunti sitten",
@@ -787,7 +785,8 @@
           "sessions": "Istuntoja",
           "schema": "Skeema",
           "size": "Koko",
-          "thr": "Kynnys (varoitus·riski)"
+          "thr": "Kynnys (varoitus·riski)",
+          "max": "Maksimi yksittäinen (ms)"
         },
         "radar": "Terveyspisteet alueittain",
         "radarCur": "Nyt",
@@ -1018,7 +1017,9 @@
       "src": "Lähde",
       "srcToggle": "Näytä tai piilota lähteen tiedot",
       "openSqlLab": "Avaa SQL Tuningissa",
-      "acct": "Tili"
+      "acct": "Tili",
+      "sortMax": "Maksimi yksittäinen suoritusaika",
+      "maxMs": "Maksimi yksittäinen ms"
     },
     "health": {
       "empty": "Ei tilannekuvia vielä. Paina Kerää nyt Kerää-välilehdellä",
@@ -1069,7 +1070,7 @@
       "fix": {
         "TOOL": "Näyttää siltä, että henkilö kysyy tuotanto-DB:tä suoraan DB-työkalulla (DBeaver jne.). Ohjaa heidät sen sijaan vain luku -replikaan tai analytiikka-DB:hen ja rajoita ajoaikaa ihmisten tileillä, esim. ALTER ROLE human_user SET statement_timeout = '30s'. Käytä erillistä vain luku -roolia ja suorita massapoiminnat ruuhka-aikojen ulkopuolella",
         "BATCH": "Näyttää eräajolta tai ajoitetulta työltä. Jaa ajoajat pois liiketoiminnan ruuhkahuipuista ja pienennä työtä per commit. Tarkista indeksit ja tilastot (ANALYZE) kohdetaulukoista ja jaa pitkät transaktiot. Työn nimen lisääminen application_nameen tekee seuraavasta luokittelusta tarkemman",
-        "PROGRAM": "Näyttää sovelluksen suorittamalta kyselyltä. Tarkista suunnitelma SQL Tuningissa. Monet lyhyen keskiarvon omaavat kutsut viittaavat toistuviin kutsuihin (N+1) tai välimuistiin; pitkä keskiarvo viittaa ensisijaisesti indekseihin tai liitosjärjestykseen. Aseta palvelun nimi yhteyspoolisi application_nameen",
+        "PROGRAM": "Tämä näyttää olevan sovelluksen suorittama kysely. Tarkista suoritussuunnitelma SQL-virityksessä. Jos maksimi yksittäinen suoritusaika on pitkä, tarkastele ensin indeksejä ja liitosjärjestystä. Jos yksittäinen suoritus on lyhyt, mutta kutsumäärä on suuri, tarkastele toistuvia kutsuja (N+1) ja välimuistia. Aseta palvelun nimi yhteyspoolin application_name-kenttään.",
         "PLATFORM": "Näyttää DB:n tai alustan sisäiseltä työltä, kuten autovacuum tai replikointi. Yleensä toimenpiteitä ei tarvita. Jos se pysyy kärjessä, tarkista autovacuum-kynnysarvot ja maintenance_work_mem",
         "MONITOR": "Näyttää tämän palvelun omilta tilastokyselyiltä (schema.pi-linkki). Toimenpiteitä ei tarvita. Jos se näkyy liian usein, alenna kyselytaajuutta",
         "UNKNOWN": "Lähteestä ei ole vihjettä. Aseta application_name jokaiselle yhteydelle ja jaa tilit tarkoituksen mukaan; se luokitellaan seuraavista näytteistä"

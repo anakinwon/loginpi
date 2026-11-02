@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} sessiya kilidləri gözləyir — bloklayan sessiyanı tapın və əməliyyatını bitirin.",
         "CACHE_HIT": "Keş hit dərəcəsi {pct}% — böyük cədvəllərin tam skanlarını axtarın və ya shared_buffers-i nəzərdən keçirin.",
         "XACT_ERR": "Geri qaytarma dərəcəsi {pct}%, {dlck} ölü kilid — uğursuz əməliyyatları və tətbiq xəta loglarını yoxlayın.",
-        "SLOW_SQL": "Bir sorğu orta hesabla {ms} ms-dir — planlarından istifadə edərək ümumi vaxta görə ən yaxşı sorğuları tənzimləyin.",
+        "SLOW_SQL": "Hər icra üçün {ms}ms-ə qədər vaxt aparan sorğu var — icra planına baxın və ən yüksək tək icra vaxtından başlayaraq onu tənzimləyin.",
         "STORAGE": "DB ({gb} GB) limitinə yaxındır (qalan günlər {days}) — böyük cədvəlləri təmizləyin və ya tutum əlavə edin.",
         "VACUUM": "{tbl} çoxlu ölü sətirlərə və ya köhnəlmiş statistikalara malikdir — VACUUM (ANALYZE) və autovacuum parametrlərini nəzərdən keçirin.",
         "INDEX": "{n} indeks tapıntısı (etibarsız, istifadəsiz, tam skanlar) — hədəflər üçün cədvəl və indeks sağlamlığı tabına baxın.",
@@ -677,9 +677,9 @@
           "3": "Yenidən cəhd məntiqinin rollback-ləri şişirtmədiyini yoxlayın."
         },
         "SLOW_SQL": {
-          "1": "Yavaş sorğu tabında ümumi vaxta görə ən yaxşı sorğuları seçin.",
+          "1": "Yavaş sorğular tabından ən yüksək tək icra vaxtına malik sorğunu seçin.",
           "2": "SQL tənzimləməsində planları nəzərdən keçirin və indeksləri və ya birləşmələri düzəldin.",
-          "3": "Düzəltdikdən sonra orta vaxtın azaldığını yoxlayın."
+          "3": "Düzəltdikdən sonra statistikaları sıfırlayın (pg_stat_statements_reset) və ən yüksək tək icra vaxtının azalıb-azalmadığını yenidən yoxlayın."
         },
         "STORAGE": {
           "1": "Ölçü trendi tabında böyümə trendini və təxmini dolma tarixini görün.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Keş hit dərəcəsi trendi",
         "capacity": "DB ölçüsü və proqnozu",
         "slowTop": "Yavaş SQL ilk 10",
-        "slowLegend": "Çubuğun uzunluğu = ümumi vaxt · rəng = orta vaxt (▲ {warn}ms-dən xəbərdarlıq · ✕ {risk}ms-dən risk)",
+        "slowLegend": "Çubuğun uzunluğu/rəngi = Maksimum tək icra vaxtı (▲ {warn}ms və ya daha çox: xəbərdarlıq · ✕ {risk}ms və ya daha çox: risk)",
         "sizeTop": "Boş yer ilk 10",
         "heat": "Zamanla siqnala görə risk",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Məhsuldarlıq və uğursuzluq dərəcəsi birlikdə hərəkət edirmi?",
           "cacheTrend": "Keş hit dərəcəsi nə vaxt düşdü?",
           "capacity": "DB nə vaxt dolacaq?",
-          "slowTop": "Əvvəlcə nəyi tənzimləməli? (ümumi vaxta görə)",
+          "slowTop": "Nədən başlamaq lazımdır? (Maksimum tək icra vaxtına görə)",
           "sizeTop": "Boş yeri nə tutur?",
           "heat": "Risk birdəfəlikdir, yoxsa təkrarlanan?",
           "radar": "Hansı sahə zəifdir?",
@@ -778,9 +778,7 @@
           "value": "Dəyər",
           "time": "Vaxt",
           "calls": "Zənglər",
-          "total": "Ümumi (ms)",
           "mean": "Orta (ms)",
-          "share": "Pay",
           "score": "Xal",
           "level": "Səviyyə",
           "ago": "1 saat əvvəl",
@@ -789,7 +787,8 @@
           "sessions": "Sessiyalar",
           "schema": "Sxem",
           "size": "Ölçü",
-          "thr": "Hədd (xəbərdarlıq·risk)"
+          "thr": "Hədd (xəbərdarlıq·risk)",
+          "max": "Maksimum tək (ms)"
         },
         "radar": "Sahə üzrə sağlamlıq balı",
         "radarCur": "İndi",
@@ -1025,7 +1024,9 @@
       "src": "Mənbə",
       "srcToggle": "Mənbə detallarını göstər və ya gizlət",
       "openSqlLab": "SQL Tuning-də açın",
-      "acct": "Hesab"
+      "acct": "Hesab",
+      "sortMax": "Maksimum tək icra vaxtı",
+      "maxMs": "Maksimum tək ms"
     },
     "health": {
       "empty": "Hələ heç bir anlıq görüntü yoxdur. Topla sekmesinde İndi topla düyməsini basın",
@@ -1077,7 +1078,7 @@
       "fix": {
         "TOOL": "Görünür ki, bir şəxs DB aləti (DBeaver və s.) ilə birbaşa istehsal DB-ni sorğulayır. Onları yalnız oxumaq üçün replikaya və ya analitika DB-yə yönəldin və insan hesablarında işləmə müddətini məhdudlaşdırın, məsələn, ALTER ROLE human_user SET statement_timeout = '30s'. Ayrı bir yalnız oxumaq üçün rol istifadə edin və kütləvi çıxarışları pik olmayan saatlarda edin.",
         "BATCH": "Görünür ki, bir partiya və ya planlaşdırılmış işdir. İşləmə müddətlərini iş piklərindən uzaqlaşdırın və hər commit üçün işi azaldın. Hədəf cədvəllərdə indeksləri və statistikaları (ANALYZE) yoxlayın və uzun əməliyyatları bölün. İş adını application_name-ə daxil etmək növbəti təsnifatı daha dəqiq edir.",
-        "PROGRAM": "Görünür ki, bir tətbiq tərəfindən işlədilən bir sorğudur. SQL Tuning-də planı yoxlayın. Qısa ortalama ilə çoxlu zənglər təkrarlanan zənglərə (N+1) və ya keşləməyə işarə edir; uzun ortalama isə əvvəlcə indekslərə və ya birləşmə sırasına işarə edir. Bağlantı hovuzunuzun application_name-də xidmət adını təyin edin.",
+        "PROGRAM": "Bu, tətbiq tərəfindən icra edilən sorğu kimi görünür. SQL tənzimləməsində icra planını yoxlayın. Əgər maksimum tək icra vaxtı uzundursa, əvvəlcə indekslərə və birləşmə sırasına baxın. Əgər tək icra qısa, lakin çağırış sayı yüksəkdirsə, təkrarlanan çağırışlara (N+1) və keşləməyə baxın. Xidmət adını bağlantı hovuzunun application_name-inə daxil edin.",
         "PLATFORM": "Görünür ki, autovacuum və ya replikasiya kimi DB və ya platforma daxili işdir. Adətən heç bir tədbirə ehtiyac yoxdur. Əgər yuxarıda qalırsa, autovacuum həddlərini və maintenance_work_mem-i nəzərdən keçirin.",
         "MONITOR": "Görünür ki, bu xidmətin öz statistika sorğularıdır (schema.pi bağlantısı). Heç bir tədbirə ehtiyac yoxdur. Əgər çox tez-tez görünürsə, sorğu tezliyini azaldın.",
         "UNKNOWN": "Mənbəyə dair heç bir ipucu yoxdur. Hər əlaqədə application_name təyin edin və hesabları məqsədə görə bölün; növbəti nümunələrdən təsnif ediləcək."

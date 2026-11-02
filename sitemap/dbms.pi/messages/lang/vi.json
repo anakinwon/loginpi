@@ -614,7 +614,7 @@
         "LOCK_WAIT": "{n} phiên đang chờ khóa — tìm phiên chặn và kết thúc giao dịch của nó.",
         "CACHE_HIT": "Tỷ lệ truy cập bộ nhớ cache {pct}% — tìm các lần quét toàn bộ bảng lớn hoặc xem lại shared_buffers.",
         "XACT_ERR": "Tỷ lệ rollback {pct}%, {dlck} deadlock — kiểm tra các giao dịch lỗi và nhật ký lỗi ứng dụng.",
-        "SLOW_SQL": "Một truy vấn trung bình {ms} ms — điều chỉnh các truy vấn hàng đầu theo tổng thời gian bằng cách sử dụng kế hoạch của chúng.",
+        "SLOW_SQL": "Có các truy vấn mất tối đa {ms}ms mỗi lần — hãy xem kế hoạch thực thi và điều chỉnh, bắt đầu từ các truy vấn có thời gian thực thi tối đa cao nhất.",
         "STORAGE": "DB ({gb} GB) gần hết giới hạn (còn lại {days} ngày) — dọn dẹp các bảng lớn hoặc thêm dung lượng.",
         "VACUUM": "{tbl} có nhiều hàng chết hoặc thống kê cũ — xem lại cài đặt VACUUM (ANALYZE) và autovacuum.",
         "INDEX": "{n} phát hiện chỉ mục (không hợp lệ, không sử dụng, quét toàn bộ) — xem tab tình trạng bảng & chỉ mục để biết các mục tiêu.",
@@ -677,9 +677,9 @@
           "3": "Kiểm tra xem logic thử lại có làm tăng rollback không."
         },
         "SLOW_SQL": {
-          "1": "Chọn các truy vấn hàng đầu theo tổng thời gian trong tab truy vấn chậm.",
+          "1": "Trong tab truy vấn chậm, chọn các truy vấn có thời gian thực thi tối đa cao nhất.",
           "2": "Xem lại kế hoạch trong điều chỉnh SQL và sửa các chỉ mục hoặc join.",
-          "3": "Sau khi sửa, kiểm tra xem thời gian trung bình có giảm xuống không."
+          "3": "Sau khi sửa, đặt lại thống kê (pg_stat_statements_reset) và kiểm tra lại xem thời gian thực thi tối đa đã giảm chưa."
         },
         "STORAGE": {
           "1": "Xem xu hướng tăng trưởng và ngày đầy đủ ước tính trong tab xu hướng kích thước.",
@@ -731,7 +731,7 @@
         "cacheTrend": "Xu hướng tỷ lệ truy cập bộ nhớ cache",
         "capacity": "Kích thước & dự báo DB",
         "slowTop": "SQL chậm top 10",
-        "slowLegend": "Độ dài thanh = tổng thời gian · màu = thời gian trung bình (▲ cảnh báo từ {warn}ms · ✕ rủi ro từ {risk}ms)",
+        "slowLegend": "Độ dài/màu thanh = thời gian thực thi tối đa mỗi lần (▲ cảnh báo trên {warn}ms · ✕ nguy hiểm trên {risk}ms)",
         "sizeTop": "Không gian top 10",
         "heat": "Rủi ro theo tín hiệu theo thời gian",
         "q": {
@@ -741,7 +741,7 @@
           "tpsCombo": "Thông lượng và tỷ lệ lỗi có di chuyển cùng nhau không?",
           "cacheTrend": "Tỷ lệ truy cập bộ nhớ cache giảm khi nào?",
           "capacity": "DB sẽ đầy khi nào?",
-          "slowTop": "Điều chỉnh gì trước? (theo tổng thời gian)",
+          "slowTop": "Nên điều chỉnh cái gì trước? (theo thời gian thực thi tối đa mỗi lần)",
           "sizeTop": "Cái gì đang chiếm không gian?",
           "heat": "Rủi ro là một lần hay lặp lại?",
           "radar": "Khu vực nào yếu?",
@@ -778,9 +778,7 @@
           "value": "Giá trị",
           "time": "Thời gian",
           "calls": "Số lượt gọi",
-          "total": "Tổng (ms)",
           "mean": "Trung bình (ms)",
-          "share": "Chia sẻ",
           "score": "Điểm",
           "level": "Mức",
           "ago": "1 giờ trước",
@@ -789,7 +787,8 @@
           "sessions": "Phiên",
           "schema": "Schema",
           "size": "Kích thước",
-          "thr": "Ngưỡng (cảnh báo·rủi ro)"
+          "thr": "Ngưỡng (cảnh báo·rủi ro)",
+          "max": "Tối đa 1 lần (ms)"
         },
         "radar": "Điểm sức khỏe theo khu vực",
         "radarCur": "Hiện tại",
@@ -1025,7 +1024,9 @@
       "src": "Nguồn",
       "srcToggle": "Hiển thị hoặc ẩn chi tiết nguồn",
       "openSqlLab": "Mở trong SQL Tuning",
-      "acct": "Tài khoản"
+      "acct": "Tài khoản",
+      "sortMax": "Thời gian thực thi tối đa 1 lần",
+      "maxMs": "Tối đa 1 lần ms"
     },
     "health": {
       "empty": "Chưa có ảnh chụp nhanh nào. Nhấn Thu thập ngay trên tab Thu thập",
@@ -1077,7 +1078,7 @@
       "fix": {
         "TOOL": "Có vẻ như một người đang truy vấn trực tiếp DB sản xuất bằng một công cụ DB (DBeaver, v.v.). Thay vào đó, hãy hướng họ đến một bản sao chỉ đọc hoặc DB phân tích, và giới hạn thời gian chạy trên các tài khoản người dùng, ví dụ: ALTER ROLE human_user SET statement_timeout = '30s'. Sử dụng một vai trò chỉ đọc riêng, và thực hiện các trích xuất lớn vào giờ thấp điểm",
         "BATCH": "Có vẻ như một lô hoặc công việc đã lên lịch. Phân tán thời gian chạy ra khỏi các đỉnh kinh doanh và thu nhỏ công việc trên mỗi commit. Kiểm tra các chỉ mục và thống kê (ANALYZE) trên các bảng đích, và chia nhỏ các giao dịch dài. Đặt tên công việc vào application_name sẽ làm cho phân loại tiếp theo chính xác hơn",
-        "PROGRAM": "Có vẻ như một truy vấn được chạy bởi một ứng dụng. Kiểm tra kế hoạch trong SQL Tuning. Nhiều cuộc gọi với thời gian trung bình ngắn chỉ ra các cuộc gọi lặp lại (N+1) hoặc bộ nhớ đệm; thời gian trung bình dài chỉ ra các chỉ mục hoặc thứ tự join trước tiên. Đặt tên dịch vụ trong application_name của nhóm kết nối của bạn",
+        "PROGRAM": "Đây có vẻ là các truy vấn được thực thi bởi ứng dụng. Hãy kiểm tra kế hoạch thực thi trong điều chỉnh SQL. Nếu thời gian thực thi tối đa mỗi lần dài, hãy xem xét thứ tự chỉ mục/kết nối trước; nếu thời gian thực thi mỗi lần ngắn nhưng số lần gọi nhiều, hãy xem xét các cuộc gọi lặp lại (N+1)/bộ nhớ đệm. Đặt tên dịch vụ vào application_name của nhóm kết nối.",
         "PLATFORM": "Có vẻ như công việc nội bộ của DB hoặc nền tảng như autovacuum hoặc sao chép. Thường không cần hành động. Nếu nó vẫn ở trên cùng, hãy xem xét ngưỡng autovacuum và maintenance_work_mem",
         "MONITOR": "Có vẻ như các truy vấn thống kê của dịch vụ này (liên kết schema.pi). Không cần hành động. Nếu nó xuất hiện quá thường xuyên, hãy giảm tần suất thăm dò",
         "UNKNOWN": "Không có manh mối nào về nguồn. Đặt application_name trên mỗi kết nối và chia tài khoản theo mục đích; nó sẽ được phân loại từ các mẫu tiếp theo"

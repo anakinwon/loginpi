@@ -609,7 +609,7 @@
         "LOCK_WAIT": "{n} sesijų laukia užraktų – raskite blokuojančią sesiją ir užbaikite jos transakciją.",
         "CACHE_HIT": "Talpyklos pataikymo dažnis {pct}% – ieškokite didelių lentelių visų nuskaitymų arba peržiūrėkite shared_buffers.",
         "XACT_ERR": "Atšaukimo dažnis {pct}%, {dlck} aklavietės – patikrinkite nepavykusias transakcijas ir programos klaidų žurnalus.",
-        "SLOW_SQL": "Užklausos vidurkis {ms} ms – sureguliuokite populiariausias užklausas pagal bendrą laiką, naudodami jų planus.",
+        "SLOW_SQL": "Yra užklausa, kurios vykdymas trunka iki {ms} ms – peržiūrėkite vykdymo planą ir suderinkite ją, pradedant nuo didžiausio vieno vykdymo laiko.",
         "STORAGE": "DB ({gb} GB) artėja prie savo limito (liko dienų {days}) – išvalykite dideles lenteles arba padidinkite talpą.",
         "VACUUM": "{tbl} turi daug negyvų eilučių arba pasenusių statistikų – peržiūrėkite VACUUM (ANALYZE) ir autovacuum nustatymus.",
         "INDEX": "{n} indekso radinių (neteisingi, nenaudojami, visi nuskaitymai) – tikslus žr. lentelės ir indekso būklės skirtuke.",
@@ -672,9 +672,9 @@
           "3": "Patikrinkite, ar pakartotinio bandymo logika nedidina atšaukimų."
         },
         "SLOW_SQL": {
-          "1": "Pasirinkite populiariausias užklausas pagal bendrą laiką lėtų užklausų skirtuke.",
+          "1": "Lėtų užklausų skirtuke pasirinkite užklausą su didžiausiu vieno vykdymo laiku.",
           "2": "Peržiūrėkite planus SQL derinime ir pataisykite indeksus ar sujungimus.",
-          "3": "Po pataisymo patikrinkite, ar vidutinis laikas sumažėjo."
+          "3": "Pataisius, iš naujo nustatykite statistiką (pg_stat_statements_reset) ir dar kartą patikrinkite, ar sumažėjo didžiausias vieno vykdymo laikas."
         },
         "STORAGE": {
           "1": "Žr. augimo tendenciją ir numatomą užpildymo datą talpos tendencijų skirtuke.",
@@ -726,7 +726,7 @@
         "cacheTrend": "Talpyklos pataikymo dažnio tendencija",
         "capacity": "DB dydis ir prognozė",
         "slowTop": "Lėtas SQL TOP 10",
-        "slowLegend": "Juostos ilgis = bendras laikas · spalva = vidutinis laikas (▲ įspėjimas nuo {warn}ms · ✕ rizika nuo {risk}ms)",
+        "slowLegend": "Juostos ilgis/spalva = Maksimalus vieno vykdymo laikas (▲ {warn} ms ar daugiau: įspėjimas · ✕ {risk} ms ar daugiau: rizika)",
         "sizeTop": "Vietos TOP 10",
         "heat": "Rizika pagal signalą laikui bėgant",
         "q": {
@@ -736,7 +736,7 @@
           "tpsCombo": "Ar pralaidumas ir gedimų dažnis juda kartu?",
           "cacheTrend": "Kada sumažėjo talpyklos pataikymo dažnis?",
           "capacity": "Kada DB užsipildys?",
-          "slowTop": "Ką derinti pirmiausia? (pagal bendrą laiką)",
+          "slowTop": "Ką derinti pirmiausia? (Pagal maksimalų vieno vykdymo laiką)",
           "sizeTop": "Kas užima vietą?",
           "heat": "Ar rizika yra vienkartinė, ar pasikartojanti?",
           "radar": "Kuri sritis yra silpna?",
@@ -773,9 +773,7 @@
           "value": "Reikšmė",
           "time": "Laikas",
           "calls": "Iškvietimai",
-          "total": "Bendra (ms)",
           "mean": "Vidutinė (ms)",
-          "share": "Dalis",
           "score": "Įvertinimas",
           "level": "Lygis",
           "ago": "Prieš 1 valandą",
@@ -784,7 +782,8 @@
           "sessions": "Sesijos",
           "schema": "Schema",
           "size": "Dydis",
-          "thr": "Riba (įspėjimas·rizika)"
+          "thr": "Riba (įspėjimas·rizika)",
+          "max": "Maks. vieno (ms)"
         },
         "radar": "Sveikatos balas pagal sritį",
         "radarCur": "Dabar",
@@ -1015,7 +1014,9 @@
       "src": "Šaltinis",
       "srcToggle": "Rodyti arba slėpti šaltinio detales",
       "openSqlLab": "Atidaryti SQL derinime",
-      "acct": "Paskyra"
+      "acct": "Paskyra",
+      "sortMax": "Maksimalus vieno vykdymo laikas",
+      "maxMs": "Maks. vieno ms"
     },
     "health": {
       "empty": "Dar nėra momentinių nuotraukų. Skirtuke „Rinkti“ paspauskite „Rinkti dabar“",
@@ -1066,7 +1067,7 @@
       "fix": {
         "TOOL": "Panašu, kad asmuo tiesiogiai užklausia gamybos DB naudodamas DB įrankį (DBeaver ir kt.). Nukreipkite juos į tik skaitomą kopiją arba analizės DB ir apribokite vykdymo laiką žmogiškosioms paskyroms, pvz., ALTER ROLE human_user SET statement_timeout = '30s'. Naudokite atskirą tik skaitomą rolę ir atlikite masinius ištraukimus ne piko valandomis.",
         "BATCH": "Panašu, kad tai paketas arba suplanuotas darbas. Paskirstykite vykdymo laikus, kad išvengtumėte verslo piko, ir sumažinkite darbo apimtį vienam įsipareigojimui. Patikrinkite indeksus ir statistiką (ANALYZE) tikslinėse lentelėse ir padalinkite ilgas transakcijas. Įdėjus užduoties pavadinimą į application_name, kitas klasifikavimas bus tikslesnis.",
-        "PROGRAM": "Panašu, kad tai programos vykdoma užklausa. Patikrinkite planą SQL derinime. Daug iškvietimų su trumpu vidurkiu rodo pasikartojančius iškvietimus (N+1) arba talpyklą; ilgas vidurkis pirmiausia rodo indeksus arba sujungimo tvarką. Nustatykite paslaugos pavadinimą savo ryšio telkinio application_name.",
+        "PROGRAM": "Atrodo, kad tai yra programos vykdyta užklausa. Patikrinkite vykdymo planą SQL derinime. Jei maksimalus vieno vykdymo laikas yra ilgas, pirmiausia peržiūrėkite indeksus ir sujungimo tvarką. Jei vienas vykdymas yra trumpas, bet iškvietimų skaičius didelis, peržiūrėkite pasikartojančius iškvietimus (N+1) ir talpyklą. Įdėkite paslaugos pavadinimą į ryšio telkinio application_name.",
         "PLATFORM": "Panašu, kad tai DB arba platformos vidinis darbas, pvz., autovacuum arba replikacija. Paprastai nereikia jokių veiksmų. Jei jis išlieka viršuje, peržiūrėkite autovacuum slenksčius ir maintenance_work_mem.",
         "MONITOR": "Panašu, kad tai šios paslaugos statistikos užklausos (schema.pi nuoroda). Jokių veiksmų nereikia. Jei rodoma per dažnai, sumažinkite apklausos dažnumą.",
         "UNKNOWN": "Nėra jokių užuominų apie šaltinį. Nustatykite application_name kiekvienam ryšiui ir padalinkite paskyras pagal paskirtį; ji bus klasifikuojama iš kitų pavyzdžių."

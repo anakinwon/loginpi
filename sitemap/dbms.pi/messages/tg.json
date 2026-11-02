@@ -106,6 +106,7 @@
     "lake": {
       "title": "Conception de lac à trois couches",
       "raw": "Brut",
+      "rawDesc": "Charge les noms et types de colonnes de la DB source tels quels.",
       "std": "Standardisé",
       "stdDesc": "Renomme les colonnes selon les termes standard approuvés par schema.pi.",
       "cur": "Organisé",
@@ -192,6 +193,7 @@
       "idxUsage": "Efficacité de l'index conçu"
     },
     "hint": {
+      "ddlMissing": "Seuls les objets manquants dans la DB selon la dernière requête DDL sont affichés. Les requêtes antérieures remplacées par une recréation ultérieure de la même table, et l'ancienne règle de nommage (_PKEY), sont normales et sont masquées ci-dessous.",
       "extraTables": "Basé sur le schéma {schema}. Regroupés par préfixe, seuls les groupes de préfixes de ce projet sont des candidats à l'omission du modèle.",
       "idxUsage": "Jugement = En cours d'utilisation / Pour l'unicité / Pas de données / En observation (Statistiques démarrées·Créé il y a moins de 7 jours) / Candidat à l'inutilisation. Seuls les index candidats à l'inutilisation sont considérés pour la suppression."
     },
@@ -228,7 +230,9 @@
     },
     "schema": "Schéma",
     "schemaHint": "Seules les tables régulières et partitionnées de ce schéma sont comparées (les vues sont exclues). Par défaut public — les schémas internes de Supabase (auth, storage, …) sont omis.",
+    "truncated": "Les {names} ont atteint la limite de {max} lignes et ont été tronquées — certains résultats \"non dans la DB\" / \"non dans le modèle\" peuvent être faux. Réduisez le schéma et relancez.",
     "colUnchecked": "La requête de colonne ayant été tronquée, {n} résultats de colonnes manquantes/supplémentaires sont considérés comme invérifiables et exclus du nombre d'incohérences de colonnes.",
+    "renamed": "{n} index(es) de clé primaire appliqué(s) selon l'ancienne règle de nommage (_PKEY) existent dans la DB sous le nouveau nom (PK_) — normal",
     "superseded": "{n} requête(s) plus ancienne(s) ont été exclues car une requête ultérieure a recréé la même table (DROP … CASCADE) — normal",
     "supersededItem": "Requête {id} → remplacée par la requête {by}",
     "sysCols": "{n} colonne(s) système ajoutée(s) automatiquement lors de la génération DDL ne sont pas dans le modèle par conception et sont exclues des incohérences",
@@ -244,9 +248,12 @@
       },
       "extraTables": {
         "s1": "Ce groupe de préfixes de projet = candidats au modèle manquant — importez-les dans le modèle via schema.pi → Paramètres → Inverser, ou décidez de les supprimer s'il s'agit de tables inutilisées.",
+        "s2": "Autres groupes de préfixes = autres systèmes partageant cette DB — pas des éléments d'action pour ce projet.",
         "s3": "Si le schéma cible n'est pas public, modifiez le champ \"Schéma\" ci-dessus et exécutez à nouveau."
       },
       "colMismatches": {
+        "s1": "Non dans la DB = appliquez la colonne du modèle à la DB via la génération DDL de schema.pi.",
+        "s2": "Non dans le modèle = importez la colonne de la DB dans le modèle via schema.pi → Paramètres → Inverse, ou décidez de la supprimer si elle est inutile.",
         "s3": "Type/NULL diffère = alignez-vous sur le modèle (source de vérité) ; avant de réduire la longueur ou de passer à NOT NULL, confirmez que les lignes existantes le satisfont."
       },
       "idxUsage": {
@@ -380,6 +387,7 @@
   },
   "migration": {
     "title": "Migration de données (PiMig)",
+    "intro": "Calcule l'ordre de chargement des tables à partir des relations dans votre modèle de conception schema.pi, organise la taille des blocs, le parallélisme et la liste de contrôle de basculement, et génère le SQL de vérification que vous exécutez vous-même sur la source et la cible. Cet écran ne fait que planifier et vérifier — il ne déplace pas de données et ne lit pas les lignes de la DB client.",
     "needLink": "Choisissez d'abord un lien schema.pi ci-dessus. Si vous n'en avez pas, enregistrez un jeton sous 'Connecter'.",
     "loading": "Chargement…",
     "newPlan": "Nouveau plan de migration",
@@ -516,6 +524,7 @@
       "TIMEOUT": "schema.pi répond lentement. Veuillez réessayer sous peu.",
       "RULE_LIMIT": "Jusqu’à 50 règles par lien.",
       "NOT_FOUND": "Règle introuvable.",
+      "CONN_FAIL": "Impossible de se connecter à la base de données. Vérifiez les paramètres de connexion et l'état de la DB.",
       "LINK_DOWN": "Impossible d'atteindre schema.pi. Réessayez dans un instant.",
       "PGSS_MISSING": "pg_stat_statements n'est pas installé, donc le SQL lent n'est pas disponible.",
       "CONN_UNSUPPORTED": "Cette connexion ne prend pas en charge la surveillance (connexions de serveur PostgreSQL uniquement).",
@@ -603,7 +612,7 @@
         "LOCK_WAIT": "{n} sessions attendent des verrous — trouvez la session bloquante et terminez sa transaction.",
         "CACHE_HIT": "Taux d'accès au cache {pct}% — recherchez les analyses complètes de grandes tables ou examinez shared_buffers.",
         "XACT_ERR": "Taux de rollback {pct}%, {dlck} impasses — vérifiez les transactions échouées et les journaux d'erreurs de l'application.",
-        "SLOW_SQL": "Une requête prend en moyenne {ms} ms — optimisez les requêtes principales par temps total en utilisant leurs plans.",
+        "SLOW_SQL": "Il y a une requête qui prend jusqu'à {ms}ms par exécution — visualisez le plan d'exécution et optimisez-la, en commençant par le temps d'exécution unique le plus élevé.",
         "STORAGE": "La DB ({gb} Go) est proche de sa limite (jours restants {days}) — nettoyez les grandes tables ou ajoutez de la capacité.",
         "VACUUM": "{tbl} a de nombreuses lignes mortes ou des statistiques obsolètes — examinez les paramètres VACUUM (ANALYZE) et autovacuum.",
         "INDEX": "{n} résultats d'index (invalides, inutilisés, analyses complètes) — voir l'onglet santé des tables et des index pour les cibles.",
@@ -666,9 +675,9 @@
           "3": "Vérifiez que la logique de nouvelle tentative n'augmente pas les rollbacks."
         },
         "SLOW_SQL": {
-          "1": "Choisissez les requêtes principales par temps total dans l'onglet des requêtes lentes.",
+          "1": "Dans l'onglet des requêtes lentes, sélectionnez la requête avec le temps d'exécution unique le plus élevé.",
           "2": "Examinez les plans dans le réglage SQL et corrigez les index ou les jointures.",
-          "3": "Après la correction, vérifiez que le temps moyen a diminué."
+          "3": "Après correction, réinitialisez les statistiques (pg_stat_statements_reset) et vérifiez à nouveau si le temps d'exécution unique le plus élevé a diminué."
         },
         "STORAGE": {
           "1": "Voir la tendance de croissance et la date de remplissage estimée dans l'onglet de tendance de taille.",
@@ -720,7 +729,7 @@
         "cacheTrend": "Tendance du taux d'accès au cache",
         "capacity": "Taille et prévision de la DB",
         "slowTop": "Top 10 des SQL lents",
-        "slowLegend": "Longueur de la barre = temps total · couleur = temps moyen (▲ avertissement à partir de {warn}ms · ✕ risque à partir de {risk}ms)",
+        "slowLegend": "Longueur/couleur de la barre = Temps d'exécution unique max (▲ {warn}ms ou plus : avertissement · ✕ {risk}ms ou plus : risque)",
         "sizeTop": "Top 10 de l'espace",
         "heat": "Risque par signal au fil du temps",
         "q": {
@@ -730,7 +739,7 @@
           "tpsCombo": "Le débit et le taux d'échec évoluent-ils ensemble ?",
           "cacheTrend": "Quand le taux d'accès au cache a-t-il chuté ?",
           "capacity": "Quand la DB sera-t-elle pleine ?",
-          "slowTop": "Quoi optimiser en premier ? (par temps total)",
+          "slowTop": "Quoi optimiser en premier ? (Par temps d'exécution unique max)",
           "sizeTop": "Qu'est-ce qui prend de l'espace ?",
           "heat": "Le risque est-il ponctuel ou récurrent ?",
           "radar": "Quelle zone est faible ?",
@@ -767,9 +776,7 @@
           "value": "Valeur",
           "time": "Heure",
           "calls": "Appels",
-          "total": "Total (ms)",
           "mean": "Moyenne (ms)",
-          "share": "Part",
           "score": "Score",
           "level": "Niveau",
           "ago": "Il y a 1 heure",
@@ -778,7 +785,8 @@
           "sessions": "Sessions",
           "schema": "Schéma",
           "size": "Taille",
-          "thr": "Seuil (avertissement·risque)"
+          "thr": "Seuil (avertissement·risque)",
+          "max": "Max unique (ms)"
         },
         "radar": "Score de santé par zone",
         "radarCur": "Maintenant",
@@ -815,6 +823,7 @@
       "empty": {
         "noConn": "Cette taxonomie n'a aucune connexion de serveur PostgreSQL à surveiller — affichage des URL et de l'état du service uniquement.",
         "unsupported": "Cette connexion ne prend pas en charge la surveillance (connexions de serveur PostgreSQL uniquement).",
+        "connFail": "Impossible de se connecter à la base de données — vérifiez les paramètres de connexion et l'état de la DB.",
         "linkDown": "Impossible d'atteindre schema.pi — nouvelle tentative automatique.",
         "linkAuth": "Le jeton de connexion a expiré — émettez un nouveau jeton dans schema.pi et enregistrez-le.",
         "timeout": "Les réponses sont lentes — nouvelle tentative automatique.",
@@ -1008,7 +1017,9 @@
       "src": "Source",
       "srcToggle": "Afficher ou masquer les détails de la source",
       "openSqlLab": "Ouvrir dans SQL Tuning",
-      "acct": "Compte"
+      "acct": "Compte",
+      "sortMax": "Temps d'exécution unique max",
+      "maxMs": "Max unique ms"
     },
     "health": {
       "empty": "Aucun instantané pour le moment. Appuyez sur « Collecter maintenant » dans l'onglet « Collecte »",
@@ -1040,6 +1051,7 @@
       "none": "Aucun"
     },
     "src": {
+      "root": "Pour identifier précisément la source : (1) utilisez un compte DB distinct pour chaque programme, lot et personne (outil), et (2) définissez application_name sur chaque connexion. Le compte provient de pg_stat_statements et est certain ; la catégorie d'application/outil est estimée à partir d'échantillons d'activité (application_name est auto-déclaré par le client, il peut donc être vide ou modifié, et les requêtes courtes qui se terminent entre les échantillons peuvent être manquées).",
       "cd": {
         "PROGRAM": "Programme",
         "BATCH": "Lot",
@@ -1058,7 +1070,8 @@
       "fix": {
         "TOOL": "Il semble qu'une personne interroge directement la base de données de production avec un outil de base de données (DBeaver, etc.). Orientez-la plutôt vers une réplique en lecture seule ou une base de données d'analyse, et limitez le temps d'exécution sur les comptes humains, par exemple ALTER ROLE human_user SET statement_timeout = '30s'. Utilisez un rôle en lecture seule distinct et effectuez les extractions en masse pendant les heures creuses.",
         "BATCH": "Il semble s'agir d'un lot ou d'une tâche planifiée. Répartissez les temps d'exécution en dehors des pics d'activité et réduisez le travail par commit. Vérifiez les index et les statistiques (ANALYZE) sur les tables cibles, et divisez les transactions longues. Mettre le nom de la tâche dans application_name rendra la prochaine classification plus précise.",
-        "PROGRAM": "Il semble s'agir d'une requête exécutée par une application. Vérifiez le plan dans SQL Tuning. De nombreux appels avec une moyenne courte indiquent des appels répétés (N+1) ou une mise en cache ; une moyenne longue indique d'abord des index ou l'ordre de jointure. Définissez le nom du service dans application_name de votre pool de connexions.",
+        "PROGRAM": "Ceci semble être une requête exécutée par l'application. Vérifiez le plan d'exécution dans l'optimisation SQL. Si le temps d'exécution unique max est long, examinez d'abord les index et l'ordre de jointure. Si une exécution unique est courte mais que le nombre d'appels est élevé, examinez les appels répétés (N+1) et la mise en cache. Placez le nom du service dans l'application_name du pool de connexions.",
+        "PLATFORM": "Semble être un travail interne à la DB ou à la plateforme, tel que l'autovacuum ou la réplication. Généralement, aucune action n'est nécessaire. S'il reste en tête, examinez les seuils d'autovacuum et maintenance_work_mem.",
         "MONITOR": "Il semble s'agir des propres requêtes de statistiques de ce service (lien schema.pi). Aucune action n'est nécessaire. S'il apparaît trop souvent, réduisez la fréquence d'interrogation.",
         "UNKNOWN": "Il n'y a aucun indice sur la source. Définissez application_name sur chaque connexion et divisez les comptes par objectif ; il sera classé à partir des prochains échantillons."
       },
@@ -1071,6 +1084,8 @@
         "none": "(vide)"
       },
       "noSample": "Pas encore d'échantillons — les sessions en cours sont échantillonnées lorsque vous consultez le tableau de bord de surveillance ou l'onglet Activité et verrous. Pour l'instant, il est classé uniquement à partir du nom du compte.",
+      "verOff": "Cette DB est antérieure à PostgreSQL 14, donc les sessions en cours n'ont pas d'ID de requête. Seul le compte (certain) est affiché.",
+      "privOff": "Le compte lié ne peut pas voir les détails de session des autres comptes, donc aucun échantillon n'est collecté. Demandez à un administrateur de DB d'exécuter GRANT pg_read_all_stats TO {user};",
       "linkUsr": "compte de liaison",
       "qidOff": "Les détails de session sont visibles mais l'ID de requête est vide (compute_query_id est désactivé). Vérifiez avec SHOW compute_query_id; puis exécutez ALTER SYSTEM SET compute_query_id = 'auto'; et rechargez (SELECT pg_reload_conf();)",
       "openHint": "Ouvre SQL Tuning avec la requête pré-remplie. Remplacez les espaces réservés comme $1 par des valeurs réelles avant de visualiser le plan."
