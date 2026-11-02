@@ -1024,7 +1024,9 @@
       "openSqlLab": "Abrir em SQL Tuning",
       "acct": "Conta",
       "sortMax": "Tempo máximo de execução única",
-      "maxMs": "Máx. único ms"
+      "maxMs": "Máx. único ms",
+      "diagToggle": "Diagnosticar Causa",
+      "noMax": "Nenhum valor máximo — {n} itens são de coletas mais antigas sem um valor máximo, então eles são temporariamente classificados pela média (não pelo tempo total). A coleta agora preencherá o valor máximo."
     },
     "health": {
       "empty": "Nenhum instantâneo ainda. Pressione Coletar agora na aba Coletar",
@@ -1078,7 +1080,7 @@
         "BATCH": "Parece um lote ou trabalho agendado. Distribua os tempos de execução para longe dos picos de negócios e reduza o trabalho por commit. Verifique índices e estatísticas (ANALYZE) nas tabelas de destino e divida transações longas. Colocar o nome do trabalho em application_name torna a próxima classificação mais precisa",
         "PROGRAM": "Parece ser uma consulta executada pela aplicação. Verifique o plano de execução no ajuste de SQL. Se o tempo máximo de execução única for longo, primeiro observe os índices e a ordem de junção. Se uma única execução for curta, mas o número de chamadas for alto, observe as chamadas repetidas (N+1) e o cache. Coloque o nome do serviço no application_name do pool de conexões.",
         "PLATFORM": "Parece trabalho interno do DB ou da plataforma, como autovacuum ou replicação. Geralmente, nenhuma ação é necessária. Se permanecer no topo, revise os limites de autovacuum e maintenance_work_mem",
-        "MONITOR": "Parece as próprias consultas de estatísticas deste serviço (link schema.pi). Nenhuma ação necessária. Se aparecer com muita frequência, diminua a frequência de sondagem",
+        "MONITOR": "Esta é uma consulta de autocoleta do dbms.pi — a conexão schema.pi é uma instrução fixa que lê apenas visualizações/catálogos estatísticos (pg_stat_*·pg_catalog), portanto, não é uma consulta de negócios e nenhuma ação do cliente é necessária. Se a carga do banco de dados de destino for um problema, reduza o número de vezes que você abre o botão de coleta/tela de monitoramento. As instruções de outras ferramentas de monitoramento que leem as mesmas visualizações estatísticas também são agrupadas aqui.",
         "UNKNOWN": "Não há nenhuma pista sobre a origem. Defina application_name em cada conexão e divida as contas por finalidade; será classificado a partir das próximas amostras"
       },
       "detail": {
@@ -1094,7 +1096,51 @@
       "privOff": "A conta de link não pode ver os detalhes da sessão de outras contas, então nenhuma amostra é coletada. Peça a um administrador de DB para executar GRANT pg_read_all_stats TO {user};",
       "linkUsr": "conta de link",
       "qidOff": "Os detalhes da sessão estão visíveis, mas o ID da consulta está vazio (compute_query_id está desativado). Verifique com SHOW compute_query_id; então execute ALTER SYSTEM SET compute_query_id = 'auto'; e recarregue (SELECT pg_reload_conf();)",
-      "openHint": "Abre o SQL Tuning com a consulta preenchida. Substitua os espaços reservados como $1 por valores reais antes de visualizar o plano"
+      "openHint": "Abre o SQL Tuning com a consulta preenchida. Substitua os espaços reservados como $1 por valores reais antes de visualizar o plano",
+      "detailTitle": "Amostras de Origem"
+    },
+    "diag": {
+      "title": "Diagnosticar Causa",
+      "fix": "Ação:",
+      "none": "Nenhuma causa revelada pelas estatísticas — verifique o plano de execução em SQL Tuning.",
+      "cum": "Nenhuma chamada neste intervalo — cumulativo (desde a redefinição das estatísticas)",
+      "basis": "Base — Máximo de 1 vez {max}ms · Média {mean}ms · Chamadas {calls} · Linhas por chamada {rpc} · Taxa de leitura de disco {read} · Blocos temporários {tmp}",
+      "SELF_MON": {
+        "cause": "Consulta de autocoleta do dbms.pi — instrução de monitoramento que lê apenas visualizações/catálogos estatísticos.",
+        "fix": "Nenhuma ação do cliente é necessária. Se a carga do banco de dados de destino for um problema, reduza o número de vezes que você abre a tela de coleta/monitoramento."
+      },
+      "NO_MAX": {
+        "cause": "Coleta antiga sem um valor de 'máximo de 1 vez', portanto, 'sempre lento/atraso intermitente' não pode ser distinguido.",
+        "fix": "Clique em 'Coletar' uma vez agora para preencher os valores máximos para um diagnóstico preciso."
+      },
+      "SLOW_EACH": {
+        "cause": "Sempre Lento — Demora muito tempo toda vez que é executado, com máximo de {max}ms e média de {mean}ms.",
+        "fix": "① Abra o plano de execução em 'Abrir em SQL Tuning'. ② Se houver varreduras completas (Seq Scan) ou grandes classificações, revise os índices nas colunas de condição WHERE/JOIN. ③ Restrinja as condições para ler apenas as colunas/linhas necessárias."
+      },
+      "SPIKE": {
+        "cause": "Atraso Intermitente — Média {mean}ms, mas ocasionalmente leva muito tempo no máximo {max}ms ({x} vezes a média).",
+        "fix": "① Quando lento, verifique as esperas de bloqueio (wait_event) na guia Atividade/Bloqueios. ② Se apenas a primeira execução for lenta, o cache estava vazio e o disco foi lido. ③ Compare a mesma consulta com valores diferentes em SQL Tuning para ver se o plano de execução muda com base nos valores."
+      },
+      "DISK_READ": {
+        "cause": "Cache Miss — {pct}% ({read} blocos) dos blocos lidos foram lidos do disco, não da memória.",
+        "fix": "① Reduza o intervalo de leitura com índices. ② Restrinja o período/condições da consulta. ③ Se os dados lidos com frequência permanecerem altos, revise shared_buffers (memória)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Estouro de Memória — A classificação/hash excedeu work_mem e escreveu {blk} blocos (aprox. {mb}MB, {perCall} blocos por chamada) para arquivos temporários.",
+        "fix": "① Colocar índices nas colunas ORDER BY/GROUP BY ignora a classificação. ② Primeiro, reduza o número de linhas a serem classificadas (LIMIT interno). ③ Se absolutamente necessário, aumente SET LOCAL work_mem apenas para esta transação de consulta."
+      },
+      "MANY_ROWS": {
+        "cause": "Recuperação Excessiva — Busca {perCall} linhas por chamada.",
+        "fix": "① As listas de tela são recuperadas página por página. ② SELECT seleciona apenas as colunas que são usadas. ③ As agregações são realizadas no banco de dados, e apenas os resultados são recebidos."
+      },
+      "PGRST_EMBED": {
+        "cause": "Instrução de filtro incorporado PostgREST (!inner) — filtrar pais por condições de filho pode varrer todo o conjunto antes das condições de classificação.",
+        "fix": "① Verifique se há índices nas chaves de junção e colunas de filtro. ② Mova os filtros para as condições da tabela pai. ③ Incorpore os filhos em uma consulta pai já existente ou combine-os em uma única função de banco de dados."
+      },
+      "OFFSET_PAGING": {
+        "cause": "Paginação OFFSET — Fica progressivamente mais lenta à medida que lê e descarta as linhas precedentes para páginas posteriores.",
+        "fix": "Mude para paginação por keyset (WHERE id > last_id ORDER BY id LIMIT n) que lê a partir da chave após a última chave recebida."
+      }
     }
   },
   "pipeline": {

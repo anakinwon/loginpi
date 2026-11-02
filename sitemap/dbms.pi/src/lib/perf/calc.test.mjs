@@ -39,7 +39,10 @@ test('증감 : 이전 수집 없음 = 누적치 그대로, 호출 0 이면 평�
 
 test('최고(maxMs) : 증감 아님 — 현재 수집 값 그대로 통과, 033 이전 null 유지', () => {
   const d = qryDelta(
-    [{ ...q('a', 15, 300), maxMs: 900 }, { ...q('b', 3, 30), maxMs: null }],
+    [
+      { ...q('a', 15, 300), maxMs: 900 },
+      { ...q('b', 3, 30), maxMs: null },
+    ],
     [{ ...q('a', 10, 100), maxMs: 500 }],
     false,
   )
@@ -167,5 +170,40 @@ test('마스킹 : 문자열·숫자 상수, $1·식별자 숫자는 유지', () 
   assert.equal(
     maskLiterals("select * from t1 where a = 'x''y' and b = 42 and c = $1"),
     "select * from t1 where a = '?' and b = ? and c = $1",
+  )
+})
+
+test('블록 수(sql/034) : 호출 수처럼 증감, 034 이전 수집(null)은 증감 불가 = null', () => {
+  const b = (qryId, calls, blkRead) => ({
+    ...q(qryId, calls, calls * 10),
+    blkHit: 100,
+    blkRead,
+    tmpBlk: 0,
+  })
+  const d = qryDelta(
+    [b('a', 15, 900), b('b', 3, 50), b('c', 5, 70), q('d', 1, 1)],
+    [b('a', 10, 400), { ...q('c', 1, 10), blkRead: null }],
+    false,
+  )
+  assert.deepEqual(
+    d.map((x) => [x.qryId, x.blkRead, x.blkHit]),
+    [
+      ['a', 500, 0],
+      ['b', 50, 100], // 신규 = 누적치
+      ['c', null, null], // 이전 수집에 칼럼 없음(034 이전) = 증감 불가
+      ['d', null, null], // 현재 수집에 칼럼 없음
+    ],
+  )
+})
+
+test('증감 : 누적치(cum*)는 덮어쓰기 전 현재 수집값 그대로', () => {
+  const [d] = qryDelta(
+    [{ ...q('a', 10, 1000, 500), blkRead: 70 }],
+    [{ ...q('a', 10, 1000, 500), blkRead: 30 }],
+    false,
+  )
+  assert.deepEqual(
+    [d.calls, d.cumCalls, d.cumMeanMs, d.cumRows, d.blkRead, d.cumBlkRead],
+    [0, 10, 100, 500, 40, 70],
   )
 })

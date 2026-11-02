@@ -1026,7 +1026,9 @@
       "openSqlLab": "Open in SQL Tuning",
       "acct": "Account",
       "sortMax": "Max single execution time",
-      "maxMs": "Max single ms"
+      "maxMs": "Max single ms",
+      "diagToggle": "Diagnose Cause",
+      "noMax": "No max value — {n} items are from older collections without a max value, so they are temporarily sorted by average (not by total time). Collecting now will populate the max value."
     },
     "health": {
       "empty": "No snapshots yet. Press Collect now on the Collect tab",
@@ -1080,7 +1082,7 @@
         "BATCH": "Looks like a batch or scheduled job. Spread run times away from business peaks and shrink the work per commit. Check indexes and statistics (ANALYZE) on the target tables, and split long transactions. Putting the job name in application_name makes the next classification more precise",
         "PROGRAM": "This appears to be a query executed by the application. Check the execution plan in SQL tuning. If the max single execution time is long, first look at indexes and join order. If a single execution is short but the call count is high, look at repeated calls (N+1) and caching. Put the service name in the application_name of the connection pool.",
         "PLATFORM": "Looks like DB or platform internal work such as autovacuum or replication. Usually no action is needed. If it stays at the top, review autovacuum thresholds and maintenance_work_mem",
-        "MONITOR": "Looks like this service's own statistics queries (schema.pi link). No action needed. If it shows up too often, lower the polling frequency",
+        "MONITOR": "This is a dbms.pi self-collection query — the schema.pi connection is a fixed statement that only reads statistical views/catalogs (pg_stat_*·pg_catalog), so it is not a business query and no customer action is required. If the target database load is an issue, reduce the number of times you open the collection button/monitoring screen. Statements from other monitoring tools that read the same statistical views are also grouped here.",
         "UNKNOWN": "There is no clue to the source. Set application_name on every connection and split accounts by purpose; it will be classified from the next samples"
       },
       "detail": {
@@ -1096,7 +1098,51 @@
       "privOff": "The link account cannot see other accounts' session details, so no samples are collected. Ask a DB admin to run GRANT pg_read_all_stats TO {user};",
       "linkUsr": "link account",
       "qidOff": "Session details are visible but the query ID is empty (compute_query_id is off). Check with SHOW compute_query_id; then run ALTER SYSTEM SET compute_query_id = 'auto'; and reload (SELECT pg_reload_conf();)",
-      "openHint": "Opens SQL Tuning with the query filled in. Replace placeholders like $1 with real values before viewing the plan"
+      "openHint": "Opens SQL Tuning with the query filled in. Replace placeholders like $1 with real values before viewing the plan",
+      "detailTitle": "Source Samples"
+    },
+    "diag": {
+      "title": "Diagnose Cause",
+      "fix": "Action:",
+      "none": "No cause revealed by statistics — check the execution plan in SQL Tuning.",
+      "cum": "No calls in this interval — cumulative (since stats reset)",
+      "basis": "Basis — Max 1-time {max}ms · Avg {mean}ms · Calls {calls} · Rows per call {rpc} · Disk read ratio {read} · Temp blocks {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi self-collection query — monitoring statement that reads only statistical views/catalogs.",
+        "fix": "No customer action is required. If the target database load is an issue, reduce the number of times you open the collection/monitoring screen."
+      },
+      "NO_MAX": {
+        "cause": "Old collection without a 'max 1-time' value, so 'always slow/intermittent delay' cannot be distinguished.",
+        "fix": "Click 'Collect' once now to fill max values for accurate diagnosis."
+      },
+      "SLOW_EACH": {
+        "cause": "Always Slow — Takes a long time every time it runs, with max {max}ms and average {mean}ms.",
+        "fix": "① Open the execution plan in 'Open in SQL Tuning'. ② If there are full scans (Seq Scan) or large sorts, review indexes on WHERE/JOIN condition columns. ③ Narrow conditions to read only necessary columns/rows."
+      },
+      "SPIKE": {
+        "cause": "Intermittent Delay — Average {mean}ms, but occasionally takes a long time at max {max}ms ({x} times the average).",
+        "fix": "① When slow, check for lock waits (wait_event) in the Activity/Locks tab. ② If only the first execution is slow, the cache was empty and disk was read. ③ Compare the same query with different values in SQL Tuning to see if the execution plan changes based on values."
+      },
+      "DISK_READ": {
+        "cause": "Cache Miss — {pct}% ({read} blocks) of read blocks were read from disk, not memory.",
+        "fix": "① Reduce the read range with indexes. ② Narrow the query period/conditions. ③ If frequently read data remains high, review shared_buffers (memory)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Memory Overflow — Sort/hash exceeded work_mem and wrote {blk} blocks (approx. {mb}MB, {perCall} blocks per call) to temporary files.",
+        "fix": "① Placing indexes on ORDER BY/GROUP BY columns skips sorting. ② First, reduce the number of rows to sort (LIMIT inside). ③ If absolutely necessary, increase SET LOCAL work_mem only for this query transaction."
+      },
+      "MANY_ROWS": {
+        "cause": "Excessive Retrieval — Fetches {perCall} rows per call.",
+        "fix": "① Screen lists are retrieved page by page. ② SELECT only selects the columns that are used. ③ Aggregations are performed in the database, and only the results are received."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST embedded filter (!inner) statement — filtering parents by child conditions can scan the entire set before classification conditions.",
+        "fix": "① Check if there are indexes on join keys and filter columns. ② Move filters to the parent table's conditions. ③ Embed children into an already existing parent query or combine them into a single database function."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET Paging — Gets progressively slower as it reads and discards preceding rows for later pages.",
+        "fix": "Change to keyset paging (WHERE id > last_id ORDER BY id LIMIT n) which reads from the key after the last received key."
+      }
     }
   },
   "pipeline": {

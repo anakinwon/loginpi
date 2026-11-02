@@ -1026,7 +1026,9 @@
       "openSqlLab": "SQL Tuning-də açın",
       "acct": "Hesab",
       "sortMax": "Maksimum tək icra vaxtı",
-      "maxMs": "Maksimum tək ms"
+      "maxMs": "Maksimum tək ms",
+      "diagToggle": "Səbəbi diaqnoz edin",
+      "noMax": "Maksimum dəyər yoxdur — {n} element maksimum dəyəri olmayan köhnə kolleksiyalardandır, buna görə də müvəqqəti olaraq orta dəyərə görə sıralanır (ümumi vaxta görə deyil). İndi toplamaq maksimum dəyəri dolduracaq."
     },
     "health": {
       "empty": "Hələ heç bir anlıq görüntü yoxdur. Topla sekmesinde İndi topla düyməsini basın",
@@ -1080,7 +1082,7 @@
         "BATCH": "Görünür ki, bir partiya və ya planlaşdırılmış işdir. İşləmə müddətlərini iş piklərindən uzaqlaşdırın və hər commit üçün işi azaldın. Hədəf cədvəllərdə indeksləri və statistikaları (ANALYZE) yoxlayın və uzun əməliyyatları bölün. İş adını application_name-ə daxil etmək növbəti təsnifatı daha dəqiq edir.",
         "PROGRAM": "Bu, tətbiq tərəfindən icra edilən sorğu kimi görünür. SQL tənzimləməsində icra planını yoxlayın. Əgər maksimum tək icra vaxtı uzundursa, əvvəlcə indekslərə və birləşmə sırasına baxın. Əgər tək icra qısa, lakin çağırış sayı yüksəkdirsə, təkrarlanan çağırışlara (N+1) və keşləməyə baxın. Xidmət adını bağlantı hovuzunun application_name-inə daxil edin.",
         "PLATFORM": "Görünür ki, autovacuum və ya replikasiya kimi DB və ya platforma daxili işdir. Adətən heç bir tədbirə ehtiyac yoxdur. Əgər yuxarıda qalırsa, autovacuum həddlərini və maintenance_work_mem-i nəzərdən keçirin.",
-        "MONITOR": "Görünür ki, bu xidmətin öz statistika sorğularıdır (schema.pi bağlantısı). Heç bir tədbirə ehtiyac yoxdur. Əgər çox tez-tez görünürsə, sorğu tezliyini azaldın.",
+        "MONITOR": "Bu, dbms.pi öz-özünə toplama sorğusudur — schema.pi bağlantısı yalnız statistik görünüşləri/kataloqları (pg_stat_*·pg_catalog) oxuyan sabit bir ifadə olduğundan, bu, iş sorğusu deyil və müştəri tərəfindən heç bir tədbir tələb olunmur. Əgər hədəf verilənlər bazasının yüklənməsi problemdirsə, toplama düyməsini/monitorinq ekranını açma sayını azaldın. Eyni statistik görünüşləri oxuyan digər monitorinq alətlərindən gələn ifadələr də burada qruplaşdırılır.",
         "UNKNOWN": "Mənbəyə dair heç bir ipucu yoxdur. Hər əlaqədə application_name təyin edin və hesabları məqsədə görə bölün; növbəti nümunələrdən təsnif ediləcək."
       },
       "detail": {
@@ -1096,7 +1098,51 @@
       "privOff": "Bağlantı hesabı digər hesabların sessiya detallarını görə bilmir, buna görə nümunələr toplanmır. DB administratorundan GRANT pg_read_all_stats TO {user}; əmrini işə salmasını xahiş edin.",
       "linkUsr": "bağlantı hesabı",
       "qidOff": "Sessiya detalları görünür, lakin sorğu ID-si boşdur (compute_query_id söndürülüb). SHOW compute_query_id; ilə yoxlayın, sonra ALTER SYSTEM SET compute_query_id = 'auto'; əmrini işə salın və yenidən yükləyin (SELECT pg_reload_conf();).",
-      "openHint": "Sorğu doldurulmuş SQL Tuning-i açır. Planı görməzdən əvvəl $1 kimi yer tutucuları real dəyərlərlə əvəz edin."
+      "openHint": "Sorğu doldurulmuş SQL Tuning-i açır. Planı görməzdən əvvəl $1 kimi yer tutucuları real dəyərlərlə əvəz edin.",
+      "detailTitle": "Mənbə Nümunələri"
+    },
+    "diag": {
+      "title": "Səbəbi diaqnoz edin",
+      "fix": "Fəaliyyət:",
+      "none": "Statistikalarla heç bir səbəb aşkar edilməyib — SQL Tuning-də icra planını yoxlayın.",
+      "cum": "Bu intervalda zəng yoxdur — kumulyativ (statistikalar sıfırlandıqdan sonra)",
+      "basis": "Əsas — Maksimum 1 dəfə {max}ms · Orta {mean}ms · Zənglər {calls} · Hər zəngə düşən sətirlər {rpc} · Disk oxuma nisbəti {read} · Müvəqqəti bloklar {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi öz-özünə toplama sorğusu — yalnız statistik görünüşləri/kataloqları oxuyan monitorinq ifadəsi.",
+        "fix": "Müştəri tədbiri tələb olunmur. Əgər hədəf verilənlər bazasının yüklənməsi problemdirsə, toplama/monitorinq ekranını açma sayını azaldın."
+      },
+      "NO_MAX": {
+        "cause": "'Maksimum 1 dəfə' dəyəri olmayan köhnə kolleksiya, buna görə də 'həmişə yavaş/aralıqlı gecikmə' fərqləndirilə bilməz.",
+        "fix": "Dəqiq diaqnoz üçün maksimum dəyərləri doldurmaq üçün indi bir dəfə 'Topla' düyməsini basın."
+      },
+      "SLOW_EACH": {
+        "cause": "Həmişə Yavaş — Hər dəfə işləyəndə uzun çəkir, maksimum {max}ms və orta {mean}ms.",
+        "fix": "① 'SQL Tuning-də aç' ilə icra planını açın. ② Əgər tam skanlar (Seq Scan) və ya böyük sıralamalar varsa, WHERE/JOIN şərt sütunlarındakı indeksləri nəzərdən keçirin. ③ Yalnız zəruri sütunları/sətirləri oxumaq üçün şərtləri daraldın."
+      },
+      "SPIKE": {
+        "cause": "Aralıqlı Gecikmə — Orta {mean}ms, lakin bəzən maksimum {max}ms ({x} dəfə orta) ilə uzun çəkir.",
+        "fix": "① Yavaş olduqda, Fəaliyyət/Kilidlər tabında kilid gözləmələrini (wait_event) yoxlayın. ② Əgər yalnız ilk icra yavaşdırsa, keş boş idi və disk oxundu. ③ İcra planının dəyərlərə əsasən dəyişib-dəyişmədiyini görmək üçün SQL Tuning-də eyni sorğunu müxtəlif dəyərlərlə müqayisə edin."
+      },
+      "DISK_READ": {
+        "cause": "Keş Miss — Oxunan blokların {pct}%-i ({read} blok) yaddaşdan deyil, diskdən oxundu.",
+        "fix": "① İndekslərlə oxuma diapazonunu azaldın. ② Sorğu müddətini/şərtlərini daraldın. ③ Əgər tez-tez oxunan məlumatlar yüksək qalırsa, shared_buffers (yaddaş) nəzərdən keçirin."
+      },
+      "TEMP_SPILL": {
+        "cause": "Yaddaş Daşması — Sıralama/heş work_mem-i aşdı və müvəqqəti fayllara {blk} blok (təxminən {mb}MB, hər zəngə {perCall} blok) yazdı.",
+        "fix": "① ORDER BY/GROUP BY sütunlarına indekslər yerləşdirmək sıralamanı atlayır. ② Əvvəlcə sıralanacaq sətirlərin sayını azaldın (LIMIT daxilində). ③ Tamamilə zəruridirsə, yalnız bu sorğu əməliyyatı üçün SET LOCAL work_mem-i artırın."
+      },
+      "MANY_ROWS": {
+        "cause": "Həddindən artıq Çıxarış — Hər zəngə {perCall} sətir gətirir.",
+        "fix": "① Ekran siyahıları səhifə-səhifə alınır. ② SELECT yalnız istifadə olunan sütunları seçir. ③ Aqreqasiyalar verilənlər bazasında aparılır və yalnız nəticələr alınır."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST daxili filtr (!inner) ifadəsi — uşaq şərtləri ilə valideynləri filtrləmək təsnifat şərtlərindən əvvəl bütün dəsti skan edə bilər.",
+        "fix": "① Birləşmə açarları və filtr sütunlarında indekslərin olub olmadığını yoxlayın. ② Filtləri ana cədvəlin şərtlərinə köçürün. ③ Uşaqları artıq mövcud olan ana sorğuya daxil edin və ya onları tək bir verilənlər bazası funksiyasına birləşdirin."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET Səhifələmə — Sonrakı səhifələr üçün əvvəlki sətirləri oxuyub atdığı üçün getdikcə yavaşlayır.",
+        "fix": "Son qəbul edilmiş açardan sonra oxuyan açar dəsti səhifələməsinə (WHERE id > last_id ORDER BY id LIMIT n) dəyişdirin."
+      }
     }
   },
   "pipeline": {

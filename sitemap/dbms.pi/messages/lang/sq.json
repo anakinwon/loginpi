@@ -1026,7 +1026,9 @@
       "openSqlLab": "Hap në SQL Tuning",
       "acct": "Llogaria",
       "sortMax": "Koha maksimale e ekzekutimit të vetëm",
-      "maxMs": "Maksimumi i vetëm ms"
+      "maxMs": "Maksimumi i vetëm ms",
+      "diagToggle": "Diagnostikoni Shkakun",
+      "noMax": "Pa vlerë maksimale — {n} artikuj janë nga koleksione më të vjetra pa vlerë maksimale, kështu që ato janë renditur përkohësisht sipas mesatares (jo sipas kohës totale). Mbledhja tani do të popullojë vlerën maksimale."
     },
     "health": {
       "empty": "Nuk ka ende pamje. Shtypni Mblidh tani në skedën Mblidh",
@@ -1080,7 +1082,7 @@
         "BATCH": "Duket si një grup ose punë e planifikuar. Shpërndani kohët e ekzekutimit larg pikut të biznesit dhe zvogëloni punën për çdo angazhim. Kontrolloni indekset dhe statistikat (ANALYZE) në tabelat e synuara, dhe ndani transaksionet e gjata. Vendosja e emrit të punës në application_name e bën klasifikimin tjetër më të saktë",
         "PROGRAM": "Kjo duket të jetë një pyetje e ekzekutuar nga aplikacioni. Kontrolloni planin e ekzekutimit në akordimin e SQL. Nëse koha maksimale e ekzekutimit të vetëm është e gjatë, shikoni së pari indekset dhe rendin e bashkimit. Nëse një ekzekutim i vetëm është i shkurtër por numri i thirrjeve është i lartë, shikoni thirrjet e përsëritura (N+1) dhe ruajtjen në cache. Vendosni emrin e shërbimit në application_name të grupit të lidhjeve.",
         "PLATFORM": "Duket si punë e brendshme e DB ose platformës si autovacuum ose replikimi. Zakonisht nuk nevojitet asnjë veprim. Nëse qëndron në krye, rishikoni pragjet e autovacuum dhe maintenance_work_mem",
-        "MONITOR": "Duket si kërkesat e statistikave të këtij shërbimi (lidhja schema.pi). Nuk nevojitet asnjë veprim. Nëse shfaqet shumë shpesh, ulni frekuencën e votimit",
+        "MONITOR": "Kjo është një pyetje vetë-mbledhëse e dbms.pi — lidhja schema.pi është një deklaratë fikse që lexon vetëm pamjet/katalogët statistikorë (pg_stat_*·pg_catalog), kështu që nuk është një pyetje biznesi dhe nuk kërkohet asnjë veprim nga klienti. Nëse ngarkesa e bazës së të dhënave të synuar është problem, zvogëloni numrin e herëve që hapni butonin e mbledhjes/ekranin e monitorimit. Deklaratat nga mjete të tjera monitorimi që lexojnë të njëjtat pamje statistikore grupohen gjithashtu këtu.",
         "UNKNOWN": "Nuk ka asnjë të dhënë për burimin. Vendosni application_name në çdo lidhje dhe ndani llogaritë sipas qëllimit; do të klasifikohet nga mostrat e ardhshme"
       },
       "detail": {
@@ -1096,7 +1098,51 @@
       "privOff": "Llogaria e lidhjes nuk mund të shohë detajet e sesionit të llogarive të tjera, kështu që nuk mblidhen mostra. Kërkoni një administrator DB të ekzekutojë GRANT pg_read_all_stats TO {user};",
       "linkUsr": "llogaria e lidhjes",
       "qidOff": "Detajet e sesionit janë të dukshme por ID e kërkesës është bosh (compute_query_id është i fikur). Kontrolloni me SHOW compute_query_id; pastaj ekzekutoni ALTER SYSTEM SET compute_query_id = 'auto'; dhe ringarkoni (SELECT pg_reload_conf();)",
-      "openHint": "Hap SQL Tuning me kërkesën e plotësuar. Zëvendësoni vendmbajtësit si $1 me vlera reale para se të shikoni planin"
+      "openHint": "Hap SQL Tuning me kërkesën e plotësuar. Zëvendësoni vendmbajtësit si $1 me vlera reale para se të shikoni planin",
+      "detailTitle": "Mostrat e Burimit"
+    },
+    "diag": {
+      "title": "Diagnostikoni Shkakun",
+      "fix": "Veprimi:",
+      "none": "Asnjë shkak i zbuluar nga statistikat — kontrolloni planin e ekzekutimit në SQL Tuning.",
+      "cum": "Asnjë thirrje në këtë interval — kumulative (që nga rivendosja e statistikave)",
+      "basis": "Baza — Maksimumi 1 herë {max}ms · Mesatarja {mean}ms · Thirrje {calls} · Rreshta për thirrje {rpc} · Raporti i leximit të diskut {read} · Blloqe të përkohshme {tmp}",
+      "SELF_MON": {
+        "cause": "Pyetje vetë-mbledhëse e dbms.pi — deklaratë monitorimi që lexon vetëm pamjet/katalogët statistikorë.",
+        "fix": "Nuk kërkohet asnjë veprim nga klienti. Nëse ngarkesa e bazës së të dhënave të synuar është problem, zvogëloni numrin e herëve që hapni ekranin e mbledhjes/monitorimit."
+      },
+      "NO_MAX": {
+        "cause": "Koleksion i vjetër pa vlerë 'maksimumi 1 herë', kështu që 'gjithmonë i ngadaltë/vonesë e ndërprerë' nuk mund të dallohet.",
+        "fix": "Klikoni 'Mblidh' një herë tani për të plotësuar vlerat maksimale për diagnozë të saktë."
+      },
+      "SLOW_EACH": {
+        "cause": "Gjithmonë i Ngadaltë — Zgjat shumë kohë sa herë që ekzekutohet, me maksimum {max}ms dhe mesatare {mean}ms.",
+        "fix": "① Hapni planin e ekzekutimit në 'Hap në SQL Tuning'. ② Nëse ka skanime të plota (Seq Scan) ose renditje të mëdha, rishikoni indekset në kolonat e kushteve WHERE/JOIN. ③ Ngushtoni kushtet për të lexuar vetëm kolonat/rreshtat e nevojshëm."
+      },
+      "SPIKE": {
+        "cause": "Vonesë e Ndërprerë — Mesatarja {mean}ms, por herë pas here zgjat shumë kohë në maksimum {max}ms ({x} herë mesatarja).",
+        "fix": "① Kur është i ngadaltë, kontrolloni për pritjet e bllokimit (wait_event) në skedën Aktivitet/Bllokime. ② Nëse vetëm ekzekutimi i parë është i ngadaltë, cache ishte bosh dhe disku u lexua. ③ Krahasoni të njëjtën pyetje me vlera të ndryshme në SQL Tuning për të parë nëse plani i ekzekutimit ndryshon bazuar në vlera."
+      },
+      "DISK_READ": {
+        "cause": "Mungesë Cache — {pct}% ({read} blloqe) të blloqeve të lexuara u lexuan nga disku, jo nga memoria.",
+        "fix": "① Zvogëloni diapazonin e leximit me indekse. ② Ngushtoni periudhën/kushtet e pyetjes. ③ Nëse të dhënat e lexuara shpesh mbeten të larta, rishikoni shared_buffers (memoria)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Mbushje Memorie — Renditja/hash kaloi work_mem dhe shkroi {blk} blloqe (afërsisht {mb}MB, {perCall} blloqe për thirrje) në skedarë të përkohshëm.",
+        "fix": "① Vendosja e indekseve në kolonat ORDER BY/GROUP BY anashkalon renditjen. ② Së pari, zvogëloni numrin e rreshtave për t'u renditur (LIMIT brenda). ③ Nëse është absolutisht e nevojshme, rritni SET LOCAL work_mem vetëm për këtë transaksion pyetjeje."
+      },
+      "MANY_ROWS": {
+        "cause": "Marrje e Tepërt — Merr {perCall} rreshta për thirrje.",
+        "fix": "① Listat e ekranit merren faqe pas faqe. ② SELECT zgjedh vetëm kolonat që përdoren. ③ Agregimet kryhen në bazën e të dhënave dhe merren vetëm rezultatet."
+      },
+      "PGRST_EMBED": {
+        "cause": "Deklaratë e filtrit të integruar PostgREST (!inner) — filtrimi i prindërve sipas kushteve të fëmijëve mund të skanojë të gjithë grupin para kushteve të klasifikimit.",
+        "fix": "① Kontrolloni nëse ka indekse në çelësat e bashkimit dhe kolonat e filtrit. ② Zhvendosni filtrat në kushtet e tabelës prind. ③ Futni fëmijët në një pyetje prind ekzistuese ose kombinoni ato në një funksion të vetëm të bazës së të dhënave."
+      },
+      "OFFSET_PAGING": {
+        "cause": "Paginim OFFSET — Bëhet gradualisht më i ngadaltë ndërsa lexon dhe hedh rreshtat paraprakë për faqet e mëvonshme.",
+        "fix": "Ndryshoni në paginim keyset (WHERE id > last_id ORDER BY id LIMIT n) i cili lexon nga çelësi pas çelësit të fundit të marrë."
+      }
     }
   },
   "pipeline": {

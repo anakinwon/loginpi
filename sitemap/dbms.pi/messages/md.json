@@ -1018,7 +1018,9 @@
       "openSqlLab": "Deschide în SQL Tuning",
       "acct": "Cont",
       "sortMax": "Timp maxim de execuție individual",
-      "maxMs": "Max individual ms"
+      "maxMs": "Max individual ms",
+      "diagToggle": "Diagnosticați cauza",
+      "noMax": "Fără valoare maximă — {n} elemente provin din colecții mai vechi fără o valoare maximă, deci sunt sortate temporar după medie (nu după timpul total). Colectarea acum va popula valoarea maximă."
     },
     "health": {
       "empty": "Nu există încă instantanee. Apăsați Colectează acum pe fila Colectează",
@@ -1071,7 +1073,7 @@
         "BATCH": "Pare a fi un lot sau o lucrare programată. Distribuiți timpii de execuție în afara orelor de vârf ale afacerii și reduceți volumul de muncă per commit. Verificați indecșii și statisticile (ANALYZE) pe tabelele țintă și împărțiți tranzacțiile lungi. Includerea numelui lucrării în application_name face următoarea clasificare mai precisă.",
         "PROGRAM": "Aceasta pare a fi o interogare executată de aplicație. Verificați planul de execuție în optimizarea SQL. Dacă timpul maxim de execuție individual este lung, uitați-vă mai întâi la indecși și ordinea de join. Dacă o singură execuție este scurtă, dar numărul de apeluri este mare, uitați-vă la apelurile repetate (N+1) și la cache. Puneți numele serviciului în application_name al pool-ului de conexiuni.",
         "PLATFORM": "Pare a fi o lucrare internă a DB-ului sau a platformei, cum ar fi autovacuum sau replicare. De obicei nu este necesară nicio acțiune. Dacă rămâne în top, revizuiți pragurile autovacuum și maintenance_work_mem.",
-        "MONITOR": "Pare a fi interogările de statistici ale acestui serviciu (link schema.pi). Nu este necesară nicio acțiune. Dacă apare prea des, reduceți frecvența de interogare.",
+        "MONITOR": "Aceasta este o interogare de auto-colectare dbms.pi — conexiunea schema.pi este o instrucțiune fixă care citește doar vizualizări/cataloage statistice (pg_stat_*·pg_catalog), deci nu este o interogare de afaceri și nu necesită acțiunea clientului. Dacă încărcarea bazei de date țintă este o problemă, reduceți numărul de ori în care deschideți butonul de colectare/ecranul de monitorizare. Instrucțiunile de la alte instrumente de monitorizare care citesc aceleași vizualizări statistice sunt, de asemenea, grupate aici.",
         "UNKNOWN": "Nu există niciun indiciu despre sursă. Setați application_name la fiecare conexiune și împărțiți conturile după scop; va fi clasificat din următoarele eșantioane."
       },
       "detail": {
@@ -1086,7 +1088,51 @@
       "privOff": "Contul de legătură nu poate vedea detaliile sesiunilor altor conturi, deci nu sunt colectate eșantioane. Rugați un administrator DB să ruleze GRANT pg_read_all_stats TO {user};",
       "linkUsr": "cont de legătură",
       "qidOff": "Detaliile sesiunii sunt vizibile, dar ID-ul interogării este gol (compute_query_id este dezactivat). Verificați cu SHOW compute_query_id; apoi rulați ALTER SYSTEM SET compute_query_id = 'auto'; și reîncărcați (SELECT pg_reload_conf();)",
-      "openHint": "Deschide SQL Tuning cu interogarea completată. Înlocuiți placeholder-ele precum $1 cu valori reale înainte de a vizualiza planul."
+      "openHint": "Deschide SQL Tuning cu interogarea completată. Înlocuiți placeholder-ele precum $1 cu valori reale înainte de a vizualiza planul.",
+      "detailTitle": "Mostre sursă"
+    },
+    "diag": {
+      "title": "Diagnosticați cauza",
+      "fix": "Acțiune:",
+      "none": "Nicio cauză relevată de statistici — verificați planul de execuție în SQL Tuning.",
+      "cum": "Niciun apel în acest interval — cumulativ (de la resetarea statisticilor)",
+      "basis": "Bază — Max o singură dată {max}ms · Medie {mean}ms · Apeluri {calls} · Rânduri per apel {rpc} · Raport citire disc {read} · Blocuri temporare {tmp}",
+      "SELF_MON": {
+        "cause": "Interogare de auto-colectare dbms.pi — instrucțiune de monitorizare care citește doar vizualizări/cataloage statistice.",
+        "fix": "Nu este necesară nicio acțiune a clientului. Dacă încărcarea bazei de date țintă este o problemă, reduceți numărul de ori în care deschideți ecranul de colectare/monitorizare."
+      },
+      "NO_MAX": {
+        "cause": "Colectare veche fără o valoare 'maximă o singură dată', deci 'întotdeauna lent/întârziere intermitentă' nu poate fi distins.",
+        "fix": "Faceți clic pe 'Colectează' o dată acum pentru a completa valorile maxime pentru o diagnosticare precisă."
+      },
+      "SLOW_EACH": {
+        "cause": "Întotdeauna lent — Durează mult timp de fiecare dată când rulează, cu maxim {max}ms și medie {mean}ms.",
+        "fix": "① Deschideți planul de execuție în 'Deschide în SQL Tuning'. ② Dacă există scanări complete (Seq Scan) sau sortări mari, revizuiți indecșii pe coloanele condițiilor WHERE/JOIN. ③ Restrângeți condițiile pentru a citi doar coloanele/rândurile necesare."
+      },
+      "SPIKE": {
+        "cause": "Întârziere intermitentă — Medie {mean}ms, dar ocazional durează mult timp la maxim {max}ms ({x} ori media).",
+        "fix": "① Când este lent, verificați așteptările de blocare (wait_event) în fila Activitate/Blocări. ② Dacă doar prima execuție este lentă, cache-ul a fost gol și discul a fost citit. ③ Comparați aceeași interogare cu valori diferite în SQL Tuning pentru a vedea dacă planul de execuție se modifică în funcție de valori."
+      },
+      "DISK_READ": {
+        "cause": "Cache Miss — {pct}% ({read} blocuri) din blocurile citite au fost citite de pe disc, nu din memorie.",
+        "fix": "① Reduceți intervalul de citire cu indecși. ② Restrângeți perioada/condițiile interogării. ③ Dacă datele citite frecvent rămân ridicate, revizuiți shared_buffers (memoria)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Depășire memorie — Sortarea/hash-ul a depășit work_mem și a scris {blk} blocuri (aprox. {mb}MB, {perCall} blocuri per apel) în fișiere temporare.",
+        "fix": "① Plasarea indecșilor pe coloanele ORDER BY/GROUP BY omite sortarea. ② Mai întâi, reduceți numărul de rânduri de sortat (LIMIT în interior). ③ Dacă este absolut necesar, măriți SET LOCAL work_mem doar pentru această tranzacție de interogare."
+      },
+      "MANY_ROWS": {
+        "cause": "Recuperare excesivă — Extrage {perCall} rânduri per apel.",
+        "fix": "① Listele de ecran sunt preluate pagină cu pagină. ② SELECT selectează doar coloanele utilizate. ③ Agregările sunt efectuate în baza de date și se primesc doar rezultatele."
+      },
+      "PGRST_EMBED": {
+        "cause": "Instrucțiune de filtru încorporat PostgREST (!inner) — filtrarea părinților după condițiile copilului poate scana întregul set înainte de condițiile de clasificare.",
+        "fix": "① Verificați dacă există indexuri pe cheile de join și coloanele de filtrare. ② Mutați filtrele la condițiile tabelului părinte. ③ Încorporați copiii într-o interogare părinte existentă sau combinați-i într-o singură funcție de bază de date."
+      },
+      "OFFSET_PAGING": {
+        "cause": "Paginare OFFSET — Devine progresiv mai lentă pe măsură ce citește și aruncă rândurile precedente pentru paginile ulterioare.",
+        "fix": "Schimbați la paginarea keyset (WHERE id > last_id ORDER BY id LIMIT n) care citește de la cheia de după ultima cheie primită."
+      }
     }
   },
   "pipeline": {

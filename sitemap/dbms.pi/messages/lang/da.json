@@ -532,6 +532,7 @@
       "INVALID_INPUT": "Anmodningen er ugyldig."
     },
     "board": {
+      "subtitle": "Hvad skal der gøres på denne DB lige nu – 14 signaler om OK, advarsel eller risiko og løsninger, på et øjeblik.",
       "refresh": {
         "updated": "Pr. {time} · opdateres hvert minut",
         "now": "Opdater nu",
@@ -1021,7 +1022,9 @@
       "openSqlLab": "Åbn i SQL Tuning",
       "acct": "Konto",
       "sortMax": "Maks. enkelt udførelsestid",
-      "maxMs": "Maks. enkelt ms"
+      "maxMs": "Maks. enkelt ms",
+      "diagToggle": "Diagnosticer årsag",
+      "noMax": "Ingen maksimumværdi — {n} elementer er fra ældre samlinger uden en maksimumværdi, så de er midlertidigt sorteret efter gennemsnit (ikke efter samlet tid). Indsamling nu vil udfylde maksimumværdien."
     },
     "health": {
       "empty": "Ingen snapshots endnu. Tryk på 'Saml nu' under fanen 'Saml'",
@@ -1075,7 +1078,7 @@
         "BATCH": "Ser ud til at være en batch- eller planlagt job. Spred køretider væk fra forretningsspidser og reducer arbejdet pr. commit. Kontroller indekser og statistikker (ANALYZE) på måltabellerne, og opdel lange transaktioner. At sætte jobnavnet i application_name gør den næste klassificering mere præcis.",
         "PROGRAM": "Dette ser ud til at være en forespørgsel udført af applikationen. Kontroller udførelsesplanen i SQL-justering. Hvis den maksimale enkelte udførelsestid er lang, skal du først se på indekser og join-rækkefølge. Hvis en enkelt udførelse er kort, men antallet af kald er højt, skal du se på gentagne kald (N+1) og caching. Indsæt servicenavnet i connection poolens application_name.",
         "PLATFORM": "Ser ud til at være DB- eller platforminternt arbejde som autovacuum eller replikering. Normalt er der ikke behov for handling. Hvis det forbliver øverst, gennemgå autovacuum-tærskler og maintenance_work_mem.",
-        "MONITOR": "Ser ud til at være denne services egne statistikforespørgsler (schema.pi-link). Ingen handling nødvendig. Hvis det vises for ofte, sænk pollingfrekvensen.",
+        "MONITOR": "Dette er en dbms.pi selvindsamlingsforespørgsel — schema.pi-forbindelsen er en fast erklæring, der kun læser statistiske visninger/kataloger (pg_stat_*·pg_catalog), så det er ikke en forretningsforespørgsel, og der kræves ingen kundehandling. Hvis belastningen på måldatabasen er et problem, skal du reducere antallet af gange, du åbner indsamlingsknappen/overvågningsskærmen. Erklæringer fra andre overvågningsværktøjer, der læser de samme statistiske visninger, grupperes også her.",
         "UNKNOWN": "Der er ingen spor til kilden. Indstil application_name på hver forbindelse og opdel konti efter formål; det vil blive klassificeret fra de næste prøver."
       },
       "detail": {
@@ -1091,7 +1094,51 @@
       "privOff": "Linkkontoen kan ikke se andre kontosessionsdetaljer, så ingen prøver indsamles. Bed en DB-administrator om at køre GRANT pg_read_all_stats TO {user};",
       "linkUsr": "linkkonto",
       "qidOff": "Sessionsdetaljer er synlige, men forespørgsels-ID'et er tomt (compute_query_id er slået fra). Kontroller med SHOW compute_query_id; kør derefter ALTER SYSTEM SET compute_query_id = 'auto'; og genindlæs (SELECT pg_reload_conf();)",
-      "openHint": "Åbner SQL Tuning med forespørgslen udfyldt. Erstat pladsholdere som $1 med reelle værdier, før du ser planen."
+      "openHint": "Åbner SQL Tuning med forespørgslen udfyldt. Erstat pladsholdere som $1 med reelle værdier, før du ser planen.",
+      "detailTitle": "Kildeeksempler"
+    },
+    "diag": {
+      "title": "Diagnosticer årsag",
+      "fix": "Handling:",
+      "none": "Ingen årsag afsløret af statistikker — kontroller udførelsesplanen i SQL Tuning.",
+      "cum": "Ingen kald i dette interval – kumulativ (siden nulstilling af statistik)",
+      "basis": "Grundlag — Maks. 1-gangs {max}ms · Gennemsnit {mean}ms · Kald {calls} · Rækker pr. kald {rpc} · Disk læseforhold {read} · Midlertidige blokke {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi selvindsamlingsforespørgsel — overvågningsudsagn, der kun læser statistiske visninger/kataloger.",
+        "fix": "Ingen kundehandling er påkrævet. Hvis belastningen på måldatabasen er et problem, skal du reducere antallet af gange, du åbner indsamlings-/overvågningsskærmen."
+      },
+      "NO_MAX": {
+        "cause": "Gammel samling uden en 'maks. 1-gangs' værdi, så 'altid langsom/intermitterende forsinkelse' kan ikke skelnes.",
+        "fix": "Klik på 'Indsaml' én gang nu for at udfylde maksimumværdier for nøjagtig diagnose."
+      },
+      "SLOW_EACH": {
+        "cause": "Altid langsom — Tager lang tid hver gang den kører, med maks. {max}ms og gennemsnit {mean}ms.",
+        "fix": "① Åbn udførelsesplanen i 'Åbn i SQL Tuning'. ② Hvis der er fulde scanninger (Seq Scan) eller store sorteringer, gennemgå indekser på WHERE/JOIN-betingelseskolonner. ③ Indsnævr betingelser for kun at læse nødvendige kolonner/rækker."
+      },
+      "SPIKE": {
+        "cause": "Intermitterende forsinkelse — Gennemsnit {mean}ms, men tager lejlighedsvis lang tid ved maks. {max}ms ({x} gange gennemsnittet).",
+        "fix": "① Når langsom, kontroller for låseventer (wait_event) under fanen Aktivitet/Låse. ② Hvis kun den første udførelse er langsom, var cachen tom, og disken blev læst. ③ Sammenlign den samme forespørgsel med forskellige værdier i SQL Tuning for at se, om udførelsesplanen ændres baseret på værdier."
+      },
+      "DISK_READ": {
+        "cause": "Cache-miss — {pct}% ({read} blokke) af læste blokke blev læst fra disk, ikke hukommelse.",
+        "fix": "① Reducer læseområdet med indekser. ② Indsnævr forespørgselsperioden/betingelserne. ③ Hvis hyppigt læste data forbliver høje, gennemgå shared_buffers (hukommelse)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Hukommelsesoverløb — Sortering/hash overskred work_mem og skrev {blk} blokke (ca. {mb}MB, {perCall} blokke pr. kald) til midlertidige filer.",
+        "fix": "① Placering af indekser på ORDER BY/GROUP BY-kolonner springer sortering over. ② Først, reducer antallet af rækker, der skal sorteres (LIMIT indeni). ③ Hvis absolut nødvendigt, øg SET LOCAL work_mem kun for denne forespørgselstransaktion."
+      },
+      "MANY_ROWS": {
+        "cause": "Overdreven hentning — Henter {perCall} rækker pr. kald.",
+        "fix": "① Skærmlister hentes side for side. ② SELECT vælger kun de kolonner, der bruges. ③ Aggregeringer udføres i databasen, og kun resultaterne modtages."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST indlejret filter (!inner) udsagn — filtrering af forældre efter børnebetingelser kan scanne hele sættet før klassificeringsbetingelser.",
+        "fix": "① Kontroller, om der er indekser på join-nøgler og filterkolonner. ② Flyt filtre til den overordnede tabels betingelser. ③ Integrer børn i en allerede eksisterende overordnet forespørgsel eller kombiner dem til en enkelt databasefunktion."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET-paginering — Bliver gradvist langsommere, da den læser og kasserer forudgående rækker for senere sider.",
+        "fix": "Skift til keyset-paginering (WHERE id > last_id ORDER BY id LIMIT n), som læser fra nøglen efter den sidst modtagne nøgle."
+      }
     }
   },
   "pipeline": {

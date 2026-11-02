@@ -20,8 +20,21 @@ export type QryStat = {
   totalMs: number
   rows: number
   maxMs: number | null // 1회 최고(리셋 이후 누적 최고치) — 증감이 아니라 현재 값 그대로 통과, sql/033 이전 수집은 null
+  // 블록 수(누적 카운터 — 호출 수처럼 증감, sql/034). 034 이전 수집은 null(이전 수집만 null 이면 증감 불가 = null)
+  blkHit?: number | null
+  blkRead?: number | null
+  tmpBlk?: number | null
 }
-export type QryDelta = QryStat & { meanMs: number; reset: boolean }
+// cum* = 증감으로 덮어쓰기 전 누적치(통계 리셋 이후) — 이번 구간 호출 0 이면 원인 진단이 이 값으로 대체(diagnose.ts withCum)
+export type QryCum = {
+  cumCalls: number
+  cumMeanMs: number
+  cumRows: number
+  cumBlkHit: number | null
+  cumBlkRead: number | null
+  cumTmpBlk: number | null
+}
+export type QryDelta = QryStat & QryCum & { meanMs: number; reset: boolean }
 
 // 상수 마스킹(방어) — pg_stat_statements 는 이미 $1 로 정규화하지만, 문자열·숫자 상수가 남은 경우 대비
 export function maskLiterals(sql: string): string {
@@ -55,13 +68,29 @@ export function qryDelta(
     const calls = c.calls - (base?.calls ?? 0)
     const totalMs = c.totalMs - (base?.totalMs ?? 0)
     const rows = c.rows - (base?.rows ?? 0)
+    const blk = (k: 'blkHit' | 'blkRead' | 'tmpBlk') => {
+      const v = c[k]
+      if (v == null) return null
+      if (!base) return v
+      const b = base[k]
+      return b == null ? null : v - b
+    }
     return {
       ...c,
       calls,
       totalMs,
       rows,
+      blkHit: blk('blkHit'),
+      blkRead: blk('blkRead'),
+      tmpBlk: blk('tmpBlk'),
       meanMs: calls > 0 ? totalMs / calls : 0,
       reset: reset || resetChanged,
+      cumCalls: c.calls,
+      cumMeanMs: c.calls > 0 ? c.totalMs / c.calls : 0,
+      cumRows: c.rows,
+      cumBlkHit: c.blkHit ?? null,
+      cumBlkRead: c.blkRead ?? null,
+      cumTmpBlk: c.tmpBlk ?? null,
     }
   })
 }

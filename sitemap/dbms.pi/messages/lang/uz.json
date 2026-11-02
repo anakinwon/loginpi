@@ -1026,7 +1026,9 @@
       "openSqlLab": "SQL Tuningda ochish",
       "acct": "Hisob",
       "sortMax": "Maksimal bir martalik ijro vaqti",
-      "maxMs": "Maksimal bir martalik ms"
+      "maxMs": "Maksimal bir martalik ms",
+      "diagToggle": "Sababini aniqlash",
+      "noMax": "Maksimal qiymat yoʻq — {n} ta element maksimal qiymatga ega boʻlmagan eski toʻplamlardan olingan, shuning uchun ular vaqtincha oʻrtacha qiymat boʻyicha saralangan (umumiy vaqt boʻyicha emas). Hozir yigʻish maksimal qiymatni toʻldiradi."
     },
     "health": {
       "empty": "Hali suratlar yoʻq. Yigʻish yorligʻida hozir yigʻish tugmasini bosing",
@@ -1080,7 +1082,7 @@
         "BATCH": "Koʻrinishidan, partiya yoki rejalashtirilgan ish. Ish vaqtini biznes choʻqqilaridan uzoqlashtiring va har bir commit uchun ish hajmini kamaytiring. Maqsadli jadvallardagi indekslar va statistikalarni (ANALYZE) tekshiring va uzoq tranzaksiyalarni boʻling. Ish nomini application_name ga kiritish keyingi tasnifni aniqroq qiladi",
         "PROGRAM": "Bu ilova tomonidan bajarilgan soʻrovga oʻxshaydi. SQL sozlashda ijro rejasini tekshiring. Agar maksimal bir martalik ijro vaqti uzoq boʻlsa, avval indekslar va qoʻshilish tartibini koʻrib chiqing. Agar bir martalik ijro qisqa boʻlsa, lekin chaqiruvlar soni koʻp boʻlsa, takroriy chaqiruvlar (N+1) va keshni koʻrib chiqing. Ulanish pulining application_name ga xizmat nomini kiriting.",
         "PLATFORM": "Koʻrinishidan, DB yoki platformaning ichki ishi, masalan, autovacuum yoki replikatsiya. Odatda hech qanday harakat talab qilinmaydi. Agar u yuqorida qolsa, autovacuum chegaralari va maintenance_work_mem ni koʻrib chiqing",
-        "MONITOR": "Koʻrinishidan, ushbu xizmatning oʻz statistika soʻrovlari (schema.pi havolasi). Hech qanday harakat talab qilinmaydi. Agar u juda tez-tez koʻrinsa, soʻrov chastotasini kamaytiring",
+        "MONITOR": "Bu dbms.pi oʻz-oʻzidan yigʻish soʻrovi — schema.pi ulanishi faqat statistik koʻrinishlar/kataloglarni (pg_stat_*·pg_catalog) oʻqiydigan qatʼiy bayonot boʻlgani uchun, bu biznes soʻrovi emas va mijozning hech qanday harakati talab qilinmaydi. Agar maqsadli maʼlumotlar bazasi yuklamasi muammo boʻlsa, yigʻish tugmasi/monitoring ekranini ochish sonini kamaytiring. Xuddi shu statistik koʻrinishlarni oʻqiydigan boshqa monitoring vositalaridan olingan bayonotlar ham shu yerga guruhlanadi.",
         "UNKNOWN": "Manbaga oid hech qanday maʼlumot yoʻq. Har bir ulanishda application_name ni oʻrnating va hisoblarni maqsad boʻyicha ajrating; u keyingi namunalardan tasniflanadi"
       },
       "detail": {
@@ -1096,7 +1098,51 @@
       "privOff": "Ulanish hisobi boshqa hisoblarning sessiya tafsilotlarini koʻra olmaydi, shuning uchun namunalar yigʻilmaydi. DB administratoridan GRANT pg_read_all_stats TO {user}; ni ishga tushirishni soʻrang",
       "linkUsr": "ulanuvchi hisob",
       "qidOff": "Sessiya tafsilotlari koʻrinadi, lekin soʻrov IDsi boʻsh (compute_query_id oʻchirilgan). SHOW compute_query_id; bilan tekshiring, soʻng ALTER SYSTEM SET compute_query_id = 'auto'; ni ishga tushiring va qayta yuklang (SELECT pg_reload_conf();)",
-      "openHint": "Soʻrov toʻldirilgan holda SQL Tuningni ochadi. Rejani koʻrishdan oldin $1 kabi joy egalarini haqiqiy qiymatlar bilan almashtiring"
+      "openHint": "Soʻrov toʻldirilgan holda SQL Tuningni ochadi. Rejani koʻrishdan oldin $1 kabi joy egalarini haqiqiy qiymatlar bilan almashtiring",
+      "detailTitle": "Manba namunalari"
+    },
+    "diag": {
+      "title": "Sababini aniqlash",
+      "fix": "Harakat:",
+      "none": "Statistika boʻyicha hech qanday sabab aniqlanmadi — SQL Tuningda bajarish rejasini tekshiring.",
+      "cum": "Bu oraliqda chaqiruvlar yoʻq — umumiy (statistik maʼlumotlar qayta tiklangandan beri)",
+      "basis": "Asos — Maksimal 1 martalik {max}ms · Oʻrtacha {mean}ms · Chaqiruvlar {calls} · Har bir chaqiruvga qatorlar {rpc} · Diskdan oʻqish nisbati {read} · Vaqtinchalik bloklar {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi oʻz-oʻzini yigʻish soʻrovi — faqat statistik koʻrinishlar/kataloglarni oʻqiydigan monitoring iborasi.",
+        "fix": "Mijoz harakati talab qilinmaydi. Agar maqsadli maʼlumotlar bazasining yuklanishi muammo boʻlsa, yigʻish/monitoring ekranini ochish sonini kamaytiring."
+      },
+      "NO_MAX": {
+        "cause": "'Maksimal 1 martalik' qiymatga ega boʻlmagan eski toʻplam, shuning uchun 'har doim sekin/vaqti-vaqti bilan kechikish'ni ajratib boʻlmaydi.",
+        "fix": "Aniq tashxis qoʻyish uchun maksimal qiymatlarni toʻldirish uchun hozir bir marta 'Yigʻish' tugmasini bosing."
+      },
+      "SLOW_EACH": {
+        "cause": "Har doim sekin — Har safar ishga tushirilganda uzoq vaqt oladi, maksimal {max}ms va oʻrtacha {mean}ms.",
+        "fix": "① 'SQL Tuningda ochish' orqali bajarish rejasini oching. ② Agar toʻliq skanerlash (Seq Scan) yoki katta saralashlar boʻlsa, WHERE/JOIN shart ustunlaridagi indekslarni koʻrib chiqing. ③ Faqat kerakli ustunlar/qatorlarni oʻqish uchun shartlarni toraytiring."
+      },
+      "SPIKE": {
+        "cause": "Vaqti-vaqti bilan kechikish — Oʻrtacha {mean}ms, lekin vaqti-vaqti bilan maksimal {max}ms (oʻrtachadan {x} marta) uzoq vaqt oladi.",
+        "fix": "① Sekin boʻlganda, Faoliyat/Qulflar yorligʻida qulf kutishlarini (wait_event) tekshiring. ② Agar faqat birinchi bajarish sekin boʻlsa, kesh boʻsh boʻlgan va diskdan oʻqilgan. ③ Bajarish rejasi qiymatlarga qarab oʻzgaradimi yoki yoʻqligini bilish uchun SQL Tuningda bir xil soʻrovni turli qiymatlar bilan solishtiring."
+      },
+      "DISK_READ": {
+        "cause": "Kesh xatosi — Oʻqilgan bloklarning {pct}% ({read} blok) xotiradan emas, diskdan oʻqilgan.",
+        "fix": "① Indekslar yordamida oʻqish diapazonini kamaytiring. ② Soʻrov davrini/shartlarini toraytiring. ③ Agar tez-tez oʻqiladigan maʼlumotlar yuqori boʻlib qolsa, shared_buffers (xotira)ni koʻrib chiqing."
+      },
+      "TEMP_SPILL": {
+        "cause": "Xotira toʻlib ketishi — Saralash/xesh work_memdan oshib ketdi va vaqtinchalik fayllarga {blk} blok (taxminan {mb}MB, har bir chaqiruvga {perCall} blok) yozdi.",
+        "fix": "① ORDER BY/GROUP BY ustunlariga indekslar qoʻyish saralashni oʻtkazib yuboradi. ② Avval, saralash uchun qatorlar sonini kamaytiring (LIMIT ichida). ③ Agar mutlaqo zarur boʻlsa, faqat ushbu soʻrov tranzaksiyasi uchun SET LOCAL work_memni oshiring."
+      },
+      "MANY_ROWS": {
+        "cause": "Haddan tashqari koʻp maʼlumot olish — Har bir chaqiruvga {perCall} qatorni oladi.",
+        "fix": "① Ekran roʻyxatlari sahifa boʻyicha olinadi. ② SELECT faqat ishlatiladigan ustunlarni tanlaydi. ③ Agregatsiyalar maʼlumotlar bazasida amalga oshiriladi va faqat natijalar qabul qilinadi."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST oʻrnatilgan filtr (!inner) iborasi — bolalar shartlari boʻyicha ota-onalarni filtrlash tasniflash shartlaridan oldin butun toʻplamni skanerlashi mumkin.",
+        "fix": "① Qoʻshilish kalitlari va filtr ustunlarida indekslar mavjudligini tekshiring. ② Filtrlarni asosiy jadval shartlariga oʻtkazing. ③ Bolalarni allaqachon mavjud asosiy soʻrovga joylashtiring yoki ularni bitta maʼlumotlar bazasi funksiyasiga birlashtiring."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET sahifalash — keyingi sahifalar uchun oldingi qatorlarni oʻqib tashlagani sababli asta-sekin sekinlashadi.",
+        "fix": "Oxirgi qabul qilingan kalitdan keyin oʻqiydigan keyset sahifalashga oʻzgartiring (WHERE id > last_id ORDER BY id LIMIT n)."
+      }
     }
   },
   "pipeline": {

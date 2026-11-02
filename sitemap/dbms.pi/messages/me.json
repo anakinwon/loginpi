@@ -1020,7 +1020,9 @@
       "openSqlLab": "Otvori u SQL Tuning-u",
       "acct": "Nalog",
       "sortMax": "Maksimalno vreme pojedinačnog izvršenja",
-      "maxMs": "Maks. pojedinačno ms"
+      "maxMs": "Maks. pojedinačno ms",
+      "diagToggle": "Dijagnostikuj uzrok",
+      "noMax": "Nema maksimalne vrednosti — {n} stavki su iz starijih kolekcija bez maksimalne vrednosti, pa su privremeno sortirane po proseku (ne po ukupnom vremenu). Prikupljanje sada će popuniti maksimalnu vrednost."
     },
     "health": {
       "empty": "Još nema snimaka. Pritisnite „Sakupi sada“ na kartici „Sakupi“",
@@ -1073,7 +1075,7 @@
         "BATCH": "Izgleda kao serija ili zakazani posao. Rasporedite vreme izvršavanja van poslovnih špica i smanjite rad po commit-u. Proverite indekse i statistike (ANALYZE) na ciljnim tabelama i podelite duge transakcije. Stavljanje imena posla u application_name čini sledeću klasifikaciju preciznijom",
         "PROGRAM": "Čini se da je ovo upit koji je izvršila aplikacija. Proverite plan izvršenja u SQL podešavanju. Ako je maksimalno vreme pojedinačnog izvršenja dugo, prvo pogledajte indekse i redosled spajanja. Ako je pojedinačno izvršenje kratko, ali je broj poziva visok, pogledajte ponovljene pozive (N+1) i keširanje. Stavite naziv usluge u application_name connection pool-a.",
         "PLATFORM": "Izgleda kao interni rad DB-a ili platforme, kao što su autovacuum ili replikacija. Obično nije potrebna akcija. Ako ostane na vrhu, pregledajte autovacuum pragove i maintenance_work_mem",
-        "MONITOR": "Izgleda kao upiti za statistiku ove usluge (schema.pi veza). Nije potrebna akcija. Ako se prečesto pojavljuje, smanjite frekvenciju anketiranja",
+        "MONITOR": "Ovo je dbms.pi upit za samoprikupljanje — schema.pi veza je fiksna izjava koja samo čita statističke prikaze/kataloge (pg_stat_*·pg_catalog), tako da to nije poslovni upit i nije potrebna akcija korisnika. Ako je opterećenje ciljne baze podataka problem, smanjite broj puta kada otvarate dugme za prikupljanje/ekran za nadzor. Izjave iz drugih alata za nadzor koji čitaju iste statističke prikaze takođe su grupisane ovde.",
         "UNKNOWN": "Nema traga o izvoru. Postavite application_name na svakoj vezi i podelite naloge po nameni; biće klasifikovano iz sledećih uzoraka"
       },
       "detail": {
@@ -1089,7 +1091,51 @@
       "privOff": "Nalog veze ne može videti detalje sesije drugih naloga, tako da se ne prikupljaju uzorci. Zamolite DB administratora da pokrene GRANT pg_read_all_stats TO {user};",
       "linkUsr": "nalog veze",
       "qidOff": "Detalji sesije su vidljivi, ali je ID upita prazan (compute_query_id je isključen). Proverite sa SHOW compute_query_id; zatim pokrenite ALTER SYSTEM SET compute_query_id = 'auto'; i ponovo učitajte (SELECT pg_reload_conf();)",
-      "openHint": "Otvara SQL Tuning sa popunjenim upitom. Zamenite zamenske simbole kao što je $1 stvarnim vrednostima pre pregleda plana"
+      "openHint": "Otvara SQL Tuning sa popunjenim upitom. Zamenite zamenske simbole kao što je $1 stvarnim vrednostima pre pregleda plana",
+      "detailTitle": "Izvorni uzorci"
+    },
+    "diag": {
+      "title": "Dijagnostikuj uzrok",
+      "fix": "Akcija:",
+      "none": "Statistika nije otkrila uzrok — proverite plan izvršenja u SQL Tuning-u.",
+      "cum": "Nema poziva u ovom intervalu — kumulativno (od resetovanja statistike)",
+      "basis": "Osnova — Maksimalno 1 put {max}ms · Prosečno {mean}ms · Poziva {calls} · Redova po pozivu {rpc} · Odnos čitanja diska {read} · Privremeni blokovi {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi upit za samostalno prikupljanje — izjava za nadzor koja čita samo statističke prikaze/kataloge.",
+        "fix": "Nije potrebna akcija korisnika. Ako je opterećenje ciljne baze podataka problem, smanjite broj puta kada otvarate ekran za prikupljanje/nadzor."
+      },
+      "NO_MAX": {
+        "cause": "Stara kolekcija bez vrednosti 'maksimalno 1 put', tako da se ne može razlikovati 'uvek sporo/povremeno kašnjenje'.",
+        "fix": "Kliknite 'Prikupljaj' jednom sada da popunite maksimalne vrednosti za tačnu dijagnozu."
+      },
+      "SLOW_EACH": {
+        "cause": "Uvek sporo — Traje dugo svaki put kada se pokrene, sa maksimalno {max}ms i prosečno {mean}ms.",
+        "fix": "① Otvorite plan izvršenja u 'Otvori u SQL Tuning-u'. ② Ako postoje potpuna skeniranja (Seq Scan) ili velika sortiranja, pregledajte indekse na kolonama uslova WHERE/JOIN. ③ Sužite uslove da čitate samo potrebne kolone/redove."
+      },
+      "SPIKE": {
+        "cause": "Povremeno kašnjenje — Prosečno {mean}ms, ali povremeno traje dugo sa maksimalno {max}ms ({x} puta proseka).",
+        "fix": "① Kada je sporo, proverite čekanja zaključavanja (wait_event) u kartici Aktivnost/Zaključavanja. ② Ako je samo prvo izvršenje sporo, keš je bio prazan i disk je pročitan. ③ Uporedite isti upit sa različitim vrednostima u SQL Tuning-u da vidite da li se plan izvršenja menja na osnovu vrednosti."
+      },
+      "DISK_READ": {
+        "cause": "Keš promašaj — {pct}% ({read} blokova) pročitanih blokova je pročitano sa diska, a ne iz memorije.",
+        "fix": "① Smanjite opseg čitanja indeksima. ② Sužite period/uslove upita. ③ Ako često čitani podaci ostaju visoki, pregledajte shared_buffers (memoriju)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Prekoračenje memorije — Sortiranje/heširanje je prekoračilo work_mem i upisalo {blk} blokova (približno {mb}MB, {perCall} blokova po pozivu) u privremene datoteke.",
+        "fix": "① Postavljanje indeksa na kolone ORDER BY/GROUP BY preskače sortiranje. ② Prvo, smanjite broj redova za sortiranje (LIMIT unutra). ③ Ako je apsolutno neophodno, povećajte SET LOCAL work_mem samo za ovu transakciju upita."
+      },
+      "MANY_ROWS": {
+        "cause": "Prekomerno preuzimanje — Dohvata {perCall} redova po pozivu.",
+        "fix": "① Liste ekrana se preuzimaju stranicu po stranicu. ② SELECT bira samo kolone koje se koriste. ③ Agregacije se izvode u bazi podataka, a primaju se samo rezultati."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST ugrađena filter (!inner) izjava — filtriranje roditelja po uslovima deteta može skenirati ceo skup pre uslova klasifikacije.",
+        "fix": "① Proverite da li postoje indeksi na ključevima za spajanje i kolonama filtera. ② Premestite filtere na uslove roditeljske tabele. ③ Ugradite decu u već postojeći roditeljski upit ili ih kombinujte u jednu funkciju baze podataka."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET Paging — Postaje progresivno sporiji kako čita i odbacuje prethodne redove za kasnije stranice.",
+        "fix": "Promenite na keyset paging (WHERE id > last_id ORDER BY id LIMIT n) koji čita od ključa nakon poslednjeg primljenog ključa."
+      }
     }
   },
   "pipeline": {

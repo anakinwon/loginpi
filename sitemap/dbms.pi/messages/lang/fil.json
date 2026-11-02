@@ -1025,7 +1025,9 @@
       "openSqlLab": "Buksan sa SQL Tuning",
       "acct": "Account",
       "sortMax": "Pinakamataas na single-execution time",
-      "maxMs": "Pinakamataas na 1 beses ms"
+      "maxMs": "Pinakamataas na 1 beses ms",
+      "diagToggle": "Pagsusuri ng Sanhi",
+      "noMax": "Walang maximum na halaga — Ang {n} na kaso ay mga lumang koleksyon na walang maximum na halaga nang isang beses, kaya pansamantalang inayos ang mga ito ayon sa average na isang beses (hindi ayon sa kabuuang oras). Kung kokolektahin ngayon, mapupuno ang maximum na halaga."
     },
     "health": {
       "empty": "Wala pang snapshot. Pindutin ang Kolektahin ngayon sa tab na Kolektahin",
@@ -1079,7 +1081,7 @@
         "BATCH": "Mukhang isang batch o naka-iskedyul na trabaho. Ikalat ang run times palayo sa mga business peak at paliitin ang trabaho bawat commit. Suriin ang mga index at istatistika (ANALYZE) sa mga target na table, at hatiin ang mahabang transaksyon. Ang paglalagay ng pangalan ng trabaho sa application_name ay nagiging mas tumpak ang susunod na klasipikasyon",
         "PROGRAM": "Mukhang ito ay isang query na isinagawa ng application. Tingnan ang execution plan sa SQL tuning. Kung mahaba ang pinakamataas na single-execution time, tingnan muna ang index/join order, at kung maikli ang single-execution time ngunit mataas ang bilang ng tawag, tingnan ang paulit-ulit na tawag (N+1)/cache. Ilagay ang pangalan ng serbisyo sa application_name ng connection pool.",
         "PLATFORM": "Mukhang DB o internal na trabaho ng platform tulad ng autovacuum o replication. Karaniwan ay walang aksyon na kailangan. Kung nananatili ito sa itaas, suriin ang mga threshold ng autovacuum at maintenance_work_mem",
-        "MONITOR": "Mukhang sariling mga query ng istatistika ng serbisyong ito (link ng schema.pi). Walang aksyon na kailangan. Kung masyadong madalas itong lumalabas, babaan ang polling frequency",
+        "MONITOR": "Ito ay isang query na kinokolekta ng dbms.pi mismo — ang koneksyon ng schema.pi ay isang nakapirming pahayag na nagbabasa lamang ng mga statistical view/catalog (pg_stat_*·pg_catalog) kaya hindi ito isang business query at hindi nangangailangan ng pagkilos ng customer. Kung ang load ng target na database ay isang problema, bawasan ang bilang ng beses na binubuksan mo ang pindutan ng koleksyon/screen ng pagsubaybay. Ang mga pahayag mula sa iba pang mga tool sa pagsubaybay na nagbabasa ng parehong statistical view ay pinagsama-sama rin dito.",
         "UNKNOWN": "Walang pahiwatig sa pinagmulan. Itakda ang application_name sa bawat koneksyon at hatiin ang mga account ayon sa layunin; ito ay ikaklasipika mula sa mga susunod na sample"
       },
       "detail": {
@@ -1095,7 +1097,51 @@
       "privOff": "Ang link account ay hindi makakita ng mga detalye ng session ng ibang account, kaya walang sample na nakolekta. Hilingin sa isang DB admin na patakbuhin ang GRANT pg_read_all_stats TO {user};",
       "linkUsr": "link account",
       "qidOff": "Nakikita ang mga detalye ng session ngunit walang laman ang query ID (naka-off ang compute_query_id). Suriin gamit ang SHOW compute_query_id; pagkatapos ay patakbuhin ang ALTER SYSTEM SET compute_query_id = 'auto'; at i-reload (SELECT pg_reload_conf();)",
-      "openHint": "Binubuksan ang SQL Tuning na may nakapuno na query. Palitan ang mga placeholder tulad ng $1 ng mga tunay na halaga bago tingnan ang plano"
+      "openHint": "Binubuksan ang SQL Tuning na may nakapuno na query. Palitan ang mga placeholder tulad ng $1 ng mga tunay na halaga bago tingnan ang plano",
+      "detailTitle": "Sample ng Pinagmulan"
+    },
+    "diag": {
+      "title": "Pagsusuri ng Sanhi",
+      "fix": "Aksyon:",
+      "none": "Walang sanhi na lumitaw sa mga istatistika — Buksan ang execution plan sa SQL tuning upang suriin.",
+      "cum": "Walang tawag sa segment na ito — batay sa pinagsama-samang (mula nang i-reset ang istatistika)",
+      "basis": "Batayan — Pinakamataas na 1 beses {max}ms · Average {mean}ms · {calls} na tawag · {rpc} na row bawat tawag · {read} na rate ng pagbasa ng disk · {tmp} na pansamantalang block",
+      "SELF_MON": {
+        "cause": "Query sa koleksyon ng dbms.pi mismo — Ito ay isang pahayag sa pagsubaybay na nagbabasa lamang ng mga view ng istatistika at katalogo.",
+        "fix": "Hindi kailangan ng pagkilos ng customer. Kung ang load ng target na database ay isang problema, bawasan ang bilang ng beses na tinitingnan mo ang screen ng koleksyon/pagsubaybay."
+      },
+      "NO_MAX": {
+        "cause": "Ito ay isang lumang koleksyon na walang pinakamataas na 1 beses na halaga, kaya hindi matukoy ang 'palaging mabagal·paminsan-minsang pagkaantala'.",
+        "fix": "Kung pipindutin mo ang koleksyon ngayon, mapupuno ang pinakamataas na halaga at magiging tumpak ang diagnosis."
+      },
+      "SLOW_EACH": {
+        "cause": "Palaging mabagal — Tumatagal ng mahabang panahon sa bawat pagpapatupad na may pinakamataas na {max}ms at average na {mean}ms.",
+        "fix": "① Tingnan ang execution plan sa 'Buksan sa SQL tuning' ② Kung may full scan (Seq Scan) o malaking pag-aayos, suriin ang mga index ng WHERE·JOIN condition column ③ Paliitin ang mga kondisyon upang basahin lamang ang mga kinakailangang column·row."
+      },
+      "SPIKE": {
+        "cause": "Paminsan-minsang pagkaantala — Ang average ay {mean}ms, ngunit paminsan-minsan ay tumatagal ng mahabang panahon sa pinakamataas na {max}ms ({x} beses ng average).",
+        "fix": "① Kapag mabagal, suriin ang lock wait (wait_event) sa tab ng aktibidad·lock ② Kung mabagal lamang ang unang pagpapatupad, nangangahulugan ito na walang laman ang cache at nabasa ang disk ③ Ihambing ang parehong query na may iba't ibang halaga sa SQL tuning upang makita kung nagbabago ang execution plan ayon sa halaga."
+      },
+      "DISK_READ": {
+        "cause": "Cache miss — {pct}% ({read} na block) ng mga nabasang block ay nabasa mula sa disk, hindi sa memorya.",
+        "fix": "① Bawasan ang saklaw ng pagbasa gamit ang index ② Paliitin ang panahon·kondisyon ng pagtingin ③ Kung madalas basahin ang data at patuloy na mataas, suriin ang shared_buffers (memorya)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Sobrang memorya — Ang pag-aayos·hash ay lumampas sa work_mem at nagsulat ng {blk} na block (humigit-kumulang {mb}MB, {perCall} na block bawat tawag) sa pansamantalang file.",
+        "fix": "① Kung may index sa ORDER BY·GROUP BY column, lalaktawan ang pag-aayos ② Bawasan muna ang bilang ng mga row na aayusin (LIMIT sa loob) ③ Kung talagang kinakailangan, itaas ang SET LOCAL work_mem para lamang sa query transaction na ito."
+      },
+      "MANY_ROWS": {
+        "cause": "Sobrang pagtingin — Kumukuha ng {perCall} na row sa bawat tawag.",
+        "fix": "① Ang listahan ng screen ay tinitingnan sa bawat pahina ② Ang SELECT ay pumipili lamang ng mga column na ginagamit ③ Ang aggregation ay ginagawa sa database at ang resulta lamang ang natatanggap"
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST embedded filter (!inner) statement — Kung sasalain ang parent gamit ang kondisyon ng child, maaaring suriin ang buong data bago ang kondisyon ng pag-uuri.",
+        "fix": "① Suriin kung may index sa join key/filter column ② Ilipat ang filter sa kondisyon ng parent table ③ I-embed ang child sa kasalukuyang ginagawang parent query o pagsamahin ito sa isang function ng database"
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET paging — Habang papalayo ang pahina, binabasa at itinatapon ang mga naunang row, kaya unti-unting bumabagal.",
+        "fix": "Palitan ng keyset paging (WHERE id > huling id ORDER BY id LIMIT n) na nagbabasa mula sa susunod na key pagkatapos ng huling natanggap na key."
+      }
     }
   },
   "pipeline": {

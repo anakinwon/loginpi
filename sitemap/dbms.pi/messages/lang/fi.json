@@ -532,6 +532,7 @@
       "INVALID_INPUT": "Pyynnön arvo on virheellinen."
     },
     "board": {
+      "subtitle": "Mitä tällä DB:llä pitäisi tehdä juuri nyt – 14 signaalia OK, varoitus tai riski, ratkaisuineen, yhdellä silmäyksellä.",
       "refresh": {
         "updated": "Tilanne {time} · päivittyy minuutin välein",
         "now": "Päivitä nyt",
@@ -550,6 +551,7 @@
         "WARN": "Varoitus – joitakin kohteita on tarkasteltava",
         "UNKNOWN": "Tuntematon – tarkista yhteys",
         "OK": "OK – kaikki signaalit ovat rajojen sisällä",
+        "CONN_DOWN": "DB:hen ei saada yhteyttä – tarkista ensin yhteys",
         "NA": "Ei sovellettavissa"
       },
       "kpi": {
@@ -983,7 +985,9 @@
     },
     "err": {
       "NOT_IMPLEMENTED": "schema.pi-yhteys on valmisteilla. Yritä uudelleen myöhemmin.",
+      "PGSS_MISSING": "pg_stat_statements-laajennusta ei ole asennettu tähän DB:hen, joten kyselytilastot eivät ole käytettävissä",
       "CONN_UNSUPPORTED": "Tätä yhteyttä ei vielä tueta (vain suorat PostgreSQL-yhteydet).",
+      "TIMEOUT": "Kohde-DB vastasi liian hitaasti. Yritä myöhemmin uudelleen",
       "RATE": "Liian monta pyyntöä. Yritä uudelleen minuutin kuluttua.",
       "LINK_AUTH": "Linkkitunnus on vanhentunut tai peruutettu. Rekisteröi tunnus uudelleen Yhdistä-sivulla.",
       "LINK_SCOPE": "Tämä yhteys ei kuulu linkin aihealueeseen.",
@@ -992,6 +996,7 @@
     },
     "pgss": {
       "title": "Miten pg_stat_statements otetaan käyttöön",
+      "body": "Hitaiden kyselyjen Top-N vaatii pg_stat_statements-laajennuksen. Suorita alla oleva lauseke DB-järjestelmänvalvojana. Supabasessa voit ottaa sen käyttöön kohdassa Database → Extensions",
       "note": "Itse isännöity PostgreSQL tarvitsee myös pg_stat_statementsin shared_preload_libraries-tiedostoon (postgresql.conf) ja uudelleenkäynnistyksen. Taulu-, indeksi- ja kokotilastot toimivat ilman sitä."
     },
     "collect": {
@@ -1019,7 +1024,9 @@
       "openSqlLab": "Avaa SQL Tuningissa",
       "acct": "Tili",
       "sortMax": "Maksimi yksittäinen suoritusaika",
-      "maxMs": "Maksimi yksittäinen ms"
+      "maxMs": "Maksimi yksittäinen ms",
+      "diagToggle": "Diagnosoi syy",
+      "noMax": "Ei enimmäisarvoa – {n} kohdetta on vanhemmista kokoelmista ilman enimmäisarvoa, joten ne on lajiteltu väliaikaisesti keskiarvon mukaan (ei kokonaisajan mukaan). Nyt kerääminen täyttää enimmäisarvon."
     },
     "health": {
       "empty": "Ei tilannekuvia vielä. Paina Kerää nyt Kerää-välilehdellä",
@@ -1036,6 +1043,7 @@
     "trend": {
       "limit": "Kokoraja",
       "empty": "Ei tilannekuvia viimeisten 30 päivän aikana",
+      "chart": "DB:n koon kehitys viimeisten 30 päivän aikana",
       "now": "Nykyinen koko",
       "perDay": "Kasvu päivässä",
       "needMore": "Tarvitaan vähintään 2 tilannekuvaa",
@@ -1072,7 +1080,7 @@
         "BATCH": "Näyttää eräajolta tai ajoitetulta työltä. Jaa ajoajat pois liiketoiminnan ruuhkahuipuista ja pienennä työtä per commit. Tarkista indeksit ja tilastot (ANALYZE) kohdetaulukoista ja jaa pitkät transaktiot. Työn nimen lisääminen application_nameen tekee seuraavasta luokittelusta tarkemman",
         "PROGRAM": "Tämä näyttää olevan sovelluksen suorittama kysely. Tarkista suoritussuunnitelma SQL-virityksessä. Jos maksimi yksittäinen suoritusaika on pitkä, tarkastele ensin indeksejä ja liitosjärjestystä. Jos yksittäinen suoritus on lyhyt, mutta kutsumäärä on suuri, tarkastele toistuvia kutsuja (N+1) ja välimuistia. Aseta palvelun nimi yhteyspoolin application_name-kenttään.",
         "PLATFORM": "Näyttää DB:n tai alustan sisäiseltä työltä, kuten autovacuum tai replikointi. Yleensä toimenpiteitä ei tarvita. Jos se pysyy kärjessä, tarkista autovacuum-kynnysarvot ja maintenance_work_mem",
-        "MONITOR": "Näyttää tämän palvelun omilta tilastokyselyiltä (schema.pi-linkki). Toimenpiteitä ei tarvita. Jos se näkyy liian usein, alenna kyselytaajuutta",
+        "MONITOR": "Tämä on dbms.pi:n itsekeräyskysely — schema.pi-yhteys on kiinteä lause, joka lukee vain tilastollisia näkymiä/luetteloita (pg_stat_*·pg_catalog), joten se ei ole liiketoimintakysely eikä vaadi asiakkaan toimenpiteitä. Jos kohdetietokannan kuormitus on ongelma, vähennä keräyspainikkeen/valvontanäytön avaamiskertoja. Myös muiden valvontatyökalujen lauseet, jotka lukevat samoja tilastollisia näkymiä, ryhmitellään tähän.",
         "UNKNOWN": "Lähteestä ei ole vihjettä. Aseta application_name jokaiselle yhteydelle ja jaa tilit tarkoituksen mukaan; se luokitellaan seuraavista näytteistä"
       },
       "detail": {
@@ -1088,7 +1096,51 @@
       "privOff": "Linkkitili ei voi nähdä muiden tilien istuntotietoja, joten näytteitä ei kerätä. Pyydä DB-järjestelmänvalvojaa suorittamaan GRANT pg_read_all_stats TO {user};",
       "linkUsr": "linkkitili",
       "qidOff": "Istuntotiedot ovat näkyvissä, mutta kysely-ID on tyhjä (compute_query_id on pois päältä). Tarkista SHOW compute_query_id; -komennolla ja suorita sitten ALTER SYSTEM SET compute_query_id = 'auto'; ja lataa uudelleen (SELECT pg_reload_conf();)",
-      "openHint": "Avaa SQL Tuningin kysely täytettynä. Korvaa paikkamerkit, kuten $1, todellisilla arvoilla ennen suunnitelman tarkastelua"
+      "openHint": "Avaa SQL Tuningin kysely täytettynä. Korvaa paikkamerkit, kuten $1, todellisilla arvoilla ennen suunnitelman tarkastelua",
+      "detailTitle": "Lähdenäytteet"
+    },
+    "diag": {
+      "title": "Diagnosoi syy",
+      "fix": "Toimenpide:",
+      "none": "Tilastot eivät paljastaneet syytä – tarkista suoritussuunnitelma SQL-virityksessä.",
+      "cum": "Ei kutsuja tällä aikavälillä – kumulatiivinen (tilastojen nollauksen jälkeen)",
+      "basis": "Perusta – Enimmäis 1-kertainen {max}ms · Keskimäärin {mean}ms · Kutsuja {calls} · Rivejä per kutsu {rpc} · Levylukusuhde {read} · Väliaikaiset lohkot {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi:n itsekokoamiskysely – valvontalause, joka lukee vain tilastollisia näkymiä/luetteloita.",
+        "fix": "Asiakkaan toimenpiteitä ei tarvita. Jos kohdetietokannan kuormitus on ongelma, vähennä keräys-/valvontanäytön avaamiskertoja."
+      },
+      "NO_MAX": {
+        "cause": "Vanha kokoelma ilman 'enimmäis 1-kertainen' arvoa, joten 'aina hidas/satunnainen viive' ei ole erotettavissa.",
+        "fix": "Napsauta 'Kerää' kerran nyt täyttääksesi enimmäisarvot tarkkaa diagnoosia varten."
+      },
+      "SLOW_EACH": {
+        "cause": "Aina hidas – Kestää kauan joka kerta, kun se suoritetaan, enintään {max}ms ja keskimäärin {mean}ms.",
+        "fix": "① Avaa suoritussuunnitelma 'Avaa SQL-virityksessä'. ② Jos on täysiä skannauksia (Seq Scan) tai suuria lajitteluja, tarkista indeksit WHERE/JOIN-ehtosarakkeissa. ③ Kavenna ehtoja lukeaksesi vain tarvittavat sarakkeet/rivit."
+      },
+      "SPIKE": {
+        "cause": "Satunnainen viive – Keskimäärin {mean}ms, mutta kestää toisinaan kauan enintään {max}ms (keskiarvon {x}-kertainen).",
+        "fix": "① Kun hidas, tarkista lukitusodotukset (wait_event) Toiminta/Lukitukset-välilehdeltä. ② Jos vain ensimmäinen suoritus on hidas, välimuisti oli tyhjä ja levyä luettiin. ③ Vertaa samaa kyselyä eri arvoilla SQL-virityksessä nähdäksesi, muuttuuko suoritussuunnitelma arvojen perusteella."
+      },
+      "DISK_READ": {
+        "cause": "Välimuistihuti – {pct}% ({read} lohkoa) luetuista lohkoista luettiin levyltä, ei muistista.",
+        "fix": "① Vähennä lukualuetta indekseillä. ② Kavenna kyselyjaksoa/ehtoja. ③ Jos usein luetun datan määrä pysyy korkeana, tarkista shared_buffers (muisti)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Muistin ylivuoto – Lajittelu/hajautus ylitti work_memin ja kirjoitti {blk} lohkoa (noin {mb}MB, {perCall} lohkoa per kutsu) väliaikaisiin tiedostoihin.",
+        "fix": "① Indeksien sijoittaminen ORDER BY/GROUP BY -sarakkeisiin ohittaa lajittelun. ② Vähennä ensin lajiteltavien rivien määrää (LIMIT sisällä). ③ Jos ehdottoman välttämätöntä, lisää SET LOCAL work_mem vain tälle kyselytransaktiolle."
+      },
+      "MANY_ROWS": {
+        "cause": "Liiallinen haku – Hakee {perCall} riviä per kutsu.",
+        "fix": "① Näyttölistat haetaan sivu kerrallaan. ② SELECT valitsee vain käytetyt sarakkeet. ③ Aggregaatiot suoritetaan tietokannassa, ja vain tulokset vastaanotetaan."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgRESTin upotettu suodatin (!inner) -lause – vanhempien suodattaminen lapsiehtojen perusteella voi skannata koko joukon ennen luokitteluehtoja.",
+        "fix": "① Tarkista, onko liitosavaimissa ja suodatussarakkeissa indeksejä. ② Siirrä suodattimet päätaulun ehtoihin. ③ Upota lapset jo olemassa olevaan pääkyselyyn tai yhdistä ne yhdeksi tietokantafunktioksi."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET-sivutus – Muuttuu asteittain hitaammaksi, kun se lukee ja hylkää edeltäviä rivejä myöhemmillä sivuilla.",
+        "fix": "Vaihda avainsivutukseen (WHERE id > last_id ORDER BY id LIMIT n), joka lukee viimeksi vastaanotetun avaimen jälkeisestä avaimesta."
+      }
     }
   },
   "pipeline": {

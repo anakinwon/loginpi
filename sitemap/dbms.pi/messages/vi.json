@@ -1026,7 +1026,9 @@
       "openSqlLab": "Mở trong SQL Tuning",
       "acct": "Tài khoản",
       "sortMax": "Thời gian thực thi tối đa 1 lần",
-      "maxMs": "Tối đa 1 lần ms"
+      "maxMs": "Tối đa 1 lần ms",
+      "diagToggle": "Chẩn đoán nguyên nhân",
+      "noMax": "Không có giá trị cao nhất — {n} mục được sắp xếp tạm thời theo giá trị trung bình một lần vì chúng là các bộ sưu tập cũ không có giá trị cao nhất một lần (không theo tổng thời gian). Giá trị cao nhất sẽ được điền nếu được thu thập ngay bây giờ."
     },
     "health": {
       "empty": "Chưa có ảnh chụp nhanh nào. Nhấn Thu thập ngay trên tab Thu thập",
@@ -1080,7 +1082,7 @@
         "BATCH": "Có vẻ như một lô hoặc công việc đã lên lịch. Phân tán thời gian chạy ra khỏi các đỉnh kinh doanh và thu nhỏ công việc trên mỗi commit. Kiểm tra các chỉ mục và thống kê (ANALYZE) trên các bảng đích, và chia nhỏ các giao dịch dài. Đặt tên công việc vào application_name sẽ làm cho phân loại tiếp theo chính xác hơn",
         "PROGRAM": "Đây có vẻ là các truy vấn được thực thi bởi ứng dụng. Hãy kiểm tra kế hoạch thực thi trong điều chỉnh SQL. Nếu thời gian thực thi tối đa mỗi lần dài, hãy xem xét thứ tự chỉ mục/kết nối trước; nếu thời gian thực thi mỗi lần ngắn nhưng số lần gọi nhiều, hãy xem xét các cuộc gọi lặp lại (N+1)/bộ nhớ đệm. Đặt tên dịch vụ vào application_name của nhóm kết nối.",
         "PLATFORM": "Có vẻ như công việc nội bộ của DB hoặc nền tảng như autovacuum hoặc sao chép. Thường không cần hành động. Nếu nó vẫn ở trên cùng, hãy xem xét ngưỡng autovacuum và maintenance_work_mem",
-        "MONITOR": "Có vẻ như các truy vấn thống kê của dịch vụ này (liên kết schema.pi). Không cần hành động. Nếu nó xuất hiện quá thường xuyên, hãy giảm tần suất thăm dò",
+        "MONITOR": "Đây là truy vấn tự thu thập của dbms.pi — kết nối schema.pi là một câu lệnh cố định chỉ đọc các chế độ xem thống kê/danh mục (pg_stat_*/pg_catalog), không phải truy vấn nghiệp vụ và không yêu cầu khách hàng thực hiện hành động. Nếu tải cơ sở dữ liệu mục tiêu là vấn đề, hãy giảm số lần mở nút thu thập/màn hình giám sát. Các câu lệnh từ các công cụ giám sát khác cũng chỉ đọc cùng một chế độ xem thống kê cũng được nhóm ở đây.",
         "UNKNOWN": "Không có manh mối nào về nguồn. Đặt application_name trên mỗi kết nối và chia tài khoản theo mục đích; nó sẽ được phân loại từ các mẫu tiếp theo"
       },
       "detail": {
@@ -1096,7 +1098,51 @@
       "privOff": "Tài khoản liên kết không thể xem chi tiết phiên của các tài khoản khác, vì vậy không có mẫu nào được thu thập. Yêu cầu quản trị viên DB chạy GRANT pg_read_all_stats TO {user};",
       "linkUsr": "tài khoản liên kết",
       "qidOff": "Chi tiết phiên hiển thị nhưng ID truy vấn trống (compute_query_id bị tắt). Kiểm tra với SHOW compute_query_id; sau đó chạy ALTER SYSTEM SET compute_query_id = 'auto'; và tải lại (SELECT pg_reload_conf();)",
-      "openHint": "Mở SQL Tuning với truy vấn đã được điền. Thay thế các chỗ giữ chỗ như $1 bằng các giá trị thực trước khi xem kế hoạch"
+      "openHint": "Mở SQL Tuning với truy vấn đã được điền. Thay thế các chỗ giữ chỗ như $1 bằng các giá trị thực trước khi xem kế hoạch",
+      "detailTitle": "Mẫu nguồn"
+    },
+    "diag": {
+      "title": "Chẩn đoán nguyên nhân",
+      "fix": "Hành động:",
+      "none": "Không có nguyên nhân nào được thống kê — hãy mở kế hoạch thực thi trong điều chỉnh SQL để kiểm tra",
+      "cum": "Không có lệnh gọi trong khoảng thời gian này — dựa trên tích lũy (kể từ khi đặt lại thống kê)",
+      "basis": "Căn cứ — Cao nhất 1 lần {max}ms · Trung bình {mean}ms · Số lần gọi {calls} · Số hàng mỗi lần {rpc} · Tỷ lệ đọc đĩa {read} · Khối tạm thời {tmp}",
+      "SELF_MON": {
+        "cause": "Truy vấn thu thập nội bộ của dbms.pi — đây là câu lệnh giám sát chỉ đọc các chế độ xem thống kê và danh mục",
+        "fix": "Không yêu cầu hành động của khách hàng. Nếu tải cơ sở dữ liệu đích là vấn đề, hãy giảm số lần truy vấn màn hình thu thập/giám sát."
+      },
+      "NO_MAX": {
+        "cause": "Đây là dữ liệu thu thập cũ không có giá trị cao nhất 1 lần, nên không thể phân biệt 'chậm mỗi lần' hay 'trì hoãn không liên tục'",
+        "fix": "Nhấn thu thập một lần ngay bây giờ để điền giá trị cao nhất và chẩn đoán sẽ chính xác hơn"
+      },
+      "SLOW_EACH": {
+        "cause": "Chậm mỗi lần — mất nhiều thời gian mỗi khi thực thi với cao nhất {max}ms, trung bình {mean}ms",
+        "fix": "① Xem kế hoạch thực thi bằng cách 'Mở trong điều chỉnh SQL' ② Nếu có quét toàn bộ (Seq Scan) hoặc sắp xếp lớn, hãy xem xét chỉ mục cột điều kiện WHERE·JOIN ③ Thu hẹp điều kiện để chỉ đọc các cột và hàng cần thiết"
+      },
+      "SPIKE": {
+        "cause": "Trì hoãn không liên tục — trung bình {mean}ms nhưng đôi khi mất nhiều thời gian với cao nhất {max}ms (gấp {x} lần trung bình)",
+        "fix": "① Khi chậm, kiểm tra chờ khóa (wait_event) trong tab hoạt động·khóa ② Nếu chỉ chậm ở lần thực thi đầu tiên, đó là do bộ nhớ cache trống và đã đọc từ đĩa ③ So sánh cùng một truy vấn với nhiều giá trị trong điều chỉnh SQL để xem kế hoạch thực thi có thay đổi theo giá trị không"
+      },
+      "DISK_READ": {
+        "cause": "Cache miss — {pct}% ({read} khối) các khối đã đọc được đọc từ đĩa chứ không phải bộ nhớ",
+        "fix": "① Giảm phạm vi đọc bằng chỉ mục ② Thu hẹp khoảng thời gian·điều kiện truy vấn ③ Nếu dữ liệu được đọc thường xuyên nhưng vẫn cao, hãy xem xét shared_buffers (bộ nhớ)"
+      },
+      "TEMP_SPILL": {
+        "cause": "Vượt quá bộ nhớ — sắp xếp·băm đã vượt quá work_mem và đã ghi {blk} khối (khoảng {mb}MB, {perCall} khối mỗi lần) vào tệp tạm thời",
+        "fix": "① Đặt chỉ mục trên các cột ORDER BY·GROUP BY để bỏ qua sắp xếp ② Giảm số hàng cần sắp xếp trước (LIMIT vào bên trong) ③ Nếu thực sự cần thiết, chỉ tăng SET LOCAL work_mem cho giao dịch truy vấn này"
+      },
+      "MANY_ROWS": {
+        "cause": "Truy vấn quá nhiều — lấy {perCall} hàng mỗi lần",
+        "fix": "① Danh sách màn hình được truy vấn theo từng trang ② SELECT chỉ chọn các cột được sử dụng ③ Tổng hợp được thực hiện trong cơ sở dữ liệu và chỉ nhận kết quả"
+      },
+      "PGRST_EMBED": {
+        "cause": "Câu lệnh bộ lọc nhúng PostgREST (!inner) — lọc cha bằng điều kiện con có thể quét toàn bộ trước điều kiện phân loại",
+        "fix": "① Kiểm tra xem có chỉ mục trên khóa nối/cột lọc không ② Di chuyển bộ lọc đến điều kiện của bảng cha ③ Nhúng con vào truy vấn cha hiện có hoặc hợp nhất thành một hàm cơ sở dữ liệu"
+      },
+      "OFFSET_PAGING": {
+        "cause": "Phân trang OFFSET — các trang sau càng chậm vì đọc và loại bỏ các hàng trước đó",
+        "fix": "Thay đổi sang phân trang keyset (WHERE id > id cuối cùng ORDER BY id LIMIT n) đọc từ khóa cuối cùng đã nhận"
+      }
     }
   },
   "pipeline": {

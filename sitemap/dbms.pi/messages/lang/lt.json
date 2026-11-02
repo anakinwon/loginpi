@@ -1016,7 +1016,9 @@
       "openSqlLab": "Atidaryti SQL derinime",
       "acct": "Paskyra",
       "sortMax": "Maksimalus vieno vykdymo laikas",
-      "maxMs": "Maks. vieno ms"
+      "maxMs": "Maks. vieno ms",
+      "diagToggle": "Diagnozuoti priežastį",
+      "noMax": "Nėra maksimalios vertės – {n} elementų yra iš senesnių rinkinių be maksimalios vertės, todėl jie laikinai rūšiuojami pagal vidurkį (ne pagal bendrą laiką). Dabar renkant bus užpildyta maksimali vertė."
     },
     "health": {
       "empty": "Dar nėra momentinių nuotraukų. Skirtuke „Rinkti“ paspauskite „Rinkti dabar“",
@@ -1069,7 +1071,7 @@
         "BATCH": "Panašu, kad tai paketas arba suplanuotas darbas. Paskirstykite vykdymo laikus, kad išvengtumėte verslo piko, ir sumažinkite darbo apimtį vienam įsipareigojimui. Patikrinkite indeksus ir statistiką (ANALYZE) tikslinėse lentelėse ir padalinkite ilgas transakcijas. Įdėjus užduoties pavadinimą į application_name, kitas klasifikavimas bus tikslesnis.",
         "PROGRAM": "Atrodo, kad tai yra programos vykdyta užklausa. Patikrinkite vykdymo planą SQL derinime. Jei maksimalus vieno vykdymo laikas yra ilgas, pirmiausia peržiūrėkite indeksus ir sujungimo tvarką. Jei vienas vykdymas yra trumpas, bet iškvietimų skaičius didelis, peržiūrėkite pasikartojančius iškvietimus (N+1) ir talpyklą. Įdėkite paslaugos pavadinimą į ryšio telkinio application_name.",
         "PLATFORM": "Panašu, kad tai DB arba platformos vidinis darbas, pvz., autovacuum arba replikacija. Paprastai nereikia jokių veiksmų. Jei jis išlieka viršuje, peržiūrėkite autovacuum slenksčius ir maintenance_work_mem.",
-        "MONITOR": "Panašu, kad tai šios paslaugos statistikos užklausos (schema.pi nuoroda). Jokių veiksmų nereikia. Jei rodoma per dažnai, sumažinkite apklausos dažnumą.",
+        "MONITOR": "Tai dbms.pi savarankiško rinkimo užklausa – schema.pi ryšys yra fiksuotas teiginys, kuris skaito tik statistinius rodinius/katalogus (pg_stat_*·pg_catalog), todėl tai nėra verslo užklausa ir nereikia jokių kliento veiksmų. Jei tikslinės duomenų bazės apkrova yra problema, sumažinkite rinkimo mygtuko/stebėjimo ekrano atidarymo skaičių. Čia taip pat grupuojami teiginiai iš kitų stebėjimo įrankių, kurie skaito tuos pačius statistinius rodinius.",
         "UNKNOWN": "Nėra jokių užuominų apie šaltinį. Nustatykite application_name kiekvienam ryšiui ir padalinkite paskyras pagal paskirtį; ji bus klasifikuojama iš kitų pavyzdžių."
       },
       "detail": {
@@ -1085,7 +1087,51 @@
       "privOff": "Susiejimo paskyra negali matyti kitų paskyrų sesijos detalių, todėl pavyzdžiai nerenkami. Paprašykite DB administratoriaus paleisti GRANT pg_read_all_stats TO {user};",
       "linkUsr": "susiejimo paskyra",
       "qidOff": "Sesijos detalės matomos, bet užklausos ID yra tuščias (compute_query_id išjungtas). Patikrinkite su SHOW compute_query_id; tada paleiskite ALTER SYSTEM SET compute_query_id = 'auto'; ir perkraukite (SELECT pg_reload_conf();)",
-      "openHint": "Atidaro SQL derinimo įrankį su užpildyta užklausa. Prieš peržiūrėdami planą, pakeiskite vietos žymeklius, pvz., $1, tikromis reikšmėmis."
+      "openHint": "Atidaro SQL derinimo įrankį su užpildyta užklausa. Prieš peržiūrėdami planą, pakeiskite vietos žymeklius, pvz., $1, tikromis reikšmėmis.",
+      "detailTitle": "Šaltinio pavyzdžiai"
+    },
+    "diag": {
+      "title": "Diagnozuoti priežastį",
+      "fix": "Veiksmas:",
+      "none": "Statistika neatskleidė priežasties – patikrinkite vykdymo planą SQL derinime.",
+      "cum": "Šiuo intervalu iškvietimų nebuvo – kaupiamasis (nuo statistikos atstatymo)",
+      "basis": "Pagrindas – maks. 1 kartas {max}ms · vid. {mean}ms · iškvietimai {calls} · eilučių per iškvietimą {rpc} · disko skaitymo santykis {read} · laikini blokai {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi savarankiško rinkimo užklausa – stebėjimo teiginys, kuris nuskaito tik statistinius rodinius/katalogus.",
+        "fix": "Nereikia jokių kliento veiksmų. Jei tikslinės duomenų bazės apkrova yra problema, sumažinkite rinkimo/stebėjimo ekrano peržiūrų skaičių."
+      },
+      "NO_MAX": {
+        "cause": "Senas rinkinys be „maksimalios 1 karto“ vertės, todėl negalima atskirti „visada lėtas/protarpinis vėlavimas“.",
+        "fix": "Dabar vieną kartą spustelėkite „Rinkti“, kad užpildytumėte maksimalias vertes tiksliai diagnozei."
+      },
+      "SLOW_EACH": {
+        "cause": "Visada lėtas – kiekvieną kartą užtrunka ilgai, maksimaliai {max}ms ir vidutiniškai {mean}ms.",
+        "fix": "① Atidarykite vykdymo planą „Atidaryti SQL derinime“. ② Jei yra pilnų nuskaitymų (Seq Scan) arba didelių rūšiavimų, peržiūrėkite indeksus WHERE/JOIN sąlygų stulpeliuose. ③ Susiaurinkite sąlygas, kad būtų skaitomi tik reikalingi stulpeliai/eilutės."
+      },
+      "SPIKE": {
+        "cause": "Protarpinis vėlavimas – vidutiniškai {mean}ms, bet kartais užtrunka ilgai, maksimaliai {max}ms ({x} kartų daugiau nei vidurkis).",
+        "fix": "① Kai lėtai, patikrinkite užrakto laukimus (wait_event) skirtuke „Veikla/Užraktai“. ② Jei tik pirmas vykdymas yra lėtas, talpykla buvo tuščia ir buvo skaitoma iš disko. ③ Palyginkite tą pačią užklausą su skirtingomis vertėmis SQL derinime, kad pamatytumėte, ar vykdymo planas keičiasi priklausomai nuo verčių."
+      },
+      "DISK_READ": {
+        "cause": "Talpyklos praleidimas – {pct}% ({read} blokų) perskaitytų blokų buvo perskaityta iš disko, o ne iš atminties.",
+        "fix": "① Sumažinkite skaitymo diapazoną naudodami indeksus. ② Susiaurinkite užklausos laikotarpį/sąlygas. ③ Jei dažnai skaitomų duomenų kiekis išlieka didelis, peržiūrėkite shared_buffers (atmintį)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Atminties perpildymas – rūšiavimas/maišymas viršijo work_mem ir įrašė {blk} blokus (apie {mb}MB, {perCall} blokų per iškvietimą) į laikinus failus.",
+        "fix": "① Indeksų įdėjimas į ORDER BY/GROUP BY stulpelius praleidžia rūšiavimą. ② Pirmiausia sumažinkite rūšiuojamų eilučių skaičių (LIMIT viduje). ③ Jei absoliučiai būtina, padidinkite SET LOCAL work_mem tik šiai užklausos transakcijai."
+      },
+      "MANY_ROWS": {
+        "cause": "Per didelis duomenų gavimas – vienu iškvietimu gaunama {perCall} eilučių.",
+        "fix": "① Ekrano sąrašai gaunami puslapiais. ② SELECT pasirenka tik naudojamus stulpelius. ③ Agregavimas atliekamas duomenų bazėje, ir gaunami tik rezultatai."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST įterptojo filtro (!inner) teiginys – filtruojant tėvus pagal vaikų sąlygas, gali būti nuskaitytas visas rinkinys prieš klasifikavimo sąlygas.",
+        "fix": "① Patikrinkite, ar yra indeksų sujungimo raktams ir filtravimo stulpeliams. ② Perkelkite filtrus į tėvinės lentelės sąlygas. ③ Įterpkite vaikus į jau esamą tėvinę užklausą arba sujunkite juos į vieną duomenų bazės funkciją."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET puslapiavimas – palaipsniui lėtėja, nes skaito ir atmeta ankstesnes eilutes vėlesniems puslapiams.",
+        "fix": "Pakeiskite į raktų rinkinio puslapiavimą (WHERE id > last_id ORDER BY id LIMIT n), kuris skaito nuo rakto po paskutinio gauto rakto."
+      }
     }
   },
   "pipeline": {

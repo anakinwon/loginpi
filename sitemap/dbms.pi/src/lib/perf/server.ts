@@ -12,6 +12,10 @@ import {
 
 export type Obj = Record<string, unknown>
 
+// 칼럼 없음 판별(마이그레이션 미적용 DB 폴백) — PG 42703(select), PostgREST PGRST204(insert 본문의 없는 칼럼)
+export const isNoCol = (e?: { code?: string } | null) =>
+  e?.code === '42703' || e?.code === 'PGRST204'
+
 export function toObjs(r: QueryResult): Obj[] {
   return r.rows.map((row) =>
     Object.fromEntries(r.cols.map((c, i) => [c.toLowerCase(), row[i]])),

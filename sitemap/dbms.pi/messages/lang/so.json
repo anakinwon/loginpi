@@ -1024,7 +1024,9 @@
       "openSqlLab": "Fur SQL Tuning",
       "acct": "Akoon",
       "sortMax": "Wakhtiga ugu sarreeya ee hal fulin",
-      "maxMs": "Ugu sarreeya hal ms"
+      "maxMs": "Ugu sarreeya hal ms",
+      "diagToggle": "Baadh Sababta",
+      "noMax": "Ma jiro qiime ugu sarreeya — {n} shay waxay ka yimaadeen ururin hore oo aan lahayn qiime ugu sarreeya, sidaa darteed si ku meel gaar ah ayaa loo kala saaray celcelis ahaan (ma aha waqtiga guud). Ururinta hadda waxay buuxin doontaa qiimaha ugu sarreeya."
     },
     "health": {
       "empty": "Wali ma jiraan sawirro. Riix Ururi hadda tabka Ururi",
@@ -1078,7 +1080,7 @@
         "BATCH": "Waxay u egtahay dufcad ama shaqo la qorsheeyay. Faafi wakhtiyada socodka si ay uga fogaadaan meelaha ugu sarreeya ee ganacsiga oo yaree shaqada halkii ballanqaad. Hubi tusmooyinka iyo tirakoobyada (ANALYZE) ee shaxda bartilmaameedka, oo kala qaybi macaamilada dhaadheer. Ku darista magaca shaqada application_name waxay ka dhigaysaa kala-saaridda xigta mid sax ah",
         "PROGRAM": "Tani waxay u muuqataa inay tahay su'aal ay fulisay codsiga. Hubi qorshaha fulinta ee hagaajinta SQL. Haddii wakhtiga ugu sarreeya ee hal fulin uu dheer yahay, marka hore eeg tusmooyinka iyo nidaamka isku xirka. Haddii hal fulin ay gaaban tahay laakiin tirada wicitaanada ay badan tahay, eeg wicitaanada soo noqnoqda (N+1) iyo kaydinta. Ku rid magaca adeegga application_name ee barkadda isku xirka.",
         "PLATFORM": "Waxay u egtahay shaqo gudaha ah oo DB ama madal ah sida autovacuum ama nuqul-samayn. Badanaa wax ficil ah looma baahna. Haddii ay ku sii jirto meesha ugu sarreysa, dib u eeg marinka autovacuum iyo maintenance_work_mem",
-        "MONITOR": "Waxay u egtahay weydiimaha tirakoobyada ee adeeggan (xiriirka schema.pi). Wax ficil ah looma baahna. Haddii ay soo muuqato marar badan, hoos u dhig inta jeer ee la hubinayo",
+        "MONITOR": "Tani waa su'aal is-ururin ah oo dbms.pi ah — isku-xirka schema.pi waa weedh go'an oo kaliya akhrisa aragtiyaha/buug-yaraha tirakoobyada (pg_stat_*·pg_catalog), sidaa darteed ma aha su'aal ganacsi mana u baahna tallaabo macmiil. Haddii culeyska xogta bartilmaameedku yahay dhibaato, yaree tirada jeer ee aad furto badhanka ururinta/shaashadda la socodka. Weedhaha ka imanaya qalabka kale ee la socodka ee akhriya isla aragtiyaha tirakoobyada ayaa sidoo kale halkan lagu soo ururiyaa.",
         "UNKNOWN": "Ma jirto wax tilmaan ah oo ku saabsan isha. Deji application_name xiriir kasta oo kala qaybi akoonnada ujeeddooyin kala duwan; waxaa lagu kala saari doonaa muunadaha xiga"
       },
       "detail": {
@@ -1094,7 +1096,51 @@
       "privOff": "Akoonka xiriirku ma arki karo faahfaahinta fadhiyada akoonnada kale, sidaa darteed ma jiraan muunado la soo ururiyay. Weydii maamulaha DB inuu sameeyo GRANT pg_read_all_stats TO {user};",
       "linkUsr": "akoonta xiriirka",
       "qidOff": "Faahfaahinta fadhiga waa la arki karaa laakiin aqoonsiga weydiinta waa madhan yahay (compute_query_id waa dansan yahay). Hubi SHOW compute_query_id; ka dibna samee ALTER SYSTEM SET compute_query_id = 'auto'; oo dib u soo shub (SELECT pg_reload_conf();)",
-      "openHint": "Wuxuu furaa SQL Tuning iyadoo weydiinta la buuxiyay. Beddel meelaha bannaan sida $1 qiimayaal dhab ah ka hor inta aanad eegin qorshaha"
+      "openHint": "Wuxuu furaa SQL Tuning iyadoo weydiinta la buuxiyay. Beddel meelaha bannaan sida $1 qiimayaal dhab ah ka hor inta aanad eegin qorshaha",
+      "detailTitle": "Tusaalooyinka Isha"
+    },
+    "diag": {
+      "title": "Baadh Sababta",
+      "fix": "Tallaabo:",
+      "none": "Ma jirto sabab ay tirakoobyadu muujiyeen — ka eeg qorshaha fulinta SQL Tuning.",
+      "cum": "Ma jiraan wicitaanno muddadan — isku-darka (tan iyo markii dib loo dejiyay tirakoobyada)",
+      "basis": "Saldhig — Ugu badnaan 1-mar {max}ms · Celcelis {mean}ms · Wicitaannada {calls} · Safafka wicitaan kasta {rpc} · Heerka akhriska diskiga {read} · Xannibaadaha ku-meel-gaadhka ah {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi su'aal is-ururin ah — odhaah la socod ah oo akhrinaysa kaliya aragtiyada tirakoobyada/buugaagta.",
+        "fix": "Ma jirto tallaabo macmiil oo loo baahan yahay. Haddii culeyska xogta bartilmaameedku uu yahay dhibaato, yaree tirada jeer ee aad furto shaashadda ururinta/la socodka."
+      },
+      "NO_MAX": {
+        "cause": "Ururin hore oo aan lahayn qiime 'ugu sarreeya 1-mar', sidaa darteed lama kala saari karo 'mar walba gaabis/dib u dhac goos-goos ah'.",
+        "fix": "Hadda hal mar guji 'Ururi' si aad u buuxiso qiimaha ugu sarreeya ee baadhista saxda ah."
+      },
+      "SLOW_EACH": {
+        "cause": "Mar walba gaabis — Waxay qaadataa wakhti dheer mar kasta oo ay socoto, iyada oo ugu badnaan {max}ms iyo celcelis {mean}ms.",
+        "fix": "① Fur qorshaha fulinta 'Fur SQL Tuning'. ② Haddii ay jiraan baadhitaanno buuxa (Seq Scan) ama kala-soocid waaweyn, dib u eeg tusmooyinka ku jira shuruudaha WHERE/JOIN. ③ Yaree shuruudaha si aad u akhrido kaliya tiirarka/safafka lagama maarmaanka ah."
+      },
+      "SPIKE": {
+        "cause": "Dib u dhac goos-goos ah — Celcelis {mean}ms, laakiin mararka qaarkood waxay qaadataa wakhti dheer oo ugu badnaan {max}ms ({x} jeer celceliska).",
+        "fix": "① Marka ay gaabis tahay, ka eeg sugitaanka qufulka (wait_event) tabka Hawsha/Qufulka. ② Haddii fulinta koowaad oo kaliya ay gaabis tahay, kaydku wuu madhnaa oo diskiga ayaa la akhriyay. ③ Isbarbardhig su'aasha isku midka ah oo leh qiimayaal kala duwan SQL Tuning si aad u aragto haddii qorshaha fulinta uu isbeddelo iyadoo lagu saleynayo qiimaha."
+      },
+      "DISK_READ": {
+        "cause": "Cache Miss — {pct}% ({read} blocks) oo ka mid ah xannibaadaha la akhriyay ayaa laga akhriyay diskiga, ma aha xusuusta.",
+        "fix": "① Yaree inta la akhrinayo tusmooyinka. ② Yaree muddada/shuruudaha su'aasha. ③ Haddii xogta si joogto ah loo akhriyo ay sii ahaanayso mid sare, dib u eeg shared_buffers (xusuusta)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Xusuusta oo buux dhaaftay — Kala-soocidda/hash-ka ayaa ka batay work_mem oo waxay ku qortay {blk} blocks (qiyaastii {mb}MB, {perCall} blocks wicitaan kasta) faylasha ku-meel-gaadhka ah.",
+        "fix": "① Ku dhejinta tusmooyinka tiirarka ORDER BY/GROUP BY waxay ka booddaa kala-soocidda. ② Marka hore, yaree tirada safafka la kala-soocayo (LIMIT gudaha). ③ Haddii ay gabi ahaanba lagama maarmaan tahay, kordhi SET LOCAL work_mem kaliya macaamilka su'aashan."
+      },
+      "MANY_ROWS": {
+        "cause": "Soo-celin xad-dhaaf ah — Waxay soo qaadataa {perCall} saf wicitaan kasta.",
+        "fix": "① Liisaska shaashadda waxaa lagu soo qaadaa bog-bog. ② SELECT waxay doorataa kaliya tiirarka la isticmaalo. ③ Isku-darka waxaa lagu sameeyaa xogta, waxaana la helaa kaliya natiijooyinka."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST odhaahda shaandhaynta la dhex-geliyay (!inner) — shaandhaynta waalidka iyadoo la adeegsanayo shuruudaha ilmaha waxay baadhi kartaa dhammaan qaybta ka hor shuruudaha kala-saaridda.",
+        "fix": "① Hubi in ay jiraan tusmooyin ku saabsan furayaasha isku-dhafka iyo tiirarka shaandhaynta. ② Shaandhaynta u wareeji shuruudaha miiska waalidka. ③ Carruurta ku dhex dar weydiin waalid oo hore u jirtay ama ku biir hal shaqo xogeed."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET Paging — Waxay si tartiib tartiib ah u gaabisaysaa marka ay akhrido oo ay iska tuurto safafka hore ee bogagga dambe.",
+        "fix": "U beddel keyset paging (WHERE id > last_id ORDER BY id LIMIT n) kaas oo ka akhriya furaha ka dambeeya furaha ugu dambeeyay ee la helay."
+      }
     }
   },
   "pipeline": {

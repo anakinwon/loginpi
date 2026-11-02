@@ -1026,7 +1026,9 @@
       "openSqlLab": "SQL Tuning-de aç",
       "acct": "Hasap",
       "sortMax": "Iň ýokary ýeke ýerine ýetiriş wagty",
-      "maxMs": "Iň ýokary ýeke ms"
+      "maxMs": "Iň ýokary ýeke ms",
+      "diagToggle": "Sebäbini anyklaň",
+      "noMax": "Iň ýokary baha ýok — {n} sany element iň ýokary bir gezeklik bahasy bolmadyk köne ýygyndylardan bolany üçin, wagtlaýynça ortaça görkeziji boýunça tertiplendi (umumy wagt boýunça däl). Häzir ýygnamak iň ýokary bahany doldurar."
     },
     "health": {
       "empty": "Heniz hiç hili surata düşürilen ýok. Ýygnamak bölüminde häzir ýygnamak düwmesini basyň",
@@ -1080,7 +1082,7 @@
         "BATCH": "Partiýa ýa-da meýilleşdirilen iş ýaly. Iş wagtlaryny iş ýokary nokatlaryndan daşlaşdyryň we her bir tabşyryk üçin işi kiçeldiň. Maksat tablisalarynda indeksleri we statistikany (ANALYZE) barlaň we uzyn tranzaksiýalary bölüň. application_name-e iş adyny goýmak indiki klassifikasiýany has takyk edýär",
         "PROGRAM": "Bu programma tarapyndan ýerine ýetirilen sorag ýaly görünýär. SQL sazlamasynda ýerine ýetiriş meýilnamasyny barlaň. Eger iň ýokary ýeke ýerine ýetiriş wagty uzyn bolsa, ilki indekslere we birikme tertibine serediň. Eger ýeke ýerine ýetiriş gysga bolsa, ýöne çagyryş sany ýokary bolsa, gaýtalanýan çagyryşlara (N+1) we keşlemä serediň. Birikme howuzynyň application_name-ine hyzmat adyny goýuň.",
         "PLATFORM": "autovacuum ýa-da replikasiýa ýaly DB ýa-da platforma içerki iş ýaly. Adatça hiç hili hereket talap edilmeýär. Eger ýokarda galýan bolsa, autovacuum çäklerini we maintenance_work_mem-i gözden geçiriň",
-        "MONITOR": "Bu hyzmatyň öz statistika soraglary (schema.pi baglanyşygy) ýaly. Hiç hili hereket talap edilmeýär. Eger gaty ýygy-ýygydan görkezilýän bolsa, sorag ýygylygyny peseldiň",
+        "MONITOR": "Bu dbms.pi öz-özüni ýygnaýan soragdyr — schema.pi birikmesi diňe statistik görnüşleri/kataloglary (pg_stat_*·pg_catalog) okaýan hemişelik beýannama bolany üçin, bu iş soragy däldir we müşderiniň hereketi talap edilmeýär. Eger maksatlaýyn maglumat bazasynyň ýüki mesele bolsa, ýygnamak düwmesini/monitoring ekranyny açmagyň sanyny azaldyň. Beýleki monitoring gurallarynyň şol bir statistik görnüşleri okaýan beýannamalary hem şu ýere jemlenýär.",
         "UNKNOWN": "Çeşmä hiç hili delil ýok. Her bir birikmede application_name-i sazlaň we hasaplary maksat boýunça bölüň; indiki nusgalardan klassifikasiýa ediler"
       },
       "detail": {
@@ -1096,7 +1098,51 @@
       "privOff": "Baglanyşyk hasaby beýleki hasaplaryň sessiýa jikme-jikliklerini görüp bilmeýär, şonuň üçin nusgalar ýygnalmaýar. DB administratoryndan GRANT pg_read_all_stats TO {user}; işe girizmegi haýyş ediň",
       "linkUsr": "baglanyşyk hasaby",
       "qidOff": "Sessiýa jikme-jiklikleri görünýär, ýöne sorag ID-si boş (compute_query_id öçürilen). SHOW compute_query_id; bilen barlaň, soňra ALTER SYSTEM SET compute_query_id = 'auto'; işe giriziň we täzeden ýükläň (SELECT pg_reload_conf();)",
-      "openHint": "Soragy doldurylan SQL Tuning-i açýar. Meýilnamany görmezden ozal $1 ýaly ýer tutujylary hakyky gymmatlyklar bilen çalşyryň"
+      "openHint": "Soragy doldurylan SQL Tuning-i açýar. Meýilnamany görmezden ozal $1 ýaly ýer tutujylary hakyky gymmatlyklar bilen çalşyryň",
+      "detailTitle": "Çeşme nusgalary"
+    },
+    "diag": {
+      "title": "Sebäbini anyklaň",
+      "fix": "Hereket:",
+      "none": "Statistika boýunça sebäp ýüze çykarylmady — SQL Tuning-de ýerine ýetiriş meýilnamasyny barlaň.",
+      "cum": "Bu aralykda jaň ýok — jemi (statistika täzeden düzülenden bäri)",
+      "basis": "Esas — Iň ýokary 1 gezek {max}ms · Ortaça {mean}ms · Jaňlar {calls} · Her jaň üçin setirler {rpc} · Disk okamak gatnaşygy {read} · Wagtlaýyn bloklar {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi öz-özüni ýygnamak soragydyr — diňe statistiki görnüşleri/kataloglary okaýan monitoring beýany.",
+        "fix": "Müşderi hereketi talap edilmeýär. Eger maksatlaýyn maglumat bazasynyň ýüki mesele bolsa, ýygnamak/monitoring ekranyny açmagyň sanyny azaldyň."
+      },
+      "NO_MAX": {
+        "cause": "'Iň ýokary 1 gezek' bahasyz köne ýygyndy, şonuň üçin 'elmydama haýal/aralyk gijikme' tapawutlandyrylyp bilinmez.",
+        "fix": "Dogry anyklamak üçin iň ýokary bahalary doldurmak üçin häzir 'Ýygna' düwmesine bir gezek basyň."
+      },
+      "SLOW_EACH": {
+        "cause": "Elmydama haýal — Her gezek işläninde köp wagt alýar, iň ýokary {max}ms we ortaça {mean}ms bilen.",
+        "fix": "① 'SQL Tuning-de aç' bilen ýerine ýetiriş meýilnamasyny açyň. ② Eger doly skanlar (Seq Scan) ýa-da uly tertiplemeler bar bolsa, WHERE/JOIN şert sütünlerindäki indeksleri gözden geçiriň. ③ Diňe zerur sütünleri/setirleri okamak üçin şertleri daraldyň."
+      },
+      "SPIKE": {
+        "cause": "Aralyk gijikme — Ortaça {mean}ms, ýöne käwagt iň ýokary {max}ms (ortaçanyň {x} essesi) bilen köp wagt alýar.",
+        "fix": "① Haýal bolanda, Aktiwlik/Gulplar tab-da gulplama garaşmalaryny (wait_event) barlaň. ② Eger diňe ilkinji ýerine ýetiriş haýal bolsa, keş boş bolup, disk okaldy. ③ Bahalara baglylykda ýerine ýetiriş meýilnamasynyň üýtgäp-üýtgemändigini görmek üçin SQL Tuning-de şol bir soragy dürli bahalar bilen deňeşdiriň."
+      },
+      "DISK_READ": {
+        "cause": "Keş ýalňyşlygy — Okalan bloklaryň {pct}% ({read} blok) ýadyndan däl-de, diskden okaldy.",
+        "fix": "① Indeksler bilen okamak aralygyny azaldyň. ② Sorag döwrüni/şertlerini daraldyň. ③ Eger ýygy-ýygydan okalýan maglumatlar ýokary galýan bolsa, shared_buffers (ýat) gözden geçiriň."
+      },
+      "TEMP_SPILL": {
+        "cause": "Ýat dolulygy — Tertipleme/heş work_mem-den geçip, wagtlaýyn faýllara {blk} blok (takmynan {mb}MB, her jaň üçin {perCall} blok) ýazdy.",
+        "fix": "① ORDER BY/GROUP BY sütünlerine indeksleri goýmak tertiplemäni geçip gider. ② Ilki bilen, tertiplemek üçin setirleriň sanyny azaldyň (LIMIT içerde). ③ Eger hökman zerur bolsa, diňe bu sorag tranzaksiýasy üçin SET LOCAL work_mem-i artdyryň."
+      },
+      "MANY_ROWS": {
+        "cause": "Aşa köp almak — Her jaňda {perCall} setir alýar.",
+        "fix": "① Ekran sanawlary sahypa boýunça alynýar. ② SELECT diňe ulanylýan sütünleri saýlaýar. ③ Agregasiýalar maglumat bazasynda ýerine ýetirilýär we diňe netijeler alynýar."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST goşulan süzgüç (!inner) beýany — çaga şertleri bilen ene-atany süzmek, klassifikasiýa şertlerinden öň tutuş toplumy skan edip biler.",
+        "fix": "① Birikme açarlarynda we süzgüç sütünlerinde indeksleriň bardygyny barlaň. ② Süzgüçleri ene tablisanyň şertlerine geçiriň. ③ Çagalary eýýäm bar bolan ene soragyna goşuň ýa-da bir maglumat bazasy funksiýasyna birleşdiriň."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET sahypalaşdyrmak — Soňky sahypalar üçin öňki setirleri okap taşlaýandygy sebäpli barha haýallaýar.",
+        "fix": "Soňky alnan açardan soňky açardan okaýan açar toplumy sahypalaşdyrmaga (WHERE id > last_id ORDER BY id LIMIT n) üýtgediň."
+      }
     }
   },
   "pipeline": {

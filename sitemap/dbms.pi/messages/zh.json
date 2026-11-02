@@ -1026,7 +1026,9 @@
       "openSqlLab": "在SQL Tuning中打开",
       "acct": "账户",
       "sortMax": "单次最高执行时间",
-      "maxMs": "单次最高 ms"
+      "maxMs": "单次最高 ms",
+      "diagToggle": "诊断原因",
+      "noMax": "无最高值 — {n}个旧收集项没有最高值，因此暂时按平均值排序（而非总时间）。现在收集将填充最高值。"
     },
     "health": {
       "empty": "暂无快照。请在“收集”选项卡上点击“立即收集”",
@@ -1080,7 +1082,7 @@
         "BATCH": "看起来是批处理·计划任务。请避开业务高峰期分散执行时间，并减少每次提交的工作量。检查目标表的索引和统计信息（ANALYZE），并拆分长事务。在application_name中放入任务名称将使下次分类更精确。",
         "PROGRAM": "这似乎是应用程序执行的查询。请在 SQL 调优中检查执行计划。如果单次最高耗时较长，请优先查看索引和连接顺序；如果单次耗时较短但调用次数很多，请查看重复调用 (N+1) 和缓存。请在连接池的 application_name 中设置服务名称。",
         "PLATFORM": "看起来是autovacuum·复制等DB·平台内部工作。通常无需采取措施。如果持续排在前面，请审查autovacuum阈值和maintenance_work_mem。",
-        "MONITOR": "看起来是此服务（schema.pi连接）自身的统计查询。无需采取措施。如果出现过于频繁，请降低查询频率。",
+        "MONITOR": "这是 dbms.pi 自收集查询 — schema.pi 连接是只读取统计视图/目录（pg_stat_*·pg_catalog）的固定语句，不是业务查询，无需客户操作。如果目标数据库负载有问题，请减少打开收集按钮/监控屏幕的次数。其他监控工具读取相同统计视图的语句也会归入此处。",
         "UNKNOWN": "没有线索可以识别来源。请为所有连接设置application_name，并按用途划分账户，下次采样时将进行分类。"
       },
       "detail": {
@@ -1096,7 +1098,51 @@
       "privOff": "连接账户无权查看其他账户的会话详情，因此未收集样本。请DB管理员执行 GRANT pg_read_all_stats TO {user};",
       "linkUsr": "连接账户",
       "qidOff": "会话详情可见，但查询ID为空（compute_query_id已关闭）。请通过 SHOW compute_query_id; 确认，然后执行 ALTER SYSTEM SET compute_query_id = 'auto'; 并重新加载配置（SELECT pg_reload_conf();）。",
-      "openHint": "在SQL Tuning输入框中填充查询并打开。在查看执行计划之前，请将$1等占位符替换为实际值。"
+      "openHint": "在SQL Tuning输入框中填充查询并打开。在查看执行计划之前，请将$1等占位符替换为实际值。",
+      "detailTitle": "来源样本"
+    },
+    "diag": {
+      "title": "诊断原因",
+      "fix": "措施：",
+      "none": "统计数据未显示原因 — 请在 SQL 调优中打开执行计划进行确认",
+      "cum": "此区间无调用 — 基于累计（自统计重置后）",
+      "basis": "依据 — 最高1次 {max}ms · 平均 {mean}ms · 调用 {calls}次 · 每次行数 {rpc} · 磁盘读取率 {read} · 临时块 {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi 自身收集查询 — 仅读取统计视图·目录的监控语句",
+        "fix": "客户无需采取任何措施。如果目标数据库负载有问题，请减少收集/监控屏幕的查询次数。"
+      },
+      "NO_MAX": {
+        "cause": "旧的收集数据没有最高1次值，无法区分“每次都慢·间歇性延迟”",
+        "fix": "现在点击一次收集，最高值将被填充，诊断将更准确"
+      },
+      "SLOW_EACH": {
+        "cause": "每次都慢 — 最高 {max}ms，平均 {mean}ms，每次执行都耗时较长",
+        "fix": "① 通过“在 SQL 调优中打开”查看执行计划 ② 如果有全表扫描（Seq Scan）·大排序，请检查 WHERE·JOIN 条件列索引 ③ 缩小条件，只读取必要的列·行"
+      },
+      "SPIKE": {
+        "cause": "间歇性延迟 — 平均 {mean}ms，但最高 {max}ms（平均的 {x}倍），偶尔耗时较长",
+        "fix": "① 慢时在活动·锁标签中确认锁等待（wait_event） ② 如果只有第一次执行慢，可能是缓存为空，读取了磁盘 ③ 在 SQL 调优中用不同值比较相同的查询，看执行计划是否随值变化"
+      },
+      "DISK_READ": {
+        "cause": "缓存未命中 — 读取的块中 {pct}%（{read}块）是从磁盘而非内存读取的",
+        "fix": "① 通过索引减少读取范围 ② 缩小查询期间·条件 ③ 如果是频繁读取的数据且持续较高，请检查 shared_buffers（内存）"
+      },
+      "TEMP_SPILL": {
+        "cause": "内存溢出 — 排序·哈希超出 work_mem，写入了 {blk}块（约 {mb}MB，每次 {perCall}块）到临时文件",
+        "fix": "① 在 ORDER BY·GROUP BY 列上创建索引可以跳过排序 ② 首先减少排序的行数（将 LIMIT 移到内部） ③ 如果确实需要，只为此查询事务提高 SET LOCAL work_mem"
+      },
+      "MANY_ROWS": {
+        "cause": "查询过多 — 每次获取 {perCall}行",
+        "fix": "① 屏幕列表按页面查询 ② SELECT 只选择使用的列 ③ 聚合在数据库中完成，只接收结果"
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST 嵌入式过滤器（!inner）语句 — 通过子条件过滤父级，可能在分类条件之前遍历整个表",
+        "fix": "① 检查连接键和过滤列是否有索引 ② 将过滤器移至父表条件 ③ 将子表嵌入到已有的父表查询中，或合并为一个数据库函数"
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET 分页 — 越往后页，越需要读取并丢弃前面的行，因此会越来越慢",
+        "fix": "改为从最后接收到的键之后读取的键集分页（WHERE id > 最后 id ORDER BY id LIMIT n）"
+      }
     }
   },
   "pipeline": {

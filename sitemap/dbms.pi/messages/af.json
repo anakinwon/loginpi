@@ -1024,7 +1024,9 @@
       "openSqlLab": "Maak oop in SQL Tuning",
       "acct": "Rekening",
       "sortMax": "Maksimum enkele uitvoeringstyd",
-      "maxMs": "Maksimum enkel ms"
+      "maxMs": "Maksimum enkel ms",
+      "diagToggle": "Diagnoseer Oorsaak",
+      "noMax": "Geen maksimum waarde nie — {n} gevalle is ouer versamelings sonder 'n maksimum waarde vir 'n enkele keer, en is tydelik gesorteer volgens die gemiddelde vir 'n enkele keer (nie volgens totale tyd nie). Maksimum waardes sal ingevul word met huidige versamelings."
     },
     "health": {
       "empty": "Nog geen momentopnames nie. Druk Versamel nou op die Versamel-oortjie",
@@ -1078,7 +1080,7 @@
         "BATCH": "Dit lyk soos 'n batch of geskeduleerde taak. Versprei looptye weg van besigheidspieke en verminder die werk per commit. Kontroleer indekse en statistieke (ANALYZE) op die teikentabelle, en verdeel lang transaksies. Deur die taaknaam in application_name te plaas, maak die volgende klassifikasie meer presies",
         "PROGRAM": "Dit blyk 'n navraag te wees wat deur die toepassing uitgevoer is. Kontroleer die uitvoeringsplan in SQL-aanpassing. As die maksimum enkele uitvoeringstyd lank is, kyk eers na indekse en aansluitingsvolgorde. As 'n enkele uitvoering kort is, maar die oproeptelling hoog is, kyk na herhaalde oproepe (N+1) en kas. Plaas die diensnaam in die application_name van die verbindingpoel.",
         "PLATFORM": "Dit lyk soos DB of platform interne werk soos autovacuum of replikasie. Gewoonlik is geen aksie nodig nie. As dit boaan bly, hersien autovacuum-drempels en maintenance_work_mem",
-        "MONITOR": "Dit lyk soos hierdie diens se eie statistieknavrae (schema.pi-skakel). Geen aksie nodig nie. As dit te gereeld verskyn, verlaag die stemfrekwensie",
+        "MONITOR": "Dit is 'n dbms.pi selfversamelingsnavraag — die schema.pi-verbinding is 'n vaste stelling wat slegs statistiese aansigte/katalogusse (pg_stat_*·pg_catalog) lees, so dit is nie 'n besigheidsnavraag nie en geen kliëntaksie word vereis nie. As die teikendatabasislas 'n probleem is, verminder die aantal kere wat jy die versamelknoppie/monitorskerm oopmaak. Stellings van ander moniteringhulpmiddels wat dieselfde statistiese aansigte lees, word ook hier gegroepeer.",
         "UNKNOWN": "Daar is geen leidraad tot die bron nie. Stel application_name op elke verbinding en verdeel rekeninge volgens doel; dit sal vanaf die volgende monsters geklassifiseer word"
       },
       "detail": {
@@ -1094,7 +1096,51 @@
       "privOff": "Die skakelrekening kan nie ander rekeninge se sessiebesonderhede sien nie, so geen monsters word versamel nie. Vra 'n DB-administrateur om GRANT pg_read_all_stats TO {user}; uit te voer",
       "linkUsr": "skakelrekening",
       "qidOff": "Sessiebesonderhede is sigbaar, maar die navraag-ID is leeg (compute_query_id is af). Kontroleer met SHOW compute_query_id; voer dan ALTER SYSTEM SET compute_query_id = 'auto'; uit en herlaai (SELECT pg_reload_conf();)",
-      "openHint": "Maak SQL Tuning oop met die navraag ingevul. Vervang plekhouers soos $1 met regte waardes voordat die plan bekyk word"
+      "openHint": "Maak SQL Tuning oop met die navraag ingevul. Vervang plekhouers soos $1 met regte waardes voordat die plan bekyk word",
+      "detailTitle": "Bronmonsters"
+    },
+    "diag": {
+      "title": "Diagnoseer Oorsaak",
+      "fix": "Aksie:",
+      "none": "Geen oorsaak deur statistieke geopenbaar nie — kontroleer die uitvoeringsplan in SQL Tuning.",
+      "cum": "Geen oproepe in hierdie interval nie – kumulatief (sedert statistieke teruggestel is)",
+      "basis": "Basis — Maksimum 1-keer {max}ms · Gemiddeld {mean}ms · Oproepe {calls} · Rye per oproep {rpc} · Skyflesingsverhouding {read} · Tydelike blokke {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi selfversamelingnavraag — moniteringstelling wat slegs statistiese aansigte/katalogusse lees.",
+        "fix": "Geen kliëntaksie is nodig nie. As die teikendatabasislas 'n probleem is, verminder die aantal kere wat u die versameling-/monitorskerm oopmaak."
+      },
+      "NO_MAX": {
+        "cause": "Ou versameling sonder 'n 'maksimum 1-keer' waarde, so 'altyd stadig/intermitterende vertraging' kan nie onderskei word nie.",
+        "fix": "Klik 'Versamel' een keer nou om maksimum waardes vir akkurate diagnose in te vul."
+      },
+      "SLOW_EACH": {
+        "cause": "Altyd Stadig — Neem elke keer lank om te loop, met maksimum {max}ms en gemiddeld {mean}ms.",
+        "fix": "① Maak die uitvoeringsplan oop in 'Maak oop in SQL Tuning'. ② As daar volle skanderings (Seq Scan) of groot sorteer is, hersien indekse op WHERE/JOIN-kondisiekolomme. ③ Vernou kondisies om slegs nodige kolomme/rye te lees."
+      },
+      "SPIKE": {
+        "cause": "Intermitterende Vertraging — Gemiddeld {mean}ms, maar neem soms lank teen maksimum {max}ms ({x} keer die gemiddelde).",
+        "fix": "① Wanneer stadig, kontroleer vir slotwagte (wait_event) in die Aktiwiteit/Slotte-oortjie. ② As slegs die eerste uitvoering stadig is, was die kas leeg en is die skyf gelees. ③ Vergelyk dieselfde navraag met verskillende waardes in SQL Tuning om te sien of die uitvoeringsplan verander op grond van waardes."
+      },
+      "DISK_READ": {
+        "cause": "Kasgemis — {pct}% ({read} blokke) van geleesde blokke is van skyf gelees, nie geheue nie.",
+        "fix": "① Verminder die leesbereik met indekse. ② Vernou die navraagperiode/kondisies. ③ As gereeld geleesde data hoog bly, hersien shared_buffers (geheue)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Geheue-oorloop — Sorteer/hash het work_mem oorskry en {blk} blokke (ongeveer {mb}MB, {perCall} blokke per oproep) na tydelike lêers geskryf.",
+        "fix": "① Die plasing van indekse op ORDER BY/GROUP BY-kolomme slaan sortering oor. ② Verminder eers die aantal rye om te sorteer (LIMIT binne). ③ Indien absoluut nodig, verhoog SET LOCAL work_mem slegs vir hierdie navraagtransaksie."
+      },
+      "MANY_ROWS": {
+        "cause": "Oormatige Herwinning — Haal {perCall} rye per oproep op.",
+        "fix": "① Skermlyste word bladsy vir bladsy opgeroep. ② SELECT kies slegs die kolomme wat gebruik word. ③ Aggregasies word in die databasis uitgevoer, en slegs die resultate word ontvang."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST ingebedde filter (!inner) stelling — die filter van ouers volgens kinderkondisies kan die hele stel skandeer voor klassifikasiekondisies.",
+        "fix": "① Kontroleer of daar indekse op aansluitsleutels en filterkolomme is. ② Skuif filters na die ouertabel se voorwaardes. ③ Sluit kinders in 'n reeds bestaande ouernavraag in of kombineer dit in 'n enkele databasis-funksie."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET-bladsyverdeling — Word progressief stadiger namate dit voorafgaande rye vir latere bladsye lees en weggooi.",
+        "fix": "Verander na sleutelstel-bladsyverdeling (WHERE id > laaste_id ORDER BY id LIMIT n) wat vanaf die sleutel na die laaste ontvangde sleutel lees."
+      }
     }
   },
   "pipeline": {

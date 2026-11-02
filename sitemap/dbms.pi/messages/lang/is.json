@@ -1016,7 +1016,9 @@
       "openSqlLab": "Opna í SQL Tuning",
       "acct": "Reikningur",
       "sortMax": "Hámark einstaks keyrslutíma",
-      "maxMs": "Hámark einstaks ms"
+      "maxMs": "Hámark einstaks ms",
+      "diagToggle": "Greina orsök",
+      "noMax": "Engin hámarksgildi — {n} atriði eru úr eldri söfnunum án hámarksgildis, svo þau eru tímabundið raðað eftir meðaltali (ekki eftir heildartíma). Söfnun núna mun fylla út hámarksgildið."
     },
     "health": {
       "empty": "Engar skyndimyndir ennþá. Ýttu á Safna núna á Safna flipanum",
@@ -1069,7 +1071,7 @@
         "BATCH": "Líklega hópur eða tímasett verk. Dreifðu keyrslutímum frá háannatímum og minnkaðu vinnu á hverja skuldbindingu. Athugaðu vísitölur og tölfræði (ANALYZE) á markatöflunum, og skiptu löngum færslum. Að setja nafn verksins í application_name gerir næstu flokkun nákvæmari.",
         "PROGRAM": "Þetta virðist vera fyrirspurn sem forritið keyrði. Athugaðu keyrsluáætlunina í SQL stillingu. Ef hámark einstaks keyrslutíma er langur, skoðaðu fyrst vísitölur og samsetningarröð. Ef ein keyrsla er stutt en fjöldi kalla er mikill, skoðaðu endurtekin köll (N+1) og skyndiminni. Settu þjónustunafnið í application_name tengipottarins.",
         "PLATFORM": "Líklega DB eða innri kerfisvinna eins og autovacuum eða afritun. Venjulega er engin aðgerð nauðsynleg. Ef það heldur áfram að vera efst, skoðaðu autovacuum þröskulda og maintenance_work_mem.",
-        "MONITOR": "Líklega eigin tölfræðifyrirspurnir þessarar þjónustu (schema.pi tengill). Engin aðgerð nauðsynleg. Ef það birtist of oft, lækkaðu könnunartíðni.",
+        "MONITOR": "Þetta er dbms.pi sjálfsöfnunar fyrirspurn — schema.pi tengingin er föst skipun sem les aðeins tölfræðilegar sýnir/skrár (pg_stat_*·pg_catalog), svo þetta er ekki viðskiptafyrirspurn og engin aðgerð viðskiptavina er nauðsynleg. Ef álag á markgagnagrunninn er vandamál, minnkaðu fjölda skipta sem þú opnar söfnunarhnappinn/eftirlitsskjáinn. Skipanir frá öðrum eftirlitstólum sem lesa sömu tölfræðilegu sýnir eru einnig flokkaðar hér.",
         "UNKNOWN": "Engin vísbending er um upprunann. Stilltu application_name á hverri tengingu og skiptu reikningum eftir tilgangi; það verður flokkað út frá næstu sýnum."
       },
       "detail": {
@@ -1085,7 +1087,51 @@
       "privOff": "Tengingarreikningurinn getur ekki séð upplýsingar um lotur annarra reikninga, svo engin sýni eru safnað. Biddu DB stjórnanda að keyra GRANT pg_read_all_stats TO {user};",
       "linkUsr": "tengingarreikningur",
       "qidOff": "Upplýsingar um lotu eru sýnilegar en fyrirspurnarauðkenni er tómt (compute_query_id er slökkt). Athugaðu með SHOW compute_query_id; keyrðu síðan ALTER SYSTEM SET compute_query_id = 'auto'; og endurhlaðið (SELECT pg_reload_conf();).",
-      "openHint": "Opnar SQL Tuning með fyrirspurninni útfylltri. Skiptu út staðgildum eins og $1 með raunverulegum gildum áður en áætlunin er skoðuð."
+      "openHint": "Opnar SQL Tuning með fyrirspurninni útfylltri. Skiptu út staðgildum eins og $1 með raunverulegum gildum áður en áætlunin er skoðuð.",
+      "detailTitle": "Upprunasýni"
+    },
+    "diag": {
+      "title": "Greina orsök",
+      "fix": "Aðgerð:",
+      "none": "Engin orsök kom fram í tölfræði — athugaðu framkvæmdaráætlunina í SQL Tuning.",
+      "cum": "Engar kallanir á þessu tímabili — uppsafnað (síðan tölfræði var endurstillt)",
+      "basis": "Grundvöllur — Hámark 1-sinni {max}ms · Meðaltal {mean}ms · Kall {calls} · Raðir á kall {rpc} · Disklestrarhlutfall {read} · Tímabundnir blokkir {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi sjálfsöfnunarfyrirspurn — eftirlitsskipun sem les aðeins tölfræðilegar sýnir/skrár.",
+        "fix": "Engin aðgerð viðskiptavina er nauðsynleg. Ef álag á markgagnagrunninn er vandamál, fækkaðu því hversu oft þú opnar söfnunar-/eftirlitsskjáinn."
+      },
+      "NO_MAX": {
+        "cause": "Gömul söfnun án 'hámarks 1-sinni' gildi, svo 'alltaf hægt/stöku tafir' er ekki hægt að greina.",
+        "fix": "Smelltu á 'Safna' einu sinni núna til að fylla út hámarksgildi fyrir nákvæma greiningu."
+      },
+      "SLOW_EACH": {
+        "cause": "Alltaf hægt — Tekur langan tíma í hvert skipti sem það keyrir, með hámark {max}ms og meðaltal {mean}ms.",
+        "fix": "① Opnaðu framkvæmdaráætlunina í 'Opna í SQL Tuning'. ② Ef það eru fullar skannanir (Seq Scan) eða stórar raðanir, skoðaðu vísitölur á WHERE/JOIN skilyrðisdálkum. ③ Þrengdu skilyrði til að lesa aðeins nauðsynlega dálka/raðir."
+      },
+      "SPIKE": {
+        "cause": "Stöku tafir — Meðaltal {mean}ms, en tekur stundum langan tíma í hámark {max}ms ({x} sinnum meðaltalið).",
+        "fix": "① Þegar hægt er, athugaðu læsingarbið (wait_event) í Activity/Locks flipanum. ② Ef aðeins fyrsta keyrsla er hæg, var skyndiminnið tómt og diskurinn lesinn. ③ Berðu saman sömu fyrirspurn með mismunandi gildum í SQL Tuning til að sjá hvort framkvæmdaráætlunin breytist eftir gildum."
+      },
+      "DISK_READ": {
+        "cause": "Skyndiminni missir — {pct}% ({read} blokkir) af lesnum blokkum voru lesnar af diski, ekki minni.",
+        "fix": "① Minnkaðu lestrarbilið með vísitölum. ② Þrengdu fyrirspurnartímabil/skilyrði. ③ Ef oft lesin gögn haldast mikil, skoðaðu shared_buffers (minni)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Minni yfirflæði — Röðun/hash fór yfir work_mem og skrifaði {blk} blokkir (u.þ.b. {mb}MB, {perCall} blokkir á kall) í tímabundnar skrár.",
+        "fix": "① Að setja vísitölur á ORDER BY/GROUP BY dálka sleppir röðun. ② Fyrst, minnkaðu fjölda raða til að raða (LIMIT innra). ③ Ef algerlega nauðsynlegt, auka SET LOCAL work_mem aðeins fyrir þessa fyrirspurnarfærslu."
+      },
+      "MANY_ROWS": {
+        "cause": "Of mikil sókn — Sækir {perCall} raðir á kall.",
+        "fix": "① Skjálistar eru sóttir síðu fyrir síðu. ② SELECT velur aðeins dálka sem eru notaðir. ③ Samanburður er framkvæmdur í gagnagrunninum og aðeins niðurstöðurnar eru mótteknar."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST innbyggð sía (!inner) skipun — að sía foreldra eftir barnaskilyrðum getur skannað allt settið áður en flokkunarskilyrði eru notuð.",
+        "fix": "① Athugaðu hvort það séu vísitölur á sameiningarlyklum og síudálkum. ② Færðu síur yfir í skilyrði foreldratöflunnar. ③ Fella börn inn í núverandi foreldra fyrirspurn eða sameina þau í eina gagnagrunnsaðgerð."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET blaðsíðuskipti — Verður smám saman hægara eftir því sem það les og hendir fyrri röðum fyrir síðari síður.",
+        "fix": "Breyttu í lyklasett blaðsíðuskipti (WHERE id > last_id ORDER BY id LIMIT n) sem les frá lyklinum eftir síðasta móttekna lykil."
+      }
     }
   },
   "pipeline": {

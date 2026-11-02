@@ -1023,7 +1023,9 @@
       "openSqlLab": "Obrir a SQL Tuning",
       "acct": "Compte",
       "sortMax": "Temps màxim d'execució individual",
-      "maxMs": "Màx. individual ms"
+      "maxMs": "Màx. individual ms",
+      "diagToggle": "Diagnostica la causa",
+      "noMax": "Sense valor màxim — {n} elements són de col·leccions antigues sense valor màxim, per la qual cosa s'han ordenat temporalment per mitjana (no per temps total). La recollida ara omplirà el valor màxim."
     },
     "health": {
       "empty": "Encara no hi ha instantànies. Premeu Recull ara a la pestanya Recull",
@@ -1077,7 +1079,7 @@
         "BATCH": "Sembla un lot o una feina programada. Distribuïu els temps d'execució fora dels pics de negoci i reduïu la feina per commit. Comproveu els índexs i les estadístiques (ANALYZE) a les taules de destinació i dividiu les transaccions llargues. Posar el nom de la feina a application_name fa que la següent classificació sigui més precisa",
         "PROGRAM": "Sembla una consulta executada per l'aplicació. Comproveu el pla d'execució a l'ajust de SQL. Si el temps màxim d'execució individual és llarg, primer mireu els índexs i l'ordre de les unions. Si una sola execució és curta però el nombre de trucades és alt, mireu les trucades repetides (N+1) i la memòria cau. Poseu el nom del servei a l'application_name del pool de connexions.",
         "PLATFORM": "Sembla una feina interna de la DB o de la plataforma, com ara autovacuum o replicació. Normalment no cal cap acció. Si es manté a la part superior, reviseu els llindars d'autovacuum i maintenance_work_mem",
-        "MONITOR": "Sembla que són les consultes d'estadístiques d'aquest servei (enllaç schema.pi). No cal cap acció. Si apareix massa sovint, reduïu la freqüència de sondeig",
+        "MONITOR": "Aquesta és una consulta d'autocol·lecció de dbms.pi — la connexió schema.pi és una sentència fixa que només llegeix vistes/catàlegs estadístics (pg_stat_*·pg_catalog), per tant, no és una consulta de negoci i no es requereix cap acció per part del client. Si la càrrega de la base de dades de destinació és un problema, reduïu el nombre de vegades que obriu el botó de recollida/pantalla de monitorització. Les sentències d'altres eines de monitorització que llegeixen les mateixes vistes estadístiques també s'agrupen aquí.",
         "UNKNOWN": "No hi ha cap pista sobre l'origen. Definiu application_name en cada connexió i dividiu els comptes per propòsit; es classificarà a partir de les properes mostres"
       },
       "detail": {
@@ -1093,7 +1095,51 @@
       "privOff": "El compte d'enllaç no pot veure els detalls de la sessió d'altres comptes, per la qual cosa no es recullen mostres. Demaneu a un administrador de DB que executi GRANT pg_read_all_stats TO {user};",
       "linkUsr": "compte d'enllaç",
       "qidOff": "Els detalls de la sessió són visibles, però l'ID de consulta està buit (compute_query_id està desactivat). Comproveu amb SHOW compute_query_id; després executeu ALTER SYSTEM SET compute_query_id = 'auto'; i torneu a carregar (SELECT pg_reload_conf();)",
-      "openHint": "Obre SQL Tuning amb la consulta emplenada. Substituïu els marcadors de posició com $1 per valors reals abans de veure el pla"
+      "openHint": "Obre SQL Tuning amb la consulta emplenada. Substituïu els marcadors de posició com $1 per valors reals abans de veure el pla",
+      "detailTitle": "Mostres d'origen"
+    },
+    "diag": {
+      "title": "Diagnostica la causa",
+      "fix": "Acció:",
+      "none": "Cap causa revelada per les estadístiques — comproveu el pla d'execució a SQL Tuning.",
+      "cum": "Cap trucada en aquest interval — acumulatiu (des del restabliment de les estadístiques)",
+      "basis": "Base — Màxim 1 vegada {max}ms · Mitjana {mean}ms · Crides {calls} · Files per crida {rpc} · Ràtio de lectura de disc {read} · Blocs temporals {tmp}",
+      "SELF_MON": {
+        "cause": "Consulta d'autocol·lecció de dbms.pi — declaració de monitorització que només llegeix vistes/catàlegs estadístics.",
+        "fix": "No es requereix cap acció del client. Si la càrrega de la base de dades de destinació és un problema, reduïu el nombre de vegades que obriu la pantalla de recollida/monitorització."
+      },
+      "NO_MAX": {
+        "cause": "Col·lecció antiga sense un valor de 'màxim 1 vegada', per tant, no es pot distingir 'sempre lent/retard intermitent'.",
+        "fix": "Feu clic a 'Recollir' una vegada ara per omplir els valors màxims per a un diagnòstic precís."
+      },
+      "SLOW_EACH": {
+        "cause": "Sempre lent — Triga molt de temps cada vegada que s'executa, amb un màxim de {max}ms i una mitjana de {mean}ms.",
+        "fix": "① Obriu el pla d'execució a 'Obrir a SQL Tuning'. ② Si hi ha escanejos complets (Seq Scan) o ordenacions grans, reviseu els índexs a les columnes de condició WHERE/JOIN. ③ Reduïu les condicions per llegir només les columnes/files necessàries."
+      },
+      "SPIKE": {
+        "cause": "Retard intermitent — Mitjana {mean}ms, però ocasionalment triga molt de temps amb un màxim de {max}ms ({x} vegades la mitjana).",
+        "fix": "① Quan sigui lent, comproveu les esperes de bloqueig (wait_event) a la pestanya Activitat/Bloquejos. ② Si només la primera execució és lenta, la memòria cau estava buida i es va llegir el disc. ③ Compareu la mateixa consulta amb diferents valors a SQL Tuning per veure si el pla d'execució canvia segons els valors."
+      },
+      "DISK_READ": {
+        "cause": "Error de memòria cau — El {pct}% ({read} blocs) dels blocs llegits es van llegir del disc, no de la memòria.",
+        "fix": "① Reduïu l'interval de lectura amb índexs. ② Reduïu el període/condicions de la consulta. ③ Si les dades llegides amb freqüència continuen sent altes, reviseu shared_buffers (memòria)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Desbordament de memòria — L'ordenació/hash va superar work_mem i va escriure {blk} blocs (aprox. {mb}MB, {perCall} blocs per crida) a fitxers temporals.",
+        "fix": "① Col·locar índexs a les columnes ORDER BY/GROUP BY omet l'ordenació. ② Primer, reduïu el nombre de files a ordenar (LIMIT a l'interior). ③ Si és absolutament necessari, augmenteu SET LOCAL work_mem només per a aquesta transacció de consulta."
+      },
+      "MANY_ROWS": {
+        "cause": "Recuperació excessiva — Recupera {perCall} files per crida.",
+        "fix": "① Les llistes de pantalla es recuperen pàgina per pàgina. ② SELECT només selecciona les columnes que s'utilitzen. ③ Les agregacions es realitzen a la base de dades i només es reben els resultats."
+      },
+      "PGRST_EMBED": {
+        "cause": "Declaració de filtre incrustat de PostgREST (!inner) — filtrar els pares per condicions de fills pot escanejar tot el conjunt abans de les condicions de classificació.",
+        "fix": "① Comproveu si hi ha índexs a les claus d'unió i a les columnes de filtre. ② Moveu els filtres a les condicions de la taula pare. ③ Inseriu els fills en una consulta pare ja existent o combineu-los en una única funció de base de dades."
+      },
+      "OFFSET_PAGING": {
+        "cause": "Paginació OFFSET — Es torna progressivament més lenta a mesura que llegeix i descarta les files precedents per a pàgines posteriors.",
+        "fix": "Canvieu a la paginació de conjunts de claus (WHERE id > last_id ORDER BY id LIMIT n) que llegeix des de la clau després de l'última clau rebuda."
+      }
     }
   },
   "pipeline": {

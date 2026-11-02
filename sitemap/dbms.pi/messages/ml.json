@@ -1019,7 +1019,9 @@
       "openSqlLab": "Ouvrir dans SQL Tuning",
       "acct": "Compte",
       "sortMax": "Temps d'exécution unique max",
-      "maxMs": "Max unique ms"
+      "maxMs": "Max unique ms",
+      "diagToggle": "Diagnostiquer la cause",
+      "noMax": "Pas de valeur maximale — {n} éléments proviennent d'anciennes collections sans valeur maximale, ils sont donc temporairement triés par moyenne (pas par temps total). La collecte maintenant remplira la valeur maximale."
     },
     "health": {
       "empty": "Aucun instantané pour le moment. Appuyez sur « Collecter maintenant » dans l'onglet « Collecte »",
@@ -1072,7 +1074,7 @@
         "BATCH": "Il semble s'agir d'un lot ou d'une tâche planifiée. Répartissez les temps d'exécution en dehors des pics d'activité et réduisez le travail par commit. Vérifiez les index et les statistiques (ANALYZE) sur les tables cibles, et divisez les transactions longues. Mettre le nom de la tâche dans application_name rendra la prochaine classification plus précise.",
         "PROGRAM": "Ceci semble être une requête exécutée par l'application. Vérifiez le plan d'exécution dans l'optimisation SQL. Si le temps d'exécution unique max est long, examinez d'abord les index et l'ordre de jointure. Si une exécution unique est courte mais que le nombre d'appels est élevé, examinez les appels répétés (N+1) et la mise en cache. Placez le nom du service dans l'application_name du pool de connexions.",
         "PLATFORM": "Semble être un travail interne à la DB ou à la plateforme, tel que l'autovacuum ou la réplication. Généralement, aucune action n'est nécessaire. S'il reste en tête, examinez les seuils d'autovacuum et maintenance_work_mem.",
-        "MONITOR": "Il semble s'agir des propres requêtes de statistiques de ce service (lien schema.pi). Aucune action n'est nécessaire. S'il apparaît trop souvent, réduisez la fréquence d'interrogation.",
+        "MONITOR": "Ceci est une requête d'auto-collecte dbms.pi — la connexion schema.pi est une instruction fixe qui ne lit que les vues/catalogues statistiques (pg_stat_*·pg_catalog), ce n'est donc pas une requête métier et aucune action client n'est requise. Si la charge de la base de données cible est un problème, réduisez le nombre de fois où vous ouvrez le bouton de collecte/l'écran de surveillance. Les instructions d'autres outils de surveillance qui lisent les mêmes vues statistiques sont également regroupées ici.",
         "UNKNOWN": "Il n'y a aucun indice sur la source. Définissez application_name sur chaque connexion et divisez les comptes par objectif ; il sera classé à partir des prochains échantillons."
       },
       "detail": {
@@ -1088,7 +1090,51 @@
       "privOff": "Le compte lié ne peut pas voir les détails de session des autres comptes, donc aucun échantillon n'est collecté. Demandez à un administrateur de DB d'exécuter GRANT pg_read_all_stats TO {user};",
       "linkUsr": "compte de liaison",
       "qidOff": "Les détails de session sont visibles mais l'ID de requête est vide (compute_query_id est désactivé). Vérifiez avec SHOW compute_query_id; puis exécutez ALTER SYSTEM SET compute_query_id = 'auto'; et rechargez (SELECT pg_reload_conf();)",
-      "openHint": "Ouvre SQL Tuning avec la requête pré-remplie. Remplacez les espaces réservés comme $1 par des valeurs réelles avant de visualiser le plan."
+      "openHint": "Ouvre SQL Tuning avec la requête pré-remplie. Remplacez les espaces réservés comme $1 par des valeurs réelles avant de visualiser le plan.",
+      "detailTitle": "Échantillons de source"
+    },
+    "diag": {
+      "title": "Diagnostiquer la cause",
+      "fix": "Action :",
+      "none": "Aucune cause révélée par les statistiques — vérifiez le plan d'exécution dans SQL Tuning.",
+      "cum": "Aucun appel dans cet intervalle — cumulatif (depuis la réinitialisation des statistiques)",
+      "basis": "Base — Max 1 fois {max}ms · Moy {mean}ms · Appels {calls} · Lignes par appel {rpc} · Ratio de lecture disque {read} · Blocs temporaires {tmp}",
+      "SELF_MON": {
+        "cause": "Requête d'auto-collecte dbms.pi — instruction de surveillance qui lit uniquement les vues/catalogues statistiques.",
+        "fix": "Aucune action client n'est requise. Si la charge de la base de données cible est un problème, réduisez le nombre de fois que vous ouvrez l'écran de collecte/surveillance."
+      },
+      "NO_MAX": {
+        "cause": "Ancienne collection sans valeur 'max 1 fois', il est donc impossible de distinguer 'toujours lent/délai intermittent'.",
+        "fix": "Cliquez sur 'Collecter' une fois maintenant pour remplir les valeurs maximales pour un diagnostic précis."
+      },
+      "SLOW_EACH": {
+        "cause": "Toujours lent — Prend beaucoup de temps à chaque exécution, avec un maximum de {max}ms et une moyenne de {mean}ms.",
+        "fix": "① Ouvrez le plan d'exécution dans 'Ouvrir dans SQL Tuning'. ② S'il y a des scans complets (Seq Scan) ou de grands tris, examinez les index sur les colonnes de condition WHERE/JOIN. ③ Réduisez les conditions pour ne lire que les colonnes/lignes nécessaires."
+      },
+      "SPIKE": {
+        "cause": "Délai intermittent — Moyenne {mean}ms, mais prend occasionnellement beaucoup de temps au maximum {max}ms ({x} fois la moyenne).",
+        "fix": "① Lorsque c'est lent, vérifiez les attentes de verrouillage (wait_event) dans l'onglet Activité/Verrous. ② Si seule la première exécution est lente, le cache était vide et le disque a été lu. ③ Comparez la même requête avec différentes valeurs dans SQL Tuning pour voir si le plan d'exécution change en fonction des valeurs."
+      },
+      "DISK_READ": {
+        "cause": "Manque de cache — {pct}% ({read} blocs) des blocs lus ont été lus depuis le disque, pas la mémoire.",
+        "fix": "① Réduisez la plage de lecture avec des index. ② Réduisez la période/les conditions de la requête. ③ Si les données fréquemment lues restent élevées, examinez shared_buffers (mémoire)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Débordement de mémoire — Le tri/hachage a dépassé work_mem et a écrit {blk} blocs (environ {mb}Mo, {perCall} blocs par appel) dans des fichiers temporaires.",
+        "fix": "① Placer des index sur les colonnes ORDER BY/GROUP BY évite le tri. ② Tout d'abord, réduisez le nombre de lignes à trier (LIMIT à l'intérieur). ③ Si absolument nécessaire, augmentez SET LOCAL work_mem uniquement pour cette transaction de requête."
+      },
+      "MANY_ROWS": {
+        "cause": "Récupération excessive — Récupère {perCall} lignes par appel.",
+        "fix": "① Les listes d'écran sont récupérées page par page. ② SELECT ne sélectionne que les colonnes utilisées. ③ Les agrégations sont effectuées dans la base de données, et seuls les résultats sont reçus."
+      },
+      "PGRST_EMBED": {
+        "cause": "Instruction de filtre intégré PostgREST (!inner) — le filtrage des parents par des conditions enfants peut scanner l'ensemble complet avant les conditions de classification.",
+        "fix": "① Vérifiez s'il existe des index sur les clés de jointure et les colonnes de filtre. ② Déplacez les filtres vers les conditions de la table parente. ③ Intégrez les enfants dans une requête parente déjà existante ou combinez-les en une seule fonction de base de données."
+      },
+      "OFFSET_PAGING": {
+        "cause": "Pagination OFFSET — Devient progressivement plus lente car elle lit et ignore les lignes précédentes pour les pages ultérieures.",
+        "fix": "Passez à la pagination par clés (WHERE id > last_id ORDER BY id LIMIT n) qui lit à partir de la clé après la dernière clé reçue."
+      }
     }
   },
   "pipeline": {

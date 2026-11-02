@@ -7,9 +7,10 @@ import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
-import { qryKey } from '@/lib/perf/calc'
+import { qryKey, type QryCum } from '@/lib/perf/calc'
 import { SQL_LAB_SEED } from '@/lib/sql-lab/seed'
 import type { QidCause, SrcJudge } from '@/lib/perf/source'
+import { diagnose, withCum, type DiagLvl } from '@/lib/perf/diagnose'
 import { readApi, type ApiErrorBody } from '@/lib/client-api'
 import { LoginGate } from '@/components/login-gate'
 import { LinkPicker, type LinkSelection } from '@/components/link/link-picker'
@@ -150,7 +151,13 @@ function PerfInner() {
           {tab === 'collect' && (
             <CollectTab sel={sel} onDone={() => setRev((r) => r + 1)} />
           )}
-          {tab === 'top' && <TopTab sel={sel} rev={rev} />}
+          {tab === 'top' && (
+            <TopTab
+              sel={sel}
+              rev={rev}
+              onCollected={() => setRev((r) => r + 1)}
+            />
+          )}
           {tab === 'health' && <HealthTab sel={sel} rev={rev} />}
           {tab === 'trend' && <TrendTab sel={sel} rev={rev} />}
           {tab === 'activity' && <ActivityTab sel={sel} />}
@@ -163,8 +170,8 @@ function PerfInner() {
 const qs = (sel: Sel, extra = '') =>
   `link=${encodeURIComponent(sel.linkId)}&conn=${encodeURIComponent(sel.connId)}${extra}`
 
-// 3-1 수집 — 버튼 1회 = 스냅샷 1건
-function CollectTab({ sel, onDone }: { sel: Sel; onDone: () => void }) {
+// 수집 1회 실행 — 수집 탭 버튼과 느린 쿼리 탭 '최고값 없음' 배너가 같이 쓴다
+function useCollect(sel: Sel, onDone: () => void) {
   const t = useTranslations('perf.collect')
   const errText = useErrText()
   const [busy, setBusy] = useState(false)
@@ -205,12 +212,24 @@ function CollectTab({ sel, onDone }: { sel: Sel; onDone: () => void }) {
       onDone()
     } else setMsg({ ok: false, text: errText(r.body), code: r.body.code })
   }
+  return { busy, msg, run }
+}
 
+function CollectBtn({
+  sel,
+  onDone,
+  primary,
+}: {
+  sel: Sel
+  onDone: () => void
+  primary?: boolean
+}) {
+  const t = useTranslations('perf.collect')
+  const { busy, msg, run } = useCollect(sel, onDone)
   return (
-    <div className="flex flex-col items-start gap-3">
-      <p className="text-muted-foreground text-sm break-keep">{t('intro')}</p>
+    <>
       <button
-        className={BTN_PRIMARY}
+        className={primary ? BTN_PRIMARY : BTN}
         disabled={busy}
         onClick={() => void run()}
       >
@@ -222,6 +241,17 @@ function CollectTab({ sel, onDone }: { sel: Sel; onDone: () => void }) {
         </p>
       )}
       {msg?.code === 'PGSS_MISSING' && <PgssGuide />}
+    </>
+  )
+}
+
+// 3-1 수집 — 버튼 1회 = 스냅샷 1건
+function CollectTab({ sel, onDone }: { sel: Sel; onDone: () => void }) {
+  const t = useTranslations('perf.collect')
+  return (
+    <div className="flex flex-col items-start gap-3">
+      <p className="text-muted-foreground text-sm break-keep">{t('intro')}</p>
+      <CollectBtn sel={sel} onDone={onDone} primary />
     </div>
   )
 }
@@ -235,9 +265,12 @@ type TopRow = {
   meanMs: number
   maxMs: number | null // 1회 최고(리셋 이후) — sql/033 이전 수집은 null
   rows: number
+  blkHit?: number | null // 블록 수 증감(sql/034 이전 수집은 null)
+  blkRead?: number | null
+  tmpBlk?: number | null
   reset: boolean
   src?: SrcJudge
-}
+} & Partial<QryCum> // 누적치(통계 리셋 이후) — 구간 호출 0 이면 원인 진단이 대체
 type TopRes = {
   clctDtm: string | null
   prevDtm: string | null
@@ -246,6 +279,7 @@ type TopRes = {
   total: number
   page: number
   pageSize: number
+  noMaxCnt?: number // 최고값 없는 행(sql/033 이전 수집) — 1회 평균으로 임시 정렬
   qid?: {
     cause: QidCause | null
     verNum: number | null
@@ -263,7 +297,15 @@ const SRC_CONF_CLS: Record<SrcJudge['conf'], string> = {
 }
 
 // 3-2 느린 쿼리 Top-N — 최근 2회 수집 증감
-function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
+function TopTab({
+  sel,
+  rev,
+  onCollected,
+}: {
+  sel: Sel
+  rev: number
+  onCollected: () => void
+}) {
   const t = useTranslations('perf.top')
   const [page, setPage] = useState(1)
   // 기본 정렬 = 1회 최고(마스터 2026-11-02 — 느린 SQL 은 max 만)
@@ -306,6 +348,15 @@ function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
               : t('first', { dtm: fmtDtm(d.clctDtm) })}
           </p>
           {!d.pgss && <PgssGuide />}
+          {!!d.noMaxCnt && (
+            <div
+              className="bg-surface-raised flex flex-col items-start gap-2 rounded-xl p-3 text-xs"
+              role="note"
+            >
+              <p className="break-keep">{t('noMax', { n: d.noMaxCnt })}</p>
+              <CollectBtn sel={sel} onDone={onCollected} />
+            </div>
+          )}
           <SrcNotice
             cause={d.qid?.cause ?? null}
             linkUsr={d.qid?.linkUsr ?? null}
@@ -336,6 +387,19 @@ function TopTab({ sel, rev }: { sel: Sel; rev: number }) {
                             {t('reset')}
                           </span>
                         )}
+                        <button
+                          type="button"
+                          className="text-accent block min-h-9 text-xs"
+                          aria-expanded={open === qryKey(r)}
+                          onClick={() =>
+                            setOpen((o) => (o === qryKey(r) ? null : qryKey(r)))
+                          }
+                        >
+                          {t('diagToggle')}{' '}
+                          <span aria-hidden="true">
+                            {open === qryKey(r) ? '▴' : '▾'}
+                          </span>
+                        </button>
                       </td>
                       <td className={TD}>
                         <SrcBadge
@@ -446,7 +510,63 @@ function SrcBadge({
   )
 }
 
-// 출처 상세 — 표본 상위 3(앱·마스킹 주소·표본 수·기간) + 출처별 해결 방안 + SQL 튜닝 딥링크
+// 원인 진단 — 통계(최고·평균·호출·행·블록)와 쿼리문 모양으로 원인 → 조치(src/lib/perf/diagnose.ts), 근거 수치 한 줄
+const DIAG_CLS: Record<DiagLvl, string> = {
+  info: 'text-muted-foreground',
+  warn: 'text-amber-400',
+  risk: 'text-danger',
+}
+function DiagBlock({ r: row }: { r: TopRow }) {
+  const t = useTranslations('perf.diag')
+  const r = withCum(row) // 구간 호출 0 = 누적치로 진단(근거 줄에 '누적' 표기)
+  const list = diagnose({
+    ...r,
+    srcCd: r.src?.cd ?? null,
+    srcConf: r.src?.conf ?? null,
+  })
+  const fmtP = (p: Record<string, number>) =>
+    Object.fromEntries(Object.entries(p).map(([k, v]) => [k, fmtNum(v)]))
+  const na = '—'
+  const readPct =
+    r.blkHit != null && r.blkRead != null && r.blkHit + r.blkRead > 0
+      ? `${fmtNum((r.blkRead / (r.blkHit + r.blkRead)) * 100)}%`
+      : na
+  return (
+    <div className="flex flex-col gap-1.5">
+      <p className="font-semibold">{t('title')}</p>
+      {list.length ? (
+        <ul className="flex flex-col gap-1.5">
+          {list.map((x) => (
+            <li key={x.cd} className="break-keep">
+              <span className={`font-medium ${DIAG_CLS[x.lvl]}`}>
+                {t(`${x.cd}.cause`, fmtP(x.params))}
+              </span>
+              <br />
+              <span className="text-muted-foreground">
+                {t('fix')} {t(`${x.cd}.fix`, fmtP(x.params))}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="break-keep">{t('none')}</p>
+      )}
+      <p className="text-muted-foreground break-keep">
+        {r.cum && `${t('cum')} · `}
+        {t('basis', {
+          max: r.maxMs == null ? na : fmtNum(r.maxMs),
+          mean: fmtNum(r.meanMs),
+          calls: fmtNum(r.calls),
+          rpc: r.calls > 0 ? fmtNum(r.rows / r.calls) : na,
+          read: readPct,
+          tmp: r.tmpBlk == null ? na : fmtNum(r.tmpBlk),
+        })}
+      </p>
+    </div>
+  )
+}
+
+// 출처 상세 — 원인 진단 + 표본 상위 3(앱·마스킹 주소·표본 수·기간) + 출처별 해결 방안 + SQL 튜닝 딥링크
 function SrcDetail({ r, sel }: { r: TopRow; sel: Sel }) {
   const t = useTranslations('perf')
   const src = r.src
@@ -454,6 +574,10 @@ function SrcDetail({ r, sel }: { r: TopRow; sel: Sel }) {
   const href = `/sql-lab?link=${encodeURIComponent(sel.linkId)}&conn=${encodeURIComponent(sel.connId)}`
   return (
     <div className="bg-surface-raised flex flex-col gap-2 rounded-xl p-3 text-xs">
+      <DiagBlock r={r} />
+      <p className="text-muted-foreground font-semibold">
+        {t('src.detailTitle')}
+      </p>
       {src.top.length ? (
         <ul className="flex flex-col gap-1">
           {src.top.map((x, i) => (

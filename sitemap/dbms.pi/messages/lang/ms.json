@@ -1026,7 +1026,9 @@
       "openSqlLab": "Buka dalam SQL Tuning",
       "acct": "Akaun",
       "sortMax": "Masa pelaksanaan tunggal maksimum",
-      "maxMs": "Maks tunggal ms"
+      "maxMs": "Maks tunggal ms",
+      "diagToggle": "Diagnosis Punca",
+      "noMax": "Tiada nilai tertinggi — {n} item ialah koleksi lama tanpa nilai tertinggi tunggal, jadi ia diisih sementara mengikut purata tunggal (bukan mengikut jumlah masa). Nilai tertinggi akan diisi jika anda mengumpul sekarang."
     },
     "health": {
       "empty": "Tiada syot kilat lagi. Tekan Kumpul sekarang pada tab Kumpul",
@@ -1080,7 +1082,7 @@
         "BATCH": "Kelihatan seperti kelompok atau kerja berjadual. Sebarkan masa jalan jauh dari puncak perniagaan dan kecilkan kerja setiap komit. Semak indeks dan statistik (ANALYZE) pada jadual sasaran, dan bahagikan transaksi panjang. Meletakkan nama kerja dalam application_name menjadikan klasifikasi seterusnya lebih tepat",
         "PROGRAM": "Ini kelihatan seperti pertanyaan yang dilaksanakan oleh aplikasi. Semak pelan pelaksanaan dalam penalaan SQL. Jika masa pelaksanaan tunggal maksimum panjang, mula-mula lihat indeks dan susunan gabungan. Jika satu pelaksanaan pendek tetapi kiraan panggilan tinggi, lihat panggilan berulang (N+1) dan caching. Letakkan nama perkhidmatan dalam application_name bagi kumpulan sambungan.",
         "PLATFORM": "Kelihatan seperti kerja dalaman DB atau platform seperti autovacuum atau replikasi. Biasanya tiada tindakan diperlukan. Jika ia kekal di atas, semak ambang autovacuum dan maintenance_work_mem",
-        "MONITOR": "Kelihatan seperti pertanyaan statistik perkhidmatan ini sendiri (pautan schema.pi). Tiada tindakan diperlukan. Jika ia muncul terlalu kerap, kurangkan kekerapan pengundian",
+        "MONITOR": "Ini ialah pertanyaan pengumpulan sendiri dbms.pi — sambungan schema.pi ialah pernyataan tetap yang hanya membaca paparan/katalog statistik (pg_stat_*·pg_catalog), jadi ia bukan pertanyaan perniagaan dan tiada tindakan pelanggan diperlukan. Jika beban pangkalan data sasaran menjadi masalah, kurangkan bilangan kali anda membuka butang pengumpulan/skrin pemantauan. Pernyataan daripada alat pemantauan lain yang membaca paparan statistik yang sama juga dikumpulkan di sini.",
         "UNKNOWN": "Tiada petunjuk kepada sumber. Tetapkan application_name pada setiap sambungan dan bahagikan akaun mengikut tujuan; ia akan diklasifikasikan daripada sampel seterusnya"
       },
       "detail": {
@@ -1096,7 +1098,51 @@
       "privOff": "Akaun pautan tidak dapat melihat butiran sesi akaun lain, jadi tiada sampel dikumpul. Minta pentadbir DB untuk menjalankan GRANT pg_read_all_stats TO {user};",
       "linkUsr": "akaun pautan",
       "qidOff": "Butiran sesi kelihatan tetapi ID pertanyaan kosong (compute_query_id dimatikan). Semak dengan SHOW compute_query_id; kemudian jalankan ALTER SYSTEM SET compute_query_id = 'auto'; dan muat semula (SELECT pg_reload_conf();)",
-      "openHint": "Membuka SQL Tuning dengan pertanyaan diisi. Gantikan pemegang tempat seperti $1 dengan nilai sebenar sebelum melihat rancangan"
+      "openHint": "Membuka SQL Tuning dengan pertanyaan diisi. Gantikan pemegang tempat seperti $1 dengan nilai sebenar sebelum melihat rancangan",
+      "detailTitle": "Sampel Sumber"
+    },
+    "diag": {
+      "title": "Diagnosis Punca",
+      "fix": "Tindakan:",
+      "none": "Tiada punca didedahkan oleh statistik — semak pelan pelaksanaan dalam Penalaan SQL.",
+      "cum": "Tiada panggilan dalam selang ini — kumulatif (sejak tetapan semula statistik)",
+      "basis": "Asas — Maks 1-kali {max}ms · Purata {mean}ms · Panggilan {calls} · Baris setiap panggilan {rpc} · Nisbah bacaan cakera {read} · Blok sementara {tmp}",
+      "SELF_MON": {
+        "cause": "Pertanyaan pengumpulan sendiri dbms.pi — pernyataan pemantauan yang hanya membaca pandangan/katalog statistik.",
+        "fix": "Tiada tindakan pelanggan diperlukan. Jika beban pangkalan data sasaran menjadi masalah, kurangkan bilangan kali anda membuka skrin pengumpulan/pemantauan."
+      },
+      "NO_MAX": {
+        "cause": "Koleksi lama tanpa nilai 'maks 1-kali', jadi 'sentiasa perlahan/kelewatan berselang' tidak dapat dibezakan.",
+        "fix": "Klik 'Kumpul' sekali sekarang untuk mengisi nilai maks bagi diagnosis yang tepat."
+      },
+      "SLOW_EACH": {
+        "cause": "Sentiasa Perlahan — Mengambil masa yang lama setiap kali ia berjalan, dengan maks {max}ms dan purata {mean}ms.",
+        "fix": "① Buka pelan pelaksanaan dalam 'Buka dalam Penalaan SQL'. ② Jika terdapat imbasan penuh (Seq Scan) atau isihan besar, semak indeks pada lajur syarat WHERE/JOIN. ③ Sempitkan syarat untuk membaca hanya lajur/baris yang diperlukan."
+      },
+      "SPIKE": {
+        "cause": "Kelewatan Berselang — Purata {mean}ms, tetapi kadang-kadang mengambil masa yang lama pada maks {max}ms ({x} kali purata).",
+        "fix": "① Apabila perlahan, semak untuk menunggu kunci (wait_event) dalam tab Aktiviti/Kunci. ② Jika hanya pelaksanaan pertama yang perlahan, cache kosong dan cakera dibaca. ③ Bandingkan pertanyaan yang sama dengan nilai yang berbeza dalam Penalaan SQL untuk melihat sama ada pelan pelaksanaan berubah berdasarkan nilai."
+      },
+      "DISK_READ": {
+        "cause": "Cache Miss — {pct}% ({read} blok) blok yang dibaca telah dibaca dari cakera, bukan memori.",
+        "fix": "① Kurangkan julat bacaan dengan indeks. ② Sempitkan tempoh/syarat pertanyaan. ③ Jika data yang kerap dibaca kekal tinggi, semak shared_buffers (memori)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Memori Melimpah — Isihan/hash melebihi work_mem dan menulis {blk} blok (kira-kira {mb}MB, {perCall} blok setiap panggilan) ke fail sementara.",
+        "fix": "① Meletakkan indeks pada lajur ORDER BY/GROUP BY melangkau isihan. ② Pertama, kurangkan bilangan baris untuk diisih (LIMIT di dalam). ③ Jika benar-benar perlu, tingkatkan SET LOCAL work_mem hanya untuk transaksi pertanyaan ini."
+      },
+      "MANY_ROWS": {
+        "cause": "Pengambilan Berlebihan — Mengambil {perCall} baris setiap panggilan.",
+        "fix": "① Senarai skrin diambil halaman demi halaman. ② SELECT hanya memilih lajur yang digunakan. ③ Agregasi dilakukan dalam pangkalan data, dan hanya hasilnya diterima."
+      },
+      "PGRST_EMBED": {
+        "cause": "Pernyataan penapis terbenam PostgREST (!inner) — menapis induk mengikut syarat anak boleh mengimbas keseluruhan set sebelum syarat klasifikasi.",
+        "fix": "① Semak sama ada terdapat indeks pada kunci gabungan dan lajur penapis. ② Pindahkan penapis ke syarat jadual induk. ③ Benamkan anak ke dalam pertanyaan induk yang sedia ada atau gabungkan mereka menjadi satu fungsi pangkalan data."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET Paging — Menjadi semakin perlahan kerana ia membaca dan membuang baris sebelumnya untuk halaman kemudian.",
+        "fix": "Tukar kepada keyset paging (WHERE id > last_id ORDER BY id LIMIT n) yang membaca dari kunci selepas kunci terakhir yang diterima."
+      }
     }
   },
   "pipeline": {

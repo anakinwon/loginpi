@@ -1024,7 +1024,9 @@
       "openSqlLab": "Odpri v SQL Tuning",
       "acct": "Račun",
       "sortMax": "Najdaljši čas posamezne izvedbe",
-      "maxMs": "Najdaljši posamezni ms"
+      "maxMs": "Najdaljši posamezni ms",
+      "diagToggle": "Diagnosticiraj vzrok",
+      "noMax": "Ni najvišje vrednosti — {n} elementov je iz starejših zbirk brez najvišje vrednosti, zato so začasno razvrščeni po povprečju (ne po skupnem času). Zbiranje zdaj bo zapolnilo najvišjo vrednost."
     },
     "health": {
       "empty": "Ni posnetkov. Pritisnite Zberi zdaj na zavihku Zbiranje",
@@ -1078,7 +1080,7 @@
         "BATCH": "Videti je kot paketno ali načrtovano opravilo. Razporedite čase izvajanja stran od poslovnih konic in zmanjšajte delo na potrditev. Preverite indekse in statistike (ANALYZE) na ciljnih tabelah in razdelite dolge transakcije. Če v application_name vnesete ime opravila, bo naslednja klasifikacija natančnejša.",
         "PROGRAM": "Zdi se, da je to poizvedba, ki jo je izvedla aplikacija. Preverite načrt izvedbe v SQL uglaševanju. Če je najdaljši čas posamezne izvedbe dolg, najprej preglejte indekse in vrstni red združevanja. Če je posamezna izvedba kratka, vendar je število klicev visoko, preglejte ponavljajoče se klice (N+1) in predpomnjenje. V application_name povezovalnega bazena vnesite ime storitve.",
         "PLATFORM": "Videti je kot notranje delo DB ali platforme, kot je autovacuum ali replikacija. Običajno ni potrebno nobeno dejanje. Če ostane na vrhu, preglejte pragove autovacuum in maintenance_work_mem.",
-        "MONITOR": "Videti je kot lastne statistične poizvedbe te storitve (povezava schema.pi). Ni potrebno nobeno dejanje. Če se pojavlja prepogosto, zmanjšajte pogostost anketiranja.",
+        "MONITOR": "To je poizvedba za samodejno zbiranje dbms.pi — povezava schema.pi je fiksna izjava, ki bere samo statistične poglede/kataloge (pg_stat_*·pg_catalog), zato ne gre za poslovno poizvedbo in ni potrebno nobeno dejanje stranke. Če je obremenitev ciljne baze podatkov problem, zmanjšajte število odpiranj gumba za zbiranje/zaslona za spremljanje. Izjave drugih orodij za spremljanje, ki berejo iste statistične poglede, so prav tako združene tukaj.",
         "UNKNOWN": "Ni namigov o viru. Nastavite application_name na vsaki povezavi in razdelite račune po namenu; klasificirano bo iz naslednjih vzorcev."
       },
       "detail": {
@@ -1094,7 +1096,51 @@
       "privOff": "Povezani račun ne more videti podrobnosti sej drugih računov, zato se vzorci ne zbirajo. Prosite skrbnika DB, naj izvede GRANT pg_read_all_stats TO {user};",
       "linkUsr": "povezani račun",
       "qidOff": "Podrobnosti seje so vidne, vendar je ID poizvedbe prazen (compute_query_id je izklopljen). Preverite z SHOW compute_query_id; nato zaženite ALTER SYSTEM SET compute_query_id = 'auto'; in ponovno naložite (SELECT pg_reload_conf();).",
-      "openHint": "Odpre SQL Tuning z izpolnjeno poizvedbo. Pred ogledom načrta zamenjajte nadomestne znake, kot je $1, z resničnimi vrednostmi."
+      "openHint": "Odpre SQL Tuning z izpolnjeno poizvedbo. Pred ogledom načrta zamenjajte nadomestne znake, kot je $1, z resničnimi vrednostmi.",
+      "detailTitle": "Vzorci vira"
+    },
+    "diag": {
+      "title": "Diagnosticiraj vzrok",
+      "fix": "Ukrep:",
+      "none": "Statistika ni razkrila vzroka — preverite načrt izvedbe v SQL Tuning.",
+      "cum": "V tem intervalu ni klicev – kumulativno (od ponastavitve statistike)",
+      "basis": "Osnova — Največ 1-krat {max}ms · Povprečje {mean}ms · Klici {calls} · Vrstice na klic {rpc} · Razmerje branja diska {read} · Začasni bloki {tmp}",
+      "SELF_MON": {
+        "cause": "Poizvedba za samodejno zbiranje dbms.pi — izjava za spremljanje, ki bere samo statistične poglede/kataloge.",
+        "fix": "Dejanje stranke ni potrebno. Če je obremenitev ciljne zbirke podatkov problem, zmanjšajte število odpiranj zaslona za zbiranje/spremljanje."
+      },
+      "NO_MAX": {
+        "cause": "Stara zbirka brez vrednosti 'največ 1-krat', zato ni mogoče razlikovati med 'vedno počasen/občasna zamuda'.",
+        "fix": "Kliknite 'Zberi' enkrat zdaj, da zapolnite največje vrednosti za natančno diagnozo."
+      },
+      "SLOW_EACH": {
+        "cause": "Vedno počasen — Vsakič, ko se izvede, traja dolgo, z največ {max}ms in povprečjem {mean}ms.",
+        "fix": "① Odprite načrt izvedbe v 'Odpri v SQL Tuning'. ② Če so prisotni polni pregledi (Seq Scan) ali velika razvrščanja, preglejte indekse na stolpcih pogojev WHERE/JOIN. ③ Zožite pogoje za branje samo potrebnih stolpcev/vrstic."
+      },
+      "SPIKE": {
+        "cause": "Občasna zamuda — Povprečje {mean}ms, vendar občasno traja dolgo, največ {max}ms ({x}-kratnik povprečja).",
+        "fix": "① Ko je počasen, preverite čakanje na zaklepanje (wait_event) na zavihku Dejavnost/Zaklepanja. ② Če je samo prva izvedba počasna, je bil predpomnilnik prazen in disk je bil prebran. ③ Primerjajte isto poizvedbo z različnimi vrednostmi v SQL Tuning, da vidite, ali se načrt izvedbe spreminja glede na vrednosti."
+      },
+      "DISK_READ": {
+        "cause": "Zgrešitev predpomnilnika — {pct}% ({read} blokov) prebranih blokov je bilo prebranih z diska, ne iz pomnilnika.",
+        "fix": "① Zmanjšajte obseg branja z indeksi. ② Zožite obdobje/pogoje poizvedbe. ③ Če pogosto brani podatki ostajajo visoki, preglejte shared_buffers (pomnilnik)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Prekoračitev pomnilnika — Razvrščanje/hash je preseglo work_mem in zapisalo {blk} blokov (približno {mb}MB, {perCall} blokov na klic) v začasne datoteke.",
+        "fix": "① Postavitev indeksov na stolpce ORDER BY/GROUP BY preskoči razvrščanje. ② Najprej zmanjšajte število vrstic za razvrščanje (LIMIT znotraj). ③ Če je nujno potrebno, povečajte SET LOCAL work_mem samo za to transakcijo poizvedbe."
+      },
+      "MANY_ROWS": {
+        "cause": "Prekomerno pridobivanje — Pridobi {perCall} vrstic na klic.",
+        "fix": "① Seznami zaslonov se pridobivajo po straneh. ② SELECT izbere samo uporabljene stolpce. ③ Agregacije se izvajajo v zbirki podatkov in prejmejo se samo rezultati."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST vdelana izjava filtra (!inner) — filtriranje staršev po otroških pogojih lahko pregleda celoten nabor pred pogoji klasifikacije.",
+        "fix": "① Preverite, ali obstajajo indeksi na ključih za združevanje in stolpcih filtra. ② Premaknite filtre na pogoje nadrejene tabele. ③ Vdelajte podrejene elemente v že obstoječo nadrejeno poizvedbo ali jih združite v eno samo funkcijo zbirke podatkov."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET Paging — Postopoma postaja počasnejše, saj bere in zavrže prejšnje vrstice za kasnejše strani.",
+        "fix": "Spremenite na keyset paging (WHERE id > last_id ORDER BY id LIMIT n), ki bere od ključa za zadnjim prejetim ključem."
+      }
     }
   },
   "pipeline": {

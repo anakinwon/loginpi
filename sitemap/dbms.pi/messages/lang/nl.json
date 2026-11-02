@@ -1022,7 +1022,9 @@
       "openSqlLab": "Openen in SQL Tuning",
       "acct": "Account",
       "sortMax": "Max. enkele uitvoeringstijd",
-      "maxMs": "Max. enkele ms"
+      "maxMs": "Max. enkele ms",
+      "diagToggle": "Oorzaak diagnosticeren",
+      "noMax": "Geen maximumwaarde — {n} items zijn afkomstig van oudere verzamelingen zonder maximumwaarde, dus ze zijn tijdelijk gesorteerd op gemiddelde (niet op totale tijd). Nu verzamelen zal de maximumwaarde invullen."
     },
     "health": {
       "empty": "Nog geen snapshots. Druk nu op Verzamelen op het tabblad Verzamelen",
@@ -1076,7 +1078,7 @@
         "BATCH": "Lijkt op een batch- of geplande taak. Spreid de looptijden buiten de piekuren en verklein het werk per commit. Controleer indexen en statistieken (ANALYZE) op de doeltabellen en splits lange transacties. Het opnemen van de taaknaam in application_name maakt de volgende classificatie preciezer.",
         "PROGRAM": "Dit lijkt een query te zijn die door de applicatie is uitgevoerd. Controleer het uitvoeringsplan in SQL-tuning. Als de maximale enkele uitvoeringstijd lang is, kijk dan eerst naar indexen en de join-volgorde. Als een enkele uitvoering kort is maar het aantal aanroepen hoog, kijk dan naar herhaalde aanroepen (N+1) en caching. Plaats de servicenaam in de application_name van de connection pool.",
         "PLATFORM": "Lijkt op DB- of platformintern werk zoals autovacuum of replicatie. Meestal is er geen actie nodig. Als het bovenaan blijft staan, controleer dan de autovacuum-drempels en maintenance_work_mem.",
-        "MONITOR": "Lijkt op de eigen statistiekqueries van deze service (schema.pi link). Geen actie nodig. Als het te vaak voorkomt, verlaag dan de pollingfrequentie.",
+        "MONITOR": "Dit is een dbms.pi zelfverzamelingsquery — de schema.pi-verbinding is een vaste instructie die alleen statistische views/catalogi (pg_stat_*·pg_catalog) leest, dus het is geen bedrijfskritische query en er is geen klantactie vereist. Als de belasting van de doordatabase een probleem is, verminder dan het aantal keren dat u de verzamelknop/monitoringscherm opent. Instructies van andere monitoringtools die dezelfde statistische views lezen, worden hier ook gegroepeerd.",
         "UNKNOWN": "Er is geen aanwijzing voor de bron. Stel application_name in op elke verbinding en splits accounts per doel; het wordt geclassificeerd vanaf de volgende monsters."
       },
       "detail": {
@@ -1092,7 +1094,51 @@
       "privOff": "Het linkaccount kan de sessiedetails van andere accounts niet zien, dus er worden geen monsters verzameld. Vraag een DB-beheerder om GRANT pg_read_all_stats TO {user}; uit te voeren.",
       "linkUsr": "linkaccount",
       "qidOff": "Sessiedetails zijn zichtbaar, maar de query-ID is leeg (compute_query_id is uitgeschakeld). Controleer met SHOW compute_query_id; voer vervolgens ALTER SYSTEM SET compute_query_id = 'auto'; uit en herlaad (SELECT pg_reload_conf();).",
-      "openHint": "Opent SQL Tuning met de query ingevuld. Vervang plaatsaanduidingen zoals $1 door echte waarden voordat u het plan bekijkt."
+      "openHint": "Opent SQL Tuning met de query ingevuld. Vervang plaatsaanduidingen zoals $1 door echte waarden voordat u het plan bekijkt.",
+      "detailTitle": "Bronvoorbeelden"
+    },
+    "diag": {
+      "title": "Oorzaak diagnosticeren",
+      "fix": "Actie:",
+      "none": "Geen oorzaak onthuld door statistieken — controleer het uitvoeringsplan in SQL Tuning.",
+      "cum": "Geen aanroepen in dit interval — cumulatief (sinds reset van statistieken)",
+      "basis": "Basis — Max 1-keer {max}ms · Gem. {mean}ms · Aanroepen {calls} · Rijen per aanroep {rpc} · Schijfleesverhouding {read} · Tijdelijke blokken {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi zelfverzamelingsquery — monitoringinstructie die alleen statistische weergaven/catalogi leest.",
+        "fix": "Geen klantactie vereist. Als de belasting van de doeldatabase een probleem is, verminder dan het aantal keren dat u het verzamel-/monitoringscherm opent."
+      },
+      "NO_MAX": {
+        "cause": "Oude verzameling zonder een 'max 1-keer' waarde, dus 'altijd traag/intermitterende vertraging' kan niet worden onderscheiden.",
+        "fix": "Klik nu één keer op 'Verzamelen' om maximale waarden in te vullen voor een nauwkeurige diagnose."
+      },
+      "SLOW_EACH": {
+        "cause": "Altijd traag — Duurt elke keer lang om uit te voeren, met max {max}ms en gemiddeld {mean}ms.",
+        "fix": "① Open het uitvoeringsplan in 'Openen in SQL Tuning'. ② Als er volledige scans (Seq Scan) of grote sorteringen zijn, controleer dan de indexen op WHERE/JOIN-conditiekolommen. ③ Beperk de condities om alleen noodzakelijke kolommen/rijen te lezen."
+      },
+      "SPIKE": {
+        "cause": "Intermitterende vertraging — Gemiddeld {mean}ms, maar duurt af en toe lang met max {max}ms ({x} keer het gemiddelde).",
+        "fix": "① Controleer bij traagheid op lock waits (wait_event) in het tabblad Activiteit/Locks. ② Als alleen de eerste uitvoering traag is, was de cache leeg en werd er van schijf gelezen. ③ Vergelijk dezelfde query met verschillende waarden in SQL Tuning om te zien of het uitvoeringsplan verandert op basis van waarden."
+      },
+      "DISK_READ": {
+        "cause": "Cache Miss — {pct}% ({read} blokken) van de gelezen blokken werden van schijf gelezen, niet uit het geheugen.",
+        "fix": "① Verminder het leesbereik met indexen. ② Beperk de queryperiode/condities. ③ Als veelgelezen gegevens hoog blijven, controleer dan shared_buffers (geheugen)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Geheugenoverloop — Sorteren/hashen overschreed work_mem en schreef {blk} blokken (ongeveer {mb}MB, {perCall} blokken per aanroep) naar tijdelijke bestanden.",
+        "fix": "① Het plaatsen van indexen op ORDER BY/GROUP BY-kolommen slaat sorteren over. ② Verminder eerst het aantal te sorteren rijen (LIMIT binnenin). ③ Indien absoluut noodzakelijk, verhoog SET LOCAL work_mem alleen voor deze querytransactie."
+      },
+      "MANY_ROWS": {
+        "cause": "Overmatige ophaalactie — Haalt {perCall} rijen per aanroep op.",
+        "fix": "① Schermlijsten worden pagina voor pagina opgehaald. ② SELECT selecteert alleen de kolommen die worden gebruikt. ③ Aggregaties worden uitgevoerd in de database, en alleen de resultaten worden ontvangen."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST embedded filter (!inner) instructie — het filteren van ouders op kindcondities kan de hele set scannen vóór classificatiecondities.",
+        "fix": "① Controleer of er indexen zijn op join-sleutels en filterkolommen. ② Verplaats filters naar de voorwaarden van de bovenliggende tabel. ③ Sluit onderliggende elementen in een reeds bestaande bovenliggende query in of combineer ze tot één databasefunctie."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET Paging — Wordt geleidelijk trager naarmate het voorgaande rijen leest en weggooit voor latere pagina's.",
+        "fix": "Wijzig naar keyset paging (WHERE id > last_id ORDER BY id LIMIT n) die leest vanaf de sleutel na de laatst ontvangen sleutel."
+      }
     }
   },
   "pipeline": {

@@ -1016,7 +1016,9 @@
       "openSqlLab": "Otwórz w SQL Tuning",
       "acct": "Konto",
       "sortMax": "Maksymalny czas pojedynczego wykonania",
-      "maxMs": "Maks. pojedyncze ms"
+      "maxMs": "Maks. pojedyncze ms",
+      "diagToggle": "Diagnozuj przyczynę",
+      "noMax": "Brak wartości maksymalnej — {n} elementów pochodzi ze starszych kolekcji bez wartości maksymalnej, więc są tymczasowo posortowane według średniej (nie według całkowitego czasu). Zebranie teraz uzupełni wartość maksymalną."
     },
     "health": {
       "empty": "Brak migawek. Naciśnij „Zbierz teraz” na karcie „Zbieranie”",
@@ -1069,7 +1071,7 @@
         "BATCH": "Wygląda na partię lub zaplanowane zadanie. Rozłóż czasy działania poza szczytami biznesowymi i zmniejsz pracę na zatwierdzenie. Sprawdź indeksy i statystyki (ANALYZE) w tabelach docelowych i podziel długie transakcje. Umieszczenie nazwy zadania w application_name sprawi, że następna klasyfikacja będzie bardziej precyzyjna",
         "PROGRAM": "Wygląda na to, że jest to zapytanie wykonane przez aplikację. Sprawdź plan wykonania w strojeniu SQL. Jeśli maksymalny czas pojedynczego wykonania jest długi, najpierw sprawdź indeksy i kolejność łączenia. Jeśli pojedyncze wykonanie jest krótkie, ale liczba wywołań jest wysoka, sprawdź powtarzające się wywołania (N+1) i buforowanie. Umieść nazwę usługi w application_name puli połączeń.",
         "PLATFORM": "Wygląda na wewnętrzną pracę DB lub platformy, taką jak autovacuum lub replikacja. Zazwyczaj nie są wymagane żadne działania. Jeśli pozostaje na szczycie, przejrzyj progi autovacuum i maintenance_work_mem",
-        "MONITOR": "Wygląda na własne zapytania statystyczne tej usługi (połączenie schema.pi). Nie są wymagane żadne działania. Jeśli pojawia się zbyt często, zmniejsz częstotliwość odpytywania",
+        "MONITOR": "Jest to zapytanie dbms.pi do samodzielnego zbierania danych — połączenie schema.pi to stałe polecenie, które odczytuje tylko widoki/katalogi statystyczne (pg_stat_*·pg_catalog), więc nie jest to zapytanie biznesowe i nie wymaga żadnych działań ze strony klienta. Jeśli obciążenie docelowej bazy danych stanowi problem, zmniejsz liczbę otwierania przycisku zbierania/ekranu monitorowania. Polecenia z innych narzędzi monitorujących, które odczytują te same widoki statystyczne, są również tutaj grupowane",
         "UNKNOWN": "Brak wskazówek co do źródła. Ustaw application_name dla każdego połączenia i podziel konta według celu; zostanie sklasyfikowane na podstawie następnych próbek"
       },
       "detail": {
@@ -1085,7 +1087,51 @@
       "privOff": "Konto połączenia nie może zobaczyć szczegółów sesji innych kont, więc nie są zbierane żadne próbki. Poproś administratora DB o uruchomienie GRANT pg_read_all_stats TO {user};",
       "linkUsr": "konto połączenia",
       "qidOff": "Szczegóły sesji są widoczne, ale ID zapytania jest puste (compute_query_id jest wyłączone). Sprawdź za pomocą SHOW compute_query_id; następnie uruchom ALTER SYSTEM SET compute_query_id = 'auto'; i przeładuj (SELECT pg_reload_conf();)",
-      "openHint": "Otwiera SQL Tuning z wypełnionym zapytaniem. Zastąp symbole zastępcze, takie jak $1, rzeczywistymi wartościami przed wyświetleniem planu"
+      "openHint": "Otwiera SQL Tuning z wypełnionym zapytaniem. Zastąp symbole zastępcze, takie jak $1, rzeczywistymi wartościami przed wyświetleniem planu",
+      "detailTitle": "Próbki źródłowe"
+    },
+    "diag": {
+      "title": "Diagnozuj przyczynę",
+      "fix": "Działanie:",
+      "none": "Brak przyczyny ujawnionej przez statystyki — sprawdź plan wykonania w SQL Tuning.",
+      "cum": "Brak wywołań w tym przedziale — skumulowane (od resetu statystyk)",
+      "basis": "Podstawa — Maks. 1-raz {max}ms · Średnia {mean}ms · Wywołania {calls} · Wiersze na wywołanie {rpc} · Współczynnik odczytu dysku {read} · Bloki tymczasowe {tmp}",
+      "SELF_MON": {
+        "cause": "Zapytanie dbms.pi do samodzielnego zbierania danych — instrukcja monitorowania, która odczytuje tylko widoki/katalogi statystyczne.",
+        "fix": "Nie są wymagane żadne działania ze strony klienta. Jeśli obciążenie docelowej bazy danych stanowi problem, zmniejsz liczbę otwierania ekranu zbierania/monitorowania."
+      },
+      "NO_MAX": {
+        "cause": "Stara kolekcja bez wartości „maks. 1-raz”, więc nie można rozróżnić „zawsze wolno/przerywane opóźnienie”.",
+        "fix": "Kliknij „Zbierz” raz teraz, aby wypełnić wartości maksymalne dla dokładnej diagnozy."
+      },
+      "SLOW_EACH": {
+        "cause": "Zawsze wolno — Za każdym razem trwa długo, z maks. {max}ms i średnią {mean}ms.",
+        "fix": "① Otwórz plan wykonania w „Otwórz w SQL Tuning”. ② Jeśli występują pełne skanowania (Seq Scan) lub duże sortowania, przejrzyj indeksy na kolumnach warunków WHERE/JOIN. ③ Zwęż warunki, aby odczytywać tylko niezbędne kolumny/wiersze."
+      },
+      "SPIKE": {
+        "cause": "Przerywane opóźnienie — Średnia {mean}ms, ale sporadycznie trwa długo przy maks. {max}ms ({x} razy średnia).",
+        "fix": "① Gdy jest wolno, sprawdź oczekiwanie na blokady (wait_event) w zakładce Aktywność/Blokady. ② Jeśli tylko pierwsze wykonanie jest wolne, pamięć podręczna była pusta i odczytano dysk. ③ Porównaj to samo zapytanie z różnymi wartościami w SQL Tuning, aby sprawdzić, czy plan wykonania zmienia się w zależności od wartości."
+      },
+      "DISK_READ": {
+        "cause": "Błąd pamięci podręcznej — {pct}% ({read} bloków) odczytanych bloków zostało odczytanych z dysku, a nie z pamięci.",
+        "fix": "① Zmniejsz zakres odczytu za pomocą indeksów. ② Zwęż okres/warunki zapytania. ③ Jeśli często odczytywane dane pozostają wysokie, przejrzyj shared_buffers (pamięć)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Przepełnienie pamięci — Sortowanie/haszowanie przekroczyło work_mem i zapisało {blk} bloków (ok. {mb}MB, {perCall} bloków na wywołanie) do plików tymczasowych.",
+        "fix": "① Umieszczenie indeksów na kolumnach ORDER BY/GROUP BY pomija sortowanie. ② Najpierw zmniejsz liczbę wierszy do posortowania (LIMIT wewnątrz). ③ Jeśli jest to absolutnie konieczne, zwiększ SET LOCAL work_mem tylko dla tej transakcji zapytania."
+      },
+      "MANY_ROWS": {
+        "cause": "Nadmierne pobieranie — Pobiera {perCall} wierszy na wywołanie.",
+        "fix": "① Listy ekranów są pobierane strona po stronie. ② SELECT wybiera tylko używane kolumny. ③ Agregacje są wykonywane w bazie danych, a odbierane są tylko wyniki."
+      },
+      "PGRST_EMBED": {
+        "cause": "Instrukcja filtru osadzonego PostgREST (!inner) — filtrowanie rodziców według warunków podrzędnych może skanować cały zestaw przed warunkami klasyfikacji.",
+        "fix": "① Sprawdź, czy istnieją indeksy na kluczach łączenia i kolumnach filtrujących. ② Przenieś filtry do warunków tabeli nadrzędnej. ③ Osadź elementy podrzędne w już istniejącym zapytaniu nadrzędnym lub połącz je w jedną funkcję bazy danych."
+      },
+      "OFFSET_PAGING": {
+        "cause": "Stronicowanie OFFSET — Staje się coraz wolniejsze, ponieważ odczytuje i odrzuca poprzedzające wiersze dla późniejszych stron.",
+        "fix": "Zmień na stronicowanie keyset (WHERE id > last_id ORDER BY id LIMIT n), które odczytuje od klucza po ostatnio odebranym kluczu."
+      }
     }
   },
   "pipeline": {

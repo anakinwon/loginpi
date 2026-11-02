@@ -288,6 +288,44 @@ test('⑥ SLOW_SQL : PGSS·VER, 유틸 제외, 1회 최고(maxMs) 순·판정, �
   )
 })
 
+test('⑥-2 SLOW_SQL : 자체 수집 쿼리(통계·카탈로그만 읽는 문장)는 TOP10·경보에서 제외', () => {
+  const q = (id, query, maxMs) => ({
+    queryid: id,
+    query,
+    calls: 21,
+    maxMs,
+    meanMs: 203,
+  })
+  const self =
+    'SELECT s.queryid::text AS queryid FROM pg_stat_statements s WHERE s.dbid = (SELECT oid FROM pg_database WHERE datname = current_database()) ORDER BY s.max_exec_time DESC LIMIT $1'
+  const e = evalSlow(
+    slowIn({
+      topSql: [
+        q('self', self, 9000),
+        q(
+          'act',
+          'SELECT a.pid FROM pg_stat_activity a WHERE a.datname = current_database()',
+          800,
+        ),
+        q(
+          'user',
+          'SELECT * FROM orders o JOIN pg_class c ON c.oid = o.id',
+          600,
+        ),
+      ],
+    }),
+  )
+  assert.deepEqual(
+    e.slowTop.map((r) => r.key),
+    ['user'],
+  )
+  assert.equal(get(e.signals, 'SLOW_SQL').params.ms, 600) // 경보도 고객 쿼리 기준
+  assert.equal(
+    get(slow({ topSql: [q('self', self, 9000)] }), 'SLOW_SQL').lvl,
+    'NA',
+  )
+})
+
 test('⑦ worst 순서·summarize 설정성 사유 제외', () => {
   assert.equal(worst(['OK', 'UNKNOWN', 'WARN', 'NA']), 'WARN')
   assert.equal(worst(['OK', 'UNKNOWN', 'NA']), 'UNKNOWN')

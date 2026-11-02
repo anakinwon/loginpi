@@ -1024,7 +1024,9 @@
       "openSqlLab": "Atvērt SQL Tuning",
       "acct": "Konts",
       "sortMax": "Maksimālais viena izpildes laiks",
-      "maxMs": "Maks. viena ms"
+      "maxMs": "Maks. viena ms",
+      "diagToggle": "Diagnostikas cēlonis",
+      "noMax": "Nav maksimālās vērtības — {n} vienumi ir no vecākām kolekcijām bez maksimālās vērtības, tāpēc tie ir īslaicīgi sakārtoti pēc vidējā (nevis pēc kopējā laika). Savācot tagad, tiks aizpildīta maksimālā vērtība."
     },
     "health": {
       "empty": "Vēl nav momentuzņēmumu. Cilnē Vākt nospiediet Vākt tūlīt",
@@ -1078,7 +1080,7 @@
         "BATCH": "Izskatās pēc partijas vai plānota darba. Izplatiet izpildes laikus ārpus biznesa pīķiem un samaziniet darbu uz vienu apņemšanos. Pārbaudiet indeksus un statistiku (ANALYZE) mērķa tabulās un sadaliet garas transakcijas. Darba nosaukuma ievietošana application_name padara nākamo klasifikāciju precīzāku",
         "PROGRAM": "Šķiet, ka šo vaicājumu izpildīja lietojumprogramma. Pārbaudiet izpildes plānu SQL regulēšanā. Ja maksimālais viena izpildes laiks ir ilgs, vispirms apskatiet indeksus un savienojuma secību. Ja viena izpilde ir īsa, bet izsaukumu skaits ir liels, apskatiet atkārtotus izsaukumus (N+1) un kešatmiņu. Ievietojiet pakalpojuma nosaukumu savienojumu kopas application_name.",
         "PLATFORM": "Izskatās pēc DB vai platformas iekšējā darba, piemēram, autovacuum vai replikācijas. Parasti nav nepieciešama nekāda darbība. Ja tas paliek augšpusē, pārskatiet autovacuum sliekšņus un maintenance_work_mem",
-        "MONITOR": "Izskatās pēc šī pakalpojuma pašu statistikas vaicājumiem (schema.pi saite). Nav nepieciešama nekāda darbība. Ja tas parādās pārāk bieži, samaziniet aptaujas frekvenci",
+        "MONITOR": "Šis ir dbms.pi paškolekcijas vaicājums — schema.pi savienojums ir fiksēts paziņojums, kas nolasa tikai statistikas skatus/katalogus (pg_stat_*·pg_catalog), tāpēc tas nav biznesa vaicājums un nav nepieciešama klienta darbība. Ja mērķa datu bāzes slodze ir problēma, samaziniet kolekcijas pogas/uzraudzības ekrāna atvēršanas reižu skaitu. Šeit tiek grupēti arī paziņojumi no citiem uzraudzības rīkiem, kas nolasa tos pašus statistikas skatus.",
         "UNKNOWN": "Nav norādes uz avotu. Iestatiet application_name katrā savienojumā un sadaliet kontus pēc mērķa; tas tiks klasificēts no nākamajiem paraugiem"
       },
       "detail": {
@@ -1094,7 +1096,51 @@
       "privOff": "Saistītais konts nevar redzēt citu kontu sesijas detaļas, tāpēc netiek vākti paraugi. Lūdziet DB administratoram palaist GRANT pg_read_all_stats TO {user};",
       "linkUsr": "saistītais konts",
       "qidOff": "Sesijas detaļas ir redzamas, bet vaicājuma ID ir tukšs (compute_query_id ir izslēgts). Pārbaudiet ar SHOW compute_query_id; pēc tam palaidiet ALTER SYSTEM SET compute_query_id = 'auto'; un pārlādējiet (SELECT pg_reload_conf();)",
-      "openHint": "Atver SQL Tuning ar aizpildītu vaicājumu. Pirms plāna skatīšanas aizstājiet vietturus, piemēram, $1, ar reālām vērtībām"
+      "openHint": "Atver SQL Tuning ar aizpildītu vaicājumu. Pirms plāna skatīšanas aizstājiet vietturus, piemēram, $1, ar reālām vērtībām",
+      "detailTitle": "Avota paraugi"
+    },
+    "diag": {
+      "title": "Diagnostikas cēlonis",
+      "fix": "Darbība:",
+      "none": "Statistika neatklāja cēloni — pārbaudiet izpildes plānu SQL Tuning.",
+      "cum": "Šajā intervālā nav izsaukumu — kumulatīvi (kopš statistikas atiestatīšanas)",
+      "basis": "Pamats — maksimālais 1 reizes {max}ms · vidējais {mean}ms · izsaukumi {calls} · rindas uz izsaukumu {rpc} · diska lasīšanas koeficients {read} · pagaidu bloki {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi pašapkopošanas vaicājums — uzraudzības paziņojums, kas nolasa tikai statistikas skatus/katalogus.",
+        "fix": "Nav nepieciešama klienta darbība. Ja mērķa datu bāzes slodze ir problēma, samaziniet vākšanas/uzraudzības ekrāna atvēršanas reižu skaitu."
+      },
+      "NO_MAX": {
+        "cause": "Vecā kolekcija bez “maksimālās 1 reizes” vērtības, tāpēc nevar atšķirt “vienmēr lēnu/pārtrauktu aizkavēšanos”.",
+        "fix": "Noklikšķiniet uz “Apkopot” vienu reizi tagad, lai aizpildītu maksimālās vērtības precīzai diagnostikai."
+      },
+      "SLOW_EACH": {
+        "cause": "Vienmēr lēns — katru reizi, kad tas tiek palaists, tas aizņem ilgu laiku, ar maksimālo {max}ms un vidējo {mean}ms.",
+        "fix": "① Atveriet izpildes plānu sadaļā “Atvērt SQL Tuning”. ② Ja ir pilnas skenēšanas (Seq Scan) vai lieli kārtojumi, pārskatiet indeksus WHERE/JOIN nosacījumu kolonnās. ③ Sašauriniet nosacījumus, lai lasītu tikai nepieciešamās kolonnas/rindas."
+      },
+      "SPIKE": {
+        "cause": "Pārtraukta aizkavēšanās — vidēji {mean}ms, bet reizēm aizņem ilgu laiku ar maksimālo {max}ms ({x} reizes vidēji).",
+        "fix": "① Kad ir lēni, pārbaudiet bloķēšanas gaidīšanas (wait_event) cilnē Aktivitāte/Bloķēšana. ② Ja tikai pirmā izpilde ir lēna, kešatmiņa bija tukša un tika nolasīts disks. ③ Salīdziniet to pašu vaicājumu ar dažādām vērtībām SQL Tuning, lai redzētu, vai izpildes plāns mainās atkarībā no vērtībām."
+      },
+      "DISK_READ": {
+        "cause": "Kešatmiņas trūkums — {pct}% ({read} bloki) no nolasītajiem blokiem tika nolasīti no diska, nevis atmiņas.",
+        "fix": "① Samaziniet lasīšanas diapazonu ar indeksiem. ② Sašauriniet vaicājuma periodu/nosacījumus. ③ Ja bieži lasīto datu apjoms joprojām ir liels, pārskatiet shared_buffers (atmiņu)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Atmiņas pārpilde — kārtošana/jaukšana pārsniedza work_mem un pagaidu failos ierakstīja {blk} blokus (aptuveni {mb}MB, {perCall} bloki uz izsaukumu).",
+        "fix": "① Indeksu novietošana uz ORDER BY/GROUP BY kolonnām izlaiž kārtošanu. ② Vispirms samaziniet kārtojamo rindu skaitu (LIMIT iekšpusē). ③ Ja tas ir absolūti nepieciešams, palieliniet SET LOCAL work_mem tikai šai vaicājuma transakcijai."
+      },
+      "MANY_ROWS": {
+        "cause": "Pārmērīga izgūšana — izgūst {perCall} rindas uz izsaukumu.",
+        "fix": "① Ekrāna saraksti tiek izgūti pa lapām. ② SELECT atlasa tikai izmantotās kolonnas. ③ Apkopojumi tiek veikti datu bāzē, un tiek saņemti tikai rezultāti."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST iegultais filtrs (!inner) paziņojums — vecāku filtrēšana pēc bērnu nosacījumiem var skenēt visu kopu pirms klasifikācijas nosacījumiem.",
+        "fix": "① Pārbaudiet, vai ir indeksi savienojuma atslēgām un filtru kolonnām. ② Pārvietojiet filtrus uz vecāktabulas nosacījumiem. ③ Iegultiet bērnus jau esošā vecākvairojumā vai apvienojiet tos vienā datu bāzes funkcijā."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET lapošana — kļūst pakāpeniski lēnāka, jo tā nolasa un izmet iepriekšējās rindas vēlākām lapām.",
+        "fix": "Mainiet uz atslēgu kopas lapošanu (WHERE id > last_id ORDER BY id LIMIT n), kas nolasa no atslēgas pēc pēdējās saņemtās atslēgas."
+      }
     }
   },
   "pipeline": {

@@ -1026,7 +1026,9 @@
       "openSqlLab": "SQL Tuning'de aç",
       "acct": "Hesap",
       "sortMax": "Maksimum tek çalıştırma süresi",
-      "maxMs": "Maks tek ms"
+      "maxMs": "Maks tek ms",
+      "diagToggle": "Nedeni Teşhis Et",
+      "noMax": "Maksimum değer yok — {n} öğe, maksimum 1 defalık değeri olmayan eski koleksiyonlardan olduğundan, geçici olarak ortalamaya göre sıralanmıştır (toplam süreye göre değil). Şimdi toplama işlemi yapılırsa maksimum değer doldurulacaktır."
     },
     "health": {
       "empty": "Henüz anlık görüntü yok. Topla sekmesinde Şimdi Topla'ya basın",
@@ -1080,7 +1082,7 @@
         "BATCH": "Bir toplu işlem veya zamanlanmış iş gibi görünüyor. Çalışma sürelerini iş yoğunluğundan uzaklaştırın ve her taahhüt başına işi küçültün. Hedef tablolardaki indeksleri ve istatistikleri (ANALYZE) kontrol edin ve uzun işlemleri bölün. İş adını application_name'e koymak, bir sonraki sınıflandırmayı daha hassas hale getirir.",
         "PROGRAM": "Bu, uygulama tarafından yürütülen bir sorgu gibi görünüyor. SQL ayarlamasında yürütme planını kontrol edin. Maksimum tek çalıştırma süresi uzunsa, önce dizinlere ve birleştirme sırasına bakın. Tek çalıştırma kısa ancak çağrı sayısı yüksekse, tekrarlanan çağrılara (N+1) ve önbelleğe almaya bakın. Bağlantı havuzunun application_name alanına hizmet adını ekleyin.",
         "PLATFORM": "Autovacuum veya replikasyon gibi DB veya platform dahili bir iş gibi görünüyor. Genellikle herhangi bir işlem gerekmez. En üstte kalmaya devam ederse, autovacuum eşiklerini ve maintenance_work_mem'i gözden geçirin.",
-        "MONITOR": "Bu hizmetin kendi istatistik sorguları (schema.pi bağlantısı) gibi görünüyor. Herhangi bir işlem gerekmez. Çok sık görünüyorsa, yoklama sıklığını düşürün.",
+        "MONITOR": "Bu bir dbms.pi kendi kendine toplama sorgusudur — schema.pi bağlantısı, yalnızca istatistiksel görünümleri/katalogları (pg_stat_*·pg_catalog) okuyan sabit bir ifadedir, bu nedenle bir iş sorgusu değildir ve müşteri eylemi gerekmez. Hedef veritabanı yükü bir sorunsa, toplama düğmesini/izleme ekranını açma sayısını azaltın. Aynı istatistiksel görünümleri okuyan diğer izleme araçlarından gelen ifadeler de burada gruplandırılmıştır.",
         "UNKNOWN": "Kaynağa dair hiçbir ipucu yok. Her bağlantıda application_name'i ayarlayın ve hesapları amaca göre ayırın; bir sonraki örneklerden itibaren sınıflandırılacaktır."
       },
       "detail": {
@@ -1096,7 +1098,51 @@
       "privOff": "Bağlantı hesabı diğer hesapların oturum detaylarını göremiyor, bu nedenle örnek toplanmıyor. Bir DB yöneticisinden GRANT pg_read_all_stats TO {user}; komutunu çalıştırmasını isteyin.",
       "linkUsr": "bağlantı hesabı",
       "qidOff": "Oturum detayları görünür ancak sorgu kimliği boş (compute_query_id kapalı). SHOW compute_query_id; ile kontrol edin, ardından ALTER SYSTEM SET compute_query_id = 'auto'; komutunu çalıştırın ve yeniden yükleyin (SELECT pg_reload_conf();).",
-      "openHint": "Sorgu doldurulmuş olarak SQL Tuning'i açar. Planı görüntülemeden önce $1 gibi yer tutucuları gerçek değerlerle değiştirin."
+      "openHint": "Sorgu doldurulmuş olarak SQL Tuning'i açar. Planı görüntülemeden önce $1 gibi yer tutucuları gerçek değerlerle değiştirin.",
+      "detailTitle": "Kaynak Örnekleri"
+    },
+    "diag": {
+      "title": "Nedeni Teşhis Et",
+      "fix": "Eylem:",
+      "none": "İstatistiklerle ortaya çıkan bir neden yok — SQL Tuning'de yürütme planını kontrol edin.",
+      "cum": "Bu aralıkta çağrı yok — kümülatif (istatistikler sıfırlandığından beri)",
+      "basis": "Temel — Maksimum 1 defalık {max}ms · Ortalama {mean}ms · Çağrı {calls} · Çağrı başına satır {rpc} · Disk okuma oranı {read} · Geçici bloklar {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi kendi kendine toplama sorgusu — yalnızca istatistiksel görünümleri/katalogları okuyan izleme ifadesi.",
+        "fix": "Müşteri eylemi gerekmez. Hedef veritabanı yükü bir sorunsa, toplama/izleme ekranını açma sayısını azaltın."
+      },
+      "NO_MAX": {
+        "cause": "'Maksimum 1 defalık' değeri olmayan eski toplama, bu nedenle 'her zaman yavaş/aralıklı gecikme' ayırt edilemez.",
+        "fix": "Doğru teşhis için maksimum değerleri doldurmak üzere şimdi bir kez 'Topla'ya tıklayın."
+      },
+      "SLOW_EACH": {
+        "cause": "Her Zaman Yavaş — Her çalıştığında uzun zaman alır, maksimum {max}ms ve ortalama {mean}ms ile.",
+        "fix": "① 'SQL Tuning'de Aç' ile yürütme planını açın. ② Tam taramalar (Seq Scan) veya büyük sıralamalar varsa, WHERE/JOIN koşul sütunlarındaki indeksleri gözden geçirin. ③ Yalnızca gerekli sütunları/satırları okumak için koşulları daraltın."
+      },
+      "SPIKE": {
+        "cause": "Aralıklı Gecikme — Ortalama {mean}ms, ancak ara sıra maksimum {max}ms ({x} katı ortalama) ile uzun zaman alır.",
+        "fix": "① Yavaş olduğunda, Etkinlik/Kilitler sekmesinde kilit beklemelerini (wait_event) kontrol edin. ② Yalnızca ilk yürütme yavaşsa, önbellek boştu ve disk okundu. ③ Yürütme planının değerlere göre değişip değişmediğini görmek için SQL Tuning'de aynı sorguyu farklı değerlerle karşılaştırın."
+      },
+      "DISK_READ": {
+        "cause": "Önbellek Kaçırma — Okunan blokların {pct}%'si ({read} blok) bellekten değil, diskten okundu.",
+        "fix": "① İndekslerle okuma aralığını azaltın. ② Sorgu süresini/koşullarını daraltın. ③ Sık okunan veriler yüksek kalıyorsa, shared_buffers (bellek) değerini gözden geçirin."
+      },
+      "TEMP_SPILL": {
+        "cause": "Bellek Taşması — Sıralama/karma work_mem'i aştı ve geçici dosyalara {blk} blok (yaklaşık {mb}MB, çağrı başına {perCall} blok) yazdı.",
+        "fix": "① ORDER BY/GROUP BY sütunlarına indeks yerleştirmek sıralamayı atlar. ② Öncelikle sıralanacak satır sayısını azaltın (LIMIT'i içeriye). ③ Kesinlikle gerekliyse, yalnızca bu sorgu işlemi için SET LOCAL work_mem'i artırın."
+      },
+      "MANY_ROWS": {
+        "cause": "Aşırı Alma — Çağrı başına {perCall} satır getirir.",
+        "fix": "① Ekran listeleri sayfa sayfa alınır. ② SELECT yalnızca kullanılan sütunları seçer. ③ Toplamalar veritabanında yapılır ve yalnızca sonuçlar alınır."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST gömülü filtre (!inner) ifadesi — alt koşullara göre üstleri filtrelemek, sınıflandırma koşullarından önce tüm kümeyi tarayabilir.",
+        "fix": "① Birleştirme anahtarlarında ve filtre sütunlarında dizin olup olmadığını kontrol edin. ② Filtreleri üst tablonun koşullarına taşıyın. ③ Alt öğeleri zaten var olan bir üst sorguya gömün veya tek bir veritabanı işlevinde birleştirin."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET Sayfalama — Sonraki sayfalar için önceki satırları okuyup attığı için giderek yavaşlar.",
+        "fix": "Son alınan anahtardan sonra okuyan anahtar kümesi sayfalamasına (WHERE id > son_id ORDER BY id LIMIT n) geçin."
+      }
     }
   },
   "pipeline": {

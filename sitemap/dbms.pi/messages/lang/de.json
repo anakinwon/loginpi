@@ -1024,7 +1024,9 @@
       "openSqlLab": "Im SQL Tuning öffnen",
       "acct": "Konto",
       "sortMax": "Maximale Einzel-Ausführungszeit",
-      "maxMs": "Max. Einzelzeit ms"
+      "maxMs": "Max. Einzelzeit ms",
+      "diagToggle": "Ursache diagnostizieren",
+      "noMax": "Kein Höchstwert – {n} Einträge sind ältere Sammlungen ohne Höchstwert, daher wurden sie vorübergehend nach dem 1-maligen Durchschnitt sortiert (nicht nach der Gesamtzeit). Wenn Sie jetzt sammeln, wird der Höchstwert ausgefüllt."
     },
     "health": {
       "empty": "Noch keine Snapshots. Drücken Sie jetzt „Sammeln“ auf der Registerkarte „Sammeln“",
@@ -1078,7 +1080,7 @@
         "BATCH": "Sieht aus wie ein Batch oder ein geplanter Job. Verteilen Sie die Laufzeiten außerhalb der Geschäftsspitzen und reduzieren Sie die Arbeit pro Commit. Überprüfen Sie Indizes und Statistiken (ANALYZE) auf den Zieltabellen und teilen Sie lange Transaktionen auf. Das Einfügen des Jobnamens in application_name macht die nächste Klassifizierung präziser.",
         "PROGRAM": "Dies scheint eine von der Anwendung ausgeführte Abfrage zu sein. Überprüfen Sie den Ausführungsplan in der SQL-Optimierung. Wenn die maximale Einzelzeit lang ist, überprüfen Sie zuerst die Index- und Join-Reihenfolge. Wenn die Einzelzeit kurz ist, aber die Anzahl der Aufrufe hoch ist, überprüfen Sie wiederholte Aufrufe (N+1) und den Cache. Fügen Sie den Dienstnamen in application_name des Verbindungspools ein.",
         "PLATFORM": "Sieht aus wie DB- oder plattforminterne Arbeit wie Autovacuum oder Replikation. Normalerweise ist keine Aktion erforderlich. Wenn es oben bleibt, überprüfen Sie die Autovacuum-Schwellenwerte und maintenance_work_mem.",
-        "MONITOR": "Sieht aus wie die eigenen Statistikabfragen dieses Dienstes (schema.pi-Link). Keine Aktion erforderlich. Wenn es zu oft angezeigt wird, reduzieren Sie die Abfragehäufigkeit.",
+        "MONITOR": "Dies ist eine dbms.pi-eigene Sammelabfrage – die schema.pi-Verbindung ist ein fester Satz, der nur Statistikansichten/Kataloge (pg_stat_*·pg_catalog) liest, daher ist es keine Geschäftsabfrage und erfordert keine Kundenaktion. Wenn die Last der Zieldatenbank ein Problem darstellt, reduzieren Sie die Häufigkeit, mit der Sie die Schaltfläche „Sammeln“ und den Überwachungsbildschirm öffnen. Andere Überwachungstools, die dieselben Statistikansichten lesen, werden hier ebenfalls zusammengefasst.",
         "UNKNOWN": "Es gibt keinen Hinweis auf die Quelle. Legen Sie application_name bei jeder Verbindung fest und teilen Sie Konten nach Zweck auf; es wird ab den nächsten Stichproben klassifiziert."
       },
       "detail": {
@@ -1094,7 +1096,51 @@
       "privOff": "Das Verbindungskonto kann die Sitzungsdetails anderer Konten nicht sehen, daher werden keine Stichproben gesammelt. Bitten Sie einen DB-Administrator, GRANT pg_read_all_stats TO {user}; auszuführen.",
       "linkUsr": "Verbindungskonto",
       "qidOff": "Sitzungsdetails sind sichtbar, aber die Abfrage-ID ist leer (compute_query_id ist deaktiviert). Überprüfen Sie mit SHOW compute_query_id; und führen Sie dann ALTER SYSTEM SET compute_query_id = 'auto'; aus und laden Sie neu (SELECT pg_reload_conf();).",
-      "openHint": "Öffnet SQL Tuning mit der ausgefüllten Abfrage. Ersetzen Sie Platzhalter wie $1 durch reale Werte, bevor Sie den Plan anzeigen."
+      "openHint": "Öffnet SQL Tuning mit der ausgefüllten Abfrage. Ersetzen Sie Platzhalter wie $1 durch reale Werte, bevor Sie den Plan anzeigen.",
+      "detailTitle": "Quellproben"
+    },
+    "diag": {
+      "title": "Ursache diagnostizieren",
+      "fix": "Aktion:",
+      "none": "Keine Ursache durch Statistiken aufgedeckt – überprüfen Sie den Ausführungsplan im SQL Tuning.",
+      "cum": "Keine Aufrufe in diesem Intervall – kumulativ (seit Statistik-Reset)",
+      "basis": "Basis – Max 1-mal {max}ms · Durchschnitt {mean}ms · Aufrufe {calls} · Zeilen pro Aufruf {rpc} · Festplattenleserate {read} · Temporäre Blöcke {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi-Selbstsammlungsabfrage – Überwachungsanweisung, die nur statistische Ansichten/Kataloge liest.",
+        "fix": "Es ist keine Kundenaktion erforderlich. Wenn die Last der Zieldatenbank ein Problem darstellt, reduzieren Sie die Häufigkeit, mit der Sie den Sammlungs-/Überwachungsbildschirm öffnen."
+      },
+      "NO_MAX": {
+        "cause": "Alte Sammlung ohne 'max 1-mal'-Wert, daher kann 'immer langsam/intermittierende Verzögerung' nicht unterschieden werden.",
+        "fix": "Klicken Sie jetzt einmal auf 'Sammeln', um Maximalwerte für eine genaue Diagnose zu füllen."
+      },
+      "SLOW_EACH": {
+        "cause": "Immer langsam – Dauert bei jeder Ausführung lange, mit max. {max}ms und durchschnittlich {mean}ms.",
+        "fix": "① Öffnen Sie den Ausführungsplan in 'Im SQL Tuning öffnen'. ② Wenn es vollständige Scans (Seq Scan) oder große Sortierungen gibt, überprüfen Sie Indizes auf WHERE-/JOIN-Bedingungsspalten. ③ Schränken Sie Bedingungen ein, um nur notwendige Spalten/Zeilen zu lesen."
+      },
+      "SPIKE": {
+        "cause": "Intermittierende Verzögerung – Durchschnittlich {mean}ms, aber gelegentlich dauert es lange bei max. {max}ms ({x} mal der Durchschnitt).",
+        "fix": "① Wenn es langsam ist, überprüfen Sie die Sperrwartezeiten (wait_event) auf der Registerkarte 'Aktivität/Sperren'. ② Wenn nur die erste Ausführung langsam ist, war der Cache leer und die Festplatte wurde gelesen. ③ Vergleichen Sie dieselbe Abfrage mit verschiedenen Werten im SQL Tuning, um zu sehen, ob sich der Ausführungsplan basierend auf den Werten ändert."
+      },
+      "DISK_READ": {
+        "cause": "Cache-Fehler – {pct}% ({read} Blöcke) der gelesenen Blöcke wurden von der Festplatte und nicht vom Speicher gelesen.",
+        "fix": "① Reduzieren Sie den Lesebereich mit Indizes. ② Schränken Sie den Abfragezeitraum/die Bedingungen ein. ③ Wenn häufig gelesene Daten weiterhin hoch sind, überprüfen Sie shared_buffers (Speicher)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Speicherüberlauf – Sortierung/Hash überschritt work_mem und schrieb {blk} Blöcke (ca. {mb}MB, {perCall} Blöcke pro Aufruf) in temporäre Dateien.",
+        "fix": "① Das Platzieren von Indizes auf ORDER BY-/GROUP BY-Spalten überspringt die Sortierung. ② Reduzieren Sie zuerst die Anzahl der zu sortierenden Zeilen (LIMIT innen). ③ Wenn unbedingt erforderlich, erhöhen Sie SET LOCAL work_mem nur für diese Abfragetransaktion."
+      },
+      "MANY_ROWS": {
+        "cause": "Übermäßige Abfrage – Ruft {perCall} Zeilen pro Aufruf ab.",
+        "fix": "① Bildschirmlisten werden seitenweise abgerufen. ② SELECT wählt nur die verwendeten Spalten aus. ③ Aggregationen werden in der Datenbank durchgeführt und nur die Ergebnisse empfangen."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST eingebettete Filter (!inner) Anweisung – das Filtern von Eltern nach Kindbedingungen kann den gesamten Satz vor den Klassifizierungsbedingungen scannen.",
+        "fix": "① Prüfen Sie, ob Indizes auf Join-Schlüsseln und Filterspalten vorhanden sind. ② Verschieben Sie Filter in die Bedingungen der übergeordneten Tabelle. ③ Betten Sie untergeordnete Elemente in eine bereits vorhandene übergeordnete Abfrage ein oder kombinieren Sie sie zu einer einzigen Datenbankfunktion."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET Paging – Wird progressiv langsamer, da es für spätere Seiten vorhergehende Zeilen liest und verwirft.",
+        "fix": "Wechseln Sie zu Keyset-Paging (WHERE id > last_id ORDER BY id LIMIT n), das ab dem Schlüssel nach dem zuletzt empfangenen Schlüssel liest."
+      }
     }
   },
   "pipeline": {

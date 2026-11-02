@@ -1020,7 +1020,9 @@
       "openSqlLab": "Ava SQL Tuningus",
       "acct": "Konto",
       "sortMax": "Maksimaalne üksik täitmisaja",
-      "maxMs": "Maksimaalne üksik ms"
+      "maxMs": "Maksimaalne üksik ms",
+      "diagToggle": "Diagnoosi põhjus",
+      "noMax": "Maksimaalset väärtust pole – {n} üksust on vanematest kogudest ilma maksimaalse väärtuseta, seega on need ajutiselt sorteeritud keskmise järgi (mitte koguaega järgi). Praegune kogumine täidab maksimaalse väärtuse."
     },
     "health": {
       "empty": "Ühtegi hetktõmmist veel pole. Vajutage kogumise vahekaardil „Kogu kohe“",
@@ -1073,7 +1075,7 @@
         "BATCH": "Näib olevat partii- või ajastatud töö. Jaotage käitusajad äri tippudest eemale ja vähendage töö mahtu ühe commit'i kohta. Kontrollige sihttabelite indekseid ja statistikat (ANALYZE) ning jagage pikad tehingud. Töö nime lisamine application_name'i muudab järgmise klassifikatsiooni täpsemaks.",
         "PROGRAM": "See näib olevat rakenduse käivitatud päring. Kontrollige täitmisplaani SQL-häälestuses. Kui maksimaalne üksik täitmisaja on pikk, vaadake esmalt indekseid ja liitumisjärjekorda. Kui üksik täitmine on lühike, kuid kutsete arv on suur, vaadake korduvaid kutseid (N+1) ja vahemälu. Pange teenuse nimi ühendusepargi application_name'i.",
         "PLATFORM": "Näib olevat DB või platvormi sisemine töö, nagu autovacuum või replikatsioon. Tavaliselt pole vaja midagi ette võtta. Kui see jääb tippu, vaadake üle autovacuum'i läved ja maintenance_work_mem.",
-        "MONITOR": "Näib olevat selle teenuse enda statistikapäringud (schema.pi link). Tegevust pole vaja. Kui see ilmub liiga sageli, vähendage küsitlussagedust.",
+        "MONITOR": "See on dbms.pi isekogumise päring – schema.pi ühendus on fikseeritud lause, mis loeb ainult statistilisi vaateid/katalooge (pg_stat_*·pg_catalog), seega ei ole see äripäring ja kliendi tegevust ei nõuta. Kui sihtandmebaasi koormus on probleem, vähendage kogumisnupu/monitooringuekraani avamise kordi. Ka teiste monitooringutööriistade laused, mis loevad samu statistilisi vaateid, rühmitatakse siia.",
         "UNKNOWN": "Allika kohta puudub vihje. Seadistage application_name igal ühendusel ja jagage kontod otstarbe järgi; see klassifitseeritakse järgmistest proovidest."
       },
       "detail": {
@@ -1089,7 +1091,51 @@
       "privOff": "Lingi kontol puudub õigus näha teiste kontode seansi üksikasju, seega proove ei koguta. Paluge DB administraatoril käivitada GRANT pg_read_all_stats TO {user};",
       "linkUsr": "lingi konto",
       "qidOff": "Seansi üksikasjad on nähtavad, kuid päringu ID on tühi (compute_query_id on välja lülitatud). Kontrollige käsuga SHOW compute_query_id; seejärel käivitage ALTER SYSTEM SET compute_query_id = 'auto'; ja laadige uuesti (SELECT pg_reload_conf();).",
-      "openHint": "Avab SQL Tuning'u, kus päring on täidetud. Asendage kohatäited nagu $1 tegelike väärtustega enne plaani vaatamist."
+      "openHint": "Avab SQL Tuning'u, kus päring on täidetud. Asendage kohatäited nagu $1 tegelike väärtustega enne plaani vaatamist.",
+      "detailTitle": "Allika näidised"
+    },
+    "diag": {
+      "title": "Diagnoosi põhjus",
+      "fix": "Tegevus:",
+      "none": "Statistika ei näidanud põhjust – kontrollige täitmiskava SQL Tuningus.",
+      "cum": "Selles intervallis kõnesid pole – kumulatiivne (alates statistika lähtestamisest)",
+      "basis": "Alus – maksimaalne 1-kordne {max}ms · keskmine {mean}ms · kõned {calls} · ridu kõne kohta {rpc} · ketta lugemise suhe {read} · ajutised plokid {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi isekogumise päring – monitooringulause, mis loeb ainult statistilisi vaateid/katalooge.",
+        "fix": "Kliendi tegevust ei nõuta. Kui sihtandmebaasi koormus on probleem, vähendage kogumise/monitooringuekraani avamise kordade arvu."
+      },
+      "NO_MAX": {
+        "cause": "Vana kogum ilma 'maksimaalse 1-kordse' väärtuseta, seega ei saa eristada 'alati aeglast/vahelduvat viivitust'.",
+        "fix": "Klõpsake kohe 'Kogu' üks kord, et täita maksimaalsed väärtused täpseks diagnoosimiseks."
+      },
+      "SLOW_EACH": {
+        "cause": "Alati aeglane – iga kord käivitamisel võtab kaua aega, maksimaalselt {max}ms ja keskmiselt {mean}ms.",
+        "fix": "① Avage täitmiskava 'Ava SQL Tuningus'. ② Kui on täielikke skaneeringuid (Seq Scan) või suuri sorteerimisi, vaadake üle indeksid WHERE/JOIN tingimuste veergudel. ③ Kitsendage tingimusi, et lugeda ainult vajalikke veerge/ridu."
+      },
+      "SPIKE": {
+        "cause": "Vahelduv viivitus – keskmiselt {mean}ms, kuid aeg-ajalt võtab kaua aega maksimaalselt {max}ms (keskmisest {x} korda).",
+        "fix": "① Kui aeglane, kontrollige lukustuse ootamisi (wait_event) vahekaardil Tegevus/Lukud. ② Kui ainult esimene täitmine on aeglane, oli vahemälu tühi ja ketast loeti. ③ Võrrelge sama päringut erinevate väärtustega SQL Tuningus, et näha, kas täitmiskava muutub väärtuste põhjal."
+      },
+      "DISK_READ": {
+        "cause": "Vahemälu möödalask – {pct}% ({read} plokki) loetud plokkidest loeti kettalt, mitte mälust.",
+        "fix": "① Vähendage lugemisvahemikku indeksitega. ② Kitsendage päringu perioodi/tingimusi. ③ Kui sageli loetud andmete hulk püsib kõrge, vaadake üle shared_buffers (mälu)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Mälu ületäitumine – sorteerimine/räsimine ületas work_mem ja kirjutas {blk} plokki (umbes {mb}MB, {perCall} plokki kõne kohta) ajutistesse failidesse.",
+        "fix": "① Indeksite paigutamine ORDER BY/GROUP BY veergudele jätab sorteerimise vahele. ② Esiteks vähendage sorteeritavate ridade arvu (LIMIT sees). ③ Kui absoluutselt vajalik, suurendage SET LOCAL work_mem ainult selle päringu tehingu jaoks."
+      },
+      "MANY_ROWS": {
+        "cause": "Liigne andmete toomine – toob {perCall} rida kõne kohta.",
+        "fix": "① Ekraaninimekirjad tuuakse lehekülgede kaupa. ② SELECT valib ainult kasutatavad veerud. ③ Agregeerimised tehakse andmebaasis ja saadakse ainult tulemused."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST sisseehitatud filter (!inner) lause – vanemate filtreerimine lapse tingimuste järgi võib enne klassifitseerimistingimusi skaneerida kogu hulka.",
+        "fix": "① Kontrollige, kas liitumisvõtmetel ja filtri veergudel on indeksid. ② Liigutage filtrid vanemtabeli tingimustesse. ③ Manustage alamad juba olemasolevasse vanempäringusse või ühendage need üheks andmebaasifunktsiooniks."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET-leheküljendus – muutub järk-järgult aeglasemaks, kuna loeb ja viskab eelnevad read hilisemate lehekülgede jaoks ära.",
+        "fix": "Muutke võtmekomplekti leheküljenduseks (WHERE id > last_id ORDER BY id LIMIT n), mis loeb pärast viimati saadud võtit."
+      }
     }
   },
   "pipeline": {

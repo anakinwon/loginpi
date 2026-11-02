@@ -1023,7 +1023,9 @@
       "openSqlLab": "Apri in SQL Tuning",
       "acct": "Account",
       "sortMax": "Tempo massimo di esecuzione singolo",
-      "maxMs": "Max singolo ms"
+      "maxMs": "Max singolo ms",
+      "diagToggle": "Diagnostica la causa",
+      "noMax": "Nessun valore massimo — {n} elementi provengono da raccolte precedenti senza un valore massimo, quindi sono temporaneamente ordinati per media (non per tempo totale). La raccolta ora popolerà il valore massimo."
     },
     "health": {
       "empty": "Nessuna istantanea ancora. Premi Raccogli ora nella scheda Raccogli",
@@ -1077,7 +1079,7 @@
         "BATCH": "Sembra un batch o un lavoro pianificato. Distribuisci i tempi di esecuzione lontano dai picchi di business e riduci il lavoro per commit. Controlla indici e statistiche (ANALYZE) sulle tabelle di destinazione e dividi le transazioni lunghe. Inserire il nome del lavoro in application_name rende la prossima classificazione più precisa",
         "PROGRAM": "Sembra essere una query eseguita dall'applicazione. Controlla il piano di esecuzione nell'ottimizzazione SQL. Se il tempo massimo di esecuzione singolo è lungo, guarda prima gli indici e l'ordine di join. Se una singola esecuzione è breve ma il numero di chiamate è alto, guarda le chiamate ripetute (N+1) e la cache. Inserisci il nome del servizio in application_name del pool di connessioni.",
         "PLATFORM": "Sembra un lavoro interno al DB o alla piattaforma come autovacuum o replica. Di solito non è necessaria alcuna azione. Se rimane in cima, rivedi le soglie di autovacuum e maintenance_work_mem",
-        "MONITOR": "Sembra che siano le query statistiche di questo servizio (collegamento schema.pi). Nessuna azione necessaria. Se appare troppo spesso, abbassa la frequenza di polling",
+        "MONITOR": "Questa è una query di auto-raccolta di dbms.pi — la connessione schema.pi è un'istruzione fissa che legge solo viste/cataloghi statistici (pg_stat_*·pg_catalog), quindi non è una query aziendale e non è richiesta alcuna azione da parte del cliente. Se il carico del database di destinazione è un problema, riduci il numero di volte in cui apri il pulsante di raccolta/la schermata di monitoraggio. Anche le istruzioni di altri strumenti di monitoraggio che leggono le stesse viste statistiche sono raggruppate qui.",
         "UNKNOWN": "Non ci sono indizi sull'origine. Imposta application_name su ogni connessione e dividi gli account per scopo; verrà classificato dai prossimi campioni"
       },
       "detail": {
@@ -1093,7 +1095,51 @@
       "privOff": "L'account di collegamento non può vedere i dettagli delle sessioni di altri account, quindi non vengono raccolti campioni. Chiedi a un amministratore DB di eseguire GRANT pg_read_all_stats TO {user};",
       "linkUsr": "account di collegamento",
       "qidOff": "I dettagli della sessione sono visibili ma l'ID query è vuoto (compute_query_id è disattivato). Controlla con SHOW compute_query_id; quindi esegui ALTER SYSTEM SET compute_query_id = 'auto'; e ricarica (SELECT pg_reload_conf();)",
-      "openHint": "Apre SQL Tuning con la query compilata. Sostituisci i segnaposto come $1 con valori reali prima di visualizzare il piano"
+      "openHint": "Apre SQL Tuning con la query compilata. Sostituisci i segnaposto come $1 con valori reali prima di visualizzare il piano",
+      "detailTitle": "Campioni di origine"
+    },
+    "diag": {
+      "title": "Diagnostica la causa",
+      "fix": "Azione:",
+      "none": "Nessuna causa rivelata dalle statistiche — controlla il piano di esecuzione in SQL Tuning.",
+      "cum": "Nessuna chiamata in questo intervallo — cumulativo (dal ripristino delle statistiche)",
+      "basis": "Base — Max 1-volta {max}ms · Media {mean}ms · Chiamate {calls} · Righe per chiamata {rpc} · Rapporto di lettura disco {read} · Blocchi temporanei {tmp}",
+      "SELF_MON": {
+        "cause": "Query di auto-raccolta di dbms.pi — istruzione di monitoraggio che legge solo viste/cataloghi statistici.",
+        "fix": "Non è richiesta alcuna azione da parte del cliente. Se il carico del database di destinazione è un problema, riduci il numero di volte in cui apri la schermata di raccolta/monitoraggio."
+      },
+      "NO_MAX": {
+        "cause": "Vecchia raccolta senza un valore 'max 1-volta', quindi 'sempre lento/ritardo intermittente' non può essere distinto.",
+        "fix": "Clicca 'Raccogli' una volta ora per riempire i valori massimi per una diagnosi accurata."
+      },
+      "SLOW_EACH": {
+        "cause": "Sempre lento — Richiede molto tempo ogni volta che viene eseguito, con un massimo di {max}ms e una media di {mean}ms.",
+        "fix": "① Apri il piano di esecuzione in 'Apri in SQL Tuning'. ② Se ci sono scansioni complete (Seq Scan) o grandi ordinamenti, rivedi gli indici sulle colonne della condizione WHERE/JOIN. ③ Riduci le condizioni per leggere solo le colonne/righe necessarie."
+      },
+      "SPIKE": {
+        "cause": "Ritardo intermittente — Media {mean}ms, ma occasionalmente richiede molto tempo al massimo {max}ms ({x} volte la media).",
+        "fix": "① Quando è lento, controlla le attese di blocco (wait_event) nella scheda Attività/Blocchi. ② Se solo la prima esecuzione è lenta, la cache era vuota e il disco è stato letto. ③ Confronta la stessa query con valori diversi in SQL Tuning per vedere se il piano di esecuzione cambia in base ai valori."
+      },
+      "DISK_READ": {
+        "cause": "Cache Miss — Il {pct}% ({read} blocchi) dei blocchi letti è stato letto dal disco, non dalla memoria.",
+        "fix": "① Riduci l'intervallo di lettura con gli indici. ② Riduci il periodo/le condizioni della query. ③ Se i dati letti frequentemente rimangono elevati, rivedi shared_buffers (memoria)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Overflow di memoria — L'ordinamento/hash ha superato work_mem e ha scritto {blk} blocchi (circa {mb}MB, {perCall} blocchi per chiamata) in file temporanei.",
+        "fix": "① Posizionare gli indici sulle colonne ORDER BY/GROUP BY salta l'ordinamento. ② Per prima cosa, riduci il numero di righe da ordinare (LIMIT all'interno). ③ Se assolutamente necessario, aumenta SET LOCAL work_mem solo per questa transazione di query."
+      },
+      "MANY_ROWS": {
+        "cause": "Recupero eccessivo — Recupera {perCall} righe per chiamata.",
+        "fix": "① Gli elenchi a schermo vengono recuperati pagina per pagina. ② SELECT seleziona solo le colonne utilizzate. ③ Le aggregazioni vengono eseguite nel database e vengono ricevuti solo i risultati."
+      },
+      "PGRST_EMBED": {
+        "cause": "Istruzione di filtro incorporato PostgREST (!inner) — il filtraggio dei genitori in base alle condizioni dei figli può scansionare l'intero set prima delle condizioni di classificazione.",
+        "fix": "① Controlla se ci sono indici sulle chiavi di join e sulle colonne di filtro. ② Sposta i filtri nelle condizioni della tabella padre. ③ Incorpora i figli in una query padre già esistente o combinali in un'unica funzione di database."
+      },
+      "OFFSET_PAGING": {
+        "cause": "Paginazione OFFSET — Diventa progressivamente più lenta man mano che legge e scarta le righe precedenti per le pagine successive.",
+        "fix": "Cambia in paginazione keyset (WHERE id > last_id ORDER BY id LIMIT n) che legge dalla chiave dopo l'ultima chiave ricevuta."
+      }
     }
   },
   "pipeline": {

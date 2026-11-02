@@ -524,6 +524,7 @@
       "TIMEOUT": "A schema.pi lassan válaszol. Kérjük, próbálja újra később.",
       "RULE_LIMIT": "Legfeljebb 50 szabály linkenként.",
       "NOT_FOUND": "A szabály nem található.",
+      "CONN_FAIL": "Nem sikerült csatlakozni az adatbázishoz. Ellenőrizze a csatlakozási beállításokat és az DB állapotát.",
       "LINK_DOWN": "Nem sikerült elérni a schema.pi-t. Próbálja újra rövidesen.",
       "PGSS_MISSING": "A pg_stat_statements nincs telepítve, így a lassú SQL nem érhető el.",
       "CONN_UNSUPPORTED": "Ez a kapcsolat nem támogatja a felügyeletet (csak PostgreSQL szerverkapcsolatok).",
@@ -822,6 +823,7 @@
       "empty": {
         "noConn": "Ez a taxonómia nem rendelkezik PostgreSQL szerverkapcsolattal a felügyelethez – csak URL-eket és szolgáltatásállapotot mutat.",
         "unsupported": "Ez a kapcsolat nem támogatja a felügyeletet (csak PostgreSQL szerverkapcsolatok).",
+        "connFail": "Nem sikerült csatlakozni az adatbázishoz – ellenőrizze a csatlakozási beállításokat és az DB állapotát.",
         "linkDown": "Nem sikerült elérni a schema.pi-t – automatikus újrapróbálkozás.",
         "linkAuth": "A kapcsolati token lejárt – adjon ki új tokent a schema.pi-ben, és regisztrálja.",
         "timeout": "A válaszok lassúak – automatikus újrapróbálkozás.",
@@ -982,6 +984,7 @@
     "err": {
       "NOT_IMPLEMENTED": "A schema.pi link előkészítés alatt áll. Kérjük, próbálja újra később.",
       "CONN_UNSUPPORTED": "Ez a kapcsolat még nem támogatott (csak közvetlen PostgreSQL kapcsolatok).",
+      "TIMEOUT": "A cél DB túl lassan válaszolt. Kérjük, próbálja újra később",
       "RATE": "Túl sok kérés. Próbálja újra egy perc múlva.",
       "LINK_AUTH": "A link token lejárt vagy visszavonásra került. Regisztrálja újra a tokent a Csatlakozás oldalon.",
       "LINK_SCOPE": "Ez a kapcsolat nem tartozik a link tárgykörébe.",
@@ -1017,7 +1020,9 @@
       "openSqlLab": "Megnyitás az SQL Tuningban",
       "acct": "Fiók",
       "sortMax": "Max. egyszeri végrehajtási idő",
-      "maxMs": "Max. egyszeri ms"
+      "maxMs": "Max. egyszeri ms",
+      "diagToggle": "Ok diagnosztizálása",
+      "noMax": "Nincs maximális érték — {n} elem régebbi gyűjtésekből származik, maximális érték nélkül, ezért ideiglenesen átlag szerint vannak rendezve (nem teljes idő szerint). A mostani gyűjtés feltölti a maximális értéket."
     },
     "health": {
       "empty": "Még nincsenek pillanatképek. Nyomja meg a „Gyűjtés most” gombot a Gyűjtés lapon",
@@ -1034,6 +1039,7 @@
     "trend": {
       "limit": "Méretküszöb",
       "empty": "Nincsenek pillanatképek az elmúlt 30 napban",
+      "chart": "DB mérete az elmúlt 30 napban",
       "now": "Jelenlegi méret",
       "perDay": "Napi növekedés",
       "needMore": "2+ pillanatkép szükséges",
@@ -1070,7 +1076,7 @@
         "BATCH": "Úgy tűnik, kötegelt vagy ütemezett feladat. Ossza el a futási időket az üzleti csúcsoktól távol, és csökkentse a munkát commitenként. Ellenőrizze az indexeket és a statisztikákat (ANALYZE) a cél táblákon, és ossza fel a hosszú tranzakciókat. A feladat nevének beállítása az application_name-ben pontosabbá teszi a következő osztályozást.",
         "PROGRAM": "Ez egy olyan lekérdezésnek tűnik, amelyet az alkalmazás hajtott végre. Ellenőrizze a végrehajtási tervet az SQL hangolásban. Ha a maximális egyszeri végrehajtási idő hosszú, először nézze meg az indexeket és a JOIN sorrendet. Ha egyetlen végrehajtás rövid, de a hívásszám magas, nézze meg az ismétlődő hívásokat (N+1) és a gyorsítótárazást. Tegye a szolgáltatás nevét a kapcsolatkészlet application_name mezőjébe.",
         "PLATFORM": "Úgy tűnik, DB vagy platform belső munka, például autovacuum vagy replikáció. Általában nincs szükség beavatkozásra. Ha a tetején marad, ellenőrizze az autovacuum küszöbértékeket és a maintenance_work_mem-et.",
-        "MONITOR": "Úgy tűnik, ez a szolgáltatás saját statisztikai lekérdezései (schema.pi link). Nincs szükség beavatkozásra. Ha túl gyakran jelenik meg, csökkentse a lekérdezési gyakoriságot.",
+        "MONITOR": "Ez egy dbms.pi saját gyűjtési lekérdezés – a schema.pi kapcsolat egy rögzített utasítás, amely csak statisztikai nézeteket/katalógusokat (pg_stat_*·pg_catalog) olvas, így nem üzleti lekérdezés, és nincs szükség ügyfélbeavatkozásra. Ha a céladatbázis terhelése problémát jelent, csökkentse a gyűjtés gomb/monitorozási képernyő megnyitásának számát. Más monitorozó eszközök ugyanazokat a statisztikai nézeteket olvasó utasításai is ide csoportosulnak.",
         "UNKNOWN": "Nincs nyom a forrásra. Állítsa be az application_name-et minden kapcsolaton, és ossza fel a fiókokat cél szerint; a következő mintákból osztályozva lesz."
       },
       "detail": {
@@ -1082,10 +1088,55 @@
         "none": "(üres)"
       },
       "noSample": "Még nincsenek minták — a futó munkamenetek mintavételezése akkor történik, amikor megtekinti a felügyeleti panelt vagy az Aktivitás és zárolások lapot. Egyelőre csak a fióknév alapján van osztályozva.",
+      "verOff": "Ez az DB régebbi, mint a PostgreSQL 14, így a futó munkameneteknek nincs lekérdezésazonosítója. Csak a fiók (biztos) jelenik meg",
       "privOff": "A csatlakozó fiók nem láthatja más fiókok munkamenet-adatait, így nem gyűjt mintákat. Kérjen meg egy DB adminisztrátort, hogy futtassa a GRANT pg_read_all_stats TO {user}; parancsot.",
       "linkUsr": "link fiók",
       "qidOff": "A munkamenet részletei láthatók, de a lekérdezési azonosító üres (a compute_query_id ki van kapcsolva). Ellenőrizze a SHOW compute_query_id; paranccsal, majd futtassa az ALTER SYSTEM SET compute_query_id = 'auto'; parancsot, és töltse újra (SELECT pg_reload_conf();).",
-      "openHint": "Megnyitja az SQL Tuningot a kitöltött lekérdezéssel. Cserélje ki a helyőrzőket, mint például a $1, valós értékekre a terv megtekintése előtt."
+      "openHint": "Megnyitja az SQL Tuningot a kitöltött lekérdezéssel. Cserélje ki a helyőrzőket, mint például a $1, valós értékekre a terv megtekintése előtt.",
+      "detailTitle": "Forrásminták"
+    },
+    "diag": {
+      "title": "Ok diagnosztizálása",
+      "fix": "Művelet:",
+      "none": "A statisztikák nem tártak fel okot – ellenőrizze a végrehajtási tervet az SQL Tuningban.",
+      "cum": "Nincs hívás ebben az intervallumban – kumulatív (a statisztikák visszaállítása óta)",
+      "basis": "Alap – Max. 1-szeres {max}ms · Átlag {mean}ms · Hívások {calls} · Sorok hívásonként {rpc} · Lemezolvasási arány {read} · Ideiglenes blokkok {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi öngyűjtő lekérdezés – monitorozási utasítás, amely csak statisztikai nézeteket/katalógusokat olvas.",
+        "fix": "Nincs szükség ügyfélbeavatkozásra. Ha a céladatbázis terhelése problémát jelent, csökkentse a gyűjtési/monitorozási képernyő megnyitásának számát."
+      },
+      "NO_MAX": {
+        "cause": "Régi gyűjtés „max. 1-szeres” érték nélkül, így nem különböztethető meg az „mindig lassú/időszakos késleltetés”.",
+        "fix": "Kattintson egyszer a „Gyűjtés” gombra most, hogy kitöltse a maximális értékeket a pontos diagnózis érdekében."
+      },
+      "SLOW_EACH": {
+        "cause": "Mindig lassú – Minden futtatáskor hosszú időt vesz igénybe, max. {max}ms és átlagosan {mean}ms.",
+        "fix": "① Nyissa meg a végrehajtási tervet az „Megnyitás SQL Tuningban” opcióval. ② Ha teljes szkennelések (Seq Scan) vagy nagy rendezések vannak, ellenőrizze az indexeket a WHERE/JOIN feltétel oszlopokon. ③ Szűkítse a feltételeket, hogy csak a szükséges oszlopokat/sorokat olvassa."
+      },
+      "SPIKE": {
+        "cause": "Időszakos késleltetés – Átlagosan {mean}ms, de alkalmanként hosszú időt vesz igénybe, max. {max}ms (az átlag {x}szerese).",
+        "fix": "① Ha lassú, ellenőrizze a zárolási várakozásokat (wait_event) az Aktivitás/Zárolások lapon. ② Ha csak az első végrehajtás lassú, a gyorsítótár üres volt, és a lemezről olvasott. ③ Hasonlítsa össze ugyanazt a lekérdezést különböző értékekkel az SQL Tuningban, hogy lássa, változik-e a végrehajtási terv az értékek alapján."
+      },
+      "DISK_READ": {
+        "cause": "Gyorsítótár-találat hiány – Az olvasott blokkok {pct}%-a ({read} blokk) lemezről, nem memóriából lett olvasva.",
+        "fix": "① Csökkentse az olvasási tartományt indexekkel. ② Szűkítse a lekérdezési időszakot/feltételeket. ③ Ha a gyakran olvasott adatok mennyisége továbbra is magas, ellenőrizze a shared_buffers (memória) beállítást."
+      },
+      "TEMP_SPILL": {
+        "cause": "Memóriatúlcsordulás – A rendezés/hash meghaladta a work_mem-et, és {blk} blokkot (kb. {mb}MB, {perCall} blokk hívásonként) írt ideiglenes fájlokba.",
+        "fix": "① Az ORDER BY/GROUP BY oszlopokra helyezett indexek kihagyják a rendezést. ② Először csökkentse a rendezendő sorok számát (LIMIT belül). ③ Ha feltétlenül szükséges, növelje a SET LOCAL work_mem-et csak ehhez a lekérdezési tranzakcióhoz."
+      },
+      "MANY_ROWS": {
+        "cause": "Túlzott lekérdezés – Hívásonként {perCall} sort kér le.",
+        "fix": "① A képernyőlisták oldalanként kerülnek lekérésre. ② A SELECT csak a használt oszlopokat választja ki. ③ Az aggregációk az adatbázisban történnek, és csak az eredmények kerülnek fogadásra."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST beágyazott szűrő (!inner) utasítás – a szülőket gyermekfeltételekkel szűrve a teljes halmazt átvizsgálhatja a besorolási feltételek előtt.",
+        "fix": "① Ellenőrizze, hogy vannak-e indexek a join kulcsokon és a szűrőoszlopokon. ② Vigye át a szűrőket a szülő tábla feltételeihez. ③ Ágyazza be a gyermekeket egy már meglévő szülő lekérdezésbe, vagy egyesítse őket egyetlen adatbázis-függvénybe."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET lapozás – Fokozatosan lassul, ahogy a későbbi oldalakhoz olvassa és eldobja az előző sorokat.",
+        "fix": "Váltson kulcskészlet lapozásra (WHERE id > last_id ORDER BY id LIMIT n), amely az utolsó fogadott kulcs utáni kulcstól olvas."
+      }
     }
   },
   "pipeline": {

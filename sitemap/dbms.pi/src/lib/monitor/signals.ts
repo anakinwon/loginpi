@@ -1,6 +1,7 @@
 // 모니터링 관문 보드 순수 평가(클라이언트·서버 공용) — 감시 신호 14개(5범주) 판정·전체 요약·할 일·추이 Δ·히트맵 구간 판정·사용자 규칙 적용
-//  런타임 import 없음(타입만 — node 타입 제거로 사라짐). 입력은 board-server.ts 가 파싱한 객체, 문자열 = 그 조회의 오류 코드
+//  런타임 import = 순수 함수 perf/source.ts(의존성 없음)뿐. 입력은 board-server.ts 가 파싱한 객체, 문자열 = 그 조회의 오류 코드
 //  시험 : node --test src/lib/monitor/signals.test.mjs
+import { isSelfQry } from '../perf/source.ts'
 import type { MetricCd, Rule, UrlCheck } from './rules'
 
 export type Lvl = 'OK' | 'WARN' | 'RISK' | 'UNKNOWN' | 'NA'
@@ -1036,7 +1037,7 @@ export function evalSlow(i: {
   const u = evalUrl(i.summaryUrl, i.now)
   out.push(u.signal)
 
-  // SLOW_SQL — 유틸 문장 제외, 순위·경보 = 1회 최고 시간(max_exec_time) 만(총 시간·평균 순 금지, 마스터 2026-11-02)
+  // SLOW_SQL — 유틸 문장·자체 수집(통계·카탈로그만 읽는 모니터링 문장 = 관찰 부하, 고객 문제 아님) 제외, 순위·경보 = 1회 최고 시간(max_exec_time) 만(총 시간·평균 순 금지, 마스터 2026-11-02)
   // 호출 수 하한 없음 — DBeaver 1회성 수십 초 쿼리도 바로 악성
   let slowTop: BoardSlow['slowTop'] = []
   if (i.topSql === 'PGSS_MISSING')
@@ -1047,7 +1048,7 @@ export function evalSlow(i: {
     out.push(sig('SLOW_SQL', 'UNKNOWN', at, { reason: `LINK_${i.topSql}` }))
   else {
     const rows = i.topSql
-      .filter((r) => !UTIL_SQL.test(r.query))
+      .filter((r) => !UTIL_SQL.test(r.query) && !isSelfQry(r.query))
       .sort((a, b) => b.maxMs - a.maxMs)
     slowTop = rows.slice(0, 10).map((r) => ({
       key: r.queryid,

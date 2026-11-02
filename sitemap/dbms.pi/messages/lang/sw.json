@@ -1024,7 +1024,9 @@
       "openSqlLab": "Fungua katika SQL Tuning",
       "acct": "Akaunti",
       "sortMax": "Muda wa juu zaidi wa utekelezaji mmoja",
-      "maxMs": "Juu zaidi moja ms"
+      "maxMs": "Juu zaidi moja ms",
+      "diagToggle": "Chunguza Sababu",
+      "noMax": "Hakuna thamani ya juu — vitu {n} vinatoka kwenye makusanyo ya zamani bila thamani ya juu, kwa hivyo vimepangwa kwa muda kwa wastani (sio kwa jumla ya muda). Kukusanya sasa kutajaza thamani ya juu."
     },
     "health": {
       "empty": "Hakuna picha bado. Bonyeza Kusanya sasa kwenye kichupo cha Kusanya",
@@ -1078,7 +1080,7 @@
         "BATCH": "Inaonekana kama kundi au kazi iliyopangwa. Sambaza nyakati za kukimbia mbali na vilele vya biashara na punguza kazi kwa kila ahadi. Angalia faharisi na takwimu (ANALYZE) kwenye majedwali lengwa, na ugawanye miamala mirefu. Kuweka jina la kazi katika application_name hufanya uainishaji unaofuata kuwa sahihi zaidi",
         "PROGRAM": "Hii inaonekana kuwa hoja iliyotekelezwa na programu. Angalia mpango wa utekelezaji katika urekebishaji wa SQL. Ikiwa muda wa juu zaidi wa utekelezaji mmoja ni mrefu, kwanza angalia faharisi na mpangilio wa kuunganisha. Ikiwa utekelezaji mmoja ni mfupi lakini idadi ya simu ni kubwa, angalia simu zinazorudiwa (N+1) na kache. Weka jina la huduma katika application_name ya kundi la muunganisho.",
         "PLATFORM": "Inaonekana kama kazi ya ndani ya DB au jukwaa kama vile autovacuum au urudufishaji. Kawaida hakuna hatua inayohitajika. Ikiwa inakaa juu, kagua vizingiti vya autovacuum na maintenance_work_mem",
-        "MONITOR": "Inaonekana kama maswali ya takwimu ya huduma hii (kiungo cha schema.pi). Hakuna hatua inayohitajika. Ikiwa inaonekana mara nyingi sana, punguza mzunguko wa upigaji kura",
+        "MONITOR": "Huu ni hoja ya kujikusanya ya dbms.pi — muunganisho wa schema.pi ni taarifa isiyobadilika ambayo husoma tu maoni/katalogi za takwimu (pg_stat_*·pg_catalog), kwa hivyo si hoja ya biashara na hakuna hatua ya mteja inayohitajika. Ikiwa mzigo wa hifadhidata lengwa ni suala, punguza idadi ya mara unazofungua kitufe cha kukusanya/skrini ya ufuatiliaji. Taarifa kutoka kwa zana zingine za ufuatiliaji zinazosoma maoni sawa ya takwimu pia huwekwa hapa.",
         "UNKNOWN": "Hakuna dalili ya chanzo. Weka application_name kwenye kila muunganisho na ugawanye akaunti kwa madhumuni; itaainishwa kutoka kwa sampuli zinazofuata"
       },
       "detail": {
@@ -1094,7 +1096,51 @@
       "privOff": "Akaunti ya kiungo haiwezi kuona maelezo ya kikao cha akaunti zingine, kwa hivyo hakuna sampuli zinazokusanywa. Muulize msimamizi wa DB kuendesha GRANT pg_read_all_stats TO {user};",
       "linkUsr": "akaunti ya kiungo",
       "qidOff": "Maelezo ya kikao yanaonekana lakini kitambulisho cha swala ni tupu (compute_query_id imezimwa). Angalia na SHOW compute_query_id; kisha endesha ALTER SYSTEM SET compute_query_id = 'auto'; na upakie upya (SELECT pg_reload_conf();)",
-      "openHint": "Inafungua SQL Tuning na swala lililojazwa. Badilisha vishikilia nafasi kama $1 na maadili halisi kabla ya kutazama mpango"
+      "openHint": "Inafungua SQL Tuning na swala lililojazwa. Badilisha vishikilia nafasi kama $1 na maadili halisi kabla ya kutazama mpango",
+      "detailTitle": "Sampuli za Chanzo"
+    },
+    "diag": {
+      "title": "Chunguza Sababu",
+      "fix": "Hatua:",
+      "none": "Hakuna sababu iliyofichuliwa na takwimu — angalia mpango wa utekelezaji katika SQL Tuning.",
+      "cum": "Hakuna simu katika kipindi hiki — jumla (tangu takwimu zilipowekwa upya)",
+      "basis": "Msingi — Kiwango cha juu cha mara 1 {max}ms · Wastani {mean}ms · Simu {calls} · Safu kwa kila simu {rpc} · Uwiano wa kusoma diski {read} · Vitalu vya muda {tmp}",
+      "SELF_MON": {
+        "cause": "Hoja ya kujikusanya ya dbms.pi — taarifa ya ufuatiliaji inayosoma tu maoni/katalogi za takwimu.",
+        "fix": "Hakuna hatua ya mteja inayohitajika. Ikiwa mzigo wa hifadhidata lengwa ni suala, punguza idadi ya mara unazofungua skrini ya kukusanya/kufuatilia."
+      },
+      "NO_MAX": {
+        "cause": "Mkusanyiko wa zamani bila thamani ya 'kiwango cha juu cha mara 1', kwa hivyo 'polepole kila wakati/kuchelewa kwa vipindi' haiwezi kutofautishwa.",
+        "fix": "Bofya 'Kusanya' mara moja sasa ili kujaza thamani za juu kwa uchunguzi sahihi."
+      },
+      "SLOW_EACH": {
+        "cause": "Polepole Kila Wakati — Huchukua muda mrefu kila inapoendeshwa, na kiwango cha juu {max}ms na wastani {mean}ms.",
+        "fix": "① Fungua mpango wa utekelezaji katika 'Fungua katika SQL Tuning'. ② Ikiwa kuna skani kamili (Seq Scan) au upangaji mkubwa, kagua faharisi kwenye safu za masharti ya WHERE/JOIN. ③ Punguza masharti ili kusoma safu/safu zinazohitajika tu."
+      },
+      "SPIKE": {
+        "cause": "Kuchelewa kwa Vipindi — Wastani {mean}ms, lakini mara kwa mara huchukua muda mrefu kwa kiwango cha juu {max}ms ({x} mara wastani).",
+        "fix": "① Inapokuwa polepole, angalia kusubiri kwa kufuli (wait_event) kwenye kichupo cha Shughuli/Kufuli. ② Ikiwa utekelezaji wa kwanza tu ni polepole, akiba ilikuwa tupu na diski ilisomwa. ③ Linganisha hoja sawa na maadili tofauti katika SQL Tuning ili kuona kama mpango wa utekelezaji unabadilika kulingana na maadili."
+      },
+      "DISK_READ": {
+        "cause": "Cache Miss — {pct}% ({read} vitalu) vya vitalu vilivyosomwa vilisomwa kutoka diski, sio kumbukumbu.",
+        "fix": "① Punguza safu ya kusoma na faharisi. ② Punguza kipindi/masharti ya hoja. ③ Ikiwa data inayosomeka mara kwa mara inabaki juu, kagua shared_buffers (kumbukumbu)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Kumbukumbu Imejaa — Upangaji/heshi ilizidi work_mem na kuandika vitalu {blk} (takriban {mb}MB, vitalu {perCall} kwa kila simu) kwenye faili za muda.",
+        "fix": "① Kuweka faharisi kwenye safu za ORDER BY/GROUP BY huruka upangaji. ② Kwanza, punguza idadi ya safu za kupanga (LIMIT ndani). ③ Ikiwa ni lazima kabisa, ongeza SET LOCAL work_mem tu kwa muamala huu wa hoja."
+      },
+      "MANY_ROWS": {
+        "cause": "Upatikanaji Mkubwa — Huchota safu {perCall} kwa kila simu.",
+        "fix": "① Orodha za skrini hupatikana ukurasa kwa ukurasa. ② SELECT huchagua tu safu zinazotumika. ③ Ujumuishaji hufanywa kwenye hifadhidata, na matokeo pekee hupokelewa."
+      },
+      "PGRST_EMBED": {
+        "cause": "Taarifa ya kichujio kilichopachikwa cha PostgREST (!inner) — kuchuja wazazi kwa masharti ya watoto kunaweza kuchanganua seti nzima kabla ya masharti ya uainishaji.",
+        "fix": "① Angalia ikiwa kuna faharisi kwenye funguo za kuunganisha na safu za vichujio. ② Hamisha vichujio kwenye masharti ya jedwali la mzazi. ③ Piga watoto kwenye hoja ya mzazi iliyopo tayari au uwaunganishe kwenye kazi moja ya hifadhidata."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET Paging — Inazidi kuwa polepole inaposoma na kutupa safu zilizotangulia kwa kurasa za baadaye.",
+        "fix": "Badilisha hadi keyset paging (WHERE id > last_id ORDER BY id LIMIT n) ambayo husoma kutoka kwa ufunguo baada ya ufunguo wa mwisho uliopokelewa."
+      }
     }
   },
   "pipeline": {

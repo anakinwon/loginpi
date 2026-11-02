@@ -1026,7 +1026,9 @@
       "openSqlLab": "Buka di SQL Tuning",
       "acct": "Akun",
       "sortMax": "Waktu Eksekusi Tunggal Terlama",
-      "maxMs": "Maks. 1x ms"
+      "maxMs": "Maks. 1x ms",
+      "diagToggle": "Diagnosis Penyebab",
+      "noMax": "Tidak ada nilai tertinggi — {n} item adalah koleksi lama tanpa nilai tertinggi tunggal, jadi diurutkan sementara berdasarkan rata-rata tunggal (bukan berdasarkan total waktu). Nilai tertinggi akan terisi jika dikumpulkan sekarang."
     },
     "health": {
       "empty": "Belum ada snapshot. Tekan Kumpulkan sekarang di tab Kumpulkan",
@@ -1080,7 +1082,7 @@
         "BATCH": "Tampaknya ini adalah batch atau pekerjaan terjadwal. Sebarkan waktu eksekusi menjauh dari puncak bisnis dan kurangi pekerjaan per commit. Periksa indeks dan statistik (ANALYZE) pada tabel target, dan bagi transaksi yang panjang. Menempatkan nama pekerjaan di application_name akan membuat klasifikasi berikutnya lebih tepat",
         "PROGRAM": "Ini tampaknya adalah kueri yang dijalankan oleh aplikasi. Periksa rencana eksekusi dalam tuning SQL. Jika waktu eksekusi tunggal terlama panjang, periksa indeks dan urutan join terlebih dahulu; jika waktu eksekusi tunggal pendek tetapi jumlah panggilan tinggi, periksa panggilan berulang (N+1) dan cache. Masukkan nama layanan di application_name dari connection pool.",
         "PLATFORM": "Tampaknya ini adalah pekerjaan internal DB atau platform seperti autovacuum atau replikasi. Biasanya tidak diperlukan tindakan. Jika tetap di atas, tinjau ambang batas autovacuum dan maintenance_work_mem",
-        "MONITOR": "Tampaknya ini adalah kueri statistik layanan ini sendiri (tautan schema.pi). Tidak diperlukan tindakan. Jika terlalu sering muncul, kurangi frekuensi polling",
+        "MONITOR": "Ini adalah kueri pengumpulan mandiri dbms.pi — koneksi schema.pi adalah pernyataan tetap yang hanya membaca tampilan statistik/katalog (pg_stat_*·pg_catalog), jadi ini bukan kueri bisnis dan tidak memerlukan tindakan pelanggan. Jika beban database target menjadi masalah, kurangi frekuensi pembukaan tombol pengumpulan/layar pemantauan. Pernyataan yang hanya membaca tampilan statistik yang sama dari alat pemantauan lain juga dikelompokkan di sini.",
         "UNKNOWN": "Tidak ada petunjuk tentang sumbernya. Atur application_name pada setiap koneksi dan pisahkan akun berdasarkan tujuan; itu akan diklasifikasikan dari sampel berikutnya"
       },
       "detail": {
@@ -1096,7 +1098,51 @@
       "privOff": "Akun tautan tidak dapat melihat detail sesi akun lain, jadi tidak ada sampel yang dikumpulkan. Minta admin DB untuk menjalankan GRANT pg_read_all_stats TO {user};",
       "linkUsr": "akun tautan",
       "qidOff": "Detail sesi terlihat tetapi ID kueri kosong (compute_query_id mati). Periksa dengan SHOW compute_query_id; lalu jalankan ALTER SYSTEM SET compute_query_id = 'auto'; dan muat ulang (SELECT pg_reload_conf();)",
-      "openHint": "Membuka SQL Tuning dengan kueri yang sudah terisi. Ganti placeholder seperti $1 dengan nilai sebenarnya sebelum melihat rencana"
+      "openHint": "Membuka SQL Tuning dengan kueri yang sudah terisi. Ganti placeholder seperti $1 dengan nilai sebenarnya sebelum melihat rencana",
+      "detailTitle": "Sampel Sumber"
+    },
+    "diag": {
+      "title": "Diagnosis Penyebab",
+      "fix": "Tindakan:",
+      "none": "Tidak ada penyebab yang terungkap oleh statistik — buka rencana eksekusi di penyetelan SQL untuk memverifikasi",
+      "cum": "Tidak ada panggilan di segmen ini — berdasarkan kumulatif (sejak reset statistik)",
+      "basis": "Dasar — Tertinggi 1 kali {max}ms · Rata-rata {mean}ms · Panggilan {calls} kali · Baris per 1 kali {rpc} · Rasio baca disk {read} · Blok sementara {tmp}",
+      "SELF_MON": {
+        "cause": "Kueri pengumpulan internal dbms.pi — Ini adalah pernyataan pemantauan yang hanya membaca tampilan statistik dan katalog",
+        "fix": "Tidak diperlukan tindakan pelanggan. Jika beban database target menjadi masalah, kurangi frekuensi pengumpulan/tampilan layar pemantauan."
+      },
+      "NO_MAX": {
+        "cause": "Ini adalah koleksi lama tanpa nilai tertinggi 1 kali, sehingga tidak dapat membedakan antara 'selalu lambat' dan 'penundaan sesekali'",
+        "fix": "Tekan tombol kumpulkan sekali sekarang untuk mengisi nilai tertinggi dan membuat diagnosis lebih akurat"
+      },
+      "SLOW_EACH": {
+        "cause": "Selalu lambat — Dibutuhkan waktu lama setiap kali dijalankan, dengan nilai tertinggi {max}ms dan rata-rata {mean}ms",
+        "fix": "① Lihat rencana eksekusi dengan 'Buka di Penyetelan SQL' ② Jika ada pemindaian penuh (Seq Scan) atau pengurutan besar, tinjau indeks kolom kondisi WHERE·JOIN ③ Persempit kondisi untuk hanya membaca kolom dan baris yang diperlukan"
+      },
+      "SPIKE": {
+        "cause": "Penundaan sesekali — Rata-rata {mean}ms, tetapi kadang-kadang membutuhkan waktu lama dengan nilai tertinggi {max}ms ({x} kali rata-rata)",
+        "fix": "① Saat lambat, periksa penantian kunci (wait_event) di tab aktivitas·kunci ② Jika hanya eksekusi pertama yang lambat, cache kosong dan membaca dari disk ③ Bandingkan kueri yang sama dengan beberapa nilai di penyetelan SQL untuk melihat apakah rencana eksekusi berubah tergantung pada nilai"
+      },
+      "DISK_READ": {
+        "cause": "Cache miss — {pct}% ({read} blok) dari blok yang dibaca berasal dari disk, bukan memori",
+        "fix": "① Kurangi rentang baca dengan indeks ② Persempit periode dan kondisi kueri ③ Jika data sering dibaca tetapi terus tinggi, tinjau shared_buffers (memori)"
+      },
+      "TEMP_SPILL": {
+        "cause": "Memori berlebih — Pengurutan·hash melebihi work_mem dan menulis {blk} blok (sekitar {mb}MB, {perCall} blok per 1 kali) ke file sementara",
+        "fix": "① Menempatkan indeks pada kolom ORDER BY·GROUP BY akan melewati pengurutan ② Kurangi jumlah baris yang akan diurutkan terlebih dahulu (LIMIT ke dalam) ③ Jika benar-benar diperlukan, tingkatkan SET LOCAL work_mem hanya untuk transaksi kueri ini"
+      },
+      "MANY_ROWS": {
+        "cause": "Kueri berlebihan — Mengambil {perCall} baris per 1 kali",
+        "fix": "① Daftar layar diambil per halaman ② SELECT hanya memilih kolom yang digunakan ③ Agregasi dilakukan di database dan hanya hasilnya yang diterima"
+      },
+      "PGRST_EMBED": {
+        "cause": "Pernyataan filter tertanam PostgREST (!inner) — Memfilter induk dengan kondisi anak dapat memindai keseluruhan sebelum kondisi klasifikasi",
+        "fix": "① Periksa apakah ada indeks pada kunci gabungan/kolom filter ② Pindahkan filter ke kondisi tabel induk ③ Sematkan anak ke dalam kueri induk yang sudah ada atau gabungkan menjadi satu fungsi database"
+      },
+      "OFFSET_PAGING": {
+        "cause": "Paging OFFSET — Semakin jauh halaman, semakin lambat karena membaca dan membuang baris sebelumnya",
+        "fix": "Ubah ke keyset paging (WHERE id > id terakhir ORDER BY id LIMIT n) yang membaca dari kunci terakhir yang diterima"
+      }
     }
   },
   "pipeline": {

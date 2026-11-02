@@ -1024,7 +1024,9 @@
       "openSqlLab": "Otevřít v SQL Tuning",
       "acct": "Účet",
       "sortMax": "Max. čas jednoho spuštění",
-      "maxMs": "Max. jedno ms"
+      "maxMs": "Max. jedno ms",
+      "diagToggle": "Diagnostikovat příčinu",
+      "noMax": "Žádná maximální hodnota – {n} položek pochází ze starších sbírek bez maximální hodnoty, takže jsou dočasně seřazeny podle průměru (nikoli podle celkového času). Shromáždění nyní vyplní maximální hodnotu."
     },
     "health": {
       "empty": "Zatím žádné snímky. Stiskněte „Shromáždit nyní“ na kartě „Shromáždit“",
@@ -1078,7 +1080,7 @@
         "BATCH": "Vypadá to jako dávka nebo naplánovaná úloha. Rozložte doby běhu mimo obchodní špičky a zmenšete práci na jeden commit. Zkontrolujte indexy a statistiky (ANALYZE) na cílových tabulkách a rozdělte dlouhé transakce. Zadání názvu úlohy do application_name zpřesní další klasifikaci.",
         "PROGRAM": "Zdá se, že se jedná o dotaz spuštěný aplikací. Zkontrolujte plán spuštění v ladění SQL. Pokud je maximální doba jednoho spuštění dlouhá, nejprve se podívejte na indexy a pořadí spojení. Pokud je jedno spuštění krátké, ale počet volání je vysoký, podívejte se na opakovaná volání (N+1) a cachování. Název služby uveďte do application_name v connection poolu.",
         "PLATFORM": "Vypadá to jako interní práce DB nebo platformy, jako je autovacuum nebo replikace. Obvykle není potřeba žádná akce. Pokud zůstává na vrcholu, zkontrolujte prahové hodnoty autovacuum a maintenance_work_mem.",
-        "MONITOR": "Vypadá to jako vlastní statistické dotazy této služby (odkaz schema.pi). Není potřeba žádná akce. Pokud se zobrazuje příliš často, snižte frekvenci dotazování.",
+        "MONITOR": "Toto je samoobslužný sběrný dotaz dbms.pi — připojení schema.pi je pevně daný příkaz, který čte pouze statistická zobrazení/katalogy (pg_stat_*·pg_catalog), takže se nejedná o obchodní dotaz a není vyžadována žádná akce zákazníka. Pokud je problémem zatížení cílové databáze, snižte počet otevření tlačítka sběru/obrazovky monitorování. Zde jsou také seskupeny příkazy z jiných monitorovacích nástrojů, které čtou stejná statistická zobrazení.",
         "UNKNOWN": "Není žádná stopa ke zdroji. Nastavte application_name na každém připojení a rozdělte účty podle účelu; bude klasifikováno z dalších vzorků."
       },
       "detail": {
@@ -1094,7 +1096,51 @@
       "privOff": "Propojený účet nemůže vidět podrobnosti relací jiných účtů, takže se neshromažďují žádné vzorky. Požádejte správce DB, aby spustil GRANT pg_read_all_stats TO {user};",
       "linkUsr": "propojený účet",
       "qidOff": "Podrobnosti relace jsou viditelné, ale ID dotazu je prázdné (compute_query_id je vypnuto). Zkontrolujte pomocí SHOW compute_query_id; poté spusťte ALTER SYSTEM SET compute_query_id = 'auto'; a znovu načtěte (SELECT pg_reload_conf();).",
-      "openHint": "Otevře SQL Tuning s vyplněným dotazem. Před zobrazením plánu nahraďte zástupné symboly jako $1 skutečnými hodnotami."
+      "openHint": "Otevře SQL Tuning s vyplněným dotazem. Před zobrazením plánu nahraďte zástupné symboly jako $1 skutečnými hodnotami.",
+      "detailTitle": "Vzorky zdroje"
+    },
+    "diag": {
+      "title": "Diagnostikovat příčinu",
+      "fix": "Akce:",
+      "none": "Statistiky neodhalily žádnou příčinu – zkontrolujte plán provedení v SQL Tuning.",
+      "cum": "V tomto intervalu žádné volání – kumulativní (od resetování statistik)",
+      "basis": "Základ – Max. 1x {max}ms · Průměr {mean}ms · Volání {calls} · Řádků na volání {rpc} · Poměr čtení z disku {read} · Dočasné bloky {tmp}",
+      "SELF_MON": {
+        "cause": "Samo-sběrný dotaz dbms.pi – monitorovací příkaz, který čte pouze statistická zobrazení/katalogy.",
+        "fix": "Není vyžadována žádná akce zákazníka. Pokud je problémem zatížení cílové databáze, snižte počet otevření obrazovky sběru/monitorování."
+      },
+      "NO_MAX": {
+        "cause": "Stará sbírka bez hodnoty „max. 1x“, takže nelze rozlišit „vždy pomalé/přerušované zpoždění“.",
+        "fix": "Klikněte nyní jednou na „Shromáždit“, abyste vyplnili maximální hodnoty pro přesnou diagnostiku."
+      },
+      "SLOW_EACH": {
+        "cause": "Vždy pomalé – Pokaždé, když se spustí, trvá to dlouho, s maximem {max}ms a průměrem {mean}ms.",
+        "fix": "① Otevřete plán provedení v „Otevřít v SQL Tuning“. ② Pokud existují úplné skeny (Seq Scan) nebo velké řazení, zkontrolujte indexy na sloupcích podmínek WHERE/JOIN. ③ Zúžte podmínky tak, aby se četly pouze potřebné sloupce/řádky."
+      },
+      "SPIKE": {
+        "cause": "Přerušované zpoždění – Průměr {mean}ms, ale občas trvá dlouho při maximu {max}ms ({x}násobek průměru).",
+        "fix": "① Když je pomalé, zkontrolujte čekání na zámek (wait_event) na kartě Aktivita/Zámky. ② Pokud je pomalé pouze první provedení, byla mezipaměť prázdná a disk byl čten. ③ Porovnejte stejný dotaz s různými hodnotami v SQL Tuning, abyste zjistili, zda se plán provedení mění na základě hodnot."
+      },
+      "DISK_READ": {
+        "cause": "Chyba mezipaměti – {pct}% ({read} bloků) přečtených bloků bylo přečteno z disku, nikoli z paměti.",
+        "fix": "① Zmenšete rozsah čtení pomocí indexů. ② Zúžte období/podmínky dotazu. ③ Pokud často čtená data zůstávají vysoká, zkontrolujte shared_buffers (paměť)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Přetečení paměti – Řazení/hash překročilo work_mem a zapsalo {blk} bloků (přibližně {mb}MB, {perCall} bloků na volání) do dočasných souborů.",
+        "fix": "① Umístění indexů na sloupce ORDER BY/GROUP BY přeskočí řazení. ② Nejprve snižte počet řádků k řazení (LIMIT uvnitř). ③ Pokud je to naprosto nezbytné, zvyšte SET LOCAL work_mem pouze pro tuto transakci dotazu."
+      },
+      "MANY_ROWS": {
+        "cause": "Nadměrné načítání – Načítá {perCall} řádků na volání.",
+        "fix": "① Seznamy obrazovek se načítají po stránkách. ② SELECT vybírá pouze použité sloupce. ③ Agregace se provádějí v databázi a přijímají se pouze výsledky."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST vložený filtr (!inner) příkaz – filtrování rodičů podle podmínek potomků může skenovat celou sadu před podmínkami klasifikace.",
+        "fix": "① Zkontrolujte, zda existují indexy na spojovacích klíčích a sloupcích filtru. ② Přesuňte filtry do podmínek nadřazené tabulky. ③ Vložte podřízené prvky do již existujícího nadřazeného dotazu nebo je zkombinujte do jedné databázové funkce."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET stránkování – Postupně se zpomaluje, protože čte a zahazuje předchozí řádky pro pozdější stránky.",
+        "fix": "Změňte na stránkování klíčovou sadou (WHERE id > last_id ORDER BY id LIMIT n), které čte od klíče po posledním přijatém klíči."
+      }
     }
   },
   "pipeline": {

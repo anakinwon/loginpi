@@ -550,6 +550,7 @@
         "WARN": "Varning – vissa objekt behöver granskas",
         "UNKNOWN": "Okänd – kontrollera anslutningen",
         "OK": "OK – alla signaler är inom gränserna",
+        "CONN_DOWN": "Kan inte nå DB — kontrollera anslutningen först",
         "NA": "Ej tillämpligt"
       },
       "kpi": {
@@ -1019,7 +1020,9 @@
       "openSqlLab": "Öppna i SQL Tuning",
       "acct": "Konto",
       "sortMax": "Max enskild körningstid",
-      "maxMs": "Max enskild ms"
+      "maxMs": "Max enskild ms",
+      "diagToggle": "Diagnostisera orsak",
+      "noMax": "Inget maxvärde – {n} objekt kommer från äldre samlingar utan ett maxvärde, så de är tillfälligt sorterade efter genomsnitt (inte efter total tid). Att samla in nu kommer att fylla i maxvärdet."
     },
     "health": {
       "empty": "Inga ögonblicksbilder än. Tryck på Samla nu på fliken Samla",
@@ -1072,7 +1075,7 @@
         "BATCH": "Verkar som en batch eller ett schemalagt jobb. Sprid körtiderna bort från affärstoppar och minska arbetet per commit. Kontrollera index och statistik (ANALYZE) på måltabellerna och dela upp långa transaktioner. Att lägga jobbnamnet i application_name gör nästa klassificering mer exakt.",
         "PROGRAM": "Detta verkar vara en fråga som körs av applikationen. Kontrollera körningsplanen i SQL-justeringen. Om den maximala enskilda körningstiden är lång, titta först på index och kopplingsordning. Om en enskild körning är kort men anropsantalet är högt, titta på upprepade anrop (N+1) och cachning. Ange tjänstens namn i application_name för anslutningspoolen.",
         "PLATFORM": "Verkar som DB- eller plattformsinternt arbete som autovacuum eller replikering. Vanligtvis behövs ingen åtgärd. Om det stannar högst upp, granska autovacuum-trösklar och maintenance_work_mem.",
-        "MONITOR": "Verkar som denna tjänsts egna statistikfrågor (schema.pi-länk). Ingen åtgärd behövs. Om det visas för ofta, sänk pollingfrekvensen.",
+        "MONITOR": "Detta är en dbms.pi självinsamlingsfråga – schema.pi-anslutningen är ett fast uttalande som endast läser statistiska vyer/kataloger (pg_stat_*·pg_catalog), så det är ingen affärsfråga och ingen kundåtgärd krävs. Om måldatabasens belastning är ett problem, minska antalet gånger du öppnar insamlingsknappen/övervakningsskärmen. Uttalanden från andra övervakningsverktyg som läser samma statistiska vyer grupperas också här.",
         "UNKNOWN": "Det finns ingen ledtråd till källan. Ställ in application_name på varje anslutning och dela upp konton efter syfte; det kommer att klassificeras från nästa urval."
       },
       "detail": {
@@ -1088,7 +1091,51 @@
       "privOff": "Länkkontot kan inte se andra kontons sessionsdetaljer, så inga urval samlas in. Be en DB-administratör att köra GRANT pg_read_all_stats TO {user};",
       "linkUsr": "länkkonto",
       "qidOff": "Sessionsdetaljer är synliga men fråge-ID är tomt (compute_query_id är avstängt). Kontrollera med SHOW compute_query_id; kör sedan ALTER SYSTEM SET compute_query_id = 'auto'; och ladda om (SELECT pg_reload_conf();).",
-      "openHint": "Öppnar SQL Tuning med frågan ifylld. Ersätt platshållare som $1 med verkliga värden innan du visar planen."
+      "openHint": "Öppnar SQL Tuning med frågan ifylld. Ersätt platshållare som $1 med verkliga värden innan du visar planen.",
+      "detailTitle": "Källprover"
+    },
+    "diag": {
+      "title": "Diagnostisera orsak",
+      "fix": "Åtgärd:",
+      "none": "Ingen orsak avslöjades av statistiken – kontrollera exekveringsplanen i SQL Tuning.",
+      "cum": "Inga anrop i detta intervall – kumulativt (sedan statistikåterställning)",
+      "basis": "Grund – Max 1-gång {max}ms · Genomsnitt {mean}ms · Anrop {calls} · Rader per anrop {rpc} · Diskavläsningsförhållande {read} · Temporära block {tmp}",
+      "SELF_MON": {
+        "cause": "dbms.pi självinsamlingsfråga – övervakningsuttalande som endast läser statistiska vyer/kataloger.",
+        "fix": "Ingen kundåtgärd krävs. Om måldatabasens belastning är ett problem, minska antalet gånger du öppnar insamlings-/övervakningsskärmen."
+      },
+      "NO_MAX": {
+        "cause": "Gammal samling utan ett 'max 1-gångs'-värde, så 'alltid långsam/intermittent fördröjning' kan inte särskiljas.",
+        "fix": "Klicka på 'Samla in' en gång nu för att fylla maxvärden för korrekt diagnos."
+      },
+      "SLOW_EACH": {
+        "cause": "Alltid långsam – Tar lång tid varje gång den körs, med max {max}ms och genomsnitt {mean}ms.",
+        "fix": "① Öppna exekveringsplanen i 'Öppna i SQL Tuning'. ② Om det finns fullständiga skanningar (Seq Scan) eller stora sorteringar, granska index på WHERE/JOIN-villkorskolumner. ③ Begränsa villkoren för att endast läsa nödvändiga kolumner/rader."
+      },
+      "SPIKE": {
+        "cause": "Intermittent fördröjning – Genomsnitt {mean}ms, men tar ibland lång tid vid max {max}ms ({x} gånger genomsnittet).",
+        "fix": "① När det är långsamt, kontrollera låsväntningar (wait_event) i fliken Aktivitet/Lås. ② Om endast den första exekveringen är långsam, var cachen tom och disken lästes. ③ Jämför samma fråga med olika värden i SQL Tuning för att se om exekveringsplanen ändras baserat på värden."
+      },
+      "DISK_READ": {
+        "cause": "Cachemiss – {pct}% ({read} block) av lästa block lästes från disk, inte minne.",
+        "fix": "① Minska läsområdet med index. ② Begränsa frågeperioden/villkoren. ③ Om ofta lästa data förblir höga, granska shared_buffers (minne)."
+      },
+      "TEMP_SPILL": {
+        "cause": "Minnesöverflöde – Sortering/hash överskred work_mem och skrev {blk} block (ca {mb}MB, {perCall} block per anrop) till temporära filer.",
+        "fix": "① Att placera index på ORDER BY/GROUP BY-kolumner hoppar över sortering. ② Först, minska antalet rader att sortera (LIMIT inuti). ③ Om det är absolut nödvändigt, öka SET LOCAL work_mem endast för denna frågetransaktion."
+      },
+      "MANY_ROWS": {
+        "cause": "Överdriven hämtning – Hämtar {perCall} rader per anrop.",
+        "fix": "① Skärmlistor hämtas sida för sida. ② SELECT väljer endast de kolumner som används. ③ Aggregeringar utförs i databasen, och endast resultaten tas emot."
+      },
+      "PGRST_EMBED": {
+        "cause": "PostgREST inbäddad filter (!inner) uttalande – filtrering av föräldrar efter barnvillkor kan skanna hela uppsättningen före klassificeringsvillkor.",
+        "fix": "① Kontrollera om det finns index på kopplingsnycklar och filterkolumner. ② Flytta filter till föräldertabellens villkor. ③ Bädda in underordnade i en redan befintlig förälderfråga eller kombinera dem till en enda databasfunktion."
+      },
+      "OFFSET_PAGING": {
+        "cause": "OFFSET-sidnumrering – Blir progressivt långsammare när den läser och kastar bort föregående rader för senare sidor.",
+        "fix": "Ändra till keyset-sidnumrering (WHERE id > last_id ORDER BY id LIMIT n) som läser från nyckeln efter den senast mottagna nyckeln."
+      }
     }
   },
   "pipeline": {

@@ -8,6 +8,7 @@ import { db, dbFail, dbRoute, parseBody } from '@/lib/api'
 import { LinkError, linkQuery } from '@/lib/link/client'
 import { maskLiterals } from '@/lib/perf/calc'
 import {
+  isNoCol,
   linkFail,
   linkParams,
   num,
@@ -26,16 +27,25 @@ const toDtm = (v: unknown) => {
   return d && !Number.isNaN(d.getTime()) ? d.toISOString() : null
 }
 
-// sql/033(max_ms)·032(usr_nm) 미적용 DB 에 코드가 먼저 배포돼도 수집은 계속 — 칼럼 없음(42703)이면 새 칼럼부터 빼고 재시도
+// sql/034(블록)·033(max_ms)·032(usr_nm) 미적용 DB 에 코드가 먼저 배포돼도 수집은 계속 — 칼럼 없음(42703·PGRST204)이면 새 칼럼부터 빼고 재시도
+const NEW_COLS = [
+  ['blks_hit_cnt', 'blks_read_cnt', 'tmp_blks_wrt_cnt'],
+  ['max_ms'],
+  ['usr_nm'],
+]
 async function insQry(rows: Record<string, unknown>[]) {
   const ins = (rs: Record<string, unknown>[]) =>
     db().from('dbm_prf_qry').insert(rs)
-  let r = await ins(rows)
-  if (r.error?.code !== '42703') return r
-  const noMax = rows.map(({ max_ms: _m, ...o }) => o)
-  r = await ins(noMax)
-  if (r.error?.code !== '42703') return r
-  return ins(noMax.map(({ usr_nm: _u, ...o }) => o))
+  let rs = rows
+  let r = await ins(rs)
+  for (const cols of NEW_COLS) {
+    if (!isNoCol(r.error)) return r
+    rs = rs.map((o) =>
+      Object.fromEntries(Object.entries(o).filter(([k]) => !cols.includes(k))),
+    )
+    r = await ins(rs)
+  }
+  return r
 }
 
 export const POST = withGuard(
@@ -125,6 +135,10 @@ export const POST = withGuard(
         row_cnt: num(pick(o, 'rows', 'row_cnt')),
         // 1회 최고(리셋 이후 누적 최고치 그대로 — 증감 불가, sql/033). 값이 없으면 null
         max_ms: numOrNull(pick(o, 'max_exec_time', 'max_time', 'max_ms')),
+        // 블록 수(누적치 그대로 — 증감은 조회 때, sql/034). 원인 진단의 디스크 읽기·임시 파일 넘침 근거
+        blks_hit_cnt: numOrNull(pick(o, 'shared_blks_hit')),
+        blks_read_cnt: numOrNull(pick(o, 'shared_blks_read')),
+        tmp_blks_wrt_cnt: numOrNull(pick(o, 'temp_blks_written')),
       }
     })
     const tblRows = toObjs(tblR).map((o, i) => {
