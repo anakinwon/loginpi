@@ -2,7 +2,7 @@
 
 // dbms.pi 하단 고정 2단 폴더블 메뉴 — schema.pi area-nav 와 같은 구조(마스터 지시 2026-11-02)
 //  1단(아래) = 묶음 4개(모니터링·GAP분석·레이크·관리) 타일 — 아이콘 타일 위 + 작은 글씨 아래, 누르면 그 묶음의 첫 기능으로
-//  2단(위) = 현재 묶음의 하위 기능 서브 바 — 현재 묶음 타일 위에 맞춰 띄움(화면 양끝 8px 안쪽), 묶음 색 연한 바탕
+//  2단(위) = 현재 묶음의 하위 기능 서브 바 — 현재 묶음 타일 위에 맞춰 띄움 — 모니터링·GAP분석은 타일 시작 끝, 레이크·관리는 타일 끝 쪽 끝(ALIGN_END, RTL 반전), 화면 양끝 8px 안쪽, 묶음 색 연한 바탕
 //  접기·펼치기 = 위 경계선 가운데 손잡이(localStorage 기억), 메뉴 높이 → :root --dbms-nav-h(본문 아래 여백이 따라감)
 //  페이지마다 로그인 게이트가 있어 로그인 여부와 무관하게 노출. 좁은 화면은 가로 스크롤(줄바꿈 없음)
 import {
@@ -26,6 +26,8 @@ import {
 
 const FOLD_KEY = 'dbms-nav-fold'
 type GroupKey = (typeof FEATURE_GROUPS)[number]['key']
+// 서브 바를 타일 끝 쪽(LTR 오른쪽)에 맞출 묶음 — 메뉴 뒤쪽이라 서브 바가 안쪽(앞쪽)으로 펼쳐지게
+const ALIGN_END: ReadonlySet<GroupKey> = new Set(['lake', 'admin'])
 
 // 묶음 색(다크 테마 무채색 + 옅은 색조) — box = 묶음 박스, on = 현재 묶음 타일·서브 탭, soft = 서브 바 바탕, text = 현재 글자
 const TONE: Record<
@@ -72,6 +74,7 @@ export function FeatureNav() {
   const cur = FEATURE_GROUPS.find((g) =>
     g.items.some((i) => isActive(path, i.href)),
   )
+  const curKey = cur?.key
   const navRef = useRef<HTMLElement>(null)
   const rowRef = useRef<HTMLDivElement>(null)
   const subRef = useRef<HTMLUListElement>(null)
@@ -95,16 +98,21 @@ export function FeatureNav() {
     }
   }
 
-  // 서브 바 = 현재 묶음 타일 왼쪽에 맞춤(화면 끝 넘치면 안쪽으로). 가로 스크롤·창 크기·글꼴 로딩 때 다시 계산
+  // 서브 바 = 현재 묶음 타일 시작 쪽 끝에 맞춤, 뒤쪽 묶음(레이크·관리)은 끝 쪽 끝에 맞춤(마스터 2026-11-02) — RTL 은 좌우 반전.
+  //  화면 끝을 넘치면 안쪽으로. 가로 스크롤·창 크기·글꼴 로딩 때 다시 계산
   useLayoutEffect(() => {
     const row = rowRef.current
     const place = () => {
       const nav = navRef.current,
         sub = subRef.current,
         a = row?.querySelector('[aria-current="true"]')
-      if (!nav || !sub || !a) return setSubX(null)
+      if (!nav || !sub || !a || !curKey) return setSubX(null)
+      const box = a.getBoundingClientRect()
+      const right =
+        ALIGN_END.has(curKey) !== (getComputedStyle(nav).direction === 'rtl')
       const x =
-        a.getBoundingClientRect().left - nav.getBoundingClientRect().left
+        (right ? box.right - sub.offsetWidth : box.left) -
+        nav.getBoundingClientRect().left
       setSubX(
         Math.round(
           Math.max(8, Math.min(x, nav.offsetWidth - sub.offsetWidth - 8)),
@@ -115,6 +123,7 @@ export function FeatureNav() {
     window.addEventListener('resize', place)
     row?.addEventListener('scroll', place)
     const ro = new ResizeObserver(place)
+    if (row) ro.observe(row) // 데스크톱 스크롤바 생김·사라짐으로 nav 폭이 바뀌어 가운데 타일이 움직일 때
     if (row?.firstElementChild) ro.observe(row.firstElementChild)
     if (subRef.current) ro.observe(subRef.current)
     return () => {
@@ -122,7 +131,7 @@ export function FeatureNav() {
       row?.removeEventListener('scroll', place)
       ro.disconnect()
     }
-  }, [path, cur?.key, fold])
+  }, [path, curKey, fold])
 
   // 메뉴 높이(서브 바 유무·접힘에 따라 바뀜) → :root --dbms-nav-h
   useEffect(() => {
