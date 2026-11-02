@@ -221,7 +221,8 @@
     "reapplyOpen": "Ponovo se prijavi",
     "spk": "Sparkle dodatak",
     "spkGo": "Plati {amount} Pi za sparkle dodatak",
-    "efctGo": "Plati {amount} Pi za efekat mjehurića"
+    "efctGo": "Plati {amount} Pi za efekat mjehurića",
+    "shipGo": "Platite {amount} Pi za Warp svemirski brod"
   },
   "pay": {
     "payNow": "Plati {amount} Pi naknadu za korištenje ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Sparkle dodatak je već plaćen.",
     "efct": "Efekat mjehurića",
     "payNowEfct": "Plati {amount} Pi za efekat mjehurića",
-    "efctAlreadyPaid": "Efekat mjehurića je već plaćen."
+    "efctAlreadyPaid": "Efekat mjehurića je već plaćen.",
+    "ship": "Warp svemirski brod",
+    "payNowShip": "Platite {amount} Pi za Warp svemirski brod",
+    "shipAlreadyPaid": "Plaćanje Warp svemirskog broda je završeno."
   },
   "form": {
     "newTitle": "Navedi stranicu",
@@ -283,7 +287,11 @@
     "efct": "Efekat mjehurića",
     "efctNone": "Ništa",
     "efctHint": "Jedan po planu — Orbita (satelit kruži oko mjehurića), Puls (talasanje disanja), Komet (trag repa). Plaćeno sa naknadom za korištenje, ili odabrano u Uredi dok je u upotrebi uz zasebno plaćanje. Može se kombinirati sa Sparkle.",
-    "efctPaid": "Plaćeno — ostaje uključeno tokom perioda korištenja."
+    "efctPaid": "Plaćeno — ostaje uključeno tokom perioda korištenja.",
+    "ship": "Warp svemirski brod",
+    "shipFree": "Osnovno·Besplatno",
+    "shipHint": "Ovo je warp svemirski brod za navođenje koji se pojavljuje kada posjetioci dođu na vašu stranicu. Osnovna opcija je Saucer Cruiser (besplatno), a možete odabrati jednu od četiri plaćene opcije. Plaćanje se vrši zajedno sa naknadom za korištenje, a možete odabrati i izvršiti dodatna plaćanja tokom korištenja.",
+    "shipPaid": "Plaćanje završeno — održava se tokom perioda korištenja."
   },
   "admin": {
     "title": "Admin stranice",
@@ -401,5 +409,12 @@
     "ORBIT": "Efekat orbite",
     "PULSE": "Efekat pulsa",
     "COMET": "Efekat komete"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Bridge Viewscreen",
+    "TWIN": "Twin-Wing Interceptor",
+    "DAGGER": "Dagger Assault Fighter",
+    "CROSS": "Borbeni avion s križnim krilima"
   }
 }

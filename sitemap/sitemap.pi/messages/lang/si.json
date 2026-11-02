@@ -221,7 +221,8 @@
     "reapplyOpen": "නැවත අයදුම් කරන්න",
     "spk": "Sparkle ඇඩෝනය",
     "spkGo": "Sparkle ඇඩෝනය සඳහා {amount} Pi ගෙවන්න",
-    "efctGo": "බුබුළු ආචරණය සඳහා {amount} Pi ගෙවන්න"
+    "efctGo": "බුබුළු ආචරණය සඳහා {amount} Pi ගෙවන්න",
+    "shipGo": "Warp Spaceship {amount} Pi ගෙවන්න"
   },
   "pay": {
     "payNow": "{amount} Pi භාවිත ගාස්තුව ({plan}) ගෙවන්න",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Sparkle ඇඩෝනය දැනටමත් ගෙවා ඇත.",
     "efct": "බුබුළු ආචරණය",
     "payNowEfct": "බුබුළු ආචරණය සඳහා {amount} Pi ගෙවන්න",
-    "efctAlreadyPaid": "බුබුළු ආචරණය දැනටමත් ගෙවා ඇත."
+    "efctAlreadyPaid": "බුබුළු ආචරණය දැනටමත් ගෙවා ඇත.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Warp Spaceship {amount} Pi ගෙවන්න",
+    "shipAlreadyPaid": "Warp Spaceship ගෙවීම සම්පූර්ණ කර ඇත."
   },
   "form": {
     "newTitle": "අඩවියක් ලැයිස්තුගත කරන්න",
@@ -283,7 +287,11 @@
     "efct": "බුබුළු ආචරණය",
     "efctNone": "කිසිවක් නැත",
     "efctHint": "සැලැස්මකට එකක් — කක්ෂය (චන්ද්‍රිකාවක් බුබුල වටා ගමන් කරයි), ස්පන්දනය (හුස්ම ගන්නා රළ), ධූමකේතුව (පසුපස වලිගය). භාවිත ගාස්තුව සමඟ ගෙවනු ලැබේ, නැතහොත් භාවිතයේ පවතින විට සංස්කරණය කිරීමේදී තෝරාගෙන වෙනම ගෙවීමක් සමඟ කළ හැක. Sparkle සමඟ ඒකාබද්ධ කළ හැක.",
-    "efctPaid": "ගෙවා ඇත — භාවිත කාලය සඳහා පවතී."
+    "efctPaid": "ගෙවා ඇත — භාවිත කාලය සඳහා පවතී.",
+    "ship": "Warp Spaceship",
+    "shipFree": "මූලික·නොමිලේ",
+    "shipHint": "අමුත්තන් ඔබේ අඩවියට පිවිසෙන විට දිස්වන Warp මාර්ගෝපදේශක අභ්‍යවකාශ යානය මෙයයි. මූලික විකල්පය Saucer Cruiser (නොමිලේ) වන අතර, ඔබට ගෙවන ලද විකල්ප හතරෙන් එකක් තෝරාගත හැක. එය භාවිත ගාස්තුව සමඟ ගෙවනු ලබන අතර, භාවිතය අතරතුර ඔබට එය තෝරාගෙන අමතර ගෙවීම් කළ හැක.",
+    "shipPaid": "ගෙවීම සම්පූර්ණයි — භාවිත කාලය පුරා පවත්වාගෙන යනු ලැබේ."
   },
   "admin": {
     "title": "අඩවි පරිපාලක",
@@ -401,5 +409,12 @@
     "ORBIT": "කක්ෂීය ආචරණය",
     "PULSE": "ස්පන්දන ආචරණය",
     "COMET": "ධූමකේතු ආචරණය"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Bridge Viewscreen",
+    "TWIN": "Twin-Wing Interceptor",
+    "DAGGER": "Dagger Assault Fighter",
+    "CROSS": "හරස් තටු ප්‍රහාරක යානය"
   }
 }

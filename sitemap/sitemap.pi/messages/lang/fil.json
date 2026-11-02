@@ -221,7 +221,8 @@
     "reapplyOpen": "Mag-apply muli",
     "spk": "Sparkle add-on",
     "spkGo": "Bayaran ang {amount} Pi para sa sparkle add-on",
-    "efctGo": "Bayaran ang {amount} Pi para sa bubble effect"
+    "efctGo": "Bayaran ang {amount} Pi para sa bubble effect",
+    "shipGo": "Magbayad ng {amount} Pi para sa Warp Spaceship"
   },
   "pay": {
     "payNow": "Bayaran ang {amount} Pi na bayad sa paggamit ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Nababayaran na ang sparkle add-on.",
     "efct": "Bubble effect",
     "payNowEfct": "Bayaran ang {amount} Pi para sa bubble effect",
-    "efctAlreadyPaid": "Nababayaran na ang bubble effect."
+    "efctAlreadyPaid": "Nababayaran na ang bubble effect.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Magbayad ng {amount} Pi para sa Warp Spaceship",
+    "shipAlreadyPaid": "Nakumpleto na ang pagbabayad para sa Warp Spaceship."
   },
   "form": {
     "newTitle": "Maglista ng site",
@@ -283,7 +287,11 @@
     "efct": "Bubble effect",
     "efctNone": "Wala",
     "efctHint": "Isa bawat plan — Orbit (isang satellite ang umiikot sa bubble), Pulse (humihinga na ripple), Comet (trailing tail). Binabayaran kasama ng bayad sa paggamit, o pinipili sa Edit habang ginagamit na may hiwalay na pagbabayad. Maaaring pagsamahin sa Sparkle.",
-    "efctPaid": "Nababayaran — mananatili sa panahon ng paggamit."
+    "efctPaid": "Nababayaran — mananatili sa panahon ng paggamit.",
+    "ship": "Warp Spaceship",
+    "shipFree": "Basic·Libre",
+    "shipHint": "Ito ang warp guide spaceship na lumalabas kapag pumunta ang mga bisita sa site. Ang default ay ang Disc Cruiser (libre), at maaari kang pumili ng isa sa apat na bayad na uri. Babayaran ito kasama ng bayad sa paggamit, at maaari mo itong piliin at magbayad ng karagdagang bayad sa panahon ng paggamit.",
+    "shipPaid": "Bayad na — mananatili sa panahon ng paggamit."
   },
   "admin": {
     "title": "Admin ng site",
@@ -401,5 +409,12 @@
     "ORBIT": "Epekto ng Orbit",
     "PULSE": "Epekto ng Pulse",
     "COMET": "Epekto ng Comet"
+  },
+  "ship": {
+    "SAUCER": "Disc Cruiser",
+    "BRIDGE": "Bridge Viewscreen",
+    "TWIN": "Twin-Wing Interceptor",
+    "DAGGER": "Dagger Assault Ship",
+    "CROSS": "Cross-wing Fighter"
   }
 }

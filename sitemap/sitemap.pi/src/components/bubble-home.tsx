@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Link, useRouter } from '@/i18n/navigation'
 import { BubbleCanvas, TONE, toneOf } from './bubble-canvas'
 import { LeaveDialog } from './leave-dialog'
+import { preloadShip } from './ships'
 import { Pagination } from './pagination'
 import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import {
@@ -50,6 +51,7 @@ export function BubbleHome() {
     domain: string
     name: string
     desc?: string | null
+    ship?: string | null // 워프 우주선(버블 응답 shipOn, null = 기본 SAUCER)
   } | null>(null)
   const td = useTranslations('detail')
 
@@ -59,8 +61,13 @@ export function BubbleHome() {
     const sp = new URLSearchParams({ period })
     if (ctgr) sp.set('ctgr', ctgr)
     const r = await readApi<BubbleResponse>(fetch(`/api/bubbles?${sp}`))
-    if (r.ok) setData(r.data)
-    else setError(r.body)
+    if (r.ok) {
+      setData(r.data)
+      // 이동 안내를 쓰는(url 있는) 사이트의 기체 청크만 미리 받기 — 클릭 뒤 빈 자리 깜빡임 방지(최대 5종, 브라우저가 중복 요청 제거)
+      new Set(
+        r.data.items.filter((it) => it.url).map((it) => it.ship ?? null),
+      ).forEach(preloadShip)
+    } else setError(r.body)
     setLoading(false)
   }, [period, ctgr])
 
@@ -102,7 +109,12 @@ export function BubbleHome() {
       const it = data?.items.find((x) => x.domain === domain)
       if (it?.sample) return router.push(`/slot?plan=${it.plan}`)
       if (it?.url) {
-        const next = { url: it.url, domain: it.domain, name: it.name }
+        const next = {
+          url: it.url,
+          domain: it.domain,
+          name: it.name,
+          ship: it.ship,
+        }
         setLeave(next)
         void readApi<{ site: { site_desc: string | null } }>(
           fetch(`/api/sites/${encodeURIComponent(it.domain)}`),
@@ -194,6 +206,7 @@ export function BubbleHome() {
           url={leave.url}
           name={leave.name}
           desc={leave.desc}
+          ship={leave.ship}
           onCancel={() => setLeave(null)}
         />
       )}

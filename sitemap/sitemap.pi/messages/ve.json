@@ -221,7 +221,8 @@
     "reapplyOpen": "Volver a aplicar",
     "spk": "Complemento de brillo",
     "spkGo": "Pagar {amount} Pi por el complemento de brillo",
-    "efctGo": "Pagar {amount} Pi por el efecto de burbuja"
+    "efctGo": "Pagar {amount} Pi por el efecto de burbuja",
+    "shipGo": "Pagar {amount} Pi por la nave espacial Warp"
   },
   "pay": {
     "payNow": "Pagar tarifa de uso de {amount} Pi ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "El complemento de brillo ya está pagado.",
     "efct": "Efecto de burbuja",
     "payNowEfct": "Pagar {amount} Pi por el efecto de burbuja",
-    "efctAlreadyPaid": "El efecto de burbuja ya está pagado."
+    "efctAlreadyPaid": "El efecto de burbuja ya está pagado.",
+    "ship": "Nave espacial Warp",
+    "payNowShip": "Pagar {amount} Pi por la nave espacial Warp",
+    "shipAlreadyPaid": "El pago de la nave espacial Warp se ha completado."
   },
   "form": {
     "newTitle": "Listar un sitio",
@@ -283,7 +287,11 @@
     "efct": "Efecto de burbuja",
     "efctNone": "Ninguno",
     "efctHint": "Uno por plan — Órbita (un satélite rodea la burbuja), Pulso (onda respiratoria), Cometa (cola de arrastre). Se paga con la tarifa de uso, o se elige en Editar mientras está en uso con un pago separado. Se puede combinar con Brillo.",
-    "efctPaid": "Pagado — permanece activo durante el período de uso."
+    "efctPaid": "Pagado — permanece activo durante el período de uso.",
+    "ship": "Nave espacial Warp",
+    "shipFree": "Básico·Gratis",
+    "shipHint": "Esta es la nave espacial guía de curvatura que aparece cuando los visitantes navegan a su sitio. La opción básica es el Crucero Platillo (gratis), y puede elegir una de las cuatro opciones de pago. Se paga junto con la tarifa de uso, y puede seleccionar y realizar pagos adicionales durante el uso.",
+    "shipPaid": "Pago completado — se mantiene durante la duración del uso."
   },
   "admin": {
     "title": "Administración del sitio",
@@ -401,5 +409,12 @@
     "ORBIT": "Efecto órbita",
     "PULSE": "Efecto pulso",
     "COMET": "Efecto cometa"
+  },
+  "ship": {
+    "SAUCER": "Crucero Platillo",
+    "BRIDGE": "Pantalla de puente",
+    "TWIN": "Interceptor de doble ala",
+    "DAGGER": "Caza de asalto Dagger",
+    "CROSS": "Caza de ala cruzada"
   }
 }

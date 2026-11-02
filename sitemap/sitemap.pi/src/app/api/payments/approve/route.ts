@@ -23,9 +23,12 @@ import {
   markPaymentCanceled,
   parseSiteRegMeta,
   parseSiteEfctMeta,
+  parseSiteShipMeta,
   parseSiteSpkMeta,
   getEfctFee,
+  getShipFee,
   SITE_EFCT,
+  SITE_SHIP,
   SITE_SPK,
 } from '@/lib/payments'
 import { PAYABLE_STS, SPK_PAYABLE_STS, type SiteSts } from '@/lib/site'
@@ -64,7 +67,8 @@ export const POST = withAuthGuard(
     const meta =
       parseSiteRegMeta(payment.metadata) ??
       parseSiteSpkMeta(payment.metadata) ??
-      parseSiteEfctMeta(payment.metadata)
+      parseSiteEfctMeta(payment.metadata) ??
+      parseSiteShipMeta(payment.metadata)
     if (!meta) return reject('PAY_SITE_MISMATCH', 400)
     if (payment.direction !== 'user_to_app')
       return reject('PAY_SITE_MISMATCH', 400)
@@ -77,7 +81,7 @@ export const POST = withAuthGuard(
     const { data: site, error } = await db()
       .from('site_mst')
       .select(
-        'site_id, site_sts_cd, plan_cd, pymnt_id, own_site_yn, spk_yn, spk_pymnt_id, efct_cd, efct_pymnt_id',
+        'site_id, site_sts_cd, plan_cd, pymnt_id, own_site_yn, spk_yn, spk_pymnt_id, efct_cd, efct_pymnt_id, ship_cd, ship_pymnt_id',
       )
       .eq('site_id', meta.site_id)
       .eq('ownr_usr_id', user.id)
@@ -92,6 +96,8 @@ export const POST = withAuthGuard(
         spk_pymnt_id: string | null
         efct_cd: string | null
         efct_pymnt_id: string | null
+        ship_cd: string | null
+        ship_pymnt_id: string | null
       }>()
     if (error) return dbFail(error)
     if (!site || site.own_site_yn === 'Y')
@@ -117,6 +123,23 @@ export const POST = withAuthGuard(
       if (paidOther) return reject('PAY_ALREADY_PAID', 409)
       if (efct == null) return reject('PAY_NOT_REQUIRED', 409)
       expected = efct
+    } else if (meta.type === SITE_SHIP) {
+      // 우주선 단독 : 이펙트 단독과 같은 가드 + 선택 코드 일치
+      if (
+        !(SPK_PAYABLE_STS as readonly string[]).includes(site.site_sts_cd) ||
+        (site.site_sts_cd === 'APPLYING' && !site.pymnt_id) ||
+        site.ship_cd !== meta.ship
+      )
+        return reject('INVALID_STATE', 409)
+      if (site.ship_pymnt_id && site.ship_pymnt_id !== payment.identifier)
+        return reject('PAY_ALREADY_PAID', 409)
+      const [paidOther, ship] = await Promise.all([
+        hasOtherApprovedPayment(site.site_id, payment.identifier, SITE_SHIP),
+        getShipFee(site.plan_cd),
+      ])
+      if (paidOther) return reject('PAY_ALREADY_PAID', 409)
+      if (ship == null) return reject('PAY_NOT_REQUIRED', 409)
+      expected = ship
     } else if (meta.type === SITE_SPK) {
       // 반짝임 단독 : 사용료 결제 뒤·신청 켜짐·미결제(같은 결제 재시도는 허용)
       if (
@@ -140,14 +163,15 @@ export const POST = withAuthGuard(
       if (site.pymnt_id && site.pymnt_id !== payment.identifier)
         return reject('PAY_ALREADY_PAID', 409)
       if (meta.plan_cd !== site.plan_cd) return reject('PAY_SITE_MISMATCH', 409)
-      // 중복 확인·사용료·합산 단가 4조회는 서로 결과를 안 씀 → 병렬(R-P1), 판정 순서는 그대로
-      const [paidOther, fee, spk, efct] = await Promise.all([
+      // 중복 확인·사용료·합산 단가 5조회는 서로 결과를 안 씀 → 병렬(R-P1), 판정 순서는 그대로
+      const [paidOther, fee, spk, efct, ship] = await Promise.all([
         hasOtherApprovedPayment(site.site_id, payment.identifier),
         getRegFee(site.plan_cd),
         site.spk_yn === 'Y' && !site.spk_pymnt_id
           ? getSpkFee(site.plan_cd)
           : null,
         site.efct_cd && !site.efct_pymnt_id ? getEfctFee(site.plan_cd) : null,
+        site.ship_cd && !site.ship_pymnt_id ? getShipFee(site.plan_cd) : null,
       ])
       if (paidOther) return reject('PAY_ALREADY_PAID', 409)
       if (!fee || fee.pi_amt <= 0) return reject('PAY_NOT_REQUIRED', 409)
@@ -157,7 +181,10 @@ export const POST = withAuthGuard(
       // 합산 이펙트 포함 여부·코드도 현재 값과 일치해야 한다
       if ((efct != null ? site.efct_cd : undefined) !== meta.efct)
         return reject('PAY_SITE_MISMATCH', 409)
-      expected = fee.pi_amt + (spk ?? 0) + (efct ?? 0)
+      // 합산 우주선 포함 여부·코드도 같은 규칙
+      if ((ship != null ? site.ship_cd : undefined) !== meta.ship)
+        return reject('PAY_SITE_MISMATCH', 409)
+      expected = fee.pi_amt + (spk ?? 0) + (efct ?? 0) + (ship ?? 0)
     }
     // 정가와 정확히 일치(초과도 거부 — 서버 prepare 금액 그대로여야 한다)
     if (Math.abs(Number(payment.amount) - expected) > 1e-6)

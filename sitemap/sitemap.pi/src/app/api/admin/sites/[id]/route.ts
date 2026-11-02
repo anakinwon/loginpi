@@ -72,6 +72,7 @@ export const PATCH = withAuthGuard(
           site_mv_url: body.mvUrl ?? null,
           spk_yn: body.spk ? 'Y' : 'N', // 자사 사이트는 결제 없이 켜짐(isSparkleOn)
           efct_cd: body.efct ?? null, // 이펙트도 동일(effectOn)
+          ship_cd: body.ship ?? null, // 우주선도 동일(shipOn)
           modr_id: admin.id,
         })
         .eq('site_id', cur.site_id)

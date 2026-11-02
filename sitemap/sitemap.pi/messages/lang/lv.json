@@ -221,7 +221,8 @@
     "reapplyOpen": "Pieteikties vēlreiz",
     "spk": "Mirdzuma papildinājums",
     "spkGo": "Maksāt {amount} Pi par mirdzuma papildinājumu",
-    "efctGo": "Maksāt {amount} Pi par burbuļa efektu"
+    "efctGo": "Maksāt {amount} Pi par burbuļa efektu",
+    "shipGo": "Apmaksāt {amount} Pi par Warp kosmosa kuģi"
   },
   "pay": {
     "payNow": "Maksāt {amount} Pi lietošanas maksu ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Mirdzuma papildinājums jau ir apmaksāts.",
     "efct": "Burbuļa efekts",
     "payNowEfct": "Maksāt {amount} Pi par burbuļa efektu",
-    "efctAlreadyPaid": "Burbuļa efekts jau ir apmaksāts."
+    "efctAlreadyPaid": "Burbuļa efekts jau ir apmaksāts.",
+    "ship": "Warp kosmosa kuģis",
+    "payNowShip": "Apmaksāt {amount} Pi par Warp kosmosa kuģi",
+    "shipAlreadyPaid": "Warp kosmosa kuģa apmaksa ir pabeigta."
   },
   "form": {
     "newTitle": "Reģistrēt vietni",
@@ -283,7 +287,11 @@
     "efct": "Burbuļa efekts",
     "efctNone": "Nav",
     "efctHint": "Viens katram plānam — Orbīta (satelīts riņķo ap burbuli), Pulss (elpošanas pulsācija), Komēta (astes atlikums). Apmaksāts kopā ar lietošanas maksu, vai izvēlēts rediģēšanas laikā, izmantojot atsevišķu maksājumu. Var kombinēt ar Mirdzumu.",
-    "efctPaid": "Apmaksāts — paliek ieslēgts lietošanas periodā."
+    "efctPaid": "Apmaksāts — paliek ieslēgts lietošanas periodā.",
+    "ship": "Warp kosmosa kuģis",
+    "shipFree": "Pamata·Bezmaksas",
+    "shipHint": "Šis ir Warp ceļvedis kosmosa kuģis, kas parādās, kad apmeklētāji pārvietojas uz jūsu vietni. Pamata opcija ir Apakštasītes kreiseris (bezmaksas), un jūs varat izvēlēties vienu no četrām maksas opcijām. Tas tiek apmaksāts kopā ar lietošanas maksu, un lietošanas laikā to var izvēlēties un veikt papildu maksājumus.",
+    "shipPaid": "Maksājums pabeigts — tiek uzturēts lietošanas periodā."
   },
   "admin": {
     "title": "Vietnes administrators",
@@ -401,5 +409,12 @@
     "ORBIT": "Orbitas efekts",
     "PULSE": "Pulsa efekts",
     "COMET": "Komētas efekts"
+  },
+  "ship": {
+    "SAUCER": "Apakštasītes kreiseris",
+    "BRIDGE": "Tilta skata ekrāns",
+    "TWIN": "Divspārnu pārtvērējs",
+    "DAGGER": "Duncis uzbrukuma iznīcinātājs",
+    "CROSS": "Spārnu krusta iznīcinātājs"
   }
 }

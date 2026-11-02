@@ -221,7 +221,8 @@
     "reapplyOpen": "Apliko përsëri",
     "spk": "Shtesë shkëlqimi",
     "spkGo": "Paguaj {amount} Pi për shtesën e shkëlqimit",
-    "efctGo": "Paguaj {amount} Pi për efektin e flluskës"
+    "efctGo": "Paguaj {amount} Pi për efektin e flluskës",
+    "shipGo": "Paguaj {amount} Pi për anijen kozmike Warp"
   },
   "pay": {
     "payNow": "Paguaj tarifën e përdorimit {amount} Pi ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Shtesa e shkëlqimit është paguar tashmë.",
     "efct": "Efekti i flluskës",
     "payNowEfct": "Paguaj {amount} Pi për efektin e flluskës",
-    "efctAlreadyPaid": "Efekti i flluskës është paguar tashmë."
+    "efctAlreadyPaid": "Efekti i flluskës është paguar tashmë.",
+    "ship": "Anija kozmike Warp",
+    "payNowShip": "Paguaj {amount} Pi për anijen kozmike Warp",
+    "shipAlreadyPaid": "Pagesa e anijes kozmike Warp është përfunduar."
   },
   "form": {
     "newTitle": "Listo një faqe",
@@ -283,7 +287,11 @@
     "efct": "Efekti i flluskës",
     "efctNone": "Asnjë",
     "efctHint": "Një për plan — Orbit (një satelit rrethon flluskën), Pulse (valëzimi i frymëmarrjes), Comet (bisht i mbetur). Paguhet me tarifën e përdorimit, ose zgjidhet në Redakto gjatë përdorimit me një pagesë të veçantë. Mund të kombinohet me Shkëlqim.",
-    "efctPaid": "Paguar — qëndron aktiv për periudhën e përdorimit."
+    "efctPaid": "Paguar — qëndron aktiv për periudhën e përdorimit.",
+    "ship": "Anija kozmike Warp",
+    "shipFree": "Bazë·Falas",
+    "shipHint": "Kjo është anija kozmike udhëzuese e deformimit që shfaqet kur vizitorët navigohen në faqen tuaj. Opsioni bazë është Saucer Cruiser (falas), dhe ju mund të zgjidhni një nga katër opsionet me pagesë. Ajo paguhet së bashku me tarifën e përdorimit, dhe ju mund të zgjidhni dhe të bëni pagesa shtesë gjatë përdorimit.",
+    "shipPaid": "Pagesa e përfunduar — mbahet për kohëzgjatjen e përdorimit."
   },
   "admin": {
     "title": "Admin i faqes",
@@ -401,5 +409,12 @@
     "ORBIT": "Efekti i orbitës",
     "PULSE": "Efekti i pulsit",
     "COMET": "Efekti i kometës"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Ekrani i urës",
+    "TWIN": "Ndërhyrës me dy krahë",
+    "DAGGER": "Gjuajtës sulmi Dagger",
+    "CROSS": "Gjuajtës me krahë kryq"
   }
 }

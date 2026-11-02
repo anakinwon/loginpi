@@ -221,7 +221,8 @@
     "reapplyOpen": "再次申請",
     "spk": "閃爍附加元件",
     "spkGo": "支付 {amount} Pi 以購買閃爍附加元件",
-    "efctGo": "支付 {amount} Pi 以購買泡泡效果"
+    "efctGo": "支付 {amount} Pi 以購買泡泡效果",
+    "shipGo": "支付 {amount} Pi 以購買曲速太空船"
   },
   "pay": {
     "payNow": "支付 {amount} Pi 使用費 ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "閃爍附加元件已支付。",
     "efct": "泡泡效果",
     "payNowEfct": "支付 {amount} Pi 以購買泡泡效果",
-    "efctAlreadyPaid": "泡泡效果已支付。"
+    "efctAlreadyPaid": "泡泡效果已支付。",
+    "ship": "曲速太空船",
+    "payNowShip": "支付 {amount} Pi 以購買曲速太空船",
+    "shipAlreadyPaid": "曲速太空船付款已完成。"
   },
   "form": {
     "newTitle": "列出網站",
@@ -283,7 +287,11 @@
     "efct": "泡泡效果",
     "efctNone": "無",
     "efctHint": "每個方案一個 — 軌道（衛星圍繞泡泡旋轉）、脈衝（呼吸波紋）、彗星（拖尾）。與使用費一起支付，或在使用中在編輯中選擇並單獨支付。可與閃爍結合使用。",
-    "efctPaid": "已支付 — 在使用期間保持開啟。"
+    "efctPaid": "已支付 — 在使用期間保持開啟。",
+    "ship": "曲速太空船",
+    "shipFree": "基本·免費",
+    "shipHint": "這是訪客導覽至您的網站時出現的曲速引導太空船。基本選項是碟形巡洋艦（免費），您可以從四種付費選項中選擇一種。它與使用費一起支付，您可以在使用期間選擇並進行額外付款。",
+    "shipPaid": "付款完成 — 在使用期間保持。"
   },
   "admin": {
     "title": "網站管理",
@@ -401,5 +409,12 @@
     "ORBIT": "軌道效果",
     "PULSE": "脈衝效果",
     "COMET": "彗星效果"
+  },
+  "ship": {
+    "SAUCER": "碟形巡洋艦",
+    "BRIDGE": "艦橋觀景窗",
+    "TWIN": "雙翼攔截機",
+    "DAGGER": "匕首突擊戰機",
+    "CROSS": "十字翼戰鬥機"
   }
 }

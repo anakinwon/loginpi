@@ -68,7 +68,7 @@ export const PATCH = withAuthGuard(
     const { data: cur, error: curErr } = await db()
       .from('site_mst')
       .select(
-        'site_id, site_dom_nm, site_sts_cd, rjct_rsn_cd, plan_cd, pymnt_id, site_mv_url, spk_yn, spk_pymnt_id, efct_cd, efct_pymnt_id',
+        'site_id, site_dom_nm, site_sts_cd, rjct_rsn_cd, plan_cd, pymnt_id, site_mv_url, spk_yn, spk_pymnt_id, efct_cd, efct_pymnt_id, ship_cd, ship_pymnt_id',
       )
       .eq('site_id', id)
       .eq('ownr_usr_id', user.id)
@@ -85,6 +85,8 @@ export const PATCH = withAuthGuard(
         spk_pymnt_id: string | null
         efct_cd: string | null
         efct_pymnt_id: string | null
+        ship_cd: string | null
+        ship_pymnt_id: string | null
       }>()
     if (curErr) return dbFail(curErr)
     if (!cur) return apiError('NOT_FOUND', 404)
@@ -158,6 +160,9 @@ export const PATCH = withAuthGuard(
         // 결제된 이펙트도 동일 — 소유자는 못 바꾼다(재등록만 새로 선택)
         efct_cd:
           cur.efct_pymnt_id && !renew ? cur.efct_cd : (body.efct ?? null),
+        // 결제된 우주선도 동일
+        ship_cd:
+          cur.ship_pymnt_id && !renew ? cur.ship_cd : (body.ship ?? null),
         pvt_cntc_txt: body.pvtCntc ?? null,
         pub_cntc_txt: body.pubCntc ?? null,
         ...(reapply && {
@@ -176,6 +181,8 @@ export const PATCH = withAuthGuard(
             spk_pay_dtm: null,
             efct_pymnt_id: null,
             efct_pay_dtm: null,
+            ship_pymnt_id: null,
+            ship_pay_dtm: null,
           }),
       }
     }

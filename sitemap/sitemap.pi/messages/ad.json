@@ -221,7 +221,8 @@
     "reapplyOpen": "Torna a sol·licitar",
     "spk": "Complement Sparkle",
     "spkGo": "Paga {amount} Pi pel complement Sparkle",
-    "efctGo": "Paga {amount} Pi per l'efecte de bombolla"
+    "efctGo": "Paga {amount} Pi per l'efecte de bombolla",
+    "shipGo": "Pagar {amount} Pi per la nau espacial de curvatura"
   },
   "pay": {
     "payNow": "Paga {amount} Pi de tarifa d'ús ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "El complement Sparkle ja està pagat.",
     "efct": "Efecte de bombolla",
     "payNowEfct": "Paga {amount} Pi per l'efecte de bombolla",
-    "efctAlreadyPaid": "L'efecte de bombolla ja està pagat."
+    "efctAlreadyPaid": "L'efecte de bombolla ja està pagat.",
+    "ship": "Nau espacial de curvatura",
+    "payNowShip": "Pagar {amount} Pi per la nau espacial de curvatura",
+    "shipAlreadyPaid": "El pagament de la nau espacial de curvatura s'ha completat."
   },
   "form": {
     "newTitle": "Llistar un lloc",
@@ -283,7 +287,11 @@
     "efct": "Efecte de bombolla",
     "efctNone": "Cap",
     "efctHint": "Un per pla — Òrbita (un satèl·lit envolta la bombolla), Puls (ona respiratòria), Cometa (cua de rastre). Es paga amb la tarifa d'ús, o es tria a Edita mentre està en ús amb un pagament separat. Es pot combinar amb Sparkle.",
-    "efctPaid": "Pagat — es manté activat durant el període d'ús."
+    "efctPaid": "Pagat — es manté activat durant el període d'ús.",
+    "ship": "Nau espacial de curvatura",
+    "shipFree": "Bàsic·Gratuït",
+    "shipHint": "Aquesta és la nau espacial de guia de curvatura que apareix quan els visitants naveguen al vostre lloc. L'opció bàsica és el Creuer Plat (gratuït), i podeu triar una de les quatre opcions de pagament. Es paga juntament amb la tarifa d'ús, i podeu seleccionar i fer pagaments addicionals durant l'ús.",
+    "shipPaid": "Pagament completat — es manté durant la durada de l'ús."
   },
   "admin": {
     "title": "Administració del lloc",
@@ -401,5 +409,12 @@
     "ORBIT": "Efecte òrbita",
     "PULSE": "Efecte pols",
     "COMET": "Efecte cometa"
+  },
+  "ship": {
+    "SAUCER": "Creuer Plat",
+    "BRIDGE": "Pantalla de visualització del pont",
+    "TWIN": "Interceptor d'ala doble",
+    "DAGGER": "Caça d'assalt Dagger",
+    "CROSS": "Caça d'ala en creu"
   }
 }

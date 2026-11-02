@@ -58,148 +58,113 @@
   .label {
     @apply mb-1 block text-sm font-medium;
   }
-  /* 외부 이동 안내 레이어(leave-dialog) — 우주선 실루엣(엔터프라이즈형 톱뷰, 마스터 지시 2026-10-14) :
-     선수(.ship-head > .ship-prow > .ship-prow-in 화살촉 clip-path + 조종석 창) → 본체(.ship-hull, 선수와 같은 폭으로 바로 이어짐, 하단 디플렉터) + 좌우 워프 나셀(.ship-nacelle, 앞끝 붉은 버사드·파란 글로우 맥동, 점프 .ship-jump 때 백열).
-     전부 HTML 요소 CSS(모바일 WebView 철칙 무관). 별은 warp-field <canvas>(뒤), 플래시는 .hud-flash(앞). 색은 다크 고정 */
+  /* 외부 이동 안내 레이어(leave-dialog) — 우주선 5종(lib/ship.ts : 기본 SAUCER + 유료 BRIDGE·TWIN·DAGGER·CROSS, 마스터 지시 2026-11-03, 구 오각형 카드·막대 나셀 폐기).
+     루트 .ship.ship-<기체> 하나에 공통 콘텐츠(.hud-label·.ship-dest·.hud-coord·.ship-log·.ship-actions·.btn-hud·.ship-go, components/ships/index.tsx)를 두고 껍데기·색은 기체 접두(.ship-saucer-* …) 규칙만 바꾼다.
+     SVG 안 움직임은 opacity 위주(모바일 WebView 철칙, PRD_02_EFCT) — 시안 그대로 둔 예외 : BRIDGE 기체 축소(점프 구간 한정), BRIDGE·DAGGER·CROSS 추진 불꽃 scale, CROSS 날개 전개 rotate(transform-box: view-box + px 원점, 안 움직여도 루트 점프는 그대로).
+     별은 warp-field <canvas>(뒤), 플래시는 .hud-flash(앞). 색은 다크 고정 */
   .ship {
-    padding: 0 26px; /* 나셀 자리 */
-    --hull: rgba(7, 10, 18, 0.95); /* 뒤 버블이 비치지 않게 거의 불투명 */
-    --rim: rgba(165, 180, 252, 0.55);
-    --glow: rgba(127, 34, 254, 0.35);
-  }
-  .ship-hull {
-    position: relative;
     color: #fff;
-    background:
-      radial-gradient(
-        120% 80% at 50% 0%,
-        rgba(127, 34, 254, 0.2),
-        transparent 60%
-      ),
-      var(--hull);
-    border: 1px solid var(--rim);
-    box-shadow:
-      inset 0 0 0 1px rgba(127, 34, 254, 0.25),
-      0 0 24px var(--glow),
-      0 18px 36px -8px rgba(0, 0, 0, 0.8);
+    /* <use> 복제본 안은 문서 선택자가 안 닿아 점프 백열·불꽃·맥동을 상속 변수로 넘긴다(BRIDGE·CROSS) */
+    --ship-hot: 0;
+    --ship-plume: none;
+    --ship-pulse-ex: ship-pulse 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite
+      alternate;
+    --ship-pulse-core: ship-pulse 1.3s cubic-bezier(0.45, 0, 0.55, 1) infinite
+      alternate;
   }
-  /* 선수(prow) — 화살촉 폴리곤(clip-path) : 테두리는 바깥(.ship-prow 림색) 안에 1.5px 작은 같은 폴리곤(.ship-prow-in), 글로우는 clip 에 안 잘리게 래퍼(.ship-head) drop-shadow */
-  .ship-head {
-    @apply w-full; /* 본체와 같은 폭 — 선수가 동체로 바로 이어진다 */
-    filter: drop-shadow(0 0 14px var(--glow))
-      drop-shadow(0 12px 18px rgba(0, 0, 0, 0.7));
+  .ship-jump {
+    --ship-hot: 1;
+    --ship-plume: ship-plume 0.42s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+    --ship-pulse-ex: none;
+    --ship-pulse-core: none;
   }
-  .ship-prow,
-  .ship-prow-in {
-    clip-path: polygon(
-      50% 0,
-      64% 14%,
-      100% 72%,
-      100% 100%,
-      0 100%,
-      0 72%,
-      36% 14%
-    );
+  /* 하단 고정(floating) 높이 — 기체별로 다르면 .ship-<기체>.ship-float 가 덮는다 */
+  .ship-float {
+    bottom: 3.5rem;
   }
-  .ship-prow {
-    padding: 1.5px;
-    background: linear-gradient(180deg, #c7d2fe, rgba(165, 180, 252, 0.4));
+  /* 점프 백열(평상시 0) */
+  .ship-hot {
+    opacity: 0;
+    transition: opacity 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   }
-  .ship-prow-in {
-    @apply relative px-10 pt-16 pb-3 text-center;
-    background:
-      radial-gradient(
-        120% 70% at 50% 0%,
-        rgba(127, 34, 254, 0.35),
-        transparent 55%
-      ),
-      repeating-linear-gradient(
-        90deg,
-        transparent 0 34px,
-        rgba(255, 255, 255, 0.035) 34px 35px
-      ),
-      var(--hull);
+  .ship-jump .ship-hot {
+    opacity: 1;
   }
-  /* 조종석 창 — 선수 끝 바로 아래, 시안 빛 */
-  .ship-prow-in::before {
-    content: '';
-    position: absolute;
-    top: 18px;
-    left: 50%;
-    width: 26px;
-    height: 12px;
-    transform: translateX(-50%);
-    border-radius: 50% 50% 40% 40%;
-    background: linear-gradient(180deg, #e0f2fe, #38bdf8);
-    box-shadow: 0 0 10px #67e8f9;
-  }
-  .ship-hull {
-    @apply px-5 pt-4 pb-5;
-    border-radius: 0 0 2rem 2rem; /* 위는 선수와 맞닿음 */
-    border-top: 0;
-  }
-  /* 디플렉터 디시 — 본체 앞(아래) 중앙, 호박빛 */
-  .ship-hull::after {
-    content: '';
-    position: absolute;
-    bottom: -7px;
-    left: 50%;
-    width: 22px;
-    height: 14px;
-    transform: translateX(-50%);
-    border-radius: 0 0 11px 11px;
-    background: radial-gradient(
-      circle at 50% 30%,
-      #fde68a,
-      #f59e0b 60%,
-      #b45309
-    );
-    box-shadow: 0 0 12px #f59e0b;
-  }
-  /* 워프 나셀 — 본체 좌우, 세로 알약, 앞끝(위) 붉은 버사드 콜렉터 */
-  .ship-nacelle {
-    position: absolute;
-    top: 38%;
-    width: 18px;
-    height: 50%;
-    border-radius: 9999px;
-    background: linear-gradient(180deg, #1e3a8a, #3b82f6 35%, #93c5fd 100%);
-    border: 1px solid rgba(191, 219, 254, 0.6);
-    box-shadow: 0 0 14px rgba(96, 165, 250, 0.7);
-    animation: nacelle-pulse 2.4s ease-in-out infinite;
-  }
-  .ship-nacelle-l {
-    left: 0;
-  }
-  .ship-nacelle-r {
-    right: 0;
-    animation-delay: -1.2s;
-  }
-  .ship-nacelle::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: 50%;
-    width: 14px;
-    height: 14px;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    background: radial-gradient(
-      circle at 40% 35%,
-      #fecaca,
-      #ef4444 55%,
-      #7f1d1d
-    );
-    box-shadow: 0 0 10px #ef4444;
-  }
-  @keyframes nacelle-pulse {
-    0%,
-    100% {
-      box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+  /* 맥동 — 최저값은 --ship-lo(기본 0.4, 기체·요소별 시안 값) */
+  @keyframes ship-pulse {
+    from {
+      opacity: var(--ship-lo, 0.4);
     }
-    50% {
-      box-shadow: 0 0 22px rgba(147, 197, 253, 0.95);
+    to {
+      opacity: 1;
     }
+  }
+  /* 추진 불꽃 — 배기구 중심(로컬 원점 0,0)에서 원형 확산 */
+  @keyframes ship-plume {
+    from {
+      transform: scale(0.85);
+      opacity: 1;
+    }
+    to {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+  /* 공통 콘텐츠 기본값(TWIN 시안 = DAGGER·CROSS 공통분) — 기체 규칙이 덮어쓴다 */
+  .hud-label {
+    @apply m-0 font-mono text-[11px] font-semibold uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(94, 234, 212, 0.8);
+  }
+  .ship-dest {
+    @apply truncate;
+    margin: 1px 0 0;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .hud-coord {
+    @apply m-0 font-mono break-all;
+    font-size: 12px;
+    color: #ccfbf1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(94, 234, 212, 0.3);
+    background: rgba(94, 234, 212, 0.08);
+  }
+  .ship-log {
+    @apply m-0 overflow-y-auto whitespace-pre-wrap;
+    max-height: min(30vh, 9rem);
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .ship-actions {
+    @apply flex justify-center gap-2;
+    margin-top: 4px;
+  }
+  .btn-hud {
+    @apply inline-flex cursor-pointer items-center justify-center gap-1 disabled:cursor-default disabled:opacity-60;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.05);
+    transition: transform 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .btn-hud:active {
+    transform: translateY(2px);
+  }
+  .btn-hud:focus-visible {
+    outline: 2px solid #5eead4;
+    outline-offset: 2px;
+  }
+  .btn-hud-primary {
+    border-color: #a78bfa;
+    background: #7f22fe;
+    box-shadow: 0 0 16px rgba(127, 34, 254, 0.6);
   }
   /* 점프 시퀀스(--fly = leave-dialog FLY_MS) — 0~35% 진동(음속 접근) → 40% 음속 돌파 플래시(.hud-flash, 우주선 링 없음 — 커지는 동그라미는 가운데 블랙홀 하나, 마스터 2026-11-01) → 화면 정중앙 블랙홀(.ship-hole)을 향해 선수 방향 그대로 작아지며 음속으로 날아가 점으로 소멸(회전 없음)(마스터 지시 2026-10-14, 구 상승 소멸 대체).
      --jx/--jy = 카드 중심에서 소멸 지점까지 거리(leave-dialog 가 점프 때 뷰포트 중심으로 계산, 인라인은 0 = 카드 중심) */
@@ -312,52 +277,924 @@
       transform: rotate(360deg);
     }
   }
-  /* 점프 — 나셀 백열·본체 글로우 강화 */
-  .ship-jump .ship-nacelle {
-    animation: none;
-    background: linear-gradient(180deg, #93c5fd, #e0f2fe 40%, #fff);
+  /* ── SAUCER(기본, 시안 a-saucer-top) : 위에서 본 원반 1차 선체 = 카드, 함교 유리 패널 안 콘텐츠. 원반 아래 후방 선체(SVG)는 흐름 안(-50px 겹침) — 시안의 absolute 대신 흐름 안이라 인라인 래퍼가 나셀까지 감싸고, 점프 원점·흡입 중심도 기체 전체 ── */
+  .ship-saucer {
+    isolation: isolate;
+  }
+  .ship-saucer.ship-float {
+    bottom: 12px; /* 후방 선체 끝이 화면 아래 12px = 원반 바닥은 시안 그대로(폭 × 0.475 − 38px) */
+  }
+  .ship-saucer-disc {
+    position: relative;
+    z-index: 1;
+    border-radius: 50%;
+    padding: 50px 11.5% 52px;
+    background:
+      /* 패널 링 2줄 */
+      radial-gradient(
+        ellipse 50% 50% at 50% 50%,
+        transparent 92.5%,
+        rgba(186, 198, 255, 0.3) 93%,
+        transparent 93.8%
+      ),
+      radial-gradient(
+        ellipse 50% 50% at 50% 50%,
+        transparent 80%,
+        rgba(186, 198, 255, 0.16) 80.6%,
+        transparent 81.4%
+      ),
+      /* 방사 패널선(16분할) */
+      repeating-conic-gradient(
+          from 11.25deg,
+          rgba(186, 198, 255, 0.08) 0 0.5deg,
+          transparent 0.5deg 22.5deg
+        ),
+      /* 키 라이트(좌상) + 원뿔 금속 광택 */
+      radial-gradient(
+          ellipse 110% 85% at 30% 14%,
+          rgba(205, 214, 240, 0.26),
+          transparent 55%
+        ),
+      conic-gradient(from 210deg, #1b2335, #2c3652, #0e1322, #2c3652, #1b2335),
+      #0e1322;
+    border: 1px solid rgba(199, 210, 254, 0.55);
     box-shadow:
-      0 0 30px #bae6fd,
-      0 0 60px #60a5fa;
+      inset 0 2px 1px rgba(255, 255, 255, 0.22),
+      inset 0 -16px 26px rgba(0, 0, 0, 0.65),
+      0 0 34px rgba(127, 34, 254, 0.35),
+      0 26px 42px -12px rgba(0, 0, 0, 0.85);
+    transition: box-shadow 0.4s cubic-bezier(0.32, 0.72, 0, 1);
   }
-  .ship-jump .ship-hull {
+  .ship-jump .ship-saucer-disc {
     box-shadow:
-      inset 0 0 0 1px rgba(165, 180, 252, 0.6),
-      0 0 40px rgba(147, 197, 253, 0.7);
+      inset 0 2px 1px rgba(255, 255, 255, 0.3),
+      inset 0 -16px 26px rgba(0, 0, 0, 0.5),
+      0 0 46px rgba(147, 197, 253, 0.75);
   }
-  .ship-jump .ship-head {
-    filter: drop-shadow(0 0 28px #93c5fd);
-  }
-  /* 파일런 — 본체에서 나셀로 뻗는 얇은 사선 */
-  .ship-pylon {
-    position: absolute;
-    top: 52%;
-    width: 30px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--rim), rgba(191, 219, 254, 0.9));
+  .ship-saucer-rear {
+    position: relative;
+    z-index: 0;
+    margin-top: -50px;
     pointer-events: none;
   }
-  .ship-pylon-l {
+  .ship-saucer-rear svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  /* 창문 열 — 점선 타원을 16구획으로 끊어 창 묶음처럼, 안쪽 열은 따뜻한 객실 불빛 */
+  .ship-saucer-win {
+    position: absolute;
+    inset: 7px;
+    border-radius: 50%;
+    border: 2px dotted rgba(214, 236, 255, 0.62);
+    mask: repeating-conic-gradient(
+      from 4deg,
+      #000 0 14deg,
+      transparent 14deg 22.5deg
+    );
+    pointer-events: none;
+  }
+  .ship-saucer-win-in {
+    inset: 17px;
+    border-color: rgba(253, 230, 138, 0.38);
+    mask: repeating-conic-gradient(
+      from 15deg,
+      #000 0 7deg,
+      transparent 7deg 22.5deg
+    );
+  }
+  /* 항법등 — 좌현 적·우현 녹·선수 백색 이중 섬광(opacity 만) */
+  .ship-saucer-nav {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .ship-saucer-nav-port {
+    left: -3px;
+    top: calc(50% - 3px);
+    background: #f87171;
+    box-shadow: 0 0 8px 2px rgba(248, 113, 113, 0.8);
+    animation: ship-saucer-blink 2.4s infinite;
+  }
+  .ship-saucer-nav-star {
+    right: -3px;
+    top: calc(50% - 3px);
+    background: #4ade80;
+    box-shadow: 0 0 8px 2px rgba(74, 222, 128, 0.8);
+    animation: ship-saucer-blink 2.4s infinite -1.2s;
+  }
+  .ship-saucer-nav-strobe {
+    top: -3px;
+    left: calc(50% - 3px);
+    background: #fff;
+    box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.9);
+    animation: ship-saucer-strobe 1.8s infinite;
+  }
+  @keyframes ship-saucer-blink {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    6% {
+      opacity: 1;
+    }
+    18% {
+      opacity: 0.3;
+    }
+  }
+  @keyframes ship-saucer-strobe {
+    0%,
+    10%,
+    22%,
+    100% {
+      opacity: 0;
+    }
+    4%,
+    16% {
+      opacity: 1;
+    }
+  }
+  /* 임펄스 엔진 — 원반 뒤 가장자리 주황 글로우 2개 */
+  .ship-saucer-impulse {
+    position: absolute;
+    bottom: 5px;
+    width: 18px;
+    height: 4px;
+    border-radius: 2px;
+    background: #fb923c;
+    box-shadow: 0 0 10px 2px rgba(251, 146, 60, 0.7);
+    --ship-lo: 0.55;
+    animation: ship-pulse 1.6s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  .ship-saucer-impulse-l {
+    left: calc(50% - 30px);
+  }
+  .ship-saucer-impulse-r {
+    left: calc(50% + 12px);
+  }
+  /* 후방 SVG — 코일·콜렉터 맥동(opacity), 점프 때 백열(.ship-hot) */
+  .ship-saucer-coil-pulse {
+    --ship-lo: 0.5;
+    animation: ship-pulse 2.4s ease-in-out infinite alternate;
+  }
+  .ship-saucer-coil-r {
+    animation-delay: -1.2s;
+  }
+  .ship-saucer-bussard-glow {
+    --ship-lo: 0.45;
+    animation: ship-pulse 1.8s ease-in-out infinite alternate;
+  }
+  .ship-jump .ship-saucer-coil-pulse,
+  .ship-jump .ship-saucer-bussard-glow {
+    animation: none;
+    opacity: 1;
+  }
+  /* 함교 유리 패널 — 콘텐츠 영역(두 겹 테: 금속 링 + 시안 헤어라인) + 위 가운데 함교 돔 */
+  .ship-saucer-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 18px 18px 14px;
+    border-radius: 40px;
+    background:
+      linear-gradient(180deg, rgba(165, 180, 252, 0.1), transparent 38%),
+      rgba(5, 9, 20, 0.86);
+    border: 1px solid rgba(103, 232, 249, 0.32);
+    box-shadow:
+      0 0 0 4px rgba(148, 163, 184, 0.1),
+      0 0 0 5px rgba(165, 180, 252, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+  .ship-saucer-dome {
+    position: absolute;
+    top: -12px;
+    left: calc(50% - 12px);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 38% 32%,
+      #f0f9ff,
+      #67e8f9 38%,
+      #0e7490 72%,
+      #0b1324 74%
+    );
+    box-shadow:
+      0 0 0 3px rgba(148, 163, 184, 0.35),
+      0 0 14px rgba(103, 232, 249, 0.7);
+    pointer-events: none;
+  }
+  .ship-saucer .hud-label {
+    margin-top: 6px;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: rgba(103, 232, 249, 0.82);
+  }
+  .ship-saucer .hud-label:first-of-type {
+    margin-top: 2px;
+  }
+  .ship-saucer .ship-dest {
+    margin: 0;
+    font-size: 21px;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
+  }
+  .ship-saucer .hud-coord {
+    margin-top: 2px;
+    line-height: 1.4;
+    color: #cffafe;
+    border-radius: 8px;
+    border-color: rgba(103, 232, 249, 0.28);
+    background: rgba(103, 232, 249, 0.08);
+  }
+  .ship-saucer .ship-log {
+    margin-top: 2px;
+    font-size: 13px;
+    max-height: min(22vh, 5.6rem);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(103, 232, 249, 0.4) transparent;
+  }
+  .ship-saucer .ship-actions {
+    margin-top: 12px;
+  }
+  .ship-saucer .btn-hud {
+    min-height: 38px;
+    padding: 0 18px;
+    border-radius: 9999px;
+    font-weight: 700;
+    transition:
+      transform 0.25s cubic-bezier(0.32, 0.72, 0, 1),
+      background-color 0.25s cubic-bezier(0.32, 0.72, 0, 1),
+      box-shadow 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .ship-saucer .btn-hud:active {
+    transform: scale(0.97);
+  }
+  .ship-saucer .btn-hud:focus-visible {
+    outline-color: #67e8f9;
+  }
+  .ship-saucer .btn-hud-primary {
+    background: linear-gradient(180deg, #8b5cf6, #6d28d9);
+    box-shadow:
+      0 0 18px rgba(139, 92, 246, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  .ship-saucer .btn-hud-primary:hover {
+    box-shadow:
+      0 0 26px rgba(167, 139, 250, 0.8),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  /* ── BRIDGE(유료, 시안 c-bridge-screen-rear) : 금속 베젤 안 곡면 뷰스크린(추적 시점 순양함·목적지 행성) → 목적지 명판 → 콘솔 데스크(스로틀 레버) ── */
+  .ship-bridge {
+    --ship-pulse-coil: ship-bridge-coil 2.4s cubic-bezier(0.45, 0, 0.55, 1)
+      infinite;
+  }
+  .ship-bridge.ship-jump {
+    --ship-pulse-coil: none;
+  }
+  .ship-bridge-bezel {
+    position: relative;
+    padding: 7px 7px 0;
+    border-radius: 26px 26px 18px 18px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 18%),
+      repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.025) 0 1px,
+        transparent 1px 3px
+      ),
+      linear-gradient(180deg, #3a4560, #1b2133 40%, #121726);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 0 0 1px rgba(165, 180, 252, 0.18),
+      0 0 0 1px rgba(0, 0, 0, 0.6),
+      0 0 28px rgba(127, 34, 254, 0.28),
+      0 24px 40px -12px rgba(0, 0, 0, 0.9);
+  }
+  .ship-bridge-bezel::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 22%;
+    right: 22%;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(103, 232, 249, 0.6),
+      transparent
+    );
+  }
+  .ship-bridge-nav {
+    position: absolute;
+    top: 12px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: ship-bridge-blink 1.6s steps(1) infinite;
+  }
+  .ship-bridge-nav-port {
+    left: -3px;
+    background: #f87171;
+    box-shadow: 0 0 8px #ef4444;
+  }
+  .ship-bridge-nav-stbd {
+    right: -3px;
+    background: #4ade80;
+    box-shadow: 0 0 8px #22c55e;
+    animation-delay: -0.8s;
+  }
+  @keyframes ship-bridge-blink {
+    0%,
+    70% {
+      opacity: 1;
+    }
+    71%,
+    100% {
+      opacity: 0.15;
+    }
+  }
+  /* 스크린 — 볼록 유리 : 가장자리 비네트 + 상단 반사 + 주사선 */
+  .ship-bridge-screen {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+    border-radius: 20px 20px 6px 6px;
+    background: radial-gradient(120% 90% at 50% 20%, #0b1430, #050813 70%);
+    box-shadow:
+      inset 0 0 0 1px rgba(103, 232, 249, 0.25),
+      inset 0 0 24px rgba(0, 0, 0, 0.9);
+  }
+  .ship-bridge-screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(170deg, rgba(255, 255, 255, 0.08) 0 20%, transparent 21%),
+      repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.03) 0 1px,
+        transparent 1px 3px
+      ),
+      radial-gradient(
+        130% 120% at 50% 50%,
+        transparent 55%,
+        rgba(0, 0, 0, 0.55)
+      );
+  }
+  .ship-bridge-view {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  /* 워프 줄무늬 — 점프 때만, 기체 뒤로 흐른다. 중심 = 행성(뷰박스 200,27 → 확장 박스 50% 28%) */
+  .ship-bridge-streak {
+    position: absolute;
+    inset: -20%;
+    opacity: 0;
+    pointer-events: none;
+    transform-origin: 50% 28%;
+    background: repeating-conic-gradient(
+      from 0deg at 50% 28%,
+      rgba(186, 230, 253, 0.55) 0 0.6deg,
+      transparent 0.6deg 7deg
+    );
+  }
+  .ship-jump .ship-bridge-streak {
+    animation: ship-bridge-streak calc(var(--fly) * 0.45)
+      cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+  @keyframes ship-bridge-streak {
+    to {
+      opacity: 1;
+      transform: scale(1.4);
+    }
+  }
+  @keyframes ship-bridge-coil {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  .ship-bridge-glow-ex {
+    animation: var(--ship-pulse-ex);
+  }
+  .ship-bridge-glow-win {
+    animation: ship-pulse 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+  .ship-bridge-strobe {
+    animation: ship-bridge-blink 1.1s steps(1) infinite;
+  }
+  .ship-bridge-hud-bracket {
+    animation: ship-pulse 1.8s cubic-bezier(0.32, 0.72, 0, 1) infinite alternate;
+  }
+  .ship-bridge-flare {
+    opacity: 0;
+  }
+  .ship-jump .ship-bridge-flare {
+    animation: ship-bridge-flare calc(var(--fly) * 0.62) linear forwards;
+  }
+  @keyframes ship-bridge-flare {
+    0%,
+    66% {
+      opacity: 0;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.5;
+    }
+  }
+  /* 기체 : 평상시 정지(상시 transform 애니메이션 금지 — 모바일 WebView 철칙, PRD_02_EFCT. 구 상하 흔들림 bob 폐기), 점프 때 행성 중심(200,27)을 원점으로 작아짐(바깥 g) — 구형 WebView 원점 해석 차이 방지 view-box + px 절대 원점 */
+  .ship-bridge-craft {
+    transform-box: view-box;
+    transform-origin: 200px 27px;
+  }
+  .ship-jump .ship-bridge-craft {
+    animation: ship-bridge-away calc(var(--fly) * 0.5)
+      cubic-bezier(0.42, 0, 1, 1) calc(var(--fly) * 0.08) forwards;
+  }
+  @keyframes ship-bridge-away {
+    to {
+      transform: scale(0.04);
+      opacity: 0.3;
+    }
+  }
+  /* 목적지 명판 — 스크린 아래 베젤에 박힌 판독창 + 조준경 아이콘 */
+  .ship-bridge-plate {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 7px 0;
+    padding: 6px 12px 7px 14px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #091024, #050914);
+    box-shadow:
+      inset 0 0 0 1px rgba(103, 232, 249, 0.22),
+      inset 0 2px 8px rgba(0, 0, 0, 0.85),
+      0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  .ship-bridge-plate > div {
+    min-width: 0;
+  }
+  .ship-bridge .ship-dest {
+    font-size: 1.2rem;
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+    text-shadow: 0 0 12px rgba(103, 232, 249, 0.55);
+  }
+  .ship-bridge-lock {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    color: #67e8f9;
+    animation: ship-pulse 0.9s cubic-bezier(0.32, 0.72, 0, 1) infinite alternate;
+  }
+  /* 콘솔 데스크 */
+  .ship-bridge-console {
+    position: relative;
+    margin: 0 -7px;
+    padding: 14px 16px 16px;
+    border-radius: 0 0 18px 18px;
+    background:
+      linear-gradient(180deg, rgba(103, 232, 249, 0.07), transparent 30%),
+      linear-gradient(180deg, #161c2c, #0c101b);
+    border-top: 1px solid rgba(0, 0, 0, 0.8);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ship-bridge .hud-label {
+    letter-spacing: 0.22em;
+    color: rgba(103, 232, 249, 0.8);
+  }
+  .ship-bridge .hud-coord {
+    line-height: 1.45;
+    color: #cffafe;
+    padding: 5px 9px;
+    border: 0;
+    border-radius: 8px;
+    background: rgba(8, 47, 73, 0.55);
+    box-shadow:
+      inset 0 0 0 1px rgba(103, 232, 249, 0.3),
+      inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  }
+  .ship-bridge .ship-log {
+    color: rgba(255, 255, 255, 0.82);
+  }
+  .ship-bridge .ship-actions {
+    margin-top: 6px;
+    gap: 10px;
+  }
+  .ship-bridge .btn-hud {
+    color: #e2e8f0;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .ship-bridge .btn-hud:active {
+    transform: scale(0.97);
+  }
+  .ship-bridge .btn-hud:focus-visible {
+    outline-color: #67e8f9;
+    outline-offset: 3px;
+  }
+  /* 스로틀 레버형 점프 — 손잡이(⚡)는 레버 안에서만(left 5px → 100% − 37px = 시안 레일 translateX(100%) 와 같은 끝점), 점프 때 끝까지 밀고 글자 숨김 */
+  .ship-bridge .ship-go {
+    position: relative;
+    overflow: hidden;
+    min-height: 42px;
+    padding: 0 22px 0 49px;
+    border: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.04em;
+    background: linear-gradient(180deg, #8b3dff, #5b12c9);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+      0 0 18px rgba(127, 34, 254, 0.6);
+  }
+  .ship-bridge .ship-go:disabled {
+    opacity: 1;
+  }
+  .ship-bridge .ship-go-knob {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    margin-top: -16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    background: radial-gradient(circle at 35% 30%, #fff, #c7d2fe 45%, #6366f1);
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.5),
+      0 0 10px rgba(199, 210, 254, 0.7);
+    transition: left 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .ship-bridge .ship-go-text {
+    transition: opacity 0.2s;
+  }
+  .ship-bridge .ship-go:hover .ship-go-knob {
     left: 8px;
-    transform: rotate(-28deg);
   }
-  .ship-pylon-r {
-    right: 8px;
-    transform: rotate(28deg);
+  .ship-bridge.ship-jump .ship-go .ship-go-knob {
+    left: calc(100% - 37px); /* hover 규칙과 같은 명시도, 뒤에 둬 우선 */
   }
-  /* 움직임 줄이기에 나셀 감속 없음 — 모바일 "애니메이션 제거" 설정이 reduce 로 잡혀 Pi Browser 에서 우주선 모션이 빠지던 문제(마스터 2026-10-16) */
-  .hud-label {
-    @apply font-mono text-[11px] font-semibold tracking-widest text-cyan-300/80 uppercase;
+  .ship-bridge.ship-jump .ship-go-text {
+    opacity: 0;
   }
-  .hud-coord {
-    @apply rounded-md border border-cyan-300/30 bg-cyan-300/10 px-2 py-1 text-cyan-100;
+
+  /* ── TWIN(유료, 시안 d-twin-wing) : 정면 양날개 요격기 — 명판은 두 날개 사이(SVG 위 absolute), 지지대 + 이중 베젤 콘솔. SVG 안 opacity 맥동만 ── */
+  .ship-twin {
+    --ship-lo: 0.45;
   }
-  .btn-hud {
-    @apply inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition-transform active:translate-y-0.5 disabled:opacity-60;
+  .ship-twin-frame {
+    position: relative;
   }
-  .btn-hud-primary {
-    @apply border-violet-400 bg-violet-600 hover:bg-violet-500;
-    box-shadow: 0 0 16px rgba(127, 34, 254, 0.6);
+  .ship-twin-frame svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .ship-twin-plate {
+    position: absolute;
+    left: 21%;
+    right: 21%;
+    top: 75%;
+    padding: 4px 10px 5px;
+    text-align: center;
+    background: linear-gradient(180deg, #1a2030, #0b0f19);
+    border: 1px solid rgba(213, 219, 230, 0.28);
+    border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+  .ship-twin-strut {
+    height: 10px;
+    margin: 0 auto;
+    width: 34%;
+    border-left: 2px solid #7a8396;
+    border-right: 2px solid #7a8396;
+  }
+  .ship-twin-console {
+    padding: 5px;
+    background: linear-gradient(180deg, #4b5263, #20252f 60%, #161a22);
+    clip-path: polygon(
+      14px 0,
+      calc(100% - 14px) 0,
+      100% 14px,
+      100% 100%,
+      0 100%,
+      0 14px
+    );
+  }
+  .ship-twin-console-in {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px 14px;
+    background: linear-gradient(
+      180deg,
+      rgba(13, 18, 32, 0.97),
+      rgba(6, 9, 16, 0.98)
+    );
+    clip-path: polygon(
+      11px 0,
+      calc(100% - 11px) 0,
+      100% 11px,
+      100% 100%,
+      0 100%,
+      0 11px
+    );
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .ship-twin .ship-log {
+    max-height: 30vh;
+  }
+  .ship-twin-glow-win {
+    animation: ship-pulse 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+  .ship-twin-glow-eng {
+    animation: ship-pulse 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+  .ship-twin-glow-edge {
+    animation: ship-pulse 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+  .ship-jump .ship-twin-glow-win,
+  .ship-jump .ship-twin-glow-eng,
+  .ship-jump .ship-twin-glow-edge {
+    animation: none;
+    opacity: 1;
+  }
+
+  /* ── DAGGER(유료, 시안 e-dagger-wing-rear) : 후면 단검형 돌격기 — 꼬리 끝이 명판 V 홈에 꽂힘, 붉은 클램프, 이중 베젤 콘솔(붉은 헤어라인)·붉은 점프 버튼 ── */
+  .ship-dagger-frame svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible; /* 꼬리 끝이 viewBox 아래로 1px 나가 명판 홈에 꽂힘 */
+  }
+  .ship-dagger-plate {
+    position: relative;
+    width: 50%; /* 아래 날개 끝(x ≤ 78)과 겹치지 않게 */
+    margin: -3px auto 0;
+    padding: 10px 14px 6px;
+    text-align: center;
+    background: linear-gradient(180deg, #3a3e47, #1a1c22 55%, #111317);
+    clip-path: polygon(
+      0 0,
+      44% 0,
+      50% 8px,
+      56% 0,
+      100% 0,
+      100% calc(100% - 6px),
+      calc(100% - 6px) 100%,
+      6px 100%,
+      0 calc(100% - 6px)
+    );
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+  .ship-dagger-plate::before,
+  .ship-dagger-plate::after {
+    content: '';
+    position: absolute;
+    top: 9px;
+    bottom: 7px;
+    width: 3px;
+    border-radius: 2px;
+    background: #ef4444;
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+  }
+  .ship-dagger-plate::before {
+    left: 7px;
+  }
+  .ship-dagger-plate::after {
+    right: 7px;
+  }
+  .ship-dagger-strut {
+    height: 8px;
+    margin: 0 auto;
+    width: 30%;
+    border-left: 2px solid #5b606b;
+    border-right: 2px solid #5b606b;
+  }
+  .ship-dagger-console {
+    padding: 5px;
+    background: linear-gradient(180deg, #5b606b, #2b2e35 55%, #17191e);
+    clip-path: polygon(
+      18px 0,
+      calc(100% - 18px) 0,
+      100% 18px,
+      100% 100%,
+      0 100%,
+      0 18px
+    );
+  }
+  .ship-dagger-console-in {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px 14px;
+    background: linear-gradient(
+      180deg,
+      rgba(14, 15, 19, 0.97),
+      rgba(7, 8, 10, 0.98)
+    );
+    clip-path: polygon(
+      15px 0,
+      calc(100% - 15px) 0,
+      100% 15px,
+      100% 100%,
+      0 100%,
+      0 15px
+    );
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  .ship-dagger-console-in::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 18%;
+    right: 18%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #ef4444, transparent);
+  }
+  .ship-dagger .hud-label {
+    color: rgba(94, 234, 212, 0.85);
+  }
+  .ship-dagger .hud-coord {
+    border-radius: 4px;
+    background: rgba(94, 234, 212, 0.07);
+  }
+  .ship-dagger .ship-log {
+    max-height: min(26vh, 9rem);
+    color: rgba(255, 255, 255, 0.82);
+  }
+  .ship-dagger .btn-hud {
+    border-radius: 6px;
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+  .ship-dagger .btn-hud-primary {
+    border-color: #fca5a5;
+    background: linear-gradient(180deg, #dc2626, #991b1b);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 0 16px rgba(239, 68, 68, 0.55);
+  }
+  .ship-dagger-glow-win {
+    animation: ship-pulse 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+  .ship-dagger-glow-eng {
+    animation: ship-pulse 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+  .ship-dagger-glow-edge {
+    animation: ship-pulse 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+  .ship-jump .ship-dagger-glow-win,
+  .ship-jump .ship-dagger-glow-eng,
+  .ship-jump .ship-dagger-glow-edge {
+    animation: none;
+    opacity: 1;
+  }
+  /* 추진 불꽃 — 감싼 <g> 의 로컬 원점(배기구 중심)에서 보는 사람 쪽으로 확산(점프 때만) */
+  .ship-dagger-plume {
+    opacity: 0;
+  }
+  .ship-jump .ship-dagger-plume {
+    animation: var(--ship-plume);
+  }
+  .ship-jump .ship-dagger-plume-b {
+    animation-delay: 0.21s;
+  }
+
+  /* ── CROSS(유료, 시안 f-cross4-rear) : 후면 십자익(4익) 전투기 — 흰·회색 패널 금속 + 붉은 띠, 지지대에 매달린 밝은 명판, 이중 베젤 콘솔. 점프 때 4익 십자 벌림 ── */
+  .ship-cross-frame svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible; /* 점프 전개 때 위 포신이 viewBox 위로 몇 px 나감 */
+  }
+  .ship-cross-plate {
+    position: relative;
+    width: 58%;
+    margin: -4px auto 0;
+    padding: 7px 12px 6px;
+    text-align: center;
+    background: linear-gradient(180deg, #e9ecf0, #b9bfc9 70%, #9aa1ad);
+    color: #12151c;
+    clip-path: polygon(
+      0 0,
+      43% 0,
+      50% 6px,
+      57% 0,
+      100% 0,
+      100% calc(100% - 8px),
+      calc(100% - 8px) 100%,
+      8px 100%,
+      0 calc(100% - 8px)
+    );
+  }
+  .ship-cross-plate::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    bottom: 8px;
+    width: 4px;
+    background: #c8372d;
+    box-shadow: 7px 0 0 -1px #c8372d;
+  }
+  .ship-cross-plate .hud-label {
+    color: #5a2420;
+  }
+  .ship-cross-strut {
+    height: 8px;
+    margin: 0 auto;
+    width: 30%;
+    border-left: 2px solid #7d8492;
+    border-right: 2px solid #7d8492;
+  }
+  .ship-cross-console {
+    padding: 4px;
+    background: linear-gradient(180deg, #c9ced6, #7d8492 55%, #4a505c);
+    clip-path: polygon(
+      14px 0,
+      calc(100% - 14px) 0,
+      100% 14px,
+      100% 100%,
+      0 100%,
+      0 14px
+    );
+  }
+  .ship-cross-console-in {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px 14px;
+    background: linear-gradient(
+      180deg,
+      rgba(14, 18, 28, 0.97),
+      rgba(6, 9, 16, 0.98)
+    );
+    clip-path: polygon(
+      11px 0,
+      calc(100% - 11px) 0,
+      100% 11px,
+      100% 100%,
+      0 100%,
+      0 11px
+    );
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .ship-cross-glow-ex {
+    animation: var(--ship-pulse-ex);
+  }
+  .ship-cross-glow-win {
+    animation: ship-pulse 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+  .ship-jump .ship-cross-glow-win {
+    animation: none;
+    opacity: 1;
+  }
+  /* 4익 X 전개 — 래퍼 <g> 회전, view-box + px 절대 원점(X 중심 200,138) */
+  .ship-cross-wg {
+    transform-box: view-box;
+    transform-origin: 200px 138px;
+    transition: transform calc(var(--fly) * 0.3) cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .ship-jump .ship-cross-wg-ul,
+  .ship-jump .ship-cross-wg-lr {
+    transform: rotate(7deg);
+  }
+  .ship-jump .ship-cross-wg-ur,
+  .ship-jump .ship-cross-wg-ll {
+    transform: rotate(-7deg);
   }
   /* 점프 플래시 — 음속 돌파 시점(--fly 의 38%)에 흰색 0 → 0.9 → 0 (HTML div, opacity 만). --fly 는 leave-dialog 래퍼에서 상속 */
   .hud-flash {

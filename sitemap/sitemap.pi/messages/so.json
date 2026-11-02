@@ -221,7 +221,8 @@
     "reapplyOpen": "Dib u codso",
     "spk": "Ku darista dhalaalka",
     "spkGo": "Bixi {amount} Pi si aad u hesho ku darista dhalaalka",
-    "efctGo": "Bixi {amount} Pi si aad u hesho saamaynta xumbada"
+    "efctGo": "Bixi {amount} Pi si aad u hesho saamaynta xumbada",
+    "shipGo": "Bixi {amount} Pi si Warp Spaceship"
   },
   "pay": {
     "payNow": "Bixi {amount} Pi khidmadda isticmaalka ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Ku darista dhalaalka waa la bixiyay.",
     "efct": "Saamaynta xumbada",
     "payNowEfct": "Bixi {amount} Pi si aad u hesho saamaynta xumbada",
-    "efctAlreadyPaid": "Saamaynta xumbada waa la bixiyay."
+    "efctAlreadyPaid": "Saamaynta xumbada waa la bixiyay.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Bixi {amount} Pi si Warp Spaceship",
+    "shipAlreadyPaid": "Bixitaanka Warp Spaceship waa la dhammaystiray."
   },
   "form": {
     "newTitle": "Ku qor goob",
@@ -283,7 +287,11 @@
     "efct": "Saamaynta xumbada",
     "efctNone": "Midna",
     "efctHint": "Mid qorshe kasta — Orbit (dayax-gacmeed wuxuu ku wareegsan yahay xumbada), Pulse (hir neefsasho), Comet (dabada raacda). Waxaa la bixiyaa iyadoo la raacayo khidmadda isticmaalka, ama waa la doortaa wax ka beddelka inta la isticmaalayo lacag bixin gooni ah. Waxaa lagu dari karaa dhalaalka.",
-    "efctPaid": "La bixiyay — wuxuu sii jiraa muddada isticmaalka."
+    "efctPaid": "La bixiyay — wuxuu sii jiraa muddada isticmaalka.",
+    "ship": "Warp Spaceship",
+    "shipFree": "Aasaasi·Bilaash",
+    "shipHint": "Tani waa markabka hagaha warp-ka ee soo muuqda marka booqdayaashu ay u gudbaan goobtaada. Doorashada aasaasiga ah waa Saucer Cruiser (bilaash), waxaadna dooran kartaa mid ka mid ah afar ikhtiyaar oo lacag ah. Waxaa lagu bixiyaa khidmadda isticmaalka, waxaadna dooran kartaa oo aad samayn kartaa lacag-bixin dheeraad ah inta lagu jiro isticmaalka.",
+    "shipPaid": "Lacag-bixinta waa la dhammaystiray — waxa la ilaaliyaa inta lagu jiro muddada isticmaalka."
   },
   "admin": {
     "title": "Maamulka goobta",
@@ -401,5 +409,12 @@
     "ORBIT": "Saamaynta Orbit",
     "PULSE": "Saamaynta Pulse",
     "COMET": "Saamaynta Comet"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Bridge Viewscreen",
+    "TWIN": "Twin-Wing Interceptor",
+    "DAGGER": "Dagger Assault Fighter",
+    "CROSS": "Diyaarad dagaal oo baalal isdhaafsan"
   }
 }

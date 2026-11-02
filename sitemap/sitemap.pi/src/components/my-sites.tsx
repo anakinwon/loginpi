@@ -20,6 +20,7 @@ import {
 } from '@/lib/client-api'
 import { EFCT_ICON } from './bubble-canvas'
 import { LogoField } from './logo-field'
+import { ShipPreview } from './ships'
 import {
   APPLY_PLAN_CD,
   DOMAIN_EDITABLE_STS,
@@ -37,6 +38,7 @@ import {
   VERIFY_FILE,
   WITHDRAW_BLOCKED_STS,
 } from '@/lib/site'
+import { SHIP_CD, SHIP_DEFAULT } from '@/lib/ship'
 
 // 결제 필요 여부 — 외부 등록·미결제·결제 가능 상태(APPLYING)·단가 > 0. 결제 자체는 /pay/<id>
 //  요금표 조회 중(null)엔 필요로 간주(admin-panel 과 동일 — 서버가 최종 판정), 조회 실패({})는 불필요
@@ -53,7 +55,9 @@ const payAmount = (s: OwnerSite, fees: FeeMap | null) => {
     s.spk_yn === 'Y' && !s.spk_pymnt_id ? (fees?.[s.plan_cd]?.spk ?? 0) : 0
   const efct =
     s.efct_cd && !s.efct_pymnt_id ? (fees?.[s.plan_cd]?.efct ?? 0) : 0
-  return String(base + spk + efct)
+  const ship =
+    s.ship_cd && !s.ship_pymnt_id ? (fees?.[s.plan_cd]?.ship ?? 0) : 0
+  return String(base + spk + efct + ship)
 }
 // 반짝임 단독 결제 필요 — 사용료 결제 뒤(APPLYING 은 pymnt_id 있을 때)·신청 켜짐·미결제·판매 중
 // 이펙트 단독 결제 필요 — 반짝임과 같은 조건
@@ -64,6 +68,14 @@ const needsEfctPayment = (s: OwnerSite, fees: FeeMap | null) =>
   (SPK_PAYABLE_STS as readonly string[]).includes(s.site_sts_cd) &&
   (s.site_sts_cd !== 'APPLYING' || !!s.pymnt_id) &&
   (fees == null || (fees[s.plan_cd]?.efct ?? 0) > 0)
+// 우주선 단독 결제 필요 — 이펙트와 같은 조건
+const needsShipPayment = (s: OwnerSite, fees: FeeMap | null) =>
+  s.own_site_yn !== 'Y' &&
+  !!s.ship_cd &&
+  !s.ship_pymnt_id &&
+  (SPK_PAYABLE_STS as readonly string[]).includes(s.site_sts_cd) &&
+  (s.site_sts_cd !== 'APPLYING' || !!s.pymnt_id) &&
+  (fees == null || (fees[s.plan_cd]?.ship ?? 0) > 0)
 const needsSpkPayment = (s: OwnerSite, fees: FeeMap | null) =>
   s.own_site_yn !== 'Y' &&
   s.spk_yn === 'Y' &&
@@ -80,6 +92,7 @@ function MySitesInner() {
   const t = useTranslations('me')
   const ts = useTranslations('siteSts')
   const te = useTranslations('efct')
+  const tsh = useTranslations('ship')
   const tr = useTranslations('rjctRsn')
   const errText = useApiErrorText()
   const [page, setPage] = useState(1)
@@ -225,6 +238,25 @@ function MySitesInner() {
                     {t('efctGo', { amount: fees?.[s.plan_cd]?.efct ?? '…' })}
                   </Link>
                 )}
+                {s.ship_cd && (
+                  <p className="text-xs">
+                    🚀 {tsh(s.ship_cd)}
+                    {s.own_site_yn !== 'Y' && (
+                      <span className="text-muted-foreground">
+                        {' · '}
+                        {s.ship_pymnt_id ? t('paid') : t('unpaid')}
+                      </span>
+                    )}
+                  </p>
+                )}
+                {needsShipPayment(s, fees) && (
+                  <Link
+                    className="btn w-fit"
+                    href={`/pay/${s.site_id}?kind=ship`}
+                  >
+                    {t('shipGo', { amount: fees?.[s.plan_cd]?.ship ?? '…' })}
+                  </Link>
+                )}
                 {needsSpkPayment(s, fees) && (
                   <Link
                     className="btn w-fit"
@@ -336,6 +368,7 @@ function SiteForm({
 }) {
   const t = useTranslations('form')
   const te = useTranslations('efct')
+  const tsh = useTranslations('ship')
   const tc = useTranslations('siteCtgr')
   const errText = useApiErrorText()
   const [domain, setDomain] = useState(site?.site_dom_nm ?? '')
@@ -358,6 +391,12 @@ function SiteForm({
   const [efct, setEfct] = useState<string>(site?.efct_cd ?? '')
   const efctPaid =
     !!site?.efct_pymnt_id &&
+    site.site_sts_cd !== 'USED' &&
+    site.site_sts_cd !== 'EXPIRED'
+  // 워프 우주선 — 빈 값 = 기본 SAUCER(무료). 결제된 뒤엔 못 바꾼다(서버도 강제)
+  const [ship, setShip] = useState<string>(site?.ship_cd ?? '')
+  const shipPaid =
+    !!site?.ship_pymnt_id &&
     site.site_sts_cd !== 'USED' &&
     site.site_sts_cd !== 'EXPIRED'
   // 재등록(USED·EXPIRED)은 새 결제라 지난 주기 결제와 무관하게 다시 고른다
@@ -404,6 +443,7 @@ function SiteForm({
           planCd,
           spk,
           efct: efct || null,
+          ship: ship || null,
           submit,
         }),
       }),
@@ -522,6 +562,34 @@ function SiteForm({
         </select>
         <p className="text-muted-foreground mt-1 text-xs">
           {efctPaid ? t('efctPaid') : t('efctHint')}
+        </p>
+      </div>
+
+      <div>
+        <label className="label" htmlFor="f-ship">
+          {t('ship')}
+          {fees?.[planCd]?.ship != null ? ` (+${fees[planCd].ship} Pi)` : ''}
+        </label>
+        <select
+          id="f-ship"
+          className="input"
+          value={ship}
+          disabled={shipPaid}
+          onChange={(e) => setShip(e.target.value)}
+        >
+          <option value="">
+            {tsh(SHIP_DEFAULT)} — {t('shipFree')}
+          </option>
+          {SHIP_CD.map((c) => (
+            <option key={c} value={c}>
+              {tsh(c)}
+            </option>
+          ))}
+        </select>
+        {/* 고른 기체 미리보기(정지·축소) — 이동 안내 화면에 이 기체가 나온다 */}
+        <ShipPreview ship={ship || null} className="mt-2" />
+        <p className="text-muted-foreground mt-1 text-xs">
+          {shipPaid ? t('shipPaid') : t('shipHint')}
         </p>
       </div>
 

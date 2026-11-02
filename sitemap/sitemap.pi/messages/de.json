@@ -221,7 +221,8 @@
     "reapplyOpen": "Erneut beantragen",
     "spk": "Glitzer-Add-on",
     "spkGo": "{amount} Pi für das Glitzer-Add-on bezahlen",
-    "efctGo": "{amount} Pi für den Blasen-Effekt bezahlen"
+    "efctGo": "{amount} Pi für den Blasen-Effekt bezahlen",
+    "shipGo": "Warp-Raumschiff {amount} Pi bezahlen"
   },
   "pay": {
     "payNow": "Nutzungsgebühr {amount} Pi ({plan}) bezahlen",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Das Glitzer-Add-on ist bereits bezahlt.",
     "efct": "Blasen-Effekt",
     "payNowEfct": "{amount} Pi für den Blasen-Effekt bezahlen",
-    "efctAlreadyPaid": "Der Blasen-Effekt ist bereits bezahlt."
+    "efctAlreadyPaid": "Der Blasen-Effekt ist bereits bezahlt.",
+    "ship": "Warp-Raumschiff",
+    "payNowShip": "Warp-Raumschiff {amount} Pi jetzt bezahlen",
+    "shipAlreadyPaid": "Die Zahlung für das Warp-Raumschiff ist abgeschlossen."
   },
   "form": {
     "newTitle": "Seite listen",
@@ -283,7 +287,11 @@
     "efct": "Blasen-Effekt",
     "efctNone": "Keine",
     "efctHint": "Einer pro Plan – Orbit (ein Satellit umkreist die Blase), Puls (atmende Welle), Komet (schwebender Schweif). Wird mit der Nutzungsgebühr bezahlt oder während der Nutzung in „Bearbeiten“ ausgewählt und separat bezahlt. Kann mit Glitzer kombiniert werden.",
-    "efctPaid": "Bezahlt – bleibt für den Nutzungszeitraum aktiv."
+    "efctPaid": "Bezahlt – bleibt für den Nutzungszeitraum aktiv.",
+    "ship": "Warp-Raumschiff",
+    "shipFree": "Standard·Kostenlos",
+    "shipHint": "Dies ist das Warp-Anleitungsraumschiff, das erscheint, wenn Besucher die Website aufrufen. Standard ist der Scheibenkreuzer (kostenlos), und Sie können eines von vier kostenpflichtigen Modellen wählen. Es wird zusammen mit der Nutzungsgebühr bezahlt und kann während der Nutzung in den Einstellungen ausgewählt und zusätzlich bezahlt werden.",
+    "shipPaid": "Bezahlt – bleibt für die Nutzungsdauer erhalten."
   },
   "admin": {
     "title": "Seitenverwaltung",
@@ -401,5 +409,12 @@
     "ORBIT": "Orbit-Effekt",
     "PULSE": "Puls-Effekt",
     "COMET": "Kometen-Effekt"
+  },
+  "ship": {
+    "SAUCER": "Scheibenkreuzer",
+    "BRIDGE": "Brücken-Bildschirm",
+    "TWIN": "Doppelflügel-Abfangjäger",
+    "DAGGER": "Dolch-Angriffsjäger",
+    "CROSS": "Kreuzflügler"
   }
 }

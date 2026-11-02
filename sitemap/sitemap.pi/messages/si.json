@@ -221,7 +221,8 @@
     "reapplyOpen": "Ponovno se prijavi",
     "spk": "Dodatek bleščic",
     "spkGo": "Plačaj {amount} Pi za dodatek bleščic",
-    "efctGo": "Plačaj {amount} Pi za učinek mehurčka"
+    "efctGo": "Plačaj {amount} Pi za učinek mehurčka",
+    "shipGo": "Plačajte {amount} Pi za vesoljsko ladjo Warp"
   },
   "pay": {
     "payNow": "Plačaj {amount} Pi uporabnine ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Dodatek bleščic je že plačan.",
     "efct": "Učinek mehurčka",
     "payNowEfct": "Plačaj {amount} Pi za učinek mehurčka",
-    "efctAlreadyPaid": "Učinek mehurčka je že plačan."
+    "efctAlreadyPaid": "Učinek mehurčka je že plačan.",
+    "ship": "Vesoljska ladja Warp",
+    "payNowShip": "Plačajte {amount} Pi za vesoljsko ladjo Warp",
+    "shipAlreadyPaid": "Plačilo za vesoljsko ladjo Warp je bilo zaključeno."
   },
   "form": {
     "newTitle": "Navedi stran",
@@ -283,7 +287,11 @@
     "efct": "Učinek mehurčka",
     "efctNone": "Brez",
     "efctHint": "En na paket — Orbita (satelit kroži okoli mehurčka), Pulz (dihajoče valovanje), Komet (sled). Plačano z uporabnino ali izbrano v Uredi med uporabo z ločenim plačilom. Lahko se kombinira z bleščicami.",
-    "efctPaid": "Plačano — ostane vklopljeno za obdobje uporabe."
+    "efctPaid": "Plačano — ostane vklopljeno za obdobje uporabe.",
+    "ship": "Vesoljska ladja Warp",
+    "shipFree": "Osnovno·Brezplačno",
+    "shipHint": "To je vesoljska ladja za vodenje po warpu, ki se prikaže, ko obiskovalci brskajo po vašem spletnem mestu. Osnovna možnost je krožnikasta križarka (brezplačno), izbirate pa lahko med štirimi plačljivimi možnostmi. Plačilo se izvede skupaj z uporabnino, med uporabo pa lahko izberete in opravite dodatna plačila.",
+    "shipPaid": "Plačilo zaključeno — vzdrževano za čas uporabe."
   },
   "admin": {
     "title": "Skrbnik strani",
@@ -401,5 +409,12 @@
     "ORBIT": "Učinek orbite",
     "PULSE": "Učinek pulza",
     "COMET": "Učinek kometa"
+  },
+  "ship": {
+    "SAUCER": "Krožnikasta križarka",
+    "BRIDGE": "Mostni zaslon",
+    "TWIN": "Prestreznik z dvojnimi krili",
+    "DAGGER": "Bojno letalo Dagger",
+    "CROSS": "Borec s križnimi krili"
   }
 }

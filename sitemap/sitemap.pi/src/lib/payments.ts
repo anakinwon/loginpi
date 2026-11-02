@@ -12,6 +12,7 @@ import {
   type EfctCd,
   type PlanCd,
 } from './site'
+import { SHIP_CD, type ShipPaidCd } from './ship'
 
 export const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 export const SITE_REG = 'SITE_REG' as const
@@ -19,6 +20,8 @@ export const SITE_REG = 'SITE_REG' as const
 export const SITE_SPK = 'SITE_SPK' as const
 // 버블 이펙트 단독 결제 — complete RPC fn_cmpl_site_efct_pymnt(sql/017)
 export const SITE_EFCT = 'SITE_EFCT' as const
+// 워프 우주선 단독 결제 — complete RPC fn_cmpl_site_ship_pymnt(sql/020)
+export const SITE_SHIP = 'SITE_SHIP' as const
 
 // SDK metadata 계약 — complete RPC(fn_cmpl_site_reg_pymnt)가 site_id·plan_cd 를 읽는다
 export interface SiteRegMeta {
@@ -28,6 +31,13 @@ export interface SiteRegMeta {
   usr_id: string
   spk: 'Y' | 'N' // 합산 결제에 반짝임 부가서비스 포함 여부 — RPC 가 spk_* 기록
   efct?: EfctCd // 합산 결제에 포함된 버블 이펙트 — RPC 가 efct_* 기록(없으면 미포함)
+  ship?: ShipPaidCd // 합산 결제에 포함된 워프 우주선 — RPC 가 ship_* 기록(없으면 미포함)
+}
+export interface SiteShipMeta {
+  type: typeof SITE_SHIP
+  site_id: string
+  usr_id: string
+  ship: ShipPaidCd
 }
 export interface SiteEfctMeta {
   type: typeof SITE_EFCT
@@ -106,13 +116,15 @@ export async function getPlanRemaining(): Promise<Record<ApplyPlanCd, number>> {
   return Object.fromEntries(counts) as Record<ApplyPlanCd, number>
 }
 
-// 반짝임 부가서비스 단가 — fee_plan SPARKLE × 요금제(sql/014). 없음·미판매·0 이면 null(판매 안 함)
-// 버블 이펙트 단가 — fee_plan EFFECT × 요금제(sql/017, 3종 공통). 없음·미판매·0 이면 null
-export async function getEfctFee(planCd: string): Promise<number | null> {
+// 부가서비스 단가 — fee_plan <유형> × 요금제. 없음·미판매·0 이면 null(판매 안 함)
+async function getAddonFee(
+  feeTpCd: 'SPARKLE' | 'EFFECT' | 'SHIP',
+  planCd: string,
+): Promise<number | null> {
   const { data, error } = await db()
     .from('fee_plan')
     .select('pi_amt')
-    .eq('fee_tp_cd', 'EFFECT')
+    .eq('fee_tp_cd', feeTpCd)
     .eq('plan_cd', planCd)
     .eq('use_yn', 'Y')
     .eq('del_yn', 'N')
@@ -122,21 +134,10 @@ export async function getEfctFee(planCd: string): Promise<number | null> {
   const amt = Number(data?.pi_amt ?? 0)
   return amt > 0 ? amt : null
 }
-
-export async function getSpkFee(planCd: string): Promise<number | null> {
-  const { data, error } = await db()
-    .from('fee_plan')
-    .select('pi_amt')
-    .eq('fee_tp_cd', 'SPARKLE')
-    .eq('plan_cd', planCd)
-    .eq('use_yn', 'Y')
-    .eq('del_yn', 'N')
-    .limit(1)
-    .maybeSingle<{ pi_amt: number | string }>()
-  if (error) throw error
-  const amt = Number(data?.pi_amt ?? 0)
-  return amt > 0 ? amt : null
-}
+// 반짝임(sql/014) · 버블 이펙트(sql/017, 3종 공통) · 워프 우주선(sql/020, 4종 공통)
+export const getSpkFee = (planCd: string) => getAddonFee('SPARKLE', planCd)
+export const getEfctFee = (planCd: string) => getAddonFee('EFFECT', planCd)
+export const getShipFee = (planCd: string) => getAddonFee('SHIP', planCd)
 
 export async function getRegFee(planCd: string): Promise<RegFee | null> {
   const fees = await getRegFees()
@@ -220,6 +221,27 @@ export function parseSiteRegMeta(meta: unknown): SiteRegMeta | null {
     usr_id: typeof m.usr_id === 'string' ? m.usr_id : '',
     spk: m.spk === 'Y' ? 'Y' : 'N',
     ...(isEfctCd(m.efct) && { efct: m.efct }),
+    ...(isShipPaidCd(m.ship) && { ship: m.ship }),
+  }
+}
+
+const isShipPaidCd = (v: unknown): v is ShipPaidCd =>
+  typeof v === 'string' && (SHIP_CD as readonly string[]).includes(v)
+
+export function parseSiteShipMeta(meta: unknown): SiteShipMeta | null {
+  if (!meta || typeof meta !== 'object') return null
+  const m = meta as Record<string, unknown>
+  if (
+    m.type !== SITE_SHIP ||
+    typeof m.site_id !== 'string' ||
+    !isShipPaidCd(m.ship)
+  )
+    return null
+  return {
+    type: SITE_SHIP,
+    site_id: m.site_id,
+    usr_id: typeof m.usr_id === 'string' ? m.usr_id : '',
+    ship: m.ship,
   }
 }
 
@@ -258,7 +280,7 @@ export interface PymntRow {
   pymnt_id: string
   usr_id: string
   pymnt_sts_cd: 'APPROVED' | 'COMPLETED' | 'CANCELED'
-  pymnt_tp_cd: string // SITE_REG | SITE_SPK — complete 가 RPC 를 고른다
+  pymnt_tp_cd: string // SITE_REG | SITE_SPK | SITE_EFCT | SITE_SHIP — complete 가 RPC 를 고른다
   meta_val: Record<string, unknown>
 }
 
@@ -283,12 +305,19 @@ export async function hasOtherApprovedPayment(
   siteId: string,
   exceptPaymentId: string,
   // type 생략 = 두 유형 모두(철회·정지 가드 — 반짝임 단독 결제 진행 중에도 상태 전이를 막는다)
-  type?: typeof SITE_REG | typeof SITE_SPK | typeof SITE_EFCT,
+  type?:
+    | typeof SITE_REG
+    | typeof SITE_SPK
+    | typeof SITE_EFCT
+    | typeof SITE_SHIP,
 ): Promise<boolean> {
   const { count, error } = await db()
     .from('pi_pymnt')
     .select('pymnt_id', { count: 'exact', head: true })
-    .in('pymnt_tp_cd', type ? [type] : [SITE_REG, SITE_SPK, SITE_EFCT])
+    .in(
+      'pymnt_tp_cd',
+      type ? [type] : [SITE_REG, SITE_SPK, SITE_EFCT, SITE_SHIP],
+    )
     .eq('pymnt_sts_cd', 'APPROVED')
     .eq('del_yn', 'N')
     // meta_val->>'site_id' 동등 비교 — sql/012·013 식 부분 인덱스(idx_pi_pymnt_meta_val_site_id*)를 탄다(JSONB @> 는 못 탐)

@@ -221,7 +221,8 @@
     "reapplyOpen": "Aplicar novamente",
     "spk": "Complemento Sparkle",
     "spkGo": "Pagar {amount} Pi pelo complemento Sparkle",
-    "efctGo": "Pagar {amount} Pi pelo efeito de bolha"
+    "efctGo": "Pagar {amount} Pi pelo efeito de bolha",
+    "shipGo": "Pagar {amount} Pi pelo Warp Spaceship"
   },
   "pay": {
     "payNow": "Pagar taxa de uso de {amount} Pi ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "O complemento Sparkle já está pago.",
     "efct": "Efeito de bolha",
     "payNowEfct": "Pagar {amount} Pi pelo efeito de bolha",
-    "efctAlreadyPaid": "O efeito de bolha já está pago."
+    "efctAlreadyPaid": "O efeito de bolha já está pago.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Pagar {amount} Pi pelo Warp Spaceship",
+    "shipAlreadyPaid": "O pagamento do Warp Spaceship foi concluído."
   },
   "form": {
     "newTitle": "Listar um site",
@@ -283,7 +287,11 @@
     "efct": "Efeito de bolha",
     "efctNone": "Nenhum",
     "efctHint": "Um por plano — Órbita (um satélite circunda a bolha), Pulso (ondulação respiratória), Cometa (cauda de rastro). Pago com a taxa de uso, ou escolhido em Editar enquanto em uso com um pagamento separado. Pode ser combinado com Sparkle.",
-    "efctPaid": "Pago — permanece ativo durante o período de uso."
+    "efctPaid": "Pago — permanece ativo durante o período de uso.",
+    "ship": "Warp Spaceship",
+    "shipFree": "Básico·Gratuito",
+    "shipHint": "Esta é a nave espacial guia de dobra que aparece quando os visitantes navegam para o seu site. A opção básica é o Saucer Cruiser (gratuito), e você pode escolher uma das quatro opções pagas. É pago junto com a taxa de uso, e você pode selecionar e fazer pagamentos adicionais durante o uso.",
+    "shipPaid": "Pagamento concluído — mantido durante o período de uso."
   },
   "admin": {
     "title": "Administração do site",
@@ -401,5 +409,12 @@
     "ORBIT": "Efeito Órbita",
     "PULSE": "Efeito Pulso",
     "COMET": "Efeito Cometa"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Tela de visualização da ponte",
+    "TWIN": "Interceptor de Asa Dupla",
+    "DAGGER": "Caça de Assalto Dagger",
+    "CROSS": "Caça de asa cruzada"
   }
 }

@@ -221,7 +221,8 @@
     "reapplyOpen": "Sækja aftur um",
     "spk": "Glitter viðbót",
     "spkGo": "Greiddu {amount} Pi fyrir glitter viðbótina",
-    "efctGo": "Greiddu {amount} Pi fyrir kúluáhrifin"
+    "efctGo": "Greiddu {amount} Pi fyrir kúluáhrifin",
+    "shipGo": "Borga {amount} Pi fyrir Warp geimskip"
   },
   "pay": {
     "payNow": "Greiddu {amount} Pi notkunargjald ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Glitter viðbótin er þegar greidd.",
     "efct": "Kúluáhrif",
     "payNowEfct": "Greiddu {amount} Pi fyrir kúluáhrifin",
-    "efctAlreadyPaid": "Kúluáhrifin eru þegar greidd."
+    "efctAlreadyPaid": "Kúluáhrifin eru þegar greidd.",
+    "ship": "Warp geimskip",
+    "payNowShip": "Borga {amount} Pi fyrir Warp geimskip",
+    "shipAlreadyPaid": "Greiðsla fyrir Warp geimskip hefur verið framkvæmd."
   },
   "form": {
     "newTitle": "Skrá síðu",
@@ -268,6 +272,7 @@
     "pvtRequired": "Tengiliður rekstraraðila er nauðsynlegur til að sækja um.",
     "pubCntc": "Opinber tengiliður (valfrjálst)",
     "pubHint": "Sýnt á síðusíðunni ef gefið upp.",
+    "mvUrl": "URL áfangastaðar (valfrjálst)",
     "mvHint": "Https heimilisfang fyrir venjulega vafra sem geta ekki opnað .pi. Ekki hægt að breyta meðan í notkun.",
     "saveDraft": "Vista drög",
     "submit": "Sækja um",
@@ -282,7 +287,11 @@
     "efct": "Kúluáhrif",
     "efctNone": "Engin",
     "efctHint": "Eitt á áætlun — Sporbraut (gervihnöttur snýst um kúluna), Púls (öndunarhrif), Halastjarna (eftirfarandi hali). Greitt með notkunargjaldi, eða valið í Breyta meðan í notkun með sérstakri greiðslu. Hægt að sameina með Glitter.",
-    "efctPaid": "Greitt — helst á meðan notkunartímabilinu stendur."
+    "efctPaid": "Greitt — helst á meðan notkunartímabilinu stendur.",
+    "ship": "Warp geimskip",
+    "shipFree": "Grunn·Frítt",
+    "shipHint": "Þetta er Warp leiðsögu geimskipið sem birtist þegar gestir fara á síðuna þína. Grunnvalkosturinn er Saucer Cruiser (ókeypis) og þú getur valið einn af fjórum greiddum valkostum. Það er greitt ásamt notkunargjaldinu og þú getur valið og greitt aukalega meðan á notkun stendur.",
+    "shipPaid": "Greiðsla lokið — viðhaldið meðan á notkun stendur."
   },
   "admin": {
     "title": "Stjórnun síðu",
@@ -400,5 +409,12 @@
     "ORBIT": "Sporbrautaráhrif",
     "PULSE": "Púlsáhrif",
     "COMET": "Halastjörnuáhrif"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Brúarskjár",
+    "TWIN": "Tvíburavængja orrustuflugvél",
+    "DAGGER": "Rýtingaárásarflugvél",
+    "CROSS": "Krossvængja orrustuþota"
   }
 }

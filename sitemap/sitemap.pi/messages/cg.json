@@ -221,7 +221,8 @@
     "reapplyOpen": "Postuler à nouveau",
     "spk": "Module complémentaire scintillant",
     "spkGo": "Payer {amount} Pi pour le module complémentaire scintillant",
-    "efctGo": "Payer {amount} Pi pour l'effet de bulle"
+    "efctGo": "Payer {amount} Pi pour l'effet de bulle",
+    "shipGo": "Payer {amount} Pi pour le vaisseau spatial Warp"
   },
   "pay": {
     "payNow": "Payer {amount} Pi de frais d'utilisation ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Le module complémentaire scintillant est déjà payé.",
     "efct": "Effet de bulle",
     "payNowEfct": "Payer {amount} Pi pour l'effet de bulle",
-    "efctAlreadyPaid": "L'effet de bulle est déjà payé."
+    "efctAlreadyPaid": "L'effet de bulle est déjà payé.",
+    "ship": "Vaisseau spatial Warp",
+    "payNowShip": "Payer {amount} Pi pour le vaisseau spatial Warp",
+    "shipAlreadyPaid": "Le paiement du vaisseau spatial Warp a été effectué."
   },
   "form": {
     "newTitle": "Lister un site",
@@ -283,7 +287,11 @@
     "efct": "Effet de bulle",
     "efctNone": "Aucun",
     "efctHint": "Un par plan — Orbite (un satellite tourne autour de la bulle), Impulsion (ondulation respiratoire), Comète (traînée). Payé avec les frais d'utilisation, ou choisi dans Modifier pendant l'utilisation avec un paiement séparé. Peut être combiné avec Scintillement.",
-    "efctPaid": "Payé — reste activé pendant la période d'utilisation."
+    "efctPaid": "Payé — reste activé pendant la période d'utilisation.",
+    "ship": "Vaisseau spatial Warp",
+    "shipFree": "Basique·Gratuit",
+    "shipHint": "Ceci est le vaisseau spatial de guidage Warp qui apparaît lorsque les visiteurs naviguent vers votre site. L'option de base est le Croiseur Soucoupe (gratuit), et vous pouvez choisir l'une des quatre options payantes. Le paiement est effectué avec les frais d'utilisation, et vous pouvez sélectionner et effectuer des paiements supplémentaires pendant l'utilisation.",
+    "shipPaid": "Paiement effectué — maintenu pendant la durée d'utilisation."
   },
   "admin": {
     "title": "Administration du site",
@@ -401,5 +409,12 @@
     "ORBIT": "Effet d'orbite",
     "PULSE": "Effet de pulsation",
     "COMET": "Effet de comète"
+  },
+  "ship": {
+    "SAUCER": "Croiseur Soucoupe",
+    "BRIDGE": "Écran de vue du pont",
+    "TWIN": "Intercepteur à double aile",
+    "DAGGER": "Chasseur d'assaut Dague",
+    "CROSS": "Chasseur à ailes croisées"
   }
 }
