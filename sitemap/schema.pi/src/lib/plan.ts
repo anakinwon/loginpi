@@ -8,23 +8,25 @@ export interface AreaPlan {
   plan: PlanCd
   end: string | null // 현재 요금제 종료일시(FREE = null)
   grace: boolean // 유예 기간(결제 아님)
+  prd: 'M' | 'Y' | null // 현재 요금제 기간 주기(FREE = null)
+  rsn: string | null // 부여 사유 PAY·GRACE·UPG(FREE = null)
 }
 
 export async function areaPlan(areaId: string): Promise<AreaPlan> {
   const now = new Date().toISOString()
   const { data, error } = await db()
     .from('std_area_plan')
-    .select('plan_cd, end_dtm, grnt_rsn_cd')
+    .select('plan_cd, prd_cd, end_dtm, grnt_rsn_cd')
     .eq('area_id', areaId)
     .eq('del_yn', 'N')
     .lte('strt_dtm', now)
     .gt('end_dtm', now)
   if (error) throw error
-  let best: AreaPlan = { plan: 'FREE', end: null, grace: false }
+  let best: AreaPlan = { plan: 'FREE', end: null, grace: false, prd: null, rsn: null }
   for (const r of data ?? []) {
     const p = r.plan_cd as PlanCd
     // 높은 요금제 우선, 같은 요금제면 늦게 끝나는 기간
-    if (PLANS.indexOf(p) > PLANS.indexOf(best.plan) || (p === best.plan && r.end_dtm > (best.end ?? ''))) best = { plan: p, end: r.end_dtm, grace: r.grnt_rsn_cd === 'GRACE' }
+    if (PLANS.indexOf(p) > PLANS.indexOf(best.plan) || (p === best.plan && r.end_dtm > (best.end ?? ''))) best = { plan: p, end: r.end_dtm, grace: r.grnt_rsn_cd === 'GRACE', prd: r.prd_cd, rsn: r.grnt_rsn_cd }
   }
   return best
 }

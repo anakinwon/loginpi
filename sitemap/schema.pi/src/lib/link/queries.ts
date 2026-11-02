@@ -7,6 +7,7 @@ import { maskErr, pgClient, resolveTarget } from '../db-exec'
 import { getConn } from '../model-ddl-req'
 import { connBlock, openPwd } from '../secret'
 import { cell, type Cell } from '../sql-run'
+import type { AreaPlan } from '../plan'
 import type { LinkCode } from './auth'
 import { explainTarget } from './rules'
 
@@ -65,6 +66,7 @@ WHERE ${SYS_NS} AND ($1::text IS NULL OR n.nspname = $1) AND ($2::text IS NULL O
   version: `SELECT version() AS version, current_setting('server_version_num')::int AS version_num, current_database() AS db_nm, pg_is_in_recovery() AS in_recovery,
   pg_postmaster_start_time() AS start_dtm, current_setting('max_connections')::int AS max_conn, current_setting('shared_buffers') AS shared_buffers`,
   explain: '', // 본문 = 'EXPLAIN (FORMAT JSON, COSTS true) ' + 검사 통과 문장
+  area_plan: '', // 대상 DB 아님 — schema.pi 자체 DB 토큰 분류체계 현재 요금제 1행(areaPlanRow, 라우트가 runNamed 전에 분기), 인자·connId 없음
 } as const
 export type QueryName = keyof typeof Q
 export const QUERY_NAMES = Object.keys(Q) as QueryName[]
@@ -108,6 +110,13 @@ function argsOf(q: QueryName, p: Params): unknown[] {
 export type QueryRes = { cols: string[]; rows: Cell[][]; ms: number }
 export type QueryFail = { fail: LinkCode; status: number; message?: string }
 
+// area_plan 응답 — 다른 조회와 같은 { cols, rows } 1행. FREE = plan_cd 'FREE'·나머지 null (현재 요금제 판정 정본 = src/lib/plan.ts areaPlan)
+export const areaPlanRow = (p: AreaPlan): QueryRes => ({
+  cols: ['plan_cd', 'prd_cd', 'end_dtm', 'grnt_rsn_cd'],
+  rows: [[p.plan, p.prd, p.end, p.rsn]],
+  ms: 0,
+})
+
 // 실행 — 이 분류체계 접속만(다른 분류체계 = LINK_SCOPE), SRV PostgreSQL 만
 export async function runNamed(
   areaId: string,
@@ -115,6 +124,7 @@ export async function runNamed(
   q: QueryName,
   p: Params,
 ): Promise<QueryRes | QueryFail> {
+  if (q === 'area_plan') return { fail: 'Q_UNKNOWN', status: 400 } // 대상 DB 조회 아님(라우트가 먼저 분기)
   let text: string = Q[q]
   if (q === 'explain') {
     const s = p.sql ? explainTarget(p.sql) : null

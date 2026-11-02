@@ -1,4 +1,4 @@
-// 사이트 연결 이름 붙인 조회(src/lib/link/queries.ts) 계약 — 조회 이름 17개 불변, 느린 쿼리 출처용 칼럼(usr_nm·query_id) 포함 · 실행 : pnpm test
+// 사이트 연결 이름 붙인 조회(src/lib/link/queries.ts) 계약 — 조회 이름 18개 불변(17개 + area_plan 2026-11-02), 느린 쿼리 출처용 칼럼(usr_nm·query_id) 포함 · 실행 : pnpm test
 // queries.ts 는 'server-only' 를 import 해서 node 에서 직접 못 불러오므로 원문 텍스트로 단언한다
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -16,7 +16,7 @@ const sqlOf = (n: string) =>
     body.indexOf('`,', body.indexOf(`  ${n}: \``)),
   )
 
-test('QUERY_NAMES 17개 불변(이름·순서)', () => {
+test('QUERY_NAMES 18개 불변(이름·순서)', () => {
   assert.deepEqual(names, [
     'db_stats',
     'top_sql',
@@ -35,7 +35,19 @@ test('QUERY_NAMES 17개 불변(이름·순서)', () => {
     'archiver',
     'version',
     'explain',
+    'area_plan',
   ])
+})
+
+// 두 앱 계약(2026-11-02 dbms.pi 요금제) — 응답 칼럼·FREE 행, 대상 DB 로 보내지 않음
+test('area_plan — { plan_cd, prd_cd, end_dtm, grnt_rsn_cd } 1행, runNamed 대상 DB 경로 차단', () => {
+  assert.match(src, /cols: \['plan_cd', 'prd_cd', 'end_dtm', 'grnt_rsn_cd'\]/)
+  assert.match(src, /rows: \[\[p\.plan, p\.prd, p\.end, p\.rsn\]\]/)
+  assert.ok(src.indexOf("if (q === 'area_plan') return { fail") < src.indexOf('await getConn('))
+  const route = readFileSync(new URL('../src/app/api/link/v1/query/route.ts', import.meta.url), 'utf8')
+  // 요금제 만료 검사보다 area_plan 분기가 먼저(만료여도 dbms.pi 가 요금제를 읽음)
+  assert.ok(route.indexOf("q === 'area_plan'") < route.indexOf('planExpired(a)'))
+  assert.match(route, /\{ anyPlan: true \}/)
 })
 
 test('top_sql — usr_nm(pg_get_userbyid) 추가, 기존 칼럼 유지', () => {

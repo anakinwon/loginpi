@@ -1,4 +1,4 @@
-// 사이트 연결 토큰 폐기 — DELETE ?area= : 논리 삭제(즉시 무효), 접속 관리 권한(DB_CONN_ADMIN)
+// 사이트 연결 토큰 폐기 — DELETE ?area= : 논리 삭제(즉시 무효), 연결 토큰 권한(LINK_ADMIN = SYS·DA ∩ 유료 요금제)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, audit, dbError, requireAreaRole } from '@/lib/api'
@@ -11,7 +11,7 @@ export async function DELETE(req: Request, { params }: Ctx) {
   const { tknId } = await params
   const areaId = new URL(req.url).searchParams.get('area')
   if (!uuid.safeParse(areaId).success || !uuid.safeParse(tknId).success) return apiError('INVALID_INPUT', 400)
-  const auth = await requireAreaRole(areaId!, 'DB_CONN_ADMIN')
+  const auth = await requireAreaRole(areaId!, 'LINK_ADMIN')
   if (auth instanceof NextResponse) return auth
   try {
     if (!(await revokeTkn(areaId!, tknId, auth.user.usr_id))) return apiError('NOT_FOUND', 404)

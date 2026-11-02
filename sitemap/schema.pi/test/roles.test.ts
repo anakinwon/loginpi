@@ -46,6 +46,10 @@ test('파생 권한 — 메뉴·신청 조합, DB 접속 관리 = 승인 ∧ 설
   assert.ok(!has('MDL', 'P4', 'DB_CONN_ADMIN') && !has('STD', 'P4', 'DDL_APPROVE')) // 설정만 있고 승인 없음
   assert.ok(!has('DA', 'P3', 'APPROVE') && !has('DA', 'P3', 'DB_CONN_ADMIN')) // DA 라도 요금제3 = 승인 없음
   assert.deepEqual(effPerms('DA', 'FREE'), ['VIEW', 'MENU_STD', 'STD_VIEW']) // 무료 = 표준 조회만
+  // 연결 토큰(2026-11-02) = SYS·DA ∩ 유료(P1~), 기존 DB_CONN_ADMIN 은 그대로
+  assert.ok(has('SYS', 'P1', 'LINK_ADMIN') && has('DA', 'P1', 'LINK_ADMIN') && has('DA', 'P4', 'LINK_ADMIN'))
+  assert.ok(!has('DA', 'P1', 'DB_CONN_ADMIN'))
+  assert.ok(!has('MDL', 'P4', 'LINK_ADMIN') && !has('VIEWER', 'P4', 'LINK_ADMIN'))
 })
 
 test('설정 서브메뉴 × 요금제(마스터 표 2026-10-19) — 시스템담당자 기준 누적', () => {

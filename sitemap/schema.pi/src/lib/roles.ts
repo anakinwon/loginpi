@@ -10,9 +10,9 @@ export const BASE_PERMS = ['APPROVE', 'SELF_APPROVE', 'SETTINGS', 'BULK', 'REQUE
 type BasePerm = (typeof BASE_PERMS)[number]
 // 파생 권한(표 밖) — 서버 경로·화면은 이 이름으로 판정
 //  VIEW = 멤버, STD_VIEW·MODEL_VIEW·SET_VIEW = 메뉴, STD_REQ·MODEL_EDIT = 신청 ∧ 메뉴, SQL_QUERY = 메뉴1,
-//  DDL_APPROVE = 승인, DB_CONN_ADMIN = 승인 ∧ 설정(접속 비밀번호 관리 — 설정만 가진 역할에는 주지 않음)
+//  DDL_APPROVE = 승인, DB_CONN_ADMIN = 승인 ∧ 설정(접속 비밀번호 관리 — 설정만 가진 역할에는 주지 않음), LINK_ADMIN = 연결 토큰 관리(SYS·DA ∩ 유료)
 //  설정 서브메뉴 : SET_VIEW = 설정·이력, BAN_VIEW = 금칙어 조회, BAN_EDIT = 금칙어 등록·삭제·일괄(금칙어 메뉴 ∧ 일괄등록), CHK_VIEW = 표준 점검·리버스, ADM_VIEW = 멤버·승인 메뉴, MBR_ADMIN = 멤버 관리(멤버 메뉴 ∧ 설정)
-export type Perm = BasePerm | 'VIEW' | 'STD_VIEW' | 'STD_REQ' | 'MODEL_VIEW' | 'MODEL_EDIT' | 'SET_VIEW' | 'BAN_VIEW' | 'BAN_EDIT' | 'CHK_VIEW' | 'ADM_VIEW' | 'MBR_ADMIN' | 'SQL_QUERY' | 'DDL_APPROVE' | 'DB_CONN_ADMIN' | 'MON_VIEW' | 'MON_EDIT' | 'MON_AI' | 'MON_FIX_APV'
+export type Perm = BasePerm | 'VIEW' | 'STD_VIEW' | 'STD_REQ' | 'MODEL_VIEW' | 'MODEL_EDIT' | 'SET_VIEW' | 'BAN_VIEW' | 'BAN_EDIT' | 'CHK_VIEW' | 'ADM_VIEW' | 'MBR_ADMIN' | 'SQL_QUERY' | 'DDL_APPROVE' | 'DB_CONN_ADMIN' | 'LINK_ADMIN' | 'MON_VIEW' | 'MON_EDIT' | 'MON_AI' | 'MON_FIX_APV'
 
 export const ROLE_NM: Record<MbrRole, string> = {
   SYS: '시스템담당자',
@@ -82,6 +82,8 @@ export function effPerms(role: string | null | undefined, plan: string | null | 
   if (b.has('MENU_SQL')) out.push('SQL_QUERY')
   if (b.has('APPROVE')) out.push('DDL_APPROVE')
   if (both('APPROVE', 'SETTINGS')) out.push('DB_CONN_ADMIN')
+  // 사이트 연결 토큰 발급·폐기(2026-11-02 dbms.pi 요금제) = SYS·DA 역할 ∩ 유료 요금제(P1~, 체험 GRACE 포함) — dbms.pi 만 쓰려고 P4 를 살 필요 없게
+  if ((role === 'SYS' || role === 'DA') && isPlan(plan) && plan !== 'FREE') out.push('LINK_ADMIN')
   // 모니터링(2026-10-21) : 보기 = SQL 편집기와 같은 기술 메뉴(요금제1~), URL 등록·삭제 = 그중 CRUD
   if (b.has('MENU_SQL')) out.push('MON_VIEW')
   if (both('MENU_SQL', 'CRUD')) out.push('MON_EDIT')

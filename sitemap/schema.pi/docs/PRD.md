@@ -338,6 +338,7 @@ DBMS에 따라 DDL이 달라진다(Oracle 대문자·PostgreSQL 소문자, 데�
 | 결제자 | 분류체계 시스템담당자·데이터아키텍트(요금제와 무관 — 무료여도 결제 가능, 2026-10-19 마스터 결정) |
 | 결제 처리 | sitemap.pi 패턴 이식(`src/lib/payments.ts`·`/api/payments/prepare·approve·complete·cancel`) : 서버가 `sys_fee_plan`으로 정가 재계산, 클라이언트 금액 불신, 검증·원장 기록 후 approve, 완료 = `fn_cmpl_area_plan_pymnt`(원장 COMPLETED + 기간 반영 한 트랜잭션, 같은 결제 두 번 반영 불가), 본인 결제만 취소, 미완료 결제 = 로그인 때 complete·cancel 복구. Pi 네트워크 = 테스트넷(운영 env `PI_API_KEY` = schema 앱 테스트넷 키) |
 | 결제 환경 | Pi Browser 전용(LOGIN_PLAYBOOK Q4), Google 세션 결제 불가 |
+| 사이트 연결 토큰(2026-11-02) | 발급·폐기 = `LINK_ADMIN`(SYS·DA 역할 ∩ 유료 요금제 P1~, 체험 GRACE 포함 — 구 `DB_CONN_ADMIN` = P4 만에서 완화, `DB_CONN_ADMIN` 의 다른 사용처는 그대로). 연결 API(`linkAuth`)는 분류체계 요금제가 FREE 면 토큰 만료일과 무관하게 403 `PLAN_EXPIRED`(요금제 60초 캐시) — 예외 = 토큰 상태 확인 `/v1/area`·이름 붙인 조회 `area_plan`(schema.pi 자체 DB 의 현재 요금제 1행 `plan_cd·prd_cd·end_dtm·grnt_rsn_cd`, dbms.pi 만료 안내·묶음 할인 판정용) |
 | 표기 제약 | Pi 직접 표기, Bean·토큰·코인 어휘 금지(MAINNET A-5) |
 
 ## 8. 비기능 요구

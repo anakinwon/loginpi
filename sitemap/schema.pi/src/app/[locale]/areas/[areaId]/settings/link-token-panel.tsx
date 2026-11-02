@@ -1,6 +1,6 @@
 'use client'
 // 설정 > 사이트 연결(2026-11-01, sql/077) — dbms.pi 등 다른 사이트가 이 분류체계를 읽을 토큰(slk_…) 발급·폐기. 원문은 발급 직후 1번만 표시
-// 권한 = 접속 관리(SYS·DA ∩ 요금제) — 그 밖 역할은 API 가 403, 안내 문구만
+// 권한 = 연결 토큰 관리(LINK_ADMIN = SYS·DA ∩ 유료 요금제) — 그 밖 역할은 API 가 403, 안내 문구만
 import { piFetch } from '@pi/auth/client'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -44,7 +44,7 @@ export default function LinkTokenPanel({ areaId }: { areaId: string }) {
     if (j.ok) void load()
   }
 
-  if (deny) return <p className="text-sm text-gray-500">{deny} — 사이트 연결 토큰은 접속 관리 권한(SYS·DA)만 발급합니다</p>
+  if (deny) return <p className="text-sm text-gray-500">{deny} — 사이트 연결 토큰은 유료 요금제의 SYS·DA 역할만 발급합니다</p>
   if (!items) return <p className="text-sm text-gray-500">불러오는 중</p>
   return (
     <div className="space-y-4 text-sm">
