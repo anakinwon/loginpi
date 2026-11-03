@@ -221,7 +221,8 @@
     "reapplyOpen": "Jelentkezzen újra",
     "spk": "Csillogás kiegészítő",
     "spkGo": "Fizessen {amount} Pi-t a csillogás kiegészítőért",
-    "efctGo": "Fizessen {amount} Pi-t a buborék effektért"
+    "efctGo": "Fizessen {amount} Pi-t a buborék effektért",
+    "shipGo": "{amount} Pi fizetése a Warp űrhajóért"
   },
   "pay": {
     "payNow": "Fizessen {amount} Pi használati díjat ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "A csillogás kiegészítő már ki van fizetve.",
     "efct": "Buborék effekt",
     "payNowEfct": "Fizessen {amount} Pi-t a buborék effektért",
-    "efctAlreadyPaid": "A buborék effekt már ki van fizetve."
+    "efctAlreadyPaid": "A buborék effekt már ki van fizetve.",
+    "ship": "Warp űrhajó",
+    "payNowShip": "{amount} Pi fizetése a Warp űrhajóért",
+    "shipAlreadyPaid": "A Warp űrhajó fizetése befejeződött."
   },
   "form": {
     "newTitle": "Oldal listázása",
@@ -283,7 +287,12 @@
     "efct": "Buborék effekt",
     "efctNone": "Nincs",
     "efctHint": "Egy csomagonként – Orbit (egy műhold kering a buborék körül), Pulse (lélegző hullámzás), Comet (csóva). A használati díjjal együtt fizetendő, vagy használat közben a Szerkesztés menüpontban választható és külön fizetéssel bekapcsolható. Kombinálható a Csillogással.",
-    "efctPaid": "Kifizetve – a használati időszak alatt bekapcsolva marad."
+    "efctPaid": "Kifizetve – a használati időszak alatt bekapcsolva marad.",
+    "ship": "Warp űrhajó",
+    "shipFree": "Alap·Ingyenes",
+    "shipSoon": "A fizetős űrhajók előkészítés alatt állnak. Jelenleg alapvető korongcirkálóként jelennek meg.",
+    "shipHint": "Ez a Warp útmutató űrhajó, amely akkor jelenik meg, amikor a látogatók az Ön webhelyére navigálnak. Az alapértelmezett a Csészealj Cirkáló (ingyenes), és négy fizetős opció közül választhat egyet. A használati díjjal együtt fizetendő, és használat közben módosítható és további fizetések is teljesíthetők.",
+    "shipPaid": "Fizetés befejezve – a használat időtartama alatt fenntartva."
   },
   "admin": {
     "title": "Oldal adminisztráció",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Nem sikerült menteni a fiókját, ezért a bejelentkezés sikertelen. Kérjük, próbálja újra később.",
     "PAY_NOT_REQUIRED": "Ez a webhely nem igényel fizetést.",
     "PAY_ALREADY_PAID": "Ez a jelentkezés már ki van fizetve. Lépjen kapcsolatba az adminisztrátorral a csomag módosításához vagy visszavonásához.",
+    "SHIP_UNAVAILABLE": "A láncolt űrhajó kiegészítők előkészítés alatt állnak. A díjak, csillogások és effektek kifizetése továbbra is lehetséges.",
     "PAY_SITE_MISMATCH": "A fizetés nem egyezik ezzel a jelentkezéssel.",
     "PAY_AMOUNT_SHORT": "A fizetési összeg nem egyezik a díjjal.",
     "PAY_PI_APPROVE_FAILED": "A Pi fizetés jóváhagyása sikertelen. Kérjük, próbálja újra később.",
@@ -401,5 +411,12 @@
     "ORBIT": "Keringési effektus",
     "PULSE": "Pulzáló effektus",
     "COMET": "Üstökös effektus"
+  },
+  "ship": {
+    "SAUCER": "Csészealj Cirkáló",
+    "BRIDGE": "Híd Képernyő",
+    "TWIN": "Két-szárnyú Interceptor",
+    "DAGGER": "Tőr Támadó Vadászgép",
+    "CROSS": "Keresztszárnyú vadászgép"
   }
 }

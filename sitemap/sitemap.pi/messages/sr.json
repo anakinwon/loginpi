@@ -221,7 +221,8 @@
     "reapplyOpen": "Opnieuw aanvragen",
     "spk": "Sparkle add-on",
     "spkGo": "Betaal {amount} Pi voor de sparkle add-on",
-    "efctGo": "Betaal {amount} Pi voor het bubbeleffect"
+    "efctGo": "Betaal {amount} Pi voor het bubbeleffect",
+    "shipGo": "Betaal {amount} Pi voor Warp Ruimteschip"
   },
   "pay": {
     "payNow": "Betaal {amount} Pi gebruikskosten ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "De sparkle add-on is al betaald.",
     "efct": "Bubbeleffect",
     "payNowEfct": "Betaal {amount} Pi voor het bubbeleffect",
-    "efctAlreadyPaid": "Het bubbeleffect is al betaald."
+    "efctAlreadyPaid": "Het bubbeleffect is al betaald.",
+    "ship": "Warp Ruimteschip",
+    "payNowShip": "Betaal {amount} Pi voor Warp Ruimteschip",
+    "shipAlreadyPaid": "De betaling voor het Warp Ruimteschip is voltooid."
   },
   "form": {
     "newTitle": "Site vermelden",
@@ -283,7 +287,12 @@
     "efct": "Bubbeleffect",
     "efctNone": "Geen",
     "efctHint": "Eén per abonnement — Orbit (een satelliet cirkelt om de bubbel), Pulse (ademende rimpeling), Comet (sleepende staart). Wordt betaald met de gebruikskosten, of gekozen in Bewerken tijdens gebruik met een aparte betaling. Kan worden gecombineerd met Sparkle.",
-    "efctPaid": "Betaald — blijft aan gedurende de gebruiksperiode."
+    "efctPaid": "Betaald — blijft aan gedurende de gebruiksperiode.",
+    "ship": "Warp Ruimteschip",
+    "shipFree": "Basis·Gratis",
+    "shipSoon": "Betaalde warpschepen zijn in voorbereiding. Voor nu worden ze weergegeven als basis schijfcruisers.",
+    "shipHint": "Dit is het warp-gids ruimteschip dat verschijnt wanneer bezoekers naar uw site navigeren. De basisoptie is de Saucer Cruiser (gratis), en u kunt één van de vier betaalde opties kiezen. Het wordt betaald samen met de gebruikskosten, en u kunt tijdens het gebruik selecteren en extra betalingen doen.",
+    "shipPaid": "Betaling voltooid — wordt gehandhaafd gedurende de gebruiksduur."
   },
   "admin": {
     "title": "Sitebeheer",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Kon uw account niet opslaan, dus aanmelden is mislukt. Probeer het later opnieuw.",
     "PAY_NOT_REQUIRED": "Deze site vereist geen betaling.",
     "PAY_ALREADY_PAID": "Deze aanvraag is al betaald. Neem contact op met een beheerder om het plan te wijzigen of in te trekken.",
+    "SHIP_UNAVAILABLE": "Warp-scheepsuitbreidingen zijn in voorbereiding. Je kunt nog steeds betalen voor kosten, sprankelingen en effecten.",
     "PAY_SITE_MISMATCH": "De betaling komt niet overeen met deze aanvraag.",
     "PAY_AMOUNT_SHORT": "Het betaalde bedrag komt niet overeen met de kosten.",
     "PAY_PI_APPROVE_FAILED": "Pi betalingsgoedkeuring mislukt. Probeer het later opnieuw.",
@@ -401,5 +411,12 @@
     "ORBIT": "Orbit-effect",
     "PULSE": "Puls-effect",
     "COMET": "Komeet-effect"
+  },
+  "ship": {
+    "SAUCER": "Schotel Kruiser",
+    "BRIDGE": "Brugscherm",
+    "TWIN": "Dubbelvleugelige Interceptor",
+    "DAGGER": "Dolk Aanvalsjager",
+    "CROSS": "Kruisvleugeljager"
   }
 }

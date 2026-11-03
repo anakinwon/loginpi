@@ -1,5 +1,6 @@
 // sitemap.pi 도메인 상수·입력 검증(zod) — 서버 API와 클라이언트 폼이 공유. 코드값 정본은 sql/001_sitemap_phase1.sql CHECK 제약
 import { z } from 'zod'
+import { SHIP_CD, type ShipPaidCd } from './ship'
 
 export const SITE_CTGR = [
   'COMMUNITY',
@@ -202,6 +203,8 @@ const SITE_CONTENT_FIELDS = {
   spk: z.boolean().default(false),
   // 버블 이펙트 부가서비스(efct_cd) — 요금제별 1종 선택, null = 없음. 결제는 반짝임과 같은 합산·단독 경로
   efct: z.enum(EFCT_CD).nullable().optional(),
+  // 워프 우주선 부가서비스(ship_cd) — 유료 4종 중 1종, null = 기본 SAUCER(무료). 결제는 이펙트와 같은 합산·단독 경로(sql/020)
+  ship: z.enum(SHIP_CD).nullable().optional(),
 }
 
 // 등록·수정 본문. submit=true 면 APPLYING 신청(비공개 연락처 필수), 아니면 DRAFT 저장
@@ -273,7 +276,7 @@ export interface PublicSite {
 }
 
 // 소유자·관리자 조회 컬럼 — 비공개 연락처·상태·반려 사유 포함
-export const OWNER_SITE_COLS = `${PUBLIC_SITE_COLS}, site_sts_cd, rjct_rsn_cd, rjct_rsn_cont, pvt_cntc_txt, plan_cd, pymnt_id, pay_dtm, aply_dtm, use_bgn_dtm, use_end_dtm, spk_yn, spk_pymnt_id, spk_pay_dtm, efct_cd, efct_pymnt_id, efct_pay_dtm, reg_dtm, mod_dtm`
+export const OWNER_SITE_COLS = `${PUBLIC_SITE_COLS}, site_sts_cd, rjct_rsn_cd, rjct_rsn_cont, pvt_cntc_txt, plan_cd, pymnt_id, pay_dtm, aply_dtm, use_bgn_dtm, use_end_dtm, spk_yn, spk_pymnt_id, spk_pay_dtm, efct_cd, efct_pymnt_id, efct_pay_dtm, ship_cd, ship_pymnt_id, ship_pay_dtm, reg_dtm, mod_dtm`
 
 // RPC 가 돌려준 site_mst 전체 행에서 소유자 응답 컬럼만 추림
 export const pickOwnerSite = (row: Record<string, unknown>) =>
@@ -298,6 +301,9 @@ export interface OwnerSite extends PublicSite {
   efct_cd: EfctCd | null // 버블 이펙트 선택(궤도·펄스·혜성)
   efct_pymnt_id: string | null // 이펙트 결제ID — null 이면 미결제
   efct_pay_dtm: string | null
+  ship_cd: ShipPaidCd | null // 워프 우주선 선택(유료 4종, null = 기본 SAUCER)
+  ship_pymnt_id: string | null // 우주선 결제ID — null 이면 미결제
+  ship_pay_dtm: string | null
   rjct_rsn_cd: string | null
   rjct_rsn_cont: string | null
   pvt_cntc_txt: string | null
@@ -326,6 +332,16 @@ export const effectOn = (s: {
     s.own_site_yn === 'Y' ||
     (s.site_dom_nm != null && EFCT_TRIAL_DOMAINS.has(s.site_dom_nm)))
     ? s.efct_cd
+    : null
+
+// 우주선 노출 조건 — 선택 + (결제 완료 또는 자사). 아니면 null = 기본 SAUCER. 상태(IN_USE)는 호출처 쿼리가 거른다(sql/020)
+export const shipOn = (s: {
+  ship_cd: ShipPaidCd | null
+  ship_pay_dtm: string | null
+  own_site_yn: 'Y' | 'N'
+}): ShipPaidCd | null =>
+  s.ship_cd && (s.ship_pay_dtm != null || s.own_site_yn === 'Y')
+    ? s.ship_cd
     : null
 
 export const isSparkleOn = (s: {
@@ -406,6 +422,7 @@ export interface BubbleItem {
   sample?: boolean // 데모 화면 전용 가상 샘플(src/data/sample-sites.json) — 배지 "샘플", 상세 이동 없음
   url?: string // 연결 주소 재지정(sitemap/sites.json url) — 있으면 버블 클릭 시 상세 대신 이동 안내 후 이 주소로
   effect?: EfctCd | null // 부가서비스 "버블 이펙트"(궤도·펄스·혜성) — effectOn(sql/017), 샘플은 항상 null
+  ship?: ShipPaidCd | null // 부가서비스 "워프 우주선" — 이동 안내 기체, shipOn(sql/020), null = 기본 SAUCER
   sparkle?: boolean // 부가서비스 "반짝임"(요금제 외 추가요금 결제) — 버블에 반짝임 효과. 실사이트는 isSparkleOn(sql/013), 샘플은 항상 false
 }
 

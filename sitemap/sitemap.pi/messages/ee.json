@@ -221,7 +221,8 @@
     "reapplyOpen": "Taotle uuesti",
     "spk": "Sädeluse lisandmoodul",
     "spkGo": "Maksa {amount} Pi sädeluse lisandmooduli eest",
-    "efctGo": "Maksa {amount} Pi mulli efekti eest"
+    "efctGo": "Maksa {amount} Pi mulli efekti eest",
+    "shipGo": "Maksa {amount} Pi Warp-kosmoselaeva eest"
   },
   "pay": {
     "payNow": "Maksa {amount} Pi kasutustasu ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Sädeluse lisandmoodul on juba makstud.",
     "efct": "Mulli efekt",
     "payNowEfct": "Maksa {amount} Pi mulli efekti eest",
-    "efctAlreadyPaid": "Mulli efekt on juba makstud."
+    "efctAlreadyPaid": "Mulli efekt on juba makstud.",
+    "ship": "Warp-kosmoselaev",
+    "payNowShip": "Maksa {amount} Pi Warp-kosmoselaeva eest",
+    "shipAlreadyPaid": "Warp-kosmoselaeva eest on tasutud."
   },
   "form": {
     "newTitle": "Lisa sait",
@@ -283,7 +287,12 @@
     "efct": "Mulli efekt",
     "efctNone": "Puudub",
     "efctHint": "Üks paketi kohta — Orbiit (satelliit tiirleb mulli ümber), Pulss (hingav lainetus), Komeet (järeljooksev saba). Makstakse koos kasutustasuga või valitakse redigeerimisel kasutamise ajal eraldi maksega. Saab kombineerida Sädelusega.",
-    "efctPaid": "Makstud — jääb sisse kasutusperioodiks."
+    "efctPaid": "Makstud — jääb sisse kasutusperioodiks.",
+    "ship": "Warp-kosmoselaev",
+    "shipFree": "Põhiline·Tasuta",
+    "shipSoon": "Tasulised kosmoselaevad on ettevalmistamisel. Praegu kuvatakse neid põhiliste kettaristlejatena.",
+    "shipHint": "See on warp-juhtkosmoselaev, mis ilmub, kui külastajad teie saidile navigeerivad. Põhivalik on Saucer Cruiser (tasuta) ja saate valida ühe neljast tasulisest valikust. See tasutakse koos kasutusmaksuga ja saate seda kasutamise ajal valida ja lisatasu maksta.",
+    "shipPaid": "Makse sooritatud – säilitatakse kasutusaja jooksul."
   },
   "admin": {
     "title": "Saidi haldus",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Sinu kontot ei õnnestunud salvestada, seega sisselogimine ebaõnnestus. Palun proovi hiljem uuesti.",
     "PAY_NOT_REQUIRED": "See sait ei vaja makset.",
     "PAY_ALREADY_PAID": "See taotlus on juba makstud. Plaani muutmiseks või tagasivõtmiseks võta ühendust administraatoriga.",
+    "SHIP_UNAVAILABLE": "Warp-kosmoselaeva lisateenused on ettevalmistamisel. Saate endiselt tasuda tasude, sädeluste ja efektide eest.",
     "PAY_SITE_MISMATCH": "Makse ei vasta sellele taotlusele.",
     "PAY_AMOUNT_SHORT": "Maksesumma ei vasta tasule.",
     "PAY_PI_APPROVE_FAILED": "Pi makse kinnitamine ebaõnnestus. Palun proovi hiljem uuesti.",
@@ -401,5 +411,12 @@
     "ORBIT": "Orbiidi efekt",
     "PULSE": "Pulsi efekt",
     "COMET": "Komeedi efekt"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Bridge Viewscreen",
+    "TWIN": "Twin-Wing Interceptor",
+    "DAGGER": "Dagger Assault Fighter",
+    "CROSS": "Risttiib-hävitaja"
   }
 }

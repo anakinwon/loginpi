@@ -221,7 +221,8 @@
     "reapplyOpen": "Mohon lagi",
     "spk": "Tambahan Kilauan",
     "spkGo": "Bayar {amount} Pi untuk tambahan kilauan",
-    "efctGo": "Bayar {amount} Pi untuk kesan buih"
+    "efctGo": "Bayar {amount} Pi untuk kesan buih",
+    "shipGo": "Bayar {amount} Pi untuk Kapal Angkasa Warp"
   },
   "pay": {
     "payNow": "Bayar yuran penggunaan {amount} Pi ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Tambahan kilauan telah dibayar.",
     "efct": "Kesan buih",
     "payNowEfct": "Bayar {amount} Pi untuk kesan buih",
-    "efctAlreadyPaid": "Kesan buih telah dibayar."
+    "efctAlreadyPaid": "Kesan buih telah dibayar.",
+    "ship": "Kapal Angkasa Warp",
+    "payNowShip": "Bayar {amount} Pi untuk Kapal Angkasa Warp",
+    "shipAlreadyPaid": "Pembayaran Kapal Angkasa Warp telah selesai."
   },
   "form": {
     "newTitle": "Senaraikan tapak",
@@ -283,7 +287,12 @@
     "efct": "Kesan buih",
     "efctNone": "Tiada",
     "efctHint": "Satu setiap pelan — Orbit (satelit mengelilingi buih), Pulse (riak pernafasan), Comet (ekor mengekori). Dibayar dengan yuran penggunaan, atau dipilih dalam Edit semasa digunakan dengan pembayaran berasingan. Boleh digabungkan dengan Kilauan.",
-    "efctPaid": "Dibayar — kekal aktif untuk tempoh penggunaan."
+    "efctPaid": "Dibayar — kekal aktif untuk tempoh penggunaan.",
+    "ship": "Kapal Angkasa Warp",
+    "shipFree": "Asas · Percuma",
+    "shipSoon": "Kapal angkasa berbayar sedang dalam persediaan. Buat masa ini, ia dipaparkan sebagai kapal penjelajah cakera asas.",
+    "shipHint": "Ini ialah kapal angkasa panduan warp yang muncul apabila pelawat pergi ke tapak. Asasnya ialah kapal penjelajah cakera (percuma), dan anda boleh memilih satu daripada empat jenis berbayar. Ia dibayar bersama dengan yuran penggunaan, dan anda boleh memilih dan membuat pembayaran tambahan daripada pengubahsuaian semasa digunakan.",
+    "shipPaid": "Pembayaran selesai — akan dikekalkan sepanjang tempoh penggunaan."
   },
   "admin": {
     "title": "Admin tapak",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Tidak dapat menyimpan akaun anda, jadi log masuk gagal. Sila cuba lagi nanti.",
     "PAY_NOT_REQUIRED": "Tapak ini tidak memerlukan pembayaran.",
     "PAY_ALREADY_PAID": "Permohonan ini sudah dibayar. Hubungi pentadbir untuk menukar pelan atau menarik diri.",
+    "SHIP_UNAVAILABLE": "Tambahan kapal angkasa warp sedang dalam persediaan. Anda masih boleh membayar yuran, kilauan dan kesan.",
     "PAY_SITE_MISMATCH": "Pembayaran tidak sepadan dengan permohonan ini.",
     "PAY_AMOUNT_SHORT": "Jumlah pembayaran tidak sepadan dengan yuran.",
     "PAY_PI_APPROVE_FAILED": "Kelulusan pembayaran Pi gagal. Sila cuba lagi nanti.",
@@ -401,5 +411,12 @@
     "ORBIT": "Kesan Orbit",
     "PULSE": "Kesan Denyutan",
     "COMET": "Kesan Komet"
+  },
+  "ship": {
+    "SAUCER": "Kapal Penjelajah Cakera",
+    "BRIDGE": "Skrin Pandangan Jambatan",
+    "TWIN": "Pemintas Sayap Berkembar",
+    "DAGGER": "Penyerang Belati",
+    "CROSS": "Pejuang Sayap Silang"
   }
 }

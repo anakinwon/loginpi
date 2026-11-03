@@ -221,7 +221,8 @@
     "reapplyOpen": "Ansök igen",
     "spk": "Glittertillägg",
     "spkGo": "Betala {amount} Pi för glittertillägget",
-    "efctGo": "Betala {amount} Pi för bubbeleffekten"
+    "efctGo": "Betala {amount} Pi för bubbeleffekten",
+    "shipGo": "Betala {amount} Pi för Warp Spaceship"
   },
   "pay": {
     "payNow": "Betala {amount} Pi användningsavgift ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Glittertillägget är redan betalt.",
     "efct": "Bubbeleffekt",
     "payNowEfct": "Betala {amount} Pi för bubbeleffekten",
-    "efctAlreadyPaid": "Bubbeleffekten är redan betald."
+    "efctAlreadyPaid": "Bubbeleffekten är redan betald.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Betala {amount} Pi för Warp Spaceship",
+    "shipAlreadyPaid": "Betalning för Warp Spaceship har slutförts."
   },
   "form": {
     "newTitle": "Lista en sajt",
@@ -283,7 +287,12 @@
     "efct": "Bubbeleffekt",
     "efctNone": "Ingen",
     "efctHint": "En per plan — Orbit (en satellit cirklar bubblan), Puls (andningsvåg), Komet (efterföljande svans). Betalas med användningsavgiften, eller väljs i Redigera under användning med en separat betalning. Kan kombineras med Glitter.",
-    "efctPaid": "Betald — förblir aktiv under användningsperioden."
+    "efctPaid": "Betald — förblir aktiv under användningsperioden.",
+    "ship": "Warp Spaceship",
+    "shipFree": "Grundläggande·Gratis",
+    "shipSoon": "Betalda rymdskepp förbereds. För närvarande visas de som grundläggande skivkryssare.",
+    "shipHint": "Detta är det warp-guide-rymdskepp som visas när besökare navigerar till din webbplats. Grundalternativet är Saucer Cruiser (gratis), och du kan välja ett av fyra betalda alternativ. Det betalas tillsammans med användningsavgiften, och du kan välja och göra ytterligare betalningar under användning.",
+    "shipPaid": "Betalning slutförd — bibehålls under användningstiden."
   },
   "admin": {
     "title": "Sajtadmin",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Kunde inte spara ditt konto, så inloggningen misslyckades. Försök igen senare.",
     "PAY_NOT_REQUIRED": "Denna webbplats kräver ingen betalning.",
     "PAY_ALREADY_PAID": "Denna ansökan är redan betald. Kontakta en administratör för att ändra plan eller dra tillbaka.",
+    "SHIP_UNAVAILABLE": "Tillägg för warpskepp förbereds. Du kan fortfarande betala för avgifter, gnistor och effekter.",
     "PAY_SITE_MISMATCH": "Betalningen matchar inte denna ansökan.",
     "PAY_AMOUNT_SHORT": "Betalningsbeloppet matchar inte avgiften.",
     "PAY_PI_APPROVE_FAILED": "Godkännande av Pi-betalning misslyckades. Försök igen senare.",
@@ -401,5 +411,12 @@
     "ORBIT": "Orbit-effekt",
     "PULSE": "Puls-effekt",
     "COMET": "Komet-effekt"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Bridge Viewscreen",
+    "TWIN": "Twin-Wing Interceptor",
+    "DAGGER": "Dagger Assault Fighter",
+    "CROSS": "Kryssvingad stridsflygplan"
   }
 }

@@ -221,7 +221,8 @@
     "reapplyOpen": "Aplică din nou",
     "spk": "Add-on Scânteie",
     "spkGo": "Plătește {amount} Pi pentru add-on-ul Scânteie",
-    "efctGo": "Plătește {amount} Pi pentru efectul de bulă"
+    "efctGo": "Plătește {amount} Pi pentru efectul de bulă",
+    "shipGo": "Plătește {amount} Pi pentru nava spațială Warp"
   },
   "pay": {
     "payNow": "Plătește taxa de utilizare {amount} Pi ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Add-on-ul Scânteie este deja plătit.",
     "efct": "Efect de bulă",
     "payNowEfct": "Plătește {amount} Pi pentru efectul de bulă",
-    "efctAlreadyPaid": "Efectul de bulă este deja plătit."
+    "efctAlreadyPaid": "Efectul de bulă este deja plătit.",
+    "ship": "Nava spațială Warp",
+    "payNowShip": "Plătește {amount} Pi pentru nava spațială Warp",
+    "shipAlreadyPaid": "Plata pentru nava spațială Warp a fost finalizată."
   },
   "form": {
     "newTitle": "Listează un site",
@@ -283,7 +287,12 @@
     "efct": "Efect de bulă",
     "efctNone": "Niciunul",
     "efctHint": "Unul per plan — Orbită (un satelit orbitează bula), Puls (ondulație de respirație), Cometă (coadă de urmă). Plătit cu taxa de utilizare, sau ales în Editare în timpul utilizării cu o plată separată. Poate fi combinat cu Scânteie.",
-    "efctPaid": "Plătit — rămâne activ pe durata perioadei de utilizare."
+    "efctPaid": "Plătit — rămâne activ pe durata perioadei de utilizare.",
+    "ship": "Nava spațială Warp",
+    "shipFree": "De bază·Gratuit",
+    "shipSoon": "Navele spațiale plătite sunt în pregătire. Deocamdată, acestea sunt afișate ca nave de croazieră cu disc de bază.",
+    "shipHint": "Aceasta este nava spațială de ghidare Warp care apare atunci când vizitatorii navighează pe site-ul dvs. Opțiunea de bază este Crucișătorul Farfurie (gratuit), și puteți alege una dintre cele patru opțiuni plătite. Se plătește împreună cu taxa de utilizare, și puteți selecta și efectua plăți suplimentare în timpul utilizării.",
+    "shipPaid": "Plată finalizată — menținută pe durata utilizării."
   },
   "admin": {
     "title": "Administrare site",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Nu s-a putut salva contul dvs., deci autentificarea a eșuat. Vă rugăm să încercați din nou mai târziu.",
     "PAY_NOT_REQUIRED": "Acest site nu necesită plată.",
     "PAY_ALREADY_PAID": "Această aplicație este deja plătită. Contactați un administrator pentru a schimba planul sau a retrage.",
+    "SHIP_UNAVAILABLE": "Suplimentele pentru navele spațiale warp sunt în pregătire. Puteți plăti în continuare taxele, sclipirile și efectele.",
     "PAY_SITE_MISMATCH": "Plata nu se potrivește cu această aplicație.",
     "PAY_AMOUNT_SHORT": "Suma plătită nu se potrivește cu taxa.",
     "PAY_PI_APPROVE_FAILED": "Aprobarea plății Pi a eșuat. Vă rugăm să încercați din nou mai târziu.",
@@ -401,5 +411,12 @@
     "ORBIT": "Efect de orbită",
     "PULSE": "Efect de puls",
     "COMET": "Efect de cometă"
+  },
+  "ship": {
+    "SAUCER": "Crucișătorul Farfurie",
+    "BRIDGE": "Ecranul de vizualizare al punții",
+    "TWIN": "Interceptor cu aripi duble",
+    "DAGGER": "Luptător de asalt Dagger",
+    "CROSS": "Avion de luptă cu aripi în cruce"
   }
 }

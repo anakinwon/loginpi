@@ -221,7 +221,8 @@
     "reapplyOpen": "Torna a sol·licitar",
     "spk": "Complement Sparkle",
     "spkGo": "Paga {amount} Pi pel complement Sparkle",
-    "efctGo": "Paga {amount} Pi per l'efecte de bombolla"
+    "efctGo": "Paga {amount} Pi per l'efecte de bombolla",
+    "shipGo": "Pagar {amount} Pi per la nau espacial de curvatura"
   },
   "pay": {
     "payNow": "Paga {amount} Pi de tarifa d'ús ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "El complement Sparkle ja està pagat.",
     "efct": "Efecte de bombolla",
     "payNowEfct": "Paga {amount} Pi per l'efecte de bombolla",
-    "efctAlreadyPaid": "L'efecte de bombolla ja està pagat."
+    "efctAlreadyPaid": "L'efecte de bombolla ja està pagat.",
+    "ship": "Nau espacial de curvatura",
+    "payNowShip": "Pagar {amount} Pi per la nau espacial de curvatura",
+    "shipAlreadyPaid": "El pagament de la nau espacial de curvatura s'ha completat."
   },
   "form": {
     "newTitle": "Llistar un lloc",
@@ -283,7 +287,12 @@
     "efct": "Efecte de bombolla",
     "efctNone": "Cap",
     "efctHint": "Un per pla — Òrbita (un satèl·lit envolta la bombolla), Puls (ona respiratòria), Cometa (cua de rastre). Es paga amb la tarifa d'ús, o es tria a Edita mentre està en ús amb un pagament separat. Es pot combinar amb Sparkle.",
-    "efctPaid": "Pagat — es manté activat durant el període d'ús."
+    "efctPaid": "Pagat — es manté activat durant el període d'ús.",
+    "ship": "Nau espacial de curvatura",
+    "shipFree": "Bàsic·Gratuït",
+    "shipSoon": "Les naus espacials de pagament estan en preparació. Ara mateix es mostren com a creuers de disc bàsics.",
+    "shipHint": "Aquesta és la nau espacial de guia de curvatura que apareix quan els visitants naveguen al vostre lloc. L'opció bàsica és el Creuer Plat (gratuït), i podeu triar una de les quatre opcions de pagament. Es paga juntament amb la tarifa d'ús, i podeu seleccionar i fer pagaments addicionals durant l'ús.",
+    "shipPaid": "Pagament completat — es manté durant la durada de l'ús."
   },
   "admin": {
     "title": "Administració del lloc",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "No s'ha pogut desar el vostre compte, per la qual cosa l'inici de sessió ha fallat. Torneu-ho a provar més tard.",
     "PAY_NOT_REQUIRED": "Aquest lloc no requereix pagament.",
     "PAY_ALREADY_PAID": "Aquesta sol·licitud ja està pagada. Contacteu amb un administrador per canviar el pla o retirar-la.",
+    "SHIP_UNAVAILABLE": "Els complements de la nau espacial de curvatura estan en preparació. Encara podeu pagar les tarifes, les brillantors i els efectes.",
     "PAY_SITE_MISMATCH": "El pagament no coincideix amb aquesta sol·licitud.",
     "PAY_AMOUNT_SHORT": "L'import del pagament no coincideix amb la tarifa.",
     "PAY_PI_APPROVE_FAILED": "L'aprovació del pagament de Pi ha fallat. Torneu-ho a provar més tard.",
@@ -401,5 +411,12 @@
     "ORBIT": "Efecte òrbita",
     "PULSE": "Efecte pols",
     "COMET": "Efecte cometa"
+  },
+  "ship": {
+    "SAUCER": "Creuer Plat",
+    "BRIDGE": "Pantalla de visualització del pont",
+    "TWIN": "Interceptor d'ala doble",
+    "DAGGER": "Caça d'assalt Dagger",
+    "CROSS": "Caça d'ala en creu"
   }
 }

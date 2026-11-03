@@ -221,7 +221,8 @@
     "reapplyOpen": "Tekrar başvur",
     "spk": "Parıltı eklentisi",
     "spkGo": "Parıltı eklentisi için {amount} Pi öde",
-    "efctGo": "Baloncuk efekti için {amount} Pi öde"
+    "efctGo": "Baloncuk efekti için {amount} Pi öde",
+    "shipGo": "Warp Uzay Gemisi için {amount} Pi öde"
   },
   "pay": {
     "payNow": "{amount} Pi kullanım ücretini öde ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Parıltı eklentisi zaten ödendi.",
     "efct": "Baloncuk efekti",
     "payNowEfct": "Baloncuk efekti için {amount} Pi öde",
-    "efctAlreadyPaid": "Baloncuk efekti zaten ödendi."
+    "efctAlreadyPaid": "Baloncuk efekti zaten ödendi.",
+    "ship": "Warp Uzay Gemisi",
+    "payNowShip": "Warp Uzay Gemisi için {amount} Pi öde",
+    "shipAlreadyPaid": "Warp Uzay Gemisi ödemesi tamamlandı."
   },
   "form": {
     "newTitle": "Bir site listele",
@@ -283,7 +287,12 @@
     "efct": "Baloncuk efekti",
     "efctNone": "Yok",
     "efctHint": "Plana göre bir tane — Yörünge (bir uydu baloncuğun etrafında döner), Nabız (nefes alan dalgalanma), Kuyruklu yıldız (iz bırakan kuyruk). Kullanım ücretiyle birlikte ödenir veya kullanımdayken Düzenle'de seçilir ve ayrı bir ödeme ile ödenir. Parıltı ile birleştirilebilir.",
-    "efctPaid": "Ödendi — kullanım süresi boyunca açık kalır."
+    "efctPaid": "Ödendi — kullanım süresi boyunca açık kalır.",
+    "ship": "Warp Uzay Gemisi",
+    "shipFree": "Temel·Ücretsiz",
+    "shipSoon": "Ücretli uzay gemileri hazırlanıyor. Şimdilik temel disk kruvazörleri olarak görüntüleniyorlar.",
+    "shipHint": "Bu, ziyaretçiler sitenize gittiğinde görünen warp rehber uzay gemisidir. Temel seçenek Saucer Cruiser (ücretsiz) olup, dört ücretli seçenekten birini seçebilirsiniz. Kullanım ücretiyle birlikte ödenir ve kullanım sırasında düzenleyerek ek ödeme yapabilirsiniz.",
+    "shipPaid": "Ödeme tamamlandı — kullanım süresi boyunca korunur."
   },
   "admin": {
     "title": "Site yöneticisi",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Hesabınız kaydedilemediği için giriş yapılamadı. Lütfen daha sonra tekrar deneyin.",
     "PAY_NOT_REQUIRED": "Bu site ödeme gerektirmiyor.",
     "PAY_ALREADY_PAID": "Bu başvuru zaten ödendi. Planı değiştirmek veya geri çekmek için bir yöneticiyle iletişime geçin.",
+    "SHIP_UNAVAILABLE": "Warp uzay gemisi eklentileri hazırlanıyor. Ücretleri, parıltıları ve efektleri ödemeye devam edebilirsiniz.",
     "PAY_SITE_MISMATCH": "Ödeme bu başvuruyla eşleşmiyor.",
     "PAY_AMOUNT_SHORT": "Ödeme miktarı ücretle eşleşmiyor.",
     "PAY_PI_APPROVE_FAILED": "Pi ödeme onayı başarısız oldu. Lütfen daha sonra tekrar deneyin.",
@@ -401,5 +411,12 @@
     "ORBIT": "Yörünge efekti",
     "PULSE": "Nabız efekti",
     "COMET": "Kuyruklu yıldız efekti"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Köprü Görüş Ekranı",
+    "TWIN": "Çift Kanatlı Önleyici",
+    "DAGGER": "Hançer Saldırı Savaşçısı",
+    "CROSS": "Çapraz kanatlı savaşçı"
   }
 }

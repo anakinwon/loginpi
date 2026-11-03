@@ -221,7 +221,8 @@
     "reapplyOpen": "Đăng ký lại",
     "spk": "Tiện ích bổ sung lấp lánh",
     "spkGo": "Thanh toán {amount} Pi cho tiện ích bổ sung lấp lánh",
-    "efctGo": "Thanh toán {amount} Pi cho hiệu ứng bong bóng"
+    "efctGo": "Thanh toán {amount} Pi cho hiệu ứng bong bóng",
+    "shipGo": "Thanh toán {amount} Pi cho Tàu vũ trụ Warp"
   },
   "pay": {
     "payNow": "Thanh toán phí sử dụng {amount} Pi ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Tiện ích bổ sung lấp lánh đã được thanh toán.",
     "efct": "Hiệu ứng bong bóng",
     "payNowEfct": "Thanh toán {amount} Pi cho hiệu ứng bong bóng",
-    "efctAlreadyPaid": "Hiệu ứng bong bóng đã được thanh toán."
+    "efctAlreadyPaid": "Hiệu ứng bong bóng đã được thanh toán.",
+    "ship": "Tàu vũ trụ Warp",
+    "payNowShip": "Thanh toán {amount} Pi cho Tàu vũ trụ Warp",
+    "shipAlreadyPaid": "Thanh toán Tàu vũ trụ Warp đã hoàn tất."
   },
   "form": {
     "newTitle": "Liệt kê một trang web",
@@ -283,7 +287,12 @@
     "efct": "Hiệu ứng bong bóng",
     "efctNone": "Không có",
     "efctHint": "Một loại cho mỗi gói — Quỹ đạo (một vệ tinh quay quanh bong bóng), Xung (gợn sóng thở), Sao chổi (đuôi kéo dài). Được thanh toán cùng với phí sử dụng, hoặc được chọn trong Chỉnh sửa khi đang sử dụng với một khoản thanh toán riêng. Có thể kết hợp với Lấp lánh.",
-    "efctPaid": "Đã thanh toán — duy trì trong thời gian sử dụng."
+    "efctPaid": "Đã thanh toán — duy trì trong thời gian sử dụng.",
+    "ship": "Tàu vũ trụ Warp",
+    "shipFree": "Mặc định·Miễn phí",
+    "shipSoon": "Tàu vũ trụ trả phí đang được chuẩn bị. Hiện tại, nó được hiển thị dưới dạng tàu tuần dương đĩa cơ bản.",
+    "shipHint": "Đây là tàu vũ trụ hướng dẫn warp xuất hiện khi khách truy cập điều hướng đến trang web. Mặc định là Tàu tuần dương đĩa bay (miễn phí) và bạn có thể chọn một trong bốn loại trả phí. Nó được thanh toán cùng với phí sử dụng và có thể được chọn và thanh toán bổ sung trong quá trình sử dụng.",
+    "shipPaid": "Đã thanh toán — sẽ được duy trì trong suốt thời gian sử dụng."
   },
   "admin": {
     "title": "Quản trị trang web",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Không thể lưu thông tin người dùng nên đăng nhập thất bại. Vui lòng thử lại sau.",
     "PAY_NOT_REQUIRED": "Trang web này không yêu cầu thanh toán.",
     "PAY_ALREADY_PAID": "Đơn đăng ký này đã được thanh toán. Để thay đổi gói cước hoặc rút lại, vui lòng liên hệ quản trị viên.",
+    "SHIP_UNAVAILABLE": "Tiện ích bổ sung tàu vũ trụ Warp đang được chuẩn bị. Bạn vẫn có thể thanh toán phí, hiệu ứng lấp lánh và hiệu ứng.",
     "PAY_SITE_MISMATCH": "Thông tin thanh toán không khớp với nội dung đăng ký.",
     "PAY_AMOUNT_SHORT": "Số tiền thanh toán không khớp với phí.",
     "PAY_PI_APPROVE_FAILED": "Phê duyệt thanh toán Pi thất bại. Vui lòng thử lại sau.",
@@ -401,5 +411,12 @@
     "ORBIT": "Hiệu ứng quỹ đạo",
     "PULSE": "Hiệu ứng xung",
     "COMET": "Hiệu ứng sao chổi"
+  },
+  "ship": {
+    "SAUCER": "Tàu tuần dương đĩa bay",
+    "BRIDGE": "Màn hình cầu tàu",
+    "TWIN": "Máy bay đánh chặn hai cánh",
+    "DAGGER": "Máy bay tấn công dao găm",
+    "CROSS": "Máy bay chiến đấu cánh chữ thập"
   }
 }

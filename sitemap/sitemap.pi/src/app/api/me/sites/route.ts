@@ -14,7 +14,13 @@ import {
   requireUser,
   verifyToken,
 } from '@/lib/api'
-import { LIMITS, OWNER_SITE_COLS, siteInputSchema } from '@/lib/site'
+import {
+  LIMITS,
+  OWNER_SITE_COLS,
+  siteInputSchema,
+  type OwnerSite,
+} from '@/lib/site'
+import { omitShip, selectWithShip } from '@/lib/ship-compat'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,13 +30,18 @@ export const GET = withGuard(
     if (user instanceof NextResponse) return user
     const page = pageParam(req)
     const size = LIMITS.adminPageSize
-    const { data, error, count } = await db()
-      .from('site_mst')
-      .select(OWNER_SITE_COLS, { count: 'exact' })
-      .eq('ownr_usr_id', user.id)
-      .eq('del_yn', 'N')
-      .order('reg_dtm', { ascending: false })
-      .range((page - 1) * size, page * size - 1)
+    const { data, error, count } = await selectWithShip(
+      OWNER_SITE_COLS,
+      (cols) =>
+        db()
+          .from('site_mst')
+          .select(cols, { count: 'exact' })
+          .eq('ownr_usr_id', user.id)
+          .eq('del_yn', 'N')
+          .order('reg_dtm', { ascending: false })
+          .range((page - 1) * size, page * size - 1)
+          .overrideTypes<OwnerSite[], { merge: false }>(),
+    )
     if (error) return dbFail(error)
     return NextResponse.json({
       items: (data ?? []).map((s) => ({
@@ -58,35 +69,46 @@ export const POST = withAuthGuard(
     })
     if (denied) return denied
 
-    const { data, error } = await db()
-      .from('site_mst')
-      .insert({
-        site_dom_nm: body.domain,
-        site_nm: body.name,
-        site_ctgr_cd: body.ctgr,
-        site_desc: body.desc ?? null,
-        site_img_url: body.imgUrl ?? null,
-        site_mv_url: body.mvUrl ?? null,
-        plan_cd: body.planCd,
-        spk_yn: body.spk ? 'Y' : 'N',
-        efct_cd: body.efct ?? null,
-        pvt_cntc_txt: body.pvtCntc ?? null,
-        pub_cntc_txt: body.pubCntc ?? null,
-        site_sts_cd: body.submit ? 'APPLYING' : 'DRAFT',
-        aply_dtm: body.submit ? new Date().toISOString() : null,
-        ownr_usr_id: user.id,
-        own_site_yn: 'N',
-        regr_id: user.id,
-        modr_id: user.id,
-      })
-      .select(OWNER_SITE_COLS)
-      .single()
+    // ship_* 칼럼(sql/020) 없는 DB 는 ship 빼고 저장 → 응답 shipUnavailable
+    const { data, error, shipOff } = await selectWithShip(
+      OWNER_SITE_COLS,
+      (cols, off) => {
+        const row = {
+          site_dom_nm: body.domain,
+          site_nm: body.name,
+          site_ctgr_cd: body.ctgr,
+          site_desc: body.desc ?? null,
+          site_img_url: body.imgUrl ?? null,
+          site_mv_url: body.mvUrl ?? null,
+          plan_cd: body.planCd,
+          spk_yn: body.spk ? 'Y' : 'N',
+          efct_cd: body.efct ?? null,
+          ship_cd: body.ship ?? null,
+          pvt_cntc_txt: body.pvtCntc ?? null,
+          pub_cntc_txt: body.pubCntc ?? null,
+          site_sts_cd: body.submit ? 'APPLYING' : 'DRAFT',
+          aply_dtm: body.submit ? new Date().toISOString() : null,
+          ownr_usr_id: user.id,
+          own_site_yn: 'N',
+          regr_id: user.id,
+          modr_id: user.id,
+        }
+        return db()
+          .from('site_mst')
+          .insert(off ? omitShip(row) : row)
+          .select(cols)
+          .single()
+      },
+    )
     if (error) {
       if (error.code === '23505') return apiError('DUPLICATE_DOMAIN', 409)
       if (error.code === '23514') return apiError('INVALID_INPUT', 400)
       return dbFail(error)
     }
-    return NextResponse.json({ site: data }, { status: 201 })
+    return NextResponse.json(
+      { site: data, ...(shipOff && { shipUnavailable: true }) },
+      { status: 201 },
+    )
   }),
   { maxBodySize: 16_384 },
 )

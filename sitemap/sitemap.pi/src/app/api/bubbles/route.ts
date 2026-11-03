@@ -5,12 +5,15 @@ import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import { resolveDbConfig } from '@pi/db'
 import registry from '../../../../../sites.json'
+import type { ShipPaidCd } from '@/lib/ship'
 import samples from '@/data/sample-sites.json'
 import { apiError, db, PUBLIC_CACHE } from '@/lib/api'
+import { selectWithShip } from '@/lib/ship-compat'
 import {
   BUBBLE_DAYS,
   effectOn,
   isSparkleOn,
+  shipOn,
   type EfctCd,
   MV_URL_RE,
   PLAN_CD,
@@ -38,7 +41,7 @@ const samplePct = (domain: string) => {
 }
 
 // 부가서비스(반짝임·이펙트)는 샘플에 붙이지 않는다 — 시연은 자사 실사이트 site_mst.spk_yn·efct_cd 로(마스터 지시 2026-10-14, 샘플 데모 폐기).
-// 실사이트는 isSparkleOn(sql/013)·effectOn(sql/017) — 결제 전엔 붙이지 않는다(미결제 유료 표시 금지, 자사 예외)
+// 실사이트는 isSparkleOn(sql/013)·effectOn(sql/017)·shipOn(sql/020) — 결제 전엔 붙이지 않는다(미결제 유료 표시 금지, 자사 예외)
 
 // 연결 주소 재지정 — .pi 도메인은 일반 브라우저에서 열리지 않으므로 레지스트리에 url 이 있으면 그 주소로 이동
 // (cafe.pi → https://cafepi.vercel.app/, 마스터 지시 2026-10-10). DB 행에도 도메인으로 적용
@@ -90,20 +93,42 @@ function demo(period: BubblePeriod, ctgr: string | null): BubbleResponse {
   return { items: withSamples(items, ctgr), period, demo: true }
 }
 
+type BubbleRow = {
+  site_id: string
+  site_dom_nm: string
+  site_nm: string
+  site_ctgr_cd: SiteCtgr
+  site_img_url: string | null
+  site_mv_url: string | null
+  plan_cd: PlanCd
+  own_site_yn: 'Y' | 'N'
+  spk_yn: 'Y' | 'N'
+  spk_pay_dtm: string | null
+  efct_cd: string | null
+  efct_pay_dtm: string | null
+  ship_cd: string | null
+  ship_pay_dtm: string | null
+}
+
 async function load(
   period: BubblePeriod,
   ctgr: string | null,
 ): Promise<BubbleResponse | null> {
-  let q = db()
-    .from('site_mst')
-    .select(
-      'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, site_mv_url, plan_cd, own_site_yn, spk_yn, spk_pay_dtm, efct_cd, efct_pay_dtm',
-    )
-    .eq('del_yn', 'N')
-    .eq('site_sts_cd', 'IN_USE')
-  if (ctgr) q = q.eq('site_ctgr_cd', ctgr)
+  // ship_* 칼럼(sql/020) 없는 DB 는 ship 빼고 1회 재시도 → ship=null(기본 SAUCER) — 실패가 데모 폴백으로 번지지 않게
+  const sitesQ = selectWithShip(
+    'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, site_mv_url, plan_cd, own_site_yn, spk_yn, spk_pay_dtm, efct_cd, efct_pay_dtm, ship_cd, ship_pay_dtm',
+    (cols) => {
+      let q = db()
+        .from('site_mst')
+        .select(cols)
+        .eq('del_yn', 'N')
+        .eq('site_sts_cd', 'IN_USE')
+      if (ctgr) q = q.eq('site_ctgr_cd', ctgr)
+      return q.order('apv_dtm', { ascending: false }).limit(MAX_BUBBLES)
+    },
+  )
   const [sites, stats] = await Promise.all([
-    q.order('apv_dtm', { ascending: false }).limit(MAX_BUBBLES),
+    sitesQ,
     db().rpc('fn_sel_stat_site_chg', { p_days: BUBBLE_DAYS[period] }),
   ])
   if (sites.error || stats.error) {
@@ -120,28 +145,32 @@ async function load(
       cur: Number(r.cur_view_cnt),
       prev: Number(r.prev_view_cnt),
     })
-  const items = (sites.data ?? []).map((s): BubbleItem => {
-    const c = chg.get(s.site_id) ?? { cur: 0, prev: 0 }
-    return {
-      id: s.site_id,
-      domain: s.site_dom_nm,
-      name: s.site_nm,
-      ctgr: s.site_ctgr_cd,
-      img: s.site_img_url,
-      // 등록자 입력 이동 URL(site_mv_url) 우선, 없으면 정적 레지스트리 폴백(데이터 모델 §10 ④)
-      url:
-        (s.site_mv_url && MV_URL_RE.test(s.site_mv_url)
-          ? s.site_mv_url
-          : null) ?? REG_URL.get(s.site_dom_nm),
-      plan: s.plan_cd,
-      own: s.own_site_yn === 'Y',
-      views: c.cur,
-      chgPct: pct(c.cur, c.prev),
-      // 반짝임 부가서비스 — 신청 + (결제 완료 또는 자사)
-      sparkle: isSparkleOn(s),
-      effect: effectOn({ ...s, efct_cd: s.efct_cd as EfctCd | null }),
-    }
-  })
+  const items = ((sites.data ?? []) as unknown as BubbleRow[]).map(
+    (s): BubbleItem => {
+      const c = chg.get(s.site_id) ?? { cur: 0, prev: 0 }
+      return {
+        id: s.site_id,
+        domain: s.site_dom_nm,
+        name: s.site_nm,
+        ctgr: s.site_ctgr_cd,
+        img: s.site_img_url,
+        // 등록자 입력 이동 URL(site_mv_url) 우선, 없으면 정적 레지스트리 폴백(데이터 모델 §10 ④)
+        url:
+          (s.site_mv_url && MV_URL_RE.test(s.site_mv_url)
+            ? s.site_mv_url
+            : null) ?? REG_URL.get(s.site_dom_nm),
+        plan: s.plan_cd,
+        own: s.own_site_yn === 'Y',
+        views: c.cur,
+        chgPct: pct(c.cur, c.prev),
+        // 반짝임 부가서비스 — 신청 + (결제 완료 또는 자사)
+        sparkle: isSparkleOn(s),
+        effect: effectOn({ ...s, efct_cd: s.efct_cd as EfctCd | null }),
+        // 워프 우주선 — 이동 안내 기체(미노출 null = 기본 SAUCER)
+        ship: shipOn({ ...s, ship_cd: s.ship_cd as ShipPaidCd | null }),
+      }
+    },
+  )
   return {
     items:
       process.env.SITEMAP_SHOW_SAMPLES === '1'
@@ -169,7 +198,9 @@ export const GET = withGuard(async (req) => {
       console.error('[bubbles]', e)
     }
   }
-  // 폴백은 캐시하지 않는다 — DB 복구 즉시 실데이터로 전환
+  // 폴백은 캐시하지 않는다 — DB 복구 즉시 실데이터로 전환. 설정된 DB 에서 떨어진 폴백은 장애를 가리므로 로그로 남긴다
+  if (!data && url && key)
+    console.error('[bubbles] DB 조회 실패 → 데모 폴백 응답', { period, ctgr })
   return data
     ? NextResponse.json(data, { headers: PUBLIC_CACHE })
     : NextResponse.json(demo(period, ctgr), {

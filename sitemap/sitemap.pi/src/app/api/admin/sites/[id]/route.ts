@@ -6,6 +6,7 @@
 import { NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
 import { hasOtherApprovedPayment } from '@/lib/payments'
+import { omitShip, selectWithShip } from '@/lib/ship-compat'
 import {
   apiError,
   db,
@@ -61,25 +62,36 @@ export const PATCH = withAuthGuard(
         !isOwnImgUrl(body.imgUrl, admin.id)
       )
         return apiError('IMG_URL_INVALID', 400)
-      const { data, error } = await db()
-        .from('site_mst')
-        .update({
-          site_nm: body.name,
-          site_ctgr_cd: body.ctgr,
-          site_desc: body.desc ?? null,
-          site_img_url: body.imgUrl ?? null,
-          pub_cntc_txt: body.pubCntc ?? null,
-          site_mv_url: body.mvUrl ?? null,
-          spk_yn: body.spk ? 'Y' : 'N', // 자사 사이트는 결제 없이 켜짐(isSparkleOn)
-          efct_cd: body.efct ?? null, // 이펙트도 동일(effectOn)
-          modr_id: admin.id,
-        })
-        .eq('site_id', cur.site_id)
-        .select(OWNER_SITE_COLS)
-        .maybeSingle()
+      // ship_* 칼럼(sql/020) 없는 DB 는 ship 빼고 저장 → 응답 shipUnavailable
+      const { data, error, shipOff } = await selectWithShip(
+        OWNER_SITE_COLS,
+        (cols, off) => {
+          const row = {
+            site_nm: body.name,
+            site_ctgr_cd: body.ctgr,
+            site_desc: body.desc ?? null,
+            site_img_url: body.imgUrl ?? null,
+            pub_cntc_txt: body.pubCntc ?? null,
+            site_mv_url: body.mvUrl ?? null,
+            spk_yn: body.spk ? 'Y' : 'N', // 자사 사이트는 결제 없이 켜짐(isSparkleOn)
+            efct_cd: body.efct ?? null, // 이펙트도 동일(effectOn)
+            ship_cd: body.ship ?? null, // 우주선도 동일(shipOn)
+            modr_id: admin.id,
+          }
+          return db()
+            .from('site_mst')
+            .update(off ? omitShip(row) : row)
+            .eq('site_id', cur.site_id)
+            .select(cols)
+            .maybeSingle()
+        },
+      )
       if (error) return dbFail(error)
       if (!data) return apiError('NOT_FOUND', 404)
-      return NextResponse.json({ site: data })
+      return NextResponse.json({
+        site: data,
+        ...(shipOff && { shipUnavailable: true }),
+      })
     }
 
     if (cur.site_sts_cd !== FROM[body.action])
@@ -125,13 +137,15 @@ export const PATCH = withAuthGuard(
           ? { site_sts_cd: 'SUSPENDED', rjct_rsn_cont: body.rsnCont ?? null }
           : { site_sts_cd: expired ? 'USED' : 'IN_USE', rjct_rsn_cont: null }
 
-    const { data, error } = await db()
-      .from('site_mst')
-      .update({ ...patch, modr_id: admin.id })
-      .eq('site_id', cur.site_id)
-      .eq('site_sts_cd', cur.site_sts_cd)
-      .select(OWNER_SITE_COLS)
-      .maybeSingle()
+    const { data, error } = await selectWithShip(OWNER_SITE_COLS, (cols) =>
+      db()
+        .from('site_mst')
+        .update({ ...patch, modr_id: admin.id })
+        .eq('site_id', cur.site_id)
+        .eq('site_sts_cd', cur.site_sts_cd)
+        .select(cols)
+        .maybeSingle(),
+    )
     if (error) {
       // 같은 도메인이 재등록된 상태에서 복구 시 활성 도메인 UNIQUE 충돌
       if (error.code === '23505') return apiError('DUPLICATE_DOMAIN', 409)

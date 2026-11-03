@@ -221,7 +221,8 @@
     "reapplyOpen": "Omba tena",
     "spk": "Nyongeza ya kumeta",
     "spkGo": "Lipa {amount} Pi kwa nyongeza ya kumeta",
-    "efctGo": "Lipa {amount} Pi kwa athari ya bubble"
+    "efctGo": "Lipa {amount} Pi kwa athari ya bubble",
+    "shipGo": "Lipa {amount} Pi kwa Warp Spaceship"
   },
   "pay": {
     "payNow": "Lipa ada ya matumizi ya Pi {amount} ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Nyongeza ya kumeta tayari imelipwa.",
     "efct": "Athari ya bubble",
     "payNowEfct": "Lipa {amount} Pi kwa athari ya bubble",
-    "efctAlreadyPaid": "Athari ya bubble tayari imelipwa."
+    "efctAlreadyPaid": "Athari ya bubble tayari imelipwa.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Lipa {amount} Pi kwa Warp Spaceship",
+    "shipAlreadyPaid": "Malipo ya Warp Spaceship yamekamilika."
   },
   "form": {
     "newTitle": "Orodhesha tovuti",
@@ -283,7 +287,12 @@
     "efct": "Athari ya bubble",
     "efctNone": "Hakuna",
     "efctHint": "Moja kwa kila mpango — Obiti (satelaiti inazunguka bubble), Pulse (mawimbi ya kupumua), Comet (mkia unaofuata). Inalipwa na ada ya matumizi, au kuchaguliwa katika Hariri wakati inatumika na malipo tofauti. Inaweza kuunganishwa na Kumeta.",
-    "efctPaid": "Imelipwa — inakaa kwa kipindi cha matumizi."
+    "efctPaid": "Imelipwa — inakaa kwa kipindi cha matumizi.",
+    "ship": "Warp Spaceship",
+    "shipFree": "Msingi·Bure",
+    "shipSoon": "Meli za kivita zinazolipishwa zinaandaliwa. Kwa sasa, zinaonyeshwa kama meli za kawaida za diski.",
+    "shipHint": "Huu ni usafiri wa anga wa mwongozo wa warp unaoonekana wageni wanapoelekea kwenye tovuti yako. Chaguo la msingi ni Saucer Cruiser (bure), na unaweza kuchagua mojawapo ya chaguo nne zinazolipwa. Inalipwa pamoja na ada ya matumizi, na unaweza kuchagua na kufanya malipo ya ziada wakati wa matumizi.",
+    "shipPaid": "Malipo yamekamilika — yanatunzwa kwa muda wote wa matumizi."
   },
   "admin": {
     "title": "Usimamizi wa tovuti",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Imeshindwa kuhifadhi akaunti yako, kwa hivyo kuingia kumefeli. Tafadhali jaribu tena baadaye.",
     "PAY_NOT_REQUIRED": "Tovuti hii haihitaji malipo.",
     "PAY_ALREADY_PAID": "Ombi hili tayari limelipwa. Wasiliana na msimamizi ili kubadilisha mpango au kujiondoa.",
+    "SHIP_UNAVAILABLE": "Nyongeza za meli za kivita zinaandaliwa. Bado unaweza kulipia ada, mng'ao, na athari.",
     "PAY_SITE_MISMATCH": "Malipo hayalingani na ombi hili.",
     "PAY_AMOUNT_SHORT": "Kiasi cha malipo hailingani na ada.",
     "PAY_PI_APPROVE_FAILED": "Idhini ya malipo ya Pi imeshindwa. Tafadhali jaribu tena baadaye.",
@@ -401,5 +411,12 @@
     "ORBIT": "Athari ya mzunguko",
     "PULSE": "Athari ya mpigo",
     "COMET": "Athari ya kometi"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Skrini ya Daraja",
+    "TWIN": "Ndege ya Kuzuia yenye Mabawa Mawili",
+    "DAGGER": "Ndege ya Kivita ya Dagger",
+    "CROSS": "Mpiganaji wa mrengo-msalaba"
   }
 }

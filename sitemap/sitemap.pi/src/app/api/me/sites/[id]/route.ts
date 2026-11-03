@@ -19,6 +19,7 @@ import {
   uuidParam,
 } from '@/lib/api'
 import { hasOtherApprovedPayment } from '@/lib/payments'
+import { omitShip, selectWithShip } from '@/lib/ship-compat'
 import {
   APPLY_FROM_STS,
   BLOCK_REAPPLY_RSN,
@@ -38,13 +39,15 @@ export const GET = withAuthGuard(
     if (!id) return apiError('INVALID_INPUT', 400)
     const user = await requireUser(req)
     if (user instanceof NextResponse) return user
-    const { data, error } = await db()
-      .from('site_mst')
-      .select(OWNER_SITE_COLS)
-      .eq('site_id', id)
-      .eq('ownr_usr_id', user.id)
-      .eq('del_yn', 'N')
-      .maybeSingle()
+    const { data, error } = await selectWithShip(OWNER_SITE_COLS, (cols) =>
+      db()
+        .from('site_mst')
+        .select(cols)
+        .eq('site_id', id)
+        .eq('ownr_usr_id', user.id)
+        .eq('del_yn', 'N')
+        .maybeSingle(),
+    )
     if (error) return dbFail(error)
     if (!data) return apiError('NOT_FOUND', 404)
     return NextResponse.json({ site: data })
@@ -65,27 +68,31 @@ export const PATCH = withAuthGuard(
       return apiError('BAD_REQUEST_BODY', 400)
     }
 
-    const { data: cur, error: curErr } = await db()
-      .from('site_mst')
-      .select(
-        'site_id, site_dom_nm, site_sts_cd, rjct_rsn_cd, plan_cd, pymnt_id, site_mv_url, spk_yn, spk_pymnt_id, efct_cd, efct_pymnt_id',
-      )
-      .eq('site_id', id)
-      .eq('ownr_usr_id', user.id)
-      .eq('del_yn', 'N')
-      .maybeSingle<{
-        site_id: string
-        site_dom_nm: string
-        site_sts_cd: SiteSts
-        rjct_rsn_cd: string | null
-        plan_cd: string
-        pymnt_id: string | null
-        site_mv_url: string | null
-        spk_yn: 'Y' | 'N'
-        spk_pymnt_id: string | null
-        efct_cd: string | null
-        efct_pymnt_id: string | null
-      }>()
+    const { data: cur, error: curErr } = await selectWithShip(
+      'site_id, site_dom_nm, site_sts_cd, rjct_rsn_cd, plan_cd, pymnt_id, site_mv_url, spk_yn, spk_pymnt_id, efct_cd, efct_pymnt_id, ship_cd, ship_pymnt_id',
+      (cols) =>
+        db()
+          .from('site_mst')
+          .select(cols)
+          .eq('site_id', id)
+          .eq('ownr_usr_id', user.id)
+          .eq('del_yn', 'N')
+          .maybeSingle<{
+            site_id: string
+            site_dom_nm: string
+            site_sts_cd: SiteSts
+            rjct_rsn_cd: string | null
+            plan_cd: string
+            pymnt_id: string | null
+            site_mv_url: string | null
+            spk_yn: 'Y' | 'N'
+            spk_pymnt_id: string | null
+            efct_cd: string | null
+            efct_pymnt_id: string | null
+            ship_cd: string | null
+            ship_pymnt_id: string | null
+          }>(),
+    )
     if (curErr) return dbFail(curErr)
     if (!cur) return apiError('NOT_FOUND', 404)
 
@@ -158,6 +165,9 @@ export const PATCH = withAuthGuard(
         // 결제된 이펙트도 동일 — 소유자는 못 바꾼다(재등록만 새로 선택)
         efct_cd:
           cur.efct_pymnt_id && !renew ? cur.efct_cd : (body.efct ?? null),
+        // 결제된 우주선도 동일
+        ship_cd:
+          cur.ship_pymnt_id && !renew ? cur.ship_cd : (body.ship ?? null),
         pvt_cntc_txt: body.pvtCntc ?? null,
         pub_cntc_txt: body.pubCntc ?? null,
         ...(reapply && {
@@ -176,25 +186,35 @@ export const PATCH = withAuthGuard(
             spk_pay_dtm: null,
             efct_pymnt_id: null,
             efct_pay_dtm: null,
+            ship_pymnt_id: null,
+            ship_pay_dtm: null,
           }),
       }
     }
 
     // 낙관적 동시성 — 읽은 상태 그대로일 때만 갱신(관리자·크론 전이와 경합 시 409)
-    const { data, error } = await db()
-      .from('site_mst')
-      .update({ ...patch, modr_id: user.id })
-      .eq('site_id', cur.site_id)
-      .eq('site_sts_cd', cur.site_sts_cd)
-      .select(OWNER_SITE_COLS)
-      .maybeSingle()
+    // ship_* 칼럼(sql/020) 없는 DB 는 ship 필드 빼고 저장(다른 필드는 그대로) → 응답 shipUnavailable
+    const { data, error, shipOff } = await selectWithShip(
+      OWNER_SITE_COLS,
+      (cols, off) =>
+        db()
+          .from('site_mst')
+          .update({ ...(off ? omitShip(patch) : patch), modr_id: user.id })
+          .eq('site_id', cur.site_id)
+          .eq('site_sts_cd', cur.site_sts_cd)
+          .select(cols)
+          .maybeSingle(),
+    )
     if (error) {
       if (error.code === '23505') return apiError('DUPLICATE_DOMAIN', 409)
       if (error.code === '23514') return apiError('INVALID_INPUT', 400)
       return dbFail(error)
     }
     if (!data) return apiError('INVALID_STATE', 409)
-    return NextResponse.json({ site: data })
+    return NextResponse.json({
+      site: data,
+      ...(shipOff && { shipUnavailable: true }),
+    })
   }),
   { maxBodySize: 16_384 },
 )

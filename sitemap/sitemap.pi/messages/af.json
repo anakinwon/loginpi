@@ -221,7 +221,8 @@
     "reapplyOpen": "Doen weer aansoek",
     "spk": "Vonkel-byvoeging",
     "spkGo": "Betaal {amount} Pi vir die vonkel-byvoeging",
-    "efctGo": "Betaal {amount} Pi vir die borrel-effek"
+    "efctGo": "Betaal {amount} Pi vir die borrel-effek",
+    "shipGo": "Betaal {amount} Pi vir Warp Ruimteskip"
   },
   "pay": {
     "payNow": "Betaal {amount} Pi gebruiksfooi ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Die vonkel-byvoeging is reeds betaal.",
     "efct": "Borrel-effek",
     "payNowEfct": "Betaal {amount} Pi vir die borrel-effek",
-    "efctAlreadyPaid": "Die borrel-effek is reeds betaal."
+    "efctAlreadyPaid": "Die borrel-effek is reeds betaal.",
+    "ship": "Warp Ruimteskip",
+    "payNowShip": "Betaal {amount} Pi vir Warp Ruimteskip",
+    "shipAlreadyPaid": "Warp Ruimteskip betaling is voltooi."
   },
   "form": {
     "newTitle": "Lys 'n werf",
@@ -283,7 +287,12 @@
     "efct": "Borrel-effek",
     "efctNone": "Geen",
     "efctHint": "Een per plan — Baan ('n satelliet sirkel die borrel), Puls (asemhalingsrimpel), Komeet (sleepstert). Word saam met die gebruiksfooi betaal, of gekies in Wysig terwyl dit in gebruik is met 'n aparte betaling. Kan met Vonkel gekombineer word.",
-    "efctPaid": "Betaal — bly aan vir die gebruiksperiode."
+    "efctPaid": "Betaal — bly aan vir die gebruiksperiode.",
+    "ship": "Warp Ruimteskip",
+    "shipFree": "Basies·Gratis",
+    "shipSoon": "Betaalde skepe is in voorbereiding. Vir nou word dit as basiese skyfvaarders vertoon.",
+    "shipHint": "Dit is die warp-gids ruimteskip wat verskyn wanneer besoekers na jou webwerf navigeer. Die basiese opsie is die Saucer Cruiser (gratis), en jy kan een van vier betaalde opsies kies. Dit word saam met die gebruiksfooi betaal, en jy kan dit tydens gebruik kies en addisionele betalings maak.",
+    "shipPaid": "Betaling voltooi — gehandhaaf vir die duur van gebruik."
   },
   "admin": {
     "title": "Werfadmin",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Kon nie jou rekening stoor nie, so aanmelding het misluk. Probeer asseblief later weer.",
     "PAY_NOT_REQUIRED": "Hierdie webwerf benodig nie betaling nie.",
     "PAY_ALREADY_PAID": "Hierdie aansoek is reeds betaal. Kontak 'n administrateur om die plan te verander of te onttrek.",
+    "SHIP_UNAVAILABLE": "Warp-skip-byvoegings is in voorbereiding. Jy kan steeds vir fooie, glinsters en effekte betaal.",
     "PAY_SITE_MISMATCH": "Die betaling stem nie ooreen met hierdie aansoek nie.",
     "PAY_AMOUNT_SHORT": "Betalingsbedrag stem nie ooreen met die fooi nie.",
     "PAY_PI_APPROVE_FAILED": "Pi-betalinggoedkeuring het misluk. Probeer asseblief later weer.",
@@ -401,5 +411,12 @@
     "ORBIT": "Wentelbaan-effek",
     "PULSE": "Pols-effek",
     "COMET": "Komeet-effek"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Brugskerm",
+    "TWIN": "Dubbelvlerk-onderskepper",
+    "DAGGER": "Dagger Aanvalsvegter",
+    "CROSS": "Kruisvlerkvegter"
   }
 }

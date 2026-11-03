@@ -221,7 +221,8 @@
     "reapplyOpen": "Apply again",
     "spk": "Sparkle add-on",
     "spkGo": "Pay {amount} Pi for the sparkle add-on",
-    "efctGo": "Pay {amount} Pi for the bubble effect"
+    "efctGo": "Pay {amount} Pi for the bubble effect",
+    "shipGo": "Pay {amount} Pi for Warp Spaceship"
   },
   "pay": {
     "payNow": "Pay {amount} Pi usage fee ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "The sparkle add-on is already paid.",
     "efct": "Bubble effect",
     "payNowEfct": "Pay {amount} Pi for the bubble effect",
-    "efctAlreadyPaid": "The bubble effect is already paid."
+    "efctAlreadyPaid": "The bubble effect is already paid.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Pay {amount} Pi for Warp Spaceship",
+    "shipAlreadyPaid": "Warp Spaceship payment has been completed."
   },
   "form": {
     "newTitle": "List a site",
@@ -283,7 +287,12 @@
     "efct": "Bubble effect",
     "efctNone": "None",
     "efctHint": "One per plan — Orbit (a satellite circles the bubble), Pulse (breathing ripple), Comet (trailing tail). Paid with the usage fee, or chosen in Edit while in use with a separate payment. Can be combined with Sparkle.",
-    "efctPaid": "Paid — stays on for the usage period."
+    "efctPaid": "Paid — stays on for the usage period.",
+    "ship": "Warp Spaceship",
+    "shipFree": "Basic·Free",
+    "shipSoon": "Paid warp ships are in preparation. For now, they are displayed as basic disc cruisers.",
+    "shipHint": "This is the warp guide spaceship that appears when visitors navigate to your site. The basic option is the Saucer Cruiser (free), and you can choose one of four paid options. It is paid along with the usage fee, and you can select and make additional payments during use.",
+    "shipPaid": "Payment complete — maintained for the duration of use."
   },
   "admin": {
     "title": "Site admin",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Could not save your account, so sign-in failed. Please try again later.",
     "PAY_NOT_REQUIRED": "This site does not require payment.",
     "PAY_ALREADY_PAID": "This application is already paid. Contact an admin to change the plan or withdraw.",
+    "SHIP_UNAVAILABLE": "Warp ship add-ons are in preparation. You can still pay for fees, sparkles, and effects.",
     "PAY_SITE_MISMATCH": "The payment does not match this application.",
     "PAY_AMOUNT_SHORT": "Payment amount does not match the fee.",
     "PAY_PI_APPROVE_FAILED": "Pi payment approval failed. Please try again later.",
@@ -401,5 +411,12 @@
     "ORBIT": "Orbit effect",
     "PULSE": "Pulse effect",
     "COMET": "Comet effect"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Bridge Viewscreen",
+    "TWIN": "Twin-Wing Interceptor",
+    "DAGGER": "Dagger Assault Fighter",
+    "CROSS": "Cross-wing fighter"
   }
 }

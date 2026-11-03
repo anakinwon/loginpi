@@ -11,7 +11,14 @@ import {
   sizeParam,
   verifyToken,
 } from '@/lib/api'
-import { LIMITS, OWNER_SITE_COLS, SITE_STS, type SiteSts } from '@/lib/site'
+import {
+  LIMITS,
+  OWNER_SITE_COLS,
+  SITE_STS,
+  type OwnerSite,
+  type SiteSts,
+} from '@/lib/site'
+import { selectWithShip } from '@/lib/ship-compat'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,20 +32,23 @@ export const GET = withGuard(
     const page = pageParam(req)
     const size = sizeParam(req, LIMITS.adminPageSize)
 
-    const { data, error, count } = await db()
-      .from('site_mst')
-      .select(
-        `${OWNER_SITE_COLS}, plan_sort_no, pi_pymnt!site_mst_pi_pymnt_id_fkey(pi_amt), sys_user!site_mst_sys_user_id_fkey(pi_username:pi_usr_nm)`,
-        { count: 'exact' },
-      )
-      .eq('del_yn', 'N')
-      .eq('site_sts_cd', sts)
-      // 정렬(마스터 지시 2026-10-13) : 비싼 요금제부터(plan_sort_no, sql/011 생성 컬럼) → 결제일시 내림차순(미결제는 뒤) → 접수순
-      .order('plan_sort_no', { ascending: false })
-      .order('pay_dtm', { ascending: false, nullsFirst: false })
-      .order('reg_dtm', { ascending: true })
-      .order('site_id')
-      .range((page - 1) * size, page * size - 1)
+    // ship_* 칼럼(sql/020) 없는 DB 는 ship 빼고 재시도 → ship=null
+    const { data, error, count } = await selectWithShip(
+      `${OWNER_SITE_COLS}, plan_sort_no, pi_pymnt!site_mst_pi_pymnt_id_fkey(pi_amt), sys_user!site_mst_sys_user_id_fkey(pi_username:pi_usr_nm)`,
+      (cols) =>
+        db()
+          .from('site_mst')
+          .select(cols, { count: 'exact' })
+          .eq('del_yn', 'N')
+          .eq('site_sts_cd', sts)
+          // 정렬(마스터 지시 2026-10-13) : 비싼 요금제부터(plan_sort_no, sql/011 생성 컬럼) → 결제일시 내림차순(미결제는 뒤) → 접수순
+          .order('plan_sort_no', { ascending: false })
+          .order('pay_dtm', { ascending: false, nullsFirst: false })
+          .order('reg_dtm', { ascending: true })
+          .order('site_id')
+          .range((page - 1) * size, page * size - 1)
+          .overrideTypes<OwnerSite[], { merge: false }>(),
+    )
     if (error) return dbFail(error)
     return NextResponse.json({
       items: (data ?? []).map((s) => ({

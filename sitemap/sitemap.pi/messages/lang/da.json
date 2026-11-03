@@ -221,7 +221,8 @@
     "reapplyOpen": "Ansøg igen",
     "spk": "Glitrende tilføjelse",
     "spkGo": "Betal {amount} Pi for den glitrende tilføjelse",
-    "efctGo": "Betal {amount} Pi for bobleeffekten"
+    "efctGo": "Betal {amount} Pi for bobleeffekten",
+    "shipGo": "Betal {amount} Pi for Warp-rumskib"
   },
   "pay": {
     "payNow": "Betal {amount} Pi brugsgebyr ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Den glitrende tilføjelse er allerede betalt.",
     "efct": "Bobleeffekt",
     "payNowEfct": "Betal {amount} Pi for bobleeffekten",
-    "efctAlreadyPaid": "Bobleeffekten er allerede betalt."
+    "efctAlreadyPaid": "Bobleeffekten er allerede betalt.",
+    "ship": "Warp-rumskib",
+    "payNowShip": "Betal {amount} Pi for Warp-rumskib",
+    "shipAlreadyPaid": "Betaling for Warp-rumskib er gennemført."
   },
   "form": {
     "newTitle": "Opret et websted",
@@ -283,7 +287,12 @@
     "efct": "Bobleeffekt",
     "efctNone": "Ingen",
     "efctHint": "Én pr. plan – Orbit (en satellit kredser om boblen), Puls (åndedrætsbølge), Komet (efterfølgende hale). Betales med brugsgebyret, eller vælges i Rediger under brug med en separat betaling. Kan kombineres med Glitrende.",
-    "efctPaid": "Betalt – forbliver aktiv i brugsperioden."
+    "efctPaid": "Betalt – forbliver aktiv i brugsperioden.",
+    "ship": "Warp-rumskib",
+    "shipFree": "Basis·Gratis",
+    "shipSoon": "Betalte warpskibe er under forberedelse. For nu vises de som grundlæggende diskkrydsere.",
+    "shipHint": "Dette er det warp-vejledende rumskib, der vises, når besøgende navigerer til dit websted. Basisindstillingen er Tallerkenkrydseren (gratis), og du kan vælge en af fire betalte muligheder. Det betales sammen med brugsgebyret, og du kan vælge og foretage yderligere betalinger under brug.",
+    "shipPaid": "Betaling gennemført — vedligeholdes i hele brugsperioden."
   },
   "admin": {
     "title": "Webstedsadministration",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Kunne ikke gemme din konto, så login mislykkedes. Prøv venligst igen senere.",
     "PAY_NOT_REQUIRED": "Denne side kræver ikke betaling.",
     "PAY_ALREADY_PAID": "Denne ansøgning er allerede betalt. Kontakt en administrator for at ændre planen eller trække den tilbage.",
+    "SHIP_UNAVAILABLE": "Warp-skibs-tilføjelser er under forberedelse. Du kan stadig betale for gebyrer, gnister og effekter.",
     "PAY_SITE_MISMATCH": "Betalingen stemmer ikke overens med denne ansøgning.",
     "PAY_AMOUNT_SHORT": "Betalingsbeløbet stemmer ikke overens med gebyret.",
     "PAY_PI_APPROVE_FAILED": "Pi-betalingsgodkendelse mislykkedes. Prøv venligst igen senere.",
@@ -401,5 +411,12 @@
     "ORBIT": "Orbit-effekt",
     "PULSE": "Puls-effekt",
     "COMET": "Komet-effekt"
+  },
+  "ship": {
+    "SAUCER": "Tallerkenkrydser",
+    "BRIDGE": "Bro-visningsskærm",
+    "TWIN": "Tvillingsvinget Interceptor",
+    "DAGGER": "Dolk-angrebsjager",
+    "CROSS": "Krydsvinget jagerfly"
   }
 }

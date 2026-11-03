@@ -221,7 +221,8 @@
     "reapplyOpen": "再次申请",
     "spk": "闪光附加服务",
     "spkGo": "支付 {amount} Pi 购买闪光附加服务",
-    "efctGo": "支付 {amount} Pi 购买气泡效果"
+    "efctGo": "支付 {amount} Pi 购买气泡效果",
+    "shipGo": "支付 {amount} Pi 以使用曲速飞船"
   },
   "pay": {
     "payNow": "支付 {amount} Pi 使用费 ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "闪光附加服务已支付。",
     "efct": "气泡效果",
     "payNowEfct": "支付 {amount} Pi 购买气泡效果",
-    "efctAlreadyPaid": "气泡效果已支付。"
+    "efctAlreadyPaid": "气泡效果已支付。",
+    "ship": "曲速飞船",
+    "payNowShip": "支付 {amount} Pi 以使用曲速飞船",
+    "shipAlreadyPaid": "曲速飞船已支付。"
   },
   "form": {
     "newTitle": "列出站点",
@@ -283,7 +287,12 @@
     "efct": "气泡效果",
     "efctNone": "无",
     "efctHint": "每个计划一个 — 轨道（卫星围绕气泡旋转）、脉冲（呼吸涟漪）、彗星（拖尾）。与使用费一起支付，或在使用期间在编辑中选择并单独支付。可与闪光结合使用。",
-    "efctPaid": "已支付 — 在使用期间保持开启。"
+    "efctPaid": "已支付 — 在使用期间保持开启。",
+    "ship": "曲速飞船",
+    "shipFree": "基本·免费",
+    "shipSoon": "付费飞船正在准备中。现在显示的是默认圆盘巡洋舰。",
+    "shipHint": "当访问者导航到您的网站时，会出现曲速引导飞船。默认是圆盘巡洋舰（免费），您可以从四种付费飞船中选择一种。它将与使用费一起支付，并且在使用期间可以在修改中选择并额外支付。",
+    "shipPaid": "已支付 — 在使用期间保持。"
   },
   "admin": {
     "title": "站点管理",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "无法保存您的账户，因此登录失败。请稍后重试。",
     "PAY_NOT_REQUIRED": "此网站不需要支付。",
     "PAY_ALREADY_PAID": "此申请已支付。如需更改套餐或撤回，请联系管理员。",
+    "SHIP_UNAVAILABLE": "曲速飞船附加服务正在准备中。您仍然可以支付费用、闪光和效果。",
     "PAY_SITE_MISMATCH": "支付与此申请不匹配。",
     "PAY_AMOUNT_SHORT": "支付金额与费用不符。",
     "PAY_PI_APPROVE_FAILED": "Pi 支付批准失败。请稍后重试。",
@@ -401,5 +411,12 @@
     "ORBIT": "轨道效果",
     "PULSE": "脉冲效果",
     "COMET": "彗星效果"
+  },
+  "ship": {
+    "SAUCER": "圆盘巡洋舰",
+    "BRIDGE": "舰桥显示屏",
+    "TWIN": "双翼拦截机",
+    "DAGGER": "匕首突击机",
+    "CROSS": "十字翼战斗机"
   }
 }

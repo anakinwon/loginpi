@@ -221,7 +221,8 @@
     "reapplyOpen": "Złóż wniosek ponownie",
     "spk": "Dodatek Blask",
     "spkGo": "Zapłać {amount} Pi za dodatek Blask",
-    "efctGo": "Zapłać {amount} Pi za efekt bąbelka"
+    "efctGo": "Zapłać {amount} Pi za efekt bąbelka",
+    "shipGo": "Zapłać {amount} Pi za statek kosmiczny Warp"
   },
   "pay": {
     "payNow": "Zapłać {amount} Pi opłaty za użytkowanie ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Dodatek Blask jest już opłacony.",
     "efct": "Efekt bąbelka",
     "payNowEfct": "Zapłać {amount} Pi za efekt bąbelka",
-    "efctAlreadyPaid": "Efekt bąbelka jest już opłacony."
+    "efctAlreadyPaid": "Efekt bąbelka jest już opłacony.",
+    "ship": "Statek kosmiczny Warp",
+    "payNowShip": "Zapłać {amount} Pi za statek kosmiczny Warp",
+    "shipAlreadyPaid": "Płatność za statek kosmiczny Warp została zakończona."
   },
   "form": {
     "newTitle": "Wymień witrynę",
@@ -283,7 +287,12 @@
     "efct": "Efekt bąbelka",
     "efctNone": "Brak",
     "efctHint": "Jeden na plan — Orbita (satelita krąży wokół bąbelka), Puls (falowanie oddechowe), Kometa (ślad ogona). Opłacany z opłatą za użytkowanie lub wybierany w Edycji podczas użytkowania z osobną płatnością. Można łączyć z Blaskiem.",
-    "efctPaid": "Opłacone — pozostaje włączone przez okres użytkowania."
+    "efctPaid": "Opłacone — pozostaje włączone przez okres użytkowania.",
+    "ship": "Statek kosmiczny Warp",
+    "shipFree": "Podstawowy·Darmowy",
+    "shipSoon": "Płatne statki kosmiczne są w przygotowaniu. Na razie są wyświetlane jako podstawowe krążowniki dyskowe.",
+    "shipHint": "To jest statek kosmiczny przewodnika Warp, który pojawia się, gdy odwiedzający przechodzą do Twojej witryny. Podstawową opcją jest Krążownik Spodek (darmowy), a możesz wybrać jedną z czterech płatnych opcji. Jest on opłacany wraz z opłatą za użytkowanie, a podczas użytkowania możesz wybrać i dokonać dodatkowych płatności.",
+    "shipPaid": "Płatność zakończona — utrzymywana przez cały okres użytkowania."
   },
   "admin": {
     "title": "Administrator witryny",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Nie udało się zapisać Twojego konta, więc logowanie nie powiodło się. Spróbuj ponownie później.",
     "PAY_NOT_REQUIRED": "Ta witryna nie wymaga płatności.",
     "PAY_ALREADY_PAID": "Ten wniosek jest już opłacony. Skontaktuj się z administratorem, aby zmienić plan lub wycofać.",
+    "SHIP_UNAVAILABLE": "Dodatki do statków kosmicznych warp są w przygotowaniu. Nadal możesz płacić za opłaty, błyski i efekty.",
     "PAY_SITE_MISMATCH": "Płatność nie pasuje do tego wniosku.",
     "PAY_AMOUNT_SHORT": "Kwota płatności nie odpowiada opłacie.",
     "PAY_PI_APPROVE_FAILED": "Zatwierdzenie płatności Pi nie powiodło się. Spróbuj ponownie później.",
@@ -401,5 +411,12 @@
     "ORBIT": "Efekt orbity",
     "PULSE": "Efekt pulsu",
     "COMET": "Efekt komety"
+  },
+  "ship": {
+    "SAUCER": "Krążownik Spodek",
+    "BRIDGE": "Ekran widokowy mostka",
+    "TWIN": "Dwuskrzydłowy przechwytnik",
+    "DAGGER": "Myśliwiec szturmowy Sztylet",
+    "CROSS": "Myśliwiec krzyżowy"
   }
 }

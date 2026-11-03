@@ -221,7 +221,8 @@
     "reapplyOpen": "Applica di nuovo",
     "spk": "Componente aggiuntivo Sparkle",
     "spkGo": "Paga {amount} Pi per il componente aggiuntivo sparkle",
-    "efctGo": "Paga {amount} Pi per l'effetto bolla"
+    "efctGo": "Paga {amount} Pi per l'effetto bolla",
+    "shipGo": "Paga {amount} Pi per la navicella spaziale Warp"
   },
   "pay": {
     "payNow": "Paga la tariffa d'uso di {amount} Pi ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Il componente aggiuntivo sparkle è già pagato.",
     "efct": "Effetto bolla",
     "payNowEfct": "Paga {amount} Pi per l'effetto bolla",
-    "efctAlreadyPaid": "L'effetto bolla è già pagato."
+    "efctAlreadyPaid": "L'effetto bolla è già pagato.",
+    "ship": "Navicella spaziale Warp",
+    "payNowShip": "Paga {amount} Pi per la navicella spaziale Warp",
+    "shipAlreadyPaid": "Il pagamento della navicella spaziale Warp è stato completato."
   },
   "form": {
     "newTitle": "Elenca un sito",
@@ -283,7 +287,12 @@
     "efct": "Effetto bolla",
     "efctNone": "Nessuno",
     "efctHint": "Uno per piano — Orbita (un satellite circonda la bolla), Impulso (increspatura respiratoria), Cometa (coda persistente). Pagato con la tariffa d'uso, o scelto in Modifica durante l'uso con un pagamento separato. Può essere combinato con Sparkle.",
-    "efctPaid": "Pagato — rimane attivo per il periodo di utilizzo."
+    "efctPaid": "Pagato — rimane attivo per il periodo di utilizzo.",
+    "ship": "Navicella spaziale Warp",
+    "shipFree": "Base·Gratuito",
+    "shipSoon": "Le navi warp a pagamento sono in preparazione. Per ora, sono visualizzate come incrociatori a disco di base.",
+    "shipHint": "Questa è la navicella spaziale guida warp che appare quando i visitatori navigano sul tuo sito. L'opzione base è l'Incrociatore a Disco (gratuito), e puoi scegliere una delle quattro opzioni a pagamento. Viene pagata insieme alla tariffa d'uso, e puoi selezionare ed effettuare pagamenti aggiuntivi durante l'uso.",
+    "shipPaid": "Pagamento completato — mantenuto per la durata dell'uso."
   },
   "admin": {
     "title": "Amministrazione sito",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Impossibile salvare il tuo account, quindi l'accesso è fallito. Riprova più tardi.",
     "PAY_NOT_REQUIRED": "Questo sito non richiede pagamento.",
     "PAY_ALREADY_PAID": "Questa applicazione è già pagata. Contatta un amministratore per cambiare il piano o ritirare.",
+    "SHIP_UNAVAILABLE": "I componenti aggiuntivi per le navi warp sono in preparazione. Puoi comunque pagare per le tariffe, gli scintillii e gli effetti.",
     "PAY_SITE_MISMATCH": "Il pagamento non corrisponde a questa applicazione.",
     "PAY_AMOUNT_SHORT": "L'importo del pagamento non corrisponde alla tariffa.",
     "PAY_PI_APPROVE_FAILED": "Approvazione del pagamento Pi fallita. Riprova più tardi.",
@@ -401,5 +411,12 @@
     "ORBIT": "Effetto orbita",
     "PULSE": "Effetto impulso",
     "COMET": "Effetto cometa"
+  },
+  "ship": {
+    "SAUCER": "Incrociatore a Disco",
+    "BRIDGE": "Schermo di Visualizzazione del Ponte",
+    "TWIN": "Intercettore a Doppia Ala",
+    "DAGGER": "Caccia d'Assalto a Pugnale",
+    "CROSS": "Caccia ad ala incrociata"
   }
 }

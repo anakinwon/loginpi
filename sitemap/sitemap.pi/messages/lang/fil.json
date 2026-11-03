@@ -221,7 +221,8 @@
     "reapplyOpen": "Mag-apply muli",
     "spk": "Sparkle add-on",
     "spkGo": "Bayaran ang {amount} Pi para sa sparkle add-on",
-    "efctGo": "Bayaran ang {amount} Pi para sa bubble effect"
+    "efctGo": "Bayaran ang {amount} Pi para sa bubble effect",
+    "shipGo": "Magbayad ng {amount} Pi para sa Warp Spaceship"
   },
   "pay": {
     "payNow": "Bayaran ang {amount} Pi na bayad sa paggamit ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Nababayaran na ang sparkle add-on.",
     "efct": "Bubble effect",
     "payNowEfct": "Bayaran ang {amount} Pi para sa bubble effect",
-    "efctAlreadyPaid": "Nababayaran na ang bubble effect."
+    "efctAlreadyPaid": "Nababayaran na ang bubble effect.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Magbayad ng {amount} Pi para sa Warp Spaceship",
+    "shipAlreadyPaid": "Nakumpleto na ang pagbabayad para sa Warp Spaceship."
   },
   "form": {
     "newTitle": "Maglista ng site",
@@ -283,7 +287,12 @@
     "efct": "Bubble effect",
     "efctNone": "Wala",
     "efctHint": "Isa bawat plan — Orbit (isang satellite ang umiikot sa bubble), Pulse (humihinga na ripple), Comet (trailing tail). Binabayaran kasama ng bayad sa paggamit, o pinipili sa Edit habang ginagamit na may hiwalay na pagbabayad. Maaaring pagsamahin sa Sparkle.",
-    "efctPaid": "Nababayaran — mananatili sa panahon ng paggamit."
+    "efctPaid": "Nababayaran — mananatili sa panahon ng paggamit.",
+    "ship": "Warp Spaceship",
+    "shipFree": "Basic·Libre",
+    "shipSoon": "Ang mga bayad na sasakyang pangkalawakan ay inihahanda. Sa ngayon, ipinapakita ang mga ito bilang mga pangunahing disc cruiser.",
+    "shipHint": "Ito ang warp guide spaceship na lumalabas kapag pumunta ang mga bisita sa site. Ang default ay ang Disc Cruiser (libre), at maaari kang pumili ng isa sa apat na bayad na uri. Babayaran ito kasama ng bayad sa paggamit, at maaari mo itong piliin at magbayad ng karagdagang bayad sa panahon ng paggamit.",
+    "shipPaid": "Bayad na — mananatili sa panahon ng paggamit."
   },
   "admin": {
     "title": "Admin ng site",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Hindi ma-save ang iyong account, kaya nabigo ang pag-sign in. Mangyaring subukang muli sa ibang pagkakataon.",
     "PAY_NOT_REQUIRED": "Hindi nangangailangan ng bayad ang site na ito.",
     "PAY_ALREADY_PAID": "Nabayaran na ang aplikasyong ito. Makipag-ugnayan sa admin para baguhin ang plano o mag-withdraw.",
+    "SHIP_UNAVAILABLE": "Ang warp spaceship add-on ay inihahanda. Maaari ka pa ring magbayad para sa mga bayarin, kislap, at epekto.",
     "PAY_SITE_MISMATCH": "Hindi tumutugma ang bayad sa aplikasyong ito.",
     "PAY_AMOUNT_SHORT": "Hindi tumutugma ang halaga ng bayad sa bayarin.",
     "PAY_PI_APPROVE_FAILED": "Nabigo ang pag-apruba ng bayad sa Pi. Mangyaring subukang muli sa ibang pagkakataon.",
@@ -401,5 +411,12 @@
     "ORBIT": "Epekto ng Orbit",
     "PULSE": "Epekto ng Pulse",
     "COMET": "Epekto ng Comet"
+  },
+  "ship": {
+    "SAUCER": "Disc Cruiser",
+    "BRIDGE": "Bridge Viewscreen",
+    "TWIN": "Twin-Wing Interceptor",
+    "DAGGER": "Dagger Assault Ship",
+    "CROSS": "Cross-wing Fighter"
   }
 }

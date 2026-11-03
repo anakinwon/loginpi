@@ -221,7 +221,8 @@
     "reapplyOpen": "Znova požiadať",
     "spk": "Doplnok Sparkle",
     "spkGo": "Zaplaťte {amount} Pi za doplnok Sparkle",
-    "efctGo": "Zaplaťte {amount} Pi za efekt bubliny"
+    "efctGo": "Zaplaťte {amount} Pi za efekt bubliny",
+    "shipGo": "Zaplatiť {amount} Pi za Warp Spaceship"
   },
   "pay": {
     "payNow": "Zaplaťte poplatok za používanie {amount} Pi ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Doplnok Sparkle je už zaplatený.",
     "efct": "Efekt bubliny",
     "payNowEfct": "Zaplaťte {amount} Pi za efekt bubliny",
-    "efctAlreadyPaid": "Efekt bubliny je už zaplatený."
+    "efctAlreadyPaid": "Efekt bubliny je už zaplatený.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Zaplatiť {amount} Pi za Warp Spaceship",
+    "shipAlreadyPaid": "Platba za Warp Spaceship bola dokončená."
   },
   "form": {
     "newTitle": "Uviesť stránku",
@@ -283,7 +287,12 @@
     "efct": "Efekt bubliny",
     "efctNone": "Žiadne",
     "efctHint": "Jeden na plán – Orbit (satelit krúži okolo bubliny), Pulse (dýchajúce vlnenie), Comet (chvostová stopa). Platí sa spolu s poplatkom za používanie, alebo sa vyberie v úprave počas používania s oddelenou platbou. Dá sa kombinovať so Sparkle.",
-    "efctPaid": "Zaplatené – zostáva zapnuté počas obdobia používania."
+    "efctPaid": "Zaplatené – zostáva zapnuté počas obdobia používania.",
+    "ship": "Warp Spaceship",
+    "shipFree": "Základné·Zadarmo",
+    "shipSoon": "Platené warp lode sú v príprave. Zatiaľ sa zobrazujú ako základné diskové krížniky.",
+    "shipHint": "Toto je navádzacia warp loď, ktorá sa zobrazí, keď návštevníci prejdú na vašu stránku. Základná možnosť je Saucer Cruiser (zadarmo) a môžete si vybrať jednu zo štyroch platených možností. Platí sa spolu s poplatkom za používanie a môžete si ju vybrať a dodatočne zaplatiť počas používania.",
+    "shipPaid": "Platba dokončená — udržiavané počas doby používania."
   },
   "admin": {
     "title": "Správa stránok",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Nepodarilo sa uložiť váš účet, takže prihlásenie zlyhalo. Skúste to znova neskôr.",
     "PAY_NOT_REQUIRED": "Táto stránka nevyžaduje platbu.",
     "PAY_ALREADY_PAID": "Táto žiadosť je už zaplatená. Kontaktujte správcu, ak chcete zmeniť plán alebo stiahnuť žiadosť.",
+    "SHIP_UNAVAILABLE": "Doplnky warp lodí sú v príprave. Poplatky, iskričky a efekty môžete platiť aj naďalej.",
     "PAY_SITE_MISMATCH": "Platba sa nezhoduje s touto žiadosťou.",
     "PAY_AMOUNT_SHORT": "Suma platby sa nezhoduje s poplatkom.",
     "PAY_PI_APPROVE_FAILED": "Schválenie platby Pi zlyhalo. Skúste to znova neskôr.",
@@ -401,5 +411,12 @@
     "ORBIT": "Efekt obežnej dráhy",
     "PULSE": "Pulzný efekt",
     "COMET": "Efekt kométy"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Mostový priezor",
+    "TWIN": "Dvojkrídlový stíhač",
+    "DAGGER": "Útočná stíhačka Dagger",
+    "CROSS": "Stíhačka s krížovými krídlami"
   }
 }

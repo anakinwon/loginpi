@@ -221,7 +221,8 @@
     "reapplyOpen": "Aplicar novamente",
     "spk": "Complemento Sparkle",
     "spkGo": "Pagar {amount} Pi pelo complemento Sparkle",
-    "efctGo": "Pagar {amount} Pi pelo efeito de bolha"
+    "efctGo": "Pagar {amount} Pi pelo efeito de bolha",
+    "shipGo": "Pagar {amount} Pi pelo Warp Spaceship"
   },
   "pay": {
     "payNow": "Pagar taxa de uso de {amount} Pi ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "O complemento Sparkle já está pago.",
     "efct": "Efeito de bolha",
     "payNowEfct": "Pagar {amount} Pi pelo efeito de bolha",
-    "efctAlreadyPaid": "O efeito de bolha já está pago."
+    "efctAlreadyPaid": "O efeito de bolha já está pago.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Pagar {amount} Pi pelo Warp Spaceship",
+    "shipAlreadyPaid": "O pagamento do Warp Spaceship foi concluído."
   },
   "form": {
     "newTitle": "Listar um site",
@@ -283,7 +287,12 @@
     "efct": "Efeito de bolha",
     "efctNone": "Nenhum",
     "efctHint": "Um por plano — Órbita (um satélite circunda a bolha), Pulso (ondulação respiratória), Cometa (cauda de rastro). Pago com a taxa de uso, ou escolhido em Editar enquanto em uso com um pagamento separado. Pode ser combinado com Sparkle.",
-    "efctPaid": "Pago — permanece ativo durante o período de uso."
+    "efctPaid": "Pago — permanece ativo durante o período de uso.",
+    "ship": "Warp Spaceship",
+    "shipFree": "Básico·Gratuito",
+    "shipSoon": "As naves de dobra pagas estão em preparação. Por enquanto, elas são exibidas como cruzadores de disco básicos.",
+    "shipHint": "Esta é a nave espacial guia de dobra que aparece quando os visitantes navegam para o seu site. A opção básica é o Saucer Cruiser (gratuito), e você pode escolher uma das quatro opções pagas. É pago junto com a taxa de uso, e você pode selecionar e fazer pagamentos adicionais durante o uso.",
+    "shipPaid": "Pagamento concluído — mantido durante o período de uso."
   },
   "admin": {
     "title": "Administração do site",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Não foi possível salvar sua conta, então o login falhou. Tente novamente mais tarde.",
     "PAY_NOT_REQUIRED": "Este site não requer pagamento.",
     "PAY_ALREADY_PAID": "Esta aplicação já está paga. Entre em contato com um administrador para alterar o plano ou retirar.",
+    "SHIP_UNAVAILABLE": "Os complementos de naves de dobra estão em preparação. Você ainda pode pagar por taxas, brilhos e efeitos.",
     "PAY_SITE_MISMATCH": "O pagamento não corresponde a esta aplicação.",
     "PAY_AMOUNT_SHORT": "O valor do pagamento não corresponde à taxa.",
     "PAY_PI_APPROVE_FAILED": "A aprovação do pagamento Pi falhou. Tente novamente mais tarde.",
@@ -401,5 +411,12 @@
     "ORBIT": "Efeito Órbita",
     "PULSE": "Efeito Pulso",
     "COMET": "Efeito Cometa"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Tela de visualização da ponte",
+    "TWIN": "Interceptor de Asa Dupla",
+    "DAGGER": "Caça de Assalto Dagger",
+    "CROSS": "Caça de asa cruzada"
   }
 }

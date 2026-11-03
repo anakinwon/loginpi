@@ -221,7 +221,8 @@
     "reapplyOpen": "Dib u codso",
     "spk": "Ku darista dhalaalka",
     "spkGo": "Bixi {amount} Pi si aad u hesho ku darista dhalaalka",
-    "efctGo": "Bixi {amount} Pi si aad u hesho saamaynta xumbada"
+    "efctGo": "Bixi {amount} Pi si aad u hesho saamaynta xumbada",
+    "shipGo": "Bixi {amount} Pi si Warp Spaceship"
   },
   "pay": {
     "payNow": "Bixi {amount} Pi khidmadda isticmaalka ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Ku darista dhalaalka waa la bixiyay.",
     "efct": "Saamaynta xumbada",
     "payNowEfct": "Bixi {amount} Pi si aad u hesho saamaynta xumbada",
-    "efctAlreadyPaid": "Saamaynta xumbada waa la bixiyay."
+    "efctAlreadyPaid": "Saamaynta xumbada waa la bixiyay.",
+    "ship": "Warp Spaceship",
+    "payNowShip": "Bixi {amount} Pi si Warp Spaceship",
+    "shipAlreadyPaid": "Bixitaanka Warp Spaceship waa la dhammaystiray."
   },
   "form": {
     "newTitle": "Ku qor goob",
@@ -283,7 +287,12 @@
     "efct": "Saamaynta xumbada",
     "efctNone": "Midna",
     "efctHint": "Mid qorshe kasta — Orbit (dayax-gacmeed wuxuu ku wareegsan yahay xumbada), Pulse (hir neefsasho), Comet (dabada raacda). Waxaa la bixiyaa iyadoo la raacayo khidmadda isticmaalka, ama waa la doortaa wax ka beddelka inta la isticmaalayo lacag bixin gooni ah. Waxaa lagu dari karaa dhalaalka.",
-    "efctPaid": "La bixiyay — wuxuu sii jiraa muddada isticmaalka."
+    "efctPaid": "La bixiyay — wuxuu sii jiraa muddada isticmaalka.",
+    "ship": "Warp Spaceship",
+    "shipFree": "Aasaasi·Bilaash",
+    "shipSoon": "Maraakiibta dagaalka ee la bixiyay ayaa diyaar garow ku jira. Hadda, waxaa loo soo bandhigay sidii maraakiibta caadiga ah ee saxanka.",
+    "shipHint": "Tani waa markabka hagaha warp-ka ee soo muuqda marka booqdayaashu ay u gudbaan goobtaada. Doorashada aasaasiga ah waa Saucer Cruiser (bilaash), waxaadna dooran kartaa mid ka mid ah afar ikhtiyaar oo lacag ah. Waxaa lagu bixiyaa khidmadda isticmaalka, waxaadna dooran kartaa oo aad samayn kartaa lacag-bixin dheeraad ah inta lagu jiro isticmaalka.",
+    "shipPaid": "Lacag-bixinta waa la dhammaystiray — waxa la ilaaliyaa inta lagu jiro muddada isticmaalka."
   },
   "admin": {
     "title": "Maamulka goobta",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Kuma guuldareystay in la keydiyo akoonkaaga, sidaas darteed galitaanku wuu fashilmay. Fadlan mar kale isku day gadaal.",
     "PAY_NOT_REQUIRED": "Goobtan uma baahna lacag bixin.",
     "PAY_ALREADY_PAID": "Codsigan horey ayaa loo bixiyay. La xiriir maamulaha si aad u beddesho qorshaha ama aad u laabato.",
+    "SHIP_UNAVAILABLE": "Adeegyada dheeraadka ah ee maraakiibta dagaalka ayaa diyaar garow ku jira. Waxaad weli bixin kartaa khidmadaha, dhalaalka, iyo saamaynta.",
     "PAY_SITE_MISMATCH": "Lacag bixinta kuma habboona codsigan.",
     "PAY_AMOUNT_SHORT": "Cadadka lacag bixinta kuma habboona khidmadda.",
     "PAY_PI_APPROVE_FAILED": "Ansixinta lacag bixinta Pi way fashilantay. Fadlan mar kale isku day gadaal.",
@@ -401,5 +411,12 @@
     "ORBIT": "Saamaynta Orbit",
     "PULSE": "Saamaynta Pulse",
     "COMET": "Saamaynta Comet"
+  },
+  "ship": {
+    "SAUCER": "Saucer Cruiser",
+    "BRIDGE": "Bridge Viewscreen",
+    "TWIN": "Twin-Wing Interceptor",
+    "DAGGER": "Dagger Assault Fighter",
+    "CROSS": "Diyaarad dagaal oo baalal isdhaafsan"
   }
 }

@@ -221,7 +221,8 @@
     "reapplyOpen": "Pateikti paraišką dar kartą",
     "spk": "Žėrinčioji priedas",
     "spkGo": "Apmokėti {amount} Pi už žėrinčiąją priedą",
-    "efctGo": "Apmokėti {amount} Pi už burbulo efektą"
+    "efctGo": "Apmokėti {amount} Pi už burbulo efektą",
+    "shipGo": "Apmokėti už „Warp“ erdvėlaivį {amount} Pi"
   },
   "pay": {
     "payNow": "Apmokėti {amount} Pi naudojimo mokestį ({plan})",
@@ -248,7 +249,10 @@
     "spkAlreadyPaid": "Žėrinčioji priedas jau apmokėtas.",
     "efct": "Burbulo efektas",
     "payNowEfct": "Apmokėti {amount} Pi už burbulo efektą",
-    "efctAlreadyPaid": "Burbulo efektas jau apmokėtas."
+    "efctAlreadyPaid": "Burbulo efektas jau apmokėtas.",
+    "ship": "„Warp“ erdvėlaivis",
+    "payNowShip": "Apmokėti už „Warp“ erdvėlaivį {amount} Pi",
+    "shipAlreadyPaid": "Apmokėjimas už „Warp“ erdvėlaivį atliktas."
   },
   "form": {
     "newTitle": "Įtraukti svetainę",
@@ -283,7 +287,12 @@
     "efct": "Burbulo efektas",
     "efctNone": "Nėra",
     "efctHint": "Vienas vienam planui – Orbita (palydovas sukasi aplink burbulą), Pulsas (kvėpuojantis bangavimas), Kometa (uodegos pėdsakas). Apmokama kartu su naudojimo mokesčiu arba pasirenkama redagavimo metu, naudojant atskirą mokėjimą. Gali būti derinamas su žėrinčiuoju priedu.",
-    "efctPaid": "Apmokėta – lieka įjungta visą naudojimo laikotarpį."
+    "efctPaid": "Apmokėta – lieka įjungta visą naudojimo laikotarpį.",
+    "ship": "„Warp“ erdvėlaivis",
+    "shipFree": "Pagrindinis·Nemokamas",
+    "shipSoon": "Mokami karo laivai ruošiami. Kol kas jie rodomi kaip pagrindiniai diskiniai kreiseriai.",
+    "shipHint": "Tai yra „Warp“ gido erdvėlaivis, kuris pasirodo lankytojams naršant jūsų svetainėje. Pagrindinis variantas yra „Saucer Cruiser“ (nemokamas), ir galite pasirinkti vieną iš keturių mokamų variantų. Jis apmokamas kartu su naudojimo mokesčiu, ir galite pasirinkti bei atlikti papildomus mokėjimus naudojimo metu.",
+    "shipPaid": "Apmokėjimas atliktas – palaikomas visą naudojimo laikotarpį."
   },
   "admin": {
     "title": "Svetainės administratorius",
@@ -370,6 +379,7 @@
     "AUTH_DB_UNAVAILABLE": "Nepavyko išsaugoti jūsų paskyros, todėl prisijungimas nepavyko. Bandykite dar kartą vėliau.",
     "PAY_NOT_REQUIRED": "Šiai svetainei nereikia mokėjimo.",
     "PAY_ALREADY_PAID": "Ši paraiška jau apmokėta. Norėdami pakeisti planą arba atšaukti, susisiekite su administratoriumi.",
+    "SHIP_UNAVAILABLE": "Warp laivų priedai ruošiami. Vis tiek galite mokėti už mokesčius, blizgučius ir efektus.",
     "PAY_SITE_MISMATCH": "Mokėjimas neatitinka šios paraiškos.",
     "PAY_AMOUNT_SHORT": "Mokėjimo suma neatitinka mokesčio.",
     "PAY_PI_APPROVE_FAILED": "Nepavyko patvirtinti Pi mokėjimo. Bandykite dar kartą vėliau.",
@@ -401,5 +411,12 @@
     "ORBIT": "Orbitos efektas",
     "PULSE": "Pulso efektas",
     "COMET": "Kometos efektas"
+  },
+  "ship": {
+    "SAUCER": "Diskinis kreiseris",
+    "BRIDGE": "Tilto vaizdo ekranas",
+    "TWIN": "Dvigubo sparno perėmėjas",
+    "DAGGER": "Durklo puolimo naikintuvas",
+    "CROSS": "Kryžminis naikintuvas"
   }
 }

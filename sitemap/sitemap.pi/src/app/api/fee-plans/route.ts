@@ -1,10 +1,11 @@
-// 사용료 요금표 — GET /api/fee-plans : 사용 중 REGISTER 요금제(plan_cd·단가 Pi) + 요금제별 남은 슬롯(remaining)·반짝임 단가 + 운영 타이머(cfg, 시간). 공개(가격 표시용), 30초 캐시
+// 사용료 요금표 — GET /api/fee-plans : 사용 중 REGISTER 요금제(plan_cd·단가 Pi) + 요금제별 남은 슬롯(remaining)·부가서비스 단가(반짝임·이펙트·우주선) + 운영 타이머(cfg, 시간). 공개(가격 표시용), 30초 캐시
 import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import { dbFail, dbRoute, PUBLIC_CACHE } from '@/lib/api'
 import { getPlanRemaining, getRegFees } from '@/lib/payments'
 import { db } from '@/lib/api'
 import { CFG_DEFAULT, getCfg } from '@/lib/cfg'
+import { isShipOff } from '@/lib/ship-compat'
 
 export const GET = withGuard(
   dbRoute(async () => {
@@ -20,7 +21,7 @@ export const GET = withGuard(
         db()
           .from('fee_plan')
           .select('plan_cd, pi_amt, fee_tp_cd')
-          .in('fee_tp_cd', ['SPARKLE', 'EFFECT'])
+          .in('fee_tp_cd', ['SPARKLE', 'EFFECT', 'SHIP'])
           .eq('use_yn', 'Y')
           .eq('del_yn', 'N'),
         // 운영 타이머(sys_cfg) — 조회 실패는 기본값(안내 문구용 보조 정보)
@@ -38,6 +39,8 @@ export const GET = withGuard(
         )
       const spkBy = byTp('SPARKLE')
       const efctBy = byTp('EFFECT')
+      // ship_* 칼럼 없음(sql/020 미적용)으로 판정된 인스턴스는 SHIP 단가를 숨긴다 — 화면이 우주선 선택을 '준비 중'으로
+      const shipBy = isShipOff() ? new Map<string, number>() : byTp('SHIP')
       const items = fees.map((f) => ({
         ...f,
         remaining: remaining?.[f.plan_cd as keyof typeof remaining] ?? null,
@@ -47,6 +50,9 @@ export const GET = withGuard(
         // efct_pi_amt : 버블 이펙트(3종 공통) 단가
         efct_pi_amt:
           (efctBy.get(f.plan_cd) ?? 0) > 0 ? efctBy.get(f.plan_cd)! : null,
+        // ship_pi_amt : 워프 우주선(유료 4종 공통) 단가
+        ship_pi_amt:
+          (shipBy.get(f.plan_cd) ?? 0) > 0 ? shipBy.get(f.plan_cd)! : null,
       }))
       return NextResponse.json({ items, cfg }, { headers: PUBLIC_CACHE })
     } catch (e) {

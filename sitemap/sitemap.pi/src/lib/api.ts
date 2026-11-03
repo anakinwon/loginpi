@@ -47,8 +47,7 @@ export const apiError = createApiError({
   LINK_ALREADY_LINKED: '이미 연동된 계정입니다',
   LINK_CODE_GEN_FAILED:
     '연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요',
-  LINK_TRY_LIMIT:
-    '연동 코드를 여러 번 틀렸습니다. 15분 뒤에 다시 시도하세요',
+  LINK_TRY_LIMIT: '연동 코드를 여러 번 틀렸습니다. 15분 뒤에 다시 시도하세요',
   // 사용료 결제(sql/004·012)
   PLAN_TERM_MISSING:
     '요금제 사용기간이 설정되지 않았습니다. 요금표를 확인하세요',
@@ -58,6 +57,7 @@ export const apiError = createApiError({
     '결제된 신청이 반려되어 환불 처리 전입니다. 관리자에게 문의하세요',
   PAY_NOT_REQUIRED: '이 사이트는 결제가 필요하지 않습니다',
   PAY_ALREADY_PAID: '이미 결제가 완료된 신청입니다',
+  SHIP_UNAVAILABLE: '워프 우주선 부가서비스는 준비 중입니다',
   PAY_SITE_MISMATCH: '결제 정보가 신청 내용과 일치하지 않습니다',
   PAY_AMOUNT_SHORT: '결제 금액이 요금과 다릅니다',
   PAY_PI_APPROVE_FAILED: 'Pi 결제 승인에 실패했습니다. 잠시 후 다시 시도하세요',
