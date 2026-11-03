@@ -1,4 +1,5 @@
 /* sitemap.pi 전역 스타일 — Tailwind v4 CSS-first 진입점(config 파일 없음) */
+/* 2026-11-04 마스터 지적 모바일·Pi Browser 버블 이동 깜빡임 — 움직이는 버블 SVG 안 CSS opacity 애니메이션·등장 CSS animation 제거, 호버 전이는 hover 가능 기기 한정(합성 레이어 분할 원인, 루트 docs/TROUBLESHOOT.md 2026-11-04) */
 @import 'tailwindcss';
 
 /* 공용 패키지(packages/*) 컴포넌트의 클래스도 스캔 */
@@ -60,7 +61,7 @@
   }
   /* 외부 이동 안내 레이어(leave-dialog) — 우주선 5종(lib/ship.ts : 기본 SAUCER + 유료 BRIDGE·TWIN·DAGGER·CROSS, 마스터 지시 2026-11-03, 구 오각형 카드·막대 나셀 폐기).
      루트 .ship.ship-<기체> 하나에 공통 콘텐츠(.hud-label·.ship-dest·.hud-coord·.ship-log·.ship-actions·.btn-hud·.ship-go, components/ships/index.tsx)를 두고 껍데기·색은 기체 접두(.ship-saucer-* …) 규칙만 바꾼다.
-     SVG 안 움직임은 opacity 위주(모바일 WebView 철칙, PRD_02_EFCT) — 시안 그대로 둔 예외 : BRIDGE 기체 축소(점프 구간 한정), BRIDGE·DAGGER·CROSS 추진 불꽃 scale, CROSS 날개 전개 rotate(transform-box: view-box + px 원점, 안 움직여도 루트 점프는 그대로).
+     정지 모달 안이라 예외(움직이는 SVG 에는 CSS opacity·transform 애니메이션 금지 — 모바일 WebView 철칙, PRD_02_EFCT) — 시안 그대로 둔 예외 : BRIDGE 기체 축소(점프 구간 한정), BRIDGE·DAGGER·CROSS 추진 불꽃 scale, CROSS 날개 전개 rotate(transform-box: view-box + px 원점, 안 움직여도 루트 점프는 그대로).
      별은 warp-field <canvas>(뒤), 플래시는 .hud-flash(앞). 색은 다크 고정 */
   .ship {
     color: #fff;
@@ -1287,7 +1288,16 @@
 .bubble-inner {
   transform-box: fill-box;
   transform-origin: center;
-  transition: transform 150ms ease-out;
+}
+/* 호버 전이는 호버 가능한 입력 장치만(UA 분기 아님, 입력 장치 기능 질의) — 전이 중인 SVG 자식은 합성 레이어가 돼 움직이는 버블 SVG 를 쪼갠다.
+   모바일은 탭·드래그 뒤 :hover 가 남아 그 150ms 동안 같은 분할이 생긴다(2026-11-04, 이론 추정). PC 는 그대로, 터치 단말은 즉시 전환 */
+@media (hover: hover) {
+  .bubble-inner {
+    transition: transform 150ms ease-out;
+  }
+  .bubble[data-sample] {
+    transition: opacity 150ms ease-out;
+  }
 }
 .bubble:hover .bubble-inner,
 .bubble:focus-visible .bubble-inner {
@@ -1301,7 +1311,6 @@
 /* 가상 샘플 버블(관리자 목록에 없는 데모) — 반투명으로 낮춰 실제 등록 사이트가 강조되게. 호버·포커스 때만 원래 밝기(마스터 2026-10-14, 0.4 → 0.2 "더 투명하게") */
 .bubble[data-sample] {
   opacity: 0.2;
-  transition: opacity 150ms ease-out;
 }
 .bubble[data-sample]:hover,
 .bubble[data-sample]:focus-visible {
@@ -1313,24 +1322,12 @@
   }
 }
 
-/* 버블 등장 — 위치 이동 없이 불투명도만 0→1(원본 관찰 0.6~0.8s) */
-.bubble {
-  animation: bubble-in 0.7s ease-out backwards;
-}
-@keyframes bubble-in {
-  from {
-    opacity: 0;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .bubble {
-    animation: none;
-  }
-}
+/* 버블 등장(불투명도 0→1, 0.7s)은 bubble-canvas.tsx paint() 의 rAF 페이드 — CSS animation 으로 두면 버블 전부가 0.7s 동안 합성 레이어가 됐다가
+   한꺼번에 풀리며 빈 타일 프레임이 생겼고, 필터 변경으로 DOM 이 재배치되면 기존 버블까지 애니메이션이 재시작될 수 있다(2026-11-04) */
 
 /* 부가서비스 "반짝임" 버블 — 외곽 별 3개 깜빡임(색 = currentColor = 요금제 보색 PLAN_SPARKLE). 테두리를 도는 빛줄기(.sparkle-glint)는 혜성 이펙트와 겹쳐 제거(마스터 2026-10-13).
-   CSS transform 비사용 — 모바일 WebKit·WebView 의 SVG transform-box 의존과 filter+transform 캐시 문제를 피하려고
-   별은 opacity 만 애니메이션한다.
+   CSS transform 비사용 — 모바일 WebKit·WebView 의 SVG transform-box 의존과 filter+transform 캐시 문제를 피하려고 별은 투명도만 애니메이션한다.
+   투명도는 opacity 가 아니라 fill-opacity — CSS opacity 애니메이션은 Chromium 이 별마다 합성 레이어로 올려 움직이는 버블 SVG 를 겹침 레이어로 쪼갰다(실측 55 → 6 레이어, 2026-11-04 깜빡임).
    움직임 줄이기 설정에도 감속·정지 없음(구 3배 감속 폐기) — 모바일 단말의 "애니메이션 제거" 설정이 reduce 로 잡혀 Pi Browser 에서 유료 효과가 정지로 보였다. 유료 부가서비스 4종은 기기·설정 무관 PC 동일(마스터 2026-10-16, effects/types.ts 철칙) */
 .sparkle-star {
   filter: drop-shadow(0 0 3px currentColor);
@@ -1339,10 +1336,10 @@
 @keyframes sparkle-twinkle {
   0%,
   100% {
-    opacity: 0;
+    fill-opacity: 0;
   }
   50% {
-    opacity: 1;
+    fill-opacity: 1;
   }
 }
 
@@ -1371,29 +1368,29 @@
 }
 
 /* 이펙트 "펄스" — 파동 링은 SMIL(pulse.tsx), 여기는 후광(halo) 박동 + 발광 filter 1개.
-   CSS transform 비사용(모바일 WebView 철칙) — opacity 만 애니메이션.
+   CSS transform 비사용(모바일 WebView 철칙) — 후광은 stroke-opacity 만 애니메이션(CSS opacity 는 합성 레이어 분할 → 깜빡임, 2026-11-04).
    박동 리듬 = pulse.tsx 와 동일 주기 2s(lub 0s → dub 0.28s → 휴지). 움직임 줄이기 감속 없음(반짝임과 같은 정책, 마스터 2026-10-16) */
 .efct-pulse {
   filter: drop-shadow(0 0 3px currentColor);
 }
 .efct-pulse-halo {
-  opacity: 0.12;
+  stroke-opacity: 0.12;
   animation: efct-pulse-beat 2s linear infinite;
 }
 @keyframes efct-pulse-beat {
   0%,
   30%,
   100% {
-    opacity: 0.12;
+    stroke-opacity: 0.12;
   }
   5% {
-    opacity: 0.55;
+    stroke-opacity: 0.55;
   }
   14% {
-    opacity: 0.15;
+    stroke-opacity: 0.15;
   }
   19% {
-    opacity: 0.45;
+    stroke-opacity: 0.45;
   }
 }
 

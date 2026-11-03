@@ -1,6 +1,6 @@
 // 이펙트 "펄스" — 버블이 숨쉬듯 뛰는 느낌. 버블 크기는 그대로 두고 바깥 링(ripple)이 r → r*1.35 로 퍼지며 사라진다.
-//  리듬 = 심박(두 번 빠르게 lub-dub, 한 번 쉼) : 링 A(0s)·링 B(0.28s 시차) + 테두리 후광(halo, CSS opacity 박동 — globals.css(.efct-pulse-*))
-//  모바일 WebView 철칙(types.ts) : CSS transform 금지 → r·opacity 는 SMIL <animate>, 후광은 CSS opacity 만.
+//  리듬 = 심박(두 번 빠르게 lub-dub, 한 번 쉼) : 링 A(0s)·링 B(0.28s 시차) + 테두리 후광(halo, CSS stroke-opacity 박동 — globals.css(.efct-pulse-*))
+//  모바일 WebView 철칙(types.ts) : CSS transform·opacity 애니메이션 금지 → r·opacity 는 SMIL <animate>, 후광은 CSS stroke-opacity 만(2026-11-04 마스터 지적 버블 이동 깜빡임 — CSS opacity 는 합성 레이어 분할).
 //  움직임 줄이기 설정에도 감속하지 않는다(구 3배 감속 폐기, 마스터 2026-10-16 "모바일도 동일" — types.ts 철칙)
 import type { EffectProps } from './types'
 

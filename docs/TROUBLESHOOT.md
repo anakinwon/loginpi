@@ -899,7 +899,7 @@ Pi Sign-In QR은 채굴 앱 스캐너·폰 카메라가 아니라 **파이지갑
 ### 재발방지·정책 메모
 1. 장식 애니메이션의 reduce 정책은 **"정지 vs 감소"를 기능 소유자(유료 여부)와 함께 결정**하고 CSS 주석에 명시 — 접근성 모드가 켜진 단말에서 '정상 동작'이 곧 '버그 신고'가 된다.
 2. 되돌림 경로(등재 심사·접근성 요구 시): 별 opacity 깜빡임(공간 이동 없음)은 감속 유지, 빛줄기(공간 이동)만 `animation-play-state: paused` — WCAG 2.2.2(A) 관점의 더 방어적인 분할.
-3. SVG 자식 요소 장식 애니메이션은 **paint 속성(stroke-dashoffset·opacity) 우선**, CSS transform(+`transform-box`)은 모바일 WebKit 변수를 늘린다.
+3. SVG 자식 요소 장식 애니메이션은 **paint 속성(stroke-dashoffset·opacity) 우선**, CSS transform(+`transform-box`)은 모바일 WebKit 변수를 늘린다. ⚠ **2026-11-04 정정** : CSS `opacity` 는 paint 속성이 아니다(Chromium 합성 애니메이션) — `fill-opacity`·`stroke-opacity` 로 쓴다(아래 2026-11-04 편).
 
 ---
 
@@ -941,3 +941,46 @@ Pi Sign-In QR은 채굴 앱 스캐너·폰 카메라가 아니라 **파이지갑
 1. **소스가 아니라 브라우저가 받은 CSS 청크를 fetch 해 셀렉터를 grep** 한다. 없으면 같은 파일에 사소한 편집 하나 더 넣어 반영되는지 본다 — 안 되면 규칙이 아니라 캐시 문제.
 2. dev 실행 중 같은 앱 폴더에서 `pnpm build` 를 돌리지 않는다(검증 빌드는 dev 를 끄고).
 3. 설명 못 하는 컴파일러 침묵 하나로 구조를 바꾸기 전에 캐시 가설을 먼저 배제한다(주석·문서에 잘못된 원인이 남는다 — 이번에 PRD_02 §3 문구 정정).
+
+---
+
+## [2026-11-04] sitemap.pi 버블이 자리잡으며 이동할 때 깜빡임(모바일 일반 브라우저, Pi Browser 더 심함) — 움직이는 SVG 안 CSS opacity 애니메이션이 합성 레이어를 쪼갬 ⭐
+
+### 증상
+- 홈 버블이 확산·정착하며 이동하는 동안 화면 일부가 깜빡임. 모바일 일반 브라우저에서 보이고 Pi Browser 에서 더 심함(마스터 보고). PC 는 보고 없음.
+
+### 원인 (headless Chromium 1248, 390×844·DPR 3·CPU 4× 실측 — 실앱 `pnpm build && pnpm start`, 스테이징 DB 버블 92개)
+1. **1순위 — 반짝임 별(`.sparkle-star`)·펄스 후광(`.efct-pulse-halo`)의 CSS `opacity` 애니메이션.** Chromium(Android WebView = Pi Browser 포함)은 SVG 자식의 opacity 애니메이션을 각각 합성 레이어로 올린다(사유 `ActiveOpacityAnimation`). 그 뒤에 그려지며 겹치는 버블·로고·글자는 `Overlap` 레이어로 밀려나고, 부모 `<g class="bubble">` 위치가 rAF 마다 바뀌므로 **겹침 레이어의 경계·구성이 매 프레임 다시 짜여 통째로 다시 래스터**된다. 내용 레이어 55개·면적 2.75 Mpx(DPR 3 기준 약 100 MB).
+2. **2순위 — 등장 애니메이션 `.bubble { animation: bubble-in 0.7s }`(opacity).** 0.7초 동안 버블 92개 전부가 합성(0.3초 시점 레이어 147개)됐다가 한꺼번에 풀리며 레이어 구조가 다시 짜인다 → 확산 시작 직후 **빈 타일(체커보드) 프레임**. 형제 : 기간·카테고리 전환 시 순서 재셔플로 React 가 노드를 재배치하면 CSS 애니메이션이 재시작돼 기존 버블까지 다시 페이드(추론).
+3. **형제 — 호버 전이**(`.bubble-inner` transform 150ms·샘플 opacity 150ms). 모바일은 탭·드래그 뒤 `:hover` 가 남아 전이 150ms 동안 같은 방식으로 합성됐다 풀린다(이론 추정, 미측정).
+4. Pi Browser 가 더 심한 이유 [추정·실기기 미검증] : 같은 Blink 라 1·2 가 그대로 적용되고, WebView 는 앱 렌더 스레드를 거쳐 그리며 타일 메모리 한도(보이는 영역 × 4B × 20)가 빠듯해 레이어 폭증이 타일 누락으로 더 쉽게 이어진다.
+- 기각(단독 제거 효과 미미 또는 레이어 0) : `filter: drop-shadow`, 로고 `<image>`+clipPath, 궤도 `<mask>`, `stroke-dashoffset`(궤도 위성·혜성), SMIL(펄스 링), 배경 `.sky-drift`.
+
+### 조치 (sitemap.pi — 시각 결과 동일, UA·reduce 분기 없음)
+- `globals.css` : 별 keyframes `opacity` → **`fill-opacity`**(drop-shadow 유지), 후광 기본값·keyframes `opacity` → **`stroke-opacity`**. `.bubble` 등장 CSS 애니메이션·keyframes·reduce 블록 삭제. 호버 전이 2줄을 **`@media (hover: hover)`** 안으로(PC 동일, 터치 단말은 즉시 전환 — 입력 장치 기능 질의라 UA 분기 아님).
+- `bubble-canvas.tsx` : 등장 페이드를 기존 rAF `paint()` 에서 `.bubble-inner` 의 `opacity` 속성으로(마운트 `opacity={0}` → ease-out 700ms → 속성 제거). 시작 시각은 요소 키 `WeakMap` 이라 DOM 재배치엔 다시 페이드하지 않고 새로 마운트된 버블만 페이드. 같은 transform 문자열이면 `setAttribute` 생략, ResizeObserver 는 크기가 같으면 상태 유지.
+- 주석·철칙 갱신 : `effects/types.ts`·`effects/pulse.tsx`·`docs/PRD_02_EFCT.md` §3.
+
+### 측정 (같은 스크립트·조건, 실앱 각 3회 — 스크래치 `measure.cjs`·`layers.cjs`)
+| 항목 | 수정 전 | 수정 후 |
+|---|---|---|
+| 합성 내용 레이어(0.3초 / 3초) | 147 / 55 | **6 / 6** |
+| 레이어 면적(CSS Mpx) | 2.75 | 1.07 |
+| 빈 타일(체커보드) 프레임 | 3회 중 2회, 5프레임(페이지 로드 기준 0.17~0.92초) | **0** |
+| 자리잡는 구간 프레임 평균 / p95 / 최대(ms) | 48.9 / 77.8 / 111.2 | 43.0 / 66.7 / 72.5 |
+| 부유 구간 프레임 평균 / p95 / 최대(ms) | 47.8 / 94.3 / 133.3 | 36.2 / 55.6 / 66.7 |
+| 스타일 재계산(ms/s, 자리잡는 구간) | 400 | 310 |
+| ⚠ 드롭 프레임(자리잡는 구간, 3회) | 8 / 12 / 13 | **38 / 47 / 28** |
+| ⚠ 드롭 프레임(부유 구간, 3회) | 5 / 3 / 3 | **20 / 36 / 21** |
+| ⚠ 페인트 시간 ms(자리잡는 구간) | 1062~1165 | **1371~1475** |
+| ⚠ 페인트 시간 ms(부유 구간) | 696~784 | **1004~1093** |
+- **트레이드오프** : 레이어 55 → 6 으로 버블 SVG 가 한 레이어로 합쳐져 버블이 움직일 때 그 레이어를 통째로 다시 그린다 → 빈 타일(깜빡임)은 0 이 됐지만 드롭 프레임·페인트 시간은 늘었다. 느린 WebView 에서는 깜빡임 대신 **끊김**이 남을 수 있다 `[확인중 : Pi Browser 실기기]`. 실기기에서 끊김이 보이면 다음 단계 = 버블을 HTML 요소(버블마다 GPU 합성 레이어, transform 이동)로 바꾸는 구조 변경.
+- 시각 동등성 : 별 fill-opacity 0.01~1.00 변화·drop-shadow 유지, 후광 stroke-opacity 0.12~0.48 박동, 등장 페이드 0 → 1 후 속성 제거(reduce 에뮬레이션도 동일). 기간 전환 뒤 기존 버블 92개 재페이드 0.
+- 형제 보류(R-P0 패턴 · 매치 6 · 처리 5 · 보류 1) : 기간·카테고리 전환 시 `order` 재셔플(`bubble-canvas.tsx` 225~232행)로 DOM 이 재배치되면 별·궤도·혜성·후광 애니메이션이 처음부터 다시 시작(별 최대 1.2초 사라짐) — 그리기 순서 설계 변경이 필요해 보류 `[확인중 : 마스터]`.
+- 실기기 확인 항목 : Android Chrome 원격 디버깅 Layers 패널 레이어 6개 안팎·Performance 패널 드롭 프레임, Pi Browser 깜빡임·끊김.
+- 한계 : headless Windows Chromium(소프트웨어 래스터), CPU 스로틀은 메인 스레드만. 프레임 시간은 세션 간 ±3ms 이상 흔들림. **Android Chrome·Pi Browser 실기기 미검증** — 실기기 확인 전엔 깜빡임 해소 완료로 보지 않는다(Android Chrome 원격 디버깅 Layers 패널로 레이어 6개 안팎 확인).
+
+### 재발방지
+1. **움직이는 SVG 안 애니메이션 = CSS `stroke-dashoffset`·`fill-opacity`·`stroke-opacity`, SMIL, rAF 속성 갱신만.** CSS `opacity`·`transform` 애니메이션·전이는 합성 레이어가 된다(2026-10-12 메모 3 의 "opacity 우선"은 틀렸다 — 정정). 전이는 PC 호버(`@media (hover: hover)`)에만.
+2. 등장·페이드 같은 일회성 연출도 다수 요소에 CSS animation 으로 걸지 않는다 — 동시 합성 → 동시 해제가 빈 타일 프레임을 만든다.
+3. 깜빡임·잔상 진단은 CDP `LayerTree`(레이어 수·`compositingReasons`)와 trace `PipelineReporter` 의 checkerboard 로 먼저 잰다 — 프레임 시간만 보면 놓친다.

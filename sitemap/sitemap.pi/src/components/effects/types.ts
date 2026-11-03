@@ -1,6 +1,7 @@
 // 버블 이펙트 부가서비스 공통 계약 — 궤도(ORBIT)·펄스(PULSE)·혜성(COMET). 반짝임(SPARKLE)과 중복 가능, 요금제별 1종 선택(PRD_01 §3-1)
 //  렌더 위치 : bubble-canvas 버블 <g> 안, 요금제 링 다음·로고/글자 앞. 좌표계 = 버블 중심(0,0), 반지름 r. pointerEvents 는 부모가 none
-//  ⚠ 모바일 WebView 철칙(TROUBLESHOOT 2026-10-12 반짝임 사고) : SVG 요소에 CSS transform 애니메이션 금지 — stroke-dashoffset·opacity·SMIL <animate> 만.
+//  ⚠ 모바일 WebView 철칙(TROUBLESHOOT 2026-10-12 반짝임 사고·2026-11-04 버블 이동 깜빡임) : SVG 요소에 CSS transform·opacity 애니메이션 금지(전이는 PC 호버 `@media (hover: hover)` 한정) — CSS stroke-dashoffset·fill-opacity·stroke-opacity, SMIL <animate>, rAF 속성 갱신만.
+//    CSS opacity·transform 애니메이션은 Chromium(Pi Browser WebView 포함)이 합성 레이어로 올려, 매 프레임 움직이는 버블 SVG 를 겹침 레이어로 쪼개고 빈 타일 프레임(깜빡임)을 만든다.
 //  ⚠ 움직임 줄이기(prefers-reduced-motion)에 감속·정지 금지 — 모바일 단말의 "애니메이션 제거" 설정이 reduce 로 잡혀 Pi Browser 에서 유료 효과가 정지로 보였다(2026-10-12 반짝임·2026-10-16 이펙트 3종 + 우주선). 유료 부가서비스는 기기·설정 무관 PC 동일(마스터 2026-10-16)
 import type { ReactNode } from 'react'
 

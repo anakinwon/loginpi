@@ -5,6 +5,7 @@
 // 버블 안 = 회사 로고 + 회사명만(마스터 지시 2026-10-10 — 광고·자사·등급 배지와 증감 % 는 툴팁·aria-label 로만 표시). 로고 미등록이면 회사명 첫 글자 심볼.
 // 글자는 9px 미만으로 줄이지 않고 반지름에 따라 표시 단계를 낮춘다(3 로고·회사명 → 2 회사명 → 1 로고(첫 글자) → 0 없음).
 // 프레임마다 React 렌더 없이 transform 속성만 갱신(60fps 목표). prefers-reduced-motion 분기 없음 — 모바일 단말의 "애니메이션 제거" 설정이 reduce 로 잡혀 Pi Browser 에서 버블이 정지·드래그 불가였다(마스터 지시 2026-10-16 "모바일에서도 드래그앤드롭"). 물리·드래그는 기기·설정 무관 동일
+// 등장 페이드도 rAF 속성 갱신(CSS animation 금지) — 2026-11-04 마스터 지적 모바일·Pi Browser 버블 이동 깜빡임 : 움직이는 버블 안 CSS opacity·transform 애니메이션이 합성 레이어를 쪼갬(루트 docs/TROUBLESHOOT.md 2026-11-04)
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { EFFECTS } from './effects'
 import {
@@ -36,6 +37,7 @@ const C = {
   clickMove: 6, // 이 거리(px) 미만 이동이면 클릭으로 판정
   iconMinR: 34, // 이 반지름 이상만 단계 3(로고 + 회사명)
   minFont: 9, // 글자 하한(px) — 이보다 작아지면 표시 단계를 낮춘다
+  fadeMs: 700, // 등장 페이드 시간(원본 관찰 0.6~0.8s)
 } as const
 
 // 반짝임 별 — [각도(°), 크기(반지름 비율), 깜빡임 지연] : 시차를 둬 번갈아 반짝이게
@@ -202,6 +204,7 @@ export function BubbleCanvas({
   const gRefs = useRef(new Map<string, SVGGElement>())
   const bodies = useRef(new Map<string, Body>())
   const startRef = useRef(0) // 새 버블이 등장한 시각 — 분리 비율 램프 기준
+  const born = useRef(new WeakMap<Element, number>()) // 등장 페이드 시작 시각 — 요소 단위라 DOM 재배치엔 다시 페이드하지 않고 새로 마운트된 버블만 페이드
   const nodesRef = useRef<Node[]>([])
   const sizeRef = useRef({ w: 0, h: 0 })
   const activeRef = useRef<string | null>(null)
@@ -234,20 +237,31 @@ export function BubbleCanvas({
     if (!el) return
     const ro = new ResizeObserver(([e]) => {
       const { width, height } = e.contentRect
-      setSize({ w: Math.round(width), h: Math.round(height) })
+      const w = Math.round(width)
+      const h = Math.round(height)
+      setSize((s) => (s.w === w && s.h === h ? s : { w, h }))
     })
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
 
   const paint = () => {
-    for (const n of nodesRef.current)
-      gRefs.current
-        .get(n.item.id)
-        ?.setAttribute(
-          'transform',
-          `translate(${n.b.x.toFixed(1)} ${n.b.y.toFixed(1)})`,
-        )
+    const now = performance.now()
+    for (const n of nodesRef.current) {
+      const g = gRefs.current.get(n.item.id)
+      if (!g) continue
+      // 정착 후 부유는 프레임당 ~0.03px 라 같은 값이 잦다 — 같으면 쓰지 않는다
+      const tf = `translate(${n.b.x.toFixed(1)} ${n.b.y.toFixed(1)})`
+      if (g.getAttribute('transform') !== tf) g.setAttribute('transform', tf)
+      // 등장 페이드 0→1(ease-out) — React 가 opacity="0" 으로 마운트, 끝나면 속성을 지워 이후엔 건너뛴다(React 는 같은 prop 을 다시 쓰지 않음)
+      const inner = g.firstElementChild
+      if (!inner?.hasAttribute('opacity')) continue
+      let t0 = born.current.get(inner)
+      if (t0 === undefined) born.current.set(inner, (t0 = now))
+      const k = (now - t0) / C.fadeMs
+      if (k < 1) inner.setAttribute('opacity', (1 - (1 - k) ** 2).toFixed(3))
+      else inner.removeAttribute('opacity')
+    }
     const tip = tipRef.current
     const n = nodesRef.current.find((v) => v.item.id === activeRef.current)
     if (tip && n) {
@@ -457,7 +471,8 @@ export function BubbleCanvas({
                 }
               }}
             >
-              <g className="bubble-inner">
+              {/* opacity 0 = 등장 페이드 시작값(첫 프레임은 위치 적용 전이라 숨김) — paint() 가 올린다 */}
+              <g className="bubble-inner" opacity={0}>
                 <circle
                   className="bubble-ring"
                   r={r}
@@ -479,7 +494,7 @@ export function BubbleCanvas({
                     })}
                   </g>
                 )}
-                {/* 부가서비스 "반짝임" — 외곽 별 3개 깜빡임(globals.css .sparkle-star). 테두리를 도는 빛줄기는 혜성 이펙트와 겹쳐 제거(마스터 2026-10-13) */}
+                {/* 부가서비스 "반짝임" — 외곽 별 3개 깜빡임(globals.css .sparkle-star, fill-opacity). 테두리를 도는 빛줄기는 혜성 이펙트와 겹쳐 제거(마스터 2026-10-13) */}
                 {it.sparkle && (
                   <g
                     pointerEvents="none"
