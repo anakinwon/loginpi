@@ -1,4 +1,4 @@
-// 공개 사이트 상세 API — GET /api/sites/<domain> : IN_USE(사용 중)·활성 사이트 공개 컬럼 + 조회수 합계(stat_site_dly.view_cnt 합) + 이동 안내 기체(ship, shipOn — null = 기본 SAUCER)
+// 공개 사이트 상세 API — GET /api/sites/<domain> : IN_USE(사용 중)·활성 사이트 공개 컬럼 + 조회수 합계(stat_site_dly.view_cnt 합)
 import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import {
@@ -13,10 +13,8 @@ import {
   decodeDomain,
   DOMAIN_RE,
   PUBLIC_SITE_COLS,
-  shipOn,
   type PublicSite,
 } from '@/lib/site'
-import type { ShipPaidCd } from '@/lib/ship'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,26 +23,15 @@ export const GET = withGuard(
     const domain = decodeDomain(await routeParam(ctx, 'domain'))
     if (!DOMAIN_RE.test(domain)) return apiError('NOT_FOUND', 404)
 
-    const { data: row, error } = await db()
+    const { data: site, error } = await db()
       .from('site_mst')
-      .select(`${PUBLIC_SITE_COLS}, ship_cd, ship_pay_dtm`)
+      .select(PUBLIC_SITE_COLS)
       .eq('site_dom_nm', domain)
       .eq('del_yn', 'N')
       .eq('site_sts_cd', 'IN_USE')
-      .maybeSingle<
-        PublicSite & {
-          ship_cd: ShipPaidCd | null
-          ship_pay_dtm: string | null
-        }
-      >()
+      .maybeSingle<PublicSite>()
     if (error) return dbFail(error)
-    if (!row) return apiError('NOT_FOUND', 404)
-    const { ship_cd, ship_pay_dtm, ...site } = row
-    const ship = shipOn({
-      ship_cd,
-      ship_pay_dtm,
-      own_site_yn: site.own_site_yn,
-    })
+    if (!site) return apiError('NOT_FOUND', 404)
 
     // 조회수 합계는 DB SUM(sql/018) — 행을 받아 합산하면 1000행 상한에서 과소(R-P3)
     let viewCnt: number
@@ -66,6 +53,6 @@ export const GET = withGuard(
       )
     } else return dbFail(sum.error)
 
-    return NextResponse.json({ site, viewCnt, ship }, { headers: PUBLIC_CACHE })
+    return NextResponse.json({ site, viewCnt }, { headers: PUBLIC_CACHE })
   }),
 )

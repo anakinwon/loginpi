@@ -28,7 +28,7 @@ export function SitePayButton({
   onPaid,
 }: {
   site: OwnerSite
-  kind: 'REG' | 'SPK' | 'EFCT' | 'SHIP' // 사용료(부가서비스 합산 포함) / 반짝임 단독 / 이펙트 단독 / 우주선 단독 — prepare 에 그대로 전달
+  kind: 'REG' | 'SPK' | 'EFCT' // 사용료(부가서비스 합산 포함) / 반짝임 단독 / 이펙트 단독 — prepare 에 그대로 전달
   amount: number | null // 표시용 단가(요금표) — null 이면 미조회
   onPaid: () => void
 }) {
@@ -115,14 +115,10 @@ export function SitePayButton({
               ? t('payNowEfct', {
                   amount: amount == null ? '…' : String(amount),
                 })
-              : kind === 'SHIP'
-                ? t('payNowShip', {
-                    amount: amount == null ? '…' : String(amount),
-                  })
-                : t('payNow', {
-                    plan: tp(site.plan_cd),
-                    amount: amount == null ? '…' : String(amount),
-                  })}
+              : t('payNow', {
+                  plan: tp(site.plan_cd),
+                  amount: amount == null ? '…' : String(amount),
+                })}
       </button>
       {!isInPiBrowser && (
         <p className="text-muted-foreground text-xs">{t('piBrowserOnly')}</p>

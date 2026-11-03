@@ -221,8 +221,7 @@
     "reapplyOpen": "Täzeden arza ber",
     "spk": "Ýalpyldawuk goşmaça",
     "spkGo": "Ýalpyldawuk goşmaça üçin {amount} Pi töle",
-    "efctGo": "Köprüjik effekti üçin {amount} Pi töle",
-    "shipGo": "Warp kosmos gämisi üçin {amount} Pi töläň"
+    "efctGo": "Köprüjik effekti üçin {amount} Pi töle"
   },
   "pay": {
     "payNow": "{amount} Pi ulanyş tölegini töle ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Ýalpyldawuk goşmaça eýýäm tölenildi.",
     "efct": "Köprüjik effekti",
     "payNowEfct": "Köprüjik effekti üçin {amount} Pi töle",
-    "efctAlreadyPaid": "Köprüjik effekti eýýäm tölenildi.",
-    "ship": "Warp kosmos gämisi",
-    "payNowShip": "Warp kosmos gämisi üçin {amount} Pi töläň",
-    "shipAlreadyPaid": "Warp kosmos gämisi üçin töleg tamamlandy."
+    "efctAlreadyPaid": "Köprüjik effekti eýýäm tölenildi."
   },
   "form": {
     "newTitle": "Saýt sanawa giriz",
@@ -287,11 +283,7 @@
     "efct": "Köprüjik effekti",
     "efctNone": "Ýok",
     "efctHint": "Meýilnama boýunça bir — Orbit (hemra köprüjigiň daşyndan aýlanýar), Pulse (dem alyş tolkuny), Comet (yzyndan galan yz). Ulanyş tölegi bilen bilelikde tölenýär ýa-da ulanylýan wagty Üýtgetmekde saýlanyp, aýratyn töleg bilen tölenýär. Ýalpyldawuk bilen birleşdirilip bilner.",
-    "efctPaid": "Töleg edildi — ulanyş döwründe galýar.",
-    "ship": "Warp kosmos gämisi",
-    "shipFree": "Esasy·Mugt",
-    "shipHint": "Bu, myhmanlar saýtyňyza girenlerinde peýda bolýan warp gollanma kosmos gämisidir. Esasy wariant Saucer Cruiser (mugt), we tölegli dört wariantdan birini saýlap bilersiňiz. Ol ulanyş tölegi bilen birlikde tölenýär we ulanyş wagtynda üýtgedip, goşmaça töleg edip bilersiňiz.",
-    "shipPaid": "Töleg tamamlandy — ulanyş möhletiniň dowamynda saklanýar."
+    "efctPaid": "Töleg edildi — ulanyş döwründe galýar."
   },
   "admin": {
     "title": "Saýt administratory",
@@ -409,12 +401,5 @@
     "ORBIT": "Orbit effekti",
     "PULSE": "Puls effekti",
     "COMET": "Komet effekti"
-  },
-  "ship": {
-    "SAUCER": "Saucer Cruiser",
-    "BRIDGE": "Köpri Ekran",
-    "TWIN": "Iki ganatly tutujy",
-    "DAGGER": "Hançer hüjümçi söweşiji",
-    "CROSS": "Haç ganatly söweşiji"
   }
 }

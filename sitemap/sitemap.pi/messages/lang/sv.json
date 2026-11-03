@@ -221,8 +221,7 @@
     "reapplyOpen": "Ansök igen",
     "spk": "Glittertillägg",
     "spkGo": "Betala {amount} Pi för glittertillägget",
-    "efctGo": "Betala {amount} Pi för bubbeleffekten",
-    "shipGo": "Betala {amount} Pi för Warp Spaceship"
+    "efctGo": "Betala {amount} Pi för bubbeleffekten"
   },
   "pay": {
     "payNow": "Betala {amount} Pi användningsavgift ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Glittertillägget är redan betalt.",
     "efct": "Bubbeleffekt",
     "payNowEfct": "Betala {amount} Pi för bubbeleffekten",
-    "efctAlreadyPaid": "Bubbeleffekten är redan betald.",
-    "ship": "Warp Spaceship",
-    "payNowShip": "Betala {amount} Pi för Warp Spaceship",
-    "shipAlreadyPaid": "Betalning för Warp Spaceship har slutförts."
+    "efctAlreadyPaid": "Bubbeleffekten är redan betald."
   },
   "form": {
     "newTitle": "Lista en sajt",
@@ -287,11 +283,7 @@
     "efct": "Bubbeleffekt",
     "efctNone": "Ingen",
     "efctHint": "En per plan — Orbit (en satellit cirklar bubblan), Puls (andningsvåg), Komet (efterföljande svans). Betalas med användningsavgiften, eller väljs i Redigera under användning med en separat betalning. Kan kombineras med Glitter.",
-    "efctPaid": "Betald — förblir aktiv under användningsperioden.",
-    "ship": "Warp Spaceship",
-    "shipFree": "Grundläggande·Gratis",
-    "shipHint": "Detta är det warp-guide-rymdskepp som visas när besökare navigerar till din webbplats. Grundalternativet är Saucer Cruiser (gratis), och du kan välja ett av fyra betalda alternativ. Det betalas tillsammans med användningsavgiften, och du kan välja och göra ytterligare betalningar under användning.",
-    "shipPaid": "Betalning slutförd — bibehålls under användningstiden."
+    "efctPaid": "Betald — förblir aktiv under användningsperioden."
   },
   "admin": {
     "title": "Sajtadmin",
@@ -409,12 +401,5 @@
     "ORBIT": "Orbit-effekt",
     "PULSE": "Puls-effekt",
     "COMET": "Komet-effekt"
-  },
-  "ship": {
-    "SAUCER": "Saucer Cruiser",
-    "BRIDGE": "Bridge Viewscreen",
-    "TWIN": "Twin-Wing Interceptor",
-    "DAGGER": "Dagger Assault Fighter",
-    "CROSS": "Kryssvingad stridsflygplan"
   }
 }

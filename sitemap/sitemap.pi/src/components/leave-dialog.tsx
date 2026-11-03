@@ -1,7 +1,7 @@
 'use client'
 
 // "외부 사이트로 이동" 안내 레이어 — 워프 점프 연출(마스터 지시 2026-10-14, 구 아이보리 3D 카드 대체) :
-//  뒤에는 <canvas> 스타필드(warp-field), 앞에는 우주선 카드(ships/ : 기체 5종 — 기본 SAUCER + 유료 BRIDGE·TWIN·DAGGER·CROSS, ship prop 2026-11-03).
+//  뒤에는 <canvas> 스타필드(warp-field), 앞에는 우주선 실루엣 카드(.ship-* : 뾰족한 선수 목적지 · 본체 좌표·항해 로그 · 워프 나셀).
 //  "점프" 클릭 → 우주선이 진동하며 음속 돌파(플래시) → 화면 정중앙에 블랙홀(.ship-hole)이 열리고 그 점을 향해 작아지며 음속으로 날아가 소멸(회전 없음)(FLY_MS, 흡입 지점은 --jx/--jy) → 블랙홀이 화면 전체로 줌인(2026-11-01) → 그 뒤에 window.open(마스터 지시 "실제 이동 전에 사라지는 효과").
 //  외부 이동은 사용자 클릭 + 안내 후에만(MAINNET A-6) — 점프 버튼이 유일한 이동 경로. 열기는 클릭 뒤 ~1.7s(일시적 사용자 활성화 5s 안)지만
 //  구형 WebKit 처럼 비동기 open 을 막는 환경은 null 을 돌려주므로 "차단됨" 안내 + 직접 링크로 폴백(링크 클릭도 사용자 클릭).
@@ -10,8 +10,6 @@ import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { markWarp } from '@pi/warp'
 import { WarpField } from './warp-field'
-import { Ship } from './ships'
-import { SHIP_DEFAULT, isShipCd } from '@/lib/ship'
 
 // 점프 연출 길이(ms) — 래퍼 인라인 --fly 로 CSS(.ship-jump / .ship-hole / .hud-flash)에 전달하는 단일 소스. 1.0s → 1.4s(마스터 2026-10-16 "조금 늦춰")
 const FLY_MS = 1400
@@ -24,7 +22,6 @@ export function LeaveDialog({
   name,
   desc,
   floating = false,
-  ship,
   onConfirm,
   onCancel,
 }: {
@@ -32,7 +29,6 @@ export function LeaveDialog({
   name?: string | null
   desc?: string | null // undefined = 조회 중, null·'' = 설명 없음(안내 문구 폴백)
   floating?: boolean
-  ship?: string | null // 기체 코드(lib/ship.ts) — 모르는 값·null 이면 기본 SAUCER
   onConfirm?: () => void // 열기 직전 부수효과(예: 클릭 통계) — 열기(window.open)·닫기(onCancel)는 이 컴포넌트가 맡는다
   onCancel: () => void
 }) {
@@ -80,7 +76,7 @@ export function LeaveDialog({
   return (
     <div
       className={
-        floating ? 'contents' : 'relative overflow-hidden rounded-xl p-2'
+        floating ? 'contents' : 'relative overflow-hidden rounded-xl pt-2'
       }
       style={{ '--fly': `${FLY_MS}ms` } as CSSProperties}
     >
@@ -95,23 +91,42 @@ export function LeaveDialog({
           aria-hidden
         />
       )}
-      {/* 우주선 — 기체별 껍데기(ships/) + 공통 콘텐츠. 제목 문구는 aria-label 로만(마스터 지시 2026-10-14 "코멘트 제거") */}
-      <Ship
+      {/* 우주선 실루엣(톱뷰, 마스터 지시 2026-10-14) — 화살촉 선수(목적지) → 본체(좌표·항해 로그·버튼) + 좌우 워프 나셀(앞끝 붉은 버사드 콜렉터, 점프 때 더 밝게). 전부 CSS(globals.css .ship-*) */}
+      <div
         ref={shipRef}
-        cd={isShipCd(ship) ? ship : SHIP_DEFAULT}
         role="dialog"
         aria-modal="false"
         aria-label={t('leaveTitle')}
-        className={`${jumping ? 'ship-jump' : ''} ${
+        className={`ship ${jumping ? 'ship-jump' : ''} ${
           floating
-            ? 'ship-float fixed left-1/2 z-20 w-[min(94vw,27rem)] -translate-x-1/2'
-            : 'relative mx-auto w-full max-w-[27rem]'
+            ? 'fixed bottom-14 left-1/2 z-20 w-[min(94vw,27rem)] -translate-x-1/2'
+            : 'relative w-full'
         }`}
-        name={name || url}
-        url={url}
-        log={desc === undefined ? '…' : desc || t('leaveBody')}
-        notice={
-          blocked && (
+      >
+        <div className="ship-nacelle ship-nacelle-l" aria-hidden />
+        <div className="ship-nacelle ship-nacelle-r" aria-hidden />
+        <div className="ship-pylon ship-pylon-l" aria-hidden />
+        <div className="ship-pylon ship-pylon-r" aria-hidden />
+        {/* 선수(prow) — 뾰족한 화살촉 윤곽(clip-path) + 조종석 창. 제목 문구는 aria-label 로만(마스터 지시 2026-10-14 "코멘트 제거") */}
+        <div className="ship-head">
+          <div className="ship-prow">
+            <div className="ship-prow-in">
+              <p className="hud-label">{t('hudDest')}</p>
+              <p className="truncate text-lg font-bold text-white">
+                {name || url}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="ship-hull flex flex-col gap-2">
+          <p className="hud-label">{t('hudCoord')}</p>
+          <p className="hud-coord font-mono text-xs break-all">{url}</p>
+          <p className="hud-label">{t('hudLog')}</p>
+          {/* 설명 최대 500자 — 작은 화면에서 카드가 화면 밖으로 밀리지 않게 높이 상한 + 내부 스크롤 */}
+          <p className="max-h-[30vh] overflow-y-auto text-sm leading-relaxed whitespace-pre-wrap text-white/80">
+            {desc === undefined ? '…' : desc || t('leaveBody')}
+          </p>
+          {blocked && (
             <p className="rounded-md border border-amber-300/40 bg-amber-300/10 px-2 py-1 text-xs text-amber-100">
               {t('popupBlocked')}{' '}
               <a
@@ -124,12 +139,27 @@ export function LeaveDialog({
                 {t('popupBlockedLink')}
               </a>
             </p>
-          )
-        }
-        busy={jumping}
-        onJump={jump}
-        onCancel={onCancel}
-      />
+          )}
+          <div className="mt-1 flex justify-center gap-2">
+            <button
+              type="button"
+              className="btn-hud btn-hud-primary"
+              onClick={jump}
+              disabled={jumping}
+            >
+              ⚡ {t('leaveConfirm')}
+            </button>
+            <button
+              type="button"
+              className="btn-hud"
+              onClick={onCancel}
+              disabled={jumping}
+            >
+              {t('cancel')}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

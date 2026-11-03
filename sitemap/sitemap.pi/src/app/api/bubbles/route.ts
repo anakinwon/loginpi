@@ -5,14 +5,12 @@ import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import { resolveDbConfig } from '@pi/db'
 import registry from '../../../../../sites.json'
-import type { ShipPaidCd } from '@/lib/ship'
 import samples from '@/data/sample-sites.json'
 import { apiError, db, PUBLIC_CACHE } from '@/lib/api'
 import {
   BUBBLE_DAYS,
   effectOn,
   isSparkleOn,
-  shipOn,
   type EfctCd,
   MV_URL_RE,
   PLAN_CD,
@@ -40,7 +38,7 @@ const samplePct = (domain: string) => {
 }
 
 // 부가서비스(반짝임·이펙트)는 샘플에 붙이지 않는다 — 시연은 자사 실사이트 site_mst.spk_yn·efct_cd 로(마스터 지시 2026-10-14, 샘플 데모 폐기).
-// 실사이트는 isSparkleOn(sql/013)·effectOn(sql/017)·shipOn(sql/020) — 결제 전엔 붙이지 않는다(미결제 유료 표시 금지, 자사 예외)
+// 실사이트는 isSparkleOn(sql/013)·effectOn(sql/017) — 결제 전엔 붙이지 않는다(미결제 유료 표시 금지, 자사 예외)
 
 // 연결 주소 재지정 — .pi 도메인은 일반 브라우저에서 열리지 않으므로 레지스트리에 url 이 있으면 그 주소로 이동
 // (cafe.pi → https://cafepi.vercel.app/, 마스터 지시 2026-10-10). DB 행에도 도메인으로 적용
@@ -99,7 +97,7 @@ async function load(
   let q = db()
     .from('site_mst')
     .select(
-      'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, site_mv_url, plan_cd, own_site_yn, spk_yn, spk_pay_dtm, efct_cd, efct_pay_dtm, ship_cd, ship_pay_dtm',
+      'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, site_mv_url, plan_cd, own_site_yn, spk_yn, spk_pay_dtm, efct_cd, efct_pay_dtm',
     )
     .eq('del_yn', 'N')
     .eq('site_sts_cd', 'IN_USE')
@@ -142,8 +140,6 @@ async function load(
       // 반짝임 부가서비스 — 신청 + (결제 완료 또는 자사)
       sparkle: isSparkleOn(s),
       effect: effectOn({ ...s, efct_cd: s.efct_cd as EfctCd | null }),
-      // 워프 우주선 — 이동 안내 기체(미노출 null = 기본 SAUCER)
-      ship: shipOn({ ...s, ship_cd: s.ship_cd as ShipPaidCd | null }),
     }
   })
   return {

@@ -10,7 +10,6 @@ import { EFCT_ICON } from './bubble-canvas'
 import { CfgPanel } from './cfg-panel'
 import { LoginGate } from './login-gate'
 import { LogoField } from './logo-field'
-import { ShipPreview } from './ships'
 import { Pagination } from './pagination'
 import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import {
@@ -23,7 +22,6 @@ import {
   type OwnerSite,
   type Paged,
 } from '@/lib/site'
-import { SHIP_CD, SHIP_DEFAULT } from '@/lib/ship'
 
 type AdminSite = OwnerSite & {
   sys_user: { pi_username: string | null } | null
@@ -320,7 +318,6 @@ function SiteRows({
 }) {
   const t = useTranslations('admin')
   const te = useTranslations('efct')
-  const tsh = useTranslations('ship')
   // 상세 행 id — 열기/닫기 버튼의 aria-controls 대상(접근성, 팀장 지적 2026-10-13)
   const detailId = `site-detail-${s.site_id}`
   // 콘텐츠 수정 폼 열림 — 행을 닫으면 폼도 닫는다
@@ -417,14 +414,6 @@ function SiteRows({
                     {EFCT_ICON[s.efct_cd]} {te(s.efct_cd)}
                   </>
                 )}
-                {s.ship_cd && (
-                  <>
-                    {' · 🚀 '}
-                    {tsh(s.ship_cd)}
-                    {s.own_site_yn !== 'Y' &&
-                      ` ${s.ship_pymnt_id ? t('paid') : t('unpaid')}`}
-                  </>
-                )}
                 {s.spk_yn === 'Y' && (
                   <>
                     {' · ✨ '}
@@ -511,7 +500,6 @@ function SiteEdit({
   const t = useTranslations('form')
   const ta = useTranslations('admin')
   const te = useTranslations('efct')
-  const tsh = useTranslations('ship')
   const tc = useTranslations('siteCtgr')
   const [name, setName] = useState(s.site_nm)
   const [ctgr, setCtgr] = useState<string>(s.site_ctgr_cd)
@@ -521,7 +509,6 @@ function SiteEdit({
   const [mvUrl, setMvUrl] = useState(s.site_mv_url ?? '')
   const [spk, setSpk] = useState(s.spk_yn === 'Y')
   const [efct, setEfct] = useState<string>(s.efct_cd ?? '')
-  const [ship, setShip] = useState<string>(s.ship_cd ?? '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const f = `a-${s.site_id}`
@@ -541,7 +528,6 @@ function SiteEdit({
           mvUrl,
           spk,
           efct: efct || null,
-          ship: ship || null,
         })
       }}
     >
@@ -657,32 +643,6 @@ function SiteEdit({
             </option>
           ))}
         </select>
-      </div>
-      <div>
-        <label className="label" htmlFor={`${f}-ship`}>
-          {t('ship')}
-          {s.own_site_yn !== 'Y' && s.ship_cd && (
-            <span className="text-muted-foreground ml-2 text-xs">
-              {s.ship_pymnt_id ? ta('paid') : ta('unpaid')}
-            </span>
-          )}
-        </label>
-        <select
-          id={`${f}-ship`}
-          className="input"
-          value={ship}
-          onChange={(e) => setShip(e.target.value)}
-        >
-          <option value="">
-            {tsh(SHIP_DEFAULT)} — {t('shipFree')}
-          </option>
-          {SHIP_CD.map((c) => (
-            <option key={c} value={c}>
-              {tsh(c)}
-            </option>
-          ))}
-        </select>
-        <ShipPreview ship={ship || null} className="mt-2" />
       </div>
       {error && (
         <p className="text-destructive text-sm" role="alert">

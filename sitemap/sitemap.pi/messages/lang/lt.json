@@ -221,8 +221,7 @@
     "reapplyOpen": "Pateikti paraišką dar kartą",
     "spk": "Žėrinčioji priedas",
     "spkGo": "Apmokėti {amount} Pi už žėrinčiąją priedą",
-    "efctGo": "Apmokėti {amount} Pi už burbulo efektą",
-    "shipGo": "Apmokėti už „Warp“ erdvėlaivį {amount} Pi"
+    "efctGo": "Apmokėti {amount} Pi už burbulo efektą"
   },
   "pay": {
     "payNow": "Apmokėti {amount} Pi naudojimo mokestį ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Žėrinčioji priedas jau apmokėtas.",
     "efct": "Burbulo efektas",
     "payNowEfct": "Apmokėti {amount} Pi už burbulo efektą",
-    "efctAlreadyPaid": "Burbulo efektas jau apmokėtas.",
-    "ship": "„Warp“ erdvėlaivis",
-    "payNowShip": "Apmokėti už „Warp“ erdvėlaivį {amount} Pi",
-    "shipAlreadyPaid": "Apmokėjimas už „Warp“ erdvėlaivį atliktas."
+    "efctAlreadyPaid": "Burbulo efektas jau apmokėtas."
   },
   "form": {
     "newTitle": "Įtraukti svetainę",
@@ -287,11 +283,7 @@
     "efct": "Burbulo efektas",
     "efctNone": "Nėra",
     "efctHint": "Vienas vienam planui – Orbita (palydovas sukasi aplink burbulą), Pulsas (kvėpuojantis bangavimas), Kometa (uodegos pėdsakas). Apmokama kartu su naudojimo mokesčiu arba pasirenkama redagavimo metu, naudojant atskirą mokėjimą. Gali būti derinamas su žėrinčiuoju priedu.",
-    "efctPaid": "Apmokėta – lieka įjungta visą naudojimo laikotarpį.",
-    "ship": "„Warp“ erdvėlaivis",
-    "shipFree": "Pagrindinis·Nemokamas",
-    "shipHint": "Tai yra „Warp“ gido erdvėlaivis, kuris pasirodo lankytojams naršant jūsų svetainėje. Pagrindinis variantas yra „Saucer Cruiser“ (nemokamas), ir galite pasirinkti vieną iš keturių mokamų variantų. Jis apmokamas kartu su naudojimo mokesčiu, ir galite pasirinkti bei atlikti papildomus mokėjimus naudojimo metu.",
-    "shipPaid": "Apmokėjimas atliktas – palaikomas visą naudojimo laikotarpį."
+    "efctPaid": "Apmokėta – lieka įjungta visą naudojimo laikotarpį."
   },
   "admin": {
     "title": "Svetainės administratorius",
@@ -409,12 +401,5 @@
     "ORBIT": "Orbitos efektas",
     "PULSE": "Pulso efektas",
     "COMET": "Kometos efektas"
-  },
-  "ship": {
-    "SAUCER": "Diskinis kreiseris",
-    "BRIDGE": "Tilto vaizdo ekranas",
-    "TWIN": "Dvigubo sparno perėmėjas",
-    "DAGGER": "Durklo puolimo naikintuvas",
-    "CROSS": "Kryžminis naikintuvas"
   }
 }

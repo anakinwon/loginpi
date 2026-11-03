@@ -221,8 +221,7 @@
     "reapplyOpen": "Mohon lagi",
     "spk": "Tambahan Kilauan",
     "spkGo": "Bayar {amount} Pi untuk tambahan kilauan",
-    "efctGo": "Bayar {amount} Pi untuk kesan buih",
-    "shipGo": "Bayar {amount} Pi untuk Kapal Angkasa Warp"
+    "efctGo": "Bayar {amount} Pi untuk kesan buih"
   },
   "pay": {
     "payNow": "Bayar yuran penggunaan {amount} Pi ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Tambahan kilauan telah dibayar.",
     "efct": "Kesan buih",
     "payNowEfct": "Bayar {amount} Pi untuk kesan buih",
-    "efctAlreadyPaid": "Kesan buih telah dibayar.",
-    "ship": "Kapal Angkasa Warp",
-    "payNowShip": "Bayar {amount} Pi untuk Kapal Angkasa Warp",
-    "shipAlreadyPaid": "Pembayaran Kapal Angkasa Warp telah selesai."
+    "efctAlreadyPaid": "Kesan buih telah dibayar."
   },
   "form": {
     "newTitle": "Senaraikan tapak",
@@ -287,11 +283,7 @@
     "efct": "Kesan buih",
     "efctNone": "Tiada",
     "efctHint": "Satu setiap pelan — Orbit (satelit mengelilingi buih), Pulse (riak pernafasan), Comet (ekor mengekori). Dibayar dengan yuran penggunaan, atau dipilih dalam Edit semasa digunakan dengan pembayaran berasingan. Boleh digabungkan dengan Kilauan.",
-    "efctPaid": "Dibayar — kekal aktif untuk tempoh penggunaan.",
-    "ship": "Kapal Angkasa Warp",
-    "shipFree": "Asas · Percuma",
-    "shipHint": "Ini ialah kapal angkasa panduan warp yang muncul apabila pelawat pergi ke tapak. Asasnya ialah kapal penjelajah cakera (percuma), dan anda boleh memilih satu daripada empat jenis berbayar. Ia dibayar bersama dengan yuran penggunaan, dan anda boleh memilih dan membuat pembayaran tambahan daripada pengubahsuaian semasa digunakan.",
-    "shipPaid": "Pembayaran selesai — akan dikekalkan sepanjang tempoh penggunaan."
+    "efctPaid": "Dibayar — kekal aktif untuk tempoh penggunaan."
   },
   "admin": {
     "title": "Admin tapak",
@@ -409,12 +401,5 @@
     "ORBIT": "Kesan Orbit",
     "PULSE": "Kesan Denyutan",
     "COMET": "Kesan Komet"
-  },
-  "ship": {
-    "SAUCER": "Kapal Penjelajah Cakera",
-    "BRIDGE": "Skrin Pandangan Jambatan",
-    "TWIN": "Pemintas Sayap Berkembar",
-    "DAGGER": "Penyerang Belati",
-    "CROSS": "Pejuang Sayap Silang"
   }
 }

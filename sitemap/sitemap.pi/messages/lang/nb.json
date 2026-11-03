@@ -221,8 +221,7 @@
     "reapplyOpen": "Søk igjen",
     "spk": "Glitrende tillegg",
     "spkGo": "Betal {amount} Pi for det glitrende tillegget",
-    "efctGo": "Betal {amount} Pi for bobleeffekten",
-    "shipGo": "Betal {amount} Pi for Warp Spaceship"
+    "efctGo": "Betal {amount} Pi for bobleeffekten"
   },
   "pay": {
     "payNow": "Betal {amount} Pi bruksavgift ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Det glitrende tillegget er allerede betalt.",
     "efct": "Bobleeffekt",
     "payNowEfct": "Betal {amount} Pi for bobleeffekten",
-    "efctAlreadyPaid": "Bobleeffekten er allerede betalt.",
-    "ship": "Warp Spaceship",
-    "payNowShip": "Betal {amount} Pi for Warp Spaceship",
-    "shipAlreadyPaid": "Betaling for Warp Spaceship er fullført."
+    "efctAlreadyPaid": "Bobleeffekten er allerede betalt."
   },
   "form": {
     "newTitle": "List en side",
@@ -287,11 +283,7 @@
     "efct": "Bobleeffekt",
     "efctNone": "Ingen",
     "efctHint": "Én per plan – Orbit (en satellitt sirkler boblen), Pulse (pustende krusning), Comet (hale). Betales med bruksavgiften, eller velges i Rediger mens den er i bruk med en separat betaling. Kan kombineres med Sparkle.",
-    "efctPaid": "Betalt – forblir på i bruksperioden.",
-    "ship": "Warp Spaceship",
-    "shipFree": "Grunnleggende·Gratis",
-    "shipHint": "Dette er Warp Spaceship som vises når besøkende navigerer til nettstedet ditt. Standardalternativet er Saucer Cruiser (gratis), og du kan velge ett av fire betalte alternativer. Det betales sammen med bruksavgiften, og du kan velge og foreta ytterligere betalinger under bruk.",
-    "shipPaid": "Betaling fullført – vedlikeholdes i bruksperioden."
+    "efctPaid": "Betalt – forblir på i bruksperioden."
   },
   "admin": {
     "title": "Sideadmin",
@@ -409,12 +401,5 @@
     "ORBIT": "Orbit-effekt",
     "PULSE": "Puls-effekt",
     "COMET": "Komet-effekt"
-  },
-  "ship": {
-    "SAUCER": "Saucer Cruiser",
-    "BRIDGE": "Bridge Viewscreen",
-    "TWIN": "Twin-Wing Interceptor",
-    "DAGGER": "Dagger Assault Fighter",
-    "CROSS": "Kryssving-jagerfly"
   }
 }

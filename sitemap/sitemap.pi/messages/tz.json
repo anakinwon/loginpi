@@ -221,8 +221,7 @@
     "reapplyOpen": "Omba tena",
     "spk": "Nyongeza ya kumeta",
     "spkGo": "Lipa {amount} Pi kwa nyongeza ya kumeta",
-    "efctGo": "Lipa {amount} Pi kwa athari ya bubble",
-    "shipGo": "Lipa {amount} Pi kwa Warp Spaceship"
+    "efctGo": "Lipa {amount} Pi kwa athari ya bubble"
   },
   "pay": {
     "payNow": "Lipa ada ya matumizi ya Pi {amount} ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Nyongeza ya kumeta tayari imelipwa.",
     "efct": "Athari ya bubble",
     "payNowEfct": "Lipa {amount} Pi kwa athari ya bubble",
-    "efctAlreadyPaid": "Athari ya bubble tayari imelipwa.",
-    "ship": "Warp Spaceship",
-    "payNowShip": "Lipa {amount} Pi kwa Warp Spaceship",
-    "shipAlreadyPaid": "Malipo ya Warp Spaceship yamekamilika."
+    "efctAlreadyPaid": "Athari ya bubble tayari imelipwa."
   },
   "form": {
     "newTitle": "Orodhesha tovuti",
@@ -287,11 +283,7 @@
     "efct": "Athari ya bubble",
     "efctNone": "Hakuna",
     "efctHint": "Moja kwa kila mpango — Obiti (satelaiti inazunguka bubble), Pulse (mawimbi ya kupumua), Comet (mkia unaofuata). Inalipwa na ada ya matumizi, au kuchaguliwa katika Hariri wakati inatumika na malipo tofauti. Inaweza kuunganishwa na Kumeta.",
-    "efctPaid": "Imelipwa — inakaa kwa kipindi cha matumizi.",
-    "ship": "Warp Spaceship",
-    "shipFree": "Msingi·Bure",
-    "shipHint": "Huu ni usafiri wa anga wa mwongozo wa warp unaoonekana wageni wanapoelekea kwenye tovuti yako. Chaguo la msingi ni Saucer Cruiser (bure), na unaweza kuchagua mojawapo ya chaguo nne zinazolipwa. Inalipwa pamoja na ada ya matumizi, na unaweza kuchagua na kufanya malipo ya ziada wakati wa matumizi.",
-    "shipPaid": "Malipo yamekamilika — yanatunzwa kwa muda wote wa matumizi."
+    "efctPaid": "Imelipwa — inakaa kwa kipindi cha matumizi."
   },
   "admin": {
     "title": "Usimamizi wa tovuti",
@@ -409,12 +401,5 @@
     "ORBIT": "Athari ya mzunguko",
     "PULSE": "Athari ya mpigo",
     "COMET": "Athari ya kometi"
-  },
-  "ship": {
-    "SAUCER": "Saucer Cruiser",
-    "BRIDGE": "Skrini ya Daraja",
-    "TWIN": "Ndege ya Kuzuia yenye Mabawa Mawili",
-    "DAGGER": "Ndege ya Kivita ya Dagger",
-    "CROSS": "Mpiganaji wa mrengo-msalaba"
   }
 }

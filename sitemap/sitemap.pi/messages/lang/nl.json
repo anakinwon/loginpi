@@ -221,8 +221,7 @@
     "reapplyOpen": "Opnieuw aanvragen",
     "spk": "Sparkle add-on",
     "spkGo": "Betaal {amount} Pi voor de sparkle add-on",
-    "efctGo": "Betaal {amount} Pi voor het bubbeleffect",
-    "shipGo": "Betaal {amount} Pi voor Warp Ruimteschip"
+    "efctGo": "Betaal {amount} Pi voor het bubbeleffect"
   },
   "pay": {
     "payNow": "Betaal {amount} Pi gebruikskosten ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "De sparkle add-on is al betaald.",
     "efct": "Bubbeleffect",
     "payNowEfct": "Betaal {amount} Pi voor het bubbeleffect",
-    "efctAlreadyPaid": "Het bubbeleffect is al betaald.",
-    "ship": "Warp Ruimteschip",
-    "payNowShip": "Betaal {amount} Pi voor Warp Ruimteschip",
-    "shipAlreadyPaid": "De betaling voor het Warp Ruimteschip is voltooid."
+    "efctAlreadyPaid": "Het bubbeleffect is al betaald."
   },
   "form": {
     "newTitle": "Site vermelden",
@@ -287,11 +283,7 @@
     "efct": "Bubbeleffect",
     "efctNone": "Geen",
     "efctHint": "Eén per abonnement — Orbit (een satelliet cirkelt om de bubbel), Pulse (ademende rimpeling), Comet (sleepende staart). Wordt betaald met de gebruikskosten, of gekozen in Bewerken tijdens gebruik met een aparte betaling. Kan worden gecombineerd met Sparkle.",
-    "efctPaid": "Betaald — blijft aan gedurende de gebruiksperiode.",
-    "ship": "Warp Ruimteschip",
-    "shipFree": "Basis·Gratis",
-    "shipHint": "Dit is het warp-gids ruimteschip dat verschijnt wanneer bezoekers naar uw site navigeren. De basisoptie is de Saucer Cruiser (gratis), en u kunt één van de vier betaalde opties kiezen. Het wordt betaald samen met de gebruikskosten, en u kunt tijdens het gebruik selecteren en extra betalingen doen.",
-    "shipPaid": "Betaling voltooid — wordt gehandhaafd gedurende de gebruiksduur."
+    "efctPaid": "Betaald — blijft aan gedurende de gebruiksperiode."
   },
   "admin": {
     "title": "Sitebeheer",
@@ -409,12 +401,5 @@
     "ORBIT": "Orbit-effect",
     "PULSE": "Puls-effect",
     "COMET": "Komeet-effect"
-  },
-  "ship": {
-    "SAUCER": "Schotel Kruiser",
-    "BRIDGE": "Brugscherm",
-    "TWIN": "Dubbelvleugelige Interceptor",
-    "DAGGER": "Dolk Aanvalsjager",
-    "CROSS": "Kruisvleugeljager"
   }
 }

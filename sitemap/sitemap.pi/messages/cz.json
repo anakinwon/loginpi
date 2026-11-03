@@ -221,8 +221,7 @@
     "reapplyOpen": "Znovu požádat",
     "spk": "Doplněk Jiskra",
     "spkGo": "Zaplatit {amount} Pi za doplněk Jiskra",
-    "efctGo": "Zaplatit {amount} Pi za bublinový efekt",
-    "shipGo": "Zaplatit {amount} Pi za Warp Spaceship"
+    "efctGo": "Zaplatit {amount} Pi za bublinový efekt"
   },
   "pay": {
     "payNow": "Zaplatit poplatek za užívání {amount} Pi ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Doplněk Jiskra je již zaplacen.",
     "efct": "Bublinový efekt",
     "payNowEfct": "Zaplatit {amount} Pi za bublinový efekt",
-    "efctAlreadyPaid": "Bublinový efekt je již zaplacen.",
-    "ship": "Warp Spaceship",
-    "payNowShip": "Zaplatit {amount} Pi za Warp Spaceship",
-    "shipAlreadyPaid": "Platba za Warp Spaceship byla dokončena."
+    "efctAlreadyPaid": "Bublinový efekt je již zaplacen."
   },
   "form": {
     "newTitle": "Uvést stránku",
@@ -287,11 +283,7 @@
     "efct": "Bublinový efekt",
     "efctNone": "Žádný",
     "efctHint": "Jeden na plán – Oběžná dráha (satelit krouží kolem bubliny), Puls (dýchající vlnění), Kometa (ocasní stopa). Zaplaceno s poplatkem za užívání, nebo vybráno v úpravách během používání s oddělenou platbou. Lze kombinovat s Jiskrou.",
-    "efctPaid": "Zaplaceno – zůstává zapnuto po dobu používání.",
-    "ship": "Warp Spaceship",
-    "shipFree": "Základní·Zdarma",
-    "shipHint": "Toto je naváděcí warp vesmírná loď, která se objeví, když návštěvníci přejdou na váš web. Základní možností je talířový křižník (zdarma) a můžete si vybrat jednu ze čtyř placených možností. Platí se spolu s poplatkem za používání a během používání ji můžete vybrat a provést dodatečnou platbu.",
-    "shipPaid": "Platba dokončena — udržováno po dobu používání."
+    "efctPaid": "Zaplaceno – zůstává zapnuto po dobu používání."
   },
   "admin": {
     "title": "Správa stránek",
@@ -409,12 +401,5 @@
     "ORBIT": "Efekt oběžné dráhy",
     "PULSE": "Efekt pulzu",
     "COMET": "Efekt komety"
-  },
-  "ship": {
-    "SAUCER": "Talířový křižník",
-    "BRIDGE": "Mostní obrazovka",
-    "TWIN": "Dvoukřídlý stíhač",
-    "DAGGER": "Útočná stíhačka Dagger",
-    "CROSS": "Stíhačka s křížovými křídly"
   }
 }

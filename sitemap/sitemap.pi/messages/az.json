@@ -221,8 +221,7 @@
     "reapplyOpen": "Yenidən müraciət edin",
     "spk": "Parıltı əlavəsi",
     "spkGo": "Parıltı əlavəsi üçün {amount} Pi ödəyin",
-    "efctGo": "Bubble effekti üçün {amount} Pi ödəyin",
-    "shipGo": "Warp Kosmik Gəmisi üçün {amount} Pi ödəyin"
+    "efctGo": "Bubble effekti üçün {amount} Pi ödəyin"
   },
   "pay": {
     "payNow": "{amount} Pi istifadə haqqını ödəyin ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Parıltı əlavəsi artıq ödənilib.",
     "efct": "Bubble effekti",
     "payNowEfct": "Bubble effekti üçün {amount} Pi ödəyin",
-    "efctAlreadyPaid": "Bubble effekti artıq ödənilib.",
-    "ship": "Warp Kosmik Gəmisi",
-    "payNowShip": "Warp Kosmik Gəmisi üçün {amount} Pi ödəyin",
-    "shipAlreadyPaid": "Warp Kosmik Gəmisi ödənişi tamamlandı."
+    "efctAlreadyPaid": "Bubble effekti artıq ödənilib."
   },
   "form": {
     "newTitle": "Sayt siyahıya al",
@@ -287,11 +283,7 @@
     "efct": "Bubble effekti",
     "efctNone": "Yoxdur",
     "efctHint": "Hər plana görə bir növ — Orbit (peykin bubble ətrafında fırlanması), Pulse (nəfəs alan dalğa), Comet (quyruq izi). İstifadə haqqı ilə birlikdə ödənilir və ya istifadə zamanı Redaktə bölməsində seçilə və əlavə ödənişlə açıla bilər. Parıltı ilə birləşdirilə bilər.",
-    "efctPaid": "Ödənilib — istifadə müddəti ərzində qalır.",
-    "ship": "Warp Kosmik Gəmisi",
-    "shipFree": "Əsas·Pulsuz",
-    "shipHint": "Bu, ziyarətçilər saytınıza daxil olduqda görünən warp bələdçi kosmik gəmisidir. Əsas seçim Saucer Cruiser (pulsuz) olub, dörd ödənişli variantdan birini seçə bilərsiniz. İstifadə haqqı ilə birlikdə ödənilir və istifadə zamanı əlavə ödənişlər edə bilərsiniz.",
-    "shipPaid": "Ödəniş tamamlandı — istifadə müddəti ərzində saxlanılır."
+    "efctPaid": "Ödənilib — istifadə müddəti ərzində qalır."
   },
   "admin": {
     "title": "Sayt admini",
@@ -409,12 +401,5 @@
     "ORBIT": "Orbit effekti",
     "PULSE": "Puls effekti",
     "COMET": "Komet effekti"
-  },
-  "ship": {
-    "SAUCER": "Saucer Cruiser",
-    "BRIDGE": "Körpü Ekranı",
-    "TWIN": "İkiqanadlı Kəşfiyyatçı",
-    "DAGGER": "Xəncər Hücum Qırıcısı",
-    "CROSS": "Çarpaz qanadlı qırıcı"
   }
 }

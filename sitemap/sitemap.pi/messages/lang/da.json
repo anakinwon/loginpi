@@ -221,8 +221,7 @@
     "reapplyOpen": "Ansøg igen",
     "spk": "Glitrende tilføjelse",
     "spkGo": "Betal {amount} Pi for den glitrende tilføjelse",
-    "efctGo": "Betal {amount} Pi for bobleeffekten",
-    "shipGo": "Betal {amount} Pi for Warp-rumskib"
+    "efctGo": "Betal {amount} Pi for bobleeffekten"
   },
   "pay": {
     "payNow": "Betal {amount} Pi brugsgebyr ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Den glitrende tilføjelse er allerede betalt.",
     "efct": "Bobleeffekt",
     "payNowEfct": "Betal {amount} Pi for bobleeffekten",
-    "efctAlreadyPaid": "Bobleeffekten er allerede betalt.",
-    "ship": "Warp-rumskib",
-    "payNowShip": "Betal {amount} Pi for Warp-rumskib",
-    "shipAlreadyPaid": "Betaling for Warp-rumskib er gennemført."
+    "efctAlreadyPaid": "Bobleeffekten er allerede betalt."
   },
   "form": {
     "newTitle": "Opret et websted",
@@ -287,11 +283,7 @@
     "efct": "Bobleeffekt",
     "efctNone": "Ingen",
     "efctHint": "Én pr. plan – Orbit (en satellit kredser om boblen), Puls (åndedrætsbølge), Komet (efterfølgende hale). Betales med brugsgebyret, eller vælges i Rediger under brug med en separat betaling. Kan kombineres med Glitrende.",
-    "efctPaid": "Betalt – forbliver aktiv i brugsperioden.",
-    "ship": "Warp-rumskib",
-    "shipFree": "Basis·Gratis",
-    "shipHint": "Dette er det warp-vejledende rumskib, der vises, når besøgende navigerer til dit websted. Basisindstillingen er Tallerkenkrydseren (gratis), og du kan vælge en af fire betalte muligheder. Det betales sammen med brugsgebyret, og du kan vælge og foretage yderligere betalinger under brug.",
-    "shipPaid": "Betaling gennemført — vedligeholdes i hele brugsperioden."
+    "efctPaid": "Betalt – forbliver aktiv i brugsperioden."
   },
   "admin": {
     "title": "Webstedsadministration",
@@ -409,12 +401,5 @@
     "ORBIT": "Orbit-effekt",
     "PULSE": "Puls-effekt",
     "COMET": "Komet-effekt"
-  },
-  "ship": {
-    "SAUCER": "Tallerkenkrydser",
-    "BRIDGE": "Bro-visningsskærm",
-    "TWIN": "Tvillingsvinget Interceptor",
-    "DAGGER": "Dolk-angrebsjager",
-    "CROSS": "Krydsvinget jagerfly"
   }
 }

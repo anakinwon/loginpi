@@ -221,8 +221,7 @@
     "reapplyOpen": "Applica di nuovo",
     "spk": "Componente aggiuntivo Sparkle",
     "spkGo": "Paga {amount} Pi per il componente aggiuntivo sparkle",
-    "efctGo": "Paga {amount} Pi per l'effetto bolla",
-    "shipGo": "Paga {amount} Pi per la navicella spaziale Warp"
+    "efctGo": "Paga {amount} Pi per l'effetto bolla"
   },
   "pay": {
     "payNow": "Paga la tariffa d'uso di {amount} Pi ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Il componente aggiuntivo sparkle è già pagato.",
     "efct": "Effetto bolla",
     "payNowEfct": "Paga {amount} Pi per l'effetto bolla",
-    "efctAlreadyPaid": "L'effetto bolla è già pagato.",
-    "ship": "Navicella spaziale Warp",
-    "payNowShip": "Paga {amount} Pi per la navicella spaziale Warp",
-    "shipAlreadyPaid": "Il pagamento della navicella spaziale Warp è stato completato."
+    "efctAlreadyPaid": "L'effetto bolla è già pagato."
   },
   "form": {
     "newTitle": "Elenca un sito",
@@ -287,11 +283,7 @@
     "efct": "Effetto bolla",
     "efctNone": "Nessuno",
     "efctHint": "Uno per piano — Orbita (un satellite circonda la bolla), Impulso (increspatura respiratoria), Cometa (coda persistente). Pagato con la tariffa d'uso, o scelto in Modifica durante l'uso con un pagamento separato. Può essere combinato con Sparkle.",
-    "efctPaid": "Pagato — rimane attivo per il periodo di utilizzo.",
-    "ship": "Navicella spaziale Warp",
-    "shipFree": "Base·Gratuito",
-    "shipHint": "Questa è la navicella spaziale guida warp che appare quando i visitatori navigano sul tuo sito. L'opzione base è l'Incrociatore a Disco (gratuito), e puoi scegliere una delle quattro opzioni a pagamento. Viene pagata insieme alla tariffa d'uso, e puoi selezionare ed effettuare pagamenti aggiuntivi durante l'uso.",
-    "shipPaid": "Pagamento completato — mantenuto per la durata dell'uso."
+    "efctPaid": "Pagato — rimane attivo per il periodo di utilizzo."
   },
   "admin": {
     "title": "Amministrazione sito",
@@ -409,12 +401,5 @@
     "ORBIT": "Effetto orbita",
     "PULSE": "Effetto impulso",
     "COMET": "Effetto cometa"
-  },
-  "ship": {
-    "SAUCER": "Incrociatore a Disco",
-    "BRIDGE": "Schermo di Visualizzazione del Ponte",
-    "TWIN": "Intercettore a Doppia Ala",
-    "DAGGER": "Caccia d'Assalto a Pugnale",
-    "CROSS": "Caccia ad ala incrociata"
   }
 }

@@ -9,7 +9,6 @@ import { LoginGate } from './login-gate'
 import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import { LIMITS, MV_URL_RE, RPT_RSN, type PublicSite } from '@/lib/site'
 import { LeaveDialog } from './leave-dialog'
-import { preloadShip } from './ships'
 
 function recordStat(siteId: string, type: 'VIEW' | 'CLCK') {
   const key = `stat:${type}:${siteId}`
@@ -34,20 +33,18 @@ export function SiteDetail({ domain }: { domain: string }) {
   const [data, setData] = useState<{
     site: PublicSite
     viewCnt: number
-    ship?: string | null // 워프 우주선(shipOn, null = 기본 SAUCER)
   } | null>(null)
   const [error, setError] = useState<ApiErrorBody | null>(null)
   const [confirming, setConfirming] = useState(false)
 
   useEffect(() => {
     let cancelled = false
-    void readApi<{ site: PublicSite; viewCnt: number; ship?: string | null }>(
+    void readApi<{ site: PublicSite; viewCnt: number }>(
       fetch(`/api/sites/${encodeURIComponent(domain)}`),
     ).then((r) => {
       if (cancelled) return
       if (r.ok) {
         setData(r.data)
-        preloadShip(r.data.ship) // 이동 안내 기체 청크 미리 받기(클릭 뒤 깜빡임 방지)
         recordStat(r.data.site.site_id, 'VIEW')
       } else setError(r.body)
     })
@@ -65,7 +62,7 @@ export function SiteDetail({ domain }: { domain: string }) {
   if (!data)
     return <p className="text-muted-foreground text-sm">{t('loading')}</p>
 
-  const { site, viewCnt, ship } = data
+  const { site, viewCnt } = data
   // 이동 URL(등록자 입력) 우선, 없으면 .pi 도메인 — 이동은 클릭+안내+새 창(A-6)
   // 렌더 시점 재검증(심층 방어) — 저장 경로(zod·DB CHECK)와 같은 https 규칙, 불일치 값은 무시
   const url =
@@ -110,7 +107,6 @@ export function SiteDetail({ domain }: { domain: string }) {
           url={url}
           name={site.site_nm}
           desc={site.site_desc}
-          ship={ship}
           onConfirm={visit}
           onCancel={() => setConfirming(false)}
         />

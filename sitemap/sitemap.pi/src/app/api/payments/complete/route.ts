@@ -16,7 +16,6 @@ import {
   completePiPayment,
   getOwnPayment,
   SITE_EFCT,
-  SITE_SHIP,
   SITE_SPK,
 } from '@/lib/payments'
 import { pickOwnerSite } from '@/lib/site'
@@ -62,9 +61,7 @@ export const POST = withAuthGuard(
         ? 'fn_cmpl_site_spk_pymnt'
         : row.pymnt_tp_cd === SITE_EFCT
           ? 'fn_cmpl_site_efct_pymnt'
-          : row.pymnt_tp_cd === SITE_SHIP
-            ? 'fn_cmpl_site_ship_pymnt'
-            : 'fn_cmpl_site_reg_pymnt',
+          : 'fn_cmpl_site_reg_pymnt',
       {
         p_pymnt_id: body.paymentId,
         p_tx_id: body.txid,

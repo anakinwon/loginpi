@@ -221,8 +221,7 @@
     "reapplyOpen": "Qayta ariza topshirish",
     "spk": "Yaltiroq qoʻshimcha",
     "spkGo": "Yaltiroq qoʻshimcha uchun {amount} Pi toʻlash",
-    "efctGo": "Pufakcha effekti uchun {amount} Pi toʻlash",
-    "shipGo": "Warp kosmik kemasi uchun {amount} Pi toʻlash"
+    "efctGo": "Pufakcha effekti uchun {amount} Pi toʻlash"
   },
   "pay": {
     "payNow": "{amount} Pi foydalanish toʻlovini toʻlash ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Yaltiroq qoʻshimcha allaqachon toʻlangan.",
     "efct": "Pufakcha effekti",
     "payNowEfct": "Pufakcha effekti uchun {amount} Pi toʻlash",
-    "efctAlreadyPaid": "Pufakcha effekti allaqachon toʻlangan.",
-    "ship": "Warp kosmik kemasi",
-    "payNowShip": "Warp kosmik kemasi uchun {amount} Pi toʻlash",
-    "shipAlreadyPaid": "Warp kosmik kemasi uchun toʻlov yakunlandi."
+    "efctAlreadyPaid": "Pufakcha effekti allaqachon toʻlangan."
   },
   "form": {
     "newTitle": "Saytni roʻyxatga olish",
@@ -287,11 +283,7 @@
     "efct": "Pufakcha effekti",
     "efctNone": "Yoʻq",
     "efctHint": "Har bir reja uchun bitta — Orbit (sunʼiy yoʻldosh pufakcha atrofida aylanadi), Pulse (nafas oluvchi toʻlqin), Comet (dumli iz). Foydalanish toʻlovi bilan birga toʻlanadi yoki foydalanish paytida Tahrirlashda tanlanadi va qoʻshimcha toʻlov bilan toʻlanadi. Yaltiroq bilan birlashtirilishi mumkin.",
-    "efctPaid": "Toʻlangan — foydalanish davrida qoladi.",
-    "ship": "Warp kosmik kemasi",
-    "shipFree": "Asosiy·Bepul",
-    "shipHint": "Bu tashrif buyuruvchilar saytingizga oʻtganda paydo boʻladigan warp yoʻriqnoma kosmik kemasi. Asosiy variant Saucer Cruiser (bepul) boʻlib, siz toʻrtta pullik variantdan birini tanlashingiz mumkin. U foydalanish toʻlovi bilan birga toʻlanadi va foydalanish davomida tanlab, qoʻshimcha toʻlovlarni amalga oshirishingiz mumkin.",
-    "shipPaid": "Toʻlov yakunlandi — foydalanish muddati davomida saqlanadi."
+    "efctPaid": "Toʻlangan — foydalanish davrida qoladi."
   },
   "admin": {
     "title": "Sayt boshqaruvi",
@@ -409,12 +401,5 @@
     "ORBIT": "Orbit effekti",
     "PULSE": "Puls effekti",
     "COMET": "Kometa effekti"
-  },
-  "ship": {
-    "SAUCER": "Saucer Cruiser",
-    "BRIDGE": "Koʻprik koʻrish ekrani",
-    "TWIN": "Ikki qanotli tutib oluvchi",
-    "DAGGER": "Xanjar hujumchi qiruvchi",
-    "CROSS": "Xoch qanotli qiruvchi"
   }
 }

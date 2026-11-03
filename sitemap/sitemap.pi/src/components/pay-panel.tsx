@@ -18,7 +18,7 @@ import {
 } from '@/lib/client-api'
 import { PAYABLE_STS, SPK_PAYABLE_STS, type OwnerSite } from '@/lib/site'
 
-export type PayKind = 'REG' | 'SPK' | 'EFCT' | 'SHIP' // 사용료(부가서비스 합산 포함) / 반짝임 단독 / 이펙트 단독 / 우주선 단독
+export type PayKind = 'REG' | 'SPK' | 'EFCT' // 사용료(부가서비스 합산 포함) / 반짝임 단독 / 이펙트 단독
 
 export function PayPanel({ siteId, kind }: { siteId: string; kind: PayKind }) {
   return (
@@ -31,7 +31,6 @@ function PayPanelInner({ siteId, kind }: { siteId: string; kind: PayKind }) {
   const tp = useTranslations('plan')
   const ts = useTranslations('siteSts')
   const te = useTranslations('efct')
-  const tsh = useTranslations('ship')
   const errText = useApiErrorText()
   const fees = useRegFees()
   const feeLabel = useFeeLabel()
@@ -68,28 +67,21 @@ function PayPanelInner({ siteId, kind }: { siteId: string; kind: PayKind }) {
   const efctFee = fee?.efct ?? null
   const efctAdd =
     kind === 'REG' && site.efct_cd && !site.efct_pymnt_id ? efctFee : null
-  const shipFee = fee?.ship ?? null
-  const shipAdd =
-    kind === 'REG' && site.ship_cd && !site.ship_pymnt_id ? shipFee : null
   const amount =
     kind === 'SPK'
       ? spkFee
       : kind === 'EFCT'
         ? efctFee
-        : kind === 'SHIP'
-          ? shipFee
-          : fee?.pi_amt == null
-            ? null
-            : fee.pi_amt + (spkAdd ?? 0) + (efctAdd ?? 0) + (shipAdd ?? 0)
+        : fee?.pi_amt == null
+          ? null
+          : fee.pi_amt + (spkAdd ?? 0) + (efctAdd ?? 0)
   const { term, discount } = feeLabel(fee)
   const paid =
     kind === 'SPK'
       ? !!site.spk_pymnt_id
       : kind === 'EFCT'
         ? !!site.efct_pymnt_id
-        : kind === 'SHIP'
-          ? !!site.ship_pymnt_id
-          : !!site.pymnt_id
+        : !!site.pymnt_id
   const addonPayable =
     (SPK_PAYABLE_STS as readonly string[]).includes(site.site_sts_cd) &&
     (site.site_sts_cd !== 'APPLYING' || !!site.pymnt_id)
@@ -98,16 +90,13 @@ function PayPanelInner({ siteId, kind }: { siteId: string; kind: PayKind }) {
       ? addonPayable && site.spk_yn === 'Y'
       : kind === 'EFCT'
         ? addonPayable && !!site.efct_cd
-        : kind === 'SHIP'
-          ? addonPayable && !!site.ship_cd
-          : (PAYABLE_STS as readonly string[]).includes(site.site_sts_cd)
+        : (PAYABLE_STS as readonly string[]).includes(site.site_sts_cd)
   // 요금표에 해당 요금제가 있고 단가 0 일 때만 "불필요" — 조회 중·조회 실패는 금액 미상으로 두고 버튼 유지(서버 prepare 가 최종 판정)
   const notRequired =
     site.own_site_yn === 'Y' ||
     (amount != null && !(amount > 0)) ||
     (kind === 'SPK' && fees != null && spkFee == null) ||
-    (kind === 'EFCT' && fees != null && efctFee == null) ||
-    (kind === 'SHIP' && fees != null && shipFee == null)
+    (kind === 'EFCT' && fees != null && efctFee == null)
 
   return (
     <div className="flex flex-col gap-4">
@@ -139,14 +128,6 @@ function PayPanelInner({ siteId, kind }: { siteId: string; kind: PayKind }) {
             </dd>
           </>
         )}
-        {(kind === 'SHIP' || shipAdd != null) && site.ship_cd && (
-          <>
-            <dt className="text-muted-foreground">{t('ship')}</dt>
-            <dd>
-              🚀 {tsh(site.ship_cd)} {shipFee == null ? '…' : `${shipFee} Pi`}
-            </dd>
-          </>
-        )}
         <dt className="text-muted-foreground">{t('amount')}</dt>
         <dd className="text-lg font-semibold">
           {amount == null ? '…' : `${amount} Pi`}
@@ -164,9 +145,7 @@ function PayPanelInner({ siteId, kind }: { siteId: string; kind: PayKind }) {
             ? t('spkAlreadyPaid')
             : kind === 'EFCT'
               ? t('efctAlreadyPaid')
-              : kind === 'SHIP'
-                ? t('shipAlreadyPaid')
-                : t('alreadyPaid', { at: site.pay_dtm ?? '' })}
+              : t('alreadyPaid', { at: site.pay_dtm ?? '' })}
         </p>
       ) : notRequired ? (
         <p className="text-muted-foreground text-sm">{t('notRequired')}</p>

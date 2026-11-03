@@ -221,8 +221,7 @@
     "reapplyOpen": "Tekrar başvur",
     "spk": "Parıltı eklentisi",
     "spkGo": "Parıltı eklentisi için {amount} Pi öde",
-    "efctGo": "Baloncuk efekti için {amount} Pi öde",
-    "shipGo": "Warp Uzay Gemisi için {amount} Pi öde"
+    "efctGo": "Baloncuk efekti için {amount} Pi öde"
   },
   "pay": {
     "payNow": "{amount} Pi kullanım ücretini öde ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Parıltı eklentisi zaten ödendi.",
     "efct": "Baloncuk efekti",
     "payNowEfct": "Baloncuk efekti için {amount} Pi öde",
-    "efctAlreadyPaid": "Baloncuk efekti zaten ödendi.",
-    "ship": "Warp Uzay Gemisi",
-    "payNowShip": "Warp Uzay Gemisi için {amount} Pi öde",
-    "shipAlreadyPaid": "Warp Uzay Gemisi ödemesi tamamlandı."
+    "efctAlreadyPaid": "Baloncuk efekti zaten ödendi."
   },
   "form": {
     "newTitle": "Bir site listele",
@@ -287,11 +283,7 @@
     "efct": "Baloncuk efekti",
     "efctNone": "Yok",
     "efctHint": "Plana göre bir tane — Yörünge (bir uydu baloncuğun etrafında döner), Nabız (nefes alan dalgalanma), Kuyruklu yıldız (iz bırakan kuyruk). Kullanım ücretiyle birlikte ödenir veya kullanımdayken Düzenle'de seçilir ve ayrı bir ödeme ile ödenir. Parıltı ile birleştirilebilir.",
-    "efctPaid": "Ödendi — kullanım süresi boyunca açık kalır.",
-    "ship": "Warp Uzay Gemisi",
-    "shipFree": "Temel·Ücretsiz",
-    "shipHint": "Bu, ziyaretçiler sitenize gittiğinde görünen warp rehber uzay gemisidir. Temel seçenek Saucer Cruiser (ücretsiz) olup, dört ücretli seçenekten birini seçebilirsiniz. Kullanım ücretiyle birlikte ödenir ve kullanım sırasında düzenleyerek ek ödeme yapabilirsiniz.",
-    "shipPaid": "Ödeme tamamlandı — kullanım süresi boyunca korunur."
+    "efctPaid": "Ödendi — kullanım süresi boyunca açık kalır."
   },
   "admin": {
     "title": "Site yöneticisi",
@@ -409,12 +401,5 @@
     "ORBIT": "Yörünge efekti",
     "PULSE": "Nabız efekti",
     "COMET": "Kuyruklu yıldız efekti"
-  },
-  "ship": {
-    "SAUCER": "Saucer Cruiser",
-    "BRIDGE": "Köprü Görüş Ekranı",
-    "TWIN": "Çift Kanatlı Önleyici",
-    "DAGGER": "Hançer Saldırı Savaşçısı",
-    "CROSS": "Çapraz kanatlı savaşçı"
   }
 }

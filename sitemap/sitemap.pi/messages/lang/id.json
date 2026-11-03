@@ -221,8 +221,7 @@
     "reapplyOpen": "Ajukan lagi",
     "spk": "Add-on kilau",
     "spkGo": "Bayar {amount} Pi untuk add-on kilau",
-    "efctGo": "Bayar {amount} Pi untuk efek gelembung",
-    "shipGo": "Bayar {amount} Pi untuk Kapal Warp"
+    "efctGo": "Bayar {amount} Pi untuk efek gelembung"
   },
   "pay": {
     "payNow": "Bayar biaya penggunaan {amount} Pi ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Add-on kilau sudah dibayar.",
     "efct": "Efek gelembung",
     "payNowEfct": "Bayar {amount} Pi untuk efek gelembung",
-    "efctAlreadyPaid": "Efek gelembung sudah dibayar.",
-    "ship": "Kapal Warp",
-    "payNowShip": "Bayar {amount} Pi untuk Kapal Warp",
-    "shipAlreadyPaid": "Pembayaran Kapal Warp telah selesai."
+    "efctAlreadyPaid": "Efek gelembung sudah dibayar."
   },
   "form": {
     "newTitle": "Daftarkan situs",
@@ -287,11 +283,7 @@
     "efct": "Efek gelembung",
     "efctNone": "Tidak ada",
     "efctHint": "Satu per paket — Orbit (satelit mengelilingi gelembung), Pulse (riak bernapas), Comet (ekor yang membuntuti). Dibayar dengan biaya penggunaan, atau dipilih di Edit saat digunakan dengan pembayaran terpisah. Dapat digabungkan dengan Kilau.",
-    "efctPaid": "Dibayar — tetap aktif selama periode penggunaan.",
-    "ship": "Kapal Warp",
-    "shipFree": "Dasar·Gratis",
-    "shipHint": "Ini adalah kapal warp yang memandu pengunjung ke situs. Standarnya adalah kapal penjelajah piringan (gratis), dan Anda dapat memilih salah satu dari 4 jenis berbayar. Ini dibayar bersama dengan biaya penggunaan, dan Anda dapat memilih dan membayar tambahan dari modifikasi saat digunakan.",
-    "shipPaid": "Pembayaran selesai — akan dipertahankan selama periode penggunaan."
+    "efctPaid": "Dibayar — tetap aktif selama periode penggunaan."
   },
   "admin": {
     "title": "Admin situs",
@@ -409,12 +401,5 @@
     "ORBIT": "Efek orbit",
     "PULSE": "Efek denyut",
     "COMET": "Efek komet"
-  },
-  "ship": {
-    "SAUCER": "Kapal Penjelajah Piringan",
-    "BRIDGE": "Layar Jembatan",
-    "TWIN": "Pesawat Pencegat Sayap Kembar",
-    "DAGGER": "Pesawat Serbu Belati",
-    "CROSS": "Pesawat Tempur Sayap Silang"
   }
 }

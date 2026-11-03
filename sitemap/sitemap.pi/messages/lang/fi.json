@@ -221,8 +221,7 @@
     "reapplyOpen": "Hae uudelleen",
     "spk": "Kimalle-lisäosa",
     "spkGo": "Maksa {amount} Pi kimalle-lisäosasta",
-    "efctGo": "Maksa {amount} Pi kuplavaikutuksesta",
-    "shipGo": "Maksa {amount} Pi Warp-avaruusaluksesta"
+    "efctGo": "Maksa {amount} Pi kuplavaikutuksesta"
   },
   "pay": {
     "payNow": "Maksa {amount} Pi käyttömaksu ({plan})",
@@ -249,10 +248,7 @@
     "spkAlreadyPaid": "Kimalle-lisäosa on jo maksettu.",
     "efct": "Kuplavaikutus",
     "payNowEfct": "Maksa {amount} Pi kuplavaikutuksesta",
-    "efctAlreadyPaid": "Kuplavaikutus on jo maksettu.",
-    "ship": "Warp-avaruusalus",
-    "payNowShip": "Maksa {amount} Pi Warp-avaruusaluksesta",
-    "shipAlreadyPaid": "Warp-avaruusaluksen maksu on suoritettu."
+    "efctAlreadyPaid": "Kuplavaikutus on jo maksettu."
   },
   "form": {
     "newTitle": "Listaa sivusto",
@@ -287,11 +283,7 @@
     "efct": "Kuplavaikutus",
     "efctNone": "Ei mitään",
     "efctHint": "Yksi per paketti – kiertorata (satelliitti kiertää kuplaa), pulssi (hengittävä aaltoilu), komeetta (jälkivaikutus). Maksetaan käyttömaksun yhteydessä tai valitaan Muokkaa-tilassa käytön aikana erillisellä maksulla. Voidaan yhdistää Kimalle-lisäosan kanssa.",
-    "efctPaid": "Maksettu – pysyy päällä käyttöjakson ajan.",
-    "ship": "Warp-avaruusalus",
-    "shipFree": "Perus·Ilmainen",
-    "shipHint": "Tämä on warp-opasavaruusalus, joka ilmestyy, kun kävijät siirtyvät sivustollesi. Perusvaihtoehto on Lautasristeilijä (ilmainen), ja voit valita yhden neljästä maksullisesta vaihtoehdosta. Se maksetaan käyttömaksujen yhteydessä, ja voit valita ja suorittaa lisämaksuja käytön aikana.",
-    "shipPaid": "Maksu suoritettu – ylläpidetään käyttöajan."
+    "efctPaid": "Maksettu – pysyy päällä käyttöjakson ajan."
   },
   "admin": {
     "title": "Sivuston ylläpito",
@@ -409,12 +401,5 @@
     "ORBIT": "Kiertorataefekti",
     "PULSE": "Pulssiefekti",
     "COMET": "Komeettaefekti"
-  },
-  "ship": {
-    "SAUCER": "Lautasristeilijä",
-    "BRIDGE": "Sillan näyttö",
-    "TWIN": "Kaksoissiipinen torjuntahävittäjä",
-    "DAGGER": "Tikarihyökkäyshävittäjä",
-    "CROSS": "Ristisiipihävittäjä"
   }
 }
