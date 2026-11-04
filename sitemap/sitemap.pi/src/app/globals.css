@@ -1221,6 +1221,24 @@
   .ship-cross-gun-lr {
     transform: translate(10.3px, -32.9px);
   }
+  /* 엔진 — 포신과 같은 방식(평행 이동만). 대기 = 날개 뿌리 회전 자리(위 세트 아래로·아래 세트 위로 9px), 점프 = 원위치 */
+  .ship-cross-eng {
+    transform-box: view-box;
+    transition: transform calc(var(--fly) * 0.3) cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .ship-cross-eng-ul {
+    transform: translate(-2.5px, 9px);
+  }
+  .ship-cross-eng-ur {
+    transform: translate(2.5px, 9px);
+  }
+  .ship-cross-eng-ll {
+    transform: translate(-2.5px, -9px);
+  }
+  .ship-cross-eng-lr {
+    transform: translate(2.5px, -9px);
+  }
+  .ship-jump .ship-cross-eng,
   .ship-jump .ship-cross-gun {
     transform: none;
   }

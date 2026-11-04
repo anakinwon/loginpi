@@ -175,6 +175,12 @@ export function CrossShip({ dest, body }: ShipSlots) {
                 strokeWidth="0.8"
               />
               <circle r="12.4" fill="#0b0f18" />
+              {/* 배기 베인(정면 사진의 팬 지지대처럼 십자 + 링) — 발광 아래 깔려 점프 때 백열에 묻힘 */}
+              <g stroke="#3a3f49" strokeWidth="1.1" opacity="0.9">
+                <line x1="-12" y1="0" x2="12" y2="0" />
+                <line x1="0" y1="-12" x2="0" y2="12" />
+              </g>
+              <circle r="4" fill="#2a2e36" stroke="#4a505c" strokeWidth="0.6" />
               <circle
                 r="12.4"
                 fill={`url(#${p}g-ex)`}
@@ -226,45 +232,62 @@ export function CrossShip({ dest, body }: ShipSlots) {
               />
             </g>
 
-            {/* 날개 끝 포신 : 원점 = 날개 끝, 진행 방향(위)으로 원근 축소, 끝 소염기 작은 원 */}
+            {/* 날개 끝 포신 : 원점 = 날개 끝. 마디진 원통 포탑(뒤에서 보는 둥근 끝 + 띠 3줄) → 가늘고 긴 포신(원근 축소) → 갈래 소염기 */}
             <g id={`${p}gun`}>
               <rect
-                x="-4.5"
-                y="-6"
-                width="9"
-                height="12"
-                rx="1.5"
-                fill="#9aa1ad"
+                x="-5.5"
+                y="-14"
+                width="11"
+                height="20"
+                rx="2"
+                fill="#aeb4be"
                 stroke="#4a505c"
                 strokeWidth="0.6"
               />
-              <rect x="-4.5" y="-1" width="9" height="2" fill="#c8372d" />
+              <g stroke="#4a505c" strokeWidth="0.6">
+                <line x1="-5.5" y1="-9" x2="5.5" y2="-9" />
+                <line x1="-5.5" y1="-5" x2="5.5" y2="-5" />
+              </g>
+              <rect x="-5.5" y="-1" width="11" height="2.2" fill="#c8372d" />
+              <ellipse
+                cy="6"
+                rx="5.5"
+                ry="2.2"
+                fill="#5b6170"
+                stroke="#4a505c"
+                strokeWidth="0.5"
+              />
+              <circle cy="6" r="1.4" fill="#1b1f28" />
               <polygon
-                points="-2,-6 2,-6 1.2,-32 -1.2,-32"
+                points="-1.6,-14 1.6,-14 1,-40 -1,-40"
                 fill="#c3c8d0"
                 stroke="#4a505c"
                 strokeWidth="0.4"
               />
-              <circle cy="-33" r="2.4" fill="#5b6170" />
-              <circle cy="-33" r="1" fill="#1b1f28" />
+              <rect
+                x="-2.2"
+                y="-30"
+                width="4.4"
+                height="3"
+                rx="0.6"
+                fill="#9aa1ad"
+              />
+              <path
+                d="M-2.6 -40 L-2.6 -45 M2.6 -40 L2.6 -45 M-2.6 -40 L2.6 -40"
+                stroke="#5b6170"
+                strokeWidth="1.1"
+                fill="none"
+              />
             </g>
 
-            {/* 왼쪽 위 날개 세트 / 왼쪽 아래(위 판을 y=138 기준 상하 반전, 엔진·포신은 진행 방향 유지) */}
+            {/* 왼쪽 위 날개 세트 / 왼쪽 아래(위 판을 y=138 기준 상하 반전, 엔진·포신은 바깥 별도 묶음) */}
             <g id={`${p}set-up`}>
               <use href={`#${p}wing-plate`} />
-              <use
-                href={`#${p}eng`}
-                transform="translate(142 113.5) scale(0.65)"
-              />
             </g>
             <g id={`${p}set-dn`}>
               <use
                 href={`#${p}wing-plate`}
                 transform="matrix(1 0 0 -1 0 276)"
-              />
-              <use
-                href={`#${p}eng`}
-                transform="translate(142 162.5) scale(0.65)"
               />
             </g>
           </defs>
@@ -283,8 +306,8 @@ export function CrossShip({ dest, body }: ShipSlots) {
             <use href={`#${p}set-up`} transform="matrix(-1 0 0 1 400 0)" />
           </g>
 
-          {/* 동체 축소(마스터 2026-11-04 "본체를 이만큼 작게") — 폭 55%·높이 50%, X 중심(200,140) 고정. 명판 지지대는 축소 묶음 밖에서 후면 아래(174) → 236 */}
-          <g transform="translate(200 140) scale(0.55 0.5) translate(-200 -140)">
+          {/* 동체 축소(마스터 2026-11-04 "원본과 비슷한 비율") — 75%, X 중심(200,140) 고정. 명판 지지대는 축소 묶음 밖에서 후면 아래(191) → 236 */}
+          <g transform="translate(200 140) scale(0.75 0.75) translate(-200 -140)">
             {/* 동체 윗면 : 뒤(아래·가까움) 넓고 앞(위·멀어짐)으로 좁아지는 원근 사다리꼴 */}
             <polygon
               points="172,152 228,152 210,36 200,26 190,36"
@@ -340,7 +363,7 @@ export function CrossShip({ dest, body }: ShipSlots) {
             <rect x="180" y="120" width="40" height="6" fill="#9aa1ad" />
           </g>
 
-          <g transform="translate(200 140) scale(0.55 0.5) translate(-200 -140)">
+          <g transform="translate(200 140) scale(0.75 0.75) translate(-200 -140)">
             {/* 동체 후면 : 각진 사각 단면(모서리 깎임) */}
             <polygon
               points="178,146 222,146 232,156 232,198 222,208 178,208 168,198 168,156"
@@ -420,6 +443,19 @@ export function CrossShip({ dest, body }: ShipSlots) {
               fill="#fb923c"
             />
           </g>
+          {/* 엔진 4기 — 날개 시작 부위·동체 옆(원본 비율 : 큰 원통). 날개 회전과 분리해 평행 이동만 → 대기 접힘에도 노즐끼리 안 겹침(대기 간격 32 ≥ 지름 30.6) */}
+          <g className="ship-cross-eng ship-cross-eng-ll">
+            <use href={`#${p}eng`} transform="translate(160 163) scale(0.85)" />
+          </g>
+          <g className="ship-cross-eng ship-cross-eng-lr">
+            <use href={`#${p}eng`} transform="translate(240 163) scale(0.85)" />
+          </g>
+          <g className="ship-cross-eng ship-cross-eng-ul">
+            <use href={`#${p}eng`} transform="translate(160 113) scale(0.85)" />
+          </g>
+          <g className="ship-cross-eng ship-cross-eng-ur">
+            <use href={`#${p}eng`} transform="translate(240 113) scale(0.85)" />
+          </g>
           {/* 날개 끝 포신 4기 — 날개 회전과 분리, 항상 진행 방향(위) 직진. 대기 위치 = 날개 끝 회전 자리(±11.6° → 끝점 이동 ∓10.3,±32.9), 점프 = 원위치 */}
           <g className="ship-cross-gun ship-cross-gun-ul">
             <use href={`#${p}gun`} transform="translate(43 71)" />
@@ -433,10 +469,10 @@ export function CrossShip({ dest, body }: ShipSlots) {
           <g className="ship-cross-gun ship-cross-gun-lr">
             <use href={`#${p}gun`} transform="translate(357 205)" />
           </g>
-          {/* 명판 지지대 : 축소 후면 아래(174) → 명판(236) */}
+          {/* 명판 지지대 : 축소 후면 아래(191) → 명판(236) */}
           <g fill="#7d8492" stroke="#4a505c" strokeWidth="0.6">
-            <rect x="193" y="172" width="3" height="64" />
-            <rect x="204" y="172" width="3" height="64" />
+            <rect x="192" y="189" width="4" height="47" />
+            <rect x="204" y="189" width="4" height="47" />
             <rect x="186" y="230" width="28" height="6" rx="1" />
           </g>
         </svg>
