@@ -388,6 +388,11 @@ function BubbleTable({
       if (!n.delete(domain)) n.add(domain)
       return n
     })
+  // 운영 주소 = 버블 연결 주소(DB url)의 origin 우선, 없으면 생성 시 등록값. '' = 이 사이트 내부 링크
+  const siteBase = (domain: string, base: string) => {
+    const url = base && items.find((x) => x.domain === domain)?.url
+    return url ? new URL(url).origin : base
+  }
   const [sort, setSort] = useState<{ key: SortKey; desc: boolean }>({
     key: 'size',
     desc: true,
@@ -446,6 +451,46 @@ function BubbleTable({
   return (
     <div className="w-full px-3 py-4">
       <CtgrLinks />
+      {/* 자사 사이트 메뉴 지도 — 정렬·페이지와 무관하게 표 위에 항상 노출(행 ▸ 펼침은 보조). 사이트 이름 줄로 접고 펼친다 */}
+      {menus && (
+        <section
+          aria-label={tm('label')}
+          className="mb-4 rounded-lg border border-white/10 bg-white/[0.03] p-3"
+        >
+          <h2 className="mb-2 text-sm font-semibold text-white/90">
+            {tm('label')}
+          </h2>
+          <div className="space-y-2">
+            {Object.entries(menus).map(([domain, m], i) => (
+              <details
+                key={domain}
+                open={i === 0}
+                className="rounded border border-white/5 px-2 py-1.5"
+              >
+                <summary className="flex cursor-pointer list-none items-center gap-1.5 font-semibold marker:hidden">
+                  <span
+                    aria-hidden
+                    className="inline-block w-3 text-white/50 transition-transform [details[open]>summary>&]:rotate-90"
+                  >
+                    ▸
+                  </span>
+                  {domain}
+                  <span className="text-[10px] font-normal text-white/40 tabular-nums">
+                    {m.menus.length}
+                  </span>
+                </summary>
+                <div className="mt-2 pl-1">
+                  <SiteMenuTree
+                    menus={m.menus}
+                    base={siteBase(domain, m.base)}
+                    onLeave={(url) => onLeave(domain, url)}
+                  />
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
       <table className="w-full text-left text-sm">
         <thead className="text-xs text-white/60">
           <tr className="border-b border-white/10">
@@ -566,11 +611,7 @@ function BubbleTable({
                       <SiteMenuTree
                         menus={menu.menus}
                         // 운영 주소 = 버블 연결 주소(DB url)의 origin 우선, 없으면 생성 시 등록값
-                        base={
-                          menu.base && it.url
-                            ? new URL(it.url).origin
-                            : menu.base
-                        }
+                        base={siteBase(it.domain, menu.base)}
                         onLeave={(url) => onLeave(it.domain, url)}
                       />
                     </td>
