@@ -269,12 +269,16 @@ export function BubbleHome() {
   )
 }
 
-// 범례 — 요금제별 버블 크기(면적 비율 그대로 축소). 크기 = 유료 노출이므로 광고 표기 병기
+// 범례 — 요금제별 버블 크기(면적 비율 그대로 축소). 크기 = 유료 노출이므로 광고 표기 병기.
+// data-ship-floor = 이동 안내 우주선(leave-dialog fitShip)이 이 바 위에 앉는 기준
 function Legend() {
   const t = useTranslations('bubble')
   const tp = useTranslations('plan')
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-white/10 px-2 py-2 text-[11px] text-white/70">
+    <div
+      data-ship-floor
+      className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-white/10 px-2 py-2 text-[11px] text-white/70"
+    >
       <span className="font-semibold text-white/80">{t('legend')}</span>
       {LEGEND.map((p) => {
         const d = Math.sqrt(PLAN_AREA[p]) * 5

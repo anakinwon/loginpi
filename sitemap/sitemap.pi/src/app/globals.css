@@ -79,9 +79,10 @@
     --ship-pulse-ex: none;
     --ship-pulse-core: none;
   }
-  /* 하단 고정(floating) 높이 — 기체별로 다르면 .ship-<기체>.ship-float 가 덮는다 */
+  /* 하단 고정(floating) 기본 기준선 = 홈 표시줄(safe-area) + 여백 8px. 하단 범례 바(bubble-home Legend[data-ship-floor], 1~4줄)가 보이면
+     leave-dialog 의 맞춤(fitShip)이 그 위로 올리고, 기체 전체 실루엣(나셀·날개·불꽃 포함)이 화면 안에 들어오게 bottom·scale 을 정한다(마스터 2026-11-04 "우주선 아래가 잘려") */
   .ship-float {
-    bottom: 3.5rem;
+    bottom: calc(env(safe-area-inset-bottom) + 8px);
   }
   /* 점프 백열(평상시 0) */
   .ship-hot {
@@ -281,9 +282,6 @@
   /* ── SAUCER(기본, 시안 a-saucer-top) : 위에서 본 원반 1차 선체 = 카드, 함교 유리 패널 안 콘텐츠. 원반 아래 후방 선체(SVG)는 흐름 안(-50px 겹침) — 시안의 absolute 대신 흐름 안이라 인라인 래퍼가 나셀까지 감싸고, 점프 원점·흡입 중심도 기체 전체 ── */
   .ship-saucer {
     isolation: isolate;
-  }
-  .ship-saucer.ship-float {
-    bottom: 12px; /* 후방 선체 끝이 화면 아래 12px = 원반 바닥은 시안 그대로(폭 × 0.475 − 38px) */
   }
   .ship-saucer-disc {
     position: relative;
