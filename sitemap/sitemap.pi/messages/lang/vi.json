@@ -418,5 +418,19 @@
     "TWIN": "Máy bay đánh chặn hai cánh",
     "DAGGER": "Máy bay tấn công dao găm",
     "CROSS": "Máy bay chiến đấu cánh chữ thập"
+  },
+  "siteMenu": {
+    "label": "Sơ đồ menu trang web",
+    "show": "Hiện menu",
+    "hide": "Ẩn menu",
+    "footer": "Liên kết chân trang",
+    "etc": "Các màn hình khác",
+    "dynHint": "{path} — màn hình này sẽ mở ra sau khi bạn chọn một mục, vì vậy nó liên kết đến màn hình cha",
+    "auth": {
+      "login": "Đăng nhập",
+      "admin": "Quản trị viên",
+      "plan": "Gói cước",
+      "owner": "Chủ sở hữu"
+    }
   }
 }

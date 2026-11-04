@@ -418,5 +418,19 @@
     "TWIN": "Pesawat Pencegat Sayap Kembar",
     "DAGGER": "Pesawat Serbu Belati",
     "CROSS": "Pesawat Tempur Sayap Silang"
+  },
+  "siteMenu": {
+    "label": "Peta menu situs",
+    "show": "Tampilkan menu",
+    "hide": "Sembunyikan menu",
+    "footer": "Tautan footer",
+    "etc": "Layar lainnya",
+    "dynHint": "{path} — membuka setelah Anda memilih item, jadi ini menautkan ke layar induk",
+    "auth": {
+      "login": "Masuk",
+      "admin": "Admin",
+      "plan": "Paket",
+      "owner": "Pemilik"
+    }
   }
 }

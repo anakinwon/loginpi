@@ -418,5 +418,19 @@
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
     "CROSS": "Risttiib-hävitaja"
+  },
+  "siteMenu": {
+    "label": "Saidi menüü kaart",
+    "show": "Näita menüüd",
+    "hide": "Peida menüü",
+    "footer": "Jaluse lingid",
+    "etc": "Muud ekraanid",
+    "dynHint": "{path} — avaneb pärast üksuse valimist, seega see link viib vanemekraanile",
+    "auth": {
+      "login": "Logi sisse",
+      "admin": "Administraator",
+      "plan": "Plaan",
+      "owner": "Omanik"
+    }
   }
 }

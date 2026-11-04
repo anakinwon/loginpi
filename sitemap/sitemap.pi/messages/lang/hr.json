@@ -418,5 +418,19 @@
     "TWIN": "Presretač s dvostrukim krilima",
     "DAGGER": "Jurišni borac bodež",
     "CROSS": "Borbeni zrakoplov s križnim krilima"
+  },
+  "siteMenu": {
+    "label": "Mapa izbornika stranice",
+    "show": "Prikaži izbornik",
+    "hide": "Sakrij izbornik",
+    "footer": "Veze podnožja",
+    "etc": "Ostali zasloni",
+    "dynHint": "{path} — otvara se nakon što odaberete stavku, stoga ova veza vodi na nadređeni zaslon",
+    "auth": {
+      "login": "Prijava",
+      "admin": "Administrator",
+      "plan": "Plan",
+      "owner": "Vlasnik"
+    }
   }
 }

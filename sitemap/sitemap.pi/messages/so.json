@@ -418,5 +418,19 @@
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
     "CROSS": "Diyaarad dagaal oo baalal isdhaafsan"
+  },
+  "siteMenu": {
+    "label": "Khariiradda menu-ga goobta",
+    "show": "Muuji menu-ga",
+    "hide": "Qari menu-ga",
+    "footer": "Xiriiriyeyaasha hoose",
+    "etc": "Shaashadaha kale",
+    "dynHint": "{path} — Waxay furantaa ka dib markaad doorato shay, markaa tani waxay ku xirtaa shaashadda waalidka",
+    "auth": {
+      "login": "Soo gal",
+      "admin": "Maamule",
+      "plan": "Qorshe",
+      "owner": "Milkiile"
+    }
   }
 }

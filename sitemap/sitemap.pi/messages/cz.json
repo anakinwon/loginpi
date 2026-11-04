@@ -418,5 +418,19 @@
     "TWIN": "Dvoukřídlý stíhač",
     "DAGGER": "Útočná stíhačka Dagger",
     "CROSS": "Stíhačka s křížovými křídly"
+  },
+  "siteMenu": {
+    "label": "Mapa menu webu",
+    "show": "Zobrazit menu",
+    "hide": "Skrýt menu",
+    "footer": "Odkazy v zápatí",
+    "etc": "Další obrazovky",
+    "dynHint": "{path} — otevře se po výběru položky, takže odkazuje na nadřazenou obrazovku",
+    "auth": {
+      "login": "Přihlásit se",
+      "admin": "Administrátor",
+      "plan": "Plán",
+      "owner": "Vlastník"
+    }
   }
 }

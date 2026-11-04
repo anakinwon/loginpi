@@ -418,5 +418,19 @@
     "TWIN": "Kaksoissiipinen torjuntahävittäjä",
     "DAGGER": "Tikarihyökkäyshävittäjä",
     "CROSS": "Ristisiipihävittäjä"
+  },
+  "siteMenu": {
+    "label": "Sivuston valikkokartta",
+    "show": "Näytä valikko",
+    "hide": "Piilota valikko",
+    "footer": "Alatunnisteen linkit",
+    "etc": "Muut näytöt",
+    "dynHint": "{path} – avautuu, kun olet valinnut kohteen, joten tämä linkittää ylätason näyttöön",
+    "auth": {
+      "login": "Kirjaudu sisään",
+      "admin": "Järjestelmänvalvoja",
+      "plan": "Tilaus",
+      "owner": "Omistaja"
+    }
   }
 }

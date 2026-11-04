@@ -418,5 +418,19 @@
     "TWIN": "Két-szárnyú Interceptor",
     "DAGGER": "Tőr Támadó Vadászgép",
     "CROSS": "Keresztszárnyú vadászgép"
+  },
+  "siteMenu": {
+    "label": "Oldaltérkép",
+    "show": "Menü megjelenítése",
+    "hide": "Menü elrejtése",
+    "footer": "Lábléc linkek",
+    "etc": "Egyéb képernyők",
+    "dynHint": "{path} – miután kiválasztott egy elemet, megnyílik, így ez a szülőképernyőre mutat",
+    "auth": {
+      "login": "Bejelentkezés",
+      "admin": "Admin",
+      "plan": "Csomag",
+      "owner": "Tulajdonos"
+    }
   }
 }

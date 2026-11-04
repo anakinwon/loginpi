@@ -418,5 +418,19 @@
     "TWIN": "Ndërhyrës me dy krahë",
     "DAGGER": "Gjuajtës sulmi Dagger",
     "CROSS": "Gjuajtës me krahë kryq"
+  },
+  "siteMenu": {
+    "label": "Harta e menysë së faqes",
+    "show": "Shfaq menynë",
+    "hide": "Fshih menynë",
+    "footer": "Lidhjet e fundfaqes",
+    "etc": "Ekrane të tjera",
+    "dynHint": "{path} — hapet pasi të zgjidhni një artikull, kështu që kjo lidhet me ekranin prind",
+    "auth": {
+      "login": "Identifikohu",
+      "admin": "Administratori",
+      "plan": "Plani",
+      "owner": "Pronari"
+    }
   }
 }

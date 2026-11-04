@@ -418,5 +418,19 @@
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
     "CROSS": "Borbeni avion s križnim krilima"
+  },
+  "siteMenu": {
+    "label": "Mapa menija stranice",
+    "show": "Prikaži meni",
+    "hide": "Sakrij meni",
+    "footer": "Veze podnožja",
+    "etc": "Ostali ekrani",
+    "dynHint": "{path} — otvara se nakon što odaberete stavku, tako da ova veza vodi na nadređeni ekran",
+    "auth": {
+      "login": "Prijava",
+      "admin": "Administrator",
+      "plan": "Plan",
+      "owner": "Vlasnik"
+    }
   }
 }

@@ -418,5 +418,19 @@
     "TWIN": "Dvokrilni presretač",
     "DAGGER": "Borbena letelica bodež",
     "CROSS": "Borbeni avion sa ukrštenim krilima"
+  },
+  "siteMenu": {
+    "label": "Mapa menija sajta",
+    "show": "Prikaži meni",
+    "hide": "Sakrij meni",
+    "footer": "Veze u podnožju",
+    "etc": "Ostali ekrani",
+    "dynHint": "{path} — otvara se nakon što odaberete stavku, tako da ovo vodi do nadređenog ekrana",
+    "auth": {
+      "login": "Prijava",
+      "admin": "Administrator",
+      "plan": "Plan",
+      "owner": "Vlasnik"
+    }
   }
 }

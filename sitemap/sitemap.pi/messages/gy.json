@@ -418,5 +418,19 @@
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
     "CROSS": "Cross-wing fighter"
+  },
+  "siteMenu": {
+    "label": "Site menu map",
+    "show": "Show menu",
+    "hide": "Hide menu",
+    "footer": "Footer links",
+    "etc": "Other screens",
+    "dynHint": "{path} — opens after you pick an item, so this links to the parent screen",
+    "auth": {
+      "login": "Login",
+      "admin": "Admin",
+      "plan": "Plan",
+      "owner": "Owner"
+    }
   }
 }

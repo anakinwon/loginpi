@@ -418,5 +418,19 @@
     "TWIN": "Dubbelvleugelige Interceptor",
     "DAGGER": "Dolk Aanvalsjager",
     "CROSS": "Kruisvleugeljager"
+  },
+  "siteMenu": {
+    "label": "Sitemenukaart",
+    "show": "Menu weergeven",
+    "hide": "Menu verbergen",
+    "footer": "Voettekstlinks",
+    "etc": "Overige schermen",
+    "dynHint": "{path} — opent nadat u een item hebt gekozen, dus dit linkt naar het bovenliggende scherm",
+    "auth": {
+      "login": "Inloggen",
+      "admin": "Beheerder",
+      "plan": "Abonnement",
+      "owner": "Eigenaar"
+    }
   }
 }

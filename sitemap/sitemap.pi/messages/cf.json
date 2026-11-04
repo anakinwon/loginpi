@@ -418,5 +418,19 @@
     "TWIN": "Intercepteur à double aile",
     "DAGGER": "Chasseur d'assaut Dague",
     "CROSS": "Chasseur à ailes croisées"
+  },
+  "siteMenu": {
+    "label": "Plan du menu du site",
+    "show": "Afficher le menu",
+    "hide": "Masquer le menu",
+    "footer": "Liens de pied de page",
+    "etc": "Autres écrans",
+    "dynHint": "{path} — s'ouvre après avoir choisi un élément, donc ce lien mène à l'écran parent",
+    "auth": {
+      "login": "Connexion",
+      "admin": "Administrateur",
+      "plan": "Forfait",
+      "owner": "Propriétaire"
+    }
   }
 }

@@ -418,5 +418,19 @@
     "TWIN": "Interceptor d'ala doble",
     "DAGGER": "Caça d'assalt Dagger",
     "CROSS": "Caça d'ala en creu"
+  },
+  "siteMenu": {
+    "label": "Mapa del menú del lloc",
+    "show": "Mostra el menú",
+    "hide": "Amaga el menú",
+    "footer": "Enllaços del peu de pàgina",
+    "etc": "Altres pantalles",
+    "dynHint": "{path} — s'obre després de triar un element, així que enllaça amb la pantalla principal",
+    "auth": {
+      "login": "Inici de sessió",
+      "admin": "Administrador",
+      "plan": "Pla",
+      "owner": "Propietari"
+    }
   }
 }

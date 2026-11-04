@@ -418,5 +418,19 @@
     "TWIN": "Prestreznik z dvojnimi krili",
     "DAGGER": "Bojno letalo Dagger",
     "CROSS": "Borec s križnimi krili"
+  },
+  "siteMenu": {
+    "label": "Zemljevid menija spletnega mesta",
+    "show": "Pokaži meni",
+    "hide": "Skrij meni",
+    "footer": "Povezave v nogi",
+    "etc": "Drugi zasloni",
+    "dynHint": "{path} — odpre se po izbiri elementa, zato ta povezava vodi na nadrejeni zaslon",
+    "auth": {
+      "login": "Prijava",
+      "admin": "Skrbnik",
+      "plan": "Načrt",
+      "owner": "Lastnik"
+    }
   }
 }

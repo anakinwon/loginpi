@@ -418,5 +418,19 @@
     "TWIN": "Intercettore a Doppia Ala",
     "DAGGER": "Caccia d'Assalto a Pugnale",
     "CROSS": "Caccia ad ala incrociata"
+  },
+  "siteMenu": {
+    "label": "Mappa del menu del sito",
+    "show": "Mostra menu",
+    "hide": "Nascondi menu",
+    "footer": "Link a piè di pagina",
+    "etc": "Altre schermate",
+    "dynHint": "{path} — si apre dopo aver scelto un elemento, quindi questo link porta alla schermata genitore",
+    "auth": {
+      "login": "Accedi",
+      "admin": "Amministratore",
+      "plan": "Piano",
+      "owner": "Proprietario"
+    }
   }
 }

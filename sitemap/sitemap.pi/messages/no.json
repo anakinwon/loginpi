@@ -418,5 +418,19 @@
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
     "CROSS": "Kryssving-jagerfly"
+  },
+  "siteMenu": {
+    "label": "Nettstedets menykart",
+    "show": "Vis meny",
+    "hide": "Skjul meny",
+    "footer": "Bunntekstlenker",
+    "etc": "Andre skjermer",
+    "dynHint": "{path} – åpnes etter at du har valgt et element, så denne lenker til overordnet skjerm",
+    "auth": {
+      "login": "Logg inn",
+      "admin": "Administrator",
+      "plan": "Plan",
+      "owner": "Eier"
+    }
   }
 }

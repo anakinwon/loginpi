@@ -418,5 +418,19 @@
     "TWIN": "Interceptor cu aripi duble",
     "DAGGER": "Luptător de asalt Dagger",
     "CROSS": "Avion de luptă cu aripi în cruce"
+  },
+  "siteMenu": {
+    "label": "Harta meniului site-ului",
+    "show": "Afișați meniul",
+    "hide": "Ascundeți meniul",
+    "footer": "Link-uri subsol",
+    "etc": "Alte ecrane",
+    "dynHint": "{path} — se deschide după ce alegeți un element, deci acest link duce la ecranul părinte",
+    "auth": {
+      "login": "Autentificare",
+      "admin": "Administrator",
+      "plan": "Plan",
+      "owner": "Proprietar"
+    }
   }
 }

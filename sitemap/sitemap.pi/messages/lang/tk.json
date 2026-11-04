@@ -418,5 +418,19 @@
     "TWIN": "Iki ganatly tutujy",
     "DAGGER": "Hançer hüjümçi söweşiji",
     "CROSS": "Haç ganatly söweşiji"
+  },
+  "siteMenu": {
+    "label": "Saýt menýu kartasy",
+    "show": "Menýuny görkez",
+    "hide": "Menýuny gizle",
+    "footer": "Aşaky baglanyşyklar",
+    "etc": "Beýleki ekranlar",
+    "dynHint": "{path} — girilenden soň element saýlanýan ekran bolany üçin, ýokarky ekrana baglanýar",
+    "auth": {
+      "login": "Giriş",
+      "admin": "Administrator",
+      "plan": "Nyrh meýilnamasy",
+      "owner": "Eýesi"
+    }
   }
 }

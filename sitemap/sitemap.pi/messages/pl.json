@@ -418,5 +418,19 @@
     "TWIN": "Dwuskrzydłowy przechwytnik",
     "DAGGER": "Myśliwiec szturmowy Sztylet",
     "CROSS": "Myśliwiec krzyżowy"
+  },
+  "siteMenu": {
+    "label": "Mapa menu witryny",
+    "show": "Pokaż menu",
+    "hide": "Ukryj menu",
+    "footer": "Linki w stopce",
+    "etc": "Inne ekrany",
+    "dynHint": "{path} — otwiera się po wybraniu elementu, więc ten link prowadzi do ekranu nadrzędnego",
+    "auth": {
+      "login": "Zaloguj się",
+      "admin": "Administrator",
+      "plan": "Plan",
+      "owner": "Właściciel"
+    }
   }
 }

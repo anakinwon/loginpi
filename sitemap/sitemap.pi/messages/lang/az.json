@@ -418,5 +418,19 @@
     "TWIN": "İkiqanadlı Kəşfiyyatçı",
     "DAGGER": "Xəncər Hücum Qırıcısı",
     "CROSS": "Çarpaz qanadlı qırıcı"
+  },
+  "siteMenu": {
+    "label": "Sayt menyu xəritəsi",
+    "show": "Menyunu göstər",
+    "hide": "Menyunu gizlət",
+    "footer": "Altbilgi keçidləri",
+    "etc": "Digər ekranlar",
+    "dynHint": "{path} — daxil olduqdan sonra element seçilən ekran olduğu üçün yuxarı səviyyəli ekrana keçid edir",
+    "auth": {
+      "login": "Daxil ol",
+      "admin": "Administrator",
+      "plan": "Tarif planı",
+      "owner": "Sahib"
+    }
   }
 }

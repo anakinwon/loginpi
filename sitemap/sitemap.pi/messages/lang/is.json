@@ -418,5 +418,19 @@
     "TWIN": "Tvíburavængja orrustuflugvél",
     "DAGGER": "Rýtingaárásarflugvél",
     "CROSS": "Krossvængja orrustuþota"
+  },
+  "siteMenu": {
+    "label": "Vefsvæðiskort",
+    "show": "Sýna valmynd",
+    "hide": "Fela valmynd",
+    "footer": "Fótatenglar",
+    "etc": "Aðrir skjáir",
+    "dynHint": "{path} — opnast eftir að þú velur atriði, svo þetta tengir við foreldraskjáinn",
+    "auth": {
+      "login": "Innskráning",
+      "admin": "Stjórnandi",
+      "plan": "Áætlun",
+      "owner": "Eigandi"
+    }
   }
 }

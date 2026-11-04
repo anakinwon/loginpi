@@ -418,5 +418,19 @@
     "TWIN": "Dvigubo sparno perėmėjas",
     "DAGGER": "Durklo puolimo naikintuvas",
     "CROSS": "Kryžminis naikintuvas"
+  },
+  "siteMenu": {
+    "label": "Svetainės meniu žemėlapis",
+    "show": "Rodyti meniu",
+    "hide": "Slėpti meniu",
+    "footer": "Puslapio apačios nuorodos",
+    "etc": "Kiti ekranai",
+    "dynHint": "{path} – atidaroma pasirinkus elementą, todėl tai yra nuoroda į pirminį ekraną",
+    "auth": {
+      "login": "Prisijungti",
+      "admin": "Administratorius",
+      "plan": "Planas",
+      "owner": "Savininkas"
+    }
   }
 }

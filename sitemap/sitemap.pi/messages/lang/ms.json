@@ -418,5 +418,19 @@
     "TWIN": "Pemintas Sayap Berkembar",
     "DAGGER": "Penyerang Belati",
     "CROSS": "Pejuang Sayap Silang"
+  },
+  "siteMenu": {
+    "label": "Peta menu tapak",
+    "show": "Tunjukkan menu",
+    "hide": "Sembunyikan menu",
+    "footer": "Pautan pengaki",
+    "etc": "Skrin lain",
+    "dynHint": "{path} — dibuka selepas anda memilih item, jadi ini memaut ke skrin induk",
+    "auth": {
+      "login": "Log masuk",
+      "admin": "Pentadbir",
+      "plan": "Pelan",
+      "owner": "Pemilik"
+    }
   }
 }

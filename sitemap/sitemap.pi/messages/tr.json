@@ -418,5 +418,19 @@
     "TWIN": "Çift Kanatlı Önleyici",
     "DAGGER": "Hançer Saldırı Savaşçısı",
     "CROSS": "Çapraz kanatlı savaşçı"
+  },
+  "siteMenu": {
+    "label": "Site menü haritası",
+    "show": "Menüyü göster",
+    "hide": "Menüyü gizle",
+    "footer": "Alt bilgi bağlantıları",
+    "etc": "Diğer ekranlar",
+    "dynHint": "{path} — bir öğe seçtikten sonra açılır, bu nedenle üst ekrana bağlanır",
+    "auth": {
+      "login": "Giriş",
+      "admin": "Yönetici",
+      "plan": "Plan",
+      "owner": "Sahip"
+    }
   }
 }

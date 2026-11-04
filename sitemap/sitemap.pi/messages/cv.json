@@ -418,5 +418,19 @@
     "TWIN": "Interceptor de Asa Dupla",
     "DAGGER": "Caça de Assalto Dagger",
     "CROSS": "Caça de asa cruzada"
+  },
+  "siteMenu": {
+    "label": "Mapa do menu do site",
+    "show": "Mostrar menu",
+    "hide": "Ocultar menu",
+    "footer": "Links do rodapé",
+    "etc": "Outras telas",
+    "dynHint": "{path} — abre depois de você escolher um item, então este link leva à tela pai",
+    "auth": {
+      "login": "Login",
+      "admin": "Administrador",
+      "plan": "Plano",
+      "owner": "Proprietário"
+    }
   }
 }

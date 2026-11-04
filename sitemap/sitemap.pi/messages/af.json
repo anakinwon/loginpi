@@ -418,5 +418,19 @@
     "TWIN": "Dubbelvlerk-onderskepper",
     "DAGGER": "Dagger Aanvalsvegter",
     "CROSS": "Kruisvlerkvegter"
+  },
+  "siteMenu": {
+    "label": "Werfmenukaart",
+    "show": "Wys kieslys",
+    "hide": "Versteek kieslys",
+    "footer": "Voetskrifskakels",
+    "etc": "Ander skerms",
+    "dynHint": "{path} — maak oop nadat jy 'n item gekies het, so dit skakel na die ouerskerm",
+    "auth": {
+      "login": "Meld aan",
+      "admin": "Admin",
+      "plan": "Plan",
+      "owner": "Eienaar"
+    }
   }
 }

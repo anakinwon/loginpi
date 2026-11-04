@@ -418,5 +418,19 @@
     "TWIN": "Tvillingsvinget Interceptor",
     "DAGGER": "Dolk-angrebsjager",
     "CROSS": "Krydsvinget jagerfly"
+  },
+  "siteMenu": {
+    "label": "Sitemenuoversigt",
+    "show": "Vis menu",
+    "hide": "Skjul menu",
+    "footer": "Links i sidefod",
+    "etc": "Andre skærme",
+    "dynHint": "{path} – åbner, når du har valgt et element, så dette linker til den overordnede skærm",
+    "auth": {
+      "login": "Log ind",
+      "admin": "Administrator",
+      "plan": "Plan",
+      "owner": "Ejer"
+    }
   }
 }

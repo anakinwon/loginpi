@@ -418,5 +418,19 @@
     "TWIN": "Doppelflügel-Abfangjäger",
     "DAGGER": "Dolch-Angriffsjäger",
     "CROSS": "Kreuzflügler"
+  },
+  "siteMenu": {
+    "label": "Seitenmenü-Übersicht",
+    "show": "Menü anzeigen",
+    "hide": "Menü ausblenden",
+    "footer": "Fußzeilen-Links",
+    "etc": "Andere Bildschirme",
+    "dynHint": "{path} – öffnet sich, nachdem Sie ein Element ausgewählt haben, daher verweist dies auf den übergeordneten Bildschirm",
+    "auth": {
+      "login": "Anmelden",
+      "admin": "Admin",
+      "plan": "Plan",
+      "owner": "Inhaber"
+    }
   }
 }

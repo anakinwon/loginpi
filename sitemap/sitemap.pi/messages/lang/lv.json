@@ -418,5 +418,19 @@
     "TWIN": "Divspārnu pārtvērējs",
     "DAGGER": "Duncis uzbrukuma iznīcinātājs",
     "CROSS": "Spārnu krusta iznīcinātājs"
+  },
+  "siteMenu": {
+    "label": "Vietnes izvēlnes karte",
+    "show": "Rādīt izvēlni",
+    "hide": "Paslēpt izvēlni",
+    "footer": "Kājenes saites",
+    "etc": "Citi ekrāni",
+    "dynHint": "{path} — atveras pēc vienuma izvēles, tāpēc šī saite ved uz vecākelementa ekrānu",
+    "auth": {
+      "login": "Pieteikties",
+      "admin": "Administrators",
+      "plan": "Plāns",
+      "owner": "Īpašnieks"
+    }
   }
 }

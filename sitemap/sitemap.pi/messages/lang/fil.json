@@ -418,5 +418,19 @@
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Ship",
     "CROSS": "Cross-wing Fighter"
+  },
+  "siteMenu": {
+    "label": "Mapa ng menu ng site",
+    "show": "Ipakita ang menu",
+    "hide": "Itago ang menu",
+    "footer": "Mga link sa footer",
+    "etc": "Iba pang screen",
+    "dynHint": "{path} — bubukas pagkatapos mong pumili ng item, kaya ito ay nagli-link sa parent screen",
+    "auth": {
+      "login": "Mag-login",
+      "admin": "Admin",
+      "plan": "Plano",
+      "owner": "May-ari"
+    }
   }
 }

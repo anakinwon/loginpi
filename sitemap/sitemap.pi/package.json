@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "pi-i18n validate && next build --turbopack",
+    "build": "(node ../../scripts/gen-site-menus.mjs || echo site-menus skipped) && pi-i18n validate && next build --turbopack",
     "start": "next start",
     "test": "node --test \"test/**/*.test.ts\"",
     "i18n:translate": "pi-i18n translate",
     "i18n:expand": "pi-i18n expand",
     "i18n:validate": "pi-i18n validate",
-    "i18n:audit": "pi-i18n audit"
+    "i18n:audit": "pi-i18n audit",
+    "menus:sync": "node ../../scripts/gen-site-menus.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

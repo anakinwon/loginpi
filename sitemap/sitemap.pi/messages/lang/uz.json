@@ -418,5 +418,19 @@
     "TWIN": "Ikki qanotli tutib oluvchi",
     "DAGGER": "Xanjar hujumchi qiruvchi",
     "CROSS": "Xoch qanotli qiruvchi"
+  },
+  "siteMenu": {
+    "label": "Sayt menyusi xaritasi",
+    "show": "Menyuni koʻrsatish",
+    "hide": "Menyuni yashirish",
+    "footer": "Pastki havolalar",
+    "etc": "Boshqa ekranlar",
+    "dynHint": "{path} — kirgandan soʻng element tanlanadigan ekran boʻlgani uchun yuqori ekranga ulanadi",
+    "auth": {
+      "login": "Kirish",
+      "admin": "Administrator",
+      "plan": "Tarif rejasi",
+      "owner": "Egasi"
+    }
   }
 }

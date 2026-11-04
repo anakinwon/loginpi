@@ -418,5 +418,19 @@
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
     "CROSS": "Kryssvingad stridsflygplan"
+  },
+  "siteMenu": {
+    "label": "Webbplatsmenykarta",
+    "show": "Visa meny",
+    "hide": "Dölj meny",
+    "footer": "Sidfotslänkar",
+    "etc": "Andra skärmar",
+    "dynHint": "{path} – öppnas efter att du har valt ett objekt, så denna länk går till föräldraskärmen",
+    "auth": {
+      "login": "Logga in",
+      "admin": "Admin",
+      "plan": "Plan",
+      "owner": "Ägare"
+    }
   }
 }

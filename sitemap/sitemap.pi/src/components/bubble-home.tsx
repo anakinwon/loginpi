@@ -2,13 +2,15 @@
 
 // 메인 화면 — 상단 바(기간·카테고리·검색·보기 전환) + 요금제 크기 버블 캔버스 ↔ 정렬 표(반응형 페이지네이션) + 범례.
 // 데이터는 /api/bubbles 비동기 조회(기간·카테고리 변경 시 재조회, 검색은 받은 목록에서 즉시 필터). 공개 API라 fetch 사용
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Link, useRouter } from '@/i18n/navigation'
 import { BubbleCanvas, TONE, toneOf } from './bubble-canvas'
 import { LeaveDialog } from './leave-dialog'
 import { preloadShip } from './ships'
 import { Pagination } from './pagination'
+import { SiteMenuTree } from './site-menu-tree'
+import type { SiteMenus } from '@/lib/site-menu'
 import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import {
   BUBBLE_DAYS,
@@ -102,6 +104,14 @@ export function BubbleHome() {
     [t],
   )
   const planName = useCallback((it: BubbleItem) => tp(it.plan), [tp])
+  // 표 탭 메뉴 지도의 다른 사이트 링크 — 버블과 같은 이동 안내(그 사이트 우주선)를 거쳐 연다
+  const leaveTo = useCallback(
+    (domain: string, url: string) => {
+      const it = data?.items.find((x) => x.domain === domain)
+      setLeave({ url, domain, name: it?.name ?? domain, ship: it?.ship })
+    },
+    [data],
+  )
   // 가상 샘플은 비어 있는 자리 — 상세 대신 "이 자리에 내 사이트를" 안내(/slot?plan=)로 등록 유도(마스터 지시 2026-10-11).
   // 연결 주소(url)가 지정된 사이트는 상세 대신 이동 안내 후 그 주소로(외부 이동은 클릭 + 안내 필수, MAINNET A-6)
   const open = useCallback(
@@ -263,7 +273,12 @@ export function BubbleHome() {
           <Legend />
         </>
       ) : (
-        <BubbleTable items={items} loading={loading || !data} fmtPct={fmtPct} />
+        <BubbleTable
+          items={items}
+          loading={loading || !data}
+          fmtPct={fmtPct}
+          onLeave={leaveTo}
+        />
       )}
     </div>
   )
@@ -337,7 +352,7 @@ const SiteLink = ({
   <Link
     // 샘플은 비어 있는 자리 → 등록 안내(/slot), 실사이트는 상세
     href={sample ? `/slot?plan=${plan}` : `/s/${domain}`}
-    className="flex items-center gap-2 hover:underline"
+    className="flex min-w-0 items-center gap-2 hover:underline"
   >
     {children}
   </Link>
@@ -348,13 +363,31 @@ function BubbleTable({
   items,
   loading,
   fmtPct,
+  onLeave,
 }: {
   items: BubbleItem[]
   loading: boolean
   fmtPct: (c: number) => string
+  onLeave: (domain: string, url: string) => void
 }) {
   const t = useTranslations('bubble')
   const tp = useTranslations('plan')
+  const tm = useTranslations('siteMenu')
+  const locale = useLocale()
+  // 사이트 메뉴 지도 — 표 탭을 열 때 한 번 비동기 조회(정적 JSON·CDN 캐시). 실패해도 표는 그대로(펼침 버튼만 없음)
+  const [menus, setMenus] = useState<SiteMenus | null>(null)
+  const [opened, setOpened] = useState<Set<string>>(() => new Set())
+  useEffect(() => {
+    void readApi<SiteMenus>(fetch(`/api/site-menus?locale=${locale}`)).then(
+      (r) => r.ok && setMenus(r.data),
+    )
+  }, [locale])
+  const toggle = (domain: string) =>
+    setOpened((s) => {
+      const n = new Set(s)
+      if (!n.delete(domain)) n.add(domain)
+      return n
+    })
   const [sort, setSort] = useState<{ key: SortKey; desc: boolean }>({
     key: 'size',
     desc: true,
@@ -428,76 +461,122 @@ function BubbleTable({
           {rows.map((it, i) => {
             // 크기 레벨 — 요금제 순서(PLAN_CD) 기준 VIP=LV5 … BSC1=LV1, NONE(무료)=없음. 점 크기보다 상대 비교가 쉽다
             const lv = PLAN_CD.length - 1 - PLAN_CD.indexOf(it.plan)
+            const menu = it.sample ? undefined : menus?.[it.domain]
+            const isOpen = !!menu && opened.has(it.domain)
             return (
-              <tr key={it.id} className="border-b border-white/5">
-                <td className="px-2 py-2 text-white/50">
-                  {(page - 1) * size + i + 1}
-                </td>
-                <td className="max-w-0 px-2 py-2">
-                  {/* 가상 샘플은 상세가 없으므로 링크 없이 표시 */}
-                  <SiteLink
-                    sample={it.sample}
-                    domain={it.domain}
-                    plan={it.plan}
-                  >
-                    {it.img ? (
-                      <img
-                        src={it.img}
-                        alt=""
-                        className="size-7 shrink-0 rounded-full object-cover"
-                        loading="lazy"
-                      />
+              <Fragment key={it.id}>
+                <tr className="border-b border-white/5">
+                  <td className="px-2 py-2 whitespace-nowrap text-white/50">
+                    <span className="flex items-center gap-0.5">
+                      {(page - 1) * size + i + 1}
+                      {/* 메뉴 지도 펼침 — 메뉴 데이터가 있는 자사 사이트만 */}
+                      {menu ? (
+                        <button
+                          type="button"
+                          onClick={() => toggle(it.domain)}
+                          aria-expanded={isOpen}
+                          aria-controls={`menu-${it.id}`}
+                          title={tm(isOpen ? 'hide' : 'show')}
+                          className="flex size-6 shrink-0 items-center justify-center rounded text-white/60 hover:bg-white/10 hover:text-white"
+                        >
+                          <span
+                            aria-hidden
+                            className={isOpen ? 'rotate-90' : ''}
+                          >
+                            ▸
+                          </span>
+                          <span className="sr-only">
+                            {tm(isOpen ? 'hide' : 'show')}
+                          </span>
+                        </button>
+                      ) : null}
+                    </span>
+                  </td>
+                  <td className="max-w-0 px-2 py-2">
+                    {/* 가상 샘플은 상세가 없으므로 링크 없이 표시 */}
+                    <SiteLink
+                      sample={it.sample}
+                      domain={it.domain}
+                      plan={it.plan}
+                    >
+                      {it.img ? (
+                        <img
+                          src={it.img}
+                          alt=""
+                          className="size-7 shrink-0 rounded-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold uppercase">
+                          {it.domain[0]}
+                        </span>
+                      )}
+                      <span className="min-w-0">
+                        <span className="block truncate font-semibold">
+                          {it.domain}
+                        </span>
+                        <span className="block truncate text-xs text-white/50">
+                          {it.name}
+                        </span>
+                      </span>
+                    </SiteLink>
+                  </td>
+                  <td className="hidden px-2 py-2 whitespace-nowrap sm:table-cell">
+                    {lv > 0 ? (
+                      <span
+                        className="rounded border px-1.5 text-xs font-bold tabular-nums"
+                        style={{
+                          color: PLAN_COLOR[it.plan],
+                          borderColor: PLAN_COLOR[it.plan],
+                        }}
+                      >
+                        LV{lv}
+                      </span>
                     ) : (
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold uppercase">
-                        {it.domain[0]}
+                      <span className="text-white/40">—</span>
+                    )}
+                  </td>
+                  <td className="px-2 py-2 whitespace-nowrap">
+                    {PLAN_BADGE[it.plan] && (
+                      <span className="mr-1 rounded bg-amber-300/20 px-1 text-xs text-amber-200">
+                        {t(it.sample ? 'sample' : it.own ? 'own' : 'ad')} ·{' '}
+                        {PLAN_BADGE[it.plan]}
                       </span>
                     )}
-                    <span className="min-w-0">
-                      <span className="block truncate font-semibold">
-                        {it.domain}
-                      </span>
-                      <span className="block truncate text-xs text-white/50">
-                        {it.name}
-                      </span>
+                    <span className="hidden text-xs text-white/70 md:inline">
+                      {tp(it.plan)}
                     </span>
-                  </SiteLink>
-                </td>
-                <td className="hidden px-2 py-2 whitespace-nowrap sm:table-cell">
-                  {lv > 0 ? (
-                    <span
-                      className="rounded border px-1.5 text-xs font-bold tabular-nums"
-                      style={{
-                        color: PLAN_COLOR[it.plan],
-                        borderColor: PLAN_COLOR[it.plan],
-                      }}
-                    >
-                      LV{lv}
-                    </span>
-                  ) : (
-                    <span className="text-white/40">—</span>
-                  )}
-                </td>
-                <td className="px-2 py-2 whitespace-nowrap">
-                  {PLAN_BADGE[it.plan] && (
-                    <span className="mr-1 rounded bg-amber-300/20 px-1 text-xs text-amber-200">
-                      {t(it.sample ? 'sample' : it.own ? 'own' : 'ad')} ·{' '}
-                      {PLAN_BADGE[it.plan]}
-                    </span>
-                  )}
-                  <span className="hidden text-xs text-white/70 md:inline">
-                    {tp(it.plan)}
-                  </span>
-                </td>
-                <td className="px-2 py-2 text-right tabular-nums">
-                  {it.views.toLocaleString()}
-                </td>
-                <td
-                  className="px-2 py-2 text-right tabular-nums"
-                  style={{ color: TONE[toneOf(it.chgPct)] }}
-                >
-                  {fmtPct(it.chgPct)}
-                </td>
-              </tr>
+                  </td>
+                  <td className="px-2 py-2 text-right tabular-nums">
+                    {it.views.toLocaleString()}
+                  </td>
+                  <td
+                    className="px-2 py-2 text-right tabular-nums"
+                    style={{ color: TONE[toneOf(it.chgPct)] }}
+                  >
+                    {fmtPct(it.chgPct)}
+                  </td>
+                </tr>
+                {isOpen && (
+                  <tr
+                    id={`menu-${it.id}`}
+                    className="border-b border-white/5 bg-white/[0.03]"
+                  >
+                    <td colSpan={6} className="px-3 py-3 sm:pl-12">
+                      <SiteMenuTree
+                        menus={menu.menus}
+                        // 운영 주소 = 버블 연결 주소(DB url)의 origin 우선, 없으면 생성 시 등록값
+                        base={
+                          menu.base && it.url
+                            ? new URL(it.url).origin
+                            : menu.base
+                        }
+                        onLeave={(url) => onLeave(it.domain, url)}
+                      />
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             )
           })}
         </tbody>
