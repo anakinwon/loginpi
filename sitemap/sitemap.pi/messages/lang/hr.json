@@ -417,7 +417,8 @@
     "BRIDGE": "Zapovjedni most – zaslon",
     "TWIN": "Presretač s dvostrukim krilima",
     "DAGGER": "Jurišni borac bodež",
-    "CROSS": "Borbeni zrakoplov s križnim krilima"
+    "CROSS": "Borbeni zrakoplov s križnim krilima",
+    "HAULER": "Tegljač diskova"
   },
   "siteMenu": {
     "label": "Mapa izbornika stranice",

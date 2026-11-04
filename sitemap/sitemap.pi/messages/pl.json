@@ -417,7 +417,8 @@
     "BRIDGE": "Ekran widokowy mostka",
     "TWIN": "Dwuskrzydłowy przechwytnik",
     "DAGGER": "Myśliwiec szturmowy Sztylet",
-    "CROSS": "Myśliwiec krzyżowy"
+    "CROSS": "Myśliwiec krzyżowy",
+    "HAULER": "Transporter dysków"
   },
   "siteMenu": {
     "label": "Mapa menu witryny",

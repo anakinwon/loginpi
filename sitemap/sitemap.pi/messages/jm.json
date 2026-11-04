@@ -417,7 +417,8 @@
     "BRIDGE": "Bridge Viewscreen",
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
-    "CROSS": "Cross-wing fighter"
+    "CROSS": "Cross-wing fighter",
+    "HAULER": "Disc Hauler"
   },
   "siteMenu": {
     "label": "Site menu map",

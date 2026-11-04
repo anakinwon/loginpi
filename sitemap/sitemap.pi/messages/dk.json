@@ -417,7 +417,8 @@
     "BRIDGE": "Bro-visningsskærm",
     "TWIN": "Tvillingsvinget Interceptor",
     "DAGGER": "Dolk-angrebsjager",
-    "CROSS": "Krydsvinget jagerfly"
+    "CROSS": "Krydsvinget jagerfly",
+    "HAULER": "Disctransportskib"
   },
   "siteMenu": {
     "label": "Sitemenuoversigt",

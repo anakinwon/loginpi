@@ -417,7 +417,8 @@
     "BRIDGE": "Bridge Viewscreen",
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
-    "CROSS": "យន្តហោះចម្បាំងស្លាបឈើឆ្កាង"
+    "CROSS": "យន្តហោះចម្បាំងស្លាបឈើឆ្កាង",
+    "HAULER": "អ្នកដឹកជញ្ជូនឌីស"
   },
   "siteMenu": {
     "label": "ផែនទីម៉ឺនុយគេហទំព័រ",

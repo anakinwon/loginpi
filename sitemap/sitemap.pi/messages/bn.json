@@ -417,7 +417,8 @@
     "BRIDGE": "Skrin Pandangan Jambatan",
     "TWIN": "Pemintas Sayap Berkembar",
     "DAGGER": "Penyerang Belati",
-    "CROSS": "Pejuang Sayap Silang"
+    "CROSS": "Pejuang Sayap Silang",
+    "HAULER": "Pengangkut Cakera"
   },
   "siteMenu": {
     "label": "Peta menu tapak",

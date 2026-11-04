@@ -417,7 +417,8 @@
     "BRIDGE": "Mostní obrazovka",
     "TWIN": "Dvoukřídlý stíhač",
     "DAGGER": "Útočná stíhačka Dagger",
-    "CROSS": "Stíhačka s křížovými křídly"
+    "CROSS": "Stíhačka s křížovými křídly",
+    "HAULER": "Diskový transportér"
   },
   "siteMenu": {
     "label": "Mapa menu webu",

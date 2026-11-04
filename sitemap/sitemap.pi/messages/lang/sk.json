@@ -417,7 +417,8 @@
     "BRIDGE": "Mostový priezor",
     "TWIN": "Dvojkrídlový stíhač",
     "DAGGER": "Útočná stíhačka Dagger",
-    "CROSS": "Stíhačka s krížovými krídlami"
+    "CROSS": "Stíhačka s krížovými krídlami",
+    "HAULER": "Diskový transportér"
   },
   "siteMenu": {
     "label": "Mapa menu stránky",

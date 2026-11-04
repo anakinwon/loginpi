@@ -417,7 +417,8 @@
     "BRIDGE": "Pantalla de visualització del pont",
     "TWIN": "Interceptor d'ala doble",
     "DAGGER": "Caça d'assalt Dagger",
-    "CROSS": "Caça d'ala en creu"
+    "CROSS": "Caça d'ala en creu",
+    "HAULER": "Transportador de discs"
   },
   "siteMenu": {
     "label": "Mapa del menú del lloc",

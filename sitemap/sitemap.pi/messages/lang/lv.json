@@ -417,7 +417,8 @@
     "BRIDGE": "Tilta skata ekrāns",
     "TWIN": "Divspārnu pārtvērējs",
     "DAGGER": "Duncis uzbrukuma iznīcinātājs",
-    "CROSS": "Spārnu krusta iznīcinātājs"
+    "CROSS": "Spārnu krusta iznīcinātājs",
+    "HAULER": "Disku pārvadātājs"
   },
   "siteMenu": {
     "label": "Vietnes izvēlnes karte",

@@ -59,7 +59,7 @@
   .label {
     @apply mb-1 block text-sm font-medium;
   }
-  /* 외부 이동 안내 레이어(leave-dialog) — 우주선 5종(lib/ship.ts : 기본 SAUCER + 유료 BRIDGE·TWIN·DAGGER·CROSS, 마스터 지시 2026-11-03, 구 오각형 카드·막대 나셀 폐기).
+  /* 외부 이동 안내 레이어(leave-dialog) — 우주선 6종(lib/ship.ts : 기본 SAUCER + 유료 BRIDGE·TWIN·DAGGER·CROSS·HAULER, 마스터 지시 2026-11-03, 구 오각형 카드·막대 나셀 폐기).
      루트 .ship.ship-<기체> 하나에 공통 콘텐츠(.hud-label·.ship-dest·.hud-coord·.ship-log·.ship-actions·.btn-hud·.ship-go, components/ships/index.tsx)를 두고 껍데기·색은 기체 접두(.ship-saucer-* …) 규칙만 바꾼다.
      정지 모달 안이라 예외(움직이는 SVG 에는 CSS opacity·transform 애니메이션 금지 — 모바일 WebView 철칙, PRD_02_EFCT) — 시안 그대로 둔 예외 : BRIDGE 기체 축소(점프 구간 한정), BRIDGE·DAGGER·CROSS 추진 불꽃 scale, CROSS 날개 전개 rotate(transform-box: view-box + px 원점, 안 움직여도 루트 점프는 그대로).
      별은 warp-field <canvas>(뒤), 플래시는 .hud-flash(앞). 색은 다크 고정 */
@@ -1241,6 +1241,91 @@
   .ship-jump .ship-cross-eng,
   .ship-jump .ship-cross-gun {
     transform: none;
+  }
+  /* ── HAULER(유료, 자체 디자인 2026-11-04) : 뒤쪽 약간 위에서 본 대형 원반 화물선 — 흰·회색 금속 + 청록 띠, 지지대에 매달린 밝은 명판, 이중 베젤 콘솔. 점프 때 후방 3연 노즐 백열·불꽃 ── */
+  .ship-hauler-frame svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible; /* 점프 불꽃이 노즐 아래로 몇 px 나감 */
+  }
+  .ship-hauler-plate {
+    position: relative;
+    width: 58%;
+    margin: -4px auto 0;
+    padding: 7px 12px 6px;
+    text-align: center;
+    background: linear-gradient(180deg, #eef1f4, #c3c8d0 70%, #9aa1ad);
+    color: #12151c;
+    clip-path: polygon(
+      8px 0,
+      calc(100% - 8px) 0,
+      100% 8px,
+      100% calc(100% - 8px),
+      calc(100% - 8px) 100%,
+      8px 100%,
+      0 calc(100% - 8px),
+      0 8px
+    );
+  }
+  .ship-hauler-plate::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 4px;
+    height: 3px;
+    background: #0f766e;
+  }
+  .ship-hauler-plate .hud-label {
+    color: #134e4a;
+  }
+  .ship-hauler-strut {
+    height: 8px;
+    margin: 0 auto;
+    width: 30%;
+    border-left: 2px solid #7d8492;
+    border-right: 2px solid #7d8492;
+  }
+  .ship-hauler-console {
+    padding: 4px;
+    background: linear-gradient(180deg, #c9ced6, #7d8492 55%, #4a505c);
+    border-radius: 18px 18px 6px 6px;
+  }
+  .ship-hauler-console-in {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px 14px;
+    background: linear-gradient(
+      180deg,
+      rgba(14, 18, 28, 0.97),
+      rgba(6, 9, 16, 0.98)
+    );
+    border-radius: 15px 15px 4px 4px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .ship-hauler-glow-ex {
+    animation: var(--ship-pulse-ex);
+  }
+  .ship-hauler-glow-win,
+  .ship-hauler-glow-rim {
+    animation: ship-pulse 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+  .ship-jump .ship-hauler-glow-win,
+  .ship-jump .ship-hauler-glow-rim {
+    animation: none;
+    opacity: 1;
+  }
+  /* 추진 불꽃 — 감싼 <g> 의 로컬 원점(노즐 중심)에서 확산(점프 때만, DAGGER 와 같은 방식) */
+  .ship-hauler-plume {
+    opacity: 0;
+  }
+  .ship-jump .ship-hauler-plume {
+    animation: var(--ship-plume);
+  }
+  .ship-jump .ship-hauler-plume-b {
+    animation-delay: 0.21s;
   }
   /* 점프 플래시 — 음속 돌파 시점(--fly 의 38%)에 흰색 0 → 0.9 → 0 (HTML div, opacity 만). --fly 는 leave-dialog 래퍼에서 상속 */
   .hud-flash {

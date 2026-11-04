@@ -417,7 +417,8 @@
     "BRIDGE": "Tela de visualização da ponte",
     "TWIN": "Interceptor de Asa Dupla",
     "DAGGER": "Caça de Assalto Dagger",
-    "CROSS": "Caça de asa cruzada"
+    "CROSS": "Caça de asa cruzada",
+    "HAULER": "Transportador de Disco"
   },
   "siteMenu": {
     "label": "Mapa do menu do site",

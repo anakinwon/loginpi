@@ -417,7 +417,8 @@
     "BRIDGE": "Ekrani i urës",
     "TWIN": "Ndërhyrës me dy krahë",
     "DAGGER": "Gjuajtës sulmi Dagger",
-    "CROSS": "Gjuajtës me krahë kryq"
+    "CROSS": "Gjuajtës me krahë kryq",
+    "HAULER": "Transportues disku"
   },
   "siteMenu": {
     "label": "Harta e menysë së faqes",

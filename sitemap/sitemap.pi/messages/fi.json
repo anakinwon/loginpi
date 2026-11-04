@@ -417,7 +417,8 @@
     "BRIDGE": "Sillan näyttö",
     "TWIN": "Kaksoissiipinen torjuntahävittäjä",
     "DAGGER": "Tikarihyökkäyshävittäjä",
-    "CROSS": "Ristisiipihävittäjä"
+    "CROSS": "Ristisiipihävittäjä",
+    "HAULER": "Levykuljetusalus"
   },
   "siteMenu": {
     "label": "Sivuston valikkokartta",

@@ -417,7 +417,8 @@
     "BRIDGE": "Ecranul de vizualizare al punții",
     "TWIN": "Interceptor cu aripi duble",
     "DAGGER": "Luptător de asalt Dagger",
-    "CROSS": "Avion de luptă cu aripi în cruce"
+    "CROSS": "Avion de luptă cu aripi în cruce",
+    "HAULER": "Transportor de discuri"
   },
   "siteMenu": {
     "label": "Harta meniului site-ului",

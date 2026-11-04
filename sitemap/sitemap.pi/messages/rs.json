@@ -417,7 +417,8 @@
     "BRIDGE": "Mostni ekran",
     "TWIN": "Dvokrilni presretač",
     "DAGGER": "Borbena letelica bodež",
-    "CROSS": "Borbeni avion sa ukrštenim krilima"
+    "CROSS": "Borbeni avion sa ukrštenim krilima",
+    "HAULER": "Tegljač diskova"
   },
   "siteMenu": {
     "label": "Mapa menija sajta",

@@ -417,7 +417,8 @@
     "BRIDGE": "Bridge Viewscreen",
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
-    "CROSS": "Kryssvingad stridsflygplan"
+    "CROSS": "Kryssvingad stridsflygplan",
+    "HAULER": "Skivtransportör"
   },
   "siteMenu": {
     "label": "Webbplatsmenykarta",

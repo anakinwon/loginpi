@@ -417,7 +417,8 @@
     "BRIDGE": "Mostni zaslon",
     "TWIN": "Prestreznik z dvojnimi krili",
     "DAGGER": "Bojno letalo Dagger",
-    "CROSS": "Borec s križnimi krili"
+    "CROSS": "Borec s križnimi krili",
+    "HAULER": "Prevoznik diskov"
   },
   "siteMenu": {
     "label": "Zemljevid menija spletnega mesta",

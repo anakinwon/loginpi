@@ -417,7 +417,8 @@
     "BRIDGE": "舰桥显示屏",
     "TWIN": "双翼拦截机",
     "DAGGER": "匕首突击机",
-    "CROSS": "十字翼战斗机"
+    "CROSS": "十字翼战斗机",
+    "HAULER": "圆盘货船"
   },
   "siteMenu": {
     "label": "网站菜单地图",

@@ -417,7 +417,8 @@
     "BRIDGE": "Köprü Görüş Ekranı",
     "TWIN": "Çift Kanatlı Önleyici",
     "DAGGER": "Hançer Saldırı Savaşçısı",
-    "CROSS": "Çapraz kanatlı savaşçı"
+    "CROSS": "Çapraz kanatlı savaşçı",
+    "HAULER": "Disk Nakliyeci"
   },
   "siteMenu": {
     "label": "Site menü haritası",

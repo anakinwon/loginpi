@@ -417,7 +417,8 @@
     "BRIDGE": "Koʻprik koʻrish ekrani",
     "TWIN": "Ikki qanotli tutib oluvchi",
     "DAGGER": "Xanjar hujumchi qiruvchi",
-    "CROSS": "Xoch qanotli qiruvchi"
+    "CROSS": "Xoch qanotli qiruvchi",
+    "HAULER": "Disk tashuvchi"
   },
   "siteMenu": {
     "label": "Sayt menyusi xaritasi",

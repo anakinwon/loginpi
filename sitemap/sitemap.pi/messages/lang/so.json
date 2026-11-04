@@ -417,7 +417,8 @@
     "BRIDGE": "Bridge Viewscreen",
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
-    "CROSS": "Diyaarad dagaal oo baalal isdhaafsan"
+    "CROSS": "Diyaarad dagaal oo baalal isdhaafsan",
+    "HAULER": "Gaadiidka saxanka"
   },
   "siteMenu": {
     "label": "Khariiradda menu-ga goobta",

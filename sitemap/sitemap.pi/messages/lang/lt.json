@@ -417,7 +417,8 @@
     "BRIDGE": "Tilto vaizdo ekranas",
     "TWIN": "Dvigubo sparno perėmėjas",
     "DAGGER": "Durklo puolimo naikintuvas",
-    "CROSS": "Kryžminis naikintuvas"
+    "CROSS": "Kryžminis naikintuvas",
+    "HAULER": "Disko vilkikas"
   },
   "siteMenu": {
     "label": "Svetainės meniu žemėlapis",

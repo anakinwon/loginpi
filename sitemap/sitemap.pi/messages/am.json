@@ -417,7 +417,8 @@
     "BRIDGE": "Bridge Viewscreen",
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
-    "CROSS": "Խաչաթև կործանիչ"
+    "CROSS": "Խաչաթև կործանիչ",
+    "HAULER": "Սկավառակային բեռնատար"
   },
   "siteMenu": {
     "label": "Կայքի մենյուի քարտեզ",

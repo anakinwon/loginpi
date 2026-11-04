@@ -417,7 +417,8 @@
     "BRIDGE": "Bridge Viewscreen",
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Fighter",
-    "CROSS": "Borbeni avion s križnim krilima"
+    "CROSS": "Borbeni avion s križnim krilima",
+    "HAULER": "Disk tegljač"
   },
   "siteMenu": {
     "label": "Mapa menija stranice",

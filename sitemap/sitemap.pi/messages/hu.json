@@ -417,7 +417,8 @@
     "BRIDGE": "Híd Képernyő",
     "TWIN": "Két-szárnyú Interceptor",
     "DAGGER": "Tőr Támadó Vadászgép",
-    "CROSS": "Keresztszárnyú vadászgép"
+    "CROSS": "Keresztszárnyú vadászgép",
+    "HAULER": "Lemezszállító"
   },
   "siteMenu": {
     "label": "Oldaltérkép",

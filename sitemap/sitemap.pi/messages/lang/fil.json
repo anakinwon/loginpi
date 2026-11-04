@@ -417,7 +417,8 @@
     "BRIDGE": "Bridge Viewscreen",
     "TWIN": "Twin-Wing Interceptor",
     "DAGGER": "Dagger Assault Ship",
-    "CROSS": "Cross-wing Fighter"
+    "CROSS": "Cross-wing Fighter",
+    "HAULER": "Disc Hauler"
   },
   "siteMenu": {
     "label": "Mapa ng menu ng site",

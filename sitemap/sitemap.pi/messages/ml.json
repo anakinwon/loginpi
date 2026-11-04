@@ -417,7 +417,8 @@
     "BRIDGE": "Écran de vue du pont",
     "TWIN": "Intercepteur à double aile",
     "DAGGER": "Chasseur d'assaut Dague",
-    "CROSS": "Chasseur à ailes croisées"
+    "CROSS": "Chasseur à ailes croisées",
+    "HAULER": "Transporteur de disques"
   },
   "siteMenu": {
     "label": "Plan du menu du site",

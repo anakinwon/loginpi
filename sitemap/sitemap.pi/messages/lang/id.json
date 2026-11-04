@@ -417,7 +417,8 @@
     "BRIDGE": "Layar Jembatan",
     "TWIN": "Pesawat Pencegat Sayap Kembar",
     "DAGGER": "Pesawat Serbu Belati",
-    "CROSS": "Pesawat Tempur Sayap Silang"
+    "CROSS": "Pesawat Tempur Sayap Silang",
+    "HAULER": "Pengangkut Cakram"
   },
   "siteMenu": {
     "label": "Peta menu situs",

@@ -417,7 +417,8 @@
     "BRIDGE": "Màn hình cầu tàu",
     "TWIN": "Máy bay đánh chặn hai cánh",
     "DAGGER": "Máy bay tấn công dao găm",
-    "CROSS": "Máy bay chiến đấu cánh chữ thập"
+    "CROSS": "Máy bay chiến đấu cánh chữ thập",
+    "HAULER": "Tàu vận chuyển đĩa"
   },
   "siteMenu": {
     "label": "Sơ đồ menu trang web",

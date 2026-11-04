@@ -10,7 +10,7 @@ import { SHIP_DEFAULT, isShipCd, type ShipCd } from '@/lib/ship'
 
 export type ShipSlots = { dest: ReactNode; body: ReactNode }
 
-// 기체 껍데기 5종은 지연 로드 — 화면에 실제로 쓰는 1종 청크만 받는다(첫 번들에서 SVG 5벌 제외).
+// 기체 껍데기 6종은 지연 로드 — 화면에 실제로 쓰는 1종 청크만 받는다(첫 번들에서 SVG 6벌 제외).
 // ssr 기본값 유지 : LeaveDialog 는 클릭 뒤에만 마운트돼 서버 렌더가 없고, ShipPreview(관리자·내 사이트)는 서버 렌더에 기체가 들어가 수화 직후 깜빡임이 없다
 const LOADERS: Record<ShipCd, () => Promise<(s: ShipSlots) => ReactNode>> = {
   SAUCER: () => import('./saucer').then((m) => m.SaucerShip),
@@ -18,6 +18,7 @@ const LOADERS: Record<ShipCd, () => Promise<(s: ShipSlots) => ReactNode>> = {
   TWIN: () => import('./twin').then((m) => m.TwinShip),
   DAGGER: () => import('./dagger').then((m) => m.DaggerShip),
   CROSS: () => import('./cross').then((m) => m.CrossShip),
+  HAULER: () => import('./hauler').then((m) => m.HaulerShip),
 }
 const SHELLS = Object.fromEntries(
   Object.entries(LOADERS).map(([cd, load]) => [

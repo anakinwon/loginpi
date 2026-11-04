@@ -417,7 +417,8 @@
     "BRIDGE": "Brúarskjár",
     "TWIN": "Tvíburavængja orrustuflugvél",
     "DAGGER": "Rýtingaárásarflugvél",
-    "CROSS": "Krossvængja orrustuþota"
+    "CROSS": "Krossvængja orrustuþota",
+    "HAULER": "Diskaflutningaskip"
   },
   "siteMenu": {
     "label": "Vefsvæðiskort",

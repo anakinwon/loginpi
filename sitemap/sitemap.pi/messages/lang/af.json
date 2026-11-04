@@ -417,7 +417,8 @@
     "BRIDGE": "Brugskerm",
     "TWIN": "Dubbelvlerk-onderskepper",
     "DAGGER": "Dagger Aanvalsvegter",
-    "CROSS": "Kruisvlerkvegter"
+    "CROSS": "Kruisvlerkvegter",
+    "HAULER": "Skyfvervoerder"
   },
   "siteMenu": {
     "label": "Werfmenukaart",

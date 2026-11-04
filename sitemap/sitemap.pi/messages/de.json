@@ -417,7 +417,8 @@
     "BRIDGE": "Brücken-Bildschirm",
     "TWIN": "Doppelflügel-Abfangjäger",
     "DAGGER": "Dolch-Angriffsjäger",
-    "CROSS": "Kreuzflügler"
+    "CROSS": "Kreuzflügler",
+    "HAULER": "Scheibentransporter"
   },
   "siteMenu": {
     "label": "Seitenmenü-Übersicht",

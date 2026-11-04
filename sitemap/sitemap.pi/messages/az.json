@@ -417,7 +417,8 @@
     "BRIDGE": "Körpü Ekranı",
     "TWIN": "İkiqanadlı Kəşfiyyatçı",
     "DAGGER": "Xəncər Hücum Qırıcısı",
-    "CROSS": "Çarpaz qanadlı qırıcı"
+    "CROSS": "Çarpaz qanadlı qırıcı",
+    "HAULER": "Disk Daşıyıcısı"
   },
   "siteMenu": {
     "label": "Sayt menyu xəritəsi",
