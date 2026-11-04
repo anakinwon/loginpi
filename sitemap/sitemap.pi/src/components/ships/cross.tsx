@@ -253,7 +253,9 @@ export function CrossShip({ dest, body }: ShipSlots) {
             <g id={`${p}set-up`}>
               <use href={`#${p}wing-plate`} />
               <use href={`#${p}gun`} transform="translate(43 71) rotate(10)" />
-              <use href={`#${p}eng`} transform="translate(154 118)" />
+              {/* 엔진 받침 */}
+              <rect x="153" y="103" width="10" height="9" rx="1" fill="#7d8492" stroke="#4a505c" strokeWidth="0.5" />
+              <use href={`#${p}eng`} transform="translate(158 96) scale(0.72)" />
             </g>
             <g id={`${p}set-dn`}>
               <use
@@ -261,10 +263,13 @@ export function CrossShip({ dest, body }: ShipSlots) {
                 transform="matrix(1 0 0 -1 0 276)"
               />
               <use href={`#${p}gun`} transform="translate(43 205) rotate(10)" />
-              <use href={`#${p}eng`} transform="translate(154 162)" />
+              <rect x="153" y="164" width="10" height="9" rx="1" fill="#7d8492" stroke="#4a505c" strokeWidth="0.5" />
+              <use href={`#${p}eng`} transform="translate(158 180) scale(0.72)" />
             </g>
           </defs>
 
+          {/* 동체 축소(마스터 2026-11-04 "본체가 상대적으로 너무 크다") — 폭 78%·높이 92%, 지지대 아래끝(200,236) 고정 */}
+          <g transform="translate(200 236) scale(0.78 0.92) translate(-200 -236)">
           {/* 동체 윗면 : 뒤(아래·가까움) 넓고 앞(위·멀어짐)으로 좁아지는 원근 사다리꼴 */}
           <polygon
             points="172,152 228,152 210,36 200,26 190,36"
@@ -318,6 +323,7 @@ export function CrossShip({ dest, body }: ShipSlots) {
             fill="#e0f2fe"
           />
           <rect x="180" y="120" width="40" height="6" fill="#9aa1ad" />
+          </g>
 
           {/* 4익 X : 기본 각도는 판 모양, 점프 전개 = 바깥 .wg CSS rotate(±7). 오른쪽은 좌우 반전 재사용. 동체 윗면 위 · 후면 판 아래에 겹침 */}
           <g className="ship-cross-wg ship-cross-wg-ll">
@@ -333,6 +339,7 @@ export function CrossShip({ dest, body }: ShipSlots) {
             <use href={`#${p}set-up`} transform="matrix(-1 0 0 1 400 0)" />
           </g>
 
+          <g transform="translate(200 236) scale(0.78 0.92) translate(-200 -236)">
           {/* 동체 후면 : 각진 사각 단면(모서리 깎임) */}
           <polygon
             points="178,146 222,146 232,156 232,198 222,208 178,208 168,198 168,156"
@@ -409,6 +416,7 @@ export function CrossShip({ dest, body }: ShipSlots) {
             <rect x="187" y="208" width="4" height="28" />
             <rect x="209" y="208" width="4" height="28" />
             <rect x="184" y="230" width="32" height="6" rx="1" />
+          </g>
           </g>
         </svg>
       </div>
