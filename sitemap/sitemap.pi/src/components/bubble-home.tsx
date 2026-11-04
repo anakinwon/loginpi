@@ -522,13 +522,17 @@ function BubbleTable({
                           aria-expanded={isOpen}
                           aria-controls={`menu-${it.id}`}
                           title={tm(isOpen ? 'hide' : 'show')}
-                          className="flex size-6 shrink-0 items-center justify-center rounded text-white/60 hover:bg-white/10 hover:text-white"
+                          // 눈에 띄는 알약 버튼 — 화살표 + 상위 메뉴 수(이름은 title·sr-only — 글자를 넣으면 넓은 화면에서 사이트 칸과 겹침)
+                          className="ml-1 flex h-7 shrink-0 items-center gap-1 rounded-full border border-sky-300/50 bg-sky-400/15 px-2 text-xs font-semibold text-sky-200 hover:bg-sky-400/30 hover:text-white"
                         >
                           <span
                             aria-hidden
-                            className={isOpen ? 'rotate-90' : ''}
+                            className={`inline-block transition-transform ${isOpen ? 'rotate-90' : ''}`}
                           >
-                            ▸
+                            ▶
+                          </span>
+                          <span aria-hidden className="tabular-nums">
+                            {menu.menus.length}
                           </span>
                           <span className="sr-only">
                             {tm(isOpen ? 'hide' : 'show')}
