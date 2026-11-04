@@ -19,6 +19,8 @@ test('도착 판정 : 표시 또는 sitemap.pi referrer 만', () => {
   assert.ok(!isWarpArrival('https://s.example/', 'https://evil-sitemap.vercel.app.attacker.com/'))
   assert.ok(!isWarpArrival('https://s.example/?utm_source=ads', ''))
   assert.ok(!isWarpArrival('https://s.example/', ''))
+  assert.ok(!isWarpArrival('https://sitemap.pi/ko', 'https://sitemap.pi/'))
+  assert.ok(isWarpArrival('https://sitemap.pi/ko?utm_source=sitemap.pi', 'https://sitemap.pi/'))
 })
 
 test('표시 지우기 : 우리 표시만, 다른 질의·해시 보존', () => {

@@ -32,9 +32,11 @@ const CSS = `
 @keyframes pi-warp-spin { to { transform: rotate(360deg) } }
 @keyframes pi-warp-flash { 0% { opacity: .85 } 100% { opacity: 0 } }
 @keyframes pi-warp-reveal { 0% { opacity: 1 } 100% { opacity: 0 } }
+@keyframes pi-warp-glow { 0% { opacity: 0 } 35% { opacity: .55 } 100% { opacity: 0 } }
 `
 
-export function WarpArrival() {
+/** revealFlash : 어두운 테마 사이트용(선택) — 덮개와 배경이 같은 어둠이라 '걷힘'이 안 보이므로, 걷힐 때 하늘빛 섬광으로 밝은 사이트(schema.pi)의 드러남 대비를 대신. 기본 false = 기존 연출 그대로 */
+export function WarpArrival({ revealFlash = false }: { revealFlash?: boolean } = {}) {
   const [on, setOn] = useState(false)
   const ref = useRef<HTMLCanvasElement>(null)
 
@@ -165,6 +167,16 @@ export function WarpArrival() {
         />
       </div>
       <div style={{ ...fill, background: 'rgba(220,235,255,.9)', animation: 'pi-warp-flash 350ms ease-out forwards' }} />
+      {revealFlash && (
+        <div
+          style={{
+            ...fill,
+            opacity: 0,
+            background: `rgba(${C.color}, .9)`,
+            animation: `pi-warp-glow ${C.ms - C.revealAt}ms ease-out ${C.revealAt - 100}ms forwards`,
+          }}
+        />
+      )}
     </div>
   )
 }

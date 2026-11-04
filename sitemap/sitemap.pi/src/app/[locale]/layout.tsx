@@ -7,6 +7,7 @@ import { ThemeProvider } from 'next-themes'
 import { SessionProvider } from 'next-auth/react'
 import { PiSdkScript } from '@pi/auth/client'
 import { getDir, PreferredLocaleScript } from '@pi/i18n'
+import { WarpArrival } from '@pi/warp/client'
 import { PiAuthRoot } from '@/components/pi-auth-root'
 import { routing } from '@/i18n/routing'
 import { SiteHeader } from '@/components/site-header'
@@ -44,6 +45,8 @@ export default async function LocaleLayout({
       <body className="bg-background text-foreground min-h-screen antialiased">
         {/* 저장된 언어(preferred_locale) 적용 — 파싱 중 1회, 하이드레이션·Pi SDK·인증 시작 전(표준 6절) */}
         <PreferredLocaleScript locales={routing.locales} />
+        {/* 도착 워프 — 버블 '점프'로 자기 자신에 온 경우(utm 표시만 판정), 어두운 테마라 걷힐 때 섬광으로 도착을 드러냄 */}
+        <WarpArrival revealFlash />
         {/* <html> 직속이면 hydration 불일치 — 반드시 body 안 */}
         <PiSdkScript />
         <NextIntlClientProvider>

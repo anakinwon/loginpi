@@ -45,7 +45,7 @@ export default async function LocaleLayout({
         {/* 저장된 언어(preferred_locale) 적용 — 파싱 중 1회, 하이드레이션·Pi SDK·인증 시작 전(전 경로 /s/* 포함, 표준 6절) */}
         <PreferredLocaleScript locales={routing.locales} />
         {/* sitemap.pi 에서 워프로 넘어온 방문 = 음속에서 감속해 멈추는 도착 연출(@pi/warp, 2026-11-01) */}
-        <WarpArrival />
+        <WarpArrival revealFlash />
         {/* <html> 직속이면 hydration 불일치 — 반드시 body 안 */}
         <PiSdkScript />
         <NextIntlClientProvider>

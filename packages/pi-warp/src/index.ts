@@ -26,7 +26,9 @@ export function isWarpArrival(href: string, referrer: string): boolean {
     /* 주소 파싱 실패 = 표시 없음 */
   }
   try {
-    return !!referrer && SOURCE_HOST.test(new URL(referrer).hostname)
+    // 같은 호스트 referrer 는 무시 — sitemap.pi 자기 안의 이동(언어 변경·로그인 콜백)이 도착으로 오판되지 않게, 자기 자신 점프는 utm 표시로만 판정
+    const r = new URL(referrer).hostname
+    return SOURCE_HOST.test(r) && r !== new URL(href).hostname
   } catch {
     return false
   }

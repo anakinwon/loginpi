@@ -52,7 +52,7 @@ export default function middleware(req: NextRequest) {
     !APP_ROUTE_SEGMENTS.has(firstSegment)
   ) {
     const rest = pathname.slice(firstSegment.length + 1)
-    const res = NextResponse.redirect(new URL('/en' + (rest || '/'), req.url))
+    const res = NextResponse.redirect(new URL('/en' + (rest || '/') + req.nextUrl.search, req.url))
     applySecurityHeaders(res)
     return res
   }
