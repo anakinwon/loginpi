@@ -1181,19 +1181,23 @@
     animation: none;
     opacity: 1;
   }
-  /* 4익 X 전개 — 래퍼 <g> 회전, view-box + px 절대 원점(X 중심 200,138) */
+  /* 4익 X 전개 — 래퍼 <g> 회전, view-box + px 절대 원점(X 중심 200,138).
+     판 원형 각도 = 약 23.3°(중심선 178,129 → 43,71). 대기 = 절반 접힘(∓11.6°), 점프 = 원형 각도(회전 0)로 펼침(마스터 2026-11-04 "대기는 절반으로 접고, 날아갈 때는 지금 대기 폭으로") */
   .ship-cross-wg {
     transform-box: view-box;
     transform-origin: 200px 138px;
     transition: transform calc(var(--fly) * 0.3) cubic-bezier(0.32, 0.72, 0, 1);
   }
-  .ship-jump .ship-cross-wg-ul,
-  .ship-jump .ship-cross-wg-lr {
-    transform: rotate(7deg);
+  .ship-cross-wg-ul,
+  .ship-cross-wg-lr {
+    transform: rotate(-11.6deg);
   }
-  .ship-jump .ship-cross-wg-ur,
-  .ship-jump .ship-cross-wg-ll {
-    transform: rotate(-7deg);
+  .ship-cross-wg-ur,
+  .ship-cross-wg-ll {
+    transform: rotate(11.6deg);
+  }
+  .ship-jump .ship-cross-wg {
+    transform: none;
   }
   /* 점프 플래시 — 음속 돌파 시점(--fly 의 38%)에 흰색 0 → 0.9 → 0 (HTML div, opacity 만). --fly 는 leave-dialog 래퍼에서 상속 */
   .hud-flash {
