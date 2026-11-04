@@ -267,7 +267,12 @@
     66% {
       transform: scale(1);
       opacity: 1;
-      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); /* 줌인은 천천히 시작해 가속 — 블랙홀 속으로 빨려 들어가는 느낌 */
+      animation-timing-function: cubic-bezier(
+        0.55,
+        0,
+        1,
+        0.45
+      ); /* 줌인은 천천히 시작해 가속 — 블랙홀 속으로 빨려 들어가는 느낌 */
     }
     100% {
       transform: scale(30);
@@ -303,13 +308,13 @@
         transparent 81.4%
       ),
       /* 방사 패널선(16분할) */
-      repeating-conic-gradient(
+        repeating-conic-gradient(
           from 11.25deg,
           rgba(186, 198, 255, 0.08) 0 0.5deg,
           transparent 0.5deg 22.5deg
         ),
       /* 키 라이트(좌상) + 원뿔 금속 광택 */
-      radial-gradient(
+        radial-gradient(
           ellipse 110% 85% at 30% 14%,
           rgba(205, 214, 240, 0.26),
           transparent 55%
@@ -1197,6 +1202,26 @@
     transform: rotate(11.6deg);
   }
   .ship-jump .ship-cross-wg {
+    transform: none;
+  }
+  /* 날개 끝 포신 — 날개와 따로 평행 이동만(회전 없음 = 늘 직진). 대기 = 날개 끝 회전 자리, 점프 = 원위치(마스터 2026-11-04 "안테나는 같은 직진 방향") */
+  .ship-cross-gun {
+    transform-box: view-box;
+    transition: transform calc(var(--fly) * 0.3) cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .ship-cross-gun-ul {
+    transform: translate(-10.3px, 32.9px);
+  }
+  .ship-cross-gun-ur {
+    transform: translate(10.3px, 32.9px);
+  }
+  .ship-cross-gun-ll {
+    transform: translate(-10.3px, -32.9px);
+  }
+  .ship-cross-gun-lr {
+    transform: translate(10.3px, -32.9px);
+  }
+  .ship-jump .ship-cross-gun {
     transform: none;
   }
   /* 점프 플래시 — 음속 돌파 시점(--fly 의 38%)에 흰색 0 → 0.9 → 0 (HTML div, opacity 만). --fly 는 leave-dialog 래퍼에서 상속 */

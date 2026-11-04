@@ -94,7 +94,7 @@ export function CrossShip({ dest, body }: ShipSlots) {
             {/* 왼쪽 위 날개 판(뒤 약간 위에서 본 윗면 띠) : 뿌리(178) → 끝(40) */}
             <polygon
               id={`${p}wing-shape`}
-              points="178,118 178,140 46,78 40,64"
+              points="192,123.5 192,146.6 46,78 40,64"
             />
             <clipPath id={`${p}c-wing`}>
               <use href={`#${p}wing-shape`} />
@@ -252,80 +252,24 @@ export function CrossShip({ dest, body }: ShipSlots) {
             {/* 왼쪽 위 날개 세트 / 왼쪽 아래(위 판을 y=138 기준 상하 반전, 엔진·포신은 진행 방향 유지) */}
             <g id={`${p}set-up`}>
               <use href={`#${p}wing-plate`} />
-              <use href={`#${p}gun`} transform="translate(43 71) rotate(10)" />
-              {/* 엔진 받침 */}
-              <rect x="153" y="103" width="10" height="9" rx="1" fill="#7d8492" stroke="#4a505c" strokeWidth="0.5" />
-              <use href={`#${p}eng`} transform="translate(158 96) scale(0.72)" />
+              <use
+                href={`#${p}eng`}
+                transform="translate(142 113.5) scale(0.65)"
+              />
             </g>
             <g id={`${p}set-dn`}>
               <use
                 href={`#${p}wing-plate`}
                 transform="matrix(1 0 0 -1 0 276)"
               />
-              <use href={`#${p}gun`} transform="translate(43 205) rotate(10)" />
-              <rect x="153" y="164" width="10" height="9" rx="1" fill="#7d8492" stroke="#4a505c" strokeWidth="0.5" />
-              <use href={`#${p}eng`} transform="translate(158 180) scale(0.72)" />
+              <use
+                href={`#${p}eng`}
+                transform="translate(142 162.5) scale(0.65)"
+              />
             </g>
           </defs>
 
-          {/* 동체 축소(마스터 2026-11-04 "본체가 상대적으로 너무 크다") — 폭 78%·높이 92%, 지지대 아래끝(200,236) 고정 */}
-          <g transform="translate(200 236) scale(0.78 0.92) translate(-200 -236)">
-          {/* 동체 윗면 : 뒤(아래·가까움) 넓고 앞(위·멀어짐)으로 좁아지는 원근 사다리꼴 */}
-          <polygon
-            points="172,152 228,152 210,36 200,26 190,36"
-            fill={`url(#${p}g-hull)`}
-            stroke="#5b6170"
-            strokeWidth="1.2"
-            strokeLinejoin="round"
-          />
-          <polygon
-            points="172,152 228,152 210,36 200,26 190,36"
-            fill={`url(#${p}p-grime)`}
-          />
-          <g stroke="#4a505c" strokeWidth="0.7" opacity="0.7" fill="none">
-            <line x1="187" y1="60" x2="213" y2="60" />
-            <line x1="183" y1="86" x2="217" y2="86" />
-            <line x1="176" y1="140" x2="224" y2="140" />
-          </g>
-          {/* 붉은 척추선(멀어지며 가늘어짐) */}
-          <polygon points="199.3,38 200.7,38 202,92 198,92" fill="#c8372d" />
-
-          {/* 캐노피 뒷부분 : 위(앞)로 기운 유리 + 뒤 받침 판 */}
-          <polygon points="186,96 214,96 222,128 178,128" fill="#5b6170" />
-          <polygon
-            points="188.5,99 211.5,99 216,118 184,118"
-            fill={`url(#${p}g-glass)`}
-          />
-          <polygon
-            className="ship-cross-glow-win"
-            points="188.5,99 211.5,99 216,118 184,118"
-            fill="#5eead4"
-            fillOpacity="0.22"
-          />
-          <line
-            x1="200"
-            y1="99"
-            x2="200"
-            y2="118"
-            stroke="#9aa1ad"
-            strokeWidth="1.6"
-          />
-          <path
-            d="M187 112 L190 102"
-            stroke="#fff"
-            strokeOpacity="0.5"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-          />
-          <polygon
-            className="ship-hot"
-            points="188.5,99 211.5,99 216,118 184,118"
-            fill="#e0f2fe"
-          />
-          <rect x="180" y="120" width="40" height="6" fill="#9aa1ad" />
-          </g>
-
-          {/* 4익 X : 기본 각도는 판 모양, 점프 전개 = 바깥 .wg CSS rotate(±7). 오른쪽은 좌우 반전 재사용. 동체 윗면 위 · 후면 판 아래에 겹침 */}
+          {/* 4익 X : 기본 각도는 판 모양, 점프 전개 = 바깥 .wg CSS rotate(±7). 오른쪽은 좌우 반전 재사용. 동체 아래에 깔림(동체가 뿌리를 덮음) */}
           <g className="ship-cross-wg ship-cross-wg-ll">
             <use href={`#${p}set-dn`} />
           </g>
@@ -339,84 +283,161 @@ export function CrossShip({ dest, body }: ShipSlots) {
             <use href={`#${p}set-up`} transform="matrix(-1 0 0 1 400 0)" />
           </g>
 
-          <g transform="translate(200 236) scale(0.78 0.92) translate(-200 -236)">
-          {/* 동체 후면 : 각진 사각 단면(모서리 깎임) */}
-          <polygon
-            points="178,146 222,146 232,156 232,198 222,208 178,208 168,198 168,156"
-            fill={`url(#${p}g-rear)`}
-            stroke="#5b6170"
-            strokeWidth="1.2"
-            strokeLinejoin="round"
-          />
-          <polygon
-            points="178,146 222,146 232,156 232,198 222,208 178,208 168,198 168,156"
-            fill={`url(#${p}p-grime)`}
-          />
-          <rect x="169" y="152" width="62" height="4" fill="#c8372d" />
-          {/* 정비 해치 : 사각 판 + 볼트 + 작은 계기 판 */}
-          <rect
-            x="182"
-            y="162"
-            width="36"
-            height="34"
-            rx="2"
-            fill="#aeb4be"
-            stroke="#4a505c"
-            strokeWidth="0.9"
-          />
-          <g fill="#5b6170">
-            <circle cx="185.5" cy="165.5" r="1.3" />
-            <circle cx="214.5" cy="165.5" r="1.3" />
-            <circle cx="185.5" cy="192.5" r="1.3" />
-            <circle cx="214.5" cy="192.5" r="1.3" />
+          {/* 동체 축소(마스터 2026-11-04 "본체를 이만큼 작게") — 폭 55%·높이 50%, X 중심(200,140) 고정. 명판 지지대는 축소 묶음 밖에서 후면 아래(174) → 236 */}
+          <g transform="translate(200 140) scale(0.55 0.5) translate(-200 -140)">
+            {/* 동체 윗면 : 뒤(아래·가까움) 넓고 앞(위·멀어짐)으로 좁아지는 원근 사다리꼴 */}
+            <polygon
+              points="172,152 228,152 210,36 200,26 190,36"
+              fill={`url(#${p}g-hull)`}
+              stroke="#5b6170"
+              strokeWidth="1.2"
+              strokeLinejoin="round"
+            />
+            <polygon
+              points="172,152 228,152 210,36 200,26 190,36"
+              fill={`url(#${p}p-grime)`}
+            />
+            <g stroke="#4a505c" strokeWidth="0.7" opacity="0.7" fill="none">
+              <line x1="187" y1="60" x2="213" y2="60" />
+              <line x1="183" y1="86" x2="217" y2="86" />
+              <line x1="176" y1="140" x2="224" y2="140" />
+            </g>
+            {/* 붉은 척추선(멀어지며 가늘어짐) */}
+            <polygon points="199.3,38 200.7,38 202,92 198,92" fill="#c8372d" />
+
+            {/* 캐노피 뒷부분 : 위(앞)로 기운 유리 + 뒤 받침 판 */}
+            <polygon points="186,96 214,96 222,128 178,128" fill="#5b6170" />
+            <polygon
+              points="188.5,99 211.5,99 216,118 184,118"
+              fill={`url(#${p}g-glass)`}
+            />
+            <polygon
+              className="ship-cross-glow-win"
+              points="188.5,99 211.5,99 216,118 184,118"
+              fill="#5eead4"
+              fillOpacity="0.22"
+            />
+            <line
+              x1="200"
+              y1="99"
+              x2="200"
+              y2="118"
+              stroke="#9aa1ad"
+              strokeWidth="1.6"
+            />
+            <path
+              d="M187 112 L190 102"
+              stroke="#fff"
+              strokeOpacity="0.5"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
+            <polygon
+              className="ship-hot"
+              points="188.5,99 211.5,99 216,118 184,118"
+              fill="#e0f2fe"
+            />
+            <rect x="180" y="120" width="40" height="6" fill="#9aa1ad" />
           </g>
-          <rect
-            x="190"
-            y="168"
-            width="20"
-            height="9"
-            rx="1.2"
-            fill="#0b1220"
-            stroke="#4a505c"
-            strokeWidth="0.6"
-          />
-          <rect
-            className="ship-cross-glow-win"
-            x="192"
-            y="170"
-            width="9"
-            height="5"
-            fill="#5eead4"
-            fillOpacity="0.55"
-          />
-          <circle
-            className="ship-cross-glow-ex"
-            cx="205.5"
-            cy="172.5"
-            r="1.6"
-            fill="#f87171"
-          />
-          <g stroke="#4a505c" strokeWidth="0.8">
-            <line x1="190" y1="183" x2="210" y2="183" />
-            <line x1="190" y1="187" x2="204" y2="187" />
+
+          <g transform="translate(200 140) scale(0.55 0.5) translate(-200 -140)">
+            {/* 동체 후면 : 각진 사각 단면(모서리 깎임) */}
+            <polygon
+              points="178,146 222,146 232,156 232,198 222,208 178,208 168,198 168,156"
+              fill={`url(#${p}g-rear)`}
+              stroke="#5b6170"
+              strokeWidth="1.2"
+              strokeLinejoin="round"
+            />
+            <polygon
+              points="178,146 222,146 232,156 232,198 222,208 178,208 168,198 168,156"
+              fill={`url(#${p}p-grime)`}
+            />
+            <rect x="169" y="152" width="62" height="4" fill="#c8372d" />
+            {/* 정비 해치 : 사각 판 + 볼트 + 작은 계기 판 */}
+            <rect
+              x="182"
+              y="162"
+              width="36"
+              height="34"
+              rx="2"
+              fill="#aeb4be"
+              stroke="#4a505c"
+              strokeWidth="0.9"
+            />
+            <g fill="#5b6170">
+              <circle cx="185.5" cy="165.5" r="1.3" />
+              <circle cx="214.5" cy="165.5" r="1.3" />
+              <circle cx="185.5" cy="192.5" r="1.3" />
+              <circle cx="214.5" cy="192.5" r="1.3" />
+            </g>
+            <rect
+              x="190"
+              y="168"
+              width="20"
+              height="9"
+              rx="1.2"
+              fill="#0b1220"
+              stroke="#4a505c"
+              strokeWidth="0.6"
+            />
+            <rect
+              className="ship-cross-glow-win"
+              x="192"
+              y="170"
+              width="9"
+              height="5"
+              fill="#5eead4"
+              fillOpacity="0.55"
+            />
+            <circle
+              className="ship-cross-glow-ex"
+              cx="205.5"
+              cy="172.5"
+              r="1.6"
+              fill="#f87171"
+            />
+            <g stroke="#4a505c" strokeWidth="0.8">
+              <line x1="190" y1="183" x2="210" y2="183" />
+              <line x1="190" y1="187" x2="204" y2="187" />
+            </g>
+            {/* 꼬리 배기 슬릿 */}
+            <rect
+              x="186"
+              y="199"
+              width="28"
+              height="5"
+              rx="2.5"
+              fill="#1b1f28"
+            />
+            <rect
+              className="ship-cross-glow-ex"
+              x="189"
+              y="200"
+              width="22"
+              height="3"
+              rx="1.5"
+              fill="#fb923c"
+            />
           </g>
-          {/* 꼬리 배기 슬릿 */}
-          <rect x="186" y="199" width="28" height="5" rx="2.5" fill="#1b1f28" />
-          <rect
-            className="ship-cross-glow-ex"
-            x="189"
-            y="200"
-            width="22"
-            height="3"
-            rx="1.5"
-            fill="#fb923c"
-          />
-          {/* 명판 지지대 : 후면 아래 → 명판 */}
+          {/* 날개 끝 포신 4기 — 날개 회전과 분리, 항상 진행 방향(위) 직진. 대기 위치 = 날개 끝 회전 자리(±11.6° → 끝점 이동 ∓10.3,±32.9), 점프 = 원위치 */}
+          <g className="ship-cross-gun ship-cross-gun-ul">
+            <use href={`#${p}gun`} transform="translate(43 71)" />
+          </g>
+          <g className="ship-cross-gun ship-cross-gun-ur">
+            <use href={`#${p}gun`} transform="translate(357 71)" />
+          </g>
+          <g className="ship-cross-gun ship-cross-gun-ll">
+            <use href={`#${p}gun`} transform="translate(43 205)" />
+          </g>
+          <g className="ship-cross-gun ship-cross-gun-lr">
+            <use href={`#${p}gun`} transform="translate(357 205)" />
+          </g>
+          {/* 명판 지지대 : 축소 후면 아래(174) → 명판(236) */}
           <g fill="#7d8492" stroke="#4a505c" strokeWidth="0.6">
-            <rect x="187" y="208" width="4" height="28" />
-            <rect x="209" y="208" width="4" height="28" />
-            <rect x="184" y="230" width="32" height="6" rx="1" />
-          </g>
+            <rect x="193" y="172" width="3" height="64" />
+            <rect x="204" y="172" width="3" height="64" />
+            <rect x="186" y="230" width="28" height="6" rx="1" />
           </g>
         </svg>
       </div>
