@@ -9,6 +9,8 @@ import { getConn, move, type ReqRow } from './model-ddl-req'
 import { splitStatements } from './modelpi/ddl-parse'
 import { connFp } from './modelpi/seal'
 import { deniedAt } from './modelpi/sql-guard'
+import { missingCol, uaVer } from './sql-agent-core'
+import { claimSql, nextSql } from './sql-agent'
 
 export type AgtRow = { agt_id: string; area_id: string; agt_nm: string; tkn_pfx: string; exp_dtm: string; lst_seen_dtm: string | null; ver_no: number }
 const AGT_COLS = 'agt_id, area_id, agt_nm, tkn_pfx, exp_dtm, lst_seen_dtm, ver_no'
@@ -39,14 +41,18 @@ export async function revokeAgt(areaId: string, agtId: string, uid: string) {
   return r.data.length > 0
 }
 
-// Bearer 토큰 → 활성 에이전트(폐기·만료면 null), 최종 확인 일시 기록
-export async function agtByToken(auth: string | null): Promise<AgtRow | null> {
+// Bearer 토큰 → 활성 에이전트(폐기·만료면 null), 최종 확인 일시 + User-Agent 버전 기록(sql/079 — 같은 UPDATE, 추가 왕복 없음)
+export async function agtByToken(auth: string | null, ua: string | null): Promise<AgtRow | null> {
   const m = /^Bearer (spa_[\w-]{43})$/.exec(auth ?? '')
   if (!m) return null
   const r = await db().from('mdl_db_agt').select(AGT_COLS).eq('tkn_hash', sha(m[1])).eq('del_yn', 'N').gt('exp_dtm', new Date().toISOString()).maybeSingle()
   if (r.error) throw r.error
   if (!r.data) return null
-  await db().from('mdl_db_agt').update({ lst_seen_dtm: new Date().toISOString() }).eq('agt_id', (r.data as AgtRow).agt_id)
+  const seen = { lst_seen_dtm: new Date().toISOString() }
+  const id = (r.data as AgtRow).agt_id
+  let u = await db().from('mdl_db_agt').update({ ...seen, agt_ver_txt: uaVer(ua) }).eq('agt_id', id) // uaVer = x.y.z 형식만(sql/079 CHECK 와 같음), 아니면 null
+  if (missingCol(u.error)) u = await db().from('mdl_db_agt').update(seen).eq('agt_id', id) // sql/079 미적용 — 최종 확인 일시만이라도
+  if (u.error) console.error('[agt-seen]', u.error.code, u.error.message)
   return r.data as AgtRow
 }
 
@@ -55,13 +61,18 @@ type ReqFull = ReqRow & { ddl_txt: string; run_nonce: string | null }
 
 const TEST_TTL_MS = 10 * 60_000 // 접속 시험 요청은 10분 안에만(에이전트가 꺼져 있으면 화면은 대기 안내)
 
-// 작업 가져가기 — 접속 시험 요청이 먼저, 없으면 승인된 DDL 1건, 둘 다 없으면 null. 대조 실패 요청은 FAIL 로 돌려 다시 잡히지 않게
-export async function claimJob(g: AgtRow) {
-  const cs = await db().from('mdl_db_conn').select('conn_id, dbms_cd, conn_url_txt, jndi_nm, usr_nm, agt_test_req_dtm, agt_test_end_dtm').eq('area_id', g.area_id).eq('agt_id', g.agt_id).eq('del_yn', 'N')
+// 작업 가져가기 — 접속 시험 요청 > SQL 편집기 요청(sql/078, sqlOk = 1.4.0 이상) > 승인된 DDL 1건, 없으면 null. 대조 실패 요청은 FAIL 로 돌려 다시 잡히지 않게
+export async function claimJob(g: AgtRow, sqlOk: boolean) {
+  const [cs, sw] = await Promise.all([
+    db().from('mdl_db_conn').select('conn_id, dbms_cd, conn_url_txt, jndi_nm, usr_nm, agt_test_req_dtm, agt_test_end_dtm').eq('area_id', g.area_id).eq('agt_id', g.agt_id).eq('del_yn', 'N'),
+    sqlOk ? nextSql(g) : null,
+  ])
   if (cs.error) throw cs.error
   const conns = cs.data as { conn_id: string; dbms_cd: string; conn_url_txt: string | null; jndi_nm: string | null; usr_nm: string | null; agt_test_req_dtm: string | null; agt_test_end_dtm: string | null }[]
   const t = conns.find((c) => c.agt_test_req_dtm && !c.agt_test_end_dtm && Date.now() - new Date(c.agt_test_req_dtm).getTime() < TEST_TTL_MS)
   if (t) return { test: { conn_id: t.conn_id, dbms_cd: t.dbms_cd, conn_url: t.conn_url_txt, jndi_nm: t.jndi_nm, usr_nm: t.usr_nm, req_dtm: t.agt_test_req_dtm } }
+  const sq = sw ? await claimSql(g, sw, conns) : null // 0건(선점·기한 지남·접속 바뀜) = 다음 순위로
+  if (sq) return { sql: sq }
   const connIds = conns.map((x) => x.conn_id)
   if (!connIds.length) return null
   const q = await db().from('mdl_ddl_req').select(REQ_SEL).eq('area_id', g.area_id).in('conn_id', connIds).eq('exec_mthd_cd', 'AGT').eq('req_sts_cd', 'APV').eq('del_yn', 'N').order('apv_dtm').limit(1)

@@ -18,7 +18,7 @@ const body = z.object({
 export async function POST(req: Request, { params }: Ctx) {
   const { reqId } = await params
   try {
-    const g = await agtByToken(req.headers.get('authorization'))
+    const g = await agtByToken(req.headers.get('authorization'), req.headers.get('user-agent'))
     if (!g) return apiError('AGT_UNAUTH', 401)
     if (!z.string().uuid().safeParse(reqId).success) return apiError('NOT_FOUND', 404)
     const b = await parseBody(req, body)

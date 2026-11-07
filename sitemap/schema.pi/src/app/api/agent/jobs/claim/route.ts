@@ -1,16 +1,17 @@
-// 로컬 에이전트 작업 가져가기(2026-10-18) — POST(Authorization: Bearer spa_…) : 접속 시험 요청(test) 또는 그 에이전트 접속의 승인된 DDL 요청 1건(job), 없으면 204
+// 로컬 에이전트 작업 가져가기(2026-10-18) — POST(Authorization: Bearer spa_…) : 우선순위 접속 시험 요청(test) > SQL 편집기 요청(sql, 2026-11-07) > 그 에이전트 접속의 승인된 DDL 요청 1건(job), 없으면 204
 // 사용자 세션이 아니라 에이전트 토큰으로만 인증(쿠키 무시). 응답에 비밀번호 없음 — 비밀번호는 에이전트 PC 환경변수
 // 본문 { m } = 호스트 지표(서버 모니터링, sql/068 mon_srv_hist) — 1.2.0 에이전트는 '{}' 라 기록 없음
 import { NextResponse } from 'next/server'
 import { apiError, audit, dbError } from '@/lib/api'
 import { agtByToken, claimJob } from '@/lib/model-agent'
 import { recordSrv } from '@/lib/mon-srv'
+import { uaVer, verOk } from '@/lib/sql-agent-core'
 
 const NO_STORE = { 'Cache-Control': 'no-store' }
 
 export async function POST(req: Request) {
   try {
-    const g = await agtByToken(req.headers.get('authorization'))
+    const g = await agtByToken(req.headers.get('authorization'), req.headers.get('user-agent'))
     if (!g) return apiError('AGT_UNAUTH', 401)
     // 1.2.0 미만 에이전트는 일반 인덱스 CREATE INDEX(2026-10-20, 1.1.0 = CREATE 직전 DROP)를 거부해 원인 모를 실패가 되므로 작업을 넘기지 않음
     const v = /schemapi-agent\/(\d+)\.(\d+)/.exec(req.headers.get('user-agent') ?? '')
@@ -18,9 +19,11 @@ export async function POST(req: Request) {
     // 서버 모니터링(2026-10-21) : 에이전트 1.3.0 이상은 본문 { m: 호스트 지표 } 를 함께 보냄(1분 1행, 실패해도 작업 가져가기는 계속)
     const pb = (await req.json().catch(() => null)) as { m?: unknown } | null
     if (pb?.m) await recordSrv(g, pb.m)
-    const r = await claimJob(g)
+    // SQL 편집기 중계(sql/078) : 1.4.0 미만은 SQL 지시서를 모르므로 SQL 큐 조회를 건너뜀(DDL·접속 시험은 그대로)
+    const r = await claimJob(g, verOk(uaVer(req.headers.get('user-agent'))))
     if (!r) return new NextResponse(null, { status: 204, headers: NO_STORE })
     if ('test' in r) return NextResponse.json({ ok: true, test: r.test }, { headers: NO_STORE })
+    if ('sql' in r) return NextResponse.json({ ok: true, sql: r.sql }, { headers: NO_STORE })
     if ('skipped' in r) return new NextResponse(null, { status: 204, headers: NO_STORE }) // 대조 실패 = FAIL 처리됨(상세는 요청 화면)
     if (r.apv_usr_id) await audit({ area_id: g.area_id, tgt_tp_cd: 'DDL', tgt_id: r.job.req_id, act_cd: 'UPD', aftr_val: { act: 'agent_claim', try_no: r.job.try_no, agt_id: g.agt_id }, usr_id: r.apv_usr_id })
     return NextResponse.json({ ok: true, job: r.job }, { headers: NO_STORE })

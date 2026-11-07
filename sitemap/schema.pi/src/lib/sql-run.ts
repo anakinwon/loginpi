@@ -1,4 +1,4 @@
-// SQL 편집기 실행(서버 전용, 2026-10-18 마스터 지시 "Universal SQL Editor" — DBeaver 참고). 접속 = 저장된 서버 직접(SRV) 접속만
+// SQL 편집기 실행(서버 전용, 2026-10-18 마스터 지시 "Universal SQL Editor" — DBeaver 참고). 접속 = 저장된 서버 직접(SRV) 접속 + 로컬 에이전트(AGT) 접속(2026-11-07, 같은 판정 뒤 큐 중계 — sql-agent.ts)
 // 판정 : 서버가 splitSql·classify·danger 를 다시 계산(클라이언트 값 신뢰 안 함) — 트랜잭션 제어 거부, 쓰기 = CRUD(역할 ∩ 요금제), 위험 문장 = confirm 필요
 // PostgreSQL 조회 = 문장마다 READ ONLY 트랜잭션 + SET LOCAL 타임아웃 + SELECT 1(스냅샷 고정 — 이후 transaction_read_only 해제 불가) 후 ROLLBACK
 //  행 질의(SELECT·WITH·VALUES·TABLE)는 cursor(확장 프로토콜 — 한 문장만 허용)로 limit 까지만 가져옴. standard_conforming_strings = on 고정(분리기와 같은 문자열 해석)
@@ -18,6 +18,8 @@ import { IDLE_TX_MS, LOCK_MS, maskErr, ORA_EXPIRE_MIN, pgClient, resolveTarget, 
 import { connBlock, openPwd } from './secret'
 import { getConn, tlsHint } from './model-ddl-req'
 import { classify, danger, splitSql, stmtAt, type Danger, type Dialect, type Kind, type Stmt } from './modelpi/sql-split'
+import { AGT_STATUS, agtDialect, mergeRunRes, ROWQ, RUN_WAIT, runVal } from './sql-agent-core'
+import { enqueueAndWait, gateAgt } from './sql-agent'
 
 export type Cell = string | number | boolean | null
 export type Col = { name: string; type: string }
@@ -46,7 +48,6 @@ const BUDGET_MS = 50_000
 const CELL_MAX = 4000
 const ALL_ROWS = 100_000 // '전체 패치' — 응답 크기 상한이 먼저 걸릴 수 있음
 const PENDING_MAX = 50
-const ROWQ = /^[\s(]*(SELECT|WITH|VALUES|TABLE)\b/i
 const IDENT = /^[A-Za-z_][A-Za-z0-9_$]{0,62}$/
 const ORA_DDL = /^[\s(]*(CREATE|ALTER|DROP|TRUNCATE|GRANT|REVOKE|RENAME|COMMENT|ANALYZE|PURGE|FLASHBACK|AUDIT|NOAUDIT|DECLARE|BEGIN|CALL|EXEC(UTE)?)\b/i // Oracle 암묵 커밋 문장 + 안에서 COMMIT·EXECUTE IMMEDIATE 할 수 있는 블록·호출
 
@@ -291,14 +292,23 @@ async function runOra(t: Target, pwd: string, stmts: Stmt[], kinds: Kind[], o: R
   }
 }
 
+type Conn = NonNullable<Awaited<ReturnType<typeof getConn>>>
+// 접속 공용 판정(SRV·AGT) — DA 아닌 역할 = 조회 전용 계정 접속만(fail-closed) — 어휘 판정·READ ONLY 트랜잭션은 사용자 함수 안 부작용을 못 막고, 메타도 그 계정 권한으로 열람
+export const connGate = (c: Conn, perms: readonly Perm[]): NextResponse | null => (!perms.includes('CRUD') && c.rdonly_acct_yn !== 'Y' ? failRes({ code: 'SQL_RDONLY_REQUIRED', status: 403 }) : null)
+// 에이전트 접속 판정 — 공용 판정 + 지원 DBMS(PG·Oracle·Tibero), 통과 = 방언(DB_PROFILE_KEY·서버 직접 스위치는 서버가 접속하지 않으므로 무관)
+export function agtConn(c: Conn, perms: readonly Perm[]): Dialect | NextResponse {
+  return connGate(c, perms) ?? agtDialect(c.dbms_cd) ?? failRes({ code: 'DB_CONN_MISMATCH', status: 400 })
+}
+
 // 접속 열기 공통(실행·메타) — 같은 분류체계·서버 직접·조회 전용 계정(DA 아니면)·스위치·키·비밀번호·공인 주소 확인
 // pre = 호출 측이 이미 조회한 접속(같은 요청 재조회 방지, R-P2 2026-10-24 전수 점검) — 없으면 여기서 조회
-export async function openConn(areaId: string, connId: string, perms: readonly Perm[], pre?: Awaited<ReturnType<typeof getConn>>): Promise<{ c: NonNullable<Awaited<ReturnType<typeof getConn>>>; d: Dialect; t: Target; pwd: string } | NextResponse> {
+// AGT 접속은 호출 측(runEditor·getMeta)이 먼저 갈라 큐로 보냄 — 여기 오는 AGT(객체 편집기·DB 모니터링)는 미지원
+export async function openConn(areaId: string, connId: string, perms: readonly Perm[], pre?: Awaited<ReturnType<typeof getConn>>): Promise<{ c: Conn; d: Dialect; t: Target; pwd: string } | NextResponse> {
   const c = pre !== undefined ? pre : await getConn(areaId, connId)
   if (!c) return failRes({ code: 'NOT_FOUND', status: 404 })
   if (c.exec_mthd_cd !== 'SRV') return failRes({ code: 'SQL_AGT_UNSUPPORTED', status: 400 })
-  // DA 아닌 역할 = 조회 전용 계정 접속만(fail-closed) — 어휘 판정·READ ONLY 트랜잭션은 사용자 함수 안 부작용을 못 막고, 메타도 그 계정 권한으로 열람
-  if (!perms.includes('CRUD') && c.rdonly_acct_yn !== 'Y') return failRes({ code: 'SQL_RDONLY_REQUIRED', status: 403 })
+  const g = connGate(c, perms)
+  if (g) return g
   const why = connBlock()
   if (why) return failRes({ code: 'DB_CONN_DISABLED', status: 503, detail: why })
   const d: Dialect | null = c.dbms_cd === '0014' ? 'PG' : c.dbms_cd === '0001' ? 'ORA' : null
@@ -315,7 +325,7 @@ export async function openConn(areaId: string, connId: string, perms: readonly P
 export async function runEditor(areaId: string, uid: string, perms: readonly Perm[], b: Body, startedAt = Date.now()): Promise<NextResponse> {
   const cn = await getConn(areaId, b.conn_id)
   if (!cn) return failRes({ code: 'NOT_FOUND', status: 404 })
-  const d: Dialect = cn.dbms_cd === '0001' ? 'ORA' : 'PG' // 판정용(지원 DBMS 확인은 openConn)
+  const d: Dialect = agtDialect(cn.dbms_cd) ?? 'PG' // 판정용(Tibero = Oracle 문법, 지원 DBMS 확인은 openConn·agtConn)
   const canWrite = perms.includes('CRUD')
   const manual = b.tx === 'MANUAL' && canWrite // MANUAL 은 쓰기 권한자만(조회 전용은 언제나 READ)
 
@@ -355,28 +365,53 @@ export async function runEditor(areaId: string, uid: string, perms: readonly Per
   const mode: Mode = b.commit ? 'TX' : manual && (write || prefix.length) ? 'TRY' : write ? 'AUTO' : 'READ'
   const histMode = mode === 'TX' ? 'CMIT' : mode === 'TRY' ? 'TRY' : mode === 'AUTO' ? 'WRITE' : 'READ'
 
-  const oc = await openConn(areaId, b.conn_id, perms, cn)
-  if (oc instanceof NextResponse) return oc
-  const { c, t, pwd } = oc
-
   // 이력 선기록(fail-closed) — 기록이 안 되면 실행하지 않음, 끝나면 결과로 갱신(중단되면 err_cd RUN 으로 남음)
   const sqlTxt = stmts.map((s) => s.txt).join(';\n').slice(0, 4000)
-  const h = await db().from('mdl_sql_exec_hist').insert({ area_id: areaId, conn_id: c.conn_id, usr_id: uid, sql_txt: sqlTxt, stmt_cnt: stmts.length, exec_mode_cd: histMode, rslt_cd: 'ERR', err_cd: 'RUN', regr_id: uid, modr_id: uid }).select('sql_exec_id').single()
-  if (h.error) throw h.error
+  const preHist = async () => {
+    const h = await db().from('mdl_sql_exec_hist').insert({ area_id: areaId, conn_id: cn.conn_id, usr_id: uid, sql_txt: sqlTxt, stmt_cnt: stmts.length, exec_mode_cd: histMode, rslt_cd: 'ERR', err_cd: 'RUN', regr_id: uid, modr_id: uid }).select('sql_exec_id').single()
+    if (h.error) throw h.error
+    return h.data.sql_exec_id as string
+  }
+  // 후처리 공용(SRV·AGT) — 이력 갱신·감사·MANUAL 대기 목록·응답
+  const finish = async (hid: string, results: RunRes[], ms: number) => {
+    for (const r of results) if (r.err_msg) r.err_msg = tlsHint(r.err_msg)
+    const okN = results.filter((r) => r.rslt === 'OK').length
+    const firstErr = results.find((r) => r.rslt === 'ERR' || r.err_cd)
+    const rslt = !firstErr ? 'OK' : okN && mode === 'AUTO' ? 'PART' : 'ERR'
+    const rowCnt = results.reduce((n, r) => n + (r.rslt === 'OK' ? (r.affected ?? 0) : 0), 0)
+    const u = await db().from('mdl_sql_exec_hist').update({ rslt_cd: rslt, row_cnt: rowCnt, elapsed_ms: ms, err_cd: firstErr?.err_cd?.slice(0, 20) ?? null, err_msg: firstErr?.err_msg?.slice(0, 200) ?? null, modr_id: uid }).eq('sql_exec_id', hid)
+    if (u.error) console.error('[sql-hist]', u.error.code, u.error.message) // 선기록은 남아 있음(err_cd RUN)
+    if (mode === 'AUTO' || mode === 'TX') await audit({ area_id: areaId, tgt_tp_cd: 'SQL', tgt_id: hid, act_cd: 'UPD', aftr_val: { conn_id: cn.conn_id, conn_nm: cn.conn_nm, sql: sqlTxt.slice(0, 1000), rslt, affected: rowCnt, mode, confirm: !!b.confirm }, usr_id: uid })
+    // MANUAL 미리 실행이 전부 성공했을 때만 쓰기 문장을 대기 목록에 추가(오류면 이번 실행분은 버림 — 실제 세션의 트랜잭션 중단과 같은 결과)
+    const journal = mode === 'TRY' && !firstErr ? stmts.filter((_, i) => kinds[i] === 'WRITE').map((s) => s.txt) : []
+    return NextResponse.json({ ok: true, mode, rslt, ms, at: new Date().toISOString(), journal, results })
+  }
+
+  // 로컬 에이전트 접속(2026-11-07) — 같은 판정을 마친 지시서를 큐로. 에이전트 꺼짐·구버전·혼잡은 이력 전에 즉시 거절
+  if (cn.exec_mthd_cd === 'AGT') {
+    const ad = agtConn(cn, perms)
+    if (ad instanceof NextResponse) return ad
+    const gc = await gateAgt(cn)
+    if (gc) return failRes({ code: gc, status: AGT_STATUS[gc] })
+    const hid = await preHist()
+    const t0 = Date.now()
+    const val = runVal({ mode, limit: b.limit, schema: b.schema ?? null, stmts, kinds, prefix: mode === 'TRY' ? prefix.map((p) => p.txt) : [], stmt_timeout_ms: STMT_MS, lock_timeout_ms: LOCK_MS, cell_max: CELL_MAX, max_bytes: MAX_BYTES })
+    const w = await enqueueAndWait({ c: cn, uid, tp: 'RUN', val, startedAt, wait: RUN_WAIT })
+    if ('code' in w) {
+      // NO_PICKUP = 실행 안 됨(다시 실행 안전) / TIMEOUT = 반영 여부 미확인 — 이력 err_cd 도 각각
+      const u = await db().from('mdl_sql_exec_hist').update({ rslt_cd: 'ERR', elapsed_ms: Date.now() - t0, err_cd: w.code.slice(0, 20), err_msg: errMsg(w.code).slice(0, 200), modr_id: uid }).eq('sql_exec_id', hid)
+      if (u.error) console.error('[sql-hist]', u.error.code, u.error.message)
+      return failRes({ code: w.code, status: AGT_STATUS[w.code] })
+    }
+    return finish(hid, mergeRunRes(val.stmts, w.results, w.err), Date.now() - t0)
+  }
+
+  const oc = await openConn(areaId, b.conn_id, perms, cn)
+  if (oc instanceof NextResponse) return oc
+  const { t, pwd } = oc
+  const hid = await preHist()
   const t0 = Date.now()
   const o: RunOpt = { mode, limit: b.limit, schema: b.schema, prefix: mode === 'TRY' ? prefix : [], deadline: startedAt + BUDGET_MS } // 요청 도착 기준
   const results = d === 'PG' ? await runPg(t, pwd, stmts, kinds, o) : await runOra(t, pwd, stmts, kinds, o)
-  const ms = Date.now() - t0
-  for (const r of results) if (r.err_msg) r.err_msg = tlsHint(r.err_msg)
-
-  const okN = results.filter((r) => r.rslt === 'OK').length
-  const firstErr = results.find((r) => r.rslt === 'ERR' || r.err_cd)
-  const rslt = !firstErr ? 'OK' : okN && mode === 'AUTO' ? 'PART' : 'ERR'
-  const rowCnt = results.reduce((n, r) => n + (r.rslt === 'OK' ? (r.affected ?? 0) : 0), 0)
-  const u = await db().from('mdl_sql_exec_hist').update({ rslt_cd: rslt, row_cnt: rowCnt, elapsed_ms: ms, err_cd: firstErr?.err_cd?.slice(0, 20) ?? null, err_msg: firstErr?.err_msg?.slice(0, 200) ?? null, modr_id: uid }).eq('sql_exec_id', h.data.sql_exec_id)
-  if (u.error) console.error('[sql-hist]', u.error.code, u.error.message) // 선기록은 남아 있음(err_cd RUN)
-  if (mode === 'AUTO' || mode === 'TX') await audit({ area_id: areaId, tgt_tp_cd: 'SQL', tgt_id: h.data.sql_exec_id, act_cd: 'UPD', aftr_val: { conn_id: c.conn_id, conn_nm: c.conn_nm, sql: sqlTxt.slice(0, 1000), rslt, affected: rowCnt, mode, confirm: !!b.confirm }, usr_id: uid })
-  // MANUAL 미리 실행이 전부 성공했을 때만 쓰기 문장을 대기 목록에 추가(오류면 이번 실행분은 버림 — 실제 세션의 트랜잭션 중단과 같은 결과)
-  const journal = mode === 'TRY' && !firstErr ? stmts.filter((_, i) => kinds[i] === 'WRITE').map((s) => s.txt) : []
-  return NextResponse.json({ ok: true, mode, rslt, ms, at: new Date().toISOString(), journal, results })
+  return finish(hid, results, Date.now() - t0)
 }

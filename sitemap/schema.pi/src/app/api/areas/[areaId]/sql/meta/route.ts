@@ -1,4 +1,4 @@
-// SQL 편집기 메타데이터(2026-10-18) — GET ?conn=&node=schemas|objects|columns|completion&schema=&rel= : 탐색기 트리·자동 완성(조회 권한 SQL_QUERY)
+// SQL 편집기 메타데이터(2026-10-18) — GET ?conn=&node=schemas|objects|columns|completion&schema=&rel= : 탐색기 트리·자동 완성(조회 권한 SQL_QUERY), 로컬 에이전트 접속은 큐 중계(대기 ≤25초)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, dbError, requireAreaRole } from '@/lib/api'
@@ -16,6 +16,7 @@ const Q = z.object({
 })
 
 export async function GET(req: Request, { params }: Ctx) {
+  const startedAt = Date.now() // 에이전트 대기 기한 기준(maxDuration 30 안)
   const { areaId } = await params
   const auth = await requireAreaRole(areaId, 'SQL_QUERY')
   if (auth instanceof NextResponse) return auth
@@ -23,7 +24,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const q = Q.safeParse({ conn: sp.get('conn'), node: sp.get('node'), schema: sp.get('schema'), rel: sp.get('rel') })
   if (!q.success || (q.data.node !== 'schemas' && !q.data.schema) || (q.data.node === 'columns' && !q.data.rel)) return apiError('INVALID_INPUT', 400)
   try {
-    return await getMeta(areaId, q.data.conn, auth.perms, q.data.node, q.data.schema, q.data.rel)
+    return await getMeta(areaId, q.data.conn, auth.perms, q.data.node, q.data.schema, q.data.rel, auth.user.usr_id, startedAt)
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }

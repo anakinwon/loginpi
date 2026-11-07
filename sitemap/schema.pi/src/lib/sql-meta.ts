@@ -1,10 +1,15 @@
 // SQL 편집기 메타데이터(서버 전용, 2026-10-18) — 탐색기 트리·자동 완성. DBeaver PostgreSchema$TableCache 처럼 스키마당 pg_class 1회 → relkind 분류, 노드 펼칠 때만
 // 고정 카탈로그 SQL + 바인드 파라미터만(사용자 입력을 SQL 에 넣지 않음), PostgreSQL 은 READ ONLY 트랜잭션
+// 로컬 에이전트(AGT) 접속(2026-11-07) = 같은 카탈로그 SQL·바인드를 지시서로 큐에 넣고 결과 행을 같은 items·tables 로 변환(카탈로그 SQL 단일 소스)
 import 'server-only'
 import { STMT_MS, maskErr, pgClient } from './db-exec'
-import { cell, openConn, type Cell } from './sql-run'
+import { agtConn, cell, openConn, type Cell } from './sql-run'
 import { NextResponse } from 'next/server'
 import type { Perm } from './roles'
+import { apiError } from './api'
+import { getConn } from './model-ddl-req'
+import { AGT_STATUS, META_WAIT, type MetaVal } from './sql-agent-core'
+import { enqueueAndWait, gateAgt } from './sql-agent'
 
 export type MetaNode = 'schemas' | 'objects' | 'columns' | 'completion'
 const PG: Record<MetaNode, string> = {
@@ -49,11 +54,25 @@ const ORA: Record<MetaNode, string> = {
   completion: `SELECT table_name AS t, column_name AS col FROM all_tab_columns WHERE owner = :1 ORDER BY table_name, column_id FETCH FIRST 20000 ROWS ONLY`,
 }
 
-export async function getMeta(areaId: string, connId: string, perms: readonly Perm[], node: MetaNode, schema: string | null, rel: string | null): Promise<NextResponse> {
-  const oc = await openConn(areaId, connId, perms)
+export async function getMeta(areaId: string, connId: string, perms: readonly Perm[], node: MetaNode, schema: string | null, rel: string | null, uid: string, startedAt = Date.now()): Promise<NextResponse> {
+  const cn = await getConn(areaId, connId)
+  const args = node === 'schemas' ? [] : node === 'columns' ? [schema, rel] : [schema]
+  if (cn?.exec_mthd_cd === 'AGT') {
+    const ad = agtConn(cn, perms)
+    if (ad instanceof NextResponse) return ad
+    const gc = await gateAgt(cn)
+    if (gc) return apiError(gc, AGT_STATUS[gc])
+    const val: MetaVal = { v: 1, tp: 'META', node, sql: ad === 'PG' ? PG[node] : ORA[node], binds: args, max_rows: 20000, stmt_timeout_ms: STMT_MS }
+    const w = await enqueueAndWait({ c: cn, uid, tp: 'META', val, startedAt, wait: META_WAIT })
+    if ('code' in w) return apiError(w.code, AGT_STATUS[w.code])
+    const r = w.results.find((x) => x.seq === 1)
+    if (!r || r.rslt !== 'OK') return NextResponse.json({ ok: false, code: 'DB_CONN_FAIL', message: String(r?.err_msg ?? w.err.err_msg ?? w.err.err_cd ?? 'ERR').slice(0, 200) }, { status: 400 })
+    const names = (r.columns ?? []).map((c) => c.name.toLowerCase())
+    return metaRes(node, (r.rows ?? []).map((x) => Object.fromEntries(names.map((n, i) => [n, x[i] as Cell]))))
+  }
+  const oc = await openConn(areaId, connId, perms, cn)
   if (oc instanceof NextResponse) return oc
   const { d, t, pwd } = oc
-  const args = node === 'schemas' ? [] : node === 'columns' ? [schema, rel] : [schema]
   const hide = [t.host, t.ip, t.usr, t.db, pwd]
   let rows: Record<string, Cell>[]
   try {
@@ -83,6 +102,11 @@ export async function getMeta(areaId: string, connId: string, perms: readonly Pe
     const x = e as { code?: string; message?: string }
     return NextResponse.json({ ok: false, code: 'DB_CONN_FAIL', message: maskErr(x.message, hide) }, { status: 400 })
   }
+  return metaRes(node, rows)
+}
+
+// 카탈로그 행 → 화면 형식(SRV·AGT 공용)
+function metaRes(node: MetaNode, rows: Record<string, Cell>[]) {
   const items = rows.map((r) => Object.fromEntries(Object.entries(r).map(([k, v]) => [k, k === 'nn' || k === 'pk' || k === 'cur' ? !!v && v !== '0' && v !== 0 : cell(v)])))
   if (node === 'completion') {
     // CodeMirror lang-sql schema 형식 { 테이블: [칼럼…] }

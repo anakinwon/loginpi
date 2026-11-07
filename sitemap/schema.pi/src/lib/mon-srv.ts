@@ -8,6 +8,7 @@ import { db } from './db'
 import { inChunks } from './paging'
 import { pgClient, type Target } from './db-exec'
 import { ipAllowed } from './modelpi/net-guard'
+import { sweepSqlAgt } from './sql-agent'
 import { evtCd, KEEP_DAYS, minuteOf, type AppRow, type Sample, type SysCd } from './mon'
 
 const since = (min: number) => new Date(Date.now() - min * 60000).toISOString()
@@ -219,7 +220,8 @@ export async function urlView(areaId: string, min: number) {
 
 // 주기 수집(Vercel Cron, CRON_SECRET) — 전체 사용 URL 점검 + 보관 기간 지난 이력 정리(이력 = 추가 전용 로그라 물리 삭제 허용, sql/068)
 export async function collectAll() {
-  // 보관 정리를 먼저(점검이 시간 예산에 걸려도 정리는 매번 실행)
+  // 보관 정리를 먼저(점검이 시간 예산에 걸려도 정리는 매번 실행) — SQL 편집기 에이전트 큐 정리(sql/078 기한 초과·점유 만료·결과 값 비움)는 독립이라 병렬
+  const sqlAgt = sweepSqlAgt().catch((e: { code?: string; message?: string }) => (console.error('[sql-agt-sweep]', e.code, e.message), { err: e.code ?? 'ERR' })) // 아래 정리가 먼저 실패해도 처리 안 된 거부로 남지 않게
   const old = since(KEEP_DAYS * 1440)
   for (const t of ['mon_app_hist', 'mon_srv_hist', 'mon_db_hist', 'mon_url_hist']) {
     const d = await db().from(t).delete().lt('bkt_dtm', old)
@@ -229,5 +231,5 @@ export async function collectAll() {
   if (e.error) throw e.error
   const r = await db().from('mon_url').select('url_id, area_id, chk_url').eq('use_yn', 'Y').eq('del_yn', 'N').order('mod_dtm').limit(1000)
   if (r.error) throw r.error
-  return { checked: await checkRows(r.data as UrlRow[], Date.now() + 45_000), total: r.data.length }
+  return { checked: await checkRows(r.data as UrlRow[], Date.now() + 45_000), total: r.data.length, sql_agt: await sqlAgt }
 }
