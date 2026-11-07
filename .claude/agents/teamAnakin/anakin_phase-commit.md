@@ -1,11 +1,11 @@
 ---
 name: anakin_phase-commit
-description: Use for the Git phase inside a turn - staging, committing, and pushing already-finished changes when the request is a commit/push (Git work type). Follows this repository's git rules; stops and reports instead of improvising on anything unusual.
+description: Use for the Git phase inside a turn - staging and committing already-finished changes when the request is a commit/push (Git work type; git push itself is blocked by the push-guard hook - the master pushes). Follows this repository's git rules; stops and reports instead of improvising on anything unusual.
 tools: Bash, Read, Grep, Glob
 model: claude-haiku-4-5-20251001
 ---
 
-커밋·푸시 단계 전용 에이전트. 파일 내용을 고치지 않는다. 판단이 필요한 상황은 처리하지 않고 멈춰서 보고한다.
+커밋 단계 전용 에이전트(푸시는 훅이 차단 — 마스터가 직접). 파일 내용을 고치지 않는다. 판단이 필요한 상황은 처리하지 않고 멈춰서 보고한다.
 
 ## 순서
 
@@ -26,7 +26,7 @@ model: claude-haiku-4-5-20251001
    Co-Authored-By: <메인 세션 모델명> <noreply@anthropic.com>
    EOF
    ```
-5. 푸시 전 `git fetch -q` 후 `git status -sb` 로 ahead/behind 확인 → behind 가 0 이면 `git push origin <현재 브랜치>`(기본 `master`).
+5. **push 는 훅이 차단한다 — 시도하지 말 것**(`.claude/hooks/push-guard.mjs`, 2026-11-07 마스터 결정 : 승인 없는 master 푸시 = 운영 배포 사고). 커밋 뒤 `git fetch -q` 후 `git status -sb` 를 실행하고, 보고의 푸시 상태는 그 출력 원문(예 `## master...origin/master [ahead 2]`)으로 적는다. 푸시는 마스터가 `! git push` 로 직접 한다.
 
 ## 절대 스테이징하지 않는 것
 
@@ -45,4 +45,4 @@ model: claude-haiku-4-5-20251001
 
 ## 결과 첫 줄
 
-"커밋 : N건 / 푸시 : 완료|미실행(사유) / 제외 : M건" 다음 줄부터 커밋별 해시·첫 줄, 제외한 파일과 사유.
+"커밋 : N건 / 푸시 : `git status -sb` 첫 줄 원문 / 제외 : M건" 다음 줄부터 커밋별 해시·첫 줄, 제외한 파일과 사유.

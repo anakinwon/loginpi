@@ -185,12 +185,13 @@
 | `task-observer` 매 세션 첫 호출 | 루트 `CLAUDE.md` '하네스: task-observer' | 스킬 호출·로그 쓰기 | 0-2 예외 4로 확정(마스터 2026-11-07) |
 | 마스터 부재 시 nonstop 위임 | 메모리 `master-absent-nonstop-delegation` | 없음 | 결정은 아소카가 하고, 실행은 전문가가 한다 |
 
-**후속 과제** — 4건 모두 2026-11-07 완료(마스터 결정 후 전문가 개정, 커밋은 별도 담당).
+**후속 과제** — 5건 모두 2026-11-07 완료(마스터 결정 후 전문가 개정, 커밋은 별도 담당).
 
 1. `.claude/hooks/model-advisor.mjs` — `[모델 단계 계획]`의 "산출 → 메인"·"메인 직접"·"메인 수정" 문구를 `anakin_phase-build` 지명으로 개정(자체 시험 assert 47·49행 + 회귀 assert 1개) — 완료
 2. `.claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md` — 산출·응답·수집·검증 단계의 메인 수행 조건 개정 — 완료
 3. `.claude/agents/teamAnakin/teamAnakin_admin.md` — "수정·적용은 메인이 수행"·"산출·응답은 메인 세션" 개정 — 완료
 4. 저장소 전용 산출 에이전트 정의 신설(0-3) — `.claude/agents/teamAnakin/anakin_phase-build.md` 완료
+5. git push 훅 차단(2026-11-07 마스터 결정 — 커밋 담당이 푸시 금지 지시를 어기고 master 푸시 = 승인 없는 운영 배포) — `.claude/hooks/push-guard.mjs` PreToolUse(루트·하위 앱 settings), 해제는 마스터 `! node .claude/hooks/push-guard.mjs --allow [분]`(1회용) 또는 `! git push`, 커밋 담당 정의 5번 개정 — 완료
 
 위임 1회에는 토큰이 든다(`model-advisor.mjs` 20행 실측 : 수집 위임 1회 = 3.7만~5.9만 토큰). 이 비용은 마스터 지시로 감수하고, 브리프 품질(0-4 ①)로 재작업을 줄여 관리한다.
 
@@ -346,3 +347,4 @@ P1·P2 는 아래 7개를 모두 갖추면 완성이다. 빠진 요소는 받는
 | 2026-11-07 | 마스터 결정 4건 반영 — task-observer 확정 예외 4(0-2), 산출 담당 `anakin_phase-build`(0-3, `general-purpose` 는 정의 밖 폴백), 그래프 정의 확정(0-4), 후속 과제 1~4 완료(0-6) | 마스터 결정 |
 | 2026-11-07 | 하네스 검수 반영 — 조회 단독 턴 = 수집 위임·팀장 승인 생략(0-5, `[확인중 : 마스터]`), CONFIG 요청 = build 단계, `.claude/engineering/` 커밋 대상 편입(.gitignore 예외) | 하네스 검수 |
 | 2026-11-07 | 조회 단독 턴 팀장 승인 생략 마스터 확정(0-5·0-4 점검표 `[확인중 : 마스터]` 해제, 루트 `CLAUDE.md`·훅 주석·운용 기준서 동기) | 마스터 결정 |
+| 2026-11-07 | git push 훅 차단 — 후속 과제 5(0-6), 커밋 담당 푸시 단계 삭제·보고는 `git status -sb` 원문 | 마스터 결정 |
