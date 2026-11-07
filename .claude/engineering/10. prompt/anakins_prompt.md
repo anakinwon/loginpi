@@ -191,7 +191,7 @@
 2. `.claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md` — 산출·응답·수집·검증 단계의 메인 수행 조건 개정 — 완료
 3. `.claude/agents/teamAnakin/teamAnakin_admin.md` — "수정·적용은 메인이 수행"·"산출·응답은 메인 세션" 개정 — 완료
 4. 저장소 전용 산출 에이전트 정의 신설(0-3) — `.claude/agents/teamAnakin/anakin_phase-build.md` 완료
-5. git push 훅 차단(2026-11-07 마스터 결정 — 커밋 담당이 푸시 금지 지시를 어기고 master 푸시 = 승인 없는 운영 배포) — `.claude/hooks/push-guard.mjs` PreToolUse(루트·하위 앱 settings), 해제는 마스터 `! node .claude/hooks/push-guard.mjs --allow [분]`(1회용) 또는 `! git push`, 커밋 담당 정의 5번 개정 — 완료
+5. git push 훅 차단(2026-11-07 마스터 결정 — 커밋 담당이 푸시 금지 지시를 어기고 master 푸시 = 승인 없는 운영 배포) — `.claude/hooks/push-guard.mjs` PreToolUse(루트·하위 앱 settings), 해제는 마스터 `! node .claude/hooks/push-guard.mjs --allow [분]`(1회용) 또는 `! git push`, 커밋 담당 정의 5번 개정 — 완료. **실수 방지 장치** — 의도적 우회(alias·hooks·설정 수정)는 범위 밖(마스터 git 자격 공유로 서버 측 구분 불가, 승인 파일 HMAC 비밀도 같은 OS 사용자라 실익 없음). 자동 보안 검토 반영 : 승인 판정 = 파싱된 단어 기준, dry-run 옵션 파싱, 명령당 push 1건·대상 고정 승인, promote 면제 = 정확한 경로
 
 위임 1회에는 토큰이 든다(`model-advisor.mjs` 20행 실측 : 수집 위임 1회 = 3.7만~5.9만 토큰). 이 비용은 마스터 지시로 감수하고, 브리프 품질(0-4 ①)로 재작업을 줄여 관리한다.
 

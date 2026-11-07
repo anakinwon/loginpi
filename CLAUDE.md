@@ -338,7 +338,7 @@ src/
 
 **트리거:** UserPromptSubmit 훅 `.claude/hooks/model-advisor.mjs`가 요청마다 `[모델 단계 계획]` 줄을 주입 → 그 순서로 호출. 팀원이 1명이라도 실행된 턴은 **`teamanakin-admin` 승인 단계 생략 불가**(커밋·조회 단독 턴 제외 — 조회 단독 제외는 마스터 확정 2026-11-07). `[모델 단계 계획]`이 주입된 턴은 위 "작업 수행 원칙" ③④의 verifier·code-reviewer 대신 teamAnakin 단계가 우선하며, 반려 시 재작업 상한 10회는 동일. 인증·결제·페이지 변경은 Pi Browser 실기기 미검증이면 APPROVED 불가(최대 CONDITIONAL).
 
-**git push 훅 차단 (2026-11-07 마스터 결정):** Claude(메인·서브에이전트)의 `git push`(전역 옵션·연결 명령·`bash -c`·`promote-to-prod.mjs --yes` 포함, `--dry-run` 만 허용)는 PreToolUse 훅 `.claude/hooks/push-guard.mjs`가 막는다(루트·하위 앱 settings 등록) — 해제는 마스터만 `! node .claude/hooks/push-guard.mjs --allow [분]`(1회용, 기본 10분) 또는 `! git push` 직접, Claude 는 승인 파일(`.omc/state/push-allow.json`)·`--allow` 사용 불가, 시험 `--selftest`.
+**git push 훅 차단 (2026-11-07 마스터 결정):** Claude(메인·서브에이전트)의 `git push`(전역 옵션·연결 명령·`bash -c`·`promote-to-prod.mjs --yes` 포함, `--dry-run` 만 허용)는 PreToolUse 훅 `.claude/hooks/push-guard.mjs`가 막는다(루트·하위 앱 settings 등록) — 해제는 마스터만 `! node .claude/hooks/push-guard.mjs --allow [분] [원격] [브랜치]`(1회용·push 1건짜리 명령만, 기본 10분) 또는 `! git push` 직접, Claude 는 승인 파일(`.omc/state/push-allow.json`)·훅 실행 불가, 시험 `--selftest`. **실수 방지 장치** — 의도적 우회(외부 alias·config·`.git/hooks`·훅·settings 수정)는 범위 밖(마스터 git 자격 공유로 서버 측 구분 불가, 승인 파일 HMAC 비밀도 같은 OS 사용자라 실익 없음).
 
 **ultrathink·ultracode 자동 선별 (2026-10-09 마스터 지시):** ultrathink는 `model-advisor.mjs`가 설계·결정·원인 분석 요청에만 같은 성격의 컨텍스트 지시를 자동 주입(조회·커밋 제외 — 실측 FEATURE 소요 차이 없음, QUERY 7배). ultracode는 훅으로 켤 수 없는 공식 설정이라 `.claude/settings.local.json` `"ultracode": true`(개인 설정)로 상시 켜고, Claude가 실질적 작업에만 워크플로를 고른다 — 워크플로 안에서도 teamAnakin 단계 에이전트·팀장 승인 규칙 적용, 끄기 `/effort ultracode off`.
 
