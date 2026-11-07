@@ -26,7 +26,7 @@ import { createPortal } from 'react-dom'
 import { dbmsList } from '@/lib/modelpi/dbms'
 import { autoLayout, boxSize } from '@/lib/modelpi/layout'
 import { autoAnchors, halfDash, project, sidePoint, type Box, type Pt, type RelLyt, type Side } from '@/lib/modelpi/edge-geo'
-import { midOf, routeAll, type RouteReq, type RoutedEdge } from '@/lib/modelpi/edge-route'
+import { midOf, routeAll, routeGrid, ROUTE_MAX, type RouteReq, type RoutedEdge } from '@/lib/modelpi/edge-route'
 import { fitView as printFit, pageGrid, PAPER, printArea, realign, type Orient } from '@/lib/modelpi/print'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import Attrs from '../model/attrs'
@@ -658,7 +658,11 @@ function Erd({ areaId }: { areaId: string }) {
   const rtSend = useCallback((x: typeof rtIn) => {
     const k = rtWk.current
     if (!k.w) {
-      setRoutes({ m: routeAll(new Map(x.boxes), x.reqs), sig: x.sig })
+      let m = new Map<string, RoutedEdge>()
+      try {
+        m = routeAll(new Map(x.boxes), x.reqs)
+      } catch {} // 실패 = 빈 결과(관계마다 단순 경로)
+      setRoutes({ m, sig: x.sig })
       return
     }
     if (k.busy) {
@@ -702,6 +706,7 @@ function Erd({ areaId }: { areaId: string }) {
   useEffect(() => {
     if (rtIn.reqs.length) rtSend(rtIn)
   }, [rtIn, rtSend])
+  const rtLim = useMemo(() => routeGrid(new Map(rtIn.boxes)), [rtIn]) // 경로 계산 한도(좌표 범위 밖·그림 범위 과대 = 단순 경로)
   const resetRel = useCallback((id: string) => {
     setLyt(({ [id]: _, ...rest }) => rest)
     setDirty(true)
@@ -1061,6 +1066,11 @@ function Erd({ areaId }: { areaId: string }) {
             물리 모델에서 전환·작성완료
           </Link>
           하면 보입니다.
+        </p>
+      )}
+      {(rtLim.far.size > 0 || rtLim.big) && (
+        <p className="mt-2 text-sm text-amber-800" role="note">
+          {rtLim.far.size > 0 ? `좌표가 ±${ROUTE_MAX.crd.toLocaleString()}px 밖이거나 크기가 비정상인 엔터티 ${rtLim.far.size}개는 관계선 경로 계산에서 빼고` : '그림 범위가 너무 넓어 관계선 경로 계산을 건너뛰고'} 단순 경로로 그립니다 — 멀리 떨어진 엔터티를 옮기거나 자동 배치 후 저장하면 정리됩니다.
         </p>
       )}
       {boxOvl > 0 && (

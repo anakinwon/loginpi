@@ -77,16 +77,40 @@ class Heap {
 type Port = { n: number; side: Side; p: Pt; off: number } // off = 변 가운데에서 떨어진 거리
 type Done = { nodes: number[]; a: Port; b: Port; relax: boolean }
 
-export function routeEdges(boxes: Map<string, Box>, reqs: RouteReq[]): Map<string, Route> {
-  const out = new Map<string, Route>()
-  const bs = [...boxes.values()]
-  const live = reqs.filter((r) => boxes.has(r.from) && boxes.has(r.to))
-  if (!bs.length || !live.length) return out
+// 경로 계산 한도(보안 검토 2026-11-07 DoS — 멀리 끌린·조작된 저장 좌표 하나로 격자 배열이 무제한 할당되던 것)
+//  격자 배열 = 칸당 약 130바이트(칸 배열 33B + 칸×방향 4 상태 배열 96B). 실데이터 최대 격자 = 수납(INV) dagre 648×216 = 139,968칸(약 18MB, scripts/erd-route-bench.ts 14개 배치 중 최대)
+//  → cells 1,000,000(실데이터 최대의 약 7배, 약 130MB 상한)을 넘으면 A* 없이 단순 경로. crd = 좌표 범위(±1e5px), 넘거나 유한수가 아니거나 크기가 이상한 박스는 경로 계산에서 뺌(그 관계는 화면 단순 경로)
+export const ROUTE_MAX = { cells: 1_000_000, crd: 1e5, size: 1e4 }
+export function routeGrid(boxes: Map<string, Box>) {
+  const ok = (b: Box) => [b.x, b.y, b.w, b.h].every(Number.isFinite) && Math.abs(b.x) <= ROUTE_MAX.crd && Math.abs(b.y) <= ROUTE_MAX.crd && b.w > 0 && b.h > 0 && b.w <= ROUTE_MAX.size && b.h <= ROUTE_MAX.size
+  const far = new Set([...boxes].filter(([, b]) => !ok(b)).map(([id]) => id))
+  const bs = [...boxes].filter(([id]) => !far.has(id)).map(([, b]) => b)
   const S = RT.step, C = RT.clear
+  if (!bs.length) return { far, bs, x0: 0, y0: 0, cols: 0, rows: 0, big: false }
   const x0 = Math.floor((Math.min(...bs.map((b) => b.x)) - C) / S) * S - RT.pad * S
   const y0 = Math.floor((Math.min(...bs.map((b) => b.y)) - C) / S) * S - RT.pad * S
   const cols = Math.ceil((Math.max(...bs.map((b) => b.x + b.w)) + C - x0) / S) + RT.pad + 1
   const rows = Math.ceil((Math.max(...bs.map((b) => b.y + b.h)) + C - y0) / S) + RT.pad + 1
+  return { far, bs, x0, y0, cols, rows, big: cols * rows > ROUTE_MAX.cells }
+}
+// 단순 꺾은선(가까운 변 가운데끼리) — 끝점 자리가 없거나 한도 초과 때
+function simpleRoute(a: Box, b: Box): Route {
+  const ca = { x: a.x + a.w / 2, y: a.y + a.h / 2 }, cb = { x: b.x + b.w / 2, y: b.y + b.h / 2 }
+  const [ps, cs]: [Side, Side] = Math.abs(cb.x - ca.x) > Math.abs(cb.y - ca.y) ? (cb.x > ca.x ? ['R', 'L'] : ['L', 'R']) : cb.y > ca.y ? ['B', 'T'] : ['T', 'B']
+  const p = sidePt(a, ps, 0.5), q = sidePt(b, cs, 0.5)
+  return { pts: simplify(ps === 'R' || ps === 'L' ? [p, { x: (p.x + q.x) / 2, y: p.y }, { x: (p.x + q.x) / 2, y: q.y }, q] : [p, { x: p.x, y: (p.y + q.y) / 2 }, { x: q.x, y: (p.y + q.y) / 2 }, q]), ps, cs, ok: false }
+}
+
+export function routeEdges(boxes: Map<string, Box>, reqs: RouteReq[]): Map<string, Route> {
+  const out = new Map<string, Route>()
+  const { far, bs, x0, y0, cols, rows, big } = routeGrid(boxes)
+  const live = reqs.filter((r) => boxes.has(r.from) && boxes.has(r.to) && !far.has(r.from) && !far.has(r.to))
+  if (!bs.length || !live.length) return out
+  if (big) {
+    for (const r of live) out.set(r.id, simpleRoute(boxes.get(r.from)!, boxes.get(r.to)!))
+    return out
+  }
+  const S = RT.step, C = RT.clear
   const N = cols * rows
   const X = (n: number) => x0 + (n % cols) * S
   const Y = (n: number) => y0 + ((n / cols) | 0) * S
@@ -275,10 +299,7 @@ export function routeEdges(boxes: Map<string, Box>, reqs: RouteReq[]): Map<strin
     const d = done.get(r.id)
     const a = boxes.get(r.from)!, b = boxes.get(r.to)!
     if (!d) {
-      // 끝점 자리조차 없음(박스가 겹쳐 놓임) — 가운데 잇는 단순 꺾은선
-      const [ps, cs]: [Side, Side] = Math.abs(cen(b).x - cen(a).x) > Math.abs(cen(b).y - cen(a).y) ? (cen(b).x > cen(a).x ? ['R', 'L'] : ['L', 'R']) : cen(b).y > cen(a).y ? ['B', 'T'] : ['T', 'B']
-      const p = sidePt(a, ps, 0.5), q = sidePt(b, cs, 0.5)
-      out.set(r.id, { pts: simplify(ps === 'R' || ps === 'L' ? [p, { x: (p.x + q.x) / 2, y: p.y }, { x: (p.x + q.x) / 2, y: q.y }, q] : [p, { x: p.x, y: (p.y + q.y) / 2 }, { x: q.x, y: (p.y + q.y) / 2 }, q]), ps, cs, ok: false })
+      out.set(r.id, simpleRoute(a, b)) // 끝점 자리조차 없음(박스가 겹쳐 놓임)
       continue
     }
     out.set(r.id, { pts: simplify([d.a.p, ...d.nodes.map((n) => ({ x: X(n), y: Y(n) })), d.b.p]), ps: d.a.side, cs: d.b.side, ok: !d.relax })

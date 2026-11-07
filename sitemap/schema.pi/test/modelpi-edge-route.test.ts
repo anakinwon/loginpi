@@ -1,7 +1,7 @@
 // ERD 관계선 직교 경로(edge-route.ts) 검사 — 평행 겹침 0·박스 관통 0·교차 건너뛰기·끝점 간격·옮긴 선(변·경유점)·기하 검사 함수
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { countBoxOverlaps, countCrossings, countLabelBoxHits, countLabelHits, detourStats, placeLabels, countNodeHits, countOverlaps, crossPoints, hopPath, routeAll, routeEdges, RT } from '../src/lib/modelpi/edge-route.ts'
+import { countBoxOverlaps, countCrossings, countLabelBoxHits, countLabelHits, detourStats, placeLabels, countNodeHits, countOverlaps, crossPoints, hopPath, routeAll, routeEdges, routeGrid, RT } from '../src/lib/modelpi/edge-route.ts'
 import type { Box } from '../src/lib/modelpi/edge-geo.ts'
 
 const B = (x: number, y: number, w = 180, h = 90): Box => ({ x, y, w, h })
@@ -85,4 +85,22 @@ test('옮긴 선 : 지정 변·비율 가까운 끝점, 꺾임점 경유', () =>
   const segDist = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(Math.max(Math.min(a.x, b.x) - 300, 0, 300 - Math.max(a.x, b.x)), Math.max(Math.min(a.y, b.y) - 120, 0, 120 - Math.max(a.y, b.y)))
   const near = p.pts.slice(1).some((q, i) => segDist(p.pts[i], q) <= RT.step)
   assert.ok(near, `경유점 지남 ${JSON.stringify(p.pts)}`)
+})
+
+test('한도 : 먼 좌표·과대 범위는 격자 할당 없이 단순 경로(예외 없음)', () => {
+  // 좌표 범위 밖 박스 1개 → 그 관계만 경로 계산에서 빠짐, 나머지는 정상
+  const far = new Map([['a', B(0, 0)], ['b', B(0, 300)], ['z', B(1e9, 1e9)]])
+  const g = routeGrid(far)
+  assert.deepEqual([...g.far], ['z'])
+  assert.ok(g.cols * g.rows < 10_000, `격자 ${g.cols}×${g.rows}`)
+  const r1 = routeAll(far, [{ id: 'ab', from: 'a', to: 'b' }, { id: 'az', from: 'a', to: 'z' }])
+  assert.ok(r1.get('ab')!.ok)
+  assert.equal(r1.has('az'), false)
+  // 범위 안이지만 그림이 너무 넓음(±1e5 양 끝) → A* 없이 단순 경로
+  const wide = new Map([['a', B(-99_000, -99_000)], ['b', B(99_000, 99_000)], ['c', B(-99_000, 99_000)]])
+  assert.ok(routeGrid(wide).big)
+  const r2 = routeEdges(wide, [{ id: 'ab', from: 'a', to: 'b' }, { id: 'ac', from: 'a', to: 'c' }])
+  assert.equal(r2.size, 2)
+  for (const v of r2.values()) assert.equal(v.ok, false)
+  assert.doesNotThrow(() => routeAll(new Map([['n', { x: NaN, y: 0, w: 10, h: 10 }]]), [{ id: 'x', from: 'n', to: 'n' }]))
 })
