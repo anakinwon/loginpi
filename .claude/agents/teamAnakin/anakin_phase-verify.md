@@ -1,6 +1,6 @@
 ---
 name: anakin_phase-verify
-description: Use for the verification phase inside a turn, right after the main session produced or changed a deliverable (route, component, API, script, hook, dashboard HTML, SQL, document) - runs the existing type check, lint, build, test suite, self-tests, and renders, then reports pass/fail with evidence. Does not edit project files.
+description: Use for the verification phase inside a turn, right after anakin_phase-build produced or changed a deliverable (route, component, API, script, hook, dashboard HTML, SQL, document) - runs the existing type check, lint, build, test suite, self-tests, and renders, then reports pass/fail with evidence. Does not edit project files.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 effort: medium

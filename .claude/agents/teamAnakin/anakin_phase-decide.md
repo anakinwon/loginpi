@@ -1,6 +1,6 @@
 ---
 name: anakin_phase-decide
-description: Use for the decision phase inside a turn - drafting a conclusion, judgment, recommendation, or architecture decision (for example an auth or payment flow design, a DB schema option, or a library choice) from material already collected. Read-only; returns a draft for the main session to write.
+description: Use for the decision phase inside a turn - drafting a conclusion, judgment, recommendation, or architecture decision (for example an auth or payment flow design, a DB schema option, or a library choice) from material already collected. Read-only; returns a draft for the build member (anakin_phase-build) to write; the main session reviews.
 tools: Read, Grep, Glob, Skill
 model: fable
 effort: high

@@ -56,6 +56,8 @@ next-env.d.ts
 !.claude/settings.json
 !.claude/rules/
 !.claude/rules/**
+!.claude/engineering/
+!.claude/engineering/**
 !.claude/subagent-statusline.mjs
 !.claude/statusline.sh
 

@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url'
 import { categorize } from '../../scripts/work-history-core.mjs'
 
 const MIN_CONFIDENCE = 0.25
-const HIGH = new Set(['FEATURE', 'FIX', 'REFACTOR', 'DOCS', 'DATA'])                                // 산출물·수정 작업 : 메인 effort high
+const HIGH = new Set(['FEATURE', 'FIX', 'REFACTOR', 'DOCS', 'DATA', 'CONFIG'])                      // 산출물·수정·설정 작업 = anakin_phase-build 단계 ; 사용자 /effort high 안내는 유지하되 메인 effort 안내는 재평가 대상 [TBD] (운용 기준서 턴 진행 규칙 5)
 const DECIDE = /결론|판정|최종\s?안|권고안|방식\s?(선정|결정)|아키텍처\s?(설계|결정)|비교\s?평가|어느\s?(쪽|것|방식)/   // 결론 설계 단계 필요
 const COLLECT = /전체|전수|집계|통계|모든\s?(파일|장표|슬라이드|테이블)|조사|목록|이력|대조|교차/                       // 대량 수집 단계 필요
 
@@ -17,14 +17,16 @@ export function route(prompt) {
   const produce = confidence >= MIN_CONFIDENCE && HIGH.has(category)
   const decide = DECIDE.test(prompt), collect = COLLECT.test(prompt) && category !== 'GIT'   // '전체 커밋' 등 Git 요청은 수집 단계 불필요
   const steps = []
-  if (collect) steps.push('수집 → Agent(subagent_type: "anakin_phase-collect") [Sonnet·medium] (파일 본문 10개 이상 읽기·로그 전수 대조면 위임, 명령 몇 번으로 끝나는 목록·집계는 메인 직접 : 위임 1회 = 3.7만~5.9만 토큰 실측)')
+  if (collect) steps.push('수집 → Agent(subagent_type: "anakin_phase-collect") [Sonnet·medium] (읽기·검색·집계는 분량과 무관하게 위임, 메인 직접 금지 : 위임 1회 = 3.7만~5.9만 토큰 실측)')
   if (decide) steps.push('결론 → Agent(subagent_type: "anakin_phase-decide") [Fable·high] (생략 불가, 메인은 결과를 받아 정리만)')
-  if (produce) steps.push('산출 → 메인 [effort high 권장]', '검증 → Agent(subagent_type: "anakin_phase-verify") [Sonnet·medium] (테스트 묶음(pnpm test·pnpm build 등)·렌더 검수·명령 여러 번이 필요한 검증이면 위임, 명령 1회로 끝나면 메인 직접 ; 실패 시 메인 수정 후 재검증)')
+  if (produce) steps.push('산출 → Agent(subagent_type: "anakin_phase-build") [Opus·high] (메인은 브리프·리뷰만, 쉬운 수정도 위임)', '검증 → Agent(subagent_type: "anakin_phase-verify") [Sonnet·medium] (tsc·lint·pnpm build·test·렌더 검수는 명령 수와 무관하게 위임 ; 실패 시 anakin_phase-build 재작업 후 재검증)')
   if (produce && category === 'DOCS') steps.push('검수 → Agent(subagent_type: "anakin_phase-review") [Opus·high] (파일로 저장하는 문서·보고서·i18n 메시지면 분량과 무관하게 생략 불가, 대화 답변만이면 생략)')
   if (category === 'GIT' && confidence >= MIN_CONFIDENCE && !produce) steps.push('커밋·푸시 → Agent(subagent_type: "anakin_phase-commit") [Haiku 4.5] (커밋 묶음·메시지를 정했으면 함께 전달, 충돌·behind·훅 실패는 에이전트가 멈추고 보고)')
   if (/팀\s?(구성|운영|재편|재평가)|팀원|재배정|에이전트\s?(성능|재평가|배정)/.test(prompt) && !steps.length) steps.push('재평가 → Agent(subagent_type: "teamanakin-admin") [Opus·high] (모드 2)')
-  if (steps.some(x => x.includes('anakin_phase-') && !x.includes('anakin_phase-commit'))) steps.push('취합·승인 → Agent(subagent_type: "teamanakin-admin") [Opus·high] (생략 불가 : 팀원 결과 요약·요청 원문·산출물 경로 전달, 반려 시 메인 수정 후 재승인)')
-  if (!produce && steps.length) steps.push('응답 → 메인 (팀장 판정 첫 줄 포함)')
+  const queryOnly = !steps.length && category === 'QUERY' && confidence >= MIN_CONFIDENCE   // 조회 단독 턴 : 메인 직접 조회 금지(2026-11-07) → 수집 위임, 팀장 승인 생략 [확인중 : 마스터]
+  if (queryOnly) steps.push('수집 → Agent(subagent_type: "anakin_phase-collect") [Sonnet·medium] (조회 단독 턴 : 메인 직접 조회 금지, 팀장 승인 생략)')
+  if (!queryOnly && steps.some(x => x.includes('anakin_phase-') && !x.includes('anakin_phase-commit'))) steps.push('취합·승인 → Agent(subagent_type: "teamanakin-admin") [Opus·high] (생략 불가 : 팀원 결과 요약·요청 원문·산출물 경로 전달, 반려 시 anakin_phase-build 재작업 후 재승인)')
+  if (!produce && steps.length) steps.push(queryOnly ? '응답 → 메인 (수집 결과 리뷰·정리 후 회신)' : '응답 → 메인 (팀장 판정 첫 줄 포함)')
   const plan = steps.length ? `[모델 단계 계획] 이 턴은 다음 호출 순서로 진행 : ${steps.map((x, i) => `${i + 1}) ${x}`).join(' ')} ; 메인 /model 전환 금지 ; 응답 첫머리에 "수행 단계 : <실제 수행 단계 → 담당>" 한 줄 보고 (기준 : anakins-claudemodel-for-work 스킬)` : null
   const user = produce ? `권장 effort high (${category}) : /effort high 입력 (작업 중 입력해도 다음 요청부터 적용, 5.5 계열은 캐시 유지)` : null
   const deep = !/ultrathink/i.test(prompt) && category !== 'GIT' && DEEP_MAIN_RE.test(prompt)   // 실측 : FEATURE 소요 차이 없음(113 vs 109초), QUERY 7배(n=5) → 설계·결정·원인 분석에만
@@ -44,11 +46,11 @@ const isMain = import.meta.url === pathToFileURL(process.argv[1] || '').href   /
 if (isMain && process.argv[2] === '--selftest') {
   const assert = (await import('node:assert/strict')).default
   assert.match(route('대시보드 만들어 줘').user, /high \(FEATURE\)/)
-  assert.match(route('대시보드 만들어 줘').plan, /1\) 산출 → 메인.*2\) 검증 → Agent\(subagent_type: "anakin_phase-verify"\).*3\) 취합·승인 → Agent\(subagent_type: "teamanakin-admin"\)/)   // 산출 → 검증 → 팀장 승인
+  assert.match(route('대시보드 만들어 줘').plan, /1\) 산출 → Agent\(subagent_type: "anakin_phase-build"\).*2\) 검증 → Agent\(subagent_type: "anakin_phase-verify"\).*3\) 취합·승인 → Agent\(subagent_type: "teamanakin-admin"\)/)   // 산출 → 검증 → 팀장 승인
   assert.match(route('복제 방식 최종 결론 설계해 줘').plan, /subagent_type: "anakin_phase-decide"\) \[Fable·high\] \(생략 불가/)
-  assert.match(route('work-history 전체 통계 집계해서 장표로 작성해 줘').plan, /anakin_phase-collect.*산출 → 메인.*검증 → Agent\(subagent_type: "anakin_phase-verify"\)/)
+  assert.match(route('work-history 전체 통계 집계해서 장표로 작성해 줘').plan, /anakin_phase-collect.*산출 → Agent\(subagent_type: "anakin_phase-build"\).*검증 → Agent\(subagent_type: "anakin_phase-verify"\)/)
   assert.match(route('회의 결과를 전체 이력과 대조해서 문서로 요약해 줘').plan, /anakin_phase-verify.*검수 → Agent\(subagent_type: "anakin_phase-review"\) \[Opus·high\]/)
-  assert.deepEqual(route('git status 보여 줘'), { user: null, plan: null })                       // 기본값과 같으면 침묵
+  assert.equal(route('git status 보여 줘').user, null); assert.match(route('git status 보여 줘').plan, /anakin_phase-collect/)   // 조회도 위임(2026-11-07), effort 안내는 침묵
   assert.match(route('복제 방식 최종 결론 설계해 줘').plan, /anakin_phase-decide.*취합·승인 → Agent\(subagent_type: "teamanakin-admin"\).*응답 → 메인/)
   assert.match(route('대시보드 만들어 줘').plan, /anakin_phase-verify.*취합·승인 → Agent\(subagent_type: "teamanakin-admin"\)/)
   assert.match(route('팀원 구성 어떻게 되어 있어?').plan, /teamanakin-admin.*모드 2/)
@@ -60,8 +62,10 @@ if (isMain && process.argv[2] === '--selftest') {
   assert.match(route('결제 실패 근본 원인 분석해 줘').plan, /ultrathink 자동 선별/)
   assert.match(route('DB 동기화 방식 결정해 줘').plan, /ultrathink 자동 선별/)
   assert.doesNotMatch(route('결론 설계해 줘 ultrathink').plan, /ultrathink 자동 선별/)   // 사용자가 직접 쓴 경우 중복 주입 안 함
-  assert.equal(route('git status 보여 줘').plan, null)
   assert.doesNotMatch(route('대시보드 만들어 줘').plan, /ultrathink 자동 선별/)
+  assert.match(route('지금 sitemap 상태가 어때?').plan, /1\) 수집 → Agent\(subagent_type: "anakin_phase-collect"\).*2\) 응답 → 메인/); assert.doesNotMatch(route('지금 sitemap 상태가 어때?').plan, /teamanakin-admin/)   // 조회 단독 턴
+  assert.match(route('환경변수 설정해 줘').plan, /산출 → Agent\(subagent_type: "anakin_phase-build"\)/)   // CONFIG = build
+  assert.doesNotMatch(route('대시보드 만들어 줘').plan, /산출 → 메인|메인 직접|메인 수정/)   // 2026-11-07 마스터 : 메인 직접 작업 금지
   console.log('selftest ok')
 } else if (isMain) {
   let raw = ''

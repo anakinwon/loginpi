@@ -334,9 +334,9 @@ src/
 
 **목표:** 한 턴 안의 단계(수집 → 결론 → 산출 → 검증 → 검수 → 커밋)마다 맞는 모델·effort의 서브에이전트에 넘기고, 팀장이 결과를 취합·승인한 뒤 메인이 보고한다.
 
-**구성:** 정의 `.claude/agents/teamAnakin/` — `anakin_phase-collect`(수집·Sonnet) · `anakin_phase-decide`(결론·Fable) · `anakin_phase-verify`(검증·Sonnet) · `anakin_phase-review`(문서 검수·Opus) · `anakin_phase-commit`(커밋·Haiku 4.5) · `teamanakin-admin`(팀장·Opus). 운용 기준서 `.claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md`.
+**구성:** 정의 `.claude/agents/teamAnakin/` — `anakin_phase-collect`(수집·Sonnet) · `anakin_phase-decide`(결론·Fable) · `anakin_phase-build`(산출·Opus, 2026-11-07 신설) · `anakin_phase-verify`(검증·Sonnet) · `anakin_phase-review`(문서 검수·Opus) · `anakin_phase-commit`(커밋·Haiku 4.5) · `teamanakin-admin`(팀장·Opus). 운용 기준서 `.claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md`.
 
-**트리거:** UserPromptSubmit 훅 `.claude/hooks/model-advisor.mjs`가 요청마다 `[모델 단계 계획]` 줄을 주입 → 그 순서로 호출. 팀원이 1명이라도 실행된 턴은 **`teamanakin-admin` 승인 단계 생략 불가**(커밋 단독 턴 제외). `[모델 단계 계획]`이 주입된 턴은 위 "작업 수행 원칙" ③④의 verifier·code-reviewer 대신 teamAnakin 단계가 우선하며, 반려 시 재작업 상한 10회는 동일. 인증·결제·페이지 변경은 Pi Browser 실기기 미검증이면 APPROVED 불가(최대 CONDITIONAL).
+**트리거:** UserPromptSubmit 훅 `.claude/hooks/model-advisor.mjs`가 요청마다 `[모델 단계 계획]` 줄을 주입 → 그 순서로 호출. 팀원이 1명이라도 실행된 턴은 **`teamanakin-admin` 승인 단계 생략 불가**(커밋·조회 단독 턴 제외 — 조회 단독 제외는 아소카 기본 결정 [확인중 : 마스터]). `[모델 단계 계획]`이 주입된 턴은 위 "작업 수행 원칙" ③④의 verifier·code-reviewer 대신 teamAnakin 단계가 우선하며, 반려 시 재작업 상한 10회는 동일. 인증·결제·페이지 변경은 Pi Browser 실기기 미검증이면 APPROVED 불가(최대 CONDITIONAL).
 
 **ultrathink·ultracode 자동 선별 (2026-10-09 마스터 지시):** ultrathink는 `model-advisor.mjs`가 설계·결정·원인 분석 요청에만 같은 성격의 컨텍스트 지시를 자동 주입(조회·커밋 제외 — 실측 FEATURE 소요 차이 없음, QUERY 7배). ultracode는 훅으로 켤 수 없는 공식 설정이라 `.claude/settings.local.json` `"ultracode": true`(개인 설정)로 상시 켜고, Claude가 실질적 작업에만 워크플로를 고른다 — 워크플로 안에서도 teamAnakin 단계 에이전트·팀장 승인 규칙 적용, 끄기 `/effort ultracode off`.
 
@@ -347,6 +347,7 @@ src/
 |------|----------|------|------|
 | 2026-10-09 | 타 프로젝트(장표·공문서·DR) 팀 이식 — 정의 6종을 loginpi 규칙(pnpm build 관문·Pi Browser 실기기·브랜드 표기·DA 표준)으로 변형, korean-law MCP·read-hwp·check-doc-style·DRM 절차 제외, subagent-statusline 신규, 훅 2종·subagentStatusLine·refreshInterval 등록, 공용 work-history 스크립트의 `npm run` 회귀를 `pnpm`으로 복원, 요청별 변경 대시보드 기준 시각을 loginpi 도입 시점으로 | agents/teamAnakin·skills/anakin-skills·hooks·settings.json·scripts | 마스터 지시 — teamAnakin 팀으로 프로젝트 진행 |
 | 2026-10-09 | ultrathink 자동 선별(model-advisor)·ultracode 상시(settings.local)·통계/mywork 자동 갱신(Stop async)·sitemap.pi 세션 기록 | hooks·settings·sitemap/.claude | 마스터 지시 — 모든 작업 이력·실시간 통계·변경이력 |
+| 2026-11-07 | 산출 단계 에이전트 `anakin_phase-build`(Opus·high) 신설, `model-advisor` 단계 계획·운용 기준서·팀장 정의의 '산출 → 메인'·'메인 직접'을 build·위임으로 개정(selftest 회귀 assert 추가) | agents/teamAnakin·hooks·skills/anakin-skills·CLAUDE.md | 마스터 지시 — 메인 직접 작업 금지(정본 `.claude/engineering/10. prompt/anakins_prompt.md`) |
 
 ---
 
@@ -358,6 +359,8 @@ src/
 4. **루핑 검증** — 결과가 최상인지 별도 패스(`verifier`/`critic`)로 검토하고 통과할 때까지 반복(`ralph` 패턴). 자기 승인 금지. 안전 상한(기본 10회) 도달 시 현황과 막힌 원인을 보고하고 지시를 받는다.
 
 **해석 확정(마스터 승인 2026-09-20):** ① "최고 성능 + 최저 토큰"은 작업 크기로 조정 — 단순 작업은 직접 수행, 다단계·다파일·조사·검증은 위임. ② "무한 반복"은 verifier 통과까지 **안전 상한 10회** 내 반복 — 상한 도달 시 현황·막힌 원인을 보고하고 지시를 받는다. 전역 사본: `~/.claude/CLAUDE.md`의 `USER:START~END` 구간(OMC 관리 구역 밖).
+
+**2026-11-07 마스터 개정 — 메인(아소카) 직접 작업 금지, 모든 작업은 전문가 서브에이전트 지명, 메인 = 정리·리뷰·승인·회신 + 프롬프트~그래프 엔지니어링 검토. 위 ②·해석 확정 ①의 '단순 작업은 직접 수행'은 폐기. 산출 단계 담당 = `anakin_phase-build`(훅 `model-advisor.mjs`·운용 기준서·팀장 정의 2026-11-07 정합화 완료). 정본 `.claude/engineering/10. prompt/anakins_prompt.md`**
 
 ## 워크스페이스 루트 전역변수 + 작업 이력 로그 (2026-09-20 마스터 지시)
 

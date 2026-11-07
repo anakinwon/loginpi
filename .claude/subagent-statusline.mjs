@@ -6,7 +6,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-const PHASE = { 'anakin_phase-collect': '수집', 'anakin_phase-decide': '결론', 'anakin_phase-verify': '검증', 'anakin_phase-review': '검수', 'anakin_phase-commit': '커밋', 'teamanakin-admin': '승인' }
+const PHASE = { 'anakin_phase-collect': '수집', 'anakin_phase-decide': '결론', 'anakin_phase-verify': '검증', 'anakin_phase-review': '검수', 'anakin_phase-commit': '커밋', 'anakin_phase-build': '산출', 'teamanakin-admin': '승인' }
 const STATE_DIR = path.join(process.env.TEMP || os.tmpdir(), 'claude-statusline-skills')   // statusline.sh 의 $sdir 와 같은 폴더
 
 /** 'claude-opus-5-5' → 'Opus 5.5', 'claude-haiku-4-5-20251001' → 'Haiku 4.5', 별칭(opus·sonnet)·미상 값은 그대로 */
@@ -43,6 +43,7 @@ if (isMain && process.argv[2] === '--selftest') {
   const r = render({ tasks: [{ id: 'a1', agentType: 'anakin_phase-decide', status: 'running', model: 'claude-fable-5-1', effort: 'high', startTime: Date.now() }, { id: 'b2', agentType: 'Explore', status: 'running' }] })
   assert.equal(r.rows.length, 1); assert.match(r.rows[0].content, /^\[결론\] anakin_phase-decide · Fable 5\.1 · high/)
   assert.equal(JSON.stringify(r.running), '[{"phase":"결론","agent":"anakin_phase-decide","model":"Fable 5.1","effort":"high"}]')   // statusline.sh jq 없을 때 grep 폴백이 이 키 순서·무공백에 의존
+  assert.match(render({ tasks: [{ id: 'c3', agentType: 'anakin_phase-build', status: 'running', model: 'claude-opus-5-5', effort: 'high', startTime: Date.now() }] }).rows[0].content, /^\[산출\] anakin_phase-build · Opus 5\.5 · high/)
   console.log('selftest ok')
 } else if (isMain) {
   let raw = ''; for await (const c of process.stdin) raw += c

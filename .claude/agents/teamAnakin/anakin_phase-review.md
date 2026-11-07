@@ -1,6 +1,6 @@
 ---
 name: anakin_phase-review
-description: Use for the review phase inside a turn when the deliverable is user-facing text (DOCS work) - docs/*.md, CLAUDE.md, i18n messages, UI labels, DA documents, reports - checks it against the request and this project's writing rules (brand notation, i18n key hygiene, DA naming, no speculation) with fresh eyes. Read-only; returns defects for the main session to fix.
+description: Use for the review phase inside a turn when the deliverable is user-facing text (DOCS work) - docs/*.md, CLAUDE.md, i18n messages, UI labels, DA documents, reports - checks it against the request and this project's writing rules (brand notation, i18n key hygiene, DA naming, no speculation) with fresh eyes. Read-only; returns defects for anakin_phase-build to fix (the main session relays them).
 tools: Read, Grep, Glob, Bash, Skill
 model: opus
 effort: high
