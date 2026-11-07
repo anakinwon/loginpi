@@ -37,11 +37,8 @@ export const IDLE_TX_MS = 10_000
 // Oracle : 서버 쪽 idle 세션 정리(SQLNET.EXPIRE_TIME·프로파일 IDLE_TIME·MAX_IDLE_BLOCKER_TIME)는 DBA 설정 — 앱은 expireTime(분) 탐지 패킷만
 export const ORA_EXPIRE_MIN = 1
 
-export function maskErr(msg: unknown, hide: (string | null | undefined)[]): string {
-  let s = String(msg ?? '').replace(/\s+/g, ' ')
-  for (const h of hide) if (h && h.length >= 2) s = s.split(h).join('***')
-  return s.slice(0, 200)
-}
+import { maskErr } from './sql-agent-core'
+export { maskErr } // 순수 함수 — 에이전트 경로(sql-agent)·단위 테스트와 공용(2026-11-07 이동)
 
 // 접속 대상 확인 — 'BLOCKED'(사설·내부·포트) / 'DNS'(이름 풀이 실패)
 export async function resolveTarget(c: { host_nm: string | null; port_no: number | null; db_nm: string | null; usr_nm: string | null; ca_cert_txt?: string | null }): Promise<Target | 'BLOCKED' | 'DNS'> {

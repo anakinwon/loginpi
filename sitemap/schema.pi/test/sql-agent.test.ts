@@ -1,7 +1,7 @@
 // SQL 편집기 에이전트 중계 순수 로직(src/lib/sql-agent-core.ts, sql/078) — 지시서·게이트·대기 기한·대기 포기 분기·결과 재결합·크기 판정. 실행 : pnpm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { agtDialect, agtGateCode, budgetMs, doneCode, missingCol, RSLT_SIZE_ERR, AGT_STATUS, expAt, giveUpOutcome, mergeRunRes, RUN_WAIT, rsltBody, runVal, tooBig, uaVer, verNum, verOk, type AgtStmt } from '../src/lib/sql-agent-core.ts'
+import { agtDialect, agtGateCode, agtHide, maskAgtErr, budgetMs, doneCode, missingCol, RSLT_SIZE_ERR, AGT_STATUS, expAt, giveUpOutcome, mergeRunRes, RUN_WAIT, rsltBody, runVal, tooBig, uaVer, verNum, verOk, type AgtStmt } from '../src/lib/sql-agent-core.ts'
 
 const NOW = Date.parse('2026-11-07T00:00:00Z')
 const ago = (ms: number) => new Date(NOW - ms).toISOString()
@@ -113,4 +113,17 @@ test('크기 초과 FAIL — 수거 시 결과 재결합 대신 413 SQL_AGT_RSLT
   assert.equal(doneCode('FAIL', 'LEASE_EXP'), null)
   assert.equal(doneCode('FAIL', null), null)
   assert.equal(doneCode('DONE', RSLT_SIZE_ERR), null)
+})
+
+test('에이전트 오류 메시지 가림 — JDBC URL 호스트·포트·DB·URL 사용자·쿼리 비밀번호, 계정명, JNDI 이름', () => {
+  const pg = agtHide({ conn_url_txt: 'jdbc:postgresql://db.corp.local:5433/payroll?user=hr_app&password=s3cret', usr_nm: 'hr_app', jndi_nm: null })
+  const m = maskAgtErr([{ seq: 1, err_msg: 'connect to db.corp.local:5433 failed for user "hr_app" db payroll (password s3cret)' }, { seq: 2 }], { err_cd: 'X', err_msg: 'FATAL: database "payroll" on db.corp.local' }, pg)
+  assert.equal(m.results[0].err_msg, 'connect to *** failed for user "***" db *** (password ***)')
+  assert.equal(m.results[1].err_msg, undefined)
+  assert.equal(m.err.err_msg, 'FATAL: database "***" on ***')
+  const ora = agtHide({ conn_url_txt: null, usr_nm: 'SCOTT', jndi_nm: 'java:comp/env/jdbc/HrDS' })
+  assert.equal(maskAgtErr([], { err_cd: 'NAMING', err_msg: 'Name java:comp/env/jdbc/HrDS not bound (SCOTT)' }, ora).err.err_msg, 'Name *** not bound (***)')
+  const tb = agtHide({ conn_url_txt: 'jdbc:tibero:thin:@10.1.2.3:8629:tibero', usr_nm: null, jndi_nm: null })
+  assert.ok(tb.indexOf('10.1.2.3:8629') < tb.indexOf('10.1.2.3')) // 긴 것부터
+  assert.equal(maskAgtErr([], { err_cd: null, err_msg: 'refused 10.1.2.3:8629' }, tb).err.err_msg, 'refused ***')
 })

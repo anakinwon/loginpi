@@ -4,6 +4,7 @@
 import { z } from 'zod'
 import type { Cell, RunRes } from './sql-run'
 import type { Dialect, Kind } from './modelpi/sql-split'
+import { parseJdbcUrl } from './modelpi/jdbc-url.ts'
 
 export const ROWQ = /^[\s(]*(SELECT|WITH|VALUES|TABLE)\b/i // 행 질의(cursor 로 가져오기) — SRV 실행(sql-run.ts)과 같은 판정
 export const AGT_MIN_VER = '1.4.0' // SQL 지시서를 아는 첫 에이전트 버전
@@ -65,6 +66,27 @@ export function giveUpOutcome(cnclN: number, sts: string | null): 'DONE' | 'SQL_
   if (cnclN > 0) return 'SQL_AGT_NO_PICKUP'
   if (sts === 'DONE' || sts === 'FAIL') return 'DONE'
   return sts === 'EXP' || sts === 'CNCL' || sts === 'WAIT' ? 'SQL_AGT_NO_PICKUP' : 'SQL_AGT_TIMEOUT'
+}
+
+// 오류 메시지 가림 — 접속 주소·계정·비밀번호를 *** 로, 공백 정리, 200자(SRV·AGT 공용, 원래 db-exec.ts)
+export function maskErr(msg: unknown, hide: (string | null | undefined)[]): string {
+  let s = String(msg ?? '').replace(/\s+/g, ' ')
+  for (const h of hide) if (h && h.length >= 2) s = s.split(h).join('***')
+  return s.slice(0, 200)
+}
+
+// 에이전트 접속 가림 목록 — 저장된 JDBC URL(호스트:포트·호스트·DB·URL 안 사용자·비밀번호, 쿼리 user·password 류)·계정명·JNDI 이름. 긴 것부터(부분 문자열이 먼저 바뀌어 긴 값이 남지 않게)
+// AGT 접속은 서버에 비밀번호를 저장하지 않음(model-ddl-req saveConn : AGT = pwd_enc_txt null) — 비밀번호는 에이전트 PC 환경변수
+export function agtHide(c: { conn_url_txt: string | null; usr_nm: string | null; jndi_nm: string | null }): string[] {
+  const u = c.conn_url_txt ?? ''
+  const p = u ? parseJdbcUrl(u) : null
+  const q = [...u.matchAll(/[?&;:](?:user|username|password|pwd|passwd)=([^&;]+)/gi)].map((m) => { try { return decodeURIComponent(m[1]) } catch { return m[1] } })
+  const all = [u, p?.port ? `${p.host}:${p.port}` : null, p?.host, p?.db, p?.usr, p?.pwd, ...q, c.usr_nm, c.jndi_nm]
+  return [...new Set(all.filter((x): x is string => !!x && x.length >= 2))].sort((a, b) => b.length - a.length)
+}
+// 에이전트가 올린 오류 메시지(문장별·요청 단위) 전부 가림 — 에이전트 쪽 마스킹을 믿지 않음(구버전·변조 에이전트, 심층 방어)
+export function maskAgtErr<T extends { err_msg?: string | null }>(results: T[], err: { err_cd: string | null; err_msg: string | null }, hide: string[]) {
+  return { results: results.map((r) => (r.err_msg ? { ...r, err_msg: maskErr(r.err_msg, hide) } : r)), err: { ...err, err_msg: err.err_msg ? maskErr(err.err_msg, hide) : err.err_msg } }
 }
 
 // 결과 업로드 본문 — txt·kind 는 받지 않음(서버가 지시서에서 seq 로 재결합)

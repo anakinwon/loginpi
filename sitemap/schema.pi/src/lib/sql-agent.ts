@@ -6,7 +6,7 @@ import { randomBytes } from 'node:crypto'
 import { db } from './db'
 import type { AgtRow } from './model-agent'
 import type { ConnRow } from './model-ddl-req'
-import { AGT_BUSY_MAX, agtGateCode, doneCode, missingCol, budgetMs, expAt, giveUpOutcome, LEASE_MS, POLL_MS, type ReqVal, type RsltBody, type RsltItem, type SqlAgtCode } from './sql-agent-core'
+import { AGT_BUSY_MAX, agtGateCode, agtHide, doneCode, maskAgtErr, missingCol, budgetMs, expAt, giveUpOutcome, LEASE_MS, POLL_MS, type ReqVal, type RsltBody, type RsltItem, type SqlAgtCode } from './sql-agent-core'
 
 const T = 'mdl_sql_agt_req'
 const iso = (ms = Date.now()) => new Date(ms).toISOString()
@@ -55,7 +55,8 @@ export async function enqueueAndWait(p: { c: ConnRow; uid: string; tp: 'RUN' | '
   const ins = await db().from(T).insert({ area_id: p.c.area_id, conn_id: p.c.conn_id, agt_id: p.c.agt_id, req_usr_id: p.uid, req_tp_cd: p.tp, req_val: p.val, exp_dtm: iso(exp), regr_id: p.uid, modr_id: p.uid }).select('req_id').single()
   if (ins.error) throw ins.error
   const id = (ins.data as { req_id: string }).req_id
-  const done = (x: Taken): Waited => { const dc = doneCode(x.req_sts_cd, x.err_cd); return dc ? { code: dc } : { results: x.rslt_val?.results ?? [], err: { err_cd: x.err_cd, err_msg: x.err_msg }, sts: x.req_sts_cd } }
+  // 수거 직후 한 곳에서 오류 메시지 가림(화면 응답·실행 이력 모두 이 값을 씀) — 가림 목록은 등록 때 가진 접속 객체에서(재조회 없음, R-P2)
+  const done = (x: Taken): Waited => { const dc = doneCode(x.req_sts_cd, x.err_cd); return dc ? { code: dc } : { ...maskAgtErr(x.rslt_val?.results ?? [], { err_cd: x.err_cd, err_msg: x.err_msg }, agtHide(p.c)), sts: x.req_sts_cd } }
   for (;;) {
     await sleep(Math.max(0, Math.min(POLL_MS, exp - Date.now())))
     const x = await takeResult(p.c.area_id, p.uid, id)
