@@ -1020,7 +1020,20 @@
       "intro": "Coletar agora lê as principais estatísticas de consulta, tabelas, índices e tamanhos uma vez e os armazena como um snapshot. Colete pelo menos duas vezes para ver as alterações e tendências de tamanho",
       "run": "Coletar agora",
       "running": "Coletando…",
-      "done": "Coletado em {dtm} — {qry} consultas · {tbl} tabelas · {idx} índices"
+      "done": "Coletado em {dtm} — {qry} consultas · {tbl} tabelas · {idx} índices",
+      "auto": {
+        "title": "Coleta automática",
+        "desc": "Quando ativada, esta conexão é coletada automaticamente todos os dias às 3h (horário da Coreia). Após 7 ou mais dias, você pode confiar na classificação de consultas lentas e na lista de índices não utilizados",
+        "on": "Ativado",
+        "off": "Desativado",
+        "turnOn": "Ativar coleta automática",
+        "turnOff": "Desativar coleta automática",
+        "need": "A partir do plano {plan}",
+        "goPlan": "Ver planos",
+        "last": "Última coleta automática {dtm} · {rslt}",
+        "never": "Nenhuma coleta automática ainda",
+        "ok": "Sucesso"
+      }
     },
     "top": {
       "sort": "Ordenar",

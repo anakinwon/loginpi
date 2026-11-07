@@ -1020,7 +1020,20 @@
       "intro": "Kusanya sasa inasoma takwimu za juu za swali, majedwali, faharisi na ukubwa mara moja na kuzihifadhi kama picha. Kusanya angalau mara mbili ili kuona mabadiliko na mienendo ya ukubwa",
       "run": "Kusanya sasa",
       "running": "Inakusanya…",
-      "done": "Imekusanywa saa {dtm} — maswali {qry} · majedwali {tbl} · faharisi {idx}"
+      "done": "Imekusanywa saa {dtm} — maswali {qry} · majedwali {tbl} · faharisi {idx}",
+      "auto": {
+        "title": "Mkusanyiko otomatiki",
+        "desc": "Ukiwashwa, muunganisho huu hukusanywa kiotomatiki kila siku saa 3 AM (saa za Korea). Baada ya siku 7 au zaidi unaweza kutegemea viwango vya hoja polepole na orodha ya faharisi zisizotumika",
+        "on": "Washa",
+        "off": "Zima",
+        "turnOn": "Washa mkusanyiko otomatiki",
+        "turnOff": "Zima mkusanyiko otomatiki",
+        "need": "Kutoka mpango wa {plan}",
+        "goPlan": "Tazama mipango",
+        "last": "Mkusanyiko wa mwisho otomatiki {dtm} · {rslt}",
+        "never": "Bado hakuna mkusanyiko otomatiki",
+        "ok": "Imefaulu"
+      }
     },
     "top": {
       "sort": "Panga",

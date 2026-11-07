@@ -1016,7 +1016,20 @@
       "intro": "A „Gyűjtés most” gomb megnyomásával egyszerre gyűjti a legfontosabb lekérdezési statisztikákat, táblákat, indexeket és méreteket, és pillanatfelvételként tárolja őket. Legalább kétszer gyűjtsön adatokat a változások és a méret trendek megtekintéséhez.",
       "run": "Gyűjtés most",
       "running": "Gyűjtés…",
-      "done": "Gyűjtve: {dtm} — {qry} lekérdezés · {tbl} tábla · {idx} index"
+      "done": "Gyűjtve: {dtm} — {qry} lekérdezés · {tbl} tábla · {idx} index",
+      "auto": {
+        "title": "Automatikus gyűjtés",
+        "desc": "Ha be van kapcsolva, ez a kapcsolat minden nap hajnali 3 órakor (koreai idő szerint) automatikusan gyűjtésre kerül. 7 vagy több nap után megbízhat a lassú lekérdezések rangsorában és a nem használt indexek listájában.",
+        "on": "Be",
+        "off": "Ki",
+        "turnOn": "Automatikus gyűjtés bekapcsolása",
+        "turnOff": "Automatikus gyűjtés kikapcsolása",
+        "need": "{plan} tervtől",
+        "goPlan": "Tervek megtekintése",
+        "last": "Utolsó automatikus gyűjtés {dtm} · {rslt}",
+        "never": "Még nincs automatikus gyűjtés",
+        "ok": "Siker"
+      }
     },
     "top": {
       "sort": "Rendezés",

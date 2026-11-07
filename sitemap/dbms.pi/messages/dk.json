@@ -1018,7 +1018,20 @@
       "intro": "Indsaml nu læser top forespørgselsstatistikker, tabeller, indekser og størrelser én gang og gemmer dem som et snapshot. Indsaml mindst to gange for at se ændringer og størrelsestrends",
       "run": "Indsaml nu",
       "running": "Indsamler…",
-      "done": "Indsamlet {dtm} — {qry} forespørgsler · {tbl} tabeller · {idx} indekser"
+      "done": "Indsamlet {dtm} — {qry} forespørgsler · {tbl} tabeller · {idx} indekser",
+      "auto": {
+        "title": "Automatisk indsamling",
+        "desc": "Når denne er slået til, indsamles denne forbindelses statistik automatisk hver dag kl. 3 (koreansk tid). Efter 7 eller flere dage kan du stole på rangeringen af langsomme forespørgsler og listen over ubrugte indekser",
+        "on": "Til",
+        "off": "Fra",
+        "turnOn": "Slå automatisk indsamling til",
+        "turnOff": "Slå automatisk indsamling fra",
+        "need": "Fra {plan}-planen",
+        "goPlan": "Se planer",
+        "last": "Sidste automatiske indsamling {dtm} · {rslt}",
+        "never": "Ingen automatisk indsamling endnu",
+        "ok": "Succes"
+      }
     },
     "top": {
       "sort": "Sorter",

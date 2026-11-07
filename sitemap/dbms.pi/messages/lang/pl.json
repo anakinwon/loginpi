@@ -1012,7 +1012,20 @@
       "intro": "Zbierz teraz odczytuje statystyki najlepszych zapytań, tabel, indeksów i rozmiarów raz i zapisuje je jako migawkę. Zbierz co najmniej dwa razy, aby zobaczyć zmiany i trendy rozmiarów.",
       "run": "Zbierz teraz",
       "running": "Zbieranie…",
-      "done": "Zebrano {dtm} — {qry} zapytań · {tbl} tabel · {idx} indeksów"
+      "done": "Zebrano {dtm} — {qry} zapytań · {tbl} tabel · {idx} indeksów",
+      "auto": {
+        "title": "Automatyczne zbieranie",
+        "desc": "Gdy włączone, to połączenie jest automatycznie zbierane codziennie o 3:00 (czasu koreańskiego). Po 7 lub więcej dniach możesz polegać na rankingu wolnych zapytań i liście nieużywanych indeksów.",
+        "on": "Włączone",
+        "off": "Wyłączone",
+        "turnOn": "Włącz automatyczne zbieranie",
+        "turnOff": "Wyłącz automatyczne zbieranie",
+        "need": "Od planu {plan}",
+        "goPlan": "Wyświetl plany",
+        "last": "Ostatnie automatyczne zbieranie {dtm} · {rslt}",
+        "never": "Brak historii automatycznego zbierania",
+        "ok": "Sukces"
+      }
     },
     "top": {
       "sort": "Sortuj",

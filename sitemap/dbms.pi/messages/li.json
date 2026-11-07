@@ -1020,7 +1020,20 @@
       "intro": "Jetzt sammeln liest Top-Abfragestatistiken, Tabellen, Indizes und Größen einmal und speichert sie als Snapshot. Sammeln Sie mindestens zweimal, um Änderungen und Größenentwicklungen zu sehen.",
       "run": "Jetzt sammeln",
       "running": "Sammeln…",
-      "done": "Gesammelt am {dtm} — {qry} Abfragen · {tbl} Tabellen · {idx} Indizes"
+      "done": "Gesammelt am {dtm} — {qry} Abfragen · {tbl} Tabellen · {idx} Indizes",
+      "auto": {
+        "title": "Automatische Sammlung",
+        "desc": "Wenn aktiviert, werden die Statistiken dieser Verbindung jeden Tag um 3 Uhr morgens (koreanische Zeit) automatisch gesammelt. Nach 7 oder mehr Tagen können Sie sich auf die Rangliste der langsamen Abfragen und die Liste der ungenutzten Indizes verlassen",
+        "on": "An",
+        "off": "Aus",
+        "turnOn": "Automatische Sammlung einschalten",
+        "turnOff": "Automatische Sammlung ausschalten",
+        "need": "Ab dem {plan} Plan",
+        "goPlan": "Pläne ansehen",
+        "last": "Letzte automatische Sammlung {dtm} · {rslt}",
+        "never": "Noch keine automatische Sammlung",
+        "ok": "Erfolg"
+      }
     },
     "top": {
       "sort": "Sortieren",

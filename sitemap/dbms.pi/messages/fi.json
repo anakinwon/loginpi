@@ -1020,7 +1020,20 @@
       "intro": "Kerää nyt lukee tärkeimmät kyselytilastot, taulut, indeksit ja koot kerran ja tallentaa ne tilannekuvana. Kerää vähintään kahdesti nähdäksesi muutokset ja kokotrendit.",
       "run": "Kerää nyt",
       "running": "Kerätään…",
-      "done": "Kerätty {dtm} — {qry} kyselyä · {tbl} taulua · {idx} indeksiä"
+      "done": "Kerätty {dtm} — {qry} kyselyä · {tbl} taulua · {idx} indeksiä",
+      "auto": {
+        "title": "Automaattinen keräys",
+        "desc": "Kun tämä on päällä, tämän yhteyden tiedot kerätään automaattisesti joka päivä klo 3 (Korean aikaa). Kun tietoja on kerätty vähintään 7 päivän ajan, voit luottaa hitaiden kyselyjen sijoitukseen ja käyttämättömien indeksien luetteloon.",
+        "on": "Päällä",
+        "off": "Pois päältä",
+        "turnOn": "Kytke automaattinen keräys päälle",
+        "turnOff": "Kytke automaattinen keräys pois päältä",
+        "need": "Alkaen {plan}-paketista",
+        "goPlan": "Näytä paketit",
+        "last": "Viimeisin automaattinen keräys {dtm} · {rslt}",
+        "never": "Ei automaattisen keräyksen historiaa vielä",
+        "ok": "Onnistui"
+      }
     },
     "top": {
       "sort": "Lajittele",

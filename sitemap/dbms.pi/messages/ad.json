@@ -1019,7 +1019,20 @@
       "intro": "Recull ara llegeix les estadístiques de consultes principals, taules, índexs i mides una vegada i les emmagatzema com a instantània. Recull almenys dues vegades per veure els canvis i les tendències de mida.",
       "run": "Recull ara",
       "running": "Recollint…",
-      "done": "Recollit a {dtm} — {qry} consultes · {tbl} taules · {idx} índexs"
+      "done": "Recollit a {dtm} — {qry} consultes · {tbl} taules · {idx} índexs",
+      "auto": {
+        "title": "Recollida automàtica",
+        "desc": "Quan està activada, aquesta connexió es recull automàticament cada dia a les 3 AM (hora de Corea). Després de 7 o més dies, podeu confiar en la classificació de consultes lentes i la llista d'índexs no utilitzats",
+        "on": "Activat",
+        "off": "Desactivat",
+        "turnOn": "Activa la recollida automàtica",
+        "turnOff": "Desactiva la recollida automàtica",
+        "need": "Des del pla {plan}",
+        "goPlan": "Veure plans",
+        "last": "Última recollida automàtica {dtm} · {rslt}",
+        "never": "Encara no hi ha recollida automàtica",
+        "ok": "Èxit"
+      }
     },
     "top": {
       "sort": "Ordena",

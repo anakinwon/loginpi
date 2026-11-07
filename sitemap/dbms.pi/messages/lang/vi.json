@@ -1022,7 +1022,20 @@
       "intro": "Thu thập ngay bây giờ đọc số liệu thống kê truy vấn hàng đầu, bảng, chỉ mục và kích thước một lần và lưu chúng dưới dạng ảnh chụp nhanh. Thu thập ít nhất hai lần để xem các thay đổi và xu hướng kích thước",
       "run": "Thu thập ngay",
       "running": "Đang thu thập…",
-      "done": "Đã thu thập lúc {dtm} — {qry} truy vấn · {tbl} bảng · {idx} chỉ mục"
+      "done": "Đã thu thập lúc {dtm} — {qry} truy vấn · {tbl} bảng · {idx} chỉ mục",
+      "auto": {
+        "title": "Thu thập tự động",
+        "desc": "Khi bật, kết nối này sẽ tự động thu thập thống kê vào 3 giờ sáng (giờ Hàn Quốc) mỗi ngày. Sau 7 ngày trở lên, bạn có thể tin tưởng vào bảng xếp hạng truy vấn chậm và danh sách chỉ mục không sử dụng",
+        "on": "Bật",
+        "off": "Tắt",
+        "turnOn": "Bật thu thập tự động",
+        "turnOff": "Tắt thu thập tự động",
+        "need": "Từ gói {plan}",
+        "goPlan": "Xem gói",
+        "last": "Lần thu thập tự động cuối cùng {dtm} · {rslt}",
+        "never": "Chưa có bản ghi thu thập tự động nào",
+        "ok": "Thành công"
+      }
     },
     "top": {
       "sort": "Sắp xếp",

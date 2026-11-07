@@ -1016,7 +1016,20 @@
       "intro": "Sada prikupljanje jednom čita statistiku najboljih upita, tabele, indekse i veličine i čuva ih kao snimak. Prikupljajte najmanje dva puta da biste videli promene i trendove veličine",
       "run": "Prikupljaj sada",
       "running": "Prikupljanje…",
-      "done": "Prikupljeno u {dtm} — {qry} upita · {tbl} tabela · {idx} indeksa"
+      "done": "Prikupljeno u {dtm} — {qry} upita · {tbl} tabela · {idx} indeksa",
+      "auto": {
+        "title": "Automatsko prikupljanje",
+        "desc": "Kada je uključeno, ova veza se automatski prikuplja svakog dana u 3 ujutru (korejsko vreme). Nakon 7 ili više dana možete se osloniti na rangiranje sporih upita i listu neiskorišćenih indeksa",
+        "on": "Uključeno",
+        "off": "Isključeno",
+        "turnOn": "Uključi automatsko prikupljanje",
+        "turnOff": "Isključi automatsko prikupljanje",
+        "need": "Od {plan} plana",
+        "goPlan": "Pogledaj planove",
+        "last": "Poslednje automatsko prikupljanje {dtm} · {rslt}",
+        "never": "Još nema automatskog prikupljanja",
+        "ok": "Uspeh"
+      }
     },
     "top": {
       "sort": "Sortiraj",

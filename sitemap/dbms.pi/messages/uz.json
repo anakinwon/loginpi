@@ -1022,7 +1022,20 @@
       "intro": "Hozir yigʻish tugmasini bosish yuqori soʻrov statistikasi, jadvallar, indekslar va hajmlarni bir marta oʻqiydi va ularni surat sifatida saqlaydi. Oʻzgarishlar va hajmi tendensiyalarini koʻrish uchun kamida ikki marta yigʻish kerak.",
       "run": "Hozir yigʻish",
       "running": "Yigʻilmoqda…",
-      "done": "{dtm} da yigʻildi — {qry} ta soʻrov · {tbl} ta jadval · {idx} ta indeks"
+      "done": "{dtm} da yigʻildi — {qry} ta soʻrov · {tbl} ta jadval · {idx} ta indeks",
+      "auto": {
+        "title": "Avtomatik yigʻish",
+        "desc": "Yoqilgan boʻlsa, ushbu ulanish statistikasi har kuni ertalab soat 3:00 da (Koreya vaqti bilan) avtomatik ravishda yigʻiladi. 7 yoki undan ortiq kun toʻplangandan soʻng, sekin soʻrovlar reytingi va ishlatilmagan indekslar roʻyxatiga ishonishingiz mumkin.",
+        "on": "Yoqilgan",
+        "off": "Oʻchirilgan",
+        "turnOn": "Avtomatik yigʻishni yoqish",
+        "turnOff": "Avtomatik yigʻishni oʻchirish",
+        "need": "{plan} rejasidan boshlab",
+        "goPlan": "Rejalarni koʻrish",
+        "last": "Oxirgi avtomatik yigʻish {dtm} · {rslt}",
+        "never": "Hali avtomatik yigʻish qaydlari yoʻq",
+        "ok": "Muvaffaqiyatli"
+      }
     },
     "top": {
       "sort": "Saralash",

@@ -1016,7 +1016,20 @@
       "intro": "Nüüd kogub see parima päringu statistika, tabelid, indeksid ja suurused korra ja salvestab need hetktõmmisena. Koguge vähemalt kaks korda, et näha muutusi ja suuruse trende",
       "run": "Kogu kohe",
       "running": "Kogumine…",
-      "done": "Kogutud {dtm} — {qry} päringut · {tbl} tabelit · {idx} indeksit"
+      "done": "Kogutud {dtm} — {qry} päringut · {tbl} tabelit · {idx} indeksit",
+      "auto": {
+        "title": "Automaatne kogumine",
+        "desc": "Sisselülitatuna kogutakse selle ühenduse statistikat automaatselt iga päev kell 3 hommikul (Korea aja järgi). Pärast 7 või enamat päeva saate tugineda aeglaste päringute järjestusele ja kasutamata indeksite loendile.",
+        "on": "Sees",
+        "off": "Väljas",
+        "turnOn": "Lülita automaatne kogumine sisse",
+        "turnOff": "Lülita automaatne kogumine välja",
+        "need": "Alates {plan} plaanist",
+        "goPlan": "Vaata plaane",
+        "last": "Viimane automaatne kogumine {dtm} · {rslt}",
+        "never": "Automaatse kogumise ajalugu puudub",
+        "ok": "Edukas"
+      }
     },
     "top": {
       "sort": "Sorteeri",

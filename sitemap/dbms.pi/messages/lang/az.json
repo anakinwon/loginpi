@@ -1022,7 +1022,20 @@
       "intro": "İndi topla düyməsini basmaqla ən yaxşı sorğu statistikalarını, cədvəlləri, indeksləri və ölçüləri bir dəfə oxuyur və onları anlıq görüntü kimi saxlayır. Dəyişiklikləri və ölçü tendensiyalarını görmək üçün ən azı iki dəfə toplayın",
       "run": "İndi topla",
       "running": "Toplanır…",
-      "done": "{dtm} tarixində toplandı — {qry} sorğu · {tbl} cədvəl · {idx} indeks"
+      "done": "{dtm} tarixində toplandı — {qry} sorğu · {tbl} cədvəl · {idx} indeks",
+      "auto": {
+        "title": "Avtomatik toplama",
+        "desc": "Aktiv olduqda, bu əlaqənin statistikası hər gün səhər saat 3-də (Koreya vaxtı ilə) avtomatik olaraq toplanır. 7 və ya daha çox gün toplandıqdan sonra, yavaş sorğu reytinqinə və istifadə olunmayan indekslər siyahısına etibar edə bilərsiniz.",
+        "on": "Aktiv",
+        "off": "Deaktiv",
+        "turnOn": "Avtomatik toplamayı aktivləşdir",
+        "turnOff": "Avtomatik toplamayı deaktivləşdir",
+        "need": "{plan} planından",
+        "goPlan": "Planlara baxın",
+        "last": "Son avtomatik toplama {dtm} · {rslt}",
+        "never": "Hələ avtomatik toplama qeydi yoxdur",
+        "ok": "Uğurlu"
+      }
     },
     "top": {
       "sort": "Sırala",

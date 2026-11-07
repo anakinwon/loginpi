@@ -1022,7 +1022,20 @@
       "intro": "Collect now reads top query statistics, tables, indexes and sizes once and stores them as a snapshot. Collect at least twice to see changes and size trends",
       "run": "Collect now",
       "running": "Collecting…",
-      "done": "Collected at {dtm} — {qry} queries · {tbl} tables · {idx} indexes"
+      "done": "Collected at {dtm} — {qry} queries · {tbl} tables · {idx} indexes",
+      "auto": {
+        "title": "Auto collection",
+        "desc": "When on, this connection is collected automatically every day at 3 AM (Korea time). After 7 or more days you can rely on the slow query ranking and unused index list",
+        "on": "On",
+        "off": "Off",
+        "turnOn": "Turn on auto collection",
+        "turnOff": "Turn off auto collection",
+        "need": "From {plan} plan",
+        "goPlan": "View plans",
+        "last": "Last auto collection {dtm} · {rslt}",
+        "never": "No auto collection yet",
+        "ok": "Success"
+      }
     },
     "top": {
       "sort": "Sort",

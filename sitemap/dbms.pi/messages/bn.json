@@ -1022,7 +1022,20 @@
       "intro": "Kumpul sekarang membaca statistik pertanyaan teratas, jadual, indeks dan saiz sekali dan menyimpannya sebagai capaian pantas. Kumpul sekurang-kurangnya dua kali untuk melihat perubahan dan trend saiz",
       "run": "Kumpul sekarang",
       "running": "Mengumpul…",
-      "done": "Dikumpul pada {dtm} — {qry} pertanyaan · {tbl} jadual · {idx} indeks"
+      "done": "Dikumpul pada {dtm} — {qry} pertanyaan · {tbl} jadual · {idx} indeks",
+      "auto": {
+        "title": "Koleksi automatik",
+        "desc": "Apabila dihidupkan, sambungan ini dikumpul secara automatik setiap hari pada jam 3 pagi (waktu Korea). Selepas 7 hari atau lebih, anda boleh bergantung pada kedudukan pertanyaan perlahan dan senarai indeks yang tidak digunakan",
+        "on": "Hidup",
+        "off": "Mati",
+        "turnOn": "Hidupkan koleksi automatik",
+        "turnOff": "Matikan koleksi automatik",
+        "need": "Daripada pelan {plan}",
+        "goPlan": "Lihat pelan",
+        "last": "Koleksi automatik terakhir {dtm} · {rslt}",
+        "never": "Tiada koleksi automatik lagi",
+        "ok": "Berjaya"
+      }
     },
     "top": {
       "sort": "Isih",

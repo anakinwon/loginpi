@@ -1022,7 +1022,20 @@
       "intro": "Mbledhja tani lexon statistikat kryesore të pyetjeve, tabelat, indekset dhe madhësitë një herë dhe i ruan ato si një pamje. Mblidhni të paktën dy herë për të parë ndryshimet dhe tendencat e madhësisë",
       "run": "Mblidh tani",
       "running": "Po mblidhet…",
-      "done": "Mbledhur në {dtm} — {qry} pyetje · {tbl} tabela · {idx} indekse"
+      "done": "Mbledhur në {dtm} — {qry} pyetje · {tbl} tabela · {idx} indekse",
+      "auto": {
+        "title": "Mbledhje automatike",
+        "desc": "Kur është aktiv, statistikat e kësaj lidhjeje mblidhen automatikisht çdo ditë në orën 3 të mëngjesit (ora e Koresë). Pas 7 ose më shumë ditësh, mund të mbështeteni te renditja e kërkesave të ngadalta dhe lista e indekseve të papërdorura.",
+        "on": "Aktiv",
+        "off": "Joaktiv",
+        "turnOn": "Aktivizo mbledhjen automatike",
+        "turnOff": "Çaktivizo mbledhjen automatike",
+        "need": "Nga plani {plan}",
+        "goPlan": "Shiko planet",
+        "last": "Mbledhja e fundit automatike {dtm} · {rslt}",
+        "never": "Nuk ka ende regjistrime të mbledhjes automatike",
+        "ok": "Sukses"
+      }
     },
     "top": {
       "sort": "Rendit",

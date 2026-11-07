@@ -1012,7 +1012,20 @@
       "intro": "Dabar surinkimas vieną kartą nuskaito populiariausių užklausų statistiką, lenteles, indeksus ir dydžius ir išsaugo juos kaip momentinę kopiją. Surinkite bent du kartus, kad pamatytumėte pokyčius ir dydžio tendencijas",
       "run": "Surinkti dabar",
       "running": "Renkama…",
-      "done": "Surinkta {dtm} – {qry} užklausų · {tbl} lentelių · {idx} indeksų"
+      "done": "Surinkta {dtm} – {qry} užklausų · {tbl} lentelių · {idx} indeksų",
+      "auto": {
+        "title": "Automatinis rinkimas",
+        "desc": "Įjungus, šio ryšio statistika automatiškai renkama kiekvieną dieną 3 val. ryto (Korėjos laiku). Po 7 ar daugiau dienų galite pasikliauti lėtų užklausų reitingu ir nenaudojamų indeksų sąrašu.",
+        "on": "Įjungta",
+        "off": "Išjungta",
+        "turnOn": "Įjungti automatinį rinkimą",
+        "turnOff": "Išjungti automatinį rinkimą",
+        "need": "Nuo {plan} plano",
+        "goPlan": "Peržiūrėti planus",
+        "last": "Paskutinis automatinis rinkimas {dtm} · {rslt}",
+        "never": "Dar nėra automatinio rinkimo įrašų",
+        "ok": "Pavyko"
+      }
     },
     "top": {
       "sort": "Rūšiuoti",

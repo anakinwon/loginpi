@@ -1017,7 +1017,20 @@
       "intro": "Samle inn nå leser topp spørringsstatistikk, tabeller, indekser og størrelser én gang og lagrer dem som et øyeblikksbilde. Samle inn minst to ganger for å se endringer og størrelsestrender.",
       "run": "Samle inn nå",
       "running": "Samler inn…",
-      "done": "Samlet inn {dtm} – {qry} spørringer · {tbl} tabeller · {idx} indekser"
+      "done": "Samlet inn {dtm} – {qry} spørringer · {tbl} tabeller · {idx} indekser",
+      "auto": {
+        "title": "Automatisk innsamling",
+        "desc": "Når denne er på, samles statistikk for denne tilkoblingen automatisk hver dag kl. 03:00 (koreansk tid). Etter 7 eller flere dager kan du stole på rangeringen av trege spørringer og listen over ubrukte indekser.",
+        "on": "På",
+        "off": "Av",
+        "turnOn": "Slå på automatisk innsamling",
+        "turnOff": "Slå av automatisk innsamling",
+        "need": "Fra {plan}-planen",
+        "goPlan": "Vis planer",
+        "last": "Siste automatiske innsamling {dtm} · {rslt}",
+        "never": "Ingen automatisk innsamling ennå",
+        "ok": "Vellykket"
+      }
     },
     "top": {
       "sort": "Sorter",

@@ -1020,7 +1020,20 @@
       "intro": "Versamel lees nou top-navraagstatistieke, tabelle, indekse en groottes een keer en stoor dit as 'n momentopname. Versamel ten minste twee keer om veranderinge en groottetendense te sien",
       "run": "Versamel nou",
       "running": "Versamel tans…",
-      "done": "Versamel op {dtm} — {qry} navrae · {tbl} tabelle · {idx} indekse"
+      "done": "Versamel op {dtm} — {qry} navrae · {tbl} tabelle · {idx} indekse",
+      "auto": {
+        "title": "Outo-versameling",
+        "desc": "Wanneer aan, word hierdie verbinding outomaties elke dag om 03:00 (Koreaanse tyd) versamel. Na 7 of meer dae kan jy staatmaak op die stadige navraagranglys en ongebruikte indekslys.",
+        "on": "Aan",
+        "off": "Af",
+        "turnOn": "Skakel outo-versameling aan",
+        "turnOff": "Skakel outo-versameling af",
+        "need": "Vanaf {plan} plan",
+        "goPlan": "Bekyk planne",
+        "last": "Laaste outo-versameling {dtm} · {rslt}",
+        "never": "Nog geen outo-versameling nie",
+        "ok": "Sukses"
+      }
     },
     "top": {
       "sort": "Sorteer",

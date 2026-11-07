@@ -1020,7 +1020,20 @@
       "intro": "Recopilar ahora lee las principales estadísticas de consultas, tablas, índices y tamaños una vez y las almacena como una instantánea. Recopile al menos dos veces para ver los cambios y las tendencias de tamaño",
       "run": "Recopilar ahora",
       "running": "Recopilando…",
-      "done": "Recopilado el {dtm} — {qry} consultas · {tbl} tablas · {idx} índices"
+      "done": "Recopilado el {dtm} — {qry} consultas · {tbl} tablas · {idx} índices",
+      "auto": {
+        "title": "Recopilación automática",
+        "desc": "Cuando está activada, esta conexión se recopila automáticamente todos los días a las 3 AM (hora de Corea). Después de 7 o más días, puede confiar en la clasificación de consultas lentas y la lista de índices no utilizados.",
+        "on": "Activado",
+        "off": "Desactivado",
+        "turnOn": "Activar recopilación automática",
+        "turnOff": "Desactivar recopilación automática",
+        "need": "Desde el plan {plan}",
+        "goPlan": "Ver planes",
+        "last": "Última recopilación automática {dtm} · {rslt}",
+        "never": "Aún no hay recopilación automática",
+        "ok": "Éxito"
+      }
     },
     "top": {
       "sort": "Ordenar",

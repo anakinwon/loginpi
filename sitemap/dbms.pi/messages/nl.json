@@ -1018,7 +1018,20 @@
       "intro": "Nu verzamelen leest de top query statistieken, tabellen, indexen en groottes één keer en slaat deze op als een snapshot. Verzamel minstens twee keer om wijzigingen en groottetrends te zien",
       "run": "Nu verzamelen",
       "running": "Verzamelen…",
-      "done": "Verzameld op {dtm} — {qry} queries · {tbl} tabellen · {idx} indexen"
+      "done": "Verzameld op {dtm} — {qry} queries · {tbl} tabellen · {idx} indexen",
+      "auto": {
+        "title": "Automatische verzameling",
+        "desc": "Indien ingeschakeld, worden de statistieken van deze verbinding elke dag om 3 uur 's ochtends (Koreaanse tijd) automatisch verzameld. Na 7 of meer dagen kunt u vertrouwen op de rangschikking van trage queries en de lijst met ongebruikte indexen.",
+        "on": "Aan",
+        "off": "Uit",
+        "turnOn": "Automatische verzameling inschakelen",
+        "turnOff": "Automatische verzameling uitschakelen",
+        "need": "Vanaf {plan} abonnement",
+        "goPlan": "Abonnementen bekijken",
+        "last": "Laatste automatische verzameling {dtm} · {rslt}",
+        "never": "Nog geen automatische verzameling",
+        "ok": "Succes"
+      }
     },
     "top": {
       "sort": "Sorteren",

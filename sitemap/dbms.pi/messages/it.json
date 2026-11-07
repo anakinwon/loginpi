@@ -1019,7 +1019,20 @@
       "intro": "Raccogli ora legge le statistiche delle query principali, tabelle, indici e dimensioni una volta e le memorizza come snapshot. Raccogli almeno due volte per vedere le modifiche e le tendenze delle dimensioni",
       "run": "Raccogli ora",
       "running": "Raccolta in corso…",
-      "done": "Raccolto il {dtm} — {qry} query · {tbl} tabelle · {idx} indici"
+      "done": "Raccolto il {dtm} — {qry} query · {tbl} tabelle · {idx} indici",
+      "auto": {
+        "title": "Raccolta automatica",
+        "desc": "Se attiva, questa connessione viene raccolta automaticamente ogni giorno alle 3 del mattino (ora coreana). Dopo 7 o più giorni puoi fare affidamento sulla classifica delle query lente e sull'elenco degli indici inutilizzati",
+        "on": "Attiva",
+        "off": "Disattiva",
+        "turnOn": "Attiva raccolta automatica",
+        "turnOff": "Disattiva raccolta automatica",
+        "need": "Dal piano {plan}",
+        "goPlan": "Visualizza piani",
+        "last": "Ultima raccolta automatica {dtm} · {rslt}",
+        "never": "Nessuna raccolta automatica ancora",
+        "ok": "Successo"
+      }
     },
     "top": {
       "sort": "Ordina",

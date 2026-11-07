@@ -1,1 +1,4 @@
-{ "regions": ["icn1"] }
+{
+  "regions": ["icn1"],
+  "crons": [{ "path": "/api/cron/perf-collect", "schedule": "*/10 18-19 * * *" }]
+}

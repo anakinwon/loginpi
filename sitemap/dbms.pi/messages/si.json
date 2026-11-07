@@ -1020,7 +1020,20 @@
       "intro": "Zberite zdaj prebere statistiko najboljših poizvedb, tabele, indekse in velikosti enkrat in jih shrani kot posnetek. Zberite vsaj dvakrat, da vidite spremembe in trende velikosti.",
       "run": "Zberi zdaj",
       "running": "Zbiranje…",
-      "done": "Zbrano ob {dtm} — {qry} poizvedb · {tbl} tabel · {idx} indeksov"
+      "done": "Zbrano ob {dtm} — {qry} poizvedb · {tbl} tabel · {idx} indeksov",
+      "auto": {
+        "title": "Samodejno zbiranje",
+        "desc": "Ko je vklopljeno, se ta povezava samodejno zbira vsak dan ob 3. uri zjutraj (korejski čas). Po 7 ali več dneh se lahko zanesete na razvrstitev počasnih poizvedb in seznam neuporabljenih indeksov.",
+        "on": "Vklopljeno",
+        "off": "Izklopljeno",
+        "turnOn": "Vklopi samodejno zbiranje",
+        "turnOff": "Izklopi samodejno zbiranje",
+        "need": "Od načrta {plan}",
+        "goPlan": "Ogled načrtov",
+        "last": "Zadnje samodejno zbiranje {dtm} · {rslt}",
+        "never": "Še ni samodejnega zbiranja",
+        "ok": "Uspeh"
+      }
     },
     "top": {
       "sort": "Razvrsti",

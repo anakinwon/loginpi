@@ -1020,7 +1020,20 @@
       "intro": "Teraz zbiera štatistiky najlepších dotazov, tabuliek, indexov a veľkostí raz a ukladá ich ako snímku. Zbierajte aspoň dvakrát, aby ste videli zmeny a trendy veľkosti",
       "run": "Zbierať teraz",
       "running": "Zbiera sa…",
-      "done": "Zozbierané {dtm} — {qry} dotazov · {tbl} tabuliek · {idx} indexov"
+      "done": "Zozbierané {dtm} — {qry} dotazov · {tbl} tabuliek · {idx} indexov",
+      "auto": {
+        "title": "Automatický zber",
+        "desc": "Ak je zapnuté, toto pripojenie sa automaticky zbiera každý deň o 3:00 (kórejského času). Po 7 alebo viacerých dňoch sa môžete spoľahnúť na poradie pomalých dotazov a zoznam nepoužívaných indexov.",
+        "on": "Zapnuté",
+        "off": "Vypnuté",
+        "turnOn": "Zapnúť automatický zber",
+        "turnOff": "Vypnúť automatický zber",
+        "need": "Od plánu {plan}",
+        "goPlan": "Zobraziť plány",
+        "last": "Posledný automatický zber {dtm} · {rslt}",
+        "never": "Zatiaľ žiadny automatický zber",
+        "ok": "Úspech"
+      }
     },
     "top": {
       "sort": "Zoradiť",

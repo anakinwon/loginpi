@@ -549,6 +549,7 @@
       "INVALID_INPUT": "Hindi valid ang kahilingan."
     },
     "board": {
+      "subtitle": "Ano ang gagawin sa DB na ito ngayon — 14 na signal ng OK, babala, at panganib na may mga solusyon, sa isang sulyap.",
       "refresh": {
         "updated": "Hanggang {time} · nagre-refresh bawat minuto",
         "now": "I-refresh ngayon",
@@ -1021,7 +1022,20 @@
       "intro": "Kinokolekta ngayon ang mga nangungunang istatistika ng query, mga talahanayan, mga index at mga laki nang isang beses at iniimbak ang mga ito bilang isang snapshot. Kolektahin nang hindi bababa sa dalawang beses upang makita ang mga pagbabago at mga trend ng laki",
       "run": "Kolektahin ngayon",
       "running": "Kinokolekta…",
-      "done": "Nakolekta noong {dtm} — {qry} na query · {tbl} na talahanayan · {idx} na index"
+      "done": "Nakolekta noong {dtm} — {qry} na query · {tbl} na talahanayan · {idx} na index",
+      "auto": {
+        "title": "Awtomatikong koleksyon",
+        "desc": "Kapag naka-on, ang koneksyon na ito ay awtomatikong kinokolekta araw-araw sa 3 AM (oras ng Korea). Pagkatapos ng 7 o higit pang araw, maaari kang umasa sa ranggo ng mabagal na query at listahan ng hindi nagamit na index",
+        "on": "Naka-on",
+        "off": "Naka-off",
+        "turnOn": "I-on ang awtomatikong koleksyon",
+        "turnOff": "I-off ang awtomatikong koleksyon",
+        "need": "Mula sa {plan} na plano",
+        "goPlan": "Tingnan ang mga plano",
+        "last": "Huling awtomatikong koleksyon {dtm} · {rslt}",
+        "never": "Wala pang awtomatikong koleksyon",
+        "ok": "Tagumpay"
+      }
     },
     "top": {
       "sort": "Pag-uri-uriin",

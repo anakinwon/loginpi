@@ -19,6 +19,7 @@ export const PERM_MIN = {
   ANY: 'FREE', // 연결·접속 목록·요금제 화면·저장 계획 목록
   MON: 'FREE', // 모니터링 보드·규칙·추이
   PERF: 'FREE', // 성능 관측·원인 진단(FREE 수동 수집 하루 clct_day_cnt 회)
+  PERF_AUTO: 'D1', // 성능 상시 자동 수집 켜기(매일 KST 03:00, sql/021) — 끄기는 누구나
   SQL_EXPLAIN: 'FREE', // SQL 튜닝 : 실행계획 보기
   SQL_TUNE: 'D2', // SQL 튜닝 : 계획 저장·비교·AI 튜닝 권고(월 ai_mon_cnt 회)
   DRIFT_VIEW: 'D1', // GAP분석 조회

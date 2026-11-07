@@ -1022,7 +1022,20 @@
       "intro": "Kumpulkan sekarang membaca statistik kueri teratas, tabel, indeks, dan ukuran sekali dan menyimpannya sebagai snapshot. Kumpulkan setidaknya dua kali untuk melihat perubahan dan tren ukuran",
       "run": "Kumpulkan sekarang",
       "running": "Mengumpulkan…",
-      "done": "Dikumpulkan pada {dtm} — {qry} kueri · {tbl} tabel · {idx} indeks"
+      "done": "Dikumpulkan pada {dtm} — {qry} kueri · {tbl} tabel · {idx} indeks",
+      "auto": {
+        "title": "Koleksi otomatis",
+        "desc": "Jika diaktifkan, koneksi ini akan dikumpulkan secara otomatis setiap hari pukul 03.00 (waktu Korea). Setelah 7 hari atau lebih, Anda dapat mengandalkan peringkat kueri lambat dan daftar indeks yang tidak digunakan",
+        "on": "Aktif",
+        "off": "Nonaktif",
+        "turnOn": "Aktifkan koleksi otomatis",
+        "turnOff": "Nonaktifkan koleksi otomatis",
+        "need": "Dari paket {plan}",
+        "goPlan": "Lihat paket",
+        "last": "Koleksi otomatis terakhir {dtm} · {rslt}",
+        "never": "Belum ada koleksi otomatis",
+        "ok": "Berhasil"
+      }
     },
     "top": {
       "sort": "Urutkan",

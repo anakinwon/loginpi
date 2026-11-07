@@ -1016,7 +1016,20 @@
       "intro": "Samla in nu läser toppfrågestatistik, tabeller, index och storlekar en gång och lagrar dem som en ögonblicksbild. Samla in minst två gånger för att se ändringar och storlekstrender.",
       "run": "Samla in nu",
       "running": "Samlar in…",
-      "done": "Samlades in {dtm} — {qry} frågor · {tbl} tabeller · {idx} index"
+      "done": "Samlades in {dtm} — {qry} frågor · {tbl} tabeller · {idx} index",
+      "auto": {
+        "title": "Automatisk insamling",
+        "desc": "När den är påslagen samlas statistik för den här anslutningen in automatiskt varje dag kl. 03.00 (koreansk tid). Efter 7 eller fler dagar kan du lita på rankningen av långsamma frågor och listan över oanvända index.",
+        "on": "På",
+        "off": "Av",
+        "turnOn": "Slå på automatisk insamling",
+        "turnOff": "Slå av automatisk insamling",
+        "need": "Från {plan} plan",
+        "goPlan": "Visa planer",
+        "last": "Senaste automatiska insamlingen {dtm} · {rslt}",
+        "never": "Ingen automatisk insamling ännu",
+        "ok": "Lyckades"
+      }
     },
     "top": {
       "sort": "Sortera",

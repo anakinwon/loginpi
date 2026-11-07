@@ -1012,7 +1012,20 @@
       "intro": "Safna núna les efstu fyrirspurnartölfræði, töflur, vísitölur og stærðir einu sinni og vistar þær sem skyndimynd. Safnaðu að minnsta kosti tvisvar til að sjá breytingar og stærðarþróun",
       "run": "Safna núna",
       "running": "Safnar…",
-      "done": "Safnað {dtm} — {qry} fyrirspurnir · {tbl} töflur · {idx} vísitölur"
+      "done": "Safnað {dtm} — {qry} fyrirspurnir · {tbl} töflur · {idx} vísitölur",
+      "auto": {
+        "title": "Sjálfvirk söfnun",
+        "desc": "Þegar kveikt er á, er þessi tenging sjálfkrafa safnað á hverjum degi klukkan 3 að morgni (Kóreutími). Eftir 7 eða fleiri daga geturðu treyst á röðun hægra fyrirspurna og lista yfir ónotaða vísitölu",
+        "on": "Kveikt",
+        "off": "Slökkt",
+        "turnOn": "Kveikja á sjálfvirkri söfnun",
+        "turnOff": "Slökkva á sjálfvirkri söfnun",
+        "need": "Frá {plan} áætlun",
+        "goPlan": "Skoða áætlanir",
+        "last": "Síðasta sjálfvirka söfnun {dtm} · {rslt}",
+        "never": "Engin sjálfvirk söfnun ennþá",
+        "ok": "Árangur"
+      }
     },
     "top": {
       "sort": "Raða",

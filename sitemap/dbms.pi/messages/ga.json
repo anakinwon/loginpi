@@ -1019,7 +1019,20 @@
       "intro": "La collecte lit maintenant les statistiques des requêtes principales, des tables, des index et des tailles une fois et les stocke sous forme d’instantané. Collectez au moins deux fois pour voir les changements et les tendances de taille.",
       "run": "Collecter maintenant",
       "running": "Collecte en cours…",
-      "done": "Collecté le {dtm} — {qry} requêtes · {tbl} tables · {idx} index"
+      "done": "Collecté le {dtm} — {qry} requêtes · {tbl} tables · {idx} index",
+      "auto": {
+        "title": "Collecte automatique",
+        "desc": "Activée, cette connexion est collectée automatiquement tous les jours à 3h du matin (heure de Corée). Après 7 jours ou plus, vous pouvez vous fier au classement des requêtes lentes et à la liste des index inutilisés.",
+        "on": "Activée",
+        "off": "Désactivée",
+        "turnOn": "Activer la collecte automatique",
+        "turnOff": "Désactiver la collecte automatique",
+        "need": "À partir du forfait {plan}",
+        "goPlan": "Voir les forfaits",
+        "last": "Dernière collecte automatique {dtm} · {rslt}",
+        "never": "Aucune collecte automatique pour l'instant",
+        "ok": "Succès"
+      }
     },
     "top": {
       "sort": "Trier",

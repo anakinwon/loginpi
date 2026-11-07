@@ -4,6 +4,7 @@ import 'server-only'
 import { cache } from 'react'
 import { db } from './api'
 import { pickCur, type Cur, type PlanCd, type PlanTerm } from './plan-rules'
+import { AUTO_ACTOR } from './perf/auto'
 
 export type FeeRow = {
   plan_cd: PlanCd
@@ -70,13 +71,14 @@ const utcMonth = () => {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)).toISOString()
 }
 
-// 오늘(UTC) 수동 성능 수집 횟수 — 삭제 행 포함(지워서 다시 늘리기 방지). 존재 수만(head)
+// 오늘(UTC) 수동 성능 수집 횟수 — 삭제 행 포함(지워서 다시 늘리기 방지), 자동 수집(regr_id SYSTEM, sql/021) 제외. 존재 수만(head)
 export async function clctUsedToday(linkId: string): Promise<number> {
   if (!UUID.test(linkId)) return 0
   const { count, error } = await db()
     .from('dbm_prf_clct')
     .select('clct_id', { count: 'exact', head: true })
     .eq('lnk_id', linkId)
+    .neq('regr_id', AUTO_ACTOR)
     .gte('reg_dtm', utcDay())
   if (error) throw error
   return count ?? 0

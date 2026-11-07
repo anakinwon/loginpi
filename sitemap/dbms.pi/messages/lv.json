@@ -1020,7 +1020,20 @@
       "intro": "Nospiežot \"Apkopot tagad\", vienreiz tiek nolasīta augstākā vaicājumu statistika, tabulas, indeksi un izmēri un saglabāti kā momentuzņēmums. Apkopojiet vismaz divas reizes, lai redzētu izmaiņas un izmēru tendences",
       "run": "Apkopot tagad",
       "running": "Apkopo…",
-      "done": "Apkopots {dtm} — {qry} vaicājumi · {tbl} tabulas · {idx} indeksi"
+      "done": "Apkopots {dtm} — {qry} vaicājumi · {tbl} tabulas · {idx} indeksi",
+      "auto": {
+        "title": "Automātiska vākšana",
+        "desc": "Ja ir ieslēgts, šis savienojums tiek automātiski apkopots katru dienu pulksten 3:00 (Korejas laiks). Pēc 7 vai vairāk dienām varat paļauties uz lēno vaicājumu rangu un neizmantoto indeksu sarakstu.",
+        "on": "Ieslēgts",
+        "off": "Izslēgts",
+        "turnOn": "Ieslēgt automātisko vākšanu",
+        "turnOff": "Izslēgt automātisko vākšanu",
+        "need": "No {plan} plāna",
+        "goPlan": "Skatīt plānus",
+        "last": "Pēdējā automātiskā vākšana {dtm} · {rslt}",
+        "never": "Vēl nav automātiskās vākšanas",
+        "ok": "Veiksmīgi"
+      }
     },
     "top": {
       "sort": "Kārtot",

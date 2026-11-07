@@ -1022,7 +1022,20 @@
       "intro": "Häzir ýygnamak düwmesini basanyňyzda, ýokarky sorag statistikasyny, tablisalary, indeksleri we ululyklary bir gezek okap, olary surat hökmünde saklaýar. Üýtgeşmeleri we ululyk tendensiýalaryny görmek üçin azyndan iki gezek ýygnamaly.",
       "run": "Häzir ýygnamak",
       "running": "Ýygnanýar…",
-      "done": "{dtm} ýygnanyldy — {qry} sorag · {tbl} tablisa · {idx} indeks"
+      "done": "{dtm} ýygnanyldy — {qry} sorag · {tbl} tablisa · {idx} indeks",
+      "auto": {
+        "title": "Awtomatiki ýygnamak",
+        "desc": "Işledilende, bu birikmäniň statistikasy her gün irden sagat 3-de (Koreýa wagty) awtomatiki usulda ýygnalýar. 7 ýa-da ondan köp gün ýygnanandan soň, haýal sorag reýtingine we ulanylmaýan indeks sanawyna bil baglap bilersiňiz.",
+        "on": "Açyk",
+        "off": "Öçük",
+        "turnOn": "Awtomatiki ýygnamagy açmak",
+        "turnOff": "Awtomatiki ýygnamagy ýapmak",
+        "need": "{plan} meýilnamasyndan başlap",
+        "goPlan": "Meýilnamalara seret",
+        "last": "Soňky awtomatiki ýygnamak {dtm} · {rslt}",
+        "never": "Heniz awtomatiki ýygnamak ýazgysy ýok",
+        "ok": "Üstünlik"
+      }
     },
     "top": {
       "sort": "Tertiple",

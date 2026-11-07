@@ -1020,7 +1020,20 @@
       "intro": "Sbírat nyní přečte statistiky nejčastějších dotazů, tabulky, indexy a velikosti jednou a uloží je jako snímek. Sbírejte alespoň dvakrát, abyste viděli změny a trendy velikosti.",
       "run": "Sbírat nyní",
       "running": "Sbírání…",
-      "done": "Shromážděno {dtm} — {qry} dotazů · {tbl} tabulek · {idx} indexů"
+      "done": "Shromážděno {dtm} — {qry} dotazů · {tbl} tabulek · {idx} indexů",
+      "auto": {
+        "title": "Automatický sběr",
+        "desc": "Pokud je zapnuto, toto připojení se automaticky shromažďuje každý den ve 3:00 (korejského času). Po 7 a více dnech se můžete spolehnout na pořadí pomalých dotazů a seznam nepoužívaných indexů.",
+        "on": "Zapnuto",
+        "off": "Vypnuto",
+        "turnOn": "Zapnout automatický sběr",
+        "turnOff": "Vypnout automatický sběr",
+        "need": "Od tarifu {plan}",
+        "goPlan": "Zobrazit tarify",
+        "last": "Poslední automatický sběr {dtm} · {rslt}",
+        "never": "Zatím žádný automatický sběr",
+        "ok": "Úspěch"
+      }
     },
     "top": {
       "sort": "Seřadit",

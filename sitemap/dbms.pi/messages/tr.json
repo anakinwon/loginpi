@@ -1022,7 +1022,20 @@
       "intro": "Şimdi topla, en iyi sorgu istatistiklerini, tabloları, indeksleri ve boyutları bir kez okur ve bunları bir anlık görüntü olarak saklar. Değişiklikleri ve boyut eğilimlerini görmek için en az iki kez toplayın",
       "run": "Şimdi topla",
       "running": "Toplanıyor…",
-      "done": "{dtm} tarihinde toplandı — {qry} sorgu · {tbl} tablo · {idx} indeks"
+      "done": "{dtm} tarihinde toplandı — {qry} sorgu · {tbl} tablo · {idx} indeks",
+      "auto": {
+        "title": "Otomatik toplama",
+        "desc": "Açık bırakıldığında, bu bağlantının istatistikleri her gün sabah 3'te (Kore saati) otomatik olarak toplanır. 7 gün veya daha fazla birikirse, yavaş sorgu sıralamasına ve kullanılmayan dizin listesine güvenebilirsiniz.",
+        "on": "Açık",
+        "off": "Kapalı",
+        "turnOn": "Otomatik toplamayı aç",
+        "turnOff": "Otomatik toplamayı kapat",
+        "need": "{plan} planından itibaren",
+        "goPlan": "Planları görüntüle",
+        "last": "Son otomatik toplama {dtm} · {rslt}",
+        "never": "Henüz otomatik toplama kaydı yok",
+        "ok": "Başarılı"
+      }
     },
     "top": {
       "sort": "Sırala",

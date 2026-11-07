@@ -245,13 +245,103 @@ function CollectBtn({
   )
 }
 
-// 3-1 수집 — 버튼 1회 = 스냅샷 1건
+// 3-1 수집 — 버튼 1회 = 스냅샷 1건 + 상시 자동 수집 설정
 function CollectTab({ sel, onDone }: { sel: Sel; onDone: () => void }) {
   const t = useTranslations('perf.collect')
   return (
     <div className="flex flex-col items-start gap-3">
       <p className="text-muted-foreground text-sm break-keep">{t('intro')}</p>
       <CollectBtn sel={sel} onDone={onDone} primary />
+      <AutoCollect sel={sel} />
+    </div>
+  )
+}
+
+type AutoRes = {
+  on: boolean
+  lstRunDtm: string | null
+  lstRsltCd: string | null
+  canOn: boolean
+  need: string
+}
+
+// 3-1 상시 자동 수집(sql/021) — 매일 KST 03:00 크론. 켜기 = D1 관측부터(화면이 먼저 막고 서버도 막음, R-P5), 끄기 = 누구나
+function AutoCollect({ sel }: { sel: Sel }) {
+  const t = useTranslations('perf.collect.auto')
+  const tp = useTranslations('plan')
+  const errText = useErrText()
+  const [rev, setRev] = useState(0) // 저장 뒤 재조회
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  const s = useGet<AutoRes>(`/api/perf/auto?${qs(sel, `&rev=${rev}`)}`)
+  const d = s?.data
+  if (!d) return <Status s={s} />
+
+  async function toggle(on: boolean) {
+    setBusy(true)
+    setErr(null)
+    const r = await readApi<{ on: boolean }>(
+      piFetch('/api/perf/auto', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...sel, on }),
+      }),
+    )
+    setBusy(false)
+    if (r.ok) setRev((n) => n + 1)
+    else setErr(errText(r.body))
+  }
+  const locked = !d.on && !d.canOn
+  const rslt =
+    d.lstRsltCd === 'OK'
+      ? t('ok')
+      : d.lstRsltCd
+        ? errText({ code: d.lstRsltCd, error: d.lstRsltCd })
+        : '-'
+  return (
+    <div className="bg-surface-raised flex w-full flex-col gap-2 rounded-xl p-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="font-semibold">{t('title')}</p>
+        <span
+          className={`rounded-full px-2 py-0.5 text-xs ${d.on ? 'bg-accent font-semibold text-white' : 'bg-surface text-muted-foreground'}`}
+        >
+          {d.on ? t('on') : t('off')}
+        </span>
+        {!d.canOn && (
+          <span className="rounded-full border border-amber-400/50 px-2 py-0.5 text-xs">
+            {t('need', { plan: tp(`names.${d.need}`) })}
+          </span>
+        )}
+      </div>
+      <p className="text-muted-foreground text-sm break-keep">{t('desc')}</p>
+      <p className="text-sm break-keep">
+        {d.lstRunDtm || d.lstRsltCd
+          ? t('last', { dtm: fmtDtm(d.lstRunDtm), rslt })
+          : t('never')}
+      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          className={d.on ? BTN : BTN_PRIMARY}
+          disabled={busy || locked}
+          aria-pressed={d.on}
+          onClick={() => void toggle(!d.on)}
+        >
+          {d.on ? t('turnOff') : t('turnOn')}
+        </button>
+        {locked && (
+          <Link
+            href={`/plan?link=${encodeURIComponent(sel.linkId)}`}
+            className="text-accent text-sm font-semibold underline"
+          >
+            {t('goPlan')}
+          </Link>
+        )}
+      </div>
+      {err && (
+        <p className="text-danger text-sm" role="alert">
+          {err}
+        </p>
+      )}
     </div>
   )
 }

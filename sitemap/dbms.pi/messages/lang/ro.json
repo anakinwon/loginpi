@@ -1014,7 +1014,20 @@
       "intro": "Colectează acum citește statisticile de top ale interogărilor, tabelele, indecșii și dimensiunile o singură dată și le stochează ca un instantaneu. Colectați de cel puțin două ori pentru a vedea modificările și tendințele de dimensiune.",
       "run": "Colectează acum",
       "running": "Se colectează…",
-      "done": "Colectat la {dtm} — {qry} interogări · {tbl} tabele · {idx} indecși"
+      "done": "Colectat la {dtm} — {qry} interogări · {tbl} tabele · {idx} indecși",
+      "auto": {
+        "title": "Colectare automată",
+        "desc": "Când este activată, această conexiune este colectată automat în fiecare zi la ora 3 AM (ora Coreei). După 7 sau mai multe zile, vă puteți baza pe clasamentul interogărilor lente și pe lista de indecși neutilizați",
+        "on": "Activat",
+        "off": "Dezactivat",
+        "turnOn": "Activează colectarea automată",
+        "turnOff": "Dezactivează colectarea automată",
+        "need": "De la planul {plan}",
+        "goPlan": "Vezi planurile",
+        "last": "Ultima colectare automată {dtm} · {rslt}",
+        "never": "Încă nu există înregistrări de colectare automată",
+        "ok": "Succes"
+      }
     },
     "top": {
       "sort": "Sortează",

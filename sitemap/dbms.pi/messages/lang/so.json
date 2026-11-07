@@ -1020,7 +1020,20 @@
       "intro": "Hadda ururi wuxuu akhriyaa tirakoobyada su'aalaha sare, miisaska, tusmooyinka iyo cabbirrada hal mar wuxuuna u keydiyaa sida sawir-qaadis. Ururi ugu yaraan laba jeer si aad u aragto isbeddellada iyo isbeddellada cabbirka",
       "run": "Hadda ururi",
       "running": "Waa la ururiyaa…",
-      "done": "La ururiyay {dtm} — {qry} su'aalo · {tbl} miisas · {idx} tusmooyin"
+      "done": "La ururiyay {dtm} — {qry} su'aalo · {tbl} miisas · {idx} tusmooyin",
+      "auto": {
+        "title": "Ururin otomaatig ah",
+        "desc": "Marka la shido, isku xirkan si otomaatig ah ayaa loo ururiyaa maalin kasta 3-da subaxnimo (waqtiga Kuuriya). Kadib 7 maalmood ama ka badan waxaad ku tiirsanaan kartaa darajada weydiimaha gaabiska ah iyo liiska tusmooyinka aan la isticmaalin.",
+        "on": "Daaran",
+        "off": "Dansan",
+        "turnOn": "Daar ururinta otomaatiga ah",
+        "turnOff": "Dami ururinta otomaatiga ah",
+        "need": "Laga bilaabo qorshaha {plan}",
+        "goPlan": "Eeg qorshayaasha",
+        "last": "Ururintii otomaatiga ahayd ee ugu dambeysay {dtm} · {rslt}",
+        "never": "Wali ma jirto ururin otomaatig ah",
+        "ok": "Guul"
+      }
     },
     "top": {
       "sort": "Kala sooc",
