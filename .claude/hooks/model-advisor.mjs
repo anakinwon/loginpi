@@ -23,7 +23,7 @@ export function route(prompt) {
   if (produce && category === 'DOCS') steps.push('검수 → Agent(subagent_type: "anakin_phase-review") [Opus·high] (파일로 저장하는 문서·보고서·i18n 메시지면 분량과 무관하게 생략 불가, 대화 답변만이면 생략)')
   if (category === 'GIT' && confidence >= MIN_CONFIDENCE && !produce) steps.push('커밋·푸시 → Agent(subagent_type: "anakin_phase-commit") [Haiku 4.5] (커밋 묶음·메시지를 정했으면 함께 전달, 충돌·behind·훅 실패는 에이전트가 멈추고 보고)')
   if (/팀\s?(구성|운영|재편|재평가)|팀원|재배정|에이전트\s?(성능|재평가|배정)/.test(prompt) && !steps.length) steps.push('재평가 → Agent(subagent_type: "teamanakin-admin") [Opus·high] (모드 2)')
-  const queryOnly = !steps.length && category === 'QUERY' && confidence >= MIN_CONFIDENCE   // 조회 단독 턴 : 메인 직접 조회 금지(2026-11-07) → 수집 위임, 팀장 승인 생략 [확인중 : 마스터]
+  const queryOnly = !steps.length && category === 'QUERY' && confidence >= MIN_CONFIDENCE   // 조회 단독 턴 : 메인 직접 조회 금지(2026-11-07) → 수집 위임, 팀장 승인 생략(마스터 확정 2026-11-07)
   if (queryOnly) steps.push('수집 → Agent(subagent_type: "anakin_phase-collect") [Sonnet·medium] (조회 단독 턴 : 메인 직접 조회 금지, 팀장 승인 생략)')
   if (!queryOnly && steps.some(x => x.includes('anakin_phase-') && !x.includes('anakin_phase-commit'))) steps.push('취합·승인 → Agent(subagent_type: "teamanakin-admin") [Opus·high] (생략 불가 : 팀원 결과 요약·요청 원문·산출물 경로 전달, 반려 시 anakin_phase-build 재작업 후 재승인)')
   if (!produce && steps.length) steps.push(queryOnly ? '응답 → 메인 (수집 결과 리뷰·정리 후 회신)' : '응답 → 메인 (팀장 판정 첫 줄 포함)')
