@@ -1,7 +1,7 @@
 // 요청 재수행 공용 함수 시험 — node:test (pnpm test). 대시보드 # 번호 → 턴 해석, 상태 판정, 세션 생존 추정, 재수행 명령 조립
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildTurns, resolveTarget, turnStatus, judgeLiveness, buildCommand, isInterruptMarker, followUp } from '../scripts/work-history-rows.mjs'
+import { buildTurns, resolveTarget, turnStatus, judgeLiveness, buildCommand, isInterruptMarker, followUp, tokenTiles } from '../scripts/work-history-rows.mjs'
 
 const SID_A = 'aaaa1111-0000-0000-0000-000000000001', SID_B = 'bbbb2222-0000-0000-0000-000000000002'
 const rec = (sid, turn, part, ts, extra = {}) => ({ id: `${sid}:${turn}.${part}`, session: sid.slice(0, 8), session_id: sid, turn, part, ts_req: ts, ts_res: null, req_head: `요청 ${turn}`, ...extra })
@@ -92,4 +92,21 @@ test('followUp : 다음 1~3턴 이어가기 신호면 후속 처리됨 (양성) 
   const done = buildTurns([rec(S, 1, 1, at(0), { ts_res: at(0) }), rec(S, 2, 1, at(1), { req_head: '계속' })], 0)
   assert.equal(followUp(done, done.at(-1)), null)
   assert.equal(turnStatus(mk('x', [{ req_head: '계속' }]).at(-1)).key, 'interrupted')   // 상태 키는 그대로
+})
+
+test('토큰 : buildTurns 가 본체·서브에이전트(tka)를 part 합산하고 tokenTiles 가 필터 행 합계를 낸다', () => {
+  const tok = (input, cache_read, cache_create, output) => ({ input, cache_read, cache_create, output })
+  const ts = buildTurns([
+    rec(SID_A, 9, 1, '2026-11-07T10:00:00+09:00', { tokens: tok(1, 10, 100, 1000), agents_detail: [{ tokens: tok(2, 20, 200, 2000) }] }),
+    rec(SID_A, 9, 2, '2026-11-07T10:00:00+09:00', { tokens: tok(3, 30, 300, 3000) }),
+  ], 0)
+  assert.deepEqual(ts[0].tk, tok(6, 60, 600, 6000))   // 본체 1+3 + 에이전트 2
+  assert.deepEqual(ts[0].tka, tok(2, 20, 200, 2000))
+  const r = { tk: [4, 40, 400, 4000], tka: [2, 20, 200, 2000] }
+  const tt = tokenTiles([r, r], String)
+  assert.equal(tt['tk-all'], '13332')                          // (4444 + 2222) × 2
+  assert.equal(tt['tk-all-s'], '본체 8888 · 에이전트 4444')
+  assert.equal(tt['tk-in'], '1332')                            // 입력+캐시 읽기+캐시 생성 (본체+에이전트)
+  assert.equal(tt['tk-out'], '12000')
+  assert.equal(tokenTiles([], String)['tk-all'], '0')          // 조회 0건
 })

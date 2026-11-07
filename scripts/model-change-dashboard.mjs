@@ -2,6 +2,7 @@
  * model-change-dashboard.mjs : 기준 시각 이후 요청마다 "작업 시작·종료 | 작업 유형 | 모델&버전 흐름 | effort 흐름 | 비용 | 작업 지시서 | 작업 결과서 | 기타" 대시보드 (2026-10-08 지시)
  * 원천 : work-history jsonl(loadRows : 턴 경계·유형·비용) + 세션 기록 ~/.claude/projects/<프로젝트>/<sid>.jsonl(메인 모델·effort·지시문·응답) + <sid>/subagents/*.jsonl(서브에이전트 모델·effort)
  * 작업 상태 열·상태 필터·재수행 복사 버튼 : 판정은 work-history-rows.mjs turnStatus 하나(표·엑셀·재수행 CLI 공용), 사용법 docs/WORK_HISTORY_RESUME.md
+ * 토큰 열·상단 조회 결과 합계(토큰·비용, 필터 즉시 재계산) : 행 토큰은 buildTurns tk(본체+에이전트)·tka(에이전트), 합계 글자는 work-history-rows.mjs tokenTiles 하나(2026-11-07)
  * 실행 : node scripts/model-change-dashboard.mjs [--from ISO시각] [--out 경로]  (수동 실행 ; Stop 훅 미등록)
  */
 import fs from 'node:fs'
@@ -9,9 +10,9 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { loadRows } from './work-history-stats.mjs'
-import { CATEGORIES, makeRedactor, costUsd } from './work-history-core.mjs'
+import { CATEGORIES, makeRedactor, costUsd, kfmt } from './work-history-core.mjs'
 import { modelLabel } from '../.claude/subagent-statusline.mjs'
-import { DEFAULT_FROM, STATUS, OPEN_KEYS, buildTurns, turnStatus, followUp, FOLLOW_LABEL } from './work-history-rows.mjs'
+import { DEFAULT_FROM, STATUS, OPEN_KEYS, TOKEN_KEYS, buildTurns, turnStatus, followUp, FOLLOW_LABEL, tokenTiles } from './work-history-rows.mjs'
 
 // 자동 실행(Stop 훅, --quiet)은 PC별 사용자 전역 설정 env MODEL_CHANGE_DASHBOARD=1 일 때만 : 공동작업자 PC가 추적 중인 HTML을 덮어쓰지 않도록
 if (process.argv.includes('--quiet') && process.env.MODEL_CHANGE_DASHBOARD !== '1') process.exit(0)
@@ -158,6 +159,14 @@ function flow(xs, cls) {
 }
 const doc = s => { s = redact(s).trim(); if (!s) return '<span class="muted">-</span>'; const head = s.length > CUT.cell ? s.slice(0, CUT.cell) + '…' : s; return s.length > CUT.cell ? `<details><summary>${esc(head)}</summary><div class="full">${esc(s.slice(0, CUT.full))}${s.length > CUT.full ? '\n…(이하 생략)' : ''}</div></details>` : `<div class="full">${esc(s)}</div>` }
 
+/** 행 토큰 [입력, 캐시 읽기, 캐시 생성, 출력] : 본체(tk - tka)·서브에이전트(tka) */
+const tkMain = t => TOKEN_KEYS.map(k => (t.tk?.[k] || 0) - (t.tka?.[k] || 0)), tkAgent = t => TOKEN_KEYS.map(k => t.tka?.[k] || 0)
+const n4 = v => v[0] + v[1] + v[2] + v[3], nfmt = n => n.toLocaleString('en-US')
+/** 토큰 칸 : 총합(본체+에이전트) 굵게, 아래 본체 입력·출력, 에이전트 있으면 +에이전트 줄 ; 입력 = 입력+캐시 읽기+캐시 생성(제목 풍선에 내역) */
+const tokCell = t => {
+  const m = tkMain(t), a = tkAgent(t), line = (l, v) => `<div class="muted" title="${esc(`입력 ${nfmt(v[0])} · 캐시 읽기 ${nfmt(v[1])} · 캐시 생성 ${nfmt(v[2])} · 출력 ${nfmt(v[3])}`)}">${l} 입력 ${kfmt(v[0] + v[1] + v[2])} · 출력 ${kfmt(v[3])}</div>`
+  return `<b title="${nfmt(n4(m) + n4(a))}">${kfmt(n4(m) + n4(a))}</b>${line('본체', m)}${n4(a) ? line('+에이전트', a) : ''}`
+}
 const actualOf = t => (t.cost_usd || 0) + (t.cost_agents_usd || 0)
 const cmpOf = t => COMPARE.map(([id, label]) => { const v = costUsd(t.tk, id) || 0; return { label, v, save: v - actualOf(t) } })
 /** 가정 비용 + 절감(+)·초과(-) : 좋음 다홍·나쁨 네이비(2026-10-06 상태색 규칙) */
@@ -169,8 +178,9 @@ const fuOf = new Map(turns.map(t => [t, followUp(turns, t)]))   // 후속 처리
 const fuBadge = t => { const f = fuOf.get(t); return f ? `<br><span class="badge fu" title="후속 턴 ${esc(f.id)} 에서 이어졌을 가능성(${esc(f.why)}) — 먼저 확인">${FOLLOW_LABEL}</span>` : '' }
 const stateCell = t => { const s = turnStatus(t); return `<span class="badge st-${s.key}">${s.label}</span>${fuBadge(t)}<br><button type="button" class="rr${s.resumable ? ' hot' : ''}" data-cmd="${esc(resumeCmd(t))}" title="${esc(resumeCmd(t))} 를 클립보드에 복사">재수행</button>` }
 const flowText = xs => { const tot = xs.reduce((s, x) => s + x.ms, 0) || 1; return xs.map(x => `${x.label} ${Math.round(100 * x.ms / tot)}%`).join(' > ') }
-const exportRows = rows.map(({ t, d }) => { const c = cmpOf(t); return { ym: fmtTs(Date.parse(t.ts_req)).slice(0, 7), span: spanTs(t).replace(/<br>/g, ' ').replace(/<[^>]+>/g, '').replace(/ ~ $/, ' ~'), start: fmtTs(Date.parse(t.ts_req)), end: t.ts_res ? fmtTs(Date.parse(t.ts_res)) : turnStatus(t).label, st: turnStatus(t).label + (fuOf.get(t) ? ` · ${FOLLOW_LABEL} ${fuOf.get(t).id}` : ''), chg: d.flow.length > 1 ? 1 : 0, cmd: resumeCmd(t), type: CAT_LABEL[t.category] || t.category || '-', flow: flowText(d.flow), tools: toolsText(d.flow), cost: +actualOf(t).toFixed(4), cmp: c.map(x => [+x.v.toFixed(4), +x.save.toFixed(4)]), req: redact(d.req).slice(0, CUT.full), res: redact(d.res).slice(0, CUT.full), note: '' } })
+const exportRows = rows.map(({ t, d }) => { const c = cmpOf(t); return { ym: fmtTs(Date.parse(t.ts_req)).slice(0, 7), span: spanTs(t).replace(/<br>/g, ' ').replace(/<[^>]+>/g, '').replace(/ ~ $/, ' ~'), start: fmtTs(Date.parse(t.ts_req)), end: t.ts_res ? fmtTs(Date.parse(t.ts_res)) : turnStatus(t).label, st: turnStatus(t).label + (fuOf.get(t) ? ` · ${FOLLOW_LABEL} ${fuOf.get(t).id}` : ''), chg: d.flow.length > 1 ? 1 : 0, cmd: resumeCmd(t), type: CAT_LABEL[t.category] || t.category || '-', flow: flowText(d.flow), tools: toolsText(d.flow), cost: +actualOf(t).toFixed(4), tk: tkMain(t), tka: tkAgent(t), cmp: c.map(x => [+x.v.toFixed(4), +x.save.toFixed(4)]), req: redact(d.req).slice(0, CUT.full), res: redact(d.res).slice(0, CUT.full), note: '' } })
 const totalCost = rows.reduce((s, { t }) => s + (t.cost_usd || 0) + (t.cost_agents_usd || 0), 0)
+const TT = tokenTiles(exportRows, kfmt)   // 첫 화면 = 조건 없음(전체) 합계, 화면 스크립트가 같은 함수로 재계산
 const changed = rows.filter(({ d }) => d.flow.length > 1).length
 const body = rows.map(({ t, d }) => {
   const notes = [
@@ -184,17 +194,17 @@ const body = rows.map(({ t, d }) => {
   exportRows[rows.findIndex(r => r.t === t)].note = notes.join(' / ')
   return `<tr data-ym="${fmtTs(Date.parse(t.ts_req)).slice(0, 7)}" data-st="${turnStatus(t).key}"${fuOf.get(t) ? ' data-fu="1"' : ''}><td class="no num" title="${esc(t.id ? t.id.replace(/\.\d+$/, '') : '')}"></td><td class="nw">${spanTs(t)}</td><td class="nw st">${stateCell(t)}</td>
 <td class="nw">${esc(CAT_LABEL[t.category] || t.category || '-')}</td><td>${flow(d.flow, 'm')}</td><td class="tools">${toolsCell(d.flow)}</td>
-<td class="nw num cost">${usd(actualOf(t))}</td><td class="nw num">${cmpOf(t).map(cmpLine).join('')}</td><td class="doc">${doc(d.req)}</td><td class="doc">${doc(d.res)}</td><td class="note">${notes.map(esc).join('<br>')}</td></tr>`
+<td class="nw num tok">${tokCell(t)}</td><td class="nw num cost">${usd(actualOf(t))}</td><td class="nw num">${cmpOf(t).map(cmpLine).join('')}</td><td class="doc">${doc(d.req)}</td><td class="doc">${doc(d.res)}</td><td class="note">${notes.map(esc).join('<br>')}</td></tr>`
 }).join('\n')
 
 const PAGE_SIZE = 10
-const COLS = 11   // # · 작업일시 · 작업 상태 · 유형 · 흐름 · 비용 · 단일 모델 가정 · 지시서 · 결과서 · 기타
+const COLS = 12   // # · 작업일시 · 작업 상태 · 유형 · 흐름 · 사용 도구 · 토큰 · 비용 · 단일 모델 가정 · 지시서 · 결과서 · 기타
 // 화면 스크립트 : 연·월 필터 → 필터 결과 순서로 # 번호 → 10줄 페이지 ; 다운로드는 필터와 무관한 전체 목록(UTF-8 BOM CSV, 엑셀에서 한글·줄바꿈 유지)
 const CLIENT = `(() => {
   const PAGE = ${PAGE_SIZE}, data = JSON.parse(document.getElementById('rowdata').textContent)
   const trs = [...document.querySelectorAll('tbody tr[data-ym]')], fy = document.getElementById('fy'), fm = document.getElementById('fm')
   const fs = document.getElementById('fs'), pg = document.getElementById('pg'), cnt = document.getElementById('cnt'); let page = 1
-  const usd = v => '$' + v.toFixed(2), OPEN = ${JSON.stringify(OPEN_KEYS)}
+  const usd = v => '$' + v.toFixed(2), kfmt = ${kfmt}, tokenTiles = ${tokenTiles}, OPEN = ${JSON.stringify(OPEN_KEYS)}
   const stOk = tr => !fs.value || (fs.value === 'open' ? OPEN.includes(tr.dataset.st) : fs.value === 'open-nofu' ? OPEN.includes(tr.dataset.st) && !tr.dataset.fu : tr.dataset.st === fs.value)
   const btn = (label, p, cur, dis) => '<button type="button" data-p="' + p + '"' + (cur ? ' aria-current="page"' : '') + (dis ? ' disabled' : '') + '>' + label + '</button>'
   function render() {
@@ -203,6 +213,7 @@ const CLIENT = `(() => {
     // 카드 합계 = 필터 결과로 다시 계산 (data.rows 순서 = 표 행 순서)
     const hr = hit.map(tr => data.rows[trs.indexOf(tr)]), cost = hr.reduce((s, r) => s + r.cost, 0)
     document.getElementById('t-n').textContent = hr.length; document.getElementById('t-chg').textContent = hr.reduce((s, r) => s + r.chg, 0); document.getElementById('t-cost').textContent = usd(cost)
+    for (const [id, v] of Object.entries(tokenTiles(hr, kfmt))) document.getElementById(id).textContent = v
     data.cols.forEach((c, ci) => { const v = hr.reduce((s, r) => s + r.cmp[ci][0], 0), d = v - cost, el = document.getElementById('t-d' + ci); document.getElementById('t-c' + ci).textContent = usd(v); el.className = d >= 0 ? 'good' : 'bad'; el.textContent = (d >= 0 ? '절감 ' : '초과 ') + usd(Math.abs(d)) })
     const pages = Math.max(1, Math.ceil(hit.length / PAGE)); page = Math.min(Math.max(1, page), pages)
     trs.forEach(tr => { tr.hidden = true })
@@ -243,6 +254,7 @@ const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta n
 @media (prefers-color-scheme: dark){:root{color-scheme:dark;--surface:#1a1a19;--page:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;--grid:#2c2c2a;--axis:#383835;--w:#3987e5;--o:#d95926;--ring:rgba(255,255,255,.10);--hd:#2b4677}}
 *{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:13.5px/1.5 "Nanum Gothic","Malgun Gothic",system-ui,sans-serif;font-variant-numeric:tabular-nums}
 main{max-width:1600px;margin:0 auto;padding:24px}h1{font-size:21px;margin:0 0 4px}.meta{color:var(--ink2);font-size:12.5px;margin:0 0 14px}
+.sum{font-size:15px;margin:0 0 8px}.sum small{font-size:12px;font-weight:400}td.tok b{font-size:14px}.tile .muted{font-size:12px}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:0 0 14px}.tile{background:var(--surface);border:1px solid var(--ring);border-radius:10px;padding:10px 14px}.tl{color:var(--ink2);font-size:12.5px}.tv{font-size:22px;font-weight:700}
 .card{background:var(--surface);border:1px solid var(--ring);border-radius:10px;padding:6px 10px;overflow-x:auto}
 table{border-collapse:collapse;width:100%;min-width:1800px}th,td{border-bottom:1px solid var(--grid);padding:7px 8px;text-align:left;vertical-align:top}th,th.num{color:#fff;background:var(--hd);position:sticky;top:0;white-space:nowrap;font-weight:700;text-align:center;vertical-align:middle}th small{color:rgba(255,255,255,.75)!important}.ix{display:inline-block;min-width:15px;height:15px;line-height:15px;border-radius:8px;background:var(--axis);color:var(--ink);font-size:10px;font-style:normal;text-align:center;margin-right:4px;vertical-align:1px}.tools{min-width:230px;max-width:340px;font-size:12.5px}.tl2{margin:0 0 5px;line-height:1.45}.k{font-size:11px;padding:0 4px;border-radius:3px;margin-right:2px;color:#fff}.kAgent{background:#2a78d6}.kHook{background:#52514e}.kMCP{background:#8a5cc2}.kSkill{background:#1f8a5a}.kPlugin{background:#b2611a}td.cost{color:var(--w);font-weight:700}.cmpl{white-space:nowrap}.cmpl+.cmpl{margin-top:4px}
@@ -254,9 +266,10 @@ table{border-collapse:collapse;width:100%;min-width:1800px}th,td{border-bottom:1
 </style></head><body><main>
 <h1>요청별 모델·effort 변경 이력</h1>
 <p class="meta">기준 시각 ${fmtTs(FROM)} 이후 요청 · 갱신 ${new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })} (매 턴 종료 시 자동) · 모델 흐름의 점선 칸·옅은 막대 = 서브에이전트 단계 · 칸의 % 와 막대 폭 = 턴 소요 중 시간 비율 · 비용은 API 단가 환산값(구독제, 청구액 아님) · 100% 사용 시 = 같은 토큰량에 그 모델 단가 적용(모델별 토큰량 차이 미반영), 절감 = 가정 비용 - 실제 비용 · 경로·비밀값은 마스킹</p>
-<div class="tiles"><div class="tile"><div class="tl">요청</div><div class="tv" id="t-n">${rows.length}</div></div><div class="tile"><div class="tl">턴 안에서 모델·effort 변경</div><div class="tv" id="t-chg">${changed}</div></div><div class="tile"><div class="tl">비용 합계(API 환산)</div><div class="tv" id="t-cost">${usd(totalCost)}</div></div>${COMPARE.map(([id, l], ci) => { const v = rows.reduce((s, { t }) => s + (costUsd(t.tk, id) || 0), 0), d = v - totalCost; return `<div class="tile"><div class="tl">${l} 100% 사용 시</div><div class="tv" id="t-c${ci}">${usd(v)}</div><div id="t-d${ci}" class="${d >= 0 ? 'good' : 'bad'}">${d >= 0 ? '절감' : '초과'} ${usd(Math.abs(d))}</div></div>` }).join('')}</div>
+<h2 class="sum">조회 결과 합계 <small class="muted">아래 연도·월·상태 조건에 맞는 전체 행 기준(페이지와 무관) · 조건을 바꾸면 즉시 다시 계산 · 토큰·비용은 서브에이전트 포함</small></h2>
+<div class="tiles"><div class="tile"><div class="tl">요청</div><div class="tv" id="t-n">${rows.length}</div></div><div class="tile"><div class="tl">턴 안에서 모델·effort 변경</div><div class="tv" id="t-chg">${changed}</div></div>${[['tk-all', '토큰 총합(본체+에이전트)'], ['tk-in', '입력 토큰(입력+캐시)'], ['tk-out', '출력 토큰(thinking 포함)']].map(([id, l]) => `<div class="tile"><div class="tl">${l}</div><div class="tv" id="${id}">${TT[id]}</div><div class="muted" id="${id}-s">${TT[id + '-s']}</div></div>`).join('')}<div class="tile"><div class="tl">비용 합계(API 환산)</div><div class="tv" id="t-cost">${usd(totalCost)}</div></div>${COMPARE.map(([id, l], ci) => { const v = rows.reduce((s, { t }) => s + (costUsd(t.tk, id) || 0), 0), d = v - totalCost; return `<div class="tile"><div class="tl">${l} 100% 사용 시</div><div class="tv" id="t-c${ci}">${usd(v)}</div><div id="t-d${ci}" class="${d >= 0 ? 'good' : 'bad'}">${d >= 0 ? '절감' : '초과'} ${usd(Math.abs(d))}</div></div>` }).join('')}</div>
 <div class="ctl"><label>연도 <select id="fy"><option value="">전체</option>${[...new Set(exportRows.map(r => r.ym.slice(0, 4)))].sort().reverse().map(y => `<option>${y}</option>`).join('')}</select></label><label>월 <select id="fm"><option value="">전체</option>${Array.from({ length: 12 }, (_, i) => `<option>${String(i + 1).padStart(2, '0')}</option>`).join('')}</select></label><label>상태 <select id="fs"><option value="">전체</option><option value="open">미완료 전체(진행 중+중단+응답 없음)</option><option value="open-nofu">미완료 — 후속 없음(${FOLLOW_LABEL} 제외)</option>${Object.entries(STATUS).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></label><span id="cnt" class="muted"></span><span id="copied" class="muted" role="status"></span><span class="sp"></span><button id="dl" type="button">전체 목록 엑셀 다운로드</button></div>
-<div class="card"><table><thead><tr><th class="num">#</th><th>작업일시</th><th>작업 상태</th><th>작업 유형</th><th>모델&amp;버전 · Effort 흐름</th><th>사용 도구<br><small>Agent · Hook · MCP · Skill · Plugin</small></th><th class="num">비용</th><th class="num">${COMPARE.map(([, l]) => l.replace(' ', '')).join('/')} 100% 사용시<br><small>가정 비용 · 실제 대비</small></th><th>작업 지시서</th><th>작업 결과서</th><th>기타 설명</th></tr></thead>
+<div class="card"><table><thead><tr><th class="num">#</th><th>작업일시</th><th>작업 상태</th><th>작업 유형</th><th>모델&amp;버전 · Effort 흐름</th><th>사용 도구<br><small>Agent · Hook · MCP · Skill · Plugin</small></th><th class="num">토큰<br><small>총합 · 본체 / +에이전트 입력·출력</small></th><th class="num">비용</th><th class="num">${COMPARE.map(([, l]) => l.replace(' ', '')).join('/')} 100% 사용시<br><small>가정 비용 · 실제 대비</small></th><th>작업 지시서</th><th>작업 결과서</th><th>기타 설명</th></tr></thead>
 <tbody>${body ? body + `<tr id="none" hidden><td colspan="${COLS}" class="empty">조회 결과가 없습니다</td></tr>` : `<tr><td colspan="${COLS}" class="empty">기준 시각 이후 완료된 요청 없음 : 다음 요청부터 자동 기록</td></tr>`}</tbody></table></div>
 <nav id="pg" class="pg" aria-label="페이지"></nav>
 </main>

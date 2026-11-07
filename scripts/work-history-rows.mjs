@@ -25,9 +25,10 @@ export function buildTurns(rows, fromMs = Date.parse(DEFAULT_FROM)) {
   for (const r of rows) {
     if (!r.ts_req || Date.parse(r.ts_req) < fromMs) continue
     const key = turnKey(r), t = byKey.get(key)
-    const tk = {}; for (const x of [r, ...(r.agents_detail || [])]) for (const k of TOKEN_KEYS) tk[k] = (tk[k] || 0) + (x.tokens?.[k] || 0)
-    if (!t) { byKey.set(key, { ...r, key, tk, skills: [...(r.skills || [])], agents: [...(r.agents || [])] }); continue }
-    for (const k of TOKEN_KEYS) t.tk[k] += tk[k]
+    const sumTk = xs => Object.fromEntries(TOKEN_KEYS.map(k => [k, xs.reduce((s, x) => s + (x.tokens?.[k] || 0), 0)]))
+    const tka = sumTk(r.agents_detail || []), tk = sumTk([r, ...(r.agents_detail || [])])   // tk = 본체 + 서브에이전트, tka = 서브에이전트만
+    if (!t) { byKey.set(key, { ...r, key, tk, tka, skills: [...(r.skills || [])], agents: [...(r.agents || [])] }); continue }
+    for (const k of TOKEN_KEYS) { t.tk[k] += tk[k]; t.tka[k] += tka[k] }
     for (const k of ['cost_usd', 'cost_agents_usd', 'tools_total', 'tool_errors', 'files_changed', 'elapsed_ms']) t[k] = (t[k] || 0) + (r[k] || 0)
     t.ts_res = r.ts_res || t.ts_res; t.skills.push(...(r.skills || [])); t.agents.push(...(r.agents || []))
     t.interrupted = r.interrupted; t.superseded = t.superseded || r.superseded
@@ -54,6 +55,20 @@ export function turnStatus(t) {
   const cut = t.interrupted && (t.incomplete || !t.ts_res)
   const key = cut ? 'interrupted' : t.superseded ? 'superseded' : t.ts_res ? 'done' : t.absorbed || t.incomplete ? 'noreply' : 'running'
   return { key, label: STATUS[key], resumable: key !== 'done' }
+}
+/**
+ * 조회 결과 합계 토큰 칸 글자(대시보드 상단 — 서버 첫 렌더와 화면 필터 재계산이 이 함수 원문을 함께 씀, 그래서 바깥 이름 참조 금지)
+ * 행 = { tk: 본체 [입력, 캐시 읽기, 캐시 생성, 출력], tka: 서브에이전트 같은 순서 } · 총합 = 4개 합(출력에 thinking 포함) · fmt = 숫자 표기(kfmt)
+ */
+export function tokenTiles(rs, fmt) {
+  const m = [0, 0, 0, 0], a = [0, 0, 0, 0]
+  for (const r of rs) for (let i = 0; i < 4; i++) { m[i] += r.tk[i] || 0; a[i] += r.tka[i] || 0 }
+  const sum = v => v[0] + v[1] + v[2] + v[3], all = m.map((x, i) => x + a[i])
+  return {
+    'tk-all': fmt(sum(all)), 'tk-all-s': '본체 ' + fmt(sum(m)) + ' · 에이전트 ' + fmt(sum(a)),
+    'tk-in': fmt(all[0] + all[1] + all[2]), 'tk-in-s': '입력 ' + fmt(all[0]) + ' · 캐시 읽기 ' + fmt(all[1]) + ' · 캐시 생성 ' + fmt(all[2]),
+    'tk-out': fmt(all[3]), 'tk-out-s': '본체 ' + fmt(m[3]) + ' · 에이전트 ' + fmt(a[3]),
+  }
 }
 /** 미완료 전체(재수행 대상) = 진행 중 + 중단 + 응답 없음 */
 export const OPEN_KEYS = ['running', 'interrupted', 'noreply']
