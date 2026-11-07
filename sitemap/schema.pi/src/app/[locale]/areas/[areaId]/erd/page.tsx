@@ -9,6 +9,8 @@ import { piFetch } from '@pi/auth/client'
 //  편집 뒤 다시 불러올 때 저장 안 한 드래그 위치는 유지
 //  관계선 위치 조정(마스터 지시 2026-10-18) : 선을 누르면 끝점 2개(박스 변 따라 이동·변 바꾸기)·꺾임점 1개(가운데 선 이동) 손잡이, 두 번 누르면 자동으로.
 //   자동 = 가까운 변 + 같은 변에 모인 선 고르게 나눔(modelpi/edge-geo.ts). 옮긴 선만 배치 저장 때 함께 저장(sql/034 mdl_dgm_rel)
+//  관계선 겹침 0(마스터 지시 2026-11-07 "관계선이 절대로 겹치면 안 됨") : 경로 = modelpi/edge-route.ts 격자 A*(박스 피함·같은 선분 공유 없음·교차는 건너뛰기 반원·라벨은 덜 겹치는 자리),
+//   작업 스레드(edge-route.worker.ts)에서 계산 — 엔터티·끝점을 옮기면 다시 계산, 결과가 오기 전 옮긴 관계만 예전 단순 경로(smoothstep). 인쇄·PNG·SVG 는 화면 그림 복사라 같은 경로
 //  인쇄(마스터 지시 2026-10-18) : 툴바 용지·방향 + '페이지 가이드' = 캔버스에 100% 크기 페이지 경계 점선(쪽 번호). 🖨 인쇄 = 미리보기(body 직속 포털)
 //   — 화면 그림(.react-flow__viewport)을 복사해 쪽마다 위치만 바꿔 그림 : '한 장에 맞춤' 또는 '가이드대로 나눔(엔터티 없는 쪽 제외)', @page 용지 지정, 인쇄 때 미리보기 밖은 숨김
 //  표기법(마스터 지시 2026-10-18) : IE(ERwin 정보공학) / 바커(DA#) 선택(이 브라우저에 기억). 바커 = 둥근 박스·# * o, 선 반쪽 실선(필수)·점선(선택),
@@ -24,6 +26,7 @@ import { createPortal } from 'react-dom'
 import { dbmsList } from '@/lib/modelpi/dbms'
 import { autoLayout, boxSize } from '@/lib/modelpi/layout'
 import { autoAnchors, halfDash, project, sidePoint, type Box, type Pt, type RelLyt, type Side } from '@/lib/modelpi/edge-geo'
+import { midOf, routeAll, type RouteReq, type RoutedEdge } from '@/lib/modelpi/edge-route'
 import { fitView as printFit, pageGrid, PAPER, printArea, realign, type Orient } from '@/lib/modelpi/print'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import Attrs from '../model/attrs'
@@ -201,14 +204,14 @@ const nodeTypes = { ent: EntNode }
 
 // 관계선(사용자 정의 선) — 끝점·꺾임점은 부모 화면이 계산해 data 로 넘김. 선택된 선(편집 권한)만 손잡이 3개
 type Grip = 's' | 't' | 'm'
-type RelData = { sp: Pt; tp: Pt; ps: Side; cs: Side; mx: number | null; my: number | null; edit: boolean; onDrag: (id: string, k: Grip, screen: Pt) => void; onReset: (id: string) => void; bk?: { p: boolean; c: boolean } } // bk = 바커 반쪽 점선 여부(부모 쪽·자식 쪽)
+type RelData = { sp: Pt; tp: Pt; ps: Side; cs: Side; mx: number | null; my: number | null; edit: boolean; onDrag: (id: string, k: Grip, screen: Pt) => void; onReset: (id: string) => void; bk?: { p: boolean; c: boolean }; rt?: { d: string; lp: Pt; mid: Pt; lt: string } } // bk = 바커 반쪽 점선 여부(부모 쪽·자식 쪽), rt = 계산된 직교 경로(없으면 smoothstep)
 type REdge = Edge<RelData, 'rel'>
 const POS: Record<Side, Position> = { T: Position.Top, R: Position.Right, B: Position.Bottom, L: Position.Left }
 const GRIP_NM: Record<Grip, string> = { s: '부모 끝점 — 끌어서 박스 변을 따라 이동', t: '자식 끝점 — 끌어서 박스 변을 따라 이동', m: '꺾임점 — 끌어서 가운데 선 이동' }
 
 function RelEdge({ id, data, markerStart, markerEnd, style, label, labelStyle, selected }: EdgeProps<REdge>) {
   const d = data!
-  const [path, lx, ly] = getSmoothStepPath({ sourceX: d.sp.x, sourceY: d.sp.y, sourcePosition: POS[d.ps], targetX: d.tp.x, targetY: d.tp.y, targetPosition: POS[d.cs], ...(d.mx !== null && d.my !== null ? { centerX: d.mx, centerY: d.my } : {}) })
+  const [path, lx, ly] = d.rt ? [d.rt.d, d.rt.lp.x, d.rt.lp.y] : getSmoothStepPath({ sourceX: d.sp.x, sourceY: d.sp.y, sourcePosition: POS[d.ps], targetX: d.tp.x, targetY: d.tp.y, targetPosition: POS[d.cs], ...(d.mx !== null && d.my !== null ? { centerX: d.mx, centerY: d.my } : {}) })
   const grip = (k: Grip, p: Pt) => (
     <div
       key={k}
@@ -230,7 +233,8 @@ function RelEdge({ id, data, markerStart, markerEnd, style, label, labelStyle, s
   )
   // 꺾임점 손잡이 = 가운데 선 위 : 좌우 변끼리면 세로 선(x 만 의미), 위아래 변끼리면 가로 선(y 만 의미), 섞이면 꺾임 1번이라 손잡이 없음
   const hz = (s: Side) => s === 'L' || s === 'R'
-  const mid = hz(d.ps) && hz(d.cs) ? { x: d.mx ?? lx, y: (d.sp.y + d.tp.y) / 2 } : !hz(d.ps) && !hz(d.cs) ? { x: (d.sp.x + d.tp.x) / 2, y: d.my ?? ly } : null
+  //  계산된 경로는 꺾임점 = 경유점(옮긴 자리, 없으면 가장 긴 안쪽 선분 가운데)
+  const mid = d.rt ? (d.mx !== null && d.my !== null ? { x: d.mx, y: d.my } : d.rt.mid) : hz(d.ps) && hz(d.cs) ? { x: d.mx ?? lx, y: (d.sp.y + d.tp.y) / 2 } : !hz(d.ps) && !hz(d.cs) ? { x: (d.sp.x + d.tp.x) / 2, y: d.my ?? ly } : null
   const st = selected ? { ...style, stroke: '#d97706', strokeWidth: 2 } : style
   // 바커 반쪽 선 — 경로 길이를 재서 앞·뒤 절반 dasharray(halfDash)
   const ref = useRef<SVGPathElement>(null)
@@ -239,18 +243,22 @@ function RelEdge({ id, data, markerStart, markerEnd, style, label, labelStyle, s
     const l = ref.current?.getTotalLength() ?? 0
     if (Math.abs(l - len) > 0.5) setLen(l)
   }) // 매 그리기마다 확인(표기 전환·경로 변경 모두) — 길이가 바뀔 때만 상태 갱신
+  // 관계명 = 선 옆 빈 곳(edge-route placeLabels) + 흰 바탕 여백 — 바커는 선을 먼저 그리고 라벨을 위에(라벨이 선·끝 표식에 가려지지 않게)
+  //  자리가 좁으면 줄인 글자('…', 전체는 툴팁) 또는 숨김(관계 편집 패널에 전체 이름)
+  const shown = d.rt && d.rt.lt !== label ? (d.rt.lt ? <><title>{label}</title>{d.rt.lt}</> : undefined) : label
+  const lab = { label: shown, labelX: lx, labelY: ly, labelStyle, labelShowBg: true, labelBgPadding: [4, 2] as [number, number], labelBgBorderRadius: 2, labelBgStyle: { fill: '#fff' } }
   if (d.bk)
     return (
       <>
-        <BaseEdge id={id} path={path} style={{ stroke: 'transparent' }} label={label} labelX={lx} labelY={ly} labelStyle={labelStyle} interactionWidth={14} />
         <path ref={ref} d={path} fill="none" stroke={st?.stroke as string} strokeWidth={st?.strokeWidth} strokeDasharray={len ? halfDash(len, 'first', d.bk.p) : undefined} markerStart={markerStart} />
         <path d={path} fill="none" stroke={st?.stroke as string} strokeWidth={st?.strokeWidth} strokeDasharray={len ? halfDash(len, 'second', d.bk.c) : undefined} markerEnd={markerEnd} />
+        <BaseEdge id={id} path={path} style={{ stroke: 'transparent' }} {...lab} interactionWidth={14} />
         {d.edit && <EdgeLabelRenderer>{[grip('s', d.sp), grip('t', d.tp), mid && grip('m', mid)]}</EdgeLabelRenderer>}
       </>
     )
   return (
     <>
-      <BaseEdge id={id} path={path} markerStart={markerStart} markerEnd={markerEnd} style={st} label={label} labelX={lx} labelY={ly} labelStyle={labelStyle} interactionWidth={14} />
+      <BaseEdge id={id} path={path} markerStart={markerStart} markerEnd={markerEnd} style={st} {...lab} interactionWidth={14} />
       {d.edit && <EdgeLabelRenderer>{[grip('s', d.sp), grip('t', d.tp), mid && grip('m', mid)]}</EdgeLabelRenderer>}
     </>
   )
@@ -464,6 +472,8 @@ function Erd({ areaId }: { areaId: string }) {
   const curRef = useRef<Map<string, { x: number; y: number }>>(new Map()) // 편집 뒤 재조회 시 저장 안 한 드래그 위치 유지
   const keepRef = useRef('') // 편집 뒤 재조회 대상 키(프로젝트|주제영역|단계) — 다른 대상 조회에는 적용 안 함
   const autoRef = useRef<Set<string>>(new Set()) // 자동 배치 후 끌지도 저장하지도 않은 엔터티 — 재조회(관계 추가 등) 때 다시 관계 상대 옆으로 배치
+  const estRef = useRef<Set<string>>(new Set()) // 불러올 때 추정 크기로 자동 배치한 엔터티 — 실측 뒤 박스가 겹치면 실측 크기로 한 번 다시 배치
+  const [boxOvl, setBoxOvl] = useState(0) // 박스끼리 겹친 쌍(저장 좌표 포함) — 안내만, 좌표는 몰래 바꾸지 않음
   const [form, setForm] = useState<'new' | 'edit' | null>(null)
   const [chk, setChk] = useState<{ summary: { no_pk: number; fk_missing: number; issues: number; reviews: number }; issues: Issue[] } | null>(null)
 
@@ -508,6 +518,7 @@ function Erd({ areaId }: { areaId: string }) {
     if (keep) for (const [id, c] of curRef.current) if (!prevAuto.has(id)) pos.set(id, { ent_id: id, ...c, fix: pos.get(id)?.fix ?? false })
     autoRef.current = new Set(es.filter((e) => !pos.has(e.ent_id) && (keep ? prevAuto.has(e.ent_id) || !curRef.current.has(e.ent_id) : dbPos)).map((e) => e.ent_id))
     // 좌표 없는 엔터티만 자동 배치(좌표가 하나도 없으면 전체 배치)
+    estRef.current = new Set(es.filter((e) => !pos.has(e.ent_id)).map((e) => e.ent_id))
     const laid = autoLayout(
       es.map((e) => ({ id: e.ent_id, ...sizeOf(e, lvl, phy, nmo), group: e.subj_id, x: pos.get(e.ent_id)?.x, y: pos.get(e.ent_id)?.y, fixed: pos.get(e.ent_id)?.fix })),
       (j.rels as Rel[]).map((r) => ({ from: r.prnt_ent_id, to: r.chld_ent_id })),
@@ -583,7 +594,20 @@ function Erd({ areaId }: { areaId: string }) {
     const shown = rels.filter((r) => boxes.has(r.prnt_ent_id) && boxes.has(r.chld_ent_id))
     return { boxes, shown, auto: autoAnchors(shown.map((r) => ({ id: r.rel_id, from: r.prnt_ent_id, to: r.chld_ent_id })), boxes) }
   }, [nodes, rels, lvl, phy, nmo, ltReady])
-  const lytOf = useCallback((id: string): RelLyt => lyt[id] ?? { ...geo.auto.get(id)!, mx: null, my: null }, [lyt, geo])
+  // 옮기지 않은 선의 현재 위치 = 계산된 경로의 끝점(변·비율), 아직 없으면 가까운 변 자동값 — 손잡이를 끌기 시작할 때 보이는 자리에서 출발
+  const rtRef = useRef<(id: string) => RoutedEdge | undefined>(() => undefined)
+  const lytOf = useCallback(
+    (id: string): RelLyt => {
+      if (lyt[id]) return lyt[id]
+      const ro = rtRef.current(id)
+      const r = rels.find((x) => x.rel_id === id)
+      const a = r && geo.boxes.get(r.prnt_ent_id), b = r && geo.boxes.get(r.chld_ent_id)
+      if (!ro || !a || !b) return { ...geo.auto.get(id)!, mx: null, my: null }
+      const rat = (bx: Box, s: Side, p: Pt) => Math.round(Math.min(1, Math.max(0, s === 'T' || s === 'B' ? (p.x - bx.x) / (bx.w || 1) : (p.y - bx.y) / (bx.h || 1))) * 1000) / 1000
+      return { ps: ro.ps, pr: rat(a, ro.ps, ro.pts[0]), cs: ro.cs, cr: rat(b, ro.cs, ro.pts[ro.pts.length - 1]), mx: null, my: null }
+    },
+    [lyt, geo, rels],
+  )
   // 손잡이 끌기 — 끝점은 놓은 자리에서 가장 가까운 변·비율로, 꺾임점은 좌표 그대로
   const dragRel = useCallback(
     (id: string, k: Grip, screen: Pt) => {
@@ -620,6 +644,64 @@ function Erd({ areaId }: { areaId: string }) {
       }),
     [rels],
   )
+  // 직교 경로 계산(작업 스레드) — 입력 = 박스·관계·옮긴 선, 관계별 서명(두 박스 좌표·크기 + 옮긴 값)이 같을 때만 결과를 씀
+  //  계산 중 새 입력은 마지막 것만 보관했다가 끝나면 보냄(끌기 중 쌓이지 않음). 작업 스레드를 못 만들면 화면에서 직접 계산
+  const rtIn = useMemo(() => {
+    const bx = (id: string) => { const b = geo.boxes.get(id)!; return `${Math.round(b.x)},${Math.round(b.y)},${Math.round(b.w)},${Math.round(b.h)}` }
+    const reqs: (RouteReq & { label: string | null })[] = geo.shown.map((r) => ({ id: r.rel_id, from: r.prnt_ent_id, to: r.chld_ent_id, label: r.rel_nm, ...(lyt[r.rel_id] ?? {}) }))
+    const sig = new Map(reqs.map((q) => [q.id, `${bx(q.from)}|${bx(q.to)}|${q.ps ?? ''}${q.pr ?? ''}${q.cs ?? ''}${q.cr ?? ''}|${q.mx ?? ''},${q.my ?? ''}|${q.label ?? ''}`]))
+    return { boxes: [...geo.boxes], reqs, sig }
+  }, [geo, lyt])
+  const [routes, setRoutes] = useState<{ m: Map<string, RoutedEdge>; sig: Map<string, string> } | null>(null)
+  rtRef.current = (id) => (routes && routes.sig.get(id) === rtIn.sig.get(id) ? routes.m.get(id) : undefined)
+  const rtWk = useRef<{ w: Worker | null; busy: boolean; next: typeof rtIn | null; seq: number; sent: Map<number, Map<string, string>> }>({ w: null, busy: false, next: null, seq: 0, sent: new Map() })
+  const rtSend = useCallback((x: typeof rtIn) => {
+    const k = rtWk.current
+    if (!k.w) {
+      setRoutes({ m: routeAll(new Map(x.boxes), x.reqs), sig: x.sig })
+      return
+    }
+    if (k.busy) {
+      k.next = x
+      return
+    }
+    k.busy = true
+    k.sent.set(++k.seq, x.sig)
+    k.w.postMessage({ seq: k.seq, boxes: x.boxes, reqs: x.reqs })
+  }, [])
+  useEffect(() => {
+    const k = rtWk.current
+    try {
+      k.w = new Worker(new URL('../../../../../lib/modelpi/edge-route.worker.ts', import.meta.url), { type: 'module' })
+      k.w.onmessage = (e: MessageEvent<{ seq: number; out: [string, RoutedEdge][] }>) => {
+        const sig = k.sent.get(e.data.seq)
+        k.sent.delete(e.data.seq)
+        k.busy = false
+        if (sig) setRoutes({ m: new Map(e.data.out), sig })
+        const nx = k.next
+        k.next = null
+        if (nx) rtSend(nx)
+      }
+      k.w.onerror = () => {
+        // 작업 스레드 실패 — 이후는 화면에서 직접 계산
+        k.w?.terminate()
+        k.w = null
+        k.busy = false
+        const nx = k.next
+        k.next = null
+        if (nx) rtSend(nx)
+      }
+    } catch {
+      k.w = null
+    }
+    return () => {
+      k.w?.terminate()
+      k.w = null
+    }
+  }, [rtSend])
+  useEffect(() => {
+    if (rtIn.reqs.length) rtSend(rtIn)
+  }, [rtIn, rtSend])
   const resetRel = useCallback((id: string) => {
     setLyt(({ [id]: _, ...rest }) => rest)
     setDirty(true)
@@ -628,9 +710,11 @@ function Erd({ areaId }: { areaId: string }) {
   const edges: REdge[] = useMemo(
     () =>
       geo.shown.map((r) => {
-          const l = lytOf(r.rel_id)
-          const sp = sidePoint(geo.boxes.get(r.prnt_ent_id)!, l.ps, l.pr)
-          const tp = sidePoint(geo.boxes.get(r.chld_ent_id)!, l.cs, l.cr)
+          const l0 = lytOf(r.rel_id)
+          const ro = rtRef.current(r.rel_id) // 입력이 같은 계산 결과만
+          const l = ro ? { ...l0, ps: ro.ps, cs: ro.cs } : l0
+          const sp = ro ? ro.pts[0] : sidePoint(geo.boxes.get(r.prnt_ent_id)!, l.ps, l.pr)
+          const tp = ro ? ro.pts[ro.pts.length - 1] : sidePoint(geo.boxes.get(r.chld_ent_id)!, l.cs, l.cr)
           const many = r.crdn_cd !== '11'
           const o = {
             id: r.rel_id,
@@ -640,7 +724,7 @@ function Erd({ areaId }: { areaId: string }) {
             targetHandle: `t-${l.cs.toLowerCase()}`,
             type: 'rel' as const,
             selected: selRel === r.rel_id,
-            data: { sp, tp, ps: l.ps, cs: l.cs, mx: l.mx, my: l.my, edit: lay && selRel === r.rel_id, onDrag: dragRel, onReset: resetRel, ...(nt === 'BK' ? { bk: { p: r.chld_opt_yn === 'Y', c: r.prnt_opt_yn === 'Y' } } : {}) },
+            data: { sp, tp, ps: l.ps, cs: l.cs, mx: l.mx, my: l.my, edit: lay && selRel === r.rel_id, onDrag: dragRel, onReset: resetRel, ...(nt === 'BK' ? { bk: { p: r.chld_opt_yn === 'Y', c: r.prnt_opt_yn === 'Y' } } : {}), ...(ro ? { rt: { d: ro.d, lp: ro.lp, mid: midOf(ro.pts), lt: ro.lt } } : {}) },
             label: r.rel_nm ?? undefined,
             labelStyle: { fontSize: 10 },
             ...(nt === 'BK'
@@ -659,14 +743,37 @@ function Erd({ areaId }: { areaId: string }) {
           const vk = verMark?.rel[r.rel_id] // 버전 차이 표시 : 추가·변경 관계선 색·굵게
           return vk ? { ...o, style: { ...o.style, stroke: VER_C[vk], strokeWidth: 2.6 } } : o
         }),
-    [geo, lytOf, selRel, lay, dragRel, resetRel, nt, verMark],
+    [geo, lytOf, selRel, lay, dragRel, resetRel, nt, verMark, routes, rtIn],
   )
 
   const curPos = () => Object.fromEntries(nodes.map((n) => [n.id, { ...n.position }]))
+  // 배치 크기 = 화면 실측(measured) 우선 — 추정(boxSize)은 글꼴·최대 폭 420 상한 때문에 실제보다 작을 수 있어 박스끼리 겹쳤음(2026-11-07 화면 검토)
+  const realSize = (n: ENode) => (n.measured?.width && n.measured?.height ? { w: Math.ceil(n.measured.width), h: Math.ceil(n.measured.height) } : sizeOf(n.data.ent, lvl, phy, nmo))
+  // 실측이 끝나면 박스 겹침 검사 — 이번에 자동 배치한 엔터티가 겹치면 실측 크기로 다시 배치(저장 좌표는 그대로, 저장은 사용자가), 남은 겹침(저장 좌표끼리)은 안내
+  useEffect(() => {
+    if (!nodes.length || nodes.some((n) => !n.measured?.width)) return
+    const bs = [...geo.boxes]
+    const pairs: [string, string][] = []
+    // ponytail: O(n²) 박스 쌍 검사 — 엔터티 500 상한이라 충분, 수천 개면 격자 색인
+    for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) { const [a, b] = [bs[i][1], bs[j][1]]; if (a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h) pairs.push([bs[i][0], bs[j][0]]) }
+    const est = estRef.current
+    estRef.current = new Set()
+    if (est.size && pairs.some(([a, b]) => est.has(a) || est.has(b))) {
+      const laid = autoLayout(
+        nodes.map((n) => ({ id: n.id, ...realSize(n), group: n.data.ent.subj_id, ...(est.has(n.id) ? {} : { x: n.position.x, y: n.position.y }), fixed: n.data.fix })),
+        rels.map((r) => ({ from: r.prnt_ent_id, to: r.chld_ent_id })),
+        { mode: 'new' },
+      )
+      setNodes((ns) => ns.map((n) => (est.has(n.id) ? { ...n, position: laid[n.id] } : n)))
+      return
+    }
+    setBoxOvl(pairs.length)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geo])
   const arrange = (mode: 'all' | 'new') => {
     setUndo(curPos())
     const laid = autoLayout(
-      nodes.map((n) => ({ id: n.id, ...sizeOf(n.data.ent, lvl, phy, nmo), group: n.data.ent.subj_id, x: n.position.x, y: n.position.y, fixed: n.data.fix })),
+      nodes.map((n) => ({ id: n.id, ...realSize(n), group: n.data.ent.subj_id, x: n.position.x, y: n.position.y, fixed: n.data.fix })),
       rels.map((r) => ({ from: r.prnt_ent_id, to: r.chld_ent_id })),
       { mode },
     )
@@ -954,6 +1061,11 @@ function Erd({ areaId }: { areaId: string }) {
             물리 모델에서 전환·작성완료
           </Link>
           하면 보입니다.
+        </p>
+      )}
+      {boxOvl > 0 && (
+        <p className="mt-2 text-sm text-amber-800" role="note">
+          엔터티 박스 {boxOvl}쌍이 서로 겹쳐 있습니다(저장된 위치) — 관계선이 겹친 박스 사이를 지나지 못해 테두리로 돌아갈 수 있습니다. {lay ? '툴바 자동 배치를 누르면 박스 간격을 다시 잡아 선이 짧게 정리된 모습을 미리 볼 수 있고, 저장해야 반영됩니다.' : '작성완료 ERD 는 완료 취소 후 자동 배치를 누르면 박스 간격을 다시 잡아 선이 짧게 정리된 모습을 미리 볼 수 있고, 저장해야 반영됩니다.'}
         </p>
       )}
       {msg && (
