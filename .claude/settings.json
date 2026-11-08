@@ -92,7 +92,11 @@
             "timeout": 10
           }
         ]
-      }
+      },
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/request-graph-refresh.mjs\"", "timeout": 5 }] }
+    ],
+    "SubagentStop": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/request-graph-refresh.mjs\"", "timeout": 5 }] }
     ],
     "PostToolUse": [
       {

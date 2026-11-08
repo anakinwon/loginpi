@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 // 훅으로 호출되면 자신을 분리 프로세스(--now)로 다시 띄우고 즉시 종료 : headless(-p) 세션 종료 시 async 훅 자식이 정리돼 갱신이 누락되던 문제(2026-10-09 검증) 방지
 if (!process.argv.includes('--now')) {
-  spawn(process.execPath, [fileURLToPath(import.meta.url), '--now'], { cwd: ROOT, detached: true, stdio: 'ignore', windowsHide: true }).unref()
+  spawn(process.execPath, [fileURLToPath(import.meta.url), '--now', '--stop'], { cwd: ROOT, detached: true, stdio: 'ignore', windowsHide: true }).unref()
   process.exit(0)
 }
 
@@ -18,6 +18,7 @@ const JOBS = [
   ['scripts/work-history-report.mjs', '--period', 'all'],   // 일·주·월·년 통계 + main-dashboard HTML (실측 약 0.8초)
   ['scripts/model-change-dashboard.mjs'],                   // mywork : 요청별 모델·effort 변경이력 (약 0.4초)
   ['scripts/my-claude-model-dashboard.mjs'],                // mywork : 모델 운용 현황 (약 0.6초)
+  ['scripts/request-graph.mjs', '--md', '--quiet', '--trigger', process.argv.includes('--stop') ? 'stop' : 'manual'],   // mywork : 요청 처리 흐름 그래프 실데이터판 + 요청별 md(.claude/engineering/50. graph/requests/, gitignore), 실행 기록 트리거 = 훅 경유 stop · 직접 --now 는 manual
 ]
 
 for (const [script, ...args] of JOBS) {
