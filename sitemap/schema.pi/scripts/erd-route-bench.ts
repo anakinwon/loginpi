@@ -1,4 +1,4 @@
-// ERD 관계선 경로 실데이터 측정(2026-11-07) — Pi통신 과금 모델(sitemap/pitel/model/logical/<영역>.json) 7개 주제영역을 ERD 입력(박스 크기·관계)으로 바꿔
+// ERD 관계선 경로 실데이터 측정(2026-11-07) — Pi통신 과금 모델(sitemap/schema.pi/pitel/model/logical/<영역>.json) 7개 주제영역을 ERD 입력(박스 크기·관계)으로 바꿔
 //  개선 전(기존 가까운 변 끝점 + React Flow smoothstep 경로·선 가운데 라벨) / 후(edge-route 격자 A* + hop + 선 옆 라벨)의 박스 겹침·평행 겹침·관통·교차·라벨 겹침·총 길이·최대 우회비·계산 ms 를 표로 출력
 //  실행 : node scripts/erd-route-bench.ts [모델 폴더(기본 ../pitel/model/logical)]
 import { readFileSync, realpathSync } from 'node:fs'
@@ -9,7 +9,7 @@ import { autoLayout, boxSize } from '../src/lib/modelpi/layout.ts'
 import { autoAnchors, sidePoint, type Box, type Pt } from '../src/lib/modelpi/edge-geo.ts'
 import { countBoxOverlaps, countCrossings, countLabelBoxHits, countLabelHits, countNodeHits, countOverlaps, detourStats, labelSize, placeLabels, routeEdges } from '../src/lib/modelpi/edge-route.ts'
 
-const DIR = process.argv[2] ?? join(import.meta.dirname, '../../pitel/model/logical')
+const DIR = process.argv[2] ?? join(import.meta.dirname, '../pitel/model/logical')
 const AREAS = ['PRD', 'CUS', 'ORD', 'PAY', 'INV', 'COL', 'PRM']
 // 개선 전 경로 = 화면이 쓰던 @xyflow/system getSmoothStepPath(모서리 반경 0 → 꺾은점만)
 const req = createRequire(join(realpathSync(join(import.meta.dirname, '../node_modules/@xyflow/react')), 'package.json'))
