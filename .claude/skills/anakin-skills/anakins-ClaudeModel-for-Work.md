@@ -18,6 +18,7 @@
 3. 산출(앱 코드·SQL·문서·도구·대시보드·설정 작성과 수정) : anakin_phase-build = Opus · effort high, 쓰기 가능, tsc·단위 테스트까지 실행(pnpm build 관문은 검증 단계) ; 쉬운 수정도 위임
 4. 검증(산출 직후 실행 확인 : 타입 체크·lint·build·테스트·자체 점검·렌더) : anakin_phase-verify = Sonnet · medium, 프로젝트 파일 수정 안 함 ; 명령 수와 무관하게 위임, 실패 시 anakin_phase-build 재작업 후 재검증
 5. 검수(문서·i18n·사용자 표시 텍스트 산출물의 요구·규칙 대조) : anakin_phase-review = Opus · high, 읽기 전용, DOCS 작업 ; 파일로 저장하는 문서·보고서·i18n 메시지면 분량과 무관하게 생략 불가
+5-1. 그래프 분석(산출 턴만, 검증·검수 뒤·팀장 승인 앞 : 이 요청의 흐름·엔지니어링 N/5·미수행 슬롯·비정상 흐름 판독) : anakin_phase-graph = Sonnet · medium, 읽기 전용 + 생성기 node scripts/request-graph.mjs --md 실행만 ; 조회·커밋·결론 단독 턴 제외(비용) (2026-11-08 마스터 신설)
 6. 응답(정리·회신) : 메인, effort medium 기본값 ; 조회는 수집 단계, 설정 변경은 산출 단계, 커밋은 6-1 로 위임
 6-1. 커밋·푸시(분류 GIT) : anakin_phase-commit = Haiku 4.5(effort 미지원), 저장소 git 규칙(.claude/rules/git-rules.md) 고정 수행, src/ 변경은 pnpm build 통과 확인 후에만, 충돌·behind·훅 실패는 멈추고 보고 ; Haiku 5.5는 원 환경 2.1.293에서 400 오류(별칭·전체 ID·서브에이전트 모두, 2026-10-08) [확인중 : 2.1.295 재시험] ; 4.5 실호출 [확인중 : loginpi 첫 커밋 턴]
 7. 취합·검토·승인(팀장) : teamanakin-admin = Opus · high ; 팀원(anakin_phase-*)이 1명 이상 실행된 턴은 생략 불가 마지막 단계(커밋 단독 턴은 제외 : 푸시 후 반려는 되돌릴 수 없고 commit 이 자체 중단 규칙을 가짐 ; 조회 단독 턴(수집 → 응답)도 제외 — 마스터 확정 2026-11-07), 승인·조건부 승인·반려 판정 ; 반려 시 anakin_phase-build 재작업 후 재승인 ; 2026-10-22 정기 재평가(재배정안)도 담당
@@ -33,6 +34,7 @@
 5. teamanakin-admin(팀장 : 취합·검토·승인, 정기 재평가) : 주 Opus·high / 보조 없음 ; 스킬·MCP 없음(점검 명령·대시보드 스크립트 2종)
 6. anakin_phase-commit(커밋·푸시) : 주 Haiku 4.5(전체 ID) / 보조 없음 ; 스킬·MCP 없음
 7. anakin_phase-build(산출, 2026-11-07 신설) : 주 Opus·high / 보조 [TBD : 재평가 후] ; 스킬은 필요 시 Skill 도구, MCP 없음
+8. anakin_phase-graph(그래프 분석, 2026-11-08 신설) : 주 Sonnet·medium / 보조 [TBD : 재평가 후] ; 스킬·MCP 없음(생성기 scripts/request-graph.mjs)
 
 - 스킬 사전 주입(skills: 필드)은 전원 미사용 : 위임 1회 사용량은 도구를 쓰지 않는 짧은 응답도 37,024~58,675 토큰(2026-10-08 원 환경 서브에이전트 완료 알림 usage 실측)이고 주입 본문이 여기에 더해짐, 600단어 이하 후보(karpathy-guidelines·verification-before-completion)는 CLAUDE.md 작업 원칙·정의 본문과 중복
 - 스킬은 정의 본문에 "필요 시 Skill 도구로 호출" 문구로 지정(서브에이전트는 이 기준서를 읽지 않음)
@@ -71,7 +73,7 @@
 - 원 환경 실측(2026-10-08) : Opus 5.5 생성 속도 144 tok/s·1차 수용률 95.2%, Fable 5.1 85 tok/s·90.9%
 - 서브에이전트 모델 결정 순서 : Agent 호출 model > 정의 model: > CLAUDE_CODE_SUBAGENT_MODEL > 메인 ; 정의 effort는 CLAUDE_CODE_EFFORT_LEVEL 환경변수를 덮어쓰지 못함(loginpi PC 미설정)
 - 상태 표시 : 메인 상태줄에 메인 모델·💪effort와 진행 중 단계(▶ 단계 모델·effort)가 2초 주기로 갱신, 에이전트 패널 행마다 [단계] 에이전트 · 실제 모델 · effort · 경과 표시(.claude/subagent-statusline.mjs) ; 사용자에게 단계 전환을 따로 알릴 필요 없음
-- 정의 파일(teamAnakin) : .claude/agents/teamAnakin/ 의 anakin_phase-collect·anakin_phase-decide·anakin_phase-verify·anakin_phase-review·anakin_phase-commit·anakin_phase-build·teamAnakin_admin(name teamanakin-admin)
+- 정의 파일(teamAnakin) : .claude/agents/teamAnakin/ 의 anakin_phase-collect·anakin_phase-decide·anakin_phase-verify·anakin_phase-review·anakin_phase-commit·anakin_phase-build·anakin_phase-graph·teamAnakin_admin(name teamanakin-admin)
 
 ## 재평가
 
@@ -81,7 +83,7 @@
 
 1. 저장소를 받으면 스킬·단계 에이전트·훅·상태줄이 함께 동작 : .claude/skills/anakin-skills/, .claude/agents/teamAnakin/, .claude/hooks/model-advisor.mjs, .claude/subagent-statusline.mjs, .claude/statusline.sh, .claude/settings.json(UserPromptSubmit·SubagentStart 훅, statusLine refreshInterval, subagentStatusLine)
 2. 전제 : Claude Code 2.1.293 이상(loginpi 2.1.295 확인)(subagentStatusLine의 agentType), Node.js, Git Bash(statusline.sh), 단계 판정 정규식은 한국어 요청 기준
-3. 팀 에이전트 7종(팀장 + 단계 6종)은 저장소에 포함(.claude/agents/teamAnakin/)
+3. 팀 에이전트 8종(팀장 + 단계 7종)은 저장소에 포함(.claude/agents/teamAnakin/)
 4. 비용 고지 : phase-decide는 Fable 고정 ; Fable 단가는 Opus 5.5의 2.5배(입력 10 대 4, 출력 50 대 20 USD/MTok ; docs.claude.com pricing 2026-10-06·08 확인, scripts/work-history-core.mjs PRICING) : API 종량제 사용자는 결론 단계마다 비용 증가, 원하지 않으면 anakin_phase-decide.md 의 model 을 opus 로 변경 ; 구독제 사용 한도 영향은 [확인중 : 공식 문서]
 5. 대시보드 2종은 수동 실행(Stop 훅 미등록) : node scripts/my-claude-model-dashboard.mjs · node scripts/model-change-dashboard.mjs → work-statistics/mywork/(gitignore)
 6. 저장소 밖 공개(플러그인·공개 저장소)는 미실시 : 개인 실측치·환경 의존 항목 분리 후 별도 결정

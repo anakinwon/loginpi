@@ -338,7 +338,7 @@ sitemap/cafe.pi/src/
 
 **목표:** 한 턴 안의 단계(수집 → 결론 → 산출 → 검증 → 검수 → 커밋)마다 맞는 모델·effort의 서브에이전트에 넘기고, 팀장이 결과를 취합·승인한 뒤 메인이 보고한다.
 
-**구성:** 정의 `.claude/agents/teamAnakin/` — `anakin_phase-collect`(수집·Sonnet) · `anakin_phase-decide`(결론·Fable) · `anakin_phase-build`(산출·Opus, 2026-11-07 신설) · `anakin_phase-verify`(검증·Sonnet) · `anakin_phase-review`(문서 검수·Opus) · `anakin_phase-commit`(커밋·Haiku 4.5) · `teamanakin-admin`(팀장·Opus). 운용 기준서 `.claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md`.
+**구성:** 정의 `.claude/agents/teamAnakin/` — `anakin_phase-collect`(수집·Sonnet) · `anakin_phase-decide`(결론·Fable) · `anakin_phase-build`(산출·Opus, 2026-11-07 신설) · `anakin_phase-verify`(검증·Sonnet) · `anakin_phase-review`(문서 검수·Opus) · `anakin_phase-graph`(그래프 분석·Sonnet, 2026-11-08 신설 — 산출 턴의 검증 뒤·승인 앞) · `anakin_phase-commit`(커밋·Haiku 4.5) · `teamanakin-admin`(팀장·Opus). 운용 기준서 `.claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md`.
 
 **트리거:** UserPromptSubmit 훅 `.claude/hooks/model-advisor.mjs`가 요청마다 `[모델 단계 계획]` 줄을 주입 → 그 순서로 호출. 팀원이 1명이라도 실행된 턴은 **`teamanakin-admin` 승인 단계 생략 불가**(커밋·조회 단독 턴 제외 — 조회 단독 제외는 마스터 확정 2026-11-07). `[모델 단계 계획]`이 주입된 턴은 위 "작업 수행 원칙" ③④의 verifier·code-reviewer 대신 teamAnakin 단계가 우선하며, 반려 시 재작업 상한 5회는 동일(2026-11-08 마스터 10→5). 인증·결제·페이지 변경은 Pi Browser 실기기 미검증이면 APPROVED 불가(최대 CONDITIONAL).
 
@@ -354,6 +354,7 @@ sitemap/cafe.pi/src/
 | 2026-10-09 | 타 프로젝트(장표·공문서·DR) 팀 이식 — 정의 6종을 loginpi 규칙(pnpm build 관문·Pi Browser 실기기·브랜드 표기·DA 표준)으로 변형, korean-law MCP·read-hwp·check-doc-style·DRM 절차 제외, subagent-statusline 신규, 훅 2종·subagentStatusLine·refreshInterval 등록, 공용 work-history 스크립트의 `npm run` 회귀를 `pnpm`으로 복원, 요청별 변경 대시보드 기준 시각을 loginpi 도입 시점으로 | agents/teamAnakin·skills/anakin-skills·hooks·settings.json·scripts | 마스터 지시 — teamAnakin 팀으로 프로젝트 진행 |
 | 2026-10-09 | ultrathink 자동 선별(model-advisor)·ultracode 상시(settings.local)·통계/mywork 자동 갱신(Stop async)·sitemap.pi 세션 기록 | hooks·settings·sitemap/.claude | 마스터 지시 — 모든 작업 이력·실시간 통계·변경이력 |
 | 2026-11-07 | 산출 단계 에이전트 `anakin_phase-build`(Opus·high) 신설, `model-advisor` 단계 계획·운용 기준서·팀장 정의의 '산출 → 메인'·'메인 직접'을 build·위임으로 개정(selftest 회귀 assert 추가) | agents/teamAnakin·hooks·skills/anakin-skills·CLAUDE.md | 마스터 지시 — 메인 직접 작업 금지(정본 `.claude/engineering/10. prompt/anakins_prompt.md`) |
+| 2026-11-08 | 그래프 분석 에이전트 `anakin_phase-graph`(Sonnet·medium) 신설 — 요청 흐름 그래프(`scripts/request-graph.mjs`) 갱신·판독(엔지니어링 N/5·미수행·비정상 흐름), `model-advisor` 산출 턴 계획에 검증 뒤·팀장 승인 앞 단계 추가(selftest 회귀 assert 갱신), 상태줄 [그래프] 라벨, 팀장 정의·운용 기준서·엔지니어링 노드 카드 반영 | agents/teamAnakin·hooks·subagent-statusline·skills/anakin-skills·engineering·CLAUDE.md | 마스터 결정 — "그래프 분석의 담당 서브에이전트 추가"(컨텍스트 분석 = collect 확정) |
 
 ---
 
