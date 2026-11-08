@@ -1,0 +1,309 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>요청 처리 흐름 그래프 — 설계도</title>
+<style>
+:root{color-scheme:light;--surface:#fcfcfb;--page:#f9f9f7;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--w:#2a78d6;--o:#eb6834;--ring:rgba(11,11,11,.10)}
+:root[data-theme=dark]{--surface:#1a1a19;--page:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--w:#3987e5;--o:#d95926;--ring:rgba(255,255,255,.10);color-scheme:dark}@media (prefers-color-scheme: dark){:root:not([data-theme=light]){--surface:#1a1a19;--page:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--w:#3987e5;--o:#d95926;--ring:rgba(255,255,255,.10);color-scheme:dark}}
+.st-done{--sc:#3fa66b;--st:#1e6b40;--sf:#dcf5e3;}.st-running{--sc:#c9b800;--st:#1a1a1a;--sf:#fff200;--si:#1a1a1a;}.st-error{--sc:#d03b3b;--st:#b42f2f;}.st-blocked{--sc:#8a5cc2;--st:#7446ad;}.st-missing{--sc:#eb6834;--st:#a8461a;}.st-unassigned{--sc:#898781;--st:#5f5e5a;}.st-notrun{--sc:#c3c2b7;--st:#5f5e5a;}:root[data-theme=dark] .st-done{--sc:#5cc98a;--st:#7fdca4;--sf:#1f3d2b;}:root[data-theme=dark] .st-error{--sc:#d03b3b;--st:#f0705c;}:root[data-theme=dark] .st-blocked{--sc:#8a5cc2;--st:#b993e6;}:root[data-theme=dark] .st-missing{--sc:#eb6834;--st:#f08a5d;}:root[data-theme=dark] .st-unassigned{--sc:#898781;--st:#b0afa9;}:root[data-theme=dark] .st-notrun{--sc:#c3c2b7;--st:#a9a8a2;}@media (prefers-color-scheme: dark){:root:not([data-theme=light]) .st-done{--sc:#5cc98a;--st:#7fdca4;--sf:#1f3d2b;}:root:not([data-theme=light]) .st-error{--sc:#d03b3b;--st:#f0705c;}:root:not([data-theme=light]) .st-blocked{--sc:#8a5cc2;--st:#b993e6;}:root:not([data-theme=light]) .st-missing{--sc:#eb6834;--st:#f08a5d;}:root:not([data-theme=light]) .st-unassigned{--sc:#898781;--st:#b0afa9;}:root:not([data-theme=light]) .st-notrun{--sc:#c3c2b7;--st:#a9a8a2;}}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:13.5px/1.5 "Nanum Gothic","Malgun Gothic",system-ui,sans-serif}
+header{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 20px 6px}h1{font-size:19px;margin:0}.meta{color:var(--ink2);font-size:12.5px;margin:0 20px 10px}.meta a{color:var(--w);font-weight:700}.sp{flex:1}
+button,input,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:6px;padding:3px 9px}button{cursor:pointer}button[aria-pressed=true]{background:var(--w);border-color:var(--w);color:#fff}button:disabled{opacity:.4;cursor:default}
+.wrap{display:grid;grid-template-columns:260px minmax(0,1fr) 280px;gap:12px;padding:0 20px 20px}@media (max-width:1100px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--ring);border-radius:10px;padding:10px 12px;min-width:0}
+.ctl{display:grid;gap:6px;margin:0 0 8px}#list{list-style:none;margin:0;padding:0;max-height:70vh;overflow:auto}#list button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--grid);border-radius:0;background:none;padding:6px 4px}#list button[aria-current]{background:color-mix(in srgb,var(--w) 14%,transparent)}
+.rt,.rm{display:block;color:var(--muted);font-size:11.5px}.rh{display:block;word-break:break-all}.lpg{display:flex;gap:6px;align-items:center;margin-top:8px}
+.gwrap{height:calc(100vh - 225px);min-height:420px;border:1px solid var(--grid);border-radius:8px;overflow:hidden}#svg{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.gtitle{margin:0 0 6px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ghd{display:flex;gap:8px;align-items:flex-start}.ghd .legend{flex:1}.zc button{min-width:34px;padding:2px 8px}
+.edge{fill:none;stroke:var(--axis);stroke-width:1.4}.flowon .edge{stroke-opacity:.35}.node,.fnode{cursor:pointer}
+.fl .v{fill:none;stroke-width:2.2}.fl .hit{fill:none;stroke:transparent;stroke-width:12}.flows:not(.fv) .fl{pointer-events:none}.fv .fl .hit{pointer-events:stroke}
+.fl.done .v{stroke:#3fa66b}.seqg.done .sq{fill:#3fa66b}.fl.running .v{stroke:#c9b800}.seqg.running .sq{fill:#c9b800}.fl.planned .v{stroke:#898781}.seqg.planned .sq{fill:#898781}.fl.example .v{stroke:#898781}.seqg.example .sq{fill:#898781}.fl.design .v{stroke:#2a78d6}.seqg.design .sq{fill:#2a78d6}.fl.loop .v{stroke-width:2.6}
+.fl.running .v{stroke-width:3.2;animation:pulse 1.2s ease-in-out infinite}.fl.plan .v{stroke-dasharray:6 5}.seqg.plan{opacity:.45}
+.seqg.running .sq{fill:#fff200;stroke:#c9b800}.sq{stroke:var(--surface);stroke-width:1.5}.sqt{font-size:9.5px;font-weight:700;fill:#fff}.seqg.running .sqt{fill:#1a1a1a}.lpl{font-size:10.5px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px}
+.fv .seqg{opacity:0}.fv .fl:hover .seqg{opacity:1}.term.pend .box,.fnode.term.pend circle{stroke-dasharray:4 3}.fleg{color:var(--ink2)}.fleg .fr{color:#c9b800;text-shadow:0 0 4px #fff200}
+.box{fill:var(--sf,var(--surface));stroke:var(--sc);stroke-width:1.6}.strip{fill:var(--sc)}.st-missing .box{stroke-dasharray:5 3;stroke-width:2}
+.l1{font-size:12.5px;fill:var(--si,var(--ink))}.l1.b{font-weight:700}.l2{font-size:11.5px;fill:var(--si,var(--st))}.tm{font-size:10px;fill:var(--si,var(--ink2))}
+.fnode circle{fill:var(--sf,var(--sc));stroke:var(--sc);stroke-width:2}.fnode.st-missing circle{fill:var(--surface);stroke-dasharray:3 2}
+.fnode .l1{font-size:12px;fill:var(--ink2);paint-order:stroke;stroke:var(--page);stroke-width:3px;stroke-linejoin:round}.fnode .l1.hid{opacity:0}.fnode:hover .l1{opacity:1;fill:var(--ink)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:0 0 8px}.legend i{display:inline-block;width:11px;height:11px;border-radius:6px;margin-right:4px;vertical-align:-1px;background:var(--sf,var(--sc));border:1.5px solid var(--sc)}.legend i.st-missing{border-style:dashed;background:transparent}
+.badge{display:inline-block;border:1px solid var(--axis);border-radius:5px;padding:0 6px;font-size:12px}.badge[class*=st-]{color:var(--st);border-color:var(--sc);background:var(--sf,transparent)}.badge.st-missing{border-style:dashed}.est{border-style:dashed;color:var(--o);border-color:var(--o)}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 1px #fff200)}50%{filter:drop-shadow(0 0 8px #fff200) drop-shadow(0 0 3px #c9b800)}}@keyframes blink{50%{opacity:.2}}@keyframes blinkf{50%{fill-opacity:.15}}
+.st-running .box,.fnode.st-running circle,.legend i.st-running,.badge.st-running{animation:pulse 1.2s ease-in-out infinite}.blink{animation:blink 1.2s ease-in-out infinite}tspan.blink{animation-name:blinkf}
+@media (prefers-reduced-motion: reduce){.fl.running .v{animation:none;stroke-width:4.5}.st-running .box,.fnode.st-running circle,.legend i.st-running,.badge.st-running,.blink{animation:none}.st-running .box,.fnode.st-running circle{stroke-width:3.5}.legend i.st-running,.badge.st-running{border-width:3px}}
+#detail h3{font-size:15px;margin:0 0 6px;word-break:break-all}#detail h4{font-size:13px;margin:12px 0 4px}#detail ul{padding-left:18px;margin:6px 0}#detail dt{color:var(--muted);font-size:12px;margin-top:8px}#detail dd{margin:0}#detail a{color:var(--w)}.tm{font-size:12px;color:var(--ink2)}
+.rd{border-collapse:collapse;width:100%;font-size:11.5px}.rd th,.rd td{border-bottom:1px solid var(--grid);padding:2px 4px;text-align:left;vertical-align:top}.rd th{color:var(--muted);font-weight:400}.rd .sum td{font-weight:700;border-bottom:0}.muted{color:var(--muted)}
+</style></head><body>
+<header><h1>요청 처리 흐름 그래프 <small class="muted">설계도</small></h1><span class="sp"></span>
+<button type="button" data-view="tree" aria-pressed="true">계층 트리</button><button type="button" data-view="force" aria-pressed="false">자유 배치(Obsidian 스타일)</button><button type="button" id="flow" aria-pressed="true" title="시작 → 실행 순서 → 종료 화살표 켜기/끄기">실행 경로</button><button type="button" id="theme" title="라이트/다크 전환">라이트/다크</button></header>
+<p class="meta">설계도판 — 실데이터(요청문·비용·시각) 없음, 시간은 형식 자리표시. 실요청 모니터링판은 work-statistics/mywork/myRequestGraph.html(gitignore, 턴 종료·서브에이전트 시작/종료 때 자동 갱신 + 화면 자동 새로고침). 노드를 누르면 역할·검수 기준·정본 문서. 원문 1.1.5.3.1 은 번호 오기로 보고 1.1.5.2.1 로 정규화. · <a href="../../../work-statistics/mywork/myRequestGraph.html">실시간 모니터링판 열기</a> <span class="muted">(로컬 생성 후 열림)</span></p>
+<div class="wrap">
+<aside class="card"><div class="ctl" hidden><input id="q" type="search" placeholder="요청문 검색"><select id="fc"><option value="">카테고리 전체</option></select><select id="fd"><option value="">날짜 전체</option></select></div>
+<ul id="list"></ul><div class="lpg" hidden><button type="button" id="lprev">‹ 이전</button><button type="button" id="lnext">다음 ›</button><span id="lcnt" class="muted"></span></div></aside>
+<section class="card"><div class="ghd"><div class="legend"><span><i class="st-done"></i>완료</span><span><i class="st-running"></i>진행</span><span><i class="st-error"></i>오류</span><span><i class="st-blocked"></i>BLOCKED</span><span><i class="st-missing"></i>미수행</span><span><i class="st-unassigned"></i>미배정(설계)</span><span><i class="st-notrun"></i>미실행</span><span><span class="badge est">시간 기준 연결(추정)</span></span><span class="fleg"><b style="color:#3fa66b">—</b> 지나감(실선) · <b style="color:#898781">- -</b> 예정(점선) · <b class="fr">—</b> 진행 중 노드로 진입 · 되돌이 = k회차</span></div><span class="zc" role="group" aria-label="확대/축소"><button type="button" data-z="fit" title="그림 전체를 화면에 맞춤">맞춤</button> <button type="button" data-z="in" title="확대">+</button> <button type="button" data-z="out" title="축소">−</button></span></div>
+<p id="gtitle" class="gtitle"></p><div class="gwrap"><svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="요청 처리 흐름 그래프"></svg></div></section>
+<aside class="card" id="detail"></aside>
+</div>
+<script type="application/json" id="graphdata">{"design":true,"live":false,"size":{"termW":96,"termH":32,"boxW":158,"colGap":26,"lineH":15,"tmH":13,"padY":6,"gapY":8,"minScale":0.72,"maxScale":1.4,"forceMinScale":0.45,"repel":9000,"link":120,"gravity":0.003,"reloadRun":5000,"reloadIdle":30000,"pageSize":50,"days":7,"mdRecent":30,"headCut":80},"flow":{"done":"#3fa66b","running":"#c9b800","planned":"#898781","example":"#898781","design":"#2a78d6"},"slots":[{"id":"1","role":"요청·needs-input 응답·최종 승인 주체(사람)","criteria":"요청 원문이 정본 — 목표·범위·완료 기준은 아소카가 계약으로 확정","docs":[{"name":"마스터","href":"../60.%20nodes/%EB%A7%88%EC%8A%A4%ED%84%B0.md"}]},{"id":"1.1","role":"요청 접수 → 목표·범위·완료 기준 확정 → 단계 계획대로 전문가 서브에이전트 지명(메인 직접 작업 금지)","criteria":"운영 규칙 0절 — 메인 = 정리·리뷰·승인·회신","docs":[{"name":"아소카","href":"../60.%20nodes/%EC%95%84%EC%86%8C%EC%B9%B4.md"},{"name":"anakins_prompt","href":"../10.%20prompt/anakins_prompt.md"}]},{"id":"1.1.1","role":"지시문 한 건의 설계 점검 — 목표·제약·출력 계약","criteria":"10장 지시문 설계 규칙","docs":[{"name":"anakins_prompt","href":"../10.%20prompt/anakins_prompt.md"}]},{"id":"1.1.1.1","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.2","role":"한 턴에 보는 토큰 전체 점검 — 넣을 것·뺄 것·남길 곳","criteria":"20장 컨텍스트 규칙","docs":[{"name":"anakins_context","href":"../20.%20context/anakins_context.md"}]},{"id":"1.1.2.1","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.3","role":"모델 바깥 강제 장치 점검 — 훅·권한·에이전트 정의·격리·관측","criteria":"30장 하네스 규칙","docs":[{"name":"anakins_harnes","href":"../30.%20harnes/anakins_harnes.md"}]},{"id":"1.1.3.1","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.4","role":"되돌아가는 엣지 점검 — build → verify → Codex → 회송 → 승인","criteria":"40장 A절 완료 기준 · C절 금지와 멈춤","docs":[{"name":"anakins_loop","href":"../40.%20loop/anakins_loop.md"},{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"}]},{"id":"1.1.4.1","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.5","role":"노드·엣지·파일 계약으로 작업 흐름 전체 점검 — 병렬·직렬·합류","criteria":"50장 A절 그래프 설계 체크리스트 10","docs":[{"name":"anakins_graph","href":"anakins_graph.md"}]},{"id":"1.1.5.1","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.5.2","role":"요청건을 그래프 페이지·Obsidian md 노드로 생성해 모니터링(scripts/request-graph.mjs)","criteria":"50장 그래프 규칙 — 기록에 있는 사실만 표시, 추정 연결은 배지로 구분","docs":[{"name":"anakins_graph","href":"anakins_graph.md"}]},{"id":"1.1.5.2.1","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.2","role":"팀장(teamanakin-admin) 판정을 받아 최종 등급 확정·마스터 보고(하향만)","criteria":"팀원이 1명이라도 실행된 턴은 팀장 승인 생략 불가(조회·커밋 단독 턴 제외)","docs":[{"name":"아소카","href":"../60.%20nodes/%EC%95%84%EC%86%8C%EC%B9%B4.md"},{"name":"teamanakin-admin","href":"../60.%20nodes/teamanakin-admin.md"}]}],"requests":[{"key":"design","when":"설계도","head":"설계도 — 요청 1건의 처리 흐름(마스터 설계 트리)","meta":"","nodes":[{"id":"1","parent":null,"label":"마스터 아나킨 요청","slot":"1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1","parent":"1","label":"파다완 아소카 접수","slot":"1.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.1","parent":"1.1","label":"서브에이전트1 : 프롬프트 분석","slot":"1.1.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.1.1","parent":"1.1.1","label":"Codex1 검수","slot":"1.1.1.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.2","parent":"1.1","label":"서브에이전트2 : 컨텍스트 분석","slot":"1.1.2","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.2.1","parent":"1.1.2","label":"Codex2 검수","slot":"1.1.2.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.3","parent":"1.1","label":"서브에이전트3 : 하네스 분석","slot":"1.1.3","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.3.1","parent":"1.1.3","label":"Codex3 검수","slot":"1.1.3.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.4","parent":"1.1","label":"서브에이전트4 : 루프 분석","slot":"1.1.4","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.4.1","parent":"1.1.4","label":"Codex4 검수","slot":"1.1.4.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.5","parent":"1.1","label":"서브에이전트5 : 그래프 분석","slot":"1.1.5","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.5.1","parent":"1.1.5","label":"Codex5 검수","slot":"1.1.5.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.5.2","parent":"1.1.5","label":"서브에이전트6 : 요청건을 obsidian 그래프로 생성해 가시적으로 모니터링","slot":"1.1.5.2","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.5.2.1","parent":"1.1.5.2","label":"Codex6 검수","slot":"1.1.5.2.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.2","parent":"1","label":"파다완 아소카 승인","slot":"1.2","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false}],"path":{"term":{"S":{},"E":{}},"edges":[{"from":"S","to":"1","seq":1,"loop":false,"state":"design","pass":false},{"from":"1","to":"1.1","seq":2,"loop":false,"state":"design","pass":false},{"from":"1.1","to":"1.1.1","seq":3,"loop":false,"state":"design","pass":false},{"from":"1.1.1","to":"1.1.1.1","seq":4,"loop":false,"state":"design","pass":false},{"from":"1.1.1.1","to":"1.1.2","seq":5,"loop":false,"state":"design","pass":false},{"from":"1.1.2","to":"1.1.2.1","seq":6,"loop":false,"state":"design","pass":false},{"from":"1.1.2.1","to":"1.1.3","seq":7,"loop":false,"state":"design","pass":false},{"from":"1.1.3","to":"1.1.3.1","seq":8,"loop":false,"state":"design","pass":false},{"from":"1.1.3.1","to":"1.1.4","seq":9,"loop":false,"state":"design","pass":false},{"from":"1.1.4","to":"1.1.4.1","seq":10,"loop":false,"state":"design","pass":false},{"from":"1.1.4.1","to":"1.1.5","seq":11,"loop":false,"state":"design","pass":false},{"from":"1.1.5","to":"1.1.5.1","seq":12,"loop":false,"state":"design","pass":false},{"from":"1.1.5.1","to":"1.1.5.2","seq":13,"loop":false,"state":"design","pass":false},{"from":"1.1.5.2","to":"1.1.5.2.1","seq":14,"loop":false,"state":"design","pass":false},{"from":"1.1.5.2.1","to":"1.2","seq":15,"loop":false,"state":"design","pass":false},{"from":"1.2","to":"E","seq":16,"loop":false,"state":"design","pass":false},{"from":"1.1.4.1","to":"1.1.4","seq":"↺","loop":true,"state":"example","pass":false,"label":"FAIL 시 회송 · 상한 5회"}]}}]}</script>
+<script>const fmtSpan = function fmtSpan(n, now, short) {
+  const kst = v => new Date(v).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
+  const a = n.t0 != null ? kst(n.t0) : null, b = n.t1 != null ? kst(n.t1) : null
+  const end = n.run ? '진행 중' : b ? (short || (a && a.slice(0, 10) === b.slice(0, 10)) ? b.slice(11) : b.slice(5)) : '—'
+  const s = a && (n.run || b) ? Math.max(0, Math.round(((n.run ? now : n.t1) - n.t0) / 1000)) : null
+  const d = s == null ? '' : Math.floor(s / 60) + 'm' + (short ? '' : ' ') + (s % 60) + 's'
+  return short ? (a ? a.slice(11) : '—') + '~' + end + (d ? ' · ' + d : '') : '시작 ' + (a ? a.slice(5) : '—') + ' ~ 종료 ' + end + (d ? ' (소요 ' + d + ')' : '')
+}, roundSummary = function roundSummary(rows, now) {
+  let n = 0, totalMs = 0
+  for (const r of rows) { if (!r.blocked) n++; if (r.t0 != null && (r.run || r.t1 != null)) totalMs += (r.run ? now : r.t1) - r.t0 }
+  return { n, totalMs }
+};(function client() {
+  const D = JSON.parse(document.getElementById('graphdata').textContent)
+  const $ = id => document.getElementById(id), NS = 'http://www.w3.org/2000/svg', Z = D.size, NOW = Date.now()
+  const SL = Object.fromEntries(D.slots.map(s => [s.id, s]))
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+  const el = (tag, at, parent) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); if (parent) parent.appendChild(e); return e }
+  const H = Object.fromEntries(new URLSearchParams(location.hash.slice(1)))   // 새로고침 뒤 복원 : k 요청 · v 보기 · f 실행 경로 · p 쪽 · s 목록 스크롤 · z 확대 영역
+  let flowOn = H.f !== '0', view = H.v === 'force' ? 'force' : 'tree', cur = null, page = +H.p || 1, raf = 0, byId = {}, root = null, touched = false, drag = null, pan = null, moved = 0, hooks = {}
+  const svg = $('svg'), vb = { x: 0, y: 0, w: 1, h: 1 }
+  const PH = { full: '시작 MM-DD HH:mm:ss ~ 종료 HH:mm:ss (소요 Xm Ys)', short: 'HH:mm:ss~HH:mm:ss · XmYs' }   // 설계도판 자리표시
+  const termTxt = (n, short) => D.design ? (short ? 'HH:mm:ss' : 'MM-DD HH:mm:ss') : n.t0 != null ? new Date(n.t0).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(short ? 11 : 5) : n.statusLabel.startsWith('중단') ? '중단' : n.pend ? '진행 중' : '—'
+  const spanTxt = (n, short) => n.term ? (short ? '' : n.statusLabel + ' ') + termTxt(n, short) : D.design ? (short ? PH.short : PH.full) : fmtSpan(n, NOW, short)
+  const spanHtml = n => esc(spanTxt(n)).replace('진행 중', '<span class="blink">진행 중</span>')
+  const durTxt = v => { const s = Math.round(v / 1000); return Math.floor(s / 60) + 'm ' + (s % 60) + 's' }
+  const tip = n => (n.slot ? n.id + ' ' : '') + n.label + ' — ' + n.statusLabel + '\n' + spanTxt(n)
+  const roundsMax = n => Math.max(0, ...(n.rounds || []).map(g => roundSummary(g.rows, NOW).n))
+  const statusTxt = n => n.statusLabel + (n.badge ? ' · ' + n.badge : '') + (n.eng != null ? ' · 엔지니어링 ' + n.eng + '/5' : '') + (n.rounds ? ' · 루프 ' + roundsMax(n) + '/' + n.rounds[0].cap : '')
+
+  function filtered() {
+    const q = $('q').value.trim().toLowerCase(), c = $('fc').value, d = $('fd').value
+    return D.requests.filter(r => (!q || r.head.toLowerCase().includes(q)) && (!c || r.cat === c) && (!d || r.date === d))
+  }
+  function renderList() {
+    const xs = filtered(), pages = Math.max(1, Math.ceil(xs.length / Z.pageSize)); page = Math.min(Math.max(1, page), pages)
+    $('list').innerHTML = xs.slice((page - 1) * Z.pageSize, page * Z.pageSize).map(r => '<li><button type="button" data-k="' + esc(r.key) + '"' + (r.key === cur ? ' aria-current="true"' : '') + '>'
+      + '<span class="rt">' + esc(r.when) + (r.catLabel ? ' · ' + esc(r.catLabel) : '') + '</span><span class="rh">' + esc(r.head) + '</span>'
+      + (r.meta ? '<span class="rm">' + esc(r.meta) + (r.st ? ' <span class="badge st-' + esc(r.st) + '">' + esc(r.statusLabel) + '</span>' : '') + '</span>' : '') + '</button></li>').join('') || '<li class="muted">조회 결과 없음</li>'
+    $('lcnt').textContent = xs.length + '건' + (pages > 1 ? ' · ' + page + '/' + pages + '쪽' : '')
+    $('lprev').disabled = page <= 1; $('lnext').disabled = page >= pages
+  }
+  function saveHash() {
+    const st = new URLSearchParams({ k: cur || '', v: view, f: flowOn ? 1 : 0, p: page, s: Math.round($('list').scrollTop) })
+    if (touched) st.set('z', [vb.x, vb.y, vb.w, vb.h].map(v => +v.toFixed(1)).join(','))
+    try { history.replaceState(null, '', '#' + st) } catch (e) { /* file:// 제한 브라우저 : 복원만 포기 */ }
+  }
+  function select(k) { cur = k; renderList(); const r = D.requests.find(x => x.key === k); if (!r) return; $('gtitle').textContent = r.head; draw(r); detail(r.nodes[0]); saveHash() }
+  function roundsHtml(g) {
+    const s = roundSummary(g.rows, NOW)
+    return '<h4>' + esc(g.name) + ' <span class="muted">' + s.n + '/' + g.cap + '</span></h4><table class="rd"><tr><th>회차</th><th>시작 ~ 종료</th><th>상태</th></tr>'
+      + g.rows.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + spanHtml(r) + '</td><td>' + esc(r.state || '') + '</td></tr>').join('')
+      + '<tr class="sum"><td colspan="3">합계 ' + s.n + '회 · 총 소요 ' + durTxt(s.totalMs) + ' · 상한 대비 ' + s.n + '/' + g.cap + '</td></tr></table>'
+  }
+  function detail(n) {
+    const s = SL[n.slot]
+    $('detail').innerHTML = '<h3>' + esc((n.slot ? n.id + ' ' : '') + n.label) + '</h3><p><span class="badge st-' + esc(n.status) + '">' + esc(n.statusLabel) + '</span>'
+      + (n.badge ? ' <span class="badge est">' + esc(n.badge) + '</span>' : '') + (n.eng != null ? ' <span class="badge">엔지니어링 ' + n.eng + '/5 수행</span>' : '') + '</p>'
+      + '<p class="tm">' + spanHtml(n) + '</p>'
+      + (n.lines.length ? '<ul>' + n.lines.map(l => '<li>' + esc(l) + '</li>').join('') + '</ul>' : '')
+      + (n.rounds || []).map(roundsHtml).join('')
+      + (n.term ? '<p class="muted">흐름 터미널 — 시작 = 요청 수신 시각, 종료 = 응답 시각(진행 중이면 아직 없음)</p>' : s ? '<dl><dt>역할</dt><dd>' + esc(s.role) + '</dd><dt>검수 기준</dt><dd>' + esc(s.criteria) + '</dd><dt>정본 문서</dt><dd>' + s.docs.map(d => '<a href="' + esc(d.href) + '">' + esc(d.name) + '</a>').join(' · ') + '</dd></dl>' : '<p class="muted">실행 기록에서 온 노드(설계 슬롯 아님)</p>')
+  }
+
+  // ── 보기 공통 : viewBox 화면 맞춤·확대·이동 ──
+  const setVB = () => svg.setAttribute('viewBox', vb.x + ' ' + vb.y + ' ' + vb.w + ' ' + vb.h)
+  /** 그림 전체를 화면에 맞춤 — 배율은 [minScale, maxScale] 안, 최소 배율에 걸리면 왼쪽 위 기준(나머지는 끌어서 이동) */
+  function fit(minScale) {
+    if (!root) return
+    const b = root.getBBox(), W = svg.clientWidth || 800, H2 = svg.clientHeight || 600, pad = 14, bw = b.width + pad * 2, bh = b.height + pad * 2
+    const s = Math.max(minScale, Math.min(W / bw, H2 / bh, Z.maxScale)); vb.w = W / s; vb.h = H2 / s
+    vb.x = bw <= vb.w ? b.x - pad - (vb.w - bw) / 2 : b.x - pad; vb.y = bh <= vb.h ? b.y - pad - (vb.h - bh) / 2 : b.y - pad; setVB()
+  }
+  const minScale = () => view === 'tree' ? Z.minScale : Z.forceMinScale
+  function zoom(k, cx, cy) { if (cx == null) { cx = vb.x + vb.w / 2; cy = vb.y + vb.h / 2 } vb.x = cx - (cx - vb.x) * k; vb.y = cy - (cy - vb.y) * k; vb.w *= k; vb.h *= k; setVB(); touched = true }
+  const pt = e => new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse())
+  svg.addEventListener('pointerdown', e => {
+    const g = e.target.closest('[data-id]'); moved = 0
+    if (g) { if (hooks.grab) { drag = hooks.grab(g.dataset.id); svg.setPointerCapture(e.pointerId) } return }
+    pan = { x: e.clientX, y: e.clientY, vx: vb.x, vy: vb.y, s: vb.w / (svg.clientWidth || 1) }; svg.setPointerCapture(e.pointerId)
+  })
+  svg.addEventListener('pointermove', e => {
+    if (!drag && !pan) return; moved++
+    if (drag) { const q = pt(e); drag.x = q.x; drag.y = q.y; hooks.wake() }
+    else if (moved > 2) { vb.x = pan.vx - (e.clientX - pan.x) * pan.s; vb.y = pan.vy - (e.clientY - pan.y) * pan.s; setVB(); touched = true }
+  })
+  svg.addEventListener('pointerup', e => { if (drag && moved < 4) detail(drag.n); drag = pan = null; if (svg.hasPointerCapture(e.pointerId)) svg.releasePointerCapture(e.pointerId) })
+  svg.addEventListener('click', e => { if (view !== 'tree') return; const g = e.target.closest('[data-id]'); if (g) detail(byId[g.dataset.id]) })
+  svg.addEventListener('wheel', e => { e.preventDefault(); const q = pt(e); zoom(e.deltaY > 0 ? 1.1 : 1 / 1.1, q.x, q.y) }, { passive: false })
+  document.querySelectorAll('[data-z]').forEach(b => b.addEventListener('click', () => { if (b.dataset.z === 'fit') { touched = false; fit(minScale()) } else zoom(b.dataset.z === 'in' ? 1 / 1.25 : 1.25) }))
+  addEventListener('resize', () => { if (!touched) fit(minScale()) })
+
+  // ── 계층 트리 : 슬롯 카드 = 이름(' : ' 로 2줄) + 상태 + 시간, 실행 에이전트 = 한 줄 넓은 카드(이름 + 시간, 상태 = 색) — 잎 노드라 오른쪽 열이 비어 있음
+  //    자식 묶음 가운데에 부모, 외길 사슬은 가장 높은 노드만큼 자리 확보
+  const nameLines = n => { const s = (n.slot ? n.id + ' ' : '') + n.label, i = s.indexOf(' : '); return i > 0 ? [s.slice(0, i), s.slice(i + 3)] : [s] }
+  const hOf = n => n.slot ? Z.padY * 2 + Z.lineH * (nameLines(n).length + 1) + Z.tmH : Z.padY * 2 + Z.lineH
+  function layout(nodes) {
+    const kids = {}, pos = {}; let y = 0, dmax = 0
+    for (const n of nodes) (kids[n.parent] = kids[n.parent] || []).push(n)
+    const walk = (n, d, reserve) => {
+      dmax = Math.max(dmax, d); const ch = kids[n.id] || [], h = hOf(n)
+      if (!ch.length) { const R = Math.max(h, reserve); pos[n.id] = { d, y: y + (R - h) / 2, h }; y += R + (n.slot ? Z.gapY : Z.gapY / 2); return }   // 에이전트 줄은 촘촘히
+      ch.forEach(c => walk(c, d + 1, ch.length === 1 ? Math.max(h, reserve) : 0))
+      const a = pos[ch[0].id], b = pos[ch[ch.length - 1].id]; pos[n.id] = { d, y: (a.y + a.h / 2 + b.y + b.h / 2) / 2 - h / 2, h }
+    }
+    walk(nodes.find(n => !n.parent), 0, 0)
+    return { pos, dmax }
+  }
+  /** 글자가 max 폭을 넘으면 실제 측정으로 잘라 … */
+  function fitText(t, s, max) {
+    t.textContent = s; if (t.getComputedTextLength() <= max) return t
+    let lo = 0, hi = s.length
+    while (lo < hi) { const m = (lo + hi + 1) >> 1; t.textContent = s.slice(0, m) + '…'; if (t.getComputedTextLength() <= max) lo = m; else hi = m - 1 }
+    t.textContent = s.slice(0, lo) + '…'; return t
+  }
+  /** 시간 글자(짧은 형식) — '진행 중'은 깜빡이는 tspan, 넘치면 글자 축소 → 그래도 넘치면 소요 생략(상세·풍선에는 전체) */
+  function timeText(t, n, max) {
+    const put = s => { t.textContent = ''; s.split('진행 중').forEach((p, i) => { if (i) el('tspan', { class: 'blink' }, t).textContent = '진행 중'; if (p) t.appendChild(document.createTextNode(p)) }) }
+    const s = spanTxt(n, true); put(s)
+    if (max && t.getComputedTextLength() > max) { t.setAttribute('font-size', 9); if (t.getComputedTextLength() > max) put(s.replace(/ · [^ ]+$/, '')) }
+    return t
+  }
+  // ── 실행 경로(흐름 화살표) 공통 : 노드 경계에서 끝나는 2차 곡선 + 화살촉 marker, 되돌이는 크게 휨, 같은 노드 반복은 오른쪽 고리 ──
+  const exitPt = (G, C) => { const dx = C.x - G.cx, dy = C.y - G.cy, l = Math.hypot(dx, dy) || 1, ux = dx / l, uy = dy / l, t = (G.r != null ? G.r : Math.min(ux ? G.hw / Math.abs(ux) : 1e9, uy ? G.hh / Math.abs(uy) : 1e9)) + 2; return { x: G.cx + ux * t, y: G.cy + uy * t } }
+  /** k = 휨 정도, j = 같은 노드 고리의 몇 번째인지(고리를 겹치지 않게 키우고 라벨을 세로로 쌓음) */
+  function curve(A, B, k, j) {
+    if (A.cx === B.cx && A.cy === B.cy) { const x = A.cx + (A.r != null ? A.r : A.hw), y = A.cy, w = 40 + 18 * j, h = 30 + 8 * j; return { d: 'M' + x + ' ' + (y - 6) + ' C' + (x + w) + ' ' + (y - h) + ' ' + (x + w) + ' ' + (y + h) + ' ' + (x + 3) + ' ' + (y + 7), mx: x + w * 0.75, my: y - 18 + 14 * j } }
+    const dx = B.cx - A.cx, dy = B.cy - A.cy, C = { x: (A.cx + B.cx) / 2 - dy * k, y: (A.cy + B.cy) / 2 + dx * k }, p0 = exitPt(A, C), p1 = exitPt(B, C)
+    return { d: 'M' + p0.x + ' ' + p0.y + ' Q' + C.x + ' ' + C.y + ' ' + p1.x + ' ' + p1.y, mx: 0.25 * p0.x + 0.5 * C.x + 0.25 * p1.x, my: 0.25 * p0.y + 0.5 * C.y + 0.25 * p1.y }
+  }
+  function markers() {
+    const defs = el('defs', {}, svg)
+    for (const [k, c] of Object.entries(D.flow)) { const m = el('marker', { id: 'ah-' + k, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 9, markerHeight: 9, markerUnits: 'userSpaceOnUse', orient: 'auto-start-reverse' }, defs); el('path', { d: 'M0,0L10,5L0,10z', fill: c }, m) }
+  }
+  /** 흐름 화살표를 그리고 위치 갱신 함수를 돌려준다(자유 배치는 매 틱 호출). gLab 이 gPath 와 같으면 순번은 화살표 그룹 안(호버 표시) */
+  function flowEdges(path, gPath, gLab, shape) {
+    const items = path.edges.map(e => {
+      const g = el('g', { class: 'fl ' + e.state + (e.loop ? ' loop' : '') + (e.pass ? '' : ' plan') }, gPath)
+      el('title', {}, g).textContent = e.seq + '. ' + e.from + ' → ' + e.to + (e.label ? ' · ' + e.label : '')
+      const hit = el('path', { class: 'hit' }, g), v = el('path', { class: 'v', 'marker-end': 'url(#ah-' + e.state + ')' }, g)
+      const lg = el('g', { class: 'seqg ' + e.state + (e.pass ? '' : ' plan') }, gLab === gPath ? g : gLab)
+      el('circle', { r: 7.5, class: 'sq' }, lg); el('text', { class: 'sqt', 'text-anchor': 'middle', y: 3.5 }, lg).textContent = e.seq
+      if (e.label) el('text', { class: 'lpl', x: 10, y: 4 }, lg).textContent = e.label
+      return { e, hit, v, lg }
+    })
+    const selfN = {}; for (const it of items) if (it.e.from === it.e.to) it.j = (selfN[it.e.to] = (selfN[it.e.to] ?? -1) + 1)
+    const update = () => items.forEach(({ e, hit, v, lg, j }) => {
+      const A = shape(e.from), B = shape(e.to); if (!A || !B) return
+      const r = curve(A, B, e.loop ? 0.4 : 0.1, j || 0); hit.setAttribute('d', r.d); v.setAttribute('d', r.d); lg.setAttribute('transform', 'translate(' + r.mx + ' ' + r.my + ')')
+    })
+    update(); return update
+  }
+  /** 터미널(시작·종료) 노드 객체 — 상세·풍선용 */
+  const termNode = (id, path) => { const T = path.term[id] || {}, pend = id === 'E' && !!(T.pending || T.stopped); return { id, term: true, pend, label: id === 'S' ? '시작' : '종료', slot: null, status: D.design ? 'unassigned' : pend ? 'notrun' : 'done', statusLabel: id === 'S' ? '요청 수신' : T.stopped ? '중단(응답 없음)' : pend ? '응답 대기' : '응답', lines: [], t0: T.t0 ?? null, t1: null, run: false } }
+
+  function drawTree(nodes, L, path) {
+    const X = d => d * (Z.boxW + Z.colGap), gE = el('g', {}, root), gF = el('g', { class: 'flows' }, root), gN = el('g', {}, root), gL = el('g', {}, root), geo = {}
+    for (const n of nodes) if (n.parent) {
+      const a = L.pos[n.parent], b = L.pos[n.id], x1 = X(a.d) + Z.boxW, y1 = a.y + a.h / 2, x2 = X(b.d), y2 = b.y + b.h / 2, mx = (x1 + x2) / 2
+      el('path', { d: 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2, class: 'edge' }, gE)
+    }
+    for (const n of nodes) {
+      const p = L.pos[n.id], w = n.slot ? Z.boxW : Z.boxW * 2 + Z.colGap, g = el('g', { class: 'node st-' + n.status, transform: 'translate(' + X(p.d) + ' ' + p.y + ')', 'data-id': n.id }, gN)
+      el('title', {}, g).textContent = tip(n); geo[n.id] = { cx: X(p.d) + w / 2, cy: p.y + p.h / 2, hw: w / 2, hh: p.h / 2 }
+      el('rect', { width: w, height: p.h, rx: 7, class: 'box' }, g); el('rect', { width: 5, height: p.h, rx: 2.5, class: 'strip' }, g)
+      if (!n.slot) {
+        const tm = timeText(el('text', { x: w - 8, y: Z.padY + Z.lineH - 3, class: 'tm', 'text-anchor': 'end' }, g), n)
+        fitText(el('text', { x: 12, y: Z.padY + Z.lineH - 3, class: 'l1' }, g), n.label + (n.rounds ? ' · ' + roundsMax(n) + '회차' : ''), w - 30 - tm.getComputedTextLength())
+        continue
+      }
+      const ls = nameLines(n)
+      ls.forEach((s, i) => fitText(el('text', { x: 12, y: Z.padY + Z.lineH * (i + 1) - 3, class: i ? 'l1' : 'l1 b' }, g), s, Z.boxW - 18))
+      fitText(el('text', { x: 12, y: Z.padY + Z.lineH * (ls.length + 1) - 3, class: 'l2' }, g), statusTxt(n), Z.boxW - 18)
+      timeText(el('text', { x: 12, y: Z.padY + Z.lineH * (ls.length + 1) + Z.tmH - 3, class: 'tm' }, g), n, Z.boxW - 18)
+    }
+    if (path) {   // 터미널 : 시작 = 루트 왼쪽, 종료 = 왼쪽 맨 아래
+      const r0 = L.pos['1'], bottom = Math.max(...Object.values(L.pos).map(p => p.y + p.h)), tx = -(Z.termW + Z.colGap)
+      const tp = { S: r0.y + r0.h / 2 - Z.termH / 2, E: bottom - Z.termH }
+      for (const id of ['S', 'E']) {
+        const n = byId[id] = termNode(id, path), g = el('g', { class: 'node term st-' + n.status + (n.pend ? ' pend' : ''), transform: 'translate(' + tx + ' ' + tp[id] + ')', 'data-id': id }, gN)
+        el('title', {}, g).textContent = n.label + ' — ' + spanTxt(n); geo[id] = { cx: tx + Z.termW / 2, cy: tp[id] + Z.termH / 2, hw: Z.termW / 2, hh: Z.termH / 2 }
+        el('rect', { width: Z.termW, height: Z.termH, rx: Z.termH / 2, class: 'box' }, g)
+        el('text', { x: Z.termW / 2, y: 13, class: 'l1 b', 'text-anchor': 'middle' }, g).textContent = n.label
+        timeText(el('text', { x: Z.termW / 2, y: 26, class: 'tm', 'text-anchor': 'middle' }, g), n)
+      }
+      flowEdges(path, gF, gL, id => geo[id])
+    }
+    fit(Z.minScale)
+  }
+
+  // ── 자유 배치(Obsidian 스타일) : 반발력(전 쌍) + 엣지 스프링 + 중심 인력, 수렴 중·후 화면 맞춤, 라벨 겹치면 숨김(호버 표시) ──
+  // ponytail: 전 쌍 O(n²) — 요청 1건 노드 수십 개 기준, 수백 개를 한 화면에 그릴 때 격자 근사로 교체
+  function drawForce(nodes, L, path) {
+    const RAN = ['done', 'running', 'error', 'blocked']
+    const P = nodes.map(n => { const p = L.pos[n.id]; return { n, d: p.d, x: p.d * 140, y: (p.y + p.h / 2) * 0.8, vx: 0, vy: 0, r: Math.max(6, 15 - 2 * p.d) + (RAN.includes(n.status) ? 2 : 0) } })
+    const at = Object.fromEntries(P.map(p => [p.n.id, p])), E = nodes.filter(n => n.parent).map(n => [at[n.parent], at[n.id]]), nStruct = E.length
+    if (path) {   // 터미널도 노드로 띄우고, 시작 — 1 · 종료 — 직전 노드는 스프링으로만 잇는다(구조선은 그리지 않음)
+      const r0 = at['1'], last = path.edges.filter(e => e.to === 'E').map(e => at[e.from]).find(Boolean) || r0
+      for (const id of ['S', 'E']) { const n = byId[id] = termNode(id, path), p = { n, d: -1, x: r0.x - 140, y: id === 'S' ? r0.y : last.y + 60, vx: 0, vy: 0, r: 10 }; P.push(p); at[id] = p }
+      E.push([at.S, r0], [last, at.E])
+    }
+    const gE = el('g', {}, root), gN = el('g', {}, root), gF = el('g', { class: 'flows fv' }, root), lines = E.slice(0, nStruct).map(() => el('line', { class: 'edge' }, gE))
+    for (const p of P) {
+      p.g = el('g', { class: 'fnode st-' + p.n.status, 'data-id': p.n.id }, gN); el('title', {}, p.g).textContent = tip(p.n)
+      el('circle', { r: p.r }, p.g); p.t = el('text', { class: 'l1', y: 4 }, p.g); p.t.textContent = p.n.label.length > 22 ? p.n.label.slice(0, 21) + '…' : p.n.label
+      if (p.n.term) { p.g.classList.add('term'); if (p.n.pend) p.g.classList.add('pend') }
+    }
+    const updFlow = path ? flowEdges(path, gF, gF, id => at[id] && { cx: at[id].x, cy: at[id].y, r: at[id].r }) : () => {}
+    /** 얕은 노드 라벨부터 놓고, 앞서 놓은 라벨·다른 노드 원과 겹치면 숨김 */
+    function declutter() {
+      const shown = [], hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h
+      for (const p of P.slice().sort((a, b) => a.d - b.d)) {
+        p.t.classList.remove('hid'); const b = p.t.getBBox(), box = { x: p.x + b.x - 2, y: p.y + b.y, w: b.width + 4, h: b.height }
+        if (shown.some(o => hit(o, box)) || P.some(q => q !== p && hit({ x: q.x - q.r, y: q.y - q.r, w: q.r * 2, h: q.r * 2 }, box))) p.t.classList.add('hid'); else shown.push(box)
+      }
+    }
+    let alpha = 1, n = 0
+    const tick = () => {
+      for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+        const a = P[i], b = P[j], dx = b.x - a.x, dy = b.y - a.y, d2 = Math.max(dx * dx + dy * dy, 40), d = Math.sqrt(d2), f = Z.repel / d2 * alpha
+        a.vx -= dx / d * f; a.vy -= dy / d * f; b.vx += dx / d * f; b.vy += dy / d * f
+      }
+      for (const [a, b] of E) { const dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) || 1, f = (d - Z.link) * 0.05 * alpha; a.vx += dx / d * f; a.vy += dy / d * f; b.vx -= dx / d * f; b.vy -= dy / d * f }
+      let cx = 0; for (const p of P) cx += p.x / P.length
+      for (const p of P) { if (p === drag) { p.vx = p.vy = 0; continue } p.vx = (p.vx - p.x * Z.gravity * alpha) * 0.6; p.vy = (p.vy - p.y * Z.gravity * alpha) * 0.6; p.x += p.vx; p.y += p.vy }
+      lines.forEach((ln, i) => { const [a, b] = E[i]; ln.setAttribute('x1', a.x); ln.setAttribute('y1', a.y); ln.setAttribute('x2', b.x); ln.setAttribute('y2', b.y) })
+      for (const p of P) {   // 라벨은 중심 반대쪽(바깥)으로
+        const out = p.x >= cx; p.t.setAttribute('x', out ? p.r + 4 : -(p.r + 4)); p.t.setAttribute('text-anchor', out ? 'start' : 'end')
+        p.g.setAttribute('transform', 'translate(' + p.x + ' ' + p.y + ')')
+      }
+      updFlow()
+      alpha *= 0.985; n++
+      const done = alpha <= 0.02 && !drag
+      if (n % 15 === 0 || done) { declutter(); if (!touched) fit(Z.forceMinScale) }
+      if (!done) raf = requestAnimationFrame(tick)
+    }
+    const wake = () => { if (alpha <= 0.02) { alpha = 0.3; raf = requestAnimationFrame(tick) } else alpha = Math.max(alpha, 0.3) }
+    hooks = { grab: id => { touched = true; wake(); return at[id] }, wake }
+    tick()
+  }
+  function draw(r) {
+    const nodes = r.nodes, path = flowOn ? r.path : null
+    cancelAnimationFrame(raf); svg.textContent = ''; touched = false; hooks = {}; drag = pan = null
+    svg.classList.toggle('flowon', !!path); if (path) markers()
+    byId = Object.fromEntries(nodes.map(n => [n.id, n])); root = el('g', {}, svg)
+    const L = layout(nodes)
+    if (view === 'tree') drawTree(nodes, L, path); else drawForce(nodes, L, path)
+  }
+  const setView = v => { view = v; document.querySelectorAll('[data-view]').forEach(x => x.setAttribute('aria-pressed', x.dataset.view === v)) }
+  $('list').addEventListener('click', e => { const b = e.target.closest('button[data-k]'); if (b) select(b.dataset.k) })
+  for (const id of ['q', 'fc', 'fd']) $(id).addEventListener('input', () => { page = 1; renderList() })
+  $('lprev').onclick = () => { page--; renderList(); saveHash() }; $('lnext').onclick = () => { page++; renderList(); saveHash() }
+  document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
+    setView(b.dataset.view); const r = D.requests.find(x => x.key === cur); if (r) draw(r); saveHash()
+  }))
+  const flowBtn = $('flow'); flowBtn.setAttribute('aria-pressed', flowOn)
+  flowBtn.onclick = () => { flowOn = !flowOn; flowBtn.setAttribute('aria-pressed', flowOn); const r = D.requests.find(x => x.key === cur); if (r) draw(r); saveHash() }
+  $('theme').onclick = () => { const h = document.documentElement, dark = (h.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark'; h.dataset.theme = dark ? 'light' : 'dark' }
+  setView(view)
+  if (D.requests.length) {
+    select((D.requests.find(r => r.key === H.k) || D.requests[0]).key)
+    if (H.z) { const z = H.z.split(',').map(Number); if (z.length === 4 && z.every(Number.isFinite)) { vb.x = z[0]; vb.y = z[1]; vb.w = z[2]; vb.h = z[3]; setVB(); touched = true } }
+    if (H.s) $('list').scrollTop = +H.s
+  } else { renderList(); $('detail').innerHTML = '<p class="muted">범위 안 요청 기록 없음 — 다음 요청부터 자동 기록</p>' }
+  // 실데이터판 자동 새로고침 : 진행 중 요청이 있으면 짧게 — 선택·보기·쪽·스크롤·확대는 location.hash 로 보존
+  if (D.live) setTimeout(() => { saveHash(); location.reload() }, D.requests.some(r => r.running) ? Z.reloadRun : Z.reloadIdle)
+})()</script></body></html>

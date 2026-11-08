@@ -131,6 +131,15 @@ flowchart TD
 
 A 체크리스트 대조 : 1 노드 카드 ○ / 2 엣지 = 파일 ○ / 4 합류 관문 = 팀장 / 6 단일 작성자 = 원장은 래퍼만·계약은 verify 만 / 7 재시작 = 원장 + 잠금 / 8 사람 노드 = 마스터(needs-input·승인)
 
+### B-6. 요청 처리 흐름 그래프 페이지 — 2026-11-08
+
+- 마스터 설계 트리(1 요청 → 1.1 접수 → 1.1.1~1.1.5.2 분석 서브에이전트·Codex 검수 → 1.2 승인)를 노드로 그린 페이지. 설계도판 = 이 폴더 `myRequestGraph.html`(실데이터 없음, 커밋) · 슬롯 md = `request-flow/`(예 [[1.1 파다완 아소카 접수]]).
+- 실요청 모니터링판 = `work-statistics/mywork/myRequestGraph.html` + 요청별 md `requests/`(둘 다 gitignore) — Stop 훅(`.claude/hooks/work-stats-refresh.mjs`)이 매 턴 갱신. 원천 = work-history 턴·agent 레코드 + `.omc/state/loop/<id>/ledger.json`.
+- 생성 : `node scripts/request-graph.mjs [--days 7] [--md]` / 설계도 `node scripts/request-graph.mjs --design-only --md`. 보기 = 계층 트리 ↔ 자유 배치(Obsidian 스타일) 토글.
+- 매핑 : 생성기 상단 `SLOT_MAP`(근거 문서 줄 주석, 근거 없는 대응은 `[확인중 : 마스터]`)이 에이전트·훅·Codex 루프를 엔지니어링 슬롯 1.1.1~1.1.5 에 잇는다 — 1.1.2 = `anakin_phase-collect`, 1.1.5 = `anakin_phase-graph`([[graph]], 마스터 확정 2026-11-08). 대응 기록이 없으면 '미수행'(주황 점선), 요청 노드에 '엔지니어링 N/5 수행'. teamanakin-admin 은 1.2 아래. 1.1.5.2(obsidian 그래프 생성) = 담당 아소카(메인) — 생성기 실행 기록 runs.jsonl 기준(`.omc/state/request-graph/runs.jsonl`, gitignore, 마스터 확정 2026-11-09) : 생성기가 실행마다 `{ts, trigger: stop|subagent|manual, mode: live|design, md}` 를 append(훅이 `--trigger` 로 넘김), 턴 창 안 live 실행 있으면 완료 · 없으면 미수행 · 로그 첫 기록 이전 턴 = '기록 이전'(미수행으로 세지 않음). 1.1.5 하위라 N/5 의 '5' 는 그대로.
+- 판 간 링크 : 설계도판 상단 안내 줄에 '실시간 모니터링판 열기'(상대경로, 다른 PC 는 로컬 생성 후 열림), 실데이터판에 '설계도판 열기' — 생성기 템플릿이 만든다.
+- 표시 : 완료 = 연초록, 진행 = 형광 노랑 + 깜빡임(`prefers-reduced-motion` 이면 굵은 테두리), 모든 노드에 시작~종료 쌍, 루프·같은 단계 반복 실행은 회차표(N/5). '실행 경로' 화살표(기본 켬) = 시작 → 1 → 1.1 → 실행 이벤트 시각순(슬롯은 첫 진입 1회 경유) → 종료, 되돌이 = 'k회차 (k/5)'. 진행 중 노드로 들어가는 화살표 = 노랑 실선(깜빡임), 지나간 선 = 실선, 아직 안 지난 예정 경로 = 점선. 턴 중간 갱신 = SubagentStart·SubagentStop 훅(`.claude/hooks/request-graph-refresh.mjs`, 2초 억제)이 세션 기록을 꼬리 스캔, 화면은 진행 중이면 5초·아니면 30초마다 새로고침(선택·보기는 주소 `#` 에 보존).
+
 ---
 
 ## C. 누가 설계하고 누가 검증하나
