@@ -16,4 +16,4 @@
 
 - 산출 → [[verify]]
 
-**들어오는 되돌림 엣지** : [[verify]] 독립 판정 CONFIRMED, [[아소카]] 회송, [[decide]] 설계 결정, [[teamanakin-admin]] REJECTED.
+**들어오는 되돌림 엣지**(4회차까지 — 5회차 결과는 회송 없음) : [[verify]] 독립 판정 CONFIRMED, [[아소카]] 회송, [[decide]] 설계 결정, [[teamanakin-admin]] REJECTED.

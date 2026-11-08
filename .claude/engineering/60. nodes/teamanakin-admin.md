@@ -15,4 +15,4 @@
 **다음 노드**
 
 - APPROVED·CONDITIONAL → [[아소카]] 최종 승인
-- REJECTED → [[build]] 회송(다음 회차 — [[codex-judge]] 재판정)
+- REJECTED → [[build]] 회송(다음 회차 — [[codex-judge]] 재판정). 5회차면 회송 없이 [[아소카]] → [[마스터]] 보고

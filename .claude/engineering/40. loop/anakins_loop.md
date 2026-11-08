@@ -29,7 +29,7 @@
 
 **2026-11-07 원문 요지** (구 A~D — 본문으로 흡수, 흡수 위치는 부록 I. 원문 글자 그대로 = [[anakins_loop#부록 J. 마스터 원문 (2026-11-07)|부록 J]])
 
-- 구 A 성공 기준 : 완료 기준을 모두 채울 때까지 [수정 → 검증 → 보고] 반복. 빌드·정적 검사, 자동 테스트, 모든 버튼·인터랙션, 모바일·Pi Browser 호환, 회귀 방지. 매 반복 `[Iteration N]` 보고, 실제 실행 출력으로만 판정, 테스트 약화 금지, 최소 범위 수정, 최대 10회. 최종 보고에 기준별 증거·수정 파일·수동 확인 항목.
+- 구 A 성공 기준 : 완료 기준을 모두 채울 때까지 [수정 → 검증 → 보고] 반복. 빌드·정적 검사, 자동 테스트, 모든 버튼·인터랙션, 모바일·Pi Browser 호환, 회귀 방지. 매 반복 `[Iteration N]` 보고, 실제 실행 출력으로만 판정, 테스트 약화 금지, 최소 범위 수정, 최대 10회(현행 회차 상한 5 — C-2). 최종 보고에 기준별 증거·수정 파일·수동 확인 항목.
 - 구 B 누가 검증 : 만드는 AI = Claude 서브에이전트, 검수 AI = Codex 도 방법.
 - 구 C 언제 멈추나 : 무한 반복 금지. 모든 테스트 통과 = 종료, 5번 시도해도 안 되면 중단·보고.
 - 구 D 반복업무 자동화 : 주간 매출 보고서(수집 → 양식 작성 → 검증 → 확인 3번까지 → 보고), 문제 접수 → AI 확인·수정 → 알림 → 해결 여부 선택.
@@ -63,23 +63,25 @@ flowchart TD
   TR -->|"CONFIRMED : 데이터 엣지, 지명은 아소카 SendMessage"| B
   TR -->|"PLAUSIBLE · FALSE"| AJ{"아소카 판단"}
   CX -->|"escalate : seenCount 2"| D["decide : 설계 재검토"]
-  CX -->|"escalate : seenCount ≥ 3 → 중단"| STOP(["중단 보고"])
+  CX -->|"escalate : seenCount ≥ 3 → 중단"| STOP(["종료 보고 : 아소카 → 마스터"])
+  CX -->|"5회차 FAIL · loopEnd"| STOP
   CX -->|noProgress| AJ
-  CX -->|BLOCKED| AJ
+  CX -->|"BLOCKED : 회차 미소모"| AJ
   AJ -->|회송| B
   AJ -->|"waive 기록 후 재판정"| V
-  AJ -->|"scope 재지정 · 플래그 재실행"| V
+  AJ -->|"BLOCKED 해소 : 같은 회차 재실행"| V
   AJ -->|"설계 재검토"| D
   AJ -->|"상한 도달 · 진척 없음 종료"| STOP
   AJ -->|needs-input| MI(("마스터"))
   D --> B
-  T -->|REJECTED| B
+  T -->|"REJECTED : 4회차까지"| B
+  T -->|"REJECTED : 5회차"| STOP
   T -->|"APPROVED · CONDITIONAL"| AF["아소카 : 최종 승인 등급 하향만"]
   AF --> R(("마스터 보고"))
   R -.->|"별도 턴"| C["commit : 커밋만"]
 ```
 
-CONFIRMED → build 는 **데이터 엣지**다(파일 `L/iter-N.triage.md` 가 흐른다). build 를 다시 부르는 지명은 아소카가 SendMessage 로 한다. seenCount ≥ 3 중단은 (마스터 확정 2026-11-08)이다.
+CONFIRMED → build 는 **데이터 엣지**다(파일 `L/iter-N.triage.md` 가 흐른다). build 를 다시 부르는 지명은 아소카가 SendMessage 로 한다. seenCount ≥ 3 중단은 (마스터 확정 2026-11-08)이다. 5회차 = 무조건 종료(`loopEnd: true`) — build 회송 없이 아소카가 마스터에게 보고(남은 결함·판정 이력·다음 선택지). 5회차 PASS 는 승인 3단을 거치되 팀장·아소카 반려도 회송하지 않고 보고한다(마스터 지시 2026-11-08). **종료 조건은 먼저 오는 것이 이긴다** — 같은 결함 seenCount 3 중단·noProgress 중단·예산 BLOCKED 가 5회차보다 먼저 오면 그것으로 끝나고, 5회차에 닿으면 판정과 무관하게 종료한다(`loopEnd`). escalate(seenCount 2 → decide)는 4회차까지만 — 5회차 결과의 escalate 는 회송하지 않고 보고에 적는다.
 
 **노드 카드** (엣지 = 파일 + 형식, 루프 폴더 `L = .omc/state/loop/<id>/` — gitignore, 커밋 대상 아님)
 
@@ -88,17 +90,17 @@ CONFIRMED → build 는 **데이터 엣지**다(파일 `L/iter-N.triage.md` 가 
 | 아소카 : 계약 | 마스터 요청 | 루프 계약 텍스트(D-1) | 없음(브리프로만 전달) | AC-n 이 실행·출력으로 판정 가능, scope 확정 |
 | verify : init | 계약 텍스트 | `L/contract.md`(원문 그대로)·`L/ledger.json` | `L/` | `--init` 종료 0, 계약 줄 수 보고 |
 | build | `L/contract.md`, 회송 시 `L/iter-N.triage.md` | 변경 파일 + 보고(파일별 diff stat) | 계약의 쓰기 허용 경로만 | tsc·단위 테스트·selftest 통과 |
-| verify : 증거·호출 | 계약, 작업 트리 | `L/evidence-N/*.txt`, `L/iter-N.codex.json` | `L/` | 증거 = 실제 출력 원문, 래퍼 종료 코드 0·1·2 |
+| verify : 증거·호출 | 계약, 작업 트리 | `L/evidence-N/*.txt`, `L/iter-N.codex.json` | `L/` | 증거 = 실제 출력 원문, 래퍼 종료 코드 0·1·2, 결과 `loopEnd` 보고 |
 | Codex | 래퍼가 조립한 프롬프트(files·diff·evidence 본문) | 판정 JSON(출력 계약) | 없음 | 스키마 통과 |
 | verify : 독립 판정 | `L/iter-N.codex.json`, 작업 트리 | `L/iter-N.triage.md`(D-3) | `L/` | 결함마다 판정·근거 |
 | decide | 원장·결함 이력·관련 파일 경로 | 설계 결정 초안(응답) | 없음 | 강력추천 1건 + 뒤집히는 조건 |
-| 아소카 : 판단 | `L/iter-N.triage.md`·결과 `noProgress`·`blocked[]` | 회송·waive·scope 재지정·decide·중단·needs-input 결정(응답) | 없음 | 결정마다 근거 1줄 |
+| 아소카 : 판단 | `L/iter-N.triage.md`·결과 `noProgress`·`blocked[]`·`loopEnd` | 회송·waive·scope 재지정·decide·중단·needs-input 결정(응답) | 없음 | 결정마다 근거 1줄 |
 | 팀장 | 요청 원문·계약·결과 경로·`maxGrade` | 판정(응답) | 없음 | 요구별 근거 짝짓기, 원본 표본 대조 |
 | 아소카 : 최종 | 팀장 판정·`maxGrade` | 마스터 보고(D-4) | 없음 | 등급 ≤ 모든 상한 |
 
 ### 0-3. 승인 3단 · 등급 규칙 · waive
 
-**3단** : ① Codex 판정(`verdict`·`maxGrade`) → ② 팀장(`teamanakin-admin`) → ③ 아소카 최종 승인. 앞 단을 통과해야 다음 단으로 간다. ②③의 반려는 build 회송 = 다음 회차(회차를 소모한다).
+**3단** : ① Codex 판정(`verdict`·`maxGrade`) → ② 팀장(`teamanakin-admin`) → ③ 아소카 최종 승인. 앞 단을 통과해야 다음 단으로 간다. ②③의 반려는 build 회송 = 다음 회차(회차를 소모한다). 단 5회차 결과는 반려돼도 회송하지 않고 아소카가 마스터에게 보고한다(`loopEnd`, 마스터 지시 2026-11-08).
 
 **최종 등급 = 아래 값 중 가장 낮은 것**
 
@@ -111,7 +113,7 @@ CONFIRMED → build 는 **데이터 엣지**다(파일 `L/iter-N.triage.md` 가 
 
 - `src/` 변경에 `pnpm build` 통과 증거가 없으면 팀장 REJECTED(팀장 정의).
 - **waive(결함 면제)** : 결정 = 팀장·아소카만, 근거 필수. 기록 = verify 가 `--waive D-xxx --waive-reason "<근거>"` 로 원장 `waived` 에 남긴다(래퍼가 seenCount·escalate 를 올리지 않음). waive 한 결함은 build 브리프에서 뺀다. 판정이 FAIL 이었으면 waive 뒤 **재판정 1회**로 PASS 를 받아야 다음 단으로 간다.
-- `--waive` 는 판정 호출에 붙는 옵션이다 — 회차 번호 1개를 쓰고, Codex 호출은 보통 1회(계약 위반 재요청 시 최대 2회, 호출 전 BLOCKED·대체 판정이면 0회)다.
+- `--waive` 는 판정 호출에 붙는 옵션이다 — 판정 결과가 나오면 회차 번호 1개를 쓰고, Codex 호출은 보통 1회(계약 위반 재요청 시 최대 2회, 호출 전 BLOCKED·대체 판정이면 0회)다.
 - waive 할 수 없는 것([[codex_procedure]] 8절과 같은 목록) : 비밀 노출, 테스트 약화, Pi Browser 치명 제약 위반, R-P0~P6 위반(의도 사유가 원장 `docs/BUILD_DEFECTS.md` 에 먼저 적힌 경우 제외).
 
 ### 0-4. Codex 호출 요약 → 세부는 [[codex_procedure]]
@@ -123,7 +125,7 @@ CONFIRMED → build 는 **데이터 엣지**다(파일 `L/iter-N.triage.md` 가 
 | 입력 | 판정 규칙 · 규칙 발췌 · 완료 기준 · scope 안 diff·파일 본문(직접 연관 1단계·규칙 문맥 포함) · 증거 · 이전 결함. 비밀·경로 가림, nonce 인젝션 방어 | 4절 |
 | 출력 | `verdict`·`criteria`·`defects(id·file·line·repro·fix_hint·seenCount)`·`maxGrade`·`noProgress`·`escalate` — 래퍼가 결정 필드를 다시 계산(fail-closed) | 5절 |
 | 대체 | `--judge claude` → 새 컨텍스트 Claude 판정 → `--ingest`, 최대 CONDITIONAL | 6절 |
-| 상한 | 회차 10 · 벽시계 90분 · Codex 호출 10 · 1회 기본 15분, `--timeout-min` 으로 최대 120분까지, 실제 타임아웃 = min(지정값, 남은 90분 예산) — 래퍼 강제, 토큰 2배 — 아소카 | 9절 |
+| 상한 | 회차 5(5회차 = 무조건 종료, `loopEnd`) · 벽시계 90분 · Codex 호출 5 · 1회 기본 15분, `--timeout-min` 으로 최대 120분까지, 실제 타임아웃 = min(지정값, 남은 90분 예산) — 래퍼 강제, 토큰 2배 — 아소카 | 9절 |
 | 보안 | `-s read-only` + `approval_policy="never"`, `--ephemeral`, 판정자 env 허용 목록 | 10절 |
 
 외부 전송 범위(마스터 확정 2026-11-08) = scope 안 변경 + 직접 연관 1단계 + 규칙 문맥. OS 수준 읽기 차단은 완화책만, 추후 결정(마스터).
@@ -202,7 +204,7 @@ verify 는 증거를 **실제 실행 출력 그대로** 파일로 저장한다(`
 
 ### B-3. 출력 계약 요지
 
-`verdict`(PASS·FAIL·BLOCKED), 기준별 `criteria[].status`, `defects[]`(id 고정 — 해결 fixed·재발 regressed·이의 contested·면제 waived), `blocked[].reason`(device·master-permission·judge-unavailable·budget) + 범위 사유 scope-missing·scope-too-broad = 6종 — 사유별 행동은 C-3 표. `maxGrade`·`seenCount`·`escalate`·`noProgress` 는 래퍼가 원장으로 계산한다 — 판정자 값을 믿지 않는다. 세부 [[codex_procedure]] 5절.
+`verdict`(PASS·FAIL·BLOCKED), 기준별 `criteria[].status`, `defects[]`(id 고정 — 해결 fixed·재발 regressed·이의 contested·면제 waived), `blocked[].reason`(device·master-permission·judge-unavailable·budget·ledger·lock + 범위 사유 scope-missing·scope-too-broad = 8종 — 사유별 행동은 C-3 표. `maxGrade`·`seenCount`·`escalate`·`noProgress` 는 래퍼가 원장으로 계산한다 — 판정자 값을 믿지 않는다. 세부 [[codex_procedure]] 5절.
 
 ### B-4. 결함 독립 판정 (verify, FAIL 때마다)
 
@@ -253,17 +255,19 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회면 `--judge cla
 
 | 상한 | 값 | 판정 주체 | 넘으면 |
 |---|---|---|---|
-| 회차 | **10** — 팀장·아소카 반려 회송도 1회차. BLOCKED 결과는 원장 회차(`iters`)에 넣지 않지만 회차 번호(결과 파일 이름 `iter-N`)는 소모한다 — 다음 판정은 N+1. `--waive` 는 판정 호출에 붙는 옵션이다 — 회차 번호 1개를 쓰고, Codex 호출은 보통 1회(계약 위반 재요청 시 최대 2회, 호출 전 BLOCKED·대체 판정이면 0회)다. | 래퍼(`--iter 11` 이상 BLOCKED) | 중단 보고 |
+| 회차 | **5**(마스터 지시 2026-11-08, 10 → 5) — 5회차 판정 결과(PASS/FAIL) = 무조건 종료(`loopEnd: true`) — 5회차 BLOCKED(budget 제외)는 같은 5회차로 재실행. build 회송 없이 아소카가 마스터에게 보고(남은 결함·판정 이력·다음 선택지). 5회차 PASS 는 승인 3단을 거치되 팀장·아소카 반려도 회송하지 않고 보고한다. 팀장·아소카 반려 회송도 1회차. BLOCKED 는 회차 번호를 소모하지 않는다 — 결과는 `iter-N.blocked-K.json` 에 남고 원장 회차(`iters`)에 넣지 않으며, 원인 해소 뒤 같은 N 으로 다시 실행한다. 회차 번호는 판정 결과(PASS/FAIL)가 나온 회차만 소모하고, 그 회차는 다시 실행할 수 없다(종료 3) — 다음 판정은 N+1. (마스터 결정 2026-11-08 "BLOCKED만 재시도 허용") `--waive` 는 판정 호출에 붙는 옵션이다 — 판정 결과가 나오면 회차 번호 1개를 쓰고, Codex 호출은 보통 1회(계약 위반 재요청 시 최대 2회, 호출 전 BLOCKED·대체 판정이면 0회)다. | 래퍼(`--iter 6` 이상 BLOCKED, 결과 `loopEnd`) | 종료 보고 |
 | 같은 결함 | `seenCount` **2** → escalate | 래퍼 계산 | decide 설계 재검토 후 build |
 | escalate 뒤 같은 결함 | `seenCount` 3 | 아소카 | 중단 보고(다시 escalate 하지 않음) (마스터 확정 2026-11-08) |
 | 벽시계 | 90분(원장 `startedAt` 부터) | 래퍼 | BLOCKED budget |
-| Codex 호출 | 10회(재요청 포함) | 래퍼 | BLOCKED budget |
+| Codex 호출 | 5회(재요청 포함, 마스터 결정 2026-11-08 10 → 5) | 래퍼 | BLOCKED budget |
 | Codex 1회 | 기본 15분, `--timeout-min` 으로 최대 120분까지, 실제 타임아웃 = min(지정값, 남은 90분 예산) | 래퍼 | BLOCKED judge-unavailable |
 | 토큰 | 추정치의 2배 | 아소카(`pnpm work:stats` 대조) | 중단 보고 |
 | flaky 재실행 | 실패 테스트 1회 | verify | C-4 |
 | 재확인(반복업무) | 3회 | 부록 G 전용 | 담당자 보고 |
 
-- 구 문서의 10회·5회·3회 불일치는 위 이름으로 정리했다 — "5번 시도"는 '같은 결함 2 → escalate, 3 → 중단, 전체 회차 10'으로 대체했다 (마스터 확정 2026-11-08).
+- 구 문서의 10회·5회·3회 불일치는 위 이름으로 정리했다 — "5번 시도"는 '같은 결함 2 → escalate, 3 → 중단'으로 대체했다 (마스터 확정 2026-11-08). 전체 회차는 10 → **5**(마스터 지시 2026-11-08).
+- **종료 조건은 먼저 오는 것이 이긴다** — 같은 결함 seenCount 3 중단·noProgress 중단·예산 BLOCKED 가 5회차보다 먼저 오면 그것으로 끝나고, 5회차에 닿으면 판정과 무관하게 종료한다(`loopEnd`). escalate(seenCount 2 → decide)는 4회차까지만 — 5회차 결과의 escalate 는 회송하지 않고 보고에 적는다.
+- 호출 상한 = 회차 상한 5 — BLOCKED 재시도·계약 위반 재요청이 있으면 5회차 판정 전에 budget 으로 멈출 수 있음(마스터 결정 2026-11-08)
 - 벽시계·토큰·Codex 호출 값은 실측 전 값이다(마스터 확정 2026-11-08). 정기 재평가일에 원장 실측으로 조정한다.
 
 ### C-3. 멈춤 조건과 행동
@@ -274,8 +278,9 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회면 `--judge cla
 | FAIL | `verdict` | 독립 판정(B-4) → 회송 |
 | escalate | 결과 `escalate: true` | 3번째 수정 대신 decide — 원인·설계부터 |
 | 진척 없음 | 결과 `noProgress: true`(미해결 결함 줄지 않음 + 새로 met 된 기준 0) | 같은 브리프 재시도 금지 → 아소카 판단 : decide 또는 중단 보고 |
+| 5회차 도달 | 결과 `loopEnd: true`(5회차 판정 결과·PASS·budget BLOCKED) | 판정과 무관하게 종료 — build 회송 없이 아소카가 마스터에게 보고(PASS 면 승인 3단 뒤) |
 | 상한 도달 | C-2 | 중단 보고(남은 결함·막힌 원인·다음 선택지) |
-| BLOCKED | `verdict`·`blocked[].reason` | 수정 반복 대상이 아님. 아소카가 아래 사유별 행동표대로 처리 |
+| BLOCKED | `verdict`·`blocked[].reason` | 수정 반복 대상이 아님. 회차 번호를 소모하지 않으므로 원인 해소 뒤 같은 회차로 재실행. 아소카가 아래 사유별 행동표(8종)대로 처리 |
 | 사람만 풀 수 있는 일 | OAuth 로그인·Pi Browser 실기기·운영 DB 쓰기·배포 승격·`codex login` | 루프 밖 — 바로 needs-input |
 | 같은 경로 두 작성자 | 예상 밖 수정 시각 변화 | 전체 일시정지, 소유자 재지정([[anakins_graph]] D) |
 
@@ -286,7 +291,9 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회면 `--judge cla
 | scope-missing | `--scope` 없음 | 아소카가 scope 를 다시 지정 → verify 재실행 |
 | scope-too-broad | 미추적 30·변경 300·프롬프트 상한 초과 | 아소카가 scope 를 다시 지정(대량 전송은 마스터 승인 `--allow-bulk`) |
 | judge-unavailable | `--confirm-real` 누락 / 미로그인·시간 초과·계약 위반 2회·격리 재확인 실패 | 플래그 누락 → verify 재실행 / 미로그인 → 마스터(`! codex login`) / 그 밖 → 아소카가 Claude 대체(B-6) 결정 |
-| budget | 회차·벽시계·호출 상한, 원장 부재·손상·불일치, 잠금 | 아소카 — 상한은 중단 보고, 원장·잠금은 확인 후 결정(재생성·잠금 해제 승인 = 아소카, 실행 = 전문가) |
+| budget | 회차 상한(6회차 이상)·벽시계 90분·Codex 호출 5회·확정 직전 재검사 초과 — `loopEnd: true` | 아소카 — 중단 보고(남은 결함·막힌 원인·다음 선택지) |
+| ledger | 원장 부재(`--init` 누락)·손상·불일치 | 아소카 — `--init` 여부·원장 확인 후 결정(재생성 승인 = 아소카, 실행 = 전문가) → 같은 회차 재실행 |
+| lock | 같은 `--id` 동시 실행(`ledger.lock` 있음) | 아소카 — 다른 실행이 진행 중인지 확인, 끝났으면 잠금 해제 승인(삭제 실행 = 전문가) → 같은 회차 재실행 |
 | device | Pi Browser 실기기 등 기기 필요 | 마스터 |
 | master-permission | 마스터 권한 필요(운영 DB·배포·승인) | 마스터 |
 
@@ -326,10 +333,10 @@ AC-n : <범위 밖 금지 — 예 git 추적 상태 불변(.omc 예외)>
 ### D-2. `[Iteration N]` 보고 (verify → 아소카, 첫 줄 고정)
 
 ```text
-[Iteration N] 판정 FAIL / 기준 met 4·unmet 1·unverifiable 1 / 결함 CONFIRMED 2·PLAUSIBLE 1·FALSE 0 / escalate N / noProgress N
+[Iteration N] 판정 FAIL / 기준 met 4·unmet 1·unverifiable 1 / 결함 CONFIRMED 2·PLAUSIBLE 1·FALSE 0 / escalate N / noProgress N / loopEnd N
 - 증거 : L/evidence-N/ (build.txt · tsc.txt · lint.txt · test.txt) — 핵심 줄 인용
 - 판정 : L/iter-N.codex.json (종료 코드 1), 독립 판정 : L/iter-N.triage.md
-- 원장 : 회차 N/10 · Codex 호출 K/10 · 경과 M/90분
+- 원장 : 회차 N/5 · Codex 호출 K/5 · 경과 M/90분
 - 회송 후보 : D-004(file:line) …
 ```
 
@@ -350,6 +357,7 @@ AC-n : <범위 밖 금지 — 예 git 추적 상태 불변(.omc 예외)>
 - 완료 기준별 통과 증거(명령 + 핵심 출력)
 - 수정 파일과 변경 요지
 - waive 목록(결함·사유·결정자)
+- 종료 사유 : PASS | 5회차 loopEnd | seenCount 3 | noProgress | 예산 BLOCKED
 - 남은 일 : 실기기 점검표 / 후속 과제 / 커밋 지시 대기(별도 턴)
 ```
 
@@ -357,7 +365,7 @@ AC-n : <범위 밖 금지 — 예 git 추적 상태 불변(.omc 예외)>
 
 ## E. 사례 → 규칙 (2026-11-08)
 
-#1~#7 원장 `.omc/state/loop/first-call/` — Codex 실호출 5회, 입력 토큰 회당 약 7만~8만·출력 약 1.4천~1.7천(`ledger.json`).
+#1~#7 원장 `.omc/state/loop/first-call/`(당시 회차 상한 10) — Codex 실호출 5회, 입력 토큰 회당 약 7만~8만·출력 약 1.4천~1.7천(`ledger.json`).
 
 | # | 일어난 일 | 규칙 |
 |---|---|---|
@@ -382,6 +390,9 @@ AC-n : <범위 밖 금지 — 예 git 추적 상태 불변(.omc 예외)>
 | 2026-11-08 | Iteration 2 — 마스터 원문 A~D 를 부록 J 로 글자 그대로 복원, 누락 기준 3개 A-3 복원, 그래프에 아소카 판단 노드·seenCount ≥ 3 중단·데이터 엣지 표기, BLOCKED 사유 6종 행동표, 회차 번호 소모 문구 통일, 대체 판정 = 응답 반환·verify 저장 정본, npm 예외 명시, 원장 재생성 승인 = 아소카, H-15~H-18 | Codex loop-docs iter1 FAIL + review 검수 |
 | 2026-11-08 | Iteration 3 — npm 예외 근거 = 마스터 승인, "5번 시도" 대체 마스터 확정(같은 결함 2 → escalate, 3 → 중단, 회차 10), Codex 1회 시간 = 기본 15분·최대 120분·min(지정값, 남은 예산), `--waive` 의 회차·호출 소모 문장 통일 | Codex loop-docs iter2 FAIL(D-005·D-006) + 마스터 결정 |
 | 2026-11-08 | C-5 잠금 항목의 절차서 해석 괄호 삭제(절차서 8절 잠금 문구를 승인 = 아소카·삭제 = 전문가로 맞춤) | 팀장 지적 2(low) |
+| 2026-11-08 | 마스터 지시 2026-11-08 회차 상한 10 → 5·5회차 무조건 종료(`loopEnd`) — 0-2 그래프·주석, 0-3, 0-4, C-2·C-3, D-2·D-4, 노드 카드, 부록 I. 종료 조건 우선순위 한 줄 | 마스터 지시(래퍼 `C.maxIter` 5) |
+| 2026-11-08 | BLOCKED만 재시도 허용 — BLOCKED 는 회차 번호 미소모·같은 회차 재실행(0-3·C-2·C-3·H-4 문장 통일, `--waive` 회차 소모 조건), 5회차 BLOCKED(budget 제외) 재실행, 행동표 budget → budget·ledger·lock 3행(8종), 그래프 BLOCKED 엣지 | 마스터 결정 |
+| 2026-11-08 | Codex 호출 상한 10 → 5(회차 상한과 같은 값) — 0-4·C-2·budget 행·D-2·부록 I, C-2 주의 문장 | 마스터 결정 |
 
 ---
 
@@ -414,7 +425,7 @@ AC-n : <범위 밖 금지 — 예 git 추적 상태 불변(.omc 예외)>
 | H-1 | 결정안 B-1 — `--allow-bulk` 에 마스터 승인 코드 강제 없음(지금은 C-1 절차로만 막음) | `scripts/codex-verify.mjs` | 다음 단계 |
 | H-2 | 결정안 B-2 — 원장 `iters` 에 `--allow-bulk` 사용 표시 필드 없음 | 래퍼 | 다음 단계 |
 | H-3 | 결정안 S-3 — 범위 밖 변경 요약에 2단계 폴더명이 노출됨 | 래퍼 | 다음 단계 |
-| H-4 | BLOCKED 결과는 원장 회차(`iters`)에 넣지 않지만 회차 번호(결과 파일 이름 `iter-N`)는 소모한다 — 다음 판정은 N+1. (사례 : first-call iter1 BLOCKED → 원장 기록은 iter2 부터.) 문서화 완료(C-2·[[codex_procedure]] 8절), 동작 변경 여부만 남음 | 래퍼 | 동작 결정 대기 |
+| H-4 | BLOCKED 는 회차 번호를 소모하지 않는다 — 결과는 `iter-N.blocked-K.json` 에 남고 원장 회차(`iters`)에 넣지 않으며, 원인 해소 뒤 같은 N 으로 다시 실행한다. 회차 번호는 판정 결과(PASS/FAIL)가 나온 회차만 소모하고, 그 회차는 다시 실행할 수 없다(종료 3) — 다음 판정은 N+1. (마스터 결정 2026-11-08 "BLOCKED만 재시도 허용") (사례 : first-call iter1 BLOCKED 는 이전 정책 — 원장 기록이 iter2 부터.) 래퍼·[[codex_procedure]] 8절 반영 | 래퍼 | **해소** |
 | H-5 | `CODEX_JS`(가짜 판정자) 지정 시 `--confirm-real` 없이 호출되는 경로 — 우회 가능성 문서화 | [[codex_procedure]] 3절 | 다음 단계 |
 | H-6 | `codexCalls` 선기록 순서 — 절차서 9절 표 "호출 직전에 원장에 센다"로 이미 문서화 | [[codex_procedure]] 9절 | **해소** |
 | H-7 | `--init` 재생성 시 예산 초기화 — 절차서 3절에는 있음, 승인 절차 명문화 | [[codex_procedure]] | 다음 단계 |
@@ -440,14 +451,14 @@ AC-n : <범위 밖 금지 — 예 git 추적 상태 불변(.omc 예외)>
 |---|---|---|---|
 | E-1-1 | npm → pnpm 11 명령 | A-2 | 반영 |
 | E-1-2 | `pnpm build` 최소 관문, 순서 고정 | A-2 | 반영(build → tsc → lint → test) |
-| E-1-3 | 상한 10/5/3 불일치 | C-2 | 반영(이름 붙인 상한) — "5번 시도" 대체 (마스터 확정 2026-11-08) |
+| E-1-3 | 상한 10/5/3 불일치 | C-2 | 반영(이름 붙인 상한) — "5번 시도" 대체 (마스터 확정 2026-11-08), 전체 회차 5·5회차 무조건 종료(마스터 지시 2026-11-08) |
 | E-1-4 | `window.Pi` ≠ Pi Browser, UA 사전 차단 금지 | A-3 인증 | 반영 |
 | E-1-5 | 쿠키 미저장 — 헤더 경로·`piFetch`·redirect 금지 | A-3 인증 | 반영 |
 | E-1-6 | 실기기 전 '완료' 금지 | A-6, 0-3 | 반영(조건부 완료) |
 | E-1-7 | 모든 버튼 범위 폭발·결제 버튼 금지 | A-3 결제·페이지 | 반영 |
 | E-1-8 | 검수자 독립성 | B-1·B-2 | 반영(작성자 결론 배제 + 독립 판정 B-4) |
 | E-2-1 | 진척 없음 감지 | C-3 `noProgress` | 반영 |
-| E-2-2 | 비용·시간 상한 | C-2 | 반영(90분·호출 10·토큰 2배) |
+| E-2-2 | 비용·시간 상한 | C-2 | 반영(90분·호출 5·토큰 2배) |
 | E-2-3 | flaky 규칙 | C-4 | 반영 |
 | E-2-4 | 사람만 풀 수 있는 실패는 루프 밖 | C-3 | 반영 |
 | E-2-5 | 배포 검증 철칙 | A-3 배포 | 반영 |

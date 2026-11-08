@@ -86,17 +86,19 @@ flowchart TD
   TR -->|"CONFIRMED : 데이터 엣지, 지명은 아소카 SendMessage"| B
   TR -->|"PLAUSIBLE · FALSE"| AJ{"아소카 판단"}
   CX -->|"escalate : seenCount 2"| D["decide : 설계 재검토"]
-  CX -->|"escalate : seenCount ≥ 3 → 중단"| STOP(["중단 보고"])
+  CX -->|"escalate : seenCount ≥ 3 → 중단"| STOP(["종료 보고 : 아소카 → 마스터"])
+  CX -->|"5회차 FAIL · loopEnd"| STOP
   CX -->|noProgress| AJ
-  CX -->|BLOCKED| AJ
+  CX -->|"BLOCKED : 회차 미소모"| AJ
   AJ -->|회송| B
   AJ -->|"waive 기록 후 재판정"| V
-  AJ -->|"scope 재지정 · 플래그 재실행"| V
+  AJ -->|"BLOCKED 해소 : 같은 회차 재실행"| V
   AJ -->|"설계 재검토"| D
   AJ -->|"상한 도달 · 진척 없음 종료"| STOP
   AJ -->|needs-input| MI(("마스터"))
   D --> B
-  T -->|REJECTED| B
+  T -->|"REJECTED : 4회차까지"| B
+  T -->|"REJECTED : 5회차"| STOP
   T -->|"APPROVED · CONDITIONAL"| AF["아소카 : 최종 승인 등급 하향만"]
   AF --> R(("마스터 보고"))
   R -.->|"별도 턴"| C["commit : 커밋만"]
