@@ -1,0 +1,4106 @@
+{
+  "area": "COL",
+  "areaNm": "미납",
+  "stg": "LGCL",
+  "ver": "2026-11-07",
+  "author": "subagent_logical_modeler",
+  "entities": [
+    {
+      "entId": "COL-001",
+      "entNm": "미납기본",
+      "phyNm": "UNPD_BAS",
+      "tblNm": "PTL_COL_UNPD_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "납부기한까지 완납되지 않은 청구서 1건 = 미납 채권 1건(청구기본과 1:1, 미납 발생 시에만 생성). 미납 채권의 현재 상태·잔액·진행 단계를 관리하는 COL 의 중심 엔터티",
+      "attrs": [
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "미납 채권 식별 번호"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구기본",
+            "attr": "청구번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "미납 원천 청구서(청구기본 1:1 — 대체키)"
+        },
+        {
+          "attrNm": "채권이관번호",
+          "phyNm": "RCVB_TRNSF_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "채권이관기본",
+            "attr": "채권이관번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "해지 후 이관 묶음(이관 전 NULL — S5)"
+        },
+        {
+          "attrNm": "분할납부약정번호",
+          "phyNm": "DIV_PAY_AGRMT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "분할납부약정기본",
+            "attr": "분할납부약정번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "분할납부 약정 대상이면 그 약정(대부분 NULL — S5)"
+        },
+        {
+          "attrNm": "미납채권명",
+          "phyNm": "UNPD_RCVB_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "미납 채권 표시명(청구년월·청구계정 표시 조합)"
+        },
+        {
+          "attrNm": "미납발생일시",
+          "phyNm": "UNPD_OCRN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "납부기한 경과로 미납이 확정된 일시(행위 일시)"
+        },
+        {
+          "attrNm": "미납상태유형코드",
+          "phyNm": "UNPD_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "미납·일부납부·완납·분할납부중·채권이관·대손·소멸(S3 저선택도 — 완납 다수)"
+        },
+        {
+          "attrNm": "최초미납금액",
+          "phyNm": "FRST_UNPD_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "미납 확정 시점의 미납 원금(청구금액 중 미수납분)"
+        },
+        {
+          "attrNm": "독촉단계유형코드",
+          "phyNm": "DUN_STEP_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "현재 도달한 독촉 단계(독촉 전 NULL)"
+        },
+        {
+          "attrNm": "완납일시",
+          "phyNm": "CMPLPAY_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "잔여 0 이 된 일시(미완납 NULL)"
+        },
+        {
+          "attrNm": "소멸시효만료일자",
+          "phyNm": "EXTSH_PRSCR_EXPRY_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "현재 소멸시효 만료 예정일(통신요금 채권 3년 — 중단 시 채권시효이력으로 갱신)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "납기 경과 미완납 청구서가 미납 채권이 된다",
+          "parent": "PAY.청구기본",
+          "child": "COL.미납기본",
+          "card": "1:1",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구번호"
+          ]
+        },
+        {
+          "relNm": "이관 묶음이 여러 미납 채권을 묶는다",
+          "parent": "COL.채권이관기본",
+          "child": "COL.미납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "채권이관번호"
+          ]
+        },
+        {
+          "relNm": "분할납부 약정이 여러 미납 채권을 묶는다",
+          "parent": "COL.분할납부약정기본",
+          "child": "COL.미납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "분할납부약정번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 반복 항목은 미납상세로 분리. 2NF: 단일 PK. 3NF: 청구년월·납부기한일자는 청구기본 속성(이행 종속)이라 제거. [04 관문] 파생 집계 속성(미납잔여금액·연체가산금누적금액)은 반정규화라 논리에서 제거 — 물리 단계 반정규화 후보(규칙 2-7)",
+      "chgNote": "개념 속성 청구년월·납부기한일자 제거 — 청구번호→청구기본에 이행 종속(3NF). 물리 단계 반정규화 후보(파티션 키·월 조회)"
+    },
+    {
+      "entId": "COL-002",
+      "entNm": "미납상세",
+      "phyNm": "UNPD_DTL",
+      "tblNm": "PTL_COL_UNPD_D",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "미납 채권의 요금항목 단위 미납액. 수납배분이 항목 순위(할부금·부가세 등)로 이뤄지므로 항목별 잔액을 관리",
+      "attrs": [
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "소속 미납 채권"
+        },
+        {
+          "attrNm": "미납상세순번",
+          "phyNm": "UNPD_DTL_SEQ",
+          "domNm": "순번N10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "미납 채권 내 항목 순번"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구상세",
+            "attr": "청구번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "원천 청구상세 복합키 구성 1(값 = 미납기본.청구번호)"
+        },
+        {
+          "attrNm": "청구상세순번",
+          "phyNm": "BILL_DTL_SEQ",
+          "domNm": "순번N5",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구상세",
+            "attr": "청구상세순번"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "원천 청구상세 복합키 구성 2(요금항목은 청구상세 경유)"
+        },
+        {
+          "attrNm": "미납항목명",
+          "phyNm": "UNPD_ITM_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "미납 요금항목 표시명"
+        },
+        {
+          "attrNm": "최종수납반영일시",
+          "phyNm": "LAST_RCV_RFLT_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "마지막으로 수납이 배분된 일시"
+        },
+        {
+          "attrNm": "미납항목상태유형코드",
+          "phyNm": "UNPD_ITM_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "항목 미납 상태"
+        },
+        {
+          "attrNm": "최초미납금액",
+          "phyNm": "FRST_UNPD_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "항목 미납 확정 금액"
+        },
+        {
+          "attrNm": "누적수납금액",
+          "phyNm": "ACML_RCV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "항목에 배분된 수납 누계"
+        },
+        {
+          "attrNm": "미납조정금액",
+          "phyNm": "UNPD_ADJ_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "감면·정정 조정 누계(음수 가능 — S7)"
+        },
+        {
+          "attrNm": "분할납부대상여부",
+          "phyNm": "DIV_PAY_TRGT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "분할납부 약정에 포함된 항목 여부"
+        },
+        {
+          "attrNm": "대손처리여부",
+          "phyNm": "BDDT_PRCS_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "대손상각된 항목 여부"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "미납 채권은 요금항목별 미납상세로 구성된다",
+          "parent": "COL.미납기본",
+          "child": "COL.미납상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        },
+        {
+          "relNm": "청구 항목이 미납 항목으로 이어진다(미납 시에만)",
+          "parent": "PAY.청구상세",
+          "child": "COL.미납상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구번호",
+            "청구상세순번"
+          ]
+        }
+      ],
+      "normNote": "1NF 만족. 2NF: 청구번호는 미납번호에 부분 종속이나 청구상세 참조 복합 FK 의 구성 속성이라 유지 — 무결성 규칙 V1(미납상세.청구번호 = 미납기본.청구번호). 3NF: 요금항목코드·항목금액은 청구상세 경유(이행 종속 배제). [04 관문] 파생 집계 속성(미납잔여금액)은 반정규화라 논리에서 제거 — 물리 단계 반정규화 후보(규칙 2-7)"
+    },
+    {
+      "entId": "COL-003",
+      "entNm": "연체가산금내역",
+      "phyNm": "OVDU_ADCHG_DTLS",
+      "tblNm": "PTL_COL_OVDU_ADCHG_L",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "미납 채권에 월 단위로 부과한 연체가산금 1건(이용약관 가산금율·상한 적용). 부과액은 다음 청구서에 실려 청구된다",
+      "attrs": [
+        {
+          "attrNm": "연체가산금번호",
+          "phyNm": "OVDU_ADCHG_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "가산금 부과 식별 번호"
+        },
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "부과 대상 미납 채권"
+        },
+        {
+          "attrNm": "반영청구번호",
+          "phyNm": "RFLT_BILL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구기본",
+            "attr": "청구번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "가산금이 실린 다음 달 청구서(반영 전·면제 NULL — 역할명 FK)"
+        },
+        {
+          "attrNm": "연체가산금기준유형코드",
+          "phyNm": "OVDU_ADCHG_STD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "연체가산금기준코드",
+            "attr": "연체가산금기준유형코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "적용 가산금 기준"
+        },
+        {
+          "attrNm": "연체가산금명",
+          "phyNm": "OVDU_ADCHG_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "부과 건 표시명"
+        },
+        {
+          "attrNm": "가산금부과일시",
+          "phyNm": "ADCHG_IMPS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "부과 일시(행위 일시)"
+        },
+        {
+          "attrNm": "가산금부과상태유형코드",
+          "phyNm": "ADCHG_IMPS_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "부과·청구반영·감면·취소"
+        },
+        {
+          "attrNm": "부과년월",
+          "phyNm": "IMPS_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "부과 대상 년월(미납 채권당 월 1건 — 대체키 미납번호+부과년월)"
+        },
+        {
+          "attrNm": "가산대상금액",
+          "phyNm": "ADTN_TRGT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "가산금 산정 기준 미납 원금"
+        },
+        {
+          "attrNm": "적용가산금율",
+          "phyNm": "APLCN_ADCHG_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "부과 시점 적용 율(기준 변경 뒤에도 유지되는 시점 값 — 이행 종속 아님)"
+        },
+        {
+          "attrNm": "부과금액",
+          "phyNm": "IMPS_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "부과 연체가산금"
+        },
+        {
+          "attrNm": "감면금액",
+          "phyNm": "RDCT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "감면·면제 금액"
+        },
+        {
+          "attrNm": "가산금상한적용여부",
+          "phyNm": "ADCHG_UPLMT_APLCN_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 13,
+          "def": "약관 상한(미납액의 일정 %) 도달로 잘린 여부"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "미납 채권에 월마다 연체가산금을 부과한다",
+          "parent": "COL.미납기본",
+          "child": "COL.연체가산금내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        },
+        {
+          "relNm": "부과된 가산금이 다음 청구서에 반영된다",
+          "parent": "PAY.청구기본",
+          "child": "COL.연체가산금내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "반영청구번호"
+          ]
+        },
+        {
+          "relNm": "가산금 기준이 부과 건에 적용된다",
+          "parent": "COL.연체가산금기준코드",
+          "child": "COL.연체가산금내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "연체가산금기준유형코드"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF 만족(단일 PK). 3NF: 적용가산금율은 부과 시점 스냅샷이라 기준코드의 현재 율과 독립 — 이행 종속 아님. 대체키(미납번호, 부과년월) 유일"
+    },
+    {
+      "entId": "COL-004",
+      "entNm": "독촉내역",
+      "phyNm": "DUN_DTLS",
+      "tblNm": "PTL_COL_DUN_L",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "미납 채권에 대한 독촉 발송 1건(문자·우편·전화·알림톡). 경과일별 독촉정책에 따라 단계를 진행",
+      "attrs": [
+        {
+          "attrNm": "독촉번호",
+          "phyNm": "DUN_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "독촉 발송 식별 번호"
+        },
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "독촉 대상 미납(청구계정 합산 독촉은 가장 오래된 미납을 대표로)"
+        },
+        {
+          "attrNm": "독촉정책번호",
+          "phyNm": "DUN_PLCY_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "독촉정책기본",
+            "attr": "독촉정책번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "적용 독촉 정책(단계는 정책 경유)"
+        },
+        {
+          "attrNm": "독촉제목명",
+          "phyNm": "DUN_TTL_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "발송 제목"
+        },
+        {
+          "attrNm": "독촉발송일시",
+          "phyNm": "DUN_SNDNG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "발송 일시(행위 일시 — S4 말일·1일 급증)"
+        },
+        {
+          "attrNm": "독촉발송상태유형코드",
+          "phyNm": "DUN_SNDNG_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "발송 상태"
+        },
+        {
+          "attrNm": "독촉매체유형코드",
+          "phyNm": "DUN_MDM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "실제 발송 매체(정책 기본 매체와 다를 수 있음 — 문자 실패 시 우편 대체)"
+        },
+        {
+          "attrNm": "독촉대상금액",
+          "phyNm": "DUN_TRGT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "독촉 시점 미납 금액"
+        },
+        {
+          "attrNm": "수신전화번호암호화값",
+          "phyNm": "RCPTN_TELNO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "문자·알림톡 수신 번호 암호화 값(우편 NULL)"
+        },
+        {
+          "attrNm": "독촉내용",
+          "phyNm": "DUN_CN",
+          "domNm": "내용V4000",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "발송 본문(S9 넓은 행 일부)"
+        },
+        {
+          "attrNm": "발송결과수신일시",
+          "phyNm": "SNDNG_RSLT_RCPTN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "최종 발송 결과 수신 일시(시도별 결과는 독촉발송결과내역)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "미납 채권에 독촉을 발송한다",
+          "parent": "COL.미납기본",
+          "child": "COL.독촉내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        },
+        {
+          "relNm": "독촉 정책에 따라 독촉을 발송한다",
+          "parent": "COL.독촉정책기본",
+          "child": "COL.독촉내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "독촉정책번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF 만족. 3NF: 독촉단계유형코드는 정책 속성(이행 종속)이라 제거, 매체는 실발송 값이 정책과 달라질 수 있어 유지. 발송 시도별 결과는 독촉발송결과내역으로 분리(반복 그룹 제거)",
+      "chgNote": "개념 속성 독촉단계유형코드 제거 — 독촉정책번호→독촉정책기본.독촉단계유형코드 이행 종속(3NF)"
+    },
+    {
+      "entId": "COL-005",
+      "entNm": "이용정지기본",
+      "phyNm": "SUSP_BAS",
+      "tblNm": "PTL_COL_SUSP_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "미납으로 인한 회선 이용정지 1건(발신정지→착발신정지 단계, 수납 시 해제). 처리 행위는 COL, 결과 회선 상태는 ORD 회선상태이력에 기록",
+      "attrs": [
+        {
+          "attrNm": "이용정지번호",
+          "phyNm": "SUSP_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "미납 이용정지 식별 번호"
+        },
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "ORD",
+            "ent": "회선기본",
+            "attr": "서비스관리번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "정지 대상 회선"
+        },
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "정지 원인 미납(대표 미납)"
+        },
+        {
+          "attrNm": "이용정지명",
+          "phyNm": "SUSP_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "정지 건 표시명"
+        },
+        {
+          "attrNm": "이용정지일시",
+          "phyNm": "SUSP_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "정지 시행 일시(행위 일시)"
+        },
+        {
+          "attrNm": "이용정지상태유형코드",
+          "phyNm": "SUSP_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "예고·정지중·해제·해지전환"
+        },
+        {
+          "attrNm": "이용정지단계유형코드",
+          "phyNm": "SUSP_STEP_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "현재 정지 단계(단계 변경은 이용정지이력)"
+        },
+        {
+          "attrNm": "이용정지예고일시",
+          "phyNm": "SUSP_PRNTC_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "사전 통지 일시(전기통신사업법 사전 통지)"
+        },
+        {
+          "attrNm": "이용정지기준미납금액",
+          "phyNm": "SUSP_STD_UNPD_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "정지 판정 시점 미납 금액"
+        },
+        {
+          "attrNm": "이용정지기준경과일수",
+          "phyNm": "SUSP_STD_ELPS_DCNT",
+          "domNm": "일수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "정지 판정 시점 납기 경과 일수"
+        },
+        {
+          "attrNm": "이용정지해제일시",
+          "phyNm": "SUSP_RLS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "정지가 끝난 일시(정지 건 종료 사실 — 해제 처리 단위는 이용정지해제내역)"
+        },
+        {
+          "attrNm": "이용정지해제사유유형코드",
+          "phyNm": "SUSP_RLS_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "정지 종료 사유"
+        },
+        {
+          "attrNm": "회선상태반영여부",
+          "phyNm": "LINE_STTS_RFLT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 13,
+          "def": "ORD 회선상태이력 반영 완료 여부"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "회선이 미납으로 이용정지된다",
+          "parent": "ORD.회선기본",
+          "child": "COL.이용정지기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "서비스관리번호"
+          ]
+        },
+        {
+          "relNm": "미납 채권이 이용정지의 원인이 된다",
+          "parent": "COL.미납기본",
+          "child": "COL.이용정지기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF 만족. 3NF: 회선 속성(서비스번호 등)은 회선기본 경유. 해제일시·해제사유는 정지 건 자체의 종료 사실(정지 1건당 1개) — 해제 처리 단위(부분 해제·망 반영 재처리)는 이용정지해제내역 1:N 으로 분리"
+    },
+    {
+      "entId": "COL-006",
+      "entNm": "직권해지기본",
+      "phyNm": "EXOFTRMN_BAS",
+      "tblNm": "PTL_COL_EXOFTRMN_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "미납 이용정지가 일정 기간 지속된 가입계약을 사업자가 직권으로 해지하는 처리 1건(사전 예고 → 확정 또는 철회). 확정 시 ORD 가입계약 종료",
+      "attrs": [
+        {
+          "attrNm": "직권해지번호",
+          "phyNm": "EXOFTRMN_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "직권해지 식별 번호"
+        },
+        {
+          "attrNm": "가입계약번호",
+          "phyNm": "SBSC_CTRT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "ORD",
+            "ent": "가입계약기본",
+            "attr": "가입계약번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "해지 대상 가입계약"
+        },
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "해지 원인 미납(대표 미납)"
+        },
+        {
+          "attrNm": "이용정지번호",
+          "phyNm": "SUSP_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "이용정지기본",
+            "attr": "이용정지번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "선행 미납 이용정지(정지 없이 해지되는 예외는 NULL)"
+        },
+        {
+          "attrNm": "직권해지명",
+          "phyNm": "EXOFTRMN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "해지 건 표시명"
+        },
+        {
+          "attrNm": "직권해지일시",
+          "phyNm": "EXOFTRMN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "해지 확정 일시(행위 일시)"
+        },
+        {
+          "attrNm": "직권해지상태유형코드",
+          "phyNm": "EXOFTRMN_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "예고·확정·철회"
+        },
+        {
+          "attrNm": "직권해지사유유형코드",
+          "phyNm": "EXOFTRMN_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "해지 사유"
+        },
+        {
+          "attrNm": "직권해지예고일시",
+          "phyNm": "EXOFTRMN_PRNTC_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "법정 사전 통지 기준 일시(최초 예고 — 통지 발송 건은 직권해지예고내역)"
+        },
+        {
+          "attrNm": "직권해지예정일자",
+          "phyNm": "EXOFTRMN_SCHD_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "예고상 해지 예정일"
+        },
+        {
+          "attrNm": "해지기준미납금액",
+          "phyNm": "TRMN_STD_UNPD_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "해지 판정 시점 미납 금액"
+        },
+        {
+          "attrNm": "직권해지철회일시",
+          "phyNm": "EXOFTRMN_WTHDR_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "납부로 철회된 일시"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "가입계약이 미납으로 직권해지된다",
+          "parent": "ORD.가입계약기본",
+          "child": "COL.직권해지기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "가입계약번호"
+          ]
+        },
+        {
+          "relNm": "미납 채권이 직권해지의 원인이 된다",
+          "parent": "COL.미납기본",
+          "child": "COL.직권해지기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        },
+        {
+          "relNm": "이용정지가 직권해지로 이어진다",
+          "parent": "COL.이용정지기본",
+          "child": "COL.직권해지기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "이용정지번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF 만족. 3NF: 직권해지예고일시는 해지 예정일 산정 기준이 되는 법정 통지 기준일(해지 건 속성)이고, 통지 발송 시도는 직권해지예고내역 1:N 으로 분리"
+    },
+    {
+      "entId": "COL-007",
+      "entNm": "채권이관기본",
+      "phyNm": "RCVB_TRNSF_BAS",
+      "tblNm": "PTL_COL_RCVB_TRNSF_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "해지 고객의 미납 채권을 채권관리 단계로 이관(내부 관리·외부 추심 위임·매각 대상)하는 묶음 1건. 고객 단위로 여러 미납을 묶는다",
+      "attrs": [
+        {
+          "attrNm": "채권이관번호",
+          "phyNm": "RCVB_TRNSF_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "채권 이관 묶음 식별 번호"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "채권 귀속 고객(해지 고객)"
+        },
+        {
+          "attrNm": "채권매각번호",
+          "phyNm": "RCVB_DSPSL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "채권매각내역",
+            "attr": "채권매각번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "매각된 경우 그 매각 건(대부분 NULL)"
+        },
+        {
+          "attrNm": "채권이관명",
+          "phyNm": "RCVB_TRNSF_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "이관 묶음 표시명"
+        },
+        {
+          "attrNm": "채권이관일시",
+          "phyNm": "RCVB_TRNSF_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "이관 일시(행위 일시)"
+        },
+        {
+          "attrNm": "채권이관상태유형코드",
+          "phyNm": "RCVB_TRNSF_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "이관 상태"
+        },
+        {
+          "attrNm": "채권이관유형코드",
+          "phyNm": "RCVB_TRNSF_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "추심위탁·채권매각·소송·신용정보사등록"
+        },
+        {
+          "attrNm": "이관채권금액",
+          "phyNm": "TRNSF_RCVB_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "이관 시점 채권 합계"
+        },
+        {
+          "attrNm": "이관채권건수",
+          "phyNm": "TRNSF_RCVB_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "묶인 미납 건수"
+        },
+        {
+          "attrNm": "회수종료일자",
+          "phyNm": "RTRVL_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "회수 종료(완제·대손·매각) 일자"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "해지 고객의 채권을 이관한다",
+          "parent": "CUS.고객기본",
+          "child": "COL.채권이관기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "채권 매각 1건이 여러 이관 묶음을 넘긴다",
+          "parent": "COL.채권매각내역",
+          "child": "COL.채권이관기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "채권매각번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 추심사 위임 반복(재위임)을 추심위임상세로 분리. 2NF 만족. 3NF: 고객 속성은 고객기본 경유. [04 관문] 파생 집계 속성(누적회수금액)은 반정규화라 논리에서 제거 — 물리 단계 반정규화 후보(규칙 2-7)",
+      "chgNote": "개념 속성 채권추심사번호·추심위임일자 → 추심위임상세로 이동(N:M 해소 — 한 묶음이 재위임으로 여러 추심사에 위임됨). 채권매각번호 FK 추가"
+    },
+    {
+      "entId": "COL-008",
+      "entNm": "분할납부약정기본",
+      "phyNm": "DIV_PAY_AGRMT_BAS",
+      "tblNm": "PTL_COL_DIV_PAY_AGRMT_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "청구계정의 누적 미납액을 여러 회차로 나눠 내기로 한 약정 1건(약정 시 이용정지 해제 조건 부여 가능). 회차별 계획·실적은 분할납부회차상세",
+      "attrs": [
+        {
+          "attrNm": "분할납부약정번호",
+          "phyNm": "DIV_PAY_AGRMT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "분할납부 약정 식별 번호"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "약정 단위 청구계정"
+        },
+        {
+          "attrNm": "분할납부약정명",
+          "phyNm": "DIV_PAY_AGRMT_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "약정 표시명"
+        },
+        {
+          "attrNm": "분할납부약정일시",
+          "phyNm": "DIV_PAY_AGRMT_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "약정 체결 일시(행위 일시)"
+        },
+        {
+          "attrNm": "분할납부약정상태유형코드",
+          "phyNm": "DIV_PAY_AGRMT_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "약정 상태"
+        },
+        {
+          "attrNm": "약정대상금액",
+          "phyNm": "AGRMT_TRGT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "분할 대상 미납 합계"
+        },
+        {
+          "attrNm": "분할회차수",
+          "phyNm": "DIV_TMS_CNT",
+          "domNm": "수N3",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "분할 회차 수"
+        },
+        {
+          "attrNm": "최초납부예정일자",
+          "phyNm": "FRST_PAY_SCHD_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "1회차 납부 예정일"
+        },
+        {
+          "attrNm": "이용정지해제조건여부",
+          "phyNm": "SUSP_RLS_CND_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "약정 체결을 조건으로 이용정지를 해제했는지"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정의 미납을 분할납부 약정으로 묶는다",
+          "parent": "CUS.청구계정기본",
+          "child": "COL.분할납부약정기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 회차 반복은 분할납부회차상세로 분리. 2NF 만족. 3NF: 청구계정 속성은 청구계정기본 경유. [04 관문] 파생 집계 속성(최종납부예정일자·납부완료회차수·누적납부금액·불이행회차수)은 반정규화라 논리에서 제거 — 물리 단계 반정규화 후보(규칙 2-7)"
+    },
+    {
+      "entId": "COL-009",
+      "entNm": "대손기본",
+      "phyNm": "BDDT_BAS",
+      "tblNm": "PTL_COL_BDDT_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "회수 불능으로 판정해 대손 상각을 확정한 미납 채권 1건(소멸시효 완성·파산·행방불명·회수비용 초과·매각). 법인세법 대손금 요건 판정과 대손 후 회수를 추적",
+      "attrs": [
+        {
+          "attrNm": "대손번호",
+          "phyNm": "BDDT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "대손 식별 번호"
+        },
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "대손 확정 미납 채권(미납 1건당 대손 최대 1건 — 대체키)"
+        },
+        {
+          "attrNm": "채권이관번호",
+          "phyNm": "RCVB_TRNSF_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "채권이관기본",
+            "attr": "채권이관번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "대손 시점의 이관 묶음(이관 없이 대손 NULL)"
+        },
+        {
+          "attrNm": "대손명",
+          "phyNm": "BDDT_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "대손 건 표시명"
+        },
+        {
+          "attrNm": "대손상각일시",
+          "phyNm": "BDDT_DPRC_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "상각 처리 일시(행위 일시)"
+        },
+        {
+          "attrNm": "대손상태유형코드",
+          "phyNm": "BDDT_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "대손 상태"
+        },
+        {
+          "attrNm": "대손사유유형코드",
+          "phyNm": "BDDT_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "대손 사유(법인세법 요건)"
+        },
+        {
+          "attrNm": "대손확정일자",
+          "phyNm": "BDDT_CFMTN_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "대손 확정 일자"
+        },
+        {
+          "attrNm": "대손금액",
+          "phyNm": "BDDT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "상각 금액"
+        },
+        {
+          "attrNm": "세무손금인정여부",
+          "phyNm": "TXAF_LSEXP_RCGTN_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "세무상 손금 인정 여부"
+        },
+        {
+          "attrNm": "회계전표번호",
+          "phyNm": "ACNTG_SLIP_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "상각 회계 전표 번호(회계 연계 전 NULL)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "회수 불능 미납 채권을 대손 상각한다(미납 1건당 최대 1건)",
+          "parent": "COL.미납기본",
+          "child": "COL.대손기본",
+          "card": "1:1",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        },
+        {
+          "relNm": "이관 묶음의 채권이 대손된다",
+          "parent": "COL.채권이관기본",
+          "child": "COL.대손기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "채권이관번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 항목별 상각은 대손상각상세로 분리. 2NF 만족. 3NF: 채권이관번호는 대손 시점 이관 묶음 기록 — 미납기본.채권이관번호(현재 값)와 의미가 달라 유지(재이관 시 달라질 수 있음). [04 관문] 파생 집계 속성(대손회수누적금액)은 반정규화라 논리에서 제거 — 물리 단계 반정규화 후보(규칙 2-7)"
+    },
+    {
+      "entId": "COL-010",
+      "entNm": "미납상태이력",
+      "phyNm": "UNPD_STTS_HIST",
+      "tblNm": "PTL_COL_UNPD_STTS_H",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "미납 채권 상태(미납→독촉→정지→해지→이관→대손·완납) 변경 1건. 유효시작·종료일시 쌍으로 레이크 SCD2 에 바로 쓰는 이력",
+      "attrs": [
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "대상 미납 채권"
+        },
+        {
+          "attrNm": "상태변경순번",
+          "phyNm": "STTS_CHG_SEQ",
+          "domNm": "순번N10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "미납 채권 내 변경 순번"
+        },
+        {
+          "attrNm": "상태변경사유명",
+          "phyNm": "STTS_CHG_RSN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "변경 사유 설명"
+        },
+        {
+          "attrNm": "상태변경일시",
+          "phyNm": "STTS_CHG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "변경 일시(행위 일시)"
+        },
+        {
+          "attrNm": "미납상태유형코드",
+          "phyNm": "UNPD_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "변경 후 상태"
+        },
+        {
+          "attrNm": "이전미납상태유형코드",
+          "phyNm": "BFR_UNPD_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "변경 전 상태(최초 NULL)"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "이 상태의 유효 시작"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "이 상태의 유효 종료(현재 행 9999-12-31)"
+        },
+        {
+          "attrNm": "변경시점미납잔여금액",
+          "phyNm": "CHG_PNT_UNPD_RMND_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "변경 시점 잔액 스냅샷"
+        },
+        {
+          "attrNm": "원인업무유형코드",
+          "phyNm": "CAUS_TASK_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "변경을 일으킨 업무(독촉·정지·해지·이관·수납·대손·분할)"
+        },
+        {
+          "attrNm": "원인업무번호",
+          "phyNm": "CAUS_TASK_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "원인 업무 건 번호(업무별 다른 엔터티 — 다형 참조라 FK 정의 없음)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "미납 채권의 상태 변경을 이력으로 남긴다",
+          "parent": "COL.미납기본",
+          "child": "COL.미납상태이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF 만족(전 속성이 미납번호+상태변경순번 전체에 종속). 3NF 만족. 원인업무번호는 원인업무유형코드에 따라 대상이 바뀌는 다형 참조 — FK 미정의, 무결성 규칙 V2 로 관리"
+    },
+    {
+      "entId": "COL-011",
+      "entNm": "연체가산금기준코드",
+      "phyNm": "OVDU_ADCHG_STD_CD",
+      "tblNm": "PTL_COL_OVDU_ADCHG_STD_C",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "연체가산금 부과 기준(가산금율·상한율·감면 기준). 이용약관 개정 시 새 기준유형코드로 등록",
+      "attrs": [
+        {
+          "attrNm": "연체가산금기준유형코드",
+          "phyNm": "OVDU_ADCHG_STD_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "가산금 기준 코드"
+        },
+        {
+          "attrNm": "연체가산금기준명",
+          "phyNm": "OVDU_ADCHG_STD_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "기준 이름"
+        },
+        {
+          "attrNm": "기준가산금율",
+          "phyNm": "STD_ADCHG_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "월 가산금율(%)"
+        },
+        {
+          "attrNm": "가산금상한율",
+          "phyNm": "ADCHG_UPLMT_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "미납 원금 대비 가산금 상한(%)"
+        },
+        {
+          "attrNm": "가산금감면기준금액",
+          "phyNm": "ADCHG_RDCT_STD_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "이 금액 미만 미납은 가산금 면제"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "기준 적용 시작"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "기준 적용 종료(현행 99991231)"
+        },
+        {
+          "attrNm": "사용여부",
+          "phyNm": "USE_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "현재 사용 여부"
+        }
+      ],
+      "rels": [],
+      "normNote": "1NF·2NF·3NF 만족 — 모든 속성이 기준유형코드에만 종속"
+    },
+    {
+      "entId": "COL-012",
+      "entNm": "독촉정책기본",
+      "phyNm": "DUN_PLCY_BAS",
+      "tblNm": "PTL_COL_DUN_PLCY_M",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "납기 경과일·고객유형별 독촉 단계 정책(몇 일 경과 시 어떤 단계·매체로 독촉)",
+      "attrs": [
+        {
+          "attrNm": "독촉정책번호",
+          "phyNm": "DUN_PLCY_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "독촉 정책 식별 번호"
+        },
+        {
+          "attrNm": "독촉정책명",
+          "phyNm": "DUN_PLCY_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "정책 이름"
+        },
+        {
+          "attrNm": "독촉단계유형코드",
+          "phyNm": "DUN_STEP_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "이 정책이 정하는 독촉 단계"
+        },
+        {
+          "attrNm": "고객유형코드",
+          "phyNm": "CUST_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "적용 고객 유형(CUS 공통코드)"
+        },
+        {
+          "attrNm": "독촉기준경과일수",
+          "phyNm": "DUN_STD_ELPS_DCNT",
+          "domNm": "일수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "납기 경과 일수 기준"
+        },
+        {
+          "attrNm": "독촉기준미납금액",
+          "phyNm": "DUN_STD_UNPD_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "이 금액 이상일 때 적용"
+        },
+        {
+          "attrNm": "독촉매체유형코드",
+          "phyNm": "DUN_MDM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "기본 발송 매체"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "정책 적용 시작"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "정책 적용 종료"
+        },
+        {
+          "attrNm": "사용여부",
+          "phyNm": "USE_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "현재 사용 여부"
+        }
+      ],
+      "rels": [],
+      "normNote": "1NF·2NF·3NF 만족. 대체키(독촉단계유형코드, 고객유형코드, 적용시작일자)"
+    },
+    {
+      "entId": "COL-013",
+      "entNm": "독촉발송결과내역",
+      "phyNm": "DUN_SNDNG_RSLT_DTLS",
+      "tblNm": "PTL_COL_DUN_SNDNG_RSLT_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "독촉 1건의 발송 시도별 결과(성공·실패·반송·재발송)",
+      "attrs": [
+        {
+          "attrNm": "독촉번호",
+          "phyNm": "DUN_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "COL",
+            "ent": "독촉내역",
+            "attr": "독촉번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "대상 독촉"
+        },
+        {
+          "attrNm": "발송결과순번",
+          "phyNm": "SNDNG_RSLT_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "독촉 내 시도 순번"
+        },
+        {
+          "attrNm": "독촉매체유형코드",
+          "phyNm": "DUN_MDM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "이 시도의 매체"
+        },
+        {
+          "attrNm": "발송결과유형코드",
+          "phyNm": "SNDNG_RSLT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "성공·실패·반송·수신거부·번호없음"
+        },
+        {
+          "attrNm": "발송결과수신일시",
+          "phyNm": "SNDNG_RSLT_RCPTN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "결과 수신 일시(행위 일시)"
+        },
+        {
+          "attrNm": "발송오류내용",
+          "phyNm": "SNDNG_ERR_CN",
+          "domNm": "내용V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "실패·반송 사유 원문(성공 NULL — S5)"
+        },
+        {
+          "attrNm": "재발송여부",
+          "phyNm": "RE_SNDNG_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "재발송 시도인지"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "독촉 발송 시도마다 결과를 남긴다",
+          "parent": "COL.독촉내역",
+          "child": "COL.독촉발송결과내역",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "독촉번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족(독촉번호+순번 전체 종속)"
+    },
+    {
+      "entId": "COL-014",
+      "entNm": "이용정지이력",
+      "phyNm": "SUSP_HIST",
+      "tblNm": "PTL_COL_SUSP_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "이용정지 1건의 단계·상태 변경 이력(발신정지→착발신정지 등)",
+      "attrs": [
+        {
+          "attrNm": "이용정지번호",
+          "phyNm": "SUSP_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "COL",
+            "ent": "이용정지기본",
+            "attr": "이용정지번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "대상 이용정지"
+        },
+        {
+          "attrNm": "이용정지이력순번",
+          "phyNm": "SUSP_HIST_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "변경 순번"
+        },
+        {
+          "attrNm": "이용정지상태유형코드",
+          "phyNm": "SUSP_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "변경 후 상태"
+        },
+        {
+          "attrNm": "이용정지단계유형코드",
+          "phyNm": "SUSP_STEP_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "변경 후 단계"
+        },
+        {
+          "attrNm": "이전이용정지단계유형코드",
+          "phyNm": "BFR_SUSP_STEP_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "변경 전 단계(최초 NULL)"
+        },
+        {
+          "attrNm": "상태변경사유명",
+          "phyNm": "STTS_CHG_RSN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "변경 사유"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "유효 시작(행위 일시)"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "유효 종료"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "이용정지 단계 변경을 이력으로 남긴다",
+          "parent": "COL.이용정지기본",
+          "child": "COL.이용정지이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "이용정지번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족"
+    },
+    {
+      "entId": "COL-015",
+      "entNm": "이용정지해제내역",
+      "phyNm": "SUSP_RLS_DTLS",
+      "tblNm": "PTL_COL_SUSP_RLS_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "이용정지 해제 처리 1건(수납·분할납부 약정·납부 약속에 따른 해제, 단계 완화 부분 해제 포함, 망 반영 결과)",
+      "attrs": [
+        {
+          "attrNm": "이용정지해제번호",
+          "phyNm": "SUSP_RLS_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "해제 처리 식별 번호"
+        },
+        {
+          "attrNm": "이용정지번호",
+          "phyNm": "SUSP_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "이용정지기본",
+            "attr": "이용정지번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "해제 대상 정지"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "해제 원인 수납(약정·약속 해제 NULL)"
+        },
+        {
+          "attrNm": "분할납부약정번호",
+          "phyNm": "DIV_PAY_AGRMT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "분할납부약정기본",
+            "attr": "분할납부약정번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "약정 조건 해제 시"
+        },
+        {
+          "attrNm": "납부약속번호",
+          "phyNm": "PAY_PRMS_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "납부약속내역",
+            "attr": "납부약속번호"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "납부 약속 조건 해제 시"
+        },
+        {
+          "attrNm": "이용정지해제일시",
+          "phyNm": "SUSP_RLS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "해제 처리 일시(행위 일시)"
+        },
+        {
+          "attrNm": "이용정지해제사유유형코드",
+          "phyNm": "SUSP_RLS_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "해제 사유"
+        },
+        {
+          "attrNm": "해제요청일시",
+          "phyNm": "RLS_REQ_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "망 해제 요청 일시"
+        },
+        {
+          "attrNm": "회선상태반영여부",
+          "phyNm": "LINE_STTS_RFLT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "회선 상태 반영 완료 여부"
+        },
+        {
+          "attrNm": "처리결과유형코드",
+          "phyNm": "PRCS_RSLT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "망 처리 결과"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "이용정지를 해제한다",
+          "parent": "COL.이용정지기본",
+          "child": "COL.이용정지해제내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "이용정지번호"
+          ]
+        },
+        {
+          "relNm": "수납이 정지 해제의 원인이 된다",
+          "parent": "INV.수납기본",
+          "child": "COL.이용정지해제내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        },
+        {
+          "relNm": "분할납부 약정을 조건으로 해제한다",
+          "parent": "COL.분할납부약정기본",
+          "child": "COL.이용정지해제내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "분할납부약정번호"
+          ]
+        },
+        {
+          "relNm": "납부 약속을 조건으로 해제한다",
+          "parent": "COL.납부약속내역",
+          "child": "COL.이용정지해제내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "납부약속번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족. 해제 원인 3종(수납·약정·약속)은 서로 다른 엔터티라 각각 선택 FK(배타 관계 — 규칙 V3 : 셋 중 최대 하나)"
+    },
+    {
+      "entId": "COL-016",
+      "entNm": "직권해지예고내역",
+      "phyNm": "EXOFTRMN_PRNTC_DTLS",
+      "tblNm": "PTL_COL_EXOFTRMN_PRNTC_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "직권해지 사전 통지 발송 1건(전기통신사업법 사전 통지 — 우편·문자 복수 발송)",
+      "attrs": [
+        {
+          "attrNm": "직권해지번호",
+          "phyNm": "EXOFTRMN_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "COL",
+            "ent": "직권해지기본",
+            "attr": "직권해지번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "대상 직권해지"
+        },
+        {
+          "attrNm": "예고순번",
+          "phyNm": "PRNTC_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "통지 순번"
+        },
+        {
+          "attrNm": "직권해지예고일시",
+          "phyNm": "EXOFTRMN_PRNTC_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "통지 발송 일시(행위 일시)"
+        },
+        {
+          "attrNm": "독촉매체유형코드",
+          "phyNm": "DUN_MDM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "통지 매체"
+        },
+        {
+          "attrNm": "예고발송상태유형코드",
+          "phyNm": "PRNTC_SNDNG_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "통지 발송 상태"
+        },
+        {
+          "attrNm": "수신전화번호암호화값",
+          "phyNm": "RCPTN_TELNO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "문자 수신 번호 암호화 값(우편 NULL)"
+        },
+        {
+          "attrNm": "예고내용",
+          "phyNm": "PRNTC_CN",
+          "domNm": "내용V4000",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "통지 본문"
+        },
+        {
+          "attrNm": "발송결과수신일시",
+          "phyNm": "SNDNG_RSLT_RCPTN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "발송 결과 수신 일시"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "직권해지를 사전 통지한다",
+          "parent": "COL.직권해지기본",
+          "child": "COL.직권해지예고내역",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "직권해지번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족"
+    },
+    {
+      "entId": "COL-017",
+      "entNm": "채권추심사기본",
+      "phyNm": "RCVB_COLL_CO_BAS",
+      "tblNm": "PTL_COL_RCVB_COLL_CO_M",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "미납 채권 추심을 위임받거나 채권을 매입하는 외부 기관(신용정보회사·자산관리회사)",
+      "attrs": [
+        {
+          "attrNm": "채권추심사번호",
+          "phyNm": "RCVB_COLL_CO_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "추심사 식별 번호"
+        },
+        {
+          "attrNm": "채권추심사명",
+          "phyNm": "RCVB_COLL_CO_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "추심사 이름"
+        },
+        {
+          "attrNm": "채권추심사유형코드",
+          "phyNm": "RCVB_COLL_CO_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "추심위탁·채권매입·신용정보집중"
+        },
+        {
+          "attrNm": "채권추심사상태유형코드",
+          "phyNm": "RCVB_COLL_CO_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "거래 상태"
+        },
+        {
+          "attrNm": "사업자등록번호",
+          "phyNm": "BRNO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "사업자등록번호(S12 앞자리 0)"
+        },
+        {
+          "attrNm": "대표전화번호",
+          "phyNm": "RPRS_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "대표 전화"
+        },
+        {
+          "attrNm": "추심수수료율",
+          "phyNm": "COLL_FEE_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "계약 기본 수수료율(회수액 대비 %)"
+        },
+        {
+          "attrNm": "계약시작일자",
+          "phyNm": "CTRT_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "위탁 계약 시작"
+        },
+        {
+          "attrNm": "계약종료일자",
+          "phyNm": "CTRT_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "위탁 계약 종료"
+        }
+      ],
+      "rels": [],
+      "normNote": "1NF·2NF·3NF 만족. PRM 파트너유형코드에 추심사 값이 없어(대리점~수납대행기관 7종) PRM 파트너기본과 분리한 COL 기준 엔터티 — 파트너 통합 시 파트너번호 FK 추가 검토(결정 메모)"
+    },
+    {
+      "entId": "COL-018",
+      "entNm": "추심위임상세",
+      "phyNm": "COLL_DLGT_DTL",
+      "tblNm": "PTL_COL_COLL_DLGT_D",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "채권이관 묶음을 추심사에 위임한 1건(재위임 시 순번 증가) — 채권이관기본 × 채권추심사기본 N:M 해소",
+      "attrs": [
+        {
+          "attrNm": "채권이관번호",
+          "phyNm": "RCVB_TRNSF_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "COL",
+            "ent": "채권이관기본",
+            "attr": "채권이관번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "위임 대상 이관 묶음"
+        },
+        {
+          "attrNm": "추심위임순번",
+          "phyNm": "COLL_DLGT_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "묶음 내 위임 순번"
+        },
+        {
+          "attrNm": "채권추심사번호",
+          "phyNm": "RCVB_COLL_CO_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "채권추심사기본",
+            "attr": "채권추심사번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "위임 추심사"
+        },
+        {
+          "attrNm": "추심위임일자",
+          "phyNm": "COLL_DLGT_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "위임 시작 일자"
+        },
+        {
+          "attrNm": "추심위임종료일자",
+          "phyNm": "COLL_DLGT_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "위임 종료 일자(진행 중 NULL)"
+        },
+        {
+          "attrNm": "위임채권금액",
+          "phyNm": "DLGT_RCVB_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "위임 시점 채권 금액"
+        },
+        {
+          "attrNm": "적용추심수수료율",
+          "phyNm": "APLCN_COLL_FEE_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "이 위임에 적용한 수수료율(계약 율 시점 스냅샷)"
+        },
+        {
+          "attrNm": "추심위임상태유형코드",
+          "phyNm": "COLL_DLGT_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "위임 상태"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "이관 묶음을 추심사에 위임한다",
+          "parent": "COL.채권이관기본",
+          "child": "COL.추심위임상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "채권이관번호"
+          ]
+        },
+        {
+          "relNm": "추심사가 이관 묶음을 위임받는다",
+          "parent": "COL.채권추심사기본",
+          "child": "COL.추심위임상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "채권추심사번호"
+          ]
+        }
+      ],
+      "normNote": "N:M(이관 묶음 ↔ 추심사) 해소 관계 엔터티. 1NF·2NF·3NF 만족. 적용추심수수료율은 위임 시점 값"
+    },
+    {
+      "entId": "COL-019",
+      "entNm": "추심회수내역",
+      "phyNm": "COLL_RTRVL_DTLS",
+      "tblNm": "PTL_COL_COLL_RTRVL_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "추심사가 회수한 금액 1건(어떤 위임으로 어떤 미납을 회수했는지, 수납 처리 연결)",
+      "attrs": [
+        {
+          "attrNm": "추심회수번호",
+          "phyNm": "COLL_RTRVL_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "추심 회수 식별 번호"
+        },
+        {
+          "attrNm": "채권이관번호",
+          "phyNm": "RCVB_TRNSF_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "추심위임상세",
+            "attr": "채권이관번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "회수한 위임(복합키 1)"
+        },
+        {
+          "attrNm": "추심위임순번",
+          "phyNm": "COLL_DLGT_SEQ",
+          "domNm": "순번N5",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "추심위임상세",
+            "attr": "추심위임순번"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "회수한 위임(복합키 2)"
+        },
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "회수 대상 미납 채권"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "회수금 수납 처리(입금 확인 전 NULL)"
+        },
+        {
+          "attrNm": "추심수수료번호",
+          "phyNm": "COLL_FEE_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "추심수수료내역",
+            "attr": "추심수수료번호"
+          },
+          "nullYn": true,
+          "seq": 6,
+          "def": "수수료 정산에 묶인 건(월 정산 전 NULL)"
+        },
+        {
+          "attrNm": "추심회수일시",
+          "phyNm": "COLL_RTRVL_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "회수 일시(행위 일시)"
+        },
+        {
+          "attrNm": "추심회수금액",
+          "phyNm": "COLL_RTRVL_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "회수 금액"
+        },
+        {
+          "attrNm": "회수방법유형코드",
+          "phyNm": "RTRVL_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "가상계좌·계좌이체·카드·현금·상계"
+        },
+        {
+          "attrNm": "추심회수상태유형코드",
+          "phyNm": "COLL_RTRVL_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "회수 상태"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "위임 건으로 채권을 회수한다",
+          "parent": "COL.추심위임상세",
+          "child": "COL.추심회수내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "채권이관번호",
+            "추심위임순번"
+          ]
+        },
+        {
+          "relNm": "미납 채권이 추심으로 회수된다",
+          "parent": "COL.미납기본",
+          "child": "COL.추심회수내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        },
+        {
+          "relNm": "추심 회수금을 수납 처리한다",
+          "parent": "INV.수납기본",
+          "child": "COL.추심회수내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        },
+        {
+          "relNm": "회수 건이 월 수수료 정산에 묶인다",
+          "parent": "COL.추심수수료내역",
+          "child": "COL.추심회수내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "추심수수료번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF 만족. 3NF: 추심사번호는 추심위임상세 경유(이행 종속 배제). 규칙 V4 : 미납기본.채권이관번호 = 회수.채권이관번호"
+    },
+    {
+      "entId": "COL-020",
+      "entNm": "추심수수료내역",
+      "phyNm": "COLL_FEE_DTLS",
+      "tblNm": "PTL_COL_COLL_FEE_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "[STL] 추심사별 월 회수 수수료 정산 1건 — 회수액 × 수수료율, PRM 정산·세금계산서로 지급",
+      "attrs": [
+        {
+          "attrNm": "추심수수료번호",
+          "phyNm": "COLL_FEE_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "추심 수수료 정산 식별 번호"
+        },
+        {
+          "attrNm": "채권추심사번호",
+          "phyNm": "RCVB_COLL_CO_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "채권추심사기본",
+            "attr": "채권추심사번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "정산 대상 추심사"
+        },
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "지급 정산 건(정산 확정 전 NULL)"
+        },
+        {
+          "attrNm": "정산년월",
+          "phyNm": "STLM_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "정산 대상 년월(대체키 추심사+정산년월)"
+        },
+        {
+          "attrNm": "수수료대상금액",
+          "phyNm": "FEE_TRGT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "해당 월 회수 합계"
+        },
+        {
+          "attrNm": "추심수수료금액",
+          "phyNm": "COLL_FEE_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "산정 수수료(공급가액)"
+        },
+        {
+          "attrNm": "세액",
+          "phyNm": "TXAMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "부가가치세"
+        },
+        {
+          "attrNm": "추심수수료상태유형코드",
+          "phyNm": "COLL_FEE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "산정·확정·지급·취소"
+        },
+        {
+          "attrNm": "추심수수료확정일시",
+          "phyNm": "COLL_FEE_CFMTN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "수수료 확정 일시(행위 일시)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "추심사에 회수 수수료를 정산한다",
+          "parent": "COL.채권추심사기본",
+          "child": "COL.추심수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "채권추심사번호"
+          ]
+        },
+        {
+          "relNm": "추심 수수료가 파트너 정산으로 지급된다",
+          "parent": "PRM.정산기본",
+          "child": "COL.추심수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족. 적용율은 위임별로 다를 수 있어(재위임) 추심위임상세에 두고 여기선 금액만",
+      "moduleCd": "STL"
+    },
+    {
+      "entId": "COL-021",
+      "entNm": "분할납부회차상세",
+      "phyNm": "DIV_PAY_TMS_DTL",
+      "tblNm": "PTL_COL_DIV_PAY_TMS_D",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "분할납부 약정의 회차별 납부 계획·실적",
+      "attrs": [
+        {
+          "attrNm": "분할납부약정번호",
+          "phyNm": "DIV_PAY_AGRMT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "COL",
+            "ent": "분할납부약정기본",
+            "attr": "분할납부약정번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "대상 약정"
+        },
+        {
+          "attrNm": "분할납부회차",
+          "phyNm": "DIV_PAY_TMS",
+          "domNm": "회차N3",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "회차"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "회차 납부 수납(미납 NULL)"
+        },
+        {
+          "attrNm": "납부예정일자",
+          "phyNm": "PAY_SCHD_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "회차 납부 예정일"
+        },
+        {
+          "attrNm": "납부예정금액",
+          "phyNm": "PAY_SCHD_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "회차 납부 예정 금액"
+        },
+        {
+          "attrNm": "회차납부금액",
+          "phyNm": "TMS_PAY_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "회차 실제 납부 금액"
+        },
+        {
+          "attrNm": "납부완료일시",
+          "phyNm": "PAY_CMPTN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "회차 납부 완료 일시"
+        },
+        {
+          "attrNm": "분할납부회차상태유형코드",
+          "phyNm": "DIV_PAY_TMS_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "예정·완납·일부납·불이행"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "분할납부 약정은 회차로 구성된다",
+          "parent": "COL.분할납부약정기본",
+          "child": "COL.분할납부회차상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "분할납부약정번호"
+          ]
+        },
+        {
+          "relNm": "수납으로 회차를 납부한다",
+          "parent": "INV.수납기본",
+          "child": "COL.분할납부회차상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족"
+    },
+    {
+      "entId": "COL-022",
+      "entNm": "납부약속내역",
+      "phyNm": "PAY_PRMS_DTLS",
+      "tblNm": "PTL_COL_PAY_PRMS_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "고객이 미납액을 특정일까지 내겠다고 한 약속 1건(약속 기간 동안 정지·독촉 유예)",
+      "attrs": [
+        {
+          "attrNm": "납부약속번호",
+          "phyNm": "PAY_PRMS_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "납부 약속 식별 번호"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "약속 단위 청구계정"
+        },
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "대표 미납(청구계정 합산 약속은 NULL 가능)"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "약속 이행 수납(미이행 NULL)"
+        },
+        {
+          "attrNm": "납부약속일시",
+          "phyNm": "PAY_PRMS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "약속 접수 일시(행위 일시)"
+        },
+        {
+          "attrNm": "납부약속일자",
+          "phyNm": "PAY_PRMS_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "약속한 납부일"
+        },
+        {
+          "attrNm": "납부약속금액",
+          "phyNm": "PAY_PRMS_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "약속 금액"
+        },
+        {
+          "attrNm": "납부약속상태유형코드",
+          "phyNm": "PAY_PRMS_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "약속·이행·일부이행·불이행·취소"
+        },
+        {
+          "attrNm": "이용정지유예여부",
+          "phyNm": "SUSP_DFRM_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "약속 기간 정지 유예 여부"
+        },
+        {
+          "attrNm": "약속이행일시",
+          "phyNm": "PRMS_FLFL_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "약속 이행 일시"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정 단위로 납부를 약속한다",
+          "parent": "CUS.청구계정기본",
+          "child": "COL.납부약속내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "미납 채권에 대해 납부를 약속한다",
+          "parent": "COL.미납기본",
+          "child": "COL.납부약속내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        },
+        {
+          "relNm": "수납으로 약속을 이행한다",
+          "parent": "INV.수납기본",
+          "child": "COL.납부약속내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족"
+    },
+    {
+      "entId": "COL-023",
+      "entNm": "신용정보등록내역",
+      "phyNm": "CRINFO_REG_DTLS",
+      "tblNm": "PTL_COL_CRINFO_REG_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "통신 채무 불이행 정보를 신용정보 집중기관에 등록한 1건(등록 전 사전 통지 포함)",
+      "attrs": [
+        {
+          "attrNm": "신용정보등록번호",
+          "phyNm": "CRINFO_REG_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "신용정보 등록 식별 번호"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "등록 대상 고객"
+        },
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "대표 미납(고객 합산 등록은 NULL 가능)"
+        },
+        {
+          "attrNm": "신용정보등록일시",
+          "phyNm": "CRINFO_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "등록 일시(행위 일시)"
+        },
+        {
+          "attrNm": "신용정보등록상태유형코드",
+          "phyNm": "CRINFO_REG_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "예고·등록·해제·취소"
+        },
+        {
+          "attrNm": "신용정보기관유형코드",
+          "phyNm": "CRINFO_INST_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "등록 기관"
+        },
+        {
+          "attrNm": "신용정보등록사유유형코드",
+          "phyNm": "CRINFO_REG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "등록 사유"
+        },
+        {
+          "attrNm": "신용정보등록금액",
+          "phyNm": "CRINFO_REG_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "등록 채무 금액"
+        },
+        {
+          "attrNm": "등록예고일시",
+          "phyNm": "REG_PRNTC_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "사전 통지 일시"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객의 채무 불이행 정보가 등록된다",
+          "parent": "CUS.고객기본",
+          "child": "COL.신용정보등록내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "미납 채권이 신용정보 등록의 원인이 된다",
+          "parent": "COL.미납기본",
+          "child": "COL.신용정보등록내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족"
+    },
+    {
+      "entId": "COL-024",
+      "entNm": "신용정보해제내역",
+      "phyNm": "CRINFO_RLS_DTLS",
+      "tblNm": "PTL_COL_CRINFO_RLS_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "신용정보 등록 해제 처리 1건(완납·정정·시효) — 기관 회신 실패 시 재요청으로 1:N",
+      "attrs": [
+        {
+          "attrNm": "신용정보해제번호",
+          "phyNm": "CRINFO_RLS_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "해제 처리 식별 번호"
+        },
+        {
+          "attrNm": "신용정보등록번호",
+          "phyNm": "CRINFO_REG_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "신용정보등록내역",
+            "attr": "신용정보등록번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "해제 대상 등록"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "완납 해제 원인 수납"
+        },
+        {
+          "attrNm": "신용정보해제일시",
+          "phyNm": "CRINFO_RLS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "해제 처리 일시(행위 일시)"
+        },
+        {
+          "attrNm": "신용정보해제사유유형코드",
+          "phyNm": "CRINFO_RLS_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "해제 사유"
+        },
+        {
+          "attrNm": "처리결과유형코드",
+          "phyNm": "PRCS_RSLT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "기관 처리 결과"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "신용정보 등록을 해제한다",
+          "parent": "COL.신용정보등록내역",
+          "child": "COL.신용정보해제내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "신용정보등록번호"
+          ]
+        },
+        {
+          "relNm": "완납 수납이 해제 원인이 된다",
+          "parent": "INV.수납기본",
+          "child": "COL.신용정보해제내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족"
+    },
+    {
+      "entId": "COL-025",
+      "entNm": "대손상각상세",
+      "phyNm": "BDDT_DPRC_DTL",
+      "tblNm": "PTL_COL_BDDT_DPRC_D",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "대손 1건의 미납 항목별 상각 금액·부가세 대손세액공제",
+      "attrs": [
+        {
+          "attrNm": "대손번호",
+          "phyNm": "BDDT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "COL",
+            "ent": "대손기본",
+            "attr": "대손번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "대상 대손"
+        },
+        {
+          "attrNm": "대손상각상세순번",
+          "phyNm": "BDDT_DPRC_DTL_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "항목 순번"
+        },
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "미납상세",
+            "attr": "미납번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "상각 미납 항목(복합키 1 — 값 = 대손기본.미납번호)"
+        },
+        {
+          "attrNm": "미납상세순번",
+          "phyNm": "UNPD_DTL_SEQ",
+          "domNm": "순번N10",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "미납상세",
+            "attr": "미납상세순번"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "상각 미납 항목(복합키 2)"
+        },
+        {
+          "attrNm": "대손상각금액",
+          "phyNm": "BDDT_DPRC_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "항목 상각 금액"
+        },
+        {
+          "attrNm": "대손세액공제금액",
+          "phyNm": "BDDT_TXAMT_DDTN_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "부가가치세법 대손세액공제 금액"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "대손은 항목별 상각상세로 구성된다",
+          "parent": "COL.대손기본",
+          "child": "COL.대손상각상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "대손번호"
+          ]
+        },
+        {
+          "relNm": "미납 항목이 대손 상각된다",
+          "parent": "COL.미납상세",
+          "child": "COL.대손상각상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "미납번호",
+            "미납상세순번"
+          ]
+        }
+      ],
+      "normNote": "1NF 만족. 2NF: 미납번호는 대손번호에 부분 종속이나 미납상세 복합 FK 구성 속성이라 유지(규칙 V5). 3NF 만족"
+    },
+    {
+      "entId": "COL-026",
+      "entNm": "대손회수내역",
+      "phyNm": "BDDT_RTRVL_DTLS",
+      "tblNm": "PTL_COL_BDDT_RTRVL_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "대손 상각 후 회수한 금액 1건(대손 환입 회계 처리)",
+      "attrs": [
+        {
+          "attrNm": "대손회수번호",
+          "phyNm": "BDDT_RTRVL_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "대손 회수 식별 번호"
+        },
+        {
+          "attrNm": "대손번호",
+          "phyNm": "BDDT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "대손기본",
+            "attr": "대손번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "회수 대상 대손"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "회수금 수납"
+        },
+        {
+          "attrNm": "추심회수번호",
+          "phyNm": "COLL_RTRVL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "추심회수내역",
+            "attr": "추심회수번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "추심으로 회수한 경우"
+        },
+        {
+          "attrNm": "대손회수일시",
+          "phyNm": "BDDT_RTRVL_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "회수 일시(행위 일시)"
+        },
+        {
+          "attrNm": "대손회수금액",
+          "phyNm": "BDDT_RTRVL_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "회수 금액"
+        },
+        {
+          "attrNm": "회수방법유형코드",
+          "phyNm": "RTRVL_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "회수 방법"
+        },
+        {
+          "attrNm": "회계전표번호",
+          "phyNm": "ACNTG_SLIP_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "대손 환입 전표 번호"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "대손 채권을 회수한다",
+          "parent": "COL.대손기본",
+          "child": "COL.대손회수내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "대손번호"
+          ]
+        },
+        {
+          "relNm": "수납으로 대손을 회수한다",
+          "parent": "INV.수납기본",
+          "child": "COL.대손회수내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        },
+        {
+          "relNm": "추심 회수가 대손 회수가 된다",
+          "parent": "COL.추심회수내역",
+          "child": "COL.대손회수내역",
+          "card": "1:1",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "추심회수번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족"
+    },
+    {
+      "entId": "COL-027",
+      "entNm": "채권매각내역",
+      "phyNm": "RCVB_DSPSL_DTLS",
+      "tblNm": "PTL_COL_RCVB_DSPSL_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "부실 채권을 매입사에 매각한 1건(여러 이관 묶음을 한 번에 매각)",
+      "attrs": [
+        {
+          "attrNm": "채권매각번호",
+          "phyNm": "RCVB_DSPSL_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "채권 매각 식별 번호"
+        },
+        {
+          "attrNm": "채권추심사번호",
+          "phyNm": "RCVB_COLL_CO_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "COL",
+            "ent": "채권추심사기본",
+            "attr": "채권추심사번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "매입사(채권추심사유형 = 채권매입)"
+        },
+        {
+          "attrNm": "채권매각일시",
+          "phyNm": "RCVB_DSPSL_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "매각 일시(행위 일시)"
+        },
+        {
+          "attrNm": "채권매각상태유형코드",
+          "phyNm": "RCVB_DSPSL_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "매각 상태"
+        },
+        {
+          "attrNm": "매각채권금액",
+          "phyNm": "DSPSL_RCVB_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "매각 채권 원금 합계"
+        },
+        {
+          "attrNm": "매각채권건수",
+          "phyNm": "DSPSL_RCVB_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "매각 미납 건수"
+        },
+        {
+          "attrNm": "매각금액",
+          "phyNm": "DSPSL_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "매각 대금"
+        },
+        {
+          "attrNm": "회계전표번호",
+          "phyNm": "ACNTG_SLIP_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "매각 회계 전표"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "매입사가 채권을 매입한다",
+          "parent": "COL.채권추심사기본",
+          "child": "COL.채권매각내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "채권추심사번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족. 매각율은 매각금액÷매각채권금액 파생이라 두지 않음"
+    },
+    {
+      "entId": "COL-028",
+      "entNm": "채권시효이력",
+      "phyNm": "RCVB_PRSCR_HIST",
+      "tblNm": "PTL_COL_RCVB_PRSCR_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "미납 채권 소멸시효의 기산·중단(청구·압류·승인)·재기산 이력",
+      "attrs": [
+        {
+          "attrNm": "미납번호",
+          "phyNm": "UNPD_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "COL",
+            "ent": "미납기본",
+            "attr": "미납번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "대상 미납 채권"
+        },
+        {
+          "attrNm": "시효변경순번",
+          "phyNm": "PRSCR_CHG_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "변경 순번"
+        },
+        {
+          "attrNm": "시효기산일자",
+          "phyNm": "PRSCR_RCKN_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "시효 기산(재기산) 일자"
+        },
+        {
+          "attrNm": "시효중단사유유형코드",
+          "phyNm": "PRSCR_INTRPT_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "중단 사유(최초 기산 NULL)"
+        },
+        {
+          "attrNm": "시효중단일자",
+          "phyNm": "PRSCR_INTRPT_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "중단 일자"
+        },
+        {
+          "attrNm": "소멸시효만료일자",
+          "phyNm": "EXTSH_PRSCR_EXPRY_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "이 변경 기준 만료 예정일"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "유효 시작(행위 일시)"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "유효 종료"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "미납 채권의 시효 기산·중단을 이력으로 남긴다",
+          "parent": "COL.미납기본",
+          "child": "COL.채권시효이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "미납번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 만족. 미납기본.소멸시효만료일자 = 현재 유효 행의 값(현재 상태 승계 속성)"
+    },
+    {
+      "entId": "COL-029",
+      "entNm": "미납월집계",
+      "phyNm": "UNPD_MM_AGG",
+      "tblNm": "PTL_COL_UNPD_MM_T",
+      "tp": "PROC",
+      "stg": "LGCL",
+      "def": "월말 기준 청구계정별 미납 잔액·연령(Aging) 스냅샷",
+      "attrs": [
+        {
+          "attrNm": "기준년월",
+          "phyNm": "STD_YM",
+          "domNm": "년월C6",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "집계 기준 년월"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "집계 대상 청구계정"
+        },
+        {
+          "attrNm": "미납건수",
+          "phyNm": "UNPD_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "월말 미납 채권 건수"
+        },
+        {
+          "attrNm": "미납잔여금액",
+          "phyNm": "UNPD_RMND_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "월말 미납 잔액 합계"
+        },
+        {
+          "attrNm": "연체가산금누적금액",
+          "phyNm": "OVDU_ADCHG_ACML_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "월말 가산금 누계"
+        },
+        {
+          "attrNm": "최대미납경과일수",
+          "phyNm": "MAX_UNPD_ELPS_DCNT",
+          "domNm": "일수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "가장 오래된 미납의 납기 경과 일수"
+        },
+        {
+          "attrNm": "미납경과구간유형코드",
+          "phyNm": "UNPD_ELPS_SCTN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "연령 구간(30·60·90·180·365일 초과)"
+        },
+        {
+          "attrNm": "이용정지여부",
+          "phyNm": "SUSP_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "월말 이용정지 중 회선 보유 여부"
+        },
+        {
+          "attrNm": "집계상태유형코드",
+          "phyNm": "AGG_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "집계 상태"
+        },
+        {
+          "attrNm": "집계일시",
+          "phyNm": "AGG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "집계 실행 일시(행위 일시)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정별로 월 미납을 집계한다",
+          "parent": "CUS.청구계정기본",
+          "child": "COL.미납월집계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        }
+      ],
+      "normNote": "가공(PROC) — 원천에서 재계산 가능한 집계라 정규화 대상 아님. 미납경과구간유형코드는 최대미납경과일수에서 결정(이행 종속)이나 분석 차원 키로 의도 유지(가공 엔터티 예외 기록)"
+    },
+    {
+      "entId": "COL-030",
+      "entNm": "미납회수월통계",
+      "phyNm": "UNPD_RTRVL_MM_STATS",
+      "tblNm": "PTL_COL_UNPD_RTRVL_MM_S",
+      "tp": "PROC",
+      "stg": "LGCL",
+      "def": "월·연령 구간·고객유형별 미납 발생·회수율·단계 전환(정지·해지·대손) 통계",
+      "attrs": [
+        {
+          "attrNm": "기준년월",
+          "phyNm": "STD_YM",
+          "domNm": "년월C6",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "통계 년월"
+        },
+        {
+          "attrNm": "미납경과구간유형코드",
+          "phyNm": "UNPD_ELPS_SCTN_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "연령 구간"
+        },
+        {
+          "attrNm": "고객유형코드",
+          "phyNm": "CUST_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "고객 유형(CUS 공통코드)"
+        },
+        {
+          "attrNm": "이월미납금액",
+          "phyNm": "CYOV_UNPD_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "전월 말 미납 잔액"
+        },
+        {
+          "attrNm": "당월발생미납금액",
+          "phyNm": "THMM_OCRN_UNPD_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "당월 새로 발생한 미납"
+        },
+        {
+          "attrNm": "당월회수금액",
+          "phyNm": "THMM_RTRVL_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "당월 회수(수납·추심) 합계"
+        },
+        {
+          "attrNm": "회수율",
+          "phyNm": "RTRVL_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "당월회수금액 ÷ (이월+당월발생) × 100"
+        },
+        {
+          "attrNm": "미납건수",
+          "phyNm": "UNPD_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "월말 미납 건수"
+        },
+        {
+          "attrNm": "이용정지전환건수",
+          "phyNm": "SUSP_CNVR_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "당월 정지로 넘어간 건수"
+        },
+        {
+          "attrNm": "직권해지전환건수",
+          "phyNm": "EXOFTRMN_CNVR_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "당월 직권해지로 넘어간 건수"
+        },
+        {
+          "attrNm": "대손전환금액",
+          "phyNm": "BDDT_CNVR_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "당월 대손 전환 금액"
+        },
+        {
+          "attrNm": "집계일시",
+          "phyNm": "AGG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "통계 생성 일시"
+        }
+      ],
+      "rels": [],
+      "normNote": "가공(PROC) 통계 — 정규화 대상 아님(회수율은 파생 지표를 의도적으로 저장)"
+    }
+  ],
+  "newTerms": [],
+  "newCodes": [],
+  "newWords": [],
+  "decisions": [
+    "채권추심사기본 = COL 기준(REF) 엔터티 — PRM 파트너유형코드에 추심사 값이 없음. PRM 이 추심사를 파트너로 받으면 파트너번호 FK 추가",
+    "채권 매입사는 채권추심사기본(채권추심사유형코드 = 채권매입)으로 통합 — 별도 매입사 엔터티 없음",
+    "채권매각 1건 : 이관 묶음 N 건 → 채권이관기본에 채권매각번호(선택 FK)",
+    "이용정지해제내역 = 해제 처리 단위(1:N), 이용정지기본 해제일시·해제사유 = 정지 건 종료 사실(1:1) — 다른 사실이라 중복 아님",
+    "미납월집계 = 청구계정 × 월 Aging 스냅샷, 미납회수월통계 = 월 × 경과 구간 × 고객유형 — 지역·조직 차원은 CUS·PRM 조인",
+    "추심수수료내역(STL) = 추심사 × 정산년월, PRM 정산기본 선택 FK. 추심회수내역이 추심수수료번호를 가져 1:N",
+    "ORD 회선상태이력 → 이용정지기본·직권해지기본 관계는 ORD 쪽 FK(02 관문 확정)",
+    "개념 basicEntRels(신용정보등록내역→CUS.고객기본) 를 해당 엔터티 rels 로 옮기고 키 삭제(02 관문 승계 이슈 3)",
+    "[04 자체 점검] 신용 = CRDT 는 표준단어 원장 여신 CRDT 와 약어 충돌 → 신용정보법 용어인 합성어 신용정보 = CRINFO 로 등재(신용 단독 사용 없음). 엔터티 2·속성 9 물리명 CRDT_INFO_ → CRINFO_",
+    "[04 관문 F1] 파생 집계 속성 9개(drvYn)는 저장형 반정규화라 규칙 2-7(반정규화 = 물리 단계만)에 따라 논리에서 제거, 물리 반정규화 후보로 인계 — COL-001 미납기본: 미납잔여금액(UNPD_RMND_AMT), 연체가산금누적금액(OVDU_ADCHG_ACML_AMT) / COL-002 미납상세: 미납잔여금액(UNPD_RMND_AMT) / COL-007 채권이관기본: 누적회수금액(ACML_RTRVL_AMT) / COL-008 분할납부약정기본: 최종납부예정일자(LAST_PAY_SCHD_DT), 납부완료회차수(PAY_CMPTN_TMS_CNT), 누적납부금액(ACML_PAY_AMT), 불이행회차수(NFLFL_TMS_CNT) / COL-009 대손기본: 대손회수누적금액(BDDT_RTRVL_ACML_AMT)",
+    "[04 관문 F2] 이용정지기본·직권해지기본 rels 의 자식 = ORD.회선상태이력 관계 2건 제거 — ORD.json 회선상태이력 rels 에 같은 관계가 정의돼 있어 적재 시 중복. 관계 소유 = FK 를 가진 자식 엔터티(ORD)"
+  ],
+  "stdMerged": "03 논리 관문 표준사전 2차 병합 완료(2026-11-07) — 이 영역 신규 단어 8·용어 89·코드 18을 tools/std_words.js·std_codes.js 원장에 등재하고 tools/std_build.js 로 model/std 재생성(docs/03_standards.md 8절). 비운 배열은 다음 단계 신규 요청용"
+}

@@ -1,0 +1,3582 @@
+{
+  "area": "PRD",
+  "areaNm": "상품",
+  "ver": "2026-11-07",
+  "author": "subagent_physical_modeler",
+  "trgtDbms": "POSTGRESQL",
+  "dbmsVer": "17",
+  "summary": {
+    "tblCnt": 30,
+    "colCnt": 244,
+    "idxCnt": 27,
+    "fkCnt": 44,
+    "partitionCnt": 0,
+    "estRowsTotal": 5687500
+  },
+  "decisions": [
+    {
+      "id": "P1",
+      "dec": "파티셔닝 없음",
+      "why": "PRD 30 테이블 전부 REF 기준(T1~T2). 파티션 규칙 대상(T4 과금계·T3 대용량 이력)이 없음 — 최대 공시지원금이력 300만 행은 PK(단말모델+요금제+시작일시) 탐색으로 충분"
+    },
+    {
+      "id": "P2",
+      "dec": "반정규화 없음",
+      "why": "규칙 2-7 반정규화는 대용량 조회 경로만. 후보(L2 요금제 기본제공 대표 3칼럼, G1 제거 5속성)는 모두 수천~수만 행 기준표라 Rating·청구 경로에서 PK 1회 조회 또는 캐시로 해결 — 같은 사실 두 곳 저장의 정합 비용이 더 큼"
+    },
+    {
+      "id": "P3",
+      "dec": "FK 는 정의만(D6) — FK 칼럼이 PK 선두가 아니면 인덱스 설계",
+      "why": "조인·역조회 경로 확보. PK 선두와 같은 칼럼은 PK 인덱스가 커버하므로 중복 인덱스 만들지 않음"
+    },
+    {
+      "id": "P4",
+      "dec": "데이터 타입 = 표준 도메인 그대로(일자 CHAR(8)·금액 NUMERIC(15)·일시 TIMESTAMP)",
+      "why": "규칙 2-10 도메인 사전이 정본"
+    },
+    {
+      "id": "P5",
+      "dec": "저선택도 상태 칼럼 단독 인덱스 금지",
+      "why": "S3(98% 한 값) — 선택도 높은 칼럼 뒤 복합으로만"
+    },
+    {
+      "id": "P6",
+      "dec": "estRows 는 실무 규모 기준 목표치, 코드 표(과금권역·요금항목분류 등)는 T1 하한보다 작음",
+      "why": "실제 코드 수 이상으로 부풀리면 기준 데이터가 비현실적 — 최종 배율은 data_migrationner(docs/06)"
+    }
+  ],
+  "tables": [
+    {
+      "tblNm": "PTL_PRD_PROD_M",
+      "entId": "PRD-001",
+      "entNm": "상품기본",
+      "tp": "REF",
+      "def": "판매하는 모든 통신 상품(요금제·부가서비스·할인·결합·약정·유심)의 공통 정의(TM Forum SID Product Offering). 유형별 상세 6종의 상위(슈퍼타입). 판매 종료·폐지 후에도 행을 지우지 않고 상태·판매종료일자로 표현한다. 현재 월정액은 여기, 변경 이력은 상품가격이력.",
+      "estRows": 20000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BAS_CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "기본요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "상품명",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "상품등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "상품상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "상품유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NTWK_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "서비스망유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_TRGT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "가입대상유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SALE_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "판매시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "SALE_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "판매종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "MM_FXAMT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "월정액금액",
+          "dflt": null
+        },
+        {
+          "colNm": "VAT_INCL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "부가가치세포함여부",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_CN",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "상품내용",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_PROD_M",
+        "cols": [
+          "PROD_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_PROD_M_01",
+          "cols": [
+            "BAS_CHRG_ITM_CD"
+          ],
+          "unq": false,
+          "why": "FK(요금항목코드) 조인 — 요금항목별 상품 역조회(청구서 항목 → 상품)"
+        },
+        {
+          "nm": "X_PTL_PRD_PROD_M_02",
+          "cols": [
+            "PROD_TY_CD",
+            "PROD_STTS_TY_CD"
+          ],
+          "unq": false,
+          "why": "상품유형별 판매중 상품 목록(가입·상담 화면 상품 선택) — 유형 먼저, 상태는 S3 저선택도라 단독 인덱스 안 만듦"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_PROD_M_01",
+          "cols": [
+            "BAS_CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_RTPLN_M",
+      "entId": "PRD-002",
+      "entNm": "요금제기본",
+      "tp": "REF",
+      "def": "음성·문자·데이터 기본제공량과 소진 후 속도 제한(QoS)을 정한 월정액 요금제의 서브타입 상세. 이용약관 신고 대상. 초과 요율·시간대 요율·기본제공 상세 항목은 기본 엔터티(요금제기본제공상세·요금제초과요율상세)로 분리.",
+      "estRows": 3000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RTPLN_PBANC_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "요금제공시명",
+          "dflt": null
+        },
+        {
+          "colNm": "RTPLN_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "요금제등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RTPLN_TRMS_DCLR_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "요금제약관신고상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RTPLN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "요금제유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHC_AGRMT_DSCNT_TRGT_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "선택약정할인대상여부",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMS_DCLR_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "약관신고일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_RTPLN_M",
+        "cols": [
+          "PROD_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_RTPLN_M_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_ADSVC_M",
+      "entId": "PRD-003",
+      "entNm": "부가서비스기본",
+      "tp": "REF",
+      "def": "요금제에 덧붙여 가입하는 부가서비스·옵션(통화연결음·데이터 옵션·로밍 요금제·휴대폰 보험·콘텐츠 구독 등)의 서브타입 상세. 망(HLR/HSS) 부가서비스 코드와 연동되며, 제3자 콘텐츠 상품은 PRM 콘텐츠제공사가 공급한다(S2 — 70% 미사용).",
+      "estRows": 10000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTS_PRVD_CO_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "콘텐츠제공사번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ADSVC_PBANC_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "부가서비스공시명",
+          "dflt": null
+        },
+        {
+          "colNm": "ADSVC_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "부가서비스등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "ADSVC_NTWK_LNK_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "부가서비스망연동상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ADSVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "부가서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RAT_SCHM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "과금방식유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NTWK_SVC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "망서비스번호",
+          "dflt": null
+        },
+        {
+          "colNm": "FREE_PRVD_MCNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "무료제공개월수",
+          "dflt": null
+        },
+        {
+          "colNm": "DUP_SBSC_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "중복가입가능여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_ADSVC_M",
+        "cols": [
+          "PROD_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_ADSVC_M_01",
+          "cols": [
+            "CNTS_PRVD_CO_NO"
+          ],
+          "unq": false,
+          "why": "FK(PRM 콘텐츠제공사) 조인 — 제공사별 부가서비스(콘텐츠 정산 STL 경로)"
+        },
+        {
+          "nm": "X_PTL_PRD_ADSVC_M_02",
+          "cols": [
+            "NTWK_SVC_NO"
+          ],
+          "unq": false,
+          "why": "망(HLR/HSS) 연동 응답의 망서비스번호 → 부가서비스 상품 역조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_ADSVC_M_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_ADSVC_M_02",
+          "cols": [
+            "CNTS_PRVD_CO_NO"
+          ],
+          "refTbl": "PTL_PRM_CNTS_PRVD_CO_M",
+          "refCols": [
+            "CNTS_PRVD_CO_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_DSCNT_PROD_M",
+      "entId": "PRD-004",
+      "entNm": "할인상품기본",
+      "tp": "REF",
+      "def": "요금에서 빼 주는 할인 규칙(선택약정 25%·장기고객·복지·제휴카드·결합·임직원·프로모션)의 서브타입 상세. 정률·정액 방식과 한도, 대상 요금항목, 할인이 청구서에 찍히는 할인 요금항목을 정한다. 조건·구간별 할인율은 기본 엔터티(할인조건상세·할인율상세).",
+      "estRows": 4000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_TRGT_CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "할인대상요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "할인요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ALNC_PRTNR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "제휴파트너번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_PBANC_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "할인공시명",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_PROD_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "할인상품등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_APRV_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "할인승인상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "할인유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_SCHM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "할인방식유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_RT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "할인율",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "할인금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_LMT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "할인한도금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DUP_DSCNT_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "중복할인가능여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_DSCNT_PROD_M",
+        "cols": [
+          "PROD_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_DSCNT_PROD_M_01",
+          "cols": [
+            "DSCNT_TRGT_CHRG_ITM_CD"
+          ],
+          "unq": false,
+          "why": "FK(요금항목코드) — 요금계산 시 대상 요금항목별 적용 할인 탐색"
+        },
+        {
+          "nm": "X_PTL_PRD_DSCNT_PROD_M_02",
+          "cols": [
+            "DSCNT_CHRG_ITM_CD"
+          ],
+          "unq": false,
+          "why": "FK(요금항목코드) — 청구서 할인 항목 → 할인상품 역조회"
+        },
+        {
+          "nm": "X_PTL_PRD_DSCNT_PROD_M_03",
+          "cols": [
+            "ALNC_PRTNR_NO"
+          ],
+          "unq": false,
+          "why": "FK(PRM 파트너) — 제휴사별 제휴할인 상품(제휴 정산 경로)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_DSCNT_PROD_M_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_DSCNT_PROD_M_02",
+          "cols": [
+            "DSCNT_TRGT_CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_DSCNT_PROD_M_03",
+          "cols": [
+            "DSCNT_CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_DSCNT_PROD_M_04",
+          "cols": [
+            "ALNC_PRTNR_NO"
+          ],
+          "refTbl": "PTL_PRM_PRTNR_M",
+          "refCols": [
+            "PRTNR_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_CMBN_PROD_M",
+      "entId": "PRD-005",
+      "entNm": "결합상품기본",
+      "tp": "REF",
+      "def": "여러 회선·상품을 묶어 할인하는 결합 규칙(유무선 결합·가족 무선 결합·인터넷+IPTV·법인 결합)의 서브타입 상세. 결합 가능 회선 수·가족관계 확인·결합할인 상품과 배분 방식을 정한다. 구성 상품·회선별 할인은 기본 엔터티(결합구성상세·결합할인상세).",
+      "estRows": 500,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_DSCNT_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "결합할인상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_PROD_PBANC_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "결합상품공시명",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_PROD_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "결합상품등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_PROD_OPER_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "결합상품운영상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "결합유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MIN_CMBN_LINE_CNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "최소결합회선수",
+          "dflt": null
+        },
+        {
+          "colNm": "MAX_CMBN_LINE_CNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "최대결합회선수",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_DSCNT_ALLC_SCHM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "결합할인배분방식유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "FMLY_REL_IDNTF_NEED_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "가족관계확인필요여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_CMBN_PROD_M",
+        "cols": [
+          "PROD_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_CMBN_PROD_M_01",
+          "cols": [
+            "CMBN_DSCNT_PROD_CD"
+          ],
+          "unq": false,
+          "why": "FK(할인상품기본) 조인"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_CMBN_PROD_M_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_CMBN_PROD_M_02",
+          "cols": [
+            "CMBN_DSCNT_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_DSCNT_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_AGRMT_PROD_M",
+      "entId": "PRD-006",
+      "entNm": "약정상품기본",
+      "tp": "REF",
+      "def": "일정 기간 이용을 약속하고 혜택을 받는 약정 규칙(선택약정 요금할인 25%·공시지원금 약정·기기·요금·결합 약정)의 서브타입 상세. 약정 개월 수·위약금(할인반환금·지원금 반환) 산정 방식과 상한을 정한다. 경과 기간별 위약금 구간은 기본 엔터티(약정위약금상세).",
+      "estRows": 300,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "LNKG_DSCNT_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "연계할인상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_PROD_PBANC_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "약정상품공시명",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_PROD_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "약정상품등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_PROD_OPER_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "약정상품운영상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "약정유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_MCNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "약정개월수",
+          "dflt": null
+        },
+        {
+          "colNm": "PNLT_ASMT_SCHM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "위약금산정방식유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PNLT_UPLMT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "위약금상한금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RE_AGRMT_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "재약정가능여부",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_SCSN_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "약정승계가능여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_AGRMT_PROD_M",
+        "cols": [
+          "PROD_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_AGRMT_PROD_M_01",
+          "cols": [
+            "LNKG_DSCNT_PROD_CD"
+          ],
+          "unq": false,
+          "why": "FK(할인상품기본) 조인 — 선택약정 25% 할인 연결"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_AGRMT_PROD_M_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_AGRMT_PROD_M_02",
+          "cols": [
+            "LNKG_DSCNT_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_DSCNT_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_EQP_MDL_M",
+      "entId": "PRD-007",
+      "entNm": "단말모델기본",
+      "tp": "REF",
+      "def": "판매·개통 가능한 단말 모델(스마트폰·피처폰·태블릿·웨어러블·라우터·IoT 모듈)의 기준 정보. 판매 상품(상품기본)이 아니라 단말 카탈로그라 별도 주식별자(단말모델코드). 현재 출고가·공시지원금은 여기, 변경 이력은 기본 엔터티(단말출고가이력·공시지원금이력 — 단말기유통법 공시). 개별 단말 재고는 PRM.",
+      "estRows": 5000,
+      "cols": [
+        {
+          "colNm": "EQP_MDL_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "단말모델코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_MDL_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "단말모델명",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_MDL_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "단말모델등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_MDL_SALE_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "단말모델판매상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MNFCT_CO_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "제조사유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "단말유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NTWK_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "서비스망유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "LNCH_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "출시일자",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_SHPM_PRC",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "단말출고가격",
+          "dflt": null
+        },
+        {
+          "colNm": "ESIM_SPRT_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "eSIM지원여부",
+          "dflt": null
+        },
+        {
+          "colNm": "SLFSPLY_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "자급제여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_EQP_MDL_M",
+        "cols": [
+          "EQP_MDL_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_EQP_MDL_M_01",
+          "cols": [
+            "MNFCT_CO_TY_CD",
+            "LNCH_DT"
+          ],
+          "unq": false,
+          "why": "제조사별 출시 모델 목록(판매·공시 화면)"
+        }
+      ],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_USIM_PROD_M",
+      "entId": "PRD-008",
+      "entNm": "유심상품기본",
+      "tp": "REF",
+      "def": "회선에 장착하는 가입자 식별 모듈 상품(USIM·eSIM·NFC 유심·IoT 유심)의 서브타입 상세. 종류·형태·판매가(유심비)를 정한다. 개별 유심 일련번호·재고는 PRM, 회선 장착은 ORD.",
+      "estRows": 200,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_PROD_PBANC_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "유심상품공시명",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_PROD_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "유심상품등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_PROD_SPLY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "유심상품공급상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_KND_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "유심종류코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_FORM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "유심형태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_SALE_PRC",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "유심판매가격",
+          "dflt": null
+        },
+        {
+          "colNm": "NFC_SPRT_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "NFC지원여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_USIM_PROD_M",
+        "cols": [
+          "PROD_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_USIM_PROD_M_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_CHRG_ITM_C",
+      "entId": "PRD-009",
+      "entNm": "요금항목코드",
+      "tp": "REF",
+      "def": "청구서 한 줄이 되는 과금 항목 체계(월정액·통화료·데이터료·부가사용료·할인·단말할부금·위약금·조정·부가가치세·연체가산금·소액결제 대행). 사용량 Rating·요금계산·청구상세·수납배분이 모두 이 코드로 이어진다. 과세 유형·청구서 출력 순서·수납배분 우선순위를 가진다.",
+      "estRows": 2000,
+      "cols": [
+        {
+          "colNm": "CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_CLSF_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "요금항목분류코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "요금항목명",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "요금항목등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_USE_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "요금항목사용상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "요금항목유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TXTN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "과세유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_OUTPT_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "청구서출력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_ALLC_PRRT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "수납배분우선순위",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_TRGT_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "할인대상여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_CHRG_ITM_C",
+        "cols": [
+          "CHRG_ITM_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_CHRG_ITM_C_01",
+          "cols": [
+            "CHRG_ITM_CLSF_CD"
+          ],
+          "unq": false,
+          "why": "FK(요금항목분류코드) — 청구서 분류 소계 조인"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_CHRG_ITM_C_01",
+          "cols": [
+            "CHRG_ITM_CLSF_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_CLSF_C",
+          "refCols": [
+            "CHRG_ITM_CLSF_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_PROD_PRC_H",
+      "entId": "PRD-010",
+      "entNm": "상품가격이력",
+      "tp": "REF",
+      "def": "상품별 월정액·가격 변경 이력(적용 시작·종료 일시, SCD2). 과거 청구월의 요금 재계산·소급 조정 때 그 시점 가격을 재현한다. 현재 가격은 상품기본.월정액금액. 단말 출고가·공시지원금 이력은 단말모델 쪽 기본 엔터티.",
+      "estRows": 200000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRC_APLCN_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "가격적용시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_PROD_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "적용상품명",
+          "dflt": null
+        },
+        {
+          "colNm": "PRC_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "가격변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PRC_APLCN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "가격적용상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRC_APLCN_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "가격적용종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "MM_FXAMT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "월정액금액",
+          "dflt": null
+        },
+        {
+          "colNm": "PRC_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "가격변경사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VAT_INCL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "부가가치세포함여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_PROD_PRC_H",
+        "cols": [
+          "PROD_CD",
+          "PRC_APLCN_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_PROD_PRC_H_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_PROD_CMPS_R",
+      "entId": "PRD-011",
+      "entNm": "상품구성관계",
+      "tp": "REF",
+      "def": "패키지 상품(요금제 + 필수 부가서비스 묶음 등)의 상위 상품 ↔ 구성 상품 N:M 해소(SID BundledProductOffering).",
+      "estRows": 30000,
+      "cols": [
+        {
+          "colNm": "UP_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상위상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMPS_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "구성상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMPS_NEED_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "구성필요여부",
+          "dflt": null
+        },
+        {
+          "colNm": "CMPS_PROD_CNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "구성상품수",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_PROD_CMPS_R",
+        "cols": [
+          "UP_PROD_CD",
+          "CMPS_PROD_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_PROD_CMPS_R_01",
+          "cols": [
+            "CMPS_PROD_CD"
+          ],
+          "unq": false,
+          "why": "FK(상품기본) 역방향 — 이 상품을 포함하는 패키지(PK 선두는 상위상품코드)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_PROD_CMPS_R_01",
+          "cols": [
+            "UP_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_PROD_CMPS_R_02",
+          "cols": [
+            "CMPS_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_PROD_EXCLN_R",
+      "entId": "PRD-012",
+      "entNm": "상품배타관계",
+      "tp": "REF",
+      "def": "동시 가입 불가·선행 가입 필수·동시 가입 필수 같은 상품 간 가입 제약(SID ProductOfferingRelationship) N:M 해소. 가입 신청 검증 규칙의 원천.",
+      "estRows": 50000,
+      "cols": [
+        {
+          "colNm": "STD_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "기준상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRGT_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "대상상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EXCLN_REL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "배타관계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "EXCLN_RSN_CN",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "배타사유내용",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_PROD_EXCLN_R",
+        "cols": [
+          "STD_PROD_CD",
+          "TRGT_PROD_CD",
+          "EXCLN_REL_TY_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_PROD_EXCLN_R_01",
+          "cols": [
+            "TRGT_PROD_CD"
+          ],
+          "unq": false,
+          "why": "FK(상품기본) 역방향 — 가입 검증 때 대상 쪽에서 배타 조합 확인"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_PROD_EXCLN_R_01",
+          "cols": [
+            "STD_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_PROD_EXCLN_R_02",
+          "cols": [
+            "TRGT_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_RTPLN_BSCPRVD_D",
+      "entId": "PRD-013",
+      "entNm": "요금제기본제공상세",
+      "tp": "REF",
+      "def": "요금제의 사용 서비스별(음성·영상통화·문자·데이터 등) 기본제공량·무제한·이월·소진 후 속도 제한. 요금제기본의 서비스별 반복 그룹을 행으로 정규화(결정 L2).",
+      "estRows": 15000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_UNIT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "사용단위유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BSCPRVD_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "기본제공량",
+          "dflt": null
+        },
+        {
+          "colNm": "UNLMT_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "무제한여부",
+          "dflt": null
+        },
+        {
+          "colNm": "CYOV_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "이월가능여부",
+          "dflt": null
+        },
+        {
+          "colNm": "EXHST_AFTR_RSTR_SPD_VL",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "소진후제한속도값",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_RTPLN_BSCPRVD_D",
+        "cols": [
+          "PROD_CD",
+          "USE_SVC_TY_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_RTPLN_BSCPRVD_D_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_RTPLN_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_RTPLN_EXCS_TRF_D",
+      "entId": "PRD-014",
+      "entNm": "요금제초과요율상세",
+      "tp": "REF",
+      "def": "기본제공량 초과 시 사용 서비스·과금권역별 단위 요율(초·KB·건 단위). 적용 기간으로 요율 변경 재현(SCD2).",
+      "estRows": 60000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RAT_ZONE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "과금권역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRF_APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 4,
+          "termNm": "요율적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRF_APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "요율적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_UNIT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "사용단위유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RAT_UNIT_VL",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "과금단위값",
+          "dflt": null
+        },
+        {
+          "colNm": "UNIT_CHRG_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "단위요금금액",
+          "dflt": null
+        },
+        {
+          "colNm": "EXCS_CHRG_UPLMT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "초과요금상한금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_RTPLN_EXCS_TRF_D",
+        "cols": [
+          "PROD_CD",
+          "RAT_ZONE_CD",
+          "USE_SVC_TY_CD",
+          "TRF_APLCN_BGNG_DT"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_RTPLN_EXCS_TRF_D_01",
+          "cols": [
+            "RAT_ZONE_CD"
+          ],
+          "unq": false,
+          "why": "FK(과금권역코드) 조인 — 권역별 요율 정비"
+        },
+        {
+          "nm": "X_PTL_PRD_RTPLN_EXCS_TRF_D_02",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "unq": false,
+          "why": "FK(요금항목코드) 조인"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_RTPLN_EXCS_TRF_D_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_RTPLN_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_RTPLN_EXCS_TRF_D_02",
+          "cols": [
+            "RAT_ZONE_CD"
+          ],
+          "refTbl": "PTL_PRD_RAT_ZONE_C",
+          "refCols": [
+            "RAT_ZONE_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_RTPLN_EXCS_TRF_D_03",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_RAT_ZONE_C",
+      "entId": "PRD-015",
+      "entNm": "과금권역코드",
+      "tp": "REF",
+      "def": "Rating 기준 과금 권역(국내 이동·유선·국제·위성·특수번호 등) 계층. planner 후보 '통화권역코드'를 개명(결정 L1).",
+      "estRows": 200,
+      "cols": [
+        {
+          "colNm": "RAT_ZONE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "과금권역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "UP_RAT_ZONE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "상위과금권역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RAT_ZONE_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "과금권역명",
+          "dflt": null
+        },
+        {
+          "colNm": "RAT_ZONE_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "과금권역유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RAT_ZONE_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "과금권역등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "사용여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_RAT_ZONE_C",
+        "cols": [
+          "RAT_ZONE_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_RAT_ZONE_C_01",
+          "cols": [
+            "UP_RAT_ZONE_CD"
+          ],
+          "unq": false,
+          "why": "FK(자기참조) — 하위 권역 펼침"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_RAT_ZONE_C_01",
+          "cols": [
+            "UP_RAT_ZONE_CD"
+          ],
+          "refTbl": "PTL_PRD_RAT_ZONE_C",
+          "refCols": [
+            "RAT_ZONE_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_TMBND_TRF_D",
+      "entId": "PRD-016",
+      "entNm": "시간대요율상세",
+      "tp": "REF",
+      "def": "과금권역·사용 서비스별 시간대(주간·야간·심야·주말·공휴일) 가산율(할증 +, 할인 −). 기준 요율에 곱해 적용.",
+      "estRows": 5000,
+      "cols": [
+        {
+          "colNm": "RAT_ZONE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "과금권역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TMBND_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "시간대유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRF_APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 4,
+          "termNm": "요율적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "TRF_APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "요율적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "BGNG_HR_VL",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "시작시간값",
+          "dflt": null
+        },
+        {
+          "colNm": "END_HR_VL",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "종료시간값",
+          "dflt": null
+        },
+        {
+          "colNm": "TMBND_ADTN_RT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "시간대가산율",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_TMBND_TRF_D",
+        "cols": [
+          "RAT_ZONE_CD",
+          "USE_SVC_TY_CD",
+          "TMBND_TY_CD",
+          "TRF_APLCN_BGNG_DT"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_TMBND_TRF_D_01",
+          "cols": [
+            "RAT_ZONE_CD"
+          ],
+          "refTbl": "PTL_PRD_RAT_ZONE_C",
+          "refCols": [
+            "RAT_ZONE_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_ROAM_NATN_C",
+      "entId": "PRD-017",
+      "entNm": "로밍국가코드",
+      "tp": "REF",
+      "def": "로밍 서비스 대상 국가(ISO 3166 국가코드 기준)와 로밍 권역. PRM.로밍사업자기본(방문망 사업자)이 국가코드로 참조한다(PRM 에 키 요구).",
+      "estRows": 250,
+      "cols": [
+        {
+          "colNm": "NATN_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "국가코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NATN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "국가명",
+          "dflt": null
+        },
+        {
+          "colNm": "ENG_NATN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "영문국가명",
+          "dflt": null
+        },
+        {
+          "colNm": "ROAM_ZONE_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "로밍권역유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NATN_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "국가번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CRNCY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "통화코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ROAM_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "로밍가능여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_ROAM_NATN_C",
+        "cols": [
+          "NATN_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_ROAM_NATN_C_01",
+          "cols": [
+            "NATN_NO"
+          ],
+          "unq": false,
+          "why": "로밍 사용내역(TAP) 국가번호 → 국가코드 매핑"
+        }
+      ],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_ROAM_TRF_D",
+      "entId": "PRD-018",
+      "entNm": "로밍요율상세",
+      "tp": "REF",
+      "def": "국가·사용 서비스·발착신별 로밍 요율(고객 청구 기준). 사업자 간 TAP 정산 요율은 PRM(STL) 쪽.",
+      "estRows": 30000,
+      "cols": [
+        {
+          "colNm": "NATN_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "국가코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_DRCT_SE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "사용방향구분코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRF_APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 4,
+          "termNm": "요율적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRF_APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "요율적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_UNIT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "사용단위유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RAT_UNIT_VL",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "과금단위값",
+          "dflt": null
+        },
+        {
+          "colNm": "UNIT_CHRG_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "단위요금금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_ROAM_TRF_D",
+        "cols": [
+          "NATN_CD",
+          "USE_SVC_TY_CD",
+          "USE_DRCT_SE_CD",
+          "TRF_APLCN_BGNG_DT"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_ROAM_TRF_D_01",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "unq": false,
+          "why": "FK(요금항목코드) 조인"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_ROAM_TRF_D_01",
+          "cols": [
+            "NATN_CD"
+          ],
+          "refTbl": "PTL_PRD_ROAM_NATN_C",
+          "refCols": [
+            "NATN_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_ROAM_TRF_D_02",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_ADSVC_CHRG_D",
+      "entId": "PRD-019",
+      "entNm": "부가서비스요금상세",
+      "tp": "REF",
+      "def": "부가서비스의 요금항목별 월정액·단위 요금과 일할 계산 여부. 적용 기간으로 요금 변경 재현(SCD2).",
+      "estRows": 30000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "요금적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "요금적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "RAT_SCHM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "과금방식유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MM_FXAMT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "월정액금액",
+          "dflt": null
+        },
+        {
+          "colNm": "UNIT_CHRG_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "단위요금금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DYPRT_CALC_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "일할계산여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_ADSVC_CHRG_D",
+        "cols": [
+          "PROD_CD",
+          "CHRG_ITM_CD",
+          "CHRG_APLCN_BGNG_DT"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_ADSVC_CHRG_D_01",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "unq": false,
+          "why": "FK(요금항목코드) — PK 2번째 칼럼이라 단독 조인용 별도"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_ADSVC_CHRG_D_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_ADSVC_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_ADSVC_CHRG_D_02",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_DSCNT_CND_D",
+      "entId": "PRD-020",
+      "entNm": "할인조건상세",
+      "tp": "REF",
+      "def": "할인 적용 조건(대상 요금제·가입 기간·고객 등급·연령·결합 회선 수·청구 금액) — 한 할인의 조건 여러 개는 AND.",
+      "estRows": 12000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CND_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "조건순번",
+          "dflt": null
+        },
+        {
+          "colNm": "CND_TRGT_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "조건대상상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_CND_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "할인조건유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CND_MIN_VL",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "조건최소값",
+          "dflt": null
+        },
+        {
+          "colNm": "CND_MAX_VL",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "조건최대값",
+          "dflt": null
+        },
+        {
+          "colNm": "CND_CN",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "조건내용",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_DSCNT_CND_D",
+        "cols": [
+          "PROD_CD",
+          "CND_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_DSCNT_CND_D_01",
+          "cols": [
+            "CND_TRGT_PROD_CD"
+          ],
+          "unq": false,
+          "why": "FK(상품기본) — 요금제 기준 적용 가능 할인 탐색(가입 화면)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_DSCNT_CND_D_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_DSCNT_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_DSCNT_CND_D_02",
+          "cols": [
+            "CND_TRGT_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_DSCNT_RT_D",
+      "entId": "PRD-021",
+      "entNm": "할인율상세",
+      "tp": "REF",
+      "def": "단계(구간)별 할인율·할인금액(예 가입 2년 10%·5년 20%, 청구액 구간별 정액).",
+      "estRows": 12000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_STEP_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "할인단계순번",
+          "dflt": null
+        },
+        {
+          "colNm": "STEP_MIN_VL",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "단계최소값",
+          "dflt": null
+        },
+        {
+          "colNm": "STEP_MAX_VL",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "단계최대값",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_RT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "할인율",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "할인금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_LMT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "할인한도금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_DSCNT_RT_D",
+        "cols": [
+          "PROD_CD",
+          "DSCNT_STEP_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_DSCNT_RT_D_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_DSCNT_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_CMBN_CMPS_D",
+      "entId": "PRD-022",
+      "entNm": "결합구성상세",
+      "tp": "REF",
+      "def": "결합 상품을 이루는 구성(무선 회선·인터넷·IPTV 등)과 구성별 최소·최대 회선 수.",
+      "estRows": 2000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMPS_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "구성순번",
+          "dflt": null
+        },
+        {
+          "colNm": "CMPS_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "구성상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_CMPS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "결합구성유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MIN_LINE_CNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "최소회선수",
+          "dflt": null
+        },
+        {
+          "colNm": "MAX_LINE_CNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "최대회선수",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_LINE_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "대표회선가능여부",
+          "dflt": null
+        },
+        {
+          "colNm": "CMPS_NEED_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "구성필요여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_CMBN_CMPS_D",
+        "cols": [
+          "PROD_CD",
+          "CMPS_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_CMBN_CMPS_D_01",
+          "cols": [
+            "CMPS_PROD_CD"
+          ],
+          "unq": false,
+          "why": "FK(상품기본) — 상품이 들어가는 결합 탐색"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_CMBN_CMPS_D_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_CMBN_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_CMBN_CMPS_D_02",
+          "cols": [
+            "CMPS_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_CMBN_DSCNT_D",
+      "entId": "PRD-023",
+      "entNm": "결합할인상세",
+      "tp": "REF",
+      "def": "결합 회선 수별 회선당·대표회선 할인(예 2회선 3,300원·5회선 이상 11,000원). 적용 기간으로 변경 재현.",
+      "estRows": 3000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_LINE_CNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "결합회선수",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "할인적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "할인요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "할인적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_DSCNT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "회선할인금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_LINE_DSCNT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "대표회선할인금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_RT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "할인율",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_CMBN_DSCNT_D",
+        "cols": [
+          "PROD_CD",
+          "CMBN_LINE_CNT",
+          "DSCNT_APLCN_BGNG_DT"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_CMBN_DSCNT_D_01",
+          "cols": [
+            "DSCNT_CHRG_ITM_CD"
+          ],
+          "unq": false,
+          "why": "FK(요금항목코드) 조인"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_CMBN_DSCNT_D_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_CMBN_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_CMBN_DSCNT_D_02",
+          "cols": [
+            "DSCNT_CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_AGRMT_PNLT_D",
+      "entId": "PRD-024",
+      "entNm": "약정위약금상세",
+      "tp": "REF",
+      "def": "약정 경과 개월 구간별 위약금(할인반환금·지원금 반환) 비율·정액.",
+      "estRows": 3000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PNLT_STEP_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "위약금단계순번",
+          "dflt": null
+        },
+        {
+          "colNm": "ELPS_BGNG_MCNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "경과시작개월수",
+          "dflt": null
+        },
+        {
+          "colNm": "ELPS_END_MCNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "경과종료개월수",
+          "dflt": null
+        },
+        {
+          "colNm": "PNLT_ASMT_SCHM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "위약금산정방식유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PNLT_RT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "위약금율",
+          "dflt": null
+        },
+        {
+          "colNm": "PNLT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "위약금금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_AGRMT_PNLT_D",
+        "cols": [
+          "PROD_CD",
+          "PNLT_STEP_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_AGRMT_PNLT_D_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_AGRMT_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_EQP_SHPM_PRC_H",
+      "entId": "PRD-025",
+      "entNm": "단말출고가격이력",
+      "tp": "REF",
+      "def": "단말 모델 출고가 변경 이력(SCD2). planner 후보 '단말출고가이력'을 표준단어 조합으로 개명(결정 L5).",
+      "estRows": 50000,
+      "cols": [
+        {
+          "colNm": "EQP_MDL_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "단말모델코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRC_APLCN_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "가격적용시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PRC_APLCN_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "가격적용종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_SHPM_PRC",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "단말출고가격",
+          "dflt": null
+        },
+        {
+          "colNm": "PRC_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "가격변경사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_EQP_SHPM_PRC_H",
+        "cols": [
+          "EQP_MDL_CD",
+          "PRC_APLCN_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_EQP_SHPM_PRC_H_01",
+          "cols": [
+            "EQP_MDL_CD"
+          ],
+          "refTbl": "PTL_PRD_EQP_MDL_M",
+          "refCols": [
+            "EQP_MDL_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_PBANC_SUBSD_H",
+      "entId": "PRD-026",
+      "entNm": "공시지원금이력",
+      "tp": "REF",
+      "def": "단말기유통법 공시 — 요금제·단말 모델별 공시지원금·추가지원금과 공시 기간(공시 후 최소 유지 일수). N:M(단말모델↔요금제)을 기간 행으로 해소.",
+      "estRows": 3000000,
+      "cols": [
+        {
+          "colNm": "EQP_MDL_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "단말모델코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RTPLN_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "요금제상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SUBSD_APLCN_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "지원금적용시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SUBSD_APLCN_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "지원금적용종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PBANC_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "공시일자",
+          "dflt": null
+        },
+        {
+          "colNm": "PBANC_SUBSD",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "공시지원금",
+          "dflt": null
+        },
+        {
+          "colNm": "ADD_SUBSD",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "추가지원금",
+          "dflt": null
+        },
+        {
+          "colNm": "MIN_PBANC_DCNT",
+          "dataTp": "NUMERIC(3)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "최소공시일수",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_PBANC_SUBSD_H",
+        "cols": [
+          "EQP_MDL_CD",
+          "RTPLN_PROD_CD",
+          "SUBSD_APLCN_BGNG_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_PBANC_SUBSD_H_01",
+          "cols": [
+            "RTPLN_PROD_CD",
+            "SUBSD_APLCN_BGNG_DTM"
+          ],
+          "unq": false,
+          "why": "FK(요금제기본) + 요금제별 시점 공시지원금(PK 선두는 단말모델) — 300만 행 T2"
+        },
+        {
+          "nm": "X_PTL_PRD_PBANC_SUBSD_H_02",
+          "cols": [
+            "PBANC_DT"
+          ],
+          "unq": false,
+          "why": "공시일자별 공시 목록(단말기유통법 공시 게시·변경 감사)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_PBANC_SUBSD_H_01",
+          "cols": [
+            "EQP_MDL_CD"
+          ],
+          "refTbl": "PTL_PRD_EQP_MDL_M",
+          "refCols": [
+            "EQP_MDL_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_PRD_PBANC_SUBSD_H_02",
+          "cols": [
+            "RTPLN_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_RTPLN_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_PROD_SALE_CHNL_R",
+      "entId": "PRD-027",
+      "entNm": "상품판매채널관계",
+      "tp": "REF",
+      "def": "상품별 판매 가능 채널(대리점·판매점·온라인·직영·텔레마케팅·법인영업) — 상품 ↔ 판매채널 N:M 해소.",
+      "estRows": 100000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SALE_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "판매채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SALE_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "판매시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "SALE_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "판매종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "SALE_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "판매가능여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_PROD_SALE_CHNL_R",
+        "cols": [
+          "PROD_CD",
+          "SALE_CHNL_TY_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_PROD_SALE_CHNL_R_01",
+          "cols": [
+            "SALE_CHNL_TY_CD"
+          ],
+          "unq": false,
+          "why": "채널별 판매 가능 상품(PK 선두는 상품코드)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_PROD_SALE_CHNL_R_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_PROD_SALE_PRD_H",
+      "entId": "PRD-028",
+      "entNm": "상품판매기간이력",
+      "tp": "REF",
+      "def": "상품 판매 개시·중지·재개 기간 이력. 현재값은 상품기본.판매시작일자·판매종료일자.",
+      "estRows": 40000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SALE_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "판매시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "SALE_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "판매종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "SALE_END_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "판매종료사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "가입가능여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_PROD_SALE_PRD_H",
+        "cols": [
+          "PROD_CD",
+          "SALE_BGNG_DT"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_PROD_SALE_PRD_H_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_CHRG_ITM_CLSF_C",
+      "entId": "PRD-029",
+      "entNm": "요금항목분류코드",
+      "tp": "REF",
+      "def": "요금항목의 상위 분류(월정액·사용·일회성·할부·할인·세금·기타) 계층. 청구서 소계 단위.",
+      "estRows": 50,
+      "cols": [
+        {
+          "colNm": "CHRG_ITM_CLSF_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "요금항목분류코드",
+          "dflt": null
+        },
+        {
+          "colNm": "UP_CHRG_ITM_CLSF_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "상위요금항목분류코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_CLSF_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "요금항목분류명",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_OUTPT_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구서출력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "사용여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_CHRG_ITM_CLSF_C",
+        "cols": [
+          "CHRG_ITM_CLSF_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_CHRG_ITM_CLSF_C_01",
+          "cols": [
+            "UP_CHRG_ITM_CLSF_CD"
+          ],
+          "unq": false,
+          "why": "FK(자기참조) — 하위 분류 펼침"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_CHRG_ITM_CLSF_C_01",
+          "cols": [
+            "UP_CHRG_ITM_CLSF_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_CLSF_C",
+          "refCols": [
+            "CHRG_ITM_CLSF_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PRD_PROD_CHG_H",
+      "entId": "PRD-030",
+      "entNm": "상품변경이력",
+      "tp": "REF",
+      "def": "상품 정의 속성 변경 감사 이력(어떤 항목이 무엇에서 무엇으로 왜 바뀌었는지). 가격·판매기간은 전용 이력 엔터티.",
+      "estRows": 2000000,
+      "cols": [
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_CHG_SEQ",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "상품변경순번",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "상품변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "상품변경사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHG_ITM_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "변경항목명",
+          "dflt": null
+        },
+        {
+          "colNm": "CHG_BFR_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "변경이전값",
+          "dflt": null
+        },
+        {
+          "colNm": "CHG_AFTR_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "변경후값",
+          "dflt": null
+        },
+        {
+          "colNm": "CHG_RSN_CN",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "변경사유내용",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PRD_PROD_CHG_H",
+        "cols": [
+          "PROD_CD",
+          "PROD_CHG_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PRD_PROD_CHG_H_01",
+          "cols": [
+            "PROD_CHG_DTM"
+          ],
+          "unq": false,
+          "why": "기간별 상품 변경 감사 조회 — 200만 행 T2"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PRD_PROD_CHG_H_01",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    }
+  ]
+}

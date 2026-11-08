@@ -1,0 +1,4102 @@
+[
+  {
+    "wordNm": "기본",
+    "abbr": "BAS",
+    "engNm": "Base",
+    "def": "엔터티의 현재 상태를 1행으로 관리하는 기본 집합, 속성에서는 기초·기본값",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_M",
+    "keyDom": null
+  },
+  {
+    "wordNm": "상세",
+    "abbr": "DTL",
+    "engNm": "Detail",
+    "def": "상위 엔터티 1건을 항목·서브타입 단위로 나눈 상세 집합",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_D",
+    "keyDom": null
+  },
+  {
+    "wordNm": "내역",
+    "abbr": "DTLS",
+    "engNm": "Details",
+    "def": "업무 행위가 발생할 때마다 쌓이는 행위 기록 집합",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_L",
+    "keyDom": null
+  },
+  {
+    "wordNm": "이력",
+    "abbr": "HIST",
+    "engNm": "History",
+    "def": "상태·값 변경 전후를 유효 기간과 함께 보존하는 집합",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_H",
+    "keyDom": null
+  },
+  {
+    "wordNm": "정보",
+    "abbr": "INFO",
+    "engNm": "Information",
+    "def": "특정 대상의 부가 정보 묶음",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_I",
+    "keyDom": null
+  },
+  {
+    "wordNm": "로그",
+    "abbr": "LOG",
+    "engNm": "Log",
+    "def": "시스템이 남기는 기술 기록",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_G",
+    "keyDom": null
+  },
+  {
+    "wordNm": "인터페이스",
+    "abbr": "IF",
+    "engNm": "Interface",
+    "def": "외부 시스템과 주고받는 연계 자료",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_F",
+    "keyDom": null
+  },
+  {
+    "wordNm": "집계",
+    "abbr": "AGG",
+    "engNm": "Aggregation",
+    "def": "원천 자료를 기간·기준별로 합산한 가공 결과",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_T",
+    "keyDom": null
+  },
+  {
+    "wordNm": "통계",
+    "abbr": "STATS",
+    "engNm": "Statistics",
+    "def": "분석용 통계 가공 결과",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_S",
+    "keyDom": null
+  },
+  {
+    "wordNm": "백업",
+    "abbr": "BKUP",
+    "engNm": "Backup",
+    "def": "원본 보존용 복사본",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_B",
+    "keyDom": null
+  },
+  {
+    "wordNm": "관계",
+    "abbr": "REL",
+    "engNm": "Relation",
+    "def": "두 대상 간의 관계, 엔터티에서는 N:M 해소 관계 집합",
+    "entClss": true,
+    "attrClss": false,
+    "tblSfx": "_R",
+    "keyDom": null
+  },
+  {
+    "wordNm": "코드",
+    "abbr": "CD",
+    "engNm": "Code",
+    "def": "업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합",
+    "entClss": true,
+    "attrClss": true,
+    "tblSfx": "_C",
+    "keyDom": "코드"
+  },
+  {
+    "wordNm": "번호",
+    "abbr": "NO",
+    "engNm": "Number",
+    "def": "대상을 식별하거나 외부에서 부여받은 번호",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "번호"
+  },
+  {
+    "wordNm": "명",
+    "abbr": "NM",
+    "engNm": "Name",
+    "def": "대상을 부르는 이름",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "명"
+  },
+  {
+    "wordNm": "일시",
+    "abbr": "DTM",
+    "engNm": "Date Time",
+    "def": "연월일 시분초까지의 시점",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "일시"
+  },
+  {
+    "wordNm": "일자",
+    "abbr": "DT",
+    "engNm": "Date",
+    "def": "연월일(YYYYMMDD)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "일자"
+  },
+  {
+    "wordNm": "년월",
+    "abbr": "YM",
+    "engNm": "Year Month",
+    "def": "연월(YYYYMM)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "년월"
+  },
+  {
+    "wordNm": "일",
+    "abbr": "DD",
+    "engNm": "Day",
+    "def": "월 중의 일(DD, 01~31)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "일"
+  },
+  {
+    "wordNm": "여부",
+    "abbr": "YN",
+    "engNm": "Yes or No",
+    "def": "해당 여부(Y/N)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "여부"
+  },
+  {
+    "wordNm": "금액",
+    "abbr": "AMT",
+    "engNm": "Amount",
+    "def": "원화 금액(원 단위 정수)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "금액"
+  },
+  {
+    "wordNm": "수",
+    "abbr": "CNT",
+    "engNm": "Count",
+    "def": "개수·인원 등 셀 수 있는 수",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "수"
+  },
+  {
+    "wordNm": "건수",
+    "abbr": "NOCS",
+    "engNm": "Number of Cases",
+    "def": "처리·발생 건의 수",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "건수"
+  },
+  {
+    "wordNm": "횟수",
+    "abbr": "NMTM",
+    "engNm": "Number of Times",
+    "def": "반복 발생한 횟수",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "수"
+  },
+  {
+    "wordNm": "개월수",
+    "abbr": "MCNT",
+    "engNm": "Month Count",
+    "def": "기간의 개월 수",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "수"
+  },
+  {
+    "wordNm": "일수",
+    "abbr": "DCNT",
+    "engNm": "Day Count",
+    "def": "기간의 일 수",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "일수"
+  },
+  {
+    "wordNm": "초수",
+    "abbr": "SCNT",
+    "engNm": "Second Count",
+    "def": "시간의 초 수",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "수"
+  },
+  {
+    "wordNm": "분수",
+    "abbr": "MNTCNT",
+    "engNm": "Minute Count",
+    "def": "시간의 분 수(음성 제공량 등)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "수"
+  },
+  {
+    "wordNm": "회차",
+    "abbr": "TMS",
+    "engNm": "Times",
+    "def": "분할·반복 거래의 차례 번호",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "회차"
+  },
+  {
+    "wordNm": "량",
+    "abbr": "QTY",
+    "engNm": "Quantity",
+    "def": "사용·과금 대상 물리량(초·바이트·건)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "수량"
+  },
+  {
+    "wordNm": "용량",
+    "abbr": "CPCT",
+    "engNm": "Capacity",
+    "def": "제공·저장 가능한 크기(바이트)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "수량"
+  },
+  {
+    "wordNm": "율",
+    "abbr": "RT",
+    "engNm": "Rate",
+    "def": "비율(백분율, 소수 2자리)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "율"
+  },
+  {
+    "wordNm": "세율",
+    "abbr": "TXRT",
+    "engNm": "Tax Rate",
+    "def": "과세표준에 적용하는 세금 비율",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "율"
+  },
+  {
+    "wordNm": "이자율",
+    "abbr": "INTRT",
+    "engNm": "Interest Rate",
+    "def": "할부 등에 적용하는 연 이자율",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "율"
+  },
+  {
+    "wordNm": "내용",
+    "abbr": "CN",
+    "engNm": "Contents",
+    "def": "자유 서술 내용",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "내용"
+  },
+  {
+    "wordNm": "값",
+    "abbr": "VL",
+    "engNm": "Value",
+    "def": "측정·설정·암호화된 값",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "값"
+  },
+  {
+    "wordNm": "일련번호",
+    "abbr": "SN",
+    "engNm": "Serial Number",
+    "def": "부모 안에서 등록 차례로 매기는 번호 또는 기기 일련번호",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "일련번호"
+  },
+  {
+    "wordNm": "순번",
+    "abbr": "SEQ",
+    "engNm": "Sequence",
+    "def": "부모 안의 처리·표시 순서",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "순번"
+  },
+  {
+    "wordNm": "우선순위",
+    "abbr": "PRRT",
+    "engNm": "Priority",
+    "def": "여러 대상 중 먼저 처리하는 순서",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "순번"
+  },
+  {
+    "wordNm": "세액",
+    "abbr": "TXAMT",
+    "engNm": "Tax Amount",
+    "def": "과세표준에 세율을 곱한 세금 금액",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "금액"
+  },
+  {
+    "wordNm": "잔액",
+    "abbr": "BAL",
+    "engNm": "Balance",
+    "def": "사용·정리하고 남은 금액",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "금액"
+  },
+  {
+    "wordNm": "가격",
+    "abbr": "PRC",
+    "engNm": "Price",
+    "def": "재화의 판매·출고 가격",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "금액"
+  },
+  {
+    "wordNm": "원금",
+    "abbr": "PRNC",
+    "engNm": "Principal",
+    "def": "이자를 제외한 원래 금액",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "금액"
+  },
+  {
+    "wordNm": "지원금",
+    "abbr": "SUBSD",
+    "engNm": "Subsidy",
+    "def": "단말 구매 시 지원하는 금액(공시·추가 지원금)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "금액"
+  },
+  {
+    "wordNm": "공급가액",
+    "abbr": "SPLYAMT",
+    "engNm": "Supply Amount",
+    "def": "부가가치세를 제외한 공급 대가 금액",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "금액"
+  },
+  {
+    "wordNm": "주소",
+    "abbr": "ADDR",
+    "engNm": "Address",
+    "def": "우편·전자 주소",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "주소"
+  },
+  {
+    "wordNm": "상세주소",
+    "abbr": "DADDR",
+    "engNm": "Detail Address",
+    "def": "도로명주소 뒤의 동·호 등 상세 주소",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "주소"
+  },
+  {
+    "wordNm": "전화번호",
+    "abbr": "TELNO",
+    "engNm": "Telephone Number",
+    "def": "전화번호(숫자 문자열)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "전화번호"
+  },
+  {
+    "wordNm": "우편번호",
+    "abbr": "ZIP",
+    "engNm": "Zip Code",
+    "def": "우편번호 5자리",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "우편번호"
+  },
+  {
+    "wordNm": "생년월일",
+    "abbr": "BRDT",
+    "engNm": "Birth Date",
+    "def": "태어난 연월일",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "일자"
+  },
+  {
+    "wordNm": "사업자등록번호",
+    "abbr": "BRNO",
+    "engNm": "Business Registration Number",
+    "def": "국세청 사업자등록번호 10자리",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "번호"
+  },
+  {
+    "wordNm": "법인등록번호",
+    "abbr": "CRNO",
+    "engNm": "Corporate Registration Number",
+    "def": "법원 법인등록번호 13자리",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "번호"
+  },
+  {
+    "wordNm": "유형",
+    "abbr": "TY",
+    "engNm": "Type",
+    "def": "값이 4개 이상이거나 늘어날 수 있는 분류(공통코드 유형코드)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "구분",
+    "abbr": "SE",
+    "engNm": "Section",
+    "def": "값이 2~3개이고 절대 늘지 않는 분류(공통코드 구분코드)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "종류",
+    "abbr": "KND",
+    "engNm": "Kind",
+    "def": "물리적 종류 분류(공통코드 종류코드)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "상태",
+    "abbr": "STTS",
+    "engNm": "Status",
+    "def": "대상의 생애주기 상태",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "가능",
+    "abbr": "PSBL",
+    "engNm": "Possible",
+    "def": "할 수 있음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "가맹점",
+    "abbr": "MRCH",
+    "engNm": "Merchant",
+    "def": "결제·소액결제 가맹점",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "가산",
+    "abbr": "ADTN",
+    "engNm": "Addition",
+    "def": "기준 금액에 더함",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "가산금",
+    "abbr": "ADCHG",
+    "engNm": "Additional Charge",
+    "def": "연체 시 부과하는 연체가산금",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "가상계좌",
+    "abbr": "VACCT",
+    "engNm": "Virtual Account",
+    "def": "수납용으로 발급한 가상 입금 계좌",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "가입",
+    "abbr": "SBSC",
+    "engNm": "Subscription",
+    "def": "이동통신 서비스 가입",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "가족",
+    "abbr": "FMLY",
+    "engNm": "Family",
+    "def": "가족",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "감면",
+    "abbr": "RDCT",
+    "engNm": "Reduction",
+    "def": "부과 금액을 줄여 줌",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "갱신",
+    "abbr": "RNW",
+    "engNm": "Renewal",
+    "def": "계약 기간 연장",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "개설",
+    "abbr": "OPN",
+    "engNm": "Opening",
+    "def": "점포·계좌를 엶",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "개인",
+    "abbr": "INDV",
+    "engNm": "Individual",
+    "def": "자연인 개인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "개인정보",
+    "abbr": "PRVC",
+    "engNm": "Privacy",
+    "def": "개인을 알아볼 수 있는 정보",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "개통",
+    "abbr": "OPNG",
+    "engNm": "Activation",
+    "def": "회선 개통(서비스 사용 시작)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "거래",
+    "abbr": "TRD",
+    "engNm": "Trade",
+    "def": "사업자 간 거래",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "거절",
+    "abbr": "RFSL",
+    "engNm": "Refusal",
+    "def": "요청을 받아들이지 않음(번호이동 거절 등)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "건물",
+    "abbr": "BLDG",
+    "engNm": "Building",
+    "def": "건물",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "검증",
+    "abbr": "VRFC",
+    "engNm": "Verification",
+    "def": "유효성 확인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "결과",
+    "abbr": "RSLT",
+    "engNm": "Result",
+    "def": "처리 결과",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "결합",
+    "abbr": "CMBN",
+    "engNm": "Combination",
+    "def": "여러 회선·상품을 묶은 결합",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "경과",
+    "abbr": "ELPS",
+    "engNm": "Elapse",
+    "def": "기준 시점부터 지난 정도",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "계산",
+    "abbr": "CALC",
+    "engNm": "Calculation",
+    "def": "요금·세금 등을 계산함",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "계약",
+    "abbr": "CTRT",
+    "engNm": "Contract",
+    "def": "계약",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "계정",
+    "abbr": "ACNT",
+    "engNm": "Account",
+    "def": "청구 단위 계정(청구계정)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "계좌",
+    "abbr": "ACCT",
+    "engNm": "Bank Account",
+    "def": "금융기관 예금 계좌",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "고객",
+    "abbr": "CUST",
+    "engNm": "Customer",
+    "def": "통신 서비스 명의 고객",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "공급",
+    "abbr": "SPLY",
+    "engNm": "Supply",
+    "def": "재화·용역의 공급",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "공시",
+    "abbr": "PBANC",
+    "engNm": "Public Announcement",
+    "def": "약관·홈페이지 공시",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "과금",
+    "abbr": "RAT",
+    "engNm": "Rating",
+    "def": "사용량을 요금 대상으로 변환하는 과금(Rating)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "과세",
+    "abbr": "TXTN",
+    "engNm": "Taxation",
+    "def": "부가가치세 과세",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "과세표준",
+    "abbr": "TXSTD",
+    "engNm": "Tax Base",
+    "def": "세액 계산의 기준 금액",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "과오납",
+    "abbr": "OVPAY",
+    "engNm": "Overpayment",
+    "def": "이중·초과·착오 납부",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "관리",
+    "abbr": "MGMT",
+    "engNm": "Management",
+    "def": "관리",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "국",
+    "abbr": "EXCH",
+    "engNm": "Exchange",
+    "def": "전화번호 국번(교환국)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "국가",
+    "abbr": "NATN",
+    "engNm": "Nation",
+    "def": "국가",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "국세청",
+    "abbr": "NTS",
+    "engNm": "National Tax Service",
+    "def": "국세청",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "규모",
+    "abbr": "SCL",
+    "engNm": "Scale",
+    "def": "기업 규모",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "금융",
+    "abbr": "FNNC",
+    "engNm": "Finance",
+    "def": "금융",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "기간",
+    "abbr": "PRD",
+    "engNm": "Period",
+    "def": "시작부터 끝까지의 기간",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "기관",
+    "abbr": "INST",
+    "engNm": "Institution",
+    "def": "기관",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "기본제공",
+    "abbr": "BSCPRVD",
+    "engNm": "Basic Provision",
+    "def": "요금제가 기본으로 제공하는 음성·문자·데이터 제공량",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "기한",
+    "abbr": "TMLMT",
+    "engNm": "Time Limit",
+    "def": "납부 등의 기한",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "기준",
+    "abbr": "STD",
+    "engNm": "Standard",
+    "def": "판단·산정의 기준",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "납부",
+    "abbr": "PAY",
+    "engNm": "Payment",
+    "def": "요금을 냄",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "납부자",
+    "abbr": "PYR",
+    "engNm": "Payer",
+    "def": "요금을 실제로 내는 사람·법인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "내외국인",
+    "abbr": "DMFRGN",
+    "engNm": "Domestic Foreign",
+    "def": "내국인·외국인 구분",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "누적",
+    "abbr": "ACML",
+    "engNm": "Accumulation",
+    "def": "기간 동안 더해 온 합계(누계 포함)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "단계",
+    "abbr": "STEP",
+    "engNm": "Step",
+    "def": "진행 단계",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "단말",
+    "abbr": "EQP",
+    "engNm": "Equipment",
+    "def": "이동통신 단말기",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "단위",
+    "abbr": "UNIT",
+    "engNm": "Unit",
+    "def": "측정 단위",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "당월",
+    "abbr": "THMM",
+    "engNm": "This Month",
+    "def": "해당 청구 월",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "대리점",
+    "abbr": "AGNC",
+    "engNm": "Agency",
+    "def": "통신사와 위탁 계약한 대리점",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "대상",
+    "abbr": "TRGT",
+    "engNm": "Target",
+    "def": "적용 대상",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "대손",
+    "abbr": "BDDT",
+    "engNm": "Bad Debt",
+    "def": "회수 불능 채권의 손실 처리",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "대표",
+    "abbr": "RPRS",
+    "engNm": "Representative",
+    "def": "여럿 중 대표",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "대표자",
+    "abbr": "RPRSV",
+    "engNm": "Representative Person",
+    "def": "법인·사업자의 대표자",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "대행",
+    "abbr": "AGT",
+    "engNm": "Agent",
+    "def": "업무를 대신 수행함",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "데이터",
+    "abbr": "DATA",
+    "engNm": "Data",
+    "def": "데이터 통신",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "도로",
+    "abbr": "ROAD",
+    "engNm": "Road",
+    "def": "도로",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "도서",
+    "abbr": "ISLND",
+    "engNm": "Island",
+    "def": "섬 지역",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "도용",
+    "abbr": "THFT",
+    "engNm": "Theft",
+    "def": "명의 도용",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "독촉",
+    "abbr": "DUN",
+    "engNm": "Dunning",
+    "def": "미납 요금 납부 독촉",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "동의",
+    "abbr": "AGRE",
+    "engNm": "Agreement",
+    "def": "개인정보·약관 동의",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "등급",
+    "abbr": "GRD",
+    "engNm": "Grade",
+    "def": "등급",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "등록",
+    "abbr": "REG",
+    "engNm": "Registration",
+    "def": "최초 등록",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "레코드",
+    "abbr": "RCRD",
+    "engNm": "Record",
+    "def": "원시 과금 레코드(CDR)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "로밍",
+    "abbr": "ROAM",
+    "engNm": "Roaming",
+    "def": "국제 로밍",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "마감",
+    "abbr": "DDLN",
+    "engNm": "Deadline",
+    "def": "작업·기간의 마감",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "만료",
+    "abbr": "EXPRY",
+    "engNm": "Expiry",
+    "def": "기간 만료",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "망",
+    "abbr": "NTWK",
+    "engNm": "Network",
+    "def": "이동통신망",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "매입",
+    "abbr": "PRCHS",
+    "engNm": "Purchase",
+    "def": "매입(세금계산서 수취)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "매체",
+    "abbr": "MDM",
+    "engNm": "Medium",
+    "def": "발송 매체",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "매출",
+    "abbr": "SLS",
+    "engNm": "Sales",
+    "def": "매출(세금계산서 발행)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "면세",
+    "abbr": "TXEMP",
+    "engNm": "Tax Exemption",
+    "def": "부가가치세 면세",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "명의",
+    "abbr": "NMNE",
+    "engNm": "Nominee",
+    "def": "가입 명의",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "모델",
+    "abbr": "MDL",
+    "engNm": "Model",
+    "def": "단말 모델",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "무료",
+    "abbr": "FREE",
+    "engNm": "Free",
+    "def": "무료",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "무제한",
+    "abbr": "UNLMT",
+    "engNm": "Unlimited",
+    "def": "제공량 제한 없음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "문자",
+    "abbr": "SMS",
+    "engNm": "Short Message",
+    "def": "문자 메시지",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "미납",
+    "abbr": "UNPD",
+    "engNm": "Unpaid",
+    "def": "납부기한까지 내지 않은 요금",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "미배분",
+    "abbr": "UNALLC",
+    "engNm": "Unallocated",
+    "def": "청구 항목에 아직 배분하지 않음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "바이트",
+    "abbr": "BYTE",
+    "engNm": "Byte",
+    "def": "데이터 크기 단위",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "반려",
+    "abbr": "RJCT",
+    "engNm": "Reject",
+    "def": "신청을 되돌려 보냄",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "반송",
+    "abbr": "RTRN",
+    "engNm": "Return",
+    "def": "우편물 반송",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "반영",
+    "abbr": "RFLT",
+    "engNm": "Reflection",
+    "def": "다른 대상에 결과를 반영",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "발급",
+    "abbr": "ISSU",
+    "engNm": "Issuance",
+    "def": "번호·계좌 등을 내어 줌",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "발생",
+    "abbr": "OCRN",
+    "engNm": "Occurrence",
+    "def": "사건 발생",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "발송",
+    "abbr": "SNDNG",
+    "engNm": "Sending",
+    "def": "우편·문자 발송",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "발신",
+    "abbr": "CLG",
+    "engNm": "Calling",
+    "def": "통화를 건 쪽(발신)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "발행",
+    "abbr": "PBLCN",
+    "engNm": "Publication",
+    "def": "청구서·세금계산서 발행",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "방법",
+    "abbr": "MTHD",
+    "engNm": "Method",
+    "def": "수행 방법",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "방식",
+    "abbr": "SCHM",
+    "engNm": "Scheme",
+    "def": "계산·배분 방식",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "방향",
+    "abbr": "DRCT",
+    "engNm": "Direction",
+    "def": "지급·수취 방향",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "배분",
+    "abbr": "ALLC",
+    "engNm": "Allocation",
+    "def": "금액을 항목별로 나눠 배정",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "버전",
+    "abbr": "VER",
+    "engNm": "Version",
+    "def": "판(版)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "번호이동",
+    "abbr": "MNP",
+    "engNm": "Mobile Number Portability",
+    "def": "번호를 유지한 채 통신사를 옮김",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "법인",
+    "abbr": "CORP",
+    "engNm": "Corporation",
+    "def": "법인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "법정대리인",
+    "abbr": "LGLRP",
+    "engNm": "Legal Representative",
+    "def": "미성년자 등의 법정대리인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "변경",
+    "abbr": "CHG",
+    "engNm": "Change",
+    "def": "값·상태 변경",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "복지",
+    "abbr": "WLFR",
+    "engNm": "Welfare",
+    "def": "요금 감면 복지 대상",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "본인",
+    "abbr": "SELF",
+    "engNm": "Self",
+    "def": "명의자 본인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "부가가치세",
+    "abbr": "VAT",
+    "engNm": "Value Added Tax",
+    "def": "부가가치세(부가세 포함)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "부가서비스",
+    "abbr": "ADSVC",
+    "engNm": "Additional Service",
+    "def": "요금제 외 선택 부가서비스",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "부과",
+    "abbr": "IMPS",
+    "engNm": "Imposition",
+    "def": "금액을 매김",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "분류",
+    "abbr": "CLSF",
+    "engNm": "Classification",
+    "def": "분류",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "분할",
+    "abbr": "DIV",
+    "engNm": "Division",
+    "def": "나눔(분할납부)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "불이행",
+    "abbr": "NFLFL",
+    "engNm": "Non Fulfillment",
+    "def": "약정 불이행",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "사",
+    "abbr": "CO",
+    "engNm": "Company",
+    "def": "회사(카드사·제공사·제조사·추심사·대행사)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "사업자",
+    "abbr": "BZMN",
+    "engNm": "Business Operator",
+    "def": "사업자(로밍·번호이동 사업자 포함)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "사용",
+    "abbr": "USE",
+    "engNm": "Use",
+    "def": "사용",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "사유",
+    "abbr": "RSN",
+    "engNm": "Reason",
+    "def": "사유",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "사전승낙",
+    "abbr": "PRAPRV",
+    "engNm": "Prior Approval",
+    "def": "판매점 사전승낙제(KAIT)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "산간",
+    "abbr": "MNTN",
+    "engNm": "Mountain",
+    "def": "산간 지역",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "산정",
+    "abbr": "ASMT",
+    "engNm": "Assessment",
+    "def": "기준에 따라 값을 정함",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "상각",
+    "abbr": "DPRC",
+    "engNm": "Write Off",
+    "def": "채권 상각",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "상위",
+    "abbr": "UP",
+    "engNm": "Upper",
+    "def": "상위 계층",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "상품",
+    "abbr": "PROD",
+    "engNm": "Product",
+    "def": "판매 상품",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "상한",
+    "abbr": "UPLMT",
+    "engNm": "Upper Limit",
+    "def": "최대 한도",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "상호접속",
+    "abbr": "INTCN",
+    "engNm": "Interconnection",
+    "def": "사업자 간 망 상호접속",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "서비스",
+    "abbr": "SVC",
+    "engNm": "Service",
+    "def": "통신 서비스",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "선납",
+    "abbr": "PRPAY",
+    "engNm": "Prepayment",
+    "def": "미리 낸 요금",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "선택",
+    "abbr": "CHC",
+    "engNm": "Choice",
+    "def": "선택(선택약정)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "설립",
+    "abbr": "FNDN",
+    "engNm": "Foundation",
+    "def": "법인 설립",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "성별",
+    "abbr": "GNDR",
+    "engNm": "Gender",
+    "def": "성별",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "세금",
+    "abbr": "TAX",
+    "engNm": "Tax",
+    "def": "세금",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "세금계산서",
+    "abbr": "TXINV",
+    "engNm": "Tax Invoice",
+    "def": "부가가치세법상 세금계산서",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "세무",
+    "abbr": "TXAF",
+    "engNm": "Tax Affairs",
+    "def": "세무",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "센터",
+    "abbr": "CTR",
+    "engNm": "Center",
+    "def": "센터",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "소멸",
+    "abbr": "EXTSH",
+    "engNm": "Extinction",
+    "def": "권리 소멸",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "소진",
+    "abbr": "EXHST",
+    "engNm": "Exhaustion",
+    "def": "제공량·잔액을 다 씀",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "속도",
+    "abbr": "SPD",
+    "engNm": "Speed",
+    "def": "전송 속도(Kbps)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "손금",
+    "abbr": "LSEXP",
+    "engNm": "Deductible Expense",
+    "def": "세무상 손금",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "수납",
+    "abbr": "RCV",
+    "engNm": "Receipt of Payment",
+    "def": "요금을 받아 들임(수납)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "수령",
+    "abbr": "RCPT",
+    "engNm": "Receipt",
+    "def": "물건·서류를 받음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "수령인",
+    "abbr": "RCPN",
+    "engNm": "Recipient",
+    "def": "우편·환불을 받는 사람",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "수신",
+    "abbr": "RCPTN",
+    "engNm": "Reception",
+    "def": "메시지·결과를 받음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "수정",
+    "abbr": "MDFCN",
+    "engNm": "Modification",
+    "def": "발행 후 수정",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "수집",
+    "abbr": "CLCT",
+    "engNm": "Collection",
+    "def": "자료 수집",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "승계",
+    "abbr": "SCSN",
+    "engNm": "Succession",
+    "def": "권리·의무 승계",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "승인",
+    "abbr": "APRV",
+    "engNm": "Approval",
+    "def": "승인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "시간",
+    "abbr": "HR",
+    "engNm": "Hour Time",
+    "def": "사용 시간",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "시작",
+    "abbr": "BGNG",
+    "engNm": "Beginning",
+    "def": "시작",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "시점",
+    "abbr": "PNT",
+    "engNm": "Point",
+    "def": "특정 시점",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "시효",
+    "abbr": "PRSCR",
+    "engNm": "Prescription",
+    "def": "소멸시효",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "신고",
+    "abbr": "DCLR",
+    "engNm": "Declaration",
+    "def": "행정기관·회사에 신고",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "신분증",
+    "abbr": "IDCD",
+    "engNm": "ID Card",
+    "def": "신분증",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "신청",
+    "abbr": "APLY",
+    "engNm": "Application",
+    "def": "신청",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "신청인",
+    "abbr": "APLCNT",
+    "engNm": "Applicant",
+    "def": "신청한 사람",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "실명",
+    "abbr": "RLNM",
+    "engNm": "Real Name",
+    "def": "실명",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "암호화",
+    "abbr": "ENCPT",
+    "engNm": "Encryption",
+    "def": "암호화",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "약관",
+    "abbr": "TRMS",
+    "engNm": "Terms",
+    "def": "이용약관",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "약정",
+    "abbr": "AGRMT",
+    "engNm": "Commitment",
+    "def": "기간 약정",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "업무",
+    "abbr": "TASK",
+    "engNm": "Task",
+    "def": "업무",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "업종",
+    "abbr": "TPBIZ",
+    "engNm": "Type of Business",
+    "def": "업종(KSIC)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "연계",
+    "abbr": "LNKG",
+    "engNm": "Linkage",
+    "def": "다른 상품·업무와 연계",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "연동",
+    "abbr": "LNK",
+    "engNm": "Link",
+    "def": "망·시스템 연동",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "연락처",
+    "abbr": "CNTC",
+    "engNm": "Contact",
+    "def": "연락처",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "연체",
+    "abbr": "OVDU",
+    "engNm": "Overdue",
+    "def": "납부기한 경과",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "영문",
+    "abbr": "ENG",
+    "engNm": "English",
+    "def": "영문 표기",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "예고",
+    "abbr": "PRNTC",
+    "engNm": "Prior Notice",
+    "def": "사전 예고",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "예금주",
+    "abbr": "DPSOWN",
+    "engNm": "Account Holder",
+    "def": "예금 계좌 명의인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "예정",
+    "abbr": "SCHD",
+    "engNm": "Schedule",
+    "def": "예정",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "오류",
+    "abbr": "ERR",
+    "engNm": "Error",
+    "def": "오류",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "완납",
+    "abbr": "CMPLPAY",
+    "engNm": "Complete Payment",
+    "def": "남은 금액 전부 납부",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "완료",
+    "abbr": "CMPTN",
+    "engNm": "Completion",
+    "def": "완료",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "외국인",
+    "abbr": "FRGNR",
+    "engNm": "Foreigner",
+    "def": "외국인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "요금",
+    "abbr": "CHRG",
+    "engNm": "Charge",
+    "def": "통신 요금",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "요금제",
+    "abbr": "RTPLN",
+    "engNm": "Rate Plan",
+    "def": "기본 요금 상품(요금제)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "요소",
+    "abbr": "ELMT",
+    "engNm": "Element",
+    "def": "망 구성 요소",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "요청",
+    "abbr": "REQ",
+    "engNm": "Request",
+    "def": "요청",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "운영",
+    "abbr": "OPER",
+    "engNm": "Operation",
+    "def": "운영",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "원",
+    "abbr": "ORGN",
+    "engNm": "Original",
+    "def": "원래의 것(원 통신사·원 세금계산서)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "원시",
+    "abbr": "RAW",
+    "engNm": "Raw",
+    "def": "가공 전 원시",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "원인",
+    "abbr": "CAUS",
+    "engNm": "Cause",
+    "def": "원인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "월",
+    "abbr": "MM",
+    "engNm": "Month",
+    "def": "월",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "위약금",
+    "abbr": "PNLT",
+    "engNm": "Penalty",
+    "def": "약정 위반 위약금",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "위임",
+    "abbr": "DLGT",
+    "engNm": "Delegation",
+    "def": "업무 위임",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "유선",
+    "abbr": "WIRE",
+    "engNm": "Wireline",
+    "def": "유선 통신",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "유심",
+    "abbr": "USIM",
+    "engNm": "USIM",
+    "def": "가입자 식별 모듈(USIM)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "유효",
+    "abbr": "VLD",
+    "engNm": "Valid",
+    "def": "유효",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "은행",
+    "abbr": "BANK",
+    "engNm": "Bank",
+    "def": "은행",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "음성",
+    "abbr": "VOICE",
+    "engNm": "Voice",
+    "def": "음성 통화",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "이관",
+    "abbr": "TRNSF",
+    "engNm": "Transfer",
+    "def": "다른 조직·기관으로 넘김",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "이메일",
+    "abbr": "EML",
+    "engNm": "Email",
+    "def": "전자우편",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "이용정지",
+    "abbr": "SUSP",
+    "engNm": "Suspension",
+    "def": "미납·요청에 따른 이용 정지",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "이월",
+    "abbr": "CYOV",
+    "engNm": "Carry Over",
+    "def": "다음 기간으로 넘김",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "이자",
+    "abbr": "INTR",
+    "engNm": "Interest",
+    "def": "이자",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "이전",
+    "abbr": "BFR",
+    "engNm": "Before",
+    "def": "직전의 것",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "이체",
+    "abbr": "TRSF",
+    "engNm": "Transfer",
+    "def": "계좌 이체",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "인정",
+    "abbr": "RCGTN",
+    "engNm": "Recognition",
+    "def": "인정",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "인증",
+    "abbr": "CRTF",
+    "engNm": "Certification",
+    "def": "인증",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "일할",
+    "abbr": "DYPRT",
+    "engNm": "Daily Proration",
+    "def": "일 단위 비례 계산",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "입금",
+    "abbr": "DPST",
+    "engNm": "Deposit",
+    "def": "입금",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "입금자",
+    "abbr": "DPSTR",
+    "engNm": "Depositor",
+    "def": "입금한 사람",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "자",
+    "abbr": "PRSN",
+    "engNm": "Person",
+    "def": "사람(동의자·명의자)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "자급제",
+    "abbr": "SLFSPLY",
+    "engNm": "Self Supply",
+    "def": "통신사 유통 없이 산 단말",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "자동",
+    "abbr": "ATMT",
+    "engNm": "Automatic",
+    "def": "자동",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "자동이체",
+    "abbr": "ATRF",
+    "engNm": "Auto Transfer",
+    "def": "계좌 자동이체",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "작성",
+    "abbr": "WRT",
+    "engNm": "Writing",
+    "def": "작성",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "작업",
+    "abbr": "JOB",
+    "engNm": "Job",
+    "def": "배치 작업",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "재",
+    "abbr": "RE",
+    "engNm": "Re",
+    "def": "다시 함",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "적요",
+    "abbr": "SMRY",
+    "engNm": "Summary",
+    "def": "거래 적요",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "적용",
+    "abbr": "APLCN",
+    "engNm": "Application",
+    "def": "기준·값 적용",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "전자",
+    "abbr": "ELCTR",
+    "engNm": "Electronic",
+    "def": "전자",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "전입",
+    "abbr": "MVIN",
+    "engNm": "Move In",
+    "def": "번호이동 전입",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "전표",
+    "abbr": "SLIP",
+    "engNm": "Slip",
+    "def": "회계 전표",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "전환",
+    "abbr": "CNVR",
+    "engNm": "Conversion",
+    "def": "상태 전환",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "접수",
+    "abbr": "ACPT",
+    "engNm": "Acceptance",
+    "def": "신청 접수",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "정산",
+    "abbr": "STLM",
+    "engNm": "Settlement",
+    "def": "사업자 간·파트너 정산",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "정액",
+    "abbr": "FXAMT",
+    "engNm": "Fixed Amount",
+    "def": "정해진 금액",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "정책",
+    "abbr": "PLCY",
+    "engNm": "Policy",
+    "def": "정책",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "제공",
+    "abbr": "PRVD",
+    "engNm": "Provision",
+    "def": "제공",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "제목",
+    "abbr": "TTL",
+    "engNm": "Title",
+    "def": "제목",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "제조",
+    "abbr": "MNFCT",
+    "engNm": "Manufacture",
+    "def": "제조",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "제한",
+    "abbr": "RSTR",
+    "engNm": "Restriction",
+    "def": "제한",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "조건",
+    "abbr": "CND",
+    "engNm": "Condition",
+    "def": "조건",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "조정",
+    "abbr": "ADJ",
+    "engNm": "Adjustment",
+    "def": "청구·미납 금액 조정",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "조직",
+    "abbr": "ORG",
+    "engNm": "Organization",
+    "def": "조직",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "종료",
+    "abbr": "END",
+    "engNm": "End",
+    "def": "종료",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "종업원",
+    "abbr": "EMP",
+    "engNm": "Employee",
+    "def": "종업원",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "주기",
+    "abbr": "CYCL",
+    "engNm": "Cycle",
+    "def": "반복 주기",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "중복",
+    "abbr": "DUP",
+    "engNm": "Duplication",
+    "def": "중복",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "증빙",
+    "abbr": "EVDC",
+    "engNm": "Evidence",
+    "def": "증빙",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "지",
+    "abbr": "PLC",
+    "engNm": "Place",
+    "def": "장소(청구지)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "지급",
+    "abbr": "GIVE",
+    "engNm": "Payment Out",
+    "def": "지급",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "지역",
+    "abbr": "RGN",
+    "engNm": "Region",
+    "def": "지역",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "지원",
+    "abbr": "SPRT",
+    "engNm": "Support",
+    "def": "지원",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "지정",
+    "abbr": "DSGN",
+    "engNm": "Designation",
+    "def": "지정",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "직권해지",
+    "abbr": "EXOFTRMN",
+    "engNm": "Ex Officio Termination",
+    "def": "사업자 직권 해지",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "차감",
+    "abbr": "DDCT",
+    "engNm": "Deduction",
+    "def": "차감",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "착신",
+    "abbr": "CLD",
+    "engNm": "Called",
+    "def": "통화를 받은 쪽(착신)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "채권",
+    "abbr": "RCVB",
+    "engNm": "Receivable",
+    "def": "받을 채권",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "채널",
+    "abbr": "CHNL",
+    "engNm": "Channel",
+    "def": "접점 채널",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "처리",
+    "abbr": "PRCS",
+    "engNm": "Process",
+    "def": "처리",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "철회",
+    "abbr": "WTHDR",
+    "engNm": "Withdrawal",
+    "def": "철회",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "청구",
+    "abbr": "BILL",
+    "engNm": "Billing",
+    "def": "요금 청구",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "청구서",
+    "abbr": "INVC",
+    "engNm": "Invoice",
+    "def": "고객에게 보내는 요금 청구서",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "체류",
+    "abbr": "STAY",
+    "engNm": "Stay",
+    "def": "외국인 체류",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "초과",
+    "abbr": "EXCS",
+    "engNm": "Excess",
+    "def": "제공량 초과",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "총",
+    "abbr": "TOT",
+    "engNm": "Total",
+    "def": "전체 합계",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "최대",
+    "abbr": "MAX",
+    "engNm": "Maximum",
+    "def": "최대",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "최소",
+    "abbr": "MIN",
+    "engNm": "Minimum",
+    "def": "최소",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "최종",
+    "abbr": "LAST",
+    "engNm": "Last",
+    "def": "마지막",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "최초",
+    "abbr": "FRST",
+    "engNm": "First",
+    "def": "처음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "추가",
+    "abbr": "ADD",
+    "engNm": "Addition",
+    "def": "추가",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "추심",
+    "abbr": "COLL",
+    "engNm": "Debt Collection",
+    "def": "채권 추심",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "출고",
+    "abbr": "SHPM",
+    "engNm": "Shipment",
+    "def": "단말 출고",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "출금",
+    "abbr": "WDRW",
+    "engNm": "Withdrawal",
+    "def": "계좌 출금",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "출력",
+    "abbr": "OUTPT",
+    "engNm": "Output",
+    "def": "출력",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "출시",
+    "abbr": "LNCH",
+    "engNm": "Launch",
+    "def": "출시",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "취소",
+    "abbr": "CNCL",
+    "engNm": "Cancel",
+    "def": "취소",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "카드",
+    "abbr": "CARD",
+    "engNm": "Card",
+    "def": "신용·체크 카드",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "콘텐츠",
+    "abbr": "CNTS",
+    "engNm": "Contents",
+    "def": "디지털 콘텐츠",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "통신사업자",
+    "abbr": "CARR",
+    "engNm": "Carrier",
+    "def": "기간통신사업자",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "통합",
+    "abbr": "INTGR",
+    "engNm": "Integration",
+    "def": "통합",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "통화",
+    "abbr": "CRNCY",
+    "engNm": "Currency",
+    "def": "통화(화폐)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "파기",
+    "abbr": "DSTR",
+    "engNm": "Destruction",
+    "def": "개인정보 파기",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "파일",
+    "abbr": "FILE",
+    "engNm": "File",
+    "def": "파일",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "파트너",
+    "abbr": "PRTNR",
+    "engNm": "Partner",
+    "def": "유통·제휴·사업자 파트너",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "판매",
+    "abbr": "SALE",
+    "engNm": "Sale",
+    "def": "판매",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "판매점",
+    "abbr": "SHOP",
+    "engNm": "Shop",
+    "def": "대리점 산하 판매점",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "포함",
+    "abbr": "INCL",
+    "engNm": "Inclusion",
+    "def": "포함",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "폐쇄",
+    "abbr": "CLSR",
+    "engNm": "Closure",
+    "def": "폐쇄",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "품목",
+    "abbr": "PRDLST",
+    "engNm": "Product List",
+    "def": "세금계산서 품목",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "필요",
+    "abbr": "NEED",
+    "engNm": "Need",
+    "def": "필요",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "한도",
+    "abbr": "LMT",
+    "engNm": "Limit",
+    "def": "금액 한도",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "할당",
+    "abbr": "ASGN",
+    "engNm": "Assignment",
+    "def": "번호 할당",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "할부",
+    "abbr": "INSTL",
+    "engNm": "Installment",
+    "def": "할부",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "할인",
+    "abbr": "DSCNT",
+    "engNm": "Discount",
+    "def": "할인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "합병",
+    "abbr": "MRGR",
+    "engNm": "Merger",
+    "def": "합병",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "항목",
+    "abbr": "ITM",
+    "engNm": "Item",
+    "def": "요금·동의 항목",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "해제",
+    "abbr": "RLS",
+    "engNm": "Release",
+    "def": "정지·제한 해제",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "해지",
+    "abbr": "TRMN",
+    "engNm": "Termination",
+    "def": "계약 해지",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "형태",
+    "abbr": "FORM",
+    "engNm": "Form",
+    "def": "형태",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "확인",
+    "abbr": "IDNTF",
+    "engNm": "Identification",
+    "def": "확인",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "확정",
+    "abbr": "CFMTN",
+    "engNm": "Confirmation",
+    "def": "확정",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "환불",
+    "abbr": "RFND",
+    "engNm": "Refund",
+    "def": "환불",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "회계",
+    "abbr": "ACNTG",
+    "engNm": "Accounting",
+    "def": "회계",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "회선",
+    "abbr": "LINE",
+    "engNm": "Line",
+    "def": "가입 회선",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "회수",
+    "abbr": "RTRVL",
+    "engNm": "Retrieval",
+    "def": "채권·번호·계좌 회수",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "후",
+    "abbr": "AFTR",
+    "engNm": "After",
+    "def": "이후",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "휴대",
+    "abbr": "MBL",
+    "engNm": "Mobile Phone",
+    "def": "휴대전화",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "휴면",
+    "abbr": "DRMT",
+    "engNm": "Dormant",
+    "def": "휴면",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "희망",
+    "abbr": "HOPE",
+    "engNm": "Hope",
+    "def": "희망",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "eSIM",
+    "abbr": "ESIM",
+    "engNm": "Embedded SIM",
+    "def": "내장형 가입자 식별 모듈",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "IMSI",
+    "abbr": "IMSI",
+    "engNm": "International Mobile Subscriber Identity",
+    "def": "국제 이동 가입자 식별번호",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "IMEI",
+    "abbr": "IMEI",
+    "engNm": "International Mobile Equipment Identity",
+    "def": "국제 이동 단말 식별번호",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "NFC",
+    "abbr": "NFC",
+    "engNm": "Near Field Communication",
+    "def": "근거리 무선 통신",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "TADIG",
+    "abbr": "TADIG",
+    "engNm": "Transferred Account Data Interchange Group",
+    "def": "GSMA 로밍 사업자 식별 코드",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "잔여",
+    "abbr": "RMND",
+    "engNm": "Remainder",
+    "def": "아직 남아 있음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "사업장",
+    "abbr": "BPLC",
+    "engNm": "Business Place",
+    "def": "사업을 하는 장소",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "장",
+    "abbr": "HD",
+    "engNm": "Head",
+    "def": "조직의 장",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "비용",
+    "abbr": "CST",
+    "engNm": "Cost",
+    "def": "비용",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "담보",
+    "abbr": "CLTRL",
+    "engNm": "Collateral",
+    "def": "채권 담보",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "전속",
+    "abbr": "EXCL",
+    "engNm": "Exclusive",
+    "def": "한 통신사 전속",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "스캐너",
+    "abbr": "SCNR",
+    "engNm": "Scanner",
+    "def": "신분증 스캐너",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "보유",
+    "abbr": "HOLD",
+    "engNm": "Holding",
+    "def": "가지고 있음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "부가통신사업",
+    "abbr": "VASB",
+    "engNm": "Value Added Service Business",
+    "def": "전기통신사업법상 부가통신사업",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "수수료",
+    "abbr": "FEE",
+    "engNm": "Fee",
+    "def": "업무 대가 수수료",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "휴대폰",
+    "abbr": "HP",
+    "engNm": "Hand Phone",
+    "def": "휴대전화 단말(휴대폰 결제)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "결제",
+    "abbr": "PYMT",
+    "engNm": "Payment Settlement",
+    "def": "대금 결제(휴대폰 소액결제)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "가맹",
+    "abbr": "AFLT",
+    "engNm": "Affiliation",
+    "def": "가맹 계약",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "식별",
+    "abbr": "IDFC",
+    "engNm": "Identification Code",
+    "def": "대상을 구별하는 식별",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "청산",
+    "abbr": "CLRH",
+    "engNm": "Clearing",
+    "def": "사업자 간 데이터·대금 청산",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "공제",
+    "abbr": "DDTN",
+    "engNm": "Deduction",
+    "def": "지급액에서 공제",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "전송",
+    "abbr": "TRNM",
+    "engNm": "Transmission",
+    "def": "외부 기관으로 전송",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "제휴",
+    "abbr": "ALNC",
+    "engNm": "Alliance",
+    "def": "제휴 관계",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "구성",
+    "abbr": "CMPS",
+    "engNm": "Composition",
+    "def": "여러 요소가 모여 하나를 이룸(패키지·결합 구성)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "배타",
+    "abbr": "EXCLN",
+    "engNm": "Exclusion",
+    "def": "함께 있을 수 없도록 서로 밀어냄(동시 가입 불가)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "요율",
+    "abbr": "TRF",
+    "engNm": "Tariff",
+    "def": "사용 단위당 요금 비율(Rating 기준표)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "권역",
+    "abbr": "ZONE",
+    "engNm": "Zone",
+    "def": "요율·로밍을 같게 적용하는 지역 묶음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "시간대",
+    "abbr": "TMBND",
+    "engNm": "Time Band",
+    "def": "하루 중 요율을 달리 적용하는 시간 구간(합성어 — 시간+대)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "수단",
+    "abbr": "MEANS",
+    "engNm": "Means",
+    "def": "어떤 일을 이루기 위한 방법·도구",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "실패",
+    "abbr": "FAIL",
+    "engNm": "Failure",
+    "def": "목적한 처리가 이루어지지 않음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "담당자",
+    "abbr": "PIC",
+    "engNm": "Person In Charge",
+    "def": "업무를 맡은 사람(합성어 — 담당+자)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "부서",
+    "abbr": "DEPT",
+    "engNm": "Department",
+    "def": "조직 안의 업무 단위",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "직위",
+    "abbr": "JBPS",
+    "engNm": "Job Position",
+    "def": "조직 안의 직급·직책",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "본사",
+    "abbr": "HQ",
+    "engNm": "Headquarters",
+    "def": "여러 사업장을 거느린 주된 사업장",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "필수",
+    "abbr": "ESNTL",
+    "engNm": "Essential",
+    "def": "반드시 있어야 함",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "마케팅",
+    "abbr": "MKT",
+    "engNm": "Marketing",
+    "def": "광고·판촉 활동",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "거부",
+    "abbr": "DENY",
+    "engNm": "Denial",
+    "def": "받아들이지 않겠다는 의사 표시(수신거부)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "멤버십",
+    "abbr": "MBSP",
+    "engNm": "Membership",
+    "def": "고객 우대 회원 제도",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "포인트",
+    "abbr": "POINT",
+    "engNm": "Point",
+    "def": "멤버십 적립·사용 단위 점수",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "상담",
+    "abbr": "CNSL",
+    "engNm": "Consultation",
+    "def": "고객 문의에 응대하는 행위",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "민원",
+    "abbr": "CVLCPT",
+    "engNm": "Civil Complaint",
+    "def": "고객이 제기한 불만·이의 신청",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "보상",
+    "abbr": "CMPNS",
+    "engNm": "Compensation",
+    "def": "손해를 갚아 줌",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "활성",
+    "abbr": "ACTV",
+    "engNm": "Active",
+    "def": "현재 사용 중인 상태",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "서류",
+    "abbr": "DOC",
+    "engNm": "Document",
+    "def": "가입·변경 때 제출하는 신분증·위임장·증명서 등 문서",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "제출",
+    "abbr": "SBMSN",
+    "engNm": "Submission",
+    "def": "서류를 내어 접수시킴",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "일시정지",
+    "abbr": "PAUS",
+    "engNm": "Temporary Pause",
+    "def": "고객 요청에 따른 회선 일시 이용 중지(미납 이용정지와 다름) — 합성어, 일시(DTM)와 혼동 방지",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "소액결제",
+    "abbr": "MCPAY",
+    "engNm": "Micro Payment",
+    "def": "휴대폰 소액결제(통신과금서비스, 전자금융거래법) — 합성어",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "이용",
+    "abbr": "UTLZ",
+    "engNm": "Utilization",
+    "def": "콘텐츠·서비스를 이용함(행안부 공통표준 이용 UTLZ)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "반환",
+    "abbr": "RTN",
+    "engNm": "Return",
+    "def": "지원금·할인 반환",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "환율",
+    "abbr": "EXRT",
+    "engNm": "Exchange Rate",
+    "def": "정산 통화 → 원화 환산 비율 — 속성 분류어(대표도메인 환율)",
+    "entClss": false,
+    "attrClss": true,
+    "tblSfx": null,
+    "keyDom": "환율"
+  },
+  {
+    "wordNm": "생성",
+    "abbr": "CRT",
+    "engNm": "Creation",
+    "def": "자료가 만들어짐",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "TAP",
+    "abbr": "TAP",
+    "engNm": "Transferred Account Procedure",
+    "def": "GSMA TAP3 로밍 사용기록 교환 절차·파일",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "정상",
+    "abbr": "NRML",
+    "engNm": "Normal",
+    "def": "오류 없이 처리된 정상 상태",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "지로",
+    "abbr": "GIRO",
+    "engNm": "Giro",
+    "def": "금융결제원 지로 — 청구서 장표로 금융기관 창구·전자납부하는 수납 수단",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "영수증",
+    "abbr": "RCIPT",
+    "engNm": "Receipt",
+    "def": "돈을 받았음을 증명하는 문서(수령 RCPT 와 구분)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "현금",
+    "abbr": "CASH",
+    "engNm": "Cash",
+    "def": "현금 — 현금영수증(조세특례제한법) 표기에 쓰임",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "대사",
+    "abbr": "RCNCL",
+    "engNm": "Reconciliation",
+    "def": "두 원장(자사·대행기관)의 건수·금액을 맞춰 보는 일",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "미확인",
+    "abbr": "UNIDNTF",
+    "engNm": "Unidentified",
+    "def": "입금 주체(청구계정)를 아직 확인하지 못함(합성어 — 미배분 UNALLC 와 같은 방식)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "매각",
+    "abbr": "DSPSL",
+    "engNm": "Disposal",
+    "def": "채권을 대가를 받고 제3자에게 넘김",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "약속",
+    "abbr": "PRMS",
+    "engNm": "Promise",
+    "def": "정해진 날까지 하기로 한 다짐(납부 약속)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "유예",
+    "abbr": "DFRM",
+    "engNm": "Deferment",
+    "def": "정지·독촉 등 조치를 일정 기간 미룸",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "이행",
+    "abbr": "FLFL",
+    "engNm": "Fulfillment",
+    "def": "약속·약정을 실제로 지킴",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "신용정보",
+    "abbr": "CRINFO",
+    "engNm": "Credit Information",
+    "def": "신용정보법상 신용정보(통신 채무 불이행 정보 포함) — 합성어, 여신 CRDT 와 약어 충돌 회피",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "기산",
+    "abbr": "RCKN",
+    "engNm": "Reckoning",
+    "def": "기간 계산의 시작점(소멸시효 기산)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "중단",
+    "abbr": "INTRPT",
+    "engNm": "Interruption",
+    "def": "진행 중이던 기간·절차가 끊김(시효 중단)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "구간",
+    "abbr": "SCTN",
+    "engNm": "Section",
+    "def": "값의 범위를 나눈 한 칸(경과일 구간)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "장려금",
+    "abbr": "INCNTV",
+    "engNm": "Incentive",
+    "def": "유통망 판매 실적에 따라 주는 판매 장려금(단말기유통법 대상)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "환수",
+    "abbr": "CLBK",
+    "engNm": "Clawback",
+    "def": "이미 지급한 수수료·장려금을 조건 미충족(조기 해지 등)으로 되돌려 받음",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "재고",
+    "abbr": "STCK",
+    "engNm": "Stock",
+    "def": "유통망이 보유한 판매 대기 단말·유심",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "입고",
+    "abbr": "WRHS",
+    "engNm": "Warehousing",
+    "def": "재고가 유통망 창고·매장에 들어옴",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "유치",
+    "abbr": "ATRCT",
+    "engNm": "Attraction",
+    "def": "판매 채널이 신규 가입을 끌어옴(유치 수수료 근거)",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  },
+  {
+    "wordNm": "이의",
+    "abbr": "OBJC",
+    "engNm": "Objection",
+    "def": "정산 결과에 대한 상대방의 이의 제기",
+    "entClss": false,
+    "attrClss": false,
+    "tblSfx": null,
+    "keyDom": null
+  }
+]

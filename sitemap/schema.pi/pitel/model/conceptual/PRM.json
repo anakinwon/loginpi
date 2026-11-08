@@ -1,0 +1,1800 @@
+{
+  "area": "PRM",
+  "areaNm": "파트너",
+  "ver": "2026-11-07",
+  "author": "subagent_subject_modeler",
+  "stg": "CNCP",
+  "refPkRule": {
+    "note": "다른 주제영역 핵심 엔터티를 참조할 때 PK 이름 = '<엔터티 핵심어>번호'(기준·코드형 = '<핵심어>코드'). PRM 서브타입 키는 파트너번호의 역할명(값 동일). 이 영역이 소유하는 키 = 파트너번호·조직코드·대리점번호·판매점번호·콘텐츠제공사번호·통신사업자번호·로밍사업자번호·파트너계약번호·정산번호·세금계산서번호",
+    "own": [
+      {
+        "attrNm": "파트너번호",
+        "phyNm": "PRTNR_NO",
+        "domNm": "번호V20",
+        "ent": "파트너기본",
+        "usedBy": "CUS·PRD(역할명 제휴파트너번호 ALNC_PRTNR_NO)"
+      },
+      {
+        "attrNm": "조직코드",
+        "phyNm": "ORG_CD",
+        "domNm": "코드V10",
+        "ent": "조직기본",
+        "usedBy": "PRM 내부(역할명 관리조직코드 MGMT_ORG_CD)"
+      },
+      {
+        "attrNm": "대리점번호",
+        "phyNm": "AGNC_NO",
+        "domNm": "번호V20",
+        "ent": "대리점기본",
+        "usedBy": "ORD.가입계약기본"
+      },
+      {
+        "attrNm": "판매점번호",
+        "phyNm": "SHOP_NO",
+        "domNm": "번호V20",
+        "ent": "판매점기본",
+        "usedBy": "ORD.가입신청기본·가입상품기본"
+      },
+      {
+        "attrNm": "콘텐츠제공사번호",
+        "phyNm": "CNTS_PRVD_CO_NO",
+        "domNm": "번호V20",
+        "ent": "콘텐츠제공사기본",
+        "usedBy": "PRD.부가서비스기본, PAY"
+      },
+      {
+        "attrNm": "통신사업자번호",
+        "phyNm": "CARR_NO",
+        "domNm": "번호V20",
+        "ent": "통신사업자기본",
+        "usedBy": "ORD.번호이동신청기본, ORD.서비스번호기본(역할명 원통신사업자번호 ORGN_CARR_NO)"
+      },
+      {
+        "attrNm": "로밍사업자번호",
+        "phyNm": "ROAM_BZMN_NO",
+        "domNm": "번호V20",
+        "ent": "로밍사업자기본",
+        "usedBy": "PAY.로밍사용내역"
+      },
+      {
+        "attrNm": "파트너계약번호",
+        "phyNm": "PRTNR_CTRT_NO",
+        "domNm": "번호V20",
+        "ent": "파트너계약기본",
+        "usedBy": "PRM 내부"
+      },
+      {
+        "attrNm": "정산번호",
+        "phyNm": "STLM_NO",
+        "domNm": "번호V20",
+        "ent": "정산기본",
+        "usedBy": "PRM 내부(STL)"
+      },
+      {
+        "attrNm": "세금계산서번호",
+        "phyNm": "TXINV_NO",
+        "domNm": "번호V20",
+        "ent": "세금계산서기본",
+        "usedBy": "PRM 내부(STL)"
+      }
+    ],
+    "foreign": [
+      {
+        "attrNm": "지역코드",
+        "phyNm": "RGN_CD",
+        "domNm": "코드V10",
+        "area": "CUS",
+        "ent": "지역코드"
+      },
+      {
+        "attrNm": "가입계약번호",
+        "phyNm": "SBSC_CTRT_NO",
+        "domNm": "번호V20",
+        "area": "ORD",
+        "ent": "가입계약기본",
+        "note": "기본 엔터티(유치·관리수수료내역)가 참조"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "entNm": "파트너기본",
+      "phyNm": "PRTNR_BAS",
+      "tblNm": "PTL_PRM_PRTNR_M",
+      "tp": "BASE",
+      "def": "통신사와 거래하는 모든 외부 당사자(대리점·판매점·제휴사·콘텐츠·소액결제 제공사·타 통신사·국제로밍 사업자·수납대행기관)의 공통 실체. 유형별 상세(서브타입)의 상위(슈퍼타입)이며 사업자등록·과세유형·관리 조직처럼 정산·세금계산서에 공통으로 쓰는 속성을 가진다. 제휴사는 별도 상세 없이 파트너유형코드로만 구분한다. 거래 종료 후에도 행을 지우지 않는다.",
+      "keyAttrs": [
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "파트너명",
+          "phyNm": "PRTNR_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "파트너등록일시",
+          "phyNm": "PRTNR_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "파트너상태유형코드",
+          "phyNm": "PRTNR_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "파트너유형코드",
+          "phyNm": "PRTNR_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "사업자등록번호",
+          "phyNm": "BRNO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "법인등록번호",
+          "phyNm": "CRNO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "대표자명",
+          "phyNm": "RPRSV_NM",
+          "role": "ATTR",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "사업자과세유형코드",
+          "phyNm": "BZMN_TXTN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "국가코드",
+          "phyNm": "NATN_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "관리조직코드",
+          "phyNm": "MGMT_ORG_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "대표전화번호",
+          "phyNm": "RPRS_TELNO",
+          "role": "ATTR",
+          "domNm": "전화번호V20"
+        },
+        {
+          "attrNm": "사업장주소",
+          "phyNm": "BPLC_ADDR",
+          "role": "ATTR",
+          "domNm": "주소V200"
+        },
+        {
+          "attrNm": "거래시작일자",
+          "phyNm": "TRD_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "거래종료일자",
+          "phyNm": "TRD_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "대리점기본",
+          "toArea": "PRM",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "대리점 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "판매점기본",
+          "toArea": "PRM",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "판매점 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "콘텐츠제공사기본",
+          "toArea": "PRM",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "콘텐츠제공사 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "통신사업자기본",
+          "toArea": "PRM",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "통신사업자 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "로밍사업자기본",
+          "toArea": "PRM",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "로밍사업자 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "조직기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "사내 영업 조직이 관리한다(역할명 관리조직코드, 해외 사업자는 NULL)"
+        },
+        {
+          "toEnt": "파트너계약기본",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "거래 계약을 체결한다"
+        },
+        {
+          "toEnt": "정산기본",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "정산 당사자가 된다(STL)"
+        },
+        {
+          "toEnt": "세금계산서기본",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "세금계산서를 주고받는다(STL)"
+        },
+        {
+          "toEnt": "지역코드",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "소재 지역에 속한다(S10 지역↔대리점 상관, 해외 사업자는 NULL)"
+        },
+        {
+          "toEnt": "할인상품기본",
+          "toArea": "PRD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "제휴 할인의 제휴사가 된다(역할명 제휴파트너번호 ALNC_PRTNR_NO)"
+        }
+      ]
+    },
+    {
+      "entNm": "조직기본",
+      "phyNm": "ORG_BAS",
+      "tblNm": "PTL_PRM_ORG_M",
+      "tp": "REF",
+      "def": "사내 영업 조직(본사·본부·지사·영업팀·직영매장)의 기준 정보(D5 — 파트너 관리 주체라 PRM 에 둔다). 상위 조직 자기 참조로 계층을 이루고, 개편 시 행을 닫고(유효종료일자) 새 코드를 연다.",
+      "keyAttrs": [
+        {
+          "attrNm": "조직코드",
+          "phyNm": "ORG_CD",
+          "role": "PK",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "조직명",
+          "phyNm": "ORG_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "조직등록일시",
+          "phyNm": "ORG_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "조직상태유형코드",
+          "phyNm": "ORG_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "조직유형코드",
+          "phyNm": "ORG_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "상위조직코드",
+          "phyNm": "UP_ORG_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "조직장명",
+          "phyNm": "ORG_HD_NM",
+          "role": "ATTR",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "비용센터코드",
+          "phyNm": "CST_CTR_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "유효시작일자",
+          "phyNm": "VLD_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "유효종료일자",
+          "phyNm": "VLD_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "조직기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "상위 조직에 속한다(자기 참조, 본사는 NULL)"
+        },
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "관할 파트너를 관리한다"
+        }
+      ]
+    },
+    {
+      "entNm": "대리점기본",
+      "phyNm": "AGNC_BAS",
+      "tblNm": "PTL_PRM_AGNC_M",
+      "tp": "BASE",
+      "def": "통신사와 위탁 계약을 맺고 개통·사후관리를 대행하는 1차 유통망(대리점)의 서브타입 상세. 관리 대리점으로서 회선의 관리수수료·유치 실적이 귀속되고(S10), 산하 판매점(2차점)을 거느린다.",
+      "keyAttrs": [
+        {
+          "attrNm": "대리점번호",
+          "phyNm": "AGNC_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "대리점명",
+          "phyNm": "AGNC_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "대리점등록일시",
+          "phyNm": "AGNC_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "대리점상태유형코드",
+          "phyNm": "AGNC_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "대리점유형코드",
+          "phyNm": "AGNC_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "대리점등급유형코드",
+          "phyNm": "AGNC_GRD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "개설일자",
+          "phyNm": "OPN_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "폐쇄일자",
+          "phyNm": "CLSR_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "담보금액",
+          "phyNm": "CLTRL_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "전속대리점여부",
+          "phyNm": "EXCL_AGNC_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "대리점의 파트너 서브타입이다(PK = 파트너번호 역할명)"
+        },
+        {
+          "toEnt": "판매점기본",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "산하 판매점(2차점)을 관리한다"
+        },
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "관리 대리점이 된다(관리수수료·유치 실적 귀속, S10)"
+        },
+        {
+          "toEnt": "관리수수료내역",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "월 관리수수료를 받는다(STL, 논리 단계 기본 엔터티)"
+        }
+      ]
+    },
+    {
+      "entNm": "판매점기본",
+      "phyNm": "SHOP_BAS",
+      "tblNm": "PTL_PRM_SHOP_M",
+      "tp": "BASE",
+      "def": "대리점 산하 또는 통신사 직계약으로 가입을 유치하는 판매 채널(판매점·양판점·온라인·방문판매)의 서브타입 상세. 단말기유통법 사전승낙 정보를 가지며 가입신청·부가서비스 유치의 귀속처(유치수수료 근거)다.",
+      "keyAttrs": [
+        {
+          "attrNm": "판매점번호",
+          "phyNm": "SHOP_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "판매점명",
+          "phyNm": "SHOP_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "판매점등록일시",
+          "phyNm": "SHOP_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "판매점상태유형코드",
+          "phyNm": "SHOP_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "대리점번호",
+          "phyNm": "AGNC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "판매점유형코드",
+          "phyNm": "SHOP_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "사전승낙번호",
+          "phyNm": "PRAPRV_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "사전승낙일자",
+          "phyNm": "PRAPRV_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "개설일자",
+          "phyNm": "OPN_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "폐쇄일자",
+          "phyNm": "CLSR_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "신분증스캐너보유여부",
+          "phyNm": "IDCD_SCNR_HOLD_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "판매점의 파트너 서브타입이다(PK = 파트너번호 역할명)"
+        },
+        {
+          "toEnt": "대리점기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "상위 대리점에 속한다(양판점·직계약 판매점은 NULL — S5)"
+        },
+        {
+          "toEnt": "가입신청기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "가입신청을 유치·접수한다(유치 수수료 근거, STL)"
+        },
+        {
+          "toEnt": "가입상품기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "부가서비스 가입을 유치한다(대부분 NULL — S5)"
+        },
+        {
+          "toEnt": "유치수수료내역",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "개통 건별 유치수수료를 받는다(STL, 논리 단계 기본 엔터티)"
+        }
+      ]
+    },
+    {
+      "entNm": "콘텐츠제공사기본",
+      "phyNm": "CNTS_PRVD_CO_BAS",
+      "tblNm": "PTL_PRM_CNTS_PRVD_CO_M",
+      "tp": "BASE",
+      "def": "부가서비스 콘텐츠(통화연결음·음악·영상·게임)와 휴대폰 소액결제를 제공하는 사업자(CP·PG·앱마켓)의 서브타입 상세. 고객 청구서에 정보이용료로 대신 청구하고 수수료를 뗀 금액을 정산해 준다(STL).",
+      "keyAttrs": [
+        {
+          "attrNm": "콘텐츠제공사번호",
+          "phyNm": "CNTS_PRVD_CO_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "콘텐츠제공사명",
+          "phyNm": "CNTS_PRVD_CO_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "콘텐츠제공사등록일시",
+          "phyNm": "CNTS_PRVD_CO_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "콘텐츠제공사상태유형코드",
+          "phyNm": "CNTS_PRVD_CO_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "콘텐츠제공사유형코드",
+          "phyNm": "CNTS_PRVD_CO_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "부가통신사업신고번호",
+          "phyNm": "VASB_DCLR_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "정산수수료율",
+          "phyNm": "STLM_FEE_RT",
+          "role": "ATTR",
+          "domNm": "율N5_2"
+        },
+        {
+          "attrNm": "휴대폰결제가맹여부",
+          "phyNm": "HP_PYMT_AFLT_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "고객센터전화번호",
+          "phyNm": "CUST_CTR_TELNO",
+          "role": "ATTR",
+          "domNm": "전화번호V20"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "콘텐츠제공사의 파트너 서브타입이다(PK = 파트너번호 역할명)"
+        },
+        {
+          "toEnt": "부가서비스기본",
+          "toArea": "PRD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "콘텐츠형 부가서비스를 제공한다(STL 정산 근거)"
+        },
+        {
+          "toEnt": "소액결제청구상세",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "소액결제 대금이 청구된다(STL)"
+        },
+        {
+          "toEnt": "콘텐츠이용요금내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "정보이용료가 대신 청구된다(STL)"
+        },
+        {
+          "toEnt": "콘텐츠정산내역",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "월 콘텐츠 정산을 받는다(STL, 논리 단계 기본 엔터티)"
+        }
+      ]
+    },
+    {
+      "entNm": "통신사업자기본",
+      "phyNm": "CARR_BAS",
+      "tblNm": "PTL_PRM_CARR_M",
+      "tp": "BASE",
+      "def": "국내 기간·별정 통신사업자(MNO·MVNO·유선·인터넷전화·국제전화)의 서브타입 상세. 번호이동 상대 사업자, 번호 원 할당 사업자, 상호접속료 정산 상대(STL)로 쓰인다. MVNO 는 망을 빌려주는 상위 사업자를 가진다.",
+      "keyAttrs": [
+        {
+          "attrNm": "통신사업자번호",
+          "phyNm": "CARR_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "통신사업자명",
+          "phyNm": "CARR_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "통신사업자등록일시",
+          "phyNm": "CARR_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "통신사업자상태유형코드",
+          "phyNm": "CARR_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "통신사업자유형코드",
+          "phyNm": "CARR_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "상위통신사업자번호",
+          "phyNm": "UP_CARR_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "번호이동사업자코드",
+          "phyNm": "MNP_BZMN_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "망식별코드",
+          "phyNm": "NTWK_IDFC_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "상호접속계약일자",
+          "phyNm": "INTCN_CTRT_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "상호접속정산대상여부",
+          "phyNm": "INTCN_STLM_TRGT_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "통신사업자의 파트너 서브타입이다(PK = 파트너번호 역할명)"
+        },
+        {
+          "toEnt": "통신사업자기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "망을 빌린 상위 사업자에 속한다(MVNO→MNO 자기 참조, MNO 는 NULL)"
+        },
+        {
+          "toEnt": "번호이동신청기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "번호이동 전출·전입 상대가 된다"
+        },
+        {
+          "toEnt": "서비스번호기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "번호를 원래 할당한 사업자가 된다(역할명 원통신사업자번호 ORGN_CARR_NO)"
+        },
+        {
+          "toEnt": "상호접속사용집계",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "접속통화가 집계된다(STL, 논리 단계 기본 엔터티)"
+        },
+        {
+          "toEnt": "상호접속요율상세",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "상호접속 요율을 적용받는다(STL, 논리 단계 기본 엔터티)"
+        }
+      ]
+    },
+    {
+      "entNm": "로밍사업자기본",
+      "phyNm": "ROAM_BZMN_BAS",
+      "tblNm": "PTL_PRM_ROAM_BZMN_M",
+      "tp": "BASE",
+      "def": "국제로밍 협정을 맺은 해외 이동통신사업자의 서브타입 상세. GSMA TADIG 코드로 TAP(사용 기록)·RAP(반송) 파일을 주고받으며, 방문망 사업자로서 우리 고객의 로밍 사용료를 청구하고(아웃바운드) 해외 고객의 사용료를 우리가 청구한다(인바운드, STL).",
+      "keyAttrs": [
+        {
+          "attrNm": "로밍사업자번호",
+          "phyNm": "ROAM_BZMN_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "로밍사업자명",
+          "phyNm": "ROAM_BZMN_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "로밍사업자등록일시",
+          "phyNm": "ROAM_BZMN_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "로밍사업자상태유형코드",
+          "phyNm": "ROAM_BZMN_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "TADIG코드",
+          "phyNm": "TADIG_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "망식별코드",
+          "phyNm": "NTWK_IDFC_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "로밍방향구분코드",
+          "phyNm": "ROAM_DRCT_SE_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "로밍계약일자",
+          "phyNm": "ROAM_CTRT_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "정산통화코드",
+          "phyNm": "STLM_CRNCY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "데이터청산사명",
+          "phyNm": "DATA_CLRH_CO_NM",
+          "role": "ATTR",
+          "domNm": "명V100"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "로밍사업자의 파트너 서브타입이다(PK = 파트너번호 역할명)"
+        },
+        {
+          "toEnt": "로밍사용내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "방문망 사업자로서 TAP 사용 기록을 보낸다(STL)"
+        },
+        {
+          "toEnt": "로밍정산파일내역",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "TAP·RAP 파일을 주고받는다(STL, 논리 단계 기본 엔터티)"
+        },
+        {
+          "toEnt": "로밍정산내역",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "사업자×월 로밍 정산을 한다(STL, 논리 단계 기본 엔터티)"
+        }
+      ]
+    },
+    {
+      "entNm": "파트너계약기본",
+      "phyNm": "PRTNR_CTRT_BAS",
+      "tblNm": "PTL_PRM_PRTNR_CTRT_M",
+      "tp": "ACT",
+      "def": "파트너와 맺은 거래 계약(대리점·판매점 위탁, 콘텐츠 제공, 상호접속, 국제로밍 협정, 제휴, 수납대행) 한 건. 계약 기간·자동갱신·정산주기·지급조건이 정산의 기준이 되고, 변경은 파트너계약이력(논리 단계)에 남긴다.",
+      "keyAttrs": [
+        {
+          "attrNm": "파트너계약번호",
+          "phyNm": "PRTNR_CTRT_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "파트너계약명",
+          "phyNm": "PRTNR_CTRT_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "파트너계약일시",
+          "phyNm": "PRTNR_CTRT_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "파트너계약상태유형코드",
+          "phyNm": "PRTNR_CTRT_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "파트너계약유형코드",
+          "phyNm": "PRTNR_CTRT_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "계약시작일자",
+          "phyNm": "CTRT_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "계약종료일자",
+          "phyNm": "CTRT_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "자동갱신여부",
+          "phyNm": "ATMT_RNW_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "정산주기유형코드",
+          "phyNm": "STLM_CYCL_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "지급조건내용",
+          "phyNm": "GIVE_CND_CN",
+          "role": "ATTR",
+          "domNm": "내용V200"
+        },
+        {
+          "attrNm": "계약해지일자",
+          "phyNm": "CTRT_TRMN_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "파트너와 체결한다"
+        },
+        {
+          "toEnt": "정산기본",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "계약 조건으로 정산한다(STL)"
+        },
+        {
+          "toEnt": "파트너계약이력",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": true,
+          "opt": true,
+          "nm": "계약 변경 이력을 남긴다(논리 단계 기본 엔터티)"
+        }
+      ]
+    },
+    {
+      "entNm": "정산기본",
+      "phyNm": "STLM_BAS",
+      "tblNm": "PTL_PRM_STLM_M",
+      "tp": "ACT",
+      "moduleCd": "STL",
+      "def": "파트너 1곳 × 정산년월 × 정산유형(유치·관리수수료, 장려금, 상호접속료, 국제로밍, 콘텐츠, 환수)의 정산 머리 건. 건별 산출 근거는 정산상세, 확정 단계는 정산확정이력, 실제 송금은 정산지급내역(논리 단계)에 둔다. 확정 시점의 공급가액·부가가치세액은 세금계산서 발행 근거라 스냅샷으로 보존한다.",
+      "keyAttrs": [
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "정산명",
+          "phyNm": "STLM_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "정산일시",
+          "phyNm": "STLM_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "정산상태유형코드",
+          "phyNm": "STLM_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "파트너계약번호",
+          "phyNm": "PRTNR_CTRT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "정산년월",
+          "phyNm": "STLM_YM",
+          "role": "ATTR",
+          "domNm": "년월C6"
+        },
+        {
+          "attrNm": "정산유형코드",
+          "phyNm": "STLM_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "정산방향구분코드",
+          "phyNm": "STLM_DRCT_SE_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "정산대상금액",
+          "phyNm": "STLM_TRGT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "공제금액",
+          "phyNm": "DDTN_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "공급가액",
+          "phyNm": "SPLYAMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "부가가치세금액",
+          "phyNm": "VAT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "통화코드",
+          "phyNm": "CRNCY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "정산확정일시",
+          "phyNm": "STLM_CFMTN_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "지급예정일자",
+          "phyNm": "GIVE_SCHD_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "정산 당사자다"
+        },
+        {
+          "toEnt": "파트너계약기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "계약 조건을 따른다"
+        },
+        {
+          "toEnt": "세금계산서기본",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "세금계산서를 발행·수취한다(수정 발행 포함)"
+        },
+        {
+          "toEnt": "정산상세",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": true,
+          "opt": true,
+          "nm": "건별 산출 근거를 가진다(논리 단계 기본 엔터티)"
+        },
+        {
+          "toEnt": "정산확정이력",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": true,
+          "opt": true,
+          "nm": "검증·이의·확정 단계를 남긴다(논리 단계 기본 엔터티)"
+        },
+        {
+          "toEnt": "정산지급내역",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "지급·수취 송금이 일어난다(논리 단계 기본 엔터티)"
+        }
+      ]
+    },
+    {
+      "entNm": "세금계산서기본",
+      "phyNm": "TXINV_BAS",
+      "tblNm": "PTL_PRM_TXINV_M",
+      "tp": "ACT",
+      "moduleCd": "STL",
+      "def": "정산 확정 금액에 대해 파트너와 주고받는 (전자)세금계산서 한 장(부가가치세법). 매출(통신사 발행 — 상호접속료·로밍 수취 등)과 매입(파트너 발행·역발행 — 수수료·장려금·콘텐츠 정산)을 모두 담고, 수정세금계산서는 원 세금계산서를 자기 참조한다.",
+      "keyAttrs": [
+        {
+          "attrNm": "세금계산서번호",
+          "phyNm": "TXINV_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "세금계산서품목명",
+          "phyNm": "TXINV_PRDLST_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "세금계산서발행일시",
+          "phyNm": "TXINV_PBLCN_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "세금계산서상태유형코드",
+          "phyNm": "TXINV_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "세금계산서유형코드",
+          "phyNm": "TXINV_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "매입매출구분코드",
+          "phyNm": "PRCHS_SLS_SE_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "작성일자",
+          "phyNm": "WRT_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "공급가액",
+          "phyNm": "SPLYAMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "세액",
+          "phyNm": "TXAMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "전자세금계산서승인번호",
+          "phyNm": "ELCTR_TXINV_APRV_NO",
+          "role": "ATTR",
+          "domNm": "번호V30"
+        },
+        {
+          "attrNm": "국세청전송일시",
+          "phyNm": "NTS_TRNM_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "수정사유유형코드",
+          "phyNm": "MDFCN_RSN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "원세금계산서번호",
+          "phyNm": "ORGN_TXINV_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "정산기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "정산 확정 금액으로 발행한다"
+        },
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "거래 상대 파트너와 주고받는다"
+        },
+        {
+          "toEnt": "세금계산서기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "원 세금계산서를 수정 발행한다(자기 참조, 정발행은 NULL)"
+        },
+        {
+          "toEnt": "세금계산서상세",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": true,
+          "opt": true,
+          "nm": "품목 줄을 가진다(논리 단계 기본 엔터티)"
+        }
+      ]
+    }
+  ],
+  "domains": [
+    {
+      "domNm": "번호V20",
+      "lgcTp": "VARCHAR",
+      "len": 20
+    },
+    {
+      "domNm": "번호V30",
+      "lgcTp": "VARCHAR",
+      "len": 30
+    },
+    {
+      "domNm": "코드V10",
+      "lgcTp": "VARCHAR",
+      "len": 10
+    },
+    {
+      "domNm": "명V100",
+      "lgcTp": "VARCHAR",
+      "len": 100
+    },
+    {
+      "domNm": "명V200",
+      "lgcTp": "VARCHAR",
+      "len": 200
+    },
+    {
+      "domNm": "일시TS",
+      "lgcTp": "TIMESTAMP"
+    },
+    {
+      "domNm": "일자C8",
+      "lgcTp": "CHAR",
+      "len": 8
+    },
+    {
+      "domNm": "년월C6",
+      "lgcTp": "CHAR",
+      "len": 6
+    },
+    {
+      "domNm": "여부C1",
+      "lgcTp": "CHAR",
+      "len": 1
+    },
+    {
+      "domNm": "금액N15",
+      "lgcTp": "NUMERIC",
+      "len": 15,
+      "scale": 0
+    },
+    {
+      "domNm": "율N5_2",
+      "lgcTp": "NUMERIC",
+      "len": 5,
+      "scale": 2
+    },
+    {
+      "domNm": "전화번호V20",
+      "lgcTp": "VARCHAR",
+      "len": 20
+    },
+    {
+      "domNm": "주소V200",
+      "lgcTp": "VARCHAR",
+      "len": 200
+    },
+    {
+      "domNm": "내용V200",
+      "lgcTp": "VARCHAR",
+      "len": 200
+    }
+  ],
+  "codeCandidates": [
+    {
+      "termNm": "파트너상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "정상",
+        "거래정지",
+        "거래종료",
+        "휴업",
+        "폐업"
+      ]
+    },
+    {
+      "termNm": "파트너유형코드",
+      "kind": "유형",
+      "vals": [
+        "대리점",
+        "판매점",
+        "제휴사",
+        "콘텐츠제공사",
+        "통신사업자",
+        "로밍사업자",
+        "수납대행기관"
+      ]
+    },
+    {
+      "termNm": "사업자과세유형코드",
+      "kind": "유형",
+      "vals": [
+        "일반과세",
+        "간이과세",
+        "면세",
+        "영세율",
+        "해외사업자"
+      ]
+    },
+    {
+      "termNm": "조직상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "운영",
+        "통합",
+        "폐지",
+        "개편예정"
+      ]
+    },
+    {
+      "termNm": "조직유형코드",
+      "kind": "유형",
+      "vals": [
+        "본사",
+        "본부",
+        "지사",
+        "영업팀",
+        "직영매장",
+        "고객센터"
+      ]
+    },
+    {
+      "termNm": "대리점상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "정상",
+        "영업정지",
+        "신규개통정지",
+        "계약해지",
+        "폐업"
+      ]
+    },
+    {
+      "termNm": "대리점유형코드",
+      "kind": "유형",
+      "vals": [
+        "일반대리점",
+        "직영점",
+        "법인영업대리점",
+        "온라인대리점",
+        "도매대리점"
+      ]
+    },
+    {
+      "termNm": "대리점등급유형코드",
+      "kind": "유형",
+      "vals": [
+        "S",
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "termNm": "판매점상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "정상",
+        "사전승낙대기",
+        "사전승낙철회",
+        "영업정지",
+        "폐점"
+      ]
+    },
+    {
+      "termNm": "판매점유형코드",
+      "kind": "유형",
+      "vals": [
+        "일반판매점",
+        "양판점",
+        "온라인판매점",
+        "방문판매",
+        "특수채널"
+      ]
+    },
+    {
+      "termNm": "콘텐츠제공사상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "정상",
+        "신규중지",
+        "결제차단",
+        "계약해지"
+      ]
+    },
+    {
+      "termNm": "콘텐츠제공사유형코드",
+      "kind": "유형",
+      "vals": [
+        "CP",
+        "결제대행PG",
+        "앱마켓",
+        "부가서비스제휴사",
+        "정보이용료CP"
+      ]
+    },
+    {
+      "termNm": "통신사업자상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "운영",
+        "일시중단",
+        "합병",
+        "사업폐지"
+      ]
+    },
+    {
+      "termNm": "통신사업자유형코드",
+      "kind": "유형",
+      "vals": [
+        "MNO",
+        "MVNO",
+        "유선사업자",
+        "인터넷전화",
+        "국제전화"
+      ]
+    },
+    {
+      "termNm": "로밍사업자상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "협정중",
+        "운영",
+        "일시중지",
+        "협정해지"
+      ]
+    },
+    {
+      "termNm": "로밍방향구분코드",
+      "kind": "구분",
+      "vals": [
+        "양방향",
+        "인바운드",
+        "아웃바운드"
+      ]
+    },
+    {
+      "termNm": "파트너계약상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "작성",
+        "체결",
+        "유효",
+        "갱신",
+        "해지",
+        "만료"
+      ]
+    },
+    {
+      "termNm": "파트너계약유형코드",
+      "kind": "유형",
+      "vals": [
+        "대리점위탁",
+        "판매점위탁",
+        "콘텐츠제공",
+        "상호접속",
+        "국제로밍",
+        "제휴",
+        "수납대행"
+      ]
+    },
+    {
+      "termNm": "정산주기유형코드",
+      "kind": "유형",
+      "vals": [
+        "월",
+        "반월",
+        "주",
+        "분기",
+        "건별"
+      ]
+    },
+    {
+      "termNm": "정산상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "생성",
+        "검증중",
+        "이의제기",
+        "확정",
+        "세금계산서발행",
+        "지급완료",
+        "취소"
+      ]
+    },
+    {
+      "termNm": "정산유형코드",
+      "kind": "유형",
+      "vals": [
+        "유치수수료",
+        "관리수수료",
+        "장려금",
+        "상호접속료",
+        "국제로밍",
+        "콘텐츠",
+        "수수료환수"
+      ]
+    },
+    {
+      "termNm": "정산방향구분코드",
+      "kind": "구분",
+      "vals": [
+        "지급",
+        "수취"
+      ]
+    },
+    {
+      "termNm": "세금계산서상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "작성",
+        "발행",
+        "국세청전송",
+        "전송완료",
+        "전송실패",
+        "취소"
+      ]
+    },
+    {
+      "termNm": "세금계산서유형코드",
+      "kind": "유형",
+      "vals": [
+        "정발행",
+        "역발행",
+        "수정세금계산서",
+        "영세율세금계산서",
+        "계산서"
+      ]
+    },
+    {
+      "termNm": "매입매출구분코드",
+      "kind": "구분",
+      "vals": [
+        "매입",
+        "매출"
+      ]
+    },
+    {
+      "termNm": "수정사유유형코드",
+      "kind": "유형",
+      "vals": [
+        "기재사항착오",
+        "공급가액변동",
+        "환입",
+        "계약해제",
+        "내국신용장사후개설",
+        "착오중복발급"
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "id": "P1",
+      "dec": "핵심 10개는 planner 후보(candidates.core) 그대로 확정, STL 2건(정산기본·세금계산서기본)은 엔터티 객체에 moduleCd:\"STL\"",
+      "why": "01 관문 승인 조건 2(STL moduleCd 필수), crossRels 가 이 이름으로 걸려 있음"
+    },
+    {
+      "id": "P2",
+      "dec": "파트너기본 = 슈퍼타입, 대리점·판매점·콘텐츠제공사·통신사업자·로밍사업자 = 1:1 식별 서브타입. 서브타입 PK 는 파트너번호의 역할명(대리점번호 AGNC_NO·판매점번호 SHOP_NO·콘텐츠제공사번호 CNTS_PRVDR_NO·통신사업자번호 CARR_NO·로밍사업자번호 ROAM_BZOPR_NO, 값 = 파트너번호)",
+      "why": "ORD·PAY·PRD 가 이미 이 이름으로 참조(ORD 참조키 note \"값은 파트너번호와 같음(역할명)\")하므로 소유자가 그 이름을 그대로 받는다. 공통 속성(사업자등록·과세유형·관리조직)은 슈퍼타입 한 곳"
+    },
+    {
+      "id": "P3",
+      "dec": "제휴사·수납대행기관은 서브타입 없이 파트너유형코드 값으로만",
+      "why": "areas.json PRM scope F4(제휴사 상세 없음). 수납대행기관 실체는 INV 소유 — 사업자 공통 속성이 필요하면 논리 단계에서 파트너번호 참조 추가 검토"
+    },
+    {
+      "id": "P4",
+      "dec": "약어는 다수안·공통표준 관행 : 유형 TY(88건 vs TP 45건), 일자 DT(33 vs YMD 7), 시작 BGNG, 정산 EXCCLC·결제 STLM(공통표준 — 계산 CALC 와 충돌 회피), 지급 GIVE",
+      "why": "여러 영역이 이미 쓴 약어 중 다수안 채택. PAY 과세유형코드 TXTN_TP_CD 와 달리 TXTN_TY_CD 로 적고 표준사전 단계에 TP→TY 통일 요청 [02 관문 해소 — reviews/02_conceptual.md]"
+    },
+    {
+      "id": "P5",
+      "dec": "단어 충돌 2건 기록(다른 영역 수정 안 함) : ① 대리점 AGNC(ORD·PRM) vs INV 수납대행기관번호 RCPT_AGNC_NO 의 AGNC ② 사업자 BZMN(CUS 사업자상태유형코드) vs BZOPR(PAY 로밍사업자번호) [02 관문 해소 — reviews/02_conceptual.md]",
+      "why": "키 소유자로서 AGNC_NO·ROAM_BZOPR_NO 는 다른 영역 이름 그대로 유지. 표준사전 단계에서 동음이의 정리 권고(예 : 대행기관 → 별도 약어, 사업자 = 등록 의미 BZMN / 통신 운영자 의미 BZOPR 를 별개 단어로 등재)"
+    },
+    {
+      "id": "P6",
+      "dec": "엔터티 phyNm 은 CUS 모범 형식(분류어 접미 _BAS, 접두 없음). 테이블명 PTL_PRM_<약어>[_접미] 는 물리 단계",
+      "why": "영역마다 형식이 3가지(CUST_BAS / PTL_ORD_… / UNPD_M)로 갈려 있음 — 지시된 모범 사례를 따르고 물리 단계에서 일괄 정리 [02 관문 해소 — reviews/02_conceptual.md]"
+    },
+    {
+      "id": "P7",
+      "dec": "판매점→대리점 N:1 은 선택(양판점·직계약 판매점 NULL), 파트너→조직·지역은 선택(해외 로밍사업자·해외 CP 는 국내 조직·지역 없음)",
+      "why": "국내 유통 구조(1차 대리점·2차 판매점·직계약 양판점) + S5 FK NULL 쏠림 근거"
+    },
+    {
+      "id": "P8",
+      "dec": "정산기본의 공급가액·부가가치세액은 확정 시점 스냅샷(정산상세 합계의 계산값이지만 보존)",
+      "why": "세금계산서·지급의 법적 근거 금액은 확정 후 바뀌면 안 됨 — 이행 종속이 아니라 시점 보존(CUS C9 와 같은 원칙). 논리 단계 normNote 에 명시"
+    },
+    {
+      "id": "P9",
+      "dec": "등급은 대리점등급유형코드(AGNC_GRD_TY_CD)로 명명",
+      "why": "공통코드 이름 3종 규칙(2-6) — CUS 고객등급코드는 규칙 밖 이름이라 따르지 않음(표준 단계 정정 대상)"
+    },
+    {
+      "id": "P10",
+      "dec": "국가코드·통화코드·TADIG코드·망식별코드(PLMN)·번호이동사업자코드는 외부 표준 기준코드라 공통코드 후보에서 제외",
+      "why": "ISO 3166·ISO 4217·GSMA TD.13·KAIT 번호이동 사업자 코드 — 값 체계를 외부가 소유"
+    }
+  ],
+  "basicEntRels": [
+    {
+      "entNm": "단말재고내역",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "단말모델기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "유통망 재고로 입고된다"
+        }
+      ]
+    },
+    {
+      "entNm": "유심재고내역",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "유심상품기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "유통망 재고로 입고된다"
+        }
+      ]
+    },
+    {
+      "entNm": "유치수수료내역",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "개통 건별 유치 수수료(PRM 쪽 FK, STL)"
+        }
+      ],
+      "moduleCd": "STL"
+    },
+    {
+      "entNm": "관리수수료내역",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "유지 회선 월 관리 수수료(PRM 쪽 FK, STL)"
+        }
+      ],
+      "moduleCd": "STL"
+    }
+  ]
+}

@@ -1,0 +1,1449 @@
+{
+  "area": "PAY",
+  "areaNm": "청구",
+  "stg": "CNCP",
+  "ver": "2026-11-07",
+  "author": "subagent_subject_modeler",
+  "relConv": "card = 이 엔터티 기준(N:1 = 이쪽이 자식), idn = 이 엔터티가 자식일 때 부모 키가 자기 PK 에 포함, opt = 이 엔터티 쪽에서 상대가 없을 수 있음",
+  "extKeys": {
+    "CUS.고객기본": {
+      "attrNm": "고객번호",
+      "phyNm": "CUST_NO",
+      "domNm": "번호V20"
+    },
+    "CUS.청구계정기본": {
+      "attrNm": "청구계정번호",
+      "phyNm": "BILL_ACNT_NO",
+      "domNm": "번호V20"
+    },
+    "ORD.가입계약기본": {
+      "attrNm": "가입계약번호",
+      "phyNm": "SBSC_CTRT_NO",
+      "domNm": "번호V20"
+    },
+    "ORD.회선기본": {
+      "attrNm": "서비스관리번호",
+      "phyNm": "SVC_MGMT_NO",
+      "domNm": "번호V20"
+    },
+    "ORD.가입상품기본": {
+      "attrNm": "가입상품번호",
+      "phyNm": "SBSC_PROD_NO",
+      "domNm": "번호V20"
+    },
+    "ORD.약정계약기본": {
+      "attrNm": "약정계약번호",
+      "phyNm": "AGRMT_CTRT_NO",
+      "domNm": "번호V20"
+    },
+    "ORD.결합계약기본": {
+      "attrNm": "결합계약번호",
+      "phyNm": "CMBN_CTRT_NO",
+      "domNm": "번호V20"
+    },
+    "ORD.단말할부상세": {
+      "attrNm": "단말할부계약번호 + 할부회차",
+      "phyNm": "EQP_INSTL_CTRT_NO, INSTL_TMS",
+      "domNm": "번호V20, 회차N3"
+    },
+    "PRD.요금항목코드": {
+      "attrNm": "요금항목코드",
+      "phyNm": "CHRG_ITM_CD",
+      "domNm": "코드V10"
+    },
+    "PRD.할인상품기본": {
+      "attrNm": "할인상품코드",
+      "phyNm": "DSCNT_PROD_CD",
+      "domNm": "코드V20"
+    },
+    "PRM.로밍사업자기본": {
+      "attrNm": "로밍사업자번호",
+      "phyNm": "ROAM_BZMN_NO",
+      "domNm": "번호V20"
+    },
+    "PRM.콘텐츠제공사기본": {
+      "attrNm": "콘텐츠제공사번호",
+      "phyNm": "CNTS_PRVD_CO_NO",
+      "domNm": "번호V20"
+    }
+  },
+  "exposedKeys": {
+    "청구기본": {
+      "attrNm": "청구번호",
+      "phyNm": "BILL_NO",
+      "domNm": "번호V20",
+      "usedBy": [
+        "INV.수납배분상세",
+        "INV.선납사용내역",
+        "COL.미납기본"
+      ]
+    },
+    "청구상세": {
+      "attrNm": "청구번호 + 청구상세순번",
+      "phyNm": "BILL_NO, BILL_DTL_SEQ",
+      "domNm": "번호V20, 순번N5",
+      "usedBy": [
+        "COL.미납상세"
+      ]
+    }
+  },
+  "entities": [
+    {
+      "entNm": "원시사용내역",
+      "phyNm": "RAW_USE_DTLS",
+      "tblNm": "PTL_PAY_RAW_USE_L",
+      "tp": "ACT",
+      "def": "교환기(MSC·IMS)·PGW/SMF·SMSC 가 만든 원시 사용기록(CDR)을 중계(Mediation)로 수집한 원본 1건. Rating 전 상태와 처리 결과(정상·오류·중복·보류)를 가진다.",
+      "keyAttrs": [
+        {
+          "attrNm": "원시사용번호",
+          "phyNm": "RAW_USE_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "수집파일명",
+          "phyNm": "CLCT_FILE_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "사용시작일시",
+          "phyNm": "USE_BGNG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "원시사용처리상태유형코드",
+          "phyNm": "RAW_USE_PRCS_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "수집파일번호",
+          "phyNm": "CLCT_FILE_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "서비스번호",
+          "phyNm": "SVC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "IMSI번호",
+          "phyNm": "IMSI_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "사용서비스유형코드",
+          "phyNm": "USE_SVC_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "발신번호",
+          "phyNm": "CLG_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "착신번호",
+          "phyNm": "CLD_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "사용시간초수",
+          "phyNm": "USE_HR_SCNT",
+          "role": "ATTR",
+          "domNm": "수N10"
+        },
+        {
+          "attrNm": "데이터사용바이트수",
+          "phyNm": "DATA_USE_BYTE_CNT",
+          "role": "ATTR",
+          "domNm": "수N18"
+        },
+        {
+          "attrNm": "망요소유형코드",
+          "phyNm": "NTWK_ELMT_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "원시레코드내용",
+          "phyNm": "RAW_RCRD_CN",
+          "role": "ATTR",
+          "domNm": "내용V4000"
+        },
+        {
+          "attrNm": "수집일시",
+          "phyNm": "CLCT_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "사용량수집파일내역",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "수집 파일에 담겨 들어옴(논리 단계 기본 엔터티)"
+        },
+        {
+          "toEnt": "사용내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "Rating 결과(오류·중복이면 없음, 분할 과금이면 여러 건)"
+        }
+      ]
+    },
+    {
+      "entNm": "사용내역",
+      "phyNm": "USE_DTLS",
+      "tblNm": "PTL_PAY_USE_L",
+      "tp": "ACT",
+      "def": "원시사용내역을 Rating(요금항목 결정·요율 적용·기본제공량 차감)한 과금 단위 사용 기록. 음성·데이터·문자·영상·로밍·콘텐츠 사용을 모두 담는 초대용량(T4) 엔터티 — 일 RANGE 파티션 후보.",
+      "keyAttrs": [
+        {
+          "attrNm": "사용번호",
+          "phyNm": "USE_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "사용서비스명",
+          "phyNm": "USE_SVC_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "사용시작일시",
+          "phyNm": "USE_BGNG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "사용과금상태유형코드",
+          "phyNm": "USE_RAT_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "원시사용번호",
+          "phyNm": "RAW_USE_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "서비스번호",
+          "phyNm": "SVC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "요금항목코드",
+          "phyNm": "CHRG_ITM_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "사용서비스유형코드",
+          "phyNm": "USE_SVC_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "사용량",
+          "phyNm": "USE_QTY",
+          "role": "ATTR",
+          "domNm": "수량N18"
+        },
+        {
+          "attrNm": "사용단위유형코드",
+          "phyNm": "USE_UNIT_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "과금량",
+          "phyNm": "RAT_QTY",
+          "role": "ATTR",
+          "domNm": "수량N18"
+        },
+        {
+          "attrNm": "기본제공차감량",
+          "phyNm": "BSCPRVD_DDCT_QTY",
+          "role": "ATTR",
+          "domNm": "수량N18"
+        },
+        {
+          "attrNm": "사용금액",
+          "phyNm": "USE_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "role": "ATTR",
+          "domNm": "년월C6"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "원시사용내역",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "원천 CDR(재Rating·수기 입력분은 없음)"
+        },
+        {
+          "toEnt": "회선기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "사용 발생 회선(서비스관리번호)"
+        },
+        {
+          "toEnt": "요금항목코드",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "Rating 결과 요금항목"
+        },
+        {
+          "toEnt": "사용량월집계",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "월 집계의 원천(PROC 재계산 기준)"
+        }
+      ]
+    },
+    {
+      "entNm": "사용량월집계",
+      "phyNm": "USE_QTY_MM_AGG",
+      "tblNm": "PTL_PAY_USE_QTY_MM_T",
+      "tp": "PROC",
+      "def": "회선×청구년월×사용서비스유형 단위로 사용내역을 집계한 가공 엔터티. 요금계산(사용료·초과량)·기본제공 소진 판정·레이크 피처의 기준점.",
+      "keyAttrs": [
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "role": "PK",
+          "domNm": "년월C6"
+        },
+        {
+          "attrNm": "사용서비스유형코드",
+          "phyNm": "USE_SVC_TY_CD",
+          "role": "PK",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "사용서비스명",
+          "phyNm": "USE_SVC_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "집계일시",
+          "phyNm": "AGG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "집계상태유형코드",
+          "phyNm": "AGG_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "사용건수",
+          "phyNm": "USE_NOCS",
+          "role": "ATTR",
+          "domNm": "건수N10"
+        },
+        {
+          "attrNm": "총사용량",
+          "phyNm": "TOT_USE_QTY",
+          "role": "ATTR",
+          "domNm": "수량N18"
+        },
+        {
+          "attrNm": "기본제공사용량",
+          "phyNm": "BSCPRVD_USE_QTY",
+          "role": "ATTR",
+          "domNm": "수량N18"
+        },
+        {
+          "attrNm": "초과사용량",
+          "phyNm": "EXCS_USE_QTY",
+          "role": "ATTR",
+          "domNm": "수량N18"
+        },
+        {
+          "attrNm": "사용금액",
+          "phyNm": "USE_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "서비스번호",
+          "phyNm": "SVC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "회선기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": true,
+          "opt": false,
+          "nm": "집계 대상 회선(식별)"
+        },
+        {
+          "toEnt": "사용내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "nm": "집계 원천"
+        },
+        {
+          "toEnt": "요금계산내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "사용료·초과요금 계산 근거"
+        }
+      ]
+    },
+    {
+      "entNm": "요금계산내역",
+      "phyNm": "CHRG_CALC_DTLS",
+      "tblNm": "PTL_PAY_CHRG_CALC_L",
+      "tp": "ACT",
+      "def": "청구작업(Bill Run)에서 가입상품×청구년월×요금항목 단위로 계산한 요금 결과(월정액·일할·사용료·할인·위약금·할부금). 청구상세 라인의 근거.",
+      "keyAttrs": [
+        {
+          "attrNm": "요금계산번호",
+          "phyNm": "CHRG_CALC_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "요금항목명",
+          "phyNm": "CHRG_ITM_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "요금계산일시",
+          "phyNm": "CHRG_CALC_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "요금계산상태유형코드",
+          "phyNm": "CHRG_CALC_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구작업번호",
+          "phyNm": "BILL_JOB_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "가입상품번호",
+          "phyNm": "SBSC_PROD_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "요금항목코드",
+          "phyNm": "CHRG_ITM_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "사용서비스유형코드",
+          "phyNm": "USE_SVC_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구상세순번",
+          "phyNm": "BILL_DTL_SEQ",
+          "role": "ATTR",
+          "domNm": "순번N5"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "role": "ATTR",
+          "domNm": "년월C6"
+        },
+        {
+          "attrNm": "요금계산유형코드",
+          "phyNm": "CHRG_CALC_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "계산금액",
+          "phyNm": "CALC_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "일할여부",
+          "phyNm": "DYPRT_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "일할일수",
+          "phyNm": "DYPRT_DCNT",
+          "role": "ATTR",
+          "domNm": "일수N3"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구작업기본",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "계산을 수행한 Bill Run"
+        },
+        {
+          "toEnt": "가입상품기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "요금 근거 가입상품"
+        },
+        {
+          "toEnt": "요금항목코드",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "계산 결과 요금항목"
+        },
+        {
+          "toEnt": "청구상세",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "반영된 청구 라인(청구 확정 전·청구 제외분은 없음)"
+        },
+        {
+          "toEnt": "사용량월집계",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "사용료 계산 근거(월정액·일할분은 없음)"
+        }
+      ]
+    },
+    {
+      "entNm": "청구주기코드",
+      "phyNm": "BILL_CYCL_CD",
+      "tblNm": "PTL_PAY_BILL_CYCL_C",
+      "tp": "REF",
+      "def": "사용기간 마감일·청구서 발행일·납부기한일을 정하는 청구주기 기준(예 1일~말일 사용, 익월 7일 발행, 익월 25일 납기). 적용 기간을 가진 이력형 기준.",
+      "keyAttrs": [
+        {
+          "attrNm": "청구주기코드",
+          "phyNm": "BILL_CYCL_CD",
+          "role": "PK",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구주기명",
+          "phyNm": "BILL_CYCL_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "청구주기등록일시",
+          "phyNm": "BILL_CYCL_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "청구주기상태유형코드",
+          "phyNm": "BILL_CYCL_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "사용기간시작일",
+          "phyNm": "USE_PRD_BGNG_DD",
+          "role": "ATTR",
+          "domNm": "일C2"
+        },
+        {
+          "attrNm": "사용기간마감일",
+          "phyNm": "USE_PRD_DDLN_DD",
+          "role": "ATTR",
+          "domNm": "일C2"
+        },
+        {
+          "attrNm": "청구서발행일",
+          "phyNm": "INVC_PBLCN_DD",
+          "role": "ATTR",
+          "domNm": "일C2"
+        },
+        {
+          "attrNm": "납부기한일",
+          "phyNm": "PAY_TMLMT_DD",
+          "role": "ATTR",
+          "domNm": "일C2"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구작업기본",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "주기별 Bill Run"
+        },
+        {
+          "toEnt": "청구기본",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "주기별 청구서"
+        },
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "청구계정에 지정된 청구주기"
+        }
+      ]
+    },
+    {
+      "entNm": "청구작업기본",
+      "phyNm": "BILL_JOB_BAS",
+      "tblNm": "PTL_PAY_BILL_JOB_M",
+      "tp": "ACT",
+      "def": "청구년월×청구주기 단위로 요금계산·청구서 생성·마감을 수행하는 청구작업(Bill Run) 1회. 정기·재청구·해지즉시 청구를 구분한다.",
+      "keyAttrs": [
+        {
+          "attrNm": "청구작업번호",
+          "phyNm": "BILL_JOB_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구작업명",
+          "phyNm": "BILL_JOB_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "청구작업시작일시",
+          "phyNm": "BILL_JOB_BGNG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "청구작업상태유형코드",
+          "phyNm": "BILL_JOB_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "role": "ATTR",
+          "domNm": "년월C6"
+        },
+        {
+          "attrNm": "청구주기코드",
+          "phyNm": "BILL_CYCL_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구작업유형코드",
+          "phyNm": "BILL_JOB_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "대상청구계정수",
+          "phyNm": "TRGT_BILL_ACNT_CNT",
+          "role": "ATTR",
+          "domNm": "수N10"
+        },
+        {
+          "attrNm": "처리건수",
+          "phyNm": "PRCS_NOCS",
+          "role": "ATTR",
+          "domNm": "건수N10"
+        },
+        {
+          "attrNm": "오류건수",
+          "phyNm": "ERR_NOCS",
+          "role": "ATTR",
+          "domNm": "건수N10"
+        },
+        {
+          "attrNm": "청구총금액",
+          "phyNm": "BILL_TOT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "청구작업종료일시",
+          "phyNm": "BILL_JOB_END_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "청구마감일시",
+          "phyNm": "BILL_DDLN_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구주기코드",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "작업 대상 청구주기"
+        },
+        {
+          "toEnt": "요금계산내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "작업이 만든 요금계산 결과"
+        },
+        {
+          "toEnt": "청구기본",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "작업이 만든 청구서"
+        },
+        {
+          "toEnt": "청구작업단계이력",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "단계별 처리 상태(논리 단계 기본 엔터티, 자식 쪽 식별 관계)"
+        }
+      ]
+    },
+    {
+      "entNm": "청구기본",
+      "phyNm": "BILL_BAS",
+      "tblNm": "PTL_PAY_BILL_M",
+      "tp": "ACT",
+      "def": "청구계정×청구년월 단위 청구서(재청구·해지즉시 청구는 같은 월 추가 건). 당월요금·할인·조정·부가가치세·미납이월을 합한 총청구금액과 납부기한을 가진다. 수납배분·미납의 기준(S14 핫 키 — 법인 청구계정 1개에 수천 건).",
+      "keyAttrs": [
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구서명",
+          "phyNm": "INVC_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "청구확정일시",
+          "phyNm": "BILL_CFMTN_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "청구상태유형코드",
+          "phyNm": "BILL_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구작업번호",
+          "phyNm": "BILL_JOB_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구주기코드",
+          "phyNm": "BILL_CYCL_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "role": "ATTR",
+          "domNm": "년월C6"
+        },
+        {
+          "attrNm": "청구서발행일자",
+          "phyNm": "INVC_PBLCN_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "납부기한일자",
+          "phyNm": "PAY_TMLMT_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "당월청구금액",
+          "phyNm": "THMM_BILL_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "할인금액",
+          "phyNm": "DSCNT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "조정금액",
+          "phyNm": "ADJ_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "부가가치세금액",
+          "phyNm": "VAT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "미납이월금액",
+          "phyNm": "UNPD_CYOV_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "총청구금액",
+          "phyNm": "TOT_BILL_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "청구서를 받는 청구계정(S14 핫 키)"
+        },
+        {
+          "toEnt": "청구주기코드",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "청구주기"
+        },
+        {
+          "toEnt": "청구작업기본",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "청구서를 만든 Bill Run"
+        },
+        {
+          "toEnt": "청구상세",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "nm": "청구 라인(청구서는 라인 1건 이상)"
+        },
+        {
+          "toEnt": "청구세금상세",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "nm": "과세 유형별 세금"
+        },
+        {
+          "toEnt": "청구조정내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "감액·증액·재청구 조정"
+        },
+        {
+          "toEnt": "수납배분상세",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "수납 → 청구서 배분(미수납이면 없음)"
+        },
+        {
+          "toEnt": "선납사용내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "선납 잔액 차감"
+        },
+        {
+          "toEnt": "미납기본",
+          "toArea": "COL",
+          "card": "1:1",
+          "idn": false,
+          "opt": true,
+          "nm": "납기 경과 미수납 시에만 존재"
+        },
+        {
+          "toEnt": "자동이체출금요청내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "출금 대상 청구서"
+        },
+        {
+          "toEnt": "연체가산금내역",
+          "toArea": "COL",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "가산금이 실린 다음 달 청구서(청구 반영 전·면제 시 NULL)"
+        }
+      ]
+    },
+    {
+      "entNm": "청구상세",
+      "phyNm": "BILL_DTL",
+      "tblNm": "PTL_PAY_BILL_D",
+      "tp": "ACT",
+      "def": "청구서의 요금항목 라인 — 청구서×회선×요금항목 단위 금액. 수납배분·미납이 항목 순위(할부금·부가세 등)로 이뤄지므로 라인별 금액·수납순위를 가진다.",
+      "keyAttrs": [
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구상세순번",
+          "phyNm": "BILL_DTL_SEQ",
+          "role": "PK",
+          "domNm": "순번N5"
+        },
+        {
+          "attrNm": "요금항목명",
+          "phyNm": "CHRG_ITM_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "청구확정일시",
+          "phyNm": "BILL_CFMTN_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "청구상세상태유형코드",
+          "phyNm": "BILL_DTL_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "요금항목코드",
+          "phyNm": "CHRG_ITM_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "서비스번호",
+          "phyNm": "SVC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "role": "ATTR",
+          "domNm": "년월C6"
+        },
+        {
+          "attrNm": "청구금액",
+          "phyNm": "BILL_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "공급가액",
+          "phyNm": "SPLYAMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "부가가치세금액",
+          "phyNm": "VAT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "과세유형코드",
+          "phyNm": "TXTN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "수납배분우선순위",
+          "phyNm": "RCV_ALLC_PRRT",
+          "role": "ATTR",
+          "domNm": "순번N5"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구기본",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": true,
+          "opt": false,
+          "nm": "소속 청구서(식별)"
+        },
+        {
+          "toEnt": "회선기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "라인 발생 회선(청구계정 단위 요금은 없음)"
+        },
+        {
+          "toEnt": "요금항목코드",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "라인 요금항목"
+        },
+        {
+          "toEnt": "요금계산내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "라인을 이룬 요금계산 결과"
+        },
+        {
+          "toEnt": "청구조정내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "라인 단위 조정"
+        },
+        {
+          "toEnt": "미납상세",
+          "toArea": "COL",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "항목 단위 미납"
+        }
+      ]
+    },
+    {
+      "entNm": "청구조정내역",
+      "phyNm": "BILL_ADJ_DTLS",
+      "tblNm": "PTL_PAY_BILL_ADJ_L",
+      "tp": "ACT",
+      "def": "확정된 청구서·청구 라인에 대한 감액·증액·재청구·이월 조정 1건(민원 감면·오과금 정정·장애 보상 등). 감액은 음수 금액(S7), 승인 후 당월 또는 다음 청구서에 반영.",
+      "keyAttrs": [
+        {
+          "attrNm": "청구조정번호",
+          "phyNm": "BILL_ADJ_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구조정명",
+          "phyNm": "BILL_ADJ_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "청구조정일시",
+          "phyNm": "BILL_ADJ_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "청구조정상태유형코드",
+          "phyNm": "BILL_ADJ_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구상세순번",
+          "phyNm": "BILL_DTL_SEQ",
+          "role": "ATTR",
+          "domNm": "순번N5"
+        },
+        {
+          "attrNm": "청구조정사유유형코드",
+          "phyNm": "BILL_ADJ_RSN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구조정유형코드",
+          "phyNm": "BILL_ADJ_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "조정금액",
+          "phyNm": "ADJ_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "조정부가가치세금액",
+          "phyNm": "ADJ_VAT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "반영청구년월",
+          "phyNm": "RFLT_BILL_YM",
+          "role": "ATTR",
+          "domNm": "년월C6"
+        },
+        {
+          "attrNm": "조정승인일시",
+          "phyNm": "ADJ_APRV_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "조정내용",
+          "phyNm": "ADJ_CN",
+          "role": "ATTR",
+          "domNm": "내용V4000"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구기본",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "조정 대상 청구서"
+        },
+        {
+          "toEnt": "청구상세",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "조정 대상 라인(청구서 전체 조정은 없음)"
+        },
+        {
+          "toEnt": "청구조정사유코드",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "조정 사유(논리 단계 기본 REF)"
+        }
+      ]
+    },
+    {
+      "entNm": "청구세금상세",
+      "phyNm": "BILL_TAX_DTL",
+      "tblNm": "PTL_PAY_BILL_TAX_D",
+      "tp": "ACT",
+      "def": "청구서의 과세 유형(과세·영세·면세)별 과세표준·세율·세액(부가가치세법). 법인 청구계정은 전자세금계산서 승인번호를 가진다.",
+      "keyAttrs": [
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "과세유형코드",
+          "phyNm": "TXTN_TY_CD",
+          "role": "PK",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "세금명",
+          "phyNm": "TAX_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "세금계산일시",
+          "phyNm": "TAX_CALC_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "청구세금상태유형코드",
+          "phyNm": "BILL_TAX_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "과세표준금액",
+          "phyNm": "TXSTD_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "세율",
+          "phyNm": "TXRT",
+          "role": "ATTR",
+          "domNm": "율N5_2"
+        },
+        {
+          "attrNm": "세액",
+          "phyNm": "TXAMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "면세금액",
+          "phyNm": "TXEMP_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "세금계산서발행여부",
+          "phyNm": "TXINV_PBLCN_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "전자세금계산서승인번호",
+          "phyNm": "ELCTR_TXINV_APRV_NO",
+          "role": "ATTR",
+          "domNm": "번호V30"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구기본",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": true,
+          "opt": false,
+          "nm": "소속 청구서(식별)"
+        }
+      ]
+    }
+  ],
+  "basicEntRels": [
+    {
+      "entNm": "할인적용내역",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "할인상품기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "요금계산 때 적용된다"
+        }
+      ]
+    },
+    {
+      "entNm": "위약금부과내역",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "약정계약기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "해지·변경 시 위약금(PAY 쪽 FK)"
+        }
+      ]
+    },
+    {
+      "entNm": "결합할인배분내역",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "결합계약기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "결합 계약 단위 할인 배분(PAY 쪽 FK)"
+        }
+      ]
+    },
+    {
+      "entNm": "소액결제청구상세",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "콘텐츠제공사기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "소액결제 대금이 청구된다(STL)"
+        }
+      ],
+      "moduleCd": "STL"
+    },
+    {
+      "entNm": "콘텐츠이용요금내역",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "콘텐츠제공사기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "정보이용료가 대신 청구된다(STL)"
+        }
+      ],
+      "moduleCd": "STL"
+    },
+    {
+      "entNm": "로밍사용내역",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "로밍사업자기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "방문망 사업자로서 TAP 사용 기록을 보낸다(STL)"
+        }
+      ],
+      "moduleCd": "STL"
+    }
+  ]
+}

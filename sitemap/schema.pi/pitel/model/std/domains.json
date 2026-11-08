@@ -1,0 +1,326 @@
+[
+  {
+    "domNm": "번호V20",
+    "keyDom": "번호",
+    "grp": "번호",
+    "lgcTp": "VARCHAR",
+    "len": 20,
+    "scale": null,
+    "def": "식별·외부 부여 번호(기본)"
+  },
+  {
+    "domNm": "번호V30",
+    "keyDom": "번호",
+    "grp": "번호",
+    "lgcTp": "VARCHAR",
+    "len": 30,
+    "scale": null,
+    "def": "국세청 승인번호·건물관리번호 등 긴 번호"
+  },
+  {
+    "domNm": "일련번호N5",
+    "keyDom": "일련번호",
+    "grp": "번호",
+    "lgcTp": "NUMERIC",
+    "len": 5,
+    "scale": 0,
+    "def": "부모 안 등록 차례 일련번호"
+  },
+  {
+    "domNm": "일련번호V20",
+    "keyDom": "일련번호",
+    "grp": "번호",
+    "lgcTp": "VARCHAR",
+    "len": 20,
+    "scale": null,
+    "def": "기기(유심) 일련번호 문자열"
+  },
+  {
+    "domNm": "순번N5",
+    "keyDom": "순번",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 5,
+    "scale": 0,
+    "def": "부모 안 처리·표시 순번(기본)"
+  },
+  {
+    "domNm": "순번N10",
+    "keyDom": "순번",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 10,
+    "scale": 0,
+    "def": "이력·상세가 많은 부모의 순번"
+  },
+  {
+    "domNm": "코드V10",
+    "keyDom": "코드",
+    "grp": "코드",
+    "lgcTp": "VARCHAR",
+    "len": 10,
+    "scale": null,
+    "def": "공통코드·기준 코드(기본)"
+  },
+  {
+    "domNm": "코드V20",
+    "keyDom": "코드",
+    "grp": "코드",
+    "lgcTp": "VARCHAR",
+    "len": 20,
+    "scale": null,
+    "def": "상품·단말모델 코드"
+  },
+  {
+    "domNm": "명V100",
+    "keyDom": "명",
+    "grp": "명칭",
+    "lgcTp": "VARCHAR",
+    "len": 100,
+    "scale": null,
+    "def": "이름(기본)"
+  },
+  {
+    "domNm": "명V200",
+    "keyDom": "명",
+    "grp": "명칭",
+    "lgcTp": "VARCHAR",
+    "len": 200,
+    "scale": null,
+    "def": "법인명·상품 공시명 등 긴 이름"
+  },
+  {
+    "domNm": "일시TS",
+    "keyDom": "일시",
+    "grp": "날짜/시간",
+    "lgcTp": "TIMESTAMP",
+    "len": null,
+    "scale": null,
+    "def": "연월일 시분초(마이크로초)"
+  },
+  {
+    "domNm": "일자C8",
+    "keyDom": "일자",
+    "grp": "날짜/시간",
+    "lgcTp": "CHAR",
+    "len": 8,
+    "scale": null,
+    "def": "YYYYMMDD"
+  },
+  {
+    "domNm": "년월C6",
+    "keyDom": "년월",
+    "grp": "날짜/시간",
+    "lgcTp": "CHAR",
+    "len": 6,
+    "scale": null,
+    "def": "YYYYMM"
+  },
+  {
+    "domNm": "일C2",
+    "keyDom": "일",
+    "grp": "날짜/시간",
+    "lgcTp": "CHAR",
+    "len": 2,
+    "scale": null,
+    "def": "DD(01~31, 말일 = 99 허용)"
+  },
+  {
+    "domNm": "여부C1",
+    "keyDom": "여부",
+    "grp": "코드",
+    "lgcTp": "CHAR",
+    "len": 1,
+    "scale": null,
+    "def": "Y/N"
+  },
+  {
+    "domNm": "금액N15",
+    "keyDom": "금액",
+    "grp": "금액",
+    "lgcTp": "NUMERIC",
+    "len": 15,
+    "scale": 0,
+    "def": "원화 금액(원 단위, 음수 = 조정·환입)"
+  },
+  {
+    "domNm": "금액N18_4",
+    "keyDom": "금액",
+    "grp": "금액",
+    "lgcTp": "NUMERIC",
+    "len": 18,
+    "scale": 4,
+    "def": "외화·SDR 금액(소수 4자리, 로밍 TAP·국제 정산) — 03 관문(구 금액N18_3 대체)"
+  },
+  {
+    "domNm": "수N10",
+    "keyDom": "수",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 10,
+    "scale": 0,
+    "def": "개수(기본)"
+  },
+  {
+    "domNm": "수N3",
+    "keyDom": "수",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 3,
+    "scale": 0,
+    "def": "회차·개월 등 작은 개수"
+  },
+  {
+    "domNm": "수N5",
+    "keyDom": "수",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 5,
+    "scale": 0,
+    "def": "개월수·회선수 등"
+  },
+  {
+    "domNm": "수N18",
+    "keyDom": "수",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 18,
+    "scale": 0,
+    "def": "바이트 수 등 큰 개수"
+  },
+  {
+    "domNm": "건수N10",
+    "keyDom": "건수",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 10,
+    "scale": 0,
+    "def": "처리·발생 건수"
+  },
+  {
+    "domNm": "일수N5",
+    "keyDom": "일수",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 5,
+    "scale": 0,
+    "def": "경과 일수(기본)"
+  },
+  {
+    "domNm": "일수N3",
+    "keyDom": "일수",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 3,
+    "scale": 0,
+    "def": "월 안의 일할 일수"
+  },
+  {
+    "domNm": "회차N3",
+    "keyDom": "회차",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 3,
+    "scale": 0,
+    "def": "분할·할부 회차"
+  },
+  {
+    "domNm": "수량N18",
+    "keyDom": "수량",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 18,
+    "scale": 0,
+    "def": "사용·과금량(초·바이트·건)"
+  },
+  {
+    "domNm": "율N5_2",
+    "keyDom": "율",
+    "grp": "율",
+    "lgcTp": "NUMERIC",
+    "len": 5,
+    "scale": 2,
+    "def": "백분율(소수 2자리, 최대 999.99)"
+  },
+  {
+    "domNm": "환율N15_4",
+    "keyDom": "환율",
+    "grp": "율",
+    "lgcTp": "NUMERIC",
+    "len": 15,
+    "scale": 4,
+    "def": "통화 환산 비율(소수 4자리) — 03 관문(구 율N12_4 대체)"
+  },
+  {
+    "domNm": "내용V4000",
+    "keyDom": "내용",
+    "grp": "내용",
+    "lgcTp": "VARCHAR",
+    "len": 4000,
+    "scale": null,
+    "def": "자유 서술(기본)"
+  },
+  {
+    "domNm": "내용V200",
+    "keyDom": "내용",
+    "grp": "내용",
+    "lgcTp": "VARCHAR",
+    "len": 200,
+    "scale": null,
+    "def": "짧은 서술(연락처 값 등)"
+  },
+  {
+    "domNm": "주소V200",
+    "keyDom": "주소",
+    "grp": "명칭",
+    "lgcTp": "VARCHAR",
+    "len": 200,
+    "scale": null,
+    "def": "우편 주소(기본)"
+  },
+  {
+    "domNm": "주소V100",
+    "keyDom": "주소",
+    "grp": "명칭",
+    "lgcTp": "VARCHAR",
+    "len": 100,
+    "scale": null,
+    "def": "이메일 주소"
+  },
+  {
+    "domNm": "전화번호V20",
+    "keyDom": "전화번호",
+    "grp": "번호",
+    "lgcTp": "VARCHAR",
+    "len": 20,
+    "scale": null,
+    "def": "전화번호 숫자 문자열"
+  },
+  {
+    "domNm": "우편번호C5",
+    "keyDom": "우편번호",
+    "grp": "번호",
+    "lgcTp": "CHAR",
+    "len": 5,
+    "scale": null,
+    "def": "우편번호 5자리"
+  },
+  {
+    "domNm": "값V256",
+    "keyDom": "값",
+    "grp": "내용",
+    "lgcTp": "VARCHAR",
+    "len": 256,
+    "scale": null,
+    "def": "암호화 값(Base64)"
+  },
+  {
+    "domNm": "값N10",
+    "keyDom": "값",
+    "grp": "수량",
+    "lgcTp": "NUMERIC",
+    "len": 10,
+    "scale": 0,
+    "def": "숫자 설정 값(속도 Kbps 등)"
+  }
+]

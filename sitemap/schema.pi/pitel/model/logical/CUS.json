@@ -1,0 +1,4391 @@
+{
+  "area": "CUS",
+  "areaNm": "고객",
+  "ver": "2026-11-07",
+  "author": "subagent_logical_modeler",
+  "stg": "LGCL",
+  "summary": {
+    "entityCnt": 30,
+    "coreCnt": 10,
+    "basicCnt": 20,
+    "stlCnt": 0,
+    "attrCnt": 310,
+    "relCnt": 51,
+    "newTermCnt": 94,
+    "newWordCnt": 15,
+    "newCodeCnt": 29
+  },
+  "conventions": {
+    "rels": "엔터티의 rels = 그 엔터티가 자식(FK 보유)인 관계. card 는 부모:자식, idn = FK 가 자식 PK 에 포함, opt = 자식 FK 가 NULL 허용(부모 없이 존재 가능). 다른 주제영역 부모는 parent = \"<영역>.<엔터티>\". CUS 가 부모이고 자식이 다른 주제영역인 관계는 그 영역 논리 모델이 소유(문서 3절 목록).",
+    "fk": "fk = {ent, attr, area} — 역할명 FK 는 attr 가 부모 PK 이름. 한 속성이 FK 두 개에 참여하면 also 배열.",
+    "history": "이력(_H) 엔터티 = 부모 PK + 유효시작일시(SCD2), 유효종료일시 현재행 9999-12-31 23:59:59.",
+    "stl": "CUS 에는 정산 모듈(STL) 엔터티가 배치되지 않음(areas.json moduleEnts.STL = [])."
+  },
+  "entities": [
+    {
+      "entId": "CUS-001",
+      "entNm": "고객기본",
+      "phyNm": "CUST_BAS",
+      "tblNm": "PTL_CUS_CUST_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "통신 서비스를 계약하고 요금 채무를 지는 당사자(개인·개인사업자·법인·외국인·공공기관)의 공통 실체. 개인·법인 상세의 상위(슈퍼타입). 해지·사망 후에도 행을 지우지 않고 상태·파기 일시로 표현한다.",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "고객명",
+          "phyNm": "CUST_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "고객의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "고객등록일시",
+          "phyNm": "CUST_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "고객 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "고객상태유형코드",
+          "phyNm": "CUST_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "고객 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "고객유형코드",
+          "phyNm": "CUST_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "고객의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "내외국인구분코드",
+          "phyNm": "DMFRGN_SE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "내외국인의 구분 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "국가코드",
+          "phyNm": "NATN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "국가 코드 — 외부 표준 ISO 3166-1 alpha-2 값을 그대로 쓴다(공통코드 아님)"
+        },
+        {
+          "attrNm": "고객등급유형코드",
+          "phyNm": "CUST_GRD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "고객 등급의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "최초가입일자",
+          "phyNm": "FRST_SBSC_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "최초 가입의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "고객해지일시",
+          "phyNm": "CUST_TRMN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "고객 해지의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "휴면전환일자",
+          "phyNm": "DRMT_CNVR_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "휴면 전환의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "개인정보파기일시",
+          "phyNm": "PRVC_DSTR_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "개인정보 파기의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "명의도용신고여부",
+          "phyNm": "NMNE_THFT_DCLR_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 13,
+          "def": "명의 도용 신고의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [],
+      "normNote": "1NF: 연락처·주소·동의 반복 그룹을 상세 엔터티로 분리. 2NF: 단일 PK. 3NF: 고객등급명은 코드값에서 파생되어 두지 않음(등급유형코드만). 현재 등급(고객등급유형코드)은 고객등급이력 현재행과 중복이지만 개념 결정 C3(현재값+이력 쌍) 유지 — 이력이 정본, 기본은 현재 스냅숏."
+    },
+    {
+      "entId": "CUS-002",
+      "entNm": "개인고객상세",
+      "phyNm": "INDV_CUST_DTL",
+      "tblNm": "PTL_CUS_INDV_CUST_D",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "개인·외국인 고객의 서브타입 상세. 생년월일·성별·실명확인 값(암호화 자리 표시 — D11, 실제 주민번호 미보관)·복지 대상 여부 등 개인에게만 있는 속성.",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "영문고객명",
+          "phyNm": "ENG_CUST_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "영문 고객의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "개인고객등록일시",
+          "phyNm": "INDV_CUST_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "개인 고객 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "실명인증상태유형코드",
+          "phyNm": "RLNM_CRTF_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "실명 인증 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "생년월일",
+          "phyNm": "BRDT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "태어난 연월일"
+        },
+        {
+          "attrNm": "성별구분코드",
+          "phyNm": "GNDR_SE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "성별의 구분 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "실명확인번호암호화값",
+          "phyNm": "RLNM_IDNTF_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "실명 확인 번호 암호화의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "신분증종류코드",
+          "phyNm": "IDCD_KND_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "신분증의 종류 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "실명인증일시",
+          "phyNm": "RLNM_CRTF_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "실명 인증의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "외국인체류만료일자",
+          "phyNm": "FRGNR_STAY_EXPRY_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "외국인 체류 만료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "복지대상유형코드",
+          "phyNm": "WLFR_TRGT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "복지 대상의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 개인고객상세",
+          "parent": "CUS.고객기본",
+          "child": "CUS.개인고객상세",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF 충족(PK = 고객번호 1:1 서브타입). 3NF: 성별·생년월일은 실명확인번호에서 파생 가능하나 원본은 암호화값이라 복호 없이 쓰도록 별도 보관(D11 — 파생 아님으로 판정)."
+    },
+    {
+      "entId": "CUS-003",
+      "entNm": "법인고객상세",
+      "phyNm": "CORP_CUST_DTL",
+      "tblNm": "PTL_CUS_CORP_CUST_D",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "법인·개인사업자·공공기관 고객의 서브타입 상세. 사업자등록·대표자·업종·규모 등 법인에게만 있는 속성(법인 1곳이 회선 100만+ 보유하는 S1 핫 키의 주인).",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "법인명",
+          "phyNm": "CORP_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "법인의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "법인고객등록일시",
+          "phyNm": "CORP_CUST_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "법인 고객 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "사업자상태유형코드",
+          "phyNm": "BZMN_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "사업자 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "사업자등록번호",
+          "phyNm": "BRNO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "국세청 사업자등록번호 10자리"
+        },
+        {
+          "attrNm": "법인등록번호",
+          "phyNm": "CRNO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "법원 법인등록번호 13자리"
+        },
+        {
+          "attrNm": "대표자명",
+          "phyNm": "RPRSV_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "대표자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "업종코드",
+          "phyNm": "TPBIZ_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "업종 코드 — 외부 표준 통계청 KSIC 대분류 값을 그대로 쓴다(공통코드 아님)"
+        },
+        {
+          "attrNm": "법인규모유형코드",
+          "phyNm": "CORP_SCL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "법인 규모의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "설립일자",
+          "phyNm": "FNDN_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "설립의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "종업원수",
+          "phyNm": "EMP_CNT",
+          "domNm": "수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "종업원의 수 — 개수·인원 등 셀 수 있는 수"
+        },
+        {
+          "attrNm": "대표전화번호",
+          "phyNm": "RPRS_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "대표의 전화번호 — 전화번호(숫자 문자열)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 법인고객상세",
+          "parent": "CUS.고객기본",
+          "child": "CUS.법인고객상세",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 사업장·담당자 반복 그룹을 법인사업장상세·법인담당자상세로 분리. 2NF·3NF 충족(업종명은 업종코드에서 파생 — 두지 않음)."
+    },
+    {
+      "entId": "CUS-004",
+      "entNm": "청구계정기본",
+      "phyNm": "BILL_ACNT_BAS",
+      "tblNm": "PTL_CUS_BILL_ACNT_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "청구서를 묶어 발행하는 단위(TM Forum Customer Account). 한 고객이 여러 청구계정을, 한 청구계정이 여러 회선(가입계약)을 가진다. 청구주기·청구서 수령 방법·납부자를 정한다. 납부방법 실체는 INV(P1).",
+      "attrs": [
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호",
+            "also": [
+              {
+                "area": "CUS",
+                "ent": "고객주소상세",
+                "attr": "고객번호"
+              }
+            ]
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "납부자번호",
+          "phyNm": "PYR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "납부자기본",
+            "attr": "납부자번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "납부자의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "청구주기코드",
+          "phyNm": "BILL_CYCL_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구주기코드",
+            "attr": "청구주기코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "청구 주기의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "청구지주소순번",
+          "phyNm": "BILL_PLC_ADDR_SEQ",
+          "domNm": "순번N5",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객주소상세",
+            "attr": "주소순번"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "청구 지 주소의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "청구계정명",
+          "phyNm": "BILL_ACNT_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "청구 계정의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "청구계정등록일시",
+          "phyNm": "BILL_ACNT_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "청구 계정 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "청구계정상태유형코드",
+          "phyNm": "BILL_ACNT_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "청구 계정 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "청구계정유형코드",
+          "phyNm": "BILL_ACNT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "청구 계정의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "청구서수령방법유형코드",
+          "phyNm": "INVC_RCPT_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "청구서 수령 방법의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "청구서이메일주소",
+          "phyNm": "INVC_EML_ADDR",
+          "domNm": "주소V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "청구서 이메일의 주소 — 우편·전자 주소"
+        },
+        {
+          "attrNm": "통합청구여부",
+          "phyNm": "INTGR_BILL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "통합 청구의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "최초청구년월",
+          "phyNm": "FRST_BILL_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 13,
+          "def": "최초 청구의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "청구계정해지일시",
+          "phyNm": "BILL_ACNT_TRMN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 14,
+          "def": "청구 계정 해지의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 청구계정기본",
+          "parent": "CUS.고객기본",
+          "child": "CUS.청구계정기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "청구지 주소로 발송한다(우편 수령만 — 역할명 청구지주소순번)",
+          "parent": "CUS.고객주소상세",
+          "child": "CUS.청구계정기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "고객번호",
+            "청구지주소순번"
+          ]
+        },
+        {
+          "relNm": "납부자기본의 청구계정기본",
+          "parent": "CUS.납부자기본",
+          "child": "CUS.청구계정기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "납부자번호"
+          ]
+        },
+        {
+          "relNm": "청구주기코드의 청구계정기본",
+          "parent": "PAY.청구주기코드",
+          "child": "CUS.청구계정기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구주기코드"
+          ]
+        }
+      ],
+      "normNote": "2NF: 단일 PK. 3NF: 청구지 주소 본문은 고객주소상세 참조(청구지주소순번)로만 두어 이행 종속 제거. 납부자 이름·연락처는 납부자기본 소유."
+    },
+    {
+      "entId": "CUS-005",
+      "entNm": "납부자기본",
+      "phyNm": "PYR_BAS",
+      "tblNm": "PTL_CUS_PYR_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "요금을 실제로 내는 사람·법인. 명의 고객과 다를 수 있다(부모가 자녀 요금 납부, 법인이 임직원 요금 납부). 자사 고객이면 고객번호를 참조하고, 아니면 이름·연락처만 가진다.",
+      "attrs": [
+        {
+          "attrNm": "납부자번호",
+          "phyNm": "PYR_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "납부자의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "납부자명",
+          "phyNm": "PYR_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "납부자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "납부자등록일시",
+          "phyNm": "PYR_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "납부자 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "납부자상태유형코드",
+          "phyNm": "PYR_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "납부자 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "납부자유형코드",
+          "phyNm": "PYR_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "납부자의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "명의자관계유형코드",
+          "phyNm": "NMNE_PRSN_REL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "명의 자 관계의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "납부자생년월일",
+          "phyNm": "PYR_BRDT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "납부자의 생년월일 — 태어난 연월일"
+        },
+        {
+          "attrNm": "납부자사업자등록번호",
+          "phyNm": "PYR_BRNO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "납부자의 사업자등록번호 — 국세청 사업자등록번호 10자리"
+        },
+        {
+          "attrNm": "납부자휴대전화번호",
+          "phyNm": "PYR_MBL_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "납부자 휴대의 전화번호 — 전화번호(숫자 문자열)"
+        },
+        {
+          "attrNm": "납부자이메일주소",
+          "phyNm": "PYR_EML_ADDR",
+          "domNm": "주소V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "납부자 이메일의 주소 — 우편·전자 주소"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 납부자기본",
+          "parent": "CUS.고객기본",
+          "child": "CUS.납부자기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        }
+      ],
+      "normNote": "3NF: 자사 고객 납부자의 이름·생년월일은 고객기본과 중복될 수 있으나 비고객 납부자 공통 속성이고 청구 시점 납부자 명의 보존 목적 — 이행 종속 아님(고객번호 → 납부자명 함수 종속이 성립하지 않음, 법인 대납 등)."
+    },
+    {
+      "entId": "CUS-006",
+      "entNm": "고객연락처상세",
+      "phyNm": "CUST_CNTC_DTL",
+      "tblNm": "PTL_CUS_CUST_CNTC_D",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "고객의 연락 수단(휴대전화·자택·직장·이메일·팩스) 현재값. 한 고객 여러 건, 유형별 대표 1건. 변경 이력은 기본 엔터티 고객연락처이력(논리 단계).",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "연락처순번",
+          "phyNm": "CNTC_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "연락처의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "연락처명",
+          "phyNm": "CNTC_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "연락처의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "연락처등록일시",
+          "phyNm": "CNTC_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "연락처 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "연락처상태유형코드",
+          "phyNm": "CNTC_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "연락처 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "연락처유형코드",
+          "phyNm": "CNTC_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "연락처의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "연락처내용",
+          "phyNm": "CNTC_CN",
+          "domNm": "내용V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "연락처의 내용 — 자유 서술 내용"
+        },
+        {
+          "attrNm": "대표연락처여부",
+          "phyNm": "RPRS_CNTC_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "대표 연락처의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "본인연락처여부",
+          "phyNm": "SELF_CNTC_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "본인 연락처의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "연락처검증일시",
+          "phyNm": "CNTC_VRFC_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "연락처 검증의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 고객연락처상세",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객연락처상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 연락 수단마다 1행(반복 그룹 해소). 2NF: 비키 속성은 (고객번호, 연락처순번) 전체에 종속. 3NF 충족."
+    },
+    {
+      "entId": "CUS-007",
+      "entNm": "고객주소상세",
+      "phyNm": "CUST_ADDR_DTL",
+      "tblNm": "PTL_CUS_CUST_ADDR_D",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "고객의 주소(거주지·청구지·직장·사업장·배송지) 현재값. 청구계정의 청구지 주소가 이 엔터티를 가리킨다. 변경 이력은 고객주소이력(논리 단계).",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "주소순번",
+          "phyNm": "ADDR_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "주소의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "지역코드",
+            "attr": "지역코드"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "지역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "우편번호",
+          "phyNm": "ZIP",
+          "domNm": "우편번호C5",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "우편번호기본",
+            "attr": "우편번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "우편번호 5자리"
+        },
+        {
+          "attrNm": "수령인명",
+          "phyNm": "RCPN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수령인의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "주소등록일시",
+          "phyNm": "ADDR_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "주소 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "주소상태유형코드",
+          "phyNm": "ADDR_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "주소 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "주소유형코드",
+          "phyNm": "ADDR_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "주소의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "도로명주소",
+          "phyNm": "ROAD_NM_ADDR",
+          "domNm": "주소V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "도로 명의 주소 — 우편·전자 주소"
+        },
+        {
+          "attrNm": "상세주소",
+          "phyNm": "DADDR",
+          "domNm": "주소V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "도로명주소 뒤의 동·호 등 상세 주소"
+        },
+        {
+          "attrNm": "건물관리번호",
+          "phyNm": "BLDG_MGMT_NO",
+          "domNm": "번호V30",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "건물 관리의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "대표주소여부",
+          "phyNm": "RPRS_ADDR_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "대표 주소의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "반송횟수",
+          "phyNm": "RTRN_NMTM",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 13,
+          "def": "반송의 횟수 — 반복 발생한 횟수"
+        },
+        {
+          "attrNm": "고객주소변경사유유형코드",
+          "phyNm": "CUST_ADDR_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 14,
+          "def": "주소 변경 사유(이사·반송·정정) — 현재값의 마지막 변경 사유"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 고객주소상세",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객주소상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "지역코드의 고객주소상세",
+          "parent": "CUS.지역코드",
+          "child": "CUS.고객주소상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "지역코드"
+          ]
+        },
+        {
+          "relNm": "우편번호기본의 고객주소상세",
+          "parent": "CUS.우편번호기본",
+          "child": "CUS.고객주소상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "우편번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 주소마다 1행. 3NF: 지역명은 지역코드, 도서산간은 우편번호기본에서 조회(두지 않음). 지역코드(법정동 10자리)는 우편번호(기초구역)로 결정되지 않아 이행 종속 아님."
+    },
+    {
+      "entId": "CUS-008",
+      "entNm": "고객동의내역",
+      "phyNm": "CUST_AGRE_DTLS",
+      "tblNm": "PTL_CUS_CUST_AGRE_L",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "고객이 개인정보 수집·이용, 마케팅 수신, 제3자 제공 등 동의 항목에 동의·거부한 행위 1건. 철회·만료·파기는 상태유형코드와 일시로 표현(행 삭제 없음 — 동의 증빙 보존 의무).",
+      "attrs": [
+        {
+          "attrNm": "고객동의번호",
+          "phyNm": "CUST_AGRE_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객 동의의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "동의항목유형코드",
+          "phyNm": "AGRE_ITM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "동의항목코드",
+            "attr": "동의항목유형코드"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "동의 항목의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "동의항목버전번호",
+          "phyNm": "AGRE_ITM_VER_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "동의항목코드",
+            "attr": "동의항목버전번호"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "동의 항목 버전의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "동의자명",
+          "phyNm": "AGRE_PRSN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "동의 자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "동의일시",
+          "phyNm": "AGRE_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "동의의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "동의상태유형코드",
+          "phyNm": "AGRE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "동의 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "동의여부",
+          "phyNm": "AGRE_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "동의의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "동의채널유형코드",
+          "phyNm": "AGRE_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "동의 채널의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "법정대리인동의여부",
+          "phyNm": "LGLRP_AGRE_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "법정대리인 동의의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "동의철회일시",
+          "phyNm": "AGRE_WTHDR_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "동의 철회의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "동의만료일자",
+          "phyNm": "AGRE_EXPRY_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "동의 만료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 고객동의내역",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객동의내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "동의항목코드의 고객동의내역",
+          "parent": "CUS.동의항목코드",
+          "child": "CUS.고객동의내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "동의항목유형코드",
+            "동의항목버전번호"
+          ]
+        }
+      ],
+      "normNote": "2NF: 행위 번호 단일 PK. 3NF: 동의항목명·필수여부는 동의항목코드(유형코드+버전)로 이동, 여기에는 FK만."
+    },
+    {
+      "entId": "CUS-009",
+      "entNm": "고객등급이력",
+      "phyNm": "CUST_GRD_HIST",
+      "tblNm": "PTL_CUS_CUST_GRD_H",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "고객 등급(VVIP·VIP·골드·실버·일반) 산정·부여 이력. 적용 기간(시작·종료)을 가져 과거 시점 등급 재현(SCD2)이 가능하다. 현재 등급은 고객기본.고객등급코드에 둔다.",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "등급적용시작일시",
+          "phyNm": "GRD_APLCN_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "등급 적용 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "고객등급명",
+          "phyNm": "CUST_GRD_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "고객 등급의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "등급산정일시",
+          "phyNm": "GRD_ASMT_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "등급 산정의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "등급적용상태유형코드",
+          "phyNm": "GRD_APLCN_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "등급 적용 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "고객등급유형코드",
+          "phyNm": "CUST_GRD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "고객 등급의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "등급적용종료일시",
+          "phyNm": "GRD_APLCN_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "등급 적용 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "등급산정기준년월",
+          "phyNm": "GRD_ASMT_STD_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "등급 산정 기준의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "산정청구금액",
+          "phyNm": "ASMT_BILL_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "산정 청구의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "가입기간개월수",
+          "phyNm": "SBSC_PRD_MCNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "가입 기간의 개월수 — 기간의 개월 수"
+        },
+        {
+          "attrNm": "등급변경사유유형코드",
+          "phyNm": "GRD_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "등급 변경 사유의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 고객등급이력",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객등급이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        }
+      ],
+      "normNote": "2NF: (고객번호, 등급적용시작일시) 전체 종속. 고객등급명은 산정 당시 명칭 보존(개념 C9 — 시점 스냅숏, 이행 종속 예외로 기록)."
+    },
+    {
+      "entId": "CUS-010",
+      "entNm": "지역코드",
+      "phyNm": "RGN_CD",
+      "tblNm": "PTL_CUS_RGN_C",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "시도·시군구·읍면동 행정구역 기준(행정표준코드 법정동 10자리 기준, D5 — 고객 영역 소유). 상위지역코드로 계층을 이룬다. 폐지·통합은 상태·적용 기간으로 표현.",
+      "attrs": [
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "지역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "상위지역코드",
+          "phyNm": "UP_RGN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "지역코드",
+            "attr": "지역코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "상위 지역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "지역명",
+          "phyNm": "RGN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "지역의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "지역등록일시",
+          "phyNm": "RGN_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "지역 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "지역상태유형코드",
+          "phyNm": "RGN_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "지역 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "지역단계구분코드",
+          "phyNm": "RGN_STEP_SE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "지역 단계의 구분 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "영문지역명",
+          "phyNm": "ENG_RGN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "영문 지역의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "도서산간여부",
+          "phyNm": "ISLND_MNTN_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "도서 산간의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상위 지역에 속한다(자기 참조, 시도는 NULL)",
+          "parent": "CUS.지역코드",
+          "child": "CUS.지역코드",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "상위지역코드"
+          ]
+        }
+      ],
+      "normNote": "3NF: 상위 지역 이름은 자기 참조로 조회(두지 않음). 계층 = 자기 참조 1:N."
+    },
+    {
+      "entId": "CUS-011",
+      "entNm": "고객이력",
+      "phyNm": "CUST_HIST",
+      "tblNm": "PTL_CUS_CUST_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "고객기본 주요 속성(이름·상태·유형·등급·명의도용)의 변경 전후를 유효 기간(SCD2)으로 보존. 현재행은 유효종료일시 = 9999-12-31 23:59:59.",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "고객명",
+          "phyNm": "CUST_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "고객의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "고객상태유형코드",
+          "phyNm": "CUST_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "고객 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "고객유형코드",
+          "phyNm": "CUST_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "고객의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "고객등급유형코드",
+          "phyNm": "CUST_GRD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "고객 등급의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "명의도용신고여부",
+          "phyNm": "NMNE_THFT_DCLR_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "명의 도용 신고의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "고객변경사유유형코드",
+          "phyNm": "CUST_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "고객 변경 사유의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "변경채널유형코드",
+          "phyNm": "CHG_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "변경 채널의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 고객이력",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        }
+      ],
+      "normNote": "2NF: (고객번호, 유효시작일시) 전체 종속. 이력 엔터티는 변경 시점 스냅숏이라 고객기본과의 값 중복은 이행 종속 아님."
+    },
+    {
+      "entId": "CUS-012",
+      "entNm": "실명인증내역",
+      "phyNm": "RLNM_CRTF_DTLS",
+      "tblNm": "PTL_CUS_RLNM_CRTF_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "가입·명의변경·본인확인 시 수행한 실명인증(신분증 진위확인·휴대폰 본인확인 등) 1건. 신규 가입 전 인증은 고객번호가 없다(가입신청번호로 연결, 확정 후 고객번호 채움).",
+      "attrs": [
+        {
+          "attrNm": "실명인증번호",
+          "phyNm": "RLNM_CRTF_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "실명 인증의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "가입신청번호",
+          "phyNm": "SBSC_APLY_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "ORD",
+            "ent": "가입신청기본",
+            "attr": "가입신청번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "가입 신청의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "인증을 수행한 매장(유통망) — 온라인 인증은 NULL"
+        },
+        {
+          "attrNm": "인증대상명",
+          "phyNm": "CRTF_TRGT_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "인증 대상의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "실명인증일시",
+          "phyNm": "RLNM_CRTF_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "실명 인증의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "실명인증결과유형코드",
+          "phyNm": "RLNM_CRTF_RSLT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "실명 인증 결과의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "실명인증수단유형코드",
+          "phyNm": "RLNM_CRTF_MEANS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "실명 인증 수단의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "신분증종류코드",
+          "phyNm": "IDCD_KND_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "신분증의 종류 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "신분증발급일자",
+          "phyNm": "IDCD_ISSU_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "신분증 발급의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "실명확인번호암호화값",
+          "phyNm": "RLNM_IDNTF_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "실명 확인 번호 암호화의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "인증실패사유유형코드",
+          "phyNm": "CRTF_FAIL_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "인증 실패 사유의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 실명인증내역",
+          "parent": "CUS.고객기본",
+          "child": "CUS.실명인증내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "가입신청기본의 실명인증내역",
+          "parent": "ORD.가입신청기본",
+          "child": "CUS.실명인증내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "가입신청번호"
+          ]
+        },
+        {
+          "relNm": "파트너기본의 실명인증내역",
+          "parent": "PRM.파트너기본",
+          "child": "CUS.실명인증내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "파트너번호"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF 충족(행위 번호 PK). 3NF: 인증 매장 이름은 파트너기본에서 조회. 인증대상명은 고객 확정 전 값이라 고객기본과 별개."
+    },
+    {
+      "entId": "CUS-013",
+      "entNm": "법정대리인상세",
+      "phyNm": "LGLRP_DTL",
+      "tblNm": "PTL_CUS_LGLRP_D",
+      "tp": "BASE",
+      "stg": "LGCL",
+      "def": "미성년(만 19세 미만)·피후견 고객의 법정대리인. 가입·요금제 변경 동의 주체. 대리인이 자사 고객이면 대리인고객번호(역할명)로 연결.",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "법정대리인순번",
+          "phyNm": "LGLRP_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "법정대리인의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "법정대리인고객번호",
+          "phyNm": "LGLRP_CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "법정대리인 고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "법정대리인명",
+          "phyNm": "LGLRP_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "법정대리인의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "법정대리인관계유형코드",
+          "phyNm": "LGLRP_REL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "법정대리인 관계의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "법정대리인생년월일",
+          "phyNm": "LGLRP_BRDT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "법정대리인의 생년월일 — 태어난 연월일"
+        },
+        {
+          "attrNm": "법정대리인휴대전화번호",
+          "phyNm": "LGLRP_MBL_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "법정대리인 휴대의 전화번호 — 전화번호(숫자 문자열)"
+        },
+        {
+          "attrNm": "법정대리인동의일시",
+          "phyNm": "LGLRP_AGRE_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "법정대리인 동의의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "법정대리인관계종료일자",
+          "phyNm": "LGLRP_REL_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "법정대리인 관계 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 법정대리인상세",
+          "parent": "CUS.고객기본",
+          "child": "CUS.법정대리인상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "자사 고객이 법정대리인이 된다(역할명 법정대리인고객번호)",
+          "parent": "CUS.고객기본",
+          "child": "CUS.법정대리인상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "법정대리인고객번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 대리인 2명(부·모) 반복 → 순번 행. 3NF: 대리인이 자사 고객이어도 이름·생년월일을 남기는 이유 = 동의 당시 증빙(스냅숏)."
+    },
+    {
+      "entId": "CUS-014",
+      "entNm": "법인담당자상세",
+      "phyNm": "CORP_PIC_DTL",
+      "tblNm": "PTL_CUS_CORP_PIC_D",
+      "tp": "BASE",
+      "stg": "LGCL",
+      "def": "법인 고객의 업무 담당자(계약·요금·기술). 법인 1곳에 여러 명, 담당 유형별 대표 1명.",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "법인고객상세",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "담당자순번",
+          "phyNm": "PIC_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "담당자의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "담당자명",
+          "phyNm": "PIC_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "담당자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "담당자유형코드",
+          "phyNm": "PIC_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "담당자의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "담당자부서명",
+          "phyNm": "PIC_DEPT_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "담당자 부서의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "담당자직위명",
+          "phyNm": "PIC_JBPS_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "담당자 직위의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "담당자휴대전화번호",
+          "phyNm": "PIC_MBL_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "담당자 휴대의 전화번호 — 전화번호(숫자 문자열)"
+        },
+        {
+          "attrNm": "담당자이메일주소",
+          "phyNm": "PIC_EML_ADDR",
+          "domNm": "주소V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "담당자 이메일의 주소 — 우편·전자 주소"
+        },
+        {
+          "attrNm": "대표담당자여부",
+          "phyNm": "RPRS_PIC_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "대표 담당자의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "담당자등록일시",
+          "phyNm": "PIC_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "담당자 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "담당자상태유형코드",
+          "phyNm": "PIC_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "담당자 상태의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "법인고객상세의 법인담당자상세",
+          "parent": "CUS.법인고객상세",
+          "child": "CUS.법인담당자상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 담당자마다 1행. 2NF·3NF 충족."
+    },
+    {
+      "entId": "CUS-015",
+      "entNm": "법인사업장상세",
+      "phyNm": "CORP_BPLC_DTL",
+      "tblNm": "PTL_CUS_CORP_BPLC_D",
+      "tp": "BASE",
+      "stg": "LGCL",
+      "def": "법인 고객의 사업장(본사·지점). 사업장별 사업자등록번호·주소를 갖고 법인 회선의 설치·청구 위치가 된다.",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "법인고객상세",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "사업장순번",
+          "phyNm": "BPLC_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "사업장의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "지역코드",
+            "attr": "지역코드"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "지역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "우편번호",
+          "phyNm": "ZIP",
+          "domNm": "우편번호C5",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "우편번호기본",
+            "attr": "우편번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "우편번호 5자리"
+        },
+        {
+          "attrNm": "사업장명",
+          "phyNm": "BPLC_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "사업장의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "사업장사업자등록번호",
+          "phyNm": "BPLC_BRNO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "사업장의 사업자등록번호 — 국세청 사업자등록번호 10자리"
+        },
+        {
+          "attrNm": "도로명주소",
+          "phyNm": "ROAD_NM_ADDR",
+          "domNm": "주소V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "도로 명의 주소 — 우편·전자 주소"
+        },
+        {
+          "attrNm": "상세주소",
+          "phyNm": "DADDR",
+          "domNm": "주소V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "도로명주소 뒤의 동·호 등 상세 주소"
+        },
+        {
+          "attrNm": "사업장대표전화번호",
+          "phyNm": "BPLC_RPRS_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "사업장 대표의 전화번호 — 전화번호(숫자 문자열)"
+        },
+        {
+          "attrNm": "본사여부",
+          "phyNm": "HQ_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "본사의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "사업장등록일시",
+          "phyNm": "BPLC_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "사업장 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "사업장상태유형코드",
+          "phyNm": "BPLC_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "사업장 상태의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "법인고객상세의 법인사업장상세",
+          "parent": "CUS.법인고객상세",
+          "child": "CUS.법인사업장상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "지역코드의 법인사업장상세",
+          "parent": "CUS.지역코드",
+          "child": "CUS.법인사업장상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "지역코드"
+          ]
+        },
+        {
+          "relNm": "우편번호기본의 법인사업장상세",
+          "parent": "CUS.우편번호기본",
+          "child": "CUS.법인사업장상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "우편번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 사업장마다 1행. 3NF: 지역명·도서산간은 지역코드·우편번호기본에서 조회."
+    },
+    {
+      "entId": "CUS-016",
+      "entNm": "고객관계",
+      "phyNm": "CUST_REL",
+      "tblNm": "PTL_CUS_CUST_R",
+      "tp": "BASE",
+      "stg": "LGCL",
+      "def": "고객과 고객 사이의 관계(가족·법인 소속 임직원·법정대리) — 고객↔고객 N:M 해소. 가족결합·법인 임직원 요금 대납의 근거.",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "관계고객번호",
+          "phyNm": "REL_CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "관계 고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "고객관계유형코드",
+          "phyNm": "CUST_REL_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "고객 관계의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "관계시작일자",
+          "phyNm": "REL_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "관계 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "관계종료일자",
+          "phyNm": "REL_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "관계 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "관계증빙유형코드",
+          "phyNm": "REL_EVDC_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "관계 증빙의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "관계확인일시",
+          "phyNm": "REL_IDNTF_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "관계 확인의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "관계상태유형코드",
+          "phyNm": "REL_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "관계 상태의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 고객관계",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객관계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "관계 상대 고객이 된다(역할명 관계고객번호)",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객관계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "관계고객번호"
+          ]
+        }
+      ],
+      "normNote": "N:M 해소(고객↔고객). PK = (고객번호, 관계고객번호, 고객관계유형코드) — 같은 두 고객이 가족이면서 법정대리 관계일 수 있어 유형까지 키. 2NF·3NF 충족."
+    },
+    {
+      "entId": "CUS-017",
+      "entNm": "청구계정이력",
+      "phyNm": "BILL_ACNT_HIST",
+      "tblNm": "PTL_CUS_BILL_ACNT_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "청구계정 속성(이름·상태·납부자·청구주기·유형·통합청구)의 변경 이력(SCD2). 청구주기 변경은 다음 청구월부터 적용.",
+      "attrs": [
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "납부자번호",
+          "phyNm": "PYR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "납부자기본",
+            "attr": "납부자번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "납부자의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "청구주기코드",
+          "phyNm": "BILL_CYCL_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구주기코드",
+            "attr": "청구주기코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "청구 주기의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "청구계정명",
+          "phyNm": "BILL_ACNT_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "청구 계정의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "청구계정상태유형코드",
+          "phyNm": "BILL_ACNT_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "청구 계정 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "청구계정유형코드",
+          "phyNm": "BILL_ACNT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "청구 계정의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "통합청구여부",
+          "phyNm": "INTGR_BILL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "통합 청구의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "청구계정변경사유유형코드",
+          "phyNm": "BILL_ACNT_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "청구 계정 변경 사유의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정기본의 청구계정이력",
+          "parent": "CUS.청구계정기본",
+          "child": "CUS.청구계정이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "납부자기본의 청구계정이력",
+          "parent": "CUS.납부자기본",
+          "child": "CUS.청구계정이력",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "납부자번호"
+          ]
+        },
+        {
+          "relNm": "청구주기코드의 청구계정이력",
+          "parent": "PAY.청구주기코드",
+          "child": "CUS.청구계정이력",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구주기코드"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족(변경 시점 스냅숏). 청구주기 이름 등은 PAY.청구주기코드 조회."
+    },
+    {
+      "entId": "CUS-018",
+      "entNm": "청구서수령방법이력",
+      "phyNm": "INVC_RCPT_MTHD_HIST",
+      "tblNm": "PTL_CUS_INVC_RCPT_MTHD_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "청구서 수령 방법(우편·이메일·모바일·문자·미발행)과 수령처 변경 이력(SCD2). 청구 시점 수령 방법 재현용.",
+      "attrs": [
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "청구서수령방법유형코드",
+          "phyNm": "INVC_RCPT_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "청구서 수령 방법의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "청구서이메일주소",
+          "phyNm": "INVC_EML_ADDR",
+          "domNm": "주소V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "청구서 이메일의 주소 — 우편·전자 주소"
+        },
+        {
+          "attrNm": "청구서수신휴대전화번호",
+          "phyNm": "INVC_RCPTN_MBL_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "청구서 수신 휴대의 전화번호 — 전화번호(숫자 문자열)"
+        },
+        {
+          "attrNm": "변경채널유형코드",
+          "phyNm": "CHG_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "변경 채널의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정기본의 청구서수령방법이력",
+          "parent": "CUS.청구계정기본",
+          "child": "CUS.청구서수령방법이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        }
+      ],
+      "normNote": "청구계정기본에서 수령 방법 변경만 따로 떼어 빈도 높은 변경을 분리(청구계정이력 행 폭증 방지). 2NF·3NF 충족."
+    },
+    {
+      "entId": "CUS-019",
+      "entNm": "납부자이력",
+      "phyNm": "PYR_HIST",
+      "tblNm": "PTL_CUS_PYR_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "납부자 속성(이름·상태·유형·명의자 관계·연락처) 변경 이력(SCD2).",
+      "attrs": [
+        {
+          "attrNm": "납부자번호",
+          "phyNm": "PYR_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "납부자기본",
+            "attr": "납부자번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "납부자의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "납부자명",
+          "phyNm": "PYR_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "납부자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "납부자상태유형코드",
+          "phyNm": "PYR_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "납부자 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "납부자유형코드",
+          "phyNm": "PYR_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "납부자의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "명의자관계유형코드",
+          "phyNm": "NMNE_PRSN_REL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "명의 자 관계의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "납부자휴대전화번호",
+          "phyNm": "PYR_MBL_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "납부자 휴대의 전화번호 — 전화번호(숫자 문자열)"
+        },
+        {
+          "attrNm": "납부자이메일주소",
+          "phyNm": "PYR_EML_ADDR",
+          "domNm": "주소V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "납부자 이메일의 주소 — 우편·전자 주소"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "납부자기본의 납부자이력",
+          "parent": "CUS.납부자기본",
+          "child": "CUS.납부자이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "납부자번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족(변경 시점 스냅숏)."
+    },
+    {
+      "entId": "CUS-020",
+      "entNm": "고객연락처이력",
+      "phyNm": "CUST_CNTC_HIST",
+      "tblNm": "PTL_CUS_CUST_CNTC_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "고객연락처상세 1건(고객번호+연락처순번)의 값·상태 변경 이력(SCD2). 개인정보 — 파기 시 연락처내용 마스킹.",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객연락처상세",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "연락처순번",
+          "phyNm": "CNTC_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객연락처상세",
+            "attr": "연락처순번"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "연락처의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "연락처유형코드",
+          "phyNm": "CNTC_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "연락처의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "연락처내용",
+          "phyNm": "CNTC_CN",
+          "domNm": "내용V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "연락처의 내용 — 자유 서술 내용"
+        },
+        {
+          "attrNm": "연락처상태유형코드",
+          "phyNm": "CNTC_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "연락처 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "대표연락처여부",
+          "phyNm": "RPRS_CNTC_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "대표 연락처의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "변경채널유형코드",
+          "phyNm": "CHG_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "변경 채널의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객연락처상세의 고객연락처이력",
+          "parent": "CUS.고객연락처상세",
+          "child": "CUS.고객연락처이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호",
+            "연락처순번"
+          ]
+        }
+      ],
+      "normNote": "부모 = 고객연락처상세(복합 PK 상속, 식별). 2NF: 비키 속성은 키 전체(유효시작일시 포함)에 종속. 3NF 충족."
+    },
+    {
+      "entId": "CUS-021",
+      "entNm": "고객주소이력",
+      "phyNm": "CUST_ADDR_HIST",
+      "tblNm": "PTL_CUS_CUST_ADDR_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "고객주소상세 1건(고객번호+주소순번)의 주소 변경 이력(SCD2). 반송·이사 추적.",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객주소상세",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "주소순번",
+          "phyNm": "ADDR_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객주소상세",
+            "attr": "주소순번"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "주소의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "지역코드",
+            "attr": "지역코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "지역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "우편번호",
+          "phyNm": "ZIP",
+          "domNm": "우편번호C5",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "우편번호기본",
+            "attr": "우편번호"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "우편번호 5자리"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "주소유형코드",
+          "phyNm": "ADDR_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "주소의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "도로명주소",
+          "phyNm": "ROAD_NM_ADDR",
+          "domNm": "주소V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "도로 명의 주소 — 우편·전자 주소"
+        },
+        {
+          "attrNm": "상세주소",
+          "phyNm": "DADDR",
+          "domNm": "주소V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "도로명주소 뒤의 동·호 등 상세 주소"
+        },
+        {
+          "attrNm": "주소상태유형코드",
+          "phyNm": "ADDR_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "주소 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "고객주소변경사유유형코드",
+          "phyNm": "CUST_ADDR_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "고객 주소 변경 사유의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "변경채널유형코드",
+          "phyNm": "CHG_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "변경 채널의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객주소상세의 고객주소이력",
+          "parent": "CUS.고객주소상세",
+          "child": "CUS.고객주소이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호",
+            "주소순번"
+          ]
+        },
+        {
+          "relNm": "지역코드의 고객주소이력",
+          "parent": "CUS.지역코드",
+          "child": "CUS.고객주소이력",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "지역코드"
+          ]
+        },
+        {
+          "relNm": "우편번호기본의 고객주소이력",
+          "parent": "CUS.우편번호기본",
+          "child": "CUS.고객주소이력",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "우편번호"
+          ]
+        }
+      ],
+      "normNote": "부모 = 고객주소상세(복합 PK 상속, 식별). 3NF: 지역명 등은 코드 조회."
+    },
+    {
+      "entId": "CUS-022",
+      "entNm": "동의항목코드",
+      "phyNm": "AGRE_ITM_CD",
+      "tblNm": "PTL_CUS_AGRE_ITM_C",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "동의 항목(개인정보 수집·이용 필수/선택, 마케팅 수신, 제3자 제공, 위치정보 등)과 그 약관 버전. 같은 항목의 약관 개정 = 새 버전 행.",
+      "attrs": [
+        {
+          "attrNm": "동의항목유형코드",
+          "phyNm": "AGRE_ITM_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "동의 항목의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "동의항목버전번호",
+          "phyNm": "AGRE_ITM_VER_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "동의 항목 버전의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "동의항목명",
+          "phyNm": "AGRE_ITM_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "동의 항목의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "필수동의여부",
+          "phyNm": "ESNTL_AGRE_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "필수 동의의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "동의항목내용",
+          "phyNm": "AGRE_ITM_CN",
+          "domNm": "내용V4000",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "동의 항목의 내용 — 자유 서술 내용"
+        },
+        {
+          "attrNm": "동의유효개월수",
+          "phyNm": "AGRE_VLD_MCNT",
+          "domNm": "수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "동의 유효의 개월수 — 기간의 개월 수"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "동의항목등록일시",
+          "phyNm": "AGRE_ITM_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "동의 항목 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "동의항목상태유형코드",
+          "phyNm": "AGRE_ITM_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "동의 항목 상태의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [],
+      "normNote": "2NF: 동의항목명·필수동의여부는 (유형코드, 버전) 전체에 종속 — 개정 시 명칭·필수 여부가 바뀔 수 있음. 3NF 충족."
+    },
+    {
+      "entId": "CUS-023",
+      "entNm": "고객동의이력",
+      "phyNm": "CUST_AGRE_HIST",
+      "tblNm": "PTL_CUS_CUST_AGRE_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "고객동의내역 1건의 상태 변경(동의→철회·만료·파기, 재동의) 이력(SCD2). 동의 증빙 보존 의무로 삭제 없음.",
+      "attrs": [
+        {
+          "attrNm": "고객동의번호",
+          "phyNm": "CUST_AGRE_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객동의내역",
+            "attr": "고객동의번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객 동의의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "동의상태유형코드",
+          "phyNm": "AGRE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "동의 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "동의여부",
+          "phyNm": "AGRE_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "동의의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "동의채널유형코드",
+          "phyNm": "AGRE_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "동의 채널의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "동의변경사유유형코드",
+          "phyNm": "AGRE_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "동의 변경 사유의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객동의내역의 고객동의이력",
+          "parent": "CUS.고객동의내역",
+          "child": "CUS.고객동의이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객동의번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 동의항목·고객은 부모 고객동의내역에서 조회(중복 보관하지 않음)."
+    },
+    {
+      "entId": "CUS-024",
+      "entNm": "마케팅수신거부내역",
+      "phyNm": "MKT_RCPTN_DENY_DTLS",
+      "tblNm": "PTL_CUS_MKT_RCPTN_DENY_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "광고성 정보 수신거부(정보통신망법 제50조) 1건 — 080 수신거부·고객센터·앱. 비고객 번호의 거부도 받으므로 고객번호는 선택.",
+      "attrs": [
+        {
+          "attrNm": "수신거부번호",
+          "phyNm": "RCPTN_DENY_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수신 거부의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수신거부전화번호",
+          "phyNm": "RCPTN_DENY_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "수신 거부의 전화번호 — 전화번호(숫자 문자열)"
+        },
+        {
+          "attrNm": "수신거부일시",
+          "phyNm": "RCPTN_DENY_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "수신 거부의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "수신거부매체유형코드",
+          "phyNm": "RCPTN_DENY_MDM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수신 거부 매체의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "수신거부채널유형코드",
+          "phyNm": "RCPTN_DENY_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "수신 거부 채널의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "수신거부상태유형코드",
+          "phyNm": "RCPTN_DENY_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "수신 거부 상태의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "수신거부해제일시",
+          "phyNm": "RCPTN_DENY_RLS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "수신 거부 해제의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 마케팅수신거부내역",
+          "parent": "CUS.고객기본",
+          "child": "CUS.마케팅수신거부내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        }
+      ],
+      "normNote": "3NF: 수신거부전화번호는 비고객 거부 때문에 고객번호로 결정되지 않음 — 이행 종속 아님."
+    },
+    {
+      "entId": "CUS-025",
+      "entNm": "우편번호기본",
+      "phyNm": "ZIP_BAS",
+      "tblNm": "PTL_CUS_ZIP_M",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "도로명주소 기초구역 우편번호(5자리)와 소속 지역. 주소 정제·도서산간 배송 판정 기준.",
+      "attrs": [
+        {
+          "attrNm": "우편번호",
+          "phyNm": "ZIP",
+          "domNm": "우편번호C5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "우편번호 5자리"
+        },
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "지역코드",
+            "attr": "지역코드"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "지역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "도서산간여부",
+          "phyNm": "ISLND_MNTN_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "도서 산간의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "우편번호등록일시",
+          "phyNm": "ZIP_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "우편번호 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "우편번호상태유형코드",
+          "phyNm": "ZIP_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "우편번호 상태의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "지역코드의 우편번호기본",
+          "parent": "CUS.지역코드",
+          "child": "CUS.우편번호기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "지역코드"
+          ]
+        }
+      ],
+      "normNote": "3NF: 시도·시군구 이름은 지역코드 → 지역코드 엔터티로 이행 종속이라 두지 않음."
+    },
+    {
+      "entId": "CUS-026",
+      "entNm": "고객멤버십기본",
+      "phyNm": "CUST_MBSP_BAS",
+      "tblNm": "PTL_CUS_CUST_MBSP_M",
+      "tp": "BASE",
+      "stg": "LGCL",
+      "def": "고객의 멤버십 가입(1고객 1멤버십). 등급은 고객 등급·회선 요금 기준으로 매년 산정. 포인트 잔액은 포인트내역 합계(파생 — 물리 단계 반정규화 후보).",
+      "attrs": [
+        {
+          "attrNm": "멤버십번호",
+          "phyNm": "MBSP_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "멤버십의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "멤버십카드번호",
+          "phyNm": "MBSP_CARD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 3,
+          "def": "멤버십 카드의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "멤버십가입일시",
+          "phyNm": "MBSP_SBSC_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "멤버십 가입의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "멤버십등급유형코드",
+          "phyNm": "MBSP_GRD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "멤버십 등급의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "멤버십상태유형코드",
+          "phyNm": "MBSP_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "멤버십 상태의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "멤버십유효종료일자",
+          "phyNm": "MBSP_VLD_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "멤버십 유효 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "멤버십해지일시",
+          "phyNm": "MBSP_TRMN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "멤버십 해지의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 고객멤버십기본",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객멤버십기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        }
+      ],
+      "normNote": "3NF: 포인트 잔액은 멤버십포인트내역 합계(파생)라 논리 모델에서 제외 — 물리 반정규화 후보."
+    },
+    {
+      "entId": "CUS-027",
+      "entNm": "멤버십포인트내역",
+      "phyNm": "MBSP_POINT_DTLS",
+      "tblNm": "PTL_CUS_MBSP_POINT_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "멤버십 포인트 적립·사용·소멸·취소·조정 거래 1건. 사용처는 제휴사(PRM 파트너). 취소 거래는 원거래 순번을 가리킨다.",
+      "attrs": [
+        {
+          "attrNm": "멤버십번호",
+          "phyNm": "MBSP_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객멤버십기본",
+            "attr": "멤버십번호",
+            "also": [
+              {
+                "area": "CUS",
+                "ent": "멤버십포인트내역",
+                "attr": "멤버십번호"
+              }
+            ]
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "멤버십의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "포인트거래순번",
+          "phyNm": "POINT_TRD_SEQ",
+          "domNm": "순번N10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "포인트 거래의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "포인트 사용 제휴처 — 적립·소멸은 NULL(S5)"
+        },
+        {
+          "attrNm": "원포인트거래순번",
+          "phyNm": "ORGN_POINT_TRD_SEQ",
+          "domNm": "순번N10",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "멤버십포인트내역",
+            "attr": "포인트거래순번"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "취소·조정 대상 원거래(같은 멤버십 안)"
+        },
+        {
+          "attrNm": "포인트거래일시",
+          "phyNm": "POINT_TRD_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "포인트 거래의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "포인트거래유형코드",
+          "phyNm": "POINT_TRD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "포인트 거래의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "거래포인트수",
+          "phyNm": "TRD_POINT_CNT",
+          "domNm": "수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "거래 포인트의 수 — 개수·인원 등 셀 수 있는 수"
+        },
+        {
+          "attrNm": "포인트소멸예정일자",
+          "phyNm": "POINT_EXTSH_SCHD_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "포인트 소멸 예정의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객멤버십기본의 멤버십포인트내역",
+          "parent": "CUS.고객멤버십기본",
+          "child": "CUS.멤버십포인트내역",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "멤버십번호"
+          ]
+        },
+        {
+          "relNm": "취소·조정이 원거래를 가리킨다(자기 참조)",
+          "parent": "CUS.멤버십포인트내역",
+          "child": "CUS.멤버십포인트내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "멤버십번호",
+            "원포인트거래순번"
+          ]
+        },
+        {
+          "relNm": "파트너기본의 멤버십포인트내역",
+          "parent": "PRM.파트너기본",
+          "child": "CUS.멤버십포인트내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "파트너번호"
+          ]
+        }
+      ],
+      "normNote": "2NF: (멤버십번호, 포인트거래순번) 전체 종속. 3NF: 제휴처 이름은 PRM 조회."
+    },
+    {
+      "entId": "CUS-028",
+      "entNm": "고객상담내역",
+      "phyNm": "CUST_CNSL_DTLS",
+      "tblNm": "PTL_CUS_CUST_CNSL_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "고객센터·매장·채팅 상담 1건. 비고객(가입 문의)도 있어 고객번호 선택, 회선 관련 상담이면 서비스관리번호. 상담내용은 자유 서술(S9 넓은 행).",
+      "attrs": [
+        {
+          "attrNm": "상담번호",
+          "phyNm": "CNSL_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "상담의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "ORD",
+            "ent": "회선기본",
+            "attr": "서비스관리번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "서비스 관리의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "조직코드",
+          "phyNm": "ORG_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "조직기본",
+            "attr": "조직코드"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "상담을 처리한 조직(고객센터·매장)"
+        },
+        {
+          "attrNm": "상담일시",
+          "phyNm": "CNSL_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "상담의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "상담채널유형코드",
+          "phyNm": "CNSL_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "상담 채널의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "상담유형코드",
+          "phyNm": "CNSL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "상담의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "상담결과유형코드",
+          "phyNm": "CNSL_RSLT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "상담 결과의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "상담초수",
+          "phyNm": "CNSL_SCNT",
+          "domNm": "수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "상담의 초수 — 시간의 초 수"
+        },
+        {
+          "attrNm": "상담내용",
+          "phyNm": "CNSL_CN",
+          "domNm": "내용V4000",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "상담의 내용 — 자유 서술 내용"
+        },
+        {
+          "attrNm": "민원전환여부",
+          "phyNm": "CVLCPT_CNVR_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "민원 전환의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 고객상담내역",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객상담내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "회선기본의 고객상담내역",
+          "parent": "ORD.회선기본",
+          "child": "CUS.고객상담내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "서비스관리번호"
+          ]
+        },
+        {
+          "relNm": "조직기본의 고객상담내역",
+          "parent": "PRM.조직기본",
+          "child": "CUS.고객상담내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "조직코드"
+          ]
+        }
+      ],
+      "normNote": "3NF: 고객·회선·조직 이름은 각 부모에서 조회. 상담내용 1건 = 원자값(1NF)."
+    },
+    {
+      "entId": "CUS-029",
+      "entNm": "고객민원내역",
+      "phyNm": "CUST_CVLCPT_DTLS",
+      "tblNm": "PTL_CUS_CUST_CVLCPT_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "민원(요금 이의·부당 가입·해지 지연·품질) 접수·처리 1건. 외부 기관(방송통신위원회·한국소비자원) 이관 민원 포함. 상담에서 전환되면 상담번호.",
+      "attrs": [
+        {
+          "attrNm": "민원번호",
+          "phyNm": "CVLCPT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "민원의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "상담번호",
+          "phyNm": "CNSL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객상담내역",
+            "attr": "상담번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "상담의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "ORD",
+            "ent": "회선기본",
+            "attr": "서비스관리번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "서비스 관리의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "민원접수일시",
+          "phyNm": "CVLCPT_ACPT_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "민원 접수의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "민원유형코드",
+          "phyNm": "CVLCPT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "민원의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "민원접수채널유형코드",
+          "phyNm": "CVLCPT_ACPT_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "민원 접수 채널의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "민원처리상태유형코드",
+          "phyNm": "CVLCPT_PRCS_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "민원 처리 상태의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "민원내용",
+          "phyNm": "CVLCPT_CN",
+          "domNm": "내용V4000",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "민원의 내용 — 자유 서술 내용"
+        },
+        {
+          "attrNm": "처리기한일자",
+          "phyNm": "PRCS_TMLMT_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "처리 기한의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "처리완료일시",
+          "phyNm": "PRCS_CMPTN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "처리 완료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "처리결과내용",
+          "phyNm": "PRCS_RSLT_CN",
+          "domNm": "내용V4000",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "처리 결과의 내용 — 자유 서술 내용"
+        },
+        {
+          "attrNm": "보상금액",
+          "phyNm": "CMPNS_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 13,
+          "def": "보상의 금액 — 원화 금액(원 단위 정수)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 고객민원내역",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객민원내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "고객상담내역의 고객민원내역",
+          "parent": "CUS.고객상담내역",
+          "child": "CUS.고객민원내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "상담번호"
+          ]
+        },
+        {
+          "relNm": "회선기본의 고객민원내역",
+          "parent": "ORD.회선기본",
+          "child": "CUS.고객민원내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "서비스관리번호"
+          ]
+        }
+      ],
+      "normNote": "3NF 충족. 상담번호로 상담과 1:N(한 상담에서 여러 민원 가능성 낮으나 허용)."
+    },
+    {
+      "entId": "CUS-030",
+      "entNm": "고객월통계",
+      "phyNm": "CUST_MM_STATS",
+      "tblNm": "PTL_CUS_CUST_MM_S",
+      "tp": "PROC",
+      "stg": "LGCL",
+      "def": "고객 × 기준년월 집계(세분·회선 수·청구·수납). 월 마감 배치가 ORD·PAY·INV 원천에서 산출하는 가공 엔터티(ARPU = 청구금액÷회선수는 저장하지 않음 — 행 내 파생).",
+      "attrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "고객기본",
+            "attr": "고객번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "고객의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "기준년월",
+          "phyNm": "STD_YM",
+          "domNm": "년월C6",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "기준의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "지역코드",
+            "attr": "지역코드"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "기준월 대표 주소의 지역(집계 시점 스냅숏)"
+        },
+        {
+          "attrNm": "고객유형코드",
+          "phyNm": "CUST_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "고객의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "고객등급유형코드",
+          "phyNm": "CUST_GRD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "고객 등급의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "회선수",
+          "phyNm": "LINE_CNT",
+          "domNm": "수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "회선의 수 — 개수·인원 등 셀 수 있는 수"
+        },
+        {
+          "attrNm": "활성회선수",
+          "phyNm": "ACTV_LINE_CNT",
+          "domNm": "수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "활성 회선의 수 — 개수·인원 등 셀 수 있는 수"
+        },
+        {
+          "attrNm": "청구금액",
+          "phyNm": "BILL_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "청구의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "수납금액",
+          "phyNm": "RCV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "수납의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "미납금액",
+          "phyNm": "UNPD_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "미납의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "가입기간개월수",
+          "phyNm": "SBSC_PRD_MCNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "가입 기간의 개월수 — 기간의 개월 수"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "고객기본의 고객월통계",
+          "parent": "CUS.고객기본",
+          "child": "CUS.고객월통계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "고객번호"
+          ]
+        },
+        {
+          "relNm": "지역코드의 고객월통계",
+          "parent": "CUS.지역코드",
+          "child": "CUS.고객월통계",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "지역코드"
+          ]
+        }
+      ],
+      "normNote": "PROC 가공 엔터티 — 집계값은 원천 대비 파생이지만 월 마감 스냅숏이 정본(재계산 불가 시점 보존). 행 내 파생(ARPU) 제외로 3NF 형태 유지. 고객유형·등급·지역은 기준월 스냅숏."
+    }
+  ],
+  "newTerms": [],
+  "newWords": [],
+  "newCodes": [],
+  "decisions": [
+    {
+      "id": "L1",
+      "dec": "핵심 10개 = 개념 모델 그대로 승계(속성·PK 무변경), 논리 단계에서 FK·필수 여부·관계·정규화만 확정, 고객주소상세에 고객주소변경사유유형코드 1개 보강",
+      "why": "확정 엔터티 무단 재설계 금지(재호출 지침), 주소 이력의 변경 사유를 현재값에도 남겨 반송 처리 판단"
+    },
+    {
+      "id": "L2",
+      "dec": "이력(_H) 7개는 부모 PK + 유효시작일시 SCD2 키",
+      "why": "표준사전에 이미 있는 유효시작일시·유효종료일시 용어 재사용(신규 용어 0), 시점 조회(BETWEEN) 단일 패턴. ORD 회선상태이력의 순번 방식은 상태 전이 순서가 업무 키인 경우라 다름"
+    },
+    {
+      "id": "L3",
+      "dec": "고객동의내역 FK = 동의항목코드(동의항목유형코드 + 동의항목버전번호) 복합 참조",
+      "why": "개정된 약관 버전별 동의 증빙(개인정보보호법 제22조) — 유형코드만 참조하면 어느 약관에 동의했는지 잃음"
+    },
+    {
+      "id": "L4",
+      "dec": "청구계정기본.청구지주소순번 → 고객주소상세(고객번호, 주소순번) 역할명 복합 FK, 고객번호는 고객기본 FK 와 겸용",
+      "why": "청구지는 반드시 소유 고객의 주소 중 하나(타 고객 주소 지정 차단)"
+    },
+    {
+      "id": "L5",
+      "dec": "고객관계 = 고객↔고객 N:M 해소, PK 에 관계유형 포함",
+      "why": "가족결합(PRD·ORD)·법인 임직원 대납·법정대리 근거를 하나로, 같은 두 사람의 복수 관계 허용"
+    },
+    {
+      "id": "L6",
+      "dec": "고객멤버십기본은 1고객 1멤버십이지만 대리 키 멤버십번호 사용",
+      "why": "멤버십 카드·포인트 거래가 해지 후 재가입 시 새 번호로 분리(국내 3사 멤버십 관행)"
+    },
+    {
+      "id": "L7",
+      "dec": "포인트 잔액·ARPU 등 파생값은 논리 모델 제외",
+      "why": "3NF — 물리 단계 반정규화 후보로 문서에 기록"
+    },
+    {
+      "id": "L8",
+      "dec": "법인담당자·법인사업장의 부모 = 법인고객상세(서브타입)",
+      "why": "법인에게만 존재하는 실체 — 개인 고객 번호로 담당자가 생기는 것을 관계로 차단"
+    },
+    {
+      "id": "L9",
+      "dec": "시스템 칼럼 4개는 넣지 않음(D7), 삭제여부도 두지 않음 — 상태유형코드·종료일시로 생애 표현",
+      "why": "CONTEXT D7·규칙 2절"
+    }
+  ],
+  "stdMerged": "03 논리 관문 표준사전 2차 병합 완료(2026-11-07) — 이 영역 신규 단어 15·용어 94·코드 29을 tools/std_words.js·std_codes.js 원장에 등재하고 tools/std_build.js 로 model/std 재생성(docs/03_standards.md 8절). 비운 배열은 다음 단계 신규 요청용"
+}

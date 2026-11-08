@@ -1,0 +1,5162 @@
+{
+  "area": "ORD",
+  "areaNm": "가입",
+  "stg": "PHY",
+  "ver": "2026-11-07",
+  "author": "subagent_physical_modeler",
+  "trgtDbms": "POSTGRESQL 17",
+  "moduleCd": {},
+  "rules": {
+    "naming": "PK_<테이블> / X_<테이블>_NN / FK_<테이블>_NN(정의만, DDL 미생성 D6) — DDL 은 소문자",
+    "sysCols": "DDL 에만 맨 끝 LST_MDDTM·LST_MDFR_ID·LST_RGDTM·LST_RGTR_ID(D7)",
+    "partition": "T3 대용량 이력(1천5백만 행 이상 ~이력) = RANGE 연 단위 2010~2027 + DEFAULT"
+  },
+  "summary": {
+    "tblCnt": 30,
+    "partTblCnt": 4,
+    "idxCnt": 64,
+    "fkCnt": 91,
+    "estRowsTotal": 386500000
+  },
+  "tables": [
+    {
+      "tblNm": "PTL_ORD_SBSC_APLY_M",
+      "entId": "ORD-001",
+      "entNm": "가입신청기본",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "신규·번호이동·기기변경·재가입 등 가입 요청서. 판매점이 접수하고 실명인증·서류 확인을 거쳐 개통(가입계약 생성)으로 이어진다. 개통 전 철회·반려 건도 남는다.",
+      "estRows": 13000000,
+      "cols": [
+        {
+          "colNm": "SBSC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "가입신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SHOP_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "판매점번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "가입신청명",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "가입신청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "가입신청상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "가입신청유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "가입채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "APLY_LINE_CNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "신청회선수",
+          "dflt": null
+        },
+        {
+          "colNm": "HOPE_SVC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "희망서비스번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RLNM_CRTF_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "실명인증여부",
+          "dflt": null
+        },
+        {
+          "colNm": "OPNG_HOPE_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 14,
+          "termNm": "개통희망일자",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_CNCL_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 15,
+          "termNm": "가입신청취소일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_RJCT_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 16,
+          "termNm": "가입신청반려사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_SBSC_APLY_M",
+        "cols": [
+          "SBSC_APLY_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_SBSC_APLY_M_01",
+          "cols": [
+            "CUST_NO"
+          ],
+          "unq": false,
+          "why": "고객별 신청 이력 조회(상담·명의도용 점검) — 고객 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_SBSC_APLY_M_02",
+          "cols": [
+            "SHOP_NO",
+            "SBSC_APLY_DTM"
+          ],
+          "unq": false,
+          "why": "판매점별 기간 유치 실적·유치 수수료(STL) 산정 경로"
+        },
+        {
+          "nm": "X_PTL_ORD_SBSC_APLY_M_03",
+          "cols": [
+            "SBSC_APLY_DTM"
+          ],
+          "unq": false,
+          "why": "일자별 신청 현황·미처리 신청 추출 배치"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_SBSC_APLY_M_01",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refTbl": "PTL_CUS_CUST_M",
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_APLY_M_02",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_APLY_M_03",
+          "cols": [
+            "SHOP_NO"
+          ],
+          "refTbl": "PTL_PRM_SHOP_M",
+          "refCols": [
+            "SHOP_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_APLY_M_04",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_SBSC_CTRT_M",
+      "entId": "ORD-002",
+      "entNm": "가입계약기본",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "고객이 회선 하나를 이용하기 위해 맺은 이용 계약(회선 단위 계약). 청구계정·관리 대리점이 귀속되고 개통부터 해지까지의 계약 상태를 가진다. 명의변경은 기존 계약 종료 + 새 계약 생성(회선 유지).",
+      "estRows": 13000000,
+      "cols": [
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "가입신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "AGNC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "대리점번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "서비스번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "가입계약명",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "가입계약일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "가입계약상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "가입계약유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "OPNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "개통일시",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "해지일시",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMN_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 14,
+          "termNm": "해지사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_SBSC_CTRT_M",
+        "cols": [
+          "SBSC_CTRT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_SBSC_CTRT_M_01",
+          "cols": [
+            "CUST_NO"
+          ],
+          "unq": false,
+          "why": "고객별 보유 계약 조회(S1 멱법칙 — 법인 1곳 100만 회선) — 고객 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_SBSC_CTRT_M_02",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "unq": false,
+          "why": "청구계정별 계약 목록(요금계산·청구서 작성 배치) — 청구계정 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_SBSC_CTRT_M_03",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "unq": false,
+          "why": "회선 → 계약 역조회(PAY 사용내역·COL 이용정지 조인) — 회선 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_SBSC_CTRT_M_04",
+          "cols": [
+            "SVC_NO"
+          ],
+          "unq": false,
+          "why": "서비스번호로 계약 검색(반정규화 칼럼)"
+        },
+        {
+          "nm": "X_PTL_ORD_SBSC_CTRT_M_05",
+          "cols": [
+            "AGNC_NO",
+            "SBSC_CTRT_DTM"
+          ],
+          "unq": false,
+          "why": "대리점별 유지 회선·관리수수료(STL) 산정 경로",
+          "where": "agnc_no IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_ORD_SBSC_CTRT_M_06",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "unq": false,
+          "why": "신청 → 계약 추적(개통 완료 확인)",
+          "where": "sbsc_aply_no IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_SBSC_CTRT_M_01",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refTbl": "PTL_CUS_CUST_M",
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_CTRT_M_02",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_CTRT_M_03",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_CTRT_M_04",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_APLY_M",
+          "refCols": [
+            "SBSC_APLY_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_CTRT_M_05",
+          "cols": [
+            "AGNC_NO"
+          ],
+          "refTbl": "PTL_PRM_AGNC_M",
+          "refCols": [
+            "AGNC_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "SVC_NO",
+          "srcTbl": "회선기본.서비스번호",
+          "why": "번호로 계약 찾기(상담·청구 검색 1순위 경로) — 회선 조인 1단계 제거. 번호 변경 시 회선변경 처리와 같은 트랜잭션에서 갱신"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_ORD_LINE_M",
+      "entId": "ORD-003",
+      "entNm": "회선기본",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "서비스가 실제 제공되는 이동통신 회선 실체. 서비스관리번호로 식별하며 서비스번호·유심(IMSI)·단말(IMEI)이 연결된다. 사용량·요금계산·이용정지가 모두 이 회선을 기준으로 붙는다. 번호변경으로 서비스번호가 바뀌어도 서비스관리번호는 그대로.",
+      "estRows": 12000000,
+      "cols": [
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "서비스번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "유심상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_MDL_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "단말모델코드",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "회선명",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "회선등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "회선상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_SN",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "유심일련번호",
+          "dflt": null
+        },
+        {
+          "colNm": "IMSI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "IMSI번호",
+          "dflt": null
+        },
+        {
+          "colNm": "IMEI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "IMEI번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NTWK_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "망유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ESIM_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "eSIM여부",
+          "dflt": null
+        },
+        {
+          "colNm": "OPNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 14,
+          "termNm": "개통일시",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 15,
+          "termNm": "해지일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_LINE_M",
+        "cols": [
+          "SVC_MGMT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_LINE_M_01",
+          "cols": [
+            "SVC_NO"
+          ],
+          "unq": false,
+          "why": "서비스번호 → 회선 조회(번호 재사용 S8 — 한 번호에 시기별 여러 회선) — 서비스번호 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_LINE_M_02",
+          "cols": [
+            "IMSI_NO"
+          ],
+          "unq": false,
+          "why": "망 이벤트·원시사용내역(CDR) IMSI → 회선 매칭"
+        },
+        {
+          "nm": "X_PTL_ORD_LINE_M_03",
+          "cols": [
+            "IMEI_NO"
+          ],
+          "unq": false,
+          "why": "분실·도난 단말 조회, 단말 기준 회선 찾기",
+          "where": "imei_no IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_LINE_M_01",
+          "cols": [
+            "SVC_NO"
+          ],
+          "refTbl": "PTL_ORD_SVC_NO_M",
+          "refCols": [
+            "SVC_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_M_02",
+          "cols": [
+            "USIM_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_USIM_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_M_03",
+          "cols": [
+            "EQP_MDL_CD"
+          ],
+          "refTbl": "PTL_PRD_EQP_MDL_M",
+          "refCols": [
+            "EQP_MDL_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_SVC_NO_M",
+      "entId": "ORD-004",
+      "entNm": "서비스번호기본",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "010 이동전화 번호 자원. 할당·사용·회수·재사용대기(해지 후 일정 기간 미할당)의 생애주기를 가진다. 같은 번호가 해지 후 다른 고객에게 재할당될 수 있다(S8).",
+      "estRows": 10000000,
+      "cols": [
+        {
+          "colNm": "SVC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "서비스번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ORGN_CARR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "원통신사업자번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "서비스번호명",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "서비스번호등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "서비스번호상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO_GRD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "서비스번호등급유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EXCH_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "국번호",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_MVIN_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "번호이동전입여부",
+          "dflt": null
+        },
+        {
+          "colNm": "LAST_ASGN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "최종할당일시",
+          "dflt": null
+        },
+        {
+          "colNm": "LAST_RTRVL_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "최종회수일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RE_USE_PSBL_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "재사용가능일자",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO_ASGN_NMTM",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "서비스번호할당횟수",
+          "dflt": "0"
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_SVC_NO_M",
+        "cols": [
+          "SVC_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_SVC_NO_M_01",
+          "cols": [
+            "SVC_NO_STTS_TY_CD",
+            "RE_USE_PSBL_DT"
+          ],
+          "unq": false,
+          "why": "신규 개통 번호 풀 — 회수 후 재사용 가능일 도래 번호 추출(상태 저선택도 S3 보완용 복합)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_SVC_NO_M_01",
+          "cols": [
+            "ORGN_CARR_NO"
+          ],
+          "refTbl": "PTL_PRM_CARR_M",
+          "refCols": [
+            "CARR_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "SVC_NO_ASGN_NMTM",
+          "srcTbl": "서비스번호이력 COUNT(할당 사유)",
+          "why": "재사용 번호 골라내기(S8)·번호 풀 등급 산정 — 이력 집계 회피. 번호 할당 처리에서 +1"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_ORD_SBSC_PROD_M",
+      "entId": "ORD-005",
+      "entNm": "가입상품기본",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "가입계약(회선)에 실제 가입된 상품 인스턴스 — 요금제 1개(대표)와 부가서비스·할인상품 여러 개. 요금계산의 근거가 되며 적용 기간(유효시작·종료)을 가진다.",
+      "estRows": 30000000,
+      "cols": [
+        {
+          "colNm": "SBSC_PROD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "가입상품번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SHOP_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "판매점번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "가입상품명",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_SBSC_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "상품가입일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "가입상품상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_TRMN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "상품해지일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_TRMN_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "상품해지사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_SBSC_PROD_M",
+        "cols": [
+          "SBSC_PROD_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_SBSC_PROD_M_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약별 가입 상품 목록(상담·해지 정산) — 가입계약 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_SBSC_PROD_M_02",
+          "cols": [
+            "SVC_MGMT_NO",
+            "VLD_BGNG_DTM"
+          ],
+          "unq": false,
+          "why": "회선 단위 요금계산 — 청구월 유효 상품 범위 조회(반정규화 칼럼)"
+        },
+        {
+          "nm": "X_PTL_ORD_SBSC_PROD_M_03",
+          "cols": [
+            "PROD_CD",
+            "SBSC_PROD_STTS_TY_CD"
+          ],
+          "unq": false,
+          "why": "상품별 가입자 수·상품 폐지 영향 분석(S2 인기 상품 쏠림 — 통계 오판 점검 대상)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_SBSC_PROD_M_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_PROD_M_02",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_PROD_M_03",
+          "cols": [
+            "SHOP_NO"
+          ],
+          "refTbl": "PTL_PRM_SHOP_M",
+          "refCols": [
+            "SHOP_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "SVC_MGMT_NO",
+          "srcTbl": "가입계약기본.서비스관리번호",
+          "why": "요금계산(PAY)·레이크 파티셔닝이 회선 단위 — 가입계약 조인 1단계 제거(개념 결정 O4). 계약의 회선은 불변(명의변경은 새 계약)"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_ORD_AGRMT_CTRT_M",
+      "entId": "ORD-006",
+      "entNm": "약정계약기본",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "가입계약에 붙는 약정(12·24개월) 계약. 지원금 유형(공시지원금 또는 선택약정 25% 요금할인)과 약정 기간을 가지며 중도 해지·변경 시 위약금 부과 근거가 된다.",
+      "estRows": 8000000,
+      "cols": [
+        {
+          "colNm": "AGRMT_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "약정계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "약정상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_CTRT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "약정계약명",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_CTRT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "약정계약일시",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_CTRT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "약정계약상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SUBSD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "지원금유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_MCNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "약정개월수",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "약정시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "약정종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "CHC_AGRMT_DSCNT_RT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "선택약정할인율",
+          "dflt": null
+        },
+        {
+          "colNm": "RE_AGRMT_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "재약정여부",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_TRMN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "약정해지일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_AGRMT_CTRT_M",
+        "cols": [
+          "AGRMT_CTRT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_AGRMT_CTRT_M_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약별 약정 조회(해지 위약금 산정) — 가입계약 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_AGRMT_CTRT_M_02",
+          "cols": [
+            "AGRMT_END_DT"
+          ],
+          "unq": false,
+          "why": "약정 만료 도래 대상 추출(재약정 안내·선택약정 종료 배치)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_AGRMT_CTRT_M_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_AGRMT_CTRT_M_02",
+          "cols": [
+            "AGRMT_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_AGRMT_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_EQP_INSTL_CTRT_M",
+      "entId": "ORD-007",
+      "entNm": "단말할부계약기본",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "단말 구매 대금을 월 요금과 함께 나눠 내는 할부 계약. 할부원금·개월수·이자율(할부수수료)을 가지며 회차별 계획은 단말할부상세, 회차 청구는 PAY 단말할부청구상세.",
+      "estRows": 2000000,
+      "cols": [
+        {
+          "colNm": "EQP_INSTL_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "단말할부계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_MDL_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "단말모델코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_INSTL_CTRT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "단말할부계약명",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_INSTL_CTRT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "단말할부계약일시",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_INSTL_CTRT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "단말할부계약상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "IMEI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "IMEI번호",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_SHPM_PRC",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "단말출고가격",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_PRPAY_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "단말선납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_PRNC",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "할부원금",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_MCNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "할부개월수",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_INTRT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "할부이자율",
+          "dflt": null
+        },
+        {
+          "colNm": "MM_INSTL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "월할부금액",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_BGNG_BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 14,
+          "termNm": "할부시작청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_CMPTN_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 15,
+          "termNm": "할부완료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_RMND_PRNC",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 16,
+          "termNm": "할부잔여원금",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_EQP_INSTL_CTRT_M",
+        "cols": [
+          "EQP_INSTL_CTRT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_EQP_INSTL_CTRT_M_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약별 할부 조회(해지·명의변경 정산) — 가입계약 조인 FK"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_EQP_INSTL_CTRT_M_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_EQP_INSTL_CTRT_M_02",
+          "cols": [
+            "EQP_MDL_CD"
+          ],
+          "refTbl": "PTL_PRD_EQP_MDL_M",
+          "refCols": [
+            "EQP_MDL_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "INSTL_RMND_PRNC",
+          "srcTbl": "단말할부상세 마지막 청구 회차의 할부잔여원금",
+          "why": "잔액 조회·해지 시 잔여 할부금 일시 청구·명의변경 승계 — 회차 상세 스캔 회피. 회차 청구 확정 때 갱신"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_ORD_MNP_APLY_M",
+      "entId": "ORD-008",
+      "entNm": "번호이동신청기본",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "번호이동(MNP) 전입·전출 신청. 번호이동 관리기관(KTOA) 중계로 본인인증·상대 사업자 승인을 거쳐 완료된다. 전입은 가입신청과, 전출은 기존 가입계약 해지와 짝을 이룬다.",
+      "estRows": 3000000,
+      "cols": [
+        {
+          "colNm": "MNP_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "번호이동신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "서비스번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "가입신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CARR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "통신사업자번호",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_APLY_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "번호이동신청명",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_APLY_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "번호이동신청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_APLY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "번호이동신청상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_SE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "번호이동구분코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_CRTF_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "번호이동인증유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_ACPT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "번호이동접수번호",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_CMPTN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "번호이동완료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_RFSL_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "번호이동거절사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_MNP_APLY_M",
+        "cols": [
+          "MNP_APLY_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_MNP_APLY_M_01",
+          "cols": [
+            "SVC_NO",
+            "MNP_APLY_DTM"
+          ],
+          "unq": false,
+          "why": "번호별 번호이동 이력(전출입 반복 고객 점검) — 서비스번호 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_MNP_APLY_M_02",
+          "cols": [
+            "CARR_NO",
+            "MNP_APLY_DTM"
+          ],
+          "unq": false,
+          "why": "상대 사업자별 기간 전출입 집계·상호 정산 — 통신사업자 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_MNP_APLY_M_03",
+          "cols": [
+            "MNP_ACPT_NO"
+          ],
+          "unq": false,
+          "why": "번호이동 관리기관(KTOA) 접수번호 대사"
+        },
+        {
+          "nm": "X_PTL_ORD_MNP_APLY_M_04",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약 → 번호이동 추적",
+          "where": "sbsc_ctrt_no IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_ORD_MNP_APLY_M_05",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "unq": false,
+          "why": "가입신청 → 번호이동 동반 신청 조회(번호이동 개통 처리 매 건) — 가입신청 조인 FK(05 ORD 물리 관문 추가)",
+          "where": "sbsc_aply_no IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_MNP_APLY_M_01",
+          "cols": [
+            "SVC_NO"
+          ],
+          "refTbl": "PTL_ORD_SVC_NO_M",
+          "refCols": [
+            "SVC_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_MNP_APLY_M_02",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_APLY_M",
+          "refCols": [
+            "SBSC_APLY_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_MNP_APLY_M_03",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_MNP_APLY_M_04",
+          "cols": [
+            "CARR_NO"
+          ],
+          "refTbl": "PTL_PRM_CARR_M",
+          "refCols": [
+            "CARR_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_CMBN_CTRT_M",
+      "entId": "ORD-009",
+      "entNm": "결합계약기본",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "여러 회선(가족결합)·유무선(인터넷·IPTV 포함)을 묶어 할인받는 결합상품 계약. 구성 회선은 결합구성회선관계로 연결하고, 결합 할인은 PAY 결합할인배분내역에서 회선별로 배분한다.",
+      "estRows": 2000000,
+      "cols": [
+        {
+          "colNm": "CMBN_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "결합계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "결합상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "대표고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "대표가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_CTRT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "결합계약명",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_CTRT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "결합계약일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_CTRT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "결합계약상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "결합시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "결합종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_TRMN_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "결합해지사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "결합유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_LINE_CNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "결합회선수",
+          "dflt": "0"
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_CMBN_CTRT_M",
+        "cols": [
+          "CMBN_CTRT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_CMBN_CTRT_M_01",
+          "cols": [
+            "RPRS_CUST_NO"
+          ],
+          "unq": false,
+          "why": "대표 고객별 결합 조회 — 고객 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_CMBN_CTRT_M_02",
+          "cols": [
+            "RPRS_SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "대표 회선 계약 → 결합 조회 — 가입계약 조인 FK"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_CMBN_CTRT_M_01",
+          "cols": [
+            "CMBN_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_CMBN_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_CMBN_CTRT_M_02",
+          "cols": [
+            "RPRS_CUST_NO"
+          ],
+          "refTbl": "PTL_CUS_CUST_M",
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_CMBN_CTRT_M_03",
+          "cols": [
+            "RPRS_SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "CMBN_TY_CD",
+          "srcTbl": "PRD 결합상품기본.결합유형코드",
+          "why": "결합 유형별 집계·할인 산정 — PRD 조인 회피(결합상품의 유형은 불변)"
+        },
+        {
+          "col": "CMBN_LINE_CNT",
+          "srcTbl": "결합구성회선관계 COUNT(유효)",
+          "why": "결합 할인 단계 산정(회선 수 구간) — 구성 관계 집계 회피. 구성 변경 처리에서 갱신"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_ORD_LINE_STTS_H",
+      "entId": "ORD-010",
+      "entNm": "회선상태이력",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "개통·일시정지·분실정지·미납 이용정지·해지 등 회선 상태가 바뀔 때마다 남는 이력. 원인 업무(ORD 고객 요청·COL 미납 처리)와 무관하게 이 한 곳에 통합하며(P2) 유효시작·종료일시로 SCD2 를 이룬다.",
+      "estRows": 28000000,
+      "cols": [
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_STTS_HIST_SEQ",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "회선상태이력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_STTS_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "회선상태변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "이용정지번호",
+          "dflt": null
+        },
+        {
+          "colNm": "EXOFTRMN_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "직권해지번호",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_STTS_HIST_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "회선상태이력명",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "회선상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_LINE_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "이전회선상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_STTS_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "회선상태변경사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "STTS_CHG_CAUS_TASK_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "상태변경원인업무유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "유효종료일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_LINE_STTS_H",
+        "cols": [
+          "SVC_MGMT_NO",
+          "LINE_STTS_HIST_SEQ",
+          "LINE_STTS_CHG_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_LINE_STTS_H_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약별 상태 이력(해지·정지 기간 산정) — 가입계약 조인 FK",
+          "where": "sbsc_ctrt_no IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_ORD_LINE_STTS_H_02",
+          "cols": [
+            "SUSP_NO"
+          ],
+          "unq": false,
+          "why": "COL 미납 이용정지 → 회선 상태 결과 추적(S5 NULL 쏠림 — 부분 인덱스)",
+          "where": "susp_no IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_ORD_LINE_STTS_H_03",
+          "cols": [
+            "EXOFTRMN_NO"
+          ],
+          "unq": false,
+          "why": "COL 직권해지 → 회선 상태 결과 추적(부분 인덱스)",
+          "where": "exoftrmn_no IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_LINE_STTS_H_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_STTS_H_02",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_STTS_H_03",
+          "cols": [
+            "SUSP_NO"
+          ],
+          "refTbl": "PTL_COL_SUSP_M",
+          "refCols": [
+            "SUSP_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_STTS_H_04",
+          "cols": [
+            "EXOFTRMN_NO"
+          ],
+          "refTbl": "PTL_COL_EXOFTRMN_M",
+          "refCols": [
+            "EXOFTRMN_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "LINE_STTS_CHG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "T3 대용량 이력(1천5백만 행 이상) — 연 단위 2010~2027 18개 + DEFAULT 1개. 파티션 키를 PK 끝에 포함(PostgreSQL 파티션 유일성 제약) — 논리 식별자(부모 + 순번)의 전역 유일은 적재기·채번이 보장",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_SBSC_APLY_D",
+      "entId": "ORD-011",
+      "entNm": "가입신청상세",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "가입신청서에 적힌 신청 상품 항목(요금제·부가서비스·할인). 개통되면 가입상품 인스턴스로 이어진다.",
+      "estRows": 20000000,
+      "cols": [
+        {
+          "colNm": "SBSC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "가입신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_DTL_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "가입신청상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "가입상품번호",
+          "dflt": null
+        },
+        {
+          "colNm": "APLY_PROD_CNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "신청상품수",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_SBSC_APLY_D",
+        "cols": [
+          "SBSC_APLY_NO",
+          "SBSC_APLY_DTL_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_SBSC_APLY_D_01",
+          "cols": [
+            "SBSC_PROD_NO"
+          ],
+          "unq": false,
+          "why": "가입상품 → 신청 항목 역추적",
+          "where": "sbsc_prod_no IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_SBSC_APLY_D_01",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_APLY_M",
+          "refCols": [
+            "SBSC_APLY_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_APLY_D_02",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_APLY_D_03",
+          "cols": [
+            "SBSC_PROD_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_PROD_M",
+          "refCols": [
+            "SBSC_PROD_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_SBSC_DOC_L",
+      "entId": "ORD-012",
+      "entNm": "가입서류내역",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "가입·명의변경 신청 때 제출된 서류(신분증·위임장·법정대리인 동의서·법인 서류) 접수·검증 내역. 개인정보라 파기 예정일을 둔다.",
+      "estRows": 15000000,
+      "cols": [
+        {
+          "colNm": "SBSC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "가입신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_DOC_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "가입서류순번",
+          "dflt": null
+        },
+        {
+          "colNm": "DOC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "서류유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DOC_SBMSN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "서류제출일시",
+          "dflt": null
+        },
+        {
+          "colNm": "DOC_VRFC_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "서류검증여부",
+          "dflt": null
+        },
+        {
+          "colNm": "DOC_VRFC_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "서류검증일시",
+          "dflt": null
+        },
+        {
+          "colNm": "DOC_FILE_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "서류파일명",
+          "dflt": null
+        },
+        {
+          "colNm": "DSTR_SCHD_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "파기예정일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_SBSC_DOC_L",
+        "cols": [
+          "SBSC_APLY_NO",
+          "SBSC_DOC_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_SBSC_DOC_L_01",
+          "cols": [
+            "DSTR_SCHD_DT"
+          ],
+          "unq": false,
+          "why": "개인정보 서류 파기 기한 도래 추출 배치(개인정보보호법)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_SBSC_DOC_L_01",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_APLY_M",
+          "refCols": [
+            "SBSC_APLY_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_OPNG_PRCS_L",
+      "entId": "ORD-013",
+      "entNm": "개통처리내역",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "가입신청을 망(HLR·HSS·PCRF)·과금 시스템에 반영하는 개통 작업 결과. 실패·재처리도 모두 남는다.",
+      "estRows": 13000000,
+      "cols": [
+        {
+          "colNm": "OPNG_PRCS_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "개통처리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "가입신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "OPNG_PRCS_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "개통처리일시",
+          "dflt": null
+        },
+        {
+          "colNm": "OPNG_PRCS_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "개통처리상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "OPNG_PRCS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "개통처리유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NTWK_LNK_RSLT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "망연동결과유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "OPNG_PRCS_CMPTN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "개통처리완료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "OPNG_ERR_CN",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "개통오류내용",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_OPNG_PRCS_L",
+        "cols": [
+          "OPNG_PRCS_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_OPNG_PRCS_L_01",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "unq": false,
+          "why": "신청별 개통 처리 결과 — 가입신청 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_OPNG_PRCS_L_02",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약별 개통 처리 조회",
+          "where": "sbsc_ctrt_no IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_ORD_OPNG_PRCS_L_03",
+          "cols": [
+            "OPNG_PRCS_DTM"
+          ],
+          "unq": false,
+          "why": "일자별 개통 현황·망 연동 실패 재처리 배치"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_OPNG_PRCS_L_01",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_APLY_M",
+          "refCols": [
+            "SBSC_APLY_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_OPNG_PRCS_L_02",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_SBSC_CTRT_H",
+      "entId": "ORD-014",
+      "entNm": "가입계약이력",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "가입계약의 상태·청구계정·관리 대리점 변경 이력(SCD2).",
+      "estRows": 18000000,
+      "cols": [
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_HIST_SEQ",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "가입계약이력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "가입계약변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "AGNC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "대리점번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_CHG_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "가입계약변경유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "가입계약상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "유효종료일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_SBSC_CTRT_H",
+        "cols": [
+          "SBSC_CTRT_NO",
+          "SBSC_CTRT_HIST_SEQ",
+          "SBSC_CTRT_CHG_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_SBSC_CTRT_H_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "unq": false,
+          "why": "청구계정 변경 추적(청구계정별 과거 계약 귀속) — 청구계정 조인 FK"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_SBSC_CTRT_H_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_CTRT_H_02",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_CTRT_H_03",
+          "cols": [
+            "AGNC_NO"
+          ],
+          "refTbl": "PTL_PRM_AGNC_M",
+          "refCols": [
+            "AGNC_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "SBSC_CTRT_CHG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "T3 대용량 이력(1천5백만 행 이상) — 연 단위 2010~2027 18개 + DEFAULT 1개. 파티션 키를 PK 끝에 포함(PostgreSQL 파티션 유일성 제약) — 논리 식별자(부모 + 순번)의 전역 유일은 적재기·채번이 보장",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_LINE_CHG_H",
+      "entId": "ORD-015",
+      "entNm": "회선변경이력",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "회선 속성(서비스번호·유심·IMSI·단말·망) 변경 스냅숏 이력(SCD2). 개별 업무 처리 내역(유심변경·단말변경)의 결과가 여기 모인다.",
+      "estRows": 16000000,
+      "cols": [
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_CHG_HIST_SEQ",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "회선변경이력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "회선변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "서비스번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "유심상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_MDL_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "단말모델코드",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_CHG_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "회선변경유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_SN",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "유심일련번호",
+          "dflt": null
+        },
+        {
+          "colNm": "IMSI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "IMSI번호",
+          "dflt": null
+        },
+        {
+          "colNm": "IMEI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "IMEI번호",
+          "dflt": null
+        },
+        {
+          "colNm": "NTWK_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "망유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "유효종료일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_LINE_CHG_H",
+        "cols": [
+          "SVC_MGMT_NO",
+          "LINE_CHG_HIST_SEQ",
+          "LINE_CHG_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_LINE_CHG_H_01",
+          "cols": [
+            "SVC_NO"
+          ],
+          "unq": false,
+          "why": "번호별 과거 회선 추적(번호변경·재사용 S8) — 서비스번호 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_LINE_CHG_H_02",
+          "cols": [
+            "IMSI_NO"
+          ],
+          "unq": false,
+          "why": "과거 IMSI → 회선 매칭(지연 도착 CDR 재처리)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_LINE_CHG_H_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_CHG_H_02",
+          "cols": [
+            "SVC_NO"
+          ],
+          "refTbl": "PTL_ORD_SVC_NO_M",
+          "refCols": [
+            "SVC_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_CHG_H_03",
+          "cols": [
+            "USIM_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_USIM_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_CHG_H_04",
+          "cols": [
+            "EQP_MDL_CD"
+          ],
+          "refTbl": "PTL_PRD_EQP_MDL_M",
+          "refCols": [
+            "EQP_MDL_CD"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "LINE_CHG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "T3 대용량 이력(1천5백만 행 이상) — 연 단위 2010~2027 18개 + DEFAULT 1개. 파티션 키를 PK 끝에 포함(PostgreSQL 파티션 유일성 제약) — 논리 식별자(부모 + 순번)의 전역 유일은 적재기·채번이 보장",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_SBSC_PROD_H",
+      "entId": "ORD-016",
+      "entNm": "가입상품이력",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "가입상품의 가입·변경·정지·해지 이력(SCD2). 요금계산의 일할 근거 기간이 된다.",
+      "estRows": 32000000,
+      "cols": [
+        {
+          "colNm": "SBSC_PROD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "가입상품번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_HIST_SEQ",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "가입상품이력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "가입상품변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RTPLN_CHG_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "요금제변경신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ADSVC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "부가서비스신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_CHG_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "가입상품변경유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "가입상품상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "유효종료일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_SBSC_PROD_H",
+        "cols": [
+          "SBSC_PROD_NO",
+          "SBSC_PROD_HIST_SEQ",
+          "SBSC_PROD_CHG_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_SBSC_PROD_H_01",
+          "cols": [
+            "RTPLN_CHG_APLY_NO"
+          ],
+          "unq": false,
+          "why": "요금제 변경 신청 → 반영 이력 추적(부분 인덱스)",
+          "where": "rtpln_chg_aply_no IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_ORD_SBSC_PROD_H_02",
+          "cols": [
+            "ADSVC_APLY_NO"
+          ],
+          "unq": false,
+          "why": "부가서비스 신청 → 반영 이력 추적(부분 인덱스)",
+          "where": "adsvc_aply_no IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_SBSC_PROD_H_01",
+          "cols": [
+            "SBSC_PROD_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_PROD_M",
+          "refCols": [
+            "SBSC_PROD_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_PROD_H_02",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_PROD_H_03",
+          "cols": [
+            "RTPLN_CHG_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_RTPLN_CHG_APLY_L",
+          "refCols": [
+            "RTPLN_CHG_APLY_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SBSC_PROD_H_04",
+          "cols": [
+            "ADSVC_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_ADSVC_APLY_L",
+          "refCols": [
+            "ADSVC_APLY_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "SBSC_PROD_CHG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "T3 대용량 이력(1천5백만 행 이상) — 연 단위 2010~2027 18개 + DEFAULT 1개. 파티션 키를 PK 끝에 포함(PostgreSQL 파티션 유일성 제약) — 논리 식별자(부모 + 순번)의 전역 유일은 적재기·채번이 보장",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_RTPLN_CHG_APLY_L",
+      "entId": "ORD-017",
+      "entNm": "요금제변경신청내역",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "회선의 요금제 변경 신청(즉시·익월 적용). 처리되면 가입상품이력에 반영된다.",
+      "estRows": 6000000,
+      "cols": [
+        {
+          "colNm": "RTPLN_CHG_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "요금제변경신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "이전상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHG_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "변경상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SHOP_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "판매점번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RTPLN_CHG_APLY_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "요금제변경신청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RTPLN_CHG_APLY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "요금제변경신청상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "APLY_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "신청채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_PNT_SE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "적용시점구분코드",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_SCHD_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "적용예정일자",
+          "dflt": null
+        },
+        {
+          "colNm": "RTPLN_CHG_APLY_CNCL_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "요금제변경신청취소일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_RTPLN_CHG_APLY_L",
+        "cols": [
+          "RTPLN_CHG_APLY_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_RTPLN_CHG_APLY_L_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약별 요금제 변경 신청 조회 — 가입계약 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_RTPLN_CHG_APLY_L_02",
+          "cols": [
+            "APLCN_SCHD_DT",
+            "RTPLN_CHG_APLY_STTS_TY_CD"
+          ],
+          "unq": false,
+          "why": "익월 1일 적용 예정 일괄 반영 배치(S4 1일 급증)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_RTPLN_CHG_APLY_L_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_RTPLN_CHG_APLY_L_02",
+          "cols": [
+            "BFR_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_RTPLN_CHG_APLY_L_03",
+          "cols": [
+            "CHG_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_RTPLN_CHG_APLY_L_04",
+          "cols": [
+            "SHOP_NO"
+          ],
+          "refTbl": "PTL_PRM_SHOP_M",
+          "refCols": [
+            "SHOP_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_ADSVC_APLY_L",
+      "entId": "ORD-018",
+      "entNm": "부가서비스신청내역",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "부가서비스 가입·해지·변경 신청. 처리되면 가입상품(인스턴스)이 생기거나 종료된다.",
+      "estRows": 12000000,
+      "cols": [
+        {
+          "colNm": "ADSVC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "부가서비스신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "가입상품번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SHOP_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "판매점번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ADSVC_APLY_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "부가서비스신청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "ADSVC_APLY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "부가서비스신청상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ADSVC_APLY_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "부가서비스신청유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "APLY_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "신청채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_SCHD_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "적용예정일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_ADSVC_APLY_L",
+        "cols": [
+          "ADSVC_APLY_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_ADSVC_APLY_L_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약별 부가서비스 신청 조회 — 가입계약 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_ADSVC_APLY_L_02",
+          "cols": [
+            "SBSC_PROD_NO"
+          ],
+          "unq": false,
+          "why": "가입상품 → 신청 추적",
+          "where": "sbsc_prod_no IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_ORD_ADSVC_APLY_L_03",
+          "cols": [
+            "APLCN_SCHD_DT"
+          ],
+          "unq": false,
+          "why": "적용 예정 일괄 반영 배치"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_ADSVC_APLY_L_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_ADSVC_APLY_L_02",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_ADSVC_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_ADSVC_APLY_L_03",
+          "cols": [
+            "SBSC_PROD_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_PROD_M",
+          "refCols": [
+            "SBSC_PROD_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_ADSVC_APLY_L_04",
+          "cols": [
+            "SHOP_NO"
+          ],
+          "refTbl": "PTL_PRM_SHOP_M",
+          "refCols": [
+            "SHOP_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_AGRMT_CTRT_H",
+      "entId": "ORD-019",
+      "entNm": "약정계약이력",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "약정 신규·재약정·연장·승계·해지 등 약정 조건 변경 이력.",
+      "estRows": 9000000,
+      "cols": [
+        {
+          "colNm": "AGRMT_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "약정계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_CTRT_HIST_SEQ",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "약정계약이력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_CTRT_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "약정계약변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_CTRT_CHG_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "약정계약변경유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_CTRT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "약정계약상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "약정시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "약정종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "CHC_AGRMT_DSCNT_RT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "선택약정할인율",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "유효종료일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_AGRMT_CTRT_H",
+        "cols": [
+          "AGRMT_CTRT_NO",
+          "AGRMT_CTRT_HIST_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_AGRMT_CTRT_H_01",
+          "cols": [
+            "AGRMT_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_AGRMT_CTRT_M",
+          "refCols": [
+            "AGRMT_CTRT_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_SUBSD_APLCN_L",
+      "entId": "ORD-020",
+      "entNm": "지원금적용내역",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "약정에 적용된 지원금(공시지원금·추가지원금·전환지원금 등) 종류별 금액. 추가지원금은 공시지원금의 15% 한도(단말기유통법).",
+      "estRows": 8000000,
+      "cols": [
+        {
+          "colNm": "AGRMT_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "약정계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SUBSD_APLCN_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "지원금적용순번",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_MDL_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "단말모델코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SHOP_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "판매점번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SUBSD_APLCN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "지원금적용일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SUBSD_APLCN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "지원금적용유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SUBSD_APLCN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "지원금적용상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SUBSD_APLCN_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "지원금적용금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_SUBSD_APLCN_L",
+        "cols": [
+          "AGRMT_CTRT_NO",
+          "SUBSD_APLCN_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_SUBSD_APLCN_L_01",
+          "cols": [
+            "SHOP_NO",
+            "SUBSD_APLCN_DTM"
+          ],
+          "unq": false,
+          "why": "판매점별 지원금 정산(STL 근거)·추가지원금 한도 점검",
+          "where": "shop_no IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_SUBSD_APLCN_L_01",
+          "cols": [
+            "AGRMT_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_AGRMT_CTRT_M",
+          "refCols": [
+            "AGRMT_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SUBSD_APLCN_L_02",
+          "cols": [
+            "EQP_MDL_CD"
+          ],
+          "refTbl": "PTL_PRD_EQP_MDL_M",
+          "refCols": [
+            "EQP_MDL_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SUBSD_APLCN_L_03",
+          "cols": [
+            "SHOP_NO"
+          ],
+          "refTbl": "PTL_PRM_SHOP_M",
+          "refCols": [
+            "SHOP_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_EQP_INSTL_D",
+      "entId": "ORD-021",
+      "entNm": "단말할부상세",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "단말할부계약의 회차별 원금·할부수수료 계획과 청구 상태. PAY 단말할부청구상세가 (단말할부계약번호, 할부회차)로 참조한다.",
+      "estRows": 45000000,
+      "cols": [
+        {
+          "colNm": "EQP_INSTL_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "단말할부계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_TMS",
+          "dataTp": "NUMERIC(3)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "할부회차",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "할부청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "TMS_PRNC",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "회차원금",
+          "dflt": null
+        },
+        {
+          "colNm": "TMS_INSTL_FEE_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "회차할부수수료금액",
+          "dflt": null
+        },
+        {
+          "colNm": "TMS_BILL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "회차청구금액",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_RMND_PRNC",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "할부잔여원금",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_TMS_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "할부회차상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_EQP_INSTL_D",
+        "cols": [
+          "EQP_INSTL_CTRT_NO",
+          "INSTL_TMS"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_EQP_INSTL_D_01",
+          "cols": [
+            "INSTL_BILL_YM"
+          ],
+          "unq": false,
+          "why": "월 청구 배치 — 해당 청구년월 할부 회차 추출(PAY 단말할부청구상세 생성)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_EQP_INSTL_D_01",
+          "cols": [
+            "EQP_INSTL_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_EQP_INSTL_CTRT_M",
+          "refCols": [
+            "EQP_INSTL_CTRT_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_LINE_EQP_R",
+      "entId": "ORD-022",
+      "entNm": "회선단말관계",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "회선에 장착된 단말(IMEI)의 기간 이력 — 회선과 단말 개체의 시간 축 관계.",
+      "estRows": 15000000,
+      "cols": [
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_EQP_REL_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "회선단말관계순번",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_MDL_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "단말모델코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_INSTL_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "단말할부계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_CHG_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "단말변경번호",
+          "dflt": null
+        },
+        {
+          "colNm": "IMEI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "IMEI번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SLFSPLY_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "자급제여부",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "유효종료일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_LINE_EQP_R",
+        "cols": [
+          "SVC_MGMT_NO",
+          "LINE_EQP_REL_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_LINE_EQP_R_01",
+          "cols": [
+            "IMEI_NO"
+          ],
+          "unq": false,
+          "why": "IMEI → 사용 회선 기간 조회(분실·도난·자급제 점검)"
+        },
+        {
+          "nm": "X_PTL_ORD_LINE_EQP_R_02",
+          "cols": [
+            "EQP_INSTL_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "할부 계약 → 단말 장착 회선",
+          "where": "eqp_instl_ctrt_no IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_ORD_LINE_EQP_R_03",
+          "cols": [
+            "EQP_CHG_NO"
+          ],
+          "unq": false,
+          "why": "단말변경 처리 → 결과 관계",
+          "where": "eqp_chg_no IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_LINE_EQP_R_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_EQP_R_02",
+          "cols": [
+            "EQP_MDL_CD"
+          ],
+          "refTbl": "PTL_PRD_EQP_MDL_M",
+          "refCols": [
+            "EQP_MDL_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_EQP_R_03",
+          "cols": [
+            "EQP_INSTL_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_EQP_INSTL_CTRT_M",
+          "refCols": [
+            "EQP_INSTL_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_LINE_EQP_R_04",
+          "cols": [
+            "EQP_CHG_NO"
+          ],
+          "refTbl": "PTL_ORD_EQP_CHG_L",
+          "refCols": [
+            "EQP_CHG_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_EQP_CHG_L",
+      "entId": "ORD-023",
+      "entNm": "단말변경내역",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "기기변경(업무명) 처리 — 같은 회선에서 단말을 바꾸고 약정·할부를 새로 맺는 행위. 표준단어 원칙(기기 = 단말)에 따라 엔터티명은 단말변경내역.",
+      "estRows": 5000000,
+      "cols": [
+        {
+          "colNm": "EQP_CHG_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "단말변경번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "가입신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_EQP_MDL_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "이전단말모델코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_MDL_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "단말모델코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SHOP_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "판매점번호",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_INSTL_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "단말할부계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "약정계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "단말변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_CHG_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "단말변경상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EQP_CHG_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "단말변경유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_IMEI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "이전IMEI번호",
+          "dflt": null
+        },
+        {
+          "colNm": "IMEI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "IMEI번호",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_EQP_CHG_L",
+        "cols": [
+          "EQP_CHG_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_EQP_CHG_L_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약별 기기변경 이력 — 가입계약 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_EQP_CHG_L_02",
+          "cols": [
+            "SHOP_NO",
+            "EQP_CHG_DTM"
+          ],
+          "unq": false,
+          "why": "판매점별 기기변경 실적·수수료(STL)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_EQP_CHG_L_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_EQP_CHG_L_02",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_APLY_M",
+          "refCols": [
+            "SBSC_APLY_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_EQP_CHG_L_03",
+          "cols": [
+            "BFR_EQP_MDL_CD"
+          ],
+          "refTbl": "PTL_PRD_EQP_MDL_M",
+          "refCols": [
+            "EQP_MDL_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_EQP_CHG_L_04",
+          "cols": [
+            "EQP_MDL_CD"
+          ],
+          "refTbl": "PTL_PRD_EQP_MDL_M",
+          "refCols": [
+            "EQP_MDL_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_EQP_CHG_L_05",
+          "cols": [
+            "SHOP_NO"
+          ],
+          "refTbl": "PTL_PRM_SHOP_M",
+          "refCols": [
+            "SHOP_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_EQP_CHG_L_06",
+          "cols": [
+            "EQP_INSTL_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_EQP_INSTL_CTRT_M",
+          "refCols": [
+            "EQP_INSTL_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_EQP_CHG_L_07",
+          "cols": [
+            "AGRMT_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_AGRMT_CTRT_M",
+          "refCols": [
+            "AGRMT_CTRT_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_USIM_CHG_L",
+      "entId": "ORD-024",
+      "entNm": "유심변경내역",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "유심·eSIM 교체(분실·파손·eSIM 전환) 처리.",
+      "estRows": 4000000,
+      "cols": [
+        {
+          "colNm": "USIM_CHG_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "유심변경번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_USIM_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "이전유심상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "유심상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SHOP_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "판매점번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "유심변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_CHG_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "유심변경상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "유심변경사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_USIM_SN",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "이전유심일련번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USIM_SN",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "유심일련번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_IMSI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "이전IMSI번호",
+          "dflt": null
+        },
+        {
+          "colNm": "IMSI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "IMSI번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ESIM_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "eSIM여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_USIM_CHG_L",
+        "cols": [
+          "USIM_CHG_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_USIM_CHG_L_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "unq": false,
+          "why": "회선별 유심 교체 이력(유심 복제 의심 점검) — 회선 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_USIM_CHG_L_02",
+          "cols": [
+            "USIM_SN"
+          ],
+          "unq": false,
+          "why": "유심 일련번호 → 교체 처리 조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_USIM_CHG_L_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_USIM_CHG_L_02",
+          "cols": [
+            "BFR_USIM_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_USIM_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_USIM_CHG_L_03",
+          "cols": [
+            "USIM_PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_USIM_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_USIM_CHG_L_04",
+          "cols": [
+            "SHOP_NO"
+          ],
+          "refTbl": "PTL_PRM_SHOP_M",
+          "refCols": [
+            "SHOP_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_MNP_H",
+      "entId": "ORD-025",
+      "entNm": "번호이동이력",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "번호이동 신청의 진행 단계(사전동의·인증·승인·개통·완료·거절) 변경 이력.",
+      "estRows": 10000000,
+      "cols": [
+        {
+          "colNm": "MNP_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "번호이동신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_HIST_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "번호이동이력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_STTS_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "번호이동상태변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_APLY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "번호이동신청상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_STEP_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "번호이동단계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_RFSL_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "번호이동거절사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_PRCS_RSLT_CN",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "번호이동처리결과내용",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_MNP_H",
+        "cols": [
+          "MNP_APLY_NO",
+          "MNP_HIST_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_MNP_H_01",
+          "cols": [
+            "MNP_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_MNP_APLY_M",
+          "refCols": [
+            "MNP_APLY_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_NMNE_CHG_L",
+      "entId": "ORD-026",
+      "entNm": "명의변경내역",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "양도·양수·상속·법인전환 명의변경. 회선·번호는 유지하고 기존 계약 종료 + 새 계약 생성(결정 O2).",
+      "estRows": 1000000,
+      "cols": [
+        {
+          "colNm": "NMNE_CHG_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "명의변경번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "이전가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "이전고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "가입신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "NMNE_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "명의변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "NMNE_CHG_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "명의변경상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NMNE_CHG_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "명의변경유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_SCSN_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "미납승계여부",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_SCSN_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "약정승계여부",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_SCSN_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "할부승계여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_NMNE_CHG_L",
+        "cols": [
+          "NMNE_CHG_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_NMNE_CHG_L_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "unq": false,
+          "why": "회선별 명의변경 이력 — 회선 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_NMNE_CHG_L_02",
+          "cols": [
+            "BFR_CUST_NO"
+          ],
+          "unq": false,
+          "why": "양도 고객 기준 조회(미납 승계 점검)"
+        },
+        {
+          "nm": "X_PTL_ORD_NMNE_CHG_L_03",
+          "cols": [
+            "CUST_NO"
+          ],
+          "unq": false,
+          "why": "양수 고객 기준 조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_NMNE_CHG_L_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_NMNE_CHG_L_02",
+          "cols": [
+            "BFR_SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_NMNE_CHG_L_03",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_NMNE_CHG_L_04",
+          "cols": [
+            "BFR_CUST_NO"
+          ],
+          "refTbl": "PTL_CUS_CUST_M",
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_NMNE_CHG_L_05",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refTbl": "PTL_CUS_CUST_M",
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_NMNE_CHG_L_06",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_APLY_M",
+          "refCols": [
+            "SBSC_APLY_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_PAUS_L",
+      "entId": "ORD-027",
+      "entNm": "일시정지내역",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "고객 요청 일시정지(해외 체류·군 입대·분실 등)·해제. 이용약관상 연간 횟수·일수 제한(미납 이용정지는 COL).",
+      "estRows": 1500000,
+      "cols": [
+        {
+          "colNm": "PAUS_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "일시정지번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PAUS_APLY_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "일시정지신청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PAUS_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "일시정지상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PAUS_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "일시정지사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PAUS_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "일시정지시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PAUS_END_SCHD_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "일시정지종료예정일자",
+          "dflt": null
+        },
+        {
+          "colNm": "PAUS_RLS_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "일시정지해제일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_PAUS_L",
+        "cols": [
+          "PAUS_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_PAUS_L_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "unq": false,
+          "why": "회선별 일시정지 이력(연간 횟수·기간 한도 점검) — 회선 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_PAUS_L_02",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약별 일시정지 조회"
+        },
+        {
+          "nm": "X_PTL_ORD_PAUS_L_03",
+          "cols": [
+            "PAUS_END_SCHD_DT"
+          ],
+          "unq": false,
+          "why": "종료 예정일 도래 자동 해제 배치 — 미해제 건만(부분)",
+          "where": "paus_rls_dtm IS NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_PAUS_L_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_PAUS_L_02",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_TRMN_APLY_L",
+      "entId": "ORD-028",
+      "entNm": "해지신청내역",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "고객 해지 신청·사유·예정일. PRM 수수료환수내역(STL)이 조기 해지 환수 근거로 참조한다.",
+      "estRows": 7000000,
+      "cols": [
+        {
+          "colNm": "TRMN_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "해지신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "MNP_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "번호이동신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMN_APLY_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "해지신청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMN_APLY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "해지신청상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMN_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "해지사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMN_ACPT_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "해지접수채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMN_SCHD_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "해지예정일자",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMN_PRCS_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "해지처리일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_TRMN_APLY_L",
+        "cols": [
+          "TRMN_APLY_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_TRMN_APLY_L_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "계약별 해지 신청 조회(PRM 수수료 환수 근거) — 가입계약 조인 FK"
+        },
+        {
+          "nm": "X_PTL_ORD_TRMN_APLY_L_02",
+          "cols": [
+            "MNP_APLY_NO"
+          ],
+          "unq": false,
+          "why": "번호이동 전출 해지 연결",
+          "where": "mnp_aply_no IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_ORD_TRMN_APLY_L_03",
+          "cols": [
+            "TRMN_SCHD_DT"
+          ],
+          "unq": false,
+          "why": "해지 예정일 도래 일괄 해지 배치"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_TRMN_APLY_L_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_TRMN_APLY_L_02",
+          "cols": [
+            "MNP_APLY_NO"
+          ],
+          "refTbl": "PTL_ORD_MNP_APLY_M",
+          "refCols": [
+            "MNP_APLY_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_CMBN_CMPS_LINE_R",
+      "entId": "ORD-029",
+      "entNm": "결합구성회선관계",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "결합계약과 가입계약의 N:M 해소 관계 — 결합에 묶인 회선(계약)과 가족 관계·결합 기간.",
+      "estRows": 5000000,
+      "cols": [
+        {
+          "colNm": "CMBN_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "결합계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_CMPS_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "결합구성상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "FMLY_REL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "가족관계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "결합시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "결합종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_CMBN_CMPS_LINE_R",
+        "cols": [
+          "CMBN_CTRT_NO",
+          "SBSC_CTRT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_CMBN_CMPS_LINE_R_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "회선 계약 → 소속 결합 역조회(결합 할인 대상 판정) — 가입계약 조인 FK"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_CMBN_CMPS_LINE_R_01",
+          "cols": [
+            "CMBN_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_CMBN_CTRT_M",
+          "refCols": [
+            "CMBN_CTRT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_CMBN_CMPS_LINE_R_02",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_ORD_SVC_NO_H",
+      "entId": "ORD-030",
+      "entNm": "서비스번호이력",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "010 번호 자원의 할당·회수·재사용대기·번호이동 전입·전출 이력(S8 재사용 추적).",
+      "estRows": 23000000,
+      "cols": [
+        {
+          "colNm": "SVC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "서비스번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO_HIST_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "서비스번호이력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO_STTS_CHG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "서비스번호상태변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "서비스번호상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "서비스번호변경사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "유효종료일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_ORD_SVC_NO_H",
+        "cols": [
+          "SVC_NO",
+          "SVC_NO_HIST_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_ORD_SVC_NO_H_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "unq": false,
+          "why": "회선 → 사용 번호 이력",
+          "where": "svc_mgmt_no IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_ORD_SVC_NO_H_01",
+          "cols": [
+            "SVC_NO"
+          ],
+          "refTbl": "PTL_ORD_SVC_NO_M",
+          "refCols": [
+            "SVC_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_ORD_SVC_NO_H_02",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    }
+  ]
+}

@@ -1,0 +1,4629 @@
+{
+  "area": "INV",
+  "areaNm": "수납",
+  "stg": "LGCL",
+  "ver": "2026-11-07",
+  "author": "subagent_logical_modeler",
+  "summary": {
+    "entityCnt": 30,
+    "coreCnt": 10,
+    "basicCnt": 20,
+    "stlCnt": 2,
+    "attrCnt": 303,
+    "relCnt": 71,
+    "newTermCnt": 91,
+    "newWordCnt": 6,
+    "newCodeCnt": 24
+  },
+  "conventions": {
+    "phyNm": "엔터티 phyNm = 접두어 없는 <단어 약어>_<분류어 약어>(개념 K1), tblNm = 물리 미리보기 PTL_INV_<단어 약어><사전 tblSfx>. 둘 다 사전에서 기계 변환.",
+    "rels": "rels = 그 엔터티가 자식(FK 보유)인 관계. card = 부모:자식, idn = FK 가 자식 PK 에 포함, opt = 자식 FK NULL 허용. 다른 영역 부모는 parent = \"<영역>.<엔터티>\". INV 가 부모인 다른 영역 자식 관계는 없음(areas.json crossRels 기준).",
+    "fk": "fk = {ent, attr, area}. 한 속성이 FK 두 개에 참여하면 also 배열(환불내역.청구계정번호 = CUS.청구계정기본 + 환불계좌상세).",
+    "history": "이력(_H) = 부모 PK + 유효시작일시(SCD2), 현재행 유효종료일시 = 9999-12-31 23:59:59.",
+    "stl": "정산 모듈 엔터티 = 수납대사내역·수납대행수수료내역(moduleCd STL, areas.json moduleCd 일치)."
+  },
+  "entities": [
+    {
+      "entId": "INV-001",
+      "entNm": "수납기본",
+      "phyNm": "RCV_BAS",
+      "tblNm": "PTL_INV_RCV_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "청구계정으로 들어온 입금 1건. 수단(자동이체·카드·지로·가상계좌·매장·ARS)과 무관하게 모든 입금은 여기 한 곳에 모이고, 배분 전 미배분 금액을 가진다. 월 RANGE 파티션 후보(수납일시), 장애일 쏠림 S4.",
+      "attrs": [
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "납부방법번호",
+          "phyNm": "PAY_MTHD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "납부방법기본",
+            "attr": "납부방법번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "납부 방법의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 납부방법기본(매장·지로 현금은 NULL — S5)"
+        },
+        {
+          "attrNm": "수납채널유형코드",
+          "phyNm": "RCV_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납채널코드",
+            "attr": "수납채널유형코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "수납 채널의 유형 코드 — 공통코드(codes.json) — FK → INV.수납채널코드(기본 엔터티)"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — FK → INV.은행코드"
+        },
+        {
+          "attrNm": "카드사코드",
+          "phyNm": "CARD_CO_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "카드사코드",
+            "attr": "카드사코드"
+          },
+          "nullYn": true,
+          "seq": 6,
+          "def": "카드 사의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — FK → INV.카드사코드(기본 엔터티)"
+        },
+        {
+          "attrNm": "수납대행기관번호",
+          "phyNm": "RCV_AGT_INST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납대행기관기본",
+            "attr": "수납대행기관번호"
+          },
+          "nullYn": true,
+          "seq": 7,
+          "def": "수납 대행 기관의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → INV.수납대행기관기본(기본 엔터티)"
+        },
+        {
+          "attrNm": "입금자명",
+          "phyNm": "DPSTR_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "입금자의 명 — 대상을 부르는 이름 — 입금 통지상의 입금자 표시명(S13 표기 흔들림 대상)"
+        },
+        {
+          "attrNm": "수납일시",
+          "phyNm": "RCV_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "수납의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "수납상태유형코드",
+          "phyNm": "RCV_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "수납 상태의 유형 코드 — 공통코드(codes.json) — 배분대기·배분완료·일부배분·취소·미확인 — 98% 배분완료(S3)"
+        },
+        {
+          "attrNm": "수납금액",
+          "phyNm": "RCV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "수납의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "미배분금액",
+          "phyNm": "UNALLC_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "미배분의 금액 — 원화 금액(원 단위 정수) — 배분 후 남은 금액 → 과오납·선납 전환 근거"
+        },
+        {
+          "attrNm": "수납일자",
+          "phyNm": "RCV_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 13,
+          "def": "수납의 일자 — 연월일(YYYYMMDD) — 회계 귀속일(은행 영업일, 수납일시와 다를 수 있음)"
+        },
+        {
+          "attrNm": "승인번호",
+          "phyNm": "APRV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 14,
+          "def": "승인의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 카드 승인·지로 수납 고유번호"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정의 입금",
+          "parent": "CUS.청구계정기본",
+          "child": "INV.수납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "입금 수단",
+          "parent": "INV.납부방법기본",
+          "child": "INV.수납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "납부방법번호"
+          ]
+        },
+        {
+          "relNm": "수납 채널",
+          "parent": "INV.수납채널코드",
+          "child": "INV.수납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수납채널유형코드"
+          ]
+        },
+        {
+          "relNm": "입금 은행",
+          "parent": "INV.은행코드",
+          "child": "INV.수납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        },
+        {
+          "relNm": "승인 카드사",
+          "parent": "INV.카드사코드",
+          "child": "INV.수납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "카드사코드"
+          ]
+        },
+        {
+          "relNm": "대행기관 경유 수납",
+          "parent": "INV.수납대행기관기본",
+          "child": "INV.수납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납대행기관번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 수단별 반복(은행·카드·대행기관)은 FK 단일값, 배분은 수납배분상세로 분리. 2NF: 단일 PK. 3NF: 은행·카드사·채널 이름은 코드 엔터티 조회. 청구계정번호는 납부방법번호에서 유도 가능하나 매장·지로 현금은 납부방법이 NULL 이라 함수 종속이 성립하지 않음 — 이행 종속 아님. 미배분금액은 수납금액 − 배분 합계(파생)이지만 개념 확정 속성·배분 잠금 시점 값이라 유지(물리 반정규화 성격으로 인계)."
+    },
+    {
+      "entId": "INV-002",
+      "entNm": "수납배분상세",
+      "phyNm": "RCV_ALLC_DTL",
+      "tblNm": "PTL_INV_RCV_ALLC_D",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "수납액을 청구서×요금항목에 나눠 붙인 결과. 납기 경과 순 → 요금항목 순위(수납배분순위코드)로 배분, 수납 취소 시 음수 역배분 행. 월 RANGE 파티션 후보(수납배분일시).",
+      "attrs": [
+        {
+          "attrNm": "수납배분번호",
+          "phyNm": "RCV_ALLC_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수납 배분의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 수납기본"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구기본",
+            "attr": "청구번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "청구의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → PAY.청구기본"
+        },
+        {
+          "attrNm": "요금항목코드",
+          "phyNm": "CHRG_ITM_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목코드",
+            "attr": "요금항목코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "요금 항목의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — FK → PRD.요금항목코드"
+        },
+        {
+          "attrNm": "수납배분우선순위",
+          "phyNm": "RCV_ALLC_PRRT",
+          "domNm": "순번N5",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납배분우선순위코드",
+            "attr": "수납배분우선순위"
+          },
+          "nullYn": false,
+          "seq": 5,
+          "def": "수납 배분의 우선순위 — 여러 대상 중 먼저 처리하는 순서 — FK → INV.수납배분순위코드(기본 엔터티)"
+        },
+        {
+          "attrNm": "선납번호",
+          "phyNm": "PRPAY_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "선납기본",
+            "attr": "선납번호"
+          },
+          "nullYn": true,
+          "seq": 6,
+          "def": "선납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 선납기본(선납 차감 배분일 때만, 99% NULL S5)"
+        },
+        {
+          "attrNm": "배분적요명",
+          "phyNm": "ALLC_SMRY_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "배분 적요의 명 — 대상을 부르는 이름 — 배분 사유 요약(정기배분·역배분·과오납대체 등 표시)"
+        },
+        {
+          "attrNm": "수납배분일시",
+          "phyNm": "RCV_ALLC_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "수납 배분의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "수납배분상태유형코드",
+          "phyNm": "RCV_ALLC_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "수납 배분 상태의 유형 코드 — 공통코드(codes.json) — 배분·역배분·과오납대체·선납대체"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "청구의 년월 — 연월(YYYYMM) — 업무 키 보존(01 문서 5절-4) — 파티션·레이크 키 후보"
+        },
+        {
+          "attrNm": "배분금액",
+          "phyNm": "ALLC_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "배분의 금액 — 원화 금액(원 단위 정수) — 역배분은 음수(S7)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수납의 배분",
+          "parent": "INV.수납기본",
+          "child": "INV.수납배분상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        },
+        {
+          "relNm": "배분 대상 청구서",
+          "parent": "PAY.청구기본",
+          "child": "INV.수납배분상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구번호"
+          ]
+        },
+        {
+          "relNm": "배분 대상 요금항목",
+          "parent": "PRD.요금항목코드",
+          "child": "INV.수납배분상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "요금항목코드"
+          ]
+        },
+        {
+          "relNm": "배분 순위",
+          "parent": "INV.수납배분우선순위코드",
+          "child": "INV.수납배분상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수납배분우선순위"
+          ]
+        },
+        {
+          "relNm": "선납 차감 배분",
+          "parent": "INV.선납기본",
+          "child": "INV.수납배분상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "선납번호"
+          ]
+        }
+      ],
+      "normNote": "N:M 해소(수납 ↔ 청구서×요금항목). 2NF: 단일 PK. 3NF: 청구년월은 청구번호 → PAY.청구기본 이행 종속이나 업무 키(01 문서 5절-4 청구월) 보존 예외. 납부기한일자는 업무 키가 아닌 이행 종속 속성이라 제거(관문 G1) — 배분 순서 판정 시 PAY.청구기본.납부기한일자 조회, 물리 반정규화 후보로 인계."
+    },
+    {
+      "entId": "INV-003",
+      "entNm": "납부방법기본",
+      "phyNm": "PAY_MTHD_BAS",
+      "tblNm": "PTL_INV_PAY_MTHD_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "청구계정이 요금을 내는 수단(자동이체·카드자동납부·지로·가상계좌). 청구계정당 현재 유효 1건 + 과거 행은 적용종료일자로 닫힘, 변경 상세는 납부방법이력.",
+      "attrs": [
+        {
+          "attrNm": "납부방법번호",
+          "phyNm": "PAY_MTHD_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "납부 방법의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "납부자번호",
+          "phyNm": "PYR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "납부자기본",
+            "attr": "납부자번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "납부자의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → CUS.납부자기본"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — FK → INV.은행코드"
+        },
+        {
+          "attrNm": "카드사코드",
+          "phyNm": "CARD_CO_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "카드사코드",
+            "attr": "카드사코드"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "카드 사의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — FK → INV.카드사코드(기본 엔터티)"
+        },
+        {
+          "attrNm": "납부방법명",
+          "phyNm": "PAY_MTHD_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "납부 방법의 명 — 대상을 부르는 이름 — 화면 표시명(예 \"국민 자동이체 ****1234\")"
+        },
+        {
+          "attrNm": "납부방법등록일시",
+          "phyNm": "PAY_MTHD_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "납부 방법 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "납부방법상태유형코드",
+          "phyNm": "PAY_MTHD_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "납부 방법 상태의 유형 코드 — 공통코드(codes.json) — 신청중·사용·정지·해지·등록오류"
+        },
+        {
+          "attrNm": "납부방법유형코드",
+          "phyNm": "PAY_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "납부 방법의 유형 코드 — 공통코드(codes.json) — 자동이체·카드자동납부·지로·가상계좌·매장 — 4개 이상 → 유형"
+        },
+        {
+          "attrNm": "계좌번호암호화값",
+          "phyNm": "ACCT_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "계좌 번호 암호화의 값 — 측정·설정·암호화된 값 — D11 — 평문 계좌번호 저장 금지"
+        },
+        {
+          "attrNm": "예금주명",
+          "phyNm": "DPSOWN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "예금주의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "카드번호암호화값",
+          "phyNm": "CARD_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "카드 번호 암호화의 값 — 측정·설정·암호화된 값 — D11"
+        },
+        {
+          "attrNm": "이체지정일",
+          "phyNm": "TRSF_DSGN_DD",
+          "domNm": "일C2",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 13,
+          "def": "이체 지정의 일 — 월 중의 일(DD, 01~31) — 자동이체 출금일(01~31, S12 앞자리 0 함정)"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 14,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 15,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD) — 현재 유효 = 99991231"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정기본이(가) 납부방법기본을(를) 가진다",
+          "parent": "CUS.청구계정기본",
+          "child": "INV.납부방법기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "납부자기본이(가) 납부방법기본을(를) 가진다",
+          "parent": "CUS.납부자기본",
+          "child": "INV.납부방법기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "납부자번호"
+          ]
+        },
+        {
+          "relNm": "은행코드이(가) 납부방법기본을(를) 가진다",
+          "parent": "INV.은행코드",
+          "child": "INV.납부방법기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        },
+        {
+          "relNm": "카드사코드이(가) 납부방법기본을(를) 가진다",
+          "parent": "INV.카드사코드",
+          "child": "INV.납부방법기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "카드사코드"
+          ]
+        }
+      ],
+      "normNote": "1NF: 수단별 속성은 한 행(유형코드로 구분, 해당 없으면 NULL). 2NF: 단일 PK. 3NF: 은행명·카드사명은 코드 조회. 변경 상세는 납부방법이력으로 분리."
+    },
+    {
+      "entId": "INV-004",
+      "entNm": "자동이체신청내역",
+      "phyNm": "ATRF_APLY_DTLS",
+      "tblNm": "PTL_INV_ATRF_APLY_L",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "자동이체 신규·변경·해지 신청 1건과 금융결제원 CMS 출금이체 등록 처리 결과. 출금 동의 증빙(서면·녹취·ARS·전자서명) 보관 근거.",
+      "attrs": [
+        {
+          "attrNm": "자동이체신청번호",
+          "phyNm": "ATRF_APLY_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "자동이체 신청의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "납부방법번호",
+          "phyNm": "PAY_MTHD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "납부방법기본",
+            "attr": "납부방법번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "납부 방법의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 납부방법기본"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — FK → INV.은행코드"
+        },
+        {
+          "attrNm": "신청인명",
+          "phyNm": "APLCNT_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "신청인의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "자동이체신청일시",
+          "phyNm": "ATRF_APLY_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "자동이체 신청의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "자동이체신청상태유형코드",
+          "phyNm": "ATRF_APLY_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "자동이체 신청 상태의 유형 코드 — 공통코드(codes.json) — 접수·금결원요청·등록완료·등록실패·철회"
+        },
+        {
+          "attrNm": "자동이체신청구분코드",
+          "phyNm": "ATRF_APLY_SE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "자동이체 신청의 구분 코드 — 공통코드(codes.json) — 신규·변경·해지 — 값 3개 고정 → 구분"
+        },
+        {
+          "attrNm": "계좌번호암호화값",
+          "phyNm": "ACCT_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "계좌 번호 암호화의 값 — 측정·설정·암호화된 값 — D11 — 평문 계좌번호 저장 금지"
+        },
+        {
+          "attrNm": "예금주명",
+          "phyNm": "DPSOWN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "예금주의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "출금동의증빙유형코드",
+          "phyNm": "WDRW_AGRE_EVDC_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "출금 동의 증빙의 유형 코드 — 공통코드(codes.json) — 서면·녹취·ARS·전자서명·공동인증"
+        },
+        {
+          "attrNm": "처리결과유형코드",
+          "phyNm": "PRCS_RSLT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "처리 결과의 유형 코드 — 공통코드(codes.json) — 금결원 응답 결과(정상·계좌없음·예금주불일치·해지계좌 등)"
+        },
+        {
+          "attrNm": "처리일시",
+          "phyNm": "PRCS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 13,
+          "def": "처리의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "납부방법기본이(가) 자동이체신청내역을(를) 가진다",
+          "parent": "INV.납부방법기본",
+          "child": "INV.자동이체신청내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "납부방법번호"
+          ]
+        },
+        {
+          "relNm": "청구계정기본이(가) 자동이체신청내역을(를) 가진다",
+          "parent": "CUS.청구계정기본",
+          "child": "INV.자동이체신청내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "은행코드이(가) 자동이체신청내역을(를) 가진다",
+          "parent": "INV.은행코드",
+          "child": "INV.자동이체신청내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        }
+      ],
+      "normNote": "2NF: 단일 PK. 3NF: 청구계정번호는 납부방법번호에서 유도되나 신규 신청은 납부방법 생성 전 접수(신청이 납부방법을 만든다) — 개념 확정 승계, 은행·계좌는 신청 당시 값(스냅숏)."
+    },
+    {
+      "entId": "INV-005",
+      "entNm": "자동이체출금요청내역",
+      "phyNm": "ATRF_WDRW_REQ_DTLS",
+      "tblNm": "PTL_INV_ATRF_WDRW_REQ_L",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "청구월마다 자동이체 납부 청구서에 대해 금결원·은행에 보내는 출금 요청 라인(재출금 회차 포함). 결과는 자동이체출금결과내역, 성공분은 수납기본을 만든다. 월 RANGE 파티션 후보(청구년월).",
+      "attrs": [
+        {
+          "attrNm": "출금요청번호",
+          "phyNm": "WDRW_REQ_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "출금 요청의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "납부방법번호",
+          "phyNm": "PAY_MTHD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "납부방법기본",
+            "attr": "납부방법번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "납부 방법의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 납부방법기본"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구기본",
+            "attr": "청구번호"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "청구의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → PAY.청구기본"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": false,
+          "seq": 5,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — FK → INV.은행코드"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 6,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 수납기본(출금 성공 시만)"
+        },
+        {
+          "attrNm": "출금요청파일명",
+          "phyNm": "WDRW_REQ_FILE_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "출금 요청 파일의 명 — 대상을 부르는 이름 — CMS 전송 파일(묶음) 이름"
+        },
+        {
+          "attrNm": "출금요청일시",
+          "phyNm": "WDRW_REQ_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "출금 요청의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "출금요청상태유형코드",
+          "phyNm": "WDRW_REQ_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "출금 요청 상태의 유형 코드 — 공통코드(codes.json) — 생성·전송·출금완료·부분출금·출금실패·취소"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "청구의 년월 — 연월(YYYYMM) — 업무 키 보존(01 문서 5절-4) — 파티션·레이크 키 후보"
+        },
+        {
+          "attrNm": "출금요청금액",
+          "phyNm": "WDRW_REQ_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "출금 요청의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "출금예정일자",
+          "phyNm": "WDRW_SCHD_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "출금 예정의 일자 — 연월일(YYYYMMDD) — 이체지정일 → 영업일 보정, 말일·1일 쏠림 S4"
+        },
+        {
+          "attrNm": "출금회차",
+          "phyNm": "WDRW_TMS",
+          "domNm": "회차N3",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 13,
+          "def": "출금의 회차 — 분할·반복 거래의 차례 번호 — 1 = 정기, 2~ = 재출금"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "납부방법기본이(가) 자동이체출금요청내역을(를) 가진다",
+          "parent": "INV.납부방법기본",
+          "child": "INV.자동이체출금요청내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "납부방법번호"
+          ]
+        },
+        {
+          "relNm": "청구계정기본이(가) 자동이체출금요청내역을(를) 가진다",
+          "parent": "CUS.청구계정기본",
+          "child": "INV.자동이체출금요청내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "청구기본이(가) 자동이체출금요청내역을(를) 가진다",
+          "parent": "PAY.청구기본",
+          "child": "INV.자동이체출금요청내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구번호"
+          ]
+        },
+        {
+          "relNm": "은행코드이(가) 자동이체출금요청내역을(를) 가진다",
+          "parent": "INV.은행코드",
+          "child": "INV.자동이체출금요청내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        },
+        {
+          "relNm": "출금 성공 → 수납 생성",
+          "parent": "INV.수납기본",
+          "child": "INV.자동이체출금요청내역",
+          "card": "1:1",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        }
+      ],
+      "normNote": "2NF: 단일 PK. 3NF: 청구계정번호·청구년월은 청구번호 이행 종속 — 개념 확정(crossRels 승인) 승계, 물리 반정규화 항목으로 인계(결정 L4). 결과 통지는 자동이체출금결과내역으로 분리(반복 그룹 해소)."
+    },
+    {
+      "entId": "INV-006",
+      "entNm": "가상계좌기본",
+      "phyNm": "VACCT_BAS",
+      "tblNm": "PTL_INV_VACCT_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "청구계정별로 은행·대행기관에서 발급받은 가상계좌. 입금 통지(가상계좌입금내역)를 청구계정에 귀속시키는 키. 해지 계좌는 회수 후 재발급(S8 번호 재사용).",
+      "attrs": [
+        {
+          "attrNm": "가상계좌번호",
+          "phyNm": "VACCT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "가상계좌의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 내부 관리번호(실제 은행 계좌번호는 계좌번호 속성)"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — FK → INV.은행코드"
+        },
+        {
+          "attrNm": "수납대행기관번호",
+          "phyNm": "RCV_AGT_INST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납대행기관기본",
+            "attr": "수납대행기관번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "수납 대행 기관의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → INV.수납대행기관기본(기본 엔터티)"
+        },
+        {
+          "attrNm": "가상계좌명",
+          "phyNm": "VACCT_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "가상계좌의 명 — 대상을 부르는 이름 — 입금 화면 예금주 표시명"
+        },
+        {
+          "attrNm": "가상계좌발급일시",
+          "phyNm": "VACCT_ISSU_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "가상계좌 발급의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "가상계좌상태유형코드",
+          "phyNm": "VACCT_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "가상계좌 상태의 유형 코드 — 공통코드(codes.json) — 발급·사용·정지·회수·만료"
+        },
+        {
+          "attrNm": "계좌번호",
+          "phyNm": "ACCT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "계좌의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 가상계좌 번호 자체(실명 계좌 아님 → 평문, 은행코드+계좌번호 유일)"
+        },
+        {
+          "attrNm": "입금기준유형코드",
+          "phyNm": "DPST_STD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "입금 기준의 유형 코드 — 공통코드(codes.json) — 청구금액일치·이상입금허용·자유입금·1회용"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "회수일시",
+          "phyNm": "RTRVL_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "회수의 일시 — 연월일 시분초까지의 시점 — 95% NULL(S5)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정기본이(가) 가상계좌기본을(를) 가진다",
+          "parent": "CUS.청구계정기본",
+          "child": "INV.가상계좌기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "은행코드이(가) 가상계좌기본을(를) 가진다",
+          "parent": "INV.은행코드",
+          "child": "INV.가상계좌기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        },
+        {
+          "relNm": "수납대행기관기본이(가) 가상계좌기본을(를) 가진다",
+          "parent": "INV.수납대행기관기본",
+          "child": "INV.가상계좌기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납대행기관번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 은행명·대행기관명은 코드 조회. 은행코드 + 계좌번호는 대체 키(유일)."
+    },
+    {
+      "entId": "INV-007",
+      "entNm": "과오납기본",
+      "phyNm": "OVPAY_BAS",
+      "tblNm": "PTL_INV_OVPAY_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "이중 납부·초과 납부·해지 후 납부·청구 취소로 생긴, 고객에게 돌려줄 돈 1건과 잔액. 다음 청구 대체·환불·선납 전환으로 정리, 상태 변경은 과오납이력.",
+      "attrs": [
+        {
+          "attrNm": "과오납번호",
+          "phyNm": "OVPAY_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "과오납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 수납기본(발생 원인 입금)"
+        },
+        {
+          "attrNm": "과오납내용명",
+          "phyNm": "OVPAY_CN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "과오납 내용의 명 — 대상을 부르는 이름 — 발생 사유 요약"
+        },
+        {
+          "attrNm": "과오납발생일시",
+          "phyNm": "OVPAY_OCRN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "과오납 발생의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "과오납상태유형코드",
+          "phyNm": "OVPAY_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "과오납 상태의 유형 코드 — 공통코드(codes.json) — 발생·대체중·환불요청·환불완료·선납전환·소멸"
+        },
+        {
+          "attrNm": "과오납유형코드",
+          "phyNm": "OVPAY_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "과오납의 유형 코드 — 공통코드(codes.json) — 이중납부·초과납부·해지후납부·청구취소·조정감액"
+        },
+        {
+          "attrNm": "과오납금액",
+          "phyNm": "OVPAY_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "과오납의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "과오납잔액",
+          "phyNm": "OVPAY_BAL",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "과오납의 잔액 — 사용·정리하고 남은 금액"
+        },
+        {
+          "attrNm": "처리방법유형코드",
+          "phyNm": "PRCS_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "처리 방법의 유형 코드 — 공통코드(codes.json) — 다음청구대체·환불·선납전환·잡이익처리"
+        },
+        {
+          "attrNm": "소멸시효일자",
+          "phyNm": "EXTSH_PRSCR_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "소멸 시효의 일자 — 연월일(YYYYMMDD) — 미청구 환급금 소멸시효(상사 5년) 기산 결과"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정기본이(가) 과오납기본을(를) 가진다",
+          "parent": "CUS.청구계정기본",
+          "child": "INV.과오납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "원인 입금",
+          "parent": "INV.수납기본",
+          "child": "INV.과오납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        }
+      ],
+      "normNote": "2NF: 단일 PK. 3NF: 상태 변동·잔액 증감은 과오납이력으로 분리. 과오납잔액은 이력의 마지막 잔액과 같은 현재 스냅숏(정본 = 이력)."
+    },
+    {
+      "entId": "INV-008",
+      "entNm": "환불내역",
+      "phyNm": "RFND_DTLS",
+      "tblNm": "PTL_INV_RFND_L",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "과오납·선납 잔액·해지 정산액을 고객에게 실제로 돌려준 행위 1건(계좌이체·카드 승인취소·현금·상계).",
+      "attrs": [
+        {
+          "attrNm": "환불번호",
+          "phyNm": "RFND_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "환불의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호",
+            "also": [
+              {
+                "area": "INV",
+                "ent": "환불계좌상세",
+                "attr": "청구계정번호"
+              }
+            ]
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "과오납번호",
+          "phyNm": "OVPAY_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "과오납기본",
+            "attr": "과오납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "과오납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 과오납기본(선납 환불이면 NULL)"
+        },
+        {
+          "attrNm": "선납번호",
+          "phyNm": "PRPAY_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "선납기본",
+            "attr": "선납번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "선납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 선납기본(과오납 환불이면 NULL)"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — FK → INV.은행코드"
+        },
+        {
+          "attrNm": "환불계좌순번",
+          "phyNm": "RFND_ACCT_SEQ",
+          "domNm": "순번N5",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "환불계좌상세",
+            "attr": "환불계좌순번"
+          },
+          "nullYn": true,
+          "seq": 6,
+          "def": "환불 계좌의 순번 — 부모 안의 처리·표시 순서 — 환불계좌상세 참조(청구계정번호와 복합 FK) — 현장 현금·상계 환불은 NULL"
+        },
+        {
+          "attrNm": "환불수령인명",
+          "phyNm": "RFND_RCPN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "환불 수령인의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "환불일시",
+          "phyNm": "RFND_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "환불의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "환불상태유형코드",
+          "phyNm": "RFND_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "환불 상태의 유형 코드 — 공통코드(codes.json) — 요청·승인·이체완료·이체실패·취소"
+        },
+        {
+          "attrNm": "환불금액",
+          "phyNm": "RFND_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "환불의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "환불방법유형코드",
+          "phyNm": "RFND_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "환불 방법의 유형 코드 — 공통코드(codes.json) — 계좌이체·카드승인취소·현금·상계"
+        },
+        {
+          "attrNm": "계좌번호암호화값",
+          "phyNm": "ACCT_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "계좌 번호 암호화의 값 — 측정·설정·암호화된 값 — D11 — 평문 계좌번호 저장 금지"
+        },
+        {
+          "attrNm": "환불요청일자",
+          "phyNm": "RFND_REQ_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 13,
+          "def": "환불 요청의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정기본이(가) 환불내역을(를) 가진다",
+          "parent": "CUS.청구계정기본",
+          "child": "INV.환불내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "환불계좌상세이(가) 환불내역을(를) 가진다",
+          "parent": "INV.환불계좌상세",
+          "child": "INV.환불내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "청구계정번호",
+            "환불계좌순번"
+          ]
+        },
+        {
+          "relNm": "과오납 환불",
+          "parent": "INV.과오납기본",
+          "child": "INV.환불내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "과오납번호"
+          ]
+        },
+        {
+          "relNm": "선납 잔액 환불",
+          "parent": "INV.선납기본",
+          "child": "INV.환불내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "선납번호"
+          ]
+        },
+        {
+          "relNm": "은행코드이(가) 환불내역을(를) 가진다",
+          "parent": "INV.은행코드",
+          "child": "INV.환불내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        }
+      ],
+      "normNote": "2NF: 단일 PK. 3NF: 은행코드·계좌번호암호화값은 환불 시점 스냅숏(등록 계좌가 바뀌어도 실제 이체 계좌 보존) — 환불계좌순번에서의 이행 종속 아님. 과오납·선납 원천은 배타 FK(둘 중 하나)."
+    },
+    {
+      "entId": "INV-009",
+      "entNm": "선납기본",
+      "phyNm": "PRPAY_BAS",
+      "tblNm": "PTL_INV_PRPAY_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "청구 전에 미리 받아 둔 돈(고객 예납·과오납 전환·법인 선결제)과 잔액. 다음 청구 시 선납사용내역으로 차감.",
+      "attrs": [
+        {
+          "attrNm": "선납번호",
+          "phyNm": "PRPAY_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "선납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 수납기본(원천 입금, 과오납 전환이면 NULL)"
+        },
+        {
+          "attrNm": "과오납번호",
+          "phyNm": "OVPAY_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "과오납기본",
+            "attr": "과오납번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "과오납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — FK → 과오납기본(전환분만)"
+        },
+        {
+          "attrNm": "선납입금자명",
+          "phyNm": "PRPAY_DPSTR_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "선납 입금자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "선납일시",
+          "phyNm": "PRPAY_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "선납의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "선납상태유형코드",
+          "phyNm": "PRPAY_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "선납 상태의 유형 코드 — 공통코드(codes.json) — 사용중·소진·환불·해지정리"
+        },
+        {
+          "attrNm": "선납유형코드",
+          "phyNm": "PRPAY_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "선납의 유형 코드 — 공통코드(codes.json) — 고객예납·과오납전환·해지예치·법인선결제"
+        },
+        {
+          "attrNm": "선납금액",
+          "phyNm": "PRPAY_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "선납의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "선납잔액",
+          "phyNm": "PRPAY_BAL",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "선납의 잔액 — 사용·정리하고 남은 금액"
+        },
+        {
+          "attrNm": "소진일시",
+          "phyNm": "EXHST_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "소진의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정기본이(가) 선납기본을(를) 가진다",
+          "parent": "CUS.청구계정기본",
+          "child": "INV.선납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "원천 입금",
+          "parent": "INV.수납기본",
+          "child": "INV.선납기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        },
+        {
+          "relNm": "과오납 전환",
+          "parent": "INV.과오납기본",
+          "child": "INV.선납기본",
+          "card": "1:1",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "과오납번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 사용·차감은 선납사용내역으로 분리(반복 그룹 해소). 선납잔액 = 현재 스냅숏(정본 = 사용내역 합계와 대사)."
+    },
+    {
+      "entId": "INV-010",
+      "entNm": "은행코드",
+      "phyNm": "BANK_CD",
+      "tblNm": "PTL_INV_BANK_C",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "은행·금융기관 기준(D5 — 수납 영역 소유). 자동이체·가상계좌 가능 여부와 합병 승계를 가진다. 합병·폐지 은행도 과거 데이터 재현을 위해 남긴다.",
+      "attrs": [
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — 금결원 3자리 표준 코드(S12 앞자리 0)"
+        },
+        {
+          "attrNm": "합병은행코드",
+          "phyNm": "MRGR_BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "합병 은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — 자기 참조 — 합병 후 승계 은행"
+        },
+        {
+          "attrNm": "은행명",
+          "phyNm": "BANK_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "은행의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "은행등록일시",
+          "phyNm": "BANK_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "은행 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "은행상태유형코드",
+          "phyNm": "BANK_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "은행 상태의 유형 코드 — 공통코드(codes.json) — 사용·거래중지·합병·폐지"
+        },
+        {
+          "attrNm": "금융기관유형코드",
+          "phyNm": "FNNC_INST_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "금융 기관의 유형 코드 — 공통코드(codes.json) — 시중은행·지방은행·특수은행·저축은행·상호금융·증권사·우체국"
+        },
+        {
+          "attrNm": "은행영문명",
+          "phyNm": "BANK_ENG_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "은행 영문의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "자동이체가능여부",
+          "phyNm": "ATRF_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "자동이체 가능의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "가상계좌가능여부",
+          "phyNm": "VACCT_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "가상계좌 가능의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "합병 승계 은행(자기 참조)",
+          "parent": "INV.은행코드",
+          "child": "INV.은행코드",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "합병은행코드"
+          ]
+        }
+      ],
+      "normNote": "3NF: 합병 승계 은행 이름은 자기 참조로 조회. 계층 = 자기 참조 1:N."
+    },
+    {
+      "entId": "INV-011",
+      "entNm": "카드사코드",
+      "phyNm": "CARD_CO_CD",
+      "tblNm": "PTL_INV_CARD_CO_C",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "카드 자동납부·카드 수납 승인을 처리하는 신용카드사 기준(D5 — 수납 영역 소유). 자사 가맹점번호와 경유 대행기관(PG·VAN)을 가진다.",
+      "attrs": [
+        {
+          "attrNm": "카드사코드",
+          "phyNm": "CARD_CO_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "카드 사의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — 여신금융협회 카드사 코드(앞자리 0 — S12)"
+        },
+        {
+          "attrNm": "수납대행기관번호",
+          "phyNm": "RCV_AGT_INST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납대행기관기본",
+            "attr": "수납대행기관번호"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "수납 대행 기관의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — PG·VAN 경유 시 대행기관, 직접 연동이면 NULL"
+        },
+        {
+          "attrNm": "카드사명",
+          "phyNm": "CARD_CO_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "카드 사의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "카드사영문명",
+          "phyNm": "CARD_CO_ENG_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "카드 사 영문의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "카드사등록일시",
+          "phyNm": "CARD_CO_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "카드 사 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "카드사상태유형코드",
+          "phyNm": "CARD_CO_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "카드 사 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "자동납부가능여부",
+          "phyNm": "ATMT_PAY_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "자동 납부 가능의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "가맹점번호",
+          "phyNm": "MRCH_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "가맹점의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 카드사별 자사 가맹점번호"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수납대행기관기본이(가) 카드사코드을(를) 가진다",
+          "parent": "INV.수납대행기관기본",
+          "child": "INV.카드사코드",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납대행기관번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 대행기관 이름은 수납대행기관기본 조회."
+    },
+    {
+      "entId": "INV-012",
+      "entNm": "납부방법이력",
+      "phyNm": "PAY_MTHD_HIST",
+      "tblNm": "PTL_INV_PAY_MTHD_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "납부방법기본의 상태·계좌·카드·이체지정일 변경 전후를 유효 기간(SCD2)으로 보존. 현재행 유효종료일시 = 9999-12-31 23:59:59.",
+      "attrs": [
+        {
+          "attrNm": "납부방법번호",
+          "phyNm": "PAY_MTHD_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "INV",
+            "ent": "납부방법기본",
+            "attr": "납부방법번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "납부 방법의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "카드사코드",
+          "phyNm": "CARD_CO_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "카드사코드",
+            "attr": "카드사코드"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "카드 사의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "납부방법유형코드",
+          "phyNm": "PAY_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "납부 방법의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "납부방법상태유형코드",
+          "phyNm": "PAY_MTHD_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "납부 방법 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "계좌번호암호화값",
+          "phyNm": "ACCT_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "계좌 번호 암호화의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "카드번호암호화값",
+          "phyNm": "CARD_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "카드 번호 암호화의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "예금주명",
+          "phyNm": "DPSOWN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "예금주의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "이체지정일",
+          "phyNm": "TRSF_DSGN_DD",
+          "domNm": "일C2",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "이체 지정의 일 — 월 중의 일(DD, 01~31)"
+        },
+        {
+          "attrNm": "납부방법변경사유유형코드",
+          "phyNm": "PAY_MTHD_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "납부 방법 변경 사유의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "납부방법기본이(가) 납부방법이력을(를) 가진다",
+          "parent": "INV.납부방법기본",
+          "child": "INV.납부방법이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "납부방법번호"
+          ]
+        },
+        {
+          "relNm": "은행코드이(가) 납부방법이력을(를) 가진다",
+          "parent": "INV.은행코드",
+          "child": "INV.납부방법이력",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        },
+        {
+          "relNm": "카드사코드이(가) 납부방법이력을(를) 가진다",
+          "parent": "INV.카드사코드",
+          "child": "INV.납부방법이력",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "카드사코드"
+          ]
+        }
+      ],
+      "normNote": "부모 = 납부방법기본(PK 상속 + 유효시작일시, 식별). 2NF: 비키 속성은 키 전체에 종속. 이력은 변경 시점 스냅숏이라 기본과의 값 중복은 이행 종속 아님."
+    },
+    {
+      "entId": "INV-013",
+      "entNm": "자동이체출금결과내역",
+      "phyNm": "ATRF_WDRW_RSLT_DTLS",
+      "tblNm": "PTL_INV_ATRF_WDRW_RSLT_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "출금 요청 1건에 대해 금결원·은행이 돌려준 결과 통지. 부분출금 후 추가 출금 통지가 올 수 있어 요청 아래 순번(식별 관계).",
+      "attrs": [
+        {
+          "attrNm": "출금요청번호",
+          "phyNm": "WDRW_REQ_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "INV",
+            "ent": "자동이체출금요청내역",
+            "attr": "출금요청번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "출금 요청의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "출금결과순번",
+          "phyNm": "WDRW_RSLT_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "출금 결과의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "출금결과일시",
+          "phyNm": "WDRW_RSLT_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "출금 결과의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "출금결과유형코드",
+          "phyNm": "WDRW_RSLT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "출금 결과의 유형 코드 — 공통코드(newCodes 신규 등재) — 정상·잔액부족·계좌해지·예금주불일치·출금동의없음 등 금결원 응답"
+        },
+        {
+          "attrNm": "출금금액",
+          "phyNm": "WDRW_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "출금의 금액 — 원화 금액(원 단위 정수) — 실제 출금액(부분출금이면 요청금액보다 작음)"
+        },
+        {
+          "attrNm": "출금결과파일명",
+          "phyNm": "WDRW_RSLT_FILE_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "출금 결과 파일의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "재출금대상여부",
+          "phyNm": "RE_WDRW_TRGT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "재 출금 대상의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "자동이체출금요청내역이(가) 자동이체출금결과내역을(를) 가진다",
+          "parent": "INV.자동이체출금요청내역",
+          "child": "INV.자동이체출금결과내역",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "출금요청번호"
+          ]
+        }
+      ],
+      "normNote": "1NF: 요청당 결과 통지 반복 → 순번 행(식별 관계). 2NF·3NF 충족(은행·청구는 요청에서 조회 — 두지 않음). 미출금액 = 요청금액 − 출금금액 파생이라 제외."
+    },
+    {
+      "entId": "INV-014",
+      "entNm": "카드자동납부승인내역",
+      "phyNm": "CARD_ATMT_PAY_APRV_DTLS",
+      "tblNm": "PTL_INV_CARD_ATMT_PAY_APRV_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "카드 자동납부 납부방법의 청구서 1건에 대한 카드사 승인 요청·결과. 승인 성공분은 수납기본을 만든다. 월 RANGE 파티션 후보(청구년월).",
+      "attrs": [
+        {
+          "attrNm": "카드자동납부승인번호",
+          "phyNm": "CARD_ATMT_PAY_APRV_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "카드 자동 납부 승인의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "납부방법번호",
+          "phyNm": "PAY_MTHD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "납부방법기본",
+            "attr": "납부방법번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "납부 방법의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구기본",
+            "attr": "청구번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "청구의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "카드사코드",
+          "phyNm": "CARD_CO_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "카드사코드",
+            "attr": "카드사코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "카드 사의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — 승인 시점 카드사(납부방법 변경 이력과 무관한 사실값)"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 승인 성공분만"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "청구의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "카드승인요청일시",
+          "phyNm": "CARD_APRV_REQ_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "카드 승인 요청의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "카드승인일시",
+          "phyNm": "CARD_APRV_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "카드 승인의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "카드승인금액",
+          "phyNm": "CARD_APRV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "카드 승인의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "승인번호",
+          "phyNm": "APRV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "승인의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 카드사 승인번호"
+        },
+        {
+          "attrNm": "카드승인상태유형코드",
+          "phyNm": "CARD_APRV_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "카드 승인 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "카드승인거절사유유형코드",
+          "phyNm": "CARD_APRV_RFSL_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "카드 승인 거절 사유의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "납부방법기본이(가) 카드자동납부승인내역을(를) 가진다",
+          "parent": "INV.납부방법기본",
+          "child": "INV.카드자동납부승인내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "납부방법번호"
+          ]
+        },
+        {
+          "relNm": "청구기본이(가) 카드자동납부승인내역을(를) 가진다",
+          "parent": "PAY.청구기본",
+          "child": "INV.카드자동납부승인내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구번호"
+          ]
+        },
+        {
+          "relNm": "카드사코드이(가) 카드자동납부승인내역을(를) 가진다",
+          "parent": "INV.카드사코드",
+          "child": "INV.카드자동납부승인내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "카드사코드"
+          ]
+        },
+        {
+          "relNm": "수납기본이(가) 카드자동납부승인내역을(를) 가진다",
+          "parent": "INV.수납기본",
+          "child": "INV.카드자동납부승인내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        }
+      ],
+      "normNote": "2NF: 단일 PK. 3NF: 청구계정은 청구번호·납부방법번호에서 조회(두지 않음). 카드사코드는 승인 시점 사실값(납부방법 이력 변경과 독립). 청구년월은 파티션 업무 키 보존(결정 L4)."
+    },
+    {
+      "entId": "INV-015",
+      "entNm": "지로수납내역",
+      "phyNm": "GIRO_RCV_DTLS",
+      "tblNm": "PTL_INV_GIRO_RCV_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "지로 청구서로 금융기관 창구·인터넷뱅킹·전자납부에서 들어온 수납 통지 1건(금결원 지로 수납 파일). 청구서 단위 수납이라 청구번호를 가진다.",
+      "attrs": [
+        {
+          "attrNm": "지로수납번호",
+          "phyNm": "GIRO_RCV_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "지로 수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구기본",
+            "attr": "청구번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "청구의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 수납 반영 후 채움(오류·미반영은 NULL)"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — 수납 은행"
+        },
+        {
+          "attrNm": "수납대행기관번호",
+          "phyNm": "RCV_AGT_INST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납대행기관기본",
+            "attr": "수납대행기관번호"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "수납 대행 기관의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "청구의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "지로수납일시",
+          "phyNm": "GIRO_RCV_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "지로 수납의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "지로수납금액",
+          "phyNm": "GIRO_RCV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "지로 수납의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "지로수납상태유형코드",
+          "phyNm": "GIRO_RCV_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "지로 수납 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "지로수납파일명",
+          "phyNm": "GIRO_RCV_FILE_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "지로 수납 파일의 명 — 대상을 부르는 이름"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구기본이(가) 지로수납내역을(를) 가진다",
+          "parent": "PAY.청구기본",
+          "child": "INV.지로수납내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "청구번호"
+          ]
+        },
+        {
+          "relNm": "수납기본이(가) 지로수납내역을(를) 가진다",
+          "parent": "INV.수납기본",
+          "child": "INV.지로수납내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        },
+        {
+          "relNm": "은행코드이(가) 지로수납내역을(를) 가진다",
+          "parent": "INV.은행코드",
+          "child": "INV.지로수납내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        },
+        {
+          "relNm": "수납대행기관기본이(가) 지로수납내역을(를) 가진다",
+          "parent": "INV.수납대행기관기본",
+          "child": "INV.지로수납내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납대행기관번호"
+          ]
+        }
+      ],
+      "normNote": "2NF: 단일 PK. 3NF: 청구계정은 청구번호에서 조회(두지 않음). 청구년월은 파티션 업무 키 보존(결정 L4)."
+    },
+    {
+      "entId": "INV-016",
+      "entNm": "가상계좌입금내역",
+      "phyNm": "VACCT_DPST_DTLS",
+      "tblNm": "PTL_INV_VACCT_DPST_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "가상계좌로 들어온 입금 통지 1건. 청구계정 귀속은 가상계좌기본으로 결정, 정상 입금은 수납기본 생성(과입금·부족입금 표시).",
+      "attrs": [
+        {
+          "attrNm": "가상계좌입금번호",
+          "phyNm": "VACCT_DPST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "가상계좌 입금의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "가상계좌번호",
+          "phyNm": "VACCT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "가상계좌기본",
+            "attr": "가상계좌번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "가상계좌의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합 — 송금 은행"
+        },
+        {
+          "attrNm": "입금일시",
+          "phyNm": "DPST_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "입금의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "입금금액",
+          "phyNm": "DPST_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "입금의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "입금자명",
+          "phyNm": "DPSTR_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "입금자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "은행거래번호",
+          "phyNm": "BANK_TRD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "은행 거래의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "가상계좌입금상태유형코드",
+          "phyNm": "VACCT_DPST_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "가상계좌 입금 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "가상계좌기본이(가) 가상계좌입금내역을(를) 가진다",
+          "parent": "INV.가상계좌기본",
+          "child": "INV.가상계좌입금내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "가상계좌번호"
+          ]
+        },
+        {
+          "relNm": "수납기본이(가) 가상계좌입금내역을(를) 가진다",
+          "parent": "INV.수납기본",
+          "child": "INV.가상계좌입금내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        },
+        {
+          "relNm": "은행코드이(가) 가상계좌입금내역을(를) 가진다",
+          "parent": "INV.은행코드",
+          "child": "INV.가상계좌입금내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 청구계정은 가상계좌번호에서 조회(두지 않음). 과입금·부족 판정은 청구금액과의 비교 결과라 상태유형코드로만 표현."
+    },
+    {
+      "entId": "INV-017",
+      "entNm": "수납취소내역",
+      "phyNm": "RCV_CNCL_DTLS",
+      "tblNm": "PTL_INV_RCV_CNCL_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "이미 확정된 수납을 취소한 행위 1건(이중 수납·오입금·카드 승인취소·부도). 취소 시 수납배분상세에 음수 역배분 행이 생긴다.",
+      "attrs": [
+        {
+          "attrNm": "수납취소번호",
+          "phyNm": "RCV_CNCL_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수납 취소의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납취소일시",
+          "phyNm": "RCV_CNCL_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "수납 취소의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "수납취소금액",
+          "phyNm": "RCV_CNCL_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "수납 취소의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "수납취소사유유형코드",
+          "phyNm": "RCV_CNCL_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수납 취소 사유의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "수납취소상태유형코드",
+          "phyNm": "RCV_CNCL_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "수납 취소 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "수납취소요청일자",
+          "phyNm": "RCV_CNCL_REQ_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "수납 취소 요청의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수납기본이(가) 수납취소내역을(를) 가진다",
+          "parent": "INV.수납기본",
+          "child": "INV.수납취소내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 취소된 수납의 청구계정·금액 원본은 수납기본 조회."
+    },
+    {
+      "entId": "INV-018",
+      "entNm": "미확인입금내역",
+      "phyNm": "UNIDNTF_DPST_DTLS",
+      "tblNm": "PTL_INV_UNIDNTF_DPST_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "입금은 됐으나 청구계정을 특정하지 못한 돈(입금자명 불일치·계좌 불명 등). 귀속 확인되면 수납기본을 만들고 수납번호를 채운다, 미귀속은 반환·잡이익 처리.",
+      "attrs": [
+        {
+          "attrNm": "미확인입금번호",
+          "phyNm": "UNIDNTF_DPST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "미확인 입금의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 귀속 확정 후 생성된 수납"
+        },
+        {
+          "attrNm": "입금일시",
+          "phyNm": "DPST_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "입금의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "입금금액",
+          "phyNm": "DPST_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "입금의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "입금자명",
+          "phyNm": "DPSTR_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "입금자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "은행거래번호",
+          "phyNm": "BANK_TRD_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "은행 거래의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "미확인사유유형코드",
+          "phyNm": "UNIDNTF_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "미확인 사유의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "미확인입금상태유형코드",
+          "phyNm": "UNIDNTF_DPST_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "미확인 입금 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "미확인입금확인일시",
+          "phyNm": "UNIDNTF_DPST_IDNTF_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "미확인 입금 확인의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "은행코드이(가) 미확인입금내역을(를) 가진다",
+          "parent": "INV.은행코드",
+          "child": "INV.미확인입금내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        },
+        {
+          "relNm": "수납기본이(가) 미확인입금내역을(를) 가진다",
+          "parent": "INV.수납기본",
+          "child": "INV.미확인입금내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 귀속 청구계정은 수납번호 → 수납기본에서 조회(청구계정번호를 두지 않아 이행 종속 제거)."
+    },
+    {
+      "entId": "INV-019",
+      "entNm": "과오납이력",
+      "phyNm": "OVPAY_HIST",
+      "tblNm": "PTL_INV_OVPAY_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "과오납기본의 상태·잔액 변동(대체·환불·선납전환·소멸)을 유효 기간(SCD2)으로 보존.",
+      "attrs": [
+        {
+          "attrNm": "과오납번호",
+          "phyNm": "OVPAY_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "INV",
+            "ent": "과오납기본",
+            "attr": "과오납번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "과오납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "과오납상태유형코드",
+          "phyNm": "OVPAY_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "과오납 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "과오납변경금액",
+          "phyNm": "OVPAY_CHG_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "과오납 변경의 금액 — 원화 금액(원 단위 정수) — 이 변경으로 증감한 금액(대체·환불은 음수)"
+        },
+        {
+          "attrNm": "과오납잔액",
+          "phyNm": "OVPAY_BAL",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "과오납의 잔액 — 사용·정리하고 남은 금액"
+        },
+        {
+          "attrNm": "처리방법유형코드",
+          "phyNm": "PRCS_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "처리 방법의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "과오납변경사유유형코드",
+          "phyNm": "OVPAY_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "과오납 변경 사유의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "과오납기본이(가) 과오납이력을(를) 가진다",
+          "parent": "INV.과오납기본",
+          "child": "INV.과오납이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "과오납번호"
+          ]
+        }
+      ],
+      "normNote": "부모 = 과오납기본(식별, SCD2). 2NF·3NF 충족(변경 시점 스냅숏)."
+    },
+    {
+      "entId": "INV-020",
+      "entNm": "환불계좌상세",
+      "phyNm": "RFND_ACCT_DTL",
+      "tblNm": "PTL_INV_RFND_ACCT_D",
+      "tp": "BASE",
+      "stg": "LGCL",
+      "def": "청구계정이 등록한 환불 받을 계좌(복수 가능, 대표 1). 실명 확인 결과를 가진다.",
+      "attrs": [
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "CUS",
+            "ent": "청구계정기본",
+            "attr": "청구계정번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "청구 계정의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "환불계좌순번",
+          "phyNm": "RFND_ACCT_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "환불 계좌의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "계좌번호암호화값",
+          "phyNm": "ACCT_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "계좌 번호 암호화의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "예금주명",
+          "phyNm": "DPSOWN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "예금주의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "환불계좌등록일시",
+          "phyNm": "RFND_ACCT_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "환불 계좌 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "환불계좌상태유형코드",
+          "phyNm": "RFND_ACCT_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "환불 계좌 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "계좌실명확인여부",
+          "phyNm": "ACCT_RLNM_IDNTF_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "계좌 실명 확인의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "대표환불계좌여부",
+          "phyNm": "RPRS_RFND_ACCT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "대표 환불 계좌의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "청구계정기본이(가) 환불계좌상세을(를) 가진다",
+          "parent": "CUS.청구계정기본",
+          "child": "INV.환불계좌상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "청구계정번호"
+          ]
+        },
+        {
+          "relNm": "은행코드이(가) 환불계좌상세을(를) 가진다",
+          "parent": "INV.은행코드",
+          "child": "INV.환불계좌상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        }
+      ],
+      "normNote": "1NF: 청구계정당 여러 계좌 → 순번 행. 2NF: 비키 속성은 (청구계정번호, 환불계좌순번) 전체 종속. 3NF: 은행명은 코드 조회."
+    },
+    {
+      "entId": "INV-021",
+      "entNm": "선납사용내역",
+      "phyNm": "PRPAY_USE_DTLS",
+      "tblNm": "PTL_INV_PRPAY_USE_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "선납 잔액을 청구서에 차감·환불·소멸시킨 사용 1건(개념 basicEntRels 승계 — PAY.청구기본 N:1 선택).",
+      "attrs": [
+        {
+          "attrNm": "선납번호",
+          "phyNm": "PRPAY_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "INV",
+            "ent": "선납기본",
+            "attr": "선납번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "선납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "선납사용순번",
+          "phyNm": "PRPAY_USE_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "선납 사용의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PAY",
+            "ent": "청구기본",
+            "attr": "청구번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "청구의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 청구 차감일 때만(환불·소멸은 NULL)"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "청구의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "선납사용일시",
+          "phyNm": "PRPAY_USE_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "선납 사용의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "선납사용금액",
+          "phyNm": "PRPAY_USE_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "선납 사용의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "선납사용유형코드",
+          "phyNm": "PRPAY_USE_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "선납 사용의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "선납기본이(가) 선납사용내역을(를) 가진다",
+          "parent": "INV.선납기본",
+          "child": "INV.선납사용내역",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "선납번호"
+          ]
+        },
+        {
+          "relNm": "선납 잔액 차감",
+          "parent": "PAY.청구기본",
+          "child": "INV.선납사용내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "청구번호"
+          ]
+        }
+      ],
+      "normNote": "부모 = 선납기본(식별, 순번). 3NF: 청구년월은 청구번호 이행 종속 — 파티션 업무 키 보존(결정 L4), 청구 차감이 아니면 둘 다 NULL."
+    },
+    {
+      "entId": "INV-022",
+      "entNm": "수납대행기관기본",
+      "phyNm": "RCV_AGT_INST_BAS",
+      "tblNm": "PTL_INV_RCV_AGT_INST_M",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "수납을 대행하는 기관(금결원·PG·VAN·편의점·은행 대행). 대사·수수료 정산 상대방.",
+      "attrs": [
+        {
+          "attrNm": "수납대행기관번호",
+          "phyNm": "RCV_AGT_INST_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수납 대행 기관의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납대행기관명",
+          "phyNm": "RCV_AGT_INST_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "수납 대행 기관의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "수납대행기관등록일시",
+          "phyNm": "RCV_AGT_INST_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "수납 대행 기관 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "수납대행기관상태유형코드",
+          "phyNm": "RCV_AGT_INST_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "수납 대행 기관 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "수납대행기관유형코드",
+          "phyNm": "RCV_AGT_INST_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수납 대행 기관의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "사업자등록번호",
+          "phyNm": "BRNO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "국세청 사업자등록번호 10자리"
+        },
+        {
+          "attrNm": "대표전화번호",
+          "phyNm": "RPRS_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "대표의 전화번호 — 전화번호(숫자 문자열)"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [],
+      "normNote": "2NF·3NF 충족."
+    },
+    {
+      "entId": "INV-023",
+      "entNm": "수납채널코드",
+      "phyNm": "RCV_CHNL_CD",
+      "tblNm": "PTL_INV_RCV_CHNL_C",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "수납이 들어오는 경로 기준(자동이체·카드·지로·가상계좌·매장·ARS·간편결제). PK = 공통코드 수납채널유형코드 값에 운영 속성을 더한 코드 엔터티.",
+      "attrs": [
+        {
+          "attrNm": "수납채널유형코드",
+          "phyNm": "RCV_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수납 채널의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "수납대행기관번호",
+          "phyNm": "RCV_AGT_INST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납대행기관기본",
+            "attr": "수납대행기관번호"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "수납 대행 기관의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 기본 경유 대행기관"
+        },
+        {
+          "attrNm": "수납채널명",
+          "phyNm": "RCV_CHNL_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "수납 채널의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "수납채널상태유형코드",
+          "phyNm": "RCV_CHNL_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "수납 채널 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "수납반영일수",
+          "phyNm": "RCV_RFLT_DCNT",
+          "domNm": "일수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수납 반영의 일수 — 기간의 일 수 — 입금 → 수납 확정까지 영업일 수(실시간 0)"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수납대행기관기본이(가) 수납채널코드을(를) 가진다",
+          "parent": "INV.수납대행기관기본",
+          "child": "INV.수납채널코드",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납대행기관번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. PK = 공통코드 값(수납채널유형코드) — 코드 엔터티가 운영 속성만 더함."
+    },
+    {
+      "entId": "INV-024",
+      "entNm": "수납배분우선순위코드",
+      "phyNm": "RCV_ALLC_PRRT_CD",
+      "tblNm": "PTL_INV_RCV_ALLC_PRRT_C",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "수납액을 청구서 안 요금항목에 나눌 때의 순위 기준(연체가산금 → 이전 미납 → 당월 단말할부 → 당월 통신요금 …). 후보명 수납배분순위코드를 표준 용어(우선순위)로 정리.",
+      "attrs": [
+        {
+          "attrNm": "수납배분우선순위",
+          "phyNm": "RCV_ALLC_PRRT",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수납 배분의 우선순위 — 여러 대상 중 먼저 처리하는 순서"
+        },
+        {
+          "attrNm": "요금항목분류코드",
+          "phyNm": "CHRG_ITM_CLSF_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목분류코드",
+            "attr": "요금항목분류코드"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "이 순위가 적용되는 요금항목 분류 — FK → PRD.요금항목분류코드(관문 G2: 같은 개념의 공통코드 요금항목분류유형코드 대신 소유 영역 코드 엔터티 키)"
+        },
+        {
+          "attrNm": "수납배분우선순위명",
+          "phyNm": "RCV_ALLC_PRRT_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "수납 배분 우선순위의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "수납배분우선순위내용",
+          "phyNm": "RCV_ALLC_PRRT_CN",
+          "domNm": "내용V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "수납 배분 우선순위의 내용 — 자유 서술 내용"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "요금항목분류코드이(가) 수납배분우선순위코드를 가진다",
+          "parent": "PRD.요금항목분류코드",
+          "child": "INV.수납배분우선순위코드",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "요금항목분류코드"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 순위 값 자체가 키(배분 순서 정렬 키)."
+    },
+    {
+      "entId": "INV-025",
+      "entNm": "수납대사내역",
+      "phyNm": "RCV_RCNCL_DTLS",
+      "tblNm": "PTL_INV_RCV_RCNCL_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "대행기관·채널별 기준일 하루치 수납을 기관 통지와 자사 수납 원장으로 맞춘 결과(STL). 차이는 파생값이라 두지 않는다.",
+      "attrs": [
+        {
+          "attrNm": "수납대사번호",
+          "phyNm": "RCV_RCNCL_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수납 대사의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납대행기관번호",
+          "phyNm": "RCV_AGT_INST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납대행기관기본",
+            "attr": "수납대행기관번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "수납 대행 기관의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납채널유형코드",
+          "phyNm": "RCV_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납채널코드",
+            "attr": "수납채널유형코드"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "수납 채널의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "수납대사기준일자",
+          "phyNm": "RCV_RCNCL_STD_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "수납 대사 기준의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "수납대사일시",
+          "phyNm": "RCV_RCNCL_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수납 대사의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "기관수납건수",
+          "phyNm": "INST_RCV_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "기관 수납의 건수 — 처리·발생 건의 수 — 대행기관 통지 건수"
+        },
+        {
+          "attrNm": "기관수납금액",
+          "phyNm": "INST_RCV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "기관 수납의 금액 — 원화 금액(원 단위 정수) — 대행기관 통지 금액"
+        },
+        {
+          "attrNm": "수납건수",
+          "phyNm": "RCV_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "수납의 건수 — 처리·발생 건의 수 — 자사 수납 원장 건수"
+        },
+        {
+          "attrNm": "수납금액",
+          "phyNm": "RCV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "수납의 금액 — 원화 금액(원 단위 정수) — 자사 수납 원장 금액"
+        },
+        {
+          "attrNm": "수납대사결과유형코드",
+          "phyNm": "RCV_RCNCL_RSLT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "수납 대사 결과의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "수납대사상태유형코드",
+          "phyNm": "RCV_RCNCL_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "수납 대사 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수납대행기관기본이(가) 수납대사내역을(를) 가진다",
+          "parent": "INV.수납대행기관기본",
+          "child": "INV.수납대사내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수납대행기관번호"
+          ]
+        },
+        {
+          "relNm": "수납채널코드이(가) 수납대사내역을(를) 가진다",
+          "parent": "INV.수납채널코드",
+          "child": "INV.수납대사내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수납채널유형코드"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 대사 차이 건수·금액은 기관값 − 자사값 파생이라 제외(결과유형코드로만 표현)."
+    },
+    {
+      "entId": "INV-026",
+      "entNm": "수납대행수수료내역",
+      "phyNm": "RCV_AGT_FEE_DTLS",
+      "tblNm": "PTL_INV_RCV_AGT_FEE_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "대행기관에 줄 수납대행 수수료 정산 1건(월·기관 단위, STL). 세금계산서 승인번호로 PRM 정산과 대조.",
+      "attrs": [
+        {
+          "attrNm": "수납대행수수료번호",
+          "phyNm": "RCV_AGT_FEE_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수납 대행 수수료의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납대행기관번호",
+          "phyNm": "RCV_AGT_INST_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납대행기관기본",
+            "attr": "수납대행기관번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "수납 대행 기관의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납대사번호",
+          "phyNm": "RCV_RCNCL_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납대사내역",
+            "attr": "수납대사번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "수납 대사의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 대사 확정분 근거(월 일괄 정산은 NULL)"
+        },
+        {
+          "attrNm": "정산년월",
+          "phyNm": "STLM_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "정산의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "수수료산정일시",
+          "phyNm": "FEE_ASMT_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수수료 산정의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "수수료대상건수",
+          "phyNm": "FEE_TRGT_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "수수료 대상의 건수 — 처리·발생 건의 수"
+        },
+        {
+          "attrNm": "수수료대상금액",
+          "phyNm": "FEE_TRGT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "수수료 대상의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "수수료율",
+          "phyNm": "FEE_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "수수료의 율 — 비율(백분율, 소수 2자리) — 정률 계약만(정액은 NULL)"
+        },
+        {
+          "attrNm": "수수료금액",
+          "phyNm": "FEE_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "수수료의 금액 — 원화 금액(원 단위 정수) — 대행기관 청구 확정액(정액·정률·단수 처리 결과 — 파생 아님)"
+        },
+        {
+          "attrNm": "부가가치세금액",
+          "phyNm": "VAT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "부가가치세의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "수납대행수수료상태유형코드",
+          "phyNm": "RCV_AGT_FEE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "수납 대행 수수료 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "지급예정일자",
+          "phyNm": "GIVE_SCHD_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "지급 예정의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "전자세금계산서승인번호",
+          "phyNm": "ELCTR_TXINV_APRV_NO",
+          "domNm": "번호V30",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 13,
+          "def": "전자 세금계산서 승인의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수납대행기관기본이(가) 수납대행수수료내역을(를) 가진다",
+          "parent": "INV.수납대행기관기본",
+          "child": "INV.수납대행수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수납대행기관번호"
+          ]
+        },
+        {
+          "relNm": "수납대사내역이(가) 수납대행수수료내역을(를) 가진다",
+          "parent": "INV.수납대사내역",
+          "child": "INV.수납대행수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "수납대사번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 수수료금액·부가가치세금액은 대행기관 세금계산서 확정값(정액·정률·단수 처리 결과)이라 대상금액 × 율 파생으로 보지 않음."
+    },
+    {
+      "entId": "INV-027",
+      "entNm": "영수증발행내역",
+      "phyNm": "RCIPT_PBLCN_DTLS",
+      "tblNm": "PTL_INV_RCIPT_PBLCN_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "수납 1건에 대한 납부 영수증 발행(종이·이메일·문자·앱) 1건, 재발행은 회차 증가.",
+      "attrs": [
+        {
+          "attrNm": "영수증발행번호",
+          "phyNm": "RCIPT_PBLCN_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "영수증 발행의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "영수증발행일시",
+          "phyNm": "RCIPT_PBLCN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "영수증 발행의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "영수증발행유형코드",
+          "phyNm": "RCIPT_PBLCN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "영수증 발행의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "영수증발행금액",
+          "phyNm": "RCIPT_PBLCN_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "영수증 발행의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "영수증발행회차",
+          "phyNm": "RCIPT_PBLCN_TMS",
+          "domNm": "회차N3",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "영수증 발행의 회차 — 분할·반복 거래의 차례 번호"
+        },
+        {
+          "attrNm": "영수증발행상태유형코드",
+          "phyNm": "RCIPT_PBLCN_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "영수증 발행 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수납기본이(가) 영수증발행내역을(를) 가진다",
+          "parent": "INV.수납기본",
+          "child": "INV.영수증발행내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 청구계정·납부자는 수납번호에서 조회."
+    },
+    {
+      "entId": "INV-028",
+      "entNm": "현금영수증발행내역",
+      "phyNm": "CASH_RCIPT_PBLCN_DTLS",
+      "tblNm": "PTL_INV_CASH_RCIPT_PBLCN_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "현금성 수납(지로·가상계좌·매장 현금·계좌이체)에 대한 현금영수증 발급·국세청 전송 1건.",
+      "attrs": [
+        {
+          "attrNm": "현금영수증발행번호",
+          "phyNm": "CASH_RCIPT_PBLCN_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "현금 영수증 발행의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "수납기본",
+            "attr": "수납번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "현금영수증발행일시",
+          "phyNm": "CASH_RCIPT_PBLCN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "현금 영수증 발행의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "현금영수증승인번호",
+          "phyNm": "CASH_RCIPT_APRV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "현금 영수증 승인의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "현금영수증거래구분코드",
+          "phyNm": "CASH_RCIPT_TRD_SE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "현금 영수증 거래의 구분 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "현금영수증식별번호암호화값",
+          "phyNm": "CASH_RCIPT_IDFC_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "현금 영수증 식별 번호 암호화의 값 — 측정·설정·암호화된 값 — D11 — 휴대전화·카드·사업자번호 평문 금지"
+        },
+        {
+          "attrNm": "현금영수증발행금액",
+          "phyNm": "CASH_RCIPT_PBLCN_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "현금 영수증 발행의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "현금영수증발행상태유형코드",
+          "phyNm": "CASH_RCIPT_PBLCN_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "현금 영수증 발행 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
+        },
+        {
+          "attrNm": "국세청전송일시",
+          "phyNm": "NTS_TRNM_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "국세청 전송의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수납기본이(가) 현금영수증발행내역을(를) 가진다",
+          "parent": "INV.수납기본",
+          "child": "INV.현금영수증발행내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수납번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족. 거래구분(소득공제·지출증빙)은 값 2개 고정 → 구분코드."
+    },
+    {
+      "entId": "INV-029",
+      "entNm": "수납일집계",
+      "phyNm": "RCV_DD_AGG",
+      "tblNm": "PTL_INV_RCV_DD_T",
+      "tp": "PROC",
+      "stg": "LGCL",
+      "def": "수납일자 × 수납채널 × 납부방법유형별 수납·취소 건수와 금액 일 마감 집계.",
+      "attrs": [
+        {
+          "attrNm": "수납채널유형코드",
+          "phyNm": "RCV_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": {
+            "area": "INV",
+            "ent": "수납채널코드",
+            "attr": "수납채널유형코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "수납 채널의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "수납일자",
+          "phyNm": "RCV_DT",
+          "domNm": "일자C8",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "수납의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "납부방법유형코드",
+          "phyNm": "PAY_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "납부 방법의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "수납건수",
+          "phyNm": "RCV_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "수납의 건수 — 처리·발생 건의 수"
+        },
+        {
+          "attrNm": "수납금액",
+          "phyNm": "RCV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수납의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "수납취소건수",
+          "phyNm": "RCV_CNCL_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "수납 취소의 건수 — 처리·발생 건의 수"
+        },
+        {
+          "attrNm": "수납취소금액",
+          "phyNm": "RCV_CNCL_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "수납 취소의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "집계일시",
+          "phyNm": "AGG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "집계의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수납채널코드이(가) 수납일집계을(를) 가진다",
+          "parent": "INV.수납채널코드",
+          "child": "INV.수납일집계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "수납채널유형코드"
+          ]
+        }
+      ],
+      "normNote": "PROC 가공 — 일 마감 스냅숏이 정본(원천 재계산 불가 시점 보존). 2NF: 집계값은 3중 키 전체에 종속."
+    },
+    {
+      "entId": "INV-030",
+      "entNm": "수납월통계",
+      "phyNm": "RCV_MM_STATS",
+      "tblNm": "PTL_INV_RCV_MM_S",
+      "tp": "PROC",
+      "stg": "LGCL",
+      "def": "수납년월 × 수납채널 × 납부방법유형별 월 마감 통계(수납·과오납 발생·환불).",
+      "attrs": [
+        {
+          "attrNm": "수납채널유형코드",
+          "phyNm": "RCV_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": {
+            "area": "INV",
+            "ent": "수납채널코드",
+            "attr": "수납채널유형코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "수납 채널의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "수납년월",
+          "phyNm": "RCV_YM",
+          "domNm": "년월C6",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "수납의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "납부방법유형코드",
+          "phyNm": "PAY_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "납부 방법의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "수납청구계정건수",
+          "phyNm": "RCV_BILL_ACNT_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "수납 청구 계정의 건수 — 처리·발생 건의 수"
+        },
+        {
+          "attrNm": "수납건수",
+          "phyNm": "RCV_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수납의 건수 — 처리·발생 건의 수"
+        },
+        {
+          "attrNm": "수납금액",
+          "phyNm": "RCV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "수납의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "과오납발생금액",
+          "phyNm": "OVPAY_OCRN_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "과오납 발생의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "환불금액",
+          "phyNm": "RFND_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "환불의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "집계일시",
+          "phyNm": "AGG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "집계의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수납채널코드이(가) 수납월통계을(를) 가진다",
+          "parent": "INV.수납채널코드",
+          "child": "INV.수납월통계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "수납채널유형코드"
+          ]
+        }
+      ],
+      "normNote": "PROC 가공 — 월 마감 스냅숏. 수납률 등 비율은 파생이라 제외. 2NF: 통계값은 3중 키 전체에 종속."
+    }
+  ],
+  "crossRelReq": [],
+  "newTerms": [],
+  "newWords": [],
+  "newCodes": [],
+  "decisions": [
+    {
+      "id": "L1",
+      "dec": "핵심 10개 = 개념 모델 keyAttrs 그대로 승계(이름·물리명·도메인 무변경), FK·필수 여부·관계·정규화만 확정. 환불내역에 환불계좌순번 1개 보강",
+      "why": "확정 엔터티 무단 재설계 금지. 등록 환불계좌(환불계좌상세)와 실제 환불을 잇는 경로가 없으면 환불계좌 엔터티가 고립됨"
+    },
+    {
+      "id": "L2",
+      "dec": "basicEntRels(선납사용내역 → PAY.청구기본 N:1 선택)를 선납사용내역 rels 로 옮기고 키 삭제",
+      "why": "02 관문 승계 이슈 3"
+    },
+    {
+      "id": "L3",
+      "dec": "기본 후보 \"수납배분순위코드\" → 엔터티명 \"수납배분우선순위코드\"(RCV_ALLC_PRRT_CD), PK = 수납배분우선순위(순번N5)",
+      "why": "표준사전 5절 \"순위 = 우선순위\"(순위 단어 미등재), 개념 수납배분상세의 FK 속성 수납배분우선순위와 PK 이름 일치"
+    },
+    {
+      "id": "L4",
+      "dec": "개념 확정 속성 중 청구번호에서 유도되는 청구년월·납부기한일자·청구계정번호는 논리에 유지하고 normNote 에 이행 종속 예외로 기록, 물리 단계 반정규화 항목으로 인계. 새 기본 엔터티에는 파티션 키 청구년월만 같은 규칙으로 두고 그 밖의 유도 속성(청구계정번호·은행코드 등)은 두지 않음",
+      "why": "개념 관문이 \"업무 키 보존(파티션·레이크 키)\"으로 승인한 속성 — 지우면 crossRels·개념 승인과 어긋남. 규칙 2-7 반정규화는 물리 단계"
+    },
+    {
+      "id": "L5",
+      "dec": "수납채널코드 = PK 가 공통코드 수납채널유형코드인 코드 엔터티(REF)",
+      "why": "개념 수납기본이 수납채널유형코드 → 수납채널코드 FK 로 확정, 공통코드 3종 규칙(유형코드)과 코드 엔터티(반영일수·대행기관 운영 속성)를 동시 충족 — CUS 동의항목코드와 같은 방식"
+    },
+    {
+      "id": "L6",
+      "dec": "이력 2개(납부방법이력·과오납이력)는 부모 PK + 유효시작일시 SCD2",
+      "why": "CUS 결정 L2 와 같은 패턴, 표준용어 유효시작일시·유효종료일시 재사용"
+    },
+    {
+      "id": "L7",
+      "dec": "자동이체출금결과내역 = 출금요청번호 + 출금결과순번 식별 관계",
+      "why": "부분출금 후 추가 출금 통지 등 요청 1건에 결과 여러 건(금결원 CMS 재통지)"
+    },
+    {
+      "id": "L8",
+      "dec": "미확인입금내역·가상계좌입금내역·지로수납내역·카드자동납부승인내역은 수납기본과 별도 원천 통지 엔터티, 수납 생성 시 수납번호(선택 FK)로 연결",
+      "why": "수납기본은 청구계정이 필수(개념 opt=false) — 귀속 전 입금·실패 승인을 담을 수 없음"
+    },
+    {
+      "id": "L9",
+      "dec": "파생값 제외 : 미출금액·대사 차이·수납률·포인트 등",
+      "why": "3NF — 필요 시 물리 반정규화"
+    },
+    {
+      "id": "L10",
+      "dec": "교차 관계 3건 추가 요청(crossRelReq) : 환불계좌상세→CUS.청구계정기본, 카드자동납부승인내역·지로수납내역→PAY.청구기본",
+      "why": "부모 키 공식(5절) 정의에 필요 — areas.json 수정 금지라 coordinator 반영 요청"
+    },
+    {
+      "id": "L11",
+      "dec": "시스템 칼럼 4개·삭제여부 없음",
+      "why": "D7 — 생애는 상태유형코드·종료일자로 표현"
+    },
+    {
+      "id": "G1",
+      "dec": "수납배분상세.납부기한일자 제거(물리 반정규화 후보로만 인계)",
+      "why": "masteragent_da_coordinator 04 관문 — 청구번호 → PAY.청구기본 이행 종속이고 01 문서 5절-4 업무 키(서비스번호·청구월·청구계정번호)에 해당하지 않음. 규칙 2-7 반정규화는 물리 단계에서만"
+    },
+    {
+      "id": "G2",
+      "dec": "수납배분우선순위코드.요금항목분류유형코드 → 요금항목분류코드(FK PRD.요금항목분류코드) + 관계·crossRels 추가",
+      "why": "04 관문 — PRD 에 같은 개념의 코드 엔터티(PRD-029)가 있는데 다른 이름 공통코드로 두면 동의어·관계 단절. 같은 키 = 소유 영역 이름(02 관문 K4)"
+    },
+    {
+      "id": "G3",
+      "dec": "crossRelReq 3건 + G2 1건을 areas.json crossRels 에 반영, crossRelReq 비움",
+      "why": "04 관문 — L10 요청 처리(관계 양끝 존재, 6절)"
+    }
+  ],
+  "crossRelDone": "04 INV 논리 관문이 areas.json crossRels 에 4건 반영(요청 3 + G2 1)",
+  "stdMerged": "03 논리 관문 표준사전 2차 병합 완료(2026-11-07) — 이 영역 신규 단어 6·용어 91·코드 24을 tools/std_words.js·std_codes.js 원장에 등재하고 tools/std_build.js 로 model/std 재생성(docs/03_standards.md 8절). 비운 배열은 다음 단계 신규 요청용"
+}

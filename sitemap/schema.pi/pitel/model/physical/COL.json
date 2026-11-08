@@ -1,0 +1,4792 @@
+{
+  "area": "COL",
+  "areaNm": "미납",
+  "stg": "PHY",
+  "trgtDbms": "POSTGRESQL",
+  "ver": "2026-11-07",
+  "author": "subagent_physical_modeler",
+  "tables": [
+    {
+      "tblNm": "PTL_COL_UNPD_M",
+      "entId": "COL-001",
+      "moduleCd": null,
+      "def": "납부기한까지 완납되지 않은 청구서 1건 = 미납 채권 1건(청구기본과 1:1, 미납 발생 시에만 생성). 미납 채권의 현재 상태·잔액·진행 단계를 관리하는 COL 의 중심 엔터티",
+      "estRows": 20000000,
+      "cols": [
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "attrNm": "청구번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "attrNm": "청구계정번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구계정번호",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "BILL_YM",
+          "attrNm": "청구년월",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구년월",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "CUST_NO",
+          "attrNm": "고객번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "고객번호",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "RCVB_TRNSF_NO",
+          "attrNm": "채권이관번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "채권이관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DIV_PAY_AGRMT_NO",
+          "attrNm": "분할납부약정번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "분할납부약정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_RCVB_NM",
+          "attrNm": "미납채권명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "미납채권명",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_OCRN_DTM",
+          "attrNm": "미납발생일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "미납발생일시",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_STTS_TY_CD",
+          "attrNm": "미납상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "미납상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "FRST_UNPD_AMT",
+          "attrNm": "최초미납금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "최초미납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_RMND_AMT",
+          "attrNm": "미납잔여금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "미납잔여금액",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "DUN_STEP_TY_CD",
+          "attrNm": "독촉단계유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "독촉단계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CMPLPAY_DTM",
+          "attrNm": "완납일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 14,
+          "termNm": "완납일시",
+          "dflt": null
+        },
+        {
+          "colNm": "EXTSH_PRSCR_EXPRY_DT",
+          "attrNm": "소멸시효만료일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 15,
+          "termNm": "소멸시효만료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_UNPD_M",
+        "cols": [
+          "UNPD_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_UNPD_M_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "unq": true,
+          "why": "PAY 청구기본과 1:1 대체키 — 청구서→미납 조인·중복 생성 방지"
+        },
+        {
+          "nm": "X_PTL_COL_UNPD_M_02",
+          "cols": [
+            "BILL_ACNT_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "청구계정+청구년월 미납 조회(반정규화 칼럼)"
+        },
+        {
+          "nm": "X_PTL_COL_UNPD_M_03",
+          "cols": [
+            "CUST_NO"
+          ],
+          "unq": false,
+          "why": "고객번호 단위 미납 조회·채권이관 묶음 생성"
+        },
+        {
+          "nm": "X_PTL_COL_UNPD_M_04",
+          "cols": [
+            "UNPD_STTS_TY_CD",
+            "UNPD_OCRN_DTM"
+          ],
+          "unq": false,
+          "where": "unpd_stts_ty_cd IN ('01','02','04')",
+          "why": "진행 중 미납(미납·일부납부·분할납부중)만 부분 인덱스 — 완납이 대부분인 저선택도 상태값(S3)을 전체 인덱싱하지 않음. 독촉·정지 대상 추출 배치"
+        },
+        {
+          "nm": "X_PTL_COL_UNPD_M_05",
+          "cols": [
+            "RCVB_TRNSF_NO"
+          ],
+          "unq": false,
+          "where": "rcvb_trnsf_no IS NOT NULL",
+          "why": "채권이관기본→미납 조인(FK, 대부분 NULL — S5 부분 인덱스)"
+        },
+        {
+          "nm": "X_PTL_COL_UNPD_M_06",
+          "cols": [
+            "DIV_PAY_AGRMT_NO"
+          ],
+          "unq": false,
+          "where": "div_pay_agrmt_no IS NOT NULL",
+          "why": "분할납부약정→대상 미납 조인(FK, 대부분 NULL — S5 부분 인덱스)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "BILL_NO",
+            "BILL_YM"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO",
+            "BILL_YM"
+          ],
+          "nm": "FK_PTL_COL_UNPD_M_01"
+        },
+        {
+          "cols": [
+            "RCVB_TRNSF_NO"
+          ],
+          "refTbl": "PTL_COL_RCVB_TRNSF_M",
+          "refCols": [
+            "RCVB_TRNSF_NO"
+          ],
+          "nm": "FK_PTL_COL_UNPD_M_02"
+        },
+        {
+          "cols": [
+            "DIV_PAY_AGRMT_NO"
+          ],
+          "refTbl": "PTL_COL_DIV_PAY_AGRMT_M",
+          "refCols": [
+            "DIV_PAY_AGRMT_NO"
+          ],
+          "nm": "FK_PTL_COL_UNPD_M_03"
+        },
+        {
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ],
+          "nm": "FK_PTL_COL_UNPD_M_04"
+        },
+        {
+          "cols": [
+            "CUST_NO"
+          ],
+          "refTbl": "PTL_CUS_CUST_M",
+          "refCols": [
+            "CUST_NO"
+          ],
+          "nm": "FK_PTL_COL_UNPD_M_05"
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "BILL_ACNT_NO",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "청구계정+청구년월 미납 조회(상담·수납배분 대상 선정)가 매일 수백만 회 — 청구기본(T4 수억 행) 조인 제거"
+        },
+        {
+          "col": "BILL_YM",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "청구계정+청구년월 복합 조회·월별 미납 발생 집계(미납월집계 생성) — 청구기본 조인 제거. 청구기본 PK(청구번호+청구년월, 연 파티션)를 완성하는 FK 칼럼 겸용"
+        },
+        {
+          "col": "CUST_NO",
+          "srcTbl": "PTL_CUS_BILL_ACNT_M",
+          "why": "고객번호 단위 미납 조회(상담·채권이관 묶음·신용정보 등록 판정 배치) — 청구계정 경유 2단 조인 제거"
+        },
+        {
+          "col": "UNPD_RMND_AMT",
+          "srcTbl": "PTL_COL_UNPD_D",
+          "why": "04 관문 F1 인계. 이용정지·독촉·직권해지 판정 배치가 매일 미납 채권 전체의 잔액을 봄 — 미납상세 6천만 행 SUM 회피. 수납배분 반영 시 같은 트랜잭션에서 갱신"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_COL_UNPD_D",
+      "entId": "COL-002",
+      "moduleCd": null,
+      "def": "미납 채권의 요금항목 단위 미납액. 수납배분이 항목 순위(할부금·부가세 등)로 이뤄지므로 항목별 잔액을 관리",
+      "estRows": 60000000,
+      "cols": [
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_DTL_SEQ",
+          "attrNm": "미납상세순번",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "미납상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "attrNm": "청구번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DTL_SEQ",
+          "attrNm": "청구상세순번",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "attrNm": "청구년월",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구년월",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "UNPD_ITM_NM",
+          "attrNm": "미납항목명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "미납항목명",
+          "dflt": null
+        },
+        {
+          "colNm": "LAST_RCV_RFLT_DTM",
+          "attrNm": "최종수납반영일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "최종수납반영일시",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_ITM_STTS_TY_CD",
+          "attrNm": "미납항목상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "미납항목상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "FRST_UNPD_AMT",
+          "attrNm": "최초미납금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "최초미납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "ACML_RCV_AMT",
+          "attrNm": "누적수납금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "누적수납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_RMND_AMT",
+          "attrNm": "미납잔여금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "미납잔여금액",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "UNPD_ADJ_AMT",
+          "attrNm": "미납조정금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "미납조정금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DIV_PAY_TRGT_YN",
+          "attrNm": "분할납부대상여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "분할납부대상여부",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_PRCS_YN",
+          "attrNm": "대손처리여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 14,
+          "termNm": "대손처리여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_UNPD_D",
+        "cols": [
+          "UNPD_NO",
+          "UNPD_DTL_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_UNPD_D_01",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "unq": false,
+          "why": "수납배분(INV)·청구 조정 시 청구상세→미납상세 조회(FK 조인)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_UNPD_D_01"
+        },
+        {
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ",
+            "BILL_YM"
+          ],
+          "refTbl": "PTL_PAY_BILL_D",
+          "refCols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ",
+            "BILL_YM"
+          ],
+          "nm": "FK_PTL_COL_UNPD_D_02"
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "BILL_YM",
+          "srcTbl": "PTL_PAY_BILL_D",
+          "why": "PAY 청구상세 PK(청구번호+청구상세순번+청구년월, 월 파티션 217개)를 완성하는 FK 칼럼 — 수납배분·조정의 청구상세 조인을 1개 파티션으로 프루닝(05 COL 물리 관문 R1)"
+        },
+        {
+          "col": "UNPD_RMND_AMT",
+          "srcTbl": "PTL_COL_UNPD_D(자기 계산값)",
+          "why": "04 관문 F1 인계. 수납배분이 항목 순위대로 잔액 있는 항목을 찾는 핫 경로 — 최초미납금액−누적수납금액+미납조정금액 매번 계산 회피"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_COL_OVDU_ADCHG_L",
+      "entId": "COL-003",
+      "moduleCd": null,
+      "def": "미납 채권에 월 단위로 부과한 연체가산금 1건(이용약관 가산금율·상한 적용). 부과액은 다음 청구서에 실려 청구된다",
+      "estRows": 40000000,
+      "cols": [
+        {
+          "colNm": "OVDU_ADCHG_NO",
+          "attrNm": "연체가산금번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "연체가산금번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ADCHG_IMPS_DTM",
+          "attrNm": "가산금부과일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "가산금부과일시",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RFLT_BILL_NO",
+          "attrNm": "반영청구번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "반영청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RFLT_BILL_YM",
+          "attrNm": "반영청구년월",
+          "dataTp": "CHAR(6)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "반영청구년월",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "OVDU_ADCHG_STD_TY_CD",
+          "attrNm": "연체가산금기준유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "연체가산금기준유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "OVDU_ADCHG_NM",
+          "attrNm": "연체가산금명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "연체가산금명",
+          "dflt": null
+        },
+        {
+          "colNm": "ADCHG_IMPS_STTS_TY_CD",
+          "attrNm": "가산금부과상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "가산금부과상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "IMPS_YM",
+          "attrNm": "부과년월",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "부과년월",
+          "dflt": null
+        },
+        {
+          "colNm": "ADTN_TRGT_AMT",
+          "attrNm": "가산대상금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "가산대상금액",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_ADCHG_RT",
+          "attrNm": "적용가산금율",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "적용가산금율",
+          "dflt": null
+        },
+        {
+          "colNm": "IMPS_AMT",
+          "attrNm": "부과금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "부과금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RDCT_AMT",
+          "attrNm": "감면금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "감면금액",
+          "dflt": null
+        },
+        {
+          "colNm": "ADCHG_UPLMT_APLCN_YN",
+          "attrNm": "가산금상한적용여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 14,
+          "termNm": "가산금상한적용여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_OVDU_ADCHG_L",
+        "cols": [
+          "OVDU_ADCHG_NO",
+          "ADCHG_IMPS_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_OVDU_ADCHG_L_01",
+          "cols": [
+            "UNPD_NO",
+            "IMPS_YM"
+          ],
+          "unq": false,
+          "why": "미납별 가산금 조회·같은 부과년월 중복 부과 점검(FK 조인)"
+        },
+        {
+          "nm": "X_PTL_COL_OVDU_ADCHG_L_02",
+          "cols": [
+            "RFLT_BILL_NO"
+          ],
+          "unq": false,
+          "where": "rflt_bill_no IS NOT NULL",
+          "why": "청구서에 실린 가산금 조회(FK, 반영 전 NULL)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_OVDU_ADCHG_L_01"
+        },
+        {
+          "cols": [
+            "RFLT_BILL_NO",
+            "RFLT_BILL_YM"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO",
+            "BILL_YM"
+          ],
+          "nm": "FK_PTL_COL_OVDU_ADCHG_L_02"
+        },
+        {
+          "cols": [
+            "OVDU_ADCHG_STD_TY_CD"
+          ],
+          "refTbl": "PTL_COL_OVDU_ADCHG_STD_C",
+          "refCols": [
+            "OVDU_ADCHG_STD_TY_CD"
+          ],
+          "nm": "FK_PTL_COL_OVDU_ADCHG_L_03"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "ADCHG_IMPS_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개(2010~2027) + DEFAULT 1개, 파티션 키 = PK 끝 칼럼",
+        "dflt": true
+      },
+      "denorm": [
+        {
+          "col": "RFLT_BILL_YM",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "PAY 청구기본 PK(청구번호+청구년월, 연 파티션)를 완성하는 FK 칼럼 — 반영 청구서 조회 프루닝(05 COL 물리 관문 R1). 반영 전 NULL"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_COL_DUN_L",
+      "entId": "COL-004",
+      "moduleCd": null,
+      "def": "미납 채권에 대한 독촉 발송 1건(문자·우편·전화·알림톡). 경과일별 독촉정책에 따라 단계를 진행",
+      "estRows": 50000000,
+      "cols": [
+        {
+          "colNm": "DUN_NO",
+          "attrNm": "독촉번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "독촉번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_SNDNG_DTM",
+          "attrNm": "독촉발송일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "독촉발송일시",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_PLCY_NO",
+          "attrNm": "독촉정책번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "독촉정책번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_TTL_NM",
+          "attrNm": "독촉제목명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "독촉제목명",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_SNDNG_STTS_TY_CD",
+          "attrNm": "독촉발송상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "독촉발송상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_MDM_TY_CD",
+          "attrNm": "독촉매체유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "독촉매체유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_TRGT_AMT",
+          "attrNm": "독촉대상금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "독촉대상금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RCPTN_TELNO_ENCPT_VL",
+          "attrNm": "수신전화번호암호화값",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "수신전화번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_CN",
+          "attrNm": "독촉내용",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "독촉내용",
+          "dflt": null
+        },
+        {
+          "colNm": "SNDNG_RSLT_RCPTN_DTM",
+          "attrNm": "발송결과수신일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "발송결과수신일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_DUN_L",
+        "cols": [
+          "DUN_NO",
+          "DUN_SNDNG_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_DUN_L_01",
+          "cols": [
+            "UNPD_NO",
+            "DUN_SNDNG_DTM"
+          ],
+          "unq": false,
+          "why": "미납별 독촉 이력 조회(FK 조인·최근순)"
+        },
+        {
+          "nm": "X_PTL_COL_DUN_L_02",
+          "cols": [
+            "DUN_SNDNG_DTM"
+          ],
+          "unq": false,
+          "where": "dun_sndng_stts_ty_cd = '01'",
+          "why": "발송대기 독촉만 부분 인덱스 — 발송 배치 큐(상태 대부분 발송 완료 S3)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_DUN_L_01"
+        },
+        {
+          "cols": [
+            "DUN_PLCY_NO"
+          ],
+          "refTbl": "PTL_COL_DUN_PLCY_M",
+          "refCols": [
+            "DUN_PLCY_NO"
+          ],
+          "nm": "FK_PTL_COL_DUN_L_02"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "DUN_SNDNG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개(2010~2027) + DEFAULT 1개, 파티션 키 = PK 끝 칼럼",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_SUSP_M",
+      "entId": "COL-005",
+      "moduleCd": null,
+      "def": "미납으로 인한 회선 이용정지 1건(발신정지→착발신정지 단계, 수납 시 해제). 처리 행위는 COL, 결과 회선 상태는 ORD 회선상태이력에 기록",
+      "estRows": 6000000,
+      "cols": [
+        {
+          "colNm": "SUSP_NO",
+          "attrNm": "이용정지번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "이용정지번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "attrNm": "서비스관리번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_NM",
+          "attrNm": "이용정지명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "이용정지명",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_DTM",
+          "attrNm": "이용정지일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "이용정지일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_STTS_TY_CD",
+          "attrNm": "이용정지상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "이용정지상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_STEP_TY_CD",
+          "attrNm": "이용정지단계유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "이용정지단계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_PRNTC_DTM",
+          "attrNm": "이용정지예고일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "이용정지예고일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_STD_UNPD_AMT",
+          "attrNm": "이용정지기준미납금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "이용정지기준미납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_STD_ELPS_DCNT",
+          "attrNm": "이용정지기준경과일수",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "이용정지기준경과일수",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_RLS_DTM",
+          "attrNm": "이용정지해제일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "이용정지해제일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_RLS_RSN_TY_CD",
+          "attrNm": "이용정지해제사유유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "이용정지해제사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_STTS_RFLT_YN",
+          "attrNm": "회선상태반영여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "회선상태반영여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_SUSP_M",
+        "cols": [
+          "SUSP_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_SUSP_M_01",
+          "cols": [
+            "SVC_MGMT_NO",
+            "SUSP_DTM"
+          ],
+          "unq": false,
+          "why": "회선(서비스관리번호)별 미납 정지 조회 — 상담·회선상태 반영(FK 조인)"
+        },
+        {
+          "nm": "X_PTL_COL_SUSP_M_02",
+          "cols": [
+            "UNPD_NO"
+          ],
+          "unq": false,
+          "why": "미납→이용정지 조인(FK)"
+        },
+        {
+          "nm": "X_PTL_COL_SUSP_M_03",
+          "cols": [
+            "SUSP_STTS_TY_CD",
+            "SUSP_DTM"
+          ],
+          "unq": false,
+          "where": "susp_stts_ty_cd IN ('01','02')",
+          "why": "예고·정지 중인 건만 부분 인덱스 — 해제·직권해지 전환 배치"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "nm": "FK_PTL_COL_SUSP_M_01"
+        },
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_SUSP_M_02"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_EXOFTRMN_M",
+      "entId": "COL-006",
+      "moduleCd": null,
+      "def": "미납 이용정지가 일정 기간 지속된 가입계약을 사업자가 직권으로 해지하는 처리 1건(사전 예고 → 확정 또는 철회). 확정 시 ORD 가입계약 종료",
+      "estRows": 1500000,
+      "cols": [
+        {
+          "colNm": "EXOFTRMN_NO",
+          "attrNm": "직권해지번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "직권해지번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_CTRT_NO",
+          "attrNm": "가입계약번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "가입계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_NO",
+          "attrNm": "이용정지번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "이용정지번호",
+          "dflt": null
+        },
+        {
+          "colNm": "EXOFTRMN_NM",
+          "attrNm": "직권해지명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "직권해지명",
+          "dflt": null
+        },
+        {
+          "colNm": "EXOFTRMN_DTM",
+          "attrNm": "직권해지일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "직권해지일시",
+          "dflt": null
+        },
+        {
+          "colNm": "EXOFTRMN_STTS_TY_CD",
+          "attrNm": "직권해지상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "직권해지상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EXOFTRMN_RSN_TY_CD",
+          "attrNm": "직권해지사유유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "직권해지사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EXOFTRMN_PRNTC_DTM",
+          "attrNm": "직권해지예고일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "직권해지예고일시",
+          "dflt": null
+        },
+        {
+          "colNm": "EXOFTRMN_SCHD_DT",
+          "attrNm": "직권해지예정일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "직권해지예정일자",
+          "dflt": null
+        },
+        {
+          "colNm": "TRMN_STD_UNPD_AMT",
+          "attrNm": "해지기준미납금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "해지기준미납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "EXOFTRMN_WTHDR_DTM",
+          "attrNm": "직권해지철회일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "직권해지철회일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_EXOFTRMN_M",
+        "cols": [
+          "EXOFTRMN_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_EXOFTRMN_M_01",
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "가입계약별 직권해지 조회(FK 조인)"
+        },
+        {
+          "nm": "X_PTL_COL_EXOFTRMN_M_02",
+          "cols": [
+            "UNPD_NO"
+          ],
+          "unq": false,
+          "why": "미납→직권해지 조인(FK)"
+        },
+        {
+          "nm": "X_PTL_COL_EXOFTRMN_M_03",
+          "cols": [
+            "SUSP_NO"
+          ],
+          "unq": false,
+          "where": "susp_no IS NOT NULL",
+          "why": "이용정지→직권해지 조인(FK, 선택)"
+        },
+        {
+          "nm": "X_PTL_COL_EXOFTRMN_M_04",
+          "cols": [
+            "EXOFTRMN_SCHD_DT"
+          ],
+          "unq": false,
+          "where": "exoftrmn_stts_ty_cd IN ('01','02')",
+          "why": "예고·예정 건의 해지 예정일 도래 배치(부분 인덱스)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "SBSC_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_CTRT_M",
+          "refCols": [
+            "SBSC_CTRT_NO"
+          ],
+          "nm": "FK_PTL_COL_EXOFTRMN_M_01"
+        },
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_EXOFTRMN_M_02"
+        },
+        {
+          "cols": [
+            "SUSP_NO"
+          ],
+          "refTbl": "PTL_COL_SUSP_M",
+          "refCols": [
+            "SUSP_NO"
+          ],
+          "nm": "FK_PTL_COL_EXOFTRMN_M_03"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_RCVB_TRNSF_M",
+      "entId": "COL-007",
+      "moduleCd": null,
+      "def": "해지 고객의 미납 채권을 채권관리 단계로 이관(내부 관리·외부 추심 위임·매각 대상)하는 묶음 1건. 고객 단위로 여러 미납을 묶는다",
+      "estRows": 1000000,
+      "cols": [
+        {
+          "colNm": "RCVB_TRNSF_NO",
+          "attrNm": "채권이관번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "채권이관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "attrNm": "고객번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_DSPSL_NO",
+          "attrNm": "채권매각번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "채권매각번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_TRNSF_NM",
+          "attrNm": "채권이관명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "채권이관명",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_TRNSF_DTM",
+          "attrNm": "채권이관일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "채권이관일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_TRNSF_STTS_TY_CD",
+          "attrNm": "채권이관상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "채권이관상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_TRNSF_TY_CD",
+          "attrNm": "채권이관유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "채권이관유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRNSF_RCVB_AMT",
+          "attrNm": "이관채권금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "이관채권금액",
+          "dflt": null
+        },
+        {
+          "colNm": "TRNSF_RCVB_NOCS",
+          "attrNm": "이관채권건수",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "이관채권건수",
+          "dflt": null
+        },
+        {
+          "colNm": "RTRVL_END_DT",
+          "attrNm": "회수종료일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "회수종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_RCVB_TRNSF_M",
+        "cols": [
+          "RCVB_TRNSF_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_RCVB_TRNSF_M_01",
+          "cols": [
+            "CUST_NO"
+          ],
+          "unq": false,
+          "why": "고객번호별 이관 채권 조회(FK 조인)"
+        },
+        {
+          "nm": "X_PTL_COL_RCVB_TRNSF_M_02",
+          "cols": [
+            "RCVB_DSPSL_NO"
+          ],
+          "unq": false,
+          "where": "rcvb_dspsl_no IS NOT NULL",
+          "why": "채권매각→이관 묶음 조인(FK, 대부분 NULL)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "CUST_NO"
+          ],
+          "refTbl": "PTL_CUS_CUST_M",
+          "refCols": [
+            "CUST_NO"
+          ],
+          "nm": "FK_PTL_COL_RCVB_TRNSF_M_01"
+        },
+        {
+          "cols": [
+            "RCVB_DSPSL_NO"
+          ],
+          "refTbl": "PTL_COL_RCVB_DSPSL_L",
+          "refCols": [
+            "RCVB_DSPSL_NO"
+          ],
+          "nm": "FK_PTL_COL_RCVB_TRNSF_M_02"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_DIV_PAY_AGRMT_M",
+      "entId": "COL-008",
+      "moduleCd": null,
+      "def": "청구계정의 누적 미납액을 여러 회차로 나눠 내기로 한 약정 1건(약정 시 이용정지 해제 조건 부여 가능). 회차별 계획·실적은 분할납부회차상세",
+      "estRows": 2000000,
+      "cols": [
+        {
+          "colNm": "DIV_PAY_AGRMT_NO",
+          "attrNm": "분할납부약정번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "분할납부약정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "attrNm": "청구계정번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DIV_PAY_AGRMT_NM",
+          "attrNm": "분할납부약정명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "분할납부약정명",
+          "dflt": null
+        },
+        {
+          "colNm": "DIV_PAY_AGRMT_DTM",
+          "attrNm": "분할납부약정일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "분할납부약정일시",
+          "dflt": null
+        },
+        {
+          "colNm": "DIV_PAY_AGRMT_STTS_TY_CD",
+          "attrNm": "분할납부약정상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "분할납부약정상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_TRGT_AMT",
+          "attrNm": "약정대상금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "약정대상금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DIV_TMS_CNT",
+          "attrNm": "분할회차수",
+          "dataTp": "NUMERIC(3)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "분할회차수",
+          "dflt": null
+        },
+        {
+          "colNm": "FRST_PAY_SCHD_DT",
+          "attrNm": "최초납부예정일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "최초납부예정일자",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_RLS_CND_YN",
+          "attrNm": "이용정지해제조건여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "이용정지해제조건여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_DIV_PAY_AGRMT_M",
+        "cols": [
+          "DIV_PAY_AGRMT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_DIV_PAY_AGRMT_M_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "unq": false,
+          "why": "청구계정별 분할납부 약정 조회(FK 조인)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ],
+          "nm": "FK_PTL_COL_DIV_PAY_AGRMT_M_01"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_BDDT_M",
+      "entId": "COL-009",
+      "moduleCd": null,
+      "def": "회수 불능으로 판정해 대손 상각을 확정한 미납 채권 1건(소멸시효 완성·파산·행방불명·회수비용 초과·매각). 법인세법 대손금 요건 판정과 대손 후 회수를 추적",
+      "estRows": 4000000,
+      "cols": [
+        {
+          "colNm": "BDDT_NO",
+          "attrNm": "대손번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "대손번호",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_TRNSF_NO",
+          "attrNm": "채권이관번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "채권이관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_NM",
+          "attrNm": "대손명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "대손명",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_DPRC_DTM",
+          "attrNm": "대손상각일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "대손상각일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_STTS_TY_CD",
+          "attrNm": "대손상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "대손상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_RSN_TY_CD",
+          "attrNm": "대손사유유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "대손사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_CFMTN_DT",
+          "attrNm": "대손확정일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "대손확정일자",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_AMT",
+          "attrNm": "대손금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "대손금액",
+          "dflt": null
+        },
+        {
+          "colNm": "TXAF_LSEXP_RCGTN_YN",
+          "attrNm": "세무손금인정여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "세무손금인정여부",
+          "dflt": null
+        },
+        {
+          "colNm": "ACNTG_SLIP_NO",
+          "attrNm": "회계전표번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "회계전표번호",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_BDDT_M",
+        "cols": [
+          "BDDT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_BDDT_M_01",
+          "cols": [
+            "UNPD_NO"
+          ],
+          "unq": false,
+          "why": "미납→대손 조인(FK)"
+        },
+        {
+          "nm": "X_PTL_COL_BDDT_M_02",
+          "cols": [
+            "RCVB_TRNSF_NO"
+          ],
+          "unq": false,
+          "where": "rcvb_trnsf_no IS NOT NULL",
+          "why": "이관 묶음→대손 조인(FK, 선택)"
+        },
+        {
+          "nm": "X_PTL_COL_BDDT_M_03",
+          "cols": [
+            "BDDT_CFMTN_DT"
+          ],
+          "unq": false,
+          "why": "회계 월 마감·세무 대손금 집계(확정일자 범위 조회)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_BDDT_M_01"
+        },
+        {
+          "cols": [
+            "RCVB_TRNSF_NO"
+          ],
+          "refTbl": "PTL_COL_RCVB_TRNSF_M",
+          "refCols": [
+            "RCVB_TRNSF_NO"
+          ],
+          "nm": "FK_PTL_COL_BDDT_M_02"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_UNPD_STTS_H",
+      "entId": "COL-010",
+      "moduleCd": null,
+      "def": "미납 채권 상태(미납→독촉→정지→해지→이관→대손·완납) 변경 1건. 유효시작·종료일시 쌍으로 레이크 SCD2 에 바로 쓰는 이력",
+      "estRows": 70000000,
+      "cols": [
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "STTS_CHG_SEQ",
+          "attrNm": "상태변경순번",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "상태변경순번",
+          "dflt": null
+        },
+        {
+          "colNm": "STTS_CHG_DTM",
+          "attrNm": "상태변경일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "상태변경일시",
+          "dflt": null
+        },
+        {
+          "colNm": "STTS_CHG_RSN_NM",
+          "attrNm": "상태변경사유명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "상태변경사유명",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_STTS_TY_CD",
+          "attrNm": "미납상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "미납상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_UNPD_STTS_TY_CD",
+          "attrNm": "이전미납상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "이전미납상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "attrNm": "유효시작일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "attrNm": "유효종료일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CHG_PNT_UNPD_RMND_AMT",
+          "attrNm": "변경시점미납잔여금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "변경시점미납잔여금액",
+          "dflt": null
+        },
+        {
+          "colNm": "CAUS_TASK_TY_CD",
+          "attrNm": "원인업무유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "원인업무유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CAUS_TASK_NO",
+          "attrNm": "원인업무번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "원인업무번호",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_UNPD_STTS_H",
+        "cols": [
+          "UNPD_NO",
+          "STTS_CHG_SEQ",
+          "STTS_CHG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_UNPD_STTS_H_01"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "STTS_CHG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개(2010~2027) + DEFAULT 1개, 파티션 키 = PK 끝 칼럼",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_OVDU_ADCHG_STD_C",
+      "entId": "COL-011",
+      "moduleCd": null,
+      "def": "연체가산금 부과 기준(가산금율·상한율·감면 기준). 이용약관 개정 시 새 기준유형코드로 등록",
+      "estRows": 20,
+      "cols": [
+        {
+          "colNm": "OVDU_ADCHG_STD_TY_CD",
+          "attrNm": "연체가산금기준유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "연체가산금기준유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "OVDU_ADCHG_STD_NM",
+          "attrNm": "연체가산금기준명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "연체가산금기준명",
+          "dflt": null
+        },
+        {
+          "colNm": "STD_ADCHG_RT",
+          "attrNm": "기준가산금율",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "기준가산금율",
+          "dflt": null
+        },
+        {
+          "colNm": "ADCHG_UPLMT_RT",
+          "attrNm": "가산금상한율",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "가산금상한율",
+          "dflt": null
+        },
+        {
+          "colNm": "ADCHG_RDCT_STD_AMT",
+          "attrNm": "가산금감면기준금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "가산금감면기준금액",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "attrNm": "적용시작일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "attrNm": "적용종료일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_YN",
+          "attrNm": "사용여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "사용여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_OVDU_ADCHG_STD_C",
+        "cols": [
+          "OVDU_ADCHG_STD_TY_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_DUN_PLCY_M",
+      "entId": "COL-012",
+      "moduleCd": null,
+      "def": "납기 경과일·고객유형별 독촉 단계 정책(몇 일 경과 시 어떤 단계·매체로 독촉)",
+      "estRows": 2000,
+      "cols": [
+        {
+          "colNm": "DUN_PLCY_NO",
+          "attrNm": "독촉정책번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "독촉정책번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_PLCY_NM",
+          "attrNm": "독촉정책명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "독촉정책명",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_STEP_TY_CD",
+          "attrNm": "독촉단계유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "독촉단계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_TY_CD",
+          "attrNm": "고객유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "고객유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_STD_ELPS_DCNT",
+          "attrNm": "독촉기준경과일수",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "독촉기준경과일수",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_STD_UNPD_AMT",
+          "attrNm": "독촉기준미납금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "독촉기준미납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_MDM_TY_CD",
+          "attrNm": "독촉매체유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "독촉매체유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "attrNm": "적용시작일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "attrNm": "적용종료일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_YN",
+          "attrNm": "사용여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "사용여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_DUN_PLCY_M",
+        "cols": [
+          "DUN_PLCY_NO"
+        ]
+      },
+      "idx": [],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_DUN_SNDNG_RSLT_L",
+      "entId": "COL-013",
+      "moduleCd": null,
+      "def": "독촉 1건의 발송 시도별 결과(성공·실패·반송·재발송)",
+      "estRows": 55000000,
+      "cols": [
+        {
+          "colNm": "DUN_NO",
+          "attrNm": "독촉번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "독촉번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_SNDNG_DTM",
+          "attrNm": "독촉발송일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "독촉발송일시",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "SNDNG_RSLT_SEQ",
+          "attrNm": "발송결과순번",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "발송결과순번",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_MDM_TY_CD",
+          "attrNm": "독촉매체유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "독촉매체유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SNDNG_RSLT_TY_CD",
+          "attrNm": "발송결과유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "발송결과유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SNDNG_RSLT_RCPTN_DTM",
+          "attrNm": "발송결과수신일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "발송결과수신일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SNDNG_ERR_CN",
+          "attrNm": "발송오류내용",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "발송오류내용",
+          "dflt": null
+        },
+        {
+          "colNm": "RE_SNDNG_YN",
+          "attrNm": "재발송여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "재발송여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_DUN_SNDNG_RSLT_L",
+        "cols": [
+          "DUN_NO",
+          "SNDNG_RSLT_SEQ",
+          "DUN_SNDNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "cols": [
+            "DUN_NO",
+            "DUN_SNDNG_DTM"
+          ],
+          "refTbl": "PTL_COL_DUN_L",
+          "refCols": [
+            "DUN_NO",
+            "DUN_SNDNG_DTM"
+          ],
+          "nm": "FK_PTL_COL_DUN_SNDNG_RSLT_L_01"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "DUN_SNDNG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개(2010~2027) + DEFAULT 1개, 파티션 키 = PK 끝 칼럼",
+        "dflt": true
+      },
+      "denorm": [
+        {
+          "col": "DUN_SNDNG_DTM",
+          "srcTbl": "PTL_COL_DUN_L",
+          "why": "부모 독촉내역 PK(독촉번호+독촉발송일시, 파티션 키 포함)를 완성하는 FK 칼럼이자 이 테이블의 파티션 키 — 부모와 같은 연 파티션끼리 조인(partition-wise join)"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_COL_SUSP_H",
+      "entId": "COL-014",
+      "moduleCd": null,
+      "def": "이용정지 1건의 단계·상태 변경 이력(발신정지→착발신정지 등)",
+      "estRows": 15000000,
+      "cols": [
+        {
+          "colNm": "SUSP_NO",
+          "attrNm": "이용정지번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "이용정지번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_HIST_SEQ",
+          "attrNm": "이용정지이력순번",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "이용정지이력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_STTS_TY_CD",
+          "attrNm": "이용정지상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "이용정지상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_STEP_TY_CD",
+          "attrNm": "이용정지단계유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "이용정지단계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_SUSP_STEP_TY_CD",
+          "attrNm": "이전이용정지단계유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "이전이용정지단계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "STTS_CHG_RSN_NM",
+          "attrNm": "상태변경사유명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "상태변경사유명",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "attrNm": "유효시작일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "attrNm": "유효종료일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "유효종료일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_SUSP_H",
+        "cols": [
+          "SUSP_NO",
+          "SUSP_HIST_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "cols": [
+            "SUSP_NO"
+          ],
+          "refTbl": "PTL_COL_SUSP_M",
+          "refCols": [
+            "SUSP_NO"
+          ],
+          "nm": "FK_PTL_COL_SUSP_H_01"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_SUSP_RLS_L",
+      "entId": "COL-015",
+      "moduleCd": null,
+      "def": "이용정지 해제 처리 1건(수납·분할납부 약정·납부 약속에 따른 해제, 단계 완화 부분 해제 포함, 망 반영 결과)",
+      "estRows": 5000000,
+      "cols": [
+        {
+          "colNm": "SUSP_RLS_NO",
+          "attrNm": "이용정지해제번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "이용정지해제번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_NO",
+          "attrNm": "이용정지번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "이용정지번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "attrNm": "수납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_DT",
+          "attrNm": "수납일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납일자",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "DIV_PAY_AGRMT_NO",
+          "attrNm": "분할납부약정번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "분할납부약정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_PRMS_NO",
+          "attrNm": "납부약속번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "납부약속번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_RLS_DTM",
+          "attrNm": "이용정지해제일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "이용정지해제일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_RLS_RSN_TY_CD",
+          "attrNm": "이용정지해제사유유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "이용정지해제사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RLS_REQ_DTM",
+          "attrNm": "해제요청일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "해제요청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_STTS_RFLT_YN",
+          "attrNm": "회선상태반영여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "회선상태반영여부",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_RSLT_TY_CD",
+          "attrNm": "처리결과유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "처리결과유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_SUSP_RLS_L",
+        "cols": [
+          "SUSP_RLS_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_SUSP_RLS_L_01",
+          "cols": [
+            "SUSP_NO"
+          ],
+          "unq": false,
+          "why": "이용정지→해제 처리 조인(FK)"
+        },
+        {
+          "nm": "X_PTL_COL_SUSP_RLS_L_02",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "where": "rcv_no IS NOT NULL",
+          "why": "수납→정지 해제 역추적(FK, 선택)"
+        },
+        {
+          "nm": "X_PTL_COL_SUSP_RLS_L_03",
+          "cols": [
+            "DIV_PAY_AGRMT_NO"
+          ],
+          "unq": false,
+          "where": "div_pay_agrmt_no IS NOT NULL",
+          "why": "분할납부약정→해제 조인(FK, 선택)"
+        },
+        {
+          "nm": "X_PTL_COL_SUSP_RLS_L_04",
+          "cols": [
+            "PAY_PRMS_NO"
+          ],
+          "unq": false,
+          "where": "pay_prms_no IS NOT NULL",
+          "why": "납부약속→해제 조인(FK, 선택)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "SUSP_NO"
+          ],
+          "refTbl": "PTL_COL_SUSP_M",
+          "refCols": [
+            "SUSP_NO"
+          ],
+          "nm": "FK_PTL_COL_SUSP_RLS_L_01"
+        },
+        {
+          "cols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "nm": "FK_PTL_COL_SUSP_RLS_L_02"
+        },
+        {
+          "cols": [
+            "DIV_PAY_AGRMT_NO"
+          ],
+          "refTbl": "PTL_COL_DIV_PAY_AGRMT_M",
+          "refCols": [
+            "DIV_PAY_AGRMT_NO"
+          ],
+          "nm": "FK_PTL_COL_SUSP_RLS_L_03"
+        },
+        {
+          "cols": [
+            "PAY_PRMS_NO"
+          ],
+          "refTbl": "PTL_COL_PAY_PRMS_L",
+          "refCols": [
+            "PAY_PRMS_NO"
+          ],
+          "nm": "FK_PTL_COL_SUSP_RLS_L_04"
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "RCV_DT",
+          "srcTbl": "PTL_INV_RCV_M",
+          "why": "INV 수납기본 PK(수납번호+수납일자, 수납일자 월 파티션 217개)를 완성하는 FK 칼럼 — 없으면 수납번호 조회가 전 파티션 인덱스를 훑음(05 COL 물리 관문 R1). 수납 반영 시 수납번호와 함께 기록, 미반영 NULL"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_COL_EXOFTRMN_PRNTC_L",
+      "entId": "COL-016",
+      "moduleCd": null,
+      "def": "직권해지 사전 통지 발송 1건(전기통신사업법 사전 통지 — 우편·문자 복수 발송)",
+      "estRows": 3000000,
+      "cols": [
+        {
+          "colNm": "EXOFTRMN_NO",
+          "attrNm": "직권해지번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "직권해지번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PRNTC_SEQ",
+          "attrNm": "예고순번",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "예고순번",
+          "dflt": null
+        },
+        {
+          "colNm": "EXOFTRMN_PRNTC_DTM",
+          "attrNm": "직권해지예고일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "직권해지예고일시",
+          "dflt": null
+        },
+        {
+          "colNm": "DUN_MDM_TY_CD",
+          "attrNm": "독촉매체유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "독촉매체유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRNTC_SNDNG_STTS_TY_CD",
+          "attrNm": "예고발송상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "예고발송상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCPTN_TELNO_ENCPT_VL",
+          "attrNm": "수신전화번호암호화값",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수신전화번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "PRNTC_CN",
+          "attrNm": "예고내용",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "예고내용",
+          "dflt": null
+        },
+        {
+          "colNm": "SNDNG_RSLT_RCPTN_DTM",
+          "attrNm": "발송결과수신일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "발송결과수신일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_EXOFTRMN_PRNTC_L",
+        "cols": [
+          "EXOFTRMN_NO",
+          "PRNTC_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "cols": [
+            "EXOFTRMN_NO"
+          ],
+          "refTbl": "PTL_COL_EXOFTRMN_M",
+          "refCols": [
+            "EXOFTRMN_NO"
+          ],
+          "nm": "FK_PTL_COL_EXOFTRMN_PRNTC_L_01"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_RCVB_COLL_CO_M",
+      "entId": "COL-017",
+      "moduleCd": null,
+      "def": "미납 채권 추심을 위임받거나 채권을 매입하는 외부 기관(신용정보회사·자산관리회사)",
+      "estRows": 200,
+      "cols": [
+        {
+          "colNm": "RCVB_COLL_CO_NO",
+          "attrNm": "채권추심사번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "채권추심사번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_COLL_CO_NM",
+          "attrNm": "채권추심사명",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "채권추심사명",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_COLL_CO_TY_CD",
+          "attrNm": "채권추심사유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "채권추심사유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_COLL_CO_STTS_TY_CD",
+          "attrNm": "채권추심사상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "채권추심사상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BRNO",
+          "attrNm": "사업자등록번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "사업자등록번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_TELNO",
+          "attrNm": "대표전화번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "대표전화번호",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_FEE_RT",
+          "attrNm": "추심수수료율",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "추심수수료율",
+          "dflt": null
+        },
+        {
+          "colNm": "CTRT_BGNG_DT",
+          "attrNm": "계약시작일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "계약시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "CTRT_END_DT",
+          "attrNm": "계약종료일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "계약종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_RCVB_COLL_CO_M",
+        "cols": [
+          "RCVB_COLL_CO_NO"
+        ]
+      },
+      "idx": [],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_COLL_DLGT_D",
+      "entId": "COL-018",
+      "moduleCd": null,
+      "def": "채권이관 묶음을 추심사에 위임한 1건(재위임 시 순번 증가) — 채권이관기본 × 채권추심사기본 N:M 해소",
+      "estRows": 1500000,
+      "cols": [
+        {
+          "colNm": "RCVB_TRNSF_NO",
+          "attrNm": "채권이관번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "채권이관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_DLGT_SEQ",
+          "attrNm": "추심위임순번",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "추심위임순번",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_COLL_CO_NO",
+          "attrNm": "채권추심사번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "채권추심사번호",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_DLGT_DT",
+          "attrNm": "추심위임일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "추심위임일자",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_DLGT_END_DT",
+          "attrNm": "추심위임종료일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "추심위임종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "DLGT_RCVB_AMT",
+          "attrNm": "위임채권금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "위임채권금액",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_COLL_FEE_RT",
+          "attrNm": "적용추심수수료율",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "적용추심수수료율",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_DLGT_STTS_TY_CD",
+          "attrNm": "추심위임상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "추심위임상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_COLL_DLGT_D",
+        "cols": [
+          "RCVB_TRNSF_NO",
+          "COLL_DLGT_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_COLL_DLGT_D_01",
+          "cols": [
+            "RCVB_COLL_CO_NO",
+            "COLL_DLGT_DT"
+          ],
+          "unq": false,
+          "why": "추심사별 위임 현황·기간 조회(FK 조인)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "RCVB_TRNSF_NO"
+          ],
+          "refTbl": "PTL_COL_RCVB_TRNSF_M",
+          "refCols": [
+            "RCVB_TRNSF_NO"
+          ],
+          "nm": "FK_PTL_COL_COLL_DLGT_D_01"
+        },
+        {
+          "cols": [
+            "RCVB_COLL_CO_NO"
+          ],
+          "refTbl": "PTL_COL_RCVB_COLL_CO_M",
+          "refCols": [
+            "RCVB_COLL_CO_NO"
+          ],
+          "nm": "FK_PTL_COL_COLL_DLGT_D_02"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_COLL_RTRVL_L",
+      "entId": "COL-019",
+      "moduleCd": null,
+      "def": "추심사가 회수한 금액 1건(어떤 위임으로 어떤 미납을 회수했는지, 수납 처리 연결)",
+      "estRows": 3000000,
+      "cols": [
+        {
+          "colNm": "COLL_RTRVL_NO",
+          "attrNm": "추심회수번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "추심회수번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_TRNSF_NO",
+          "attrNm": "채권이관번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "채권이관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_DLGT_SEQ",
+          "attrNm": "추심위임순번",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "추심위임순번",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "attrNm": "수납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_DT",
+          "attrNm": "수납일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수납일자",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "COLL_FEE_NO",
+          "attrNm": "추심수수료번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "추심수수료번호",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_RTRVL_DTM",
+          "attrNm": "추심회수일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "추심회수일시",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_RTRVL_AMT",
+          "attrNm": "추심회수금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "추심회수금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RTRVL_MTHD_TY_CD",
+          "attrNm": "회수방법유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "회수방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_RTRVL_STTS_TY_CD",
+          "attrNm": "추심회수상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "추심회수상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_COLL_RTRVL_L",
+        "cols": [
+          "COLL_RTRVL_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_COLL_RTRVL_L_01",
+          "cols": [
+            "RCVB_TRNSF_NO",
+            "COLL_DLGT_SEQ"
+          ],
+          "unq": false,
+          "why": "추심위임→회수 조인(FK)"
+        },
+        {
+          "nm": "X_PTL_COL_COLL_RTRVL_L_02",
+          "cols": [
+            "UNPD_NO"
+          ],
+          "unq": false,
+          "why": "미납별 추심 회수 조회(FK)"
+        },
+        {
+          "nm": "X_PTL_COL_COLL_RTRVL_L_03",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "where": "rcv_no IS NOT NULL",
+          "why": "수납→추심회수 역추적(FK, 선택)"
+        },
+        {
+          "nm": "X_PTL_COL_COLL_RTRVL_L_04",
+          "cols": [
+            "COLL_FEE_NO"
+          ],
+          "unq": false,
+          "where": "coll_fee_no IS NOT NULL",
+          "why": "추심수수료→대상 회수 조인(FK, 정산 전 NULL)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "RCVB_TRNSF_NO",
+            "COLL_DLGT_SEQ"
+          ],
+          "refTbl": "PTL_COL_COLL_DLGT_D",
+          "refCols": [
+            "RCVB_TRNSF_NO",
+            "COLL_DLGT_SEQ"
+          ],
+          "nm": "FK_PTL_COL_COLL_RTRVL_L_01"
+        },
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_COLL_RTRVL_L_02"
+        },
+        {
+          "cols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "nm": "FK_PTL_COL_COLL_RTRVL_L_03"
+        },
+        {
+          "cols": [
+            "COLL_FEE_NO"
+          ],
+          "refTbl": "PTL_COL_COLL_FEE_L",
+          "refCols": [
+            "COLL_FEE_NO"
+          ],
+          "nm": "FK_PTL_COL_COLL_RTRVL_L_04"
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "RCV_DT",
+          "srcTbl": "PTL_INV_RCV_M",
+          "why": "INV 수납기본 PK(수납번호+수납일자, 수납일자 월 파티션 217개)를 완성하는 FK 칼럼 — 없으면 수납번호 조회가 전 파티션 인덱스를 훑음(05 COL 물리 관문 R1). 수납 반영 시 수납번호와 함께 기록, 미반영 NULL"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_COL_COLL_FEE_L",
+      "entId": "COL-020",
+      "moduleCd": "STL",
+      "def": "[STL] 추심사별 월 회수 수수료 정산 1건 — 회수액 × 수수료율, PRM 정산·세금계산서로 지급",
+      "estRows": 12000,
+      "cols": [
+        {
+          "colNm": "COLL_FEE_NO",
+          "attrNm": "추심수수료번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "추심수수료번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_COLL_CO_NO",
+          "attrNm": "채권추심사번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "채권추심사번호",
+          "dflt": null
+        },
+        {
+          "colNm": "STLM_NO",
+          "attrNm": "정산번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "정산번호",
+          "dflt": null
+        },
+        {
+          "colNm": "STLM_YM",
+          "attrNm": "정산년월",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "정산년월",
+          "dflt": null
+        },
+        {
+          "colNm": "FEE_TRGT_AMT",
+          "attrNm": "수수료대상금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수수료대상금액",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_FEE_AMT",
+          "attrNm": "추심수수료금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "추심수수료금액",
+          "dflt": null
+        },
+        {
+          "colNm": "TXAMT",
+          "attrNm": "세액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "세액",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_FEE_STTS_TY_CD",
+          "attrNm": "추심수수료상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "추심수수료상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "COLL_FEE_CFMTN_DTM",
+          "attrNm": "추심수수료확정일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "추심수수료확정일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_COLL_FEE_L",
+        "cols": [
+          "COLL_FEE_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_COLL_FEE_L_01",
+          "cols": [
+            "RCVB_COLL_CO_NO",
+            "STLM_YM"
+          ],
+          "unq": true,
+          "why": "추심사×정산년월 1건 — 중복 정산 방지·월 정산 조회(FK 조인)"
+        },
+        {
+          "nm": "X_PTL_COL_COLL_FEE_L_02",
+          "cols": [
+            "STLM_NO"
+          ],
+          "unq": false,
+          "where": "stlm_no IS NOT NULL",
+          "why": "PRM 정산기본→추심수수료 조인(FK, 선택)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "RCVB_COLL_CO_NO"
+          ],
+          "refTbl": "PTL_COL_RCVB_COLL_CO_M",
+          "refCols": [
+            "RCVB_COLL_CO_NO"
+          ],
+          "nm": "FK_PTL_COL_COLL_FEE_L_01"
+        },
+        {
+          "cols": [
+            "STLM_NO"
+          ],
+          "refTbl": "PTL_PRM_STLM_M",
+          "refCols": [
+            "STLM_NO"
+          ],
+          "nm": "FK_PTL_COL_COLL_FEE_L_02"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_DIV_PAY_TMS_D",
+      "entId": "COL-021",
+      "moduleCd": null,
+      "def": "분할납부 약정의 회차별 납부 계획·실적",
+      "estRows": 12000000,
+      "cols": [
+        {
+          "colNm": "DIV_PAY_AGRMT_NO",
+          "attrNm": "분할납부약정번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "분할납부약정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DIV_PAY_TMS",
+          "attrNm": "분할납부회차",
+          "dataTp": "NUMERIC(3)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "분할납부회차",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "attrNm": "수납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_DT",
+          "attrNm": "수납일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납일자",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "PAY_SCHD_DT",
+          "attrNm": "납부예정일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "납부예정일자",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_SCHD_AMT",
+          "attrNm": "납부예정금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "납부예정금액",
+          "dflt": null
+        },
+        {
+          "colNm": "TMS_PAY_AMT",
+          "attrNm": "회차납부금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "회차납부금액",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_CMPTN_DTM",
+          "attrNm": "납부완료일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "납부완료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "DIV_PAY_TMS_STTS_TY_CD",
+          "attrNm": "분할납부회차상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "분할납부회차상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_DIV_PAY_TMS_D",
+        "cols": [
+          "DIV_PAY_AGRMT_NO",
+          "DIV_PAY_TMS"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_DIV_PAY_TMS_D_01",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "where": "rcv_no IS NOT NULL",
+          "why": "수납→분할납부 회차 반영 조회(FK, 선택)"
+        },
+        {
+          "nm": "X_PTL_COL_DIV_PAY_TMS_D_02",
+          "cols": [
+            "PAY_SCHD_DT"
+          ],
+          "unq": false,
+          "where": "div_pay_tms_stts_ty_cd IN ('01','03')",
+          "why": "예정·일부납 회차의 납부예정일 도래 배치(부분 인덱스)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "DIV_PAY_AGRMT_NO"
+          ],
+          "refTbl": "PTL_COL_DIV_PAY_AGRMT_M",
+          "refCols": [
+            "DIV_PAY_AGRMT_NO"
+          ],
+          "nm": "FK_PTL_COL_DIV_PAY_TMS_D_01"
+        },
+        {
+          "cols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "nm": "FK_PTL_COL_DIV_PAY_TMS_D_02"
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "RCV_DT",
+          "srcTbl": "PTL_INV_RCV_M",
+          "why": "INV 수납기본 PK(수납번호+수납일자, 수납일자 월 파티션 217개)를 완성하는 FK 칼럼 — 없으면 수납번호 조회가 전 파티션 인덱스를 훑음(05 COL 물리 관문 R1). 수납 반영 시 수납번호와 함께 기록, 미반영 NULL"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_COL_PAY_PRMS_L",
+      "entId": "COL-022",
+      "moduleCd": null,
+      "def": "고객이 미납액을 특정일까지 내겠다고 한 약속 1건(약속 기간 동안 정지·독촉 유예)",
+      "estRows": 4000000,
+      "cols": [
+        {
+          "colNm": "PAY_PRMS_NO",
+          "attrNm": "납부약속번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "납부약속번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "attrNm": "청구계정번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "attrNm": "수납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_DT",
+          "attrNm": "수납일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수납일자",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "PAY_PRMS_DTM",
+          "attrNm": "납부약속일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "납부약속일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_PRMS_DT",
+          "attrNm": "납부약속일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "납부약속일자",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_PRMS_AMT",
+          "attrNm": "납부약속금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "납부약속금액",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_PRMS_STTS_TY_CD",
+          "attrNm": "납부약속상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "납부약속상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_DFRM_YN",
+          "attrNm": "이용정지유예여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "이용정지유예여부",
+          "dflt": null
+        },
+        {
+          "colNm": "PRMS_FLFL_DTM",
+          "attrNm": "약속이행일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "약속이행일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_PAY_PRMS_L",
+        "cols": [
+          "PAY_PRMS_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_PAY_PRMS_L_01",
+          "cols": [
+            "BILL_ACNT_NO",
+            "PAY_PRMS_DT"
+          ],
+          "unq": false,
+          "why": "청구계정별 납부약속 조회·약속일 도래 점검(FK 조인)"
+        },
+        {
+          "nm": "X_PTL_COL_PAY_PRMS_L_02",
+          "cols": [
+            "UNPD_NO"
+          ],
+          "unq": false,
+          "where": "unpd_no IS NOT NULL",
+          "why": "미납→납부약속 조인(FK, 선택)"
+        },
+        {
+          "nm": "X_PTL_COL_PAY_PRMS_L_03",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "where": "rcv_no IS NOT NULL",
+          "why": "수납→약속 이행 확인(FK, 선택)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ],
+          "nm": "FK_PTL_COL_PAY_PRMS_L_01"
+        },
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_PAY_PRMS_L_02"
+        },
+        {
+          "cols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "nm": "FK_PTL_COL_PAY_PRMS_L_03"
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "RCV_DT",
+          "srcTbl": "PTL_INV_RCV_M",
+          "why": "INV 수납기본 PK(수납번호+수납일자, 수납일자 월 파티션 217개)를 완성하는 FK 칼럼 — 없으면 수납번호 조회가 전 파티션 인덱스를 훑음(05 COL 물리 관문 R1). 수납 반영 시 수납번호와 함께 기록, 미반영 NULL"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_COL_CRINFO_REG_L",
+      "entId": "COL-023",
+      "moduleCd": null,
+      "def": "통신 채무 불이행 정보를 신용정보 집중기관에 등록한 1건(등록 전 사전 통지 포함)",
+      "estRows": 3000000,
+      "cols": [
+        {
+          "colNm": "CRINFO_REG_NO",
+          "attrNm": "신용정보등록번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "신용정보등록번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "attrNm": "고객번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CRINFO_REG_DTM",
+          "attrNm": "신용정보등록일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "신용정보등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CRINFO_REG_STTS_TY_CD",
+          "attrNm": "신용정보등록상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "신용정보등록상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CRINFO_INST_TY_CD",
+          "attrNm": "신용정보기관유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "신용정보기관유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CRINFO_REG_RSN_TY_CD",
+          "attrNm": "신용정보등록사유유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "신용정보등록사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CRINFO_REG_AMT",
+          "attrNm": "신용정보등록금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "신용정보등록금액",
+          "dflt": null
+        },
+        {
+          "colNm": "REG_PRNTC_DTM",
+          "attrNm": "등록예고일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "등록예고일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_CRINFO_REG_L",
+        "cols": [
+          "CRINFO_REG_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_CRINFO_REG_L_01",
+          "cols": [
+            "CUST_NO"
+          ],
+          "unq": false,
+          "why": "고객번호별 신용정보 등록 조회(FK 조인)"
+        },
+        {
+          "nm": "X_PTL_COL_CRINFO_REG_L_02",
+          "cols": [
+            "UNPD_NO"
+          ],
+          "unq": false,
+          "where": "unpd_no IS NOT NULL",
+          "why": "미납→신용정보 등록 조인(FK, 선택)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "CUST_NO"
+          ],
+          "refTbl": "PTL_CUS_CUST_M",
+          "refCols": [
+            "CUST_NO"
+          ],
+          "nm": "FK_PTL_COL_CRINFO_REG_L_01"
+        },
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_CRINFO_REG_L_02"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_CRINFO_RLS_L",
+      "entId": "COL-024",
+      "moduleCd": null,
+      "def": "신용정보 등록 해제 처리 1건(완납·정정·시효) — 기관 회신 실패 시 재요청으로 1:N",
+      "estRows": 2500000,
+      "cols": [
+        {
+          "colNm": "CRINFO_RLS_NO",
+          "attrNm": "신용정보해제번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "신용정보해제번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CRINFO_REG_NO",
+          "attrNm": "신용정보등록번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "신용정보등록번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "attrNm": "수납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_DT",
+          "attrNm": "수납일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납일자",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "CRINFO_RLS_DTM",
+          "attrNm": "신용정보해제일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "신용정보해제일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CRINFO_RLS_RSN_TY_CD",
+          "attrNm": "신용정보해제사유유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "신용정보해제사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_RSLT_TY_CD",
+          "attrNm": "처리결과유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "처리결과유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_CRINFO_RLS_L",
+        "cols": [
+          "CRINFO_RLS_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_CRINFO_RLS_L_01",
+          "cols": [
+            "CRINFO_REG_NO"
+          ],
+          "unq": false,
+          "why": "등록→해제 조인(FK)"
+        },
+        {
+          "nm": "X_PTL_COL_CRINFO_RLS_L_02",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "where": "rcv_no IS NOT NULL",
+          "why": "완납 수납→해제 역추적(FK, 선택)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "CRINFO_REG_NO"
+          ],
+          "refTbl": "PTL_COL_CRINFO_REG_L",
+          "refCols": [
+            "CRINFO_REG_NO"
+          ],
+          "nm": "FK_PTL_COL_CRINFO_RLS_L_01"
+        },
+        {
+          "cols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "nm": "FK_PTL_COL_CRINFO_RLS_L_02"
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "RCV_DT",
+          "srcTbl": "PTL_INV_RCV_M",
+          "why": "INV 수납기본 PK(수납번호+수납일자, 수납일자 월 파티션 217개)를 완성하는 FK 칼럼 — 없으면 수납번호 조회가 전 파티션 인덱스를 훑음(05 COL 물리 관문 R1). 수납 반영 시 수납번호와 함께 기록, 미반영 NULL"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_COL_BDDT_DPRC_D",
+      "entId": "COL-025",
+      "moduleCd": null,
+      "def": "대손 1건의 미납 항목별 상각 금액·부가세 대손세액공제",
+      "estRows": 12000000,
+      "cols": [
+        {
+          "colNm": "BDDT_NO",
+          "attrNm": "대손번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "대손번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_DPRC_DTL_SEQ",
+          "attrNm": "대손상각상세순번",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "대손상각상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_DTL_SEQ",
+          "attrNm": "미납상세순번",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "미납상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_DPRC_AMT",
+          "attrNm": "대손상각금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "대손상각금액",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_TXAMT_DDTN_AMT",
+          "attrNm": "대손세액공제금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "대손세액공제금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_BDDT_DPRC_D",
+        "cols": [
+          "BDDT_NO",
+          "BDDT_DPRC_DTL_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_BDDT_DPRC_D_01",
+          "cols": [
+            "UNPD_NO",
+            "UNPD_DTL_SEQ"
+          ],
+          "unq": false,
+          "why": "미납상세→대손상각상세 조인(FK)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "BDDT_NO"
+          ],
+          "refTbl": "PTL_COL_BDDT_M",
+          "refCols": [
+            "BDDT_NO"
+          ],
+          "nm": "FK_PTL_COL_BDDT_DPRC_D_01"
+        },
+        {
+          "cols": [
+            "UNPD_NO",
+            "UNPD_DTL_SEQ"
+          ],
+          "refTbl": "PTL_COL_UNPD_D",
+          "refCols": [
+            "UNPD_NO",
+            "UNPD_DTL_SEQ"
+          ],
+          "nm": "FK_PTL_COL_BDDT_DPRC_D_02"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_BDDT_RTRVL_L",
+      "entId": "COL-026",
+      "moduleCd": null,
+      "def": "대손 상각 후 회수한 금액 1건(대손 환입 회계 처리)",
+      "estRows": 400000,
+      "cols": [
+        {
+          "colNm": "BDDT_RTRVL_NO",
+          "attrNm": "대손회수번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "대손회수번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_NO",
+          "attrNm": "대손번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "대손번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "attrNm": "수납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_DT",
+          "attrNm": "수납일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납일자",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "COLL_RTRVL_NO",
+          "attrNm": "추심회수번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "추심회수번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_RTRVL_DTM",
+          "attrNm": "대손회수일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "대손회수일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_RTRVL_AMT",
+          "attrNm": "대손회수금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "대손회수금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RTRVL_MTHD_TY_CD",
+          "attrNm": "회수방법유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "회수방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ACNTG_SLIP_NO",
+          "attrNm": "회계전표번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "회계전표번호",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_BDDT_RTRVL_L",
+        "cols": [
+          "BDDT_RTRVL_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_BDDT_RTRVL_L_01",
+          "cols": [
+            "BDDT_NO"
+          ],
+          "unq": false,
+          "why": "대손→회수 조인(FK)"
+        },
+        {
+          "nm": "X_PTL_COL_BDDT_RTRVL_L_02",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "where": "rcv_no IS NOT NULL",
+          "why": "수납→대손 회수 역추적(FK, 선택)"
+        },
+        {
+          "nm": "X_PTL_COL_BDDT_RTRVL_L_03",
+          "cols": [
+            "COLL_RTRVL_NO"
+          ],
+          "unq": false,
+          "where": "coll_rtrvl_no IS NOT NULL",
+          "why": "추심회수→대손 회수 조인(FK, 선택)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "BDDT_NO"
+          ],
+          "refTbl": "PTL_COL_BDDT_M",
+          "refCols": [
+            "BDDT_NO"
+          ],
+          "nm": "FK_PTL_COL_BDDT_RTRVL_L_01"
+        },
+        {
+          "cols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO",
+            "RCV_DT"
+          ],
+          "nm": "FK_PTL_COL_BDDT_RTRVL_L_02"
+        },
+        {
+          "cols": [
+            "COLL_RTRVL_NO"
+          ],
+          "refTbl": "PTL_COL_COLL_RTRVL_L",
+          "refCols": [
+            "COLL_RTRVL_NO"
+          ],
+          "nm": "FK_PTL_COL_BDDT_RTRVL_L_03"
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "RCV_DT",
+          "srcTbl": "PTL_INV_RCV_M",
+          "why": "INV 수납기본 PK(수납번호+수납일자, 수납일자 월 파티션 217개)를 완성하는 FK 칼럼 — 없으면 수납번호 조회가 전 파티션 인덱스를 훑음(05 COL 물리 관문 R1). 수납 반영 시 수납번호와 함께 기록, 미반영 NULL"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_COL_RCVB_DSPSL_L",
+      "entId": "COL-027",
+      "moduleCd": null,
+      "def": "부실 채권을 매입사에 매각한 1건(여러 이관 묶음을 한 번에 매각)",
+      "estRows": 3000,
+      "cols": [
+        {
+          "colNm": "RCVB_DSPSL_NO",
+          "attrNm": "채권매각번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "채권매각번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_COLL_CO_NO",
+          "attrNm": "채권추심사번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "채권추심사번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_DSPSL_DTM",
+          "attrNm": "채권매각일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "채권매각일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RCVB_DSPSL_STTS_TY_CD",
+          "attrNm": "채권매각상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "채권매각상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DSPSL_RCVB_AMT",
+          "attrNm": "매각채권금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "매각채권금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DSPSL_RCVB_NOCS",
+          "attrNm": "매각채권건수",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "매각채권건수",
+          "dflt": null
+        },
+        {
+          "colNm": "DSPSL_AMT",
+          "attrNm": "매각금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "매각금액",
+          "dflt": null
+        },
+        {
+          "colNm": "ACNTG_SLIP_NO",
+          "attrNm": "회계전표번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "회계전표번호",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_RCVB_DSPSL_L",
+        "cols": [
+          "RCVB_DSPSL_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_RCVB_DSPSL_L_01",
+          "cols": [
+            "RCVB_COLL_CO_NO"
+          ],
+          "unq": false,
+          "why": "매입사별 매각 조회(FK 조인)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "RCVB_COLL_CO_NO"
+          ],
+          "refTbl": "PTL_COL_RCVB_COLL_CO_M",
+          "refCols": [
+            "RCVB_COLL_CO_NO"
+          ],
+          "nm": "FK_PTL_COL_RCVB_DSPSL_L_01"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_RCVB_PRSCR_H",
+      "entId": "COL-028",
+      "moduleCd": null,
+      "def": "미납 채권 소멸시효의 기산·중단(청구·압류·승인)·재기산 이력",
+      "estRows": 26000000,
+      "cols": [
+        {
+          "colNm": "UNPD_NO",
+          "attrNm": "미납번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "미납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PRSCR_CHG_SEQ",
+          "attrNm": "시효변경순번",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "시효변경순번",
+          "dflt": null
+        },
+        {
+          "colNm": "PRSCR_RCKN_DT",
+          "attrNm": "시효기산일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "시효기산일자",
+          "dflt": null
+        },
+        {
+          "colNm": "PRSCR_INTRPT_RSN_TY_CD",
+          "attrNm": "시효중단사유유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "시효중단사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRSCR_INTRPT_DT",
+          "attrNm": "시효중단일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "시효중단일자",
+          "dflt": null
+        },
+        {
+          "colNm": "EXTSH_PRSCR_EXPRY_DT",
+          "attrNm": "소멸시효만료일자",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "소멸시효만료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "attrNm": "유효시작일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "attrNm": "유효종료일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "유효종료일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_RCVB_PRSCR_H",
+        "cols": [
+          "UNPD_NO",
+          "PRSCR_CHG_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_COL_RCVB_PRSCR_H_01",
+          "cols": [
+            "EXTSH_PRSCR_EXPRY_DT"
+          ],
+          "unq": false,
+          "where": "vld_end_dtm = '9999-12-31 23:59:59'",
+          "why": "현재 유효 시효만 부분 인덱스 — 소멸시효 만료 도래 배치(대손 전환)"
+        }
+      ],
+      "fks": [
+        {
+          "cols": [
+            "UNPD_NO"
+          ],
+          "refTbl": "PTL_COL_UNPD_M",
+          "refCols": [
+            "UNPD_NO"
+          ],
+          "nm": "FK_PTL_COL_RCVB_PRSCR_H_01"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_UNPD_MM_T",
+      "entId": "COL-029",
+      "moduleCd": null,
+      "def": "월말 기준 청구계정별 미납 잔액·연령(Aging) 스냅샷",
+      "estRows": 60000000,
+      "cols": [
+        {
+          "colNm": "STD_YM",
+          "attrNm": "기준년월",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "기준년월",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "attrNm": "청구계정번호",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NOCS",
+          "attrNm": "미납건수",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "미납건수",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_RMND_AMT",
+          "attrNm": "미납잔여금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "미납잔여금액",
+          "dflt": null
+        },
+        {
+          "colNm": "OVDU_ADCHG_ACML_AMT",
+          "attrNm": "연체가산금누적금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "연체가산금누적금액",
+          "dflt": null
+        },
+        {
+          "colNm": "MAX_UNPD_ELPS_DCNT",
+          "attrNm": "최대미납경과일수",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "최대미납경과일수",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_ELPS_SCTN_TY_CD",
+          "attrNm": "미납경과구간유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "미납경과구간유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_YN",
+          "attrNm": "이용정지여부",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "이용정지여부",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_STTS_TY_CD",
+          "attrNm": "집계상태유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "집계상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_DTM",
+          "attrNm": "집계일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "집계일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_UNPD_MM_T",
+        "cols": [
+          "BILL_ACNT_NO",
+          "STD_YM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ],
+          "nm": "FK_PTL_COL_UNPD_MM_T_01"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "STD_YM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개(2010~2027) + DEFAULT 1개, 파티션 키 = PK 끝 칼럼",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_COL_UNPD_RTRVL_MM_S",
+      "entId": "COL-030",
+      "moduleCd": null,
+      "def": "월·연령 구간·고객유형별 미납 발생·회수율·단계 전환(정지·해지·대손) 통계",
+      "estRows": 20000,
+      "cols": [
+        {
+          "colNm": "STD_YM",
+          "attrNm": "기준년월",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "기준년월",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_ELPS_SCTN_TY_CD",
+          "attrNm": "미납경과구간유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "미납경과구간유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_TY_CD",
+          "attrNm": "고객유형코드",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "고객유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CYOV_UNPD_AMT",
+          "attrNm": "이월미납금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "이월미납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "THMM_OCRN_UNPD_AMT",
+          "attrNm": "당월발생미납금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "당월발생미납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "THMM_RTRVL_AMT",
+          "attrNm": "당월회수금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "당월회수금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RTRVL_RT",
+          "attrNm": "회수율",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "회수율",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_NOCS",
+          "attrNm": "미납건수",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "미납건수",
+          "dflt": null
+        },
+        {
+          "colNm": "SUSP_CNVR_NOCS",
+          "attrNm": "이용정지전환건수",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "이용정지전환건수",
+          "dflt": null
+        },
+        {
+          "colNm": "EXOFTRMN_CNVR_NOCS",
+          "attrNm": "직권해지전환건수",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "직권해지전환건수",
+          "dflt": null
+        },
+        {
+          "colNm": "BDDT_CNVR_AMT",
+          "attrNm": "대손전환금액",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "대손전환금액",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_DTM",
+          "attrNm": "집계일시",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "집계일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_COL_UNPD_RTRVL_MM_S",
+        "cols": [
+          "STD_YM",
+          "UNPD_ELPS_SCTN_TY_CD",
+          "CUST_TY_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    }
+  ],
+  "decisions": [
+    "파티션 기준 : COL 은 T3 영역 — 목표 3천만 행 이상인 누적형(내역·이력·월 스냅샷) 테이블만 연 RANGE 파티션(2010~2027 + DEFAULT). 현재값 ~기본(미납기본 2천만·미납상세 6천만)은 자식 FK 가 많고 날짜 조건 없는 키 조회가 주 경로라 파티션하지 않음",
+    "파티션 키는 PK 끝에 둔다 — 업무 식별자(번호) 선두로 단건 조회는 그대로, PostgreSQL 파티션 PK 요건 충족",
+    "독촉발송결과내역 = 부모 독촉내역 파티션 키(독촉발송일시)를 반정규화해 PK·파티션 키로 사용 → 부모·자식 같은 연 파티션끼리 조인",
+    "04 관문 F1 반정규화 후보 9개 중 채택 2개(미납기본·미납상세 미납잔여금액) — 매일 배치·수납배분 핫 경로. 나머지 7개(연체가산금누적금액·누적회수금액·분할납부 집계 4종·대손회수누적금액)는 행 수 수백만 이하 또는 월 1회 조회라 원천 집계로 충분해 미채택",
+    "미납기본에 청구계정번호·청구년월·고객번호 반정규화 — 실무 조회 경로(청구계정+청구년월, 고객번호)를 청구기본(T4) 조인 없이 처리",
+    "저선택도 상태값(S3)은 전체 인덱스 대신 진행 중 상태만 부분 인덱스, NULL 이 대부분인 선택 FK(S5)는 IS NOT NULL 부분 인덱스",
+    "작은 기준 테이블(코드·정책·추심사, 수천 행 이하)을 가리키는 FK 칼럼은 인덱스 없음 — 조인은 자식→부모 PK 방향만 쓰고 부모 삭제는 논리 처리(D6 RI 미구현)",
+    "REF 기준 테이블 행 수는 업무 실제 규모(추심사 200·정책 2천·가산금 기준 20)로 T1 하한(1만) 미만 — data_migrationner 가 배율로 조정",
+    "교차 FK 의 refCols 는 부모 물리 PK 전체(파티션 키 포함) — PAY 청구기본(청구년월)·청구상세(청구년월)·INV 수납기본(수납일자)의 파티션 키를 자식에 반정규화해 FK 를 완성(05 COL 물리 관문 R1, 미완성 시 생성기 실패). 부모 물리 모델이 아직 없는 영역(PRM)은 논리 PK 기준",
+    "부모 물리 테이블명은 표준 접미어(_M 등) 기준 — ORD 물리가 엔터티 약어(_BAS)로 이름을 지은 불일치는 ORD 관문 소관(05 COL 물리 관문 R3)"
+  ]
+}

@@ -1,0 +1,18 @@
+# Pi통신 과금 DDL 실행 순서 (D14 : 테이블 → 데이터 적재 → 제약)
+# 1단계 : 테이블(PK·인덱스 없음, 파티션 포함) — 주제영역 순 10~70
+10_prd_tables.sql
+20_cus_tables.sql
+30_ord_tables.sql
+40_pay_tables.sql
+50_inv_tables.sql
+60_col_tables.sql
+70_prm_tables.sql
+# 2단계 : 데이터 적재 (datagen — 2단계 워크플로)
+# 3단계 : PK·인덱스(적재 뒤) — 주제영역 순 10~70, 끝나면 ANALYZE
+10_prd_constraints.sql
+20_cus_constraints.sql
+30_ord_constraints.sql
+40_pay_constraints.sql
+50_inv_constraints.sql
+60_col_constraints.sql
+70_prm_constraints.sql

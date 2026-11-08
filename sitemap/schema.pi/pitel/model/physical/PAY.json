@@ -1,0 +1,5064 @@
+{
+  "area": "PAY",
+  "areaNm": "청구",
+  "stg": "PHY",
+  "trgtDbms": "POSTGRESQL",
+  "dbmsVer": "17",
+  "ver": "2026-11-07",
+  "author": "subagent_physical_modeler",
+  "conv": "cols 순서 = PK → FK → 일반(DDL 때 시스템 칼럼 4개 추가). nullYn true = NULL 허용. idx.where = 부분 인덱스 조건(PostgreSQL 소문자 SQL). fks = 설계 정의만(D6 — DDL 미생성), refArea·refEnt = 부모 위치. denorm 칼럼은 cols 에 denorm:true",
+  "decisions": [
+    {
+      "id": "P1",
+      "dec": "파티션 키는 PK 에 포함 — 파티션 테이블의 물리 PK = 논리 PK + 파티션 키",
+      "why": "PostgreSQL 파티션 테이블의 PK·유일 인덱스는 파티션 키를 포함해야 한다. 논리 식별자(번호)는 결정적 키 공식으로 전역 유일하게 발번(데이터 생성 5절)하므로 업무 유일성은 유지"
+    },
+    {
+      "id": "P2",
+      "dec": "T4(1억+) = 월 RANGE 2010-01~2027-12(216 + DEFAULT), T3 2천만+ 누적 이력 = 연 RANGE 2010~2027(18 + DEFAULT), 그 외 비파티션",
+      "why": "과제 지시. 월 키는 청구년월(청구 마감 단위 = 보관·재청구·삭제 단위)이 있으면 그것, 없으면 행위 일시(원시사용 = 수집일시, 사용량일집계 = 사용일자)"
+    },
+    {
+      "id": "P3",
+      "dec": "청구상세·청구세금상세에 청구년월 반정규화(파티션 키)",
+      "why": "논리 M1 에서 부분 종속으로 제거한 칼럼 — 파티션 정렬·회선 + 청구년월 조회 때문에 물리에서만 복원. 다른 반정규화(서비스번호 등)는 회선기본 1회 조회로 충분해 하지 않음"
+    },
+    {
+      "id": "P4",
+      "dec": "FK 의 부모가 파티션 키를 PK 에 추가한 테이블이면(원시사용내역·사용내역·요금계산내역·청구기본·청구상세·청구서발행내역) 참조 칼럼 = 논리 PK 만",
+      "why": "FK 는 DDL 미생성(D6) — 설계 정의는 업무 키 기준. PostgreSQL 에서 실제 FK 를 걸려면 자식에 파티션 키를 추가해야 하므로 RI 물리 구현 시 재검토"
+    },
+    {
+      "id": "P5",
+      "dec": "상태 칼럼 단독 인덱스 금지 — 저선택도(S3) 상태는 처리 대상 상태만 부분 인덱스",
+      "why": "98% 한 값 칼럼의 B-tree 는 옵티마이저가 쓰지 않거나 오판(S3 편향). 처리 큐(미과금·재처리·미반영 조정·미납 확정 대상)만 작게 유지"
+    },
+    {
+      "id": "P6",
+      "dec": "기준 코드 FK(요금항목코드·청구조정사유유형코드·청구주기코드) 단독 인덱스 없음",
+      "why": "부모가 수십~수백 행 기준 테이블이라 부모→자식 조인 경로가 없고 저선택도. 요금항목별 집계는 요금항목월통계(PROC)가 담당"
+    },
+    {
+      "id": "P7",
+      "dec": "estRows 는 볼륨 등급 목표 — 청구주기코드(30)·청구조정사유코드(200)는 코드 성격상 T1 하한 미만",
+      "why": "실무 코드 수. 최종 행 수·배율은 data_migrationner(docs/06) 결정"
+    }
+  ],
+  "tables": [
+    {
+      "tblNm": "PTL_PAY_RAW_USE_L",
+      "entId": "PAY-001",
+      "entNm": "원시사용내역",
+      "tp": "ACT",
+      "def": "교환기(MSC·IMS)·PGW/SMF·SMSC 가 만든 원시 사용기록(CDR)을 중계(Mediation)로 수집한 원본 1건. Rating 전 상태와 처리 결과(정상·오류·중복·보류)를 가진다.",
+      "estRows": 100000000,
+      "volTier": "T4",
+      "cols": [
+        {
+          "colNm": "RAW_USE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "원시사용번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CLCT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "수집일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CLCT_FILE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수집파일번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RAW_USE_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "원시사용명",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "사용시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RAW_USE_PRCS_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "원시사용처리상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "서비스번호",
+          "dflt": null
+        },
+        {
+          "colNm": "IMSI_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "IMSI번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CLG_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "발신번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CLD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "착신번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "사용종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_HR_SCNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "사용시간초수",
+          "dflt": null
+        },
+        {
+          "colNm": "DATA_USE_BYTE_CNT",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 14,
+          "termNm": "데이터사용바이트수",
+          "dflt": null
+        },
+        {
+          "colNm": "RAW_RCRD_CN",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 15,
+          "termNm": "원시레코드내용",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_RAW_USE_L",
+        "cols": [
+          "RAW_USE_NO",
+          "CLCT_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_RAW_USE_L_01",
+          "cols": [
+            "CLCT_FILE_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(수집파일 → 원시 CDR) — 파일 단위 건수 대사·재수집 삭제 범위"
+        },
+        {
+          "nm": "X_PTL_PAY_RAW_USE_L_02",
+          "cols": [
+            "SVC_NO",
+            "USE_BGNG_DTM"
+          ],
+          "unq": false,
+          "why": "서비스번호 + 사용 기간 원시 CDR 조회(과금 이의·민원 원본 확인)"
+        },
+        {
+          "nm": "X_PTL_PAY_RAW_USE_L_03",
+          "cols": [
+            "CLCT_DTM"
+          ],
+          "unq": false,
+          "why": "미과금 처리 큐 — 수집·파싱완료·과금대기·오류 상태만(98% 과금완료 저선택도 S3 회피 부분 인덱스)",
+          "where": "raw_use_prcs_stts_ty_cd IN ('01','02','03','05')"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_RAW_USE_L_01",
+          "cols": [
+            "CLCT_FILE_NO"
+          ],
+          "refTbl": "PTL_PAY_USE_QTY_CLCT_FILE_L",
+          "refCols": [
+            "CLCT_FILE_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "사용량수집파일내역"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "CLCT_DTM",
+        "unit": "MONTH",
+        "from": "2010-01",
+        "to": "2027-12",
+        "note": "월 단위 216개 + DEFAULT 1개(TIMESTAMP) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_USE_L",
+      "entId": "PAY-002",
+      "entNm": "사용내역",
+      "tp": "ACT",
+      "def": "원시사용내역을 Rating(요금항목 결정·요율 적용·기본제공량 차감)한 과금 단위 사용 기록. 음성·데이터·문자·영상·로밍·콘텐츠 사용을 모두 담는 초대용량(T4) 엔터티 — 일 RANGE 파티션 후보.",
+      "estRows": 150000000,
+      "volTier": "T4",
+      "cols": [
+        {
+          "colNm": "USE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "사용번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "RAW_USE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "원시사용번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_DTLS_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "사용내역명",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "사용시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_RAT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "사용과금상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "사용종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "서비스번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CLD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "착신번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "사용량",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_UNIT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 14,
+          "termNm": "사용단위유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RAT_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 15,
+          "termNm": "과금량",
+          "dflt": null
+        },
+        {
+          "colNm": "BSCPRVD_DDCT_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 16,
+          "termNm": "기본제공차감량",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 17,
+          "termNm": "사용금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RAT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 18,
+          "termNm": "과금일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_USE_L",
+        "cols": [
+          "USE_NO",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_USE_L_01",
+          "cols": [
+            "SVC_MGMT_NO",
+            "BILL_YM",
+            "USE_BGNG_DTM"
+          ],
+          "unq": false,
+          "why": "회선 + 청구년월 사용내역 조회(요금 상세·통화내역서) — 최다 조회 경로, FK 조인(회선기본)"
+        },
+        {
+          "nm": "X_PTL_PAY_USE_L_02",
+          "cols": [
+            "SVC_NO",
+            "USE_BGNG_DTM"
+          ],
+          "unq": false,
+          "why": "서비스번호 + 사용 일시 조회(상담 화면 — 서비스관리번호 모르는 진입)"
+        },
+        {
+          "nm": "X_PTL_PAY_USE_L_03",
+          "cols": [
+            "RAW_USE_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(원시사용내역 ↔ 사용내역 대사·재Rating)"
+        },
+        {
+          "nm": "X_PTL_PAY_USE_L_04",
+          "cols": [
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "Bill Run 직전 미완료 과금 점검 — 과금대기·재과금·오류만(부분 인덱스)",
+          "where": "use_rat_stts_ty_cd IN ('01','03','05')"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_USE_L_01",
+          "cols": [
+            "RAW_USE_NO"
+          ],
+          "refTbl": "PTL_PAY_RAW_USE_L",
+          "refCols": [
+            "RAW_USE_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "원시사용내역"
+        },
+        {
+          "nm": "FK_PTL_PAY_USE_L_02",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "회선기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_USE_L_03",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ],
+          "refArea": "PRD",
+          "refEnt": "요금항목코드"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "MONTH",
+        "from": "2010-01",
+        "to": "2027-12",
+        "note": "월 단위 216개 + DEFAULT 1개(CHAR(6)) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_USE_QTY_MM_T",
+      "entId": "PAY-003",
+      "entNm": "사용량월집계",
+      "tp": "PROC",
+      "def": "회선×청구년월×사용서비스유형 단위로 사용내역을 집계한 가공 엔터티. 요금계산(사용료·초과량)·기본제공 소진 판정·레이크 피처의 기준점.",
+      "estRows": 20000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_QTY_AGG_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "사용량집계명",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "집계일시",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "집계상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "사용건수",
+          "dflt": null
+        },
+        {
+          "colNm": "TOT_USE_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "총사용량",
+          "dflt": null
+        },
+        {
+          "colNm": "TOT_RAT_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "총과금량",
+          "dflt": null
+        },
+        {
+          "colNm": "BSCPRVD_USE_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "기본제공사용량",
+          "dflt": null
+        },
+        {
+          "colNm": "EXCS_USE_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "초과사용량",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "사용금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_USE_QTY_MM_T",
+        "cols": [
+          "SVC_MGMT_NO",
+          "BILL_YM",
+          "USE_SVC_TY_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_USE_QTY_MM_T_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "회선기본"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개 + DEFAULT 1개(CHAR(6)) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_CHRG_CALC_L",
+      "entId": "PAY-004",
+      "entNm": "요금계산내역",
+      "tp": "ACT",
+      "def": "청구작업(Bill Run)에서 회선(가입상품)×청구년월×요금항목 단위로 계산한 요금 결과(월정액·일할·사용료·할인·위약금·할부금). 청구상세 라인의 근거.",
+      "estRows": 100000000,
+      "volTier": "T4",
+      "cols": [
+        {
+          "colNm": "CHRG_CALC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "요금계산번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구작업번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "가입상품번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DTL_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "청구상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_CALC_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "요금계산명",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_CALC_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "요금계산일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_CALC_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "요금계산상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_CALC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 14,
+          "termNm": "요금계산유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CALC_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 15,
+          "termNm": "계산금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DYPRT_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 16,
+          "termNm": "일할여부",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 17,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 18,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_CHRG_CALC_L",
+        "cols": [
+          "CHRG_CALC_NO",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_CHRG_CALC_L_01",
+          "cols": [
+            "BILL_ACNT_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "청구계정 + 청구년월 요금계산 결과 조회(청구서 구성·상담) — FK 조인(청구계정기본)"
+        },
+        {
+          "nm": "X_PTL_PAY_CHRG_CALC_L_02",
+          "cols": [
+            "SVC_MGMT_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "회선 + 청구년월 요금계산 조회 — FK 조인(회선기본)"
+        },
+        {
+          "nm": "X_PTL_PAY_CHRG_CALC_L_03",
+          "cols": [
+            "BILL_JOB_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구작업) — Bill Run 단위 재계산·롤백 대상"
+        },
+        {
+          "nm": "X_PTL_PAY_CHRG_CALC_L_04",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구상세) — 청구 라인의 계산 근거 역추적"
+        },
+        {
+          "nm": "X_PTL_PAY_CHRG_CALC_L_05",
+          "cols": [
+            "SBSC_PROD_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(가입상품기본) — 가입상품별 요금 이력"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_CHRG_CALC_L_01",
+          "cols": [
+            "BILL_JOB_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_JOB_M",
+          "refCols": [
+            "BILL_JOB_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구작업기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_CHRG_CALC_L_02",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ],
+          "refArea": "CUS",
+          "refEnt": "청구계정기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_CHRG_CALC_L_03",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "회선기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_CHRG_CALC_L_04",
+          "cols": [
+            "SVC_MGMT_NO",
+            "BILL_YM",
+            "USE_SVC_TY_CD"
+          ],
+          "refTbl": "PTL_PAY_USE_QTY_MM_T",
+          "refCols": [
+            "SVC_MGMT_NO",
+            "BILL_YM",
+            "USE_SVC_TY_CD"
+          ],
+          "refArea": "PAY",
+          "refEnt": "사용량월집계"
+        },
+        {
+          "nm": "FK_PTL_PAY_CHRG_CALC_L_05",
+          "cols": [
+            "SBSC_PROD_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_PROD_M",
+          "refCols": [
+            "SBSC_PROD_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "가입상품기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_CHRG_CALC_L_06",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ],
+          "refArea": "PRD",
+          "refEnt": "요금항목코드"
+        },
+        {
+          "nm": "FK_PTL_PAY_CHRG_CALC_L_07",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "refTbl": "PTL_PAY_BILL_D",
+          "refCols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구상세"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "MONTH",
+        "from": "2010-01",
+        "to": "2027-12",
+        "note": "월 단위 216개 + DEFAULT 1개(CHAR(6)) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_BILL_CYCL_C",
+      "entId": "PAY-005",
+      "entNm": "청구주기코드",
+      "tp": "REF",
+      "def": "사용기간 마감일·청구서 발행일·납부기한일을 정하는 청구주기 기준(예 1일~말일 사용, 익월 7일 발행, 익월 25일 납기). 적용 기간을 가진 이력형 기준.",
+      "estRows": 30,
+      "volTier": "T1",
+      "cols": [
+        {
+          "colNm": "BILL_CYCL_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구주기코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_CYCL_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구주기명",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_CYCL_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구주기등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_CYCL_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구주기상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_PRD_BGNG_DD",
+          "dataTp": "CHAR(2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "사용기간시작일",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_PRD_DDLN_DD",
+          "dataTp": "CHAR(2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "사용기간마감일",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_PBLCN_DD",
+          "dataTp": "CHAR(2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "청구서발행일",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_TMLMT_DD",
+          "dataTp": "CHAR(2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "납부기한일",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BILL_CYCL_C",
+        "cols": [
+          "BILL_CYCL_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_BILL_JOB_M",
+      "entId": "PAY-006",
+      "entNm": "청구작업기본",
+      "tp": "ACT",
+      "def": "청구년월×청구주기 단위로 요금계산·청구서 생성·마감을 수행하는 청구작업(Bill Run) 1회. 정기·재청구·해지즉시 청구를 구분한다.",
+      "estRows": 5000,
+      "volTier": "T1",
+      "cols": [
+        {
+          "colNm": "BILL_JOB_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구작업번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_CYCL_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구주기코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구작업명",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구작업시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구작업상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "청구작업유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRGT_BILL_ACNT_CNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "대상청구계정수",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "처리건수",
+          "dflt": null
+        },
+        {
+          "colNm": "ERR_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "오류건수",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_TOT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "청구총금액",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "청구작업종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DDLN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "청구마감일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BILL_JOB_M",
+        "cols": [
+          "BILL_JOB_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_BILL_JOB_M_01",
+          "cols": [
+            "BILL_YM",
+            "BILL_CYCL_CD"
+          ],
+          "unq": false,
+          "why": "청구년월 + 청구주기 Bill Run 조회 — FK 조인(청구주기코드)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_BILL_JOB_M_01",
+          "cols": [
+            "BILL_CYCL_CD"
+          ],
+          "refTbl": "PTL_PAY_BILL_CYCL_C",
+          "refCols": [
+            "BILL_CYCL_CD"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구주기코드"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_BILL_M",
+      "entId": "PAY-007",
+      "entNm": "청구기본",
+      "tp": "ACT",
+      "def": "청구계정×청구년월 단위 청구서(재청구·해지즉시 청구는 같은 월 추가 건). 당월요금·할인·조정·부가가치세·미납이월을 합한 총청구금액과 납부기한을 가진다. 수납배분·미납의 기준(S14 핫 키 — 법인 청구계정 1개에 수천 건).",
+      "estRows": 25000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구작업번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_CYCL_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구주기코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ORGN_BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "원청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "청구서명",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_CFMTN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "청구확정일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "청구상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "청구유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_PBLCN_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "청구서발행일자",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_TMLMT_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "납부기한일자",
+          "dflt": null
+        },
+        {
+          "colNm": "THMM_BILL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "당월청구금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 14,
+          "termNm": "할인금액",
+          "dflt": null
+        },
+        {
+          "colNm": "ADJ_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 15,
+          "termNm": "조정금액",
+          "dflt": null
+        },
+        {
+          "colNm": "VAT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 16,
+          "termNm": "부가가치세금액",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_CYOV_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 17,
+          "termNm": "미납이월금액",
+          "dflt": null
+        },
+        {
+          "colNm": "TOT_BILL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 18,
+          "termNm": "총청구금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BILL_M",
+        "cols": [
+          "BILL_NO",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_BILL_M_01",
+          "cols": [
+            "BILL_ACNT_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "청구계정 + 청구년월 청구서 조회(수납·상담 최다 경로) — FK 조인(청구계정기본), 핫 키 S14 는 BILL_YM 으로 범위 축소"
+        },
+        {
+          "nm": "X_PTL_PAY_BILL_M_02",
+          "cols": [
+            "BILL_JOB_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구작업) — Bill Run 단위 청구서 확정·발행"
+        },
+        {
+          "nm": "X_PTL_PAY_BILL_M_03",
+          "cols": [
+            "ORGN_BILL_NO"
+          ],
+          "unq": false,
+          "why": "재청구 → 원청구 추적(자기 참조 FK) — 재청구만(부분 인덱스)",
+          "where": "orgn_bill_no IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_PAY_BILL_M_04",
+          "cols": [
+            "PAY_TMLMT_DT"
+          ],
+          "unq": false,
+          "why": "납부기한 경과 미납 확정 배치(COL 입력) — 발행·일부수납·미납 상태만(부분 인덱스)",
+          "where": "bill_stts_ty_cd IN ('03','05','06')"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_BILL_M_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ],
+          "refArea": "CUS",
+          "refEnt": "청구계정기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_BILL_M_02",
+          "cols": [
+            "BILL_JOB_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_JOB_M",
+          "refCols": [
+            "BILL_JOB_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구작업기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_BILL_M_03",
+          "cols": [
+            "BILL_CYCL_CD"
+          ],
+          "refTbl": "PTL_PAY_BILL_CYCL_C",
+          "refCols": [
+            "BILL_CYCL_CD"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구주기코드"
+        },
+        {
+          "nm": "FK_PTL_PAY_BILL_M_04",
+          "cols": [
+            "ORGN_BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구기본"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개 + DEFAULT 1개(CHAR(6)) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_BILL_D",
+      "entId": "PAY-008",
+      "entNm": "청구상세",
+      "tp": "ACT",
+      "def": "청구서의 요금항목 라인 — 청구서×회선×요금항목 단위 금액. 수납배분·미납이 항목 순위(할부금·부가세 등)로 이뤄지므로 라인별 금액을 가진다.",
+      "estRows": 100000000,
+      "volTier": "T4",
+      "cols": [
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DTL_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "청구년월",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DTL_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구상세명",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DTL_CRT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "청구상세생성일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DTL_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "청구상세상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "청구금액",
+          "dflt": null
+        },
+        {
+          "colNm": "SPLYAMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "공급가액",
+          "dflt": null
+        },
+        {
+          "colNm": "VAT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "부가가치세금액",
+          "dflt": null
+        },
+        {
+          "colNm": "TXTN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "과세유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BILL_D",
+        "cols": [
+          "BILL_NO",
+          "BILL_DTL_SEQ",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_BILL_D_01",
+          "cols": [
+            "SVC_MGMT_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "회선 + 청구년월 청구 라인 조회(회선별 요금 명세) — FK 조인(회선기본)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_BILL_D_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_BILL_D_02",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "회선기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_BILL_D_03",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ],
+          "refArea": "PRD",
+          "refEnt": "요금항목코드"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "MONTH",
+        "from": "2010-01",
+        "to": "2027-12",
+        "note": "월 단위 216개 + DEFAULT 1개(CHAR(6)) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": [
+        {
+          "col": "BILL_YM",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "월 RANGE 파티션 키(논리 M1 에서 제거한 청구년월 복원) — 청구기본과 같은 월 파티션 정렬, 회선 + 청구년월 청구 라인 조회. 값은 청구기본.청구년월과 항상 같음(청구서 생성 시 함께 기록)"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_PAY_BILL_ADJ_L",
+      "entId": "PAY-009",
+      "entNm": "청구조정내역",
+      "tp": "ACT",
+      "def": "확정된 청구서·청구 라인에 대한 감액·증액·재청구·이월 조정 1건(민원 감면·오과금 정정·장애 보상 등). 감액은 음수 금액(S7), 승인 후 당월 또는 다음 청구서에 반영.",
+      "estRows": 5000000,
+      "volTier": "T2",
+      "cols": [
+        {
+          "colNm": "BILL_ADJ_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구조정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DTL_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ADJ_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구조정사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ADJ_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구조정명",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ADJ_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구조정일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ADJ_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "청구조정상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ADJ_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "청구조정유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ADJ_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "조정금액",
+          "dflt": null
+        },
+        {
+          "colNm": "ADJ_VAT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "조정부가가치세금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RFLT_BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "반영청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "ADJ_APRV_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "조정승인일시",
+          "dflt": null
+        },
+        {
+          "colNm": "ADJ_CN",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "조정내용",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BILL_ADJ_L",
+        "cols": [
+          "BILL_ADJ_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_BILL_ADJ_L_01",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구기본·청구상세) — 청구서별 조정 내역"
+        },
+        {
+          "nm": "X_PTL_PAY_BILL_ADJ_L_02",
+          "cols": [
+            "RFLT_BILL_YM"
+          ],
+          "unq": false,
+          "why": "승인되었으나 미반영된 조정 → 반영 청구년월 Bill Run 입력(부분 인덱스)",
+          "where": "bill_adj_stts_ty_cd = '02'"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_BILL_ADJ_L_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_BILL_ADJ_L_02",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "refTbl": "PTL_PAY_BILL_D",
+          "refCols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구상세"
+        },
+        {
+          "nm": "FK_PTL_PAY_BILL_ADJ_L_03",
+          "cols": [
+            "BILL_ADJ_RSN_TY_CD"
+          ],
+          "refTbl": "PTL_PAY_BILL_ADJ_RSN_C",
+          "refCols": [
+            "BILL_ADJ_RSN_TY_CD"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구조정사유코드"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_BILL_TAX_D",
+      "entId": "PAY-010",
+      "entNm": "청구세금상세",
+      "tp": "ACT",
+      "def": "청구서의 과세 유형(과세·영세·면세)별 과세표준·세율·세액(부가가치세법). 법인 청구계정은 전자세금계산서 승인번호를 가진다.",
+      "estRows": 30000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "TXTN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "과세유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "청구년월",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "BILL_TAX_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구세금명",
+          "dflt": null
+        },
+        {
+          "colNm": "TAX_CALC_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "세금계산일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_TAX_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구세금상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TXSTD_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "과세표준금액",
+          "dflt": null
+        },
+        {
+          "colNm": "TXRT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "세율",
+          "dflt": null
+        },
+        {
+          "colNm": "TXAMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "세액",
+          "dflt": null
+        },
+        {
+          "colNm": "TXEMP_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "면세금액",
+          "dflt": null
+        },
+        {
+          "colNm": "TXINV_PBLCN_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "세금계산서발행여부",
+          "dflt": null
+        },
+        {
+          "colNm": "ELCTR_TXINV_APRV_NO",
+          "dataTp": "VARCHAR(30)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "전자세금계산서승인번호",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BILL_TAX_D",
+        "cols": [
+          "BILL_NO",
+          "TXTN_TY_CD",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_BILL_TAX_D_01",
+          "cols": [
+            "ELCTR_TXINV_APRV_NO"
+          ],
+          "unq": false,
+          "why": "전자세금계산서 승인번호 조회(국세청 대사) — 발행분만(부분 인덱스)",
+          "where": "elctr_txinv_aprv_no IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_BILL_TAX_D_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구기본"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개 + DEFAULT 1개(CHAR(6)) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": [
+        {
+          "col": "BILL_YM",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "연 RANGE 파티션 키 — 부모 청구기본과 같은 연 파티션 정렬(부가가치세 신고 기간 = 청구년월 기준 조회)"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_PAY_USE_QTY_CLCT_FILE_L",
+      "entId": "PAY-011",
+      "entNm": "사용량수집파일내역",
+      "tp": "ACT",
+      "def": "중계(Mediation) 시스템이 망요소에서 수집한 CDR 파일 1개(TS 32.297 파일 전송). 파일 단위 건수 대사·재수집의 기준.",
+      "estRows": 2000000,
+      "volTier": "T2",
+      "cols": [
+        {
+          "colNm": "CLCT_FILE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수집파일번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CLCT_FILE_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "수집파일명",
+          "dflt": null
+        },
+        {
+          "colNm": "NTWK_ELMT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "망요소유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "FILE_CRT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "파일생성일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CLCT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수집일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CLCT_FILE_PRCS_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수집파일처리상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCRD_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "레코드건수",
+          "dflt": null
+        },
+        {
+          "colNm": "NRML_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "정상건수",
+          "dflt": null
+        },
+        {
+          "colNm": "ERR_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "오류건수",
+          "dflt": null
+        },
+        {
+          "colNm": "DUP_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "중복건수",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_CMPTN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "처리완료일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_USE_QTY_CLCT_FILE_L",
+        "cols": [
+          "CLCT_FILE_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_USE_QTY_CLCT_FILE_L_01",
+          "cols": [
+            "CLCT_DTM"
+          ],
+          "unq": false,
+          "why": "수집일시 범위 파일 대사(일별 수집 건수 점검)"
+        },
+        {
+          "nm": "X_PTL_PAY_USE_QTY_CLCT_FILE_L_02",
+          "cols": [
+            "CLCT_FILE_NM"
+          ],
+          "unq": false,
+          "why": "파일명 중복 수집 확인(재전송 파일 판별)"
+        }
+      ],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_USE_QTY_ERR_L",
+      "entId": "PAY-012",
+      "entNm": "사용량오류내역",
+      "tp": "ACT",
+      "def": "Rating 실패·보류된 CDR 1건의 오류 발생 기록(회선 미매칭·요금항목 미정의·중복 의심 등). 재처리 횟수와 결과를 관리한다.",
+      "estRows": 3000000,
+      "volTier": "T2",
+      "cols": [
+        {
+          "colNm": "USE_QTY_ERR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "사용량오류번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RAW_USE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "원시사용번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_QTY_ERR_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "사용량오류유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ERR_OCRN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "오류발생일시",
+          "dflt": null
+        },
+        {
+          "colNm": "ERR_PRCS_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "오류처리상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RE_PRCS_NMTM",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "재처리횟수",
+          "dflt": null
+        },
+        {
+          "colNm": "LAST_RE_PRCS_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "최종재처리일시",
+          "dflt": null
+        },
+        {
+          "colNm": "ERR_CN",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "오류내용",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_USE_QTY_ERR_L",
+        "cols": [
+          "USE_QTY_ERR_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_USE_QTY_ERR_L_01",
+          "cols": [
+            "RAW_USE_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(원시사용내역) — 원본 CDR 별 오류 이력"
+        },
+        {
+          "nm": "X_PTL_PAY_USE_QTY_ERR_L_02",
+          "cols": [
+            "ERR_OCRN_DTM"
+          ],
+          "unq": false,
+          "why": "재처리 대상 큐 — 미처리·재처리중만(부분 인덱스)",
+          "where": "err_prcs_stts_ty_cd IN ('01','02')"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_USE_QTY_ERR_L_01",
+          "cols": [
+            "RAW_USE_NO"
+          ],
+          "refTbl": "PTL_PAY_RAW_USE_L",
+          "refCols": [
+            "RAW_USE_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "원시사용내역"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_USE_QTY_DD_T",
+      "entId": "PAY-013",
+      "entNm": "사용량일집계",
+      "tp": "PROC",
+      "def": "회선×사용일자×사용서비스유형 단위 일 사용량 집계. 실시간 사용량 조회·데이터 소진 알림·이상 사용 탐지(FDS) 피처의 기준.",
+      "estRows": 100000000,
+      "volTier": "T4",
+      "cols": [
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "사용일자",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "집계일시",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "사용건수",
+          "dflt": null
+        },
+        {
+          "colNm": "TOT_USE_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "총사용량",
+          "dflt": null
+        },
+        {
+          "colNm": "TOT_RAT_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "총과금량",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "사용금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_USE_QTY_DD_T",
+        "cols": [
+          "SVC_MGMT_NO",
+          "USE_DT",
+          "USE_SVC_TY_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_USE_QTY_DD_T_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "회선기본"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "USE_DT",
+        "unit": "MONTH",
+        "from": "2010-01",
+        "to": "2027-12",
+        "note": "월 단위 216개 + DEFAULT 1개(CHAR(8)) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_BSCPRVD_EXHST_L",
+      "entId": "PAY-014",
+      "entNm": "기본제공소진내역",
+      "tp": "ACT",
+      "def": "회선×청구년월×사용서비스유형×가입상품(요금제·데이터 부가팩) 단위 기본제공량·사용량·이월량과 소진 시점. 초과요금·QoS 제한·소진 알림의 근거.",
+      "estRows": 20000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 4,
+          "termNm": "가입상품번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BSCPRVD_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "기본제공량",
+          "dflt": null
+        },
+        {
+          "colNm": "BSCPRVD_CYOV_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "기본제공이월량",
+          "dflt": null
+        },
+        {
+          "colNm": "BSCPRVD_USE_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "기본제공사용량",
+          "dflt": null
+        },
+        {
+          "colNm": "BSCPRVD_EXHST_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "기본제공소진상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EXHST_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "소진일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BSCPRVD_EXHST_L",
+        "cols": [
+          "SVC_MGMT_NO",
+          "BILL_YM",
+          "USE_SVC_TY_CD",
+          "SBSC_PROD_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_BSCPRVD_EXHST_L_01",
+          "cols": [
+            "SBSC_PROD_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "FK 조인(가입상품기본) — 가입상품(데이터 부가팩)별 월 소진 조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_BSCPRVD_EXHST_L_01",
+          "cols": [
+            "SVC_MGMT_NO",
+            "BILL_YM",
+            "USE_SVC_TY_CD"
+          ],
+          "refTbl": "PTL_PAY_USE_QTY_MM_T",
+          "refCols": [
+            "SVC_MGMT_NO",
+            "BILL_YM",
+            "USE_SVC_TY_CD"
+          ],
+          "refArea": "PAY",
+          "refEnt": "사용량월집계"
+        },
+        {
+          "nm": "FK_PTL_PAY_BSCPRVD_EXHST_L_02",
+          "cols": [
+            "SBSC_PROD_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_PROD_M",
+          "refCols": [
+            "SBSC_PROD_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "가입상품기본"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개 + DEFAULT 1개(CHAR(6)) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_CHRG_CALC_H",
+      "entId": "PAY-015",
+      "entNm": "요금계산이력",
+      "tp": "ACT",
+      "def": "요금계산내역의 재계산(재Rating·소급 정정) 이력 — 계산 회차별 금액과 사유. 최초 계산도 1회차로 남긴다.",
+      "estRows": 15000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "CHRG_CALC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "요금계산번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_CALC_HIST_SEQ",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "요금계산이력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구작업번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_CALC_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "요금계산일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RE_CALC_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "재계산사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_CALC_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "요금계산상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CALC_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "계산금액",
+          "dflt": null
+        },
+        {
+          "colNm": "BFR_CALC_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "이전계산금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_CHRG_CALC_H",
+        "cols": [
+          "CHRG_CALC_NO",
+          "CHRG_CALC_HIST_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_CHRG_CALC_H_01",
+          "cols": [
+            "BILL_JOB_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구작업) — Bill Run 별 재계산 이력"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_CHRG_CALC_H_01",
+          "cols": [
+            "CHRG_CALC_NO"
+          ],
+          "refTbl": "PTL_PAY_CHRG_CALC_L",
+          "refCols": [
+            "CHRG_CALC_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "요금계산내역"
+        },
+        {
+          "nm": "FK_PTL_PAY_CHRG_CALC_H_02",
+          "cols": [
+            "BILL_JOB_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_JOB_M",
+          "refCols": [
+            "BILL_JOB_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구작업기본"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_DYPRT_CHRG_D",
+      "entId": "PAY-016",
+      "entNm": "일할요금상세",
+      "tp": "ACT",
+      "def": "개통·해지·요금제 변경·정지가 있는 달의 월정액 일할 계산 구간(구간별 적용일수·일할금액). 요금계산내역 1건에 구간 여러 개.",
+      "estRows": 8000000,
+      "volTier": "T2",
+      "cols": [
+        {
+          "colNm": "CHRG_CALC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "요금계산번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DYPRT_CHRG_DTL_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "일할요금상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "DYPRT_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "일할사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "DYPRT_DCNT",
+          "dataTp": "NUMERIC(3)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "일할일수",
+          "dflt": null
+        },
+        {
+          "colNm": "MM_DCNT",
+          "dataTp": "NUMERIC(3)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "월일수",
+          "dflt": null
+        },
+        {
+          "colNm": "MM_FXAMT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "월정액금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DYPRT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "일할금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_DYPRT_CHRG_D",
+        "cols": [
+          "CHRG_CALC_NO",
+          "DYPRT_CHRG_DTL_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_DYPRT_CHRG_D_01",
+          "cols": [
+            "CHRG_CALC_NO"
+          ],
+          "refTbl": "PTL_PAY_CHRG_CALC_L",
+          "refCols": [
+            "CHRG_CALC_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "요금계산내역"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_DSCNT_APLCN_L",
+      "entId": "PAY-017",
+      "entNm": "할인적용내역",
+      "tp": "ACT",
+      "def": "요금계산 결과에 적용된 할인 1건(선택약정 25%·결합·복지·프로모션 등) — 할인 대상 금액·할인율·할인금액.",
+      "estRows": 30000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "DSCNT_APLCN_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "할인적용번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_APLCN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "할인적용일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_CALC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "요금계산번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PROD_CD",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "상품코드",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PROD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "가입상품번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_APLCN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "할인적용상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_TRGT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "할인대상금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_RT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "할인율",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "할인금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_DSCNT_APLCN_L",
+        "cols": [
+          "DSCNT_APLCN_NO",
+          "DSCNT_APLCN_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_DSCNT_APLCN_L_01",
+          "cols": [
+            "CHRG_CALC_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(요금계산내역) — 요금계산 건별 할인"
+        },
+        {
+          "nm": "X_PTL_PAY_DSCNT_APLCN_L_02",
+          "cols": [
+            "SBSC_PROD_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(가입상품기본) — 가입 할인상품 적용 실적"
+        },
+        {
+          "nm": "X_PTL_PAY_DSCNT_APLCN_L_03",
+          "cols": [
+            "PROD_CD",
+            "DSCNT_APLCN_DTM"
+          ],
+          "unq": false,
+          "why": "FK 조인(할인상품기본) — 할인상품별 기간 적용 실적(선택약정 25% 등)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_DSCNT_APLCN_L_01",
+          "cols": [
+            "CHRG_CALC_NO"
+          ],
+          "refTbl": "PTL_PAY_CHRG_CALC_L",
+          "refCols": [
+            "CHRG_CALC_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "요금계산내역"
+        },
+        {
+          "nm": "FK_PTL_PAY_DSCNT_APLCN_L_02",
+          "cols": [
+            "PROD_CD"
+          ],
+          "refTbl": "PTL_PRD_DSCNT_PROD_M",
+          "refCols": [
+            "PROD_CD"
+          ],
+          "refArea": "PRD",
+          "refEnt": "할인상품기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_DSCNT_APLCN_L_03",
+          "cols": [
+            "SBSC_PROD_NO"
+          ],
+          "refTbl": "PTL_ORD_SBSC_PROD_M",
+          "refCols": [
+            "SBSC_PROD_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "가입상품기본"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "DSCNT_APLCN_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개 + DEFAULT 1개(TIMESTAMP) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_CMBN_DSCNT_ALLC_L",
+      "entId": "PAY-018",
+      "entNm": "결합할인배분내역",
+      "tp": "ACT",
+      "def": "결합계약(가족·유무선 결합) 단위로 계산된 결합할인을 구성 회선에 배분한 결과 — 회선×청구년월 배분 금액·배분율.",
+      "estRows": 10000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "CMBN_DSCNT_ALLC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "결합할인배분번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "결합계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_CALC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "요금계산번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_DSCNT_ALLC_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "결합할인배분일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CMBN_DSCNT_ALLC_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "결합할인배분상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ALLC_STD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "배분기준유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ALLC_RT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "배분율",
+          "dflt": null
+        },
+        {
+          "colNm": "ALLC_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "배분금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_CMBN_DSCNT_ALLC_L",
+        "cols": [
+          "CMBN_DSCNT_ALLC_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_CMBN_DSCNT_ALLC_L_01",
+          "cols": [
+            "CMBN_CTRT_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "FK 조인(결합계약기본) — 결합계약 + 청구년월 배분 조회"
+        },
+        {
+          "nm": "X_PTL_PAY_CMBN_DSCNT_ALLC_L_02",
+          "cols": [
+            "SVC_MGMT_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "FK 조인(회선기본) — 회선 + 청구년월 결합할인"
+        },
+        {
+          "nm": "X_PTL_PAY_CMBN_DSCNT_ALLC_L_03",
+          "cols": [
+            "CHRG_CALC_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(요금계산내역)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_CMBN_DSCNT_ALLC_L_01",
+          "cols": [
+            "CMBN_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_CMBN_CTRT_M",
+          "refCols": [
+            "CMBN_CTRT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "결합계약기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_CMBN_DSCNT_ALLC_L_02",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "회선기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_CMBN_DSCNT_ALLC_L_03",
+          "cols": [
+            "CHRG_CALC_NO"
+          ],
+          "refTbl": "PTL_PAY_CHRG_CALC_L",
+          "refCols": [
+            "CHRG_CALC_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "요금계산내역"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_PNLT_IMPS_L",
+      "entId": "PAY-019",
+      "entNm": "위약금부과내역",
+      "tp": "ACT",
+      "def": "약정 해지·요금제 하향 시 위약금(할인반환금·공시지원금 반환금) 부과 1건 — 약정 잔여일수 기준 산정 금액·감면.",
+      "estRows": 3000000,
+      "volTier": "T2",
+      "cols": [
+        {
+          "colNm": "PNLT_IMPS_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "위약금부과번호",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "약정계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_CALC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "요금계산번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PNLT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "위약금유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PNLT_IMPS_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "위약금부과일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PNLT_IMPS_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "위약금부과상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRMT_RMND_DCNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "약정잔여일수",
+          "dflt": null
+        },
+        {
+          "colNm": "RTN_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "반환금액",
+          "dflt": null
+        },
+        {
+          "colNm": "IMPS_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "부과금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RDCT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "감면금액",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "청구년월",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_PNLT_IMPS_L",
+        "cols": [
+          "PNLT_IMPS_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_PNLT_IMPS_L_01",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(회선기본) — 회선별 위약금 조회(해지 상담)"
+        },
+        {
+          "nm": "X_PTL_PAY_PNLT_IMPS_L_02",
+          "cols": [
+            "AGRMT_CTRT_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(약정계약기본)"
+        },
+        {
+          "nm": "X_PTL_PAY_PNLT_IMPS_L_03",
+          "cols": [
+            "CHRG_CALC_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(요금계산내역)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_PNLT_IMPS_L_01",
+          "cols": [
+            "AGRMT_CTRT_NO"
+          ],
+          "refTbl": "PTL_ORD_AGRMT_CTRT_M",
+          "refCols": [
+            "AGRMT_CTRT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "약정계약기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_PNLT_IMPS_L_02",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "회선기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_PNLT_IMPS_L_03",
+          "cols": [
+            "CHRG_CALC_NO"
+          ],
+          "refTbl": "PTL_PAY_CHRG_CALC_L",
+          "refCols": [
+            "CHRG_CALC_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "요금계산내역"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_EQP_INSTL_BILL_D",
+      "entId": "PAY-020",
+      "entNm": "단말할부청구상세",
+      "tp": "ACT",
+      "def": "단말 할부계약의 회차별 할부금(원금·할부이자) 청구 결과 — ORD 단말할부상세(회차 계획)와 1:1, 청구서 라인으로 반영.",
+      "estRows": 20000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "EQP_INSTL_CTRT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "단말할부계약번호",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_TMS",
+          "dataTp": "NUMERIC(3)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "할부회차",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DTL_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_BILL_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "할부청구일시",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_BILL_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "할부청구상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_PRNC",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "할부원금",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_INTR_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "할부이자금액",
+          "dflt": null
+        },
+        {
+          "colNm": "INSTL_RMND_PRNC",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "할부잔여원금",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_EQP_INSTL_BILL_D",
+        "cols": [
+          "EQP_INSTL_CTRT_NO",
+          "INSTL_TMS",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_EQP_INSTL_BILL_D_01",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구상세) — 청구 라인별 할부금"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_EQP_INSTL_BILL_D_01",
+          "cols": [
+            "EQP_INSTL_CTRT_NO",
+            "INSTL_TMS"
+          ],
+          "refTbl": "PTL_ORD_EQP_INSTL_D",
+          "refCols": [
+            "EQP_INSTL_CTRT_NO",
+            "INSTL_TMS"
+          ],
+          "refArea": "ORD",
+          "refEnt": "단말할부상세"
+        },
+        {
+          "nm": "FK_PTL_PAY_EQP_INSTL_BILL_D_02",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "refTbl": "PTL_PAY_BILL_D",
+          "refCols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구상세"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개 + DEFAULT 1개(CHAR(6)) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_ROAM_USE_L",
+      "entId": "PAY-021",
+      "entNm": "로밍사용내역",
+      "tp": "ACT",
+      "moduleCd": "STL",
+      "def": "국외 로밍 사용 기록(방문망 사업자가 GSMA TAP3 파일로 보낸 사용분) — 정산통화(SDR) 금액·환율·원화 사용금액. 고객 청구 근거이자 로밍 정산(PRM) 입력.",
+      "estRows": 5000000,
+      "volTier": "T2",
+      "cols": [
+        {
+          "colNm": "ROAM_USE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "로밍사용번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ROAM_BZMN_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "로밍사업자번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "사용번호",
+          "dflt": null
+        },
+        {
+          "colNm": "TAP_FILE_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "TAP파일명",
+          "dflt": null
+        },
+        {
+          "colNm": "TAP_RCPTN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "TAP수신일시",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "사용시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "ROAM_USE_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "로밍사용상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ROAM_DRCT_SE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "로밍방향구분코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_SVC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "사용서비스유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_QTY",
+          "dataTp": "NUMERIC(18)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "사용량",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_UNIT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "사용단위유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "STLM_CRNCY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "정산통화코드",
+          "dflt": null
+        },
+        {
+          "colNm": "STLM_CRNCY_AMT",
+          "dataTp": "NUMERIC(18,4)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 14,
+          "termNm": "정산통화금액",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_EXRT",
+          "dataTp": "NUMERIC(15,4)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 15,
+          "termNm": "적용환율",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 16,
+          "termNm": "사용금액",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 17,
+          "termNm": "청구년월",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_ROAM_USE_L",
+        "cols": [
+          "ROAM_USE_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_ROAM_USE_L_01",
+          "cols": [
+            "SVC_MGMT_NO",
+            "USE_BGNG_DTM"
+          ],
+          "unq": false,
+          "why": "FK 조인(회선기본) — 회선 로밍 사용 조회"
+        },
+        {
+          "nm": "X_PTL_PAY_ROAM_USE_L_02",
+          "cols": [
+            "ROAM_BZMN_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "FK 조인(로밍사업자기본) — 사업자 + 청구년월 로밍 정산 집계(STL)"
+        },
+        {
+          "nm": "X_PTL_PAY_ROAM_USE_L_03",
+          "cols": [
+            "USE_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(사용내역)"
+        },
+        {
+          "nm": "X_PTL_PAY_ROAM_USE_L_04",
+          "cols": [
+            "TAP_FILE_NM"
+          ],
+          "unq": false,
+          "why": "TAP 파일 단위 수신 대사·RAP 반송"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_ROAM_USE_L_01",
+          "cols": [
+            "ROAM_BZMN_NO"
+          ],
+          "refTbl": "PTL_PRM_ROAM_BZMN_M",
+          "refCols": [
+            "ROAM_BZMN_NO"
+          ],
+          "refArea": "PRM",
+          "refEnt": "로밍사업자기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_ROAM_USE_L_02",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "회선기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_ROAM_USE_L_03",
+          "cols": [
+            "USE_NO"
+          ],
+          "refTbl": "PTL_PAY_USE_L",
+          "refCols": [
+            "USE_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "사용내역"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_MCPAY_BILL_D",
+      "entId": "PAY-022",
+      "entNm": "소액결제청구상세",
+      "tp": "ACT",
+      "moduleCd": "STL",
+      "def": "휴대폰 소액결제(통신과금서비스) 1건과 그 청구 반영 — 결제 제공사(PG·콘텐츠제공사)·결제금액·취소. 제공사 정산(PRM) 입력.",
+      "estRows": 10000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "MCPAY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "소액결제번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTS_PRVD_CO_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "콘텐츠제공사번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DTL_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "PYMT_PROD_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "결제상품명",
+          "dflt": null
+        },
+        {
+          "colNm": "PYMT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "결제일시",
+          "dflt": null
+        },
+        {
+          "colNm": "MCPAY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "소액결제상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PYMT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "결제금액",
+          "dflt": null
+        },
+        {
+          "colNm": "PYMT_CNCL_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "결제취소일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "청구년월",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_MCPAY_BILL_D",
+        "cols": [
+          "MCPAY_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_MCPAY_BILL_D_01",
+          "cols": [
+            "SVC_MGMT_NO",
+            "PYMT_DTM"
+          ],
+          "unq": false,
+          "why": "FK 조인(회선기본) — 회선 소액결제 이용 내역(상담·한도)"
+        },
+        {
+          "nm": "X_PTL_PAY_MCPAY_BILL_D_02",
+          "cols": [
+            "CNTS_PRVD_CO_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "FK 조인(콘텐츠제공사기본) — 제공사 + 청구년월 정산(STL)"
+        },
+        {
+          "nm": "X_PTL_PAY_MCPAY_BILL_D_03",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구상세)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_MCPAY_BILL_D_01",
+          "cols": [
+            "CNTS_PRVD_CO_NO"
+          ],
+          "refTbl": "PTL_PRM_CNTS_PRVD_CO_M",
+          "refCols": [
+            "CNTS_PRVD_CO_NO"
+          ],
+          "refArea": "PRM",
+          "refEnt": "콘텐츠제공사기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_MCPAY_BILL_D_02",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "회선기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_MCPAY_BILL_D_03",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "refTbl": "PTL_PAY_BILL_D",
+          "refCols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구상세"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_CNTS_UTLZ_CHRG_L",
+      "entId": "PAY-023",
+      "entNm": "콘텐츠이용요금내역",
+      "tp": "ACT",
+      "moduleCd": "STL",
+      "def": "콘텐츠 제공사 서비스(음악·영상·게임 등) 이용료(정보이용료)를 통신요금과 함께 대신 청구하는 이용 1건. 제공사 정산(PRM) 입력.",
+      "estRows": 10000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "CNTS_UTLZ_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "콘텐츠이용번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTS_PRVD_CO_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "콘텐츠제공사번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "USE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "사용번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DTL_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구상세순번",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTS_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "콘텐츠명",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTS_UTLZ_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "콘텐츠이용일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTS_UTLZ_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "콘텐츠이용상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "콘텐츠유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTS_UTLZ_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "콘텐츠이용금액",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "청구년월",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_CNTS_UTLZ_CHRG_L",
+        "cols": [
+          "CNTS_UTLZ_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_CNTS_UTLZ_CHRG_L_01",
+          "cols": [
+            "SVC_MGMT_NO",
+            "CNTS_UTLZ_DTM"
+          ],
+          "unq": false,
+          "why": "FK 조인(회선기본) — 회선 콘텐츠 이용 내역"
+        },
+        {
+          "nm": "X_PTL_PAY_CNTS_UTLZ_CHRG_L_02",
+          "cols": [
+            "CNTS_PRVD_CO_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "FK 조인(콘텐츠제공사기본) — 제공사 + 청구년월 정산(STL)"
+        },
+        {
+          "nm": "X_PTL_PAY_CNTS_UTLZ_CHRG_L_03",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구상세)"
+        },
+        {
+          "nm": "X_PTL_PAY_CNTS_UTLZ_CHRG_L_04",
+          "cols": [
+            "USE_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(사용내역)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_CNTS_UTLZ_CHRG_L_01",
+          "cols": [
+            "CNTS_PRVD_CO_NO"
+          ],
+          "refTbl": "PTL_PRM_CNTS_PRVD_CO_M",
+          "refCols": [
+            "CNTS_PRVD_CO_NO"
+          ],
+          "refArea": "PRM",
+          "refEnt": "콘텐츠제공사기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_CNTS_UTLZ_CHRG_L_02",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refTbl": "PTL_ORD_LINE_M",
+          "refCols": [
+            "SVC_MGMT_NO"
+          ],
+          "refArea": "ORD",
+          "refEnt": "회선기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_CNTS_UTLZ_CHRG_L_03",
+          "cols": [
+            "USE_NO"
+          ],
+          "refTbl": "PTL_PAY_USE_L",
+          "refCols": [
+            "USE_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "사용내역"
+        },
+        {
+          "nm": "FK_PTL_PAY_CNTS_UTLZ_CHRG_L_04",
+          "cols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "refTbl": "PTL_PAY_BILL_D",
+          "refCols": [
+            "BILL_NO",
+            "BILL_DTL_SEQ"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구상세"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_BILL_ADJ_RSN_C",
+      "entId": "PAY-024",
+      "entNm": "청구조정사유코드",
+      "tp": "REF",
+      "def": "청구조정 사유 체계(민원감면·오과금정정·장애보상·재청구·이월 등)와 사유별 기본 조정유형·승인 필요 여부·한도. 공통코드 청구조정사유유형코드의 확장 기준.",
+      "estRows": 200,
+      "volTier": "T1",
+      "cols": [
+        {
+          "colNm": "BILL_ADJ_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구조정사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ADJ_RSN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구조정사유명",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ADJ_RSN_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구조정사유등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ADJ_RSN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구조정사유상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ADJ_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구조정유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ADJ_APRV_NEED_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "조정승인필요여부",
+          "dflt": null
+        },
+        {
+          "colNm": "ADJ_LMT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "조정한도금액",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BILL_ADJ_RSN_C",
+        "cols": [
+          "BILL_ADJ_RSN_TY_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_BILL_DDLN_H",
+      "entId": "PAY-025",
+      "entNm": "청구마감이력",
+      "tp": "ACT",
+      "def": "청구작업의 청구월 마감·재오픈 이력(마감 후 민원 정정을 위한 재오픈 포함).",
+      "estRows": 15000,
+      "volTier": "T1",
+      "cols": [
+        {
+          "colNm": "BILL_JOB_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구작업번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DDLN_HIST_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구마감이력순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DDLN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구마감유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DDLN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구마감일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_DDLN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구마감상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DDLN_RSN_CN",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "마감사유내용",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BILL_DDLN_H",
+        "cols": [
+          "BILL_JOB_NO",
+          "BILL_DDLN_HIST_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_BILL_DDLN_H_01",
+          "cols": [
+            "BILL_JOB_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_JOB_M",
+          "refCols": [
+            "BILL_JOB_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구작업기본"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_INVC_PBLCN_L",
+      "entId": "PAY-026",
+      "entNm": "청구서발행내역",
+      "tp": "ACT",
+      "def": "청구서 발송 1건(우편·이메일·모바일(MMS·앱)) — 매체·발송 결과·반송.",
+      "estRows": 28000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "INVC_PBLCN_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구서발행번호",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_PBLCN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구서발행일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_PBLCN_MDM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구서발행매체유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_PBLCN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구서발행상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCPTN_ADDR_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수신주소암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "SNDNG_CMPTN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "발송완료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RTRN_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "반송사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_INVC_PBLCN_L",
+        "cols": [
+          "INVC_PBLCN_NO",
+          "INVC_PBLCN_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_INVC_PBLCN_L_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구기본) — 청구서별 발송 결과"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_INVC_PBLCN_L_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구기본"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "INVC_PBLCN_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개 + DEFAULT 1개(TIMESTAMP) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_INVC_RE_PBLCN_L",
+      "entId": "PAY-027",
+      "entNm": "청구서재발행내역",
+      "tp": "ACT",
+      "def": "고객 요청·분실·반송에 따른 청구서 재발행 1건 — 원 발행 건과 재발행 매체·상태.",
+      "estRows": 2000000,
+      "volTier": "T2",
+      "cols": [
+        {
+          "colNm": "INVC_RE_PBLCN_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구서재발행번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_PBLCN_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구서발행번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RE_PBLCN_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "재발행사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RE_PBLCN_REQ_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "재발행요청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RE_PBLCN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "재발행상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_PBLCN_MDM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "청구서발행매체유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_INVC_RE_PBLCN_L",
+        "cols": [
+          "INVC_RE_PBLCN_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_INVC_RE_PBLCN_L_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구기본)"
+        },
+        {
+          "nm": "X_PTL_PAY_INVC_RE_PBLCN_L_02",
+          "cols": [
+            "INVC_PBLCN_NO"
+          ],
+          "unq": false,
+          "why": "FK 조인(청구서발행내역) — 원 발행 건 추적"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_INVC_RE_PBLCN_L_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구기본"
+        },
+        {
+          "nm": "FK_PTL_PAY_INVC_RE_PBLCN_L_02",
+          "cols": [
+            "INVC_PBLCN_NO"
+          ],
+          "refTbl": "PTL_PAY_INVC_PBLCN_L",
+          "refCols": [
+            "INVC_PBLCN_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구서발행내역"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_BILL_ACNT_MM_T",
+      "entId": "PAY-028",
+      "entNm": "청구계정월집계",
+      "tp": "PROC",
+      "def": "청구계정×청구년월 청구·할인·조정·세금 집계 — 고객 가치·연체 예측 피처, 청구 대사의 기준점.",
+      "estRows": 25000000,
+      "volTier": "T3",
+      "cols": [
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "집계일시",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "집계상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구건수",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_CNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "회선수",
+          "dflt": null
+        },
+        {
+          "colNm": "THMM_BILL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "당월청구금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DSCNT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "할인금액",
+          "dflt": null
+        },
+        {
+          "colNm": "ADJ_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "조정금액",
+          "dflt": null
+        },
+        {
+          "colNm": "VAT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "부가가치세금액",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_CYOV_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "미납이월금액",
+          "dflt": null
+        },
+        {
+          "colNm": "TOT_BILL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "총청구금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BILL_ACNT_MM_T",
+        "cols": [
+          "BILL_ACNT_NO",
+          "BILL_YM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_BILL_ACNT_MM_T_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ],
+          "refArea": "CUS",
+          "refEnt": "청구계정기본"
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 18개 + DEFAULT 1개(CHAR(6)) — 파티션 키는 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_CHRG_ITM_MM_S",
+      "entId": "PAY-029",
+      "entNm": "요금항목월통계",
+      "tp": "PROC",
+      "def": "요금항목×청구년월 매출 통계(청구 라인 기준) — 매출 분석·회계 대사.",
+      "estRows": 100000,
+      "volTier": "T1",
+      "cols": [
+        {
+          "colNm": "CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "집계일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구건수",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_CNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "회선수",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구금액",
+          "dflt": null
+        },
+        {
+          "colNm": "SPLYAMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "공급가액",
+          "dflt": null
+        },
+        {
+          "colNm": "VAT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "부가가치세금액",
+          "dflt": null
+        },
+        {
+          "colNm": "ADJ_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "조정금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_CHRG_ITM_MM_S",
+        "cols": [
+          "CHRG_ITM_CD",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_PAY_CHRG_ITM_MM_S_01",
+          "cols": [
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "청구년월 전체 요금항목 매출 통계(PK 선두가 요금항목코드라 월 단위 조회 보완)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_CHRG_ITM_MM_S_01",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ],
+          "refArea": "PRD",
+          "refEnt": "요금항목코드"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_PAY_BILL_JOB_STEP_H",
+      "entId": "PAY-030",
+      "entNm": "청구작업단계이력",
+      "tp": "ACT",
+      "def": "Bill Run 단계(사용량 마감·요금계산·할인·결합배분·청구서 생성·세금·마감)별 처리 시작·종료·건수·오류.",
+      "estRows": 50000,
+      "volTier": "T1",
+      "cols": [
+        {
+          "colNm": "BILL_JOB_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구작업번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_STEP_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구작업단계순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_STEP_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구작업단계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "STEP_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "단계시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "STEP_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "단계종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_JOB_STEP_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구작업단계상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "처리건수",
+          "dflt": null
+        },
+        {
+          "colNm": "ERR_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "오류건수",
+          "dflt": null
+        },
+        {
+          "colNm": "ERR_CN",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "오류내용",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_PAY_BILL_JOB_STEP_H",
+        "cols": [
+          "BILL_JOB_NO",
+          "BILL_JOB_STEP_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_PAY_BILL_JOB_STEP_H_01",
+          "cols": [
+            "BILL_JOB_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_JOB_M",
+          "refCols": [
+            "BILL_JOB_NO"
+          ],
+          "refArea": "PAY",
+          "refEnt": "청구작업기본"
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    }
+  ]
+}

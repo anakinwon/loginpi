@@ -1,0 +1,4274 @@
+{
+  "area": "CUS",
+  "areaNm": "고객",
+  "ver": "2026-11-07",
+  "author": "subagent_physical_modeler",
+  "trgtDbms": "POSTGRESQL 17",
+  "conventions": {
+    "naming": "PK = PK_<테이블>, 인덱스 = X_<테이블>_NN, FK = FK_<자식테이블>_NN(정의만 — D6, DDL 미생성). PostgreSQL DDL 은 소문자",
+    "colOrder": "PK → FK → 일반(논리 순번 순). 시스템 칼럼 4개는 DDL 에만(D7)",
+    "types": "도메인 사전(model/std/domains.json) lgcTp·len·scale 그대로 — 일자 CHAR(8)·년월 CHAR(6)·금액 NUMERIC(15)",
+    "partition": "월 단위 적재·조회 테이블(고객월통계 — 기준년월 키) 월 RANGE 2010-01~2027-12, T3 대용량 이력·행위(7백만 행 이상 + 시점 키) 연 RANGE 2010~2027, 각각 DEFAULT 1개. 파티션 키는 PK 에 포함",
+    "index": "PK 선두 칼럼과 같은 FK 는 별도 인덱스 없음(중복 금지). 소용량 기준(REF T1) 부모로 가는 FK(지역코드·우편번호·청구주기·조직·동의항목)는 자식→부모 방향만 쓰여 부모 PK 로 충분 — 인덱스 없음. 예외 : 청구계정이력.납부자번호는 납부자→청구계정 경로를 청구계정기본 X_02 가 받고 이력은 청구계정번호(PK 선두)로만 읽어 인덱스 없음(리뷰 05_physical_CUS R2)"
+  },
+  "decisions": [
+    {
+      "id": "P1",
+      "dec": "연 파티션 8개(고객등급이력·고객이력·청구계정이력·고객연락처이력·고객주소이력·고객동의이력·멤버십포인트내역·고객상담내역), 월 파티션 1개(고객월통계)",
+      "why": "과업 지시(T4 월·T3 대용량 이력 연) + 영역 상위 테이블 7백만 행 이상 기준. 고객월통계는 1.5천만 행이라 T4 는 아니나 월 집계를 파티션 단위로 교체 적재(DETACH·ATTACH)하므로 월 단위. 이력 테이블은 고객번호 조회 시 전 파티션 탐색 비용이 있으나 보관기간 경과분 파티션 DETACH(개인정보 파기)·CDC 기간 추출 이득이 더 큼. 고객동의내역(1천만)은 PK 에 시점이 없고 현재 상태 조회 위주라 파티션 제외"
+    },
+    {
+      "id": "P2",
+      "dec": "멤버십포인트내역·고객상담내역은 파티션 키(거래일시·상담일시)를 PK 뒤에 편입",
+      "why": "PostgreSQL 파티션 테이블의 PK·UNIQUE 는 파티션 키를 포함해야 함. 논리 PK 는 그대로(물리만 확장)"
+    },
+    {
+      "id": "P3",
+      "dec": "반정규화 1건 — 고객민원내역.상담일시",
+      "why": "파티션된 상담 PK 조회를 1개 파티션으로 한정(denorm.why)"
+    },
+    {
+      "id": "P4",
+      "dec": "포인트잔액(고객멤버십기본) 반정규화는 보류",
+      "why": "표준용어 미등재(포인트잔액) — 표준 먼저 규칙. 필요 시 표준 등재 후 추가(논리 L7 후보)"
+    },
+    {
+      "id": "P5",
+      "dec": "청구계정기본.청구주기코드·각종 상태유형코드 인덱스 없음",
+      "why": "값 수 소수(저선택도 S3) — Bill Run 은 주기별 대량 추출이라 순차 스캔이 유리"
+    },
+    {
+      "id": "P6",
+      "dec": "CUS 예상 행 수 합계 약 1.6억(최대 테이블 1.5천만 — T3 범위)",
+      "why": "D9 전체 10억~12억 중 과금계(PAY·INV T4)가 대부분 — 고객계는 약 15% 배분. 고객 500만(누적) 기준 상세·이력 배수, 고객월통계는 고객×월 전량 대신 표본 고객 월 평균 약 7만(최근 월 많게 S6). data_migrationner 가 docs/06 에서 최종 확정"
+    }
+  ],
+  "tables": [
+    {
+      "tblNm": "PTL_CUS_CUST_M",
+      "entId": "CUS-001",
+      "def": "통신 서비스를 계약하고 요금 채무를 지는 당사자(개인·개인사업자·법인·외국인·공공기관)의 공통 실체. 개인·법인 상세의 상위(슈퍼타입). 해지·사망 후에도 행을 지우지 않고 상태·파기 일시로 표현한다.",
+      "estRows": 5000000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객명",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "고객등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "고객상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "고객유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DMFRGN_SE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "내외국인구분코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NATN_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "국가코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_GRD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "고객등급유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "FRST_SBSC_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "최초가입일자",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_TRMN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "고객해지일시",
+          "dflt": null
+        },
+        {
+          "colNm": "DRMT_CNVR_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "휴면전환일자",
+          "dflt": null
+        },
+        {
+          "colNm": "PRVC_DSTR_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "개인정보파기일시",
+          "dflt": null
+        },
+        {
+          "colNm": "NMNE_THFT_DCLR_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "명의도용신고여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_M",
+        "cols": [
+          "CUST_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_CUST_M_01",
+          "cols": [
+            "CUST_NM"
+          ],
+          "unq": false,
+          "why": "상담·매장 화면 고객명 검색(동명이인 다수 S8 — 생년월일·연락처로 2차 확인)"
+        }
+      ],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_INDV_CUST_D",
+      "entId": "CUS-002",
+      "def": "개인·외국인 고객의 서브타입 상세. 생년월일·성별·실명확인 값(암호화 자리 표시 — D11, 실제 주민번호 미보관)·복지 대상 여부 등 개인에게만 있는 속성.",
+      "estRows": 4650000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ENG_CUST_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "영문고객명",
+          "dflt": null
+        },
+        {
+          "colNm": "INDV_CUST_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "개인고객등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RLNM_CRTF_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "실명인증상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BRDT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "생년월일",
+          "dflt": null
+        },
+        {
+          "colNm": "GNDR_SE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "성별구분코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RLNM_IDNTF_NO_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "실명확인번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "IDCD_KND_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "신분증종류코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RLNM_CRTF_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "실명인증일시",
+          "dflt": null
+        },
+        {
+          "colNm": "FRGNR_STAY_EXPRY_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "외국인체류만료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "WLFR_TRGT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "복지대상유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_INDV_CUST_D",
+        "cols": [
+          "CUST_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_INDV_CUST_D_01",
+          "cols": [
+            "RLNM_IDNTF_NO_ENCPT_VL"
+          ],
+          "unq": false,
+          "why": "가입 시 명의자 기존 고객 여부·명의도용 점검(암호화 실명번호 동등 조회)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_INDV_CUST_D_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CORP_CUST_D",
+      "entId": "CUS-003",
+      "def": "법인·개인사업자·공공기관 고객의 서브타입 상세. 사업자등록·대표자·업종·규모 등 법인에게만 있는 속성(법인 1곳이 회선 100만+ 보유하는 S1 핫 키의 주인).",
+      "estRows": 350000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CORP_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "법인명",
+          "dflt": null
+        },
+        {
+          "colNm": "CORP_CUST_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "법인고객등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BZMN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "사업자상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BRNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "사업자등록번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CRNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "법인등록번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRSV_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "대표자명",
+          "dflt": null
+        },
+        {
+          "colNm": "TPBIZ_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "업종코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CORP_SCL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "법인규모유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "FNDN_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "설립일자",
+          "dflt": null
+        },
+        {
+          "colNm": "EMP_CNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "종업원수",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_TELNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "대표전화번호",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CORP_CUST_D",
+        "cols": [
+          "CUST_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_CORP_CUST_D_01",
+          "cols": [
+            "BRNO"
+          ],
+          "unq": false,
+          "why": "법인 가입·세금계산서 발행 시 사업자등록번호로 법인 고객 조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CORP_CUST_D_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_BILL_ACNT_M",
+      "entId": "CUS-004",
+      "def": "청구서를 묶어 발행하는 단위(TM Forum Customer Account). 한 고객이 여러 청구계정을, 한 청구계정이 여러 회선(가입계약)을 가진다. 청구주기·청구서 수령 방법·납부자를 정한다. 납부방법 실체는 INV(P1).",
+      "estRows": 6000000,
+      "cols": [
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "납부자번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_CYCL_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구주기코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_PLC_ADDR_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구지주소순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구계정명",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "청구계정등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "청구계정상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "청구계정유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_RCPT_MTHD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "청구서수령방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_EML_ADDR",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "청구서이메일주소",
+          "dflt": null
+        },
+        {
+          "colNm": "INTGR_BILL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "통합청구여부",
+          "dflt": null
+        },
+        {
+          "colNm": "FRST_BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "최초청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_TRMN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 14,
+          "termNm": "청구계정해지일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_BILL_ACNT_M",
+        "cols": [
+          "BILL_ACNT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_BILL_ACNT_M_01",
+          "cols": [
+            "CUST_NO"
+          ],
+          "unq": false,
+          "why": "고객→청구계정 조인(FK), 청구지주소 복합 FK(고객번호+청구지주소순번)의 선두 칼럼 겸용"
+        },
+        {
+          "nm": "X_PTL_CUS_BILL_ACNT_M_02",
+          "cols": [
+            "PYR_NO"
+          ],
+          "unq": false,
+          "why": "납부자→청구계정 조인(FK) — 자동이체 납부자 기준 청구계정 일괄 조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_BILL_ACNT_M_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_BILL_ACNT_M_02",
+          "refTbl": "PTL_CUS_CUST_ADDR_D",
+          "cols": [
+            "CUST_NO",
+            "BILL_PLC_ADDR_SEQ"
+          ],
+          "refCols": [
+            "CUST_NO",
+            "ADDR_SEQ"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_BILL_ACNT_M_03",
+          "refTbl": "PTL_CUS_PYR_M",
+          "cols": [
+            "PYR_NO"
+          ],
+          "refCols": [
+            "PYR_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_BILL_ACNT_M_04",
+          "refTbl": "PTL_PAY_BILL_CYCL_C",
+          "cols": [
+            "BILL_CYCL_CD"
+          ],
+          "refCols": [
+            "BILL_CYCL_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_PYR_M",
+      "entId": "CUS-005",
+      "def": "요금을 실제로 내는 사람·법인. 명의 고객과 다를 수 있다(부모가 자녀 요금 납부, 법인이 임직원 요금 납부). 자사 고객이면 고객번호를 참조하고, 아니면 이름·연락처만 가진다.",
+      "estRows": 5500000,
+      "cols": [
+        {
+          "colNm": "PYR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "납부자번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "납부자명",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "납부자등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "납부자상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "납부자유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NMNE_PRSN_REL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "명의자관계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_BRDT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "납부자생년월일",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_BRNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "납부자사업자등록번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_MBL_TELNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "납부자휴대전화번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_EML_ADDR",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "납부자이메일주소",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_PYR_M",
+        "cols": [
+          "PYR_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_PYR_M_01",
+          "cols": [
+            "CUST_NO"
+          ],
+          "unq": false,
+          "why": "고객→납부자 조인(FK) — 명의자 본인 납부자 조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_PYR_M_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_CNTC_D",
+      "entId": "CUS-006",
+      "def": "고객의 연락 수단(휴대전화·자택·직장·이메일·팩스) 현재값. 한 고객 여러 건, 유형별 대표 1건. 변경 이력은 기본 엔터티 고객연락처이력(논리 단계).",
+      "estRows": 8000000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "연락처순번",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "연락처명",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "연락처등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "연락처상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "연락처유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_CN",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "연락처내용",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_CNTC_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "대표연락처여부",
+          "dflt": null
+        },
+        {
+          "colNm": "SELF_CNTC_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "본인연락처여부",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_VRFC_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "연락처검증일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_CNTC_D",
+        "cols": [
+          "CUST_NO",
+          "CNTC_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_CUST_CNTC_D_01",
+          "cols": [
+            "CNTC_CN"
+          ],
+          "unq": false,
+          "why": "연락처(전화번호·이메일)로 고객 역조회 — 고객센터 인입 번호 식별"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_CNTC_D_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_ADDR_D",
+      "entId": "CUS-007",
+      "def": "고객의 주소(거주지·청구지·직장·사업장·배송지) 현재값. 청구계정의 청구지 주소가 이 엔터티를 가리킨다. 변경 이력은 고객주소이력(논리 단계).",
+      "estRows": 6000000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ADDR_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "주소순번",
+          "dflt": null
+        },
+        {
+          "colNm": "RGN_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "지역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ZIP",
+          "dataTp": "CHAR(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "우편번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCPN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수령인명",
+          "dflt": null
+        },
+        {
+          "colNm": "ADDR_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "주소등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "ADDR_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "주소상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ADDR_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "주소유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ROAD_NM_ADDR",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "도로명주소",
+          "dflt": null
+        },
+        {
+          "colNm": "DADDR",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "상세주소",
+          "dflt": null
+        },
+        {
+          "colNm": "BLDG_MGMT_NO",
+          "dataTp": "VARCHAR(30)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "건물관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_ADDR_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "대표주소여부",
+          "dflt": null
+        },
+        {
+          "colNm": "RTRN_NMTM",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "반송횟수",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_ADDR_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 14,
+          "termNm": "고객주소변경사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_ADDR_D",
+        "cols": [
+          "CUST_NO",
+          "ADDR_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_ADDR_D_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_ADDR_D_02",
+          "refTbl": "PTL_CUS_RGN_C",
+          "cols": [
+            "RGN_CD"
+          ],
+          "refCols": [
+            "RGN_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_ADDR_D_03",
+          "refTbl": "PTL_CUS_ZIP_M",
+          "cols": [
+            "ZIP"
+          ],
+          "refCols": [
+            "ZIP"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_AGRE_L",
+      "entId": "CUS-008",
+      "def": "고객이 개인정보 수집·이용, 마케팅 수신, 제3자 제공 등 동의 항목에 동의·거부한 행위 1건. 철회·만료·파기는 상태유형코드와 일시로 표현(행 삭제 없음 — 동의 증빙 보존 의무).",
+      "estRows": 10000000,
+      "cols": [
+        {
+          "colNm": "CUST_AGRE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객동의번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_ITM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "동의항목유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_ITM_VER_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "동의항목버전번호",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_PRSN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "동의자명",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "동의일시",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "동의상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "동의여부",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "동의채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "LGLRP_AGRE_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "법정대리인동의여부",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_WTHDR_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "동의철회일시",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_EXPRY_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "동의만료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_AGRE_L",
+        "cols": [
+          "CUST_AGRE_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_CUST_AGRE_L_01",
+          "cols": [
+            "CUST_NO",
+            "AGRE_ITM_TY_CD"
+          ],
+          "unq": false,
+          "why": "고객별 동의 현황(마케팅·제3자 제공) 조회 — 발송 대상 판정 시 고객번호+항목 동등 조회(FK)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_AGRE_L_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_AGRE_L_02",
+          "refTbl": "PTL_CUS_AGRE_ITM_C",
+          "cols": [
+            "AGRE_ITM_TY_CD",
+            "AGRE_ITM_VER_NO"
+          ],
+          "refCols": [
+            "AGRE_ITM_TY_CD",
+            "AGRE_ITM_VER_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_GRD_H",
+      "entId": "CUS-009",
+      "def": "고객 등급(VVIP·VIP·골드·실버·일반) 산정·부여 이력. 적용 기간(시작·종료)을 가져 과거 시점 등급 재현(SCD2)이 가능하다. 현재 등급은 고객기본.고객등급코드에 둔다.",
+      "estRows": 7000000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "GRD_APLCN_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "등급적용시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_GRD_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "고객등급명",
+          "dflt": null
+        },
+        {
+          "colNm": "GRD_ASMT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "등급산정일시",
+          "dflt": null
+        },
+        {
+          "colNm": "GRD_APLCN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "등급적용상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_GRD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "고객등급유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "GRD_APLCN_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "등급적용종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "GRD_ASMT_STD_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "등급산정기준년월",
+          "dflt": null
+        },
+        {
+          "colNm": "ASMT_BILL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "산정청구금액",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PRD_MCNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "가입기간개월수",
+          "dflt": null
+        },
+        {
+          "colNm": "GRD_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "등급변경사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_GRD_H",
+        "cols": [
+          "CUST_NO",
+          "GRD_APLCN_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_GRD_H_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "GRD_APLCN_BGNG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 2010~2027(18개) + DEFAULT — 파티션 키가 이미 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_RGN_C",
+      "entId": "CUS-010",
+      "def": "시도·시군구·읍면동 행정구역 기준(행정표준코드 법정동 10자리 기준, D5 — 고객 영역 소유). 상위지역코드로 계층을 이룬다. 폐지·통합은 상태·적용 기간으로 표현.",
+      "estRows": 20000,
+      "cols": [
+        {
+          "colNm": "RGN_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "지역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "UP_RGN_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "상위지역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RGN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "지역명",
+          "dflt": null
+        },
+        {
+          "colNm": "RGN_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "지역등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RGN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "지역상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RGN_STEP_SE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "지역단계구분코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ENG_RGN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "영문지역명",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "ISLND_MNTN_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "도서산간여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_RGN_C",
+        "cols": [
+          "RGN_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_RGN_C_01",
+          "cols": [
+            "UP_RGN_CD"
+          ],
+          "unq": false,
+          "why": "상위지역코드 계층 전개(시도→시군구→읍면동) 재귀 조회(자기 참조 FK)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_RGN_C_01",
+          "refTbl": "PTL_CUS_RGN_C",
+          "cols": [
+            "UP_RGN_CD"
+          ],
+          "refCols": [
+            "RGN_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_H",
+      "entId": "CUS-011",
+      "def": "고객기본 주요 속성(이름·상태·유형·등급·명의도용)의 변경 전후를 유효 기간(SCD2)으로 보존. 현재행은 유효종료일시 = 9999-12-31 23:59:59.",
+      "estRows": 8000000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "고객명",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "고객상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "고객유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_GRD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "고객등급유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NMNE_THFT_DCLR_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "명의도용신고여부",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "고객변경사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHG_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "변경채널유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_H",
+        "cols": [
+          "CUST_NO",
+          "VLD_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_H_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "VLD_BGNG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 2010~2027(18개) + DEFAULT — 파티션 키가 이미 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_RLNM_CRTF_L",
+      "entId": "CUS-012",
+      "def": "가입·명의변경·본인확인 시 수행한 실명인증(신분증 진위확인·휴대폰 본인확인 등) 1건. 신규 가입 전 인증은 고객번호가 없다(가입신청번호로 연결, 확정 후 고객번호 채움).",
+      "estRows": 6000000,
+      "cols": [
+        {
+          "colNm": "RLNM_CRTF_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "실명인증번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "가입신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PRTNR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "파트너번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CRTF_TRGT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "인증대상명",
+          "dflt": null
+        },
+        {
+          "colNm": "RLNM_CRTF_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "실명인증일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RLNM_CRTF_RSLT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "실명인증결과유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RLNM_CRTF_MEANS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "실명인증수단유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "IDCD_KND_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "신분증종류코드",
+          "dflt": null
+        },
+        {
+          "colNm": "IDCD_ISSU_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "신분증발급일자",
+          "dflt": null
+        },
+        {
+          "colNm": "RLNM_IDNTF_NO_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "실명확인번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "CRTF_FAIL_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "인증실패사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_RLNM_CRTF_L",
+        "cols": [
+          "RLNM_CRTF_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_RLNM_CRTF_L_01",
+          "cols": [
+            "CUST_NO",
+            "RLNM_CRTF_DTM"
+          ],
+          "unq": false,
+          "why": "고객별 실명인증 이력 최신순 조회(FK)"
+        },
+        {
+          "nm": "X_PTL_CUS_RLNM_CRTF_L_02",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "unq": false,
+          "why": "가입신청서→실명인증 결과 조인(ORD FK) — 개통 전 인증 확인"
+        },
+        {
+          "nm": "X_PTL_CUS_RLNM_CRTF_L_03",
+          "cols": [
+            "PRTNR_NO",
+            "RLNM_CRTF_DTM"
+          ],
+          "unq": false,
+          "why": "대리점별 기간 인증 실적·명의도용 의심 점검(PRM FK + 기간 범위)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_RLNM_CRTF_L_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_RLNM_CRTF_L_02",
+          "refTbl": "PTL_ORD_SBSC_APLY_M",
+          "cols": [
+            "SBSC_APLY_NO"
+          ],
+          "refCols": [
+            "SBSC_APLY_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_RLNM_CRTF_L_03",
+          "refTbl": "PTL_PRM_PRTNR_M",
+          "cols": [
+            "PRTNR_NO"
+          ],
+          "refCols": [
+            "PRTNR_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_LGLRP_D",
+      "entId": "CUS-013",
+      "def": "미성년(만 19세 미만)·피후견 고객의 법정대리인. 가입·요금제 변경 동의 주체. 대리인이 자사 고객이면 대리인고객번호(역할명)로 연결.",
+      "estRows": 300000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "LGLRP_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "법정대리인순번",
+          "dflt": null
+        },
+        {
+          "colNm": "LGLRP_CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "법정대리인고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "LGLRP_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "법정대리인명",
+          "dflt": null
+        },
+        {
+          "colNm": "LGLRP_REL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "법정대리인관계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "LGLRP_BRDT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "법정대리인생년월일",
+          "dflt": null
+        },
+        {
+          "colNm": "LGLRP_MBL_TELNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "법정대리인휴대전화번호",
+          "dflt": null
+        },
+        {
+          "colNm": "LGLRP_AGRE_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "법정대리인동의일시",
+          "dflt": null
+        },
+        {
+          "colNm": "LGLRP_REL_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "법정대리인관계종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_LGLRP_D",
+        "cols": [
+          "CUST_NO",
+          "LGLRP_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_LGLRP_D_01",
+          "cols": [
+            "LGLRP_CUST_NO"
+          ],
+          "unq": false,
+          "why": "법정대리인 고객 쪽에서 피대리 미성년 고객 역조회(역할명 FK)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_LGLRP_D_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_LGLRP_D_02",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "LGLRP_CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CORP_PIC_D",
+      "entId": "CUS-014",
+      "def": "법인 고객의 업무 담당자(계약·요금·기술). 법인 1곳에 여러 명, 담당 유형별 대표 1명.",
+      "estRows": 600000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PIC_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "담당자순번",
+          "dflt": null
+        },
+        {
+          "colNm": "PIC_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "담당자명",
+          "dflt": null
+        },
+        {
+          "colNm": "PIC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "담당자유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PIC_DEPT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "담당자부서명",
+          "dflt": null
+        },
+        {
+          "colNm": "PIC_JBPS_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "담당자직위명",
+          "dflt": null
+        },
+        {
+          "colNm": "PIC_MBL_TELNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "담당자휴대전화번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PIC_EML_ADDR",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "담당자이메일주소",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_PIC_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "대표담당자여부",
+          "dflt": null
+        },
+        {
+          "colNm": "PIC_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "담당자등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PIC_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "담당자상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CORP_PIC_D",
+        "cols": [
+          "CUST_NO",
+          "PIC_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CORP_PIC_D_01",
+          "refTbl": "PTL_CUS_CORP_CUST_D",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CORP_BPLC_D",
+      "entId": "CUS-015",
+      "def": "법인 고객의 사업장(본사·지점). 사업장별 사업자등록번호·주소를 갖고 법인 회선의 설치·청구 위치가 된다.",
+      "estRows": 400000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BPLC_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "사업장순번",
+          "dflt": null
+        },
+        {
+          "colNm": "RGN_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "지역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ZIP",
+          "dataTp": "CHAR(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "우편번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BPLC_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "사업장명",
+          "dflt": null
+        },
+        {
+          "colNm": "BPLC_BRNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "사업장사업자등록번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ROAD_NM_ADDR",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "도로명주소",
+          "dflt": null
+        },
+        {
+          "colNm": "DADDR",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "상세주소",
+          "dflt": null
+        },
+        {
+          "colNm": "BPLC_RPRS_TELNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "사업장대표전화번호",
+          "dflt": null
+        },
+        {
+          "colNm": "HQ_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "본사여부",
+          "dflt": null
+        },
+        {
+          "colNm": "BPLC_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "사업장등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BPLC_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "사업장상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CORP_BPLC_D",
+        "cols": [
+          "CUST_NO",
+          "BPLC_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CORP_BPLC_D_01",
+          "refTbl": "PTL_CUS_CORP_CUST_D",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CORP_BPLC_D_02",
+          "refTbl": "PTL_CUS_RGN_C",
+          "cols": [
+            "RGN_CD"
+          ],
+          "refCols": [
+            "RGN_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CORP_BPLC_D_03",
+          "refTbl": "PTL_CUS_ZIP_M",
+          "cols": [
+            "ZIP"
+          ],
+          "refCols": [
+            "ZIP"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_R",
+      "entId": "CUS-016",
+      "def": "고객과 고객 사이의 관계(가족·법인 소속 임직원·법정대리) — 고객↔고객 N:M 해소. 가족결합·법인 임직원 요금 대납의 근거.",
+      "estRows": 1500000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "REL_CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "관계고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_REL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "고객관계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "REL_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "관계시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "REL_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "관계종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "REL_EVDC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "관계증빙유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "REL_IDNTF_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "관계확인일시",
+          "dflt": null
+        },
+        {
+          "colNm": "REL_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "관계상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_R",
+        "cols": [
+          "CUST_NO",
+          "REL_CUST_NO",
+          "CUST_REL_TY_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_CUST_R_01",
+          "cols": [
+            "REL_CUST_NO"
+          ],
+          "unq": false,
+          "why": "관계고객 쪽 역방향 조회(가족결합·대납 상대방) — PK 선두가 고객번호라 역방향 별도 필요(FK)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_R_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_R_02",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "REL_CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_BILL_ACNT_H",
+      "entId": "CUS-017",
+      "def": "청구계정 속성(이름·상태·납부자·청구주기·유형·통합청구)의 변경 이력(SCD2). 청구주기 변경은 다음 청구월부터 적용.",
+      "estRows": 7000000,
+      "cols": [
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "납부자번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_CYCL_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구주기코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구계정명",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "청구계정상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "청구계정유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "INTGR_BILL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "통합청구여부",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "청구계정변경사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_BILL_ACNT_H",
+        "cols": [
+          "BILL_ACNT_NO",
+          "VLD_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_BILL_ACNT_H_01",
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_BILL_ACNT_H_02",
+          "refTbl": "PTL_CUS_PYR_M",
+          "cols": [
+            "PYR_NO"
+          ],
+          "refCols": [
+            "PYR_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_BILL_ACNT_H_03",
+          "refTbl": "PTL_PAY_BILL_CYCL_C",
+          "cols": [
+            "BILL_CYCL_CD"
+          ],
+          "refCols": [
+            "BILL_CYCL_CD"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "VLD_BGNG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 2010~2027(18개) + DEFAULT — 파티션 키가 이미 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_INVC_RCPT_MTHD_H",
+      "entId": "CUS-018",
+      "def": "청구서 수령 방법(우편·이메일·모바일·문자·미발행)과 수령처 변경 이력(SCD2). 청구 시점 수령 방법 재현용.",
+      "estRows": 5000000,
+      "cols": [
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_RCPT_MTHD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구서수령방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_EML_ADDR",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구서이메일주소",
+          "dflt": null
+        },
+        {
+          "colNm": "INVC_RCPTN_MBL_TELNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구서수신휴대전화번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CHG_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "변경채널유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_INVC_RCPT_MTHD_H",
+        "cols": [
+          "BILL_ACNT_NO",
+          "VLD_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_INVC_RCPT_MTHD_H_01",
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_PYR_H",
+      "entId": "CUS-019",
+      "def": "납부자 속성(이름·상태·유형·명의자 관계·연락처) 변경 이력(SCD2).",
+      "estRows": 5500000,
+      "cols": [
+        {
+          "colNm": "PYR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "납부자번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "납부자명",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "납부자상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "납부자유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NMNE_PRSN_REL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "명의자관계유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_MBL_TELNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "납부자휴대전화번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_EML_ADDR",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "납부자이메일주소",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_PYR_H",
+        "cols": [
+          "PYR_NO",
+          "VLD_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_PYR_H_01",
+          "refTbl": "PTL_CUS_PYR_M",
+          "cols": [
+            "PYR_NO"
+          ],
+          "refCols": [
+            "PYR_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_CNTC_H",
+      "entId": "CUS-020",
+      "def": "고객연락처상세 1건(고객번호+연락처순번)의 값·상태 변경 이력(SCD2). 개인정보 — 파기 시 연락처내용 마스킹.",
+      "estRows": 9000000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "연락처순번",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "연락처유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_CN",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "연락처내용",
+          "dflt": null
+        },
+        {
+          "colNm": "CNTC_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "연락처상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_CNTC_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "대표연락처여부",
+          "dflt": null
+        },
+        {
+          "colNm": "CHG_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "변경채널유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_CNTC_H",
+        "cols": [
+          "CUST_NO",
+          "CNTC_SEQ",
+          "VLD_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_CNTC_H_01",
+          "refTbl": "PTL_CUS_CUST_CNTC_D",
+          "cols": [
+            "CUST_NO",
+            "CNTC_SEQ"
+          ],
+          "refCols": [
+            "CUST_NO",
+            "CNTC_SEQ"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "VLD_BGNG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 2010~2027(18개) + DEFAULT — 파티션 키가 이미 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_ADDR_H",
+      "entId": "CUS-021",
+      "def": "고객주소상세 1건(고객번호+주소순번)의 주소 변경 이력(SCD2). 반송·이사 추적.",
+      "estRows": 7000000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ADDR_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "주소순번",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RGN_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "지역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ZIP",
+          "dataTp": "CHAR(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "우편번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "ADDR_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "주소유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ROAD_NM_ADDR",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "도로명주소",
+          "dflt": null
+        },
+        {
+          "colNm": "DADDR",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "상세주소",
+          "dflt": null
+        },
+        {
+          "colNm": "ADDR_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "주소상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_ADDR_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "고객주소변경사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CHG_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "변경채널유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_ADDR_H",
+        "cols": [
+          "CUST_NO",
+          "ADDR_SEQ",
+          "VLD_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_ADDR_H_01",
+          "refTbl": "PTL_CUS_CUST_ADDR_D",
+          "cols": [
+            "CUST_NO",
+            "ADDR_SEQ"
+          ],
+          "refCols": [
+            "CUST_NO",
+            "ADDR_SEQ"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_ADDR_H_02",
+          "refTbl": "PTL_CUS_RGN_C",
+          "cols": [
+            "RGN_CD"
+          ],
+          "refCols": [
+            "RGN_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_ADDR_H_03",
+          "refTbl": "PTL_CUS_ZIP_M",
+          "cols": [
+            "ZIP"
+          ],
+          "refCols": [
+            "ZIP"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "VLD_BGNG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 2010~2027(18개) + DEFAULT — 파티션 키가 이미 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_AGRE_ITM_C",
+      "entId": "CUS-022",
+      "def": "동의 항목(개인정보 수집·이용 필수/선택, 마케팅 수신, 제3자 제공, 위치정보 등)과 그 약관 버전. 같은 항목의 약관 개정 = 새 버전 행.",
+      "estRows": 10000,
+      "cols": [
+        {
+          "colNm": "AGRE_ITM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "동의항목유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_ITM_VER_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "동의항목버전번호",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_ITM_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "동의항목명",
+          "dflt": null
+        },
+        {
+          "colNm": "ESNTL_AGRE_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "필수동의여부",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_ITM_CN",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "동의항목내용",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_VLD_MCNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "동의유효개월수",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_ITM_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "동의항목등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_ITM_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "동의항목상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_AGRE_ITM_C",
+        "cols": [
+          "AGRE_ITM_TY_CD",
+          "AGRE_ITM_VER_NO"
+        ]
+      },
+      "idx": [],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_AGRE_H",
+      "entId": "CUS-023",
+      "def": "고객동의내역 1건의 상태 변경(동의→철회·만료·파기, 재동의) 이력(SCD2). 동의 증빙 보존 의무로 삭제 없음.",
+      "estRows": 12000000,
+      "cols": [
+        {
+          "colNm": "CUST_AGRE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객동의번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "동의상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "동의여부",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "동의채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "AGRE_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "동의변경사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_AGRE_H",
+        "cols": [
+          "CUST_AGRE_NO",
+          "VLD_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_AGRE_H_01",
+          "refTbl": "PTL_CUS_CUST_AGRE_L",
+          "cols": [
+            "CUST_AGRE_NO"
+          ],
+          "refCols": [
+            "CUST_AGRE_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "VLD_BGNG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 2010~2027(18개) + DEFAULT — 파티션 키가 이미 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_MKT_RCPTN_DENY_L",
+      "entId": "CUS-024",
+      "def": "광고성 정보 수신거부(정보통신망법 제50조) 1건 — 080 수신거부·고객센터·앱. 비고객 번호의 거부도 받으므로 고객번호는 선택.",
+      "estRows": 1000000,
+      "cols": [
+        {
+          "colNm": "RCPTN_DENY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수신거부번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCPTN_DENY_TELNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수신거부전화번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCPTN_DENY_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수신거부일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RCPTN_DENY_MDM_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수신거부매체유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCPTN_DENY_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수신거부채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCPTN_DENY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "수신거부상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCPTN_DENY_RLS_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "수신거부해제일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_MKT_RCPTN_DENY_L",
+        "cols": [
+          "RCPTN_DENY_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_MKT_RCPTN_DENY_L_01",
+          "cols": [
+            "CUST_NO"
+          ],
+          "unq": false,
+          "why": "고객→수신거부 조인(FK)"
+        },
+        {
+          "nm": "X_PTL_CUS_MKT_RCPTN_DENY_L_02",
+          "cols": [
+            "RCPTN_DENY_TELNO"
+          ],
+          "unq": false,
+          "why": "광고 발송 직전 수신거부 번호 대조(정보통신망법 제50조) — 번호 동등 조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_MKT_RCPTN_DENY_L_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_ZIP_M",
+      "entId": "CUS-025",
+      "def": "도로명주소 기초구역 우편번호(5자리)와 소속 지역. 주소 정제·도서산간 배송 판정 기준.",
+      "estRows": 35000,
+      "cols": [
+        {
+          "colNm": "ZIP",
+          "dataTp": "CHAR(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "우편번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RGN_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "지역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ISLND_MNTN_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "도서산간여부",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "적용종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "ZIP_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "우편번호등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "ZIP_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "우편번호상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_ZIP_M",
+        "cols": [
+          "ZIP"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_ZIP_M_01",
+          "refTbl": "PTL_CUS_RGN_C",
+          "cols": [
+            "RGN_CD"
+          ],
+          "refCols": [
+            "RGN_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_MBSP_M",
+      "entId": "CUS-026",
+      "def": "고객의 멤버십 가입(1고객 1멤버십). 등급은 고객 등급·회선 요금 기준으로 매년 산정. 포인트 잔액은 포인트내역 합계(파생 — 물리 단계 반정규화 후보).",
+      "estRows": 3000000,
+      "cols": [
+        {
+          "colNm": "MBSP_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "멤버십번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "MBSP_CARD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "멤버십카드번호",
+          "dflt": null
+        },
+        {
+          "colNm": "MBSP_SBSC_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "멤버십가입일시",
+          "dflt": null
+        },
+        {
+          "colNm": "MBSP_GRD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "멤버십등급유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MBSP_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "멤버십상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MBSP_VLD_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "멤버십유효종료일자",
+          "dflt": null
+        },
+        {
+          "colNm": "MBSP_TRMN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "멤버십해지일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_MBSP_M",
+        "cols": [
+          "MBSP_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_CUST_MBSP_M_01",
+          "cols": [
+            "CUST_NO"
+          ],
+          "unq": false,
+          "why": "고객→멤버십 조인(FK) — 재가입 시 과거 멤버십 포함 조회"
+        },
+        {
+          "nm": "X_PTL_CUS_CUST_MBSP_M_02",
+          "cols": [
+            "MBSP_CARD_NO"
+          ],
+          "unq": false,
+          "why": "제휴처 결제·적립 시 멤버십 카드번호로 멤버십 조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_MBSP_M_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_MBSP_POINT_L",
+      "entId": "CUS-027",
+      "def": "멤버십 포인트 적립·사용·소멸·취소·조정 거래 1건. 사용처는 제휴사(PRM 파트너). 취소 거래는 원거래 순번을 가리킨다.",
+      "estRows": 15000000,
+      "cols": [
+        {
+          "colNm": "MBSP_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "멤버십번호",
+          "dflt": null
+        },
+        {
+          "colNm": "POINT_TRD_SEQ",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "포인트거래순번",
+          "dflt": null
+        },
+        {
+          "colNm": "POINT_TRD_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "포인트거래일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PRTNR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "파트너번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ORGN_POINT_TRD_SEQ",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "원포인트거래순번",
+          "dflt": null
+        },
+        {
+          "colNm": "POINT_TRD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "포인트거래유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "TRD_POINT_CNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "거래포인트수",
+          "dflt": null
+        },
+        {
+          "colNm": "POINT_EXTSH_SCHD_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "포인트소멸예정일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_MBSP_POINT_L",
+        "cols": [
+          "MBSP_NO",
+          "POINT_TRD_SEQ",
+          "POINT_TRD_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_MBSP_POINT_L_01",
+          "cols": [
+            "PRTNR_NO",
+            "POINT_TRD_DTM"
+          ],
+          "unq": false,
+          "why": "제휴사별 기간 포인트 정산 대사(PRM FK + 거래일시 범위 — 파티션 프루닝)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_MBSP_POINT_L_01",
+          "refTbl": "PTL_CUS_CUST_MBSP_M",
+          "cols": [
+            "MBSP_NO"
+          ],
+          "refCols": [
+            "MBSP_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_MBSP_POINT_L_02",
+          "refTbl": "PTL_CUS_MBSP_POINT_L",
+          "cols": [
+            "MBSP_NO",
+            "ORGN_POINT_TRD_SEQ"
+          ],
+          "refCols": [
+            "MBSP_NO",
+            "POINT_TRD_SEQ"
+          ],
+          "note": "논리 키(멤버십번호, 포인트거래순번) 참조 — 물리 PK 는 파티션 키 포함이라 이 FK 는 설계 정의만(D6), 원거래 탐색은 PK 선두 2칼럼 범위 조회"
+        },
+        {
+          "nm": "FK_PTL_CUS_MBSP_POINT_L_03",
+          "refTbl": "PTL_PRM_PRTNR_M",
+          "cols": [
+            "PRTNR_NO"
+          ],
+          "refCols": [
+            "PRTNR_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "POINT_TRD_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 2010~2027(18개) + DEFAULT — 파티션 키 POINT_TRD_DTM 를 PK 뒤에 편입(PostgreSQL 파티션 PK 제약). 논리 주식별자 유일성은 채번 규칙으로 보장",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_CNSL_L",
+      "entId": "CUS-028",
+      "def": "고객센터·매장·채팅 상담 1건. 비고객(가입 문의)도 있어 고객번호 선택, 회선 관련 상담이면 서비스관리번호. 상담내용은 자유 서술(S9 넓은 행).",
+      "estRows": 12000000,
+      "cols": [
+        {
+          "colNm": "CNSL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "상담번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CNSL_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "상담일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "ORG_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "조직코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CNSL_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "상담채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CNSL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "상담유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CNSL_RSLT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "상담결과유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CNSL_SCNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "상담초수",
+          "dflt": null
+        },
+        {
+          "colNm": "CNSL_CN",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "상담내용",
+          "dflt": null
+        },
+        {
+          "colNm": "CVLCPT_CNVR_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "민원전환여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_CNSL_L",
+        "cols": [
+          "CNSL_NO",
+          "CNSL_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_CUST_CNSL_L_01",
+          "cols": [
+            "CUST_NO",
+            "CNSL_DTM"
+          ],
+          "unq": false,
+          "why": "고객별 상담 이력 최신순 조회(FK) — 상담 화면 기본 경로"
+        },
+        {
+          "nm": "X_PTL_CUS_CUST_CNSL_L_02",
+          "cols": [
+            "SVC_MGMT_NO",
+            "CNSL_DTM"
+          ],
+          "unq": false,
+          "why": "회선(서비스관리번호)별 상담 이력 조회(ORD FK)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_CNSL_L_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_CNSL_L_02",
+          "refTbl": "PTL_ORD_LINE_M",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refCols": [
+            "SVC_MGMT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_CNSL_L_03",
+          "refTbl": "PTL_PRM_ORG_M",
+          "cols": [
+            "ORG_CD"
+          ],
+          "refCols": [
+            "ORG_CD"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "CNSL_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "note": "연 단위 2010~2027(18개) + DEFAULT — 파티션 키 CNSL_DTM 를 PK 뒤에 편입(PostgreSQL 파티션 PK 제약). 논리 주식별자 유일성은 채번 규칙으로 보장",
+        "dflt": true
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_CVLCPT_L",
+      "entId": "CUS-029",
+      "def": "민원(요금 이의·부당 가입·해지 지연·품질) 접수·처리 1건. 외부 기관(방송통신위원회·한국소비자원) 이관 민원 포함. 상담에서 전환되면 상담번호.",
+      "estRows": 500000,
+      "cols": [
+        {
+          "colNm": "CVLCPT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "민원번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CNSL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "상담번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CNSL_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "상담일시",
+          "dflt": null
+        },
+        {
+          "colNm": "SVC_MGMT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "서비스관리번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CVLCPT_ACPT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "민원접수일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CVLCPT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "민원유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CVLCPT_ACPT_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "민원접수채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CVLCPT_PRCS_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "민원처리상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CVLCPT_CN",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "민원내용",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_TMLMT_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "처리기한일자",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_CMPTN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "처리완료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_RSLT_CN",
+          "dataTp": "VARCHAR(4000)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "처리결과내용",
+          "dflt": null
+        },
+        {
+          "colNm": "CMPNS_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 14,
+          "termNm": "보상금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_CVLCPT_L",
+        "cols": [
+          "CVLCPT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_CUST_CVLCPT_L_01",
+          "cols": [
+            "CUST_NO",
+            "CVLCPT_ACPT_DTM"
+          ],
+          "unq": false,
+          "why": "고객별 민원 이력 조회(FK)"
+        },
+        {
+          "nm": "X_PTL_CUS_CUST_CVLCPT_L_02",
+          "cols": [
+            "CNSL_NO",
+            "CNSL_DTM"
+          ],
+          "unq": false,
+          "why": "상담→민원 전환 건 조인(FK + 반정규화 상담일시)"
+        },
+        {
+          "nm": "X_PTL_CUS_CUST_CVLCPT_L_03",
+          "cols": [
+            "PRCS_TMLMT_DT"
+          ],
+          "unq": false,
+          "why": "미처리 민원 처리기한 관리(처리완료일시 NULL 인 행만 — 부분 인덱스, 상태값 저선택도 S3 회피)",
+          "where": "PRCS_CMPTN_DTM IS NULL"
+        },
+        {
+          "nm": "X_PTL_CUS_CUST_CVLCPT_L_04",
+          "cols": [
+            "SVC_MGMT_NO",
+            "CVLCPT_ACPT_DTM"
+          ],
+          "unq": false,
+          "why": "회선(서비스관리번호)별 민원 이력 조회(ORD FK) — 고객상담내역 X_02 와 같은 접근 경로(리뷰 05_physical_CUS R1 추가)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_CVLCPT_L_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_CVLCPT_L_02",
+          "refTbl": "PTL_CUS_CUST_CNSL_L",
+          "cols": [
+            "CNSL_NO",
+            "CNSL_DTM"
+          ],
+          "refCols": [
+            "CNSL_NO",
+            "CNSL_DTM"
+          ],
+          "note": "물리 PK(상담번호, 상담일시)에 맞춰 반정규화 칼럼 상담일시 포함"
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_CVLCPT_L_03",
+          "refTbl": "PTL_ORD_LINE_M",
+          "cols": [
+            "SVC_MGMT_NO"
+          ],
+          "refCols": [
+            "SVC_MGMT_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "CNSL_DTM",
+          "srcTbl": "PTL_CUS_CUST_CNSL_L",
+          "why": "고객상담내역이 상담일시 연 파티션 + PK(상담번호, 상담일시)라 민원→상담 조인 때 상담번호만으로는 19개 파티션 PK 를 모두 탐색 — 상담일시를 함께 들고 있어 파티션 프루닝·PK 1건 조회로 만든다(민원 50만 행, 저장 비용 미미). 상담번호 NULL 이면 함께 NULL"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_CUS_CUST_MM_S",
+      "entId": "CUS-030",
+      "def": "고객 × 기준년월 집계(세분·회선 수·청구·수납). 월 마감 배치가 ORD·PAY·INV 원천에서 산출하는 가공 엔터티(ARPU = 청구금액÷회선수는 저장하지 않음 — 행 내 파생).",
+      "estRows": 15000000,
+      "cols": [
+        {
+          "colNm": "CUST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "고객번호",
+          "dflt": null
+        },
+        {
+          "colNm": "STD_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "기준년월",
+          "dflt": null
+        },
+        {
+          "colNm": "RGN_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "지역코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "고객유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CUST_GRD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "고객등급유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "LINE_CNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "회선수",
+          "dflt": null
+        },
+        {
+          "colNm": "ACTV_LINE_CNT",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "활성회선수",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "청구금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "수납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "UNPD_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "미납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "SBSC_PRD_MCNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "가입기간개월수",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_CUS_CUST_MM_S",
+        "cols": [
+          "CUST_NO",
+          "STD_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_CUS_CUST_MM_S_01",
+          "cols": [
+            "RGN_CD"
+          ],
+          "unq": false,
+          "why": "월별(파티션) 지역별 고객 집계 — 월 파티션 안 지역코드 조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_CUS_CUST_MM_S_01",
+          "refTbl": "PTL_CUS_CUST_M",
+          "cols": [
+            "CUST_NO"
+          ],
+          "refCols": [
+            "CUST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_CUS_CUST_MM_S_02",
+          "refTbl": "PTL_CUS_RGN_C",
+          "cols": [
+            "RGN_CD"
+          ],
+          "refCols": [
+            "RGN_CD"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "STD_YM",
+        "unit": "MONTH",
+        "from": "2010-01",
+        "to": "2027-12",
+        "note": "월 단위 2010-01~2027-12(216개) + DEFAULT — 파티션 키가 이미 PK 에 포함",
+        "dflt": true
+      },
+      "denorm": []
+    }
+  ]
+}

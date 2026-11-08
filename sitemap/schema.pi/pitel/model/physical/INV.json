@@ -1,0 +1,4749 @@
+{
+  "area": "INV",
+  "areaNm": "수납",
+  "stg": "PHY",
+  "trgtDbms": "POSTGRESQL",
+  "dbmsVer": "17",
+  "ver": "1.0",
+  "author": "subagent_physical_modeler",
+  "dt": "2026-11-07",
+  "conventions": {
+    "naming": "PK_<테이블>·X_<테이블>_NN·FK_<자식>_NN(모델 대문자, DDL 소문자)",
+    "fk": "D6 — FK 는 정의만, DDL 제약 없음. refCols = 부모 논리 PK(파티션 부모는 물리 PK 가 파티션 키만큼 넓음)",
+    "partition": "월 RANGE 2010-01~2027-12(216) · 연 RANGE 2010~2027(18) + DEFAULT 1, 파티션 키는 PK 포함",
+    "sysCols": "D7 — JSON 제외, DDL 끝 4칼럼",
+    "partialIdx": "idx[].where = 부분 인덱스 조건(물리명 대문자, DDL 소문자)",
+    "denorm": "denorm[].origin = 논리 인계(L4 유도 속성) | 물리 추가(cols[].denorm=true)"
+  },
+  "tables": [
+    {
+      "tblNm": "PTL_INV_RCV_M",
+      "entId": "INV-001",
+      "entNm": "수납기본",
+      "tp": "ACT",
+      "def": "청구계정으로 들어온 입금 1건. 수단(자동이체·카드·지로·가상계좌·매장·ARS)과 무관하게 모든 입금은 여기 한 곳에 모이고, 배분 전 미배분 금액을 가진다. 월 RANGE 파티션 후보(수납일시), 장애일 쏠림 S4.",
+      "estRows": 100000000,
+      "cols": [
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "수납일자",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "납부방법번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수납채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_CO_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "카드사코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "수납대행기관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DPSTR_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "입금자명",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "수납일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "수납상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "수납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "UNALLC_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "미배분금액",
+          "dflt": null
+        },
+        {
+          "colNm": "APRV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 14,
+          "termNm": "승인번호",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCV_M",
+        "cols": [
+          "RCV_NO",
+          "RCV_DT"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_RCV_M_01",
+          "cols": [
+            "BILL_ACNT_NO",
+            "RCV_DT"
+          ],
+          "unq": false,
+          "why": "청구계정별 수납 이력(상담·미납 판단) — 조인 FK + 기간 조건"
+        },
+        {
+          "nm": "X_PTL_INV_RCV_M_02",
+          "cols": [
+            "RCV_DT",
+            "RCV_CHNL_TY_CD"
+          ],
+          "unq": false,
+          "why": "수납일자·채널 일마감·수납일집계 생성 — 파티션 안 일자 범위"
+        },
+        {
+          "nm": "X_PTL_INV_RCV_M_03",
+          "cols": [
+            "PAY_MTHD_NO"
+          ],
+          "unq": false,
+          "why": "납부방법 → 수납 조인(자동이체·카드 수납 추적), NULL 30%(S5)",
+          "where": "PAY_MTHD_NO IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_INV_RCV_M_04",
+          "cols": [
+            "RCV_AGT_INST_NO",
+            "RCV_DT"
+          ],
+          "unq": false,
+          "why": "대행기관 수납 대사(STL) — 기관·일자별 건수·금액 집계",
+          "where": "RCV_AGT_INST_NO IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_INV_RCV_M_05",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "unq": false,
+          "why": "배분 배치 대상(배분대기·일부배분)만 — 상태 98% 배분완료(S3)라 상태 단독 인덱스 대신 부분 인덱스",
+          "where": "RCV_STTS_TY_CD IN ('01','03')"
+        },
+        {
+          "nm": "X_PTL_INV_RCV_M_06",
+          "cols": [
+            "APRV_NO"
+          ],
+          "unq": false,
+          "why": "카드·간편결제 승인번호로 수납 역조회(고객 문의·카드사 대사)",
+          "where": "APRV_NO IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RCV_M_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_M_02",
+          "cols": [
+            "PAY_MTHD_NO"
+          ],
+          "refTbl": "PTL_INV_PAY_MTHD_M",
+          "refCols": [
+            "PAY_MTHD_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_M_03",
+          "cols": [
+            "RCV_CHNL_TY_CD"
+          ],
+          "refTbl": "PTL_INV_RCV_CHNL_C",
+          "refCols": [
+            "RCV_CHNL_TY_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_M_04",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_M_05",
+          "cols": [
+            "CARD_CO_CD"
+          ],
+          "refTbl": "PTL_INV_CARD_CO_C",
+          "refCols": [
+            "CARD_CO_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_M_06",
+          "cols": [
+            "RCV_AGT_INST_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_AGT_INST_M",
+          "refCols": [
+            "RCV_AGT_INST_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "RCV_DT",
+        "unit": "MONTH",
+        "from": "2010-01",
+        "to": "2027-12",
+        "dflt": true,
+        "note": "수납일자 월 파티션 — 일마감·대사·장애일(S4) 조회가 일자 범위, 최근 파티션 쏠림 S6 · 기본 파티션 DEFAULT 1개"
+      },
+      "denorm": [
+        {
+          "col": "UNALLC_AMT",
+          "srcTbl": null,
+          "why": "미배분금액 = 수납금액 − 배분 합계(파생). 배분 배치·과오납 판단이 1억 행 수납마다 배분 합계를 다시 구하지 않도록 유지(논리 L4 인계)",
+          "origin": "논리 인계"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_INV_RCV_ALLC_D",
+      "entId": "INV-002",
+      "entNm": "수납배분상세",
+      "tp": "ACT",
+      "def": "수납액을 청구서×요금항목에 나눠 붙인 결과. 납기 경과 순 → 요금항목 순위(수납배분순위코드)로 배분, 수납 취소 시 음수 역배분 행. 월 RANGE 파티션 후보(수납배분일시).",
+      "estRows": 120000000,
+      "cols": [
+        {
+          "colNm": "RCV_ALLC_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수납배분번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "요금항목코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_ALLC_PRRT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수납배분우선순위",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "선납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "청구계정번호",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "ALLC_SMRY_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "배분적요명",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_ALLC_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "수납배분일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_ALLC_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "수납배분상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ALLC_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "배분금액",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCV_ALLC_D",
+        "cols": [
+          "RCV_ALLC_NO",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_RCV_ALLC_D_01",
+          "cols": [
+            "BILL_NO",
+            "CHRG_ITM_CD"
+          ],
+          "unq": false,
+          "why": "청구서·요금항목별 수납액 합계 — 미납 확정(COL 미납상세 항목 단위)의 핵심 경로, 청구년월로 파티션 프루닝"
+        },
+        {
+          "nm": "X_PTL_INV_RCV_ALLC_D_02",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 배분 조인(수납취소 역배분·수납 상세) — 파티션 키 없는 조회라 전 파티션 로컬 인덱스 탐색"
+        },
+        {
+          "nm": "X_PTL_INV_RCV_ALLC_D_03",
+          "cols": [
+            "BILL_ACNT_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "청구계정+청구년월 수납 조회(반정규화 칼럼)"
+        },
+        {
+          "nm": "X_PTL_INV_RCV_ALLC_D_04",
+          "cols": [
+            "PRPAY_NO"
+          ],
+          "unq": false,
+          "why": "선납 차감 배분 추적",
+          "where": "PRPAY_NO IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RCV_ALLC_D_01",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_ALLC_D_02",
+          "cols": [
+            "BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_ALLC_D_03",
+          "cols": [
+            "CHRG_ITM_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_C",
+          "refCols": [
+            "CHRG_ITM_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_ALLC_D_04",
+          "cols": [
+            "RCV_ALLC_PRRT"
+          ],
+          "refTbl": "PTL_INV_RCV_ALLC_PRRT_C",
+          "refCols": [
+            "RCV_ALLC_PRRT"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_ALLC_D_05",
+          "cols": [
+            "PRPAY_NO"
+          ],
+          "refTbl": "PTL_INV_PRPAY_M",
+          "refCols": [
+            "PRPAY_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "MONTH",
+        "from": "2010-01",
+        "to": "2027-12",
+        "dflt": true,
+        "note": "청구년월 월 파티션 — PAY 청구기본·청구상세와 같은 키라 청구월 단위 조인·미납 판단이 파티션 단위로 끝남 · 기본 파티션 DEFAULT 1개"
+      },
+      "denorm": [
+        {
+          "col": "BILL_YM",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "청구번호 → 청구년월 이행 종속. 파티션 키·레이크 업무 키(논리 L4 인계)",
+          "origin": "논리 인계"
+        },
+        {
+          "col": "BILL_ACNT_NO",
+          "srcTbl": "PTL_INV_RCV_M",
+          "why": "청구계정+청구년월 수납 조회(상담·미납 판단)가 1.2억 행 배분상세에서 수납기본 조인 없이 끝나도록 복제. 값은 수납기본.청구계정번호(=청구서의 청구계정)와 같음 — 배분 생성 시 기록, 수정 없음",
+          "origin": "물리 추가"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_INV_PAY_MTHD_M",
+      "entId": "INV-003",
+      "entNm": "납부방법기본",
+      "tp": "BASE",
+      "def": "청구계정이 요금을 내는 수단(자동이체·카드자동납부·지로·가상계좌). 청구계정당 현재 유효 1건 + 과거 행은 적용종료일자로 닫힘, 변경 상세는 납부방법이력.",
+      "estRows": 10000000,
+      "cols": [
+        {
+          "colNm": "PAY_MTHD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "납부방법번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PYR_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "납부자번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_CO_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "카드사코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "납부방법명",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "납부방법등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "납부방법상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "납부방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ACCT_NO_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "계좌번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "DPSOWN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "예금주명",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_NO_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "카드번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "TRSF_DSGN_DD",
+          "dataTp": "CHAR(2)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "이체지정일",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 14,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 15,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_PAY_MTHD_M",
+        "cols": [
+          "PAY_MTHD_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_PAY_MTHD_M_01",
+          "cols": [
+            "BILL_ACNT_NO",
+            "APLCN_END_DT"
+          ],
+          "unq": false,
+          "why": "청구계정의 현재 납부방법(적용종료일자 99991231) 조회 — 청구·출금 배치 조인"
+        },
+        {
+          "nm": "X_PTL_INV_PAY_MTHD_M_02",
+          "cols": [
+            "PYR_NO"
+          ],
+          "unq": false,
+          "why": "납부자 → 납부방법 조인(CUS 납부자 상담)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_PAY_MTHD_M_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_PAY_MTHD_M_02",
+          "cols": [
+            "PYR_NO"
+          ],
+          "refTbl": "PTL_CUS_PYR_M",
+          "refCols": [
+            "PYR_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_PAY_MTHD_M_03",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_PAY_MTHD_M_04",
+          "cols": [
+            "CARD_CO_CD"
+          ],
+          "refTbl": "PTL_INV_CARD_CO_C",
+          "refCols": [
+            "CARD_CO_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_ATRF_APLY_L",
+      "entId": "INV-004",
+      "entNm": "자동이체신청내역",
+      "tp": "ACT",
+      "def": "자동이체 신규·변경·해지 신청 1건과 금융결제원 CMS 출금이체 등록 처리 결과. 출금 동의 증빙(서면·녹취·ARS·전자서명) 보관 근거.",
+      "estRows": 10000000,
+      "cols": [
+        {
+          "colNm": "ATRF_APLY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "자동이체신청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "납부방법번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCNT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "신청인명",
+          "dflt": null
+        },
+        {
+          "colNm": "ATRF_APLY_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "자동이체신청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "ATRF_APLY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "자동이체신청상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ATRF_APLY_SE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "자동이체신청구분코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ACCT_NO_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "계좌번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "DPSOWN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "예금주명",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_AGRE_EVDC_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "출금동의증빙유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_RSLT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "처리결과유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "처리일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_ATRF_APLY_L",
+        "cols": [
+          "ATRF_APLY_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_ATRF_APLY_L_01",
+          "cols": [
+            "PAY_MTHD_NO"
+          ],
+          "unq": false,
+          "why": "납부방법 → 자동이체 신청 조인"
+        },
+        {
+          "nm": "X_PTL_INV_ATRF_APLY_L_02",
+          "cols": [
+            "BILL_ACNT_NO",
+            "ATRF_APLY_DTM"
+          ],
+          "unq": false,
+          "why": "청구계정별 자동이체 신청 이력"
+        },
+        {
+          "nm": "X_PTL_INV_ATRF_APLY_L_03",
+          "cols": [
+            "ATRF_APLY_DTM"
+          ],
+          "unq": false,
+          "why": "금결원 CMS 신청 결과 미처리 건 배치",
+          "where": "PRCS_RSLT_TY_CD IS NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_ATRF_APLY_L_01",
+          "cols": [
+            "PAY_MTHD_NO"
+          ],
+          "refTbl": "PTL_INV_PAY_MTHD_M",
+          "refCols": [
+            "PAY_MTHD_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_ATRF_APLY_L_02",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_ATRF_APLY_L_03",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_ATRF_WDRW_REQ_L",
+      "entId": "INV-005",
+      "entNm": "자동이체출금요청내역",
+      "tp": "ACT",
+      "def": "청구월마다 자동이체 납부 청구서에 대해 금결원·은행에 보내는 출금 요청 라인(재출금 회차 포함). 결과는 자동이체출금결과내역, 성공분은 수납기본을 만든다. 월 RANGE 파티션 후보(청구년월).",
+      "estRows": 30000000,
+      "cols": [
+        {
+          "colNm": "WDRW_REQ_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "출금요청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "납부방법번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_REQ_FILE_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "출금요청파일명",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_REQ_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "출금요청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_REQ_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "출금요청상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_REQ_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "출금요청금액",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_SCHD_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "출금예정일자",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_TMS",
+          "dataTp": "NUMERIC(3)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 13,
+          "termNm": "출금회차",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_ATRF_WDRW_REQ_L",
+        "cols": [
+          "WDRW_REQ_NO",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_ATRF_WDRW_REQ_L_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "unq": false,
+          "why": "청구서 → 출금요청 조인(수납 반영·미납 판단)"
+        },
+        {
+          "nm": "X_PTL_INV_ATRF_WDRW_REQ_L_02",
+          "cols": [
+            "BILL_ACNT_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "청구계정+청구년월 출금 이력(상담)"
+        },
+        {
+          "nm": "X_PTL_INV_ATRF_WDRW_REQ_L_03",
+          "cols": [
+            "WDRW_SCHD_DT",
+            "BANK_CD"
+          ],
+          "unq": false,
+          "why": "출금예정일자·은행별 출금 요청 파일 생성 배치"
+        },
+        {
+          "nm": "X_PTL_INV_ATRF_WDRW_REQ_L_04",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 출금요청 역추적(수납취소·재출금)",
+          "where": "RCV_NO IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_INV_ATRF_WDRW_REQ_L_05",
+          "cols": [
+            "PAY_MTHD_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "납부방법 → 출금요청 조인(자동이체 해지·변경 시 진행 중 출금 확인, 납부방법별 월 출금 이력) — 리뷰 추가(05 물리 INV 관문 R1)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_ATRF_WDRW_REQ_L_01",
+          "cols": [
+            "PAY_MTHD_NO"
+          ],
+          "refTbl": "PTL_INV_PAY_MTHD_M",
+          "refCols": [
+            "PAY_MTHD_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_ATRF_WDRW_REQ_L_02",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_ATRF_WDRW_REQ_L_03",
+          "cols": [
+            "BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_ATRF_WDRW_REQ_L_04",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_ATRF_WDRW_REQ_L_05",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "dflt": true,
+        "note": "청구년월 연 파티션(T3) — 출금 요청은 청구월 단위 생성, 결과내역과 같은 키로 파티션 조인 · 기본 파티션 DEFAULT 1개"
+      },
+      "denorm": [
+        {
+          "col": "BILL_YM",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "파티션 키·업무 키(논리 L4)",
+          "origin": "논리 인계"
+        },
+        {
+          "col": "BILL_ACNT_NO",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "청구계정+청구년월 조회 경로(논리 L4)",
+          "origin": "논리 인계"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_INV_VACCT_M",
+      "entId": "INV-006",
+      "entNm": "가상계좌기본",
+      "tp": "BASE",
+      "def": "청구계정별로 은행·대행기관에서 발급받은 가상계좌. 입금 통지(가상계좌입금내역)를 청구계정에 귀속시키는 키. 해지 계좌는 회수 후 재발급(S8 번호 재사용).",
+      "estRows": 3000000,
+      "cols": [
+        {
+          "colNm": "VACCT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "가상계좌번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납대행기관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VACCT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "가상계좌명",
+          "dflt": null
+        },
+        {
+          "colNm": "VACCT_ISSU_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "가상계좌발급일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VACCT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "가상계좌상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ACCT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "계좌번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DPST_STD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "입금기준유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RTRVL_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "회수일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_VACCT_M",
+        "cols": [
+          "VACCT_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_VACCT_M_01",
+          "cols": [
+            "ACCT_NO",
+            "BANK_CD"
+          ],
+          "unq": false,
+          "why": "은행 입금 통지(계좌번호) → 가상계좌 매칭 — 회수 후 재사용 번호(S8)라 유일 아님"
+        },
+        {
+          "nm": "X_PTL_INV_VACCT_M_02",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "unq": false,
+          "why": "청구계정의 가상계좌 조회"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_VACCT_M_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_VACCT_M_02",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_VACCT_M_03",
+          "cols": [
+            "RCV_AGT_INST_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_AGT_INST_M",
+          "refCols": [
+            "RCV_AGT_INST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_OVPAY_M",
+      "entId": "INV-007",
+      "entNm": "과오납기본",
+      "tp": "ACT",
+      "def": "이중 납부·초과 납부·해지 후 납부·청구 취소로 생긴, 고객에게 돌려줄 돈 1건과 잔액. 다음 청구 대체·환불·선납 전환으로 정리, 상태 변경은 과오납이력.",
+      "estRows": 3000000,
+      "cols": [
+        {
+          "colNm": "OVPAY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "과오납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_CN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "과오납내용명",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_OCRN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "과오납발생일시",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "과오납상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "과오납유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "과오납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_BAL",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "과오납잔액",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_MTHD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "처리방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "EXTSH_PRSCR_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "소멸시효일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_OVPAY_M",
+        "cols": [
+          "OVPAY_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_OVPAY_M_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "unq": false,
+          "why": "청구계정별 과오납 조회·다음 달 대체"
+        },
+        {
+          "nm": "X_PTL_INV_OVPAY_M_02",
+          "cols": [
+            "OVPAY_OCRN_DTM"
+          ],
+          "unq": false,
+          "why": "잔액 남은 과오납(환불·대체·소멸시효 배치)만",
+          "where": "OVPAY_BAL > 0"
+        },
+        {
+          "nm": "X_PTL_INV_OVPAY_M_03",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 과오납 조인",
+          "where": "RCV_NO IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_OVPAY_M_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_OVPAY_M_02",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_RFND_L",
+      "entId": "INV-008",
+      "entNm": "환불내역",
+      "tp": "ACT",
+      "def": "과오납·선납 잔액·해지 정산액을 고객에게 실제로 돌려준 행위 1건(계좌이체·카드 승인취소·현금·상계).",
+      "estRows": 2000000,
+      "cols": [
+        {
+          "colNm": "RFND_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "환불번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "과오납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "선납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_ACCT_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "환불계좌순번",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_RCPN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "환불수령인명",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "환불일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "환불상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "환불금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_MTHD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "환불방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ACCT_NO_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "계좌번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_REQ_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "환불요청일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RFND_L",
+        "cols": [
+          "RFND_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_RFND_L_01",
+          "cols": [
+            "BILL_ACNT_NO",
+            "RFND_DTM"
+          ],
+          "unq": false,
+          "why": "청구계정별 환불 이력"
+        },
+        {
+          "nm": "X_PTL_INV_RFND_L_02",
+          "cols": [
+            "OVPAY_NO"
+          ],
+          "unq": false,
+          "why": "과오납 → 환불 조인",
+          "where": "OVPAY_NO IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_INV_RFND_L_03",
+          "cols": [
+            "PRPAY_NO"
+          ],
+          "unq": false,
+          "why": "선납 → 환불 조인",
+          "where": "PRPAY_NO IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RFND_L_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RFND_L_02",
+          "cols": [
+            "BILL_ACNT_NO",
+            "RFND_ACCT_SEQ"
+          ],
+          "refTbl": "PTL_INV_RFND_ACCT_D",
+          "refCols": [
+            "BILL_ACNT_NO",
+            "RFND_ACCT_SEQ"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RFND_L_03",
+          "cols": [
+            "OVPAY_NO"
+          ],
+          "refTbl": "PTL_INV_OVPAY_M",
+          "refCols": [
+            "OVPAY_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RFND_L_04",
+          "cols": [
+            "PRPAY_NO"
+          ],
+          "refTbl": "PTL_INV_PRPAY_M",
+          "refCols": [
+            "PRPAY_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RFND_L_05",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_PRPAY_M",
+      "entId": "INV-009",
+      "entNm": "선납기본",
+      "tp": "ACT",
+      "def": "청구 전에 미리 받아 둔 돈(고객 예납·과오납 전환·법인 선결제)과 잔액. 다음 청구 시 선납사용내역으로 차감.",
+      "estRows": 2000000,
+      "cols": [
+        {
+          "colNm": "PRPAY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "선납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "과오납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_DPSTR_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "선납입금자명",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "선납일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "선납상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "선납유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "선납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_BAL",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "선납잔액",
+          "dflt": null
+        },
+        {
+          "colNm": "EXHST_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "소진일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_PRPAY_M",
+        "cols": [
+          "PRPAY_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_PRPAY_M_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "unq": false,
+          "why": "청구계정별 선납 조회 — 청구 시 선납 차감 대상 탐색"
+        },
+        {
+          "nm": "X_PTL_INV_PRPAY_M_02",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 선납 조인",
+          "where": "RCV_NO IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_INV_PRPAY_M_03",
+          "cols": [
+            "OVPAY_NO"
+          ],
+          "unq": false,
+          "why": "과오납 → 선납 전환 조인",
+          "where": "OVPAY_NO IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_PRPAY_M_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_PRPAY_M_02",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_PRPAY_M_03",
+          "cols": [
+            "OVPAY_NO"
+          ],
+          "refTbl": "PTL_INV_OVPAY_M",
+          "refCols": [
+            "OVPAY_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_BANK_C",
+      "entId": "INV-010",
+      "entNm": "은행코드",
+      "tp": "REF",
+      "def": "은행·금융기관 기준(D5 — 수납 영역 소유). 자동이체·가상계좌 가능 여부와 합병 승계를 가진다. 합병·폐지 은행도 과거 데이터 재현을 위해 남긴다.",
+      "estRows": 10000,
+      "cols": [
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "MRGR_BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "합병은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "은행명",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "은행등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "은행상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "FNNC_INST_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "금융기관유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_ENG_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "은행영문명",
+          "dflt": null
+        },
+        {
+          "colNm": "ATRF_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "자동이체가능여부",
+          "dflt": null
+        },
+        {
+          "colNm": "VACCT_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "가상계좌가능여부",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_BANK_C",
+        "cols": [
+          "BANK_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_BANK_C_01",
+          "cols": [
+            "MRGR_BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_CARD_CO_C",
+      "entId": "INV-011",
+      "entNm": "카드사코드",
+      "tp": "REF",
+      "def": "카드 자동납부·카드 수납 승인을 처리하는 신용카드사 기준(D5 — 수납 영역 소유). 자사 가맹점번호와 경유 대행기관(PG·VAN)을 가진다.",
+      "estRows": 10000,
+      "cols": [
+        {
+          "colNm": "CARD_CO_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "카드사코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "수납대행기관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_CO_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "카드사명",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_CO_ENG_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "카드사영문명",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_CO_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "카드사등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_CO_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "카드사상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ATMT_PAY_PSBL_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "자동납부가능여부",
+          "dflt": null
+        },
+        {
+          "colNm": "MRCH_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "가맹점번호",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_CARD_CO_C",
+        "cols": [
+          "CARD_CO_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_CARD_CO_C_01",
+          "cols": [
+            "RCV_AGT_INST_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_AGT_INST_M",
+          "refCols": [
+            "RCV_AGT_INST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_PAY_MTHD_H",
+      "entId": "INV-012",
+      "entNm": "납부방법이력",
+      "tp": "ACT",
+      "def": "납부방법기본의 상태·계좌·카드·이체지정일 변경 전후를 유효 기간(SCD2)으로 보존. 현재행 유효종료일시 = 9999-12-31 23:59:59.",
+      "estRows": 20000000,
+      "cols": [
+        {
+          "colNm": "PAY_MTHD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "납부방법번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_CO_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "카드사코드",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "납부방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "납부방법상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ACCT_NO_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "계좌번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_NO_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "카드번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "DPSOWN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "예금주명",
+          "dflt": null
+        },
+        {
+          "colNm": "TRSF_DSGN_DD",
+          "dataTp": "CHAR(2)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 11,
+          "termNm": "이체지정일",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 12,
+          "termNm": "납부방법변경사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_PAY_MTHD_H",
+        "cols": [
+          "PAY_MTHD_NO",
+          "VLD_BGNG_DTM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_PAY_MTHD_H_01",
+          "cols": [
+            "PAY_MTHD_NO",
+            "VLD_END_DTM"
+          ],
+          "unq": false,
+          "why": "납부방법의 현재 이력(유효종료일시 9999-12-31) — 파티션 키 없는 조회 보조"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_PAY_MTHD_H_01",
+          "cols": [
+            "PAY_MTHD_NO"
+          ],
+          "refTbl": "PTL_INV_PAY_MTHD_M",
+          "refCols": [
+            "PAY_MTHD_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_PAY_MTHD_H_02",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_PAY_MTHD_H_03",
+          "cols": [
+            "CARD_CO_CD"
+          ],
+          "refTbl": "PTL_INV_CARD_CO_C",
+          "refCols": [
+            "CARD_CO_CD"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "VLD_BGNG_DTM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "dflt": true,
+        "note": "유효시작일시 연 파티션(T3 대용량 이력) — PK 에 이미 포함, 오래된 이력 보관·삭제 단위 · 기본 파티션 DEFAULT 1개"
+      },
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_ATRF_WDRW_RSLT_L",
+      "entId": "INV-013",
+      "entNm": "자동이체출금결과내역",
+      "tp": "ACT",
+      "def": "출금 요청 1건에 대해 금결원·은행이 돌려준 결과 통지. 부분출금 후 추가 출금 통지가 올 수 있어 요청 아래 순번(식별 관계).",
+      "estRows": 32000000,
+      "cols": [
+        {
+          "colNm": "WDRW_REQ_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "출금요청번호",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_RSLT_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "출금결과순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "청구년월",
+          "dflt": null,
+          "denorm": true
+        },
+        {
+          "colNm": "WDRW_RSLT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "출금결과일시",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_RSLT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "출금결과유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "출금금액",
+          "dflt": null
+        },
+        {
+          "colNm": "WDRW_RSLT_FILE_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "출금결과파일명",
+          "dflt": null
+        },
+        {
+          "colNm": "RE_WDRW_TRGT_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "재출금대상여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_ATRF_WDRW_RSLT_L",
+        "cols": [
+          "WDRW_REQ_NO",
+          "WDRW_RSLT_SEQ",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_ATRF_WDRW_RSLT_L_01",
+          "cols": [
+            "WDRW_RSLT_DTM"
+          ],
+          "unq": false,
+          "why": "재출금 대상 배치 — 재출금대상여부 Y 소수(S3)라 부분 인덱스",
+          "where": "RE_WDRW_TRGT_YN = 'Y'"
+        },
+        {
+          "nm": "X_PTL_INV_ATRF_WDRW_RSLT_L_02",
+          "cols": [
+            "WDRW_RSLT_TY_CD",
+            "WDRW_RSLT_DTM"
+          ],
+          "unq": false,
+          "why": "출금 실패 사유별 통계·모니터링(정상 제외)",
+          "where": "WDRW_RSLT_TY_CD <> '01'"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_ATRF_WDRW_RSLT_L_01",
+          "cols": [
+            "WDRW_REQ_NO",
+            "BILL_YM"
+          ],
+          "refTbl": "PTL_INV_ATRF_WDRW_REQ_L",
+          "refCols": [
+            "WDRW_REQ_NO",
+            "BILL_YM"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "dflt": true,
+        "note": "반정규화한 청구년월 연 파티션 — 출금요청내역과 같은 파티션 경계(파티션 단위 조인) · 기본 파티션 DEFAULT 1개"
+      },
+      "denorm": [
+        {
+          "col": "BILL_YM",
+          "srcTbl": "PTL_INV_ATRF_WDRW_REQ_L",
+          "why": "파티션 키 — 부모 출금요청내역과 같은 청구년월 연 파티션으로 맞춰 요청↔결과 조인을 파티션 단위로 끝냄. 요청의 청구년월 그대로(불변)",
+          "origin": "물리 추가"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_INV_CARD_ATMT_PAY_APRV_L",
+      "entId": "INV-014",
+      "entNm": "카드자동납부승인내역",
+      "tp": "ACT",
+      "def": "카드 자동납부 납부방법의 청구서 1건에 대한 카드사 승인 요청·결과. 승인 성공분은 수납기본을 만든다. 월 RANGE 파티션 후보(청구년월).",
+      "estRows": 15000000,
+      "cols": [
+        {
+          "colNm": "CARD_ATMT_PAY_APRV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "카드자동납부승인번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "납부방법번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_CO_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "카드사코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_APRV_REQ_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "카드승인요청일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_APRV_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "카드승인일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_APRV_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "카드승인금액",
+          "dflt": null
+        },
+        {
+          "colNm": "APRV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "승인번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_APRV_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "카드승인상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CARD_APRV_RFSL_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "카드승인거절사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_CARD_ATMT_PAY_APRV_L",
+        "cols": [
+          "CARD_ATMT_PAY_APRV_NO",
+          "BILL_YM"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_CARD_ATMT_PAY_APRV_L_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "unq": false,
+          "why": "청구서 → 카드 승인 조인"
+        },
+        {
+          "nm": "X_PTL_INV_CARD_ATMT_PAY_APRV_L_02",
+          "cols": [
+            "PAY_MTHD_NO",
+            "BILL_YM"
+          ],
+          "unq": false,
+          "why": "납부방법별 월 승인 이력(재승인·거절 상담)"
+        },
+        {
+          "nm": "X_PTL_INV_CARD_ATMT_PAY_APRV_L_03",
+          "cols": [
+            "CARD_CO_CD",
+            "CARD_APRV_REQ_DTM"
+          ],
+          "unq": false,
+          "why": "카드사별 승인·매입 대사 파일"
+        },
+        {
+          "nm": "X_PTL_INV_CARD_ATMT_PAY_APRV_L_04",
+          "cols": [
+            "APRV_NO"
+          ],
+          "unq": false,
+          "why": "카드 승인번호 조회",
+          "where": "APRV_NO IS NOT NULL"
+        },
+        {
+          "nm": "X_PTL_INV_CARD_ATMT_PAY_APRV_L_05",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 카드 승인 역추적(수납취소 시 승인취소) — 형제 내역(출금요청·지로·입금)과 같은 경로, 리뷰 추가(R2)",
+          "where": "RCV_NO IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_CARD_ATMT_PAY_APRV_L_01",
+          "cols": [
+            "PAY_MTHD_NO"
+          ],
+          "refTbl": "PTL_INV_PAY_MTHD_M",
+          "refCols": [
+            "PAY_MTHD_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_CARD_ATMT_PAY_APRV_L_02",
+          "cols": [
+            "BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_CARD_ATMT_PAY_APRV_L_03",
+          "cols": [
+            "CARD_CO_CD"
+          ],
+          "refTbl": "PTL_INV_CARD_CO_C",
+          "refCols": [
+            "CARD_CO_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_CARD_ATMT_PAY_APRV_L_04",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        }
+      ],
+      "partition": {
+        "type": "RANGE",
+        "key": "BILL_YM",
+        "unit": "YEAR",
+        "from": "2010",
+        "to": "2027",
+        "dflt": true,
+        "note": "청구년월 연 파티션(T3) — 청구월 단위 카드 자동납부 승인 요청 · 기본 파티션 DEFAULT 1개"
+      },
+      "denorm": [
+        {
+          "col": "BILL_YM",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "파티션 키·업무 키(논리 L4)",
+          "origin": "논리 인계"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_INV_GIRO_RCV_L",
+      "entId": "INV-015",
+      "entNm": "지로수납내역",
+      "tp": "ACT",
+      "def": "지로 청구서로 금융기관 창구·인터넷뱅킹·전자납부에서 들어온 수납 통지 1건(금결원 지로 수납 파일). 청구서 단위 수납이라 청구번호를 가진다.",
+      "estRows": 8000000,
+      "cols": [
+        {
+          "colNm": "GIRO_RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "지로수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수납대행기관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "GIRO_RCV_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "지로수납일시",
+          "dflt": null
+        },
+        {
+          "colNm": "GIRO_RCV_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "지로수납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "GIRO_RCV_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "지로수납상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "GIRO_RCV_FILE_NM",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "지로수납파일명",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_GIRO_RCV_L",
+        "cols": [
+          "GIRO_RCV_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_GIRO_RCV_L_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "unq": false,
+          "why": "청구서 → 지로 수납 조인"
+        },
+        {
+          "nm": "X_PTL_INV_GIRO_RCV_L_02",
+          "cols": [
+            "GIRO_RCV_DTM"
+          ],
+          "unq": false,
+          "why": "지로 수납 일자별 반영·대사"
+        },
+        {
+          "nm": "X_PTL_INV_GIRO_RCV_L_03",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 지로 원천 역추적",
+          "where": "RCV_NO IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_GIRO_RCV_L_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_GIRO_RCV_L_02",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_GIRO_RCV_L_03",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_GIRO_RCV_L_04",
+          "cols": [
+            "RCV_AGT_INST_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_AGT_INST_M",
+          "refCols": [
+            "RCV_AGT_INST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "BILL_YM",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "청구월 지로 대사 업무 키(논리 L4)",
+          "origin": "논리 인계"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_INV_VACCT_DPST_L",
+      "entId": "INV-016",
+      "entNm": "가상계좌입금내역",
+      "tp": "ACT",
+      "def": "가상계좌로 들어온 입금 통지 1건. 청구계정 귀속은 가상계좌기본으로 결정, 정상 입금은 수납기본 생성(과입금·부족입금 표시).",
+      "estRows": 5000000,
+      "cols": [
+        {
+          "colNm": "VACCT_DPST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "가상계좌입금번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VACCT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "가상계좌번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "DPST_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "입금일시",
+          "dflt": null
+        },
+        {
+          "colNm": "DPST_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "입금금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DPSTR_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "입금자명",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_TRD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "은행거래번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VACCT_DPST_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "가상계좌입금상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_VACCT_DPST_L",
+        "cols": [
+          "VACCT_DPST_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_VACCT_DPST_L_01",
+          "cols": [
+            "VACCT_NO",
+            "DPST_DTM"
+          ],
+          "unq": false,
+          "why": "가상계좌별 입금 이력"
+        },
+        {
+          "nm": "X_PTL_INV_VACCT_DPST_L_02",
+          "cols": [
+            "BANK_CD",
+            "BANK_TRD_NO"
+          ],
+          "unq": false,
+          "why": "은행 거래번호 중복 통지 검사·대사 — 형식 함정(S12) 데이터라 유일 아님"
+        },
+        {
+          "nm": "X_PTL_INV_VACCT_DPST_L_03",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 입금 원천 역추적",
+          "where": "RCV_NO IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_VACCT_DPST_L_01",
+          "cols": [
+            "VACCT_NO"
+          ],
+          "refTbl": "PTL_INV_VACCT_M",
+          "refCols": [
+            "VACCT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_VACCT_DPST_L_02",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_VACCT_DPST_L_03",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_RCV_CNCL_L",
+      "entId": "INV-017",
+      "entNm": "수납취소내역",
+      "tp": "ACT",
+      "def": "이미 확정된 수납을 취소한 행위 1건(이중 수납·오입금·카드 승인취소·부도). 취소 시 수납배분상세에 음수 역배분 행이 생긴다.",
+      "estRows": 1200000,
+      "cols": [
+        {
+          "colNm": "RCV_CNCL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수납취소번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CNCL_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납취소일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CNCL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납취소금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CNCL_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수납취소사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CNCL_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수납취소상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CNCL_REQ_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "수납취소요청일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCV_CNCL_L",
+        "cols": [
+          "RCV_CNCL_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_RCV_CNCL_L_01",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 취소 조인(역배분)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RCV_CNCL_L_01",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_UNIDNTF_DPST_L",
+      "entId": "INV-018",
+      "entNm": "미확인입금내역",
+      "tp": "ACT",
+      "def": "입금은 됐으나 청구계정을 특정하지 못한 돈(입금자명 불일치·계좌 불명 등). 귀속 확인되면 수납기본을 만들고 수납번호를 채운다, 미귀속은 반환·잡이익 처리.",
+      "estRows": 500000,
+      "cols": [
+        {
+          "colNm": "UNIDNTF_DPST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "미확인입금번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "DPST_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "입금일시",
+          "dflt": null
+        },
+        {
+          "colNm": "DPST_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "입금금액",
+          "dflt": null
+        },
+        {
+          "colNm": "DPSTR_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "입금자명",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_TRD_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "은행거래번호",
+          "dflt": null
+        },
+        {
+          "colNm": "UNIDNTF_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "미확인사유유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "UNIDNTF_DPST_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "미확인입금상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "UNIDNTF_DPST_IDNTF_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 10,
+          "termNm": "미확인입금확인일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_UNIDNTF_DPST_L",
+        "cols": [
+          "UNIDNTF_DPST_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_UNIDNTF_DPST_L_01",
+          "cols": [
+            "DPST_DTM"
+          ],
+          "unq": false,
+          "why": "미확인 상태 입금만 — 귀속 처리 작업 목록",
+          "where": "UNIDNTF_DPST_STTS_TY_CD = '01'"
+        },
+        {
+          "nm": "X_PTL_INV_UNIDNTF_DPST_L_02",
+          "cols": [
+            "BANK_CD",
+            "BANK_TRD_NO"
+          ],
+          "unq": false,
+          "why": "은행 거래번호 조회·중복 통지 검사"
+        },
+        {
+          "nm": "X_PTL_INV_UNIDNTF_DPST_L_03",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 미확인입금 귀속 원천 역추적 — 형제 내역과 같은 경로, 리뷰 추가(R3)",
+          "where": "RCV_NO IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_UNIDNTF_DPST_L_01",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_UNIDNTF_DPST_L_02",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_OVPAY_H",
+      "entId": "INV-019",
+      "entNm": "과오납이력",
+      "tp": "ACT",
+      "def": "과오납기본의 상태·잔액 변동(대체·환불·선납전환·소멸)을 유효 기간(SCD2)으로 보존.",
+      "estRows": 6000000,
+      "cols": [
+        {
+          "colNm": "OVPAY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "과오납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_BGNG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "유효시작일시",
+          "dflt": null
+        },
+        {
+          "colNm": "VLD_END_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "유효종료일시",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "과오납상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_CHG_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "과오납변경금액",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_BAL",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "과오납잔액",
+          "dflt": null
+        },
+        {
+          "colNm": "PRCS_MTHD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "처리방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_CHG_RSN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "과오납변경사유유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_OVPAY_H",
+        "cols": [
+          "OVPAY_NO",
+          "VLD_BGNG_DTM"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_OVPAY_H_01",
+          "cols": [
+            "OVPAY_NO"
+          ],
+          "refTbl": "PTL_INV_OVPAY_M",
+          "refCols": [
+            "OVPAY_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_RFND_ACCT_D",
+      "entId": "INV-020",
+      "entNm": "환불계좌상세",
+      "tp": "BASE",
+      "def": "청구계정이 등록한 환불 받을 계좌(복수 가능, 대표 1). 실명 확인 결과를 가진다.",
+      "estRows": 3000000,
+      "cols": [
+        {
+          "colNm": "BILL_ACNT_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "청구계정번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_ACCT_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "환불계좌순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BANK_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "은행코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ACCT_NO_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "계좌번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "DPSOWN_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "예금주명",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_ACCT_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "환불계좌등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_ACCT_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "환불계좌상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "ACCT_RLNM_IDNTF_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "계좌실명확인여부",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_RFND_ACCT_YN",
+          "dataTp": "CHAR(1)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "대표환불계좌여부",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RFND_ACCT_D",
+        "cols": [
+          "BILL_ACNT_NO",
+          "RFND_ACCT_SEQ"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RFND_ACCT_D_01",
+          "cols": [
+            "BILL_ACNT_NO"
+          ],
+          "refTbl": "PTL_CUS_BILL_ACNT_M",
+          "refCols": [
+            "BILL_ACNT_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RFND_ACCT_D_02",
+          "cols": [
+            "BANK_CD"
+          ],
+          "refTbl": "PTL_INV_BANK_C",
+          "refCols": [
+            "BANK_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_PRPAY_USE_L",
+      "entId": "INV-021",
+      "entNm": "선납사용내역",
+      "tp": "ACT",
+      "def": "선납 잔액을 청구서에 차감·환불·소멸시킨 사용 1건(개념 basicEntRels 승계 — PAY.청구기본 N:1 선택).",
+      "estRows": 8000000,
+      "cols": [
+        {
+          "colNm": "PRPAY_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "선납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_USE_SEQ",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "선납사용순번",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "청구번호",
+          "dflt": null
+        },
+        {
+          "colNm": "BILL_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "청구년월",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_USE_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "선납사용일시",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_USE_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "선납사용금액",
+          "dflt": null
+        },
+        {
+          "colNm": "PRPAY_USE_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "선납사용유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_PRPAY_USE_L",
+        "cols": [
+          "PRPAY_NO",
+          "PRPAY_USE_SEQ"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_PRPAY_USE_L_01",
+          "cols": [
+            "BILL_NO"
+          ],
+          "unq": false,
+          "why": "청구서 → 선납 차감 조인",
+          "where": "BILL_NO IS NOT NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_PRPAY_USE_L_01",
+          "cols": [
+            "PRPAY_NO"
+          ],
+          "refTbl": "PTL_INV_PRPAY_M",
+          "refCols": [
+            "PRPAY_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_PRPAY_USE_L_02",
+          "cols": [
+            "BILL_NO"
+          ],
+          "refTbl": "PTL_PAY_BILL_M",
+          "refCols": [
+            "BILL_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": [
+        {
+          "col": "BILL_YM",
+          "srcTbl": "PTL_PAY_BILL_M",
+          "why": "청구월 차감 업무 키(논리 L4)",
+          "origin": "논리 인계"
+        }
+      ]
+    },
+    {
+      "tblNm": "PTL_INV_RCV_AGT_INST_M",
+      "entId": "INV-022",
+      "entNm": "수납대행기관기본",
+      "tp": "REF",
+      "def": "수납을 대행하는 기관(금결원·PG·VAN·편의점·은행 대행). 대사·수수료 정산 상대방.",
+      "estRows": 10000,
+      "cols": [
+        {
+          "colNm": "RCV_AGT_INST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수납대행기관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "수납대행기관명",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_REG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납대행기관등록일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납대행기관상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수납대행기관유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "BRNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 6,
+          "termNm": "사업자등록번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RPRS_TELNO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 7,
+          "termNm": "대표전화번호",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCV_AGT_INST_M",
+        "cols": [
+          "RCV_AGT_INST_NO"
+        ]
+      },
+      "idx": [],
+      "fks": [],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_RCV_CHNL_C",
+      "entId": "INV-023",
+      "entNm": "수납채널코드",
+      "tp": "REF",
+      "def": "수납이 들어오는 경로 기준(자동이체·카드·지로·가상계좌·매장·ARS·간편결제). PK = 공통코드 수납채널유형코드 값에 운영 속성을 더한 코드 엔터티.",
+      "estRows": 50,
+      "cols": [
+        {
+          "colNm": "RCV_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수납채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 2,
+          "termNm": "수납대행기관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CHNL_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납채널명",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CHNL_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납채널상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_RFLT_DCNT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수납반영일수",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCV_CHNL_C",
+        "cols": [
+          "RCV_CHNL_TY_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RCV_CHNL_C_01",
+          "cols": [
+            "RCV_AGT_INST_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_AGT_INST_M",
+          "refCols": [
+            "RCV_AGT_INST_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_RCV_ALLC_PRRT_C",
+      "entId": "INV-024",
+      "entNm": "수납배분우선순위코드",
+      "tp": "REF",
+      "def": "수납액을 청구서 안 요금항목에 나눌 때의 순위 기준(연체가산금 → 이전 미납 → 당월 단말할부 → 당월 통신요금 …). 후보명 수납배분순위코드를 표준 용어(우선순위)로 정리.",
+      "estRows": 200,
+      "cols": [
+        {
+          "colNm": "RCV_ALLC_PRRT",
+          "dataTp": "NUMERIC(5)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수납배분우선순위",
+          "dflt": null
+        },
+        {
+          "colNm": "CHRG_ITM_CLSF_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "요금항목분류코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_ALLC_PRRT_NM",
+          "dataTp": "VARCHAR(100)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납배분우선순위명",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_ALLC_PRRT_CN",
+          "dataTp": "VARCHAR(200)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납배분우선순위내용",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_BGNG_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "적용시작일자",
+          "dflt": null
+        },
+        {
+          "colNm": "APLCN_END_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "적용종료일자",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCV_ALLC_PRRT_C",
+        "cols": [
+          "RCV_ALLC_PRRT"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RCV_ALLC_PRRT_C_01",
+          "cols": [
+            "CHRG_ITM_CLSF_CD"
+          ],
+          "refTbl": "PTL_PRD_CHRG_ITM_CLSF_C",
+          "refCols": [
+            "CHRG_ITM_CLSF_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_RCV_RCNCL_L",
+      "entId": "INV-025",
+      "entNm": "수납대사내역",
+      "tp": "ACT",
+      "moduleCd": "STL",
+      "def": "대행기관·채널별 기준일 하루치 수납을 기관 통지와 자사 수납 원장으로 맞춘 결과(STL). 차이는 파생값이라 두지 않는다.",
+      "estRows": 300000,
+      "cols": [
+        {
+          "colNm": "RCV_RCNCL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수납대사번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "수납대행기관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_RCNCL_STD_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납대사기준일자",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_RCNCL_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수납대사일시",
+          "dflt": null
+        },
+        {
+          "colNm": "INST_RCV_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "기관수납건수",
+          "dflt": null
+        },
+        {
+          "colNm": "INST_RCV_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "기관수납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "수납건수",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "수납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_RCNCL_RSLT_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "수납대사결과유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_RCNCL_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "수납대사상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCV_RCNCL_L",
+        "cols": [
+          "RCV_RCNCL_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_RCV_RCNCL_L_01",
+          "cols": [
+            "RCV_RCNCL_STD_DT",
+            "RCV_AGT_INST_NO"
+          ],
+          "unq": false,
+          "why": "기준일자·기관별 대사 결과 조회(STL)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RCV_RCNCL_L_01",
+          "cols": [
+            "RCV_AGT_INST_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_AGT_INST_M",
+          "refCols": [
+            "RCV_AGT_INST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_RCNCL_L_02",
+          "cols": [
+            "RCV_CHNL_TY_CD"
+          ],
+          "refTbl": "PTL_INV_RCV_CHNL_C",
+          "refCols": [
+            "RCV_CHNL_TY_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_RCV_AGT_FEE_L",
+      "entId": "INV-026",
+      "entNm": "수납대행수수료내역",
+      "tp": "ACT",
+      "moduleCd": "STL",
+      "def": "대행기관에 줄 수납대행 수수료 정산 1건(월·기관 단위, STL). 세금계산서 승인번호로 PRM 정산과 대조.",
+      "estRows": 10000,
+      "cols": [
+        {
+          "colNm": "RCV_AGT_FEE_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수납대행수수료번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_INST_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "수납대행기관번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_RCNCL_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 3,
+          "termNm": "수납대사번호",
+          "dflt": null
+        },
+        {
+          "colNm": "STLM_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "정산년월",
+          "dflt": null
+        },
+        {
+          "colNm": "FEE_ASMT_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수수료산정일시",
+          "dflt": null
+        },
+        {
+          "colNm": "FEE_TRGT_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수수료대상건수",
+          "dflt": null
+        },
+        {
+          "colNm": "FEE_TRGT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "수수료대상금액",
+          "dflt": null
+        },
+        {
+          "colNm": "FEE_RT",
+          "dataTp": "NUMERIC(5,2)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 8,
+          "termNm": "수수료율",
+          "dflt": null
+        },
+        {
+          "colNm": "FEE_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "수수료금액",
+          "dflt": null
+        },
+        {
+          "colNm": "VAT_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 10,
+          "termNm": "부가가치세금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AGT_FEE_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 11,
+          "termNm": "수납대행수수료상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "GIVE_SCHD_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 12,
+          "termNm": "지급예정일자",
+          "dflt": null
+        },
+        {
+          "colNm": "ELCTR_TXINV_APRV_NO",
+          "dataTp": "VARCHAR(30)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 13,
+          "termNm": "전자세금계산서승인번호",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCV_AGT_FEE_L",
+        "cols": [
+          "RCV_AGT_FEE_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_RCV_AGT_FEE_L_01",
+          "cols": [
+            "RCV_AGT_INST_NO",
+            "STLM_YM"
+          ],
+          "unq": false,
+          "why": "기관·정산년월 수수료 조회(STL)"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RCV_AGT_FEE_L_01",
+          "cols": [
+            "RCV_AGT_INST_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_AGT_INST_M",
+          "refCols": [
+            "RCV_AGT_INST_NO"
+          ]
+        },
+        {
+          "nm": "FK_PTL_INV_RCV_AGT_FEE_L_02",
+          "cols": [
+            "RCV_RCNCL_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_RCNCL_L",
+          "refCols": [
+            "RCV_RCNCL_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_RCIPT_PBLCN_L",
+      "entId": "INV-027",
+      "entNm": "영수증발행내역",
+      "tp": "ACT",
+      "def": "수납 1건에 대한 납부 영수증 발행(종이·이메일·문자·앱) 1건, 재발행은 회차 증가.",
+      "estRows": 5000000,
+      "cols": [
+        {
+          "colNm": "RCIPT_PBLCN_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "영수증발행번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCIPT_PBLCN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "영수증발행일시",
+          "dflt": null
+        },
+        {
+          "colNm": "RCIPT_PBLCN_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "영수증발행유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCIPT_PBLCN_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "영수증발행금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RCIPT_PBLCN_TMS",
+          "dataTp": "NUMERIC(3)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "영수증발행회차",
+          "dflt": null
+        },
+        {
+          "colNm": "RCIPT_PBLCN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "영수증발행상태유형코드",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCIPT_PBLCN_L",
+        "cols": [
+          "RCIPT_PBLCN_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_RCIPT_PBLCN_L_01",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 영수증 조인"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RCIPT_PBLCN_L_01",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_CASH_RCIPT_PBLCN_L",
+      "entId": "INV-028",
+      "entNm": "현금영수증발행내역",
+      "tp": "ACT",
+      "def": "현금성 수납(지로·가상계좌·매장 현금·계좌이체)에 대한 현금영수증 발급·국세청 전송 1건.",
+      "estRows": 3000000,
+      "cols": [
+        {
+          "colNm": "CASH_RCIPT_PBLCN_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "현금영수증발행번호",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 2,
+          "termNm": "수납번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CASH_RCIPT_PBLCN_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 3,
+          "termNm": "현금영수증발행일시",
+          "dflt": null
+        },
+        {
+          "colNm": "CASH_RCIPT_APRV_NO",
+          "dataTp": "VARCHAR(20)",
+          "nullYn": true,
+          "pk": false,
+          "seq": 4,
+          "termNm": "현금영수증승인번호",
+          "dflt": null
+        },
+        {
+          "colNm": "CASH_RCIPT_TRD_SE_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "현금영수증거래구분코드",
+          "dflt": null
+        },
+        {
+          "colNm": "CASH_RCIPT_IDFC_NO_ENCPT_VL",
+          "dataTp": "VARCHAR(256)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "현금영수증식별번호암호화값",
+          "dflt": null
+        },
+        {
+          "colNm": "CASH_RCIPT_PBLCN_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "현금영수증발행금액",
+          "dflt": null
+        },
+        {
+          "colNm": "CASH_RCIPT_PBLCN_STTS_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "현금영수증발행상태유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "NTS_TRNM_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": true,
+          "pk": false,
+          "seq": 9,
+          "termNm": "국세청전송일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_CASH_RCIPT_PBLCN_L",
+        "cols": [
+          "CASH_RCIPT_PBLCN_NO"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_CASH_RCIPT_PBLCN_L_01",
+          "cols": [
+            "RCV_NO"
+          ],
+          "unq": false,
+          "why": "수납 → 현금영수증 조인"
+        },
+        {
+          "nm": "X_PTL_INV_CASH_RCIPT_PBLCN_L_02",
+          "cols": [
+            "CASH_RCIPT_PBLCN_DTM"
+          ],
+          "unq": false,
+          "why": "국세청 미전송 건 전송 배치",
+          "where": "NTS_TRNM_DTM IS NULL"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_CASH_RCIPT_PBLCN_L_01",
+          "cols": [
+            "RCV_NO"
+          ],
+          "refTbl": "PTL_INV_RCV_M",
+          "refCols": [
+            "RCV_NO"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_RCV_DD_T",
+      "entId": "INV-029",
+      "entNm": "수납일집계",
+      "tp": "PROC",
+      "def": "수납일자 × 수납채널 × 납부방법유형별 수납·취소 건수와 금액 일 마감 집계.",
+      "estRows": 500000,
+      "cols": [
+        {
+          "colNm": "RCV_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수납채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_DT",
+          "dataTp": "CHAR(8)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "수납일자",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "납부방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납건수",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CNCL_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수납취소건수",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_CNCL_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "수납취소금액",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "집계일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCV_DD_T",
+        "cols": [
+          "RCV_CHNL_TY_CD",
+          "RCV_DT",
+          "PAY_MTHD_TY_CD"
+        ]
+      },
+      "idx": [
+        {
+          "nm": "X_PTL_INV_RCV_DD_T_01",
+          "cols": [
+            "RCV_DT"
+          ],
+          "unq": false,
+          "why": "일자 범위 전 채널 집계 조회 — PK 선두가 채널이라 보조"
+        }
+      ],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RCV_DD_T_01",
+          "cols": [
+            "RCV_CHNL_TY_CD"
+          ],
+          "refTbl": "PTL_INV_RCV_CHNL_C",
+          "refCols": [
+            "RCV_CHNL_TY_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    },
+    {
+      "tblNm": "PTL_INV_RCV_MM_S",
+      "entId": "INV-030",
+      "entNm": "수납월통계",
+      "tp": "PROC",
+      "def": "수납년월 × 수납채널 × 납부방법유형별 월 마감 통계(수납·과오납 발생·환불).",
+      "estRows": 16000,
+      "cols": [
+        {
+          "colNm": "RCV_CHNL_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 1,
+          "termNm": "수납채널유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_YM",
+          "dataTp": "CHAR(6)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 2,
+          "termNm": "수납년월",
+          "dflt": null
+        },
+        {
+          "colNm": "PAY_MTHD_TY_CD",
+          "dataTp": "VARCHAR(10)",
+          "nullYn": false,
+          "pk": true,
+          "seq": 3,
+          "termNm": "납부방법유형코드",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_BILL_ACNT_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 4,
+          "termNm": "수납청구계정건수",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_NOCS",
+          "dataTp": "NUMERIC(10)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 5,
+          "termNm": "수납건수",
+          "dflt": null
+        },
+        {
+          "colNm": "RCV_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 6,
+          "termNm": "수납금액",
+          "dflt": null
+        },
+        {
+          "colNm": "OVPAY_OCRN_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 7,
+          "termNm": "과오납발생금액",
+          "dflt": null
+        },
+        {
+          "colNm": "RFND_AMT",
+          "dataTp": "NUMERIC(15)",
+          "nullYn": false,
+          "pk": false,
+          "seq": 8,
+          "termNm": "환불금액",
+          "dflt": null
+        },
+        {
+          "colNm": "AGG_DTM",
+          "dataTp": "TIMESTAMP",
+          "nullYn": false,
+          "pk": false,
+          "seq": 9,
+          "termNm": "집계일시",
+          "dflt": null
+        }
+      ],
+      "pk": {
+        "nm": "PK_PTL_INV_RCV_MM_S",
+        "cols": [
+          "RCV_CHNL_TY_CD",
+          "RCV_YM",
+          "PAY_MTHD_TY_CD"
+        ]
+      },
+      "idx": [],
+      "fks": [
+        {
+          "nm": "FK_PTL_INV_RCV_MM_S_01",
+          "cols": [
+            "RCV_CHNL_TY_CD"
+          ],
+          "refTbl": "PTL_INV_RCV_CHNL_C",
+          "refCols": [
+            "RCV_CHNL_TY_CD"
+          ]
+        }
+      ],
+      "partition": null,
+      "denorm": []
+    }
+  ]
+}

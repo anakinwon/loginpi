@@ -1,0 +1,1649 @@
+{
+  "area": "CUS",
+  "areaNm": "고객",
+  "ver": "2026-11-07",
+  "author": "subagent_subject_modeler",
+  "stg": "CNCP",
+  "refPkRule": {
+    "note": "다른 주제영역 핵심 엔터티를 참조할 때 PK 이름 = '<엔터티 핵심어>번호'(기준·코드형 = '<핵심어>코드'). 이 영역이 소유하는 키 = 고객번호·청구계정번호·납부자번호·지역코드",
+    "own": [
+      {
+        "attrNm": "고객번호",
+        "phyNm": "CUST_NO",
+        "domNm": "번호V20",
+        "ent": "고객기본"
+      },
+      {
+        "attrNm": "청구계정번호",
+        "phyNm": "BILL_ACNT_NO",
+        "domNm": "번호V20",
+        "ent": "청구계정기본"
+      },
+      {
+        "attrNm": "납부자번호",
+        "phyNm": "PYR_NO",
+        "domNm": "번호V20",
+        "ent": "납부자기본"
+      },
+      {
+        "attrNm": "지역코드",
+        "phyNm": "RGN_CD",
+        "domNm": "코드V10",
+        "ent": "지역코드"
+      }
+    ],
+    "foreign": [
+      {
+        "attrNm": "청구주기코드",
+        "phyNm": "BILL_CYCL_CD",
+        "domNm": "코드V10",
+        "area": "PAY",
+        "ent": "청구주기코드"
+      },
+      {
+        "attrNm": "가입계약번호",
+        "phyNm": "SBSC_CTRT_NO",
+        "domNm": "번호V20",
+        "area": "ORD",
+        "ent": "가입계약기본"
+      },
+      {
+        "attrNm": "파트너번호",
+        "phyNm": "PRTNR_NO",
+        "domNm": "번호V20",
+        "area": "PRM",
+        "ent": "파트너기본"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "entNm": "고객기본",
+      "phyNm": "CUST_BAS",
+      "tblNm": "PTL_CUS_CUST_M",
+      "tp": "BASE",
+      "def": "통신 서비스를 계약하고 요금 채무를 지는 당사자(개인·개인사업자·법인·외국인·공공기관)의 공통 실체. 개인·법인 상세의 상위(슈퍼타입). 해지·사망 후에도 행을 지우지 않고 상태·파기 일시로 표현한다.",
+      "keyAttrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "고객명",
+          "phyNm": "CUST_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "고객등록일시",
+          "phyNm": "CUST_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "고객상태유형코드",
+          "phyNm": "CUST_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "고객유형코드",
+          "phyNm": "CUST_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "내외국인구분코드",
+          "phyNm": "DMFRGN_SE_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "국가코드",
+          "phyNm": "NATN_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "고객등급유형코드",
+          "phyNm": "CUST_GRD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "최초가입일자",
+          "phyNm": "FRST_SBSC_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "고객해지일시",
+          "phyNm": "CUST_TRMN_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "휴면전환일자",
+          "phyNm": "DRMT_CNVR_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "개인정보파기일시",
+          "phyNm": "PRVC_DSTR_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "명의도용신고여부",
+          "phyNm": "NMNE_THFT_DCLR_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "개인고객상세",
+          "toArea": "CUS",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "개인 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "법인고객상세",
+          "toArea": "CUS",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "법인 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "청구계정을 소유한다"
+        },
+        {
+          "toEnt": "납부자기본",
+          "toArea": "CUS",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "납부자로 등록된다(자사 고객인 납부자)"
+        },
+        {
+          "toEnt": "고객연락처상세",
+          "toArea": "CUS",
+          "card": "1:N",
+          "idn": true,
+          "opt": true,
+          "nm": "연락처를 가진다"
+        },
+        {
+          "toEnt": "고객주소상세",
+          "toArea": "CUS",
+          "card": "1:N",
+          "idn": true,
+          "opt": true,
+          "nm": "주소를 가진다"
+        },
+        {
+          "toEnt": "고객동의내역",
+          "toArea": "CUS",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "동의한다"
+        },
+        {
+          "toEnt": "고객등급이력",
+          "toArea": "CUS",
+          "card": "1:N",
+          "idn": true,
+          "opt": true,
+          "nm": "등급을 부여받는다"
+        },
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "회선 계약을 체결한다(S1 멱법칙)"
+        },
+        {
+          "toEnt": "채권이관기본",
+          "toArea": "COL",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "해지 채권이 이관된다"
+        },
+        {
+          "toEnt": "신용정보등록내역",
+          "toArea": "COL",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "채무 불이행 정보가 등록된다"
+        },
+        {
+          "toEnt": "가입신청기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "고객이 가입을 신청한다(신규 고객은 실명인증 뒤 확정 — 선택)"
+        },
+        {
+          "toEnt": "결합계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "결합 대표 고객(역할명 대표고객번호)"
+        }
+      ]
+    },
+    {
+      "entNm": "개인고객상세",
+      "phyNm": "INDV_CUST_DTL",
+      "tblNm": "PTL_CUS_INDV_CUST_D",
+      "tp": "BASE",
+      "def": "개인·외국인 고객의 서브타입 상세. 생년월일·성별·실명확인 값(암호화 자리 표시 — D11, 실제 주민번호 미보관)·복지 대상 여부 등 개인에게만 있는 속성.",
+      "keyAttrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "영문고객명",
+          "phyNm": "ENG_CUST_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "개인고객등록일시",
+          "phyNm": "INDV_CUST_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "실명인증상태유형코드",
+          "phyNm": "RLNM_CRTF_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "생년월일",
+          "phyNm": "BRDT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "성별구분코드",
+          "phyNm": "GNDR_SE_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "실명확인번호암호화값",
+          "phyNm": "RLNM_IDNTF_NO_ENCPT_VL",
+          "role": "ATTR",
+          "domNm": "값V256"
+        },
+        {
+          "attrNm": "신분증종류코드",
+          "phyNm": "IDCD_KND_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "실명인증일시",
+          "phyNm": "RLNM_CRTF_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "외국인체류만료일자",
+          "phyNm": "FRGNR_STAY_EXPRY_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "복지대상유형코드",
+          "phyNm": "WLFR_TRGT_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "고객의 개인 서브타입이다"
+        }
+      ]
+    },
+    {
+      "entNm": "법인고객상세",
+      "phyNm": "CORP_CUST_DTL",
+      "tblNm": "PTL_CUS_CORP_CUST_D",
+      "tp": "BASE",
+      "def": "법인·개인사업자·공공기관 고객의 서브타입 상세. 사업자등록·대표자·업종·규모 등 법인에게만 있는 속성(법인 1곳이 회선 100만+ 보유하는 S1 핫 키의 주인).",
+      "keyAttrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "법인명",
+          "phyNm": "CORP_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "법인고객등록일시",
+          "phyNm": "CORP_CUST_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "사업자상태유형코드",
+          "phyNm": "BZMN_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "사업자등록번호",
+          "phyNm": "BRNO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "법인등록번호",
+          "phyNm": "CRNO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "대표자명",
+          "phyNm": "RPRSV_NM",
+          "role": "ATTR",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "업종코드",
+          "phyNm": "TPBIZ_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "법인규모유형코드",
+          "phyNm": "CORP_SCL_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "설립일자",
+          "phyNm": "FNDN_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "종업원수",
+          "phyNm": "EMP_CNT",
+          "role": "ATTR",
+          "domNm": "수N10"
+        },
+        {
+          "attrNm": "대표전화번호",
+          "phyNm": "RPRS_TELNO",
+          "role": "ATTR",
+          "domNm": "전화번호V20"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "고객의 법인 서브타입이다"
+        }
+      ]
+    },
+    {
+      "entNm": "청구계정기본",
+      "phyNm": "BILL_ACNT_BAS",
+      "tblNm": "PTL_CUS_BILL_ACNT_M",
+      "tp": "BASE",
+      "def": "청구서를 묶어 발행하는 단위(TM Forum Customer Account). 한 고객이 여러 청구계정을, 한 청구계정이 여러 회선(가입계약)을 가진다. 청구주기·청구서 수령 방법·납부자를 정한다. 납부방법 실체는 INV(P1).",
+      "keyAttrs": [
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구계정명",
+          "phyNm": "BILL_ACNT_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "청구계정등록일시",
+          "phyNm": "BILL_ACNT_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "청구계정상태유형코드",
+          "phyNm": "BILL_ACNT_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "납부자번호",
+          "phyNm": "PYR_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구주기코드",
+          "phyNm": "BILL_CYCL_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구계정유형코드",
+          "phyNm": "BILL_ACNT_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구서수령방법유형코드",
+          "phyNm": "INVC_RCPT_MTHD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구서이메일주소",
+          "phyNm": "INVC_EML_ADDR",
+          "role": "ATTR",
+          "domNm": "주소V100"
+        },
+        {
+          "attrNm": "청구지주소순번",
+          "phyNm": "BILL_PLC_ADDR_SEQ",
+          "role": "ATTR",
+          "domNm": "순번N5"
+        },
+        {
+          "attrNm": "통합청구여부",
+          "phyNm": "INTGR_BILL_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "최초청구년월",
+          "phyNm": "FRST_BILL_YM",
+          "role": "ATTR",
+          "domNm": "년월C6"
+        },
+        {
+          "attrNm": "청구계정해지일시",
+          "phyNm": "BILL_ACNT_TRMN_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "고객이 소유한다"
+        },
+        {
+          "toEnt": "납부자기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "납부자가 요금을 낸다"
+        },
+        {
+          "toEnt": "고객주소상세",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "청구지 주소로 발송한다(우편 수령만)"
+        },
+        {
+          "toEnt": "청구주기코드",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "청구주기를 따른다(신규 교차 관계 제안)"
+        },
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "회선 요금을 묶어 청구받는다"
+        },
+        {
+          "toEnt": "청구기본",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "청구월마다 청구서를 받는다(S14 핫 키)"
+        },
+        {
+          "toEnt": "납부방법기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "납부방법을 등록한다"
+        },
+        {
+          "toEnt": "수납기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "입금이 귀속된다"
+        },
+        {
+          "toEnt": "과오납기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "과오납이 발생한다"
+        },
+        {
+          "toEnt": "가입신청기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "요금을 묶을 청구계정 지정(신규 계정 생성 전 선택)"
+        },
+        {
+          "toEnt": "자동이체신청내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "신청 청구계정"
+        },
+        {
+          "toEnt": "자동이체출금요청내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "출금 청구계정"
+        },
+        {
+          "toEnt": "가상계좌기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "청구계정 전용 계좌"
+        },
+        {
+          "toEnt": "환불내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "환불 청구계정"
+        },
+        {
+          "toEnt": "선납기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "선납 청구계정"
+        },
+        {
+          "toEnt": "분할납부약정기본",
+          "toArea": "COL",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "약정 단위 청구계정(그 청구계정의 미납을 묶음)"
+        }
+      ]
+    },
+    {
+      "entNm": "납부자기본",
+      "phyNm": "PYR_BAS",
+      "tblNm": "PTL_CUS_PYR_M",
+      "tp": "BASE",
+      "def": "요금을 실제로 내는 사람·법인. 명의 고객과 다를 수 있다(부모가 자녀 요금 납부, 법인이 임직원 요금 납부). 자사 고객이면 고객번호를 참조하고, 아니면 이름·연락처만 가진다.",
+      "keyAttrs": [
+        {
+          "attrNm": "납부자번호",
+          "phyNm": "PYR_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "납부자명",
+          "phyNm": "PYR_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "납부자등록일시",
+          "phyNm": "PYR_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "납부자상태유형코드",
+          "phyNm": "PYR_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "납부자유형코드",
+          "phyNm": "PYR_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "명의자관계유형코드",
+          "phyNm": "NMNE_PRSN_REL_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "납부자생년월일",
+          "phyNm": "PYR_BRDT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "납부자사업자등록번호",
+          "phyNm": "PYR_BRNO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "납부자휴대전화번호",
+          "phyNm": "PYR_MBL_TELNO",
+          "role": "ATTR",
+          "domNm": "전화번호V20"
+        },
+        {
+          "attrNm": "납부자이메일주소",
+          "phyNm": "PYR_EML_ADDR",
+          "role": "ATTR",
+          "domNm": "주소V100"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "자사 고객이 납부자가 된다(S5 — 비고객 납부자는 NULL)"
+        },
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "여러 청구계정 요금을 낸다"
+        },
+        {
+          "toEnt": "납부방법기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "납부방법 명의 납부자"
+        }
+      ]
+    },
+    {
+      "entNm": "고객연락처상세",
+      "phyNm": "CUST_CNTC_DTL",
+      "tblNm": "PTL_CUS_CUST_CNTC_D",
+      "tp": "BASE",
+      "def": "고객의 연락 수단(휴대전화·자택·직장·이메일·팩스) 현재값. 한 고객 여러 건, 유형별 대표 1건. 변경 이력은 기본 엔터티 고객연락처이력(논리 단계).",
+      "keyAttrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "연락처순번",
+          "phyNm": "CNTC_SEQ",
+          "role": "PK",
+          "domNm": "순번N5"
+        },
+        {
+          "attrNm": "연락처명",
+          "phyNm": "CNTC_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "연락처등록일시",
+          "phyNm": "CNTC_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "연락처상태유형코드",
+          "phyNm": "CNTC_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "연락처유형코드",
+          "phyNm": "CNTC_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "연락처내용",
+          "phyNm": "CNTC_CN",
+          "role": "ATTR",
+          "domNm": "내용V200"
+        },
+        {
+          "attrNm": "대표연락처여부",
+          "phyNm": "RPRS_CNTC_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "본인연락처여부",
+          "phyNm": "SELF_CNTC_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "연락처검증일시",
+          "phyNm": "CNTC_VRFC_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": true,
+          "opt": false,
+          "nm": "고객의 연락처다"
+        }
+      ]
+    },
+    {
+      "entNm": "고객주소상세",
+      "phyNm": "CUST_ADDR_DTL",
+      "tblNm": "PTL_CUS_CUST_ADDR_D",
+      "tp": "BASE",
+      "def": "고객의 주소(거주지·청구지·직장·사업장·배송지) 현재값. 청구계정의 청구지 주소가 이 엔터티를 가리킨다. 변경 이력은 고객주소이력(논리 단계).",
+      "keyAttrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "주소순번",
+          "phyNm": "ADDR_SEQ",
+          "role": "PK",
+          "domNm": "순번N5"
+        },
+        {
+          "attrNm": "수령인명",
+          "phyNm": "RCPN_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "주소등록일시",
+          "phyNm": "ADDR_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "주소상태유형코드",
+          "phyNm": "ADDR_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "주소유형코드",
+          "phyNm": "ADDR_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "우편번호",
+          "phyNm": "ZIP",
+          "role": "ATTR",
+          "domNm": "우편번호C5"
+        },
+        {
+          "attrNm": "도로명주소",
+          "phyNm": "ROAD_NM_ADDR",
+          "role": "ATTR",
+          "domNm": "주소V200"
+        },
+        {
+          "attrNm": "상세주소",
+          "phyNm": "DADDR",
+          "role": "ATTR",
+          "domNm": "주소V200"
+        },
+        {
+          "attrNm": "건물관리번호",
+          "phyNm": "BLDG_MGMT_NO",
+          "role": "ATTR",
+          "domNm": "번호V30"
+        },
+        {
+          "attrNm": "대표주소여부",
+          "phyNm": "RPRS_ADDR_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "반송횟수",
+          "phyNm": "RTRN_NMTM",
+          "role": "ATTR",
+          "domNm": "수N5"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": true,
+          "opt": false,
+          "nm": "고객의 주소다"
+        },
+        {
+          "toEnt": "지역코드",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "지역에 속한다"
+        },
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "청구지 주소로 쓰인다"
+        }
+      ]
+    },
+    {
+      "entNm": "고객동의내역",
+      "phyNm": "CUST_AGRE_DTLS",
+      "tblNm": "PTL_CUS_CUST_AGRE_L",
+      "tp": "ACT",
+      "def": "고객이 개인정보 수집·이용, 마케팅 수신, 제3자 제공 등 동의 항목에 동의·거부한 행위 1건. 철회·만료·파기는 상태유형코드와 일시로 표현(행 삭제 없음 — 동의 증빙 보존 의무).",
+      "keyAttrs": [
+        {
+          "attrNm": "고객동의번호",
+          "phyNm": "CUST_AGRE_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "동의자명",
+          "phyNm": "AGRE_PRSN_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "동의일시",
+          "phyNm": "AGRE_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "동의상태유형코드",
+          "phyNm": "AGRE_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "동의항목유형코드",
+          "phyNm": "AGRE_ITM_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "동의항목버전번호",
+          "phyNm": "AGRE_ITM_VER_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "동의여부",
+          "phyNm": "AGRE_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "동의채널유형코드",
+          "phyNm": "AGRE_CHNL_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "법정대리인동의여부",
+          "phyNm": "LGLRP_AGRE_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "동의철회일시",
+          "phyNm": "AGRE_WTHDR_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "동의만료일자",
+          "phyNm": "AGRE_EXPRY_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "고객이 동의한다"
+        },
+        {
+          "toEnt": "동의항목코드",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "동의 항목 정의를 따른다(논리 단계 기본 엔터티)"
+        }
+      ]
+    },
+    {
+      "entNm": "고객등급이력",
+      "phyNm": "CUST_GRD_HIST",
+      "tblNm": "PTL_CUS_CUST_GRD_H",
+      "tp": "ACT",
+      "def": "고객 등급(VVIP·VIP·골드·실버·일반) 산정·부여 이력. 적용 기간(시작·종료)을 가져 과거 시점 등급 재현(SCD2)이 가능하다. 현재 등급은 고객기본.고객등급코드에 둔다.",
+      "keyAttrs": [
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "등급적용시작일시",
+          "phyNm": "GRD_APLCN_BGNG_DTM",
+          "role": "PK",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "고객등급명",
+          "phyNm": "CUST_GRD_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "등급산정일시",
+          "phyNm": "GRD_ASMT_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "등급적용상태유형코드",
+          "phyNm": "GRD_APLCN_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "고객등급유형코드",
+          "phyNm": "CUST_GRD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "등급적용종료일시",
+          "phyNm": "GRD_APLCN_END_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "등급산정기준년월",
+          "phyNm": "GRD_ASMT_STD_YM",
+          "role": "ATTR",
+          "domNm": "년월C6"
+        },
+        {
+          "attrNm": "산정청구금액",
+          "phyNm": "ASMT_BILL_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "가입기간개월수",
+          "phyNm": "SBSC_PRD_MCNT",
+          "role": "ATTR",
+          "domNm": "수N5"
+        },
+        {
+          "attrNm": "등급변경사유유형코드",
+          "phyNm": "GRD_CHG_RSN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": true,
+          "opt": false,
+          "nm": "고객의 등급 이력이다"
+        }
+      ]
+    },
+    {
+      "entNm": "지역코드",
+      "phyNm": "RGN_CD",
+      "tblNm": "PTL_CUS_RGN_C",
+      "tp": "REF",
+      "def": "시도·시군구·읍면동 행정구역 기준(행정표준코드 법정동 10자리 기준, D5 — 고객 영역 소유). 상위지역코드로 계층을 이룬다. 폐지·통합은 상태·적용 기간으로 표현.",
+      "keyAttrs": [
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "role": "PK",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "지역명",
+          "phyNm": "RGN_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "지역등록일시",
+          "phyNm": "RGN_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "지역상태유형코드",
+          "phyNm": "RGN_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "상위지역코드",
+          "phyNm": "UP_RGN_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "지역단계구분코드",
+          "phyNm": "RGN_STEP_SE_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "영문지역명",
+          "phyNm": "ENG_RGN_NM",
+          "role": "ATTR",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "도서산간여부",
+          "phyNm": "ISLND_MNTN_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "지역코드",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "상위 지역에 속한다(자기 참조, 시도는 NULL)"
+        },
+        {
+          "toEnt": "고객주소상세",
+          "toArea": "CUS",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "주소의 지역이 된다"
+        },
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "유통망 소재 지역이 된다(S10)"
+        }
+      ]
+    }
+  ],
+  "domains": [
+    {
+      "domNm": "번호V20",
+      "lgcTp": "VARCHAR",
+      "len": 20
+    },
+    {
+      "domNm": "번호V30",
+      "lgcTp": "VARCHAR",
+      "len": 30
+    },
+    {
+      "domNm": "코드V10",
+      "lgcTp": "VARCHAR",
+      "len": 10
+    },
+    {
+      "domNm": "명V100",
+      "lgcTp": "VARCHAR",
+      "len": 100
+    },
+    {
+      "domNm": "명V200",
+      "lgcTp": "VARCHAR",
+      "len": 200
+    },
+    {
+      "domNm": "일시TS",
+      "lgcTp": "TIMESTAMP"
+    },
+    {
+      "domNm": "일자C8",
+      "lgcTp": "CHAR",
+      "len": 8
+    },
+    {
+      "domNm": "년월C6",
+      "lgcTp": "CHAR",
+      "len": 6
+    },
+    {
+      "domNm": "여부C1",
+      "lgcTp": "CHAR",
+      "len": 1
+    },
+    {
+      "domNm": "금액N15",
+      "lgcTp": "NUMERIC",
+      "len": 15,
+      "scale": 0
+    },
+    {
+      "domNm": "수N5",
+      "lgcTp": "NUMERIC",
+      "len": 5,
+      "scale": 0
+    },
+    {
+      "domNm": "수N10",
+      "lgcTp": "NUMERIC",
+      "len": 10,
+      "scale": 0
+    },
+    {
+      "domNm": "순번N5",
+      "lgcTp": "NUMERIC",
+      "len": 5,
+      "scale": 0
+    },
+    {
+      "domNm": "전화번호V20",
+      "lgcTp": "VARCHAR",
+      "len": 20
+    },
+    {
+      "domNm": "이메일V100",
+      "lgcTp": "VARCHAR",
+      "len": 100
+    },
+    {
+      "domNm": "주소V200",
+      "lgcTp": "VARCHAR",
+      "len": 200
+    },
+    {
+      "domNm": "내용V200",
+      "lgcTp": "VARCHAR",
+      "len": 200
+    },
+    {
+      "domNm": "우편번호C5",
+      "lgcTp": "CHAR",
+      "len": 5
+    },
+    {
+      "domNm": "암호화값V256",
+      "lgcTp": "VARCHAR",
+      "len": 256
+    }
+  ],
+  "codeCandidates": [
+    {
+      "termNm": "고객상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "정상",
+        "해지",
+        "휴면",
+        "사망",
+        "명의도용정지",
+        "파기"
+      ]
+    },
+    {
+      "termNm": "고객유형코드",
+      "kind": "유형",
+      "vals": [
+        "개인",
+        "개인사업자",
+        "법인",
+        "외국인",
+        "공공기관"
+      ]
+    },
+    {
+      "termNm": "내외국인구분코드",
+      "kind": "구분",
+      "vals": [
+        "내국인",
+        "외국인"
+      ]
+    },
+    {
+      "termNm": "성별구분코드",
+      "kind": "구분",
+      "vals": [
+        "남",
+        "여"
+      ]
+    },
+    {
+      "termNm": "실명인증상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "미인증",
+        "인증",
+        "인증실패",
+        "재인증필요"
+      ]
+    },
+    {
+      "termNm": "신분증종류코드",
+      "kind": "종류",
+      "vals": [
+        "주민등록증",
+        "운전면허증",
+        "여권",
+        "외국인등록증",
+        "장애인등록증"
+      ]
+    },
+    {
+      "termNm": "복지대상유형코드",
+      "kind": "유형",
+      "vals": [
+        "해당없음",
+        "장애인",
+        "기초생활수급자",
+        "차상위계층",
+        "국가유공자",
+        "기초연금수급자"
+      ]
+    },
+    {
+      "termNm": "사업자상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "계속",
+        "휴업",
+        "폐업",
+        "확인불가"
+      ]
+    },
+    {
+      "termNm": "법인규모유형코드",
+      "kind": "유형",
+      "vals": [
+        "대기업",
+        "중견기업",
+        "중소기업",
+        "소상공인",
+        "공공기관"
+      ]
+    },
+    {
+      "termNm": "청구계정상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "정상",
+        "미납정지",
+        "해지",
+        "채권이관",
+        "대손",
+        "소멸"
+      ]
+    },
+    {
+      "termNm": "청구계정유형코드",
+      "kind": "유형",
+      "vals": [
+        "개인",
+        "법인",
+        "법인통합",
+        "가족통합"
+      ]
+    },
+    {
+      "termNm": "청구서수령방법유형코드",
+      "kind": "유형",
+      "vals": [
+        "우편",
+        "이메일",
+        "모바일",
+        "문자",
+        "미발행"
+      ]
+    },
+    {
+      "termNm": "납부자상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "정상",
+        "변경",
+        "해지",
+        "사망"
+      ]
+    },
+    {
+      "termNm": "납부자유형코드",
+      "kind": "유형",
+      "vals": [
+        "본인",
+        "가족",
+        "법인",
+        "제3자개인",
+        "제3자법인"
+      ]
+    },
+    {
+      "termNm": "명의자관계유형코드",
+      "kind": "유형",
+      "vals": [
+        "본인",
+        "부모",
+        "자녀",
+        "배우자",
+        "형제",
+        "법인임직원",
+        "기타"
+      ]
+    },
+    {
+      "termNm": "연락처상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "유효",
+        "결번",
+        "수신불가",
+        "반송",
+        "변경"
+      ]
+    },
+    {
+      "termNm": "연락처유형코드",
+      "kind": "유형",
+      "vals": [
+        "휴대전화",
+        "자택전화",
+        "직장전화",
+        "이메일",
+        "팩스"
+      ]
+    },
+    {
+      "termNm": "주소상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "유효",
+        "반송",
+        "불명",
+        "변경"
+      ]
+    },
+    {
+      "termNm": "주소유형코드",
+      "kind": "유형",
+      "vals": [
+        "거주지",
+        "청구지",
+        "직장",
+        "사업장",
+        "배송지"
+      ]
+    },
+    {
+      "termNm": "동의상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "동의",
+        "거부",
+        "철회",
+        "만료",
+        "파기"
+      ]
+    },
+    {
+      "termNm": "동의채널유형코드",
+      "kind": "유형",
+      "vals": [
+        "매장",
+        "온라인",
+        "고객센터",
+        "앱",
+        "서면"
+      ]
+    },
+    {
+      "termNm": "등급적용상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "예약",
+        "적용중",
+        "종료",
+        "취소"
+      ]
+    },
+    {
+      "termNm": "고객등급유형코드",
+      "kind": "유형",
+      "vals": [
+        "VVIP",
+        "VIP",
+        "골드",
+        "실버",
+        "일반"
+      ]
+    },
+    {
+      "termNm": "지역상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "사용",
+        "폐지",
+        "통합",
+        "분리"
+      ]
+    },
+    {
+      "termNm": "지역단계구분코드",
+      "kind": "구분",
+      "vals": [
+        "시도",
+        "시군구",
+        "읍면동"
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "id": "C1",
+      "dec": "핵심 10개는 planner 후보 그대로 확정(교체 없음)",
+      "why": "청구계정·납부자·연락처·주소·동의는 국내 3사 BSS 고객 영역 필수 실체이고 crossRels 가 이미 이 이름으로 걸려 있음. 고객관계·법정대리인은 기본 엔터티로 충분"
+    },
+    {
+      "id": "C2",
+      "dec": "개인·법인 = 고객기본의 1:1 식별 서브타입(PK = 고객번호 승계)",
+      "why": "SID Party(Individual·Organization) 구조, 공통 조회(고객번호)는 슈퍼타입 한 곳"
+    },
+    {
+      "id": "C3",
+      "dec": "현재 등급은 고객기본.고객등급코드, 이력은 고객등급이력(적용 시작·종료)",
+      "why": "현재값 기본 + 변경 이력 쌍(01 문서 5절 원칙 1, SCD2)"
+    },
+    {
+      "id": "C4",
+      "dec": "연락처·주소는 고객 종속 식별 관계(고객번호 + 일련번호)",
+      "why": "고객 없이 존재하지 않는 약한 실체, 개인정보 분리(01 문서 5절 원칙 6)"
+    },
+    {
+      "id": "C5",
+      "dec": "고객동의내역은 행위 번호 PK 고객동의번호(고객번호는 비식별 속성)",
+      "why": "동의·재동의·철회가 같은 항목에 반복 발생하고 증빙 보존 — 복합키 대신 행위 번호"
+    },
+    {
+      "id": "C6",
+      "dec": "납부자→고객 참조는 선택(비고객 납부자 허용)",
+      "why": "국내 실무에서 납부자는 명의자와 다른 비가입자일 수 있음(S5 FK NULL 쏠림 근거)"
+    },
+    {
+      "id": "C7",
+      "dec": "청구계정→PAY.청구주기코드 N:1 신규 교차 관계 제안",
+      "why": "청구주기는 청구계정 속성(청구서는 그 시점 주기를 복사) — coordinator 가 areas.json crossRels 추가 판단"
+    },
+    {
+      "id": "C8",
+      "dec": "개인고객상세 NM = 영문고객명, 고객주소상세 NM = 수령인명, 고객연락처상세 NM = 연락처명, 고객동의내역 NM = 동의자명",
+      "why": "필수 4종의 '~명'을 법정 실명(고객기본.고객명) 중복 없이 각 실체의 업무 의미 있는 이름으로 채움"
+    },
+    {
+      "id": "C9",
+      "dec": "고객등급이력.고객등급명 = 산정 당시 등급명 보존",
+      "why": "등급 체계 개편 시 과거 명칭 재현 필요(시점 보존 — 이행 종속 아님)"
+    },
+    {
+      "id": "C10",
+      "dec": "실명확인번호는 암호화값 자리 표시만(D11)",
+      "why": "실제 주민번호 금지, 데이터는 무작위 해시"
+    },
+    {
+      "id": "C11",
+      "dec": "phyNm 약어는 공통표준(행안부) 관행 후보(STTS·TY·SE·KND·YMD·SN·RGN 등) — 표준사전 단계에서 확정",
+      "why": "규칙 2-1 표준 먼저, 이 단계는 후보"
+    }
+  ]
+}

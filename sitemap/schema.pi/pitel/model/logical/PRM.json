@@ -1,0 +1,4653 @@
+{
+  "area": "PRM",
+  "areaNm": "파트너",
+  "stg": "LGCL",
+  "ver": "1.1",
+  "author": "subagent_logical_modeler",
+  "nullYnRule": "nullYn true = NULL 허용",
+  "entities": [
+    {
+      "entId": "PRM-001",
+      "entNm": "파트너기본",
+      "phyNm": "PRTNR_BAS",
+      "tblNm": "PTL_PRM_PRTNR_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "통신사와 거래하는 모든 외부 당사자(대리점·판매점·제휴사·콘텐츠·소액결제 제공사·타 통신사·국제로밍 사업자·수납대행기관)의 공통 실체(슈퍼타입). 사업자등록·과세유형·관리 조직처럼 정산·세금계산서에 공통으로 쓰는 속성을 가진다. 제휴사는 별도 상세 없이 파트너유형코드로만 구분. 거래 종료 후에도 행을 지우지 않는다.",
+      "attrs": [
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너의 번호 — 대상을 식별하거나 외부에서 부여받은 번호",
+          "role": "PK"
+        },
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "지역코드",
+            "attr": "지역코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "소재 지역(해외 사업자 NULL — S10 지역↔대리점 상관)"
+        },
+        {
+          "attrNm": "관리조직코드",
+          "phyNm": "MGMT_ORG_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "조직기본",
+            "attr": "조직코드"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "관리하는 사내 영업 조직 — 역할명, PRM.조직기본.조직코드(해외 사업자 NULL)"
+        },
+        {
+          "attrNm": "파트너명",
+          "phyNm": "PRTNR_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "사업자등록상 상호(법적 명의)",
+          "role": "NM"
+        },
+        {
+          "attrNm": "파트너등록일시",
+          "phyNm": "PRTNR_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "파트너 등록의 일시 — 연월일 시분초까지의 시점",
+          "role": "DTM"
+        },
+        {
+          "attrNm": "파트너상태유형코드",
+          "phyNm": "PRTNR_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "파트너 상태의 유형 코드 — 공통코드(codes.json)",
+          "role": "STS"
+        },
+        {
+          "attrNm": "파트너유형코드",
+          "phyNm": "PRTNR_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "서브타입 판별자(대리점·판매점·제휴사·콘텐츠제공사·통신사업자·로밍사업자·수납대행기관)"
+        },
+        {
+          "attrNm": "사업자등록번호",
+          "phyNm": "BRNO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "국내 사업자만(해외 NULL — S5)"
+        },
+        {
+          "attrNm": "법인등록번호",
+          "phyNm": "CRNO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "법원 법인등록번호 13자리"
+        },
+        {
+          "attrNm": "대표자명",
+          "phyNm": "RPRSV_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "대표자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "사업자과세유형코드",
+          "phyNm": "BZMN_TXTN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "사업자 과세의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "국가코드",
+          "phyNm": "NATN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "ISO 3166 국가(외부 표준 코드)"
+        },
+        {
+          "attrNm": "대표전화번호",
+          "phyNm": "RPRS_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 13,
+          "def": "대표의 전화번호 — 전화번호(숫자 문자열)"
+        },
+        {
+          "attrNm": "사업장주소",
+          "phyNm": "BPLC_ADDR",
+          "domNm": "주소V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 14,
+          "def": "사업장의 주소 — 우편·전자 주소"
+        },
+        {
+          "attrNm": "거래시작일자",
+          "phyNm": "TRD_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 15,
+          "def": "거래 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "거래종료일자",
+          "phyNm": "TRD_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 16,
+          "def": "거래 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "지역코드-파트너기본",
+          "parent": "CUS.지역코드",
+          "child": "PRM.파트너기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "지역코드"
+          ]
+        },
+        {
+          "relNm": "조직기본-파트너기본(관리조직코드)",
+          "parent": "PRM.조직기본",
+          "child": "PRM.파트너기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "관리조직코드"
+          ]
+        }
+      ],
+      "normNote": "1NF : 계좌·담당자 반복 → 파트너계좌상세·파트너담당자상세, 변경 → 파트너이력. 2NF : 단일 PK. 3NF : 국가코드는 국내 사업자면 지역코드로 정해지지만 해외 사업자는 지역이 NULL 이라 국가가 유일한 소재 정보 — 지역→국가 종속은 지역이 있을 때만 성립하는 부분 함수라 독립 속성으로 둠. 유형별 고유 속성은 서브타입 5개로 분리."
+    },
+    {
+      "entId": "PRM-002",
+      "entNm": "조직기본",
+      "phyNm": "ORG_BAS",
+      "tblNm": "PTL_PRM_ORG_M",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "사내 영업 조직(본사·본부·지사·영업팀·직영매장·고객센터) 기준 정보(D5 — 파트너 관리 주체라 PRM). 상위 조직 자기 참조로 계층을 이루고, 개편 시 행을 닫고(유효종료일자) 새 코드를 연다.",
+      "attrs": [
+        {
+          "attrNm": "조직코드",
+          "phyNm": "ORG_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "조직의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합",
+          "role": "PK"
+        },
+        {
+          "attrNm": "상위조직코드",
+          "phyNm": "UP_ORG_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "조직기본",
+            "attr": "조직코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "상위 조직 — 역할명 자기 참조(본사 NULL)"
+        },
+        {
+          "attrNm": "조직명",
+          "phyNm": "ORG_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "조직의 명 — 대상을 부르는 이름",
+          "role": "NM"
+        },
+        {
+          "attrNm": "조직등록일시",
+          "phyNm": "ORG_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "조직 등록의 일시 — 연월일 시분초까지의 시점",
+          "role": "DTM"
+        },
+        {
+          "attrNm": "조직상태유형코드",
+          "phyNm": "ORG_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "조직 상태의 유형 코드 — 공통코드(codes.json)",
+          "role": "STS"
+        },
+        {
+          "attrNm": "조직유형코드",
+          "phyNm": "ORG_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "조직의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "조직장명",
+          "phyNm": "ORG_HD_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "조직 장의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "비용센터코드",
+          "phyNm": "CST_CTR_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "ERP 비용센터(외부 코드)"
+        },
+        {
+          "attrNm": "유효시작일자",
+          "phyNm": "VLD_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "유효 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "유효종료일자",
+          "phyNm": "VLD_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "유효 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "조직기본-조직기본(상위조직코드)",
+          "parent": "PRM.조직기본",
+          "child": "PRM.조직기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "상위조직코드"
+          ]
+        }
+      ],
+      "normNote": "1NF : 명칭·상위 조직 변경 → 조직이력. 2NF : 단일 PK. 3NF : 이행 종속 없음(계층은 자기 참조 FK)."
+    },
+    {
+      "entId": "PRM-003",
+      "entNm": "대리점기본",
+      "phyNm": "AGNC_BAS",
+      "tblNm": "PTL_PRM_AGNC_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "통신사와 위탁 계약을 맺고 개통·사후관리를 대행하는 1차 유통망(대리점) 서브타입. 관리 대리점으로서 회선의 관리수수료·유치 실적이 귀속되고(S10) 산하 판매점(2차점)을 거느린다.",
+      "attrs": [
+        {
+          "attrNm": "대리점번호",
+          "phyNm": "AGNC_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너번호의 역할명(값 동일, 1:1 식별 서브타입)",
+          "role": "PK"
+        },
+        {
+          "attrNm": "대리점명",
+          "phyNm": "AGNC_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "영업 간판명(법적 상호 = 파트너명과 다를 수 있음)",
+          "role": "NM"
+        },
+        {
+          "attrNm": "대리점등록일시",
+          "phyNm": "AGNC_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "대리점 등록의 일시 — 연월일 시분초까지의 시점",
+          "role": "DTM"
+        },
+        {
+          "attrNm": "대리점상태유형코드",
+          "phyNm": "AGNC_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "대리점 상태의 유형 코드 — 공통코드(codes.json)",
+          "role": "STS"
+        },
+        {
+          "attrNm": "대리점유형코드",
+          "phyNm": "AGNC_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "대리점의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "대리점등급유형코드",
+          "phyNm": "AGNC_GRD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "대리점 등급의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "개설일자",
+          "phyNm": "OPN_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "개설의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "폐쇄일자",
+          "phyNm": "CLSR_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "폐쇄의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "담보금액",
+          "phyNm": "CLTRL_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "담보의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "전속대리점여부",
+          "phyNm": "EXCL_AGNC_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "전속 대리점의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-대리점기본(대리점번호)",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.대리점기본",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "대리점번호"
+          ]
+        }
+      ],
+      "normNote": "1NF 충족. 2NF : 단일 PK. 3NF : 사업자·과세·조직 등 공통 속성은 슈퍼타입(파트너기본) 한 곳에만. 대리점명은 간판명으로 파트너명(법적 상호)과 독립."
+    },
+    {
+      "entId": "PRM-004",
+      "entNm": "판매점기본",
+      "phyNm": "SHOP_BAS",
+      "tblNm": "PTL_PRM_SHOP_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "대리점 산하 또는 통신사 직계약으로 가입을 유치하는 판매 채널(판매점·양판점·온라인·방문판매) 서브타입. 단말기유통법 사전승낙 정보를 가지며 가입신청·부가서비스 유치의 귀속처(유치수수료 근거).",
+      "attrs": [
+        {
+          "attrNm": "판매점번호",
+          "phyNm": "SHOP_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너번호의 역할명(값 동일)",
+          "role": "PK"
+        },
+        {
+          "attrNm": "대리점번호",
+          "phyNm": "AGNC_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "대리점기본",
+            "attr": "대리점번호"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "상위 대리점(양판점·직계약 판매점 NULL — S5)"
+        },
+        {
+          "attrNm": "판매점명",
+          "phyNm": "SHOP_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "판매점의 명 — 대상을 부르는 이름",
+          "role": "NM"
+        },
+        {
+          "attrNm": "판매점등록일시",
+          "phyNm": "SHOP_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "판매점 등록의 일시 — 연월일 시분초까지의 시점",
+          "role": "DTM"
+        },
+        {
+          "attrNm": "판매점상태유형코드",
+          "phyNm": "SHOP_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "판매점 상태의 유형 코드 — 공통코드(codes.json)",
+          "role": "STS"
+        },
+        {
+          "attrNm": "판매점유형코드",
+          "phyNm": "SHOP_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "판매점의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "사전승낙번호",
+          "phyNm": "PRAPRV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "사전승낙의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "사전승낙일자",
+          "phyNm": "PRAPRV_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "사전승낙의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "개설일자",
+          "phyNm": "OPN_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "개설의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "폐쇄일자",
+          "phyNm": "CLSR_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "폐쇄의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "신분증스캐너보유여부",
+          "phyNm": "IDCD_SCNR_HOLD_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "신분증 스캐너 보유의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-판매점기본(판매점번호)",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.판매점기본",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "판매점번호"
+          ]
+        },
+        {
+          "relNm": "대리점기본-판매점기본",
+          "parent": "PRM.대리점기본",
+          "child": "PRM.판매점기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "대리점번호"
+          ]
+        }
+      ],
+      "normNote": "1NF 충족. 2NF : 단일 PK. 3NF : 사전승낙일자는 사전승낙번호(외부 발급 번호)의 속성이지만 번호 체계 엔터티가 없고 1:1 이라 판매점 속성으로 둠."
+    },
+    {
+      "entId": "PRM-005",
+      "entNm": "콘텐츠제공사기본",
+      "phyNm": "CNTS_PRVD_CO_BAS",
+      "tblNm": "PTL_PRM_CNTS_PRVD_CO_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "부가서비스 콘텐츠(통화연결음·음악·영상·게임)와 휴대폰 소액결제를 제공하는 사업자(CP·PG·앱마켓) 서브타입. 고객 청구서에 정보이용료로 대신 청구하고 수수료를 뗀 금액을 정산해 준다(STL).",
+      "attrs": [
+        {
+          "attrNm": "콘텐츠제공사번호",
+          "phyNm": "CNTS_PRVD_CO_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너번호의 역할명(값 동일)",
+          "role": "PK"
+        },
+        {
+          "attrNm": "콘텐츠제공사명",
+          "phyNm": "CNTS_PRVD_CO_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "콘텐츠 제공 사의 명 — 대상을 부르는 이름",
+          "role": "NM"
+        },
+        {
+          "attrNm": "콘텐츠제공사등록일시",
+          "phyNm": "CNTS_PRVD_CO_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "콘텐츠 제공 사 등록의 일시 — 연월일 시분초까지의 시점",
+          "role": "DTM"
+        },
+        {
+          "attrNm": "콘텐츠제공사상태유형코드",
+          "phyNm": "CNTS_PRVD_CO_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "콘텐츠 제공 사 상태의 유형 코드 — 공통코드(codes.json)",
+          "role": "STS"
+        },
+        {
+          "attrNm": "콘텐츠제공사유형코드",
+          "phyNm": "CNTS_PRVD_CO_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "콘텐츠 제공 사의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "부가통신사업신고번호",
+          "phyNm": "VASB_DCLR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "부가통신사업 신고의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산수수료율",
+          "phyNm": "STLM_FEE_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "현재 적용 정산 수수료율(월 정산 건의 수수료 금액은 콘텐츠정산내역에 확정)"
+        },
+        {
+          "attrNm": "휴대폰결제가맹여부",
+          "phyNm": "HP_PYMT_AFLT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "휴대폰 결제 가맹의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "고객센터전화번호",
+          "phyNm": "CUST_CTR_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "고객 센터의 전화번호 — 전화번호(숫자 문자열)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-콘텐츠제공사기본(콘텐츠제공사번호)",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.콘텐츠제공사기본",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "콘텐츠제공사번호"
+          ]
+        }
+      ],
+      "normNote": "1NF 충족. 2NF : 단일 PK. 3NF : 이행 종속 없음. 정산수수료율은 현재값, 과거 월 적용분은 콘텐츠정산내역의 정산수수료금액으로 보존."
+    },
+    {
+      "entId": "PRM-006",
+      "entNm": "통신사업자기본",
+      "phyNm": "CARR_BAS",
+      "tblNm": "PTL_PRM_CARR_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "국내 기간·별정 통신사업자(MNO·MVNO·유선·인터넷전화·국제전화) 서브타입. 번호이동 상대·번호 원 할당 사업자·상호접속료 정산 상대(STL). MVNO 는 망을 빌려주는 상위 사업자를 가진다.",
+      "attrs": [
+        {
+          "attrNm": "통신사업자번호",
+          "phyNm": "CARR_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너번호의 역할명(값 동일)",
+          "role": "PK"
+        },
+        {
+          "attrNm": "상위통신사업자번호",
+          "phyNm": "UP_CARR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "통신사업자기본",
+            "attr": "통신사업자번호"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "MVNO 의 망 제공 사업자 — 역할명 자기 참조(MNO NULL)"
+        },
+        {
+          "attrNm": "통신사업자명",
+          "phyNm": "CARR_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "통신사업자의 명 — 대상을 부르는 이름",
+          "role": "NM"
+        },
+        {
+          "attrNm": "통신사업자등록일시",
+          "phyNm": "CARR_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "통신사업자 등록의 일시 — 연월일 시분초까지의 시점",
+          "role": "DTM"
+        },
+        {
+          "attrNm": "통신사업자상태유형코드",
+          "phyNm": "CARR_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "통신사업자 상태의 유형 코드 — 공통코드(codes.json)",
+          "role": "STS"
+        },
+        {
+          "attrNm": "통신사업자유형코드",
+          "phyNm": "CARR_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "통신사업자의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "번호이동사업자코드",
+          "phyNm": "MNP_BZMN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "KTOA 번호이동 사업자 코드(외부 코드)"
+        },
+        {
+          "attrNm": "망식별코드",
+          "phyNm": "NTWK_IDFC_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "ITU-T E.212 MCC+MNC(MVNO NULL)"
+        },
+        {
+          "attrNm": "상호접속계약일자",
+          "phyNm": "INTCN_CTRT_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "상호접속 계약의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "상호접속정산대상여부",
+          "phyNm": "INTCN_STLM_TRGT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "상호접속 정산 대상의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-통신사업자기본(통신사업자번호)",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.통신사업자기본",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "통신사업자번호"
+          ]
+        },
+        {
+          "relNm": "통신사업자기본-통신사업자기본(상위통신사업자번호)",
+          "parent": "PRM.통신사업자기본",
+          "child": "PRM.통신사업자기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "상위통신사업자번호"
+          ]
+        }
+      ],
+      "normNote": "1NF : 상호접속 요율 반복 → 상호접속요율상세. 2NF : 단일 PK. 3NF : 이행 종속 없음."
+    },
+    {
+      "entId": "PRM-007",
+      "entNm": "로밍사업자기본",
+      "phyNm": "ROAM_BZMN_BAS",
+      "tblNm": "PTL_PRM_ROAM_BZMN_M",
+      "tp": "BASE",
+      "stg": "CNCP",
+      "def": "국제로밍 협정을 맺은 해외 이동통신사업자 서브타입. GSMA TADIG 코드로 TAP(사용 기록)·RAP(반송) 파일을 주고받으며 아웃바운드(우리 고객 해외 사용)·인바운드(해외 고객 국내 사용) 사용료를 상호 청구한다(STL).",
+      "attrs": [
+        {
+          "attrNm": "로밍사업자번호",
+          "phyNm": "ROAM_BZMN_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너번호의 역할명(값 동일)",
+          "role": "PK"
+        },
+        {
+          "attrNm": "국가코드",
+          "phyNm": "NATN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "로밍국가코드",
+            "attr": "국가코드"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "방문망(로밍 상대 망)이 서비스하는 국가 — ISO 3166-1 alpha-2, FK → PRD.로밍국가코드. 파트너기본.국가코드(계약 법인 소재국)와 다를 수 있음(그룹 사업자)"
+        },
+        {
+          "attrNm": "로밍사업자명",
+          "phyNm": "ROAM_BZMN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "로밍 사업자의 명 — 대상을 부르는 이름",
+          "role": "NM"
+        },
+        {
+          "attrNm": "로밍사업자등록일시",
+          "phyNm": "ROAM_BZMN_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "로밍 사업자 등록의 일시 — 연월일 시분초까지의 시점",
+          "role": "DTM"
+        },
+        {
+          "attrNm": "로밍사업자상태유형코드",
+          "phyNm": "ROAM_BZMN_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "로밍 사업자 상태의 유형 코드 — 공통코드(codes.json)",
+          "role": "STS"
+        },
+        {
+          "attrNm": "TADIG코드",
+          "phyNm": "TADIG_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "GSMA TD.13 사업자 코드(외부 코드)"
+        },
+        {
+          "attrNm": "망식별코드",
+          "phyNm": "NTWK_IDFC_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "망 식별 코드 — 외부 표준 ITU-T E.212 MCC+MNC 값을 그대로 쓴다(공통코드 아님)"
+        },
+        {
+          "attrNm": "로밍방향구분코드",
+          "phyNm": "ROAM_DRCT_SE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "로밍 방향의 구분 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "로밍계약일자",
+          "phyNm": "ROAM_CTRT_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "로밍 계약의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "정산통화코드",
+          "phyNm": "STLM_CRNCY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "ISO 4217(SDR·USD·EUR 등)"
+        },
+        {
+          "attrNm": "데이터청산사명",
+          "phyNm": "DATA_CLRH_CO_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "데이터 청산 사의 명 — 대상을 부르는 이름"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-로밍사업자기본(로밍사업자번호)",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.로밍사업자기본",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "로밍사업자번호"
+          ]
+        },
+        {
+          "relNm": "로밍국가코드-로밍사업자기본(방문망 국가)",
+          "parent": "PRD.로밍국가코드",
+          "child": "PRM.로밍사업자기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "국가코드"
+          ]
+        }
+      ],
+      "normNote": "1NF : 파일·월 정산 반복 → 로밍정산파일내역·로밍정산내역. 2NF : 단일 PK. 3NF : 국가코드(방문망 국가, FK → PRD.로밍국가코드)는 TADIG 망 단위 사실로, 슈퍼타입 파트너기본.국가코드(계약 법인 소재국)와 다를 수 있어(그룹 사업자) 이행 종속 아님 — 03 관문 L4-R 로 추가(당초 L4 는 같은 값으로 보고 불수용)."
+    },
+    {
+      "entId": "PRM-008",
+      "entNm": "파트너계약기본",
+      "phyNm": "PRTNR_CTRT_BAS",
+      "tblNm": "PTL_PRM_PRTNR_CTRT_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "def": "파트너와 맺은 거래 계약(대리점·판매점 위탁, 콘텐츠 제공, 상호접속, 국제로밍 협정, 제휴, 수납대행) 한 건. 계약 기간·자동갱신·정산주기·지급조건이 정산의 기준이 되고 변경은 파트너계약이력에 남긴다.",
+      "attrs": [
+        {
+          "attrNm": "파트너계약번호",
+          "phyNm": "PRTNR_CTRT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너 계약의 번호 — 대상을 식별하거나 외부에서 부여받은 번호",
+          "role": "PK"
+        },
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "파트너의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "파트너계약명",
+          "phyNm": "PRTNR_CTRT_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "파트너 계약의 명 — 대상을 부르는 이름",
+          "role": "NM"
+        },
+        {
+          "attrNm": "파트너계약일시",
+          "phyNm": "PRTNR_CTRT_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "파트너 계약의 일시 — 연월일 시분초까지의 시점",
+          "role": "DTM"
+        },
+        {
+          "attrNm": "파트너계약상태유형코드",
+          "phyNm": "PRTNR_CTRT_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "파트너 계약 상태의 유형 코드 — 공통코드(codes.json)",
+          "role": "STS"
+        },
+        {
+          "attrNm": "파트너계약유형코드",
+          "phyNm": "PRTNR_CTRT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "파트너 계약의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "계약시작일자",
+          "phyNm": "CTRT_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "계약 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "계약종료일자",
+          "phyNm": "CTRT_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "계약 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "자동갱신여부",
+          "phyNm": "ATMT_RNW_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "자동 갱신의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "정산주기유형코드",
+          "phyNm": "STLM_CYCL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "정산 주기의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "지급조건내용",
+          "phyNm": "GIVE_CND_CN",
+          "domNm": "내용V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "지급 조건의 내용 — 자유 서술 내용"
+        },
+        {
+          "attrNm": "계약해지일자",
+          "phyNm": "CTRT_TRMN_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "계약 해지의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-파트너계약기본",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.파트너계약기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "파트너번호"
+          ]
+        }
+      ],
+      "normNote": "1NF : 계약 조건 변경 반복 → 파트너계약이력. 2NF : 단일 PK. 3NF : 이행 종속 없음."
+    },
+    {
+      "entId": "PRM-009",
+      "entNm": "정산기본",
+      "phyNm": "STLM_BAS",
+      "tblNm": "PTL_PRM_STLM_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "moduleCd": "STL",
+      "def": "파트너 계약 1건 × 정산년월 × 정산유형(유치·관리수수료, 장려금, 상호접속료, 국제로밍, 콘텐츠, 환수)의 정산 머리 건. 건별 근거는 정산상세·원천 내역, 단계는 정산확정이력, 송금은 정산지급내역. 공급가액·부가가치세금액은 세금계산서 발행 근거라 확정 시점 스냅샷(P8).",
+      "attrs": [
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호",
+          "role": "PK"
+        },
+        {
+          "attrNm": "파트너계약번호",
+          "phyNm": "PRTNR_CTRT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너계약기본",
+            "attr": "파트너계약번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "정산 기준 계약(정산 당사자 파트너는 계약에서 결정)"
+        },
+        {
+          "attrNm": "정산명",
+          "phyNm": "STLM_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "정산의 명 — 대상을 부르는 이름",
+          "role": "NM"
+        },
+        {
+          "attrNm": "정산일시",
+          "phyNm": "STLM_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "정산의 일시 — 연월일 시분초까지의 시점",
+          "role": "DTM"
+        },
+        {
+          "attrNm": "정산상태유형코드",
+          "phyNm": "STLM_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "정산 상태의 유형 코드 — 공통코드(codes.json)",
+          "role": "STS"
+        },
+        {
+          "attrNm": "정산년월",
+          "phyNm": "STLM_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "정산의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "정산유형코드",
+          "phyNm": "STLM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "정산의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "정산방향구분코드",
+          "phyNm": "STLM_DRCT_SE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "지급·수취(상호접속·로밍은 상계 후 순액 방향)"
+        },
+        {
+          "attrNm": "정산대상금액",
+          "phyNm": "STLM_TRGT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "정산 대상의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "공제금액",
+          "phyNm": "DDTN_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "공제의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "공급가액",
+          "phyNm": "SPLYAMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "부가가치세를 제외한 공급 대가 금액"
+        },
+        {
+          "attrNm": "부가가치세금액",
+          "phyNm": "VAT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "부가가치세의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "통화코드",
+          "phyNm": "CRNCY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 13,
+          "def": "통화 코드 — 외부 표준 ISO 4217 값을 그대로 쓴다(공통코드 아님)"
+        },
+        {
+          "attrNm": "지급예정일자",
+          "phyNm": "GIVE_SCHD_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 14,
+          "def": "지급 예정의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너계약기본-정산기본",
+          "parent": "PRM.파트너계약기본",
+          "child": "PRM.정산기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "파트너계약번호"
+          ]
+        }
+      ],
+      "normNote": "1NF : 항목별 금액 → 정산상세, 확정 단계 → 정산확정이력, 송금 → 정산지급내역. 2NF : 단일 PK(후보키 = 파트너계약번호+정산년월+정산유형코드). 3NF : 개념 모델의 파트너번호는 파트너계약번호가 결정하는 이행 종속 → 제거(물리 반정규화 후보). 정산확정일시는 정산확정이력의 확정 행에서 유도 → 제거. 공급가액·부가가치세금액은 상세 합계지만 법적 확정값 스냅샷(P8)으로 보존."
+    },
+    {
+      "entId": "PRM-010",
+      "entNm": "세금계산서기본",
+      "phyNm": "TXINV_BAS",
+      "tblNm": "PTL_PRM_TXINV_M",
+      "tp": "ACT",
+      "stg": "CNCP",
+      "moduleCd": "STL",
+      "def": "정산 확정 금액으로 파트너와 주고받는 (전자)세금계산서 한 장(부가가치세법). 매출(통신사 발행 — 상호접속료·로밍 수취)과 매입(파트너 발행·역발행 — 수수료·장려금·콘텐츠)을 모두 담고, 수정세금계산서는 원 세금계산서를 자기 참조한다.",
+      "attrs": [
+        {
+          "attrNm": "세금계산서번호",
+          "phyNm": "TXINV_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "세금계산서의 번호 — 대상을 식별하거나 외부에서 부여받은 번호",
+          "role": "PK"
+        },
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "원세금계산서번호",
+          "phyNm": "ORGN_TXINV_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "세금계산서기본",
+            "attr": "세금계산서번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "수정 발행의 원 세금계산서 — 역할명 자기 참조(정발행 NULL)"
+        },
+        {
+          "attrNm": "세금계산서품목명",
+          "phyNm": "TXINV_PRDLST_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "세금계산서 품목의 명 — 대상을 부르는 이름",
+          "role": "NM"
+        },
+        {
+          "attrNm": "세금계산서발행일시",
+          "phyNm": "TXINV_PBLCN_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "세금계산서 발행의 일시 — 연월일 시분초까지의 시점",
+          "role": "DTM"
+        },
+        {
+          "attrNm": "세금계산서상태유형코드",
+          "phyNm": "TXINV_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "세금계산서 상태의 유형 코드 — 공통코드(codes.json)",
+          "role": "STS"
+        },
+        {
+          "attrNm": "세금계산서유형코드",
+          "phyNm": "TXINV_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "세금계산서의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "매입매출구분코드",
+          "phyNm": "PRCHS_SLS_SE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "매입 매출의 구분 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "작성일자",
+          "phyNm": "WRT_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "작성의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "공급가액",
+          "phyNm": "SPLYAMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "부가가치세를 제외한 공급 대가 금액"
+        },
+        {
+          "attrNm": "세액",
+          "phyNm": "TXAMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "과세표준에 세율을 곱한 세금 금액"
+        },
+        {
+          "attrNm": "전자세금계산서승인번호",
+          "phyNm": "ELCTR_TXINV_APRV_NO",
+          "domNm": "번호V30",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "전자 세금계산서 승인의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "국세청전송일시",
+          "phyNm": "NTS_TRNM_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 13,
+          "def": "국세청 전송의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "수정사유유형코드",
+          "phyNm": "MDFCN_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 14,
+          "def": "수정 사유의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "정산기본-세금계산서기본",
+          "parent": "PRM.정산기본",
+          "child": "PRM.세금계산서기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        },
+        {
+          "relNm": "세금계산서기본-세금계산서기본(원세금계산서번호)",
+          "parent": "PRM.세금계산서기본",
+          "child": "PRM.세금계산서기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "원세금계산서번호"
+          ]
+        }
+      ],
+      "normNote": "1NF : 품목 줄 → 세금계산서상세. 2NF : 단일 PK. 3NF : 개념 모델의 파트너번호는 정산번호→파트너계약→파트너로 결정되는 이행 종속 → 제거(물리 반정규화 후보). 매입매출구분코드는 정산방향과 대부분 같지만 상계 정산(상호접속·로밍)에서 한 정산에 매출·매입 세금계산서가 함께 나오므로 독립."
+    },
+    {
+      "entId": "PRM-011",
+      "entNm": "파트너이력",
+      "phyNm": "PRTNR_HIST",
+      "tblNm": "PTL_PRM_PRTNR_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "파트너 상호·상태·과세유형·관리 조직·소재 지역 변경 이력(SCD2 — 유효시작·종료일시).",
+      "attrs": [
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "지역코드",
+          "phyNm": "RGN_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "CUS",
+            "ent": "지역코드",
+            "attr": "지역코드"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "지역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "관리조직코드",
+          "phyNm": "MGMT_ORG_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "조직기본",
+            "attr": "조직코드"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "관리 조직의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "파트너명",
+          "phyNm": "PRTNR_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "파트너의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "파트너상태유형코드",
+          "phyNm": "PRTNR_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "파트너 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "사업자과세유형코드",
+          "phyNm": "BZMN_TXTN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "사업자 과세의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "대표자명",
+          "phyNm": "RPRSV_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "대표자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "파트너변경사유유형코드",
+          "phyNm": "PRTNR_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "파트너 변경 사유의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-파트너이력",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.파트너이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "파트너번호"
+          ]
+        },
+        {
+          "relNm": "지역코드-파트너이력",
+          "parent": "CUS.지역코드",
+          "child": "PRM.파트너이력",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "지역코드"
+          ]
+        },
+        {
+          "relNm": "조직기본-파트너이력(관리조직코드)",
+          "parent": "PRM.조직기본",
+          "child": "PRM.파트너이력",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "관리조직코드"
+          ]
+        }
+      ],
+      "normNote": "2NF : 모든 속성이 (파트너번호, 유효시작일시) 시점 값. 3NF : 이행 종속 없음."
+    },
+    {
+      "entId": "PRM-012",
+      "entNm": "파트너계약이력",
+      "phyNm": "PRTNR_CTRT_HIST",
+      "tblNm": "PTL_PRM_PRTNR_CTRT_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "파트너계약 상태·종료일자·정산주기·자동갱신 변경 이력(SCD2).",
+      "attrs": [
+        {
+          "attrNm": "파트너계약번호",
+          "phyNm": "PRTNR_CTRT_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너계약기본",
+            "attr": "파트너계약번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너 계약의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 3,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "파트너계약상태유형코드",
+          "phyNm": "PRTNR_CTRT_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "파트너 계약 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "계약종료일자",
+          "phyNm": "CTRT_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "계약 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "정산주기유형코드",
+          "phyNm": "STLM_CYCL_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "정산 주기의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "자동갱신여부",
+          "phyNm": "ATMT_RNW_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "자동 갱신의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "파트너계약변경사유유형코드",
+          "phyNm": "PRTNR_CTRT_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "파트너 계약 변경 사유의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너계약기본-파트너계약이력",
+          "parent": "PRM.파트너계약기본",
+          "child": "PRM.파트너계약이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "파트너계약번호"
+          ]
+        }
+      ],
+      "normNote": "2NF : 시점 값만. 3NF : 이행 종속 없음."
+    },
+    {
+      "entId": "PRM-013",
+      "entNm": "파트너계좌상세",
+      "phyNm": "PRTNR_ACCT_DTL",
+      "tblNm": "PTL_PRM_PRTNR_ACCT_D",
+      "tp": "BASE",
+      "stg": "LGCL",
+      "def": "정산 지급·수취에 쓰는 파트너 은행 계좌. 계좌번호는 암호화 값으로만 둔다(D11).",
+      "attrs": [
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "파트너계좌순번",
+          "phyNm": "PRTNR_ACCT_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "파트너 계좌의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "INV",
+            "ent": "은행코드",
+            "attr": "은행코드"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "은행의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "계좌번호암호화값",
+          "phyNm": "ACCT_NO_ENCPT_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "계좌 번호 암호화의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "예금주명",
+          "phyNm": "DPSOWN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "예금주의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "대표계좌여부",
+          "phyNm": "RPRS_ACCT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "대표 계좌의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "계좌실명확인여부",
+          "phyNm": "ACCT_RLNM_IDNTF_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "계좌 실명 확인의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "유효시작일자",
+          "phyNm": "VLD_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "유효 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "유효종료일자",
+          "phyNm": "VLD_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "유효 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-파트너계좌상세",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.파트너계좌상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "파트너번호"
+          ]
+        },
+        {
+          "relNm": "은행코드-파트너계좌상세",
+          "parent": "INV.은행코드",
+          "child": "PRM.파트너계좌상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "은행코드"
+          ]
+        }
+      ],
+      "normNote": "1NF : 파트너의 반복 계좌를 행으로 분리. 2NF : 은행명 등 은행 속성은 은행코드(INV) 소유. 3NF : 이행 종속 없음."
+    },
+    {
+      "entId": "PRM-014",
+      "entNm": "파트너담당자상세",
+      "phyNm": "PRTNR_PIC_DTL",
+      "tblNm": "PTL_PRM_PRTNR_PIC_D",
+      "tp": "BASE",
+      "stg": "LGCL",
+      "def": "파트너 쪽 업무 담당자(정산·영업·기술·세무) 연락처. 합성 이름·번호만(D11).",
+      "attrs": [
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "파트너의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "담당자순번",
+          "phyNm": "PIC_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "담당자의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "담당자명",
+          "phyNm": "PIC_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "담당자의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "담당자유형코드",
+          "phyNm": "PIC_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "담당 업무(정산·영업·기술·세무·법무)"
+        },
+        {
+          "attrNm": "담당자휴대전화번호",
+          "phyNm": "PIC_MBL_TELNO",
+          "domNm": "전화번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "담당자 휴대의 전화번호 — 전화번호(숫자 문자열)"
+        },
+        {
+          "attrNm": "담당자이메일주소",
+          "phyNm": "PIC_EML_ADDR",
+          "domNm": "주소V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "담당자 이메일의 주소 — 우편·전자 주소"
+        },
+        {
+          "attrNm": "대표담당자여부",
+          "phyNm": "RPRS_PIC_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "대표 담당자의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-파트너담당자상세",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.파트너담당자상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "파트너번호"
+          ]
+        }
+      ],
+      "normNote": "1NF : 반복 담당자를 행으로 분리. 2NF·3NF 충족(CUS 법인 담당자와 같은 용어 사용)."
+    },
+    {
+      "entId": "PRM-015",
+      "entNm": "조직이력",
+      "phyNm": "ORG_HIST",
+      "tblNm": "PTL_PRM_ORG_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "조직 명칭·상위 조직·상태 변경 이력(SCD2) — 개편 시점 실적 귀속 재현용.",
+      "attrs": [
+        {
+          "attrNm": "조직코드",
+          "phyNm": "ORG_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "조직기본",
+            "attr": "조직코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "조직의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유효 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "상위조직코드",
+          "phyNm": "UP_ORG_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "조직기본",
+            "attr": "조직코드"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "상위 조직의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "유효 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "조직명",
+          "phyNm": "ORG_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "조직의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "조직상태유형코드",
+          "phyNm": "ORG_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "조직 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "조직변경사유유형코드",
+          "phyNm": "ORG_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "조직 변경 사유의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "조직기본-조직이력",
+          "parent": "PRM.조직기본",
+          "child": "PRM.조직이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "조직코드"
+          ]
+        },
+        {
+          "relNm": "조직기본-조직이력(상위조직코드)",
+          "parent": "PRM.조직기본",
+          "child": "PRM.조직이력",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "상위조직코드"
+          ]
+        }
+      ],
+      "normNote": "2NF : 시점 값만. 3NF : 이행 종속 없음."
+    },
+    {
+      "entId": "PRM-016",
+      "entNm": "단말재고내역",
+      "phyNm": "EQP_STCK_DTLS",
+      "tblNm": "PTL_PRM_EQP_STCK_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "유통망(대리점·판매점)이 보유한 단말 한 대(IMEI 단위) 재고의 입고·출고 내역.",
+      "attrs": [
+        {
+          "attrNm": "단말재고번호",
+          "phyNm": "EQP_STCK_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "단말 재고의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "재고 보유 유통망(대리점·판매점 파트너번호)"
+        },
+        {
+          "attrNm": "단말모델코드",
+          "phyNm": "EQP_MDL_CD",
+          "domNm": "코드V20",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "단말모델기본",
+            "attr": "단말모델코드"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "단말 모델의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "IMEI번호",
+          "phyNm": "IMEI_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "IMEI의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "단말재고유형코드",
+          "phyNm": "EQP_STCK_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "단말 재고의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "단말재고상태유형코드",
+          "phyNm": "EQP_STCK_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "단말 재고 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "입고일시",
+          "phyNm": "WRHS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "입고의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "입고금액",
+          "phyNm": "WRHS_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "입고의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "출고일시",
+          "phyNm": "SHPM_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "출고의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-단말재고내역",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.단말재고내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "파트너번호"
+          ]
+        },
+        {
+          "relNm": "단말모델기본-단말재고내역",
+          "parent": "PRD.단말모델기본",
+          "child": "PRM.단말재고내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "단말모델코드"
+          ]
+        }
+      ],
+      "normNote": "1NF 충족(대당 1행). 2NF : 단일 PK. 3NF : 출고가격은 단말모델(PRD 가격 이력)이 결정 → 두지 않음, 입고금액은 거래 사실이라 보존."
+    },
+    {
+      "entId": "PRM-017",
+      "entNm": "유심재고내역",
+      "phyNm": "USIM_STCK_DTLS",
+      "tblNm": "PTL_PRM_USIM_STCK_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "def": "유통망이 보유한 유심 한 장(유심일련번호 단위) 재고의 입고·출고 내역.",
+      "attrs": [
+        {
+          "attrNm": "유심재고번호",
+          "phyNm": "USIM_STCK_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "유심 재고의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "파트너의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유심상품코드",
+          "phyNm": "USIM_PROD_CD",
+          "domNm": "코드V20",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "유심상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "유심 상품 — 역할명, PRD.유심상품기본.상품코드"
+        },
+        {
+          "attrNm": "유심일련번호",
+          "phyNm": "USIM_SN",
+          "domNm": "일련번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "유심의 일련번호 — 부모 안에서 등록 차례로 매기는 번호 또는 기기 일련번호"
+        },
+        {
+          "attrNm": "유심재고상태유형코드",
+          "phyNm": "USIM_STCK_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "유심 재고 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "입고일시",
+          "phyNm": "WRHS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "입고의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "출고일시",
+          "phyNm": "SHPM_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "출고의 일시 — 연월일 시분초까지의 시점"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "파트너기본-유심재고내역",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.유심재고내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "파트너번호"
+          ]
+        },
+        {
+          "relNm": "유심상품기본-유심재고내역(유심상품코드)",
+          "parent": "PRD.유심상품기본",
+          "child": "PRM.유심재고내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "유심상품코드"
+          ]
+        }
+      ],
+      "normNote": "1NF·2NF·3NF 충족(장당 1행, 단일 PK)."
+    },
+    {
+      "entId": "PRM-018",
+      "entNm": "정산상세",
+      "phyNm": "STLM_DTL",
+      "tblNm": "PTL_PRM_STLM_D",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "정산 머리 건의 항목별(정산항목유형) 건수·금액 요약 줄. 원천 건별 근거는 각 수수료·장려금·상호접속·로밍·콘텐츠 내역이 정산번호로 가리킨다.",
+      "attrs": [
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산상세순번",
+          "phyNm": "STLM_DTL_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "정산 상세의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "정산항목유형코드",
+          "phyNm": "STLM_ITM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "정산 항목의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "정산건수",
+          "phyNm": "STLM_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "정산의 건수 — 처리·발생 건의 수"
+        },
+        {
+          "attrNm": "정산대상금액",
+          "phyNm": "STLM_TRGT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "정산 대상의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "공제금액",
+          "phyNm": "DDTN_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "공제의 금액 — 원화 금액(원 단위 정수)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "정산기본-정산상세",
+          "parent": "PRM.정산기본",
+          "child": "PRM.정산상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        }
+      ],
+      "normNote": "1NF : 항목 반복을 행으로. 2NF : 정산 머리 속성 없음. 3NF : 이행 종속 없음."
+    },
+    {
+      "entId": "PRM-019",
+      "entNm": "수수료정책기본",
+      "phyNm": "FEE_PLCY_BAS",
+      "tblNm": "PTL_PRM_FEE_PLCY_M",
+      "tp": "REF",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "유치·관리·환수 수수료 정책(기간·대상). 정책별 요율은 수수료요율상세.",
+      "attrs": [
+        {
+          "attrNm": "수수료정책번호",
+          "phyNm": "FEE_PLCY_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수수료 정책의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수수료정책명",
+          "phyNm": "FEE_PLCY_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "수수료 정책의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "수수료유형코드",
+          "phyNm": "FEE_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "수수료의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "수수료정책상태유형코드",
+          "phyNm": "FEE_PLCY_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "수수료 정책 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "수수료정책내용",
+          "phyNm": "FEE_PLCY_CN",
+          "domNm": "내용V4000",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "수수료 정책의 내용 — 자유 서술 내용"
+        }
+      ],
+      "rels": [],
+      "normNote": "1NF : 요율 반복 → 수수료요율상세. 2NF·3NF 충족."
+    },
+    {
+      "entId": "PRM-020",
+      "entNm": "수수료요율상세",
+      "phyNm": "FEE_TRF_DTL",
+      "tblNm": "PTL_PRM_FEE_TRF_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "수수료 정책의 요율 줄 — 대상 요금제·대리점 등급별 정액 또는 정률.",
+      "attrs": [
+        {
+          "attrNm": "수수료정책번호",
+          "phyNm": "FEE_PLCY_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "수수료정책기본",
+            "attr": "수수료정책번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "수수료 정책의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수수료요율순번",
+          "phyNm": "FEE_TRF_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "수수료 요율의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "대상 요금제(NULL = 전 상품)"
+        },
+        {
+          "attrNm": "대리점등급유형코드",
+          "phyNm": "AGNC_GRD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "대상 대리점 등급(NULL = 전 등급)"
+        },
+        {
+          "attrNm": "수수료계산유형코드",
+          "phyNm": "FEE_CALC_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수수료 계산의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "수수료율",
+          "phyNm": "FEE_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "정률일 때"
+        },
+        {
+          "attrNm": "수수료금액",
+          "phyNm": "FEE_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "정액일 때 건당 금액"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "수수료정책기본-수수료요율상세",
+          "parent": "PRM.수수료정책기본",
+          "child": "PRM.수수료요율상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "수수료정책번호"
+          ]
+        },
+        {
+          "relNm": "상품기본-수수료요율상세",
+          "parent": "PRD.상품기본",
+          "child": "PRM.수수료요율상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "normNote": "2NF : 정책 속성(기간·유형)은 머리에만. 3NF : 정률·정액은 수수료계산유형코드에 따라 배타(한쪽 NULL)."
+    },
+    {
+      "entId": "PRM-021",
+      "entNm": "유치수수료내역",
+      "phyNm": "ATRCT_FEE_DTLS",
+      "tblNm": "PTL_PRM_ATRCT_FEE_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "개통(가입계약) 건별로 유치 판매점에 지급하는 유치(판매) 수수료.",
+      "attrs": [
+        {
+          "attrNm": "유치수수료번호",
+          "phyNm": "ATRCT_FEE_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "유치 수수료의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "가입계약번호",
+          "phyNm": "SBSC_CTRT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "ORD",
+            "ent": "가입계약기본",
+            "attr": "가입계약번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "수수료 근거 개통 계약(ORD 소유 키)"
+        },
+        {
+          "attrNm": "판매점번호",
+          "phyNm": "SHOP_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "판매점기본",
+            "attr": "판매점번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "지급 귀속 판매점(확정 시점 사실 — 양수도·이관 반영)"
+        },
+        {
+          "attrNm": "수수료정책번호",
+          "phyNm": "FEE_PLCY_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "수수료정책기본",
+            "attr": "수수료정책번호"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "수수료 정책의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "반영 정산(정산 전 NULL)"
+        },
+        {
+          "attrNm": "수수료발생일자",
+          "phyNm": "FEE_OCRN_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "수수료 발생의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "수수료금액",
+          "phyNm": "FEE_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "수수료의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "유치수수료상태유형코드",
+          "phyNm": "ATRCT_FEE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "유치 수수료 상태의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "가입계약기본-유치수수료내역",
+          "parent": "ORD.가입계약기본",
+          "child": "PRM.유치수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "가입계약번호"
+          ]
+        },
+        {
+          "relNm": "판매점기본-유치수수료내역",
+          "parent": "PRM.판매점기본",
+          "child": "PRM.유치수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "판매점번호"
+          ]
+        },
+        {
+          "relNm": "수수료정책기본-유치수수료내역",
+          "parent": "PRM.수수료정책기본",
+          "child": "PRM.유치수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수수료정책번호"
+          ]
+        },
+        {
+          "relNm": "정산기본-유치수수료내역",
+          "parent": "PRM.정산기본",
+          "child": "PRM.유치수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        }
+      ],
+      "normNote": "2NF : 단일 PK. 3NF : 판매점번호는 가입신청(ORD)에서 유도 가능하지만 가입신청이 없는 계약(명의변경 등)·판매점 이관이 있어 지급 귀속 사실로 독립."
+    },
+    {
+      "entId": "PRM-022",
+      "entNm": "관리수수료내역",
+      "phyNm": "MGMT_FEE_DTLS",
+      "tblNm": "PTL_PRM_MGMT_FEE_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "유지 회선(가입계약) × 월 관리 대리점에 지급하는 관리 수수료(청구금액 기준 정률).",
+      "attrs": [
+        {
+          "attrNm": "관리수수료번호",
+          "phyNm": "MGMT_FEE_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "관리 수수료의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "가입계약번호",
+          "phyNm": "SBSC_CTRT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "ORD",
+            "ent": "가입계약기본",
+            "attr": "가입계약번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "가입 계약의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "대리점번호",
+          "phyNm": "AGNC_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "대리점기본",
+            "attr": "대리점번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "그 달 관리 대리점(시점 사실 — 대리점 변경 반영)"
+        },
+        {
+          "attrNm": "수수료정책번호",
+          "phyNm": "FEE_PLCY_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "수수료정책기본",
+            "attr": "수수료정책번호"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "수수료 정책의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산년월",
+          "phyNm": "STLM_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "정산의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "수수료대상금액",
+          "phyNm": "FEE_TRGT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "수수료 대상의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "수수료율",
+          "phyNm": "FEE_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "수수료의 율 — 비율(백분율, 소수 2자리)"
+        },
+        {
+          "attrNm": "수수료금액",
+          "phyNm": "FEE_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "수수료의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "관리수수료상태유형코드",
+          "phyNm": "MGMT_FEE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "관리 수수료 상태의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "가입계약기본-관리수수료내역",
+          "parent": "ORD.가입계약기본",
+          "child": "PRM.관리수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "가입계약번호"
+          ]
+        },
+        {
+          "relNm": "대리점기본-관리수수료내역",
+          "parent": "PRM.대리점기본",
+          "child": "PRM.관리수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "대리점번호"
+          ]
+        },
+        {
+          "relNm": "수수료정책기본-관리수수료내역",
+          "parent": "PRM.수수료정책기본",
+          "child": "PRM.관리수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "수수료정책번호"
+          ]
+        },
+        {
+          "relNm": "정산기본-관리수수료내역",
+          "parent": "PRM.정산기본",
+          "child": "PRM.관리수수료내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        }
+      ],
+      "normNote": "2NF : 단일 PK(후보키 가입계약번호+정산년월). 3NF : 수수료금액은 대상금액×율이지만 절사·상한 적용 후 확정값이라 보존(INV 수납대행수수료와 같은 원칙)."
+    },
+    {
+      "entId": "PRM-023",
+      "entNm": "수수료환수내역",
+      "phyNm": "FEE_CLBK_DTLS",
+      "tblNm": "PTL_PRM_FEE_CLBK_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "조기 해지·약정 위반 등으로 지급한 유치 수수료를 되돌려 받는 환수 건.",
+      "attrs": [
+        {
+          "attrNm": "수수료환수번호",
+          "phyNm": "FEE_CLBK_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "수수료 환수의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "유치수수료번호",
+          "phyNm": "ATRCT_FEE_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "유치수수료내역",
+            "attr": "유치수수료번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "유치 수수료의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "해지신청번호",
+          "phyNm": "TRMN_APLY_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "ORD",
+            "ent": "해지신청내역",
+            "attr": "해지신청번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "원인 해지(ORD 소유 키, 해지 외 사유 NULL)"
+        },
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "수수료환수일자",
+          "phyNm": "FEE_CLBK_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "수수료 환수의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "수수료환수금액",
+          "phyNm": "FEE_CLBK_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "수수료 환수의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "수수료환수사유유형코드",
+          "phyNm": "FEE_CLBK_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "수수료 환수 사유의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "수수료환수상태유형코드",
+          "phyNm": "FEE_CLBK_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "수수료 환수 상태의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "유치수수료내역-수수료환수내역",
+          "parent": "PRM.유치수수료내역",
+          "child": "PRM.수수료환수내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "유치수수료번호"
+          ]
+        },
+        {
+          "relNm": "해지신청내역-수수료환수내역",
+          "parent": "ORD.해지신청내역",
+          "child": "PRM.수수료환수내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "해지신청번호"
+          ]
+        },
+        {
+          "relNm": "정산기본-수수료환수내역",
+          "parent": "PRM.정산기본",
+          "child": "PRM.수수료환수내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        }
+      ],
+      "normNote": "3NF : 환수 대상 판매점·계약은 유치수수료번호가 결정 → 두지 않음."
+    },
+    {
+      "entId": "PRM-024",
+      "entNm": "장려금정책기본",
+      "phyNm": "INCNTV_PLCY_BAS",
+      "tblNm": "PTL_PRM_INCNTV_PLCY_M",
+      "tp": "REF",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "단말 모델·요금제별 유통망 판매 장려금 정책(기간·건당 금액).",
+      "attrs": [
+        {
+          "attrNm": "장려금정책번호",
+          "phyNm": "INCNTV_PLCY_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "장려금 정책의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "단말모델코드",
+          "phyNm": "EQP_MDL_CD",
+          "domNm": "코드V20",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "단말모델기본",
+            "attr": "단말모델코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "대상 단말(NULL = 전 단말)"
+        },
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "대상 요금제(NULL = 전 요금제)"
+        },
+        {
+          "attrNm": "장려금정책명",
+          "phyNm": "INCNTV_PLCY_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "장려금 정책의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "장려금유형코드",
+          "phyNm": "INCNTV_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "장려금의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "장려금금액",
+          "phyNm": "INCNTV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "장려금의 금액 — 원화 금액(원 단위 정수)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "단말모델기본-장려금정책기본",
+          "parent": "PRD.단말모델기본",
+          "child": "PRM.장려금정책기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "단말모델코드"
+          ]
+        },
+        {
+          "relNm": "상품기본-장려금정책기본",
+          "parent": "PRD.상품기본",
+          "child": "PRM.장려금정책기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "normNote": "1NF : 정책 1행 = 대상 1조합(대상 여러 개면 정책 분리). 3NF 충족."
+    },
+    {
+      "entId": "PRM-025",
+      "entNm": "장려금지급내역",
+      "phyNm": "INCNTV_GIVE_DTLS",
+      "tblNm": "PTL_PRM_INCNTV_GIVE_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "장려금 정책에 따라 유통망에 지급하는 판매 장려금 건(개통 건 기준).",
+      "attrs": [
+        {
+          "attrNm": "장려금지급번호",
+          "phyNm": "INCNTV_GIVE_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "장려금 지급의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "장려금정책번호",
+          "phyNm": "INCNTV_PLCY_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "장려금정책기본",
+            "attr": "장려금정책번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "장려금 정책의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "지급 유통망(대리점·판매점)"
+        },
+        {
+          "attrNm": "가입계약번호",
+          "phyNm": "SBSC_CTRT_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "ORD",
+            "ent": "가입계약기본",
+            "attr": "가입계약번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "근거 개통 계약(실적 일괄 장려금 NULL)"
+        },
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": true,
+          "seq": 5,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "장려금발생일자",
+          "phyNm": "INCNTV_OCRN_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "장려금 발생의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "장려금금액",
+          "phyNm": "INCNTV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "장려금의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "장려금지급상태유형코드",
+          "phyNm": "INCNTV_GIVE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "장려금 지급 상태의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "장려금정책기본-장려금지급내역",
+          "parent": "PRM.장려금정책기본",
+          "child": "PRM.장려금지급내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "장려금정책번호"
+          ]
+        },
+        {
+          "relNm": "파트너기본-장려금지급내역",
+          "parent": "PRM.파트너기본",
+          "child": "PRM.장려금지급내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "파트너번호"
+          ]
+        },
+        {
+          "relNm": "가입계약기본-장려금지급내역",
+          "parent": "ORD.가입계약기본",
+          "child": "PRM.장려금지급내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "가입계약번호"
+          ]
+        },
+        {
+          "relNm": "정산기본-장려금지급내역",
+          "parent": "PRM.정산기본",
+          "child": "PRM.장려금지급내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        }
+      ],
+      "normNote": "3NF : 장려금금액은 정책 금액의 지급 시점 확정값(정책 변경 후 보존)."
+    },
+    {
+      "entId": "PRM-026",
+      "entNm": "상호접속요율상세",
+      "phyNm": "INTCN_TRF_DTL",
+      "tblNm": "PTL_PRM_INTCN_TRF_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "상대 통신사업자 × 상호접속유형 × 적용기간별 접속 요율(과기정통부 고시 기준, 원/분).",
+      "attrs": [
+        {
+          "attrNm": "통신사업자번호",
+          "phyNm": "CARR_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "통신사업자기본",
+            "attr": "통신사업자번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "통신사업자의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "상호접속유형코드",
+          "phyNm": "INTCN_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "상호접속의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "상호접속율",
+          "phyNm": "INTCN_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "분당 접속 요율(원/분, 소수 2자리)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "통신사업자기본-상호접속요율상세",
+          "parent": "PRM.통신사업자기본",
+          "child": "PRM.상호접속요율상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "통신사업자번호"
+          ]
+        }
+      ],
+      "normNote": "2NF : 요율은 키 3개 전체에 종속. 3NF 충족."
+    },
+    {
+      "entId": "PRM-027",
+      "entNm": "상호접속사용집계",
+      "phyNm": "INTCN_USE_AGG",
+      "tblNm": "PTL_PRM_INTCN_USE_T",
+      "tp": "PROC",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "상대 사업자 × 월 × 상호접속유형별 접속 사용(호) 건수·초수·금액 집계(원천 = PAY 사용내역). 후보명 \"상호접속통화집계\" 에서 개명(L3).",
+      "attrs": [
+        {
+          "attrNm": "통신사업자번호",
+          "phyNm": "CARR_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "통신사업자기본",
+            "attr": "통신사업자번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "통신사업자의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산년월",
+          "phyNm": "STLM_YM",
+          "domNm": "년월C6",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "정산의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "상호접속유형코드",
+          "phyNm": "INTCN_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "상호접속의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "상호접속건수",
+          "phyNm": "INTCN_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "상호접속의 건수 — 처리·발생 건의 수"
+        },
+        {
+          "attrNm": "상호접속초수",
+          "phyNm": "INTCN_SCNT",
+          "domNm": "수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "상호접속의 초수 — 시간의 초 수"
+        },
+        {
+          "attrNm": "상호접속금액",
+          "phyNm": "INTCN_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "상호접속의 금액 — 원화 금액(원 단위 정수)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "통신사업자기본-상호접속사용집계",
+          "parent": "PRM.통신사업자기본",
+          "child": "PRM.상호접속사용집계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "통신사업자번호"
+          ]
+        },
+        {
+          "relNm": "정산기본-상호접속사용집계",
+          "parent": "PRM.정산기본",
+          "child": "PRM.상호접속사용집계",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        }
+      ],
+      "normNote": "가공(PROC) 엔터티 — 원천 집계. 2NF : 집계값은 키 전체에 종속. 3NF 충족."
+    },
+    {
+      "entId": "PRM-028",
+      "entNm": "로밍정산파일내역",
+      "phyNm": "ROAM_STLM_FILE_DTLS",
+      "tblNm": "PTL_PRM_ROAM_STLM_FILE_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "로밍 사업자와 주고받은 TAP·RAP 파일 한 개(파일 순번·레코드 건수·금액).",
+      "attrs": [
+        {
+          "attrNm": "로밍정산파일번호",
+          "phyNm": "ROAM_STLM_FILE_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "로밍 정산 파일의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "로밍사업자번호",
+          "phyNm": "ROAM_BZMN_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "로밍사업자기본",
+            "attr": "로밍사업자번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "로밍 사업자의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "로밍정산번호",
+          "phyNm": "ROAM_STLM_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "로밍정산내역",
+            "attr": "로밍정산번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "반영 월 정산(미반영 NULL)"
+        },
+        {
+          "attrNm": "로밍정산파일명",
+          "phyNm": "ROAM_STLM_FILE_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "로밍 정산 파일의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "로밍정산파일유형코드",
+          "phyNm": "ROAM_STLM_FILE_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "로밍 정산 파일의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "로밍방향구분코드",
+          "phyNm": "ROAM_DRCT_SE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "로밍 방향의 구분 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "로밍정산파일순번",
+          "phyNm": "ROAM_STLM_FILE_SEQ",
+          "domNm": "순번N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "로밍 정산 파일의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "로밍정산파일처리일시",
+          "phyNm": "ROAM_STLM_FILE_PRCS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "로밍 정산 파일 처리의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "레코드건수",
+          "phyNm": "RCRD_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "파일에 담긴 CDR 레코드 수"
+        },
+        {
+          "attrNm": "정산통화금액",
+          "phyNm": "STLM_CRNCY_AMT",
+          "domNm": "금액N18_4",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "정산통화(SDR 등) 기준 사용 금액 — 소수 정밀도는 물리 단계 지정(SDR 소수 3자리)"
+        },
+        {
+          "attrNm": "로밍정산파일상태유형코드",
+          "phyNm": "ROAM_STLM_FILE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "로밍 정산 파일 상태의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "로밍사업자기본-로밍정산파일내역",
+          "parent": "PRM.로밍사업자기본",
+          "child": "PRM.로밍정산파일내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "로밍사업자번호"
+          ]
+        },
+        {
+          "relNm": "로밍정산내역-로밍정산파일내역",
+          "parent": "PRM.로밍정산내역",
+          "child": "PRM.로밍정산파일내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "로밍정산번호"
+          ]
+        }
+      ],
+      "normNote": "3NF : 로밍사업자번호는 월 정산 반영 전부터 필요한 파일 귀속 사실(로밍정산번호 NULL 가능)이라 유지."
+    },
+    {
+      "entId": "PRM-029",
+      "entNm": "로밍정산내역",
+      "phyNm": "ROAM_STLM_DTLS",
+      "tblNm": "PTL_PRM_ROAM_STLM_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "로밍 사업자 × 월 × 방향(인·아웃바운드) 정산 금액(정산 통화·환율).",
+      "attrs": [
+        {
+          "attrNm": "로밍정산번호",
+          "phyNm": "ROAM_STLM_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "로밍 정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "로밍사업자번호",
+          "phyNm": "ROAM_BZMN_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "로밍사업자기본",
+            "attr": "로밍사업자번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "로밍 사업자의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산년월",
+          "phyNm": "STLM_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "정산의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "로밍방향구분코드",
+          "phyNm": "ROAM_DRCT_SE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "로밍 방향의 구분 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "정산통화금액",
+          "phyNm": "STLM_CRNCY_AMT",
+          "domNm": "금액N18_4",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "정산통화(SDR 등) 기준 사용 금액 — 소수 정밀도는 물리 단계 지정(SDR 소수 3자리)"
+        },
+        {
+          "attrNm": "적용환율",
+          "phyNm": "APLCN_EXRT",
+          "domNm": "환율N15_4",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "정산통화 → 원화 환산에 적용한 환율"
+        },
+        {
+          "attrNm": "로밍정산상태유형코드",
+          "phyNm": "ROAM_STLM_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "로밍 정산 상태의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "로밍사업자기본-로밍정산내역",
+          "parent": "PRM.로밍사업자기본",
+          "child": "PRM.로밍정산내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "로밍사업자번호"
+          ]
+        },
+        {
+          "relNm": "정산기본-로밍정산내역",
+          "parent": "PRM.정산기본",
+          "child": "PRM.로밍정산내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        }
+      ],
+      "normNote": "3NF : 원화 환산 금액은 정산통화금액×적용환율로 유도 → 두지 않음(물리 반정규화 후보). 정산 통화는 로밍사업자기본 소유."
+    },
+    {
+      "entId": "PRM-030",
+      "entNm": "콘텐츠정산내역",
+      "phyNm": "CNTS_STLM_DTLS",
+      "tblNm": "PTL_PRM_CNTS_STLM_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "콘텐츠제공사 × 월 정보이용료·소액결제 정산(청구·수납 금액에서 수수료 공제).",
+      "attrs": [
+        {
+          "attrNm": "콘텐츠정산번호",
+          "phyNm": "CNTS_STLM_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "콘텐츠 정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "콘텐츠제공사번호",
+          "phyNm": "CNTS_PRVD_CO_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "콘텐츠제공사기본",
+            "attr": "콘텐츠제공사번호"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "콘텐츠 제공 사의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산년월",
+          "phyNm": "STLM_YM",
+          "domNm": "년월C6",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "정산의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "결제건수",
+          "phyNm": "PYMT_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "결제의 건수 — 처리·발생 건의 수"
+        },
+        {
+          "attrNm": "청구금액",
+          "phyNm": "BILL_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "청구의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "수납금액",
+          "phyNm": "RCV_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "수납의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "정산수수료금액",
+          "phyNm": "STLM_FEE_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "정산 수수료의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "콘텐츠정산상태유형코드",
+          "phyNm": "CNTS_STLM_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "콘텐츠 정산 상태의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "콘텐츠제공사기본-콘텐츠정산내역",
+          "parent": "PRM.콘텐츠제공사기본",
+          "child": "PRM.콘텐츠정산내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "콘텐츠제공사번호"
+          ]
+        },
+        {
+          "relNm": "정산기본-콘텐츠정산내역",
+          "parent": "PRM.정산기본",
+          "child": "PRM.콘텐츠정산내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        }
+      ],
+      "normNote": "3NF : 정산수수료금액은 그 달 적용 수수료율의 확정값(제공사 현재 율과 독립)."
+    },
+    {
+      "entId": "PRM-031",
+      "entNm": "정산지급내역",
+      "phyNm": "STLM_GIVE_DTLS",
+      "tblNm": "PTL_PRM_STLM_GIVE_L",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "정산 확정 금액의 실제 송금·수취·상계 건(분할 지급 가능).",
+      "attrs": [
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산지급순번",
+          "phyNm": "STLM_GIVE_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "정산 지급의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "파트너번호",
+          "phyNm": "PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너계좌상세",
+            "attr": "파트너번호"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "지급 계좌 소유 파트너(채권양도 시 정산 당사자와 다름, 상계 NULL)"
+        },
+        {
+          "attrNm": "파트너계좌순번",
+          "phyNm": "PRTNR_ACCT_SEQ",
+          "domNm": "순번N5",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너계좌상세",
+            "attr": "파트너계좌순번"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "파트너 계좌의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "정산지급일시",
+          "phyNm": "STLM_GIVE_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "정산 지급의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "정산지급금액",
+          "phyNm": "STLM_GIVE_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "정산 지급의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "정산지급방법유형코드",
+          "phyNm": "STLM_GIVE_MTHD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "정산 지급 방법의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "정산지급상태유형코드",
+          "phyNm": "STLM_GIVE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "정산 지급 상태의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "정산기본-정산지급내역",
+          "parent": "PRM.정산기본",
+          "child": "PRM.정산지급내역",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        },
+        {
+          "relNm": "파트너계좌상세-정산지급내역",
+          "parent": "PRM.파트너계좌상세",
+          "child": "PRM.정산지급내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "파트너번호"
+          ]
+        },
+        {
+          "relNm": "파트너계좌상세-정산지급내역",
+          "parent": "PRM.파트너계좌상세",
+          "child": "PRM.정산지급내역",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "파트너계좌순번"
+          ]
+        }
+      ],
+      "normNote": "2NF : 지급 속성은 (정산번호, 순번) 전체에 종속. 3NF : 지급 계좌 파트너는 채권양도(팩토링) 때 정산 당사자와 달라 이행 종속 아님."
+    },
+    {
+      "entId": "PRM-032",
+      "entNm": "정산확정이력",
+      "phyNm": "STLM_CFMTN_HIST",
+      "tblNm": "PTL_PRM_STLM_CFMTN_H",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "정산의 검증·이의·확정·취소 단계 이력.",
+      "attrs": [
+        {
+          "attrNm": "정산번호",
+          "phyNm": "STLM_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "정산기본",
+            "attr": "정산번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "정산의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "정산확정이력순번",
+          "phyNm": "STLM_CFMTN_HIST_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "정산 확정 이력의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "정산상태유형코드",
+          "phyNm": "STLM_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "정산 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "처리일시",
+          "phyNm": "PRCS_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "처리의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "정산대상금액",
+          "phyNm": "STLM_TRGT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "정산 대상의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "이의내용",
+          "phyNm": "OBJC_CN",
+          "domNm": "내용V4000",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "이의의 내용 — 자유 서술 내용"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "정산기본-정산확정이력",
+          "parent": "PRM.정산기본",
+          "child": "PRM.정산확정이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "정산번호"
+          ]
+        }
+      ],
+      "normNote": "2NF·3NF 충족 — 정산대상금액은 단계별 시점 값."
+    },
+    {
+      "entId": "PRM-033",
+      "entNm": "세금계산서상세",
+      "phyNm": "TXINV_DTL",
+      "tblNm": "PTL_PRM_TXINV_D",
+      "tp": "ACT",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "세금계산서 품목 줄(최대 4줄 관행 — 정산 항목별).",
+      "attrs": [
+        {
+          "attrNm": "세금계산서번호",
+          "phyNm": "TXINV_NO",
+          "domNm": "번호V20",
+          "pk": true,
+          "fk": {
+            "area": "PRM",
+            "ent": "세금계산서기본",
+            "attr": "세금계산서번호"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "세금계산서의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "세금계산서상세순번",
+          "phyNm": "TXINV_DTL_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "세금계산서 상세의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "세금계산서품목명",
+          "phyNm": "TXINV_PRDLST_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "세금계산서 품목의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "공급가액",
+          "phyNm": "SPLYAMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "부가가치세를 제외한 공급 대가 금액"
+        },
+        {
+          "attrNm": "세액",
+          "phyNm": "TXAMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "과세표준에 세율을 곱한 세금 금액"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "세금계산서기본-세금계산서상세",
+          "parent": "PRM.세금계산서기본",
+          "child": "PRM.세금계산서상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "세금계산서번호"
+          ]
+        }
+      ],
+      "normNote": "1NF : 품목 반복을 행으로. 2NF·3NF 충족."
+    },
+    {
+      "entId": "PRM-034",
+      "entNm": "정산월통계",
+      "phyNm": "STLM_MM_STATS",
+      "tblNm": "PTL_PRM_STLM_MM_S",
+      "tp": "PROC",
+      "stg": "LGCL",
+      "moduleCd": "STL",
+      "def": "정산년월 × 정산유형 × 파트너유형 정산 건수·금액 통계(경영 보고).",
+      "attrs": [
+        {
+          "attrNm": "정산년월",
+          "phyNm": "STLM_YM",
+          "domNm": "년월C6",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "정산의 년월 — 연월(YYYYMM)"
+        },
+        {
+          "attrNm": "정산유형코드",
+          "phyNm": "STLM_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "정산의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "파트너유형코드",
+          "phyNm": "PRTNR_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "파트너의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "정산건수",
+          "phyNm": "STLM_NOCS",
+          "domNm": "건수N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "정산의 건수 — 처리·발생 건의 수"
+        },
+        {
+          "attrNm": "정산대상금액",
+          "phyNm": "STLM_TRGT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "정산 대상의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "공제금액",
+          "phyNm": "DDTN_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "공제의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "공급가액",
+          "phyNm": "SPLYAMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "부가가치세를 제외한 공급 대가 금액"
+        },
+        {
+          "attrNm": "부가가치세금액",
+          "phyNm": "VAT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "부가가치세의 금액 — 원화 금액(원 단위 정수)"
+        }
+      ],
+      "rels": [],
+      "normNote": "가공(PROC) 엔터티 — 정산기본 집계. 2NF·3NF 충족."
+    }
+  ],
+  "newTerms": [],
+  "newCodes": [],
+  "newWords": [],
+  "summary": {
+    "entityCnt": 34,
+    "coreCnt": 10,
+    "stlCnt": 19,
+    "attrCnt": 302,
+    "relCnt": 61
+  },
+  "decisions": [
+    {
+      "no": "L1",
+      "dec": "개념 모델 이행 종속 제거 : 정산기본.파트너번호(파트너계약번호가 결정)·정산확정일시(정산확정이력에서 유도), 세금계산서기본.파트너번호(정산→계약→파트너)",
+      "why": "규칙 2-7 3NF, 반정규화는 물리 단계에서만 — denormCandidates 로 넘김. 개념 rels 파트너기본 1:N 정산기본·세금계산서기본은 계약 경유 관계로 대체"
+    },
+    {
+      "no": "L2",
+      "dec": "서브타입 5개(대리점·판매점·콘텐츠제공사·통신사업자·로밍사업자) PK = 파트너번호 역할명이면서 파트너기본 FK(1:1 식별)",
+      "why": "개념 P2. ORD·PAY·PRD 가 이미 이 이름으로 참조"
+    },
+    {
+      "no": "L3",
+      "dec": "후보 \"상호접속통화집계\" → 엔터티명 상호접속사용집계",
+      "why": "표준단어 통화 = CRNCY(화폐) — PRD L1 과 같은 동음이의 회피. areas.json crossRels·개념 rels 의 옛 이름은 coordinator 정리 대상(PRM 내부 관계라 다른 영역 영향 없음)"
+    },
+    {
+      "no": "L4",
+      "dec": "PRD 논리 제안(PRM.로밍사업자기본→PRD.로밍국가코드 FK ROAM_NATN_CD) 불수용 — 조인은 파트너기본.국가코드 = PRD.로밍국가코드.국가코드(같은 ISO 값)",
+      "why": "PRD 로밍국가코드 PK = 국가코드(NATN_CD) 로 파트너기본.국가코드와 같은 값 — 서브타입에 FK 를 또 두면 슈퍼타입 속성에 이행 종속되는 중복. 로밍 미협정 국가(국내 등)는 로밍국가코드에 없어 슈퍼타입에 FK 를 걸 수도 없음 → 관계는 설계 메모(조건부 참조)로만"
+    },
+    {
+      "no": "L5",
+      "dec": "정산 원천 내역(유치·관리수수료, 환수, 장려금, 상호접속사용집계, 로밍정산, 콘텐츠정산)은 정산번호 FK(NULL 허용 = 정산 전)로 정산기본에 묶고 정산상세는 항목 요약 줄",
+      "why": "원천 유형마다 키가 달라 정산상세에서 다형 FK 를 두면 RI 설계 불가 — 원천→정산 방향 FK 가 정규형"
+    },
+    {
+      "no": "L6",
+      "dec": "정산지급내역의 지급 계좌 = (파트너번호, 파트너계좌순번) 복합 FK",
+      "why": "채권양도(팩토링)로 지급 계좌 소유자가 정산 당사자와 다를 수 있음 — 이행 종속 아님. 상계 지급은 계좌 NULL"
+    },
+    {
+      "no": "L7",
+      "dec": "상호접속 요율 속성 = 상호접속율(율N5_2, 원/분)",
+      "why": "원/분 소수 2자리 요율(최대 999.99) — 율 대표도메인 율N5_2. 요율(TRF)은 속성 분류어가 아니라 용어 끝 단어로 못 써 상호접속+율로 구성(금액N18_4 은 통화 금액용)"
+    },
+    {
+      "no": "L8",
+      "dec": "새 단어 9개(담당자 PIC·요율 TRF·환율 EXRT·장려금 INCNTV·환수 CLBK·재고 STCK·입고 WRHS·유치 ATRCT·이의 OBJC) — 담당자·요율·환율은 CUS·PRD·PAY 논리 newWords 와 같은 약어",
+      "why": "사전 미등재. model/std 수정 금지 지시 — newWords 로만 기록, 다른 영역 새 용어와 같은 이름은 같은 물리명 재사용(sameAs)"
+    },
+    {
+      "no": "L9",
+      "dec": "개념 basicEntRels 4건(단말재고→PRD 단말모델, 유심재고→PRD 유심상품, 유치·관리수수료→ORD 가입계약) 을 해당 엔터티 rels 로 이관, basicEntRels 키는 논리 JSON 에 두지 않음",
+      "why": "02 관문 승계 이슈 3"
+    },
+    {
+      "no": "L10",
+      "dec": "외부 표준 코드(국가·통화·정산통화·TADIG·망식별·번호이동사업자·비용센터)는 공통코드 3종 대상 밖",
+      "why": "docs/03 6절 ②·개념 P10"
+    },
+    {
+      "no": "L11",
+      "dec": "수납대행기관은 INV 소유 실체로 두고 PRM 파트너 서브타입을 만들지 않음(파트너유형코드 값만)",
+      "why": "개념 P3 — INV 수납대행기관기본이 이미 정산번호로 PRM 정산과 연결"
+    },
+    {
+      "no": "L12",
+      "dec": "04 논리 관문(coordinator) : L3 개명을 areas.json·개념 PRM·PAY 논리 normNote·docs/01·02·04_PAY 에 전파, L4 수용 — areas.json crossRels PRM.로밍사업자기본→PRD.로밍국가코드 철회, 이 모델의 새 교차 관계 6건(파트너이력→CUS.지역코드, 파트너계좌상세→INV.은행코드, 수수료요율상세·장려금정책기본→PRD.상품기본, 장려금정책기본→PRD.단말모델기본, 장려금지급내역→ORD.가입계약기본) crossRels 등재",
+      "why": "CONTEXT 6절 관계 양끝 존재·crossRels = 논리 rels 일치. 기록 reviews/04_logical_PRM.md"
+    },
+    {
+      "no": "L4-R",
+      "dec": "(03 논리 관문 번복) 로밍사업자기본에 국가코드(NATN_CD, 방문망 국가) FK → PRD.로밍국가코드 추가 — L4 불수용 철회",
+      "why": "TADIG 망 단위 국가(요율 권역 결정 키)와 파트너 법인 소재국은 다른 사실(예 그룹 본사 국가 ≠ 망 국가) → 슈퍼타입 이행 종속 아님. 로밍 정산·요율 권역 조회가 이 FK 로 PRD 로밍국가코드에 바로 닿음. 요청 PRD childReq 반영"
+    }
+  ],
+  "crossKeys": [
+    {
+      "ent": "파트너기본",
+      "keys": "파트너번호 PRTNR_NO 번호V20",
+      "refBy": "CUS 실명인증내역·멤버십포인트내역, PRD 할인상품기본(역할명 제휴파트너번호 ALNC_PRTNR_NO)"
+    },
+    {
+      "ent": "조직기본",
+      "keys": "조직코드 ORG_CD 코드V10",
+      "refBy": "CUS 고객상담내역"
+    },
+    {
+      "ent": "대리점기본",
+      "keys": "대리점번호 AGNC_NO 번호V20",
+      "refBy": "ORD 가입계약기본·가입계약이력"
+    },
+    {
+      "ent": "판매점기본",
+      "keys": "판매점번호 SHOP_NO 번호V20",
+      "refBy": "ORD 가입신청기본·가입상품기본·요금제변경신청내역·부가서비스신청내역·지원금적용내역·단말변경내역·유심변경내역"
+    },
+    {
+      "ent": "콘텐츠제공사기본",
+      "keys": "콘텐츠제공사번호 CNTS_PRVD_CO_NO 번호V20",
+      "refBy": "PRD 부가서비스기본, PAY 소액결제청구상세·콘텐츠이용요금내역"
+    },
+    {
+      "ent": "통신사업자기본",
+      "keys": "통신사업자번호 CARR_NO 번호V20",
+      "refBy": "ORD 번호이동신청기본, ORD 서비스번호기본(역할명 원통신사업자번호)"
+    },
+    {
+      "ent": "로밍사업자기본",
+      "keys": "로밍사업자번호 ROAM_BZMN_NO 번호V20",
+      "refBy": "PAY 로밍사용내역"
+    },
+    {
+      "ent": "정산기본",
+      "keys": "정산번호 STLM_NO 번호V20",
+      "refBy": "INV 수납대행수수료내역, COL 추심수수료내역"
+    }
+  ],
+  "requestsToOtherAreas": [
+    "PRD : crossRels 제안 PRM.로밍사업자기본→PRD.로밍국가코드 철회(L4 — 파트너기본.국가코드로 조인) — 처리 완료(04 PRM 논리 관문, coordinator) → 03 논리 관문이 번복·반영(L4-R)",
+    "coordinator : areas.json·개념 PRM 의 상호접속통화집계 → 상호접속사용집계 개명 반영(L3) — 처리 완료(04 PRM 논리 관문, coordinator)"
+  ],
+  "denormCandidates": [
+    {
+      "col": "파트너번호",
+      "tbl": "PTL_PRM_STLM_M",
+      "src": "파트너계약기본",
+      "why": "파트너별 정산 조회·정산월통계 집계 경로(조인 1단계 제거)"
+    },
+    {
+      "col": "정산확정일시",
+      "tbl": "PTL_PRM_STLM_M",
+      "src": "정산확정이력",
+      "why": "확정 기간 조회·지급 예정 산정"
+    },
+    {
+      "col": "파트너번호",
+      "tbl": "PTL_PRM_TXINV_M",
+      "src": "정산기본→파트너계약기본",
+      "why": "거래처별 세금계산서 조회·국세청 전송 묶음"
+    },
+    {
+      "col": "원화정산금액",
+      "tbl": "PTL_PRM_ROAM_STLM_L",
+      "src": "정산통화금액×적용환율",
+      "why": "원화 합계 보고"
+    }
+  ],
+  "stdMerged": "03 논리 관문 표준사전 2차 병합 완료(2026-11-07) — 이 영역 신규 단어 9·용어 79·코드 24을 tools/std_words.js·std_codes.js 원장에 등재하고 tools/std_build.js 로 model/std 재생성(docs/03_standards.md 8절). 비운 배열은 다음 단계 신규 요청용"
+}

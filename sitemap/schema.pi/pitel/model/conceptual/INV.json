@@ -1,0 +1,1389 @@
+{
+  "area": "INV",
+  "areaNm": "수납",
+  "stg": "CNCP",
+  "ver": "2026-11-07",
+  "author": "subagent_subject_modeler",
+  "entities": [
+    {
+      "entNm": "수납기본",
+      "phyNm": "RCV_BAS",
+      "tblNm": "PTL_INV_RCV_M",
+      "tp": "ACT",
+      "def": "청구계정으로 들어온 입금 1건. 수단(자동이체·카드·지로·가상계좌·매장·ARS)과 무관하게 모든 입금은 여기 한 곳에 모이고, 배분 전 미배분 금액을 가진다. 월 RANGE 파티션 후보(수납일시), 장애일 쏠림 S4.",
+      "keyAttrs": [
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "입금자명",
+          "phyNm": "DPSTR_NM",
+          "role": "NM",
+          "domNm": "명V100",
+          "note": "입금 통지상의 입금자 표시명(S13 표기 흔들림 대상)"
+        },
+        {
+          "attrNm": "수납일시",
+          "phyNm": "RCV_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "수납상태유형코드",
+          "phyNm": "RCV_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10",
+          "note": "배분대기·배분완료·일부배분·취소·미확인 — 98% 배분완료(S3)"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "납부방법번호",
+          "phyNm": "PAY_MTHD_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 납부방법기본(매장·지로 현금은 NULL — S5)"
+        },
+        {
+          "attrNm": "수납채널유형코드",
+          "phyNm": "RCV_CHNL_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "FK → INV.수납채널코드(기본 엔터티)"
+        },
+        {
+          "attrNm": "수납금액",
+          "phyNm": "RCV_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "미배분금액",
+          "phyNm": "UNALLC_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15",
+          "note": "배분 후 남은 금액 → 과오납·선납 전환 근거"
+        },
+        {
+          "attrNm": "수납일자",
+          "phyNm": "RCV_DT",
+          "role": "ATTR",
+          "domNm": "일자C8",
+          "note": "회계 귀속일(은행 영업일, 수납일시와 다를 수 있음)"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "FK → INV.은행코드"
+        },
+        {
+          "attrNm": "카드사코드",
+          "phyNm": "CARD_CO_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "FK → INV.카드사코드(기본 엔터티)"
+        },
+        {
+          "attrNm": "수납대행기관번호",
+          "phyNm": "RCV_AGT_INST_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → INV.수납대행기관기본(기본 엔터티)"
+        },
+        {
+          "attrNm": "승인번호",
+          "phyNm": "APRV_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "카드 승인·지로 수납 고유번호"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "청구계정의 입금"
+        },
+        {
+          "toEnt": "납부방법기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "입금 수단"
+        },
+        {
+          "toEnt": "수납채널코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "수납 채널"
+        },
+        {
+          "toEnt": "은행코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "입금 은행"
+        },
+        {
+          "toEnt": "카드사코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "승인 카드사"
+        },
+        {
+          "toEnt": "수납대행기관기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "대행기관 경유 수납"
+        },
+        {
+          "toEnt": "수납배분상세",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "수납의 배분"
+        },
+        {
+          "toEnt": "자동이체출금요청내역",
+          "toArea": "INV",
+          "card": "1:1",
+          "idn": false,
+          "opt": true,
+          "nm": "출금 성공 → 수납 생성"
+        },
+        {
+          "toEnt": "과오납기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "원인 입금"
+        },
+        {
+          "toEnt": "선납기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "원천 입금"
+        }
+      ],
+      "volTier": "T4"
+    },
+    {
+      "entNm": "수납배분상세",
+      "phyNm": "RCV_ALLC_DTL",
+      "tblNm": "PTL_INV_RCV_ALLC_D",
+      "tp": "ACT",
+      "def": "수납액을 청구서×요금항목에 나눠 붙인 결과. 납기 경과 순 → 요금항목 순위(수납배분순위코드)로 배분, 수납 취소 시 음수 역배분 행. 월 RANGE 파티션 후보(수납배분일시).",
+      "keyAttrs": [
+        {
+          "attrNm": "수납배분번호",
+          "phyNm": "RCV_ALLC_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "배분적요명",
+          "phyNm": "ALLC_SMRY_NM",
+          "role": "NM",
+          "domNm": "명V100",
+          "note": "배분 사유 요약(정기배분·역배분·과오납대체 등 표시)"
+        },
+        {
+          "attrNm": "수납배분일시",
+          "phyNm": "RCV_ALLC_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "수납배분상태유형코드",
+          "phyNm": "RCV_ALLC_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10",
+          "note": "배분·역배분·과오납대체·선납대체"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 수납기본"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → PAY.청구기본"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "role": "ATTR",
+          "domNm": "년월C6",
+          "note": "업무 키 보존(01 문서 5절-4) — 파티션·레이크 키 후보"
+        },
+        {
+          "attrNm": "요금항목코드",
+          "phyNm": "CHRG_ITM_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "FK → PRD.요금항목코드"
+        },
+        {
+          "attrNm": "배분금액",
+          "phyNm": "ALLC_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15",
+          "note": "역배분은 음수(S7)"
+        },
+        {
+          "attrNm": "수납배분우선순위",
+          "phyNm": "RCV_ALLC_PRRT",
+          "role": "ATTR",
+          "domNm": "순번N5",
+          "note": "FK → INV.수납배분순위코드(기본 엔터티)"
+        },
+        {
+          "attrNm": "납부기한일자",
+          "phyNm": "PAY_TMLMT_DT",
+          "role": "ATTR",
+          "domNm": "일자C8",
+          "note": "청구서 납기 — 반정규화 후보(배분 순서 판정), 확정은 물리 단계"
+        },
+        {
+          "attrNm": "선납번호",
+          "phyNm": "PRPAY_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 선납기본(선납 차감 배분일 때만, 99% NULL S5)"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "수납기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "수납의 배분"
+        },
+        {
+          "toEnt": "청구기본",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "배분 대상 청구서"
+        },
+        {
+          "toEnt": "요금항목코드",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "배분 대상 요금항목"
+        },
+        {
+          "toEnt": "수납배분순위코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "배분 순위"
+        },
+        {
+          "toEnt": "선납기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "선납 차감 배분"
+        }
+      ],
+      "volTier": "T4"
+    },
+    {
+      "entNm": "납부방법기본",
+      "phyNm": "PAY_MTHD_BAS",
+      "tblNm": "PTL_INV_PAY_MTHD_M",
+      "tp": "BASE",
+      "def": "청구계정이 요금을 내는 수단(자동이체·카드자동납부·지로·가상계좌). 청구계정당 현재 유효 1건 + 과거 행은 적용종료일자로 닫힘, 변경 상세는 납부방법이력.",
+      "keyAttrs": [
+        {
+          "attrNm": "납부방법번호",
+          "phyNm": "PAY_MTHD_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "납부방법명",
+          "phyNm": "PAY_MTHD_NM",
+          "role": "NM",
+          "domNm": "명V100",
+          "note": "화면 표시명(예 \"국민 자동이체 ****1234\")"
+        },
+        {
+          "attrNm": "납부방법등록일시",
+          "phyNm": "PAY_MTHD_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "납부방법상태유형코드",
+          "phyNm": "PAY_MTHD_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10",
+          "note": "신청중·사용·정지·해지·등록오류"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "납부자번호",
+          "phyNm": "PYR_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → CUS.납부자기본"
+        },
+        {
+          "attrNm": "납부방법유형코드",
+          "phyNm": "PAY_MTHD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "자동이체·카드자동납부·지로·가상계좌·매장 — 4개 이상 → 유형"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "FK → INV.은행코드"
+        },
+        {
+          "attrNm": "계좌번호암호화값",
+          "phyNm": "ACCT_NO_ENCPT_VL",
+          "role": "ATTR",
+          "domNm": "값V256",
+          "note": "D11 — 평문 계좌번호 저장 금지"
+        },
+        {
+          "attrNm": "예금주명",
+          "phyNm": "DPSOWN_NM",
+          "role": "ATTR",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "카드사코드",
+          "phyNm": "CARD_CO_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "FK → INV.카드사코드(기본 엔터티)"
+        },
+        {
+          "attrNm": "카드번호암호화값",
+          "phyNm": "CARD_NO_ENCPT_VL",
+          "role": "ATTR",
+          "domNm": "값V256",
+          "note": "D11"
+        },
+        {
+          "attrNm": "이체지정일",
+          "phyNm": "TRSF_DSGN_DD",
+          "role": "ATTR",
+          "domNm": "일C2",
+          "note": "자동이체 출금일(01~31, S12 앞자리 0 함정)"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8",
+          "note": "현재 유효 = 99991231"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "청구계정의 납부방법"
+        },
+        {
+          "toEnt": "납부자기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "납부방법 명의 납부자"
+        },
+        {
+          "toEnt": "은행코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "자동이체 은행"
+        },
+        {
+          "toEnt": "카드사코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "자동납부 카드사"
+        },
+        {
+          "toEnt": "수납기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "입금 수단"
+        },
+        {
+          "toEnt": "자동이체신청내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "등록 대상 납부방법"
+        },
+        {
+          "toEnt": "자동이체출금요청내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "출금 근거 납부방법"
+        }
+      ],
+      "volTier": "T3"
+    },
+    {
+      "entNm": "자동이체신청내역",
+      "phyNm": "ATRF_APLY_DTLS",
+      "tblNm": "PTL_INV_ATRF_APLY_L",
+      "tp": "ACT",
+      "def": "자동이체 신규·변경·해지 신청 1건과 금융결제원 CMS 출금이체 등록 처리 결과. 출금 동의 증빙(서면·녹취·ARS·전자서명) 보관 근거.",
+      "keyAttrs": [
+        {
+          "attrNm": "자동이체신청번호",
+          "phyNm": "ATRF_APLY_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "신청인명",
+          "phyNm": "APLCNT_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "자동이체신청일시",
+          "phyNm": "ATRF_APLY_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "자동이체신청상태유형코드",
+          "phyNm": "ATRF_APLY_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10",
+          "note": "접수·금결원요청·등록완료·등록실패·철회"
+        },
+        {
+          "attrNm": "납부방법번호",
+          "phyNm": "PAY_MTHD_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 납부방법기본"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "자동이체신청구분코드",
+          "phyNm": "ATRF_APLY_SE_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "신규·변경·해지 — 값 3개 고정 → 구분"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "FK → INV.은행코드"
+        },
+        {
+          "attrNm": "계좌번호암호화값",
+          "phyNm": "ACCT_NO_ENCPT_VL",
+          "role": "ATTR",
+          "domNm": "값V256",
+          "note": "D11 — 평문 계좌번호 저장 금지"
+        },
+        {
+          "attrNm": "예금주명",
+          "phyNm": "DPSOWN_NM",
+          "role": "ATTR",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "출금동의증빙유형코드",
+          "phyNm": "WDRW_AGRE_EVDC_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "서면·녹취·ARS·전자서명·공동인증"
+        },
+        {
+          "attrNm": "처리결과유형코드",
+          "phyNm": "PRCS_RSLT_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "금결원 응답 결과(정상·계좌없음·예금주불일치·해지계좌 등)"
+        },
+        {
+          "attrNm": "처리일시",
+          "phyNm": "PRCS_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "납부방법기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "등록 대상 납부방법"
+        },
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "신청 청구계정"
+        },
+        {
+          "toEnt": "은행코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "출금 은행"
+        }
+      ],
+      "volTier": "T3"
+    },
+    {
+      "entNm": "자동이체출금요청내역",
+      "phyNm": "ATRF_WDRW_REQ_DTLS",
+      "tblNm": "PTL_INV_ATRF_WDRW_REQ_L",
+      "tp": "ACT",
+      "def": "청구월마다 자동이체 납부 청구서에 대해 금결원·은행에 보내는 출금 요청 라인(재출금 회차 포함). 결과는 자동이체출금결과내역, 성공분은 수납기본을 만든다. 월 RANGE 파티션 후보(청구년월).",
+      "keyAttrs": [
+        {
+          "attrNm": "출금요청번호",
+          "phyNm": "WDRW_REQ_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "출금요청파일명",
+          "phyNm": "WDRW_REQ_FILE_NM",
+          "role": "NM",
+          "domNm": "명V200",
+          "note": "CMS 전송 파일(묶음) 이름"
+        },
+        {
+          "attrNm": "출금요청일시",
+          "phyNm": "WDRW_REQ_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "출금요청상태유형코드",
+          "phyNm": "WDRW_REQ_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10",
+          "note": "생성·전송·출금완료·부분출금·출금실패·취소"
+        },
+        {
+          "attrNm": "납부방법번호",
+          "phyNm": "PAY_MTHD_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 납부방법기본"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "청구번호",
+          "phyNm": "BILL_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → PAY.청구기본"
+        },
+        {
+          "attrNm": "청구년월",
+          "phyNm": "BILL_YM",
+          "role": "ATTR",
+          "domNm": "년월C6",
+          "note": "업무 키 보존(01 문서 5절-4) — 파티션·레이크 키 후보"
+        },
+        {
+          "attrNm": "출금요청금액",
+          "phyNm": "WDRW_REQ_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "출금예정일자",
+          "phyNm": "WDRW_SCHD_DT",
+          "role": "ATTR",
+          "domNm": "일자C8",
+          "note": "이체지정일 → 영업일 보정, 말일·1일 쏠림 S4"
+        },
+        {
+          "attrNm": "출금회차",
+          "phyNm": "WDRW_TMS",
+          "role": "ATTR",
+          "domNm": "회차N3",
+          "note": "1 = 정기, 2~ = 재출금"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "FK → INV.은행코드"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 수납기본(출금 성공 시만)"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "납부방법기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "출금 근거 납부방법"
+        },
+        {
+          "toEnt": "청구기본",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "출금 대상 청구서"
+        },
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "출금 청구계정"
+        },
+        {
+          "toEnt": "수납기본",
+          "toArea": "INV",
+          "card": "1:1",
+          "idn": false,
+          "opt": true,
+          "nm": "출금 성공 → 수납 생성"
+        },
+        {
+          "toEnt": "은행코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "출금 은행"
+        }
+      ],
+      "volTier": "T4"
+    },
+    {
+      "entNm": "가상계좌기본",
+      "phyNm": "VACCT_BAS",
+      "tblNm": "PTL_INV_VACCT_M",
+      "tp": "BASE",
+      "def": "청구계정별로 은행·대행기관에서 발급받은 가상계좌. 입금 통지(가상계좌입금내역)를 청구계정에 귀속시키는 키. 해지 계좌는 회수 후 재발급(S8 번호 재사용).",
+      "keyAttrs": [
+        {
+          "attrNm": "가상계좌번호",
+          "phyNm": "VACCT_NO",
+          "role": "PK",
+          "domNm": "번호V20",
+          "note": "내부 관리번호(실제 은행 계좌번호는 계좌번호 속성)"
+        },
+        {
+          "attrNm": "가상계좌명",
+          "phyNm": "VACCT_NM",
+          "role": "NM",
+          "domNm": "명V100",
+          "note": "입금 화면 예금주 표시명"
+        },
+        {
+          "attrNm": "가상계좌발급일시",
+          "phyNm": "VACCT_ISSU_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "가상계좌상태유형코드",
+          "phyNm": "VACCT_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10",
+          "note": "발급·사용·정지·회수·만료"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "FK → INV.은행코드"
+        },
+        {
+          "attrNm": "수납대행기관번호",
+          "phyNm": "RCV_AGT_INST_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → INV.수납대행기관기본(기본 엔터티)"
+        },
+        {
+          "attrNm": "계좌번호",
+          "phyNm": "ACCT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "가상계좌 번호 자체(실명 계좌 아님 → 평문, 은행코드+계좌번호 유일)"
+        },
+        {
+          "attrNm": "입금기준유형코드",
+          "phyNm": "DPST_STD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "청구금액일치·이상입금허용·자유입금·1회용"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "회수일시",
+          "phyNm": "RTRVL_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS",
+          "note": "95% NULL(S5)"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "청구계정 전용 계좌"
+        },
+        {
+          "toEnt": "은행코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "발급 은행"
+        },
+        {
+          "toEnt": "수납대행기관기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "발급 대행기관"
+        }
+      ],
+      "volTier": "T3"
+    },
+    {
+      "entNm": "과오납기본",
+      "phyNm": "OVPAY_BAS",
+      "tblNm": "PTL_INV_OVPAY_M",
+      "tp": "ACT",
+      "def": "이중 납부·초과 납부·해지 후 납부·청구 취소로 생긴, 고객에게 돌려줄 돈 1건과 잔액. 다음 청구 대체·환불·선납 전환으로 정리, 상태 변경은 과오납이력.",
+      "keyAttrs": [
+        {
+          "attrNm": "과오납번호",
+          "phyNm": "OVPAY_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "과오납내용명",
+          "phyNm": "OVPAY_CN_NM",
+          "role": "NM",
+          "domNm": "명V100",
+          "note": "발생 사유 요약"
+        },
+        {
+          "attrNm": "과오납발생일시",
+          "phyNm": "OVPAY_OCRN_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "과오납상태유형코드",
+          "phyNm": "OVPAY_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10",
+          "note": "발생·대체중·환불요청·환불완료·선납전환·소멸"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 수납기본(발생 원인 입금)"
+        },
+        {
+          "attrNm": "과오납유형코드",
+          "phyNm": "OVPAY_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "이중납부·초과납부·해지후납부·청구취소·조정감액"
+        },
+        {
+          "attrNm": "과오납금액",
+          "phyNm": "OVPAY_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "과오납잔액",
+          "phyNm": "OVPAY_BAL",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "처리방법유형코드",
+          "phyNm": "PRCS_MTHD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "다음청구대체·환불·선납전환·잡이익처리"
+        },
+        {
+          "attrNm": "소멸시효일자",
+          "phyNm": "EXTSH_PRSCR_DT",
+          "role": "ATTR",
+          "domNm": "일자C8",
+          "note": "미청구 환급금 소멸시효(상사 5년) 기산 결과"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "과오납 발생 청구계정"
+        },
+        {
+          "toEnt": "수납기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "원인 입금"
+        },
+        {
+          "toEnt": "환불내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "과오납 환불"
+        },
+        {
+          "toEnt": "선납기본",
+          "toArea": "INV",
+          "card": "1:1",
+          "idn": false,
+          "opt": true,
+          "nm": "과오납 전환"
+        }
+      ],
+      "volTier": "T3"
+    },
+    {
+      "entNm": "환불내역",
+      "phyNm": "RFND_DTLS",
+      "tblNm": "PTL_INV_RFND_L",
+      "tp": "ACT",
+      "def": "과오납·선납 잔액·해지 정산액을 고객에게 실제로 돌려준 행위 1건(계좌이체·카드 승인취소·현금·상계).",
+      "keyAttrs": [
+        {
+          "attrNm": "환불번호",
+          "phyNm": "RFND_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "환불수령인명",
+          "phyNm": "RFND_RCPN_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "환불일시",
+          "phyNm": "RFND_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "환불상태유형코드",
+          "phyNm": "RFND_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10",
+          "note": "요청·승인·이체완료·이체실패·취소"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "과오납번호",
+          "phyNm": "OVPAY_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 과오납기본(선납 환불이면 NULL)"
+        },
+        {
+          "attrNm": "선납번호",
+          "phyNm": "PRPAY_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 선납기본(과오납 환불이면 NULL)"
+        },
+        {
+          "attrNm": "환불금액",
+          "phyNm": "RFND_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "환불방법유형코드",
+          "phyNm": "RFND_MTHD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "계좌이체·카드승인취소·현금·상계"
+        },
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "FK → INV.은행코드"
+        },
+        {
+          "attrNm": "계좌번호암호화값",
+          "phyNm": "ACCT_NO_ENCPT_VL",
+          "role": "ATTR",
+          "domNm": "값V256",
+          "note": "D11 — 평문 계좌번호 저장 금지"
+        },
+        {
+          "attrNm": "환불요청일자",
+          "phyNm": "RFND_REQ_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "환불 청구계정"
+        },
+        {
+          "toEnt": "과오납기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "과오납 환불"
+        },
+        {
+          "toEnt": "선납기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "선납 잔액 환불"
+        },
+        {
+          "toEnt": "은행코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "환불 입금 은행"
+        }
+      ],
+      "volTier": "T3"
+    },
+    {
+      "entNm": "선납기본",
+      "phyNm": "PRPAY_BAS",
+      "tblNm": "PTL_INV_PRPAY_M",
+      "tp": "ACT",
+      "def": "청구 전에 미리 받아 둔 돈(고객 예납·과오납 전환·법인 선결제)과 잔액. 다음 청구 시 선납사용내역으로 차감.",
+      "keyAttrs": [
+        {
+          "attrNm": "선납번호",
+          "phyNm": "PRPAY_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "선납입금자명",
+          "phyNm": "PRPAY_DPSTR_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "선납일시",
+          "phyNm": "PRPAY_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "선납상태유형코드",
+          "phyNm": "PRPAY_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10",
+          "note": "사용중·소진·환불·해지정리"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → CUS.청구계정기본"
+        },
+        {
+          "attrNm": "수납번호",
+          "phyNm": "RCV_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 수납기본(원천 입금, 과오납 전환이면 NULL)"
+        },
+        {
+          "attrNm": "과오납번호",
+          "phyNm": "OVPAY_NO",
+          "role": "ATTR",
+          "domNm": "번호V20",
+          "note": "FK → 과오납기본(전환분만)"
+        },
+        {
+          "attrNm": "선납유형코드",
+          "phyNm": "PRPAY_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "고객예납·과오납전환·해지예치·법인선결제"
+        },
+        {
+          "attrNm": "선납금액",
+          "phyNm": "PRPAY_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "선납잔액",
+          "phyNm": "PRPAY_BAL",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "소진일시",
+          "phyNm": "EXHST_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "선납 청구계정"
+        },
+        {
+          "toEnt": "수납기본",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "원천 입금"
+        },
+        {
+          "toEnt": "과오납기본",
+          "toArea": "INV",
+          "card": "1:1",
+          "idn": false,
+          "opt": true,
+          "nm": "과오납 전환"
+        },
+        {
+          "toEnt": "수납배분상세",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "선납 차감 배분"
+        },
+        {
+          "toEnt": "환불내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "선납 잔액 환불"
+        }
+      ],
+      "volTier": "T3"
+    },
+    {
+      "entNm": "은행코드",
+      "phyNm": "BANK_CD",
+      "tblNm": "PTL_INV_BANK_C",
+      "tp": "REF",
+      "def": "은행·금융기관 기준(D5 — 수납 영역 소유). 자동이체·가상계좌 가능 여부와 합병 승계를 가진다. 합병·폐지 은행도 과거 데이터 재현을 위해 남긴다.",
+      "keyAttrs": [
+        {
+          "attrNm": "은행코드",
+          "phyNm": "BANK_CD",
+          "role": "PK",
+          "domNm": "코드V10",
+          "note": "금결원 3자리 표준 코드(S12 앞자리 0)"
+        },
+        {
+          "attrNm": "은행명",
+          "phyNm": "BANK_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "은행등록일시",
+          "phyNm": "BANK_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "은행상태유형코드",
+          "phyNm": "BANK_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10",
+          "note": "사용·거래중지·합병·폐지"
+        },
+        {
+          "attrNm": "금융기관유형코드",
+          "phyNm": "FNNC_INST_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "시중은행·지방은행·특수은행·저축은행·상호금융·증권사·우체국"
+        },
+        {
+          "attrNm": "은행영문명",
+          "phyNm": "BANK_ENG_NM",
+          "role": "ATTR",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "자동이체가능여부",
+          "phyNm": "ATRF_PSBL_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "가상계좌가능여부",
+          "phyNm": "VACCT_PSBL_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "합병은행코드",
+          "phyNm": "MRGR_BANK_CD",
+          "role": "ATTR",
+          "domNm": "코드V10",
+          "note": "자기 참조 — 합병 후 승계 은행"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "은행코드",
+          "toArea": "INV",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "합병 승계 은행(자기 참조)"
+        },
+        {
+          "toEnt": "수납기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "입금 은행"
+        },
+        {
+          "toEnt": "납부방법기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "자동이체 은행"
+        },
+        {
+          "toEnt": "자동이체신청내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "출금 은행"
+        },
+        {
+          "toEnt": "자동이체출금요청내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "출금 은행"
+        },
+        {
+          "toEnt": "가상계좌기본",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "발급 은행"
+        },
+        {
+          "toEnt": "환불내역",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "환불 입금 은행"
+        }
+      ],
+      "volTier": "T1"
+    }
+  ],
+  "basicEntRels": [
+    {
+      "entNm": "선납사용내역",
+      "stg": "LGCL",
+      "rels": [
+        {
+          "toEnt": "청구기본",
+          "toArea": "PAY",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "선납 잔액 차감"
+        }
+      ]
+    }
+  ]
+}

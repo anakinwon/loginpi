@@ -1,0 +1,1664 @@
+{
+  "area": "PRD",
+  "areaNm": "상품",
+  "ver": "2026-11-07",
+  "author": "subagent_subject_modeler",
+  "stg": "CNCP",
+  "refPkRule": {
+    "note": "다른 주제영역이 PRD 를 참조할 때 이름. 상품기본·서브타입 6종은 PK 가 모두 상품코드(PROD_CD) — 참조하는 쪽은 역할명(<서브타입 핵심어>상품코드)을 쓴다. 단말모델·요금항목은 독립 코드",
+    "own": [
+      {
+        "attrNm": "상품코드",
+        "phyNm": "PROD_CD",
+        "domNm": "코드V20",
+        "ent": "상품기본"
+      },
+      {
+        "attrNm": "요금제상품코드",
+        "phyNm": "RTPLN_PROD_CD",
+        "domNm": "코드V20",
+        "ent": "요금제기본",
+        "roleOf": "PROD_CD"
+      },
+      {
+        "attrNm": "부가서비스상품코드",
+        "phyNm": "ADSVC_PROD_CD",
+        "domNm": "코드V20",
+        "ent": "부가서비스기본",
+        "roleOf": "PROD_CD"
+      },
+      {
+        "attrNm": "할인상품코드",
+        "phyNm": "DSCNT_PROD_CD",
+        "domNm": "코드V20",
+        "ent": "할인상품기본",
+        "roleOf": "PROD_CD"
+      },
+      {
+        "attrNm": "결합상품코드",
+        "phyNm": "CMBN_PROD_CD",
+        "domNm": "코드V20",
+        "ent": "결합상품기본",
+        "roleOf": "PROD_CD"
+      },
+      {
+        "attrNm": "약정상품코드",
+        "phyNm": "AGRMT_PROD_CD",
+        "domNm": "코드V20",
+        "ent": "약정상품기본",
+        "roleOf": "PROD_CD"
+      },
+      {
+        "attrNm": "유심상품코드",
+        "phyNm": "USIM_PROD_CD",
+        "domNm": "코드V20",
+        "ent": "유심상품기본",
+        "roleOf": "PROD_CD"
+      },
+      {
+        "attrNm": "단말모델코드",
+        "phyNm": "EQP_MDL_CD",
+        "domNm": "코드V20",
+        "ent": "단말모델기본"
+      },
+      {
+        "attrNm": "요금항목코드",
+        "phyNm": "CHRG_ITM_CD",
+        "domNm": "코드V10",
+        "ent": "요금항목코드"
+      }
+    ],
+    "foreign": [
+      {
+        "attrNm": "콘텐츠제공사번호",
+        "phyNm": "CNTS_PRVD_CO_NO",
+        "domNm": "번호V20",
+        "area": "PRM",
+        "ent": "콘텐츠제공사기본"
+      }
+    ],
+    "alignedWith": [
+      "ORD.가입신청기본·가입상품기본 PROD_CD",
+      "ORD.회선기본 USIM_PROD_CD·EQP_MDL_CD",
+      "ORD.약정계약기본 AGRMT_PROD_CD·CHC_AGRMT_DSCNT_RT",
+      "ORD.단말할부계약기본 EQP_MDL_CD·EQP_RLS_PRC",
+      "ORD.결합계약기본 CMBN_PROD_CD·CMBN_TY_CD",
+      "PAY.사용내역·요금계산내역·청구상세 CHRG_ITM_CD·CHRG_ITM_NM",
+      "PAY.사용내역 BSCPRVD(기본제공)"
+    ],
+    "mismatch": [
+      {
+        "area": "PAY",
+        "where": "extKeys PRD.할인상품기본",
+        "now": "PRD_CD/코드V10",
+        "fix": "DSCNT_PROD_CD/코드V20",
+        "status": "02 관문 수정 완료(reviews/02_conceptual.md)"
+      },
+      {
+        "area": "INV",
+        "where": "수납배분상세.요금항목코드",
+        "now": "CHRG_ITEM_CD",
+        "fix": "CHRG_ITM_CD",
+        "status": "02 관문 수정 완료(reviews/02_conceptual.md)"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "entNm": "상품기본",
+      "phyNm": "PROD_BAS",
+      "tblNm": "PTL_PRD_PROD_M",
+      "tp": "REF",
+      "def": "판매하는 모든 통신 상품(요금제·부가서비스·할인·결합·약정·유심)의 공통 정의(TM Forum SID Product Offering). 유형별 상세 6종의 상위(슈퍼타입). 판매 종료·폐지 후에도 행을 지우지 않고 상태·판매종료일자로 표현한다. 현재 월정액은 여기, 변경 이력은 상품가격이력.",
+      "keyAttrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "role": "PK",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "상품명",
+          "phyNm": "PROD_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "상품등록일시",
+          "phyNm": "PROD_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "상품상태유형코드",
+          "phyNm": "PROD_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "상품유형코드",
+          "phyNm": "PROD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "서비스망유형코드",
+          "phyNm": "SVC_NTWK_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "가입대상유형코드",
+          "phyNm": "SBSC_TRGT_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "판매시작일자",
+          "phyNm": "SALE_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "판매종료일자",
+          "phyNm": "SALE_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "기본요금항목코드",
+          "phyNm": "BAS_CHRG_ITM_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "월정액금액",
+          "phyNm": "MM_FXAMT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "부가가치세포함여부",
+          "phyNm": "VAT_INCL_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "요금제기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "요금제 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "부가서비스기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "부가서비스 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "할인상품기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "할인 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "결합상품기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "결합 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "약정상품기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "약정 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "유심상품기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": true,
+          "nm": "유심 상세를 가진다(서브타입)"
+        },
+        {
+          "toEnt": "상품가격이력",
+          "toArea": "PRD",
+          "card": "1:N",
+          "idn": true,
+          "opt": true,
+          "nm": "가격이 변경된다"
+        },
+        {
+          "toEnt": "요금항목코드",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "기본 요금항목으로 청구된다"
+        },
+        {
+          "toEnt": "가입상품기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "회선에 가입된다(S2 요금제 1개 = 35%)"
+        },
+        {
+          "toEnt": "가입신청기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "대표 요금제로 신청된다"
+        }
+      ]
+    },
+    {
+      "entNm": "요금제기본",
+      "phyNm": "RTPLN_BAS",
+      "tblNm": "PTL_PRD_RTPLN_M",
+      "tp": "REF",
+      "def": "음성·문자·데이터 기본제공량과 소진 후 속도 제한(QoS)을 정한 월정액 요금제의 서브타입 상세. 이용약관 신고 대상. 초과 요율·시간대 요율·기본제공 상세 항목은 기본 엔터티(요금제기본제공상세·요금제초과요율상세)로 분리.",
+      "keyAttrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "role": "PK",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "요금제공시명",
+          "phyNm": "RTPLN_PBANC_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "요금제등록일시",
+          "phyNm": "RTPLN_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "요금제약관신고상태유형코드",
+          "phyNm": "RTPLN_TRMS_DCLR_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "요금제유형코드",
+          "phyNm": "RTPLN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "기본제공음성분수",
+          "phyNm": "BSCPRVD_VOICE_MNTCNT",
+          "role": "ATTR",
+          "domNm": "수N10"
+        },
+        {
+          "attrNm": "기본제공문자건수",
+          "phyNm": "BSCPRVD_SMS_NOCS",
+          "role": "ATTR",
+          "domNm": "건수N10"
+        },
+        {
+          "attrNm": "기본제공데이터용량",
+          "phyNm": "BSCPRVD_DATA_CPCT",
+          "role": "ATTR",
+          "domNm": "수량N18"
+        },
+        {
+          "attrNm": "음성무제한여부",
+          "phyNm": "VOICE_UNLMT_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "데이터무제한여부",
+          "phyNm": "DATA_UNLMT_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "소진후제한속도값",
+          "phyNm": "EXHST_AFTR_RSTR_SPD_VL",
+          "role": "ATTR",
+          "domNm": "값N10"
+        },
+        {
+          "attrNm": "선택약정할인대상여부",
+          "phyNm": "CHC_AGRMT_DSCNT_TRGT_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "상품기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "상품의 요금제 서브타입이다"
+        }
+      ]
+    },
+    {
+      "entNm": "부가서비스기본",
+      "phyNm": "ADSVC_BAS",
+      "tblNm": "PTL_PRD_ADSVC_M",
+      "tp": "REF",
+      "def": "요금제에 덧붙여 가입하는 부가서비스·옵션(통화연결음·데이터 옵션·로밍 요금제·휴대폰 보험·콘텐츠 구독 등)의 서브타입 상세. 망(HLR/HSS) 부가서비스 코드와 연동되며, 제3자 콘텐츠 상품은 PRM 콘텐츠제공사가 공급한다(S2 — 70% 미사용).",
+      "keyAttrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "role": "PK",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "부가서비스공시명",
+          "phyNm": "ADSVC_PBANC_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "부가서비스등록일시",
+          "phyNm": "ADSVC_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "부가서비스망연동상태유형코드",
+          "phyNm": "ADSVC_NTWK_LNK_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "부가서비스유형코드",
+          "phyNm": "ADSVC_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "과금방식유형코드",
+          "phyNm": "RAT_SCHM_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "망서비스번호",
+          "phyNm": "NTWK_SVC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "콘텐츠제공사번호",
+          "phyNm": "CNTS_PRVD_CO_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "무료제공개월수",
+          "phyNm": "FREE_PRVD_MCNT",
+          "role": "ATTR",
+          "domNm": "수N5"
+        },
+        {
+          "attrNm": "중복가입가능여부",
+          "phyNm": "DUP_SBSC_PSBL_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "상품기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "상품의 부가서비스 서브타입이다"
+        },
+        {
+          "toEnt": "콘텐츠제공사기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "콘텐츠제공사가 공급한다(자사 서비스는 NULL — S5)"
+        }
+      ]
+    },
+    {
+      "entNm": "할인상품기본",
+      "phyNm": "DSCNT_PROD_BAS",
+      "tblNm": "PTL_PRD_DSCNT_PROD_M",
+      "tp": "REF",
+      "def": "요금에서 빼 주는 할인 규칙(선택약정 25%·장기고객·복지·제휴카드·결합·임직원·프로모션)의 서브타입 상세. 정률·정액 방식과 한도, 대상 요금항목, 할인이 청구서에 찍히는 할인 요금항목을 정한다. 조건·구간별 할인율은 기본 엔터티(할인조건상세·할인율상세).",
+      "keyAttrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "role": "PK",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "할인공시명",
+          "phyNm": "DSCNT_PBANC_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "할인상품등록일시",
+          "phyNm": "DSCNT_PROD_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "할인승인상태유형코드",
+          "phyNm": "DSCNT_APRV_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "할인유형코드",
+          "phyNm": "DSCNT_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "할인방식유형코드",
+          "phyNm": "DSCNT_SCHM_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "할인율",
+          "phyNm": "DSCNT_RT",
+          "role": "ATTR",
+          "domNm": "율N5_2"
+        },
+        {
+          "attrNm": "할인금액",
+          "phyNm": "DSCNT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "할인한도금액",
+          "phyNm": "DSCNT_LMT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "할인대상요금항목코드",
+          "phyNm": "DSCNT_TRGT_CHRG_ITM_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "할인요금항목코드",
+          "phyNm": "DSCNT_CHRG_ITM_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "중복할인가능여부",
+          "phyNm": "DUP_DSCNT_PSBL_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "제휴파트너번호",
+          "phyNm": "ALNC_PRTNR_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "상품기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "상품의 할인 서브타입이다"
+        },
+        {
+          "toEnt": "요금항목코드",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "할인 금액이 이 요금항목으로 청구된다"
+        },
+        {
+          "toEnt": "요금항목코드",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "이 요금항목을 할인 대상으로 한다(전체 대상이면 NULL)"
+        },
+        {
+          "toEnt": "약정상품기본",
+          "toArea": "PRD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "약정에 연계된다(선택약정 25%)"
+        },
+        {
+          "toEnt": "결합상품기본",
+          "toArea": "PRD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "결합할인으로 쓰인다"
+        },
+        {
+          "toEnt": "할인적용내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "요금계산 때 적용된다"
+        },
+        {
+          "toEnt": "파트너기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "제휴 할인을 후원하는 파트너"
+        }
+      ]
+    },
+    {
+      "entNm": "결합상품기본",
+      "phyNm": "CMBN_PROD_BAS",
+      "tblNm": "PTL_PRD_CMBN_PROD_M",
+      "tp": "REF",
+      "def": "여러 회선·상품을 묶어 할인하는 결합 규칙(유무선 결합·가족 무선 결합·인터넷+IPTV·법인 결합)의 서브타입 상세. 결합 가능 회선 수·가족관계 확인·결합할인 상품과 배분 방식을 정한다. 구성 상품·회선별 할인은 기본 엔터티(결합구성상세·결합할인상세).",
+      "keyAttrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "role": "PK",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "결합상품공시명",
+          "phyNm": "CMBN_PROD_PBANC_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "결합상품등록일시",
+          "phyNm": "CMBN_PROD_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "결합상품운영상태유형코드",
+          "phyNm": "CMBN_PROD_OPER_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "결합유형코드",
+          "phyNm": "CMBN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "최소결합회선수",
+          "phyNm": "MIN_CMBN_LINE_CNT",
+          "role": "ATTR",
+          "domNm": "수N5"
+        },
+        {
+          "attrNm": "최대결합회선수",
+          "phyNm": "MAX_CMBN_LINE_CNT",
+          "role": "ATTR",
+          "domNm": "수N5"
+        },
+        {
+          "attrNm": "결합할인상품코드",
+          "phyNm": "CMBN_DSCNT_PROD_CD",
+          "role": "ATTR",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "결합할인배분방식유형코드",
+          "phyNm": "CMBN_DSCNT_ALLC_SCHM_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "가족관계확인필요여부",
+          "phyNm": "FMLY_REL_IDNTF_NEED_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "유선상품포함여부",
+          "phyNm": "WIRE_PROD_INCL_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "상품기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "상품의 결합 서브타입이다"
+        },
+        {
+          "toEnt": "할인상품기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "결합할인 규칙을 쓴다"
+        },
+        {
+          "toEnt": "결합계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "결합 계약으로 체결된다"
+        }
+      ]
+    },
+    {
+      "entNm": "약정상품기본",
+      "phyNm": "AGRMT_PROD_BAS",
+      "tblNm": "PTL_PRD_AGRMT_PROD_M",
+      "tp": "REF",
+      "def": "일정 기간 이용을 약속하고 혜택을 받는 약정 규칙(선택약정 요금할인 25%·공시지원금 약정·기기·요금·결합 약정)의 서브타입 상세. 약정 개월 수·위약금(할인반환금·지원금 반환) 산정 방식과 상한을 정한다. 경과 기간별 위약금 구간은 기본 엔터티(약정위약금상세).",
+      "keyAttrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "role": "PK",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "약정상품공시명",
+          "phyNm": "AGRMT_PROD_PBANC_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "약정상품등록일시",
+          "phyNm": "AGRMT_PROD_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "약정상품운영상태유형코드",
+          "phyNm": "AGRMT_PROD_OPER_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "약정유형코드",
+          "phyNm": "AGRMT_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "약정개월수",
+          "phyNm": "AGRMT_MCNT",
+          "role": "ATTR",
+          "domNm": "수N5"
+        },
+        {
+          "attrNm": "선택약정할인율",
+          "phyNm": "CHC_AGRMT_DSCNT_RT",
+          "role": "ATTR",
+          "domNm": "율N5_2"
+        },
+        {
+          "attrNm": "연계할인상품코드",
+          "phyNm": "LNKG_DSCNT_PROD_CD",
+          "role": "ATTR",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "위약금산정방식유형코드",
+          "phyNm": "PNLT_ASMT_SCHM_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "위약금상한금액",
+          "phyNm": "PNLT_UPLMT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "재약정가능여부",
+          "phyNm": "RE_AGRMT_PSBL_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "약정승계가능여부",
+          "phyNm": "AGRMT_SCSN_PSBL_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "상품기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "상품의 약정 서브타입이다"
+        },
+        {
+          "toEnt": "할인상품기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "선택약정 할인 규칙을 쓴다(공시지원금 약정은 NULL)"
+        },
+        {
+          "toEnt": "약정계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "약정 계약으로 체결된다"
+        }
+      ]
+    },
+    {
+      "entNm": "단말모델기본",
+      "phyNm": "EQP_MDL_BAS",
+      "tblNm": "PTL_PRD_EQP_MDL_M",
+      "tp": "REF",
+      "def": "판매·개통 가능한 단말 모델(스마트폰·피처폰·태블릿·웨어러블·라우터·IoT 모듈)의 기준 정보. 판매 상품(상품기본)이 아니라 단말 카탈로그라 별도 주식별자(단말모델코드). 현재 출고가·공시지원금은 여기, 변경 이력은 기본 엔터티(단말출고가이력·공시지원금이력 — 단말기유통법 공시). 개별 단말 재고는 PRM.",
+      "keyAttrs": [
+        {
+          "attrNm": "단말모델코드",
+          "phyNm": "EQP_MDL_CD",
+          "role": "PK",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "단말모델명",
+          "phyNm": "EQP_MDL_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "단말모델등록일시",
+          "phyNm": "EQP_MDL_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "단말모델판매상태유형코드",
+          "phyNm": "EQP_MDL_SALE_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "제조사유형코드",
+          "phyNm": "MNFCT_CO_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "단말유형코드",
+          "phyNm": "EQP_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "서비스망유형코드",
+          "phyNm": "SVC_NTWK_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "출시일자",
+          "phyNm": "LNCH_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "단말출고가격",
+          "phyNm": "EQP_SHPM_PRC",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "공시지원금",
+          "phyNm": "PBANC_SUBSD",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "eSIM지원여부",
+          "phyNm": "ESIM_SPRT_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "자급제여부",
+          "phyNm": "SLFSPLY_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "회선기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "회선에 장착된다(자급제 미확인 단말은 회선 쪽 NULL — S5)"
+        },
+        {
+          "toEnt": "단말할부계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "할부로 판매된다"
+        },
+        {
+          "toEnt": "단말재고내역",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "유통망 재고로 입고된다"
+        }
+      ]
+    },
+    {
+      "entNm": "유심상품기본",
+      "phyNm": "USIM_PROD_BAS",
+      "tblNm": "PTL_PRD_USIM_PROD_M",
+      "tp": "REF",
+      "def": "회선에 장착하는 가입자 식별 모듈 상품(USIM·eSIM·NFC 유심·IoT 유심)의 서브타입 상세. 종류·형태·판매가(유심비)를 정한다. 개별 유심 일련번호·재고는 PRM, 회선 장착은 ORD.",
+      "keyAttrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "role": "PK",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "유심상품공시명",
+          "phyNm": "USIM_PROD_PBANC_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "유심상품등록일시",
+          "phyNm": "USIM_PROD_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "유심상품공급상태유형코드",
+          "phyNm": "USIM_PROD_SPLY_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "유심종류코드",
+          "phyNm": "USIM_KND_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "유심형태유형코드",
+          "phyNm": "USIM_FORM_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "서비스망유형코드",
+          "phyNm": "SVC_NTWK_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "유심판매가격",
+          "phyNm": "USIM_SALE_PRC",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "NFC지원여부",
+          "phyNm": "NFC_SPRT_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "상품기본",
+          "toArea": "PRD",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "nm": "상품의 유심 서브타입이다"
+        },
+        {
+          "toEnt": "회선기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "회선에 장착된다(USIM·eSIM)"
+        },
+        {
+          "toEnt": "유심재고내역",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "유통망 재고로 입고된다"
+        }
+      ]
+    },
+    {
+      "entNm": "요금항목코드",
+      "phyNm": "CHRG_ITM_CD",
+      "tblNm": "PTL_PRD_CHRG_ITM_C",
+      "tp": "REF",
+      "def": "청구서 한 줄이 되는 과금 항목 체계(월정액·통화료·데이터료·부가사용료·할인·단말할부금·위약금·조정·부가가치세·연체가산금·소액결제 대행). 사용량 Rating·요금계산·청구상세·수납배분이 모두 이 코드로 이어진다. 과세 유형·청구서 출력 순서·수납배분 우선순위를 가진다.",
+      "keyAttrs": [
+        {
+          "attrNm": "요금항목코드",
+          "phyNm": "CHRG_ITM_CD",
+          "role": "PK",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "요금항목명",
+          "phyNm": "CHRG_ITM_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "요금항목등록일시",
+          "phyNm": "CHRG_ITM_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "요금항목사용상태유형코드",
+          "phyNm": "CHRG_ITM_USE_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "요금항목분류코드",
+          "phyNm": "CHRG_ITM_CLSF_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "요금항목유형코드",
+          "phyNm": "CHRG_ITM_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "과세유형코드",
+          "phyNm": "TXTN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "청구서출력순번",
+          "phyNm": "INVC_OUTPT_SEQ",
+          "role": "ATTR",
+          "domNm": "순번N5"
+        },
+        {
+          "attrNm": "수납배분우선순위",
+          "phyNm": "RCV_ALLC_PRRT",
+          "role": "ATTR",
+          "domNm": "순번N5"
+        },
+        {
+          "attrNm": "할인대상여부",
+          "phyNm": "DSCNT_TRGT_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "상품기본",
+          "toArea": "PRD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "상품의 기본 요금항목이 된다"
+        },
+        {
+          "toEnt": "할인상품기본",
+          "toArea": "PRD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "할인 청구 항목이 된다"
+        },
+        {
+          "toEnt": "할인상품기본",
+          "toArea": "PRD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "할인 대상 항목이 된다"
+        },
+        {
+          "toEnt": "사용내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "Rating 결과 요금항목이 된다"
+        },
+        {
+          "toEnt": "요금계산내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "요금계산 결과 요금항목이 된다"
+        },
+        {
+          "toEnt": "청구상세",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "청구서 라인 항목이 된다"
+        },
+        {
+          "toEnt": "수납배분상세",
+          "toArea": "INV",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "수납 배분 대상 항목이 된다"
+        }
+      ]
+    },
+    {
+      "entNm": "상품가격이력",
+      "phyNm": "PROD_PRC_HIST",
+      "tblNm": "PTL_PRD_PROD_PRC_H",
+      "tp": "REF",
+      "def": "상품별 월정액·가격 변경 이력(적용 시작·종료 일시, SCD2). 과거 청구월의 요금 재계산·소급 조정 때 그 시점 가격을 재현한다. 현재 가격은 상품기본.월정액금액. 단말 출고가·공시지원금 이력은 단말모델 쪽 기본 엔터티.",
+      "keyAttrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "role": "PK",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "가격적용시작일시",
+          "phyNm": "PRC_APLCN_BGNG_DTM",
+          "role": "PK",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "적용상품명",
+          "phyNm": "APLCN_PROD_NM",
+          "role": "NM",
+          "domNm": "명V200"
+        },
+        {
+          "attrNm": "가격변경일시",
+          "phyNm": "PRC_CHG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "가격적용상태유형코드",
+          "phyNm": "PRC_APLCN_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "가격적용종료일시",
+          "phyNm": "PRC_APLCN_END_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "월정액금액",
+          "phyNm": "MM_FXAMT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "이전월정액금액",
+          "phyNm": "BFR_MM_FXAMT_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "가격변경사유유형코드",
+          "phyNm": "PRC_CHG_RSN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "부가가치세포함여부",
+          "phyNm": "VAT_INCL_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "상품기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": true,
+          "opt": false,
+          "nm": "상품의 가격 이력이다"
+        }
+      ]
+    }
+  ],
+  "domains": [
+    {
+      "domNm": "번호V20",
+      "lgcTp": "VARCHAR",
+      "len": 20
+    },
+    {
+      "domNm": "코드V10",
+      "lgcTp": "VARCHAR",
+      "len": 10
+    },
+    {
+      "domNm": "코드V20",
+      "lgcTp": "VARCHAR",
+      "len": 20
+    },
+    {
+      "domNm": "명V100",
+      "lgcTp": "VARCHAR",
+      "len": 100
+    },
+    {
+      "domNm": "명V200",
+      "lgcTp": "VARCHAR",
+      "len": 200
+    },
+    {
+      "domNm": "일시TS",
+      "lgcTp": "TIMESTAMP"
+    },
+    {
+      "domNm": "일자C8",
+      "lgcTp": "CHAR",
+      "len": 8
+    },
+    {
+      "domNm": "여부C1",
+      "lgcTp": "CHAR",
+      "len": 1
+    },
+    {
+      "domNm": "금액N15",
+      "lgcTp": "NUMERIC",
+      "len": 15,
+      "scale": 0
+    },
+    {
+      "domNm": "율N5_2",
+      "lgcTp": "NUMERIC",
+      "len": 5,
+      "scale": 2
+    },
+    {
+      "domNm": "수N5",
+      "lgcTp": "NUMERIC",
+      "len": 5,
+      "scale": 0
+    },
+    {
+      "domNm": "수N10",
+      "lgcTp": "NUMERIC",
+      "len": 10,
+      "scale": 0
+    },
+    {
+      "domNm": "수량N18",
+      "lgcTp": "NUMERIC",
+      "len": 18,
+      "scale": 0
+    }
+  ],
+  "codeCandidates": [
+    {
+      "termNm": "상품상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "기획",
+        "판매중",
+        "신규가입중지",
+        "판매종료",
+        "폐지"
+      ]
+    },
+    {
+      "termNm": "상품유형코드",
+      "kind": "유형",
+      "vals": [
+        "요금제",
+        "부가서비스",
+        "할인",
+        "결합",
+        "약정",
+        "유심"
+      ]
+    },
+    {
+      "termNm": "서비스망유형코드",
+      "kind": "유형",
+      "vals": [
+        "3G",
+        "LTE",
+        "5G",
+        "공통",
+        "IoT"
+      ]
+    },
+    {
+      "termNm": "가입대상유형코드",
+      "kind": "유형",
+      "vals": [
+        "전체",
+        "개인",
+        "법인",
+        "청소년",
+        "시니어",
+        "복지",
+        "외국인",
+        "임직원"
+      ]
+    },
+    {
+      "termNm": "요금제약관신고상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "작성",
+        "신고",
+        "수리",
+        "인가",
+        "반려",
+        "폐지"
+      ]
+    },
+    {
+      "termNm": "요금제유형코드",
+      "kind": "유형",
+      "vals": [
+        "일반",
+        "데이터무제한",
+        "청소년",
+        "시니어",
+        "복지",
+        "데이터전용",
+        "선불",
+        "IoT"
+      ]
+    },
+    {
+      "termNm": "부가서비스망연동상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "미연동",
+        "연동",
+        "연동오류",
+        "연동해제"
+      ]
+    },
+    {
+      "termNm": "부가서비스유형코드",
+      "kind": "유형",
+      "vals": [
+        "음성부가",
+        "데이터옵션",
+        "콘텐츠",
+        "보험",
+        "로밍",
+        "안심서비스",
+        "소액결제"
+      ]
+    },
+    {
+      "termNm": "과금방식유형코드",
+      "kind": "유형",
+      "vals": [
+        "월정액",
+        "일정액",
+        "건별",
+        "사용량",
+        "무료"
+      ]
+    },
+    {
+      "termNm": "할인승인상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "작성",
+        "승인요청",
+        "승인",
+        "반려",
+        "폐지"
+      ]
+    },
+    {
+      "termNm": "할인유형코드",
+      "kind": "유형",
+      "vals": [
+        "선택약정",
+        "장기고객",
+        "복지",
+        "제휴카드",
+        "결합",
+        "임직원",
+        "프로모션"
+      ]
+    },
+    {
+      "termNm": "할인방식유형코드",
+      "kind": "유형",
+      "vals": [
+        "정률",
+        "정액",
+        "면제",
+        "요금항목대체"
+      ]
+    },
+    {
+      "termNm": "결합상품운영상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "준비",
+        "운영",
+        "신규중지",
+        "종료"
+      ]
+    },
+    {
+      "termNm": "결합유형코드",
+      "kind": "유형",
+      "vals": [
+        "유무선",
+        "가족무선",
+        "인터넷IPTV",
+        "법인",
+        "기타"
+      ]
+    },
+    {
+      "termNm": "결합할인배분방식유형코드",
+      "kind": "유형",
+      "vals": [
+        "대표회선",
+        "균등",
+        "요금비례",
+        "회선별지정"
+      ]
+    },
+    {
+      "termNm": "약정상품운영상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "준비",
+        "운영",
+        "신규중지",
+        "종료"
+      ]
+    },
+    {
+      "termNm": "약정유형코드",
+      "kind": "유형",
+      "vals": [
+        "선택약정",
+        "공시지원금",
+        "기기약정",
+        "요금약정",
+        "결합약정"
+      ]
+    },
+    {
+      "termNm": "위약금산정방식유형코드",
+      "kind": "유형",
+      "vals": [
+        "할인반환금",
+        "지원금반환",
+        "잔여기간비례",
+        "정액",
+        "면제"
+      ]
+    },
+    {
+      "termNm": "단말모델판매상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "출시예정",
+        "판매중",
+        "판매중지",
+        "단종"
+      ]
+    },
+    {
+      "termNm": "제조사유형코드",
+      "kind": "유형",
+      "vals": [
+        "삼성전자",
+        "애플",
+        "LG전자",
+        "모토로라",
+        "샤오미",
+        "기타"
+      ]
+    },
+    {
+      "termNm": "단말유형코드",
+      "kind": "유형",
+      "vals": [
+        "스마트폰",
+        "피처폰",
+        "태블릿",
+        "웨어러블",
+        "라우터",
+        "IoT모듈"
+      ]
+    },
+    {
+      "termNm": "유심상품공급상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "공급중",
+        "공급중지",
+        "단종"
+      ]
+    },
+    {
+      "termNm": "유심종류코드",
+      "kind": "종류",
+      "vals": [
+        "USIM",
+        "eSIM",
+        "NFC유심",
+        "IoT유심"
+      ]
+    },
+    {
+      "termNm": "유심형태유형코드",
+      "kind": "유형",
+      "vals": [
+        "표준",
+        "마이크로",
+        "나노",
+        "내장형"
+      ]
+    },
+    {
+      "termNm": "요금항목사용상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "사용",
+        "사용중지",
+        "폐지"
+      ]
+    },
+    {
+      "termNm": "요금항목유형코드",
+      "kind": "유형",
+      "vals": [
+        "월정액",
+        "사용료",
+        "부가사용료",
+        "할인",
+        "단말할부금",
+        "위약금",
+        "조정",
+        "세금",
+        "연체가산금",
+        "대행수납"
+      ]
+    },
+    {
+      "termNm": "과세유형코드",
+      "kind": "유형",
+      "vals": [
+        "과세",
+        "면세",
+        "영세율",
+        "과세제외"
+      ]
+    },
+    {
+      "termNm": "가격적용상태유형코드",
+      "kind": "유형",
+      "vals": [
+        "예약",
+        "적용중",
+        "종료",
+        "취소"
+      ]
+    },
+    {
+      "termNm": "가격변경사유유형코드",
+      "kind": "유형",
+      "vals": [
+        "신규출시",
+        "요금인하",
+        "요금인상",
+        "약관변경",
+        "프로모션",
+        "정정"
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "id": "P1",
+      "dec": "핵심 10개는 planner 후보 그대로 확정(교체 없음)",
+      "why": "crossRels 8건과 ORD·PAY·INV 개념 JSON 이 이미 이 이름으로 걸려 있음. 통화권역·로밍·요율 상세는 Rating 기준표라 기본 엔터티로 충분"
+    },
+    {
+      "id": "P2",
+      "dec": "요금제·부가서비스·할인·결합·약정·유심 = 상품기본의 1:1 식별 서브타입(PK = 상품코드 승계)",
+      "why": "SID Product Offering 단일 카탈로그 + ORD.가입상품기본 이 상품코드 하나로 요금제·부가·할인을 모두 참조. 다른 영역은 역할명(유심상품코드·약정상품코드·결합상품코드·할인상품코드)으로 같은 상품코드를 가리킨다"
+    },
+    {
+      "id": "P3",
+      "dec": "단말모델기본은 서브타입이 아닌 독립 기준 엔터티(PK 단말모델코드)",
+      "why": "단말은 판매 상품이 아니라 하드웨어 카탈로그(출고가·공시지원금 공시 단위). ORD 가 이미 EQP_MDL_CD 로 참조"
+    },
+    {
+      "id": "P4",
+      "dec": "소유 키 물리명 = PROD_CD(코드V20)·CHRG_ITM_CD(코드V10)·EQP_MDL_CD(코드V20) — ORD·PAY 다수 표기를 정본으로 채택",
+      "why": "키 소유자(PRD) 확정. 불일치는 각 영역 수정 대상 : PAY extKeys 할인상품 PRD_CD/코드V10 → DSCNT_PROD_CD/코드V20, INV 수납배분상세 CHRG_ITEM_CD → CHRG_ITM_CD, (참고·PRD 무관) PAY SBSC_PRD_NO ↔ ORD SBSC_PROD_NO [02 관문 해소 — reviews/02_conceptual.md]"
+    },
+    {
+      "id": "P5",
+      "dec": "서브타입 NM = 공시명(이용약관·홈페이지 공시 명칭), 상품기본.상품명 = 내부 관리명",
+      "why": "필수 4종 ~명을 중복 없이 업무 의미로 채움(CUS C8 과 같은 방식). 공시명은 약관 신고 단위라 내부명과 실무상 다름"
+    },
+    {
+      "id": "P6",
+      "dec": "서브타입 STS = 서브타입 고유 생애주기(약관 신고·망 연동·할인 승인·운영·공급)",
+      "why": "판매 상태는 상품기본.상품상태유형코드 한 곳(이행 종속 방지), 서브타입은 다른 축의 상태만"
+    },
+    {
+      "id": "P7",
+      "dec": "현재 가격 = 상품기본.월정액금액, 이력 = 상품가격이력(적용 시작·종료, SCD2), 이력 NM = 적용상품명(당시 이름 보존)",
+      "why": "현재값 기본 + 변경 이력 쌍(CUS C3·C9 와 동일 원칙), 소급 요금 재계산 근거"
+    },
+    {
+      "id": "P8",
+      "dec": "할인상품기본 → 요금항목코드 2관계(할인 청구 항목 필수 / 할인 대상 항목 선택)",
+      "why": "할인도 청구상세 한 줄(음수)로 찍히고, 대상 항목 한정 할인(데이터료만 등)이 실무에 있음"
+    },
+    {
+      "id": "P9",
+      "dec": "선택약정 = 약정상품기본(선택약정할인율 25.00) + 연계할인상품코드 → 할인상품기본",
+      "why": "약정(위약금 규칙)과 할인(요금 차감 규칙)은 생애주기가 달라 분리, ORD.약정계약기본 의 CHC_AGRMT_DSCNT_RT 와 이름 일치"
+    },
+    {
+      "id": "P10",
+      "dec": "신규 교차 관계 제안 3건 : PRD.부가서비스기본→PRM.콘텐츠제공사기본, PRM.단말재고내역→PRD.단말모델기본, PRM.유심재고내역→PRD.유심상품기본",
+      "why": "areas.json crossRels 에 없음 — 제3자 콘텐츠 정산(STL)과 유통망 재고의 부모 키 공식에 필요. coordinator 가 crossRels 추가 판단"
+    },
+    {
+      "id": "P11",
+      "dec": "상태 약어 STTS_TY_CD(CUS·ORD 관행) 채택, 일자 접미 _DT(ORD·PAY 관행) 채택",
+      "why": "영역 간 표기 흔들림(PAY STTS_TP_CD, CUS _YMD) — 표준사전 단계에서 하나로 확정 [02 관문 해소 — reviews/02_conceptual.md]"
+    },
+    {
+      "id": "P12",
+      "dec": "STL 정산 엔터티 없음(moduleCd 표시 대상 0건), 개인정보 속성 없음(D11 해당 없음)",
+      "why": "areas.json PRD moduleEnts.STL = [], 상품은 기준 정보"
+    }
+  ]
+}

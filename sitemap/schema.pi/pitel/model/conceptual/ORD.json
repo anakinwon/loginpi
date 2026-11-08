@@ -1,0 +1,1528 @@
+{
+  "area": "ORD",
+  "areaNm": "가입",
+  "stg": "CNCP",
+  "ver": "1.0",
+  "author": "subagent_subject_modeler",
+  "refPkRule": "다른 주제영역 핵심 엔터티 참조 = <엔터티 핵심어>번호(기준·상품류 = <핵심어>코드), 역할명은 접두어(대표·원·희망) + 원 키 이름",
+  "extKeys": [
+    {
+      "attrNm": "고객번호",
+      "phyNm": "CUST_NO",
+      "domNm": "번호V20",
+      "ownEnt": "CUS.고객기본"
+    },
+    {
+      "attrNm": "청구계정번호",
+      "phyNm": "BILL_ACNT_NO",
+      "domNm": "번호V20",
+      "ownEnt": "CUS.청구계정기본"
+    },
+    {
+      "attrNm": "상품코드",
+      "phyNm": "PROD_CD",
+      "domNm": "코드V20",
+      "ownEnt": "PRD.상품기본"
+    },
+    {
+      "attrNm": "약정상품코드",
+      "phyNm": "AGRMT_PROD_CD",
+      "domNm": "코드V20",
+      "ownEnt": "PRD.약정상품기본"
+    },
+    {
+      "attrNm": "단말모델코드",
+      "phyNm": "EQP_MDL_CD",
+      "domNm": "코드V20",
+      "ownEnt": "PRD.단말모델기본"
+    },
+    {
+      "attrNm": "유심상품코드",
+      "phyNm": "USIM_PROD_CD",
+      "domNm": "코드V20",
+      "ownEnt": "PRD.유심상품기본"
+    },
+    {
+      "attrNm": "결합상품코드",
+      "phyNm": "CMBN_PROD_CD",
+      "domNm": "코드V20",
+      "ownEnt": "PRD.결합상품기본"
+    },
+    {
+      "attrNm": "판매점번호",
+      "phyNm": "SHOP_NO",
+      "domNm": "번호V20",
+      "ownEnt": "PRM.판매점기본",
+      "note": "판매점이 PRM 파트너기본의 서브타입이면 값은 파트너번호와 같음(역할명)"
+    },
+    {
+      "attrNm": "대리점번호",
+      "phyNm": "AGNC_NO",
+      "domNm": "번호V20",
+      "ownEnt": "PRM.대리점기본",
+      "note": "판매점번호와 같은 규칙"
+    },
+    {
+      "attrNm": "통신사업자번호",
+      "phyNm": "CARR_NO",
+      "domNm": "번호V20",
+      "ownEnt": "PRM.통신사업자기본"
+    },
+    {
+      "attrNm": "이용정지번호",
+      "phyNm": "SUSP_NO",
+      "domNm": "번호V20",
+      "ownEnt": "COL.이용정지기본"
+    },
+    {
+      "attrNm": "직권해지번호",
+      "phyNm": "EXOFTRMN_NO",
+      "domNm": "번호V20",
+      "ownEnt": "COL.직권해지기본"
+    }
+  ],
+  "decisions": [
+    {
+      "no": "O1",
+      "dec": "회선 주식별자 = 서비스관리번호(SVC_MGMT_NO), 회선번호라는 이름은 쓰지 않는다",
+      "why": "국내 이동통신 실무에서 회선은 서비스관리번호로 식별하고 서비스번호(전화번호)는 번호변경·재사용으로 바뀐다. PAY 개념 모델도 서비스관리번호 사용. COL 개념 모델의 '회선번호(LINE_NO)'는 서비스관리번호로 통일 권고(coordinator) [02 관문 해소 — reviews/02_conceptual.md]"
+    },
+    {
+      "no": "O2",
+      "dec": "회선 1 : 가입계약 N(시점별 활성 1)",
+      "why": "명의변경(양도·양수) 때 회선·번호·유심은 그대로 두고 계약만 종료·신규 — 사용내역·회선상태이력이 끊기지 않는다"
+    },
+    {
+      "no": "O3",
+      "dec": "서비스번호기본은 별도 실체(번호 자원), 회선 N : 서비스번호 1",
+      "why": "해지 번호 재사용(S8)·골드번호·재사용 대기 기간 관리가 회선과 독립 생애주기"
+    },
+    {
+      "no": "O4",
+      "dec": "가입상품기본은 가입계약에 종속(N:1), 서비스관리번호는 업무 키로 함께 보존",
+      "why": "요금 귀속(청구계정)은 계약 단위, 요금계산·레이크 파티셔닝은 회선 단위(01 문서 5-4 업무 키 보존)"
+    },
+    {
+      "no": "O5",
+      "dec": "회선상태이력 = 서비스관리번호 + 회선상태이력순번 식별 관계, 원인 COL 참조는 선택 FK(이용정지번호·직권해지번호)",
+      "why": "P2 원인 무관 통합. 원천업무유형코드로 ORD 고객 요청·COL 미납·시스템을 구분"
+    },
+    {
+      "no": "O6",
+      "dec": "결합계약 ↔ 가입계약 N:M 은 기본 엔터티 결합구성회선관계로 해소(논리 단계)",
+      "why": "규칙 2-7. 개념 단계에서는 대표가입계약번호만 핵심 속성으로 둠"
+    },
+    {
+      "no": "O7",
+      "dec": "약정의 지원금 유형(공시지원금·선택약정)은 약정계약 한 엔터티 + 지원금유형코드",
+      "why": "국내 단말기유통법상 둘 중 택일 — 별도 엔터티로 나누면 배타 관계만 늘어남. 추가지원금 상세 적용은 지원금적용내역(기본)"
+    },
+    {
+      "no": "O8",
+      "dec": "번호이동구분코드(전입·전출) = 구분코드, 그 밖의 분류는 유형코드",
+      "why": "공통코드 3종 규칙 — 값 2개·절대 늘지 않음만 구분코드"
+    }
+  ],
+  "entities": [
+    {
+      "entNm": "가입신청기본",
+      "phyNm": "SBSC_APLY_BAS",
+      "tblNm": "PTL_ORD_SBSC_APLY_M",
+      "tp": "ACT",
+      "def": "신규·번호이동·기기변경·재가입 등 가입 요청서. 판매점이 접수하고 실명인증·서류 확인을 거쳐 개통(가입계약 생성)으로 이어진다. 개통 전 철회·반려 건도 남는다.",
+      "keyAttrs": [
+        {
+          "attrNm": "가입신청번호",
+          "phyNm": "SBSC_APLY_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "가입신청명",
+          "phyNm": "SBSC_APLY_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "가입신청일시",
+          "phyNm": "SBSC_APLY_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "가입신청상태유형코드",
+          "phyNm": "SBSC_APLY_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "가입신청유형코드",
+          "phyNm": "SBSC_APLY_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "판매점번호",
+          "phyNm": "SHOP_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "role": "ATTR",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "가입채널유형코드",
+          "phyNm": "SBSC_CHNL_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "희망서비스번호",
+          "phyNm": "HOPE_SVC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "실명인증여부",
+          "phyNm": "RLNM_CRTF_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "개통희망일자",
+          "phyNm": "OPNG_HOPE_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "가입신청취소일시",
+          "phyNm": "SBSC_APLY_CNCL_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "가입신청반려사유유형코드",
+          "phyNm": "SBSC_APLY_RJCT_RSN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "고객이 가입을 신청한다(신규 고객은 실명인증 뒤 확정 — 선택)"
+        },
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "요금을 묶을 청구계정 지정(신규 계정 생성 전 선택)"
+        },
+        {
+          "toEnt": "판매점기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "유치 판매점이 신청을 접수한다(유치 수수료 근거, STL)"
+        },
+        {
+          "toEnt": "상품기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "신청 대표 요금제(세부 신청 상품은 가입신청상세)"
+        },
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "신청이 개통되면 가입계약이 생긴다(법인 다회선 신청 = 1:N, 반려·철회 = 0)"
+        },
+        {
+          "toEnt": "번호이동신청기본",
+          "toArea": "ORD",
+          "card": "1:1",
+          "idn": false,
+          "opt": true,
+          "nm": "번호이동 전입 신청은 번호이동신청을 동반한다"
+        }
+      ]
+    },
+    {
+      "entNm": "가입계약기본",
+      "phyNm": "SBSC_CTRT_BAS",
+      "tblNm": "PTL_ORD_SBSC_CTRT_M",
+      "tp": "ACT",
+      "def": "고객이 회선 하나를 이용하기 위해 맺은 이용 계약(회선 단위 계약). 청구계정·관리 대리점이 귀속되고 개통부터 해지까지의 계약 상태를 가진다. 명의변경은 기존 계약 종료 + 새 계약 생성(회선 유지).",
+      "keyAttrs": [
+        {
+          "attrNm": "가입계약번호",
+          "phyNm": "SBSC_CTRT_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "가입계약명",
+          "phyNm": "SBSC_CTRT_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "가입계약일시",
+          "phyNm": "SBSC_CTRT_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "가입계약상태유형코드",
+          "phyNm": "SBSC_CTRT_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "고객번호",
+          "phyNm": "CUST_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "청구계정번호",
+          "phyNm": "BILL_ACNT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "가입신청번호",
+          "phyNm": "SBSC_APLY_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "대리점번호",
+          "phyNm": "AGNC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "가입계약유형코드",
+          "phyNm": "SBSC_CTRT_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "서비스유형코드",
+          "phyNm": "SVC_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "서비스번호",
+          "phyNm": "SVC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "개통일시",
+          "phyNm": "OPNG_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "해지일시",
+          "phyNm": "TRMN_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "해지사유유형코드",
+          "phyNm": "TRMN_RSN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "고객은 여러 회선 계약을 가진다(S1 멱법칙 — 법인 1곳 100만+)"
+        },
+        {
+          "toEnt": "청구계정기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "계약 요금은 청구계정 하나에 묶여 청구된다"
+        },
+        {
+          "toEnt": "대리점기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "관리 대리점(관리수수료·유치 실적 귀속, S10) — 온라인 직영 개통은 없음"
+        },
+        {
+          "toEnt": "회선기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "계약 대상 회선. 명의변경 시 회선은 유지되고 계약만 바뀌므로 회선 1 : 계약 N(시점별 활성 1)"
+        },
+        {
+          "toEnt": "가입신청기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "개통 근거 신청(이관·전환 데이터는 신청 없음)"
+        },
+        {
+          "toEnt": "가입상품기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "nm": "계약에 요금제·부가서비스·할인이 가입된다"
+        },
+        {
+          "toEnt": "약정계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "약정·재약정(시점별 활성 1)"
+        },
+        {
+          "toEnt": "단말할부계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "기기변경마다 할부 계약이 생긴다"
+        },
+        {
+          "toEnt": "결합구성회선관계",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "결합계약과의 N:M 을 결합구성회선관계(기본 엔터티)로 해소"
+        },
+        {
+          "toEnt": "유치수수료내역",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "개통 건별 유치 수수료(PRM 쪽 FK, STL)"
+        },
+        {
+          "toEnt": "관리수수료내역",
+          "toArea": "PRM",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "유지 회선 월 관리 수수료(PRM 쪽 FK, STL)"
+        },
+        {
+          "toEnt": "직권해지기본",
+          "toArea": "COL",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "미납 직권해지 대상 계약(COL 쪽 FK)"
+        },
+        {
+          "toEnt": "번호이동신청기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "전출 = 해지되는 기존 계약(전입은 NULL)"
+        },
+        {
+          "toEnt": "결합계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "대표 회선 계약(역할명 대표가입계약번호)"
+        },
+        {
+          "toEnt": "회선상태이력",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "변경 시점 계약(업무 키 보존)"
+        }
+      ]
+    },
+    {
+      "entNm": "회선기본",
+      "phyNm": "LINE_BAS",
+      "tblNm": "PTL_ORD_LINE_M",
+      "tp": "BASE",
+      "def": "서비스가 실제 제공되는 이동통신 회선 실체. 서비스관리번호로 식별하며 서비스번호·유심(IMSI)·단말(IMEI)이 연결된다. 사용량·요금계산·이용정지가 모두 이 회선을 기준으로 붙는다. 번호변경으로 서비스번호가 바뀌어도 서비스관리번호는 그대로.",
+      "keyAttrs": [
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "회선명",
+          "phyNm": "LINE_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "회선등록일시",
+          "phyNm": "LINE_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "회선상태유형코드",
+          "phyNm": "LINE_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "서비스번호",
+          "phyNm": "SVC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "유심상품코드",
+          "phyNm": "USIM_PROD_CD",
+          "role": "ATTR",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "유심일련번호",
+          "phyNm": "USIM_SN",
+          "role": "ATTR",
+          "domNm": "일련번호V20"
+        },
+        {
+          "attrNm": "IMSI번호",
+          "phyNm": "IMSI_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "단말모델코드",
+          "phyNm": "EQP_MDL_CD",
+          "role": "ATTR",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "IMEI번호",
+          "phyNm": "IMEI_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "서비스유형코드",
+          "phyNm": "SVC_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "망유형코드",
+          "phyNm": "NTWK_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "eSIM여부",
+          "phyNm": "ESIM_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "개통일시",
+          "phyNm": "OPNG_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "해지일시",
+          "phyNm": "TRMN_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "서비스번호기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "회선이 쓰는 서비스번호 — 번호 재사용으로 한 번호에 시기별 여러 회선(S8)"
+        },
+        {
+          "toEnt": "유심상품기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "장착 유심 종류(USIM·eSIM)"
+        },
+        {
+          "toEnt": "단말모델기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "현재 단말 모델(자급제 미확인 단말은 NULL — S5)"
+        },
+        {
+          "toEnt": "회선상태이력",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "nm": "회선 상태 변경은 원인과 무관하게 회선상태이력 한 곳에 남는다(P2)"
+        },
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "nm": "회선 1 : 계약 N(명의변경)"
+        },
+        {
+          "toEnt": "사용내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "사용 발생 회선(초대용량 — PAY 쪽 FK)"
+        },
+        {
+          "toEnt": "이용정지기본",
+          "toArea": "COL",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "미납 이용정지 대상 회선(COL 쪽 FK, 결과는 회선상태이력)"
+        },
+        {
+          "toEnt": "사용량월집계",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": true,
+          "opt": true,
+          "nm": "집계 대상 회선(식별)"
+        },
+        {
+          "toEnt": "청구상세",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "라인 발생 회선(청구계정 단위 요금은 없음)"
+        }
+      ]
+    },
+    {
+      "entNm": "서비스번호기본",
+      "phyNm": "SVC_NO_BAS",
+      "tblNm": "PTL_ORD_SVC_NO_M",
+      "tp": "BASE",
+      "def": "010 이동전화 번호 자원. 할당·사용·회수·재사용대기(해지 후 일정 기간 미할당)의 생애주기를 가진다. 같은 번호가 해지 후 다른 고객에게 재할당될 수 있다(S8).",
+      "keyAttrs": [
+        {
+          "attrNm": "서비스번호",
+          "phyNm": "SVC_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "서비스번호명",
+          "phyNm": "SVC_NO_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "서비스번호등록일시",
+          "phyNm": "SVC_NO_REG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "서비스번호상태유형코드",
+          "phyNm": "SVC_NO_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "서비스번호등급유형코드",
+          "phyNm": "SVC_NO_GRD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "국번호",
+          "phyNm": "EXCH_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "원통신사업자번호",
+          "phyNm": "ORGN_CARR_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "번호이동전입여부",
+          "phyNm": "MNP_MVIN_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "최종할당일시",
+          "phyNm": "LAST_ASGN_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "최종회수일시",
+          "phyNm": "LAST_RTRVL_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "재사용가능일자",
+          "phyNm": "RE_USE_PSBL_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "서비스번호할당횟수",
+          "phyNm": "SVC_NO_ASGN_NMTM",
+          "role": "ATTR",
+          "domNm": "수N5"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "회선기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "시기별로 여러 회선이 같은 번호를 쓴다(재사용, 동시 활성 1)"
+        },
+        {
+          "toEnt": "통신사업자기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "번호 원래 할당 사업자(역할명 원통신사업자번호, 번호이동 전입 번호만)"
+        },
+        {
+          "toEnt": "번호이동신청기본",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "번호이동 대상 번호"
+        }
+      ]
+    },
+    {
+      "entNm": "가입상품기본",
+      "phyNm": "SBSC_PROD_BAS",
+      "tblNm": "PTL_ORD_SBSC_PROD_M",
+      "tp": "ACT",
+      "def": "가입계약(회선)에 실제 가입된 상품 인스턴스 — 요금제 1개(대표)와 부가서비스·할인상품 여러 개. 요금계산의 근거가 되며 적용 기간(유효시작·종료)을 가진다.",
+      "keyAttrs": [
+        {
+          "attrNm": "가입상품번호",
+          "phyNm": "SBSC_PROD_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "가입상품명",
+          "phyNm": "SBSC_PROD_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "상품가입일시",
+          "phyNm": "PROD_SBSC_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "가입상품상태유형코드",
+          "phyNm": "SBSC_PROD_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "가입계약번호",
+          "phyNm": "SBSC_CTRT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "role": "ATTR",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "상품유형코드",
+          "phyNm": "PROD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "대표상품여부",
+          "phyNm": "RPRS_PROD_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "상품해지일시",
+          "phyNm": "PROD_TRMN_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "상품해지사유유형코드",
+          "phyNm": "PROD_TRMN_RSN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "판매점번호",
+          "phyNm": "SHOP_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "계약에 속한 상품 인스턴스"
+        },
+        {
+          "toEnt": "상품기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "가입 인스턴스 ← 상품 정의(S2 요금제 1개 = 35%)"
+        },
+        {
+          "toEnt": "판매점기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "부가서비스 유치 판매점(대부분 NULL — S5)"
+        },
+        {
+          "toEnt": "요금계산내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "요금 근거 가입상품(PAY 쪽 FK)"
+        }
+      ]
+    },
+    {
+      "entNm": "약정계약기본",
+      "phyNm": "AGRMT_CTRT_BAS",
+      "tblNm": "PTL_ORD_AGRMT_CTRT_M",
+      "tp": "ACT",
+      "def": "가입계약에 붙는 약정(12·24개월) 계약. 지원금 유형(공시지원금 또는 선택약정 25% 요금할인)과 약정 기간을 가지며 중도 해지·변경 시 위약금 부과 근거가 된다.",
+      "keyAttrs": [
+        {
+          "attrNm": "약정계약번호",
+          "phyNm": "AGRMT_CTRT_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "약정계약명",
+          "phyNm": "AGRMT_CTRT_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "약정계약일시",
+          "phyNm": "AGRMT_CTRT_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "약정계약상태유형코드",
+          "phyNm": "AGRMT_CTRT_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "가입계약번호",
+          "phyNm": "SBSC_CTRT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "약정상품코드",
+          "phyNm": "AGRMT_PROD_CD",
+          "role": "ATTR",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "지원금유형코드",
+          "phyNm": "SUBSD_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "약정개월수",
+          "phyNm": "AGRMT_MCNT",
+          "role": "ATTR",
+          "domNm": "수N5"
+        },
+        {
+          "attrNm": "약정시작일자",
+          "phyNm": "AGRMT_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "약정종료일자",
+          "phyNm": "AGRMT_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "공시지원금",
+          "phyNm": "PBANC_SUBSD",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "추가지원금",
+          "phyNm": "ADD_SUBSD",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "선택약정할인율",
+          "phyNm": "CHC_AGRMT_DSCNT_RT",
+          "role": "ATTR",
+          "domNm": "율N5_2"
+        },
+        {
+          "attrNm": "재약정여부",
+          "phyNm": "RE_AGRMT_YN",
+          "role": "ATTR",
+          "domNm": "여부C1"
+        },
+        {
+          "attrNm": "약정해지일시",
+          "phyNm": "AGRMT_TRMN_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "약정이 걸린 계약(재약정으로 시기별 N)"
+        },
+        {
+          "toEnt": "약정상품기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "약정 규칙·위약금 기준 참조"
+        },
+        {
+          "toEnt": "위약금부과내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "해지·변경 시 위약금(PAY 쪽 FK)"
+        }
+      ]
+    },
+    {
+      "entNm": "단말할부계약기본",
+      "phyNm": "EQP_INSTL_CTRT_BAS",
+      "tblNm": "PTL_ORD_EQP_INSTL_CTRT_M",
+      "tp": "ACT",
+      "def": "단말 구매 대금을 월 요금과 함께 나눠 내는 할부 계약. 할부원금·개월수·이자율(할부수수료)을 가지며 회차별 계획은 단말할부상세, 회차 청구는 PAY 단말할부청구상세.",
+      "keyAttrs": [
+        {
+          "attrNm": "단말할부계약번호",
+          "phyNm": "EQP_INSTL_CTRT_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "단말할부계약명",
+          "phyNm": "EQP_INSTL_CTRT_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "단말할부계약일시",
+          "phyNm": "EQP_INSTL_CTRT_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "단말할부계약상태유형코드",
+          "phyNm": "EQP_INSTL_CTRT_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "가입계약번호",
+          "phyNm": "SBSC_CTRT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "단말모델코드",
+          "phyNm": "EQP_MDL_CD",
+          "role": "ATTR",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "IMEI번호",
+          "phyNm": "IMEI_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "단말출고가격",
+          "phyNm": "EQP_SHPM_PRC",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "할부원금",
+          "phyNm": "INSTL_PRNC",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "할부개월수",
+          "phyNm": "INSTL_MCNT",
+          "role": "ATTR",
+          "domNm": "수N5"
+        },
+        {
+          "attrNm": "할부이자율",
+          "phyNm": "INSTL_INTRT",
+          "role": "ATTR",
+          "domNm": "율N5_2"
+        },
+        {
+          "attrNm": "월할부금액",
+          "phyNm": "MM_INSTL_AMT",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "할부시작청구년월",
+          "phyNm": "INSTL_BGNG_BILL_YM",
+          "role": "ATTR",
+          "domNm": "년월C6"
+        },
+        {
+          "attrNm": "할부잔여원금",
+          "phyNm": "INSTL_RMND_PRNC",
+          "role": "ATTR",
+          "domNm": "금액N15"
+        },
+        {
+          "attrNm": "할부완료일자",
+          "phyNm": "INSTL_CMPTN_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "할부가 걸린 계약(기기변경마다 N)"
+        },
+        {
+          "toEnt": "단말모델기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "할부 단말 모델"
+        },
+        {
+          "toEnt": "단말할부상세",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "nm": "회차별 원금·이자 계획(기본 엔터티, PAY 단말할부청구상세가 참조)"
+        }
+      ]
+    },
+    {
+      "entNm": "번호이동신청기본",
+      "phyNm": "MNP_APLY_BAS",
+      "tblNm": "PTL_ORD_MNP_APLY_M",
+      "tp": "ACT",
+      "def": "번호이동(MNP) 전입·전출 신청. 번호이동 관리기관(KTOA) 중계로 본인인증·상대 사업자 승인을 거쳐 완료된다. 전입은 가입신청과, 전출은 기존 가입계약 해지와 짝을 이룬다.",
+      "keyAttrs": [
+        {
+          "attrNm": "번호이동신청번호",
+          "phyNm": "MNP_APLY_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "번호이동신청명",
+          "phyNm": "MNP_APLY_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "번호이동신청일시",
+          "phyNm": "MNP_APLY_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "번호이동신청상태유형코드",
+          "phyNm": "MNP_APLY_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "번호이동구분코드",
+          "phyNm": "MNP_SE_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "서비스번호",
+          "phyNm": "SVC_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "가입신청번호",
+          "phyNm": "SBSC_APLY_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "가입계약번호",
+          "phyNm": "SBSC_CTRT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "통신사업자번호",
+          "phyNm": "CARR_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "번호이동인증유형코드",
+          "phyNm": "MNP_CRTF_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "번호이동접수번호",
+          "phyNm": "MNP_ACPT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "번호이동완료일시",
+          "phyNm": "MNP_CMPTN_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "번호이동거절사유유형코드",
+          "phyNm": "MNP_RFSL_RSN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "서비스번호기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "이동 대상 번호(같은 번호가 전입·전출을 반복 — N)"
+        },
+        {
+          "toEnt": "가입신청기본",
+          "toArea": "ORD",
+          "card": "1:1",
+          "idn": false,
+          "opt": true,
+          "nm": "전입 = 가입신청 동반(전출은 NULL)"
+        },
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "전출 = 해지되는 기존 계약(전입은 NULL)"
+        },
+        {
+          "toEnt": "통신사업자기본",
+          "toArea": "PRM",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "전출·전입 상대 사업자"
+        },
+        {
+          "toEnt": "번호이동이력",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "nm": "인증·승인·완료 진행 상태(기본 엔터티)"
+        }
+      ]
+    },
+    {
+      "entNm": "결합계약기본",
+      "phyNm": "CMBN_CTRT_BAS",
+      "tblNm": "PTL_ORD_CMBN_CTRT_M",
+      "tp": "ACT",
+      "def": "여러 회선(가족결합)·유무선(인터넷·IPTV 포함)을 묶어 할인받는 결합상품 계약. 구성 회선은 결합구성회선관계로 연결하고, 결합 할인은 PAY 결합할인배분내역에서 회선별로 배분한다.",
+      "keyAttrs": [
+        {
+          "attrNm": "결합계약번호",
+          "phyNm": "CMBN_CTRT_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "결합계약명",
+          "phyNm": "CMBN_CTRT_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "결합계약일시",
+          "phyNm": "CMBN_CTRT_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "결합계약상태유형코드",
+          "phyNm": "CMBN_CTRT_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "결합상품코드",
+          "phyNm": "CMBN_PROD_CD",
+          "role": "ATTR",
+          "domNm": "코드V20"
+        },
+        {
+          "attrNm": "대표고객번호",
+          "phyNm": "RPRS_CUST_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "대표가입계약번호",
+          "phyNm": "RPRS_SBSC_CTRT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "결합유형코드",
+          "phyNm": "CMBN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "결합회선수",
+          "phyNm": "CMBN_LINE_CNT",
+          "role": "ATTR",
+          "domNm": "수N5"
+        },
+        {
+          "attrNm": "결합시작일자",
+          "phyNm": "CMBN_BGNG_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "결합종료일자",
+          "phyNm": "CMBN_END_DT",
+          "role": "ATTR",
+          "domNm": "일자C8"
+        },
+        {
+          "attrNm": "결합해지사유유형코드",
+          "phyNm": "CMBN_TRMN_RSN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "결합상품기본",
+          "toArea": "PRD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "결합 규칙·할인 기준"
+        },
+        {
+          "toEnt": "고객기본",
+          "toArea": "CUS",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "결합 대표 고객(역할명 대표고객번호)"
+        },
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": false,
+          "nm": "대표 회선 계약(역할명 대표가입계약번호)"
+        },
+        {
+          "toEnt": "결합구성회선관계",
+          "toArea": "ORD",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "nm": "구성 회선 — 가입계약과의 N:M 해소(기본 엔터티)"
+        },
+        {
+          "toEnt": "결합할인배분내역",
+          "toArea": "PAY",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "nm": "결합 계약 단위 할인 배분(PAY 쪽 FK)"
+        }
+      ]
+    },
+    {
+      "entNm": "회선상태이력",
+      "phyNm": "LINE_STTS_HIST",
+      "tblNm": "PTL_ORD_LINE_STTS_H",
+      "tp": "ACT",
+      "def": "개통·일시정지·분실정지·미납 이용정지·해지 등 회선 상태가 바뀔 때마다 남는 이력. 원인 업무(ORD 고객 요청·COL 미납 처리)와 무관하게 이 한 곳에 통합하며(P2) 유효시작·종료일시로 SCD2 를 이룬다.",
+      "keyAttrs": [
+        {
+          "attrNm": "서비스관리번호",
+          "phyNm": "SVC_MGMT_NO",
+          "role": "PK",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "회선상태이력순번",
+          "phyNm": "LINE_STTS_HIST_SEQ",
+          "role": "PK",
+          "domNm": "순번N10"
+        },
+        {
+          "attrNm": "회선상태이력명",
+          "phyNm": "LINE_STTS_HIST_NM",
+          "role": "NM",
+          "domNm": "명V100"
+        },
+        {
+          "attrNm": "회선상태변경일시",
+          "phyNm": "LINE_STTS_CHG_DTM",
+          "role": "DTM",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "회선상태유형코드",
+          "phyNm": "LINE_STTS_TY_CD",
+          "role": "STS",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "이전회선상태유형코드",
+          "phyNm": "BFR_LINE_STTS_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "회선상태변경사유유형코드",
+          "phyNm": "LINE_STTS_CHG_RSN_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "상태변경원인업무유형코드",
+          "phyNm": "STTS_CHG_CAUS_TASK_TY_CD",
+          "role": "ATTR",
+          "domNm": "코드V10"
+        },
+        {
+          "attrNm": "가입계약번호",
+          "phyNm": "SBSC_CTRT_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "이용정지번호",
+          "phyNm": "SUSP_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "직권해지번호",
+          "phyNm": "EXOFTRMN_NO",
+          "role": "ATTR",
+          "domNm": "번호V20"
+        },
+        {
+          "attrNm": "유효시작일시",
+          "phyNm": "VLD_BGNG_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        },
+        {
+          "attrNm": "유효종료일시",
+          "phyNm": "VLD_END_DTM",
+          "role": "ATTR",
+          "domNm": "일시TS"
+        }
+      ],
+      "rels": [
+        {
+          "toEnt": "회선기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": true,
+          "opt": false,
+          "nm": "상태가 바뀐 회선(식별 관계)"
+        },
+        {
+          "toEnt": "가입계약기본",
+          "toArea": "ORD",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "변경 시점 계약(업무 키 보존)"
+        },
+        {
+          "toEnt": "이용정지기본",
+          "toArea": "COL",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "미납 이용정지·해제가 원인일 때만(S5 NULL 쏠림)"
+        },
+        {
+          "toEnt": "직권해지기본",
+          "toArea": "COL",
+          "card": "N:1",
+          "idn": false,
+          "opt": true,
+          "nm": "직권해지가 원인일 때만"
+        }
+      ]
+    }
+  ]
+}

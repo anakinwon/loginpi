@@ -1,0 +1,3763 @@
+{
+  "area": "PRD",
+  "areaNm": "상품",
+  "ver": "2026-11-07",
+  "author": "subagent_logical_modeler",
+  "stg": "LGCL",
+  "summary": {
+    "entityCnt": 30,
+    "coreCnt": 10,
+    "basicCnt": 20,
+    "stlCnt": 0,
+    "attrCnt": 244,
+    "relCnt": 44,
+    "newTermCnt": 78,
+    "newWordCnt": 5,
+    "newCodeCnt": 10
+  },
+  "conventions": {
+    "phyNm": "엔터티 phyNm = 접두어 없는 <단어 약어>_<분류어 약어>(02 관문 K1, 개념 모델과 동일). tblNm = 물리 단계 테이블명 미리보기(PTL_PRD_<약어>_<접미어>) — 둘 다 사전에서 기계 변환.",
+    "rels": "엔터티의 rels = 그 엔터티가 자식(FK 보유)인 관계. card 는 부모:자식, idn = FK 가 자식 PK 에 포함, opt = 자식 FK 가 NULL 허용. 다른 영역 부모는 parent = \"<영역>.<엔터티>\". PRD 가 부모이고 자식이 다른 영역인 관계는 그 영역 논리 모델이 소유 — childReq 목록.",
+    "fk": "fk = {ent, attr, area} — attr = 부모 PK 속성명(역할명 FK 도 부모 PK 이름).",
+    "history": "이력(_H)·요율 기간 행 = 부모 PK + 적용(유효)시작 일자/일시(SCD2). 종료 NULL 또는 9999-12-31 = 현재행.",
+    "stl": "PRD 에는 정산 모듈(STL) 엔터티 없음(areas.json moduleEnts.STL = []).",
+    "basicEntRels": "PRD 개념 모델에는 basicEntRels 없음(02 관문 승계 이슈 3 해당 없음). 다른 영역의 basicEntRels 중 PRD 를 가리키는 것(PAY 할인적용내역·PRM 단말재고내역·유심재고내역)은 PRD 핵심 엔터티가 부모라 PRD 쪽 변경 없음."
+  },
+  "entities": [
+    {
+      "entId": "PRD-001",
+      "entNm": "상품기본",
+      "phyNm": "PROD_BAS",
+      "tblNm": "PTL_PRD_PROD_M",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "판매하는 모든 통신 상품(요금제·부가서비스·할인·결합·약정·유심)의 공통 정의(TM Forum SID Product Offering). 유형별 상세 6종의 상위(슈퍼타입). 판매 종료·폐지 후에도 행을 지우지 않고 상태·판매종료일자로 표현한다. 현재 월정액은 여기, 변경 이력은 상품가격이력.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "기본요금항목코드",
+          "phyNm": "BAS_CHRG_ITM_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목코드",
+            "attr": "요금항목코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "기본 요금 항목의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "상품명",
+          "phyNm": "PROD_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "상품의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "상품등록일시",
+          "phyNm": "PROD_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "상품 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "상품상태유형코드",
+          "phyNm": "PROD_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "상품 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "상품유형코드",
+          "phyNm": "PROD_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "상품의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "서비스망유형코드",
+          "phyNm": "SVC_NTWK_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "서비스 망의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "가입대상유형코드",
+          "phyNm": "SBSC_TRGT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "가입 대상의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "판매시작일자",
+          "phyNm": "SALE_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "판매 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "판매종료일자",
+          "phyNm": "SALE_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "판매 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "월정액금액",
+          "phyNm": "MM_FXAMT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "월 정액의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "부가가치세포함여부",
+          "phyNm": "VAT_INCL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 12,
+          "def": "부가가치세 포함의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "상품내용",
+          "phyNm": "PROD_CN",
+          "domNm": "내용V4000",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 13,
+          "def": "상품 설명(약관 요약·홈페이지 안내 문구) — 자유 서술(S9 넓은 행 후보)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "기본 요금항목으로 청구된다",
+          "parent": "PRD.요금항목코드",
+          "child": "PRD.상품기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "기본요금항목코드"
+          ]
+        }
+      ],
+      "chgNote": "논리 보강 : 상품내용",
+      "normNote": "슈퍼타입. 1NF: 서브타입별 속성은 6개 서브타입으로 분리(빈 칼럼 반복 방지). 2NF: 단일 PK. 3NF: 기본 요금항목 이름은 요금항목코드 조회(FK 만). 현재 월정액은 상품가격이력 현재행과 같지만 개념 P7(현재값+이력 쌍) 유지 — 이력이 정본."
+    },
+    {
+      "entId": "PRD-002",
+      "entNm": "요금제기본",
+      "phyNm": "RTPLN_BAS",
+      "tblNm": "PTL_PRD_RTPLN_M",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "음성·문자·데이터 기본제공량과 소진 후 속도 제한(QoS)을 정한 월정액 요금제의 서브타입 상세. 이용약관 신고 대상. 초과 요율·시간대 요율·기본제공 상세 항목은 기본 엔터티(요금제기본제공상세·요금제초과요율상세)로 분리.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "요금제공시명",
+          "phyNm": "RTPLN_PBANC_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "요금제 공시의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "요금제등록일시",
+          "phyNm": "RTPLN_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "요금제 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "요금제약관신고상태유형코드",
+          "phyNm": "RTPLN_TRMS_DCLR_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "요금제 약관 신고 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "요금제유형코드",
+          "phyNm": "RTPLN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "요금제의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "선택약정할인대상여부",
+          "phyNm": "CHC_AGRMT_DSCNT_TRGT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "선택 약정 할인 대상의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "약관신고일자",
+          "phyNm": "TRMS_DCLR_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "이용약관 신고(수리) 일자 — 미신고(작성 중)는 NULL"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상품기본이(가) 요금제기본을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.요금제기본",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "chgNote": "개념 대비 제거 : 기본제공음성분수·기본제공문자건수·기본제공데이터용량·음성무제한여부·데이터무제한여부·소진후제한속도값 / 논리 보강 : 약관신고일자",
+      "normNote": "서브타입(1:1 식별). 1NF: 개념의 기본제공음성분수·기본제공문자건수·기본제공데이터용량·음성/데이터무제한여부·소진후제한속도값은 사용 서비스별 반복 그룹 → 요금제기본제공상세(상품코드+사용서비스유형코드) 행으로 이동(결정 L2). 2NF·3NF 충족."
+    },
+    {
+      "entId": "PRD-003",
+      "entNm": "부가서비스기본",
+      "phyNm": "ADSVC_BAS",
+      "tblNm": "PTL_PRD_ADSVC_M",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "요금제에 덧붙여 가입하는 부가서비스·옵션(통화연결음·데이터 옵션·로밍 요금제·휴대폰 보험·콘텐츠 구독 등)의 서브타입 상세. 망(HLR/HSS) 부가서비스 코드와 연동되며, 제3자 콘텐츠 상품은 PRM 콘텐츠제공사가 공급한다(S2 — 70% 미사용).",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "콘텐츠제공사번호",
+          "phyNm": "CNTS_PRVD_CO_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "콘텐츠제공사기본",
+            "attr": "콘텐츠제공사번호"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "콘텐츠 제공 사의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "부가서비스공시명",
+          "phyNm": "ADSVC_PBANC_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "부가서비스 공시의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "부가서비스등록일시",
+          "phyNm": "ADSVC_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "부가서비스 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "부가서비스망연동상태유형코드",
+          "phyNm": "ADSVC_NTWK_LNK_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "부가서비스 망 연동 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "부가서비스유형코드",
+          "phyNm": "ADSVC_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "부가서비스의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "과금방식유형코드",
+          "phyNm": "RAT_SCHM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "과금 방식의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "망서비스번호",
+          "phyNm": "NTWK_SVC_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "망 서비스의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "무료제공개월수",
+          "phyNm": "FREE_PRVD_MCNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "무료 제공의 개월수 — 기간의 개월 수"
+        },
+        {
+          "attrNm": "중복가입가능여부",
+          "phyNm": "DUP_SBSC_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "중복 가입 가능의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상품기본이(가) 부가서비스기본을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.부가서비스기본",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        },
+        {
+          "relNm": "콘텐츠제공사가 공급한다(자사 서비스는 NULL — S5)",
+          "parent": "PRM.콘텐츠제공사기본",
+          "child": "PRD.부가서비스기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "콘텐츠제공사번호"
+          ]
+        }
+      ],
+      "normNote": "서브타입(1:1 식별). 금액은 요금항목별·기간별로 달라 부가서비스요금상세로 분리(반복 그룹 제거). 3NF: 제공사 이름은 PRM 조회."
+    },
+    {
+      "entId": "PRD-004",
+      "entNm": "할인상품기본",
+      "phyNm": "DSCNT_PROD_BAS",
+      "tblNm": "PTL_PRD_DSCNT_PROD_M",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "요금에서 빼 주는 할인 규칙(선택약정 25%·장기고객·복지·제휴카드·결합·임직원·프로모션)의 서브타입 상세. 정률·정액 방식과 한도, 대상 요금항목, 할인이 청구서에 찍히는 할인 요금항목을 정한다. 조건·구간별 할인율은 기본 엔터티(할인조건상세·할인율상세).",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "할인대상요금항목코드",
+          "phyNm": "DSCNT_TRGT_CHRG_ITM_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목코드",
+            "attr": "요금항목코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "할인 대상 요금 항목의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "할인요금항목코드",
+          "phyNm": "DSCNT_CHRG_ITM_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목코드",
+            "attr": "요금항목코드"
+          },
+          "nullYn": false,
+          "seq": 3,
+          "def": "할인 요금 항목의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "제휴파트너번호",
+          "phyNm": "ALNC_PRTNR_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": {
+            "area": "PRM",
+            "ent": "파트너기본",
+            "attr": "파트너번호"
+          },
+          "nullYn": true,
+          "seq": 4,
+          "def": "제휴 파트너의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
+        },
+        {
+          "attrNm": "할인공시명",
+          "phyNm": "DSCNT_PBANC_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "할인 공시의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "할인상품등록일시",
+          "phyNm": "DSCNT_PROD_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "할인 상품 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "할인승인상태유형코드",
+          "phyNm": "DSCNT_APRV_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "할인 승인 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "할인유형코드",
+          "phyNm": "DSCNT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "할인의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "할인방식유형코드",
+          "phyNm": "DSCNT_SCHM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "할인 방식의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "할인율",
+          "phyNm": "DSCNT_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "할인의 율 — 비율(백분율, 소수 2자리)"
+        },
+        {
+          "attrNm": "할인금액",
+          "phyNm": "DSCNT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 11,
+          "def": "할인의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "할인한도금액",
+          "phyNm": "DSCNT_LMT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 12,
+          "def": "할인 한도의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "중복할인가능여부",
+          "phyNm": "DUP_DSCNT_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 13,
+          "def": "중복 할인 가능의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상품기본이(가) 할인상품기본을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.할인상품기본",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        },
+        {
+          "relNm": "이 요금항목을 할인 대상으로 한다(전체 대상이면 NULL)",
+          "parent": "PRD.요금항목코드",
+          "child": "PRD.할인상품기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "할인대상요금항목코드"
+          ]
+        },
+        {
+          "relNm": "할인 금액이 이 요금항목으로 청구된다",
+          "parent": "PRD.요금항목코드",
+          "child": "PRD.할인상품기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "할인요금항목코드"
+          ]
+        },
+        {
+          "relNm": "제휴 할인을 후원하는 파트너(역할명 제휴파트너번호)",
+          "parent": "PRM.파트너기본",
+          "child": "PRD.할인상품기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "제휴파트너번호"
+          ]
+        }
+      ],
+      "normNote": "서브타입(1:1 식별). 대표 정률·정액만 여기, 조건·단계는 할인조건상세·할인율상세(반복 그룹 제거). 3NF: 요금항목·파트너 이름은 FK 조회."
+    },
+    {
+      "entId": "PRD-005",
+      "entNm": "결합상품기본",
+      "phyNm": "CMBN_PROD_BAS",
+      "tblNm": "PTL_PRD_CMBN_PROD_M",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "여러 회선·상품을 묶어 할인하는 결합 규칙(유무선 결합·가족 무선 결합·인터넷+IPTV·법인 결합)의 서브타입 상세. 결합 가능 회선 수·가족관계 확인·결합할인 상품과 배분 방식을 정한다. 구성 상품·회선별 할인은 기본 엔터티(결합구성상세·결합할인상세).",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "결합할인상품코드",
+          "phyNm": "CMBN_DSCNT_PROD_CD",
+          "domNm": "코드V20",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "할인상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "결합 할인 상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "결합상품공시명",
+          "phyNm": "CMBN_PROD_PBANC_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "결합 상품 공시의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "결합상품등록일시",
+          "phyNm": "CMBN_PROD_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "결합 상품 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "결합상품운영상태유형코드",
+          "phyNm": "CMBN_PROD_OPER_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "결합 상품 운영 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "결합유형코드",
+          "phyNm": "CMBN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "결합의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "최소결합회선수",
+          "phyNm": "MIN_CMBN_LINE_CNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "최소 결합 회선의 수 — 개수·인원 등 셀 수 있는 수"
+        },
+        {
+          "attrNm": "최대결합회선수",
+          "phyNm": "MAX_CMBN_LINE_CNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "최대 결합 회선의 수 — 개수·인원 등 셀 수 있는 수"
+        },
+        {
+          "attrNm": "결합할인배분방식유형코드",
+          "phyNm": "CMBN_DSCNT_ALLC_SCHM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "결합 할인 배분 방식의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "가족관계확인필요여부",
+          "phyNm": "FMLY_REL_IDNTF_NEED_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "가족 관계 확인 필요의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상품기본이(가) 결합상품기본을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.결합상품기본",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        },
+        {
+          "relNm": "결합할인 규칙을 쓴다(역할명 결합할인상품코드)",
+          "parent": "PRD.할인상품기본",
+          "child": "PRD.결합상품기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "결합할인상품코드"
+          ]
+        }
+      ],
+      "normNote": "서브타입(1:1 식별). 구성·회선 수별 할인은 결합구성상세·결합할인상세(반복 그룹 제거). 3NF 충족 — 유선상품포함여부는 결합유형코드·결합구성상세에서 유도되므로 제거(관문 G1)."
+    },
+    {
+      "entId": "PRD-006",
+      "entNm": "약정상품기본",
+      "phyNm": "AGRMT_PROD_BAS",
+      "tblNm": "PTL_PRD_AGRMT_PROD_M",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "일정 기간 이용을 약속하고 혜택을 받는 약정 규칙(선택약정 요금할인 25%·공시지원금 약정·기기·요금·결합 약정)의 서브타입 상세. 약정 개월 수·위약금(할인반환금·지원금 반환) 산정 방식과 상한을 정한다. 경과 기간별 위약금 구간은 기본 엔터티(약정위약금상세).",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "연계할인상품코드",
+          "phyNm": "LNKG_DSCNT_PROD_CD",
+          "domNm": "코드V20",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "할인상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "연계 할인 상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "약정상품공시명",
+          "phyNm": "AGRMT_PROD_PBANC_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "약정 상품 공시의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "약정상품등록일시",
+          "phyNm": "AGRMT_PROD_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "약정 상품 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "약정상품운영상태유형코드",
+          "phyNm": "AGRMT_PROD_OPER_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "약정 상품 운영 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "약정유형코드",
+          "phyNm": "AGRMT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "약정의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "약정개월수",
+          "phyNm": "AGRMT_MCNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "약정의 개월수 — 기간의 개월 수"
+        },
+        {
+          "attrNm": "위약금산정방식유형코드",
+          "phyNm": "PNLT_ASMT_SCHM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "위약금 산정 방식의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "위약금상한금액",
+          "phyNm": "PNLT_UPLMT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "위약금 상한의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "재약정가능여부",
+          "phyNm": "RE_AGRMT_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "재 약정 가능의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "약정승계가능여부",
+          "phyNm": "AGRMT_SCSN_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "약정 승계 가능의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상품기본이(가) 약정상품기본을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.약정상품기본",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        },
+        {
+          "relNm": "선택약정 할인 규칙을 쓴다(역할명 연계할인상품코드)",
+          "parent": "PRD.할인상품기본",
+          "child": "PRD.약정상품기본",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "연계할인상품코드"
+          ]
+        }
+      ],
+      "normNote": "서브타입(1:1 식별). 경과 구간별 위약금은 약정위약금상세. 선택약정할인율 제거 — 연계할인상품코드 → 할인상품기본.할인율 이행 종속(관문 G1, L6 대체). ORD.약정계약기본은 가입 당시 값을 자기 속성으로 보존."
+    },
+    {
+      "entId": "PRD-007",
+      "entNm": "단말모델기본",
+      "phyNm": "EQP_MDL_BAS",
+      "tblNm": "PTL_PRD_EQP_MDL_M",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "판매·개통 가능한 단말 모델(스마트폰·피처폰·태블릿·웨어러블·라우터·IoT 모듈)의 기준 정보. 판매 상품(상품기본)이 아니라 단말 카탈로그라 별도 주식별자(단말모델코드). 현재 출고가·공시지원금은 여기, 변경 이력은 기본 엔터티(단말출고가이력·공시지원금이력 — 단말기유통법 공시). 개별 단말 재고는 PRM.",
+      "attrs": [
+        {
+          "attrNm": "단말모델코드",
+          "phyNm": "EQP_MDL_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "단말 모델의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "단말모델명",
+          "phyNm": "EQP_MDL_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "단말 모델의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "단말모델등록일시",
+          "phyNm": "EQP_MDL_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "단말 모델 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "단말모델판매상태유형코드",
+          "phyNm": "EQP_MDL_SALE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "단말 모델 판매 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "제조사유형코드",
+          "phyNm": "MNFCT_CO_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "제조 사의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "단말유형코드",
+          "phyNm": "EQP_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "단말의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "서비스망유형코드",
+          "phyNm": "SVC_NTWK_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "서비스 망의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "출시일자",
+          "phyNm": "LNCH_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "출시의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "단말출고가격",
+          "phyNm": "EQP_SHPM_PRC",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "단말 출고의 가격 — 재화의 판매·출고 가격"
+        },
+        {
+          "attrNm": "eSIM지원여부",
+          "phyNm": "ESIM_SPRT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "eSIM 지원의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "자급제여부",
+          "phyNm": "SLFSPLY_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 11,
+          "def": "자급제의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [],
+      "normNote": "독립 기준 엔터티. 3NF: 제조사 이름은 코드값. 현재 출고가는 현재값+이력 쌍(01 §5-1). 공시지원금 제거 — 값이 (단말모델, 요금제)에 종속(공시지원금이력이 원천, 관문 G1·L7 대체)."
+    },
+    {
+      "entId": "PRD-008",
+      "entNm": "유심상품기본",
+      "phyNm": "USIM_PROD_BAS",
+      "tblNm": "PTL_PRD_USIM_PROD_M",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "회선에 장착하는 가입자 식별 모듈 상품(USIM·eSIM·NFC 유심·IoT 유심)의 서브타입 상세. 종류·형태·판매가(유심비)를 정한다. 개별 유심 일련번호·재고는 PRM, 회선 장착은 ORD.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "유심상품공시명",
+          "phyNm": "USIM_PROD_PBANC_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "유심 상품 공시의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "유심상품등록일시",
+          "phyNm": "USIM_PROD_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "유심 상품 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "유심상품공급상태유형코드",
+          "phyNm": "USIM_PROD_SPLY_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "유심 상품 공급 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "유심종류코드",
+          "phyNm": "USIM_KND_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "유심의 종류 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "유심형태유형코드",
+          "phyNm": "USIM_FORM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "유심 형태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "유심판매가격",
+          "phyNm": "USIM_SALE_PRC",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "유심 판매의 가격 — 재화의 판매·출고 가격"
+        },
+        {
+          "attrNm": "NFC지원여부",
+          "phyNm": "NFC_SPRT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "NFC 지원의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상품기본이(가) 유심상품기본을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.유심상품기본",
+          "card": "1:1",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "chgNote": "개념 대비 제거 : 서비스망유형코드",
+      "normNote": "서브타입(1:1 식별). 서비스망유형코드는 슈퍼타입(상품기본)에 이미 있어 제거(결정 L3 — 중복 속성 제거). 2NF·3NF 충족."
+    },
+    {
+      "entId": "PRD-009",
+      "entNm": "요금항목코드",
+      "phyNm": "CHRG_ITM_CD",
+      "tblNm": "PTL_PRD_CHRG_ITM_C",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "청구서 한 줄이 되는 과금 항목 체계(월정액·통화료·데이터료·부가사용료·할인·단말할부금·위약금·조정·부가가치세·연체가산금·소액결제 대행). 사용량 Rating·요금계산·청구상세·수납배분이 모두 이 코드로 이어진다. 과세 유형·청구서 출력 순서·수납배분 우선순위를 가진다.",
+      "attrs": [
+        {
+          "attrNm": "요금항목코드",
+          "phyNm": "CHRG_ITM_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "요금 항목의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "요금항목분류코드",
+          "phyNm": "CHRG_ITM_CLSF_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목분류코드",
+            "attr": "요금항목분류코드"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "상위 분류(청구서 소계 단위) — 개념의 요금항목분류유형코드를 기준 엔터티 FK 로 대체(결정 L4)"
+        },
+        {
+          "attrNm": "요금항목명",
+          "phyNm": "CHRG_ITM_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "요금 항목의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "요금항목등록일시",
+          "phyNm": "CHRG_ITM_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "요금 항목 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "요금항목사용상태유형코드",
+          "phyNm": "CHRG_ITM_USE_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "요금 항목 사용 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "요금항목유형코드",
+          "phyNm": "CHRG_ITM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "요금 항목의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "과세유형코드",
+          "phyNm": "TXTN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "과세의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "청구서출력순번",
+          "phyNm": "INVC_OUTPT_SEQ",
+          "domNm": "순번N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "청구서 출력의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "수납배분우선순위",
+          "phyNm": "RCV_ALLC_PRRT",
+          "domNm": "순번N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "수납 배분의 우선순위 — 여러 대상 중 먼저 처리하는 순서"
+        },
+        {
+          "attrNm": "할인대상여부",
+          "phyNm": "DSCNT_TRGT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 10,
+          "def": "할인 대상의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "분류에 속한다",
+          "parent": "PRD.요금항목분류코드",
+          "child": "PRD.요금항목코드",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "요금항목분류코드"
+          ]
+        }
+      ],
+      "chgNote": "개념 대비 제거 : 요금항목분류유형코드 / 논리 보강 : 요금항목분류코드",
+      "normNote": "3NF: 개념의 요금항목분류유형코드(공통코드)를 요금항목분류코드 엔터티 FK 로 대체 — 분류가 계층·출력 순번을 가져 기준 엔터티(결정 L4). 분류명은 FK 조회."
+    },
+    {
+      "entId": "PRD-010",
+      "entNm": "상품가격이력",
+      "phyNm": "PROD_PRC_HIST",
+      "tblNm": "PTL_PRD_PROD_PRC_H",
+      "tp": "REF",
+      "stg": "CNCP",
+      "def": "상품별 월정액·가격 변경 이력(적용 시작·종료 일시, SCD2). 과거 청구월의 요금 재계산·소급 조정 때 그 시점 가격을 재현한다. 현재 가격은 상품기본.월정액금액. 단말 출고가·공시지원금 이력은 단말모델 쪽 기본 엔터티.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "가격적용시작일시",
+          "phyNm": "PRC_APLCN_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "가격 적용 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "적용상품명",
+          "phyNm": "APLCN_PROD_NM",
+          "domNm": "명V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "적용 상품의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "가격변경일시",
+          "phyNm": "PRC_CHG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "가격 변경의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "가격적용상태유형코드",
+          "phyNm": "PRC_APLCN_STTS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "가격 적용 상태의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "가격적용종료일시",
+          "phyNm": "PRC_APLCN_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "가격 적용 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "월정액금액",
+          "phyNm": "MM_FXAMT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "월 정액의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "가격변경사유유형코드",
+          "phyNm": "PRC_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "가격 변경 사유의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "부가가치세포함여부",
+          "phyNm": "VAT_INCL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "부가가치세 포함의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상품기본이(가) 상품가격이력을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.상품가격이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "normNote": "SCD2 이력(상품코드+가격적용시작일시). 적용상품명은 당시 명칭 스냅숏(시점 보존). 이전월정액금액 제거 — 직전 이력 행에서 유도(관문 G1, 물리 반정규화 후보)."
+    },
+    {
+      "entId": "PRD-011",
+      "entNm": "상품구성관계",
+      "phyNm": "PROD_CMPS_REL",
+      "tblNm": "PTL_PRD_PROD_CMPS_R",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "패키지 상품(요금제 + 필수 부가서비스 묶음 등)의 상위 상품 ↔ 구성 상품 N:M 해소(SID BundledProductOffering).",
+      "attrs": [
+        {
+          "attrNm": "상위상품코드",
+          "phyNm": "UP_PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상위 상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "구성상품코드",
+          "phyNm": "CMPS_PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "구성 상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "구성필요여부",
+          "phyNm": "CMPS_NEED_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "구성 필요의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "구성상품수",
+          "phyNm": "CMPS_PROD_CNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "패키지 안 같은 구성 상품 수량(대개 1)"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "패키지 상위 상품이 된다(역할명 상위상품코드)",
+          "parent": "PRD.상품기본",
+          "child": "PRD.상품구성관계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상위상품코드"
+          ]
+        },
+        {
+          "relNm": "패키지 구성 상품이 된다(역할명 구성상품코드)",
+          "parent": "PRD.상품기본",
+          "child": "PRD.상품구성관계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "구성상품코드"
+          ]
+        }
+      ],
+      "normNote": "N:M 해소(상품↔상품, 역할명 상위·구성). 2NF: 비키 속성은 두 키 조합 전체에 종속. 3NF 충족."
+    },
+    {
+      "entId": "PRD-012",
+      "entNm": "상품배타관계",
+      "phyNm": "PROD_EXCLN_REL",
+      "tblNm": "PTL_PRD_PROD_EXCLN_R",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "동시 가입 불가·선행 가입 필수·동시 가입 필수 같은 상품 간 가입 제약(SID ProductOfferingRelationship) N:M 해소. 가입 신청 검증 규칙의 원천.",
+      "attrs": [
+        {
+          "attrNm": "기준상품코드",
+          "phyNm": "STD_PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "기준 상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "대상상품코드",
+          "phyNm": "TRGT_PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "대상 상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "배타관계유형코드",
+          "phyNm": "EXCLN_REL_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "제약 종류 — 같은 두 상품에 여러 제약이 있을 수 있어 키에 포함"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "배타사유내용",
+          "phyNm": "EXCLN_RSN_CN",
+          "domNm": "내용V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "배타 사유의 내용 — 자유 서술 내용"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "가입 제약의 기준 상품이 된다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.상품배타관계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "기준상품코드"
+          ]
+        },
+        {
+          "relNm": "가입 제약의 대상 상품이 된다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.상품배타관계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "대상상품코드"
+          ]
+        }
+      ],
+      "normNote": "N:M 해소(상품↔상품). PK 에 배타관계유형코드 포함 — 같은 두 상품에 다른 제약 공존. 2NF·3NF 충족."
+    },
+    {
+      "entId": "PRD-013",
+      "entNm": "요금제기본제공상세",
+      "phyNm": "RTPLN_BSCPRVD_DTL",
+      "tblNm": "PTL_PRD_RTPLN_BSCPRVD_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "요금제의 사용 서비스별(음성·영상통화·문자·데이터 등) 기본제공량·무제한·이월·소진 후 속도 제한. 요금제기본의 서비스별 반복 그룹을 행으로 정규화(결정 L2).",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금제기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "사용서비스유형코드",
+          "phyNm": "USE_SVC_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "사용 서비스의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "사용단위유형코드",
+          "phyNm": "USE_UNIT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "사용 단위의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "기본제공량",
+          "phyNm": "BSCPRVD_QTY",
+          "domNm": "수량N18",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "사용단위 기준 월 기본제공량 — 무제한이면 NULL"
+        },
+        {
+          "attrNm": "무제한여부",
+          "phyNm": "UNLMT_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "무제한의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "이월가능여부",
+          "phyNm": "CYOV_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "이월 가능의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "소진후제한속도값",
+          "phyNm": "EXHST_AFTR_RSTR_SPD_VL",
+          "domNm": "값N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "기본제공 소진 후 제한 속도(kbps) — 제한 없으면 NULL"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "요금제기본이(가) 요금제기본제공상세을(를) 가진다",
+          "parent": "PRD.요금제기본",
+          "child": "PRD.요금제기본제공상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "normNote": "요금제기본의 반복 그룹을 정규화한 결과. 2NF: (상품코드, 사용서비스유형코드) 전체 종속. 3NF 충족."
+    },
+    {
+      "entId": "PRD-014",
+      "entNm": "요금제초과요율상세",
+      "phyNm": "RTPLN_EXCS_TRF_DTL",
+      "tblNm": "PTL_PRD_RTPLN_EXCS_TRF_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "기본제공량 초과 시 사용 서비스·과금권역별 단위 요율(초·KB·건 단위). 적용 기간으로 요율 변경 재현(SCD2).",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금제기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "과금권역코드",
+          "phyNm": "RAT_ZONE_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "과금권역코드",
+            "attr": "과금권역코드"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "과금 권역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "사용서비스유형코드",
+          "phyNm": "USE_SVC_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "사용 서비스의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "요율적용시작일자",
+          "phyNm": "TRF_APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "요율 적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "요금항목코드",
+          "phyNm": "CHRG_ITM_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목코드",
+            "attr": "요금항목코드"
+          },
+          "nullYn": false,
+          "seq": 5,
+          "def": "초과 사용료가 청구되는 요금항목"
+        },
+        {
+          "attrNm": "요율적용종료일자",
+          "phyNm": "TRF_APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "요율 적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "사용단위유형코드",
+          "phyNm": "USE_UNIT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "사용 단위의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "과금단위값",
+          "phyNm": "RAT_UNIT_VL",
+          "domNm": "값N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "과금 단위 크기(예 10초·512바이트)"
+        },
+        {
+          "attrNm": "단위요금금액",
+          "phyNm": "UNIT_CHRG_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "과금 단위당 요금(원)"
+        },
+        {
+          "attrNm": "초과요금상한금액",
+          "phyNm": "EXCS_CHRG_UPLMT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 10,
+          "def": "월 초과 요금 상한(데이터 안심 차단) — 없으면 NULL"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "요금제기본이(가) 요금제초과요율상세을(를) 가진다",
+          "parent": "PRD.요금제기본",
+          "child": "PRD.요금제초과요율상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        },
+        {
+          "relNm": "과금권역코드이(가) 요금제초과요율상세을(를) 가진다",
+          "parent": "PRD.과금권역코드",
+          "child": "PRD.요금제초과요율상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "과금권역코드"
+          ]
+        },
+        {
+          "relNm": "요금항목코드이(가) 요금제초과요율상세을(를) 가진다",
+          "parent": "PRD.요금항목코드",
+          "child": "PRD.요금제초과요율상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "요금항목코드"
+          ]
+        }
+      ],
+      "normNote": "SCD2 기간 행. 2NF: 단위요금은 (요금제·서비스·권역·시작일자) 전체에 종속. 3NF: 권역명·요금항목명은 FK 조회."
+    },
+    {
+      "entId": "PRD-015",
+      "entNm": "과금권역코드",
+      "phyNm": "RAT_ZONE_CD",
+      "tblNm": "PTL_PRD_RAT_ZONE_C",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "Rating 기준 과금 권역(국내 이동·유선·국제·위성·특수번호 등) 계층. planner 후보 '통화권역코드'를 개명(결정 L1).",
+      "attrs": [
+        {
+          "attrNm": "과금권역코드",
+          "phyNm": "RAT_ZONE_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "과금 권역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "상위과금권역코드",
+          "phyNm": "UP_RAT_ZONE_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "과금권역코드",
+            "attr": "과금권역코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "상위 과금 권역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "과금권역명",
+          "phyNm": "RAT_ZONE_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "과금 권역의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "과금권역유형코드",
+          "phyNm": "RAT_ZONE_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "과금 권역의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "과금권역등록일시",
+          "phyNm": "RAT_ZONE_REG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "과금 권역 등록의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "사용여부",
+          "phyNm": "USE_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "사용의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상위 권역에 속한다(자기 참조, 최상위는 NULL)",
+          "parent": "PRD.과금권역코드",
+          "child": "PRD.과금권역코드",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "상위과금권역코드"
+          ]
+        }
+      ],
+      "normNote": "계층 = 자기 참조 1:N. 3NF: 상위 권역 이름은 조회."
+    },
+    {
+      "entId": "PRD-016",
+      "entNm": "시간대요율상세",
+      "phyNm": "TMBND_TRF_DTL",
+      "tblNm": "PTL_PRD_TMBND_TRF_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "과금권역·사용 서비스별 시간대(주간·야간·심야·주말·공휴일) 가산율(할증 +, 할인 −). 기준 요율에 곱해 적용.",
+      "attrs": [
+        {
+          "attrNm": "과금권역코드",
+          "phyNm": "RAT_ZONE_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "과금권역코드",
+            "attr": "과금권역코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "과금 권역의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "사용서비스유형코드",
+          "phyNm": "USE_SVC_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "사용 서비스의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "시간대유형코드",
+          "phyNm": "TMBND_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "시간대의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "요율적용시작일자",
+          "phyNm": "TRF_APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "요율 적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "요율적용종료일자",
+          "phyNm": "TRF_APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "요율 적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "시작시간값",
+          "phyNm": "BGNG_HR_VL",
+          "domNm": "값N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "시간대 시작 HHMM(예 2300)"
+        },
+        {
+          "attrNm": "종료시간값",
+          "phyNm": "END_HR_VL",
+          "domNm": "값N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "시간대 종료 HHMM(예 0800, 자정 넘김 허용)"
+        },
+        {
+          "attrNm": "시간대가산율",
+          "phyNm": "TMBND_ADTN_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "기준 요율 대비 가산율(%) — 할인은 음수"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "과금권역코드이(가) 시간대요율상세을(를) 가진다",
+          "parent": "PRD.과금권역코드",
+          "child": "PRD.시간대요율상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "과금권역코드"
+          ]
+        }
+      ],
+      "normNote": "2NF: 가산율·시각은 (권역·서비스·시간대·시작일자) 전체 종속. 3NF 충족."
+    },
+    {
+      "entId": "PRD-017",
+      "entNm": "로밍국가코드",
+      "phyNm": "ROAM_NATN_CD",
+      "tblNm": "PTL_PRD_ROAM_NATN_C",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "로밍 서비스 대상 국가(ISO 3166 국가코드 기준)와 로밍 권역. PRM.로밍사업자기본(방문망 사업자)이 국가코드로 참조한다(PRM 에 키 요구).",
+      "attrs": [
+        {
+          "attrNm": "국가코드",
+          "phyNm": "NATN_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "국가 코드 — 외부 표준 ISO 3166-1 alpha-2 값을 그대로 쓴다(공통코드 아님)"
+        },
+        {
+          "attrNm": "국가명",
+          "phyNm": "NATN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "국가의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "영문국가명",
+          "phyNm": "ENG_NATN_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "영문 국가의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "로밍권역유형코드",
+          "phyNm": "ROAM_ZONE_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "로밍 권역의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "국가번호",
+          "phyNm": "NATN_NO",
+          "domNm": "번호V20",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "국제전화 국가 번호(예 82·1·81)"
+        },
+        {
+          "attrNm": "통화코드",
+          "phyNm": "CRNCY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "현지 통화(ISO 4217)"
+        },
+        {
+          "attrNm": "로밍가능여부",
+          "phyNm": "ROAM_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "로밍 가능의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [],
+      "normNote": "PK = ISO 국가코드(외부 표준). 3NF: 통화 이름은 외부 코드값. 국가명·영문국가명은 국가코드에 직접 종속."
+    },
+    {
+      "entId": "PRD-018",
+      "entNm": "로밍요율상세",
+      "phyNm": "ROAM_TRF_DTL",
+      "tblNm": "PTL_PRD_ROAM_TRF_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "국가·사용 서비스·발착신별 로밍 요율(고객 청구 기준). 사업자 간 TAP 정산 요율은 PRM(STL) 쪽.",
+      "attrs": [
+        {
+          "attrNm": "국가코드",
+          "phyNm": "NATN_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "로밍국가코드",
+            "attr": "국가코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "국가 코드 — 외부 표준 ISO 3166-1 alpha-2 값을 그대로 쓴다(공통코드 아님)"
+        },
+        {
+          "attrNm": "사용서비스유형코드",
+          "phyNm": "USE_SVC_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "사용 서비스의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "사용방향구분코드",
+          "phyNm": "USE_DRCT_SE_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "사용 방향의 구분 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "요율적용시작일자",
+          "phyNm": "TRF_APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "요율 적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "요금항목코드",
+          "phyNm": "CHRG_ITM_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목코드",
+            "attr": "요금항목코드"
+          },
+          "nullYn": false,
+          "seq": 5,
+          "def": "요금 항목의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "요율적용종료일자",
+          "phyNm": "TRF_APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "요율 적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "사용단위유형코드",
+          "phyNm": "USE_UNIT_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "사용 단위의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "과금단위값",
+          "phyNm": "RAT_UNIT_VL",
+          "domNm": "값N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "과금 단위의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "단위요금금액",
+          "phyNm": "UNIT_CHRG_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 9,
+          "def": "단위 요금의 금액 — 원화 금액(원 단위 정수)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "로밍국가코드이(가) 로밍요율상세을(를) 가진다",
+          "parent": "PRD.로밍국가코드",
+          "child": "PRD.로밍요율상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "국가코드"
+          ]
+        },
+        {
+          "relNm": "요금항목코드이(가) 로밍요율상세을(를) 가진다",
+          "parent": "PRD.요금항목코드",
+          "child": "PRD.로밍요율상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "요금항목코드"
+          ]
+        }
+      ],
+      "normNote": "SCD2 기간 행. 2NF: (국가·서비스·발착신·시작일자) 전체 종속. 3NF 충족."
+    },
+    {
+      "entId": "PRD-019",
+      "entNm": "부가서비스요금상세",
+      "phyNm": "ADSVC_CHRG_DTL",
+      "tblNm": "PTL_PRD_ADSVC_CHRG_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "부가서비스의 요금항목별 월정액·단위 요금과 일할 계산 여부. 적용 기간으로 요금 변경 재현(SCD2).",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "부가서비스기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "요금항목코드",
+          "phyNm": "CHRG_ITM_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목코드",
+            "attr": "요금항목코드"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "요금 항목의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "요금적용시작일자",
+          "phyNm": "CHRG_APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "요금 적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "요금적용종료일자",
+          "phyNm": "CHRG_APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "요금 적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "과금방식유형코드",
+          "phyNm": "RAT_SCHM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "과금 방식의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "월정액금액",
+          "phyNm": "MM_FXAMT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "월 정액의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "단위요금금액",
+          "phyNm": "UNIT_CHRG_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "단위 요금의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "일할계산여부",
+          "phyNm": "DYPRT_CALC_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "일할 계산의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "부가서비스기본이(가) 부가서비스요금상세을(를) 가진다",
+          "parent": "PRD.부가서비스기본",
+          "child": "PRD.부가서비스요금상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        },
+        {
+          "relNm": "요금항목코드이(가) 부가서비스요금상세을(를) 가진다",
+          "parent": "PRD.요금항목코드",
+          "child": "PRD.부가서비스요금상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "요금항목코드"
+          ]
+        }
+      ],
+      "normNote": "SCD2 기간 행. 월정액·단위요금은 과금방식에 따라 하나만 쓰임(나머지 NULL — S5). 3NF 충족."
+    },
+    {
+      "entId": "PRD-020",
+      "entNm": "할인조건상세",
+      "phyNm": "DSCNT_CND_DTL",
+      "tblNm": "PTL_PRD_DSCNT_CND_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "할인 적용 조건(대상 요금제·가입 기간·고객 등급·연령·결합 회선 수·청구 금액) — 한 할인의 조건 여러 개는 AND.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "할인상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "조건순번",
+          "phyNm": "CND_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "조건의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "조건대상상품코드",
+          "phyNm": "CND_TRGT_PROD_CD",
+          "domNm": "코드V20",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "대상 요금제 조건일 때만 — 그 밖의 조건은 NULL(S5)"
+        },
+        {
+          "attrNm": "할인조건유형코드",
+          "phyNm": "DSCNT_CND_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "할인 조건의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "조건최소값",
+          "phyNm": "CND_MIN_VL",
+          "domNm": "값N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "조건 최소의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "조건최대값",
+          "phyNm": "CND_MAX_VL",
+          "domNm": "값N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "조건 최대의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "조건내용",
+          "phyNm": "CND_CN",
+          "domNm": "내용V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "조건의 내용 — 자유 서술 내용"
+        },
+        {
+          "attrNm": "적용시작일자",
+          "phyNm": "APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "적용종료일자",
+          "phyNm": "APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 9,
+          "def": "적용 종료의 일자 — 연월일(YYYYMMDD)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "할인상품기본이(가) 할인조건상세을(를) 가진다",
+          "parent": "PRD.할인상품기본",
+          "child": "PRD.할인조건상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        },
+        {
+          "relNm": "상품기본이(가) 할인조건상세을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.할인조건상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "조건대상상품코드"
+          ]
+        }
+      ],
+      "normNote": "1NF: 조건마다 1행(AND). 2NF: (할인상품, 조건순번) 전체 종속. 3NF 충족."
+    },
+    {
+      "entId": "PRD-021",
+      "entNm": "할인율상세",
+      "phyNm": "DSCNT_RT_DTL",
+      "tblNm": "PTL_PRD_DSCNT_RT_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "단계(구간)별 할인율·할인금액(예 가입 2년 10%·5년 20%, 청구액 구간별 정액).",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "할인상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "할인단계순번",
+          "phyNm": "DSCNT_STEP_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "할인 단계의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "단계최소값",
+          "phyNm": "STEP_MIN_VL",
+          "domNm": "값N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "단계 최소의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "단계최대값",
+          "phyNm": "STEP_MAX_VL",
+          "domNm": "값N10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "단계 최대의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "할인율",
+          "phyNm": "DSCNT_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "할인의 율 — 비율(백분율, 소수 2자리)"
+        },
+        {
+          "attrNm": "할인금액",
+          "phyNm": "DSCNT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "할인의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "할인한도금액",
+          "phyNm": "DSCNT_LMT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "할인 한도의 금액 — 원화 금액(원 단위 정수)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "할인상품기본이(가) 할인율상세을(를) 가진다",
+          "parent": "PRD.할인상품기본",
+          "child": "PRD.할인율상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "normNote": "1NF: 단계마다 1행. 2NF·3NF 충족."
+    },
+    {
+      "entId": "PRD-022",
+      "entNm": "결합구성상세",
+      "phyNm": "CMBN_CMPS_DTL",
+      "tblNm": "PTL_PRD_CMBN_CMPS_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "결합 상품을 이루는 구성(무선 회선·인터넷·IPTV 등)과 구성별 최소·최대 회선 수.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "결합상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "구성순번",
+          "phyNm": "CMPS_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "구성의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "구성상품코드",
+          "phyNm": "CMPS_PROD_CD",
+          "domNm": "코드V20",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": true,
+          "seq": 3,
+          "def": "특정 상품 한정 구성일 때만 — 유형만 정하면 NULL"
+        },
+        {
+          "attrNm": "결합구성유형코드",
+          "phyNm": "CMBN_CMPS_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "결합 구성의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "최소회선수",
+          "phyNm": "MIN_LINE_CNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "최소 회선의 수 — 개수·인원 등 셀 수 있는 수"
+        },
+        {
+          "attrNm": "최대회선수",
+          "phyNm": "MAX_LINE_CNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "최대 회선의 수 — 개수·인원 등 셀 수 있는 수"
+        },
+        {
+          "attrNm": "대표회선가능여부",
+          "phyNm": "RPRS_LINE_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 7,
+          "def": "대표 회선 가능의 여부 — 해당 여부(Y/N)"
+        },
+        {
+          "attrNm": "구성필요여부",
+          "phyNm": "CMPS_NEED_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "구성 필요의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "결합상품기본이(가) 결합구성상세을(를) 가진다",
+          "parent": "PRD.결합상품기본",
+          "child": "PRD.결합구성상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        },
+        {
+          "relNm": "상품기본이(가) 결합구성상세을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.결합구성상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "구성상품코드"
+          ]
+        }
+      ],
+      "normNote": "1NF: 구성마다 1행. 2NF·3NF 충족."
+    },
+    {
+      "entId": "PRD-023",
+      "entNm": "결합할인상세",
+      "phyNm": "CMBN_DSCNT_DTL",
+      "tblNm": "PTL_PRD_CMBN_DSCNT_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "결합 회선 수별 회선당·대표회선 할인(예 2회선 3,300원·5회선 이상 11,000원). 적용 기간으로 변경 재현.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "결합상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "결합회선수",
+          "phyNm": "CMBN_LINE_CNT",
+          "domNm": "수N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "결합 회선의 수 — 개수·인원 등 셀 수 있는 수"
+        },
+        {
+          "attrNm": "할인적용시작일자",
+          "phyNm": "DSCNT_APLCN_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "할인 적용 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "할인요금항목코드",
+          "phyNm": "DSCNT_CHRG_ITM_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목코드",
+            "attr": "요금항목코드"
+          },
+          "nullYn": false,
+          "seq": 4,
+          "def": "할인 요금 항목의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "할인적용종료일자",
+          "phyNm": "DSCNT_APLCN_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 5,
+          "def": "할인 적용 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "회선할인금액",
+          "phyNm": "LINE_DSCNT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "회선 할인의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "대표회선할인금액",
+          "phyNm": "RPRS_LINE_DSCNT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "대표 회선 할인의 금액 — 원화 금액(원 단위 정수)"
+        },
+        {
+          "attrNm": "할인율",
+          "phyNm": "DSCNT_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "할인의 율 — 비율(백분율, 소수 2자리)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "결합상품기본이(가) 결합할인상세을(를) 가진다",
+          "parent": "PRD.결합상품기본",
+          "child": "PRD.결합할인상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        },
+        {
+          "relNm": "요금항목코드이(가) 결합할인상세을(를) 가진다",
+          "parent": "PRD.요금항목코드",
+          "child": "PRD.결합할인상세",
+          "card": "1:N",
+          "idn": false,
+          "opt": false,
+          "fkAttrs": [
+            "할인요금항목코드"
+          ]
+        }
+      ],
+      "normNote": "SCD2 기간 행(회선 수 단계). 2NF·3NF 충족."
+    },
+    {
+      "entId": "PRD-024",
+      "entNm": "약정위약금상세",
+      "phyNm": "AGRMT_PNLT_DTL",
+      "tblNm": "PTL_PRD_AGRMT_PNLT_D",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "약정 경과 개월 구간별 위약금(할인반환금·지원금 반환) 비율·정액.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "약정상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "위약금단계순번",
+          "phyNm": "PNLT_STEP_SEQ",
+          "domNm": "순번N5",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "위약금 단계의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "경과시작개월수",
+          "phyNm": "ELPS_BGNG_MCNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "경과 시작의 개월수 — 기간의 개월 수"
+        },
+        {
+          "attrNm": "경과종료개월수",
+          "phyNm": "ELPS_END_MCNT",
+          "domNm": "수N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "경과 종료의 개월수 — 기간의 개월 수"
+        },
+        {
+          "attrNm": "위약금산정방식유형코드",
+          "phyNm": "PNLT_ASMT_SCHM_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "위약금 산정 방식의 유형 코드 — 공통코드(codes.json)"
+        },
+        {
+          "attrNm": "위약금율",
+          "phyNm": "PNLT_RT",
+          "domNm": "율N5_2",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "위약금의 율 — 비율(백분율, 소수 2자리)"
+        },
+        {
+          "attrNm": "위약금금액",
+          "phyNm": "PNLT_AMT",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "위약금의 금액 — 원화 금액(원 단위 정수)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "약정상품기본이(가) 약정위약금상세을(를) 가진다",
+          "parent": "PRD.약정상품기본",
+          "child": "PRD.약정위약금상세",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "normNote": "1NF: 경과 구간마다 1행. 2NF·3NF 충족."
+    },
+    {
+      "entId": "PRD-025",
+      "entNm": "단말출고가격이력",
+      "phyNm": "EQP_SHPM_PRC_HIST",
+      "tblNm": "PTL_PRD_EQP_SHPM_PRC_H",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "단말 모델 출고가 변경 이력(SCD2). planner 후보 '단말출고가이력'을 표준단어 조합으로 개명(결정 L5).",
+      "attrs": [
+        {
+          "attrNm": "단말모델코드",
+          "phyNm": "EQP_MDL_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "단말모델기본",
+            "attr": "단말모델코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "단말 모델의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "가격적용시작일시",
+          "phyNm": "PRC_APLCN_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "가격 적용 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "가격적용종료일시",
+          "phyNm": "PRC_APLCN_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 3,
+          "def": "가격 적용 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "단말출고가격",
+          "phyNm": "EQP_SHPM_PRC",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "단말 출고의 가격 — 재화의 판매·출고 가격"
+        },
+        {
+          "attrNm": "가격변경사유유형코드",
+          "phyNm": "PRC_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "가격 변경 사유의 유형 코드 — 공통코드(codes.json)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "단말모델기본이(가) 단말출고가격이력을(를) 가진다",
+          "parent": "PRD.단말모델기본",
+          "child": "PRD.단말출고가격이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "단말모델코드"
+          ]
+        }
+      ],
+      "normNote": "SCD2 이력. 이전단말출고가격 제거 — 직전 이력 행에서 유도(관문 G1, 물리 반정규화 후보)."
+    },
+    {
+      "entId": "PRD-026",
+      "entNm": "공시지원금이력",
+      "phyNm": "PBANC_SUBSD_HIST",
+      "tblNm": "PTL_PRD_PBANC_SUBSD_H",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "단말기유통법 공시 — 요금제·단말 모델별 공시지원금·추가지원금과 공시 기간(공시 후 최소 유지 일수). N:M(단말모델↔요금제)을 기간 행으로 해소.",
+      "attrs": [
+        {
+          "attrNm": "단말모델코드",
+          "phyNm": "EQP_MDL_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "단말모델기본",
+            "attr": "단말모델코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "단말 모델의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "요금제상품코드",
+          "phyNm": "RTPLN_PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금제기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 2,
+          "def": "요금제 상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "지원금적용시작일시",
+          "phyNm": "SUBSD_APLCN_BGNG_DTM",
+          "domNm": "일시TS",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "지원금 적용 시작의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "지원금적용종료일시",
+          "phyNm": "SUBSD_APLCN_END_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "지원금 적용 종료의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "공시일자",
+          "phyNm": "PBANC_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "공시의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "공시지원금",
+          "phyNm": "PBANC_SUBSD",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 6,
+          "def": "공시의 지원금 — 단말 구매 시 지원하는 금액(공시·추가 지원금)"
+        },
+        {
+          "attrNm": "추가지원금",
+          "phyNm": "ADD_SUBSD",
+          "domNm": "금액N15",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "유통망 추가지원금(공시지원금의 15% 이내)"
+        },
+        {
+          "attrNm": "최소공시일수",
+          "phyNm": "MIN_PBANC_DCNT",
+          "domNm": "일수N3",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 8,
+          "def": "공시 후 변경 금지 최소 일수(7일)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "단말모델기본이(가) 공시지원금이력을(를) 가진다",
+          "parent": "PRD.단말모델기본",
+          "child": "PRD.공시지원금이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "단말모델코드"
+          ]
+        },
+        {
+          "relNm": "요금제별 공시 금액(역할명 요금제상품코드)",
+          "parent": "PRD.요금제기본",
+          "child": "PRD.공시지원금이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "요금제상품코드"
+          ]
+        }
+      ],
+      "normNote": "N:M(단말모델↔요금제) + 기간 해소. 2NF: 지원금은 (모델·요금제·시작일시) 전체 종속. 3NF 충족."
+    },
+    {
+      "entId": "PRD-027",
+      "entNm": "상품판매채널관계",
+      "phyNm": "PROD_SALE_CHNL_REL",
+      "tblNm": "PTL_PRD_PROD_SALE_CHNL_R",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "상품별 판매 가능 채널(대리점·판매점·온라인·직영·텔레마케팅·법인영업) — 상품 ↔ 판매채널 N:M 해소.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "판매채널유형코드",
+          "phyNm": "SALE_CHNL_TY_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "판매 채널의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "판매시작일자",
+          "phyNm": "SALE_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "판매 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "판매종료일자",
+          "phyNm": "SALE_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "판매 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "판매가능여부",
+          "phyNm": "SALE_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "판매 가능의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상품기본이(가) 상품판매채널관계을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.상품판매채널관계",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "normNote": "N:M 해소(상품↔판매채널 코드값). 2NF·3NF 충족."
+    },
+    {
+      "entId": "PRD-028",
+      "entNm": "상품판매기간이력",
+      "phyNm": "PROD_SALE_PRD_HIST",
+      "tblNm": "PTL_PRD_PROD_SALE_PRD_H",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "상품 판매 개시·중지·재개 기간 이력. 현재값은 상품기본.판매시작일자·판매종료일자.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "판매시작일자",
+          "phyNm": "SALE_BGNG_DT",
+          "domNm": "일자C8",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "판매 시작의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "판매종료일자",
+          "phyNm": "SALE_END_DT",
+          "domNm": "일자C8",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 3,
+          "def": "판매 종료의 일자 — 연월일(YYYYMMDD)"
+        },
+        {
+          "attrNm": "판매종료사유유형코드",
+          "phyNm": "SALE_END_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 4,
+          "def": "판매 종료 사유의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "가입가능여부",
+          "phyNm": "SBSC_PSBL_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "가입 가능의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상품기본이(가) 상품판매기간이력을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.상품판매기간이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "normNote": "SCD2 형태 기간 이력(상품코드+판매시작일자). 3NF 충족."
+    },
+    {
+      "entId": "PRD-029",
+      "entNm": "요금항목분류코드",
+      "phyNm": "CHRG_ITM_CLSF_CD",
+      "tblNm": "PTL_PRD_CHRG_ITM_CLSF_C",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "요금항목의 상위 분류(월정액·사용·일회성·할부·할인·세금·기타) 계층. 청구서 소계 단위.",
+      "attrs": [
+        {
+          "attrNm": "요금항목분류코드",
+          "phyNm": "CHRG_ITM_CLSF_CD",
+          "domNm": "코드V10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 1,
+          "def": "요금 항목 분류의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "상위요금항목분류코드",
+          "phyNm": "UP_CHRG_ITM_CLSF_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": {
+            "area": "PRD",
+            "ent": "요금항목분류코드",
+            "attr": "요금항목분류코드"
+          },
+          "nullYn": true,
+          "seq": 2,
+          "def": "상위 요금 항목 분류의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "요금항목분류명",
+          "phyNm": "CHRG_ITM_CLSF_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "요금 항목 분류의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "청구서출력순번",
+          "phyNm": "INVC_OUTPT_SEQ",
+          "domNm": "순번N5",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "청구서 출력의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "사용여부",
+          "phyNm": "USE_YN",
+          "domNm": "여부C1",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "사용의 여부 — 해당 여부(Y/N)"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상위 분류에 속한다(자기 참조, 최상위는 NULL)",
+          "parent": "PRD.요금항목분류코드",
+          "child": "PRD.요금항목분류코드",
+          "card": "1:N",
+          "idn": false,
+          "opt": true,
+          "fkAttrs": [
+            "상위요금항목분류코드"
+          ]
+        }
+      ],
+      "normNote": "계층 = 자기 참조 1:N. 3NF 충족."
+    },
+    {
+      "entId": "PRD-030",
+      "entNm": "상품변경이력",
+      "phyNm": "PROD_CHG_HIST",
+      "tblNm": "PTL_PRD_PROD_CHG_H",
+      "tp": "REF",
+      "stg": "LGCL",
+      "def": "상품 정의 속성 변경 감사 이력(어떤 항목이 무엇에서 무엇으로 왜 바뀌었는지). 가격·판매기간은 전용 이력 엔터티.",
+      "attrs": [
+        {
+          "attrNm": "상품코드",
+          "phyNm": "PROD_CD",
+          "domNm": "코드V20",
+          "pk": true,
+          "fk": {
+            "area": "PRD",
+            "ent": "상품기본",
+            "attr": "상품코드"
+          },
+          "nullYn": false,
+          "seq": 1,
+          "def": "상품의 코드 — 업무 분류 값을 식별하는 부호, 엔터티에서는 기준 코드 집합"
+        },
+        {
+          "attrNm": "상품변경순번",
+          "phyNm": "PROD_CHG_SEQ",
+          "domNm": "순번N10",
+          "pk": true,
+          "fk": null,
+          "nullYn": false,
+          "seq": 2,
+          "def": "상품 변경의 순번 — 부모 안의 처리·표시 순서"
+        },
+        {
+          "attrNm": "상품변경일시",
+          "phyNm": "PROD_CHG_DTM",
+          "domNm": "일시TS",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 3,
+          "def": "상품 변경의 일시 — 연월일 시분초까지의 시점"
+        },
+        {
+          "attrNm": "상품변경사유유형코드",
+          "phyNm": "PROD_CHG_RSN_TY_CD",
+          "domNm": "코드V10",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 4,
+          "def": "상품 변경 사유의 유형 코드 — 공통코드(codes.json 신규 등재 필요)"
+        },
+        {
+          "attrNm": "변경항목명",
+          "phyNm": "CHG_ITM_NM",
+          "domNm": "명V100",
+          "pk": false,
+          "fk": null,
+          "nullYn": false,
+          "seq": 5,
+          "def": "변경 항목의 명 — 대상을 부르는 이름"
+        },
+        {
+          "attrNm": "변경이전값",
+          "phyNm": "CHG_BFR_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 6,
+          "def": "변경 이전의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "변경후값",
+          "phyNm": "CHG_AFTR_VL",
+          "domNm": "값V256",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 7,
+          "def": "변경 후의 값 — 측정·설정·암호화된 값"
+        },
+        {
+          "attrNm": "변경사유내용",
+          "phyNm": "CHG_RSN_CN",
+          "domNm": "내용V200",
+          "pk": false,
+          "fk": null,
+          "nullYn": true,
+          "seq": 8,
+          "def": "변경 사유의 내용 — 자유 서술 내용"
+        }
+      ],
+      "rels": [
+        {
+          "relNm": "상품기본이(가) 상품변경이력을(를) 가진다",
+          "parent": "PRD.상품기본",
+          "child": "PRD.상품변경이력",
+          "card": "1:N",
+          "idn": true,
+          "opt": false,
+          "fkAttrs": [
+            "상품코드"
+          ]
+        }
+      ],
+      "normNote": "감사 이력(항목 단위 1행 — 1NF). 변경 전후 값은 자유 문자열(원자값). 3NF 충족."
+    }
+  ],
+  "childReq": [
+    {
+      "child": "ORD.가입상품기본",
+      "parent": "상품기본",
+      "card": "N:1",
+      "fkKey": "상품코드(PROD_CD, 코드V20)",
+      "roleNm": null,
+      "note": "가입 인스턴스 ← 상품 정의(S2 인기 상품 쏠림)",
+      "reflected": true
+    },
+    {
+      "child": "ORD.약정계약기본",
+      "parent": "약정상품기본",
+      "card": "N:1",
+      "fkKey": "상품코드(PROD_CD, 코드V20)",
+      "roleNm": "약정상품코드",
+      "note": "약정 규칙 참조",
+      "reflected": true
+    },
+    {
+      "child": "ORD.단말할부계약기본",
+      "parent": "단말모델기본",
+      "card": "N:1",
+      "fkKey": "단말모델코드(EQP_MDL_CD, 코드V20)",
+      "roleNm": null,
+      "note": "할부 단말 모델",
+      "reflected": true
+    },
+    {
+      "child": "ORD.회선기본",
+      "parent": "유심상품기본",
+      "card": "N:1",
+      "fkKey": "상품코드(PROD_CD, 코드V20)",
+      "roleNm": "유심상품코드",
+      "note": "장착 유심 종류",
+      "reflected": true
+    },
+    {
+      "child": "ORD.결합계약기본",
+      "parent": "결합상품기본",
+      "card": "N:1",
+      "fkKey": "상품코드(PROD_CD, 코드V20)",
+      "roleNm": "결합상품코드",
+      "note": "결합 규칙",
+      "reflected": true
+    },
+    {
+      "child": "PAY.사용내역",
+      "parent": "요금항목코드",
+      "card": "N:1",
+      "fkKey": "요금항목코드(CHRG_ITM_CD, 코드V10)",
+      "roleNm": null,
+      "note": "Rating 결과 요금항목",
+      "reflected": true
+    },
+    {
+      "child": "PAY.할인적용내역",
+      "parent": "할인상품기본",
+      "card": "N:1",
+      "fkKey": "상품코드(PROD_CD, 코드V20)",
+      "roleNm": "할인상품코드",
+      "note": "적용 할인 규칙",
+      "reflected": true
+    },
+    {
+      "child": "PAY.요금계산내역",
+      "parent": "요금항목코드",
+      "card": "N:1",
+      "fkKey": "요금항목코드(CHRG_ITM_CD, 코드V10)",
+      "roleNm": null,
+      "note": "요금계산 결과 요금항목",
+      "reflected": true
+    },
+    {
+      "child": "ORD.가입신청기본",
+      "parent": "상품기본",
+      "card": "N:1",
+      "fkKey": "상품코드(PROD_CD, 코드V20)",
+      "roleNm": null,
+      "note": "대표 요금제로 신청된다 (02 개념 관문 추가)",
+      "reflected": true
+    },
+    {
+      "child": "ORD.회선기본",
+      "parent": "단말모델기본",
+      "card": "N:1",
+      "fkKey": "단말모델코드(EQP_MDL_CD, 코드V20)",
+      "roleNm": null,
+      "note": "회선에 장착된다(자급제 미확인 단말은 회선 쪽 NULL — S5) (02 개념 관문 추가)",
+      "reflected": true
+    },
+    {
+      "child": "PRM.단말재고내역",
+      "parent": "단말모델기본",
+      "card": "N:1",
+      "fkKey": "단말모델코드(EQP_MDL_CD, 코드V20)",
+      "roleNm": null,
+      "note": "유통망 재고로 입고된다 (02 개념 관문 추가)",
+      "reflected": true
+    },
+    {
+      "child": "PRM.유심재고내역",
+      "parent": "유심상품기본",
+      "card": "N:1",
+      "fkKey": "상품코드(PROD_CD, 코드V20)",
+      "roleNm": "유심상품코드",
+      "note": "유통망 재고로 입고된다 (02 개념 관문 추가)",
+      "reflected": true
+    },
+    {
+      "child": "PAY.청구상세",
+      "parent": "요금항목코드",
+      "card": "N:1",
+      "fkKey": "요금항목코드(CHRG_ITM_CD, 코드V10)",
+      "roleNm": null,
+      "note": "청구서 라인 항목이 된다 (02 개념 관문 추가)",
+      "reflected": true
+    },
+    {
+      "child": "INV.수납배분상세",
+      "parent": "요금항목코드",
+      "card": "N:1",
+      "fkKey": "요금항목코드(CHRG_ITM_CD, 코드V10)",
+      "roleNm": null,
+      "note": "수납 배분 대상 항목이 된다 (02 개념 관문 추가)",
+      "reflected": true
+    },
+    {
+      "child": "PRM.로밍사업자기본",
+      "parent": "로밍국가코드",
+      "card": "N:1",
+      "fkKey": "국가코드(NATN_CD, 코드V10)",
+      "roleNm": null,
+      "note": "신규 요구(논리 단계) — 방문망 사업자의 국가. PRM 개념에 국가코드 없음 → PRM 논리 모델이 국가코드(NATN_CD) FK 추가",
+      "reflected": true
+    }
+  ],
+  "newTerms": [],
+  "newWords": [],
+  "newCodes": [],
+  "decisions": [
+    {
+      "id": "L1",
+      "dec": "planner '통화권역코드' → '과금권역코드'(RAT_ZONE_CD)",
+      "why": "표준단어 '통화' = CRNCY(화폐, ISO 4217)와 '통화(call)' 동음이의 — 한 단어 두 뜻 금지. Rating 권역이라 과금(RAT) + 권역(신규 ZONE)"
+    },
+    {
+      "id": "L2",
+      "dec": "요금제기본의 기본제공 6속성 → 요금제기본제공상세(요금제 × 사용서비스유형코드) 행으로 이동",
+      "why": "음성·문자·데이터 칼럼 나열은 1NF 반복 그룹(영상통화·MMS·로밍데이터 추가 때마다 칼럼 추가). PAY 사용서비스유형코드 공통코드와 키를 맞춰 Rating 조인 경로 단일화. 대표 3칼럼 반정규화는 물리 단계 판단"
+    },
+    {
+      "id": "L3",
+      "dec": "유심상품기본.서비스망유형코드 제거",
+      "why": "슈퍼타입 상품기본에 같은 속성 — 서브타입 중복(같은 사실 두 곳)"
+    },
+    {
+      "id": "L4",
+      "dec": "요금항목코드.요금항목분류유형코드(공통코드) → 요금항목분류코드 엔터티 FK",
+      "why": "planner 기본 엔터티와 공통코드 이중 정의. 계층(상위 분류)·청구서 소계 순번을 가지므로 기준 엔터티가 맞음. codes.json 요금항목분류유형코드는 폐기 대상(값 9개는 엔터티 초기 데이터로 이관) — 표준사전 담당 반영"
+    },
+    {
+      "id": "L5",
+      "dec": "planner '단말출고가이력' → '단말출고가격이력'",
+      "why": "'가'는 표준단어 아님(가격 = PRC). 개념 속성 단말출고가격(EQP_SHPM_PRC)과 일치"
+    },
+    {
+      "id": "L6",
+      "dec": "약정상품기본.선택약정할인율 제거(관문 G1 — 원안 \"유지\" 대체)",
+      "why": "연계할인상품코드 → 할인상품기본.할인율 이행 종속(3NF). ORD.약정계약기본 CHC_AGRMT_DSCNT_RT 는 가입 당시 스냅숏이라 PRD 원천 불필요"
+    },
+    {
+      "id": "L7",
+      "dec": "단말모델기본.공시지원금 제거(관문 G1 — 원안 \"의미 한정\" 대체)",
+      "why": "공시지원금은 (단말모델, 요금제) 종속 — 공시지원금이력이 원천. 대표 요금제 속성이 없어 단말모델 단독으로 결정 불가"
+    },
+    {
+      "id": "L8",
+      "dec": "요율·공시·가격 기간 행은 적용 시작 일자/일시를 PK 에 포함(SCD2)",
+      "why": "과거 청구월 재계산·AI 학습 때 당시 기준 재현"
+    },
+    {
+      "id": "L9",
+      "dec": "로밍국가코드 PK = 국가코드(NATN_CD, ISO 3166) — 별도 로밍국가코드 속성 만들지 않음",
+      "why": "CUS·PRM 이 이미 국가코드 용어를 씀(같은 키 = 같은 이름). PRM.로밍사업자기본에 국가코드 FK 추가 요구(childReq)"
+    },
+    {
+      "id": "L10",
+      "dec": "신규 단어 5개(구성 CMPS·배타 EXCLN·요율 TRF·권역 ZONE·시간대 TMBND)",
+      "why": "planner 엔터티명 유지에 필요. 시간대는 '시간+대' 분해 시 '대'가 비표준이라 합성어 1단어"
+    },
+    {
+      "id": "L11",
+      "dec": "시간대 경계 = 시작시간값·종료시간값(HHMM, 값N10)",
+      "why": "'시간'(HR)은 속성 분류어가 아님 — 분류어 '값'으로 끝맺음. 자정 넘김(2300→0800) 허용"
+    },
+    {
+      "id": "L12",
+      "dec": "핵심 엔터티 유형·이름·PK 는 개념 그대로(무단 재설계 금지), 상품내용·약관신고일자·요금항목분류코드만 논리 보강",
+      "why": "재호출 지침. 보강 사유는 엔터티 chgNote"
+    },
+    {
+      "id": "L13",
+      "dec": "시스템 칼럼 4개·삭제여부 없음 — 상태유형코드·종료일자로 생애 표현",
+      "why": "CONTEXT D7"
+    },
+    {
+      "id": "G1",
+      "dec": "논리 단계 유도·이행 종속 속성 5개 제거(결합상품기본.유선상품포함여부·약정상품기본.선택약정할인율·단말모델기본.공시지원금·상품가격이력.이전월정액금액·단말출고가격이력.이전단말출고가격)",
+      "why": "규칙 2-7 반정규화는 물리 단계에서만 — 물리 모델러가 조회 경로·건수 근거로 재도입 판단. 기본(현재값)+이력 쌍(월정액금액·단말출고가격)은 01 §5-1 SCD2 원칙이라 유지 (coordinator 04 관문 2026-11-07)"
+    }
+  ],
+  "stdMerged": "03 논리 관문 표준사전 2차 병합 완료(2026-11-07) — 이 영역 신규 단어 5·용어 78·코드 10을 tools/std_words.js·std_codes.js 원장에 등재하고 tools/std_build.js 로 model/std 재생성(docs/03_standards.md 8절). 비운 배열은 다음 단계 신규 요청용"
+}
