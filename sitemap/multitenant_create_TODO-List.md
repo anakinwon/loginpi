@@ -26,7 +26,7 @@
 | 0-1 | 웨이브 게이트 확인. 앞 웨이브 회고 전에 착수하면 예외 사유를 `docs/ROADMAP_MULTISITE.md`에 한 줄 남긴다 | ROADMAP_MULTISITE 게이트 표 |
 | 0-2 | 로그인 방식: Pi 전용(기본) 또는 Pi + Google 연동(예외). 예외면 PRD_28 §1.1-2와 `docs/LOGIN_PLAYBOOK.md`에 사이트를 추가한다 | PRD_28 §1.1-2 |
 | 0-3 | 레드라인 플래그(⏸·△)가 있으면 Pi 앱 생성·제출을 보류한다 | PRD_28 §1.1-8, `sites.json` hold |
-| 0-4 | 로컬 포트를 정한다. 사용 중: 3000 cafe · 3001 sitemap · 3002 schema · 3003 seminar | ENV_GUIDE 2절 |
+| 0-4 | 로컬 포트를 정한다. 사용 중: 3000 cafe(`sitemap/cafe.pi`) · 3001 sitemap · 3002 schema · 3003 seminar | ENV_GUIDE 2절 |
 
 ## 1. 생성기 실행 — 서비스
 
@@ -46,7 +46,7 @@ sitemap.pi를 기준으로 복제한다. 앱 코드 `_template`은 선제 작성
 
 | 지점 | 내용 |
 |---|---|
-| `package.json` | 이름 `@site/<이름>`, `dev`·`start`에 `-p <포트>`, 의존성 `@pi/auth`·`@pi/db`·`@pi/guard`·`@pi/mon`(`workspace:*`) + cafe.pi와 같은 버전(next·react·next-intl·next-auth·zod) |
+| `package.json` | 이름 `@site/<이름>`, `dev`·`start`에 `-p <포트>`, 의존성 `@pi/auth`·`@pi/db`·`@pi/guard`·`@pi/mon`(`workspace:*`) + cafe.pi(`sitemap/cafe.pi/package.json`)와 같은 버전(next·react·next-intl·next-auth·zod) |
 | `next.config.ts` | `import './src/env'`, next-intl 플러그인, `turbopack.root`·`outputFileTracingRoot = ../..`, `validation-key.txt` 포함 |
 | `src/env.ts` | t3-env. `.env.example`과 같은 키 |
 | `src/app/[locale]/layout.tsx` | PiSdkScript · NextIntlClientProvider · PiAuthRoot · MonRum |
@@ -94,6 +94,8 @@ sitemap.pi를 기준으로 복제한다. 앱 코드 `_template`은 선제 작성
 - [ ] (고객) env 등록: `.env.vercel-prod`의 값을 Production에, 스테이징 값을 Preview에 넣는다. `*_DATABASE_URL`은 등록하지 않는다
 - [ ] (서비스) 운영 승격 `node scripts/promote-to-prod.mjs --app <이름> --yes`(첫 실행에서 `prod/<이름>` 브랜치 생성). 승격은 마스터 지시 후에만 한다
 - [ ] (서비스) GitHub commit status에서 `Vercel – <프로젝트>: success`를 개별로 확인한다
+
+> 현행(2026-11-04 확인, 2026-11-08 API 재확인): 기존 Vercel 프로젝트(cafe·loginpi·schema·dbms·seminar·sitemaps)의 Production Branch는 모두 **master**이고 `production`·`prod/*` 푸시는 미리보기만 만든다. cafe.pi도 이제 `sitemap/cafe.pi`(Root Directory, loginpi 프로젝트 포함)로 다른 사이트와 같은 구조다. 위 `prod/<이름>` 절차를 유지할지는 [확인중 : 마스터], `promote-to-prod.mjs` 정비는 후속.
 
 ## 9. 검증·원장 — 서비스
 

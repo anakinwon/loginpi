@@ -186,7 +186,7 @@
 | D1 | 웨이브 게이트를 지키는가, 선착수 예외인가 | 게이트 통과 후 / 예외 | W4 선착수 예외(W3 회고 전) | [docs/ROADMAP_MULTISITE.md](../docs/ROADMAP_MULTISITE.md) 게이트 표 한 줄 + TODO 진행 현황 표 행 |
 | D2 | 로그인 방식 | Pi 전용(기본) / Pi + Google 연동(예외) | Pi + Google 연동 예외 — PRD_28 §1.1-2 예외 목록·LOGIN_PLAYBOOK 에는 아직 미등재(둘 다 sitemap.pi·seminar.pi 만, dbms `sql/001` 헤더도 '등재 [확인중]') [확인중 : 마스터] | PRD_28 §1.1-2 · [LOGIN_PLAYBOOK](../docs/LOGIN_PLAYBOOK.md) 사이트 추가 · TODO 진행 현황 |
 | D3 | 레드라인 플래그(⏸·△)가 있는가 | 없음 / 있음 → Pi 앱 생성·제출 보류 | 없음 | `sites.json` hold |
-| D4 | 로컬 포트 | 빈 포트. 사용 중 3000 cafe · 3001 sitemap · 3002 schema · 3003 seminar · 3004 dbms | 3004 | 생성기 `--port` · TODO 진행 현황 |
+| D4 | 로컬 포트 | 빈 포트. 사용 중 3000 cafe(`sitemap/cafe.pi`) · 3001 sitemap · 3002 schema · 3003 seminar · 3004 dbms | 3004 | 생성기 `--port` · TODO 진행 현황 |
 | D5 | DB | 사이트 전용 Supabase 프로젝트 1개, 전 환경 `public` 스키마 | 전용 1개 · `public` | 앱 `docs/PRD.md` |
 | D6 | 골격 기준 앱 | seminar.pi(가장 최신 : Pi + Google + `@pi/i18n`) | seminar.pi 복제·축소 | 앱 `docs/ROADMAP.md` |
 | D7 | 앱 경계·다른 앱과 연결 방식 | 데이터 공유 없음(PDB). 연결이 필요하면 상대 앱 API | 별도 DB + schema.pi 연결 API | 앱 `docs/PRD.md` (dbms 는 `sitemap/schema.pi/docs/MASTER_ROADMAP.md` §3-10 에도) |
@@ -394,7 +394,7 @@ cd ../..
   2. Project Name = `<app>`(GitHub 상태 이름이 `Vercel – <app>` 이 된다). **Root Directory = `sitemap/<domain>`**. (선택) 첫 빌드 실패(T01)를 피하려면 Deploy 전에 이 Import 화면의 Environment Variables 에 `PI_SESSION_SECRET`(`.env.vercel-prod` 값)·`NEXT_PUBLIC_PI_SANDBOX=true` 를 먼저 넣어도 된다(`NEXT_PUBLIC_APP_URL` 은 optional 이라 나중에 넣어도 빌드 통과). Deploy.
   3. **`<URL>` 확정** : **Settings → Domains** 에서 운영 주소를 `<app>pi.vercel.app`(또는 비어 있는 `*.vercel.app`)으로 추가하고 기본으로 지정한다. 프로젝트 이름이 `<app>` 이어도 `<app>.vercel.app` 이 나온다는 보장이 없다(다른 계정이 쓰면 접미사가 붙은 주소 — dbms 도 프로젝트 `dbms` · 주소 `https://dbmspi.vercel.app`, dbms 가 주소를 정한 방법은 [확인중 : 마스터]). 이 값을 `<URL>` 로 확정해 `.env.vercel-prod` 의 `NEXT_PUBLIC_APP_URL`(생성기 값 `[확인중 : 운영 도메인]`)·`docs/PRD.md`·`docs/ROADMAP.md` 에 적는다. 이후 Google 리디렉션(S9)·Pi Portal App URL(S12)·Pi Sign-In 콜백은 모두 이 값을 쓴다.
   4. **Settings → Git** 에서 확인 : Connected Git Repository 가 `anakinwon/loginpi` · Ignored Build Step 비움 · (S8 뒤) Production Branch.
-- **완료 확인** : 서비스가 아무 커밋이나 push 한 뒤 5.1 상태 스크립트에 `Vercel – <app>` 줄이 생긴다. 기존 프로젝트(loginpi·cafe·schema·seminar·sitemaps·dbms … — 사이트가 늘면 함께 늘어남) 줄은 있는데 자기 줄만 없으면 Git 연결 미완이다(T03). 프로젝트 목록은 5.1 의 컨텍스트 목록 명령으로 본다.
+- **완료 확인** : 서비스가 아무 커밋이나 push 한 뒤 5.1 상태 스크립트에 `Vercel – <app>` 줄이 생긴다. 기존 프로젝트(loginpi·cafe·schema·seminar·sitemaps·dbms … — 사이트가 늘면 함께 늘어남, loginpi·cafe 의 Root Directory 는 `sitemap/cafe.pi`) 줄은 있는데 자기 줄만 없으면 Git 연결 미완이다(T03). 프로젝트 목록은 5.1 의 컨텍스트 목록 명령으로 본다.
 - **흔한 실수** : 첫 빌드가 `Invalid environment variables … PI_SESSION_SECRET undefined` 로 실패 — S6-2 에서 미리 넣지 않았다면 정상이다. S7 등록 후 재배포(T01). 프로젝트 생성 때의 첫 빌드나 수동 Redeploy 로 생긴 상태를 "push 로 빌드됨" 으로 착각 → 상태 시각을 push 시각과 비교한다.
 
 ### S7. 환경변수 1차 등록 (첫 배포 최소 집합)
@@ -416,6 +416,7 @@ cd ../..
 ### S8. 운영 브랜치 승격
 
 - **목적** : `prod/<app>` 브랜치를 만들고 Vercel Production 을 거기에 묶는다.
+- **현행 주의(2026-11-04 확인, 2026-11-08 API 재확인)** : 기존 Vercel 프로젝트(cafe·loginpi·schema·dbms·seminar·sitemaps)의 Production Branch 는 모두 **master** 다 — `production`(cafe)·`prod/*` 푸시는 미리보기만 만들고, 운영 반영은 master push 다. cafe.pi 도 `sitemap/cafe.pi` 로 옮겨져(2026-11-08) cafe 만의 예외(루트 앱·`production` 브랜치)는 없어졌다. 이 Step 의 `prod/<app>` 절차를 유지할지는 [확인중 : 마스터], `promote-to-prod.mjs` 정비는 후속.
 - **담당** : 서비스(마스터 지시 후) + 마스터(Vercel 설정)
 - **방법**
 

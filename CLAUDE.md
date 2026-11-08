@@ -32,8 +32,11 @@ pnpm format           # Prettier (Tailwind 클래스 순서 자동 정렬)
 pnpm format:check     # 포맷 검사 (수정 없음)
 pnpm tsc --noEmit     # 타입 체크
 pnpm dlx shadcn@latest add <컴포넌트명>
-node scripts/promote-to-prod.mjs --yes   # 운영 승격 (master→production, ff-only)
+node scripts/promote-to-prod.mjs --yes   # 운영 승격 (master→production, ff-only) — 아래 주석 참조
 ```
+
+루트 명령은 `pnpm --filter @site/cafe …` 프록시(루트 `package.json` = 워크스페이스 전용) — `sitemap/cafe.pi` 에서 직접 실행해도 같다.
+`promote-to-prod.mjs` 의 'cafe = production 브랜치' 전제는 낡았다 — Vercel cafe 운영 브랜치는 master(2026-11-04 확인, 2026-11-08 API 재확인)라 production 승격은 미리보기만 만든다. 스크립트 정비는 후속 [확인중 : 마스터].
 
 **⚠️ 배포 검증 철칙 (2026-07-16 사고)**: Vercel은 빌드 실패 시 **이전 배포를 조용히 계속 서빙** — "서비스가 응답한다" ≠ 반영됨. 승격 후 반드시 `api.github.com/repos/anakinwon/loginpi/commits/<sha>/status`에서 **`Vercel – cafe: success` 개별 확인**(종합 state는 staging 선실패로 오판 가능, gh CLI 없음 — node fetch). 라우트 수정 커밋 전 최소 관문은 lint가 아니라 **`pnpm build`**(lint는 타입 에러를 못 잡음). 게이트를 함수로 추출하면 TS 내로잉이 끊긴다 — 타입 술어(`user is UserRow`)로 선언.
 
@@ -72,7 +75,7 @@ node scripts/promote-to-prod.mjs --yes   # 운영 승격 (master→production, f
 
 ### Tailwind CSS v4 (CSS-first)
 
-- `tailwind.config.*` **없음** — `src/app/globals.css`의 `@import 'tailwindcss'`가 진입점
+- `tailwind.config.*` **없음** — `sitemap/cafe.pi/src/app/globals.css`의 `@import 'tailwindcss'`가 진입점
 - 테마: `@theme inline { ... }` CSS 변수 블록 | PostCSS: `@tailwindcss/postcss`
 - 다크모드 연결 필수: `@custom-variant dark (&:where(.dark, .dark *));`
   이 줄 없으면 next-themes가 `<html class="dark">` 주입해도 `dark:` 클래스 미작동
@@ -80,8 +83,8 @@ node scripts/promote-to-prod.mjs --yes   # 운영 승격 (master→production, f
 
 ### 환경변수 (t3-env)
 
-- 스키마: `src/env.ts` — `next.config.ts` 상단 `import './src/env'`로 빌드 시점 자동 검증
-- 새 env 추가 시 `src/env.ts` + `.env.example` 동시 수정
+- 스키마: `sitemap/cafe.pi/src/env.ts` — 앱 `next.config.ts` 상단 `import './src/env'`로 빌드 시점 자동 검증
+- 새 env 추가 시 `sitemap/cafe.pi/src/env.ts` + `sitemap/cafe.pi/.env.example` 동시 수정
 - **환경변수 질문·신규 테넌트 = `docs/ENV_GUIDE.md` 정본**(키별 구하는 곳·시스템 간 공유 규칙·질의 이력) — 질문엔 위치만 안내하고 새 답은 5절에 추가. 값 모음 `.env.multi`(gitignore), 신규 테넌트 설정 한 세트 `node scripts/tenant-env.mjs new <도메인>.pi`(env·docs 골격·CLAUDE.md), 모음 갱신 `… multi`, **신규 테넌트 전체 단계 = `sitemap/multitenant_create_TODO-List.md`**
 
 ### pnpm 11
@@ -92,14 +95,14 @@ node scripts/promote-to-prod.mjs --yes   # 운영 승격 (master→production, f
 
 ## 다국어 (next-intl v4)
 
-- `src/i18n/routing.ts`의 `locales` 배열은 **빌드 시점 고정** — Vercel 런타임 수정 불가. 203개 선점 등록.
-- locale 매핑 단일 소스: `src/lib/locale-currency.ts` / `src/lib/locale-country.ts` — 직접 정의 금지 (sync 버그)
+- `sitemap/cafe.pi/src/i18n/routing.ts`의 `locales` 배열은 **빌드 시점 고정** — Vercel 런타임 수정 불가. 203개 선점 등록.
+- locale 매핑 단일 소스: `sitemap/cafe.pi/src/lib/locale-currency.ts` / `sitemap/cafe.pi/src/lib/locale-country.ts` — 직접 정의 금지 (sync 버그)
 - `locale_cd` 형식: `/^[a-z]{2,3}(-[A-Z]{2,3})?$/` (Admin 신규 추가 시 필수 검증)
 - 번역 로딩: `import()` 대신 `readFile()` 사용 — Node.js 모듈캐시가 동기화 결과를 반영하지 않음
-- `pnpm build` 시 `scripts/validate-locales.mjs`가 messages ↔ 통화 ↔ 국가 ↔ routing.ts 교차 검증 (수동: `pnpm validate:locales`)
-- **활성 locale 189개** (2026-07-08 글로벌 대확장, 66개 언어 완역). 신규 locale 추가는 **7곳 체크리스트**(PRD_3_MUL_LAN v2.0 §0) — ⚠️ `i18n_cntry_mst` FK는 `i18n_lang_mst`(언어마스터) 참조, 국기 이모지 베이스 U+1F1E6, 국가코드≠언어코드(실제 주 언어는 `scripts/i18n-lang-map.mjs` 단일소스)
+- `pnpm build` 시 `sitemap/cafe.pi/scripts/validate-locales.mjs`가 messages ↔ 통화 ↔ 국가 ↔ routing.ts 교차 검증 (수동: `pnpm validate:locales`)
+- **활성 locale 189개** (2026-07-08 글로벌 대확장, 66개 언어 완역). 신규 locale 추가는 **7곳 체크리스트**(PRD_3_MUL_LAN v2.0 §0) — ⚠️ `i18n_cntry_mst` FK는 `i18n_lang_mst`(언어마스터) 참조, 국기 이모지 베이스 U+1F1E6, 국가코드≠언어코드(실제 주 언어는 `sitemap/cafe.pi/scripts/i18n-lang-map.mjs` 단일소스)
 - **카페 테마명은 번역키** `themes.<theme_cd>` + `useThemeName` 훅(폐기 테마는 DB명 폴백) — theme_nm_en 직접 표시 금지. 번역키 폐기는 **삭제**(빈 값 "" 금지 — 99% 통계 사고)
-- **번들 직렬화 노출 주의**: next-intl은 메시지 번들 **전체**를 모든 페이지 HTML에 직렬화 — 죽은 키·오버레이 `_comment`도 소스에 노출된다(등재 심사 스캔 대상, 2026-07-16 베팅 키 4,512행 사고). 폐기 키는 json+DB 동시 삭제. `i18n_message`는 del_yn이 없고 sync가 무필터 조회라 **유일하게 물리 DELETE가 정본**(sql/182 — 남기면 동기화 때 부활)
+- **번들 직렬화 노출 주의**: next-intl은 메시지 번들 **전체**를 모든 페이지 HTML에 직렬화 — 죽은 키·오버레이 `_comment`도 소스에 노출된다(등재 심사 스캔 대상, 2026-07-16 베팅 키 4,512행 사고). 폐기 키는 json+DB 동시 삭제. `i18n_message`는 del_yn이 없고 sync가 무필터 조회라 **유일하게 물리 DELETE가 정본**(sitemap/cafe.pi/sql/182 — 남기면 동기화 때 부활)
 
 ---
 
@@ -109,12 +112,12 @@ node scripts/promote-to-prod.mjs --yes   # 운영 승격 (master→production, f
 
 - **시스템 컬럼 4개** 전 테이블 필수: `regr_id TEXT NOT NULL DEFAULT 'ADMIN'`, `reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`, `modr_id TEXT NOT NULL DEFAULT 'ADMIN'`, `mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`
 - **논리삭제**: `del_yn CHAR(1) DEFAULT 'N'` + `del_dtm TIMESTAMPTZ` — **물리 DELETE 절대 금지**
-- **FK(외래키) — 현재는 유지, 전환은 반드시 단계적으로**: 이 프로젝트는 PostgREST 임베디드 조인(`.select('*, mps_shop(...)')`·`msg_theme(...)` 등)을 광범위하게 쓰며, 이는 **DB의 FK 관계에 의존**한다. 따라서 **FK를 일괄 제거하면 `PGRST200`으로 목록 조회가 붕괴**한다(2026-07-01 사고: FK 62개 제거 → 카페·매장·상품 목록 장애 → `sql/156`으로 전량 복구).
+- **FK(외래키) — 현재는 유지, 전환은 반드시 단계적으로**: 이 프로젝트는 PostgREST 임베디드 조인(`.select('*, mps_shop(...)')`·`msg_theme(...)` 등)을 광범위하게 쓰며, 이는 **DB의 FK 관계에 의존**한다. 따라서 **FK를 일괄 제거하면 `PGRST200`으로 목록 조회가 붕괴**한다(2026-07-01 사고: FK 62개 제거 → 카페·매장·상품 목록 장애 → `sitemap/cafe.pi/sql/156`으로 전량 복구).
   무FK(앱 레벨 참조 무결성 + 별도 조회·Map 병합)가 성능·유연성 면에서 **더 나은 선택일 수 있다** — 신기술이 과거 방식을 능가하는 경우는 충분히 있다. 다만 전환 시 **반드시 "① 해당 임베디드 조인을 별도 조회+Map으로 대체 → ② 그 뒤 FK 제거" 순서**를 지킨다. ⛔ 코드 대체 없이 FK만 먼저 지우지 말 것(이번 사고의 근본 원인). 특정 FK의 성능이 우려되면 개별·점진 전환으로 접근한다.
 - **PK·인덱스 이름 (정본 §5 v2.5, 2026-10-20 마스터 재정의)**: PK = `pk_<테이블>`(이름 없는 PRIMARY KEY 금지), 인덱스·유일 제약 = `x_<테이블>_NN` — 구 `_pkey`·`_key`·`idx_`·`ux_` 금지. schema.pi 는 소급 완료(`sitemap/schema.pi/sql/066`)·Hook R9 강제, **cafe.pi DB 소급은 [확인중 : 마스터]**(기존 cafe.pi 객체는 구 이름 유지 중). FK 이름은 PostgREST 임베디드 조인 힌트라 범위 밖
 - 복합어: REGR(등록자), MODR(변경자), PYMNT(결제), CTGR(카테고리)
 - 도메인 약어: `_id`(식별자), `_nm`(이름), `_cd`(코드), `_yn`(여부), `_dtm`(일시), `_dt`(날짜)
-- `sql/*.sql` 작성 시 `da-ddl-guard` Hook 자동 검사 → 위반 차단, DA 승인(`-- DA-APPROVED:` 주석) 필요
+- `sql/*.sql`(cafe.pi = `sitemap/cafe.pi/sql/`) 작성 시 `da-ddl-guard` Hook 자동 검사 → 위반 차단, DA 승인(`-- DA-APPROVED:` 주석) 필요
 - 현재 테이블: `sys_user`, `pi_pymnt`, `auth_link_cd`, `brd_*`, `std_*`, `approval_queue`, `i18n_locale`, `i18n_message`, `i18n_cntry_mst`
 
 ---
@@ -127,9 +130,9 @@ Pi Browser는 쿠키를 저장하지 않으므로 **쿠키(일반 브라우저) 
 
 - **발급** (`/api/auth/pi` POST): HMAC-SHA256 토큰을 `pi_session` 쿠키와 JSON `token` 필드로 **둘 다 반환**
 - **클라이언트 저장**: `pi-auth-provider`가 `localStorage`(`pi_token`)에 저장
-- **요청**: `fetch` 대신 **`piFetch`**(`src/lib/pi-fetch.ts`) 사용 → `X-Pi-Token` 헤더 자동 첨부 + `credentials: 'include'`
+- **요청**: `fetch` 대신 **`piFetch`**(`sitemap/cafe.pi/src/lib/pi-fetch.ts`) 사용 → `X-Pi-Token` 헤더 자동 첨부 + `credentials: 'include'`
 - **서버 검증**: `getSessionUser()`가 쿠키 우선 → `X-Pi-Token` 헤더 폴백 + `tokenValidUntil` 만료 검증
-- **⭐사용자 매칭 철칙 (2026-07-02 uid 재발급 사고)**: `pi_uid`는 (포털 앱 × Testnet/Mainnet) **scoped 값**이라 sandbox 플립·메인넷 전환·포털 앱 변경 시 전원 재발급된다 → **영구 식별자로 쓰지 말 것**. 사람의 불변 키는 `pi_username`(전역 유일·`/v2/me` 검증). `upsertPiUser`가 `uid → username` 재바인딩 폴백 + 재가입 부활(`rejoin_dtm`·`del_rsn_cd`)을 수행하며, 활성 `pi_username`은 UNIQUE 인덱스(sql/162)로 강제 — 위반 에러 시 인덱스가 아니라 코드를 고칠 것. 계정 중복 발견 시 자산(seller_id 등) 이관 금지, 세션을 원본으로 복원(정본: `docs/TROUBLESHOOT.md` 2026-07-02 근본수정편).
+- **⭐사용자 매칭 철칙 (2026-07-02 uid 재발급 사고)**: `pi_uid`는 (포털 앱 × Testnet/Mainnet) **scoped 값**이라 sandbox 플립·메인넷 전환·포털 앱 변경 시 전원 재발급된다 → **영구 식별자로 쓰지 말 것**. 사람의 불변 키는 `pi_username`(전역 유일·`/v2/me` 검증). `upsertPiUser`가 `uid → username` 재바인딩 폴백 + 재가입 부활(`rejoin_dtm`·`del_rsn_cd`)을 수행하며, 활성 `pi_username`은 UNIQUE 인덱스(sitemap/cafe.pi/sql/162)로 강제 — 위반 에러 시 인덱스가 아니라 코드를 고칠 것. 계정 중복 발견 시 자산(seller_id 등) 이관 금지, 세션을 원본으로 복원(정본: `docs/TROUBLESHOOT.md` 2026-07-02 근본수정편).
 
 ### 클라이언트 게이트 패턴 (Pi Browser 필수 — 위반 시 무한 루프)
 
@@ -172,9 +175,9 @@ if (!isAdmin(user)) return NextResponse.json({ error: 'unauthorized' }, { status
 ## Supabase 사용 패턴
 
 - RLS **비활성화** — 모든 접근은 서버 전용 `SUPABASE_SERVICE_ROLE_KEY`
-- `src/lib/supabase-admin.ts` — lazy init (빌드 시 SERVICE_ROLE_KEY 미설정 방지)
+- `sitemap/cafe.pi/src/lib/supabase-admin.ts` — lazy init (빌드 시 SERVICE_ROLE_KEY 미설정 방지)
 - anon key 클라이언트 직접 사용 금지 | 단건 조회: `.maybeSingle()` (`.single()`은 결과 없을 때 에러)
-- **텍스트 부분일치 검색 표준**: `%검색어%`(substring) 검색엔 `pg_trgm` GIN 인덱스(`gin_trgm_ops`)를 표준으로 쓴다. PostgREST `.ilike`는 대소문자 무시로 GIN을 **자동 가속**(코드 변경 0), `lower() LIKE` RPC는 `lower()` 식 인덱스 필요. 활성행 부분 인덱스(`WHERE del_yn='N'`)·UI 최소 2글자 권장(trigram=3글자 단위). 적용: 카페 `sql/072`·상품·게시판 `sql/076`. 신규 검색 추가 시 동일 패턴 따를 것.
+- **텍스트 부분일치 검색 표준**: `%검색어%`(substring) 검색엔 `pg_trgm` GIN 인덱스(`gin_trgm_ops`)를 표준으로 쓴다. PostgREST `.ilike`는 대소문자 무시로 GIN을 **자동 가속**(코드 변경 0), `lower() LIKE` RPC는 `lower()` 식 인덱스 필요. 활성행 부분 인덱스(`WHERE del_yn='N'`)·UI 최소 2글자 권장(trigram=3글자 단위). 적용: 카페 `sitemap/cafe.pi/sql/072`·상품·게시판 `sitemap/cafe.pi/sql/076`. 신규 검색 추가 시 동일 패턴 따를 것.
 
 ---
 
@@ -213,8 +216,10 @@ const toPi = (units: bigint): number => Number(units) / 10_000_000
 
 ## 디렉토리 구조
 
+cafe.pi 앱 = `sitemap/cafe.pi`(`@site/cafe`, 2026-11-08 이동) — 루트 = 공용 도구·문서·하네스(`scripts/`·`docs/`·`.claude/`·`packages/`). 앱의 `messages/`(번역 파일, ko.json 이 source of truth)·`scripts/`(cafe 전용)·`sql/`·`docs/law/`(약관 런타임 자산)는 `sitemap/cafe.pi/` 바로 아래.
+
 ```
-src/
+sitemap/cafe.pi/src/
 ├── app/
 │   ├── [locale]/
 │   │   ├── (admin)/admin/      # 대시보드·users·payments·links·board·std·i18n
@@ -242,7 +247,6 @@ src/
 │   ├── supabase-admin.ts       # lazy init admin 클라이언트
 │   ├── users.ts                # sys_user CRUD
 │   └── utils.ts                # cn() = twMerge + clsx
-├── messages/                   # 번역 파일 (ko.json이 source of truth)
 ├── types/
 │   ├── next-auth.d.ts
 │   └── pi-session.ts
@@ -268,7 +272,7 @@ src/
 
 ## 구축 결함 재발 방지 R-P0~P6 (전 시스템 상속 정본 — 2026-10-24 마스터 부탁, 예외 없음)
 
-**적용 범위 = 이 저장소의 모든 시스템**(cafe.pi 루트 `src/`·`sitemap/sitemap.pi`·`sitemap/schema.pi`, 이후 추가 앱 포함). 정본은 이 절 하나 — 하위 시스템 CLAUDE.md 는 "R-P0~P6 상속 + 그 시스템의 예시·공용 함수"만 적고 규칙 문구를 복제하지 않는다. 출처 사례 : `sitemap/schema.pi/docs/TROUBLESHOOT.md` TS-01(운영 느림·오류 22건이 전부 구축 결함 — 구현·발견·해결을 모두 서비스가 하면서 고객 결재 27회).
+**적용 범위 = 이 저장소의 모든 시스템**(cafe.pi `sitemap/cafe.pi`·`sitemap/sitemap.pi`·`sitemap/schema.pi`, 이후 추가 앱 포함). 정본은 이 절 하나 — 하위 시스템 CLAUDE.md 는 "R-P0~P6 상속 + 그 시스템의 예시·공용 함수"만 적고 규칙 문구를 복제하지 않는다. 출처 사례 : `sitemap/schema.pi/docs/TROUBLESHOOT.md` TS-01(운영 느림·오류 22건이 전부 구축 결함 — 구현·발견·해결을 모두 서비스가 하면서 고객 결재 27회).
 
 원격 DB·외부 API 호출은 1회마다 네트워크 왕복이고, 로컬 시험(PGlite·목업)은 이 지연을 못 본다 → **코드를 쓸 때** 지킨다.
 
