@@ -75,6 +75,16 @@ test('categorize: verbs beat nouns, evidence bonus, negation window, forced tag'
   assert.equal(categorize('MCP 서버는 (m)으로 구분해줘', { tools: { Bash: 2 }, descriptions: ['Test the hook with synthetic events'] }).category, 'CONFIG')   // 설명문의 "test" 는 증거가 아니다
 })
 
+test('categorize: 화면·기능 변경 요청은 OTHER/QUERY 가 아니다(2026-11-09 그래프 분석 결함 ④ 회귀), 질문은 QUERY 유지', () => {
+  for (const s of ['지금 수행되는 부분을 깜빡이게 효과를 넣어줘', '완료된 노드에 연초록 색으로 표시해 주고,', '진행중인 노드는 형광 노란색으로 표시해 줘', '시작과 종료까지 진행되는 모든 노드를 화살표로 계속 연결시켜 줘!', '<pasted_content id="x"> 웹페이지 하나 만들자. 1. 요청 - 1.1 접수 </pasted_content>'])
+    assert.equal(categorize(s).category, 'FEATURE', s)
+  for (const s of ['모바일에서 우주선 아래가 잘려, 크기조정 및 위치조정 해줘', '트리 메뉴를 펼칠 수 있습니다 <- 이거 안된다구,,,'])
+    assert.equal(categorize(s).category, 'FIX', s)
+  for (const s of ['이 노드는 왜 미수행으로 표시되지?','이 렙톱으로 AI모델 연구가 가능한가?', 'git status 보여 줘', '어떤 옵션이 있는지 알려줘'])
+    assert.equal(categorize(s).category, 'QUERY', s)
+  assert.equal(categorize('<pasted_content id="x">로그 원문</pasted_content> 이거 왜 그래?').category, 'QUERY')   // 질문이 붙여넣기 밖에 있으면 붙여넣기 본문은 계속 무시
+})
+
 test('costUsd uses per-model pricing and does not double count thinking', () => {
   const t = { input: 1_000_000, cache_read: 0, cache_create: 0, output: 1_000_000, thinking: 900_000 }
   assert.equal(costUsd(t, 'claude-fable-5-1', { cache1h: false }), 60)

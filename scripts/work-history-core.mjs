@@ -17,8 +17,8 @@ export const SCHEMA_VERSION = 2
 // ── 카테고리 ───────────────────────────────────────────────────────────────────
 // verb: 동작 동사(가중 3), noun: 주제 명사(가중 1). 동점 시 order 가 앞선 쪽. color: dataviz 팔레트 슬롯(라이트/다크 검증 완료 8색 + 보조 4색)
 export const CATEGORIES = [
-  { key: 'FEATURE',  label: '기능 구현', color: 1,  verb: /만들어|만들고|구현|추가해|생성해|작성해|개발해|그려|짜\s?줘|\bbuild\b|\bimplement|\bcreate\b|\badd\b|\bwrite\b|\bgenerate/i, noun: /기능|스크립트|훅\b|컴포넌트|페이지|\bAPI\b|대시보드|보고서|차트|그래프|통계\s?파일/i },
-  { key: 'FIX',      label: '수정·버그', color: 8,  verb: /고쳐|수정해|바로잡|해결해|\bfix\b|\brepair|\bresolve/i, noun: /버그|\bbug\b|오류|에러|\berror\b|안\s?돼|안\s?됨|깨졌|깨진|실패|\bfail/i },
+  { key: 'FEATURE',  label: '기능 구현', color: 1,  verb: /만들어|만들고|만들자|구현|추가해|생성해|작성해|개발해|그려|짜\s?줘|넣어\s?줘|넣어\s?주|표시해\s?(?:줘|주)|연결시켜|연결해\s?줘|보이게\s?해|띄워\s?줘|\bbuild\b|\bimplement|\bcreate\b|\badd\b|\bwrite\b|\bgenerate/i, noun: /기능|스크립트|훅\b|컴포넌트|페이지|\bAPI\b|대시보드|보고서|차트|그래프|통계\s?파일/i },
+  { key: 'FIX',      label: '수정·버그', color: 8,  verb: /고쳐|수정해|바로잡|해결해|조정\s?해|\bfix\b|\brepair|\bresolve/i, noun: /버그|\bbug\b|오류|에러|\berror\b|안\s?돼|안\s?됨|안\s?된다|잘려|잘린|원상\s?복구|깨졌|깨진|실패|\bfail/i },
   { key: 'REFACTOR', label: '재구성',   color: 7,  verb: /리팩토|재구성|정리해|단순화|분리해|통합해|\brefactor|\bsimplif|\bextract|\bsplit|\bmerge\b(?!.*(?:branch|pr))/i, noun: /구조|중복|모듈/i },
   { key: 'GIT',      label: 'Git',      color: 4,  verb: /커밋|푸시|\bcommit\b|\bpush\b|\brebase\b|체리픽|\bcherry/i, noun: /브랜치|\bbranch\b|\bPR\b|풀리퀘|머지/i },
   { key: 'DEPLOY',   label: '배포',     color: 6,  verb: /배포해|승격|\bdeploy|\bpromote|\brelease\b|롤백|\brollback/i, noun: /운영|프로덕션|\bprod\b|스테이징|\bvercel\b/i },
@@ -27,7 +27,7 @@ export const CATEGORIES = [
   { key: 'DATA',     label: '데이터',   color: 2,  verb: /마이그레이션|\bmigrat/i, noun: /\bDDL\b|테이블|스키마|\bschema\b|\bSQL\b|컬럼|인덱스|\bsupabase\b/i },
   { key: 'CONFIG',   label: '설정',     color: 9,  verb: /설정해|등록|반영|적용|활성화|비활성화|구분해|표기해|항상\s|앞으로\s|원칙|규칙|지시|\bconfigure|\bregister|\benable|\bdisable|\balways\b/i, noun: /설정|\bsettings|\bconfig|환경변수|전역변수|\benv\b|CLAUDE\.md|권한|상태표시줄|\bhooks?\b|훅|접미|라벨/i },
   { key: 'DOCS',     label: '문서',     color: 10, verb: /문서화|정리해\s?줘|요약해|기록해|남겨\s?줘|\bdocument|\bsummari[sz]e/i, noun: /문서|\bdocs?\b|README|메모리|주석|\bPRD\b|가이드|매뉴얼/i },
-  { key: 'QUERY',    label: '조회·설명', color: 11, verb: /보여\s?줘|알려\s?줘|확인해\s?줘|설명해|표시해\s?줘|찾아\s?줘|평가해|분석해|비교해|\bshow\b|\blist\b|\bexplain|\bevaluate|\banaly[sz]e|\bcompare/i, noun: /뭐야|무엇|어떻게|왜\b|\bwhat\b|\bhow\b|\bwhy\b|\?\s*$/i },
+  { key: 'QUERY',    label: '조회·설명', color: 11, verb: /보여\s?줘|알려\s?줘|확인해\s?줘|설명해|찾아\s?줘|평가해|분석해|비교해|\bshow\b|\blist\b|\bexplain|\bevaluate|\banaly[sz]e|\bcompare/i, noun: /뭐야|무엇|어떻게|왜\b|\bwhat\b|\bhow\b|\bwhy\b|\?\s*$/i },
   { key: 'OTHER',    label: '기타',     color: 0,  verb: /$^/, noun: /$^/ },
 ]
 export const CATEGORY_KEYS = CATEGORIES.map(c => c.key)
@@ -55,7 +55,8 @@ export function categorize(text, evidence = {}) {
   const raw = String(text || '')
   const forced = raw.match(/#cat:([A-Za-z]+)/)
   if (forced) { const k = forced[1].toUpperCase(); return { category: k, tags: [k], rule: 'forced', scores: { [k]: 99 }, confidence: 1 } }
-  const plain = stripNoise(raw)
+  let plain = stripNoise(raw)
+  if (!plain.trim()) plain = stripNoise(raw.replace(/<\/?pasted_content[^>]*>/g, ' '))   // 요청 전체가 붙여넣기면 그 본문이 요청(2026-11-09 '웹페이지 하나 만들자' 붙여넣기 요청이 OTHER 로 빠진 사례)
   const scores = {}, why = {}
   const hit = (re) => { const m = plain.match(re); if (!m) return 0; const before = plain.slice(Math.max(0, m.index - 12), m.index), after = plain.slice(m.index + m[0].length, m.index + m[0].length + 10); return NEGATION.test(before) || NEGATION.test(after) ? -2 : 1 }   // 한국어는 부정어가 뒤에 온다("설치하지 말고")
   for (const c of CATEGORIES) {
