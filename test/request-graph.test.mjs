@@ -4,7 +4,7 @@ import test from 'node:test'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import assert from 'node:assert/strict'
-import { buildRequestGraph, buildPath, loopRounds, roundSummary, fmtSpan, designGraph, safeName, renderHtml, SLOTS, SLOT_MAP, ENG_SLOTS, STATUS_STYLE, PAGE_BG } from '../scripts/request-graph.mjs'
+import { buildRequestGraph, buildPath, loopRounds, roundSummary, fmtSpan, designGraph, safeName, renderHtml, agentRounds, splitAgentRounds, nodeAlerts, engTxt, ALERT, SLOTS, SLOT_MAP, ENG_SLOTS, STATUS_STYLE, PAGE_BG } from '../scripts/request-graph.mjs'
 
 const T0 = '2026-11-08T10:00:00+09:00', T1 = '2026-11-08T10:30:00+09:00', P = Date.parse
 const turn = (extra = {}) => ({ ts_req: T0, ts_res: T1, req_head: '요청', ...extra })
@@ -22,14 +22,80 @@ test('빈 매핑·에이전트 없는 완료 턴 : 1·1.1 완료, 분석 슬롯 
   assert.equal(node(ns, '1').eng, 0)
 })
 
-test('기본 SLOT_MAP : 대응 기록 없는 엔지니어링 슬롯 = 미수행, 훅 기록 = 완료(시각 —), 엔지니어링 N/5', () => {
+test('기본 SLOT_MAP : 대응 기록 없는 엔지니어링 슬롯 = 미수행, 시각 없는 훅 기록 = 완료(추정), 엔지니어링 N/5 (추정 k)', () => {
   assert.deepEqual(Object.keys(SLOT_MAP).filter(k => ENG_SLOTS.includes(k)).sort(), ENG_SLOTS)
   const ns = buildRequestGraph(turn({ resources: { hooks: [{ name: 'UserPromptSubmit', event: 'UserPromptSubmit', n: 1 }] } }), [])
-  assert.equal(node(ns, '1.1.1').status, 'done')
-  assert.equal(node(ns, '1.1.1').t0, null)
+  assert.equal(node(ns, '1.1.1').status, 'estimated'); assert.equal(node(ns, '1.1.1').statusLabel, '완료(추정)')
+  assert.equal(node(ns, '1.1.1').t0, null); assert.equal(fmtSpan(node(ns, '1.1.1'), 0), '훅 실행(시각 미기록)'); assert.equal(fmtSpan(node(ns, '1.1.1'), 0, true), '훅 실행(시각 미기록)')
   for (const id of ['1.1.2', '1.1.3', '1.1.4', '1.1.5']) assert.equal(node(ns, id).status, 'missing', id)
   assert.equal(node(ns, '1.1.5.2').status, 'unassigned')   // 5단계 밖 슬롯은 미수행이 아님
-  assert.equal(node(ns, '1').eng, 1)
+  assert.equal(node(ns, '1').eng, 1); assert.equal(node(ns, '1').engEst, 1); assert.equal(engTxt(1, 1), '1/5 (추정 1)'); assert.equal(engTxt(2, 0), '2/5')
+  assert.match(node(ns, '1').lines[0], /^엔지니어링 1\/5 \(추정 1\) 수행/)
+})
+
+test('결함 ③ : 훅 시각이 있으면(턴 중간 스캔) 완료 확정 + 시간 쌍, 화면 범례·점선 CSS', () => {
+  const h = (e, t0, t1) => ({ name: e, event: e, t0: P(t0), t1: P(t1) })
+  const ns = buildRequestGraph(turn({ resources: { hooks: [h('UserPromptSubmit', '2026-11-08T10:00:01+09:00', '2026-11-08T10:00:01+09:00'), h('PreToolUse', '2026-11-08T10:01:00+09:00', '2026-11-08T10:09:00+09:00')] } }), [])
+  assert.equal(node(ns, '1.1.1').status, 'done'); assert.equal(node(ns, '1.1.3').t1, P('2026-11-08T10:09:00+09:00'))
+  assert.equal(node(ns, '1').engEst, 0)
+  const html = renderHtml({ design: true, outDir: '.', requests: [], meta: '' })
+  assert.match(html, /\.st-estimated \.box\{stroke-dasharray/); assert.match(html, /<i class="st-estimated"><\/i>완료\(추정\)/)
+})
+
+// 서브에이전트 기록 조각 : 전달(teammate-message 문자열) · 시스템 알림 메타 · 도구 결과(오류) · end_turn
+const rec = {
+  give: (ts, s = '<teammate-message teammate_id="team-lead" summary="재작업">…</teammate-message>') => ({ type: 'user', timestamp: ts, message: { role: 'user', content: s } }),
+  meta: ts => ({ type: 'user', isMeta: true, timestamp: ts, message: { role: 'user', content: '<system-reminder> 다른 에이전트 목록 </system-reminder>' } }),
+  err: ts => ({ type: 'user', timestamp: ts, message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'x', is_error: true, content: 'fail' }] } }),
+  ok: ts => ({ type: 'user', timestamp: ts, message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'y', content: 'ok' }] } }),
+  end: ts => ({ type: 'assistant', timestamp: ts, message: { stop_reason: 'end_turn', content: [] } }),
+  hook: ts => ({ type: 'attachment', timestamp: ts, attachment: { type: 'hook_success', hookEvent: 'PostToolUse' } }),
+}
+const Z = s => `2026-11-08T${s}:00Z`
+
+test('결함 ①② agentRounds : 전달마다 1회차(알림·도구 결과 제외), 회차 끝 = end_turn, 회차별 도구 오류, 끝 뒤 훅 기록은 진행으로 안 봄', () => {
+  const rs = [rec.give(Z('01:00')), rec.meta(Z('01:00')), rec.err(Z('01:05')), rec.ok(Z('01:06')), rec.end(Z('01:10')), rec.give(Z('01:20')), rec.err(Z('01:21')), rec.err(Z('01:22')), rec.end(Z('01:30')), rec.hook(Z('01:30'))]
+  assert.deepEqual(agentRounds(rs), [{ t0: P(Z('01:00')), t1: P(Z('01:10')), run: false, errors: 1 }, { t0: P(Z('01:20')), t1: P(Z('01:30')), run: false, errors: 2 }])
+  const open = [...rs, rec.give(Z('01:40'), '지금 진행중인 프로세스가 왜 안 보이지?'), rec.ok(Z('01:41'))]   // 마스터가 팀원 창에 직접 쓴 글도 전달
+  assert.deepEqual(agentRounds(open).at(-1), { t0: P(Z('01:40')), t1: null, run: true, errors: 0 })
+  assert.equal(agentRounds(open, { alive: false }).at(-1).run, false)   // 오래 안 바뀐 기록 = 진행 아님(종료 기록 없음)
+})
+
+test('결함 ① 작업 묶음 : 지속 에이전트 회차를 요청별로 나누고(누적 번호), 묶음 누적 N/5 · 4 이상 상한 근접 · 5 이상 상한 도달', () => {
+  const mk = n => {   // 요청 A(01:00) 에 build 회차 1·2, 요청 B(02:00) 에 회차 3..n
+    const rounds = [...Array(n)].map((_, i) => ({ t0: P(Z(i < 2 ? `01:${10 + i * 10}` : `02:${10 + i * 5}`)), t1: P(Z(i < 2 ? `01:${15 + i * 10}` : `02:${12 + i * 5}`)), run: false, errors: 1 }))
+    const A = { key: 'A', session_id: 's', ts_req: Z('01:00'), ts_res: Z('01:50'), agents_detail: [ag('anakin_phase-build', Z('01:10'), { agent_id: 'abuild', ts_end: Z('02:59'), cost_usd: 3, rounds })] }
+    const B = { key: 'B', session_id: 's', ts_req: Z('02:00'), ts_res: Z('02:59'), agents_detail: [] }, C = { key: 'C', session_id: 'other', ts_req: Z('02:05'), ts_res: Z('02:06') }
+    splitAgentRounds([B, C, A]); return { A, B, C }
+  }
+  const { A, B, C } = mk(4)
+  assert.deepEqual(A.bundle, { size: 2, n: 4, agents: ['anakin_phase-build'] }); assert.deepEqual(B.bundle, A.bundle); assert.equal(C.bundle, undefined)
+  const a = A.agents_detail[0], b = B.agents_detail[0]
+  assert.equal(a.rounds.length, 2); assert.equal(a.ts_end, new Date(P(Z('01:25'))).toISOString()); assert.equal(a.errors, 2); assert.equal(a.cost_usd, 3)
+  assert.equal(b.cont, true); assert.equal(b.roundBase, 2); assert.equal(b.rounds.length, 2); assert.equal(b.cost_usd, null)
+  const nb = buildRequestGraph(B, []), bn = nb.find(n => !n.slot)
+  assert.deepEqual(bn.rounds[0].rows.map(r => r.label), ['3회차', '4회차']); assert.equal(bn.rounds[0].base, 2)
+  assert.deepEqual(node(nb, '1').cum, { n: 4, size: 2, cap: 5, level: '상한 근접' })
+  assert.match(node(nb, '1').lines[1], /^묶음 누적 4\/5 — 지속 에이전트\(anakin_phase-build\)로 이어진 요청 2건 · 상한 근접/)
+  assert.deepEqual(buildPath(nb).edges.filter(e => e.to === bn.id).map(e => e.label), ['재작업 3회차 (3/5)', '재작업 4회차 (4/5)'])
+  assert.equal(node(buildRequestGraph(mk(5).A, []), '1').cum.level, '상한 도달')
+  const solo = node(buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00')] }), []), '1')   // 지속 에이전트 없음 = 요청 단위
+  assert.deepEqual(solo.cum, { n: 0, size: 1, cap: 5 }); assert.match(solo.lines[1], /요청 단위/)
+  const html = renderHtml({ design: false, outDir: '.', requests: [], meta: '' })
+  assert.match(html, /\.badge\.alert\{color:#b42f2f;border:2px solid #d03b3b/); assert.match(html, /"alert":\{"longMs":1800000,"errors":5,"nearCap":4,"cap":5\}/)
+})
+
+test('결함 ② 경보 : 한 회차 30분 이상 = 장시간, 도구 오류 5회 이상 = 오류 다발, 회차로 나뉘면 회차 단위로 판정, 요청 노드에 경보 수', () => {
+  assert.deepEqual(ALERT, { longMs: 30 * 60e3, errors: 5, nearCap: 4, cap: 5 })
+  const long = ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { ts_end: '2026-11-08T11:19:00+09:00', errors: 5 })   // 78분 · 오류 5 (실사례)
+  const ns = buildRequestGraph(turn({ agents_detail: [long] }), []), a = ns.find(n => !n.slot)
+  assert.deepEqual(a.alerts, ['장시간', '오류 다발']); assert.equal(node(ns, '1').alertN, 2); assert.match(node(ns, '1').lines[2], /^경보 2건 — anakin_phase-build 장시간 · anakin_phase-build 오류 다발/)
+  const split = { ...long, errors: 1, rounds: [0, 26, 52].map(m => ({ t0: P('2026-11-08T10:01:00+09:00') + m * 60e3, t1: P('2026-11-08T10:01:00+09:00') + (m + 25) * 60e3, run: false, errors: 0 })) }   // 같은 78분을 25분 회차 3개로
+  const s = buildRequestGraph(turn({ agents_detail: [split] }), []).find(n => !n.slot)
+  assert.equal(s.alerts, undefined); assert.equal(s.rounds[0].rows.length, 3)
+  const now = P('2026-11-08T11:00:00+09:00')   // 진행 중 회차는 now 까지
+  assert.deepEqual(nodeAlerts({ t0: P('2026-11-08T10:20:00+09:00'), t1: null, run: true }, 0, now), ['장시간'])
+  assert.deepEqual(nodeAlerts({ t0: P('2026-11-08T10:40:00+09:00'), t1: null, run: true }, 4, now), [])
 })
 
 test('마스터 확정 매핑(2026-11-08) : 1.1.2 = collect, 1.1.5 = graph → 해당 슬롯 아래·완료, 엔지니어링 N/5 반영', () => {

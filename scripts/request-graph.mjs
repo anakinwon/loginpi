@@ -21,6 +21,7 @@ const PATHS = {
   reqMd: '.claude/engineering/50. graph/requests',                   // 요청별 md(실데이터 — gitignore)
   loops: '.omc/state/loop',
   runs: '.omc/state/request-graph/runs.jsonl',                      // 생성기 실행 기록(append-only, gitignore) — 1.1.5.2 판정 원천
+  roundsCache: '.omc/state/request-graph/rounds-cache.json',         // 팀원 에이전트 회차 캐시(agent_id → 기록 크기·mtime·회차, gitignore)
 }
 const RUN_TRIGGERS = ['stop', 'subagent', 'manual']
 // ponytail: Stop 훅 실행은 응답 직후(로거·통계 다음)라 턴 창 끝 뒤에 찍힌다 → 창 끝 60초 유예. 그 사이 다음 턴이 시작되면 그 턴 실행도 앞 턴에 잡힐 수 있음(세션 구분 필드 추가 시 해소)
@@ -31,6 +32,8 @@ const RUN_GRACE_MS = 60e3
  */
 export const STATUS_STYLE = {
   done: { label: '완료', color: '#3fa66b', fill: '#dcf5e3', text: '#1e6b40', dark: { color: '#5cc98a', fill: '#1f3d2b', text: '#7fdca4' } },
+  // 완료(추정) = 시각 없는 훅 기록만 있는 슬롯(2026-11-09 결함 ③) : 완료와 같은 연초록 채움 + 점선 테두리
+  estimated: { label: '완료(추정)', color: '#3fa66b', fill: '#dcf5e3', text: '#1e6b40', dash: true, dark: { color: '#5cc98a', fill: '#1f3d2b', text: '#7fdca4' } },
   running: { label: '진행', color: '#c9b800', fill: '#fff200', text: '#1a1a1a', ink: '#1a1a1a', pulse: true },
   error: { label: '오류', color: '#d03b3b', text: '#b42f2f', dark: { text: '#f0705c' } },
   blocked: { label: 'BLOCKED', color: '#8a5cc2', text: '#7446ad', dark: { text: '#b993e6' } },
@@ -43,6 +46,11 @@ export const PAGE_BG = { light: '#fcfcfb', dark: '#1a1a19' }      // 카드 바�
 const SIZE = { termW: 96, termH: 32, boxW: 158, colGap: 26, lineH: 15, tmH: 13, padY: 6, gapY: 8, minScale: 0.72, maxScale: 1.4, forceMinScale: 0.45, repel: 9000, link: 120, gravity: 0.003, reloadRun: 5000, reloadIdle: 30000, pageSize: 50, days: 7, mdRecent: 30, headCut: 80 }
 export const FLOW_COLOR = { done: '#3fa66b', running: '#c9b800', planned: '#898781', example: '#898781', design: '#2a78d6' }   // 실행 경로 화살표·화살촉 색(완료 연초록 · 진행 형광 노랑 테두리색 · 대기·예시 회색 · 설계도 파랑)
 export const LOOP_CAP = 5                                            // 루트 CLAUDE.md 작업 수행 원칙 ④ 안전 상한 5회(2026-11-08 마스터 10→5)
+/**
+ * 경보 규칙(2026-11-09 그래프 분석 결함 ①②) : 실행 노드 한 회차 소요 ≥ longMs = '장시간', 도구 오류 ≥ errors = '오류 다발'
+ *   작업 묶음 누적 회차 ≥ nearCap = '상한 근접', ≥ cap = '상한 도달'(빨강 테두리 배지)
+ */
+export const ALERT = { longMs: 30 * 60e3, errors: 5, nearCap: LOOP_CAP - 1, cap: LOOP_CAP }
 const LIVE = { windowMs: 10 * 60e3, tailBytes: 4 * 2 ** 20 }        // 턴 중간 스캔 : 최근 10분 안에 바뀐 세션 기록만, 파일 끝 4MB 만 읽음
 const TURN_NODE = { done: 'done', running: 'running', interrupted: 'error', noreply: 'error', superseded: 'notrun' }   // turnStatus 키 → 노드 상태
 const VERDICT_NODE = { PASS: 'done', FAIL: 'error', BLOCKED: 'blocked' }
@@ -94,10 +102,13 @@ export const SLOTS = [
 
 // ── 순수 함수(시험 대상 — fmtSpan·roundSummary 는 화면 스크립트에도 원문 그대로 인라인되므로 바깥 이름 참조 금지) ──
 const sty = k => ({ status: k, statusLabel: STATUS_STYLE[k].label })
+/** 엔지니어링 배지 글자 : 'N/5' + 추정 슬롯 수(결함 ③ — 확정·추정 구분) */
+export const engTxt = (n, est) => `${n}/5${est ? ` (추정 ${est})` : ''}`
 const ms = v => { const t = Date.parse(v); return Number.isNaN(t) ? null : t }
 
 /** 노드 시간 쌍 → 글자. full : '시작 MM-DD HH:mm:ss ~ 종료 HH:mm:ss (소요 Xm Ys)', short(트리 카드) : 'HH:mm:ss~HH:mm:ss · XmYs'. 진행 중 = 종료 칸 '진행 중' + now 까지 경과, 값 없음 = '—' */
 export function fmtSpan(n, now, short) {
+  if (n.tmNote && n.t0 == null) return n.tmNote   // 완료(추정) 슬롯 : 시각 대신 사유
   const kst = v => new Date(v).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
   const a = n.t0 != null ? kst(n.t0) : null, b = n.t1 != null ? kst(n.t1) : null
   const end = n.run ? '진행 중' : b ? (short || (a && a.slice(0, 10) === b.slice(0, 10)) ? b.slice(11) : b.slice(5)) : '—'
@@ -127,16 +138,79 @@ const spanOf = xs => {
   return { t0: t0s.length ? Math.min(...t0s) : null, t1: run || !t1s.length ? null : Math.max(...t1s), run }
 }
 
+/**
+ * 서브에이전트 기록(jsonl 레코드 배열) → 과제 전달 회차 [{ t0, t1, run, errors }] (2026-11-09 결함 ①② — 생성기 전체가 이 한 함수로 재전달을 감지)
+ *   전달 = type 'user' 이고 글이 시스템 알림이 아닌 기록. 근거(실기록 2026-11-08 세션 7d5698d5 의 팀원 build-graph) : 메인 SendMessage 재전달은
+ *   서브에이전트 기록에 type 'user' · content 문자열 '<teammate-message teammate_id="team-lead" summary=…>' 로 1줄씩 남고(9회), 마스터가 팀원 창에 직접 쓴 글도 같은 형태(1회).
+ *   도구 결과(content 배열의 tool_result)·'<system-reminder>' 메타 글은 전달이 아님. 회차 끝 = 그 구간 마지막 assistant stop_reason 'end_turn'
+ *   errors = 구간 안 tool_result.is_error 수. alive=false(오래 안 바뀐 기록)면 끝 기록 없는 마지막 회차도 진행으로 보지 않음(종료 기록 없음)
+ */
+export function agentRounds(recs, { alive = true } = {}) {
+  const isStart = j => j.type === 'user' && !/^\s*<system-reminder>/.test(textOf(j.message?.content) ?? '<system-reminder>')
+  const ended = j => j?.type === 'assistant' && j.message?.stop_reason === 'end_turn'
+  const starts = recs.map((j, i) => [j, i]).filter(([j]) => isStart(j))
+  const lastMsg = recs.filter(j => j.type === 'user' || j.type === 'assistant').at(-1)   // 끝 판정은 대화 기록만(뒤따르는 훅·요청 메타 기록 제외)
+  return starts.map(([j, i], k) => {
+    const last = k === starts.length - 1, seg = recs.slice(i, last ? recs.length : starts[k + 1][1]), fin = seg.filter(ended).at(-1)
+    const errors = seg.reduce((s, x) => s + (x.type === 'user' && Array.isArray(x.message?.content) ? x.message.content.filter(b => b?.type === 'tool_result' && b.is_error).length : 0), 0)
+    return { t0: ms(j.timestamp), t1: fin && (!last || ended(lastMsg)) ? ms(fin.timestamp) : null, run: alive && last && !ended(lastMsg), errors }
+  })
+}
+
+/**
+ * 작업 묶음(2026-11-09 결함 ①) : work-history agent 레코드는 첫 디스패치 턴 1곳에만 귀속된다(work-history-logger.mjs scanSubagents 의 st.agentTurn 고정)
+ *   → 지속 에이전트(SendMessage 로 이어 받은 팀원)가 다음 요청에서 재전달받은 회차도 첫 턴 노드 하나에 몰린다(실사례 build 1건 78분).
+ *   회차 시작 시각이 속한 같은 세션 턴(ts_req ≤ t0 인 마지막 턴)으로 회차를 나눈다 : 귀속 턴 = 자기 몫만(시각·오류 재계산), 다른 턴 = 이어받음 항목(cont) 추가,
+ *   roundBase = 앞 턴들 회차 수(라벨 누적 번호). 회차가 2개 이상 턴에 걸친 에이전트로 이어진 턴들 = 한 묶음(합집합)
+ *   t.bundle = { size(묶음 요청 수), n(묶음 안 에이전트별 전달 수 최대), agents } 를 붙인다. 첫 회차가 귀속 턴 밖이면 나누지 않음(귀속 판단을 지어내지 않음)
+ */
+export function splitAgentRounds(turns) {
+  const bySess = {}, parent = new Map()
+  for (const t of turns) (bySess[t.session_id] = bySess[t.session_id] || []).push(t)
+  for (const xs of Object.values(bySess)) xs.sort((a, b) => ms(a.ts_req) - ms(b.ts_req))
+  const find = t => { while (parent.get(t) !== t) t = parent.get(t); return t }
+  const iso = v => v == null ? null : new Date(v).toISOString(), links = []
+  for (const t of turns) for (const ag of [...(t.agents_detail || [])]) {
+    if (ag.cont || !(ag.rounds || []).length) continue
+    const xs = bySess[t.session_id] || [], share = new Map()
+    for (const r of ag.rounds) { const o = xs.filter(x => ms(x.ts_req) <= r.t0).at(-1) || t; if (!share.has(o)) share.set(o, []); share.get(o).push(r) }
+    if (share.size < 2 || share.keys().next().value !== t) continue
+    let base = 0; const total = ag.rounds.length
+    for (const [o, rs] of share) {
+      const t1s = rs.map(r => r.t1).filter(v => v != null), part = { rounds: rs, roundBase: base, roundsTotal: total, live: rs.some(r => r.run), ts_start: iso(rs[0].t0), ts_end: rs.at(-1).run || !t1s.length ? null : iso(Math.max(...t1s)), errors: rs.reduce((s, r) => s + (r.errors || 0), 0) }
+      if (o === t) Object.assign(ag, part); else (o.agents_detail = o.agents_detail || []).push({ ...ag, ...part, cont: true, cost_usd: null })
+      base += rs.length
+    }
+    links.push({ turns: [...share.keys()], n: total, type: ag.type || ag.name })
+  }
+  for (const l of links) for (const t of l.turns) if (!parent.has(t)) parent.set(t, t)
+  for (const l of links) for (const t of l.turns.slice(1)) parent.set(find(t), find(l.turns[0]))
+  const groups = new Map()
+  for (const l of links) { const r = find(l.turns[0]), g = groups.get(r) || { turns: new Set(), n: 0, agents: new Set() }; l.turns.forEach(x => g.turns.add(x)); g.n = Math.max(g.n, l.n); g.agents.add(l.type); groups.set(r, g) }
+  for (const g of groups.values()) for (const t of g.turns) t.bundle = { size: g.turns.size, n: g.n, agents: [...g.agents] }
+  return turns
+}
+
+/** 실행 노드 경보 : 한 회차(회차 없으면 노드 전체) 최장 소요 ≥ ALERT.longMs → '장시간', 도구 오류 ≥ ALERT.errors → '오류 다발' */
+export function nodeAlerts(n, errors, now) {
+  const dur = r => r.t0 == null ? 0 : (r.run ? now : r.t1 ?? r.t0) - r.t0
+  const rows = n.rounds?.find(g => g.name.startsWith('재작업'))?.rows || [n]
+  return [...(Math.max(0, ...rows.map(dur)) >= ALERT.longMs ? ['장시간'] : []), ...(errors >= ALERT.errors ? ['오류 다발'] : [])]
+}
+
 /** agent 레코드 1건 → 노드. 진행 = 종료 기록 없음 + (턴 진행 중 또는 세션 기록 스캔에서 실행 중) / 완료 = ts_end(도구 오류 수는 라벨에만) / 그 밖 = 오류(종료 기록 없음) */
-function agentNode(ag, id, parent, turnRunning) {
-  const run = !ag.ts_end && (turnRunning || !!ag.live), k = run ? 'running' : ag.ts_end ? 'done' : 'error'
-  const rounds = (ag.rounds || []).length >= 2 ? [{ name: '재작업 회차(같은 에이전트에 과제 재전달)', cap: LOOP_CAP, rows: ag.rounds.map((r, i) => ({ label: `${i + 1}회차`, t0: r.t0, t1: r.t1, run: r.run, state: r.run ? '진행' : r.t1 != null ? '완료' : '—' })) }] : undefined
-  return {
+function agentNode(ag, id, parent, turnRunning, now) {
+  const run = !ag.ts_end && (turnRunning || !!ag.live), k = run ? 'running' : ag.ts_end ? 'done' : 'error', base = ag.roundBase || 0
+  const rounds = (ag.rounds || []).length >= 2 || base ? [{ name: '재작업 회차(같은 에이전트에 과제 재전달)', cap: LOOP_CAP, base, rows: ag.rounds.map((r, i) => ({ label: `${base + i + 1}회차`, t0: r.t0, t1: r.t1, run: r.run, state: (r.run ? '진행' : r.t1 != null ? '완료' : '—') + (r.errors ? ` · 도구 오류 ${r.errors}` : '') })) }] : undefined
+  const cost = ag.cont ? '비용 — 첫 요청 노드에 합산(지속 에이전트)' : ag.cost_usd != null ? `비용 $${ag.cost_usd.toFixed(2)} (API 환산${ag.roundsTotal > (ag.rounds || []).length ? ' · 이어받은 요청 몫 포함' : ''})` : '비용 — (턴 종료 후 기록)'
+  const n = {
     id, parent, label: ag.type || ag.name || '에이전트', slot: null, ...sty(k), t0: ms(ag.ts_start), t1: ag.ts_end ? ms(ag.ts_end) : null, run,
     statusLabel: k === 'error' ? '오류(종료 기록 없음)' : STATUS_STYLE[k].label + (ag.errors ? `(도구 오류 ${ag.errors}회)` : ''),
-    lines: [`모델 ${String(ag.model || '-').replace(/^claude-/, '')}`, ag.cost_usd != null ? `비용 $${ag.cost_usd.toFixed(2)} (API 환산)` : '비용 — (턴 종료 후 기록)', ...(ag.errors ? [`도구 오류 ${ag.errors}회 기록`] : []), ...(ag.name && ag.name !== ag.type ? [`이름 ${ag.name}`] : [])],
+    lines: [`모델 ${String(ag.model || '-').replace(/^claude-/, '')}`, cost, ...(ag.errors ? [`도구 오류 ${ag.errors}회 기록`] : []), ...(ag.name && ag.name !== ag.type ? [`이름 ${ag.name}`] : []), ...(base ? [`지속 에이전트 이어받음 — 앞 요청 ${base}회차 뒤`] : [])],
     ...(rounds ? { rounds } : {}),
   }
+  const alerts = nodeAlerts(n, ag.errors || 0, now)
+  return alerts.length ? { ...n, alerts } : n
 }
 
 /**
@@ -170,9 +244,9 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   const nodes = SLOTS.map(s => ({ id: s.id, parent: s.parent, label: s.label, slot: s.id, ...sty('unassigned'), lines: [], t0: null, t1: null, run: false }))
   const byId = Object.fromEntries(nodes.map(n => [n.id, n])), kind = Object.fromEntries(SLOTS.map(s => [s.id, s.kind]))
   const slotOf = ag => ag.type === ADMIN_TYPE ? '1.2' : Object.keys(slotMap).find(id => kind[id] === 'sub' && (slotMap[id].agents || []).includes(ag.type)) || '1.1'
-  const added = agents.map((ag, i) => { const p = slotOf(ag); return agentNode(ag, `${p}.a${i + 1}`, p, turnRunning) })
+  const added = agents.map((ag, i) => { const p = slotOf(ag); return agentNode(ag, `${p}.a${i + 1}`, p, turnRunning, now) })
   nodes.push(...added)
-  const hooks = new Set((t.resources?.hooks || []).flatMap(h => [h.event, h.name]).filter(Boolean))
+  const hookRecs = t.resources?.hooks || [], hooks = new Set(hookRecs.flatMap(h => [h.event, h.name]).filter(Boolean))
   const loopsOf = m => {
     if (!m?.loops) return []
     return loops.filter(l => m.loops === true || m.loops.includes(l.id)).map(l => ({ id: l.id, rows: loopRounds(l, a, b) })).filter(x => x.rows.length)
@@ -184,8 +258,12 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
     const kids = added.filter(n => n.parent === s.id), hk = (m.hooks || []).filter(h => hooks.has(h)), lr = loopsOf(m)
     const want = [...(m.agents || []).map(x => `에이전트 ${x}`), ...(m.hooks || []).map(x => `훅 ${x}`), ...(m.loops ? ['Codex 루프'] : [])]
     if (!kids.length && !hk.length && !lr.length) { Object.assign(byId[s.id], sty('missing'), { lines: [want.length ? `대응 ${want.join(' · ')} — 이 턴 기록 없음` : '대응 기록 없음 — SLOT_MAP 대응 [확인중 : 마스터]'] }); continue }
-    const sp = spanOf([...kids, ...lr.flatMap(x => x.rows)])
-    Object.assign(byId[s.id], sp, sp.run ? sty('running') : sty('done'), { lines: [...(kids.length ? [`에이전트 ${kids.length}건`] : []), ...(hk.length ? [`훅 ${hk.join(' · ')} 실행(시각 기록 없음)`] : []), ...(lr.length ? [`Codex 루프 ${lr.map(x => x.id).join(' · ')}`] : [])] })
+    // 훅 시각(결함 ③) : work-history 훅 기록은 { name, event, n } 뿐(work-history-logger.mjs bump(st.res.hooks) — 시각 필드 없음) → 훅만 있으면 '완료(추정)'.
+    //   턴 중간 스캔(scanLive)의 진행 중 턴은 세션 기록 attachment.timestamp 로 t0·t1 을 채우므로 그때는 확정
+    const hkT = hookRecs.filter(h => hk.includes(h.event) && h.t0 != null).map(h => ({ t0: h.t0, t1: h.t1 ?? h.t0, run: false }))
+    if (!kids.length && !lr.length && !hkT.length) { Object.assign(byId[s.id], sty('estimated'), { tmNote: '훅 실행(시각 미기록)', lines: [`훅 ${hk.join(' · ')} 실행 — 시각 미기록(work-history 훅 기록은 이벤트명·횟수뿐)`] }); continue }
+    const sp = spanOf([...kids, ...lr.flatMap(x => x.rows), ...hkT])
+    Object.assign(byId[s.id], sp, sp.run ? sty('running') : sty('done'), { lines: [...(kids.length ? [`에이전트 ${kids.length}건`] : []), ...(hk.length ? [`훅 ${hk.join(' · ')} 실행${hkT.length ? '' : '(시각 기록 없음)'}`] : []), ...(lr.length ? [`Codex 루프 ${lr.map(x => x.id).join(' · ')}`] : [])] })
   }
   // Codex 슬롯
   for (const s of SLOTS.filter(s => s.kind === 'codex')) {
@@ -211,8 +289,17 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   const under = id => nodes.filter(n => n.parent === id).flatMap(n => [n, ...under(n.id)])
   const sub = spanOf(under('1.1').filter(n => n.t0 != null || n.t1 != null || n.run))
   const turnSt = anyRun ? { status: 'running', statusLabel: turnRunning ? STATUS_STYLE.running.label : '진행(팀원 실행 중)' } : { status: TURN_NODE[ts.key], statusLabel: ts.label }
-  const eng = ENG_SLOTS.filter(id => ['done', 'running'].includes(byId[id].status))
-  Object.assign(byId['1'], turnSt, { t0: a, t1: anyRun ? null : ms(t.ts_res), run: anyRun, eng: eng.length, lines: [`엔지니어링 ${eng.length}/5 수행${eng.length ? ` — ${eng.join(' · ')}` : ''}`] })
+  const eng = ENG_SLOTS.filter(id => ['done', 'running', 'estimated'].includes(byId[id].status)), est = eng.filter(id => byId[id].status === 'estimated')
+  // 누적 회차(결함 ①) : 요청 안 회차표 최대(이어받은 회차는 앞 요청 몫 base 포함) vs 작업 묶음(splitAgentRounds) 전달 수 최대 → 큰 값
+  const own = Math.max(0, ...nodes.flatMap(n => (n.rounds || []).map(g => (g.base || 0) + roundSummary(g.rows, now).n)))
+  const cumN = Math.max(own, t.bundle?.n || 0), size = t.bundle?.size || 1
+  const level = cumN >= ALERT.cap ? '상한 도달' : cumN >= ALERT.nearCap ? '상한 근접' : null
+  const alerts = added.reduce((s, n) => s + (n.alerts || []).length, 0) + (level ? 1 : 0)
+  Object.assign(byId['1'], turnSt, {
+    t0: a, t1: anyRun ? null : ms(t.ts_res), run: anyRun, eng: eng.length, engEst: est.length, cum: { n: cumN, size, cap: ALERT.cap, ...(level ? { level } : {}) }, alertN: alerts,
+    lines: [`엔지니어링 ${engTxt(eng.length, est.length)} 수행${eng.length ? ` — ${eng.join(' · ')}` : ''}`, `묶음 누적 ${cumN}/${ALERT.cap}${size > 1 ? ` — 지속 에이전트(${t.bundle.agents.join(' · ')})로 이어진 요청 ${size}건` : ' — 요청 단위(이어받은 지속 에이전트 없음)'}${level ? ` · ${level}` : ''}`,
+      ...(alerts ? [`경보 ${alerts}건 — ${[...added.flatMap(n => (n.alerts || []).map(x => `${n.label} ${x}`)), ...(level ? [level] : [])].join(' · ')}`] : [])],
+  })
   Object.assign(byId['1.1'], turnSt, { t0: a, t1: anyRun ? null : sub.t1, run: anyRun })
   return nodes
 }
@@ -242,7 +329,7 @@ export function buildPath(nodes, { design = false } = {}) {
   for (const n of nodes) {
     if (!n.slot) {
       const g = (n.rounds || []).find(x => x.name.startsWith('재작업'))
-      if (g) g.rows.forEach((r, i) => ev.push({ id: n.id, t: r.t0, run: !!r.run, ...(i ? { lab: `재작업 ${i + 1}회차 (${i + 1}/${LOOP_CAP})` } : {}) })); else ev.push({ id: n.id, t: n.t0, run: !!n.run })
+      if (g) g.rows.forEach((r, i) => { const k = (g.base || 0) + i + 1; ev.push({ id: n.id, t: r.t0, run: !!r.run, ...(k > 1 ? { lab: `재작업 ${k}회차 (${k}/${LOOP_CAP})` } : {}) }) }); else ev.push({ id: n.id, t: n.t0, run: !!n.run })   // 이어받은 회차는 앞 요청 몫(base)부터 번호
     } else if (kind[n.id] === 'codex' && n.rounds) for (const g of n.rounds) { let k = 0; for (const r of g.rows) { if (!r.blocked) k++; ev.push({ id: n.id, t: r.t0 ?? r.t1, run: !!r.run, lab: `${g.name.replace(/^Codex 루프 /, '')} ${r.label}${r.blocked ? '' : ` (${k}/${LOOP_CAP})`}` }) } }   // 회차 라벨 = 그 루프 안 회차(루프가 여러 개여도 섞지 않음)
   }
   const seq = [{ id: 'S' }, { id: '1' }, { id: '1.1' }], entered = new Set(['1', '1.1'])
@@ -306,8 +393,8 @@ const isRequest = t => { t = String(t || '').trim(); return !!t && !/^(<local-co
 /**
  * 턴 중간 스캔 : work-history 는 Stop 때 기록되므로, 최근 LIVE.windowMs 안에 바뀐 세션 기록에서
  *   ① 아직 기록되지 않은 요청(마지막 사용자 요청 시각 > 그 세션의 기록된 마지막 ts_req) → 진행 중 턴 추가
- *   ② <sid>/subagents/*.jsonl 에서 실행 중(마지막 기록이 end_turn 아님)·막 끝난 에이전트 → 해당 턴(시작 시각 이전의 가장 최근 턴)에 추가·덮어쓰기
- *   회차 = 에이전트 기록 안의 과제 전달(사용자 글 기록)마다 1행 — 팀원에게 재작업을 다시 보낸 경우
+ *   ② <sid>/subagents/*.jsonl 에서 실행 중(마지막 대화 기록이 end_turn 아님)·막 끝난 에이전트 → 기록된 레코드에 회차 전체를 붙이거나, 없으면 첫 회차가 속한 턴에 추가
+ *   회차 = agentRounds(과제 전달마다 1행 — 팀원에게 재작업을 다시 보낸 경우), 요청별 분배·작업 묶음은 splitAgentRounds
  * turns 를 직접 고치고(에이전트 추가), 새 진행 중 턴 목록을 반환
  */
 export function scanLive(turns, { sessDir, now = Date.now() } = {}) {
@@ -325,37 +412,55 @@ export function scanLive(turns, { sessDir, now = Date.now() } = {}) {
     const own = turns.filter(t => t.session_id === sid)
     if (prompt && ms(prompt.timestamp) > logged + 2000) {
       const p0 = ms(prompt.timestamp)
-      const hooks = [...new Set(recs.filter(j => j.type === 'attachment' && ms(j.timestamp) >= p0 && j.attachment?.hookEvent).map(j => j.attachment.hookEvent))].map(e => ({ name: e, event: e }))
+      const hk = {}   // 훅 이벤트 → 첫·마지막 attachment 시각(결함 ③ : 진행 중 턴은 훅 시각이 있으므로 '완료' 확정)
+      for (const j of recs) { const e = j.type === 'attachment' && j.attachment?.hookEvent, v = ms(j.timestamp); if (e && v != null && v >= p0) hk[e] = { t0: Math.min(hk[e]?.t0 ?? v, v), t1: Math.max(hk[e]?.t1 ?? v, v) } }
+      const hooks = Object.entries(hk).map(([e, x]) => ({ name: e, event: e, ...x }))
       const t = { key: `${sid}:live`, id: `${sid}:live`, session_id: sid, session: sid.slice(0, 8), turn: '진행', ts_req: new Date(p0).toISOString(), ts_res: null, req_head: textOf(prompt.message.content).trim().slice(0, 200), category: '', agents_detail: [], resources: { hooks }, live: true }
       out.push(t); own.push(t)
     }
     const subDir = path.join(sessDir, sid, 'subagents')
     if (!fs.existsSync(subDir)) continue
     for (const sf of fs.readdirSync(subDir).filter(x => x.endsWith('.jsonl')).map(x => path.join(subDir, x)).filter(fresh)) {
-      const isStart = j => j.type === 'user' && !/^\s*<system-reminder>/.test(textOf(j.message?.content) ?? '<system-reminder>')   // 과제 전달 = 사용자 글 기록(도구 결과·시스템 알림 제외)
-      let rs = tailJsonl(sf); if (!rs.some(isStart)) rs = tailJsonl(sf, Infinity)   // 긴 작업은 마지막 과제 전달이 꼬리 밖 — 그때만 전체 읽기
-      if (!rs.length) continue
+      // ponytail: 최근에 바뀐 기록은 전체 읽기(회차 전체가 있어야 요청 간 누적 번호가 맞음, 파일당 수 MB) — 느려지면 회차 캐시(loadAgentRounds)에 바이트 오프셋 증분 추가
+      const rs = tailJsonl(sf, Infinity), rounds = agentRounds(rs)
+      if (!rounds.length) continue
       let meta = {}; try { meta = JSON.parse(fs.readFileSync(sf.replace(/\.jsonl$/, '.meta.json'), 'utf8')) } catch { /* meta 없음 */ }
-      const ended = j => j?.type === 'assistant' && j.message?.stop_reason === 'end_turn'
-      const starts = rs.map((j, i) => [j, i]).filter(([j]) => isStart(j))
-      if (!starts.length) continue
-      const rounds = starts.map(([j, i], k) => {
-        const seg = rs.slice(i, k + 1 < starts.length ? starts[k + 1][1] : rs.length), fin = seg.filter(ended).at(-1)
-        const last = k === starts.length - 1
-        return { t0: ms(j.timestamp), t1: fin && (!last || ended(rs.at(-1))) ? ms(fin.timestamp) : null, run: last && !ended(rs.at(-1)) }
-      })
-      const cur = rounds.at(-1).t0, target = own.filter(t => ms(t.ts_req) <= cur).sort((x, y) => ms(y.ts_req) - ms(x.ts_req))[0]
-      if (!target) continue
-      const mine = rounds.filter(r => r.t0 >= ms(target.ts_req)), id = path.basename(sf, '.jsonl').replace(/^agent-/, '')
+      const id = path.basename(sf, '.jsonl').replace(/^agent-/, ''), running = rounds.some(r => r.run)
       const model = rs.filter(j => j.type === 'assistant' && j.message?.model && !/^</.test(j.message.model)).at(-1)?.message.model || meta.model
-      const live = { live: mine.some(r => r.run), rounds: mine, ...(mine.some(r => r.run) ? { ts_end: null } : {}) }
-      target.agents_detail = target.agents_detail || []
-      const ex = target.agents_detail.find(x => x.agent_id === id)
-      if (ex) Object.assign(ex, live)
-      else target.agents_detail.push({ agent_id: id, type: meta.customAgentType || meta.spawnedAgentType || meta.agentType || '서브에이전트', name: meta.name, model, ts_start: new Date(mine[0].t0).toISOString(), ts_end: mine.at(-1).t1 != null ? new Date(mine.at(-1).t1).toISOString() : null, cost_usd: null, errors: 0, ...live })
+      const live = { live: running, rounds, ...(running ? { ts_end: null } : {}) }
+      // 이미 기록된 레코드(첫 디스패치 턴 귀속)에 회차 전체를 붙이고, 없으면 첫 회차가 속한 턴에 추가 — 요청별 분배는 splitAgentRounds
+      const ex = own.flatMap(t => t.agents_detail || []).find(x => x.agent_id === id)
+      if (ex) { Object.assign(ex, live); continue }
+      const target = own.filter(t => ms(t.ts_req) <= rounds[0].t0).sort((x, y) => ms(y.ts_req) - ms(x.ts_req))[0]
+      if (!target) continue
+      const t1s = rounds.map(r => r.t1).filter(v => v != null)
+      ;(target.agents_detail = target.agents_detail || []).push({ agent_id: id, type: meta.customAgentType || meta.spawnedAgentType || meta.agentType || '서브에이전트', name: meta.name, model, ts_start: new Date(rounds[0].t0).toISOString(), ts_end: running || !t1s.length ? null : new Date(Math.max(...t1s)).toISOString(), cost_usd: null, errors: rounds.reduce((s, r) => s + r.errors, 0), ...live })
     }
   }
   return out
+}
+
+/**
+ * 지난 요청의 팀원 회차 : scanLive 가 못 본(최근 10분 밖) 에이전트 기록에서 agentRounds 로 회차를 읽어 ag.rounds 에 채운다(결함 ①② — 재전달 감지가 진행 중에만 되던 문제)
+ *   대상 = meta.taskKind 'in_process_teammate'(SendMessage 로 이어 받을 수 있는 팀원)만. 캐시 = agent_id → 기록 크기·mtime 가 같으면 재사용(첫 실행만 전체 읽기)
+ */
+function loadAgentRounds(turns, sessDir, cacheFile) {
+  let cache = {}; try { cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8')) } catch { /* 캐시 없음 = 전부 읽기 */ }
+  const next = {}
+  for (const t of turns) for (const ag of t.agents_detail || []) {
+    if (ag.rounds || !ag.agent_id || !t.session_id) continue
+    const base = path.join(sessDir, t.session_id, 'subagents', 'agent-' + ag.agent_id)
+    let st; try { st = fs.statSync(base + '.jsonl') } catch { continue }
+    const sig = `${st.size}:${Math.round(st.mtimeMs)}`
+    let c = cache[ag.agent_id]
+    if (c?.sig !== sig) {
+      let meta = {}; try { meta = JSON.parse(fs.readFileSync(base + '.meta.json', 'utf8')) } catch { /* meta 없음 = 팀원 아님으로 봄 */ }
+      c = { sig, rounds: meta.taskKind === 'in_process_teammate' ? agentRounds(tailJsonl(base + '.jsonl', Infinity), { alive: false }) : [] }
+    }
+    next[ag.agent_id] = c
+    if (c.rounds.length) ag.rounds = c.rounds
+  }
+  try { fs.mkdirSync(path.dirname(cacheFile), { recursive: true }); fs.writeFileSync(cacheFile, JSON.stringify(next)) } catch { /* 캐시 저장 실패 = 다음 실행에서 다시 읽음 */ }
 }
 
 const docLink = (outDir, d) => ({ name: path.basename(d, '.md'), href: encodeURI(path.relative(outDir, path.join(ENG, d)).replace(/\\/g, '/')) })
@@ -377,8 +482,10 @@ function client() {
   const spanHtml = n => esc(spanTxt(n)).replace('진행 중', '<span class="blink">진행 중</span>')
   const durTxt = v => { const s = Math.round(v / 1000); return Math.floor(s / 60) + 'm ' + (s % 60) + 's' }
   const tip = n => (n.slot ? n.id + ' ' : '') + n.label + ' — ' + n.statusLabel + '\n' + spanTxt(n)
-  const roundsMax = n => Math.max(0, ...(n.rounds || []).map(g => roundSummary(g.rows, NOW).n))
-  const statusTxt = n => n.statusLabel + (n.badge ? ' · ' + n.badge : '') + (n.eng != null ? ' · 엔지니어링 ' + n.eng + '/5' : '') + (n.rounds ? ' · 루프 ' + roundsMax(n) + '/' + n.rounds[0].cap : '')
+  const roundsMax = n => Math.max(0, ...(n.rounds || []).map(g => (g.base || 0) + roundSummary(g.rows, NOW).n))
+  const engT = n => n.eng + '/5' + (n.engEst ? ' (추정 ' + n.engEst + ')' : '')
+  const statusTxt = n => n.statusLabel + (n.badge ? ' · ' + n.badge : '') + (n.eng != null ? ' · 엔지니어링 ' + engT(n) : '') + (n.cum ? ' · 묶음 ' + n.cum.n + '/' + n.cum.cap : '') + (n.alertN ? ' · 경보 ' + n.alertN : '') + (n.rounds ? ' · 루프 ' + roundsMax(n) + '/' + n.rounds[0].cap : '')
+  const alertHtml = xs => (xs || []).map(x => ' <span class="badge alert">' + esc(x) + '</span>').join('')
 
   function filtered() {
     const q = $('q').value.trim().toLowerCase(), c = $('fc').value, d = $('fd').value
@@ -388,7 +495,7 @@ function client() {
     const xs = filtered(), pages = Math.max(1, Math.ceil(xs.length / Z.pageSize)); page = Math.min(Math.max(1, page), pages)
     $('list').innerHTML = xs.slice((page - 1) * Z.pageSize, page * Z.pageSize).map(r => '<li><button type="button" data-k="' + esc(r.key) + '"' + (r.key === cur ? ' aria-current="true"' : '') + '>'
       + '<span class="rt">' + esc(r.when) + (r.catLabel ? ' · ' + esc(r.catLabel) : '') + '</span><span class="rh">' + esc(r.head) + '</span>'
-      + (r.meta ? '<span class="rm">' + esc(r.meta) + (r.st ? ' <span class="badge st-' + esc(r.st) + '">' + esc(r.statusLabel) + '</span>' : '') + '</span>' : '') + '</button></li>').join('') || '<li class="muted">조회 결과 없음</li>'
+      + (r.meta ? '<span class="rm">' + esc(r.meta) + (r.st ? ' <span class="badge st-' + esc(r.st) + '">' + esc(r.statusLabel) + '</span>' : '') + (r.alert ? alertHtml([r.alert]) : '') + '</span>' : '') + '</button></li>').join('') || '<li class="muted">조회 결과 없음</li>'
     $('lcnt').textContent = xs.length + '건' + (pages > 1 ? ' · ' + page + '/' + pages + '쪽' : '')
     $('lprev').disabled = page <= 1; $('lnext').disabled = page >= pages
   }
@@ -399,15 +506,16 @@ function client() {
   }
   function select(k) { cur = k; renderList(); const r = D.requests.find(x => x.key === k); if (!r) return; $('gtitle').textContent = r.head; draw(r); detail(r.nodes[0]); saveHash() }
   function roundsHtml(g) {
-    const s = roundSummary(g.rows, NOW)
-    return '<h4>' + esc(g.name) + ' <span class="muted">' + s.n + '/' + g.cap + '</span></h4><table class="rd"><tr><th>회차</th><th>시작 ~ 종료</th><th>상태</th></tr>'
+    const s = roundSummary(g.rows, NOW), b = g.base || 0, k = b + s.n
+    return '<h4>' + esc(g.name) + ' <span class="muted">' + (b ? '묶음 누적 ' : '') + k + '/' + g.cap + '</span>' + alertHtml(k >= D.alert.cap ? ['상한 도달'] : k >= D.alert.nearCap ? ['상한 근접'] : []) + '</h4><table class="rd"><tr><th>회차</th><th>시작 ~ 종료</th><th>상태</th></tr>'
       + g.rows.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + spanHtml(r) + '</td><td>' + esc(r.state || '') + '</td></tr>').join('')
-      + '<tr class="sum"><td colspan="3">합계 ' + s.n + '회 · 총 소요 ' + durTxt(s.totalMs) + ' · 상한 대비 ' + s.n + '/' + g.cap + '</td></tr></table>'
+      + '<tr class="sum"><td colspan="3">합계 ' + s.n + '회' + (b ? '(앞 요청 ' + b + '회 이어받음)' : '') + ' · 총 소요 ' + durTxt(s.totalMs) + ' · 상한 대비 ' + k + '/' + g.cap + '</td></tr></table>'
   }
   function detail(n) {
     const s = SL[n.slot]
     $('detail').innerHTML = '<h3>' + esc((n.slot ? n.id + ' ' : '') + n.label) + '</h3><p><span class="badge st-' + esc(n.status) + '">' + esc(n.statusLabel) + '</span>'
-      + (n.badge ? ' <span class="badge est">' + esc(n.badge) + '</span>' : '') + (n.eng != null ? ' <span class="badge">엔지니어링 ' + n.eng + '/5 수행</span>' : '') + '</p>'
+      + (n.badge ? ' <span class="badge est">' + esc(n.badge) + '</span>' : '') + (n.eng != null ? ' <span class="badge">엔지니어링 ' + engT(n) + ' 수행</span>' : '')
+      + (n.cum ? ' <span class="badge">묶음 누적 ' + n.cum.n + '/' + n.cum.cap + (n.cum.size > 1 ? ' · 요청 ' + n.cum.size + '건' : '') + '</span>' + alertHtml(n.cum.level ? [n.cum.level] : []) : '') + alertHtml(n.alerts) + '</p>'
       + '<p class="tm">' + spanHtml(n) + '</p>'
       + (n.lines.length ? '<ul>' + n.lines.map(l => '<li>' + esc(l) + '</li>').join('') + '</ul>' : '')
       + (n.rounds || []).map(roundsHtml).join('')
@@ -517,7 +625,7 @@ function client() {
       el('rect', { width: w, height: p.h, rx: 7, class: 'box' }, g); el('rect', { width: 5, height: p.h, rx: 2.5, class: 'strip' }, g)
       if (!n.slot) {
         const tm = timeText(el('text', { x: w - 8, y: Z.padY + Z.lineH - 3, class: 'tm', 'text-anchor': 'end' }, g), n)
-        fitText(el('text', { x: 12, y: Z.padY + Z.lineH - 3, class: 'l1' }, g), n.label + (n.rounds ? ' · ' + roundsMax(n) + '회차' : ''), w - 30 - tm.getComputedTextLength())
+        fitText(el('text', { x: 12, y: Z.padY + Z.lineH - 3, class: 'l1' }, g), (n.alerts ? '⚠ ' : '') + n.label + (n.rounds ? ' · ' + roundsMax(n) + '회차' : '') + (n.alerts ? ' · ' + n.alerts.join(' · ') : ''), w - 30 - tm.getComputedTextLength())
         continue
       }
       const ls = nameLines(n)
@@ -627,7 +735,7 @@ function statusCss() {
 }
 
 export function renderHtml({ design, outDir, requests, meta }) {
-  const data = { design: !!design, live: !design, size: SIZE, flow: FLOW_COLOR, slots: SLOTS.map(s => ({ id: s.id, role: s.role, criteria: s.criteria, docs: s.docs.map(d => docLink(outDir, d)) })), requests }
+  const data = { design: !!design, live: !design, size: SIZE, flow: FLOW_COLOR, alert: ALERT, slots: SLOTS.map(s => ({ id: s.id, role: s.role, criteria: s.criteria, docs: s.docs.map(d => docLink(outDir, d)) })), requests }
   const cats = [...new Set(requests.map(r => r.cat).filter(Boolean))], dates = [...new Set(requests.map(r => r.date).filter(Boolean))]
   const catLabel = Object.fromEntries(CATEGORIES.map(c => [c.key, c.label]))
   const DARK = '--surface:#1a1a19;--page:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--w:#3987e5;--o:#d95926;--ring:rgba(255,255,255,.10);color-scheme:dark'
@@ -655,12 +763,12 @@ ${Object.entries(FLOW_COLOR).map(([k, c]) => `.fl.${k} .v{stroke:${c}}.seqg.${k}
 .fl.running .v{stroke-width:3.2;animation:pulse 1.2s ease-in-out infinite}.fl.plan .v{stroke-dasharray:6 5}.seqg.plan{opacity:.45}
 .seqg.running .sq{fill:${RUN.fill};stroke:${RUN.color}}.sq{stroke:var(--surface);stroke-width:1.5}.sqt{font-size:9.5px;font-weight:700;fill:#fff}.seqg.running .sqt{fill:${RUN.ink}}.lpl{font-size:10.5px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px}
 .fv .seqg{opacity:0}.fv .fl:hover .seqg{opacity:1}.term.pend .box,.fnode.term.pend circle{stroke-dasharray:4 3}.fleg{color:var(--ink2)}.fleg .fr{color:${RUN.color};text-shadow:0 0 4px ${RUN.fill}}
-.box{fill:var(--sf,var(--surface));stroke:var(--sc);stroke-width:1.6}.strip{fill:var(--sc)}.st-missing .box{stroke-dasharray:5 3;stroke-width:2}
+.box{fill:var(--sf,var(--surface));stroke:var(--sc);stroke-width:1.6}.strip{fill:var(--sc)}.st-missing .box,.st-estimated .box{stroke-dasharray:5 3;stroke-width:2}
 .l1{font-size:12.5px;fill:var(--si,var(--ink))}.l1.b{font-weight:700}.l2{font-size:11.5px;fill:var(--si,var(--st))}.tm{font-size:10px;fill:var(--si,var(--ink2))}
-.fnode circle{fill:var(--sf,var(--sc));stroke:var(--sc);stroke-width:2}.fnode.st-missing circle{fill:var(--surface);stroke-dasharray:3 2}
+.fnode circle{fill:var(--sf,var(--sc));stroke:var(--sc);stroke-width:2}.fnode.st-missing circle{fill:var(--surface);stroke-dasharray:3 2}.fnode.st-estimated circle{stroke-dasharray:3 2}
 .fnode .l1{font-size:12px;fill:var(--ink2);paint-order:stroke;stroke:var(--page);stroke-width:3px;stroke-linejoin:round}.fnode .l1.hid{opacity:0}.fnode:hover .l1{opacity:1;fill:var(--ink)}
-.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:0 0 8px}.legend i{display:inline-block;width:11px;height:11px;border-radius:6px;margin-right:4px;vertical-align:-1px;background:var(--sf,var(--sc));border:1.5px solid var(--sc)}.legend i.st-missing{border-style:dashed;background:transparent}
-.badge{display:inline-block;border:1px solid var(--axis);border-radius:5px;padding:0 6px;font-size:12px}.badge[class*=st-]{color:var(--st);border-color:var(--sc);background:var(--sf,transparent)}.badge.st-missing{border-style:dashed}.est{border-style:dashed;color:var(--o);border-color:var(--o)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:0 0 8px}.legend i{display:inline-block;width:11px;height:11px;border-radius:6px;margin-right:4px;vertical-align:-1px;background:var(--sf,var(--sc));border:1.5px solid var(--sc)}.legend i.st-missing{border-style:dashed;background:transparent}.legend i.st-estimated{border-style:dashed}
+.badge{display:inline-block;border:1px solid var(--axis);border-radius:5px;padding:0 6px;font-size:12px}.badge[class*=st-]{color:var(--st);border-color:var(--sc);background:var(--sf,transparent)}.badge.st-missing,.badge.st-estimated{border-style:dashed}.badge.alert{color:${STATUS_STYLE.error.text};border:2px solid ${STATUS_STYLE.error.color};font-weight:700}:root[data-theme=dark] .badge.alert{color:${STATUS_STYLE.error.dark.text}}@media (prefers-color-scheme: dark){:root:not([data-theme=light]) .badge.alert{color:${STATUS_STYLE.error.dark.text}}}.est{border-style:dashed;color:var(--o);border-color:var(--o)}
 @keyframes pulse{0%,100%{filter:drop-shadow(0 0 1px ${RUN.fill})}50%{filter:drop-shadow(0 0 8px ${RUN.fill}) drop-shadow(0 0 3px ${RUN.color})}}@keyframes blink{50%{opacity:.2}}@keyframes blinkf{50%{fill-opacity:.15}}
 .st-running .box,.fnode.st-running circle,.legend i.st-running,.badge.st-running{animation:pulse 1.2s ease-in-out infinite}.blink{animation:blink 1.2s ease-in-out infinite}tspan.blink{animation-name:blinkf}
 @media (prefers-reduced-motion: reduce){.fl.running .v{animation:none;stroke-width:4.5}.st-running .box,.fnode.st-running circle,.legend i.st-running,.badge.st-running,.blink{animation:none}.st-running .box,.fnode.st-running circle{stroke-width:3.5}.legend i.st-running,.badge.st-running{border-width:3px}}
@@ -711,14 +819,15 @@ function writeRequestMd(dir, items, now) {
     const f = safeName(`${r.when.replace(':', '')} ${r.sid} ${r.head.slice(0, 40)}`) + '.md'; keep.add(f)
     const agents = r.nodes.filter(n => !n.slot), by = id => r.nodes.find(n => n.id === id)
     const rounds = r.nodes.filter(n => n.rounds).flatMap(n => n.rounds.map(g => ({ n, g })))
-    const body = [`# ${r.head}`, '', `> 요청 노드(실데이터 — gitignore) · 생성기 \`scripts/request-graph.mjs --md\` · ${r.when} · ${r.catLabel || '-'} · 상태 ${r.statusLabel} · 엔지니어링 ${by('1').eng}/5 수행`, '',
+    const body = [`# ${r.head}`, '', `> 요청 노드(실데이터 — gitignore) · 생성기 \`scripts/request-graph.mjs --md\` · ${r.when} · ${r.catLabel || '-'} · 상태 ${r.statusLabel} · 엔지니어링 ${engTxt(by('1').eng, by('1').engEst)} 수행 · 묶음 누적 ${by('1').cum.n}/${by('1').cum.cap}${r.alert ? ` · ⚠ ${r.alert}` : ''}`, '',
+      ...by('1').lines.slice(1).map(l => `- ${l}`), '',
       `${fmtSpan(by('1'), now)}`, '',
       `흐름 : [[${slotFile(SLOTS[0])}]] → [[${slotFile(SLOTS[1])}]] → [[${slotFile(SLOTS.at(-1))}]]`, '',
       '## 엔지니어링 5단계', '', ...ENG_SLOTS.map(id => { const n = by(id), s = SLOTS.find(x => x.id === id); return `- [[${slotFile(s)}]] — ${n.statusLabel} · ${fmtSpan(n, now)}` }), '',
-      '## 실행 에이전트(시간순)', '', ...(agents.length ? agents.map(n => `- ${n.label}${roleLink(n.label)} — ${n.statusLabel} · ${fmtSpan(n, now)} · ${n.lines.join(' · ')}`) : ['- 없음(메인 단독 턴)']), '',
+      '## 실행 에이전트(시간순)', '', ...(agents.length ? agents.map(n => `- ${n.label}${roleLink(n.label)} — ${n.statusLabel}${n.alerts ? ` · ⚠ ${n.alerts.join(' · ')}` : ''} · ${fmtSpan(n, now)} · ${n.lines.join(' · ')}`) : ['- 없음(메인 단독 턴)']), '',
       `## 승인(1.2) : ${by('1.2').statusLabel}`, '',
       '## 실행 경로', '', (r.path?.edges || []).map(e => `${e.seq}. ${e.to === 'E' ? '종료' : (by(e.to)?.slot ? e.to + ' ' : '') + (by(e.to)?.label || e.to)}${e.label ? ` [${e.label}]` : ''}${e.state === 'running' ? ' (진행 중)' : e.state === 'planned' ? ' (예정)' : ''}`).join(' → ') || '-', '',
-      ...rounds.flatMap(({ n, g }) => { const s = roundSummary(g.rows, now); return [`## 회차 — ${n.slot ? n.id + ' ' : ''}${n.label} · ${g.name} (${s.n}/${g.cap})`, '', ...g.rows.map(x => `- ${x.label} : ${fmtSpan(x, now)} · ${x.state || ''}`), `- 합계 ${s.n}회 · 총 소요 ${Math.floor(s.totalMs / 60e3)}m ${Math.round(s.totalMs / 1e3) % 60}s`, ''] })]
+      ...rounds.flatMap(({ n, g }) => { const s = roundSummary(g.rows, now); return [`## 회차 — ${n.slot ? n.id + ' ' : ''}${n.label} · ${g.name} (${g.base ? `묶음 누적 ${g.base + s.n}` : s.n}/${g.cap})`, '', ...g.rows.map(x => `- ${x.label} : ${fmtSpan(x, now)} · ${x.state || ''}`), `- 합계 ${s.n}회 · 총 소요 ${Math.floor(s.totalMs / 60e3)}m ${Math.round(s.totalMs / 1e3) % 60}s`, ''] })]
     fs.writeFileSync(path.join(dir, f), body.join('\n'))
   }
   for (const f of fs.readdirSync(dir)) if (f.endsWith('.md') && !keep.has(f)) fs.unlinkSync(path.join(dir, f))   // 최근 N건만 유지(생성기 산출 폴더)
@@ -751,13 +860,15 @@ function main() {
     let liveTurns = []
     try { liveTurns = scanLive(turns, { sessDir, now }) } catch (e) { if (!has('--quiet')) console.error(`턴 중간 스캔 건너뜀 : ${e.message}`) }
     const all = [...liveTurns, ...turns].sort((x, y) => ms(y.ts_req) - ms(x.ts_req))
+    try { loadAgentRounds(all, sessDir, path.join(ROOT, PATHS.roundsCache)) } catch (e) { if (!has('--quiet')) console.error(`팀원 회차 읽기 건너뜀 : ${e.message}`) }
+    splitAgentRounds(all)
     // ponytail: 실행 기록 전체 읽기(줄당 약 80바이트) — 수 MB 넘으면 기간 회전 추가
     let runs = []; try { runs = fs.readFileSync(runsFile, 'utf8').split('\n').flatMap(l => { try { return l ? [JSON.parse(l)] : [] } catch { return [] } }) } catch { /* 기록 없음 = 전 턴 '기록 이전' */ }
     requests = all.map(t => {
       const nodes = buildRequestGraph(t, loops, { now, runs }), n1 = nodes[0], ag = nodes.filter(n => !n.slot).length, when = new Date(ms(t.ts_req)).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 16)
       const cost = t.live ? null : (t.cost_usd || 0) + (t.cost_agents_usd || 0)
       const head = redact(t.req_head || '').replace(/<\/?[a-z_-]+(?:\s[^>]*)?>/gi, '').trim().slice(0, SIZE.headCut) || '(요청문 없음)'
-      return { key: t.key, sid: `${t.session || ''}-${t.turn ?? ''}`, date: when.slice(0, 10), when, head, cat: t.category || '', catLabel: catLabel[t.category] || t.category || (t.live ? '진행 중(기록 전)' : ''), st: n1.status, statusLabel: n1.statusLabel, running: n1.run, path: buildPath(nodes), meta: `에이전트 ${ag} · ${cost == null ? '$—' : '$' + cost.toFixed(2)} · 엔지니어링 ${n1.eng}/5 ·`, nodes }
+      return { key: t.key, sid: `${t.session || ''}-${t.turn ?? ''}`, date: when.slice(0, 10), when, head, cat: t.category || '', catLabel: catLabel[t.category] || t.category || (t.live ? '진행 중(기록 전)' : ''), st: n1.status, statusLabel: n1.statusLabel, running: n1.run, path: buildPath(nodes), meta: `에이전트 ${ag} · ${cost == null ? '$—' : '$' + cost.toFixed(2)} · 엔지니어링 ${engTxt(n1.eng, n1.engEst)} · 묶음 ${n1.cum.n}/${n1.cum.cap} ·`, alert: n1.alertN ? `경보 ${n1.alertN}${n1.cum.level ? ' · ' + n1.cum.level : ''}` : '', nodes }
     })
     fs.mkdirSync(outDir, { recursive: true })
     fs.writeFileSync(out, renderHtml({ design, outDir, requests, meta: `최근 ${days}일 요청 ${requests.length}건(진행 중 ${requests.filter(r => r.running).length}) · 갱신 ${new Date(now).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })} (턴 종료·서브에이전트 시작/종료 때 재생성, 화면은 진행 중 있으면 ${SIZE.reloadRun / 1e3}초·없으면 ${SIZE.reloadIdle / 1e3}초마다 새로고침) · 비용은 API 단가 환산(청구액 아님, 진행 중 턴은 종료 후 기록) · 점선 배지 = 턴 시간창 기준 추정 연결 · 경로·비밀값 마스킹` }))
