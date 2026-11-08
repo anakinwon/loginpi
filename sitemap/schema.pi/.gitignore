@@ -9,3 +9,11 @@ next-env.d.ts
 agent/*.jar
 agent/out/
 agent/agent.properties
+# pitel 샘플 DB 실행 부산물 — 로그·상태·재생성 산출물(2026-11-08)
+pitel/database/*.log
+pitel/database/verify_state.json
+pitel/database/init_data*.html
+pitel/datagen/state/
+pitel/datagen/out/
+pitel/model/std/_build_log.txt
+pitel/database/init_data.json
