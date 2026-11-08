@@ -336,7 +336,7 @@ src/
 
 **구성:** 정의 `.claude/agents/teamAnakin/` — `anakin_phase-collect`(수집·Sonnet) · `anakin_phase-decide`(결론·Fable) · `anakin_phase-build`(산출·Opus, 2026-11-07 신설) · `anakin_phase-verify`(검증·Sonnet) · `anakin_phase-review`(문서 검수·Opus) · `anakin_phase-commit`(커밋·Haiku 4.5) · `teamanakin-admin`(팀장·Opus). 운용 기준서 `.claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md`.
 
-**트리거:** UserPromptSubmit 훅 `.claude/hooks/model-advisor.mjs`가 요청마다 `[모델 단계 계획]` 줄을 주입 → 그 순서로 호출. 팀원이 1명이라도 실행된 턴은 **`teamanakin-admin` 승인 단계 생략 불가**(커밋·조회 단독 턴 제외 — 조회 단독 제외는 마스터 확정 2026-11-07). `[모델 단계 계획]`이 주입된 턴은 위 "작업 수행 원칙" ③④의 verifier·code-reviewer 대신 teamAnakin 단계가 우선하며, 반려 시 재작업 상한 10회는 동일. 인증·결제·페이지 변경은 Pi Browser 실기기 미검증이면 APPROVED 불가(최대 CONDITIONAL).
+**트리거:** UserPromptSubmit 훅 `.claude/hooks/model-advisor.mjs`가 요청마다 `[모델 단계 계획]` 줄을 주입 → 그 순서로 호출. 팀원이 1명이라도 실행된 턴은 **`teamanakin-admin` 승인 단계 생략 불가**(커밋·조회 단독 턴 제외 — 조회 단독 제외는 마스터 확정 2026-11-07). `[모델 단계 계획]`이 주입된 턴은 위 "작업 수행 원칙" ③④의 verifier·code-reviewer 대신 teamAnakin 단계가 우선하며, 반려 시 재작업 상한 5회는 동일(2026-11-08 마스터 10→5). 인증·결제·페이지 변경은 Pi Browser 실기기 미검증이면 APPROVED 불가(최대 CONDITIONAL).
 
 **git push 훅 차단 (2026-11-07 마스터 결정):** Claude(메인·서브에이전트)의 `git push`(전역 옵션·연결 명령·`bash -c`·`promote-to-prod.mjs --yes` 포함, `--dry-run` 만 허용)는 PreToolUse 훅 `.claude/hooks/push-guard.mjs`가 막는다(루트·하위 앱 settings 등록) — 해제는 마스터만 `! node .claude/hooks/push-guard.mjs --allow [분] [원격] [브랜치]`(1회용·push 1건짜리 명령만, 기본 10분) 또는 `! git push` 직접, Claude 는 승인 파일(`.omc/state/push-allow.json`)·훅 실행 불가, 시험 `--selftest`. **실수 방지 장치** — 의도적 우회(외부 alias·config·`.git/hooks`·훅·settings 수정)는 범위 밖(마스터 git 자격 공유로 서버 측 구분 불가, 승인 파일 HMAC 비밀도 같은 OS 사용자라 실익 없음).
 
@@ -358,9 +358,9 @@ src/
 1. **요청 철저 검토** — 착수 전 목표·범위·완료 기준을 세운다. 읽기에 따라 결과가 달라지면 AskUserQuestion 1문항으로 확인.
 2. **최적 다중 스킬·플러그인 선정** — 설치된 스킬(`.agents/skills`·OMC·GSD·superpowers)·플러그인·MCP 중 최적 조합을 먼저 고르고, 없으면 `find-skills`·skills.sh·`/plugin` 마켓에서 찾아 설치 후 사용. 기준은 **최고 성능 + 최저 토큰** — 단순 작업은 직접 수행(에이전트 오버헤드 금지), 다단계·다파일·조사·검증은 위임.
 3. **에이전트 적극 활용** — 독립 작업은 한 메시지에 여러 `Agent` 호출로 병렬 처리하고 메인 세션은 총괄·통합만 맡는다. 코드=`executor`, 탐색=`explore`, 외부 문서=`document-specialist`, 검토=`code-reviewer`/`critic`, 검증=`verifier`.
-4. **루핑 검증** — 결과가 최상인지 별도 패스(`verifier`/`critic`)로 검토하고 통과할 때까지 반복(`ralph` 패턴). 자기 승인 금지. 안전 상한(기본 10회) 도달 시 현황과 막힌 원인을 보고하고 지시를 받는다.
+4. **루핑 검증** — 결과가 최상인지 별도 패스(`verifier`/`critic`)로 검토하고 통과할 때까지 반복(`ralph` 패턴). 자기 승인 금지. 안전 상한(기본 5회) 도달 시 현황과 막힌 원인을 보고하고 지시를 받는다(2026-11-08 마스터 10→5).
 
-**해석 확정(마스터 승인 2026-09-20):** ① "최고 성능 + 최저 토큰"은 작업 크기로 조정 — 단순 작업은 직접 수행, 다단계·다파일·조사·검증은 위임. ② "무한 반복"은 verifier 통과까지 **안전 상한 10회** 내 반복 — 상한 도달 시 현황·막힌 원인을 보고하고 지시를 받는다. 전역 사본: `~/.claude/CLAUDE.md`의 `USER:START~END` 구간(OMC 관리 구역 밖).
+**해석 확정(마스터 승인 2026-09-20):** ① "최고 성능 + 최저 토큰"은 작업 크기로 조정 — 단순 작업은 직접 수행, 다단계·다파일·조사·검증은 위임. ② "무한 반복"은 verifier 통과까지 **안전 상한 5회** 내 반복 — 상한 도달 시 현황·막힌 원인을 보고하고 지시를 받는다(2026-11-08 마스터 10→5).
 
 **2026-11-07 마스터 개정 — 메인(아소카) 직접 작업 금지, 모든 작업은 전문가 서브에이전트 지명, 메인 = 정리·리뷰·승인·회신 + 프롬프트~그래프 엔지니어링 검토. 위 ②·해석 확정 ①의 '단순 작업은 직접 수행'은 폐기. 산출 단계 담당 = `anakin_phase-build`(훅 `model-advisor.mjs`·운용 기준서·팀장 정의 2026-11-07 정합화 완료). 정본 `.claude/engineering/10. prompt/anakins_prompt.md`**
 
