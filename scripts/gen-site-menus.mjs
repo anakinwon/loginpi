@@ -15,7 +15,7 @@ const OUT_DEFAULT = 'sitemap/sitemap.pi/src/data/site-menus.json'
 // 사이트 레지스트리 — dir = 앱 루트(저장소 상대), base = 운영 주소(자기 사이트 sitemap.pi 는 내부 링크라 비움)
 // 운영 주소 근거 : sitemap/sites.json(cafe) · docs/ENV_GUIDE.md 5절(seminar·schema) · dbms.pi docs/ROADMAP.md
 const SITES = [
-  { domain: 'cafe.pi', dir: '.', base: 'https://cafepi.vercel.app', build: cafe },
+  { domain: 'cafe.pi', dir: 'sitemap/cafe.pi', base: 'https://cafepi.vercel.app', build: cafe },
   { domain: 'sitemap.pi', dir: 'sitemap/sitemap.pi', base: '', build: sitemap },
   { domain: 'seminar.pi', dir: 'sitemap/seminar.pi', base: 'https://seminarz.vercel.app', build: seminar },
   { domain: 'schema.pi', dir: 'sitemap/schema.pi', base: 'https://schem.vercel.app', build: schema },
@@ -24,16 +24,16 @@ const SITES = [
 
 // 메뉴 소스 파일(저장소 상대) — 이 목록·페이지 파일·ko/en 번역이 바뀌면 훅이 다시 생성한다
 export const WATCH = [
-  /^src\/components\/layout\/(bottom-nav-client|site-footer)\.tsx$/,
-  /^src\/components\/store\/store-nav\.tsx$/,
-  /^src\/lib\/admin-nav-catalog\.ts$/,
-  /^src\/app\/\[locale\]\/profile\/_components\/profile-tabs\.tsx$/,
+  /^sitemap\/cafe\.pi\/src\/components\/layout\/(bottom-nav-client|site-footer)\.tsx$/,
+  /^sitemap\/cafe\.pi\/src\/components\/store\/store-nav\.tsx$/,
+  /^sitemap\/cafe\.pi\/src\/lib\/admin-nav-catalog\.ts$/,
+  /^sitemap\/cafe\.pi\/src\/app\/\[locale\]\/profile\/_components\/profile-tabs\.tsx$/,
   /^sitemap\/sitemap\.pi\/src\/(components\/(site-header|admin-panel)\.tsx|lib\/site\.ts)$/,
   /^sitemap\/seminar\.pi\/src\/components\/site-header\.tsx$/,
   /^sitemap\/schema\.pi\/src\/app\/\[locale\]\/areas\/\[areaId\]\/area-nav\.tsx$/,
   /^sitemap\/dbms\.pi\/src\/lib\/features\.ts$/,
-  /^(sitemap\/[^/]+\/)?src\/app\/\[locale\]\/.*page\.tsx$/,
-  /^(sitemap\/[^/]+\/)?messages\/(ko|en)\.json$/,
+  /^sitemap\/[^/]+\/src\/app\/\[locale\]\/.*page\.tsx$/,
+  /^sitemap\/[^/]+\/messages\/(ko|en)\.json$/,
 ]
 
 // sitemap.pi 노출 금지 — 'Pi 외 통화' 어휘(Bean·토큰, sitemap.pi CLAUDE.md · MAINNET A-5)와 OAuth 콜백·실험 화면(/lab/*·*-test·*lab)

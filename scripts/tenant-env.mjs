@@ -20,11 +20,11 @@ const writeSecret = (p, body) => {
   chmodSync(p, 0o600)
 }
 
-// 앱 목록 — 루트(cafe.pi) + sitemap/<domain>.pi 폴더 중 .env.local 이 있는 것
+// 앱 목록 — sitemap/<domain>.pi 폴더(cafe.pi 맨 앞) 중 .env.local 이 있는 것
 function apps() {
-  const list = [{ name: 'cafe.pi', dir: '.' }]
+  const list = [{ name: 'cafe.pi', dir: 'sitemap/cafe.pi' }]
   for (const d of readdirSync(join(ROOT, 'sitemap'), { withFileTypes: true }))
-    if (d.isDirectory() && d.name.endsWith('.pi')) list.push({ name: d.name, dir: `sitemap/${d.name}` })
+    if (d.isDirectory() && d.name.endsWith('.pi') && d.name !== 'cafe.pi') list.push({ name: d.name, dir: `sitemap/${d.name}` })
   // 순서 = cafe.pi → 사이트 앱들 → schema.pi(모니터링 수집처라 맨 뒤)
   return list
     .filter((a) => existsSync(join(ROOT, a.dir, '.env.local')))
@@ -95,12 +95,12 @@ function multi() {
 const readMulti = (k) => (existsSync(join(ROOT, '.env.multi')) ? load('.env.multi')[k] : undefined)
 
 const DESC = {
-  'cafe.pi': 'Pi 커뮤니티 카페·상점·게시판(루트 앱). Vercel 운영 cafe(production 브랜치) / 스테이징 loginpi(master)',
+  'cafe.pi': 'Pi 커뮤니티 카페·상점·게시판(sitemap/cafe.pi). Vercel cafe(운영)·loginpi(테스트넷) — 둘 다 운영 브랜치 master, Root Directory sitemap/cafe.pi',
   'sitemap.pi': 'Pi 생태계 사이트 지도·등록 신청. Vercel 운영 sitemaps(prod/sitemap) / 비운영 스키마 sitemap_dev·sitemap_stg',
   'schema.pi': '데이터 표준·모델링·모니터링 수집처(/api/mon/ingest). Vercel 운영 schema(prod/schema)',
 }
 const URLS = {
-  'cafe.pi': ['운영 : https://cafepi.vercel.app (Pi 앱 도메인 [확인중] cafe7092.pinet.com)', '스테이징 : https://loginpi.vercel.app (Pi 앱 도메인 apppilogintestbd3106.pinet.com)', '로컬 : http://localhost:3000'],
+  'cafe.pi': ['운영 : https://cafepi.vercel.app (Pi 앱 도메인 [확인중] cafe7092.pinet.com)', '테스트넷 : https://loginpi.vercel.app (Pi 앱 도메인 apppilogintestbd3106.pinet.com)', '로컬 : http://localhost:3000'],
   'sitemap.pi': ['운영 : [확인중] (Vercel 프로젝트 sitemaps 도메인)', '스테이징 : https://sitemapst.vercel.app', '로컬 : http://localhost:3001'],
   'schema.pi': ['운영 : https://schem.vercel.app', '로컬 : http://localhost:3002'],
 }

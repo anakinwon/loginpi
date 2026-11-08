@@ -1,5 +1,5 @@
 {
-  "name": "claude-nextjs-starterkit",
+  "name": "@site/cafe",
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@11.4.0",
@@ -11,12 +11,7 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "build:whitepaper": "node .whitepaper-build/build.js",
-    "work:stats": "node scripts/work-history-stats.mjs",
-    "work:report": "node scripts/work-history-report.mjs",
-    "test": "node --test test/**/*.test.mjs",
-    "work:metrics-doc": "node scripts/work-history-metrics-doc.mjs",
-    "work:resume": "node scripts/request-resume.mjs"
+    "test": "node --test \"test/**/*.test.mjs\""
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.101.0",
@@ -41,7 +36,6 @@
     "next-themes": "^0.4.6",
     "pi-backend": "^0.1.3",
     "plotly.js-basic-dist-min": "^3.6.0",
-    "pptxgenjs": "^4.0.1",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "react-icons": "^5.6.0",

@@ -1,7 +1,5 @@
 .next
 node_modules
 pnpm-lock.yaml
-packages
-sitemap
 public
 *.md

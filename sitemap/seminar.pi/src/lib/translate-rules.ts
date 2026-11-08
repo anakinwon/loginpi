@@ -3,8 +3,8 @@
 // speech-rules 를 import 하지 않는다 — node:test 가 .ts 를 확장자 없이 못 찾음. 글자 상한 = 자막 표시 상한 CAPTION.maxChars(500, 시험이 같음을 확인)
 export const MAX_TEXT_CHARS = 500
 
-// 번역 대상 언어 — 루트 cafe.pi 의 완역 66개 언어(scripts/i18n-lang-map.mjs) 기준 언어 코드.
-// seminar.pi src/i18n/routing.ts 는 UI locale(ko·en)만 있고, 루트 routing.ts 는 국가 코드('dz' = 알제리)가 섞여 그대로 못 쓴다
+// 번역 대상 언어 — cafe.pi(sitemap/cafe.pi)의 완역 66개 언어(scripts/i18n-lang-map.mjs) 기준 언어 코드.
+// seminar.pi src/i18n/routing.ts 는 UI locale(ko·en)만 있고, cafe.pi routing.ts 는 국가 코드('dz' = 알제리)가 섞여 그대로 못 쓴다
 // 표시명은 화면이 Intl.DisplayNames(UI locale)로 만든다 — 번역 파일 불필요
 export const TRANSLATE_LANGS = [
   'ko', 'en', 'zh', 'zh-TW', 'ja', 'hi', 'vi', 'af', 'fil', 'th', 'id', 'ms', 'es', 'fr', 'de', 'it', 'ru', 'pt', 'ar',

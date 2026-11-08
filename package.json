@@ -1,0 +1,35 @@
+{
+  "name": "loginpi-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "loginpi pnpm 워크스페이스 루트 — 공용 도구(작업 이력·통계·문서 빌드)만, 앱은 sitemap/<도메인>.pi · 공용 패키지는 packages/*",
+  "packageManager": "pnpm@11.4.0",
+  "scripts": {
+    "dev": "pnpm --filter @site/cafe dev",
+    "build": "pnpm --filter @site/cafe build",
+    "start": "pnpm --filter @site/cafe start",
+    "lint": "pnpm --filter @site/cafe lint",
+    "format": "pnpm --filter @site/cafe format",
+    "format:check": "pnpm --filter @site/cafe format:check",
+    "validate:locales": "pnpm --filter @site/cafe validate:locales",
+    "tsc": "pnpm --filter @site/cafe exec tsc --noEmit",
+    "build:whitepaper": "node .whitepaper-build/build.js",
+    "work:stats": "node scripts/work-history-stats.mjs",
+    "work:report": "node scripts/work-history-report.mjs",
+    "test": "node --test test/**/*.test.mjs",
+    "work:metrics-doc": "node scripts/work-history-metrics-doc.mjs",
+    "work:resume": "node scripts/request-resume.mjs"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "pg": "^8.22.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "react-icons": "^5.6.0",
+    "sharp": "^0.35.1",
+    "typescript": "^6.0.3"
+  }
+}

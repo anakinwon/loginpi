@@ -68,12 +68,6 @@ next-env.d.ts
 *.jpg
 *.jpeg
 
-# public 폴더 정적 이미지는 배포에 필요하므로 예외 처리
-!public/*.png
-!public/*.jpg
-!public/*.jpeg
-!public/*.svg
-!public/*.ico
 # 데이터 모델 ERD 산출 이미지(스크린샷 아님 — 정본 산출물)
 !sitemap/sitemap.pi/data-model/erd/*.png
 package-lock.json
@@ -87,9 +81,6 @@ docs/.pptx-build/qa*/
 
 # 환경변수 템플릿은 추적(실값 없는 placeholder만). 실값 파일(.env.local 등)은 위 .env* 규칙으로 제외 유지
 !.env.example
-
-# 운영DB 초기화 번들(파생물·505KB, scripts/build-prod-db-bundle.mjs로 재생성)
-sql/_prod_db_bundle.sql
 
 # 운영DB 부트스트랩 일회성 산출물(실데이터 — 커밋 금지)
 prod_schema.sql

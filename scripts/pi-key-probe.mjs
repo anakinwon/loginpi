@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
-const APP_ENV = { sitemap: 'sitemap/sitemap.pi/.env.local', cafe: '.env.local' }
+const APP_ENV = { sitemap: 'sitemap/sitemap.pi/.env.local', cafe: 'sitemap/cafe.pi/.env.local' }
 
 const args = process.argv.slice(2)
 const opt = (name) => {

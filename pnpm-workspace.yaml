@@ -1,4 +1,4 @@
-# 워크스페이스(PRD_28 §3) : 루트 패키지 = cafe.pi(이동 없음), 공용 패키지 packages/*, 사이트 앱 sitemap/<도메인>.pi
+# 워크스페이스(PRD_28 §3) : 루트 패키지 = 워크스페이스 전용(공용 도구만), 공용 패키지 packages/*, 사이트 앱 sitemap/<도메인>.pi(cafe.pi 포함)
 packages:
   - 'packages/*'
   - 'sitemap/*'
