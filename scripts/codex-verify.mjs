@@ -20,9 +20,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const C = {
   // 루프 예산(마스터 확정 2026-11-08) — 하나라도 넘으면 BLOCKED budget. 실측 전 값이라 재평가일에 조정
   // (토큰 상한 '추정치의 2배'는 래퍼가 측정 못 해 절차서에만 둔다)
-  maxIter: 10, // 회차 상한
+  maxIter: 5, // 회차 상한(마스터 지시 2026-11-08 : 10 → 5, 5회차 결과는 무조건 루프 종료)
   maxWallMin: 90, // 루프 시작(원장 startedAt)부터 벽시계
-  maxCodexCalls: 10, // 루프 전체 Codex 호출 횟수(재요청 포함)
+  maxCodexCalls: 5, // 루프 전체 Codex 호출 횟수(재요청·BLOCKED 재시도 포함, 마스터 결정 2026-11-08 : 10 → 5 = 회차 상한)
   defaultTimeoutMin: 15,
   loginTimeoutMs: 20_000,
   maxDiffBytes: 400_000, // 입력 묶음 diff 상한
@@ -46,7 +46,10 @@ const C = {
   criterionStatus: ['met', 'unmet', 'unverifiable'],
   defectStatus: ['open', 'fixed', 'regressed', 'contested', 'waived'],
   liveDefect: ['open', 'regressed', 'contested'], // 아직 해결 안 된 결함
-  blockedReasons: ['device', 'master-permission', 'judge-unavailable', 'budget', 'scope-missing', 'scope-too-broad'],
+  // ledger = 원장 부재·손상·불일치, lock = 같은 --id 동시 실행 잠금(마스터 결정 2026-11-08 — 예산 초과 budget 과 분리)
+  // 판정자 출력 예시·스키마 enum 모두 이 목록 하나에서 만든다. 판정자가 보통 쓰는 사유 = device·master-permission(입력 결손이면 judge-unavailable),
+  // 나머지(budget·ledger·lock·scope-*)는 래퍼가 판정 전에 붙이는 사유 — 판정자가 budget 을 내도 loopEndOf 가 종료로 처리
+  blockedReasons: ['device', 'master-permission', 'judge-unavailable', 'budget', 'ledger', 'lock', 'scope-missing', 'scope-too-broad'],
   // 승인 상한(마스터 확정 2026-11-08) — 팀장·아소카는 이 등급을 넘겨 줄 수 없다
   maxGrade: { codex: 'APPROVED', 'claude-substitute': 'CONDITIONAL' },
   substituteNote: '검증자 : Claude 대체(Codex 미가용)',
@@ -174,11 +177,12 @@ const RESULT_SCHEMA = (() => {
   s.properties.maxGrade = { type: 'string', enum: Object.values(C.maxGrade) }
   s.properties.noProgress = bool
   s.properties.escalate = bool
+  s.properties.loopEnd = bool
   const d = s.properties.defects.items
   d.properties.firstSeen = int
   d.properties.seenCount = int
   d.required.push('firstSeen', 'seenCount')
-  s.required.push('judge', 'maxGrade', 'noProgress', 'escalate')
+  s.required.push('judge', 'maxGrade', 'noProgress', 'escalate', 'loopEnd')
   return s
 })()
 
@@ -200,7 +204,7 @@ const PROMPT_HEAD = `너는 독립 검증자다. 결과물을 만든 쪽(Claude)
 
 ## 출력
 JSON 객체 하나만 출력한다(코드펜스·설명 금지). 형태 :
-{"verdict":"PASS|FAIL|BLOCKED","iter":N,"criteria":[{"id":"","status":"met|unmet|unverifiable","met":true,"evidence":""}],"defects":[{"id":"D-001","severity":"high|med|low","status":"open|fixed|regressed|contested|waived","file":"","line":0,"summary":"","repro":"","fix_hint":""}],"blocked":[{"reason":"device|master-permission|judge-unavailable|budget","detail":""}],"blocked_reason":"","notes":""}`
+{"verdict":"PASS|FAIL|BLOCKED","iter":N,"criteria":[{"id":"","status":"met|unmet|unverifiable","met":true,"evidence":""}],"defects":[{"id":"D-001","severity":"high|med|low","status":"open|fixed|regressed|contested|waived","file":"","line":0,"summary":"","repro":"","fix_hint":""}],"blocked":[{"reason":"${C.blockedReasons.join('|')}","detail":""}],"blocked_reason":"","notes":""}`
 
 // ───────── 인자 ─────────
 export function parseArgs(argv) {
@@ -431,18 +435,26 @@ export function callTimeoutMs(ledger, timeoutMin, now = Date.now()) {
   return remainingMs < 60_000 ? 0 : Math.min(timeoutMin * 60_000, remainingMs)
 }
 
-// 확정 직전 재검사 — 벽시계를 넘겼으면 verdict 를 BLOCKED(budget) 로, 원래 판정은 notes 에
+// 확정 직전 재검사 — 벽시계를 넘겼으면 verdict 와 무관하게(판정자 BLOCKED 포함, D-003) BLOCKED + budget 사유 추가.
+// 기존 blocked 사유는 유지, 원래 판정은 notes 에
 export function cutoffIfOver(result, ledger, now = Date.now()) {
   const { over } = wallClock(ledger, now)
-  if (!over || result.verdict === 'BLOCKED') return result
-  return {
+  if (!over) return result
+  const r = {
     ...result,
     verdict: 'BLOCKED',
     blocked: [...(result.blocked || []), { reason: 'budget', detail: '실행 중 상한 초과' }],
-    blocked_reason: '실행 중 상한 초과',
-    notes: [result.notes, `원래 판정 : ${result.verdict}(${over})`].filter(Boolean).join('\n'),
+    blocked_reason: [result.verdict === 'BLOCKED' ? result.blocked_reason : '', '실행 중 상한 초과'].filter(Boolean).join(' · '),
+    notes: [result.notes, `실행 중 상한 초과 — 원래 판정 : ${result.verdict}(${over})`].filter(Boolean).join('\n'),
   }
+  r.loopEnd = loopEndOf(r, r.iter) // budget 사유 추가 → 루프 종료
+  return r
 }
+
+// 루프 종료 판정 단일 규칙(마스터 결정 2026-11-08) — PASS / 회차 상한의 FAIL / budget(실제 상한 초과) 사유가 하나라도 든 BLOCKED
+// 그 밖의 BLOCKED(ledger·lock·judge-unavailable·scope-*·device·master-permission)는 회차 번호를 소모하지 않고 같은 회차 재실행
+export const loopEndOf = (r, iter) =>
+  r.verdict === 'PASS' || (r.verdict === 'FAIL' && iter >= C.maxIter) || (r.verdict === 'BLOCKED' && (r.blocked || []).some((b) => b?.reason === 'budget'))
 
 // 원장 — 파일이 없을 때만 새로 만든다. 있는데 손상(파싱 실패·필수 필드 이상)이면 broken(예산 우회 차단, 7회차 D-005)
 // 원장 상태 결함은 사례별로 고치지 않는다 — 생성 경로는 --init 하나(create=true), 나머지는 부재·손상·불일치 전부 fail-closed(8회차 D-005)
@@ -471,16 +483,35 @@ export function loadLedger(file, id, { create = false } = {}) {
 
 // --out 은 loopDir 안, 래퍼 예약 파일(원장·스키마·이벤트·프롬프트·원본)과 겹치면 안 됨(8회차 D-009) — 문제면 사유, 아니면 ''
 // 9회차 G-2 : 다른 회차·다른 판정자의 결과 이름(iter-N.codex|claude.json)도 예약, 이미 있는 파일은 덮어쓰기 금지
+// BLOCKED 재시도(마스터 결정 2026-11-08) : BLOCKED 는 iter-N.blocked-K.json 에 따로 저장(예약) — 판정 결과(PASS/FAIL)가 있는 회차만 재실행 금지
 export function outProblem(out, loopDir, iter = null, judgeName = null, checkExists = true) {
   const rel = path.relative(path.resolve(loopDir), path.resolve(out))
   if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return `--out 은 ${path.relative(ROOT, loopDir) || loopDir} 안이어야 함`
   const name = path.basename(rel).toLowerCase()
-  const reserved = ['ledger.json', 'ledger.lock', 'output.schema.json'].includes(name) || /\.codex\.events-\d+\.jsonl$/.test(name) || /\.claude\.(prompt\.md|raw\.json)$/.test(name) || name.endsWith('.tmp')
+  const reserved = ['ledger.json', 'ledger.lock', 'output.schema.json'].includes(name) || /\.codex\.events-\d+\.jsonl$/.test(name) || /\.claude\.(prompt\.md|raw\.json)$/.test(name) || /^iter-\d+\.blocked-\d+\.json$/.test(name) || name.endsWith('.tmp')
   if (reserved) return `--out 이 래퍼 예약 파일과 겹침 : ${name}`
   const m = name.match(/^iter-(\d+)\.(codex|claude)\.json$/)
   if (m && (Number(m[1]) !== iter || m[2] !== judgeName)) return `--out 이 다른 회차·판정자의 결과 이름과 겹침 : ${name}`
-  if (checkExists && fs.existsSync(out)) return `결과 파일이 이미 있음(덮어쓰기 금지) : ${name} — 다시 판정하려면 다음 회차 번호를 쓴다`
+  if (!checkExists) return ''
+  if (fs.existsSync(out)) return `결과 파일이 이미 있음(덮어쓰기 금지) : ${name} — 다시 판정하려면 다음 회차 번호를 쓴다`
+  // 다른 판정자의 같은 회차 판정 결과도 번호를 소모한 것 — 같은 회차 재판정 금지
+  for (const j of ['codex', 'claude']) {
+    const other = `iter-${iter}.${j}.json`
+    if (iter != null && fs.existsSync(path.join(loopDir, other))) return `이 회차 판정 결과가 이미 있음(덮어쓰기 금지) : ${other} — 다시 판정하려면 다음 회차 번호를 쓴다`
+  }
   return ''
+}
+
+// loopDir 안 파일 이름에서 re 첫 그룹 숫자의 최댓값 + 1(없으면 1) — extra = 원장에 남은 번호
+export function nextNum(loopDir, re, extra = []) {
+  const ns = fs.existsSync(loopDir) ? fs.readdirSync(loopDir).map((f) => f.match(re)?.[1]).filter(Boolean).map(Number) : []
+  return Math.max(0, ...ns, ...extra.filter(Number.isInteger)) + 1
+}
+
+// BLOCKED 결과 저장 위치 = iter-N.blocked-K.json(K = 이 회차 기존 blocked 다음 번호) — 판정 결과 이름을 차지하지 않아 같은 회차 재실행 가능
+export function blockedOut(loopDir, iter, ledgerBlocked = []) {
+  const k = nextNum(loopDir, new RegExp(`^iter-${iter}\\.blocked-(\\d+)\\.json$`, 'i'), ledgerBlocked.filter((b) => b?.iter === iter).map((b) => b.k))
+  return { k, file: path.join(loopDir, `iter-${iter}.blocked-${k}.json`) }
 }
 
 // ───────── 동시 실행 잠금(9회차 D-011) ─────────
@@ -581,6 +612,10 @@ export function finalize(model, { iter, ledger, judge, extraNotes = [], expected
     notes.push('래퍼 정합 : 기준 0건 PASS 불가')
   }
   r.escalate = live.some((d) => d.seenCount >= 2)
+  // 무조건 종료 조건(마스터 지시 2026-11-08) — PASS 이거나 회차 상한(5)의 판정 결과가 FAIL 이면 루프 끝, 더 회송하지 않는다
+  // BLOCKED 는 회차 번호를 소모하지 않으므로(같은 회차 재실행) 종료 아님
+  r.loopEnd = loopEndOf(r, iter)
+  if (r.loopEnd && r.verdict === 'FAIL') notes.push(`회차 상한 ${C.maxIter} 도달 — 루프 종료(build 회송 금지), 남은 결함은 아소카가 마스터에게 보고`)
   const curOpen = new Set(live.map((d) => d.id))
   r.noProgress = false
   if (prevIter && r.verdict !== 'PASS') {
@@ -597,7 +632,7 @@ export function finalize(model, { iter, ledger, judge, extraNotes = [], expected
 }
 
 export function blockedResult(iter, reason, detail, judge) {
-  return {
+  const r = {
     verdict: 'BLOCKED',
     iter,
     judge,
@@ -610,6 +645,8 @@ export function blockedResult(iter, reason, detail, judge) {
     noProgress: false,
     escalate: false,
   }
+  r.loopEnd = loopEndOf(r, iter) // budget 만 종료 — 원장(ledger)·잠금(lock) 등은 확인 후 같은 회차 재실행
+  return r
 }
 
 function writeAtomic(file, data) {
@@ -1259,7 +1296,7 @@ async function main(a) {
   const r = await withLock(lockFile, a.timeoutMin || C.defaultTimeoutMin, () => runMain(a))
   if (r.blocked) {
     // 다른 실행의 결과·원장을 덮어쓰지 않도록 아무 파일도 쓰지 않는다
-    console.error(`BLOCKED(budget) : ${r.blocked} — ${path.relative(ROOT, lockFile)}`)
+    console.error(`BLOCKED(lock) : ${r.blocked} — ${path.relative(ROOT, lockFile)}`)
     return C.exit.BLOCKED
   }
   return r.value
@@ -1275,7 +1312,7 @@ async function runMain(a) {
   // 루프 시작 시각 고정(벽시계 상한 기준) — build 착수 전에 1회. 이미 있으면 startedAt 불변
   if (a.init) {
     if (broken) {
-      console.error(`BLOCKED(budget) : ${broken} — ${path.relative(ROOT, ledgerFile)}`)
+      console.error(`BLOCKED(ledger) : ${broken} — ${path.relative(ROOT, ledgerFile)}`)
       return C.exit.BLOCKED
     }
     if (lr.created) writeAtomic(ledgerFile, ledger)
@@ -1284,13 +1321,15 @@ async function runMain(a) {
   }
   // dry-run 은 쓰지도 부르지도 않으므로 원장 부재만 경고로 미리보기 허용(손상·불일치는 그대로 차단)
   if (a.dryRun && lr.missing) {
-    console.warn(`⚠ ${broken} — 실제 실행은 BLOCKED(budget). 미리보기는 빈 원장으로`)
+    console.warn(`⚠ ${broken} — 실제 실행은 BLOCKED(ledger). 미리보기는 빈 원장으로`)
     broken = ''
   }
   const kind = a.judge === 'codex' ? 'codex' : 'claude-substitute'
   const out = path.resolve(a.out || path.join(loopDir, `iter-${a.iter}.${a.judge}.json`))
   const outBad = outProblem(out, loopDir, a.iter, a.judge, !a.dryRun)
   if (outBad) throw new Error(outBad) // 종료 3(D-009·G-2)
+  // --out 을 다른 이름으로 줬어도 원장에 이 회차 판정 결과가 있으면 재판정 금지(판정 결과만 회차 번호 소모)
+  if (!a.dryRun && !broken && ledger.iters.some((x) => x.iter === a.iter)) throw new Error(`원장에 ${a.iter}회차 판정 결과가 이미 있음(덮어쓰기 금지) — 다시 판정하려면 다음 회차 번호를 쓴다`)
   const judge = {
     kind,
     model: a.model || (kind === 'codex' ? readConfigModel() || '[codex 기본값]' : '[판정 에이전트가 기입]'),
@@ -1306,15 +1345,17 @@ async function runMain(a) {
       return C.exit.ERROR
     }
     if (a.dryRun) return exitFor(result.verdict)
-    writeAtomic(out, result)
+    // BLOCKED 는 iter-N.blocked-K.json(회차 번호 소모 안 함), 판정 결과(PASS/FAIL)만 out(iter-N.<judge>.json)
+    const bo = result.verdict === 'BLOCKED' ? blockedOut(loopDir, a.iter, broken ? [] : ledger.blocked) : null
+    const dest = bo ? bo.file : out
+    writeAtomic(dest, result)
     if (broken) {
-      console.error(`${broken} — ledger.json 은 만들거나 고치지 않음 → ${path.relative(ROOT, out)}`)
+      console.error(`${broken} — ledger.json 은 만들거나 고치지 않음 → ${path.relative(ROOT, dest)}`)
       return exitFor(result.verdict)
     }
     const at = new Date().toISOString()
-    if (result.verdict === 'BLOCKED') ledger.blocked.push({ iter: a.iter, at, out, blocked: result.blocked })
+    if (bo) ledger.blocked.push({ iter: a.iter, k: bo.k, reason: [...new Set(result.blocked.map((b) => b.reason))].join(','), at, out: dest, blocked: result.blocked })
     else {
-      ledger.iters = ledger.iters.filter((x) => x.iter !== a.iter)
       ledger.iters.push({
         iter: a.iter,
         at,
@@ -1332,8 +1373,8 @@ async function runMain(a) {
       ledger.defects = extra.nextDefects
     }
     writeAtomic(ledgerFile, ledger)
-    const flags = `${result.escalate ? ' · escalate' : ''}${result.noProgress ? ' · noProgress' : ''}`
-    console.log(`${result.verdict}${flags} · maxGrade ${result.maxGrade} → ${path.relative(ROOT, out)}`)
+    const flags = `${result.escalate ? ' · escalate' : ''}${result.noProgress ? ' · noProgress' : ''}${result.loopEnd ? ' · 루프 종료' : ''}`
+    console.log(`${result.verdict}${flags} · maxGrade ${result.maxGrade} → ${path.relative(ROOT, dest)}`)
     return exitFor(result.verdict)
   }
   const block = (reason, detail) => {
@@ -1341,8 +1382,8 @@ async function runMain(a) {
     return finish(blockedResult(a.iter, reason, detail, judge))
   }
 
-  // 원장 손상 → 예산 우회 차단(7회차 D-005)
-  if (broken) return block('budget', broken)
+  // 원장 부재·손상·불일치 → 예산 우회 차단(7회차 D-005). 사유 ledger = 상한 초과 아님(loopEnd false)
+  if (broken) return block('ledger', broken)
   // 예산(회차·벽시계·Codex 호출) fail-closed — 다른 무엇보다 먼저
   const over = budgetExceeded(ledger, a.iter)
   if (over) return block('budget', over)
@@ -1472,13 +1513,15 @@ async function runMain(a) {
     const t0 = Date.now()
     let p = prompt
     let last = { errs: ['미실행'] }
+    // 이벤트 파일 번호는 같은 회차 재실행(BLOCKED 뒤)까지 누적 — 앞선 실호출 흔적을 덮어쓰지 않는다
+    const evBase = nextNum(loopDir, new RegExp(`^iter-${a.iter}\\.codex\\.events-(\\d+)\\.jsonl$`, 'i')) - 1
     for (let attempt = 1; attempt <= 2; attempt++) {
       const over2 = budgetExceeded(ledger, a.iter)
       if (over2) return block('budget', over2)
       ledger.codexCalls = (ledger.codexCalls || 0) + 1
       writeAtomic(ledgerFile, ledger) // 호출 횟수는 호출 전에 기록(중단돼도 셈)
       const lastMsg = path.join(scratch, `last-${attempt}.txt`)
-      const events = path.join(loopDir, `iter-${a.iter}.codex.events-${attempt}.jsonl`)
+      const events = path.join(loopDir, `iter-${a.iter}.codex.events-${evBase + attempt}.jsonl`)
       const args = codexArgs({ exportDir: ex.dir, schemaFile, lastMsg, model: a.model })
       // 타임아웃 = min(--timeout-min, 남은 벽시계) — 남은 예산 1분 미만이면 호출 안 함(7회차 D-004)
       const tmo = callTimeoutMs(ledger, a.timeoutMin)
@@ -1622,7 +1665,7 @@ async function selftest() {
   assert.throws(() => parseArgs(['--id', 'x', '--iter', '1', '--task']), /값 없음/)
   assert.throws(() => parseArgs(['--id', 'x', '--iter', '1', '--task', 't', '--bogus']), /알 수 없는/)
   assert.throws(() => parseArgs(['--id', 'x', '--iter', '1', '--task', 't', '--diff', 'HEAD;rm']), /ref/)
-  assert.doesNotThrow(() => parseArgs(['--id', 'x', '--iter', '11'])) // 상한 초과는 task 없이도 BLOCKED 로 가야 함
+  assert.doesNotThrow(() => parseArgs(['--id', 'x', '--iter', '6'])) // 상한 초과는 task 없이도 BLOCKED 로 가야 함
   assert.equal(parseArgs(['--id', 'x', '--init']).init, true)
   assert.throws(() => parseArgs(['--init']), /--id/)
 
@@ -1772,12 +1815,14 @@ async function selftest() {
   // 예산
   const fresh = emptyLedger('B')
   const ago = (m) => new Date(Date.now() - m * 60_000).toISOString()
-  assert.equal(budgetExceeded(fresh, 10), '')
-  assert.match(budgetExceeded(fresh, 11), /회차 상한 10/)
+  assert.equal(C.maxIter, 5, '회차 상한 5(마스터 지시)')
+  assert.equal(budgetExceeded(fresh, 5), '')
+  assert.match(budgetExceeded(fresh, 6), /회차 상한 5/)
   assert.match(budgetExceeded({ ...fresh, startedAt: ago(91) }, 1), /벽시계 상한 90분/)
   assert.equal(budgetExceeded({ ...fresh, startedAt: ago(89) }, 1), '')
-  assert.match(budgetExceeded({ ...fresh, codexCalls: 10 }, 1), /Codex 호출 상한 10/)
-  assert.equal(budgetExceeded({ ...fresh, codexCalls: 9 }, 1), '')
+  assert.equal(C.maxCodexCalls, 5, 'Codex 호출 상한 5(마스터 결정 2026-11-08)')
+  assert.equal(budgetExceeded({ ...fresh, codexCalls: 4 }, 1), '', '5번째 호출까지 허용')
+  assert.match(budgetExceeded({ ...fresh, codexCalls: 5 }, 1), /Codex 호출 상한 5/, '6번째 호출 → budget')
   // D-005 손상 원장·NaN
   assert.match(budgetExceeded({ ...fresh, startedAt: 'not-a-date' }, 1), /startedAt 손상/)
   assert.match(budgetExceeded({ ...fresh, startedAt: undefined }, 1), /startedAt 손상/)
@@ -1821,6 +1866,24 @@ async function selftest() {
     assert.match(outProblem(path.join(ld, 'iter-3.codex.json'), ld, 3, 'codex'), /덮어쓰기 금지/)
     assert.equal(outProblem(path.join(ld, 'iter-3.codex.json'), ld, 3, 'codex', false), '', 'dry-run 은 존재 검사 생략')
     assert.match(outProblem(path.join(ld, 'ledger.lock'), ld, 1, 'codex'), /예약/)
+    // BLOCKED 재시도(마스터 결정 2026-11-08) : 5회차 일시 BLOCKED → blocked 파일 → 같은 5회차 재실행 허용 → 판정 결과 저장 후 재실행 종료 3
+    assert.match(outProblem(path.join(ld, 'iter-5.blocked-1.json'), ld, 5, 'codex'), /예약/, 'blocked 파일 이름은 --out 불가')
+    const bo1 = blockedOut(ld, 5)
+    assert.ok(bo1.k === 1 && path.basename(bo1.file) === 'iter-5.blocked-1.json')
+    fs.writeFileSync(bo1.file, '{}')
+    assert.equal(outProblem(path.join(ld, 'iter-5.codex.json'), ld, 5, 'codex'), '', 'blocked 만 있으면 같은 회차 재실행 허용')
+    assert.equal(blockedOut(ld, 5).k, 2, '같은 회차 다음 blocked = K+1')
+    assert.equal(blockedOut(ld, 5, [{ iter: 5, k: 7 }, { iter: 4, k: 9 }, { iter: 5 }]).k, 8, '원장 번호도 반영(회차별)')
+    assert.equal(blockedOut(ld, 4).k, 1, '회차마다 1부터')
+    fs.writeFileSync(path.join(ld, 'iter-5.codex.json'), '{}')
+    assert.match(outProblem(path.join(ld, 'iter-5.codex.json'), ld, 5, 'codex'), /덮어쓰기 금지/, '판정 결과 저장 후 재실행 = 종료 3')
+    assert.match(outProblem(path.join(ld, 'iter-5.claude.json'), ld, 5, 'claude'), /이 회차 판정 결과가 이미 있음/, '다른 판정자로 같은 회차 재판정 금지')
+    assert.equal(outProblem(path.join(ld, 'iter-5.claude.json'), ld, 5, 'claude', false), '', 'dry-run 은 존재 검사 생략')
+    // 이벤트 번호 누적(재실행이 앞선 실호출 흔적을 덮지 않음)
+    const evRe = /^iter-5\.codex\.events-(\d+)\.jsonl$/i
+    assert.equal(nextNum(ld, evRe), 1)
+    fs.writeFileSync(path.join(ld, 'iter-5.codex.events-2.jsonl'), '')
+    assert.equal(nextNum(ld, evRe), 3)
     // D-011 잠금 : 있으면 차단 / 정상 해제 / 예외에도 해제 / 오래된 잠금은 자동 해제 안 함
     const lockF = path.join(ld, 'ledger.lock')
     const l1 = acquireLock(lockF)
@@ -1858,8 +1921,39 @@ async function selftest() {
   const cut = cutoffIfOver(fr, lt, t0 + 91 * 60_000)
   assert.equal(cut.verdict, 'BLOCKED')
   assert.deepEqual(cut.blocked.at(-1), { reason: 'budget', detail: '실행 중 상한 초과' })
-  assert.match(cut.notes, /원래 판정 : FAIL/)
-  const b = blockedResult(11, 'budget', '회차 상한 10 초과', judge)
+  assert.match(cut.notes, /실행 중 상한 초과 — 원래 판정 : FAIL/)
+  // D-003 : 판정자 BLOCKED(device) + 벽시계 초과 → 원래 사유 유지 + budget, loopEnd true
+  const devB = { ...good, verdict: 'BLOCKED', blocked: [{ reason: 'device', detail: 'd' }], blocked_reason: '실기기 필요', notes: 'n', loopEnd: false }
+  const devCut = cutoffIfOver(devB, lt, t0 + 91 * 60_000)
+  assert.deepEqual(devCut.blocked.map((x) => x.reason), ['device', 'budget'])
+  assert.ok(devCut.loopEnd === true && devCut.blocked_reason === '실기기 필요 · 실행 중 상한 초과' && /실행 중 상한 초과 — 원래 판정 : BLOCKED/.test(devCut.notes))
+  assert.equal(cutoffIfOver(devB, lt, t0 + 10 * 60_000), devB, '예산 안 판정자 BLOCKED → 그대로')
+  // 판정자 PASS + 벽시계 초과 → BLOCKED budget(기존 동작 유지)
+  const passCut = cutoffIfOver({ ...good, verdict: 'PASS', blocked: [], blocked_reason: '', loopEnd: true }, lt, t0 + 91 * 60_000)
+  assert.ok(passCut.verdict === 'BLOCKED' && passCut.blocked.at(-1).reason === 'budget' && passCut.loopEnd === true && /원래 판정 : PASS/.test(passCut.notes))
+  const b = blockedResult(6, 'budget', '회차 상한 5 초과', judge)
+  assert.equal(b.loopEnd, true, '예산 초과 BLOCKED = 무조건 종료')
+  assert.equal(cut.loopEnd, true, '확정 직전 재검사 초과 = 종료')
+  // 상한 초과(budget)만 종료 — 원장·잠금·판정자 미가용·scope·기기·권한은 확인 후 같은 회차 재실행
+  for (const why of C.blockedReasons.filter((x) => x !== 'budget')) assert.equal(blockedResult(5, why, 'x', judge).loopEnd, false, `${why} = 종료 아님`)
+  assert.ok(C.blockedReasons.includes('ledger') && C.blockedReasons.includes('lock'))
+  // D-002 : 판정자가 budget BLOCKED 를 내도 종료(loopEndOf 단일 규칙 — finalize·blockedResult·cutoffIfOver 공통)
+  const jBudget = finalize({ ...structuredClone(good), verdict: 'BLOCKED', blocked: [{ reason: 'device', detail: 'x' }, { reason: 'budget', detail: 'y' }] }, { iter: 2, ledger: emptyLedger('e'), judge })
+  assert.equal(jBudget.result.loopEnd, true, '판정자 budget BLOCKED → loopEnd true')
+  assert.equal(loopEndOf({ verdict: 'FAIL' }, 4), false)
+  assert.equal(loopEndOf({ verdict: 'BLOCKED', blocked: [{ reason: 'lock' }] }, 6), false)
+  // D-001 : 판정자 출력 예시 사유 = C.blockedReasons 8종 = 스키마 enum
+  const exReasons = PROMPT_HEAD.match(/"reason":"([^"]+)"/)[1].split('|')
+  assert.deepEqual(exReasons, C.blockedReasons, '출력 예시 사유 = blockedReasons')
+  assert.equal(exReasons.length, 8)
+  assert.deepEqual(MODEL_SCHEMA.properties.blocked.items.properties.reason.enum, C.blockedReasons, '스키마 enum 과 같음')
+  const blk5 = finalize({ ...structuredClone(good), verdict: 'BLOCKED', blocked: [{ reason: 'device', detail: 'x' }] }, { iter: 5, ledger: emptyLedger('e'), judge })
+  assert.ok(blk5.result.verdict === 'BLOCKED' && blk5.result.loopEnd === false && !/회차 상한 5 도달/.test(blk5.result.notes), '5회차 판정자 BLOCKED = 번호 소모 안 함·종료 아님')
+  // 무조건 종료 : 5회차는 FAIL 이어도 loopEnd, 4회차 FAIL 은 계속, PASS 는 언제나 종료
+  const end5 = finalize(structuredClone(good), { iter: 5, ledger: emptyLedger('e'), judge })
+  assert.ok(end5.result.loopEnd && end5.result.verdict === 'FAIL' && /회차 상한 5 도달 — 루프 종료/.test(end5.result.notes))
+  assert.equal(finalize(structuredClone(good), { iter: 4, ledger: emptyLedger('e'), judge }).result.loopEnd, false)
+  assert.equal(r3.loopEnd, true, 'PASS = 종료')
   assert.equal(exitFor(b.verdict), 2)
   assert.equal(b.blocked[0].reason, 'budget')
 
@@ -1889,6 +1983,8 @@ async function selftest() {
   // D-007 RESULT_SCHEMA
   assert.deepEqual(validate(r3, RESULT_SCHEMA), [], '정상 결과 통과')
   assert.deepEqual(validate(blockedResult(1, 'budget', 'x', judge), RESULT_SCHEMA), [], 'BLOCKED 결과 통과')
+  for (const why of ['ledger', 'lock']) assert.deepEqual(validate(blockedResult(1, why, 'x', judge), RESULT_SCHEMA), [], `BLOCKED ${why} 통과`)
+  assert.ok(validate(blockedResult(1, 'bogus', 'x', judge), RESULT_SCHEMA).some((e) => e.includes('reason')), '사유 enum 밖 = 위반')
   assert.deepEqual(validate(cutoffIfOver(r3, lt, t0 + 91 * 60_000), RESULT_SCHEMA), [], '실행 중 상한 초과 결과 통과')
   assert.ok(validate({ ...r3, maxGrade: 'GOLD' }, RESULT_SCHEMA).some((e) => e.includes('maxGrade')))
   assert.ok(validate({ ...r3, judge: { ...r3.judge, tokens: { input: 1 } } }, RESULT_SCHEMA).some((e) => e.includes('tokens')))

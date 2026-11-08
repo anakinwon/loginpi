@@ -58,11 +58,11 @@ node scripts/codex-verify.mjs --selftest         # Codex 호출 없이 인자·�
 | `--allow-bulk` | 넓은 scope 차단(4절)을 풀고 통과시킨다 — notes 에 "대량 전송 허용(--allow-bulk)" 기록. **아소카가 마스터 승인 없이 --allow-bulk 를 쓰지 않는다** |
 | `--diff` | 비교 기준 ref(기본 `HEAD`) — scope 안의 작업 트리 변경(추적 diff + 미추적 신규 파일)을 묶는다. 프롬프트의 diff 본문도 scope 안만 싣는다 |
 | `--prev` | 이전 회차 결과. 생략하면 원장의 직전 회차 결과를 쓴다 |
-| `--out` | 기본 `.omc/state/loop/<id>/iter-<N>.codex.json`. 그 loopDir 밖이거나 래퍼 예약 파일(`ledger.json`·`output.schema.json`·`*.codex.events-N.jsonl`·`*.claude.prompt.md`·`*.claude.raw.json`·`*.tmp`·`ledger.lock`)과 겹치면 종료 3(8회차 D-009). 다른 회차·판정자의 결과 이름(`iter-M.codex.json`·`iter-M.claude.json`)도 예약이고, **같은 회차 결과가 이미 있으면 덮어쓰지 않고 종료 3**(9회차 G-2 — 다시 판정하려면 다음 회차 번호. dry-run 은 존재 검사 생략) |
+| `--out` | 기본 `.omc/state/loop/<id>/iter-<N>.codex.json`. 그 loopDir 밖이거나 래퍼 예약 파일(`ledger.json`·`output.schema.json`·`*.codex.events-N.jsonl`·`*.claude.prompt.md`·`*.claude.raw.json`·`*.tmp`·`ledger.lock`)과 겹치면 종료 3(8회차 D-009). 다른 회차·판정자의 결과 이름(`iter-M.codex.json`·`iter-M.claude.json`)과 BLOCKED 결과 이름(`iter-M.blocked-K.json`)도 예약이고, **같은 회차 판정 결과(PASS/FAIL — 어느 판정자든, 원장 `iters` 포함)가 이미 있으면 덮어쓰지 않고 종료 3**(9회차 G-2 — 다시 판정하려면 다음 회차 번호. dry-run 은 존재 검사 생략). **BLOCKED 결과는 `--out` 대신 `iter-N.blocked-K.json`(K = 그 회차 기존 blocked 다음 번호, 1부터)에 저장**되므로 blocked 파일만 있는 회차는 같은 N 으로 다시 실행한다(마스터 결정 2026-11-08 "BLOCKED만 재시도 허용") |
 | `--confirm-real` | **실호출 허가**. `CODEX_JS` 없이 실제 Codex 를 부르려면 필수 — 없으면 Codex 를 부르지 않고 BLOCKED judge-unavailable "실호출은 --confirm-real 필요 — 시험은 CODEX_JS 사용"(종료 2). dry-run·`--judge claude` 는 검사 제외. **실호출은 verify 담당만 --confirm-real 사용, build·시험은 CODEX_JS 필수**(9회차 G-1 — 8회차 시험 중 실호출 사고 재발 방지) |
 | `--judge` | `codex`(기본) / `claude` = Codex 미가용 대체(6절) |
 | `--ingest` | Claude 대체 판정 원본 JSON 을 원장에 반영 |
-| `--init` | **원장을 만드는 유일한 경로**. 없으면 생성, 있으면 startedAt 불변, 손상·불일치면 종료 2. 그 밖의 모든 호출(판정·`--ingest`)은 원장이 없거나 손상·불일치(id ≠ `--id`, iters 회차 역행·중복 등)면 Codex 를 부르지 않고 원장도 만들지 않은 채 BLOCKED budget(종료 2). dry-run 만 부재를 경고로 넘긴다. **--init 으로 원장을 다시 만들면 예산 이력이 새로 시작된다 — 원장 삭제 후 재생성은 아소카 승인 사항** |
+| `--init` | **원장을 만드는 유일한 경로**. 없으면 생성, 있으면 startedAt 불변, 손상·불일치면 종료 2. 그 밖의 모든 호출(판정·`--ingest`)은 원장이 없거나 손상·불일치(id ≠ `--id`, iters 회차 역행·중복 등)면 Codex 를 부르지 않고 원장도 만들지 않은 채 BLOCKED ledger(종료 2, `loopEnd: false`). dry-run 만 부재를 경고로 넘긴다. **--init 으로 원장을 다시 만들면 예산 이력이 새로 시작된다 — 원장 삭제 후 재생성은 아소카 승인 사항** |
 | `--waive` · `--waive-reason` | `--waive D-001,D-003 --waive-reason "<근거>"` — 결함 면제를 원장 `waived` 에 사유·회차와 기록. 다음 프롬프트의 이전 결함 목록에 status waived·waiveReason 으로 표시되고, 판정자가 다시 올려도 래퍼가 waived 로 유지(seenCount·escalate 미증가). **waived 결정 권한 = 팀장·아소카**, 근거 필수 |
 
 **scope 정하는 사람** : 루프 브리프에서 **아소카가 build 산출 파일·폴더로 scope 를 정하고**, verify 담당은 래퍼를 부를 때 그 값을 그대로 `--scope` 로 넘긴다(verify 가 넓히거나 줄이지 않는다). 예 : `--scope "scripts/codex-verify.mjs,.claude/engineering/40. loop"`.
@@ -141,11 +141,12 @@ verify 담당이 증거를 모은다 : `pnpm tsc --noEmit`·`pnpm build`·관련
   "criteria": [{ "id": "C1", "status": "met|unmet|unverifiable", "met": true, "evidence": "" }],
   "defects": [{ "id": "D-001", "severity": "high|med|low", "status": "open|fixed|regressed|contested|waived",
                 "file": "", "line": 0, "summary": "", "repro": "", "fix_hint": "", "firstSeen": 1, "seenCount": 1 }],
-  "blocked": [{ "reason": "device|master-permission|judge-unavailable|budget", "detail": "" }],
+  "blocked": [{ "reason": "device|master-permission|judge-unavailable|budget|ledger|lock|scope-missing|scope-too-broad", "detail": "" }],
   "blocked_reason": "",
   "notes": "",
   "noProgress": false,
-  "escalate": false
+  "escalate": false,
+  "loopEnd": false
 }
 ```
 
@@ -157,6 +158,7 @@ verify 담당이 증거를 모은다 : `pnpm tsc --noEmit`·`pnpm build`·관련
 - `defects[].firstSeen`·`seenCount` — 원장 기준. `open`·`regressed`·`contested` 로 나온 회차 수
 - `escalate` — 미해결 결함 중 `seenCount ≥ 2` 가 있으면 true
 - `noProgress` — 직전 회차의 미해결 결함 집합 ⊇ 이번 미해결 결함 집합 **이고** 이번에 새로 met 된 기준 0개
+- `loopEnd` — PASS, 또는 회차 상한(5)의 FAIL, 또는 budget 사유가 하나라도 든 BLOCKED(회차 상한 초과·벽시계 90분·Codex 호출 5회·확정 직전 재검사 초과 — 판정자가 낸 budget 포함)일 때만 true(래퍼 `loopEndOf` 단일 규칙). 그 밖의 BLOCKED(ledger·lock·judge-unavailable·scope-*·device·master-permission, 5회차 포함)는 false — 원인 해소 뒤 같은 회차로 재실행
 - verdict 정합(fail-closed) — PASS 라 해도 met 아닌 기준이나 `open`·`regressed` 결함이 있으면, 또는 기준이 0건이면 FAIL 로 고치고 notes 에 적는다
 
 결함 ID 는 이전 회차 결함 목록을 프롬프트에 넘겨 같은 문제면 같은 ID 를 유지하게 한다(해결 = fixed, 재발 = regressed, 결함 아님 주장 = contested).
@@ -177,8 +179,9 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회 등으로 쓸 �
 | 파일 | 내용 |
 |---|---|
 | `ledger.json` | 원장 — **래퍼만 쓴다**(원자 쓰기). `startedAt`·`codexCalls`·상한 값·회차별 verdict 요약(`openDefects`·`metCriteria`·`noProgress`·`escalate`)·`defects{id: firstSeen·seenCount·lastStatus}`·`blocked[]` |
-| `iter-N.codex.json` / `iter-N.claude.json` | 회차 결과(출력 계약) |
-| `iter-N.codex.events-K.jsonl` | Codex `--json` 이벤트(K = 시도 번호, 재요청 포함) |
+| `iter-N.codex.json` / `iter-N.claude.json` | 회차 판정 결과(PASS/FAIL, 출력 계약) — 있으면 같은 회차 재실행 금지(종료 3) |
+| `iter-N.blocked-K.json` | 회차 BLOCKED 결과(출력 계약, K = 그 회차 blocked 순번 1부터). 원장 `blocked[]` 에 `iter`·`k`·`reason`·경로가 남는다. 원장이 없거나 손상이면 이 파일만 쓰고 원장은 건드리지 않는다 |
+| `iter-N.codex.events-K.jsonl` | Codex `--json` 이벤트(K = 시도 번호, 재요청과 BLOCKED 뒤 같은 회차 재실행까지 누적 — 앞선 실호출 흔적을 덮지 않음) |
 | `iter-N.claude.prompt.md` · `iter-N.claude.raw.json` | Claude 대체 판정 입력·원본 |
 | `output.schema.json` | 판정자 출력 스키마(Claude 대체용. Codex 호출 때는 임시 폴더에 따로 만든다 — 원 저장소 경로를 CLI 인자로 넘기지 않기 위해) |
 
@@ -189,11 +192,12 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회 등으로 쓸 �
   → 판정 분기
      PASS    → 팀장(teamanakin-admin) 규칙 대조 → 아소카 최종 승인 → 마스터 보고
      FAIL    → verify 독립 판정(루프 문서 B-4) 뒤 CONFIRMED defects(id·file·line·repro·fix_hint)를 build 브리프로 회송 → 다음 회차(iter+1)
+               단 결과가 loopEnd: true(5회차)면 회송하지 않고 종료 → 아소카가 남은 결함·판정 이력을 마스터에게 보고
      BLOCKED → 아래 사유별 행동표(아소카 경유)
 ```
 
-- **BLOCKED 결과는 원장 회차(`iters`)에 넣지 않지만 회차 번호(결과 파일 이름 `iter-N`)는 소모한다 — 다음 판정은 N+1.**
-- `--waive` 는 판정 호출에 붙는 옵션이다 — 회차 번호 1개를 쓰고, Codex 호출은 보통 1회(계약 위반 재요청 시 최대 2회, 호출 전 BLOCKED·대체 판정이면 0회)다.
+- **BLOCKED 는 회차 번호를 소모하지 않는다 — 결과는 `iter-N.blocked-K.json` 에 남고 원장 회차(`iters`)에 넣지 않으며, 원인 해소 뒤 같은 N 으로 다시 실행한다. 회차 번호는 판정 결과(PASS/FAIL)가 나온 회차만 소모하고, 그 회차는 다시 실행할 수 없다(종료 3) — 다음 판정은 N+1.** (마스터 결정 2026-11-08 "BLOCKED만 재시도 허용" — 5회차 일시 BLOCKED 로 판정이 영구 불가해지던 문제 해소. Codex 호출 수·벽시계는 BLOCKED 재시도에도 그대로 쌓인다)
+- `--waive` 는 판정 호출에 붙는 옵션이다 — 판정 결과가 나오면 회차 번호 1개를 쓰고, Codex 호출은 보통 1회(계약 위반 재요청 시 최대 2회, 호출 전 BLOCKED·대체 판정이면 0회)다.
 
 **BLOCKED 사유별 행동** (루프 문서 C-3 과 같은 표)
 
@@ -202,12 +206,14 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회 등으로 쓸 �
 | scope-missing | `--scope` 없음 | 아소카가 scope 를 다시 지정 → verify 재실행 |
 | scope-too-broad | 미추적 30·변경 300·프롬프트 상한 초과 | 아소카가 scope 를 다시 지정(대량 전송은 마스터 승인 `--allow-bulk`) |
 | judge-unavailable | `--confirm-real` 누락 / 미로그인·시간 초과·계약 위반 2회·격리 재확인 실패 | 플래그 누락 → verify 재실행 / 미로그인 → 마스터(`! codex login`) / 그 밖 → 아소카가 Claude 대체(6절) 결정 |
-| budget | 회차·벽시계·호출 상한, 원장 부재·손상·불일치, 잠금 | 아소카 — 상한은 중단 보고, 원장·잠금은 확인 후 결정(재생성·잠금 해제 승인 = 아소카, 실행 = 전문가) |
+| budget | 회차 상한(6회차 이상)·벽시계 90분·Codex 호출 5회·확정 직전 재검사 초과 — `loopEnd: true` | 아소카 — 중단 보고(남은 결함·막힌 원인·다음 선택지) |
+| ledger | 원장 부재(`--init` 누락)·손상·불일치 | 아소카 — `--init` 여부·원장 확인 후 결정(재생성 승인 = 아소카, 실행 = 전문가) → 같은 회차 재실행 |
+| lock | 같은 `--id` 동시 실행(`ledger.lock` 있음) | 아소카 — 다른 실행이 진행 중인지 확인, 끝났으면 잠금 해제 승인(삭제 실행 = 전문가) → 같은 회차 재실행 |
 | device | Pi Browser 실기기 등 기기 필요 | 마스터 |
 | master-permission | 마스터 권한 필요(운영 DB·배포·승인) | 마스터 |
 
 - 래퍼를 실행하는 것은 **verify 담당**(Bash)이다. build 담당은 래퍼를 부르지 않는다(시험은 가짜 판정자 `CODEX_JS` 로만).
-- **같은 --id 동시 실행 금지(잠금으로 강제)** — 래퍼가 `--init`·판정·반영 전 구간을 `ledger.lock`(배타 생성, pid·시작 시각만 기록)으로 감싸고 끝나면(예외 포함) 해제한다. 잠금이 이미 있으면 아무 파일도 쓰지 않고 BLOCKED budget "동시 실행 — 다른 실행이 진행 중"(종료 2). 오래된 잠금(생성 후 timeout+5분 경과·pid 사망)도 자동으로 풀지 않고 "잠금 수동 확인 필요" 를 붙인다 — 확인 후 해제 승인 = 아소카, 삭제 실행 = 전문가(9회차 D-011).
+- **같은 --id 동시 실행 금지(잠금으로 강제)** — 래퍼가 `--init`·판정·반영 전 구간을 `ledger.lock`(배타 생성, pid·시작 시각만 기록)으로 감싸고 끝나면(예외 포함) 해제한다. 잠금이 이미 있으면 아무 파일도 쓰지 않고(blocked 파일·원장 포함 — 다른 실행과 번호 경합 방지) BLOCKED lock "동시 실행 — 다른 실행이 진행 중"(종료 2, 콘솔만). 오래된 잠금(생성 후 timeout+5분 경과·pid 사망)도 자동으로 풀지 않고 "잠금 수동 확인 필요" 를 붙인다 — 확인 후 해제 승인 = 아소카, 삭제 실행 = 전문가(9회차 D-011).
 - **실호출 흔적(결과·이벤트·원장)은 시험 정리 때도 삭제 금지** — 8회차 사고 때 실호출 결과를 시험 원장과 함께 지워 판정·토큰을 확인할 수 없었다.
 - **팀장·아소카는 결과의 `maxGrade` 를 넘는 등급을 줄 수 없다**(Claude 대체 판정 = 최대 CONDITIONAL).
 - 아소카의 최종 승인은 등급을 **내릴 수만 있고 올릴 수 없다**(Codex FAIL 을 PASS 로 바꾸지 않음). 인증·결제·페이지 변경은 Pi Browser 실기기 미검증이면 최대 CONDITIONAL(루트 CLAUDE.md).
@@ -222,9 +228,9 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회 등으로 쓸 �
 
 | 상한 | 값 | 판정 주체 |
 |---|---|---|
-| 회차 | 10회 — `--iter 11` 이상이면 Codex 를 부르지 않고 BLOCKED budget(fail-closed) | 래퍼 |
-| 벽시계 | 90분 — 원장 `startedAt` 부터. 호출 타임아웃 = min(`--timeout-min`, 남은 예산), 남은 예산 1분 미만이면 호출 안 함, 판정 확정 직전 재검사(넘었으면 결과는 저장하되 BLOCKED budget "실행 중 상한 초과", 원래 판정은 notes). `startedAt` 이 NaN 이면 초과로 판정. 원장 파일이 있는데 손상(파싱 실패·startedAt·codexCalls·iters 이상)이면 BLOCKED budget "원장 손상 — 수동 확인"(새로 만들지 않음 — 예산 우회 차단, 7회차 D-005·D-004) | 래퍼 |
-| Codex 호출 | 10회 — 재요청 포함, 호출 직전에 원장에 센다 | 래퍼 |
+| 회차 | **5회**(마스터 지시 2026-11-08, 10 → 5) — **5회차 판정 결과(PASS/FAIL)는 무조건 루프 종료**(`loopEnd: true`, build 회송 금지, 남은 결함은 아소카가 마스터에게 보고). 5회차 BLOCKED(budget 제외)는 회차 번호를 소모하지 않으므로 원인 해소 뒤 같은 5회차로 재실행(8절). `--iter 6` 이상이면 Codex 를 부르지 않고 BLOCKED budget(fail-closed, `loopEnd: true`) | 래퍼 |
+| 벽시계 | 90분 — 원장 `startedAt` 부터. 호출 타임아웃 = min(`--timeout-min`, 남은 예산), 남은 예산 1분 미만이면 호출 안 함, 판정 확정 직전 재검사(넘었으면 결과는 저장하되 BLOCKED budget "실행 중 상한 초과", 원래 판정은 notes). `startedAt` 이 NaN 이면 초과로 판정. 원장 파일이 있는데 손상(파싱 실패·startedAt·codexCalls·iters 이상)이면 BLOCKED ledger "원장 손상 — 수동 확인"(상한 초과가 아니라 `loopEnd: false`)(새로 만들지 않음 — 예산 우회 차단, 7회차 D-005·D-004) | 래퍼 |
+| Codex 호출 | **5회**(마스터 결정 2026-11-08, 10 → 5) — 재요청·BLOCKED 재시도 포함, 호출 직전에 원장에 센다. 6번째 호출 직전 BLOCKED budget(`loopEnd: true`). **호출 상한 = 회차 상한 5 — BLOCKED 재시도·계약 위반 재요청이 있으면 5회차 판정 전에 budget 으로 멈출 수 있음(마스터 결정 2026-11-08)** | 래퍼 |
 | 토큰 | 추정치의 2배 — 래퍼는 측정하지 못한다. 아소카가 루프 착수 때 추정치를 브리프에 적고, 작업 이력 통계(`pnpm work:stats`)로 대조한다 | 아소카 |
 | Codex 1회 시간 | 기본 15분, `--timeout-min` 으로 최대 120분까지, 실제 타임아웃 = min(지정값, 남은 90분 예산), 넘으면 프로세스 트리 종료 → BLOCKED judge-unavailable | 래퍼 |
 
@@ -263,4 +269,4 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회 등으로 쓸 �
 - 해소(2026-11-08 첫 실호출) : 판정자 환경변수 허용 목록만으로 인증·호출 정상(36초)
 - [확인중 : 마스터 추후 결정] OS 수준 읽기 차단(별도 Windows 계정·MXC 샌드박스) — 2026-11-08 "완화책만, 추후 결정"으로 보류(10절 R-3)
 - [확인중 : 로그인 후 실호출] 범위 축소(변경 + 직접 연관 1단계 + 규칙 문맥)로 판정 품질이 떨어지는지 — unverifiable·"문맥 부족" 판정 빈도를 실호출 결과로 확인하고, 필요하면 연관 단계·상한 조정
-- [확인중 : 정기 재평가일] 벽시계 90분·토큰 2배·Codex 호출 10회 상한 실측 조정
+- [확인중 : 정기 재평가일] 벽시계 90분·토큰 2배·Codex 호출 5회 상한 실측 조정
