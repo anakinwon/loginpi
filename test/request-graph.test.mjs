@@ -199,6 +199,14 @@ test('Codex 슬롯 : 기본 매핑은 1.1.4.1 만(추정 배지), 창 밖 루프
   assert.equal(node(m, '1.1.1.1').statusLabel, '루프 기록 없음')
 })
 
+test('백그라운드 워크플로 재개 턴 : 요청 시각보다 앞서 시작한 귀속 에이전트 구간의 Codex 판정도 회차로 연결', () => {
+  const loops = [loop('c3-codex-wiring', [{ iter: 1, at: '2026-11-09T08:31:00+09:00', verdict: 'PASS', open: 0 }], { startedAt: '2026-11-09T08:20:00+09:00' })]
+  const t = turn({ ts_req: '2026-11-09T13:49:00+09:00', ts_res: '2026-11-09T13:55:00+09:00', agents_detail: [ag('anakin_phase-verify', '2026-11-09T08:17:00+09:00', { ts_end: '2026-11-09T08:59:00+09:00' })] })
+  const c = node(buildRequestGraph(t, loops), '1.1.4.1')
+  assert.notEqual(c.statusLabel, '루프 기록 없음')
+  assert.equal(c.rounds[0].rows.length, 1); assert.equal(c.status, 'done')
+})
+
 test('끝난(중단) 턴은 이후 루프를 끌어오지 않음', () => {
   const loops = [loop('late', [{ iter: 1, at: '2026-11-08T05:00:00Z', verdict: 'PASS', open: 0 }])]
   const ns = buildRequestGraph(turn({ ts_res: null, interrupted: true, incomplete: true }), loops, { now: P('2026-11-08T23:00:00+09:00') })

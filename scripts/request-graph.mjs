@@ -241,6 +241,8 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   const agentRun = ag => !ag.ts_end && (turnRunning || !!ag.live), anyRun = turnRunning || agents.some(agentRun)
   // 시간창 끝 : 진행 중이면 지금 > 응답 시각 > (중단·응답 없음) 마지막 에이전트 종료 시각 또는 요청 시각 — 끝난 턴이 이후 루프를 끌어오지 않게
   const b = anyRun ? now : t.ts_res ? ms(t.ts_res) : Math.max(a, ...agents.map(x => ms(x.ts_end) || 0))
+  // 루프 전용 창 : 이전 턴에 시작된 백그라운드 워크플로가 재개 턴에 귀속되면 에이전트가 요청 시각보다 앞서 돌므로 귀속 에이전트 시작·종료까지 넓힌다
+  const la = Math.min(a, ...agents.map(x => ms(x.ts_start) ?? a)), lb = Math.max(b, ...agents.map(x => ms(x.ts_end) || 0))
   const nodes = SLOTS.map(s => ({ id: s.id, parent: s.parent, label: s.label, slot: s.id, ...sty('unassigned'), lines: [], t0: null, t1: null, run: false }))
   const byId = Object.fromEntries(nodes.map(n => [n.id, n])), kind = Object.fromEntries(SLOTS.map(s => [s.id, s.kind]))
   const slotOf = ag => ag.type === ADMIN_TYPE ? '1.2' : Object.keys(slotMap).find(id => kind[id] === 'sub' && (slotMap[id].agents || []).includes(ag.type)) || '1.1'
@@ -249,7 +251,7 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   const hookRecs = t.resources?.hooks || [], hooks = new Set(hookRecs.flatMap(h => [h.event, h.name]).filter(Boolean))
   const loopsOf = m => {
     if (!m?.loops) return []
-    return loops.filter(l => m.loops === true || m.loops.includes(l.id)).map(l => ({ id: l.id, rows: loopRounds(l, a, b) })).filter(x => x.rows.length)
+    return loops.filter(l => m.loops === true || m.loops.includes(l.id)).map(l => ({ id: l.id, rows: loopRounds(l, la, lb) })).filter(x => x.rows.length)
   }
   // 엔지니어링·분석 슬롯
   for (const s of SLOTS.filter(s => s.kind === 'sub')) {
