@@ -81,22 +81,22 @@ export const SLOT_MAP = {
 }
 
 const CODEX = { role: '외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수', criteria: 'verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED', docs: ['40. loop/codex_procedure.md', '60. nodes/codex-judge.md'] }
-/** 마스터 설계 트리(라벨 원문 유지). 원문의 '1.1.5.3.1 Codex6 검수'는 번호 오기로 보고 1.1.5.2.1 로 정규화 */
+/** 마스터 설계 트리. 원문의 '1.1.5.3.1 Codex6'(현 CDX-총괄 검수)은 번호 오기로 보고 1.1.5.2.1 로 정규화 · 라벨 단축 2026-11-09 마스터 지시(서브에이전트N → SA-, CodexN → CDX-) */
 export const SLOTS = [
   { id: '1', parent: null, kind: 'request', label: '마스터 아나킨 요청', role: '요청·needs-input 응답·최종 승인 주체(사람)', criteria: '요청 원문이 정본 — 목표·범위·완료 기준은 아소카가 계약으로 확정', docs: ['60. nodes/마스터.md'] },
   { id: '1.1', parent: '1', kind: 'main', label: '파다완 아소카 접수', role: '요청 접수 → 목표·범위·완료 기준 확정 → 단계 계획대로 전문가 서브에이전트 지명(메인 직접 작업 금지)', criteria: '운영 규칙 0절 — 메인 = 정리·리뷰·승인·회신', docs: ['60. nodes/아소카.md', '10. prompt/anakins_prompt.md'] },
-  { id: '1.1.1', parent: '1.1', kind: 'sub', label: '서브에이전트1 : 프롬프트 분석', role: '지시문 한 건의 설계 점검 — 목표·제약·출력 계약', criteria: '10장 지시문 설계 규칙', docs: ['10. prompt/anakins_prompt.md'] },
-  { id: '1.1.1.1', parent: '1.1.1', kind: 'codex', label: 'Codex1 검수', ...CODEX },
-  { id: '1.1.2', parent: '1.1', kind: 'sub', label: '서브에이전트2 : 컨텍스트 분석', role: '한 턴에 보는 토큰 전체 점검 — 넣을 것·뺄 것·남길 곳', criteria: '20장 컨텍스트 규칙', docs: ['20. context/anakins_context.md'] },
-  { id: '1.1.2.1', parent: '1.1.2', kind: 'codex', label: 'Codex2 검수', ...CODEX },
-  { id: '1.1.3', parent: '1.1', kind: 'sub', label: '서브에이전트3 : 하네스 분석', role: '모델 바깥 강제 장치 점검 — 훅·권한·에이전트 정의·격리·관측', criteria: '30장 하네스 규칙', docs: ['30. harnes/anakins_harnes.md'] },
-  { id: '1.1.3.1', parent: '1.1.3', kind: 'codex', label: 'Codex3 검수', ...CODEX },
-  { id: '1.1.4', parent: '1.1', kind: 'sub', label: '서브에이전트4 : 루프 분석', role: '되돌아가는 엣지 점검 — build → verify → Codex → 회송 → 승인', criteria: '40장 A절 완료 기준 · C절 금지와 멈춤', docs: ['40. loop/anakins_loop.md', '40. loop/codex_procedure.md'] },
-  { id: '1.1.4.1', parent: '1.1.4', kind: 'codex', label: 'Codex4 검수', ...CODEX },
-  { id: '1.1.5', parent: '1.1', kind: 'sub', label: '서브에이전트5 : 그래프 분석', role: '노드·엣지·파일 계약으로 작업 흐름 전체 점검 — 병렬·직렬·합류', criteria: '50장 A절 그래프 설계 체크리스트 10', docs: ['50. graph/anakins_graph.md'] },
-  { id: '1.1.5.1', parent: '1.1.5', kind: 'codex', label: 'Codex5 검수', ...CODEX },
+  { id: '1.1.1', parent: '1.1', kind: 'sub', label: 'SA-프롬프트', role: '지시문 한 건의 설계 점검 — 목표·제약·출력 계약', criteria: '10장 지시문 설계 규칙', docs: ['10. prompt/anakins_prompt.md'] },
+  { id: '1.1.1.1', parent: '1.1.1', kind: 'codex', label: 'CDX-프롬프트 검수', ...CODEX },
+  { id: '1.1.2', parent: '1.1', kind: 'sub', label: 'SA-컨텍스트', role: '한 턴에 보는 토큰 전체 점검 — 넣을 것·뺄 것·남길 곳', criteria: '20장 컨텍스트 규칙', docs: ['20. context/anakins_context.md'] },
+  { id: '1.1.2.1', parent: '1.1.2', kind: 'codex', label: 'CDX-컨텍스트 검수', ...CODEX },
+  { id: '1.1.3', parent: '1.1', kind: 'sub', label: 'SA-하네스', role: '모델 바깥 강제 장치 점검 — 훅·권한·에이전트 정의·격리·관측', criteria: '30장 하네스 규칙', docs: ['30. harnes/anakins_harnes.md'] },
+  { id: '1.1.3.1', parent: '1.1.3', kind: 'codex', label: 'CDX-하네스 검수', ...CODEX },
+  { id: '1.1.4', parent: '1.1', kind: 'sub', label: 'SA-루프', role: '되돌아가는 엣지 점검 — build → verify → Codex → 회송 → 승인', criteria: '40장 A절 완료 기준 · C절 금지와 멈춤', docs: ['40. loop/anakins_loop.md', '40. loop/codex_procedure.md'] },
+  { id: '1.1.4.1', parent: '1.1.4', kind: 'codex', label: 'CDX-루프 검수', ...CODEX },
+  { id: '1.1.5', parent: '1.1', kind: 'sub', label: 'SA-그래프', role: '노드·엣지·파일 계약으로 작업 흐름 전체 점검 — 병렬·직렬·합류', criteria: '50장 A절 그래프 설계 체크리스트 10', docs: ['50. graph/anakins_graph.md'] },
+  { id: '1.1.5.1', parent: '1.1.5', kind: 'codex', label: 'CDX-그래프 검수', ...CODEX },
   { id: '1.1.5.2', parent: '1.1.5', kind: 'sub', label: '서브에이전트6 : 요청건을 obsidian 그래프로 생성해 가시적으로 모니터링', role: '요청건을 그래프 페이지·Obsidian md 노드로 생성해 모니터링(scripts/request-graph.mjs)', criteria: '50장 그래프 규칙 — 기록에 있는 사실만 표시, 추정 연결은 배지로 구분', docs: ['50. graph/anakins_graph.md'] },
-  { id: '1.1.5.2.1', parent: '1.1.5.2', kind: 'codex', label: 'Codex6 검수', ...CODEX },
+  { id: '1.1.5.2.1', parent: '1.1.5.2', kind: 'codex', label: 'CDX-총괄 검수', ...CODEX },
   { id: '1.2', parent: '1', kind: 'approve', label: '파다완 아소카 승인', role: '팀장(teamanakin-admin) 판정을 받아 최종 등급 확정·마스터 보고(하향만)', criteria: '팀원이 1명이라도 실행된 턴은 팀장 승인 생략 불가(조회·커밋 단독 턴 제외)', docs: ['60. nodes/아소카.md', '60. nodes/teamanakin-admin.md'] },
 ]
 

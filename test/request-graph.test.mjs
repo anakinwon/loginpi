@@ -233,7 +233,7 @@ test('실행 경로 : 시작 → 1 → 1.1 → 이벤트 시작 시각순(슬롯
     ag('anakin_phase-build', '2026-11-08T10:05:00+09:00'), ag('anakin_phase-build', '2026-11-08T10:15:00+09:00'), ag('teamanakin-admin', '2026-11-08T10:20:00+09:00'),
   ] }), [])
   const p = buildPath(ns), lab = id => ns.find(n => n.id === id)?.label || id
-  assert.deepEqual(route(p).map(lab), ['마스터 아나킨 요청', '파다완 아소카 접수', '서브에이전트2 : 컨텍스트 분석', 'anakin_phase-collect', '서브에이전트4 : 루프 분석', 'anakin_phase-build', 'anakin_phase-verify', 'anakin_phase-build', '파다완 아소카 승인', 'teamanakin-admin', 'E'])
+  assert.deepEqual(route(p).map(lab), ['마스터 아나킨 요청', '파다완 아소카 접수', 'SA-컨텍스트', 'anakin_phase-collect', 'SA-루프', 'anakin_phase-build', 'anakin_phase-verify', 'anakin_phase-build', '파다완 아소카 승인', 'teamanakin-admin', 'E'])
   assert.equal(p.edges[0].from, 'S')
   assert.deepEqual(p.edges.map(e => e.seq), p.edges.map((_, i) => i + 1))
   assert.equal(p.edges.find(e => e.label)?.label, 'build 2회차 (2/5)')
@@ -301,6 +301,7 @@ test('설계도 노드·Obsidian 안전 파일명', () => {
   assert.equal(d.length, SLOTS.length)
   assert.ok(d.every(n => n.status === 'unassigned' && !n.lines.length && n.t0 === null))
   assert.ok(SLOTS.some(s => s.id === '1.1.5.2.1'))
-  assert.equal(safeName('1.1.1 서브에이전트1 : 프롬프트 분석'), '1.1.1 서브에이전트1 프롬프트 분석')
+  assert.equal(safeName('1.1.1 SA : 프롬프트'), '1.1.1 SA 프롬프트')
+  assert.equal(safeName('1.1.1.1 CDX-프롬프트 검수'), '1.1.1.1 CDX-프롬프트 검수')
   assert.equal(safeName('a[b]#c|d?'), 'a b c d')
 })
