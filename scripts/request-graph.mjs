@@ -42,6 +42,14 @@ export const STATUS_STYLE = {
   notrun: { label: '미실행', color: '#c3c2b7', text: '#5f5e5a', dark: { text: '#a9a8a2' } },
 }
 export const PAGE_BG = { light: '#fcfcfb', dark: '#1a1a19' }      // 카드 바탕(--surface) — 대비 시험 기준
+/**
+ * Codex 칸 바탕(2026-11-09 마스터 : 형광 분홍 2단계) — pending = PASS 아닌 전부(미실행·진행·FAIL·BLOCKED 등) 연분홍, done = PASS 진분홍
+ * fill = 박스·원 바탕, ink = 박스 글자(대비 AA 4.5:1 이상 — 시험 test/request-graph.test.mjs). 다크 모드도 같은 밝은 분홍(마스터 결정). 완료(추정)도 done. 상태 구분은 테두리·띠(--sc)·상태 글자로 유지
+ */
+export const CODEX_STYLE = {
+  pending: { fill: '#ffc2ef', ink: '#1a1a1a' },
+  done: { fill: '#ff4fc8', ink: '#1a1a1a' },
+}
 // 트리 : 노드 폭·열 간격·줄 높이(px, viewBox 단위), 화면 맞춤 배율 하한(글자 약 9px 유지)·상한 / 자유 배치 : 반발력·링크 길이·중심 인력 / 자동 새로고침 간격
 const SIZE = { termW: 96, termH: 32, boxW: 158, colGap: 26, lineH: 15, tmH: 13, padY: 6, gapY: 8, minScale: 0.72, maxScale: 1.4, forceMinScale: 0.45, repel: 9000, link: 120, gravity: 0.003, reloadRun: 5000, reloadIdle: 30000, pageSize: 50, days: 7, mdRecent: 30, headCut: 80 }
 export const FLOW_COLOR = { done: '#3fa66b', running: '#c9b800', planned: '#898781', example: '#898781', design: '#2a78d6' }   // 실행 경로 화살표·화살촉 색(완료 연초록 · 진행 형광 노랑 테두리색 · 대기·예시 회색 · 설계도 파랑)
@@ -622,7 +630,7 @@ function client() {
       el('path', { d: 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2, class: 'edge' }, gE)
     }
     for (const n of nodes) {
-      const p = L.pos[n.id], w = n.slot ? Z.boxW : Z.boxW * 2 + Z.colGap, g = el('g', { class: 'node st-' + n.status, transform: 'translate(' + X(p.d) + ' ' + p.y + ')', 'data-id': n.id }, gN)
+      const p = L.pos[n.id], w = n.slot ? Z.boxW : Z.boxW * 2 + Z.colGap, g = el('g', { class: 'node st-' + n.status + (SL[n.slot]?.kind === 'codex' ? ' k-codex' : ''), transform: 'translate(' + X(p.d) + ' ' + p.y + ')', 'data-id': n.id }, gN)
       el('title', {}, g).textContent = tip(n); geo[n.id] = { cx: X(p.d) + w / 2, cy: p.y + p.h / 2, hw: w / 2, hh: p.h / 2 }
       el('rect', { width: w, height: p.h, rx: 7, class: 'box' }, g); el('rect', { width: 5, height: p.h, rx: 2.5, class: 'strip' }, g)
       if (!n.slot) {
@@ -663,7 +671,7 @@ function client() {
     }
     const gE = el('g', {}, root), gN = el('g', {}, root), gF = el('g', { class: 'flows fv' }, root), lines = E.slice(0, nStruct).map(() => el('line', { class: 'edge' }, gE))
     for (const p of P) {
-      p.g = el('g', { class: 'fnode st-' + p.n.status, 'data-id': p.n.id }, gN); el('title', {}, p.g).textContent = tip(p.n)
+      p.g = el('g', { class: 'fnode st-' + p.n.status + (SL[p.n.slot]?.kind === 'codex' ? ' k-codex' : ''), 'data-id': p.n.id }, gN); el('title', {}, p.g).textContent = tip(p.n)
       el('circle', { r: p.r }, p.g); p.t = el('text', { class: 'l1', y: 4 }, p.g); p.t.textContent = p.n.label.length > 22 ? p.n.label.slice(0, 21) + '…' : p.n.label
       if (p.n.term) { p.g.classList.add('term'); if (p.n.pend) p.g.classList.add('pend') }
     }
@@ -733,11 +741,14 @@ function statusCss() {
   const vars = s => `--sc:${s.color};--st:${s.text};${s.fill ? `--sf:${s.fill};` : ''}${s.ink ? `--si:${s.ink};` : ''}`
   const base = Object.entries(STATUS_STYLE).map(([k, s]) => `.st-${k}{${vars(s)}}`).join('')
   const dark = sel => Object.entries(STATUS_STYLE).filter(([, s]) => s.dark).map(([k, s]) => `${sel} .st-${k}{${vars({ ...s, ...s.dark })}}`).join('')
-  return base + dark(':root[data-theme=dark]') + `@media (prefers-color-scheme: dark){${dark(':root:not([data-theme=light])')}}`
+  // Codex 칸 변수(--cf 바탕·--ci 글자) : 라이트·다크 공통, 완료·완료(추정)는 미완료보다 우선
+  const { pending: p, done: d } = CODEX_STYLE
+  const codex = `.k-codex{--cf:${p.fill};--ci:${p.ink}}.k-codex.st-done,.k-codex.st-estimated{--cf:${d.fill};--ci:${d.ink}}`
+  return base + dark(':root[data-theme=dark]') + `@media (prefers-color-scheme: dark){${dark(':root:not([data-theme=light])')}}` + codex
 }
 
 export function renderHtml({ design, outDir, requests, meta }) {
-  const data = { design: !!design, live: !design, size: SIZE, flow: FLOW_COLOR, alert: ALERT, slots: SLOTS.map(s => ({ id: s.id, role: s.role, criteria: s.criteria, docs: s.docs.map(d => docLink(outDir, d)) })), requests }
+  const data = { design: !!design, live: !design, size: SIZE, flow: FLOW_COLOR, alert: ALERT, slots: SLOTS.map(s => ({ id: s.id, kind: s.kind, role: s.role, criteria: s.criteria, docs: s.docs.map(d => docLink(outDir, d)) })), requests }
   const cats = [...new Set(requests.map(r => r.cat).filter(Boolean))], dates = [...new Set(requests.map(r => r.date).filter(Boolean))]
   const catLabel = Object.fromEntries(CATEGORIES.map(c => [c.key, c.label]))
   const DARK = '--surface:#1a1a19;--page:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--w:#3987e5;--o:#d95926;--ring:rgba(255,255,255,.10);color-scheme:dark'
@@ -768,6 +779,7 @@ ${Object.entries(FLOW_COLOR).map(([k, c]) => `.fl.${k} .v{stroke:${c}}.seqg.${k}
 .box{fill:var(--sf,var(--surface));stroke:var(--sc);stroke-width:1.6}.strip{fill:var(--sc)}.st-missing .box,.st-estimated .box{stroke-dasharray:5 3;stroke-width:2}
 .l1{font-size:12.5px;fill:var(--si,var(--ink))}.l1.b{font-weight:700}.l2{font-size:11.5px;fill:var(--si,var(--st))}.tm{font-size:10px;fill:var(--si,var(--ink2))}
 .fnode circle{fill:var(--sf,var(--sc));stroke:var(--sc);stroke-width:2}.fnode.st-missing circle{fill:var(--surface);stroke-dasharray:3 2}.fnode.st-estimated circle{stroke-dasharray:3 2}
+.k-codex .box,.fnode.k-codex circle{fill:var(--cf)}.k-codex .l1,.k-codex .l2,.k-codex .tm{fill:var(--ci)}.legend i.k-codex{background:var(--cf);border-color:var(--cf)}
 .fnode .l1{font-size:12px;fill:var(--ink2);paint-order:stroke;stroke:var(--page);stroke-width:3px;stroke-linejoin:round}.fnode .l1.hid{opacity:0}.fnode:hover .l1{opacity:1;fill:var(--ink)}
 .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:0 0 8px}.legend i{display:inline-block;width:11px;height:11px;border-radius:6px;margin-right:4px;vertical-align:-1px;background:var(--sf,var(--sc));border:1.5px solid var(--sc)}.legend i.st-missing{border-style:dashed;background:transparent}.legend i.st-estimated{border-style:dashed}
 .badge{display:inline-block;border:1px solid var(--axis);border-radius:5px;padding:0 6px;font-size:12px}.badge[class*=st-]{color:var(--st);border-color:var(--sc);background:var(--sf,transparent)}.badge.st-missing,.badge.st-estimated{border-style:dashed}.badge.alert{color:${STATUS_STYLE.error.text};border:2px solid ${STATUS_STYLE.error.color};font-weight:700}:root[data-theme=dark] .badge.alert{color:${STATUS_STYLE.error.dark.text}}@media (prefers-color-scheme: dark){:root:not([data-theme=light]) .badge.alert{color:${STATUS_STYLE.error.dark.text}}}.est{border-style:dashed;color:var(--o);border-color:var(--o)}
@@ -783,7 +795,7 @@ ${Object.entries(FLOW_COLOR).map(([k, c]) => `.fl.${k} .v{stroke:${c}}.seqg.${k}
 <div class="wrap">
 <aside class="card"><div class="ctl"${design ? ' hidden' : ''}><input id="q" type="search" placeholder="요청문 검색"><select id="fc"><option value="">카테고리 전체</option>${cats.map(c => `<option value="${esc(c)}">${esc(catLabel[c] || c)}</option>`).join('')}</select><select id="fd"><option value="">날짜 전체</option>${dates.map(d => `<option>${esc(d)}</option>`).join('')}</select></div>
 <ul id="list"></ul><div class="lpg"${design ? ' hidden' : ''}><button type="button" id="lprev">‹ 이전</button><button type="button" id="lnext">다음 ›</button><span id="lcnt" class="muted"></span></div></aside>
-<section class="card"><div class="ghd"><div class="legend">${Object.entries(STATUS_STYLE).map(([k, s]) => `<span><i class="st-${k}"></i>${esc(s.label)}</span>`).join('')}<span><span class="badge est">${EST_BADGE}</span></span><span class="fleg"><b style="color:${FLOW_COLOR.done}">—</b> 지나감(실선) · <b style="color:${FLOW_COLOR.planned}">- -</b> 예정(점선) · <b class="fr">—</b> 진행 중 노드로 진입 · 되돌이 = k회차</span></div><span class="zc" role="group" aria-label="확대/축소"><button type="button" data-z="fit" title="그림 전체를 화면에 맞춤">맞춤</button> <button type="button" data-z="in" title="확대">+</button> <button type="button" data-z="out" title="축소">−</button></span></div>
+<section class="card"><div class="ghd"><div class="legend">${Object.entries(STATUS_STYLE).map(([k, s]) => `<span><i class="st-${k}"></i>${esc(s.label)}</span>`).join('')}<span><i class="k-codex"></i>Codex 미완료</span><span><i class="k-codex st-done"></i>Codex 완료</span><span><span class="badge est">${EST_BADGE}</span></span><span class="fleg"><b style="color:${FLOW_COLOR.done}">—</b> 지나감(실선) · <b style="color:${FLOW_COLOR.planned}">- -</b> 예정(점선) · <b class="fr">—</b> 진행 중 노드로 진입 · 되돌이 = k회차</span></div><span class="zc" role="group" aria-label="확대/축소"><button type="button" data-z="fit" title="그림 전체를 화면에 맞춤">맞춤</button> <button type="button" data-z="in" title="확대">+</button> <button type="button" data-z="out" title="축소">−</button></span></div>
 <p id="gtitle" class="gtitle"></p><div class="gwrap"><svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="요청 처리 흐름 그래프"></svg></div></section>
 <aside class="card" id="detail"></aside>
 </div>

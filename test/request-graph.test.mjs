@@ -4,7 +4,7 @@ import test from 'node:test'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import assert from 'node:assert/strict'
-import { buildRequestGraph, buildPath, loopRounds, roundSummary, fmtSpan, designGraph, safeName, renderHtml, agentRounds, splitAgentRounds, nodeAlerts, engTxt, ALERT, SLOTS, SLOT_MAP, ENG_SLOTS, STATUS_STYLE, PAGE_BG } from '../scripts/request-graph.mjs'
+import { buildRequestGraph, buildPath, loopRounds, roundSummary, fmtSpan, designGraph, safeName, renderHtml, agentRounds, splitAgentRounds, nodeAlerts, engTxt, ALERT, SLOTS, SLOT_MAP, ENG_SLOTS, STATUS_STYLE, PAGE_BG, CODEX_STYLE } from '../scripts/request-graph.mjs'
 
 const T0 = '2026-11-08T10:00:00+09:00', T1 = '2026-11-08T10:30:00+09:00', P = Date.parse
 const turn = (extra = {}) => ({ ts_req: T0, ts_res: T1, req_head: '요청', ...extra })
@@ -224,6 +224,16 @@ test('상태 글자 대비 AA 4.5:1 이상(라이트·다크, 채움 또는 카�
     assert.ok(ratio(v.text, bg) >= 4.5, `${k} ${mode} ${v.text} on ${bg} = ${ratio(v.text, bg).toFixed(2)}`)
   }
   assert.ok(ratio('#0b0b0b', STATUS_STYLE.done.fill) >= 4.5 && ratio('#ffffff', STATUS_STYLE.done.dark.fill) >= 4.5)   // 카드 본문 글자
+})
+
+test('Codex 칸 분홍 2단계 : 미완료 연분홍·완료(추정 포함) 진분홍 클래스·색, 글자 대비 AA(라이트·다크 공통 값)', () => {
+  for (const k of ['pending', 'done']) { const v = CODEX_STYLE[k]; assert.ok(ratio(v.ink, v.fill) >= 4.5, `${k} ${v.ink} on ${v.fill} = ${ratio(v.ink, v.fill).toFixed(2)}`) }
+  assert.deepEqual([CODEX_STYLE.pending.fill, CODEX_STYLE.done.fill], ['#ffc2ef', '#ff4fc8'])   // 다크도 같은 밝은 분홍(다크 분기 없음)
+  assert.ok(!CODEX_STYLE.pending.dark && !CODEX_STYLE.done.dark)
+  const html = renderHtml({ design: true, outDir: '.', requests: [], meta: '' })
+  assert.ok(html.includes(`.k-codex{--cf:${CODEX_STYLE.pending.fill}`) && html.includes(`.k-codex.st-done,.k-codex.st-estimated{--cf:${CODEX_STYLE.done.fill}`))
+  assert.ok(html.includes("SL[n.slot]?.kind === 'codex' ? ' k-codex'") && html.includes('Codex 미완료') && html.includes('Codex 완료'))
+  assert.deepEqual(SLOTS.filter(s => s.kind === 'codex').map(s => s.id), ['1.1.1.1', '1.1.2.1', '1.1.3.1', '1.1.4.1', '1.1.5.1', '1.1.5.2.1'])
 })
 
 const route = p => p.edges.map(e => e.to)
