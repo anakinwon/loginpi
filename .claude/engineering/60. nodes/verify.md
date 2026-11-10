@@ -1,19 +1,17 @@
-# verify (실행 검증 · Codex 호출 · 독립 판정)
+# verify (폐지 2026-11-10 — Codex 판정은 SubagentStop 훅)
 
-> 역할 노드 카드 — 목차 [[00. index]] · 루프 [[anakins_loop]] B-2·B-4 · 호출 [[codex_procedure]] 3절
+> 역할 노드 카드 — 목차 [[00. index]] · 루프 [[anakins_loop]] · 호출 [[codex_procedure]] 13절
 
-| 항목 | 내용 |
+2026-11-10 마스터 결정("Codex 목적이 검수인데 클로드가 검수를 또 하는 의도가 뭘까 … 그래프가 복잡해지고 전체 구조의 오해가 있으니 삭제 바람", 실행 주체 = "훅 자동 실행")으로 검증 단계 에이전트를 폐지하고 정의 파일을 삭제했다. 이 카드는 옛 링크([[verify]])가 끊기지 않게 남긴 안내다.
+
+| 항목 | 지금 |
 |---|---|
-| 담당 | `anakin_phase-verify` |
-| 모델 | Sonnet · medium |
-| 입력 | 루프 계약, 작업 트리, Codex 결과 |
-| 출력 | `L/evidence-N/*.txt`(실행 출력 원문), `L/iter-N.codex.json`(래퍼), `L/iter-N.triage.md`(독립 판정 표), `[Iteration N]` 보고(회차 N/5·`loopEnd`) |
-| 쓰기 | `L/ = .omc/state/loop/<id>/` 만 — 프로젝트 파일 수정 안 함 |
-| 명령 | `pnpm build` → `pnpm tsc --noEmit` → `pnpm lint` → `pnpm test`, 래퍼 `--confirm-real`(실호출은 verify 만), `--init`·`--waive` 실행 |
-| 정의 | `.claude/agents/teamAnakin/anakin_phase-verify.md` |
+| Codex 판정 실행 | SubagentStop 훅 `.claude/hooks/codex-gate.mjs` — 서브에이전트 종료마다 자동 계약·증거·scope 저장 → `--init` → `--confirm-real` |
+| 결과 전달 | 메인의 다음 도구 호출·요청 때 `[CDX 자동 판정]`(`--flush`, PostToolUse·UserPromptSubmit) |
+| 실행 검사(tsc·lint·build·test·selftest) | [[build]] 가 산출과 함께 실행·보고 |
+| 독립 판정·회송 지명·waive 결정 | [[아소카]]·[[teamanakin-admin]] |
+| 그래프 | 과거 verify 실행은 칸·집계에서 숨기고 판정 원장만 CDX 칸에 반영 |
 
 **다음 노드**
 
-- 증거 → [[codex-judge]]
-- FAIL → 독립 판정 → CONFIRMED 는 [[build]], PLAUSIBLE·FALSE 는 [[아소카]] — 단 `loopEnd: true`(5회차)면 회송 없이 [[아소카]]
-- PASS → [[teamanakin-admin]](문서면 [[review]] 먼저)
+- 판정 → [[codex-judge]] → PASS 면 다음 단계, FAIL 이면 결과를 낸 에이전트로 회송(같은 원장 다음 회차, 상한 5회)

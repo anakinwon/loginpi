@@ -98,7 +98,7 @@
 |---|---|
 | 하네스 변경 결정 | 마스터(권한·차단 훅·MCP 추가는 승인 필수) |
 | 구현 | Claude |
-| 검증 | `--selftest` + 실제 발동 1회 + `anakin_phase-verify` |
+| 검증 | `--selftest` + 실제 발동 1회 + Codex 판정(SubagentStop 훅 `codex-gate.mjs` 자동, 2026-11-10) |
 | 정기 점검(월 1회) | `ecc:harness-audit` 스킬 또는 아래 E 표 다시 측정 |
 
 ---

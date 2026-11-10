@@ -2,6 +2,7 @@
 
 > 작성 2026-11-08 (마스터 지시 "Codex 를 설치하고 호출 절차를 만들어줘"). 래퍼 `scripts/codex-verify.mjs`, 루프 원칙 `anakins_loop.md`(이 문서는 그 본문을 바꾸지 않음).
 > 루프 구조 : 구현 = Claude 서브에이전트(`anakin_phase-build`) / 검증 = Codex(외부 독립 판정자) / 미진하면 build 로 회송 반복 / 최종 승인 = 아소카(메인) → 마스터 보고.
+> **2026-11-10 개정(마스터 결정)** : 검증 단계 에이전트(verify) 폐지 — "Codex 목적이 검수인데 클로드가 검수를 또 하는 의도가 뭘까 … 삭제 바람", 실행 주체 = "훅 자동 실행". 래퍼는 SubagentStop 훅 `.claude/hooks/codex-gate.mjs` 만 실행한다(13절). 아래 절의 '판정 실행자'는 이 훅이다 — 훅이 자동 계약·증거·scope 를 만들고 `--init` → `--confirm-real` 을 부른다.
 
 ## 1. 설치·로그인
 
@@ -42,7 +43,7 @@ npm 전역을 쓰는 이유 : pnpm 11 은 네이티브 빌드 스크립트를 `a
 # 루프 시작(build 착수 전 1회) — 원장 시작 시각 고정(벽시계 상한 기준)
 node scripts/codex-verify.mjs --id <루프ID> --init
 
-# 회차 검증(verify 담당이 Bash 로 실행)
+# 회차 검증(SubagentStop 훅 codex-gate.mjs 가 자동 실행 — 메인·서브에이전트는 부르지 않음)
 node scripts/codex-verify.mjs --task <완료기준.md> --evidence <증거 파일|폴더> --id <루프ID> --iter <N> \
   --scope <경로[,경로…]> [--diff HEAD] [--prev <이전 결과.json>] [--out <결과.json>] [--timeout-min 15] [--model <m>]
 
@@ -65,14 +66,16 @@ node scripts/codex-verify.mjs --selftest         # Codex 호출 없이 인자·�
 | `--init` | **원장을 만드는 유일한 경로**. 없으면 생성, 있으면 startedAt 불변, 손상·불일치면 종료 2. 그 밖의 모든 호출(판정·`--ingest`)은 원장이 없거나 손상·불일치(id ≠ `--id`, iters 회차 역행·중복 등)면 Codex 를 부르지 않고 원장도 만들지 않은 채 BLOCKED ledger(종료 2, `loopEnd: false`). dry-run 만 부재를 경고로 넘긴다. **--init 으로 원장을 다시 만들면 예산 이력이 새로 시작된다 — 원장 삭제 후 재생성은 아소카 승인 사항** |
 | `--waive` · `--waive-reason` | `--waive D-001,D-003 --waive-reason "<근거>"` — 결함 면제를 원장 `waived` 에 사유·회차와 기록. 다음 프롬프트의 이전 결함 목록에 status waived·waiveReason 으로 표시되고, 판정자가 다시 올려도 래퍼가 waived 로 유지(seenCount·escalate 미증가). **waived 결정 권한 = 팀장·아소카**, 근거 필수 |
 
-**scope 정하는 사람** : 루프 브리프에서 **아소카가 build 산출 파일·폴더로 scope 를 정하고**, verify 담당은 래퍼를 부를 때 그 값을 그대로 `--scope` 로 넘긴다(verify 가 넓히거나 줄이지 않는다). 예 : `--scope "scripts/codex-verify.mjs,.claude/engineering/40. loop"`.
+**원장 id 규칙(마스터 결정 2026-11-09)** : `--id` = `c<칸번호>-<주제>`(영문 소문자·숫자·하이픈, 래퍼 허용 형식 `[A-Za-z0-9._-]{1,64}`, 예 `c4-codex-wiring`). 접두 `c<N>-` 의 N 이 요청 그래프 Codex 칸 번호다 — 생성기 `scripts/request-graph.mjs` SLOT_MAP 이 원장 id 접두로 Codex1~6 칸에 '매핑 연결'한다(칸별 검수 대상 정의 [[anakins_graph]] B-6-2). 칸별 판정 대상·시점·입력 증거는 **13절 CDX 관문**이 정본이다(마스터 확장 2026-11-09 "모든 claude subagent 프로세스는 반드시 codex 승인을 받아서, OK 되어야 다음으로 진행" — 구 문구 "`c1-`·`c2-`·`c5-`·`c6-` 는 아소카 판단 시"·"산출 턴만 c4" 는 폐기). 요약 : c1 = 메인 브리프, c2 = 수집 결과, c3 = 하네스 변경(변경 0건이면 '해당 없음' 기록), c4 = 산출물·결론·문서 검수 결과, c5 = 그래프 분석 결과, c6 = 팀장 승인 직전 총괄·커밋 결과. 접두 없는 과거 원장(`first-call`·`loop-docs`·`loop-cap5`)은 Codex4 칸에 턴 시간창으로 추정 연결된다. 원장 생성·판정 실행 = SubagentStop 훅 `.claude/hooks/codex-gate.mjs`(2026-11-10 — 원장 id 끝에 `-<agentId 앞 6자>` 대상 접미를 붙여 자동 생성, 13절).
+
+**scope 정하는 방법(2026-11-10)** : 훅이 그 서브에이전트 시간 동안 바뀐 파일(기록의 Write·Edit 대상 ∪ `git status` 변경 중 에이전트 시작 이후 수정 — Bash 로 쓴 변경 보완, `.omc`·`voice`·`work-history`·`work-statistics` 제외)을 `--scope` 로 넘긴다. 0건(수집·결론 등)이면 규칙 문맥 `CLAUDE.md` 만 — 판정 본체는 증거다.
 
 **종료 코드** : PASS `0` / FAIL `1` / BLOCKED `2` / 호출 오류(인자·파일·git 오류) `3` / 프롬프트만 생성(`--judge claude`) `4`.
 `4` 는 판정이 아니다 — 0 으로 오인하지 않도록 따로 뒀다.
 
 ## 4. 입력 묶음과 비밀 격리
 
-verify 담당이 증거를 모은다 : `pnpm tsc --noEmit`·`pnpm build`·관련 테스트·`--selftest` 출력을 파일로 저장(`> <증거폴더>/build.txt 2>&1`) 한 뒤 래퍼를 부른다. 증거는 실제 실행 출력만 — 요약·발췌로 바꾸지 않는다.
+훅이 증거를 모은다(`L/evidence-N/`) : 최종 보고 원문 `report.md`(지시 구간별 최종 응답 전부, 시각순) · c1 은 브리프 `brief.md`(첫 프롬프트 + 이후 사용자 측 지시 전부 시각순 — 기록 형태 = `user` 글 · 쉬는 사이 SendMessage `user`(isMeta, origin coordinator) · 작업 중 SendMessage `attachment` `queued_command`(origin coordinator), 2026-11-10 c1-build-ab3cb5 D-002 근본 수정)와 요청 원문 `request.md`(메인 세션의 마스터 입력 = `user`(origin human) · 메인 작업 중 입력 `queued_command`(origin human), 훅 주입문·system-reminder·task-notification 제외) + 바꾼 파일 목록 `changed-files.txt`. 글 상한을 넘으면 앞뒤 보존·가운데 생략. 로컬 검사(`pnpm tsc --noEmit`·`pnpm build`·관련 테스트·`--selftest`)는 build 가 실행해 최종 보고에 실제 출력 핵심 줄을 넣는다 — 요약·발췌로 바꾸지 않는다.
 
 래퍼가 만드는 묶음 = ① 판정 규칙(독립 검증자·파일 수정 금지·추측 금지·테스트 약화 감지·비밀 노출 감지) ② 프로젝트 규칙 발췌(핵심 가치 2개·Pi Browser 치명 제약·R-P0~P6·DB 표준·브랜드 표기 — 원문 경로 `CLAUDE.md` 병기) ③ 완료 기준 ④ 작업 폴더 범위(아래 선정 목록·생략 건수) ⑤ `git diff` ⑥ 증거 ⑦ 이전 회차 결함.
 
@@ -166,9 +169,9 @@ verify 담당이 증거를 모은다 : `pnpm tsc --noEmit`·`pnpm build`·관련
 ## 6. Codex 미가용 대체 (`--judge claude`)
 
 Codex 미설치·미로그인·시간 초과·계약 위반 2회 등으로 쓸 수 없을 때 :
-1. verify 담당 : `node scripts/codex-verify.mjs --task … --evidence … --id <id> --iter <N> --judge claude` → 종료 코드 4, 프롬프트 `iter-N.claude.prompt.md`·원본 출력 경로 `iter-N.claude.raw.json`·스키마 경로를 출력한다(Claude 호출은 하지 않는다).
+1. 아소카가 지명한 전문가(Bash — 2026-11-10 verify 폐지 뒤 수동 대체 경로) : `node scripts/codex-verify.mjs --task … --evidence … --id <id> --iter <N> --judge claude` → 종료 코드 4, 프롬프트 `iter-N.claude.prompt.md`·원본 출력 경로 `iter-N.claude.raw.json`·스키마 경로를 출력한다(Claude 호출은 하지 않는다).
 2. 아소카가 **새 컨텍스트의 Claude 판정 에이전트**(build 와 다른 에이전트)를 지명해 그 프롬프트로 판정시킨다. **판정자는 JSON 1개를 응답으로만 반환**하고(프롬프트 안의 파일 쓰기 지시는 무시), **verify 가 그 응답을 가공 없이 raw 경로에 저장**한다(정본 확정 2026-11-08 — 루프 문서 B-6).
-3. verify 담당 : `node scripts/codex-verify.mjs --id <id> --iter <N> --judge claude --ingest <raw 경로>` → 같은 검증·후처리·원장 반영, 결과 `iter-N.claude.json`, `judge.kind = "claude-substitute"`.
+3. 같은 전문가 : `node scripts/codex-verify.mjs --id <id> --iter <N> --judge claude --ingest <raw 경로>` → 같은 검증·후처리·원장 반영, 결과 `iter-N.claude.json`, `judge.kind = "claude-substitute"`.
 
 규칙(마스터 확정 2026-11-08) : 보고 **첫 줄**에 `검증자 : Claude 대체(Codex 미가용)` 를 쓰고, 승인 등급은 **최대 CONDITIONAL** 이다. 래퍼가 결과에 `maxGrade: "CONDITIONAL"` 과 notes 첫 줄 고정 문구를 기록한다.
 
@@ -188,10 +191,10 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회 등으로 쓸 �
 ## 8. 루프 안에서의 위치
 
 ```
-[--init] → build(anakin_phase-build) → verify(anakin_phase-verify : 증거 파일 저장 → codex-verify 실행)
+build(anakin_phase-build) 종료 → SubagentStop 훅 codex-gate.mjs(자동 계약·증거 저장 → --init → codex-verify --confirm-real, c4 + c1 + 하네스 변경 시 c3)
   → 판정 분기
-     PASS    → 팀장(teamanakin-admin) 규칙 대조 → 아소카 최종 승인 → 마스터 보고
-     FAIL    → verify 독립 판정(루프 문서 B-4) 뒤 CONFIRMED defects(id·file·line·repro·fix_hint)를 build 브리프로 회송 → 다음 회차(iter+1)
+     PASS    → 다음 단계(검수 → c4-review → 그래프 분석 → c5 → c6 총괄, 13절) → 팀장(teamanakin-admin) 규칙 대조 → c6-admin → 아소카 최종 승인 → 마스터 보고
+     FAIL    → 훅 알림([CDX 자동 판정])을 받은 아소카가 결함(id·file·line·repro·fix_hint, `L/iter-N.codex.json`)을 build 브리프로 회송 → 재실행이 끝나면 훅이 같은 원장 다음 회차(iter+1)
                단 결과가 loopEnd: true(5회차)면 회송하지 않고 종료 → 아소카가 남은 결함·판정 이력을 마스터에게 보고
      BLOCKED → 아래 사유별 행동표(아소카 경유)
 ```
@@ -203,16 +206,16 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회 등으로 쓸 �
 
 | 사유 | 뜻 | 행동 |
 |---|---|---|
-| scope-missing | `--scope` 없음 | 아소카가 scope 를 다시 지정 → verify 재실행 |
+| scope-missing | `--scope` 없음 | 훅 결함(훅은 늘 scope 를 넘김) — 훅 점검 후 같은 에이전트 재실행 |
 | scope-too-broad | 미추적 30·변경 300·프롬프트 상한 초과 | 아소카가 scope 를 다시 지정(대량 전송은 마스터 승인 `--allow-bulk`) |
-| judge-unavailable | `--confirm-real` 누락 / 미로그인·시간 초과·계약 위반 2회·격리 재확인 실패 | 플래그 누락 → verify 재실행 / 미로그인 → 마스터(`! codex login`) / 그 밖 → 아소카가 Claude 대체(6절) 결정 |
+| judge-unavailable | `--confirm-real` 누락 / 미로그인·시간 초과·계약 위반 2회·격리 재확인 실패 | 플래그 누락 → 훅 점검 후 재실행 / 훅 시간 예산(600초) 소진 → 같은 에이전트 재실행 / 미로그인 → 마스터(`! codex login`) / 그 밖 → 아소카가 Claude 대체(6절) 결정 |
 | budget | 회차 상한(6회차 이상)·벽시계 90분·Codex 호출 5회·확정 직전 재검사 초과 — `loopEnd: true` | 아소카 — 중단 보고(남은 결함·막힌 원인·다음 선택지) |
 | ledger | 원장 부재(`--init` 누락)·손상·불일치 | 아소카 — `--init` 여부·원장 확인 후 결정(재생성 승인 = 아소카, 실행 = 전문가) → 같은 회차 재실행 |
 | lock | 같은 `--id` 동시 실행(`ledger.lock` 있음) | 아소카 — 다른 실행이 진행 중인지 확인, 끝났으면 잠금 해제 승인(삭제 실행 = 전문가) → 같은 회차 재실행 |
-| device | Pi Browser 실기기 등 기기 필요 | 마스터 |
+| device | Pi Browser 실기기 등 기기 필요 | 마스터 점검 항목 — 그 밖의 기준이 모두 met 이면 승인 단계로 진행하되 최대 `CONDITIONAL`(루트 `CLAUDE.md` Codex 판정 예외) |
 | master-permission | 마스터 권한 필요(운영 DB·배포·승인) | 마스터 |
 
-- 래퍼를 실행하는 것은 **verify 담당**(Bash)이다. build 담당은 래퍼를 부르지 않는다(시험은 가짜 판정자 `CODEX_JS` 로만).
+- 래퍼를 실행하는 것은 **SubagentStop 훅 `codex-gate.mjs` 뿐**이다(2026-11-10). 메인·서브에이전트는 래퍼를 부르지 않는다(시험은 가짜 판정자 `CODEX_JS` 로만). 훅이 띄운 프로세스(환경 `CODEX_GATE_ACTIVE`)에서는 훅이 다시 돌지 않는다(재진입 금지).
 - **같은 --id 동시 실행 금지(잠금으로 강제)** — 래퍼가 `--init`·판정·반영 전 구간을 `ledger.lock`(배타 생성, pid·시작 시각만 기록)으로 감싸고 끝나면(예외 포함) 해제한다. 잠금이 이미 있으면 아무 파일도 쓰지 않고(blocked 파일·원장 포함 — 다른 실행과 번호 경합 방지) BLOCKED lock "동시 실행 — 다른 실행이 진행 중"(종료 2, 콘솔만). 오래된 잠금(생성 후 timeout+5분 경과·pid 사망)도 자동으로 풀지 않고 "잠금 수동 확인 필요" 를 붙인다 — 확인 후 해제 승인 = 아소카, 삭제 실행 = 전문가(9회차 D-011).
 - **실호출 흔적(결과·이벤트·원장)은 시험 정리 때도 삭제 금지** — 8회차 사고 때 실호출 결과를 시험 원장과 함께 지워 판정·토큰을 확인할 수 없었다.
 - **팀장·아소카는 결과의 `maxGrade` 를 넘는 등급을 줄 수 없다**(Claude 대체 판정 = 최대 CONDITIONAL).
@@ -221,7 +224,7 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회 등으로 쓸 �
   - 상태 파일 결함(부재·손상·불일치)은 사례별 분기로 고치지 않는다 — 생성 경로 1개(--init) + 나머지 전부 fail-closed 가 기본이며, 첫 수정 때 같은 파일의 부재·손상·불일치 케이스를 한 번에 열거한다. (사례 : first-call D-005 — 1차 수정이 '손상'만 막고 형제 케이스 '부재'를 놓쳐 2회 연속 미해결 → escalate. R-P0 위반)
 - `noProgress: true` → 같은 브리프로 재시도하지 말고 결정 단계 상향 또는 마스터 보고.
 - `contested` 결함은 아소카가 판단(인정 → waived 사유 기록, 불인정 → build 회송).
-- **waived 결정 권한은 팀장·아소카에게 있다** — verify 가 결정하지 않는다. 면제는 `--waive … --waive-reason "<근거>"` 로만 기록(원장 `waived`), build 브리프에서 해당 결함을 뺀다. 사례(2026-11-08 first-call 2회차) : D-001 = R-2 숫자 없는 단어형 비밀(의도된 오탐 방지 한계), D-003 = 마스터 승인 예외 `--allow-bulk`(승인 강제 B-1 은 loop.md 개편 때), D-008 = 원장 위치 `.omc`(gitignore) — 설계상 의도.
+- **waived 결정 권한은 팀장·아소카에게 있다** — 훅이 결정하지 않는다. 면제는 `--waive … --waive-reason "<근거>"` 로만 기록(원장 `waived`), build 브리프에서 해당 결함을 뺀다. 사례(2026-11-08 first-call 2회차) : D-001 = R-2 숫자 없는 단어형 비밀(의도된 오탐 방지 한계), D-003 = 마스터 승인 예외 `--allow-bulk`(승인 강제 B-1 은 loop.md 개편 때), D-008 = 원장 위치 `.omc`(gitignore) — 설계상 의도.
   - **waive 할 수 없는 것** : 비밀 노출, 테스트 약화, Pi Browser 치명 제약 위반, R-P0~P6 위반(의도 사유가 원장 `docs/BUILD_DEFECTS.md` 에 먼저 적힌 경우 제외) — 루프 문서 0-3 과 같은 목록.
 
 ## 9. 상한 (한 루프)
@@ -270,3 +273,45 @@ Codex 미설치·미로그인·시간 초과·계약 위반 2회 등으로 쓸 �
 - [확인중 : 마스터 추후 결정] OS 수준 읽기 차단(별도 Windows 계정·MXC 샌드박스) — 2026-11-08 "완화책만, 추후 결정"으로 보류(10절 R-3)
 - [확인중 : 로그인 후 실호출] 범위 축소(변경 + 직접 연관 1단계 + 규칙 문맥)로 판정 품질이 떨어지는지 — unverifiable·"문맥 부족" 판정 빈도를 실호출 결과로 확인하고, 필요하면 연관 단계·상한 조정
 - [확인중 : 정기 재평가일] 벽시계 90분·토큰 2배·Codex 호출 5회 상한 실측 조정
+
+## 13. CDX 관문 — 모든 서브에이전트 결과 검수 (마스터 결정 2026-11-09)
+
+> 원문 ① "'3. SA-프롬프트' 완료되었는데, 왜 검증을 안하지? 무조건해야지! … '4. CDX-프롬프트 검수' 검수를 통과해야만 다음 프로세스로 간다고 했잖아!" ② (확장·최우선) "아소카가 접수하고 전달받은 모든 claude subagent 프로세스는 반드시 codex 승인을 받아서, OK 되어야 다음으로 진행한다."
+> 단계 계획 문구 = 훅 `.claude/hooks/model-advisor.mjs`(`CDX_RULE`·`cdx()`, selftest 가 "결과를 내는 서브에이전트 뒤에는 CDX 검수" 를 검사).
+
+**규칙**
+1. 서브에이전트가 끝나면 **SubagentStop 훅 `.claude/hooks/codex-gate.mjs` 가 자동으로** 그 결과의 Codex 판정(`codex-verify.mjs --init` → `--confirm-real`, 훅 timeout 600초)을 실행하고, 결과(종료 0 PASS / 1 FAIL / 2 BLOCKED · 원장 경로)를 `.omc/state/codex-gate/pending/` 에 남긴다 — 메인의 다음 도구 호출(PostToolUse)·요청(UserPromptSubmit) 때 `--flush` 가 `[CDX 자동 판정 — codex-gate 훅]` 글로 메인 컨텍스트에 1회 전달한다(SubagentStop 의 additionalContext 는 서브에이전트에게 가므로 쓰지 않음, 사용자 화면엔 systemMessage). 사용량 한도·기기 오류·호출 오류(종료 3)·시간 예산 소진은 BLOCKED 로 기록하고 세션은 막지 않는다. (2026-11-10 마스터 결정 — 종전 '메인이 verify 를 불러 판정'은 폐지)
+2. **Y(종료 0 PASS) 전에는 다음 단계로 진행하지 않는다.** N(종료 1 FAIL) = 그 결과를 낸 SA 단계로 되돌려 재작업(c1 = 메인 브리프 재작성) → 같은 원장 id 다음 회차, 상한 5회(5회차 판정 = `loopEnd`, 남은 결함 마스터 보고). BLOCKED(종료 2) = 회차 미소모, 사유 해소 후 같은 회차(8절 사유표).
+3. **예외 없음** — 조회 단독 턴의 collect(c2), 커밋 단독 턴의 commit(c6), 결론 단독 턴의 decide(c4)도 판정한다. 계획에 없던 서브에이전트(general-purpose 대행 등)도 같다(조사 성격 = c2, 산출 성격 = c4).
+4. **재귀 금지** — 판정을 실행하는 것은 훅이고 서브에이전트가 아니므로 '판정 결과의 재판정'이 생기지 않는다. 훅이 띄운 프로세스에서는 훅이 돌지 않고(환경 `CODEX_GATE_ACTIVE`), 폐지된 verify 에이전트의 과거 실행이 다시 끝나도 판정하지 않는다. 팀장 모드 1(취합·승인) 결과도 판정 대상이다(아소카 결정 2026-11-09 D-001) : 승인 종료 → 훅이 `c6-<주제>-admin-<agentId 앞 6자>`(승인 판정이 증거·원장과 일치하는지, 총괄 포함) → 응답.
+5. 실호출 주체는 **훅만**이다(build·시험은 `CODEX_JS` 대역). 원장 id 매핑(훅 `GATE_OF` = 생성기 `CDX_OF`) : collect = c2 · build = c4 + c1(브리프) + 하네스 파일 변경 시 c3 · decide = c4-…-decide + c1 · review = c4-…-review · graph = c5 · commit = c6-…-commit · teamanakin-admin = c6-…-admin · 표에 없는 일반 에이전트 = 바꾼 파일 있으면 c4(+하네스면 c3) · 없으면 c2. 원장 id = `c<칸>-<주제>[-접미]-<agentId 앞 6자>`(주제 = 에이전트 설명의 영문·숫자 슬러그 또는 종류 이름) — 같은 에이전트에 재전달하면 같은 원장의 다음 회차.
+6. **큰 산출(2026-11-10 c4 회송 — 첫 실호출 3원장 BLOCKED scope-too-broad 사고)** : ① 칸별 scope 분리 — c3 = `HARNESS_RE` 파일만, c4(그 밖 칸) = 나머지 산출 파일, 생성물(`50. graph/myRequestGraph.html`·`request-flow/`·`requests/`·`work-statistics/`)은 scope 에서 빼고 증거 `generated.txt`(생성기 실행 증거)로만, c1 = 파일 scope 없음(브리프 `brief.md` 대 요청 원문 `request.md` — 메인 세션 기록의 에이전트 시작 전 마지막 요청). ② 기준선 — SubagentStart 훅(`codex-gate.mjs --base`)이 에이전트별 `git stash create` 스냅샷(작업 트리 무변경, 깨끗하면 HEAD)을 `.omc/state/codex-gate/base/` 에 남기고, 판정은 `--diff <스냅샷>` + 그 뒤 바뀐 파일만(다른 세션 미커밋 변경 제외) — 스냅샷이 없으면 계약에 '기준선 없음'. ③ 상한 대응 — 래퍼 프롬프트 상한(`maxPromptBytes` 600KB = 고정 구획 + scope diff + 변경 본문(파일당 200KB) + 증거 200KB 이하)에 맞춰 파일별 비용(diff + 본문×1.15)을 추정하고 묶음당 360KB 를 넘으면 원장을 파일 묶음 `-p1`…`-pN` 으로 나눈다(큰 것부터 첫 맞춤, 기준 원장 폴더에 `split.json`). 증거는 파일 목록 → diff stat 까지(파일별 diff·hunk 는 래퍼 diff 구획이 scope 한정으로 싣는다). **칸 판정 = 모든 묶음 PASS 일 때만 Y(AND)** — 생성기 `mergeParts` 가 회차별로 합치고 나뉘기 전 기준 원장은 대체로 본다. ④ BLOCKED 자동 재판정 — SubagentStop 때마다 현재 에이전트 판정 뒤 남은 시간 예산(2분 이상) 안에서, 같은 요청(요청 시각 이후 시작) 원장 중 마지막 기록이 BLOCKED 이고 사유가 scope-too-broad·judge-unavailable(쿨다운 10분)·lock 인 원장을 1회 재판정한다(같은 회차 — BLOCKED 는 회차 미소모, scope-too-broad 단일 원장은 묶음으로 다시 나눔, 작업 기록 `gate.json` 없는 원장 제외). device·master-permission·budget·ledger 는 사람 몫이라 재판정하지 않는다.
+
+7. **턴 끝 = 턴 묶음 판정 → 아소카 종료 승인(2026-11-10 마스터 — "각 CDX마다 왜 검증이 누락되었는지 확인하고, 반드시 검증단계를 누락시키지 말고, 총괄검수가 끝나면 반드시 파다완 아소카의 종료 승인이 있어야 모든 프로세스를 종료", 선택 "턴 묶음 1회 판정"·"아소카(메인) 직접 승인")** : 진단 = 오늘 누락 약 75건은 판정 실패가 아니라 계기 부재(SubagentStop 은 에이전트 종류별로만 원장을 만들어 메인 단독 턴은 계기 0, c6 총괄은 판정자 없음, 승인 칸은 admin 실행으로만 채워짐). 처방 = Stop 훅 `.claude/hooks/turn-gate.mjs`(루트 settings Stop, 동기·timeout 300초) :
+   ① 이 턴(마지막 마스터 요청 ~ 지금)을 생성기 `buildRequestGraph` 와 같은 규칙으로 계산 → 보이는 CDX 칸 중 이 턴에서 아직 Y 아닌 칸(접두 P 프롬프트 c1 · X 컨텍스트 c2 · G 그래프 c5 · T 총괄 c6 늘, H 하네스 c3 = 도구 1건 이상, L 루프 c4 = N 1회 이상 또는 반복 2회 이상)만 고른다 — "이미 Y" = 이 턴 칸 원장 + 이 턴 서브에이전트 접미 원장(SubagentStop 판정은 그대로 유지·중복 판정 안 함).
+   ② 칸마다 자동 계약(AC 3개)·증거(P = 마스터 원문·메인 브리프·SendMessage·메인 응답 / X = 훅 주입 목록·읽은 파일·collect 결과 / H = 도구 사용 기록(입력값 제외)·하네스 파일 변경(scope) / L = 되돌림·반복 기록 / G = 요청 md 발췌·생성기 실행 결과·정본 규칙 / T = 칸별 최종 판정 요약·원장 요약·마스터 요청 대비 메인 응답)을 칸 원장 `c<N>-turn-<요청키>` 폴더에 쓰고 `node scripts/codex-verify.mjs --bundle <manifest> --id bundle-turn-<요청키> --confirm-real` **Codex 1회** — 래퍼가 칸 계약을 `## 칸 <접두>` 절로 묶고 기준 ID 를 `<접두>-n`(결함 `<접두>-D-NNN`)으로 바꿔 판정한 뒤, 결과를 칸 원장마다 `--ingest`(AC-n·D-NNN 로 되돌림 — 회차·상한 5·잠금·waived 규칙은 칸 원장 그대로, 잠금·예산·호출 상한은 묶음 원장 몫). 하네스 파일이 묶음 예산(360KB)을 넘으면 c3 는 기존 분할 규칙(파일 묶음 원장 `-pN`, AND)으로 따로.
+   ③ 처리 : 전부 Y → ④ / N = 차단(사유 = 칸별 결함·원장 경로, 메인이 회송·재작업 → 메인 도구 사용 뒤 다음 Stop 때 N 칸만 같은 원장 다음 회차) / BLOCKED = 차단(사유) — 단 judge-unavailable(인증 만료·한도 = 래퍼의 `codex 종료 코드 …`·로그인 실패)·device·master-permission 은 메인이 고칠 수 없어 Codex 판정 없이 보류로 끝낼 수 있다 — 응답에 `종료 승인 : 보류 — <사유>` 줄이 이미 있으면 첫 Stop 에서 허용(차단 0회), 없을 때만 차단. 판정자 미가용을 확인하면 `.omc/state/codex-gate/turn/unavailable.json` 에 남기고 10분 동안은 새 요청이어도 Codex 를 부르지 않는다(래퍼 `--bundle … --skip-judge <사유>` = 칸 원장에 BLOCKED(judge-unavailable)만 기록 — coordinator 결함 2026-11-10 "턴마다 5칸 재호출·보류 줄 있어도 1회 차단"). 보류 사유 = 승인 기록 `hold`·칸 원장 BLOCKED·그래프 CDX 칸 보류·1.2 보류 줄.
+   ④ 종료 승인 = 메인 응답 끝 `종료 승인 : <승인|보류> — <근거>` 줄 — 없으면 차단(사유 "총괄 검수 결과 <요약> 확인 후 응답 끝에 '종료 승인 : …' 줄을 쓰고 끝낼 것"), 재진입(차단 뒤 `stop_hook_active`) 때 판정은 캐시(`.omc/state/codex-gate/turn/<세션>.json` — 재작업 없으면 다시 돌지 않음). 승인 = `.omc/state/codex-gate/approvals.jsonl` 기록·그래프 1.2 완료.
+   ⑤ 연속 차단 합계 3회 상한(Claude Code 강제 종료 8회 전) = 종료 허용 + '승인 강제 실패' 기록(승인 기록 + 묶음 원장 폴더 `approval-forced.json`, 그래프 1.2 오류). 훅 예외 = 차단하지 않고 `turn/errors.log` 에만 기록.
+   ⑥ **증거·재판정 보강(2026-11-10 첫 실판정 FAIL 회송 — 증거 공백 unverifiable · 결함 7·9)** : 증거 = P 에 관련 서브에이전트(이 턴 실행·이 턴 작업 알림·브리프/SendMessage 가 가리킨 agent id)의 받은 지시·최종 보고(정지 응답 전부) `reports.md`, X 에 작업 알림 요지·읽은 파일·훅 주입·산출 중 파일 본문 발췌 `products.md`, H 에 도구 기록(Bash·PowerShell = 명령 문자열 + 출력 앞 2줄, Read·Write·Edit = 경로만, 둘 다 `redact` 비밀 가림 — 토큰·키·URL 자격·접속 문자열·`.env` 값) — 칸당 약 20,000자, 묶음 증거 상한 300KB(래퍼 `evidenceCap`). 재판정 = 직전 판정 뒤 변경으로만 — 산출(메인 Write·Edit 또는 서브에이전트 완료 알림, BLOCKED 면 도구 사용)이 바뀌면 보이는 칸 전부 다음 회차(Y 캐시 금지), 응답(`종료 승인` 줄 뺀 본문 해시)만 바뀌면 P·X·T 만, 아무것도 안 바뀌면 직전 결과 재사용(Codex 0회). 서브에이전트 실행 중(메인 기록의 백그라운드 실행 'launched' 뒤 완료 알림 없음)이면 H·G = '수정 진행 중' 보류(Codex 없이 칸 원장 BLOCKED `in-progress` — 래퍼 `--skip-reason`, 그래프 '검증 보류(수정 진행 중)'), P·X·T 는 계속 판정 — 응답에 칸별 상태 표와 `종료 승인 : 보류 —` 줄이 둘 다 있으면 보류로 종료 허용. 차단 사유문·`model-advisor` `[턴 종료 규칙]` = '응답에 칸별 판정 상태 표(| 칸 | 상태 Y/N/보류 | 보류·N 사유 | 원장 |)'. 묶음 판정 규칙은 래퍼 신뢰 구획(`BUNDLE_RULES` — task 데이터 구획 아님), 칸별 이전 결함·면제는 접두 붙여 전달(`bundlePrev`), 묶음 모드 Codex 호출 1회 고정(출력 계약 위반 = 재요청 없이 BLOCKED).
+   시험 : `node .claude/hooks/turn-gate.mjs --selftest`(가짜 판정자 — 승인 줄 없음 차단·승인 허용·N 결함 차단·변경 없음 재사용 0회·응답만 바뀜 P·X·T 1회·산출 바뀜 전 칸·실행 중 H·G 보류·미가용 보류 줄 없으면 차단·보류 줄 있으면 차단 0회·쿨다운 안 Codex 호출 0회·3회 상한·예외 허용), `node --test test/turn-gate.test.mjs test/codex-verify.test.mjs`.
+
+8. **SubagentStop scope 귀속(2026-11-10 결함 8 — c4-build-a9509f 에 병렬 에이전트·이전 세션 미커밋 변경이 섞이고 gitignore 산출물은 빠짐)** : 1차 = 그 에이전트 기록의 Write·Edit·NotebookEdit 대상(gitignore 무관 — 무시 대상 본문은 증거 `written-files.md`), 2차(보조) = 그 에이전트가 Bash·PowerShell 을 썼을 때만 (기준선 diff ∪ 미추적, 기준선 없음 = git status) ∩ 시작 뒤 수정 시각 — 같은 시간 형제 서브에이전트·메인 기록이 Write·Edit 한 경로는 빼고 계약에 '병렬 에이전트 귀속 제외 n건'. 기준선 이전 미커밋 변경은 시각 조건으로 빠진다. 같은 에이전트의 이번 판정 계획에 없는 이전 원장(옛 scope 의 `-pN`·더는 없는 c3 등)은 `superseded.json` 표식 → 그래프·BLOCKED 재판정에서 제외(원장 본문은 보존). c1 `request.md` 시작 = 브리프가 인용한 가장 이른 마스터 메시지(직전 10건 안), 에이전트 실행 중 들어온 마스터 메시지는 본문과 나눠 '실행 중 들어온 마스터 메시지'(전달 여부 = 브리프 추가 지시), `<bash-…>`·Stop hook feedback 은 요청 아님. 증거 `report.md` = 지시 구간마다 정지 응답 전부(본 보고 뒤 알림으로 깨어나 쓴 보충까지), `tools.md` = 도구 기록(위 ⑥과 같은 규칙).
+
+**칸별 판정 대상·입력 증거** (증거 저장 위치 `L/evidence-N/`, 요약·발췌 금지는 4절과 같음 — 단 c1·c2 는 아래 '짧은 증거')
+
+| 칸 | SA 단계(그래프) | 판정 대상 = 결과를 낸 쪽 | 시점 | 입력 증거 | 기본 AC 틀(계약에 아소카 고유 AC 추가) | N 회송처 | 원장 id |
+|---|---|---|---|---|---|---|---|
+| c1 | 1.1.1 프롬프트 | 메인 브리프 | build·decide 종료 때 훅(첫 프롬프트) | 요청 원문 + 브리프 원문(목표·범위·AC-n·scope) | 요구 항목 누락·추가 해석 없음 / 쓰기 허용·금지 경로 명시 / AC-n 이 명령·파일·수치로 판정 가능 | 메인(브리프 재작성) | `c1-<주제>` |
+| c2 | 1.1.2 컨텍스트 | collect 결과(조회 단독 포함)·조사형 대행 | collect 결과 직후 | collect 결과 원문 + 출처 목록 | 주장·수치마다 출처(경로:줄·명령) / 질문·브리프에 필요한 근거 누락 없음 / 미확인은 `[확인중]`·`[TBD]` | collect(재수집) | `c2-<주제>` |
+| c3 | 1.1.3 하네스 | build·일반 에이전트의 하네스 파일 변경(훅·settings·에이전트 정의·운용 기준서 — `HARNESS_RE`) | 그 에이전트 종료 때 훅이 c4 와 함께(병렬) | 바꾼 파일 목록 + 최종 보고(selftest·`node --check` 출력 포함) | 규칙 정합 / 우회·회귀 없음 / selftest 통과 | build | `c3-<주제>-<agentId 앞 6자>` — **바꾼 파일에 하네스 경로가 없으면 c3 원장을 만들지 않는다(훅이 자동 판단)** |
+| c4 | 1.1.4 루프 | build 산출물(현행 2~9절) / decide 결론 / review 결과 / 산출형 대행 | 각 에이전트 종료 때 훅 | 현행 증거 / 결론 원문 + 요청 원문 + 수집 근거 / 검수 보고 원문 + 문서 AC | 브리프 AC-n 충족 / 결론 근거·반론 검토 / 검수 지적의 근거 | build / decide / review | `c4-<주제>` · `c4-<주제>-decide` · `c4-<주제>-review` |
+| c5 | 1.1.5 그래프 | graph 보고 | graph 직후 | graph 보고 원문 + `node scripts/request-graph.mjs --md` 출력 + 정본 규칙 사본(`.claude/engineering/50. graph/anakins_graph.md` 전문 복사) | 보고의 엔지니어링 N/5·미수행·비정상이 생성기 출력과 일치 / 판독이 정본 정의를 따름 | graph | `c5-<주제>` |
+| c6 | 1.1.5.2 서브에이전트6(총괄) | 팀장 승인 직전 전체 취합 / commit 결과 / 팀장 모드 2 재평가 결과 / 팀장 모드 1 승인 판정 | admin 직전 / commit 직후 / 재평가 직후 / 승인 직후·응답 앞 | 요청 원문 + 팀원 결과 원문 + 이 턴 c1~c5 결과 파일 사본 / commit 보고 + `git log -1 --stat` + `git status` / 재평가 보고 + 대시보드 수치 / 승인 보고 원문 + 이 턴 칸별 결과 파일 사본 | 실행된 단계 CDX 전부 PASS(c3 해당 없음 기록 포함) / 요청 항목마다 근거 / 팀원 결과 간 모순 없음 ; 커밋 = 묶음·메시지 규칙·비밀 없음 ; 승인 = 등급·지적이 칸별 결과·maxGrade·실기기 미검증 상한과 일치 | 결함 소유 단계 / commit / 팀장 | `c6-<주제>` · `c6-<주제>-commit` · `c6-<주제>-admin` |
+
+- `--scope`(래퍼 필수) : 아소카가 정한 이 턴 산출 scope 를 그대로 쓴다. c1·c2 는 build 전이라 scope 안 변경이 0건 — 전송은 규칙 문맥뿐이고 판정 본체는 증거다. 조회 단독 턴(산출 scope 없음)은 수집 대상 경로를 scope 로 쓰되 4절 넓은 scope 차단에 걸리지 않게 좁힌다.
+- 원장 : 칸·대상마다 별도 id → `--init`·`L/contract.md`·예산(회차 5·호출 5·90분)이 id 마다 따로다. c1 N 재작성도 같은 `c1-<주제>` 의 다음 회차.
+- 병렬 대상 접미(아소카 결정 2026-11-09 D-004) : 병렬로 같은 칸 판정을 받는 실행은 원장 id 끝에 `-<agentId 앞 6자>` 접미(예 `c2-<주제>-a1b2c3`) — 접미 없는 원장은 그래프에서 어느 실행의 Y 로도 쓰지 않는다('검증 보류(대상 불명)').
+- c1 판정 시점(2026-11-10 개정) = build·decide 종료 때 훅이 그 에이전트의 첫 프롬프트(브리프)를 c1 원장으로 함께 판정한다 — 브리프를 고쳐 다시 보내면 같은 원장의 다음 회차. 종전 'build 보다 verify 를 먼저' 순서는 폐지.
+
+**짧은 증거·비용** : c1·c2 는 같은 턴에 한 번씩, 짧은 증거(브리프·collect 결과 원문 + 출처 목록)만 넣는다 — 원천 파일 전문을 붙이지 않는다(c2 AC 는 출처 표기·누락 여부로 판정 가능하게 쓴다 ; 원천 대조가 필요한 수치는 해당 원천 사본만). **Codex 호출 수(턴당 최소, 2026-11-10) = 결과를 낸 서브에이전트 수(팀장 승인 = c6-admin 포함) + build·decide 마다 c1(+ c3 하네스 변경 시) + 턴 끝 묶음 판정 1회(규칙 7 — 이미 Y 칸만 남으면 0회, 메인 단독 턴은 이 1회가 전부)** — c6 총괄은 별도 호출 없이 c6-admin 이 포함, FAIL 회송마다 +1. 예 : 산출 턴 기본(build·graph) = c1·c4·c5·c6·c6-admin 5회, 수집·문서 검수 포함 = c2·c1·c4·c4-review·c5·c6·c6-admin 7회, 결론 단독 = c4-decide·c6·c6-admin 3회, 조회 단독 = c2 1회(종전 0회). 회당 export 약 5~7초 + Codex 판정(첫 실호출 36초)이 더해진다(verify 위임 토큰은 폐지로 0). 한 에이전트의 여러 칸(c4·c1·c3)은 훅이 병렬로 판정하고, 칸을 건너뛰는 것은 허용하지 않는다.

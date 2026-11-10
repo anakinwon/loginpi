@@ -67,7 +67,7 @@
 **허용 예외** (이 4가지뿐)
 
 1. **오케스트레이션 도구** — Agent·SendMessage·ListAgents·TaskStop, 공유 작업 목록 TaskCreate·TaskGet·TaskList·TaskUpdate(루트 `CLAUDE.md` '하네스: DA팀' 2026-10-10 이력에서 활성화)
-2. **리뷰 목적의 산출물 읽기** — 전문가가 보고한 파일을 Read 로 직접 대조한다. 새로 조사하려는 탐색 읽기는 예외가 아니다(→ `anakin_phase-collect`). diff·빌드 로그처럼 셸 출력이 필요하면 `anakin_phase-verify` 에 요청한다.
+2. **리뷰 목적의 산출물 읽기** — 전문가가 보고한 파일을 Read 로 직접 대조한다. 새로 조사하려는 탐색 읽기는 예외가 아니다(→ `anakin_phase-collect`). diff·빌드 로그처럼 셸 출력이 필요하면 `anakin_phase-build`(검사 실행·보고)에 요청한다(2026-11-10 검증 단계 에이전트 폐지 — Codex 판정은 SubagentStop 훅 `codex-gate.mjs`).
 3. **마스터 확인 질문** — AskUserQuestion(해석에 따라 결과가 갈릴 때 1문항)
 4. **`task-observer`** — 세션 시작 스킬 호출과 관찰 로그 기록만 메인이 직접 한다(루트 `CLAUDE.md` 매 세션 강제, 마스터 확정 2026-11-07)
 
@@ -84,7 +84,7 @@
 | 수집 — 대량 읽기·검색·집계·이력 통계 | `anakin_phase-collect` | 쓰기 도구 없음(Bash 는 점검용) | `teamAnakin/anakin_phase-collect.md` |
 | 결론·설계 판단 — 권장안·아키텍처 결정 초안 | `anakin_phase-decide` | 읽기 전용(초안 반환) | `teamAnakin/anakin_phase-decide.md` |
 | 산출 — 코드·SQL·문서·도구·설정 작성과 수정 | `anakin_phase-build` | 쓰기 가능(tsc·단위 테스트까지, 커밋·배포 안 함) | `teamAnakin/anakin_phase-build.md` (2026-11-07 신설, 마스터 승인) |
-| 실행 검증 — tsc·lint·build·test·렌더 | `anakin_phase-verify` | 쓰기 도구 없음(Bash 는 점검·검증용, 프로젝트 파일 수정 안 함) | `teamAnakin/anakin_phase-verify.md` |
+| 실행 검증 — tsc·lint·build·test·렌더 | `anakin_phase-build`(2026-11-10 검증 단계 폐지로 이관 — Codex 판정은 SubagentStop 훅 `.claude/hooks/codex-gate.mjs` 자동) | 산출과 같은 권한(브리프 쓰기 범위) | `teamAnakin/anakin_phase-build.md` |
 | 문서 검수 — docs·CLAUDE.md·i18n·보고서 | `anakin_phase-review` | 쓰기 도구 없음(Bash 는 점검용) | `teamAnakin/anakin_phase-review.md` |
 | 커밋·푸시 | `anakin_phase-commit` | git 명령만 | `teamAnakin/anakin_phase-commit.md` |
 | 최종 승인 | `teamanakin-admin` | 쓰기 도구 없음(Bash 는 점검용) | `teamAnakin/teamAnakin_admin.md` |
