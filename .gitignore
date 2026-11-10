@@ -58,8 +58,8 @@ next-env.d.ts
 !.claude/rules/**
 !.claude/engineering/
 !.claude/engineering/**
-# Obsidian 볼트 앱 설정(볼트 루트 = .claude/engineering/, 마스터 확정 2026-11-08)
-.claude/engineering/.obsidian/
+# Obsidian 볼트 앱 설정(볼트 루트 = .claude/engineering/, 마스터 확정 2026-11-08 · 하위 볼트 50. graph/ 포함 2026-11-09)
+.claude/engineering/**/.obsidian/
 !.claude/subagent-statusline.mjs
 !.claude/statusline.sh
 
