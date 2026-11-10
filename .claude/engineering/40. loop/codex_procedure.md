@@ -300,6 +300,8 @@ build(anakin_phase-build) 종료 → SubagentStop 훅 codex-gate.mjs(자동 계�
 
 **칸별 판정 대상·입력 증거** (증거 저장 위치 `L/evidence-N/`, 요약·발췌 금지는 4절과 같음 — 단 c1·c2 는 아래 '짧은 증거')
 
+**증거 본문 = allowlist + 공용 비밀 경로 제외(2026-11-10 보안 검토)** : 훅(codex-gate `written-files.md` · turn-gate `products.md`)이 파일 본문을 붙일 때는 공용 `fileExcerpt`(codex-gate) 하나만 쓴다 — 비밀 경로(`scripts/codex-verify.mjs` `isSecretPath`, 래퍼 export 제외와 같은 목록)는 읽지 않고 경로만, 허용 확장자(`.md .mjs .js .cjs .ts .tsx .jsx .json .css .html .sql .yml .yaml .txt`) 밖은 경로·크기만, 허용 대상(gitignore 여부 무관)은 `redact` 를 거친 본문.
+
 | 칸 | SA 단계(그래프) | 판정 대상 = 결과를 낸 쪽 | 시점 | 입력 증거 | 기본 AC 틀(계약에 아소카 고유 AC 추가) | N 회송처 | 원장 id |
 |---|---|---|---|---|---|---|---|
 | c1 | 1.1.1 프롬프트 | 메인 브리프 | build·decide 종료 때 훅(첫 프롬프트) | 요청 원문 + 브리프 원문(목표·범위·AC-n·scope) | 요구 항목 누락·추가 해석 없음 / 쓰기 허용·금지 경로 명시 / AC-n 이 명령·파일·수치로 판정 가능 | 메인(브리프 재작성) | `c1-<주제>` |

@@ -10,7 +10,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { scrub } from '../../scripts/codex-verify.mjs'
+import { scrub, isSecretPath, canAttachBody } from '../../scripts/codex-verify.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 /** 상태 루트(원장·pending·기준선) — 기본 .omc/state, env CODEX_GATE_STATE = 시험 격리(2026-11-10 E : 시험이 실제 pending 에 가짜 결과를 써 메인에 전달된 사고). 원장 루트는 래퍼에 env CODEX_LOOP_ROOT 로 넘긴다 */
@@ -124,6 +124,12 @@ export function toolLines(recs, who = 'main') {
 }
 /** 상한 넘는 글 = 앞뒤 보존·가운데 생략(래퍼 fileBlock 과 같은 분할 규칙 — 첫 지시·마지막 응답을 둘 다 남긴다) */
 export const capMid = (x, n) => { x = String(x || ''); if (x.length <= n) return x; const h = Math.floor(n / 2); return x.slice(0, h) + `\n…[가운데 ${x.length - n}자 생략 — 상한 ${n}자, 앞뒤 보존]…\n` + x.slice(-h) }
+/** 증거용 파일 본문 — codex-gate·turn-gate 공용(2026-11-10 보안 검토) : 비밀 경로 = 읽지 않음(경로만), 허용 확장자 밖 = 경로·크기만, 허용 = redact(capMid) */
+export function fileExcerpt(rel, max, root = ROOT) {
+  if (isSecretPath(rel)) return '(본문 미첨부 — 비밀 경로)'
+  if (!canAttachBody(rel)) { let n = '?'; try { n = fs.statSync(path.join(root, rel)).size } catch { /* 없음 */ } return `(본문 미첨부 — 허용 확장자 아님, 크기 ${n} 바이트)` }
+  try { return redact(capMid(fs.readFileSync(path.join(root, rel), 'utf8'), max)) } catch { return '(읽기 실패 — 삭제됨)' }
+}
 const git = (args, root = ROOT) => spawnSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true, timeout: 30e3, maxBuffer: 64 * 2 ** 20 })
 /**
  * 서브에이전트 기록 → { brief, report, finals, t0, t1, writes } (2026-11-10 B — 훅 자동 계약 범위 보강)
@@ -317,18 +323,18 @@ function writeEvidence(job, ctx, dir, ev, ref) {
   if (job.no === 1) { put('brief.md', capMid(ctx.brief, C.briefMax)); put('request.md', capMid(ctx.request || '(요청 원문 없음 — 메인 세션 기록 미확인)', C.briefMax)); return }
   put('report.md', capMid(ctx.report || '(최종 보고 없음)', C.reportMax))
   put('changed-files.txt', job.files.join('\n') + '\n')
-  // 결함 8-1 : 이 에이전트가 직접 쓴 파일 중 git 이 보지 않는 것(gitignore — 래퍼 diff·미추적 목록에 안 잡힘) = 현재 본문 첨부(capMid·비밀 가림, 비밀 경로 제외)
+  // 결함 8-1 : 이 에이전트가 직접 쓴 파일 중 git 이 보지 않는 것(gitignore — 래퍼 diff·미추적 목록에 안 잡힘) = 현재 본문 첨부(fileExcerpt — 허용 확장자·비밀 경로 제외·redact)
   const ign = new Set(job.files.length ? git(['check-ignore', '--', ...job.files]).stdout.split(/\r?\n/).filter(Boolean).map(f => f.replace(/\\/g, '/')) : [])
-  const body = job.files.filter(f => ign.has(f) && (ctx.own || []).includes(f) && !/(^|\/)(\.env[^/]*|[^/]*\.(pem|key)|id_rsa[^/]*|\.credentials[^/]*)$/i.test(f))
-  if (body.length) put('written-files.md', body.map(f => { let t; try { t = fs.readFileSync(path.join(ROOT, f), 'utf8') } catch { t = '(읽기 실패 — 삭제됨)' } return `=== FILE ${f} (gitignore 대상 — 이 에이전트 Write·Edit 기록, 현재 본문) ===\n${redact(capMid(t, C.srcMax))}` }).join('\n\n') + '\n')
+  const body = job.files.filter(f => ign.has(f) && (ctx.own || []).includes(f))
+  if (body.length) put('written-files.md', body.map(f => `=== FILE ${f} (gitignore 대상 — 이 에이전트 Write·Edit 기록, 현재 본문) ===\n${fileExcerpt(f, C.srcMax)}`).join('\n\n') + '\n')
   put('tools.md', `## 이 에이전트 도구 사용 기록(시각순 — Bash·PowerShell = 명령 + 출력 앞 2줄, 비밀 가림 / 파일 도구 = 경로만)\n${capMid(ctx.tools || '(도구 사용 없음)', C.srcMax)}\n`)   // c2-collect-ac25ad AC-2 : 근거 명령·출력
   if (job.files.length) put('diffstat.txt', git(['diff', '--stat', ref, '--', ...job.files.map(f => `:(literal)${f}`)]).stdout.slice(0, 20000))
   const runs = ctx.genRuns || []
   if (ctx.generated?.length) put('generated.txt', `생성물 목록(scope 제외 — 생성기 실행 증거로만 판정)\n${ctx.generated.join('\n')}\n\n## 생성기 실제 실행(codex-gate 훅 재실행)\n${runs.length ? runs.map(genText).join('\n') : '(재실행 없음 — request-graph 생성물이 아님)\n'}`)
   if (job.no === 5) {
     put('generator.txt', runs.length ? runs.map(genText).join('\n') : '(생성기 재실행 기록 없음)\n')
-    const rm = requestMd(ctx); put('request-md.md', rm ? `<!-- ${rm.f} -->\n${capMid(rm.text, C.srcMax)}` : '(이 요청의 요청 md 없음)\n')
-    try { put('graph-rules.md', capMid(fs.readFileSync(C.graphRules, 'utf8'), C.srcMax)) } catch { put('graph-rules.md', '(정본 규칙 파일 없음)\n') }
+    const rm = requestMd(ctx); put('request-md.md', rm ? `<!-- ${rm.f} -->\n${redact(capMid(rm.text, C.srcMax))}` : '(이 요청의 요청 md 없음)\n')
+    try { put('graph-rules.md', redact(capMid(fs.readFileSync(C.graphRules, 'utf8'), C.srcMax))) } catch { put('graph-rules.md', '(정본 규칙 파일 없음)\n') }
   }
   if (job.no === 6 && job.sfx === 'commit') {
     const since = git(['log', `--since=${new Date(ctx.t0 ?? Date.now() - 3600e3).toISOString()}`, '--stat', '--format=commit %H%nDate: %aI%n%n    %s%n'])
@@ -555,6 +561,14 @@ if (isMain && process.argv[2] === '--selftest') {
     const tl = toolLines([{ type: 'assistant', timestamp: '2026-11-10T01:00:00Z', message: { content: [{ type: 'tool_use', id: 'b1', name: 'Bash', input: { command: `git status && echo ${sec}` } }, { type: 'tool_use', id: 'e1', name: 'Edit', input: { file_path: 'scripts/x.mjs', old_string: 'SECRET_OLD', new_string: 'SECRET_NEW' } }, { type: 'tool_use', id: 'r1', name: 'Read', input: { file_path: '.env' } }] } },
       { type: 'user', timestamp: '2026-11-10T01:00:02Z', message: { content: [{ type: 'tool_result', tool_use_id: 'b1', content: `줄1 ${sec}\n\n줄2\n줄3 셋째` }] } }], 'build')
     assert.deepEqual(tl, [`10:00:00 Bash [build] : $ git status && echo [REDACTED:github-token]\n    → 줄1 [REDACTED:github-token]\n    → 줄2`, '10:00:00 Edit [build] : scripts/x.mjs', '10:00:00 Read [build] : .env']) }
+  // 2026-11-10 보안 검토 : 증거 본문 = 허용 확장자 + 공용 비밀 경로 제외 + redact (turn-gate selftest 와 같은 표)
+  { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'cgate-ex-')), w = (f, t) => { fs.mkdirSync(path.dirname(path.join(d, f)), { recursive: true }); fs.writeFileSync(path.join(d, f), t) }
+    try {
+      for (const f of ['.env.local', 'credentials.json', 'id_rsa', '.npmrc', 'voice/x.md']) { w(f, 'BODY_SECRET'); assert.equal(fileExcerpt(f, 1500, d), '(본문 미첨부 — 비밀 경로)', f) }
+      w('.claude/setup/pgm_list.md', '목록 본문\nPI_API_KEY="abc12345xyz"'); const pg = fileExcerpt('.claude/setup/pgm_list.md', 1500, d)
+      assert.ok(pg.includes('목록 본문') && pg.includes('[REDACTED') && !pg.includes('abc12345xyz'), pg)
+      w('a.png', 'PNG!'); assert.equal(fileExcerpt('a.png', 1500, d), '(본문 미첨부 — 허용 확장자 아님, 크기 4 바이트)')
+    } finally { fs.rmSync(d, { recursive: true, force: true }) } }
   // c2-collect-ac25ad D-001 : 형제 서브에이전트·메인이 같은 시간에 쓴 파일 = 다른 실행 몫(otherWrites)
   { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'cgate-ow-')), wr = (t, p) => JSON.stringify({ type: 'assistant', timestamp: t, message: { content: [{ type: 'tool_use', name: 'Write', input: { file_path: p } }] } })
     try {

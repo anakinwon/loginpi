@@ -10,7 +10,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import crypto from 'node:crypto'
-import { stateOf, sayOf, capMid, tailJsonl, readJsonl, textOf, kst, changedFiles, splitScope, costOf, packGroups, jobsFor, judgeOne, nextIter, runGenerator, genText, requestMd, ledgerSummary, readAgent, toolLines, redact } from './codex-gate.mjs'
+import { stateOf, sayOf, capMid, tailJsonl, readJsonl, textOf, kst, changedFiles, splitScope, costOf, packGroups, jobsFor, judgeOne, nextIter, runGenerator, genText, requestMd, ledgerSummary, readAgent, toolLines, redact, fileExcerpt } from './codex-gate.mjs'
 import { buildRequestGraph, loadLoops, partBase, agentRounds, toolEventsOf, groupTools, promptsOf, harnessTouched, shortType, approvalOf, turnKey } from '../../scripts/request-graph.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
@@ -128,12 +128,12 @@ function evidenceOf(cell, x) {
     const hooks = x.mainRecs.filter(j => j.type === 'attachment' && j.attachment?.hookEvent).map(j => `${kst(ms(j.timestamp)).slice(11)} ${j.attachment.hookEvent}${j.attachment.hookName ? ' ' + j.attachment.hookName : ''} [${j.attachment.type}]${j.attachment.type === 'hook_additional_context' ? ' : ' + String(j.attachment.content ?? '').replace(/\s+/g, ' ').slice(0, 300) : ''}`)
     const reads = [...new Set([...x.mainTools, ...x.agents.flatMap(s => tools(s.recs))].filter(({ b }) => b.name === 'Read').map(({ b }) => relOf(b.input?.file_path) || '(저장소 밖 경로)'))]
     const notes = (x.related || []).flatMap(r => r.notes.map(n => `- ${r.type} ${r.id.slice(0, 6)} ${capMid(n, 800)}`))
-    const ex = [...new Set(x.writes.map(p => relOf(p)).filter(Boolean))].slice(0, 4).map(f => { let t = '(읽기 실패 — 삭제됨)'; try { t = fs.readFileSync(path.join(ROOT, f), 'utf8') } catch { /* 없음 */ } return `### ${f} (현재 본문 발췌)\n${redact(capMid(t, 1500))}` })
+    const ex = [...new Set(x.writes.map(p => relOf(p)).filter(Boolean))].slice(0, 4).map(f => `### ${f} (현재 본문 발췌)\n${fileExcerpt(f, 1500)}`)   // 2026-11-10 보안 검토 : 비밀 경로·허용 확장자 밖 = 본문 미첨부(codex-gate 공용)
     return { 'context.md': capMid(`## 훅 주입·실행 ${hooks.length}건\n${hooks.join('\n')}\n\n## 읽은 파일(Read) ${reads.length}건\n${reads.join('\n')}\n\n## 이 턴 작업 알림(서브에이전트 결과 요지) ${notes.length}건\n${notes.join('\n') || '(없음)'}\n`, 9000), 'products.md': capMid(ex.join('\n\n') || '(이 턴 Write·Edit 산출 파일 없음)', 7000) }
   }
   if (cell.prefix === 'H') return { 'tools.md': capMid(`## 도구 사용 기록(시각순 — Bash·PowerShell = 명령 + 출력 앞 2줄, 비밀 가림 / Read·Write·Edit = 경로만)\n${x.toolText || '(도구 사용 없음)'}\n\n## 훅 실행(묶음)\n${x.toolLog.filter(l => / hook /.test(l)).join('\n')}\n`, 14000), 'harness-files.txt': x.harness.length ? x.harness.join('\n') + '\n' : '(이 턴 하네스 파일 변경 없음)\n', 'response.md': capMid(x.response || '(메인 응답 없음)', 3000) }
   if (cell.prefix === 'L') return { 'loop.md': capMid(x.loopText, 10000) }
-  if (cell.prefix === 'G') return { 'generator.txt': x.gen ? genText(x.gen) : '(생성기 실행 없음)\n', 'request-md.md': x.reqMd ? `<!-- ${x.reqMd.f} -->\n${capMid(x.reqMd.text, 8000)}` : '(이 요청의 요청 md 없음)\n', 'graph-rules.md': capMid(x.rules, 10000) }
+  if (cell.prefix === 'G') return { 'generator.txt': x.gen ? genText(x.gen) : '(생성기 실행 없음)\n', 'request-md.md': x.reqMd ? `<!-- ${x.reqMd.f} -->\n${redact(capMid(x.reqMd.text, 8000))}` : '(이 요청의 요청 md 없음)\n', 'graph-rules.md': redact(capMid(x.rules, 10000)) }
   return { 'summary.md': capMid(`## 마스터 요청\n${capMid(P, 3000)}\n\n## 칸별 최종 판정 요약(이 턴 그래프 — 이번 묶음 판정 전)\n${x.cellText}\n\n## 이 턴 원장(턴 시작 뒤 시작)\n${x.ledgers}\n\n## 메인 응답\n${resp}\n`, 16000) }
 }
 
@@ -294,6 +294,12 @@ if (isMain && process.argv[2] === '--selftest') {
   assert.deepEqual(tr, { a: Date.parse('2026-11-10T01:00:00Z'), prompts: [{ t: Date.parse('2026-11-10T01:00:00Z'), text: '이번 요청' }, { t: Date.parse('2026-11-10T01:01:00Z'), text: '추가 지시' }] })
   assert.match(turnContract(CELLS[2], 'c3-turn-k', 'k', Date.parse('2026-11-10T01:00:00Z')), /칸 c3 하네스\(그래프 1\.1\.3\.1\)[\s\S]*- AC-1 : 하네스 파일 변경[\s\S]*- AC-3 : /)
   assert.deepEqual(CELLS.map(c => c.prefix).join(''), 'PXHLGT'); assert.ok(Object.values(AC).every(a => a.length === 3))
+  // 2026-11-10 보안 검토 : products.md 본문 = codex-gate 공용 fileExcerpt(허용 확장자 + 공용 비밀 경로 제외 + redact) — codex-gate selftest 와 같은 표
+  { const w = (f, t) => { fs.mkdirSync(path.dirname(path.join(tmp, f)), { recursive: true }); fs.writeFileSync(path.join(tmp, f), t) }
+    for (const f of ['.env.local', 'credentials.json', 'id_rsa', '.npmrc', 'voice/x.md']) { w(f, 'BODY_SECRET'); assert.equal(fileExcerpt(f, 1500, tmp), '(본문 미첨부 — 비밀 경로)', f) }
+    w('.claude/setup/pgm_list.md', '목록 본문\nPI_API_KEY="abc12345xyz"'); const pg = fileExcerpt('.claude/setup/pgm_list.md', 1500, tmp)
+    assert.ok(pg.includes('목록 본문') && pg.includes('[REDACTED') && !pg.includes('abc12345xyz'), pg)
+    w('a.png', 'PNG!'); assert.equal(fileExcerpt('a.png', 1500, tmp), '(본문 미첨부 — 허용 확장자 아님, 크기 4 바이트)') }
   // 가짜 판정자 : 모드 파일(mode.txt) pass | fail-H(H-1 unmet + H-D-001) | unavail(종료 1 + token_expired — 인증 만료 = judge-unavailable 분류 확인)
   const fake = path.join(tmp, 'fake-codex.mjs')
   fs.writeFileSync(fake, ["import fs from 'node:fs'", "if (process.argv.includes('login')) process.exit(0)", "let s = ''", "process.stdin.on('data', d => (s += d))",

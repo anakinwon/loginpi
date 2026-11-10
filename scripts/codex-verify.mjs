@@ -72,8 +72,11 @@ const C = {
 
 // export·입력 묶음에서 제외할 비밀 후보 경로
 // 7회차 D-002 : 자격 증명 디렉터리·파일 추가(.ssh·.aws·.azure·.gnupg·.git-credentials·.npmrc·.pypirc·.netrc·.docker/config.json·p12·pfx·keystore·credentials*.json·service-account*.json)
+// 2026-11-10 보안 검토 : 훅 증거(codex-gate·turn-gate)와 공용 — .env*·id_ed25519*·.credentials*·auth.json·*.kdbx·secrets*·루트 voice/ 추가(승인 파일 push-allow* = .omc 로 포함)
 const SECRET_PATH =
-  /(^|\/)(\.env($|\.)|\.(omc|codex|ssh|aws|azure|gnupg)(\/|$)|\.git-credentials$|\.npmrc$|\.pypirc$|\.netrc$|\.docker\/config\.json$|id_rsa|[^/]*\.(pem|key|p12|pfx|keystore)$|credentials[^/]*\.json$|service-account[^/]*\.json$)/i
+  /(^|\/)(\.env[^/]*($|\/)|\.(omc|codex|ssh|aws|azure|gnupg)(\/|$)|\.git-credentials$|\.npmrc$|\.pypirc$|\.netrc$|\.docker\/config\.json$|id_rsa|id_ed25519|\.credentials|[^/]*\.(pem|key|p12|pfx|keystore|kdbx)$|credentials[^/]*\.json$|service-account[^/]*\.json$|auth\.json$|secrets[^/]*($|\/))|^voice\//i
+// 증거 본문 허용 확장자(allowlist) — 그 밖은 경로·크기만
+const EVIDENCE_EXT = /\.(md|mjs|js|cjs|ts|tsx|jsx|json|css|html|sql|ya?ml|txt)$/i
 
 // 자격 증명 이름(대소문자 무시) — 값 가림 규칙의 이름 부분
 // 앞뒤 수식어는 {0,40} 상한 : 무제한(*)이면 긴 토큰 줄(번들·lock 파일)에서 역추적이 폭증한다(실측 4,900파일 82초)
@@ -674,13 +677,16 @@ function writeAtomic(file, data) {
 // ───────── 입력 묶음 ─────────
 const git = (args, cwd = ROOT, env, input) =>
   spawnSync('git', args, { cwd, env: env ? { ...process.env, ...env } : process.env, input, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 })
-const isSecretPath = (p) => SECRET_PATH.test(p.replace(/\\/g, '/'))
+export const isSecretPath = (p) => SECRET_PATH.test(String(p).replace(/\\/g, '/'))
+// 훅 증거 본문 첨부 가능 = 허용 확장자 + 비밀 경로 아님(gitignore 여부 무관) — 본문은 첨부 전 redact 필수(codex-gate fileExcerpt)
+export const canAttachBody = (p) => EVIDENCE_EXT.test(String(p)) && !isSecretPath(p)
 const cap = (s, n) => (Buffer.byteLength(s) > n ? s.slice(0, n) + `\n…[잘림 : ${n} 바이트 상한]` : s)
 // git pathspec 제외 — SECRET_PATH 와 같은 대상(diff 단계에서 먼저 뺀다)
 const SECRET_GLOBS = [
   '**/.env*', '**/.omc/**', '**/.codex/**', '**/.ssh/**', '**/.aws/**', '**/.azure/**', '**/.gnupg/**',
   '**/.git-credentials', '**/.npmrc', '**/.pypirc', '**/.netrc', '**/.docker/config.json',
   '**/*.pem', '**/*.key', '**/*.p12', '**/*.pfx', '**/*.keystore', '**/credentials*.json', '**/service-account*.json',
+  '**/id_rsa*', '**/id_ed25519*', '**/.credentials*', '**/auth.json', '**/*.kdbx', '**/secrets*', '**/secrets*/**', 'voice/**',
 ]
 const EXCLUDE_SPEC = ['--', '.', ':(exclude).omc', ...SECRET_GLOBS.map((g) => `:(exclude,glob,icase)${g}`)]
 const zsplit = (s) => s.split('\0').filter(Boolean)
@@ -1898,6 +1904,10 @@ async function selftest() {
   const credPaths = ['.ssh/id_ed25519', 'a/.ssh/config', '.aws/credentials', '.azure/x', '.gnupg/k', '.git-credentials', 'a/.npmrc', '.pypirc', '.netrc', '.docker/config.json', 'c.p12', 'd.PFX', 'e.keystore', 'credentials.json', 'gcp/credentials-prod.json', 'service-account-key.json']
   for (const p of credPaths) assert.ok(isSecretPath(p), `자격 증명 경로 : ${p}`)
   for (const p of ['docs/ssh-guide.md', 'src/npmrc.ts', 'docker/compose.yml', 'src/credential-form.tsx']) assert.ok(!isSecretPath(p), `오탐 : ${p}`)
+  // 2026-11-10 보안 검토 : 훅 증거 공용 패턴 + 본문 첨부 허용 목록
+  for (const p of ['.envrc', 'a/.env.multi', 'id_ed25519.pub', 'x/id_rsa_old', '.credentials.json', 'auth.json', 'x/vault.kdbx', 'secrets.yml', 'secrets/a.md', 'voice/x.md', '.omc/state/allow.json']) assert.ok(isSecretPath(p), `비밀 경로 : ${p}`)
+  for (const p of ['sitemap/cafe.pi/src/app/api/voice/rooms/r/route.ts', 'docs/auth.md', 'src/auth.ts', '.claude/setup/pgm_list.md']) assert.ok(!isSecretPath(p), `오탐 : ${p}`)
+  for (const [p, ok] of [['.claude/setup/pgm_list.md', true], ['a.SQL', true], ['b.yaml', true], ['c.png', false], ['credentials.json', false], ['.env.local', false], ['k.pfx', false]]) assert.equal(canAttachBody(p), ok, p)
   const uc = scrub('git clone https://bob:s3cr3tpw@github.com/o/r.git\nhttp://u:p@10.0.0.1:8080/x')
   assert.ok(!uc.text.includes('s3cr3tpw') && !uc.text.includes('u:p@') && uc.text.includes('[REDACTED:url-cred]github.com/o/r.git'), 'URL 자격 증명 가림')
   const plainUrls = 'https://example.com/a:b@c http://localhost:3000/api https://user@host.com/x https://docs.anthropic.com/en/docs?a=1:2'
