@@ -3,7 +3,7 @@
 <style>
 :root{color-scheme:light;--surface:#fcfcfb;--page:#f9f9f7;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--w:#2a78d6;--o:#eb6834;--ring:rgba(11,11,11,.10)}
 :root[data-theme=dark]{--surface:#1a1a19;--page:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--w:#3987e5;--o:#d95926;--ring:rgba(255,255,255,.10);color-scheme:dark}@media (prefers-color-scheme: dark){:root:not([data-theme=light]){--surface:#1a1a19;--page:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--w:#3987e5;--o:#d95926;--ring:rgba(255,255,255,.10);color-scheme:dark}}
-.st-done{--sc:#3fa66b;--st:#1e6b40;--sf:#dcf5e3;}.st-estimated{--sc:#3fa66b;--st:#1e6b40;--sf:#dcf5e3;}.st-running{--sc:#c9b800;--st:#1a1a1a;--sf:#fff200;--si:#1a1a1a;}.st-error{--sc:#d03b3b;--st:#b42f2f;}.st-blocked{--sc:#8a5cc2;--st:#7446ad;}.st-missing{--sc:#eb6834;--st:#a8461a;}.st-unassigned{--sc:#898781;--st:#5f5e5a;}.st-notrun{--sc:#c3c2b7;--st:#5f5e5a;}:root[data-theme=dark] .st-done{--sc:#5cc98a;--st:#7fdca4;--sf:#1f3d2b;}:root[data-theme=dark] .st-estimated{--sc:#5cc98a;--st:#7fdca4;--sf:#1f3d2b;}:root[data-theme=dark] .st-error{--sc:#d03b3b;--st:#f0705c;}:root[data-theme=dark] .st-blocked{--sc:#8a5cc2;--st:#b993e6;}:root[data-theme=dark] .st-missing{--sc:#eb6834;--st:#f08a5d;}:root[data-theme=dark] .st-unassigned{--sc:#898781;--st:#b0afa9;}:root[data-theme=dark] .st-notrun{--sc:#c3c2b7;--st:#a9a8a2;}@media (prefers-color-scheme: dark){:root:not([data-theme=light]) .st-done{--sc:#5cc98a;--st:#7fdca4;--sf:#1f3d2b;}:root:not([data-theme=light]) .st-estimated{--sc:#5cc98a;--st:#7fdca4;--sf:#1f3d2b;}:root:not([data-theme=light]) .st-error{--sc:#d03b3b;--st:#f0705c;}:root:not([data-theme=light]) .st-blocked{--sc:#8a5cc2;--st:#b993e6;}:root:not([data-theme=light]) .st-missing{--sc:#eb6834;--st:#f08a5d;}:root:not([data-theme=light]) .st-unassigned{--sc:#898781;--st:#b0afa9;}:root:not([data-theme=light]) .st-notrun{--sc:#c3c2b7;--st:#a9a8a2;}}.k-codex{--cf:#ffc2ef;--ci:#1a1a1a}.k-codex.st-done,.k-codex.st-estimated{--cf:#ff4fc8;--ci:#1a1a1a}
+.st-done{--sc:#3fa66b;--st:#1e6b40;--sf:#dcf5e3;}.st-estimated{--sc:#3fa66b;--st:#1e6b40;--sf:#dcf5e3;}.st-running{--sc:#c9b800;--st:#1a1a1a;--sf:#fff200;--si:#1a1a1a;}.st-error{--sc:#d03b3b;--st:#b42f2f;}.st-blocked{--sc:#8a5cc2;--st:#7446ad;}.st-missing{--sc:#eb6834;--st:#a8461a;}.st-unassigned{--sc:#898781;--st:#5f5e5a;}.st-notrun{--sc:#c3c2b7;--st:#5f5e5a;}:root[data-theme=dark] .st-done{--sc:#5cc98a;--st:#7fdca4;--sf:#1f3d2b;}:root[data-theme=dark] .st-estimated{--sc:#5cc98a;--st:#7fdca4;--sf:#1f3d2b;}:root[data-theme=dark] .st-error{--sc:#d03b3b;--st:#f0705c;}:root[data-theme=dark] .st-blocked{--sc:#8a5cc2;--st:#b993e6;}:root[data-theme=dark] .st-missing{--sc:#eb6834;--st:#f08a5d;}:root[data-theme=dark] .st-unassigned{--sc:#898781;--st:#b0afa9;}:root[data-theme=dark] .st-notrun{--sc:#c3c2b7;--st:#a9a8a2;}@media (prefers-color-scheme: dark){:root:not([data-theme=light]) .st-done{--sc:#5cc98a;--st:#7fdca4;--sf:#1f3d2b;}:root:not([data-theme=light]) .st-estimated{--sc:#5cc98a;--st:#7fdca4;--sf:#1f3d2b;}:root:not([data-theme=light]) .st-error{--sc:#d03b3b;--st:#f0705c;}:root:not([data-theme=light]) .st-blocked{--sc:#8a5cc2;--st:#b993e6;}:root:not([data-theme=light]) .st-missing{--sc:#eb6834;--st:#f08a5d;}:root:not([data-theme=light]) .st-unassigned{--sc:#898781;--st:#b0afa9;}:root:not([data-theme=light]) .st-notrun{--sc:#c3c2b7;--st:#a9a8a2;}}.k-codex{--cf:#ffd9f4;--ci:#1a1a1a;--cs:#db2777}.k-codex.st-done,.k-codex.st-estimated{--cf:#ff4fc8;--ci:#1a1a1a;--cs:#831843}
 *{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:13.5px/1.5 "Nanum Gothic","Malgun Gothic",system-ui,sans-serif}
 header{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 20px 6px}h1{font-size:19px;margin:0}.meta{color:var(--ink2);font-size:12.5px;margin:0 20px 10px}.meta a{color:var(--w);font-weight:700}.sp{flex:1}
 button,input,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:6px;padding:3px 9px}button{cursor:pointer}button[aria-pressed=true]{background:var(--w);border-color:var(--w);color:#fff}button:disabled{opacity:.4;cursor:default}
@@ -14,17 +14,19 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
 .gwrap{height:calc(100vh - 225px);min-height:420px;border:1px solid var(--grid);border-radius:8px;overflow:hidden}#svg{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.gtitle{margin:0 0 6px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ghd{display:flex;gap:8px;align-items:flex-start}.ghd .legend{flex:1}.zc button{min-width:34px;padding:2px 8px}
 .edge{fill:none;stroke:var(--axis);stroke-width:1.4}.flowon .edge{stroke-opacity:.35}.node,.fnode{cursor:pointer}
 .fl .v{fill:none;stroke-width:2.2}.fl .hit{fill:none;stroke:transparent;stroke-width:12}.flows:not(.fv) .fl{pointer-events:none}.fv .fl .hit{pointer-events:stroke}
-.fl.done .v{stroke:#3fa66b}.seqg.done .sq{fill:#3fa66b}.fl.running .v{stroke:#c9b800}.seqg.running .sq{fill:#c9b800}.fl.planned .v{stroke:#898781}.seqg.planned .sq{fill:#898781}.fl.example .v{stroke:#898781}.seqg.example .sq{fill:#898781}.fl.design .v{stroke:#2a78d6}.seqg.design .sq{fill:#2a78d6}.fl.loop .v{stroke-width:2.6}
+.fl.done .v{stroke:#3fa66b}.seqg.done .sq{fill:#3fa66b}.fl.running .v{stroke:#c9b800}.seqg.running .sq{fill:#c9b800}.fl.planned .v{stroke:#898781}.seqg.planned .sq{fill:#898781}.fl.example .v{stroke:#898781}.seqg.example .sq{fill:#898781}.fl.design .v{stroke:#2a78d6}.seqg.design .sq{fill:#2a78d6}.fl.yes .v{stroke:#1e6b40}.seqg.yes .sq{fill:#1e6b40}.fl.no .v{stroke:#d03b3b}.seqg.no .sq{fill:#d03b3b}.fl.noold .v{stroke:#d03b3b}.seqg.noold .sq{fill:#d03b3b}.fl.loop .v{stroke-width:2.6}.fl.no .v,.fl.noold .v{stroke-dasharray:5 4}.fl.noold,.seqg.noold{opacity:.35}
 .fl.running .v{stroke-width:3.2;animation:pulse 1.2s ease-in-out infinite}.fl.plan .v{stroke-dasharray:6 5}.seqg.plan{opacity:.45}
 .seqg.running .sq{fill:#fff200;stroke:#c9b800}.sq{stroke:var(--surface);stroke-width:1.5}.sqt{font-size:9.5px;font-weight:700;fill:#fff}.seqg.running .sqt{fill:#1a1a1a}.lpl{font-size:10.5px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px}
 .fv .seqg{opacity:0}.fv .fl:hover .seqg{opacity:1}.term.pend .box,.fnode.term.pend circle{stroke-dasharray:4 3}.fleg{color:var(--ink2)}.fleg .fr{color:#c9b800;text-shadow:0 0 4px #fff200}
-.box{fill:var(--sf,var(--surface));stroke:var(--sc);stroke-width:1.6}.strip{fill:var(--sc)}.st-missing .box,.st-estimated .box{stroke-dasharray:5 3;stroke-width:2}
+.box{fill:var(--sf,var(--surface));stroke:var(--sc);stroke-width:1.6}.strip{fill:var(--sc)}.st-missing .box{stroke-dasharray:5 3;stroke-width:2}
 .l1{font-size:12.5px;fill:var(--si,var(--ink))}.l1.b{font-weight:700}.l2{font-size:11.5px;fill:var(--si,var(--st))}.tm{font-size:10px;fill:var(--si,var(--ink2))}
-.fnode circle{fill:var(--sf,var(--sc));stroke:var(--sc);stroke-width:2}.fnode.st-missing circle{fill:var(--surface);stroke-dasharray:3 2}.fnode.st-estimated circle{stroke-dasharray:3 2}
-.k-codex .box,.fnode.k-codex circle{fill:var(--cf)}.k-codex .l1,.k-codex .l2,.k-codex .tm{fill:var(--ci)}.legend i.k-codex{background:var(--cf);border-color:var(--cf)}
+.fnode circle{fill:var(--sf,var(--sc));stroke:var(--sc);stroke-width:2}.fnode.st-missing circle{fill:var(--surface);stroke-dasharray:3 2}.chip{font-size:10px;fill:var(--si,var(--ink2))}.chip.head,.chip.run{font-weight:700}.chip.bad{fill:#b42f2f;font-weight:700}.chip.warn{fill:#a8461a;font-weight:700}.k-codex .chip{fill:var(--ci)}.st-running .chip{fill:var(--si)}:root[data-theme=dark] .node:not(.k-codex):not(.st-running) .chip.bad{fill:#f0705c}:root[data-theme=dark] .node:not(.k-codex):not(.st-running) .chip.warn{fill:#f08a5d}.edge.pair{stroke-width:2;stroke-opacity:.8}.chipsep{stroke:var(--grid);stroke-width:1}#detail li.sep{border-top:1px solid var(--grid);margin-top:3px;padding-top:3px;list-style:none}
+.hlist{height:100%;overflow:auto;font:10px/13px ui-monospace,Consolas,monospace;color:var(--ink2);background:var(--surface);border:1px solid var(--grid);border-radius:4px;padding:0 3px}.hlist div{white-space:nowrap}#detail li.chip.bad{color:#b42f2f}#detail li.chip.warn{color:#a8461a}#detail ol.tl{font:11px/1.45 ui-monospace,Consolas,monospace;padding-left:28px;max-height:40vh;overflow:auto}
+.k-codex .box,.fnode.k-codex circle{fill:var(--cf)}.k-codex .strip{fill:var(--cs)}.k-codex .l1,.k-codex .l2,.k-codex .tm{fill:var(--ci)}.legend i.k-codex{background:var(--cf);border:1.5px solid var(--cs)}.legend i.k-codex.st-notrun{border-style:dashed}
+.k-codex.st-notrun .l2{fill:var(--st);font-size:10.5px}.k-codex.st-error .box{stroke-width:2.6}.k-codex.st-notrun .box,.k-codex.st-missing .box{stroke:var(--cs);stroke-dasharray:5 3;stroke-width:2}.fnode.k-codex.st-notrun circle,.fnode.k-codex.st-missing circle{stroke:var(--cs);stroke-dasharray:3 2}
 .fnode .l1{font-size:12px;fill:var(--ink2);paint-order:stroke;stroke:var(--page);stroke-width:3px;stroke-linejoin:round}.fnode .l1.hid{opacity:0}.fnode:hover .l1{opacity:1;fill:var(--ink)}
-.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:0 0 8px}.legend i{display:inline-block;width:11px;height:11px;border-radius:6px;margin-right:4px;vertical-align:-1px;background:var(--sf,var(--sc));border:1.5px solid var(--sc)}.legend i.st-missing{border-style:dashed;background:transparent}.legend i.st-estimated{border-style:dashed}
-.badge{display:inline-block;border:1px solid var(--axis);border-radius:5px;padding:0 6px;font-size:12px}.badge[class*=st-]{color:var(--st);border-color:var(--sc);background:var(--sf,transparent)}.badge.st-missing,.badge.st-estimated{border-style:dashed}.badge.alert{color:#b42f2f;border:2px solid #d03b3b;font-weight:700}:root[data-theme=dark] .badge.alert{color:#f0705c}@media (prefers-color-scheme: dark){:root:not([data-theme=light]) .badge.alert{color:#f0705c}}.est{border-style:dashed;color:var(--o);border-color:var(--o)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:0 0 8px}.legend i{display:inline-block;width:11px;height:11px;border-radius:6px;margin-right:4px;vertical-align:-1px;background:var(--sf,var(--sc));border:1.5px solid var(--sc)}.legend i.st-missing{border-style:dashed;background:transparent}
+.badge{display:inline-block;border:1px solid var(--axis);border-radius:5px;padding:0 6px;font-size:12px}.badge[class*=st-]{color:var(--st);border-color:var(--sc);background:var(--sf,transparent)}.badge.st-missing{border-style:dashed}.badge.alert{color:#b42f2f;border:2px solid #d03b3b;font-weight:700}:root[data-theme=dark] .badge.alert{color:#f0705c}@media (prefers-color-scheme: dark){:root:not([data-theme=light]) .badge.alert{color:#f0705c}}.est{border-style:dashed;color:var(--o);border-color:var(--o)}.badge.final{border:2px solid var(--w);color:var(--w);font-weight:700}
 @keyframes pulse{0%,100%{filter:drop-shadow(0 0 1px #fff200)}50%{filter:drop-shadow(0 0 8px #fff200) drop-shadow(0 0 3px #c9b800)}}@keyframes blink{50%{opacity:.2}}@keyframes blinkf{50%{fill-opacity:.15}}
 .st-running .box,.fnode.st-running circle,.legend i.st-running,.badge.st-running{animation:pulse 1.2s ease-in-out infinite}.blink{animation:blink 1.2s ease-in-out infinite}tspan.blink{animation-name:blinkf}
 @media (prefers-reduced-motion: reduce){.fl.running .v{animation:none;stroke-width:4.5}.st-running .box,.fnode.st-running circle,.legend i.st-running,.badge.st-running,.blink{animation:none}.st-running .box,.fnode.st-running circle{stroke-width:3.5}.legend i.st-running,.badge.st-running{border-width:3px}}
@@ -32,16 +34,16 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
 .rd{border-collapse:collapse;width:100%;font-size:11.5px}.rd th,.rd td{border-bottom:1px solid var(--grid);padding:2px 4px;text-align:left;vertical-align:top}.rd th{color:var(--muted);font-weight:400}.rd .sum td{font-weight:700;border-bottom:0}.muted{color:var(--muted)}
 </style></head><body>
 <header><h1>요청 처리 흐름 그래프 <small class="muted">설계도</small></h1><span class="sp"></span>
-<button type="button" data-view="tree" aria-pressed="true">계층 트리</button><button type="button" data-view="force" aria-pressed="false">자유 배치(Obsidian 스타일)</button><button type="button" id="flow" aria-pressed="true" title="시작 → 실행 순서 → 종료 화살표 켜기/끄기">실행 경로</button><button type="button" id="theme" title="라이트/다크 전환">라이트/다크</button></header>
-<p class="meta">설계도판 — 실데이터(요청문·비용·시각) 없음, 시간은 형식 자리표시. 실요청 모니터링판은 work-statistics/mywork/myRequestGraph.html(gitignore, 턴 종료·서브에이전트 시작/종료 때 자동 갱신 + 화면 자동 새로고침). 노드를 누르면 역할·검수 기준·정본 문서. 원문 1.1.5.3.1 은 번호 오기로 보고 1.1.5.2.1 로 정규화. · <a href="../../../work-statistics/mywork/myRequestGraph.html">실시간 모니터링판 열기</a> <span class="muted">(로컬 생성 후 열림)</span></p>
+<button type="button" data-view="tree" aria-pressed="true">계층 트리</button><button type="button" data-view="force" aria-pressed="false">자유 배치(그래프 보기)</button><button type="button" id="dir" title="계층 트리 방향 전환 — 세로(위→아래, 기본) / 가로(왼쪽→오른쪽)">방향 : 세로</button><button type="button" id="flow" aria-pressed="true" title="시작 → 실행 순서 → 종료 화살표 켜기/끄기">실행 경로</button><button type="button" id="theme" title="라이트/다크 전환">라이트/다크</button></header>
+<p class="meta">설계도판 — 실데이터(요청문·비용·시각) 없음, 시간은 형식 자리표시. 실요청 모니터링판은 work-statistics/mywork/myRequestGraph.html(gitignore, 턴 종료·서브에이전트 시작/종료 때 자동 갱신 + 화면 자동 새로고침). 노드를 누르면 역할·검수 기준·정본 문서. 노드 번호 = 처리 순서 일련번호 1~15(실행 경로 순번은 원 배지). · <a href="../../../work-statistics/mywork/myRequestGraph.html">실시간 모니터링판 열기</a> <span class="muted">(로컬 생성 후 열림)</span></p>
 <div class="wrap">
 <aside class="card"><div class="ctl" hidden><input id="q" type="search" placeholder="요청문 검색"><select id="fc"><option value="">카테고리 전체</option></select><select id="fd"><option value="">날짜 전체</option></select></div>
 <ul id="list"></ul><div class="lpg" hidden><button type="button" id="lprev">‹ 이전</button><button type="button" id="lnext">다음 ›</button><span id="lcnt" class="muted"></span></div></aside>
-<section class="card"><div class="ghd"><div class="legend"><span><i class="st-done"></i>완료</span><span><i class="st-estimated"></i>완료(추정)</span><span><i class="st-running"></i>진행</span><span><i class="st-error"></i>오류</span><span><i class="st-blocked"></i>BLOCKED</span><span><i class="st-missing"></i>미수행</span><span><i class="st-unassigned"></i>미배정(설계)</span><span><i class="st-notrun"></i>미실행</span><span><i class="k-codex"></i>Codex 미완료</span><span><i class="k-codex st-done"></i>Codex 완료</span><span><span class="badge est">시간 기준 연결(추정)</span></span><span class="fleg"><b style="color:#3fa66b">—</b> 지나감(실선) · <b style="color:#898781">- -</b> 예정(점선) · <b class="fr">—</b> 진행 중 노드로 진입 · 되돌이 = k회차</span></div><span class="zc" role="group" aria-label="확대/축소"><button type="button" data-z="fit" title="그림 전체를 화면에 맞춤">맞춤</button> <button type="button" data-z="in" title="확대">+</button> <button type="button" data-z="out" title="축소">−</button></span></div>
+<section class="card"><div class="ghd"><div class="legend"><span><i class="st-done"></i>완료</span><span><i class="st-estimated"></i>완료(추정)</span><span><i class="st-running"></i>진행</span><span><i class="st-error"></i>오류</span><span><i class="st-blocked"></i>BLOCKED</span><span><i class="st-missing"></i>미수행</span><span><i class="st-unassigned"></i>미배정(설계)</span><span><i class="st-notrun"></i>미실행</span><span><i class="k-codex st-notrun"></i>Codex 미수행(점선)</span><span><i class="k-codex"></i>Codex 미완료(실선)</span><span><i class="k-codex st-done"></i>Codex 완료</span><span><span class="badge est">시간 기준 연결(추정)</span></span><span class="fleg"><b style="color:#3fa66b">—</b> 지나감(실선) · <b style="color:#898781">- -</b> 예정(점선) · <b class="fr">—</b> 진행 중 노드로 진입 · 번호 = 표준 처리 순서(실행된 칸을 SA → 짝 CDX → 다음 SA … 순으로 끝까지 연결) · <b style="color:#1e6b40">→Y</b> 검증 Y 뒤 다음 칸 · CDX 가 Y 아니면 칸에 ⚠ 검증 누락·N 표시(선은 이어 감) · <b style="color:#d03b3b">⇢N</b> 검증 N → 되돌림(점선, 최종 Y 면 흐리게) · 칸 안 줄 = 에이전트 실행(×n·회송·<b style="color:#b42f2f">✖</b> 실패·<b style="color:#a8461a">⚠</b> 장시간)·판정 회차·하네스 사용(시각순)</span></div><span class="zc" role="group" aria-label="확대/축소"><button type="button" data-z="fit" title="그림 전체를 화면에 맞춤">맞춤</button> <button type="button" data-z="in" title="확대">+</button> <button type="button" data-z="out" title="축소">−</button></span></div>
 <p id="gtitle" class="gtitle"></p><div class="gwrap"><svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="요청 처리 흐름 그래프"></svg></div></section>
 <aside class="card" id="detail"></aside>
 </div>
-<script type="application/json" id="graphdata">{"design":true,"live":false,"size":{"termW":96,"termH":32,"boxW":158,"colGap":26,"lineH":15,"tmH":13,"padY":6,"gapY":8,"minScale":0.72,"maxScale":1.4,"forceMinScale":0.45,"repel":9000,"link":120,"gravity":0.003,"reloadRun":5000,"reloadIdle":30000,"pageSize":50,"days":7,"mdRecent":30,"headCut":80},"flow":{"done":"#3fa66b","running":"#c9b800","planned":"#898781","example":"#898781","design":"#2a78d6"},"alert":{"longMs":1800000,"errors":5,"nearCap":4,"cap":5},"slots":[{"id":"1","kind":"request","role":"요청·needs-input 응답·최종 승인 주체(사람)","criteria":"요청 원문이 정본 — 목표·범위·완료 기준은 아소카가 계약으로 확정","docs":[{"name":"마스터","href":"../60.%20nodes/%EB%A7%88%EC%8A%A4%ED%84%B0.md"}]},{"id":"1.1","kind":"main","role":"요청 접수 → 목표·범위·완료 기준 확정 → 단계 계획대로 전문가 서브에이전트 지명(메인 직접 작업 금지)","criteria":"운영 규칙 0절 — 메인 = 정리·리뷰·승인·회신","docs":[{"name":"아소카","href":"../60.%20nodes/%EC%95%84%EC%86%8C%EC%B9%B4.md"},{"name":"anakins_prompt","href":"../10.%20prompt/anakins_prompt.md"}]},{"id":"1.1.1","kind":"sub","role":"지시문 한 건의 설계 점검 — 목표·제약·출력 계약","criteria":"10장 지시문 설계 규칙","docs":[{"name":"anakins_prompt","href":"../10.%20prompt/anakins_prompt.md"}]},{"id":"1.1.1.1","kind":"codex","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.2","kind":"sub","role":"한 턴에 보는 토큰 전체 점검 — 넣을 것·뺄 것·남길 곳","criteria":"20장 컨텍스트 규칙","docs":[{"name":"anakins_context","href":"../20.%20context/anakins_context.md"}]},{"id":"1.1.2.1","kind":"codex","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.3","kind":"sub","role":"모델 바깥 강제 장치 점검 — 훅·권한·에이전트 정의·격리·관측","criteria":"30장 하네스 규칙","docs":[{"name":"anakins_harnes","href":"../30.%20harnes/anakins_harnes.md"}]},{"id":"1.1.3.1","kind":"codex","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.4","kind":"sub","role":"되돌아가는 엣지 점검 — build → verify → Codex → 회송 → 승인","criteria":"40장 A절 완료 기준 · C절 금지와 멈춤","docs":[{"name":"anakins_loop","href":"../40.%20loop/anakins_loop.md"},{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"}]},{"id":"1.1.4.1","kind":"codex","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.5","kind":"sub","role":"노드·엣지·파일 계약으로 작업 흐름 전체 점검 — 병렬·직렬·합류","criteria":"50장 A절 그래프 설계 체크리스트 10","docs":[{"name":"anakins_graph","href":"anakins_graph.md"}]},{"id":"1.1.5.1","kind":"codex","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.5.2","kind":"sub","role":"요청건을 그래프 페이지·Obsidian md 노드로 생성해 모니터링(scripts/request-graph.mjs)","criteria":"50장 그래프 규칙 — 기록에 있는 사실만 표시, 추정 연결은 배지로 구분","docs":[{"name":"anakins_graph","href":"anakins_graph.md"}]},{"id":"1.1.5.2.1","kind":"codex","role":"외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.2","kind":"approve","role":"팀장(teamanakin-admin) 판정을 받아 최종 등급 확정·마스터 보고(하향만)","criteria":"팀원이 1명이라도 실행된 턴은 팀장 승인 생략 불가(조회·커밋 단독 턴 제외)","docs":[{"name":"아소카","href":"../60.%20nodes/%EC%95%84%EC%86%8C%EC%B9%B4.md"},{"name":"teamanakin-admin","href":"../60.%20nodes/teamanakin-admin.md"}]}],"requests":[{"key":"design","when":"설계도","head":"설계도 — 요청 1건의 처리 흐름(마스터 설계 트리)","meta":"","nodes":[{"id":"1","parent":null,"label":"마스터 아나킨 요청","slot":"1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1","parent":"1","label":"파다완 아소카 접수","slot":"1.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.1","parent":"1.1","label":"SA-프롬프트","slot":"1.1.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.1.1","parent":"1.1.1","label":"CDX-프롬프트 검수","slot":"1.1.1.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.2","parent":"1.1","label":"SA-컨텍스트","slot":"1.1.2","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.2.1","parent":"1.1.2","label":"CDX-컨텍스트 검수","slot":"1.1.2.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.3","parent":"1.1","label":"SA-하네스","slot":"1.1.3","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.3.1","parent":"1.1.3","label":"CDX-하네스 검수","slot":"1.1.3.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.4","parent":"1.1","label":"SA-루프","slot":"1.1.4","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.4.1","parent":"1.1.4","label":"CDX-루프 검수","slot":"1.1.4.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.5","parent":"1.1","label":"SA-그래프","slot":"1.1.5","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.5.1","parent":"1.1.5","label":"CDX-그래프 검수","slot":"1.1.5.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.5.2","parent":"1.1.5","label":"서브에이전트6 : 요청건을 obsidian 그래프로 생성해 가시적으로 모니터링","slot":"1.1.5.2","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.1.5.2.1","parent":"1.1.5.2","label":"CDX-총괄 검수","slot":"1.1.5.2.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false},{"id":"1.2","parent":"1","label":"파다완 아소카 승인","slot":"1.2","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false}],"path":{"term":{"S":{},"E":{}},"edges":[{"from":"S","to":"1","seq":1,"loop":false,"state":"design","pass":false},{"from":"1","to":"1.1","seq":2,"loop":false,"state":"design","pass":false},{"from":"1.1","to":"1.1.1","seq":3,"loop":false,"state":"design","pass":false},{"from":"1.1.1","to":"1.1.1.1","seq":4,"loop":false,"state":"design","pass":false},{"from":"1.1.1.1","to":"1.1.2","seq":5,"loop":false,"state":"design","pass":false},{"from":"1.1.2","to":"1.1.2.1","seq":6,"loop":false,"state":"design","pass":false},{"from":"1.1.2.1","to":"1.1.3","seq":7,"loop":false,"state":"design","pass":false},{"from":"1.1.3","to":"1.1.3.1","seq":8,"loop":false,"state":"design","pass":false},{"from":"1.1.3.1","to":"1.1.4","seq":9,"loop":false,"state":"design","pass":false},{"from":"1.1.4","to":"1.1.4.1","seq":10,"loop":false,"state":"design","pass":false},{"from":"1.1.4.1","to":"1.1.5","seq":11,"loop":false,"state":"design","pass":false},{"from":"1.1.5","to":"1.1.5.1","seq":12,"loop":false,"state":"design","pass":false},{"from":"1.1.5.1","to":"1.1.5.2","seq":13,"loop":false,"state":"design","pass":false},{"from":"1.1.5.2","to":"1.1.5.2.1","seq":14,"loop":false,"state":"design","pass":false},{"from":"1.1.5.2.1","to":"1.2","seq":15,"loop":false,"state":"design","pass":false},{"from":"1.2","to":"E","seq":16,"loop":false,"state":"design","pass":false},{"from":"1.1.4.1","to":"1.1.4","seq":"↺","loop":true,"state":"example","pass":false,"label":"FAIL 시 회송 · 상한 5회"}]}}]}</script>
+<script type="application/json" id="graphdata">{"design":true,"live":false,"size":{"termW":96,"termH":32,"termGapS":40,"termGapE":40,"foot":"1.2","boxW":158,"colGap":26,"pairGap":28,"pairIndent":18,"chipH":13,"wrapW":1800,"rowGap":34,"lineH":15,"tmH":13,"padY":6,"gapY":8,"minScale":0.72,"maxScale":1.4,"forceMinScale":0.45,"repel":9000,"link":120,"gravity":0.003,"reloadRun":5000,"reloadIdle":30000,"pageSize":50,"days":7,"mdRecent":30,"headCut":80},"flow":{"done":"#3fa66b","running":"#c9b800","planned":"#898781","example":"#898781","design":"#2a78d6","yes":"#1e6b40","no":"#d03b3b","noold":"#d03b3b"},"alert":{"longMs":1800000,"errors":5,"nearCap":4,"cap":5},"slots":[{"id":"1","kind":"request","role":"요청·needs-input 응답·최종 승인 주체(사람)","criteria":"요청 원문이 정본 — 목표·범위·완료 기준은 아소카가 계약으로 확정","docs":[{"name":"마스터","href":"../60.%20nodes/%EB%A7%88%EC%8A%A4%ED%84%B0.md"}]},{"id":"1.1","kind":"main","role":"요청 접수 → 목표·범위·완료 기준 확정 → 단계 계획대로 전문가 서브에이전트 지명(메인 직접 작업 금지)","criteria":"운영 규칙 0절 — 메인 = 정리·리뷰·승인·회신","docs":[{"name":"아소카","href":"../60.%20nodes/%EC%95%84%EC%86%8C%EC%B9%B4.md"},{"name":"anakins_prompt","href":"../10.%20prompt/anakins_prompt.md"}]},{"id":"1.1.1","kind":"sub","role":"지시문 한 건의 설계 점검 — 목표·제약·출력 계약","criteria":"10장 지시문 설계 규칙","docs":[{"name":"anakins_prompt","href":"../10.%20prompt/anakins_prompt.md"}]},{"id":"1.1.1.1","kind":"codex","role":"Codex1 검수 대상 : 메인 브리프 — 요구 항목 누락·추가 해석 없음 / 쓰기 허용·금지 경로 명시 / AC-n 이 명령·파일·수치로 판정 가능 (외부 판정자 Codex read-only 교차 검수)","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED · 호출 : 브리프 작성 직후·build 앞(산출 턴) 필수 · 원장 id 접두 c1-","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.2","kind":"sub","role":"한 턴에 보는 토큰 전체 점검 — 넣을 것·뺄 것·남길 곳","criteria":"20장 컨텍스트 규칙","docs":[{"name":"anakins_context","href":"../20.%20context/anakins_context.md"}]},{"id":"1.1.2.1","kind":"codex","role":"Codex2 검수 대상 : collect 결과(조회 단독 포함)·조사형 대행 — 주장·수치마다 출처(경로:줄·명령) / 필요한 근거 누락 없음 / 미확인은 [확인중]·[TBD] (외부 판정자 Codex read-only 교차 검수)","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED · 호출 : collect 결과 직후 필수 · 원장 id 접두 c2-","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.3","kind":"sub","role":"모델 바깥 강제 장치 점검 — 훅·권한·에이전트 정의·격리·관측","criteria":"30장 하네스 규칙","docs":[{"name":"anakins_harnes","href":"../30.%20harnes/anakins_harnes.md"}]},{"id":"1.1.3.1","kind":"codex","role":"Codex3 검수 대상 : build 의 하네스 파일 변경(훅·settings·에이전트 정의·운용 기준서) — 규칙 정합 / 우회·회귀 없음 / selftest 통과 (외부 판정자 Codex read-only 교차 검수)","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED · 호출 : build 직후 c4 와 함께 SubagentStop 훅 자동 필수 — 하네스 변경 0건이면 해당 없음 기록 · 원장 id 접두 c3-","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.4","kind":"sub","role":"되돌아가는 엣지 점검 — build → Codex(SubagentStop 훅 자동) → 회송 → 승인","criteria":"40장 A절 완료 기준 · C절 금지와 멈춤","docs":[{"name":"anakins_loop","href":"../40.%20loop/anakins_loop.md"},{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"}]},{"id":"1.1.4.1","kind":"codex","role":"Codex4 검수 대상 : build 산출물 / decide 결론 / review 결과 / 산출형 대행 — 브리프 AC-n 충족 / 결론 근거·반론 검토 / 검수 지적의 근거 (외부 판정자 Codex read-only 교차 검수)","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED · 호출 : build 직후 / decide 직후 / review 직후 필수(SubagentStop 훅 자동) · 원장 id 접두 c4-","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.5","kind":"sub","role":"노드·엣지·파일 계약으로 작업 흐름 전체 점검 — 병렬·직렬·합류","criteria":"50장 A절 그래프 설계 체크리스트 10","docs":[{"name":"anakins_graph","href":"anakins_graph.md"}]},{"id":"1.1.5.1","kind":"codex","role":"Codex5 검수 대상 : graph 보고 — 엔지니어링 N/5·미수행·비정상이 생성기 출력과 일치 / 판독이 정본 정의를 따름 (외부 판정자 Codex read-only 교차 검수)","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED · 호출 : graph 직후 필수 · 원장 id 접두 c5-","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.1.5.2","kind":"sub","role":"요청건을 그래프 페이지·Obsidian md 노드로 생성해 모니터링(scripts/request-graph.mjs)","criteria":"50장 그래프 규칙 — 기록에 있는 사실만 표시, 추정 연결은 배지로 구분","docs":[{"name":"anakins_graph","href":"anakins_graph.md"}]},{"id":"1.1.5.2.1","kind":"codex","role":"Codex6 검수 대상 : 팀장 승인 직전 총괄 / commit 결과 / 팀장 모드 2 재평가 결과 / 팀장 모드 1 승인 판정 — 실행된 단계 CDX 전부 PASS / 요청 항목마다 근거 / 팀원 결과 간 모순 없음 ; 커밋 = 묶음·메시지 규칙·비밀 없음 ; 승인 = 등급·지적이 칸별 결과·maxGrade·실기기 미검증 상한과 일치 (외부 판정자 Codex read-only 교차 검수)","criteria":"verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED · 호출 : admin 직전 / commit 직후 / 재평가 직후 / 승인 직후·응답 앞 필수 · 원장 id 접두 c6-","docs":[{"name":"codex_procedure","href":"../40.%20loop/codex_procedure.md"},{"name":"codex-judge","href":"../60.%20nodes/codex-judge.md"}]},{"id":"1.2","kind":"approve","role":"턴 묶음 판정(Stop 훅 turn-gate.mjs — 보이는 CDX 칸 중 Y 아닌 칸을 Codex 1회로) 뒤 아소카가 직접 종료 승인 — 팀장(teamanakin-admin) 판정은 있으면 근거로 함께","criteria":"메인 응답 끝 '종료 승인 : \u003c승인|보류> — \u003c근거>' 줄 = 완료(없으면 Stop 훅이 차단, 연속 차단 3회 상한 = 승인 강제 실패) · 팀원이 1명이라도 실행된 턴은 팀장 승인 생략 불가(조회·커밋 단독 턴 제외)","docs":[{"name":"아소카","href":"../60.%20nodes/%EC%95%84%EC%86%8C%EC%B9%B4.md"},{"name":"teamanakin-admin","href":"../60.%20nodes/teamanakin-admin.md"}]}],"requests":[{"key":"design","when":"설계도","head":"설계도 — 요청 1건의 처리 흐름(마스터 설계 트리)","meta":"","nodes":[{"id":"1","parent":null,"label":"마스터 아나킨 요청","slot":"1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":1},{"id":"1.1","parent":"1","label":"파다완 아소카 접수","slot":"1.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":2},{"id":"1.1.1","parent":"1.1","label":"SA-프롬프트","slot":"1.1.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":3},{"id":"1.1.1.1","parent":"1.1.1","label":"CDX-프롬프트 검수","slot":"1.1.1.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":"3-1"},{"id":"1.1.2","parent":"1.1","label":"SA-컨텍스트","slot":"1.1.2","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":4},{"id":"1.1.2.1","parent":"1.1.2","label":"CDX-컨텍스트 검수","slot":"1.1.2.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":"4-1"},{"id":"1.1.3","parent":"1.1","label":"SA-하네스","slot":"1.1.3","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":5},{"id":"1.1.3.1","parent":"1.1.3","label":"CDX-하네스 검수","slot":"1.1.3.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":"5-1"},{"id":"1.1.4","parent":"1.1","label":"SA-루프","slot":"1.1.4","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":6},{"id":"1.1.4.1","parent":"1.1.4","label":"CDX-루프 검수","slot":"1.1.4.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":"6-1"},{"id":"1.1.5","parent":"1.1","label":"SA-그래프","slot":"1.1.5","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":7},{"id":"1.1.5.1","parent":"1.1.5","label":"CDX-그래프 검수","slot":"1.1.5.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":"7-1"},{"id":"1.1.5.2","parent":"1.1.5","label":"서브에이전트6 : 요청건을 obsidian 그래프로 생성해 가시적으로 모니터링","slot":"1.1.5.2","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":8},{"id":"1.1.5.2.1","parent":"1.1.5.2","label":"CDX-총괄 검수","slot":"1.1.5.2.1","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":"8-1"},{"id":"1.2","parent":"1","label":"파다완 아소카 승인","slot":"1.2","status":"unassigned","statusLabel":"설계","lines":[],"t0":null,"t1":null,"run":false,"no":9}],"path":{"term":{"S":{},"E":{}},"edges":[{"from":"S","to":"1","seq":1,"loop":false,"state":"design","pass":false},{"from":"1","to":"1.1","seq":2,"loop":false,"state":"design","pass":false},{"from":"1.1","to":"1.1.1","seq":3,"loop":false,"state":"design","pass":false},{"from":"1.1.1","to":"1.1.1.1","seq":4,"loop":false,"state":"design","pass":false},{"from":"1.1.1.1","to":"1.1.2","seq":5,"loop":false,"state":"design","pass":false},{"from":"1.1.2","to":"1.1.2.1","seq":6,"loop":false,"state":"design","pass":false},{"from":"1.1.2.1","to":"1.1.3","seq":7,"loop":false,"state":"design","pass":false},{"from":"1.1.3","to":"1.1.3.1","seq":8,"loop":false,"state":"design","pass":false},{"from":"1.1.3.1","to":"1.1.4","seq":9,"loop":false,"state":"design","pass":false},{"from":"1.1.4","to":"1.1.4.1","seq":10,"loop":false,"state":"design","pass":false},{"from":"1.1.4.1","to":"1.1.5","seq":11,"loop":false,"state":"design","pass":false},{"from":"1.1.5","to":"1.1.5.1","seq":12,"loop":false,"state":"design","pass":false},{"from":"1.1.5.1","to":"1.1.5.2","seq":13,"loop":false,"state":"design","pass":false},{"from":"1.1.5.2","to":"1.1.5.2.1","seq":14,"loop":false,"state":"design","pass":false},{"from":"1.1.5.2.1","to":"1.2","seq":15,"loop":false,"state":"design","pass":false},{"from":"1.2","to":"E","seq":16,"loop":false,"state":"design","pass":false},{"from":"1.1.4.1","to":"1.1.4","seq":"↺","loop":true,"state":"example","pass":false,"label":"FAIL 시 회송 · 상한 5회"}]}}]}</script>
 <script>const fmtSpan = function fmtSpan(n, now, short) {
   if (n.tmNote && n.t0 == null) return n.tmNote   // 완료(추정) 슬롯 : 시각 대신 사유
   const kst = v => new Date(v).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
@@ -54,24 +56,75 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
   let n = 0, totalMs = 0
   for (const r of rows) { if (!r.blocked) n++; if (r.t0 != null && (r.run || r.t1 != null)) totalMs += (r.run ? now : r.t1) - r.t0 }
   return { n, totalMs }
-};(function client() {
+}, layoutTree = function layoutTree(nodes, dir, Z, size, isPair) {
+  const kids = {}, pos = {}, mate = {}, gap = Z.pairGap || 0, ind = Z.pairIndent || 0; let dmax = 0
+  for (const n of nodes) { if (n.parent && isPair && isPair(n)) mate[n.parent] = n; else (kids[n.parent] = kids[n.parent] || []).push(n) }
+  const top = nodes.find(n => !n.parent)
+  if (dir === 'h') {
+    let y = 0
+    const walk = (n, d, reserve) => {
+      dmax = Math.max(dmax, d); const ch = kids[n.id] || [], s = size(n), mt = mate[n.id], x = d * (Z.boxW + Z.colGap)
+      if (mt) {   // 짝 : SA 위 맞춤 + CDX 다음 열 같은 위, SA 의 다른 자식 = CDX 아래부터
+        const m = size(mt), y0 = y; dmax = Math.max(dmax, d + 1)
+        pos[n.id] = { d, x, y: y0, w: s.w, h: s.h }; pos[mt.id] = { d: d + 1, x: x + s.w + Z.colGap, y: y0, w: m.w, h: m.h }
+        y += Math.max(s.h, m.h) + Z.gapY; ch.forEach(c => walk(c, d + 1, 0)); return
+      }
+      if (!ch.length) { const R = Math.max(s.h, reserve); pos[n.id] = { d, x, y: y + (R - s.h) / 2, w: s.w, h: s.h }; y += R + (n.slot ? Z.gapY : Z.gapY / 2); return }
+      ch.forEach(c => walk(c, d + 1, ch.length === 1 ? Math.max(s.h, reserve) : 0))
+      const a = pos[ch[0].id], b = pos[ch[ch.length - 1].id]; pos[n.id] = { d, x, y: (a.y + a.h / 2 + b.y + b.h / 2) / 2 - s.h / 2, w: s.w, h: s.h }
+    }
+    walk(top, 0, 0)
+    return { pos, dmax }
+  }
+  // 머리 = 칸 + 아래 들여쓴 짝 CDX(있으면) 덩어리
+  const head = n => { const s = size(n), m = mate[n.id] && size(mate[n.id]); return { s, m, w: m ? Math.max(s.w, ind + m.w) : s.w, h: m ? s.h + gap + m.h : s.h } }
+  const blk = {}
+  const measure = (n, d) => {
+    dmax = Math.max(dmax, d + (mate[n.id] ? 1 : 0)); const ch = kids[n.id] || [], s = head(n), rows = []
+    ch.forEach(c => measure(c, d + 1))
+    let row = [], rw = 0
+    for (const c of ch) { const bw = blk[c.id].w; if (row.length && rw + Z.colGap + bw > Z.wrapW) { rows.push({ xs: row, w: rw }); row = []; rw = 0 } rw += (row.length ? Z.colGap : 0) + bw; row.push(c) }
+    if (row.length) rows.push({ xs: row, w: rw })
+    for (const r of rows) r.h = Math.max(...r.xs.map(c => blk[c.id].h))
+    const cw = Math.max(0, ...rows.map(r => r.w)), chh = rows.reduce((a, r) => a + r.h, 0) + Z.rowGap * Math.max(0, rows.length - 1)
+    blk[n.id] = { s, rows, w: Math.max(s.w, cw), h: s.h + (rows.length ? Z.rowGap + chh : 0) }
+  }
+  const place = (n, d, x0, y0) => {   // x0 = 블록 왼쪽, y0 = 블록 위
+    const b = blk[n.id], hd = b.s, x = x0 + (b.w - hd.w) / 2, mt = mate[n.id]
+    pos[n.id] = { d, x, y: y0, w: hd.s.w, h: hd.s.h }
+    if (mt) pos[mt.id] = { d: d + 1, x: x + ind, y: y0 + hd.s.h + gap, w: hd.m.w, h: hd.m.h }
+    let y = y0 + hd.h + Z.rowGap
+    for (const r of b.rows) { let x = x0 + (b.w - r.w) / 2; for (const c of r.xs) { place(c, d + 1, x, y); x += blk[c.id].w + Z.colGap } y += r.h + Z.rowGap }
+  }
+  // 세로 바닥 칸(2026-11-10 마스터 C-15 "'승인' 하단 정중앙", 세로 모드만) : Z.foot(승인 칸 id)을 루트 형제 줄에서 빼고 그림 맨 아래 · 전체 폭 정중앙에 둔다
+  const foot = Z.foot && (kids[top.id] || []).find(n => n.id === Z.foot)
+  if (foot) kids[top.id] = kids[top.id].filter(n => n !== foot)
+  measure(top, 0); place(top, 0, 0, 0)
+  if (foot) { measure(foot, 1); const ps = Object.values(pos), cx = (Math.min(...ps.map(p => p.x)) + Math.max(...ps.map(p => p.x + p.w))) / 2; place(foot, 1, cx - blk[foot.id].w / 2, Math.max(...ps.map(p => p.y + p.h)) + Z.rowGap) }
+  return { pos, dmax }
+}, termPos = function termPos(pos, dir, Z) {
+  const r0 = pos['1'], bottom = Math.max(...Object.values(pos).map(p => p.y + p.h)), f = pos[Z.foot], mid = (p, h) => p.y + p.h / 2 - h / 2
+  if (dir !== 'v') { const x = -(Z.termW + Z.colGap); return { S: { x, y: mid(r0, Z.termH) }, E: { x, y: bottom - Z.termH } } }
+  return { S: { x: r0.x - Z.termGapS - Z.termW, y: mid(r0, Z.termH) }, E: f ? { x: f.x - Z.termGapE - Z.termW, y: mid(f, Z.termH) } : { x: r0.x + r0.w / 2 - Z.termW / 2, y: bottom + Z.rowGap } }
+}, matePos = (m, r, gap) => ({ x: m.x, y: m.y + m.r + gap + r });(function client() {
   const D = JSON.parse(document.getElementById('graphdata').textContent)
   const $ = id => document.getElementById(id), NS = 'http://www.w3.org/2000/svg', Z = D.size, NOW = Date.now()
   const SL = Object.fromEntries(D.slots.map(s => [s.id, s]))
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
   const el = (tag, at, parent) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); if (parent) parent.appendChild(e); return e }
-  const H = Object.fromEntries(new URLSearchParams(location.hash.slice(1)))   // 새로고침 뒤 복원 : k 요청 · v 보기 · f 실행 경로 · p 쪽 · s 목록 스크롤 · z 확대 영역
-  let flowOn = H.f !== '0', view = H.v === 'force' ? 'force' : 'tree', cur = null, page = +H.p || 1, raf = 0, byId = {}, root = null, touched = false, drag = null, pan = null, moved = 0, hooks = {}
+  const H = Object.fromEntries(new URLSearchParams(location.hash.slice(1)))   // 새로고침 뒤 복원 : k 요청 · v 보기 · o 트리 방향(v 세로 기본 · h 가로) · f 실행 경로 · p 쪽 · s 목록 스크롤 · z 확대 영역
+  let flowOn = H.f !== '0', view = H.v === 'force' ? 'force' : 'tree', dir = H.o === 'h' ? 'h' : 'v', fitCx = null, cur = null, page = +H.p || 1, raf = 0, byId = {}, root = null, touched = false, drag = null, dragId = null, pan = null, moved = 0, hooks = {}
   const svg = $('svg'), vb = { x: 0, y: 0, w: 1, h: 1 }
   const PH = { full: '시작 MM-DD HH:mm:ss ~ 종료 HH:mm:ss (소요 Xm Ys)', short: 'HH:mm:ss~HH:mm:ss · XmYs' }   // 설계도판 자리표시
   const termTxt = (n, short) => D.design ? (short ? 'HH:mm:ss' : 'MM-DD HH:mm:ss') : n.t0 != null ? new Date(n.t0).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(short ? 11 : 5) : n.statusLabel.startsWith('중단') ? '중단' : n.pend ? '진행 중' : '—'
   const spanTxt = (n, short) => n.term ? (short ? '' : n.statusLabel + ' ') + termTxt(n, short) : D.design ? (short ? PH.short : PH.full) : fmtSpan(n, NOW, short)
   const spanHtml = n => esc(spanTxt(n)).replace('진행 중', '<span class="blink">진행 중</span>')
   const durTxt = v => { const s = Math.round(v / 1000); return Math.floor(s / 60) + 'm ' + (s % 60) + 's' }
-  const tip = n => (n.slot ? n.id + ' ' : '') + n.label + ' — ' + n.statusLabel + '\n' + spanTxt(n)
-  const roundsMax = n => Math.max(0, ...(n.rounds || []).map(g => (g.base || 0) + roundSummary(g.rows, NOW).n))
+  const ttl = n => (n.no ? n.no + '. ' : '') + n.label   // 노드 제목 = 일련번호 + 이름(계층 id 는 data-id 에만)
+  const tip = n => ttl(n) + ' — ' + n.statusLabel + '\n' + spanTxt(n)
+  const roundsMax = n => Math.max(0, ...(n.rounds || []).filter(g => g.cap).map(g => (g.base || 0) + roundSummary(g.rows, NOW).n))
   const engT = n => n.eng + '/5' + (n.engEst ? ' (추정 ' + n.engEst + ')' : '')
-  const statusTxt = n => n.statusLabel + (n.badge ? ' · ' + n.badge : '') + (n.eng != null ? ' · 엔지니어링 ' + engT(n) : '') + (n.cum ? ' · 묶음 ' + n.cum.n + '/' + n.cum.cap : '') + (n.alertN ? ' · 경보 ' + n.alertN : '') + (n.rounds ? ' · 루프 ' + roundsMax(n) + '/' + n.rounds[0].cap : '')
+  const statusTxt = n => (n.slot && n.alerts ? '⚠ ' : '') + n.statusLabel + (n.badge ? ' · ' + n.badge : '') + (n.eng != null ? ' · 엔지니어링 ' + engT(n) : '') + (n.check ? ' · 검증 Y ' + n.check.y + ' / 누락 ' + n.check.miss + ' / 위반 ' + n.check.viol : '') + (n.cum ? ' · 묶음 ' + n.cum.n + '/' + n.cum.cap : '') + (n.alertN ? ' · 경보 ' + n.alertN : '') + (n.rounds && n.rounds.some(g => g.cap) && SL[n.slot]?.kind !== 'codex' ? ' · 루프 ' + roundsMax(n) + '/' + n.rounds.find(g => g.cap).cap : '')
   const alertHtml = xs => (xs || []).map(x => ' <span class="badge alert">' + esc(x) + '</span>').join('')
 
   function filtered() {
@@ -87,43 +140,48 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
     $('lprev').disabled = page <= 1; $('lnext').disabled = page >= pages
   }
   function saveHash() {
-    const st = new URLSearchParams({ k: cur || '', v: view, f: flowOn ? 1 : 0, p: page, s: Math.round($('list').scrollTop) })
+    const st = new URLSearchParams({ k: cur || '', v: view, o: dir, f: flowOn ? 1 : 0, p: page, s: Math.round($('list').scrollTop) })
     if (touched) st.set('z', [vb.x, vb.y, vb.w, vb.h].map(v => +v.toFixed(1)).join(','))
     try { history.replaceState(null, '', '#' + st) } catch (e) { /* file:// 제한 브라우저 : 복원만 포기 */ }
   }
   function select(k) { cur = k; renderList(); const r = D.requests.find(x => x.key === k); if (!r) return; $('gtitle').textContent = r.head; draw(r); detail(r.nodes[0]); saveHash() }
   function roundsHtml(g) {
     const s = roundSummary(g.rows, NOW), b = g.base || 0, k = b + s.n
-    return '<h4>' + esc(g.name) + ' <span class="muted">' + (b ? '묶음 누적 ' : '') + k + '/' + g.cap + '</span>' + alertHtml(k >= D.alert.cap ? ['상한 도달'] : k >= D.alert.nearCap ? ['상한 근접'] : []) + '</h4><table class="rd"><tr><th>회차</th><th>시작 ~ 종료</th><th>상태</th></tr>'
+    return '<h4>' + esc(g.name) + ' <span class="muted">' + (b ? '묶음 누적 ' : '') + k + (g.cap ? '/' + g.cap : ' — 상한 제외(원장별)') + '</span>' + alertHtml(!g.cap ? [] : k >= D.alert.cap ? ['상한 도달'] : k >= D.alert.nearCap ? ['상한 근접'] : []) + '</h4><table class="rd"><tr><th>회차</th><th>시작 ~ 종료</th><th>상태</th></tr>'
       + g.rows.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + spanHtml(r) + '</td><td>' + esc(r.state || '') + '</td></tr>').join('')
-      + '<tr class="sum"><td colspan="3">합계 ' + s.n + '회' + (b ? '(앞 요청 ' + b + '회 이어받음)' : '') + ' · 총 소요 ' + durTxt(s.totalMs) + ' · 상한 대비 ' + k + '/' + g.cap + '</td></tr></table>'
+      + '<tr class="sum"><td colspan="3">합계 ' + s.n + '회' + (b ? '(앞 요청 ' + b + '회 이어받음)' : '') + ' · 총 소요 ' + durTxt(s.totalMs) + (g.cap ? ' · 상한 대비 ' + k + '/' + g.cap : '') + '</td></tr></table>'
   }
   function detail(n) {
     const s = SL[n.slot]
-    $('detail').innerHTML = '<h3>' + esc((n.slot ? n.id + ' ' : '') + n.label) + '</h3><p><span class="badge st-' + esc(n.status) + '">' + esc(n.statusLabel) + '</span>'
-      + (n.badge ? ' <span class="badge est">' + esc(n.badge) + '</span>' : '') + (n.eng != null ? ' <span class="badge">엔지니어링 ' + engT(n) + ' 수행</span>' : '')
+    $('detail').innerHTML = '<h3>' + esc(ttl(n)) + '</h3><p><span class="badge st-' + esc(n.status) + '">' + esc(n.statusLabel) + '</span>'
+      + (n.badge ? ' <span class="badge est">' + esc(n.badge) + '</span>' : '') + (n.approval ? ' <span class="badge' + (n.approval === '최종' ? ' final' : '') + '">' + esc(n.approval) + ' 승인</span>' : '') + (n.eng != null ? ' <span class="badge">엔지니어링 ' + engT(n) + ' 수행</span>' : '') + (n.check ? ' <span class="badge' + (n.check.miss || n.check.viol ? ' alert' : '') + '">검증 Y ' + n.check.y + ' / 누락 ' + n.check.miss + ' / 위반 ' + n.check.viol + '</span>' : '')
       + (n.cum ? ' <span class="badge">묶음 누적 ' + n.cum.n + '/' + n.cum.cap + (n.cum.size > 1 ? ' · 요청 ' + n.cum.size + '건' : '') + '</span>' + alertHtml(n.cum.level ? [n.cum.level] : []) : '') + alertHtml(n.alerts) + '</p>'
       + '<p class="tm">' + spanHtml(n) + '</p>'
+      + (s && s.kind === 'codex' && byId[n.parent] ? '<p class="muted">↳ ' + esc(ttl(byId[n.parent])) + ' 의 검수 칸(자식 — 한 단계 아래)</p>' : '') + (Object.values(byId).filter(c => c.parent === n.id && SL[c.slot]?.kind === 'codex').map(c => '<p class="muted">└ 검수 ' + esc(ttl(c)) + ' : ' + esc(c.statusLabel) + '</p>').join(''))   // C-11 : CDX = SA 아래 들여쓴 자식
       + (n.lines.length ? '<ul>' + n.lines.map(l => '<li>' + esc(l) + '</li>').join('') + '</ul>' : '')
+      + ((n.chips || []).length ? '<h4>칸 안 표시</h4><ul>' + n.chips.map((c, i) => '<li class="chip ' + esc(c.tone) + (c.sep && i ? ' sep' : '') + '">' + esc(c.txt) + '</li>').join('') + '</ul>' : '')
+      + ((n.agents || []).length ? '<h4>실행 에이전트 ' + n.agents.length + '건</h4><ul>' + n.agents.map(a => '<li><b>' + esc((a.approval ? '[' + a.approval + '] ' : '') + a.label) + '</b> — ' + esc(a.statusLabel) + ' · ' + spanHtml(a) + (a.alerts ? alertHtml(a.alerts) : '') + '<br><span class="muted">' + esc(a.lines.join(' · ')) + '</span>' + (a.rounds || []).map(roundsHtml).join('') + '</li>').join('') + '</ul>' : '')
+      + ((n.toolLog || []).length ? '<h4>하네스 사용 기록(시각순) ' + n.toolLog.length + '줄</h4><ol class="tl">' + n.toolLog.map(g => '<li>' + esc(g.txt) + '</li>').join('') + '</ol>' : '')
       + (n.rounds || []).map(roundsHtml).join('')
       + (n.term ? '<p class="muted">흐름 터미널 — 시작 = 요청 수신 시각, 종료 = 응답 시각(진행 중이면 아직 없음)</p>' : s ? '<dl><dt>역할</dt><dd>' + esc(s.role) + '</dd><dt>검수 기준</dt><dd>' + esc(s.criteria) + '</dd><dt>정본 문서</dt><dd>' + s.docs.map(d => '<a href="' + esc(d.href) + '">' + esc(d.name) + '</a>').join(' · ') + '</dd></dl>' : '<p class="muted">실행 기록에서 온 노드(설계 슬롯 아님)</p>')
   }
 
   // ── 보기 공통 : viewBox 화면 맞춤·확대·이동 ──
   const setVB = () => svg.setAttribute('viewBox', vb.x + ' ' + vb.y + ' ' + vb.w + ' ' + vb.h)
-  /** 그림 전체를 화면에 맞춤 — 배율은 [minScale, maxScale] 안, 최소 배율에 걸리면 왼쪽 위 기준(나머지는 끌어서 이동) */
+  /** 그림 전체를 화면에 맞춤 — 배율은 [minScale, maxScale] 안, 최소 배율에 걸리면 위 기준 + 가로는 왼쪽(세로 트리는 루트 가운데 fitCx, 그림 밖으로는 안 나감) — 나머지는 끌어서 이동 */
   function fit(minScale) {
     if (!root) return
     const b = root.getBBox(), W = svg.clientWidth || 800, H2 = svg.clientHeight || 600, pad = 14, bw = b.width + pad * 2, bh = b.height + pad * 2
     const s = Math.max(minScale, Math.min(W / bw, H2 / bh, Z.maxScale)); vb.w = W / s; vb.h = H2 / s
-    vb.x = bw <= vb.w ? b.x - pad - (vb.w - bw) / 2 : b.x - pad; vb.y = bh <= vb.h ? b.y - pad - (vb.h - bh) / 2 : b.y - pad; setVB()
+    const cx = view === 'tree' && fitCx != null ? Math.min(Math.max(fitCx - vb.w / 2, b.x - pad), b.x - pad + bw - vb.w) : b.x - pad
+    vb.x = bw <= vb.w ? b.x - pad - (vb.w - bw) / 2 : cx; vb.y = bh <= vb.h ? b.y - pad - (vb.h - bh) / 2 : b.y - pad; setVB()
   }
   const minScale = () => view === 'tree' ? Z.minScale : Z.forceMinScale
   function zoom(k, cx, cy) { if (cx == null) { cx = vb.x + vb.w / 2; cy = vb.y + vb.h / 2 } vb.x = cx - (cx - vb.x) * k; vb.y = cy - (cy - vb.y) * k; vb.w *= k; vb.h *= k; setVB(); touched = true }
   const pt = e => new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse())
   svg.addEventListener('pointerdown', e => {
     const g = e.target.closest('[data-id]'); moved = 0
-    if (g) { if (hooks.grab) { drag = hooks.grab(g.dataset.id); svg.setPointerCapture(e.pointerId) } return }
+    if (g) { if (hooks.grab) { drag = hooks.grab(g.dataset.id); dragId = g.dataset.id; svg.setPointerCapture(e.pointerId) } return }
     pan = { x: e.clientX, y: e.clientY, vx: vb.x, vy: vb.y, s: vb.w / (svg.clientWidth || 1) }; svg.setPointerCapture(e.pointerId)
   })
   svg.addEventListener('pointermove', e => {
@@ -131,28 +189,18 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
     if (drag) { const q = pt(e); drag.x = q.x; drag.y = q.y; hooks.wake() }
     else if (moved > 2) { vb.x = pan.vx - (e.clientX - pan.x) * pan.s; vb.y = pan.vy - (e.clientY - pan.y) * pan.s; setVB(); touched = true }
   })
-  svg.addEventListener('pointerup', e => { if (drag && moved < 4) detail(drag.n); drag = pan = null; if (svg.hasPointerCapture(e.pointerId)) svg.releasePointerCapture(e.pointerId) })
+  svg.addEventListener('pointerup', e => { if (drag && moved < 4) detail(byId[dragId] || drag.n); drag = pan = null; if (svg.hasPointerCapture(e.pointerId)) svg.releasePointerCapture(e.pointerId) })
   svg.addEventListener('click', e => { if (view !== 'tree') return; const g = e.target.closest('[data-id]'); if (g) detail(byId[g.dataset.id]) })
-  svg.addEventListener('wheel', e => { e.preventDefault(); const q = pt(e); zoom(e.deltaY > 0 ? 1.1 : 1 / 1.1, q.x, q.y) }, { passive: false })
+  svg.addEventListener('wheel', e => { const hl = e.target.closest('.hlist'); if (hl && hl.scrollHeight > hl.clientHeight) return; e.preventDefault(); const q = pt(e); zoom(e.deltaY > 0 ? 1.1 : 1 / 1.1, q.x, q.y) }, { passive: false })
   document.querySelectorAll('[data-z]').forEach(b => b.addEventListener('click', () => { if (b.dataset.z === 'fit') { touched = false; fit(minScale()) } else zoom(b.dataset.z === 'in' ? 1 / 1.25 : 1.25) }))
   addEventListener('resize', () => { if (!touched) fit(minScale()) })
 
-  // ── 계층 트리 : 슬롯 카드 = 이름(' : ' 로 2줄) + 상태 + 시간, 실행 에이전트 = 한 줄 넓은 카드(이름 + 시간, 상태 = 색) — 잎 노드라 오른쪽 열이 비어 있음
-  //    자식 묶음 가운데에 부모, 외길 사슬은 가장 높은 노드만큼 자리 확보
-  const nameLines = n => { const s = (n.slot ? n.id + ' ' : '') + n.label, i = s.indexOf(' : '); return i > 0 ? [s.slice(0, i), s.slice(i + 3)] : [s] }
-  const hOf = n => n.slot ? Z.padY * 2 + Z.lineH * (nameLines(n).length + 1) + Z.tmH : Z.padY * 2 + Z.lineH
-  function layout(nodes) {
-    const kids = {}, pos = {}; let y = 0, dmax = 0
-    for (const n of nodes) (kids[n.parent] = kids[n.parent] || []).push(n)
-    const walk = (n, d, reserve) => {
-      dmax = Math.max(dmax, d); const ch = kids[n.id] || [], h = hOf(n)
-      if (!ch.length) { const R = Math.max(h, reserve); pos[n.id] = { d, y: y + (R - h) / 2, h }; y += R + (n.slot ? Z.gapY : Z.gapY / 2); return }   // 에이전트 줄은 촘촘히
-      ch.forEach(c => walk(c, d + 1, ch.length === 1 ? Math.max(h, reserve) : 0))
-      const a = pos[ch[0].id], b = pos[ch[ch.length - 1].id]; pos[n.id] = { d, y: (a.y + a.h / 2 + b.y + b.h / 2) / 2 - h / 2, h }
-    }
-    walk(nodes.find(n => !n.parent), 0, 0)
-    return { pos, dmax }
-  }
+  // ── 계층 트리 : 칸 카드 = 이름(' : ' 로 2줄) + 상태 + 시간 + 칸 안 줄(실행·판정 chips) + 하네스 사용 목록(스크롤) — 에이전트 실행은 독립 카드 없음(2026-11-10). 좌표는 layoutTree(세로 기본 · 가로, CDX = 짝 SA 옆·아래)
+  const nameLines = n => { const s = ttl(n), i = s.indexOf(' : '); return i > 0 ? [s.slice(0, i), s.slice(i + 3)] : [s] }
+  const HL = 8   // 하네스 사용 목록 보이는 줄 수(넘으면 스크롤 — 생략 없이 전부 넣음)
+  const listH = n => (n.toolLog || []).length ? Math.min(n.toolLog.length, HL) * Z.chipH + 6 : 0
+  const sizeOf = n => ({ w: SL[n.slot]?.kind === 'codex' ? Z.boxW - Z.pairIndent : Z.boxW, h: Z.padY * 2 + Z.lineH * (nameLines(n).length + 1) + Z.tmH + (n.chips || []).length * Z.chipH + listH(n) })
+  const isPair = n => SL[n.slot]?.kind === 'codex'
   /** 글자가 max 폭을 넘으면 실제 측정으로 잘라 … */
   function fitText(t, s, max) {
     t.textContent = s; if (t.getComputedTextLength() <= max) return t
@@ -181,9 +229,9 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
   }
   /** 흐름 화살표를 그리고 위치 갱신 함수를 돌려준다(자유 배치는 매 틱 호출). gLab 이 gPath 와 같으면 순번은 화살표 그룹 안(호버 표시) */
   function flowEdges(path, gPath, gLab, shape) {
-    const items = path.edges.map(e => {
+    const items = path.edges.concat(path.verdicts || []).map(e => {
       const g = el('g', { class: 'fl ' + e.state + (e.loop ? ' loop' : '') + (e.pass ? '' : ' plan') }, gPath)
-      el('title', {}, g).textContent = e.seq + '. ' + e.from + ' → ' + e.to + (e.label ? ' · ' + e.label : '')
+      el('title', {}, g).textContent = '경로 ' + e.seq + ' : ' + [e.from, e.to].map(id => byId[id] ? ttl(byId[id]) : id).join(' → ') + (e.label ? ' · ' + e.label : '')
       const hit = el('path', { class: 'hit' }, g), v = el('path', { class: 'v', 'marker-end': 'url(#ah-' + e.state + ')' }, g)
       const lg = el('g', { class: 'seqg ' + e.state + (e.pass ? '' : ' plan') }, gLab === gPath ? g : gLab)
       el('circle', { r: 7.5, class: 'sq' }, lg); el('text', { class: 'sqt', 'text-anchor': 'middle', y: 3.5 }, lg).textContent = e.seq
@@ -193,7 +241,9 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
     const selfN = {}; for (const it of items) if (it.e.from === it.e.to) it.j = (selfN[it.e.to] = (selfN[it.e.to] ?? -1) + 1)
     const update = () => items.forEach(({ e, hit, v, lg, j }) => {
       const A = shape(e.from), B = shape(e.to); if (!A || !B) return
-      const r = curve(A, B, e.loop ? 0.4 : 0.1, j || 0); hit.setAttribute('d', r.d); v.setAttribute('d', r.d); lg.setAttribute('transform', 'translate(' + r.mx + ' ' + r.my + ')')
+      // SA → 짝 CDX = 짧은 직선(휨 0), 되돌이 = 크게 휨, 나머지 = 살짝 휨
+      const flat = view === 'tree' && dir === 'v' && (e.from === 'S' || e.to === 'E')   // C-15 : 세로 트리의 시작 → 1 · 승인 → 종료 = 짧은 가로 직선
+      const r = curve(A, B, e.loop ? 0.4 : flat || SL[e.to]?.kind === 'codex' && byId[e.to]?.parent === e.from ? 0 : 0.1, j || 0); hit.setAttribute('d', r.d); v.setAttribute('d', r.d); lg.setAttribute('transform', 'translate(' + r.mx + ' ' + r.my + ')')
     })
     update(); return update
   }
@@ -201,31 +251,36 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
   const termNode = (id, path) => { const T = path.term[id] || {}, pend = id === 'E' && !!(T.pending || T.stopped); return { id, term: true, pend, label: id === 'S' ? '시작' : '종료', slot: null, status: D.design ? 'unassigned' : pend ? 'notrun' : 'done', statusLabel: id === 'S' ? '요청 수신' : T.stopped ? '중단(응답 없음)' : pend ? '응답 대기' : '응답', lines: [], t0: T.t0 ?? null, t1: null, run: false } }
 
   function drawTree(nodes, L, path) {
-    const X = d => d * (Z.boxW + Z.colGap), gE = el('g', {}, root), gF = el('g', { class: 'flows' }, root), gN = el('g', {}, root), gL = el('g', {}, root), geo = {}
-    for (const n of nodes) if (n.parent) {
-      const a = L.pos[n.parent], b = L.pos[n.id], x1 = X(a.d) + Z.boxW, y1 = a.y + a.h / 2, x2 = X(b.d), y2 = b.y + b.h / 2, mx = (x1 + x2) / 2
-      el('path', { d: 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2, class: 'edge' }, gE)
+    const gE = el('g', {}, root), gF = el('g', { class: 'flows' }, root), gN = el('g', {}, root), gL = el('g', {}, root), geo = {}, vert = dir === 'v'
+    for (const n of nodes) if (n.parent) {   // 구조선 : 가로 = 부모 오른쪽 → 자식 왼쪽, 세로 = 부모 아래 → 자식 위, SA → 짝 CDX(자식) = 세로 흐름 들여쓰기 브래킷 · 가로 흐름 짧은 직선
+      const a = L.pos[n.parent], b = L.pos[n.id]
+      if (isPair(n)) { const bx = a.x + Z.pairIndent / 2, by = b.y + Math.min(b.h, 24) / 2; el('path', { d: vert ? 'M' + bx + ' ' + (a.y + a.h) + ' L' + bx + ' ' + by + ' L' + b.x + ' ' + by : 'M' + (a.x + a.w) + ' ' + (a.y + Math.min(a.h, b.h) / 2) + ' L' + b.x + ' ' + (a.y + Math.min(a.h, b.h) / 2), class: 'edge pair' }, gE); continue }   // 세로 = 들여쓰기 브래킷(짧은 수직 + 가로), 가로 = 짧은 직선
+      if (vert && n.id === Z.foot) continue   // C-15 : 맨 아래 정중앙 승인 칸 = 구조선 생략(루트에서 내려오는 선이 트리를 가로지름, 연결은 흐름 화살표)
+      if (vert) { const x1 = a.x + a.w / 2, y1 = a.y + a.h, x2 = b.x + b.w / 2, y2 = b.y, my = (y1 + y2) / 2; el('path', { d: 'M' + x1 + ' ' + y1 + ' C' + x1 + ' ' + my + ' ' + x2 + ' ' + my + ' ' + x2 + ' ' + y2, class: 'edge' }, gE) }
+      else { const x1 = a.x + a.w, y1 = a.y + a.h / 2, x2 = b.x, y2 = b.y + b.h / 2, mx = (x1 + x2) / 2; el('path', { d: 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2, class: 'edge' }, gE) }
     }
     for (const n of nodes) {
-      const p = L.pos[n.id], w = n.slot ? Z.boxW : Z.boxW * 2 + Z.colGap, g = el('g', { class: 'node st-' + n.status + (SL[n.slot]?.kind === 'codex' ? ' k-codex' : ''), transform: 'translate(' + X(p.d) + ' ' + p.y + ')', 'data-id': n.id }, gN)
-      el('title', {}, g).textContent = tip(n); geo[n.id] = { cx: X(p.d) + w / 2, cy: p.y + p.h / 2, hw: w / 2, hh: p.h / 2 }
+      const p = L.pos[n.id], w = p.w, g = el('g', { class: 'node st-' + n.status + (SL[n.slot]?.kind === 'codex' ? ' k-codex' : ''), transform: 'translate(' + p.x + ' ' + p.y + ')', 'data-id': n.id }, gN)
+      el('title', {}, g).textContent = tip(n); geo[n.id] = { cx: p.x + w / 2, cy: p.y + p.h / 2, hw: w / 2, hh: p.h / 2 }
       el('rect', { width: w, height: p.h, rx: 7, class: 'box' }, g); el('rect', { width: 5, height: p.h, rx: 2.5, class: 'strip' }, g)
-      if (!n.slot) {
-        const tm = timeText(el('text', { x: w - 8, y: Z.padY + Z.lineH - 3, class: 'tm', 'text-anchor': 'end' }, g), n)
-        fitText(el('text', { x: 12, y: Z.padY + Z.lineH - 3, class: 'l1' }, g), (n.alerts ? '⚠ ' : '') + n.label + (n.rounds ? ' · ' + roundsMax(n) + '회차' : '') + (n.alerts ? ' · ' + n.alerts.join(' · ') : ''), w - 30 - tm.getComputedTextLength())
-        continue
-      }
       const ls = nameLines(n)
-      ls.forEach((s, i) => fitText(el('text', { x: 12, y: Z.padY + Z.lineH * (i + 1) - 3, class: i ? 'l1' : 'l1 b' }, g), s, Z.boxW - 18))
-      fitText(el('text', { x: 12, y: Z.padY + Z.lineH * (ls.length + 1) - 3, class: 'l2' }, g), statusTxt(n), Z.boxW - 18)
-      timeText(el('text', { x: 12, y: Z.padY + Z.lineH * (ls.length + 1) + Z.tmH - 3, class: 'tm' }, g), n, Z.boxW - 18)
+      ls.forEach((s, i) => fitText(el('text', { x: 12, y: Z.padY + Z.lineH * (i + 1) - 3, class: i ? 'l1' : 'l1 b' }, g), s, w - 18))
+      fitText(el('text', { x: 12, y: Z.padY + Z.lineH * (ls.length + 1) - 3, class: 'l2' }, g), statusTxt(n), w - 18)
+      timeText(el('text', { x: 12, y: Z.padY + Z.lineH * (ls.length + 1) + Z.tmH - 3, class: 'tm' }, g), n, w - 18)
+      // 칸 안 줄(2026-11-10) : SA·접수·승인 = 에이전트 실행(type 별 ×n·회송·실패 표식), CDX = 판정 회차, 하네스 = 도구 합계 + 시각순 사용 목록(스크롤)
+      const y0 = Z.padY + Z.lineH * (ls.length + 1) + Z.tmH
+      ;(n.chips || []).forEach((c, i) => { if (c.sep && i) el('line', { x1: 10, x2: w - 8, y1: y0 + Z.chipH * i + 0.5, y2: y0 + Z.chipH * i + 0.5, class: 'chipsep' }, g); fitText(el('text', { x: 12, y: y0 + Z.chipH * (i + 1) - 3, class: 'chip ' + c.tone }, g), c.txt, w - 18) })   // 구획 구분 = 얇은 선(C-12)
+      if ((n.toolLog || []).length) {
+        const fo = el('foreignObject', { x: 8, y: y0 + Z.chipH * (n.chips || []).length + 2, width: w - 14, height: listH(n) - 4 }, g), d = document.createElement('div')
+        d.className = 'hlist'; d.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml'); d.innerHTML = n.toolLog.map(x => '<div>' + esc(x.txt) + '</div>').join(''); fo.appendChild(d)
+      }
     }
-    if (path) {   // 터미널 : 시작 = 루트 왼쪽, 종료 = 왼쪽 맨 아래
-      const r0 = L.pos['1'], bottom = Math.max(...Object.values(L.pos).map(p => p.y + p.h)), tx = -(Z.termW + Z.colGap)
-      const tp = { S: r0.y + r0.h / 2 - Z.termH / 2, E: bottom - Z.termH }
+    const r0 = L.pos['1']; fitCx = vert ? r0.x + r0.w / 2 : null   // 세로 : 화면보다 넓으면 루트 가운데 기준으로 맞춤
+    if (path) {   // 터미널(termPos) : 가로 = 시작 루트 왼쪽 · 종료 왼쪽 맨 아래(종전) / 세로 = 시작 1번 칸 왼쪽 · 종료 승인 칸(맨 아래 정중앙) 왼쪽(C-15)
+      const tp = termPos(L.pos, dir, Z)
       for (const id of ['S', 'E']) {
-        const n = byId[id] = termNode(id, path), g = el('g', { class: 'node term st-' + n.status + (n.pend ? ' pend' : ''), transform: 'translate(' + tx + ' ' + tp[id] + ')', 'data-id': id }, gN)
-        el('title', {}, g).textContent = n.label + ' — ' + spanTxt(n); geo[id] = { cx: tx + Z.termW / 2, cy: tp[id] + Z.termH / 2, hw: Z.termW / 2, hh: Z.termH / 2 }
+        const q = tp[id], n = byId[id] = termNode(id, path), g = el('g', { class: 'node term st-' + n.status + (n.pend ? ' pend' : ''), transform: 'translate(' + q.x + ' ' + q.y + ')', 'data-id': id }, gN)
+        el('title', {}, g).textContent = n.label + ' — ' + spanTxt(n); geo[id] = { cx: q.x + Z.termW / 2, cy: q.y + Z.termH / 2, hw: Z.termW / 2, hh: Z.termH / 2 }
         el('rect', { width: Z.termW, height: Z.termH, rx: Z.termH / 2, class: 'box' }, g)
         el('text', { x: Z.termW / 2, y: 13, class: 'l1 b', 'text-anchor': 'middle' }, g).textContent = n.label
         timeText(el('text', { x: Z.termW / 2, y: 26, class: 'tm', 'text-anchor': 'middle' }, g), n)
@@ -235,21 +290,24 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
     fit(Z.minScale)
   }
 
-  // ── 자유 배치(Obsidian 스타일) : 반발력(전 쌍) + 엣지 스프링 + 중심 인력, 수렴 중·후 화면 맞춤, 라벨 겹치면 숨김(호버 표시) ──
+  // ── 자유 배치(그래프 보기) : 반발력(전 쌍) + 엣지 스프링 + 중심 인력, 수렴 중·후 화면 맞춤, 라벨 겹치면 숨김(호버 표시) ──
   // ponytail: 전 쌍 O(n²) — 요청 1건 노드 수십 개 기준, 수백 개를 한 화면에 그릴 때 격자 근사로 교체
   function drawForce(nodes, L, path) {
     const RAN = ['done', 'running', 'error', 'blocked']
     const P = nodes.map(n => { const p = L.pos[n.id]; return { n, d: p.d, x: p.d * 140, y: (p.y + p.h / 2) * 0.8, vx: 0, vy: 0, r: Math.max(6, 15 - 2 * p.d) + (RAN.includes(n.status) ? 2 : 0) } })
-    const at = Object.fromEntries(P.map(p => [p.n.id, p])), E = nodes.filter(n => n.parent).map(n => [at[n.parent], at[n.id]]), nStruct = E.length
+    const at = Object.fromEntries(P.map(p => [p.n.id, p])), E = nodes.filter(n => n.parent && !isPair(n)).map(n => [at[n.parent], at[n.id]]), nStruct = E.length
+    for (const p of P) if (isPair(p.n) && at[p.n.parent]) p.mate = at[p.n.parent]   // C-11 : 자유 배치에서도 CDX 는 짝 SA 에 붙음(물리 계산 밖, 위치 = matePos)
+    const glue = () => { for (const p of P) if (p.mate) { const q = matePos(p.mate, p.r, Z.pairGap); p.x = q.x; p.y = q.y; p.vx = p.vy = 0 } }
+    const pairLines = P.filter(p => p.mate).map(p => [p.mate, p])
     if (path) {   // 터미널도 노드로 띄우고, 시작 — 1 · 종료 — 직전 노드는 스프링으로만 잇는다(구조선은 그리지 않음)
       const r0 = at['1'], last = path.edges.filter(e => e.to === 'E').map(e => at[e.from]).find(Boolean) || r0
       for (const id of ['S', 'E']) { const n = byId[id] = termNode(id, path), p = { n, d: -1, x: r0.x - 140, y: id === 'S' ? r0.y : last.y + 60, vx: 0, vy: 0, r: 10 }; P.push(p); at[id] = p }
       E.push([at.S, r0], [last, at.E])
     }
-    const gE = el('g', {}, root), gN = el('g', {}, root), gF = el('g', { class: 'flows fv' }, root), lines = E.slice(0, nStruct).map(() => el('line', { class: 'edge' }, gE))
+    const gE = el('g', {}, root), gN = el('g', {}, root), gF = el('g', { class: 'flows fv' }, root), lines = [...E.slice(0, nStruct), ...pairLines].map((_, i) => el('line', { class: i < nStruct ? 'edge' : 'edge pair' }, gE))
     for (const p of P) {
       p.g = el('g', { class: 'fnode st-' + p.n.status + (SL[p.n.slot]?.kind === 'codex' ? ' k-codex' : ''), 'data-id': p.n.id }, gN); el('title', {}, p.g).textContent = tip(p.n)
-      el('circle', { r: p.r }, p.g); p.t = el('text', { class: 'l1', y: 4 }, p.g); p.t.textContent = p.n.label.length > 22 ? p.n.label.slice(0, 21) + '…' : p.n.label
+      el('circle', { r: p.r }, p.g); p.t = el('text', { class: 'l1', y: 4 }, p.g); const nm = ttl(p.n); p.t.textContent = nm.length > 22 ? nm.slice(0, 21) + '…' : nm
       if (p.n.term) { p.g.classList.add('term'); if (p.n.pend) p.g.classList.add('pend') }
     }
     const updFlow = path ? flowEdges(path, gF, gF, id => at[id] && { cx: at[id].x, cy: at[id].y, r: at[id].r }) : () => {}
@@ -264,13 +322,15 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
     let alpha = 1, n = 0
     const tick = () => {
       for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+        if (P[i].mate || P[j].mate) continue   // 위성(CDX)은 반발력 계산 밖 — 짝 SA 를 따라감
         const a = P[i], b = P[j], dx = b.x - a.x, dy = b.y - a.y, d2 = Math.max(dx * dx + dy * dy, 40), d = Math.sqrt(d2), f = Z.repel / d2 * alpha
         a.vx -= dx / d * f; a.vy -= dy / d * f; b.vx += dx / d * f; b.vy += dy / d * f
       }
       for (const [a, b] of E) { const dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) || 1, f = (d - Z.link) * 0.05 * alpha; a.vx += dx / d * f; a.vy += dy / d * f; b.vx -= dx / d * f; b.vy -= dy / d * f }
       let cx = 0; for (const p of P) cx += p.x / P.length
-      for (const p of P) { if (p === drag) { p.vx = p.vy = 0; continue } p.vx = (p.vx - p.x * Z.gravity * alpha) * 0.6; p.vy = (p.vy - p.y * Z.gravity * alpha) * 0.6; p.x += p.vx; p.y += p.vy }
-      lines.forEach((ln, i) => { const [a, b] = E[i]; ln.setAttribute('x1', a.x); ln.setAttribute('y1', a.y); ln.setAttribute('x2', b.x); ln.setAttribute('y2', b.y) })
+      for (const p of P) { if (p === drag || p.mate) { p.vx = p.vy = 0; continue } p.vx = (p.vx - p.x * Z.gravity * alpha) * 0.6; p.vy = (p.vy - p.y * Z.gravity * alpha) * 0.6; p.x += p.vx; p.y += p.vy }
+      glue()
+      lines.forEach((ln, i) => { const [a, b] = i < nStruct ? E[i] : pairLines[i - nStruct]; ln.setAttribute('x1', a.x); ln.setAttribute('y1', a.y); ln.setAttribute('x2', b.x); ln.setAttribute('y2', b.y) })
       for (const p of P) {   // 라벨은 중심 반대쪽(바깥)으로
         const out = p.x >= cx; p.t.setAttribute('x', out ? p.r + 4 : -(p.r + 4)); p.t.setAttribute('text-anchor', out ? 'start' : 'end')
         p.g.setAttribute('transform', 'translate(' + p.x + ' ' + p.y + ')')
@@ -282,7 +342,7 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
       if (!done) raf = requestAnimationFrame(tick)
     }
     const wake = () => { if (alpha <= 0.02) { alpha = 0.3; raf = requestAnimationFrame(tick) } else alpha = Math.max(alpha, 0.3) }
-    hooks = { grab: id => { touched = true; wake(); return at[id] }, wake }
+    hooks = { grab: id => { touched = true; wake(); return at[id]?.mate || at[id] }, wake }   // CDX 를 끌면 짝 SA 가 같이 움직임
     tick()
   }
   function draw(r) {
@@ -290,10 +350,13 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
     cancelAnimationFrame(raf); svg.textContent = ''; touched = false; hooks = {}; drag = pan = null
     svg.classList.toggle('flowon', !!path); if (path) markers()
     byId = Object.fromEntries(nodes.map(n => [n.id, n])); root = el('g', {}, svg)
-    const L = layout(nodes)
+    // 자유 배치 초기 위치는 가로 트리 좌표(깊이 → x)를 쓴다
+    const L = layoutTree(nodes, view === 'tree' ? dir : 'h', Z, sizeOf, isPair)
     if (view === 'tree') drawTree(nodes, L, path); else drawForce(nodes, L, path)
   }
-  const setView = v => { view = v; document.querySelectorAll('[data-view]').forEach(x => x.setAttribute('aria-pressed', x.dataset.view === v)) }
+  const dirBtn = $('dir'), setDir = o => { dir = o; dirBtn.textContent = o === 'v' ? '방향 : 세로' : '방향 : 가로'; dirBtn.disabled = view !== 'tree' }
+  const setView = v => { view = v; document.querySelectorAll('[data-view]').forEach(x => x.setAttribute('aria-pressed', x.dataset.view === v)); setDir(dir) }
+  dirBtn.onclick = () => { setDir(dir === 'v' ? 'h' : 'v'); const r = D.requests.find(x => x.key === cur); if (r) draw(r); saveHash() }
   $('list').addEventListener('click', e => { const b = e.target.closest('button[data-k]'); if (b) select(b.dataset.k) })
   for (const id of ['q', 'fc', 'fd']) $(id).addEventListener('input', () => { page = 1; renderList() })
   $('lprev').onclick = () => { page--; renderList(); saveHash() }; $('lnext').onclick = () => { page++; renderList(); saveHash() }
