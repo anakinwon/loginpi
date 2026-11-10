@@ -10,13 +10,16 @@ effort: high
 
 1. 규칙 우선순위 : 루트 `CLAUDE.md` → 작업 대상 하위 앱 `CLAUDE.md`(예 `sitemap/schema.pi/CLAUDE.md`) → 브리프. 충돌하면 멈추지 말고 상위 규칙을 따르고 보고에 적는다.
 2. 쓰기 범위 : 브리프의 쓰기 허용 경로만 고친다. 그 밖의 파일은 수정하지 않고 '계약 이탈'로 보고한다. 다른 담당이 작업 중이라고 적힌 경로는 읽기만 한다.
-3. 검증 범위 : 바꾼 파일에 대해 `pnpm tsc --noEmit`(또는 하위 앱의 같은 명령)·관련 단위 테스트·`node --check`·`node <파일> --selftest`까지 실행한다. 라우트·`src/` 변경의 관문 `pnpm build` 는 검증 담당(`anakin_phase-verify`)이 실행한다.
+3. 검증 범위 : 바꾼 파일에 대해 `pnpm tsc --noEmit`(또는 하위 앱의 같은 명령)·관련 단위 테스트·`node --check`·`node <파일> --selftest`까지 실행한다. 라우트·`src/` 변경이면 관문 `pnpm build` 도 이 에이전트가 실행한다(2026-11-10 검증 단계 에이전트 폐지로 이관 — 결과는 보고 첫 줄 집계에 넣는다).
 4. 포맷 : `pnpm format`·prettier 는 브리프가 지시할 때만. schema.pi 등 prettier 를 쓰지 않는 앱에서는 포맷 명령을 실행하지 않는다(재포맷 사고 이력).
 5. DA 표준 : `sql/*.sql` 은 `da-ddl-guard` 훅이 검사한다. 차단되면 우회하지 말고 위반 내용을 보고한다(DA 승인은 `da-governance-expert` 몫). 시스템 컬럼 4개·논리삭제·PK/인덱스 이름은 `docs/da/데이터표준규칙.md`.
 6. 구축 결함 R-P0~P6(루트 `CLAUDE.md`) : 직렬 조회·반복 조회·과다 조회·외부 호출 타임아웃·실패 경로·dev 전용 가드를 쓰는 시점에 지킨다. `build-defect-guard` 경고가 뜨면 고치거나 의도 사유를 보고에 남긴다.
 7. 하지 않는 것 : 커밋·푸시(`anakin_phase-commit` 담당), 운영 DB 적용·배포·Vercel env 변경(마스터 승인 필요), 훅·설정(`.claude/settings*.json`) 변경(브리프에 명시된 경우만).
 8. 비밀값 : API 키·접속 문자열·토큰·지갑 시드를 출력·보고·커밋 대상 파일에 쓰지 않는다. 환경변수는 이름만 적는다.
 9. 미확정 값은 `[TBD]`·`[확인중 : 확인 채널]`로 적고, 근거 없는 값을 만들지 않는다.
+10. Codex : 실제 Codex 호출(`scripts/codex-verify.mjs` 의 `--confirm-real`)은 하지 않는다 — 판정은 이 에이전트가 끝날 때 SubagentStop 훅 `.claude/hooks/codex-gate.mjs` 가 자동 실행한다(c4 산출물 + c1 브리프 + 하네스 파일 변경 시 c3, 원장 id `c<칸>-<주제>-<agentId 앞 6자>`, 마스터 결정 2026-11-10 — 검증 단계 에이전트 폐지). 래퍼·루프를 시험할 때는 가짜 판정자 `CODEX_JS` 대역만 쓴다. 루프 폴더(`.omc/state/loop/<id>/` — 원장·계약 `contract.md`·결과)는 읽기만 한다.
+11. FAIL 회송 : 회송 브리프의 입력(`L/iter-N.codex.json` 결함 목록, 아소카가 쓴 `L/iter-N.triage.md` 가 있으면 함께)을 읽고 CONFIRMED(와 아소카가 회송으로 정한) 결함만 고친다. 결함 ID 는 바꾸지 않고, 같은 원인의 형제 케이스는 함께 고친다(R-P0 — 패턴·매치 N·처리 N). 결함 밖 개선·리팩터는 하지 않는다. 계약의 쓰기 허용 밖이면 고치지 않고 '계약 이탈'로 보고.
+12. CDX N 회송(마스터 확장 2026-11-09 — 모든 서브에이전트 결과는 Codex Y 뒤에만 다음 진행, 정본 `.claude/engineering/40. loop/codex_procedure.md` 13절) : 이 에이전트가 고치는 칸 = c4(산출물)·c3(하네스 파일 변경)과, c6 총괄 N 중 결함 소유가 산출물인 항목. 입력은 11과 같다(`.omc/state/loop/c<N>-<주제>/iter-N.triage.md`·`iter-N.codex.json`). c1(브리프)·c2(수집)·c5(그래프) N 은 각각 메인·collect·graph 몫이라 받지 않는다 — 회송 브리프에 섞여 오면 '계약 이탈'로 보고. 고친 뒤 결과는 다시 CDX 판정을 받는다(같은 id 다음 회차).
 
 ## 결과 첫 줄
 
@@ -25,4 +28,5 @@ effort: high
 - 변경 파일 목록(절대경로)과 `git diff --stat`(신규 파일은 줄 수)
 - 실행한 검증 명령과 결과 핵심 줄(실행하지 않은 검증은 통과로 적지 않는다)
 - 계약 이탈 : 브리프 밖 수정·브리프와 다르게 한 판단과 사유
+- 회송이면 결함 ID → 수정 파일:줄
 - `[확인중]`·`[TBD]` 항목

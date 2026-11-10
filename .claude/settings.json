@@ -58,7 +58,8 @@
             "timeout": 20
           }
         ]
-      }
+      },
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/turn-gate.mjs\"", "timeout": 300 }] }
     ],
     "SessionEnd": [
       {
@@ -80,7 +81,8 @@
             "timeout": 10
           }
         ]
-      }
+      },
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-gate.mjs\" --flush", "timeout": 10 }] }
     ],
     "SubagentStart": [
       {
@@ -93,12 +95,15 @@
           }
         ]
       },
-      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/request-graph-refresh.mjs\"", "timeout": 5 }] }
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/request-graph-refresh.mjs\"", "timeout": 5 }] },
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-gate.mjs\" --base", "timeout": 15 }] }
     ],
     "SubagentStop": [
-      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/request-graph-refresh.mjs\"", "timeout": 5 }] }
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/request-graph-refresh.mjs\"", "timeout": 5 }] },
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-gate.mjs\"", "timeout": 600 }] }
     ],
     "PostToolUse": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-gate.mjs\" --flush", "timeout": 10 }] },
       {
         "matcher": "Write|Edit|MultiEdit",
         "hooks": [

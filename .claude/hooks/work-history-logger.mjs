@@ -131,7 +131,13 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
   const short = sid.slice(0, 8)
   const results = new Map()                                              // 이번 구간의 tool_result (Stop 시점엔 턴의 결과가 모두 도착해 있음)
   const resultChars = c => typeof c === 'string' ? c.length : Array.isArray(c) ? c.reduce((a, p) => a + (typeof p?.text === 'string' ? p.text.length : typeof p?.source?.data === 'string' ? p.source.data.length : 0), 0) : 0
-  for (const j of fresh) if (j.type === 'user' && Array.isArray(j.message?.content)) for (const b of j.message.content) if (b.type === 'tool_result') results.set(b.tool_use_id, { ok: !b.is_error, ts: j.timestamp, chars: resultChars(b.content) })
+  // Workflow 도구 결과 'Transcript dir: …\subagents\workflows\wf_<id>' → tool_use_id → 워크플로 id (워크플로 에이전트 meta 에는 toolUseId·name 이 없어 이것이 유일한 정확 귀속 근거, 2026-11-09)
+  const wfOf = new Map(), resultText = c => typeof c === 'string' ? c : Array.isArray(c) ? c.map(p => (typeof p?.text === 'string' ? p.text : '')).join('\n') : ''
+  for (const j of fresh) if (j.type === 'user' && Array.isArray(j.message?.content)) for (const b of j.message.content) if (b.type === 'tool_result') {
+    results.set(b.tool_use_id, { ok: !b.is_error, ts: j.timestamp, chars: resultChars(b.content) })
+    const wf = /workflows[\\/]+(wf_[\w-]+)/.exec(resultText(b.content))?.[1]; if (wf) wfOf.set(b.tool_use_id, wf)
+  }
+  for (const [tu, wf] of wfOf) if (st.agentTurn['wftu:' + tu]) st.agentTurn['wf:' + wf] = st.agentTurn['wftu:' + tu]   // tool_use 가 앞 구간(이전 Stop)에 있었던 경우
   const subagentsDir = path.join(path.dirname(transcript), sid, 'subagents')
 
   let pendingText = null
@@ -179,17 +185,23 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
     }
   }
   // 서브에이전트 기록(<transcript dir>/<sid>/subagents/*.jsonl + .meta.json) → 디스패치한 턴에 귀속되는 agent 레코드 (Stop 마다 갱신, loadRows 가 agent_id 기준 last-write-wins 병합)
+  //   + 워크플로 에이전트(<sid>/subagents/workflows/wf_<id>/agent-*.jsonl, 2026-11-09 — 최상위만 읽어 누락하던 결함) : 귀속 = ① wf_<id> 를 돌려준 Workflow 호출 턴 ② 시작 이전 마지막 Workflow 호출 턴 ③ 아래 공통 규칙
   const scanSubagents = () => {
-    let dir; try { dir = fs.readdirSync(subagentsDir).filter(f => f.endsWith('.meta.json')) } catch { return }
-    for (const mf of dir) {
-      const base = path.join(subagentsDir, mf.replace(/\.meta\.json$/, ''))
+    let dir; try { dir = fs.readdirSync(subagentsDir).filter(f => f.endsWith('.meta.json')).map(mf => ({ d: subagentsDir, mf, wf: null })) } catch { return }
+    try { for (const wf of fs.readdirSync(path.join(subagentsDir, 'workflows')).filter(w => /^wf_/.test(w))) { const d = path.join(subagentsDir, 'workflows', wf); for (const mf of fs.readdirSync(d)) if (mf.endsWith('.meta.json')) dir.push({ d, mf, wf }) } } catch { /* 워크플로 없음 */ }
+    for (const { d, mf, wf } of dir) {
+      const base = path.join(d, mf.replace(/\.meta\.json$/, ''))
       let meta, stat; try { meta = JSON.parse(fs.readFileSync(base + '.meta.json', 'utf8')); stat = fs.statSync(base + '.jsonl') } catch { continue }
       const agentId = mf.replace(/^agent-/, '').replace(/\.meta\.json$/, '')   // 파일명 agent-<agentId>.meta.json (agentId 는 'a'+이름+'-'+해시)
-      const seen = st.agentSeen[agentId]; if (seen && seen.mtime === stat.mtimeMs && seen.size === stat.size) continue
+      // 파일이 그대로여도 Workflow 결과가 늦게 도착해 정확 매핑(wf:)이 새로 생기거나 바뀌면 재기록(시간 추정 귀속 보정, D-003 2026-11-09)
+      const exact = (wf && st.agentTurn['wf:' + wf]) || null
+      const seen = st.agentSeen[agentId]; if (seen && seen.mtime === stat.mtimeMs && seen.size === stat.size && (seen.exact || null) === exact) continue
       let text; try { text = fs.readFileSync(base + '.jsonl', 'utf8') } catch { continue }
       const firstTs = (text.match(/"timestamp":"([^"]+)"/) || [])[1] || null
       // 귀속 턴: ① 이미 매핑 ② toolUseId(일반 Agent) ③ name(팀원 에이전트: meta.name = Agent 호출의 name 인자) ④ 부모 에이전트의 턴 ⑤ 시작 시각이 속한 턴
-      let turnId = st.agentTurn[agentId] || (meta.toolUseId && st.agentTurn['tu:' + meta.toolUseId]) || (meta.name && st.agentTurn['nm:' + meta.name]) || (meta.parentAgentId && st.agentTurn[meta.parentAgentId])
+      // 워크플로 정확 매핑(wf:)이 있으면 그것이 우선 — 앞서 시간 추정으로 붙은 매핑도 바로잡는다(loadRows 는 agent_id last-write-wins), wf_exact 로 생성기에 전달
+      let turnId = (wf && st.agentTurn['wf:' + wf]) || st.agentTurn[agentId] || (meta.toolUseId && st.agentTurn['tu:' + meta.toolUseId]) || (meta.name && st.agentTurn['nm:' + meta.name]) || (meta.parentAgentId && st.agentTurn[meta.parentAgentId])
+      if (!turnId && wf && firstTs) { const calls = Object.entries(st.agentTurn).filter(([k]) => k.startsWith('wfcall:')).map(([k, v]) => [v, k.slice(7)]).sort(); for (const [ts, id] of calls) if (ts <= firstTs) turnId = id }
       if (!turnId && firstTs) { const starts = Object.entries(st.agentTurn).filter(([k]) => k.startsWith('ts:')).map(([k, v]) => [v, k.slice(3)]).sort(); for (const [ts, id] of starts) if (ts <= firstTs) turnId = id }
       if (!turnId) continue                                                // 아직 디스패치 턴을 모름(다음 Stop 에서 재시도)
       st.agentTurn[agentId] = turnId
@@ -205,8 +217,8 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
         } else if (j.type === 'user' && Array.isArray(j.message?.content)) for (const b of j.message.content) if (b.type === 'tool_result' && b.is_error) errors++
       }
       const nameFromTu = meta.toolUseId && st.agentTurn['name:' + meta.toolUseId]
-      record(logFileFor(st.agentTurn['ts:' + turnId] || st.reqTs, 'jsonl'), { v: SCHEMA_VERSION, agent: true, id: turnId, agent_id: agentId, name: meta.name || nameFromTu || agentId.slice(0, 12), type: meta.customAgentType || meta.agentType || null, model, depth: meta.spawnDepth || 1, parent: meta.parentAgentId || null, ts_start: first ? localIso(first) : null, ts_end: last ? localIso(last) : null, wall_ms: first && last ? Math.max(0, new Date(last) - new Date(first)) : null, tokens: { ...tk, context: tk.input + tk.cache_read + tk.cache_create }, cost_usd: costUsd(tk, model), tools, errors, out_chars: outChars })
-      st.agentSeen[agentId] = { mtime: stat.mtimeMs, size: stat.size }
+      record(logFileFor(st.agentTurn['ts:' + turnId] || st.reqTs, 'jsonl'), { v: SCHEMA_VERSION, agent: true, id: turnId, agent_id: agentId, ...(wf ? { workflow: wf, ...(turnId === st.agentTurn['wf:' + wf] ? { wf_exact: true } : {}) } : {}), name: meta.name || nameFromTu || (wf && meta.description) || agentId.slice(0, 12), type: meta.customAgentType || meta.agentType || null, model, depth: meta.spawnDepth || 1, parent: meta.parentAgentId || null, ts_start: first ? localIso(first) : null, ts_end: last ? localIso(last) : null, wall_ms: first && last ? Math.max(0, new Date(last) - new Date(first)) : null, tokens: { ...tk, context: tk.input + tk.cache_read + tk.cache_create }, cost_usd: costUsd(tk, model), tools, errors, out_chars: outChars })
+      st.agentSeen[agentId] = { mtime: stat.mtimeMs, size: stat.size, ...(exact ? { exact } : {}) }
     }
   }
   const resetPart = () => Object.assign(st, emptyPart())                  // part 델타: 방출 후 누적기 초기화 (agentTurn/agentSeen/fixQueue 는 턴·세션 단위라 유지)
@@ -280,6 +292,7 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
           if ((b.name === 'Bash' || b.name === 'PowerShell') && b.input?.description) st.descriptions.push(String(b.input.description))
           if (b.name === 'Skill' && b.input?.skill) { const r = skillRes(b.input.skill); bump(st.res.skills, r, r) }
           if (b.name === 'Agent') { const n = String(b.input?.subagent_type || 'general-purpose'); bump(st.res.agents, { name: n }, { name: n }); st.agentTurn['tu:' + b.id] = `${sid}:${st.turn}`; if (b.input?.name) { st.agentTurn['name:' + b.id] = String(b.input.name); st.agentTurn['nm:' + String(b.input.name)] = `${sid}:${st.turn}` } }
+          if (b.name === 'Workflow') { const tid = `${sid}:${st.turn}`; st.agentTurn['wftu:' + b.id] = tid; st.agentTurn['wfcall:' + tid] = ts; const wf = wfOf.get(b.id); if (wf) st.agentTurn['wf:' + wf] = tid }   // 워크플로 에이전트 귀속 = Workflow 를 부른 턴
           const mr = mcpRes(b.name); if (mr) bump(st.res.mcp, mr, mr)
           const r = results.get(b.id); const ms = r ? new Date(r.ts) - new Date(ts) : null
           const tgt = /^(Read|Edit|Write|MultiEdit|NotebookEdit)$/.test(b.name) ? rel(b.input?.file_path || b.input?.notebook_path || '') : (b.name === 'Grep' || b.name === 'Glob') && b.input?.path ? rel(b.input.path) : undefined
