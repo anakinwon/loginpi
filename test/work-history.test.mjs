@@ -191,6 +191,63 @@ test('subagent transcripts are attributed to the dispatching turn by name and co
   assert.equal(aggregate(rows).total.cost_total_usd, +(rows[0].cost_usd + a[0].cost_usd).toFixed(4))
 })
 
+test('workflow agents under subagents/workflows/wf_*/ are attributed to the turn that called Workflow (not the later turn they started in), once', () => {
+  const { dir, env, transcript } = setup(); const s = sid()
+  const wfResult = (id, ms, wf) => ({ type: 'user', message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: id, content: `Workflow launched in background. Task ID: w1\nTranscript dir: C:\\x\\${s}\\subagents\\workflows\\${wf}\nScript file: y` }] }, timestamp: iso(ms) })
+  fs.writeFileSync(transcript, jsonl([
+    user('워크플로 돌려줘', 0),
+    asst([toolUse('w1', 'Workflow', { script: 'x' })], 500, { requestId: 'r1' }), wfResult('w1', 900, 'wf_abc-123'),
+    asst([{ type: 'text', text: '워크플로 시작' }], 1000, { requestId: 'r2' }),
+    user('다른 질문', 2000),                                                                          // 워크플로 실행 중 끼어든 요청
+    asst([{ type: 'text', text: '답' }], 2500, { requestId: 'r3' }),
+  ]))
+  const wfd = path.join(dir, s, 'subagents', 'workflows', 'wf_abc-123'); fs.mkdirSync(wfd, { recursive: true })
+  fs.writeFileSync(path.join(wfd, 'agent-abld1.meta.json'), JSON.stringify({ agentType: 'anakin_phase-build', description: 'build-A', workflowPhase: 'Build A', spawnDepth: 1 }))
+  fs.writeFileSync(path.join(wfd, 'agent-abld1.jsonl'), jsonl([
+    { type: 'user', isSidechain: true, message: { role: 'user', content: 'p' }, timestamp: iso(3000) },   // 시작 = 두 번째 요청 뒤
+    { type: 'assistant', isSidechain: true, requestId: 'b1', message: { model: 'claude-sonnet-5', content: [{ type: 'text', text: 'done' }], usage: { input_tokens: 1000, cache_read_input_tokens: 0, cache_creation_input_tokens: 0, output_tokens: 1000 } }, timestamp: iso(8000) },
+  ]))
+  fs.writeFileSync(path.join(wfd, 'journal.jsonl'), '{"type":"launched"}\n')
+  runLogger(env, { session_id: s, hook_event_name: 'Stop', transcript_path: transcript })
+  runLogger(env, { session_id: s, hook_event_name: 'Stop', transcript_path: transcript })            // 재실행 : 중복 귀속 없음
+  const rows = loadRows({ root: env.WORK_HISTORY_DIR }).sort((a, b) => a.turn - b.turn)
+  assert.equal(rows.length, 2)
+  assert.equal((rows[1].agents_detail || []).length, 0)
+  const a = rows[0].agents_detail; assert.ok(a && a.length === 1)
+  assert.equal(a[0].name, 'build-A'); assert.equal(a[0].type, 'anakin_phase-build'); assert.equal(a[0].workflow, 'wf_abc-123'); assert.equal(a[0].wall_ms, 5000)
+  assert.equal(a[0].wf_exact, true)                                                                 // Workflow 결과로 정확 연결 → 생성기가 시간 추정으로 옮기지 않음
+  assert.equal(a[0].cost_usd, +((1000 * 2 + 1000 * 10) / 1e6).toFixed(4))
+  assert.equal(readRecords(env).filter(r => r.agent).length, 1)                                     // 기록 변화 없으면 다시 쓰지 않음
+})
+
+test('workflow result arriving at a later Stop re-attributes an agent first placed by time estimate (D-003)', () => {
+  const { dir, env, transcript } = setup(); const s = sid()
+  const wfResult = (id, ms, wf) => ({ type: 'user', message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: id, content: `Transcript dir: C:\\x\\${s}\\subagents\\workflows\\${wf}` }] }, timestamp: iso(ms) })
+  fs.writeFileSync(transcript, jsonl([
+    user('워크플로 A', 0),
+    asst([toolUse('w1', 'Workflow', { script: 'x' })], 500, { requestId: 'r1' }),                    // 결과 미도착
+    asst([{ type: 'text', text: 'A 시작' }], 1000, { requestId: 'r2' }),
+    user('워크플로 B', 2000),
+    asst([toolUse('w2', 'Workflow', { script: 'y' })], 2500, { requestId: 'r3' }),
+    asst([{ type: 'text', text: 'B 시작' }], 2600, { requestId: 'r4' }),
+  ]))
+  const wfd = path.join(dir, s, 'subagents', 'workflows', 'wf_late-1'); fs.mkdirSync(wfd, { recursive: true })
+  fs.writeFileSync(path.join(wfd, 'agent-alate1.meta.json'), JSON.stringify({ agentType: 'anakin_phase-build', description: 'build-L' }))
+  fs.writeFileSync(path.join(wfd, 'agent-alate1.jsonl'), jsonl([
+    { type: 'user', isSidechain: true, message: { role: 'user', content: 'p' }, timestamp: iso(3000) },   // 시작 = 두 번째 Workflow 호출 뒤 → 시간 추정은 턴 2
+    { type: 'assistant', isSidechain: true, requestId: 'b1', message: { model: 'claude-sonnet-5', content: [{ type: 'text', text: 'done' }], usage: { input_tokens: 10, cache_read_input_tokens: 0, cache_creation_input_tokens: 0, output_tokens: 10 } }, timestamp: iso(4000) },
+  ]))
+  runLogger(env, { session_id: s, hook_event_name: 'Stop', transcript_path: transcript })
+  let a = readRecords(env).filter(r => r.agent); assert.equal(a.length, 1); assert.equal(a[0].id, `${s}:2`); assert.equal(a[0].wf_exact, undefined)
+  fs.appendFileSync(transcript, jsonl([wfResult('w1', 5000, 'wf_late-1'), asst([{ type: 'text', text: '보정' }], 5100, { requestId: 'r5' })]))   // 다음 Stop 에 결과 도착(에이전트 파일은 그대로)
+  runLogger(env, { session_id: s, hook_event_name: 'Stop', transcript_path: transcript })
+  a = readRecords(env).filter(r => r.agent); assert.equal(a.length, 2); assert.equal(a[1].id, `${s}:1`); assert.equal(a[1].wf_exact, true)
+  runLogger(env, { session_id: s, hook_event_name: 'Stop', transcript_path: transcript })            // 이후 변화 없으면 다시 쓰지 않음
+  assert.equal(readRecords(env).filter(r => r.agent).length, 2)
+  const rows = loadRows({ root: env.WORK_HISTORY_DIR }).sort((x, y) => x.turn - y.turn)
+  assert.equal((rows[0].agents_detail || []).length, 1); assert.equal((rows[1].agents_detail || []).length, 0)   // last-write-wins → 턴 1 로 이동, 중복 귀속 없음
+})
+
 test('continuation parts are deltas, not cumulative snapshots', () => {
   const { env, transcript } = setup(); const s = sid()
   fs.writeFileSync(transcript, jsonl([
